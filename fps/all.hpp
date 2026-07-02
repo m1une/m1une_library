@@ -5,6 +5,7 @@
 #include "convolution_ll.hpp"
 #include "floating_point_convolution.hpp"
 #include "formal_power_series.hpp"
+#include "half_gcd.hpp"
 #include "lagrange_inversion.hpp"
 #include "linear_recurrence.hpp"
 #include "multipoint_evaluation.hpp"
