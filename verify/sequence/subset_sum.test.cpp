@@ -1,4 +1,4 @@
-#define PROBLEM "https://atcoder.jp/contests/abc184/tasks/abc184_f"
+#define PROBLEM "https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=ALDS1_5_A"
 
 #include <algorithm>
 #include <cassert>
@@ -87,10 +87,17 @@ int main() {
     randomized_test();
 
     int n;
-    long long limit;
-    std::cin >> n >> limit;
+    std::cin >> n;
     std::vector<long long> values(n);
     for (long long& value : values) std::cin >> value;
 
-    std::cout << m1une::sequence::maximum_subset_sum(values, limit) << '\n';
+    int query_count;
+    std::cin >> query_count;
+    while (query_count--) {
+        long long target;
+        std::cin >> target;
+        const bool found =
+            m1une::sequence::maximum_subset_sum(values, target) == target;
+        std::cout << (found ? "yes" : "no") << '\n';
+    }
 }
