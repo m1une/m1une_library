@@ -14,6 +14,9 @@ data:
     path: fps/formal_power_series.hpp
     title: Formal Power Series
   - icon: ':heavy_check_mark:'
+    path: fps/half_gcd.hpp
+    title: Polynomial Half-GCD
+  - icon: ':heavy_check_mark:'
     path: fps/lagrange_inversion.hpp
     title: Lagrange Inversion Formula
   - icon: ':heavy_check_mark:'
@@ -414,11 +417,85 @@ data:
     \      power *= shift;\n        }\n        Fps product = left * right;\n     \
     \   Fps result(n);\n        for (int i = 0; i < n; i++) result[i] = product[n\
     \ - 1 - i] * inverse_factorial[i];\n        return result;\n    }\n};\n\n}  //\
-    \ namespace fps\n}  // namespace m1une\n\n\n#line 1 \"fps/lagrange_inversion.hpp\"\
-    \n\n\n\n#line 7 \"fps/lagrange_inversion.hpp\"\n\n#line 9 \"fps/lagrange_inversion.hpp\"\
-    \n\nnamespace m1une {\nnamespace fps {\n\ntemplate <class Mint>\nMint lagrange_inversion_coefficient(const\
-    \ FormalPowerSeries<Mint>& phi, int degree) {\n    assert(1 <= degree && uint32_t(degree)\
-    \ < Mint::mod());\n    assert(!phi.empty() && phi[0] != Mint(0));\n\n    FormalPowerSeries<Mint>\
+    \ namespace fps\n}  // namespace m1une\n\n\n#line 1 \"fps/half_gcd.hpp\"\n\n\n\
+    \n#line 7 \"fps/half_gcd.hpp\"\n\n#line 9 \"fps/half_gcd.hpp\"\n\nnamespace m1une\
+    \ {\nnamespace fps {\n\ntemplate <class Mint>\nstruct PolynomialMatrix2x2 {\n\
+    \    using Fps = FormalPowerSeries<Mint>;\n\n    Fps a00;\n    Fps a01;\n    Fps\
+    \ a10;\n    Fps a11;\n\n    static PolynomialMatrix2x2 identity() {\n        return\
+    \ PolynomialMatrix2x2{Fps(1, Mint(1)), Fps(), Fps(), Fps(1, Mint(1))};\n    }\n\
+    \n    std::pair<Fps, Fps> apply(const Fps& first, const Fps& second) const {\n\
+    \        Fps result_first = a00 * first + a01 * second;\n        Fps result_second\
+    \ = a10 * first + a11 * second;\n        result_first.shrink();\n        result_second.shrink();\n\
+    \        return std::make_pair(std::move(result_first), std::move(result_second));\n\
+    \    }\n\n    friend PolynomialMatrix2x2 operator*(const PolynomialMatrix2x2&\
+    \ lhs,\n                                          const PolynomialMatrix2x2& rhs)\
+    \ {\n        PolynomialMatrix2x2 result;\n        result.a00 = lhs.a00 * rhs.a00\
+    \ + lhs.a01 * rhs.a10;\n        result.a01 = lhs.a00 * rhs.a01 + lhs.a01 * rhs.a11;\n\
+    \        result.a10 = lhs.a10 * rhs.a00 + lhs.a11 * rhs.a10;\n        result.a11\
+    \ = lhs.a10 * rhs.a01 + lhs.a11 * rhs.a11;\n        result.a00.shrink();\n   \
+    \     result.a01.shrink();\n        result.a10.shrink();\n        result.a11.shrink();\n\
+    \        return result;\n    }\n};\n\nnamespace internal {\n\ntemplate <class\
+    \ Mint>\nvoid polynomial_euclidean_step(PolynomialMatrix2x2<Mint>& matrix,\n \
+    \                              std::pair<FormalPowerSeries<Mint>,\n          \
+    \                               FormalPowerSeries<Mint>>& values) {\n    using\
+    \ Fps = FormalPowerSeries<Mint>;\n    assert(!values.second.empty());\n\n    auto\
+    \ division = values.first.divmod(values.second);\n    Fps next_a10 = matrix.a00\
+    \ - matrix.a10 * division.first;\n    Fps next_a11 = matrix.a01 - matrix.a11 *\
+    \ division.first;\n    next_a10.shrink();\n    next_a11.shrink();\n\n    matrix.a00\
+    \ = std::move(matrix.a10);\n    matrix.a01 = std::move(matrix.a11);\n    matrix.a10\
+    \ = std::move(next_a10);\n    matrix.a11 = std::move(next_a11);\n    values.first\
+    \ = std::move(values.second);\n    values.second = std::move(division.second);\n\
+    }\n\ntemplate <class Mint>\nPolynomialMatrix2x2<Mint> half_gcd_impl(\n    std::pair<FormalPowerSeries<Mint>,\
+    \ FormalPowerSeries<Mint>> values) {\n    using Matrix = PolynomialMatrix2x2<Mint>;\n\
+    \n    const int first_size = int(values.first.size());\n    const int half_size\
+    \ = (first_size + 1) / 2;\n    if (int(values.second.size()) <= half_size) return\
+    \ Matrix::identity();\n\n    Matrix first_matrix =\n        half_gcd_impl<Mint>(std::make_pair(values.first\
+    \ >> half_size, values.second >> half_size));\n    values = first_matrix.apply(values.first,\
+    \ values.second);\n    if (int(values.second.size()) <= half_size) return first_matrix;\n\
+    \n    polynomial_euclidean_step(first_matrix, values);\n    if (int(values.second.size())\
+    \ <= half_size) return first_matrix;\n\n    const int first_degree = int(values.first.size())\
+    \ - 1;\n    const int shift = 2 * half_size - first_degree;\n    assert(shift\
+    \ >= 0);\n    values.first >>= shift;\n    values.second >>= shift;\n    return\
+    \ half_gcd_impl<Mint>(std::move(values)) * first_matrix;\n}\n\ntemplate <class\
+    \ Mint>\nPolynomialMatrix2x2<Mint> polynomial_gcd_matrix(FormalPowerSeries<Mint>\
+    \ first,\n                                                FormalPowerSeries<Mint>\
+    \ second) {\n    using Matrix = PolynomialMatrix2x2<Mint>;\n    first.shrink();\n\
+    \    second.shrink();\n\n    if (first.size() < second.size()) {\n        Matrix\
+    \ result = polynomial_gcd_matrix(std::move(second), std::move(first));\n     \
+    \   std::swap(result.a00, result.a01);\n        std::swap(result.a10, result.a11);\n\
+    \        return result;\n    }\n\n    std::pair<FormalPowerSeries<Mint>, FormalPowerSeries<Mint>>\
+    \ values(\n        std::move(first), std::move(second));\n    Matrix result =\
+    \ Matrix::identity();\n    while (true) {\n        Matrix block = half_gcd_impl<Mint>(values);\n\
+    \        values = block.apply(values.first, values.second);\n        if (values.second.empty())\
+    \ return block * result;\n\n        polynomial_euclidean_step(block, values);\n\
+    \        if (values.second.empty()) return block * result;\n        result = block\
+    \ * result;\n    }\n}\n\n}  // namespace internal\n\ntemplate <class Mint>\nPolynomialMatrix2x2<Mint>\
+    \ half_gcd(FormalPowerSeries<Mint> first,\n                                  \
+    \ FormalPowerSeries<Mint> second) {\n    first.shrink();\n    second.shrink();\n\
+    \    assert(first.size() >= second.size());\n    return internal::half_gcd_impl<Mint>(std::make_pair(std::move(first),\
+    \ std::move(second)));\n}\n\ntemplate <class Mint>\nstruct PolynomialExtendedGcdResult\
+    \ {\n    FormalPowerSeries<Mint> gcd;\n    FormalPowerSeries<Mint> x;\n    FormalPowerSeries<Mint>\
+    \ y;\n};\n\ntemplate <class Mint>\nPolynomialExtendedGcdResult<Mint> polynomial_extended_gcd(\n\
+    \    const FormalPowerSeries<Mint>& first, const FormalPowerSeries<Mint>& second)\
+    \ {\n    PolynomialMatrix2x2<Mint> matrix = internal::polynomial_gcd_matrix(first,\
+    \ second);\n    auto values = matrix.apply(first, second);\n\n    if (!values.first.empty())\
+    \ {\n        const Mint inverse_leading = values.first.back().inv();\n       \
+    \ values.first *= inverse_leading;\n        matrix.a00 *= inverse_leading;\n \
+    \       matrix.a01 *= inverse_leading;\n    }\n    return PolynomialExtendedGcdResult<Mint>{std::move(values.first),\
+    \ std::move(matrix.a00),\n                                             std::move(matrix.a01)};\n\
+    }\n\ntemplate <class Mint>\nFormalPowerSeries<Mint> polynomial_gcd(const FormalPowerSeries<Mint>&\
+    \ first,\n                                       const FormalPowerSeries<Mint>&\
+    \ second) {\n    return polynomial_extended_gcd(first, second).gcd;\n}\n\ntemplate\
+    \ <class Mint>\nstd::optional<FormalPowerSeries<Mint>> polynomial_inv_mod(\n \
+    \   const FormalPowerSeries<Mint>& polynomial, FormalPowerSeries<Mint> modulus)\
+    \ {\n    modulus.shrink();\n    assert(!modulus.empty());\n    auto result = polynomial_extended_gcd(polynomial,\
+    \ modulus);\n    if (result.gcd.size() != 1) return std::nullopt;\n    return\
+    \ result.x % modulus;\n}\n\n}  // namespace fps\n}  // namespace m1une\n\n\n#line\
+    \ 1 \"fps/lagrange_inversion.hpp\"\n\n\n\n#line 7 \"fps/lagrange_inversion.hpp\"\
+    \n\n#line 9 \"fps/lagrange_inversion.hpp\"\n\nnamespace m1une {\nnamespace fps\
+    \ {\n\ntemplate <class Mint>\nMint lagrange_inversion_coefficient(const FormalPowerSeries<Mint>&\
+    \ phi, int degree) {\n    assert(1 <= degree && uint32_t(degree) < Mint::mod());\n\
+    \    assert(!phi.empty() && phi[0] != Mint(0));\n\n    FormalPowerSeries<Mint>\
     \ power = phi.pre(degree).pow(degree, degree);\n    return power[degree - 1] /\
     \ Mint(degree);\n}\n\ntemplate <class Mint>\nMint lagrange_burmann_coefficient(const\
     \ FormalPowerSeries<Mint>& phi,\n                                  const FormalPowerSeries<Mint>&\
@@ -503,7 +580,7 @@ data:
     }\n\ntemplate <class Mint>\nFormalPowerSeries<Mint> polynomial_interpolate(const\
     \ std::vector<Mint>& points,\n                                               const\
     \ std::vector<Mint>& values) {\n    return SubproductTree<Mint>(points).interpolate(values);\n\
-    }\n\n}  // namespace fps\n}  // namespace m1une\n\n\n#line 11 \"fps/all.hpp\"\n\
+    }\n\n}  // namespace fps\n}  // namespace m1une\n\n\n#line 12 \"fps/all.hpp\"\n\
     \n\n"
   code: '#ifndef M1UNE_FPS_ALL_HPP
 
@@ -517,6 +594,8 @@ data:
     #include "floating_point_convolution.hpp"
 
     #include "formal_power_series.hpp"
+
+    #include "half_gcd.hpp"
 
     #include "lagrange_inversion.hpp"
 
@@ -534,13 +613,14 @@ data:
   - fps/convolution_ll.hpp
   - fps/floating_point_convolution.hpp
   - fps/formal_power_series.hpp
+  - fps/half_gcd.hpp
   - fps/lagrange_inversion.hpp
   - fps/linear_recurrence.hpp
   - fps/multipoint_evaluation.hpp
   isVerificationFile: false
   path: fps/all.hpp
   requiredBy: []
-  timestamp: '2026-07-01 22:52:49+09:00'
+  timestamp: '2026-07-03 01:27:57+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/fps/fps_algorithms.test.cpp
@@ -561,6 +641,7 @@ title: Formal Power Series All
 | `fps/convolution_ll.hpp` | Exact signed 64-bit convolution using three NTT primes. |
 | `fps/floating_point_convolution.hpp` | FFT convolution for real, complex, and rounded integral coefficients. |
 | `fps/formal_power_series.hpp` | Formal power series operations and polynomial utilities. |
+| `fps/half_gcd.hpp` | Fast half-GCD, polynomial GCD, extended GCD, and modular inverse. |
 | `fps/lagrange_inversion.hpp` | Coefficients from the Lagrange inversion and Lagrange-Bürmann formulas. |
 | `fps/linear_recurrence.hpp` | Berlekamp-Massey and linear-recurrence term evaluation. |
 | `fps/multipoint_evaluation.hpp` | Multipoint evaluation and polynomial interpolation. |

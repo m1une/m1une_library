@@ -5,97 +5,44 @@ data:
     path: fps/convolution.hpp
     title: Convolution
   - icon: ':heavy_check_mark:'
+    path: fps/formal_power_series.hpp
+    title: Formal Power Series
+  - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
   _extendedRequiredBy:
   - icon: ':heavy_check_mark:'
     path: fps/all.hpp
     title: Formal Power Series All
-  - icon: ':heavy_check_mark:'
-    path: fps/half_gcd.hpp
-    title: Polynomial Half-GCD
-  - icon: ':heavy_check_mark:'
-    path: fps/lagrange_inversion.hpp
-    title: Lagrange Inversion Formula
-  - icon: ':heavy_check_mark:'
-    path: fps/linear_recurrence.hpp
-    title: Linear Recurrence and Bostan-Mori
-  - icon: ':heavy_check_mark:'
-    path: fps/multipoint_evaluation.hpp
-    title: Multipoint Evaluation and Interpolation
-  - icon: ':heavy_check_mark:'
-    path: math/all.hpp
-    title: Math All
-  - icon: ':heavy_check_mark:'
-    path: math/combinatorial_sequences.hpp
-    title: Combinatorial Sequences
   _extendedVerifiedWith:
-  - icon: ':heavy_check_mark:'
-    path: verify/fps/exp_of_formal_power_series.test.cpp
-    title: verify/fps/exp_of_formal_power_series.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/fps/fps_algorithms.test.cpp
     title: verify/fps/fps_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/fps/half_gcd.test.cpp
     title: verify/fps/half_gcd.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/fps/inv_of_formal_power_series.test.cpp
-    title: verify/fps/inv_of_formal_power_series.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
-    title: verify/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/fps/lagrange_inversion.test.cpp
-    title: verify/fps/lagrange_inversion.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/fps/multipoint_evaluation.test.cpp
-    title: verify/fps/multipoint_evaluation.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/fps/polynomial_interpolation.test.cpp
-    title: verify/fps/polynomial_interpolation.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/fps/polynomial_taylor_shift.test.cpp
-    title: verify/fps/polynomial_taylor_shift.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/fps/pow_of_formal_power_series.test.cpp
-    title: verify/fps/pow_of_formal_power_series.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/math/bell_number.test.cpp
-    title: verify/math/bell_number.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/math/bernoulli_number.test.cpp
-    title: verify/math/bernoulli_number.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/math/math_algorithms.test.cpp
-    title: verify/math/math_algorithms.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/math/partition_function.test.cpp
-    title: verify/math/partition_function.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/math/stirling_number_of_the_second_kind.test.cpp
-    title: verify/math/stirling_number_of_the_second_kind.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"fps/formal_power_series.hpp\"\n\n\n\n#include <algorithm>\n\
-    #include <cassert>\n#include <cstdint>\n#include <optional>\n#include <utility>\n\
-    #include <vector>\n\n#line 1 \"fps/convolution.hpp\"\n\n\n\n#line 5 \"fps/convolution.hpp\"\
-    \n#include <array>\n#line 10 \"fps/convolution.hpp\"\n\n#line 1 \"math/modint.hpp\"\
-    \n\n\n\n#line 5 \"math/modint.hpp\"\n#include <iostream>\n#include <type_traits>\n\
-    #line 8 \"math/modint.hpp\"\n\nnamespace m1une {\nnamespace math {\n\ntemplate\
-    \ <uint32_t Modulus>\nstruct ModInt {\n    static_assert(0 < Modulus, \"Modulus\
-    \ must be positive\");\n\n   private:\n    uint32_t _v;\n\n   public:\n    static\
-    \ constexpr uint32_t mod() {\n        return Modulus;\n    }\n\n    static constexpr\
-    \ ModInt raw(uint32_t v) noexcept {\n        ModInt x;\n        x._v = v;\n  \
-    \      return x;\n    }\n\n    constexpr ModInt() noexcept : _v(0) {}\n\n    template\
-    \ <class Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>\n  \
-    \  constexpr ModInt(Integer v) noexcept {\n        if constexpr (std::is_signed_v<Integer>)\
-    \ {\n            int64_t x = static_cast<int64_t>(v) % static_cast<int64_t>(Modulus);\n\
-    \            if (x < 0) x += Modulus;\n            _v = static_cast<uint32_t>(x);\n\
-    \        } else {\n            _v = static_cast<uint32_t>(static_cast<uint64_t>(v)\
+  bundledCode: "#line 1 \"fps/half_gcd.hpp\"\n\n\n\n#include <cassert>\n#include <optional>\n\
+    #include <utility>\n\n#line 1 \"fps/formal_power_series.hpp\"\n\n\n\n#include\
+    \ <algorithm>\n#line 6 \"fps/formal_power_series.hpp\"\n#include <cstdint>\n#line\
+    \ 9 \"fps/formal_power_series.hpp\"\n#include <vector>\n\n#line 1 \"fps/convolution.hpp\"\
+    \n\n\n\n#line 5 \"fps/convolution.hpp\"\n#include <array>\n#line 10 \"fps/convolution.hpp\"\
+    \n\n#line 1 \"math/modint.hpp\"\n\n\n\n#line 5 \"math/modint.hpp\"\n#include <iostream>\n\
+    #include <type_traits>\n#line 8 \"math/modint.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ math {\n\ntemplate <uint32_t Modulus>\nstruct ModInt {\n    static_assert(0\
+    \ < Modulus, \"Modulus must be positive\");\n\n   private:\n    uint32_t _v;\n\
+    \n   public:\n    static constexpr uint32_t mod() {\n        return Modulus;\n\
+    \    }\n\n    static constexpr ModInt raw(uint32_t v) noexcept {\n        ModInt\
+    \ x;\n        x._v = v;\n        return x;\n    }\n\n    constexpr ModInt() noexcept\
+    \ : _v(0) {}\n\n    template <class Integer, std::enable_if_t<std::is_integral_v<Integer>,\
+    \ int> = 0>\n    constexpr ModInt(Integer v) noexcept {\n        if constexpr\
+    \ (std::is_signed_v<Integer>) {\n            int64_t x = static_cast<int64_t>(v)\
+    \ % static_cast<int64_t>(Modulus);\n            if (x < 0) x += Modulus;\n   \
+    \         _v = static_cast<uint32_t>(x);\n        } else {\n            _v = static_cast<uint32_t>(static_cast<uint64_t>(v)\
     \ % Modulus);\n        }\n    }\n\n    constexpr uint32_t val() const noexcept\
     \ {\n        return _v;\n    }\n\n    constexpr ModInt& operator++() noexcept\
     \ {\n        _v++;\n        if (_v == Modulus) _v = 0;\n        return *this;\n\
@@ -361,268 +308,276 @@ data:
     \      power *= shift;\n        }\n        Fps product = left * right;\n     \
     \   Fps result(n);\n        for (int i = 0; i < n; i++) result[i] = product[n\
     \ - 1 - i] * inverse_factorial[i];\n        return result;\n    }\n};\n\n}  //\
-    \ namespace fps\n}  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_FPS_FORMAL_POWER_SERIES_HPP\n#define M1UNE_FPS_FORMAL_POWER_SERIES_HPP\
-    \ 1\n\n#include <algorithm>\n#include <cassert>\n#include <cstdint>\n#include\
-    \ <optional>\n#include <utility>\n#include <vector>\n\n#include \"convolution.hpp\"\
-    \n\nnamespace m1une {\nnamespace fps {\n\nnamespace internal {\n\ntemplate <class\
-    \ Mint>\nstd::optional<Mint> modular_square_root(Mint value) {\n    const uint32_t\
-    \ mod = Mint::mod();\n    if (value == Mint(0)) return Mint(0);\n    if (mod ==\
-    \ 2) return value;\n    if (value.pow((mod - 1) / 2) != Mint(1)) return std::nullopt;\n\
-    \    if (mod % 4 == 3) return value.pow((mod + 1) / 4);\n\n    uint32_t q = mod\
-    \ - 1;\n    int s = 0;\n    while ((q & 1) == 0) {\n        q >>= 1;\n       \
-    \ s++;\n    }\n\n    Mint z = 2;\n    while (z.pow((mod - 1) / 2) == Mint(1))\
-    \ ++z;\n    Mint c = z.pow(q);\n    Mint x = value.pow((q + 1) / 2);\n    Mint\
-    \ t = value.pow(q);\n    int m = s;\n    while (t != Mint(1)) {\n        int i\
-    \ = 1;\n        Mint squared = t * t;\n        while (squared != Mint(1)) {\n\
-    \            squared *= squared;\n            i++;\n        }\n        Mint b\
-    \ = c.pow(uint64_t(1) << (m - i - 1));\n        x *= b;\n        c = b * b;\n\
-    \        t *= c;\n        m = i;\n    }\n    return x;\n}\n\n}  // namespace internal\n\
-    \ntemplate <class Mint>\nstruct FormalPowerSeries : std::vector<Mint> {\n    using\
-    \ std::vector<Mint>::vector;\n    using Fps = FormalPowerSeries;\n\n    FormalPowerSeries()\
-    \ = default;\n    FormalPowerSeries(const std::vector<Mint>& values) : std::vector<Mint>(values)\
-    \ {}\n    FormalPowerSeries(std::vector<Mint>&& values) : std::vector<Mint>(std::move(values))\
-    \ {}\n\n    Fps& shrink() {\n        while (!this->empty() && this->back() ==\
-    \ Mint(0)) this->pop_back();\n        return *this;\n    }\n\n    Fps pre(int\
-    \ degree) const {\n        assert(degree >= 0);\n        Fps result(this->begin(),\
-    \ this->begin() + std::min<int>(degree, this->size()));\n        result.resize(degree);\n\
-    \        return result;\n    }\n\n    Fps reversed(int size = -1) const {\n  \
-    \      Fps result = *this;\n        if (size >= 0) result.resize(size);\n    \
-    \    std::reverse(result.begin(), result.end());\n        return result;\n   \
-    \ }\n\n    Fps& operator+=(const Fps& rhs) {\n        if (this->size() < rhs.size())\
-    \ this->resize(rhs.size());\n        for (int i = 0; i < int(rhs.size()); i++)\
-    \ (*this)[i] += rhs[i];\n        return *this;\n    }\n\n    Fps& operator-=(const\
-    \ Fps& rhs) {\n        if (this->size() < rhs.size()) this->resize(rhs.size());\n\
-    \        for (int i = 0; i < int(rhs.size()); i++) (*this)[i] -= rhs[i];\n   \
-    \     return *this;\n    }\n\n    Fps& operator*=(const Fps& rhs) {\n        std::vector<Mint>\
-    \ lhs(this->begin(), this->end());\n        *this = convolution(lhs, rhs);\n \
-    \       return *this;\n    }\n\n    Fps& operator*=(Mint rhs) {\n        for (Mint&\
-    \ value : *this) value *= rhs;\n        return *this;\n    }\n\n    Fps& operator/=(Mint\
-    \ rhs) {\n        return *this *= rhs.inv();\n    }\n\n    Fps& operator<<=(int\
-    \ shift) {\n        assert(shift >= 0);\n        this->insert(this->begin(), shift,\
-    \ Mint(0));\n        return *this;\n    }\n\n    Fps& operator>>=(int shift) {\n\
-    \        assert(shift >= 0);\n        if (shift >= int(this->size())) {\n    \
-    \        this->clear();\n        } else {\n            this->erase(this->begin(),\
-    \ this->begin() + shift);\n        }\n        return *this;\n    }\n\n    Fps\
-    \ operator+() const {\n        return *this;\n    }\n\n    Fps operator-() const\
-    \ {\n        Fps result = *this;\n        for (Mint& value : result) value = Mint(0)\
-    \ - value;\n        return result;\n    }\n\n    friend Fps operator+(Fps lhs,\
-    \ const Fps& rhs) {\n        return lhs += rhs;\n    }\n\n    friend Fps operator-(Fps\
-    \ lhs, const Fps& rhs) {\n        return lhs -= rhs;\n    }\n\n    friend Fps\
-    \ operator*(Fps lhs, const Fps& rhs) {\n        return lhs *= rhs;\n    }\n\n\
-    \    friend Fps operator*(Fps lhs, Mint rhs) {\n        return lhs *= rhs;\n \
-    \   }\n\n    friend Fps operator*(Mint lhs, Fps rhs) {\n        return rhs *=\
-    \ lhs;\n    }\n\n    friend Fps operator/(Fps lhs, Mint rhs) {\n        return\
-    \ lhs /= rhs;\n    }\n\n    friend Fps operator<<(Fps lhs, int shift) {\n    \
-    \    return lhs <<= shift;\n    }\n\n    friend Fps operator>>(Fps lhs, int shift)\
-    \ {\n        return lhs >>= shift;\n    }\n\n    Fps derivative() const {\n  \
-    \      if (this->empty()) return {};\n        Fps result(this->size() - 1);\n\
-    \        for (int i = 1; i < int(this->size()); i++) result[i - 1] = (*this)[i]\
-    \ * Mint(i);\n        return result;\n    }\n\n    Fps integral() const {\n  \
-    \      Fps result(this->size() + 1);\n        if (this->empty()) return result;\n\
-    \        assert(this->size() < Mint::mod());\n\n        std::vector<Mint> inverse(this->size()\
-    \ + 1);\n        inverse[1] = 1;\n        for (int i = 2; i <= int(this->size());\
-    \ i++) {\n            inverse[i] = Mint(0) - Mint(Mint::mod() / uint32_t(i)) *\
-    \ inverse[Mint::mod() % uint32_t(i)];\n        }\n        for (int i = 0; i <\
-    \ int(this->size()); i++) result[i + 1] = (*this)[i] * inverse[i + 1];\n     \
-    \   return result;\n    }\n\n    Mint evaluate(Mint x) const {\n        Mint result\
-    \ = 0;\n        for (auto it = this->rbegin(); it != this->rend(); ++it) result\
-    \ = result * x + *it;\n        return result;\n    }\n\n    Fps inv(int degree\
-    \ = -1) const {\n        if (degree < 0) degree = int(this->size());\n       \
-    \ assert(degree >= 0);\n        if (degree == 0) return {};\n        assert(!this->empty()\
-    \ && (*this)[0] != Mint(0));\n\n        Fps result(1, (*this)[0].inv());\n   \
-    \     for (int size = 1; size < degree; size <<= 1) {\n            const int next_size\
-    \ = std::min(size << 1, degree);\n            Fps product = this->pre(next_size)\
-    \ * result;\n            product.resize(next_size);\n            for (Mint& value\
-    \ : product) value = Mint(0) - value;\n            product[0] += Mint(2);\n  \
-    \          result = (result * product).pre(next_size);\n        }\n        return\
-    \ result.pre(degree);\n    }\n\n    Fps log(int degree = -1) const {\n       \
-    \ if (degree < 0) degree = int(this->size());\n        assert(degree >= 0);\n\
-    \        if (degree == 0) return {};\n        assert(!this->empty() && (*this)[0]\
-    \ == Mint(1));\n        return (derivative() * inv(degree)).pre(degree - 1).integral();\n\
-    \    }\n\n    Fps exp(int degree = -1) const {\n        if (degree < 0) degree\
-    \ = int(this->size());\n        assert(degree >= 0);\n        if (degree == 0)\
-    \ return {};\n        assert(this->empty() || (*this)[0] == Mint(0));\n\n    \
-    \    Fps result(1, Mint(1));\n        for (int size = 1; size < degree; size <<=\
-    \ 1) {\n            const int next_size = std::min(size << 1, degree);\n     \
-    \       Fps correction = this->pre(next_size) - result.log(next_size);\n     \
-    \       correction[0] += Mint(1);\n            result = (result * correction).pre(next_size);\n\
-    \        }\n        return result.pre(degree);\n    }\n\n    Fps pow(long long\
-    \ exponent, int degree = -1) const {\n        if (degree < 0) degree = int(this->size());\n\
-    \        assert(exponent >= 0 && degree >= 0);\n        if (degree == 0) return\
-    \ {};\n        if (exponent == 0) {\n            Fps result(degree);\n       \
-    \     result[0] = 1;\n            return result;\n        }\n\n        int first\
-    \ = 0;\n        while (first < int(this->size()) && (*this)[first] == Mint(0))\
-    \ first++;\n        if (first == int(this->size()) || first > (degree - 1) / exponent)\
-    \ return Fps(degree);\n\n        const int shift = int(first * exponent);\n  \
-    \      const Mint leading = (*this)[first];\n        Fps normalized = (*this >>\
-    \ first) / leading;\n        Fps result = (normalized.log(degree - shift) * Mint(exponent)).exp(degree\
-    \ - shift);\n        result *= leading.pow(exponent);\n        result <<= shift;\n\
-    \        result.resize(degree);\n        return result;\n    }\n\n    std::optional<Fps>\
-    \ sqrt(int degree = -1) const {\n        if (degree < 0) degree = int(this->size());\n\
-    \        assert(degree >= 0);\n        if (degree == 0) return Fps();\n\n    \
-    \    int first = 0;\n        while (first < int(this->size()) && (*this)[first]\
-    \ == Mint(0)) first++;\n        if (first == int(this->size())) return Fps(degree);\n\
-    \        if (first >= degree) return Fps(degree);\n        if (first & 1) return\
-    \ std::nullopt;\n\n        const int shift = first / 2;\n        auto leading_root\
-    \ = internal::modular_square_root((*this)[first]);\n        if (!leading_root.has_value())\
-    \ return std::nullopt;\n\n        const int result_degree = degree - shift;\n\
-    \        Fps normalized = (*this >> first) / (*this)[first];\n        Fps result\
-    \ = (normalized.log(result_degree) / Mint(2)).exp(result_degree);\n        result\
-    \ *= *leading_root;\n        result <<= shift;\n        result.resize(degree);\n\
-    \        return result;\n    }\n\n    std::pair<Fps, Fps> divmod(const Fps& divisor)\
-    \ const {\n        Fps dividend = *this;\n        Fps normalized_divisor = divisor;\n\
-    \        dividend.shrink();\n        normalized_divisor.shrink();\n        assert(!normalized_divisor.empty());\n\
-    \n        if (dividend.size() < normalized_divisor.size()) return std::make_pair(Fps(),\
-    \ dividend);\n        const int quotient_size = int(dividend.size() - normalized_divisor.size()\
-    \ + 1);\n        Fps quotient =\n            (dividend.reversed().pre(quotient_size)\
-    \ * normalized_divisor.reversed().inv(quotient_size))\n                .pre(quotient_size)\n\
-    \                .reversed();\n        quotient.shrink();\n        Fps remainder\
-    \ = dividend - normalized_divisor * quotient;\n        remainder.resize(normalized_divisor.size()\
-    \ - 1);\n        remainder.shrink();\n        return std::make_pair(std::move(quotient),\
-    \ std::move(remainder));\n    }\n\n    Fps& operator/=(const Fps& rhs) {\n   \
-    \     *this = divmod(rhs).first;\n        return *this;\n    }\n\n    Fps& operator%=(const\
-    \ Fps& rhs) {\n        *this = divmod(rhs).second;\n        return *this;\n  \
-    \  }\n\n    friend Fps operator/(Fps lhs, const Fps& rhs) {\n        return lhs\
-    \ /= rhs;\n    }\n\n    friend Fps operator%(Fps lhs, const Fps& rhs) {\n    \
-    \    return lhs %= rhs;\n    }\n\n    Fps taylor_shift(Mint shift) const {\n \
-    \       const int n = int(this->size());\n        if (n == 0) return {};\n   \
-    \     assert(uint32_t(n) < Mint::mod());\n\n        std::vector<Mint> factorial(n,\
-    \ Mint(1));\n        std::vector<Mint> inverse_factorial(n, Mint(1));\n      \
-    \  for (int i = 1; i < n; i++) factorial[i] = factorial[i - 1] * Mint(i);\n  \
-    \      inverse_factorial[n - 1] = factorial[n - 1].inv();\n        for (int i\
-    \ = n - 1; i > 0; i--) inverse_factorial[i - 1] = inverse_factorial[i] * Mint(i);\n\
-    \n        Fps left(n);\n        Fps right(n);\n        Mint power = 1;\n     \
-    \   for (int i = 0; i < n; i++) {\n            left[n - 1 - i] = (*this)[i] *\
-    \ factorial[i];\n            right[i] = power * inverse_factorial[i];\n      \
-    \      power *= shift;\n        }\n        Fps product = left * right;\n     \
-    \   Fps result(n);\n        for (int i = 0; i < n; i++) result[i] = product[n\
-    \ - 1 - i] * inverse_factorial[i];\n        return result;\n    }\n};\n\n}  //\
-    \ namespace fps\n}  // namespace m1une\n\n#endif  // M1UNE_FPS_FORMAL_POWER_SERIES_HPP\n"
+    \ namespace fps\n}  // namespace m1une\n\n\n#line 9 \"fps/half_gcd.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace fps {\n\ntemplate <class Mint>\nstruct PolynomialMatrix2x2\
+    \ {\n    using Fps = FormalPowerSeries<Mint>;\n\n    Fps a00;\n    Fps a01;\n\
+    \    Fps a10;\n    Fps a11;\n\n    static PolynomialMatrix2x2 identity() {\n \
+    \       return PolynomialMatrix2x2{Fps(1, Mint(1)), Fps(), Fps(), Fps(1, Mint(1))};\n\
+    \    }\n\n    std::pair<Fps, Fps> apply(const Fps& first, const Fps& second) const\
+    \ {\n        Fps result_first = a00 * first + a01 * second;\n        Fps result_second\
+    \ = a10 * first + a11 * second;\n        result_first.shrink();\n        result_second.shrink();\n\
+    \        return std::make_pair(std::move(result_first), std::move(result_second));\n\
+    \    }\n\n    friend PolynomialMatrix2x2 operator*(const PolynomialMatrix2x2&\
+    \ lhs,\n                                          const PolynomialMatrix2x2& rhs)\
+    \ {\n        PolynomialMatrix2x2 result;\n        result.a00 = lhs.a00 * rhs.a00\
+    \ + lhs.a01 * rhs.a10;\n        result.a01 = lhs.a00 * rhs.a01 + lhs.a01 * rhs.a11;\n\
+    \        result.a10 = lhs.a10 * rhs.a00 + lhs.a11 * rhs.a10;\n        result.a11\
+    \ = lhs.a10 * rhs.a01 + lhs.a11 * rhs.a11;\n        result.a00.shrink();\n   \
+    \     result.a01.shrink();\n        result.a10.shrink();\n        result.a11.shrink();\n\
+    \        return result;\n    }\n};\n\nnamespace internal {\n\ntemplate <class\
+    \ Mint>\nvoid polynomial_euclidean_step(PolynomialMatrix2x2<Mint>& matrix,\n \
+    \                              std::pair<FormalPowerSeries<Mint>,\n          \
+    \                               FormalPowerSeries<Mint>>& values) {\n    using\
+    \ Fps = FormalPowerSeries<Mint>;\n    assert(!values.second.empty());\n\n    auto\
+    \ division = values.first.divmod(values.second);\n    Fps next_a10 = matrix.a00\
+    \ - matrix.a10 * division.first;\n    Fps next_a11 = matrix.a01 - matrix.a11 *\
+    \ division.first;\n    next_a10.shrink();\n    next_a11.shrink();\n\n    matrix.a00\
+    \ = std::move(matrix.a10);\n    matrix.a01 = std::move(matrix.a11);\n    matrix.a10\
+    \ = std::move(next_a10);\n    matrix.a11 = std::move(next_a11);\n    values.first\
+    \ = std::move(values.second);\n    values.second = std::move(division.second);\n\
+    }\n\ntemplate <class Mint>\nPolynomialMatrix2x2<Mint> half_gcd_impl(\n    std::pair<FormalPowerSeries<Mint>,\
+    \ FormalPowerSeries<Mint>> values) {\n    using Matrix = PolynomialMatrix2x2<Mint>;\n\
+    \n    const int first_size = int(values.first.size());\n    const int half_size\
+    \ = (first_size + 1) / 2;\n    if (int(values.second.size()) <= half_size) return\
+    \ Matrix::identity();\n\n    Matrix first_matrix =\n        half_gcd_impl<Mint>(std::make_pair(values.first\
+    \ >> half_size, values.second >> half_size));\n    values = first_matrix.apply(values.first,\
+    \ values.second);\n    if (int(values.second.size()) <= half_size) return first_matrix;\n\
+    \n    polynomial_euclidean_step(first_matrix, values);\n    if (int(values.second.size())\
+    \ <= half_size) return first_matrix;\n\n    const int first_degree = int(values.first.size())\
+    \ - 1;\n    const int shift = 2 * half_size - first_degree;\n    assert(shift\
+    \ >= 0);\n    values.first >>= shift;\n    values.second >>= shift;\n    return\
+    \ half_gcd_impl<Mint>(std::move(values)) * first_matrix;\n}\n\ntemplate <class\
+    \ Mint>\nPolynomialMatrix2x2<Mint> polynomial_gcd_matrix(FormalPowerSeries<Mint>\
+    \ first,\n                                                FormalPowerSeries<Mint>\
+    \ second) {\n    using Matrix = PolynomialMatrix2x2<Mint>;\n    first.shrink();\n\
+    \    second.shrink();\n\n    if (first.size() < second.size()) {\n        Matrix\
+    \ result = polynomial_gcd_matrix(std::move(second), std::move(first));\n     \
+    \   std::swap(result.a00, result.a01);\n        std::swap(result.a10, result.a11);\n\
+    \        return result;\n    }\n\n    std::pair<FormalPowerSeries<Mint>, FormalPowerSeries<Mint>>\
+    \ values(\n        std::move(first), std::move(second));\n    Matrix result =\
+    \ Matrix::identity();\n    while (true) {\n        Matrix block = half_gcd_impl<Mint>(values);\n\
+    \        values = block.apply(values.first, values.second);\n        if (values.second.empty())\
+    \ return block * result;\n\n        polynomial_euclidean_step(block, values);\n\
+    \        if (values.second.empty()) return block * result;\n        result = block\
+    \ * result;\n    }\n}\n\n}  // namespace internal\n\ntemplate <class Mint>\nPolynomialMatrix2x2<Mint>\
+    \ half_gcd(FormalPowerSeries<Mint> first,\n                                  \
+    \ FormalPowerSeries<Mint> second) {\n    first.shrink();\n    second.shrink();\n\
+    \    assert(first.size() >= second.size());\n    return internal::half_gcd_impl<Mint>(std::make_pair(std::move(first),\
+    \ std::move(second)));\n}\n\ntemplate <class Mint>\nstruct PolynomialExtendedGcdResult\
+    \ {\n    FormalPowerSeries<Mint> gcd;\n    FormalPowerSeries<Mint> x;\n    FormalPowerSeries<Mint>\
+    \ y;\n};\n\ntemplate <class Mint>\nPolynomialExtendedGcdResult<Mint> polynomial_extended_gcd(\n\
+    \    const FormalPowerSeries<Mint>& first, const FormalPowerSeries<Mint>& second)\
+    \ {\n    PolynomialMatrix2x2<Mint> matrix = internal::polynomial_gcd_matrix(first,\
+    \ second);\n    auto values = matrix.apply(first, second);\n\n    if (!values.first.empty())\
+    \ {\n        const Mint inverse_leading = values.first.back().inv();\n       \
+    \ values.first *= inverse_leading;\n        matrix.a00 *= inverse_leading;\n \
+    \       matrix.a01 *= inverse_leading;\n    }\n    return PolynomialExtendedGcdResult<Mint>{std::move(values.first),\
+    \ std::move(matrix.a00),\n                                             std::move(matrix.a01)};\n\
+    }\n\ntemplate <class Mint>\nFormalPowerSeries<Mint> polynomial_gcd(const FormalPowerSeries<Mint>&\
+    \ first,\n                                       const FormalPowerSeries<Mint>&\
+    \ second) {\n    return polynomial_extended_gcd(first, second).gcd;\n}\n\ntemplate\
+    \ <class Mint>\nstd::optional<FormalPowerSeries<Mint>> polynomial_inv_mod(\n \
+    \   const FormalPowerSeries<Mint>& polynomial, FormalPowerSeries<Mint> modulus)\
+    \ {\n    modulus.shrink();\n    assert(!modulus.empty());\n    auto result = polynomial_extended_gcd(polynomial,\
+    \ modulus);\n    if (result.gcd.size() != 1) return std::nullopt;\n    return\
+    \ result.x % modulus;\n}\n\n}  // namespace fps\n}  // namespace m1une\n\n\n"
+  code: "#ifndef M1UNE_FPS_HALF_GCD_HPP\n#define M1UNE_FPS_HALF_GCD_HPP 1\n\n#include\
+    \ <cassert>\n#include <optional>\n#include <utility>\n\n#include \"formal_power_series.hpp\"\
+    \n\nnamespace m1une {\nnamespace fps {\n\ntemplate <class Mint>\nstruct PolynomialMatrix2x2\
+    \ {\n    using Fps = FormalPowerSeries<Mint>;\n\n    Fps a00;\n    Fps a01;\n\
+    \    Fps a10;\n    Fps a11;\n\n    static PolynomialMatrix2x2 identity() {\n \
+    \       return PolynomialMatrix2x2{Fps(1, Mint(1)), Fps(), Fps(), Fps(1, Mint(1))};\n\
+    \    }\n\n    std::pair<Fps, Fps> apply(const Fps& first, const Fps& second) const\
+    \ {\n        Fps result_first = a00 * first + a01 * second;\n        Fps result_second\
+    \ = a10 * first + a11 * second;\n        result_first.shrink();\n        result_second.shrink();\n\
+    \        return std::make_pair(std::move(result_first), std::move(result_second));\n\
+    \    }\n\n    friend PolynomialMatrix2x2 operator*(const PolynomialMatrix2x2&\
+    \ lhs,\n                                          const PolynomialMatrix2x2& rhs)\
+    \ {\n        PolynomialMatrix2x2 result;\n        result.a00 = lhs.a00 * rhs.a00\
+    \ + lhs.a01 * rhs.a10;\n        result.a01 = lhs.a00 * rhs.a01 + lhs.a01 * rhs.a11;\n\
+    \        result.a10 = lhs.a10 * rhs.a00 + lhs.a11 * rhs.a10;\n        result.a11\
+    \ = lhs.a10 * rhs.a01 + lhs.a11 * rhs.a11;\n        result.a00.shrink();\n   \
+    \     result.a01.shrink();\n        result.a10.shrink();\n        result.a11.shrink();\n\
+    \        return result;\n    }\n};\n\nnamespace internal {\n\ntemplate <class\
+    \ Mint>\nvoid polynomial_euclidean_step(PolynomialMatrix2x2<Mint>& matrix,\n \
+    \                              std::pair<FormalPowerSeries<Mint>,\n          \
+    \                               FormalPowerSeries<Mint>>& values) {\n    using\
+    \ Fps = FormalPowerSeries<Mint>;\n    assert(!values.second.empty());\n\n    auto\
+    \ division = values.first.divmod(values.second);\n    Fps next_a10 = matrix.a00\
+    \ - matrix.a10 * division.first;\n    Fps next_a11 = matrix.a01 - matrix.a11 *\
+    \ division.first;\n    next_a10.shrink();\n    next_a11.shrink();\n\n    matrix.a00\
+    \ = std::move(matrix.a10);\n    matrix.a01 = std::move(matrix.a11);\n    matrix.a10\
+    \ = std::move(next_a10);\n    matrix.a11 = std::move(next_a11);\n    values.first\
+    \ = std::move(values.second);\n    values.second = std::move(division.second);\n\
+    }\n\ntemplate <class Mint>\nPolynomialMatrix2x2<Mint> half_gcd_impl(\n    std::pair<FormalPowerSeries<Mint>,\
+    \ FormalPowerSeries<Mint>> values) {\n    using Matrix = PolynomialMatrix2x2<Mint>;\n\
+    \n    const int first_size = int(values.first.size());\n    const int half_size\
+    \ = (first_size + 1) / 2;\n    if (int(values.second.size()) <= half_size) return\
+    \ Matrix::identity();\n\n    Matrix first_matrix =\n        half_gcd_impl<Mint>(std::make_pair(values.first\
+    \ >> half_size, values.second >> half_size));\n    values = first_matrix.apply(values.first,\
+    \ values.second);\n    if (int(values.second.size()) <= half_size) return first_matrix;\n\
+    \n    polynomial_euclidean_step(first_matrix, values);\n    if (int(values.second.size())\
+    \ <= half_size) return first_matrix;\n\n    const int first_degree = int(values.first.size())\
+    \ - 1;\n    const int shift = 2 * half_size - first_degree;\n    assert(shift\
+    \ >= 0);\n    values.first >>= shift;\n    values.second >>= shift;\n    return\
+    \ half_gcd_impl<Mint>(std::move(values)) * first_matrix;\n}\n\ntemplate <class\
+    \ Mint>\nPolynomialMatrix2x2<Mint> polynomial_gcd_matrix(FormalPowerSeries<Mint>\
+    \ first,\n                                                FormalPowerSeries<Mint>\
+    \ second) {\n    using Matrix = PolynomialMatrix2x2<Mint>;\n    first.shrink();\n\
+    \    second.shrink();\n\n    if (first.size() < second.size()) {\n        Matrix\
+    \ result = polynomial_gcd_matrix(std::move(second), std::move(first));\n     \
+    \   std::swap(result.a00, result.a01);\n        std::swap(result.a10, result.a11);\n\
+    \        return result;\n    }\n\n    std::pair<FormalPowerSeries<Mint>, FormalPowerSeries<Mint>>\
+    \ values(\n        std::move(first), std::move(second));\n    Matrix result =\
+    \ Matrix::identity();\n    while (true) {\n        Matrix block = half_gcd_impl<Mint>(values);\n\
+    \        values = block.apply(values.first, values.second);\n        if (values.second.empty())\
+    \ return block * result;\n\n        polynomial_euclidean_step(block, values);\n\
+    \        if (values.second.empty()) return block * result;\n        result = block\
+    \ * result;\n    }\n}\n\n}  // namespace internal\n\ntemplate <class Mint>\nPolynomialMatrix2x2<Mint>\
+    \ half_gcd(FormalPowerSeries<Mint> first,\n                                  \
+    \ FormalPowerSeries<Mint> second) {\n    first.shrink();\n    second.shrink();\n\
+    \    assert(first.size() >= second.size());\n    return internal::half_gcd_impl<Mint>(std::make_pair(std::move(first),\
+    \ std::move(second)));\n}\n\ntemplate <class Mint>\nstruct PolynomialExtendedGcdResult\
+    \ {\n    FormalPowerSeries<Mint> gcd;\n    FormalPowerSeries<Mint> x;\n    FormalPowerSeries<Mint>\
+    \ y;\n};\n\ntemplate <class Mint>\nPolynomialExtendedGcdResult<Mint> polynomial_extended_gcd(\n\
+    \    const FormalPowerSeries<Mint>& first, const FormalPowerSeries<Mint>& second)\
+    \ {\n    PolynomialMatrix2x2<Mint> matrix = internal::polynomial_gcd_matrix(first,\
+    \ second);\n    auto values = matrix.apply(first, second);\n\n    if (!values.first.empty())\
+    \ {\n        const Mint inverse_leading = values.first.back().inv();\n       \
+    \ values.first *= inverse_leading;\n        matrix.a00 *= inverse_leading;\n \
+    \       matrix.a01 *= inverse_leading;\n    }\n    return PolynomialExtendedGcdResult<Mint>{std::move(values.first),\
+    \ std::move(matrix.a00),\n                                             std::move(matrix.a01)};\n\
+    }\n\ntemplate <class Mint>\nFormalPowerSeries<Mint> polynomial_gcd(const FormalPowerSeries<Mint>&\
+    \ first,\n                                       const FormalPowerSeries<Mint>&\
+    \ second) {\n    return polynomial_extended_gcd(first, second).gcd;\n}\n\ntemplate\
+    \ <class Mint>\nstd::optional<FormalPowerSeries<Mint>> polynomial_inv_mod(\n \
+    \   const FormalPowerSeries<Mint>& polynomial, FormalPowerSeries<Mint> modulus)\
+    \ {\n    modulus.shrink();\n    assert(!modulus.empty());\n    auto result = polynomial_extended_gcd(polynomial,\
+    \ modulus);\n    if (result.gcd.size() != 1) return std::nullopt;\n    return\
+    \ result.x % modulus;\n}\n\n}  // namespace fps\n}  // namespace m1une\n\n#endif\
+    \  // M1UNE_FPS_HALF_GCD_HPP\n"
   dependsOn:
+  - fps/formal_power_series.hpp
   - fps/convolution.hpp
   - math/modint.hpp
   isVerificationFile: false
-  path: fps/formal_power_series.hpp
+  path: fps/half_gcd.hpp
   requiredBy:
-  - math/combinatorial_sequences.hpp
-  - math/all.hpp
-  - fps/half_gcd.hpp
   - fps/all.hpp
-  - fps/lagrange_inversion.hpp
-  - fps/multipoint_evaluation.hpp
-  - fps/linear_recurrence.hpp
-  timestamp: '2026-07-01 22:52:49+09:00'
+  timestamp: '2026-07-03 01:27:57+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/bell_number.test.cpp
-  - verify/math/partition_function.test.cpp
-  - verify/math/math_algorithms.test.cpp
-  - verify/math/stirling_number_of_the_second_kind.test.cpp
-  - verify/math/bernoulli_number.test.cpp
-  - verify/fps/inv_of_formal_power_series.test.cpp
   - verify/fps/half_gcd.test.cpp
-  - verify/fps/pow_of_formal_power_series.test.cpp
-  - verify/fps/polynomial_interpolation.test.cpp
-  - verify/fps/exp_of_formal_power_series.test.cpp
-  - verify/fps/multipoint_evaluation.test.cpp
-  - verify/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
-  - verify/fps/polynomial_taylor_shift.test.cpp
-  - verify/fps/lagrange_inversion.test.cpp
   - verify/fps/fps_algorithms.test.cpp
-documentation_of: fps/formal_power_series.hpp
+documentation_of: fps/half_gcd.hpp
 layout: document
-title: Formal Power Series
+title: Polynomial Half-GCD
 ---
 
 ## Overview
 
-`FormalPowerSeries<Mint>` is a vector-like polynomial and formal power
-series type. Coefficients are stored from the constant term upward.
+This header accelerates the Euclidean algorithm for polynomials over a field.
+`half_gcd(a, b)` batches roughly half of the remaining Euclidean steps into a
+unimodular polynomial matrix. The same machinery provides a monic polynomial
+GCD, Bézout coefficients, and inversion modulo a polynomial.
 
-It provides the operations most often needed in polynomial problems:
+Coefficients are stored from the constant term upward. Trailing zero
+coefficients are ignored by every public algorithm.
 
-* addition, subtraction, scalar multiplication, and fast multiplication;
-* multiplication or division by a power of `x`;
-* derivative, integral, and point evaluation;
-* formal inverse, logarithm, exponential, integer power, and square root;
-* polynomial quotient and remainder;
-* Taylor shift from `f(x)` to `f(x + c)`.
+## Requirements
 
-## Type
+`Mint` must represent a field and provide the interface expected by
+`FormalPowerSeries<Mint>`, including `inv()`. The supplied static modular
+integer types meet this requirement when their modulus is prime.
+
+For `half_gcd(first, second)`, the normalized degree of `first` must be at least
+the normalized degree of `second`. The returned matrix `M` combines several
+consecutive steps from the beginning of the polynomial Euclidean algorithm:
+
+\[
+(c,d)^T = M (first,second)^T, \qquad \gcd(c,d)=\gcd(first,second).
+\]
+
+The recursion chooses the block from the high halves of the inputs. If the
+second input is already below the half-size boundary, the result is the
+identity; otherwise the block strictly decreases its degree. This convention
+lets the full GCD routine alternate half-GCD blocks with single Euclidean steps.
+
+## Public Interface
+
+Let `Fps` denote `FormalPowerSeries<Mint>`.
 
 ```cpp
 template <class Mint>
-struct FormalPowerSeries : std::vector<Mint>;
+struct PolynomialMatrix2x2 {
+    Fps a00, a01, a10, a11;
+
+    static PolynomialMatrix2x2 identity();
+    std::pair<Fps, Fps> apply(const Fps& first, const Fps& second) const;
+    friend PolynomialMatrix2x2 operator*(
+        const PolynomialMatrix2x2& lhs, const PolynomialMatrix2x2& rhs);
+};
+
+template <class Mint>
+PolynomialMatrix2x2<Mint> half_gcd(Fps first, Fps second);
+
+template <class Mint>
+struct PolynomialExtendedGcdResult {
+    Fps gcd, x, y;
+};
+
+template <class Mint>
+PolynomialExtendedGcdResult<Mint> polynomial_extended_gcd(
+    const Fps& first, const Fps& second);
+
+template <class Mint>
+Fps polynomial_gcd(const Fps& first, const Fps& second);
+
+template <class Mint>
+std::optional<Fps> polynomial_inv_mod(const Fps& polynomial, Fps modulus);
 ```
 
-`Mint` should be a static modular integer type with `mod()`, `val()`, `raw()`,
-`pow()`, and `inv()`. The supplied `math/modint.hpp` types satisfy this
-interface. Series functions assume a prime modulus, and degrees used by
-integration must be smaller than the modulus.
+## Methods
 
-## Basic Operations
+Here, `n` is the larger normalized coefficient count and `M(n)` is the cost of
+multiplying degree-`n` polynomials. With the supplied NTT convolution,
+`M(n) = O(n log n)`.
 
-Let `Fps` denote `FormalPowerSeries<Mint>`.
-Here, `n` is the number of coefficients involved in the operation.
-
-| Operation | Description | Complexity |
+| Method | Result | Complexity |
 | --- | --- | --- |
-| `f.shrink()` | Removes trailing zero coefficients. | $O(n)$ |
-| `f.pre(n)` | Returns exactly the first `n` coefficients, padding with zero. | $O(n)$ |
-| `f.reversed(n)` | Resizes to `n` when specified, then reverses coefficients. | $O(n)$ |
-| `f + g`, `f - g` | Coefficient-wise addition or subtraction. | $O(n)$ |
-| `f * g` | Polynomial convolution. | $O(n \log n)$ |
-| `f * c`, `f / c` | Scalar multiplication or division. | $O(n)$ |
-| `f << k` | Multiplies by $x^k$. | $O(n + k)$ |
-| `f >> k` | Divides by $x^k$, discarding lower terms. | $O(n)$ |
-| `f.derivative()` | Formal derivative. | $O(n)$ |
-| `f.integral()` | Formal integral with constant term zero. | $O(n)$ |
-| `f.evaluate(x)` | Evaluates by Horner's method. | $O(n)$ |
+| `PolynomialMatrix2x2::identity()` | The identity transformation. | $O(1)$ |
+| `matrix.apply(a, b)` | Applies the matrix to the polynomial pair. | $O(M(n))$ |
+| `lhs * rhs` | Composes two polynomial matrices. | $O(M(n))$ |
+| `half_gcd(a, b)` | Combines the first batch of Euclidean-algorithm steps into one matrix. | $O(M(n) \log n)$ |
+| `polynomial_extended_gcd(a, b)` | Monic `gcd` and `x`, `y` satisfying `a * x + b * y = gcd`. | $O(M(n) \log n)$ |
+| `polynomial_gcd(a, b)` | The monic GCD; returns zero only when both inputs are zero. | $O(M(n) \log n)$ |
+| `polynomial_inv_mod(f, g)` | `h` with `f * h = 1 (mod g)`, or `nullopt` when none exists. | $O(M(n) \log n)$ |
 
-## Series Functions
-
-| Method | Requirement | Result | Complexity |
-| --- | --- | --- | --- |
-| `f.inv(n)` | `f[0] != 0` | $1/f \pmod{x^n}$ | $O(n \log n)$ |
-| `f.log(n)` | `f[0] == 1` | $\log f \pmod{x^n}$ | $O(n \log n)$ |
-| `f.exp(n)` | `f[0] == 0` | $\exp f \pmod{x^n}$ | $O(n \log n)$ |
-| `f.pow(k, n)` | `k >= 0` | $f^k \pmod{x^n}$ | $O(n \log n)$ |
-| `f.sqrt(n)` | A square root exists | An optional $g$ with $g^2=f \pmod{x^n}$ | $O(n \log n)$ |
-
-When `n` is omitted, the current series size is used. `sqrt` returns
-`std::nullopt` if the leading degree is odd or its coefficient is not a
-quadratic residue.
-
-## Polynomial Operations
-
-| Method | Description | Complexity |
-| --- | --- | --- |
-| `f.divmod(g)` | Returns the quotient and remainder of polynomial division. | $O(n \log n)$ |
-| `f / g`, `f % g` | Returns only the quotient or remainder. | $O(n \log n)$ |
-| `f.taylor_shift(c)` | Returns coefficients of `f(x + c)`. | $O(n \log n)$ |
-
-The divisor must be nonzero. Taylor shift requires `f.size() < Mint::mod()`.
+`polynomial_inv_mod` requires a nonzero modulus. None of the functions mutate
+their arguments.
 
 ## Example
 
 ```cpp
-#include "fps/formal_power_series.hpp"
+#include "fps/half_gcd.hpp"
 #include "math/modint.hpp"
-#include <iostream>
 
 using mint = m1une::math::modint998244353;
 using Fps = m1une::fps::FormalPowerSeries<mint>;
 
 int main() {
-    Fps f = {1, 2, 3};
+    Fps common = {1, 1};
+    Fps a = common * Fps{2, 0, 1};
+    Fps b = common * Fps{3, 1};
 
-    Fps inverse = f.inv(5);
-    Fps logarithm = f.log(5);
-    Fps cube = f.pow(3, 7);
-    Fps shifted = f.taylor_shift(10);
+    Fps gcd = m1une::fps::polynomial_gcd(a, b);
+    auto extended = m1une::fps::polynomial_extended_gcd(a, b);
+    auto inverse = m1une::fps::polynomial_inv_mod(Fps{1, 1}, Fps{1, 0, 1});
+    Fps bezout = extended.x * a + extended.y * b;
+    bezout.shrink();
 
-    mint value = f.evaluate(4);
-    std::cout << value << "\n";
+    return gcd == common && bezout == common && inverse.has_value()
+               ? 0
+               : 1;
 }
 ```

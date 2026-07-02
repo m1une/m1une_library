@@ -15,6 +15,9 @@ data:
     path: fps/formal_power_series.hpp
     title: Formal Power Series
   - icon: ':heavy_check_mark:'
+    path: fps/half_gcd.hpp
+    title: Polynomial Half-GCD
+  - icon: ':heavy_check_mark:'
     path: fps/lagrange_inversion.hpp
     title: Lagrange Inversion Formula
   - icon: ':heavy_check_mark:'
@@ -42,6 +45,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/fps/fps_algorithms.test.cpp
     title: verify/fps/fps_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/fps/half_gcd.test.cpp
+    title: verify/fps/half_gcd.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/fps/inv_of_formal_power_series.test.cpp
     title: verify/fps/inv_of_formal_power_series.test.cpp
@@ -333,6 +339,7 @@ data:
   requiredBy:
   - math/combinatorial_sequences.hpp
   - math/all.hpp
+  - fps/half_gcd.hpp
   - fps/formal_power_series.hpp
   - fps/convolution_ll.hpp
   - fps/all.hpp
@@ -348,6 +355,7 @@ data:
   - verify/math/stirling_number_of_the_second_kind.test.cpp
   - verify/math/bernoulli_number.test.cpp
   - verify/fps/inv_of_formal_power_series.test.cpp
+  - verify/fps/half_gcd.test.cpp
   - verify/fps/pow_of_formal_power_series.test.cpp
   - verify/fps/polynomial_interpolation.test.cpp
   - verify/fps/convolution_ll.test.cpp
