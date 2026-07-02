@@ -13,5 +13,6 @@
 #include "tree.hpp"
 #include "tree_hash.hpp"
 #include "virtual_tree.hpp"
+#include "zero_one_on_tree.hpp"
 
 #endif  // M1UNE_TREE_ALL_HPP

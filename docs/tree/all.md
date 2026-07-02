@@ -25,6 +25,7 @@ existing graph library.
 | `tree/rerooting_static_top_tree.hpp` | Bidirectional static top-tree clusters for dynamic rerooting-DP solutions. |
 | `tree/centroid_decomposition.hpp` | Centroid decomposition for trees and forests. |
 | `tree/virtual_tree.hpp` | Virtual-tree compression for a selected vertex set. |
+| `tree/zero_one_on_tree.hpp` | Minimum inversions in an ancestor-respecting order of binary-labeled vertices. |
 
 ## Example
 
