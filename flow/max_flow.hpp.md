@@ -223,9 +223,97 @@ needed.
 | `get_edge` | `Edge get_edge(int i) const` | Returns the current state of original edge `i`. | $O(1)$ |
 | `edges` | `std::vector<Edge> edges() const` | Returns all original edges with current flow. | $O(M)$ |
 | `change_edge` | `void change_edge(int i, Cap new_cap, Cap new_flow)` | Replaces edge `i`'s capacity and current flow. | $O(1)$ |
-| `max_flow` | `Cap max_flow(int s, int t)` | Sends maximum flow from `s` to `t`. | General-case $O(N^2 \cdot M)$ |
-| `max_flow` | `Cap max_flow(int s, int t, Cap flow_limit)` | Sends at most `flow_limit` additional flow. | General-case $O(N^2 \cdot M)$ |
+| `max_flow` | `Cap max_flow(int s, int t)` | Sends maximum flow from `s` to `t`. | $O(N^2 M)$ in general; see below |
+| `max_flow` | `Cap max_flow(int s, int t, Cap flow_limit)` | Sends at most `flow_limit` additional flow. | $O(N^2 M)$ in general; see below |
 | `min_cut` | `std::vector<bool> min_cut(int s) const` | Returns vertices reachable from `s` in the residual graph. | $O(N + M)$ |
+
+## Time Complexity of `max_flow`
+
+Here, $N$ is the number of vertices and $M$ is the number of original edges.
+The residual graph stores two directed residual edges for each original edge,
+which changes only constant factors.
+
+Dinic's algorithm works in phases. Each phase first uses BFS to construct a
+level graph in $O(N + M)$ time, then uses DFS with current-edge pointers to
+find a blocking flow. A blocking-flow computation takes $O(NM)$ time in the
+general case. After a blocking flow is found, the shortest residual distance
+from `s` to `t` strictly increases, so there are fewer than $N$ phases. This
+gives the general bound
+
+$$
+O(N^2 M).
+$$
+
+This bound counts each `Cap` arithmetic or comparison operation as $O(1)$ and
+does not depend on the numerical size of the capacities.
+
+### Bounds for Integer Capacities
+
+When every capacity is an integer, several additional bounds hold for this
+current-edge implementation. Let $u_e$ be the capacity of edge $e$, and define
+
+$$
+\bar{u} = \frac{1}{M}\sum_e u_e,
+\qquad
+U = \max_e u_e,
+$$
+
+and
+
+$$
+\bar{c} = \frac{1}{N}\sum_v
+\min\left(\sum_{e\text{ enters }v}u_e,
+          \sum_{e\text{ leaves }v}u_e\right).
+$$
+
+If $F$ is the amount of flow still sendable from `s` to `t` in the current
+residual graph, the following are alternative upper bounds:
+
+| Condition | Complexity |
+| --- | --- |
+| Integer capacities | $O(FM)$ |
+| Average edge capacity $\bar{u}$ | $O(\bar{u}M^{3/2})$ |
+| Maximum edge capacity $U$, with no parallel edges | $O(UN^{2/3}M)$ |
+| Average vertex throughput $\bar{c}$ as defined above | $O(\bar{c}\sqrt{N}M)$ |
+
+These bounds hold at the same time as the general $O(N^2M)$ bound, so use the
+smallest applicable one. As usual, zero-capacity edges and isolated vertices
+can be omitted when applying the specialized bounds; if they are retained,
+include the $O(N+M)$ initialization and scanning cost.
+
+The $O(FM)$ bound follows because each successful augmentation increases an
+integer flow by at least one. The other bounds combine this observation with a
+small residual cut after sufficiently many level-graph phases.
+
+If every residual capacity at the start of a call has greatest common divisor
+$g$, divide the capacity-dependent quantities $F$, $\bar{u}$, $U$, and
+$\bar{c}$ by $g$ in these bounds. When using `flow_limit`, it must be scaled as
+well. Scaling all these values by $g$ does not change which paths and edges
+Dinic's algorithm processes.
+
+For unit-capacity graphs, $\bar{u}=U=1$. Combining the two edge-capacity bounds
+gives the standard result
+
+$$
+O\left(M \min\left(N^{2/3}, \sqrt{M}\right)\right).
+$$
+
+On unit networks, where every non-terminal vertex has either one incoming edge
+or one outgoing edge, $\bar{c}=O(1)$ and the bound improves further to
+$O(M\sqrt{N})$. Bipartite matching networks are a common example.
+
+For a detailed derivation of these bounds, see
+[Dinic's Algorithm and Its Time Complexity](https://misawa.github.io/others/flow/dinic_time_complexity.html).
+
+The `flow_limit` overload may stop before a complete maximum flow is found, so
+it can be faster in practice, but its general worst-case bound remains
+$O(N^2 M)$. With integer capacities, let $F_{call}$ be the amount returned by
+the call. Its flow-dependent work is $O(F_{call}M)$, and the exact bound
+including initialization and a final unsuccessful search is
+$O(N+(F_{call}+1)M)$. Here, $F_{call}$ is at most `flow_limit`. Every call
+returns only the **additional** flow sent during that call. Since the residual
+graph is preserved, calling `max_flow` again continues from the current flow
+rather than recomputing it from scratch.
 
 ## Minimum Cut
 
