@@ -1,23 +1,23 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: sequence/subset_sum.hpp
     title: Meet-in-the-Middle Subset Sum
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
-  _isVerificationFailed: true
+  _isVerificationFailed: false
   _pathExtension: cpp
-  _verificationStatusIcon: ':x:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://atcoder.jp/contests/abc184/tasks/abc184_f
+    PROBLEM: https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=ALDS1_5_A
     links:
-    - https://atcoder.jp/contests/abc184/tasks/abc184_f
+    - https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=ALDS1_5_A
   bundledCode: "#line 1 \"verify/sequence/subset_sum.test.cpp\"\n#define PROBLEM \"\
-    https://atcoder.jp/contests/abc184/tasks/abc184_f\"\n\n#include <algorithm>\n\
-    #include <cassert>\n#include <iostream>\n#include <random>\n#include <vector>\n\
-    \n#line 1 \"sequence/subset_sum.hpp\"\n\n\n\n#line 5 \"sequence/subset_sum.hpp\"\
+    https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=ALDS1_5_A\"\n\n#include\
+    \ <algorithm>\n#include <cassert>\n#include <iostream>\n#include <random>\n#include\
+    \ <vector>\n\n#line 1 \"sequence/subset_sum.hpp\"\n\n\n\n#line 5 \"sequence/subset_sum.hpp\"\
     \n#include <cstddef>\n#include <utility>\n#line 8 \"sequence/subset_sum.hpp\"\n\
     \nnamespace m1une {\nnamespace sequence {\n\nnamespace internal {\n\ntemplate\
     \ <typename T>\nstd::vector<T> enumerate_sorted_subset_sums(\n    const std::vector<T>&\
@@ -83,12 +83,14 @@ data:
     \ expected);\n\n        assert(\n            m1une::sequence::maximum_subset_sum(values,\
     \ limit) ==\n            naive_maximum_subset_sum(values, limit)\n        );\n\
     \    }\n}\n\nint main() {\n    basic_test();\n    randomized_test();\n\n    int\
-    \ n;\n    long long limit;\n    std::cin >> n >> limit;\n    std::vector<long\
-    \ long> values(n);\n    for (long long& value : values) std::cin >> value;\n\n\
-    \    std::cout << m1une::sequence::maximum_subset_sum(values, limit) << '\\n';\n\
-    }\n"
-  code: "#define PROBLEM \"https://atcoder.jp/contests/abc184/tasks/abc184_f\"\n\n\
-    #include <algorithm>\n#include <cassert>\n#include <iostream>\n#include <random>\n\
+    \ n;\n    std::cin >> n;\n    std::vector<long long> values(n);\n    for (long\
+    \ long& value : values) std::cin >> value;\n\n    int query_count;\n    std::cin\
+    \ >> query_count;\n    while (query_count--) {\n        long long target;\n  \
+    \      std::cin >> target;\n        const bool found =\n            m1une::sequence::maximum_subset_sum(values,\
+    \ target) == target;\n        std::cout << (found ? \"yes\" : \"no\") << '\\n';\n\
+    \    }\n}\n"
+  code: "#define PROBLEM \"https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=ALDS1_5_A\"\
+    \n\n#include <algorithm>\n#include <cassert>\n#include <iostream>\n#include <random>\n\
     #include <vector>\n\n#include \"../../sequence/subset_sum.hpp\"\n\nstd::vector<long\
     \ long> naive_subset_sums(const std::vector<long long>& values) {\n    std::vector<long\
     \ long> sums(1, 0);\n    for (long long value : values) {\n        const std::size_t\
@@ -124,17 +126,19 @@ data:
     \ expected);\n\n        assert(\n            m1une::sequence::maximum_subset_sum(values,\
     \ limit) ==\n            naive_maximum_subset_sum(values, limit)\n        );\n\
     \    }\n}\n\nint main() {\n    basic_test();\n    randomized_test();\n\n    int\
-    \ n;\n    long long limit;\n    std::cin >> n >> limit;\n    std::vector<long\
-    \ long> values(n);\n    for (long long& value : values) std::cin >> value;\n\n\
-    \    std::cout << m1une::sequence::maximum_subset_sum(values, limit) << '\\n';\n\
-    }\n"
+    \ n;\n    std::cin >> n;\n    std::vector<long long> values(n);\n    for (long\
+    \ long& value : values) std::cin >> value;\n\n    int query_count;\n    std::cin\
+    \ >> query_count;\n    while (query_count--) {\n        long long target;\n  \
+    \      std::cin >> target;\n        const bool found =\n            m1une::sequence::maximum_subset_sum(values,\
+    \ target) == target;\n        std::cout << (found ? \"yes\" : \"no\") << '\\n';\n\
+    \    }\n}\n"
   dependsOn:
   - sequence/subset_sum.hpp
   isVerificationFile: true
   path: verify/sequence/subset_sum.test.cpp
   requiredBy: []
-  timestamp: '2026-07-02 10:41:48+09:00'
-  verificationStatus: TEST_WRONG_ANSWER
+  timestamp: '2026-07-02 20:43:48+09:00'
+  verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/sequence/subset_sum.test.cpp
 layout: document

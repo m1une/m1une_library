@@ -3,12 +3,12 @@ data:
   _extendedDependsOn: []
   _extendedRequiredBy: []
   _extendedVerifiedWith:
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/sequence/subset_sum.test.cpp
     title: verify/sequence/subset_sum.test.cpp
-  _isVerificationFailed: true
+  _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':x:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"sequence/subset_sum.hpp\"\n\n\n\n#include <cassert>\n#include\
@@ -79,7 +79,7 @@ data:
   path: sequence/subset_sum.hpp
   requiredBy: []
   timestamp: '2026-07-02 10:41:48+09:00'
-  verificationStatus: LIBRARY_ALL_WA
+  verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/sequence/subset_sum.test.cpp
 documentation_of: sequence/subset_sum.hpp
