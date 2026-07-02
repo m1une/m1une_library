@@ -1,5 +1,5 @@
 ---
-title: Chmin Chmax Add Segment Tree
+title: Chmin Chmax Add Segment Tree Beats!
 documentation_of: ../../../ds/segtree/chmin_chmax_add_segtree.hpp
 ---
 
