@@ -4,10 +4,10 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/general_matching.hpp
     title: General Matching
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: graph/graph.hpp
     title: Graph
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: graph/graph.hpp
     title: Graph
   _extendedRequiredBy: []

@@ -4,10 +4,10 @@ data:
   - icon: ':heavy_check_mark:'
     path: ds/range_query/sparse_table.hpp
     title: Sparse Table
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: graph/graph.hpp
     title: Graph
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: graph/graph.hpp
     title: Graph
   - icon: ':heavy_check_mark:'
@@ -34,7 +34,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: tree/rerooting_static_top_tree.hpp
     title: Rerooting Static Top Tree
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: tree/rooted_tree.hpp
     title: Rooted Tree
   - icon: ':heavy_check_mark:'
@@ -52,6 +52,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: tree/virtual_tree.hpp
     title: Virtual Tree
+  - icon: ':question:'
+    path: tree/zero_one_on_tree.hpp
+    title: 01 on Tree
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
   _isVerificationFailed: false
@@ -1039,25 +1042,69 @@ data:
     \ - _lca.depth[_vertices[p]];\n                result.parent_cost[i] = _lca.dist[_vertices[i]]\
     \ - _lca.dist[_vertices[p]];\n                result.children[p].push_back(i);\n\
     \            }\n            _stack.push_back(i);\n        }\n        return result;\n\
-    \    }\n};\n\n}  // namespace tree\n}  // namespace m1une\n\n\n#line 16 \"tree/all.hpp\"\
-    \n\n\n#line 14 \"verify/tree/tree_algorithms.test.cpp\"\n\nusing m1une::graph::Graph;\n\
-    \ntemplate <class Hld>\nstd::vector<int> expand_segments(const Hld& hld, const\
-    \ std::vector<m1une::tree::HldPathSegment>& segments) {\n    std::vector<int>\
-    \ result;\n    for (auto seg : segments) {\n        if (seg.reversed) {\n    \
-    \        for (int i = seg.r - 1; i >= seg.l; i--) result.push_back(hld.order[i]);\n\
-    \        } else {\n            for (int i = seg.l; i < seg.r; i++) result.push_back(hld.order[i]);\n\
-    \        }\n    }\n    return result;\n}\n\nGraph<long long> sample_tree() {\n\
-    \    Graph<long long> g(7);\n    g.add_edge(0, 1, 3);\n    g.add_edge(0, 2, 2);\n\
-    \    g.add_edge(1, 3, 4);\n    g.add_edge(1, 4, 1);\n    g.add_edge(2, 5, 6);\n\
-    \    g.add_edge(5, 6, 2);\n    return g;\n}\n\nvoid test_rooted_tree() {\n   \
-    \ auto g = sample_tree();\n    m1une::tree::RootedTree<long long> tree(g, 0);\n\
-    \n    assert(tree.size() == 7);\n    assert(!tree.empty());\n    assert(tree.root\
-    \ == 0);\n    assert(tree.parent[0] == -1);\n    assert(tree.parent[3] == 1);\n\
-    \    assert(tree.depth[6] == 3);\n    assert(tree.dist[6] == 10);\n    assert(tree.subtree_size[0]\
-    \ == 7);\n    assert(tree.subtree_size[1] == 3);\n    assert(tree.is_ancestor(1,\
-    \ 4));\n    assert(!tree.is_ancestor(2, 4));\n    assert(tree.in_subtree(4, 1));\n\
-    \n    assert(tree.kth_ancestor(6, 0) == 6);\n    assert(tree.kth_ancestor(6, 1)\
-    \ == 5);\n    assert(tree.kth_ancestor(6, 3) == 0);\n    assert(tree.kth_ancestor(6,\
+    \    }\n};\n\n}  // namespace tree\n}  // namespace m1une\n\n\n#line 1 \"tree/zero_one_on_tree.hpp\"\
+    \n\n\n\n#line 7 \"tree/zero_one_on_tree.hpp\"\n\n#line 9 \"tree/zero_one_on_tree.hpp\"\
+    \n\nnamespace m1une {\nnamespace tree {\n\ninline long long zero_one_on_tree(const\
+    \ std::vector<int>& parent,\n                                  const std::vector<int>&\
+    \ value) {\n    const int n = int(parent.size());\n    assert(int(value.size())\
+    \ == n);\n    if (n == 0) return 0;\n\n    int root = -1;\n    std::vector<std::vector<int>>\
+    \ children(n);\n    for (int v = 0; v < n; v++) {\n        assert(value[v] ==\
+    \ 0 || value[v] == 1);\n        if (parent[v] == -1) {\n            assert(root\
+    \ == -1);\n            root = v;\n        } else {\n            assert(0 <= parent[v]\
+    \ && parent[v] < n && parent[v] != v);\n            children[parent[v]].push_back(v);\n\
+    \        }\n    }\n    assert(root != -1);\n\n    std::vector<int> stack(1, root);\n\
+    \    std::vector<char> visited(n, false);\n    visited[root] = true;\n    int\
+    \ visited_count = 0;\n    while (!stack.empty()) {\n        const int v = stack.back();\n\
+    \        stack.pop_back();\n        visited_count++;\n        for (int child :\
+    \ children[v]) {\n            assert(!visited[child]);\n            visited[child]\
+    \ = true;\n            stack.push_back(child);\n        }\n    }\n    assert(visited_count\
+    \ == n);\n\n    struct Component {\n        long long zeros;\n        long long\
+    \ ones;\n        int vertex;\n    };\n    struct Compare {\n        bool operator()(const\
+    \ Component& lhs, const Component& rhs) const {\n            const long long lhs_product\
+    \ = lhs.zeros * rhs.ones;\n            const long long rhs_product = rhs.zeros\
+    \ * lhs.ones;\n            if (lhs_product != rhs_product) return lhs_product\
+    \ < rhs_product;\n            return lhs.vertex < rhs.vertex;\n        }\n   \
+    \ };\n\n    std::vector<long long> zeros(n), ones(n);\n    std::vector<int> dsu(n);\n\
+    \    std::set<Component, Compare> components;\n    for (int v = 0; v < n; v++)\
+    \ {\n        zeros[v] = value[v] == 0;\n        ones[v] = value[v] == 1;\n   \
+    \     dsu[v] = v;\n        if (v != root) components.insert(Component{zeros[v],\
+    \ ones[v], v});\n    }\n\n    auto leader = [&](int v) {\n        int result =\
+    \ v;\n        while (dsu[result] != result) result = dsu[result];\n        while\
+    \ (dsu[v] != v) {\n            const int next = dsu[v];\n            dsu[v] =\
+    \ result;\n            v = next;\n        }\n        return result;\n    };\n\n\
+    \    long long answer = 0;\n    while (!components.empty()) {\n        auto it\
+    \ = components.end();\n        --it;\n        const Component child = *it;\n \
+    \       components.erase(it);\n\n        const int p = leader(parent[child.vertex]);\n\
+    \        if (p != root) {\n            const int erased = int(components.erase(Component{zeros[p],\
+    \ ones[p], p}));\n            assert(erased == 1);\n        }\n\n        answer\
+    \ += ones[p] * zeros[child.vertex];\n        zeros[p] += zeros[child.vertex];\n\
+    \        ones[p] += ones[child.vertex];\n        dsu[child.vertex] = p;\n\n  \
+    \      if (p != root) components.insert(Component{zeros[p], ones[p], p});\n  \
+    \  }\n    return answer;\n}\n\ntemplate <class T>\nlong long zero_one_on_tree(const\
+    \ m1une::graph::Graph<T>& graph,\n                           const std::vector<int>&\
+    \ value, int root = 0) {\n    const int n = graph.size();\n    assert(int(value.size())\
+    \ == n);\n    if (n == 0) return 0;\n    assert(0 <= root && root < n);\n    assert(int(graph.edges().size())\
+    \ == n - 1);\n\n    RootedTree<T> rooted_tree(graph, root);\n    assert(int(rooted_tree.order.size())\
+    \ == n);\n    return zero_one_on_tree(rooted_tree.parent, value);\n}\n\n}  //\
+    \ namespace tree\n}  // namespace m1une\n\n\n#line 17 \"tree/all.hpp\"\n\n\n#line\
+    \ 14 \"verify/tree/tree_algorithms.test.cpp\"\n\nusing m1une::graph::Graph;\n\n\
+    template <class Hld>\nstd::vector<int> expand_segments(const Hld& hld, const std::vector<m1une::tree::HldPathSegment>&\
+    \ segments) {\n    std::vector<int> result;\n    for (auto seg : segments) {\n\
+    \        if (seg.reversed) {\n            for (int i = seg.r - 1; i >= seg.l;\
+    \ i--) result.push_back(hld.order[i]);\n        } else {\n            for (int\
+    \ i = seg.l; i < seg.r; i++) result.push_back(hld.order[i]);\n        }\n    }\n\
+    \    return result;\n}\n\nGraph<long long> sample_tree() {\n    Graph<long long>\
+    \ g(7);\n    g.add_edge(0, 1, 3);\n    g.add_edge(0, 2, 2);\n    g.add_edge(1,\
+    \ 3, 4);\n    g.add_edge(1, 4, 1);\n    g.add_edge(2, 5, 6);\n    g.add_edge(5,\
+    \ 6, 2);\n    return g;\n}\n\nvoid test_rooted_tree() {\n    auto g = sample_tree();\n\
+    \    m1une::tree::RootedTree<long long> tree(g, 0);\n\n    assert(tree.size()\
+    \ == 7);\n    assert(!tree.empty());\n    assert(tree.root == 0);\n    assert(tree.parent[0]\
+    \ == -1);\n    assert(tree.parent[3] == 1);\n    assert(tree.depth[6] == 3);\n\
+    \    assert(tree.dist[6] == 10);\n    assert(tree.subtree_size[0] == 7);\n   \
+    \ assert(tree.subtree_size[1] == 3);\n    assert(tree.is_ancestor(1, 4));\n  \
+    \  assert(!tree.is_ancestor(2, 4));\n    assert(tree.in_subtree(4, 1));\n\n  \
+    \  assert(tree.kth_ancestor(6, 0) == 6);\n    assert(tree.kth_ancestor(6, 1) ==\
+    \ 5);\n    assert(tree.kth_ancestor(6, 3) == 0);\n    assert(tree.kth_ancestor(6,\
     \ 4) == -1);\n    assert(tree.lca(3, 4) == 1);\n    assert(tree.lca(3, 6) == 0);\n\
     \    assert(tree.dist_edges(3, 6) == 5);\n    assert(tree.dist_cost(3, 6) == 17);\n\
     \    assert(tree.jump(3, 6, 0) == 3);\n    assert(tree.jump(3, 6, 1) == 1);\n\
@@ -1679,10 +1726,11 @@ data:
   - tree/tree.hpp
   - tree/tree_hash.hpp
   - tree/virtual_tree.hpp
+  - tree/zero_one_on_tree.hpp
   isVerificationFile: true
   path: verify/tree/tree_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-01 13:39:10+09:00'
+  timestamp: '2026-07-03 01:33:01+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/tree/tree_algorithms.test.cpp

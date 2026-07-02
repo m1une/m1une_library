@@ -92,7 +92,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: tree/rerooting_static_top_tree.hpp
     title: Rerooting Static Top Tree
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: tree/rooted_tree.hpp
     title: Rooted Tree
   - icon: ':heavy_check_mark:'
@@ -110,6 +110,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: tree/virtual_tree.hpp
     title: Virtual Tree
+  - icon: ':question:'
+    path: tree/zero_one_on_tree.hpp
+    title: 01 on Tree
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/graph/cow_game.test.cpp
@@ -165,9 +168,15 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/tree/tree_algorithms.test.cpp
     title: verify/tree/tree_algorithms.test.cpp
-  _isVerificationFailed: false
+  - icon: ':x:'
+    path: verify/tree/zero_one_on_tree.test.cpp
+    title: verify/tree/zero_one_on_tree.test.cpp
+  - icon: ':x:'
+    path: verify/tree/zero_one_on_tree.test.cpp
+    title: verify/tree/zero_one_on_tree.test.cpp
+  _isVerificationFailed: true
   _pathExtension: hpp
-  _verificationStatusIcon: ':heavy_check_mark:'
+  _verificationStatusIcon: ':question:'
   attributes:
     links: []
   bundledCode: "#line 1 \"graph/graph.hpp\"\n\n\n\n#include <cassert>\n#include <utility>\n\
@@ -284,6 +293,7 @@ data:
   isVerificationFile: false
   path: graph/graph.hpp
   requiredBy:
+  - tree/zero_one_on_tree.hpp
   - tree/centroid_decomposition.hpp
   - tree/sparse_table_lca.hpp
   - tree/rooted_tree.hpp
@@ -321,7 +331,7 @@ data:
   - graph/shortest_path.hpp
   - graph/general_matching.hpp
   timestamp: '2026-06-17 14:06:24+09:00'
-  verificationStatus: LIBRARY_ALL_AC
+  verificationStatus: LIBRARY_SOME_WA
   verifiedWith:
   - verify/tree/rooted_tree_isomorphism_classification.test.cpp
   - verify/tree/rooted_tree_isomorphism_classification.test.cpp
@@ -329,6 +339,8 @@ data:
   - verify/tree/tree_algorithms.test.cpp
   - verify/tree/dsu_on_tree.test.cpp
   - verify/tree/dsu_on_tree.test.cpp
+  - verify/tree/zero_one_on_tree.test.cpp
+  - verify/tree/zero_one_on_tree.test.cpp
   - verify/graph/library_checker_maximum_independent_set.test.cpp
   - verify/graph/library_checker_maximum_independent_set.test.cpp
   - verify/graph/cow_game.test.cpp
