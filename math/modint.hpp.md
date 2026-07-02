@@ -58,6 +58,9 @@ data:
     path: verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
     title: verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/segtree/segtree_beats.test.cpp
+    title: verify/ds/segtree/segtree_beats.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/fps/convolution_ll.test.cpp
     title: verify/fps/convolution_ll.test.cpp
   - icon: ':heavy_check_mark:'
@@ -300,6 +303,7 @@ data:
   - verify/ds/segtree/dynamic_dual_segtree.test.cpp
   - verify/ds/segtree/lazy_segtree.test.cpp
   - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
+  - verify/ds/segtree/segtree_beats.test.cpp
   - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
   - verify/math/bitwise_convolution.test.cpp
   - verify/math/lucas.test.cpp

@@ -15,6 +15,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
     title: verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/segtree/segtree_beats.test.cpp
+    title: verify/ds/segtree/segtree_beats.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -70,6 +73,7 @@ data:
   - verify/ds/dynamic_array/dynamic_lazy_monoid_array.test.cpp
   - verify/ds/segtree/lazy_segtree.test.cpp
   - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
+  - verify/ds/segtree/segtree_beats.test.cpp
   - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
 documentation_of: acted_monoid/range_affine_range_sum.hpp
 layout: document

@@ -18,8 +18,14 @@ data:
     path: ds/segtree/segtree_2d.hpp
     title: Segtree 2D
   - icon: ':heavy_check_mark:'
+    path: ds/segtree/segtree_beats.hpp
+    title: Generic Segment Tree Beats
+  - icon: ':heavy_check_mark:'
     path: math/all.hpp
     title: Math All
+  - icon: ':warning:'
+    path: tests/ds/segtree/segtree_beats_test.cpp
+    title: tests/ds/segtree/segtree_beats_test.cpp
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/dual_segtree.test.cpp
@@ -36,6 +42,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/segtree_2d.test.cpp
     title: verify/ds/segtree/segtree_2d.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/segtree/segtree_beats.test.cpp
+    title: verify/ds/segtree/segtree_beats.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
@@ -61,6 +70,8 @@ data:
   - ds/segtree/lazy_segtree.hpp
   - ds/segtree/segtree_2d.hpp
   - ds/segtree/dual_segtree.hpp
+  - ds/segtree/segtree_beats.hpp
+  - tests/ds/segtree/segtree_beats_test.cpp
   - math/all.hpp
   timestamp: '2026-06-15 01:47:39+09:00'
   verificationStatus: LIBRARY_ALL_AC
@@ -69,6 +80,7 @@ data:
   - verify/ds/segtree/dual_segtree.test.cpp
   - verify/ds/segtree/segtree_2d.test.cpp
   - verify/ds/segtree/lazy_segtree.test.cpp
+  - verify/ds/segtree/segtree_beats.test.cpp
   - verify/ds/segtree/segtree.test.cpp
   - verify/math/math_algorithms.test.cpp
 documentation_of: math/bit_ceil.hpp

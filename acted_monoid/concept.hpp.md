@@ -3,6 +3,9 @@ data:
   _extendedDependsOn: []
   _extendedRequiredBy:
   - icon: ':heavy_check_mark:'
+    path: acted_monoid/beats_concept.hpp
+    title: Beats Acted Monoid Concept
+  - icon: ':heavy_check_mark:'
     path: ds/dynamic_array/dynamic_lazy_monoid_array.hpp
     title: Dynamic Lazy Monoid Array
   - icon: ':heavy_check_mark:'
@@ -26,6 +29,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: ds/segtree/persistent_lazy_segtree.hpp
     title: Persistent Lazy Segment Tree
+  - icon: ':heavy_check_mark:'
+    path: ds/segtree/segtree_beats.hpp
+    title: Generic Segment Tree Beats
+  - icon: ':warning:'
+    path: tests/ds/segtree/segtree_beats_test.cpp
+    title: tests/ds/segtree/segtree_beats_test.cpp
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/ds/dynamic_array/dynamic_lazy_monoid_array.test.cpp
@@ -57,6 +66,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/persistent_lazy_segtree.test.cpp
     title: verify/ds/segtree/persistent_lazy_segtree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/segtree/segtree_beats.test.cpp
+    title: verify/ds/segtree/segtree_beats.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -108,6 +120,9 @@ data:
   - ds/segtree/dynamic_lazy_segtree.hpp
   - ds/segtree/persistent_lazy_segtree.hpp
   - ds/segtree/persistent_dynamic_lazy_segtree.hpp
+  - ds/segtree/segtree_beats.hpp
+  - acted_monoid/beats_concept.hpp
+  - tests/ds/segtree/segtree_beats_test.cpp
   timestamp: '2026-06-17 21:06:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
@@ -120,6 +135,7 @@ data:
   - verify/ds/segtree/lazy_segtree.test.cpp
   - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
   - verify/ds/segtree/persistent_lazy_segtree.test.cpp
+  - verify/ds/segtree/segtree_beats.test.cpp
   - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
 documentation_of: acted_monoid/concept.hpp
 layout: document

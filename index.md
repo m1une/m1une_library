@@ -4,6 +4,12 @@ data:
   - name: acted_monoid
     pages:
     - icon: ':heavy_check_mark:'
+      path: acted_monoid/beats_concept.hpp
+      title: Beats Acted Monoid Concept
+    - icon: ':warning:'
+      path: acted_monoid/beats_wrapper.hpp
+      title: Beats Acted Monoid Wrapper
+    - icon: ':heavy_check_mark:'
       path: acted_monoid/concept.hpp
       title: Acted Monoid Concept
     - icon: ':warning:'
@@ -225,6 +231,9 @@ data:
   - name: ds/segtree
     pages:
     - icon: ':heavy_check_mark:'
+      path: ds/segtree/chmin_chmax_add_segtree.hpp
+      title: Chmin Chmax Add Segment Tree
+    - icon: ':heavy_check_mark:'
       path: ds/segtree/dual_segtree.hpp
       title: Dual Segment Tree
     - icon: ':heavy_check_mark:'
@@ -271,7 +280,7 @@ data:
       title: Segtree 2D
     - icon: ':heavy_check_mark:'
       path: ds/segtree/segtree_beats.hpp
-      title: Segment Tree Beats!
+      title: Generic Segment Tree Beats
   - name: flow
     pages:
     - icon: ':heavy_check_mark:'
@@ -731,6 +740,11 @@ data:
     - icon: ':heavy_check_mark:'
       path: string/z_algorithm.hpp
       title: Z Algorithm
+  - name: tests/ds/segtree
+    pages:
+    - icon: ':warning:'
+      path: tests/ds/segtree/segtree_beats_test.cpp
+      title: tests/ds/segtree/segtree_beats_test.cpp
   - name: tree
     pages:
     - icon: ':heavy_check_mark:'
@@ -972,6 +986,9 @@ data:
       title: verify/ds/range_query/wavelet_matrix_sum.test.cpp
   - name: verify/ds/segtree
     pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/segtree/chmin_chmax_add_segtree.test.cpp
+      title: verify/ds/segtree/chmin_chmax_add_segtree.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/ds/segtree/dual_segtree.test.cpp
       title: verify/ds/segtree/dual_segtree.test.cpp
