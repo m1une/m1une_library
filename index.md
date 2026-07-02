@@ -740,11 +740,6 @@ data:
     - icon: ':heavy_check_mark:'
       path: string/z_algorithm.hpp
       title: Z Algorithm
-  - name: tests/ds/segtree
-    pages:
-    - icon: ':warning:'
-      path: tests/ds/segtree/segtree_beats_test.cpp
-      title: tests/ds/segtree/segtree_beats_test.cpp
   - name: tree
     pages:
     - icon: ':heavy_check_mark:'

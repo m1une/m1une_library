@@ -8,9 +8,6 @@ data:
   - icon: ':heavy_check_mark:'
     path: ds/segtree/segtree_beats.hpp
     title: Generic Segment Tree Beats!
-  - icon: ':warning:'
-    path: tests/ds/segtree/segtree_beats_test.cpp
-    title: tests/ds/segtree/segtree_beats_test.cpp
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/segtree_beats.test.cpp
@@ -56,7 +53,6 @@ data:
   path: acted_monoid/beats_concept.hpp
   requiredBy:
   - ds/segtree/segtree_beats.hpp
-  - tests/ds/segtree/segtree_beats_test.cpp
   timestamp: '2026-07-02 21:23:03+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:

@@ -1,10 +1,7 @@
 ---
 data:
   _extendedDependsOn: []
-  _extendedRequiredBy:
-  - icon: ':warning:'
-    path: tests/ds/segtree/segtree_beats_test.cpp
-    title: tests/ds/segtree/segtree_beats_test.cpp
+  _extendedRequiredBy: []
   _extendedVerifiedWith: []
   _isVerificationFailed: false
   _pathExtension: hpp
@@ -75,8 +72,7 @@ data:
   dependsOn: []
   isVerificationFile: false
   path: acted_monoid/beats_wrapper.hpp
-  requiredBy:
-  - tests/ds/segtree/segtree_beats_test.cpp
+  requiredBy: []
   timestamp: '2026-07-02 23:51:56+09:00'
   verificationStatus: LIBRARY_NO_TESTS
   verifiedWith: []

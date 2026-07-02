@@ -32,9 +32,6 @@ data:
   - icon: ':heavy_check_mark:'
     path: ds/segtree/segtree_beats.hpp
     title: Generic Segment Tree Beats!
-  - icon: ':warning:'
-    path: tests/ds/segtree/segtree_beats_test.cpp
-    title: tests/ds/segtree/segtree_beats_test.cpp
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/ds/dynamic_array/dynamic_lazy_monoid_array.test.cpp
@@ -122,7 +119,6 @@ data:
   - ds/segtree/persistent_dynamic_lazy_segtree.hpp
   - ds/segtree/segtree_beats.hpp
   - acted_monoid/beats_concept.hpp
-  - tests/ds/segtree/segtree_beats_test.cpp
   timestamp: '2026-06-17 21:06:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:

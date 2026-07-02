@@ -23,9 +23,6 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/all.hpp
     title: Math All
-  - icon: ':warning:'
-    path: tests/ds/segtree/segtree_beats_test.cpp
-    title: tests/ds/segtree/segtree_beats_test.cpp
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/dual_segtree.test.cpp
@@ -71,7 +68,6 @@ data:
   - ds/segtree/segtree_2d.hpp
   - ds/segtree/dual_segtree.hpp
   - ds/segtree/segtree_beats.hpp
-  - tests/ds/segtree/segtree_beats_test.cpp
   - math/all.hpp
   timestamp: '2026-06-15 01:47:39+09:00'
   verificationStatus: LIBRARY_ALL_AC

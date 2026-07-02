@@ -10,10 +10,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/bit_ceil.hpp
     title: Bit Ceil
-  _extendedRequiredBy:
-  - icon: ':warning:'
-    path: tests/ds/segtree/segtree_beats_test.cpp
-    title: tests/ds/segtree/segtree_beats_test.cpp
+  _extendedRequiredBy: []
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/segtree_beats.test.cpp
@@ -388,8 +385,7 @@ data:
   - math/bit_ceil.hpp
   isVerificationFile: false
   path: ds/segtree/segtree_beats.hpp
-  requiredBy:
-  - tests/ds/segtree/segtree_beats_test.cpp
+  requiredBy: []
   timestamp: '2026-07-02 21:23:03+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
