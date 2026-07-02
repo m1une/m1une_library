@@ -344,7 +344,7 @@ data:
   - verify/ds/segtree/chmin_chmax_add_segtree.test.cpp
 documentation_of: ds/segtree/chmin_chmax_add_segtree.hpp
 layout: document
-title: Chmin Chmax Add Segment Tree
+title: Chmin Chmax Add Segment Tree Beats!
 ---
 
 ## Overview

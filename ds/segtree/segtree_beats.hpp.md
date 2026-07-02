@@ -396,7 +396,7 @@ data:
   - verify/ds/segtree/segtree_beats.test.cpp
 documentation_of: ds/segtree/segtree_beats.hpp
 layout: document
-title: Generic Segment Tree Beats
+title: Generic Segment Tree Beats!
 ---
 
 ## Overview

@@ -7,7 +7,7 @@ data:
   _extendedRequiredBy:
   - icon: ':heavy_check_mark:'
     path: ds/segtree/segtree_beats.hpp
-    title: Generic Segment Tree Beats
+    title: Generic Segment Tree Beats!
   - icon: ':warning:'
     path: tests/ds/segtree/segtree_beats_test.cpp
     title: tests/ds/segtree/segtree_beats_test.cpp

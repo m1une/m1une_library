@@ -232,7 +232,7 @@ data:
     pages:
     - icon: ':heavy_check_mark:'
       path: ds/segtree/chmin_chmax_add_segtree.hpp
-      title: Chmin Chmax Add Segment Tree
+      title: Chmin Chmax Add Segment Tree Beats!
     - icon: ':heavy_check_mark:'
       path: ds/segtree/dual_segtree.hpp
       title: Dual Segment Tree
@@ -280,7 +280,7 @@ data:
       title: Segtree 2D
     - icon: ':heavy_check_mark:'
       path: ds/segtree/segtree_beats.hpp
-      title: Generic Segment Tree Beats
+      title: Generic Segment Tree Beats!
   - name: flow
     pages:
     - icon: ':heavy_check_mark:'

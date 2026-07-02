@@ -3,7 +3,7 @@ data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
     path: ds/segtree/chmin_chmax_add_segtree.hpp
-    title: Chmin Chmax Add Segment Tree
+    title: Chmin Chmax Add Segment Tree Beats!
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
   _isVerificationFailed: false

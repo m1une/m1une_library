@@ -19,7 +19,7 @@ data:
     title: Segtree 2D
   - icon: ':heavy_check_mark:'
     path: ds/segtree/segtree_beats.hpp
-    title: Generic Segment Tree Beats
+    title: Generic Segment Tree Beats!
   - icon: ':heavy_check_mark:'
     path: math/all.hpp
     title: Math All

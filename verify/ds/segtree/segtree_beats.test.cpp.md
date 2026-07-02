@@ -12,7 +12,7 @@ data:
     title: Range Affine Range Sum
   - icon: ':heavy_check_mark:'
     path: ds/segtree/segtree_beats.hpp
-    title: Generic Segment Tree Beats
+    title: Generic Segment Tree Beats!
   - icon: ':heavy_check_mark:'
     path: math/bit_ceil.hpp
     title: Bit Ceil
