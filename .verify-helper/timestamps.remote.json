@@ -132,6 +132,7 @@
 "verify/optimization/simplex.test.cpp": "2026-06-23 02:47:46 +0900",
 "verify/optimization/slope_trick.test.cpp": "2026-06-23 02:47:46 +0900",
 "verify/sequence/sequence_algorithms.test.cpp": "2026-06-21 04:34:53 +0900",
+"verify/sequence/subset_sum.test.cpp": "2026-07-02 20:43:48 +0900",
 "verify/string/aho_corasick.test.cpp": "2026-06-27 03:13:10 +0900",
 "verify/string/aoj_alds1_14_b.test.cpp": "2026-06-20 02:38:39 +0900",
 "verify/string/eertree.test.cpp": "2026-06-27 03:13:10 +0900",
