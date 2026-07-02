@@ -690,6 +690,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: sequence/lis.hpp
       title: Longest Increasing Subsequence (LIS)
+    - icon: ':x:'
+      path: sequence/subset_sum.hpp
+      title: Meet-in-the-Middle Subset Sum
   - name: string
     pages:
     - icon: ':heavy_check_mark:'
@@ -1261,6 +1264,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/sequence/sequence_algorithms.test.cpp
       title: verify/sequence/sequence_algorithms.test.cpp
+    - icon: ':x:'
+      path: verify/sequence/subset_sum.test.cpp
+      title: verify/sequence/subset_sum.test.cpp
   - name: verify/string
     pages:
     - icon: ':heavy_check_mark:'
