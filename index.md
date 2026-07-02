@@ -78,6 +78,14 @@ data:
     - icon: ':warning:'
       path: acted_monoid/wrapper.hpp
       title: Acted Monoid Wrapper
+  - name: .
+    pages:
+    - icon: ':warning:'
+      path: compressor.py
+      title: compressor.py
+    - icon: ':warning:'
+      path: template.cpp
+      title: template.cpp
   - name: ds/dsu
     pages:
     - icon: ':heavy_check_mark:'
@@ -731,11 +739,6 @@ data:
     - icon: ':heavy_check_mark:'
       path: string/z_algorithm.hpp
       title: Z Algorithm
-  - name: .
-    pages:
-    - icon: ':warning:'
-      path: template.cpp
-      title: template.cpp
   - name: tree
     pages:
     - icon: ':heavy_check_mark:'
