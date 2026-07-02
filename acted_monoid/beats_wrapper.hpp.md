@@ -13,15 +13,15 @@ data:
     links: []
   bundledCode: "#line 1 \"acted_monoid/beats_wrapper.hpp\"\n\n\n\n#include <concepts>\n\
     \nnamespace m1une {\nnamespace acted_monoid {\n\n// Wrapper for defining a Beats\
-    \ acted monoid with functions or constexpr lambdas.\ntemplate <\n    typename\
-    \ T,\n    typename E,\n    auto Op,\n    auto Id,\n    auto OpComp,\n    auto\
-    \ OpId,\n    auto Mapping,\n    auto CanApply,\n    auto Make = nullptr,\n   \
-    \ auto MakeAt = nullptr,\n    auto MappingAt = nullptr,\n    auto CanApplyAt =\
-    \ nullptr,\n    auto OpShift = nullptr\n>\nstruct BeatsWrapper {\n    using value_type\
-    \ = T;\n    using operator_type = E;\n\n    static constexpr T id() {\n      \
-    \  return Id();\n    }\n\n    static constexpr T op(const T& lhs, const T& rhs)\
-    \ {\n        return Op(lhs, rhs);\n    }\n\n    static constexpr E op_id() {\n\
-    \        return OpId();\n    }\n\n    static constexpr E op_comp(const E& f, const\
+    \ acted monoid with callables supplied as NTTPs.\ntemplate <\n    typename T,\n\
+    \    typename E,\n    auto Op,\n    auto Id,\n    auto OpComp,\n    auto OpId,\n\
+    \    auto Mapping,\n    auto CanApply,\n    auto Make = nullptr,\n    auto MakeAt\
+    \ = nullptr,\n    auto MappingAt = nullptr,\n    auto CanApplyAt = nullptr,\n\
+    \    auto OpShift = nullptr\n>\nstruct BeatsWrapper {\n    using value_type =\
+    \ T;\n    using operator_type = E;\n\n    static constexpr T id() {\n        return\
+    \ Id();\n    }\n\n    static constexpr T op(const T& lhs, const T& rhs) {\n  \
+    \      return Op(lhs, rhs);\n    }\n\n    static constexpr E op_id() {\n     \
+    \   return OpId();\n    }\n\n    static constexpr E op_comp(const E& f, const\
     \ E& g) {\n        return OpComp(f, g);\n    }\n\n    static constexpr T mapping(const\
     \ E& f, const T& x) {\n        return Mapping(f, x);\n    }\n\n    static constexpr\
     \ bool can_apply(const E& f, const T& x) {\n        return CanApply(f, x);\n \
@@ -43,7 +43,7 @@ data:
     \ acted_monoid\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_ACTED_MONOID_BEATS_WRAPPER_HPP\n#define M1UNE_ACTED_MONOID_BEATS_WRAPPER_HPP\
     \ 1\n\n#include <concepts>\n\nnamespace m1une {\nnamespace acted_monoid {\n\n\
-    // Wrapper for defining a Beats acted monoid with functions or constexpr lambdas.\n\
+    // Wrapper for defining a Beats acted monoid with callables supplied as NTTPs.\n\
     template <\n    typename T,\n    typename E,\n    auto Op,\n    auto Id,\n   \
     \ auto OpComp,\n    auto OpId,\n    auto Mapping,\n    auto CanApply,\n    auto\
     \ Make = nullptr,\n    auto MakeAt = nullptr,\n    auto MappingAt = nullptr,\n\
@@ -77,7 +77,7 @@ data:
   path: acted_monoid/beats_wrapper.hpp
   requiredBy:
   - tests/ds/segtree/segtree_beats_test.cpp
-  timestamp: '2026-07-02 21:23:03+09:00'
+  timestamp: '2026-07-02 23:51:56+09:00'
   verificationStatus: LIBRARY_NO_TESTS
   verifiedWith: []
 documentation_of: acted_monoid/beats_wrapper.hpp
@@ -87,10 +87,16 @@ title: Beats Acted Monoid Wrapper
 
 ## Overview
 
-`m1une::acted_monoid::BeatsWrapper` defines a Beats acted monoid from
-captureless `constexpr` lambdas, functions, or function objects. It is useful
-when the operations are short enough that declaring a named acted-monoid
-`struct` would add ceremony during a contest.
+`m1une::acted_monoid::BeatsWrapper` defines a Beats acted monoid from callables
+supplied as C++20 non-type template arguments (NTTPs). It is useful when the
+operations are short enough that declaring a named acted-monoid `struct` would
+add ceremony during a contest.
+
+The template arguments themselves must be valid constant template arguments.
+The operations do not have to be callable in a constant expression:
+`IsBeatsActedMonoid` checks their signatures and return types only. Named lambda
+objects in the example are declared `constexpr` solely so their values can be
+used as template arguments.
 
 A Beats action differs from an ordinary acted-monoid action because an update
 cannot necessarily be calculated from one aggregate. `can_apply(f, x)` tells
