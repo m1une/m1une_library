@@ -5,10 +5,16 @@ documentation_of: ../../acted_monoid/beats_wrapper.hpp
 
 ## Overview
 
-`m1une::acted_monoid::BeatsWrapper` defines a Beats acted monoid from
-captureless `constexpr` lambdas, functions, or function objects. It is useful
-when the operations are short enough that declaring a named acted-monoid
-`struct` would add ceremony during a contest.
+`m1une::acted_monoid::BeatsWrapper` defines a Beats acted monoid from callables
+supplied as C++20 non-type template arguments (NTTPs). It is useful when the
+operations are short enough that declaring a named acted-monoid `struct` would
+add ceremony during a contest.
+
+The template arguments themselves must be valid constant template arguments.
+The operations do not have to be callable in a constant expression:
+`IsBeatsActedMonoid` checks their signatures and return types only. Named lambda
+objects in the example are declared `constexpr` solely so their values can be
+used as template arguments.
 
 A Beats action differs from an ordinary acted-monoid action because an update
 cannot necessarily be calculated from one aggregate. `can_apply(f, x)` tells

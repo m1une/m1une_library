@@ -6,7 +6,7 @@
 namespace m1une {
 namespace acted_monoid {
 
-// Wrapper for defining a Beats acted monoid with functions or constexpr lambdas.
+// Wrapper for defining a Beats acted monoid with callables supplied as NTTPs.
 template <
     typename T,
     typename E,

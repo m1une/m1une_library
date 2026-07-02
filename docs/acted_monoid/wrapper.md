@@ -7,7 +7,11 @@ documentation_of: ../../acted_monoid/wrapper.hpp
 
 `Wrapper` provides a convenient way to define an Acted Monoid inline without writing a separate `struct`. This is particularly useful during contests when you need to combine custom mapping logic quickly.
 
-It uses Non-Type Template Parameters (NTTP) introduced in C++20, allowing you to pass `constexpr` functions or lambdas directly as template arguments.
+It uses C++20 non-type template parameters (NTTPs), allowing functions,
+structural function objects, and captureless lambda values to be passed as
+template arguments. The template arguments must be valid constant template
+arguments, but `IsActedMonoid` does not require the operations themselves to be
+callable in a constant expression.
 
 ## Template Parameters
 

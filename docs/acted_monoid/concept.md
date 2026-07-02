@@ -30,30 +30,32 @@ The concept requires the type to implement these members:
 * `using operator_type`
   The type stored for each lazy operation.
 
-* `static constexpr value_type id()`
+* `static value_type id()`
   Returns the identity element of the value monoid.
 
-* `static constexpr value_type op(const value_type& a, const value_type& b)`
+* `static value_type op(const value_type& a, const value_type& b)`
   Combines two segment values.
 
-* `static constexpr operator_type op_id()`
+* `static operator_type op_id()`
   Returns the identity operation.
 
-* `static constexpr operator_type op_comp(const operator_type& f, const operator_type& g)`
+* `static operator_type op_comp(const operator_type& f, const operator_type& g)`
   Composes two operators. The order is `f(g(x))`: apply `g` first, then `f`.
 
-* `static constexpr value_type mapping(const operator_type& f, const value_type& x)`
+* `static value_type mapping(const operator_type& f, const value_type& x)`
   Applies operator `f` to value `x`.
 
-The concept checks the interface only. Associativity, identity laws, and the
-interaction between `mapping` and `op` must be satisfied by the implementation.
+The concept checks that these expressions are valid and return the exact stated
+types. It does not require any operation to be `constexpr`. Associativity,
+identity laws, and the interaction between `mapping` and `op` must be satisfied
+by the implementation.
 
 ## Commutative Acted Group
 
 `m1une::acted_monoid::IsCommutativeActedGroup` extends `IsActedMonoid` with an
 inverse for the value monoid:
 
-* `static constexpr value_type inv(const value_type& x)`
+* `static value_type inv(const value_type& x)`
   Returns the inverse of `x` with respect to the value operation `op`.
 
 The concept checks only the interface. The value operation should satisfy the
