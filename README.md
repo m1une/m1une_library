@@ -66,6 +66,16 @@ seg.set(1, 10);
 long long answer = seg.prod(0, 3);  // 1 + 10 + 3
 ```
 
+To shrink an expanded submission, run the dependency-free compressor. It removes
+comments and redundant whitespace and conservatively shortens variable names:
+
+```sh
+python3 compressor.py bundled.cpp -o submission.cpp --stats
+```
+
+Pass `--no-rename` to keep all identifiers unchanged. The compressor preserves
+preprocessor lines, string and character literals, and raw strings.
+
 ## Documentation Conventions
 
 * Ranges are half-open: `[l, r)` includes `l` and excludes `r`.
