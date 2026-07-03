@@ -3,7 +3,8 @@ import re
 import sys
 
 LIBRARY_ROOT = os.path.abspath(os.path.dirname(__file__))
-INCLUDE_PATHS = ('.', LIBRARY_ROOT)
+LIBRARY_PARENT = os.path.dirname(LIBRARY_ROOT)
+INCLUDE_PATHS = ('.', LIBRARY_ROOT, LIBRARY_PARENT)
 visited = set()
 
 
