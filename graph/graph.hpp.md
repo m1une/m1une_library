@@ -48,6 +48,9 @@ data:
     path: graph/maximum_clique.hpp
     title: Maximum Clique, Independent Set, and Vertex Cover
   - icon: ':heavy_check_mark:'
+    path: graph/minimum_steiner_tree.hpp
+    title: Minimum Steiner Tree
+  - icon: ':heavy_check_mark:'
     path: graph/namori.hpp
     title: Namori Graph Decomposition
   - icon: ':heavy_check_mark:'
@@ -144,6 +147,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/library_checker_maximum_independent_set.test.cpp
     title: verify/graph/library_checker_maximum_independent_set.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/minimum_steiner_tree.test.cpp
+    title: verify/graph/minimum_steiner_tree.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/namori.test.cpp
     title: verify/graph/namori.test.cpp
@@ -313,6 +319,7 @@ data:
   - graph/kruskal.hpp
   - graph/range_edge_graph.hpp
   - graph/bipartite.hpp
+  - graph/minimum_steiner_tree.hpp
   - graph/bellman_ford.hpp
   - graph/dag_shortest_path.hpp
   - graph/namori.hpp
@@ -346,6 +353,7 @@ data:
   - verify/graph/cow_game.test.cpp
   - verify/graph/library_checker_lowest_common_ancestor.test.cpp
   - verify/graph/library_checker_lowest_common_ancestor.test.cpp
+  - verify/graph/minimum_steiner_tree.test.cpp
   - verify/graph/library_checker_general_matching.test.cpp
   - verify/graph/library_checker_general_matching.test.cpp
   - verify/graph/range_edge_graph.test.cpp
