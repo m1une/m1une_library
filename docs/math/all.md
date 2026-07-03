@@ -16,6 +16,7 @@ You usually do not need to include this entire bundle:
   digit sequences.
 * Use `bitwise_convolution.hpp` for OR, AND, or XOR convolution over mask
   indices.
+* Use `gray_code.hpp` to enumerate bit masks so that one bit changes at a time.
 * Use `zeta_mobius_transform.hpp` for subset, superset, divisor, and multiple
   transforms.
 * Use `combinatorics.hpp` for many factorial, combination, or permutation
@@ -51,6 +52,7 @@ few unused headers do not matter.
 | `math/base_n.hpp` | Checked conversion between integers and arbitrary-base digits. |
 | `math/bitwise_convolution.hpp` | OR, AND, XOR convolutions and the Walsh-Hadamard transform. |
 | `math/bit_ceil.hpp` | Smallest power of two at least a given value. |
+| `math/gray_code.hpp` | Binary-reflected Gray-code encoding, decoding, and enumeration. |
 | `math/integer_arithmetic.hpp` | Exact integer square roots and overflow-aware powers. |
 | `math/lucas.hpp` | Lucas's theorem for huge binomial arguments modulo a small prime. |
 | `math/modint.hpp` | Static modular integer type. |
