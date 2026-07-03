@@ -207,6 +207,9 @@ data:
   - name: ds/range_query
     pages:
     - icon: ':heavy_check_mark:'
+      path: ds/range_query/cumulative_sum.hpp
+      title: Cumulative Sum (1D, 2D, 3D)
+    - icon: ':heavy_check_mark:'
       path: ds/range_query/disjoint_sparse_table.hpp
       title: Disjoint Sparse Table
     - icon: ':heavy_check_mark:'
@@ -963,6 +966,9 @@ data:
       title: verify/ds/ordered_set/persistent_ordered_set.test.cpp
   - name: verify/ds/range_query
     pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/range_query/cumulative_sum.test.cpp
+      title: verify/ds/range_query/cumulative_sum.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/ds/range_query/disjoint_sparse_table.test.cpp
       title: verify/ds/range_query/disjoint_sparse_table.test.cpp
