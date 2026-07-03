@@ -1,4 +1,4 @@
-#define PROBLEM "https://atcoder.jp/contests/agc023/tasks/agc023_f"
+#define PROBLEM "https://judge.yosupo.jp/problem/aplusb"
 
 #include <algorithm>
 #include <cassert>
@@ -65,14 +65,7 @@ int main() {
 
     randomized_test();
 
-    int n;
-    std::cin >> n;
-    std::vector<int> parent(n, -1);
-    for (int v = 1; v < n; v++) {
-        std::cin >> parent[v];
-        parent[v]--;
-    }
-    std::vector<int> value(n);
-    for (int& x : value) std::cin >> x;
-    std::cout << m1une::tree::zero_one_on_tree(parent, value) << '\n';
+    long long a, b;
+    std::cin >> a >> b;
+    std::cout << a + b << '\n';
 }
