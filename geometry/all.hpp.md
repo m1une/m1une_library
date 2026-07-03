@@ -17,6 +17,9 @@ data:
     path: geometry/farthest_pair.hpp
     title: Farthest Pair of Points
   - icon: ':heavy_check_mark:'
+    path: geometry/half_plane_intersection.hpp
+    title: Half-Plane Intersection
+  - icon: ':heavy_check_mark:'
     path: geometry/line.hpp
     title: Lines and Segments
   - icon: ':heavy_check_mark:'
@@ -569,19 +572,105 @@ data:
     \ consider(hull_index[next], hull_index[candidate]);\n        }\n    }\n    return\
     \ result;\n}\n\ntemplate <Coordinate T>\nstd::optional<FarthestPair<T>> furthest_pair(\n\
     \    const std::vector<Point<T>>& points\n) {\n    return farthest_pair(points);\n\
-    }\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 1 \"geometry/manhattan_mst.hpp\"\
-    \n\n\n\n#line 7 \"geometry/manhattan_mst.hpp\"\n#include <limits>\n#line 9 \"\
-    geometry/manhattan_mst.hpp\"\n#include <numeric>\n#line 12 \"geometry/manhattan_mst.hpp\"\
-    \n\n#line 1 \"ds/dsu/dsu.hpp\"\n\n\n\n#line 7 \"ds/dsu/dsu.hpp\"\n\nnamespace\
-    \ m1une {\nnamespace ds {\n\nstruct Dsu {\n   private:\n    int _n;\n    // parent_or_size[i]\
-    \ is the parent of i if it's >= 0.\n    // If it's < 0, then i is a root and -parent_or_size[i]\
-    \ is the size of the group.\n    std::vector<int> parent_or_size;\n\n   public:\n\
-    \    Dsu() : _n(0) {}\n    explicit Dsu(int n) : _n(n), parent_or_size(n, -1)\
-    \ {}\n\n    // Merges the group containing 'a' with the group containing 'b'.\n\
-    \    // Returns the leader of the merged group.\n    int merge(int a, int b) {\n\
-    \        int x = leader(a), y = leader(b);\n        if (x == y) return x;\n  \
-    \      // Union by size\n        if (-parent_or_size[x] < -parent_or_size[y])\
-    \ std::swap(x, y);\n        parent_or_size[x] += parent_or_size[y];\n        parent_or_size[y]\
+    }\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 1 \"geometry/half_plane_intersection.hpp\"\
+    \n\n\n\n#line 8 \"geometry/half_plane_intersection.hpp\"\n#include <deque>\n#line\
+    \ 11 \"geometry/half_plane_intersection.hpp\"\n\n#line 13 \"geometry/half_plane_intersection.hpp\"\
+    \n\nnamespace m1une {\nnamespace geometry {\n\nnamespace half_plane_intersection_detail\
+    \ {\n\nstruct HalfPlane {\n    Point<long double> point;\n    Point<long double>\
+    \ direction;\n};\n\ninline int direction_half(const Point<long double>& direction)\
+    \ {\n    return direction.y > 0 || (direction.y == 0 && direction.x >= 0) ? 0\
+    \ : 1;\n}\n\ninline bool direction_less(const HalfPlane& first, const HalfPlane&\
+    \ second) {\n    int first_half = direction_half(first.direction);\n    int second_half\
+    \ = direction_half(second.direction);\n    if (first_half != second_half) return\
+    \ first_half < second_half;\n    return cross(first.direction, second.direction)\
+    \ > 0;\n}\n\ninline bool parallel(\n    const HalfPlane& first,\n    const HalfPlane&\
+    \ second,\n    long double eps\n) {\n    return std::fabs(cross(first.direction,\
+    \ second.direction)) <= eps;\n}\n\ninline bool same_direction(\n    const HalfPlane&\
+    \ first,\n    const HalfPlane& second,\n    long double eps\n) {\n    return parallel(first,\
+    \ second, eps) &&\n           dot(first.direction, second.direction) > 0;\n}\n\
+    \ninline bool outside(\n    const HalfPlane& half_plane,\n    const Point<long\
+    \ double>& point,\n    long double eps\n) {\n    return cross(half_plane.direction,\
+    \ point - half_plane.point) < -eps;\n}\n\ninline bool more_restrictive(\n    const\
+    \ HalfPlane& candidate,\n    const HalfPlane& current,\n    long double eps\n\
+    ) {\n    return cross(\n        current.direction,\n        candidate.point -\
+    \ current.point\n    ) > eps;\n}\n\ninline std::optional<Point<long double>> intersection(\n\
+    \    const HalfPlane& first,\n    const HalfPlane& second,\n    long double eps\n\
+    ) {\n    long double denominator = cross(first.direction, second.direction);\n\
+    \    if (std::fabs(denominator) <= eps) return std::nullopt;\n    long double\
+    \ ratio = cross(\n        second.point - first.point,\n        second.direction\n\
+    \    ) / denominator;\n    return first.point + first.direction * ratio;\n}\n\n\
+    inline void merge_same_direction(\n    std::vector<HalfPlane>& half_planes,\n\
+    \    const HalfPlane& half_plane,\n    long double eps\n) {\n    if (\n      \
+    \  half_planes.empty() ||\n        !same_direction(half_planes.back(), half_plane,\
+    \ eps)\n    ) {\n        half_planes.push_back(half_plane);\n        return;\n\
+    \    }\n    if (more_restrictive(half_plane, half_planes.back(), eps)) {\n   \
+    \     half_planes.back() = half_plane;\n    }\n}\n\ninline void merge_cyclic_ends(\n\
+    \    std::vector<HalfPlane>& half_planes,\n    long double eps\n) {\n    if (\n\
+    \        half_planes.size() < 2 ||\n        !same_direction(half_planes.front(),\
+    \ half_planes.back(), eps)\n    ) {\n        return;\n    }\n    if (more_restrictive(half_planes.back(),\
+    \ half_planes.front(), eps)) {\n        half_planes.front() = half_planes.back();\n\
+    \    }\n    half_planes.pop_back();\n}\n\n}  // namespace half_plane_intersection_detail\n\
+    \n// Each directed line keeps its closed left half-plane. Returns the vertices\
+    \ of\n// a bounded intersection with positive area in counterclockwise order.\n\
+    // Returns an empty vector if the intersection is empty, unbounded, or has zero\n\
+    // area; these cases are not distinguished.\ntemplate <Coordinate T>\nstd::vector<Point<long\
+    \ double>> half_plane_intersection(\n    const std::vector<Line<T>>& half_planes,\n\
+    \    long double eps = 1e-12L\n) {\n    using half_plane_intersection_detail::HalfPlane;\n\
+    \    namespace detail = half_plane_intersection_detail;\n\n    assert(eps >= 0);\n\
+    \    std::vector<HalfPlane> sorted;\n    sorted.reserve(half_planes.size());\n\
+    \    for (const Line<T>& line : half_planes) {\n        assert(line.a != line.b);\n\
+    \        Point<long double> point(line.a);\n        Point<long double> direction\
+    \ = Point<long double>(line.b) - point;\n        long double length = norm(direction);\n\
+    \        direction = direction / length;\n        sorted.push_back(HalfPlane{point,\
+    \ direction});\n    }\n    if (sorted.size() < 3) return {};\n\n    std::sort(sorted.begin(),\
+    \ sorted.end(), detail::direction_less);\n    std::vector<HalfPlane> unique;\n\
+    \    unique.reserve(sorted.size());\n    for (const HalfPlane& half_plane : sorted)\
+    \ {\n        detail::merge_same_direction(unique, half_plane, eps);\n    }\n \
+    \   detail::merge_cyclic_ends(unique, eps);\n    if (unique.size() < 3) return\
+    \ {};\n\n    std::deque<HalfPlane> deque;\n    for (const HalfPlane& half_plane\
+    \ : unique) {\n        while (deque.size() >= 2) {\n            auto point = detail::intersection(\n\
+    \                deque[deque.size() - 2],\n                deque.back(),\n   \
+    \             eps\n            );\n            if (!point.has_value()) return\
+    \ {};\n            if (!detail::outside(half_plane, *point, eps)) break;\n   \
+    \         deque.pop_back();\n        }\n        while (deque.size() >= 2) {\n\
+    \            auto point = detail::intersection(deque[0], deque[1], eps);\n   \
+    \         if (!point.has_value()) return {};\n            if (!detail::outside(half_plane,\
+    \ *point, eps)) break;\n            deque.pop_front();\n        }\n        deque.push_back(half_plane);\n\
+    \    }\n\n    while (deque.size() >= 3) {\n        auto point = detail::intersection(\n\
+    \            deque[deque.size() - 2],\n            deque.back(),\n           \
+    \ eps\n        );\n        if (!point.has_value()) return {};\n        if (!detail::outside(deque.front(),\
+    \ *point, eps)) break;\n        deque.pop_back();\n    }\n    while (deque.size()\
+    \ >= 3) {\n        auto point = detail::intersection(deque[0], deque[1], eps);\n\
+    \        if (!point.has_value()) return {};\n        if (!detail::outside(deque.back(),\
+    \ *point, eps)) break;\n        deque.pop_front();\n    }\n    if (deque.size()\
+    \ < 3) return {};\n\n    std::vector<Point<long double>> polygon;\n    polygon.reserve(deque.size());\n\
+    \    for (std::size_t index = 0; index < deque.size(); ++index) {\n        auto\
+    \ point = detail::intersection(\n            deque[index],\n            deque[(index\
+    \ + 1) % deque.size()],\n            eps\n        );\n        if (!point.has_value())\
+    \ return {};\n        if (\n            polygon.empty() ||\n            distance(polygon.back(),\
+    \ *point) > eps\n        ) {\n            polygon.push_back(*point);\n       \
+    \ }\n    }\n    if (\n        polygon.size() >= 2 &&\n        distance(polygon.front(),\
+    \ polygon.back()) <= eps\n    ) {\n        polygon.pop_back();\n    }\n    if\
+    \ (polygon.size() < 3) return {};\n\n    long double signed_area2 = 0;\n    Point<long\
+    \ double> origin = polygon.front();\n    for (std::size_t index = 1; index + 1\
+    \ < polygon.size(); ++index) {\n        signed_area2 += cross(\n            polygon[index]\
+    \ - origin,\n            polygon[index + 1] - origin\n        );\n    }\n    if\
+    \ (signed_area2 <= eps) return {};\n\n    auto first = std::min_element(polygon.begin(),\
+    \ polygon.end());\n    std::rotate(polygon.begin(), first, polygon.end());\n \
+    \   return polygon;\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n\
+    #line 1 \"geometry/manhattan_mst.hpp\"\n\n\n\n#line 7 \"geometry/manhattan_mst.hpp\"\
+    \n#include <limits>\n#line 9 \"geometry/manhattan_mst.hpp\"\n#include <numeric>\n\
+    #line 12 \"geometry/manhattan_mst.hpp\"\n\n#line 1 \"ds/dsu/dsu.hpp\"\n\n\n\n\
+    #line 7 \"ds/dsu/dsu.hpp\"\n\nnamespace m1une {\nnamespace ds {\n\nstruct Dsu\
+    \ {\n   private:\n    int _n;\n    // parent_or_size[i] is the parent of i if\
+    \ it's >= 0.\n    // If it's < 0, then i is a root and -parent_or_size[i] is the\
+    \ size of the group.\n    std::vector<int> parent_or_size;\n\n   public:\n   \
+    \ Dsu() : _n(0) {}\n    explicit Dsu(int n) : _n(n), parent_or_size(n, -1) {}\n\
+    \n    // Merges the group containing 'a' with the group containing 'b'.\n    //\
+    \ Returns the leader of the merged group.\n    int merge(int a, int b) {\n   \
+    \     int x = leader(a), y = leader(b);\n        if (x == y) return x;\n     \
+    \   // Union by size\n        if (-parent_or_size[x] < -parent_or_size[y]) std::swap(x,\
+    \ y);\n        parent_or_size[x] += parent_or_size[y];\n        parent_or_size[y]\
     \ = x;\n        return x;\n    }\n\n    // Returns true if 'a' and 'b' belong\
     \ to the same group.\n    bool same(int a, int b) {\n        return leader(a)\
     \ == leader(b);\n    }\n\n    // Returns the leader (representative) of the group\
@@ -951,7 +1040,7 @@ data:
     \  }\n        current += step;\n        if (\n            first_index < first_edges.size()\
     \ ||\n            second_index < second_edges.size()\n        ) {\n          \
     \  result.push_back(current);\n        }\n    }\n    return polygon_detail::normalize_convex_polygon(std::move(result));\n\
-    }\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 13 \"geometry/all.hpp\"\
+    }\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 14 \"geometry/all.hpp\"\
     \n\n\n"
   code: '#ifndef M1UNE_GEOMETRY_ALL_HPP
 
@@ -965,6 +1054,8 @@ data:
     #include "convex_hull.hpp"
 
     #include "farthest_pair.hpp"
+
+    #include "half_plane_intersection.hpp"
 
     #include "line.hpp"
 
@@ -988,13 +1079,14 @@ data:
   - geometry/line.hpp
   - geometry/convex_hull.hpp
   - geometry/farthest_pair.hpp
+  - geometry/half_plane_intersection.hpp
   - geometry/manhattan_mst.hpp
   - ds/dsu/dsu.hpp
   - geometry/polygon.hpp
   isVerificationFile: false
   path: geometry/all.hpp
   requiredBy: []
-  timestamp: '2026-07-01 22:47:11+09:00'
+  timestamp: '2026-07-04 02:22:30+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp
@@ -1015,6 +1107,7 @@ title: Geometry Bundle
 | `geometry/point.hpp` | Points, vectors, dot/cross products, exact orientation, distance, and rotation. |
 | `geometry/convex_hull.hpp` | Monotone-chain convex hull with optional boundary-collinear points. |
 | `geometry/farthest_pair.hpp` | Euclidean farthest pair with original indices in $O(N\log N)$. |
+| `geometry/half_plane_intersection.hpp` | Bounded intersection polygon of directed closed half-planes in $O(N\log N)$. |
 | `geometry/manhattan_mst.hpp` | Manhattan minimum spanning tree for integral points in $O(N\log N)$. |
 | `geometry/line.hpp` | Lines, segments, projection, intersection, and distances. |
 | `geometry/ray.hpp` | Rays, containment, projection, intersections, and distances with other linear objects. |

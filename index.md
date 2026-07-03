@@ -362,6 +362,9 @@ data:
       path: geometry/farthest_pair.hpp
       title: Farthest Pair of Points
     - icon: ':heavy_check_mark:'
+      path: geometry/half_plane_intersection.hpp
+      title: Half-Plane Intersection
+    - icon: ':heavy_check_mark:'
       path: geometry/line.hpp
       title: Lines and Segments
     - icon: ':heavy_check_mark:'
@@ -1130,6 +1133,12 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/geometry/geometry_algorithms.test.cpp
       title: verify/geometry/geometry_algorithms.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/geometry/half_plane_intersection.test.cpp
+      title: verify/geometry/half_plane_intersection.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/geometry/half_plane_intersection_random.test.cpp
+      title: verify/geometry/half_plane_intersection_random.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/geometry/manhattan_mst.test.cpp
       title: verify/geometry/manhattan_mst.test.cpp

@@ -2,66 +2,30 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: geometry/point.hpp
-    title: 2D Point and Predicates
-  _extendedRequiredBy:
-  - icon: ':heavy_check_mark:'
-    path: geometry/all.hpp
-    title: Geometry Bundle
-  - icon: ':heavy_check_mark:'
-    path: geometry/circle.hpp
-    title: Circles
-  - icon: ':heavy_check_mark:'
     path: geometry/half_plane_intersection.hpp
     title: Half-Plane Intersection
   - icon: ':heavy_check_mark:'
-    path: geometry/polygon.hpp
-    title: Polygons
+    path: geometry/line.hpp
+    title: Lines and Segments
   - icon: ':heavy_check_mark:'
-    path: geometry/ray.hpp
-    title: Rays
-  _extendedVerifiedWith:
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/circle_line_intersection.test.cpp
-    title: verify/geometry/circle_line_intersection.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/circle_ray.test.cpp
-    title: verify/geometry/circle_ray.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/geometry_algorithms.test.cpp
-    title: verify/geometry/geometry_algorithms.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/half_plane_intersection.test.cpp
-    title: verify/geometry/half_plane_intersection.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/half_plane_intersection_random.test.cpp
-    title: verify/geometry/half_plane_intersection_random.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/point_in_polygon.test.cpp
-    title: verify/geometry/point_in_polygon.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/polygon_area.test.cpp
-    title: verify/geometry/polygon_area.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/polygon_operations.test.cpp
-    title: verify/geometry/polygon_operations.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/projection.test.cpp
-    title: verify/geometry/projection.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/ray.test.cpp
-    title: verify/geometry/ray.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/segment_intersection.test.cpp
-    title: verify/geometry/segment_intersection.test.cpp
+    path: geometry/point.hpp
+    title: 2D Point and Predicates
+  _extendedRequiredBy: []
+  _extendedVerifiedWith: []
   _isVerificationFailed: false
-  _pathExtension: hpp
+  _pathExtension: cpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
-    links: []
-  bundledCode: "#line 1 \"geometry/line.hpp\"\n\n\n\n#include <algorithm>\n#include\
-    \ <cassert>\n#include <cmath>\n#include <optional>\n\n#line 1 \"geometry/point.hpp\"\
-    \n\n\n\n#line 5 \"geometry/point.hpp\"\n#include <concepts>\n#line 7 \"geometry/point.hpp\"\
+    '*NOT_SPECIAL_COMMENTS*': ''
+    PROBLEM: https://onlinejudge.u-aizu.ac.jp/problems/1283
+    links:
+    - https://onlinejudge.u-aizu.ac.jp/problems/1283
+  bundledCode: "#line 1 \"verify/geometry/half_plane_intersection.test.cpp\"\n#define\
+    \ PROBLEM \"https://onlinejudge.u-aizu.ac.jp/problems/1283\"\n\n#line 1 \"geometry/half_plane_intersection.hpp\"\
+    \n\n\n\n#include <algorithm>\n#include <cassert>\n#include <cmath>\n#include <cstddef>\n\
+    #include <deque>\n#include <optional>\n#include <vector>\n\n#line 1 \"geometry/line.hpp\"\
+    \n\n\n\n#line 8 \"geometry/line.hpp\"\n\n#line 1 \"geometry/point.hpp\"\n\n\n\n\
+    #line 5 \"geometry/point.hpp\"\n#include <concepts>\n#line 7 \"geometry/point.hpp\"\
     \n#include <type_traits>\n\nnamespace m1une {\nnamespace geometry {\n\ntemplate\
     \ <typename T>\nconcept Coordinate = std::is_arithmetic_v<T> && !std::same_as<std::remove_cv_t<T>,\
     \ bool>;\n\ntemplate <Coordinate T>\nusing wide_type = std::conditional_t<std::integral<T>,\
@@ -243,206 +207,146 @@ data:
     template <Coordinate T>\nstd::optional<Point<long double>> line_segment_intersection(\n\
     \    const Segment<T>& segment,\n    const Line<T>& line,\n    long double eps\
     \ = 1e-12L\n) {\n    return line_segment_intersection(line, segment, eps);\n}\n\
-    \n}  // namespace geometry\n}  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_GEOMETRY_LINE_HPP\n#define M1UNE_GEOMETRY_LINE_HPP 1\n\n#include\
-    \ <algorithm>\n#include <cassert>\n#include <cmath>\n#include <optional>\n\n#include\
-    \ \"point.hpp\"\n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <Coordinate\
-    \ T>\nstruct Line {\n    Point<T> a;\n    Point<T> b;\n};\n\ntemplate <Coordinate\
-    \ T>\nstruct Segment {\n    Point<T> a;\n    Point<T> b;\n};\n\ntemplate <Coordinate\
-    \ T>\nbool on_line(\n    const Line<T>& line,\n    const Point<T>& point,\n  \
-    \  long double eps = 1e-12L\n) {\n    assert(line.a != line.b);\n    return orientation(line.a,\
-    \ line.b, point, eps) == 0;\n}\n\ntemplate <Coordinate T>\nbool parallel(const\
-    \ Line<T>& first, const Line<T>& second, long double eps = 1e-12L) {\n    using\
-    \ W = wide_type<T>;\n    W first_x = W(first.b.x) - W(first.a.x);\n    W first_y\
-    \ = W(first.b.y) - W(first.a.y);\n    W second_x = W(second.b.x) - W(second.a.x);\n\
-    \    W second_y = W(second.b.y) - W(second.a.y);\n    return sign<T>(first_x *\
-    \ second_y - first_y * second_x, eps) == 0;\n}\n\ntemplate <Coordinate T>\nbool\
-    \ orthogonal(const Line<T>& first, const Line<T>& second, long double eps = 1e-12L)\
-    \ {\n    using W = wide_type<T>;\n    W first_x = W(first.b.x) - W(first.a.x);\n\
-    \    W first_y = W(first.b.y) - W(first.a.y);\n    W second_x = W(second.b.x)\
-    \ - W(second.a.x);\n    W second_y = W(second.b.y) - W(second.a.y);\n    return\
-    \ sign<T>(first_x * second_x + first_y * second_y, eps) == 0;\n}\n\ntemplate <Coordinate\
-    \ T>\nPoint<long double> projection(const Line<T>& line, const Point<T>& point)\
-    \ {\n    assert(line.a != line.b);\n    Point<long double> a(line.a);\n    Point<long\
-    \ double> direction(\n        static_cast<long double>(line.b.x) - static_cast<long\
-    \ double>(line.a.x),\n        static_cast<long double>(line.b.y) - static_cast<long\
-    \ double>(line.a.y)\n    );\n    Point<long double> offset(\n        static_cast<long\
-    \ double>(point.x) - a.x,\n        static_cast<long double>(point.y) - a.y\n \
-    \   );\n    long double ratio = dot(offset, direction) / dot(direction, direction);\n\
-    \    return a + direction * ratio;\n}\n\ntemplate <Coordinate T>\nPoint<long double>\
-    \ reflection(const Line<T>& line, const Point<T>& point) {\n    Point<long double>\
-    \ projected = projection(line, point);\n    return projected * 2.0L - Point<long\
-    \ double>(point);\n}\n\ntemplate <Coordinate T>\nlong double distance(const Line<T>&\
-    \ line, const Point<T>& point) {\n    assert(line.a != line.b);\n    Point<long\
-    \ double> direction(\n        static_cast<long double>(line.b.x) - static_cast<long\
-    \ double>(line.a.x),\n        static_cast<long double>(line.b.y) - static_cast<long\
-    \ double>(line.a.y)\n    );\n    Point<long double> offset(\n        static_cast<long\
-    \ double>(point.x) - static_cast<long double>(line.a.x),\n        static_cast<long\
-    \ double>(point.y) - static_cast<long double>(line.a.y)\n    );\n    return std::fabs(cross(direction,\
-    \ offset)) / norm(direction);\n}\n\ntemplate <Coordinate T>\nlong double distance(const\
-    \ Point<T>& point, const Line<T>& line) {\n    return distance(line, point);\n\
-    }\n\ntemplate <Coordinate T>\nbool intersects(\n    const Line<T>& first,\n  \
-    \  const Line<T>& second,\n    long double eps = 1e-12L\n) {\n    return !parallel(first,\
-    \ second, eps) || on_line(first, second.a, eps);\n}\n\ntemplate <Coordinate T>\n\
-    long double distance(const Line<T>& first, const Line<T>& second) {\n    return\
-    \ intersects(first, second) ? 0 : distance(first, second.a);\n}\n\ntemplate <Coordinate\
-    \ T>\nbool on_segment(\n    const Segment<T>& segment,\n    const Point<T>& point,\n\
-    \    long double eps = 1e-12L\n) {\n    if (orientation(segment.a, segment.b,\
-    \ point, eps) != 0) return false;\n    using W = wide_type<T>;\n    W px = W(point.x);\n\
-    \    W py = W(point.y);\n    W min_x = std::min(W(segment.a.x), W(segment.b.x));\n\
-    \    W max_x = std::max(W(segment.a.x), W(segment.b.x));\n    W min_y = std::min(W(segment.a.y),\
-    \ W(segment.b.y));\n    W max_y = std::max(W(segment.a.y), W(segment.b.y));\n\
-    \    if constexpr (std::integral<T>) {\n        return min_x <= px && px <= max_x\
-    \ && min_y <= py && py <= max_y;\n    } else {\n        return min_x - eps <=\
-    \ px && px <= max_x + eps &&\n               min_y - eps <= py && py <= max_y\
-    \ + eps;\n    }\n}\n\ntemplate <Coordinate T>\nbool intersects(\n    const Segment<T>&\
-    \ first,\n    const Segment<T>& second,\n    long double eps = 1e-12L\n) {\n \
-    \   int abc = orientation(first.a, first.b, second.a, eps);\n    int abd = orientation(first.a,\
-    \ first.b, second.b, eps);\n    int cda = orientation(second.a, second.b, first.a,\
-    \ eps);\n    int cdb = orientation(second.a, second.b, first.b, eps);\n\n    if\
-    \ (abc == 0 && on_segment(first, second.a, eps)) return true;\n    if (abd ==\
-    \ 0 && on_segment(first, second.b, eps)) return true;\n    if (cda == 0 && on_segment(second,\
-    \ first.a, eps)) return true;\n    if (cdb == 0 && on_segment(second, first.b,\
-    \ eps)) return true;\n    return abc * abd < 0 && cda * cdb < 0;\n}\n\ntemplate\
-    \ <Coordinate T>\nbool intersects(\n    const Line<T>& line,\n    const Segment<T>&\
-    \ segment,\n    long double eps = 1e-12L\n) {\n    int first_side = orientation(line.a,\
-    \ line.b, segment.a, eps);\n    int second_side = orientation(line.a, line.b,\
-    \ segment.b, eps);\n    return first_side == 0 || second_side == 0 || first_side\
-    \ != second_side;\n}\n\ntemplate <Coordinate T>\nbool intersects(\n    const Segment<T>&\
-    \ segment,\n    const Line<T>& line,\n    long double eps = 1e-12L\n) {\n    return\
-    \ intersects(line, segment, eps);\n}\n\ntemplate <Coordinate T>\nlong double distance(const\
-    \ Segment<T>& segment, const Point<T>& point) {\n    Point<long double> a(segment.a);\n\
-    \    Point<long double> b(segment.b);\n    Point<long double> p(point);\n    Point<long\
-    \ double> direction = b - a;\n    long double length_squared = dot(direction,\
-    \ direction);\n    if (length_squared == 0) return geometry::distance(segment.a,\
-    \ point);\n    long double ratio = dot(p - a, direction) / length_squared;\n \
-    \   ratio = std::clamp(ratio, 0.0L, 1.0L);\n    Point<long double> closest = a\
-    \ + direction * ratio;\n    return geometry::distance(closest, p);\n}\n\ntemplate\
-    \ <Coordinate T>\nlong double distance(const Point<T>& point, const Segment<T>&\
-    \ segment) {\n    return distance(segment, point);\n}\n\ntemplate <Coordinate\
-    \ T>\nlong double distance(const Segment<T>& first, const Segment<T>& second)\
-    \ {\n    if (intersects(first, second)) return 0;\n    return std::min({\n   \
-    \     distance(first, second.a),\n        distance(first, second.b),\n       \
-    \ distance(second, first.a),\n        distance(second, first.b),\n    });\n}\n\
-    \ntemplate <Coordinate T>\nlong double distance(const Line<T>& line, const Segment<T>&\
-    \ segment) {\n    if (intersects(line, segment)) return 0;\n    return std::min(distance(line,\
-    \ segment.a), distance(line, segment.b));\n}\n\ntemplate <Coordinate T>\nlong\
-    \ double distance(const Segment<T>& segment, const Line<T>& line) {\n    return\
-    \ distance(line, segment);\n}\n\ntemplate <Coordinate T>\nstd::optional<Point<long\
-    \ double>> line_intersection(\n    const Line<T>& first,\n    const Line<T>& second,\n\
-    \    long double eps = 1e-12L\n) {\n    assert(first.a != first.b);\n    assert(second.a\
-    \ != second.b);\n    Point<long double> p(first.a);\n    Point<long double> q(second.a);\n\
-    \    Point<long double> r = Point<long double>(first.b) - p;\n    Point<long double>\
-    \ s = Point<long double>(second.b) - q;\n    long double denominator = cross(r,\
-    \ s);\n    if (std::fabs(denominator) <= eps) return std::nullopt;\n    long double\
-    \ ratio = cross(q - p, s) / denominator;\n    return p + r * ratio;\n}\n\ntemplate\
-    \ <Coordinate T>\nstd::optional<Point<long double>> line_segment_intersection(\n\
-    \    const Line<T>& line,\n    const Segment<T>& segment,\n    long double eps\
-    \ = 1e-12L\n) {\n    assert(line.a != line.b);\n    if (segment.a == segment.b)\
-    \ {\n        if (on_line(line, segment.a, eps)) {\n            return Point<long\
-    \ double>(segment.a);\n        }\n        return std::nullopt;\n    }\n    if\
-    \ (!intersects(line, segment, eps)) return std::nullopt;\n    Line<T> supporting_line{segment.a,\
-    \ segment.b};\n    return line_intersection(line, supporting_line, eps);\n}\n\n\
-    template <Coordinate T>\nstd::optional<Point<long double>> line_segment_intersection(\n\
-    \    const Segment<T>& segment,\n    const Line<T>& line,\n    long double eps\
-    \ = 1e-12L\n) {\n    return line_segment_intersection(line, segment, eps);\n}\n\
-    \n}  // namespace geometry\n}  // namespace m1une\n\n#endif  // M1UNE_GEOMETRY_LINE_HPP\n"
+    \n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 13 \"geometry/half_plane_intersection.hpp\"\
+    \n\nnamespace m1une {\nnamespace geometry {\n\nnamespace half_plane_intersection_detail\
+    \ {\n\nstruct HalfPlane {\n    Point<long double> point;\n    Point<long double>\
+    \ direction;\n};\n\ninline int direction_half(const Point<long double>& direction)\
+    \ {\n    return direction.y > 0 || (direction.y == 0 && direction.x >= 0) ? 0\
+    \ : 1;\n}\n\ninline bool direction_less(const HalfPlane& first, const HalfPlane&\
+    \ second) {\n    int first_half = direction_half(first.direction);\n    int second_half\
+    \ = direction_half(second.direction);\n    if (first_half != second_half) return\
+    \ first_half < second_half;\n    return cross(first.direction, second.direction)\
+    \ > 0;\n}\n\ninline bool parallel(\n    const HalfPlane& first,\n    const HalfPlane&\
+    \ second,\n    long double eps\n) {\n    return std::fabs(cross(first.direction,\
+    \ second.direction)) <= eps;\n}\n\ninline bool same_direction(\n    const HalfPlane&\
+    \ first,\n    const HalfPlane& second,\n    long double eps\n) {\n    return parallel(first,\
+    \ second, eps) &&\n           dot(first.direction, second.direction) > 0;\n}\n\
+    \ninline bool outside(\n    const HalfPlane& half_plane,\n    const Point<long\
+    \ double>& point,\n    long double eps\n) {\n    return cross(half_plane.direction,\
+    \ point - half_plane.point) < -eps;\n}\n\ninline bool more_restrictive(\n    const\
+    \ HalfPlane& candidate,\n    const HalfPlane& current,\n    long double eps\n\
+    ) {\n    return cross(\n        current.direction,\n        candidate.point -\
+    \ current.point\n    ) > eps;\n}\n\ninline std::optional<Point<long double>> intersection(\n\
+    \    const HalfPlane& first,\n    const HalfPlane& second,\n    long double eps\n\
+    ) {\n    long double denominator = cross(first.direction, second.direction);\n\
+    \    if (std::fabs(denominator) <= eps) return std::nullopt;\n    long double\
+    \ ratio = cross(\n        second.point - first.point,\n        second.direction\n\
+    \    ) / denominator;\n    return first.point + first.direction * ratio;\n}\n\n\
+    inline void merge_same_direction(\n    std::vector<HalfPlane>& half_planes,\n\
+    \    const HalfPlane& half_plane,\n    long double eps\n) {\n    if (\n      \
+    \  half_planes.empty() ||\n        !same_direction(half_planes.back(), half_plane,\
+    \ eps)\n    ) {\n        half_planes.push_back(half_plane);\n        return;\n\
+    \    }\n    if (more_restrictive(half_plane, half_planes.back(), eps)) {\n   \
+    \     half_planes.back() = half_plane;\n    }\n}\n\ninline void merge_cyclic_ends(\n\
+    \    std::vector<HalfPlane>& half_planes,\n    long double eps\n) {\n    if (\n\
+    \        half_planes.size() < 2 ||\n        !same_direction(half_planes.front(),\
+    \ half_planes.back(), eps)\n    ) {\n        return;\n    }\n    if (more_restrictive(half_planes.back(),\
+    \ half_planes.front(), eps)) {\n        half_planes.front() = half_planes.back();\n\
+    \    }\n    half_planes.pop_back();\n}\n\n}  // namespace half_plane_intersection_detail\n\
+    \n// Each directed line keeps its closed left half-plane. Returns the vertices\
+    \ of\n// a bounded intersection with positive area in counterclockwise order.\n\
+    // Returns an empty vector if the intersection is empty, unbounded, or has zero\n\
+    // area; these cases are not distinguished.\ntemplate <Coordinate T>\nstd::vector<Point<long\
+    \ double>> half_plane_intersection(\n    const std::vector<Line<T>>& half_planes,\n\
+    \    long double eps = 1e-12L\n) {\n    using half_plane_intersection_detail::HalfPlane;\n\
+    \    namespace detail = half_plane_intersection_detail;\n\n    assert(eps >= 0);\n\
+    \    std::vector<HalfPlane> sorted;\n    sorted.reserve(half_planes.size());\n\
+    \    for (const Line<T>& line : half_planes) {\n        assert(line.a != line.b);\n\
+    \        Point<long double> point(line.a);\n        Point<long double> direction\
+    \ = Point<long double>(line.b) - point;\n        long double length = norm(direction);\n\
+    \        direction = direction / length;\n        sorted.push_back(HalfPlane{point,\
+    \ direction});\n    }\n    if (sorted.size() < 3) return {};\n\n    std::sort(sorted.begin(),\
+    \ sorted.end(), detail::direction_less);\n    std::vector<HalfPlane> unique;\n\
+    \    unique.reserve(sorted.size());\n    for (const HalfPlane& half_plane : sorted)\
+    \ {\n        detail::merge_same_direction(unique, half_plane, eps);\n    }\n \
+    \   detail::merge_cyclic_ends(unique, eps);\n    if (unique.size() < 3) return\
+    \ {};\n\n    std::deque<HalfPlane> deque;\n    for (const HalfPlane& half_plane\
+    \ : unique) {\n        while (deque.size() >= 2) {\n            auto point = detail::intersection(\n\
+    \                deque[deque.size() - 2],\n                deque.back(),\n   \
+    \             eps\n            );\n            if (!point.has_value()) return\
+    \ {};\n            if (!detail::outside(half_plane, *point, eps)) break;\n   \
+    \         deque.pop_back();\n        }\n        while (deque.size() >= 2) {\n\
+    \            auto point = detail::intersection(deque[0], deque[1], eps);\n   \
+    \         if (!point.has_value()) return {};\n            if (!detail::outside(half_plane,\
+    \ *point, eps)) break;\n            deque.pop_front();\n        }\n        deque.push_back(half_plane);\n\
+    \    }\n\n    while (deque.size() >= 3) {\n        auto point = detail::intersection(\n\
+    \            deque[deque.size() - 2],\n            deque.back(),\n           \
+    \ eps\n        );\n        if (!point.has_value()) return {};\n        if (!detail::outside(deque.front(),\
+    \ *point, eps)) break;\n        deque.pop_back();\n    }\n    while (deque.size()\
+    \ >= 3) {\n        auto point = detail::intersection(deque[0], deque[1], eps);\n\
+    \        if (!point.has_value()) return {};\n        if (!detail::outside(deque.back(),\
+    \ *point, eps)) break;\n        deque.pop_front();\n    }\n    if (deque.size()\
+    \ < 3) return {};\n\n    std::vector<Point<long double>> polygon;\n    polygon.reserve(deque.size());\n\
+    \    for (std::size_t index = 0; index < deque.size(); ++index) {\n        auto\
+    \ point = detail::intersection(\n            deque[index],\n            deque[(index\
+    \ + 1) % deque.size()],\n            eps\n        );\n        if (!point.has_value())\
+    \ return {};\n        if (\n            polygon.empty() ||\n            distance(polygon.back(),\
+    \ *point) > eps\n        ) {\n            polygon.push_back(*point);\n       \
+    \ }\n    }\n    if (\n        polygon.size() >= 2 &&\n        distance(polygon.front(),\
+    \ polygon.back()) <= eps\n    ) {\n        polygon.pop_back();\n    }\n    if\
+    \ (polygon.size() < 3) return {};\n\n    long double signed_area2 = 0;\n    Point<long\
+    \ double> origin = polygon.front();\n    for (std::size_t index = 1; index + 1\
+    \ < polygon.size(); ++index) {\n        signed_area2 += cross(\n            polygon[index]\
+    \ - origin,\n            polygon[index + 1] - origin\n        );\n    }\n    if\
+    \ (signed_area2 <= eps) return {};\n\n    auto first = std::min_element(polygon.begin(),\
+    \ polygon.end());\n    std::rotate(polygon.begin(), first, polygon.end());\n \
+    \   return polygon;\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n\
+    #line 4 \"verify/geometry/half_plane_intersection.test.cpp\"\n\n#line 6 \"verify/geometry/half_plane_intersection.test.cpp\"\
+    \n#include <iomanip>\n#include <iostream>\n#line 9 \"verify/geometry/half_plane_intersection.test.cpp\"\
+    \n\nint main() {\n    using namespace m1une::geometry;\n    using PointType =\
+    \ Point<long double>;\n\n    std::cout << std::fixed << std::setprecision(6);\n\
+    \    while (true) {\n        int n;\n        std::cin >> n;\n        if (n ==\
+    \ 0) break;\n\n        std::vector<PointType> polygon(n);\n        for (PointType&\
+    \ point : polygon) {\n            std::cin >> point.x >> point.y;\n        }\n\
+    \n        long double lower = 0;\n        long double upper = 1e9L;\n        for\
+    \ (int iteration = 0; iteration < 100; ++iteration) {\n            long double\
+    \ middle = (lower + upper) / 2;\n            std::vector<Line<long double>> half_planes;\n\
+    \            half_planes.reserve(n);\n            for (int index = 0; index <\
+    \ n; ++index) {\n                PointType first = polygon[index];\n         \
+    \       PointType second = polygon[(index + 1) % n];\n                PointType\
+    \ direction = second - first;\n                PointType left_normal(-direction.y,\
+    \ direction.x);\n                PointType shift = left_normal * (middle / norm(left_normal));\n\
+    \                half_planes.push_back(Line<long double>{\n                  \
+    \  first + shift,\n                    second + shift,\n                });\n\
+    \            }\n            if (half_plane_intersection(half_planes, 1e-18L).empty())\
+    \ {\n                upper = middle;\n            } else {\n                lower\
+    \ = middle;\n            }\n        }\n        std::cout << lower << '\\n';\n\
+    \    }\n}\n"
+  code: "#define PROBLEM \"https://onlinejudge.u-aizu.ac.jp/problems/1283\"\n\n#include\
+    \ \"../../geometry/half_plane_intersection.hpp\"\n\n#include <cmath>\n#include\
+    \ <iomanip>\n#include <iostream>\n#include <vector>\n\nint main() {\n    using\
+    \ namespace m1une::geometry;\n    using PointType = Point<long double>;\n\n  \
+    \  std::cout << std::fixed << std::setprecision(6);\n    while (true) {\n    \
+    \    int n;\n        std::cin >> n;\n        if (n == 0) break;\n\n        std::vector<PointType>\
+    \ polygon(n);\n        for (PointType& point : polygon) {\n            std::cin\
+    \ >> point.x >> point.y;\n        }\n\n        long double lower = 0;\n      \
+    \  long double upper = 1e9L;\n        for (int iteration = 0; iteration < 100;\
+    \ ++iteration) {\n            long double middle = (lower + upper) / 2;\n    \
+    \        std::vector<Line<long double>> half_planes;\n            half_planes.reserve(n);\n\
+    \            for (int index = 0; index < n; ++index) {\n                PointType\
+    \ first = polygon[index];\n                PointType second = polygon[(index +\
+    \ 1) % n];\n                PointType direction = second - first;\n          \
+    \      PointType left_normal(-direction.y, direction.x);\n                PointType\
+    \ shift = left_normal * (middle / norm(left_normal));\n                half_planes.push_back(Line<long\
+    \ double>{\n                    first + shift,\n                    second + shift,\n\
+    \                });\n            }\n            if (half_plane_intersection(half_planes,\
+    \ 1e-18L).empty()) {\n                upper = middle;\n            } else {\n\
+    \                lower = middle;\n            }\n        }\n        std::cout\
+    \ << lower << '\\n';\n    }\n}\n"
   dependsOn:
-  - geometry/point.hpp
-  isVerificationFile: false
-  path: geometry/line.hpp
-  requiredBy:
-  - geometry/ray.hpp
-  - geometry/circle.hpp
-  - geometry/all.hpp
-  - geometry/polygon.hpp
   - geometry/half_plane_intersection.hpp
-  timestamp: '2026-06-21 12:04:47+09:00'
-  verificationStatus: LIBRARY_ALL_AC
-  verifiedWith:
-  - verify/geometry/half_plane_intersection.test.cpp
-  - verify/geometry/polygon_area.test.cpp
-  - verify/geometry/circle_line_intersection.test.cpp
-  - verify/geometry/geometry_algorithms.test.cpp
-  - verify/geometry/segment_intersection.test.cpp
-  - verify/geometry/circle_ray.test.cpp
-  - verify/geometry/half_plane_intersection_random.test.cpp
-  - verify/geometry/point_in_polygon.test.cpp
-  - verify/geometry/polygon_operations.test.cpp
-  - verify/geometry/projection.test.cpp
-  - verify/geometry/ray.test.cpp
-documentation_of: geometry/line.hpp
+  - geometry/line.hpp
+  - geometry/point.hpp
+  isVerificationFile: true
+  path: verify/geometry/half_plane_intersection.test.cpp
+  requiredBy: []
+  timestamp: '2026-07-04 02:22:30+09:00'
+  verificationStatus: TEST_ACCEPTED
+  verifiedWith: []
+documentation_of: verify/geometry/half_plane_intersection.test.cpp
 layout: document
-title: Lines and Segments
+redirect_from:
+- /verify/verify/geometry/half_plane_intersection.test.cpp
+- /verify/verify/geometry/half_plane_intersection.test.cpp.html
+title: verify/geometry/half_plane_intersection.test.cpp
 ---
-
-## Overview
-
-This header provides `Line<T>` and `Segment<T>` together with projection,
-reflection, distances, intersection tests, and line intersection coordinates.
-
-Segment predicates are exact for integral coordinates through 128-bit cross
-products. Constructed coordinates are returned as `Point<long double>`.
-
-## Types
-
-```cpp
-template <Coordinate T>
-struct Line {
-    Point<T> a;
-    Point<T> b;
-};
-
-template <Coordinate T>
-struct Segment {
-    Point<T> a;
-    Point<T> b;
-};
-```
-
-A line requires distinct endpoints. A segment may be degenerate.
-
-## Functions
-
-| Function | Description | Complexity |
-| --- | --- | --- |
-| `on_line(line, point, eps)` | Tests whether a point lies on an infinite line. | $O(1)$ |
-| `parallel(first, second, eps)` | Tests whether two lines are parallel. | $O(1)$ |
-| `orthogonal(first, second, eps)` | Tests whether two lines are perpendicular. | $O(1)$ |
-| `projection(line, point)` | Returns the orthogonal projection. | $O(1)$ |
-| `reflection(line, point)` | Reflects a point across a line. | $O(1)$ |
-| `intersects(first, second, eps)` | Tests whether two infinite lines share a point, including coincidence. | $O(1)$ |
-| `distance(line, point)` | Point-to-line distance. Both argument orders are supported. | $O(1)$ |
-| `distance(first, second)` | Distance between two infinite lines. | $O(1)$ |
-| `on_segment(segment, point, eps)` | Tests whether a point lies on a closed segment. | $O(1)$ |
-| `intersects(first, second, eps)` | Tests whether two closed segments intersect, including overlap. | $O(1)$ |
-| `intersects(line, segment, eps)` | Tests whether an infinite line and a closed segment intersect. Both argument orders are supported. | $O(1)$ |
-| `distance(segment, point)` | Point-to-segment distance. Both argument orders are supported. | $O(1)$ |
-| `distance(first, second)` | Segment-to-segment distance. | $O(1)$ |
-| `distance(line, segment)` | Line-to-segment distance. Both argument orders are supported. | $O(1)$ |
-| `line_intersection(first, second, eps)` | Returns the unique line intersection, or `nullopt` for parallel/coincident lines. | $O(1)$ |
-| `line_segment_intersection(line, segment, eps)` | Returns the unique intersection, or `nullopt` for no intersection or collinear overlap. Both argument orders are supported. | $O(1)$ |
-
-For a degenerate segment, `line_segment_intersection` returns its endpoint when
-that point lies on the line.
-
-## Example
-
-```cpp
-#include "geometry/line.hpp"
-
-#include <iostream>
-
-int main() {
-    using namespace m1une::geometry;
-    Segment<long long> first;
-    first.a = Point<long long>(0, 0);
-    first.b = Point<long long>(2, 2);
-
-    Segment<long long> second;
-    second.a = Point<long long>(0, 2);
-    second.b = Point<long long>(2, 0);
-
-    std::cout << intersects(first, second) << "\n"; // 1
-}
-```
