@@ -23,6 +23,9 @@ data:
     path: math/combinatorics.hpp
     title: Combinatorics
   - icon: ':heavy_check_mark:'
+    path: math/cyclotomic_polynomial.hpp
+    title: Cyclotomic Polynomial
+  - icon: ':heavy_check_mark:'
     path: math/gray_code.hpp
     title: Gray Code
   - icon: ':heavy_check_mark:'
@@ -52,6 +55,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/rational.hpp
     title: Rational Number
+  - icon: ':heavy_check_mark:'
+    path: math/repunit.hpp
+    title: Repunit
   - icon: ':heavy_check_mark:'
     path: math/stern_brocot_tree.hpp
     title: Stern-Brocot Tree
@@ -584,6 +590,103 @@ data:
     \n    std::vector<Mint> result(maximum + 1);\n    result[0] = 1;\n    if (maximum\
     \ >= 1) result[1] = 0;\n    for (int n = 2; n <= maximum; n++) {\n        result[n]\
     \ = Mint(n - 1) * (result[n - 1] + result[n - 2]);\n    }\n    return result;\n\
+    }\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line 1 \"math/cyclotomic_polynomial.hpp\"\
+    \n\n\n\n#line 9 \"math/cyclotomic_polynomial.hpp\"\n\n#line 1 \"math/prime_factorization.hpp\"\
+    \n\n\n\n#line 7 \"math/prime_factorization.hpp\"\n#include <numeric>\n#line 10\
+    \ \"math/prime_factorization.hpp\"\n\nnamespace m1une {\nnamespace math {\n\n\
+    namespace internal {\n\ninline uint64_t multiply_mod(uint64_t a, uint64_t b, uint64_t\
+    \ mod) {\n    return static_cast<uint64_t>(static_cast<unsigned __int128>(a) *\
+    \ b % mod);\n}\n\ninline uint64_t power_mod(uint64_t base, uint64_t exponent,\
+    \ uint64_t mod) {\n    uint64_t result = 1;\n    while (exponent > 0) {\n    \
+    \    if (exponent & 1) result = multiply_mod(result, base, mod);\n        base\
+    \ = multiply_mod(base, base, mod);\n        exponent >>= 1;\n    }\n    return\
+    \ result;\n}\n\ninline uint64_t pollard_random() {\n    static uint64_t state\
+    \ = 0x123456789abcdef0ULL;\n    state += 0x9e3779b97f4a7c15ULL;\n    uint64_t\
+    \ value = state;\n    value = (value ^ (value >> 30)) * 0xbf58476d1ce4e5b9ULL;\n\
+    \    value = (value ^ (value >> 27)) * 0x94d049bb133111ebULL;\n    return value\
+    \ ^ (value >> 31);\n}\n\n}  // namespace internal\n\ninline bool is_prime(uint64_t\
+    \ value) {\n    if (value < 2) return false;\n    for (uint64_t prime : {2ULL,\
+    \ 3ULL, 5ULL, 7ULL, 11ULL, 13ULL, 17ULL, 19ULL, 23ULL, 29ULL, 31ULL, 37ULL}) {\n\
+    \        if (value % prime == 0) return value == prime;\n    }\n\n    uint64_t\
+    \ odd_part = value - 1;\n    int power_of_two = 0;\n    while ((odd_part & 1)\
+    \ == 0) {\n        odd_part >>= 1;\n        power_of_two++;\n    }\n\n    for\
+    \ (uint64_t base : {2ULL, 325ULL, 9375ULL, 28178ULL, 450775ULL, 9780504ULL, 1795265022ULL})\
+    \ {\n        if (base % value == 0) continue;\n        uint64_t x = internal::power_mod(base\
+    \ % value, odd_part, value);\n        if (x == 1 || x == value - 1) continue;\n\
+    \n        bool composite = true;\n        for (int i = 1; i < power_of_two; i++)\
+    \ {\n            x = internal::multiply_mod(x, x, value);\n            if (x ==\
+    \ value - 1) {\n                composite = false;\n                break;\n \
+    \           }\n        }\n        if (composite) return false;\n    }\n    return\
+    \ true;\n}\n\nnamespace internal {\n\ninline uint64_t pollard_rho(uint64_t value)\
+    \ {\n    for (uint64_t prime : {2ULL, 3ULL, 5ULL, 7ULL, 11ULL, 13ULL, 17ULL, 19ULL,\
+    \ 23ULL, 29ULL, 31ULL, 37ULL}) {\n        if (value % prime == 0) return prime;\n\
+    \    }\n\n    while (true) {\n        const uint64_t constant = pollard_random()\
+    \ % (value - 1) + 1;\n        uint64_t y = pollard_random() % (value - 1) + 1;\n\
+    \        uint64_t x = 0;\n        uint64_t saved_y = 0;\n        uint64_t gcd\
+    \ = 1;\n        uint64_t segment_length = 1;\n\n        auto advance = [&](uint64_t\
+    \ current) {\n            return static_cast<uint64_t>(\n                (static_cast<unsigned\
+    \ __int128>(multiply_mod(current, current, value)) + constant) % value);\n   \
+    \     };\n\n        while (gcd == 1) {\n            x = y;\n            for (uint64_t\
+    \ i = 0; i < segment_length; i++) y = advance(y);\n\n            for (uint64_t\
+    \ offset = 0; offset < segment_length && gcd == 1; offset += 128) {\n        \
+    \        saved_y = y;\n                uint64_t product = 1;\n               \
+    \ const uint64_t block = std::min<uint64_t>(128, segment_length - offset);\n \
+    \               for (uint64_t i = 0; i < block; i++) {\n                    y\
+    \ = advance(y);\n                    const uint64_t difference = x > y ? x - y\
+    \ : y - x;\n                    product = multiply_mod(product, difference, value);\n\
+    \                }\n                gcd = std::gcd(product, value);\n        \
+    \    }\n            segment_length <<= 1;\n        }\n\n        if (gcd == value)\
+    \ {\n            do {\n                saved_y = advance(saved_y);\n         \
+    \       const uint64_t difference = x > saved_y ? x - saved_y : saved_y - x;\n\
+    \                gcd = std::gcd(difference, value);\n            } while (gcd\
+    \ == 1);\n        }\n        if (gcd != value) return gcd;\n    }\n}\n\ninline\
+    \ void factor_recursively(uint64_t value, std::vector<uint64_t>& factors) {\n\
+    \    if (value == 1) return;\n    if (is_prime(value)) {\n        factors.push_back(value);\n\
+    \        return;\n    }\n    const uint64_t divisor = pollard_rho(value);\n  \
+    \  factor_recursively(divisor, factors);\n    factor_recursively(value / divisor,\
+    \ factors);\n}\n\n}  // namespace internal\n\ninline std::vector<uint64_t> prime_factors(uint64_t\
+    \ value) {\n    assert(value >= 1);\n    std::vector<uint64_t> result;\n    internal::factor_recursively(value,\
+    \ result);\n    std::sort(result.begin(), result.end());\n    return result;\n\
+    }\n\ninline std::vector<std::pair<uint64_t, int>> prime_factorize(uint64_t value)\
+    \ {\n    std::vector<uint64_t> factors = prime_factors(value);\n    std::vector<std::pair<uint64_t,\
+    \ int>> result;\n    for (uint64_t prime : factors) {\n        if (result.empty()\
+    \ || result.back().first != prime) {\n            result.emplace_back(prime, 1);\n\
+    \        } else {\n            result.back().second++;\n        }\n    }\n   \
+    \ return result;\n}\n\ninline std::vector<uint64_t> divisors(uint64_t value) {\n\
+    \    std::vector<uint64_t> result = {1};\n    for (const auto& factor : prime_factorize(value))\
+    \ {\n        const int current_size = int(result.size());\n        uint64_t power\
+    \ = 1;\n        for (int exponent = 1; exponent <= factor.second; exponent++)\
+    \ {\n            power *= factor.first;\n            for (int i = 0; i < current_size;\
+    \ i++) {\n                result.push_back(result[i] * power);\n            }\n\
+    \        }\n    }\n    std::sort(result.begin(), result.end());\n    return result;\n\
+    }\n\ninline uint64_t euler_phi(uint64_t value) {\n    assert(value >= 1);\n  \
+    \  uint64_t result = value;\n    for (const auto& factor : prime_factorize(value))\
+    \ {\n        result = result / factor.first * (factor.first - 1);\n    }\n   \
+    \ return result;\n}\n\ninline int mobius(uint64_t value) {\n    assert(value >=\
+    \ 1);\n    int result = 1;\n    for (const auto& factor : prime_factorize(value))\
+    \ {\n        if (factor.second >= 2) return 0;\n        result = -result;\n  \
+    \  }\n    return result;\n}\n\n}  // namespace math\n}  // namespace m1une\n\n\
+    \n#line 11 \"math/cyclotomic_polynomial.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ math {\n\ntemplate <class T = long long>\nstd::vector<T> cyclotomic_polynomial(std::uint64_t\
+    \ index) {\n    assert(index >= 1);\n    if (index == 1) return {T(-1), T(1)};\n\
+    \n    const std::vector<std::pair<std::uint64_t, int>> factors =\n        prime_factorize(index);\n\
+    \    std::uint64_t degree = index;\n    for (const auto& factor : factors) {\n\
+    \        degree = degree / factor.first * (factor.first - 1);\n    }\n    assert(degree\
+    \ < std::numeric_limits<std::size_t>::max());\n\n    std::vector<T> result(static_cast<std::size_t>(degree)\
+    \ + 1, T(0));\n    result[0] = T(1);\n\n    const std::size_t subset_count = std::size_t(1)\
+    \ << factors.size();\n    for (std::size_t mask = 0; mask < subset_count; mask++)\
+    \ {\n        std::uint64_t exponent = index;\n        bool negative_mobius = false;\n\
+    \        for (std::size_t i = 0; i < factors.size(); i++) {\n            if ((mask\
+    \ >> i) & 1) {\n                exponent /= factors[i].first;\n              \
+    \  negative_mobius = !negative_mobius;\n            }\n        }\n        if (exponent\
+    \ > degree) continue;\n\n        const std::size_t shift = static_cast<std::size_t>(exponent);\n\
+    \        if (negative_mobius) {\n            // Divide by 1 - x^shift as a truncated\
+    \ formal power series.\n            for (std::size_t i = shift; i <= degree; i++)\
+    \ {\n                result[i] += result[i - shift];\n            }\n        }\
+    \ else {\n            // Multiply by 1 - x^shift.\n            for (std::size_t\
+    \ i = static_cast<std::size_t>(degree);\n                 i >= shift;\n      \
+    \           i--) {\n                result[i] -= result[i - shift];\n        \
+    \        if (i == shift) break;\n            }\n        }\n    }\n    return result;\n\
     }\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line 1 \"math/gray_code.hpp\"\
     \n\n\n\n#line 11 \"math/gray_code.hpp\"\n\nnamespace m1une {\nnamespace math {\n\
     \n// Converts a binary value to its binary-reflected Gray code.\ntemplate <std::unsigned_integral\
@@ -764,81 +867,7 @@ data:
     \ long long>(normalized_b));\n\n    assert(answer >= std::numeric_limits<long\
     \ long>::min());\n    assert(answer <= std::numeric_limits<long long>::max());\n\
     \    return static_cast<long long>(answer);\n}\n\n}  // namespace math\n}  //\
-    \ namespace m1une\n\n\n#line 1 \"math/prime_factorization.hpp\"\n\n\n\n#line 7\
-    \ \"math/prime_factorization.hpp\"\n#include <numeric>\n#line 10 \"math/prime_factorization.hpp\"\
-    \n\nnamespace m1une {\nnamespace math {\n\nnamespace internal {\n\ninline uint64_t\
-    \ multiply_mod(uint64_t a, uint64_t b, uint64_t mod) {\n    return static_cast<uint64_t>(static_cast<unsigned\
-    \ __int128>(a) * b % mod);\n}\n\ninline uint64_t power_mod(uint64_t base, uint64_t\
-    \ exponent, uint64_t mod) {\n    uint64_t result = 1;\n    while (exponent > 0)\
-    \ {\n        if (exponent & 1) result = multiply_mod(result, base, mod);\n   \
-    \     base = multiply_mod(base, base, mod);\n        exponent >>= 1;\n    }\n\
-    \    return result;\n}\n\ninline uint64_t pollard_random() {\n    static uint64_t\
-    \ state = 0x123456789abcdef0ULL;\n    state += 0x9e3779b97f4a7c15ULL;\n    uint64_t\
-    \ value = state;\n    value = (value ^ (value >> 30)) * 0xbf58476d1ce4e5b9ULL;\n\
-    \    value = (value ^ (value >> 27)) * 0x94d049bb133111ebULL;\n    return value\
-    \ ^ (value >> 31);\n}\n\n}  // namespace internal\n\ninline bool is_prime(uint64_t\
-    \ value) {\n    if (value < 2) return false;\n    for (uint64_t prime : {2ULL,\
-    \ 3ULL, 5ULL, 7ULL, 11ULL, 13ULL, 17ULL, 19ULL, 23ULL, 29ULL, 31ULL, 37ULL}) {\n\
-    \        if (value % prime == 0) return value == prime;\n    }\n\n    uint64_t\
-    \ odd_part = value - 1;\n    int power_of_two = 0;\n    while ((odd_part & 1)\
-    \ == 0) {\n        odd_part >>= 1;\n        power_of_two++;\n    }\n\n    for\
-    \ (uint64_t base : {2ULL, 325ULL, 9375ULL, 28178ULL, 450775ULL, 9780504ULL, 1795265022ULL})\
-    \ {\n        if (base % value == 0) continue;\n        uint64_t x = internal::power_mod(base\
-    \ % value, odd_part, value);\n        if (x == 1 || x == value - 1) continue;\n\
-    \n        bool composite = true;\n        for (int i = 1; i < power_of_two; i++)\
-    \ {\n            x = internal::multiply_mod(x, x, value);\n            if (x ==\
-    \ value - 1) {\n                composite = false;\n                break;\n \
-    \           }\n        }\n        if (composite) return false;\n    }\n    return\
-    \ true;\n}\n\nnamespace internal {\n\ninline uint64_t pollard_rho(uint64_t value)\
-    \ {\n    for (uint64_t prime : {2ULL, 3ULL, 5ULL, 7ULL, 11ULL, 13ULL, 17ULL, 19ULL,\
-    \ 23ULL, 29ULL, 31ULL, 37ULL}) {\n        if (value % prime == 0) return prime;\n\
-    \    }\n\n    while (true) {\n        const uint64_t constant = pollard_random()\
-    \ % (value - 1) + 1;\n        uint64_t y = pollard_random() % (value - 1) + 1;\n\
-    \        uint64_t x = 0;\n        uint64_t saved_y = 0;\n        uint64_t gcd\
-    \ = 1;\n        uint64_t segment_length = 1;\n\n        auto advance = [&](uint64_t\
-    \ current) {\n            return static_cast<uint64_t>(\n                (static_cast<unsigned\
-    \ __int128>(multiply_mod(current, current, value)) + constant) % value);\n   \
-    \     };\n\n        while (gcd == 1) {\n            x = y;\n            for (uint64_t\
-    \ i = 0; i < segment_length; i++) y = advance(y);\n\n            for (uint64_t\
-    \ offset = 0; offset < segment_length && gcd == 1; offset += 128) {\n        \
-    \        saved_y = y;\n                uint64_t product = 1;\n               \
-    \ const uint64_t block = std::min<uint64_t>(128, segment_length - offset);\n \
-    \               for (uint64_t i = 0; i < block; i++) {\n                    y\
-    \ = advance(y);\n                    const uint64_t difference = x > y ? x - y\
-    \ : y - x;\n                    product = multiply_mod(product, difference, value);\n\
-    \                }\n                gcd = std::gcd(product, value);\n        \
-    \    }\n            segment_length <<= 1;\n        }\n\n        if (gcd == value)\
-    \ {\n            do {\n                saved_y = advance(saved_y);\n         \
-    \       const uint64_t difference = x > saved_y ? x - saved_y : saved_y - x;\n\
-    \                gcd = std::gcd(difference, value);\n            } while (gcd\
-    \ == 1);\n        }\n        if (gcd != value) return gcd;\n    }\n}\n\ninline\
-    \ void factor_recursively(uint64_t value, std::vector<uint64_t>& factors) {\n\
-    \    if (value == 1) return;\n    if (is_prime(value)) {\n        factors.push_back(value);\n\
-    \        return;\n    }\n    const uint64_t divisor = pollard_rho(value);\n  \
-    \  factor_recursively(divisor, factors);\n    factor_recursively(value / divisor,\
-    \ factors);\n}\n\n}  // namespace internal\n\ninline std::vector<uint64_t> prime_factors(uint64_t\
-    \ value) {\n    assert(value >= 1);\n    std::vector<uint64_t> result;\n    internal::factor_recursively(value,\
-    \ result);\n    std::sort(result.begin(), result.end());\n    return result;\n\
-    }\n\ninline std::vector<std::pair<uint64_t, int>> prime_factorize(uint64_t value)\
-    \ {\n    std::vector<uint64_t> factors = prime_factors(value);\n    std::vector<std::pair<uint64_t,\
-    \ int>> result;\n    for (uint64_t prime : factors) {\n        if (result.empty()\
-    \ || result.back().first != prime) {\n            result.emplace_back(prime, 1);\n\
-    \        } else {\n            result.back().second++;\n        }\n    }\n   \
-    \ return result;\n}\n\ninline std::vector<uint64_t> divisors(uint64_t value) {\n\
-    \    std::vector<uint64_t> result = {1};\n    for (const auto& factor : prime_factorize(value))\
-    \ {\n        const int current_size = int(result.size());\n        uint64_t power\
-    \ = 1;\n        for (int exponent = 1; exponent <= factor.second; exponent++)\
-    \ {\n            power *= factor.first;\n            for (int i = 0; i < current_size;\
-    \ i++) {\n                result.push_back(result[i] * power);\n            }\n\
-    \        }\n    }\n    std::sort(result.begin(), result.end());\n    return result;\n\
-    }\n\ninline uint64_t euler_phi(uint64_t value) {\n    assert(value >= 1);\n  \
-    \  uint64_t result = value;\n    for (const auto& factor : prime_factorize(value))\
-    \ {\n        result = result / factor.first * (factor.first - 1);\n    }\n   \
-    \ return result;\n}\n\ninline int mobius(uint64_t value) {\n    assert(value >=\
-    \ 1);\n    int result = 1;\n    for (const auto& factor : prime_factorize(value))\
-    \ {\n        if (factor.second >= 2) return 0;\n        result = -result;\n  \
-    \  }\n    return result;\n}\n\n}  // namespace math\n}  // namespace m1une\n\n\
-    \n#line 1 \"math/primitive_root.hpp\"\n\n\n\n#line 9 \"math/primitive_root.hpp\"\
+    \ namespace m1une\n\n\n#line 1 \"math/primitive_root.hpp\"\n\n\n\n#line 9 \"math/primitive_root.hpp\"\
     \n\n#line 11 \"math/primitive_root.hpp\"\n\nnamespace m1une {\nnamespace math\
     \ {\n\ninline bool has_primitive_root(uint64_t mod) {\n    if (mod == 2 || mod\
     \ == 4) return true;\n    if (mod < 2) return false;\n\n    uint64_t odd_part\
@@ -991,15 +1020,67 @@ data:
     \ input;\n        }\n        value = Rational(numerator, denominator);\n     \
     \   return input;\n    }\n};\n\ntemplate <std::signed_integral T>\nconstexpr Rational<T>\
     \ abs(const Rational<T>& value) {\n    return value.abs();\n}\n\n}  // namespace\
-    \ math\n}  // namespace m1une\n\n\n#line 1 \"math/stern_brocot_tree.hpp\"\n\n\n\
-    \n#line 10 \"math/stern_brocot_tree.hpp\"\n\n#line 12 \"math/stern_brocot_tree.hpp\"\
-    \n\nnamespace m1une {\nnamespace math {\n\nenum class SternBrocotDirection {\n\
-    \    Left,\n    Right,\n};\n\nstruct SternBrocotRun {\n    SternBrocotDirection\
-    \ direction;\n    uint64_t count;\n\n    friend bool operator==(const SternBrocotRun&,\
-    \ const SternBrocotRun&) = default;\n};\n\nstruct SternBrocotPath {\n    std::vector<SternBrocotRun>\
-    \ runs;\n\n    bool empty() const {\n        return runs.empty();\n    }\n\n \
-    \   uint64_t depth() const {\n        uint64_t result = 0;\n        for (const\
-    \ SternBrocotRun& run : runs) {\n            assert(run.count <= std::numeric_limits<uint64_t>::max()\
+    \ math\n}  // namespace m1une\n\n\n#line 1 \"math/repunit.hpp\"\n\n\n\n#line 9\
+    \ \"math/repunit.hpp\"\n\nnamespace m1une {\nnamespace math {\n\ntemplate <class\
+    \ T>\nconstexpr std::pair<T, T> repunit_and_power(\n    std::uint64_t length,\n\
+    \    T base = T(10)\n) {\n    T result = T(0);\n    T result_power = T(1);\n \
+    \   T block = T(1);\n    T block_power = base;\n\n    while (length > 0) {\n \
+    \       if (length & 1) {\n            result = result * block_power + block;\n\
+    \            result_power = result_power * block_power;\n        }\n        block\
+    \ = block * block_power + block;\n        block_power = block_power * block_power;\n\
+    \        length >>= 1;\n    }\n    return std::make_pair(result, result_power);\n\
+    }\n\n// Returns 1 + base + ... + base^(length - 1).\n// The arithmetic, including\
+    \ any modular reduction, is performed by T.\ntemplate <class T>\nconstexpr T repunit(std::uint64_t\
+    \ length, T base = T(10)) {\n    return repunit_and_power<T>(length, base).first;\n\
+    }\n\ntemplate <class T>\nconstexpr T repdigit(std::uint64_t length, T digit, T\
+    \ base = T(10)) {\n    return digit * repunit<T>(length, base);\n}\n\ntemplate\
+    \ <class T>\nconstexpr T concatenate_digits(\n    T left,\n    T right,\n    std::uint64_t\
+    \ right_length,\n    T base = T(10)\n) {\n    return left * repunit_and_power<T>(right_length,\
+    \ base).second + right;\n}\n\nnamespace repunit_detail {\n\ninline std::uint64_t\
+    \ multiply_mod(\n    std::uint64_t left,\n    std::uint64_t right,\n    std::uint64_t\
+    \ mod\n) {\n    return static_cast<std::uint64_t>(\n        static_cast<unsigned\
+    \ __int128>(left) * right % mod\n    );\n}\n\ninline std::pair<std::uint64_t,\
+    \ std::uint64_t> repunit_and_power_mod(\n    std::uint64_t length,\n    std::uint64_t\
+    \ base,\n    std::uint64_t mod\n) {\n    if (mod == 1) return std::make_pair(0,\
+    \ 0);\n\n    std::uint64_t result = 0;\n    std::uint64_t result_power = 1;\n\
+    \    std::uint64_t block = 1;\n    std::uint64_t block_power = base % mod;\n \
+    \   while (length > 0) {\n        if (length & 1) {\n            result = (\n\
+    \                static_cast<unsigned __int128>(result) * block_power + block\n\
+    \            ) % mod;\n            result_power = multiply_mod(result_power, block_power,\
+    \ mod);\n        }\n        block = (\n            static_cast<unsigned __int128>(block)\
+    \ * block_power + block\n        ) % mod;\n        block_power = multiply_mod(block_power,\
+    \ block_power, mod);\n        length >>= 1;\n    }\n    return std::make_pair(result,\
+    \ result_power);\n}\n\n}  // namespace repunit_detail\n\ninline std::pair<std::uint64_t,\
+    \ std::uint64_t> repunit_and_power_mod(\n    std::uint64_t length,\n    std::uint64_t\
+    \ base,\n    std::uint64_t mod\n) {\n    assert(mod >= 1);\n    return repunit_detail::repunit_and_power_mod(length,\
+    \ base, mod);\n}\n\ninline std::uint64_t repunit_mod(\n    std::uint64_t length,\n\
+    \    std::uint64_t base,\n    std::uint64_t mod\n) {\n    return repunit_and_power_mod(length,\
+    \ base, mod).first;\n}\n\ninline std::uint64_t repdigit_mod(\n    std::uint64_t\
+    \ length,\n    std::uint64_t digit,\n    std::uint64_t base,\n    std::uint64_t\
+    \ mod\n) {\n    assert(mod >= 1);\n    if (mod == 1) return 0;\n    return repunit_detail::multiply_mod(\n\
+    \        digit % mod,\n        repunit_mod(length, base, mod),\n        mod\n\
+    \    );\n}\n\ninline std::uint64_t concatenate_digits_mod(\n    std::uint64_t\
+    \ left,\n    std::uint64_t right,\n    std::uint64_t right_length,\n    std::uint64_t\
+    \ base,\n    std::uint64_t mod\n) {\n    assert(mod >= 1);\n    if (mod == 1)\
+    \ return 0;\n    const std::uint64_t power =\n        repunit_and_power_mod(right_length,\
+    \ base, mod).second;\n    return (\n        static_cast<unsigned __int128>(left\
+    \ % mod) * power + right % mod\n    ) % mod;\n}\n\ninline std::optional<std::uint64_t>\
+    \ minimum_repunit_length(\n    std::uint64_t divisor,\n    std::uint64_t base\
+    \ = 10\n) {\n    assert(divisor >= 1);\n    assert(base >= 2);\n    if (std::gcd(divisor,\
+    \ base) != 1) return std::nullopt;\n\n    std::uint64_t remainder = 0;\n    for\
+    \ (std::uint64_t length = 1; length <= divisor; length++) {\n        remainder\
+    \ = (\n            static_cast<unsigned __int128>(remainder) * base + 1\n    \
+    \    ) % divisor;\n        if (remainder == 0) return length;\n    }\n    return\
+    \ std::nullopt;\n}\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line 1\
+    \ \"math/stern_brocot_tree.hpp\"\n\n\n\n#line 10 \"math/stern_brocot_tree.hpp\"\
+    \n\n#line 12 \"math/stern_brocot_tree.hpp\"\n\nnamespace m1une {\nnamespace math\
+    \ {\n\nenum class SternBrocotDirection {\n    Left,\n    Right,\n};\n\nstruct\
+    \ SternBrocotRun {\n    SternBrocotDirection direction;\n    uint64_t count;\n\
+    \n    friend bool operator==(const SternBrocotRun&, const SternBrocotRun&) = default;\n\
+    };\n\nstruct SternBrocotPath {\n    std::vector<SternBrocotRun> runs;\n\n    bool\
+    \ empty() const {\n        return runs.empty();\n    }\n\n    uint64_t depth()\
+    \ const {\n        uint64_t result = 0;\n        for (const SternBrocotRun& run\
+    \ : runs) {\n            assert(run.count <= std::numeric_limits<uint64_t>::max()\
     \ - result);\n            result += run.count;\n        }\n        return result;\n\
     \    }\n\n    void push(SternBrocotDirection direction, uint64_t count = 1) {\n\
     \        if (count == 0) return;\n        if (!runs.empty() && runs.back().direction\
@@ -1264,7 +1345,7 @@ data:
     \ value) {\n    if (value == 0) return true;\n    for (const auto& factor : prime_factorize(value))\
     \ {\n        if (factor.first % 4 == 3 && (factor.second & 1) != 0) return false;\n\
     \    }\n    return true;\n}\n\n}  // namespace math\n}  // namespace m1une\n\n\
-    \n#line 23 \"math/all.hpp\"\n\n\n"
+    \n#line 25 \"math/all.hpp\"\n\n\n"
   code: '#ifndef M1UNE_MATH_ALL_HPP
 
     #define M1UNE_MATH_ALL_HPP 1
@@ -1279,6 +1360,8 @@ data:
     #include "combinatorics.hpp"
 
     #include "combinatorial_sequences.hpp"
+
+    #include "cyclotomic_polynomial.hpp"
 
     #include "gray_code.hpp"
 
@@ -1297,6 +1380,8 @@ data:
     #include "prime_sieve.hpp"
 
     #include "rational.hpp"
+
+    #include "repunit.hpp"
 
     #include "stern_brocot_tree.hpp"
 
@@ -1322,15 +1407,17 @@ data:
   - fps/formal_power_series.hpp
   - fps/convolution.hpp
   - math/modint.hpp
+  - math/cyclotomic_polynomial.hpp
+  - math/prime_factorization.hpp
   - math/gray_code.hpp
   - math/integer_arithmetic.hpp
   - math/lucas.hpp
   - math/modint.hpp
   - math/number_theory.hpp
-  - math/prime_factorization.hpp
   - math/primitive_root.hpp
   - math/prime_sieve.hpp
   - math/rational.hpp
+  - math/repunit.hpp
   - math/stern_brocot_tree.hpp
   - math/tetration.hpp
   - math/totient_sum.hpp
@@ -1338,7 +1425,7 @@ data:
   isVerificationFile: false
   path: math/all.hpp
   requiredBy: []
-  timestamp: '2026-07-03 14:55:58+09:00'
+  timestamp: '2026-07-03 15:39:11+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
@@ -1369,6 +1456,8 @@ You usually do not need to include this entire bundle:
   prime.
 * Use `combinatorial_sequences.hpp` for Catalan, Bernoulli, Bell, Stirling,
   partition, or derangement numbers.
+* Use `cyclotomic_polynomial.hpp` to construct the polynomial of primitive
+  roots of unity of a given order.
 * Use `prime_sieve.hpp` when all queried integers are at most a manageable
   limit, usually a few million or tens of millions.
 * Use `prime_factorization.hpp` for isolated 64-bit integers that are too large
@@ -1380,6 +1469,8 @@ You usually do not need to include this entire bundle:
 * Use `number_theory.hpp` for extended GCD, modular inverses, simultaneous
   remainder constraints, and sums involving floor division.
 * Use `integer_arithmetic.hpp` for exact integer square roots and powers.
+* Use `repunit.hpp` for a repeated-one numeral or geometric sum in an
+  arbitrary base.
 * Use `tetration.hpp` for modular tetration and arbitrary power towers.
 * Use `totient_sum.hpp` for summatory Euler totient queries.
 * Use `rational.hpp` for normalized exact fractions.
@@ -1402,10 +1493,12 @@ few unused headers do not matter.
 | `math/modint.hpp` | Static modular integer type. |
 | `math/combinatorics.hpp` | Factorials, binomial coefficients, permutations, and multiset counts. |
 | `math/combinatorial_sequences.hpp` | Fast standard counting sequences and special numbers. |
+| `math/cyclotomic_polynomial.hpp` | Integer coefficients of cyclotomic polynomials. |
 | `math/number_theory.hpp` | Extended GCD, modular power and inverse, CRT, and floor sum. |
 | `math/prime_sieve.hpp` | Linear sieve with smallest prime factors. |
 | `math/prime_factorization.hpp` | Deterministic 64-bit primality test and Pollard-Rho factorization. |
 | `math/primitive_root.hpp` | Smallest primitive root modulo an integer, when one exists. |
+| `math/repunit.hpp` | Repunits, repdigits, digit-block concatenation, and divisibility lengths. |
 | `math/two_square_sum.hpp` | Enumerates representations as a sum of two non-negative squares. |
 | `math/tetration.hpp` | Modular tetration, arbitrary power towers, and bounded tower comparison. |
 | `math/totient_sum.hpp` | Summatory Euler totient function. |

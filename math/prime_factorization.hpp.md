@@ -6,6 +6,9 @@ data:
     path: math/all.hpp
     title: Math All
   - icon: ':heavy_check_mark:'
+    path: math/cyclotomic_polynomial.hpp
+    title: Cyclotomic Polynomial
+  - icon: ':heavy_check_mark:'
     path: math/primitive_root.hpp
     title: Primitive Root
   - icon: ':heavy_check_mark:'
@@ -15,6 +18,9 @@ data:
     path: math/two_square_sum.hpp
     title: Sum of Two Squares
   _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/math/cyclotomic_polynomial.test.cpp
+    title: verify/math/cyclotomic_polynomial.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/factorize.test.cpp
     title: verify/math/factorize.test.cpp
@@ -194,6 +200,7 @@ data:
   isVerificationFile: false
   path: math/prime_factorization.hpp
   requiredBy:
+  - math/cyclotomic_polynomial.hpp
   - math/primitive_root.hpp
   - math/tetration.hpp
   - math/all.hpp
@@ -206,6 +213,7 @@ data:
   - verify/math/primality_test.test.cpp
   - verify/math/yosupo_factorize.test.cpp
   - verify/math/math_algorithms.test.cpp
+  - verify/math/cyclotomic_polynomial.test.cpp
   - verify/math/factorize.test.cpp
 documentation_of: math/prime_factorization.hpp
 layout: document

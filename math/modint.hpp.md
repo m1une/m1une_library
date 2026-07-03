@@ -148,6 +148,9 @@ data:
     path: verify/math/bitwise_convolution.test.cpp
     title: verify/math/bitwise_convolution.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/cyclotomic_polynomial.test.cpp
+    title: verify/math/cyclotomic_polynomial.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/lucas.test.cpp
     title: verify/math/lucas.test.cpp
   - icon: ':heavy_check_mark:'
@@ -165,6 +168,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/partition_function.test.cpp
     title: verify/math/partition_function.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/repunit.test.cpp
+    title: verify/math/repunit.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/stirling_number_of_the_second_kind.test.cpp
     title: verify/math/stirling_number_of_the_second_kind.test.cpp
@@ -321,8 +327,10 @@ data:
   - verify/math/bell_number.test.cpp
   - verify/math/partition_function.test.cpp
   - verify/math/partition_function.test.cpp
+  - verify/math/repunit.test.cpp
   - verify/math/math_algorithms.test.cpp
   - verify/math/math_algorithms.test.cpp
+  - verify/math/cyclotomic_polynomial.test.cpp
   - verify/math/stirling_number_of_the_second_kind.test.cpp
   - verify/math/stirling_number_of_the_second_kind.test.cpp
   - verify/math/modint.test.cpp

@@ -480,6 +480,9 @@ data:
       path: math/combinatorics.hpp
       title: Combinatorics
     - icon: ':heavy_check_mark:'
+      path: math/cyclotomic_polynomial.hpp
+      title: Cyclotomic Polynomial
+    - icon: ':heavy_check_mark:'
       path: math/gray_code.hpp
       title: Gray Code
     - icon: ':heavy_check_mark:'
@@ -506,6 +509,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: math/rational.hpp
       title: Rational Number
+    - icon: ':heavy_check_mark:'
+      path: math/repunit.hpp
+      title: Repunit
     - icon: ':heavy_check_mark:'
       path: math/stern_brocot_tree.hpp
       title: Stern-Brocot Tree
@@ -1192,6 +1198,9 @@ data:
       path: verify/math/bitwise_convolution.test.cpp
       title: verify/math/bitwise_convolution.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/math/cyclotomic_polynomial.test.cpp
+      title: verify/math/cyclotomic_polynomial.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/math/enumerate_primes.test.cpp
       title: verify/math/enumerate_primes.test.cpp
     - icon: ':heavy_check_mark:'
@@ -1227,6 +1236,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/rational.test.cpp
       title: verify/math/rational.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/repunit.test.cpp
+      title: verify/math/repunit.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/stern_brocot_tree.test.cpp
       title: verify/math/stern_brocot_tree.test.cpp
