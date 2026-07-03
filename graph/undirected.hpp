@@ -10,6 +10,7 @@
 #include "kruskal.hpp"
 #include "lowlink.hpp"
 #include "maximum_clique.hpp"
+#include "minimum_steiner_tree.hpp"
 #include "namori.hpp"
 #include "shortest_path.hpp"
 
