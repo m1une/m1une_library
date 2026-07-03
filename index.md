@@ -411,7 +411,7 @@ data:
     - icon: ':heavy_check_mark:'
       path: graph/general_matching.hpp
       title: General Matching
-    - icon: ':question:'
+    - icon: ':heavy_check_mark:'
       path: graph/graph.hpp
       title: Graph
     - icon: ':heavy_check_mark:'
@@ -777,7 +777,7 @@ data:
     - icon: ':heavy_check_mark:'
       path: tree/rerooting_static_top_tree.hpp
       title: Rerooting Static Top Tree
-    - icon: ':question:'
+    - icon: ':heavy_check_mark:'
       path: tree/rooted_tree.hpp
       title: Rooted Tree
     - icon: ':heavy_check_mark:'
@@ -795,7 +795,7 @@ data:
     - icon: ':heavy_check_mark:'
       path: tree/virtual_tree.hpp
       title: Virtual Tree
-    - icon: ':question:'
+    - icon: ':heavy_check_mark:'
       path: tree/zero_one_on_tree.hpp
       title: 01 on Tree
   - name: utilities
@@ -1343,7 +1343,7 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/tree/tree_algorithms.test.cpp
       title: verify/tree/tree_algorithms.test.cpp
-    - icon: ':x:'
+    - icon: ':heavy_check_mark:'
       path: verify/tree/zero_one_on_tree.test.cpp
       title: verify/tree/zero_one_on_tree.test.cpp
   - name: verify/utilities

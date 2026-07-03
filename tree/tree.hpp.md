@@ -4,7 +4,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: ds/range_query/sparse_table.hpp
     title: Sparse Table
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: graph/graph.hpp
     title: Graph
   - icon: ':heavy_check_mark:'
@@ -13,7 +13,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: tree/diameter.hpp
     title: Tree Diameter
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: tree/rooted_tree.hpp
     title: Rooted Tree
   - icon: ':heavy_check_mark:'

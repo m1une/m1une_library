@@ -92,7 +92,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: tree/rerooting_static_top_tree.hpp
     title: Rerooting Static Top Tree
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: tree/rooted_tree.hpp
     title: Rooted Tree
   - icon: ':heavy_check_mark:'
@@ -110,7 +110,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: tree/virtual_tree.hpp
     title: Virtual Tree
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: tree/zero_one_on_tree.hpp
     title: 01 on Tree
   _extendedVerifiedWith:
@@ -168,15 +168,15 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/tree/tree_algorithms.test.cpp
     title: verify/tree/tree_algorithms.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/tree/zero_one_on_tree.test.cpp
     title: verify/tree/zero_one_on_tree.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/tree/zero_one_on_tree.test.cpp
     title: verify/tree/zero_one_on_tree.test.cpp
-  _isVerificationFailed: true
+  _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':question:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"graph/graph.hpp\"\n\n\n\n#include <cassert>\n#include <utility>\n\
@@ -331,7 +331,7 @@ data:
   - graph/shortest_path.hpp
   - graph/general_matching.hpp
   timestamp: '2026-06-17 14:06:24+09:00'
-  verificationStatus: LIBRARY_SOME_WA
+  verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/tree/rooted_tree_isomorphism_classification.test.cpp
   - verify/tree/rooted_tree_isomorphism_classification.test.cpp

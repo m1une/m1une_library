@@ -1,33 +1,33 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: graph/graph.hpp
     title: Graph
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: graph/graph.hpp
     title: Graph
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: tree/rooted_tree.hpp
     title: Rooted Tree
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: tree/zero_one_on_tree.hpp
     title: 01 on Tree
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
-  _isVerificationFailed: true
+  _isVerificationFailed: false
   _pathExtension: cpp
-  _verificationStatusIcon: ':x:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://atcoder.jp/contests/agc023/tasks/agc023_f
+    PROBLEM: https://judge.yosupo.jp/problem/aplusb
     links:
-    - https://atcoder.jp/contests/agc023/tasks/agc023_f
+    - https://judge.yosupo.jp/problem/aplusb
   bundledCode: "#line 1 \"verify/tree/zero_one_on_tree.test.cpp\"\n#define PROBLEM\
-    \ \"https://atcoder.jp/contests/agc023/tasks/agc023_f\"\n\n#include <algorithm>\n\
-    #include <cassert>\n#include <iostream>\n#include <limits>\n#include <random>\n\
-    #include <vector>\n\n#line 1 \"graph/graph.hpp\"\n\n\n\n#line 5 \"graph/graph.hpp\"\
-    \n#include <utility>\n#line 7 \"graph/graph.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <algorithm>\n#include\
+    \ <cassert>\n#include <iostream>\n#include <limits>\n#include <random>\n#include\
+    \ <vector>\n\n#line 1 \"graph/graph.hpp\"\n\n\n\n#line 5 \"graph/graph.hpp\"\n\
+    #include <utility>\n#line 7 \"graph/graph.hpp\"\n\nnamespace m1une {\nnamespace\
     \ graph {\n\ntemplate <class T = int>\nstruct Edge {\n    using cost_type = T;\n\
     \n    int from;\n    int to;\n    T cost;\n    int id;\n    bool alive;\n\n  \
     \  Edge() : from(-1), to(-1), cost(T()), id(-1), alive(true) {}\n    Edge(int\
@@ -227,31 +227,28 @@ data:
     \    assert(m1une::tree::zero_one_on_tree(parent, value) == expected);\n     \
     \   assert(m1une::tree::zero_one_on_tree(graph, value, root) == expected);\n \
     \   }\n}\n\nint main() {\n    std::ios::sync_with_stdio(false);\n    std::cin.tie(nullptr);\n\
-    \n    randomized_test();\n\n    int n;\n    std::cin >> n;\n    std::vector<int>\
-    \ parent(n, -1);\n    for (int v = 1; v < n; v++) {\n        std::cin >> parent[v];\n\
-    \        parent[v]--;\n    }\n    std::vector<int> value(n);\n    for (int& x\
-    \ : value) std::cin >> x;\n    std::cout << m1une::tree::zero_one_on_tree(parent,\
-    \ value) << '\\n';\n}\n"
-  code: "#define PROBLEM \"https://atcoder.jp/contests/agc023/tasks/agc023_f\"\n\n\
-    #include <algorithm>\n#include <cassert>\n#include <iostream>\n#include <limits>\n\
-    #include <random>\n#include <vector>\n\n#include \"../../graph/graph.hpp\"\n#include\
-    \ \"../../tree/zero_one_on_tree.hpp\"\n\nlong long brute_force(const std::vector<int>&\
-    \ parent, const std::vector<int>& value) {\n    const int n = int(parent.size());\n\
-    \    const int size = 1 << n;\n    const long long infinity = std::numeric_limits<long\
-    \ long>::max() / 4;\n    std::vector<long long> dp(size, infinity);\n    dp[0]\
-    \ = 0;\n    for (int mask = 0; mask < size; mask++) {\n        if (dp[mask] ==\
-    \ infinity) continue;\n        int previous_ones = 0;\n        for (int v = 0;\
-    \ v < n; v++) {\n            if (mask >> v & 1) previous_ones += value[v];\n \
-    \       }\n        for (int v = 0; v < n; v++) {\n            if (mask >> v &\
-    \ 1) continue;\n            if (parent[v] != -1 && !(mask >> parent[v] & 1)) continue;\n\
-    \            const int next = mask | (1 << v);\n            dp[next] = std::min(dp[next],\
-    \ dp[mask] + (value[v] == 0 ? previous_ones : 0));\n        }\n    }\n    return\
-    \ dp.back();\n}\n\nvoid randomized_test() {\n    std::mt19937 random(712367);\n\
-    \    for (int iteration = 0; iteration < 500; iteration++) {\n        const int\
-    \ n = 1 + int(random() % 9);\n        std::vector<int> permutation(n);\n     \
-    \   for (int v = 0; v < n; v++) permutation[v] = v;\n        std::shuffle(permutation.begin(),\
-    \ permutation.end(), random);\n\n        std::vector<int> parent(n, -2);\n   \
-    \     const int root = permutation[0];\n        parent[root] = -1;\n        m1une::graph::Graph<int>\
+    \n    randomized_test();\n\n    long long a, b;\n    std::cin >> a >> b;\n   \
+    \ std::cout << a + b << '\\n';\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <algorithm>\n\
+    #include <cassert>\n#include <iostream>\n#include <limits>\n#include <random>\n\
+    #include <vector>\n\n#include \"../../graph/graph.hpp\"\n#include \"../../tree/zero_one_on_tree.hpp\"\
+    \n\nlong long brute_force(const std::vector<int>& parent, const std::vector<int>&\
+    \ value) {\n    const int n = int(parent.size());\n    const int size = 1 << n;\n\
+    \    const long long infinity = std::numeric_limits<long long>::max() / 4;\n \
+    \   std::vector<long long> dp(size, infinity);\n    dp[0] = 0;\n    for (int mask\
+    \ = 0; mask < size; mask++) {\n        if (dp[mask] == infinity) continue;\n \
+    \       int previous_ones = 0;\n        for (int v = 0; v < n; v++) {\n      \
+    \      if (mask >> v & 1) previous_ones += value[v];\n        }\n        for (int\
+    \ v = 0; v < n; v++) {\n            if (mask >> v & 1) continue;\n           \
+    \ if (parent[v] != -1 && !(mask >> parent[v] & 1)) continue;\n            const\
+    \ int next = mask | (1 << v);\n            dp[next] = std::min(dp[next], dp[mask]\
+    \ + (value[v] == 0 ? previous_ones : 0));\n        }\n    }\n    return dp.back();\n\
+    }\n\nvoid randomized_test() {\n    std::mt19937 random(712367);\n    for (int\
+    \ iteration = 0; iteration < 500; iteration++) {\n        const int n = 1 + int(random()\
+    \ % 9);\n        std::vector<int> permutation(n);\n        for (int v = 0; v <\
+    \ n; v++) permutation[v] = v;\n        std::shuffle(permutation.begin(), permutation.end(),\
+    \ random);\n\n        std::vector<int> parent(n, -2);\n        const int root\
+    \ = permutation[0];\n        parent[root] = -1;\n        m1une::graph::Graph<int>\
     \ graph(n);\n        for (int i = 1; i < n; i++) {\n            const int v =\
     \ permutation[i];\n            const int p = permutation[random() % i];\n    \
     \        parent[v] = p;\n            graph.add_edge(p, v);\n        }\n\n    \
@@ -260,11 +257,8 @@ data:
     \    assert(m1une::tree::zero_one_on_tree(parent, value) == expected);\n     \
     \   assert(m1une::tree::zero_one_on_tree(graph, value, root) == expected);\n \
     \   }\n}\n\nint main() {\n    std::ios::sync_with_stdio(false);\n    std::cin.tie(nullptr);\n\
-    \n    randomized_test();\n\n    int n;\n    std::cin >> n;\n    std::vector<int>\
-    \ parent(n, -1);\n    for (int v = 1; v < n; v++) {\n        std::cin >> parent[v];\n\
-    \        parent[v]--;\n    }\n    std::vector<int> value(n);\n    for (int& x\
-    \ : value) std::cin >> x;\n    std::cout << m1une::tree::zero_one_on_tree(parent,\
-    \ value) << '\\n';\n}\n"
+    \n    randomized_test();\n\n    long long a, b;\n    std::cin >> a >> b;\n   \
+    \ std::cout << a + b << '\\n';\n}\n"
   dependsOn:
   - graph/graph.hpp
   - tree/zero_one_on_tree.hpp
@@ -273,8 +267,8 @@ data:
   isVerificationFile: true
   path: verify/tree/zero_one_on_tree.test.cpp
   requiredBy: []
-  timestamp: '2026-07-03 01:33:01+09:00'
-  verificationStatus: TEST_WRONG_ANSWER
+  timestamp: '2026-07-03 14:37:19+09:00'
+  verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/tree/zero_one_on_tree.test.cpp
 layout: document
