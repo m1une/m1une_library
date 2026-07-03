@@ -477,6 +477,9 @@ data:
       path: math/combinatorics.hpp
       title: Combinatorics
     - icon: ':heavy_check_mark:'
+      path: math/gray_code.hpp
+      title: Gray Code
+    - icon: ':heavy_check_mark:'
       path: math/integer_arithmetic.hpp
       title: Integer Square Root and Power
     - icon: ':heavy_check_mark:'
@@ -1194,6 +1197,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/floor_sum.test.cpp
       title: verify/math/floor_sum.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/gray_code.test.cpp
+      title: verify/math/gray_code.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/integer_arithmetic.test.cpp
       title: verify/math/integer_arithmetic.test.cpp

@@ -23,6 +23,9 @@ data:
     path: math/combinatorics.hpp
     title: Combinatorics
   - icon: ':heavy_check_mark:'
+    path: math/gray_code.hpp
+    title: Gray Code
+  - icon: ':heavy_check_mark:'
     path: math/integer_arithmetic.hpp
     title: Integer Square Root and Power
   - icon: ':heavy_check_mark:'
@@ -581,37 +584,56 @@ data:
     \n    std::vector<Mint> result(maximum + 1);\n    result[0] = 1;\n    if (maximum\
     \ >= 1) result[1] = 0;\n    for (int n = 2; n <= maximum; n++) {\n        result[n]\
     \ = Mint(n - 1) * (result[n - 1] + result[n - 2]);\n    }\n    return result;\n\
-    }\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line 1 \"math/integer_arithmetic.hpp\"\
-    \n\n\n\n#line 9 \"math/integer_arithmetic.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ math {\n\nnamespace integer_arithmetic_detail {\n\ntemplate <std::integral T>\n\
-    requires(!std::same_as<std::remove_cv_t<T>, bool>)\nconstexpr std::optional<T>\
-    \ checked_multiply(T first, T second) {\n    constexpr T minimum = std::numeric_limits<T>::min();\n\
-    \    constexpr T maximum = std::numeric_limits<T>::max();\n\n    if constexpr\
-    \ (std::unsigned_integral<T>) {\n        if (second != 0 && maximum / second <\
-    \ first) return std::nullopt;\n    } else {\n        if (0 < first) {\n      \
-    \      if (0 < second) {\n                if (maximum / second < first) return\
-    \ std::nullopt;\n            } else if (second < minimum / first) {\n        \
-    \        return std::nullopt;\n            }\n        } else if (first < 0) {\n\
-    \            if (0 < second) {\n                if (first < minimum / second)\
-    \ return std::nullopt;\n            } else if (second < maximum / first) {\n \
-    \               return std::nullopt;\n            }\n        }\n    }\n    return\
-    \ T(first * second);\n}\n\n}  // namespace integer_arithmetic_detail\n\n// Returns\
-    \ floor(sqrt(value)) exactly, without floating-point arithmetic.\ntemplate <std::integral\
-    \ T>\nrequires(!std::same_as<std::remove_cv_t<T>, bool>)\nconstexpr T isqrt(T\
-    \ value) {\n    if constexpr (std::signed_integral<T>) assert(0 <= value);\n \
-    \   if (value <= 1) return value;\n\n    T low = 1;\n    T high = value / 2 +\
-    \ 1;\n    while (low < high) {\n        T middle = low + (high - low + 1) / 2;\n\
-    \        if (middle <= value / middle) {\n            low = middle;\n        }\
-    \ else {\n            high = middle - 1;\n        }\n    }\n    return low;\n\
-    }\n\ntemplate <std::integral T>\nrequires(!std::same_as<std::remove_cv_t<T>, bool>)\n\
-    constexpr T floor_sqrt(T value) {\n    return isqrt(value);\n}\n\n// Returns ceil(sqrt(value))\
-    \ exactly, without floating-point arithmetic.\ntemplate <std::integral T>\nrequires(!std::same_as<std::remove_cv_t<T>,\
-    \ bool>)\nconstexpr T ceil_sqrt(T value) {\n    T result = isqrt(value);\n   \
-    \ if (result == 0) return 0;\n    if (result != 0 && value / result == result\
-    \ && value % result == 0) {\n        return result;\n    }\n    return result\
-    \ + 1;\n}\n\n// Returns base^exponent, or nullopt when the result does not fit\
-    \ in T.\ntemplate <std::integral T, std::unsigned_integral Exponent>\nrequires(\n\
-    \    !std::same_as<std::remove_cv_t<T>, bool>\n    && !std::same_as<std::remove_cv_t<Exponent>,\
+    }\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line 1 \"math/gray_code.hpp\"\
+    \n\n\n\n#line 11 \"math/gray_code.hpp\"\n\nnamespace m1une {\nnamespace math {\n\
+    \n// Converts a binary value to its binary-reflected Gray code.\ntemplate <std::unsigned_integral\
+    \ UInt>\nrequires(!std::same_as<std::remove_cv_t<UInt>, bool>)\nconstexpr UInt\
+    \ gray_encode(UInt value) noexcept {\n    return value ^ (value >> 1);\n}\n\n\
+    // Converts a binary-reflected Gray code to the corresponding binary value.\n\
+    template <std::unsigned_integral UInt>\nrequires(!std::same_as<std::remove_cv_t<UInt>,\
+    \ bool>)\nconstexpr UInt gray_decode(UInt code) noexcept {\n    for (int shift\
+    \ = 1; shift < std::numeric_limits<UInt>::digits;\n         shift <<= 1) {\n \
+    \       code ^= code >> shift;\n    }\n    return code;\n}\n\n// Returns all bit_count-bit\
+    \ binary-reflected Gray codes in traversal order.\ntemplate <std::unsigned_integral\
+    \ UInt = std::uint64_t>\nrequires(!std::same_as<std::remove_cv_t<UInt>, bool>)\n\
+    std::vector<UInt> gray_code_sequence(int bit_count) {\n    constexpr int uint_digits\
+    \ = std::numeric_limits<UInt>::digits;\n    constexpr int size_digits = std::numeric_limits<std::size_t>::digits;\n\
+    \    assert(0 <= bit_count);\n    assert(bit_count <= uint_digits);\n    assert(bit_count\
+    \ < size_digits);\n    if (bit_count < 0 || uint_digits < bit_count || size_digits\
+    \ <= bit_count) {\n        return {};\n    }\n\n    const std::size_t size = std::size_t(1)\
+    \ << bit_count;\n    std::vector<UInt> result(size);\n    for (std::size_t index\
+    \ = 0; index < size; ++index) {\n        result[index] = gray_encode(static_cast<UInt>(index));\n\
+    \    }\n    return result;\n}\n\n}  // namespace math\n}  // namespace m1une\n\
+    \n\n#line 1 \"math/integer_arithmetic.hpp\"\n\n\n\n#line 9 \"math/integer_arithmetic.hpp\"\
+    \n\nnamespace m1une {\nnamespace math {\n\nnamespace integer_arithmetic_detail\
+    \ {\n\ntemplate <std::integral T>\nrequires(!std::same_as<std::remove_cv_t<T>,\
+    \ bool>)\nconstexpr std::optional<T> checked_multiply(T first, T second) {\n \
+    \   constexpr T minimum = std::numeric_limits<T>::min();\n    constexpr T maximum\
+    \ = std::numeric_limits<T>::max();\n\n    if constexpr (std::unsigned_integral<T>)\
+    \ {\n        if (second != 0 && maximum / second < first) return std::nullopt;\n\
+    \    } else {\n        if (0 < first) {\n            if (0 < second) {\n     \
+    \           if (maximum / second < first) return std::nullopt;\n            }\
+    \ else if (second < minimum / first) {\n                return std::nullopt;\n\
+    \            }\n        } else if (first < 0) {\n            if (0 < second) {\n\
+    \                if (first < minimum / second) return std::nullopt;\n        \
+    \    } else if (second < maximum / first) {\n                return std::nullopt;\n\
+    \            }\n        }\n    }\n    return T(first * second);\n}\n\n}  // namespace\
+    \ integer_arithmetic_detail\n\n// Returns floor(sqrt(value)) exactly, without\
+    \ floating-point arithmetic.\ntemplate <std::integral T>\nrequires(!std::same_as<std::remove_cv_t<T>,\
+    \ bool>)\nconstexpr T isqrt(T value) {\n    if constexpr (std::signed_integral<T>)\
+    \ assert(0 <= value);\n    if (value <= 1) return value;\n\n    T low = 1;\n \
+    \   T high = value / 2 + 1;\n    while (low < high) {\n        T middle = low\
+    \ + (high - low + 1) / 2;\n        if (middle <= value / middle) {\n         \
+    \   low = middle;\n        } else {\n            high = middle - 1;\n        }\n\
+    \    }\n    return low;\n}\n\ntemplate <std::integral T>\nrequires(!std::same_as<std::remove_cv_t<T>,\
+    \ bool>)\nconstexpr T floor_sqrt(T value) {\n    return isqrt(value);\n}\n\n//\
+    \ Returns ceil(sqrt(value)) exactly, without floating-point arithmetic.\ntemplate\
+    \ <std::integral T>\nrequires(!std::same_as<std::remove_cv_t<T>, bool>)\nconstexpr\
+    \ T ceil_sqrt(T value) {\n    T result = isqrt(value);\n    if (result == 0) return\
+    \ 0;\n    if (result != 0 && value / result == result && value % result == 0)\
+    \ {\n        return result;\n    }\n    return result + 1;\n}\n\n// Returns base^exponent,\
+    \ or nullopt when the result does not fit in T.\ntemplate <std::integral T, std::unsigned_integral\
+    \ Exponent>\nrequires(\n    !std::same_as<std::remove_cv_t<T>, bool>\n    && !std::same_as<std::remove_cv_t<Exponent>,\
     \ bool>\n)\nconstexpr std::optional<T> checked_ipow(T base, Exponent exponent)\
     \ {\n    T result = 1;\n    while (exponent != 0) {\n        if (exponent & 1)\
     \ {\n            auto product =\n                integer_arithmetic_detail::checked_multiply(result,\
@@ -1242,7 +1264,7 @@ data:
     \ value) {\n    if (value == 0) return true;\n    for (const auto& factor : prime_factorize(value))\
     \ {\n        if (factor.first % 4 == 3 && (factor.second & 1) != 0) return false;\n\
     \    }\n    return true;\n}\n\n}  // namespace math\n}  // namespace m1une\n\n\
-    \n#line 22 \"math/all.hpp\"\n\n\n"
+    \n#line 23 \"math/all.hpp\"\n\n\n"
   code: '#ifndef M1UNE_MATH_ALL_HPP
 
     #define M1UNE_MATH_ALL_HPP 1
@@ -1257,6 +1279,8 @@ data:
     #include "combinatorics.hpp"
 
     #include "combinatorial_sequences.hpp"
+
+    #include "gray_code.hpp"
 
     #include "integer_arithmetic.hpp"
 
@@ -1298,6 +1322,7 @@ data:
   - fps/formal_power_series.hpp
   - fps/convolution.hpp
   - math/modint.hpp
+  - math/gray_code.hpp
   - math/integer_arithmetic.hpp
   - math/lucas.hpp
   - math/modint.hpp
@@ -1313,7 +1338,7 @@ data:
   isVerificationFile: false
   path: math/all.hpp
   requiredBy: []
-  timestamp: '2026-07-01 22:52:49+09:00'
+  timestamp: '2026-07-03 14:55:58+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
@@ -1335,6 +1360,7 @@ You usually do not need to include this entire bundle:
   digit sequences.
 * Use `bitwise_convolution.hpp` for OR, AND, or XOR convolution over mask
   indices.
+* Use `gray_code.hpp` to enumerate bit masks so that one bit changes at a time.
 * Use `zeta_mobius_transform.hpp` for subset, superset, divisor, and multiple
   transforms.
 * Use `combinatorics.hpp` for many factorial, combination, or permutation
@@ -1370,6 +1396,7 @@ few unused headers do not matter.
 | `math/base_n.hpp` | Checked conversion between integers and arbitrary-base digits. |
 | `math/bitwise_convolution.hpp` | OR, AND, XOR convolutions and the Walsh-Hadamard transform. |
 | `math/bit_ceil.hpp` | Smallest power of two at least a given value. |
+| `math/gray_code.hpp` | Binary-reflected Gray-code encoding, decoding, and enumeration. |
 | `math/integer_arithmetic.hpp` | Exact integer square roots and overflow-aware powers. |
 | `math/lucas.hpp` | Lucas's theorem for huge binomial arguments modulo a small prime. |
 | `math/modint.hpp` | Static modular integer type. |
