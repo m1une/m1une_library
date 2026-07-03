@@ -5,6 +5,7 @@
 #include "circle.hpp"
 #include "convex_hull.hpp"
 #include "farthest_pair.hpp"
+#include "half_plane_intersection.hpp"
 #include "line.hpp"
 #include "manhattan_mst.hpp"
 #include "point.hpp"
