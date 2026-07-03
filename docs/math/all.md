@@ -25,6 +25,8 @@ You usually do not need to include this entire bundle:
   prime.
 * Use `combinatorial_sequences.hpp` for Catalan, Bernoulli, Bell, Stirling,
   partition, or derangement numbers.
+* Use `cyclotomic_polynomial.hpp` to construct the polynomial of primitive
+  roots of unity of a given order.
 * Use `prime_sieve.hpp` when all queried integers are at most a manageable
   limit, usually a few million or tens of millions.
 * Use `prime_factorization.hpp` for isolated 64-bit integers that are too large
@@ -36,6 +38,8 @@ You usually do not need to include this entire bundle:
 * Use `number_theory.hpp` for extended GCD, modular inverses, simultaneous
   remainder constraints, and sums involving floor division.
 * Use `integer_arithmetic.hpp` for exact integer square roots and powers.
+* Use `repunit.hpp` for a repeated-one numeral or geometric sum in an
+  arbitrary base.
 * Use `tetration.hpp` for modular tetration and arbitrary power towers.
 * Use `totient_sum.hpp` for summatory Euler totient queries.
 * Use `rational.hpp` for normalized exact fractions.
@@ -58,10 +62,12 @@ few unused headers do not matter.
 | `math/modint.hpp` | Static modular integer type. |
 | `math/combinatorics.hpp` | Factorials, binomial coefficients, permutations, and multiset counts. |
 | `math/combinatorial_sequences.hpp` | Fast standard counting sequences and special numbers. |
+| `math/cyclotomic_polynomial.hpp` | Integer coefficients of cyclotomic polynomials. |
 | `math/number_theory.hpp` | Extended GCD, modular power and inverse, CRT, and floor sum. |
 | `math/prime_sieve.hpp` | Linear sieve with smallest prime factors. |
 | `math/prime_factorization.hpp` | Deterministic 64-bit primality test and Pollard-Rho factorization. |
 | `math/primitive_root.hpp` | Smallest primitive root modulo an integer, when one exists. |
+| `math/repunit.hpp` | Repunits, repdigits, digit-block concatenation, and divisibility lengths. |
 | `math/two_square_sum.hpp` | Enumerates representations as a sum of two non-negative squares. |
 | `math/tetration.hpp` | Modular tetration, arbitrary power towers, and bounded tower comparison. |
 | `math/totient_sum.hpp` | Summatory Euler totient function. |
