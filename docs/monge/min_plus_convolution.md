@@ -13,7 +13,9 @@ $$
 
 When `b` is a discrete convex sequence, the minimizing index in `a` is
 nondecreasing with `k`. `min_plus_convolution_convex` uses this Monge structure
-to avoid the naive quadratic algorithm.
+to avoid the naive quadratic algorithm. When both sequences are convex,
+`min_plus_convolution_convex_convex` merges their nondecreasing adjacent
+differences and runs in linear time.
 
 The header also provides the symmetric max-plus operation when the second
 sequence is concave.
@@ -28,18 +30,26 @@ std::vector<T> min_plus_convolution_convex(
 );
 
 template <class T>
+std::vector<T> min_plus_convolution_convex_convex(
+    const std::vector<T>& first,
+    const std::vector<T>& second
+);
+
+template <class T>
 std::vector<T> max_plus_convolution_concave(
     const std::vector<T>& arbitrary,
     const std::vector<T>& concave
 );
 ```
 
-The first sequence is arbitrary. The second sequence must have nondecreasing
-adjacent differences for min-plus, or nonincreasing adjacent differences for
-max-plus.
+For `min_plus_convolution_convex`, the first sequence is arbitrary and the
+second must have nondecreasing adjacent differences. Both arguments to
+`min_plus_convolution_convex_convex` must have nondecreasing adjacent
+differences. For max-plus, the first sequence is arbitrary and the second must
+have nonincreasing adjacent differences.
 
 If either sequence is empty, the result is empty. Otherwise its length is
-`arbitrary.size() + structured.size() - 1`.
+the sum of the input lengths minus one.
 
 The precondition helpers are:
 
@@ -56,8 +66,15 @@ functions do not run these checks automatically.
 
 ## Complexity
 
-For input lengths `N` and `M`, the implementation uses
-$O((N + M)\log(N + M))$ time and $O(N + M)$ memory.
+For input lengths `N` and `M`:
+
+| Function | Time | Memory, including the result |
+| --- | --- | --- |
+| `min_plus_convolution_convex` | $O((N + M)\log(N + M))$ | $O(N + M)$ |
+| `min_plus_convolution_convex_convex` | $O(N + M)$ | $O(N + M)$ |
+| `max_plus_convolution_concave` | $O((N + M)\log(N + M))$ | $O(N + M)$ |
+| `is_convex_sequence` | $O(N)$ | $O(1)$ |
+| `is_concave_sequence` | $O(N)$ | $O(1)$ |
 
 The element type must support addition, subtraction, and comparison.
 Intermediate values and adjacent differences must fit in the type.
@@ -69,10 +86,10 @@ Intermediate values and adjacent differences must fit in the type.
 #include <vector>
 
 int main() {
-    std::vector<long long> arbitrary = {5, 1, 8, 3};
-    std::vector<long long> convex = {0, 1, 4, 9};
+    std::vector<long long> first = {0, 2, 7, 15};
+    std::vector<long long> second = {1, 2, 5, 10};
 
-    auto result =
-        m1une::monge::min_plus_convolution_convex(arbitrary, convex);
+    auto result = m1une::monge::min_plus_convolution_convex_convex(first,
+                                                                   second);
 }
 ```

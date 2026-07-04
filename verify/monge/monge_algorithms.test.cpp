@@ -181,6 +181,22 @@ void test_structured_convolutions() {
                 assert(m1une::monge::min_plus_convolution_convex(arbitrary, convex) ==
                        expected_min);
 
+                std::vector<long long> first_convex(first_size);
+                difference = -12 - test;
+                for (int i = 1; i < first_size; i++) {
+                    difference += (test * 5 + i * 7) % 5;
+                    first_convex[i] = first_convex[i - 1] + difference;
+                }
+                assert(m1une::monge::is_convex_sequence(first_convex));
+                auto expected_convex =
+                    brute_convolution(first_convex, convex, std::less<>());
+                assert(m1une::monge::min_plus_convolution_convex_convex(first_convex,
+                                                                        convex) ==
+                       expected_convex);
+                assert(m1une::monge::min_plus_convolution_convex_convex(convex,
+                                                                        first_convex) ==
+                       expected_convex);
+
                 std::vector<long long> concave = convex;
                 for (auto& value : concave) value = -value;
                 assert(m1une::monge::is_concave_sequence(concave));
