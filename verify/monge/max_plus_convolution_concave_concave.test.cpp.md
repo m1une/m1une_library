@@ -14,7 +14,7 @@ data:
     PROBLEM: https://judge.yosupo.jp/problem/min_plus_convolution_convex_convex
     links:
     - https://judge.yosupo.jp/problem/min_plus_convolution_convex_convex
-  bundledCode: "#line 1 \"verify/monge/min_plus_convolution_convex_convex.test.cpp\"\
+  bundledCode: "#line 1 \"verify/monge/max_plus_convolution_concave_concave.test.cpp\"\
     \n#define PROBLEM \"https://judge.yosupo.jp/problem/min_plus_convolution_convex_convex\"\
     \n\n#include <iostream>\n#include <vector>\n\n#line 1 \"monge/min_plus_convolution.hpp\"\
     \n\n\n\n#include <functional>\n#line 6 \"monge/min_plus_convolution.hpp\"\n\n\
@@ -79,35 +79,39 @@ data:
     \ std::vector<T>& first,\n                                                   \
     \ const std::vector<T>& second) {\n    return convolution_detail::linear_structured_convolution(first,\
     \ second, std::greater<>());\n}\n\n}  // namespace monge\n}  // namespace m1une\n\
-    \n\n#line 7 \"verify/monge/min_plus_convolution_convex_convex.test.cpp\"\n\nint\
-    \ main() {\n    std::ios::sync_with_stdio(false);\n    std::cin.tie(nullptr);\n\
+    \n\n#line 7 \"verify/monge/max_plus_convolution_concave_concave.test.cpp\"\n\n\
+    int main() {\n    std::ios::sync_with_stdio(false);\n    std::cin.tie(nullptr);\n\
     \n    int n, m;\n    std::cin >> n >> m;\n    std::vector<long long> first(n),\
-    \ second(m);\n    for (long long& value : first) std::cin >> value;\n    for (long\
-    \ long& value : second) std::cin >> value;\n\n    std::vector<long long> result\
-    \ =\n        m1une::monge::min_plus_convolution_convex_convex(first, second);\n\
-    \    for (int i = 0; i < int(result.size()); i++) {\n        if (i) std::cout\
-    \ << ' ';\n        std::cout << result[i];\n    }\n    std::cout << '\\n';\n}\n"
+    \ second(m);\n    for (long long& value : first) {\n        std::cin >> value;\n\
+    \        value = -value;\n    }\n    for (long long& value : second) {\n     \
+    \   std::cin >> value;\n        value = -value;\n    }\n\n    std::vector<long\
+    \ long> result =\n        m1une::monge::max_plus_convolution_concave_concave(first,\
+    \ second);\n    for (int i = 0; i < int(result.size()); i++) {\n        if (i)\
+    \ std::cout << ' ';\n        std::cout << -result[i];\n    }\n    std::cout <<\
+    \ '\\n';\n}\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/min_plus_convolution_convex_convex\"\
     \n\n#include <iostream>\n#include <vector>\n\n#include \"../../monge/min_plus_convolution.hpp\"\
     \n\nint main() {\n    std::ios::sync_with_stdio(false);\n    std::cin.tie(nullptr);\n\
     \n    int n, m;\n    std::cin >> n >> m;\n    std::vector<long long> first(n),\
-    \ second(m);\n    for (long long& value : first) std::cin >> value;\n    for (long\
-    \ long& value : second) std::cin >> value;\n\n    std::vector<long long> result\
-    \ =\n        m1une::monge::min_plus_convolution_convex_convex(first, second);\n\
-    \    for (int i = 0; i < int(result.size()); i++) {\n        if (i) std::cout\
-    \ << ' ';\n        std::cout << result[i];\n    }\n    std::cout << '\\n';\n}\n"
+    \ second(m);\n    for (long long& value : first) {\n        std::cin >> value;\n\
+    \        value = -value;\n    }\n    for (long long& value : second) {\n     \
+    \   std::cin >> value;\n        value = -value;\n    }\n\n    std::vector<long\
+    \ long> result =\n        m1une::monge::max_plus_convolution_concave_concave(first,\
+    \ second);\n    for (int i = 0; i < int(result.size()); i++) {\n        if (i)\
+    \ std::cout << ' ';\n        std::cout << -result[i];\n    }\n    std::cout <<\
+    \ '\\n';\n}\n"
   dependsOn:
   - monge/min_plus_convolution.hpp
   isVerificationFile: true
-  path: verify/monge/min_plus_convolution_convex_convex.test.cpp
+  path: verify/monge/max_plus_convolution_concave_concave.test.cpp
   requiredBy: []
   timestamp: '2026-07-05 05:15:40+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/monge/min_plus_convolution_convex_convex.test.cpp
+documentation_of: verify/monge/max_plus_convolution_concave_concave.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/monge/min_plus_convolution_convex_convex.test.cpp
-- /verify/verify/monge/min_plus_convolution_convex_convex.test.cpp.html
-title: verify/monge/min_plus_convolution_convex_convex.test.cpp
+- /verify/verify/monge/max_plus_convolution_concave_concave.test.cpp
+- /verify/verify/monge/max_plus_convolution_concave_concave.test.cpp.html
+title: verify/monge/max_plus_convolution_concave_concave.test.cpp
 ---
