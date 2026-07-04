@@ -1,5 +1,5 @@
 ---
-title: Structured Min-Plus Convolution
+title: Structured Min-Plus and Max-Plus Convolution
 documentation_of: ../../monge/min_plus_convolution.hpp
 ---
 
@@ -15,7 +15,9 @@ When `b` is a discrete convex sequence, the minimizing index in `a` is
 nondecreasing with `k`. `min_plus_convolution_convex` uses this Monge structure
 to avoid the naive quadratic algorithm. When both sequences are convex,
 `min_plus_convolution_convex_convex` merges their nondecreasing adjacent
-differences and runs in linear time.
+differences and runs in linear time. Symmetrically,
+`max_plus_convolution_concave_concave` merges the nonincreasing adjacent
+differences of two concave sequences in linear time.
 
 The header also provides the symmetric max-plus operation when the second
 sequence is concave.
@@ -40,13 +42,21 @@ std::vector<T> max_plus_convolution_concave(
     const std::vector<T>& arbitrary,
     const std::vector<T>& concave
 );
+
+template <class T>
+std::vector<T> max_plus_convolution_concave_concave(
+    const std::vector<T>& first,
+    const std::vector<T>& second
+);
 ```
 
 For `min_plus_convolution_convex`, the first sequence is arbitrary and the
 second must have nondecreasing adjacent differences. Both arguments to
 `min_plus_convolution_convex_convex` must have nondecreasing adjacent
-differences. For max-plus, the first sequence is arbitrary and the second must
-have nonincreasing adjacent differences.
+differences. For `max_plus_convolution_concave`, the first sequence is arbitrary
+and the second must have nonincreasing adjacent differences. Both arguments to
+`max_plus_convolution_concave_concave` must have nonincreasing adjacent
+differences.
 
 If either sequence is empty, the result is empty. Otherwise its length is
 the sum of the input lengths minus one.
@@ -73,6 +83,7 @@ For input lengths `N` and `M`:
 | `min_plus_convolution_convex` | $O((N + M)\log(N + M))$ | $O(N + M)$ |
 | `min_plus_convolution_convex_convex` | $O(N + M)$ | $O(N + M)$ |
 | `max_plus_convolution_concave` | $O((N + M)\log(N + M))$ | $O(N + M)$ |
+| `max_plus_convolution_concave_concave` | $O(N + M)$ | $O(N + M)$ |
 | `is_convex_sequence` | $O(N)$ | $O(1)$ |
 | `is_concave_sequence` | $O(N)$ | $O(1)$ |
 
@@ -91,5 +102,10 @@ int main() {
 
     auto result = m1une::monge::min_plus_convolution_convex_convex(first,
                                                                    second);
+
+    std::vector<long long> first_concave = {0, -2, -7, -15};
+    std::vector<long long> second_concave = {-1, -2, -5, -10};
+    auto maximum = m1une::monge::max_plus_convolution_concave_concave(
+        first_concave, second_concave);
 }
 ```

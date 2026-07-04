@@ -203,6 +203,18 @@ void test_structured_convolutions() {
                 auto expected_max = brute_convolution(arbitrary, concave, std::greater<>());
                 assert(m1une::monge::max_plus_convolution_concave(arbitrary, concave) ==
                        expected_max);
+
+                std::vector<long long> first_concave = first_convex;
+                for (auto& value : first_concave) value = -value;
+                assert(m1une::monge::is_concave_sequence(first_concave));
+                auto expected_concave =
+                    brute_convolution(first_concave, concave, std::greater<>());
+                assert(m1une::monge::max_plus_convolution_concave_concave(first_concave,
+                                                                          concave) ==
+                       expected_concave);
+                assert(m1une::monge::max_plus_convolution_concave_concave(concave,
+                                                                          first_concave) ==
+                       expected_concave);
             }
         }
     }

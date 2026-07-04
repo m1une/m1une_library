@@ -46,6 +46,47 @@ std::vector<T> structured_convolution(const std::vector<T>& arbitrary,
     return result;
 }
 
+template <class T, class Compare>
+std::vector<T> linear_structured_convolution(const std::vector<T>& first,
+                                             const std::vector<T>& second,
+                                             Compare compare) {
+    if (first.empty() || second.empty()) return {};
+
+    int first_size = int(first.size());
+    int second_size = int(second.size());
+    std::vector<T> result(first_size + second_size - 1);
+    result[0] = first[0] + second[0];
+
+    int first_index = 1;
+    int second_index = 1;
+    int result_index = 1;
+    while (first_index < first_size && second_index < second_size) {
+        T first_difference = first[first_index] - first[first_index - 1];
+        T second_difference = second[second_index] - second[second_index - 1];
+        if (compare(second_difference, first_difference)) {
+            result[result_index] = result[result_index - 1] + second_difference;
+            second_index++;
+        } else {
+            result[result_index] = result[result_index - 1] + first_difference;
+            first_index++;
+        }
+        result_index++;
+    }
+    while (first_index < first_size) {
+        T difference = first[first_index] - first[first_index - 1];
+        result[result_index] = result[result_index - 1] + difference;
+        first_index++;
+        result_index++;
+    }
+    while (second_index < second_size) {
+        T difference = second[second_index] - second[second_index - 1];
+        result[result_index] = result[result_index - 1] + difference;
+        second_index++;
+        result_index++;
+    }
+    return result;
+}
+
 }  // namespace convolution_detail
 
 template <class T>
@@ -77,47 +118,19 @@ std::vector<T> min_plus_convolution_convex(const std::vector<T>& arbitrary,
 template <class T>
 std::vector<T> min_plus_convolution_convex_convex(const std::vector<T>& first,
                                                   const std::vector<T>& second) {
-    if (first.empty() || second.empty()) return {};
-
-    int first_size = int(first.size());
-    int second_size = int(second.size());
-    std::vector<T> result(first_size + second_size - 1);
-    result[0] = first[0] + second[0];
-
-    int first_index = 1;
-    int second_index = 1;
-    int result_index = 1;
-    while (first_index < first_size && second_index < second_size) {
-        T first_difference = first[first_index] - first[first_index - 1];
-        T second_difference = second[second_index] - second[second_index - 1];
-        if (second_difference < first_difference) {
-            result[result_index] = result[result_index - 1] + second_difference;
-            second_index++;
-        } else {
-            result[result_index] = result[result_index - 1] + first_difference;
-            first_index++;
-        }
-        result_index++;
-    }
-    while (first_index < first_size) {
-        T difference = first[first_index] - first[first_index - 1];
-        result[result_index] = result[result_index - 1] + difference;
-        first_index++;
-        result_index++;
-    }
-    while (second_index < second_size) {
-        T difference = second[second_index] - second[second_index - 1];
-        result[result_index] = result[result_index - 1] + difference;
-        second_index++;
-        result_index++;
-    }
-    return result;
+    return convolution_detail::linear_structured_convolution(first, second, std::less<>());
 }
 
 template <class T>
 std::vector<T> max_plus_convolution_concave(const std::vector<T>& arbitrary,
                                             const std::vector<T>& concave) {
     return convolution_detail::structured_convolution(arbitrary, concave, std::greater<>());
+}
+
+template <class T>
+std::vector<T> max_plus_convolution_concave_concave(const std::vector<T>& first,
+                                                    const std::vector<T>& second) {
+    return convolution_detail::linear_structured_convolution(first, second, std::greater<>());
 }
 
 }  // namespace monge
