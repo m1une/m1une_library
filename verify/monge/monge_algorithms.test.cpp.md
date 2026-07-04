@@ -225,7 +225,26 @@ data:
     \        }\n    }\n    return true;\n}\n\ntemplate <class T>\nstd::vector<T> min_plus_convolution_convex(const\
     \ std::vector<T>& arbitrary,\n                                           const\
     \ std::vector<T>& convex) {\n    return convolution_detail::structured_convolution(arbitrary,\
-    \ convex, std::less<>());\n}\n\ntemplate <class T>\nstd::vector<T> max_plus_convolution_concave(const\
+    \ convex, std::less<>());\n}\n\ntemplate <class T>\nstd::vector<T> min_plus_convolution_convex_convex(const\
+    \ std::vector<T>& first,\n                                                  const\
+    \ std::vector<T>& second) {\n    if (first.empty() || second.empty()) return {};\n\
+    \n    int first_size = int(first.size());\n    int second_size = int(second.size());\n\
+    \    std::vector<T> result(first_size + second_size - 1);\n    result[0] = first[0]\
+    \ + second[0];\n\n    int first_index = 1;\n    int second_index = 1;\n    int\
+    \ result_index = 1;\n    while (first_index < first_size && second_index < second_size)\
+    \ {\n        T first_difference = first[first_index] - first[first_index - 1];\n\
+    \        T second_difference = second[second_index] - second[second_index - 1];\n\
+    \        if (second_difference < first_difference) {\n            result[result_index]\
+    \ = result[result_index - 1] + second_difference;\n            second_index++;\n\
+    \        } else {\n            result[result_index] = result[result_index - 1]\
+    \ + first_difference;\n            first_index++;\n        }\n        result_index++;\n\
+    \    }\n    while (first_index < first_size) {\n        T difference = first[first_index]\
+    \ - first[first_index - 1];\n        result[result_index] = result[result_index\
+    \ - 1] + difference;\n        first_index++;\n        result_index++;\n    }\n\
+    \    while (second_index < second_size) {\n        T difference = second[second_index]\
+    \ - second[second_index - 1];\n        result[result_index] = result[result_index\
+    \ - 1] + difference;\n        second_index++;\n        result_index++;\n    }\n\
+    \    return result;\n}\n\ntemplate <class T>\nstd::vector<T> max_plus_convolution_concave(const\
     \ std::vector<T>& arbitrary,\n                                            const\
     \ std::vector<T>& concave) {\n    return convolution_detail::structured_convolution(arbitrary,\
     \ concave, std::greater<>());\n}\n\n}  // namespace monge\n}  // namespace m1une\n\
@@ -360,6 +379,16 @@ data:
     \   auto expected_min = brute_convolution(arbitrary, convex, std::less<>());\n\
     \                assert(m1une::monge::min_plus_convolution_convex(arbitrary, convex)\
     \ ==\n                       expected_min);\n\n                std::vector<long\
+    \ long> first_convex(first_size);\n                difference = -12 - test;\n\
+    \                for (int i = 1; i < first_size; i++) {\n                    difference\
+    \ += (test * 5 + i * 7) % 5;\n                    first_convex[i] = first_convex[i\
+    \ - 1] + difference;\n                }\n                assert(m1une::monge::is_convex_sequence(first_convex));\n\
+    \                auto expected_convex =\n                    brute_convolution(first_convex,\
+    \ convex, std::less<>());\n                assert(m1une::monge::min_plus_convolution_convex_convex(first_convex,\n\
+    \                                                                        convex)\
+    \ ==\n                       expected_convex);\n                assert(m1une::monge::min_plus_convolution_convex_convex(convex,\n\
+    \                                                                        first_convex)\
+    \ ==\n                       expected_convex);\n\n                std::vector<long\
     \ long> concave = convex;\n                for (auto& value : concave) value =\
     \ -value;\n                assert(m1une::monge::is_concave_sequence(concave));\n\
     \                auto expected_max = brute_convolution(arbitrary, concave, std::greater<>());\n\
@@ -461,6 +490,16 @@ data:
     \   auto expected_min = brute_convolution(arbitrary, convex, std::less<>());\n\
     \                assert(m1une::monge::min_plus_convolution_convex(arbitrary, convex)\
     \ ==\n                       expected_min);\n\n                std::vector<long\
+    \ long> first_convex(first_size);\n                difference = -12 - test;\n\
+    \                for (int i = 1; i < first_size; i++) {\n                    difference\
+    \ += (test * 5 + i * 7) % 5;\n                    first_convex[i] = first_convex[i\
+    \ - 1] + difference;\n                }\n                assert(m1une::monge::is_convex_sequence(first_convex));\n\
+    \                auto expected_convex =\n                    brute_convolution(first_convex,\
+    \ convex, std::less<>());\n                assert(m1une::monge::min_plus_convolution_convex_convex(first_convex,\n\
+    \                                                                        convex)\
+    \ ==\n                       expected_convex);\n                assert(m1une::monge::min_plus_convolution_convex_convex(convex,\n\
+    \                                                                        first_convex)\
+    \ ==\n                       expected_convex);\n\n                std::vector<long\
     \ long> concave = convex;\n                for (auto& value : concave) value =\
     \ -value;\n                assert(m1une::monge::is_concave_sequence(concave));\n\
     \                auto expected_max = brute_convolution(arbitrary, concave, std::greater<>());\n\
@@ -485,7 +524,7 @@ data:
   isVerificationFile: true
   path: verify/monge/monge_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-06-23 01:05:20+09:00'
+  timestamp: '2026-07-05 05:07:51+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/monge/monge_algorithms.test.cpp

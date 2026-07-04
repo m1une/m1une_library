@@ -7,6 +7,9 @@ data:
     title: Monge All
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/monge/min_plus_convolution_convex_convex.test.cpp
+    title: verify/monge/min_plus_convolution_convex_convex.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/monge/monge_algorithms.test.cpp
     title: verify/monge/monge_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
@@ -49,7 +52,26 @@ data:
     \        }\n    }\n    return true;\n}\n\ntemplate <class T>\nstd::vector<T> min_plus_convolution_convex(const\
     \ std::vector<T>& arbitrary,\n                                           const\
     \ std::vector<T>& convex) {\n    return convolution_detail::structured_convolution(arbitrary,\
-    \ convex, std::less<>());\n}\n\ntemplate <class T>\nstd::vector<T> max_plus_convolution_concave(const\
+    \ convex, std::less<>());\n}\n\ntemplate <class T>\nstd::vector<T> min_plus_convolution_convex_convex(const\
+    \ std::vector<T>& first,\n                                                  const\
+    \ std::vector<T>& second) {\n    if (first.empty() || second.empty()) return {};\n\
+    \n    int first_size = int(first.size());\n    int second_size = int(second.size());\n\
+    \    std::vector<T> result(first_size + second_size - 1);\n    result[0] = first[0]\
+    \ + second[0];\n\n    int first_index = 1;\n    int second_index = 1;\n    int\
+    \ result_index = 1;\n    while (first_index < first_size && second_index < second_size)\
+    \ {\n        T first_difference = first[first_index] - first[first_index - 1];\n\
+    \        T second_difference = second[second_index] - second[second_index - 1];\n\
+    \        if (second_difference < first_difference) {\n            result[result_index]\
+    \ = result[result_index - 1] + second_difference;\n            second_index++;\n\
+    \        } else {\n            result[result_index] = result[result_index - 1]\
+    \ + first_difference;\n            first_index++;\n        }\n        result_index++;\n\
+    \    }\n    while (first_index < first_size) {\n        T difference = first[first_index]\
+    \ - first[first_index - 1];\n        result[result_index] = result[result_index\
+    \ - 1] + difference;\n        first_index++;\n        result_index++;\n    }\n\
+    \    while (second_index < second_size) {\n        T difference = second[second_index]\
+    \ - second[second_index - 1];\n        result[result_index] = result[result_index\
+    \ - 1] + difference;\n        second_index++;\n        result_index++;\n    }\n\
+    \    return result;\n}\n\ntemplate <class T>\nstd::vector<T> max_plus_convolution_concave(const\
     \ std::vector<T>& arbitrary,\n                                            const\
     \ std::vector<T>& concave) {\n    return convolution_detail::structured_convolution(arbitrary,\
     \ concave, std::greater<>());\n}\n\n}  // namespace monge\n}  // namespace m1une\n\
@@ -87,7 +109,26 @@ data:
     \        }\n    }\n    return true;\n}\n\ntemplate <class T>\nstd::vector<T> min_plus_convolution_convex(const\
     \ std::vector<T>& arbitrary,\n                                           const\
     \ std::vector<T>& convex) {\n    return convolution_detail::structured_convolution(arbitrary,\
-    \ convex, std::less<>());\n}\n\ntemplate <class T>\nstd::vector<T> max_plus_convolution_concave(const\
+    \ convex, std::less<>());\n}\n\ntemplate <class T>\nstd::vector<T> min_plus_convolution_convex_convex(const\
+    \ std::vector<T>& first,\n                                                  const\
+    \ std::vector<T>& second) {\n    if (first.empty() || second.empty()) return {};\n\
+    \n    int first_size = int(first.size());\n    int second_size = int(second.size());\n\
+    \    std::vector<T> result(first_size + second_size - 1);\n    result[0] = first[0]\
+    \ + second[0];\n\n    int first_index = 1;\n    int second_index = 1;\n    int\
+    \ result_index = 1;\n    while (first_index < first_size && second_index < second_size)\
+    \ {\n        T first_difference = first[first_index] - first[first_index - 1];\n\
+    \        T second_difference = second[second_index] - second[second_index - 1];\n\
+    \        if (second_difference < first_difference) {\n            result[result_index]\
+    \ = result[result_index - 1] + second_difference;\n            second_index++;\n\
+    \        } else {\n            result[result_index] = result[result_index - 1]\
+    \ + first_difference;\n            first_index++;\n        }\n        result_index++;\n\
+    \    }\n    while (first_index < first_size) {\n        T difference = first[first_index]\
+    \ - first[first_index - 1];\n        result[result_index] = result[result_index\
+    \ - 1] + difference;\n        first_index++;\n        result_index++;\n    }\n\
+    \    while (second_index < second_size) {\n        T difference = second[second_index]\
+    \ - second[second_index - 1];\n        result[result_index] = result[result_index\
+    \ - 1] + difference;\n        second_index++;\n        result_index++;\n    }\n\
+    \    return result;\n}\n\ntemplate <class T>\nstd::vector<T> max_plus_convolution_concave(const\
     \ std::vector<T>& arbitrary,\n                                            const\
     \ std::vector<T>& concave) {\n    return convolution_detail::structured_convolution(arbitrary,\
     \ concave, std::greater<>());\n}\n\n}  // namespace monge\n}  // namespace m1une\n\
@@ -97,10 +138,11 @@ data:
   path: monge/min_plus_convolution.hpp
   requiredBy:
   - monge/all.hpp
-  timestamp: '2026-06-23 01:05:20+09:00'
+  timestamp: '2026-07-05 05:07:51+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/monge/monge_algorithms.test.cpp
+  - verify/monge/min_plus_convolution_convex_convex.test.cpp
   - verify/monge/monge_dp_optimization.test.cpp
 documentation_of: monge/min_plus_convolution.hpp
 layout: document
@@ -117,7 +159,9 @@ $$
 
 When `b` is a discrete convex sequence, the minimizing index in `a` is
 nondecreasing with `k`. `min_plus_convolution_convex` uses this Monge structure
-to avoid the naive quadratic algorithm.
+to avoid the naive quadratic algorithm. When both sequences are convex,
+`min_plus_convolution_convex_convex` merges their nondecreasing adjacent
+differences and runs in linear time.
 
 The header also provides the symmetric max-plus operation when the second
 sequence is concave.
@@ -132,18 +176,26 @@ std::vector<T> min_plus_convolution_convex(
 );
 
 template <class T>
+std::vector<T> min_plus_convolution_convex_convex(
+    const std::vector<T>& first,
+    const std::vector<T>& second
+);
+
+template <class T>
 std::vector<T> max_plus_convolution_concave(
     const std::vector<T>& arbitrary,
     const std::vector<T>& concave
 );
 ```
 
-The first sequence is arbitrary. The second sequence must have nondecreasing
-adjacent differences for min-plus, or nonincreasing adjacent differences for
-max-plus.
+For `min_plus_convolution_convex`, the first sequence is arbitrary and the
+second must have nondecreasing adjacent differences. Both arguments to
+`min_plus_convolution_convex_convex` must have nondecreasing adjacent
+differences. For max-plus, the first sequence is arbitrary and the second must
+have nonincreasing adjacent differences.
 
 If either sequence is empty, the result is empty. Otherwise its length is
-`arbitrary.size() + structured.size() - 1`.
+the sum of the input lengths minus one.
 
 The precondition helpers are:
 
@@ -160,8 +212,15 @@ functions do not run these checks automatically.
 
 ## Complexity
 
-For input lengths `N` and `M`, the implementation uses
-$O((N + M)\log(N + M))$ time and $O(N + M)$ memory.
+For input lengths `N` and `M`:
+
+| Function | Time | Memory, including the result |
+| --- | --- | --- |
+| `min_plus_convolution_convex` | $O((N + M)\log(N + M))$ | $O(N + M)$ |
+| `min_plus_convolution_convex_convex` | $O(N + M)$ | $O(N + M)$ |
+| `max_plus_convolution_concave` | $O((N + M)\log(N + M))$ | $O(N + M)$ |
+| `is_convex_sequence` | $O(N)$ | $O(1)$ |
+| `is_concave_sequence` | $O(N)$ | $O(1)$ |
 
 The element type must support addition, subtraction, and comparison.
 Intermediate values and adjacent differences must fit in the type.
@@ -173,10 +232,10 @@ Intermediate values and adjacent differences must fit in the type.
 #include <vector>
 
 int main() {
-    std::vector<long long> arbitrary = {5, 1, 8, 3};
-    std::vector<long long> convex = {0, 1, 4, 9};
+    std::vector<long long> first = {0, 2, 7, 15};
+    std::vector<long long> second = {1, 2, 5, 10};
 
-    auto result =
-        m1une::monge::min_plus_convolution_convex(arbitrary, convex);
+    auto result = m1une::monge::min_plus_convolution_convex_convex(first,
+                                                                   second);
 }
 ```

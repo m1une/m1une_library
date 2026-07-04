@@ -223,7 +223,26 @@ data:
     \        }\n    }\n    return true;\n}\n\ntemplate <class T>\nstd::vector<T> min_plus_convolution_convex(const\
     \ std::vector<T>& arbitrary,\n                                           const\
     \ std::vector<T>& convex) {\n    return convolution_detail::structured_convolution(arbitrary,\
-    \ convex, std::less<>());\n}\n\ntemplate <class T>\nstd::vector<T> max_plus_convolution_concave(const\
+    \ convex, std::less<>());\n}\n\ntemplate <class T>\nstd::vector<T> min_plus_convolution_convex_convex(const\
+    \ std::vector<T>& first,\n                                                  const\
+    \ std::vector<T>& second) {\n    if (first.empty() || second.empty()) return {};\n\
+    \n    int first_size = int(first.size());\n    int second_size = int(second.size());\n\
+    \    std::vector<T> result(first_size + second_size - 1);\n    result[0] = first[0]\
+    \ + second[0];\n\n    int first_index = 1;\n    int second_index = 1;\n    int\
+    \ result_index = 1;\n    while (first_index < first_size && second_index < second_size)\
+    \ {\n        T first_difference = first[first_index] - first[first_index - 1];\n\
+    \        T second_difference = second[second_index] - second[second_index - 1];\n\
+    \        if (second_difference < first_difference) {\n            result[result_index]\
+    \ = result[result_index - 1] + second_difference;\n            second_index++;\n\
+    \        } else {\n            result[result_index] = result[result_index - 1]\
+    \ + first_difference;\n            first_index++;\n        }\n        result_index++;\n\
+    \    }\n    while (first_index < first_size) {\n        T difference = first[first_index]\
+    \ - first[first_index - 1];\n        result[result_index] = result[result_index\
+    \ - 1] + difference;\n        first_index++;\n        result_index++;\n    }\n\
+    \    while (second_index < second_size) {\n        T difference = second[second_index]\
+    \ - second[second_index - 1];\n        result[result_index] = result[result_index\
+    \ - 1] + difference;\n        second_index++;\n        result_index++;\n    }\n\
+    \    return result;\n}\n\ntemplate <class T>\nstd::vector<T> max_plus_convolution_concave(const\
     \ std::vector<T>& arbitrary,\n                                            const\
     \ std::vector<T>& concave) {\n    return convolution_detail::structured_convolution(arbitrary,\
     \ concave, std::greater<>());\n}\n\n}  // namespace monge\n}  // namespace m1une\n\
@@ -305,7 +324,7 @@ data:
   isVerificationFile: false
   path: monge/all.hpp
   requiredBy: []
-  timestamp: '2026-06-23 01:05:20+09:00'
+  timestamp: '2026-07-05 05:07:51+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/monge/monge_algorithms.test.cpp
@@ -329,4 +348,4 @@ title: Monge All
 | `monge/knuth_optimization.hpp` | Quadratic Knuth optimization for interval DP. |
 | `monge/larsch.hpp` | Linear-time online minima and shortest paths for triangular totally monotone matrices. |
 | `monge/check.hpp` | Monge and anti-Monge quadrangle-inequality checks. |
-| `monge/min_plus_convolution.hpp` | Fast min-plus convolution with a convex sequence and max-plus convolution with a concave sequence. |
+| `monge/min_plus_convolution.hpp` | Structured min-plus/max-plus convolution, including linear-time convex-convex min-plus convolution. |

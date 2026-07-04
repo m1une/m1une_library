@@ -1294,6 +1294,9 @@ data:
   - name: verify/monge
     pages:
     - icon: ':heavy_check_mark:'
+      path: verify/monge/min_plus_convolution_convex_convex.test.cpp
+      title: verify/monge/min_plus_convolution_convex_convex.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/monge/monge_algorithms.test.cpp
       title: verify/monge/monge_algorithms.test.cpp
     - icon: ':heavy_check_mark:'
