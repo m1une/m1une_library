@@ -38,8 +38,7 @@ reading the source. Include:
 Before finishing a library addition, verify against the most relevant judge
 problem available. Library Checker has the best datasets for library testing and
 is the first priority whenever it has a matching problem. If Library Checker
-does not have a suitable target, then prefer AOJ, yukicoder, or another judge
-already used in this repository. Use `aplusb` only as a fallback when no
+does not have a suitable target, then prefer AOJ, yukicoder. Do not use AtCoder, since it's not verifiable with oj-verify. Use `aplusb` only as a fallback when no
 suitable library-specific verification problem is available; in that case,
 include focused assertions and randomized tests against a naive implementation
 when practical. When auditing existing tests, replace `aplusb` fallbacks with
