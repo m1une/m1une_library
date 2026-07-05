@@ -13,8 +13,14 @@ data:
     path: verify/monge/max_plus_convolution_concave_arbitrary.test.cpp
     title: verify/monge/max_plus_convolution_concave_arbitrary.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/monge/max_plus_convolution_concave_concave.test.cpp
+    title: verify/monge/max_plus_convolution_concave_concave.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/monge/min_plus_convolution_convex_arbitrary.test.cpp
     title: verify/monge/min_plus_convolution_convex_arbitrary.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/monge/min_plus_convolution_convex_convex.test.cpp
+    title: verify/monge/min_plus_convolution_convex_convex.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/monge/monge_algorithms.test.cpp
     title: verify/monge/monge_algorithms.test.cpp
@@ -128,9 +134,11 @@ data:
   timestamp: '2026-07-06 04:27:24+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/monge/max_plus_convolution_concave_concave.test.cpp
   - verify/monge/min_plus_convolution_convex_arbitrary.test.cpp
   - verify/monge/max_plus_convolution_concave_arbitrary.test.cpp
   - verify/monge/monge_algorithms.test.cpp
+  - verify/monge/min_plus_convolution_convex_convex.test.cpp
   - verify/monge/monge_dp_optimization.test.cpp
 documentation_of: monge/smawk.hpp
 layout: document

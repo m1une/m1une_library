@@ -192,7 +192,7 @@ data:
     \ {\n        int parent = optimizer.next_argmin();\n        result.parent[vertex]\
     \ = parent;\n        result.distance[vertex] = result.distance[parent] + cost(parent,\
     \ vertex);\n    }\n    return result;\n}\n\n}  // namespace monge\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"monge/min_plus_convolution.hpp\"\n\n\n\n#line 6 \"monge/min_plus_convolution.hpp\"\
+    \ m1une\n\n\n#line 1 \"monge/min_plus_convolution.hpp\"\n\n\n\n#line 7 \"monge/min_plus_convolution.hpp\"\
     \n\n#line 1 \"monge/smawk.hpp\"\n\n\n\n#line 6 \"monge/smawk.hpp\"\n#include <numeric>\n\
     #line 8 \"monge/smawk.hpp\"\n\nnamespace m1une {\nnamespace monge {\n\nnamespace\
     \ smawk_detail {\n\ntemplate <class Select>\nvoid solve(const std::vector<int>&\
@@ -238,57 +238,153 @@ data:
     \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
     \ == column_count);\n    return smawk_row_argmax(\n        row_count, column_count,\n\
     \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
-    }\n\n}  // namespace monge\n}  // namespace m1une\n\n\n#line 8 \"monge/min_plus_convolution.hpp\"\
+    }\n\n}  // namespace monge\n}  // namespace m1une\n\n\n#line 9 \"monge/min_plus_convolution.hpp\"\
     \n\nnamespace m1une {\nnamespace monge {\n\nnamespace convolution_detail {\n\n\
-    template <class T, class Compare>\nstd::vector<T> structured_convolution(const\
+    template <class T, class Compare, class Add>\nstd::vector<T> structured_convolution(const\
     \ std::vector<T>& arbitrary,\n                                      const std::vector<T>&\
-    \ structured,\n                                      Compare compare) {\n    if\
-    \ (arbitrary.empty() || structured.empty()) return {};\n\n    int first_size =\
-    \ int(arbitrary.size());\n    int second_size = int(structured.size());\n    int\
-    \ result_size = first_size + second_size - 1;\n    auto select = [&](int index,\
-    \ int current, int candidate) {\n        if (index < candidate) return false;\n\
-    \        if (index - current >= second_size) return true;\n        T current_value\
-    \ = arbitrary[current] + structured[index - current];\n        T candidate_value\
-    \ = arbitrary[candidate] + structured[index - candidate];\n        return !compare(current_value,\
-    \ candidate_value);\n    };\n\n    std::vector<int> optima =\n        smawk_detail::row_optima(result_size,\
-    \ first_size, select);\n    std::vector<T> result;\n    result.reserve(result_size);\n\
-    \    for (int index = 0; index < result_size; index++) {\n        int first_index\
-    \ = optima[index];\n        result.emplace_back(arbitrary[first_index] + structured[index\
-    \ - first_index]);\n    }\n    return result;\n}\n\n}  // namespace convolution_detail\n\
+    \ structured,\n                                      Compare compare, Add add)\
+    \ {\n    if (arbitrary.empty() || structured.empty()) return {};\n\n    int first_size\
+    \ = int(arbitrary.size());\n    int second_size = int(structured.size());\n  \
+    \  int result_size = first_size + second_size - 1;\n    auto select = [&](int\
+    \ index, int current, int candidate) {\n        if (index < candidate) return\
+    \ false;\n        if (index - current >= second_size) return true;\n        T\
+    \ current_value = add(arbitrary[current], structured[index - current]);\n    \
+    \    T candidate_value = add(arbitrary[candidate], structured[index - candidate]);\n\
+    \        return !compare(current_value, candidate_value);\n    };\n\n    std::vector<int>\
+    \ optima =\n        smawk_detail::row_optima(result_size, first_size, select);\n\
+    \    std::vector<T> result;\n    result.reserve(result_size);\n    for (int index\
+    \ = 0; index < result_size; index++) {\n        int first_index = optima[index];\n\
+    \        result.emplace_back(add(arbitrary[first_index],\n                   \
+    \             structured[index - first_index]));\n    }\n    return result;\n\
+    }\n\ntemplate <class T>\nstd::pair<int, int> finite_interval(const std::vector<T>&\
+    \ sequence,\n                                    const T& infinity) {\n    int\
+    \ left = 0;\n    while (left < int(sequence.size()) && sequence[left] == infinity)\
+    \ left++;\n    int right = int(sequence.size());\n    while (right > left && sequence[right\
+    \ - 1] == infinity) right--;\n    return {left, right};\n}\n\ntemplate <class\
+    \ T, class Compare>\nstd::vector<T> structured_convolution_with_infinity(\n  \
+    \  const std::vector<T>& arbitrary, const std::vector<T>& structured,\n    const\
+    \ T& infinity, Compare compare) {\n    if (arbitrary.empty() || structured.empty())\
+    \ return {};\n\n    auto [left, right] = finite_interval(structured, infinity);\n\
+    \    int result_size = int(arbitrary.size() + structured.size() - 1);\n    std::vector<T>\
+    \ result(result_size, infinity);\n    if (left == right) return result;\n\n  \
+    \  std::vector<T> finite(structured.begin() + left, structured.begin() + right);\n\
+    \    auto add = [&](const T& first, const T& second) {\n        if (first == infinity\
+    \ || second == infinity) return infinity;\n        return first + second;\n  \
+    \  };\n    auto extended_compare = [&](const T& first, const T& second) {\n  \
+    \      if (first == infinity) return false;\n        if (second == infinity) return\
+    \ true;\n        return compare(first, second);\n    };\n    std::vector<T> middle\
+    \ =\n        structured_convolution(arbitrary, finite, extended_compare, add);\n\
+    \    for (int i = 0; i < int(middle.size()); i++) result[left + i] = middle[i];\n\
+    \    return result;\n}\n\ntemplate <class T, class Compare>\nstd::vector<T> linear_structured_convolution(const\
+    \ std::vector<T>& first,\n                                             const std::vector<T>&\
+    \ second,\n                                             Compare compare) {\n \
+    \   if (first.empty() || second.empty()) return {};\n\n    int first_size = int(first.size());\n\
+    \    int second_size = int(second.size());\n    std::vector<T> result(first_size\
+    \ + second_size - 1);\n    result[0] = first[0] + second[0];\n\n    int first_index\
+    \ = 1;\n    int second_index = 1;\n    int result_index = 1;\n    while (first_index\
+    \ < first_size && second_index < second_size) {\n        T first_difference =\
+    \ first[first_index] - first[first_index - 1];\n        T second_difference =\
+    \ second[second_index] - second[second_index - 1];\n        if (compare(second_difference,\
+    \ first_difference)) {\n            result[result_index] = result[result_index\
+    \ - 1] + second_difference;\n            second_index++;\n        } else {\n \
+    \           result[result_index] = result[result_index - 1] + first_difference;\n\
+    \            first_index++;\n        }\n        result_index++;\n    }\n    while\
+    \ (first_index < first_size) {\n        T difference = first[first_index] - first[first_index\
+    \ - 1];\n        result[result_index] = result[result_index - 1] + difference;\n\
+    \        first_index++;\n        result_index++;\n    }\n    while (second_index\
+    \ < second_size) {\n        T difference = second[second_index] - second[second_index\
+    \ - 1];\n        result[result_index] = result[result_index - 1] + difference;\n\
+    \        second_index++;\n        result_index++;\n    }\n    return result;\n\
+    }\n\ntemplate <class T, class Compare>\nstd::vector<T> linear_structured_convolution_with_infinity(\n\
+    \    const std::vector<T>& first, const std::vector<T>& second,\n    const T&\
+    \ infinity, Compare compare) {\n    if (first.empty() || second.empty()) return\
+    \ {};\n\n    auto [first_left, first_right] = finite_interval(first, infinity);\n\
+    \    auto [second_left, second_right] = finite_interval(second, infinity);\n \
+    \   int result_size = int(first.size() + second.size() - 1);\n    std::vector<T>\
+    \ result(result_size, infinity);\n    if (first_left == first_right || second_left\
+    \ == second_right) return result;\n\n    std::vector<T> finite_first(first.begin()\
+    \ + first_left,\n                                first.begin() + first_right);\n\
+    \    std::vector<T> finite_second(second.begin() + second_left,\n            \
+    \                     second.begin() + second_right);\n    std::vector<T> middle\
+    \ =\n        linear_structured_convolution(finite_first, finite_second, compare);\n\
+    \    int offset = first_left + second_left;\n    for (int i = 0; i < int(middle.size());\
+    \ i++) result[offset + i] = middle[i];\n    return result;\n}\n\ntemplate <class\
+    \ T, class Compare>\nbool is_structured_sequence_with_infinity(const std::vector<T>&\
+    \ sequence,\n                                          const T& infinity, Compare\
+    \ violation) {\n    auto [left, right] = finite_interval(sequence, infinity);\n\
+    \    for (int i = left; i < right; i++) {\n        if (sequence[i] == infinity)\
+    \ return false;\n    }\n    for (int i = left + 1; i + 1 < right; i++) {\n   \
+    \     T first_difference = sequence[i] - sequence[i - 1];\n        T second_difference\
+    \ = sequence[i + 1] - sequence[i];\n        if (violation(first_difference, second_difference))\
+    \ return false;\n    }\n    return true;\n}\n\n}  // namespace convolution_detail\n\
     \ntemplate <class T>\nbool is_convex_sequence(const std::vector<T>& sequence)\
     \ {\n    for (int i = 1; i + 1 < int(sequence.size()); i++) {\n        if (sequence[i]\
     \ - sequence[i - 1] > sequence[i + 1] - sequence[i]) {\n            return false;\n\
-    \        }\n    }\n    return true;\n}\n\ntemplate <class T>\nbool is_concave_sequence(const\
-    \ std::vector<T>& sequence) {\n    for (int i = 1; i + 1 < int(sequence.size());\
-    \ i++) {\n        if (sequence[i] - sequence[i - 1] < sequence[i + 1] - sequence[i])\
-    \ {\n            return false;\n        }\n    }\n    return true;\n}\n\ntemplate\
-    \ <class T>\nstd::vector<T> min_plus_convolution_convex(const std::vector<T>&\
+    \        }\n    }\n    return true;\n}\n\ntemplate <class T>\nbool is_convex_sequence(const\
+    \ std::vector<T>& sequence, const T& infinity) {\n    return convolution_detail::is_structured_sequence_with_infinity(\n\
+    \        sequence, infinity, std::greater<>());\n}\n\ntemplate <class T>\nbool\
+    \ is_concave_sequence(const std::vector<T>& sequence) {\n    for (int i = 1; i\
+    \ + 1 < int(sequence.size()); i++) {\n        if (sequence[i] - sequence[i - 1]\
+    \ < sequence[i + 1] - sequence[i]) {\n            return false;\n        }\n \
+    \   }\n    return true;\n}\n\ntemplate <class T>\nbool is_concave_sequence(const\
+    \ std::vector<T>& sequence,\n                         const T& negative_infinity)\
+    \ {\n    return convolution_detail::is_structured_sequence_with_infinity(\n  \
+    \      sequence, negative_infinity, std::less<>());\n}\n\ntemplate <class T>\n\
+    std::vector<T> min_plus_convolution_convex(const std::vector<T>& arbitrary,\n\
+    \                                           const std::vector<T>& convex) {\n\
+    \    auto add = [](const T& first, const T& second) { return first + second; };\n\
+    \    return convolution_detail::structured_convolution(arbitrary, convex,\n  \
+    \                                                    std::less<>(), add);\n}\n\
+    \ntemplate <class T>\nstd::vector<T> min_plus_convolution_convex(const std::vector<T>&\
     \ arbitrary,\n                                           const std::vector<T>&\
-    \ convex) {\n    return convolution_detail::structured_convolution(arbitrary,\
-    \ convex, std::less<>());\n}\n\ntemplate <class T>\nstd::vector<T> max_plus_convolution_concave(const\
-    \ std::vector<T>& arbitrary,\n                                            const\
-    \ std::vector<T>& concave) {\n    return convolution_detail::structured_convolution(arbitrary,\
-    \ concave, std::greater<>());\n}\n\n}  // namespace monge\n}  // namespace m1une\n\
-    \n\n#line 11 \"monge/all.hpp\"\n\n\n#line 10 \"verify/monge/monge_dp_optimization.test.cpp\"\
-    \n\nvoid test_divide_and_conquer_dp() {\n    for (int states = 0; states <= 60;\
-    \ states++) {\n        for (int candidates = 0; candidates <= 60; candidates++)\
-    \ {\n            auto value = [&](int state, int candidate) {\n              \
-    \  long long difference = state * 3LL - candidate * 2LL;\n                return\
-    \ difference * difference + candidate * 5LL;\n            };\n            auto\
-    \ result = m1une::monge::divide_and_conquer_dp(states, candidates, value);\n \
-    \           assert(int(result.value.size()) == states);\n            assert(int(result.argmin.size())\
-    \ == states);\n            for (int state = 0; state < states; state++) {\n  \
-    \              if (candidates == 0) {\n                    assert(result.argmin[state]\
-    \ == -1);\n                    continue;\n                }\n                int\
-    \ best = 0;\n                for (int candidate = 1; candidate < candidates; candidate++)\
-    \ {\n                    if (value(state, candidate) < value(state, best)) best\
-    \ = candidate;\n                }\n                assert(result.argmin[state]\
-    \ == best);\n                assert(result.value[state] == value(state, best));\n\
-    \            }\n        }\n    }\n\n    std::vector<long long> previous = {7,\
-    \ 1, 9, 3, 6};\n    auto result = m1une::monge::divide_and_conquer_transition(\n\
-    \        previous, 8, [](int candidate, int state) {\n            long long difference\
-    \ = state - candidate;\n            return difference * difference;\n        });\n\
-    \    for (int state = 0; state < 8; state++) {\n        long long expected = std::numeric_limits<long\
+    \ convex,\n                                           const T& infinity) {\n \
+    \   return convolution_detail::structured_convolution_with_infinity(\n       \
+    \ arbitrary, convex, infinity, std::less<>());\n}\n\ntemplate <class T>\nstd::vector<T>\
+    \ min_plus_convolution_convex_convex(const std::vector<T>& first,\n          \
+    \                                        const std::vector<T>& second) {\n   \
+    \ return convolution_detail::linear_structured_convolution(first, second, std::less<>());\n\
+    }\n\ntemplate <class T>\nstd::vector<T> min_plus_convolution_convex_convex(\n\
+    \    const std::vector<T>& first, const std::vector<T>& second,\n    const T&\
+    \ infinity) {\n    return convolution_detail::linear_structured_convolution_with_infinity(\n\
+    \        first, second, infinity, std::less<>());\n}\n\ntemplate <class T>\nstd::vector<T>\
+    \ max_plus_convolution_concave(const std::vector<T>& arbitrary,\n            \
+    \                                const std::vector<T>& concave) {\n    auto add\
+    \ = [](const T& first, const T& second) { return first + second; };\n    return\
+    \ convolution_detail::structured_convolution(arbitrary, concave,\n           \
+    \                                           std::greater<>(), add);\n}\n\ntemplate\
+    \ <class T>\nstd::vector<T> max_plus_convolution_concave(const std::vector<T>&\
+    \ arbitrary,\n                                            const std::vector<T>&\
+    \ concave,\n                                            const T& negative_infinity)\
+    \ {\n    return convolution_detail::structured_convolution_with_infinity(\n  \
+    \      arbitrary, concave, negative_infinity, std::greater<>());\n}\n\ntemplate\
+    \ <class T>\nstd::vector<T> max_plus_convolution_concave_concave(const std::vector<T>&\
+    \ first,\n                                                    const std::vector<T>&\
+    \ second) {\n    return convolution_detail::linear_structured_convolution(first,\
+    \ second, std::greater<>());\n}\n\ntemplate <class T>\nstd::vector<T> max_plus_convolution_concave_concave(\n\
+    \    const std::vector<T>& first, const std::vector<T>& second,\n    const T&\
+    \ negative_infinity) {\n    return convolution_detail::linear_structured_convolution_with_infinity(\n\
+    \        first, second, negative_infinity, std::greater<>());\n}\n\n}  // namespace\
+    \ monge\n}  // namespace m1une\n\n\n#line 11 \"monge/all.hpp\"\n\n\n#line 10 \"\
+    verify/monge/monge_dp_optimization.test.cpp\"\n\nvoid test_divide_and_conquer_dp()\
+    \ {\n    for (int states = 0; states <= 60; states++) {\n        for (int candidates\
+    \ = 0; candidates <= 60; candidates++) {\n            auto value = [&](int state,\
+    \ int candidate) {\n                long long difference = state * 3LL - candidate\
+    \ * 2LL;\n                return difference * difference + candidate * 5LL;\n\
+    \            };\n            auto result = m1une::monge::divide_and_conquer_dp(states,\
+    \ candidates, value);\n            assert(int(result.value.size()) == states);\n\
+    \            assert(int(result.argmin.size()) == states);\n            for (int\
+    \ state = 0; state < states; state++) {\n                if (candidates == 0)\
+    \ {\n                    assert(result.argmin[state] == -1);\n               \
+    \     continue;\n                }\n                int best = 0;\n          \
+    \      for (int candidate = 1; candidate < candidates; candidate++) {\n      \
+    \              if (value(state, candidate) < value(state, best)) best = candidate;\n\
+    \                }\n                assert(result.argmin[state] == best);\n  \
+    \              assert(result.value[state] == value(state, best));\n          \
+    \  }\n        }\n    }\n\n    std::vector<long long> previous = {7, 1, 9, 3, 6};\n\
+    \    auto result = m1une::monge::divide_and_conquer_transition(\n        previous,\
+    \ 8, [](int candidate, int state) {\n            long long difference = state\
+    \ - candidate;\n            return difference * difference;\n        });\n   \
+    \ for (int state = 0; state < 8; state++) {\n        long long expected = std::numeric_limits<long\
     \ long>::max();\n        for (int candidate = 0; candidate < int(previous.size());\
     \ candidate++) {\n            long long difference = state - candidate;\n    \
     \        expected = std::min(expected, previous[candidate] + difference * difference);\n\
@@ -457,7 +553,7 @@ data:
   isVerificationFile: true
   path: verify/monge/monge_dp_optimization.test.cpp
   requiredBy: []
-  timestamp: '2026-07-06 04:27:24+09:00'
+  timestamp: '2026-07-06 05:50:31+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/monge/monge_dp_optimization.test.cpp
