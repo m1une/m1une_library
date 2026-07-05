@@ -5,7 +5,16 @@ data:
   - icon: ':heavy_check_mark:'
     path: monge/all.hpp
     title: Monge All
+  - icon: ':heavy_check_mark:'
+    path: monge/min_plus_convolution.hpp
+    title: Structured Min-Plus and Max-Plus Convolution
   _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/monge/max_plus_convolution_concave_arbitrary.test.cpp
+    title: verify/monge/max_plus_convolution_concave_arbitrary.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/monge/min_plus_convolution_convex_arbitrary.test.cpp
+    title: verify/monge/min_plus_convolution_convex_arbitrary.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/monge/monge_algorithms.test.cpp
     title: verify/monge/monge_algorithms.test.cpp
@@ -19,100 +28,108 @@ data:
     links: []
   bundledCode: "#line 1 \"monge/smawk.hpp\"\n\n\n\n#include <cassert>\n#include <functional>\n\
     #include <numeric>\n#include <vector>\n\nnamespace m1une {\nnamespace monge {\n\
-    \nnamespace smawk_detail {\n\ntemplate <class Value, class Compare>\nvoid solve(const\
-    \ std::vector<int>& rows, const std::vector<int>& columns,\n           const Value&\
-    \ value, const Compare& compare, std::vector<int>& answer) {\n    if (rows.empty())\
-    \ return;\n\n    std::vector<int> reduced;\n    reduced.reserve(columns.size());\n\
-    \    for (int column : columns) {\n        while (!reduced.empty()) {\n      \
-    \      int row = rows[int(reduced.size()) - 1];\n            if (!compare(value(row,\
-    \ column), value(row, reduced.back()))) break;\n            reduced.pop_back();\n\
-    \        }\n        if (reduced.size() < rows.size()) reduced.push_back(column);\n\
-    \    }\n\n    std::vector<int> odd_rows;\n    odd_rows.reserve(rows.size() / 2);\n\
-    \    for (int i = 1; i < int(rows.size()); i += 2) odd_rows.push_back(rows[i]);\n\
-    \    solve(odd_rows, reduced, value, compare, answer);\n\n    int left = 0;\n\
-    \    int right = 0;\n    for (int i = 0; i < int(rows.size()); i += 2) {\n   \
-    \     if (i + 1 < int(rows.size())) {\n            while (reduced[right] != answer[rows[i\
-    \ + 1]]) right++;\n        } else {\n            right = int(reduced.size()) -\
-    \ 1;\n        }\n\n        int best = left;\n        for (int j = left + 1; j\
-    \ <= right; j++) {\n            if (compare(value(rows[i], reduced[j]), value(rows[i],\
-    \ reduced[best]))) {\n                best = j;\n            }\n        }\n  \
-    \      answer[rows[i]] = reduced[best];\n        left = right;\n    }\n}\n\n}\
-    \  // namespace smawk_detail\n\ntemplate <class Value, class Compare = std::less<>>\n\
-    std::vector<int> smawk_row_optima(int row_count, int column_count, Value value,\n\
-    \                                  Compare compare = Compare()) {\n    assert(row_count\
-    \ >= 0);\n    assert(column_count >= 0);\n    std::vector<int> answer(row_count,\
-    \ -1);\n    if (row_count == 0 || column_count == 0) return answer;\n\n    std::vector<int>\
-    \ rows(row_count), columns(column_count);\n    std::iota(rows.begin(), rows.end(),\
-    \ 0);\n    std::iota(columns.begin(), columns.end(), 0);\n    smawk_detail::solve(rows,\
-    \ columns, value, compare, answer);\n    return answer;\n}\n\ntemplate <class\
-    \ Value>\nstd::vector<int> smawk_row_argmin(int row_count, int column_count, Value\
-    \ value) {\n    return smawk_row_optima(row_count, column_count, value, std::less<>());\n\
-    }\n\ntemplate <class Value>\nstd::vector<int> smawk_row_argmax(int row_count,\
-    \ int column_count, Value value) {\n    return smawk_row_optima(row_count, column_count,\
-    \ value, std::greater<>());\n}\n\ntemplate <class T>\nstd::vector<int> smawk_row_argmin(const\
-    \ std::vector<std::vector<T>>& matrix) {\n    int row_count = int(matrix.size());\n\
-    \    int column_count = row_count == 0 ? 0 : int(matrix[0].size());\n    for (const\
-    \ auto& row : matrix) assert(int(row.size()) == column_count);\n    return smawk_row_argmin(\n\
-    \        row_count, column_count,\n        [&](int row, int column) -> const T&\
-    \ { return matrix[row][column]; });\n}\n\ntemplate <class T>\nstd::vector<int>\
-    \ smawk_row_argmax(const std::vector<std::vector<T>>& matrix) {\n    int row_count\
-    \ = int(matrix.size());\n    int column_count = row_count == 0 ? 0 : int(matrix[0].size());\n\
-    \    for (const auto& row : matrix) assert(int(row.size()) == column_count);\n\
-    \    return smawk_row_argmax(\n        row_count, column_count,\n        [&](int\
-    \ row, int column) -> const T& { return matrix[row][column]; });\n}\n\n}  // namespace\
-    \ monge\n}  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_MONGE_SMAWK_HPP\n#define M1UNE_MONGE_SMAWK_HPP 1\n\n#include\
-    \ <cassert>\n#include <functional>\n#include <numeric>\n#include <vector>\n\n\
-    namespace m1une {\nnamespace monge {\n\nnamespace smawk_detail {\n\ntemplate <class\
-    \ Value, class Compare>\nvoid solve(const std::vector<int>& rows, const std::vector<int>&\
-    \ columns,\n           const Value& value, const Compare& compare, std::vector<int>&\
+    \nnamespace smawk_detail {\n\ntemplate <class Select>\nvoid solve(const std::vector<int>&\
+    \ rows, const std::vector<int>& columns,\n           const Select& select, std::vector<int>&\
     \ answer) {\n    if (rows.empty()) return;\n\n    std::vector<int> reduced;\n\
     \    reduced.reserve(columns.size());\n    for (int column : columns) {\n    \
     \    while (!reduced.empty()) {\n            int row = rows[int(reduced.size())\
-    \ - 1];\n            if (!compare(value(row, column), value(row, reduced.back())))\
-    \ break;\n            reduced.pop_back();\n        }\n        if (reduced.size()\
-    \ < rows.size()) reduced.push_back(column);\n    }\n\n    std::vector<int> odd_rows;\n\
-    \    odd_rows.reserve(rows.size() / 2);\n    for (int i = 1; i < int(rows.size());\
-    \ i += 2) odd_rows.push_back(rows[i]);\n    solve(odd_rows, reduced, value, compare,\
-    \ answer);\n\n    int left = 0;\n    int right = 0;\n    for (int i = 0; i < int(rows.size());\
-    \ i += 2) {\n        if (i + 1 < int(rows.size())) {\n            while (reduced[right]\
-    \ != answer[rows[i + 1]]) right++;\n        } else {\n            right = int(reduced.size())\
-    \ - 1;\n        }\n\n        int best = left;\n        for (int j = left + 1;\
-    \ j <= right; j++) {\n            if (compare(value(rows[i], reduced[j]), value(rows[i],\
-    \ reduced[best]))) {\n                best = j;\n            }\n        }\n  \
-    \      answer[rows[i]] = reduced[best];\n        left = right;\n    }\n}\n\n}\
-    \  // namespace smawk_detail\n\ntemplate <class Value, class Compare = std::less<>>\n\
+    \ - 1];\n            if (!select(row, reduced.back(), column)) break;\n      \
+    \      reduced.pop_back();\n        }\n        if (reduced.size() < rows.size())\
+    \ reduced.push_back(column);\n    }\n\n    std::vector<int> odd_rows;\n    odd_rows.reserve(rows.size()\
+    \ / 2);\n    for (int i = 1; i < int(rows.size()); i += 2) odd_rows.push_back(rows[i]);\n\
+    \    solve(odd_rows, reduced, select, answer);\n\n    int left = 0;\n    int right\
+    \ = 0;\n    for (int i = 0; i < int(rows.size()); i += 2) {\n        if (i + 1\
+    \ < int(rows.size())) {\n            while (reduced[right] != answer[rows[i +\
+    \ 1]]) right++;\n        } else {\n            right = int(reduced.size()) - 1;\n\
+    \        }\n\n        int best = left;\n        for (int j = left + 1; j <= right;\
+    \ j++) {\n            if (select(rows[i], reduced[best], reduced[j])) {\n    \
+    \            best = j;\n            }\n        }\n        answer[rows[i]] = reduced[best];\n\
+    \        left = right;\n    }\n}\n\ntemplate <class Select>\nstd::vector<int>\
+    \ row_optima(int row_count, int column_count, const Select& select) {\n    std::vector<int>\
+    \ answer(row_count, -1);\n    if (row_count == 0 || column_count == 0) return\
+    \ answer;\n\n    std::vector<int> rows(row_count), columns(column_count);\n  \
+    \  std::iota(rows.begin(), rows.end(), 0);\n    std::iota(columns.begin(), columns.end(),\
+    \ 0);\n    solve(rows, columns, select, answer);\n    return answer;\n}\n\n} \
+    \ // namespace smawk_detail\n\ntemplate <class Value, class Compare = std::less<>>\n\
     std::vector<int> smawk_row_optima(int row_count, int column_count, Value value,\n\
     \                                  Compare compare = Compare()) {\n    assert(row_count\
-    \ >= 0);\n    assert(column_count >= 0);\n    std::vector<int> answer(row_count,\
-    \ -1);\n    if (row_count == 0 || column_count == 0) return answer;\n\n    std::vector<int>\
-    \ rows(row_count), columns(column_count);\n    std::iota(rows.begin(), rows.end(),\
-    \ 0);\n    std::iota(columns.begin(), columns.end(), 0);\n    smawk_detail::solve(rows,\
-    \ columns, value, compare, answer);\n    return answer;\n}\n\ntemplate <class\
-    \ Value>\nstd::vector<int> smawk_row_argmin(int row_count, int column_count, Value\
-    \ value) {\n    return smawk_row_optima(row_count, column_count, value, std::less<>());\n\
-    }\n\ntemplate <class Value>\nstd::vector<int> smawk_row_argmax(int row_count,\
-    \ int column_count, Value value) {\n    return smawk_row_optima(row_count, column_count,\
-    \ value, std::greater<>());\n}\n\ntemplate <class T>\nstd::vector<int> smawk_row_argmin(const\
-    \ std::vector<std::vector<T>>& matrix) {\n    int row_count = int(matrix.size());\n\
-    \    int column_count = row_count == 0 ? 0 : int(matrix[0].size());\n    for (const\
-    \ auto& row : matrix) assert(int(row.size()) == column_count);\n    return smawk_row_argmin(\n\
-    \        row_count, column_count,\n        [&](int row, int column) -> const T&\
-    \ { return matrix[row][column]; });\n}\n\ntemplate <class T>\nstd::vector<int>\
-    \ smawk_row_argmax(const std::vector<std::vector<T>>& matrix) {\n    int row_count\
-    \ = int(matrix.size());\n    int column_count = row_count == 0 ? 0 : int(matrix[0].size());\n\
-    \    for (const auto& row : matrix) assert(int(row.size()) == column_count);\n\
-    \    return smawk_row_argmax(\n        row_count, column_count,\n        [&](int\
-    \ row, int column) -> const T& { return matrix[row][column]; });\n}\n\n}  // namespace\
-    \ monge\n}  // namespace m1une\n\n#endif  // M1UNE_MONGE_SMAWK_HPP\n"
+    \ >= 0);\n    assert(column_count >= 0);\n    return smawk_detail::row_optima(\n\
+    \        row_count, column_count,\n        [&](int row, int current, int candidate)\
+    \ {\n            return compare(value(row, candidate), value(row, current));\n\
+    \        });\n}\n\ntemplate <class Value>\nstd::vector<int> smawk_row_argmin(int\
+    \ row_count, int column_count, Value value) {\n    return smawk_row_optima(row_count,\
+    \ column_count, value, std::less<>());\n}\n\ntemplate <class Value>\nstd::vector<int>\
+    \ smawk_row_argmax(int row_count, int column_count, Value value) {\n    return\
+    \ smawk_row_optima(row_count, column_count, value, std::greater<>());\n}\n\ntemplate\
+    \ <class T>\nstd::vector<int> smawk_row_argmin(const std::vector<std::vector<T>>&\
+    \ matrix) {\n    int row_count = int(matrix.size());\n    int column_count = row_count\
+    \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
+    \ == column_count);\n    return smawk_row_argmin(\n        row_count, column_count,\n\
+    \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
+    }\n\ntemplate <class T>\nstd::vector<int> smawk_row_argmax(const std::vector<std::vector<T>>&\
+    \ matrix) {\n    int row_count = int(matrix.size());\n    int column_count = row_count\
+    \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
+    \ == column_count);\n    return smawk_row_argmax(\n        row_count, column_count,\n\
+    \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
+    }\n\n}  // namespace monge\n}  // namespace m1une\n\n\n"
+  code: "#ifndef M1UNE_MONGE_SMAWK_HPP\n#define M1UNE_MONGE_SMAWK_HPP 1\n\n#include\
+    \ <cassert>\n#include <functional>\n#include <numeric>\n#include <vector>\n\n\
+    namespace m1une {\nnamespace monge {\n\nnamespace smawk_detail {\n\ntemplate <class\
+    \ Select>\nvoid solve(const std::vector<int>& rows, const std::vector<int>& columns,\n\
+    \           const Select& select, std::vector<int>& answer) {\n    if (rows.empty())\
+    \ return;\n\n    std::vector<int> reduced;\n    reduced.reserve(columns.size());\n\
+    \    for (int column : columns) {\n        while (!reduced.empty()) {\n      \
+    \      int row = rows[int(reduced.size()) - 1];\n            if (!select(row,\
+    \ reduced.back(), column)) break;\n            reduced.pop_back();\n        }\n\
+    \        if (reduced.size() < rows.size()) reduced.push_back(column);\n    }\n\
+    \n    std::vector<int> odd_rows;\n    odd_rows.reserve(rows.size() / 2);\n   \
+    \ for (int i = 1; i < int(rows.size()); i += 2) odd_rows.push_back(rows[i]);\n\
+    \    solve(odd_rows, reduced, select, answer);\n\n    int left = 0;\n    int right\
+    \ = 0;\n    for (int i = 0; i < int(rows.size()); i += 2) {\n        if (i + 1\
+    \ < int(rows.size())) {\n            while (reduced[right] != answer[rows[i +\
+    \ 1]]) right++;\n        } else {\n            right = int(reduced.size()) - 1;\n\
+    \        }\n\n        int best = left;\n        for (int j = left + 1; j <= right;\
+    \ j++) {\n            if (select(rows[i], reduced[best], reduced[j])) {\n    \
+    \            best = j;\n            }\n        }\n        answer[rows[i]] = reduced[best];\n\
+    \        left = right;\n    }\n}\n\ntemplate <class Select>\nstd::vector<int>\
+    \ row_optima(int row_count, int column_count, const Select& select) {\n    std::vector<int>\
+    \ answer(row_count, -1);\n    if (row_count == 0 || column_count == 0) return\
+    \ answer;\n\n    std::vector<int> rows(row_count), columns(column_count);\n  \
+    \  std::iota(rows.begin(), rows.end(), 0);\n    std::iota(columns.begin(), columns.end(),\
+    \ 0);\n    solve(rows, columns, select, answer);\n    return answer;\n}\n\n} \
+    \ // namespace smawk_detail\n\ntemplate <class Value, class Compare = std::less<>>\n\
+    std::vector<int> smawk_row_optima(int row_count, int column_count, Value value,\n\
+    \                                  Compare compare = Compare()) {\n    assert(row_count\
+    \ >= 0);\n    assert(column_count >= 0);\n    return smawk_detail::row_optima(\n\
+    \        row_count, column_count,\n        [&](int row, int current, int candidate)\
+    \ {\n            return compare(value(row, candidate), value(row, current));\n\
+    \        });\n}\n\ntemplate <class Value>\nstd::vector<int> smawk_row_argmin(int\
+    \ row_count, int column_count, Value value) {\n    return smawk_row_optima(row_count,\
+    \ column_count, value, std::less<>());\n}\n\ntemplate <class Value>\nstd::vector<int>\
+    \ smawk_row_argmax(int row_count, int column_count, Value value) {\n    return\
+    \ smawk_row_optima(row_count, column_count, value, std::greater<>());\n}\n\ntemplate\
+    \ <class T>\nstd::vector<int> smawk_row_argmin(const std::vector<std::vector<T>>&\
+    \ matrix) {\n    int row_count = int(matrix.size());\n    int column_count = row_count\
+    \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
+    \ == column_count);\n    return smawk_row_argmin(\n        row_count, column_count,\n\
+    \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
+    }\n\ntemplate <class T>\nstd::vector<int> smawk_row_argmax(const std::vector<std::vector<T>>&\
+    \ matrix) {\n    int row_count = int(matrix.size());\n    int column_count = row_count\
+    \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
+    \ == column_count);\n    return smawk_row_argmax(\n        row_count, column_count,\n\
+    \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
+    }\n\n}  // namespace monge\n}  // namespace m1une\n\n#endif  // M1UNE_MONGE_SMAWK_HPP\n"
   dependsOn: []
   isVerificationFile: false
   path: monge/smawk.hpp
   requiredBy:
   - monge/all.hpp
-  timestamp: '2026-06-23 01:05:20+09:00'
+  - monge/min_plus_convolution.hpp
+  timestamp: '2026-07-06 04:27:24+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/monge/min_plus_convolution_convex_arbitrary.test.cpp
+  - verify/monge/max_plus_convolution_concave_arbitrary.test.cpp
   - verify/monge/monge_algorithms.test.cpp
   - verify/monge/monge_dp_optimization.test.cpp
 documentation_of: monge/smawk.hpp

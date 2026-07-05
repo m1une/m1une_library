@@ -1294,11 +1294,11 @@ data:
   - name: verify/monge
     pages:
     - icon: ':heavy_check_mark:'
-      path: verify/monge/max_plus_convolution_concave_concave.test.cpp
-      title: verify/monge/max_plus_convolution_concave_concave.test.cpp
+      path: verify/monge/max_plus_convolution_concave_arbitrary.test.cpp
+      title: verify/monge/max_plus_convolution_concave_arbitrary.test.cpp
     - icon: ':heavy_check_mark:'
-      path: verify/monge/min_plus_convolution_convex_convex.test.cpp
-      title: verify/monge/min_plus_convolution_convex_convex.test.cpp
+      path: verify/monge/min_plus_convolution_convex_arbitrary.test.cpp
+      title: verify/monge/min_plus_convolution_convex_arbitrary.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/monge/monge_algorithms.test.cpp
       title: verify/monge/monge_algorithms.test.cpp
