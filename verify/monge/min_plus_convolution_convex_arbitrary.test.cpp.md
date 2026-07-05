@@ -95,11 +95,10 @@ data:
     \ return {};\n\n    auto [left, right] = finite_interval(structured, infinity);\n\
     \    int result_size = int(arbitrary.size() + structured.size() - 1);\n    std::vector<T>\
     \ result(result_size, infinity);\n    if (left == right) return result;\n\n  \
-    \  std::vector<T> finite(structured.begin() + left, structured.begin() + right);\n\
-    \    std::vector<int> columns;\n    columns.reserve(arbitrary.size());\n    for\
+    \  std::vector<int> columns;\n    columns.reserve(arbitrary.size());\n    for\
     \ (int i = 0; i < int(arbitrary.size()); i++) {\n        if (arbitrary[i] != infinity)\
     \ columns.push_back(i);\n    }\n    if (columns.empty()) return result;\n\n  \
-    \  int finite_size = int(finite.size());\n    int middle_size = int(arbitrary.size())\
+    \  int finite_size = right - left;\n    int middle_size = int(arbitrary.size())\
     \ + finite_size - 1;\n    std::vector<int> rows;\n    rows.reserve(middle_size);\n\
     \    int active = 0;\n    for (int row = 0; row < middle_size; row++) {\n    \
     \    if (row < int(arbitrary.size()) && arbitrary[row] != infinity) active++;\n\
@@ -107,17 +106,18 @@ data:
     \        if (active > 0) rows.push_back(row);\n    }\n\n    auto select = [&](int\
     \ index, int current, int candidate) {\n        if (index < candidate) return\
     \ false;\n        if (index - current >= finite_size) return true;\n        T\
-    \ current_value = arbitrary[current] + finite[index - current];\n        T candidate_value\
-    \ = arbitrary[candidate] + finite[index - candidate];\n        return !compare(current_value,\
-    \ candidate_value);\n    };\n    std::vector<int> optima(middle_size, -1);\n \
-    \   smawk_detail::solve(rows, columns, select, optima);\n    for (int row : rows)\
-    \ {\n        int first_index = optima[row];\n        result[left + row] = arbitrary[first_index]\
-    \ + finite[row - first_index];\n    }\n    return result;\n}\n\ntemplate <class\
-    \ T, class Compare>\nstd::vector<T> linear_structured_convolution(const std::vector<T>&\
-    \ first,\n                                             const std::vector<T>& second,\n\
-    \                                             Compare compare) {\n    if (first.empty()\
-    \ || second.empty()) return {};\n\n    int first_size = int(first.size());\n \
-    \   int second_size = int(second.size());\n    std::vector<T> result(first_size\
+    \ current_value =\n            arbitrary[current] + structured[left + index -\
+    \ current];\n        T candidate_value =\n            arbitrary[candidate] + structured[left\
+    \ + index - candidate];\n        return !compare(current_value, candidate_value);\n\
+    \    };\n    std::vector<int> optima(middle_size, -1);\n    smawk_detail::solve(rows,\
+    \ columns, select, optima);\n    for (int row : rows) {\n        int first_index\
+    \ = optima[row];\n        result[left + row] =\n            arbitrary[first_index]\
+    \ + structured[left + row - first_index];\n    }\n    return result;\n}\n\ntemplate\
+    \ <class T, class Compare>\nstd::vector<T> linear_structured_convolution(const\
+    \ std::vector<T>& first,\n                                             const std::vector<T>&\
+    \ second,\n                                             Compare compare) {\n \
+    \   if (first.empty() || second.empty()) return {};\n\n    int first_size = int(first.size());\n\
+    \    int second_size = int(second.size());\n    std::vector<T> result(first_size\
     \ + second_size - 1);\n    result[0] = first[0] + second[0];\n\n    int first_index\
     \ = 1;\n    int second_index = 1;\n    int result_index = 1;\n    while (first_index\
     \ < first_size && second_index < second_size) {\n        T first_difference =\
@@ -140,34 +140,43 @@ data:
     \    auto [second_left, second_right] = finite_interval(second, infinity);\n \
     \   int result_size = int(first.size() + second.size() - 1);\n    std::vector<T>\
     \ result(result_size, infinity);\n    if (first_left == first_right || second_left\
-    \ == second_right) return result;\n\n    std::vector<T> finite_first(first.begin()\
-    \ + first_left,\n                                first.begin() + first_right);\n\
-    \    std::vector<T> finite_second(second.begin() + second_left,\n            \
-    \                     second.begin() + second_right);\n    std::vector<T> middle\
-    \ =\n        linear_structured_convolution(finite_first, finite_second, compare);\n\
-    \    int offset = first_left + second_left;\n    for (int i = 0; i < int(middle.size());\
-    \ i++) result[offset + i] = middle[i];\n    return result;\n}\n\ntemplate <class\
-    \ T, class Compare>\nbool is_structured_sequence_with_infinity(const std::vector<T>&\
-    \ sequence,\n                                          const T& infinity, Compare\
-    \ violation) {\n    auto [left, right] = finite_interval(sequence, infinity);\n\
-    \    for (int i = left; i < right; i++) {\n        if (sequence[i] == infinity)\
-    \ return false;\n    }\n    for (int i = left + 1; i + 1 < right; i++) {\n   \
-    \     T first_difference = sequence[i] - sequence[i - 1];\n        T second_difference\
-    \ = sequence[i + 1] - sequence[i];\n        if (violation(first_difference, second_difference))\
-    \ return false;\n    }\n    return true;\n}\n\n}  // namespace convolution_detail\n\
-    \ntemplate <class T>\nbool is_convex_sequence(const std::vector<T>& sequence)\
-    \ {\n    for (int i = 1; i + 1 < int(sequence.size()); i++) {\n        if (sequence[i]\
-    \ - sequence[i - 1] > sequence[i + 1] - sequence[i]) {\n            return false;\n\
-    \        }\n    }\n    return true;\n}\n\ntemplate <class T>\nbool is_convex_sequence(const\
-    \ std::vector<T>& sequence, const T& infinity) {\n    return convolution_detail::is_structured_sequence_with_infinity(\n\
-    \        sequence, infinity, std::greater<>());\n}\n\ntemplate <class T>\nbool\
-    \ is_concave_sequence(const std::vector<T>& sequence) {\n    for (int i = 1; i\
-    \ + 1 < int(sequence.size()); i++) {\n        if (sequence[i] - sequence[i - 1]\
-    \ < sequence[i + 1] - sequence[i]) {\n            return false;\n        }\n \
-    \   }\n    return true;\n}\n\ntemplate <class T>\nbool is_concave_sequence(const\
-    \ std::vector<T>& sequence,\n                         const T& negative_infinity)\
+    \ == second_right) return result;\n\n    int offset = first_left + second_left;\n\
+    \    result[offset] = first[first_left] + second[second_left];\n\n    int first_index\
+    \ = first_left + 1;\n    int second_index = second_left + 1;\n    int result_index\
+    \ = offset + 1;\n    while (first_index < first_right && second_index < second_right)\
+    \ {\n        T first_difference = first[first_index] - first[first_index - 1];\n\
+    \        T second_difference = second[second_index] - second[second_index - 1];\n\
+    \        if (compare(second_difference, first_difference)) {\n            result[result_index]\
+    \ = result[result_index - 1] + second_difference;\n            second_index++;\n\
+    \        } else {\n            result[result_index] = result[result_index - 1]\
+    \ + first_difference;\n            first_index++;\n        }\n        result_index++;\n\
+    \    }\n    while (first_index < first_right) {\n        T difference = first[first_index]\
+    \ - first[first_index - 1];\n        result[result_index] = result[result_index\
+    \ - 1] + difference;\n        first_index++;\n        result_index++;\n    }\n\
+    \    while (second_index < second_right) {\n        T difference = second[second_index]\
+    \ - second[second_index - 1];\n        result[result_index] = result[result_index\
+    \ - 1] + difference;\n        second_index++;\n        result_index++;\n    }\n\
+    \    return result;\n}\n\ntemplate <class T, class Compare>\nbool is_structured_sequence_with_infinity(const\
+    \ std::vector<T>& sequence,\n                                          const T&\
+    \ infinity, Compare violation) {\n    auto [left, right] = finite_interval(sequence,\
+    \ infinity);\n    for (int i = left; i < right; i++) {\n        if (sequence[i]\
+    \ == infinity) return false;\n    }\n    for (int i = left + 1; i + 1 < right;\
+    \ i++) {\n        T first_difference = sequence[i] - sequence[i - 1];\n      \
+    \  T second_difference = sequence[i + 1] - sequence[i];\n        if (violation(first_difference,\
+    \ second_difference)) return false;\n    }\n    return true;\n}\n\n}  // namespace\
+    \ convolution_detail\n\ntemplate <class T>\nbool is_convex_sequence(const std::vector<T>&\
+    \ sequence) {\n    for (int i = 1; i + 1 < int(sequence.size()); i++) {\n    \
+    \    if (sequence[i] - sequence[i - 1] > sequence[i + 1] - sequence[i]) {\n  \
+    \          return false;\n        }\n    }\n    return true;\n}\n\ntemplate <class\
+    \ T>\nbool is_convex_sequence(const std::vector<T>& sequence, const T& infinity)\
     \ {\n    return convolution_detail::is_structured_sequence_with_infinity(\n  \
-    \      sequence, negative_infinity, std::less<>());\n}\n\ntemplate <class T>\n\
+    \      sequence, infinity, std::greater<>());\n}\n\ntemplate <class T>\nbool is_concave_sequence(const\
+    \ std::vector<T>& sequence) {\n    for (int i = 1; i + 1 < int(sequence.size());\
+    \ i++) {\n        if (sequence[i] - sequence[i - 1] < sequence[i + 1] - sequence[i])\
+    \ {\n            return false;\n        }\n    }\n    return true;\n}\n\ntemplate\
+    \ <class T>\nbool is_concave_sequence(const std::vector<T>& sequence,\n      \
+    \                   const T& negative_infinity) {\n    return convolution_detail::is_structured_sequence_with_infinity(\n\
+    \        sequence, negative_infinity, std::less<>());\n}\n\ntemplate <class T>\n\
     std::vector<T> min_plus_convolution_convex(const std::vector<T>& arbitrary,\n\
     \                                           const std::vector<T>& convex) {\n\
     \    auto add = [](const T& first, const T& second) { return first + second; };\n\
@@ -227,7 +236,7 @@ data:
   isVerificationFile: true
   path: verify/monge/min_plus_convolution_convex_arbitrary.test.cpp
   requiredBy: []
-  timestamp: '2026-07-06 05:57:59+09:00'
+  timestamp: '2026-07-06 06:03:02+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/monge/min_plus_convolution_convex_arbitrary.test.cpp
