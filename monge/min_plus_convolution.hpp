@@ -63,18 +63,37 @@ std::vector<T> structured_convolution_with_infinity(
     if (left == right) return result;
 
     std::vector<T> finite(structured.begin() + left, structured.begin() + right);
-    auto add = [&](const T& first, const T& second) {
-        if (first == infinity || second == infinity) return infinity;
-        return first + second;
+    std::vector<int> columns;
+    columns.reserve(arbitrary.size());
+    for (int i = 0; i < int(arbitrary.size()); i++) {
+        if (arbitrary[i] != infinity) columns.push_back(i);
+    }
+    if (columns.empty()) return result;
+
+    int finite_size = int(finite.size());
+    int middle_size = int(arbitrary.size()) + finite_size - 1;
+    std::vector<int> rows;
+    rows.reserve(middle_size);
+    int active = 0;
+    for (int row = 0; row < middle_size; row++) {
+        if (row < int(arbitrary.size()) && arbitrary[row] != infinity) active++;
+        if (row >= finite_size && arbitrary[row - finite_size] != infinity) active--;
+        if (active > 0) rows.push_back(row);
+    }
+
+    auto select = [&](int index, int current, int candidate) {
+        if (index < candidate) return false;
+        if (index - current >= finite_size) return true;
+        T current_value = arbitrary[current] + finite[index - current];
+        T candidate_value = arbitrary[candidate] + finite[index - candidate];
+        return !compare(current_value, candidate_value);
     };
-    auto extended_compare = [&](const T& first, const T& second) {
-        if (first == infinity) return false;
-        if (second == infinity) return true;
-        return compare(first, second);
-    };
-    std::vector<T> middle =
-        structured_convolution(arbitrary, finite, extended_compare, add);
-    for (int i = 0; i < int(middle.size()); i++) result[left + i] = middle[i];
+    std::vector<int> optima(middle_size, -1);
+    smawk_detail::solve(rows, columns, select, optima);
+    for (int row : rows) {
+        int first_index = optima[row];
+        result[left + row] = arbitrary[first_index] + finite[row - first_index];
+    }
     return result;
 }
 

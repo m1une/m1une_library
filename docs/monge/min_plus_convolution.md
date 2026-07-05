@@ -94,9 +94,11 @@ value. For min-plus, `infinity + x` is `infinity`; for max-plus,
 structured input must form one contiguous convex or concave interval. Infinity
 may occur before or after that interval, so `{0, 1, infinity, infinity}` is a
 valid extended convex sequence. The arbitrary input may contain the sentinel at
-any indices. Values are recognized as infinite by equality with the supplied
-sentinel, so no finite input or finite sum may equal that value. The sentinel
-does not need to be the numeric maximum or minimum of `T`.
+any indices; those candidates are omitted from SMAWK, and result indices with no
+finite decomposition remain infinite. Values are recognized as infinite by
+equality with the supplied sentinel, so no finite input or finite sum may equal
+that value. The sentinel does not need to be the numeric maximum or minimum of
+`T`.
 
 The two-argument overloads continue to treat every value as an ordinary element
 of `T`.
