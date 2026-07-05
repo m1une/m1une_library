@@ -62,7 +62,6 @@ std::vector<T> structured_convolution_with_infinity(
     std::vector<T> result(result_size, infinity);
     if (left == right) return result;
 
-    std::vector<T> finite(structured.begin() + left, structured.begin() + right);
     std::vector<int> columns;
     columns.reserve(arbitrary.size());
     for (int i = 0; i < int(arbitrary.size()); i++) {
@@ -70,7 +69,7 @@ std::vector<T> structured_convolution_with_infinity(
     }
     if (columns.empty()) return result;
 
-    int finite_size = int(finite.size());
+    int finite_size = right - left;
     int middle_size = int(arbitrary.size()) + finite_size - 1;
     std::vector<int> rows;
     rows.reserve(middle_size);
@@ -84,15 +83,18 @@ std::vector<T> structured_convolution_with_infinity(
     auto select = [&](int index, int current, int candidate) {
         if (index < candidate) return false;
         if (index - current >= finite_size) return true;
-        T current_value = arbitrary[current] + finite[index - current];
-        T candidate_value = arbitrary[candidate] + finite[index - candidate];
+        T current_value =
+            arbitrary[current] + structured[left + index - current];
+        T candidate_value =
+            arbitrary[candidate] + structured[left + index - candidate];
         return !compare(current_value, candidate_value);
     };
     std::vector<int> optima(middle_size, -1);
     smawk_detail::solve(rows, columns, select, optima);
     for (int row : rows) {
         int first_index = optima[row];
-        result[left + row] = arbitrary[first_index] + finite[row - first_index];
+        result[left + row] =
+            arbitrary[first_index] + structured[left + row - first_index];
     }
     return result;
 }
@@ -150,14 +152,36 @@ std::vector<T> linear_structured_convolution_with_infinity(
     std::vector<T> result(result_size, infinity);
     if (first_left == first_right || second_left == second_right) return result;
 
-    std::vector<T> finite_first(first.begin() + first_left,
-                                first.begin() + first_right);
-    std::vector<T> finite_second(second.begin() + second_left,
-                                 second.begin() + second_right);
-    std::vector<T> middle =
-        linear_structured_convolution(finite_first, finite_second, compare);
     int offset = first_left + second_left;
-    for (int i = 0; i < int(middle.size()); i++) result[offset + i] = middle[i];
+    result[offset] = first[first_left] + second[second_left];
+
+    int first_index = first_left + 1;
+    int second_index = second_left + 1;
+    int result_index = offset + 1;
+    while (first_index < first_right && second_index < second_right) {
+        T first_difference = first[first_index] - first[first_index - 1];
+        T second_difference = second[second_index] - second[second_index - 1];
+        if (compare(second_difference, first_difference)) {
+            result[result_index] = result[result_index - 1] + second_difference;
+            second_index++;
+        } else {
+            result[result_index] = result[result_index - 1] + first_difference;
+            first_index++;
+        }
+        result_index++;
+    }
+    while (first_index < first_right) {
+        T difference = first[first_index] - first[first_index - 1];
+        result[result_index] = result[result_index - 1] + difference;
+        first_index++;
+        result_index++;
+    }
+    while (second_index < second_right) {
+        T difference = second[second_index] - second[second_index - 1];
+        result[result_index] = result[result_index - 1] + difference;
+        second_index++;
+        result_index++;
+    }
     return result;
 }
 
