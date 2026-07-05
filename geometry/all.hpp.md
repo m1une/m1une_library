@@ -573,18 +573,22 @@ data:
     \ result;\n}\n\ntemplate <Coordinate T>\nstd::optional<FarthestPair<T>> furthest_pair(\n\
     \    const std::vector<Point<T>>& points\n) {\n    return farthest_pair(points);\n\
     }\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 1 \"geometry/half_plane_intersection.hpp\"\
-    \n\n\n\n#line 8 \"geometry/half_plane_intersection.hpp\"\n#include <deque>\n#line\
-    \ 11 \"geometry/half_plane_intersection.hpp\"\n\n#line 13 \"geometry/half_plane_intersection.hpp\"\
-    \n\nnamespace m1une {\nnamespace geometry {\n\nnamespace half_plane_intersection_detail\
-    \ {\n\nstruct HalfPlane {\n    Point<long double> point;\n    Point<long double>\
-    \ direction;\n};\n\ninline int direction_half(const Point<long double>& direction)\
-    \ {\n    return direction.y > 0 || (direction.y == 0 && direction.x >= 0) ? 0\
-    \ : 1;\n}\n\ninline bool direction_less(const HalfPlane& first, const HalfPlane&\
-    \ second) {\n    int first_half = direction_half(first.direction);\n    int second_half\
-    \ = direction_half(second.direction);\n    if (first_half != second_half) return\
-    \ first_half < second_half;\n    return cross(first.direction, second.direction)\
-    \ > 0;\n}\n\ninline bool parallel(\n    const HalfPlane& first,\n    const HalfPlane&\
-    \ second,\n    long double eps\n) {\n    return std::fabs(cross(first.direction,\
+    \n\n\n\n#line 8 \"geometry/half_plane_intersection.hpp\"\n#include <deque>\n#include\
+    \ <limits>\n#include <numbers>\n#line 12 \"geometry/half_plane_intersection.hpp\"\
+    \n#include <random>\n#line 15 \"geometry/half_plane_intersection.hpp\"\n\n#line\
+    \ 17 \"geometry/half_plane_intersection.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ geometry {\n\nenum class HalfPlaneIntersectionStatus {\n    Empty,\n    Unbounded,\n\
+    \    Degenerate,\n    Bounded,\n};\n\nstruct HalfPlaneIntersectionResult {\n \
+    \   HalfPlaneIntersectionStatus status;\n    std::vector<Point<long double>> polygon;\n\
+    };\n\nnamespace half_plane_intersection_detail {\n\nstruct HalfPlane {\n    Point<long\
+    \ double> point;\n    Point<long double> direction;\n};\n\ninline int direction_half(const\
+    \ Point<long double>& direction) {\n    return direction.y > 0 || (direction.y\
+    \ == 0 && direction.x >= 0) ? 0 : 1;\n}\n\ninline bool direction_less(const HalfPlane&\
+    \ first, const HalfPlane& second) {\n    int first_half = direction_half(first.direction);\n\
+    \    int second_half = direction_half(second.direction);\n    if (first_half !=\
+    \ second_half) return first_half < second_half;\n    return cross(first.direction,\
+    \ second.direction) > 0;\n}\n\ninline bool parallel(\n    const HalfPlane& first,\n\
+    \    const HalfPlane& second,\n    long double eps\n) {\n    return std::fabs(cross(first.direction,\
     \ second.direction)) <= eps;\n}\n\ninline bool same_direction(\n    const HalfPlane&\
     \ first,\n    const HalfPlane& second,\n    long double eps\n) {\n    return parallel(first,\
     \ second, eps) &&\n           dot(first.direction, second.direction) > 0;\n}\n\
@@ -609,68 +613,122 @@ data:
     \        half_planes.size() < 2 ||\n        !same_direction(half_planes.front(),\
     \ half_planes.back(), eps)\n    ) {\n        return;\n    }\n    if (more_restrictive(half_planes.back(),\
     \ half_planes.front(), eps)) {\n        half_planes.front() = half_planes.back();\n\
-    \    }\n    half_planes.pop_back();\n}\n\n}  // namespace half_plane_intersection_detail\n\
-    \n// Each directed line keeps its closed left half-plane. Returns the vertices\
-    \ of\n// a bounded intersection with positive area in counterclockwise order.\n\
-    // Returns an empty vector if the intersection is empty, unbounded, or has zero\n\
-    // area; these cases are not distinguished.\ntemplate <Coordinate T>\nstd::vector<Point<long\
-    \ double>> half_plane_intersection(\n    const std::vector<Line<T>>& half_planes,\n\
-    \    long double eps = 1e-12L\n) {\n    using half_plane_intersection_detail::HalfPlane;\n\
+    \    }\n    half_planes.pop_back();\n}\n\ninline bool has_feasible_point(\n  \
+    \  std::vector<HalfPlane> half_planes,\n    long double eps\n) {\n    std::mt19937_64\
+    \ generator(0x6a09e667f3bcc909ULL);\n    std::shuffle(half_planes.begin(), half_planes.end(),\
+    \ generator);\n\n    Point<long double> feasible(0, 0);\n    for (std::size_t\
+    \ index = 0; index < half_planes.size(); ++index) {\n        const HalfPlane&\
+    \ current = half_planes[index];\n        if (!outside(current, feasible, eps))\
+    \ continue;\n\n        Point<long double> normal(\n            -current.direction.y,\n\
+    \            current.direction.x\n        );\n        Point<long double> base\
+    \ = normal * dot(normal, current.point);\n        long double lower = -std::numeric_limits<long\
+    \ double>::infinity();\n        long double upper = std::numeric_limits<long double>::infinity();\n\
+    \        for (std::size_t previous_index = 0;\n             previous_index < index;\n\
+    \             ++previous_index) {\n            const HalfPlane& previous = half_planes[previous_index];\n\
+    \            long double coefficient = cross(\n                previous.direction,\n\
+    \                current.direction\n            );\n            long double constant\
+    \ = cross(\n                previous.direction,\n                base - previous.point\n\
+    \            );\n            if (std::fabs(coefficient) <= eps) {\n          \
+    \      if (constant < -eps) return false;\n                continue;\n       \
+    \     }\n\n            long double bound = (-eps - constant) / coefficient;\n\
+    \            if (coefficient > 0) {\n                lower = std::max(lower, bound);\n\
+    \            } else {\n                upper = std::min(upper, bound);\n     \
+    \       }\n            if (lower > upper) return false;\n        }\n\n       \
+    \ long double parameter = 0;\n        if (parameter < lower) parameter = lower;\n\
+    \        if (parameter > upper) parameter = upper;\n        feasible = base +\
+    \ current.direction * parameter;\n    }\n    return true;\n}\n\ninline bool has_bounded_recession_cone(\n\
+    \    const std::vector<HalfPlane>& half_planes,\n    long double eps\n) {\n  \
+    \  if (half_planes.empty()) return false;\n\n    constexpr long double pi = std::numbers::pi_v<long\
+    \ double>;\n    std::vector<long double> angles;\n    angles.reserve(half_planes.size());\n\
+    \    for (const HalfPlane& half_plane : half_planes) {\n        long double angle\
+    \ = std::atan2(\n            half_plane.direction.y,\n            half_plane.direction.x\n\
+    \        );\n        if (angle < 0) angle += 2 * pi;\n        angles.push_back(angle);\n\
+    \    }\n\n    long double maximum_gap = angles.front() + 2 * pi - angles.back();\n\
+    \    for (std::size_t index = 1; index < angles.size(); ++index) {\n        maximum_gap\
+    \ = std::max(\n            maximum_gap,\n            angles[index] - angles[index\
+    \ - 1]\n        );\n    }\n    return maximum_gap < pi - eps;\n}\n\n}  // namespace\
+    \ half_plane_intersection_detail\n\n// Each directed line keeps its closed left\
+    \ half-plane. Returns the vertices of\n// a bounded intersection with positive\
+    \ area in counterclockwise order. Empty,\n// unbounded, and bounded zero-area\
+    \ intersections have distinct statuses.\ntemplate <Coordinate T>\nHalfPlaneIntersectionResult\
+    \ half_plane_intersection(\n    const std::vector<Line<T>>& half_planes,\n   \
+    \ long double eps = 1e-12L\n) {\n    using half_plane_intersection_detail::HalfPlane;\n\
     \    namespace detail = half_plane_intersection_detail;\n\n    assert(eps >= 0);\n\
     \    std::vector<HalfPlane> sorted;\n    sorted.reserve(half_planes.size());\n\
     \    for (const Line<T>& line : half_planes) {\n        assert(line.a != line.b);\n\
     \        Point<long double> point(line.a);\n        Point<long double> direction\
     \ = Point<long double>(line.b) - point;\n        long double length = norm(direction);\n\
     \        direction = direction / length;\n        sorted.push_back(HalfPlane{point,\
-    \ direction});\n    }\n    if (sorted.size() < 3) return {};\n\n    std::sort(sorted.begin(),\
-    \ sorted.end(), detail::direction_less);\n    std::vector<HalfPlane> unique;\n\
-    \    unique.reserve(sorted.size());\n    for (const HalfPlane& half_plane : sorted)\
+    \ direction});\n    }\n    if (!detail::has_feasible_point(sorted, eps)) {\n \
+    \       return HalfPlaneIntersectionResult{\n            HalfPlaneIntersectionStatus::Empty,\n\
+    \            {},\n        };\n    }\n    std::sort(sorted.begin(), sorted.end(),\
+    \ detail::direction_less);\n    if (!detail::has_bounded_recession_cone(sorted,\
+    \ eps)) {\n        return HalfPlaneIntersectionResult{\n            HalfPlaneIntersectionStatus::Unbounded,\n\
+    \            {},\n        };\n    }\n    if (sorted.size() < 3) {\n        return\
+    \ HalfPlaneIntersectionResult{\n            HalfPlaneIntersectionStatus::Degenerate,\n\
+    \            {},\n        };\n    }\n\n    std::vector<HalfPlane> unique;\n  \
+    \  unique.reserve(sorted.size());\n    for (const HalfPlane& half_plane : sorted)\
     \ {\n        detail::merge_same_direction(unique, half_plane, eps);\n    }\n \
-    \   detail::merge_cyclic_ends(unique, eps);\n    if (unique.size() < 3) return\
-    \ {};\n\n    std::deque<HalfPlane> deque;\n    for (const HalfPlane& half_plane\
-    \ : unique) {\n        while (deque.size() >= 2) {\n            auto point = detail::intersection(\n\
-    \                deque[deque.size() - 2],\n                deque.back(),\n   \
-    \             eps\n            );\n            if (!point.has_value()) return\
-    \ {};\n            if (!detail::outside(half_plane, *point, eps)) break;\n   \
-    \         deque.pop_back();\n        }\n        while (deque.size() >= 2) {\n\
-    \            auto point = detail::intersection(deque[0], deque[1], eps);\n   \
-    \         if (!point.has_value()) return {};\n            if (!detail::outside(half_plane,\
+    \   detail::merge_cyclic_ends(unique, eps);\n    if (unique.size() < 3) {\n  \
+    \      return HalfPlaneIntersectionResult{\n            HalfPlaneIntersectionStatus::Degenerate,\n\
+    \            {},\n        };\n    }\n\n    std::deque<HalfPlane> deque;\n    for\
+    \ (const HalfPlane& half_plane : unique) {\n        while (deque.size() >= 2)\
+    \ {\n            auto point = detail::intersection(\n                deque[deque.size()\
+    \ - 2],\n                deque.back(),\n                eps\n            );\n\
+    \            if (!point.has_value()) {\n                return HalfPlaneIntersectionResult{\n\
+    \                    HalfPlaneIntersectionStatus::Degenerate,\n              \
+    \      {},\n                };\n            }\n            if (!detail::outside(half_plane,\
+    \ *point, eps)) break;\n            deque.pop_back();\n        }\n        while\
+    \ (deque.size() >= 2) {\n            auto point = detail::intersection(deque[0],\
+    \ deque[1], eps);\n            if (!point.has_value()) {\n                return\
+    \ HalfPlaneIntersectionResult{\n                    HalfPlaneIntersectionStatus::Degenerate,\n\
+    \                    {},\n                };\n            }\n            if (!detail::outside(half_plane,\
     \ *point, eps)) break;\n            deque.pop_front();\n        }\n        deque.push_back(half_plane);\n\
     \    }\n\n    while (deque.size() >= 3) {\n        auto point = detail::intersection(\n\
     \            deque[deque.size() - 2],\n            deque.back(),\n           \
-    \ eps\n        );\n        if (!point.has_value()) return {};\n        if (!detail::outside(deque.front(),\
-    \ *point, eps)) break;\n        deque.pop_back();\n    }\n    while (deque.size()\
-    \ >= 3) {\n        auto point = detail::intersection(deque[0], deque[1], eps);\n\
-    \        if (!point.has_value()) return {};\n        if (!detail::outside(deque.back(),\
-    \ *point, eps)) break;\n        deque.pop_front();\n    }\n    if (deque.size()\
-    \ < 3) return {};\n\n    std::vector<Point<long double>> polygon;\n    polygon.reserve(deque.size());\n\
-    \    for (std::size_t index = 0; index < deque.size(); ++index) {\n        auto\
-    \ point = detail::intersection(\n            deque[index],\n            deque[(index\
-    \ + 1) % deque.size()],\n            eps\n        );\n        if (!point.has_value())\
-    \ return {};\n        if (\n            polygon.empty() ||\n            distance(polygon.back(),\
-    \ *point) > eps\n        ) {\n            polygon.push_back(*point);\n       \
-    \ }\n    }\n    if (\n        polygon.size() >= 2 &&\n        distance(polygon.front(),\
+    \ eps\n        );\n        if (!point.has_value()) {\n            return HalfPlaneIntersectionResult{\n\
+    \                HalfPlaneIntersectionStatus::Degenerate,\n                {},\n\
+    \            };\n        }\n        if (!detail::outside(deque.front(), *point,\
+    \ eps)) break;\n        deque.pop_back();\n    }\n    while (deque.size() >= 3)\
+    \ {\n        auto point = detail::intersection(deque[0], deque[1], eps);\n   \
+    \     if (!point.has_value()) {\n            return HalfPlaneIntersectionResult{\n\
+    \                HalfPlaneIntersectionStatus::Degenerate,\n                {},\n\
+    \            };\n        }\n        if (!detail::outside(deque.back(), *point,\
+    \ eps)) break;\n        deque.pop_front();\n    }\n    if (deque.size() < 3) {\n\
+    \        return HalfPlaneIntersectionResult{\n            HalfPlaneIntersectionStatus::Degenerate,\n\
+    \            {},\n        };\n    }\n\n    std::vector<Point<long double>> polygon;\n\
+    \    polygon.reserve(deque.size());\n    for (std::size_t index = 0; index < deque.size();\
+    \ ++index) {\n        auto point = detail::intersection(\n            deque[index],\n\
+    \            deque[(index + 1) % deque.size()],\n            eps\n        );\n\
+    \        if (!point.has_value()) {\n            return HalfPlaneIntersectionResult{\n\
+    \                HalfPlaneIntersectionStatus::Degenerate,\n                {},\n\
+    \            };\n        }\n        if (\n            polygon.empty() ||\n   \
+    \         distance(polygon.back(), *point) > eps\n        ) {\n            polygon.push_back(*point);\n\
+    \        }\n    }\n    if (\n        polygon.size() >= 2 &&\n        distance(polygon.front(),\
     \ polygon.back()) <= eps\n    ) {\n        polygon.pop_back();\n    }\n    if\
-    \ (polygon.size() < 3) return {};\n\n    long double signed_area2 = 0;\n    Point<long\
-    \ double> origin = polygon.front();\n    for (std::size_t index = 1; index + 1\
-    \ < polygon.size(); ++index) {\n        signed_area2 += cross(\n            polygon[index]\
-    \ - origin,\n            polygon[index + 1] - origin\n        );\n    }\n    if\
-    \ (signed_area2 <= eps) return {};\n\n    auto first = std::min_element(polygon.begin(),\
+    \ (polygon.size() < 3) {\n        return HalfPlaneIntersectionResult{\n      \
+    \      HalfPlaneIntersectionStatus::Degenerate,\n            {},\n        };\n\
+    \    }\n\n    long double signed_area2 = 0;\n    Point<long double> origin = polygon.front();\n\
+    \    for (std::size_t index = 1; index + 1 < polygon.size(); ++index) {\n    \
+    \    signed_area2 += cross(\n            polygon[index] - origin,\n          \
+    \  polygon[index + 1] - origin\n        );\n    }\n    if (signed_area2 <= eps)\
+    \ {\n        return HalfPlaneIntersectionResult{\n            HalfPlaneIntersectionStatus::Degenerate,\n\
+    \            {},\n        };\n    }\n\n    auto first = std::min_element(polygon.begin(),\
     \ polygon.end());\n    std::rotate(polygon.begin(), first, polygon.end());\n \
-    \   return polygon;\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n\
-    #line 1 \"geometry/manhattan_mst.hpp\"\n\n\n\n#line 7 \"geometry/manhattan_mst.hpp\"\
-    \n#include <limits>\n#line 9 \"geometry/manhattan_mst.hpp\"\n#include <numeric>\n\
-    #line 12 \"geometry/manhattan_mst.hpp\"\n\n#line 1 \"ds/dsu/dsu.hpp\"\n\n\n\n\
-    #line 7 \"ds/dsu/dsu.hpp\"\n\nnamespace m1une {\nnamespace ds {\n\nstruct Dsu\
-    \ {\n   private:\n    int _n;\n    // parent_or_size[i] is the parent of i if\
-    \ it's >= 0.\n    // If it's < 0, then i is a root and -parent_or_size[i] is the\
-    \ size of the group.\n    std::vector<int> parent_or_size;\n\n   public:\n   \
-    \ Dsu() : _n(0) {}\n    explicit Dsu(int n) : _n(n), parent_or_size(n, -1) {}\n\
-    \n    // Merges the group containing 'a' with the group containing 'b'.\n    //\
-    \ Returns the leader of the merged group.\n    int merge(int a, int b) {\n   \
-    \     int x = leader(a), y = leader(b);\n        if (x == y) return x;\n     \
-    \   // Union by size\n        if (-parent_or_size[x] < -parent_or_size[y]) std::swap(x,\
-    \ y);\n        parent_or_size[x] += parent_or_size[y];\n        parent_or_size[y]\
+    \   return HalfPlaneIntersectionResult{\n        HalfPlaneIntersectionStatus::Bounded,\n\
+    \        std::move(polygon),\n    };\n}\n\n}  // namespace geometry\n}  // namespace\
+    \ m1une\n\n\n#line 1 \"geometry/manhattan_mst.hpp\"\n\n\n\n#line 9 \"geometry/manhattan_mst.hpp\"\
+    \n#include <numeric>\n#line 12 \"geometry/manhattan_mst.hpp\"\n\n#line 1 \"ds/dsu/dsu.hpp\"\
+    \n\n\n\n#line 7 \"ds/dsu/dsu.hpp\"\n\nnamespace m1une {\nnamespace ds {\n\nstruct\
+    \ Dsu {\n   private:\n    int _n;\n    // parent_or_size[i] is the parent of i\
+    \ if it's >= 0.\n    // If it's < 0, then i is a root and -parent_or_size[i] is\
+    \ the size of the group.\n    std::vector<int> parent_or_size;\n\n   public:\n\
+    \    Dsu() : _n(0) {}\n    explicit Dsu(int n) : _n(n), parent_or_size(n, -1)\
+    \ {}\n\n    // Merges the group containing 'a' with the group containing 'b'.\n\
+    \    // Returns the leader of the merged group.\n    int merge(int a, int b) {\n\
+    \        int x = leader(a), y = leader(b);\n        if (x == y) return x;\n  \
+    \      // Union by size\n        if (-parent_or_size[x] < -parent_or_size[y])\
+    \ std::swap(x, y);\n        parent_or_size[x] += parent_or_size[y];\n        parent_or_size[y]\
     \ = x;\n        return x;\n    }\n\n    // Returns true if 'a' and 'b' belong\
     \ to the same group.\n    bool same(int a, int b) {\n        return leader(a)\
     \ == leader(b);\n    }\n\n    // Returns the leader (representative) of the group\
@@ -1086,7 +1144,7 @@ data:
   isVerificationFile: false
   path: geometry/all.hpp
   requiredBy: []
-  timestamp: '2026-07-04 02:22:30+09:00'
+  timestamp: '2026-07-05 15:57:09+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp
