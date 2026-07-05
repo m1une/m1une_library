@@ -109,18 +109,28 @@ data:
     \    int result_size = int(arbitrary.size() + structured.size() - 1);\n    std::vector<T>\
     \ result(result_size, infinity);\n    if (left == right) return result;\n\n  \
     \  std::vector<T> finite(structured.begin() + left, structured.begin() + right);\n\
-    \    auto add = [&](const T& first, const T& second) {\n        if (first == infinity\
-    \ || second == infinity) return infinity;\n        return first + second;\n  \
-    \  };\n    auto extended_compare = [&](const T& first, const T& second) {\n  \
-    \      if (first == infinity) return false;\n        if (second == infinity) return\
-    \ true;\n        return compare(first, second);\n    };\n    std::vector<T> middle\
-    \ =\n        structured_convolution(arbitrary, finite, extended_compare, add);\n\
-    \    for (int i = 0; i < int(middle.size()); i++) result[left + i] = middle[i];\n\
-    \    return result;\n}\n\ntemplate <class T, class Compare>\nstd::vector<T> linear_structured_convolution(const\
-    \ std::vector<T>& first,\n                                             const std::vector<T>&\
-    \ second,\n                                             Compare compare) {\n \
-    \   if (first.empty() || second.empty()) return {};\n\n    int first_size = int(first.size());\n\
-    \    int second_size = int(second.size());\n    std::vector<T> result(first_size\
+    \    std::vector<int> columns;\n    columns.reserve(arbitrary.size());\n    for\
+    \ (int i = 0; i < int(arbitrary.size()); i++) {\n        if (arbitrary[i] != infinity)\
+    \ columns.push_back(i);\n    }\n    if (columns.empty()) return result;\n\n  \
+    \  int finite_size = int(finite.size());\n    int middle_size = int(arbitrary.size())\
+    \ + finite_size - 1;\n    std::vector<int> rows;\n    rows.reserve(middle_size);\n\
+    \    int active = 0;\n    for (int row = 0; row < middle_size; row++) {\n    \
+    \    if (row < int(arbitrary.size()) && arbitrary[row] != infinity) active++;\n\
+    \        if (row >= finite_size && arbitrary[row - finite_size] != infinity) active--;\n\
+    \        if (active > 0) rows.push_back(row);\n    }\n\n    auto select = [&](int\
+    \ index, int current, int candidate) {\n        if (index < candidate) return\
+    \ false;\n        if (index - current >= finite_size) return true;\n        T\
+    \ current_value = arbitrary[current] + finite[index - current];\n        T candidate_value\
+    \ = arbitrary[candidate] + finite[index - candidate];\n        return !compare(current_value,\
+    \ candidate_value);\n    };\n    std::vector<int> optima(middle_size, -1);\n \
+    \   smawk_detail::solve(rows, columns, select, optima);\n    for (int row : rows)\
+    \ {\n        int first_index = optima[row];\n        result[left + row] = arbitrary[first_index]\
+    \ + finite[row - first_index];\n    }\n    return result;\n}\n\ntemplate <class\
+    \ T, class Compare>\nstd::vector<T> linear_structured_convolution(const std::vector<T>&\
+    \ first,\n                                             const std::vector<T>& second,\n\
+    \                                             Compare compare) {\n    if (first.empty()\
+    \ || second.empty()) return {};\n\n    int first_size = int(first.size());\n \
+    \   int second_size = int(second.size());\n    std::vector<T> result(first_size\
     \ + second_size - 1);\n    result[0] = first[0] + second[0];\n\n    int first_index\
     \ = 1;\n    int second_index = 1;\n    int result_index = 1;\n    while (first_index\
     \ < first_size && second_index < second_size) {\n        T first_difference =\
@@ -237,18 +247,28 @@ data:
     \    int result_size = int(arbitrary.size() + structured.size() - 1);\n    std::vector<T>\
     \ result(result_size, infinity);\n    if (left == right) return result;\n\n  \
     \  std::vector<T> finite(structured.begin() + left, structured.begin() + right);\n\
-    \    auto add = [&](const T& first, const T& second) {\n        if (first == infinity\
-    \ || second == infinity) return infinity;\n        return first + second;\n  \
-    \  };\n    auto extended_compare = [&](const T& first, const T& second) {\n  \
-    \      if (first == infinity) return false;\n        if (second == infinity) return\
-    \ true;\n        return compare(first, second);\n    };\n    std::vector<T> middle\
-    \ =\n        structured_convolution(arbitrary, finite, extended_compare, add);\n\
-    \    for (int i = 0; i < int(middle.size()); i++) result[left + i] = middle[i];\n\
-    \    return result;\n}\n\ntemplate <class T, class Compare>\nstd::vector<T> linear_structured_convolution(const\
-    \ std::vector<T>& first,\n                                             const std::vector<T>&\
-    \ second,\n                                             Compare compare) {\n \
-    \   if (first.empty() || second.empty()) return {};\n\n    int first_size = int(first.size());\n\
-    \    int second_size = int(second.size());\n    std::vector<T> result(first_size\
+    \    std::vector<int> columns;\n    columns.reserve(arbitrary.size());\n    for\
+    \ (int i = 0; i < int(arbitrary.size()); i++) {\n        if (arbitrary[i] != infinity)\
+    \ columns.push_back(i);\n    }\n    if (columns.empty()) return result;\n\n  \
+    \  int finite_size = int(finite.size());\n    int middle_size = int(arbitrary.size())\
+    \ + finite_size - 1;\n    std::vector<int> rows;\n    rows.reserve(middle_size);\n\
+    \    int active = 0;\n    for (int row = 0; row < middle_size; row++) {\n    \
+    \    if (row < int(arbitrary.size()) && arbitrary[row] != infinity) active++;\n\
+    \        if (row >= finite_size && arbitrary[row - finite_size] != infinity) active--;\n\
+    \        if (active > 0) rows.push_back(row);\n    }\n\n    auto select = [&](int\
+    \ index, int current, int candidate) {\n        if (index < candidate) return\
+    \ false;\n        if (index - current >= finite_size) return true;\n        T\
+    \ current_value = arbitrary[current] + finite[index - current];\n        T candidate_value\
+    \ = arbitrary[candidate] + finite[index - candidate];\n        return !compare(current_value,\
+    \ candidate_value);\n    };\n    std::vector<int> optima(middle_size, -1);\n \
+    \   smawk_detail::solve(rows, columns, select, optima);\n    for (int row : rows)\
+    \ {\n        int first_index = optima[row];\n        result[left + row] = arbitrary[first_index]\
+    \ + finite[row - first_index];\n    }\n    return result;\n}\n\ntemplate <class\
+    \ T, class Compare>\nstd::vector<T> linear_structured_convolution(const std::vector<T>&\
+    \ first,\n                                             const std::vector<T>& second,\n\
+    \                                             Compare compare) {\n    if (first.empty()\
+    \ || second.empty()) return {};\n\n    int first_size = int(first.size());\n \
+    \   int second_size = int(second.size());\n    std::vector<T> result(first_size\
     \ + second_size - 1);\n    result[0] = first[0] + second[0];\n\n    int first_index\
     \ = 1;\n    int second_index = 1;\n    int result_index = 1;\n    while (first_index\
     \ < first_size && second_index < second_size) {\n        T first_difference =\
@@ -340,7 +360,7 @@ data:
   path: monge/min_plus_convolution.hpp
   requiredBy:
   - monge/all.hpp
-  timestamp: '2026-07-06 05:50:31+09:00'
+  timestamp: '2026-07-06 05:57:59+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/monge/max_plus_convolution_concave_concave.test.cpp
@@ -445,9 +465,11 @@ value. For min-plus, `infinity + x` is `infinity`; for max-plus,
 structured input must form one contiguous convex or concave interval. Infinity
 may occur before or after that interval, so `{0, 1, infinity, infinity}` is a
 valid extended convex sequence. The arbitrary input may contain the sentinel at
-any indices. Values are recognized as infinite by equality with the supplied
-sentinel, so no finite input or finite sum may equal that value. The sentinel
-does not need to be the numeric maximum or minimum of `T`.
+any indices; those candidates are omitted from SMAWK, and result indices with no
+finite decomposition remain infinite. Values are recognized as infinite by
+equality with the supplied sentinel, so no finite input or finite sum may equal
+that value. The sentinel does not need to be the numeric maximum or minimum of
+`T`.
 
 The two-argument overloads continue to treat every value as an ordinary element
 of `T`.

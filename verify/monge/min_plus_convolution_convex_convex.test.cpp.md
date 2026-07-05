@@ -96,18 +96,28 @@ data:
     \    int result_size = int(arbitrary.size() + structured.size() - 1);\n    std::vector<T>\
     \ result(result_size, infinity);\n    if (left == right) return result;\n\n  \
     \  std::vector<T> finite(structured.begin() + left, structured.begin() + right);\n\
-    \    auto add = [&](const T& first, const T& second) {\n        if (first == infinity\
-    \ || second == infinity) return infinity;\n        return first + second;\n  \
-    \  };\n    auto extended_compare = [&](const T& first, const T& second) {\n  \
-    \      if (first == infinity) return false;\n        if (second == infinity) return\
-    \ true;\n        return compare(first, second);\n    };\n    std::vector<T> middle\
-    \ =\n        structured_convolution(arbitrary, finite, extended_compare, add);\n\
-    \    for (int i = 0; i < int(middle.size()); i++) result[left + i] = middle[i];\n\
-    \    return result;\n}\n\ntemplate <class T, class Compare>\nstd::vector<T> linear_structured_convolution(const\
-    \ std::vector<T>& first,\n                                             const std::vector<T>&\
-    \ second,\n                                             Compare compare) {\n \
-    \   if (first.empty() || second.empty()) return {};\n\n    int first_size = int(first.size());\n\
-    \    int second_size = int(second.size());\n    std::vector<T> result(first_size\
+    \    std::vector<int> columns;\n    columns.reserve(arbitrary.size());\n    for\
+    \ (int i = 0; i < int(arbitrary.size()); i++) {\n        if (arbitrary[i] != infinity)\
+    \ columns.push_back(i);\n    }\n    if (columns.empty()) return result;\n\n  \
+    \  int finite_size = int(finite.size());\n    int middle_size = int(arbitrary.size())\
+    \ + finite_size - 1;\n    std::vector<int> rows;\n    rows.reserve(middle_size);\n\
+    \    int active = 0;\n    for (int row = 0; row < middle_size; row++) {\n    \
+    \    if (row < int(arbitrary.size()) && arbitrary[row] != infinity) active++;\n\
+    \        if (row >= finite_size && arbitrary[row - finite_size] != infinity) active--;\n\
+    \        if (active > 0) rows.push_back(row);\n    }\n\n    auto select = [&](int\
+    \ index, int current, int candidate) {\n        if (index < candidate) return\
+    \ false;\n        if (index - current >= finite_size) return true;\n        T\
+    \ current_value = arbitrary[current] + finite[index - current];\n        T candidate_value\
+    \ = arbitrary[candidate] + finite[index - candidate];\n        return !compare(current_value,\
+    \ candidate_value);\n    };\n    std::vector<int> optima(middle_size, -1);\n \
+    \   smawk_detail::solve(rows, columns, select, optima);\n    for (int row : rows)\
+    \ {\n        int first_index = optima[row];\n        result[left + row] = arbitrary[first_index]\
+    \ + finite[row - first_index];\n    }\n    return result;\n}\n\ntemplate <class\
+    \ T, class Compare>\nstd::vector<T> linear_structured_convolution(const std::vector<T>&\
+    \ first,\n                                             const std::vector<T>& second,\n\
+    \                                             Compare compare) {\n    if (first.empty()\
+    \ || second.empty()) return {};\n\n    int first_size = int(first.size());\n \
+    \   int second_size = int(second.size());\n    std::vector<T> result(first_size\
     \ + second_size - 1);\n    result[0] = first[0] + second[0];\n\n    int first_index\
     \ = 1;\n    int second_index = 1;\n    int result_index = 1;\n    while (first_index\
     \ < first_size && second_index < second_size) {\n        T first_difference =\
@@ -217,7 +227,7 @@ data:
   isVerificationFile: true
   path: verify/monge/min_plus_convolution_convex_convex.test.cpp
   requiredBy: []
-  timestamp: '2026-07-06 05:50:31+09:00'
+  timestamp: '2026-07-06 05:57:59+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/monge/min_plus_convolution_convex_convex.test.cpp
