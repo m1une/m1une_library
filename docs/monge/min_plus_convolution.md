@@ -12,15 +12,13 @@ c[k] = \min_{i+j=k}(a[i] + b[j]).
 $$
 
 When `b` is a discrete convex sequence, the minimizing index in `a` is
-nondecreasing with `k`. `min_plus_convolution_convex` uses this Monge structure
-to avoid the naive quadratic algorithm. When both sequences are convex,
-`min_plus_convolution_convex_convex` merges their nondecreasing adjacent
-differences and runs in linear time. Symmetrically,
-`max_plus_convolution_concave_concave` merges the nonincreasing adjacent
-differences of two concave sequences in linear time.
+nondecreasing with `k`. `min_plus_convolution_convex` applies SMAWK to this
+implicit Monge matrix and computes every minimum in linear time. Only the second
+sequence must be convex; the first may be arbitrary.
 
-The header also provides the symmetric max-plus operation when the second
-sequence is concave.
+The header also provides the symmetric `max_plus_convolution_concave`. Only its
+second sequence must be concave, meaning that its adjacent differences are
+nonincreasing.
 
 ## Functions
 
@@ -32,31 +30,16 @@ std::vector<T> min_plus_convolution_convex(
 );
 
 template <class T>
-std::vector<T> min_plus_convolution_convex_convex(
-    const std::vector<T>& first,
-    const std::vector<T>& second
-);
-
-template <class T>
 std::vector<T> max_plus_convolution_concave(
     const std::vector<T>& arbitrary,
     const std::vector<T>& concave
 );
-
-template <class T>
-std::vector<T> max_plus_convolution_concave_concave(
-    const std::vector<T>& first,
-    const std::vector<T>& second
-);
 ```
 
 For `min_plus_convolution_convex`, the first sequence is arbitrary and the
-second must have nondecreasing adjacent differences. Both arguments to
-`min_plus_convolution_convex_convex` must have nondecreasing adjacent
-differences. For `max_plus_convolution_concave`, the first sequence is arbitrary
-and the second must have nonincreasing adjacent differences. Both arguments to
-`max_plus_convolution_concave_concave` must have nonincreasing adjacent
-differences.
+second must have nondecreasing adjacent differences. For
+`max_plus_convolution_concave`, the first sequence is arbitrary and the second
+must have nonincreasing adjacent differences.
 
 If either sequence is empty, the result is empty. Otherwise its length is
 the sum of the input lengths minus one.
@@ -80,15 +63,14 @@ For input lengths `N` and `M`:
 
 | Function | Time | Memory, including the result |
 | --- | --- | --- |
-| `min_plus_convolution_convex` | $O((N + M)\log(N + M))$ | $O(N + M)$ |
-| `min_plus_convolution_convex_convex` | $O(N + M)$ | $O(N + M)$ |
-| `max_plus_convolution_concave` | $O((N + M)\log(N + M))$ | $O(N + M)$ |
-| `max_plus_convolution_concave_concave` | $O(N + M)$ | $O(N + M)$ |
+| `min_plus_convolution_convex` | $O(N + M)$ | $O(N + M)$ |
+| `max_plus_convolution_concave` | $O(N + M)$ | $O(N + M)$ |
 | `is_convex_sequence` | $O(N)$ | $O(1)$ |
 | `is_concave_sequence` | $O(N)$ | $O(1)$ |
 
-The element type must support addition, subtraction, and comparison.
-Intermediate values and adjacent differences must fit in the type.
+The convolution element type must support addition and comparison. The
+precondition helpers additionally require subtraction. Intermediate sums and
+adjacent differences must fit in the type.
 
 ## Example
 
@@ -97,15 +79,14 @@ Intermediate values and adjacent differences must fit in the type.
 #include <vector>
 
 int main() {
-    std::vector<long long> first = {0, 2, 7, 15};
+    std::vector<long long> first = {4, -3, 8, 1};
     std::vector<long long> second = {1, 2, 5, 10};
 
-    auto result = m1une::monge::min_plus_convolution_convex_convex(first,
-                                                                   second);
+    auto result = m1une::monge::min_plus_convolution_convex(first, second);
 
-    std::vector<long long> first_concave = {0, -2, -7, -15};
+    std::vector<long long> first_max = {2, 9, -1, 5};
     std::vector<long long> second_concave = {-1, -2, -5, -10};
-    auto maximum = m1une::monge::max_plus_convolution_concave_concave(
-        first_concave, second_concave);
+    auto maximum =
+        m1une::monge::max_plus_convolution_concave(first_max, second_concave);
 }
 ```

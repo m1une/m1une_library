@@ -190,11 +190,9 @@ void test_structured_convolutions() {
                 assert(m1une::monge::is_convex_sequence(first_convex));
                 auto expected_convex =
                     brute_convolution(first_convex, convex, std::less<>());
-                assert(m1une::monge::min_plus_convolution_convex_convex(first_convex,
-                                                                        convex) ==
+                assert(m1une::monge::min_plus_convolution_convex(first_convex, convex) ==
                        expected_convex);
-                assert(m1une::monge::min_plus_convolution_convex_convex(convex,
-                                                                        first_convex) ==
+                assert(m1une::monge::min_plus_convolution_convex(convex, first_convex) ==
                        expected_convex);
 
                 std::vector<long long> concave = convex;
@@ -209,11 +207,9 @@ void test_structured_convolutions() {
                 assert(m1une::monge::is_concave_sequence(first_concave));
                 auto expected_concave =
                     brute_convolution(first_concave, concave, std::greater<>());
-                assert(m1une::monge::max_plus_convolution_concave_concave(first_concave,
-                                                                          concave) ==
+                assert(m1une::monge::max_plus_convolution_concave(first_concave, concave) ==
                        expected_concave);
-                assert(m1une::monge::max_plus_convolution_concave_concave(concave,
-                                                                          first_concave) ==
+                assert(m1une::monge::max_plus_convolution_concave(concave, first_concave) ==
                        expected_concave);
             }
         }

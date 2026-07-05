@@ -11,9 +11,9 @@ namespace monge {
 
 namespace smawk_detail {
 
-template <class Value, class Compare>
+template <class Select>
 void solve(const std::vector<int>& rows, const std::vector<int>& columns,
-           const Value& value, const Compare& compare, std::vector<int>& answer) {
+           const Select& select, std::vector<int>& answer) {
     if (rows.empty()) return;
 
     std::vector<int> reduced;
@@ -21,7 +21,7 @@ void solve(const std::vector<int>& rows, const std::vector<int>& columns,
     for (int column : columns) {
         while (!reduced.empty()) {
             int row = rows[int(reduced.size()) - 1];
-            if (!compare(value(row, column), value(row, reduced.back()))) break;
+            if (!select(row, reduced.back(), column)) break;
             reduced.pop_back();
         }
         if (reduced.size() < rows.size()) reduced.push_back(column);
@@ -30,7 +30,7 @@ void solve(const std::vector<int>& rows, const std::vector<int>& columns,
     std::vector<int> odd_rows;
     odd_rows.reserve(rows.size() / 2);
     for (int i = 1; i < int(rows.size()); i += 2) odd_rows.push_back(rows[i]);
-    solve(odd_rows, reduced, value, compare, answer);
+    solve(odd_rows, reduced, select, answer);
 
     int left = 0;
     int right = 0;
@@ -43,13 +43,25 @@ void solve(const std::vector<int>& rows, const std::vector<int>& columns,
 
         int best = left;
         for (int j = left + 1; j <= right; j++) {
-            if (compare(value(rows[i], reduced[j]), value(rows[i], reduced[best]))) {
+            if (select(rows[i], reduced[best], reduced[j])) {
                 best = j;
             }
         }
         answer[rows[i]] = reduced[best];
         left = right;
     }
+}
+
+template <class Select>
+std::vector<int> row_optima(int row_count, int column_count, const Select& select) {
+    std::vector<int> answer(row_count, -1);
+    if (row_count == 0 || column_count == 0) return answer;
+
+    std::vector<int> rows(row_count), columns(column_count);
+    std::iota(rows.begin(), rows.end(), 0);
+    std::iota(columns.begin(), columns.end(), 0);
+    solve(rows, columns, select, answer);
+    return answer;
 }
 
 }  // namespace smawk_detail
@@ -59,14 +71,11 @@ std::vector<int> smawk_row_optima(int row_count, int column_count, Value value,
                                   Compare compare = Compare()) {
     assert(row_count >= 0);
     assert(column_count >= 0);
-    std::vector<int> answer(row_count, -1);
-    if (row_count == 0 || column_count == 0) return answer;
-
-    std::vector<int> rows(row_count), columns(column_count);
-    std::iota(rows.begin(), rows.end(), 0);
-    std::iota(columns.begin(), columns.end(), 0);
-    smawk_detail::solve(rows, columns, value, compare, answer);
-    return answer;
+    return smawk_detail::row_optima(
+        row_count, column_count,
+        [&](int row, int current, int candidate) {
+            return compare(value(row, candidate), value(row, current));
+        });
 }
 
 template <class Value>
