@@ -1,4 +1,4 @@
-#define PROBLEM "https://judge.yosupo.jp/problem/min_plus_convolution_convex_arbitrary"
+#define PROBLEM "https://judge.yosupo.jp/problem/min_plus_convolution_convex_convex"
 
 #include <iostream>
 #include <vector>
@@ -11,19 +11,20 @@ int main() {
 
     int n, m;
     std::cin >> n >> m;
-    std::vector<long long> concave(n), arbitrary(m);
-    for (long long& value : concave) {
+    std::vector<long long> first(n), second(m);
+    for (long long& value : first) {
         std::cin >> value;
         value = -value;
     }
-    for (long long& value : arbitrary) {
+    for (long long& value : second) {
         std::cin >> value;
         value = -value;
     }
 
     constexpr long long negative_infinity = -2'000'000'000'000'000'000LL;
-    std::vector<long long> result = m1une::monge::max_plus_convolution_concave(
-        arbitrary, concave, negative_infinity);
+    std::vector<long long> result =
+        m1une::monge::max_plus_convolution_concave_concave(
+            first, second, negative_infinity);
     for (int i = 0; i < int(result.size()); i++) {
         if (i) std::cout << ' ';
         std::cout << -result[i];

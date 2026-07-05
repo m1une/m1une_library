@@ -161,7 +161,28 @@ std::vector<T> brute_convolution(const std::vector<T>& first, const std::vector<
     return result;
 }
 
+template <class T, class Compare>
+std::vector<T> brute_convolution_with_infinity(const std::vector<T>& first,
+                                               const std::vector<T>& second,
+                                               Compare compare,
+                                               const T& infinity) {
+    if (first.empty() || second.empty()) return {};
+    std::vector<T> result(first.size() + second.size() - 1, infinity);
+    for (int i = 0; i < int(first.size()); i++) {
+        for (int j = 0; j < int(second.size()); j++) {
+            if (first[i] == infinity || second[j] == infinity) continue;
+            T value = first[i] + second[j];
+            if (result[i + j] == infinity || compare(value, result[i + j])) {
+                result[i + j] = value;
+            }
+        }
+    }
+    return result;
+}
+
 void test_structured_convolutions() {
+    const long long infinity = 2'000'000'000'000'000'000LL;
+    const long long negative_infinity = -infinity;
     for (int first_size = 0; first_size <= 35; first_size++) {
         for (int second_size = 0; second_size <= 35; second_size++) {
             for (int test = 0; test < 8; test++) {
@@ -181,6 +202,19 @@ void test_structured_convolutions() {
                 assert(m1une::monge::min_plus_convolution_convex(arbitrary, convex) ==
                        expected_min);
 
+                std::vector<long long> arbitrary_extended = arbitrary;
+                for (int i = 0; i < first_size; i++) {
+                    if ((i + test) % 7 == 0) arbitrary_extended[i] = infinity;
+                }
+                std::vector<long long> convex_extended(second_size + 2, infinity);
+                std::copy(convex.begin(), convex.end(), convex_extended.begin() + 1);
+                assert(m1une::monge::is_convex_sequence(convex_extended, infinity));
+                auto expected_extended_min = brute_convolution_with_infinity(
+                    arbitrary_extended, convex_extended, std::less<>(), infinity);
+                assert(m1une::monge::min_plus_convolution_convex(
+                           arbitrary_extended, convex_extended, infinity) ==
+                       expected_extended_min);
+
                 std::vector<long long> first_convex(first_size);
                 difference = -12 - test;
                 for (int i = 1; i < first_size; i++) {
@@ -194,6 +228,22 @@ void test_structured_convolutions() {
                        expected_convex);
                 assert(m1une::monge::min_plus_convolution_convex(convex, first_convex) ==
                        expected_convex);
+                assert(m1une::monge::min_plus_convolution_convex_convex(first_convex,
+                                                                        convex) ==
+                       expected_convex);
+                assert(m1une::monge::min_plus_convolution_convex_convex(convex,
+                                                                        first_convex) ==
+                       expected_convex);
+
+                std::vector<long long> first_convex_extended(first_size + 2,
+                                                              infinity);
+                std::copy(first_convex.begin(), first_convex.end(),
+                          first_convex_extended.begin() + 1);
+                auto expected_extended_convex = brute_convolution_with_infinity(
+                    first_convex_extended, convex_extended, std::less<>(), infinity);
+                assert(m1une::monge::min_plus_convolution_convex_convex(
+                           first_convex_extended, convex_extended, infinity) ==
+                       expected_extended_convex);
 
                 std::vector<long long> concave = convex;
                 for (auto& value : concave) value = -value;
@@ -211,12 +261,97 @@ void test_structured_convolutions() {
                        expected_concave);
                 assert(m1une::monge::max_plus_convolution_concave(concave, first_concave) ==
                        expected_concave);
+                assert(m1une::monge::max_plus_convolution_concave_concave(first_concave,
+                                                                          concave) ==
+                       expected_concave);
+                assert(m1une::monge::max_plus_convolution_concave_concave(concave,
+                                                                          first_concave) ==
+                       expected_concave);
+
+                std::vector<long long> arbitrary_max_extended = arbitrary_extended;
+                for (long long& value : arbitrary_max_extended) {
+                    value = value == infinity ? negative_infinity : -value;
+                }
+                std::vector<long long> concave_extended = convex_extended;
+                for (long long& value : concave_extended) {
+                    value = value == infinity ? negative_infinity : -value;
+                }
+                auto expected_extended_max = brute_convolution_with_infinity(
+                    arbitrary_max_extended, concave_extended, std::greater<>(),
+                    negative_infinity);
+                assert(m1une::monge::max_plus_convolution_concave(
+                           arbitrary_max_extended, concave_extended,
+                           negative_infinity) == expected_extended_max);
+
+                std::vector<long long> first_concave_extended =
+                    first_convex_extended;
+                for (long long& value : first_concave_extended) {
+                    value = value == infinity ? negative_infinity : -value;
+                }
+                auto expected_extended_concave = brute_convolution_with_infinity(
+                    first_concave_extended, concave_extended, std::greater<>(),
+                    negative_infinity);
+                assert(m1une::monge::max_plus_convolution_concave_concave(
+                           first_concave_extended, concave_extended,
+                           negative_infinity) == expected_extended_concave);
             }
         }
     }
 
     assert(!m1une::monge::is_convex_sequence(std::vector<int>{0, 2, 1}));
     assert(!m1une::monge::is_concave_sequence(std::vector<int>{0, -2, -1}));
+    assert(!m1une::monge::is_convex_sequence(
+        std::vector<long long>{1, infinity, infinity}));
+    assert(m1une::monge::is_convex_sequence(
+        std::vector<long long>{1, infinity, infinity}, infinity));
+    assert(m1une::monge::is_convex_sequence(
+        std::vector<long long>{infinity, 0, 1, 4, infinity}, infinity));
+    assert(!m1une::monge::is_convex_sequence(
+        std::vector<long long>{0, infinity, 1}, infinity));
+
+    std::vector<long long> arbitrary = {infinity, 3, infinity, -2};
+    std::vector<long long> convex = {infinity, 0, 1, 4, infinity, infinity};
+    auto expected_min =
+        brute_convolution_with_infinity(arbitrary, convex, std::less<>(), infinity);
+    assert(m1une::monge::min_plus_convolution_convex(arbitrary, convex, infinity) ==
+           expected_min);
+
+    std::vector<long long> first_convex = {infinity, 2, 2, 3, infinity};
+    expected_min = brute_convolution_with_infinity(first_convex, convex,
+                                                   std::less<>(), infinity);
+    assert(m1une::monge::min_plus_convolution_convex_convex(
+               first_convex, convex, infinity) == expected_min);
+
+    long long unordered_infinity = 7;
+    std::vector<long long> large_arbitrary = {10, 20};
+    std::vector<long long> small_convex = {0, 1};
+    assert(m1une::monge::min_plus_convolution_convex(
+               large_arbitrary, small_convex, unordered_infinity) ==
+           std::vector<long long>({10, 11, 21}));
+
+    std::vector<long long> arbitrary_max = {negative_infinity, 3,
+                                             negative_infinity, -2};
+    std::vector<long long> concave = {negative_infinity, 0, -1, -4,
+                                      negative_infinity};
+    assert(m1une::monge::is_concave_sequence(concave, negative_infinity));
+    auto expected_max = brute_convolution_with_infinity(
+        arbitrary_max, concave, std::greater<>(), negative_infinity);
+    assert(m1une::monge::max_plus_convolution_concave(
+               arbitrary_max, concave, negative_infinity) == expected_max);
+
+    std::vector<long long> first_concave = {negative_infinity, 2, 2, 1,
+                                            negative_infinity};
+    expected_max = brute_convolution_with_infinity(
+        first_concave, concave, std::greater<>(), negative_infinity);
+    assert(m1une::monge::max_plus_convolution_concave_concave(
+               first_concave, concave, negative_infinity) == expected_max);
+
+    std::vector<long long> all_infinity(3, infinity);
+    assert(m1une::monge::is_convex_sequence(all_infinity, infinity));
+    assert(m1une::monge::min_plus_convolution_convex_convex(
+               all_infinity, convex, infinity) ==
+           std::vector<long long>(all_infinity.size() + convex.size() - 1,
+                                  infinity));
 }
 
 int main() {

@@ -17,4 +17,4 @@ documentation_of: ../../monge/all.hpp
 | `monge/knuth_optimization.hpp` | Quadratic Knuth optimization for interval DP. |
 | `monge/larsch.hpp` | Linear-time online minima and shortest paths for triangular totally monotone matrices. |
 | `monge/check.hpp` | Monge and anti-Monge quadrangle-inequality checks. |
-| `monge/min_plus_convolution.hpp` | Linear-time min-plus/max-plus convolution when one sequence is convex/concave. |
+| `monge/min_plus_convolution.hpp` | Linear-time structured min-plus/max-plus convolution, including infinity-aware and low-constant variants. |

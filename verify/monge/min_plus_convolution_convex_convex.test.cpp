@@ -1,4 +1,4 @@
-#define PROBLEM "https://judge.yosupo.jp/problem/min_plus_convolution_convex_arbitrary"
+#define PROBLEM "https://judge.yosupo.jp/problem/min_plus_convolution_convex_convex"
 
 #include <iostream>
 #include <vector>
@@ -11,13 +11,13 @@ int main() {
 
     int n, m;
     std::cin >> n >> m;
-    std::vector<long long> convex(n), arbitrary(m);
-    for (long long& value : convex) std::cin >> value;
-    for (long long& value : arbitrary) std::cin >> value;
+    std::vector<long long> first(n), second(m);
+    for (long long& value : first) std::cin >> value;
+    for (long long& value : second) std::cin >> value;
 
     constexpr long long infinity = 2'000'000'000'000'000'000LL;
     std::vector<long long> result =
-        m1une::monge::min_plus_convolution_convex(arbitrary, convex, infinity);
+        m1une::monge::min_plus_convolution_convex_convex(first, second, infinity);
     for (int i = 0; i < int(result.size()); i++) {
         if (i) std::cout << ' ';
         std::cout << result[i];
