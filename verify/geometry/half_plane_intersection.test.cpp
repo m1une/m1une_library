@@ -39,7 +39,8 @@ int main() {
                     second + shift,
                 });
             }
-            if (half_plane_intersection(half_planes, 1e-18L).empty()) {
+            auto result = half_plane_intersection(half_planes, 1e-18L);
+            if (result.status != HalfPlaneIntersectionStatus::Bounded) {
                 upper = middle;
             } else {
                 lower = middle;

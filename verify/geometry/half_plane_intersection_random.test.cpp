@@ -70,29 +70,75 @@ void test_special_cases() {
     integer_square.push_back(Line<long long>{IntegerPoint(0, 2), IntegerPoint(0, 0)});
     auto integer_polygon =
         m1une::geometry::half_plane_intersection(integer_square);
-    assert(integer_polygon.size() == 4);
-    assert(std::fabs(area(integer_polygon) - 4) <= 1e-12L);
+    assert(
+        integer_polygon.status ==
+        m1une::geometry::HalfPlaneIntersectionStatus::Bounded
+    );
+    assert(integer_polygon.polygon.size() == 4);
+    assert(std::fabs(area(integer_polygon.polygon) - 4) <= 1e-12L);
 
     std::vector<Line<long double>> square;
     add_bounding_square(square);
     square.push_back(Line<long double>{PointType(-4, -5), PointType(4, -5)});
     square.push_back(Line<long double>{PointType(-4, -3), PointType(4, -3)});
-    auto polygon = m1une::geometry::half_plane_intersection(square);
-    assert(polygon.size() == 4);
-    assert(std::fabs(area(polygon) - 5300) <= 1e-8L);
+    auto square_result = m1une::geometry::half_plane_intersection(square);
+    assert(
+        square_result.status ==
+        m1une::geometry::HalfPlaneIntersectionStatus::Bounded
+    );
+    assert(square_result.polygon.size() == 4);
+    assert(std::fabs(area(square_result.polygon) - 5300) <= 1e-8L);
 
     std::vector<Line<long double>> impossible;
     impossible.push_back(Line<long double>{PointType(1, 1), PointType(1, 0)});
     impossible.push_back(Line<long double>{PointType(0, 0), PointType(0, 1)});
     impossible.push_back(Line<long double>{PointType(0, 0), PointType(1, 0)});
     impossible.push_back(Line<long double>{PointType(1, 1), PointType(0, 1)});
-    assert(m1une::geometry::half_plane_intersection(impossible).empty());
+    assert(
+        m1une::geometry::half_plane_intersection(impossible).status ==
+        m1une::geometry::HalfPlaneIntersectionStatus::Empty
+    );
+
+    std::vector<Line<long double>> triangularly_impossible;
+    triangularly_impossible.push_back(
+        Line<long double>{PointType(0, 0), PointType(0, -1)}
+    );
+    triangularly_impossible.push_back(
+        Line<long double>{PointType(0, 0), PointType(1, 0)}
+    );
+    triangularly_impossible.push_back(
+        Line<long double>{PointType(0, -1), PointType(-1, 0)}
+    );
+    assert(
+        m1une::geometry::half_plane_intersection(
+            triangularly_impossible
+        ).status == m1une::geometry::HalfPlaneIntersectionStatus::Empty
+    );
 
     std::vector<Line<long double>> unbounded;
     unbounded.push_back(Line<long double>{PointType(0, 0), PointType(1, 0)});
     unbounded.push_back(Line<long double>{PointType(0, 0), PointType(0, -1)});
     unbounded.push_back(Line<long double>{PointType(0, 1), PointType(1, 0)});
-    assert(m1une::geometry::half_plane_intersection(unbounded).empty());
+    assert(
+        m1une::geometry::half_plane_intersection(unbounded).status ==
+        m1une::geometry::HalfPlaneIntersectionStatus::Unbounded
+    );
+
+    std::vector<Line<long double>> segment;
+    segment.push_back(Line<long double>{PointType(0, 0), PointType(0, -1)});
+    segment.push_back(Line<long double>{PointType(0, 1), PointType(0, 2)});
+    segment.push_back(Line<long double>{PointType(0, 0), PointType(1, 0)});
+    segment.push_back(Line<long double>{PointType(1, 1), PointType(0, 1)});
+    assert(
+        m1une::geometry::half_plane_intersection(segment).status ==
+        m1une::geometry::HalfPlaneIntersectionStatus::Degenerate
+    );
+
+    std::vector<Line<long double>> no_constraints;
+    assert(
+        m1une::geometry::half_plane_intersection(no_constraints).status ==
+        m1une::geometry::HalfPlaneIntersectionStatus::Unbounded
+    );
 }
 
 void test_randomized() {
@@ -135,14 +181,17 @@ void test_randomized() {
             std::mt19937_64(random())
         );
         auto actual = m1une::geometry::half_plane_intersection(half_planes);
-        assert(!actual.empty());
+        assert(
+            actual.status ==
+            m1une::geometry::HalfPlaneIntersectionStatus::Bounded
+        );
         long double expected_area = area(expected);
-        long double actual_area = area(actual);
+        long double actual_area = area(actual.polygon);
         assert(
             std::fabs(expected_area - actual_area) <=
             1e-8L * std::max(1.0L, expected_area)
         );
-        for (const PointType& point : actual) {
+        for (const PointType& point : actual.polygon) {
             for (const auto& half_plane : half_planes) {
                 assert(cross(
                     half_plane.b - half_plane.a,
@@ -187,14 +236,76 @@ void test_randomized() {
         auto actual = m1une::geometry::half_plane_intersection(half_planes);
         long double expected_area = area(expected);
         if (expected_area <= 1e-10L) {
-            assert(actual.empty());
-        } else {
-            assert(!actual.empty());
             assert(
-                std::fabs(expected_area - area(actual)) <=
+                actual.status ==
+                    m1une::geometry::HalfPlaneIntersectionStatus::Empty ||
+                actual.status ==
+                    m1une::geometry::HalfPlaneIntersectionStatus::Degenerate
+            );
+        } else {
+            assert(
+                actual.status ==
+                m1une::geometry::HalfPlaneIntersectionStatus::Bounded
+            );
+            assert(
+                std::fabs(expected_area - area(actual.polygon)) <=
                 1e-8L * std::max(1.0L, expected_area)
             );
         }
+    }
+
+    constexpr long double box_size = 100000;
+    for (int trial = 0; trial < 3000; ++trial) {
+        std::vector<Line<long double>> half_planes;
+        int count = 1 + int(random() % 20);
+        for (int index = 0; index < count; ++index) {
+            long long dx;
+            long long dy;
+            do {
+                dx = static_cast<long long>(random() % 21) - 10;
+                dy = static_cast<long long>(random() % 21) - 10;
+            } while (dx == 0 && dy == 0);
+            PointType first(
+                static_cast<long long>(random() % 21) - 10,
+                static_cast<long long>(random() % 21) - 10
+            );
+            PointType second(first.x + dx, first.y + dy);
+            half_planes.push_back(Line<long double>{first, second});
+        }
+
+        std::vector<PointType> clipped;
+        clipped.emplace_back(-box_size, -box_size);
+        clipped.emplace_back(box_size, -box_size);
+        clipped.emplace_back(box_size, box_size);
+        clipped.emplace_back(-box_size, box_size);
+        for (const auto& half_plane : half_planes) {
+            clipped = clip(clipped, half_plane);
+        }
+
+        auto actual = m1une::geometry::half_plane_intersection(half_planes);
+        if (area(clipped) <= 1e-10L) {
+            assert(
+                actual.status ==
+                    m1une::geometry::HalfPlaneIntersectionStatus::Empty ||
+                actual.status ==
+                    m1une::geometry::HalfPlaneIntersectionStatus::Degenerate
+            );
+            continue;
+        }
+
+        bool touches_box = false;
+        for (const PointType& point : clipped) {
+            if (
+                std::fabs(point.x) >= box_size - 1e-7L ||
+                std::fabs(point.y) >= box_size - 1e-7L
+            ) {
+                touches_box = true;
+            }
+        }
+        auto expected_status = touches_box
+            ? m1une::geometry::HalfPlaneIntersectionStatus::Unbounded
+            : m1une::geometry::HalfPlaneIntersectionStatus::Bounded;
+        assert(actual.status == expected_status);
     }
 }
 
