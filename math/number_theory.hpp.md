@@ -13,6 +13,9 @@ data:
     path: verify/math/floor_sum.test.cpp
     title: verify/math/floor_sum.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/generalized_floor_sum.test.cpp
+    title: verify/math/generalized_floor_sum.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
   _isVerificationFailed: false
@@ -210,6 +213,7 @@ data:
   verifiedWith:
   - verify/math/floor_sum.test.cpp
   - verify/math/extended_gcd.test.cpp
+  - verify/math/generalized_floor_sum.test.cpp
   - verify/math/math_algorithms.test.cpp
 documentation_of: math/number_theory.hpp
 layout: document

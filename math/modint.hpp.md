@@ -151,6 +151,9 @@ data:
     path: verify/math/cyclotomic_polynomial.test.cpp
     title: verify/math/cyclotomic_polynomial.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/generalized_floor_sum.test.cpp
+    title: verify/math/generalized_floor_sum.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/lucas.test.cpp
     title: verify/math/lucas.test.cpp
   - icon: ':heavy_check_mark:'
@@ -321,6 +324,7 @@ data:
   - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
   - verify/ds/segtree/segtree_beats.test.cpp
   - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
+  - verify/math/generalized_floor_sum.test.cpp
   - verify/math/bitwise_convolution.test.cpp
   - verify/math/lucas.test.cpp
   - verify/math/bell_number.test.cpp

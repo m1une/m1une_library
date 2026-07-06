@@ -489,6 +489,9 @@ data:
       path: math/cyclotomic_polynomial.hpp
       title: Cyclotomic Polynomial
     - icon: ':heavy_check_mark:'
+      path: math/generalized_floor_sum.hpp
+      title: Generalized Floor Sum
+    - icon: ':heavy_check_mark:'
       path: math/gray_code.hpp
       title: Gray Code
     - icon: ':heavy_check_mark:'
@@ -1228,6 +1231,9 @@ data:
       path: verify/math/floor_sum.test.cpp
       title: verify/math/floor_sum.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/math/generalized_floor_sum.test.cpp
+      title: verify/math/generalized_floor_sum.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/math/gray_code.test.cpp
       title: verify/math/gray_code.test.cpp
     - icon: ':heavy_check_mark:'
@@ -1272,6 +1278,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/yosupo_stern_brocot_tree.test.cpp
       title: verify/math/yosupo_stern_brocot_tree.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/yukicoder_2362.test.cpp
+      title: verify/math/yukicoder_2362.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/zeta_mobius_transform.test.cpp
       title: verify/math/zeta_mobius_transform.test.cpp
