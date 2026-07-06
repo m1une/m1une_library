@@ -22,7 +22,7 @@ contest.
 | `matrix/` | Dense row-major matrices, fast multiplication and powers, Gaussian elimination, determinant, inverse, and linear systems. |
 | `fps/` | Fast convolution, formal power series operations, polynomial half-GCD, Lagrange inversion, multipoint evaluation, interpolation, and linear recurrences. |
 | `sequence/` | Sequence algorithms such as longest increasing subsequence, inversion counting, and meet-in-the-middle subset sum. |
-| `geometry/` | 2D points, lines, rays, segments, polygons, convex hulls, half-plane intersection, and circles. |
+| `geometry/` | 2D points, lines, rays, segments, polygons, convex hulls, half-plane intersection, lattice-point counting, and circles. |
 | `ds/` | Categorized data structures for range queries, online/offline dynamic connectivity, dynamic sequences and trees, ordered sets, and hash tables. |
 | `monoid/` | Reusable monoids for generic data structures such as `Segtree`. |
 | `acted_monoid/` | Acted monoids for lazy propagation structures such as `LazySegtree` and generic `SegtreeBeats`. |
