@@ -115,6 +115,10 @@ $$
 = \sum_{n=0}^{\infty}\frac{x^n}{(n+1)!}.
 $$
 
+The function is defined in [`math/bernoulli.hpp`](bernoulli.md), which also
+provides Bernoulli polynomials, power sums, and polynomial discrete
+integration. It remains available through this header for compatibility.
+
 ## Stirling Numbers of the Second Kind
 
 The Stirling number of the second kind $S(n,k)$ counts ways to divide a set of

@@ -2,6 +2,7 @@
 #define M1UNE_MATH_ALL_HPP 1
 
 #include "base_n.hpp"
+#include "bernoulli.hpp"
 #include "bitwise_convolution.hpp"
 #include "bit_ceil.hpp"
 #include "combinatorics.hpp"

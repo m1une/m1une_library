@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "../fps/formal_power_series.hpp"
+#include "bernoulli.hpp"
 #include "combinatorics.hpp"
 
 namespace m1une {
@@ -26,26 +27,6 @@ std::vector<Mint> catalan_numbers(int maximum) {
     result[0] = 1;
     for (int n = 0; n < maximum; n++) {
         result[n + 1] = result[n] * Mint(2) * Mint(2LL * n + 1) * inverse[n + 2];
-    }
-    return result;
-}
-
-template <class Mint>
-std::vector<Mint> bernoulli_numbers(int maximum) {
-    assert(maximum >= 0);
-    assert(static_cast<uint64_t>(maximum) + 1 < Mint::mod());
-
-    using Fps = fps::FormalPowerSeries<Mint>;
-    Combinatorics<Mint> combinations(maximum + 1);
-    Fps denominator(maximum + 1);
-    for (int i = 0; i <= maximum; i++) {
-        denominator[i] = combinations.inverse_factorial(i + 1);
-    }
-
-    Fps generating_function = denominator.inv(maximum + 1);
-    std::vector<Mint> result(maximum + 1);
-    for (int i = 0; i <= maximum; i++) {
-        result[i] = generating_function[i] * combinations.factorial(i);
     }
     return result;
 }

@@ -3,7 +3,7 @@
 #include <iostream>
 #include <vector>
 
-#include "../../math/combinatorial_sequences.hpp"
+#include "../../math/bernoulli.hpp"
 #include "../../math/modint.hpp"
 
 using Mint = m1une::math::modint998244353;

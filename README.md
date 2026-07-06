@@ -26,7 +26,7 @@ contest.
 | `ds/` | Categorized data structures for range queries, online/offline dynamic connectivity, dynamic sequences and trees, ordered sets, and hash tables. |
 | `monoid/` | Reusable monoids for generic data structures such as `Segtree`. |
 | `acted_monoid/` | Acted monoids for lazy propagation structures such as `LazySegtree` and generic `SegtreeBeats`. |
-| `math/` | Base and Gray-code conversion, repunits, cyclotomic polynomials, extended GCD, modular arithmetic, Lucas binomials, tetration, Stern-Brocot paths, combinatorial sequences, sieves, factorization, CRT, and ordinary or generalized floor sums. |
+| `math/` | Base and Gray-code conversion, Bernoulli and power-sum tools, repunits, cyclotomic polynomials, extended GCD, modular arithmetic, Lucas binomials, tetration, Stern-Brocot paths, combinatorial sequences, sieves, factorization, CRT, and ordinary or generalized floor sums. |
 | `string/` | Z/KMP, edit distance, Manacher, eertrees, suffix automata/arrays, tries, Aho-Corasick, and string hashes. |
 | `utilities/` | Fast I/O, parsing, dice, integer helpers, compression, random generation, stress testing, and general contest utilities. |
 | `verify/` | Online Judge Verify Helper tests. |

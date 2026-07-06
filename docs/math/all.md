@@ -25,8 +25,10 @@ You usually do not need to include this entire bundle:
   queries under a prime modulus.
 * Use `lucas.hpp` for binomial coefficients with huge arguments modulo a small
   prime.
-* Use `combinatorial_sequences.hpp` for Catalan, Bernoulli, Bell, Stirling,
-  partition, or derangement numbers.
+* Use `bernoulli.hpp` for Bernoulli numbers, Bernoulli polynomials, Faulhaber
+  sums, and polynomial discrete integration.
+* Use `combinatorial_sequences.hpp` for Catalan, Bell, Stirling, partition, or
+  derangement numbers.
 * Use `cyclotomic_polynomial.hpp` to construct the polynomial of primitive
   roots of unity of a given order.
 * Use `prime_sieve.hpp` when all queried integers are at most a manageable
@@ -56,6 +58,7 @@ few unused headers do not matter.
 | Header | Contents |
 | --- | --- |
 | `math/base_n.hpp` | Checked conversion between integers and arbitrary-base digits. |
+| `math/bernoulli.hpp` | Bernoulli numbers and polynomials, power sums, and polynomial discrete integration. |
 | `math/bitwise_convolution.hpp` | OR, AND, XOR convolutions and the Walsh-Hadamard transform. |
 | `math/bit_ceil.hpp` | Smallest power of two at least a given value. |
 | `math/gray_code.hpp` | Binary-reflected Gray-code encoding, decoding, and enumeration. |
