@@ -79,7 +79,6 @@
 "verify/geometry/circle_ray.test.cpp": "2026-06-21 12:04:47 +0900",
 "verify/geometry/convex_hull.test.cpp": "2026-07-01 22:47:11 +0900",
 "verify/geometry/farthest_pair.test.cpp": "2026-07-01 22:47:11 +0900",
-"verify/geometry/geometry_algorithms.test.cpp": "2026-07-05 15:57:09 +0900",
 "verify/geometry/half_plane_intersection.test.cpp": "2026-07-05 15:57:09 +0900",
 "verify/geometry/half_plane_intersection_random.test.cpp": "2026-07-05 15:57:09 +0900",
 "verify/geometry/manhattan_mst.test.cpp": "2026-06-23 01:30:45 +0900",
