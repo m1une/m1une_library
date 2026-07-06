@@ -8,6 +8,9 @@ data:
     path: fps/formal_power_series.hpp
     title: Formal Power Series
   - icon: ':heavy_check_mark:'
+    path: math/bernoulli.hpp
+    title: Bernoulli Numbers and Power Sums
+  - icon: ':heavy_check_mark:'
     path: math/combinatorial_sequences.hpp
     title: Combinatorial Sequences
   - icon: ':heavy_check_mark:'
@@ -314,9 +317,10 @@ data:
     \      power *= shift;\n        }\n        Fps product = left * right;\n     \
     \   Fps result(n);\n        for (int i = 0; i < n; i++) result[i] = product[n\
     \ - 1 - i] * inverse_factorial[i];\n        return result;\n    }\n};\n\n}  //\
-    \ namespace fps\n}  // namespace m1une\n\n\n#line 1 \"math/combinatorics.hpp\"\
-    \n\n\n\n#line 7 \"math/combinatorics.hpp\"\n\nnamespace m1une {\nnamespace math\
-    \ {\n\ntemplate <class Mint>\nstruct Combinatorics {\n   private:\n    std::vector<Mint>\
+    \ namespace fps\n}  // namespace m1une\n\n\n#line 1 \"math/bernoulli.hpp\"\n\n\
+    \n\n#line 7 \"math/bernoulli.hpp\"\n\n#line 1 \"math/combinatorics.hpp\"\n\n\n\
+    \n#line 7 \"math/combinatorics.hpp\"\n\nnamespace m1une {\nnamespace math {\n\n\
+    template <class Mint>\nstruct Combinatorics {\n   private:\n    std::vector<Mint>\
     \ _factorial;\n    std::vector<Mint> _inverse_factorial;\n\n   public:\n    explicit\
     \ Combinatorics(int maximum = 0) : _factorial(1, Mint(1)), _inverse_factorial(1,\
     \ Mint(1)) {\n        ensure(maximum);\n    }\n\n    int maximum() const {\n \
@@ -346,51 +350,127 @@ data:
     \ {\n        assert(n >= 0);\n        const long long doubled = 2LL * n;\n   \
     \     assert(doubled <= maximum());\n        return binom(int(doubled), n) - binom(int(doubled),\
     \ n + 1);\n    }\n};\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line\
-    \ 10 \"math/combinatorial_sequences.hpp\"\n\nnamespace m1une {\nnamespace math\
-    \ {\n\ntemplate <class Mint>\nstd::vector<Mint> catalan_numbers(int maximum) {\n\
-    \    assert(maximum >= 0);\n    assert(static_cast<uint64_t>(maximum) + 1 < Mint::mod());\n\
-    \n    std::vector<Mint> inverse(maximum + 2);\n    inverse[1] = 1;\n    for (int\
-    \ i = 2; i <= maximum + 1; i++) {\n        inverse[i] = Mint(0) - Mint(Mint::mod()\
-    \ / uint32_t(i)) * inverse[Mint::mod() % uint32_t(i)];\n    }\n\n    std::vector<Mint>\
-    \ result(maximum + 1);\n    result[0] = 1;\n    for (int n = 0; n < maximum; n++)\
-    \ {\n        result[n + 1] = result[n] * Mint(2) * Mint(2LL * n + 1) * inverse[n\
-    \ + 2];\n    }\n    return result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint>\
-    \ bernoulli_numbers(int maximum) {\n    assert(maximum >= 0);\n    assert(static_cast<uint64_t>(maximum)\
-    \ + 1 < Mint::mod());\n\n    using Fps = fps::FormalPowerSeries<Mint>;\n    Combinatorics<Mint>\
-    \ combinations(maximum + 1);\n    Fps denominator(maximum + 1);\n    for (int\
-    \ i = 0; i <= maximum; i++) {\n        denominator[i] = combinations.inverse_factorial(i\
+    \ 10 \"math/bernoulli.hpp\"\n\nnamespace m1une {\nnamespace math {\n\nnamespace\
+    \ bernoulli_detail {\n\ntemplate <class Mint>\nstd::vector<Mint> numbers(\n  \
+    \  int maximum,\n    const Combinatorics<Mint>& combinations\n) {\n    using Fps\
+    \ = fps::FormalPowerSeries<Mint>;\n    Fps denominator(maximum + 1);\n    for\
+    \ (int index = 0; index <= maximum; ++index) {\n        denominator[index] = combinations.inverse_factorial(index\
     \ + 1);\n    }\n\n    Fps generating_function = denominator.inv(maximum + 1);\n\
-    \    std::vector<Mint> result(maximum + 1);\n    for (int i = 0; i <= maximum;\
-    \ i++) {\n        result[i] = generating_function[i] * combinations.factorial(i);\n\
-    \    }\n    return result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint> bell_numbers(int\
+    \    std::vector<Mint> result(maximum + 1);\n    for (int index = 0; index <=\
+    \ maximum; ++index) {\n        result[index] =\n            generating_function[index]\
+    \ * combinations.factorial(index);\n    }\n    return result;\n}\n\ntemplate <class\
+    \ Mint>\nMint evaluate_polynomial(const std::vector<Mint>& coefficients, Mint\
+    \ x) {\n    Mint result = 0;\n    for (int index = int(coefficients.size()) -\
+    \ 1; index >= 0; --index) {\n        result = result * x + coefficients[index];\n\
+    \    }\n    return result;\n}\n\n}  // namespace bernoulli_detail\n\n// Uses x\
+    \ / (exp(x) - 1), so B_1 = -1/2.\ntemplate <class Mint>\nstd::vector<Mint> bernoulli_numbers(int\
     \ maximum) {\n    assert(maximum >= 0);\n    assert(static_cast<uint64_t>(maximum)\
-    \ < Mint::mod());\n\n    using Fps = fps::FormalPowerSeries<Mint>;\n    Combinatorics<Mint>\
-    \ combinations(maximum);\n    Fps exponent(maximum + 1);\n    for (int i = 1;\
-    \ i <= maximum; i++) {\n        exponent[i] = combinations.inverse_factorial(i);\n\
-    \    }\n\n    Fps generating_function = exponent.exp(maximum + 1);\n    std::vector<Mint>\
-    \ result(maximum + 1);\n    for (int i = 0; i <= maximum; i++) {\n        result[i]\
-    \ = generating_function[i] * combinations.factorial(i);\n    }\n    return result;\n\
-    }\n\ntemplate <class Mint>\nstd::vector<Mint> stirling_numbers_second_kind(int\
-    \ n) {\n    assert(n >= 0);\n    assert(static_cast<uint64_t>(n) < Mint::mod());\n\
-    \n    Combinatorics<Mint> combinations(n);\n    std::vector<Mint> powers(n + 1);\n\
-    \    std::vector<Mint> signs(n + 1);\n    for (int i = 0; i <= n; i++) {\n   \
-    \     powers[i] = Mint(i).pow(n) * combinations.inverse_factorial(i);\n      \
-    \  signs[i] = combinations.inverse_factorial(i);\n        if (i & 1) signs[i]\
-    \ = Mint(0) - signs[i];\n    }\n\n    std::vector<Mint> result = fps::convolution(powers,\
-    \ signs);\n    result.resize(n + 1);\n    return result;\n}\n\ntemplate <class\
-    \ Mint>\nstd::vector<Mint> partition_numbers(int maximum) {\n    assert(maximum\
-    \ >= 0);\n\n    using Fps = fps::FormalPowerSeries<Mint>;\n    Fps denominator(maximum\
-    \ + 1);\n    denominator[0] = 1;\n    for (long long k = 1;; k++) {\n        const\
-    \ long long first = k * (3 * k - 1) / 2;\n        const long long second = k *\
-    \ (3 * k + 1) / 2;\n        if (first > maximum) break;\n\n        const Mint\
-    \ sign = (k & 1) ? Mint(-1) : Mint(1);\n        denominator[int(first)] += sign;\n\
-    \        if (second <= maximum) denominator[int(second)] += sign;\n    }\n   \
-    \ return denominator.inv(maximum + 1);\n}\n\ntemplate <class Mint>\nstd::vector<Mint>\
-    \ derangement_numbers(int maximum) {\n    assert(maximum >= 0);\n\n    std::vector<Mint>\
-    \ result(maximum + 1);\n    result[0] = 1;\n    if (maximum >= 1) result[1] =\
-    \ 0;\n    for (int n = 2; n <= maximum; n++) {\n        result[n] = Mint(n - 1)\
-    \ * (result[n - 1] + result[n - 2]);\n    }\n    return result;\n}\n\n}  // namespace\
-    \ math\n}  // namespace m1une\n\n\n#line 8 \"verify/math/partition_function.test.cpp\"\
+    \ + 1 < Mint::mod());\n    Combinatorics<Mint> combinations(maximum + 1);\n  \
+    \  return bernoulli_detail::numbers(maximum, combinations);\n}\n\ntemplate <class\
+    \ Mint>\nclass Bernoulli {\n   public:\n    explicit Bernoulli(int maximum)\n\
+    \        : combinations_(checked_maximum(maximum) + 1),\n          numbers_(bernoulli_detail::numbers(maximum,\
+    \ combinations_)) {}\n\n    int maximum() const {\n        return int(numbers_.size())\
+    \ - 1;\n    }\n\n    const std::vector<Mint>& numbers() const {\n        return\
+    \ numbers_;\n    }\n\n    Mint number(int degree) const {\n        assert(0 <=\
+    \ degree && degree <= maximum());\n        return numbers_[degree];\n    }\n\n\
+    \    // Coefficients of B_degree(x), in increasing order of powers of x.\n   \
+    \ std::vector<Mint> polynomial_coefficients(int degree) const {\n        assert(0\
+    \ <= degree && degree <= maximum());\n        std::vector<Mint> result(degree\
+    \ + 1);\n        for (int power = 0; power <= degree; ++power) {\n           \
+    \ result[power] =\n                combinations_.binom(degree, power) *\n    \
+    \            numbers_[degree - power];\n        }\n        return result;\n  \
+    \  }\n\n    Mint polynomial(int degree, Mint x) const {\n        assert(0 <= degree\
+    \ && degree <= maximum());\n        std::vector<Mint> powers(degree + 1, Mint(1));\n\
+    \        for (int power = 0; power < degree; ++power) {\n            powers[power\
+    \ + 1] = powers[power] * x;\n        }\n\n        Mint result = 0;\n        for\
+    \ (int index = 0; index <= degree; ++index) {\n            result += combinations_.binom(degree,\
+    \ index) * numbers_[index] *\n                      powers[degree - index];\n\
+    \        }\n        return result;\n    }\n\n    // Returns sum_{i=0}^{n-1} i^degree,\
+    \ evaluated as a polynomial in n.\n    Mint power_sum(Mint n, int degree) const\
+    \ {\n        assert(0 <= degree && degree <= maximum());\n        std::vector<Mint>\
+    \ powers(degree + 2, Mint(1));\n        for (int power = 0; power <= degree; ++power)\
+    \ {\n            powers[power + 1] = powers[power] * n;\n        }\n\n       \
+    \ Mint result = 0;\n        for (int index = 0; index <= degree; ++index) {\n\
+    \            result += combinations_.binom(degree + 1, index) *\n            \
+    \          numbers_[index] * powers[degree + 1 - index];\n        }\n        return\
+    \ result * combinations_.inverse(degree + 1);\n    }\n\n    // Returns sum_{i=left}^{right-1}\
+    \ i^degree.\n    Mint power_sum(Mint left, Mint right, int degree) const {\n \
+    \       return power_sum(right, degree) - power_sum(left, degree);\n    }\n\n\
+    \    // Coefficients of sum_{i=0}^{n-1} i^degree as a polynomial in n.\n    std::vector<Mint>\
+    \ power_sum_polynomial(int degree) const {\n        assert(0 <= degree && degree\
+    \ <= maximum());\n        std::vector<Mint> result(degree + 2);\n        Mint\
+    \ inverse = combinations_.inverse(degree + 1);\n        for (int index = 0; index\
+    \ <= degree; ++index) {\n            result[degree + 1 - index] +=\n         \
+    \       combinations_.binom(degree + 1, index) * numbers_[index] *\n         \
+    \       inverse;\n        }\n        return result;\n    }\n\n    // If P is given\
+    \ by coefficients, returns coefficients of the unique Q\n    // with Q(0) = 0\
+    \ and Q(n) = sum_{i=0}^{n-1} P(i).\n    std::vector<Mint> polynomial_prefix_sum(\n\
+    \        const std::vector<Mint>& coefficients\n    ) const {\n        if (coefficients.empty())\
+    \ return std::vector<Mint>{Mint(0)};\n        int degree = int(coefficients.size())\
+    \ - 1;\n        assert(degree <= maximum());\n\n        std::vector<Mint> result(degree\
+    \ + 2);\n        for (int source_degree = 0;\n             source_degree <= degree;\n\
+    \             ++source_degree) {\n            Mint inverse = combinations_.inverse(source_degree\
+    \ + 1);\n            for (int index = 0; index <= source_degree; ++index) {\n\
+    \                result[source_degree + 1 - index] +=\n                    coefficients[source_degree]\
+    \ *\n                    combinations_.binom(source_degree + 1, index) *\n   \
+    \                 numbers_[index] * inverse;\n            }\n        }\n     \
+    \   return result;\n    }\n\n    // Returns sum_{i=left}^{right-1} P(i).\n   \
+    \ Mint polynomial_sum(\n        const std::vector<Mint>& coefficients,\n     \
+    \   Mint left,\n        Mint right\n    ) const {\n        std::vector<Mint> prefix\
+    \ = polynomial_prefix_sum(coefficients);\n        return bernoulli_detail::evaluate_polynomial(prefix,\
+    \ right) -\n               bernoulli_detail::evaluate_polynomial(prefix, left);\n\
+    \    }\n\n    // Returns sum_{i=0}^{count-1} (start + step*i)^degree.\n    Mint\
+    \ arithmetic_progression_power_sum(\n        Mint start,\n        Mint step,\n\
+    \        Mint count,\n        int degree\n    ) const {\n        assert(0 <= degree\
+    \ && degree <= maximum());\n        std::vector<Mint> start_powers(degree + 1,\
+    \ Mint(1));\n        std::vector<Mint> step_powers(degree + 1, Mint(1));\n   \
+    \     for (int power = 0; power < degree; ++power) {\n            start_powers[power\
+    \ + 1] = start_powers[power] * start;\n            step_powers[power + 1] = step_powers[power]\
+    \ * step;\n        }\n\n        Mint result = 0;\n        for (int power = 0;\
+    \ power <= degree; ++power) {\n            result += combinations_.binom(degree,\
+    \ power) *\n                      start_powers[degree - power] * step_powers[power]\
+    \ *\n                      power_sum(count, power);\n        }\n        return\
+    \ result;\n    }\n\n   private:\n    static int checked_maximum(int maximum) {\n\
+    \        assert(maximum >= 0);\n        assert(static_cast<uint64_t>(maximum)\
+    \ + 1 < Mint::mod());\n        return maximum;\n    }\n\n    Combinatorics<Mint>\
+    \ combinations_;\n    std::vector<Mint> numbers_;\n};\n\n}  // namespace math\n\
+    }  // namespace m1une\n\n\n#line 11 \"math/combinatorial_sequences.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace math {\n\ntemplate <class Mint>\nstd::vector<Mint> catalan_numbers(int\
+    \ maximum) {\n    assert(maximum >= 0);\n    assert(static_cast<uint64_t>(maximum)\
+    \ + 1 < Mint::mod());\n\n    std::vector<Mint> inverse(maximum + 2);\n    inverse[1]\
+    \ = 1;\n    for (int i = 2; i <= maximum + 1; i++) {\n        inverse[i] = Mint(0)\
+    \ - Mint(Mint::mod() / uint32_t(i)) * inverse[Mint::mod() % uint32_t(i)];\n  \
+    \  }\n\n    std::vector<Mint> result(maximum + 1);\n    result[0] = 1;\n    for\
+    \ (int n = 0; n < maximum; n++) {\n        result[n + 1] = result[n] * Mint(2)\
+    \ * Mint(2LL * n + 1) * inverse[n + 2];\n    }\n    return result;\n}\n\ntemplate\
+    \ <class Mint>\nstd::vector<Mint> bell_numbers(int maximum) {\n    assert(maximum\
+    \ >= 0);\n    assert(static_cast<uint64_t>(maximum) < Mint::mod());\n\n    using\
+    \ Fps = fps::FormalPowerSeries<Mint>;\n    Combinatorics<Mint> combinations(maximum);\n\
+    \    Fps exponent(maximum + 1);\n    for (int i = 1; i <= maximum; i++) {\n  \
+    \      exponent[i] = combinations.inverse_factorial(i);\n    }\n\n    Fps generating_function\
+    \ = exponent.exp(maximum + 1);\n    std::vector<Mint> result(maximum + 1);\n \
+    \   for (int i = 0; i <= maximum; i++) {\n        result[i] = generating_function[i]\
+    \ * combinations.factorial(i);\n    }\n    return result;\n}\n\ntemplate <class\
+    \ Mint>\nstd::vector<Mint> stirling_numbers_second_kind(int n) {\n    assert(n\
+    \ >= 0);\n    assert(static_cast<uint64_t>(n) < Mint::mod());\n\n    Combinatorics<Mint>\
+    \ combinations(n);\n    std::vector<Mint> powers(n + 1);\n    std::vector<Mint>\
+    \ signs(n + 1);\n    for (int i = 0; i <= n; i++) {\n        powers[i] = Mint(i).pow(n)\
+    \ * combinations.inverse_factorial(i);\n        signs[i] = combinations.inverse_factorial(i);\n\
+    \        if (i & 1) signs[i] = Mint(0) - signs[i];\n    }\n\n    std::vector<Mint>\
+    \ result = fps::convolution(powers, signs);\n    result.resize(n + 1);\n    return\
+    \ result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint> partition_numbers(int\
+    \ maximum) {\n    assert(maximum >= 0);\n\n    using Fps = fps::FormalPowerSeries<Mint>;\n\
+    \    Fps denominator(maximum + 1);\n    denominator[0] = 1;\n    for (long long\
+    \ k = 1;; k++) {\n        const long long first = k * (3 * k - 1) / 2;\n     \
+    \   const long long second = k * (3 * k + 1) / 2;\n        if (first > maximum)\
+    \ break;\n\n        const Mint sign = (k & 1) ? Mint(-1) : Mint(1);\n        denominator[int(first)]\
+    \ += sign;\n        if (second <= maximum) denominator[int(second)] += sign;\n\
+    \    }\n    return denominator.inv(maximum + 1);\n}\n\ntemplate <class Mint>\n\
+    std::vector<Mint> derangement_numbers(int maximum) {\n    assert(maximum >= 0);\n\
+    \n    std::vector<Mint> result(maximum + 1);\n    result[0] = 1;\n    if (maximum\
+    \ >= 1) result[1] = 0;\n    for (int n = 2; n <= maximum; n++) {\n        result[n]\
+    \ = Mint(n - 1) * (result[n - 1] + result[n - 2]);\n    }\n    return result;\n\
+    }\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line 8 \"verify/math/partition_function.test.cpp\"\
     \n\nusing Mint = m1une::math::modint998244353;\n\nint main() {\n    std::ios::sync_with_stdio(false);\n\
     \    std::cin.tie(nullptr);\n\n    int n;\n    std::cin >> n;\n    const std::vector<Mint>\
     \ values = m1une::math::partition_numbers<Mint>(n);\n    for (int i = 0; i <=\
@@ -408,12 +488,13 @@ data:
   - fps/formal_power_series.hpp
   - fps/convolution.hpp
   - math/modint.hpp
+  - math/bernoulli.hpp
   - math/combinatorics.hpp
   - math/modint.hpp
   isVerificationFile: true
   path: verify/math/partition_function.test.cpp
   requiredBy: []
-  timestamp: '2026-07-01 22:52:49+09:00'
+  timestamp: '2026-07-07 02:56:26+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/partition_function.test.cpp

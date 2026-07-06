@@ -11,6 +11,9 @@ data:
     path: math/base_n.hpp
     title: Base-N Numbers
   - icon: ':heavy_check_mark:'
+    path: math/bernoulli.hpp
+    title: Bernoulli Numbers and Power Sums
+  - icon: ':heavy_check_mark:'
     path: math/bit_ceil.hpp
     title: Bit Ceil
   - icon: ':heavy_check_mark:'
@@ -129,160 +132,22 @@ data:
     \ bool>)\nInteger from_base_n(const DigitSequence& digits, int base) {\n    std::optional<Integer>\
     \ result = checked_from_base_n<Integer>(digits, base);\n    assert(result.has_value());\n\
     \    return result.value_or(Integer(0));\n}\n\n}  // namespace math\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"math/bitwise_convolution.hpp\"\n\n\n\n#line 5 \"math/bitwise_convolution.hpp\"\
-    \n#include <cstddef>\n#include <utility>\n#line 8 \"math/bitwise_convolution.hpp\"\
-    \n\n#line 1 \"math/zeta_mobius_transform.hpp\"\n\n\n\n#line 7 \"math/zeta_mobius_transform.hpp\"\
-    \n\nnamespace m1une {\nnamespace math {\n\nnamespace zeta_mobius_transform_detail\
-    \ {\n\ninline bool is_power_of_two(std::size_t size) noexcept {\n    return size\
-    \ != 0 && (size & (size - 1)) == 0;\n}\n\ninline std::vector<std::size_t> primes_up_to(std::size_t\
-    \ limit) {\n    std::vector<std::size_t> primes;\n    std::vector<bool> is_prime(limit\
-    \ + 1, true);\n    if (!is_prime.empty()) is_prime[0] = false;\n    if (limit\
-    \ >= 1) is_prime[1] = false;\n    for (std::size_t value = 2; value <= limit;\
-    \ ++value) {\n        if (!is_prime[value]) continue;\n        primes.emplace_back(value);\n\
-    \        if (value > limit / value) continue;\n        for (\n            std::size_t\
-    \ multiple = value * value;\n            multiple <= limit;\n            multiple\
-    \ += value\n        ) {\n            is_prime[multiple] = false;\n        }\n\
-    \    }\n    return primes;\n}\n\n}  // namespace zeta_mobius_transform_detail\n\
-    \ntemplate <typename T>\nvoid subset_zeta_transform(std::vector<T>& values) {\n\
-    \    assert(zeta_mobius_transform_detail::is_power_of_two(values.size()));\n \
-    \   for (std::size_t bit = 1; bit < values.size(); bit <<= 1) {\n        for (\n\
-    \            std::size_t block = 0;\n            block < values.size();\n    \
-    \        block += bit << 1\n        ) {\n            for (std::size_t offset =\
-    \ 0; offset < bit; ++offset) {\n                values[block + bit + offset] +=\
-    \ values[block + offset];\n            }\n        }\n    }\n}\n\ntemplate <typename\
-    \ T>\nvoid subset_mobius_transform(std::vector<T>& values) {\n    assert(zeta_mobius_transform_detail::is_power_of_two(values.size()));\n\
-    \    for (std::size_t bit = 1; bit < values.size(); bit <<= 1) {\n        for\
-    \ (\n            std::size_t block = 0;\n            block < values.size();\n\
-    \            block += bit << 1\n        ) {\n            for (std::size_t offset\
-    \ = 0; offset < bit; ++offset) {\n                values[block + bit + offset]\
-    \ -= values[block + offset];\n            }\n        }\n    }\n}\n\ntemplate <typename\
-    \ T>\nvoid superset_zeta_transform(std::vector<T>& values) {\n    assert(zeta_mobius_transform_detail::is_power_of_two(values.size()));\n\
-    \    for (std::size_t bit = 1; bit < values.size(); bit <<= 1) {\n        for\
-    \ (\n            std::size_t block = 0;\n            block < values.size();\n\
-    \            block += bit << 1\n        ) {\n            for (std::size_t offset\
-    \ = 0; offset < bit; ++offset) {\n                values[block + offset] += values[block\
-    \ + bit + offset];\n            }\n        }\n    }\n}\n\ntemplate <typename T>\n\
-    void superset_mobius_transform(std::vector<T>& values) {\n    assert(zeta_mobius_transform_detail::is_power_of_two(values.size()));\n\
-    \    for (std::size_t bit = 1; bit < values.size(); bit <<= 1) {\n        for\
-    \ (\n            std::size_t block = 0;\n            block < values.size();\n\
-    \            block += bit << 1\n        ) {\n            for (std::size_t offset\
-    \ = 0; offset < bit; ++offset) {\n                values[block + offset] -= values[block\
-    \ + bit + offset];\n            }\n        }\n    }\n}\n\ntemplate <typename T>\n\
-    void divisor_zeta_transform(std::vector<T>& values) {\n    if (values.size() <=\
-    \ 2) return;\n    const std::size_t limit = values.size() - 1;\n    const std::vector<std::size_t>\
-    \ primes =\n        zeta_mobius_transform_detail::primes_up_to(limit);\n    for\
-    \ (std::size_t prime : primes) {\n        for (std::size_t value = 1; value <=\
-    \ limit / prime; ++value) {\n            values[value * prime] += values[value];\n\
-    \        }\n    }\n}\n\ntemplate <typename T>\nvoid divisor_mobius_transform(std::vector<T>&\
-    \ values) {\n    if (values.size() <= 2) return;\n    const std::size_t limit\
-    \ = values.size() - 1;\n    const std::vector<std::size_t> primes =\n        zeta_mobius_transform_detail::primes_up_to(limit);\n\
-    \    for (std::size_t prime : primes) {\n        for (\n            std::size_t\
-    \ value = limit / prime;\n            value >= 1;\n            --value\n     \
-    \   ) {\n            values[value * prime] -= values[value];\n        }\n    }\n\
-    }\n\ntemplate <typename T>\nvoid multiple_zeta_transform(std::vector<T>& values)\
-    \ {\n    if (values.size() <= 2) return;\n    const std::size_t limit = values.size()\
-    \ - 1;\n    const std::vector<std::size_t> primes =\n        zeta_mobius_transform_detail::primes_up_to(limit);\n\
-    \    for (std::size_t prime : primes) {\n        for (\n            std::size_t\
-    \ value = limit / prime;\n            value >= 1;\n            --value\n     \
-    \   ) {\n            values[value] += values[value * prime];\n        }\n    }\n\
-    }\n\ntemplate <typename T>\nvoid multiple_mobius_transform(std::vector<T>& values)\
-    \ {\n    if (values.size() <= 2) return;\n    const std::size_t limit = values.size()\
-    \ - 1;\n    const std::vector<std::size_t> primes =\n        zeta_mobius_transform_detail::primes_up_to(limit);\n\
-    \    for (std::size_t prime : primes) {\n        for (std::size_t value = 1; value\
-    \ <= limit / prime; ++value) {\n            values[value] -= values[value * prime];\n\
-    \        }\n    }\n}\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line\
-    \ 10 \"math/bitwise_convolution.hpp\"\n\nnamespace m1une {\nnamespace math {\n\
-    \nnamespace bitwise_convolution_detail {\n\ninline std::size_t common_size(\n\
-    \    std::size_t first_size,\n    std::size_t second_size\n) {\n    std::size_t\
-    \ required = first_size > second_size\n        ? first_size\n        : second_size;\n\
-    \    std::size_t size = 1;\n    while (size < required) size <<= 1;\n    return\
-    \ size;\n}\n\ntemplate <typename T>\nstd::vector<T> pointwise_product(\n    std::vector<T>\
-    \ first,\n    const std::vector<T>& second\n) {\n    assert(first.size() == second.size());\n\
-    \    for (std::size_t index = 0; index < first.size(); ++index) {\n        first[index]\
-    \ *= second[index];\n    }\n    return first;\n}\n\n}  // namespace bitwise_convolution_detail\n\
-    \ntemplate <typename T>\nvoid walsh_hadamard_transform(\n    std::vector<T>& values,\n\
-    \    bool inverse = false\n) {\n    assert(zeta_mobius_transform_detail::is_power_of_two(values.size()));\n\
-    \    for (std::size_t length = 1; length < values.size(); length <<= 1) {\n  \
-    \      for (\n            std::size_t block = 0;\n            block < values.size();\n\
-    \            block += length << 1\n        ) {\n            for (std::size_t offset\
-    \ = 0; offset < length; ++offset) {\n                T first = values[block +\
-    \ offset];\n                T second = values[block + offset + length];\n    \
-    \            values[block + offset] = first + second;\n                values[block\
-    \ + offset + length] = first - second;\n            }\n        }\n    }\n    if\
-    \ (inverse) {\n        T size = T(static_cast<long long>(values.size()));\n  \
-    \      for (T& value : values) value /= size;\n    }\n}\n\ntemplate <typename\
-    \ T>\nstd::vector<T> bitwise_or_convolution(\n    std::vector<T> first,\n    std::vector<T>\
-    \ second\n) {\n    if (first.empty() || second.empty()) return {};\n    std::size_t\
-    \ size = bitwise_convolution_detail::common_size(\n        first.size(),\n   \
-    \     second.size()\n    );\n    first.resize(size);\n    second.resize(size);\n\
-    \    subset_zeta_transform(first);\n    subset_zeta_transform(second);\n    first\
-    \ = bitwise_convolution_detail::pointwise_product(\n        std::move(first),\n\
-    \        second\n    );\n    subset_mobius_transform(first);\n    return first;\n\
-    }\n\ntemplate <typename T>\nstd::vector<T> bitwise_and_convolution(\n    std::vector<T>\
-    \ first,\n    std::vector<T> second\n) {\n    if (first.empty() || second.empty())\
-    \ return {};\n    std::size_t size = bitwise_convolution_detail::common_size(\n\
-    \        first.size(),\n        second.size()\n    );\n    first.resize(size);\n\
-    \    second.resize(size);\n    superset_zeta_transform(first);\n    superset_zeta_transform(second);\n\
-    \    first = bitwise_convolution_detail::pointwise_product(\n        std::move(first),\n\
-    \        second\n    );\n    superset_mobius_transform(first);\n    return first;\n\
-    }\n\ntemplate <typename T>\nstd::vector<T> bitwise_xor_convolution(\n    std::vector<T>\
-    \ first,\n    std::vector<T> second\n) {\n    if (first.empty() || second.empty())\
-    \ return {};\n    std::size_t size = bitwise_convolution_detail::common_size(\n\
-    \        first.size(),\n        second.size()\n    );\n    first.resize(size);\n\
-    \    second.resize(size);\n    walsh_hadamard_transform(first);\n    walsh_hadamard_transform(second);\n\
-    \    first = bitwise_convolution_detail::pointwise_product(\n        std::move(first),\n\
-    \        second\n    );\n    walsh_hadamard_transform(first, true);\n    return\
-    \ first;\n}\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line 1 \"math/bit_ceil.hpp\"\
-    \n\n\n\nnamespace m1une {\nnamespace math {\n\ntemplate <typename T>\nconstexpr\
-    \ T bit_ceil(T n) {\n    if (n <= 1) return 1;\n    T x = 1;\n    while (x < n)\
-    \ x <<= 1;\n    return x;\n}\n\n}  // namespace math\n}  // namespace m1une\n\n\
-    \n#line 1 \"math/combinatorics.hpp\"\n\n\n\n#line 5 \"math/combinatorics.hpp\"\
-    \n#include <cstdint>\n#line 7 \"math/combinatorics.hpp\"\n\nnamespace m1une {\n\
-    namespace math {\n\ntemplate <class Mint>\nstruct Combinatorics {\n   private:\n\
-    \    std::vector<Mint> _factorial;\n    std::vector<Mint> _inverse_factorial;\n\
-    \n   public:\n    explicit Combinatorics(int maximum = 0) : _factorial(1, Mint(1)),\
-    \ _inverse_factorial(1, Mint(1)) {\n        ensure(maximum);\n    }\n\n    int\
-    \ maximum() const {\n        return int(_factorial.size()) - 1;\n    }\n\n   \
-    \ void ensure(int maximum) {\n        assert(maximum >= 0);\n        assert(static_cast<uint64_t>(maximum)\
-    \ < Mint::mod());\n        if (maximum <= this->maximum()) return;\n\n       \
-    \ const int old_maximum = this->maximum();\n        _factorial.resize(maximum\
-    \ + 1);\n        _inverse_factorial.resize(maximum + 1);\n        for (int i =\
-    \ old_maximum + 1; i <= maximum; i++) {\n            _factorial[i] = _factorial[i\
-    \ - 1] * Mint(i);\n        }\n        _inverse_factorial[maximum] = _factorial[maximum].inv();\n\
-    \        for (int i = maximum; i > old_maximum; i--) {\n            _inverse_factorial[i\
-    \ - 1] = _inverse_factorial[i] * Mint(i);\n        }\n    }\n\n    Mint factorial(int\
-    \ n) const {\n        assert(0 <= n && n <= maximum());\n        return _factorial[n];\n\
-    \    }\n\n    Mint inverse_factorial(int n) const {\n        assert(0 <= n &&\
-    \ n <= maximum());\n        return _inverse_factorial[n];\n    }\n\n    Mint inverse(int\
-    \ n) const {\n        assert(1 <= n && n <= maximum());\n        return _factorial[n\
-    \ - 1] * _inverse_factorial[n];\n    }\n\n    Mint binom(int n, int k) const {\n\
-    \        if (k < 0 || k > n) return Mint(0);\n        assert(n <= maximum());\n\
-    \        return _factorial[n] * _inverse_factorial[k] * _inverse_factorial[n -\
-    \ k];\n    }\n\n    Mint perm(int n, int k) const {\n        if (k < 0 || k >\
-    \ n) return Mint(0);\n        assert(n <= maximum());\n        return _factorial[n]\
-    \ * _inverse_factorial[n - k];\n    }\n\n    Mint multiset(int types, int count)\
-    \ const {\n        if (types < 0 || count < 0) return Mint(0);\n        if (types\
-    \ == 0) return Mint(count == 0);\n        const long long total = static_cast<long\
-    \ long>(types) + count - 1;\n        assert(total <= maximum());\n        return\
-    \ binom(static_cast<int>(total), count);\n    }\n\n    Mint catalan(int n) const\
-    \ {\n        assert(n >= 0);\n        const long long doubled = 2LL * n;\n   \
-    \     assert(doubled <= maximum());\n        return binom(int(doubled), n) - binom(int(doubled),\
-    \ n + 1);\n    }\n};\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line\
-    \ 1 \"math/combinatorial_sequences.hpp\"\n\n\n\n#line 7 \"math/combinatorial_sequences.hpp\"\
-    \n\n#line 1 \"fps/formal_power_series.hpp\"\n\n\n\n#line 10 \"fps/formal_power_series.hpp\"\
-    \n\n#line 1 \"fps/convolution.hpp\"\n\n\n\n#line 5 \"fps/convolution.hpp\"\n#include\
-    \ <array>\n#line 10 \"fps/convolution.hpp\"\n\n#line 1 \"math/modint.hpp\"\n\n\
-    \n\n#line 5 \"math/modint.hpp\"\n#include <iostream>\n#line 8 \"math/modint.hpp\"\
-    \n\nnamespace m1une {\nnamespace math {\n\ntemplate <uint32_t Modulus>\nstruct\
-    \ ModInt {\n    static_assert(0 < Modulus, \"Modulus must be positive\");\n\n\
-    \   private:\n    uint32_t _v;\n\n   public:\n    static constexpr uint32_t mod()\
-    \ {\n        return Modulus;\n    }\n\n    static constexpr ModInt raw(uint32_t\
-    \ v) noexcept {\n        ModInt x;\n        x._v = v;\n        return x;\n   \
-    \ }\n\n    constexpr ModInt() noexcept : _v(0) {}\n\n    template <class Integer,\
-    \ std::enable_if_t<std::is_integral_v<Integer>, int> = 0>\n    constexpr ModInt(Integer\
-    \ v) noexcept {\n        if constexpr (std::is_signed_v<Integer>) {\n        \
-    \    int64_t x = static_cast<int64_t>(v) % static_cast<int64_t>(Modulus);\n  \
-    \          if (x < 0) x += Modulus;\n            _v = static_cast<uint32_t>(x);\n\
+    \ m1une\n\n\n#line 1 \"math/bernoulli.hpp\"\n\n\n\n#line 5 \"math/bernoulli.hpp\"\
+    \n#include <cstdint>\n#line 7 \"math/bernoulli.hpp\"\n\n#line 1 \"fps/formal_power_series.hpp\"\
+    \n\n\n\n#line 8 \"fps/formal_power_series.hpp\"\n#include <utility>\n#line 10\
+    \ \"fps/formal_power_series.hpp\"\n\n#line 1 \"fps/convolution.hpp\"\n\n\n\n#line\
+    \ 5 \"fps/convolution.hpp\"\n#include <array>\n#line 10 \"fps/convolution.hpp\"\
+    \n\n#line 1 \"math/modint.hpp\"\n\n\n\n#line 5 \"math/modint.hpp\"\n#include <iostream>\n\
+    #line 8 \"math/modint.hpp\"\n\nnamespace m1une {\nnamespace math {\n\ntemplate\
+    \ <uint32_t Modulus>\nstruct ModInt {\n    static_assert(0 < Modulus, \"Modulus\
+    \ must be positive\");\n\n   private:\n    uint32_t _v;\n\n   public:\n    static\
+    \ constexpr uint32_t mod() {\n        return Modulus;\n    }\n\n    static constexpr\
+    \ ModInt raw(uint32_t v) noexcept {\n        ModInt x;\n        x._v = v;\n  \
+    \      return x;\n    }\n\n    constexpr ModInt() noexcept : _v(0) {}\n\n    template\
+    \ <class Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>\n  \
+    \  constexpr ModInt(Integer v) noexcept {\n        if constexpr (std::is_signed_v<Integer>)\
+    \ {\n            int64_t x = static_cast<int64_t>(v) % static_cast<int64_t>(Modulus);\n\
+    \            if (x < 0) x += Modulus;\n            _v = static_cast<uint32_t>(x);\n\
     \        } else {\n            _v = static_cast<uint32_t>(static_cast<uint64_t>(v)\
     \ % Modulus);\n        }\n    }\n\n    constexpr uint32_t val() const noexcept\
     \ {\n        return _v;\n    }\n\n    constexpr ModInt& operator++() noexcept\
@@ -549,26 +414,242 @@ data:
     \      power *= shift;\n        }\n        Fps product = left * right;\n     \
     \   Fps result(n);\n        for (int i = 0; i < n; i++) result[i] = product[n\
     \ - 1 - i] * inverse_factorial[i];\n        return result;\n    }\n};\n\n}  //\
-    \ namespace fps\n}  // namespace m1une\n\n\n#line 10 \"math/combinatorial_sequences.hpp\"\
-    \n\nnamespace m1une {\nnamespace math {\n\ntemplate <class Mint>\nstd::vector<Mint>\
-    \ catalan_numbers(int maximum) {\n    assert(maximum >= 0);\n    assert(static_cast<uint64_t>(maximum)\
-    \ + 1 < Mint::mod());\n\n    std::vector<Mint> inverse(maximum + 2);\n    inverse[1]\
+    \ namespace fps\n}  // namespace m1une\n\n\n#line 1 \"math/combinatorics.hpp\"\
+    \n\n\n\n#line 7 \"math/combinatorics.hpp\"\n\nnamespace m1une {\nnamespace math\
+    \ {\n\ntemplate <class Mint>\nstruct Combinatorics {\n   private:\n    std::vector<Mint>\
+    \ _factorial;\n    std::vector<Mint> _inverse_factorial;\n\n   public:\n    explicit\
+    \ Combinatorics(int maximum = 0) : _factorial(1, Mint(1)), _inverse_factorial(1,\
+    \ Mint(1)) {\n        ensure(maximum);\n    }\n\n    int maximum() const {\n \
+    \       return int(_factorial.size()) - 1;\n    }\n\n    void ensure(int maximum)\
+    \ {\n        assert(maximum >= 0);\n        assert(static_cast<uint64_t>(maximum)\
+    \ < Mint::mod());\n        if (maximum <= this->maximum()) return;\n\n       \
+    \ const int old_maximum = this->maximum();\n        _factorial.resize(maximum\
+    \ + 1);\n        _inverse_factorial.resize(maximum + 1);\n        for (int i =\
+    \ old_maximum + 1; i <= maximum; i++) {\n            _factorial[i] = _factorial[i\
+    \ - 1] * Mint(i);\n        }\n        _inverse_factorial[maximum] = _factorial[maximum].inv();\n\
+    \        for (int i = maximum; i > old_maximum; i--) {\n            _inverse_factorial[i\
+    \ - 1] = _inverse_factorial[i] * Mint(i);\n        }\n    }\n\n    Mint factorial(int\
+    \ n) const {\n        assert(0 <= n && n <= maximum());\n        return _factorial[n];\n\
+    \    }\n\n    Mint inverse_factorial(int n) const {\n        assert(0 <= n &&\
+    \ n <= maximum());\n        return _inverse_factorial[n];\n    }\n\n    Mint inverse(int\
+    \ n) const {\n        assert(1 <= n && n <= maximum());\n        return _factorial[n\
+    \ - 1] * _inverse_factorial[n];\n    }\n\n    Mint binom(int n, int k) const {\n\
+    \        if (k < 0 || k > n) return Mint(0);\n        assert(n <= maximum());\n\
+    \        return _factorial[n] * _inverse_factorial[k] * _inverse_factorial[n -\
+    \ k];\n    }\n\n    Mint perm(int n, int k) const {\n        if (k < 0 || k >\
+    \ n) return Mint(0);\n        assert(n <= maximum());\n        return _factorial[n]\
+    \ * _inverse_factorial[n - k];\n    }\n\n    Mint multiset(int types, int count)\
+    \ const {\n        if (types < 0 || count < 0) return Mint(0);\n        if (types\
+    \ == 0) return Mint(count == 0);\n        const long long total = static_cast<long\
+    \ long>(types) + count - 1;\n        assert(total <= maximum());\n        return\
+    \ binom(static_cast<int>(total), count);\n    }\n\n    Mint catalan(int n) const\
+    \ {\n        assert(n >= 0);\n        const long long doubled = 2LL * n;\n   \
+    \     assert(doubled <= maximum());\n        return binom(int(doubled), n) - binom(int(doubled),\
+    \ n + 1);\n    }\n};\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line\
+    \ 10 \"math/bernoulli.hpp\"\n\nnamespace m1une {\nnamespace math {\n\nnamespace\
+    \ bernoulli_detail {\n\ntemplate <class Mint>\nstd::vector<Mint> numbers(\n  \
+    \  int maximum,\n    const Combinatorics<Mint>& combinations\n) {\n    using Fps\
+    \ = fps::FormalPowerSeries<Mint>;\n    Fps denominator(maximum + 1);\n    for\
+    \ (int index = 0; index <= maximum; ++index) {\n        denominator[index] = combinations.inverse_factorial(index\
+    \ + 1);\n    }\n\n    Fps generating_function = denominator.inv(maximum + 1);\n\
+    \    std::vector<Mint> result(maximum + 1);\n    for (int index = 0; index <=\
+    \ maximum; ++index) {\n        result[index] =\n            generating_function[index]\
+    \ * combinations.factorial(index);\n    }\n    return result;\n}\n\ntemplate <class\
+    \ Mint>\nMint evaluate_polynomial(const std::vector<Mint>& coefficients, Mint\
+    \ x) {\n    Mint result = 0;\n    for (int index = int(coefficients.size()) -\
+    \ 1; index >= 0; --index) {\n        result = result * x + coefficients[index];\n\
+    \    }\n    return result;\n}\n\n}  // namespace bernoulli_detail\n\n// Uses x\
+    \ / (exp(x) - 1), so B_1 = -1/2.\ntemplate <class Mint>\nstd::vector<Mint> bernoulli_numbers(int\
+    \ maximum) {\n    assert(maximum >= 0);\n    assert(static_cast<uint64_t>(maximum)\
+    \ + 1 < Mint::mod());\n    Combinatorics<Mint> combinations(maximum + 1);\n  \
+    \  return bernoulli_detail::numbers(maximum, combinations);\n}\n\ntemplate <class\
+    \ Mint>\nclass Bernoulli {\n   public:\n    explicit Bernoulli(int maximum)\n\
+    \        : combinations_(checked_maximum(maximum) + 1),\n          numbers_(bernoulli_detail::numbers(maximum,\
+    \ combinations_)) {}\n\n    int maximum() const {\n        return int(numbers_.size())\
+    \ - 1;\n    }\n\n    const std::vector<Mint>& numbers() const {\n        return\
+    \ numbers_;\n    }\n\n    Mint number(int degree) const {\n        assert(0 <=\
+    \ degree && degree <= maximum());\n        return numbers_[degree];\n    }\n\n\
+    \    // Coefficients of B_degree(x), in increasing order of powers of x.\n   \
+    \ std::vector<Mint> polynomial_coefficients(int degree) const {\n        assert(0\
+    \ <= degree && degree <= maximum());\n        std::vector<Mint> result(degree\
+    \ + 1);\n        for (int power = 0; power <= degree; ++power) {\n           \
+    \ result[power] =\n                combinations_.binom(degree, power) *\n    \
+    \            numbers_[degree - power];\n        }\n        return result;\n  \
+    \  }\n\n    Mint polynomial(int degree, Mint x) const {\n        assert(0 <= degree\
+    \ && degree <= maximum());\n        std::vector<Mint> powers(degree + 1, Mint(1));\n\
+    \        for (int power = 0; power < degree; ++power) {\n            powers[power\
+    \ + 1] = powers[power] * x;\n        }\n\n        Mint result = 0;\n        for\
+    \ (int index = 0; index <= degree; ++index) {\n            result += combinations_.binom(degree,\
+    \ index) * numbers_[index] *\n                      powers[degree - index];\n\
+    \        }\n        return result;\n    }\n\n    // Returns sum_{i=0}^{n-1} i^degree,\
+    \ evaluated as a polynomial in n.\n    Mint power_sum(Mint n, int degree) const\
+    \ {\n        assert(0 <= degree && degree <= maximum());\n        std::vector<Mint>\
+    \ powers(degree + 2, Mint(1));\n        for (int power = 0; power <= degree; ++power)\
+    \ {\n            powers[power + 1] = powers[power] * n;\n        }\n\n       \
+    \ Mint result = 0;\n        for (int index = 0; index <= degree; ++index) {\n\
+    \            result += combinations_.binom(degree + 1, index) *\n            \
+    \          numbers_[index] * powers[degree + 1 - index];\n        }\n        return\
+    \ result * combinations_.inverse(degree + 1);\n    }\n\n    // Returns sum_{i=left}^{right-1}\
+    \ i^degree.\n    Mint power_sum(Mint left, Mint right, int degree) const {\n \
+    \       return power_sum(right, degree) - power_sum(left, degree);\n    }\n\n\
+    \    // Coefficients of sum_{i=0}^{n-1} i^degree as a polynomial in n.\n    std::vector<Mint>\
+    \ power_sum_polynomial(int degree) const {\n        assert(0 <= degree && degree\
+    \ <= maximum());\n        std::vector<Mint> result(degree + 2);\n        Mint\
+    \ inverse = combinations_.inverse(degree + 1);\n        for (int index = 0; index\
+    \ <= degree; ++index) {\n            result[degree + 1 - index] +=\n         \
+    \       combinations_.binom(degree + 1, index) * numbers_[index] *\n         \
+    \       inverse;\n        }\n        return result;\n    }\n\n    // If P is given\
+    \ by coefficients, returns coefficients of the unique Q\n    // with Q(0) = 0\
+    \ and Q(n) = sum_{i=0}^{n-1} P(i).\n    std::vector<Mint> polynomial_prefix_sum(\n\
+    \        const std::vector<Mint>& coefficients\n    ) const {\n        if (coefficients.empty())\
+    \ return std::vector<Mint>{Mint(0)};\n        int degree = int(coefficients.size())\
+    \ - 1;\n        assert(degree <= maximum());\n\n        std::vector<Mint> result(degree\
+    \ + 2);\n        for (int source_degree = 0;\n             source_degree <= degree;\n\
+    \             ++source_degree) {\n            Mint inverse = combinations_.inverse(source_degree\
+    \ + 1);\n            for (int index = 0; index <= source_degree; ++index) {\n\
+    \                result[source_degree + 1 - index] +=\n                    coefficients[source_degree]\
+    \ *\n                    combinations_.binom(source_degree + 1, index) *\n   \
+    \                 numbers_[index] * inverse;\n            }\n        }\n     \
+    \   return result;\n    }\n\n    // Returns sum_{i=left}^{right-1} P(i).\n   \
+    \ Mint polynomial_sum(\n        const std::vector<Mint>& coefficients,\n     \
+    \   Mint left,\n        Mint right\n    ) const {\n        std::vector<Mint> prefix\
+    \ = polynomial_prefix_sum(coefficients);\n        return bernoulli_detail::evaluate_polynomial(prefix,\
+    \ right) -\n               bernoulli_detail::evaluate_polynomial(prefix, left);\n\
+    \    }\n\n    // Returns sum_{i=0}^{count-1} (start + step*i)^degree.\n    Mint\
+    \ arithmetic_progression_power_sum(\n        Mint start,\n        Mint step,\n\
+    \        Mint count,\n        int degree\n    ) const {\n        assert(0 <= degree\
+    \ && degree <= maximum());\n        std::vector<Mint> start_powers(degree + 1,\
+    \ Mint(1));\n        std::vector<Mint> step_powers(degree + 1, Mint(1));\n   \
+    \     for (int power = 0; power < degree; ++power) {\n            start_powers[power\
+    \ + 1] = start_powers[power] * start;\n            step_powers[power + 1] = step_powers[power]\
+    \ * step;\n        }\n\n        Mint result = 0;\n        for (int power = 0;\
+    \ power <= degree; ++power) {\n            result += combinations_.binom(degree,\
+    \ power) *\n                      start_powers[degree - power] * step_powers[power]\
+    \ *\n                      power_sum(count, power);\n        }\n        return\
+    \ result;\n    }\n\n   private:\n    static int checked_maximum(int maximum) {\n\
+    \        assert(maximum >= 0);\n        assert(static_cast<uint64_t>(maximum)\
+    \ + 1 < Mint::mod());\n        return maximum;\n    }\n\n    Combinatorics<Mint>\
+    \ combinations_;\n    std::vector<Mint> numbers_;\n};\n\n}  // namespace math\n\
+    }  // namespace m1une\n\n\n#line 1 \"math/bitwise_convolution.hpp\"\n\n\n\n#line\
+    \ 5 \"math/bitwise_convolution.hpp\"\n#include <cstddef>\n#line 8 \"math/bitwise_convolution.hpp\"\
+    \n\n#line 1 \"math/zeta_mobius_transform.hpp\"\n\n\n\n#line 7 \"math/zeta_mobius_transform.hpp\"\
+    \n\nnamespace m1une {\nnamespace math {\n\nnamespace zeta_mobius_transform_detail\
+    \ {\n\ninline bool is_power_of_two(std::size_t size) noexcept {\n    return size\
+    \ != 0 && (size & (size - 1)) == 0;\n}\n\ninline std::vector<std::size_t> primes_up_to(std::size_t\
+    \ limit) {\n    std::vector<std::size_t> primes;\n    std::vector<bool> is_prime(limit\
+    \ + 1, true);\n    if (!is_prime.empty()) is_prime[0] = false;\n    if (limit\
+    \ >= 1) is_prime[1] = false;\n    for (std::size_t value = 2; value <= limit;\
+    \ ++value) {\n        if (!is_prime[value]) continue;\n        primes.emplace_back(value);\n\
+    \        if (value > limit / value) continue;\n        for (\n            std::size_t\
+    \ multiple = value * value;\n            multiple <= limit;\n            multiple\
+    \ += value\n        ) {\n            is_prime[multiple] = false;\n        }\n\
+    \    }\n    return primes;\n}\n\n}  // namespace zeta_mobius_transform_detail\n\
+    \ntemplate <typename T>\nvoid subset_zeta_transform(std::vector<T>& values) {\n\
+    \    assert(zeta_mobius_transform_detail::is_power_of_two(values.size()));\n \
+    \   for (std::size_t bit = 1; bit < values.size(); bit <<= 1) {\n        for (\n\
+    \            std::size_t block = 0;\n            block < values.size();\n    \
+    \        block += bit << 1\n        ) {\n            for (std::size_t offset =\
+    \ 0; offset < bit; ++offset) {\n                values[block + bit + offset] +=\
+    \ values[block + offset];\n            }\n        }\n    }\n}\n\ntemplate <typename\
+    \ T>\nvoid subset_mobius_transform(std::vector<T>& values) {\n    assert(zeta_mobius_transform_detail::is_power_of_two(values.size()));\n\
+    \    for (std::size_t bit = 1; bit < values.size(); bit <<= 1) {\n        for\
+    \ (\n            std::size_t block = 0;\n            block < values.size();\n\
+    \            block += bit << 1\n        ) {\n            for (std::size_t offset\
+    \ = 0; offset < bit; ++offset) {\n                values[block + bit + offset]\
+    \ -= values[block + offset];\n            }\n        }\n    }\n}\n\ntemplate <typename\
+    \ T>\nvoid superset_zeta_transform(std::vector<T>& values) {\n    assert(zeta_mobius_transform_detail::is_power_of_two(values.size()));\n\
+    \    for (std::size_t bit = 1; bit < values.size(); bit <<= 1) {\n        for\
+    \ (\n            std::size_t block = 0;\n            block < values.size();\n\
+    \            block += bit << 1\n        ) {\n            for (std::size_t offset\
+    \ = 0; offset < bit; ++offset) {\n                values[block + offset] += values[block\
+    \ + bit + offset];\n            }\n        }\n    }\n}\n\ntemplate <typename T>\n\
+    void superset_mobius_transform(std::vector<T>& values) {\n    assert(zeta_mobius_transform_detail::is_power_of_two(values.size()));\n\
+    \    for (std::size_t bit = 1; bit < values.size(); bit <<= 1) {\n        for\
+    \ (\n            std::size_t block = 0;\n            block < values.size();\n\
+    \            block += bit << 1\n        ) {\n            for (std::size_t offset\
+    \ = 0; offset < bit; ++offset) {\n                values[block + offset] -= values[block\
+    \ + bit + offset];\n            }\n        }\n    }\n}\n\ntemplate <typename T>\n\
+    void divisor_zeta_transform(std::vector<T>& values) {\n    if (values.size() <=\
+    \ 2) return;\n    const std::size_t limit = values.size() - 1;\n    const std::vector<std::size_t>\
+    \ primes =\n        zeta_mobius_transform_detail::primes_up_to(limit);\n    for\
+    \ (std::size_t prime : primes) {\n        for (std::size_t value = 1; value <=\
+    \ limit / prime; ++value) {\n            values[value * prime] += values[value];\n\
+    \        }\n    }\n}\n\ntemplate <typename T>\nvoid divisor_mobius_transform(std::vector<T>&\
+    \ values) {\n    if (values.size() <= 2) return;\n    const std::size_t limit\
+    \ = values.size() - 1;\n    const std::vector<std::size_t> primes =\n        zeta_mobius_transform_detail::primes_up_to(limit);\n\
+    \    for (std::size_t prime : primes) {\n        for (\n            std::size_t\
+    \ value = limit / prime;\n            value >= 1;\n            --value\n     \
+    \   ) {\n            values[value * prime] -= values[value];\n        }\n    }\n\
+    }\n\ntemplate <typename T>\nvoid multiple_zeta_transform(std::vector<T>& values)\
+    \ {\n    if (values.size() <= 2) return;\n    const std::size_t limit = values.size()\
+    \ - 1;\n    const std::vector<std::size_t> primes =\n        zeta_mobius_transform_detail::primes_up_to(limit);\n\
+    \    for (std::size_t prime : primes) {\n        for (\n            std::size_t\
+    \ value = limit / prime;\n            value >= 1;\n            --value\n     \
+    \   ) {\n            values[value] += values[value * prime];\n        }\n    }\n\
+    }\n\ntemplate <typename T>\nvoid multiple_mobius_transform(std::vector<T>& values)\
+    \ {\n    if (values.size() <= 2) return;\n    const std::size_t limit = values.size()\
+    \ - 1;\n    const std::vector<std::size_t> primes =\n        zeta_mobius_transform_detail::primes_up_to(limit);\n\
+    \    for (std::size_t prime : primes) {\n        for (std::size_t value = 1; value\
+    \ <= limit / prime; ++value) {\n            values[value] -= values[value * prime];\n\
+    \        }\n    }\n}\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line\
+    \ 10 \"math/bitwise_convolution.hpp\"\n\nnamespace m1une {\nnamespace math {\n\
+    \nnamespace bitwise_convolution_detail {\n\ninline std::size_t common_size(\n\
+    \    std::size_t first_size,\n    std::size_t second_size\n) {\n    std::size_t\
+    \ required = first_size > second_size\n        ? first_size\n        : second_size;\n\
+    \    std::size_t size = 1;\n    while (size < required) size <<= 1;\n    return\
+    \ size;\n}\n\ntemplate <typename T>\nstd::vector<T> pointwise_product(\n    std::vector<T>\
+    \ first,\n    const std::vector<T>& second\n) {\n    assert(first.size() == second.size());\n\
+    \    for (std::size_t index = 0; index < first.size(); ++index) {\n        first[index]\
+    \ *= second[index];\n    }\n    return first;\n}\n\n}  // namespace bitwise_convolution_detail\n\
+    \ntemplate <typename T>\nvoid walsh_hadamard_transform(\n    std::vector<T>& values,\n\
+    \    bool inverse = false\n) {\n    assert(zeta_mobius_transform_detail::is_power_of_two(values.size()));\n\
+    \    for (std::size_t length = 1; length < values.size(); length <<= 1) {\n  \
+    \      for (\n            std::size_t block = 0;\n            block < values.size();\n\
+    \            block += length << 1\n        ) {\n            for (std::size_t offset\
+    \ = 0; offset < length; ++offset) {\n                T first = values[block +\
+    \ offset];\n                T second = values[block + offset + length];\n    \
+    \            values[block + offset] = first + second;\n                values[block\
+    \ + offset + length] = first - second;\n            }\n        }\n    }\n    if\
+    \ (inverse) {\n        T size = T(static_cast<long long>(values.size()));\n  \
+    \      for (T& value : values) value /= size;\n    }\n}\n\ntemplate <typename\
+    \ T>\nstd::vector<T> bitwise_or_convolution(\n    std::vector<T> first,\n    std::vector<T>\
+    \ second\n) {\n    if (first.empty() || second.empty()) return {};\n    std::size_t\
+    \ size = bitwise_convolution_detail::common_size(\n        first.size(),\n   \
+    \     second.size()\n    );\n    first.resize(size);\n    second.resize(size);\n\
+    \    subset_zeta_transform(first);\n    subset_zeta_transform(second);\n    first\
+    \ = bitwise_convolution_detail::pointwise_product(\n        std::move(first),\n\
+    \        second\n    );\n    subset_mobius_transform(first);\n    return first;\n\
+    }\n\ntemplate <typename T>\nstd::vector<T> bitwise_and_convolution(\n    std::vector<T>\
+    \ first,\n    std::vector<T> second\n) {\n    if (first.empty() || second.empty())\
+    \ return {};\n    std::size_t size = bitwise_convolution_detail::common_size(\n\
+    \        first.size(),\n        second.size()\n    );\n    first.resize(size);\n\
+    \    second.resize(size);\n    superset_zeta_transform(first);\n    superset_zeta_transform(second);\n\
+    \    first = bitwise_convolution_detail::pointwise_product(\n        std::move(first),\n\
+    \        second\n    );\n    superset_mobius_transform(first);\n    return first;\n\
+    }\n\ntemplate <typename T>\nstd::vector<T> bitwise_xor_convolution(\n    std::vector<T>\
+    \ first,\n    std::vector<T> second\n) {\n    if (first.empty() || second.empty())\
+    \ return {};\n    std::size_t size = bitwise_convolution_detail::common_size(\n\
+    \        first.size(),\n        second.size()\n    );\n    first.resize(size);\n\
+    \    second.resize(size);\n    walsh_hadamard_transform(first);\n    walsh_hadamard_transform(second);\n\
+    \    first = bitwise_convolution_detail::pointwise_product(\n        std::move(first),\n\
+    \        second\n    );\n    walsh_hadamard_transform(first, true);\n    return\
+    \ first;\n}\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line 1 \"math/bit_ceil.hpp\"\
+    \n\n\n\nnamespace m1une {\nnamespace math {\n\ntemplate <typename T>\nconstexpr\
+    \ T bit_ceil(T n) {\n    if (n <= 1) return 1;\n    T x = 1;\n    while (x < n)\
+    \ x <<= 1;\n    return x;\n}\n\n}  // namespace math\n}  // namespace m1une\n\n\
+    \n#line 1 \"math/combinatorial_sequences.hpp\"\n\n\n\n#line 7 \"math/combinatorial_sequences.hpp\"\
+    \n\n#line 11 \"math/combinatorial_sequences.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ math {\n\ntemplate <class Mint>\nstd::vector<Mint> catalan_numbers(int maximum)\
+    \ {\n    assert(maximum >= 0);\n    assert(static_cast<uint64_t>(maximum) + 1\
+    \ < Mint::mod());\n\n    std::vector<Mint> inverse(maximum + 2);\n    inverse[1]\
     \ = 1;\n    for (int i = 2; i <= maximum + 1; i++) {\n        inverse[i] = Mint(0)\
     \ - Mint(Mint::mod() / uint32_t(i)) * inverse[Mint::mod() % uint32_t(i)];\n  \
     \  }\n\n    std::vector<Mint> result(maximum + 1);\n    result[0] = 1;\n    for\
     \ (int n = 0; n < maximum; n++) {\n        result[n + 1] = result[n] * Mint(2)\
     \ * Mint(2LL * n + 1) * inverse[n + 2];\n    }\n    return result;\n}\n\ntemplate\
-    \ <class Mint>\nstd::vector<Mint> bernoulli_numbers(int maximum) {\n    assert(maximum\
-    \ >= 0);\n    assert(static_cast<uint64_t>(maximum) + 1 < Mint::mod());\n\n  \
-    \  using Fps = fps::FormalPowerSeries<Mint>;\n    Combinatorics<Mint> combinations(maximum\
-    \ + 1);\n    Fps denominator(maximum + 1);\n    for (int i = 0; i <= maximum;\
-    \ i++) {\n        denominator[i] = combinations.inverse_factorial(i + 1);\n  \
-    \  }\n\n    Fps generating_function = denominator.inv(maximum + 1);\n    std::vector<Mint>\
-    \ result(maximum + 1);\n    for (int i = 0; i <= maximum; i++) {\n        result[i]\
-    \ = generating_function[i] * combinations.factorial(i);\n    }\n    return result;\n\
-    }\n\ntemplate <class Mint>\nstd::vector<Mint> bell_numbers(int maximum) {\n  \
-    \  assert(maximum >= 0);\n    assert(static_cast<uint64_t>(maximum) < Mint::mod());\n\
-    \n    using Fps = fps::FormalPowerSeries<Mint>;\n    Combinatorics<Mint> combinations(maximum);\n\
+    \ <class Mint>\nstd::vector<Mint> bell_numbers(int maximum) {\n    assert(maximum\
+    \ >= 0);\n    assert(static_cast<uint64_t>(maximum) < Mint::mod());\n\n    using\
+    \ Fps = fps::FormalPowerSeries<Mint>;\n    Combinatorics<Mint> combinations(maximum);\n\
     \    Fps exponent(maximum + 1);\n    for (int i = 1; i <= maximum; i++) {\n  \
     \      exponent[i] = combinations.inverse_factorial(i);\n    }\n\n    Fps generating_function\
     \ = exponent.exp(maximum + 1);\n    std::vector<Mint> result(maximum + 1);\n \
@@ -1480,13 +1561,15 @@ data:
     \ value) {\n    if (value == 0) return true;\n    for (const auto& factor : prime_factorize(value))\
     \ {\n        if (factor.first % 4 == 3 && (factor.second & 1) != 0) return false;\n\
     \    }\n    return true;\n}\n\n}  // namespace math\n}  // namespace m1une\n\n\
-    \n#line 26 \"math/all.hpp\"\n\n\n"
+    \n#line 27 \"math/all.hpp\"\n\n\n"
   code: '#ifndef M1UNE_MATH_ALL_HPP
 
     #define M1UNE_MATH_ALL_HPP 1
 
 
     #include "base_n.hpp"
+
+    #include "bernoulli.hpp"
 
     #include "bitwise_convolution.hpp"
 
@@ -1536,14 +1619,15 @@ data:
     '
   dependsOn:
   - math/base_n.hpp
-  - math/bitwise_convolution.hpp
-  - math/zeta_mobius_transform.hpp
-  - math/bit_ceil.hpp
-  - math/combinatorics.hpp
-  - math/combinatorial_sequences.hpp
+  - math/bernoulli.hpp
   - fps/formal_power_series.hpp
   - fps/convolution.hpp
   - math/modint.hpp
+  - math/combinatorics.hpp
+  - math/bitwise_convolution.hpp
+  - math/zeta_mobius_transform.hpp
+  - math/bit_ceil.hpp
+  - math/combinatorial_sequences.hpp
   - math/cyclotomic_polynomial.hpp
   - math/prime_factorization.hpp
   - math/generalized_floor_sum.hpp
@@ -1563,7 +1647,7 @@ data:
   isVerificationFile: false
   path: math/all.hpp
   requiredBy: []
-  timestamp: '2026-07-07 02:47:56+09:00'
+  timestamp: '2026-07-07 02:56:26+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
@@ -1594,8 +1678,10 @@ You usually do not need to include this entire bundle:
   queries under a prime modulus.
 * Use `lucas.hpp` for binomial coefficients with huge arguments modulo a small
   prime.
-* Use `combinatorial_sequences.hpp` for Catalan, Bernoulli, Bell, Stirling,
-  partition, or derangement numbers.
+* Use `bernoulli.hpp` for Bernoulli numbers, Bernoulli polynomials, Faulhaber
+  sums, and polynomial discrete integration.
+* Use `combinatorial_sequences.hpp` for Catalan, Bell, Stirling, partition, or
+  derangement numbers.
 * Use `cyclotomic_polynomial.hpp` to construct the polynomial of primitive
   roots of unity of a given order.
 * Use `prime_sieve.hpp` when all queried integers are at most a manageable
@@ -1625,6 +1711,7 @@ few unused headers do not matter.
 | Header | Contents |
 | --- | --- |
 | `math/base_n.hpp` | Checked conversion between integers and arbitrary-base digits. |
+| `math/bernoulli.hpp` | Bernoulli numbers and polynomials, power sums, and polynomial discrete integration. |
 | `math/bitwise_convolution.hpp` | OR, AND, XOR convolutions and the Walsh-Hadamard transform. |
 | `math/bit_ceil.hpp` | Smallest power of two at least a given value. |
 | `math/gray_code.hpp` | Binary-reflected Gray-code encoding, decoding, and enumeration. |

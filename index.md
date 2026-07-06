@@ -474,6 +474,9 @@ data:
       path: math/base_n.hpp
       title: Base-N Numbers
     - icon: ':heavy_check_mark:'
+      path: math/bernoulli.hpp
+      title: Bernoulli Numbers and Power Sums
+    - icon: ':heavy_check_mark:'
       path: math/bit_ceil.hpp
       title: Bit Ceil
     - icon: ':heavy_check_mark:'
@@ -1212,6 +1215,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/bernoulli_number.test.cpp
       title: verify/math/bernoulli_number.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/bernoulli_utilities.test.cpp
+      title: verify/math/bernoulli_utilities.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/bitwise_convolution.test.cpp
       title: verify/math/bitwise_convolution.test.cpp

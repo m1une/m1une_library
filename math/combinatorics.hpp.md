@@ -6,6 +6,9 @@ data:
     path: math/all.hpp
     title: Math All
   - icon: ':heavy_check_mark:'
+    path: math/bernoulli.hpp
+    title: Bernoulli Numbers and Power Sums
+  - icon: ':heavy_check_mark:'
     path: math/combinatorial_sequences.hpp
     title: Combinatorial Sequences
   _extendedVerifiedWith:
@@ -15,6 +18,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/bernoulli_number.test.cpp
     title: verify/math/bernoulli_number.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/bernoulli_utilities.test.cpp
+    title: verify/math/bernoulli_utilities.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
@@ -100,9 +106,11 @@ data:
   requiredBy:
   - math/combinatorial_sequences.hpp
   - math/all.hpp
+  - math/bernoulli.hpp
   timestamp: '2026-06-20 09:18:49+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/math/bernoulli_utilities.test.cpp
   - verify/math/bell_number.test.cpp
   - verify/math/partition_function.test.cpp
   - verify/math/math_algorithms.test.cpp
