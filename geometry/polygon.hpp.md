@@ -1,24 +1,24 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: geometry/convex_hull.hpp
     title: Convex Hull
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: geometry/line.hpp
     title: Lines and Segments
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: geometry/point.hpp
     title: 2D Point and Predicates
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: geometry/ray.hpp
     title: Rays
   _extendedRequiredBy:
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: geometry/all.hpp
     title: Geometry Bundle
   _extendedVerifiedWith:
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/geometry/geometry_algorithms.test.cpp
     title: verify/geometry/geometry_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
@@ -30,9 +30,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/polygon_operations.test.cpp
     title: verify/geometry/polygon_operations.test.cpp
-  _isVerificationFailed: false
+  _isVerificationFailed: true
   _pathExtension: hpp
-  _verificationStatusIcon: ':heavy_check_mark:'
+  _verificationStatusIcon: ':question:'
   attributes:
     links: []
   bundledCode: "#line 1 \"geometry/polygon.hpp\"\n\n\n\n#include <algorithm>\n#include\
@@ -1037,7 +1037,7 @@ data:
   requiredBy:
   - geometry/all.hpp
   timestamp: '2026-07-01 22:47:11+09:00'
-  verificationStatus: LIBRARY_ALL_AC
+  verificationStatus: LIBRARY_SOME_WA
   verifiedWith:
   - verify/geometry/polygon_area.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp

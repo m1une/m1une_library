@@ -1,23 +1,23 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: geometry/point.hpp
     title: 2D Point and Predicates
   _extendedRequiredBy:
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: geometry/all.hpp
     title: Geometry Bundle
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: geometry/circle.hpp
     title: Circles
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: geometry/half_plane_intersection.hpp
     title: Half-Plane Intersection
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: geometry/polygon.hpp
     title: Polygons
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: geometry/ray.hpp
     title: Rays
   _extendedVerifiedWith:
@@ -27,7 +27,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/circle_ray.test.cpp
     title: verify/geometry/circle_ray.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/geometry/geometry_algorithms.test.cpp
     title: verify/geometry/geometry_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
@@ -54,9 +54,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/segment_intersection.test.cpp
     title: verify/geometry/segment_intersection.test.cpp
-  _isVerificationFailed: false
+  _isVerificationFailed: true
   _pathExtension: hpp
-  _verificationStatusIcon: ':heavy_check_mark:'
+  _verificationStatusIcon: ':question:'
   attributes:
     links: []
   bundledCode: "#line 1 \"geometry/line.hpp\"\n\n\n\n#include <algorithm>\n#include\
@@ -358,7 +358,7 @@ data:
   - geometry/polygon.hpp
   - geometry/half_plane_intersection.hpp
   timestamp: '2026-06-21 12:04:47+09:00'
-  verificationStatus: LIBRARY_ALL_AC
+  verificationStatus: LIBRARY_SOME_WA
   verifiedWith:
   - verify/geometry/half_plane_intersection.test.cpp
   - verify/geometry/polygon_area.test.cpp
