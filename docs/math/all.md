@@ -17,6 +17,8 @@ You usually do not need to include this entire bundle:
 * Use `bitwise_convolution.hpp` for OR, AND, or XOR convolution over mask
   indices.
 * Use `gray_code.hpp` to enumerate bit masks so that one bit changes at a time.
+* Use `generalized_floor_sum.hpp` for polynomial moments of
+  `floor((a * i + b) / mod)`.
 * Use `zeta_mobius_transform.hpp` for subset, superset, divisor, and multiple
   transforms.
 * Use `combinatorics.hpp` for many factorial, combination, or permutation
@@ -63,6 +65,7 @@ few unused headers do not matter.
 | `math/combinatorics.hpp` | Factorials, binomial coefficients, permutations, and multiset counts. |
 | `math/combinatorial_sequences.hpp` | Fast standard counting sequences and special numbers. |
 | `math/cyclotomic_polynomial.hpp` | Integer coefficients of cyclotomic polynomials. |
+| `math/generalized_floor_sum.hpp` | Polynomial moments of a linear floor sequence using monoid floor sum. |
 | `math/number_theory.hpp` | Extended GCD, modular power and inverse, CRT, and floor sum. |
 | `math/prime_sieve.hpp` | Linear sieve with smallest prime factors. |
 | `math/prime_factorization.hpp` | Deterministic 64-bit primality test and Pollard-Rho factorization. |
