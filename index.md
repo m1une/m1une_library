@@ -209,7 +209,7 @@ data:
       title: SMAWK
   - name: ds/dsu
     pages:
-    - icon: ':question:'
+    - icon: ':heavy_check_mark:'
       path: ds/dsu/dsu.hpp
       title: DSU (Disjoint Set Union)
     - icon: ':heavy_check_mark:'
@@ -406,40 +406,40 @@ data:
       title: Generic Segment Tree Beats!
   - name: geometry
     pages:
-    - icon: ':x:'
+    - icon: ':heavy_check_mark:'
       path: geometry/all.hpp
       title: Geometry Bundle
-    - icon: ':question:'
+    - icon: ':heavy_check_mark:'
       path: geometry/angle_sort.hpp
       title: Angle Sort
-    - icon: ':question:'
+    - icon: ':heavy_check_mark:'
       path: geometry/circle.hpp
       title: Circles
-    - icon: ':question:'
+    - icon: ':heavy_check_mark:'
       path: geometry/convex_hull.hpp
       title: Convex Hull
-    - icon: ':question:'
+    - icon: ':heavy_check_mark:'
       path: geometry/farthest_pair.hpp
       title: Farthest Pair of Points
-    - icon: ':question:'
+    - icon: ':heavy_check_mark:'
       path: geometry/half_plane_intersection.hpp
       title: Half-Plane Intersection
-    - icon: ':x:'
+    - icon: ':heavy_check_mark:'
       path: geometry/lattice_point_count.hpp
       title: Lattice-Point Count
-    - icon: ':question:'
+    - icon: ':heavy_check_mark:'
       path: geometry/line.hpp
       title: Lines and Segments
-    - icon: ':question:'
+    - icon: ':heavy_check_mark:'
       path: geometry/manhattan_mst.hpp
       title: Manhattan Minimum Spanning Tree
-    - icon: ':question:'
+    - icon: ':heavy_check_mark:'
       path: geometry/point.hpp
       title: 2D Point and Predicates
-    - icon: ':question:'
+    - icon: ':heavy_check_mark:'
       path: geometry/polygon.hpp
       title: Polygons
-    - icon: ':question:'
+    - icon: ':heavy_check_mark:'
       path: geometry/ray.hpp
       title: Rays
   - name: graph
@@ -1221,7 +1221,7 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/geometry/farthest_pair.test.cpp
       title: verify/geometry/farthest_pair.test.cpp
-    - icon: ':x:'
+    - icon: ':heavy_check_mark:'
       path: verify/geometry/geometry_algorithms.test.cpp
       title: verify/geometry/geometry_algorithms.test.cpp
     - icon: ':heavy_check_mark:'
@@ -1230,7 +1230,7 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/geometry/half_plane_intersection_random.test.cpp
       title: verify/geometry/half_plane_intersection_random.test.cpp
-    - icon: ':x:'
+    - icon: ':heavy_check_mark:'
       path: verify/geometry/lattice_point_count.test.cpp
       title: verify/geometry/lattice_point_count.test.cpp
     - icon: ':heavy_check_mark:'

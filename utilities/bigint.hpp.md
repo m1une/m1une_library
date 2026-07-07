@@ -1,8 +1,20 @@
 ---
 data:
   _extendedDependsOn: []
-  _extendedRequiredBy: []
+  _extendedRequiredBy:
+  - icon: ':heavy_check_mark:'
+    path: geometry/all.hpp
+    title: Geometry Bundle
+  - icon: ':heavy_check_mark:'
+    path: geometry/lattice_point_count.hpp
+    title: Lattice-Point Count
   _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/geometry_algorithms.test.cpp
+    title: verify/geometry/geometry_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/lattice_point_count.test.cpp
+    title: verify/geometry/lattice_point_count.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/utilities/basic_utilities.test.cpp
     title: verify/utilities/basic_utilities.test.cpp
@@ -55,36 +67,38 @@ data:
     \ BigInt& x, const BigInt& y) {\n        return !(x < y) && !(y < x);\n    }\n\
     \    friend bool operator!=(const BigInt& x, const BigInt& y) {\n        return\
     \ x < y || y < x;\n    }\n\n    BigInt& operator+=(const BigInt& other) {\n  \
-    \      if (sign != other.sign) return *this -= (-other);\n        for (int i =\
-    \ 0, carry = 0; i < (int)std::max(a.size(), other.a.size()) || carry; ++i) {\n\
-    \            if (i == (int)a.size()) a.push_back(0);\n            a[i] += carry\
-    \ + (i < (int)other.a.size() ? other.a[i] : 0);\n            carry = a[i] >= BASE;\n\
-    \            if (carry) a[i] -= BASE;\n        }\n        return *this;\n    }\n\
-    \n    BigInt& operator-=(const BigInt& other) {\n        if (sign != other.sign)\
-    \ return *this += (-other);\n        if (abs() < other.abs()) {\n            BigInt\
-    \ tmp = other;\n            tmp -= *this;\n            *this = tmp;\n        \
-    \    sign = -sign;\n            return *this;\n        }\n        for (int i =\
-    \ 0, carry = 0; i < (int)other.a.size() || carry; ++i) {\n            a[i] -=\
-    \ carry + (i < (int)other.a.size() ? other.a[i] : 0);\n            carry = a[i]\
-    \ < 0;\n            if (carry) a[i] += BASE;\n        }\n        trim();\n   \
-    \     return *this;\n    }\n\n    BigInt& operator*=(int v) {\n        long long\
-    \ multiplier = v;\n        if (multiplier < 0) {\n            sign = -sign;\n\
-    \            multiplier = -multiplier;\n        }\n        long long carry = 0;\n\
-    \        for (int i = 0; i < (int)a.size() || carry; ++i) {\n            if (i\
-    \ == (int)a.size()) a.push_back(0);\n            const long long cur = a[i] *\
-    \ multiplier + carry;\n            carry = cur / BASE;\n            a[i] = (int)(cur\
-    \ % BASE);\n        }\n        trim();\n        return *this;\n    }\n\n    BigInt&\
-    \ operator*=(const BigInt& other) {\n        if (is_zero() || other.is_zero())\
-    \ return *this = 0;\n        std::vector<int> res(a.size() + other.a.size());\n\
-    \        for (int i = 0; i < (int)a.size(); ++i) {\n            for (int j = 0,\
-    \ carry = 0; j < (int)other.a.size() || carry; ++j) {\n                long long\
-    \ cur = res[i + j] + a[i] * (long long)(j < (int)other.a.size() ? other.a[j] :\
-    \ 0) + carry;\n                carry = (int)(cur / BASE);\n                res[i\
-    \ + j] = (int)(cur % BASE);\n            }\n        }\n        a = res;\n    \
-    \    sign *= other.sign;\n        trim();\n        return *this;\n    }\n\n  \
-    \  friend std::pair<BigInt, BigInt> divmod(const BigInt& a1, const BigInt& b1)\
-    \ {\n        if (b1.is_zero()) {\n            throw std::domain_error(\"BigInt\
-    \ division by zero\");\n        }\n        BigInt a = a1.abs(), b = b1.abs(),\
+    \      if (other.is_zero()) return *this;\n        if (is_zero()) return *this\
+    \ = other;\n        if (sign != other.sign) return *this -= (-other);\n      \
+    \  for (int i = 0, carry = 0; i < (int)std::max(a.size(), other.a.size()) || carry;\
+    \ ++i) {\n            if (i == (int)a.size()) a.push_back(0);\n            a[i]\
+    \ += carry + (i < (int)other.a.size() ? other.a[i] : 0);\n            carry =\
+    \ a[i] >= BASE;\n            if (carry) a[i] -= BASE;\n        }\n        return\
+    \ *this;\n    }\n\n    BigInt& operator-=(const BigInt& other) {\n        if (other.is_zero())\
+    \ return *this;\n        if (is_zero()) return *this = -other;\n        if (sign\
+    \ != other.sign) return *this += (-other);\n        if (abs() < other.abs()) {\n\
+    \            BigInt tmp = other;\n            tmp -= *this;\n            *this\
+    \ = tmp;\n            sign = -sign;\n            return *this;\n        }\n  \
+    \      for (int i = 0, carry = 0; i < (int)other.a.size() || carry; ++i) {\n \
+    \           a[i] -= carry + (i < (int)other.a.size() ? other.a[i] : 0);\n    \
+    \        carry = a[i] < 0;\n            if (carry) a[i] += BASE;\n        }\n\
+    \        trim();\n        return *this;\n    }\n\n    BigInt& operator*=(int v)\
+    \ {\n        long long multiplier = v;\n        if (multiplier < 0) {\n      \
+    \      sign = -sign;\n            multiplier = -multiplier;\n        }\n     \
+    \   long long carry = 0;\n        for (int i = 0; i < (int)a.size() || carry;\
+    \ ++i) {\n            if (i == (int)a.size()) a.push_back(0);\n            const\
+    \ long long cur = a[i] * multiplier + carry;\n            carry = cur / BASE;\n\
+    \            a[i] = (int)(cur % BASE);\n        }\n        trim();\n        return\
+    \ *this;\n    }\n\n    BigInt& operator*=(const BigInt& other) {\n        if (is_zero()\
+    \ || other.is_zero()) return *this = 0;\n        std::vector<int> res(a.size()\
+    \ + other.a.size());\n        for (int i = 0; i < (int)a.size(); ++i) {\n    \
+    \        for (int j = 0, carry = 0; j < (int)other.a.size() || carry; ++j) {\n\
+    \                long long cur = res[i + j] + a[i] * (long long)(j < (int)other.a.size()\
+    \ ? other.a[j] : 0) + carry;\n                carry = (int)(cur / BASE);\n   \
+    \             res[i + j] = (int)(cur % BASE);\n            }\n        }\n    \
+    \    a = res;\n        sign *= other.sign;\n        trim();\n        return *this;\n\
+    \    }\n\n    friend std::pair<BigInt, BigInt> divmod(const BigInt& a1, const\
+    \ BigInt& b1) {\n        if (b1.is_zero()) {\n            throw std::domain_error(\"\
+    BigInt division by zero\");\n        }\n        BigInt a = a1.abs(), b = b1.abs(),\
     \ q, r;\n        q.a.resize(a.a.size());\n        for (int i = (int)a.a.size()\
     \ - 1; i >= 0; --i) {\n            r *= BASE;\n            r += a.a[i];\n    \
     \        int s1 = r.a.size() <= b.a.size() ? 0 : r.a[b.a.size()];\n          \
@@ -151,36 +165,38 @@ data:
     \ BigInt& x, const BigInt& y) {\n        return !(x < y) && !(y < x);\n    }\n\
     \    friend bool operator!=(const BigInt& x, const BigInt& y) {\n        return\
     \ x < y || y < x;\n    }\n\n    BigInt& operator+=(const BigInt& other) {\n  \
-    \      if (sign != other.sign) return *this -= (-other);\n        for (int i =\
-    \ 0, carry = 0; i < (int)std::max(a.size(), other.a.size()) || carry; ++i) {\n\
-    \            if (i == (int)a.size()) a.push_back(0);\n            a[i] += carry\
-    \ + (i < (int)other.a.size() ? other.a[i] : 0);\n            carry = a[i] >= BASE;\n\
-    \            if (carry) a[i] -= BASE;\n        }\n        return *this;\n    }\n\
-    \n    BigInt& operator-=(const BigInt& other) {\n        if (sign != other.sign)\
-    \ return *this += (-other);\n        if (abs() < other.abs()) {\n            BigInt\
-    \ tmp = other;\n            tmp -= *this;\n            *this = tmp;\n        \
-    \    sign = -sign;\n            return *this;\n        }\n        for (int i =\
-    \ 0, carry = 0; i < (int)other.a.size() || carry; ++i) {\n            a[i] -=\
-    \ carry + (i < (int)other.a.size() ? other.a[i] : 0);\n            carry = a[i]\
-    \ < 0;\n            if (carry) a[i] += BASE;\n        }\n        trim();\n   \
-    \     return *this;\n    }\n\n    BigInt& operator*=(int v) {\n        long long\
-    \ multiplier = v;\n        if (multiplier < 0) {\n            sign = -sign;\n\
-    \            multiplier = -multiplier;\n        }\n        long long carry = 0;\n\
-    \        for (int i = 0; i < (int)a.size() || carry; ++i) {\n            if (i\
-    \ == (int)a.size()) a.push_back(0);\n            const long long cur = a[i] *\
-    \ multiplier + carry;\n            carry = cur / BASE;\n            a[i] = (int)(cur\
-    \ % BASE);\n        }\n        trim();\n        return *this;\n    }\n\n    BigInt&\
-    \ operator*=(const BigInt& other) {\n        if (is_zero() || other.is_zero())\
-    \ return *this = 0;\n        std::vector<int> res(a.size() + other.a.size());\n\
-    \        for (int i = 0; i < (int)a.size(); ++i) {\n            for (int j = 0,\
-    \ carry = 0; j < (int)other.a.size() || carry; ++j) {\n                long long\
-    \ cur = res[i + j] + a[i] * (long long)(j < (int)other.a.size() ? other.a[j] :\
-    \ 0) + carry;\n                carry = (int)(cur / BASE);\n                res[i\
-    \ + j] = (int)(cur % BASE);\n            }\n        }\n        a = res;\n    \
-    \    sign *= other.sign;\n        trim();\n        return *this;\n    }\n\n  \
-    \  friend std::pair<BigInt, BigInt> divmod(const BigInt& a1, const BigInt& b1)\
-    \ {\n        if (b1.is_zero()) {\n            throw std::domain_error(\"BigInt\
-    \ division by zero\");\n        }\n        BigInt a = a1.abs(), b = b1.abs(),\
+    \      if (other.is_zero()) return *this;\n        if (is_zero()) return *this\
+    \ = other;\n        if (sign != other.sign) return *this -= (-other);\n      \
+    \  for (int i = 0, carry = 0; i < (int)std::max(a.size(), other.a.size()) || carry;\
+    \ ++i) {\n            if (i == (int)a.size()) a.push_back(0);\n            a[i]\
+    \ += carry + (i < (int)other.a.size() ? other.a[i] : 0);\n            carry =\
+    \ a[i] >= BASE;\n            if (carry) a[i] -= BASE;\n        }\n        return\
+    \ *this;\n    }\n\n    BigInt& operator-=(const BigInt& other) {\n        if (other.is_zero())\
+    \ return *this;\n        if (is_zero()) return *this = -other;\n        if (sign\
+    \ != other.sign) return *this += (-other);\n        if (abs() < other.abs()) {\n\
+    \            BigInt tmp = other;\n            tmp -= *this;\n            *this\
+    \ = tmp;\n            sign = -sign;\n            return *this;\n        }\n  \
+    \      for (int i = 0, carry = 0; i < (int)other.a.size() || carry; ++i) {\n \
+    \           a[i] -= carry + (i < (int)other.a.size() ? other.a[i] : 0);\n    \
+    \        carry = a[i] < 0;\n            if (carry) a[i] += BASE;\n        }\n\
+    \        trim();\n        return *this;\n    }\n\n    BigInt& operator*=(int v)\
+    \ {\n        long long multiplier = v;\n        if (multiplier < 0) {\n      \
+    \      sign = -sign;\n            multiplier = -multiplier;\n        }\n     \
+    \   long long carry = 0;\n        for (int i = 0; i < (int)a.size() || carry;\
+    \ ++i) {\n            if (i == (int)a.size()) a.push_back(0);\n            const\
+    \ long long cur = a[i] * multiplier + carry;\n            carry = cur / BASE;\n\
+    \            a[i] = (int)(cur % BASE);\n        }\n        trim();\n        return\
+    \ *this;\n    }\n\n    BigInt& operator*=(const BigInt& other) {\n        if (is_zero()\
+    \ || other.is_zero()) return *this = 0;\n        std::vector<int> res(a.size()\
+    \ + other.a.size());\n        for (int i = 0; i < (int)a.size(); ++i) {\n    \
+    \        for (int j = 0, carry = 0; j < (int)other.a.size() || carry; ++j) {\n\
+    \                long long cur = res[i + j] + a[i] * (long long)(j < (int)other.a.size()\
+    \ ? other.a[j] : 0) + carry;\n                carry = (int)(cur / BASE);\n   \
+    \             res[i + j] = (int)(cur % BASE);\n            }\n        }\n    \
+    \    a = res;\n        sign *= other.sign;\n        trim();\n        return *this;\n\
+    \    }\n\n    friend std::pair<BigInt, BigInt> divmod(const BigInt& a1, const\
+    \ BigInt& b1) {\n        if (b1.is_zero()) {\n            throw std::domain_error(\"\
+    BigInt division by zero\");\n        }\n        BigInt a = a1.abs(), b = b1.abs(),\
     \ q, r;\n        q.a.resize(a.a.size());\n        for (int i = (int)a.a.size()\
     \ - 1; i >= 0; --i) {\n            r *= BASE;\n            r += a.a[i];\n    \
     \        int s1 = r.a.size() <= b.a.size() ? 0 : r.a[b.a.size()];\n          \
@@ -205,11 +221,15 @@ data:
   dependsOn: []
   isVerificationFile: false
   path: utilities/bigint.hpp
-  requiredBy: []
-  timestamp: '2026-06-20 02:38:39+09:00'
+  requiredBy:
+  - geometry/all.hpp
+  - geometry/lattice_point_count.hpp
+  timestamp: '2026-07-07 22:43:27+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/utilities/basic_utilities.test.cpp
+  - verify/geometry/geometry_algorithms.test.cpp
+  - verify/geometry/lattice_point_count.test.cpp
 documentation_of: utilities/bigint.hpp
 layout: document
 title: BigInt
