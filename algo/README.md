@@ -1,6 +1,8 @@
 # Algorithms
 
 Use this directory for one-shot algorithms that are not tied to another domain.
+If a header builds an object and then answers repeated queries, it belongs in
+`ds/` instead; for example, cumulative sums live in `ds/range_query/`.
 Convex optimization helpers live under `convex/`, and mutable query/update
 objects live under `ds/`.
 

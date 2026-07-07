@@ -1,12 +1,15 @@
 # Data structures
 
-Choose a category by the operation you need during a contest.
+Choose a category by the operation you need during a contest. If you construct
+an object and then call query methods repeatedly, it belongs here even when the
+object is static. For example, cumulative sums are in `ds/range_query/`, while
+one-shot sequence computations such as LIS are in `algo/sequence/`.
 
 | Category | Headers |
 | --- | --- |
 | [`dsu/`](dsu/) | `dsu.hpp`, `dsu_monoid.hpp`, `potentialized_dsu.hpp`, `persistent_dsu.hpp`, `persistent_potentialized_dsu.hpp`, `partially_persistent_dsu.hpp` |
 | [`segtree/`](segtree/) | Dense, dynamic, lazy, dual, generic Beats, specialized chmin/chmax/add, and persistent variants, including `segtree_2d.hpp` and `dual_segtree_2d.hpp` |
-| [`range_query/`](range_query/) | 1D/2D/3D cumulative sums, SWAG, range inversions, monoid and custom-state square-root decomposition, Fenwick tree, sqrt/sparse tables, and wavelet matrices |
+| [`range_query/`](range_query/) | Repeated range-query objects: 1D/2D/3D cumulative sums, SWAG, range inversions, monoid and custom-state square-root decomposition, Fenwick tree, sqrt/sparse tables, and wavelet matrices |
 | [`dynamic_array/`](dynamic_array/) | Dynamic and persistent implicit-treap arrays, with optional monoid or lazy aggregation |
 | [`ordered_set/`](ordered_set/) | Ordered sets, multisets, and binary tries for integer xor queries and monoid aggregates |
 | [`dynamic_tree/`](dynamic_tree/) | Link-cut tree, path-oriented variants, and rake-compress link-cut tree |
