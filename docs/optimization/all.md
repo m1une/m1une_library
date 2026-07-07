@@ -9,10 +9,8 @@ documentation_of: ../../optimization/all.hpp
 is not naturally a graph, data structure, or algebraic object.
 The public namespace is `m1une::opt`.
 
-Line-query containers such as CHT and Li Chao tree live under
-`ds/line_container/`. Slope trick lives under `ds/convex_function/`, and DP
-optimization helpers such as Alien Trick and Monge routines live under
-`algo/dp_optimization/`.
+Convex tools such as CHT, Li Chao tree, slope trick, Alien Trick, and Monge
+routines live under `convex/`.
 
 ## Included Headers
 
