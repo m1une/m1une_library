@@ -58,8 +58,16 @@ data:
     \ {\n        add_constant(other._minimum);\n        while (!other._left.empty())\
     \ {\n            add_a_minus_x(other.left_top());\n            other._left.pop();\n\
     \        }\n        while (!other._right.empty()) {\n            add_x_minus_a(other.right_top());\n\
-    \            other._right.pop();\n        }\n    }\n};\n\n}  // namespace ds\n\
-    }  // namespace m1une\n\n\n"
+    \            other._right.pop();\n        }\n    }\n\n    void min_plus_convolve(SlopeTrick\
+    \ other) {\n        SlopeTrick result;\n        result._minimum = _minimum + other._minimum;\n\
+    \n        while (!_left.empty() && !other._left.empty()) {\n            result.push_left(left_top()\
+    \ + other.left_top());\n            _left.pop();\n            other._left.pop();\n\
+    \        }\n        while (!_right.empty() && !other._right.empty()) {\n     \
+    \       result.push_right(right_top() + other.right_top());\n            _right.pop();\n\
+    \            other._right.pop();\n        }\n        *this = std::move(result);\n\
+    \    }\n};\n\ntemplate <class T>\nSlopeTrick<T> min_plus_convolution(SlopeTrick<T>\
+    \ first,\n                                   SlopeTrick<T> second) {\n    first.min_plus_convolve(std::move(second));\n\
+    \    return first;\n}\n\n}  // namespace ds\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_DS_CONVEX_FUNCTION_SLOPE_TRICK_HPP\n#define M1UNE_DS_CONVEX_FUNCTION_SLOPE_TRICK_HPP\
     \ 1\n\n#include <cassert>\n#include <functional>\n#include <optional>\n#include\
     \ <queue>\n#include <type_traits>\n#include <utility>\n#include <vector>\n\nnamespace\
@@ -104,14 +112,23 @@ data:
     \ {\n        add_constant(other._minimum);\n        while (!other._left.empty())\
     \ {\n            add_a_minus_x(other.left_top());\n            other._left.pop();\n\
     \        }\n        while (!other._right.empty()) {\n            add_x_minus_a(other.right_top());\n\
-    \            other._right.pop();\n        }\n    }\n};\n\n}  // namespace ds\n\
-    }  // namespace m1une\n\n#endif  // M1UNE_DS_CONVEX_FUNCTION_SLOPE_TRICK_HPP\n"
+    \            other._right.pop();\n        }\n    }\n\n    void min_plus_convolve(SlopeTrick\
+    \ other) {\n        SlopeTrick result;\n        result._minimum = _minimum + other._minimum;\n\
+    \n        while (!_left.empty() && !other._left.empty()) {\n            result.push_left(left_top()\
+    \ + other.left_top());\n            _left.pop();\n            other._left.pop();\n\
+    \        }\n        while (!_right.empty() && !other._right.empty()) {\n     \
+    \       result.push_right(right_top() + other.right_top());\n            _right.pop();\n\
+    \            other._right.pop();\n        }\n        *this = std::move(result);\n\
+    \    }\n};\n\ntemplate <class T>\nSlopeTrick<T> min_plus_convolution(SlopeTrick<T>\
+    \ first,\n                                   SlopeTrick<T> second) {\n    first.min_plus_convolve(std::move(second));\n\
+    \    return first;\n}\n\n}  // namespace ds\n}  // namespace m1une\n\n#endif \
+    \ // M1UNE_DS_CONVEX_FUNCTION_SLOPE_TRICK_HPP\n"
   dependsOn: []
   isVerificationFile: false
   path: ds/convex_function/slope_trick.hpp
   requiredBy:
   - ds/convex_function/all.hpp
-  timestamp: '2026-07-07 14:26:59+09:00'
+  timestamp: '2026-07-07 17:18:14+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/convex_function/slope_trick.test.cpp
@@ -124,7 +141,8 @@ title: Slope Trick
 
 `SlopeTrick<T>` maintains a convex piecewise-linear function whose slopes
 change by integer units. It supports adding hinge and absolute-value functions,
-translations, sliding-window minima, evaluation, and function addition.
+translations, sliding-window minima, evaluation, function addition, and
+min-plus convolution of two slope-trick functions.
 
 The structure stores the breakpoints in two heaps. Most updates take logarithmic
 time without explicitly constructing the function over its whole domain.
@@ -135,7 +153,8 @@ and dynamic programs with convex piecewise-linear states.
 ## Complexity Notation
 
 * `N` is the number of breakpoints stored in the current object.
-* `M` is the number of breakpoints stored in another object passed to `merge`.
+* `M` is the number of breakpoints stored in another object passed to `merge`
+  or `min_plus_convolve`.
 
 ## Represented Function
 
@@ -149,10 +168,10 @@ intermediate sums must fit in `T`.
 
 | Method | Effect |
 | --- | --- |
-| `add_constant(c)` | Adds the constant `c`. |
-| `add_x_minus_a(a)` | Adds `max(x - a, 0)`. |
-| `add_a_minus_x(a)` | Adds `max(a - x, 0)`. |
-| `add_abs(a)` | Adds `abs(x - a)`. |
+| `void add_constant(T c)` | Adds the constant `c`. |
+| `void add_x_minus_a(T a)` | Adds `max(x - a, 0)`. |
+| `void add_a_minus_x(T a)` | Adds `max(a - x, 0)`. |
+| `void add_abs(T a)` | Adds `abs(x - a)`. |
 
 Each hinge insertion takes amortized $O(\log N)$ time, where `N` is the current
 number of stored breakpoints. `add_abs` inserts two hinges.
@@ -161,9 +180,9 @@ number of stored breakpoints. `add_abs` inserts two hinges.
 
 | Method | Meaning |
 | --- | --- |
-| `minimum()` | Minimum function value. |
-| `argmin()` | Closed interval on which the minimum is attained. |
-| `breakpoint_count()` | Number of stored unit-slope breakpoints. |
+| `T minimum() const` | Minimum function value. |
+| `SlopeTrickArgmin<T> argmin() const` | Closed interval on which the minimum is attained. |
+| `int breakpoint_count() const` | Number of stored unit-slope breakpoints. |
 
 `argmin()` returns `SlopeTrickArgmin<T>` with optional `left` and `right`
 endpoints. An empty left endpoint means the interval is unbounded below; an
@@ -193,20 +212,40 @@ The one-sided variants are:
 
 | Method | Effect |
 | --- | --- |
-| `prefix_minimum()` / `clear_right()` | Replaces `f(x)` by `min` over `y <= x` of `f(y)`. |
-| `suffix_minimum()` / `clear_left()` | Replaces `f(x)` by `min` over `y >= x` of `f(y)`. |
+| `void shift(T delta)` | Replaces `f(x)` by `f(x - delta)`. |
+| `void shift(T left_delta, T right_delta)` | Replaces `f(x)` by a sliding-window minimum. |
+| `void prefix_minimum()` / `void clear_right()` | Replaces `f(x)` by `min` over `y <= x` of `f(y)`. |
+| `void suffix_minimum()` / `void clear_left()` | Replaces `f(x)` by `min` over `y >= x` of `f(y)`. |
 
 Clearing one side takes linear time in the number of discarded breakpoints.
 
-## Evaluation and Merge
+## Evaluation, Merge, and Convolution
 
-`evaluate(x)` returns `f(x)` in $O(N)$ time without changing the structure.
+`T evaluate(T x) const` returns `f(x)` in $O(N)$ time without changing the structure.
 This is intended mainly for final answers and debugging; slope trick is useful
 because updates and minimum queries avoid evaluating arbitrary points.
 
-`merge(other)` adds the function represented by `other` to this function.
+`void merge(SlopeTrick other)` adds the function represented by `other` to this function.
 `other` is passed by value, so passing an rvalue avoids an extra copy. The
 operation takes $O((N+M)\log(N+M))$ time in the worst case.
+
+`void min_plus_convolve(SlopeTrick other)` replaces the represented function by
+
+$$
+h(x) = \min_y f(y) + g(x-y),
+$$
+
+where `g` is the function represented by `other`. The minimum value becomes
+`f.minimum() + g.minimum()`, and the argmin interval is the Minkowski sum of
+the two argmin intervals. If either side is unbounded on the left or right, the
+corresponding result side is also unbounded.
+
+`SlopeTrick<T> min_plus_convolution(SlopeTrick<T> first, SlopeTrick<T> second)`
+returns the same convolution as a free function. Both APIs take their
+arguments by value, so moving temporary slope tricks avoids extra copies.
+
+The convolution keeps only slope levels that appear in both functions. Its
+worst-case running time is $O((N+M)\log(N+M))$.
 
 ## Example
 
@@ -220,8 +259,12 @@ int main() {
     slope.add_x_minus_a(0);
     slope.shift(-1, 2);
 
-    std::cout << slope.minimum() << "\n";
-    auto range = slope.argmin();
+    m1une::ds::SlopeTrick<long long> other;
+    other.add_abs(5);
+    auto convolved = m1une::ds::min_plus_convolution(slope, other);
+
+    std::cout << convolved.minimum() << "\n";
+    auto range = convolved.argmin();
     if (range.left) std::cout << *range.left << "\n";
 }
 ```

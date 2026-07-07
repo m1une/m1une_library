@@ -13,10 +13,10 @@ data:
   - icon: ':heavy_check_mark:'
     path: ds/segtree/segtree_beats.hpp
     title: Generic Segment Tree Beats!
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/bit_ceil.hpp
     title: Bit Ceil
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
   _extendedRequiredBy: []

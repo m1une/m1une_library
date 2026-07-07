@@ -8,40 +8,40 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/counting.hpp
     title: Graph Counting
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: math/all.hpp
     title: Math All
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: math/all.hpp
     title: Math All
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/bernoulli.hpp
     title: Bernoulli Numbers and Power Sums
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/combinatorial_sequences.hpp
     title: Combinatorial Sequences
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/all.hpp
     title: Formal Power Series All
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/convolution.hpp
     title: Convolution
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/convolution_ll.hpp
     title: Long Long Convolution
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/formal_power_series.hpp
     title: Formal Power Series
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/half_gcd.hpp
     title: Polynomial Half-GCD
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/lagrange_inversion.hpp
     title: Lagrange Inversion Formula
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/linear_recurrence.hpp
     title: Linear Recurrence and Bostan-Mori
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/multipoint_evaluation.hpp
     title: Multipoint Evaluation and Interpolation
   _extendedVerifiedWith:
@@ -186,45 +186,45 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/lucas.test.cpp
     title: verify/math/lucas.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/matrix/inverse_matrix.test.cpp
     title: verify/math/matrix/inverse_matrix.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/matrix/matrix.test.cpp
     title: verify/math/matrix/matrix.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/matrix/matrix_product.test.cpp
     title: verify/math/matrix/matrix_product.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/modint.test.cpp
     title: verify/math/modint.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/partition_function.test.cpp
     title: verify/math/partition_function.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/partition_function.test.cpp
     title: verify/math/partition_function.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/repunit.test.cpp
     title: verify/math/repunit.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/stirling_number_of_the_second_kind.test.cpp
     title: verify/math/stirling_number_of_the_second_kind.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/stirling_number_of_the_second_kind.test.cpp
     title: verify/math/stirling_number_of_the_second_kind.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/matroid/matroids.test.cpp
     title: verify/matroid/matroids.test.cpp
-  _isVerificationFailed: true
+  _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':question:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"math/modint.hpp\"\n\n\n\n#include <cstdint>\n#include <iostream>\n\
@@ -346,7 +346,7 @@ data:
   - graph/all.hpp
   - graph/counting.hpp
   timestamp: '2026-07-01 14:11:51+09:00'
-  verificationStatus: LIBRARY_SOME_WA
+  verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/dynamic_tree/rake_compress_link_cut_tree.test.cpp
   - verify/ds/dynamic_tree/yosupo_point_set_tree_path_composite_sum.test.cpp

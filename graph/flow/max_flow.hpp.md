@@ -11,10 +11,10 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/flow/flow.hpp
     title: Flow
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: optimization/all.hpp
     title: Optimization All
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: optimization/project_selection.hpp
     title: Project Selection
   _extendedVerifiedWith:
@@ -30,18 +30,18 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/range_edge_graph.test.cpp
     title: verify/graph/range_edge_graph.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/optimization/integer_lp.test.cpp
     title: verify/optimization/integer_lp.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/optimization/project_selection.test.cpp
     title: verify/optimization/project_selection.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/optimization/simplex.test.cpp
     title: verify/optimization/simplex.test.cpp
-  _isVerificationFailed: true
+  _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':question:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"graph/flow/max_flow.hpp\"\n\n\n\n#include <algorithm>\n\
@@ -170,7 +170,7 @@ data:
   - graph/flow/flow.hpp
   - graph/flow/bounded_flow.hpp
   timestamp: '2026-07-07 14:26:59+09:00'
-  verificationStatus: LIBRARY_SOME_WA
+  verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/optimization/project_selection.test.cpp
   - verify/optimization/integer_lp.test.cpp

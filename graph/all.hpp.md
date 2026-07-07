@@ -52,7 +52,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/flow/gomory_hu.hpp
     title: Gomory-Hu Tree
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: graph/flow/max_flow.hpp
     title: Max Flow
   - icon: ':heavy_check_mark:'
@@ -151,19 +151,19 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/zero_one_bfs.hpp
     title: 0-1 BFS
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/combinatorics.hpp
     title: Combinatorics
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/convolution.hpp
     title: Convolution
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/convolution.hpp
     title: Convolution
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/formal_power_series.hpp
     title: Formal Power Series
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
   - icon: ':heavy_check_mark:'

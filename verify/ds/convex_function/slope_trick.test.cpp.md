@@ -61,12 +61,21 @@ data:
     \ {\n        add_constant(other._minimum);\n        while (!other._left.empty())\
     \ {\n            add_a_minus_x(other.left_top());\n            other._left.pop();\n\
     \        }\n        while (!other._right.empty()) {\n            add_x_minus_a(other.right_top());\n\
-    \            other._right.pop();\n        }\n    }\n};\n\n}  // namespace ds\n\
-    }  // namespace m1une\n\n\n#line 10 \"verify/ds/convex_function/slope_trick.test.cpp\"\
-    \n\nusing SlopeTrick = m1une::ds::SlopeTrick<long long>;\n\nconstexpr int coordinate_limit\
-    \ = 300;\nconstexpr long long inf = std::numeric_limits<long long>::max() / 4;\n\
-    \nint index_of(int x) {\n    return x + coordinate_limit;\n}\n\nvoid check_values(const\
-    \ SlopeTrick& slope, const std::vector<long long>& value) {\n    long long expected_minimum\
+    \            other._right.pop();\n        }\n    }\n\n    void min_plus_convolve(SlopeTrick\
+    \ other) {\n        SlopeTrick result;\n        result._minimum = _minimum + other._minimum;\n\
+    \n        while (!_left.empty() && !other._left.empty()) {\n            result.push_left(left_top()\
+    \ + other.left_top());\n            _left.pop();\n            other._left.pop();\n\
+    \        }\n        while (!_right.empty() && !other._right.empty()) {\n     \
+    \       result.push_right(right_top() + other.right_top());\n            _right.pop();\n\
+    \            other._right.pop();\n        }\n        *this = std::move(result);\n\
+    \    }\n};\n\ntemplate <class T>\nSlopeTrick<T> min_plus_convolution(SlopeTrick<T>\
+    \ first,\n                                   SlopeTrick<T> second) {\n    first.min_plus_convolve(std::move(second));\n\
+    \    return first;\n}\n\n}  // namespace ds\n}  // namespace m1une\n\n\n#line\
+    \ 10 \"verify/ds/convex_function/slope_trick.test.cpp\"\n\nusing SlopeTrick =\
+    \ m1une::ds::SlopeTrick<long long>;\n\nconstexpr int coordinate_limit = 300;\n\
+    constexpr long long inf = std::numeric_limits<long long>::max() / 4;\n\nint index_of(int\
+    \ x) {\n    return x + coordinate_limit;\n}\n\nvoid check_values(const SlopeTrick&\
+    \ slope, const std::vector<long long>& value) {\n    long long expected_minimum\
     \ = *std::min_element(value.begin(), value.end());\n    assert(slope.minimum()\
     \ == expected_minimum);\n    for (int x = -100; x <= 100; x++) {\n        assert(slope.evaluate(x)\
     \ == value[index_of(x)]);\n    }\n\n    auto range = slope.argmin();\n    int\
@@ -141,9 +150,39 @@ data:
     \ expected(201);\n        for (int x = -100; x <= 100; x++) {\n            expected[x\
     \ + 100] = first.evaluate(x) + second.evaluate(x);\n        }\n        first.merge(second);\n\
     \        for (int x = -100; x <= 100; x++) {\n            assert(first.evaluate(x)\
-    \ == expected[x + 100]);\n        }\n    }\n}\n\nint main() {\n    test_basic();\n\
-    \    test_operations_against_explicit_function();\n    test_merge();\n\n    long\
-    \ long a, b;\n    std::cin >> a >> b;\n    std::cout << a + b << '\\n';\n}\n"
+    \ == expected[x + 100]);\n        }\n    }\n}\n\nvoid test_min_plus_convolution()\
+    \ {\n    constexpr int brute_limit = 500;\n\n    for (int test = 0; test < 120;\
+    \ test++) {\n        SlopeTrick first;\n        SlopeTrick second;\n\n       \
+    \ for (int i = 0; i < 18; i++) {\n            int a = (test * 17 + i * 11) % 51\
+    \ - 25;\n            int b = (test * 23 + i * 7) % 51 - 25;\n\n            if\
+    \ (i % 4 == 0) {\n                first.add_abs(a);\n                second.add_abs(b);\n\
+    \            } else if (i % 4 == 1) {\n                first.add_x_minus_a(a);\n\
+    \                second.add_a_minus_x(b);\n            } else if (i % 4 == 2)\
+    \ {\n                first.add_a_minus_x(a);\n                second.add_x_minus_a(b);\n\
+    \            } else {\n                first.add_constant(a - b);\n          \
+    \      second.add_constant(b - a / 2);\n            }\n\n            if (i % 7\
+    \ == 3) first.shift(-2, 3);\n            if (i % 7 == 5) second.shift(1);\n  \
+    \      }\n\n        if (test % 4 == 0) first.prefix_minimum();\n        if (test\
+    \ % 5 == 0) first.suffix_minimum();\n        if (test % 6 == 0) second.prefix_minimum();\n\
+    \        if (test % 7 == 0) second.suffix_minimum();\n\n        SlopeTrick assigned\
+    \ = first;\n        assigned.min_plus_convolve(second);\n        SlopeTrick returned\
+    \ = m1une::ds::min_plus_convolution(first, second);\n\n        assert(assigned.minimum()\
+    \ == first.minimum() + second.minimum());\n        auto first_range = first.argmin();\n\
+    \        auto second_range = second.argmin();\n        auto result_range = assigned.argmin();\n\
+    \        if (first_range.left && second_range.left) {\n            assert(result_range.left);\n\
+    \            assert(*result_range.left == *first_range.left + *second_range.left);\n\
+    \        } else {\n            assert(!result_range.left);\n        }\n      \
+    \  if (first_range.right && second_range.right) {\n            assert(result_range.right);\n\
+    \            assert(*result_range.right == *first_range.right + *second_range.right);\n\
+    \        } else {\n            assert(!result_range.right);\n        }\n\n   \
+    \     for (int x = -100; x <= 100; x++) {\n            long long expected = inf;\n\
+    \            for (int y = -brute_limit; y <= brute_limit; y++) {\n           \
+    \     expected =\n                    std::min(expected, first.evaluate(y) + second.evaluate(x\
+    \ - y));\n            }\n            assert(assigned.evaluate(x) == expected);\n\
+    \            assert(returned.evaluate(x) == expected);\n        }\n    }\n}\n\n\
+    int main() {\n    test_basic();\n    test_operations_against_explicit_function();\n\
+    \    test_merge();\n    test_min_plus_convolution();\n\n    long long a, b;\n\
+    \    std::cin >> a >> b;\n    std::cout << a + b << '\\n';\n}\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <algorithm>\n\
     #include <cassert>\n#include <iostream>\n#include <limits>\n#include <vector>\n\
     \n#include \"../../../ds/convex_function/slope_trick.hpp\"\n\nusing SlopeTrick\
@@ -225,15 +264,45 @@ data:
     \ expected(201);\n        for (int x = -100; x <= 100; x++) {\n            expected[x\
     \ + 100] = first.evaluate(x) + second.evaluate(x);\n        }\n        first.merge(second);\n\
     \        for (int x = -100; x <= 100; x++) {\n            assert(first.evaluate(x)\
-    \ == expected[x + 100]);\n        }\n    }\n}\n\nint main() {\n    test_basic();\n\
-    \    test_operations_against_explicit_function();\n    test_merge();\n\n    long\
-    \ long a, b;\n    std::cin >> a >> b;\n    std::cout << a + b << '\\n';\n}\n"
+    \ == expected[x + 100]);\n        }\n    }\n}\n\nvoid test_min_plus_convolution()\
+    \ {\n    constexpr int brute_limit = 500;\n\n    for (int test = 0; test < 120;\
+    \ test++) {\n        SlopeTrick first;\n        SlopeTrick second;\n\n       \
+    \ for (int i = 0; i < 18; i++) {\n            int a = (test * 17 + i * 11) % 51\
+    \ - 25;\n            int b = (test * 23 + i * 7) % 51 - 25;\n\n            if\
+    \ (i % 4 == 0) {\n                first.add_abs(a);\n                second.add_abs(b);\n\
+    \            } else if (i % 4 == 1) {\n                first.add_x_minus_a(a);\n\
+    \                second.add_a_minus_x(b);\n            } else if (i % 4 == 2)\
+    \ {\n                first.add_a_minus_x(a);\n                second.add_x_minus_a(b);\n\
+    \            } else {\n                first.add_constant(a - b);\n          \
+    \      second.add_constant(b - a / 2);\n            }\n\n            if (i % 7\
+    \ == 3) first.shift(-2, 3);\n            if (i % 7 == 5) second.shift(1);\n  \
+    \      }\n\n        if (test % 4 == 0) first.prefix_minimum();\n        if (test\
+    \ % 5 == 0) first.suffix_minimum();\n        if (test % 6 == 0) second.prefix_minimum();\n\
+    \        if (test % 7 == 0) second.suffix_minimum();\n\n        SlopeTrick assigned\
+    \ = first;\n        assigned.min_plus_convolve(second);\n        SlopeTrick returned\
+    \ = m1une::ds::min_plus_convolution(first, second);\n\n        assert(assigned.minimum()\
+    \ == first.minimum() + second.minimum());\n        auto first_range = first.argmin();\n\
+    \        auto second_range = second.argmin();\n        auto result_range = assigned.argmin();\n\
+    \        if (first_range.left && second_range.left) {\n            assert(result_range.left);\n\
+    \            assert(*result_range.left == *first_range.left + *second_range.left);\n\
+    \        } else {\n            assert(!result_range.left);\n        }\n      \
+    \  if (first_range.right && second_range.right) {\n            assert(result_range.right);\n\
+    \            assert(*result_range.right == *first_range.right + *second_range.right);\n\
+    \        } else {\n            assert(!result_range.right);\n        }\n\n   \
+    \     for (int x = -100; x <= 100; x++) {\n            long long expected = inf;\n\
+    \            for (int y = -brute_limit; y <= brute_limit; y++) {\n           \
+    \     expected =\n                    std::min(expected, first.evaluate(y) + second.evaluate(x\
+    \ - y));\n            }\n            assert(assigned.evaluate(x) == expected);\n\
+    \            assert(returned.evaluate(x) == expected);\n        }\n    }\n}\n\n\
+    int main() {\n    test_basic();\n    test_operations_against_explicit_function();\n\
+    \    test_merge();\n    test_min_plus_convolution();\n\n    long long a, b;\n\
+    \    std::cin >> a >> b;\n    std::cout << a + b << '\\n';\n}\n"
   dependsOn:
   - ds/convex_function/slope_trick.hpp
   isVerificationFile: true
   path: verify/ds/convex_function/slope_trick.test.cpp
   requiredBy: []
-  timestamp: '2026-07-07 14:26:59+09:00'
+  timestamp: '2026-07-07 17:18:14+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/convex_function/slope_trick.test.cpp

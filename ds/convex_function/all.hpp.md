@@ -55,8 +55,17 @@ data:
     \ {\n        add_constant(other._minimum);\n        while (!other._left.empty())\
     \ {\n            add_a_minus_x(other.left_top());\n            other._left.pop();\n\
     \        }\n        while (!other._right.empty()) {\n            add_x_minus_a(other.right_top());\n\
-    \            other._right.pop();\n        }\n    }\n};\n\n}  // namespace ds\n\
-    }  // namespace m1une\n\n\n#line 5 \"ds/convex_function/all.hpp\"\n\n\n"
+    \            other._right.pop();\n        }\n    }\n\n    void min_plus_convolve(SlopeTrick\
+    \ other) {\n        SlopeTrick result;\n        result._minimum = _minimum + other._minimum;\n\
+    \n        while (!_left.empty() && !other._left.empty()) {\n            result.push_left(left_top()\
+    \ + other.left_top());\n            _left.pop();\n            other._left.pop();\n\
+    \        }\n        while (!_right.empty() && !other._right.empty()) {\n     \
+    \       result.push_right(right_top() + other.right_top());\n            _right.pop();\n\
+    \            other._right.pop();\n        }\n        *this = std::move(result);\n\
+    \    }\n};\n\ntemplate <class T>\nSlopeTrick<T> min_plus_convolution(SlopeTrick<T>\
+    \ first,\n                                   SlopeTrick<T> second) {\n    first.min_plus_convolve(std::move(second));\n\
+    \    return first;\n}\n\n}  // namespace ds\n}  // namespace m1une\n\n\n#line\
+    \ 5 \"ds/convex_function/all.hpp\"\n\n\n"
   code: '#ifndef M1UNE_DS_CONVEX_FUNCTION_ALL_HPP
 
     #define M1UNE_DS_CONVEX_FUNCTION_ALL_HPP 1
@@ -73,7 +82,7 @@ data:
   isVerificationFile: false
   path: ds/convex_function/all.hpp
   requiredBy: []
-  timestamp: '2026-07-07 14:26:59+09:00'
+  timestamp: '2026-07-07 17:18:14+09:00'
   verificationStatus: LIBRARY_NO_TESTS
   verifiedWith: []
 documentation_of: ds/convex_function/all.hpp

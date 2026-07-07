@@ -4,7 +4,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: ds/segtree/segtree_2d.hpp
     title: Segtree 2D
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/bit_ceil.hpp
     title: Bit Ceil
   - icon: ':heavy_check_mark:'

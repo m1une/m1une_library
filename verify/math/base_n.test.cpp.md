@@ -1,7 +1,7 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/base_n.hpp
     title: Base-N Numbers
   _extendedRequiredBy: []

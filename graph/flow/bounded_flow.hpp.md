@@ -1,7 +1,7 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: graph/flow/max_flow.hpp
     title: Max Flow
   _extendedRequiredBy:

@@ -1,37 +1,37 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/all.hpp
     title: Formal Power Series All
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/convolution.hpp
     title: Convolution
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/convolution_ll.hpp
     title: Long Long Convolution
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/floating_point_convolution.hpp
     title: Floating-Point Convolution
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/formal_power_series.hpp
     title: Formal Power Series
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/half_gcd.hpp
     title: Polynomial Half-GCD
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/lagrange_inversion.hpp
     title: Lagrange Inversion Formula
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/linear_recurrence.hpp
     title: Linear Recurrence and Bostan-Mori
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/multipoint_evaluation.hpp
     title: Multipoint Evaluation and Interpolation
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
   _extendedRequiredBy: []

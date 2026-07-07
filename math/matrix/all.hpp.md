@@ -1,26 +1,26 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: math/matrix/linear_algebra.hpp
     title: Matrix Linear Algebra
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: math/matrix/matrix.hpp
     title: Dense Matrix
   _extendedRequiredBy:
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: math/all.hpp
     title: Math All
   _extendedVerifiedWith:
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/matrix/matrix.test.cpp
     title: verify/math/matrix/matrix.test.cpp
-  _isVerificationFailed: true
+  _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':x:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"math/matrix/all.hpp\"\n\n\n\n#line 1 \"math/matrix/linear_algebra.hpp\"\
@@ -232,7 +232,7 @@ data:
   requiredBy:
   - math/all.hpp
   timestamp: '2026-07-07 14:26:59+09:00'
-  verificationStatus: LIBRARY_ALL_WA
+  verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
   - verify/math/matrix/matrix.test.cpp

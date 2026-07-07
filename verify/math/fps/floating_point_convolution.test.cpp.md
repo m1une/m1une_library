@@ -1,7 +1,7 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/floating_point_convolution.hpp
     title: Floating-Point Convolution
   _extendedRequiredBy: []

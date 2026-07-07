@@ -13,7 +13,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/flow/gomory_hu.hpp
     title: Gomory-Hu Tree
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: graph/flow/max_flow.hpp
     title: Max Flow
   - icon: ':heavy_check_mark:'

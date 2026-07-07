@@ -3,12 +3,12 @@ data:
   _extendedDependsOn: []
   _extendedRequiredBy: []
   _extendedVerifiedWith:
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/utilities/dynamic_bitset.test.cpp
     title: verify/utilities/dynamic_bitset.test.cpp
-  _isVerificationFailed: true
+  _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':x:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"utilities/dynamic_bitset.hpp\"\n\n\n\n#include <algorithm>\n\
@@ -144,7 +144,7 @@ data:
   path: utilities/dynamic_bitset.hpp
   requiredBy: []
   timestamp: '2026-06-21 04:03:53+09:00'
-  verificationStatus: LIBRARY_ALL_WA
+  verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/utilities/dynamic_bitset.test.cpp
 documentation_of: utilities/dynamic_bitset.hpp

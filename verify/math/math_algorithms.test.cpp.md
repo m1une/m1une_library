@@ -1,125 +1,125 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: math/all.hpp
     title: Math All
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/base_n.hpp
     title: Base-N Numbers
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/bernoulli.hpp
     title: Bernoulli Numbers and Power Sums
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/bit_ceil.hpp
     title: Bit Ceil
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/bitwise_convolution.hpp
     title: Bitwise Convolution
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/combinatorial_sequences.hpp
     title: Combinatorial Sequences
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/combinatorics.hpp
     title: Combinatorics
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/cyclotomic_polynomial.hpp
     title: Cyclotomic Polynomial
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/all.hpp
     title: Formal Power Series All
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/convolution.hpp
     title: Convolution
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/convolution_ll.hpp
     title: Long Long Convolution
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/floating_point_convolution.hpp
     title: Floating-Point Convolution
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/formal_power_series.hpp
     title: Formal Power Series
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/formal_power_series.hpp
     title: Formal Power Series
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/half_gcd.hpp
     title: Polynomial Half-GCD
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/lagrange_inversion.hpp
     title: Lagrange Inversion Formula
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/linear_recurrence.hpp
     title: Linear Recurrence and Bostan-Mori
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/multipoint_evaluation.hpp
     title: Multipoint Evaluation and Interpolation
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/generalized_floor_sum.hpp
     title: Generalized Floor Sum
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/gray_code.hpp
     title: Gray Code
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/integer_arithmetic.hpp
     title: Integer Square Root and Power
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/lucas.hpp
     title: Lucas's Theorem
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: math/matrix/all.hpp
     title: Matrix Bundle
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: math/matrix/linear_algebra.hpp
     title: Matrix Linear Algebra
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: math/matrix/matrix.hpp
     title: Dense Matrix
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/number_theory.hpp
     title: Number Theory
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/prime_factorization.hpp
     title: 64-bit Prime Factorization
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/prime_sieve.hpp
     title: Prime Sieve
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: math/primitive_root.hpp
     title: Primitive Root
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/rational.hpp
     title: Rational Number
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/repunit.hpp
     title: Repunit
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/stern_brocot_tree.hpp
     title: Stern-Brocot Tree
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/tetration.hpp
     title: Tetration
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: math/totient_sum.hpp
     title: Totient Sum
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/two_square_sum.hpp
     title: Sum of Two Squares
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/zeta_mobius_transform.hpp
     title: Zeta and Mobius Transform
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
-  _isVerificationFailed: true
+  _isVerificationFailed: false
   _pathExtension: cpp
-  _verificationStatusIcon: ':x:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
     PROBLEM: https://judge.yosupo.jp/problem/aplusb
@@ -2422,7 +2422,7 @@ data:
   path: verify/math/math_algorithms.test.cpp
   requiredBy: []
   timestamp: '2026-07-07 14:26:59+09:00'
-  verificationStatus: TEST_WRONG_ANSWER
+  verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/math_algorithms.test.cpp
 layout: document

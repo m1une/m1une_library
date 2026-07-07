@@ -2,19 +2,19 @@
 data:
   _extendedDependsOn: []
   _extendedRequiredBy:
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: math/all.hpp
     title: Math All
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/math/base_n.test.cpp
     title: verify/math/base_n.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
-  _isVerificationFailed: true
+  _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':question:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"math/base_n.hpp\"\n\n\n\n#include <algorithm>\n#include\
@@ -111,7 +111,7 @@ data:
   requiredBy:
   - math/all.hpp
   timestamp: '2026-07-01 22:19:42+09:00'
-  verificationStatus: LIBRARY_SOME_WA
+  verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/base_n.test.cpp
   - verify/math/math_algorithms.test.cpp
