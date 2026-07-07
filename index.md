@@ -84,6 +84,59 @@ data:
     - icon: ':warning:'
       path: acted_monoid/wrapper.hpp
       title: Acted Monoid Wrapper
+  - name: algo
+    pages:
+    - icon: ':warning:'
+      path: algo/all.hpp
+      title: Algorithms All
+  - name: algo/dp_optimization
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: algo/dp_optimization/alien_trick.hpp
+      title: Alien Trick
+    - icon: ':warning:'
+      path: algo/dp_optimization/all.hpp
+      title: DP Optimization All
+  - name: algo/dp_optimization/monge
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: algo/dp_optimization/monge/all.hpp
+      title: Monge All
+    - icon: ':heavy_check_mark:'
+      path: algo/dp_optimization/monge/check.hpp
+      title: Monge Checks
+    - icon: ':heavy_check_mark:'
+      path: algo/dp_optimization/monge/divide_and_conquer_optimization.hpp
+      title: Divide-and-Conquer DP Optimization
+    - icon: ':heavy_check_mark:'
+      path: algo/dp_optimization/monge/knuth_optimization.hpp
+      title: Knuth Optimization
+    - icon: ':heavy_check_mark:'
+      path: algo/dp_optimization/monge/larsch.hpp
+      title: LARSCH
+    - icon: ':heavy_check_mark:'
+      path: algo/dp_optimization/monge/min_plus_convolution.hpp
+      title: Structured Min-Plus and Max-Plus Convolution
+    - icon: ':heavy_check_mark:'
+      path: algo/dp_optimization/monge/monotone_minima.hpp
+      title: Monotone Minima
+    - icon: ':heavy_check_mark:'
+      path: algo/dp_optimization/monge/smawk.hpp
+      title: SMAWK
+  - name: algo/sequence
+    pages:
+    - icon: ':warning:'
+      path: algo/sequence/all.hpp
+      title: Sequence Algorithms All
+    - icon: ':heavy_check_mark:'
+      path: algo/sequence/inversion_count.hpp
+      title: Inversion Count
+    - icon: ':heavy_check_mark:'
+      path: algo/sequence/lis.hpp
+      title: Longest Increasing Subsequence (LIS)
+    - icon: ':heavy_check_mark:'
+      path: algo/sequence/subset_sum.hpp
+      title: Meet-in-the-Middle Subset Sum
   - name: .
     pages:
     - icon: ':warning:'
@@ -95,6 +148,14 @@ data:
     - icon: ':warning:'
       path: template.cpp
       title: template.cpp
+  - name: ds/convex_function
+    pages:
+    - icon: ':warning:'
+      path: ds/convex_function/all.hpp
+      title: Convex Function All
+    - icon: ':heavy_check_mark:'
+      path: ds/convex_function/slope_trick.hpp
+      title: Slope Trick
   - name: ds/dsu
     pages:
     - icon: ':question:'
@@ -184,6 +245,17 @@ data:
     - icon: ':heavy_check_mark:'
       path: ds/interval_set/interval_set.hpp
       title: Interval Set
+  - name: ds/line_container
+    pages:
+    - icon: ':warning:'
+      path: ds/line_container/all.hpp
+      title: Line Container All
+    - icon: ':heavy_check_mark:'
+      path: ds/line_container/convex_hull_trick.hpp
+      title: Convex Hull Trick
+    - icon: ':heavy_check_mark:'
+      path: ds/line_container/li_chao_tree.hpp
+      title: Li Chao Tree
   - name: ds/ordered_set
     pages:
     - icon: ':heavy_check_mark:'
@@ -295,55 +367,6 @@ data:
     - icon: ':heavy_check_mark:'
       path: ds/segtree/segtree_beats.hpp
       title: Generic Segment Tree Beats!
-  - name: flow
-    pages:
-    - icon: ':heavy_check_mark:'
-      path: flow/bounded_flow.hpp
-      title: Bounded Flow
-    - icon: ':heavy_check_mark:'
-      path: flow/bounded_min_cost_flow.hpp
-      title: Bounded Min Cost Flow
-    - icon: ':heavy_check_mark:'
-      path: flow/flow.hpp
-      title: Flow
-    - icon: ':heavy_check_mark:'
-      path: flow/gomory_hu.hpp
-      title: Gomory-Hu Tree
-    - icon: ':heavy_check_mark:'
-      path: flow/max_flow.hpp
-      title: Max Flow
-    - icon: ':heavy_check_mark:'
-      path: flow/min_cost_flow.hpp
-      title: Min Cost Flow
-  - name: fps
-    pages:
-    - icon: ':heavy_check_mark:'
-      path: fps/all.hpp
-      title: Formal Power Series All
-    - icon: ':heavy_check_mark:'
-      path: fps/convolution.hpp
-      title: Convolution
-    - icon: ':heavy_check_mark:'
-      path: fps/convolution_ll.hpp
-      title: Long Long Convolution
-    - icon: ':heavy_check_mark:'
-      path: fps/floating_point_convolution.hpp
-      title: Floating-Point Convolution
-    - icon: ':heavy_check_mark:'
-      path: fps/formal_power_series.hpp
-      title: Formal Power Series
-    - icon: ':heavy_check_mark:'
-      path: fps/half_gcd.hpp
-      title: Polynomial Half-GCD
-    - icon: ':heavy_check_mark:'
-      path: fps/lagrange_inversion.hpp
-      title: Lagrange Inversion Formula
-    - icon: ':heavy_check_mark:'
-      path: fps/linear_recurrence.hpp
-      title: Linear Recurrence and Bostan-Mori
-    - icon: ':heavy_check_mark:'
-      path: fps/multipoint_evaluation.hpp
-      title: Multipoint Evaluation and Interpolation
   - name: geometry
     pages:
     - icon: ':x:'
@@ -468,90 +491,183 @@ data:
     - icon: ':heavy_check_mark:'
       path: graph/zero_one_bfs.hpp
       title: 0-1 BFS
+  - name: graph/flow
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: graph/flow/bounded_flow.hpp
+      title: Bounded Flow
+    - icon: ':heavy_check_mark:'
+      path: graph/flow/bounded_min_cost_flow.hpp
+      title: Bounded Min Cost Flow
+    - icon: ':heavy_check_mark:'
+      path: graph/flow/flow.hpp
+      title: Flow
+    - icon: ':heavy_check_mark:'
+      path: graph/flow/gomory_hu.hpp
+      title: Gomory-Hu Tree
+    - icon: ':question:'
+      path: graph/flow/max_flow.hpp
+      title: Max Flow
+    - icon: ':heavy_check_mark:'
+      path: graph/flow/min_cost_flow.hpp
+      title: Min Cost Flow
+  - name: graph/tree
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: graph/tree/all.hpp
+      title: Tree All
+    - icon: ':heavy_check_mark:'
+      path: graph/tree/centroid_decomposition.hpp
+      title: Centroid Decomposition
+    - icon: ':heavy_check_mark:'
+      path: graph/tree/diameter.hpp
+      title: Tree Diameter
+    - icon: ':heavy_check_mark:'
+      path: graph/tree/dsu_on_tree.hpp
+      title: DSU on Tree
+    - icon: ':heavy_check_mark:'
+      path: graph/tree/heavy_light_decomposition.hpp
+      title: Heavy Light Decomposition
+    - icon: ':heavy_check_mark:'
+      path: graph/tree/rerooting_dp.hpp
+      title: Rerooting DP
+    - icon: ':heavy_check_mark:'
+      path: graph/tree/rerooting_static_top_tree.hpp
+      title: Rerooting Static Top Tree
+    - icon: ':heavy_check_mark:'
+      path: graph/tree/rooted_tree.hpp
+      title: Rooted Tree
+    - icon: ':heavy_check_mark:'
+      path: graph/tree/sparse_table_lca.hpp
+      title: Sparse Table LCA
+    - icon: ':heavy_check_mark:'
+      path: graph/tree/static_top_tree.hpp
+      title: Static Top Tree
+    - icon: ':heavy_check_mark:'
+      path: graph/tree/tree.hpp
+      title: Tree
+    - icon: ':heavy_check_mark:'
+      path: graph/tree/tree_hash.hpp
+      title: Hash of Tree
+    - icon: ':heavy_check_mark:'
+      path: graph/tree/virtual_tree.hpp
+      title: Virtual Tree
+    - icon: ':heavy_check_mark:'
+      path: graph/tree/zero_one_on_tree.hpp
+      title: 01 on Tree
   - name: math
     pages:
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: math/all.hpp
       title: Math All
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/base_n.hpp
       title: Base-N Numbers
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/bernoulli.hpp
       title: Bernoulli Numbers and Power Sums
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/bit_ceil.hpp
       title: Bit Ceil
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/bitwise_convolution.hpp
       title: Bitwise Convolution
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/combinatorial_sequences.hpp
       title: Combinatorial Sequences
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/combinatorics.hpp
       title: Combinatorics
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/cyclotomic_polynomial.hpp
       title: Cyclotomic Polynomial
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/generalized_floor_sum.hpp
       title: Generalized Floor Sum
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/gray_code.hpp
       title: Gray Code
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/integer_arithmetic.hpp
       title: Integer Square Root and Power
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/lucas.hpp
       title: Lucas's Theorem
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/modint.hpp
       title: ModInt
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/number_theory.hpp
       title: Number Theory
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/prime_factorization.hpp
       title: 64-bit Prime Factorization
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/prime_sieve.hpp
       title: Prime Sieve
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: math/primitive_root.hpp
       title: Primitive Root
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/rational.hpp
       title: Rational Number
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/repunit.hpp
       title: Repunit
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/stern_brocot_tree.hpp
       title: Stern-Brocot Tree
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/tetration.hpp
       title: Tetration
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: math/totient_sum.hpp
       title: Totient Sum
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/two_square_sum.hpp
       title: Sum of Two Squares
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/zeta_mobius_transform.hpp
       title: Zeta and Mobius Transform
-  - name: matrix
+  - name: math/fps
     pages:
-    - icon: ':heavy_check_mark:'
-      path: matrix/all.hpp
+    - icon: ':question:'
+      path: math/fps/all.hpp
+      title: Formal Power Series All
+    - icon: ':question:'
+      path: math/fps/convolution.hpp
+      title: Convolution
+    - icon: ':question:'
+      path: math/fps/convolution_ll.hpp
+      title: Long Long Convolution
+    - icon: ':question:'
+      path: math/fps/floating_point_convolution.hpp
+      title: Floating-Point Convolution
+    - icon: ':question:'
+      path: math/fps/formal_power_series.hpp
+      title: Formal Power Series
+    - icon: ':question:'
+      path: math/fps/half_gcd.hpp
+      title: Polynomial Half-GCD
+    - icon: ':question:'
+      path: math/fps/lagrange_inversion.hpp
+      title: Lagrange Inversion Formula
+    - icon: ':question:'
+      path: math/fps/linear_recurrence.hpp
+      title: Linear Recurrence and Bostan-Mori
+    - icon: ':question:'
+      path: math/fps/multipoint_evaluation.hpp
+      title: Multipoint Evaluation and Interpolation
+  - name: math/matrix
+    pages:
+    - icon: ':x:'
+      path: math/matrix/all.hpp
       title: Matrix Bundle
-    - icon: ':heavy_check_mark:'
-      path: matrix/linear_algebra.hpp
+    - icon: ':x:'
+      path: math/matrix/linear_algebra.hpp
       title: Matrix Linear Algebra
-    - icon: ':heavy_check_mark:'
-      path: matrix/matrix.hpp
+    - icon: ':x:'
+      path: math/matrix/matrix.hpp
       title: Dense Matrix
   - name: matroid
     pages:
@@ -576,32 +692,6 @@ data:
     - icon: ':heavy_check_mark:'
       path: matroid/weighted_matroid_intersection.hpp
       title: Weighted Matroid Intersection
-  - name: monge
-    pages:
-    - icon: ':heavy_check_mark:'
-      path: monge/all.hpp
-      title: Monge All
-    - icon: ':heavy_check_mark:'
-      path: monge/check.hpp
-      title: Monge Checks
-    - icon: ':heavy_check_mark:'
-      path: monge/divide_and_conquer_optimization.hpp
-      title: Divide-and-Conquer DP Optimization
-    - icon: ':heavy_check_mark:'
-      path: monge/knuth_optimization.hpp
-      title: Knuth Optimization
-    - icon: ':heavy_check_mark:'
-      path: monge/larsch.hpp
-      title: LARSCH
-    - icon: ':heavy_check_mark:'
-      path: monge/min_plus_convolution.hpp
-      title: Structured Min-Plus and Max-Plus Convolution
-    - icon: ':heavy_check_mark:'
-      path: monge/monotone_minima.hpp
-      title: Monotone Minima
-    - icon: ':heavy_check_mark:'
-      path: monge/smawk.hpp
-      title: SMAWK
   - name: monoid
     pages:
     - icon: ':heavy_check_mark:'
@@ -708,44 +798,21 @@ data:
       title: Bitwise XOR Monoid
   - name: optimization
     pages:
-    - icon: ':heavy_check_mark:'
-      path: optimization/alien_trick.hpp
-      title: Alien Trick
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: optimization/all.hpp
       title: Optimization All
-    - icon: ':heavy_check_mark:'
-      path: optimization/convex_hull_trick.hpp
-      title: Convex Hull Trick
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: optimization/hungarian.hpp
       title: Hungarian Algorithm
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: optimization/integer_lp.hpp
       title: Integer Linear Programming
-    - icon: ':heavy_check_mark:'
-      path: optimization/li_chao_tree.hpp
-      title: Li Chao Tree
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: optimization/project_selection.hpp
       title: Project Selection
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: optimization/simplex.hpp
       title: Simplex Algorithm
-    - icon: ':heavy_check_mark:'
-      path: optimization/slope_trick.hpp
-      title: Slope Trick
-  - name: sequence
-    pages:
-    - icon: ':heavy_check_mark:'
-      path: sequence/inversion_count.hpp
-      title: Inversion Count
-    - icon: ':heavy_check_mark:'
-      path: sequence/lis.hpp
-      title: Longest Increasing Subsequence (LIS)
-    - icon: ':heavy_check_mark:'
-      path: sequence/subset_sum.hpp
-      title: Meet-in-the-Middle Subset Sum
   - name: string
     pages:
     - icon: ':heavy_check_mark:'
@@ -784,50 +851,6 @@ data:
     - icon: ':heavy_check_mark:'
       path: string/z_algorithm.hpp
       title: Z Algorithm
-  - name: tree
-    pages:
-    - icon: ':heavy_check_mark:'
-      path: tree/all.hpp
-      title: Tree All
-    - icon: ':heavy_check_mark:'
-      path: tree/centroid_decomposition.hpp
-      title: Centroid Decomposition
-    - icon: ':heavy_check_mark:'
-      path: tree/diameter.hpp
-      title: Tree Diameter
-    - icon: ':heavy_check_mark:'
-      path: tree/dsu_on_tree.hpp
-      title: DSU on Tree
-    - icon: ':heavy_check_mark:'
-      path: tree/heavy_light_decomposition.hpp
-      title: Heavy Light Decomposition
-    - icon: ':heavy_check_mark:'
-      path: tree/rerooting_dp.hpp
-      title: Rerooting DP
-    - icon: ':heavy_check_mark:'
-      path: tree/rerooting_static_top_tree.hpp
-      title: Rerooting Static Top Tree
-    - icon: ':heavy_check_mark:'
-      path: tree/rooted_tree.hpp
-      title: Rooted Tree
-    - icon: ':heavy_check_mark:'
-      path: tree/sparse_table_lca.hpp
-      title: Sparse Table LCA
-    - icon: ':heavy_check_mark:'
-      path: tree/static_top_tree.hpp
-      title: Static Top Tree
-    - icon: ':heavy_check_mark:'
-      path: tree/tree.hpp
-      title: Tree
-    - icon: ':heavy_check_mark:'
-      path: tree/tree_hash.hpp
-      title: Hash of Tree
-    - icon: ':heavy_check_mark:'
-      path: tree/virtual_tree.hpp
-      title: Virtual Tree
-    - icon: ':heavy_check_mark:'
-      path: tree/zero_one_on_tree.hpp
-      title: 01 on Tree
   - name: utilities
     pages:
     - icon: ':heavy_check_mark:'
@@ -845,7 +868,7 @@ data:
     - icon: ':heavy_check_mark:'
       path: utilities/dice.hpp
       title: Dice
-    - icon: ':warning:'
+    - icon: ':x:'
       path: utilities/dynamic_bitset.hpp
       title: Dynamic Bitset
     - icon: ':heavy_check_mark:'
@@ -876,6 +899,44 @@ data:
       path: utilities/y_combinator.hpp
       title: Y Combinator
   verificationCategories:
+  - name: verify/algo/dp_optimization
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/algo/dp_optimization/alien_trick.test.cpp
+      title: verify/algo/dp_optimization/alien_trick.test.cpp
+  - name: verify/algo/dp_optimization/monge
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/algo/dp_optimization/monge/max_plus_convolution_concave_arbitrary.test.cpp
+      title: verify/algo/dp_optimization/monge/max_plus_convolution_concave_arbitrary.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/algo/dp_optimization/monge/max_plus_convolution_concave_concave.test.cpp
+      title: verify/algo/dp_optimization/monge/max_plus_convolution_concave_concave.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/algo/dp_optimization/monge/min_plus_convolution_convex_arbitrary.test.cpp
+      title: verify/algo/dp_optimization/monge/min_plus_convolution_convex_arbitrary.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/algo/dp_optimization/monge/min_plus_convolution_convex_convex.test.cpp
+      title: verify/algo/dp_optimization/monge/min_plus_convolution_convex_convex.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/algo/dp_optimization/monge/monge_algorithms.test.cpp
+      title: verify/algo/dp_optimization/monge/monge_algorithms.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/algo/dp_optimization/monge/monge_dp_optimization.test.cpp
+      title: verify/algo/dp_optimization/monge/monge_dp_optimization.test.cpp
+  - name: verify/algo/sequence
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/algo/sequence/sequence_algorithms.test.cpp
+      title: verify/algo/sequence/sequence_algorithms.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/algo/sequence/subset_sum.test.cpp
+      title: verify/algo/sequence/subset_sum.test.cpp
+  - name: verify/ds/convex_function
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/convex_function/slope_trick.test.cpp
+      title: verify/ds/convex_function/slope_trick.test.cpp
   - name: verify/ds/dsu
     pages:
     - icon: ':heavy_check_mark:'
@@ -971,6 +1032,14 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/ds/interval_set/interval_set.test.cpp
       title: verify/ds/interval_set/interval_set.test.cpp
+  - name: verify/ds/line_container
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/line_container/convex_hull_trick.test.cpp
+      title: verify/ds/line_container/convex_hull_trick.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/line_container/li_chao_tree.test.cpp
+      title: verify/ds/line_container/li_chao_tree.test.cpp
   - name: verify/ds/ordered_set
     pages:
     - icon: ':heavy_check_mark:'
@@ -1079,52 +1148,6 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/ds/segtree/segtree_beats.test.cpp
       title: verify/ds/segtree/segtree_beats.test.cpp
-  - name: verify/flow
-    pages:
-    - icon: ':heavy_check_mark:'
-      path: verify/flow/flow_algorithms.test.cpp
-      title: verify/flow/flow_algorithms.test.cpp
-  - name: verify/fps
-    pages:
-    - icon: ':heavy_check_mark:'
-      path: verify/fps/convolution_ll.test.cpp
-      title: verify/fps/convolution_ll.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/fps/convolution_mod.test.cpp
-      title: verify/fps/convolution_mod.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/fps/exp_of_formal_power_series.test.cpp
-      title: verify/fps/exp_of_formal_power_series.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/fps/floating_point_convolution.test.cpp
-      title: verify/fps/floating_point_convolution.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/fps/fps_algorithms.test.cpp
-      title: verify/fps/fps_algorithms.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/fps/half_gcd.test.cpp
-      title: verify/fps/half_gcd.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/fps/inv_of_formal_power_series.test.cpp
-      title: verify/fps/inv_of_formal_power_series.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
-      title: verify/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/fps/lagrange_inversion.test.cpp
-      title: verify/fps/lagrange_inversion.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/fps/multipoint_evaluation.test.cpp
-      title: verify/fps/multipoint_evaluation.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/fps/polynomial_interpolation.test.cpp
-      title: verify/fps/polynomial_interpolation.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/fps/polynomial_taylor_shift.test.cpp
-      title: verify/fps/polynomial_taylor_shift.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/fps/pow_of_formal_power_series.test.cpp
-      title: verify/fps/pow_of_formal_power_series.test.cpp
   - name: verify/geometry
     pages:
     - icon: ':heavy_check_mark:'
@@ -1210,6 +1233,25 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/graph/two_sat.test.cpp
       title: verify/graph/two_sat.test.cpp
+  - name: verify/graph/flow
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/flow/flow_algorithms.test.cpp
+      title: verify/graph/flow/flow_algorithms.test.cpp
+  - name: verify/graph/tree
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/tree/dsu_on_tree.test.cpp
+      title: verify/graph/tree/dsu_on_tree.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
+      title: verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/tree/tree_algorithms.test.cpp
+      title: verify/graph/tree/tree_algorithms.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/tree/zero_one_on_tree.test.cpp
+      title: verify/graph/tree/zero_one_on_tree.test.cpp
   - name: verify/math
     pages:
     - icon: ':heavy_check_mark:'
@@ -1254,13 +1296,13 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/lucas.test.cpp
       title: verify/math/lucas.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: verify/math/math_algorithms.test.cpp
       title: verify/math/math_algorithms.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/modint.test.cpp
       title: verify/math/modint.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: verify/math/partition_function.test.cpp
       title: verify/math/partition_function.test.cpp
     - icon: ':heavy_check_mark:'
@@ -1275,7 +1317,7 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/stern_brocot_tree.test.cpp
       title: verify/math/stern_brocot_tree.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: verify/math/stirling_number_of_the_second_kind.test.cpp
       title: verify/math/stirling_number_of_the_second_kind.test.cpp
     - icon: ':heavy_check_mark:'
@@ -1296,17 +1338,58 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/zeta_mobius_transform.test.cpp
       title: verify/math/zeta_mobius_transform.test.cpp
-  - name: verify/matrix
+  - name: verify/math/fps
     pages:
     - icon: ':heavy_check_mark:'
-      path: verify/matrix/inverse_matrix.test.cpp
-      title: verify/matrix/inverse_matrix.test.cpp
+      path: verify/math/fps/convolution_ll.test.cpp
+      title: verify/math/fps/convolution_ll.test.cpp
     - icon: ':heavy_check_mark:'
-      path: verify/matrix/matrix.test.cpp
-      title: verify/matrix/matrix.test.cpp
+      path: verify/math/fps/convolution_mod.test.cpp
+      title: verify/math/fps/convolution_mod.test.cpp
     - icon: ':heavy_check_mark:'
-      path: verify/matrix/matrix_product.test.cpp
-      title: verify/matrix/matrix_product.test.cpp
+      path: verify/math/fps/exp_of_formal_power_series.test.cpp
+      title: verify/math/fps/exp_of_formal_power_series.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/fps/floating_point_convolution.test.cpp
+      title: verify/math/fps/floating_point_convolution.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/fps/fps_algorithms.test.cpp
+      title: verify/math/fps/fps_algorithms.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/fps/half_gcd.test.cpp
+      title: verify/math/fps/half_gcd.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/fps/inv_of_formal_power_series.test.cpp
+      title: verify/math/fps/inv_of_formal_power_series.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
+      title: verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/fps/lagrange_inversion.test.cpp
+      title: verify/math/fps/lagrange_inversion.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/fps/multipoint_evaluation.test.cpp
+      title: verify/math/fps/multipoint_evaluation.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/fps/polynomial_interpolation.test.cpp
+      title: verify/math/fps/polynomial_interpolation.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/fps/polynomial_taylor_shift.test.cpp
+      title: verify/math/fps/polynomial_taylor_shift.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/fps/pow_of_formal_power_series.test.cpp
+      title: verify/math/fps/pow_of_formal_power_series.test.cpp
+  - name: verify/math/matrix
+    pages:
+    - icon: ':x:'
+      path: verify/math/matrix/inverse_matrix.test.cpp
+      title: verify/math/matrix/inverse_matrix.test.cpp
+    - icon: ':x:'
+      path: verify/math/matrix/matrix.test.cpp
+      title: verify/math/matrix/matrix.test.cpp
+    - icon: ':x:'
+      path: verify/math/matrix/matrix_product.test.cpp
+      title: verify/math/matrix/matrix_product.test.cpp
   - name: verify/matroid
     pages:
     - icon: ':heavy_check_mark:'
@@ -1318,60 +1401,20 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/matroid/weighted_matroid_intersection.test.cpp
       title: verify/matroid/weighted_matroid_intersection.test.cpp
-  - name: verify/monge
-    pages:
-    - icon: ':heavy_check_mark:'
-      path: verify/monge/max_plus_convolution_concave_arbitrary.test.cpp
-      title: verify/monge/max_plus_convolution_concave_arbitrary.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/monge/max_plus_convolution_concave_concave.test.cpp
-      title: verify/monge/max_plus_convolution_concave_concave.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/monge/min_plus_convolution_convex_arbitrary.test.cpp
-      title: verify/monge/min_plus_convolution_convex_arbitrary.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/monge/min_plus_convolution_convex_convex.test.cpp
-      title: verify/monge/min_plus_convolution_convex_convex.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/monge/monge_algorithms.test.cpp
-      title: verify/monge/monge_algorithms.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/monge/monge_dp_optimization.test.cpp
-      title: verify/monge/monge_dp_optimization.test.cpp
   - name: verify/optimization
     pages:
-    - icon: ':heavy_check_mark:'
-      path: verify/optimization/alien_trick.test.cpp
-      title: verify/optimization/alien_trick.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/optimization/convex_hull_trick.test.cpp
-      title: verify/optimization/convex_hull_trick.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: verify/optimization/hungarian.test.cpp
       title: verify/optimization/hungarian.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: verify/optimization/integer_lp.test.cpp
       title: verify/optimization/integer_lp.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/optimization/li_chao_tree.test.cpp
-      title: verify/optimization/li_chao_tree.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: verify/optimization/project_selection.test.cpp
       title: verify/optimization/project_selection.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: verify/optimization/simplex.test.cpp
       title: verify/optimization/simplex.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/optimization/slope_trick.test.cpp
-      title: verify/optimization/slope_trick.test.cpp
-  - name: verify/sequence
-    pages:
-    - icon: ':heavy_check_mark:'
-      path: verify/sequence/sequence_algorithms.test.cpp
-      title: verify/sequence/sequence_algorithms.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/sequence/subset_sum.test.cpp
-      title: verify/sequence/subset_sum.test.cpp
   - name: verify/string
     pages:
     - icon: ':heavy_check_mark:'
@@ -1410,20 +1453,6 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/string/yosupo_zalgorithm.test.cpp
       title: verify/string/yosupo_zalgorithm.test.cpp
-  - name: verify/tree
-    pages:
-    - icon: ':heavy_check_mark:'
-      path: verify/tree/dsu_on_tree.test.cpp
-      title: verify/tree/dsu_on_tree.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/tree/rooted_tree_isomorphism_classification.test.cpp
-      title: verify/tree/rooted_tree_isomorphism_classification.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/tree/tree_algorithms.test.cpp
-      title: verify/tree/tree_algorithms.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/tree/zero_one_on_tree.test.cpp
-      title: verify/tree/zero_one_on_tree.test.cpp
   - name: verify/utilities
     pages:
     - icon: ':heavy_check_mark:'
@@ -1435,6 +1464,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/utilities/dice.test.cpp
       title: verify/utilities/dice.test.cpp
+    - icon: ':x:'
+      path: verify/utilities/dynamic_bitset.test.cpp
+      title: verify/utilities/dynamic_bitset.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/utilities/extra_utilities.test.cpp
       title: verify/utilities/extra_utilities.test.cpp

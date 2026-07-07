@@ -6,27 +6,39 @@ data:
     title: Monoid Concept
   _extendedRequiredBy:
   - icon: ':heavy_check_mark:'
-    path: tree/all.hpp
+    path: graph/all.hpp
+    title: Graph All
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/all.hpp
     title: Tree All
   - icon: ':heavy_check_mark:'
-    path: tree/sparse_table_lca.hpp
+    path: graph/tree/sparse_table_lca.hpp
     title: Sparse Table LCA
   - icon: ':heavy_check_mark:'
-    path: tree/tree.hpp
+    path: graph/tree/tree.hpp
     title: Tree
   - icon: ':heavy_check_mark:'
-    path: tree/virtual_tree.hpp
+    path: graph/tree/virtual_tree.hpp
     title: Virtual Tree
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/ds/range_query/sparse_table.test.cpp
     title: verify/ds/range_query/sparse_table.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/cow_game.test.cpp
+    title: verify/graph/cow_game.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/graph_algorithms.test.cpp
+    title: verify/graph/graph_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/library_checker_lowest_common_ancestor.test.cpp
     title: verify/graph/library_checker_lowest_common_ancestor.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/tree/tree_algorithms.test.cpp
-    title: verify/tree/tree_algorithms.test.cpp
+    path: verify/graph/range_edge_graph.test.cpp
+    title: verify/graph/range_edge_graph.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/tree_algorithms.test.cpp
+    title: verify/graph/tree/tree_algorithms.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -153,16 +165,20 @@ data:
   isVerificationFile: false
   path: ds/range_query/sparse_table.hpp
   requiredBy:
-  - tree/sparse_table_lca.hpp
-  - tree/all.hpp
-  - tree/virtual_tree.hpp
-  - tree/tree.hpp
+  - graph/tree/sparse_table_lca.hpp
+  - graph/tree/all.hpp
+  - graph/tree/virtual_tree.hpp
+  - graph/tree/tree.hpp
+  - graph/all.hpp
   timestamp: '2026-06-21 04:34:53+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/tree/tree_algorithms.test.cpp
   - verify/ds/range_query/sparse_table.test.cpp
+  - verify/graph/cow_game.test.cpp
   - verify/graph/library_checker_lowest_common_ancestor.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/tree/tree_algorithms.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
 documentation_of: ds/range_query/sparse_table.hpp
 layout: document
 title: Sparse Table

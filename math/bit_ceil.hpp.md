@@ -20,7 +20,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: ds/segtree/segtree_beats.hpp
     title: Generic Segment Tree Beats!
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: math/all.hpp
     title: Math All
   _extendedVerifiedWith:
@@ -42,12 +42,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/segtree_beats.test.cpp
     title: verify/ds/segtree/segtree_beats.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
-  _isVerificationFailed: false
+  _isVerificationFailed: true
   _pathExtension: hpp
-  _verificationStatusIcon: ':heavy_check_mark:'
+  _verificationStatusIcon: ':question:'
   attributes:
     links: []
   bundledCode: "#line 1 \"math/bit_ceil.hpp\"\n\n\n\nnamespace m1une {\nnamespace\
@@ -70,7 +70,7 @@ data:
   - ds/segtree/segtree_beats.hpp
   - math/all.hpp
   timestamp: '2026-06-15 01:47:39+09:00'
-  verificationStatus: LIBRARY_ALL_AC
+  verificationStatus: LIBRARY_SOME_WA
   verifiedWith:
   - verify/ds/segtree/dual_segtree_2d.test.cpp
   - verify/ds/segtree/dual_segtree.test.cpp

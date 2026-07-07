@@ -6,6 +6,9 @@ data:
     path: graph/all.hpp
     title: Graph All
   - icon: ':heavy_check_mark:'
+    path: graph/all.hpp
+    title: Graph All
+  - icon: ':heavy_check_mark:'
     path: graph/bellman_ford.hpp
     title: Bellman-Ford
   - icon: ':heavy_check_mark:'
@@ -66,6 +69,48 @@ data:
     path: graph/topological_sort.hpp
     title: Topological Sort
   - icon: ':heavy_check_mark:'
+    path: graph/tree/all.hpp
+    title: Tree All
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/centroid_decomposition.hpp
+    title: Centroid Decomposition
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/diameter.hpp
+    title: Tree Diameter
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/dsu_on_tree.hpp
+    title: DSU on Tree
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/heavy_light_decomposition.hpp
+    title: Heavy Light Decomposition
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/rerooting_dp.hpp
+    title: Rerooting DP
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/rerooting_static_top_tree.hpp
+    title: Rerooting Static Top Tree
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/rooted_tree.hpp
+    title: Rooted Tree
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/sparse_table_lca.hpp
+    title: Sparse Table LCA
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/static_top_tree.hpp
+    title: Static Top Tree
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/tree.hpp
+    title: Tree
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/tree_hash.hpp
+    title: Hash of Tree
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/virtual_tree.hpp
+    title: Virtual Tree
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/zero_one_on_tree.hpp
+    title: 01 on Tree
+  - icon: ':heavy_check_mark:'
     path: graph/undirected.hpp
     title: Undirected Graph Algorithms
   - icon: ':heavy_check_mark:'
@@ -74,49 +119,10 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/zero_one_bfs.hpp
     title: 0-1 BFS
-  - icon: ':heavy_check_mark:'
-    path: tree/all.hpp
-    title: Tree All
-  - icon: ':heavy_check_mark:'
-    path: tree/centroid_decomposition.hpp
-    title: Centroid Decomposition
-  - icon: ':heavy_check_mark:'
-    path: tree/diameter.hpp
-    title: Tree Diameter
-  - icon: ':heavy_check_mark:'
-    path: tree/dsu_on_tree.hpp
-    title: DSU on Tree
-  - icon: ':heavy_check_mark:'
-    path: tree/heavy_light_decomposition.hpp
-    title: Heavy Light Decomposition
-  - icon: ':heavy_check_mark:'
-    path: tree/rerooting_dp.hpp
-    title: Rerooting DP
-  - icon: ':heavy_check_mark:'
-    path: tree/rerooting_static_top_tree.hpp
-    title: Rerooting Static Top Tree
-  - icon: ':heavy_check_mark:'
-    path: tree/rooted_tree.hpp
-    title: Rooted Tree
-  - icon: ':heavy_check_mark:'
-    path: tree/sparse_table_lca.hpp
-    title: Sparse Table LCA
-  - icon: ':heavy_check_mark:'
-    path: tree/static_top_tree.hpp
-    title: Static Top Tree
-  - icon: ':heavy_check_mark:'
-    path: tree/tree.hpp
-    title: Tree
-  - icon: ':heavy_check_mark:'
-    path: tree/tree_hash.hpp
-    title: Hash of Tree
-  - icon: ':heavy_check_mark:'
-    path: tree/virtual_tree.hpp
-    title: Virtual Tree
-  - icon: ':heavy_check_mark:'
-    path: tree/zero_one_on_tree.hpp
-    title: 01 on Tree
   _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/cow_game.test.cpp
+    title: verify/graph/cow_game.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/cow_game.test.cpp
     title: verify/graph/cow_game.test.cpp
@@ -126,6 +132,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/dominator_tree.test.cpp
     title: verify/graph/dominator_tree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/graph_algorithms.test.cpp
+    title: verify/graph/graph_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/graph_algorithms.test.cpp
     title: verify/graph/graph_algorithms.test.cpp
@@ -157,29 +166,32 @@ data:
     path: verify/graph/range_edge_graph.test.cpp
     title: verify/graph/range_edge_graph.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/tree/dsu_on_tree.test.cpp
-    title: verify/tree/dsu_on_tree.test.cpp
+    path: verify/graph/range_edge_graph.test.cpp
+    title: verify/graph/range_edge_graph.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/tree/dsu_on_tree.test.cpp
-    title: verify/tree/dsu_on_tree.test.cpp
+    path: verify/graph/tree/dsu_on_tree.test.cpp
+    title: verify/graph/tree/dsu_on_tree.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/tree/rooted_tree_isomorphism_classification.test.cpp
-    title: verify/tree/rooted_tree_isomorphism_classification.test.cpp
+    path: verify/graph/tree/dsu_on_tree.test.cpp
+    title: verify/graph/tree/dsu_on_tree.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/tree/rooted_tree_isomorphism_classification.test.cpp
-    title: verify/tree/rooted_tree_isomorphism_classification.test.cpp
+    path: verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
+    title: verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/tree/tree_algorithms.test.cpp
-    title: verify/tree/tree_algorithms.test.cpp
+    path: verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
+    title: verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/tree/tree_algorithms.test.cpp
-    title: verify/tree/tree_algorithms.test.cpp
+    path: verify/graph/tree/tree_algorithms.test.cpp
+    title: verify/graph/tree/tree_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/tree/zero_one_on_tree.test.cpp
-    title: verify/tree/zero_one_on_tree.test.cpp
+    path: verify/graph/tree/tree_algorithms.test.cpp
+    title: verify/graph/tree/tree_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/tree/zero_one_on_tree.test.cpp
-    title: verify/tree/zero_one_on_tree.test.cpp
+    path: verify/graph/tree/zero_one_on_tree.test.cpp
+    title: verify/graph/tree/zero_one_on_tree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/zero_one_on_tree.test.cpp
+    title: verify/graph/tree/zero_one_on_tree.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -299,20 +311,6 @@ data:
   isVerificationFile: false
   path: graph/graph.hpp
   requiredBy:
-  - tree/zero_one_on_tree.hpp
-  - tree/centroid_decomposition.hpp
-  - tree/sparse_table_lca.hpp
-  - tree/rooted_tree.hpp
-  - tree/rerooting_dp.hpp
-  - tree/all.hpp
-  - tree/rerooting_static_top_tree.hpp
-  - tree/heavy_light_decomposition.hpp
-  - tree/static_top_tree.hpp
-  - tree/dsu_on_tree.hpp
-  - tree/tree_hash.hpp
-  - tree/virtual_tree.hpp
-  - tree/tree.hpp
-  - tree/diameter.hpp
   - graph/maximum_clique.hpp
   - graph/dijkstra.hpp
   - graph/scc.hpp
@@ -323,8 +321,23 @@ data:
   - graph/bellman_ford.hpp
   - graph/dag_shortest_path.hpp
   - graph/namori.hpp
+  - graph/tree/zero_one_on_tree.hpp
+  - graph/tree/centroid_decomposition.hpp
+  - graph/tree/sparse_table_lca.hpp
+  - graph/tree/rooted_tree.hpp
+  - graph/tree/rerooting_dp.hpp
+  - graph/tree/all.hpp
+  - graph/tree/rerooting_static_top_tree.hpp
+  - graph/tree/heavy_light_decomposition.hpp
+  - graph/tree/static_top_tree.hpp
+  - graph/tree/dsu_on_tree.hpp
+  - graph/tree/tree_hash.hpp
+  - graph/tree/virtual_tree.hpp
+  - graph/tree/tree.hpp
+  - graph/tree/diameter.hpp
   - graph/dominator_tree.hpp
   - graph/connected_components.hpp
+  - graph/all.hpp
   - graph/all.hpp
   - graph/lowlink.hpp
   - graph/zero_one_bfs.hpp
@@ -340,16 +353,9 @@ data:
   timestamp: '2026-06-17 14:06:24+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/tree/rooted_tree_isomorphism_classification.test.cpp
-  - verify/tree/rooted_tree_isomorphism_classification.test.cpp
-  - verify/tree/tree_algorithms.test.cpp
-  - verify/tree/tree_algorithms.test.cpp
-  - verify/tree/dsu_on_tree.test.cpp
-  - verify/tree/dsu_on_tree.test.cpp
-  - verify/tree/zero_one_on_tree.test.cpp
-  - verify/tree/zero_one_on_tree.test.cpp
   - verify/graph/library_checker_maximum_independent_set.test.cpp
   - verify/graph/library_checker_maximum_independent_set.test.cpp
+  - verify/graph/cow_game.test.cpp
   - verify/graph/cow_game.test.cpp
   - verify/graph/library_checker_lowest_common_ancestor.test.cpp
   - verify/graph/library_checker_lowest_common_ancestor.test.cpp
@@ -357,8 +363,18 @@ data:
   - verify/graph/library_checker_general_matching.test.cpp
   - verify/graph/library_checker_general_matching.test.cpp
   - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
+  - verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
+  - verify/graph/tree/tree_algorithms.test.cpp
+  - verify/graph/tree/tree_algorithms.test.cpp
+  - verify/graph/tree/dsu_on_tree.test.cpp
+  - verify/graph/tree/dsu_on_tree.test.cpp
+  - verify/graph/tree/zero_one_on_tree.test.cpp
+  - verify/graph/tree/zero_one_on_tree.test.cpp
   - verify/graph/dominator_tree.test.cpp
   - verify/graph/dominator_tree.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/namori.test.cpp
 documentation_of: graph/graph.hpp

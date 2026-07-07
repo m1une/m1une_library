@@ -1,13 +1,13 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/cyclotomic_polynomial.hpp
     title: Cyclotomic Polynomial
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/modint.hpp
     title: ModInt
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/prime_factorization.hpp
     title: 64-bit Prime Factorization
   _extendedRequiredBy: []

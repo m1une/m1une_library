@@ -2,41 +2,38 @@
 data:
   _extendedDependsOn: []
   _extendedRequiredBy:
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: optimization/all.hpp
     title: Optimization All
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: optimization/integer_lp.hpp
     title: Integer Linear Programming
   _extendedVerifiedWith:
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/optimization/integer_lp.test.cpp
     title: verify/optimization/integer_lp.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/optimization/project_selection.test.cpp
     title: verify/optimization/project_selection.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/optimization/simplex.test.cpp
     title: verify/optimization/simplex.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/optimization/slope_trick.test.cpp
-    title: verify/optimization/slope_trick.test.cpp
-  _isVerificationFailed: false
+  _isVerificationFailed: true
   _pathExtension: hpp
-  _verificationStatusIcon: ':heavy_check_mark:'
+  _verificationStatusIcon: ':x:'
   attributes:
     links: []
   bundledCode: "#line 1 \"optimization/simplex.hpp\"\n\n\n\n#include <cassert>\n#include\
     \ <limits>\n#include <type_traits>\n#include <utility>\n#include <vector>\n\n\
-    namespace m1une {\nnamespace optimization {\n\nenum class SimplexStatus {\n  \
-    \  Optimal,\n    Infeasible,\n    Unbounded,\n};\n\ntemplate <class T>\nstruct\
-    \ SimplexResult {\n    SimplexStatus status;\n    T objective_value;\n    std::vector<T>\
-    \ variables;\n\n    bool is_optimal() const { return status == SimplexStatus::Optimal;\
-    \ }\n    bool is_infeasible() const { return status == SimplexStatus::Infeasible;\
-    \ }\n    bool is_unbounded() const { return status == SimplexStatus::Unbounded;\
-    \ }\n};\n\nnamespace detail {\n\ntemplate <class T>\nT simplex_abs(T x) {\n  \
-    \  return x < T() ? -x : x;\n}\n\ntemplate <class T>\nstruct SimplexTableau {\n\
-    \    int constraint_count;\n    int variable_count;\n    T eps;\n    std::vector<int>\
+    namespace m1une {\nnamespace opt {\n\nenum class SimplexStatus {\n    Optimal,\n\
+    \    Infeasible,\n    Unbounded,\n};\n\ntemplate <class T>\nstruct SimplexResult\
+    \ {\n    SimplexStatus status;\n    T objective_value;\n    std::vector<T> variables;\n\
+    \n    bool is_optimal() const { return status == SimplexStatus::Optimal; }\n \
+    \   bool is_infeasible() const { return status == SimplexStatus::Infeasible; }\n\
+    \    bool is_unbounded() const { return status == SimplexStatus::Unbounded; }\n\
+    };\n\nnamespace detail {\n\ntemplate <class T>\nT simplex_abs(T x) {\n    return\
+    \ x < T() ? -x : x;\n}\n\ntemplate <class T>\nstruct SimplexTableau {\n    int\
+    \ constraint_count;\n    int variable_count;\n    T eps;\n    std::vector<int>\
     \ basis;\n    std::vector<int> nonbasis;\n    std::vector<std::vector<T>> table;\n\
     \n    SimplexTableau(const std::vector<std::vector<T>>& a, const std::vector<T>&\
     \ b,\n                   const std::vector<T>& c, T epsilon)\n        : constraint_count(int(b.size())),\n\
@@ -125,47 +122,46 @@ data:
     \ <class T>\nSimplexResult<T> simplex(const std::vector<std::vector<T>>& a, const\
     \ std::vector<T>& b,\n                         const std::vector<T>& c, T eps\
     \ = T(1e-10)) {\n    return simplex_maximize(a, b, c, eps);\n}\n\n}  // namespace\
-    \ optimization\n}  // namespace m1une\n\n\n"
+    \ opt\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_OPTIMIZATION_SIMPLEX_HPP\n#define M1UNE_OPTIMIZATION_SIMPLEX_HPP\
     \ 1\n\n#include <cassert>\n#include <limits>\n#include <type_traits>\n#include\
-    \ <utility>\n#include <vector>\n\nnamespace m1une {\nnamespace optimization {\n\
-    \nenum class SimplexStatus {\n    Optimal,\n    Infeasible,\n    Unbounded,\n\
-    };\n\ntemplate <class T>\nstruct SimplexResult {\n    SimplexStatus status;\n\
-    \    T objective_value;\n    std::vector<T> variables;\n\n    bool is_optimal()\
-    \ const { return status == SimplexStatus::Optimal; }\n    bool is_infeasible()\
-    \ const { return status == SimplexStatus::Infeasible; }\n    bool is_unbounded()\
-    \ const { return status == SimplexStatus::Unbounded; }\n};\n\nnamespace detail\
-    \ {\n\ntemplate <class T>\nT simplex_abs(T x) {\n    return x < T() ? -x : x;\n\
-    }\n\ntemplate <class T>\nstruct SimplexTableau {\n    int constraint_count;\n\
-    \    int variable_count;\n    T eps;\n    std::vector<int> basis;\n    std::vector<int>\
-    \ nonbasis;\n    std::vector<std::vector<T>> table;\n\n    SimplexTableau(const\
-    \ std::vector<std::vector<T>>& a, const std::vector<T>& b,\n                 \
-    \  const std::vector<T>& c, T epsilon)\n        : constraint_count(int(b.size())),\n\
-    \          variable_count(int(c.size())),\n          eps(epsilon),\n         \
-    \ basis(constraint_count),\n          nonbasis(variable_count + 1),\n        \
-    \  table(constraint_count + 2, std::vector<T>(variable_count + 2, T())) {\n  \
-    \      for (int i = 0; i < constraint_count; i++) {\n            for (int j =\
-    \ 0; j < variable_count; j++) table[i][j] = a[i][j];\n        }\n        for (int\
-    \ i = 0; i < constraint_count; i++) {\n            basis[i] = variable_count +\
-    \ i;\n            table[i][artificial_col()] = T(-1);\n            table[i][rhs_col()]\
-    \ = b[i];\n        }\n        for (int j = 0; j < variable_count; j++) {\n   \
-    \         nonbasis[j] = j;\n            table[objective_row()][j] = -c[j];\n \
-    \       }\n        nonbasis[artificial_col()] = artificial_id();\n        table[auxiliary_row()][artificial_col()]\
-    \ = T(1);\n    }\n\n    int objective_row() const { return constraint_count; }\n\
-    \    int auxiliary_row() const { return constraint_count + 1; }\n    int artificial_col()\
-    \ const { return variable_count; }\n    int rhs_col() const { return variable_count\
-    \ + 1; }\n    int artificial_id() const { return -1; }\n\n    T normalize(T x)\
-    \ const {\n        return simplex_abs(x) <= eps ? T() : x;\n    }\n\n    bool\
-    \ less_with_tie(int row, int lhs, int rhs) const {\n        if (table[row][lhs]\
-    \ < table[row][rhs] - eps) return true;\n        if (table[row][rhs] < table[row][lhs]\
-    \ - eps) return false;\n        return nonbasis[lhs] < nonbasis[rhs];\n    }\n\
-    \n    bool better_leaving_row(int lhs, int rhs, int entering_col) const {\n  \
-    \      T lhs_ratio = table[lhs][rhs_col()] / table[lhs][entering_col];\n     \
-    \   T rhs_ratio = table[rhs][rhs_col()] / table[rhs][entering_col];\n        if\
-    \ (lhs_ratio < rhs_ratio - eps) return true;\n        if (rhs_ratio < lhs_ratio\
-    \ - eps) return false;\n        return basis[lhs] < basis[rhs];\n    }\n\n   \
-    \ void pivot(int leaving_row, int entering_col) {\n        T inverse = T(1) /\
-    \ table[leaving_row][entering_col];\n        for (int i = 0; i < constraint_count\
+    \ <utility>\n#include <vector>\n\nnamespace m1une {\nnamespace opt {\n\nenum class\
+    \ SimplexStatus {\n    Optimal,\n    Infeasible,\n    Unbounded,\n};\n\ntemplate\
+    \ <class T>\nstruct SimplexResult {\n    SimplexStatus status;\n    T objective_value;\n\
+    \    std::vector<T> variables;\n\n    bool is_optimal() const { return status\
+    \ == SimplexStatus::Optimal; }\n    bool is_infeasible() const { return status\
+    \ == SimplexStatus::Infeasible; }\n    bool is_unbounded() const { return status\
+    \ == SimplexStatus::Unbounded; }\n};\n\nnamespace detail {\n\ntemplate <class\
+    \ T>\nT simplex_abs(T x) {\n    return x < T() ? -x : x;\n}\n\ntemplate <class\
+    \ T>\nstruct SimplexTableau {\n    int constraint_count;\n    int variable_count;\n\
+    \    T eps;\n    std::vector<int> basis;\n    std::vector<int> nonbasis;\n   \
+    \ std::vector<std::vector<T>> table;\n\n    SimplexTableau(const std::vector<std::vector<T>>&\
+    \ a, const std::vector<T>& b,\n                   const std::vector<T>& c, T epsilon)\n\
+    \        : constraint_count(int(b.size())),\n          variable_count(int(c.size())),\n\
+    \          eps(epsilon),\n          basis(constraint_count),\n          nonbasis(variable_count\
+    \ + 1),\n          table(constraint_count + 2, std::vector<T>(variable_count +\
+    \ 2, T())) {\n        for (int i = 0; i < constraint_count; i++) {\n         \
+    \   for (int j = 0; j < variable_count; j++) table[i][j] = a[i][j];\n        }\n\
+    \        for (int i = 0; i < constraint_count; i++) {\n            basis[i] =\
+    \ variable_count + i;\n            table[i][artificial_col()] = T(-1);\n     \
+    \       table[i][rhs_col()] = b[i];\n        }\n        for (int j = 0; j < variable_count;\
+    \ j++) {\n            nonbasis[j] = j;\n            table[objective_row()][j]\
+    \ = -c[j];\n        }\n        nonbasis[artificial_col()] = artificial_id();\n\
+    \        table[auxiliary_row()][artificial_col()] = T(1);\n    }\n\n    int objective_row()\
+    \ const { return constraint_count; }\n    int auxiliary_row() const { return constraint_count\
+    \ + 1; }\n    int artificial_col() const { return variable_count; }\n    int rhs_col()\
+    \ const { return variable_count + 1; }\n    int artificial_id() const { return\
+    \ -1; }\n\n    T normalize(T x) const {\n        return simplex_abs(x) <= eps\
+    \ ? T() : x;\n    }\n\n    bool less_with_tie(int row, int lhs, int rhs) const\
+    \ {\n        if (table[row][lhs] < table[row][rhs] - eps) return true;\n     \
+    \   if (table[row][rhs] < table[row][lhs] - eps) return false;\n        return\
+    \ nonbasis[lhs] < nonbasis[rhs];\n    }\n\n    bool better_leaving_row(int lhs,\
+    \ int rhs, int entering_col) const {\n        T lhs_ratio = table[lhs][rhs_col()]\
+    \ / table[lhs][entering_col];\n        T rhs_ratio = table[rhs][rhs_col()] / table[rhs][entering_col];\n\
+    \        if (lhs_ratio < rhs_ratio - eps) return true;\n        if (rhs_ratio\
+    \ < lhs_ratio - eps) return false;\n        return basis[lhs] < basis[rhs];\n\
+    \    }\n\n    void pivot(int leaving_row, int entering_col) {\n        T inverse\
+    \ = T(1) / table[leaving_row][entering_col];\n        for (int i = 0; i < constraint_count\
     \ + 2; i++) {\n            if (i == leaving_row) continue;\n            for (int\
     \ j = 0; j < variable_count + 2; j++) {\n                if (j == entering_col)\
     \ continue;\n                table[i][j] -= table[leaving_row][j] * table[i][entering_col]\
@@ -226,19 +222,18 @@ data:
     \ <class T>\nSimplexResult<T> simplex(const std::vector<std::vector<T>>& a, const\
     \ std::vector<T>& b,\n                         const std::vector<T>& c, T eps\
     \ = T(1e-10)) {\n    return simplex_maximize(a, b, c, eps);\n}\n\n}  // namespace\
-    \ optimization\n}  // namespace m1une\n\n#endif  // M1UNE_OPTIMIZATION_SIMPLEX_HPP\n"
+    \ opt\n}  // namespace m1une\n\n#endif  // M1UNE_OPTIMIZATION_SIMPLEX_HPP\n"
   dependsOn: []
   isVerificationFile: false
   path: optimization/simplex.hpp
   requiredBy:
   - optimization/integer_lp.hpp
   - optimization/all.hpp
-  timestamp: '2026-06-18 01:30:22+09:00'
-  verificationStatus: LIBRARY_ALL_AC
+  timestamp: '2026-07-07 14:26:59+09:00'
+  verificationStatus: LIBRARY_ALL_WA
   verifiedWith:
   - verify/optimization/project_selection.test.cpp
   - verify/optimization/integer_lp.test.cpp
-  - verify/optimization/slope_trick.test.cpp
   - verify/optimization/simplex.test.cpp
 documentation_of: optimization/simplex.hpp
 layout: document
@@ -323,7 +318,7 @@ int main() {
     std::vector<long double> b = {4, 2, 3};
     std::vector<long double> c = {3, 2};
 
-    auto result = m1une::optimization::simplex_maximize(a, b, c);
+    auto result = m1une::opt::simplex_maximize(a, b, c);
     if (result.is_optimal()) {
         std::cout << result.objective_value << "\n";  // 10
         std::cout << result.variables[0] << " " << result.variables[1] << "\n";

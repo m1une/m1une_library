@@ -11,11 +11,11 @@ data:
     path: graph/graph.hpp
     title: Graph
   - icon: ':heavy_check_mark:'
+    path: graph/tree/sparse_table_lca.hpp
+    title: Sparse Table LCA
+  - icon: ':heavy_check_mark:'
     path: monoid/concept.hpp
     title: Monoid Concept
-  - icon: ':heavy_check_mark:'
-    path: tree/sparse_table_lca.hpp
-    title: Sparse Table LCA
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
   _isVerificationFailed: false
@@ -82,7 +82,7 @@ data:
     \ e.from, e.cost, e.id, e.alive));\n                if (0 <= e.id && e.id < _edge_count)\
     \ result._edge_positions[e.id].push_back({e.to, idx});\n            }\n      \
     \  }\n        return result;\n    }\n};\n\n}  // namespace graph\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"tree/sparse_table_lca.hpp\"\n\n\n\n#line 9 \"tree/sparse_table_lca.hpp\"\
+    \ m1une\n\n\n#line 1 \"graph/tree/sparse_table_lca.hpp\"\n\n\n\n#line 9 \"graph/tree/sparse_table_lca.hpp\"\
     \n\n#line 1 \"ds/range_query/sparse_table.hpp\"\n\n\n\n#include <bit>\n#line 6\
     \ \"ds/range_query/sparse_table.hpp\"\n#include <concepts>\n#line 9 \"ds/range_query/sparse_table.hpp\"\
     \n\n#line 1 \"monoid/concept.hpp\"\n\n\n\n#line 5 \"monoid/concept.hpp\"\n\nnamespace\
@@ -147,8 +147,8 @@ data:
     \n        // Calculate the largest power of 2 less than or equal to the interval\
     \ length\n        int k = std::bit_width((unsigned int)(r - l)) - 1;\n       \
     \ return Monoid::op(_st[k][l], _st[k][r - (1 << k)]);\n    }\n};\n\n}  // namespace\
-    \ ds\n}  // namespace m1une\n\n\n#line 12 \"tree/sparse_table_lca.hpp\"\n\nnamespace\
-    \ m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct SparseTableLca\
+    \ ds\n}  // namespace m1une\n\n\n#line 12 \"graph/tree/sparse_table_lca.hpp\"\n\
+    \nnamespace m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct SparseTableLca\
     \ {\n    using cost_type = T;\n    using edge_type = m1une::graph::Edge<T>;\n\n\
     \    int root;\n    std::vector<int> parent;\n    std::vector<int> parent_edge;\n\
     \    std::vector<int> depth;\n    std::vector<T> dist;\n    std::vector<int> subtree_size;\n\
@@ -210,7 +210,7 @@ data:
     \        int u, v;\n        cin >> u >> v;\n        cout << lca.lca(u, v) << '\\\
     n';\n    }\n}\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/lca\"\n\n#include <bits/stdc++.h>\n\
-    using namespace std;\n\n#include \"../../graph/graph.hpp\"\n#include \"../../tree/sparse_table_lca.hpp\"\
+    using namespace std;\n\n#include \"../../graph/graph.hpp\"\n#include \"../../graph/tree/sparse_table_lca.hpp\"\
     \n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n  \
     \  int N, Q;\n    cin >> N >> Q;\n    m1une::graph::Graph<> g(N);\n    for (int\
     \ i = 1; i < N; ++i) {\n        int p;\n        cin >> p;\n        g.add_edge(p,\
@@ -219,14 +219,14 @@ data:
     n';\n    }\n}\n"
   dependsOn:
   - graph/graph.hpp
-  - tree/sparse_table_lca.hpp
+  - graph/tree/sparse_table_lca.hpp
   - ds/range_query/sparse_table.hpp
   - monoid/concept.hpp
   - graph/graph.hpp
   isVerificationFile: true
   path: verify/graph/library_checker_lowest_common_ancestor.test.cpp
   requiredBy: []
-  timestamp: '2026-06-21 04:34:53+09:00'
+  timestamp: '2026-07-07 14:26:59+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/library_checker_lowest_common_ancestor.test.cpp

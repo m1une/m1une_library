@@ -1,92 +1,125 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':heavy_check_mark:'
-    path: fps/convolution.hpp
-    title: Convolution
-  - icon: ':heavy_check_mark:'
-    path: fps/formal_power_series.hpp
-    title: Formal Power Series
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: math/all.hpp
     title: Math All
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/base_n.hpp
     title: Base-N Numbers
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/bernoulli.hpp
     title: Bernoulli Numbers and Power Sums
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/bit_ceil.hpp
     title: Bit Ceil
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/bitwise_convolution.hpp
     title: Bitwise Convolution
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/combinatorial_sequences.hpp
     title: Combinatorial Sequences
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/combinatorics.hpp
     title: Combinatorics
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/cyclotomic_polynomial.hpp
     title: Cyclotomic Polynomial
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
+    path: math/fps/all.hpp
+    title: Formal Power Series All
+  - icon: ':question:'
+    path: math/fps/convolution.hpp
+    title: Convolution
+  - icon: ':question:'
+    path: math/fps/convolution_ll.hpp
+    title: Long Long Convolution
+  - icon: ':question:'
+    path: math/fps/floating_point_convolution.hpp
+    title: Floating-Point Convolution
+  - icon: ':question:'
+    path: math/fps/formal_power_series.hpp
+    title: Formal Power Series
+  - icon: ':question:'
+    path: math/fps/formal_power_series.hpp
+    title: Formal Power Series
+  - icon: ':question:'
+    path: math/fps/half_gcd.hpp
+    title: Polynomial Half-GCD
+  - icon: ':question:'
+    path: math/fps/lagrange_inversion.hpp
+    title: Lagrange Inversion Formula
+  - icon: ':question:'
+    path: math/fps/linear_recurrence.hpp
+    title: Linear Recurrence and Bostan-Mori
+  - icon: ':question:'
+    path: math/fps/multipoint_evaluation.hpp
+    title: Multipoint Evaluation and Interpolation
+  - icon: ':question:'
     path: math/generalized_floor_sum.hpp
     title: Generalized Floor Sum
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/gray_code.hpp
     title: Gray Code
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/integer_arithmetic.hpp
     title: Integer Square Root and Power
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/lucas.hpp
     title: Lucas's Theorem
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
+    path: math/matrix/all.hpp
+    title: Matrix Bundle
+  - icon: ':x:'
+    path: math/matrix/linear_algebra.hpp
+    title: Matrix Linear Algebra
+  - icon: ':x:'
+    path: math/matrix/matrix.hpp
+    title: Dense Matrix
+  - icon: ':question:'
     path: math/modint.hpp
     title: ModInt
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/modint.hpp
     title: ModInt
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/number_theory.hpp
     title: Number Theory
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/prime_factorization.hpp
     title: 64-bit Prime Factorization
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/prime_sieve.hpp
     title: Prime Sieve
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: math/primitive_root.hpp
     title: Primitive Root
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/rational.hpp
     title: Rational Number
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/repunit.hpp
     title: Repunit
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/stern_brocot_tree.hpp
     title: Stern-Brocot Tree
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/tetration.hpp
     title: Tetration
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: math/totient_sum.hpp
     title: Totient Sum
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/two_square_sum.hpp
     title: Sum of Two Squares
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/zeta_mobius_transform.hpp
     title: Zeta and Mobius Transform
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
-  _isVerificationFailed: false
+  _isVerificationFailed: true
   _pathExtension: cpp
-  _verificationStatusIcon: ':heavy_check_mark:'
+  _verificationStatusIcon: ':x:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
     PROBLEM: https://judge.yosupo.jp/problem/aplusb
@@ -139,20 +172,20 @@ data:
     \ result = checked_from_base_n<Integer>(digits, base);\n    assert(result.has_value());\n\
     \    return result.value_or(Integer(0));\n}\n\n}  // namespace math\n}  // namespace\
     \ m1une\n\n\n#line 1 \"math/bernoulli.hpp\"\n\n\n\n#line 7 \"math/bernoulli.hpp\"\
-    \n\n#line 1 \"fps/formal_power_series.hpp\"\n\n\n\n#line 10 \"fps/formal_power_series.hpp\"\
-    \n\n#line 1 \"fps/convolution.hpp\"\n\n\n\n#line 5 \"fps/convolution.hpp\"\n#include\
-    \ <array>\n#line 10 \"fps/convolution.hpp\"\n\n#line 1 \"math/modint.hpp\"\n\n\
-    \n\n#line 8 \"math/modint.hpp\"\n\nnamespace m1une {\nnamespace math {\n\ntemplate\
-    \ <uint32_t Modulus>\nstruct ModInt {\n    static_assert(0 < Modulus, \"Modulus\
-    \ must be positive\");\n\n   private:\n    uint32_t _v;\n\n   public:\n    static\
-    \ constexpr uint32_t mod() {\n        return Modulus;\n    }\n\n    static constexpr\
-    \ ModInt raw(uint32_t v) noexcept {\n        ModInt x;\n        x._v = v;\n  \
-    \      return x;\n    }\n\n    constexpr ModInt() noexcept : _v(0) {}\n\n    template\
-    \ <class Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>\n  \
-    \  constexpr ModInt(Integer v) noexcept {\n        if constexpr (std::is_signed_v<Integer>)\
-    \ {\n            int64_t x = static_cast<int64_t>(v) % static_cast<int64_t>(Modulus);\n\
-    \            if (x < 0) x += Modulus;\n            _v = static_cast<uint32_t>(x);\n\
-    \        } else {\n            _v = static_cast<uint32_t>(static_cast<uint64_t>(v)\
+    \n\n#line 1 \"math/fps/formal_power_series.hpp\"\n\n\n\n#line 10 \"math/fps/formal_power_series.hpp\"\
+    \n\n#line 1 \"math/fps/convolution.hpp\"\n\n\n\n#line 5 \"math/fps/convolution.hpp\"\
+    \n#include <array>\n#line 10 \"math/fps/convolution.hpp\"\n\n#line 1 \"math/modint.hpp\"\
+    \n\n\n\n#line 8 \"math/modint.hpp\"\n\nnamespace m1une {\nnamespace math {\n\n\
+    template <uint32_t Modulus>\nstruct ModInt {\n    static_assert(0 < Modulus, \"\
+    Modulus must be positive\");\n\n   private:\n    uint32_t _v;\n\n   public:\n\
+    \    static constexpr uint32_t mod() {\n        return Modulus;\n    }\n\n   \
+    \ static constexpr ModInt raw(uint32_t v) noexcept {\n        ModInt x;\n    \
+    \    x._v = v;\n        return x;\n    }\n\n    constexpr ModInt() noexcept :\
+    \ _v(0) {}\n\n    template <class Integer, std::enable_if_t<std::is_integral_v<Integer>,\
+    \ int> = 0>\n    constexpr ModInt(Integer v) noexcept {\n        if constexpr\
+    \ (std::is_signed_v<Integer>) {\n            int64_t x = static_cast<int64_t>(v)\
+    \ % static_cast<int64_t>(Modulus);\n            if (x < 0) x += Modulus;\n   \
+    \         _v = static_cast<uint32_t>(x);\n        } else {\n            _v = static_cast<uint32_t>(static_cast<uint64_t>(v)\
     \ % Modulus);\n        }\n    }\n\n    constexpr uint32_t val() const noexcept\
     \ {\n        return _v;\n    }\n\n    constexpr ModInt& operator++() noexcept\
     \ {\n        _v++;\n        if (_v == Modulus) _v = 0;\n        return *this;\n\
@@ -190,7 +223,7 @@ data:
     \ ModInt& rhs) {\n        long long v;\n        is >> v;\n        rhs = ModInt(v);\n\
     \        return is;\n    }\n};\n\nusing modint998244353 = ModInt<998244353>;\n\
     using modint1000000007 = ModInt<1000000007>;\n\n}  // namespace math\n}  // namespace\
-    \ m1une\n\n\n#line 12 \"fps/convolution.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ m1une\n\n\n#line 12 \"math/fps/convolution.hpp\"\n\nnamespace m1une {\nnamespace\
     \ fps {\n\nnamespace internal {\n\nconstexpr uint32_t primitive_root_constexpr(uint32_t\
     \ mod) {\n    if (mod == 2) return 1;\n    if (mod == 167772161) return 3;\n \
     \   if (mod == 469762049) return 3;\n    if (mod == 754974721) return 11;\n  \
@@ -284,7 +317,7 @@ data:
     \        value = (value + mod1_target * (first % target_mod)) % target_mod;\n\
     \        value = (value + mod1_mod2_target * (second % target_mod)) % target_mod;\n\
     \        result[i] = Mint::raw(uint32_t(value));\n    }\n    return result;\n\
-    }\n\n}  // namespace fps\n}  // namespace m1une\n\n\n#line 12 \"fps/formal_power_series.hpp\"\
+    }\n\n}  // namespace fps\n}  // namespace m1une\n\n\n#line 12 \"math/fps/formal_power_series.hpp\"\
     \n\nnamespace m1une {\nnamespace fps {\n\nnamespace internal {\n\ntemplate <class\
     \ Mint>\nstd::optional<Mint> modular_square_root(Mint value) {\n    const uint32_t\
     \ mod = Mint::mod();\n    if (value == Mint(0)) return Mint(0);\n    if (mod ==\
@@ -997,8 +1030,456 @@ data:
     \ n /= modulus;\n            k /= modulus;\n        }\n        return result;\n\
     \    }\n\n    Mint operator()(uint64_t n, uint64_t k) const {\n        return\
     \ binom(n, k);\n    }\n};\n\ntemplate <class Mint>\nusing LucasTheorem = Lucas<Mint>;\n\
-    \n}  // namespace math\n}  // namespace m1une\n\n\n#line 1 \"math/number_theory.hpp\"\
-    \n\n\n\n#line 7 \"math/number_theory.hpp\"\n#include <tuple>\n#line 10 \"math/number_theory.hpp\"\
+    \n}  // namespace math\n}  // namespace m1une\n\n\n#line 1 \"math/fps/all.hpp\"\
+    \n\n\n\n#line 1 \"math/fps/convolution_ll.hpp\"\n\n\n\n#line 8 \"math/fps/convolution_ll.hpp\"\
+    \n\n#line 11 \"math/fps/convolution_ll.hpp\"\n\nnamespace m1une {\nnamespace fps\
+    \ {\n\n// Exact convolution of signed 64-bit coefficients.\n// Every result coefficient\
+    \ must fit in long long.\ninline std::vector<long long> convolution_ll(\n    const\
+    \ std::vector<long long>& first,\n    const std::vector<long long>& second\n)\
+    \ {\n    if (first.empty() || second.empty()) return {};\n    std::size_t result_size\
+    \ = first.size() + second.size() - 1;\n    assert(result_size <= (std::size_t(1)\
+    \ << 24));\n\n    using Mint1 = math::ModInt<167772161>;\n    using Mint2 = math::ModInt<469762049>;\n\
+    \    using Mint3 = math::ModInt<754974721>;\n\n    auto convolve = [&]<class Mint>()\
+    \ {\n        std::vector<Mint> converted_first(first.size());\n        std::vector<Mint>\
+    \ converted_second(second.size());\n        for (int index = 0; index < int(first.size());\
+    \ index++) {\n            converted_first[index] = Mint(first[index]);\n     \
+    \   }\n        for (int index = 0; index < int(second.size()); index++) {\n  \
+    \          converted_second[index] = Mint(second[index]);\n        }\n       \
+    \ return convolution(converted_first, converted_second);\n    };\n\n    std::vector<Mint1>\
+    \ result1 = convolve.template operator()<Mint1>();\n    std::vector<Mint2> result2\
+    \ = convolve.template operator()<Mint2>();\n    std::vector<Mint3> result3 = convolve.template\
+    \ operator()<Mint3>();\n\n    static const std::uint64_t inverse_mod1_mod2 =\n\
+    \        Mint2(Mint1::mod()).inv().val();\n    static const std::uint64_t mod1_mod2\
+    \ =\n        std::uint64_t(Mint1::mod()) * Mint2::mod();\n    static const std::uint64_t\
+    \ inverse_mod1_mod2_mod3 =\n        Mint3(mod1_mod2 % Mint3::mod()).inv().val();\n\
+    \    static const unsigned __int128 crt_modulus =\n        static_cast<unsigned\
+    \ __int128>(mod1_mod2) * Mint3::mod();\n\n    std::vector<long long> result(result_size);\n\
+    \    for (int index = 0; index < int(result_size); index++) {\n        std::uint64_t\
+    \ residue1 = result1[index].val();\n        std::uint64_t residue2 = result2[index].val();\n\
+    \        std::uint64_t residue3 = result3[index].val();\n\n        std::uint64_t\
+    \ second_digit =\n            (residue2 + Mint2::mod() - residue1 % Mint2::mod())\
+    \ %\n            Mint2::mod();\n        second_digit = second_digit * inverse_mod1_mod2\
+    \ % Mint2::mod();\n        std::uint64_t first_two =\n            residue1 + std::uint64_t(Mint1::mod())\
+    \ * second_digit;\n\n        std::uint64_t third_digit =\n            (residue3\
+    \ + Mint3::mod() - first_two % Mint3::mod()) %\n            Mint3::mod();\n  \
+    \      third_digit =\n            third_digit * inverse_mod1_mod2_mod3 % Mint3::mod();\n\
+    \n        unsigned __int128 reconstructed =\n            first_two + static_cast<unsigned\
+    \ __int128>(mod1_mod2) * third_digit;\n        __int128 centered = reconstructed\
+    \ <= crt_modulus / 2\n                                ? static_cast<__int128>(reconstructed)\n\
+    \                                : -static_cast<__int128>(crt_modulus - reconstructed);\n\
+    \        assert(std::numeric_limits<long long>::min() <= centered);\n        assert(centered\
+    \ <= std::numeric_limits<long long>::max());\n        result[index] = static_cast<long\
+    \ long>(centered);\n    }\n    return result;\n}\n\n}  // namespace fps\n}  //\
+    \ namespace m1une\n\n\n#line 1 \"math/fps/floating_point_convolution.hpp\"\n\n\
+    \n\n#line 5 \"math/fps/floating_point_convolution.hpp\"\n#include <bit>\n#include\
+    \ <cmath>\n#include <complex>\n#line 9 \"math/fps/floating_point_convolution.hpp\"\
+    \n#include <numbers>\n#line 12 \"math/fps/floating_point_convolution.hpp\"\n\n\
+    namespace m1une {\nnamespace fps {\n\nnamespace floating_point_convolution_detail\
+    \ {\n\ntemplate <std::floating_point Real>\nvoid fft(std::vector<std::complex<Real>>&\
+    \ values, bool inverse) {\n    int size = int(values.size());\n    for (int index\
+    \ = 1, reversed = 0; index < size; ++index) {\n        int bit = size >> 1;\n\
+    \        while (reversed & bit) {\n            reversed ^= bit;\n            bit\
+    \ >>= 1;\n        }\n        reversed ^= bit;\n        if (index < reversed) std::swap(values[index],\
+    \ values[reversed]);\n    }\n\n    for (int length = 2; length <= size; length\
+    \ <<= 1) {\n        Real angle = Real(2) * std::numbers::pi_v<Real> / Real(length);\n\
+    \        if (inverse) angle = -angle;\n        std::complex<Real> step(std::cos(angle),\
+    \ std::sin(angle));\n        int half = length >> 1;\n        for (int offset\
+    \ = 0; offset < size; offset += length) {\n            std::complex<Real> root(1,\
+    \ 0);\n            for (int index = 0; index < half; ++index) {\n            \
+    \    std::complex<Real> even = values[offset + index];\n                std::complex<Real>\
+    \ odd = values[offset + index + half] * root;\n                values[offset +\
+    \ index] = even + odd;\n                values[offset + index + half] = even -\
+    \ odd;\n                root *= step;\n            }\n        }\n    }\n\n   \
+    \ if (inverse) {\n        Real inverse_size = Real(1) / Real(size);\n        for\
+    \ (auto& value : values) value *= inverse_size;\n    }\n}\n\ntemplate <std::floating_point\
+    \ Real>\nstd::vector<std::complex<Real>> complex_convolution(const std::vector<std::complex<Real>>&\
+    \ first,\n                                                    const std::vector<std::complex<Real>>&\
+    \ second) {\n    if (first.empty() || second.empty()) return {};\n    std::size_t\
+    \ result_size = first.size() + second.size() - 1;\n    std::size_t size = std::bit_ceil(result_size);\n\
+    \    std::vector<std::complex<Real>> transformed_first(size);\n    std::vector<std::complex<Real>>\
+    \ transformed_second(size);\n    std::copy(first.begin(), first.end(), transformed_first.begin());\n\
+    \    std::copy(second.begin(), second.end(), transformed_second.begin());\n\n\
+    \    fft(transformed_first, false);\n    fft(transformed_second, false);\n   \
+    \ for (std::size_t index = 0; index < size; ++index) {\n        transformed_first[index]\
+    \ *= transformed_second[index];\n    }\n    fft(transformed_first, true);\n  \
+    \  transformed_first.resize(result_size);\n    return transformed_first;\n}\n\n\
+    }  // namespace floating_point_convolution_detail\n\n// Convolution of complex\
+    \ floating-point coefficients.\ntemplate <std::floating_point Real>\nstd::vector<std::complex<Real>>\
+    \ convolution_fft(const std::vector<std::complex<Real>>& first,\n            \
+    \                                    const std::vector<std::complex<Real>>& second)\
+    \ {\n    return floating_point_convolution_detail::complex_convolution(first,\
+    \ second);\n}\n\n// Convolution of real floating-point coefficients.\ntemplate\
+    \ <std::floating_point Real>\nstd::vector<Real> convolution_fft(const std::vector<Real>&\
+    \ first, const std::vector<Real>& second) {\n    if (first.empty() || second.empty())\
+    \ return {};\n    std::vector<std::complex<Real>> complex_first(first.size());\n\
+    \    std::vector<std::complex<Real>> complex_second(second.size());\n    for (std::size_t\
+    \ index = 0; index < first.size(); ++index) {\n        complex_first[index] =\
+    \ std::complex<Real>(first[index], 0);\n    }\n    for (std::size_t index = 0;\
+    \ index < second.size(); ++index) {\n        complex_second[index] = std::complex<Real>(second[index],\
+    \ 0);\n    }\n    auto result = floating_point_convolution_detail::complex_convolution(complex_first,\
+    \ complex_second);\n    std::vector<Real> real_result(result.size());\n    for\
+    \ (std::size_t index = 0; index < result.size(); ++index) {\n        real_result[index]\
+    \ = result[index].real();\n    }\n    return real_result;\n}\n\n// Uses long-double\
+    \ FFT and rounds each coefficient to the nearest integer.\ntemplate <std::integral\
+    \ Integer>\nstd::vector<Integer> convolution_round(const std::vector<Integer>&\
+    \ first, const std::vector<Integer>& second) {\n    if (first.empty() || second.empty())\
+    \ return {};\n    std::vector<long double> real_first(first.begin(), first.end());\n\
+    \    std::vector<long double> real_second(second.begin(), second.end());\n   \
+    \ std::vector<long double> real_result = convolution_fft(real_first, real_second);\n\
+    \    std::vector<Integer> result(real_result.size());\n    for (std::size_t index\
+    \ = 0; index < result.size(); ++index) {\n        result[index] = static_cast<Integer>(std::round(real_result[index]));\n\
+    \    }\n    return result;\n}\n\n}  // namespace fps\n}  // namespace m1une\n\n\
+    \n#line 1 \"math/fps/half_gcd.hpp\"\n\n\n\n#line 7 \"math/fps/half_gcd.hpp\"\n\
+    \n#line 9 \"math/fps/half_gcd.hpp\"\n\nnamespace m1une {\nnamespace fps {\n\n\
+    template <class Mint>\nstruct PolynomialMatrix2x2 {\n    using Fps = FormalPowerSeries<Mint>;\n\
+    \n    Fps a00;\n    Fps a01;\n    Fps a10;\n    Fps a11;\n\n    static PolynomialMatrix2x2\
+    \ identity() {\n        return PolynomialMatrix2x2{Fps(1, Mint(1)), Fps(), Fps(),\
+    \ Fps(1, Mint(1))};\n    }\n\n    std::pair<Fps, Fps> apply(const Fps& first,\
+    \ const Fps& second) const {\n        Fps result_first = a00 * first + a01 * second;\n\
+    \        Fps result_second = a10 * first + a11 * second;\n        result_first.shrink();\n\
+    \        result_second.shrink();\n        return std::make_pair(std::move(result_first),\
+    \ std::move(result_second));\n    }\n\n    friend PolynomialMatrix2x2 operator*(const\
+    \ PolynomialMatrix2x2& lhs,\n                                          const PolynomialMatrix2x2&\
+    \ rhs) {\n        PolynomialMatrix2x2 result;\n        result.a00 = lhs.a00 *\
+    \ rhs.a00 + lhs.a01 * rhs.a10;\n        result.a01 = lhs.a00 * rhs.a01 + lhs.a01\
+    \ * rhs.a11;\n        result.a10 = lhs.a10 * rhs.a00 + lhs.a11 * rhs.a10;\n  \
+    \      result.a11 = lhs.a10 * rhs.a01 + lhs.a11 * rhs.a11;\n        result.a00.shrink();\n\
+    \        result.a01.shrink();\n        result.a10.shrink();\n        result.a11.shrink();\n\
+    \        return result;\n    }\n};\n\nnamespace internal {\n\ntemplate <class\
+    \ Mint>\nvoid polynomial_euclidean_step(PolynomialMatrix2x2<Mint>& matrix,\n \
+    \                              std::pair<FormalPowerSeries<Mint>,\n          \
+    \                               FormalPowerSeries<Mint>>& values) {\n    using\
+    \ Fps = FormalPowerSeries<Mint>;\n    assert(!values.second.empty());\n\n    auto\
+    \ division = values.first.divmod(values.second);\n    Fps next_a10 = matrix.a00\
+    \ - matrix.a10 * division.first;\n    Fps next_a11 = matrix.a01 - matrix.a11 *\
+    \ division.first;\n    next_a10.shrink();\n    next_a11.shrink();\n\n    matrix.a00\
+    \ = std::move(matrix.a10);\n    matrix.a01 = std::move(matrix.a11);\n    matrix.a10\
+    \ = std::move(next_a10);\n    matrix.a11 = std::move(next_a11);\n    values.first\
+    \ = std::move(values.second);\n    values.second = std::move(division.second);\n\
+    }\n\ntemplate <class Mint>\nPolynomialMatrix2x2<Mint> half_gcd_impl(\n    std::pair<FormalPowerSeries<Mint>,\
+    \ FormalPowerSeries<Mint>> values) {\n    using Matrix = PolynomialMatrix2x2<Mint>;\n\
+    \n    const int first_size = int(values.first.size());\n    const int half_size\
+    \ = (first_size + 1) / 2;\n    if (int(values.second.size()) <= half_size) return\
+    \ Matrix::identity();\n\n    Matrix first_matrix =\n        half_gcd_impl<Mint>(std::make_pair(values.first\
+    \ >> half_size, values.second >> half_size));\n    values = first_matrix.apply(values.first,\
+    \ values.second);\n    if (int(values.second.size()) <= half_size) return first_matrix;\n\
+    \n    polynomial_euclidean_step(first_matrix, values);\n    if (int(values.second.size())\
+    \ <= half_size) return first_matrix;\n\n    const int first_degree = int(values.first.size())\
+    \ - 1;\n    const int shift = 2 * half_size - first_degree;\n    assert(shift\
+    \ >= 0);\n    values.first >>= shift;\n    values.second >>= shift;\n    return\
+    \ half_gcd_impl<Mint>(std::move(values)) * first_matrix;\n}\n\ntemplate <class\
+    \ Mint>\nPolynomialMatrix2x2<Mint> polynomial_gcd_matrix(FormalPowerSeries<Mint>\
+    \ first,\n                                                FormalPowerSeries<Mint>\
+    \ second) {\n    using Matrix = PolynomialMatrix2x2<Mint>;\n    first.shrink();\n\
+    \    second.shrink();\n\n    if (first.size() < second.size()) {\n        Matrix\
+    \ result = polynomial_gcd_matrix(std::move(second), std::move(first));\n     \
+    \   std::swap(result.a00, result.a01);\n        std::swap(result.a10, result.a11);\n\
+    \        return result;\n    }\n\n    std::pair<FormalPowerSeries<Mint>, FormalPowerSeries<Mint>>\
+    \ values(\n        std::move(first), std::move(second));\n    Matrix result =\
+    \ Matrix::identity();\n    while (true) {\n        Matrix block = half_gcd_impl<Mint>(values);\n\
+    \        values = block.apply(values.first, values.second);\n        if (values.second.empty())\
+    \ return block * result;\n\n        polynomial_euclidean_step(block, values);\n\
+    \        if (values.second.empty()) return block * result;\n        result = block\
+    \ * result;\n    }\n}\n\n}  // namespace internal\n\ntemplate <class Mint>\nPolynomialMatrix2x2<Mint>\
+    \ half_gcd(FormalPowerSeries<Mint> first,\n                                  \
+    \ FormalPowerSeries<Mint> second) {\n    first.shrink();\n    second.shrink();\n\
+    \    assert(first.size() >= second.size());\n    return internal::half_gcd_impl<Mint>(std::make_pair(std::move(first),\
+    \ std::move(second)));\n}\n\ntemplate <class Mint>\nstruct PolynomialExtendedGcdResult\
+    \ {\n    FormalPowerSeries<Mint> gcd;\n    FormalPowerSeries<Mint> x;\n    FormalPowerSeries<Mint>\
+    \ y;\n};\n\ntemplate <class Mint>\nPolynomialExtendedGcdResult<Mint> polynomial_extended_gcd(\n\
+    \    const FormalPowerSeries<Mint>& first, const FormalPowerSeries<Mint>& second)\
+    \ {\n    PolynomialMatrix2x2<Mint> matrix = internal::polynomial_gcd_matrix(first,\
+    \ second);\n    auto values = matrix.apply(first, second);\n\n    if (!values.first.empty())\
+    \ {\n        const Mint inverse_leading = values.first.back().inv();\n       \
+    \ values.first *= inverse_leading;\n        matrix.a00 *= inverse_leading;\n \
+    \       matrix.a01 *= inverse_leading;\n    }\n    return PolynomialExtendedGcdResult<Mint>{std::move(values.first),\
+    \ std::move(matrix.a00),\n                                             std::move(matrix.a01)};\n\
+    }\n\ntemplate <class Mint>\nFormalPowerSeries<Mint> polynomial_gcd(const FormalPowerSeries<Mint>&\
+    \ first,\n                                       const FormalPowerSeries<Mint>&\
+    \ second) {\n    return polynomial_extended_gcd(first, second).gcd;\n}\n\ntemplate\
+    \ <class Mint>\nstd::optional<FormalPowerSeries<Mint>> polynomial_inv_mod(\n \
+    \   const FormalPowerSeries<Mint>& polynomial, FormalPowerSeries<Mint> modulus)\
+    \ {\n    modulus.shrink();\n    assert(!modulus.empty());\n    auto result = polynomial_extended_gcd(polynomial,\
+    \ modulus);\n    if (result.gcd.size() != 1) return std::nullopt;\n    return\
+    \ result.x % modulus;\n}\n\n}  // namespace fps\n}  // namespace m1une\n\n\n#line\
+    \ 1 \"math/fps/lagrange_inversion.hpp\"\n\n\n\n#line 7 \"math/fps/lagrange_inversion.hpp\"\
+    \n\n#line 9 \"math/fps/lagrange_inversion.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ fps {\n\ntemplate <class Mint>\nMint lagrange_inversion_coefficient(const FormalPowerSeries<Mint>&\
+    \ phi, int degree) {\n    assert(1 <= degree && uint32_t(degree) < Mint::mod());\n\
+    \    assert(!phi.empty() && phi[0] != Mint(0));\n\n    FormalPowerSeries<Mint>\
+    \ power = phi.pre(degree).pow(degree, degree);\n    return power[degree - 1] /\
+    \ Mint(degree);\n}\n\ntemplate <class Mint>\nMint lagrange_burmann_coefficient(const\
+    \ FormalPowerSeries<Mint>& phi,\n                                  const FormalPowerSeries<Mint>&\
+    \ outer, int degree) {\n    assert(0 <= degree && uint32_t(degree) < Mint::mod());\n\
+    \    if (degree == 0) return outer.empty() ? Mint(0) : outer[0];\n    assert(!phi.empty()\
+    \ && phi[0] != Mint(0));\n\n    FormalPowerSeries<Mint> power = phi.pre(degree).pow(degree,\
+    \ degree);\n    Mint result = 0;\n    int limit = std::min(degree, int(outer.size())\
+    \ - 1);\n    for (int i = 1; i <= limit; i++) {\n        result += Mint(i) * outer[i]\
+    \ * power[degree - i];\n    }\n    return result / Mint(degree);\n}\n\ntemplate\
+    \ <class Mint>\nMint compositional_inverse_coefficient(const FormalPowerSeries<Mint>&\
+    \ f, int degree) {\n    assert(0 <= degree && uint32_t(degree) < Mint::mod());\n\
+    \    assert(2 <= int(f.size()) && f[0] == Mint(0) && f[1] != Mint(0));\n    if\
+    \ (degree == 0) return Mint(0);\n\n    FormalPowerSeries<Mint> divided(degree);\n\
+    \    for (int i = 0; i < degree && i + 1 < int(f.size()); i++) divided[i] = f[i\
+    \ + 1];\n    FormalPowerSeries<Mint> phi = divided.inv(degree);\n    return lagrange_inversion_coefficient(phi,\
+    \ degree);\n}\n\n}  // namespace fps\n}  // namespace m1une\n\n\n#line 1 \"math/fps/linear_recurrence.hpp\"\
+    \n\n\n\n#line 7 \"math/fps/linear_recurrence.hpp\"\n\n#line 9 \"math/fps/linear_recurrence.hpp\"\
+    \n\nnamespace m1une {\nnamespace fps {\n\ntemplate <class Mint>\nMint coefficient_of_rational(FormalPowerSeries<Mint>\
+    \ numerator,\n                             FormalPowerSeries<Mint> denominator,\
+    \ uint64_t index) {\n    using Fps = FormalPowerSeries<Mint>;\n    assert(!denominator.empty()\
+    \ && denominator[0] != Mint(0));\n\n    while (index > 0) {\n        Fps denominator_negative\
+    \ = denominator;\n        for (int i = 1; i < int(denominator_negative.size());\
+    \ i += 2) {\n            denominator_negative[i] = Mint(0) - denominator_negative[i];\n\
+    \        }\n\n        Fps numerator_product = numerator * denominator_negative;\n\
+    \        Fps denominator_product = denominator * denominator_negative;\n     \
+    \   Fps next_numerator;\n        Fps next_denominator;\n        next_numerator.reserve((numerator_product.size()\
+    \ + 1) / 2);\n        next_denominator.reserve((denominator_product.size() + 1)\
+    \ / 2);\n        for (int i = int(index & 1); i < int(numerator_product.size());\
+    \ i += 2) {\n            next_numerator.emplace_back(numerator_product[i]);\n\
+    \        }\n        for (int i = 0; i < int(denominator_product.size()); i +=\
+    \ 2) {\n            next_denominator.emplace_back(denominator_product[i]);\n \
+    \       }\n        numerator = std::move(next_numerator);\n        denominator\
+    \ = std::move(next_denominator);\n        index >>= 1;\n    }\n    return numerator.empty()\
+    \ ? Mint(0) : numerator[0] / denominator[0];\n}\n\ntemplate <class Mint>\nMint\
+    \ linear_recurrence_kth(const std::vector<Mint>& initial,\n                  \
+    \         const std::vector<Mint>& recurrence, uint64_t index) {\n    using Fps\
+    \ = FormalPowerSeries<Mint>;\n    assert(!initial.empty() && initial.size() ==\
+    \ recurrence.size());\n    if (index < initial.size()) return initial[index];\n\
+    \n    const int order = int(recurrence.size());\n    Fps denominator(order + 1);\n\
+    \    denominator[0] = 1;\n    for (int i = 0; i < order; i++) denominator[i +\
+    \ 1] = Mint(0) - recurrence[i];\n    Fps numerator = (Fps(initial) * denominator).pre(order);\n\
+    \    return coefficient_of_rational(std::move(numerator), std::move(denominator),\
+    \ index);\n}\n\n}  // namespace fps\n}  // namespace m1une\n\n\n#line 1 \"math/fps/multipoint_evaluation.hpp\"\
+    \n\n\n\n#line 6 \"math/fps/multipoint_evaluation.hpp\"\n\n#line 8 \"math/fps/multipoint_evaluation.hpp\"\
+    \n\nnamespace m1une {\nnamespace fps {\n\ntemplate <class Mint>\nstruct SubproductTree\
+    \ {\n    using Fps = FormalPowerSeries<Mint>;\n\n   private:\n    int point_count_;\n\
+    \    int leaf_count_;\n    std::vector<Mint> points_;\n    std::vector<Fps> product_;\n\
+    \n   public:\n    explicit SubproductTree(const std::vector<Mint>& points)\n \
+    \       : point_count_(points.size()), leaf_count_(1), points_(points) {\n   \
+    \     while (leaf_count_ < point_count_) leaf_count_ <<= 1;\n        product_.resize(leaf_count_\
+    \ << 1);\n        for (int i = 0; i < leaf_count_; i++) {\n            if (i <\
+    \ point_count_) {\n                product_[leaf_count_ + i].resize(2);\n    \
+    \            product_[leaf_count_ + i][0] = Mint(0) - points_[i];\n          \
+    \      product_[leaf_count_ + i][1] = Mint(1);\n            } else {\n       \
+    \         product_[leaf_count_ + i].resize(1, Mint(1));\n            }\n     \
+    \   }\n        for (int node = leaf_count_ - 1; node > 0; node--) {\n        \
+    \    product_[node] = product_[node << 1] * product_[node << 1 | 1];\n       \
+    \ }\n    }\n\n    int size() const {\n        return point_count_;\n    }\n\n\
+    \    const Fps& product() const {\n        return product_[1];\n    }\n\n    std::vector<Mint>\
+    \ evaluate(const Fps& polynomial) const {\n        std::vector<Mint> result(point_count_);\n\
+    \        if (point_count_ == 0) return result;\n\n        std::vector<Fps> remainder(leaf_count_\
+    \ << 1);\n        remainder[1] = polynomial % product_[1];\n        for (int node\
+    \ = 1; node < leaf_count_; node++) {\n            remainder[node << 1] = remainder[node]\
+    \ % product_[node << 1];\n            remainder[node << 1 | 1] = remainder[node]\
+    \ % product_[node << 1 | 1];\n        }\n        for (int i = 0; i < point_count_;\
+    \ i++) {\n            const Fps& value = remainder[leaf_count_ + i];\n       \
+    \     result[i] = value.empty() ? Mint(0) : value[0];\n        }\n        return\
+    \ result;\n    }\n\n    Fps interpolate(const std::vector<Mint>& values) const\
+    \ {\n        assert(int(values.size()) == point_count_);\n        if (point_count_\
+    \ == 0) return {};\n\n        std::vector<Mint> derivative_values = evaluate(product_[1].derivative());\n\
+    \        std::vector<Fps> polynomial(leaf_count_ << 1);\n        for (int i =\
+    \ 0; i < leaf_count_; i++) {\n            polynomial[leaf_count_ + i].resize(1);\n\
+    \            if (i < point_count_) {\n                assert(derivative_values[i]\
+    \ != Mint(0));\n                polynomial[leaf_count_ + i][0] = values[i] / derivative_values[i];\n\
+    \            }\n        }\n        for (int node = leaf_count_ - 1; node > 0;\
+    \ node--) {\n            polynomial[node] = polynomial[node << 1] * product_[node\
+    \ << 1 | 1] +\n                               polynomial[node << 1 | 1] * product_[node\
+    \ << 1];\n        }\n        polynomial[1].resize(point_count_);\n        return\
+    \ polynomial[1];\n    }\n};\n\ntemplate <class Mint>\nstd::vector<Mint> multipoint_evaluate(const\
+    \ FormalPowerSeries<Mint>& polynomial,\n                                     \
+    \ const std::vector<Mint>& points) {\n    return SubproductTree<Mint>(points).evaluate(polynomial);\n\
+    }\n\ntemplate <class Mint>\nFormalPowerSeries<Mint> polynomial_interpolate(const\
+    \ std::vector<Mint>& points,\n                                               const\
+    \ std::vector<Mint>& values) {\n    return SubproductTree<Mint>(points).interpolate(values);\n\
+    }\n\n}  // namespace fps\n}  // namespace m1une\n\n\n#line 12 \"math/fps/all.hpp\"\
+    \n\n\n#line 1 \"math/matrix/all.hpp\"\n\n\n\n#line 1 \"math/matrix/linear_algebra.hpp\"\
+    \n\n\n\n#line 7 \"math/matrix/linear_algebra.hpp\"\n\n#line 1 \"math/matrix/matrix.hpp\"\
+    \n\n\n\n#line 9 \"math/matrix/matrix.hpp\"\n\nnamespace m1une {\nnamespace matrix\
+    \ {\n\ntemplate <class T>\nclass Matrix {\n   private:\n    int _rows;\n    int\
+    \ _cols;\n    std::vector<T> _data;\n\n    static std::size_t storage_size(int\
+    \ rows, int cols) {\n        assert(rows >= 0);\n        assert(cols >= 0);\n\
+    \        return std::size_t(rows) * std::size_t(cols);\n    }\n\n   public:\n\
+    \    using value_type = T;\n\n    Matrix() : _rows(0), _cols(0) {}\n\n    Matrix(int\
+    \ rows, int cols, const T& value = T())\n        : _rows(rows), _cols(cols), _data(storage_size(rows,\
+    \ cols), value) {}\n\n    Matrix(int rows, int cols, std::vector<T> values)\n\
+    \        : _rows(rows), _cols(cols), _data(std::move(values)) {\n        assert(rows\
+    \ >= 0);\n        assert(cols >= 0);\n        assert(_data.size() == std::size_t(rows)\
+    \ * std::size_t(cols));\n    }\n\n    explicit Matrix(const std::vector<std::vector<T>>&\
+    \ values)\n        : _rows(int(values.size())), _cols(values.empty() ? 0 : int(values[0].size())),\n\
+    \          _data(storage_size(_rows, _cols)) {\n        for (int row = 0; row\
+    \ < _rows; row++) {\n            assert(int(values[std::size_t(row)].size()) ==\
+    \ _cols);\n            for (int col = 0; col < _cols; col++) {\n             \
+    \   (*this)[row][col] = values[std::size_t(row)][std::size_t(col)];\n        \
+    \    }\n        }\n    }\n\n    int rows() const {\n        return _rows;\n  \
+    \  }\n\n    int cols() const {\n        return _cols;\n    }\n\n    bool empty()\
+    \ const {\n        return _rows == 0 || _cols == 0;\n    }\n\n    std::vector<T>&\
+    \ data() {\n        return _data;\n    }\n\n    const std::vector<T>& data() const\
+    \ {\n        return _data;\n    }\n\n    T* operator[](int row) {\n        assert(0\
+    \ <= row && row < _rows);\n        return _data.data() + std::size_t(row) * std::size_t(_cols);\n\
+    \    }\n\n    const T* operator[](int row) const {\n        assert(0 <= row &&\
+    \ row < _rows);\n        return _data.data() + std::size_t(row) * std::size_t(_cols);\n\
+    \    }\n\n    T& operator()(int row, int col) {\n        assert(0 <= col && col\
+    \ < _cols);\n        return (*this)[row][col];\n    }\n\n    const T& operator()(int\
+    \ row, int col) const {\n        assert(0 <= col && col < _cols);\n        return\
+    \ (*this)[row][col];\n    }\n\n    static Matrix identity(int size) {\n      \
+    \  assert(size >= 0);\n        Matrix result(size, size);\n        for (int i\
+    \ = 0; i < size; i++) result[i][i] = T(1);\n        return result;\n    }\n\n\
+    \    Matrix transposed() const {\n        Matrix result(_cols, _rows);\n     \
+    \   for (int row = 0; row < _rows; row++) {\n            for (int col = 0; col\
+    \ < _cols; col++) {\n                result[col][row] = (*this)[row][col];\n \
+    \           }\n        }\n        return result;\n    }\n\n    void swap_rows(int\
+    \ first, int second) {\n        assert(0 <= first && first < _rows);\n       \
+    \ assert(0 <= second && second < _rows);\n        if (first == second) return;\n\
+    \        for (int col = 0; col < _cols; col++) {\n            std::swap((*this)[first][col],\
+    \ (*this)[second][col]);\n        }\n    }\n\n    Matrix& operator+=(const Matrix&\
+    \ rhs) {\n        assert(_rows == rhs._rows && _cols == rhs._cols);\n        for\
+    \ (std::size_t i = 0; i < _data.size(); i++) _data[i] += rhs._data[i];\n     \
+    \   return *this;\n    }\n\n    Matrix& operator-=(const Matrix& rhs) {\n    \
+    \    assert(_rows == rhs._rows && _cols == rhs._cols);\n        for (std::size_t\
+    \ i = 0; i < _data.size(); i++) _data[i] -= rhs._data[i];\n        return *this;\n\
+    \    }\n\n    Matrix& operator*=(const T& scalar) {\n        for (T& value : _data)\
+    \ value *= scalar;\n        return *this;\n    }\n\n    Matrix& operator/=(const\
+    \ T& scalar) {\n        for (T& value : _data) value /= scalar;\n        return\
+    \ *this;\n    }\n\n    Matrix& operator*=(const Matrix& rhs) {\n        return\
+    \ *this = *this * rhs;\n    }\n\n    Matrix operator+() const {\n        return\
+    \ *this;\n    }\n\n    Matrix operator-() const {\n        Matrix result = *this;\n\
+    \        for (T& value : result._data) value = T() - value;\n        return result;\n\
+    \    }\n\n    friend Matrix operator+(Matrix lhs, const Matrix& rhs) {\n     \
+    \   return lhs += rhs;\n    }\n\n    friend Matrix operator-(Matrix lhs, const\
+    \ Matrix& rhs) {\n        return lhs -= rhs;\n    }\n\n    friend Matrix operator*(Matrix\
+    \ lhs, const T& rhs) {\n        return lhs *= rhs;\n    }\n\n    friend Matrix\
+    \ operator*(const T& lhs, Matrix rhs) {\n        return rhs *= lhs;\n    }\n\n\
+    \    friend Matrix operator/(Matrix lhs, const T& rhs) {\n        return lhs /=\
+    \ rhs;\n    }\n\n    friend Matrix operator*(const Matrix& lhs, const Matrix&\
+    \ rhs) {\n        assert(lhs._cols == rhs._rows);\n        Matrix result(lhs._rows,\
+    \ rhs._cols);\n        for (int row = 0; row < lhs._rows; row++) {\n         \
+    \   T* output = result[row];\n            for (int middle = 0; middle < lhs._cols;\
+    \ middle++) {\n                const T coefficient = lhs[row][middle];\n     \
+    \           if (coefficient == T()) continue;\n                const T* input\
+    \ = rhs[middle];\n                for (int col = 0; col < rhs._cols; col++) {\n\
+    \                    output[col] += coefficient * input[col];\n              \
+    \  }\n            }\n        }\n        return result;\n    }\n\n    friend std::vector<T>\
+    \ operator*(const Matrix& lhs, const std::vector<T>& rhs) {\n        assert(lhs._cols\
+    \ == int(rhs.size()));\n        std::vector<T> result(std::size_t(lhs._rows));\n\
+    \        for (int row = 0; row < lhs._rows; row++) {\n            T value = T();\n\
+    \            for (int col = 0; col < lhs._cols; col++) {\n                value\
+    \ += lhs[row][col] * rhs[std::size_t(col)];\n            }\n            result[std::size_t(row)]\
+    \ = value;\n        }\n        return result;\n    }\n\n    friend std::vector<T>\
+    \ operator*(const std::vector<T>& lhs, const Matrix& rhs) {\n        assert(int(lhs.size())\
+    \ == rhs._rows);\n        std::vector<T> result(std::size_t(rhs._cols));\n   \
+    \     for (int row = 0; row < rhs._rows; row++) {\n            if (lhs[std::size_t(row)]\
+    \ == T()) continue;\n            for (int col = 0; col < rhs._cols; col++) {\n\
+    \                result[std::size_t(col)] += lhs[std::size_t(row)] * rhs[row][col];\n\
+    \            }\n        }\n        return result;\n    }\n\n    bool operator==(const\
+    \ Matrix& rhs) const {\n        return _rows == rhs._rows && _cols == rhs._cols\
+    \ && _data == rhs._data;\n    }\n\n    bool operator!=(const Matrix& rhs) const\
+    \ {\n        return !(*this == rhs);\n    }\n\n    Matrix pow(std::uint64_t exponent)\
+    \ const {\n        assert(_rows == _cols);\n        Matrix result = identity(_rows);\n\
+    \        Matrix base = *this;\n        while (exponent > 0) {\n            if\
+    \ (exponent & 1) result *= base;\n            exponent >>= 1;\n            if\
+    \ (exponent > 0) base *= base;\n        }\n        return result;\n    }\n};\n\
+    \n}  // namespace matrix\n}  // namespace m1une\n\n\n#line 9 \"math/matrix/linear_algebra.hpp\"\
+    \n\nnamespace m1une {\nnamespace matrix {\n\ntemplate <class T>\nconstexpr T default_epsilon()\
+    \ {\n    if constexpr (std::is_floating_point_v<T>) {\n        return T(1e-10);\n\
+    \    } else {\n        return T();\n    }\n}\n\nnamespace detail {\n\ntemplate\
+    \ <class T>\nT matrix_abs(T value) {\n    return value < T() ? T() - value : value;\n\
+    }\n\ntemplate <class T>\nbool is_zero(const T& value, const T& eps) {\n    if\
+    \ constexpr (std::is_floating_point_v<T>) {\n        return matrix_abs(value)\
+    \ <= eps;\n    } else {\n        (void)eps;\n        return value == T();\n  \
+    \  }\n}\n\ntemplate <class T>\nint choose_pivot(const Matrix<T>& matrix, int first_row,\
+    \ int col, const T& eps) {\n    int pivot = -1;\n    if constexpr (std::is_floating_point_v<T>)\
+    \ {\n        for (int row = first_row; row < matrix.rows(); row++) {\n       \
+    \     if (is_zero(matrix[row][col], eps)) continue;\n            if (pivot ==\
+    \ -1 || matrix_abs(matrix[pivot][col]) < matrix_abs(matrix[row][col])) {\n   \
+    \             pivot = row;\n            }\n        }\n    } else {\n        for\
+    \ (int row = first_row; row < matrix.rows(); row++) {\n            if (!is_zero(matrix[row][col],\
+    \ eps)) {\n                pivot = row;\n                break;\n            }\n\
+    \        }\n    }\n    return pivot;\n}\n\ntemplate <class T>\nstd::vector<int>\
+    \ row_reduce(Matrix<T>& matrix, int pivot_col_limit, const T& eps,\n         \
+    \                   bool reduced) {\n    std::vector<int> pivot_columns;\n   \
+    \ int pivot_row = 0;\n    for (int col = 0; col < pivot_col_limit && pivot_row\
+    \ < matrix.rows(); col++) {\n        int pivot = choose_pivot(matrix, pivot_row,\
+    \ col, eps);\n        if (pivot == -1) continue;\n        matrix.swap_rows(pivot_row,\
+    \ pivot);\n\n        const T pivot_value = matrix[pivot_row][col];\n        if\
+    \ (reduced) {\n            for (int j = col; j < matrix.cols(); j++) matrix[pivot_row][j]\
+    \ /= pivot_value;\n        }\n\n        const int first_row = reduced ? 0 : pivot_row\
+    \ + 1;\n        for (int row = first_row; row < matrix.rows(); row++) {\n    \
+    \        if (row == pivot_row || is_zero(matrix[row][col], eps)) continue;\n \
+    \           T factor = matrix[row][col];\n            if (!reduced) factor /=\
+    \ pivot_value;\n            matrix[row][col] = T();\n            for (int j =\
+    \ col + 1; j < matrix.cols(); j++) {\n                matrix[row][j] -= factor\
+    \ * matrix[pivot_row][j];\n            }\n        }\n\n        pivot_columns.push_back(col);\n\
+    \        pivot_row++;\n    }\n\n    if constexpr (std::is_floating_point_v<T>)\
+    \ {\n        for (T& value : matrix.data()) {\n            if (is_zero(value,\
+    \ eps)) value = T();\n        }\n    }\n    return pivot_columns;\n}\n\n}  //\
+    \ namespace detail\n\ntemplate <class T>\nstruct RowReduction {\n    Matrix<T>\
+    \ matrix;\n    std::vector<int> pivot_columns;\n\n    int rank() const {\n   \
+    \     return int(pivot_columns.size());\n    }\n};\n\ntemplate <class T>\nRowReduction<T>\
+    \ reduced_row_echelon_form(Matrix<T> matrix,\n                               \
+    \          T eps = default_epsilon<T>()) {\n    RowReduction<T> result;\n    result.pivot_columns\
+    \ = detail::row_reduce(matrix, matrix.cols(), eps, true);\n    result.matrix =\
+    \ std::move(matrix);\n    return result;\n}\n\ntemplate <class T>\nint matrix_rank(Matrix<T>\
+    \ matrix, T eps = default_epsilon<T>()) {\n    return int(detail::row_reduce(matrix,\
+    \ matrix.cols(), eps, false).size());\n}\n\ntemplate <class T>\nT determinant(Matrix<T>\
+    \ matrix, T eps = default_epsilon<T>()) {\n    assert(matrix.rows() == matrix.cols());\n\
+    \    const int size = matrix.rows();\n    T result = T(1);\n    bool negate =\
+    \ false;\n\n    for (int col = 0; col < size; col++) {\n        int pivot = detail::choose_pivot(matrix,\
+    \ col, col, eps);\n        if (pivot == -1) return T();\n        if (pivot !=\
+    \ col) {\n            matrix.swap_rows(pivot, col);\n            negate = !negate;\n\
+    \        }\n\n        const T pivot_value = matrix[col][col];\n        result\
+    \ *= pivot_value;\n        for (int row = col + 1; row < size; row++) {\n    \
+    \        if (detail::is_zero(matrix[row][col], eps)) continue;\n            const\
+    \ T factor = matrix[row][col] / pivot_value;\n            matrix[row][col] = T();\n\
+    \            for (int j = col + 1; j < size; j++) {\n                matrix[row][j]\
+    \ -= factor * matrix[col][j];\n            }\n        }\n    }\n    return negate\
+    \ ? T() - result : result;\n}\n\ntemplate <class T>\nstd::optional<Matrix<T>>\
+    \ inverse(const Matrix<T>& matrix,\n                                 T eps = default_epsilon<T>())\
+    \ {\n    assert(matrix.rows() == matrix.cols());\n    const int size = matrix.rows();\n\
+    \    Matrix<T> augmented(size, size * 2);\n    for (int row = 0; row < size; row++)\
+    \ {\n        for (int col = 0; col < size; col++) {\n            augmented[row][col]\
+    \ = matrix[row][col];\n        }\n        augmented[row][size + row] = T(1);\n\
+    \    }\n\n    const std::vector<int> pivots = detail::row_reduce(augmented, size,\
+    \ eps, true);\n    if (int(pivots.size()) != size) return std::nullopt;\n\n  \
+    \  Matrix<T> result(size, size);\n    for (int row = 0; row < size; row++) {\n\
+    \        for (int col = 0; col < size; col++) {\n            result[row][col]\
+    \ = augmented[row][size + col];\n        }\n    }\n    return result;\n}\n\ntemplate\
+    \ <class T>\nstruct LinearSystemResult {\n    bool consistent = false;\n    std::vector<T>\
+    \ particular_solution;\n    std::vector<std::vector<T>> nullspace_basis;\n   \
+    \ std::vector<int> pivot_columns;\n\n    int rank() const {\n        return int(pivot_columns.size());\n\
+    \    }\n\n    int nullity() const {\n        return consistent ? int(nullspace_basis.size())\
+    \ : 0;\n    }\n\n    bool has_unique_solution() const {\n        return consistent\
+    \ && nullspace_basis.empty();\n    }\n};\n\ntemplate <class T>\nLinearSystemResult<T>\
+    \ solve_linear_system(const Matrix<T>& coefficients,\n                       \
+    \                   const std::vector<T>& constants,\n                       \
+    \                   T eps = default_epsilon<T>()) {\n    assert(coefficients.rows()\
+    \ == int(constants.size()));\n    const int equation_count = coefficients.rows();\n\
+    \    const int variable_count = coefficients.cols();\n    Matrix<T> augmented(equation_count,\
+    \ variable_count + 1);\n    for (int row = 0; row < equation_count; row++) {\n\
+    \        for (int col = 0; col < variable_count; col++) {\n            augmented[row][col]\
+    \ = coefficients[row][col];\n        }\n        augmented[row][variable_count]\
+    \ = constants[std::size_t(row)];\n    }\n\n    LinearSystemResult<T> result;\n\
+    \    result.pivot_columns =\n        detail::row_reduce(augmented, variable_count,\
+    \ eps, true);\n\n    for (int row = result.rank(); row < equation_count; row++)\
+    \ {\n        bool zero_left = true;\n        for (int col = 0; col < variable_count;\
+    \ col++) {\n            if (!detail::is_zero(augmented[row][col], eps)) {\n  \
+    \              zero_left = false;\n                break;\n            }\n   \
+    \     }\n        if (zero_left && !detail::is_zero(augmented[row][variable_count],\
+    \ eps)) {\n            return result;\n        }\n    }\n\n    result.consistent\
+    \ = true;\n    result.particular_solution.assign(std::size_t(variable_count),\
+    \ T());\n    std::vector<bool> is_pivot(std::size_t(variable_count), false);\n\
+    \    for (int row = 0; row < result.rank(); row++) {\n        const int col =\
+    \ result.pivot_columns[std::size_t(row)];\n        is_pivot[std::size_t(col)]\
+    \ = true;\n        result.particular_solution[std::size_t(col)] = augmented[row][variable_count];\n\
+    \    }\n\n    for (int free_col = 0; free_col < variable_count; free_col++) {\n\
+    \        if (is_pivot[std::size_t(free_col)]) continue;\n        std::vector<T>\
+    \ direction(static_cast<std::size_t>(variable_count));\n        direction[std::size_t(free_col)]\
+    \ = T(1);\n        for (int row = 0; row < result.rank(); row++) {\n         \
+    \   const int pivot_col = result.pivot_columns[std::size_t(row)];\n          \
+    \  direction[std::size_t(pivot_col)] = T() - augmented[row][free_col];\n     \
+    \   }\n        result.nullspace_basis.push_back(std::move(direction));\n    }\n\
+    \    return result;\n}\n\n}  // namespace matrix\n}  // namespace m1une\n\n\n\
+    #line 6 \"math/matrix/all.hpp\"\n\n\n#line 1 \"math/number_theory.hpp\"\n\n\n\n\
+    #line 7 \"math/number_theory.hpp\"\n#include <tuple>\n#line 10 \"math/number_theory.hpp\"\
     \n\nnamespace m1une {\nnamespace math {\n\nnamespace internal {\n\ninline long\
     \ long safe_mod(long long x, long long mod) {\n    x %= mod;\n    if (x < 0) x\
     \ += mod;\n    return x;\n}\n\ninline unsigned __int128 floor_sum_unsigned(unsigned\
@@ -1564,7 +2045,7 @@ data:
     \ value) {\n    if (value == 0) return true;\n    for (const auto& factor : prime_factorize(value))\
     \ {\n        if (factor.first % 4 == 3 && (factor.second & 1) != 0) return false;\n\
     \    }\n    return true;\n}\n\n}  // namespace math\n}  // namespace m1une\n\n\
-    \n#line 27 \"math/all.hpp\"\n\n\n#line 12 \"verify/math/math_algorithms.test.cpp\"\
+    \n#line 29 \"math/all.hpp\"\n\n\n#line 12 \"verify/math/math_algorithms.test.cpp\"\
     \n\nlong long floor_div(long long numerator, long long denominator) {\n    long\
     \ long quotient = numerator / denominator;\n    if (numerator % denominator <\
     \ 0) quotient--;\n    return quotient;\n}\n\nvoid test_number_theory() {\n   \
@@ -1902,8 +2383,8 @@ data:
   - math/all.hpp
   - math/base_n.hpp
   - math/bernoulli.hpp
-  - fps/formal_power_series.hpp
-  - fps/convolution.hpp
+  - math/fps/formal_power_series.hpp
+  - math/fps/convolution.hpp
   - math/modint.hpp
   - math/combinatorics.hpp
   - math/bitwise_convolution.hpp
@@ -1916,6 +2397,17 @@ data:
   - math/gray_code.hpp
   - math/integer_arithmetic.hpp
   - math/lucas.hpp
+  - math/fps/all.hpp
+  - math/fps/convolution_ll.hpp
+  - math/fps/floating_point_convolution.hpp
+  - math/fps/formal_power_series.hpp
+  - math/fps/half_gcd.hpp
+  - math/fps/lagrange_inversion.hpp
+  - math/fps/linear_recurrence.hpp
+  - math/fps/multipoint_evaluation.hpp
+  - math/matrix/all.hpp
+  - math/matrix/linear_algebra.hpp
+  - math/matrix/matrix.hpp
   - math/modint.hpp
   - math/number_theory.hpp
   - math/primitive_root.hpp
@@ -1929,8 +2421,8 @@ data:
   isVerificationFile: true
   path: verify/math/math_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-07 02:56:26+09:00'
-  verificationStatus: TEST_ACCEPTED
+  timestamp: '2026-07-07 14:26:59+09:00'
+  verificationStatus: TEST_WRONG_ANSWER
   verifiedWith: []
 documentation_of: verify/math/math_algorithms.test.cpp
 layout: document

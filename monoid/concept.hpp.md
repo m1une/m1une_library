@@ -77,21 +77,24 @@ data:
   - icon: ':heavy_check_mark:'
     path: ds/segtree/segtree_2d.hpp
     title: Segtree 2D
+  - icon: ':heavy_check_mark:'
+    path: graph/all.hpp
+    title: Graph All
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/all.hpp
+    title: Tree All
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/sparse_table_lca.hpp
+    title: Sparse Table LCA
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/tree.hpp
+    title: Tree
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/virtual_tree.hpp
+    title: Virtual Tree
   - icon: ':warning:'
     path: monoid/power.hpp
     title: Monoid Power
-  - icon: ':heavy_check_mark:'
-    path: tree/all.hpp
-    title: Tree All
-  - icon: ':heavy_check_mark:'
-    path: tree/sparse_table_lca.hpp
-    title: Sparse Table LCA
-  - icon: ':heavy_check_mark:'
-    path: tree/tree.hpp
-    title: Tree
-  - icon: ':heavy_check_mark:'
-    path: tree/virtual_tree.hpp
-    title: Virtual Tree
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/ds/dsu/dsu_monoid.test.cpp
@@ -166,11 +169,20 @@ data:
     path: verify/ds/segtree/segtree_2d.test.cpp
     title: verify/ds/segtree/segtree_2d.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/cow_game.test.cpp
+    title: verify/graph/cow_game.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/graph_algorithms.test.cpp
+    title: verify/graph/graph_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/library_checker_lowest_common_ancestor.test.cpp
     title: verify/graph/library_checker_lowest_common_ancestor.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/tree/tree_algorithms.test.cpp
-    title: verify/tree/tree_algorithms.test.cpp
+    path: verify/graph/range_edge_graph.test.cpp
+    title: verify/graph/range_edge_graph.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/tree_algorithms.test.cpp
+    title: verify/graph/tree/tree_algorithms.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -208,10 +220,6 @@ data:
   isVerificationFile: false
   path: monoid/concept.hpp
   requiredBy:
-  - tree/sparse_table_lca.hpp
-  - tree/all.hpp
-  - tree/virtual_tree.hpp
-  - tree/tree.hpp
   - ds/dynamic_tree/link_cut_tree.hpp
   - ds/dynamic_tree/path_link_cut_tree.hpp
   - ds/dynamic_array/dynamic_monoid_array.hpp
@@ -238,10 +246,14 @@ data:
   - ds/dsu/potentialized_dsu.hpp
   - ds/dsu/persistent_potentialized_dsu.hpp
   - monoid/power.hpp
+  - graph/tree/sparse_table_lca.hpp
+  - graph/tree/all.hpp
+  - graph/tree/virtual_tree.hpp
+  - graph/tree/tree.hpp
+  - graph/all.hpp
   timestamp: '2026-06-17 21:06:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/tree/tree_algorithms.test.cpp
   - verify/ds/dynamic_tree/link_cut_tree.test.cpp
   - verify/ds/dynamic_tree/path_link_cut_tree.test.cpp
   - verify/ds/dynamic_array/persistent_dynamic_monoid_array.test.cpp
@@ -266,7 +278,11 @@ data:
   - verify/ds/dsu/persistent_potentialized_dsu.test.cpp
   - verify/ds/dsu/dsu_monoid.test.cpp
   - verify/ds/dsu/potentialized_dsu.test.cpp
+  - verify/graph/cow_game.test.cpp
   - verify/graph/library_checker_lowest_common_ancestor.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/tree/tree_algorithms.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
 documentation_of: monoid/concept.hpp
 layout: document
 title: Monoid Concept

@@ -2,33 +2,30 @@
 data:
   _extendedDependsOn: []
   _extendedRequiredBy:
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: optimization/all.hpp
     title: Optimization All
   _extendedVerifiedWith:
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/optimization/hungarian.test.cpp
     title: verify/optimization/hungarian.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/optimization/integer_lp.test.cpp
     title: verify/optimization/integer_lp.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/optimization/project_selection.test.cpp
     title: verify/optimization/project_selection.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/optimization/simplex.test.cpp
     title: verify/optimization/simplex.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/optimization/slope_trick.test.cpp
-    title: verify/optimization/slope_trick.test.cpp
-  _isVerificationFailed: false
+  _isVerificationFailed: true
   _pathExtension: hpp
-  _verificationStatusIcon: ':heavy_check_mark:'
+  _verificationStatusIcon: ':x:'
   attributes:
     links: []
   bundledCode: "#line 1 \"optimization/hungarian.hpp\"\n\n\n\n#include <algorithm>\n\
     #include <cassert>\n#include <limits>\n#include <utility>\n#include <vector>\n\
-    \nnamespace m1une {\nnamespace optimization {\n\ntemplate <class T>\nstruct HungarianResult\
+    \nnamespace m1une {\nnamespace opt {\n\ntemplate <class T>\nstruct HungarianResult\
     \ {\n    T cost;\n    std::vector<int> row_to_col;\n    std::vector<int> col_to_row;\n\
     \n    int matching_size() const {\n        int result = 0;\n        for (int col\
     \ : row_to_col) {\n            if (col != -1) result++;\n        }\n        return\
@@ -80,21 +77,21 @@ data:
     \ hungarian_min(negated);\n    result.cost = detail::assignment_cost(cost, result.row_to_col);\n\
     \    return result;\n}\n\ntemplate <class T>\nHungarianResult<T> hungarian(const\
     \ std::vector<std::vector<T>>& cost) {\n    return hungarian_min(cost);\n}\n\n\
-    }  // namespace optimization\n}  // namespace m1une\n\n\n"
+    }  // namespace opt\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_OPTIMIZATION_HUNGARIAN_HPP\n#define M1UNE_OPTIMIZATION_HUNGARIAN_HPP\
     \ 1\n\n#include <algorithm>\n#include <cassert>\n#include <limits>\n#include <utility>\n\
-    #include <vector>\n\nnamespace m1une {\nnamespace optimization {\n\ntemplate <class\
-    \ T>\nstruct HungarianResult {\n    T cost;\n    std::vector<int> row_to_col;\n\
-    \    std::vector<int> col_to_row;\n\n    int matching_size() const {\n       \
-    \ int result = 0;\n        for (int col : row_to_col) {\n            if (col !=\
-    \ -1) result++;\n        }\n        return result;\n    }\n\n    std::vector<std::pair<int,\
-    \ int>> matching() const {\n        std::vector<std::pair<int, int>> result;\n\
-    \        for (int row = 0; row < int(row_to_col.size()); row++) {\n          \
-    \  if (row_to_col[row] != -1) result.push_back({row, row_to_col[row]});\n    \
-    \    }\n        return result;\n    }\n};\n\nnamespace detail {\n\ntemplate <class\
-    \ T>\nT assignment_cost(const std::vector<std::vector<T>>& cost, const std::vector<int>&\
-    \ row_to_col) {\n    T result = T();\n    for (int row = 0; row < int(row_to_col.size());\
-    \ row++) {\n        if (row_to_col[row] != -1) result += cost[row][row_to_col[row]];\n\
+    #include <vector>\n\nnamespace m1une {\nnamespace opt {\n\ntemplate <class T>\n\
+    struct HungarianResult {\n    T cost;\n    std::vector<int> row_to_col;\n    std::vector<int>\
+    \ col_to_row;\n\n    int matching_size() const {\n        int result = 0;\n  \
+    \      for (int col : row_to_col) {\n            if (col != -1) result++;\n  \
+    \      }\n        return result;\n    }\n\n    std::vector<std::pair<int, int>>\
+    \ matching() const {\n        std::vector<std::pair<int, int>> result;\n     \
+    \   for (int row = 0; row < int(row_to_col.size()); row++) {\n            if (row_to_col[row]\
+    \ != -1) result.push_back({row, row_to_col[row]});\n        }\n        return\
+    \ result;\n    }\n};\n\nnamespace detail {\n\ntemplate <class T>\nT assignment_cost(const\
+    \ std::vector<std::vector<T>>& cost, const std::vector<int>& row_to_col) {\n \
+    \   T result = T();\n    for (int row = 0; row < int(row_to_col.size()); row++)\
+    \ {\n        if (row_to_col[row] != -1) result += cost[row][row_to_col[row]];\n\
     \    }\n    return result;\n}\n\n}  // namespace detail\n\ntemplate <class T>\n\
     HungarianResult<T> hungarian_min(const std::vector<std::vector<T>>& cost) {\n\
     \    int row_count = int(cost.size());\n    int col_count = row_count == 0 ? 0\
@@ -135,18 +132,17 @@ data:
     \ hungarian_min(negated);\n    result.cost = detail::assignment_cost(cost, result.row_to_col);\n\
     \    return result;\n}\n\ntemplate <class T>\nHungarianResult<T> hungarian(const\
     \ std::vector<std::vector<T>>& cost) {\n    return hungarian_min(cost);\n}\n\n\
-    }  // namespace optimization\n}  // namespace m1une\n\n#endif  // M1UNE_OPTIMIZATION_HUNGARIAN_HPP\n"
+    }  // namespace opt\n}  // namespace m1une\n\n#endif  // M1UNE_OPTIMIZATION_HUNGARIAN_HPP\n"
   dependsOn: []
   isVerificationFile: false
   path: optimization/hungarian.hpp
   requiredBy:
   - optimization/all.hpp
-  timestamp: '2026-06-17 10:25:58+09:00'
-  verificationStatus: LIBRARY_ALL_AC
+  timestamp: '2026-07-07 14:26:59+09:00'
+  verificationStatus: LIBRARY_ALL_WA
   verifiedWith:
   - verify/optimization/project_selection.test.cpp
   - verify/optimization/integer_lp.test.cpp
-  - verify/optimization/slope_trick.test.cpp
   - verify/optimization/simplex.test.cpp
   - verify/optimization/hungarian.test.cpp
 documentation_of: optimization/hungarian.hpp
@@ -207,7 +203,7 @@ int main() {
         {3, 2, 2},
     };
 
-    auto result = m1une::optimization::hungarian_min(cost);
+    auto result = m1une::opt::hungarian_min(cost);
     std::cout << result.cost << "\n";  // 5
     for (auto [row, col] : result.matching()) {
         std::cout << row << " " << col << "\n";

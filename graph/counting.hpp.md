@@ -1,19 +1,19 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':heavy_check_mark:'
-    path: fps/convolution.hpp
-    title: Convolution
-  - icon: ':heavy_check_mark:'
-    path: fps/convolution.hpp
-    title: Convolution
-  - icon: ':heavy_check_mark:'
-    path: fps/formal_power_series.hpp
-    title: Formal Power Series
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/combinatorics.hpp
     title: Combinatorics
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
+    path: math/fps/convolution.hpp
+    title: Convolution
+  - icon: ':question:'
+    path: math/fps/convolution.hpp
+    title: Convolution
+  - icon: ':question:'
+    path: math/fps/formal_power_series.hpp
+    title: Formal Power Series
+  - icon: ':question:'
     path: math/modint.hpp
     title: ModInt
   _extendedRequiredBy:
@@ -40,19 +40,19 @@ data:
     links: []
   bundledCode: "#line 1 \"graph/counting.hpp\"\n\n\n\n#include <cassert>\n#include\
     \ <cstdint>\n#include <optional>\n#include <utility>\n#include <vector>\n\n#line\
-    \ 1 \"fps/convolution.hpp\"\n\n\n\n#include <algorithm>\n#include <array>\n#line\
-    \ 10 \"fps/convolution.hpp\"\n\n#line 1 \"math/modint.hpp\"\n\n\n\n#line 5 \"\
-    math/modint.hpp\"\n#include <iostream>\n#include <type_traits>\n#line 8 \"math/modint.hpp\"\
-    \n\nnamespace m1une {\nnamespace math {\n\ntemplate <uint32_t Modulus>\nstruct\
-    \ ModInt {\n    static_assert(0 < Modulus, \"Modulus must be positive\");\n\n\
-    \   private:\n    uint32_t _v;\n\n   public:\n    static constexpr uint32_t mod()\
-    \ {\n        return Modulus;\n    }\n\n    static constexpr ModInt raw(uint32_t\
-    \ v) noexcept {\n        ModInt x;\n        x._v = v;\n        return x;\n   \
-    \ }\n\n    constexpr ModInt() noexcept : _v(0) {}\n\n    template <class Integer,\
-    \ std::enable_if_t<std::is_integral_v<Integer>, int> = 0>\n    constexpr ModInt(Integer\
-    \ v) noexcept {\n        if constexpr (std::is_signed_v<Integer>) {\n        \
-    \    int64_t x = static_cast<int64_t>(v) % static_cast<int64_t>(Modulus);\n  \
-    \          if (x < 0) x += Modulus;\n            _v = static_cast<uint32_t>(x);\n\
+    \ 1 \"math/fps/convolution.hpp\"\n\n\n\n#include <algorithm>\n#include <array>\n\
+    #line 10 \"math/fps/convolution.hpp\"\n\n#line 1 \"math/modint.hpp\"\n\n\n\n#line\
+    \ 5 \"math/modint.hpp\"\n#include <iostream>\n#include <type_traits>\n#line 8\
+    \ \"math/modint.hpp\"\n\nnamespace m1une {\nnamespace math {\n\ntemplate <uint32_t\
+    \ Modulus>\nstruct ModInt {\n    static_assert(0 < Modulus, \"Modulus must be\
+    \ positive\");\n\n   private:\n    uint32_t _v;\n\n   public:\n    static constexpr\
+    \ uint32_t mod() {\n        return Modulus;\n    }\n\n    static constexpr ModInt\
+    \ raw(uint32_t v) noexcept {\n        ModInt x;\n        x._v = v;\n        return\
+    \ x;\n    }\n\n    constexpr ModInt() noexcept : _v(0) {}\n\n    template <class\
+    \ Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>\n    constexpr\
+    \ ModInt(Integer v) noexcept {\n        if constexpr (std::is_signed_v<Integer>)\
+    \ {\n            int64_t x = static_cast<int64_t>(v) % static_cast<int64_t>(Modulus);\n\
+    \            if (x < 0) x += Modulus;\n            _v = static_cast<uint32_t>(x);\n\
     \        } else {\n            _v = static_cast<uint32_t>(static_cast<uint64_t>(v)\
     \ % Modulus);\n        }\n    }\n\n    constexpr uint32_t val() const noexcept\
     \ {\n        return _v;\n    }\n\n    constexpr ModInt& operator++() noexcept\
@@ -91,7 +91,7 @@ data:
     \ ModInt& rhs) {\n        long long v;\n        is >> v;\n        rhs = ModInt(v);\n\
     \        return is;\n    }\n};\n\nusing modint998244353 = ModInt<998244353>;\n\
     using modint1000000007 = ModInt<1000000007>;\n\n}  // namespace math\n}  // namespace\
-    \ m1une\n\n\n#line 12 \"fps/convolution.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ m1une\n\n\n#line 12 \"math/fps/convolution.hpp\"\n\nnamespace m1une {\nnamespace\
     \ fps {\n\nnamespace internal {\n\nconstexpr uint32_t primitive_root_constexpr(uint32_t\
     \ mod) {\n    if (mod == 2) return 1;\n    if (mod == 167772161) return 3;\n \
     \   if (mod == 469762049) return 3;\n    if (mod == 754974721) return 11;\n  \
@@ -185,8 +185,8 @@ data:
     \        value = (value + mod1_target * (first % target_mod)) % target_mod;\n\
     \        value = (value + mod1_mod2_target * (second % target_mod)) % target_mod;\n\
     \        result[i] = Mint::raw(uint32_t(value));\n    }\n    return result;\n\
-    }\n\n}  // namespace fps\n}  // namespace m1une\n\n\n#line 1 \"fps/formal_power_series.hpp\"\
-    \n\n\n\n#line 10 \"fps/formal_power_series.hpp\"\n\n#line 12 \"fps/formal_power_series.hpp\"\
+    }\n\n}  // namespace fps\n}  // namespace m1une\n\n\n#line 1 \"math/fps/formal_power_series.hpp\"\
+    \n\n\n\n#line 10 \"math/fps/formal_power_series.hpp\"\n\n#line 12 \"math/fps/formal_power_series.hpp\"\
     \n\nnamespace m1une {\nnamespace fps {\n\nnamespace internal {\n\ntemplate <class\
     \ Mint>\nstd::optional<Mint> modular_square_root(Mint value) {\n    const uint32_t\
     \ mod = Mint::mod();\n    if (value == Mint(0)) return Mint(0);\n    if (mod ==\
@@ -477,7 +477,7 @@ data:
     \ m1une\n\n\n"
   code: "#ifndef M1UNE_GRAPH_COUNTING_HPP\n#define M1UNE_GRAPH_COUNTING_HPP 1\n\n\
     #include <cassert>\n#include <cstdint>\n#include <optional>\n#include <utility>\n\
-    #include <vector>\n\n#include \"../fps/convolution.hpp\"\n#include \"../fps/formal_power_series.hpp\"\
+    #include <vector>\n\n#include \"../math/fps/convolution.hpp\"\n#include \"../math/fps/formal_power_series.hpp\"\
     \n#include \"../math/combinatorics.hpp\"\n\nnamespace m1une {\nnamespace graph\
     \ {\n\nnamespace graph_counting_detail {\n\ntemplate <class Mint>\nusing Fps =\
     \ fps::FormalPowerSeries<Mint>;\n\ntemplate <class Mint>\nvoid assert_maximum(int\
@@ -603,16 +603,16 @@ data:
     \ / 2] * half;\n    }\n    return result;\n}\n\n}  // namespace graph\n}  // namespace\
     \ m1une\n\n#endif  // M1UNE_GRAPH_COUNTING_HPP\n"
   dependsOn:
-  - fps/convolution.hpp
+  - math/fps/convolution.hpp
   - math/modint.hpp
-  - fps/formal_power_series.hpp
-  - fps/convolution.hpp
+  - math/fps/formal_power_series.hpp
+  - math/fps/convolution.hpp
   - math/combinatorics.hpp
   isVerificationFile: false
   path: graph/counting.hpp
   requiredBy:
   - graph/all.hpp
-  timestamp: '2026-07-07 14:04:22+09:00'
+  timestamp: '2026-07-07 14:26:59+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp

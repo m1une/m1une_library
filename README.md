@@ -4,45 +4,75 @@
 
 C++20 library for competitive programming by [m1une](https://atcoder.jp/users/m1une).
 
-This repository is organized as header-only building blocks. Data structures live in
-`ds/`, and reusable algebraic definitions live in `monoid/` and
-`acted_monoid/` so they can be combined without rewriting boilerplate during a
-contest.
+This repository is organized as header-only building blocks. Use `ds/` when
+you need an object that maintains state and answers updates or queries, such as
+Li Chao tree, CHT, or slope trick. Use `algo/` for one-shot sequence algorithms
+and DP optimization helpers. Graph-specialized algorithms, including tree and
+flow routines, live under `graph/`; algebraic and numeric tools, including FPS
+and matrices, live under `math/`. Reusable algebraic definitions live in
+`monoid/` and `acted_monoid/` so they can be combined without rewriting
+boilerplate during a contest.
 
 ## Structure
 
 | Directory | Contents |
 | --- | --- |
-| `graph/` | General graph algorithms and builders, including graph-counting sequences, range edges, shortest paths, components, cycles, Namori decomposition, DAGs, 2-SAT, lowlink, MST, and minimum Steiner trees. |
-| `tree/` | Rooted-tree metadata, LCA, HLD, virtual trees, 01-on-Tree optimization, tree hashing, rerooting DP, and centroid decomposition. |
-| `flow/` | Flow-network algorithms such as max flow, min-cost flow, and bounded flow. |
-| `optimization/` | Project selection, slope trick, Hungarian assignment, simplex LP, and integer LP. |
+| `algo/` | One-shot algorithms that are not tied to a graph/string/geometry domain, including sequence algorithms and DP optimization helpers. |
+| `graph/` | General graph algorithms and builders, plus `graph/tree/` for rooted-tree tools and `graph/flow/` for flow networks. |
+| `optimization/` | Combinatorial and numeric optimization solvers such as project selection, Hungarian assignment, simplex LP, and integer LP. |
 | `matroid/` | Uniform, partition, graphic, and linear matroids, plus weighted and unweighted matroid intersection. |
-| `monge/` | SMAWK, D&C DP, Knuth optimization, LARSCH, Monge checks, and structured min-plus/max-plus convolution. |
-| `matrix/` | Dense row-major matrices, fast multiplication and powers, Gaussian elimination, determinant, inverse, and linear systems. |
-| `fps/` | Fast convolution, formal power series operations, polynomial half-GCD, Lagrange inversion, multipoint evaluation, interpolation, and linear recurrences. |
-| `sequence/` | Sequence algorithms such as longest increasing subsequence, inversion counting, and meet-in-the-middle subset sum. |
 | `geometry/` | 2D points, lines, rays, segments, polygons, convex hulls, half-plane intersection, lattice-point counting, and circles. |
-| `ds/` | Categorized data structures for range queries, online/offline dynamic connectivity, dynamic sequences and trees, ordered sets, and hash tables. |
+| `ds/` | Categorized data structures for line queries, convex functions, range queries, online/offline dynamic connectivity, dynamic sequences and trees, ordered sets, heaps, intervals, and hash tables. |
 | `monoid/` | Reusable monoids for generic data structures such as `Segtree`. |
 | `acted_monoid/` | Acted monoids for lazy propagation structures such as `LazySegtree` and generic `SegtreeBeats`. |
-| `math/` | Base and Gray-code conversion, Bernoulli and power-sum tools, repunits, cyclotomic polynomials, extended GCD, modular arithmetic, Lucas binomials, tetration, Stern-Brocot paths, combinatorial sequences, sieves, factorization, CRT, and ordinary or generalized floor sums. |
+| `math/` | Number theory, modular arithmetic, combinatorics, bitwise transforms, FPS/polynomials, matrices, exact rationals, and integer arithmetic. |
 | `string/` | Z/KMP, edit distance, Manacher, eertrees, suffix automata/arrays, tries, Aho-Corasick, and string hashes. |
 | `utilities/` | Fast I/O, parsing, dice, integer helpers, compression, random generation, stress testing, and general contest utilities. |
 | `verify/` | Online Judge Verify Helper tests. |
 | `docs/` | Markdown documentation for the public headers. |
+
+### Namespace map
+
+Namespaces intentionally do not mirror nested directories. Public APIs use one
+short namespace segment after `m1une::`; nested directories are for browsing.
+
+| Directory | Namespace |
+| --- | --- |
+| `algo/sequence/` | `m1une::sequence` |
+| `algo/dp_optimization/alien_trick.hpp` | `m1une::dp` |
+| `algo/dp_optimization/monge/` | `m1une::monge` |
+| `ds/` | `m1une::ds` |
+| `graph/` | `m1une::graph` |
+| `graph/flow/` | `m1une::flow` |
+| `graph/tree/` | `m1une::tree` |
+| `math/` | `m1une::math` |
+| `math/fps/` | `m1une::fps` |
+| `math/matrix/` | `m1une::matrix` |
+| `optimization/` | `m1une::opt` |
+| `geometry/`, `string/`, `matroid/`, `monoid/` | Matching short top-level namespaces. |
+
+### Algorithm categories
+
+| Directory | Use it for |
+| --- | --- |
+| `algo/sequence/` | Array and sequence algorithms such as LIS, inversion count, and meet-in-the-middle subset sum. |
+| `algo/dp_optimization/` | Alien Trick, Monge/SMAWK/Knuth/D&C optimization, LARSCH, and structured min-plus/max-plus convolution. |
 
 ### Data structure categories
 
 | Directory | Use it for |
 | --- | --- |
 | `ds/dsu/` | Connectivity, component aggregation, potentials, and persistent union-find. |
+| `ds/line_container/` | Convex hull trick and Li Chao tree for adding lines or line segments and querying an optimum at `x`. |
+| `ds/convex_function/` | Slope trick for maintaining convex piecewise-linear functions. |
 | `ds/segtree/` | Dense and dynamic segment trees, lazy propagation, dual segment trees, and persistent variants. |
 | `ds/range_query/` | Cumulative sums, Fenwick trees, static sparse-table queries, and wavelet matrices. |
 | `ds/dynamic_array/` | Implicit-treap sequences with insertion, deletion, reversal, aggregation, or persistence. |
 | `ds/ordered_set/` | Ordered sets and multisets, including persistent variants and binary tries with optional monoid aggregates. |
 | `ds/dynamic_tree/` | Link-cut trees and rake-compress trees for changing forests. |
 | `ds/dynamic_connectivity/` | Online and offline connectivity under edge insertions and deletions. |
+| `ds/heap/` | Meldable priority queues. |
+| `ds/interval_set/` | Disjoint interval maintenance. |
 | `ds/hash_table/` | Hash maps and hash sets. |
 
 See [`ds/README.md`](ds/README.md) for the complete header index.

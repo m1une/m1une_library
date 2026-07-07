@@ -1,22 +1,22 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':heavy_check_mark:'
-    path: fps/convolution.hpp
-    title: Convolution
-  - icon: ':heavy_check_mark:'
-    path: fps/formal_power_series.hpp
-    title: Formal Power Series
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/bernoulli.hpp
     title: Bernoulli Numbers and Power Sums
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/combinatorics.hpp
     title: Combinatorics
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
+    path: math/fps/convolution.hpp
+    title: Convolution
+  - icon: ':question:'
+    path: math/fps/formal_power_series.hpp
+    title: Formal Power Series
+  - icon: ':question:'
     path: math/modint.hpp
     title: ModInt
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/modint.hpp
     title: ModInt
   _extendedRequiredBy: []
@@ -32,11 +32,11 @@ data:
   bundledCode: "#line 1 \"verify/math/bernoulli_utilities.test.cpp\"\n#define PROBLEM\
     \ \"https://judge.yosupo.jp/problem/aplusb\"\n\n#line 1 \"math/bernoulli.hpp\"\
     \n\n\n\n#include <cassert>\n#include <cstdint>\n#include <vector>\n\n#line 1 \"\
-    fps/formal_power_series.hpp\"\n\n\n\n#include <algorithm>\n#line 7 \"fps/formal_power_series.hpp\"\
-    \n#include <optional>\n#include <utility>\n#line 10 \"fps/formal_power_series.hpp\"\
-    \n\n#line 1 \"fps/convolution.hpp\"\n\n\n\n#line 5 \"fps/convolution.hpp\"\n#include\
-    \ <array>\n#line 10 \"fps/convolution.hpp\"\n\n#line 1 \"math/modint.hpp\"\n\n\
-    \n\n#line 5 \"math/modint.hpp\"\n#include <iostream>\n#include <type_traits>\n\
+    math/fps/formal_power_series.hpp\"\n\n\n\n#include <algorithm>\n#line 7 \"math/fps/formal_power_series.hpp\"\
+    \n#include <optional>\n#include <utility>\n#line 10 \"math/fps/formal_power_series.hpp\"\
+    \n\n#line 1 \"math/fps/convolution.hpp\"\n\n\n\n#line 5 \"math/fps/convolution.hpp\"\
+    \n#include <array>\n#line 10 \"math/fps/convolution.hpp\"\n\n#line 1 \"math/modint.hpp\"\
+    \n\n\n\n#line 5 \"math/modint.hpp\"\n#include <iostream>\n#include <type_traits>\n\
     #line 8 \"math/modint.hpp\"\n\nnamespace m1une {\nnamespace math {\n\ntemplate\
     \ <uint32_t Modulus>\nstruct ModInt {\n    static_assert(0 < Modulus, \"Modulus\
     \ must be positive\");\n\n   private:\n    uint32_t _v;\n\n   public:\n    static\
@@ -85,7 +85,7 @@ data:
     \ ModInt& rhs) {\n        long long v;\n        is >> v;\n        rhs = ModInt(v);\n\
     \        return is;\n    }\n};\n\nusing modint998244353 = ModInt<998244353>;\n\
     using modint1000000007 = ModInt<1000000007>;\n\n}  // namespace math\n}  // namespace\
-    \ m1une\n\n\n#line 12 \"fps/convolution.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ m1une\n\n\n#line 12 \"math/fps/convolution.hpp\"\n\nnamespace m1une {\nnamespace\
     \ fps {\n\nnamespace internal {\n\nconstexpr uint32_t primitive_root_constexpr(uint32_t\
     \ mod) {\n    if (mod == 2) return 1;\n    if (mod == 167772161) return 3;\n \
     \   if (mod == 469762049) return 3;\n    if (mod == 754974721) return 11;\n  \
@@ -179,7 +179,7 @@ data:
     \        value = (value + mod1_target * (first % target_mod)) % target_mod;\n\
     \        value = (value + mod1_mod2_target * (second % target_mod)) % target_mod;\n\
     \        result[i] = Mint::raw(uint32_t(value));\n    }\n    return result;\n\
-    }\n\n}  // namespace fps\n}  // namespace m1une\n\n\n#line 12 \"fps/formal_power_series.hpp\"\
+    }\n\n}  // namespace fps\n}  // namespace m1une\n\n\n#line 12 \"math/fps/formal_power_series.hpp\"\
     \n\nnamespace m1une {\nnamespace fps {\n\nnamespace internal {\n\ntemplate <class\
     \ Mint>\nstd::optional<Mint> modular_square_root(Mint value) {\n    const uint32_t\
     \ mod = Mint::mod();\n    if (value == Mint(0)) return Mint(0);\n    if (mod ==\
@@ -550,15 +550,15 @@ data:
     n';\n}\n"
   dependsOn:
   - math/bernoulli.hpp
-  - fps/formal_power_series.hpp
-  - fps/convolution.hpp
+  - math/fps/formal_power_series.hpp
+  - math/fps/convolution.hpp
   - math/modint.hpp
   - math/combinatorics.hpp
   - math/modint.hpp
   isVerificationFile: true
   path: verify/math/bernoulli_utilities.test.cpp
   requiredBy: []
-  timestamp: '2026-07-07 02:56:26+09:00'
+  timestamp: '2026-07-07 14:26:59+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/bernoulli_utilities.test.cpp

@@ -5,14 +5,8 @@ data:
     path: ds/dsu/dsu.hpp
     title: DSU (Disjoint Set Union)
   - icon: ':heavy_check_mark:'
-    path: fps/convolution.hpp
-    title: Convolution
-  - icon: ':heavy_check_mark:'
-    path: fps/convolution.hpp
-    title: Convolution
-  - icon: ':heavy_check_mark:'
-    path: fps/formal_power_series.hpp
-    title: Formal Power Series
+    path: ds/range_query/sparse_table.hpp
+    title: Sparse Table
   - icon: ':heavy_check_mark:'
     path: graph/all.hpp
     title: Graph All
@@ -50,8 +44,29 @@ data:
     path: graph/dominator_tree.hpp
     title: Dominator Tree
   - icon: ':heavy_check_mark:'
+    path: graph/flow/bounded_flow.hpp
+    title: Bounded Flow
+  - icon: ':heavy_check_mark:'
+    path: graph/flow/bounded_min_cost_flow.hpp
+    title: Bounded Min Cost Flow
+  - icon: ':heavy_check_mark:'
+    path: graph/flow/flow.hpp
+    title: Flow
+  - icon: ':heavy_check_mark:'
+    path: graph/flow/gomory_hu.hpp
+    title: Gomory-Hu Tree
+  - icon: ':question:'
+    path: graph/flow/max_flow.hpp
+    title: Max Flow
+  - icon: ':heavy_check_mark:'
+    path: graph/flow/min_cost_flow.hpp
+    title: Min Cost Flow
+  - icon: ':heavy_check_mark:'
     path: graph/general_matching.hpp
     title: General Matching
+  - icon: ':heavy_check_mark:'
+    path: graph/graph.hpp
+    title: Graph
   - icon: ':heavy_check_mark:'
     path: graph/graph.hpp
     title: Graph
@@ -86,6 +101,48 @@ data:
     path: graph/topological_sort.hpp
     title: Topological Sort
   - icon: ':heavy_check_mark:'
+    path: graph/tree/all.hpp
+    title: Tree All
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/centroid_decomposition.hpp
+    title: Centroid Decomposition
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/diameter.hpp
+    title: Tree Diameter
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/dsu_on_tree.hpp
+    title: DSU on Tree
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/heavy_light_decomposition.hpp
+    title: Heavy Light Decomposition
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/rerooting_dp.hpp
+    title: Rerooting DP
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/rerooting_static_top_tree.hpp
+    title: Rerooting Static Top Tree
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/rooted_tree.hpp
+    title: Rooted Tree
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/sparse_table_lca.hpp
+    title: Sparse Table LCA
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/static_top_tree.hpp
+    title: Static Top Tree
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/tree.hpp
+    title: Tree
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/tree_hash.hpp
+    title: Hash of Tree
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/virtual_tree.hpp
+    title: Virtual Tree
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/zero_one_on_tree.hpp
+    title: 01 on Tree
+  - icon: ':heavy_check_mark:'
     path: graph/two_sat.hpp
     title: Two-Satisfiability
   - icon: ':heavy_check_mark:'
@@ -97,12 +154,24 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/zero_one_bfs.hpp
     title: 0-1 BFS
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/combinatorics.hpp
     title: Combinatorics
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
+    path: math/fps/convolution.hpp
+    title: Convolution
+  - icon: ':question:'
+    path: math/fps/convolution.hpp
+    title: Convolution
+  - icon: ':question:'
+    path: math/fps/formal_power_series.hpp
+    title: Formal Power Series
+  - icon: ':question:'
     path: math/modint.hpp
     title: ModInt
+  - icon: ':heavy_check_mark:'
+    path: monoid/concept.hpp
+    title: Monoid Concept
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
   _isVerificationFailed: false
@@ -118,8 +187,8 @@ data:
     \ <cassert>\n#include <iostream>\n#include <set>\n#include <string>\n#include\
     \ <vector>\n\n#line 1 \"graph/all.hpp\"\n\n\n\n#line 1 \"graph/counting.hpp\"\n\
     \n\n\n#line 5 \"graph/counting.hpp\"\n#include <cstdint>\n#include <optional>\n\
-    #include <utility>\n#line 9 \"graph/counting.hpp\"\n\n#line 1 \"fps/convolution.hpp\"\
-    \n\n\n\n#line 5 \"fps/convolution.hpp\"\n#include <array>\n#line 10 \"fps/convolution.hpp\"\
+    #include <utility>\n#line 9 \"graph/counting.hpp\"\n\n#line 1 \"math/fps/convolution.hpp\"\
+    \n\n\n\n#line 5 \"math/fps/convolution.hpp\"\n#include <array>\n#line 10 \"math/fps/convolution.hpp\"\
     \n\n#line 1 \"math/modint.hpp\"\n\n\n\n#line 6 \"math/modint.hpp\"\n#include <type_traits>\n\
     #line 8 \"math/modint.hpp\"\n\nnamespace m1une {\nnamespace math {\n\ntemplate\
     \ <uint32_t Modulus>\nstruct ModInt {\n    static_assert(0 < Modulus, \"Modulus\
@@ -169,7 +238,7 @@ data:
     \ ModInt& rhs) {\n        long long v;\n        is >> v;\n        rhs = ModInt(v);\n\
     \        return is;\n    }\n};\n\nusing modint998244353 = ModInt<998244353>;\n\
     using modint1000000007 = ModInt<1000000007>;\n\n}  // namespace math\n}  // namespace\
-    \ m1une\n\n\n#line 12 \"fps/convolution.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ m1une\n\n\n#line 12 \"math/fps/convolution.hpp\"\n\nnamespace m1une {\nnamespace\
     \ fps {\n\nnamespace internal {\n\nconstexpr uint32_t primitive_root_constexpr(uint32_t\
     \ mod) {\n    if (mod == 2) return 1;\n    if (mod == 167772161) return 3;\n \
     \   if (mod == 469762049) return 3;\n    if (mod == 754974721) return 11;\n  \
@@ -263,8 +332,8 @@ data:
     \        value = (value + mod1_target * (first % target_mod)) % target_mod;\n\
     \        value = (value + mod1_mod2_target * (second % target_mod)) % target_mod;\n\
     \        result[i] = Mint::raw(uint32_t(value));\n    }\n    return result;\n\
-    }\n\n}  // namespace fps\n}  // namespace m1une\n\n\n#line 1 \"fps/formal_power_series.hpp\"\
-    \n\n\n\n#line 10 \"fps/formal_power_series.hpp\"\n\n#line 12 \"fps/formal_power_series.hpp\"\
+    }\n\n}  // namespace fps\n}  // namespace m1une\n\n\n#line 1 \"math/fps/formal_power_series.hpp\"\
+    \n\n\n\n#line 10 \"math/fps/formal_power_series.hpp\"\n\n#line 12 \"math/fps/formal_power_series.hpp\"\
     \n\nnamespace m1une {\nnamespace fps {\n\nnamespace internal {\n\ntemplate <class\
     \ Mint>\nstd::optional<Mint> modular_square_root(Mint value) {\n    const uint32_t\
     \ mod = Mint::mod();\n    if (value == Mint(0)) return Mint(0);\n    if (mod ==\
@@ -1091,23 +1160,421 @@ data:
     \       continue;\n        }\n        int child = result.children[current][child_index++];\n\
     \        result.tin[child] = timer++;\n        tree_stack.emplace_back(child,\
     \ 0);\n    }\n    return result;\n}\n\n}  // namespace graph\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"graph/grid.hpp\"\n\n\n\n#line 8 \"graph/grid.hpp\"\n\n\
-    #line 10 \"graph/grid.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\nstruct\
-    \ Grid {\n   private:\n    int _h;\n    int _w;\n\n   public:\n    static constexpr\
-    \ std::array<int, 4> di4 = {-1, 0, 1, 0};\n    static constexpr std::array<int,\
-    \ 4> dj4 = {0, 1, 0, -1};\n    static constexpr std::array<int, 8> di8 = {-1,\
-    \ -1, -1, 0, 0, 1, 1, 1};\n    static constexpr std::array<int, 8> dj8 = {-1,\
-    \ 0, 1, -1, 1, -1, 0, 1};\n\n    Grid() : _h(0), _w(0) {}\n    Grid(int h, int\
-    \ w) : _h(h), _w(w) {\n        assert(0 <= h);\n        assert(0 <= w);\n    }\n\
-    \n    int height() const {\n        return _h;\n    }\n\n    int width() const\
-    \ {\n        return _w;\n    }\n\n    int size() const {\n        return _h *\
-    \ _w;\n    }\n\n    bool empty() const {\n        return size() == 0;\n    }\n\
-    \n    bool inside(int i, int j) const {\n        return 0 <= i && i < _h && 0\
-    \ <= j && j < _w;\n    }\n\n    int id(int i, int j) const {\n        assert(inside(i,\
-    \ j));\n        return i * _w + j;\n    }\n\n    std::pair<int, int> pos(int v)\
-    \ const {\n        assert(0 <= v && v < size());\n        return {v / _w, v %\
-    \ _w};\n    }\n\n    std::vector<std::pair<int, int>> adj4(int i, int j) const\
-    \ {\n        assert(inside(i, j));\n        std::vector<std::pair<int, int>> result;\n\
+    \ m1une\n\n\n#line 1 \"graph/flow/flow.hpp\"\n\n\n\n#line 1 \"graph/flow/bounded_flow.hpp\"\
+    \n\n\n\n#line 7 \"graph/flow/bounded_flow.hpp\"\n\n#line 1 \"graph/flow/max_flow.hpp\"\
+    \n\n\n\n#line 10 \"graph/flow/max_flow.hpp\"\n\nnamespace m1une {\nnamespace flow\
+    \ {\n\ntemplate <class Cap>\nstruct MaxFlow {\n    struct Edge {\n        int\
+    \ from;\n        int to;\n        Cap cap;\n        Cap flow;\n    };\n\n   private:\n\
+    \    struct InternalEdge {\n        int to;\n        int rev;\n        Cap cap;\n\
+    \    };\n\n    int _n;\n    std::vector<std::pair<int, int>> _pos;\n    std::vector<std::vector<InternalEdge>>\
+    \ _g;\n\n   public:\n    MaxFlow() : MaxFlow(0) {}\n\n    explicit MaxFlow(int\
+    \ n) : _n(n), _g(n) {\n        assert(0 <= n);\n    }\n\n    int size() const\
+    \ {\n        return _n;\n    }\n\n    int edge_count() const {\n        return\
+    \ int(_pos.size());\n    }\n\n    int add_edge(int from, int to, Cap cap) {\n\
+    \        assert(0 <= from && from < _n);\n        assert(0 <= to && to < _n);\n\
+    \        assert(Cap(0) <= cap);\n        int id = int(_pos.size());\n        int\
+    \ from_id = int(_g[from].size());\n        int to_id = int(_g[to].size());\n \
+    \       if (from == to) to_id++;\n        _pos.emplace_back(from, from_id);\n\
+    \        _g[from].push_back(InternalEdge{to, to_id, cap});\n        _g[to].push_back(InternalEdge{from,\
+    \ from_id, Cap(0)});\n        return id;\n    }\n\n    Edge get_edge(int i) const\
+    \ {\n        assert(0 <= i && i < int(_pos.size()));\n        auto [from, idx]\
+    \ = _pos[i];\n        const auto& e = _g[from][idx];\n        const auto& re =\
+    \ _g[e.to][e.rev];\n        return Edge{from, e.to, e.cap + re.cap, re.cap};\n\
+    \    }\n\n    std::vector<Edge> edges() const {\n        std::vector<Edge> result;\n\
+    \        result.reserve(_pos.size());\n        for (int i = 0; i < int(_pos.size());\
+    \ i++) result.push_back(get_edge(i));\n        return result;\n    }\n\n    void\
+    \ change_edge(int i, Cap new_cap, Cap new_flow) {\n        assert(0 <= i && i\
+    \ < int(_pos.size()));\n        assert(Cap(0) <= new_flow && new_flow <= new_cap);\n\
+    \        auto [from, idx] = _pos[i];\n        auto& e = _g[from][idx];\n     \
+    \   auto& re = _g[e.to][e.rev];\n        e.cap = new_cap - new_flow;\n       \
+    \ re.cap = new_flow;\n    }\n\n    Cap max_flow(int s, int t) {\n        return\
+    \ max_flow(s, t, std::numeric_limits<Cap>::max());\n    }\n\n    Cap max_flow(int\
+    \ s, int t, Cap flow_limit) {\n        assert(0 <= s && s < _n);\n        assert(0\
+    \ <= t && t < _n);\n        assert(s != t);\n\n        std::vector<int> level(_n),\
+    \ iter(_n);\n        auto bfs = [&]() -> bool {\n            std::fill(level.begin(),\
+    \ level.end(), -1);\n            std::queue<int> que;\n            level[s] =\
+    \ 0;\n            que.push(s);\n            while (!que.empty()) {\n         \
+    \       int v = que.front();\n                que.pop();\n                for\
+    \ (const auto& e : _g[v]) {\n                    if (e.cap == Cap(0) || level[e.to]\
+    \ != -1) continue;\n                    level[e.to] = level[v] + 1;\n        \
+    \            if (e.to == t) return true;\n                    que.push(e.to);\n\
+    \                }\n            }\n            return level[t] != -1;\n      \
+    \  };\n\n        auto dfs = [&](auto self, int v, Cap up) -> Cap {\n         \
+    \   if (v == t) return up;\n            for (int& i = iter[v]; i < int(_g[v].size());\
+    \ i++) {\n                auto& e = _g[v][i];\n                if (e.cap == Cap(0)\
+    \ || level[v] >= level[e.to]) continue;\n                Cap d = self(self, e.to,\
+    \ std::min(up, e.cap));\n                if (d == Cap(0)) continue;\n        \
+    \        e.cap -= d;\n                _g[e.to][e.rev].cap += d;\n            \
+    \    return d;\n            }\n            return Cap(0);\n        };\n\n    \
+    \    Cap flow = 0;\n        while (flow < flow_limit && bfs()) {\n           \
+    \ std::fill(iter.begin(), iter.end(), 0);\n            while (flow < flow_limit)\
+    \ {\n                Cap f = dfs(dfs, s, flow_limit - flow);\n               \
+    \ if (f == Cap(0)) break;\n                flow += f;\n            }\n       \
+    \ }\n        return flow;\n    }\n\n    std::vector<bool> min_cut(int s) const\
+    \ {\n        assert(0 <= s && s < _n);\n        std::vector<bool> visited(_n,\
+    \ false);\n        std::queue<int> que;\n        visited[s] = true;\n        que.push(s);\n\
+    \        while (!que.empty()) {\n            int v = que.front();\n          \
+    \  que.pop();\n            for (const auto& e : _g[v]) {\n                if (e.cap\
+    \ == Cap(0) || visited[e.to]) continue;\n                visited[e.to] = true;\n\
+    \                que.push(e.to);\n            }\n        }\n        return visited;\n\
+    \    }\n};\n\n}  // namespace flow\n}  // namespace m1une\n\n\n#line 9 \"graph/flow/bounded_flow.hpp\"\
+    \n\nnamespace m1une {\nnamespace flow {\n\ntemplate <class Cap>\nstruct BoundedFlow\
+    \ {\n    struct Edge {\n        int from;\n        int to;\n        Cap lower;\n\
+    \        Cap upper;\n    };\n\n    struct ResultEdge {\n        int from;\n  \
+    \      int to;\n        Cap lower;\n        Cap upper;\n        Cap flow;\n  \
+    \  };\n\n    struct Result {\n        std::vector<ResultEdge> edges;\n       \
+    \ std::vector<Cap> balance;\n\n        ResultEdge get_edge(int i) const {\n  \
+    \          assert(0 <= i && i < int(edges.size()));\n            return edges[i];\n\
+    \        }\n\n        Cap flow(int i) const {\n            assert(0 <= i && i\
+    \ < int(edges.size()));\n            return edges[i].flow;\n        }\n    };\n\
+    \n   private:\n    int _n;\n    std::vector<Edge> _edges;\n    std::vector<Cap>\
+    \ _balance;\n\n   public:\n    BoundedFlow() : BoundedFlow(0) {}\n\n    explicit\
+    \ BoundedFlow(int n) : _n(n), _balance(n, Cap(0)) {\n        assert(0 <= n);\n\
+    \    }\n\n    int size() const {\n        return _n;\n    }\n\n    int edge_count()\
+    \ const {\n        return int(_edges.size());\n    }\n\n    int add_edge(int from,\
+    \ int to, Cap lower, Cap upper) {\n        assert(0 <= from && from < _n);\n \
+    \       assert(0 <= to && to < _n);\n        assert(lower <= upper);\n       \
+    \ int id = int(_edges.size());\n        _edges.push_back(Edge{from, to, lower,\
+    \ upper});\n        return id;\n    }\n\n    Edge get_edge(int i) const {\n  \
+    \      assert(0 <= i && i < int(_edges.size()));\n        return _edges[i];\n\
+    \    }\n\n    std::vector<Edge> edges() const {\n        return _edges;\n    }\n\
+    \n    void set_balance(int v, Cap b) {\n        assert(0 <= v && v < _n);\n  \
+    \      _balance[v] = b;\n    }\n\n    void add_balance(int v, Cap b) {\n     \
+    \   assert(0 <= v && v < _n);\n        _balance[v] += b;\n    }\n\n    void add_supply(int\
+    \ v, Cap supply) {\n        assert(Cap(0) <= supply);\n        add_balance(v,\
+    \ supply);\n    }\n\n    void add_demand(int v, Cap demand) {\n        assert(Cap(0)\
+    \ <= demand);\n        add_balance(v, -demand);\n    }\n\n    Cap balance(int\
+    \ v) const {\n        assert(0 <= v && v < _n);\n        return _balance[v];\n\
+    \    }\n\n    const std::vector<Cap>& balances() const {\n        return _balance;\n\
+    \    }\n\n    std::optional<Result> feasible_flow() const {\n        return feasible_flow(_balance);\n\
+    \    }\n\n    std::optional<Result> feasible_flow(const std::vector<Cap>& balance)\
+    \ const {\n        assert(int(balance.size()) == _n);\n        int ss = _n, tt\
+    \ = _n + 1;\n        MaxFlow<Cap> mf(_n + 2);\n        std::vector<int> edge_ids;\n\
+    \        edge_ids.reserve(_edges.size());\n\n        std::vector<Cap> need = balance;\n\
+    \        for (const auto& e : _edges) {\n            edge_ids.push_back(mf.add_edge(e.from,\
+    \ e.to, e.upper - e.lower));\n            need[e.from] -= e.lower;\n         \
+    \   need[e.to] += e.lower;\n        }\n\n        Cap positive_sum = Cap(0), negative_sum\
+    \ = Cap(0);\n        for (int v = 0; v < _n; v++) {\n            if (need[v] >\
+    \ Cap(0)) {\n                positive_sum += need[v];\n                mf.add_edge(ss,\
+    \ v, need[v]);\n            } else if (need[v] < Cap(0)) {\n                negative_sum\
+    \ += -need[v];\n                mf.add_edge(v, tt, -need[v]);\n            }\n\
+    \        }\n        if (positive_sum != negative_sum) return std::nullopt;\n \
+    \       if (mf.max_flow(ss, tt) != positive_sum) return std::nullopt;\n\n    \
+    \    Result result;\n        result.balance = balance;\n        result.edges.reserve(_edges.size());\n\
+    \        for (int i = 0; i < int(_edges.size()); i++) {\n            auto used\
+    \ = mf.get_edge(edge_ids[i]).flow;\n            const auto& e = _edges[i];\n \
+    \           result.edges.push_back(ResultEdge{e.from, e.to, e.lower, e.upper,\
+    \ e.lower + used});\n        }\n        return result;\n    }\n\n    std::optional<Result>\
+    \ feasible_st_flow(int s, int t, Cap flow_value) const {\n        assert(0 <=\
+    \ s && s < _n);\n        assert(0 <= t && t < _n);\n        assert(s != t);\n\
+    \        std::vector<Cap> balance = _balance;\n        balance[s] += flow_value;\n\
+    \        balance[t] -= flow_value;\n        return feasible_flow(balance);\n \
+    \   }\n};\n\ntemplate <class Cap>\nusing BFlow = BoundedFlow<Cap>;\n\n}  // namespace\
+    \ flow\n}  // namespace m1une\n\n\n#line 1 \"graph/flow/bounded_min_cost_flow.hpp\"\
+    \n\n\n\n#line 7 \"graph/flow/bounded_min_cost_flow.hpp\"\n\n#line 1 \"graph/flow/min_cost_flow.hpp\"\
+    \n\n\n\n#line 11 \"graph/flow/min_cost_flow.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ flow {\n\ntemplate <class Cap, class Cost>\nstruct MinCostFlow {\n    struct\
+    \ Edge {\n        int from;\n        int to;\n        Cap cap;\n        Cap flow;\n\
+    \        Cost cost;\n    };\n\n   private:\n    struct InternalEdge {\n      \
+    \  int to;\n        int rev;\n        Cap cap;\n        Cost cost;\n    };\n\n\
+    \    int _n;\n    std::vector<std::pair<int, int>> _pos;\n    std::vector<std::vector<InternalEdge>>\
+    \ _g;\n\n    void init_potential(int s, std::vector<Cost>& potential, Cost cost_inf)\
+    \ const {\n        potential.assign(_n, cost_inf);\n        potential[s] = Cost(0);\n\
+    \        for (int iter = 0; iter < _n - 1; iter++) {\n            bool updated\
+    \ = false;\n            for (int v = 0; v < _n; v++) {\n                if (potential[v]\
+    \ == cost_inf) continue;\n                for (const auto& e : _g[v]) {\n    \
+    \                if (e.cap == Cap(0)) continue;\n                    Cost nd =\
+    \ potential[v] + e.cost;\n                    if (nd < potential[e.to]) {\n  \
+    \                      potential[e.to] = nd;\n                        updated\
+    \ = true;\n                    }\n                }\n            }\n         \
+    \   if (!updated) break;\n        }\n        for (int v = 0; v < _n; v++) {\n\
+    \            if (potential[v] == cost_inf) potential[v] = Cost(0);\n        }\n\
+    \    }\n\n   public:\n    MinCostFlow() : MinCostFlow(0) {}\n\n    explicit MinCostFlow(int\
+    \ n) : _n(n), _g(n) {\n        assert(0 <= n);\n    }\n\n    int size() const\
+    \ {\n        return _n;\n    }\n\n    int edge_count() const {\n        return\
+    \ int(_pos.size());\n    }\n\n    int add_edge(int from, int to, Cap cap, Cost\
+    \ cost) {\n        assert(0 <= from && from < _n);\n        assert(0 <= to &&\
+    \ to < _n);\n        assert(Cap(0) <= cap);\n        int id = int(_pos.size());\n\
+    \        int from_id = int(_g[from].size());\n        int to_id = int(_g[to].size());\n\
+    \        if (from == to) to_id++;\n        _pos.emplace_back(from, from_id);\n\
+    \        _g[from].push_back(InternalEdge{to, to_id, cap, cost});\n        _g[to].push_back(InternalEdge{from,\
+    \ from_id, Cap(0), -cost});\n        return id;\n    }\n\n    Edge get_edge(int\
+    \ i) const {\n        assert(0 <= i && i < int(_pos.size()));\n        auto [from,\
+    \ idx] = _pos[i];\n        const auto& e = _g[from][idx];\n        const auto&\
+    \ re = _g[e.to][e.rev];\n        return Edge{from, e.to, e.cap + re.cap, re.cap,\
+    \ e.cost};\n    }\n\n    std::vector<Edge> edges() const {\n        std::vector<Edge>\
+    \ result;\n        result.reserve(_pos.size());\n        for (int i = 0; i < int(_pos.size());\
+    \ i++) result.push_back(get_edge(i));\n        return result;\n    }\n\n    std::pair<Cap,\
+    \ Cost> flow(int s, int t) {\n        return flow(s, t, std::numeric_limits<Cap>::max());\n\
+    \    }\n\n    std::pair<Cap, Cost> flow(int s, int t, Cap flow_limit) {\n    \
+    \    auto result = slope(s, t, flow_limit);\n        return result.back();\n \
+    \   }\n\n    std::vector<std::pair<Cap, Cost>> slope(int s, int t) {\n       \
+    \ return slope(s, t, std::numeric_limits<Cap>::max());\n    }\n\n    std::vector<std::pair<Cap,\
+    \ Cost>> slope(int s, int t, Cap flow_limit) {\n        assert(0 <= s && s < _n);\n\
+    \        assert(0 <= t && t < _n);\n        assert(s != t);\n\n        const Cost\
+    \ cost_inf = std::numeric_limits<Cost>::max() / Cost(4);\n        std::vector<Cost>\
+    \ potential, dist(_n);\n        std::vector<int> prev_v(_n), prev_e(_n);\n   \
+    \     init_potential(s, potential, cost_inf);\n\n        std::vector<std::pair<Cap,\
+    \ Cost>> result;\n        result.emplace_back(Cap(0), Cost(0));\n        Cap flow\
+    \ = 0;\n        Cost cost = 0;\n\n        while (flow < flow_limit) {\n      \
+    \      std::fill(dist.begin(), dist.end(), cost_inf);\n            dist[s] = Cost(0);\n\
+    \            using P = std::pair<Cost, int>;\n            std::priority_queue<P,\
+    \ std::vector<P>, std::greater<P>> que;\n            que.emplace(Cost(0), s);\n\
+    \n            while (!que.empty()) {\n                auto [d, v] = que.top();\n\
+    \                que.pop();\n                if (dist[v] != d) continue;\n   \
+    \             for (int i = 0; i < int(_g[v].size()); i++) {\n                \
+    \    const auto& e = _g[v][i];\n                    if (e.cap == Cap(0)) continue;\n\
+    \                    Cost nd = d + e.cost + potential[v] - potential[e.to];\n\
+    \                    if (nd >= dist[e.to]) continue;\n                    dist[e.to]\
+    \ = nd;\n                    prev_v[e.to] = v;\n                    prev_e[e.to]\
+    \ = i;\n                    que.emplace(nd, e.to);\n                }\n      \
+    \      }\n\n            if (dist[t] == cost_inf) break;\n            for (int\
+    \ v = 0; v < _n; v++) {\n                if (dist[v] != cost_inf) potential[v]\
+    \ += dist[v];\n            }\n\n            Cap add = flow_limit - flow;\n   \
+    \         for (int v = t; v != s; v = prev_v[v]) {\n                add = std::min(add,\
+    \ _g[prev_v[v]][prev_e[v]].cap);\n            }\n            Cost path_cost =\
+    \ potential[t] - potential[s];\n            for (int v = t; v != s; v = prev_v[v])\
+    \ {\n                auto& e = _g[prev_v[v]][prev_e[v]];\n                e.cap\
+    \ -= add;\n                _g[e.to][e.rev].cap += add;\n            }\n\n    \
+    \        flow += add;\n            cost += Cost(add) * path_cost;\n          \
+    \  result.emplace_back(flow, cost);\n        }\n\n        return result;\n   \
+    \ }\n};\n\n}  // namespace flow\n}  // namespace m1une\n\n\n#line 9 \"graph/flow/bounded_min_cost_flow.hpp\"\
+    \n\nnamespace m1une {\nnamespace flow {\n\ntemplate <class Cap, class Cost>\n\
+    struct BoundedMinCostFlow {\n    struct Edge {\n        int from;\n        int\
+    \ to;\n        Cap lower;\n        Cap upper;\n        Cost cost;\n    };\n\n\
+    \    struct ResultEdge {\n        int from;\n        int to;\n        Cap lower;\n\
+    \        Cap upper;\n        Cap flow;\n        Cost cost;\n    };\n\n    struct\
+    \ Result {\n        std::vector<ResultEdge> edges;\n        std::vector<Cap> balance;\n\
+    \        Cost cost;\n\n        ResultEdge get_edge(int i) const {\n          \
+    \  assert(0 <= i && i < int(edges.size()));\n            return edges[i];\n  \
+    \      }\n\n        Cap flow(int i) const {\n            assert(0 <= i && i <\
+    \ int(edges.size()));\n            return edges[i].flow;\n        }\n    };\n\n\
+    \   private:\n    int _n;\n    std::vector<Edge> _edges;\n    std::vector<Cap>\
+    \ _balance;\n\n   public:\n    BoundedMinCostFlow() : BoundedMinCostFlow(0) {}\n\
+    \n    explicit BoundedMinCostFlow(int n) : _n(n), _balance(n, Cap(0)) {\n    \
+    \    assert(0 <= n);\n    }\n\n    int size() const {\n        return _n;\n  \
+    \  }\n\n    int edge_count() const {\n        return int(_edges.size());\n   \
+    \ }\n\n    int add_edge(int from, int to, Cap lower, Cap upper, Cost cost) {\n\
+    \        assert(0 <= from && from < _n);\n        assert(0 <= to && to < _n);\n\
+    \        assert(lower <= upper);\n        int id = int(_edges.size());\n     \
+    \   _edges.push_back(Edge{from, to, lower, upper, cost});\n        return id;\n\
+    \    }\n\n    Edge get_edge(int i) const {\n        assert(0 <= i && i < int(_edges.size()));\n\
+    \        return _edges[i];\n    }\n\n    std::vector<Edge> edges() const {\n \
+    \       return _edges;\n    }\n\n    void set_balance(int v, Cap b) {\n      \
+    \  assert(0 <= v && v < _n);\n        _balance[v] = b;\n    }\n\n    void add_balance(int\
+    \ v, Cap b) {\n        assert(0 <= v && v < _n);\n        _balance[v] += b;\n\
+    \    }\n\n    void add_supply(int v, Cap supply) {\n        assert(Cap(0) <= supply);\n\
+    \        add_balance(v, supply);\n    }\n\n    void add_demand(int v, Cap demand)\
+    \ {\n        assert(Cap(0) <= demand);\n        add_balance(v, -demand);\n   \
+    \ }\n\n    Cap balance(int v) const {\n        assert(0 <= v && v < _n);\n   \
+    \     return _balance[v];\n    }\n\n    const std::vector<Cap>& balances() const\
+    \ {\n        return _balance;\n    }\n\n    std::optional<Result> min_cost_flow()\
+    \ const {\n        return min_cost_flow(_balance);\n    }\n\n    std::optional<Result>\
+    \ min_cost_flow(const std::vector<Cap>& balance) const {\n        assert(int(balance.size())\
+    \ == _n);\n        int ss = _n, tt = _n + 1;\n        MinCostFlow<Cap, Cost> mcf(_n\
+    \ + 2);\n\n        std::vector<Cap> need = balance;\n        std::vector<Cap>\
+    \ initial(_edges.size(), Cap(0));\n        std::vector<int> edge_ids(_edges.size(),\
+    \ -1);\n        std::vector<char> reversed(_edges.size(), false);\n\n        for\
+    \ (int i = 0; i < int(_edges.size()); i++) {\n            const auto& e = _edges[i];\n\
+    \            Cap cap = e.upper - e.lower;\n            need[e.from] -= e.lower;\n\
+    \            need[e.to] += e.lower;\n            if (e.cost < Cost(0)) {\n   \
+    \             initial[i] = cap;\n                need[e.from] -= cap;\n      \
+    \          need[e.to] += cap;\n                edge_ids[i] = mcf.add_edge(e.to,\
+    \ e.from, cap, -e.cost);\n                reversed[i] = true;\n            } else\
+    \ {\n                edge_ids[i] = mcf.add_edge(e.from, e.to, cap, e.cost);\n\
+    \            }\n        }\n\n        Cap positive_sum = Cap(0), negative_sum =\
+    \ Cap(0);\n        for (int v = 0; v < _n; v++) {\n            if (need[v] > Cap(0))\
+    \ {\n                positive_sum += need[v];\n                mcf.add_edge(ss,\
+    \ v, need[v], Cost(0));\n            } else if (need[v] < Cap(0)) {\n        \
+    \        negative_sum += -need[v];\n                mcf.add_edge(v, tt, -need[v],\
+    \ Cost(0));\n            }\n        }\n        if (positive_sum != negative_sum)\
+    \ return std::nullopt;\n\n        auto [sent, extra_cost] = mcf.flow(ss, tt, positive_sum);\n\
+    \        (void)extra_cost;\n        if (sent != positive_sum) return std::nullopt;\n\
+    \n        Result result;\n        result.balance = balance;\n        result.cost\
+    \ = Cost(0);\n        result.edges.reserve(_edges.size());\n        for (int i\
+    \ = 0; i < int(_edges.size()); i++) {\n            const auto& e = _edges[i];\n\
+    \            Cap used = mcf.get_edge(edge_ids[i]).flow;\n            Cap residual_flow\
+    \ = reversed[i] ? initial[i] - used : used;\n            Cap flow = e.lower +\
+    \ residual_flow;\n            result.cost += Cost(flow) * e.cost;\n          \
+    \  result.edges.push_back(ResultEdge{e.from, e.to, e.lower, e.upper, flow, e.cost});\n\
+    \        }\n        return result;\n    }\n\n    std::optional<Result> min_cost_st_flow(int\
+    \ s, int t, Cap flow_value) const {\n        assert(0 <= s && s < _n);\n     \
+    \   assert(0 <= t && t < _n);\n        assert(s != t);\n        std::vector<Cap>\
+    \ balance = _balance;\n        balance[s] += flow_value;\n        balance[t] -=\
+    \ flow_value;\n        return min_cost_flow(balance);\n    }\n};\n\ntemplate <class\
+    \ Cap, class Cost>\nusing BMinCostFlow = BoundedMinCostFlow<Cap, Cost>;\n\n} \
+    \ // namespace flow\n}  // namespace m1une\n\n\n#line 1 \"graph/flow/gomory_hu.hpp\"\
+    \n\n\n\n#line 9 \"graph/flow/gomory_hu.hpp\"\n\nnamespace m1une {\nnamespace flow\
+    \ {\n\ntemplate <class Cap>\nstruct GomoryHu {\n    struct Edge {\n        int\
+    \ u;\n        int v;\n        Cap cap;\n    };\n\n   private:\n    struct FlowEdge\
+    \ {\n        int to;\n        int rev;\n        Cap cap;\n        Cap initial_cap;\n\
+    \    };\n\n    int _n;\n    bool _built = false;\n    std::vector<Edge> _edges;\n\
+    \    std::vector<Edge> _tree_edges;\n    std::vector<int> _parent;\n    std::vector<Cap>\
+    \ _cut_value;\n    std::vector<std::vector<std::pair<int, Cap>>> _tree;\n    std::vector<std::vector<int>>\
+    \ _up;\n    std::vector<std::vector<Cap>> _minimum;\n    std::vector<int> _depth;\n\
+    \n    std::vector<std::vector<FlowEdge>> _graph;\n    std::vector<Cap> _excess;\n\
+    \    std::vector<int> _height;\n    std::vector<int> _height_count;\n    std::vector<int>\
+    \ _current;\n    std::vector<bool> _active;\n    std::vector<std::vector<int>>\
+    \ _buckets;\n    std::vector<int> _queue;\n    int _highest;\n    long long _work;\n\
+    \    long long _work_limit;\n\n    void add_flow_edge(int u, int v, Cap cap) {\n\
+    \        if (u == v || cap == Cap(0)) return;\n        int ui = int(_graph[u].size());\n\
+    \        int vi = int(_graph[v].size());\n        _graph[u].push_back(FlowEdge{v,\
+    \ vi, cap, cap});\n        _graph[v].push_back(FlowEdge{u, ui, cap, cap});\n \
+    \   }\n\n    void reset_flow() {\n        for (auto& edges : _graph) {\n     \
+    \       for (auto& edge : edges) edge.cap = edge.initial_cap;\n        }\n   \
+    \ }\n\n    void activate(int v, int s, int t) {\n        int dead = 2 * _n;\n\
+    \        if (v == s || v == t || _active[v] || _excess[v] == Cap(0) || _height[v]\
+    \ >= dead) return;\n        _active[v] = true;\n        _buckets[_height[v]].push_back(v);\n\
+    \        _highest = std::max(_highest, _height[v]);\n    }\n\n    void rebuild_buckets(int\
+    \ s, int t) {\n        for (auto& bucket : _buckets) bucket.clear();\n       \
+    \ std::fill(_active.begin(), _active.end(), false);\n        _highest = -1;\n\
+    \        for (int v = 0; v < _n; v++) activate(v, s, t);\n    }\n\n    void global_relabel(int\
+    \ s, int t) {\n        int dead = 2 * _n;\n        int unreachable = _n + 1;\n\
+    \        std::fill(_height.begin(), _height.end(), unreachable);\n        std::fill(_height_count.begin(),\
+    \ _height_count.end(), 0);\n        std::fill(_current.begin(), _current.end(),\
+    \ 0);\n\n        int head = 0;\n        int tail = 0;\n        _height[t] = 0;\n\
+    \        _height[s] = _n;\n        _queue[tail++] = t;\n        while (head <\
+    \ tail) {\n            int v = _queue[head++];\n            for (const auto& edge\
+    \ : _graph[v]) {\n                const FlowEdge& reverse = _graph[edge.to][edge.rev];\n\
+    \                if (reverse.cap == Cap(0) || _height[edge.to] != unreachable)\
+    \ continue;\n                _height[edge.to] = _height[v] + 1;\n            \
+    \    _queue[tail++] = edge.to;\n            }\n        }\n        for (int v =\
+    \ 0; v < _n; v++) {\n            _height[v] = std::min(_height[v], dead);\n  \
+    \          _height_count[_height[v]]++;\n        }\n        rebuild_buckets(s,\
+    \ t);\n        _work = 0;\n    }\n\n    void push(int v, FlowEdge& edge, int s,\
+    \ int t) {\n        if (edge.cap == Cap(0) || _height[v] != _height[edge.to] +\
+    \ 1) return;\n        Cap sent = std::min(_excess[v], edge.cap);\n        if (sent\
+    \ == Cap(0)) return;\n        bool was_zero = _excess[edge.to] == Cap(0);\n  \
+    \      edge.cap -= sent;\n        _graph[edge.to][edge.rev].cap += sent;\n   \
+    \     _excess[v] -= sent;\n        _excess[edge.to] += sent;\n        if (was_zero)\
+    \ activate(edge.to, s, t);\n    }\n\n    void gap(int height, int s, int t) {\n\
+    \        int unreachable = _n + 1;\n        for (int v = 0; v < _n; v++) {\n \
+    \           if (v == s || v == t || _height[v] <= height || _height[v] >= _n)\
+    \ continue;\n            _height_count[_height[v]]--;\n            _height[v]\
+    \ = unreachable;\n            _height_count[_height[v]]++;\n            _current[v]\
+    \ = 0;\n        }\n        rebuild_buckets(s, t);\n    }\n\n    bool relabel(int\
+    \ v, int s, int t) {\n        int dead = 2 * _n;\n        int old_height = _height[v];\n\
+    \        int new_height = dead;\n        _work += int(_graph[v].size());\n   \
+    \     for (const auto& edge : _graph[v]) {\n            if (edge.cap != Cap(0))\
+    \ new_height = std::min(new_height, _height[edge.to] + 1);\n        }\n      \
+    \  _height_count[old_height]--;\n        _height[v] = std::min(new_height, dead);\n\
+    \        _height_count[_height[v]]++;\n        _current[v] = 0;\n        if (old_height\
+    \ < _n && _height_count[old_height] == 0) {\n            gap(old_height, s, t);\n\
+    \            return true;\n        }\n        return false;\n    }\n\n    void\
+    \ discharge(int v, int s, int t) {\n        while (_excess[v] != Cap(0) && _height[v]\
+    \ < 2 * _n) {\n            if (_current[v] == int(_graph[v].size())) {\n     \
+    \           if (relabel(v, s, t)) return;\n                continue;\n       \
+    \     }\n            FlowEdge& edge = _graph[v][_current[v]];\n            _work++;\n\
+    \            if (edge.cap != Cap(0) && _height[v] == _height[edge.to] + 1) {\n\
+    \                push(v, edge, s, t);\n            } else {\n                _current[v]++;\n\
+    \            }\n        }\n        activate(v, s, t);\n    }\n\n    Cap max_flow(int\
+    \ s, int t) {\n        reset_flow();\n        std::fill(_excess.begin(), _excess.end(),\
+    \ Cap(0));\n        for (auto& edge : _graph[s]) {\n            Cap sent = edge.cap;\n\
+    \            if (sent == Cap(0)) continue;\n            edge.cap = Cap(0);\n \
+    \           _graph[edge.to][edge.rev].cap += sent;\n            _excess[edge.to]\
+    \ += sent;\n        }\n        global_relabel(s, t);\n\n        while (_highest\
+    \ >= 0) {\n            if (_buckets[_highest].empty()) {\n                _highest--;\n\
+    \                continue;\n            }\n            int v = _buckets[_highest].back();\n\
+    \            _buckets[_highest].pop_back();\n            if (!_active[v] || _height[v]\
+    \ != _highest) continue;\n            _active[v] = false;\n            discharge(v,\
+    \ s, t);\n            if (_work >= _work_limit) global_relabel(s, t);\n      \
+    \  }\n        return _excess[t];\n    }\n\n    std::vector<bool> source_side(int\
+    \ s) {\n        std::vector<bool> visited(_n, false);\n        int head = 0;\n\
+    \        int tail = 0;\n        visited[s] = true;\n        _queue[tail++] = s;\n\
+    \        while (head < tail) {\n            int v = _queue[head++];\n        \
+    \    for (const auto& edge : _graph[v]) {\n                if (edge.cap == Cap(0)\
+    \ || visited[edge.to]) continue;\n                visited[edge.to] = true;\n \
+    \               _queue[tail++] = edge.to;\n            }\n        }\n        return\
+    \ visited;\n    }\n\n    void build_query_table() {\n        int log = 1;\n  \
+    \      while ((1LL << log) <= std::max(1, _n)) log++;\n        const Cap infinity\
+    \ = std::numeric_limits<Cap>::max();\n        _up.assign(log, std::vector<int>(_n,\
+    \ 0));\n        _minimum.assign(log, std::vector<Cap>(_n, infinity));\n      \
+    \  _depth.assign(_n, 0);\n        if (_n == 0) return;\n\n        std::vector<int>\
+    \ order;\n        order.reserve(_n);\n        order.push_back(0);\n        for\
+    \ (int i = 0; i < int(order.size()); i++) {\n            int v = order[i];\n \
+    \           for (auto [to, cap] : _tree[v]) {\n                if (to == _up[0][v]\
+    \ && v != 0) continue;\n                _up[0][to] = v;\n                _minimum[0][to]\
+    \ = cap;\n                _depth[to] = _depth[v] + 1;\n                order.push_back(to);\n\
+    \            }\n        }\n        for (int k = 1; k < log; k++) {\n         \
+    \   for (int v = 0; v < _n; v++) {\n                int middle = _up[k - 1][v];\n\
+    \                _up[k][v] = _up[k - 1][middle];\n                _minimum[k][v]\
+    \ = std::min(_minimum[k - 1][v], _minimum[k - 1][middle]);\n            }\n  \
+    \      }\n    }\n\n   public:\n    GomoryHu() : GomoryHu(0) {}\n\n    explicit\
+    \ GomoryHu(int n) : _n(n) {\n        assert(0 <= n);\n    }\n\n    int size()\
+    \ const {\n        return _n;\n    }\n\n    int edge_count() const {\n       \
+    \ return int(_edges.size());\n    }\n\n    int add_edge(int u, int v, Cap cap)\
+    \ {\n        assert(0 <= u && u < _n);\n        assert(0 <= v && v < _n);\n  \
+    \      assert(Cap(0) <= cap);\n        _built = false;\n        int id = int(_edges.size());\n\
+    \        _edges.push_back(Edge{u, v, cap});\n        return id;\n    }\n\n   \
+    \ void build() {\n        std::vector<Edge> flow_edges;\n        flow_edges.reserve(_edges.size());\n\
+    \        for (auto edge : _edges) {\n            if (edge.u == edge.v || edge.cap\
+    \ == Cap(0)) continue;\n            if (edge.u > edge.v) std::swap(edge.u, edge.v);\n\
+    \            flow_edges.push_back(edge);\n        }\n        std::sort(flow_edges.begin(),\
+    \ flow_edges.end(), [](const Edge& lhs, const Edge& rhs) {\n            return\
+    \ std::pair<int, int>(lhs.u, lhs.v) < std::pair<int, int>(rhs.u, rhs.v);\n   \
+    \     });\n        int unique_edges = 0;\n        for (const auto& edge : flow_edges)\
+    \ {\n            if (unique_edges > 0 && flow_edges[unique_edges - 1].u == edge.u\
+    \ &&\n                flow_edges[unique_edges - 1].v == edge.v) {\n          \
+    \      flow_edges[unique_edges - 1].cap += edge.cap;\n            } else {\n \
+    \               flow_edges[unique_edges++] = edge;\n            }\n        }\n\
+    \        flow_edges.resize(unique_edges);\n\n        _graph.assign(_n, {});\n\
+    \        std::vector<int> degree(_n, 0);\n        for (const auto& edge : flow_edges)\
+    \ {\n            degree[edge.u]++;\n            degree[edge.v]++;\n        }\n\
+    \        for (int v = 0; v < _n; v++) _graph[v].reserve(degree[v]);\n        for\
+    \ (const auto& edge : flow_edges) add_flow_edge(edge.u, edge.v, edge.cap);\n \
+    \       _excess.resize(_n);\n        _height.resize(_n);\n        _height_count.resize(2\
+    \ * _n + 1);\n        _current.resize(_n);\n        _active.resize(_n);\n    \
+    \    _buckets.resize(2 * _n + 1);\n        _queue.resize(_n);\n        long long\
+    \ arc_count = 0;\n        for (const auto& edges : _graph) arc_count += int(edges.size());\n\
+    \        _work_limit = std::max(1LL, 4 * arc_count + _n);\n\n        _parent.assign(_n,\
+    \ 0);\n        _cut_value.assign(_n, std::numeric_limits<Cap>::max());\n     \
+    \   for (int s = 1; s < _n; s++) {\n            int t = _parent[s];\n        \
+    \    Cap flow = max_flow(s, t);\n            std::vector<bool> cut = source_side(s);\n\
+    \            for (int v = s + 1; v < _n; v++) {\n                if (_parent[v]\
+    \ == t && cut[v]) _parent[v] = s;\n            }\n            if (cut[_parent[t]])\
+    \ {\n                _parent[s] = _parent[t];\n                _parent[t] = s;\n\
+    \                _cut_value[s] = _cut_value[t];\n                _cut_value[t]\
+    \ = flow;\n            } else {\n                _cut_value[s] = flow;\n     \
+    \       }\n        }\n\n        _tree.assign(_n, {});\n        _tree_edges.clear();\n\
+    \        if (_n > 0) _tree_edges.reserve(_n - 1);\n        for (int v = 1; v <\
+    \ _n; v++) {\n            int p = _parent[v];\n            Cap cap = _cut_value[v];\n\
+    \            _tree_edges.push_back(Edge{v, p, cap});\n            _tree[v].emplace_back(p,\
+    \ cap);\n            _tree[p].emplace_back(v, cap);\n        }\n        build_query_table();\n\
+    \        _built = true;\n    }\n\n    const std::vector<Edge>& tree_edges() const\
+    \ {\n        assert(_built);\n        return _tree_edges;\n    }\n\n    const\
+    \ std::vector<int>& parent() const {\n        assert(_built);\n        return\
+    \ _parent;\n    }\n\n    const std::vector<Cap>& cut_values() const {\n      \
+    \  assert(_built);\n        return _cut_value;\n    }\n\n    Cap min_cut(int u,\
+    \ int v) const {\n        assert(_built);\n        assert(0 <= u && u < _n);\n\
+    \        assert(0 <= v && v < _n);\n        assert(u != v);\n        Cap result\
+    \ = std::numeric_limits<Cap>::max();\n        if (_depth[u] < _depth[v]) std::swap(u,\
+    \ v);\n        int difference = _depth[u] - _depth[v];\n        for (int k = 0;\
+    \ difference > 0; k++, difference >>= 1) {\n            if ((difference & 1) ==\
+    \ 0) continue;\n            result = std::min(result, _minimum[k][u]);\n     \
+    \       u = _up[k][u];\n        }\n        if (u == v) return result;\n      \
+    \  for (int k = int(_up.size()) - 1; k >= 0; k--) {\n            if (_up[k][u]\
+    \ == _up[k][v]) continue;\n            result = std::min(result, _minimum[k][u]);\n\
+    \            result = std::min(result, _minimum[k][v]);\n            u = _up[k][u];\n\
+    \            v = _up[k][v];\n        }\n        result = std::min(result, _minimum[0][u]);\n\
+    \        result = std::min(result, _minimum[0][v]);\n        return result;\n\
+    \    }\n};\n\n}  // namespace flow\n}  // namespace m1une\n\n\n#line 9 \"graph/flow/flow.hpp\"\
+    \n\n\n#line 1 \"graph/grid.hpp\"\n\n\n\n#line 8 \"graph/grid.hpp\"\n\n#line 10\
+    \ \"graph/grid.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\nstruct Grid {\n\
+    \   private:\n    int _h;\n    int _w;\n\n   public:\n    static constexpr std::array<int,\
+    \ 4> di4 = {-1, 0, 1, 0};\n    static constexpr std::array<int, 4> dj4 = {0, 1,\
+    \ 0, -1};\n    static constexpr std::array<int, 8> di8 = {-1, -1, -1, 0, 0, 1,\
+    \ 1, 1};\n    static constexpr std::array<int, 8> dj8 = {-1, 0, 1, -1, 1, -1,\
+    \ 0, 1};\n\n    Grid() : _h(0), _w(0) {}\n    Grid(int h, int w) : _h(h), _w(w)\
+    \ {\n        assert(0 <= h);\n        assert(0 <= w);\n    }\n\n    int height()\
+    \ const {\n        return _h;\n    }\n\n    int width() const {\n        return\
+    \ _w;\n    }\n\n    int size() const {\n        return _h * _w;\n    }\n\n   \
+    \ bool empty() const {\n        return size() == 0;\n    }\n\n    bool inside(int\
+    \ i, int j) const {\n        return 0 <= i && i < _h && 0 <= j && j < _w;\n  \
+    \  }\n\n    int id(int i, int j) const {\n        assert(inside(i, j));\n    \
+    \    return i * _w + j;\n    }\n\n    std::pair<int, int> pos(int v) const {\n\
+    \        assert(0 <= v && v < size());\n        return {v / _w, v % _w};\n   \
+    \ }\n\n    std::vector<std::pair<int, int>> adj4(int i, int j) const {\n     \
+    \   assert(inside(i, j));\n        std::vector<std::pair<int, int>> result;\n\
     \        result.reserve(4);\n        for (int k = 0; k < 4; k++) {\n         \
     \   int ni = i + di4[k], nj = j + dj4[k];\n            if (inside(ni, nj)) result.emplace_back(ni,\
     \ nj);\n        }\n        return result;\n    }\n\n    std::vector<std::pair<int,\
@@ -1198,9 +1665,972 @@ data:
     \ cost);\n        }\n        for (const auto& node : to_range_nodes(to_left, to_right))\
     \ {\n            _graph.add_directed_edge(auxiliary, node.vertex, T());\n    \
     \    }\n        return auxiliary;\n    }\n};\n\n}  // namespace graph\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"graph/undirected.hpp\"\n\n\n\n#line 1 \"graph/bipartite.hpp\"\
-    \n\n\n\n#line 8 \"graph/bipartite.hpp\"\n\n#line 10 \"graph/bipartite.hpp\"\n\n\
-    namespace m1une {\nnamespace graph {\n\nstruct BipartiteResult {\n    bool is_bipartite;\n\
+    \ m1une\n\n\n#line 1 \"graph/tree/all.hpp\"\n\n\n\n#line 1 \"graph/tree/centroid_decomposition.hpp\"\
+    \n\n\n\n#line 6 \"graph/tree/centroid_decomposition.hpp\"\n\n#line 8 \"graph/tree/centroid_decomposition.hpp\"\
+    \n\nnamespace m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct CentroidDecomposition\
+    \ {\n    int n;\n    std::vector<int> parent;\n    std::vector<int> depth;\n \
+    \   std::vector<int> order;\n    std::vector<int> roots;\n    std::vector<std::vector<int>>\
+    \ children;\n\n   private:\n    std::vector<int> _subtree_size;\n    std::vector<int>\
+    \ _work_parent;\n    std::vector<char> _removed;\n\n    void build_component(const\
+    \ m1une::graph::Graph<T>& g, int start, int p, int d) {\n        std::vector<int>\
+    \ nodes;\n        std::vector<int> stack = {start};\n        _work_parent[start]\
+    \ = -2;\n        while (!stack.empty()) {\n            int v = stack.back();\n\
+    \            stack.pop_back();\n            nodes.push_back(v);\n            for\
+    \ (const auto& e : g[v]) {\n                if (!e.alive || _removed[e.to]) continue;\n\
+    \                if (_work_parent[e.to] != -1) continue;\n                _work_parent[e.to]\
+    \ = v;\n                stack.push_back(e.to);\n            }\n        }\n\n \
+    \       for (int v : nodes) _subtree_size[v] = 1;\n        for (int i = int(nodes.size())\
+    \ - 1; i >= 0; i--) {\n            int v = nodes[i];\n            if (_work_parent[v]\
+    \ >= 0) _subtree_size[_work_parent[v]] += _subtree_size[v];\n        }\n\n   \
+    \     int total = int(nodes.size());\n        int centroid = start;\n        int\
+    \ best = total + 1;\n        for (int v : nodes) {\n            int largest =\
+    \ total - _subtree_size[v];\n            for (const auto& e : g[v]) {\n      \
+    \          if (!e.alive || _removed[e.to]) continue;\n                if (_work_parent[e.to]\
+    \ == v) largest = std::max(largest, _subtree_size[e.to]);\n            }\n   \
+    \         if (largest < best) {\n                best = largest;\n           \
+    \     centroid = v;\n            }\n        }\n\n        for (int v : nodes) _work_parent[v]\
+    \ = -1;\n\n        parent[centroid] = p;\n        depth[centroid] = d;\n     \
+    \   order.push_back(centroid);\n        if (p == -1) {\n            roots.push_back(centroid);\n\
+    \        } else {\n            children[p].push_back(centroid);\n        }\n \
+    \       _removed[centroid] = true;\n\n        for (const auto& e : g[centroid])\
+    \ {\n            if (!e.alive || _removed[e.to]) continue;\n            build_component(g,\
+    \ e.to, centroid, d + 1);\n        }\n    }\n\n   public:\n    CentroidDecomposition()\
+    \ : n(0) {}\n    explicit CentroidDecomposition(const m1une::graph::Graph<T>&\
+    \ g) {\n        build(g);\n    }\n\n    void build(const m1une::graph::Graph<T>&\
+    \ g) {\n        n = g.size();\n        parent.assign(n, -1);\n        depth.assign(n,\
+    \ -1);\n        order.clear();\n        order.reserve(n);\n        roots.clear();\n\
+    \        children.assign(n, {});\n        _subtree_size.assign(n, 0);\n      \
+    \  _work_parent.assign(n, -1);\n        _removed.assign(n, false);\n\n       \
+    \ for (int v = 0; v < n; v++) {\n            if (depth[v] == -1) build_component(g,\
+    \ v, -1, 0);\n        }\n    }\n\n    int size() const {\n        return n;\n\
+    \    }\n\n    bool empty() const {\n        return n == 0;\n    }\n\n    int root()\
+    \ const {\n        return roots.empty() ? -1 : roots[0];\n    }\n};\n\n}  // namespace\
+    \ tree\n}  // namespace m1une\n\n\n#line 1 \"graph/tree/diameter.hpp\"\n\n\n\n\
+    #line 6 \"graph/tree/diameter.hpp\"\n\n#line 8 \"graph/tree/diameter.hpp\"\n\n\
+    namespace m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct TreeDiameter\
+    \ {\n    T cost;\n    int edge_count;\n    int from;\n    int to;\n    std::vector<int>\
+    \ vertices;\n    std::vector<int> edge_ids;\n\n    bool empty() const {\n    \
+    \    return vertices.empty();\n    }\n};\n\nnamespace internal {\n\ntemplate <class\
+    \ T>\nstruct FarthestResult {\n    int vertex;\n    std::vector<char> seen;\n\
+    \    std::vector<T> dist;\n    std::vector<int> parent;\n    std::vector<int>\
+    \ parent_edge;\n};\n\ntemplate <class T>\nFarthestResult<T> farthest_from(const\
+    \ m1une::graph::Graph<T>& g, int start) {\n    int n = g.size();\n    FarthestResult<T>\
+    \ result;\n    result.vertex = start;\n    result.seen.assign(n, false);\n   \
+    \ result.dist.assign(n, T(0));\n    result.parent.assign(n, -1);\n    result.parent_edge.assign(n,\
+    \ -1);\n\n    std::vector<int> stack = {start};\n    result.seen[start] = true;\n\
+    \    while (!stack.empty()) {\n        int v = stack.back();\n        stack.pop_back();\n\
+    \        if (result.dist[result.vertex] < result.dist[v]) result.vertex = v;\n\
+    \        for (const auto& e : g[v]) {\n            if (!e.alive) continue;\n \
+    \           if (result.seen[e.to]) continue;\n            result.seen[e.to] =\
+    \ true;\n            result.dist[e.to] = result.dist[v] + e.cost;\n          \
+    \  result.parent[e.to] = v;\n            result.parent_edge[e.to] = e.id;\n  \
+    \          stack.push_back(e.to);\n        }\n    }\n    return result;\n}\n\n\
+    }  // namespace internal\n\ntemplate <class T>\nTreeDiameter<T> tree_diameter(const\
+    \ m1une::graph::Graph<T>& g) {\n    int n = g.size();\n    TreeDiameter<T> best;\n\
+    \    best.cost = T(0);\n    best.edge_count = 0;\n    best.from = -1;\n    best.to\
+    \ = -1;\n    if (n == 0) return best;\n\n    std::vector<char> done(n, false);\n\
+    \    for (int start = 0; start < n; start++) {\n        if (done[start]) continue;\n\
+    \        auto first = internal::farthest_from(g, start);\n        for (int v =\
+    \ 0; v < n; v++) {\n            if (first.seen[v]) done[v] = true;\n        }\n\
+    \        auto second = internal::farthest_from(g, first.vertex);\n        int\
+    \ a = first.vertex;\n        int b = second.vertex;\n        T cost = second.dist[b];\n\
+    \        if (best.from != -1 && !(best.cost < cost)) continue;\n\n        best.cost\
+    \ = cost;\n        best.from = a;\n        best.to = b;\n        best.vertices.clear();\n\
+    \        best.edge_ids.clear();\n        for (int v = b; v != -1; v = second.parent[v])\
+    \ {\n            best.vertices.push_back(v);\n            if (v != a) best.edge_ids.push_back(second.parent_edge[v]);\n\
+    \        }\n        std::reverse(best.vertices.begin(), best.vertices.end());\n\
+    \        std::reverse(best.edge_ids.begin(), best.edge_ids.end());\n        best.edge_count\
+    \ = int(best.edge_ids.size());\n    }\n\n    return best;\n}\n\n}  // namespace\
+    \ tree\n}  // namespace m1une\n\n\n#line 1 \"graph/tree/dsu_on_tree.hpp\"\n\n\n\
+    \n#line 7 \"graph/tree/dsu_on_tree.hpp\"\n\n#line 9 \"graph/tree/dsu_on_tree.hpp\"\
+    \n\nnamespace m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct DsuOnTree\
+    \ {\n    int n;\n    int root;\n    std::vector<int> parent;\n    std::vector<int>\
+    \ parent_edge;\n    std::vector<int> depth;\n    std::vector<int> subtree_size;\n\
+    \    std::vector<int> heavy_child;\n    std::vector<int> tin;\n    std::vector<int>\
+    \ tout;\n    std::vector<int> order;\n    std::vector<std::vector<int>> children;\n\
+    \n    DsuOnTree() : n(0), root(-1) {}\n\n    explicit DsuOnTree(\n        const\
+    \ m1une::graph::Graph<T>& graph,\n        int root_vertex = 0\n    ) {\n     \
+    \   build(graph, root_vertex);\n    }\n\n    void build(\n        const m1une::graph::Graph<T>&\
+    \ graph,\n        int root_vertex = 0\n    ) {\n        n = graph.size();\n  \
+    \      root = n == 0 ? -1 : root_vertex;\n        parent.assign(n, -2);\n    \
+    \    parent_edge.assign(n, -1);\n        depth.assign(n, 0);\n        subtree_size.assign(n,\
+    \ 1);\n        heavy_child.assign(n, -1);\n        tin.assign(n, -1);\n      \
+    \  tout.assign(n, -1);\n        order.clear();\n        order.reserve(n);\n  \
+    \      children.assign(n, {});\n        if (n == 0) return;\n\n        assert(0\
+    \ <= root && root < n);\n        std::vector<int> stack;\n        stack.push_back(root);\n\
+    \        parent[root] = -1;\n        while (!stack.empty()) {\n            int\
+    \ vertex = stack.back();\n            stack.pop_back();\n            tin[vertex]\
+    \ = int(order.size());\n            order.push_back(vertex);\n\n            for\
+    \ (const auto& edge : graph[vertex]) {\n                if (!edge.alive || parent[edge.to]\
+    \ != -2) continue;\n                parent[edge.to] = vertex;\n              \
+    \  parent_edge[edge.to] = edge.id;\n                depth[edge.to] = depth[vertex]\
+    \ + 1;\n                children[vertex].push_back(edge.to);\n               \
+    \ stack.push_back(edge.to);\n            }\n        }\n        assert(int(order.size())\
+    \ == n);\n\n        for (int index = n - 1; index >= 0; --index) {\n         \
+    \   int vertex = order[index];\n            for (int child : children[vertex])\
+    \ {\n                subtree_size[vertex] += subtree_size[child];\n          \
+    \      if (\n                    heavy_child[vertex] == -1 ||\n              \
+    \      subtree_size[heavy_child[vertex]] < subtree_size[child]\n             \
+    \   ) {\n                    heavy_child[vertex] = child;\n                }\n\
+    \            }\n            tout[vertex] = tin[vertex] + subtree_size[vertex];\n\
+    \        }\n    }\n\n    int size() const {\n        return n;\n    }\n\n    bool\
+    \ empty() const {\n        return n == 0;\n    }\n\n    std::pair<int, int> subtree_range(int\
+    \ vertex) const {\n        assert(0 <= vertex && vertex < n);\n        return\
+    \ {tin[vertex], tout[vertex]};\n    }\n\n    // Runs DSU on tree. `add(v)` inserts\
+    \ one vertex into the maintained state,\n    // `remove(v)` erases it, and `answer(v)`\
+    \ observes the state for subtree(v).\n    template <class Add, class Remove, class\
+    \ Answer>\n    void run(Add add, Remove remove, Answer answer) const {\n     \
+    \   if (n == 0) return;\n\n        enum ActionType {\n            Process,\n \
+    \           AddSubtree,\n            AddVertex,\n            AnswerVertex,\n \
+    \           RemoveSubtree,\n        };\n        struct Action {\n            ActionType\
+    \ type;\n            int vertex;\n            bool keep;\n        };\n\n     \
+    \   std::vector<Action> actions;\n        actions.reserve(3 * std::size_t(n));\n\
+    \        actions.push_back(Action{Process, root, true});\n\n        while (!actions.empty())\
+    \ {\n            Action action = actions.back();\n            actions.pop_back();\n\
+    \            int vertex = action.vertex;\n\n            if (action.type == AddSubtree)\
+    \ {\n                for (int index = tin[vertex]; index < tout[vertex]; ++index)\
+    \ {\n                    add(order[index]);\n                }\n            }\
+    \ else if (action.type == AddVertex) {\n                add(vertex);\n       \
+    \     } else if (action.type == AnswerVertex) {\n                answer(vertex);\n\
+    \            } else if (action.type == RemoveSubtree) {\n                for (int\
+    \ index = tin[vertex]; index < tout[vertex]; ++index) {\n                    remove(order[index]);\n\
+    \                }\n            } else {\n                if (!action.keep) {\n\
+    \                    actions.push_back(Action{\n                        RemoveSubtree,\n\
+    \                        vertex,\n                        false,\n           \
+    \         });\n                }\n                actions.push_back(Action{AnswerVertex,\
+    \ vertex, false});\n                actions.push_back(Action{AddVertex, vertex,\
+    \ false});\n\n                for (int child : children[vertex]) {\n         \
+    \           if (child != heavy_child[vertex]) {\n                        actions.push_back(Action{\n\
+    \                            AddSubtree,\n                            child,\n\
+    \                            false,\n                        });\n           \
+    \         }\n                }\n                if (heavy_child[vertex] != -1)\
+    \ {\n                    actions.push_back(Action{\n                        Process,\n\
+    \                        heavy_child[vertex],\n                        true,\n\
+    \                    });\n                }\n                for (int child :\
+    \ children[vertex]) {\n                    if (child != heavy_child[vertex]) {\n\
+    \                        actions.push_back(Action{Process, child, false});\n \
+    \                   }\n                }\n            }\n        }\n    }\n};\n\
+    \n}  // namespace tree\n}  // namespace m1une\n\n\n#line 1 \"graph/tree/heavy_light_decomposition.hpp\"\
+    \n\n\n\n#line 8 \"graph/tree/heavy_light_decomposition.hpp\"\n\n#line 10 \"graph/tree/heavy_light_decomposition.hpp\"\
+    \n\nnamespace m1une {\nnamespace tree {\n\nstruct HldPathSegment {\n    int l;\n\
+    \    int r;\n    bool reversed;\n};\n\ntemplate <class T = int>\nstruct HeavyLightDecomposition\
+    \ {\n    using cost_type = T;\n    using edge_type = m1une::graph::Edge<T>;\n\n\
+    \    int root;\n    std::vector<int> parent;\n    std::vector<int> parent_edge;\n\
+    \    std::vector<int> depth;\n    std::vector<T> dist;\n    std::vector<int> subtree_size;\n\
+    \    std::vector<int> heavy;\n    std::vector<int> head;\n    std::vector<int>\
+    \ tin;\n    std::vector<int> tout;\n    std::vector<int> order;\n\n   private:\n\
+    \    int _n;\n\n    void check_vertex(int v) const {\n        assert(0 <= v &&\
+    \ v < _n);\n        assert(tin[v] != -1);\n    }\n\n    static void add_segment(std::vector<HldPathSegment>&\
+    \ result, int l, int r, bool reversed) {\n        if (l < r) result.push_back({l,\
+    \ r, reversed});\n    }\n\n   public:\n    HeavyLightDecomposition() : root(-1),\
+    \ _n(0) {}\n    explicit HeavyLightDecomposition(const m1une::graph::Graph<T>&\
+    \ g, int root_ = 0) {\n        build(g, root_);\n    }\n\n    void build(const\
+    \ m1une::graph::Graph<T>& g, int root_ = 0) {\n        _n = g.size();\n      \
+    \  root = _n == 0 ? -1 : root_;\n        parent.assign(_n, -2);\n        parent_edge.assign(_n,\
+    \ -1);\n        depth.assign(_n, 0);\n        dist.assign(_n, T(0));\n       \
+    \ subtree_size.assign(_n, 1);\n        heavy.assign(_n, -1);\n        head.assign(_n,\
+    \ -1);\n        tin.assign(_n, -1);\n        tout.assign(_n, -1);\n        order.clear();\n\
+    \        order.reserve(_n);\n        if (_n == 0) return;\n        assert(0 <=\
+    \ root && root < _n);\n\n        std::vector<int> dfs_order;\n        dfs_order.reserve(_n);\n\
+    \        std::vector<int> stack = {root};\n        parent[root] = -1;\n      \
+    \  while (!stack.empty()) {\n            int v = stack.back();\n            stack.pop_back();\n\
+    \            dfs_order.push_back(v);\n            for (const auto& e : g[v]) {\n\
+    \                if (!e.alive) continue;\n                if (parent[e.to] !=\
+    \ -2) continue;\n                parent[e.to] = v;\n                parent_edge[e.to]\
+    \ = e.id;\n                depth[e.to] = depth[v] + 1;\n                dist[e.to]\
+    \ = dist[v] + e.cost;\n                stack.push_back(e.to);\n            }\n\
+    \        }\n\n        for (int i = int(dfs_order.size()) - 1; i >= 0; i--) {\n\
+    \            int v = dfs_order[i];\n            if (parent[v] == -1) continue;\n\
+    \            int p = parent[v];\n            subtree_size[p] += subtree_size[v];\n\
+    \            if (heavy[p] == -1 || subtree_size[heavy[p]] < subtree_size[v]) heavy[p]\
+    \ = v;\n        }\n\n        order.assign(dfs_order.size(), -1);\n        int\
+    \ timer = 0;\n        std::vector<std::pair<int, int>> starts = {std::pair<int,\
+    \ int>{root, root}};\n        while (!starts.empty()) {\n            auto [start,\
+    \ h] = starts.back();\n            starts.pop_back();\n            for (int v\
+    \ = start; v != -1; v = heavy[v]) {\n                head[v] = h;\n          \
+    \      tin[v] = timer;\n                order[timer++] = v;\n                for\
+    \ (auto it = g[v].rbegin(); it != g[v].rend(); ++it) {\n                    if\
+    \ (!it->alive) continue;\n                    int to = it->to;\n             \
+    \       if (parent[to] != v || to == heavy[v]) continue;\n                   \
+    \ starts.push_back({to, to});\n                }\n            }\n        }\n \
+    \       for (int i = int(dfs_order.size()) - 1; i >= 0; i--) {\n            int\
+    \ v = dfs_order[i];\n            tout[v] = tin[v] + subtree_size[v];\n       \
+    \ }\n    }\n\n    int size() const {\n        return _n;\n    }\n\n    bool empty()\
+    \ const {\n        return _n == 0;\n    }\n\n    bool is_ancestor(int u, int v)\
+    \ const {\n        check_vertex(u);\n        check_vertex(v);\n        return\
+    \ tin[u] <= tin[v] && tout[v] <= tout[u];\n    }\n\n    int lca(int u, int v)\
+    \ const {\n        check_vertex(u);\n        check_vertex(v);\n        while (head[u]\
+    \ != head[v]) {\n            if (depth[head[u]] < depth[head[v]]) std::swap(u,\
+    \ v);\n            u = parent[head[u]];\n        }\n        return depth[u] <\
+    \ depth[v] ? u : v;\n    }\n\n    int dist_edges(int u, int v) const {\n     \
+    \   int w = lca(u, v);\n        return depth[u] + depth[v] - 2 * depth[w];\n \
+    \   }\n\n    T dist_cost(int u, int v) const {\n        int w = lca(u, v);\n \
+    \       return dist[u] + dist[v] - dist[w] - dist[w];\n    }\n\n    int kth_ancestor(int\
+    \ v, int k) const {\n        check_vertex(v);\n        assert(0 <= k);\n     \
+    \   while (v != -1) {\n            int h = head[v];\n            int len = depth[v]\
+    \ - depth[h];\n            if (k <= len) return order[tin[v] - k];\n         \
+    \   k -= len + 1;\n            v = parent[h];\n        }\n        return -1;\n\
+    \    }\n\n    int jump(int from, int to, int k) const {\n        check_vertex(from);\n\
+    \        check_vertex(to);\n        assert(0 <= k);\n        int w = lca(from,\
+    \ to);\n        int up_len = depth[from] - depth[w];\n        int down_len = depth[to]\
+    \ - depth[w];\n        if (up_len + down_len < k) return -1;\n        if (k <=\
+    \ up_len) return kth_ancestor(from, k);\n        return kth_ancestor(to, down_len\
+    \ - (k - up_len));\n    }\n\n    std::pair<int, int> subtree_range(int v, bool\
+    \ edge = false) const {\n        check_vertex(v);\n        return {tin[v] + (edge\
+    \ ? 1 : 0), tout[v]};\n    }\n\n    std::vector<HldPathSegment> path_segments(int\
+    \ u, int v, bool edge = false) const {\n        check_vertex(u);\n        check_vertex(v);\n\
+    \        std::vector<HldPathSegment> result, down;\n        while (head[u] !=\
+    \ head[v]) {\n            if (depth[head[u]] >= depth[head[v]]) {\n          \
+    \      add_segment(result, tin[head[u]], tin[u] + 1, true);\n                u\
+    \ = parent[head[u]];\n            } else {\n                add_segment(down,\
+    \ tin[head[v]], tin[v] + 1, false);\n                v = parent[head[v]];\n  \
+    \          }\n        }\n\n        if (depth[u] >= depth[v]) {\n            add_segment(result,\
+    \ tin[v] + (edge ? 1 : 0), tin[u] + 1, true);\n        } else {\n            add_segment(down,\
+    \ tin[u] + (edge ? 1 : 0), tin[v] + 1, false);\n        }\n        std::reverse(down.begin(),\
+    \ down.end());\n        result.insert(result.end(), down.begin(), down.end());\n\
+    \        return result;\n    }\n\n    template <class F>\n    void for_each_path(int\
+    \ u, int v, F f, bool edge = false) const {\n        for (auto seg : path_segments(u,\
+    \ v, edge)) f(seg.l, seg.r, seg.reversed);\n    }\n};\n\n}  // namespace tree\n\
+    }  // namespace m1une\n\n\n#line 1 \"graph/tree/rerooting_dp.hpp\"\n\n\n\n#line\
+    \ 5 \"graph/tree/rerooting_dp.hpp\"\n\n#line 7 \"graph/tree/rerooting_dp.hpp\"\
+    \n\nnamespace m1une {\nnamespace tree {\n\ntemplate <class T, class DP, class\
+    \ Merge, class AddVertex, class AddEdge>\nstd::vector<DP> rerooting_dp(const m1une::graph::Graph<T>&\
+    \ g, DP id, Merge merge, AddVertex add_vertex,\n                             AddEdge\
+    \ add_edge) {\n    int n = g.size();\n    std::vector<int> parent(n, -2), parent_edge(n,\
+    \ -1), order;\n    order.reserve(n);\n    for (int root = 0; root < n; root++)\
+    \ {\n        if (parent[root] != -2) continue;\n        parent[root] = -1;\n \
+    \       std::vector<int> stack = {root};\n        while (!stack.empty()) {\n \
+    \           int v = stack.back();\n            stack.pop_back();\n           \
+    \ order.push_back(v);\n            for (const auto& e : g[v]) {\n            \
+    \    if (!e.alive) continue;\n                if (parent[e.to] != -2) continue;\n\
+    \                parent[e.to] = v;\n                parent_edge[e.to] = e.id;\n\
+    \                stack.push_back(e.to);\n            }\n        }\n    }\n\n \
+    \   std::vector<DP> down(n, id), outside(n, id), answer(n, id);\n    for (int\
+    \ i = n - 1; i >= 0; i--) {\n        int v = order[i];\n        DP acc = id;\n\
+    \        for (const auto& e : g[v]) {\n            if (!e.alive) continue;\n \
+    \           if (parent[e.to] != v) continue;\n            acc = merge(acc, add_edge(down[e.to],\
+    \ e));\n        }\n        down[v] = add_vertex(acc, v);\n    }\n\n    for (int\
+    \ v : order) {\n        int d = int(g[v].size());\n        std::vector<DP> contrib(d,\
+    \ id);\n        for (int i = 0; i < d; i++) {\n            const auto& e = g[v][i];\n\
+    \            if (!e.alive) continue;\n            if (parent[e.to] == v) {\n \
+    \               contrib[i] = add_edge(down[e.to], e);\n            } else if (parent[v]\
+    \ == e.to && parent_edge[v] == e.id) {\n                contrib[i] = add_edge(outside[v],\
+    \ e);\n            }\n        }\n\n        std::vector<DP> pref(d + 1, id), suff(d\
+    \ + 1, id);\n        for (int i = 0; i < d; i++) pref[i + 1] = merge(pref[i],\
+    \ contrib[i]);\n        for (int i = d - 1; i >= 0; i--) suff[i] = merge(contrib[i],\
+    \ suff[i + 1]);\n        answer[v] = add_vertex(pref[d], v);\n\n        for (int\
+    \ i = 0; i < d; i++) {\n            const auto& e = g[v][i];\n            if (!e.alive)\
+    \ continue;\n            if (parent[e.to] != v) continue;\n            outside[e.to]\
+    \ = add_vertex(merge(pref[i], suff[i + 1]), v);\n        }\n    }\n\n    return\
+    \ answer;\n}\n\n}  // namespace tree\n}  // namespace m1une\n\n\n#line 1 \"graph/tree/rerooting_static_top_tree.hpp\"\
+    \n\n\n\n#line 10 \"graph/tree/rerooting_static_top_tree.hpp\"\n\n#line 12 \"graph/tree/rerooting_static_top_tree.hpp\"\
+    \n\nnamespace m1une {\nnamespace tree {\n\nnamespace internal {\n\nenum class\
+    \ RerootingStaticTopTreeNodeType {\n    Compress,\n    Rake,\n    AddEdge,\n \
+    \   AddVertex,\n};\n\nenum class RerootingStaticTopTreeStepType {\n    CompressLower,\n\
+    \    CompressUpper,\n    AddEdge,\n    RakeLeft,\n    RakeRight,\n    AddVertex,\n\
+    };\n\n}  // namespace internal\n\ntemplate <class T, class Vertex, class Path,\
+    \ class Point, class CompressDown, class CompressUp, class Rake,\n          class\
+    \ AddEdgeDown, class AddEdgeUp, class AddVertex>\nstruct RerootingStaticTopTree\
+    \ {\n    using cost_type = T;\n    using vertex_type = Vertex;\n    using path_type\
+    \ = Path;\n    using point_type = Point;\n    using edge_type = m1une::graph::Edge<T>;\n\
+    \    using node_type = internal::RerootingStaticTopTreeNodeType;\n    using step_type\
+    \ = internal::RerootingStaticTopTreeStepType;\n\n    struct Node {\n        node_type\
+    \ type;\n        int left = -1;\n        int right = -1;\n        int parent =\
+    \ -1;\n        int vertex = -1;\n        edge_type edge;\n        int size = 0;\n\
+    \        int height = 1;\n        std::optional<Path> path_down;\n        std::optional<Path>\
+    \ path_up;\n        std::optional<Point> point;\n    };\n\n    struct RerootingStep\
+    \ {\n        step_type type;\n        int node = -1;\n        int sibling = -1;\n\
+    \        int vertex = -1;\n        edge_type edge;\n    };\n\n   private:\n  \
+    \  int _n;\n    int _root;\n    int _root_node;\n    Point _point_id;\n    CompressDown\
+    \ _compress_down;\n    CompressUp _compress_up;\n    Rake _rake;\n    AddEdgeDown\
+    \ _add_edge_down;\n    AddEdgeUp _add_edge_up;\n    AddVertex _add_vertex;\n \
+    \   std::vector<Vertex> _values;\n    std::vector<Node> _nodes;\n    std::vector<int>\
+    \ _vertex_node;\n    std::vector<int> _edge_node;\n    std::vector<int> _parent;\n\
+    \    std::vector<int> _subtree_size;\n    std::vector<int> _heavy;\n    std::vector<edge_type>\
+    \ _heavy_edge;\n    std::vector<std::vector<edge_type>> _children;\n\n    static\
+    \ edge_type reversed_edge(edge_type e) {\n        std::swap(e.from, e.to);\n \
+    \       return e;\n    }\n\n    const Path& node_path_down(int node) const {\n\
+    \        assert(0 <= node && node < int(_nodes.size()));\n        assert(_nodes[node].path_down.has_value());\n\
+    \        return *_nodes[node].path_down;\n    }\n\n    const Path& node_path_up(int\
+    \ node) const {\n        assert(0 <= node && node < int(_nodes.size()));\n   \
+    \     assert(_nodes[node].path_up.has_value());\n        return *_nodes[node].path_up;\n\
+    \    }\n\n    const Point& node_point(int node) const {\n        assert(0 <= node\
+    \ && node < int(_nodes.size()));\n        assert(_nodes[node].point.has_value());\n\
+    \        return *_nodes[node].point;\n    }\n\n    void set_parent(int child,\
+    \ int parent) {\n        if (child != -1) _nodes[child].parent = parent;\n   \
+    \ }\n\n    void recompute(int node) {\n        auto& x = _nodes[node];\n     \
+    \   if (x.type == node_type::Compress) {\n            x.path_down = _compress_down(node_path_down(x.left),\
+    \ node_path_down(x.right), x.edge);\n            x.path_up = _compress_up(node_path_up(x.right),\
+    \ node_path_up(x.left), reversed_edge(x.edge));\n        } else if (x.type ==\
+    \ node_type::Rake) {\n            x.point = _rake(node_point(x.left), node_point(x.right));\n\
+    \        } else if (x.type == node_type::AddEdge) {\n            x.point = _add_edge_down(node_path_down(x.left),\
+    \ x.edge);\n        } else {\n            const Point& side = x.left == -1 ? _point_id\
+    \ : node_point(x.left);\n            Path path = _add_vertex(side, _values[x.vertex],\
+    \ x.vertex);\n            x.path_down = path;\n            x.path_up = std::move(path);\n\
+    \        }\n    }\n\n    int new_node(Node node) {\n        int id = int(_nodes.size());\n\
+    \        _nodes.push_back(std::move(node));\n        set_parent(_nodes[id].left,\
+    \ id);\n        set_parent(_nodes[id].right, id);\n        recompute(id);\n  \
+    \      return id;\n    }\n\n    int new_compress(int left, int right, edge_type\
+    \ edge) {\n        Node node;\n        node.type = node_type::Compress;\n    \
+    \    node.left = left;\n        node.right = right;\n        node.edge = edge;\n\
+    \        node.size = _nodes[left].size + _nodes[right].size;\n        node.height\
+    \ = std::max(_nodes[left].height, _nodes[right].height) + 1;\n        int id =\
+    \ new_node(std::move(node));\n        if (0 <= edge.id && edge.id < int(_edge_node.size()))\
+    \ _edge_node[edge.id] = id;\n        return id;\n    }\n\n    int new_rake(int\
+    \ left, int right) {\n        Node node;\n        node.type = node_type::Rake;\n\
+    \        node.left = left;\n        node.right = right;\n        node.size = _nodes[left].size\
+    \ + _nodes[right].size;\n        node.height = std::max(_nodes[left].height, _nodes[right].height)\
+    \ + 1;\n        return new_node(std::move(node));\n    }\n\n    int new_add_edge(int\
+    \ child, edge_type edge) {\n        Node node;\n        node.type = node_type::AddEdge;\n\
+    \        node.left = child;\n        node.edge = edge;\n        node.size = _nodes[child].size;\n\
+    \        node.height = _nodes[child].height + 1;\n        int id = new_node(std::move(node));\n\
+    \        if (0 <= edge.id && edge.id < int(_edge_node.size())) _edge_node[edge.id]\
+    \ = id;\n        return id;\n    }\n\n    int new_add_vertex(int side, int vertex)\
+    \ {\n        Node node;\n        node.type = node_type::AddVertex;\n        node.left\
+    \ = side;\n        node.vertex = vertex;\n        node.size = 1 + (side == -1\
+    \ ? 0 : _nodes[side].size);\n        node.height = 1 + (side == -1 ? 0 : _nodes[side].height);\n\
+    \        int id = new_node(std::move(node));\n        _vertex_node[vertex] = id;\n\
+    \        return id;\n    }\n\n    int weighted_split(const std::vector<int>& nodes,\
+    \ int l, int r) const {\n        int total = 0;\n        for (int i = l; i < r;\
+    \ i++) total += _nodes[nodes[i]].size;\n        int left_sum = 0;\n        for\
+    \ (int i = l; i + 1 < r; i++) {\n            left_sum += _nodes[nodes[i]].size;\n\
+    \            if (2 * left_sum >= total) return i + 1;\n        }\n        return\
+    \ r - 1;\n    }\n\n    int build_rake(const std::vector<int>& nodes, int l, int\
+    \ r) {\n        if (l == r) return -1;\n        if (l + 1 == r) return nodes[l];\n\
+    \        int m = weighted_split(nodes, l, r);\n        return new_rake(build_rake(nodes,\
+    \ l, m), build_rake(nodes, m, r));\n    }\n\n    int build_compress(const std::vector<int>&\
+    \ nodes, const std::vector<edge_type>& edges, int l, int r) {\n        if (l +\
+    \ 1 == r) return nodes[l];\n        int m = weighted_split(nodes, l, r);\n   \
+    \     return new_compress(build_compress(nodes, edges, l, m), build_compress(nodes,\
+    \ edges, m, r), edges[m - 1]);\n    }\n\n    int build_vertex(int v) {\n     \
+    \   std::vector<int> side_nodes;\n        for (const auto& e : _children[v]) {\n\
+    \            if (e.to == _heavy[v]) continue;\n            int child_path = build_path(e.to);\n\
+    \            side_nodes.push_back(new_add_edge(child_path, e));\n        }\n \
+    \       return new_add_vertex(build_rake(side_nodes, 0, int(side_nodes.size())),\
+    \ v);\n    }\n\n    int build_path(int start) {\n        std::vector<int> path_nodes;\n\
+    \        std::vector<edge_type> path_edges;\n        for (int v = start; v !=\
+    \ -1; v = _heavy[v]) {\n            path_nodes.push_back(build_vertex(v));\n \
+    \           if (_heavy[v] != -1) path_edges.push_back(_heavy_edge[v]);\n     \
+    \   }\n        return build_compress(path_nodes, path_edges, 0, int(path_nodes.size()));\n\
+    \    }\n\n    void recompute_up(int node) {\n        while (node != -1) {\n  \
+    \          recompute(node);\n            node = _nodes[node].parent;\n       \
+    \ }\n    }\n\n   public:\n    RerootingStaticTopTree(const m1une::graph::Graph<T>&\
+    \ g, const std::vector<Vertex>& values, Point point_id,\n                    \
+    \       CompressDown compress_down, CompressUp compress_up, Rake rake,\n     \
+    \                      AddEdgeDown add_edge_down, AddEdgeUp add_edge_up, AddVertex\
+    \ add_vertex, int root = 0)\n        : _n(g.size()),\n          _root(_n == 0\
+    \ ? -1 : root),\n          _root_node(-1),\n          _point_id(std::move(point_id)),\n\
+    \          _compress_down(std::move(compress_down)),\n          _compress_up(std::move(compress_up)),\n\
+    \          _rake(std::move(rake)),\n          _add_edge_down(std::move(add_edge_down)),\n\
+    \          _add_edge_up(std::move(add_edge_up)),\n          _add_vertex(std::move(add_vertex)),\n\
+    \          _values(values) {\n        build(g, root);\n    }\n\n    void build(const\
+    \ m1une::graph::Graph<T>& g, int root = 0) {\n        _n = g.size();\n       \
+    \ _root = _n == 0 ? -1 : root;\n        assert(int(_values.size()) == _n);\n \
+    \       _nodes.clear();\n        _vertex_node.assign(_n, -1);\n        _edge_node.assign(g.edge_count(),\
+    \ -1);\n        _parent.assign(_n, -2);\n        _subtree_size.assign(_n, 1);\n\
+    \        _heavy.assign(_n, -1);\n        _heavy_edge.assign(_n, edge_type());\n\
+    \        _children.assign(_n, {});\n        _root_node = -1;\n\n        if (_n\
+    \ == 0) return;\n        assert(0 <= root && root < _n);\n        assert(int(g.edges().size())\
+    \ == _n - 1);\n\n        std::vector<int> order;\n        order.reserve(_n);\n\
+    \        std::vector<int> stack = {root};\n        _parent[root] = -1;\n     \
+    \   while (!stack.empty()) {\n            int v = stack.back();\n            stack.pop_back();\n\
+    \            order.push_back(v);\n            for (const auto& e : g[v]) {\n \
+    \               if (!e.alive) continue;\n                if (_parent[e.to] !=\
+    \ -2) continue;\n                _parent[e.to] = v;\n                _children[v].push_back(e);\n\
+    \                stack.push_back(e.to);\n            }\n        }\n        assert(int(order.size())\
+    \ == _n);\n\n        for (int i = int(order.size()) - 1; i >= 0; i--) {\n    \
+    \        int v = order[i];\n            for (const auto& e : _children[v]) {\n\
+    \                _subtree_size[v] += _subtree_size[e.to];\n                if\
+    \ (_heavy[v] == -1 || _subtree_size[_heavy[v]] < _subtree_size[e.to]) {\n    \
+    \                _heavy[v] = e.to;\n                    _heavy_edge[v] = e;\n\
+    \                }\n            }\n        }\n\n        _root_node = build_path(root);\n\
+    \    }\n\n    int size() const {\n        return _n;\n    }\n\n    bool empty()\
+    \ const {\n        return _n == 0;\n    }\n\n    int root() const {\n        return\
+    \ _root;\n    }\n\n    int root_node() const {\n        return _root_node;\n \
+    \   }\n\n    int node_count() const {\n        return int(_nodes.size());\n  \
+    \  }\n\n    int height() const {\n        return _root_node == -1 ? 0 : _nodes[_root_node].height;\n\
+    \    }\n\n    const std::vector<Node>& nodes() const {\n        return _nodes;\n\
+    \    }\n\n    const Node& node(int id) const {\n        assert(0 <= id && id <\
+    \ int(_nodes.size()));\n        return _nodes[id];\n    }\n\n    int parent_node(int\
+    \ id) const {\n        return node(id).parent;\n    }\n\n    int vertex_node(int\
+    \ v) const {\n        assert(0 <= v && v < _n);\n        return _vertex_node[v];\n\
+    \    }\n\n    int local_point_node(int v) const {\n        int id = vertex_node(v);\n\
+    \        assert(_nodes[id].type == node_type::AddVertex);\n        return _nodes[id].left;\n\
+    \    }\n\n    const Point& local_point(int v) const {\n        int point_node\
+    \ = local_point_node(v);\n        return point_node == -1 ? _point_id : node_point(point_node);\n\
+    \    }\n\n    const Vertex& get(int v) const {\n        assert(0 <= v && v < _n);\n\
+    \        return _values[v];\n    }\n\n    const Vertex& operator[](int v) const\
+    \ {\n        return get(v);\n    }\n\n    void set(int v, const Vertex& value)\
+    \ {\n        assert(0 <= v && v < _n);\n        assert(_vertex_node[v] != -1);\n\
+    \        _values[v] = value;\n        recompute_up(_vertex_node[v]);\n    }\n\n\
+    \    void set(int v, Vertex&& value) {\n        assert(0 <= v && v < _n);\n  \
+    \      assert(_vertex_node[v] != -1);\n        _values[v] = std::move(value);\n\
+    \        recompute_up(_vertex_node[v]);\n    }\n\n    void set_edge_cost(int edge_id,\
+    \ T cost) {\n        assert(0 <= edge_id && edge_id < int(_edge_node.size()));\n\
+    \        int node = _edge_node[edge_id];\n        assert(node != -1);\n      \
+    \  _nodes[node].edge.cost = cost;\n        recompute_up(node);\n    }\n\n    const\
+    \ Path& path_down(int node_id) const {\n        return node_path_down(node_id);\n\
+    \    }\n\n    const Path& path_up(int node_id) const {\n        return node_path_up(node_id);\n\
+    \    }\n\n    const Point& point(int node_id) const {\n        return node_point(node_id);\n\
+    \    }\n\n    const Path& all_prod_down() const {\n        assert(_root_node !=\
+    \ -1);\n        return path_down(_root_node);\n    }\n\n    const Path& all_prod_up()\
+    \ const {\n        assert(_root_node != -1);\n        return path_up(_root_node);\n\
+    \    }\n\n    const Point& point_id() const {\n        return _point_id;\n   \
+    \ }\n\n    template <class F>\n    void for_each_rerooting_step(int v, F&& f)\
+    \ const {\n        assert(0 <= v && v < _n);\n        int cur = _vertex_node[v];\n\
+    \        assert(cur != -1);\n        while (_nodes[cur].parent != -1) {\n    \
+    \        int par = _nodes[cur].parent;\n            const auto& p = _nodes[par];\n\
+    \            RerootingStep step;\n            step.node = par;\n            if\
+    \ (p.type == node_type::Compress) {\n                step.edge = p.edge;\n   \
+    \             if (p.left == cur) {\n                    step.type = step_type::CompressLower;\n\
+    \                    step.sibling = p.right;\n                } else {\n     \
+    \               assert(p.right == cur);\n                    step.type = step_type::CompressUpper;\n\
+    \                    step.sibling = p.left;\n                }\n            }\
+    \ else if (p.type == node_type::Rake) {\n                if (p.left == cur) {\n\
+    \                    step.type = step_type::RakeRight;\n                    step.sibling\
+    \ = p.right;\n                } else {\n                    assert(p.right ==\
+    \ cur);\n                    step.type = step_type::RakeLeft;\n              \
+    \      step.sibling = p.left;\n                }\n            } else if (p.type\
+    \ == node_type::AddEdge) {\n                assert(p.left == cur);\n         \
+    \       step.type = step_type::AddEdge;\n                step.edge = p.edge;\n\
+    \            } else {\n                assert(p.type == node_type::AddVertex);\n\
+    \                assert(p.left == cur);\n                step.type = step_type::AddVertex;\n\
+    \                step.vertex = p.vertex;\n            }\n            f(step);\n\
+    \            cur = par;\n        }\n    }\n\n    std::vector<RerootingStep> rerooting_steps(int\
+    \ v) const {\n        std::vector<RerootingStep> result;\n        int cur = vertex_node(v);\n\
+    \        int depth = 0;\n        while (_nodes[cur].parent != -1) {\n        \
+    \    cur = _nodes[cur].parent;\n            depth++;\n        }\n        result.reserve(depth);\n\
+    \        for_each_rerooting_step(v, [&](const RerootingStep& step) {\n       \
+    \     result.push_back(step);\n        });\n        return result;\n    }\n\n\
+    \    template <class Folder>\n    auto fold_rerooting(int v, Folder folder) const\
+    \ {\n        folder.start(v, _values[v], local_point(v));\n        for_each_rerooting_step(v,\
+    \ [&](const RerootingStep& step) {\n            if (step.type == step_type::CompressLower)\
+    \ {\n                folder.compress_lower(path_down(step.sibling), step.edge);\n\
+    \            } else if (step.type == step_type::CompressUpper) {\n           \
+    \     folder.compress_upper(path_up(step.sibling), reversed_edge(step.edge));\n\
+    \            } else if (step.type == step_type::AddEdge) {\n                folder.add_edge(reversed_edge(step.edge));\n\
+    \            } else if (step.type == step_type::RakeLeft) {\n                folder.rake_left(point(step.sibling));\n\
+    \            } else if (step.type == step_type::RakeRight) {\n               \
+    \ folder.rake_right(point(step.sibling));\n            } else {\n            \
+    \    folder.add_vertex(step.vertex, _values[step.vertex]);\n            }\n  \
+    \      });\n        return folder.result();\n    }\n\n    Path compress_down(const\
+    \ Path& upper, const Path& lower, edge_type edge) const {\n        return _compress_down(upper,\
+    \ lower, edge);\n    }\n\n    Path compress_up(const Path& lower, const Path&\
+    \ upper, edge_type edge) const {\n        return _compress_up(lower, upper, edge);\n\
+    \    }\n\n    Point rake(const Point& left, const Point& right) const {\n    \
+    \    return _rake(left, right);\n    }\n\n    Point add_edge_down(const Path&\
+    \ path, edge_type edge) const {\n        return _add_edge_down(path, edge);\n\
+    \    }\n\n    Point add_edge_up(const Path& path, edge_type edge) const {\n  \
+    \      return _add_edge_up(path, edge);\n    }\n\n    Path add_vertex(const Point&\
+    \ side, const Vertex& value, int vertex) const {\n        return _add_vertex(side,\
+    \ value, vertex);\n    }\n\n    static edge_type reverse_edge(edge_type edge)\
+    \ {\n        return reversed_edge(edge);\n    }\n};\n\ntemplate <class T, class\
+    \ Vertex, class Point, class CompressDown, class CompressUp, class Rake, class\
+    \ AddEdgeDown,\n          class AddEdgeUp, class AddVertex>\nRerootingStaticTopTree(const\
+    \ m1une::graph::Graph<T>&, const std::vector<Vertex>&, Point, CompressDown, CompressUp,\n\
+    \                       Rake, AddEdgeDown, AddEdgeUp, AddVertex, int)\n    ->\
+    \ RerootingStaticTopTree<T, Vertex, std::invoke_result_t<AddVertex, Point, Vertex,\
+    \ int>, Point, CompressDown,\n                              CompressUp, Rake,\
+    \ AddEdgeDown, AddEdgeUp, AddVertex>;\n\ntemplate <class T, class Vertex, class\
+    \ Point, class CompressDown, class CompressUp, class Rake, class AddEdgeDown,\n\
+    \          class AddEdgeUp, class AddVertex>\nRerootingStaticTopTree(const m1une::graph::Graph<T>&,\
+    \ const std::vector<Vertex>&, Point, CompressDown, CompressUp,\n             \
+    \          Rake, AddEdgeDown, AddEdgeUp, AddVertex)\n    -> RerootingStaticTopTree<T,\
+    \ Vertex, std::invoke_result_t<AddVertex, Point, Vertex, int>, Point, CompressDown,\n\
+    \                              CompressUp, Rake, AddEdgeDown, AddEdgeUp, AddVertex>;\n\
+    \n}  // namespace tree\n}  // namespace m1une\n\n\n#line 1 \"graph/tree/rooted_tree.hpp\"\
+    \n\n\n\n#line 7 \"graph/tree/rooted_tree.hpp\"\n\n#line 9 \"graph/tree/rooted_tree.hpp\"\
+    \n\nnamespace m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct RootedTree\
+    \ {\n    using cost_type = T;\n    using edge_type = m1une::graph::Edge<T>;\n\n\
+    \    int root;\n    std::vector<int> parent;\n    std::vector<int> parent_edge;\n\
+    \    std::vector<int> depth;\n    std::vector<T> dist;\n    std::vector<int> subtree_size;\n\
+    \    std::vector<int> tin;\n    std::vector<int> tout;\n    std::vector<int> order;\n\
+    \    std::vector<std::vector<int>> up;\n\n   private:\n    int _n;\n    int _log;\n\
+    \n    void check_vertex(int v) const {\n        assert(0 <= v && v < _n);\n  \
+    \      assert(tin[v] != -1);\n    }\n\n   public:\n    RootedTree() : root(-1),\
+    \ _n(0), _log(0) {}\n    explicit RootedTree(const m1une::graph::Graph<T>& g,\
+    \ int root_ = 0) {\n        build(g, root_);\n    }\n\n    void build(const m1une::graph::Graph<T>&\
+    \ g, int root_ = 0) {\n        _n = g.size();\n        root = _n == 0 ? -1 : root_;\n\
+    \        _log = 1;\n        while ((1U << _log) <= (unsigned int)(std::max(1,\
+    \ _n))) _log++;\n\n        parent.assign(_n, -1);\n        parent_edge.assign(_n,\
+    \ -1);\n        depth.assign(_n, 0);\n        dist.assign(_n, T(0));\n       \
+    \ subtree_size.assign(_n, 0);\n        tin.assign(_n, -1);\n        tout.assign(_n,\
+    \ -1);\n        order.clear();\n        order.reserve(_n);\n        up.assign(_log,\
+    \ std::vector<int>(_n, -1));\n\n        if (_n == 0) return;\n        assert(0\
+    \ <= root && root < _n);\n\n        struct Frame {\n            int v;\n     \
+    \       int state;\n        };\n\n        std::vector<char> visited(_n, false);\n\
+    \        std::vector<Frame> stack;\n        stack.push_back({root, 0});\n    \
+    \    visited[root] = true;\n        int timer = 0;\n\n        while (!stack.empty())\
+    \ {\n            Frame frame = stack.back();\n            stack.pop_back();\n\
+    \            int v = frame.v;\n            if (frame.state == 0) {\n         \
+    \       tin[v] = timer++;\n                order.push_back(v);\n             \
+    \   up[0][v] = parent[v];\n                for (int k = 1; k < _log; k++) {\n\
+    \                    int p = up[k - 1][v];\n                    up[k][v] = p ==\
+    \ -1 ? -1 : up[k - 1][p];\n                }\n\n                stack.push_back({v,\
+    \ 1});\n                const auto& adj = g[v];\n                for (int i =\
+    \ int(adj.size()) - 1; i >= 0; i--) {\n                    const auto& e = adj[i];\n\
+    \                    if (!e.alive) continue;\n                    if (visited[e.to])\
+    \ continue;\n                    visited[e.to] = true;\n                    parent[e.to]\
+    \ = v;\n                    parent_edge[e.to] = e.id;\n                    depth[e.to]\
+    \ = depth[v] + 1;\n                    dist[e.to] = dist[v] + e.cost;\n      \
+    \              stack.push_back({e.to, 0});\n                }\n            } else\
+    \ {\n                subtree_size[v]++;\n                if (parent[v] != -1)\
+    \ subtree_size[parent[v]] += subtree_size[v];\n                tout[v] = timer;\n\
+    \            }\n        }\n    }\n\n    int size() const {\n        return _n;\n\
+    \    }\n\n    bool empty() const {\n        return _n == 0;\n    }\n\n    int\
+    \ log() const {\n        return _log;\n    }\n\n    bool is_ancestor(int u, int\
+    \ v) const {\n        check_vertex(u);\n        check_vertex(v);\n        return\
+    \ tin[u] <= tin[v] && tout[v] <= tout[u];\n    }\n\n    bool in_subtree(int v,\
+    \ int u) const {\n        return is_ancestor(u, v);\n    }\n\n    int kth_ancestor(int\
+    \ v, int k) const {\n        check_vertex(v);\n        assert(0 <= k);\n     \
+    \   int bit = 0;\n        while (k > 0 && v != -1) {\n            if (k & 1) {\n\
+    \                if (_log <= bit) return -1;\n                v = up[bit][v];\n\
+    \            }\n            k >>= 1;\n            bit++;\n        }\n        return\
+    \ v;\n    }\n\n    int lca(int u, int v) const {\n        check_vertex(u);\n \
+    \       check_vertex(v);\n        if (depth[u] < depth[v]) std::swap(u, v);\n\
+    \        u = kth_ancestor(u, depth[u] - depth[v]);\n        if (u == v) return\
+    \ u;\n        for (int k = _log - 1; k >= 0; k--) {\n            if (up[k][u]\
+    \ != up[k][v]) {\n                u = up[k][u];\n                v = up[k][v];\n\
+    \            }\n        }\n        return parent[u];\n    }\n\n    int dist_edges(int\
+    \ u, int v) const {\n        int w = lca(u, v);\n        return depth[u] + depth[v]\
+    \ - 2 * depth[w];\n    }\n\n    T dist_cost(int u, int v) const {\n        int\
+    \ w = lca(u, v);\n        return dist[u] + dist[v] - dist[w] - dist[w];\n    }\n\
+    \n    int jump(int from, int to, int k) const {\n        check_vertex(from);\n\
+    \        check_vertex(to);\n        assert(0 <= k);\n        int w = lca(from,\
+    \ to);\n        int up_len = depth[from] - depth[w];\n        int down_len = depth[to]\
+    \ - depth[w];\n        if (up_len + down_len < k) return -1;\n        if (k <=\
+    \ up_len) return kth_ancestor(from, k);\n        return kth_ancestor(to, down_len\
+    \ - (k - up_len));\n    }\n\n    std::vector<int> path(int u, int v) const {\n\
+    \        check_vertex(u);\n        check_vertex(v);\n        int w = lca(u, v);\n\
+    \        std::vector<int> a, b;\n        for (int x = u; x != w; x = parent[x])\
+    \ a.push_back(x);\n        a.push_back(w);\n        for (int x = v; x != w; x\
+    \ = parent[x]) b.push_back(x);\n        std::reverse(b.begin(), b.end());\n  \
+    \      a.insert(a.end(), b.begin(), b.end());\n        return a;\n    }\n\n  \
+    \  std::vector<int> path_edges(int u, int v) const {\n        check_vertex(u);\n\
+    \        check_vertex(v);\n        int w = lca(u, v);\n        std::vector<int>\
+    \ a, b;\n        for (int x = u; x != w; x = parent[x]) a.push_back(parent_edge[x]);\n\
+    \        for (int x = v; x != w; x = parent[x]) b.push_back(parent_edge[x]);\n\
+    \        std::reverse(b.begin(), b.end());\n        a.insert(a.end(), b.begin(),\
+    \ b.end());\n        return a;\n    }\n\n    std::pair<int, int> subtree_range(int\
+    \ v) const {\n        check_vertex(v);\n        return {tin[v], tout[v]};\n  \
+    \  }\n\n    std::vector<int> subtree_vertices(int v) const {\n        check_vertex(v);\n\
+    \        return std::vector<int>(order.begin() + tin[v], order.begin() + tout[v]);\n\
+    \    }\n};\n\n}  // namespace tree\n}  // namespace m1une\n\n\n#line 1 \"graph/tree/sparse_table_lca.hpp\"\
+    \n\n\n\n#line 9 \"graph/tree/sparse_table_lca.hpp\"\n\n#line 1 \"ds/range_query/sparse_table.hpp\"\
+    \n\n\n\n#include <bit>\n#line 6 \"ds/range_query/sparse_table.hpp\"\n#include\
+    \ <concepts>\n#line 9 \"ds/range_query/sparse_table.hpp\"\n\n#line 1 \"monoid/concept.hpp\"\
+    \n\n\n\n#line 5 \"monoid/concept.hpp\"\n\nnamespace m1une {\nnamespace monoid\
+    \ {\n\n// Concept to check if a type satisfies the requirements of a Monoid.\n\
+    // A Monoid must have a `value_type`, an identity element `id()`, and an associative\
+    \ binary operation `op()`.\ntemplate <typename M>\nconcept IsMonoid = requires(typename\
+    \ M::value_type a, typename M::value_type b) {\n    // 1. Must define `value_type`\n\
+    \    typename M::value_type;\n\n    // 2. Must have a static method `id()` returning\
+    \ `value_type`\n    { M::id() } -> std::same_as<typename M::value_type>;\n\n \
+    \   // 3. Must have a static method `op(a, b)` returning `value_type`\n    { M::op(a,\
+    \ b) } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for commutative\
+    \ group monoids.\n// A type satisfying this concept must also obey commutativity\
+    \ and inverse laws.\ntemplate <typename M>\nconcept IsCommutativeGroup = IsMonoid<M>\
+    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
+    \ M::value_type>;\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line\
+    \ 11 \"ds/range_query/sparse_table.hpp\"\n\nnamespace m1une {\nnamespace ds {\n\
+    \n// A Sparse Table utilizing C++20 Concepts for type safety.\n// It requires\
+    \ a Monoid struct that satisfies `m1une::monoid::IsMonoid`.\n// [IMPORTANT] For\
+    \ O(1) range queries to work correctly, the monoid operation MUST be idempotent.\n\
+    // i.e., Monoid::op(x, x) == x must hold (e.g., Min, Max, GCD, Bitwise AND/OR).\n\
+    template <m1une::monoid::IsMonoid Monoid>\nstruct SparseTable {\n    using T =\
+    \ typename Monoid::value_type;\n\n   private:\n    int _n;\n    std::vector<std::vector<T>>\
+    \ _st;\n\n   public:\n    // Constructs an empty sparse table.\n    SparseTable()\
+    \ : _n(0) {}\n\n    // Constructs a sparse table from an existing vector in O(N\
+    \ log N) time.\n    explicit SparseTable(const std::vector<T>& v) : _n(int(v.size()))\
+    \ {\n        if (_n == 0) return;\n\n        // Compute the maximum power of 2\
+    \ needed\n        int max_log = std::bit_width((unsigned int)_n);\n        _st.assign(max_log,\
+    \ std::vector<T>(_n));\n\n        // Initialize the base level\n        for (int\
+    \ i = 0; i < _n; i++) {\n            _st[0][i] = v[i];\n        }\n\n        //\
+    \ Build the sparse table\n        for (int k = 1; k < max_log; k++) {\n      \
+    \      for (int i = 0; i + (1 << k) <= _n; i++) {\n                _st[k][i] =\
+    \ Monoid::op(_st[k - 1][i], _st[k - 1][i + (1 << (k - 1))]);\n            }\n\
+    \        }\n    }\n    explicit SparseTable(std::vector<T>&& v) : _n(int(v.size()))\
+    \ {\n        if (_n == 0) return;\n\n        int max_log = std::bit_width((unsigned\
+    \ int)_n);\n        _st.assign(max_log, std::vector<T>(_n));\n\n        for (int\
+    \ i = 0; i < _n; i++) {\n            _st[0][i] = std::move(v[i]);\n        }\n\
+    \n        for (int k = 1; k < max_log; k++) {\n            for (int i = 0; i +\
+    \ (1 << k) <= _n; i++) {\n                _st[k][i] = Monoid::op(_st[k - 1][i],\
+    \ _st[k - 1][i + (1 << (k - 1))]);\n            }\n        }\n    }\n\n    //\
+    \ Constructs a sparse table from a vector of a different type U.\n    // It automatically\
+    \ adapts to the Monoid's initialization requirements:\n    // 1. Monoid::make(val)\
+    \ if it exists.\n    // 2. Monoid::make(val, index) if the monoid requires global\
+    \ indices.\n    // 3. static_cast<T>(val) as a fallback for simple monoids.\n\
+    \    template <typename U>\n    requires (!std::same_as<U, T>) && (\n        requires(U\
+    \ x) { Monoid::make(x); } ||\n        requires(U x, int i) { Monoid::make(x, i);\
+    \ } ||\n        std::convertible_to<U, T>\n    )\n    explicit SparseTable(const\
+    \ std::vector<U>& v) : _n(int(v.size())) {\n        if (_n == 0) return;\n\n \
+    \       int max_log = std::bit_width((unsigned int)_n);\n        _st.assign(max_log,\
+    \ std::vector<T>(_n));\n\n        // Compile-time branching based on the available\
+    \ make() signature\n        for (int i = 0; i < _n; i++) {\n            if constexpr\
+    \ (requires(U x) { Monoid::make(x); }) {\n                _st[0][i] = Monoid::make(v[i]);\n\
+    \            } else if constexpr (requires(U x, int idx) { Monoid::make(x, idx);\
+    \ }) {\n                _st[0][i] = Monoid::make(v[i], i);\n            } else\
+    \ {\n                _st[0][i] = static_cast<T>(v[i]);\n            }\n      \
+    \  }\n        for (int k = 1; k < max_log; k++) {\n            for (int i = 0;\
+    \ i + (1 << k) <= _n; i++) {\n                _st[k][i] = Monoid::op(_st[k - 1][i],\
+    \ _st[k - 1][i + (1 << (k - 1))]);\n            }\n        }\n    }\n\n    //\
+    \ Returns the product (result of the monoid operation) in the range [l, r) in\
+    \ O(1) time.\n    // Requires the monoid operation to be idempotent.\n    T prod(int\
+    \ l, int r) const {\n        assert(0 <= l && l <= r && r <= _n);\n        if\
+    \ (l == r) return Monoid::id();\n\n        // Calculate the largest power of 2\
+    \ less than or equal to the interval length\n        int k = std::bit_width((unsigned\
+    \ int)(r - l)) - 1;\n        return Monoid::op(_st[k][l], _st[k][r - (1 << k)]);\n\
+    \    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n#line 12 \"graph/tree/sparse_table_lca.hpp\"\
+    \n\nnamespace m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct SparseTableLca\
+    \ {\n    using cost_type = T;\n    using edge_type = m1une::graph::Edge<T>;\n\n\
+    \    int root;\n    std::vector<int> parent;\n    std::vector<int> parent_edge;\n\
+    \    std::vector<int> depth;\n    std::vector<T> dist;\n    std::vector<int> subtree_size;\n\
+    \    std::vector<int> tin;\n    std::vector<int> tout;\n    std::vector<int> order;\n\
+    \    std::vector<int> first;\n    std::vector<int> euler;\n\n   private:\n   \
+    \ struct RmqNode {\n        int depth;\n        int vertex;\n    };\n\n    struct\
+    \ RmqMonoid {\n        using value_type = RmqNode;\n\n        static value_type\
+    \ id() {\n            return {std::numeric_limits<int>::max(), -1};\n        }\n\
+    \n        static value_type op(const value_type& a, const value_type& b) {\n \
+    \           if (a.depth != b.depth) return a.depth < b.depth ? a : b;\n      \
+    \      return a.vertex < b.vertex ? a : b;\n        }\n    };\n\n    int _n;\n\
+    \    m1une::ds::SparseTable<RmqMonoid> _st;\n\n    void check_vertex(int v) const\
+    \ {\n        assert(0 <= v && v < _n);\n        assert(first[v] != -1);\n    }\n\
+    \n   public:\n    SparseTableLca() : root(-1), _n(0) {}\n    explicit SparseTableLca(const\
+    \ m1une::graph::Graph<T>& g, int root_ = 0) {\n        build(g, root_);\n    }\n\
+    \n    void build(const m1une::graph::Graph<T>& g, int root_ = 0) {\n        _n\
+    \ = g.size();\n        root = _n == 0 ? -1 : root_;\n        parent.assign(_n,\
+    \ -2);\n        parent_edge.assign(_n, -1);\n        depth.assign(_n, 0);\n  \
+    \      dist.assign(_n, T(0));\n        subtree_size.assign(_n, 0);\n        tin.assign(_n,\
+    \ -1);\n        tout.assign(_n, -1);\n        order.clear();\n        order.reserve(_n);\n\
+    \        first.assign(_n, -1);\n        euler.clear();\n        euler.reserve(std::max(0,\
+    \ 2 * _n - 1));\n        _st = m1une::ds::SparseTable<RmqMonoid>();\n\n      \
+    \  if (_n == 0) return;\n        assert(0 <= root && root < _n);\n\n        std::vector<int>\
+    \ it(_n, 0);\n        std::vector<char> visited(_n, false);\n        std::vector<int>\
+    \ stack = {root};\n        visited[root] = true;\n        parent[root] = -1;\n\
+    \n        int timer = 0;\n        tin[root] = timer++;\n        order.push_back(root);\n\
+    \        first[root] = 0;\n        euler.push_back(root);\n\n        while (!stack.empty())\
+    \ {\n            int v = stack.back();\n            if (it[v] < int(g[v].size()))\
+    \ {\n                const auto& e = g[v][it[v]++];\n                if (!e.alive)\
+    \ continue;\n                if (visited[e.to]) continue;\n                visited[e.to]\
+    \ = true;\n                parent[e.to] = v;\n                parent_edge[e.to]\
+    \ = e.id;\n                depth[e.to] = depth[v] + 1;\n                dist[e.to]\
+    \ = dist[v] + e.cost;\n                tin[e.to] = timer++;\n                order.push_back(e.to);\n\
+    \                first[e.to] = int(euler.size());\n                euler.push_back(e.to);\n\
+    \                stack.push_back(e.to);\n            } else {\n              \
+    \  subtree_size[v]++;\n                if (parent[v] != -1) subtree_size[parent[v]]\
+    \ += subtree_size[v];\n                tout[v] = timer;\n                stack.pop_back();\n\
+    \                if (!stack.empty()) euler.push_back(stack.back());\n        \
+    \    }\n        }\n\n        std::vector<RmqNode> rmq;\n        rmq.reserve(euler.size());\n\
+    \        for (int v : euler) rmq.push_back({depth[v], v});\n        _st = m1une::ds::SparseTable<RmqMonoid>(std::move(rmq));\n\
+    \    }\n\n    int size() const {\n        return _n;\n    }\n\n    bool empty()\
+    \ const {\n        return _n == 0;\n    }\n\n    bool is_ancestor(int u, int v)\
+    \ const {\n        check_vertex(u);\n        check_vertex(v);\n        return\
+    \ tin[u] <= tin[v] && tout[v] <= tout[u];\n    }\n\n    bool in_subtree(int v,\
+    \ int u) const {\n        return is_ancestor(u, v);\n    }\n\n    int lca(int\
+    \ u, int v) const {\n        check_vertex(u);\n        check_vertex(v);\n    \
+    \    int l = first[u], r = first[v];\n        if (l > r) std::swap(l, r);\n  \
+    \      return _st.prod(l, r + 1).vertex;\n    }\n\n    int dist_edges(int u, int\
+    \ v) const {\n        int w = lca(u, v);\n        return depth[u] + depth[v] -\
+    \ 2 * depth[w];\n    }\n\n    T dist_cost(int u, int v) const {\n        int w\
+    \ = lca(u, v);\n        return dist[u] + dist[v] - dist[w] - dist[w];\n    }\n\
+    \n    std::pair<int, int> subtree_range(int v) const {\n        check_vertex(v);\n\
+    \        return {tin[v], tout[v]};\n    }\n};\n\n}  // namespace tree\n}  // namespace\
+    \ m1une\n\n\n#line 1 \"graph/tree/static_top_tree.hpp\"\n\n\n\n#line 10 \"graph/tree/static_top_tree.hpp\"\
+    \n\n#line 12 \"graph/tree/static_top_tree.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ tree {\n\nnamespace internal {\n\nenum class StaticTopTreeNodeType {\n    Compress,\n\
+    \    Rake,\n    AddEdge,\n    AddVertex,\n};\n\n}  // namespace internal\n\ntemplate\
+    \ <class T, class Vertex, class Path, class Point, class Compress, class Rake,\
+    \ class AddEdge,\n          class AddVertex>\nstruct StaticTopTree {\n    using\
+    \ cost_type = T;\n    using vertex_type = Vertex;\n    using path_type = Path;\n\
+    \    using point_type = Point;\n    using edge_type = m1une::graph::Edge<T>;\n\
+    \n   private:\n    struct Node {\n        internal::StaticTopTreeNodeType type;\n\
+    \        int left = -1;\n        int right = -1;\n        int parent = -1;\n \
+    \       int vertex = -1;\n        edge_type edge;\n        int size = 0;\n   \
+    \     int height = 1;\n        std::optional<Path> path;\n        std::optional<Point>\
+    \ point;\n    };\n\n    int _n;\n    int _root;\n    int _root_node;\n    Point\
+    \ _point_id;\n    Compress _compress;\n    Rake _rake;\n    AddEdge _add_edge;\n\
+    \    AddVertex _add_vertex;\n    std::vector<Vertex> _values;\n    std::vector<Node>\
+    \ _nodes;\n    std::vector<int> _vertex_node;\n    std::vector<int> _edge_node;\n\
+    \    std::vector<int> _parent;\n    std::vector<int> _subtree_size;\n    std::vector<int>\
+    \ _heavy;\n    std::vector<edge_type> _heavy_edge;\n    std::vector<std::vector<edge_type>>\
+    \ _children;\n\n    const Path& path_value(int node) const {\n        assert(0\
+    \ <= node && node < int(_nodes.size()));\n        assert(_nodes[node].path.has_value());\n\
+    \        return *_nodes[node].path;\n    }\n\n    const Point& point_value(int\
+    \ node) const {\n        assert(0 <= node && node < int(_nodes.size()));\n   \
+    \     assert(_nodes[node].point.has_value());\n        return *_nodes[node].point;\n\
+    \    }\n\n    void set_parent(int child, int parent) {\n        if (child != -1)\
+    \ _nodes[child].parent = parent;\n    }\n\n    void recompute(int node) {\n  \
+    \      auto& x = _nodes[node];\n        if (x.type == internal::StaticTopTreeNodeType::Compress)\
+    \ {\n            x.path = _compress(path_value(x.left), path_value(x.right), x.edge);\n\
+    \        } else if (x.type == internal::StaticTopTreeNodeType::Rake) {\n     \
+    \       x.point = _rake(point_value(x.left), point_value(x.right));\n        }\
+    \ else if (x.type == internal::StaticTopTreeNodeType::AddEdge) {\n           \
+    \ x.point = _add_edge(path_value(x.left), x.edge);\n        } else {\n       \
+    \     const Point& side = x.left == -1 ? _point_id : point_value(x.left);\n  \
+    \          x.path = _add_vertex(side, _values[x.vertex], x.vertex);\n        }\n\
+    \    }\n\n    int new_node(Node node) {\n        int id = int(_nodes.size());\n\
+    \        _nodes.push_back(std::move(node));\n        set_parent(_nodes[id].left,\
+    \ id);\n        set_parent(_nodes[id].right, id);\n        recompute(id);\n  \
+    \      return id;\n    }\n\n    int new_compress(int left, int right, edge_type\
+    \ edge) {\n        Node node;\n        node.type = internal::StaticTopTreeNodeType::Compress;\n\
+    \        node.left = left;\n        node.right = right;\n        node.edge = edge;\n\
+    \        node.size = _nodes[left].size + _nodes[right].size;\n        node.height\
+    \ = std::max(_nodes[left].height, _nodes[right].height) + 1;\n        int id =\
+    \ new_node(std::move(node));\n        if (0 <= edge.id && edge.id < int(_edge_node.size()))\
+    \ _edge_node[edge.id] = id;\n        return id;\n    }\n\n    int new_rake(int\
+    \ left, int right) {\n        Node node;\n        node.type = internal::StaticTopTreeNodeType::Rake;\n\
+    \        node.left = left;\n        node.right = right;\n        node.size = _nodes[left].size\
+    \ + _nodes[right].size;\n        node.height = std::max(_nodes[left].height, _nodes[right].height)\
+    \ + 1;\n        return new_node(std::move(node));\n    }\n\n    int new_add_edge(int\
+    \ child, edge_type edge) {\n        Node node;\n        node.type = internal::StaticTopTreeNodeType::AddEdge;\n\
+    \        node.left = child;\n        node.edge = edge;\n        node.size = _nodes[child].size;\n\
+    \        node.height = _nodes[child].height + 1;\n        int id = new_node(std::move(node));\n\
+    \        if (0 <= edge.id && edge.id < int(_edge_node.size())) _edge_node[edge.id]\
+    \ = id;\n        return id;\n    }\n\n    int new_add_vertex(int side, int vertex)\
+    \ {\n        Node node;\n        node.type = internal::StaticTopTreeNodeType::AddVertex;\n\
+    \        node.left = side;\n        node.vertex = vertex;\n        node.size =\
+    \ 1 + (side == -1 ? 0 : _nodes[side].size);\n        node.height = 1 + (side ==\
+    \ -1 ? 0 : _nodes[side].height);\n        int id = new_node(std::move(node));\n\
+    \        _vertex_node[vertex] = id;\n        return id;\n    }\n\n    int weighted_split(const\
+    \ std::vector<int>& nodes, int l, int r) const {\n        int total = 0;\n   \
+    \     for (int i = l; i < r; i++) total += _nodes[nodes[i]].size;\n        int\
+    \ left_sum = 0;\n        for (int i = l; i + 1 < r; i++) {\n            left_sum\
+    \ += _nodes[nodes[i]].size;\n            if (2 * left_sum >= total) return i +\
+    \ 1;\n        }\n        return r - 1;\n    }\n\n    int build_rake(const std::vector<int>&\
+    \ nodes, int l, int r) {\n        if (l == r) return -1;\n        if (l + 1 ==\
+    \ r) return nodes[l];\n        int m = weighted_split(nodes, l, r);\n        return\
+    \ new_rake(build_rake(nodes, l, m), build_rake(nodes, m, r));\n    }\n\n    int\
+    \ build_compress(const std::vector<int>& nodes, const std::vector<edge_type>&\
+    \ edges, int l, int r) {\n        if (l + 1 == r) return nodes[l];\n        int\
+    \ m = weighted_split(nodes, l, r);\n        return new_compress(build_compress(nodes,\
+    \ edges, l, m), build_compress(nodes, edges, m, r), edges[m - 1]);\n    }\n\n\
+    \    int build_vertex(int v) {\n        std::vector<int> side_nodes;\n       \
+    \ for (const auto& e : _children[v]) {\n            if (e.to == _heavy[v]) continue;\n\
+    \            int child_path = build_path(e.to);\n            side_nodes.push_back(new_add_edge(child_path,\
+    \ e));\n        }\n        return new_add_vertex(build_rake(side_nodes, 0, int(side_nodes.size())),\
+    \ v);\n    }\n\n    int build_path(int start) {\n        std::vector<int> path_nodes;\n\
+    \        std::vector<edge_type> path_edges;\n        for (int v = start; v !=\
+    \ -1; v = _heavy[v]) {\n            path_nodes.push_back(build_vertex(v));\n \
+    \           if (_heavy[v] != -1) path_edges.push_back(_heavy_edge[v]);\n     \
+    \   }\n        return build_compress(path_nodes, path_edges, 0, int(path_nodes.size()));\n\
+    \    }\n\n    void recompute_up(int node) {\n        while (node != -1) {\n  \
+    \          recompute(node);\n            node = _nodes[node].parent;\n       \
+    \ }\n    }\n\n   public:\n    StaticTopTree(const m1une::graph::Graph<T>& g, const\
+    \ std::vector<Vertex>& values, Point point_id,\n                  Compress compress,\
+    \ Rake rake, AddEdge add_edge, AddVertex add_vertex, int root = 0)\n        :\
+    \ _n(g.size()),\n          _root(_n == 0 ? -1 : root),\n          _root_node(-1),\n\
+    \          _point_id(std::move(point_id)),\n          _compress(std::move(compress)),\n\
+    \          _rake(std::move(rake)),\n          _add_edge(std::move(add_edge)),\n\
+    \          _add_vertex(std::move(add_vertex)),\n          _values(values) {\n\
+    \        build(g, root);\n    }\n\n    void build(const m1une::graph::Graph<T>&\
+    \ g, int root = 0) {\n        _n = g.size();\n        _root = _n == 0 ? -1 : root;\n\
+    \        assert(int(_values.size()) == _n);\n        _nodes.clear();\n       \
+    \ _vertex_node.assign(_n, -1);\n        _edge_node.assign(g.edge_count(), -1);\n\
+    \        _parent.assign(_n, -2);\n        _subtree_size.assign(_n, 1);\n     \
+    \   _heavy.assign(_n, -1);\n        _heavy_edge.assign(_n, edge_type());\n   \
+    \     _children.assign(_n, {});\n        _root_node = -1;\n\n        if (_n ==\
+    \ 0) return;\n        assert(0 <= root && root < _n);\n        assert(int(g.edges().size())\
+    \ == _n - 1);\n\n        std::vector<int> order;\n        order.reserve(_n);\n\
+    \        std::vector<int> stack = {root};\n        _parent[root] = -1;\n     \
+    \   while (!stack.empty()) {\n            int v = stack.back();\n            stack.pop_back();\n\
+    \            order.push_back(v);\n            for (const auto& e : g[v]) {\n \
+    \               if (!e.alive) continue;\n                if (_parent[e.to] !=\
+    \ -2) continue;\n                _parent[e.to] = v;\n                _children[v].push_back(e);\n\
+    \                stack.push_back(e.to);\n            }\n        }\n        assert(int(order.size())\
+    \ == _n);\n\n        for (int i = int(order.size()) - 1; i >= 0; i--) {\n    \
+    \        int v = order[i];\n            for (const auto& e : _children[v]) {\n\
+    \                _subtree_size[v] += _subtree_size[e.to];\n                if\
+    \ (_heavy[v] == -1 || _subtree_size[_heavy[v]] < _subtree_size[e.to]) {\n    \
+    \                _heavy[v] = e.to;\n                    _heavy_edge[v] = e;\n\
+    \                }\n            }\n        }\n\n        _root_node = build_path(root);\n\
+    \    }\n\n    int size() const {\n        return _n;\n    }\n\n    bool empty()\
+    \ const {\n        return _n == 0;\n    }\n\n    int root() const {\n        return\
+    \ _root;\n    }\n\n    int node_count() const {\n        return int(_nodes.size());\n\
+    \    }\n\n    int height() const {\n        return _root_node == -1 ? 0 : _nodes[_root_node].height;\n\
+    \    }\n\n    const Vertex& get(int v) const {\n        assert(0 <= v && v < _n);\n\
+    \        return _values[v];\n    }\n\n    const Vertex& operator[](int v) const\
+    \ {\n        return get(v);\n    }\n\n    void set(int v, const Vertex& value)\
+    \ {\n        assert(0 <= v && v < _n);\n        assert(_vertex_node[v] != -1);\n\
+    \        _values[v] = value;\n        recompute_up(_vertex_node[v]);\n    }\n\n\
+    \    void set(int v, Vertex&& value) {\n        assert(0 <= v && v < _n);\n  \
+    \      assert(_vertex_node[v] != -1);\n        _values[v] = std::move(value);\n\
+    \        recompute_up(_vertex_node[v]);\n    }\n\n    void set_edge_cost(int edge_id,\
+    \ T cost) {\n        assert(0 <= edge_id && edge_id < int(_edge_node.size()));\n\
+    \        int node = _edge_node[edge_id];\n        assert(node != -1);\n      \
+    \  _nodes[node].edge.cost = cost;\n        recompute_up(node);\n    }\n\n    const\
+    \ Path& all_prod() const {\n        assert(_root_node != -1);\n        return\
+    \ path_value(_root_node);\n    }\n\n    const Path& query() const {\n        return\
+    \ all_prod();\n    }\n};\n\ntemplate <class T, class Vertex, class Point, class\
+    \ Compress, class Rake, class AddEdge, class AddVertex>\nStaticTopTree(const m1une::graph::Graph<T>&,\
+    \ const std::vector<Vertex>&, Point, Compress, Rake, AddEdge,\n              AddVertex,\
+    \ int)\n    -> StaticTopTree<T, Vertex, std::invoke_result_t<AddVertex, Point,\
+    \ Vertex, int>, Point, Compress, Rake,\n                     AddEdge, AddVertex>;\n\
+    \ntemplate <class T, class Vertex, class Point, class Compress, class Rake, class\
+    \ AddEdge, class AddVertex>\nStaticTopTree(const m1une::graph::Graph<T>&, const\
+    \ std::vector<Vertex>&, Point, Compress, Rake, AddEdge, AddVertex)\n    -> StaticTopTree<T,\
+    \ Vertex, std::invoke_result_t<AddVertex, Point, Vertex, int>, Point, Compress,\
+    \ Rake,\n                     AddEdge, AddVertex>;\n\n}  // namespace tree\n}\
+    \  // namespace m1une\n\n\n#line 1 \"graph/tree/tree.hpp\"\n\n\n\n#line 7 \"graph/tree/tree.hpp\"\
+    \n\n\n#line 1 \"graph/tree/tree_hash.hpp\"\n\n\n\n#line 9 \"graph/tree/tree_hash.hpp\"\
+    \n\n#line 11 \"graph/tree/tree_hash.hpp\"\n\nnamespace m1une {\nnamespace tree\
+    \ {\n\nusing TreeHashValue = std::array<std::uint64_t, 2>;\n\nclass TreeHasher\
+    \ {\n   private:\n    static constexpr std::uint64_t mod = (std::uint64_t(1) <<\
+    \ 61) - 1;\n    std::uint64_t _seed;\n\n    static std::uint64_t splitmix64(std::uint64_t\
+    \ x) {\n        x += 0x9e3779b97f4a7c15ULL;\n        x = (x ^ (x >> 30)) * 0xbf58476d1ce4e5b9ULL;\n\
+    \        x = (x ^ (x >> 27)) * 0x94d049bb133111ebULL;\n        return x ^ (x >>\
+    \ 31);\n    }\n\n    static std::uint64_t mul_mod(std::uint64_t a, std::uint64_t\
+    \ b) {\n        __uint128_t product = static_cast<__uint128_t>(a) * b;\n     \
+    \   std::uint64_t result = std::uint64_t(product & mod) + std::uint64_t(product\
+    \ >> 61);\n        if (mod <= result) result -= mod;\n        return result;\n\
+    \    }\n\n    static std::uint64_t add_mod(std::uint64_t a, std::uint64_t b) {\n\
+    \        std::uint64_t result = a + b;\n        if (mod <= result) result -= mod;\n\
+    \        return result;\n    }\n\n    TreeHashValue salt(int height) const {\n\
+    \        std::uint64_t x = static_cast<std::uint64_t>(height);\n        std::uint64_t\
+    \ first = splitmix64(_seed ^ (x + 0x243f6a8885a308d3ULL));\n        std::uint64_t\
+    \ second = splitmix64(_seed ^ (x + 0x13198a2e03707344ULL));\n        return {first\
+    \ % (mod - 1) + 1, second % (mod - 1) + 1};\n    }\n\n    template <class T>\n\
+    \    static std::vector<int> tree_centers(const m1une::graph::Graph<T>& g) {\n\
+    \        int n = g.size();\n        if (n == 0) return {};\n\n        std::vector<int>\
+    \ degree(n, 0);\n        std::vector<int> queue;\n        queue.reserve(n);\n\
+    \        long long active_arcs = 0;\n        for (int v = 0; v < n; v++) {\n \
+    \           for (const auto& e : g[v]) {\n                if (!e.alive) continue;\n\
+    \                degree[v]++;\n                active_arcs++;\n            }\n\
+    \            if (degree[v] <= 1) queue.push_back(v);\n        }\n        assert(active_arcs\
+    \ == 2LL * (n - 1));\n\n        std::vector<char> removed(n, false);\n       \
+    \ int remaining = n;\n        int head = 0;\n        while (2 < remaining) {\n\
+    \            int layer_end = int(queue.size());\n            assert(head < layer_end);\n\
+    \            remaining -= layer_end - head;\n            while (head < layer_end)\
+    \ {\n                int v = queue[head++];\n                removed[v] = true;\n\
+    \                for (const auto& e : g[v]) {\n                    if (!e.alive\
+    \ || removed[e.to]) continue;\n                    if (--degree[e.to] == 1) queue.push_back(e.to);\n\
+    \                }\n            }\n        }\n\n        std::vector<int> centers;\n\
+    \        for (int v = 0; v < n; v++) {\n            if (!removed[v]) centers.push_back(v);\n\
+    \        }\n        assert(1 <= int(centers.size()) && int(centers.size()) <=\
+    \ 2);\n        return centers;\n    }\n\n   public:\n    explicit TreeHasher(std::uint64_t\
+    \ seed = 0x6a09e667f3bcc909ULL) : _seed(seed) {}\n\n    std::uint64_t seed() const\
+    \ {\n        return _seed;\n    }\n\n    template <class T>\n    std::vector<TreeHashValue>\
+    \ hash_subtrees(const m1une::graph::Graph<T>& g, int root = 0) const {\n     \
+    \   int n = g.size();\n        if (n == 0) return {};\n        assert(0 <= root\
+    \ && root < n);\n\n        std::vector<int> parent(n, -1);\n        std::vector<int>\
+    \ order;\n        order.reserve(n);\n        parent[root] = root;\n        order.push_back(root);\n\
+    \        long long active_arcs = 0;\n        for (int v = 0; v < n; v++) {\n \
+    \           for (const auto& e : g[v]) active_arcs += e.alive;\n        }\n  \
+    \      assert(active_arcs == 2LL * (n - 1));\n\n        for (int i = 0; i < int(order.size());\
+    \ i++) {\n            int v = order[i];\n            for (const auto& e : g[v])\
+    \ {\n                if (!e.alive || parent[e.to] != -1) continue;\n         \
+    \       parent[e.to] = v;\n                order.push_back(e.to);\n          \
+    \  }\n        }\n        assert(int(order.size()) == n);\n\n        std::vector<int>\
+    \ height(n, 0);\n        std::vector<TreeHashValue> result(n, TreeHashValue{1,\
+    \ 1});\n        for (int i = n - 1; i >= 0; i--) {\n            int v = order[i];\n\
+    \            for (const auto& e : g[v]) {\n                if (!e.alive || parent[e.to]\
+    \ != v) continue;\n                height[v] = std::max(height[v], height[e.to]\
+    \ + 1);\n            }\n            TreeHashValue random = salt(height[v]);\n\
+    \            for (const auto& e : g[v]) {\n                if (!e.alive || parent[e.to]\
+    \ != v) continue;\n                result[v][0] = mul_mod(result[v][0], add_mod(result[e.to][0],\
+    \ random[0]));\n                result[v][1] = mul_mod(result[v][1], add_mod(result[e.to][1],\
+    \ random[1]));\n            }\n        }\n        return result;\n    }\n\n  \
+    \  template <class T>\n    TreeHashValue hash_rooted(const m1une::graph::Graph<T>&\
+    \ g, int root = 0) const {\n        if (g.empty()) return {0, 0};\n        return\
+    \ hash_subtrees(g, root)[root];\n    }\n\n    template <class T>\n    std::vector<TreeHashValue>\
+    \ hash_unrooted(const m1une::graph::Graph<T>& g) const {\n        std::vector<int>\
+    \ centers = tree_centers(g);\n        std::vector<TreeHashValue> result;\n   \
+    \     result.reserve(centers.size());\n        for (int center : centers) result.push_back(hash_rooted(g,\
+    \ center));\n        std::sort(result.begin(), result.end());\n        return\
+    \ result;\n    }\n};\n\n}  // namespace tree\n}  // namespace m1une\n\n\n#line\
+    \ 1 \"graph/tree/virtual_tree.hpp\"\n\n\n\n#line 8 \"graph/tree/virtual_tree.hpp\"\
+    \n\n#line 11 \"graph/tree/virtual_tree.hpp\"\n\nnamespace m1une {\nnamespace tree\
+    \ {\n\ntemplate <class T = int>\nstruct VirtualTreeResult {\n    std::vector<int>\
+    \ vertex;\n    std::vector<int> parent;\n    std::vector<int> parent_edge_count;\n\
+    \    std::vector<T> parent_cost;\n    std::vector<std::vector<int>> children;\n\
+    \    std::vector<bool> is_key;\n\n    int size() const {\n        return int(vertex.size());\n\
+    \    }\n\n    bool empty() const {\n        return vertex.empty();\n    }\n\n\
+    \    int edge_count() const {\n        return vertex.empty() ? 0 : int(vertex.size())\
+    \ - 1;\n    }\n\n    int root() const {\n        return vertex.empty() ? -1 :\
+    \ 0;\n    }\n\n    int root_vertex() const {\n        return vertex.empty() ?\
+    \ -1 : vertex[0];\n    }\n};\n\ntemplate <class T = int>\nstruct VirtualTree {\n\
+    \    using cost_type = T;\n    using result_type = VirtualTreeResult<T>;\n\n \
+    \  private:\n    SparseTableLca<T> _lca;\n    std::vector<int> _key;\n    std::vector<int>\
+    \ _vertices;\n    std::vector<int> _stack;\n\n   public:\n    VirtualTree() =\
+    \ default;\n\n    explicit VirtualTree(const m1une::graph::Graph<T>& graph, int\
+    \ root = 0) : _lca(graph, root) {}\n\n    void build_lca(const m1une::graph::Graph<T>&\
+    \ graph, int root = 0) {\n        _lca.build(graph, root);\n    }\n\n    int original_size()\
+    \ const {\n        return _lca.size();\n    }\n\n    const SparseTableLca<T>&\
+    \ lca_data() const {\n        return _lca;\n    }\n\n    result_type build(std::vector<int>\
+    \ key_vertices) {\n        result_type result;\n        if (key_vertices.empty())\
+    \ return result;\n\n        auto by_tin = [&](int u, int v) { return _lca.tin[u]\
+    \ < _lca.tin[v]; };\n        for (int v : key_vertices) {\n            assert(0\
+    \ <= v && v < _lca.size());\n            assert(_lca.tin[v] != -1);\n        }\n\
+    \        std::sort(key_vertices.begin(), key_vertices.end(), by_tin);\n      \
+    \  key_vertices.erase(std::unique(key_vertices.begin(), key_vertices.end()), key_vertices.end());\n\
+    \n        _key = key_vertices;\n        _vertices = key_vertices;\n        _vertices.reserve(2\
+    \ * _key.size());\n        for (int i = 1; i < int(_key.size()); i++) {\n    \
+    \        _vertices.push_back(_lca.lca(_key[i - 1], _key[i]));\n        }\n   \
+    \     std::sort(_vertices.begin(), _vertices.end(), by_tin);\n        _vertices.erase(std::unique(_vertices.begin(),\
+    \ _vertices.end()), _vertices.end());\n\n        int n = int(_vertices.size());\n\
+    \        result.vertex = _vertices;\n        result.parent.assign(n, -1);\n  \
+    \      result.parent_edge_count.assign(n, 0);\n        result.parent_cost.assign(n,\
+    \ T(0));\n        result.children.assign(n, {});\n        result.is_key.assign(n,\
+    \ false);\n\n        int key_index = 0;\n        for (int i = 0; i < n; i++) {\n\
+    \            while (key_index < int(_key.size()) && _lca.tin[_key[key_index]]\
+    \ < _lca.tin[_vertices[i]]) {\n                key_index++;\n            }\n \
+    \           if (key_index < int(_key.size()) && _key[key_index] == _vertices[i])\
+    \ result.is_key[i] = true;\n        }\n\n        _stack.clear();\n        _stack.reserve(n);\n\
+    \        for (int i = 0; i < n; i++) {\n            while (!_stack.empty() &&\
+    \ !_lca.is_ancestor(_vertices[_stack.back()], _vertices[i])) {\n             \
+    \   _stack.pop_back();\n            }\n            if (!_stack.empty()) {\n  \
+    \              int p = _stack.back();\n                result.parent[i] = p;\n\
+    \                result.parent_edge_count[i] = _lca.depth[_vertices[i]] - _lca.depth[_vertices[p]];\n\
+    \                result.parent_cost[i] = _lca.dist[_vertices[i]] - _lca.dist[_vertices[p]];\n\
+    \                result.children[p].push_back(i);\n            }\n           \
+    \ _stack.push_back(i);\n        }\n        return result;\n    }\n};\n\n}  //\
+    \ namespace tree\n}  // namespace m1une\n\n\n#line 1 \"graph/tree/zero_one_on_tree.hpp\"\
+    \n\n\n\n#line 7 \"graph/tree/zero_one_on_tree.hpp\"\n\n#line 9 \"graph/tree/zero_one_on_tree.hpp\"\
+    \n\nnamespace m1une {\nnamespace tree {\n\ninline long long zero_one_on_tree(const\
+    \ std::vector<int>& parent,\n                                  const std::vector<int>&\
+    \ value) {\n    const int n = int(parent.size());\n    assert(int(value.size())\
+    \ == n);\n    if (n == 0) return 0;\n\n    int root = -1;\n    std::vector<std::vector<int>>\
+    \ children(n);\n    for (int v = 0; v < n; v++) {\n        assert(value[v] ==\
+    \ 0 || value[v] == 1);\n        if (parent[v] == -1) {\n            assert(root\
+    \ == -1);\n            root = v;\n        } else {\n            assert(0 <= parent[v]\
+    \ && parent[v] < n && parent[v] != v);\n            children[parent[v]].push_back(v);\n\
+    \        }\n    }\n    assert(root != -1);\n\n    std::vector<int> stack(1, root);\n\
+    \    std::vector<char> visited(n, false);\n    visited[root] = true;\n    int\
+    \ visited_count = 0;\n    while (!stack.empty()) {\n        const int v = stack.back();\n\
+    \        stack.pop_back();\n        visited_count++;\n        for (int child :\
+    \ children[v]) {\n            assert(!visited[child]);\n            visited[child]\
+    \ = true;\n            stack.push_back(child);\n        }\n    }\n    assert(visited_count\
+    \ == n);\n\n    struct Component {\n        long long zeros;\n        long long\
+    \ ones;\n        int vertex;\n    };\n    struct Compare {\n        bool operator()(const\
+    \ Component& lhs, const Component& rhs) const {\n            const long long lhs_product\
+    \ = lhs.zeros * rhs.ones;\n            const long long rhs_product = rhs.zeros\
+    \ * lhs.ones;\n            if (lhs_product != rhs_product) return lhs_product\
+    \ < rhs_product;\n            return lhs.vertex < rhs.vertex;\n        }\n   \
+    \ };\n\n    std::vector<long long> zeros(n), ones(n);\n    std::vector<int> dsu(n);\n\
+    \    std::set<Component, Compare> components;\n    for (int v = 0; v < n; v++)\
+    \ {\n        zeros[v] = value[v] == 0;\n        ones[v] = value[v] == 1;\n   \
+    \     dsu[v] = v;\n        if (v != root) components.insert(Component{zeros[v],\
+    \ ones[v], v});\n    }\n\n    auto leader = [&](int v) {\n        int result =\
+    \ v;\n        while (dsu[result] != result) result = dsu[result];\n        while\
+    \ (dsu[v] != v) {\n            const int next = dsu[v];\n            dsu[v] =\
+    \ result;\n            v = next;\n        }\n        return result;\n    };\n\n\
+    \    long long answer = 0;\n    while (!components.empty()) {\n        auto it\
+    \ = components.end();\n        --it;\n        const Component child = *it;\n \
+    \       components.erase(it);\n\n        const int p = leader(parent[child.vertex]);\n\
+    \        if (p != root) {\n            const int erased = int(components.erase(Component{zeros[p],\
+    \ ones[p], p}));\n            assert(erased == 1);\n        }\n\n        answer\
+    \ += ones[p] * zeros[child.vertex];\n        zeros[p] += zeros[child.vertex];\n\
+    \        ones[p] += ones[child.vertex];\n        dsu[child.vertex] = p;\n\n  \
+    \      if (p != root) components.insert(Component{zeros[p], ones[p], p});\n  \
+    \  }\n    return answer;\n}\n\ntemplate <class T>\nlong long zero_one_on_tree(const\
+    \ m1une::graph::Graph<T>& graph,\n                           const std::vector<int>&\
+    \ value, int root = 0) {\n    const int n = graph.size();\n    assert(int(value.size())\
+    \ == n);\n    if (n == 0) return 0;\n    assert(0 <= root && root < n);\n    assert(int(graph.edges().size())\
+    \ == n - 1);\n\n    RootedTree<T> rooted_tree(graph, root);\n    assert(int(rooted_tree.order.size())\
+    \ == n);\n    return zero_one_on_tree(rooted_tree.parent, value);\n}\n\n}  //\
+    \ namespace tree\n}  // namespace m1une\n\n\n#line 17 \"graph/tree/all.hpp\"\n\
+    \n\n#line 1 \"graph/undirected.hpp\"\n\n\n\n#line 1 \"graph/bipartite.hpp\"\n\n\
+    \n\n#line 8 \"graph/bipartite.hpp\"\n\n#line 10 \"graph/bipartite.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace graph {\n\nstruct BipartiteResult {\n    bool is_bipartite;\n\
     \    std::vector<int> color;\n    std::vector<int> left_vertices;\n    std::vector<int>\
     \ right_vertices;\n    std::vector<int> left_id;\n    std::vector<int> right_id;\n\
     };\n\ntemplate <class T>\nBipartiteResult bipartite(const Graph<T>& g) {\n   \
@@ -1887,8 +3317,7 @@ data:
     \    }\n    return result;\n}\n\ntemplate <class T>\nint minimum_vertex_cover_size(const\
     \ Graph<T>& g) {\n    return minimum_vertex_cover(g).size();\n}\n\n}  // namespace\
     \ graph\n}  // namespace m1une\n\n\n#line 1 \"graph/minimum_steiner_tree.hpp\"\
-    \n\n\n\n#line 5 \"graph/minimum_steiner_tree.hpp\"\n#include <bit>\n#line 15 \"\
-    graph/minimum_steiner_tree.hpp\"\n\n#line 17 \"graph/minimum_steiner_tree.hpp\"\
+    \n\n\n\n#line 15 \"graph/minimum_steiner_tree.hpp\"\n\n#line 17 \"graph/minimum_steiner_tree.hpp\"\
     \n\nnamespace m1une {\nnamespace graph {\n\ntemplate <class Cost>\nstruct MinimumSteinerTreeResult\
     \ {\n    Cost cost;\n    std::vector<int> edge_ids;\n    std::vector<int> vertices;\n\
     };\n\nnamespace internal {\n\ninline std::vector<int> steiner_terminals(int n,\
@@ -2192,7 +3621,7 @@ data:
     }\n\ntemplate <class T>\nstd::optional<NamoriDecomposition<T>> decompose_namori(const\
     \ Graph<T>& graph) {\n    return namori_decomposition(graph);\n}\n\n}  // namespace\
     \ graph\n}  // namespace m1une\n\n\n#line 16 \"graph/undirected.hpp\"\n\n\n#line\
-    \ 12 \"graph/all.hpp\"\n\n\n#line 11 \"verify/graph/graph_algorithms.test.cpp\"\
+    \ 14 \"graph/all.hpp\"\n\n\n#line 11 \"verify/graph/graph_algorithms.test.cpp\"\
     \n\nusing m1une::graph::Graph;\n\nvoid test_graph_container() {\n    Graph<int>\
     \ g(2);\n    assert(g.size() == 2);\n    int added = g.add_vertex();\n    assert(added\
     \ == 2);\n    int e0 = g.add_directed_edge(0, 1, 4);\n    int e1 = g.add_edge(1,\
@@ -2677,10 +4106,10 @@ data:
   dependsOn:
   - graph/all.hpp
   - graph/counting.hpp
-  - fps/convolution.hpp
+  - math/fps/convolution.hpp
   - math/modint.hpp
-  - fps/formal_power_series.hpp
-  - fps/convolution.hpp
+  - math/fps/formal_power_series.hpp
+  - math/fps/convolution.hpp
   - math/combinatorics.hpp
   - graph/directed.hpp
   - graph/cycle_detection.hpp
@@ -2697,8 +4126,31 @@ data:
   - graph/zero_one_bfs.hpp
   - graph/two_sat.hpp
   - graph/dominator_tree.hpp
+  - graph/flow/flow.hpp
+  - graph/flow/bounded_flow.hpp
+  - graph/flow/max_flow.hpp
+  - graph/flow/bounded_min_cost_flow.hpp
+  - graph/flow/min_cost_flow.hpp
+  - graph/flow/gomory_hu.hpp
   - graph/grid.hpp
   - graph/range_edge_graph.hpp
+  - graph/tree/all.hpp
+  - graph/tree/centroid_decomposition.hpp
+  - graph/graph.hpp
+  - graph/tree/diameter.hpp
+  - graph/tree/dsu_on_tree.hpp
+  - graph/tree/heavy_light_decomposition.hpp
+  - graph/tree/rerooting_dp.hpp
+  - graph/tree/rerooting_static_top_tree.hpp
+  - graph/tree/rooted_tree.hpp
+  - graph/tree/sparse_table_lca.hpp
+  - ds/range_query/sparse_table.hpp
+  - monoid/concept.hpp
+  - graph/tree/static_top_tree.hpp
+  - graph/tree/tree.hpp
+  - graph/tree/tree_hash.hpp
+  - graph/tree/virtual_tree.hpp
+  - graph/tree/zero_one_on_tree.hpp
   - graph/undirected.hpp
   - graph/bipartite.hpp
   - graph/connected_components.hpp
@@ -2712,7 +4164,7 @@ data:
   isVerificationFile: true
   path: verify/graph/graph_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-07 14:04:22+09:00'
+  timestamp: '2026-07-07 14:26:59+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/graph_algorithms.test.cpp
