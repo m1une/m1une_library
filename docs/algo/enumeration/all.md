@@ -13,3 +13,5 @@ spaces. The public namespace is `m1une::algo`.
 | Header | Contents |
 | --- | --- |
 | `algo/enumeration/gray_code.hpp` | Binary-reflected Gray-code encoding, decoding, and enumeration. |
+| `algo/enumeration/submask.hpp` | Submask and supermask enumeration helpers. |
+| `algo/enumeration/combination.hpp` | Fixed-size subset mask generation helpers. |

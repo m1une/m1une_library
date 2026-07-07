@@ -22,3 +22,4 @@ If a header builds an object and then answers repeated queries, it belongs in
 | `algo/search/all.hpp` | Search-over-answer helpers such as integer and floating-point binary search. |
 | `algo/offline/all.hpp` | Offline query processing such as Mo's algorithm. |
 | `algo/enumeration/all.hpp` | Combinatorial traversal helpers such as Gray-code enumeration. |
+| `algo/dp/all.hpp` | Domain-neutral DP helpers such as knapsack routines. |

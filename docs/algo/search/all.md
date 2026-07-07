@@ -13,3 +13,4 @@ namespace is `m1une::algo`.
 | Header | Contents |
 | --- | --- |
 | `algo/search/bisect.hpp` | Integer and floating-point binary search helpers for monotone predicates. |
+| `algo/search/ternary_search.hpp` | Integer and real ternary search helpers for unimodal functions. |

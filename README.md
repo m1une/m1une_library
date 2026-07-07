@@ -63,6 +63,7 @@ short namespace segment after `m1une::`; nested directories are for browsing.
 | `algo/search/` | Search-over-answer helpers such as integer and floating-point binary search. |
 | `algo/offline/` | Offline query processing such as Mo's algorithm. |
 | `algo/enumeration/` | Combinatorial traversal helpers such as Gray-code enumeration. |
+| `algo/dp/` | Domain-neutral DP helpers such as knapsack routines. |
 
 Rule of thumb: if you call a function once and use its returned result directly,
 look in `algo/`. If you construct an object and then call query methods such as

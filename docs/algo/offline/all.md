@@ -13,3 +13,5 @@ namespace is `m1une::algo`.
 | Header | Contents |
 | --- | --- |
 | `algo/offline/mo.hpp` | Mo's algorithm for reordering static range queries. |
+| `algo/offline/parallel_binary_search.hpp` | Parallel binary search for batched monotone prefix decisions. |
+| `algo/offline/cdq_divide_and_conquer.hpp` | Generic CDQ divide-and-conquer recursion helper. |
