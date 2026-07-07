@@ -1,6 +1,6 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/aplusb"
 
-#include "../../math/gray_code.hpp"
+#include "../../../algo/enumeration/gray_code.hpp"
 
 #include <algorithm>
 #include <bit>
@@ -21,8 +21,8 @@ constexpr UInt naive_gray_decode(UInt code) {
 }
 
 void fixed_tests() {
-    using m1une::math::gray_decode;
-    using m1une::math::gray_encode;
+    using m1une::algo::gray_decode;
+    using m1une::algo::gray_encode;
 
     static_assert(gray_encode(std::uint32_t(0)) == 0);
     static_assert(gray_encode(std::uint32_t(1)) == 1);
@@ -35,12 +35,12 @@ void fixed_tests() {
     )) == std::numeric_limits<std::uint64_t>::max());
 
     const std::vector<std::uint64_t> expected = {0, 1, 3, 2, 6, 7, 5, 4};
-    assert(m1une::math::gray_code_sequence(3) == expected);
-    assert(m1une::math::gray_code_sequence(0) ==
+    assert(m1une::algo::gray_code_sequence(3) == expected);
+    assert(m1une::algo::gray_code_sequence(0) ==
            std::vector<std::uint64_t>({0}));
 
     const std::vector<std::uint8_t> byte_codes =
-        m1une::math::gray_code_sequence<std::uint8_t>(8);
+        m1une::algo::gray_code_sequence<std::uint8_t>(8);
     assert(byte_codes.size() == 256);
     for (int value = 0; value < 256; ++value) {
         assert(gray_decode(byte_codes[value]) == value);
@@ -48,8 +48,8 @@ void fixed_tests() {
 }
 
 void exhaustive_tests() {
-    using m1une::math::gray_decode;
-    using m1une::math::gray_encode;
+    using m1une::algo::gray_decode;
+    using m1une::algo::gray_encode;
 
     for (std::uint32_t value = 0; value < (std::uint32_t(1) << 16); ++value) {
         const std::uint32_t code = gray_encode(value);
@@ -59,7 +59,7 @@ void exhaustive_tests() {
 
     for (int bit_count = 0; bit_count <= 16; ++bit_count) {
         std::vector<std::uint32_t> codes =
-            m1une::math::gray_code_sequence<std::uint32_t>(bit_count);
+            m1une::algo::gray_code_sequence<std::uint32_t>(bit_count);
         assert(codes.size() == (std::size_t(1) << bit_count));
         for (std::size_t index = 0; index < codes.size(); ++index) {
             assert(
@@ -85,9 +85,9 @@ void randomized_tests() {
     std::mt19937_64 random(0x6a09e667f3bcc909ULL);
     for (int trial = 0; trial < 100000; ++trial) {
         const std::uint64_t value = random();
-        const std::uint64_t code = m1une::math::gray_encode(value);
-        assert(m1une::math::gray_decode(code) == value);
-        assert(m1une::math::gray_decode(code) == naive_gray_decode(code));
+        const std::uint64_t code = m1une::algo::gray_encode(value);
+        assert(m1une::algo::gray_decode(code) == value);
+        assert(m1une::algo::gray_decode(code) == naive_gray_decode(code));
     }
 }
 

@@ -1,6 +1,6 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/static_range_inversions_query"
 
-#include "../../../ds/range_query/mo.hpp"
+#include "../../../algo/offline/mo.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -26,7 +26,7 @@ void test_randomized() {
         std::vector<int> values(n);
         for (int& value : values) value = int(random() % 12);
 
-        m1une::ds::Mo mo(n);
+        m1une::algo::Mo mo(n);
         mo.reserve(query_count);
         std::vector<std::pair<int, int>> ranges;
         for (int query = 0; query < query_count; ++query) {
@@ -86,7 +86,7 @@ std::vector<long long> inversion_queries(
         );
     }
 
-    m1une::ds::Mo mo(int(values.size()));
+    m1une::algo::Mo mo(int(values.size()));
     for (const auto& range : ranges) {
         mo.add_query(range.first, range.second);
     }

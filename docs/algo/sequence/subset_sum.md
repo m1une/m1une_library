@@ -49,9 +49,9 @@ int main() {
     const std::vector<long long> values = {2, 3, 5, 7, 11};
     const long long limit = 17;
 
-    std::cout << m1une::sequence::maximum_subset_sum(values, limit) << '\n';
+    std::cout << m1une::algo::maximum_subset_sum(values, limit) << '\n';
 
     const auto [left_sums, right_sums] =
-        m1une::sequence::enumerate_half_subset_sums(values);
+        m1une::algo::enumerate_half_subset_sums(values);
 }
 ```

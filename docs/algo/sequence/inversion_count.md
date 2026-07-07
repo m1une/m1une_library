@@ -33,7 +33,7 @@ $N(N-1)/2$ inversions.
 int main() {
     std::vector<int> a = {2, 4, 1, 3, 5};
 
-    const long long inversions = m1une::sequence::inversion_count(a);
+    const long long inversions = m1une::algo::inversion_count(a);
 
     // The inversions are:
     // (2, 1) -> indices 0 and 2
@@ -42,7 +42,7 @@ int main() {
     std::cout << "Inversions: " << inversions << "\n"; // Output: 3
 
     // To avoid copying the array if you don't need it afterward:
-    // long long fast_invs = m1une::sequence::inversion_count(std::move(a));
+    // long long fast_invs = m1une::algo::inversion_count(std::move(a));
 
     return 0;
 }

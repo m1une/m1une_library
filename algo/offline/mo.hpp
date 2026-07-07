@@ -1,5 +1,5 @@
-#ifndef M1UNE_DS_RANGE_QUERY_MO_HPP
-#define M1UNE_DS_RANGE_QUERY_MO_HPP 1
+#ifndef M1UNE_ALGO_OFFLINE_MO_HPP
+#define M1UNE_ALGO_OFFLINE_MO_HPP 1
 
 #include <algorithm>
 #include <cassert>
@@ -8,7 +8,7 @@
 #include <vector>
 
 namespace m1une {
-namespace ds {
+namespace algo {
 
 // Offline Mo's algorithm for half-open array ranges.
 struct Mo {
@@ -113,7 +113,7 @@ struct Mo {
     }
 };
 
-}  // namespace ds
+}  // namespace algo
 }  // namespace m1une
 
-#endif  // M1UNE_DS_RANGE_QUERY_MO_HPP
+#endif  // M1UNE_ALGO_OFFLINE_MO_HPP

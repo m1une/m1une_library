@@ -1,12 +1,12 @@
-#ifndef M1UNE_SEQUENCE_LIS_HPP
-#define M1UNE_SEQUENCE_LIS_HPP 1
+#ifndef M1UNE_ALGO_SEQUENCE_LIS_HPP
+#define M1UNE_ALGO_SEQUENCE_LIS_HPP 1
 
 #include <algorithm>
 #include <iterator>
 #include <vector>
 
 namespace m1une {
-namespace sequence {
+namespace algo {
 
 // Returns the zero-based indices of a longest increasing subsequence.
 // If `strict` is false, equal adjacent values are also allowed.
@@ -50,7 +50,7 @@ std::vector<int> lis(const std::vector<T>& a, bool strict = true) {
     return result;
 }
 
-}  // namespace sequence
+}  // namespace algo
 }  // namespace m1une
 
-#endif  // M1UNE_SEQUENCE_LIS_HPP
+#endif  // M1UNE_ALGO_SEQUENCE_LIS_HPP

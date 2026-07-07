@@ -1,10 +1,10 @@
-#ifndef M1UNE_SEQUENCE_INVERSION_COUNT_HPP
-#define M1UNE_SEQUENCE_INVERSION_COUNT_HPP 1
+#ifndef M1UNE_ALGO_SEQUENCE_INVERSION_COUNT_HPP
+#define M1UNE_ALGO_SEQUENCE_INVERSION_COUNT_HPP 1
 
 #include <vector>
 
 namespace m1une {
-namespace sequence {
+namespace algo {
 
 // Returns the number of pairs (i, j) with i < j and a[i] > a[j].
 // The vector is taken by value because merge sort rearranges it.
@@ -44,7 +44,7 @@ long long inversion_count(std::vector<T> a) {
     return merge_sort(merge_sort, 0, n);
 }
 
-}  // namespace sequence
+}  // namespace algo
 }  // namespace m1une
 
-#endif  // M1UNE_SEQUENCE_INVERSION_COUNT_HPP
+#endif  // M1UNE_ALGO_SEQUENCE_INVERSION_COUNT_HPP

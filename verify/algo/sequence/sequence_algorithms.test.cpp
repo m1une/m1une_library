@@ -6,6 +6,7 @@
 
 #include "../../../algo/sequence/inversion_count.hpp"
 #include "../../../algo/sequence/lis.hpp"
+#include "../../../algo/sequence/run_length_encoding.hpp"
 
 struct LessOnly {
     int value;
@@ -38,29 +39,45 @@ void assert_subsequence(
 void test_lis() {
     const std::vector<int> values = {3, 1, 2, 2, 4};
 
-    const auto strict = m1une::sequence::lis(values);
+    const auto strict = m1une::algo::lis(values);
     assert(strict.size() == 3);
     assert_subsequence(values, strict, true);
 
-    const auto non_decreasing = m1une::sequence::lis(values, false);
+    const auto non_decreasing = m1une::algo::lis(values, false);
     assert(non_decreasing.size() == 4);
     assert_subsequence(values, non_decreasing, false);
 
-    assert(m1une::sequence::lis(std::vector<int>()).empty());
+    assert(m1une::algo::lis(std::vector<int>()).empty());
 }
 
 void test_inversion_count() {
-    assert(m1une::sequence::inversion_count(std::vector<int>{2, 4, 1, 3, 5}) == 3);
-    assert(m1une::sequence::inversion_count(std::vector<int>{1, 1, 1}) == 0);
-    assert(m1une::sequence::inversion_count(std::vector<int>{3, 2, 1}) == 3);
+    assert(m1une::algo::inversion_count(std::vector<int>{2, 4, 1, 3, 5}) == 3);
+    assert(m1une::algo::inversion_count(std::vector<int>{1, 1, 1}) == 0);
+    assert(m1une::algo::inversion_count(std::vector<int>{3, 2, 1}) == 3);
 
     std::vector<LessOnly> values = {LessOnly(2), LessOnly(1), LessOnly(1)};
-    assert(m1une::sequence::inversion_count(values) == 2);
+    assert(m1une::algo::inversion_count(values) == 2);
+}
+
+void test_run_length_encoding() {
+    std::string s = "aaabbc";
+    auto runs = m1une::algo::run_length_encoding(s);
+    assert(runs.size() == 3);
+    assert(runs[0] == std::make_pair('a', 3LL));
+    assert(runs[1] == std::make_pair('b', 2LL));
+    assert(runs[2] == std::make_pair('c', 1LL));
+
+    std::vector<int> v = {1, 1, 2, 2, 2, 1};
+    auto vector_runs = m1une::algo::run_length_encoding(v);
+    assert(vector_runs[0] == std::make_pair(1, 2LL));
+    assert(vector_runs[1] == std::make_pair(2, 3LL));
+    assert(vector_runs[2] == std::make_pair(1, 1LL));
 }
 
 int main() {
     test_lis();
     test_inversion_count();
+    test_run_length_encoding();
 
     long long a, b;
     std::cin >> a >> b;

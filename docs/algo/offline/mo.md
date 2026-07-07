@@ -1,6 +1,6 @@
 ---
 title: Mo's Algorithm
-documentation_of: ../../../ds/range_query/mo.hpp
+documentation_of: ../../../algo/offline/mo.hpp
 ---
 
 ## Overview
@@ -17,7 +17,7 @@ Use it when:
 ## Basic API
 
 ```cpp
-m1une::ds::Mo mo(n);
+m1une::algo::Mo mo(n);
 int id = mo.add_query(left, right);
 mo.run(add, remove, answer);
 ```
@@ -81,13 +81,13 @@ The exact number of endpoint movements depends on the query distribution.
 This computes the number of distinct values in every query:
 
 ```cpp
-#include "ds/range_query/mo.hpp"
+#include "algo/offline/mo.hpp"
 
 #include <vector>
 
 int main() {
     std::vector<int> values = {1, 2, 1, 3};
-    m1une::ds::Mo mo(int(values.size()));
+    m1une::algo::Mo mo(int(values.size()));
     mo.add_query(0, 3);
     mo.add_query(1, 4);
 

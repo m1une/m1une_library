@@ -1,6 +1,6 @@
 ---
 title: Run Length Encoding
-documentation_of: ../../utilities/run_length_encoding.hpp
+documentation_of: ../../../algo/sequence/run_length_encoding.hpp
 ---
 
 ## Overview
@@ -16,12 +16,12 @@ Compresses consecutive equal values into `(value, count)` pairs. It works with c
 ## Example
 
 ```cpp
-#include "utilities/run_length_encoding.hpp"
+#include "algo/sequence/run_length_encoding.hpp"
 #include <string>
 
 int main() {
     std::string s = "aaabbc";
-    auto runs = m1une::utilities::run_length_encoding(s);
+    auto runs = m1une::algo::run_length_encoding(s);
     // ('a', 3), ('b', 2), ('c', 1)
 }
 ```

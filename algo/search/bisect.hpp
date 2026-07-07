@@ -1,10 +1,10 @@
-#ifndef M1UNE_BISECT_HPP
-#define M1UNE_BISECT_HPP 1
+#ifndef M1UNE_ALGO_SEARCH_BISECT_HPP
+#define M1UNE_ALGO_SEARCH_BISECT_HPP 1
 
 #include <numeric>
 
 namespace m1une {
-namespace utilities {
+namespace algo {
 
 template <typename F>
 long long first_true(long long ng, long long ok, F pred) {
@@ -51,7 +51,7 @@ double real_first_true(double ng, double ok, F pred, int iterations = 80) {
     return ok;
 }
 
-}  // namespace utilities
+}  // namespace algo
 }  // namespace m1une
 
-#endif  // M1UNE_BISECT_HPP
+#endif  // M1UNE_ALGO_SEARCH_BISECT_HPP

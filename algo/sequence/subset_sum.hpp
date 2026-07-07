@@ -1,5 +1,5 @@
-#ifndef M1UNE_SEQUENCE_SUBSET_SUM_HPP
-#define M1UNE_SEQUENCE_SUBSET_SUM_HPP 1
+#ifndef M1UNE_ALGO_SEQUENCE_SUBSET_SUM_HPP
+#define M1UNE_ALGO_SEQUENCE_SUBSET_SUM_HPP 1
 
 #include <cassert>
 #include <cstddef>
@@ -7,7 +7,7 @@
 #include <vector>
 
 namespace m1une {
-namespace sequence {
+namespace algo {
 
 namespace internal {
 
@@ -89,7 +89,7 @@ T maximum_subset_sum(const std::vector<T>& values, const T& limit) {
     return answer;
 }
 
-}  // namespace sequence
+}  // namespace algo
 }  // namespace m1une
 
-#endif  // M1UNE_SEQUENCE_SUBSET_SUM_HPP
+#endif  // M1UNE_ALGO_SEQUENCE_SUBSET_SUM_HPP

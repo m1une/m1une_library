@@ -1,12 +1,12 @@
-#ifndef M1UNE_RUN_LENGTH_ENCODING_HPP
-#define M1UNE_RUN_LENGTH_ENCODING_HPP 1
+#ifndef M1UNE_ALGO_SEQUENCE_RUN_LENGTH_ENCODING_HPP
+#define M1UNE_ALGO_SEQUENCE_RUN_LENGTH_ENCODING_HPP 1
 
 #include <iterator>
 #include <utility>
 #include <vector>
 
 namespace m1une {
-namespace utilities {
+namespace algo {
 
 template <typename Container>
 auto run_length_encoding(const Container& values) {
@@ -34,7 +34,7 @@ auto run_length_encoding(const Container& values) {
     return result;
 }
 
-}  // namespace utilities
+}  // namespace algo
 }  // namespace m1une
 
-#endif  // M1UNE_RUN_LENGTH_ENCODING_HPP
+#endif  // M1UNE_ALGO_SEQUENCE_RUN_LENGTH_ENCODING_HPP

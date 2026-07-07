@@ -1,6 +1,6 @@
 ---
 title: Gray Code
-documentation_of: ../../math/gray_code.hpp
+documentation_of: ../../../algo/enumeration/gray_code.hpp
 ---
 
 ## Overview
@@ -44,7 +44,7 @@ last and first values also differ in exactly one bit.
 ## Example
 
 ```cpp
-#include "math/gray_code.hpp"
+#include "algo/enumeration/gray_code.hpp"
 
 #include <cstdint>
 #include <iostream>
@@ -52,10 +52,10 @@ last and first values also differ in exactly one bit.
 
 int main() {
     std::vector<std::uint64_t> codes =
-        m1une::math::gray_code_sequence(3);
+        m1une::algo::gray_code_sequence(3);
     for (std::uint64_t code : codes) std::cout << code << " ";
     std::cout << "\n"; // 0 1 3 2 6 7 5 4
 
-    std::cout << m1une::math::gray_decode(std::uint64_t(6)) << "\n"; // 4
+    std::cout << m1une::algo::gray_decode(std::uint64_t(6)) << "\n"; // 4
 }
 ```

@@ -20,7 +20,6 @@ You usually do not need to include this entire bundle:
   digit sequences.
 * Use `bitwise_convolution.hpp` for OR, AND, or XOR convolution over mask
   indices.
-* Use `gray_code.hpp` to enumerate bit masks so that one bit changes at a time.
 * Use `generalized_floor_sum.hpp` for polynomial moments of
   `floor((a * i + b) / mod)`.
 * Use `zeta_mobius_transform.hpp` for subset, superset, divisor, and multiple
@@ -68,7 +67,6 @@ few unused headers do not matter.
 | `math/bernoulli.hpp` | Bernoulli numbers and polynomials, power sums, and polynomial discrete integration. |
 | `math/bitwise_convolution.hpp` | OR, AND, XOR convolutions and the Walsh-Hadamard transform. |
 | `math/bit_ceil.hpp` | Smallest power of two at least a given value. |
-| `math/gray_code.hpp` | Binary-reflected Gray-code encoding, decoding, and enumeration. |
 | `math/integer_arithmetic.hpp` | Exact integer square roots and overflow-aware powers. |
 | `math/lucas.hpp` | Lucas's theorem for huge binomial arguments modulo a small prime. |
 | `math/modint.hpp` | Static modular integer type. |

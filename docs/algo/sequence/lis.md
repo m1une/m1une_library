@@ -32,7 +32,7 @@ non-decreasing subsequence.
 int main() {
     std::vector<int> a = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5};
 
-    const std::vector<int> lis_indices = m1une::sequence::lis(a);
+    const std::vector<int> lis_indices = m1une::algo::lis(a);
 
     std::cout << "LIS length: " << lis_indices.size() << "\n"; // Output: 4
 
@@ -44,7 +44,7 @@ int main() {
     for (int idx : lis_indices) std::cout << a[idx] << " ";
     std::cout << "\n";
 
-    const std::vector<int> non_decreasing = m1une::sequence::lis(a, false);
+    const std::vector<int> non_decreasing = m1une::algo::lis(a, false);
     std::cout << "Non-decreasing length: " << non_decreasing.size() << "\n";
 
     return 0;

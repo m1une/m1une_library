@@ -1,6 +1,6 @@
 ---
 title: Bisect
-documentation_of: ../../utilities/bisect.hpp
+documentation_of: ../../../algo/search/bisect.hpp
 ---
 
 ## Overview
@@ -18,12 +18,12 @@ Binary search helpers for monotone predicates. The integer functions use explici
 ## Example
 
 ```cpp
-#include "utilities/bisect.hpp"
+#include "algo/search/bisect.hpp"
 #include <iostream>
 
 int main() {
     long long n = 100;
-    long long x = m1une::utilities::first_true(0, n + 1, [&](long long v) {
+    long long x = m1une::algo::first_true(0, n + 1, [&](long long v) {
         return v * v >= n;
     });
     std::cout << x << "\n";

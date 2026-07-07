@@ -1,0 +1,6 @@
+#ifndef M1UNE_ALGO_OFFLINE_ALL_HPP
+#define M1UNE_ALGO_OFFLINE_ALL_HPP 1
+
+#include "mo.hpp"
+
+#endif  // M1UNE_ALGO_OFFLINE_ALL_HPP

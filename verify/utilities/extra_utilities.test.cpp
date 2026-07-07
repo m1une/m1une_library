@@ -1,12 +1,14 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/aplusb"
 
-#include <bits/stdc++.h>
+#include <cassert>
+#include <iostream>
+#include <stdexcept>
+#include <vector>
+
 using namespace std;
 
-#include "../../utilities/bisect.hpp"
 #include "../../utilities/chmin_chmax.hpp"
 #include "../../utilities/compressor.hpp"
-#include "../../utilities/run_length_encoding.hpp"
 #include "../../utilities/y_combinator.hpp"
 
 void test_chmin_chmax() {
@@ -59,45 +61,10 @@ void test_y_combinator() {
     assert(fact(10) == 3628800);
 }
 
-void test_bisect() {
-    long long n = 100;
-    long long first = m1une::utilities::first_true(0, n + 1, [&](long long x) {
-        return x * x >= n;
-    });
-    assert(first == 10);
-
-    long long last = m1une::utilities::last_true(n + 1, 0, [&](long long x) {
-        return x * x >= n;
-    });
-    assert(last == 10);
-
-    double root = m1une::utilities::real_first_true(0.0, 2.0, [](double x) {
-        return x * x >= 2.0;
-    });
-    assert(abs(root * root - 2.0) < 1e-12);
-}
-
-void test_run_length_encoding() {
-    string s = "aaabbc";
-    auto runs = m1une::utilities::run_length_encoding(s);
-    assert(runs.size() == 3);
-    assert(runs[0] == make_pair('a', 3LL));
-    assert(runs[1] == make_pair('b', 2LL));
-    assert(runs[2] == make_pair('c', 1LL));
-
-    vector<int> v = {1, 1, 2, 2, 2, 1};
-    auto vector_runs = m1une::utilities::run_length_encoding(v);
-    assert(vector_runs[0] == make_pair(1, 2LL));
-    assert(vector_runs[1] == make_pair(2, 3LL));
-    assert(vector_runs[2] == make_pair(1, 1LL));
-}
-
 int main() {
     test_chmin_chmax();
     test_compressor();
     test_y_combinator();
-    test_bisect();
-    test_run_length_encoding();
 
     long long a, b;
     cin >> a >> b;

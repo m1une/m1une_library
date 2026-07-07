@@ -33,17 +33,17 @@ long long naive_maximum_subset_sum(
 void basic_test() {
     const std::vector<long long> empty;
     auto [empty_left, empty_right] =
-        m1une::sequence::enumerate_half_subset_sums(empty);
+        m1une::algo::enumerate_half_subset_sums(empty);
     assert(empty_left == std::vector<long long>{0});
     assert(empty_right == std::vector<long long>{0});
-    assert(m1une::sequence::maximum_subset_sum(empty, 10LL) == 0);
+    assert(m1une::algo::maximum_subset_sum(empty, 10LL) == 0);
 
     const std::vector<long long> values = {3, -1, 3};
     auto [left_sums, right_sums] =
-        m1une::sequence::enumerate_half_subset_sums(values);
+        m1une::algo::enumerate_half_subset_sums(values);
     assert(left_sums == std::vector<long long>({0, 3}));
     assert(right_sums == std::vector<long long>({-1, 0, 2, 3}));
-    assert(m1une::sequence::maximum_subset_sum(values, 4LL) == 3);
+    assert(m1une::algo::maximum_subset_sum(values, 4LL) == 3);
 }
 
 void randomized_test() {
@@ -57,7 +57,7 @@ void randomized_test() {
         const long long limit = random() % 101;
 
         auto [left_sums, right_sums] =
-            m1une::sequence::enumerate_half_subset_sums(values);
+            m1une::algo::enumerate_half_subset_sums(values);
         assert(std::is_sorted(left_sums.begin(), left_sums.end()));
         assert(std::is_sorted(right_sums.begin(), right_sums.end()));
         assert(left_sums.size() == (std::size_t(1) << (n / 2)));
@@ -76,7 +76,7 @@ void randomized_test() {
         assert(actual == expected);
 
         assert(
-            m1une::sequence::maximum_subset_sum(values, limit) ==
+            m1une::algo::maximum_subset_sum(values, limit) ==
             naive_maximum_subset_sum(values, limit)
         );
     }
@@ -97,7 +97,7 @@ int main() {
         long long target;
         std::cin >> target;
         const bool found =
-            m1une::sequence::maximum_subset_sum(values, target) == target;
+            m1une::algo::maximum_subset_sum(values, target) == target;
         std::cout << (found ? "yes" : "no") << '\n';
     }
 }

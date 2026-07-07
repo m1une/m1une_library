@@ -3,6 +3,7 @@
 
 #include "inversion_count.hpp"
 #include "lis.hpp"
+#include "run_length_encoding.hpp"
 #include "subset_sum.hpp"
 
 #endif  // M1UNE_ALGO_SEQUENCE_ALL_HPP

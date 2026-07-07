@@ -9,7 +9,6 @@
 #include "combinatorial_sequences.hpp"
 #include "cyclotomic_polynomial.hpp"
 #include "generalized_floor_sum.hpp"
-#include "gray_code.hpp"
 #include "integer_arithmetic.hpp"
 #include "lucas.hpp"
 #include "fps/all.hpp"

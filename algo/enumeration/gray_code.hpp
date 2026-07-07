@@ -1,5 +1,5 @@
-#ifndef M1UNE_MATH_GRAY_CODE_HPP
-#define M1UNE_MATH_GRAY_CODE_HPP 1
+#ifndef M1UNE_ALGO_ENUMERATION_GRAY_CODE_HPP
+#define M1UNE_ALGO_ENUMERATION_GRAY_CODE_HPP 1
 
 #include <cassert>
 #include <concepts>
@@ -10,7 +10,7 @@
 #include <vector>
 
 namespace m1une {
-namespace math {
+namespace algo {
 
 // Converts a binary value to its binary-reflected Gray code.
 template <std::unsigned_integral UInt>
@@ -51,7 +51,7 @@ std::vector<UInt> gray_code_sequence(int bit_count) {
     return result;
 }
 
-}  // namespace math
+}  // namespace algo
 }  // namespace m1une
 
-#endif  // M1UNE_MATH_GRAY_CODE_HPP
+#endif  // M1UNE_ALGO_ENUMERATION_GRAY_CODE_HPP

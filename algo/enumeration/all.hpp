@@ -1,0 +1,6 @@
+#ifndef M1UNE_ALGO_ENUMERATION_ALL_HPP
+#define M1UNE_ALGO_ENUMERATION_ALL_HPP 1
+
+#include "gray_code.hpp"
+
+#endif  // M1UNE_ALGO_ENUMERATION_ALL_HPP
