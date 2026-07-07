@@ -131,6 +131,8 @@ struct BigInt {
     }
 
     BigInt& operator+=(const BigInt& other) {
+        if (other.is_zero()) return *this;
+        if (is_zero()) return *this = other;
         if (sign != other.sign) return *this -= (-other);
         for (int i = 0, carry = 0; i < (int)std::max(a.size(), other.a.size()) || carry; ++i) {
             if (i == (int)a.size()) a.push_back(0);
@@ -142,6 +144,8 @@ struct BigInt {
     }
 
     BigInt& operator-=(const BigInt& other) {
+        if (other.is_zero()) return *this;
+        if (is_zero()) return *this = -other;
         if (sign != other.sign) return *this += (-other);
         if (abs() < other.abs()) {
             BigInt tmp = other;

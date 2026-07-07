@@ -10,7 +10,23 @@
 #include <utility>
 #include <vector>
 
+#ifndef M1UNE_GEOMETRY_LATTICE_POINT_COUNT_USE_BOOST
+#if defined(__has_include)
+#if __has_include(<boost/multiprecision/cpp_int.hpp>)
+#define M1UNE_GEOMETRY_LATTICE_POINT_COUNT_USE_BOOST 1
+#else
+#define M1UNE_GEOMETRY_LATTICE_POINT_COUNT_USE_BOOST 0
+#endif
+#else
+#define M1UNE_GEOMETRY_LATTICE_POINT_COUNT_USE_BOOST 0
+#endif
+#endif
+
+#if M1UNE_GEOMETRY_LATTICE_POINT_COUNT_USE_BOOST
 #include <boost/multiprecision/cpp_int.hpp>
+#else
+#include "../utilities/bigint.hpp"
+#endif
 
 namespace m1une {
 namespace geometry {
@@ -24,7 +40,40 @@ struct LinearInequality {
 
 namespace lattice_point_count_detail {
 
+#if M1UNE_GEOMETRY_LATTICE_POINT_COUNT_USE_BOOST
 using Integer = boost::multiprecision::int256_t;
+
+inline Integer signed_int128_max() {
+    return (Integer(1) << 127) - 1;
+}
+
+inline __int128_t to_int128(const Integer& value) {
+    assert(0 <= value);
+    return static_cast<__int128_t>(value);
+}
+#else
+using Integer = ::m1une::utilities::BigInt;
+
+inline Integer signed_int128_max() {
+    Integer result = 1;
+    for (int bit = 0; bit < 127; ++bit) result *= 2;
+    result -= 1;
+    return result;
+}
+
+inline __int128_t to_int128(const Integer& value) {
+    assert(0 <= value);
+    __uint128_t result = 0;
+    for (
+        int index = static_cast<int>(value.a.size()) - 1;
+        index >= 0;
+        --index
+    ) {
+        result = result * Integer::BASE + static_cast<unsigned>(value.a[index]);
+    }
+    return static_cast<__int128_t>(result);
+}
+#endif
 
 struct Fraction {
     Integer numerator = 0;
@@ -202,7 +251,7 @@ inline Integer floor_div(Integer numerator, const Integer& denominator) {
     assert(denominator > 0);
     Integer quotient = numerator / denominator;
     Integer remainder = numerator % denominator;
-    if (remainder < 0) --quotient;
+    if (remainder < 0) quotient -= 1;
     return quotient;
 }
 
@@ -454,8 +503,8 @@ __int128_t count_lattice_points(
     answer += detail::sum_floor_of_negative(lower, first_x, last_x);
 
     assert(answer >= 0);
-    assert(answer <= (Integer(1) << 127) - 1);
-    return static_cast<__int128_t>(answer);
+    assert(answer <= detail::signed_int128_max());
+    return detail::to_int128(answer);
 }
 
 }  // namespace geometry

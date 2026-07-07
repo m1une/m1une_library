@@ -53,6 +53,12 @@ x-coordinates in its projection must fit `long long`, and the returned count
 must fit signed `__int128`. These conditions are checked by assertions where
 possible.
 
+When `<boost/multiprecision/cpp_int.hpp>` is available, the internal exact
+integer backend uses `boost::multiprecision::int256_t`. Otherwise it falls back
+to the library's local `BigInt`. Define
+`M1UNE_GEOMETRY_LATTICE_POINT_COUNT_USE_BOOST` to `0` before including this
+header to force the fallback backend.
+
 All inequalities are closed, so boundary grid points are included. A
 constraint with `a == 0` and `b == 0` is either redundant when `c >= 0` or
 makes the result zero when `c < 0`. The function does not mutate its input.

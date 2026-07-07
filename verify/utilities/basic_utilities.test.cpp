@@ -29,6 +29,12 @@ void test_bigint() {
     positive *= std::numeric_limits<int>::min();
     assert(positive.to_string() == "2147483648");
 
+    BigInt negative = -5;
+    negative += BigInt(0);
+    assert(negative.to_string() == "-5");
+    negative -= BigInt(0);
+    assert(negative.to_string() == "-5");
+
     BigInt large("12345678901234567890");
     assert(large.to_string() == "12345678901234567890");
 
