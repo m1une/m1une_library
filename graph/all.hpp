@@ -1,6 +1,7 @@
 #ifndef M1UNE_GRAPH_ALL_HPP
 #define M1UNE_GRAPH_ALL_HPP 1
 
+#include "counting.hpp"
 #include "directed.hpp"
 #include "dominator_tree.hpp"
 #include "graph.hpp"
