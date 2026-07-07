@@ -906,6 +906,9 @@ data:
       path: utilities/fast_io.hpp
       title: Fast IO
     - icon: ':heavy_check_mark:'
+      path: utilities/grid_transform.hpp
+      title: Grid Transform
+    - icon: ':heavy_check_mark:'
       path: utilities/int128.hpp
       title: Int128
     - icon: ':heavy_check_mark:'
@@ -1526,6 +1529,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/utilities/fast_io.test.cpp
       title: verify/utilities/fast_io.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/utilities/grid_transform.test.cpp
+      title: verify/utilities/grid_transform.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/utilities/parser.test.cpp
       title: verify/utilities/parser.test.cpp

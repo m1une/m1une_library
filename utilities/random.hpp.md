@@ -10,6 +10,9 @@ data:
     path: verify/utilities/basic_utilities.test.cpp
     title: verify/utilities/basic_utilities.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/utilities/grid_transform.test.cpp
+    title: verify/utilities/grid_transform.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/utilities/random_generators.test.cpp
     title: verify/utilities/random_generators.test.cpp
   - icon: ':heavy_check_mark:'
@@ -351,6 +354,7 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/utilities/random_generators.test.cpp
+  - verify/utilities/grid_transform.test.cpp
   - verify/utilities/basic_utilities.test.cpp
   - verify/utilities/random_testing.test.cpp
 documentation_of: utilities/random.hpp
