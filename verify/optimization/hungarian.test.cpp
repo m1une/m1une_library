@@ -43,7 +43,7 @@ long long brute_max(const std::vector<std::vector<long long>>& cost) {
 }
 
 void check_result(const std::vector<std::vector<long long>>& cost,
-                  const m1une::optimization::HungarianResult<long long>& result,
+                  const m1une::opt::HungarianResult<long long>& result,
                   long long expected) {
     int h = int(cost.size());
     int w = h == 0 ? 0 : int(cost[0].size());
@@ -82,14 +82,14 @@ void test_hungarian_min() {
         {2, 0, 5},
         {3, 2, 2},
     };
-    auto sq = m1une::optimization::hungarian_min(square);
+    auto sq = m1une::opt::hungarian_min(square);
     check_result(square, sq, 5);
 
     std::vector<std::vector<long long>> wide = {
         {7, 4, 6, 8},
         {5, 9, 3, 1},
     };
-    check_result(wide, m1une::optimization::hungarian(wide), brute_min(wide));
+    check_result(wide, m1une::opt::hungarian(wide), brute_min(wide));
 
     std::vector<std::vector<long long>> tall = {
         {9, 4},
@@ -97,7 +97,7 @@ void test_hungarian_min() {
         {5, 8},
         {1, 3},
     };
-    auto tall_result = m1une::optimization::hungarian_min(tall);
+    auto tall_result = m1une::opt::hungarian_min(tall);
     check_result(tall, tall_result, brute_min(tall));
     assert(tall_result.col_to_row[0] != -1);
     assert(tall_result.col_to_row[1] != -1);
@@ -106,10 +106,10 @@ void test_hungarian_min() {
         {-4, 2, 0},
         {3, -5, 1},
     };
-    check_result(negative, m1une::optimization::hungarian_min(negative), brute_min(negative));
+    check_result(negative, m1une::opt::hungarian_min(negative), brute_min(negative));
 
     std::vector<std::vector<long long>> zero_cols(3);
-    check_result(zero_cols, m1une::optimization::hungarian_min(zero_cols), 0);
+    check_result(zero_cols, m1une::opt::hungarian_min(zero_cols), 0);
 }
 
 void test_hungarian_max() {
@@ -118,7 +118,7 @@ void test_hungarian_max() {
         {5, 3, 4},
         {6, 7, 0},
     };
-    check_result(cost, m1une::optimization::hungarian_max(cost), brute_max(cost));
+    check_result(cost, m1une::opt::hungarian_max(cost), brute_max(cost));
 }
 
 void test_against_bruteforce() {
@@ -130,8 +130,8 @@ void test_against_bruteforce() {
                     cost[i][j] = ((i + 2) * (j + 3) * 5 + i * 7 - j * 11) % 17 - 8;
                 }
             }
-            check_result(cost, m1une::optimization::hungarian_min(cost), brute_min(cost));
-            check_result(cost, m1une::optimization::hungarian_max(cost), brute_max(cost));
+            check_result(cost, m1une::opt::hungarian_min(cost), brute_min(cost));
+            check_result(cost, m1une::opt::hungarian_max(cost), brute_max(cost));
         }
     }
 }
@@ -153,7 +153,7 @@ int main() {
         }
     }
 
-    auto result = m1une::optimization::hungarian_min(cost);
+    auto result = m1une::opt::hungarian_min(cost);
     std::cout << result.cost << '\n';
     for (int i = 0; i < n; i++) {
         if (i) std::cout << ' ';

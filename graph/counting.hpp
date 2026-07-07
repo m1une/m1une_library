@@ -7,8 +7,8 @@
 #include <utility>
 #include <vector>
 
-#include "../fps/convolution.hpp"
-#include "../fps/formal_power_series.hpp"
+#include "../math/fps/convolution.hpp"
+#include "../math/fps/formal_power_series.hpp"
 #include "../math/combinatorics.hpp"
 
 namespace m1une {

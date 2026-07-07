@@ -7,7 +7,7 @@
 
 #include "../../optimization/all.hpp"
 
-using ProjectSelection = m1une::optimization::ProjectSelection<long long>;
+using ProjectSelection = m1une::opt::ProjectSelection<long long>;
 
 void test_basic() {
     ProjectSelection solver(4);

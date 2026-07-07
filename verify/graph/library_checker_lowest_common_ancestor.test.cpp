@@ -4,7 +4,7 @@
 using namespace std;
 
 #include "../../graph/graph.hpp"
-#include "../../tree/sparse_table_lca.hpp"
+#include "../../graph/tree/sparse_table_lca.hpp"
 
 int main() {
     ios::sync_with_stdio(false);

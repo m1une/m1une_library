@@ -56,7 +56,7 @@ int main() {
         {3, 2, 2},
     };
 
-    auto result = m1une::optimization::hungarian_min(cost);
+    auto result = m1une::opt::hungarian_min(cost);
     std::cout << result.cost << "\n";  // 5
     for (auto [row, col] : result.matching()) {
         std::cout << row << " " << col << "\n";

@@ -57,7 +57,7 @@ long long brute_solve(const std::vector<std::vector<long long>>& a,
 
 void check_optimal(const std::vector<std::vector<long long>>& a,
                    const std::vector<long long>& b, const std::vector<long long>& c,
-                   const m1une::optimization::IntegerLpResult<long long>& result,
+                   const m1une::opt::IntegerLpResult<long long>& result,
                    long long expected) {
     assert(result.is_optimal());
     assert(feasible(a, b, result.variables));
@@ -72,10 +72,10 @@ void test_basic_maximize() {
     std::vector<long long> b = {4, 4};
     std::vector<long long> c = {3, 2};
 
-    auto result = m1une::optimization::integer_lp_maximize(a, b, c);
+    auto result = m1une::opt::integer_lp_maximize(a, b, c);
     check_optimal(a, b, c, result, 6);
 
-    auto alias_result = m1une::optimization::integer_lp(a, b, c);
+    auto alias_result = m1une::opt::integer_lp(a, b, c);
     check_optimal(a, b, c, alias_result, 6);
 }
 
@@ -87,7 +87,7 @@ void test_minimize() {
     std::vector<long long> b = {-3, 5, 5};
     std::vector<long long> c = {1, 1};
 
-    auto result = m1une::optimization::integer_lp_minimize(a, b, c);
+    auto result = m1une::opt::integer_lp_minimize(a, b, c);
     check_optimal(a, b, c, result, 3);
 }
 
@@ -98,7 +98,7 @@ void test_integer_infeasible_fractional_relaxation() {
     std::vector<long long> b = {1, -1};
     std::vector<long long> c = {1};
 
-    auto result = m1une::optimization::integer_lp_maximize(a, b, c);
+    auto result = m1une::opt::integer_lp_maximize(a, b, c);
     assert(result.is_infeasible());
 }
 
@@ -108,7 +108,7 @@ void test_unbounded() {
     std::vector<long long> b = {-1};
     std::vector<long long> c = {1};
 
-    auto result = m1une::optimization::integer_lp_maximize(a, b, c);
+    auto result = m1une::opt::integer_lp_maximize(a, b, c);
     assert(result.is_unbounded());
     assert(feasible(a, b, result.variables));
 }
@@ -120,7 +120,7 @@ void test_unbounded_relaxation_but_integer_infeasible() {
     std::vector<long long> b = {1, -1};
     std::vector<long long> c = {0, 1};
 
-    auto result = m1une::optimization::integer_lp_maximize(a, b, c);
+    auto result = m1une::opt::integer_lp_maximize(a, b, c);
     assert(result.is_infeasible());
 }
 
@@ -129,14 +129,14 @@ void test_no_variables() {
     std::vector<long long> b = {0, 3};
     std::vector<long long> c;
 
-    auto result = m1une::optimization::integer_lp_maximize(a, b, c);
+    auto result = m1une::opt::integer_lp_maximize(a, b, c);
     assert(result.is_optimal());
     assert(result.variables.empty());
     assert(result.objective_value == 0);
 
     std::vector<std::vector<long long>> bad_a(1);
     std::vector<long long> bad_b = {-1};
-    auto bad_result = m1une::optimization::integer_lp_maximize(bad_a, bad_b, c);
+    auto bad_result = m1une::opt::integer_lp_maximize(bad_a, bad_b, c);
     assert(bad_result.is_infeasible());
 }
 
@@ -170,11 +170,11 @@ void test_against_bruteforce() {
         for (int j = 0; j < variable_count; j++) c[j] = (t * 5 + j * 3) % 11 - 5;
 
         long long expected_max = brute_solve(a, b, c, limits, true);
-        auto max_result = m1une::optimization::integer_lp_maximize(a, b, c);
+        auto max_result = m1une::opt::integer_lp_maximize(a, b, c);
         check_optimal(a, b, c, max_result, expected_max);
 
         long long expected_min = brute_solve(a, b, c, limits, false);
-        auto min_result = m1une::optimization::integer_lp_minimize(a, b, c);
+        auto min_result = m1une::opt::integer_lp_minimize(a, b, c);
         check_optimal(a, b, c, min_result, expected_min);
     }
 }

@@ -8,7 +8,7 @@
 #include <vector>
 
 namespace m1une {
-namespace optimization {
+namespace opt {
 
 template <class T>
 struct HungarianResult {
@@ -149,7 +149,7 @@ HungarianResult<T> hungarian(const std::vector<std::vector<T>>& cost) {
     return hungarian_min(cost);
 }
 
-}  // namespace optimization
+}  // namespace opt
 }  // namespace m1une
 
 #endif  // M1UNE_OPTIMIZATION_HUNGARIAN_HPP

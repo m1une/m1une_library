@@ -43,7 +43,7 @@ void test_basic_maximize() {
     std::vector<long double> b = {4, 2, 3};
     std::vector<long double> c = {3, 2};
 
-    auto result = m1une::optimization::simplex_maximize(a, b, c);
+    auto result = m1une::opt::simplex_maximize(a, b, c);
     assert(result.is_optimal());
     check_feasible(a, b, result.variables);
     assert(approx(result.objective_value, 10));
@@ -51,7 +51,7 @@ void test_basic_maximize() {
     assert(approx(result.variables[0], 2));
     assert(approx(result.variables[1], 2));
 
-    auto alias_result = m1une::optimization::simplex(a, b, c);
+    auto alias_result = m1une::opt::simplex(a, b, c);
     assert(alias_result.is_optimal());
     assert(approx(alias_result.objective_value, 10));
 }
@@ -65,7 +65,7 @@ void test_minimize() {
     std::vector<long double> b = {-4, 10, 10};
     std::vector<long double> c = {1, 1};
 
-    auto result = m1une::optimization::simplex_minimize(a, b, c);
+    auto result = m1une::opt::simplex_minimize(a, b, c);
     assert(result.is_optimal());
     check_feasible(a, b, result.variables);
     assert(approx(result.objective_value, 4));
@@ -80,7 +80,7 @@ void test_negative_rhs() {
     std::vector<long double> b = {-1, 3};
     std::vector<long double> c = {1};
 
-    auto result = m1une::optimization::simplex_maximize(a, b, c);
+    auto result = m1une::opt::simplex_maximize(a, b, c);
     assert(result.is_optimal());
     check_feasible(a, b, result.variables);
     assert(approx(result.objective_value, 3));
@@ -95,7 +95,7 @@ void test_infeasible() {
     std::vector<long double> b = {0, -1};
     std::vector<long double> c = {1};
 
-    auto result = m1une::optimization::simplex_maximize(a, b, c);
+    auto result = m1une::opt::simplex_maximize(a, b, c);
     assert(result.is_infeasible());
 }
 
@@ -104,7 +104,7 @@ void test_unbounded() {
     std::vector<long double> b;
     std::vector<long double> c = {1, 2};
 
-    auto result = m1une::optimization::simplex_maximize(a, b, c);
+    auto result = m1une::opt::simplex_maximize(a, b, c);
     assert(result.is_unbounded());
 }
 
@@ -113,14 +113,14 @@ void test_no_variables() {
     std::vector<long double> b = {1, 2};
     std::vector<long double> c;
 
-    auto result = m1une::optimization::simplex_maximize(a, b, c);
+    auto result = m1une::opt::simplex_maximize(a, b, c);
     assert(result.is_optimal());
     assert(result.variables.empty());
     assert(approx(result.objective_value, 0));
 
     std::vector<std::vector<long double>> bad_a(1);
     std::vector<long double> bad_b = {-1};
-    auto bad_result = m1une::optimization::simplex_maximize(bad_a, bad_b, c);
+    auto bad_result = m1une::opt::simplex_maximize(bad_a, bad_b, c);
     assert(bad_result.is_infeasible());
 }
 
@@ -211,7 +211,7 @@ void test_against_vertices() {
         std::vector<long double> c = {first_objective, second_objective};
         if (abs_ld(c[0]) + abs_ld(c[1]) == 0) c[0] = 1;
 
-        auto result = m1une::optimization::simplex_maximize(a, b, c);
+        auto result = m1une::opt::simplex_maximize(a, b, c);
         assert(result.is_optimal());
         check_feasible(a, b, result.variables);
         long double expected = brute_max_2d(a, b, c);

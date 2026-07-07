@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <vector>
 
-#include "../fps/formal_power_series.hpp"
+#include "fps/formal_power_series.hpp"
 #include "combinatorics.hpp"
 
 namespace m1une {

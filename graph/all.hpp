@@ -4,10 +4,12 @@
 #include "counting.hpp"
 #include "directed.hpp"
 #include "dominator_tree.hpp"
+#include "flow/flow.hpp"
 #include "graph.hpp"
 #include "grid.hpp"
 #include "range_edge_graph.hpp"
 #include "shortest_path.hpp"
+#include "tree/all.hpp"
 #include "undirected.hpp"
 
 #endif  // M1UNE_GRAPH_ALL_HPP

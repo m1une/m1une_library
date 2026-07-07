@@ -5,7 +5,11 @@ documentation_of: ../../math/all.hpp
 
 ## Overview
 
-`math/all.hpp` includes every general math header in this directory.
+`math/all.hpp` includes every general math header in this directory, including
+the FPS/polynomial and dense-matrix subcategories.
+
+Public namespaces stay flat and short: general math helpers use `m1une::math`,
+FPS helpers use `m1une::fps`, and dense matrix helpers use `m1une::matrix`.
 
 ## Choosing a Header
 
@@ -49,6 +53,9 @@ You usually do not need to include this entire bundle:
 * Use `rational.hpp` for normalized exact fractions.
 * Use `stern_brocot_tree.hpp` for positive rational tree paths, ancestors, and
   LCA operations.
+* Use `fps/` for formal power series, convolution, multipoint evaluation,
+  interpolation, and linear recurrences.
+* Use `matrix/` for dense matrices and linear algebra.
 
 `math/all.hpp` is convenient during a contest when compile time and including a
 few unused headers do not matter.
@@ -65,6 +72,8 @@ few unused headers do not matter.
 | `math/integer_arithmetic.hpp` | Exact integer square roots and overflow-aware powers. |
 | `math/lucas.hpp` | Lucas's theorem for huge binomial arguments modulo a small prime. |
 | `math/modint.hpp` | Static modular integer type. |
+| `math/fps/all.hpp` | Convolution, formal power series, polynomial algorithms, and linear recurrences. |
+| `math/matrix/all.hpp` | Dense matrices, powers, Gaussian elimination, determinant, inverse, and linear systems. |
 | `math/combinatorics.hpp` | Factorials, binomial coefficients, permutations, and multiset counts. |
 | `math/combinatorial_sequences.hpp` | Fast standard counting sequences and special numbers. |
 | `math/cyclotomic_polynomial.hpp` | Integer coefficients of cyclotomic polynomials. |

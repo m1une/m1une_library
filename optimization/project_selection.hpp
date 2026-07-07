@@ -7,10 +7,10 @@
 #include <utility>
 #include <vector>
 
-#include "../flow/max_flow.hpp"
+#include "../graph/flow/max_flow.hpp"
 
 namespace m1une {
-namespace optimization {
+namespace opt {
 
 template <class T>
 struct ProjectSelectionResult {
@@ -242,7 +242,7 @@ class ProjectSelection {
     }
 };
 
-}  // namespace optimization
+}  // namespace opt
 }  // namespace m1une
 
 #endif  // M1UNE_OPTIMIZATION_PROJECT_SELECTION_HPP

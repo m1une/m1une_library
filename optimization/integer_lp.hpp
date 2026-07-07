@@ -11,7 +11,7 @@
 #include "simplex.hpp"
 
 namespace m1une {
-namespace optimization {
+namespace opt {
 
 enum class IntegerLpStatus {
     Optimal,
@@ -294,7 +294,7 @@ IntegerLpResult<T> integer_lp(const std::vector<std::vector<T>>& a, const std::v
     return integer_lp_maximize(a, b, c, eps);
 }
 
-}  // namespace optimization
+}  // namespace opt
 }  // namespace m1une
 
 #endif  // M1UNE_OPTIMIZATION_INTEGER_LP_HPP

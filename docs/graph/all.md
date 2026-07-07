@@ -5,16 +5,21 @@ documentation_of: ../../graph/all.hpp
 
 ## Overview
 
-`graph/all.hpp` includes every general graph header in this directory. It is
-convenient when writing quickly during a contest and you do not want to manage
-individual graph includes. Flow-network algorithms live separately under
-`flow/`.
+`graph/all.hpp` includes the general graph bundle plus the tree and flow
+subcategories. It is convenient when writing quickly during a contest and you do
+not want to manage individual graph includes.
+
+Public namespaces stay flat and short: general graph helpers use
+`m1une::graph`, tree helpers use `m1une::tree`, and flow helpers use
+`m1une::flow`.
 
 ## Included Headers
 
 | Header | Graph orientation | Contents |
 | --- | --- | --- |
 | `graph/graph.hpp` | Container | `Graph<T>` and `Edge<T>` adjacency-list container. |
+| `graph/tree/all.hpp` | Tree algorithms | Rooted-tree metadata, LCA, HLD, virtual trees, tree hashing, rerooting DP, static top trees, and centroid decomposition. |
+| `graph/flow/flow.hpp` | Flow networks | Max flow, min-cost flow, bounded flow, bounded min-cost flow, and Gomory-Hu trees. |
 | `graph/counting.hpp` | Counting formulas | Counts common labeled graph classes, tournaments, DAGs, and unlabeled trees by vertex number. |
 | `graph/range_edge_graph.hpp` | Directed graph builder | Compact point-to-range, range-to-point, and range-to-range edges using segment trees. |
 | `graph/shortest_path.hpp` | Direction-respecting / DAG-specific | Cow game difference constraints, BFS, 0-1 BFS, DAG shortest path, Dijkstra, Bellman-Ford, and Warshall-Floyd. |

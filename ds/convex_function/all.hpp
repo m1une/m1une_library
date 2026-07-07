@@ -1,0 +1,6 @@
+#ifndef M1UNE_DS_CONVEX_FUNCTION_ALL_HPP
+#define M1UNE_DS_CONVEX_FUNCTION_ALL_HPP 1
+
+#include "slope_trick.hpp"
+
+#endif  // M1UNE_DS_CONVEX_FUNCTION_ALL_HPP

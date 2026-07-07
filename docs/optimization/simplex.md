@@ -81,7 +81,7 @@ int main() {
     std::vector<long double> b = {4, 2, 3};
     std::vector<long double> c = {3, 2};
 
-    auto result = m1une::optimization::simplex_maximize(a, b, c);
+    auto result = m1une::opt::simplex_maximize(a, b, c);
     if (result.is_optimal()) {
         std::cout << result.objective_value << "\n";  // 10
         std::cout << result.variables[0] << " " << result.variables[1] << "\n";

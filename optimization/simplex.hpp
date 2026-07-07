@@ -8,7 +8,7 @@
 #include <vector>
 
 namespace m1une {
-namespace optimization {
+namespace opt {
 
 enum class SimplexStatus {
     Optimal,
@@ -215,7 +215,7 @@ SimplexResult<T> simplex(const std::vector<std::vector<T>>& a, const std::vector
     return simplex_maximize(a, b, c, eps);
 }
 
-}  // namespace optimization
+}  // namespace opt
 }  // namespace m1une
 
 #endif  // M1UNE_OPTIMIZATION_SIMPLEX_HPP

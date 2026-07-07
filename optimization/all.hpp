@@ -1,13 +1,9 @@
 #ifndef M1UNE_OPTIMIZATION_ALL_HPP
 #define M1UNE_OPTIMIZATION_ALL_HPP 1
 
-#include "alien_trick.hpp"
-#include "convex_hull_trick.hpp"
 #include "hungarian.hpp"
 #include "integer_lp.hpp"
-#include "li_chao_tree.hpp"
 #include "project_selection.hpp"
 #include "simplex.hpp"
-#include "slope_trick.hpp"
 
 #endif  // M1UNE_OPTIMIZATION_ALL_HPP

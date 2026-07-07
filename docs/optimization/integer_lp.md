@@ -87,7 +87,7 @@ int main() {
     std::vector<long long> b = {4, 4};
     std::vector<long long> c = {3, 2};
 
-    auto result = m1une::optimization::integer_lp_maximize(a, b, c);
+    auto result = m1une::opt::integer_lp_maximize(a, b, c);
     if (result.is_optimal()) {
         std::cout << result.objective_value << "\n";  // 6
         std::cout << result.variables[0] << " " << result.variables[1] << "\n";

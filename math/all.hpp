@@ -12,6 +12,8 @@
 #include "gray_code.hpp"
 #include "integer_arithmetic.hpp"
 #include "lucas.hpp"
+#include "fps/all.hpp"
+#include "matrix/all.hpp"
 #include "modint.hpp"
 #include "number_theory.hpp"
 #include "prime_factorization.hpp"

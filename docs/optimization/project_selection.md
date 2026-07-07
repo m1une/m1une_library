@@ -124,7 +124,7 @@ project `1`, and completing projects `1` and `2` together earns a bonus.
 #include <vector>
 
 int main() {
-    m1une::optimization::ProjectSelection<long long> solver(3);
+    m1une::opt::ProjectSelection<long long> solver(3);
     solver.add_gain(0, 10);
     solver.add_gain(1, -3);  // Selecting project 1 costs 3.
     solver.add_gain(2, 4);
