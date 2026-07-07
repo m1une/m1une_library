@@ -400,6 +400,9 @@ data:
       path: graph/connected_components.hpp
       title: Connected Components
     - icon: ':heavy_check_mark:'
+      path: graph/counting.hpp
+      title: Graph Counting
+    - icon: ':heavy_check_mark:'
       path: graph/cow_game.hpp
       title: Cow Game (Difference Constraints)
     - icon: ':heavy_check_mark:'
@@ -1183,6 +1186,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/graph/graph_algorithms.test.cpp
       title: verify/graph/graph_algorithms.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/graph_counting.test.cpp
+      title: verify/graph/graph_counting.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/graph/library_checker_general_matching.test.cpp
       title: verify/graph/library_checker_general_matching.test.cpp

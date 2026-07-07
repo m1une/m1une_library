@@ -24,6 +24,12 @@ data:
     path: fps/multipoint_evaluation.hpp
     title: Multipoint Evaluation and Interpolation
   - icon: ':heavy_check_mark:'
+    path: graph/all.hpp
+    title: Graph All
+  - icon: ':heavy_check_mark:'
+    path: graph/counting.hpp
+    title: Graph Counting
+  - icon: ':heavy_check_mark:'
     path: math/all.hpp
     title: Math All
   - icon: ':heavy_check_mark:'
@@ -63,6 +69,18 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/fps/pow_of_formal_power_series.test.cpp
     title: verify/fps/pow_of_formal_power_series.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/cow_game.test.cpp
+    title: verify/graph/cow_game.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/graph_algorithms.test.cpp
+    title: verify/graph/graph_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/graph_counting.test.cpp
+    title: verify/graph/graph_counting.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/range_edge_graph.test.cpp
+    title: verify/graph/range_edge_graph.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/bell_number.test.cpp
     title: verify/math/bell_number.test.cpp
@@ -519,6 +537,8 @@ data:
   - fps/lagrange_inversion.hpp
   - fps/multipoint_evaluation.hpp
   - fps/linear_recurrence.hpp
+  - graph/all.hpp
+  - graph/counting.hpp
   timestamp: '2026-07-01 22:52:49+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
@@ -538,6 +558,10 @@ data:
   - verify/fps/polynomial_taylor_shift.test.cpp
   - verify/fps/lagrange_inversion.test.cpp
   - verify/fps/fps_algorithms.test.cpp
+  - verify/graph/cow_game.test.cpp
+  - verify/graph/graph_counting.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
 documentation_of: fps/formal_power_series.hpp
 layout: document
 title: Formal Power Series
