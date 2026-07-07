@@ -151,7 +151,31 @@ class SlopeTrick {
             other._right.pop();
         }
     }
+
+    void min_plus_convolve(SlopeTrick other) {
+        SlopeTrick result;
+        result._minimum = _minimum + other._minimum;
+
+        while (!_left.empty() && !other._left.empty()) {
+            result.push_left(left_top() + other.left_top());
+            _left.pop();
+            other._left.pop();
+        }
+        while (!_right.empty() && !other._right.empty()) {
+            result.push_right(right_top() + other.right_top());
+            _right.pop();
+            other._right.pop();
+        }
+        *this = std::move(result);
+    }
 };
+
+template <class T>
+SlopeTrick<T> min_plus_convolution(SlopeTrick<T> first,
+                                   SlopeTrick<T> second) {
+    first.min_plus_convolve(std::move(second));
+    return first;
+}
 
 }  // namespace ds
 }  // namespace m1une

@@ -169,10 +169,78 @@ void test_merge() {
     }
 }
 
+void test_min_plus_convolution() {
+    constexpr int brute_limit = 500;
+
+    for (int test = 0; test < 120; test++) {
+        SlopeTrick first;
+        SlopeTrick second;
+
+        for (int i = 0; i < 18; i++) {
+            int a = (test * 17 + i * 11) % 51 - 25;
+            int b = (test * 23 + i * 7) % 51 - 25;
+
+            if (i % 4 == 0) {
+                first.add_abs(a);
+                second.add_abs(b);
+            } else if (i % 4 == 1) {
+                first.add_x_minus_a(a);
+                second.add_a_minus_x(b);
+            } else if (i % 4 == 2) {
+                first.add_a_minus_x(a);
+                second.add_x_minus_a(b);
+            } else {
+                first.add_constant(a - b);
+                second.add_constant(b - a / 2);
+            }
+
+            if (i % 7 == 3) first.shift(-2, 3);
+            if (i % 7 == 5) second.shift(1);
+        }
+
+        if (test % 4 == 0) first.prefix_minimum();
+        if (test % 5 == 0) first.suffix_minimum();
+        if (test % 6 == 0) second.prefix_minimum();
+        if (test % 7 == 0) second.suffix_minimum();
+
+        SlopeTrick assigned = first;
+        assigned.min_plus_convolve(second);
+        SlopeTrick returned = m1une::ds::min_plus_convolution(first, second);
+
+        assert(assigned.minimum() == first.minimum() + second.minimum());
+        auto first_range = first.argmin();
+        auto second_range = second.argmin();
+        auto result_range = assigned.argmin();
+        if (first_range.left && second_range.left) {
+            assert(result_range.left);
+            assert(*result_range.left == *first_range.left + *second_range.left);
+        } else {
+            assert(!result_range.left);
+        }
+        if (first_range.right && second_range.right) {
+            assert(result_range.right);
+            assert(*result_range.right == *first_range.right + *second_range.right);
+        } else {
+            assert(!result_range.right);
+        }
+
+        for (int x = -100; x <= 100; x++) {
+            long long expected = inf;
+            for (int y = -brute_limit; y <= brute_limit; y++) {
+                expected =
+                    std::min(expected, first.evaluate(y) + second.evaluate(x - y));
+            }
+            assert(assigned.evaluate(x) == expected);
+            assert(returned.evaluate(x) == expected);
+        }
+    }
+}
+
 int main() {
     test_basic();
     test_operations_against_explicit_function();
     test_merge();
+    test_min_plus_convolution();
 
     long long a, b;
     std::cin >> a >> b;
