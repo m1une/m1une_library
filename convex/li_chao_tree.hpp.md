@@ -2,27 +2,27 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: ds/line_container/convex_hull_trick.hpp
+    path: convex/convex_hull_trick.hpp
     title: Convex Hull Trick
   _extendedRequiredBy:
   - icon: ':warning:'
-    path: ds/line_container/all.hpp
-    title: Line Container All
+    path: convex/all.hpp
+    title: Convex All
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
-    path: verify/ds/line_container/li_chao_tree.test.cpp
-    title: verify/ds/line_container/li_chao_tree.test.cpp
+    path: verify/convex/li_chao_tree.test.cpp
+    title: verify/convex/li_chao_tree.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"ds/line_container/li_chao_tree.hpp\"\n\n\n\n#include <cassert>\n\
-    #include <concepts>\n#include <cstddef>\n#include <limits>\n#include <numeric>\n\
-    #include <optional>\n#include <type_traits>\n#include <utility>\n#include <vector>\n\
-    \n#line 1 \"ds/line_container/convex_hull_trick.hpp\"\n\n\n\n#line 10 \"ds/line_container/convex_hull_trick.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\n\nenum class LineOptimization {\n    Minimize,\n\
-    \    Maximize,\n};\n\ntemplate <std::signed_integral T>\nusing line_wide_type\
+  bundledCode: "#line 1 \"convex/li_chao_tree.hpp\"\n\n\n\n#include <cassert>\n#include\
+    \ <concepts>\n#include <cstddef>\n#include <limits>\n#include <numeric>\n#include\
+    \ <optional>\n#include <type_traits>\n#include <utility>\n#include <vector>\n\n\
+    #line 1 \"convex/convex_hull_trick.hpp\"\n\n\n\n#line 10 \"convex/convex_hull_trick.hpp\"\
+    \n\nnamespace m1une {\nnamespace convex {\n\nenum class LineOptimization {\n \
+    \   Minimize,\n    Maximize,\n};\n\ntemplate <std::signed_integral T>\nusing line_wide_type\
     \ = __int128_t;\n\ntemplate <std::signed_integral T>\nstruct LinearFunction {\n\
     \    using value_type = line_wide_type<T>;\n\n    value_type slope;\n    value_type\
     \ intercept;\n\n    constexpr LinearFunction() : slope(0), intercept(0) {}\n\n\
@@ -65,8 +65,8 @@ data:
     \   return *try_query(x);\n    }\n};\n\ntemplate <std::signed_integral T>\nusing\
     \ MinConvexHullTrick = ConvexHullTrick<T, LineOptimization::Minimize>;\n\ntemplate\
     \ <std::signed_integral T>\nusing MaxConvexHullTrick = ConvexHullTrick<T, LineOptimization::Maximize>;\n\
-    \n}  // namespace ds\n}  // namespace m1une\n\n\n#line 15 \"ds/line_container/li_chao_tree.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\n\n// Dynamic Li Chao tree over an integral\
+    \n}  // namespace convex\n}  // namespace m1une\n\n\n#line 15 \"convex/li_chao_tree.hpp\"\
+    \n\nnamespace m1une {\nnamespace convex {\n\n// Dynamic Li Chao tree over an integral\
     \ half-open coordinate domain.\ntemplate <std::signed_integral T, LineOptimization\
     \ Objective = LineOptimization::Minimize>\nstruct LiChaoTree {\n    using Line\
     \ = LinearFunction<T>;\n    using value_type = typename Line::value_type;\n\n\
@@ -133,13 +133,13 @@ data:
     \ query(x);\n        assert(result.has_value());\n        return result.value_or(value_type());\n\
     \    }\n};\n\ntemplate <std::signed_integral T>\nusing MinLiChaoTree = LiChaoTree<T,\
     \ LineOptimization::Minimize>;\n\ntemplate <std::signed_integral T>\nusing MaxLiChaoTree\
-    \ = LiChaoTree<T, LineOptimization::Maximize>;\n\n}  // namespace ds\n}  // namespace\
-    \ m1une\n\n\n"
-  code: "#ifndef M1UNE_DS_LINE_CONTAINER_LI_CHAO_TREE_HPP\n#define M1UNE_DS_LINE_CONTAINER_LI_CHAO_TREE_HPP\
+    \ = LiChaoTree<T, LineOptimization::Maximize>;\n\n}  // namespace convex\n}  //\
+    \ namespace m1une\n\n\n"
+  code: "#ifndef M1UNE_CONVEX_LI_CHAO_TREE_HPP\n#define M1UNE_CONVEX_LI_CHAO_TREE_HPP\
     \ 1\n\n#include <cassert>\n#include <concepts>\n#include <cstddef>\n#include <limits>\n\
     #include <numeric>\n#include <optional>\n#include <type_traits>\n#include <utility>\n\
     #include <vector>\n\n#include \"convex_hull_trick.hpp\"\n\nnamespace m1une {\n\
-    namespace ds {\n\n// Dynamic Li Chao tree over an integral half-open coordinate\
+    namespace convex {\n\n// Dynamic Li Chao tree over an integral half-open coordinate\
     \ domain.\ntemplate <std::signed_integral T, LineOptimization Objective = LineOptimization::Minimize>\n\
     struct LiChaoTree {\n    using Line = LinearFunction<T>;\n    using value_type\
     \ = typename Line::value_type;\n\n   private:\n    struct Node {\n        Line\
@@ -205,19 +205,19 @@ data:
     \ query(x);\n        assert(result.has_value());\n        return result.value_or(value_type());\n\
     \    }\n};\n\ntemplate <std::signed_integral T>\nusing MinLiChaoTree = LiChaoTree<T,\
     \ LineOptimization::Minimize>;\n\ntemplate <std::signed_integral T>\nusing MaxLiChaoTree\
-    \ = LiChaoTree<T, LineOptimization::Maximize>;\n\n}  // namespace ds\n}  // namespace\
-    \ m1une\n\n#endif  // M1UNE_DS_LINE_CONTAINER_LI_CHAO_TREE_HPP\n"
+    \ = LiChaoTree<T, LineOptimization::Maximize>;\n\n}  // namespace convex\n}  //\
+    \ namespace m1une\n\n#endif  // M1UNE_CONVEX_LI_CHAO_TREE_HPP\n"
   dependsOn:
-  - ds/line_container/convex_hull_trick.hpp
+  - convex/convex_hull_trick.hpp
   isVerificationFile: false
-  path: ds/line_container/li_chao_tree.hpp
+  path: convex/li_chao_tree.hpp
   requiredBy:
-  - ds/line_container/all.hpp
-  timestamp: '2026-07-07 14:26:59+09:00'
+  - convex/all.hpp
+  timestamp: '2026-07-07 18:38:36+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/line_container/li_chao_tree.test.cpp
-documentation_of: ds/line_container/li_chao_tree.hpp
+  - verify/convex/li_chao_tree.test.cpp
+documentation_of: convex/li_chao_tree.hpp
 layout: document
 title: Li Chao Tree
 ---
@@ -245,7 +245,7 @@ The aliases `MinLiChaoTree<T>` and `MaxLiChaoTree<T>` select minimum and maximum
 queries. `T` must be a signed integral type.
 
 Evaluation uses the widened type described by `LinearFunction<T>` in
-`convex_hull_trick.hpp`.
+`convex/convex_hull_trick.hpp`.
 
 ## Methods
 
@@ -265,12 +265,12 @@ Let $U$ be the number of integer coordinates in the domain.
 ## Example
 
 ```cpp
-#include "ds/line_container/li_chao_tree.hpp"
+#include "convex/li_chao_tree.hpp"
 
 #include <iostream>
 
 int main() {
-    m1une::ds::MinLiChaoTree<long long> tree(-1000, 1001);
+    m1une::convex::MinLiChaoTree<long long> tree(-1000, 1001);
     tree.add_line(2, 3);
     tree.add_line(-1, 8);
     tree.add_segment(-10, 11, 0, -5);

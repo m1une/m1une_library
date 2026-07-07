@@ -89,40 +89,6 @@ data:
     - icon: ':warning:'
       path: algo/all.hpp
       title: Algorithms All
-  - name: algo/dp_optimization
-    pages:
-    - icon: ':heavy_check_mark:'
-      path: algo/dp_optimization/alien_trick.hpp
-      title: Alien Trick
-    - icon: ':warning:'
-      path: algo/dp_optimization/all.hpp
-      title: DP Optimization All
-  - name: algo/dp_optimization/monge
-    pages:
-    - icon: ':heavy_check_mark:'
-      path: algo/dp_optimization/monge/all.hpp
-      title: Monge All
-    - icon: ':heavy_check_mark:'
-      path: algo/dp_optimization/monge/check.hpp
-      title: Monge Checks
-    - icon: ':heavy_check_mark:'
-      path: algo/dp_optimization/monge/divide_and_conquer_optimization.hpp
-      title: Divide-and-Conquer DP Optimization
-    - icon: ':heavy_check_mark:'
-      path: algo/dp_optimization/monge/knuth_optimization.hpp
-      title: Knuth Optimization
-    - icon: ':heavy_check_mark:'
-      path: algo/dp_optimization/monge/larsch.hpp
-      title: LARSCH
-    - icon: ':heavy_check_mark:'
-      path: algo/dp_optimization/monge/min_plus_convolution.hpp
-      title: Structured Min-Plus and Max-Plus Convolution
-    - icon: ':heavy_check_mark:'
-      path: algo/dp_optimization/monge/monotone_minima.hpp
-      title: Monotone Minima
-    - icon: ':heavy_check_mark:'
-      path: algo/dp_optimization/monge/smawk.hpp
-      title: SMAWK
   - name: algo/sequence
     pages:
     - icon: ':warning:'
@@ -148,14 +114,49 @@ data:
     - icon: ':warning:'
       path: template.cpp
       title: template.cpp
-  - name: ds/convex_function
+  - name: convex
     pages:
-    - icon: ':warning:'
-      path: ds/convex_function/all.hpp
-      title: Convex Function All
     - icon: ':heavy_check_mark:'
-      path: ds/convex_function/slope_trick.hpp
+      path: convex/alien_trick.hpp
+      title: Alien Trick
+    - icon: ':warning:'
+      path: convex/all.hpp
+      title: Convex All
+    - icon: ':heavy_check_mark:'
+      path: convex/convex_hull_trick.hpp
+      title: Convex Hull Trick
+    - icon: ':heavy_check_mark:'
+      path: convex/li_chao_tree.hpp
+      title: Li Chao Tree
+    - icon: ':heavy_check_mark:'
+      path: convex/slope_trick.hpp
       title: Slope Trick
+  - name: convex/monge
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: convex/monge/all.hpp
+      title: Monge All
+    - icon: ':heavy_check_mark:'
+      path: convex/monge/check.hpp
+      title: Monge Checks
+    - icon: ':heavy_check_mark:'
+      path: convex/monge/divide_and_conquer_optimization.hpp
+      title: Divide-and-Conquer DP Optimization
+    - icon: ':heavy_check_mark:'
+      path: convex/monge/knuth_optimization.hpp
+      title: Knuth Optimization
+    - icon: ':heavy_check_mark:'
+      path: convex/monge/larsch.hpp
+      title: LARSCH
+    - icon: ':heavy_check_mark:'
+      path: convex/monge/min_plus_convolution.hpp
+      title: Structured Min-Plus and Max-Plus Convolution
+    - icon: ':heavy_check_mark:'
+      path: convex/monge/monotone_minima.hpp
+      title: Monotone Minima
+    - icon: ':heavy_check_mark:'
+      path: convex/monge/smawk.hpp
+      title: SMAWK
   - name: ds/dsu
     pages:
     - icon: ':question:'
@@ -245,17 +246,6 @@ data:
     - icon: ':heavy_check_mark:'
       path: ds/interval_set/interval_set.hpp
       title: Interval Set
-  - name: ds/line_container
-    pages:
-    - icon: ':warning:'
-      path: ds/line_container/all.hpp
-      title: Line Container All
-    - icon: ':heavy_check_mark:'
-      path: ds/line_container/convex_hull_trick.hpp
-      title: Convex Hull Trick
-    - icon: ':heavy_check_mark:'
-      path: ds/line_container/li_chao_tree.hpp
-      title: Li Chao Tree
   - name: ds/ordered_set
     pages:
     - icon: ':heavy_check_mark:'
@@ -899,31 +889,6 @@ data:
       path: utilities/y_combinator.hpp
       title: Y Combinator
   verificationCategories:
-  - name: verify/algo/dp_optimization
-    pages:
-    - icon: ':heavy_check_mark:'
-      path: verify/algo/dp_optimization/alien_trick.test.cpp
-      title: verify/algo/dp_optimization/alien_trick.test.cpp
-  - name: verify/algo/dp_optimization/monge
-    pages:
-    - icon: ':heavy_check_mark:'
-      path: verify/algo/dp_optimization/monge/max_plus_convolution_concave_arbitrary.test.cpp
-      title: verify/algo/dp_optimization/monge/max_plus_convolution_concave_arbitrary.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/algo/dp_optimization/monge/max_plus_convolution_concave_concave.test.cpp
-      title: verify/algo/dp_optimization/monge/max_plus_convolution_concave_concave.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/algo/dp_optimization/monge/min_plus_convolution_convex_arbitrary.test.cpp
-      title: verify/algo/dp_optimization/monge/min_plus_convolution_convex_arbitrary.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/algo/dp_optimization/monge/min_plus_convolution_convex_convex.test.cpp
-      title: verify/algo/dp_optimization/monge/min_plus_convolution_convex_convex.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/algo/dp_optimization/monge/monge_algorithms.test.cpp
-      title: verify/algo/dp_optimization/monge/monge_algorithms.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/algo/dp_optimization/monge/monge_dp_optimization.test.cpp
-      title: verify/algo/dp_optimization/monge/monge_dp_optimization.test.cpp
   - name: verify/algo/sequence
     pages:
     - icon: ':heavy_check_mark:'
@@ -932,11 +897,40 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/algo/sequence/subset_sum.test.cpp
       title: verify/algo/sequence/subset_sum.test.cpp
-  - name: verify/ds/convex_function
+  - name: verify/convex
     pages:
     - icon: ':heavy_check_mark:'
-      path: verify/ds/convex_function/slope_trick.test.cpp
-      title: verify/ds/convex_function/slope_trick.test.cpp
+      path: verify/convex/alien_trick.test.cpp
+      title: verify/convex/alien_trick.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/convex/convex_hull_trick.test.cpp
+      title: verify/convex/convex_hull_trick.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/convex/li_chao_tree.test.cpp
+      title: verify/convex/li_chao_tree.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/convex/slope_trick.test.cpp
+      title: verify/convex/slope_trick.test.cpp
+  - name: verify/convex/monge
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/convex/monge/max_plus_convolution_concave_arbitrary.test.cpp
+      title: verify/convex/monge/max_plus_convolution_concave_arbitrary.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/convex/monge/max_plus_convolution_concave_concave.test.cpp
+      title: verify/convex/monge/max_plus_convolution_concave_concave.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/convex/monge/min_plus_convolution_convex_arbitrary.test.cpp
+      title: verify/convex/monge/min_plus_convolution_convex_arbitrary.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/convex/monge/min_plus_convolution_convex_convex.test.cpp
+      title: verify/convex/monge/min_plus_convolution_convex_convex.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/convex/monge/monge_algorithms.test.cpp
+      title: verify/convex/monge/monge_algorithms.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/convex/monge/monge_dp_optimization.test.cpp
+      title: verify/convex/monge/monge_dp_optimization.test.cpp
   - name: verify/ds/dsu
     pages:
     - icon: ':heavy_check_mark:'
@@ -1032,14 +1026,6 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/ds/interval_set/interval_set.test.cpp
       title: verify/ds/interval_set/interval_set.test.cpp
-  - name: verify/ds/line_container
-    pages:
-    - icon: ':heavy_check_mark:'
-      path: verify/ds/line_container/convex_hull_trick.test.cpp
-      title: verify/ds/line_container/convex_hull_trick.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/ds/line_container/li_chao_tree.test.cpp
-      title: verify/ds/line_container/li_chao_tree.test.cpp
   - name: verify/ds/ordered_set
     pages:
     - icon: ':heavy_check_mark:'

@@ -2,10 +2,10 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: algo/dp_optimization/monge/min_plus_convolution.hpp
+    path: convex/monge/min_plus_convolution.hpp
     title: Structured Min-Plus and Max-Plus Convolution
   - icon: ':heavy_check_mark:'
-    path: algo/dp_optimization/monge/smawk.hpp
+    path: convex/monge/smawk.hpp
     title: SMAWK
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
@@ -17,22 +17,22 @@ data:
     PROBLEM: https://judge.yosupo.jp/problem/min_plus_convolution_convex_arbitrary
     links:
     - https://judge.yosupo.jp/problem/min_plus_convolution_convex_arbitrary
-  bundledCode: "#line 1 \"verify/algo/dp_optimization/monge/min_plus_convolution_convex_arbitrary.test.cpp\"\
+  bundledCode: "#line 1 \"verify/convex/monge/max_plus_convolution_concave_arbitrary.test.cpp\"\
     \n#define PROBLEM \"https://judge.yosupo.jp/problem/min_plus_convolution_convex_arbitrary\"\
-    \n\n#include <iostream>\n#include <vector>\n\n#line 1 \"algo/dp_optimization/monge/min_plus_convolution.hpp\"\
-    \n\n\n\n#include <functional>\n#include <utility>\n#line 7 \"algo/dp_optimization/monge/min_plus_convolution.hpp\"\
-    \n\n#line 1 \"algo/dp_optimization/monge/smawk.hpp\"\n\n\n\n#include <cassert>\n\
-    #line 6 \"algo/dp_optimization/monge/smawk.hpp\"\n#include <numeric>\n#line 8\
-    \ \"algo/dp_optimization/monge/smawk.hpp\"\n\nnamespace m1une {\nnamespace monge\
-    \ {\n\nnamespace smawk_detail {\n\ntemplate <class Select>\nvoid solve(const std::vector<int>&\
-    \ rows, const std::vector<int>& columns,\n           const Select& select, std::vector<int>&\
-    \ answer) {\n    if (rows.empty()) return;\n\n    std::vector<int> reduced;\n\
-    \    reduced.reserve(columns.size());\n    for (int column : columns) {\n    \
-    \    while (!reduced.empty()) {\n            int row = rows[int(reduced.size())\
-    \ - 1];\n            if (!select(row, reduced.back(), column)) break;\n      \
-    \      reduced.pop_back();\n        }\n        if (reduced.size() < rows.size())\
-    \ reduced.push_back(column);\n    }\n\n    std::vector<int> odd_rows;\n    odd_rows.reserve(rows.size()\
-    \ / 2);\n    for (int i = 1; i < int(rows.size()); i += 2) odd_rows.push_back(rows[i]);\n\
+    \n\n#include <iostream>\n#include <vector>\n\n#line 1 \"convex/monge/min_plus_convolution.hpp\"\
+    \n\n\n\n#include <functional>\n#include <utility>\n#line 7 \"convex/monge/min_plus_convolution.hpp\"\
+    \n\n#line 1 \"convex/monge/smawk.hpp\"\n\n\n\n#include <cassert>\n#line 6 \"convex/monge/smawk.hpp\"\
+    \n#include <numeric>\n#line 8 \"convex/monge/smawk.hpp\"\n\nnamespace m1une {\n\
+    namespace convex {\n\nnamespace smawk_detail {\n\ntemplate <class Select>\nvoid\
+    \ solve(const std::vector<int>& rows, const std::vector<int>& columns,\n     \
+    \      const Select& select, std::vector<int>& answer) {\n    if (rows.empty())\
+    \ return;\n\n    std::vector<int> reduced;\n    reduced.reserve(columns.size());\n\
+    \    for (int column : columns) {\n        while (!reduced.empty()) {\n      \
+    \      int row = rows[int(reduced.size()) - 1];\n            if (!select(row,\
+    \ reduced.back(), column)) break;\n            reduced.pop_back();\n        }\n\
+    \        if (reduced.size() < rows.size()) reduced.push_back(column);\n    }\n\
+    \n    std::vector<int> odd_rows;\n    odd_rows.reserve(rows.size() / 2);\n   \
+    \ for (int i = 1; i < int(rows.size()); i += 2) odd_rows.push_back(rows[i]);\n\
     \    solve(odd_rows, reduced, select, answer);\n\n    int left = 0;\n    int right\
     \ = 0;\n    for (int i = 0; i < int(rows.size()); i += 2) {\n        if (i + 1\
     \ < int(rows.size())) {\n            while (reduced[right] != answer[rows[i +\
@@ -67,8 +67,8 @@ data:
     \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
     \ == column_count);\n    return smawk_row_argmax(\n        row_count, column_count,\n\
     \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
-    }\n\n}  // namespace monge\n}  // namespace m1une\n\n\n#line 9 \"algo/dp_optimization/monge/min_plus_convolution.hpp\"\
-    \n\nnamespace m1une {\nnamespace monge {\n\nnamespace convolution_detail {\n\n\
+    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n#line 9 \"convex/monge/min_plus_convolution.hpp\"\
+    \n\nnamespace m1une {\nnamespace convex {\n\nnamespace convolution_detail {\n\n\
     template <class T, class Compare, class Add>\nstd::vector<T> structured_convolution(const\
     \ std::vector<T>& arbitrary,\n                                      const std::vector<T>&\
     \ structured,\n                                      Compare compare, Add add)\
@@ -212,38 +212,42 @@ data:
     \    const std::vector<T>& first, const std::vector<T>& second,\n    const T&\
     \ negative_infinity) {\n    return convolution_detail::linear_structured_convolution_with_infinity(\n\
     \        first, second, negative_infinity, std::greater<>());\n}\n\n}  // namespace\
-    \ monge\n}  // namespace m1une\n\n\n#line 7 \"verify/algo/dp_optimization/monge/min_plus_convolution_convex_arbitrary.test.cpp\"\
+    \ convex\n}  // namespace m1une\n\n\n#line 7 \"verify/convex/monge/max_plus_convolution_concave_arbitrary.test.cpp\"\
     \n\nint main() {\n    std::ios::sync_with_stdio(false);\n    std::cin.tie(nullptr);\n\
-    \n    int n, m;\n    std::cin >> n >> m;\n    std::vector<long long> convex(n),\
-    \ arbitrary(m);\n    for (long long& value : convex) std::cin >> value;\n    for\
-    \ (long long& value : arbitrary) std::cin >> value;\n\n    constexpr long long\
-    \ infinity = 2'000'000'000'000'000'000LL;\n    std::vector<long long> result =\n\
-    \        m1une::monge::min_plus_convolution_convex(arbitrary, convex, infinity);\n\
-    \    for (int i = 0; i < int(result.size()); i++) {\n        if (i) std::cout\
-    \ << ' ';\n        std::cout << result[i];\n    }\n    std::cout << '\\n';\n}\n"
+    \n    int n, m;\n    std::cin >> n >> m;\n    std::vector<long long> concave(n),\
+    \ arbitrary(m);\n    for (long long& value : concave) {\n        std::cin >> value;\n\
+    \        value = -value;\n    }\n    for (long long& value : arbitrary) {\n  \
+    \      std::cin >> value;\n        value = -value;\n    }\n\n    constexpr long\
+    \ long negative_infinity = -2'000'000'000'000'000'000LL;\n    std::vector<long\
+    \ long> result = m1une::convex::max_plus_convolution_concave(\n        arbitrary,\
+    \ concave, negative_infinity);\n    for (int i = 0; i < int(result.size()); i++)\
+    \ {\n        if (i) std::cout << ' ';\n        std::cout << -result[i];\n    }\n\
+    \    std::cout << '\\n';\n}\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/min_plus_convolution_convex_arbitrary\"\
-    \n\n#include <iostream>\n#include <vector>\n\n#include \"../../../../algo/dp_optimization/monge/min_plus_convolution.hpp\"\
+    \n\n#include <iostream>\n#include <vector>\n\n#include \"../../../convex/monge/min_plus_convolution.hpp\"\
     \n\nint main() {\n    std::ios::sync_with_stdio(false);\n    std::cin.tie(nullptr);\n\
-    \n    int n, m;\n    std::cin >> n >> m;\n    std::vector<long long> convex(n),\
-    \ arbitrary(m);\n    for (long long& value : convex) std::cin >> value;\n    for\
-    \ (long long& value : arbitrary) std::cin >> value;\n\n    constexpr long long\
-    \ infinity = 2'000'000'000'000'000'000LL;\n    std::vector<long long> result =\n\
-    \        m1une::monge::min_plus_convolution_convex(arbitrary, convex, infinity);\n\
-    \    for (int i = 0; i < int(result.size()); i++) {\n        if (i) std::cout\
-    \ << ' ';\n        std::cout << result[i];\n    }\n    std::cout << '\\n';\n}\n"
+    \n    int n, m;\n    std::cin >> n >> m;\n    std::vector<long long> concave(n),\
+    \ arbitrary(m);\n    for (long long& value : concave) {\n        std::cin >> value;\n\
+    \        value = -value;\n    }\n    for (long long& value : arbitrary) {\n  \
+    \      std::cin >> value;\n        value = -value;\n    }\n\n    constexpr long\
+    \ long negative_infinity = -2'000'000'000'000'000'000LL;\n    std::vector<long\
+    \ long> result = m1une::convex::max_plus_convolution_concave(\n        arbitrary,\
+    \ concave, negative_infinity);\n    for (int i = 0; i < int(result.size()); i++)\
+    \ {\n        if (i) std::cout << ' ';\n        std::cout << -result[i];\n    }\n\
+    \    std::cout << '\\n';\n}\n"
   dependsOn:
-  - algo/dp_optimization/monge/min_plus_convolution.hpp
-  - algo/dp_optimization/monge/smawk.hpp
+  - convex/monge/min_plus_convolution.hpp
+  - convex/monge/smawk.hpp
   isVerificationFile: true
-  path: verify/algo/dp_optimization/monge/min_plus_convolution_convex_arbitrary.test.cpp
+  path: verify/convex/monge/max_plus_convolution_concave_arbitrary.test.cpp
   requiredBy: []
-  timestamp: '2026-07-07 14:26:59+09:00'
+  timestamp: '2026-07-07 18:38:36+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/algo/dp_optimization/monge/min_plus_convolution_convex_arbitrary.test.cpp
+documentation_of: verify/convex/monge/max_plus_convolution_concave_arbitrary.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/algo/dp_optimization/monge/min_plus_convolution_convex_arbitrary.test.cpp
-- /verify/verify/algo/dp_optimization/monge/min_plus_convolution_convex_arbitrary.test.cpp.html
-title: verify/algo/dp_optimization/monge/min_plus_convolution_convex_arbitrary.test.cpp
+- /verify/verify/convex/monge/max_plus_convolution_concave_arbitrary.test.cpp
+- /verify/verify/convex/monge/max_plus_convolution_concave_arbitrary.test.cpp.html
+title: verify/convex/monge/max_plus_convolution_concave_arbitrary.test.cpp
 ---

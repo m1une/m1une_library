@@ -3,53 +3,53 @@ data:
   _extendedDependsOn: []
   _extendedRequiredBy:
   - icon: ':warning:'
-    path: ds/line_container/all.hpp
-    title: Line Container All
+    path: convex/all.hpp
+    title: Convex All
   - icon: ':heavy_check_mark:'
-    path: ds/line_container/li_chao_tree.hpp
+    path: convex/li_chao_tree.hpp
     title: Li Chao Tree
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
-    path: verify/ds/line_container/convex_hull_trick.test.cpp
-    title: verify/ds/line_container/convex_hull_trick.test.cpp
+    path: verify/convex/convex_hull_trick.test.cpp
+    title: verify/convex/convex_hull_trick.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/ds/line_container/li_chao_tree.test.cpp
-    title: verify/ds/line_container/li_chao_tree.test.cpp
+    path: verify/convex/li_chao_tree.test.cpp
+    title: verify/convex/li_chao_tree.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"ds/line_container/convex_hull_trick.hpp\"\n\n\n\n#include\
-    \ <cassert>\n#include <concepts>\n#include <cstddef>\n#include <optional>\n#include\
-    \ <type_traits>\n#include <vector>\n\nnamespace m1une {\nnamespace ds {\n\nenum\
-    \ class LineOptimization {\n    Minimize,\n    Maximize,\n};\n\ntemplate <std::signed_integral\
-    \ T>\nusing line_wide_type = __int128_t;\n\ntemplate <std::signed_integral T>\n\
-    struct LinearFunction {\n    using value_type = line_wide_type<T>;\n\n    value_type\
-    \ slope;\n    value_type intercept;\n\n    constexpr LinearFunction() : slope(0),\
-    \ intercept(0) {}\n\n    constexpr LinearFunction(T slope_value, T intercept_value)\
-    \ : slope(slope_value), intercept(intercept_value) {}\n\n    constexpr value_type\
-    \ operator()(T x) const {\n        return slope * value_type(x) + intercept;\n\
-    \    }\n};\n\n// Convex hull trick for lines inserted in nondecreasing slope order.\n\
-    template <std::signed_integral T, LineOptimization Objective = LineOptimization::Minimize>\n\
-    struct ConvexHullTrick {\n    using Line = LinearFunction<T>;\n    using value_type\
-    \ = typename Line::value_type;\n\n   private:\n    std::vector<Line> _lines;\n\
-    \n    static bool better(value_type first, value_type second) {\n        if constexpr\
-    \ (Objective == LineOptimization::Minimize) {\n            return first < second;\n\
-    \        } else {\n            return second < first;\n        }\n    }\n\n  \
-    \  static bool redundant(const Line& first, const Line& middle, const Line& last)\
-    \ {\n        value_type left = (first.intercept - middle.intercept) * (last.slope\
-    \ - middle.slope);\n        value_type right = (middle.intercept - last.intercept)\
-    \ * (middle.slope - first.slope);\n        if constexpr (Objective == LineOptimization::Minimize)\
-    \ {\n            return left <= right;\n        } else {\n            return right\
-    \ <= left;\n        }\n    }\n\n   public:\n    ConvexHullTrick() = default;\n\
-    \n    int size() const {\n        return int(_lines.size());\n    }\n\n    bool\
-    \ empty() const {\n        return _lines.empty();\n    }\n\n    const std::vector<Line>&\
-    \ lines() const {\n        return _lines;\n    }\n\n    void reserve(std::size_t\
-    \ line_capacity) {\n        _lines.reserve(line_capacity);\n    }\n\n    void\
-    \ clear() {\n        _lines.clear();\n    }\n\n    // Slopes must be inserted\
-    \ in nondecreasing order.\n    void add_line(T slope, T intercept) {\n       \
-    \ Line line(slope, intercept);\n        if (!_lines.empty()) {\n            assert(_lines.back().slope\
+  bundledCode: "#line 1 \"convex/convex_hull_trick.hpp\"\n\n\n\n#include <cassert>\n\
+    #include <concepts>\n#include <cstddef>\n#include <optional>\n#include <type_traits>\n\
+    #include <vector>\n\nnamespace m1une {\nnamespace convex {\n\nenum class LineOptimization\
+    \ {\n    Minimize,\n    Maximize,\n};\n\ntemplate <std::signed_integral T>\nusing\
+    \ line_wide_type = __int128_t;\n\ntemplate <std::signed_integral T>\nstruct LinearFunction\
+    \ {\n    using value_type = line_wide_type<T>;\n\n    value_type slope;\n    value_type\
+    \ intercept;\n\n    constexpr LinearFunction() : slope(0), intercept(0) {}\n\n\
+    \    constexpr LinearFunction(T slope_value, T intercept_value) : slope(slope_value),\
+    \ intercept(intercept_value) {}\n\n    constexpr value_type operator()(T x) const\
+    \ {\n        return slope * value_type(x) + intercept;\n    }\n};\n\n// Convex\
+    \ hull trick for lines inserted in nondecreasing slope order.\ntemplate <std::signed_integral\
+    \ T, LineOptimization Objective = LineOptimization::Minimize>\nstruct ConvexHullTrick\
+    \ {\n    using Line = LinearFunction<T>;\n    using value_type = typename Line::value_type;\n\
+    \n   private:\n    std::vector<Line> _lines;\n\n    static bool better(value_type\
+    \ first, value_type second) {\n        if constexpr (Objective == LineOptimization::Minimize)\
+    \ {\n            return first < second;\n        } else {\n            return\
+    \ second < first;\n        }\n    }\n\n    static bool redundant(const Line& first,\
+    \ const Line& middle, const Line& last) {\n        value_type left = (first.intercept\
+    \ - middle.intercept) * (last.slope - middle.slope);\n        value_type right\
+    \ = (middle.intercept - last.intercept) * (middle.slope - first.slope);\n    \
+    \    if constexpr (Objective == LineOptimization::Minimize) {\n            return\
+    \ left <= right;\n        } else {\n            return right <= left;\n      \
+    \  }\n    }\n\n   public:\n    ConvexHullTrick() = default;\n\n    int size()\
+    \ const {\n        return int(_lines.size());\n    }\n\n    bool empty() const\
+    \ {\n        return _lines.empty();\n    }\n\n    const std::vector<Line>& lines()\
+    \ const {\n        return _lines;\n    }\n\n    void reserve(std::size_t line_capacity)\
+    \ {\n        _lines.reserve(line_capacity);\n    }\n\n    void clear() {\n   \
+    \     _lines.clear();\n    }\n\n    // Slopes must be inserted in nondecreasing\
+    \ order.\n    void add_line(T slope, T intercept) {\n        Line line(slope,\
+    \ intercept);\n        if (!_lines.empty()) {\n            assert(_lines.back().slope\
     \ <= line.slope);\n        }\n\n        if (!_lines.empty() && _lines.back().slope\
     \ == line.slope) {\n            if (!better(line.intercept, _lines.back().intercept))\
     \ return;\n            _lines.pop_back();\n        }\n\n        while (_lines.size()\
@@ -66,11 +66,11 @@ data:
     \   return *try_query(x);\n    }\n};\n\ntemplate <std::signed_integral T>\nusing\
     \ MinConvexHullTrick = ConvexHullTrick<T, LineOptimization::Minimize>;\n\ntemplate\
     \ <std::signed_integral T>\nusing MaxConvexHullTrick = ConvexHullTrick<T, LineOptimization::Maximize>;\n\
-    \n}  // namespace ds\n}  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_DS_LINE_CONTAINER_CONVEX_HULL_TRICK_HPP\n#define M1UNE_DS_LINE_CONTAINER_CONVEX_HULL_TRICK_HPP\
+    \n}  // namespace convex\n}  // namespace m1une\n\n\n"
+  code: "#ifndef M1UNE_CONVEX_CONVEX_HULL_TRICK_HPP\n#define M1UNE_CONVEX_CONVEX_HULL_TRICK_HPP\
     \ 1\n\n#include <cassert>\n#include <concepts>\n#include <cstddef>\n#include <optional>\n\
-    #include <type_traits>\n#include <vector>\n\nnamespace m1une {\nnamespace ds {\n\
-    \nenum class LineOptimization {\n    Minimize,\n    Maximize,\n};\n\ntemplate\
+    #include <type_traits>\n#include <vector>\n\nnamespace m1une {\nnamespace convex\
+    \ {\n\nenum class LineOptimization {\n    Minimize,\n    Maximize,\n};\n\ntemplate\
     \ <std::signed_integral T>\nusing line_wide_type = __int128_t;\n\ntemplate <std::signed_integral\
     \ T>\nstruct LinearFunction {\n    using value_type = line_wide_type<T>;\n\n \
     \   value_type slope;\n    value_type intercept;\n\n    constexpr LinearFunction()\
@@ -113,19 +113,19 @@ data:
     \   return *try_query(x);\n    }\n};\n\ntemplate <std::signed_integral T>\nusing\
     \ MinConvexHullTrick = ConvexHullTrick<T, LineOptimization::Minimize>;\n\ntemplate\
     \ <std::signed_integral T>\nusing MaxConvexHullTrick = ConvexHullTrick<T, LineOptimization::Maximize>;\n\
-    \n}  // namespace ds\n}  // namespace m1une\n\n#endif  // M1UNE_DS_LINE_CONTAINER_CONVEX_HULL_TRICK_HPP\n"
+    \n}  // namespace convex\n}  // namespace m1une\n\n#endif  // M1UNE_CONVEX_CONVEX_HULL_TRICK_HPP\n"
   dependsOn: []
   isVerificationFile: false
-  path: ds/line_container/convex_hull_trick.hpp
+  path: convex/convex_hull_trick.hpp
   requiredBy:
-  - ds/line_container/all.hpp
-  - ds/line_container/li_chao_tree.hpp
-  timestamp: '2026-07-07 14:26:59+09:00'
+  - convex/all.hpp
+  - convex/li_chao_tree.hpp
+  timestamp: '2026-07-07 18:38:36+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/line_container/li_chao_tree.test.cpp
-  - verify/ds/line_container/convex_hull_trick.test.cpp
-documentation_of: ds/line_container/convex_hull_trick.hpp
+  - verify/convex/li_chao_tree.test.cpp
+  - verify/convex/convex_hull_trick.test.cpp
+documentation_of: convex/convex_hull_trick.hpp
 layout: document
 title: Convex Hull Trick
 ---
@@ -181,12 +181,12 @@ For equal slopes, only the better intercept is retained.
 ## Example
 
 ```cpp
-#include "ds/line_container/convex_hull_trick.hpp"
+#include "convex/convex_hull_trick.hpp"
 
 #include <iostream>
 
 int main() {
-    m1une::ds::MinConvexHullTrick<long long> cht;
+    m1une::convex::MinConvexHullTrick<long long> cht;
     cht.add_line(-2, 5);
     cht.add_line(0, 1);
     cht.add_line(3, -4);

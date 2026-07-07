@@ -2,7 +2,7 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: ds/line_container/convex_hull_trick.hpp
+    path: convex/convex_hull_trick.hpp
     title: Convex Hull Trick
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
@@ -14,11 +14,11 @@ data:
     PROBLEM: https://judge.yosupo.jp/problem/aplusb
     links:
     - https://judge.yosupo.jp/problem/aplusb
-  bundledCode: "#line 1 \"verify/ds/line_container/convex_hull_trick.test.cpp\"\n\
-    #define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#line 1 \"ds/line_container/convex_hull_trick.hpp\"\
+  bundledCode: "#line 1 \"verify/convex/convex_hull_trick.test.cpp\"\n#define PROBLEM\
+    \ \"https://judge.yosupo.jp/problem/aplusb\"\n\n#line 1 \"convex/convex_hull_trick.hpp\"\
     \n\n\n\n#include <cassert>\n#include <concepts>\n#include <cstddef>\n#include\
     \ <optional>\n#include <type_traits>\n#include <vector>\n\nnamespace m1une {\n\
-    namespace ds {\n\nenum class LineOptimization {\n    Minimize,\n    Maximize,\n\
+    namespace convex {\n\nenum class LineOptimization {\n    Minimize,\n    Maximize,\n\
     };\n\ntemplate <std::signed_integral T>\nusing line_wide_type = __int128_t;\n\n\
     template <std::signed_integral T>\nstruct LinearFunction {\n    using value_type\
     \ = line_wide_type<T>;\n\n    value_type slope;\n    value_type intercept;\n\n\
@@ -62,28 +62,28 @@ data:
     \   return *try_query(x);\n    }\n};\n\ntemplate <std::signed_integral T>\nusing\
     \ MinConvexHullTrick = ConvexHullTrick<T, LineOptimization::Minimize>;\n\ntemplate\
     \ <std::signed_integral T>\nusing MaxConvexHullTrick = ConvexHullTrick<T, LineOptimization::Maximize>;\n\
-    \n}  // namespace ds\n}  // namespace m1une\n\n\n#line 4 \"verify/ds/line_container/convex_hull_trick.test.cpp\"\
-    \n\n#include <algorithm>\n#line 7 \"verify/ds/line_container/convex_hull_trick.test.cpp\"\
-    \n#include <cstdint>\n#include <iostream>\n#include <limits>\n#line 11 \"verify/ds/line_container/convex_hull_trick.test.cpp\"\
+    \n}  // namespace convex\n}  // namespace m1une\n\n\n#line 4 \"verify/convex/convex_hull_trick.test.cpp\"\
+    \n\n#include <algorithm>\n#line 7 \"verify/convex/convex_hull_trick.test.cpp\"\
+    \n#include <cstdint>\n#include <iostream>\n#include <limits>\n#line 11 \"verify/convex/convex_hull_trick.test.cpp\"\
     \n\nnamespace {\n\nstruct Line {\n    long long slope;\n    long long intercept;\n\
-    };\n\ntemplate <m1une::ds::LineOptimization Objective>\nvoid check(const std::vector<Line>&\
-    \ lines) {\n    m1une::ds::ConvexHullTrick<long long, Objective> cht;\n    for\
-    \ (const Line& line : lines) {\n        cht.add_line(line.slope, line.intercept);\n\
+    };\n\ntemplate <m1une::convex::LineOptimization Objective>\nvoid check(const std::vector<Line>&\
+    \ lines) {\n    m1une::convex::ConvexHullTrick<long long, Objective> cht;\n  \
+    \  for (const Line& line : lines) {\n        cht.add_line(line.slope, line.intercept);\n\
     \    }\n\n    for (long long x = -100; x <= 100; ++x) {\n        __int128_t expected;\n\
-    \        if constexpr (\n            Objective == m1une::ds::LineOptimization::Minimize\n\
+    \        if constexpr (\n            Objective == m1une::convex::LineOptimization::Minimize\n\
     \        ) {\n            expected = std::numeric_limits<__int128_t>::max();\n\
     \        } else {\n            expected = std::numeric_limits<__int128_t>::min();\n\
     \        }\n        for (const Line& line : lines) {\n            __int128_t value\
     \ =\n                __int128_t(line.slope) * x + line.intercept;\n          \
-    \  if constexpr (\n                Objective == m1une::ds::LineOptimization::Minimize\n\
+    \  if constexpr (\n                Objective == m1une::convex::LineOptimization::Minimize\n\
     \            ) {\n                expected = std::min(expected, value);\n    \
     \        } else {\n                expected = std::max(expected, value);\n   \
     \         }\n        }\n        assert(cht.query(x) == expected);\n    }\n}\n\n\
-    void test_fixed() {\n    m1une::ds::MinConvexHullTrick<long long> empty;\n   \
-    \ assert(!empty.try_query(0).has_value());\n\n    std::vector<Line> lines;\n \
-    \   lines.push_back(Line{-3, 4});\n    lines.push_back(Line{-1, 10});\n    lines.push_back(Line{-1,\
+    void test_fixed() {\n    m1une::convex::MinConvexHullTrick<long long> empty;\n\
+    \    assert(!empty.try_query(0).has_value());\n\n    std::vector<Line> lines;\n\
+    \    lines.push_back(Line{-3, 4});\n    lines.push_back(Line{-1, 10});\n    lines.push_back(Line{-1,\
     \ -5});\n    lines.push_back(Line{0, 2});\n    lines.push_back(Line{4, -7});\n\
-    \    check<m1une::ds::LineOptimization::Minimize>(lines);\n    check<m1une::ds::LineOptimization::Maximize>(lines);\n\
+    \    check<m1une::convex::LineOptimization::Minimize>(lines);\n    check<m1une::convex::LineOptimization::Maximize>(lines);\n\
     }\n\nvoid test_randomized() {\n    std::uint64_t state = 1009;\n    auto random\
     \ = [&state]() {\n        state ^= state << 7;\n        state ^= state >> 9;\n\
     \        return state;\n    };\n\n    for (int trial = 0; trial < 5000; ++trial)\
@@ -91,33 +91,33 @@ data:
     \        long long slope = -50;\n        for (int index = 0; index < count; ++index)\
     \ {\n            slope += int(random() % 4);\n            lines.push_back(Line{\n\
     \                slope,\n                static_cast<long long>(random() % 201)\
-    \ - 100,\n            });\n        }\n        check<m1une::ds::LineOptimization::Minimize>(lines);\n\
-    \        check<m1une::ds::LineOptimization::Maximize>(lines);\n    }\n}\n\n} \
-    \ // namespace\n\nint main() {\n    test_fixed();\n    test_randomized();\n\n\
+    \ - 100,\n            });\n        }\n        check<m1une::convex::LineOptimization::Minimize>(lines);\n\
+    \        check<m1une::convex::LineOptimization::Maximize>(lines);\n    }\n}\n\n\
+    }  // namespace\n\nint main() {\n    test_fixed();\n    test_randomized();\n\n\
     \    long long a, b;\n    std::cin >> a >> b;\n    std::cout << a + b << '\\n';\n\
     }\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
-    ../../../ds/line_container/convex_hull_trick.hpp\"\n\n#include <algorithm>\n#include\
-    \ <cassert>\n#include <cstdint>\n#include <iostream>\n#include <limits>\n#include\
-    \ <vector>\n\nnamespace {\n\nstruct Line {\n    long long slope;\n    long long\
-    \ intercept;\n};\n\ntemplate <m1une::ds::LineOptimization Objective>\nvoid check(const\
-    \ std::vector<Line>& lines) {\n    m1une::ds::ConvexHullTrick<long long, Objective>\
-    \ cht;\n    for (const Line& line : lines) {\n        cht.add_line(line.slope,\
-    \ line.intercept);\n    }\n\n    for (long long x = -100; x <= 100; ++x) {\n \
-    \       __int128_t expected;\n        if constexpr (\n            Objective ==\
-    \ m1une::ds::LineOptimization::Minimize\n        ) {\n            expected = std::numeric_limits<__int128_t>::max();\n\
+    ../../convex/convex_hull_trick.hpp\"\n\n#include <algorithm>\n#include <cassert>\n\
+    #include <cstdint>\n#include <iostream>\n#include <limits>\n#include <vector>\n\
+    \nnamespace {\n\nstruct Line {\n    long long slope;\n    long long intercept;\n\
+    };\n\ntemplate <m1une::convex::LineOptimization Objective>\nvoid check(const std::vector<Line>&\
+    \ lines) {\n    m1une::convex::ConvexHullTrick<long long, Objective> cht;\n  \
+    \  for (const Line& line : lines) {\n        cht.add_line(line.slope, line.intercept);\n\
+    \    }\n\n    for (long long x = -100; x <= 100; ++x) {\n        __int128_t expected;\n\
+    \        if constexpr (\n            Objective == m1une::convex::LineOptimization::Minimize\n\
+    \        ) {\n            expected = std::numeric_limits<__int128_t>::max();\n\
     \        } else {\n            expected = std::numeric_limits<__int128_t>::min();\n\
     \        }\n        for (const Line& line : lines) {\n            __int128_t value\
     \ =\n                __int128_t(line.slope) * x + line.intercept;\n          \
-    \  if constexpr (\n                Objective == m1une::ds::LineOptimization::Minimize\n\
+    \  if constexpr (\n                Objective == m1une::convex::LineOptimization::Minimize\n\
     \            ) {\n                expected = std::min(expected, value);\n    \
     \        } else {\n                expected = std::max(expected, value);\n   \
     \         }\n        }\n        assert(cht.query(x) == expected);\n    }\n}\n\n\
-    void test_fixed() {\n    m1une::ds::MinConvexHullTrick<long long> empty;\n   \
-    \ assert(!empty.try_query(0).has_value());\n\n    std::vector<Line> lines;\n \
-    \   lines.push_back(Line{-3, 4});\n    lines.push_back(Line{-1, 10});\n    lines.push_back(Line{-1,\
+    void test_fixed() {\n    m1une::convex::MinConvexHullTrick<long long> empty;\n\
+    \    assert(!empty.try_query(0).has_value());\n\n    std::vector<Line> lines;\n\
+    \    lines.push_back(Line{-3, 4});\n    lines.push_back(Line{-1, 10});\n    lines.push_back(Line{-1,\
     \ -5});\n    lines.push_back(Line{0, 2});\n    lines.push_back(Line{4, -7});\n\
-    \    check<m1une::ds::LineOptimization::Minimize>(lines);\n    check<m1une::ds::LineOptimization::Maximize>(lines);\n\
+    \    check<m1une::convex::LineOptimization::Minimize>(lines);\n    check<m1une::convex::LineOptimization::Maximize>(lines);\n\
     }\n\nvoid test_randomized() {\n    std::uint64_t state = 1009;\n    auto random\
     \ = [&state]() {\n        state ^= state << 7;\n        state ^= state >> 9;\n\
     \        return state;\n    };\n\n    for (int trial = 0; trial < 5000; ++trial)\
@@ -125,23 +125,23 @@ data:
     \        long long slope = -50;\n        for (int index = 0; index < count; ++index)\
     \ {\n            slope += int(random() % 4);\n            lines.push_back(Line{\n\
     \                slope,\n                static_cast<long long>(random() % 201)\
-    \ - 100,\n            });\n        }\n        check<m1une::ds::LineOptimization::Minimize>(lines);\n\
-    \        check<m1une::ds::LineOptimization::Maximize>(lines);\n    }\n}\n\n} \
-    \ // namespace\n\nint main() {\n    test_fixed();\n    test_randomized();\n\n\
+    \ - 100,\n            });\n        }\n        check<m1une::convex::LineOptimization::Minimize>(lines);\n\
+    \        check<m1une::convex::LineOptimization::Maximize>(lines);\n    }\n}\n\n\
+    }  // namespace\n\nint main() {\n    test_fixed();\n    test_randomized();\n\n\
     \    long long a, b;\n    std::cin >> a >> b;\n    std::cout << a + b << '\\n';\n\
     }\n"
   dependsOn:
-  - ds/line_container/convex_hull_trick.hpp
+  - convex/convex_hull_trick.hpp
   isVerificationFile: true
-  path: verify/ds/line_container/convex_hull_trick.test.cpp
+  path: verify/convex/convex_hull_trick.test.cpp
   requiredBy: []
-  timestamp: '2026-07-07 14:26:59+09:00'
+  timestamp: '2026-07-07 18:38:36+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/ds/line_container/convex_hull_trick.test.cpp
+documentation_of: verify/convex/convex_hull_trick.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/ds/line_container/convex_hull_trick.test.cpp
-- /verify/verify/ds/line_container/convex_hull_trick.test.cpp.html
-title: verify/ds/line_container/convex_hull_trick.test.cpp
+- /verify/verify/convex/convex_hull_trick.test.cpp
+- /verify/verify/convex/convex_hull_trick.test.cpp.html
+title: verify/convex/convex_hull_trick.test.cpp
 ---

@@ -3,29 +3,26 @@ data:
   _extendedDependsOn: []
   _extendedRequiredBy:
   - icon: ':warning:'
-    path: algo/all.hpp
-    title: Algorithms All
-  - icon: ':warning:'
-    path: algo/dp_optimization/all.hpp
-    title: DP Optimization All
+    path: convex/all.hpp
+    title: Convex All
   - icon: ':heavy_check_mark:'
-    path: algo/dp_optimization/monge/all.hpp
+    path: convex/monge/all.hpp
     title: Monge All
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
-    path: verify/algo/dp_optimization/monge/monge_algorithms.test.cpp
-    title: verify/algo/dp_optimization/monge/monge_algorithms.test.cpp
+    path: verify/convex/monge/monge_algorithms.test.cpp
+    title: verify/convex/monge/monge_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/algo/dp_optimization/monge/monge_dp_optimization.test.cpp
-    title: verify/algo/dp_optimization/monge/monge_dp_optimization.test.cpp
+    path: verify/convex/monge/monge_dp_optimization.test.cpp
+    title: verify/convex/monge/monge_dp_optimization.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"algo/dp_optimization/monge/knuth_optimization.hpp\"\n\n\n\
-    \n#include <algorithm>\n#include <cassert>\n#include <type_traits>\n#include <vector>\n\
-    \nnamespace m1une {\nnamespace monge {\n\ntemplate <class T>\nstruct KnuthOptimizationResult\
+  bundledCode: "#line 1 \"convex/monge/knuth_optimization.hpp\"\n\n\n\n#include <algorithm>\n\
+    #include <cassert>\n#include <type_traits>\n#include <vector>\n\nnamespace m1une\
+    \ {\nnamespace convex {\n\ntemplate <class T>\nstruct KnuthOptimizationResult\
     \ {\n    std::vector<std::vector<T>> value;\n    std::vector<std::vector<int>>\
     \ split;\n\n    T optimum() const {\n        return value[0].back();\n    }\n\
     };\n\ntemplate <class IntervalCost>\nauto knuth_optimization(int element_count,\
@@ -48,10 +45,10 @@ data:
     \                    best_value = candidate;\n                }\n            }\n\
     \            result.value[left][right] = best_value + interval_cost(left, right);\n\
     \            result.split[left][right] = best;\n        }\n    }\n    return result;\n\
-    }\n\n}  // namespace monge\n}  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_MONGE_KNUTH_OPTIMIZATION_HPP\n#define M1UNE_MONGE_KNUTH_OPTIMIZATION_HPP\
+    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n"
+  code: "#ifndef M1UNE_CONVEX_MONGE_KNUTH_OPTIMIZATION_HPP\n#define M1UNE_CONVEX_MONGE_KNUTH_OPTIMIZATION_HPP\
     \ 1\n\n#include <algorithm>\n#include <cassert>\n#include <type_traits>\n#include\
-    \ <vector>\n\nnamespace m1une {\nnamespace monge {\n\ntemplate <class T>\nstruct\
+    \ <vector>\n\nnamespace m1une {\nnamespace convex {\n\ntemplate <class T>\nstruct\
     \ KnuthOptimizationResult {\n    std::vector<std::vector<T>> value;\n    std::vector<std::vector<int>>\
     \ split;\n\n    T optimum() const {\n        return value[0].back();\n    }\n\
     };\n\ntemplate <class IntervalCost>\nauto knuth_optimization(int element_count,\
@@ -74,20 +71,19 @@ data:
     \                    best_value = candidate;\n                }\n            }\n\
     \            result.value[left][right] = best_value + interval_cost(left, right);\n\
     \            result.split[left][right] = best;\n        }\n    }\n    return result;\n\
-    }\n\n}  // namespace monge\n}  // namespace m1une\n\n#endif  // M1UNE_MONGE_KNUTH_OPTIMIZATION_HPP\n"
+    }\n\n}  // namespace convex\n}  // namespace m1une\n\n#endif  // M1UNE_CONVEX_MONGE_KNUTH_OPTIMIZATION_HPP\n"
   dependsOn: []
   isVerificationFile: false
-  path: algo/dp_optimization/monge/knuth_optimization.hpp
+  path: convex/monge/knuth_optimization.hpp
   requiredBy:
-  - algo/all.hpp
-  - algo/dp_optimization/monge/all.hpp
-  - algo/dp_optimization/all.hpp
-  timestamp: '2026-07-07 14:26:59+09:00'
+  - convex/monge/all.hpp
+  - convex/all.hpp
+  timestamp: '2026-07-07 18:38:36+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/algo/dp_optimization/monge/monge_algorithms.test.cpp
-  - verify/algo/dp_optimization/monge/monge_dp_optimization.test.cpp
-documentation_of: algo/dp_optimization/monge/knuth_optimization.hpp
+  - verify/convex/monge/monge_algorithms.test.cpp
+  - verify/convex/monge/monge_dp_optimization.test.cpp
+documentation_of: convex/monge/knuth_optimization.hpp
 layout: document
 title: Knuth Optimization
 ---
@@ -161,7 +157,7 @@ $O(N^2)$ time and $O(N^2)$ memory, improving the unrestricted cubic recurrence.
 ## Example
 
 ```cpp
-#include "algo/dp_optimization/monge/knuth_optimization.hpp"
+#include "convex/monge/knuth_optimization.hpp"
 #include <vector>
 
 int main() {
@@ -171,7 +167,7 @@ int main() {
         prefix[i + 1] = prefix[i] + weight[i];
     }
 
-    auto result = m1une::monge::knuth_optimization(
+    auto result = m1une::convex::knuth_optimization(
         int(weight.size()),
         [&](int left, int right) {
             return prefix[right] - prefix[left];

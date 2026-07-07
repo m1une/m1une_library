@@ -3,28 +3,25 @@ data:
   _extendedDependsOn: []
   _extendedRequiredBy:
   - icon: ':warning:'
-    path: algo/all.hpp
-    title: Algorithms All
-  - icon: ':warning:'
-    path: algo/dp_optimization/all.hpp
-    title: DP Optimization All
+    path: convex/all.hpp
+    title: Convex All
   - icon: ':heavy_check_mark:'
-    path: algo/dp_optimization/monge/all.hpp
+    path: convex/monge/all.hpp
     title: Monge All
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
-    path: verify/algo/dp_optimization/monge/monge_algorithms.test.cpp
-    title: verify/algo/dp_optimization/monge/monge_algorithms.test.cpp
+    path: verify/convex/monge/monge_algorithms.test.cpp
+    title: verify/convex/monge/monge_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/algo/dp_optimization/monge/monge_dp_optimization.test.cpp
-    title: verify/algo/dp_optimization/monge/monge_dp_optimization.test.cpp
+    path: verify/convex/monge/monge_dp_optimization.test.cpp
+    title: verify/convex/monge/monge_dp_optimization.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"algo/dp_optimization/monge/check.hpp\"\n\n\n\n#include <cassert>\n\
-    #include <vector>\n\nnamespace m1une {\nnamespace monge {\n\ntemplate <class Value>\n\
+  bundledCode: "#line 1 \"convex/monge/check.hpp\"\n\n\n\n#include <cassert>\n#include\
+    \ <vector>\n\nnamespace m1une {\nnamespace convex {\n\ntemplate <class Value>\n\
     bool is_monge(int row_count, int column_count, Value value) {\n    assert(row_count\
     \ >= 0);\n    assert(column_count >= 0);\n    for (int row = 0; row + 1 < row_count;\
     \ row++) {\n        for (int column = 0; column + 1 < column_count; column++)\
@@ -47,16 +44,16 @@ data:
     \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
     \ == column_count);\n    return is_anti_monge(\n        row_count, column_count,\n\
     \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
-    }\n\n}  // namespace monge\n}  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_MONGE_CHECK_HPP\n#define M1UNE_MONGE_CHECK_HPP 1\n\n#include\
-    \ <cassert>\n#include <vector>\n\nnamespace m1une {\nnamespace monge {\n\ntemplate\
-    \ <class Value>\nbool is_monge(int row_count, int column_count, Value value) {\n\
-    \    assert(row_count >= 0);\n    assert(column_count >= 0);\n    for (int row\
-    \ = 0; row + 1 < row_count; row++) {\n        for (int column = 0; column + 1\
-    \ < column_count; column++) {\n            if (value(row, column) + value(row\
-    \ + 1, column + 1) >\n                value(row, column + 1) + value(row + 1,\
-    \ column)) {\n                return false;\n            }\n        }\n    }\n\
-    \    return true;\n}\n\ntemplate <class Value>\nbool is_anti_monge(int row_count,\
+    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n"
+  code: "#ifndef M1UNE_CONVEX_MONGE_CHECK_HPP\n#define M1UNE_CONVEX_MONGE_CHECK_HPP\
+    \ 1\n\n#include <cassert>\n#include <vector>\n\nnamespace m1une {\nnamespace convex\
+    \ {\n\ntemplate <class Value>\nbool is_monge(int row_count, int column_count,\
+    \ Value value) {\n    assert(row_count >= 0);\n    assert(column_count >= 0);\n\
+    \    for (int row = 0; row + 1 < row_count; row++) {\n        for (int column\
+    \ = 0; column + 1 < column_count; column++) {\n            if (value(row, column)\
+    \ + value(row + 1, column + 1) >\n                value(row, column + 1) + value(row\
+    \ + 1, column)) {\n                return false;\n            }\n        }\n \
+    \   }\n    return true;\n}\n\ntemplate <class Value>\nbool is_anti_monge(int row_count,\
     \ int column_count, Value value) {\n    assert(row_count >= 0);\n    assert(column_count\
     \ >= 0);\n    for (int row = 0; row + 1 < row_count; row++) {\n        for (int\
     \ column = 0; column + 1 < column_count; column++) {\n            if (value(row,\
@@ -72,21 +69,20 @@ data:
     \    int column_count = row_count == 0 ? 0 : int(matrix[0].size());\n    for (const\
     \ auto& row : matrix) assert(int(row.size()) == column_count);\n    return is_anti_monge(\n\
     \        row_count, column_count,\n        [&](int row, int column) -> const T&\
-    \ { return matrix[row][column]; });\n}\n\n}  // namespace monge\n}  // namespace\
-    \ m1une\n\n#endif  // M1UNE_MONGE_CHECK_HPP\n"
+    \ { return matrix[row][column]; });\n}\n\n}  // namespace convex\n}  // namespace\
+    \ m1une\n\n#endif  // M1UNE_CONVEX_MONGE_CHECK_HPP\n"
   dependsOn: []
   isVerificationFile: false
-  path: algo/dp_optimization/monge/check.hpp
+  path: convex/monge/check.hpp
   requiredBy:
-  - algo/all.hpp
-  - algo/dp_optimization/monge/all.hpp
-  - algo/dp_optimization/all.hpp
-  timestamp: '2026-07-07 14:26:59+09:00'
+  - convex/monge/all.hpp
+  - convex/all.hpp
+  timestamp: '2026-07-07 18:38:36+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/algo/dp_optimization/monge/monge_algorithms.test.cpp
-  - verify/algo/dp_optimization/monge/monge_dp_optimization.test.cpp
-documentation_of: algo/dp_optimization/monge/check.hpp
+  - verify/convex/monge/monge_algorithms.test.cpp
+  - verify/convex/monge/monge_dp_optimization.test.cpp
+documentation_of: convex/monge/check.hpp
 layout: document
 title: Monge Checks
 ---

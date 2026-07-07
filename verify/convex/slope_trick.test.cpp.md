@@ -2,7 +2,7 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: ds/convex_function/slope_trick.hpp
+    path: convex/slope_trick.hpp
     title: Slope Trick
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
@@ -14,14 +14,13 @@ data:
     PROBLEM: https://judge.yosupo.jp/problem/aplusb
     links:
     - https://judge.yosupo.jp/problem/aplusb
-  bundledCode: "#line 1 \"verify/ds/convex_function/slope_trick.test.cpp\"\n#define\
-    \ PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <algorithm>\n\
-    #include <cassert>\n#include <iostream>\n#include <limits>\n#include <vector>\n\
-    \n#line 1 \"ds/convex_function/slope_trick.hpp\"\n\n\n\n#line 5 \"ds/convex_function/slope_trick.hpp\"\
-    \n#include <functional>\n#include <optional>\n#include <queue>\n#include <type_traits>\n\
-    #include <utility>\n#line 11 \"ds/convex_function/slope_trick.hpp\"\n\nnamespace\
-    \ m1une {\nnamespace ds {\n\ntemplate <class T>\nstruct SlopeTrickArgmin {\n \
-    \   std::optional<T> left;\n    std::optional<T> right;\n};\n\ntemplate <class\
+  bundledCode: "#line 1 \"verify/convex/slope_trick.test.cpp\"\n#define PROBLEM \"\
+    https://judge.yosupo.jp/problem/aplusb\"\n\n#include <algorithm>\n#include <cassert>\n\
+    #include <iostream>\n#include <limits>\n#include <vector>\n\n#line 1 \"convex/slope_trick.hpp\"\
+    \n\n\n\n#line 5 \"convex/slope_trick.hpp\"\n#include <functional>\n#include <optional>\n\
+    #include <queue>\n#include <type_traits>\n#include <utility>\n#line 11 \"convex/slope_trick.hpp\"\
+    \n\nnamespace m1une {\nnamespace convex {\n\ntemplate <class T>\nstruct SlopeTrickArgmin\
+    \ {\n    std::optional<T> left;\n    std::optional<T> right;\n};\n\ntemplate <class\
     \ T>\nclass SlopeTrick {\n    static_assert(std::is_arithmetic_v<T> && std::is_signed_v<T>);\n\
     \n    T _minimum = T();\n    T _left_offset = T();\n    T _right_offset = T();\n\
     \    std::priority_queue<T> _left;\n    std::priority_queue<T, std::vector<T>,\
@@ -70,26 +69,25 @@ data:
     \            other._right.pop();\n        }\n        *this = std::move(result);\n\
     \    }\n};\n\ntemplate <class T>\nSlopeTrick<T> min_plus_convolution(SlopeTrick<T>\
     \ first,\n                                   SlopeTrick<T> second) {\n    first.min_plus_convolve(std::move(second));\n\
-    \    return first;\n}\n\n}  // namespace ds\n}  // namespace m1une\n\n\n#line\
-    \ 10 \"verify/ds/convex_function/slope_trick.test.cpp\"\n\nusing SlopeTrick =\
-    \ m1une::ds::SlopeTrick<long long>;\n\nconstexpr int coordinate_limit = 300;\n\
-    constexpr long long inf = std::numeric_limits<long long>::max() / 4;\n\nint index_of(int\
-    \ x) {\n    return x + coordinate_limit;\n}\n\nvoid check_values(const SlopeTrick&\
-    \ slope, const std::vector<long long>& value) {\n    long long expected_minimum\
-    \ = *std::min_element(value.begin(), value.end());\n    assert(slope.minimum()\
-    \ == expected_minimum);\n    for (int x = -100; x <= 100; x++) {\n        assert(slope.evaluate(x)\
-    \ == value[index_of(x)]);\n    }\n\n    auto range = slope.argmin();\n    int\
-    \ first = -coordinate_limit;\n    while (first <= coordinate_limit && value[index_of(first)]\
-    \ != expected_minimum) first++;\n    int last = coordinate_limit;\n    while (last\
-    \ >= -coordinate_limit && value[index_of(last)] != expected_minimum) last--;\n\
-    \    if (range.left.has_value()) assert(*range.left == first);\n    if (range.right.has_value())\
-    \ assert(*range.right == last);\n}\n\nvoid test_basic() {\n    SlopeTrick slope;\n\
-    \    assert(slope.minimum() == 0);\n    assert(!slope.argmin().left.has_value());\n\
-    \    assert(!slope.argmin().right.has_value());\n\n    slope.add_abs(3);\n   \
-    \ slope.add_x_minus_a(-2);\n    slope.add_a_minus_x(7);\n    slope.add_constant(5);\n\
-    \    assert(slope.minimum() == 14);\n    assert(slope.evaluate(3) == 14);\n  \
-    \  auto range = slope.argmin();\n    assert(range.left == std::optional<long long>(3));\n\
-    \    assert(range.right == std::optional<long long>(3));\n    assert(slope.breakpoint_count()\
+    \    return first;\n}\n\n}  // namespace convex\n}  // namespace m1une\n\n\n#line\
+    \ 10 \"verify/convex/slope_trick.test.cpp\"\n\nusing SlopeTrick = m1une::convex::SlopeTrick<long\
+    \ long>;\n\nconstexpr int coordinate_limit = 300;\nconstexpr long long inf = std::numeric_limits<long\
+    \ long>::max() / 4;\n\nint index_of(int x) {\n    return x + coordinate_limit;\n\
+    }\n\nvoid check_values(const SlopeTrick& slope, const std::vector<long long>&\
+    \ value) {\n    long long expected_minimum = *std::min_element(value.begin(),\
+    \ value.end());\n    assert(slope.minimum() == expected_minimum);\n    for (int\
+    \ x = -100; x <= 100; x++) {\n        assert(slope.evaluate(x) == value[index_of(x)]);\n\
+    \    }\n\n    auto range = slope.argmin();\n    int first = -coordinate_limit;\n\
+    \    while (first <= coordinate_limit && value[index_of(first)] != expected_minimum)\
+    \ first++;\n    int last = coordinate_limit;\n    while (last >= -coordinate_limit\
+    \ && value[index_of(last)] != expected_minimum) last--;\n    if (range.left.has_value())\
+    \ assert(*range.left == first);\n    if (range.right.has_value()) assert(*range.right\
+    \ == last);\n}\n\nvoid test_basic() {\n    SlopeTrick slope;\n    assert(slope.minimum()\
+    \ == 0);\n    assert(!slope.argmin().left.has_value());\n    assert(!slope.argmin().right.has_value());\n\
+    \n    slope.add_abs(3);\n    slope.add_x_minus_a(-2);\n    slope.add_a_minus_x(7);\n\
+    \    slope.add_constant(5);\n    assert(slope.minimum() == 14);\n    assert(slope.evaluate(3)\
+    \ == 14);\n    auto range = slope.argmin();\n    assert(range.left == std::optional<long\
+    \ long>(3));\n    assert(range.right == std::optional<long long>(3));\n    assert(slope.breakpoint_count()\
     \ == 4);\n\n    SlopeTrick right_hinge;\n    right_hinge.add_x_minus_a(5);\n \
     \   assert(!right_hinge.argmin().left.has_value());\n    assert(right_hinge.argmin().right\
     \ == std::optional<long long>(5));\n\n    SlopeTrick left_hinge;\n    left_hinge.add_a_minus_x(-4);\n\
@@ -166,7 +164,7 @@ data:
     \ % 5 == 0) first.suffix_minimum();\n        if (test % 6 == 0) second.prefix_minimum();\n\
     \        if (test % 7 == 0) second.suffix_minimum();\n\n        SlopeTrick assigned\
     \ = first;\n        assigned.min_plus_convolve(second);\n        SlopeTrick returned\
-    \ = m1une::ds::min_plus_convolution(first, second);\n\n        assert(assigned.minimum()\
+    \ = m1une::convex::min_plus_convolution(first, second);\n\n        assert(assigned.minimum()\
     \ == first.minimum() + second.minimum());\n        auto first_range = first.argmin();\n\
     \        auto second_range = second.argmin();\n        auto result_range = assigned.argmin();\n\
     \        if (first_range.left && second_range.left) {\n            assert(result_range.left);\n\
@@ -185,25 +183,24 @@ data:
     \    std::cin >> a >> b;\n    std::cout << a + b << '\\n';\n}\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <algorithm>\n\
     #include <cassert>\n#include <iostream>\n#include <limits>\n#include <vector>\n\
-    \n#include \"../../../ds/convex_function/slope_trick.hpp\"\n\nusing SlopeTrick\
-    \ = m1une::ds::SlopeTrick<long long>;\n\nconstexpr int coordinate_limit = 300;\n\
-    constexpr long long inf = std::numeric_limits<long long>::max() / 4;\n\nint index_of(int\
-    \ x) {\n    return x + coordinate_limit;\n}\n\nvoid check_values(const SlopeTrick&\
-    \ slope, const std::vector<long long>& value) {\n    long long expected_minimum\
-    \ = *std::min_element(value.begin(), value.end());\n    assert(slope.minimum()\
-    \ == expected_minimum);\n    for (int x = -100; x <= 100; x++) {\n        assert(slope.evaluate(x)\
-    \ == value[index_of(x)]);\n    }\n\n    auto range = slope.argmin();\n    int\
-    \ first = -coordinate_limit;\n    while (first <= coordinate_limit && value[index_of(first)]\
-    \ != expected_minimum) first++;\n    int last = coordinate_limit;\n    while (last\
-    \ >= -coordinate_limit && value[index_of(last)] != expected_minimum) last--;\n\
-    \    if (range.left.has_value()) assert(*range.left == first);\n    if (range.right.has_value())\
-    \ assert(*range.right == last);\n}\n\nvoid test_basic() {\n    SlopeTrick slope;\n\
-    \    assert(slope.minimum() == 0);\n    assert(!slope.argmin().left.has_value());\n\
-    \    assert(!slope.argmin().right.has_value());\n\n    slope.add_abs(3);\n   \
-    \ slope.add_x_minus_a(-2);\n    slope.add_a_minus_x(7);\n    slope.add_constant(5);\n\
-    \    assert(slope.minimum() == 14);\n    assert(slope.evaluate(3) == 14);\n  \
-    \  auto range = slope.argmin();\n    assert(range.left == std::optional<long long>(3));\n\
-    \    assert(range.right == std::optional<long long>(3));\n    assert(slope.breakpoint_count()\
+    \n#include \"../../convex/slope_trick.hpp\"\n\nusing SlopeTrick = m1une::convex::SlopeTrick<long\
+    \ long>;\n\nconstexpr int coordinate_limit = 300;\nconstexpr long long inf = std::numeric_limits<long\
+    \ long>::max() / 4;\n\nint index_of(int x) {\n    return x + coordinate_limit;\n\
+    }\n\nvoid check_values(const SlopeTrick& slope, const std::vector<long long>&\
+    \ value) {\n    long long expected_minimum = *std::min_element(value.begin(),\
+    \ value.end());\n    assert(slope.minimum() == expected_minimum);\n    for (int\
+    \ x = -100; x <= 100; x++) {\n        assert(slope.evaluate(x) == value[index_of(x)]);\n\
+    \    }\n\n    auto range = slope.argmin();\n    int first = -coordinate_limit;\n\
+    \    while (first <= coordinate_limit && value[index_of(first)] != expected_minimum)\
+    \ first++;\n    int last = coordinate_limit;\n    while (last >= -coordinate_limit\
+    \ && value[index_of(last)] != expected_minimum) last--;\n    if (range.left.has_value())\
+    \ assert(*range.left == first);\n    if (range.right.has_value()) assert(*range.right\
+    \ == last);\n}\n\nvoid test_basic() {\n    SlopeTrick slope;\n    assert(slope.minimum()\
+    \ == 0);\n    assert(!slope.argmin().left.has_value());\n    assert(!slope.argmin().right.has_value());\n\
+    \n    slope.add_abs(3);\n    slope.add_x_minus_a(-2);\n    slope.add_a_minus_x(7);\n\
+    \    slope.add_constant(5);\n    assert(slope.minimum() == 14);\n    assert(slope.evaluate(3)\
+    \ == 14);\n    auto range = slope.argmin();\n    assert(range.left == std::optional<long\
+    \ long>(3));\n    assert(range.right == std::optional<long long>(3));\n    assert(slope.breakpoint_count()\
     \ == 4);\n\n    SlopeTrick right_hinge;\n    right_hinge.add_x_minus_a(5);\n \
     \   assert(!right_hinge.argmin().left.has_value());\n    assert(right_hinge.argmin().right\
     \ == std::optional<long long>(5));\n\n    SlopeTrick left_hinge;\n    left_hinge.add_a_minus_x(-4);\n\
@@ -280,7 +277,7 @@ data:
     \ % 5 == 0) first.suffix_minimum();\n        if (test % 6 == 0) second.prefix_minimum();\n\
     \        if (test % 7 == 0) second.suffix_minimum();\n\n        SlopeTrick assigned\
     \ = first;\n        assigned.min_plus_convolve(second);\n        SlopeTrick returned\
-    \ = m1une::ds::min_plus_convolution(first, second);\n\n        assert(assigned.minimum()\
+    \ = m1une::convex::min_plus_convolution(first, second);\n\n        assert(assigned.minimum()\
     \ == first.minimum() + second.minimum());\n        auto first_range = first.argmin();\n\
     \        auto second_range = second.argmin();\n        auto result_range = assigned.argmin();\n\
     \        if (first_range.left && second_range.left) {\n            assert(result_range.left);\n\
@@ -298,17 +295,17 @@ data:
     \    test_merge();\n    test_min_plus_convolution();\n\n    long long a, b;\n\
     \    std::cin >> a >> b;\n    std::cout << a + b << '\\n';\n}\n"
   dependsOn:
-  - ds/convex_function/slope_trick.hpp
+  - convex/slope_trick.hpp
   isVerificationFile: true
-  path: verify/ds/convex_function/slope_trick.test.cpp
+  path: verify/convex/slope_trick.test.cpp
   requiredBy: []
-  timestamp: '2026-07-07 17:18:14+09:00'
+  timestamp: '2026-07-07 18:38:36+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/ds/convex_function/slope_trick.test.cpp
+documentation_of: verify/convex/slope_trick.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/ds/convex_function/slope_trick.test.cpp
-- /verify/verify/ds/convex_function/slope_trick.test.cpp.html
-title: verify/ds/convex_function/slope_trick.test.cpp
+- /verify/verify/convex/slope_trick.test.cpp
+- /verify/verify/convex/slope_trick.test.cpp.html
+title: verify/convex/slope_trick.test.cpp
 ---

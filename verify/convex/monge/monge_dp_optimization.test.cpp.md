@@ -2,48 +2,45 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: algo/dp_optimization/monge/check.hpp
+    path: convex/monge/all.hpp
+    title: Monge All
+  - icon: ':heavy_check_mark:'
+    path: convex/monge/check.hpp
     title: Monge Checks
   - icon: ':heavy_check_mark:'
-    path: algo/dp_optimization/monge/divide_and_conquer_optimization.hpp
+    path: convex/monge/divide_and_conquer_optimization.hpp
     title: Divide-and-Conquer DP Optimization
   - icon: ':heavy_check_mark:'
-    path: algo/dp_optimization/monge/knuth_optimization.hpp
+    path: convex/monge/knuth_optimization.hpp
     title: Knuth Optimization
   - icon: ':heavy_check_mark:'
-    path: algo/dp_optimization/monge/larsch.hpp
+    path: convex/monge/larsch.hpp
     title: LARSCH
   - icon: ':heavy_check_mark:'
-    path: algo/dp_optimization/monge/min_plus_convolution.hpp
+    path: convex/monge/min_plus_convolution.hpp
     title: Structured Min-Plus and Max-Plus Convolution
   - icon: ':heavy_check_mark:'
-    path: algo/dp_optimization/monge/monotone_minima.hpp
+    path: convex/monge/monotone_minima.hpp
     title: Monotone Minima
   - icon: ':heavy_check_mark:'
-    path: algo/dp_optimization/monge/smawk.hpp
+    path: convex/monge/smawk.hpp
     title: SMAWK
-  _extendedRequiredBy:
-  - icon: ':warning:'
-    path: algo/all.hpp
-    title: Algorithms All
-  - icon: ':warning:'
-    path: algo/dp_optimization/all.hpp
-    title: DP Optimization All
-  _extendedVerifiedWith:
-  - icon: ':heavy_check_mark:'
-    path: verify/algo/dp_optimization/monge/monge_algorithms.test.cpp
-    title: verify/algo/dp_optimization/monge/monge_algorithms.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/algo/dp_optimization/monge/monge_dp_optimization.test.cpp
-    title: verify/algo/dp_optimization/monge/monge_dp_optimization.test.cpp
+  _extendedRequiredBy: []
+  _extendedVerifiedWith: []
   _isVerificationFailed: false
-  _pathExtension: hpp
+  _pathExtension: cpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
-    links: []
-  bundledCode: "#line 1 \"algo/dp_optimization/monge/all.hpp\"\n\n\n\n#line 1 \"algo/dp_optimization/monge/check.hpp\"\
-    \n\n\n\n#include <cassert>\n#include <vector>\n\nnamespace m1une {\nnamespace\
-    \ monge {\n\ntemplate <class Value>\nbool is_monge(int row_count, int column_count,\
+    '*NOT_SPECIAL_COMMENTS*': ''
+    PROBLEM: https://judge.yosupo.jp/problem/aplusb
+    links:
+    - https://judge.yosupo.jp/problem/aplusb
+  bundledCode: "#line 1 \"verify/convex/monge/monge_dp_optimization.test.cpp\"\n#define\
+    \ PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <algorithm>\n\
+    #include <cassert>\n#include <iostream>\n#include <limits>\n#include <vector>\n\
+    \n#line 1 \"convex/monge/all.hpp\"\n\n\n\n#line 1 \"convex/monge/check.hpp\"\n\
+    \n\n\n#line 6 \"convex/monge/check.hpp\"\n\nnamespace m1une {\nnamespace convex\
+    \ {\n\ntemplate <class Value>\nbool is_monge(int row_count, int column_count,\
     \ Value value) {\n    assert(row_count >= 0);\n    assert(column_count >= 0);\n\
     \    for (int row = 0; row + 1 < row_count; row++) {\n        for (int column\
     \ = 0; column + 1 < column_count; column++) {\n            if (value(row, column)\
@@ -65,14 +62,13 @@ data:
     \    int column_count = row_count == 0 ? 0 : int(matrix[0].size());\n    for (const\
     \ auto& row : matrix) assert(int(row.size()) == column_count);\n    return is_anti_monge(\n\
     \        row_count, column_count,\n        [&](int row, int column) -> const T&\
-    \ { return matrix[row][column]; });\n}\n\n}  // namespace monge\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"algo/dp_optimization/monge/divide_and_conquer_optimization.hpp\"\
-    \n\n\n\n#include <type_traits>\n#include <utility>\n#line 7 \"algo/dp_optimization/monge/divide_and_conquer_optimization.hpp\"\
-    \n\n#line 1 \"algo/dp_optimization/monge/monotone_minima.hpp\"\n\n\n\n#line 5\
-    \ \"algo/dp_optimization/monge/monotone_minima.hpp\"\n#include <functional>\n\
-    #line 7 \"algo/dp_optimization/monge/monotone_minima.hpp\"\n\nnamespace m1une\
-    \ {\nnamespace monge {\n\nnamespace monotone_minima_detail {\n\ntemplate <class\
-    \ Value, class Compare>\nvoid solve(int row_left, int row_right, int column_left,\
+    \ { return matrix[row][column]; });\n}\n\n}  // namespace convex\n}  // namespace\
+    \ m1une\n\n\n#line 1 \"convex/monge/divide_and_conquer_optimization.hpp\"\n\n\n\
+    \n#include <type_traits>\n#include <utility>\n#line 7 \"convex/monge/divide_and_conquer_optimization.hpp\"\
+    \n\n#line 1 \"convex/monge/monotone_minima.hpp\"\n\n\n\n#line 5 \"convex/monge/monotone_minima.hpp\"\
+    \n#include <functional>\n#line 7 \"convex/monge/monotone_minima.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace convex {\n\nnamespace monotone_minima_detail {\n\ntemplate\
+    \ <class Value, class Compare>\nvoid solve(int row_left, int row_right, int column_left,\
     \ int column_right,\n           const Value& value, const Compare& compare, std::vector<int>&\
     \ answer) {\n    if (row_left == row_right) return;\n    int row = (row_left +\
     \ row_right) / 2;\n    int best = column_left;\n    for (int column = column_left\
@@ -101,8 +97,8 @@ data:
     \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
     \ == column_count);\n    return monotone_row_argmax(\n        row_count, column_count,\n\
     \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
-    }\n\n}  // namespace monge\n}  // namespace m1une\n\n\n#line 9 \"algo/dp_optimization/monge/divide_and_conquer_optimization.hpp\"\
-    \n\nnamespace m1une {\nnamespace monge {\n\ntemplate <class T>\nstruct DivideAndConquerDpResult\
+    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n#line 9 \"convex/monge/divide_and_conquer_optimization.hpp\"\
+    \n\nnamespace m1une {\nnamespace convex {\n\ntemplate <class T>\nstruct DivideAndConquerDpResult\
     \ {\n    std::vector<T> value;\n    std::vector<int> argmin;\n};\n\ntemplate <class\
     \ Value>\nauto divide_and_conquer_dp(int state_count, int candidate_count, Value\
     \ value)\n    -> DivideAndConquerDpResult<\n        std::decay_t<std::invoke_result_t<Value,\
@@ -118,14 +114,14 @@ data:
     \ Result = std::decay_t<decltype(std::declval<T>() + cost(0, 0))>;\n    return\
     \ divide_and_conquer_dp(\n        state_count, int(previous.size()),\n       \
     \ [&](int state, int candidate) -> Result {\n            return previous[candidate]\
-    \ + cost(candidate, state);\n        });\n}\n\n}  // namespace monge\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"algo/dp_optimization/monge/knuth_optimization.hpp\"\n\n\
-    \n\n#include <algorithm>\n#line 8 \"algo/dp_optimization/monge/knuth_optimization.hpp\"\
-    \n\nnamespace m1une {\nnamespace monge {\n\ntemplate <class T>\nstruct KnuthOptimizationResult\
-    \ {\n    std::vector<std::vector<T>> value;\n    std::vector<std::vector<int>>\
-    \ split;\n\n    T optimum() const {\n        return value[0].back();\n    }\n\
-    };\n\ntemplate <class IntervalCost>\nauto knuth_optimization(int element_count,\
-    \ IntervalCost interval_cost)\n    -> KnuthOptimizationResult<\n        std::decay_t<std::invoke_result_t<IntervalCost,\
+    \ + cost(candidate, state);\n        });\n}\n\n}  // namespace convex\n}  // namespace\
+    \ m1une\n\n\n#line 1 \"convex/monge/knuth_optimization.hpp\"\n\n\n\n#line 8 \"\
+    convex/monge/knuth_optimization.hpp\"\n\nnamespace m1une {\nnamespace convex {\n\
+    \ntemplate <class T>\nstruct KnuthOptimizationResult {\n    std::vector<std::vector<T>>\
+    \ value;\n    std::vector<std::vector<int>> split;\n\n    T optimum() const {\n\
+    \        return value[0].back();\n    }\n};\n\ntemplate <class IntervalCost>\n\
+    auto knuth_optimization(int element_count, IntervalCost interval_cost)\n    ->\
+    \ KnuthOptimizationResult<\n        std::decay_t<std::invoke_result_t<IntervalCost,\
     \ int, int>>> {\n    assert(element_count >= 0);\n    using T = std::decay_t<std::invoke_result_t<IntervalCost,\
     \ int, int>>;\n\n    KnuthOptimizationResult<T> result;\n    result.value.assign(element_count\
     \ + 1, std::vector<T>(element_count + 1, T()));\n    result.split.assign(element_count\
@@ -144,36 +140,35 @@ data:
     \                    best_value = candidate;\n                }\n            }\n\
     \            result.value[left][right] = best_value + interval_cost(left, right);\n\
     \            result.split[left][right] = best;\n        }\n    }\n    return result;\n\
-    }\n\n}  // namespace monge\n}  // namespace m1une\n\n\n#line 1 \"algo/dp_optimization/monge/larsch.hpp\"\
-    \n\n\n\n#line 6 \"algo/dp_optimization/monge/larsch.hpp\"\n#include <memory>\n\
-    #line 10 \"algo/dp_optimization/monge/larsch.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ monge {\n\ntemplate <class T>\nclass Larsch {\n    struct ReduceColumn;\n\n\
-    \    struct ReduceRow {\n        int size;\n        std::function<T(int, int)>\
-    \ value;\n        int current_row = 0;\n        int boundary = 0;\n        std::unique_ptr<ReduceColumn>\
-    \ recursive;\n\n        explicit ReduceRow(int size_) : size(size_) {\n      \
-    \      if (size / 2 != 0) recursive = std::make_unique<ReduceColumn>(size / 2);\n\
-    \        }\n\n        void set_value(std::function<T(int, int)> value_) {\n  \
-    \          value = std::move(value_);\n            if (recursive) {\n        \
-    \        recursive->set_value(\n                    [&](int row, int column) {\
-    \ return value(row * 2 + 1, column); });\n            }\n        }\n\n       \
-    \ int next_argmin() {\n            int row = current_row++;\n            if (row\
-    \ % 2 == 0) {\n                int previous = boundary;\n                int next\
-    \ = row + 1 == size ? size - 1 : recursive->next_argmin();\n                boundary\
-    \ = next;\n                int best = previous;\n                for (int column\
-    \ = previous + 1; column <= next; column++) {\n                    if (value(row,\
-    \ column) < value(row, best)) best = column;\n                }\n            \
-    \    return best;\n            }\n            return value(row, boundary) <= value(row,\
-    \ row) ? boundary : row;\n        }\n    };\n\n    struct ReduceColumn {\n   \
-    \     int size;\n        std::function<T(int, int)> value;\n        int current_row\
-    \ = 0;\n        std::vector<int> columns;\n        ReduceRow recursive;\n\n  \
-    \      explicit ReduceColumn(int size_) : size(size_), recursive(size_) {}\n\n\
+    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n#line 1 \"convex/monge/larsch.hpp\"\
+    \n\n\n\n#line 6 \"convex/monge/larsch.hpp\"\n#include <memory>\n#line 10 \"convex/monge/larsch.hpp\"\
+    \n\nnamespace m1une {\nnamespace convex {\n\ntemplate <class T>\nclass Larsch\
+    \ {\n    struct ReduceColumn;\n\n    struct ReduceRow {\n        int size;\n \
+    \       std::function<T(int, int)> value;\n        int current_row = 0;\n    \
+    \    int boundary = 0;\n        std::unique_ptr<ReduceColumn> recursive;\n\n \
+    \       explicit ReduceRow(int size_) : size(size_) {\n            if (size /\
+    \ 2 != 0) recursive = std::make_unique<ReduceColumn>(size / 2);\n        }\n\n\
     \        void set_value(std::function<T(int, int)> value_) {\n            value\
-    \ = std::move(value_);\n            recursive.set_value(\n                [&](int\
-    \ row, int column) { return value(row, columns[column]); });\n        }\n\n  \
-    \      int next_argmin() {\n            int row = current_row++;\n           \
-    \ int first = row == 0 ? 0 : row * 2 - 1;\n            int last = row * 2;\n \
-    \           for (int column = first; column <= last; column++) {\n           \
-    \     while (int(columns.size()) != row &&\n                       value(int(columns.size())\
+    \ = std::move(value_);\n            if (recursive) {\n                recursive->set_value(\n\
+    \                    [&](int row, int column) { return value(row * 2 + 1, column);\
+    \ });\n            }\n        }\n\n        int next_argmin() {\n            int\
+    \ row = current_row++;\n            if (row % 2 == 0) {\n                int previous\
+    \ = boundary;\n                int next = row + 1 == size ? size - 1 : recursive->next_argmin();\n\
+    \                boundary = next;\n                int best = previous;\n    \
+    \            for (int column = previous + 1; column <= next; column++) {\n   \
+    \                 if (value(row, column) < value(row, best)) best = column;\n\
+    \                }\n                return best;\n            }\n            return\
+    \ value(row, boundary) <= value(row, row) ? boundary : row;\n        }\n    };\n\
+    \n    struct ReduceColumn {\n        int size;\n        std::function<T(int, int)>\
+    \ value;\n        int current_row = 0;\n        std::vector<int> columns;\n  \
+    \      ReduceRow recursive;\n\n        explicit ReduceColumn(int size_) : size(size_),\
+    \ recursive(size_) {}\n\n        void set_value(std::function<T(int, int)> value_)\
+    \ {\n            value = std::move(value_);\n            recursive.set_value(\n\
+    \                [&](int row, int column) { return value(row, columns[column]);\
+    \ });\n        }\n\n        int next_argmin() {\n            int row = current_row++;\n\
+    \            int first = row == 0 ? 0 : row * 2 - 1;\n            int last = row\
+    \ * 2;\n            for (int column = first; column <= last; column++) {\n   \
+    \             while (int(columns.size()) != row &&\n                       value(int(columns.size())\
     \ - 1, columns.back()) >\n                           value(int(columns.size())\
     \ - 1, column)) {\n                    columns.pop_back();\n                }\n\
     \                if (int(columns.size()) != size) columns.push_back(column);\n\
@@ -198,15 +193,14 @@ data:
     \ row + 1);\n    });\n    for (int vertex = 1; vertex < vertex_count; vertex++)\
     \ {\n        int parent = optimizer.next_argmin();\n        result.parent[vertex]\
     \ = parent;\n        result.distance[vertex] = result.distance[parent] + cost(parent,\
-    \ vertex);\n    }\n    return result;\n}\n\n}  // namespace monge\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"algo/dp_optimization/monge/min_plus_convolution.hpp\"\n\
-    \n\n\n#line 7 \"algo/dp_optimization/monge/min_plus_convolution.hpp\"\n\n#line\
-    \ 1 \"algo/dp_optimization/monge/smawk.hpp\"\n\n\n\n#line 6 \"algo/dp_optimization/monge/smawk.hpp\"\
-    \n#include <numeric>\n#line 8 \"algo/dp_optimization/monge/smawk.hpp\"\n\nnamespace\
-    \ m1une {\nnamespace monge {\n\nnamespace smawk_detail {\n\ntemplate <class Select>\n\
-    void solve(const std::vector<int>& rows, const std::vector<int>& columns,\n  \
-    \         const Select& select, std::vector<int>& answer) {\n    if (rows.empty())\
-    \ return;\n\n    std::vector<int> reduced;\n    reduced.reserve(columns.size());\n\
+    \ vertex);\n    }\n    return result;\n}\n\n}  // namespace convex\n}  // namespace\
+    \ m1une\n\n\n#line 1 \"convex/monge/min_plus_convolution.hpp\"\n\n\n\n#line 7\
+    \ \"convex/monge/min_plus_convolution.hpp\"\n\n#line 1 \"convex/monge/smawk.hpp\"\
+    \n\n\n\n#line 6 \"convex/monge/smawk.hpp\"\n#include <numeric>\n#line 8 \"convex/monge/smawk.hpp\"\
+    \n\nnamespace m1une {\nnamespace convex {\n\nnamespace smawk_detail {\n\ntemplate\
+    \ <class Select>\nvoid solve(const std::vector<int>& rows, const std::vector<int>&\
+    \ columns,\n           const Select& select, std::vector<int>& answer) {\n   \
+    \ if (rows.empty()) return;\n\n    std::vector<int> reduced;\n    reduced.reserve(columns.size());\n\
     \    for (int column : columns) {\n        while (!reduced.empty()) {\n      \
     \      int row = rows[int(reduced.size()) - 1];\n            if (!select(row,\
     \ reduced.back(), column)) break;\n            reduced.pop_back();\n        }\n\
@@ -247,8 +241,8 @@ data:
     \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
     \ == column_count);\n    return smawk_row_argmax(\n        row_count, column_count,\n\
     \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
-    }\n\n}  // namespace monge\n}  // namespace m1une\n\n\n#line 9 \"algo/dp_optimization/monge/min_plus_convolution.hpp\"\
-    \n\nnamespace m1une {\nnamespace monge {\n\nnamespace convolution_detail {\n\n\
+    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n#line 9 \"convex/monge/min_plus_convolution.hpp\"\
+    \n\nnamespace m1une {\nnamespace convex {\n\nnamespace convolution_detail {\n\n\
     template <class T, class Compare, class Add>\nstd::vector<T> structured_convolution(const\
     \ std::vector<T>& arbitrary,\n                                      const std::vector<T>&\
     \ structured,\n                                      Compare compare, Add add)\
@@ -392,66 +386,202 @@ data:
     \    const std::vector<T>& first, const std::vector<T>& second,\n    const T&\
     \ negative_infinity) {\n    return convolution_detail::linear_structured_convolution_with_infinity(\n\
     \        first, second, negative_infinity, std::greater<>());\n}\n\n}  // namespace\
-    \ monge\n}  // namespace m1une\n\n\n#line 11 \"algo/dp_optimization/monge/all.hpp\"\
-    \n\n\n"
-  code: '#ifndef M1UNE_MONGE_ALL_HPP
-
-    #define M1UNE_MONGE_ALL_HPP 1
-
-
-    #include "check.hpp"
-
-    #include "divide_and_conquer_optimization.hpp"
-
-    #include "knuth_optimization.hpp"
-
-    #include "larsch.hpp"
-
-    #include "min_plus_convolution.hpp"
-
-    #include "monotone_minima.hpp"
-
-    #include "smawk.hpp"
-
-
-    #endif  // M1UNE_MONGE_ALL_HPP
-
-    '
+    \ convex\n}  // namespace m1une\n\n\n#line 11 \"convex/monge/all.hpp\"\n\n\n#line\
+    \ 10 \"verify/convex/monge/monge_dp_optimization.test.cpp\"\n\nvoid test_divide_and_conquer_dp()\
+    \ {\n    for (int states = 0; states <= 60; states++) {\n        for (int candidates\
+    \ = 0; candidates <= 60; candidates++) {\n            auto value = [&](int state,\
+    \ int candidate) {\n                long long difference = state * 3LL - candidate\
+    \ * 2LL;\n                return difference * difference + candidate * 5LL;\n\
+    \            };\n            auto result = m1une::convex::divide_and_conquer_dp(states,\
+    \ candidates, value);\n            assert(int(result.value.size()) == states);\n\
+    \            assert(int(result.argmin.size()) == states);\n            for (int\
+    \ state = 0; state < states; state++) {\n                if (candidates == 0)\
+    \ {\n                    assert(result.argmin[state] == -1);\n               \
+    \     continue;\n                }\n                int best = 0;\n          \
+    \      for (int candidate = 1; candidate < candidates; candidate++) {\n      \
+    \              if (value(state, candidate) < value(state, best)) best = candidate;\n\
+    \                }\n                assert(result.argmin[state] == best);\n  \
+    \              assert(result.value[state] == value(state, best));\n          \
+    \  }\n        }\n    }\n\n    std::vector<long long> previous = {7, 1, 9, 3, 6};\n\
+    \    auto result = m1une::convex::divide_and_conquer_transition(\n        previous,\
+    \ 8, [](int candidate, int state) {\n            long long difference = state\
+    \ - candidate;\n            return difference * difference;\n        });\n   \
+    \ for (int state = 0; state < 8; state++) {\n        long long expected = std::numeric_limits<long\
+    \ long>::max();\n        for (int candidate = 0; candidate < int(previous.size());\
+    \ candidate++) {\n            long long difference = state - candidate;\n    \
+    \        expected = std::min(expected, previous[candidate] + difference * difference);\n\
+    \        }\n        assert(result.value[state] == expected);\n    }\n}\n\nvoid\
+    \ test_knuth_optimization() {\n    for (int n = 0; n <= 45; n++) {\n        for\
+    \ (int test = 0; test < 20; test++) {\n            std::vector<long long> weight(n);\n\
+    \            for (int i = 0; i < n; i++) weight[i] = (test * 7 + i * 11 + n) %\
+    \ 13;\n            std::vector<long long> prefix(n + 1);\n            for (int\
+    \ i = 0; i < n; i++) prefix[i + 1] = prefix[i] + weight[i];\n            auto\
+    \ interval_cost = [&](int left, int right) {\n                return prefix[right]\
+    \ - prefix[left];\n            };\n\n            auto result = m1une::convex::knuth_optimization(n,\
+    \ interval_cost);\n            std::vector<std::vector<long long>> expected(\n\
+    \                n + 1, std::vector<long long>(n + 1));\n            for (int\
+    \ length = 2; length <= n; length++) {\n                for (int left = 0; left\
+    \ + length <= n; left++) {\n                    int right = left + length;\n \
+    \                   expected[left][right] = std::numeric_limits<long long>::max();\n\
+    \                    for (int split = left + 1; split < right; split++) {\n  \
+    \                      expected[left][right] =\n                            std::min(expected[left][right],\n\
+    \                                     expected[left][split] + expected[split][right]\
+    \ +\n                                         interval_cost(left, right));\n \
+    \                   }\n                }\n            }\n            assert(result.value\
+    \ == expected);\n            assert(result.optimum() == expected[0][n]);\n\n \
+    \           for (int length = 2; length <= n; length++) {\n                for\
+    \ (int left = 0; left + length <= n; left++) {\n                    int right\
+    \ = left + length;\n                    int split = result.split[left][right];\n\
+    \                    assert(result.split[left][right - 1] <= split);\n       \
+    \             assert(split <= result.split[left + 1][right]);\n              \
+    \      assert(result.value[left][right] ==\n                           result.value[left][split]\
+    \ + result.value[split][right] +\n                               interval_cost(left,\
+    \ right));\n                }\n            }\n        }\n    }\n}\n\nvoid test_larsch_triangular_matrix()\
+    \ {\n    for (int n = 0; n <= 100; n++) {\n        int evaluations = 0;\n    \
+    \    auto raw_value = [&](int row, int column) {\n            long long difference\
+    \ = row * 2LL - column * 3LL;\n            return difference * difference + column\
+    \ * 4LL;\n        };\n        auto value = [&](int row, int column) {\n      \
+    \      evaluations++;\n            return raw_value(row, column);\n        };\n\
+    \        m1une::convex::Larsch<long long> larsch(n, value);\n        assert(larsch.size()\
+    \ == n);\n        for (int row = 0; row < n; row++) {\n            int expected\
+    \ = 0;\n            for (int column = 1; column <= row; column++) {\n        \
+    \        if (raw_value(row, column) < raw_value(row, expected)) expected = column;\n\
+    \            }\n            assert(larsch.next_argmin() == expected);\n      \
+    \      assert(larsch.processed_rows() == row + 1);\n        }\n        assert(larsch.finished());\n\
+    \        if (n != 0) assert(evaluations <= 50 * n);\n    }\n\n    m1une::convex::Larsch<int>\
+    \ ties(80, [](int, int) { return 0; });\n    for (int row = 0; row < 80; row++)\
+    \ assert(ties.next_argmin() == 0);\n}\n\nvoid test_larsch_shortest_path() {\n\
+    \    for (int n = 0; n <= 150; n++) {\n        for (int test = 0; test < 12; test++)\
+    \ {\n            std::vector<long long> position(n);\n            for (int i =\
+    \ 1; i < n; i++) {\n                position[i] = position[i - 1] + 1 + (test\
+    \ * 5 + i * 7) % 6;\n            }\n            int evaluations = 0;\n       \
+    \     auto raw_cost = [&](int from, int to) {\n                long long distance\
+    \ = position[to] - position[from];\n                return distance * distance\
+    \ + 3;\n            };\n            auto cost = [&](int from, int to) {\n    \
+    \            evaluations++;\n                return raw_cost(from, to);\n    \
+    \        };\n\n            auto result = m1une::convex::larsch_shortest_path(n,\
+    \ cost);\n            int larsch_evaluations = evaluations;\n            std::vector<long\
+    \ long> expected(n);\n            std::vector<int> parent(n, -1);\n          \
+    \  for (int to = 1; to < n; to++) {\n                expected[to] = expected[0]\
+    \ + raw_cost(0, to);\n                parent[to] = 0;\n                for (int\
+    \ from = 1; from < to; from++) {\n                    long long candidate = expected[from]\
+    \ + raw_cost(from, to);\n                    if (candidate < expected[to]) {\n\
+    \                        expected[to] = candidate;\n                        parent[to]\
+    \ = from;\n                    }\n                }\n            }\n         \
+    \   assert(result.distance == expected);\n            assert(result.parent ==\
+    \ parent);\n            if (n >= 2) assert(larsch_evaluations <= 80 * n);\n  \
+    \      }\n    }\n}\n\nint main() {\n    test_divide_and_conquer_dp();\n    test_knuth_optimization();\n\
+    \    test_larsch_triangular_matrix();\n    test_larsch_shortest_path();\n\n  \
+    \  long long a, b;\n    std::cin >> a >> b;\n    std::cout << a + b << '\\n';\n\
+    }\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <algorithm>\n\
+    #include <cassert>\n#include <iostream>\n#include <limits>\n#include <vector>\n\
+    \n#include \"../../../convex/monge/all.hpp\"\n\nvoid test_divide_and_conquer_dp()\
+    \ {\n    for (int states = 0; states <= 60; states++) {\n        for (int candidates\
+    \ = 0; candidates <= 60; candidates++) {\n            auto value = [&](int state,\
+    \ int candidate) {\n                long long difference = state * 3LL - candidate\
+    \ * 2LL;\n                return difference * difference + candidate * 5LL;\n\
+    \            };\n            auto result = m1une::convex::divide_and_conquer_dp(states,\
+    \ candidates, value);\n            assert(int(result.value.size()) == states);\n\
+    \            assert(int(result.argmin.size()) == states);\n            for (int\
+    \ state = 0; state < states; state++) {\n                if (candidates == 0)\
+    \ {\n                    assert(result.argmin[state] == -1);\n               \
+    \     continue;\n                }\n                int best = 0;\n          \
+    \      for (int candidate = 1; candidate < candidates; candidate++) {\n      \
+    \              if (value(state, candidate) < value(state, best)) best = candidate;\n\
+    \                }\n                assert(result.argmin[state] == best);\n  \
+    \              assert(result.value[state] == value(state, best));\n          \
+    \  }\n        }\n    }\n\n    std::vector<long long> previous = {7, 1, 9, 3, 6};\n\
+    \    auto result = m1une::convex::divide_and_conquer_transition(\n        previous,\
+    \ 8, [](int candidate, int state) {\n            long long difference = state\
+    \ - candidate;\n            return difference * difference;\n        });\n   \
+    \ for (int state = 0; state < 8; state++) {\n        long long expected = std::numeric_limits<long\
+    \ long>::max();\n        for (int candidate = 0; candidate < int(previous.size());\
+    \ candidate++) {\n            long long difference = state - candidate;\n    \
+    \        expected = std::min(expected, previous[candidate] + difference * difference);\n\
+    \        }\n        assert(result.value[state] == expected);\n    }\n}\n\nvoid\
+    \ test_knuth_optimization() {\n    for (int n = 0; n <= 45; n++) {\n        for\
+    \ (int test = 0; test < 20; test++) {\n            std::vector<long long> weight(n);\n\
+    \            for (int i = 0; i < n; i++) weight[i] = (test * 7 + i * 11 + n) %\
+    \ 13;\n            std::vector<long long> prefix(n + 1);\n            for (int\
+    \ i = 0; i < n; i++) prefix[i + 1] = prefix[i] + weight[i];\n            auto\
+    \ interval_cost = [&](int left, int right) {\n                return prefix[right]\
+    \ - prefix[left];\n            };\n\n            auto result = m1une::convex::knuth_optimization(n,\
+    \ interval_cost);\n            std::vector<std::vector<long long>> expected(\n\
+    \                n + 1, std::vector<long long>(n + 1));\n            for (int\
+    \ length = 2; length <= n; length++) {\n                for (int left = 0; left\
+    \ + length <= n; left++) {\n                    int right = left + length;\n \
+    \                   expected[left][right] = std::numeric_limits<long long>::max();\n\
+    \                    for (int split = left + 1; split < right; split++) {\n  \
+    \                      expected[left][right] =\n                            std::min(expected[left][right],\n\
+    \                                     expected[left][split] + expected[split][right]\
+    \ +\n                                         interval_cost(left, right));\n \
+    \                   }\n                }\n            }\n            assert(result.value\
+    \ == expected);\n            assert(result.optimum() == expected[0][n]);\n\n \
+    \           for (int length = 2; length <= n; length++) {\n                for\
+    \ (int left = 0; left + length <= n; left++) {\n                    int right\
+    \ = left + length;\n                    int split = result.split[left][right];\n\
+    \                    assert(result.split[left][right - 1] <= split);\n       \
+    \             assert(split <= result.split[left + 1][right]);\n              \
+    \      assert(result.value[left][right] ==\n                           result.value[left][split]\
+    \ + result.value[split][right] +\n                               interval_cost(left,\
+    \ right));\n                }\n            }\n        }\n    }\n}\n\nvoid test_larsch_triangular_matrix()\
+    \ {\n    for (int n = 0; n <= 100; n++) {\n        int evaluations = 0;\n    \
+    \    auto raw_value = [&](int row, int column) {\n            long long difference\
+    \ = row * 2LL - column * 3LL;\n            return difference * difference + column\
+    \ * 4LL;\n        };\n        auto value = [&](int row, int column) {\n      \
+    \      evaluations++;\n            return raw_value(row, column);\n        };\n\
+    \        m1une::convex::Larsch<long long> larsch(n, value);\n        assert(larsch.size()\
+    \ == n);\n        for (int row = 0; row < n; row++) {\n            int expected\
+    \ = 0;\n            for (int column = 1; column <= row; column++) {\n        \
+    \        if (raw_value(row, column) < raw_value(row, expected)) expected = column;\n\
+    \            }\n            assert(larsch.next_argmin() == expected);\n      \
+    \      assert(larsch.processed_rows() == row + 1);\n        }\n        assert(larsch.finished());\n\
+    \        if (n != 0) assert(evaluations <= 50 * n);\n    }\n\n    m1une::convex::Larsch<int>\
+    \ ties(80, [](int, int) { return 0; });\n    for (int row = 0; row < 80; row++)\
+    \ assert(ties.next_argmin() == 0);\n}\n\nvoid test_larsch_shortest_path() {\n\
+    \    for (int n = 0; n <= 150; n++) {\n        for (int test = 0; test < 12; test++)\
+    \ {\n            std::vector<long long> position(n);\n            for (int i =\
+    \ 1; i < n; i++) {\n                position[i] = position[i - 1] + 1 + (test\
+    \ * 5 + i * 7) % 6;\n            }\n            int evaluations = 0;\n       \
+    \     auto raw_cost = [&](int from, int to) {\n                long long distance\
+    \ = position[to] - position[from];\n                return distance * distance\
+    \ + 3;\n            };\n            auto cost = [&](int from, int to) {\n    \
+    \            evaluations++;\n                return raw_cost(from, to);\n    \
+    \        };\n\n            auto result = m1une::convex::larsch_shortest_path(n,\
+    \ cost);\n            int larsch_evaluations = evaluations;\n            std::vector<long\
+    \ long> expected(n);\n            std::vector<int> parent(n, -1);\n          \
+    \  for (int to = 1; to < n; to++) {\n                expected[to] = expected[0]\
+    \ + raw_cost(0, to);\n                parent[to] = 0;\n                for (int\
+    \ from = 1; from < to; from++) {\n                    long long candidate = expected[from]\
+    \ + raw_cost(from, to);\n                    if (candidate < expected[to]) {\n\
+    \                        expected[to] = candidate;\n                        parent[to]\
+    \ = from;\n                    }\n                }\n            }\n         \
+    \   assert(result.distance == expected);\n            assert(result.parent ==\
+    \ parent);\n            if (n >= 2) assert(larsch_evaluations <= 80 * n);\n  \
+    \      }\n    }\n}\n\nint main() {\n    test_divide_and_conquer_dp();\n    test_knuth_optimization();\n\
+    \    test_larsch_triangular_matrix();\n    test_larsch_shortest_path();\n\n  \
+    \  long long a, b;\n    std::cin >> a >> b;\n    std::cout << a + b << '\\n';\n\
+    }\n"
   dependsOn:
-  - algo/dp_optimization/monge/check.hpp
-  - algo/dp_optimization/monge/divide_and_conquer_optimization.hpp
-  - algo/dp_optimization/monge/monotone_minima.hpp
-  - algo/dp_optimization/monge/knuth_optimization.hpp
-  - algo/dp_optimization/monge/larsch.hpp
-  - algo/dp_optimization/monge/min_plus_convolution.hpp
-  - algo/dp_optimization/monge/smawk.hpp
-  isVerificationFile: false
-  path: algo/dp_optimization/monge/all.hpp
-  requiredBy:
-  - algo/all.hpp
-  - algo/dp_optimization/all.hpp
-  timestamp: '2026-07-07 14:26:59+09:00'
-  verificationStatus: LIBRARY_ALL_AC
-  verifiedWith:
-  - verify/algo/dp_optimization/monge/monge_algorithms.test.cpp
-  - verify/algo/dp_optimization/monge/monge_dp_optimization.test.cpp
-documentation_of: algo/dp_optimization/monge/all.hpp
+  - convex/monge/all.hpp
+  - convex/monge/check.hpp
+  - convex/monge/divide_and_conquer_optimization.hpp
+  - convex/monge/monotone_minima.hpp
+  - convex/monge/knuth_optimization.hpp
+  - convex/monge/larsch.hpp
+  - convex/monge/min_plus_convolution.hpp
+  - convex/monge/smawk.hpp
+  isVerificationFile: true
+  path: verify/convex/monge/monge_dp_optimization.test.cpp
+  requiredBy: []
+  timestamp: '2026-07-07 18:38:36+09:00'
+  verificationStatus: TEST_ACCEPTED
+  verifiedWith: []
+documentation_of: verify/convex/monge/monge_dp_optimization.test.cpp
 layout: document
-title: Monge All
+redirect_from:
+- /verify/verify/convex/monge/monge_dp_optimization.test.cpp
+- /verify/verify/convex/monge/monge_dp_optimization.test.cpp.html
+title: verify/convex/monge/monge_dp_optimization.test.cpp
 ---
-
-## Overview
-
-`algo/dp_optimization/monge/all.hpp` includes the repository's Monge and monotone-matrix algorithms.
-
-## Included Headers
-
-| Header | Contents |
-| --- | --- |
-| `algo/dp_optimization/monge/smawk.hpp` | Linear-time row optima for implicit totally monotone matrices. |
-| `algo/dp_optimization/monge/monotone_minima.hpp` | Divide-and-conquer row optima under monotone argmins. |
-| `algo/dp_optimization/monge/divide_and_conquer_optimization.hpp` | DP-facing divide-and-conquer optimization returning values and choices. |
-| `algo/dp_optimization/monge/knuth_optimization.hpp` | Quadratic Knuth optimization for interval DP. |
-| `algo/dp_optimization/monge/larsch.hpp` | Linear-time online minima and shortest paths for triangular totally monotone matrices. |
-| `algo/dp_optimization/monge/check.hpp` | Monge and anti-Monge quadrangle-inequality checks. |
-| `algo/dp_optimization/monge/min_plus_convolution.hpp` | Linear-time structured min-plus/max-plus convolution, including infinity-aware and low-constant variants. |

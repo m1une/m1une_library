@@ -5,8 +5,6 @@ Choose a category by the operation you need during a contest.
 | Category | Headers |
 | --- | --- |
 | [`dsu/`](dsu/) | `dsu.hpp`, `dsu_monoid.hpp`, `potentialized_dsu.hpp`, `persistent_dsu.hpp`, `persistent_potentialized_dsu.hpp`, `partially_persistent_dsu.hpp` |
-| [`line_container/`](line_container/) | `convex_hull_trick.hpp`, `li_chao_tree.hpp`, and `all.hpp` |
-| [`convex_function/`](convex_function/) | `slope_trick.hpp` and `all.hpp` |
 | [`segtree/`](segtree/) | Dense, dynamic, lazy, dual, generic Beats, specialized chmin/chmax/add, and persistent variants, including `segtree_2d.hpp` and `dual_segtree_2d.hpp` |
 | [`range_query/`](range_query/) | 1D/2D/3D cumulative sums, SWAG, Mo's algorithm, range inversions, monoid and custom-state square-root decomposition, Fenwick tree, sqrt/sparse tables, and wavelet matrices |
 | [`dynamic_array/`](dynamic_array/) | Dynamic and persistent implicit-treap arrays, with optional monoid or lazy aggregation |
@@ -20,8 +18,11 @@ Choose a category by the operation you need during a contest.
 Include headers from the repository root:
 
 ```cpp
-#include "ds/line_container/li_chao_tree.hpp"
+#include "ds/segtree/segtree.hpp"
 ```
+
+Convex structures such as CHT, Li Chao tree, and slope trick live under
+`convex/`.
 
 The lazy and Beats variants differ as follows:
 

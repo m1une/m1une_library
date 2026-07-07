@@ -3,53 +3,49 @@ data:
   _extendedDependsOn: []
   _extendedRequiredBy:
   - icon: ':warning:'
-    path: algo/all.hpp
-    title: Algorithms All
-  - icon: ':warning:'
-    path: algo/dp_optimization/all.hpp
-    title: DP Optimization All
+    path: convex/all.hpp
+    title: Convex All
   - icon: ':heavy_check_mark:'
-    path: algo/dp_optimization/monge/all.hpp
+    path: convex/monge/all.hpp
     title: Monge All
   - icon: ':heavy_check_mark:'
-    path: algo/dp_optimization/monge/min_plus_convolution.hpp
+    path: convex/monge/min_plus_convolution.hpp
     title: Structured Min-Plus and Max-Plus Convolution
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
-    path: verify/algo/dp_optimization/monge/max_plus_convolution_concave_arbitrary.test.cpp
-    title: verify/algo/dp_optimization/monge/max_plus_convolution_concave_arbitrary.test.cpp
+    path: verify/convex/monge/max_plus_convolution_concave_arbitrary.test.cpp
+    title: verify/convex/monge/max_plus_convolution_concave_arbitrary.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/algo/dp_optimization/monge/max_plus_convolution_concave_concave.test.cpp
-    title: verify/algo/dp_optimization/monge/max_plus_convolution_concave_concave.test.cpp
+    path: verify/convex/monge/max_plus_convolution_concave_concave.test.cpp
+    title: verify/convex/monge/max_plus_convolution_concave_concave.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/algo/dp_optimization/monge/min_plus_convolution_convex_arbitrary.test.cpp
-    title: verify/algo/dp_optimization/monge/min_plus_convolution_convex_arbitrary.test.cpp
+    path: verify/convex/monge/min_plus_convolution_convex_arbitrary.test.cpp
+    title: verify/convex/monge/min_plus_convolution_convex_arbitrary.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/algo/dp_optimization/monge/min_plus_convolution_convex_convex.test.cpp
-    title: verify/algo/dp_optimization/monge/min_plus_convolution_convex_convex.test.cpp
+    path: verify/convex/monge/min_plus_convolution_convex_convex.test.cpp
+    title: verify/convex/monge/min_plus_convolution_convex_convex.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/algo/dp_optimization/monge/monge_algorithms.test.cpp
-    title: verify/algo/dp_optimization/monge/monge_algorithms.test.cpp
+    path: verify/convex/monge/monge_algorithms.test.cpp
+    title: verify/convex/monge/monge_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/algo/dp_optimization/monge/monge_dp_optimization.test.cpp
-    title: verify/algo/dp_optimization/monge/monge_dp_optimization.test.cpp
+    path: verify/convex/monge/monge_dp_optimization.test.cpp
+    title: verify/convex/monge/monge_dp_optimization.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"algo/dp_optimization/monge/smawk.hpp\"\n\n\n\n#include <cassert>\n\
-    #include <functional>\n#include <numeric>\n#include <vector>\n\nnamespace m1une\
-    \ {\nnamespace monge {\n\nnamespace smawk_detail {\n\ntemplate <class Select>\n\
-    void solve(const std::vector<int>& rows, const std::vector<int>& columns,\n  \
-    \         const Select& select, std::vector<int>& answer) {\n    if (rows.empty())\
-    \ return;\n\n    std::vector<int> reduced;\n    reduced.reserve(columns.size());\n\
-    \    for (int column : columns) {\n        while (!reduced.empty()) {\n      \
-    \      int row = rows[int(reduced.size()) - 1];\n            if (!select(row,\
-    \ reduced.back(), column)) break;\n            reduced.pop_back();\n        }\n\
-    \        if (reduced.size() < rows.size()) reduced.push_back(column);\n    }\n\
-    \n    std::vector<int> odd_rows;\n    odd_rows.reserve(rows.size() / 2);\n   \
-    \ for (int i = 1; i < int(rows.size()); i += 2) odd_rows.push_back(rows[i]);\n\
+  bundledCode: "#line 1 \"convex/monge/smawk.hpp\"\n\n\n\n#include <cassert>\n#include\
+    \ <functional>\n#include <numeric>\n#include <vector>\n\nnamespace m1une {\nnamespace\
+    \ convex {\n\nnamespace smawk_detail {\n\ntemplate <class Select>\nvoid solve(const\
+    \ std::vector<int>& rows, const std::vector<int>& columns,\n           const Select&\
+    \ select, std::vector<int>& answer) {\n    if (rows.empty()) return;\n\n    std::vector<int>\
+    \ reduced;\n    reduced.reserve(columns.size());\n    for (int column : columns)\
+    \ {\n        while (!reduced.empty()) {\n            int row = rows[int(reduced.size())\
+    \ - 1];\n            if (!select(row, reduced.back(), column)) break;\n      \
+    \      reduced.pop_back();\n        }\n        if (reduced.size() < rows.size())\
+    \ reduced.push_back(column);\n    }\n\n    std::vector<int> odd_rows;\n    odd_rows.reserve(rows.size()\
+    \ / 2);\n    for (int i = 1; i < int(rows.size()); i += 2) odd_rows.push_back(rows[i]);\n\
     \    solve(odd_rows, reduced, select, answer);\n\n    int left = 0;\n    int right\
     \ = 0;\n    for (int i = 0; i < int(rows.size()); i += 2) {\n        if (i + 1\
     \ < int(rows.size())) {\n            while (reduced[right] != answer[rows[i +\
@@ -84,19 +80,19 @@ data:
     \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
     \ == column_count);\n    return smawk_row_argmax(\n        row_count, column_count,\n\
     \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
-    }\n\n}  // namespace monge\n}  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_MONGE_SMAWK_HPP\n#define M1UNE_MONGE_SMAWK_HPP 1\n\n#include\
-    \ <cassert>\n#include <functional>\n#include <numeric>\n#include <vector>\n\n\
-    namespace m1une {\nnamespace monge {\n\nnamespace smawk_detail {\n\ntemplate <class\
-    \ Select>\nvoid solve(const std::vector<int>& rows, const std::vector<int>& columns,\n\
-    \           const Select& select, std::vector<int>& answer) {\n    if (rows.empty())\
-    \ return;\n\n    std::vector<int> reduced;\n    reduced.reserve(columns.size());\n\
-    \    for (int column : columns) {\n        while (!reduced.empty()) {\n      \
-    \      int row = rows[int(reduced.size()) - 1];\n            if (!select(row,\
-    \ reduced.back(), column)) break;\n            reduced.pop_back();\n        }\n\
-    \        if (reduced.size() < rows.size()) reduced.push_back(column);\n    }\n\
-    \n    std::vector<int> odd_rows;\n    odd_rows.reserve(rows.size() / 2);\n   \
-    \ for (int i = 1; i < int(rows.size()); i += 2) odd_rows.push_back(rows[i]);\n\
+    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n"
+  code: "#ifndef M1UNE_CONVEX_MONGE_SMAWK_HPP\n#define M1UNE_CONVEX_MONGE_SMAWK_HPP\
+    \ 1\n\n#include <cassert>\n#include <functional>\n#include <numeric>\n#include\
+    \ <vector>\n\nnamespace m1une {\nnamespace convex {\n\nnamespace smawk_detail\
+    \ {\n\ntemplate <class Select>\nvoid solve(const std::vector<int>& rows, const\
+    \ std::vector<int>& columns,\n           const Select& select, std::vector<int>&\
+    \ answer) {\n    if (rows.empty()) return;\n\n    std::vector<int> reduced;\n\
+    \    reduced.reserve(columns.size());\n    for (int column : columns) {\n    \
+    \    while (!reduced.empty()) {\n            int row = rows[int(reduced.size())\
+    \ - 1];\n            if (!select(row, reduced.back(), column)) break;\n      \
+    \      reduced.pop_back();\n        }\n        if (reduced.size() < rows.size())\
+    \ reduced.push_back(column);\n    }\n\n    std::vector<int> odd_rows;\n    odd_rows.reserve(rows.size()\
+    \ / 2);\n    for (int i = 1; i < int(rows.size()); i += 2) odd_rows.push_back(rows[i]);\n\
     \    solve(odd_rows, reduced, select, answer);\n\n    int left = 0;\n    int right\
     \ = 0;\n    for (int i = 0; i < int(rows.size()); i += 2) {\n        if (i + 1\
     \ < int(rows.size())) {\n            while (reduced[right] != answer[rows[i +\
@@ -131,25 +127,24 @@ data:
     \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
     \ == column_count);\n    return smawk_row_argmax(\n        row_count, column_count,\n\
     \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
-    }\n\n}  // namespace monge\n}  // namespace m1une\n\n#endif  // M1UNE_MONGE_SMAWK_HPP\n"
+    }\n\n}  // namespace convex\n}  // namespace m1une\n\n#endif  // M1UNE_CONVEX_MONGE_SMAWK_HPP\n"
   dependsOn: []
   isVerificationFile: false
-  path: algo/dp_optimization/monge/smawk.hpp
+  path: convex/monge/smawk.hpp
   requiredBy:
-  - algo/all.hpp
-  - algo/dp_optimization/monge/all.hpp
-  - algo/dp_optimization/monge/min_plus_convolution.hpp
-  - algo/dp_optimization/all.hpp
-  timestamp: '2026-07-07 14:26:59+09:00'
+  - convex/monge/all.hpp
+  - convex/monge/min_plus_convolution.hpp
+  - convex/all.hpp
+  timestamp: '2026-07-07 18:38:36+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/algo/dp_optimization/monge/max_plus_convolution_concave_concave.test.cpp
-  - verify/algo/dp_optimization/monge/min_plus_convolution_convex_arbitrary.test.cpp
-  - verify/algo/dp_optimization/monge/max_plus_convolution_concave_arbitrary.test.cpp
-  - verify/algo/dp_optimization/monge/monge_algorithms.test.cpp
-  - verify/algo/dp_optimization/monge/min_plus_convolution_convex_convex.test.cpp
-  - verify/algo/dp_optimization/monge/monge_dp_optimization.test.cpp
-documentation_of: algo/dp_optimization/monge/smawk.hpp
+  - verify/convex/monge/max_plus_convolution_concave_concave.test.cpp
+  - verify/convex/monge/min_plus_convolution_convex_arbitrary.test.cpp
+  - verify/convex/monge/max_plus_convolution_concave_arbitrary.test.cpp
+  - verify/convex/monge/monge_algorithms.test.cpp
+  - verify/convex/monge/min_plus_convolution_convex_convex.test.cpp
+  - verify/convex/monge/monge_dp_optimization.test.cpp
+documentation_of: convex/monge/smawk.hpp
 layout: document
 title: SMAWK
 ---
@@ -168,7 +163,7 @@ nondecreasing after selecting any subset of rows and columns. Every Monge
 matrix is totally monotone, so SMAWK is the standard linear-time row-minimum
 primitive for Monge optimization.
 
-All names are in `m1une::monge`.
+All names are in `m1une::convex`.
 
 ## Interface
 
@@ -240,7 +235,7 @@ $O(1)$ time.
 ## Example
 
 ```cpp
-#include "algo/dp_optimization/monge/smawk.hpp"
+#include "convex/monge/smawk.hpp"
 #include <iostream>
 
 int main() {
@@ -251,7 +246,7 @@ int main() {
         return difference * difference;
     };
 
-    auto argmin = m1une::monge::smawk_row_argmin(rows, columns, value);
+    auto argmin = m1une::convex::smawk_row_argmin(rows, columns, value);
     for (int column : argmin) std::cout << column << "\n";
 }
 ```

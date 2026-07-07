@@ -4,25 +4,26 @@
 
 C++20 library for competitive programming by [m1une](https://atcoder.jp/users/m1une).
 
-This repository is organized as header-only building blocks. Use `ds/` when
-you need an object that maintains state and answers updates or queries, such as
-Li Chao tree, CHT, or slope trick. Use `algo/` for one-shot sequence algorithms
-and DP optimization helpers. Graph-specialized algorithms, including tree and
-flow routines, live under `graph/`; algebraic and numeric tools, including FPS
-and matrices, live under `math/`. Reusable algebraic definitions live in
-`monoid/` and `acted_monoid/` so they can be combined without rewriting
-boilerplate during a contest.
+This repository is organized as header-only building blocks. Convex tools such
+as Li Chao tree, CHT, slope trick, Alien Trick, and Monge optimizations live
+under `convex/`. Use `ds/` for non-convex stateful query/update objects, and
+`algo/` for one-shot sequence algorithms. Graph-specialized algorithms,
+including tree and flow routines, live under `graph/`; algebraic and numeric
+tools, including FPS and matrices, live under `math/`. Reusable algebraic
+definitions live in `monoid/` and `acted_monoid/` so they can be combined
+without rewriting boilerplate during a contest.
 
 ## Structure
 
 | Directory | Contents |
 | --- | --- |
-| `algo/` | One-shot algorithms that are not tied to a graph/string/geometry domain, including sequence algorithms and DP optimization helpers. |
+| `convex/` | Convex-structure and convex-optimization tools, including CHT, Li Chao tree, slope trick, Alien Trick, Monge/SMAWK/Knuth/D&C optimization, and structured min-plus/max-plus convolution. |
+| `algo/` | One-shot algorithms that are not tied to a graph/string/geometry/convex domain, currently sequence algorithms. |
 | `graph/` | General graph algorithms and builders, plus `graph/tree/` for rooted-tree tools and `graph/flow/` for flow networks. |
 | `optimization/` | Combinatorial and numeric optimization solvers such as project selection, Hungarian assignment, simplex LP, and integer LP. |
 | `matroid/` | Uniform, partition, graphic, and linear matroids, plus weighted and unweighted matroid intersection. |
 | `geometry/` | 2D points, lines, rays, segments, polygons, convex hulls, half-plane intersection, lattice-point counting, and circles. |
-| `ds/` | Categorized data structures for line queries, convex functions, range queries, online/offline dynamic connectivity, dynamic sequences and trees, ordered sets, heaps, intervals, and hash tables. |
+| `ds/` | Categorized data structures for range queries, online/offline dynamic connectivity, dynamic sequences and trees, ordered sets, heaps, intervals, and hash tables. |
 | `monoid/` | Reusable monoids for generic data structures such as `Segtree`. |
 | `acted_monoid/` | Acted monoids for lazy propagation structures such as `LazySegtree` and generic `SegtreeBeats`. |
 | `math/` | Number theory, modular arithmetic, combinatorics, bitwise transforms, FPS/polynomials, matrices, exact rationals, and integer arithmetic. |
@@ -38,9 +39,8 @@ short namespace segment after `m1une::`; nested directories are for browsing.
 
 | Directory | Namespace |
 | --- | --- |
+| `convex/` | `m1une::convex` |
 | `algo/sequence/` | `m1une::sequence` |
-| `algo/dp_optimization/alien_trick.hpp` | `m1une::dp` |
-| `algo/dp_optimization/monge/` | `m1une::monge` |
 | `ds/` | `m1une::ds` |
 | `graph/` | `m1une::graph` |
 | `graph/flow/` | `m1une::flow` |
@@ -56,15 +56,22 @@ short namespace segment after `m1une::`; nested directories are for browsing.
 | Directory | Use it for |
 | --- | --- |
 | `algo/sequence/` | Array and sequence algorithms such as LIS, inversion count, and meet-in-the-middle subset sum. |
-| `algo/dp_optimization/` | Alien Trick, Monge/SMAWK/Knuth/D&C optimization, LARSCH, and structured min-plus/max-plus convolution. |
+
+### Convex categories
+
+| Directory | Use it for |
+| --- | --- |
+| `convex/convex_hull_trick.hpp` | Monotone-slope CHT for adding lines and querying an optimum at `x`. |
+| `convex/li_chao_tree.hpp` | Dynamic Li Chao tree for arbitrary line and line-segment insertion. |
+| `convex/monge/` | Monge/SMAWK/Knuth/D&C optimization, LARSCH, checks, and structured min-plus/max-plus convolution. |
+| `convex/slope_trick.hpp` | Slope trick for maintaining convex piecewise-linear functions. |
+| `convex/alien_trick.hpp` | Exact-count optimization through Lagrangian relaxation. |
 
 ### Data structure categories
 
 | Directory | Use it for |
 | --- | --- |
 | `ds/dsu/` | Connectivity, component aggregation, potentials, and persistent union-find. |
-| `ds/line_container/` | Convex hull trick and Li Chao tree for adding lines or line segments and querying an optimum at `x`. |
-| `ds/convex_function/` | Slope trick for maintaining convex piecewise-linear functions. |
 | `ds/segtree/` | Dense and dynamic segment trees, lazy propagation, dual segment trees, and persistent variants. |
 | `ds/range_query/` | Cumulative sums, Fenwick trees, static sparse-table queries, and wavelet matrices. |
 | `ds/dynamic_array/` | Implicit-treap sequences with insertion, deletion, reversal, aggregation, or persistence. |

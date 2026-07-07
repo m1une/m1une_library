@@ -2,10 +2,10 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: ds/line_container/convex_hull_trick.hpp
+    path: convex/convex_hull_trick.hpp
     title: Convex Hull Trick
   - icon: ':heavy_check_mark:'
-    path: ds/line_container/li_chao_tree.hpp
+    path: convex/li_chao_tree.hpp
     title: Li Chao Tree
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
@@ -17,46 +17,45 @@ data:
     PROBLEM: https://judge.yosupo.jp/problem/line_add_get_min
     links:
     - https://judge.yosupo.jp/problem/line_add_get_min
-  bundledCode: "#line 1 \"verify/ds/line_container/li_chao_tree.test.cpp\"\n#define\
-    \ PROBLEM \"https://judge.yosupo.jp/problem/line_add_get_min\"\n\n#line 1 \"ds/line_container/li_chao_tree.hpp\"\
+  bundledCode: "#line 1 \"verify/convex/li_chao_tree.test.cpp\"\n#define PROBLEM \"\
+    https://judge.yosupo.jp/problem/line_add_get_min\"\n\n#line 1 \"convex/li_chao_tree.hpp\"\
     \n\n\n\n#include <cassert>\n#include <concepts>\n#include <cstddef>\n#include\
     \ <limits>\n#include <numeric>\n#include <optional>\n#include <type_traits>\n\
-    #include <utility>\n#include <vector>\n\n#line 1 \"ds/line_container/convex_hull_trick.hpp\"\
-    \n\n\n\n#line 10 \"ds/line_container/convex_hull_trick.hpp\"\n\nnamespace m1une\
-    \ {\nnamespace ds {\n\nenum class LineOptimization {\n    Minimize,\n    Maximize,\n\
-    };\n\ntemplate <std::signed_integral T>\nusing line_wide_type = __int128_t;\n\n\
-    template <std::signed_integral T>\nstruct LinearFunction {\n    using value_type\
-    \ = line_wide_type<T>;\n\n    value_type slope;\n    value_type intercept;\n\n\
-    \    constexpr LinearFunction() : slope(0), intercept(0) {}\n\n    constexpr LinearFunction(T\
-    \ slope_value, T intercept_value) : slope(slope_value), intercept(intercept_value)\
-    \ {}\n\n    constexpr value_type operator()(T x) const {\n        return slope\
-    \ * value_type(x) + intercept;\n    }\n};\n\n// Convex hull trick for lines inserted\
-    \ in nondecreasing slope order.\ntemplate <std::signed_integral T, LineOptimization\
-    \ Objective = LineOptimization::Minimize>\nstruct ConvexHullTrick {\n    using\
-    \ Line = LinearFunction<T>;\n    using value_type = typename Line::value_type;\n\
-    \n   private:\n    std::vector<Line> _lines;\n\n    static bool better(value_type\
-    \ first, value_type second) {\n        if constexpr (Objective == LineOptimization::Minimize)\
-    \ {\n            return first < second;\n        } else {\n            return\
-    \ second < first;\n        }\n    }\n\n    static bool redundant(const Line& first,\
-    \ const Line& middle, const Line& last) {\n        value_type left = (first.intercept\
-    \ - middle.intercept) * (last.slope - middle.slope);\n        value_type right\
-    \ = (middle.intercept - last.intercept) * (middle.slope - first.slope);\n    \
-    \    if constexpr (Objective == LineOptimization::Minimize) {\n            return\
-    \ left <= right;\n        } else {\n            return right <= left;\n      \
-    \  }\n    }\n\n   public:\n    ConvexHullTrick() = default;\n\n    int size()\
-    \ const {\n        return int(_lines.size());\n    }\n\n    bool empty() const\
-    \ {\n        return _lines.empty();\n    }\n\n    const std::vector<Line>& lines()\
-    \ const {\n        return _lines;\n    }\n\n    void reserve(std::size_t line_capacity)\
-    \ {\n        _lines.reserve(line_capacity);\n    }\n\n    void clear() {\n   \
-    \     _lines.clear();\n    }\n\n    // Slopes must be inserted in nondecreasing\
-    \ order.\n    void add_line(T slope, T intercept) {\n        Line line(slope,\
-    \ intercept);\n        if (!_lines.empty()) {\n            assert(_lines.back().slope\
-    \ <= line.slope);\n        }\n\n        if (!_lines.empty() && _lines.back().slope\
-    \ == line.slope) {\n            if (!better(line.intercept, _lines.back().intercept))\
-    \ return;\n            _lines.pop_back();\n        }\n\n        while (_lines.size()\
-    \ >= 2 && redundant(_lines[_lines.size() - 2], _lines.back(), line)) {\n     \
-    \       _lines.pop_back();\n        }\n        _lines.push_back(line);\n    }\n\
-    \n    std::optional<value_type> try_query(T x) const {\n        if (_lines.empty())\
+    #include <utility>\n#include <vector>\n\n#line 1 \"convex/convex_hull_trick.hpp\"\
+    \n\n\n\n#line 10 \"convex/convex_hull_trick.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ convex {\n\nenum class LineOptimization {\n    Minimize,\n    Maximize,\n};\n\
+    \ntemplate <std::signed_integral T>\nusing line_wide_type = __int128_t;\n\ntemplate\
+    \ <std::signed_integral T>\nstruct LinearFunction {\n    using value_type = line_wide_type<T>;\n\
+    \n    value_type slope;\n    value_type intercept;\n\n    constexpr LinearFunction()\
+    \ : slope(0), intercept(0) {}\n\n    constexpr LinearFunction(T slope_value, T\
+    \ intercept_value) : slope(slope_value), intercept(intercept_value) {}\n\n   \
+    \ constexpr value_type operator()(T x) const {\n        return slope * value_type(x)\
+    \ + intercept;\n    }\n};\n\n// Convex hull trick for lines inserted in nondecreasing\
+    \ slope order.\ntemplate <std::signed_integral T, LineOptimization Objective =\
+    \ LineOptimization::Minimize>\nstruct ConvexHullTrick {\n    using Line = LinearFunction<T>;\n\
+    \    using value_type = typename Line::value_type;\n\n   private:\n    std::vector<Line>\
+    \ _lines;\n\n    static bool better(value_type first, value_type second) {\n \
+    \       if constexpr (Objective == LineOptimization::Minimize) {\n           \
+    \ return first < second;\n        } else {\n            return second < first;\n\
+    \        }\n    }\n\n    static bool redundant(const Line& first, const Line&\
+    \ middle, const Line& last) {\n        value_type left = (first.intercept - middle.intercept)\
+    \ * (last.slope - middle.slope);\n        value_type right = (middle.intercept\
+    \ - last.intercept) * (middle.slope - first.slope);\n        if constexpr (Objective\
+    \ == LineOptimization::Minimize) {\n            return left <= right;\n      \
+    \  } else {\n            return right <= left;\n        }\n    }\n\n   public:\n\
+    \    ConvexHullTrick() = default;\n\n    int size() const {\n        return int(_lines.size());\n\
+    \    }\n\n    bool empty() const {\n        return _lines.empty();\n    }\n\n\
+    \    const std::vector<Line>& lines() const {\n        return _lines;\n    }\n\
+    \n    void reserve(std::size_t line_capacity) {\n        _lines.reserve(line_capacity);\n\
+    \    }\n\n    void clear() {\n        _lines.clear();\n    }\n\n    // Slopes\
+    \ must be inserted in nondecreasing order.\n    void add_line(T slope, T intercept)\
+    \ {\n        Line line(slope, intercept);\n        if (!_lines.empty()) {\n  \
+    \          assert(_lines.back().slope <= line.slope);\n        }\n\n        if\
+    \ (!_lines.empty() && _lines.back().slope == line.slope) {\n            if (!better(line.intercept,\
+    \ _lines.back().intercept)) return;\n            _lines.pop_back();\n        }\n\
+    \n        while (_lines.size() >= 2 && redundant(_lines[_lines.size() - 2], _lines.back(),\
+    \ line)) {\n            _lines.pop_back();\n        }\n        _lines.push_back(line);\n\
+    \    }\n\n    std::optional<value_type> try_query(T x) const {\n        if (_lines.empty())\
     \ return std::nullopt;\n        int low = 0;\n        int high = int(_lines.size())\
     \ - 1;\n        while (low < high) {\n            int middle = low + (high - low)\
     \ / 2;\n            value_type first = _lines[middle](x);\n            value_type\
@@ -67,8 +66,8 @@ data:
     \   return *try_query(x);\n    }\n};\n\ntemplate <std::signed_integral T>\nusing\
     \ MinConvexHullTrick = ConvexHullTrick<T, LineOptimization::Minimize>;\n\ntemplate\
     \ <std::signed_integral T>\nusing MaxConvexHullTrick = ConvexHullTrick<T, LineOptimization::Maximize>;\n\
-    \n}  // namespace ds\n}  // namespace m1une\n\n\n#line 15 \"ds/line_container/li_chao_tree.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\n\n// Dynamic Li Chao tree over an integral\
+    \n}  // namespace convex\n}  // namespace m1une\n\n\n#line 15 \"convex/li_chao_tree.hpp\"\
+    \n\nnamespace m1une {\nnamespace convex {\n\n// Dynamic Li Chao tree over an integral\
     \ half-open coordinate domain.\ntemplate <std::signed_integral T, LineOptimization\
     \ Objective = LineOptimization::Minimize>\nstruct LiChaoTree {\n    using Line\
     \ = LinearFunction<T>;\n    using value_type = typename Line::value_type;\n\n\
@@ -135,13 +134,13 @@ data:
     \ query(x);\n        assert(result.has_value());\n        return result.value_or(value_type());\n\
     \    }\n};\n\ntemplate <std::signed_integral T>\nusing MinLiChaoTree = LiChaoTree<T,\
     \ LineOptimization::Minimize>;\n\ntemplate <std::signed_integral T>\nusing MaxLiChaoTree\
-    \ = LiChaoTree<T, LineOptimization::Maximize>;\n\n}  // namespace ds\n}  // namespace\
-    \ m1une\n\n\n#line 4 \"verify/ds/line_container/li_chao_tree.test.cpp\"\n\n#include\
-    \ <algorithm>\n#line 7 \"verify/ds/line_container/li_chao_tree.test.cpp\"\n#include\
-    \ <cstdint>\n#include <iostream>\n#line 12 \"verify/ds/line_container/li_chao_tree.test.cpp\"\
-    \n\nnamespace {\n\nstruct SegmentLine {\n    int left;\n    int right;\n    long\
-    \ long slope;\n    long long intercept;\n};\n\ntemplate <m1une::ds::LineOptimization\
-    \ Objective>\nvoid check(const std::vector<SegmentLine>& lines) {\n    m1une::ds::LiChaoTree<long\
+    \ = LiChaoTree<T, LineOptimization::Maximize>;\n\n}  // namespace convex\n}  //\
+    \ namespace m1une\n\n\n#line 4 \"verify/convex/li_chao_tree.test.cpp\"\n\n#include\
+    \ <algorithm>\n#line 7 \"verify/convex/li_chao_tree.test.cpp\"\n#include <cstdint>\n\
+    #include <iostream>\n#line 12 \"verify/convex/li_chao_tree.test.cpp\"\n\nnamespace\
+    \ {\n\nstruct SegmentLine {\n    int left;\n    int right;\n    long long slope;\n\
+    \    long long intercept;\n};\n\ntemplate <m1une::convex::LineOptimization Objective>\n\
+    void check(const std::vector<SegmentLine>& lines) {\n    m1une::convex::LiChaoTree<long\
     \ long, Objective> tree(-64, 65);\n    for (const SegmentLine& line : lines) {\n\
     \        if (line.left == -64 && line.right == 65) {\n            tree.add_line(line.slope,\
     \ line.intercept);\n        } else {\n            tree.add_segment(\n        \
@@ -152,10 +151,10 @@ data:
     \ || line.right <= x) continue;\n            __int128_t value =\n            \
     \    __int128_t(line.slope) * x + line.intercept;\n            if (\n        \
     \        !expected\n                || (\n                    Objective\n    \
-    \                    == m1une::ds::LineOptimization::Minimize\n              \
-    \      ? value < *expected\n                    : *expected < value\n        \
-    \        )\n            ) {\n                expected = value;\n            }\n\
-    \        }\n        assert(tree.query(x) == expected);\n        if (expected)\
+    \                    == m1une::convex::LineOptimization::Minimize\n          \
+    \          ? value < *expected\n                    : *expected < value\n    \
+    \            )\n            ) {\n                expected = value;\n         \
+    \   }\n        }\n        assert(tree.query(x) == expected);\n        if (expected)\
     \ assert(tree.get(x) == *expected);\n    }\n}\n\nvoid test_randomized() {\n  \
     \  std::uint64_t state = 1013;\n    auto random = [&state]() {\n        state\
     \ ^= state << 7;\n        state ^= state >> 9;\n        return state;\n    };\n\
@@ -167,14 +166,14 @@ data:
     \    left = -64;\n                right = 65;\n            }\n            lines.push_back(SegmentLine{\n\
     \                left,\n                right,\n                static_cast<long\
     \ long>(random() % 101) - 50,\n                static_cast<long long>(random()\
-    \ % 201) - 100,\n            });\n        }\n        check<m1une::ds::LineOptimization::Minimize>(lines);\n\
-    \        check<m1une::ds::LineOptimization::Maximize>(lines);\n    }\n}\n\n} \
-    \ // namespace\n\nint main() {\n    test_randomized();\n\n    int line_count,\
+    \ % 201) - 100,\n            });\n        }\n        check<m1une::convex::LineOptimization::Minimize>(lines);\n\
+    \        check<m1une::convex::LineOptimization::Maximize>(lines);\n    }\n}\n\n\
+    }  // namespace\n\nint main() {\n    test_randomized();\n\n    int line_count,\
     \ query_count;\n    std::cin >> line_count >> query_count;\n    constexpr long\
     \ long left = -1'000'000'000LL;\n    constexpr long long right = 1'000'000'001LL;\n\
-    \    m1une::ds::MinLiChaoTree<long long> tree(left, right);\n    for (int index\
-    \ = 0; index < line_count; ++index) {\n        long long slope, intercept;\n \
-    \       std::cin >> slope >> intercept;\n        tree.add_line(slope, intercept);\n\
+    \    m1une::convex::MinLiChaoTree<long long> tree(left, right);\n    for (int\
+    \ index = 0; index < line_count; ++index) {\n        long long slope, intercept;\n\
+    \        std::cin >> slope >> intercept;\n        tree.add_line(slope, intercept);\n\
     \    }\n\n    while (query_count--) {\n        int type;\n        std::cin >>\
     \ type;\n        if (type == 0) {\n            long long slope, intercept;\n \
     \           std::cin >> slope >> intercept;\n            tree.add_line(slope,\
@@ -182,25 +181,25 @@ data:
     \ >> x;\n            std::cout << static_cast<long long>(tree.get(x)) << '\\n';\n\
     \        }\n    }\n}\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/line_add_get_min\"\n\n\
-    #include \"../../../ds/line_container/li_chao_tree.hpp\"\n\n#include <algorithm>\n\
-    #include <cassert>\n#include <cstdint>\n#include <iostream>\n#include <limits>\n\
-    #include <optional>\n#include <vector>\n\nnamespace {\n\nstruct SegmentLine {\n\
-    \    int left;\n    int right;\n    long long slope;\n    long long intercept;\n\
-    };\n\ntemplate <m1une::ds::LineOptimization Objective>\nvoid check(const std::vector<SegmentLine>&\
-    \ lines) {\n    m1une::ds::LiChaoTree<long long, Objective> tree(-64, 65);\n \
-    \   for (const SegmentLine& line : lines) {\n        if (line.left == -64 && line.right\
-    \ == 65) {\n            tree.add_line(line.slope, line.intercept);\n        }\
-    \ else {\n            tree.add_segment(\n                line.left,\n        \
-    \        line.right,\n                line.slope,\n                line.intercept\n\
-    \            );\n        }\n    }\n\n    for (long long x = -64; x < 65; ++x)\
-    \ {\n        std::optional<__int128_t> expected;\n        for (const SegmentLine&\
-    \ line : lines) {\n            if (x < line.left || line.right <= x) continue;\n\
-    \            __int128_t value =\n                __int128_t(line.slope) * x +\
-    \ line.intercept;\n            if (\n                !expected\n             \
-    \   || (\n                    Objective\n                        == m1une::ds::LineOptimization::Minimize\n\
-    \                    ? value < *expected\n                    : *expected < value\n\
-    \                )\n            ) {\n                expected = value;\n     \
-    \       }\n        }\n        assert(tree.query(x) == expected);\n        if (expected)\
+    #include \"../../convex/li_chao_tree.hpp\"\n\n#include <algorithm>\n#include <cassert>\n\
+    #include <cstdint>\n#include <iostream>\n#include <limits>\n#include <optional>\n\
+    #include <vector>\n\nnamespace {\n\nstruct SegmentLine {\n    int left;\n    int\
+    \ right;\n    long long slope;\n    long long intercept;\n};\n\ntemplate <m1une::convex::LineOptimization\
+    \ Objective>\nvoid check(const std::vector<SegmentLine>& lines) {\n    m1une::convex::LiChaoTree<long\
+    \ long, Objective> tree(-64, 65);\n    for (const SegmentLine& line : lines) {\n\
+    \        if (line.left == -64 && line.right == 65) {\n            tree.add_line(line.slope,\
+    \ line.intercept);\n        } else {\n            tree.add_segment(\n        \
+    \        line.left,\n                line.right,\n                line.slope,\n\
+    \                line.intercept\n            );\n        }\n    }\n\n    for (long\
+    \ long x = -64; x < 65; ++x) {\n        std::optional<__int128_t> expected;\n\
+    \        for (const SegmentLine& line : lines) {\n            if (x < line.left\
+    \ || line.right <= x) continue;\n            __int128_t value =\n            \
+    \    __int128_t(line.slope) * x + line.intercept;\n            if (\n        \
+    \        !expected\n                || (\n                    Objective\n    \
+    \                    == m1une::convex::LineOptimization::Minimize\n          \
+    \          ? value < *expected\n                    : *expected < value\n    \
+    \            )\n            ) {\n                expected = value;\n         \
+    \   }\n        }\n        assert(tree.query(x) == expected);\n        if (expected)\
     \ assert(tree.get(x) == *expected);\n    }\n}\n\nvoid test_randomized() {\n  \
     \  std::uint64_t state = 1013;\n    auto random = [&state]() {\n        state\
     \ ^= state << 7;\n        state ^= state >> 9;\n        return state;\n    };\n\
@@ -212,14 +211,14 @@ data:
     \    left = -64;\n                right = 65;\n            }\n            lines.push_back(SegmentLine{\n\
     \                left,\n                right,\n                static_cast<long\
     \ long>(random() % 101) - 50,\n                static_cast<long long>(random()\
-    \ % 201) - 100,\n            });\n        }\n        check<m1une::ds::LineOptimization::Minimize>(lines);\n\
-    \        check<m1une::ds::LineOptimization::Maximize>(lines);\n    }\n}\n\n} \
-    \ // namespace\n\nint main() {\n    test_randomized();\n\n    int line_count,\
+    \ % 201) - 100,\n            });\n        }\n        check<m1une::convex::LineOptimization::Minimize>(lines);\n\
+    \        check<m1une::convex::LineOptimization::Maximize>(lines);\n    }\n}\n\n\
+    }  // namespace\n\nint main() {\n    test_randomized();\n\n    int line_count,\
     \ query_count;\n    std::cin >> line_count >> query_count;\n    constexpr long\
     \ long left = -1'000'000'000LL;\n    constexpr long long right = 1'000'000'001LL;\n\
-    \    m1une::ds::MinLiChaoTree<long long> tree(left, right);\n    for (int index\
-    \ = 0; index < line_count; ++index) {\n        long long slope, intercept;\n \
-    \       std::cin >> slope >> intercept;\n        tree.add_line(slope, intercept);\n\
+    \    m1une::convex::MinLiChaoTree<long long> tree(left, right);\n    for (int\
+    \ index = 0; index < line_count; ++index) {\n        long long slope, intercept;\n\
+    \        std::cin >> slope >> intercept;\n        tree.add_line(slope, intercept);\n\
     \    }\n\n    while (query_count--) {\n        int type;\n        std::cin >>\
     \ type;\n        if (type == 0) {\n            long long slope, intercept;\n \
     \           std::cin >> slope >> intercept;\n            tree.add_line(slope,\
@@ -227,18 +226,18 @@ data:
     \ >> x;\n            std::cout << static_cast<long long>(tree.get(x)) << '\\n';\n\
     \        }\n    }\n}\n"
   dependsOn:
-  - ds/line_container/li_chao_tree.hpp
-  - ds/line_container/convex_hull_trick.hpp
+  - convex/li_chao_tree.hpp
+  - convex/convex_hull_trick.hpp
   isVerificationFile: true
-  path: verify/ds/line_container/li_chao_tree.test.cpp
+  path: verify/convex/li_chao_tree.test.cpp
   requiredBy: []
-  timestamp: '2026-07-07 14:26:59+09:00'
+  timestamp: '2026-07-07 18:38:36+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/ds/line_container/li_chao_tree.test.cpp
+documentation_of: verify/convex/li_chao_tree.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/ds/line_container/li_chao_tree.test.cpp
-- /verify/verify/ds/line_container/li_chao_tree.test.cpp.html
-title: verify/ds/line_container/li_chao_tree.test.cpp
+- /verify/verify/convex/li_chao_tree.test.cpp
+- /verify/verify/convex/li_chao_tree.test.cpp.html
+title: verify/convex/li_chao_tree.test.cpp
 ---

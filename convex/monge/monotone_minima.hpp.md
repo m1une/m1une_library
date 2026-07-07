@@ -3,38 +3,35 @@ data:
   _extendedDependsOn: []
   _extendedRequiredBy:
   - icon: ':warning:'
-    path: algo/all.hpp
-    title: Algorithms All
-  - icon: ':warning:'
-    path: algo/dp_optimization/all.hpp
-    title: DP Optimization All
+    path: convex/all.hpp
+    title: Convex All
   - icon: ':heavy_check_mark:'
-    path: algo/dp_optimization/monge/all.hpp
+    path: convex/monge/all.hpp
     title: Monge All
   - icon: ':heavy_check_mark:'
-    path: algo/dp_optimization/monge/divide_and_conquer_optimization.hpp
+    path: convex/monge/divide_and_conquer_optimization.hpp
     title: Divide-and-Conquer DP Optimization
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
-    path: verify/algo/dp_optimization/monge/monge_algorithms.test.cpp
-    title: verify/algo/dp_optimization/monge/monge_algorithms.test.cpp
+    path: verify/convex/monge/monge_algorithms.test.cpp
+    title: verify/convex/monge/monge_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/algo/dp_optimization/monge/monge_dp_optimization.test.cpp
-    title: verify/algo/dp_optimization/monge/monge_dp_optimization.test.cpp
+    path: verify/convex/monge/monge_dp_optimization.test.cpp
+    title: verify/convex/monge/monge_dp_optimization.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"algo/dp_optimization/monge/monotone_minima.hpp\"\n\n\n\n\
-    #include <cassert>\n#include <functional>\n#include <vector>\n\nnamespace m1une\
-    \ {\nnamespace monge {\n\nnamespace monotone_minima_detail {\n\ntemplate <class\
-    \ Value, class Compare>\nvoid solve(int row_left, int row_right, int column_left,\
-    \ int column_right,\n           const Value& value, const Compare& compare, std::vector<int>&\
-    \ answer) {\n    if (row_left == row_right) return;\n    int row = (row_left +\
-    \ row_right) / 2;\n    int best = column_left;\n    for (int column = column_left\
-    \ + 1; column < column_right; column++) {\n        if (compare(value(row, column),\
-    \ value(row, best))) best = column;\n    }\n    answer[row] = best;\n    solve(row_left,\
+  bundledCode: "#line 1 \"convex/monge/monotone_minima.hpp\"\n\n\n\n#include <cassert>\n\
+    #include <functional>\n#include <vector>\n\nnamespace m1une {\nnamespace convex\
+    \ {\n\nnamespace monotone_minima_detail {\n\ntemplate <class Value, class Compare>\n\
+    void solve(int row_left, int row_right, int column_left, int column_right,\n \
+    \          const Value& value, const Compare& compare, std::vector<int>& answer)\
+    \ {\n    if (row_left == row_right) return;\n    int row = (row_left + row_right)\
+    \ / 2;\n    int best = column_left;\n    for (int column = column_left + 1; column\
+    \ < column_right; column++) {\n        if (compare(value(row, column), value(row,\
+    \ best))) best = column;\n    }\n    answer[row] = best;\n    solve(row_left,\
     \ row, column_left, best + 1, value, compare, answer);\n    solve(row + 1, row_right,\
     \ best, column_right, value, compare, answer);\n}\n\n}  // namespace monotone_minima_detail\n\
     \ntemplate <class Value, class Compare = std::less<>>\nstd::vector<int> monotone_row_optima(int\
@@ -58,10 +55,10 @@ data:
     \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
     \ == column_count);\n    return monotone_row_argmax(\n        row_count, column_count,\n\
     \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
-    }\n\n}  // namespace monge\n}  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_MONGE_MONOTONE_MINIMA_HPP\n#define M1UNE_MONGE_MONOTONE_MINIMA_HPP\
+    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n"
+  code: "#ifndef M1UNE_CONVEX_MONGE_MONOTONE_MINIMA_HPP\n#define M1UNE_CONVEX_MONGE_MONOTONE_MINIMA_HPP\
     \ 1\n\n#include <cassert>\n#include <functional>\n#include <vector>\n\nnamespace\
-    \ m1une {\nnamespace monge {\n\nnamespace monotone_minima_detail {\n\ntemplate\
+    \ m1une {\nnamespace convex {\n\nnamespace monotone_minima_detail {\n\ntemplate\
     \ <class Value, class Compare>\nvoid solve(int row_left, int row_right, int column_left,\
     \ int column_right,\n           const Value& value, const Compare& compare, std::vector<int>&\
     \ answer) {\n    if (row_left == row_right) return;\n    int row = (row_left +\
@@ -91,21 +88,20 @@ data:
     \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
     \ == column_count);\n    return monotone_row_argmax(\n        row_count, column_count,\n\
     \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
-    }\n\n}  // namespace monge\n}  // namespace m1une\n\n#endif  // M1UNE_MONGE_MONOTONE_MINIMA_HPP\n"
+    }\n\n}  // namespace convex\n}  // namespace m1une\n\n#endif  // M1UNE_CONVEX_MONGE_MONOTONE_MINIMA_HPP\n"
   dependsOn: []
   isVerificationFile: false
-  path: algo/dp_optimization/monge/monotone_minima.hpp
+  path: convex/monge/monotone_minima.hpp
   requiredBy:
-  - algo/all.hpp
-  - algo/dp_optimization/monge/all.hpp
-  - algo/dp_optimization/monge/divide_and_conquer_optimization.hpp
-  - algo/dp_optimization/all.hpp
-  timestamp: '2026-07-07 14:26:59+09:00'
+  - convex/monge/all.hpp
+  - convex/monge/divide_and_conquer_optimization.hpp
+  - convex/all.hpp
+  timestamp: '2026-07-07 18:38:36+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/algo/dp_optimization/monge/monge_algorithms.test.cpp
-  - verify/algo/dp_optimization/monge/monge_dp_optimization.test.cpp
-documentation_of: algo/dp_optimization/monge/monotone_minima.hpp
+  - verify/convex/monge/monge_algorithms.test.cpp
+  - verify/convex/monge/monge_dp_optimization.test.cpp
+documentation_of: convex/monge/monotone_minima.hpp
 layout: document
 title: Monotone Minima
 ---
@@ -164,7 +160,7 @@ additional memory including the result and recursion stack.
 ## Example
 
 ```cpp
-#include "algo/dp_optimization/monge/monotone_minima.hpp"
+#include "convex/monge/monotone_minima.hpp"
 #include <vector>
 
 int main() {
@@ -174,6 +170,6 @@ int main() {
         return previous[column] + distance * distance;
     };
 
-    auto opt = m1une::monge::monotone_row_argmin(5, 5, transition);
+    auto opt = m1une::convex::monotone_row_argmin(5, 5, transition);
 }
 ```

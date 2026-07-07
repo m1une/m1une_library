@@ -3,23 +3,23 @@ data:
   _extendedDependsOn: []
   _extendedRequiredBy:
   - icon: ':warning:'
-    path: ds/convex_function/all.hpp
-    title: Convex Function All
+    path: convex/all.hpp
+    title: Convex All
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
-    path: verify/ds/convex_function/slope_trick.test.cpp
-    title: verify/ds/convex_function/slope_trick.test.cpp
+    path: verify/convex/slope_trick.test.cpp
+    title: verify/convex/slope_trick.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"ds/convex_function/slope_trick.hpp\"\n\n\n\n#include <cassert>\n\
-    #include <functional>\n#include <optional>\n#include <queue>\n#include <type_traits>\n\
-    #include <utility>\n#include <vector>\n\nnamespace m1une {\nnamespace ds {\n\n\
-    template <class T>\nstruct SlopeTrickArgmin {\n    std::optional<T> left;\n  \
-    \  std::optional<T> right;\n};\n\ntemplate <class T>\nclass SlopeTrick {\n   \
-    \ static_assert(std::is_arithmetic_v<T> && std::is_signed_v<T>);\n\n    T _minimum\
+  bundledCode: "#line 1 \"convex/slope_trick.hpp\"\n\n\n\n#include <cassert>\n#include\
+    \ <functional>\n#include <optional>\n#include <queue>\n#include <type_traits>\n\
+    #include <utility>\n#include <vector>\n\nnamespace m1une {\nnamespace convex {\n\
+    \ntemplate <class T>\nstruct SlopeTrickArgmin {\n    std::optional<T> left;\n\
+    \    std::optional<T> right;\n};\n\ntemplate <class T>\nclass SlopeTrick {\n \
+    \   static_assert(std::is_arithmetic_v<T> && std::is_signed_v<T>);\n\n    T _minimum\
     \ = T();\n    T _left_offset = T();\n    T _right_offset = T();\n    std::priority_queue<T>\
     \ _left;\n    std::priority_queue<T, std::vector<T>, std::greater<T>> _right;\n\
     \n    T left_top() const {\n        return _left.top() + _left_offset;\n    }\n\
@@ -67,12 +67,12 @@ data:
     \            other._right.pop();\n        }\n        *this = std::move(result);\n\
     \    }\n};\n\ntemplate <class T>\nSlopeTrick<T> min_plus_convolution(SlopeTrick<T>\
     \ first,\n                                   SlopeTrick<T> second) {\n    first.min_plus_convolve(std::move(second));\n\
-    \    return first;\n}\n\n}  // namespace ds\n}  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_DS_CONVEX_FUNCTION_SLOPE_TRICK_HPP\n#define M1UNE_DS_CONVEX_FUNCTION_SLOPE_TRICK_HPP\
+    \    return first;\n}\n\n}  // namespace convex\n}  // namespace m1une\n\n\n"
+  code: "#ifndef M1UNE_CONVEX_SLOPE_TRICK_HPP\n#define M1UNE_CONVEX_SLOPE_TRICK_HPP\
     \ 1\n\n#include <cassert>\n#include <functional>\n#include <optional>\n#include\
     \ <queue>\n#include <type_traits>\n#include <utility>\n#include <vector>\n\nnamespace\
-    \ m1une {\nnamespace ds {\n\ntemplate <class T>\nstruct SlopeTrickArgmin {\n \
-    \   std::optional<T> left;\n    std::optional<T> right;\n};\n\ntemplate <class\
+    \ m1une {\nnamespace convex {\n\ntemplate <class T>\nstruct SlopeTrickArgmin {\n\
+    \    std::optional<T> left;\n    std::optional<T> right;\n};\n\ntemplate <class\
     \ T>\nclass SlopeTrick {\n    static_assert(std::is_arithmetic_v<T> && std::is_signed_v<T>);\n\
     \n    T _minimum = T();\n    T _left_offset = T();\n    T _right_offset = T();\n\
     \    std::priority_queue<T> _left;\n    std::priority_queue<T, std::vector<T>,\
@@ -121,18 +121,18 @@ data:
     \            other._right.pop();\n        }\n        *this = std::move(result);\n\
     \    }\n};\n\ntemplate <class T>\nSlopeTrick<T> min_plus_convolution(SlopeTrick<T>\
     \ first,\n                                   SlopeTrick<T> second) {\n    first.min_plus_convolve(std::move(second));\n\
-    \    return first;\n}\n\n}  // namespace ds\n}  // namespace m1une\n\n#endif \
-    \ // M1UNE_DS_CONVEX_FUNCTION_SLOPE_TRICK_HPP\n"
+    \    return first;\n}\n\n}  // namespace convex\n}  // namespace m1une\n\n#endif\
+    \  // M1UNE_CONVEX_SLOPE_TRICK_HPP\n"
   dependsOn: []
   isVerificationFile: false
-  path: ds/convex_function/slope_trick.hpp
+  path: convex/slope_trick.hpp
   requiredBy:
-  - ds/convex_function/all.hpp
-  timestamp: '2026-07-07 17:18:14+09:00'
+  - convex/all.hpp
+  timestamp: '2026-07-07 18:38:36+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/convex_function/slope_trick.test.cpp
-documentation_of: ds/convex_function/slope_trick.hpp
+  - verify/convex/slope_trick.test.cpp
+documentation_of: convex/slope_trick.hpp
 layout: document
 title: Slope Trick
 ---
@@ -250,18 +250,18 @@ worst-case running time is $O((N+M)\log(N+M))$.
 ## Example
 
 ```cpp
-#include "ds/convex_function/slope_trick.hpp"
+#include "convex/slope_trick.hpp"
 #include <iostream>
 
 int main() {
-    m1une::ds::SlopeTrick<long long> slope;
+    m1une::convex::SlopeTrick<long long> slope;
     slope.add_abs(3);
     slope.add_x_minus_a(0);
     slope.shift(-1, 2);
 
-    m1une::ds::SlopeTrick<long long> other;
+    m1une::convex::SlopeTrick<long long> other;
     other.add_abs(5);
-    auto convolved = m1une::ds::min_plus_convolution(slope, other);
+    auto convolved = m1une::convex::min_plus_convolution(slope, other);
 
     std::cout << convolved.minimum() << "\n";
     auto range = convolved.argmin();

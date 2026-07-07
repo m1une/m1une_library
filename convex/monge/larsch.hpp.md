@@ -3,56 +3,52 @@ data:
   _extendedDependsOn: []
   _extendedRequiredBy:
   - icon: ':warning:'
-    path: algo/all.hpp
-    title: Algorithms All
-  - icon: ':warning:'
-    path: algo/dp_optimization/all.hpp
-    title: DP Optimization All
+    path: convex/all.hpp
+    title: Convex All
   - icon: ':heavy_check_mark:'
-    path: algo/dp_optimization/monge/all.hpp
+    path: convex/monge/all.hpp
     title: Monge All
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
-    path: verify/algo/dp_optimization/monge/monge_algorithms.test.cpp
-    title: verify/algo/dp_optimization/monge/monge_algorithms.test.cpp
+    path: verify/convex/monge/monge_algorithms.test.cpp
+    title: verify/convex/monge/monge_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/algo/dp_optimization/monge/monge_dp_optimization.test.cpp
-    title: verify/algo/dp_optimization/monge/monge_dp_optimization.test.cpp
+    path: verify/convex/monge/monge_dp_optimization.test.cpp
+    title: verify/convex/monge/monge_dp_optimization.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"algo/dp_optimization/monge/larsch.hpp\"\n\n\n\n#include\
-    \ <cassert>\n#include <functional>\n#include <memory>\n#include <type_traits>\n\
-    #include <utility>\n#include <vector>\n\nnamespace m1une {\nnamespace monge {\n\
-    \ntemplate <class T>\nclass Larsch {\n    struct ReduceColumn;\n\n    struct ReduceRow\
-    \ {\n        int size;\n        std::function<T(int, int)> value;\n        int\
-    \ current_row = 0;\n        int boundary = 0;\n        std::unique_ptr<ReduceColumn>\
-    \ recursive;\n\n        explicit ReduceRow(int size_) : size(size_) {\n      \
-    \      if (size / 2 != 0) recursive = std::make_unique<ReduceColumn>(size / 2);\n\
-    \        }\n\n        void set_value(std::function<T(int, int)> value_) {\n  \
-    \          value = std::move(value_);\n            if (recursive) {\n        \
-    \        recursive->set_value(\n                    [&](int row, int column) {\
-    \ return value(row * 2 + 1, column); });\n            }\n        }\n\n       \
-    \ int next_argmin() {\n            int row = current_row++;\n            if (row\
-    \ % 2 == 0) {\n                int previous = boundary;\n                int next\
-    \ = row + 1 == size ? size - 1 : recursive->next_argmin();\n                boundary\
-    \ = next;\n                int best = previous;\n                for (int column\
-    \ = previous + 1; column <= next; column++) {\n                    if (value(row,\
-    \ column) < value(row, best)) best = column;\n                }\n            \
-    \    return best;\n            }\n            return value(row, boundary) <= value(row,\
-    \ row) ? boundary : row;\n        }\n    };\n\n    struct ReduceColumn {\n   \
+  bundledCode: "#line 1 \"convex/monge/larsch.hpp\"\n\n\n\n#include <cassert>\n#include\
+    \ <functional>\n#include <memory>\n#include <type_traits>\n#include <utility>\n\
+    #include <vector>\n\nnamespace m1une {\nnamespace convex {\n\ntemplate <class\
+    \ T>\nclass Larsch {\n    struct ReduceColumn;\n\n    struct ReduceRow {\n   \
     \     int size;\n        std::function<T(int, int)> value;\n        int current_row\
-    \ = 0;\n        std::vector<int> columns;\n        ReduceRow recursive;\n\n  \
-    \      explicit ReduceColumn(int size_) : size(size_), recursive(size_) {}\n\n\
-    \        void set_value(std::function<T(int, int)> value_) {\n            value\
-    \ = std::move(value_);\n            recursive.set_value(\n                [&](int\
-    \ row, int column) { return value(row, columns[column]); });\n        }\n\n  \
-    \      int next_argmin() {\n            int row = current_row++;\n           \
-    \ int first = row == 0 ? 0 : row * 2 - 1;\n            int last = row * 2;\n \
-    \           for (int column = first; column <= last; column++) {\n           \
-    \     while (int(columns.size()) != row &&\n                       value(int(columns.size())\
+    \ = 0;\n        int boundary = 0;\n        std::unique_ptr<ReduceColumn> recursive;\n\
+    \n        explicit ReduceRow(int size_) : size(size_) {\n            if (size\
+    \ / 2 != 0) recursive = std::make_unique<ReduceColumn>(size / 2);\n        }\n\
+    \n        void set_value(std::function<T(int, int)> value_) {\n            value\
+    \ = std::move(value_);\n            if (recursive) {\n                recursive->set_value(\n\
+    \                    [&](int row, int column) { return value(row * 2 + 1, column);\
+    \ });\n            }\n        }\n\n        int next_argmin() {\n            int\
+    \ row = current_row++;\n            if (row % 2 == 0) {\n                int previous\
+    \ = boundary;\n                int next = row + 1 == size ? size - 1 : recursive->next_argmin();\n\
+    \                boundary = next;\n                int best = previous;\n    \
+    \            for (int column = previous + 1; column <= next; column++) {\n   \
+    \                 if (value(row, column) < value(row, best)) best = column;\n\
+    \                }\n                return best;\n            }\n            return\
+    \ value(row, boundary) <= value(row, row) ? boundary : row;\n        }\n    };\n\
+    \n    struct ReduceColumn {\n        int size;\n        std::function<T(int, int)>\
+    \ value;\n        int current_row = 0;\n        std::vector<int> columns;\n  \
+    \      ReduceRow recursive;\n\n        explicit ReduceColumn(int size_) : size(size_),\
+    \ recursive(size_) {}\n\n        void set_value(std::function<T(int, int)> value_)\
+    \ {\n            value = std::move(value_);\n            recursive.set_value(\n\
+    \                [&](int row, int column) { return value(row, columns[column]);\
+    \ });\n        }\n\n        int next_argmin() {\n            int row = current_row++;\n\
+    \            int first = row == 0 ? 0 : row * 2 - 1;\n            int last = row\
+    \ * 2;\n            for (int column = first; column <= last; column++) {\n   \
+    \             while (int(columns.size()) != row &&\n                       value(int(columns.size())\
     \ - 1, columns.back()) >\n                           value(int(columns.size())\
     \ - 1, column)) {\n                    columns.pop_back();\n                }\n\
     \                if (int(columns.size()) != size) columns.push_back(column);\n\
@@ -77,14 +73,14 @@ data:
     \ row + 1);\n    });\n    for (int vertex = 1; vertex < vertex_count; vertex++)\
     \ {\n        int parent = optimizer.next_argmin();\n        result.parent[vertex]\
     \ = parent;\n        result.distance[vertex] = result.distance[parent] + cost(parent,\
-    \ vertex);\n    }\n    return result;\n}\n\n}  // namespace monge\n}  // namespace\
+    \ vertex);\n    }\n    return result;\n}\n\n}  // namespace convex\n}  // namespace\
     \ m1une\n\n\n"
-  code: "#ifndef M1UNE_MONGE_LARSCH_HPP\n#define M1UNE_MONGE_LARSCH_HPP 1\n\n#include\
-    \ <cassert>\n#include <functional>\n#include <memory>\n#include <type_traits>\n\
-    #include <utility>\n#include <vector>\n\nnamespace m1une {\nnamespace monge {\n\
-    \ntemplate <class T>\nclass Larsch {\n    struct ReduceColumn;\n\n    struct ReduceRow\
-    \ {\n        int size;\n        std::function<T(int, int)> value;\n        int\
-    \ current_row = 0;\n        int boundary = 0;\n        std::unique_ptr<ReduceColumn>\
+  code: "#ifndef M1UNE_CONVEX_MONGE_LARSCH_HPP\n#define M1UNE_CONVEX_MONGE_LARSCH_HPP\
+    \ 1\n\n#include <cassert>\n#include <functional>\n#include <memory>\n#include\
+    \ <type_traits>\n#include <utility>\n#include <vector>\n\nnamespace m1une {\n\
+    namespace convex {\n\ntemplate <class T>\nclass Larsch {\n    struct ReduceColumn;\n\
+    \n    struct ReduceRow {\n        int size;\n        std::function<T(int, int)>\
+    \ value;\n        int current_row = 0;\n        int boundary = 0;\n        std::unique_ptr<ReduceColumn>\
     \ recursive;\n\n        explicit ReduceRow(int size_) : size(size_) {\n      \
     \      if (size / 2 != 0) recursive = std::make_unique<ReduceColumn>(size / 2);\n\
     \        }\n\n        void set_value(std::function<T(int, int)> value_) {\n  \
@@ -133,21 +129,20 @@ data:
     \ row + 1);\n    });\n    for (int vertex = 1; vertex < vertex_count; vertex++)\
     \ {\n        int parent = optimizer.next_argmin();\n        result.parent[vertex]\
     \ = parent;\n        result.distance[vertex] = result.distance[parent] + cost(parent,\
-    \ vertex);\n    }\n    return result;\n}\n\n}  // namespace monge\n}  // namespace\
-    \ m1une\n\n#endif  // M1UNE_MONGE_LARSCH_HPP\n"
+    \ vertex);\n    }\n    return result;\n}\n\n}  // namespace convex\n}  // namespace\
+    \ m1une\n\n#endif  // M1UNE_CONVEX_MONGE_LARSCH_HPP\n"
   dependsOn: []
   isVerificationFile: false
-  path: algo/dp_optimization/monge/larsch.hpp
+  path: convex/monge/larsch.hpp
   requiredBy:
-  - algo/all.hpp
-  - algo/dp_optimization/monge/all.hpp
-  - algo/dp_optimization/all.hpp
-  timestamp: '2026-07-07 14:26:59+09:00'
+  - convex/monge/all.hpp
+  - convex/all.hpp
+  timestamp: '2026-07-07 18:38:36+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/algo/dp_optimization/monge/monge_algorithms.test.cpp
-  - verify/algo/dp_optimization/monge/monge_dp_optimization.test.cpp
-documentation_of: algo/dp_optimization/monge/larsch.hpp
+  - verify/convex/monge/monge_algorithms.test.cpp
+  - verify/convex/monge/monge_dp_optimization.test.cpp
+documentation_of: convex/monge/larsch.hpp
 layout: document
 title: LARSCH
 ---
@@ -182,7 +177,7 @@ class Larsch;
 Construct it with the number of rows and a callback:
 
 ```cpp
-m1une::monge::Larsch<long long> optimizer(
+m1une::convex::Larsch<long long> optimizer(
     row_count,
     [&](int row, int column) {
         return matrix_value(row, column);
@@ -248,12 +243,12 @@ assuming each callback evaluation takes $O(1)$.
 ## Example
 
 ```cpp
-#include "algo/dp_optimization/monge/larsch.hpp"
+#include "convex/monge/larsch.hpp"
 #include <vector>
 
 int main() {
     std::vector<long long> position = {0, 2, 5, 9, 14};
-    auto result = m1une::monge::larsch_shortest_path(
+    auto result = m1une::convex::larsch_shortest_path(
         int(position.size()),
         [&](int from, int to) {
             long long distance = position[to] - position[from];

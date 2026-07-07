@@ -3,23 +3,20 @@ data:
   _extendedDependsOn: []
   _extendedRequiredBy:
   - icon: ':warning:'
-    path: algo/all.hpp
-    title: Algorithms All
-  - icon: ':warning:'
-    path: algo/dp_optimization/all.hpp
-    title: DP Optimization All
+    path: convex/all.hpp
+    title: Convex All
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
-    path: verify/algo/dp_optimization/alien_trick.test.cpp
-    title: verify/algo/dp_optimization/alien_trick.test.cpp
+    path: verify/convex/alien_trick.test.cpp
+    title: verify/convex/alien_trick.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"algo/dp_optimization/alien_trick.hpp\"\n\n\n\n#include <cassert>\n\
-    #include <concepts>\n#include <numeric>\n#include <type_traits>\n#include <utility>\n\
-    \nnamespace m1une {\nnamespace dp {\n\nnamespace detail {\n\ntemplate <std::integral\
+  bundledCode: "#line 1 \"convex/alien_trick.hpp\"\n\n\n\n#include <cassert>\n#include\
+    \ <concepts>\n#include <numeric>\n#include <type_traits>\n#include <utility>\n\
+    \nnamespace m1une {\nnamespace convex {\n\nnamespace detail {\n\ntemplate <std::integral\
     \ Penalty, std::integral Count, class Oracle>\nPenalty alien_trick_penalty(Penalty\
     \ lower, Penalty upper, Count target_count, Oracle& oracle) {\n    assert(lower\
     \ <= upper);\n    assert(oracle(lower).second >= target_count);\n    assert(oracle(upper).second\
@@ -42,11 +39,11 @@ data:
     \ oracle) {\n    Penalty penalty = detail::alien_trick_penalty(lower, upper, target_count,\
     \ oracle);\n    auto result = oracle(penalty);\n    using Value = std::remove_cvref_t<decltype(result.first)>;\n\
     \    return result.first + static_cast<Value>(penalty) * static_cast<Value>(target_count);\n\
-    }\n\n}  // namespace dp\n}  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_ALGO_DP_OPTIMIZATION_ALIEN_TRICK_HPP\n#define M1UNE_ALGO_DP_OPTIMIZATION_ALIEN_TRICK_HPP\
+    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n"
+  code: "#ifndef M1UNE_CONVEX_ALIEN_TRICK_HPP\n#define M1UNE_CONVEX_ALIEN_TRICK_HPP\
     \ 1\n\n#include <cassert>\n#include <concepts>\n#include <numeric>\n#include <type_traits>\n\
-    #include <utility>\n\nnamespace m1une {\nnamespace dp {\n\nnamespace detail {\n\
-    \ntemplate <std::integral Penalty, std::integral Count, class Oracle>\nPenalty\
+    #include <utility>\n\nnamespace m1une {\nnamespace convex {\n\nnamespace detail\
+    \ {\n\ntemplate <std::integral Penalty, std::integral Count, class Oracle>\nPenalty\
     \ alien_trick_penalty(Penalty lower, Penalty upper, Count target_count, Oracle&\
     \ oracle) {\n    assert(lower <= upper);\n    assert(oracle(lower).second >= target_count);\n\
     \    assert(oracle(upper).second <= target_count);\n\n    while (lower < upper)\
@@ -69,18 +66,17 @@ data:
     \ upper, target_count, oracle);\n    auto result = oracle(penalty);\n    using\
     \ Value = std::remove_cvref_t<decltype(result.first)>;\n    return result.first\
     \ + static_cast<Value>(penalty) * static_cast<Value>(target_count);\n}\n\n}  //\
-    \ namespace dp\n}  // namespace m1une\n\n#endif  // M1UNE_ALGO_DP_OPTIMIZATION_ALIEN_TRICK_HPP\n"
+    \ namespace convex\n}  // namespace m1une\n\n#endif  // M1UNE_CONVEX_ALIEN_TRICK_HPP\n"
   dependsOn: []
   isVerificationFile: false
-  path: algo/dp_optimization/alien_trick.hpp
+  path: convex/alien_trick.hpp
   requiredBy:
-  - algo/all.hpp
-  - algo/dp_optimization/all.hpp
-  timestamp: '2026-07-07 14:26:59+09:00'
+  - convex/all.hpp
+  timestamp: '2026-07-07 18:38:36+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/algo/dp_optimization/alien_trick.test.cpp
-documentation_of: algo/dp_optimization/alien_trick.hpp
+  - verify/convex/alien_trick.test.cpp
+documentation_of: convex/alien_trick.hpp
 layout: document
 title: Alien Trick
 ---
@@ -99,7 +95,7 @@ This header provides:
 Both functions return the optimum among solutions whose count is exactly
 `target_count`.
 
-The public namespace is `m1une::dp`.
+The public namespace is `m1une::convex`.
 
 ## Oracle Contract
 
@@ -144,7 +140,7 @@ excluding the oracle.
 ## Example
 
 ```cpp
-#include "algo/dp_optimization/alien_trick.hpp"
+#include "convex/alien_trick.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -168,7 +164,7 @@ int main() {
         return best;
     };
 
-    std::cout << m1une::dp::alien_trick_minimize(
+    std::cout << m1une::convex::alien_trick_minimize(
         -100LL,
         100LL,
         3,
