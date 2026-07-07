@@ -59,9 +59,6 @@ data:
     path: math/generalized_floor_sum.hpp
     title: Generalized Floor Sum
   - icon: ':heavy_check_mark:'
-    path: math/gray_code.hpp
-    title: Gray Code
-  - icon: ':heavy_check_mark:'
     path: math/integer_arithmetic.hpp
     title: Integer Square Root and Power
   - icon: ':heavy_check_mark:'
@@ -939,29 +936,9 @@ data:
     \ }\n    }\n    return result;\n}\n\ntemplate <class T, int Power, int FloorPower,\
     \ class I>\nT generalized_floor_sum(I n, I mod, I a, I b) {\n    return generalized_floor_sum_table<T,\
     \ Power, FloorPower>(n, mod, a, b)\n        [Power][FloorPower];\n}\n\n}  // namespace\
-    \ math\n}  // namespace m1une\n\n\n#line 1 \"math/gray_code.hpp\"\n\n\n\n#line\
-    \ 11 \"math/gray_code.hpp\"\n\nnamespace m1une {\nnamespace math {\n\n// Converts\
-    \ a binary value to its binary-reflected Gray code.\ntemplate <std::unsigned_integral\
-    \ UInt>\nrequires(!std::same_as<std::remove_cv_t<UInt>, bool>)\nconstexpr UInt\
-    \ gray_encode(UInt value) noexcept {\n    return value ^ (value >> 1);\n}\n\n\
-    // Converts a binary-reflected Gray code to the corresponding binary value.\n\
-    template <std::unsigned_integral UInt>\nrequires(!std::same_as<std::remove_cv_t<UInt>,\
-    \ bool>)\nconstexpr UInt gray_decode(UInt code) noexcept {\n    for (int shift\
-    \ = 1; shift < std::numeric_limits<UInt>::digits;\n         shift <<= 1) {\n \
-    \       code ^= code >> shift;\n    }\n    return code;\n}\n\n// Returns all bit_count-bit\
-    \ binary-reflected Gray codes in traversal order.\ntemplate <std::unsigned_integral\
-    \ UInt = std::uint64_t>\nrequires(!std::same_as<std::remove_cv_t<UInt>, bool>)\n\
-    std::vector<UInt> gray_code_sequence(int bit_count) {\n    constexpr int uint_digits\
-    \ = std::numeric_limits<UInt>::digits;\n    constexpr int size_digits = std::numeric_limits<std::size_t>::digits;\n\
-    \    assert(0 <= bit_count);\n    assert(bit_count <= uint_digits);\n    assert(bit_count\
-    \ < size_digits);\n    if (bit_count < 0 || uint_digits < bit_count || size_digits\
-    \ <= bit_count) {\n        return {};\n    }\n\n    const std::size_t size = std::size_t(1)\
-    \ << bit_count;\n    std::vector<UInt> result(size);\n    for (std::size_t index\
-    \ = 0; index < size; ++index) {\n        result[index] = gray_encode(static_cast<UInt>(index));\n\
-    \    }\n    return result;\n}\n\n}  // namespace math\n}  // namespace m1une\n\
-    \n\n#line 1 \"math/integer_arithmetic.hpp\"\n\n\n\n#line 9 \"math/integer_arithmetic.hpp\"\
-    \n\nnamespace m1une {\nnamespace math {\n\nnamespace integer_arithmetic_detail\
-    \ {\n\ntemplate <std::integral T>\nrequires(!std::same_as<std::remove_cv_t<T>,\
+    \ math\n}  // namespace m1une\n\n\n#line 1 \"math/integer_arithmetic.hpp\"\n\n\
+    \n\n#line 9 \"math/integer_arithmetic.hpp\"\n\nnamespace m1une {\nnamespace math\
+    \ {\n\nnamespace integer_arithmetic_detail {\n\ntemplate <std::integral T>\nrequires(!std::same_as<std::remove_cv_t<T>,\
     \ bool>)\nconstexpr std::optional<T> checked_multiply(T first, T second) {\n \
     \   constexpr T minimum = std::numeric_limits<T>::min();\n    constexpr T maximum\
     \ = std::numeric_limits<T>::max();\n\n    if constexpr (std::unsigned_integral<T>)\
@@ -2045,7 +2022,7 @@ data:
     \ value) {\n    if (value == 0) return true;\n    for (const auto& factor : prime_factorize(value))\
     \ {\n        if (factor.first % 4 == 3 && (factor.second & 1) != 0) return false;\n\
     \    }\n    return true;\n}\n\n}  // namespace math\n}  // namespace m1une\n\n\
-    \n#line 29 \"math/all.hpp\"\n\n\n#line 12 \"verify/math/math_algorithms.test.cpp\"\
+    \n#line 28 \"math/all.hpp\"\n\n\n#line 12 \"verify/math/math_algorithms.test.cpp\"\
     \n\nlong long floor_div(long long numerator, long long denominator) {\n    long\
     \ long quotient = numerator / denominator;\n    if (numerator % denominator <\
     \ 0) quotient--;\n    return quotient;\n}\n\nvoid test_number_theory() {\n   \
@@ -2394,7 +2371,6 @@ data:
   - math/cyclotomic_polynomial.hpp
   - math/prime_factorization.hpp
   - math/generalized_floor_sum.hpp
-  - math/gray_code.hpp
   - math/integer_arithmetic.hpp
   - math/lucas.hpp
   - math/fps/all.hpp
@@ -2421,7 +2397,7 @@ data:
   isVerificationFile: true
   path: verify/math/math_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-07 14:26:59+09:00'
+  timestamp: '2026-07-07 21:49:48+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/math_algorithms.test.cpp

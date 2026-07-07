@@ -1,18 +1,24 @@
 ---
 data:
   _extendedDependsOn: []
-  _extendedRequiredBy: []
+  _extendedRequiredBy:
+  - icon: ':warning:'
+    path: algo/all.hpp
+    title: Algorithms All
+  - icon: ':warning:'
+    path: algo/search/all.hpp
+    title: Search Algorithms All
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
-    path: verify/utilities/extra_utilities.test.cpp
-    title: verify/utilities/extra_utilities.test.cpp
+    path: verify/algo/search/bisect.test.cpp
+    title: verify/algo/search/bisect.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"utilities/bisect.hpp\"\n\n\n\n#include <numeric>\n\nnamespace\
-    \ m1une {\nnamespace utilities {\n\ntemplate <typename F>\nlong long first_true(long\
+  bundledCode: "#line 1 \"algo/search/bisect.hpp\"\n\n\n\n#include <numeric>\n\nnamespace\
+    \ m1une {\nnamespace algo {\n\ntemplate <typename F>\nlong long first_true(long\
     \ long ng, long long ok, F pred) {\n    auto distance = [](long long a, long long\
     \ b) {\n        return a > b ? static_cast<__int128_t>(a) - b : static_cast<__int128_t>(b)\
     \ - a;\n    };\n    while (distance(ng, ok) > 1) {\n        long long mid = std::midpoint(ng,\
@@ -27,16 +33,15 @@ data:
     \ ng, double ok, F pred, int iterations = 80) {\n    for (int i = 0; i < iterations;\
     \ ++i) {\n        double mid = (ng + ok) / 2.0;\n        if (pred(mid)) {\n  \
     \          ok = mid;\n        } else {\n            ng = mid;\n        }\n   \
-    \ }\n    return ok;\n}\n\n}  // namespace utilities\n}  // namespace m1une\n\n\
-    \n"
-  code: "#ifndef M1UNE_BISECT_HPP\n#define M1UNE_BISECT_HPP 1\n\n#include <numeric>\n\
-    \nnamespace m1une {\nnamespace utilities {\n\ntemplate <typename F>\nlong long\
-    \ first_true(long long ng, long long ok, F pred) {\n    auto distance = [](long\
-    \ long a, long long b) {\n        return a > b ? static_cast<__int128_t>(a) -\
-    \ b : static_cast<__int128_t>(b) - a;\n    };\n    while (distance(ng, ok) > 1)\
-    \ {\n        long long mid = std::midpoint(ng, ok);\n        if (pred(mid)) {\n\
-    \            ok = mid;\n        } else {\n            ng = mid;\n        }\n \
-    \   }\n    return ok;\n}\n\ntemplate <typename F>\nlong long last_true(long long\
+    \ }\n    return ok;\n}\n\n}  // namespace algo\n}  // namespace m1une\n\n\n"
+  code: "#ifndef M1UNE_ALGO_SEARCH_BISECT_HPP\n#define M1UNE_ALGO_SEARCH_BISECT_HPP\
+    \ 1\n\n#include <numeric>\n\nnamespace m1une {\nnamespace algo {\n\ntemplate <typename\
+    \ F>\nlong long first_true(long long ng, long long ok, F pred) {\n    auto distance\
+    \ = [](long long a, long long b) {\n        return a > b ? static_cast<__int128_t>(a)\
+    \ - b : static_cast<__int128_t>(b) - a;\n    };\n    while (distance(ng, ok) >\
+    \ 1) {\n        long long mid = std::midpoint(ng, ok);\n        if (pred(mid))\
+    \ {\n            ok = mid;\n        } else {\n            ng = mid;\n        }\n\
+    \    }\n    return ok;\n}\n\ntemplate <typename F>\nlong long last_true(long long\
     \ ok, long long ng, F pred) {\n    auto distance = [](long long a, long long b)\
     \ {\n        return a > b ? static_cast<__int128_t>(a) - b : static_cast<__int128_t>(b)\
     \ - a;\n    };\n    while (distance(ok, ng) > 1) {\n        long long mid = std::midpoint(ok,\
@@ -46,16 +51,18 @@ data:
     \ {\n    for (int i = 0; i < iterations; ++i) {\n        double mid = (ng + ok)\
     \ / 2.0;\n        if (pred(mid)) {\n            ok = mid;\n        } else {\n\
     \            ng = mid;\n        }\n    }\n    return ok;\n}\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n#endif  // M1UNE_BISECT_HPP\n"
+    \ algo\n}  // namespace m1une\n\n#endif  // M1UNE_ALGO_SEARCH_BISECT_HPP\n"
   dependsOn: []
   isVerificationFile: false
-  path: utilities/bisect.hpp
-  requiredBy: []
-  timestamp: '2026-06-16 01:13:59+09:00'
+  path: algo/search/bisect.hpp
+  requiredBy:
+  - algo/search/all.hpp
+  - algo/all.hpp
+  timestamp: '2026-07-07 21:49:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/utilities/extra_utilities.test.cpp
-documentation_of: utilities/bisect.hpp
+  - verify/algo/search/bisect.test.cpp
+documentation_of: algo/search/bisect.hpp
 layout: document
 title: Bisect
 ---
@@ -75,12 +82,12 @@ Binary search helpers for monotone predicates. The integer functions use explici
 ## Example
 
 ```cpp
-#include "utilities/bisect.hpp"
+#include "algo/search/bisect.hpp"
 #include <iostream>
 
 int main() {
     long long n = 100;
-    long long x = m1une::utilities::first_true(0, n + 1, [&](long long v) {
+    long long x = m1une::algo::first_true(0, n + 1, [&](long long v) {
         return v * v >= n;
     });
     std::cout << x << "\n";

@@ -7,6 +7,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: algo/sequence/lis.hpp
     title: Longest Increasing Subsequence (LIS)
+  - icon: ':heavy_check_mark:'
+    path: algo/sequence/run_length_encoding.hpp
+    title: Run Length Encoding
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
   _isVerificationFailed: false
@@ -21,7 +24,7 @@ data:
     \ PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <cassert>\n#include\
     \ <iostream>\n#include <vector>\n\n#line 1 \"algo/sequence/inversion_count.hpp\"\
     \n\n\n\n#line 5 \"algo/sequence/inversion_count.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ sequence {\n\n// Returns the number of pairs (i, j) with i < j and a[i] > a[j].\n\
+    \ algo {\n\n// Returns the number of pairs (i, j) with i < j and a[i] > a[j].\n\
     // The vector is taken by value because merge sort rearranges it.\ntemplate <typename\
     \ T>\nlong long inversion_count(std::vector<T> a) {\n    const int n = int(a.size());\n\
     \    std::vector<T> temp = a;\n\n    auto merge_sort = [&](auto& self, int l,\
@@ -34,15 +37,15 @@ data:
     \ m) temp[k++] = a[i++];\n        while (j < r) temp[k++] = a[j++];\n\n      \
     \  for (int p = l; p < r; ++p) {\n            a[p] = temp[p];\n        }\n\n \
     \       return inv;\n    };\n\n    return merge_sort(merge_sort, 0, n);\n}\n\n\
-    }  // namespace sequence\n}  // namespace m1une\n\n\n#line 1 \"algo/sequence/lis.hpp\"\
+    }  // namespace algo\n}  // namespace m1une\n\n\n#line 1 \"algo/sequence/lis.hpp\"\
     \n\n\n\n#include <algorithm>\n#include <iterator>\n#line 7 \"algo/sequence/lis.hpp\"\
-    \n\nnamespace m1une {\nnamespace sequence {\n\n// Returns the zero-based indices\
-    \ of a longest increasing subsequence.\n// If `strict` is false, equal adjacent\
-    \ values are also allowed.\ntemplate <typename T>\nstd::vector<int> lis(const\
-    \ std::vector<T>& a, bool strict = true) {\n    const int n = int(a.size());\n\
-    \    std::vector<T> tails;\n    std::vector<int> tail_positions;\n    std::vector<int>\
-    \ predecessor(n, -1);\n    tails.reserve(n);\n    tail_positions.reserve(n);\n\
-    \n    for (int i = 0; i < n; ++i) {\n        auto it = strict ? std::lower_bound(tails.begin(),\
+    \n\nnamespace m1une {\nnamespace algo {\n\n// Returns the zero-based indices of\
+    \ a longest increasing subsequence.\n// If `strict` is false, equal adjacent values\
+    \ are also allowed.\ntemplate <typename T>\nstd::vector<int> lis(const std::vector<T>&\
+    \ a, bool strict = true) {\n    const int n = int(a.size());\n    std::vector<T>\
+    \ tails;\n    std::vector<int> tail_positions;\n    std::vector<int> predecessor(n,\
+    \ -1);\n    tails.reserve(n);\n    tail_positions.reserve(n);\n\n    for (int\
+    \ i = 0; i < n; ++i) {\n        auto it = strict ? std::lower_bound(tails.begin(),\
     \ tails.end(), a[i])\n                         : std::upper_bound(tails.begin(),\
     \ tails.end(), a[i]);\n        const int length = int(std::distance(tails.begin(),\
     \ it));\n\n        if (it == tails.end()) {\n            tails.push_back(a[i]);\n\
@@ -53,59 +56,87 @@ data:
     \    result.reserve(tail_positions.size());\n    int current = tail_positions.back();\n\
     \    while (current != -1) {\n        result.push_back(current);\n        current\
     \ = predecessor[current];\n    }\n    std::reverse(result.begin(), result.end());\n\
-    \    return result;\n}\n\n}  // namespace sequence\n}  // namespace m1une\n\n\n\
-    #line 9 \"verify/algo/sequence/sequence_algorithms.test.cpp\"\n\nstruct LessOnly\
-    \ {\n    int value;\n\n    explicit LessOnly(int value) : value(value) {}\n\n\
-    \    friend bool operator<(const LessOnly& lhs, const LessOnly& rhs) {\n     \
-    \   return lhs.value < rhs.value;\n    }\n};\n\ntemplate <typename T>\nvoid assert_subsequence(\n\
-    \    const std::vector<T>& values,\n    const std::vector<int>& indices,\n   \
-    \ bool strict\n) {\n    for (int i = 0; i < int(indices.size()); ++i) {\n    \
-    \    assert(0 <= indices[i] && indices[i] < int(values.size()));\n        if (i\
-    \ == 0) continue;\n        assert(indices[i - 1] < indices[i]);\n        if (strict)\
-    \ {\n            assert(values[indices[i - 1]] < values[indices[i]]);\n      \
-    \  } else {\n            assert(!(values[indices[i]] < values[indices[i - 1]]));\n\
-    \        }\n    }\n}\n\nvoid test_lis() {\n    const std::vector<int> values =\
-    \ {3, 1, 2, 2, 4};\n\n    const auto strict = m1une::sequence::lis(values);\n\
+    \    return result;\n}\n\n}  // namespace algo\n}  // namespace m1une\n\n\n#line\
+    \ 1 \"algo/sequence/run_length_encoding.hpp\"\n\n\n\n#line 5 \"algo/sequence/run_length_encoding.hpp\"\
+    \n#include <utility>\n#line 7 \"algo/sequence/run_length_encoding.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace algo {\n\ntemplate <typename Container>\nauto run_length_encoding(const\
+    \ Container& values) {\n    using T = typename Container::value_type;\n    std::vector<std::pair<T,\
+    \ long long>> result;\n\n    auto it = std::begin(values);\n    auto last = std::end(values);\n\
+    \    if (it == last) {\n        return result;\n    }\n\n    T current = *it;\n\
+    \    long long count = 0;\n    for (; it != last; ++it) {\n        if (*it ==\
+    \ current) {\n            ++count;\n        } else {\n            result.emplace_back(current,\
+    \ count);\n            current = *it;\n            count = 1;\n        }\n   \
+    \ }\n    result.emplace_back(current, count);\n    return result;\n}\n\n}  //\
+    \ namespace algo\n}  // namespace m1une\n\n\n#line 10 \"verify/algo/sequence/sequence_algorithms.test.cpp\"\
+    \n\nstruct LessOnly {\n    int value;\n\n    explicit LessOnly(int value) : value(value)\
+    \ {}\n\n    friend bool operator<(const LessOnly& lhs, const LessOnly& rhs) {\n\
+    \        return lhs.value < rhs.value;\n    }\n};\n\ntemplate <typename T>\nvoid\
+    \ assert_subsequence(\n    const std::vector<T>& values,\n    const std::vector<int>&\
+    \ indices,\n    bool strict\n) {\n    for (int i = 0; i < int(indices.size());\
+    \ ++i) {\n        assert(0 <= indices[i] && indices[i] < int(values.size()));\n\
+    \        if (i == 0) continue;\n        assert(indices[i - 1] < indices[i]);\n\
+    \        if (strict) {\n            assert(values[indices[i - 1]] < values[indices[i]]);\n\
+    \        } else {\n            assert(!(values[indices[i]] < values[indices[i\
+    \ - 1]]));\n        }\n    }\n}\n\nvoid test_lis() {\n    const std::vector<int>\
+    \ values = {3, 1, 2, 2, 4};\n\n    const auto strict = m1une::algo::lis(values);\n\
     \    assert(strict.size() == 3);\n    assert_subsequence(values, strict, true);\n\
-    \n    const auto non_decreasing = m1une::sequence::lis(values, false);\n    assert(non_decreasing.size()\
-    \ == 4);\n    assert_subsequence(values, non_decreasing, false);\n\n    assert(m1une::sequence::lis(std::vector<int>()).empty());\n\
-    }\n\nvoid test_inversion_count() {\n    assert(m1une::sequence::inversion_count(std::vector<int>{2,\
-    \ 4, 1, 3, 5}) == 3);\n    assert(m1une::sequence::inversion_count(std::vector<int>{1,\
-    \ 1, 1}) == 0);\n    assert(m1une::sequence::inversion_count(std::vector<int>{3,\
-    \ 2, 1}) == 3);\n\n    std::vector<LessOnly> values = {LessOnly(2), LessOnly(1),\
-    \ LessOnly(1)};\n    assert(m1une::sequence::inversion_count(values) == 2);\n\
-    }\n\nint main() {\n    test_lis();\n    test_inversion_count();\n\n    long long\
-    \ a, b;\n    std::cin >> a >> b;\n    std::cout << a + b << '\\n';\n}\n"
+    \n    const auto non_decreasing = m1une::algo::lis(values, false);\n    assert(non_decreasing.size()\
+    \ == 4);\n    assert_subsequence(values, non_decreasing, false);\n\n    assert(m1une::algo::lis(std::vector<int>()).empty());\n\
+    }\n\nvoid test_inversion_count() {\n    assert(m1une::algo::inversion_count(std::vector<int>{2,\
+    \ 4, 1, 3, 5}) == 3);\n    assert(m1une::algo::inversion_count(std::vector<int>{1,\
+    \ 1, 1}) == 0);\n    assert(m1une::algo::inversion_count(std::vector<int>{3, 2,\
+    \ 1}) == 3);\n\n    std::vector<LessOnly> values = {LessOnly(2), LessOnly(1),\
+    \ LessOnly(1)};\n    assert(m1une::algo::inversion_count(values) == 2);\n}\n\n\
+    void test_run_length_encoding() {\n    std::string s = \"aaabbc\";\n    auto runs\
+    \ = m1une::algo::run_length_encoding(s);\n    assert(runs.size() == 3);\n    assert(runs[0]\
+    \ == std::make_pair('a', 3LL));\n    assert(runs[1] == std::make_pair('b', 2LL));\n\
+    \    assert(runs[2] == std::make_pair('c', 1LL));\n\n    std::vector<int> v =\
+    \ {1, 1, 2, 2, 2, 1};\n    auto vector_runs = m1une::algo::run_length_encoding(v);\n\
+    \    assert(vector_runs[0] == std::make_pair(1, 2LL));\n    assert(vector_runs[1]\
+    \ == std::make_pair(2, 3LL));\n    assert(vector_runs[2] == std::make_pair(1,\
+    \ 1LL));\n}\n\nint main() {\n    test_lis();\n    test_inversion_count();\n  \
+    \  test_run_length_encoding();\n\n    long long a, b;\n    std::cin >> a >> b;\n\
+    \    std::cout << a + b << '\\n';\n}\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <cassert>\n\
     #include <iostream>\n#include <vector>\n\n#include \"../../../algo/sequence/inversion_count.hpp\"\
-    \n#include \"../../../algo/sequence/lis.hpp\"\n\nstruct LessOnly {\n    int value;\n\
-    \n    explicit LessOnly(int value) : value(value) {}\n\n    friend bool operator<(const\
-    \ LessOnly& lhs, const LessOnly& rhs) {\n        return lhs.value < rhs.value;\n\
-    \    }\n};\n\ntemplate <typename T>\nvoid assert_subsequence(\n    const std::vector<T>&\
-    \ values,\n    const std::vector<int>& indices,\n    bool strict\n) {\n    for\
-    \ (int i = 0; i < int(indices.size()); ++i) {\n        assert(0 <= indices[i]\
-    \ && indices[i] < int(values.size()));\n        if (i == 0) continue;\n      \
-    \  assert(indices[i - 1] < indices[i]);\n        if (strict) {\n            assert(values[indices[i\
-    \ - 1]] < values[indices[i]]);\n        } else {\n            assert(!(values[indices[i]]\
-    \ < values[indices[i - 1]]));\n        }\n    }\n}\n\nvoid test_lis() {\n    const\
-    \ std::vector<int> values = {3, 1, 2, 2, 4};\n\n    const auto strict = m1une::sequence::lis(values);\n\
+    \n#include \"../../../algo/sequence/lis.hpp\"\n#include \"../../../algo/sequence/run_length_encoding.hpp\"\
+    \n\nstruct LessOnly {\n    int value;\n\n    explicit LessOnly(int value) : value(value)\
+    \ {}\n\n    friend bool operator<(const LessOnly& lhs, const LessOnly& rhs) {\n\
+    \        return lhs.value < rhs.value;\n    }\n};\n\ntemplate <typename T>\nvoid\
+    \ assert_subsequence(\n    const std::vector<T>& values,\n    const std::vector<int>&\
+    \ indices,\n    bool strict\n) {\n    for (int i = 0; i < int(indices.size());\
+    \ ++i) {\n        assert(0 <= indices[i] && indices[i] < int(values.size()));\n\
+    \        if (i == 0) continue;\n        assert(indices[i - 1] < indices[i]);\n\
+    \        if (strict) {\n            assert(values[indices[i - 1]] < values[indices[i]]);\n\
+    \        } else {\n            assert(!(values[indices[i]] < values[indices[i\
+    \ - 1]]));\n        }\n    }\n}\n\nvoid test_lis() {\n    const std::vector<int>\
+    \ values = {3, 1, 2, 2, 4};\n\n    const auto strict = m1une::algo::lis(values);\n\
     \    assert(strict.size() == 3);\n    assert_subsequence(values, strict, true);\n\
-    \n    const auto non_decreasing = m1une::sequence::lis(values, false);\n    assert(non_decreasing.size()\
-    \ == 4);\n    assert_subsequence(values, non_decreasing, false);\n\n    assert(m1une::sequence::lis(std::vector<int>()).empty());\n\
-    }\n\nvoid test_inversion_count() {\n    assert(m1une::sequence::inversion_count(std::vector<int>{2,\
-    \ 4, 1, 3, 5}) == 3);\n    assert(m1une::sequence::inversion_count(std::vector<int>{1,\
-    \ 1, 1}) == 0);\n    assert(m1une::sequence::inversion_count(std::vector<int>{3,\
-    \ 2, 1}) == 3);\n\n    std::vector<LessOnly> values = {LessOnly(2), LessOnly(1),\
-    \ LessOnly(1)};\n    assert(m1une::sequence::inversion_count(values) == 2);\n\
-    }\n\nint main() {\n    test_lis();\n    test_inversion_count();\n\n    long long\
-    \ a, b;\n    std::cin >> a >> b;\n    std::cout << a + b << '\\n';\n}\n"
+    \n    const auto non_decreasing = m1une::algo::lis(values, false);\n    assert(non_decreasing.size()\
+    \ == 4);\n    assert_subsequence(values, non_decreasing, false);\n\n    assert(m1une::algo::lis(std::vector<int>()).empty());\n\
+    }\n\nvoid test_inversion_count() {\n    assert(m1une::algo::inversion_count(std::vector<int>{2,\
+    \ 4, 1, 3, 5}) == 3);\n    assert(m1une::algo::inversion_count(std::vector<int>{1,\
+    \ 1, 1}) == 0);\n    assert(m1une::algo::inversion_count(std::vector<int>{3, 2,\
+    \ 1}) == 3);\n\n    std::vector<LessOnly> values = {LessOnly(2), LessOnly(1),\
+    \ LessOnly(1)};\n    assert(m1une::algo::inversion_count(values) == 2);\n}\n\n\
+    void test_run_length_encoding() {\n    std::string s = \"aaabbc\";\n    auto runs\
+    \ = m1une::algo::run_length_encoding(s);\n    assert(runs.size() == 3);\n    assert(runs[0]\
+    \ == std::make_pair('a', 3LL));\n    assert(runs[1] == std::make_pair('b', 2LL));\n\
+    \    assert(runs[2] == std::make_pair('c', 1LL));\n\n    std::vector<int> v =\
+    \ {1, 1, 2, 2, 2, 1};\n    auto vector_runs = m1une::algo::run_length_encoding(v);\n\
+    \    assert(vector_runs[0] == std::make_pair(1, 2LL));\n    assert(vector_runs[1]\
+    \ == std::make_pair(2, 3LL));\n    assert(vector_runs[2] == std::make_pair(1,\
+    \ 1LL));\n}\n\nint main() {\n    test_lis();\n    test_inversion_count();\n  \
+    \  test_run_length_encoding();\n\n    long long a, b;\n    std::cin >> a >> b;\n\
+    \    std::cout << a + b << '\\n';\n}\n"
   dependsOn:
   - algo/sequence/inversion_count.hpp
   - algo/sequence/lis.hpp
+  - algo/sequence/run_length_encoding.hpp
   isVerificationFile: true
   path: verify/algo/sequence/sequence_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-07 14:26:59+09:00'
+  timestamp: '2026-07-07 21:49:48+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/algo/sequence/sequence_algorithms.test.cpp

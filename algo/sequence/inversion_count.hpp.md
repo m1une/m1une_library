@@ -18,9 +18,9 @@ data:
   attributes:
     links: []
   bundledCode: "#line 1 \"algo/sequence/inversion_count.hpp\"\n\n\n\n#include <vector>\n\
-    \nnamespace m1une {\nnamespace sequence {\n\n// Returns the number of pairs (i,\
-    \ j) with i < j and a[i] > a[j].\n// The vector is taken by value because merge\
-    \ sort rearranges it.\ntemplate <typename T>\nlong long inversion_count(std::vector<T>\
+    \nnamespace m1une {\nnamespace algo {\n\n// Returns the number of pairs (i, j)\
+    \ with i < j and a[i] > a[j].\n// The vector is taken by value because merge sort\
+    \ rearranges it.\ntemplate <typename T>\nlong long inversion_count(std::vector<T>\
     \ a) {\n    const int n = int(a.size());\n    std::vector<T> temp = a;\n\n   \
     \ auto merge_sort = [&](auto& self, int l, int r) -> long long {\n        if (r\
     \ - l <= 1) return 0;\n\n        const int m = l + (r - l) / 2;\n        long\
@@ -31,10 +31,10 @@ data:
     \            }\n        }\n\n        while (i < m) temp[k++] = a[i++];\n     \
     \   while (j < r) temp[k++] = a[j++];\n\n        for (int p = l; p < r; ++p) {\n\
     \            a[p] = temp[p];\n        }\n\n        return inv;\n    };\n\n   \
-    \ return merge_sort(merge_sort, 0, n);\n}\n\n}  // namespace sequence\n}  // namespace\
+    \ return merge_sort(merge_sort, 0, n);\n}\n\n}  // namespace algo\n}  // namespace\
     \ m1une\n\n\n"
-  code: "#ifndef M1UNE_SEQUENCE_INVERSION_COUNT_HPP\n#define M1UNE_SEQUENCE_INVERSION_COUNT_HPP\
-    \ 1\n\n#include <vector>\n\nnamespace m1une {\nnamespace sequence {\n\n// Returns\
+  code: "#ifndef M1UNE_ALGO_SEQUENCE_INVERSION_COUNT_HPP\n#define M1UNE_ALGO_SEQUENCE_INVERSION_COUNT_HPP\
+    \ 1\n\n#include <vector>\n\nnamespace m1une {\nnamespace algo {\n\n// Returns\
     \ the number of pairs (i, j) with i < j and a[i] > a[j].\n// The vector is taken\
     \ by value because merge sort rearranges it.\ntemplate <typename T>\nlong long\
     \ inversion_count(std::vector<T> a) {\n    const int n = int(a.size());\n    std::vector<T>\
@@ -47,15 +47,15 @@ data:
     \ += m - i;\n            }\n        }\n\n        while (i < m) temp[k++] = a[i++];\n\
     \        while (j < r) temp[k++] = a[j++];\n\n        for (int p = l; p < r; ++p)\
     \ {\n            a[p] = temp[p];\n        }\n\n        return inv;\n    };\n\n\
-    \    return merge_sort(merge_sort, 0, n);\n}\n\n}  // namespace sequence\n}  //\
-    \ namespace m1une\n\n#endif  // M1UNE_SEQUENCE_INVERSION_COUNT_HPP\n"
+    \    return merge_sort(merge_sort, 0, n);\n}\n\n}  // namespace algo\n}  // namespace\
+    \ m1une\n\n#endif  // M1UNE_ALGO_SEQUENCE_INVERSION_COUNT_HPP\n"
   dependsOn: []
   isVerificationFile: false
   path: algo/sequence/inversion_count.hpp
   requiredBy:
   - algo/all.hpp
   - algo/sequence/all.hpp
-  timestamp: '2026-07-07 14:26:59+09:00'
+  timestamp: '2026-07-07 21:49:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/algo/sequence/sequence_algorithms.test.cpp
@@ -94,7 +94,7 @@ $N(N-1)/2$ inversions.
 int main() {
     std::vector<int> a = {2, 4, 1, 3, 5};
 
-    const long long inversions = m1une::sequence::inversion_count(a);
+    const long long inversions = m1une::algo::inversion_count(a);
 
     // The inversions are:
     // (2, 1) -> indices 0 and 2
@@ -103,7 +103,7 @@ int main() {
     std::cout << "Inversions: " << inversions << "\n"; // Output: 3
 
     // To avoid copying the array if you don't need it afterward:
-    // long long fast_invs = m1une::sequence::inversion_count(std::move(a));
+    // long long fast_invs = m1une::algo::inversion_count(std::move(a));
 
     return 0;
 }

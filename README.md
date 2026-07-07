@@ -7,7 +7,8 @@ C++20 library for competitive programming by [m1une](https://atcoder.jp/users/m1
 This repository is organized as header-only building blocks. Convex tools such
 as Li Chao tree, CHT, slope trick, Alien Trick, and Monge optimizations live
 under `convex/`. Use `ds/` for non-convex stateful query/update objects, and
-`algo/` for one-shot sequence algorithms. Graph-specialized algorithms,
+`algo/` for one-shot, domain-neutral techniques such as sequence algorithms,
+search-over-answer helpers, offline query ordering, and enumeration. Graph-specialized algorithms,
 including tree and flow routines, live under `graph/`; algebraic and numeric
 tools, including FPS and matrices, live under `math/`. Reusable algebraic
 definitions live in `monoid/` and `acted_monoid/` so they can be combined
@@ -18,7 +19,7 @@ without rewriting boilerplate during a contest.
 | Directory | Contents |
 | --- | --- |
 | `convex/` | Convex-structure and convex-optimization tools, including CHT, Li Chao tree, slope trick, Alien Trick, Monge/SMAWK/Knuth/D&C optimization, and structured min-plus/max-plus convolution. |
-| `algo/` | One-shot algorithms that are not tied to a graph/string/geometry/convex domain, currently sequence algorithms. |
+| `algo/` | One-shot algorithms that are not tied to a graph/string/geometry/convex domain, including sequence, search, offline, and enumeration helpers. |
 | `graph/` | General graph algorithms and builders, plus `graph/tree/` for rooted-tree tools and `graph/flow/` for flow networks. |
 | `optimization/` | Combinatorial and numeric optimization solvers such as project selection, Hungarian assignment, simplex LP, and integer LP. |
 | `matroid/` | Uniform, partition, graphic, and linear matroids, plus weighted and unweighted matroid intersection. |
@@ -40,7 +41,7 @@ short namespace segment after `m1une::`; nested directories are for browsing.
 | Directory | Namespace |
 | --- | --- |
 | `convex/` | `m1une::convex` |
-| `algo/sequence/` | `m1une::sequence` |
+| `algo/` | `m1une::algo` |
 | `ds/` | `m1une::ds` |
 | `graph/` | `m1une::graph` |
 | `graph/flow/` | `m1une::flow` |
@@ -55,7 +56,10 @@ short namespace segment after `m1une::`; nested directories are for browsing.
 
 | Directory | Use it for |
 | --- | --- |
-| `algo/sequence/` | Array and sequence algorithms such as LIS, inversion count, and meet-in-the-middle subset sum. |
+| `algo/sequence/` | Array and sequence algorithms such as LIS, inversion count, run-length encoding, and meet-in-the-middle subset sum. |
+| `algo/search/` | Search-over-answer helpers such as integer and floating-point binary search. |
+| `algo/offline/` | Offline query processing such as Mo's algorithm. |
+| `algo/enumeration/` | Combinatorial traversal helpers such as Gray-code enumeration. |
 
 ### Convex categories
 

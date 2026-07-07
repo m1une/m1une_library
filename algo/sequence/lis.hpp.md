@@ -18,52 +18,52 @@ data:
   attributes:
     links: []
   bundledCode: "#line 1 \"algo/sequence/lis.hpp\"\n\n\n\n#include <algorithm>\n#include\
-    \ <iterator>\n#include <vector>\n\nnamespace m1une {\nnamespace sequence {\n\n\
-    // Returns the zero-based indices of a longest increasing subsequence.\n// If\
-    \ `strict` is false, equal adjacent values are also allowed.\ntemplate <typename\
-    \ T>\nstd::vector<int> lis(const std::vector<T>& a, bool strict = true) {\n  \
-    \  const int n = int(a.size());\n    std::vector<T> tails;\n    std::vector<int>\
-    \ tail_positions;\n    std::vector<int> predecessor(n, -1);\n    tails.reserve(n);\n\
-    \    tail_positions.reserve(n);\n\n    for (int i = 0; i < n; ++i) {\n       \
-    \ auto it = strict ? std::lower_bound(tails.begin(), tails.end(), a[i])\n    \
-    \                     : std::upper_bound(tails.begin(), tails.end(), a[i]);\n\
-    \        const int length = int(std::distance(tails.begin(), it));\n\n       \
-    \ if (it == tails.end()) {\n            tails.push_back(a[i]);\n            tail_positions.push_back(i);\n\
-    \        } else {\n            *it = a[i];\n            tail_positions[length]\
-    \ = i;\n        }\n\n        if (length > 0) {\n            predecessor[i] = tail_positions[length\
-    \ - 1];\n        }\n    }\n\n    if (tail_positions.empty()) return {};\n\n  \
-    \  std::vector<int> result;\n    result.reserve(tail_positions.size());\n    int\
-    \ current = tail_positions.back();\n    while (current != -1) {\n        result.push_back(current);\n\
-    \        current = predecessor[current];\n    }\n    std::reverse(result.begin(),\
-    \ result.end());\n    return result;\n}\n\n}  // namespace sequence\n}  // namespace\
-    \ m1une\n\n\n"
-  code: "#ifndef M1UNE_SEQUENCE_LIS_HPP\n#define M1UNE_SEQUENCE_LIS_HPP 1\n\n#include\
-    \ <algorithm>\n#include <iterator>\n#include <vector>\n\nnamespace m1une {\nnamespace\
-    \ sequence {\n\n// Returns the zero-based indices of a longest increasing subsequence.\n\
-    // If `strict` is false, equal adjacent values are also allowed.\ntemplate <typename\
-    \ T>\nstd::vector<int> lis(const std::vector<T>& a, bool strict = true) {\n  \
-    \  const int n = int(a.size());\n    std::vector<T> tails;\n    std::vector<int>\
-    \ tail_positions;\n    std::vector<int> predecessor(n, -1);\n    tails.reserve(n);\n\
-    \    tail_positions.reserve(n);\n\n    for (int i = 0; i < n; ++i) {\n       \
-    \ auto it = strict ? std::lower_bound(tails.begin(), tails.end(), a[i])\n    \
-    \                     : std::upper_bound(tails.begin(), tails.end(), a[i]);\n\
-    \        const int length = int(std::distance(tails.begin(), it));\n\n       \
-    \ if (it == tails.end()) {\n            tails.push_back(a[i]);\n            tail_positions.push_back(i);\n\
-    \        } else {\n            *it = a[i];\n            tail_positions[length]\
-    \ = i;\n        }\n\n        if (length > 0) {\n            predecessor[i] = tail_positions[length\
-    \ - 1];\n        }\n    }\n\n    if (tail_positions.empty()) return {};\n\n  \
-    \  std::vector<int> result;\n    result.reserve(tail_positions.size());\n    int\
-    \ current = tail_positions.back();\n    while (current != -1) {\n        result.push_back(current);\n\
-    \        current = predecessor[current];\n    }\n    std::reverse(result.begin(),\
-    \ result.end());\n    return result;\n}\n\n}  // namespace sequence\n}  // namespace\
-    \ m1une\n\n#endif  // M1UNE_SEQUENCE_LIS_HPP\n"
+    \ <iterator>\n#include <vector>\n\nnamespace m1une {\nnamespace algo {\n\n// Returns\
+    \ the zero-based indices of a longest increasing subsequence.\n// If `strict`\
+    \ is false, equal adjacent values are also allowed.\ntemplate <typename T>\nstd::vector<int>\
+    \ lis(const std::vector<T>& a, bool strict = true) {\n    const int n = int(a.size());\n\
+    \    std::vector<T> tails;\n    std::vector<int> tail_positions;\n    std::vector<int>\
+    \ predecessor(n, -1);\n    tails.reserve(n);\n    tail_positions.reserve(n);\n\
+    \n    for (int i = 0; i < n; ++i) {\n        auto it = strict ? std::lower_bound(tails.begin(),\
+    \ tails.end(), a[i])\n                         : std::upper_bound(tails.begin(),\
+    \ tails.end(), a[i]);\n        const int length = int(std::distance(tails.begin(),\
+    \ it));\n\n        if (it == tails.end()) {\n            tails.push_back(a[i]);\n\
+    \            tail_positions.push_back(i);\n        } else {\n            *it =\
+    \ a[i];\n            tail_positions[length] = i;\n        }\n\n        if (length\
+    \ > 0) {\n            predecessor[i] = tail_positions[length - 1];\n        }\n\
+    \    }\n\n    if (tail_positions.empty()) return {};\n\n    std::vector<int> result;\n\
+    \    result.reserve(tail_positions.size());\n    int current = tail_positions.back();\n\
+    \    while (current != -1) {\n        result.push_back(current);\n        current\
+    \ = predecessor[current];\n    }\n    std::reverse(result.begin(), result.end());\n\
+    \    return result;\n}\n\n}  // namespace algo\n}  // namespace m1une\n\n\n"
+  code: "#ifndef M1UNE_ALGO_SEQUENCE_LIS_HPP\n#define M1UNE_ALGO_SEQUENCE_LIS_HPP\
+    \ 1\n\n#include <algorithm>\n#include <iterator>\n#include <vector>\n\nnamespace\
+    \ m1une {\nnamespace algo {\n\n// Returns the zero-based indices of a longest\
+    \ increasing subsequence.\n// If `strict` is false, equal adjacent values are\
+    \ also allowed.\ntemplate <typename T>\nstd::vector<int> lis(const std::vector<T>&\
+    \ a, bool strict = true) {\n    const int n = int(a.size());\n    std::vector<T>\
+    \ tails;\n    std::vector<int> tail_positions;\n    std::vector<int> predecessor(n,\
+    \ -1);\n    tails.reserve(n);\n    tail_positions.reserve(n);\n\n    for (int\
+    \ i = 0; i < n; ++i) {\n        auto it = strict ? std::lower_bound(tails.begin(),\
+    \ tails.end(), a[i])\n                         : std::upper_bound(tails.begin(),\
+    \ tails.end(), a[i]);\n        const int length = int(std::distance(tails.begin(),\
+    \ it));\n\n        if (it == tails.end()) {\n            tails.push_back(a[i]);\n\
+    \            tail_positions.push_back(i);\n        } else {\n            *it =\
+    \ a[i];\n            tail_positions[length] = i;\n        }\n\n        if (length\
+    \ > 0) {\n            predecessor[i] = tail_positions[length - 1];\n        }\n\
+    \    }\n\n    if (tail_positions.empty()) return {};\n\n    std::vector<int> result;\n\
+    \    result.reserve(tail_positions.size());\n    int current = tail_positions.back();\n\
+    \    while (current != -1) {\n        result.push_back(current);\n        current\
+    \ = predecessor[current];\n    }\n    std::reverse(result.begin(), result.end());\n\
+    \    return result;\n}\n\n}  // namespace algo\n}  // namespace m1une\n\n#endif\
+    \  // M1UNE_ALGO_SEQUENCE_LIS_HPP\n"
   dependsOn: []
   isVerificationFile: false
   path: algo/sequence/lis.hpp
   requiredBy:
   - algo/all.hpp
   - algo/sequence/all.hpp
-  timestamp: '2026-07-07 14:26:59+09:00'
+  timestamp: '2026-07-07 21:49:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/algo/sequence/sequence_algorithms.test.cpp
@@ -101,7 +101,7 @@ non-decreasing subsequence.
 int main() {
     std::vector<int> a = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5};
 
-    const std::vector<int> lis_indices = m1une::sequence::lis(a);
+    const std::vector<int> lis_indices = m1une::algo::lis(a);
 
     std::cout << "LIS length: " << lis_indices.size() << "\n"; // Output: 4
 
@@ -113,7 +113,7 @@ int main() {
     for (int idx : lis_indices) std::cout << a[idx] << " ";
     std::cout << "\n";
 
-    const std::vector<int> non_decreasing = m1une::sequence::lis(a, false);
+    const std::vector<int> non_decreasing = m1une::algo::lis(a, false);
     std::cout << "Non-decreasing length: " << non_decreasing.size() << "\n";
 
     return 0;

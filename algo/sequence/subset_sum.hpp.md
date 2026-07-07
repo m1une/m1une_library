@@ -19,7 +19,7 @@ data:
     links: []
   bundledCode: "#line 1 \"algo/sequence/subset_sum.hpp\"\n\n\n\n#include <cassert>\n\
     #include <cstddef>\n#include <utility>\n#include <vector>\n\nnamespace m1une {\n\
-    namespace sequence {\n\nnamespace internal {\n\ntemplate <typename T>\nstd::vector<T>\
+    namespace algo {\n\nnamespace internal {\n\ntemplate <typename T>\nstd::vector<T>\
     \ enumerate_sorted_subset_sums(\n    const std::vector<T>& values,\n    int left,\n\
     \    int right\n) {\n    std::vector<T> sums(1, T{});\n    std::vector<T> merged;\n\
     \n    for (int i = left; i < right; ++i) {\n        const std::size_t size = sums.size();\n\
@@ -47,11 +47,11 @@ data:
     \   --right_count;\n        }\n        if (right_count == 0) break;\n\n      \
     \  const T candidate = left + right_sums[right_count - 1];\n        if (answer\
     \ < candidate) answer = candidate;\n    }\n    return answer;\n}\n\n}  // namespace\
-    \ sequence\n}  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_SEQUENCE_SUBSET_SUM_HPP\n#define M1UNE_SEQUENCE_SUBSET_SUM_HPP\
+    \ algo\n}  // namespace m1une\n\n\n"
+  code: "#ifndef M1UNE_ALGO_SEQUENCE_SUBSET_SUM_HPP\n#define M1UNE_ALGO_SEQUENCE_SUBSET_SUM_HPP\
     \ 1\n\n#include <cassert>\n#include <cstddef>\n#include <utility>\n#include <vector>\n\
-    \nnamespace m1une {\nnamespace sequence {\n\nnamespace internal {\n\ntemplate\
-    \ <typename T>\nstd::vector<T> enumerate_sorted_subset_sums(\n    const std::vector<T>&\
+    \nnamespace m1une {\nnamespace algo {\n\nnamespace internal {\n\ntemplate <typename\
+    \ T>\nstd::vector<T> enumerate_sorted_subset_sums(\n    const std::vector<T>&\
     \ values,\n    int left,\n    int right\n) {\n    std::vector<T> sums(1, T{});\n\
     \    std::vector<T> merged;\n\n    for (int i = left; i < right; ++i) {\n    \
     \    const std::size_t size = sums.size();\n        merged.clear();\n        merged.reserve(size\
@@ -79,14 +79,14 @@ data:
     \   --right_count;\n        }\n        if (right_count == 0) break;\n\n      \
     \  const T candidate = left + right_sums[right_count - 1];\n        if (answer\
     \ < candidate) answer = candidate;\n    }\n    return answer;\n}\n\n}  // namespace\
-    \ sequence\n}  // namespace m1une\n\n#endif  // M1UNE_SEQUENCE_SUBSET_SUM_HPP\n"
+    \ algo\n}  // namespace m1une\n\n#endif  // M1UNE_ALGO_SEQUENCE_SUBSET_SUM_HPP\n"
   dependsOn: []
   isVerificationFile: false
   path: algo/sequence/subset_sum.hpp
   requiredBy:
   - algo/all.hpp
   - algo/sequence/all.hpp
-  timestamp: '2026-07-07 14:26:59+09:00'
+  timestamp: '2026-07-07 21:49:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/algo/sequence/subset_sum.test.cpp
@@ -141,9 +141,9 @@ int main() {
     const std::vector<long long> values = {2, 3, 5, 7, 11};
     const long long limit = 17;
 
-    std::cout << m1une::sequence::maximum_subset_sum(values, limit) << '\n';
+    std::cout << m1une::algo::maximum_subset_sum(values, limit) << '\n';
 
     const auto [left_sums, right_sums] =
-        m1une::sequence::enumerate_half_subset_sums(values);
+        m1une::algo::enumerate_half_subset_sums(values);
 }
 ```

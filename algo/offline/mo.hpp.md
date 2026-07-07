@@ -1,19 +1,25 @@
 ---
 data:
   _extendedDependsOn: []
-  _extendedRequiredBy: []
+  _extendedRequiredBy:
+  - icon: ':warning:'
+    path: algo/all.hpp
+    title: Algorithms All
+  - icon: ':warning:'
+    path: algo/offline/all.hpp
+    title: Offline Algorithms All
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
-    path: verify/ds/range_query/mo.test.cpp
-    title: verify/ds/range_query/mo.test.cpp
+    path: verify/algo/offline/mo.test.cpp
+    title: verify/algo/offline/mo.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"ds/range_query/mo.hpp\"\n\n\n\n#include <algorithm>\n#include\
+  bundledCode: "#line 1 \"algo/offline/mo.hpp\"\n\n\n\n#include <algorithm>\n#include\
     \ <cassert>\n#include <cmath>\n#include <numeric>\n#include <vector>\n\nnamespace\
-    \ m1une {\nnamespace ds {\n\n// Offline Mo's algorithm for half-open array ranges.\n\
+    \ m1une {\nnamespace algo {\n\n// Offline Mo's algorithm for half-open array ranges.\n\
     struct Mo {\n    struct Query {\n        int left;\n        int right;\n     \
     \   int id;\n    };\n\n   private:\n    int _n;\n    std::vector<Query> _queries;\n\
     \n   public:\n    Mo() : _n(0) {}\n\n    explicit Mo(int n) : _n(n) {\n      \
@@ -53,10 +59,10 @@ data:
     \ independent of\n    // which side moves.\n    template <class Add, class Remove,\
     \ class Answer>\n    void run(Add add, Remove remove, Answer answer, int block_size\
     \ = 0) const {\n        run(add, add, remove, remove, answer, block_size);\n \
-    \   }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_DS_RANGE_QUERY_MO_HPP\n#define M1UNE_DS_RANGE_QUERY_MO_HPP\
-    \ 1\n\n#include <algorithm>\n#include <cassert>\n#include <cmath>\n#include <numeric>\n\
-    #include <vector>\n\nnamespace m1une {\nnamespace ds {\n\n// Offline Mo's algorithm\
+    \   }\n};\n\n}  // namespace algo\n}  // namespace m1une\n\n\n"
+  code: "#ifndef M1UNE_ALGO_OFFLINE_MO_HPP\n#define M1UNE_ALGO_OFFLINE_MO_HPP 1\n\n\
+    #include <algorithm>\n#include <cassert>\n#include <cmath>\n#include <numeric>\n\
+    #include <vector>\n\nnamespace m1une {\nnamespace algo {\n\n// Offline Mo's algorithm\
     \ for half-open array ranges.\nstruct Mo {\n    struct Query {\n        int left;\n\
     \        int right;\n        int id;\n    };\n\n   private:\n    int _n;\n   \
     \ std::vector<Query> _queries;\n\n   public:\n    Mo() : _n(0) {}\n\n    explicit\
@@ -96,16 +102,18 @@ data:
     \ independent of\n    // which side moves.\n    template <class Add, class Remove,\
     \ class Answer>\n    void run(Add add, Remove remove, Answer answer, int block_size\
     \ = 0) const {\n        run(add, add, remove, remove, answer, block_size);\n \
-    \   }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n#endif  // M1UNE_DS_RANGE_QUERY_MO_HPP\n"
+    \   }\n};\n\n}  // namespace algo\n}  // namespace m1une\n\n#endif  // M1UNE_ALGO_OFFLINE_MO_HPP\n"
   dependsOn: []
   isVerificationFile: false
-  path: ds/range_query/mo.hpp
-  requiredBy: []
-  timestamp: '2026-06-23 02:21:21+09:00'
+  path: algo/offline/mo.hpp
+  requiredBy:
+  - algo/all.hpp
+  - algo/offline/all.hpp
+  timestamp: '2026-07-07 21:49:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/range_query/mo.test.cpp
-documentation_of: ds/range_query/mo.hpp
+  - verify/algo/offline/mo.test.cpp
+documentation_of: algo/offline/mo.hpp
 layout: document
 title: Mo's Algorithm
 ---
@@ -124,7 +132,7 @@ Use it when:
 ## Basic API
 
 ```cpp
-m1une::ds::Mo mo(n);
+m1une::algo::Mo mo(n);
 int id = mo.add_query(left, right);
 mo.run(add, remove, answer);
 ```
@@ -188,13 +196,13 @@ The exact number of endpoint movements depends on the query distribution.
 This computes the number of distinct values in every query:
 
 ```cpp
-#include "ds/range_query/mo.hpp"
+#include "algo/offline/mo.hpp"
 
 #include <vector>
 
 int main() {
     std::vector<int> values = {1, 2, 1, 3};
-    m1une::ds::Mo mo(int(values.size()));
+    m1une::algo::Mo mo(int(values.size()));
     mo.add_query(0, 3);
     mo.add_query(1, 4);
 

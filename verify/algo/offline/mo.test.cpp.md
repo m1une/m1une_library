@@ -2,11 +2,11 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
+    path: algo/offline/mo.hpp
+    title: Mo's Algorithm
+  - icon: ':heavy_check_mark:'
     path: ds/range_query/fenwick_tree.hpp
     title: Fenwick Tree (Binary Indexed Tree)
-  - icon: ':heavy_check_mark:'
-    path: ds/range_query/mo.hpp
-    title: Mo's Algorithm
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
   _isVerificationFailed: false
@@ -17,25 +17,24 @@ data:
     PROBLEM: https://judge.yosupo.jp/problem/static_range_inversions_query
     links:
     - https://judge.yosupo.jp/problem/static_range_inversions_query
-  bundledCode: "#line 1 \"verify/ds/range_query/mo.test.cpp\"\n#define PROBLEM \"\
-    https://judge.yosupo.jp/problem/static_range_inversions_query\"\n\n#line 1 \"\
-    ds/range_query/mo.hpp\"\n\n\n\n#include <algorithm>\n#include <cassert>\n#include\
-    \ <cmath>\n#include <numeric>\n#include <vector>\n\nnamespace m1une {\nnamespace\
-    \ ds {\n\n// Offline Mo's algorithm for half-open array ranges.\nstruct Mo {\n\
-    \    struct Query {\n        int left;\n        int right;\n        int id;\n\
-    \    };\n\n   private:\n    int _n;\n    std::vector<Query> _queries;\n\n   public:\n\
-    \    Mo() : _n(0) {}\n\n    explicit Mo(int n) : _n(n) {\n        assert(0 <=\
-    \ n);\n    }\n\n    int size() const {\n        return _n;\n    }\n\n    int query_count()\
-    \ const {\n        return int(_queries.size());\n    }\n\n    bool empty() const\
-    \ {\n        return _queries.empty();\n    }\n\n    const std::vector<Query>&\
-    \ queries() const {\n        return _queries;\n    }\n\n    void reserve(int query_capacity)\
-    \ {\n        assert(0 <= query_capacity);\n        _queries.reserve(query_capacity);\n\
-    \    }\n\n    void clear() {\n        _queries.clear();\n    }\n\n    // Adds\
-    \ [left, right) and returns its insertion-order ID.\n    int add_query(int left,\
-    \ int right) {\n        assert(0 <= left && left <= right && right <= _n);\n \
-    \       int id = query_count();\n        _queries.push_back(Query{left, right,\
-    \ id});\n        return id;\n    }\n\n    // Returns query IDs in Mo order. A\
-    \ non-positive block size selects one\n    // automatically.\n    std::vector<int>\
+  bundledCode: "#line 1 \"verify/algo/offline/mo.test.cpp\"\n#define PROBLEM \"https://judge.yosupo.jp/problem/static_range_inversions_query\"\
+    \n\n#line 1 \"algo/offline/mo.hpp\"\n\n\n\n#include <algorithm>\n#include <cassert>\n\
+    #include <cmath>\n#include <numeric>\n#include <vector>\n\nnamespace m1une {\n\
+    namespace algo {\n\n// Offline Mo's algorithm for half-open array ranges.\nstruct\
+    \ Mo {\n    struct Query {\n        int left;\n        int right;\n        int\
+    \ id;\n    };\n\n   private:\n    int _n;\n    std::vector<Query> _queries;\n\n\
+    \   public:\n    Mo() : _n(0) {}\n\n    explicit Mo(int n) : _n(n) {\n       \
+    \ assert(0 <= n);\n    }\n\n    int size() const {\n        return _n;\n    }\n\
+    \n    int query_count() const {\n        return int(_queries.size());\n    }\n\
+    \n    bool empty() const {\n        return _queries.empty();\n    }\n\n    const\
+    \ std::vector<Query>& queries() const {\n        return _queries;\n    }\n\n \
+    \   void reserve(int query_capacity) {\n        assert(0 <= query_capacity);\n\
+    \        _queries.reserve(query_capacity);\n    }\n\n    void clear() {\n    \
+    \    _queries.clear();\n    }\n\n    // Adds [left, right) and returns its insertion-order\
+    \ ID.\n    int add_query(int left, int right) {\n        assert(0 <= left && left\
+    \ <= right && right <= _n);\n        int id = query_count();\n        _queries.push_back(Query{left,\
+    \ right, id});\n        return id;\n    }\n\n    // Returns query IDs in Mo order.\
+    \ A non-positive block size selects one\n    // automatically.\n    std::vector<int>\
     \ order(int block_size = 0) const {\n        int query_size = query_count();\n\
     \        std::vector<int> result(query_size);\n        std::iota(result.begin(),\
     \ result.end(), 0);\n        if (query_size == 0) return result;\n\n        if\
@@ -61,9 +60,9 @@ data:
     \ independent of\n    // which side moves.\n    template <class Add, class Remove,\
     \ class Answer>\n    void run(Add add, Remove remove, Answer answer, int block_size\
     \ = 0) const {\n        run(add, add, remove, remove, answer, block_size);\n \
-    \   }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n#line 4 \"verify/ds/range_query/mo.test.cpp\"\
-    \n\n#line 7 \"verify/ds/range_query/mo.test.cpp\"\n#include <cstdint>\n#include\
-    \ <iostream>\n#line 10 \"verify/ds/range_query/mo.test.cpp\"\n\n#line 1 \"ds/range_query/fenwick_tree.hpp\"\
+    \   }\n};\n\n}  // namespace algo\n}  // namespace m1une\n\n\n#line 4 \"verify/algo/offline/mo.test.cpp\"\
+    \n\n#line 7 \"verify/algo/offline/mo.test.cpp\"\n#include <cstdint>\n#include\
+    \ <iostream>\n#line 10 \"verify/algo/offline/mo.test.cpp\"\n\n#line 1 \"ds/range_query/fenwick_tree.hpp\"\
     \n\n\n\n#line 6 \"ds/range_query/fenwick_tree.hpp\"\n\nnamespace m1une {\nnamespace\
     \ ds {\n\ntemplate <typename T>\nstruct FenwickTree {\n   private:\n    int _n;\n\
     \    int _max_power;\n    std::vector<T> _data;\n\n    static int max_power_leq(int\
@@ -94,13 +93,13 @@ data:
     \        for (int k = _max_power; k > 0; k >>= 1) {\n            if (x + k <=\
     \ _n && data[x + k] < w) {\n                w -= data[x + k];\n              \
     \  x += k;\n            }\n        }\n        return x + 1;\n    }\n};\n\n}  //\
-    \ namespace ds\n}  // namespace m1une\n\n\n#line 12 \"verify/ds/range_query/mo.test.cpp\"\
+    \ namespace ds\n}  // namespace m1une\n\n\n#line 12 \"verify/algo/offline/mo.test.cpp\"\
     \n\nnamespace {\n\nvoid test_randomized() {\n    std::uint64_t state = 503;\n\
     \    auto random = [&state]() {\n        state ^= state << 7;\n        state ^=\
     \ state >> 9;\n        return state;\n    };\n\n    for (int trial = 0; trial\
     \ < 2500; ++trial) {\n        int n = int(random() % 60);\n        int query_count\
     \ = int(random() % 80);\n        std::vector<int> values(n);\n        for (int&\
-    \ value : values) value = int(random() % 12);\n\n        m1une::ds::Mo mo(n);\n\
+    \ value : values) value = int(random() % 12);\n\n        m1une::algo::Mo mo(n);\n\
     \        mo.reserve(query_count);\n        std::vector<std::pair<int, int>> ranges;\n\
     \        for (int query = 0; query < query_count; ++query) {\n            int\
     \ left = int(random() % (n + 1));\n            int right = int(random() % (n +\
@@ -124,7 +123,7 @@ data:
     \ sorted.end()), sorted.end());\n\n    std::vector<int> compressed(values.size());\n\
     \    for (int index = 0; index < int(values.size()); ++index) {\n        compressed[index]\
     \ = int(\n            std::lower_bound(sorted.begin(), sorted.end(), values[index])\n\
-    \            - sorted.begin()\n        );\n    }\n\n    m1une::ds::Mo mo(int(values.size()));\n\
+    \            - sorted.begin()\n        );\n    }\n\n    m1une::algo::Mo mo(int(values.size()));\n\
     \    for (const auto& range : ranges) {\n        mo.add_query(range.first, range.second);\n\
     \    }\n\n    m1une::ds::FenwickTree<int> frequency(int(sorted.size()));\n   \
     \ std::vector<long long> result(ranges.size());\n    long long inversions = 0;\n\
@@ -163,7 +162,7 @@ data:
     \ >> range.second;\n    }\n    for (long long answer : inversion_queries(values,\
     \ ranges)) {\n        std::cout << answer << '\\n';\n    }\n}\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/static_range_inversions_query\"\
-    \n\n#include \"../../../ds/range_query/mo.hpp\"\n\n#include <algorithm>\n#include\
+    \n\n#include \"../../../algo/offline/mo.hpp\"\n\n#include <algorithm>\n#include\
     \ <cassert>\n#include <cstdint>\n#include <iostream>\n#include <vector>\n\n#include\
     \ \"../../../ds/range_query/fenwick_tree.hpp\"\n\nnamespace {\n\nvoid test_randomized()\
     \ {\n    std::uint64_t state = 503;\n    auto random = [&state]() {\n        state\
@@ -171,7 +170,7 @@ data:
     \n    for (int trial = 0; trial < 2500; ++trial) {\n        int n = int(random()\
     \ % 60);\n        int query_count = int(random() % 80);\n        std::vector<int>\
     \ values(n);\n        for (int& value : values) value = int(random() % 12);\n\n\
-    \        m1une::ds::Mo mo(n);\n        mo.reserve(query_count);\n        std::vector<std::pair<int,\
+    \        m1une::algo::Mo mo(n);\n        mo.reserve(query_count);\n        std::vector<std::pair<int,\
     \ int>> ranges;\n        for (int query = 0; query < query_count; ++query) {\n\
     \            int left = int(random() % (n + 1));\n            int right = int(random()\
     \ % (n + 1));\n            if (right < left) std::swap(left, right);\n       \
@@ -194,7 +193,7 @@ data:
     \ sorted.end()), sorted.end());\n\n    std::vector<int> compressed(values.size());\n\
     \    for (int index = 0; index < int(values.size()); ++index) {\n        compressed[index]\
     \ = int(\n            std::lower_bound(sorted.begin(), sorted.end(), values[index])\n\
-    \            - sorted.begin()\n        );\n    }\n\n    m1une::ds::Mo mo(int(values.size()));\n\
+    \            - sorted.begin()\n        );\n    }\n\n    m1une::algo::Mo mo(int(values.size()));\n\
     \    for (const auto& range : ranges) {\n        mo.add_query(range.first, range.second);\n\
     \    }\n\n    m1une::ds::FenwickTree<int> frequency(int(sorted.size()));\n   \
     \ std::vector<long long> result(ranges.size());\n    long long inversions = 0;\n\
@@ -233,18 +232,18 @@ data:
     \ >> range.second;\n    }\n    for (long long answer : inversion_queries(values,\
     \ ranges)) {\n        std::cout << answer << '\\n';\n    }\n}\n"
   dependsOn:
-  - ds/range_query/mo.hpp
+  - algo/offline/mo.hpp
   - ds/range_query/fenwick_tree.hpp
   isVerificationFile: true
-  path: verify/ds/range_query/mo.test.cpp
+  path: verify/algo/offline/mo.test.cpp
   requiredBy: []
-  timestamp: '2026-06-27 04:10:54+09:00'
+  timestamp: '2026-07-07 21:49:48+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/ds/range_query/mo.test.cpp
+documentation_of: verify/algo/offline/mo.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/ds/range_query/mo.test.cpp
-- /verify/verify/ds/range_query/mo.test.cpp.html
-title: verify/ds/range_query/mo.test.cpp
+- /verify/verify/algo/offline/mo.test.cpp
+- /verify/verify/algo/offline/mo.test.cpp.html
+title: verify/algo/offline/mo.test.cpp
 ---

@@ -4,11 +4,11 @@ data:
   _extendedRequiredBy: []
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/algo/offline/mo.test.cpp
+    title: verify/algo/offline/mo.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/range_query/fenwick_tree.test.cpp
     title: verify/ds/range_query/fenwick_tree.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/ds/range_query/mo.test.cpp
-    title: verify/ds/range_query/mo.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -85,8 +85,8 @@ data:
   timestamp: '2026-06-27 04:10:54+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/algo/offline/mo.test.cpp
   - verify/ds/range_query/fenwick_tree.test.cpp
-  - verify/ds/range_query/mo.test.cpp
 documentation_of: ds/range_query/fenwick_tree.hpp
 layout: document
 title: Fenwick Tree (Binary Indexed Tree)

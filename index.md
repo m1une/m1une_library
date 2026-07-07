@@ -89,6 +89,30 @@ data:
     - icon: ':warning:'
       path: algo/all.hpp
       title: Algorithms All
+  - name: algo/enumeration
+    pages:
+    - icon: ':warning:'
+      path: algo/enumeration/all.hpp
+      title: Enumeration Algorithms All
+    - icon: ':heavy_check_mark:'
+      path: algo/enumeration/gray_code.hpp
+      title: Gray Code
+  - name: algo/offline
+    pages:
+    - icon: ':warning:'
+      path: algo/offline/all.hpp
+      title: Offline Algorithms All
+    - icon: ':heavy_check_mark:'
+      path: algo/offline/mo.hpp
+      title: Mo's Algorithm
+  - name: algo/search
+    pages:
+    - icon: ':warning:'
+      path: algo/search/all.hpp
+      title: Search Algorithms All
+    - icon: ':heavy_check_mark:'
+      path: algo/search/bisect.hpp
+      title: Bisect
   - name: algo/sequence
     pages:
     - icon: ':warning:'
@@ -100,6 +124,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: algo/sequence/lis.hpp
       title: Longest Increasing Subsequence (LIS)
+    - icon: ':heavy_check_mark:'
+      path: algo/sequence/run_length_encoding.hpp
+      title: Run Length Encoding
     - icon: ':heavy_check_mark:'
       path: algo/sequence/subset_sum.hpp
       title: Meet-in-the-Middle Subset Sum
@@ -277,9 +304,6 @@ data:
     - icon: ':heavy_check_mark:'
       path: ds/range_query/fenwick_tree.hpp
       title: Fenwick Tree (Binary Indexed Tree)
-    - icon: ':heavy_check_mark:'
-      path: ds/range_query/mo.hpp
-      title: Mo's Algorithm
     - icon: ':heavy_check_mark:'
       path: ds/range_query/range_inversion_count.hpp
       title: Static Range Inversion Count
@@ -575,9 +599,6 @@ data:
       path: math/generalized_floor_sum.hpp
       title: Generalized Floor Sum
     - icon: ':heavy_check_mark:'
-      path: math/gray_code.hpp
-      title: Gray Code
-    - icon: ':heavy_check_mark:'
       path: math/integer_arithmetic.hpp
       title: Integer Square Root and Power
     - icon: ':heavy_check_mark:'
@@ -847,9 +868,6 @@ data:
       path: utilities/bigint.hpp
       title: BigInt
     - icon: ':heavy_check_mark:'
-      path: utilities/bisect.hpp
-      title: Bisect
-    - icon: ':heavy_check_mark:'
       path: utilities/chmin_chmax.hpp
       title: Chmin Chmax
     - icon: ':heavy_check_mark:'
@@ -877,9 +895,6 @@ data:
       path: utilities/random_testing.hpp
       title: Random Testing
     - icon: ':heavy_check_mark:'
-      path: utilities/run_length_encoding.hpp
-      title: Run Length Encoding
-    - icon: ':heavy_check_mark:'
       path: utilities/shifted_array.hpp
       title: Shifted Array
     - icon: ':heavy_check_mark:'
@@ -889,6 +904,21 @@ data:
       path: utilities/y_combinator.hpp
       title: Y Combinator
   verificationCategories:
+  - name: verify/algo/enumeration
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/algo/enumeration/gray_code.test.cpp
+      title: verify/algo/enumeration/gray_code.test.cpp
+  - name: verify/algo/offline
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/algo/offline/mo.test.cpp
+      title: verify/algo/offline/mo.test.cpp
+  - name: verify/algo/search
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/algo/search/bisect.test.cpp
+      title: verify/algo/search/bisect.test.cpp
   - name: verify/algo/sequence
     pages:
     - icon: ':heavy_check_mark:'
@@ -1057,9 +1087,6 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/ds/range_query/fenwick_tree.test.cpp
       title: verify/ds/range_query/fenwick_tree.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/ds/range_query/mo.test.cpp
-      title: verify/ds/range_query/mo.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/ds/range_query/range_inversion_count.test.cpp
       title: verify/ds/range_query/range_inversion_count.test.cpp
@@ -1273,9 +1300,6 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/generalized_floor_sum.test.cpp
       title: verify/math/generalized_floor_sum.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/math/gray_code.test.cpp
-      title: verify/math/gray_code.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/integer_arithmetic.test.cpp
       title: verify/math/integer_arithmetic.test.cpp

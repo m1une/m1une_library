@@ -2,17 +2,11 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: utilities/bisect.hpp
-    title: Bisect
-  - icon: ':heavy_check_mark:'
     path: utilities/chmin_chmax.hpp
     title: Chmin Chmax
   - icon: ':heavy_check_mark:'
     path: utilities/compressor.hpp
     title: Compressor
-  - icon: ':heavy_check_mark:'
-    path: utilities/run_length_encoding.hpp
-    title: Run Length Encoding
   - icon: ':heavy_check_mark:'
     path: utilities/y_combinator.hpp
     title: Y Combinator
@@ -27,37 +21,21 @@ data:
     links:
     - https://judge.yosupo.jp/problem/aplusb
   bundledCode: "#line 1 \"verify/utilities/extra_utilities.test.cpp\"\n#define PROBLEM\
-    \ \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <bits/stdc++.h>\nusing\
-    \ namespace std;\n\n#line 1 \"utilities/bisect.hpp\"\n\n\n\n#line 5 \"utilities/bisect.hpp\"\
-    \n\nnamespace m1une {\nnamespace utilities {\n\ntemplate <typename F>\nlong long\
-    \ first_true(long long ng, long long ok, F pred) {\n    auto distance = [](long\
-    \ long a, long long b) {\n        return a > b ? static_cast<__int128_t>(a) -\
-    \ b : static_cast<__int128_t>(b) - a;\n    };\n    while (distance(ng, ok) > 1)\
-    \ {\n        long long mid = std::midpoint(ng, ok);\n        if (pred(mid)) {\n\
-    \            ok = mid;\n        } else {\n            ng = mid;\n        }\n \
-    \   }\n    return ok;\n}\n\ntemplate <typename F>\nlong long last_true(long long\
-    \ ok, long long ng, F pred) {\n    auto distance = [](long long a, long long b)\
-    \ {\n        return a > b ? static_cast<__int128_t>(a) - b : static_cast<__int128_t>(b)\
-    \ - a;\n    };\n    while (distance(ok, ng) > 1) {\n        long long mid = std::midpoint(ok,\
-    \ ng);\n        if (pred(mid)) {\n            ok = mid;\n        } else {\n  \
-    \          ng = mid;\n        }\n    }\n    return ok;\n}\n\ntemplate <typename\
-    \ F>\ndouble real_first_true(double ng, double ok, F pred, int iterations = 80)\
-    \ {\n    for (int i = 0; i < iterations; ++i) {\n        double mid = (ng + ok)\
-    \ / 2.0;\n        if (pred(mid)) {\n            ok = mid;\n        } else {\n\
-    \            ng = mid;\n        }\n    }\n    return ok;\n}\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 1 \"utilities/chmin_chmax.hpp\"\n\
-    \n\n\nnamespace m1une {\nnamespace utilities {\n\ntemplate <typename T, typename\
-    \ U>\nbool chmin(T& a, const U& b) {\n    if (b < a) {\n        a = b;\n     \
-    \   return true;\n    }\n    return false;\n}\n\ntemplate <typename T, typename\
-    \ U>\nbool chmax(T& a, const U& b) {\n    if (a < b) {\n        a = b;\n     \
-    \   return true;\n    }\n    return false;\n}\n\n}  // namespace utilities\n}\
-    \  // namespace m1une\n\n\n#line 1 \"utilities/compressor.hpp\"\n\n\n\n#line 5\
-    \ \"utilities/compressor.hpp\"\n#include <initializer_list>\n#line 9 \"utilities/compressor.hpp\"\
-    \n\nnamespace m1une {\nnamespace utilities {\n\ntemplate <typename T>\nstruct\
-    \ Compressor {\n   private:\n    std::vector<T> _values;\n\n   public:\n    Compressor()\
-    \ = default;\n\n    explicit Compressor(std::vector<T> values) : _values(std::move(values))\
-    \ {\n        build();\n    }\n\n    Compressor(std::initializer_list<T> values)\
-    \ : _values(values) {\n        build();\n    }\n\n    template <typename Iterator>\n\
+    \ \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <cassert>\n#include <iostream>\n\
+    #include <stdexcept>\n#include <vector>\n\nusing namespace std;\n\n#line 1 \"\
+    utilities/chmin_chmax.hpp\"\n\n\n\nnamespace m1une {\nnamespace utilities {\n\n\
+    template <typename T, typename U>\nbool chmin(T& a, const U& b) {\n    if (b <\
+    \ a) {\n        a = b;\n        return true;\n    }\n    return false;\n}\n\n\
+    template <typename T, typename U>\nbool chmax(T& a, const U& b) {\n    if (a <\
+    \ b) {\n        a = b;\n        return true;\n    }\n    return false;\n}\n\n\
+    }  // namespace utilities\n}  // namespace m1une\n\n\n#line 1 \"utilities/compressor.hpp\"\
+    \n\n\n\n#include <algorithm>\n#include <initializer_list>\n#line 7 \"utilities/compressor.hpp\"\
+    \n#include <utility>\n#line 9 \"utilities/compressor.hpp\"\n\nnamespace m1une\
+    \ {\nnamespace utilities {\n\ntemplate <typename T>\nstruct Compressor {\n   private:\n\
+    \    std::vector<T> _values;\n\n   public:\n    Compressor() = default;\n\n  \
+    \  explicit Compressor(std::vector<T> values) : _values(std::move(values)) {\n\
+    \        build();\n    }\n\n    Compressor(std::initializer_list<T> values) :\
+    \ _values(values) {\n        build();\n    }\n\n    template <typename Iterator>\n\
     \    Compressor(Iterator first, Iterator last) : _values(first, last) {\n    \
     \    build();\n    }\n\n    void add(const T& value) {\n        _values.push_back(value);\n\
     \    }\n\n    void build() {\n        std::sort(_values.begin(), _values.end());\n\
@@ -76,17 +54,7 @@ data:
     \n    const std::vector<T>& values() const {\n        return _values;\n    }\n\
     \n    int size() const {\n        return static_cast<int>(_values.size());\n \
     \   }\n\n    bool empty() const {\n        return _values.empty();\n    }\n};\n\
-    \n}  // namespace utilities\n}  // namespace m1une\n\n\n#line 1 \"utilities/run_length_encoding.hpp\"\
-    \n\n\n\n#line 7 \"utilities/run_length_encoding.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ utilities {\n\ntemplate <typename Container>\nauto run_length_encoding(const\
-    \ Container& values) {\n    using T = typename Container::value_type;\n    std::vector<std::pair<T,\
-    \ long long>> result;\n\n    auto it = std::begin(values);\n    auto last = std::end(values);\n\
-    \    if (it == last) {\n        return result;\n    }\n\n    T current = *it;\n\
-    \    long long count = 0;\n    for (; it != last; ++it) {\n        if (*it ==\
-    \ current) {\n            ++count;\n        } else {\n            result.emplace_back(current,\
-    \ count);\n            current = *it;\n            count = 1;\n        }\n   \
-    \ }\n    result.emplace_back(current, count);\n    return result;\n}\n\n}  //\
-    \ namespace utilities\n}  // namespace m1une\n\n\n#line 1 \"utilities/y_combinator.hpp\"\
+    \n}  // namespace utilities\n}  // namespace m1une\n\n\n#line 1 \"utilities/y_combinator.hpp\"\
     \n\n\n\n#include <type_traits>\n#line 6 \"utilities/y_combinator.hpp\"\n\nnamespace\
     \ m1une {\nnamespace utilities {\n\ntemplate <typename F>\nstruct YCombinator\
     \ {\n   private:\n    F _f;\n\n   public:\n    explicit YCombinator(F&& f) : _f(std::forward<F>(f))\
@@ -95,7 +63,7 @@ data:
     \   template <typename... Args>\n    decltype(auto) operator()(Args&&... args)\
     \ const {\n        return _f(*this, std::forward<Args>(args)...);\n    }\n};\n\
     \ntemplate <typename F>\nauto y_combinator(F&& f) {\n    return YCombinator<std::decay_t<F>>(std::forward<F>(f));\n\
-    }\n\n}  // namespace utilities\n}  // namespace m1une\n\n\n#line 11 \"verify/utilities/extra_utilities.test.cpp\"\
+    }\n\n}  // namespace utilities\n}  // namespace m1une\n\n\n#line 13 \"verify/utilities/extra_utilities.test.cpp\"\
     \n\nvoid test_chmin_chmax() {\n    int x = 10;\n    assert(m1une::utilities::chmin(x,\
     \ 3));\n    assert(x == 3);\n    assert(!m1une::utilities::chmin(x, 7));\n   \
     \ assert(m1une::utilities::chmax(x, 7));\n    assert(x == 7);\n    assert(!m1une::utilities::chmax(x,\
@@ -112,25 +80,12 @@ data:
     \        rejected = true;\n    }\n    assert(rejected);\n}\n\nvoid test_y_combinator()\
     \ {\n    auto fact = m1une::utilities::y_combinator([](auto self, int n) -> long\
     \ long {\n        if (n == 0) return 1;\n        return n * self(n - 1);\n   \
-    \ });\n    assert(fact(10) == 3628800);\n}\n\nvoid test_bisect() {\n    long long\
-    \ n = 100;\n    long long first = m1une::utilities::first_true(0, n + 1, [&](long\
-    \ long x) {\n        return x * x >= n;\n    });\n    assert(first == 10);\n\n\
-    \    long long last = m1une::utilities::last_true(n + 1, 0, [&](long long x) {\n\
-    \        return x * x >= n;\n    });\n    assert(last == 10);\n\n    double root\
-    \ = m1une::utilities::real_first_true(0.0, 2.0, [](double x) {\n        return\
-    \ x * x >= 2.0;\n    });\n    assert(abs(root * root - 2.0) < 1e-12);\n}\n\nvoid\
-    \ test_run_length_encoding() {\n    string s = \"aaabbc\";\n    auto runs = m1une::utilities::run_length_encoding(s);\n\
-    \    assert(runs.size() == 3);\n    assert(runs[0] == make_pair('a', 3LL));\n\
-    \    assert(runs[1] == make_pair('b', 2LL));\n    assert(runs[2] == make_pair('c',\
-    \ 1LL));\n\n    vector<int> v = {1, 1, 2, 2, 2, 1};\n    auto vector_runs = m1une::utilities::run_length_encoding(v);\n\
-    \    assert(vector_runs[0] == make_pair(1, 2LL));\n    assert(vector_runs[1] ==\
-    \ make_pair(2, 3LL));\n    assert(vector_runs[2] == make_pair(1, 1LL));\n}\n\n\
-    int main() {\n    test_chmin_chmax();\n    test_compressor();\n    test_y_combinator();\n\
-    \    test_bisect();\n    test_run_length_encoding();\n\n    long long a, b;\n\
-    \    cin >> a >> b;\n    cout << a + b << '\\n';\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <bits/stdc++.h>\n\
-    using namespace std;\n\n#include \"../../utilities/bisect.hpp\"\n#include \"../../utilities/chmin_chmax.hpp\"\
-    \n#include \"../../utilities/compressor.hpp\"\n#include \"../../utilities/run_length_encoding.hpp\"\
+    \ });\n    assert(fact(10) == 3628800);\n}\n\nint main() {\n    test_chmin_chmax();\n\
+    \    test_compressor();\n    test_y_combinator();\n\n    long long a, b;\n   \
+    \ cin >> a >> b;\n    cout << a + b << '\\n';\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <cassert>\n\
+    #include <iostream>\n#include <stdexcept>\n#include <vector>\n\nusing namespace\
+    \ std;\n\n#include \"../../utilities/chmin_chmax.hpp\"\n#include \"../../utilities/compressor.hpp\"\
     \n#include \"../../utilities/y_combinator.hpp\"\n\nvoid test_chmin_chmax() {\n\
     \    int x = 10;\n    assert(m1une::utilities::chmin(x, 3));\n    assert(x ==\
     \ 3);\n    assert(!m1une::utilities::chmin(x, 7));\n    assert(m1une::utilities::chmax(x,\
@@ -148,32 +103,17 @@ data:
     \ = true;\n    }\n    assert(rejected);\n}\n\nvoid test_y_combinator() {\n   \
     \ auto fact = m1une::utilities::y_combinator([](auto self, int n) -> long long\
     \ {\n        if (n == 0) return 1;\n        return n * self(n - 1);\n    });\n\
-    \    assert(fact(10) == 3628800);\n}\n\nvoid test_bisect() {\n    long long n\
-    \ = 100;\n    long long first = m1une::utilities::first_true(0, n + 1, [&](long\
-    \ long x) {\n        return x * x >= n;\n    });\n    assert(first == 10);\n\n\
-    \    long long last = m1une::utilities::last_true(n + 1, 0, [&](long long x) {\n\
-    \        return x * x >= n;\n    });\n    assert(last == 10);\n\n    double root\
-    \ = m1une::utilities::real_first_true(0.0, 2.0, [](double x) {\n        return\
-    \ x * x >= 2.0;\n    });\n    assert(abs(root * root - 2.0) < 1e-12);\n}\n\nvoid\
-    \ test_run_length_encoding() {\n    string s = \"aaabbc\";\n    auto runs = m1une::utilities::run_length_encoding(s);\n\
-    \    assert(runs.size() == 3);\n    assert(runs[0] == make_pair('a', 3LL));\n\
-    \    assert(runs[1] == make_pair('b', 2LL));\n    assert(runs[2] == make_pair('c',\
-    \ 1LL));\n\n    vector<int> v = {1, 1, 2, 2, 2, 1};\n    auto vector_runs = m1une::utilities::run_length_encoding(v);\n\
-    \    assert(vector_runs[0] == make_pair(1, 2LL));\n    assert(vector_runs[1] ==\
-    \ make_pair(2, 3LL));\n    assert(vector_runs[2] == make_pair(1, 1LL));\n}\n\n\
-    int main() {\n    test_chmin_chmax();\n    test_compressor();\n    test_y_combinator();\n\
-    \    test_bisect();\n    test_run_length_encoding();\n\n    long long a, b;\n\
-    \    cin >> a >> b;\n    cout << a + b << '\\n';\n}\n"
+    \    assert(fact(10) == 3628800);\n}\n\nint main() {\n    test_chmin_chmax();\n\
+    \    test_compressor();\n    test_y_combinator();\n\n    long long a, b;\n   \
+    \ cin >> a >> b;\n    cout << a + b << '\\n';\n}\n"
   dependsOn:
-  - utilities/bisect.hpp
   - utilities/chmin_chmax.hpp
   - utilities/compressor.hpp
-  - utilities/run_length_encoding.hpp
   - utilities/y_combinator.hpp
   isVerificationFile: true
   path: verify/utilities/extra_utilities.test.cpp
   requiredBy: []
-  timestamp: '2026-06-21 04:34:53+09:00'
+  timestamp: '2026-07-07 21:49:48+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/utilities/extra_utilities.test.cpp
