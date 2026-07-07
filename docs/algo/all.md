@@ -10,6 +10,10 @@ namespace is `m1une::algo`; subdirectories are only browsing categories.
 
 Convex optimization helpers live under `convex/`.
 
+If a header builds an object and then answers repeated queries, it belongs in
+`ds/` instead, even when it is static. For example, cumulative sums live in
+`ds/range_query/`.
+
 ## Included Headers
 
 | Header | Contents |

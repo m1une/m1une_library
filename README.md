@@ -8,8 +8,11 @@ This repository is organized as header-only building blocks. Convex tools such
 as Li Chao tree, CHT, slope trick, Alien Trick, and Monge optimizations live
 under `convex/`. Use `ds/` for non-convex stateful query/update objects, and
 `algo/` for one-shot, domain-neutral techniques such as sequence algorithms,
-search-over-answer helpers, offline query ordering, and enumeration. Graph-specialized algorithms,
-including tree and flow routines, live under `graph/`; algebraic and numeric
+search-over-answer helpers, offline query ordering, and enumeration. A header
+that builds an object and answers repeated queries, even with no updates, belongs
+to `ds/`; for example, cumulative sums stay in `ds/range_query/`.
+Graph-specialized algorithms, including tree and flow routines, live under
+`graph/`; algebraic and numeric
 tools, including FPS and matrices, live under `math/`. Reusable algebraic
 definitions live in `monoid/` and `acted_monoid/` so they can be combined
 without rewriting boilerplate during a contest.
@@ -61,6 +64,11 @@ short namespace segment after `m1une::`; nested directories are for browsing.
 | `algo/offline/` | Offline query processing such as Mo's algorithm. |
 | `algo/enumeration/` | Combinatorial traversal helpers such as Gray-code enumeration. |
 
+Rule of thumb: if you call a function once and use its returned result directly,
+look in `algo/`. If you construct an object and then call query methods such as
+`sum`, `prod`, `fold`, or `get`, look in `ds/`. Small syntax helpers and contest
+plumbing live in `utilities/`.
+
 ### Convex categories
 
 | Directory | Use it for |
@@ -77,7 +85,7 @@ short namespace segment after `m1une::`; nested directories are for browsing.
 | --- | --- |
 | `ds/dsu/` | Connectivity, component aggregation, potentials, and persistent union-find. |
 | `ds/segtree/` | Dense and dynamic segment trees, lazy propagation, dual segment trees, and persistent variants. |
-| `ds/range_query/` | Cumulative sums, Fenwick trees, static sparse-table queries, and wavelet matrices. |
+| `ds/range_query/` | Objects built for repeated range queries, including cumulative sums, Fenwick trees, static sparse-table queries, and wavelet matrices. |
 | `ds/dynamic_array/` | Implicit-treap sequences with insertion, deletion, reversal, aggregation, or persistence. |
 | `ds/ordered_set/` | Ordered sets and multisets, including persistent variants and binary tries with optional monoid aggregates. |
 | `ds/dynamic_tree/` | Link-cut trees and rake-compress trees for changing forests. |

@@ -9,6 +9,10 @@ documentation_of: ../../../ds/range_query/cumulative_sum.hpp
 arrays so that interval, rectangle, and cuboid sums can be answered in constant
 time. Indices are zero-based and every range is half-open.
 
+This header lives in `ds/range_query/` because it constructs a reusable query
+object. One-shot sequence algorithms live in `algo/sequence/`, and small contest
+helpers live in `utilities/`.
+
 `CumulativeSum<T>` is an alias for `CumulativeSum1D<T>`.
 
 The multidimensional classes store their prefix tables in contiguous memory.
