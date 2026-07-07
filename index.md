@@ -89,22 +89,42 @@ data:
     - icon: ':warning:'
       path: algo/all.hpp
       title: Algorithms All
+  - name: algo/dp
+    pages:
+    - icon: ':warning:'
+      path: algo/dp/all.hpp
+      title: DP Algorithms All
+    - icon: ':heavy_check_mark:'
+      path: algo/dp/knapsack.hpp
+      title: Knapsack Helpers
   - name: algo/enumeration
     pages:
     - icon: ':warning:'
       path: algo/enumeration/all.hpp
       title: Enumeration Algorithms All
     - icon: ':heavy_check_mark:'
+      path: algo/enumeration/combination.hpp
+      title: Combination Masks
+    - icon: ':heavy_check_mark:'
       path: algo/enumeration/gray_code.hpp
       title: Gray Code
+    - icon: ':heavy_check_mark:'
+      path: algo/enumeration/submask.hpp
+      title: Submask Enumeration
   - name: algo/offline
     pages:
     - icon: ':warning:'
       path: algo/offline/all.hpp
       title: Offline Algorithms All
     - icon: ':heavy_check_mark:'
+      path: algo/offline/cdq_divide_and_conquer.hpp
+      title: CDQ Divide And Conquer
+    - icon: ':heavy_check_mark:'
       path: algo/offline/mo.hpp
       title: Mo's Algorithm
+    - icon: ':heavy_check_mark:'
+      path: algo/offline/parallel_binary_search.hpp
+      title: Parallel Binary Search
   - name: algo/search
     pages:
     - icon: ':warning:'
@@ -113,6 +133,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: algo/search/bisect.hpp
       title: Bisect
+    - icon: ':heavy_check_mark:'
+      path: algo/search/ternary_search.hpp
+      title: Ternary Search
   - name: algo/sequence
     pages:
     - icon: ':warning:'
@@ -904,21 +927,41 @@ data:
       path: utilities/y_combinator.hpp
       title: Y Combinator
   verificationCategories:
+  - name: verify/algo/dp
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/algo/dp/knapsack.test.cpp
+      title: verify/algo/dp/knapsack.test.cpp
   - name: verify/algo/enumeration
     pages:
     - icon: ':heavy_check_mark:'
+      path: verify/algo/enumeration/combination.test.cpp
+      title: verify/algo/enumeration/combination.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/algo/enumeration/gray_code.test.cpp
       title: verify/algo/enumeration/gray_code.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/algo/enumeration/submask.test.cpp
+      title: verify/algo/enumeration/submask.test.cpp
   - name: verify/algo/offline
     pages:
     - icon: ':heavy_check_mark:'
+      path: verify/algo/offline/cdq_divide_and_conquer.test.cpp
+      title: verify/algo/offline/cdq_divide_and_conquer.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/algo/offline/mo.test.cpp
       title: verify/algo/offline/mo.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/algo/offline/parallel_binary_search.test.cpp
+      title: verify/algo/offline/parallel_binary_search.test.cpp
   - name: verify/algo/search
     pages:
     - icon: ':heavy_check_mark:'
       path: verify/algo/search/bisect.test.cpp
       title: verify/algo/search/bisect.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/algo/search/ternary_search.test.cpp
+      title: verify/algo/search/ternary_search.test.cpp
   - name: verify/algo/sequence
     pages:
     - icon: ':heavy_check_mark:'

@@ -2,23 +2,44 @@
 data:
   _extendedDependsOn:
   - icon: ':warning:'
+    path: algo/dp/all.hpp
+    title: DP Algorithms All
+  - icon: ':heavy_check_mark:'
+    path: algo/dp/knapsack.hpp
+    title: Knapsack Helpers
+  - icon: ':warning:'
     path: algo/enumeration/all.hpp
     title: Enumeration Algorithms All
   - icon: ':heavy_check_mark:'
+    path: algo/enumeration/combination.hpp
+    title: Combination Masks
+  - icon: ':heavy_check_mark:'
     path: algo/enumeration/gray_code.hpp
     title: Gray Code
+  - icon: ':heavy_check_mark:'
+    path: algo/enumeration/submask.hpp
+    title: Submask Enumeration
   - icon: ':warning:'
     path: algo/offline/all.hpp
     title: Offline Algorithms All
   - icon: ':heavy_check_mark:'
+    path: algo/offline/cdq_divide_and_conquer.hpp
+    title: CDQ Divide And Conquer
+  - icon: ':heavy_check_mark:'
     path: algo/offline/mo.hpp
     title: Mo's Algorithm
+  - icon: ':heavy_check_mark:'
+    path: algo/offline/parallel_binary_search.hpp
+    title: Parallel Binary Search
   - icon: ':warning:'
     path: algo/search/all.hpp
     title: Search Algorithms All
   - icon: ':heavy_check_mark:'
     path: algo/search/bisect.hpp
     title: Bisect
+  - icon: ':heavy_check_mark:'
+    path: algo/search/ternary_search.hpp
+    title: Ternary Search
   - icon: ':warning:'
     path: algo/sequence/all.hpp
     title: Sequence Algorithms All
@@ -41,12 +62,111 @@ data:
   _verificationStatusIcon: ':warning:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"algo/all.hpp\"\n\n\n\n#line 1 \"algo/enumeration/all.hpp\"\
-    \n\n\n\n#line 1 \"algo/enumeration/gray_code.hpp\"\n\n\n\n#include <cassert>\n\
-    #include <concepts>\n#include <cstddef>\n#include <cstdint>\n#include <limits>\n\
-    #include <type_traits>\n#include <vector>\n\nnamespace m1une {\nnamespace algo\
-    \ {\n\n// Converts a binary value to its binary-reflected Gray code.\ntemplate\
-    \ <std::unsigned_integral UInt>\nrequires(!std::same_as<std::remove_cv_t<UInt>,\
+  bundledCode: "#line 1 \"algo/all.hpp\"\n\n\n\n#line 1 \"algo/dp/all.hpp\"\n\n\n\n\
+    #line 1 \"algo/dp/knapsack.hpp\"\n\n\n\n#include <algorithm>\n#include <cassert>\n\
+    #include <cstddef>\n#include <deque>\n#include <limits>\n#include <vector>\n\n\
+    namespace m1une {\nnamespace algo {\n\ninline std::vector<char> subset_sum_reachable(const\
+    \ std::vector<int>& weights, int limit) {\n    assert(0 <= limit);\n    using\
+    \ Word = unsigned long long;\n    constexpr int word_bits = std::numeric_limits<Word>::digits;\n\
+    \n    const std::size_t bit_count = std::size_t(limit) + 1;\n    std::vector<Word>\
+    \ bits((bit_count + word_bits - 1) / word_bits, Word(0));\n    bits[0] = Word(1);\n\
+    \n    auto trim = [&]() {\n        const int extra = int(bit_count % word_bits);\n\
+    \        if (extra != 0) {\n            bits.back() &= (Word(1) << extra) - Word(1);\n\
+    \        }\n    };\n\n    for (int weight : weights) {\n        assert(0 <= weight);\n\
+    \        if (weight == 0 || limit < weight) continue;\n\n        const std::size_t\
+    \ word_shift = std::size_t(weight / word_bits);\n        const int bit_shift =\
+    \ weight % word_bits;\n        for (std::size_t i = bits.size() - word_shift;\
+    \ i-- > 0;) {\n            const Word source = bits[i];\n            if (source\
+    \ == Word(0)) continue;\n            const std::size_t target = i + word_shift;\n\
+    \            bits[target] |= source << bit_shift;\n            if (bit_shift !=\
+    \ 0 && target + 1 < bits.size()) {\n                bits[target + 1] |= source\
+    \ >> (word_bits - bit_shift);\n            }\n        }\n        trim();\n   \
+    \ }\n\n    std::vector<char> reachable(std::size_t(limit) + 1, 0);\n    for (int\
+    \ sum = 0; sum <= limit; ++sum) {\n        reachable[sum] = char((bits[std::size_t(sum\
+    \ / word_bits)] >> (sum % word_bits)) & Word(1));\n    }\n    return reachable;\n\
+    }\n\ntemplate <typename Value = long long>\nstd::vector<Value> zero_one_knapsack_max_value(\n\
+    \    const std::vector<int>& weights,\n    const std::vector<Value>& values,\n\
+    \    int capacity,\n    Value neg_inf = std::numeric_limits<Value>::lowest() /\
+    \ Value(4)\n) {\n    assert(weights.size() == values.size());\n    assert(0 <=\
+    \ capacity);\n\n    std::vector<Value> dp(std::size_t(capacity) + 1, neg_inf);\n\
+    \    dp[0] = Value{};\n    for (std::size_t item = 0; item < weights.size(); ++item)\
+    \ {\n        const int weight = weights[item];\n        assert(0 <= weight);\n\
+    \        for (int current = capacity; weight <= current; --current) {\n      \
+    \      if (dp[current - weight] == neg_inf) continue;\n            dp[current]\
+    \ = std::max(dp[current], dp[current - weight] + values[item]);\n        }\n \
+    \   }\n\n    for (int current = 1; current <= capacity; ++current) {\n       \
+    \ dp[current] = std::max(dp[current], dp[current - 1]);\n    }\n    return dp;\n\
+    }\n\ntemplate <typename Value = long long>\nstd::vector<Value> bounded_knapsack_max_value(\n\
+    \    const std::vector<int>& weights,\n    const std::vector<Value>& values,\n\
+    \    const std::vector<int>& counts,\n    int capacity,\n    Value neg_inf = std::numeric_limits<Value>::lowest()\
+    \ / Value(4)\n) {\n    assert(weights.size() == values.size());\n    assert(weights.size()\
+    \ == counts.size());\n    assert(0 <= capacity);\n\n    std::vector<Value> dp(std::size_t(capacity)\
+    \ + 1, neg_inf);\n    dp[0] = Value{};\n\n    for (std::size_t item = 0; item\
+    \ < weights.size(); ++item) {\n        const int weight = weights[item];\n   \
+    \     const Value value = values[item];\n        const int count = counts[item];\n\
+    \        assert(0 <= weight);\n        assert(0 <= count);\n        if (count\
+    \ == 0) continue;\n\n        if (weight == 0) {\n            if (Value{} < value)\
+    \ {\n                const Value gain = value * Value(count);\n              \
+    \  for (Value& current : dp) {\n                    if (current != neg_inf) current\
+    \ += gain;\n                }\n            }\n            continue;\n        }\n\
+    \n        std::vector<Value> next = dp;\n        for (int residue = 0; residue\
+    \ < weight && residue <= capacity; ++residue) {\n            std::deque<int> indices;\n\
+    \            std::deque<Value> bases;\n            int k = 0;\n            for\
+    \ (int current = residue; current <= capacity; current += weight, ++k) {\n   \
+    \             if (dp[current] != neg_inf) {\n                    const Value base\
+    \ = dp[current] - Value(k) * value;\n                    while (!bases.empty()\
+    \ && bases.back() <= base) {\n                        bases.pop_back();\n    \
+    \                    indices.pop_back();\n                    }\n            \
+    \        bases.push_back(base);\n                    indices.push_back(k);\n \
+    \               }\n\n                while (!indices.empty() && indices.front()\
+    \ < k - count) {\n                    indices.pop_front();\n                 \
+    \   bases.pop_front();\n                }\n                if (!bases.empty())\
+    \ {\n                    next[current] = std::max(next[current], bases.front()\
+    \ + Value(k) * value);\n                }\n            }\n        }\n        dp.swap(next);\n\
+    \    }\n\n    for (int current = 1; current <= capacity; ++current) {\n      \
+    \  dp[current] = std::max(dp[current], dp[current - 1]);\n    }\n    return dp;\n\
+    }\n\ntemplate <typename Weight = long long>\nstd::vector<Weight> zero_one_knapsack_min_weight_for_value(\n\
+    \    const std::vector<Weight>& weights,\n    const std::vector<int>& values,\n\
+    \    int value_limit,\n    Weight inf = std::numeric_limits<Weight>::max() / Weight(4)\n\
+    ) {\n    assert(weights.size() == values.size());\n    assert(0 <= value_limit);\n\
+    \n    std::vector<Weight> dp(std::size_t(value_limit) + 1, inf);\n    dp[0] =\
+    \ Weight{};\n    for (std::size_t item = 0; item < weights.size(); ++item) {\n\
+    \        assert(Weight{} <= weights[item]);\n        assert(0 <= values[item]);\n\
+    \        for (int value = value_limit; values[item] <= value; --value) {\n   \
+    \         if (dp[value - values[item]] == inf) continue;\n            dp[value]\
+    \ = std::min(dp[value], dp[value - values[item]] + weights[item]);\n        }\n\
+    \    }\n    return dp;\n}\n\n}  // namespace algo\n}  // namespace m1une\n\n\n\
+    #line 5 \"algo/dp/all.hpp\"\n\n\n#line 1 \"algo/enumeration/all.hpp\"\n\n\n\n\
+    #line 1 \"algo/enumeration/combination.hpp\"\n\n\n\n#line 5 \"algo/enumeration/combination.hpp\"\
+    \n#include <concepts>\n#include <cstdint>\n#line 8 \"algo/enumeration/combination.hpp\"\
+    \n#include <type_traits>\n\nnamespace m1une {\nnamespace algo {\n\nnamespace internal\
+    \ {\n\ntemplate <std::unsigned_integral UInt>\nrequires(!std::same_as<std::remove_cv_t<UInt>,\
+    \ bool>)\nUInt combination_low_bits(int bit_count) {\n    constexpr int digits\
+    \ = std::numeric_limits<UInt>::digits;\n    assert(0 <= bit_count && bit_count\
+    \ <= digits);\n    if (bit_count == digits) return ~UInt(0);\n    return (UInt(1)\
+    \ << bit_count) - UInt(1);\n}\n\n}  // namespace internal\n\ntemplate <std::unsigned_integral\
+    \ UInt = std::uint64_t>\nrequires(!std::same_as<std::remove_cv_t<UInt>, bool>)\n\
+    UInt first_combination_mask(int bit_count, int choose) {\n    constexpr int digits\
+    \ = std::numeric_limits<UInt>::digits;\n    assert(0 <= choose && choose <= bit_count\
+    \ && bit_count <= digits);\n    if (choose == 0) return UInt(0);\n    if (choose\
+    \ == bit_count) return internal::combination_low_bits<UInt>(bit_count);\n    return\
+    \ (UInt(1) << choose) - UInt(1);\n}\n\ntemplate <std::unsigned_integral UInt>\n\
+    requires(!std::same_as<std::remove_cv_t<UInt>, bool>)\nbool next_combination_mask(UInt&\
+    \ mask, int bit_count) {\n    const UInt universe = internal::combination_low_bits<UInt>(bit_count);\n\
+    \    assert((mask & ~universe) == 0);\n    if (mask == 0) return false;\n\n  \
+    \  const UInt lowest = mask & (~mask + UInt(1));\n    const UInt ripple = mask\
+    \ + lowest;\n    if (ripple == 0 || (ripple & ~universe) != 0) return false;\n\
+    \n    const UInt next = (((ripple ^ mask) >> 2) / lowest) | ripple;\n    if ((next\
+    \ & ~universe) != 0) return false;\n    mask = next;\n    return true;\n}\n\n\
+    template <std::unsigned_integral UInt = std::uint64_t, class F>\nrequires(!std::same_as<std::remove_cv_t<UInt>,\
+    \ bool>)\nvoid for_each_combination_mask(int bit_count, int choose, F f) {\n \
+    \   constexpr int digits = std::numeric_limits<UInt>::digits;\n    assert(0 <=\
+    \ choose && choose <= bit_count && bit_count <= digits);\n    UInt mask = first_combination_mask<UInt>(bit_count,\
+    \ choose);\n    while (true) {\n        f(mask);\n        if (!next_combination_mask(mask,\
+    \ bit_count)) break;\n    }\n}\n\n}  // namespace algo\n}  // namespace m1une\n\
+    \n\n#line 1 \"algo/enumeration/gray_code.hpp\"\n\n\n\n#line 11 \"algo/enumeration/gray_code.hpp\"\
+    \n\nnamespace m1une {\nnamespace algo {\n\n// Converts a binary value to its binary-reflected\
+    \ Gray code.\ntemplate <std::unsigned_integral UInt>\nrequires(!std::same_as<std::remove_cv_t<UInt>,\
     \ bool>)\nconstexpr UInt gray_encode(UInt value) noexcept {\n    return value\
     \ ^ (value >> 1);\n}\n\n// Converts a binary-reflected Gray code to the corresponding\
     \ binary value.\ntemplate <std::unsigned_integral UInt>\nrequires(!std::same_as<std::remove_cv_t<UInt>,\
@@ -63,24 +183,52 @@ data:
     \ << bit_count;\n    std::vector<UInt> result(size);\n    for (std::size_t index\
     \ = 0; index < size; ++index) {\n        result[index] = gray_encode(static_cast<UInt>(index));\n\
     \    }\n    return result;\n}\n\n}  // namespace algo\n}  // namespace m1une\n\
-    \n\n#line 5 \"algo/enumeration/all.hpp\"\n\n\n#line 1 \"algo/offline/all.hpp\"\
-    \n\n\n\n#line 1 \"algo/offline/mo.hpp\"\n\n\n\n#include <algorithm>\n#line 6 \"\
-    algo/offline/mo.hpp\"\n#include <cmath>\n#include <numeric>\n#line 9 \"algo/offline/mo.hpp\"\
-    \n\nnamespace m1une {\nnamespace algo {\n\n// Offline Mo's algorithm for half-open\
-    \ array ranges.\nstruct Mo {\n    struct Query {\n        int left;\n        int\
-    \ right;\n        int id;\n    };\n\n   private:\n    int _n;\n    std::vector<Query>\
-    \ _queries;\n\n   public:\n    Mo() : _n(0) {}\n\n    explicit Mo(int n) : _n(n)\
-    \ {\n        assert(0 <= n);\n    }\n\n    int size() const {\n        return\
-    \ _n;\n    }\n\n    int query_count() const {\n        return int(_queries.size());\n\
-    \    }\n\n    bool empty() const {\n        return _queries.empty();\n    }\n\n\
-    \    const std::vector<Query>& queries() const {\n        return _queries;\n \
-    \   }\n\n    void reserve(int query_capacity) {\n        assert(0 <= query_capacity);\n\
-    \        _queries.reserve(query_capacity);\n    }\n\n    void clear() {\n    \
-    \    _queries.clear();\n    }\n\n    // Adds [left, right) and returns its insertion-order\
-    \ ID.\n    int add_query(int left, int right) {\n        assert(0 <= left && left\
-    \ <= right && right <= _n);\n        int id = query_count();\n        _queries.push_back(Query{left,\
-    \ right, id});\n        return id;\n    }\n\n    // Returns query IDs in Mo order.\
-    \ A non-positive block size selects one\n    // automatically.\n    std::vector<int>\
+    \n\n#line 1 \"algo/enumeration/submask.hpp\"\n\n\n\n#line 8 \"algo/enumeration/submask.hpp\"\
+    \n\nnamespace m1une {\nnamespace algo {\n\nnamespace internal {\n\ntemplate <std::unsigned_integral\
+    \ UInt>\nrequires(!std::same_as<std::remove_cv_t<UInt>, bool>)\nUInt submask_low_bits(int\
+    \ bit_count) {\n    constexpr int digits = std::numeric_limits<UInt>::digits;\n\
+    \    assert(0 <= bit_count && bit_count <= digits);\n    if (bit_count == digits)\
+    \ return ~UInt(0);\n    return (UInt(1) << bit_count) - UInt(1);\n}\n\n}  // namespace\
+    \ internal\n\ntemplate <std::unsigned_integral UInt, class F>\nrequires(!std::same_as<std::remove_cv_t<UInt>,\
+    \ bool>)\nvoid for_each_submask(UInt mask, F f) {\n    UInt submask = mask;\n\
+    \    while (true) {\n        f(submask);\n        if (submask == 0) break;\n \
+    \       submask = (submask - 1) & mask;\n    }\n}\n\ntemplate <std::unsigned_integral\
+    \ UInt, class F>\nrequires(!std::same_as<std::remove_cv_t<UInt>, bool>)\nvoid\
+    \ for_each_nonzero_submask(UInt mask, F f) {\n    for (UInt submask = mask; submask\
+    \ != 0; submask = (submask - 1) & mask) {\n        f(submask);\n    }\n}\n\ntemplate\
+    \ <std::unsigned_integral UInt, class F>\nrequires(!std::same_as<std::remove_cv_t<UInt>,\
+    \ bool>)\nvoid for_each_supermask(UInt mask, int bit_count, F f) {\n    const\
+    \ UInt universe = internal::submask_low_bits<UInt>(bit_count);\n    assert((mask\
+    \ & ~universe) == 0);\n    const UInt free_bits = universe ^ mask;\n    for_each_submask(free_bits,\
+    \ [&](UInt added_bits) {\n        f(mask | added_bits);\n    });\n}\n\n}  // namespace\
+    \ algo\n}  // namespace m1une\n\n\n#line 7 \"algo/enumeration/all.hpp\"\n\n\n\
+    #line 1 \"algo/offline/all.hpp\"\n\n\n\n#line 1 \"algo/offline/cdq_divide_and_conquer.hpp\"\
+    \n\n\n\n#line 5 \"algo/offline/cdq_divide_and_conquer.hpp\"\n\nnamespace m1une\
+    \ {\nnamespace algo {\n\ntemplate <class SolveCross>\nvoid cdq_divide_and_conquer(int\
+    \ left, int right, SolveCross solve_cross) {\n    assert(left <= right);\n\n \
+    \   auto dfs = [&](auto& self, int l, int r) -> void {\n        if (r - l <= 1)\
+    \ return;\n        const int middle = l + (r - l) / 2;\n        self(self, l,\
+    \ middle);\n        self(self, middle, r);\n        solve_cross(l, middle, r);\n\
+    \    };\n    dfs(dfs, left, right);\n}\n\ntemplate <class SolveCross>\nvoid cdq_divide_and_conquer(int\
+    \ n, SolveCross solve_cross) {\n    assert(0 <= n);\n    cdq_divide_and_conquer(0,\
+    \ n, solve_cross);\n}\n\n}  // namespace algo\n}  // namespace m1une\n\n\n#line\
+    \ 1 \"algo/offline/mo.hpp\"\n\n\n\n#line 6 \"algo/offline/mo.hpp\"\n#include <cmath>\n\
+    #include <numeric>\n#line 9 \"algo/offline/mo.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ algo {\n\n// Offline Mo's algorithm for half-open array ranges.\nstruct Mo {\n\
+    \    struct Query {\n        int left;\n        int right;\n        int id;\n\
+    \    };\n\n   private:\n    int _n;\n    std::vector<Query> _queries;\n\n   public:\n\
+    \    Mo() : _n(0) {}\n\n    explicit Mo(int n) : _n(n) {\n        assert(0 <=\
+    \ n);\n    }\n\n    int size() const {\n        return _n;\n    }\n\n    int query_count()\
+    \ const {\n        return int(_queries.size());\n    }\n\n    bool empty() const\
+    \ {\n        return _queries.empty();\n    }\n\n    const std::vector<Query>&\
+    \ queries() const {\n        return _queries;\n    }\n\n    void reserve(int query_capacity)\
+    \ {\n        assert(0 <= query_capacity);\n        _queries.reserve(query_capacity);\n\
+    \    }\n\n    void clear() {\n        _queries.clear();\n    }\n\n    // Adds\
+    \ [left, right) and returns its insertion-order ID.\n    int add_query(int left,\
+    \ int right) {\n        assert(0 <= left && left <= right && right <= _n);\n \
+    \       int id = query_count();\n        _queries.push_back(Query{left, right,\
+    \ id});\n        return id;\n    }\n\n    // Returns query IDs in Mo order. A\
+    \ non-positive block size selects one\n    // automatically.\n    std::vector<int>\
     \ order(int block_size = 0) const {\n        int query_size = query_count();\n\
     \        std::vector<int> result(query_size);\n        std::iota(result.begin(),\
     \ result.end(), 0);\n        if (query_size == 0) return result;\n\n        if\
@@ -106,13 +254,32 @@ data:
     \ independent of\n    // which side moves.\n    template <class Add, class Remove,\
     \ class Answer>\n    void run(Add add, Remove remove, Answer answer, int block_size\
     \ = 0) const {\n        run(add, add, remove, remove, answer, block_size);\n \
-    \   }\n};\n\n}  // namespace algo\n}  // namespace m1une\n\n\n#line 5 \"algo/offline/all.hpp\"\
-    \n\n\n#line 1 \"algo/search/all.hpp\"\n\n\n\n#line 1 \"algo/search/bisect.hpp\"\
-    \n\n\n\n#line 5 \"algo/search/bisect.hpp\"\n\nnamespace m1une {\nnamespace algo\
-    \ {\n\ntemplate <typename F>\nlong long first_true(long long ng, long long ok,\
-    \ F pred) {\n    auto distance = [](long long a, long long b) {\n        return\
-    \ a > b ? static_cast<__int128_t>(a) - b : static_cast<__int128_t>(b) - a;\n \
-    \   };\n    while (distance(ng, ok) > 1) {\n        long long mid = std::midpoint(ng,\
+    \   }\n};\n\n}  // namespace algo\n}  // namespace m1une\n\n\n#line 1 \"algo/offline/parallel_binary_search.hpp\"\
+    \n\n\n\n#line 6 \"algo/offline/parallel_binary_search.hpp\"\n\nnamespace m1une\
+    \ {\nnamespace algo {\n\ntemplate <class Apply, class Check, class Reset>\nstd::vector<int>\
+    \ parallel_binary_search(\n    int query_count,\n    int event_count,\n    Apply\
+    \ apply,\n    Check check,\n    Reset reset\n) {\n    assert(0 <= query_count);\n\
+    \    assert(0 <= event_count);\n\n    std::vector<int> low(query_count, -1);\n\
+    \    std::vector<int> high(query_count, event_count + 1);\n    std::vector<std::vector<int>>\
+    \ bucket(event_count + 1);\n\n    while (true) {\n        bool active = false;\n\
+    \        for (auto& queries : bucket) queries.clear();\n\n        for (int query\
+    \ = 0; query < query_count; ++query) {\n            if (high[query] - low[query]\
+    \ <= 1) continue;\n            const int middle = low[query] + (high[query] -\
+    \ low[query]) / 2;\n            bucket[middle].push_back(query);\n           \
+    \ active = true;\n        }\n        if (!active) break;\n\n        reset();\n\
+    \        int applied = 0;\n        for (int middle = 0; middle <= event_count;\
+    \ ++middle) {\n            while (applied < middle) {\n                apply(applied);\n\
+    \                ++applied;\n            }\n            for (int query : bucket[middle])\
+    \ {\n                if (check(query)) {\n                    high[query] = middle;\n\
+    \                } else {\n                    low[query] = middle;\n        \
+    \        }\n            }\n        }\n    }\n\n    return high;\n}\n\n}  // namespace\
+    \ algo\n}  // namespace m1une\n\n\n#line 7 \"algo/offline/all.hpp\"\n\n\n#line\
+    \ 1 \"algo/search/all.hpp\"\n\n\n\n#line 1 \"algo/search/bisect.hpp\"\n\n\n\n\
+    #line 5 \"algo/search/bisect.hpp\"\n\nnamespace m1une {\nnamespace algo {\n\n\
+    template <typename F>\nlong long first_true(long long ng, long long ok, F pred)\
+    \ {\n    auto distance = [](long long a, long long b) {\n        return a > b\
+    \ ? static_cast<__int128_t>(a) - b : static_cast<__int128_t>(b) - a;\n    };\n\
+    \    while (distance(ng, ok) > 1) {\n        long long mid = std::midpoint(ng,\
     \ ok);\n        if (pred(mid)) {\n            ok = mid;\n        } else {\n  \
     \          ng = mid;\n        }\n    }\n    return ok;\n}\n\ntemplate <typename\
     \ F>\nlong long last_true(long long ok, long long ng, F pred) {\n    auto distance\
@@ -125,8 +292,41 @@ data:
     \ ++i) {\n        double mid = (ng + ok) / 2.0;\n        if (pred(mid)) {\n  \
     \          ok = mid;\n        } else {\n            ng = mid;\n        }\n   \
     \ }\n    return ok;\n}\n\n}  // namespace algo\n}  // namespace m1une\n\n\n#line\
-    \ 5 \"algo/search/all.hpp\"\n\n\n#line 1 \"algo/sequence/all.hpp\"\n\n\n\n#line\
-    \ 1 \"algo/sequence/inversion_count.hpp\"\n\n\n\n#line 5 \"algo/sequence/inversion_count.hpp\"\
+    \ 1 \"algo/search/ternary_search.hpp\"\n\n\n\n#line 6 \"algo/search/ternary_search.hpp\"\
+    \n\nnamespace m1une {\nnamespace algo {\n\ntemplate <std::integral Int, class\
+    \ F>\nInt ternary_search_argmin(Int left, Int right, F f) {\n    assert(left <\
+    \ right);\n    while (right - left > 3) {\n        const Int third = (right -\
+    \ left) / 3;\n        const Int middle_left = left + third;\n        const Int\
+    \ middle_right = right - third;\n        if (f(middle_right) < f(middle_left))\
+    \ {\n            left = middle_left + 1;\n        } else {\n            right\
+    \ = middle_right;\n        }\n    }\n\n    Int best = left;\n    auto best_value\
+    \ = f(best);\n    for (Int x = left + 1; x < right; ++x) {\n        auto value\
+    \ = f(x);\n        if (value < best_value) {\n            best = x;\n        \
+    \    best_value = value;\n        }\n    }\n    return best;\n}\n\ntemplate <std::integral\
+    \ Int, class F>\nInt ternary_search_argmax(Int left, Int right, F f) {\n    assert(left\
+    \ < right);\n    while (right - left > 3) {\n        const Int third = (right\
+    \ - left) / 3;\n        const Int middle_left = left + third;\n        const Int\
+    \ middle_right = right - third;\n        if (f(middle_left) < f(middle_right))\
+    \ {\n            left = middle_left + 1;\n        } else {\n            right\
+    \ = middle_right;\n        }\n    }\n\n    Int best = left;\n    auto best_value\
+    \ = f(best);\n    for (Int x = left + 1; x < right; ++x) {\n        auto value\
+    \ = f(x);\n        if (best_value < value) {\n            best = x;\n        \
+    \    best_value = value;\n        }\n    }\n    return best;\n}\n\ntemplate <class\
+    \ F>\ndouble real_ternary_search_argmin(double left, double right, F f, int iterations\
+    \ = 100) {\n    assert(left <= right);\n    assert(0 <= iterations);\n    for\
+    \ (int i = 0; i < iterations; ++i) {\n        const double middle_left = (left\
+    \ * 2.0 + right) / 3.0;\n        const double middle_right = (left + right * 2.0)\
+    \ / 3.0;\n        if (f(middle_right) < f(middle_left)) {\n            left =\
+    \ middle_left;\n        } else {\n            right = middle_right;\n        }\n\
+    \    }\n    return (left + right) / 2.0;\n}\n\ntemplate <class F>\ndouble real_ternary_search_argmax(double\
+    \ left, double right, F f, int iterations = 100) {\n    assert(left <= right);\n\
+    \    assert(0 <= iterations);\n    for (int i = 0; i < iterations; ++i) {\n  \
+    \      const double middle_left = (left * 2.0 + right) / 3.0;\n        const double\
+    \ middle_right = (left + right * 2.0) / 3.0;\n        if (f(middle_left) < f(middle_right))\
+    \ {\n            left = middle_left;\n        } else {\n            right = middle_right;\n\
+    \        }\n    }\n    return (left + right) / 2.0;\n}\n\n}  // namespace algo\n\
+    }  // namespace m1une\n\n\n#line 6 \"algo/search/all.hpp\"\n\n\n#line 1 \"algo/sequence/all.hpp\"\
+    \n\n\n\n#line 1 \"algo/sequence/inversion_count.hpp\"\n\n\n\n#line 5 \"algo/sequence/inversion_count.hpp\"\
     \n\nnamespace m1une {\nnamespace algo {\n\n// Returns the number of pairs (i,\
     \ j) with i < j and a[i] > a[j].\n// The vector is taken by value because merge\
     \ sort rearranges it.\ntemplate <typename T>\nlong long inversion_count(std::vector<T>\
@@ -202,11 +402,13 @@ data:
     \  const T candidate = left + right_sums[right_count - 1];\n        if (answer\
     \ < candidate) answer = candidate;\n    }\n    return answer;\n}\n\n}  // namespace\
     \ algo\n}  // namespace m1une\n\n\n#line 8 \"algo/sequence/all.hpp\"\n\n\n#line\
-    \ 8 \"algo/all.hpp\"\n\n\n"
+    \ 9 \"algo/all.hpp\"\n\n\n"
   code: '#ifndef M1UNE_ALGO_ALL_HPP
 
     #define M1UNE_ALGO_ALL_HPP 1
 
+
+    #include "dp/all.hpp"
 
     #include "enumeration/all.hpp"
 
@@ -221,12 +423,19 @@ data:
 
     '
   dependsOn:
+  - algo/dp/all.hpp
+  - algo/dp/knapsack.hpp
   - algo/enumeration/all.hpp
+  - algo/enumeration/combination.hpp
   - algo/enumeration/gray_code.hpp
+  - algo/enumeration/submask.hpp
   - algo/offline/all.hpp
+  - algo/offline/cdq_divide_and_conquer.hpp
   - algo/offline/mo.hpp
+  - algo/offline/parallel_binary_search.hpp
   - algo/search/all.hpp
   - algo/search/bisect.hpp
+  - algo/search/ternary_search.hpp
   - algo/sequence/all.hpp
   - algo/sequence/inversion_count.hpp
   - algo/sequence/lis.hpp
@@ -235,7 +444,7 @@ data:
   isVerificationFile: false
   path: algo/all.hpp
   requiredBy: []
-  timestamp: '2026-07-07 21:49:48+09:00'
+  timestamp: '2026-07-07 22:10:04+09:00'
   verificationStatus: LIBRARY_NO_TESTS
   verifiedWith: []
 documentation_of: algo/all.hpp
@@ -262,3 +471,4 @@ If a header builds an object and then answers repeated queries, it belongs in
 | `algo/search/all.hpp` | Search-over-answer helpers such as integer and floating-point binary search. |
 | `algo/offline/all.hpp` | Offline query processing such as Mo's algorithm. |
 | `algo/enumeration/all.hpp` | Combinatorial traversal helpers such as Gray-code enumeration. |
+| `algo/dp/all.hpp` | Domain-neutral DP helpers such as knapsack routines. |
