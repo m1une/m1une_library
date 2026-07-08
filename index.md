@@ -134,6 +134,9 @@ data:
       path: algo/search/bisect.hpp
       title: Bisect
     - icon: ':heavy_check_mark:'
+      path: algo/search/golden_section_search.hpp
+      title: Golden Section Search
+    - icon: ':heavy_check_mark:'
       path: algo/search/ternary_search.hpp
       title: Ternary Search
   - name: algo/sequence
@@ -962,6 +965,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/algo/search/bisect.test.cpp
       title: verify/algo/search/bisect.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/algo/search/golden_section_search.test.cpp
+      title: verify/algo/search/golden_section_search.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/algo/search/ternary_search.test.cpp
       title: verify/algo/search/ternary_search.test.cpp
