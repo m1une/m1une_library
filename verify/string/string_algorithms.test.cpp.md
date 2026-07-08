@@ -17,6 +17,9 @@ data:
     path: string/longest_common_extension.hpp
     title: Longest Common Extension
   - icon: ':heavy_check_mark:'
+    path: string/longest_common_subsequence.hpp
+    title: Longest Common Subsequence
+  - icon: ':heavy_check_mark:'
     path: string/longest_common_substring.hpp
     title: Longest Common Substring
   - icon: ':heavy_check_mark:'
@@ -397,6 +400,59 @@ data:
     \ == len1 && common == len2) return 0;\n        if (common == len1) return -1;\n\
     \        if (common == len2) return 1;\n        return _sequence[l1 + common]\
     \ < _sequence[l2 + common] ? -1 : 1;\n    }\n};\n\n}  // namespace string\n} \
+    \ // namespace m1une\n\n\n#line 1 \"string/longest_common_subsequence.hpp\"\n\n\
+    \n\n#line 9 \"string/longest_common_subsequence.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ string {\n\nstruct LongestCommonSubsequence {\n    std::vector<std::pair<int,\
+    \ int>> matches;\n\n    int length() const {\n        return int(matches.size());\n\
+    \    }\n\n    bool empty() const {\n        return matches.empty();\n    }\n\n\
+    \    std::vector<int> first_indices() const {\n        std::vector<int> result;\n\
+    \        result.reserve(matches.size());\n        for (auto [i, j] : matches)\
+    \ {\n            (void)j;\n            result.push_back(i);\n        }\n     \
+    \   return result;\n    }\n\n    std::vector<int> second_indices() const {\n \
+    \       std::vector<int> result;\n        result.reserve(matches.size());\n  \
+    \      for (auto [i, j] : matches) {\n            (void)i;\n            result.push_back(j);\n\
+    \        }\n        return result;\n    }\n\n    template <class Sequence>\n \
+    \   std::vector<std::remove_cv_t<std::remove_reference_t<decltype(std::declval<const\
+    \ Sequence&>()[0])>>>\n    values_from_first(const Sequence& first) const {\n\
+    \        using Value = std::remove_cv_t<std::remove_reference_t<decltype(std::declval<const\
+    \ Sequence&>()[0])>>;\n        std::vector<Value> result;\n        result.reserve(matches.size());\n\
+    \        for (auto [i, j] : matches) {\n            (void)j;\n            result.push_back(first[i]);\n\
+    \        }\n        return result;\n    }\n\n    template <class Sequence>\n \
+    \   std::vector<std::remove_cv_t<std::remove_reference_t<decltype(std::declval<const\
+    \ Sequence&>()[0])>>>\n    values_from_second(const Sequence& second) const {\n\
+    \        using Value = std::remove_cv_t<std::remove_reference_t<decltype(std::declval<const\
+    \ Sequence&>()[0])>>;\n        std::vector<Value> result;\n        result.reserve(matches.size());\n\
+    \        for (auto [i, j] : matches) {\n            (void)i;\n            result.push_back(second[j]);\n\
+    \        }\n        return result;\n    }\n};\n\ntemplate <class FirstSequence,\
+    \ class SecondSequence>\nint longest_common_subsequence_length(const FirstSequence&\
+    \ first, const SecondSequence& second) {\n    int n = int(first.size());\n   \
+    \ int m = int(second.size());\n    if (m <= n) {\n        std::vector<int> dp(m\
+    \ + 1, 0);\n        for (int i = 0; i < n; i++) {\n            int diagonal =\
+    \ 0;\n            for (int j = 0; j < m; j++) {\n                int up = dp[j\
+    \ + 1];\n                if (first[i] == second[j]) {\n                    dp[j\
+    \ + 1] = diagonal + 1;\n                } else {\n                    dp[j + 1]\
+    \ = std::max(dp[j + 1], dp[j]);\n                }\n                diagonal =\
+    \ up;\n            }\n        }\n        return dp[m];\n    } else {\n       \
+    \ std::vector<int> dp(n + 1, 0);\n        for (int j = 0; j < m; j++) {\n    \
+    \        int diagonal = 0;\n            for (int i = 0; i < n; i++) {\n      \
+    \          int up = dp[i + 1];\n                if (first[i] == second[j]) {\n\
+    \                    dp[i + 1] = diagonal + 1;\n                } else {\n   \
+    \                 dp[i + 1] = std::max(dp[i + 1], dp[i]);\n                }\n\
+    \                diagonal = up;\n            }\n        }\n        return dp[n];\n\
+    \    }\n}\n\ntemplate <class FirstSequence, class SecondSequence>\nLongestCommonSubsequence\
+    \ longest_common_subsequence(\n    const FirstSequence& first,\n    const SecondSequence&\
+    \ second\n) {\n    int n = int(first.size());\n    int m = int(second.size());\n\
+    \    std::vector<std::vector<int>> dp(n + 1, std::vector<int>(m + 1, 0));\n  \
+    \  for (int i = 0; i < n; i++) {\n        for (int j = 0; j < m; j++) {\n    \
+    \        if (first[i] == second[j]) {\n                dp[i + 1][j + 1] = dp[i][j]\
+    \ + 1;\n            } else {\n                dp[i + 1][j + 1] = std::max(dp[i][j\
+    \ + 1], dp[i + 1][j]);\n            }\n        }\n    }\n\n    LongestCommonSubsequence\
+    \ result;\n    result.matches.reserve(dp[n][m]);\n    int i = n;\n    int j =\
+    \ m;\n    while (i > 0 && j > 0) {\n        if (first[i - 1] == second[j - 1])\
+    \ {\n            result.matches.emplace_back(i - 1, j - 1);\n            i--;\n\
+    \            j--;\n        } else if (dp[i - 1][j] >= dp[i][j - 1]) {\n      \
+    \      i--;\n        } else {\n            j--;\n        }\n    }\n    std::reverse(result.matches.begin(),\
+    \ result.matches.end());\n    return result;\n}\n\n}  // namespace string\n} \
     \ // namespace m1une\n\n\n#line 1 \"string/longest_common_substring.hpp\"\n\n\n\
     \n#line 9 \"string/longest_common_substring.hpp\"\n\n#line 11 \"string/longest_common_substring.hpp\"\
     \n\nnamespace m1une {\nnamespace string {\n\nstruct LongestCommonSubstring {\n\
@@ -806,7 +862,7 @@ data:
     \ + z[i] < n && sequence[z[i]] == sequence[i + z[i]]) {\n            z[i]++;\n\
     \        }\n        if (right < i + z[i]) {\n            left = i;\n         \
     \   right = i + z[i];\n        }\n    }\n    return z;\n}\n\n}  // namespace string\n\
-    }  // namespace m1une\n\n\n#line 18 \"string/all.hpp\"\n\n\n#line 4 \"verify/string/string_algorithms.test.cpp\"\
+    }  // namespace m1une\n\n\n#line 19 \"string/all.hpp\"\n\n\n#line 4 \"verify/string/string_algorithms.test.cpp\"\
     \n\n#line 8 \"verify/string/string_algorithms.test.cpp\"\n#include <iostream>\n\
     #line 12 \"verify/string/string_algorithms.test.cpp\"\n\nnamespace {\n\nvoid test_edge_cases()\
     \ {\n    std::string empty;\n    assert(m1une::string::z_algorithm(empty).empty());\n\
@@ -969,6 +1025,7 @@ data:
   - string/levenshtein_distance.hpp
   - string/longest_common_extension.hpp
   - string/suffix_array.hpp
+  - string/longest_common_subsequence.hpp
   - string/longest_common_substring.hpp
   - string/lyndon_factorization.hpp
   - string/manacher.hpp
@@ -981,7 +1038,7 @@ data:
   isVerificationFile: true
   path: verify/string/string_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-09 02:40:33+09:00'
+  timestamp: '2026-07-09 02:44:58+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/string/string_algorithms.test.cpp

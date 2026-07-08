@@ -871,6 +871,9 @@ data:
       path: string/longest_common_extension.hpp
       title: Longest Common Extension
     - icon: ':heavy_check_mark:'
+      path: string/longest_common_subsequence.hpp
+      title: Longest Common Subsequence
+    - icon: ':heavy_check_mark:'
       path: string/longest_common_substring.hpp
       title: Longest Common Substring
     - icon: ':heavy_check_mark:'
@@ -1509,6 +1512,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/string/longest_common_extension.test.cpp
       title: verify/string/longest_common_extension.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/string/longest_common_subsequence.test.cpp
+      title: verify/string/longest_common_subsequence.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/string/longest_common_substring.test.cpp
       title: verify/string/longest_common_substring.test.cpp
