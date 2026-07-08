@@ -17,6 +17,7 @@ contest when convenience matters more.
 | `string/eertree.hpp` | Online palindromic tree with suffix and series links. |
 | `string/levenshtein_distance.hpp` | Unit-cost edit distance in linear auxiliary memory. |
 | `string/longest_common_extension.hpp` | Static longest-common-extension queries and substring comparisons. |
+| `string/longest_common_subsequence.hpp` | Finds one longest subsequence common to two sequences. |
 | `string/longest_common_substring.hpp` | Finds one longest substring common to two sequences. |
 | `string/lyndon_factorization.hpp` | Duval's linear-time Lyndon factorization. |
 | `string/z_algorithm.hpp` | Linear-time Z array. |

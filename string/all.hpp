@@ -5,6 +5,7 @@
 #include "eertree.hpp"
 #include "levenshtein_distance.hpp"
 #include "longest_common_extension.hpp"
+#include "longest_common_subsequence.hpp"
 #include "longest_common_substring.hpp"
 #include "lyndon_factorization.hpp"
 #include "manacher.hpp"
