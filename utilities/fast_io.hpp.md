@@ -10,6 +10,9 @@ data:
     path: verify/ds/range_query/range_inversion_count.test.cpp
     title: verify/ds/range_query/range_inversion_count.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/vertex_add_subtree_sum.test.cpp
+    title: verify/graph/tree/vertex_add_subtree_sum.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
     title: verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
   - icon: ':heavy_check_mark:'
@@ -267,6 +270,7 @@ data:
   - verify/ds/range_query/range_inversion_count.test.cpp
   - verify/ds/range_query/fenwick_tree.test.cpp
   - verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
+  - verify/graph/tree/vertex_add_subtree_sum.test.cpp
 documentation_of: utilities/fast_io.hpp
 layout: document
 title: Fast IO

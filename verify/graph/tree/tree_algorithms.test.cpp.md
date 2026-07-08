@@ -26,6 +26,9 @@ data:
     path: graph/tree/dsu_on_tree.hpp
     title: DSU on Tree
   - icon: ':heavy_check_mark:'
+    path: graph/tree/euler_tour.hpp
+    title: Euler Tour
+  - icon: ':heavy_check_mark:'
     path: graph/tree/heavy_light_decomposition.hpp
     title: Heavy Light Decomposition
   - icon: ':heavy_check_mark:'
@@ -308,7 +311,53 @@ data:
     \ children[vertex]) {\n                    if (child != heavy_child[vertex]) {\n\
     \                        actions.push_back(Action{Process, child, false});\n \
     \                   }\n                }\n            }\n        }\n    }\n};\n\
-    \n}  // namespace tree\n}  // namespace m1une\n\n\n#line 1 \"graph/tree/heavy_light_decomposition.hpp\"\
+    \n}  // namespace tree\n}  // namespace m1une\n\n\n#line 1 \"graph/tree/euler_tour.hpp\"\
+    \n\n\n\n#line 8 \"graph/tree/euler_tour.hpp\"\n\n#line 10 \"graph/tree/euler_tour.hpp\"\
+    \n\nnamespace m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct EulerTour\
+    \ {\n    using cost_type = T;\n    using edge_type = m1une::graph::Edge<T>;\n\n\
+    \    int root;\n    std::vector<int> parent;\n    std::vector<int> parent_edge;\n\
+    \    std::vector<int> depth;\n    std::vector<T> dist;\n    std::vector<int> subtree_size;\n\
+    \    std::vector<int> tin;\n    std::vector<int> tout;\n    std::vector<int> order;\n\
+    \    std::vector<std::vector<int>> children;\n\n   private:\n    int _n;\n\n \
+    \   void check_vertex(int v) const {\n        assert(0 <= v && v < _n);\n    \
+    \    assert(tin[v] != -1);\n    }\n\n   public:\n    EulerTour() : root(-1), _n(0)\
+    \ {}\n    explicit EulerTour(const m1une::graph::Graph<T>& g, int root_ = 0) {\n\
+    \        build(g, root_);\n    }\n\n    void build(const m1une::graph::Graph<T>&\
+    \ g, int root_ = 0) {\n        _n = g.size();\n        root = _n == 0 ? -1 : root_;\n\
+    \        parent.assign(_n, -2);\n        parent_edge.assign(_n, -1);\n       \
+    \ depth.assign(_n, 0);\n        dist.assign(_n, T(0));\n        subtree_size.assign(_n,\
+    \ 0);\n        tin.assign(_n, -1);\n        tout.assign(_n, -1);\n        order.clear();\n\
+    \        order.reserve(_n);\n        children.assign(_n, {});\n\n        if (_n\
+    \ == 0) return;\n        assert(0 <= root && root < _n);\n\n        struct Frame\
+    \ {\n            int v;\n            int state;\n        };\n\n        std::vector<Frame>\
+    \ stack;\n        stack.push_back({root, 0});\n        parent[root] = -1;\n\n\
+    \        while (!stack.empty()) {\n            Frame frame = stack.back();\n \
+    \           stack.pop_back();\n            int v = frame.v;\n            if (frame.state\
+    \ == 0) {\n                tin[v] = int(order.size());\n                order.push_back(v);\n\
+    \                stack.push_back({v, 1});\n                const auto& adj = g[v];\n\
+    \                for (int i = int(adj.size()) - 1; i >= 0; --i) {\n          \
+    \          const auto& e = adj[i];\n                    if (!e.alive) continue;\n\
+    \                    if (parent[e.to] != -2) continue;\n                    parent[e.to]\
+    \ = v;\n                    parent_edge[e.to] = e.id;\n                    depth[e.to]\
+    \ = depth[v] + 1;\n                    dist[e.to] = dist[v] + e.cost;\n      \
+    \              children[v].push_back(e.to);\n                    stack.push_back({e.to,\
+    \ 0});\n                }\n                std::reverse(children[v].begin(), children[v].end());\n\
+    \            } else {\n                subtree_size[v] = 1;\n                for\
+    \ (int child : children[v]) subtree_size[v] += subtree_size[child];\n        \
+    \        tout[v] = int(order.size());\n            }\n        }\n    }\n\n   \
+    \ int size() const {\n        return _n;\n    }\n\n    int visited_size() const\
+    \ {\n        return int(order.size());\n    }\n\n    bool empty() const {\n  \
+    \      return _n == 0;\n    }\n\n    bool is_ancestor(int u, int v) const {\n\
+    \        check_vertex(u);\n        check_vertex(v);\n        return tin[u] <=\
+    \ tin[v] && tout[v] <= tout[u];\n    }\n\n    bool in_subtree(int v, int u) const\
+    \ {\n        return is_ancestor(u, v);\n    }\n\n    std::pair<int, int> subtree_range(int\
+    \ v, bool edge = false) const {\n        check_vertex(v);\n        return {tin[v]\
+    \ + (edge ? 1 : 0), tout[v]};\n    }\n\n    std::vector<int> subtree_vertices(int\
+    \ v) const {\n        check_vertex(v);\n        return std::vector<int>(order.begin()\
+    \ + tin[v], order.begin() + tout[v]);\n    }\n\n    template <class F>\n    void\
+    \ for_each_subtree(int v, F f) const {\n        auto [l, r] = subtree_range(v);\n\
+    \        for (int i = l; i < r; ++i) f(order[i]);\n    }\n};\n\n}  // namespace\
+    \ tree\n}  // namespace m1une\n\n\n#line 1 \"graph/tree/heavy_light_decomposition.hpp\"\
     \n\n\n\n#line 8 \"graph/tree/heavy_light_decomposition.hpp\"\n\n#line 10 \"graph/tree/heavy_light_decomposition.hpp\"\
     \n\nnamespace m1une {\nnamespace tree {\n\nstruct HldPathSegment {\n    int l;\n\
     \    int r;\n    bool reversed;\n};\n\ntemplate <class T = int>\nstruct HeavyLightDecomposition\
@@ -970,7 +1019,7 @@ data:
     \ std::vector<Vertex>&, Point, Compress, Rake, AddEdge, AddVertex)\n    -> StaticTopTree<T,\
     \ Vertex, std::invoke_result_t<AddVertex, Point, Vertex, int>, Point, Compress,\
     \ Rake,\n                     AddEdge, AddVertex>;\n\n}  // namespace tree\n}\
-    \  // namespace m1une\n\n\n#line 1 \"graph/tree/tree.hpp\"\n\n\n\n#line 7 \"graph/tree/tree.hpp\"\
+    \  // namespace m1une\n\n\n#line 1 \"graph/tree/tree.hpp\"\n\n\n\n#line 8 \"graph/tree/tree.hpp\"\
     \n\n\n#line 1 \"graph/tree/tree_hash.hpp\"\n\n\n\n#line 7 \"graph/tree/tree_hash.hpp\"\
     \n#include <cstdint>\n#line 9 \"graph/tree/tree_hash.hpp\"\n\n#line 11 \"graph/tree/tree_hash.hpp\"\
     \n\nnamespace m1une {\nnamespace tree {\n\nusing TreeHashValue = std::array<std::uint64_t,\
@@ -1127,7 +1176,7 @@ data:
     \ == n);\n    if (n == 0) return 0;\n    assert(0 <= root && root < n);\n    assert(int(graph.edges().size())\
     \ == n - 1);\n\n    RootedTree<T> rooted_tree(graph, root);\n    assert(int(rooted_tree.order.size())\
     \ == n);\n    return zero_one_on_tree(rooted_tree.parent, value);\n}\n\n}  //\
-    \ namespace tree\n}  // namespace m1une\n\n\n#line 18 \"graph/tree/all.hpp\"\n\
+    \ namespace tree\n}  // namespace m1une\n\n\n#line 19 \"graph/tree/all.hpp\"\n\
     \n\n#line 14 \"verify/graph/tree/tree_algorithms.test.cpp\"\n\nusing m1une::graph::Graph;\n\
     \ntemplate <class Hld>\nstd::vector<int> expand_segments(const Hld& hld, const\
     \ std::vector<m1une::tree::HldPathSegment>& segments) {\n    std::vector<int>\
@@ -1155,19 +1204,30 @@ data:
     \ 6) == expected_path);\n    std::vector<int> expected_edges = {2, 0, 1, 4, 5};\n\
     \    assert(tree.path_edges(3, 6) == expected_edges);\n\n    auto [l, r] = tree.subtree_range(1);\n\
     \    assert(r - l == 3);\n    auto sub = tree.subtree_vertices(1);\n    std::sort(sub.begin(),\
-    \ sub.end());\n    assert((sub == std::vector<int>{1, 3, 4}));\n}\n\nvoid test_sparse_table_lca()\
-    \ {\n    auto g = sample_tree();\n    m1une::tree::RootedTree<long long> tree(g,\
-    \ 0);\n    m1une::tree::SparseTableLca<long long> lca(g, 0);\n\n    assert(lca.size()\
-    \ == 7);\n    assert(!lca.empty());\n    assert(lca.root == 0);\n    assert(lca.parent[0]\
-    \ == -1);\n    assert(lca.parent[6] == 5);\n    assert(lca.depth[6] == 3);\n \
-    \   assert(lca.dist[6] == 10);\n    assert(lca.euler.size() == 13);\n    assert(lca.first[0]\
-    \ == 0);\n    assert(lca.is_ancestor(2, 6));\n    assert(!lca.is_ancestor(1, 6));\n\
-    \    assert(lca.in_subtree(6, 2));\n\n    for (int u = 0; u < 7; u++) {\n    \
-    \    for (int v = 0; v < 7; v++) {\n            assert(lca.lca(u, v) == tree.lca(u,\
-    \ v));\n            assert(lca.dist_edges(u, v) == tree.dist_edges(u, v));\n \
-    \           assert(lca.dist_cost(u, v) == tree.dist_cost(u, v));\n        }\n\
-    \    }\n\n    auto [l, r] = lca.subtree_range(2);\n    assert(r - l == 3);\n \
-    \   std::vector<int> subtree;\n    for (int i = l; i < r; i++) subtree.push_back(lca.order[i]);\n\
+    \ sub.end());\n    assert((sub == std::vector<int>{1, 3, 4}));\n}\n\nvoid test_euler_tour()\
+    \ {\n    auto g = sample_tree();\n    m1une::tree::EulerTour<long long> tour(g,\
+    \ 0);\n\n    std::vector<int> expected_order = {0, 1, 3, 4, 2, 5, 6};\n    assert(tour.size()\
+    \ == 7);\n    assert(tour.visited_size() == 7);\n    assert(tour.root == 0);\n\
+    \    assert(tour.order == expected_order);\n    assert(tour.parent[6] == 5);\n\
+    \    assert(tour.parent_edge[6] == 5);\n    assert(tour.depth[6] == 3);\n    assert(tour.dist[6]\
+    \ == 10);\n    assert(tour.subtree_size[1] == 3);\n    assert(tour.is_ancestor(1,\
+    \ 4));\n    assert(!tour.is_ancestor(2, 4));\n\n    auto [l, r] = tour.subtree_range(1);\n\
+    \    assert(l == 1);\n    assert(r == 4);\n    auto [el, er] = tour.subtree_range(1,\
+    \ true);\n    assert(el == 2);\n    assert(er == 4);\n\n    std::vector<int> subtree\
+    \ = tour.subtree_vertices(1);\n    std::sort(subtree.begin(), subtree.end());\n\
+    \    std::vector<int> expected_subtree = {1, 3, 4};\n    assert(subtree == expected_subtree);\n\
+    }\n\nvoid test_sparse_table_lca() {\n    auto g = sample_tree();\n    m1une::tree::RootedTree<long\
+    \ long> tree(g, 0);\n    m1une::tree::SparseTableLca<long long> lca(g, 0);\n\n\
+    \    assert(lca.size() == 7);\n    assert(!lca.empty());\n    assert(lca.root\
+    \ == 0);\n    assert(lca.parent[0] == -1);\n    assert(lca.parent[6] == 5);\n\
+    \    assert(lca.depth[6] == 3);\n    assert(lca.dist[6] == 10);\n    assert(lca.euler.size()\
+    \ == 13);\n    assert(lca.first[0] == 0);\n    assert(lca.is_ancestor(2, 6));\n\
+    \    assert(!lca.is_ancestor(1, 6));\n    assert(lca.in_subtree(6, 2));\n\n  \
+    \  for (int u = 0; u < 7; u++) {\n        for (int v = 0; v < 7; v++) {\n    \
+    \        assert(lca.lca(u, v) == tree.lca(u, v));\n            assert(lca.dist_edges(u,\
+    \ v) == tree.dist_edges(u, v));\n            assert(lca.dist_cost(u, v) == tree.dist_cost(u,\
+    \ v));\n        }\n    }\n\n    auto [l, r] = lca.subtree_range(2);\n    assert(r\
+    \ - l == 3);\n    std::vector<int> subtree;\n    for (int i = l; i < r; i++) subtree.push_back(lca.order[i]);\n\
     \    std::sort(subtree.begin(), subtree.end());\n    assert((subtree == std::vector<int>{2,\
     \ 5, 6}));\n}\n\nvoid test_virtual_tree() {\n    auto graph = sample_tree();\n\
     \    m1une::tree::VirtualTree<long long> builder(graph, 0);\n\n    auto virtual_tree\
@@ -1432,8 +1492,8 @@ data:
     \ [](int acc, int) { return acc + 1; },\n        [](int dp, const auto&) { return\
     \ dp; });\n    assert(component_size == std::vector<int>(4, 2));\n\n    m1une::tree::CentroidDecomposition<int>\
     \ cd(g);\n    assert(cd.roots.size() == 2);\n    assert(cd.order.size() == 4);\n\
-    }\n\nint main() {\n    test_rooted_tree();\n    test_sparse_table_lca();\n   \
-    \ test_virtual_tree();\n    test_hld();\n    test_diameter();\n    test_rerooting();\n\
+    }\n\nint main() {\n    test_rooted_tree();\n    test_euler_tour();\n    test_sparse_table_lca();\n\
+    \    test_virtual_tree();\n    test_hld();\n    test_diameter();\n    test_rerooting();\n\
     \    test_static_top_tree();\n    test_rerooting_static_top_tree();\n    test_rerooting_static_top_tree_vertex_component();\n\
     \    test_centroid_decomposition();\n    test_forest();\n\n    long long a = 0,\
     \ b = 0;\n    std::cin >> a >> b;\n    std::cout << a + b << '\\n';\n}\n"
@@ -1467,19 +1527,30 @@ data:
     \ 6) == expected_path);\n    std::vector<int> expected_edges = {2, 0, 1, 4, 5};\n\
     \    assert(tree.path_edges(3, 6) == expected_edges);\n\n    auto [l, r] = tree.subtree_range(1);\n\
     \    assert(r - l == 3);\n    auto sub = tree.subtree_vertices(1);\n    std::sort(sub.begin(),\
-    \ sub.end());\n    assert((sub == std::vector<int>{1, 3, 4}));\n}\n\nvoid test_sparse_table_lca()\
-    \ {\n    auto g = sample_tree();\n    m1une::tree::RootedTree<long long> tree(g,\
-    \ 0);\n    m1une::tree::SparseTableLca<long long> lca(g, 0);\n\n    assert(lca.size()\
-    \ == 7);\n    assert(!lca.empty());\n    assert(lca.root == 0);\n    assert(lca.parent[0]\
-    \ == -1);\n    assert(lca.parent[6] == 5);\n    assert(lca.depth[6] == 3);\n \
-    \   assert(lca.dist[6] == 10);\n    assert(lca.euler.size() == 13);\n    assert(lca.first[0]\
-    \ == 0);\n    assert(lca.is_ancestor(2, 6));\n    assert(!lca.is_ancestor(1, 6));\n\
-    \    assert(lca.in_subtree(6, 2));\n\n    for (int u = 0; u < 7; u++) {\n    \
-    \    for (int v = 0; v < 7; v++) {\n            assert(lca.lca(u, v) == tree.lca(u,\
-    \ v));\n            assert(lca.dist_edges(u, v) == tree.dist_edges(u, v));\n \
-    \           assert(lca.dist_cost(u, v) == tree.dist_cost(u, v));\n        }\n\
-    \    }\n\n    auto [l, r] = lca.subtree_range(2);\n    assert(r - l == 3);\n \
-    \   std::vector<int> subtree;\n    for (int i = l; i < r; i++) subtree.push_back(lca.order[i]);\n\
+    \ sub.end());\n    assert((sub == std::vector<int>{1, 3, 4}));\n}\n\nvoid test_euler_tour()\
+    \ {\n    auto g = sample_tree();\n    m1une::tree::EulerTour<long long> tour(g,\
+    \ 0);\n\n    std::vector<int> expected_order = {0, 1, 3, 4, 2, 5, 6};\n    assert(tour.size()\
+    \ == 7);\n    assert(tour.visited_size() == 7);\n    assert(tour.root == 0);\n\
+    \    assert(tour.order == expected_order);\n    assert(tour.parent[6] == 5);\n\
+    \    assert(tour.parent_edge[6] == 5);\n    assert(tour.depth[6] == 3);\n    assert(tour.dist[6]\
+    \ == 10);\n    assert(tour.subtree_size[1] == 3);\n    assert(tour.is_ancestor(1,\
+    \ 4));\n    assert(!tour.is_ancestor(2, 4));\n\n    auto [l, r] = tour.subtree_range(1);\n\
+    \    assert(l == 1);\n    assert(r == 4);\n    auto [el, er] = tour.subtree_range(1,\
+    \ true);\n    assert(el == 2);\n    assert(er == 4);\n\n    std::vector<int> subtree\
+    \ = tour.subtree_vertices(1);\n    std::sort(subtree.begin(), subtree.end());\n\
+    \    std::vector<int> expected_subtree = {1, 3, 4};\n    assert(subtree == expected_subtree);\n\
+    }\n\nvoid test_sparse_table_lca() {\n    auto g = sample_tree();\n    m1une::tree::RootedTree<long\
+    \ long> tree(g, 0);\n    m1une::tree::SparseTableLca<long long> lca(g, 0);\n\n\
+    \    assert(lca.size() == 7);\n    assert(!lca.empty());\n    assert(lca.root\
+    \ == 0);\n    assert(lca.parent[0] == -1);\n    assert(lca.parent[6] == 5);\n\
+    \    assert(lca.depth[6] == 3);\n    assert(lca.dist[6] == 10);\n    assert(lca.euler.size()\
+    \ == 13);\n    assert(lca.first[0] == 0);\n    assert(lca.is_ancestor(2, 6));\n\
+    \    assert(!lca.is_ancestor(1, 6));\n    assert(lca.in_subtree(6, 2));\n\n  \
+    \  for (int u = 0; u < 7; u++) {\n        for (int v = 0; v < 7; v++) {\n    \
+    \        assert(lca.lca(u, v) == tree.lca(u, v));\n            assert(lca.dist_edges(u,\
+    \ v) == tree.dist_edges(u, v));\n            assert(lca.dist_cost(u, v) == tree.dist_cost(u,\
+    \ v));\n        }\n    }\n\n    auto [l, r] = lca.subtree_range(2);\n    assert(r\
+    \ - l == 3);\n    std::vector<int> subtree;\n    for (int i = l; i < r; i++) subtree.push_back(lca.order[i]);\n\
     \    std::sort(subtree.begin(), subtree.end());\n    assert((subtree == std::vector<int>{2,\
     \ 5, 6}));\n}\n\nvoid test_virtual_tree() {\n    auto graph = sample_tree();\n\
     \    m1une::tree::VirtualTree<long long> builder(graph, 0);\n\n    auto virtual_tree\
@@ -1744,8 +1815,8 @@ data:
     \ [](int acc, int) { return acc + 1; },\n        [](int dp, const auto&) { return\
     \ dp; });\n    assert(component_size == std::vector<int>(4, 2));\n\n    m1une::tree::CentroidDecomposition<int>\
     \ cd(g);\n    assert(cd.roots.size() == 2);\n    assert(cd.order.size() == 4);\n\
-    }\n\nint main() {\n    test_rooted_tree();\n    test_sparse_table_lca();\n   \
-    \ test_virtual_tree();\n    test_hld();\n    test_diameter();\n    test_rerooting();\n\
+    }\n\nint main() {\n    test_rooted_tree();\n    test_euler_tour();\n    test_sparse_table_lca();\n\
+    \    test_virtual_tree();\n    test_hld();\n    test_diameter();\n    test_rerooting();\n\
     \    test_static_top_tree();\n    test_rerooting_static_top_tree();\n    test_rerooting_static_top_tree_vertex_component();\n\
     \    test_centroid_decomposition();\n    test_forest();\n\n    long long a = 0,\
     \ b = 0;\n    std::cin >> a >> b;\n    std::cout << a + b << '\\n';\n}\n"
@@ -1757,6 +1828,7 @@ data:
   - graph/tree/centroid_decomposition.hpp
   - graph/tree/diameter.hpp
   - graph/tree/dsu_on_tree.hpp
+  - graph/tree/euler_tour.hpp
   - graph/tree/heavy_light_decomposition.hpp
   - graph/tree/rerooting_dp.hpp
   - graph/tree/rerooting_static_top_tree.hpp
@@ -1772,7 +1844,7 @@ data:
   isVerificationFile: true
   path: verify/graph/tree/tree_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-09 01:53:44+09:00'
+  timestamp: '2026-07-09 03:02:06+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/tree/tree_algorithms.test.cpp

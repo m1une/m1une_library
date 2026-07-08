@@ -11,6 +11,9 @@ data:
     path: graph/tree/diameter.hpp
     title: Tree Diameter
   - icon: ':heavy_check_mark:'
+    path: graph/tree/euler_tour.hpp
+    title: Euler Tour
+  - icon: ':heavy_check_mark:'
     path: graph/tree/rooted_tree.hpp
     title: Rooted Tree
   - icon: ':heavy_check_mark:'
@@ -135,6 +138,52 @@ data:
     \        }\n        std::reverse(best.vertices.begin(), best.vertices.end());\n\
     \        std::reverse(best.edge_ids.begin(), best.edge_ids.end());\n        best.edge_count\
     \ = int(best.edge_ids.size());\n    }\n\n    return best;\n}\n\n}  // namespace\
+    \ tree\n}  // namespace m1une\n\n\n#line 1 \"graph/tree/euler_tour.hpp\"\n\n\n\
+    \n#line 8 \"graph/tree/euler_tour.hpp\"\n\n#line 10 \"graph/tree/euler_tour.hpp\"\
+    \n\nnamespace m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct EulerTour\
+    \ {\n    using cost_type = T;\n    using edge_type = m1une::graph::Edge<T>;\n\n\
+    \    int root;\n    std::vector<int> parent;\n    std::vector<int> parent_edge;\n\
+    \    std::vector<int> depth;\n    std::vector<T> dist;\n    std::vector<int> subtree_size;\n\
+    \    std::vector<int> tin;\n    std::vector<int> tout;\n    std::vector<int> order;\n\
+    \    std::vector<std::vector<int>> children;\n\n   private:\n    int _n;\n\n \
+    \   void check_vertex(int v) const {\n        assert(0 <= v && v < _n);\n    \
+    \    assert(tin[v] != -1);\n    }\n\n   public:\n    EulerTour() : root(-1), _n(0)\
+    \ {}\n    explicit EulerTour(const m1une::graph::Graph<T>& g, int root_ = 0) {\n\
+    \        build(g, root_);\n    }\n\n    void build(const m1une::graph::Graph<T>&\
+    \ g, int root_ = 0) {\n        _n = g.size();\n        root = _n == 0 ? -1 : root_;\n\
+    \        parent.assign(_n, -2);\n        parent_edge.assign(_n, -1);\n       \
+    \ depth.assign(_n, 0);\n        dist.assign(_n, T(0));\n        subtree_size.assign(_n,\
+    \ 0);\n        tin.assign(_n, -1);\n        tout.assign(_n, -1);\n        order.clear();\n\
+    \        order.reserve(_n);\n        children.assign(_n, {});\n\n        if (_n\
+    \ == 0) return;\n        assert(0 <= root && root < _n);\n\n        struct Frame\
+    \ {\n            int v;\n            int state;\n        };\n\n        std::vector<Frame>\
+    \ stack;\n        stack.push_back({root, 0});\n        parent[root] = -1;\n\n\
+    \        while (!stack.empty()) {\n            Frame frame = stack.back();\n \
+    \           stack.pop_back();\n            int v = frame.v;\n            if (frame.state\
+    \ == 0) {\n                tin[v] = int(order.size());\n                order.push_back(v);\n\
+    \                stack.push_back({v, 1});\n                const auto& adj = g[v];\n\
+    \                for (int i = int(adj.size()) - 1; i >= 0; --i) {\n          \
+    \          const auto& e = adj[i];\n                    if (!e.alive) continue;\n\
+    \                    if (parent[e.to] != -2) continue;\n                    parent[e.to]\
+    \ = v;\n                    parent_edge[e.to] = e.id;\n                    depth[e.to]\
+    \ = depth[v] + 1;\n                    dist[e.to] = dist[v] + e.cost;\n      \
+    \              children[v].push_back(e.to);\n                    stack.push_back({e.to,\
+    \ 0});\n                }\n                std::reverse(children[v].begin(), children[v].end());\n\
+    \            } else {\n                subtree_size[v] = 1;\n                for\
+    \ (int child : children[v]) subtree_size[v] += subtree_size[child];\n        \
+    \        tout[v] = int(order.size());\n            }\n        }\n    }\n\n   \
+    \ int size() const {\n        return _n;\n    }\n\n    int visited_size() const\
+    \ {\n        return int(order.size());\n    }\n\n    bool empty() const {\n  \
+    \      return _n == 0;\n    }\n\n    bool is_ancestor(int u, int v) const {\n\
+    \        check_vertex(u);\n        check_vertex(v);\n        return tin[u] <=\
+    \ tin[v] && tout[v] <= tout[u];\n    }\n\n    bool in_subtree(int v, int u) const\
+    \ {\n        return is_ancestor(u, v);\n    }\n\n    std::pair<int, int> subtree_range(int\
+    \ v, bool edge = false) const {\n        check_vertex(v);\n        return {tin[v]\
+    \ + (edge ? 1 : 0), tout[v]};\n    }\n\n    std::vector<int> subtree_vertices(int\
+    \ v) const {\n        check_vertex(v);\n        return std::vector<int>(order.begin()\
+    \ + tin[v], order.begin() + tout[v]);\n    }\n\n    template <class F>\n    void\
+    \ for_each_subtree(int v, F f) const {\n        auto [l, r] = subtree_range(v);\n\
+    \        for (int i = l; i < r; ++i) f(order[i]);\n    }\n};\n\n}  // namespace\
     \ tree\n}  // namespace m1une\n\n\n#line 1 \"graph/tree/rooted_tree.hpp\"\n\n\n\
     \n#line 7 \"graph/tree/rooted_tree.hpp\"\n\n#line 9 \"graph/tree/rooted_tree.hpp\"\
     \n\nnamespace m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct RootedTree\
@@ -333,13 +382,15 @@ data:
     \ = lca(u, v);\n        return dist[u] + dist[v] - dist[w] - dist[w];\n    }\n\
     \n    std::pair<int, int> subtree_range(int v) const {\n        check_vertex(v);\n\
     \        return {tin[v], tout[v]};\n    }\n};\n\n}  // namespace tree\n}  // namespace\
-    \ m1une\n\n\n#line 7 \"graph/tree/tree.hpp\"\n\n\n"
+    \ m1une\n\n\n#line 8 \"graph/tree/tree.hpp\"\n\n\n"
   code: '#ifndef M1UNE_TREE_TREE_HPP
 
     #define M1UNE_TREE_TREE_HPP 1
 
 
     #include "diameter.hpp"
+
+    #include "euler_tour.hpp"
 
     #include "rooted_tree.hpp"
 
@@ -352,6 +403,7 @@ data:
   dependsOn:
   - graph/tree/diameter.hpp
   - graph/graph.hpp
+  - graph/tree/euler_tour.hpp
   - graph/tree/rooted_tree.hpp
   - graph/tree/sparse_table_lca.hpp
   - ds/range_query/sparse_table.hpp
@@ -361,7 +413,7 @@ data:
   requiredBy:
   - graph/tree/all.hpp
   - graph/all.hpp
-  timestamp: '2026-07-07 14:26:59+09:00'
+  timestamp: '2026-07-09 03:02:06+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
@@ -375,8 +427,8 @@ title: Tree
 
 ## Overview
 
-`graph/tree/tree.hpp` is a small tree bundle containing the core rooted-tree helpers,
-the sparse-table LCA helper, and the diameter routine.
+`graph/tree/tree.hpp` is a small tree bundle containing the core rooted-tree
+helpers, the sparse-table LCA helper, and the diameter routine.
 
 For the full tree toolbox, include `graph/tree/all.hpp`.
 
@@ -384,6 +436,7 @@ For the full tree toolbox, include `graph/tree/all.hpp`.
 
 | Header | Contents |
 | --- | --- |
+| `graph/tree/euler_tour.hpp` | Lightweight rooted-tree preorder, subtree ranges, and parent/depth metadata. |
 | `graph/tree/rooted_tree.hpp` | Rooted metadata, Euler intervals, LCA, jumps, paths, and distances. |
 | `graph/tree/sparse_table_lca.hpp` | Euler-tour sparse-table LCA with $O(1)$ queries. |
 | `graph/tree/diameter.hpp` | Weighted tree/forest diameter path. |

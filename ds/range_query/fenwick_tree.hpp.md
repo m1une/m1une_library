@@ -9,6 +9,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/range_query/fenwick_tree.test.cpp
     title: verify/ds/range_query/fenwick_tree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/vertex_add_subtree_sum.test.cpp
+    title: verify/graph/tree/vertex_add_subtree_sum.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -87,6 +90,7 @@ data:
   verifiedWith:
   - verify/algo/offline/mo.test.cpp
   - verify/ds/range_query/fenwick_tree.test.cpp
+  - verify/graph/tree/vertex_add_subtree_sum.test.cpp
 documentation_of: ds/range_query/fenwick_tree.hpp
 layout: document
 title: Fenwick Tree (Binary Indexed Tree)

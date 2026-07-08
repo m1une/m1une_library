@@ -569,6 +569,9 @@ data:
       path: graph/tree/dsu_on_tree.hpp
       title: DSU on Tree
     - icon: ':heavy_check_mark:'
+      path: graph/tree/euler_tour.hpp
+      title: Euler Tour
+    - icon: ':heavy_check_mark:'
       path: graph/tree/heavy_light_decomposition.hpp
       title: Heavy Light Decomposition
     - icon: ':heavy_check_mark:'
@@ -1332,6 +1335,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/graph/tree/tree_algorithms.test.cpp
       title: verify/graph/tree/tree_algorithms.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/tree/vertex_add_subtree_sum.test.cpp
+      title: verify/graph/tree/vertex_add_subtree_sum.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/graph/tree/zero_one_on_tree.test.cpp
       title: verify/graph/tree/zero_one_on_tree.test.cpp
