@@ -11,6 +11,9 @@ data:
     path: string/levenshtein_distance.hpp
     title: Levenshtein Distance
   - icon: ':heavy_check_mark:'
+    path: string/lyndon_factorization.hpp
+    title: Lyndon Factorization
+  - icon: ':heavy_check_mark:'
     path: string/manacher.hpp
     title: Manacher Algorithm
   - icon: ':heavy_check_mark:'
@@ -278,6 +281,34 @@ data:
     \ {\n    assert(0 <= max_distance);\n    if (first.size() < second.size()) {\n\
     \        return levenshtein_distance_detail::solve_bounded(second, first, max_distance);\n\
     \    }\n    return levenshtein_distance_detail::solve_bounded(first, second, max_distance);\n\
+    }\n\n}  // namespace string\n}  // namespace m1une\n\n\n#line 1 \"string/lyndon_factorization.hpp\"\
+    \n\n\n\n#line 6 \"string/lyndon_factorization.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ string {\n\n// Returns boundaries 0 = a[0] < a[1] < ... < a[k] = sequence.size()\n\
+    // of the Lyndon factorization.\ntemplate <class Sequence>\nstd::vector<int> lyndon_factor_boundaries(const\
+    \ Sequence& sequence) {\n    int n = int(sequence.size());\n    std::vector<int>\
+    \ boundaries;\n    boundaries.push_back(0);\n\n    int i = 0;\n    while (i <\
+    \ n) {\n        int j = i + 1;\n        int k = i;\n        while (j < n && !(sequence[j]\
+    \ < sequence[k])) {\n            if (sequence[k] < sequence[j]) {\n          \
+    \      k = i;\n            } else {\n                k++;\n            }\n   \
+    \         j++;\n        }\n\n        int length = j - k;\n        while (i <=\
+    \ k) {\n            i += length;\n            boundaries.push_back(i);\n     \
+    \   }\n    }\n    return boundaries;\n}\n\n// Returns half-open intervals [left,\
+    \ right) of the Lyndon factorization.\ntemplate <class Sequence>\nstd::vector<std::pair<int,\
+    \ int>> lyndon_factorization(const Sequence& sequence) {\n    std::vector<int>\
+    \ boundaries = lyndon_factor_boundaries(sequence);\n    std::vector<std::pair<int,\
+    \ int>> factors;\n    factors.reserve(boundaries.size() - 1);\n    for (int i\
+    \ = 0; i + 1 < int(boundaries.size()); i++) {\n        factors.emplace_back(boundaries[i],\
+    \ boundaries[i + 1]);\n    }\n    return factors;\n}\n\n// Returns the smallest\
+    \ starting index of a lexicographically minimum cyclic shift.\ntemplate <class\
+    \ Sequence>\nint minimum_cyclic_shift(const Sequence& sequence) {\n    int n =\
+    \ int(sequence.size());\n    if (n == 0) return 0;\n\n    auto less = [&](int\
+    \ left, int right) {\n        return sequence[left < n ? left : left - n] <\n\
+    \               sequence[right < n ? right : right - n];\n    };\n\n    int answer\
+    \ = 0;\n    int i = 0;\n    while (i < n) {\n        answer = i;\n        int\
+    \ j = i + 1;\n        int k = i;\n        while (j < 2 * n && !less(j, k)) {\n\
+    \            if (less(k, j)) {\n                k = i;\n            } else {\n\
+    \                k++;\n            }\n            j++;\n        }\n\n        int\
+    \ length = j - k;\n        while (i <= k) i += length;\n    }\n    return answer;\n\
     }\n\n}  // namespace string\n}  // namespace m1une\n\n\n#line 1 \"string/manacher.hpp\"\
     \n\n\n\n#line 7 \"string/manacher.hpp\"\n\nnamespace m1une {\nnamespace string\
     \ {\n\nstruct ManacherResult {\n    // odd[i] is the radius including center i.\n\
@@ -674,7 +705,7 @@ data:
     \ + z[i] < n && sequence[z[i]] == sequence[i + z[i]]) {\n            z[i]++;\n\
     \        }\n        if (right < i + z[i]) {\n            left = i;\n         \
     \   right = i + z[i];\n        }\n    }\n    return z;\n}\n\n}  // namespace string\n\
-    }  // namespace m1une\n\n\n#line 15 \"string/all.hpp\"\n\n\n"
+    }  // namespace m1une\n\n\n#line 16 \"string/all.hpp\"\n\n\n"
   code: '#ifndef M1UNE_STRING_ALL_HPP
 
     #define M1UNE_STRING_ALL_HPP 1
@@ -685,6 +716,8 @@ data:
     #include "eertree.hpp"
 
     #include "levenshtein_distance.hpp"
+
+    #include "lyndon_factorization.hpp"
 
     #include "manacher.hpp"
 
@@ -710,6 +743,7 @@ data:
   - string/aho_corasick.hpp
   - string/eertree.hpp
   - string/levenshtein_distance.hpp
+  - string/lyndon_factorization.hpp
   - string/manacher.hpp
   - string/prefix_function.hpp
   - string/rolling_hash.hpp
@@ -721,7 +755,7 @@ data:
   isVerificationFile: false
   path: string/all.hpp
   requiredBy: []
-  timestamp: '2026-07-01 21:56:39+09:00'
+  timestamp: '2026-07-09 01:38:54+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/string/string_algorithms.test.cpp
@@ -743,6 +777,7 @@ contest when convenience matters more.
 | `string/aho_corasick.hpp` | Multi-pattern matching with failure links and occurrence counting. |
 | `string/eertree.hpp` | Online palindromic tree with suffix and series links. |
 | `string/levenshtein_distance.hpp` | Unit-cost edit distance in linear auxiliary memory. |
+| `string/lyndon_factorization.hpp` | Duval's linear-time Lyndon factorization. |
 | `string/z_algorithm.hpp` | Linear-time Z array. |
 | `string/prefix_function.hpp` | Prefix function and KMP occurrence search. |
 | `string/manacher.hpp` | Odd/even palindrome radii and substring checks. |

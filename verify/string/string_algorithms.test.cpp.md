@@ -14,6 +14,9 @@ data:
     path: string/levenshtein_distance.hpp
     title: Levenshtein Distance
   - icon: ':heavy_check_mark:'
+    path: string/lyndon_factorization.hpp
+    title: Lyndon Factorization
+  - icon: ':heavy_check_mark:'
     path: string/manacher.hpp
     title: Manacher Algorithm
   - icon: ':heavy_check_mark:'
@@ -282,6 +285,34 @@ data:
     \ {\n    assert(0 <= max_distance);\n    if (first.size() < second.size()) {\n\
     \        return levenshtein_distance_detail::solve_bounded(second, first, max_distance);\n\
     \    }\n    return levenshtein_distance_detail::solve_bounded(first, second, max_distance);\n\
+    }\n\n}  // namespace string\n}  // namespace m1une\n\n\n#line 1 \"string/lyndon_factorization.hpp\"\
+    \n\n\n\n#line 6 \"string/lyndon_factorization.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ string {\n\n// Returns boundaries 0 = a[0] < a[1] < ... < a[k] = sequence.size()\n\
+    // of the Lyndon factorization.\ntemplate <class Sequence>\nstd::vector<int> lyndon_factor_boundaries(const\
+    \ Sequence& sequence) {\n    int n = int(sequence.size());\n    std::vector<int>\
+    \ boundaries;\n    boundaries.push_back(0);\n\n    int i = 0;\n    while (i <\
+    \ n) {\n        int j = i + 1;\n        int k = i;\n        while (j < n && !(sequence[j]\
+    \ < sequence[k])) {\n            if (sequence[k] < sequence[j]) {\n          \
+    \      k = i;\n            } else {\n                k++;\n            }\n   \
+    \         j++;\n        }\n\n        int length = j - k;\n        while (i <=\
+    \ k) {\n            i += length;\n            boundaries.push_back(i);\n     \
+    \   }\n    }\n    return boundaries;\n}\n\n// Returns half-open intervals [left,\
+    \ right) of the Lyndon factorization.\ntemplate <class Sequence>\nstd::vector<std::pair<int,\
+    \ int>> lyndon_factorization(const Sequence& sequence) {\n    std::vector<int>\
+    \ boundaries = lyndon_factor_boundaries(sequence);\n    std::vector<std::pair<int,\
+    \ int>> factors;\n    factors.reserve(boundaries.size() - 1);\n    for (int i\
+    \ = 0; i + 1 < int(boundaries.size()); i++) {\n        factors.emplace_back(boundaries[i],\
+    \ boundaries[i + 1]);\n    }\n    return factors;\n}\n\n// Returns the smallest\
+    \ starting index of a lexicographically minimum cyclic shift.\ntemplate <class\
+    \ Sequence>\nint minimum_cyclic_shift(const Sequence& sequence) {\n    int n =\
+    \ int(sequence.size());\n    if (n == 0) return 0;\n\n    auto less = [&](int\
+    \ left, int right) {\n        return sequence[left < n ? left : left - n] <\n\
+    \               sequence[right < n ? right : right - n];\n    };\n\n    int answer\
+    \ = 0;\n    int i = 0;\n    while (i < n) {\n        answer = i;\n        int\
+    \ j = i + 1;\n        int k = i;\n        while (j < 2 * n && !less(j, k)) {\n\
+    \            if (less(k, j)) {\n                k = i;\n            } else {\n\
+    \                k++;\n            }\n            j++;\n        }\n\n        int\
+    \ length = j - k;\n        while (i <= k) i += length;\n    }\n    return answer;\n\
     }\n\n}  // namespace string\n}  // namespace m1une\n\n\n#line 1 \"string/manacher.hpp\"\
     \n\n\n\n#line 7 \"string/manacher.hpp\"\n\nnamespace m1une {\nnamespace string\
     \ {\n\nstruct ManacherResult {\n    // odd[i] is the radius including center i.\n\
@@ -678,30 +709,34 @@ data:
     \ + z[i] < n && sequence[z[i]] == sequence[i + z[i]]) {\n            z[i]++;\n\
     \        }\n        if (right < i + z[i]) {\n            left = i;\n         \
     \   right = i + z[i];\n        }\n    }\n    return z;\n}\n\n}  // namespace string\n\
-    }  // namespace m1une\n\n\n#line 15 \"string/all.hpp\"\n\n\n#line 4 \"verify/string/string_algorithms.test.cpp\"\
+    }  // namespace m1une\n\n\n#line 16 \"string/all.hpp\"\n\n\n#line 4 \"verify/string/string_algorithms.test.cpp\"\
     \n\n#line 8 \"verify/string/string_algorithms.test.cpp\"\n#include <iostream>\n\
     #line 12 \"verify/string/string_algorithms.test.cpp\"\n\nnamespace {\n\nvoid test_edge_cases()\
     \ {\n    std::string empty;\n    assert(m1une::string::z_algorithm(empty).empty());\n\
     \    assert(m1une::string::prefix_function(empty).empty());\n    assert(m1une::string::suffix_array(empty).empty());\n\
-    \    assert(m1une::string::lcp_array(empty, std::vector<int>()).empty());\n\n\
-    \    auto empty_palindromes = m1une::string::manacher(empty);\n    assert(empty_palindromes.empty());\n\
-    \    assert(empty_palindromes.longest_length() == 0);\n    assert(empty_palindromes.is_palindrome(0,\
-    \ 0));\n\n    std::string text = \"aaaa\";\n    assert(\n        m1une::string::kmp_search(text,\
-    \ std::string(\"aa\")) ==\n        std::vector<int>({0, 1, 2})\n    );\n    assert(\n\
-    \        m1une::string::kmp_search(text, empty) ==\n        std::vector<int>({0,\
-    \ 1, 2, 3, 4})\n    );\n\n    std::vector<int> values;\n    values.push_back(2);\n\
-    \    values.push_back(-1);\n    values.push_back(2);\n    assert(\n        m1une::string::suffix_array(values)\
-    \ ==\n        std::vector<int>({1, 2, 0})\n    );\n    assert(\n        m1une::string::z_algorithm(values)\
-    \ ==\n        std::vector<int>({3, 0, 1})\n    );\n\n    std::string bytes;\n\
-    \    bytes.push_back(char(255));\n    bytes.push_back(char(0));\n    bytes.push_back(char(128));\n\
-    \    assert(\n        m1une::string::suffix_array(bytes) ==\n        std::vector<int>({1,\
-    \ 2, 0})\n    );\n}\n\nvoid test_randomized() {\n    std::uint64_t state = 31;\n\
-    \    auto random = [&state]() {\n        state ^= state << 7;\n        state ^=\
-    \ state >> 9;\n        return state;\n    };\n\n    for (int trial = 0; trial\
-    \ < 1500; trial++) {\n        int n = int(random() % 45);\n        std::string\
-    \ text(n, 'a');\n        for (char& character : text) character = char('a' + random()\
-    \ % 4);\n\n        std::vector<int> z = m1une::string::z_algorithm(text);\n  \
-    \      for (int i = 0; i < n; i++) {\n            [[maybe_unused]] int expected\
+    \    assert(m1une::string::lcp_array(empty, std::vector<int>()).empty());\n  \
+    \  assert(m1une::string::lyndon_factor_boundaries(empty) == std::vector<int>(1,\
+    \ 0));\n    assert(m1une::string::lyndon_factorization(empty).empty());\n    assert(m1une::string::minimum_cyclic_shift(empty)\
+    \ == 0);\n\n    auto empty_palindromes = m1une::string::manacher(empty);\n   \
+    \ assert(empty_palindromes.empty());\n    assert(empty_palindromes.longest_length()\
+    \ == 0);\n    assert(empty_palindromes.is_palindrome(0, 0));\n\n    std::string\
+    \ text = \"aaaa\";\n    assert(\n        m1une::string::kmp_search(text, std::string(\"\
+    aa\")) ==\n        std::vector<int>({0, 1, 2})\n    );\n    assert(\n        m1une::string::kmp_search(text,\
+    \ empty) ==\n        std::vector<int>({0, 1, 2, 3, 4})\n    );\n\n    std::vector<int>\
+    \ values;\n    values.push_back(2);\n    values.push_back(-1);\n    values.push_back(2);\n\
+    \    assert(\n        m1une::string::suffix_array(values) ==\n        std::vector<int>({1,\
+    \ 2, 0})\n    );\n    assert(\n        m1une::string::z_algorithm(values) ==\n\
+    \        std::vector<int>({3, 0, 1})\n    );\n    assert(\n        m1une::string::lyndon_factor_boundaries(values)\
+    \ ==\n        std::vector<int>({0, 1, 3})\n    );\n    assert(m1une::string::minimum_cyclic_shift(values)\
+    \ == 1);\n\n    std::string bytes;\n    bytes.push_back(char(255));\n    bytes.push_back(char(0));\n\
+    \    bytes.push_back(char(128));\n    assert(\n        m1une::string::suffix_array(bytes)\
+    \ ==\n        std::vector<int>({1, 2, 0})\n    );\n}\n\nvoid test_randomized()\
+    \ {\n    std::uint64_t state = 31;\n    auto random = [&state]() {\n        state\
+    \ ^= state << 7;\n        state ^= state >> 9;\n        return state;\n    };\n\
+    \n    for (int trial = 0; trial < 1500; trial++) {\n        int n = int(random()\
+    \ % 45);\n        std::string text(n, 'a');\n        for (char& character : text)\
+    \ character = char('a' + random() % 4);\n\n        std::vector<int> z = m1une::string::z_algorithm(text);\n\
+    \        for (int i = 0; i < n; i++) {\n            [[maybe_unused]] int expected\
     \ = 0;\n            while (\n                i + expected < n &&\n           \
     \     text[expected] == text[i + expected]\n            ) {\n                expected++;\n\
     \            }\n            assert(z[i] == expected);\n        }\n\n        std::vector<int>\
@@ -738,34 +773,48 @@ data:
     \        suffixes[i] + expected < n &&\n                suffixes[i + 1] + expected\
     \ < n &&\n                text[suffixes[i] + expected] ==\n                  \
     \  text[suffixes[i + 1] + expected]\n            ) {\n                expected++;\n\
-    \            }\n            assert(lcp[i] == expected);\n        }\n    }\n}\n\
-    \n}  // namespace\n\nint main() {\n    test_edge_cases();\n    test_randomized();\n\
-    \n    long long a, b;\n    std::cin >> a >> b;\n    std::cout << a + b << '\\\
-    n';\n}\n"
+    \            }\n            assert(lcp[i] == expected);\n        }\n\n       \
+    \ std::vector<std::pair<int, int>> lyndon_factors =\n            m1une::string::lyndon_factorization(text);\n\
+    \        int minimum_shift = m1une::string::minimum_cyclic_shift(text);\n    \
+    \    assert(\n            (n == 0 && minimum_shift == 0) ||\n            (0 <=\
+    \ minimum_shift && minimum_shift < n)\n        );\n        std::string restored;\n\
+    \        std::vector<std::string> factor_words;\n        for (auto [left, right]\
+    \ : lyndon_factors) {\n            assert(0 <= left && left < right && right <=\
+    \ n);\n            std::string word = text.substr(left, right - left);\n     \
+    \       restored += word;\n            factor_words.push_back(word);\n       \
+    \ }\n        assert(restored == text);\n        for (int i = 0; i + 1 < int(factor_words.size());\
+    \ i++) {\n            assert(!(factor_words[i] < factor_words[i + 1]));\n    \
+    \    }\n    }\n}\n\n}  // namespace\n\nint main() {\n    test_edge_cases();\n\
+    \    test_randomized();\n\n    long long a, b;\n    std::cin >> a >> b;\n    std::cout\
+    \ << a + b << '\\n';\n}\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
     ../../string/all.hpp\"\n\n#include <algorithm>\n#include <cassert>\n#include <cstdint>\n\
     #include <iostream>\n#include <numeric>\n#include <string>\n#include <vector>\n\
     \nnamespace {\n\nvoid test_edge_cases() {\n    std::string empty;\n    assert(m1une::string::z_algorithm(empty).empty());\n\
     \    assert(m1une::string::prefix_function(empty).empty());\n    assert(m1une::string::suffix_array(empty).empty());\n\
-    \    assert(m1une::string::lcp_array(empty, std::vector<int>()).empty());\n\n\
-    \    auto empty_palindromes = m1une::string::manacher(empty);\n    assert(empty_palindromes.empty());\n\
-    \    assert(empty_palindromes.longest_length() == 0);\n    assert(empty_palindromes.is_palindrome(0,\
-    \ 0));\n\n    std::string text = \"aaaa\";\n    assert(\n        m1une::string::kmp_search(text,\
-    \ std::string(\"aa\")) ==\n        std::vector<int>({0, 1, 2})\n    );\n    assert(\n\
-    \        m1une::string::kmp_search(text, empty) ==\n        std::vector<int>({0,\
-    \ 1, 2, 3, 4})\n    );\n\n    std::vector<int> values;\n    values.push_back(2);\n\
-    \    values.push_back(-1);\n    values.push_back(2);\n    assert(\n        m1une::string::suffix_array(values)\
-    \ ==\n        std::vector<int>({1, 2, 0})\n    );\n    assert(\n        m1une::string::z_algorithm(values)\
-    \ ==\n        std::vector<int>({3, 0, 1})\n    );\n\n    std::string bytes;\n\
-    \    bytes.push_back(char(255));\n    bytes.push_back(char(0));\n    bytes.push_back(char(128));\n\
-    \    assert(\n        m1une::string::suffix_array(bytes) ==\n        std::vector<int>({1,\
-    \ 2, 0})\n    );\n}\n\nvoid test_randomized() {\n    std::uint64_t state = 31;\n\
-    \    auto random = [&state]() {\n        state ^= state << 7;\n        state ^=\
-    \ state >> 9;\n        return state;\n    };\n\n    for (int trial = 0; trial\
-    \ < 1500; trial++) {\n        int n = int(random() % 45);\n        std::string\
-    \ text(n, 'a');\n        for (char& character : text) character = char('a' + random()\
-    \ % 4);\n\n        std::vector<int> z = m1une::string::z_algorithm(text);\n  \
-    \      for (int i = 0; i < n; i++) {\n            [[maybe_unused]] int expected\
+    \    assert(m1une::string::lcp_array(empty, std::vector<int>()).empty());\n  \
+    \  assert(m1une::string::lyndon_factor_boundaries(empty) == std::vector<int>(1,\
+    \ 0));\n    assert(m1une::string::lyndon_factorization(empty).empty());\n    assert(m1une::string::minimum_cyclic_shift(empty)\
+    \ == 0);\n\n    auto empty_palindromes = m1une::string::manacher(empty);\n   \
+    \ assert(empty_palindromes.empty());\n    assert(empty_palindromes.longest_length()\
+    \ == 0);\n    assert(empty_palindromes.is_palindrome(0, 0));\n\n    std::string\
+    \ text = \"aaaa\";\n    assert(\n        m1une::string::kmp_search(text, std::string(\"\
+    aa\")) ==\n        std::vector<int>({0, 1, 2})\n    );\n    assert(\n        m1une::string::kmp_search(text,\
+    \ empty) ==\n        std::vector<int>({0, 1, 2, 3, 4})\n    );\n\n    std::vector<int>\
+    \ values;\n    values.push_back(2);\n    values.push_back(-1);\n    values.push_back(2);\n\
+    \    assert(\n        m1une::string::suffix_array(values) ==\n        std::vector<int>({1,\
+    \ 2, 0})\n    );\n    assert(\n        m1une::string::z_algorithm(values) ==\n\
+    \        std::vector<int>({3, 0, 1})\n    );\n    assert(\n        m1une::string::lyndon_factor_boundaries(values)\
+    \ ==\n        std::vector<int>({0, 1, 3})\n    );\n    assert(m1une::string::minimum_cyclic_shift(values)\
+    \ == 1);\n\n    std::string bytes;\n    bytes.push_back(char(255));\n    bytes.push_back(char(0));\n\
+    \    bytes.push_back(char(128));\n    assert(\n        m1une::string::suffix_array(bytes)\
+    \ ==\n        std::vector<int>({1, 2, 0})\n    );\n}\n\nvoid test_randomized()\
+    \ {\n    std::uint64_t state = 31;\n    auto random = [&state]() {\n        state\
+    \ ^= state << 7;\n        state ^= state >> 9;\n        return state;\n    };\n\
+    \n    for (int trial = 0; trial < 1500; trial++) {\n        int n = int(random()\
+    \ % 45);\n        std::string text(n, 'a');\n        for (char& character : text)\
+    \ character = char('a' + random() % 4);\n\n        std::vector<int> z = m1une::string::z_algorithm(text);\n\
+    \        for (int i = 0; i < n; i++) {\n            [[maybe_unused]] int expected\
     \ = 0;\n            while (\n                i + expected < n &&\n           \
     \     text[expected] == text[i + expected]\n            ) {\n                expected++;\n\
     \            }\n            assert(z[i] == expected);\n        }\n\n        std::vector<int>\
@@ -802,15 +851,26 @@ data:
     \        suffixes[i] + expected < n &&\n                suffixes[i + 1] + expected\
     \ < n &&\n                text[suffixes[i] + expected] ==\n                  \
     \  text[suffixes[i + 1] + expected]\n            ) {\n                expected++;\n\
-    \            }\n            assert(lcp[i] == expected);\n        }\n    }\n}\n\
-    \n}  // namespace\n\nint main() {\n    test_edge_cases();\n    test_randomized();\n\
-    \n    long long a, b;\n    std::cin >> a >> b;\n    std::cout << a + b << '\\\
-    n';\n}\n"
+    \            }\n            assert(lcp[i] == expected);\n        }\n\n       \
+    \ std::vector<std::pair<int, int>> lyndon_factors =\n            m1une::string::lyndon_factorization(text);\n\
+    \        int minimum_shift = m1une::string::minimum_cyclic_shift(text);\n    \
+    \    assert(\n            (n == 0 && minimum_shift == 0) ||\n            (0 <=\
+    \ minimum_shift && minimum_shift < n)\n        );\n        std::string restored;\n\
+    \        std::vector<std::string> factor_words;\n        for (auto [left, right]\
+    \ : lyndon_factors) {\n            assert(0 <= left && left < right && right <=\
+    \ n);\n            std::string word = text.substr(left, right - left);\n     \
+    \       restored += word;\n            factor_words.push_back(word);\n       \
+    \ }\n        assert(restored == text);\n        for (int i = 0; i + 1 < int(factor_words.size());\
+    \ i++) {\n            assert(!(factor_words[i] < factor_words[i + 1]));\n    \
+    \    }\n    }\n}\n\n}  // namespace\n\nint main() {\n    test_edge_cases();\n\
+    \    test_randomized();\n\n    long long a, b;\n    std::cin >> a >> b;\n    std::cout\
+    \ << a + b << '\\n';\n}\n"
   dependsOn:
   - string/all.hpp
   - string/aho_corasick.hpp
   - string/eertree.hpp
   - string/levenshtein_distance.hpp
+  - string/lyndon_factorization.hpp
   - string/manacher.hpp
   - string/prefix_function.hpp
   - string/rolling_hash.hpp
@@ -822,7 +882,7 @@ data:
   isVerificationFile: true
   path: verify/string/string_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-01 21:56:39+09:00'
+  timestamp: '2026-07-09 01:38:54+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/string/string_algorithms.test.cpp
