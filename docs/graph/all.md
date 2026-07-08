@@ -18,7 +18,7 @@ Public namespaces stay flat and short: general graph helpers use
 | Header | Graph orientation | Contents |
 | --- | --- | --- |
 | `graph/graph.hpp` | Container | `Graph<T>` and `Edge<T>` adjacency-list container. |
-| `graph/tree/all.hpp` | Tree algorithms | Rooted-tree metadata, LCA, HLD, Cartesian tree construction, virtual trees, tree hashing, rerooting DP, static top trees, and centroid decomposition. |
+| `graph/tree/all.hpp` | Tree algorithms | Euler tours, rooted-tree metadata, LCA, HLD, Cartesian tree construction, virtual trees, tree hashing, rerooting DP, static top trees, and centroid decomposition. |
 | `graph/flow/flow.hpp` | Flow networks | Max flow, min-cost flow, bounded flow, bounded min-cost flow, and Gomory-Hu trees. |
 | `graph/counting.hpp` | Counting formulas | Counts common labeled graph classes, tournaments, DAGs, and unlabeled trees by vertex number. |
 | `graph/range_edge_graph.hpp` | Directed graph builder | Compact point-to-range, range-to-point, and range-to-range edges using segment trees. |

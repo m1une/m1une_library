@@ -16,6 +16,7 @@ same graph container.
 | --- | --- |
 | `graph/tree/cartesian_tree.hpp` | Cartesian tree construction from an array. |
 | `graph/tree/tree.hpp` | Core rooted tree and diameter bundle. |
+| `graph/tree/euler_tour.hpp` | Lightweight rooted-tree preorder, subtree ranges, and parent/depth metadata. |
 | `graph/tree/rooted_tree.hpp` | Rooted metadata, Euler intervals, LCA, jumps, paths, and distances. |
 | `graph/tree/sparse_table_lca.hpp` | Euler-tour sparse-table LCA with $O(1)$ queries. |
 | `graph/tree/heavy_light_decomposition.hpp` | HLD order, path segments, subtree ranges, LCA, and jumps. |

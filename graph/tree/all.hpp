@@ -5,6 +5,7 @@
 #include "centroid_decomposition.hpp"
 #include "diameter.hpp"
 #include "dsu_on_tree.hpp"
+#include "euler_tour.hpp"
 #include "heavy_light_decomposition.hpp"
 #include "rerooting_dp.hpp"
 #include "rerooting_static_top_tree.hpp"

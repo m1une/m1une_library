@@ -82,6 +82,36 @@ void test_rooted_tree() {
     assert((sub == std::vector<int>{1, 3, 4}));
 }
 
+void test_euler_tour() {
+    auto g = sample_tree();
+    m1une::tree::EulerTour<long long> tour(g, 0);
+
+    std::vector<int> expected_order = {0, 1, 3, 4, 2, 5, 6};
+    assert(tour.size() == 7);
+    assert(tour.visited_size() == 7);
+    assert(tour.root == 0);
+    assert(tour.order == expected_order);
+    assert(tour.parent[6] == 5);
+    assert(tour.parent_edge[6] == 5);
+    assert(tour.depth[6] == 3);
+    assert(tour.dist[6] == 10);
+    assert(tour.subtree_size[1] == 3);
+    assert(tour.is_ancestor(1, 4));
+    assert(!tour.is_ancestor(2, 4));
+
+    auto [l, r] = tour.subtree_range(1);
+    assert(l == 1);
+    assert(r == 4);
+    auto [el, er] = tour.subtree_range(1, true);
+    assert(el == 2);
+    assert(er == 4);
+
+    std::vector<int> subtree = tour.subtree_vertices(1);
+    std::sort(subtree.begin(), subtree.end());
+    std::vector<int> expected_subtree = {1, 3, 4};
+    assert(subtree == expected_subtree);
+}
+
 void test_sparse_table_lca() {
     auto g = sample_tree();
     m1une::tree::RootedTree<long long> tree(g, 0);
@@ -700,6 +730,7 @@ void test_forest() {
 
 int main() {
     test_rooted_tree();
+    test_euler_tour();
     test_sparse_table_lca();
     test_virtual_tree();
     test_hld();
