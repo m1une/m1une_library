@@ -5,14 +5,16 @@ documentation_of: ../../../graph/tree/all.hpp
 
 ## Overview
 
-`graph/tree/all.hpp` includes every tree header in this directory. The algorithms use
-`m1une::graph::Graph<T>` as their input container, so they compose with the
-existing graph library.
+`graph/tree/all.hpp` includes every tree header in this directory. Most
+algorithms use `m1une::graph::Graph<T>` as their input container, and
+sequence-derived helpers such as Cartesian tree can convert their result to the
+same graph container.
 
 ## Included Headers
 
 | Header | Contents |
 | --- | --- |
+| `graph/tree/cartesian_tree.hpp` | Cartesian tree construction from an array. |
 | `graph/tree/tree.hpp` | Core rooted tree and diameter bundle. |
 | `graph/tree/rooted_tree.hpp` | Rooted metadata, Euler intervals, LCA, jumps, paths, and distances. |
 | `graph/tree/sparse_table_lca.hpp` | Euler-tour sparse-table LCA with $O(1)$ queries. |

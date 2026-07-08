@@ -1,6 +1,7 @@
 #ifndef M1UNE_TREE_ALL_HPP
 #define M1UNE_TREE_ALL_HPP 1
 
+#include "cartesian_tree.hpp"
 #include "centroid_decomposition.hpp"
 #include "diameter.hpp"
 #include "dsu_on_tree.hpp"
