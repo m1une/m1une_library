@@ -3,6 +3,7 @@
 
 #include "aho_corasick.hpp"
 #include "eertree.hpp"
+#include "lce.hpp"
 #include "levenshtein_distance.hpp"
 #include "lyndon_factorization.hpp"
 #include "manacher.hpp"
