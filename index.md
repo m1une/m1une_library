@@ -865,11 +865,14 @@ data:
       path: string/eertree.hpp
       title: Eertree
     - icon: ':heavy_check_mark:'
-      path: string/lce.hpp
-      title: Longest Common Extension
-    - icon: ':heavy_check_mark:'
       path: string/levenshtein_distance.hpp
       title: Levenshtein Distance
+    - icon: ':heavy_check_mark:'
+      path: string/longest_common_extension.hpp
+      title: Longest Common Extension
+    - icon: ':heavy_check_mark:'
+      path: string/longest_common_substring.hpp
+      title: Longest Common Substring
     - icon: ':heavy_check_mark:'
       path: string/lyndon_factorization.hpp
       title: Lyndon Factorization
@@ -1501,11 +1504,14 @@ data:
       path: verify/string/eertree.test.cpp
       title: verify/string/eertree.test.cpp
     - icon: ':heavy_check_mark:'
-      path: verify/string/lce.test.cpp
-      title: verify/string/lce.test.cpp
-    - icon: ':heavy_check_mark:'
       path: verify/string/levenshtein_distance.test.cpp
       title: verify/string/levenshtein_distance.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/string/longest_common_extension.test.cpp
+      title: verify/string/longest_common_extension.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/string/longest_common_substring.test.cpp
+      title: verify/string/longest_common_substring.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/string/lyndon_factorization.test.cpp
       title: verify/string/lyndon_factorization.test.cpp

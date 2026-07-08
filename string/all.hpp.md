@@ -8,11 +8,14 @@ data:
     path: string/eertree.hpp
     title: Eertree
   - icon: ':heavy_check_mark:'
-    path: string/lce.hpp
-    title: Longest Common Extension
-  - icon: ':heavy_check_mark:'
     path: string/levenshtein_distance.hpp
     title: Levenshtein Distance
+  - icon: ':heavy_check_mark:'
+    path: string/longest_common_extension.hpp
+    title: Longest Common Extension
+  - icon: ':heavy_check_mark:'
+    path: string/longest_common_substring.hpp
+    title: Longest Common Substring
   - icon: ':heavy_check_mark:'
     path: string/lyndon_factorization.hpp
     title: Lyndon Factorization
@@ -233,14 +236,65 @@ data:
     \ = _nodes[id].first_end;\n        return {end - _nodes[id].length, end};\n  \
     \  }\n};\n\ntemplate <int AlphabetSize = 26, int FirstCharacter = 'a'>\nusing\
     \ PalindromicTree = Eertree<AlphabetSize, FirstCharacter>;\n\n}  // namespace\
-    \ string\n}  // namespace m1une\n\n\n#line 1 \"string/lce.hpp\"\n\n\n\n#include\
-    \ <algorithm>\n#line 6 \"string/lce.hpp\"\n#include <string>\n#line 9 \"string/lce.hpp\"\
-    \n\n#line 1 \"string/suffix_array.hpp\"\n\n\n\n#line 6 \"string/suffix_array.hpp\"\
-    \n#include <numeric>\n#line 8 \"string/suffix_array.hpp\"\n#include <type_traits>\n\
-    #line 10 \"string/suffix_array.hpp\"\n\nnamespace m1une {\nnamespace string {\n\
-    namespace detail {\n\ntemplate <class Sequence>\nstd::vector<int> suffix_array_impl(const\
-    \ Sequence& sequence) {\n    int n = int(sequence.size());\n    if (n == 0) return\
-    \ {};\n\n    using Value = std::remove_cv_t<std::remove_reference_t<decltype(sequence[0])>>;\n\
+    \ string\n}  // namespace m1une\n\n\n#line 1 \"string/levenshtein_distance.hpp\"\
+    \n\n\n\n#include <algorithm>\n#line 7 \"string/levenshtein_distance.hpp\"\n\n\
+    namespace m1une {\nnamespace string {\n\nnamespace levenshtein_distance_detail\
+    \ {\n\ntemplate <class RowSequence, class ColumnSequence>\nint solve(const RowSequence&\
+    \ rows, const ColumnSequence& columns) {\n    int row_count = int(rows.size());\n\
+    \    int column_count = int(columns.size());\n    std::vector<int> distance(column_count\
+    \ + 1);\n    for (int column = 0; column <= column_count; column++) distance[column]\
+    \ = column;\n\n    for (int row = 1; row <= row_count; row++) {\n        int diagonal\
+    \ = distance[0];\n        distance[0] = row;\n        for (int column = 1; column\
+    \ <= column_count; column++) {\n            int above = distance[column];\n  \
+    \          int substitution = diagonal + (rows[row - 1] == columns[column - 1]\
+    \ ? 0 : 1);\n            distance[column] =\n                std::min({above +\
+    \ 1, distance[column - 1] + 1, substitution});\n            diagonal = above;\n\
+    \        }\n    }\n    return distance[column_count];\n}\n\ntemplate <class RowSequence,\
+    \ class ColumnSequence>\nint solve_bounded(const RowSequence& rows, const ColumnSequence&\
+    \ columns,\n                  int max_distance) {\n    int row_count = int(rows.size());\n\
+    \    int column_count = int(columns.size());\n    assert(column_count <= row_count);\n\
+    \    if (row_count - column_count > max_distance) return max_distance + 1;\n \
+    \   if (max_distance >= row_count) return solve(rows, columns);\n\n    int infinity\
+    \ = max_distance + 1;\n    int previous_left = 0;\n    int previous_right = std::min(column_count,\
+    \ max_distance);\n    std::vector<int> previous(previous_right + 1);\n    for\
+    \ (int column = 0; column <= previous_right; column++) previous[column] = column;\n\
+    \    std::vector<int> current;\n\n    for (int row = 1; row <= row_count; row++)\
+    \ {\n        int current_left = std::max(0, row - max_distance);\n        int\
+    \ current_right = int(std::min<long long>(column_count,\n                    \
+    \                                static_cast<long long>(row) + max_distance));\n\
+    \        current.assign(current_right - current_left + 1, infinity);\n\n     \
+    \   for (int column = current_left; column <= current_right; column++) {\n   \
+    \         int best = infinity;\n            if (previous_left <= column && column\
+    \ <= previous_right) {\n                best = std::min(best, previous[column\
+    \ - previous_left] + 1);\n            }\n            if (current_left < column)\
+    \ {\n                best = std::min(best, current[column - current_left - 1]\
+    \ + 1);\n            }\n            if (0 < column && previous_left <= column\
+    \ - 1 && column - 1 <= previous_right) {\n                int substitution = previous[column\
+    \ - 1 - previous_left] +\n                                   (rows[row - 1] ==\
+    \ columns[column - 1] ? 0 : 1);\n                best = std::min(best, substitution);\n\
+    \            }\n            current[column - current_left] = std::min(best, infinity);\n\
+    \        }\n\n        previous.swap(current);\n        previous_left = current_left;\n\
+    \        previous_right = current_right;\n    }\n    return previous[column_count\
+    \ - previous_left];\n}\n\n}  // namespace levenshtein_distance_detail\n\n// Returns\
+    \ the minimum number of insertions, deletions, and substitutions\n// needed to\
+    \ transform first into second.\ntemplate <class Sequence1, class Sequence2>\n\
+    int levenshtein_distance(const Sequence1& first, const Sequence2& second) {\n\
+    \    if (first.size() < second.size()) {\n        return levenshtein_distance_detail::solve(second,\
+    \ first);\n    }\n    return levenshtein_distance_detail::solve(first, second);\n\
+    }\n\n// Returns the exact distance when it is at most max_distance, and\n// max_distance\
+    \ + 1 otherwise.\ntemplate <class Sequence1, class Sequence2>\nint levenshtein_distance(const\
+    \ Sequence1& first, const Sequence2& second,\n                         int max_distance)\
+    \ {\n    assert(0 <= max_distance);\n    if (first.size() < second.size()) {\n\
+    \        return levenshtein_distance_detail::solve_bounded(second, first, max_distance);\n\
+    \    }\n    return levenshtein_distance_detail::solve_bounded(first, second, max_distance);\n\
+    }\n\n}  // namespace string\n}  // namespace m1une\n\n\n#line 1 \"string/longest_common_extension.hpp\"\
+    \n\n\n\n#line 6 \"string/longest_common_extension.hpp\"\n#include <string>\n#line\
+    \ 9 \"string/longest_common_extension.hpp\"\n\n#line 1 \"string/suffix_array.hpp\"\
+    \n\n\n\n#line 6 \"string/suffix_array.hpp\"\n#include <numeric>\n#line 8 \"string/suffix_array.hpp\"\
+    \n#include <type_traits>\n#line 10 \"string/suffix_array.hpp\"\n\nnamespace m1une\
+    \ {\nnamespace string {\nnamespace detail {\n\ntemplate <class Sequence>\nstd::vector<int>\
+    \ suffix_array_impl(const Sequence& sequence) {\n    int n = int(sequence.size());\n\
+    \    if (n == 0) return {};\n\n    using Value = std::remove_cv_t<std::remove_reference_t<decltype(sequence[0])>>;\n\
     \    std::vector<Value> sorted(sequence.begin(), sequence.end());\n    std::sort(sorted.begin(),\
     \ sorted.end());\n    sorted.erase(std::unique(sorted.begin(), sorted.end()),\
     \ sorted.end());\n\n    int length = n + 1;\n    std::vector<int> order(length);\n\
@@ -288,117 +342,107 @@ data:
     \ < n &&\n            sequence[i + common] == sequence[j + common]\n        )\
     \ {\n            common++;\n        }\n        lcp[position] = common;\n     \
     \   if (common > 0) common--;\n    }\n    return lcp;\n}\n\n}  // namespace string\n\
-    }  // namespace m1une\n\n\n#line 11 \"string/lce.hpp\"\n\nnamespace m1une {\n\
-    namespace string {\n\ntemplate <class Sequence = std::string>\nstruct LCE {\n\
-    \   private:\n    Sequence _sequence;\n    std::vector<int> _suffix_array;\n \
-    \   std::vector<int> _rank;\n    std::vector<int> _lcp;\n    std::vector<int>\
-    \ _log;\n    std::vector<std::vector<int>> _table;\n\n    int range_min(int left,\
-    \ int right) const {\n        assert(0 <= left && left < right && right <= int(_lcp.size()));\n\
-    \        int k = _log[right - left];\n        return std::min(_table[k][left],\
-    \ _table[k][right - (1 << k)]);\n    }\n\n    void build() {\n        int n =\
-    \ int(_sequence.size());\n        _suffix_array = m1une::string::suffix_array(_sequence);\n\
-    \        _rank.assign(n, 0);\n        for (int i = 0; i < n; i++) {\n        \
-    \    _rank[_suffix_array[i]] = i;\n        }\n\n        _lcp = m1une::string::lcp_array(_sequence,\
-    \ _suffix_array);\n        int m = int(_lcp.size());\n        _log.assign(m +\
-    \ 1, 0);\n        for (int i = 2; i <= m; i++) {\n            _log[i] = _log[i\
-    \ >> 1] + 1;\n        }\n\n        _table.clear();\n        if (m == 0) return;\n\
-    \        _table.assign(_log[m] + 1, std::vector<int>());\n        _table[0] =\
-    \ _lcp;\n        for (int k = 1; k < int(_table.size()); k++) {\n            int\
-    \ width = 1 << k;\n            int half = width >> 1;\n            _table[k].resize(m\
-    \ - width + 1);\n            for (int i = 0; i + width <= m; i++) {\n        \
-    \        _table[k][i] = std::min(_table[k - 1][i], _table[k - 1][i + half]);\n\
-    \            }\n        }\n    }\n\n   public:\n    LCE() = default;\n\n    explicit\
-    \ LCE(const Sequence& sequence) : _sequence(sequence) {\n        build();\n  \
-    \  }\n\n    explicit LCE(Sequence&& sequence) : _sequence(std::move(sequence))\
-    \ {\n        build();\n    }\n\n    int size() const {\n        return int(_sequence.size());\n\
-    \    }\n\n    bool empty() const {\n        return _sequence.empty();\n    }\n\
-    \n    const Sequence& sequence() const {\n        return _sequence;\n    }\n\n\
-    \    const std::vector<int>& suffix_array() const {\n        return _suffix_array;\n\
-    \    }\n\n    const std::vector<int>& rank() const {\n        return _rank;\n\
-    \    }\n\n    const std::vector<int>& lcp_array() const {\n        return _lcp;\n\
-    \    }\n\n    int lce(int i, int j) const {\n        int n = size();\n       \
-    \ assert(0 <= i && i <= n);\n        assert(0 <= j && j <= n);\n        if (i\
-    \ == j) return n - i;\n        if (i == n || j == n) return 0;\n\n        int\
-    \ left = _rank[i];\n        int right = _rank[j];\n        if (left > right) std::swap(left,\
-    \ right);\n        return range_min(left, right);\n    }\n\n    int lce(int i,\
-    \ int j, int limit) const {\n        assert(0 <= limit);\n        return std::min(lce(i,\
-    \ j), limit);\n    }\n\n    int lcp(int i, int j) const {\n        return lce(i,\
-    \ j);\n    }\n\n    int operator()(int i, int j) const {\n        return lce(i,\
+    }  // namespace m1une\n\n\n#line 11 \"string/longest_common_extension.hpp\"\n\n\
+    namespace m1une {\nnamespace string {\n\ntemplate <class Sequence = std::string>\n\
+    struct LongestCommonExtension {\n   private:\n    Sequence _sequence;\n    std::vector<int>\
+    \ _suffix_array;\n    std::vector<int> _rank;\n    std::vector<int> _lcp;\n  \
+    \  std::vector<int> _log;\n    std::vector<std::vector<int>> _table;\n\n    int\
+    \ range_min(int left, int right) const {\n        assert(0 <= left && left < right\
+    \ && right <= int(_lcp.size()));\n        int k = _log[right - left];\n      \
+    \  return std::min(_table[k][left], _table[k][right - (1 << k)]);\n    }\n\n \
+    \   void build() {\n        int n = int(_sequence.size());\n        _suffix_array\
+    \ = m1une::string::suffix_array(_sequence);\n        _rank.assign(n, 0);\n   \
+    \     for (int i = 0; i < n; i++) {\n            _rank[_suffix_array[i]] = i;\n\
+    \        }\n\n        _lcp = m1une::string::lcp_array(_sequence, _suffix_array);\n\
+    \        int m = int(_lcp.size());\n        _log.assign(m + 1, 0);\n        for\
+    \ (int i = 2; i <= m; i++) {\n            _log[i] = _log[i >> 1] + 1;\n      \
+    \  }\n\n        _table.clear();\n        if (m == 0) return;\n        _table.assign(_log[m]\
+    \ + 1, std::vector<int>());\n        _table[0] = _lcp;\n        for (int k = 1;\
+    \ k < int(_table.size()); k++) {\n            int width = 1 << k;\n          \
+    \  int half = width >> 1;\n            _table[k].resize(m - width + 1);\n    \
+    \        for (int i = 0; i + width <= m; i++) {\n                _table[k][i]\
+    \ = std::min(_table[k - 1][i], _table[k - 1][i + half]);\n            }\n    \
+    \    }\n    }\n\n   public:\n    LongestCommonExtension() = default;\n\n    explicit\
+    \ LongestCommonExtension(const Sequence& sequence) : _sequence(sequence) {\n \
+    \       build();\n    }\n\n    explicit LongestCommonExtension(Sequence&& sequence)\
+    \ : _sequence(std::move(sequence)) {\n        build();\n    }\n\n    int size()\
+    \ const {\n        return int(_sequence.size());\n    }\n\n    bool empty() const\
+    \ {\n        return _sequence.empty();\n    }\n\n    const Sequence& sequence()\
+    \ const {\n        return _sequence;\n    }\n\n    const std::vector<int>& suffix_array()\
+    \ const {\n        return _suffix_array;\n    }\n\n    const std::vector<int>&\
+    \ rank() const {\n        return _rank;\n    }\n\n    const std::vector<int>&\
+    \ lcp_array() const {\n        return _lcp;\n    }\n\n    int longest_common_extension(int\
+    \ i, int j) const {\n        int n = size();\n        assert(0 <= i && i <= n);\n\
+    \        assert(0 <= j && j <= n);\n        if (i == j) return n - i;\n      \
+    \  if (i == n || j == n) return 0;\n\n        int left = _rank[i];\n        int\
+    \ right = _rank[j];\n        if (left > right) std::swap(left, right);\n     \
+    \   return range_min(left, right);\n    }\n\n    int longest_common_extension(int\
+    \ i, int j, int limit) const {\n        assert(0 <= limit);\n        return std::min(longest_common_extension(i,\
+    \ j), limit);\n    }\n\n    int lcp(int i, int j) const {\n        return longest_common_extension(i,\
+    \ j);\n    }\n\n    int operator()(int i, int j) const {\n        return longest_common_extension(i,\
     \ j);\n    }\n\n    int compare_suffix(int i, int j) const {\n        int n =\
     \ size();\n        assert(0 <= i && i <= n);\n        assert(0 <= j && j <= n);\n\
-    \        if (i == j) return 0;\n        int common = lce(i, j);\n        if (i\
-    \ + common == n && j + common == n) return 0;\n        if (i + common == n) return\
-    \ -1;\n        if (j + common == n) return 1;\n        return _sequence[i + common]\
-    \ < _sequence[j + common] ? -1 : 1;\n    }\n\n    int compare(int l1, int r1,\
-    \ int l2, int r2) const {\n        int n = size();\n        assert(0 <= l1 &&\
-    \ l1 <= r1 && r1 <= n);\n        assert(0 <= l2 && l2 <= r2 && r2 <= n);\n   \
-    \     int len1 = r1 - l1;\n        int len2 = r2 - l2;\n        int common = lce(l1,\
-    \ l2, std::min(len1, len2));\n        if (common == len1 && common == len2) return\
-    \ 0;\n        if (common == len1) return -1;\n        if (common == len2) return\
-    \ 1;\n        return _sequence[l1 + common] < _sequence[l2 + common] ? -1 : 1;\n\
-    \    }\n};\n\n}  // namespace string\n}  // namespace m1une\n\n\n#line 1 \"string/levenshtein_distance.hpp\"\
-    \n\n\n\n#line 7 \"string/levenshtein_distance.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ string {\n\nnamespace levenshtein_distance_detail {\n\ntemplate <class RowSequence,\
-    \ class ColumnSequence>\nint solve(const RowSequence& rows, const ColumnSequence&\
-    \ columns) {\n    int row_count = int(rows.size());\n    int column_count = int(columns.size());\n\
-    \    std::vector<int> distance(column_count + 1);\n    for (int column = 0; column\
-    \ <= column_count; column++) distance[column] = column;\n\n    for (int row =\
-    \ 1; row <= row_count; row++) {\n        int diagonal = distance[0];\n       \
-    \ distance[0] = row;\n        for (int column = 1; column <= column_count; column++)\
-    \ {\n            int above = distance[column];\n            int substitution =\
-    \ diagonal + (rows[row - 1] == columns[column - 1] ? 0 : 1);\n            distance[column]\
-    \ =\n                std::min({above + 1, distance[column - 1] + 1, substitution});\n\
-    \            diagonal = above;\n        }\n    }\n    return distance[column_count];\n\
-    }\n\ntemplate <class RowSequence, class ColumnSequence>\nint solve_bounded(const\
-    \ RowSequence& rows, const ColumnSequence& columns,\n                  int max_distance)\
-    \ {\n    int row_count = int(rows.size());\n    int column_count = int(columns.size());\n\
-    \    assert(column_count <= row_count);\n    if (row_count - column_count > max_distance)\
-    \ return max_distance + 1;\n    if (max_distance >= row_count) return solve(rows,\
-    \ columns);\n\n    int infinity = max_distance + 1;\n    int previous_left = 0;\n\
-    \    int previous_right = std::min(column_count, max_distance);\n    std::vector<int>\
-    \ previous(previous_right + 1);\n    for (int column = 0; column <= previous_right;\
-    \ column++) previous[column] = column;\n    std::vector<int> current;\n\n    for\
-    \ (int row = 1; row <= row_count; row++) {\n        int current_left = std::max(0,\
-    \ row - max_distance);\n        int current_right = int(std::min<long long>(column_count,\n\
-    \                                                    static_cast<long long>(row)\
-    \ + max_distance));\n        current.assign(current_right - current_left + 1,\
-    \ infinity);\n\n        for (int column = current_left; column <= current_right;\
-    \ column++) {\n            int best = infinity;\n            if (previous_left\
-    \ <= column && column <= previous_right) {\n                best = std::min(best,\
-    \ previous[column - previous_left] + 1);\n            }\n            if (current_left\
-    \ < column) {\n                best = std::min(best, current[column - current_left\
-    \ - 1] + 1);\n            }\n            if (0 < column && previous_left <= column\
-    \ - 1 && column - 1 <= previous_right) {\n                int substitution = previous[column\
-    \ - 1 - previous_left] +\n                                   (rows[row - 1] ==\
-    \ columns[column - 1] ? 0 : 1);\n                best = std::min(best, substitution);\n\
-    \            }\n            current[column - current_left] = std::min(best, infinity);\n\
-    \        }\n\n        previous.swap(current);\n        previous_left = current_left;\n\
-    \        previous_right = current_right;\n    }\n    return previous[column_count\
-    \ - previous_left];\n}\n\n}  // namespace levenshtein_distance_detail\n\n// Returns\
-    \ the minimum number of insertions, deletions, and substitutions\n// needed to\
-    \ transform first into second.\ntemplate <class Sequence1, class Sequence2>\n\
-    int levenshtein_distance(const Sequence1& first, const Sequence2& second) {\n\
-    \    if (first.size() < second.size()) {\n        return levenshtein_distance_detail::solve(second,\
-    \ first);\n    }\n    return levenshtein_distance_detail::solve(first, second);\n\
-    }\n\n// Returns the exact distance when it is at most max_distance, and\n// max_distance\
-    \ + 1 otherwise.\ntemplate <class Sequence1, class Sequence2>\nint levenshtein_distance(const\
-    \ Sequence1& first, const Sequence2& second,\n                         int max_distance)\
-    \ {\n    assert(0 <= max_distance);\n    if (first.size() < second.size()) {\n\
-    \        return levenshtein_distance_detail::solve_bounded(second, first, max_distance);\n\
-    \    }\n    return levenshtein_distance_detail::solve_bounded(first, second, max_distance);\n\
-    }\n\n}  // namespace string\n}  // namespace m1une\n\n\n#line 1 \"string/lyndon_factorization.hpp\"\
-    \n\n\n\n#line 6 \"string/lyndon_factorization.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ string {\n\n// Returns boundaries 0 = a[0] < a[1] < ... < a[k] = sequence.size()\n\
-    // of the Lyndon factorization.\ntemplate <class Sequence>\nstd::vector<int> lyndon_factor_boundaries(const\
-    \ Sequence& sequence) {\n    int n = int(sequence.size());\n    std::vector<int>\
-    \ boundaries;\n    boundaries.push_back(0);\n\n    int i = 0;\n    while (i <\
-    \ n) {\n        int j = i + 1;\n        int k = i;\n        while (j < n && !(sequence[j]\
-    \ < sequence[k])) {\n            if (sequence[k] < sequence[j]) {\n          \
-    \      k = i;\n            } else {\n                k++;\n            }\n   \
-    \         j++;\n        }\n\n        int length = j - k;\n        while (i <=\
-    \ k) {\n            i += length;\n            boundaries.push_back(i);\n     \
-    \   }\n    }\n    return boundaries;\n}\n\n// Returns half-open intervals [left,\
-    \ right) of the Lyndon factorization.\ntemplate <class Sequence>\nstd::vector<std::pair<int,\
+    \        if (i == j) return 0;\n        int common = longest_common_extension(i,\
+    \ j);\n        if (i + common == n && j + common == n) return 0;\n        if (i\
+    \ + common == n) return -1;\n        if (j + common == n) return 1;\n        return\
+    \ _sequence[i + common] < _sequence[j + common] ? -1 : 1;\n    }\n\n    int compare(int\
+    \ l1, int r1, int l2, int r2) const {\n        int n = size();\n        assert(0\
+    \ <= l1 && l1 <= r1 && r1 <= n);\n        assert(0 <= l2 && l2 <= r2 && r2 <=\
+    \ n);\n        int len1 = r1 - l1;\n        int len2 = r2 - l2;\n        int common\
+    \ = longest_common_extension(l1, l2, std::min(len1, len2));\n        if (common\
+    \ == len1 && common == len2) return 0;\n        if (common == len1) return -1;\n\
+    \        if (common == len2) return 1;\n        return _sequence[l1 + common]\
+    \ < _sequence[l2 + common] ? -1 : 1;\n    }\n};\n\n}  // namespace string\n} \
+    \ // namespace m1une\n\n\n#line 1 \"string/longest_common_substring.hpp\"\n\n\n\
+    \n#line 9 \"string/longest_common_substring.hpp\"\n\n#line 11 \"string/longest_common_substring.hpp\"\
+    \n\nnamespace m1une {\nnamespace string {\n\nstruct LongestCommonSubstring {\n\
+    \    int first_left = 0;\n    int first_right = 0;\n    int second_left = 0;\n\
+    \    int second_right = 0;\n\n    int length() const {\n        assert(first_right\
+    \ - first_left == second_right - second_left);\n        return first_right - first_left;\n\
+    \    }\n\n    bool empty() const {\n        return length() == 0;\n    }\n\n \
+    \   std::pair<int, int> first_interval() const {\n        return {first_left,\
+    \ first_right};\n    }\n\n    std::pair<int, int> second_interval() const {\n\
+    \        return {second_left, second_right};\n    }\n};\n\nnamespace detail {\n\
+    \ntemplate <class Sequence>\nstd::vector<int> compressed_join_with_separator(const\
+    \ Sequence& first, const Sequence& second) {\n    using Value = std::remove_cv_t<std::remove_reference_t<decltype(first[0])>>;\n\
+    \n    std::vector<Value> values;\n    values.reserve(first.size() + second.size());\n\
+    \    for (const auto& value : first) values.push_back(value);\n    for (const\
+    \ auto& value : second) values.push_back(value);\n    std::sort(values.begin(),\
+    \ values.end());\n    values.erase(std::unique(values.begin(), values.end()),\
+    \ values.end());\n\n    std::vector<int> joined;\n    joined.reserve(first.size()\
+    \ + second.size() + 1);\n    for (const auto& value : first) {\n        joined.push_back(int(std::lower_bound(values.begin(),\
+    \ values.end(), value) - values.begin()) + 2);\n    }\n    joined.push_back(1);\n\
+    \    for (const auto& value : second) {\n        joined.push_back(int(std::lower_bound(values.begin(),\
+    \ values.end(), value) - values.begin()) + 2);\n    }\n    return joined;\n}\n\
+    \n}  // namespace detail\n\ntemplate <class Sequence>\nLongestCommonSubstring\
+    \ longest_common_substring(const Sequence& first, const Sequence& second) {\n\
+    \    int n = int(first.size());\n    int m = int(second.size());\n    std::vector<int>\
+    \ joined = detail::compressed_join_with_separator(first, second);\n    std::vector<int>\
+    \ suffixes = suffix_array(joined);\n    std::vector<int> lcp = lcp_array(joined,\
+    \ suffixes);\n\n    LongestCommonSubstring result;\n    for (int i = 0; i + 1\
+    \ < int(suffixes.size()); i++) {\n        int a = suffixes[i];\n        int b\
+    \ = suffixes[i + 1];\n        if (a == n || b == n) continue;\n\n        bool\
+    \ a_first = a < n;\n        bool b_first = b < n;\n        if (a_first == b_first)\
+    \ continue;\n\n        int first_left = a_first ? a : b;\n        int second_left\
+    \ = a_first ? b - n - 1 : a - n - 1;\n        int length = lcp[i];\n        length\
+    \ = std::min(length, n - first_left);\n        length = std::min(length, m - second_left);\n\
+    \        if (length > result.length()) {\n            result.first_left = first_left;\n\
+    \            result.first_right = first_left + length;\n            result.second_left\
+    \ = second_left;\n            result.second_right = second_left + length;\n  \
+    \      }\n    }\n    return result;\n}\n\n}  // namespace string\n}  // namespace\
+    \ m1une\n\n\n#line 1 \"string/lyndon_factorization.hpp\"\n\n\n\n#line 6 \"string/lyndon_factorization.hpp\"\
+    \n\nnamespace m1une {\nnamespace string {\n\n// Returns boundaries 0 = a[0] <\
+    \ a[1] < ... < a[k] = sequence.size()\n// of the Lyndon factorization.\ntemplate\
+    \ <class Sequence>\nstd::vector<int> lyndon_factor_boundaries(const Sequence&\
+    \ sequence) {\n    int n = int(sequence.size());\n    std::vector<int> boundaries;\n\
+    \    boundaries.push_back(0);\n\n    int i = 0;\n    while (i < n) {\n       \
+    \ int j = i + 1;\n        int k = i;\n        while (j < n && !(sequence[j] <\
+    \ sequence[k])) {\n            if (sequence[k] < sequence[j]) {\n            \
+    \    k = i;\n            } else {\n                k++;\n            }\n     \
+    \       j++;\n        }\n\n        int length = j - k;\n        while (i <= k)\
+    \ {\n            i += length;\n            boundaries.push_back(i);\n        }\n\
+    \    }\n    return boundaries;\n}\n\n// Returns half-open intervals [left, right)\
+    \ of the Lyndon factorization.\ntemplate <class Sequence>\nstd::vector<std::pair<int,\
     \ int>> lyndon_factorization(const Sequence& sequence) {\n    std::vector<int>\
     \ boundaries = lyndon_factor_boundaries(sequence);\n    std::vector<std::pair<int,\
     \ int>> factors;\n    factors.reserve(boundaries.size() - 1);\n    for (int i\
@@ -758,7 +802,7 @@ data:
     \ + z[i] < n && sequence[z[i]] == sequence[i + z[i]]) {\n            z[i]++;\n\
     \        }\n        if (right < i + z[i]) {\n            left = i;\n         \
     \   right = i + z[i];\n        }\n    }\n    return z;\n}\n\n}  // namespace string\n\
-    }  // namespace m1une\n\n\n#line 17 \"string/all.hpp\"\n\n\n"
+    }  // namespace m1une\n\n\n#line 18 \"string/all.hpp\"\n\n\n"
   code: '#ifndef M1UNE_STRING_ALL_HPP
 
     #define M1UNE_STRING_ALL_HPP 1
@@ -768,9 +812,11 @@ data:
 
     #include "eertree.hpp"
 
-    #include "lce.hpp"
-
     #include "levenshtein_distance.hpp"
+
+    #include "longest_common_extension.hpp"
+
+    #include "longest_common_substring.hpp"
 
     #include "lyndon_factorization.hpp"
 
@@ -797,9 +843,10 @@ data:
   dependsOn:
   - string/aho_corasick.hpp
   - string/eertree.hpp
-  - string/lce.hpp
-  - string/suffix_array.hpp
   - string/levenshtein_distance.hpp
+  - string/longest_common_extension.hpp
+  - string/suffix_array.hpp
+  - string/longest_common_substring.hpp
   - string/lyndon_factorization.hpp
   - string/manacher.hpp
   - string/prefix_function.hpp
@@ -811,7 +858,7 @@ data:
   isVerificationFile: false
   path: string/all.hpp
   requiredBy: []
-  timestamp: '2026-07-09 02:24:22+09:00'
+  timestamp: '2026-07-09 02:40:33+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/string/string_algorithms.test.cpp
@@ -832,8 +879,9 @@ contest when convenience matters more.
 | --- | --- |
 | `string/aho_corasick.hpp` | Multi-pattern matching with failure links and occurrence counting. |
 | `string/eertree.hpp` | Online palindromic tree with suffix and series links. |
-| `string/lce.hpp` | Static longest-common-extension queries and substring comparisons. |
 | `string/levenshtein_distance.hpp` | Unit-cost edit distance in linear auxiliary memory. |
+| `string/longest_common_extension.hpp` | Static longest-common-extension queries and substring comparisons. |
+| `string/longest_common_substring.hpp` | Finds one longest substring common to two sequences. |
 | `string/lyndon_factorization.hpp` | Duval's linear-time Lyndon factorization. |
 | `string/z_algorithm.hpp` | Linear-time Z array. |
 | `string/prefix_function.hpp` | Prefix function and KMP occurrence search. |
