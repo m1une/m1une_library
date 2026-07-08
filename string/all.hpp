@@ -3,8 +3,9 @@
 
 #include "aho_corasick.hpp"
 #include "eertree.hpp"
-#include "lce.hpp"
 #include "levenshtein_distance.hpp"
+#include "longest_common_extension.hpp"
+#include "longest_common_substring.hpp"
 #include "lyndon_factorization.hpp"
 #include "manacher.hpp"
 #include "prefix_function.hpp"

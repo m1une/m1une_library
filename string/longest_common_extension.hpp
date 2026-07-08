@@ -1,5 +1,5 @@
-#ifndef M1UNE_STRING_LCE_HPP
-#define M1UNE_STRING_LCE_HPP 1
+#ifndef M1UNE_STRING_LONGEST_COMMON_EXTENSION_HPP
+#define M1UNE_STRING_LONGEST_COMMON_EXTENSION_HPP 1
 
 #include <algorithm>
 #include <cassert>
@@ -13,7 +13,7 @@ namespace m1une {
 namespace string {
 
 template <class Sequence = std::string>
-struct LCE {
+struct LongestCommonExtension {
    private:
     Sequence _sequence;
     std::vector<int> _suffix_array;
@@ -58,13 +58,13 @@ struct LCE {
     }
 
    public:
-    LCE() = default;
+    LongestCommonExtension() = default;
 
-    explicit LCE(const Sequence& sequence) : _sequence(sequence) {
+    explicit LongestCommonExtension(const Sequence& sequence) : _sequence(sequence) {
         build();
     }
 
-    explicit LCE(Sequence&& sequence) : _sequence(std::move(sequence)) {
+    explicit LongestCommonExtension(Sequence&& sequence) : _sequence(std::move(sequence)) {
         build();
     }
 
@@ -92,7 +92,7 @@ struct LCE {
         return _lcp;
     }
 
-    int lce(int i, int j) const {
+    int longest_common_extension(int i, int j) const {
         int n = size();
         assert(0 <= i && i <= n);
         assert(0 <= j && j <= n);
@@ -105,17 +105,17 @@ struct LCE {
         return range_min(left, right);
     }
 
-    int lce(int i, int j, int limit) const {
+    int longest_common_extension(int i, int j, int limit) const {
         assert(0 <= limit);
-        return std::min(lce(i, j), limit);
+        return std::min(longest_common_extension(i, j), limit);
     }
 
     int lcp(int i, int j) const {
-        return lce(i, j);
+        return longest_common_extension(i, j);
     }
 
     int operator()(int i, int j) const {
-        return lce(i, j);
+        return longest_common_extension(i, j);
     }
 
     int compare_suffix(int i, int j) const {
@@ -123,7 +123,7 @@ struct LCE {
         assert(0 <= i && i <= n);
         assert(0 <= j && j <= n);
         if (i == j) return 0;
-        int common = lce(i, j);
+        int common = longest_common_extension(i, j);
         if (i + common == n && j + common == n) return 0;
         if (i + common == n) return -1;
         if (j + common == n) return 1;
@@ -136,7 +136,7 @@ struct LCE {
         assert(0 <= l2 && l2 <= r2 && r2 <= n);
         int len1 = r1 - l1;
         int len2 = r2 - l2;
-        int common = lce(l1, l2, std::min(len1, len2));
+        int common = longest_common_extension(l1, l2, std::min(len1, len2));
         if (common == len1 && common == len2) return 0;
         if (common == len1) return -1;
         if (common == len2) return 1;
@@ -147,4 +147,4 @@ struct LCE {
 }  // namespace string
 }  // namespace m1une
 
-#endif  // M1UNE_STRING_LCE_HPP
+#endif  // M1UNE_STRING_LONGEST_COMMON_EXTENSION_HPP
