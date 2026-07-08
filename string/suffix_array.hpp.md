@@ -5,7 +5,13 @@ data:
   - icon: ':heavy_check_mark:'
     path: string/all.hpp
     title: String Algorithms Bundle
+  - icon: ':heavy_check_mark:'
+    path: string/lce.hpp
+    title: Longest Common Extension
   _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/string/lce.test.cpp
+    title: verify/string/lce.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/string/string_algorithms.test.cpp
     title: verify/string/string_algorithms.test.cpp
@@ -130,11 +136,13 @@ data:
   path: string/suffix_array.hpp
   requiredBy:
   - string/all.hpp
+  - string/lce.hpp
   timestamp: '2026-06-21 02:43:08+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/string/string_algorithms.test.cpp
   - verify/string/suffix_array.test.cpp
+  - verify/string/lce.test.cpp
 documentation_of: string/suffix_array.hpp
 layout: document
 title: Suffix Array and LCP Array

@@ -11,6 +11,9 @@ data:
     path: string/eertree.hpp
     title: Eertree
   - icon: ':heavy_check_mark:'
+    path: string/lce.hpp
+    title: Longest Common Extension
+  - icon: ':heavy_check_mark:'
     path: string/levenshtein_distance.hpp
     title: Levenshtein Distance
   - icon: ':heavy_check_mark:'
@@ -234,39 +237,141 @@ data:
     \ = _nodes[id].first_end;\n        return {end - _nodes[id].length, end};\n  \
     \  }\n};\n\ntemplate <int AlphabetSize = 26, int FirstCharacter = 'a'>\nusing\
     \ PalindromicTree = Eertree<AlphabetSize, FirstCharacter>;\n\n}  // namespace\
-    \ string\n}  // namespace m1une\n\n\n#line 1 \"string/levenshtein_distance.hpp\"\
-    \n\n\n\n#include <algorithm>\n#line 7 \"string/levenshtein_distance.hpp\"\n\n\
-    namespace m1une {\nnamespace string {\n\nnamespace levenshtein_distance_detail\
-    \ {\n\ntemplate <class RowSequence, class ColumnSequence>\nint solve(const RowSequence&\
-    \ rows, const ColumnSequence& columns) {\n    int row_count = int(rows.size());\n\
-    \    int column_count = int(columns.size());\n    std::vector<int> distance(column_count\
-    \ + 1);\n    for (int column = 0; column <= column_count; column++) distance[column]\
-    \ = column;\n\n    for (int row = 1; row <= row_count; row++) {\n        int diagonal\
-    \ = distance[0];\n        distance[0] = row;\n        for (int column = 1; column\
-    \ <= column_count; column++) {\n            int above = distance[column];\n  \
-    \          int substitution = diagonal + (rows[row - 1] == columns[column - 1]\
-    \ ? 0 : 1);\n            distance[column] =\n                std::min({above +\
-    \ 1, distance[column - 1] + 1, substitution});\n            diagonal = above;\n\
-    \        }\n    }\n    return distance[column_count];\n}\n\ntemplate <class RowSequence,\
-    \ class ColumnSequence>\nint solve_bounded(const RowSequence& rows, const ColumnSequence&\
-    \ columns,\n                  int max_distance) {\n    int row_count = int(rows.size());\n\
-    \    int column_count = int(columns.size());\n    assert(column_count <= row_count);\n\
-    \    if (row_count - column_count > max_distance) return max_distance + 1;\n \
-    \   if (max_distance >= row_count) return solve(rows, columns);\n\n    int infinity\
-    \ = max_distance + 1;\n    int previous_left = 0;\n    int previous_right = std::min(column_count,\
-    \ max_distance);\n    std::vector<int> previous(previous_right + 1);\n    for\
-    \ (int column = 0; column <= previous_right; column++) previous[column] = column;\n\
-    \    std::vector<int> current;\n\n    for (int row = 1; row <= row_count; row++)\
-    \ {\n        int current_left = std::max(0, row - max_distance);\n        int\
-    \ current_right = int(std::min<long long>(column_count,\n                    \
-    \                                static_cast<long long>(row) + max_distance));\n\
-    \        current.assign(current_right - current_left + 1, infinity);\n\n     \
-    \   for (int column = current_left; column <= current_right; column++) {\n   \
-    \         int best = infinity;\n            if (previous_left <= column && column\
-    \ <= previous_right) {\n                best = std::min(best, previous[column\
-    \ - previous_left] + 1);\n            }\n            if (current_left < column)\
-    \ {\n                best = std::min(best, current[column - current_left - 1]\
-    \ + 1);\n            }\n            if (0 < column && previous_left <= column\
+    \ string\n}  // namespace m1une\n\n\n#line 1 \"string/lce.hpp\"\n\n\n\n#include\
+    \ <algorithm>\n#line 6 \"string/lce.hpp\"\n#include <string>\n#line 9 \"string/lce.hpp\"\
+    \n\n#line 1 \"string/suffix_array.hpp\"\n\n\n\n#line 6 \"string/suffix_array.hpp\"\
+    \n#include <numeric>\n#line 8 \"string/suffix_array.hpp\"\n#include <type_traits>\n\
+    #line 10 \"string/suffix_array.hpp\"\n\nnamespace m1une {\nnamespace string {\n\
+    namespace detail {\n\ntemplate <class Sequence>\nstd::vector<int> suffix_array_impl(const\
+    \ Sequence& sequence) {\n    int n = int(sequence.size());\n    if (n == 0) return\
+    \ {};\n\n    using Value = std::remove_cv_t<std::remove_reference_t<decltype(sequence[0])>>;\n\
+    \    std::vector<Value> sorted(sequence.begin(), sequence.end());\n    std::sort(sorted.begin(),\
+    \ sorted.end());\n    sorted.erase(std::unique(sorted.begin(), sorted.end()),\
+    \ sorted.end());\n\n    int length = n + 1;\n    std::vector<int> order(length);\n\
+    \    std::vector<int> rank(length);\n    std::vector<int> key(length);\n    key[n]\
+    \ = 0;\n    for (int i = 0; i < n; i++) {\n        key[i] = int(std::lower_bound(sorted.begin(),\
+    \ sorted.end(), sequence[i]) - sorted.begin()) + 1;\n    }\n\n    int alphabet\
+    \ = int(sorted.size()) + 1;\n    std::vector<int> count(std::max(length, alphabet),\
+    \ 0);\n    for (int value : key) count[value]++;\n    for (int i = 1; i < alphabet;\
+    \ i++) count[i] += count[i - 1];\n    for (int i = length - 1; i >= 0; i--) order[--count[key[i]]]\
+    \ = i;\n\n    int classes = 1;\n    rank[order[0]] = 0;\n    for (int i = 1; i\
+    \ < length; i++) {\n        if (key[order[i - 1]] != key[order[i]]) classes++;\n\
+    \        rank[order[i]] = classes - 1;\n    }\n\n    std::vector<int> shifted(length);\n\
+    \    std::vector<int> next_rank(length);\n    for (long long half = 1; half <\
+    \ length; half <<= 1) {\n        for (int i = 0; i < length; i++) {\n        \
+    \    long long position = order[i] - half;\n            if (position < 0) position\
+    \ += length;\n            shifted[i] = int(position);\n        }\n\n        count.assign(classes,\
+    \ 0);\n        for (int position : shifted) count[rank[position]]++;\n       \
+    \ for (int i = 1; i < classes; i++) count[i] += count[i - 1];\n        for (int\
+    \ i = length - 1; i >= 0; i--) {\n            int position = shifted[i];\n   \
+    \         order[--count[rank[position]]] = position;\n        }\n\n        int\
+    \ next_classes = 1;\n        next_rank[order[0]] = 0;\n        for (int i = 1;\
+    \ i < length; i++) {\n            int current = order[i];\n            int previous\
+    \ = order[i - 1];\n            int current_second = int((current + half) % length);\n\
+    \            int previous_second = int((previous + half) % length);\n        \
+    \    if (\n                rank[current] != rank[previous] ||\n              \
+    \  rank[current_second] != rank[previous_second]\n            ) {\n          \
+    \      next_classes++;\n            }\n            next_rank[current] = next_classes\
+    \ - 1;\n        }\n        rank.swap(next_rank);\n        classes = next_classes;\n\
+    \        if (classes == length) break;\n    }\n\n    std::vector<int> suffixes(n);\n\
+    \    for (int i = 0; i < n; i++) suffixes[i] = order[i + 1];\n    return suffixes;\n\
+    }\n\n}  // namespace detail\n\ntemplate <class Sequence>\nstd::vector<int> suffix_array(const\
+    \ Sequence& sequence) {\n    return detail::suffix_array_impl(sequence);\n}\n\n\
+    inline std::vector<int> suffix_array(const std::string& text) {\n    std::vector<unsigned\
+    \ char> values;\n    values.reserve(text.size());\n    for (unsigned char character\
+    \ : text) values.push_back(character);\n    return detail::suffix_array_impl(values);\n\
+    }\n\ntemplate <class Sequence>\nstd::vector<int> lcp_array(const Sequence& sequence,\
+    \ const std::vector<int>& suffixes) {\n    int n = int(sequence.size());\n   \
+    \ assert(int(suffixes.size()) == n);\n    if (n == 0) return {};\n\n    std::vector<int>\
+    \ rank(n);\n    for (int i = 0; i < n; i++) {\n        assert(0 <= suffixes[i]\
+    \ && suffixes[i] < n);\n        rank[suffixes[i]] = i;\n    }\n\n    std::vector<int>\
+    \ lcp(n - 1);\n    int common = 0;\n    for (int i = 0; i < n; i++) {\n      \
+    \  int position = rank[i];\n        if (position == n - 1) {\n            common\
+    \ = 0;\n            continue;\n        }\n        int j = suffixes[position +\
+    \ 1];\n        while (\n            i + common < n &&\n            j + common\
+    \ < n &&\n            sequence[i + common] == sequence[j + common]\n        )\
+    \ {\n            common++;\n        }\n        lcp[position] = common;\n     \
+    \   if (common > 0) common--;\n    }\n    return lcp;\n}\n\n}  // namespace string\n\
+    }  // namespace m1une\n\n\n#line 11 \"string/lce.hpp\"\n\nnamespace m1une {\n\
+    namespace string {\n\ntemplate <class Sequence = std::string>\nstruct LCE {\n\
+    \   private:\n    Sequence _sequence;\n    std::vector<int> _suffix_array;\n \
+    \   std::vector<int> _rank;\n    std::vector<int> _lcp;\n    std::vector<int>\
+    \ _log;\n    std::vector<std::vector<int>> _table;\n\n    int range_min(int left,\
+    \ int right) const {\n        assert(0 <= left && left < right && right <= int(_lcp.size()));\n\
+    \        int k = _log[right - left];\n        return std::min(_table[k][left],\
+    \ _table[k][right - (1 << k)]);\n    }\n\n    void build() {\n        int n =\
+    \ int(_sequence.size());\n        _suffix_array = m1une::string::suffix_array(_sequence);\n\
+    \        _rank.assign(n, 0);\n        for (int i = 0; i < n; i++) {\n        \
+    \    _rank[_suffix_array[i]] = i;\n        }\n\n        _lcp = m1une::string::lcp_array(_sequence,\
+    \ _suffix_array);\n        int m = int(_lcp.size());\n        _log.assign(m +\
+    \ 1, 0);\n        for (int i = 2; i <= m; i++) {\n            _log[i] = _log[i\
+    \ >> 1] + 1;\n        }\n\n        _table.clear();\n        if (m == 0) return;\n\
+    \        _table.assign(_log[m] + 1, std::vector<int>());\n        _table[0] =\
+    \ _lcp;\n        for (int k = 1; k < int(_table.size()); k++) {\n            int\
+    \ width = 1 << k;\n            int half = width >> 1;\n            _table[k].resize(m\
+    \ - width + 1);\n            for (int i = 0; i + width <= m; i++) {\n        \
+    \        _table[k][i] = std::min(_table[k - 1][i], _table[k - 1][i + half]);\n\
+    \            }\n        }\n    }\n\n   public:\n    LCE() = default;\n\n    explicit\
+    \ LCE(const Sequence& sequence) : _sequence(sequence) {\n        build();\n  \
+    \  }\n\n    explicit LCE(Sequence&& sequence) : _sequence(std::move(sequence))\
+    \ {\n        build();\n    }\n\n    int size() const {\n        return int(_sequence.size());\n\
+    \    }\n\n    bool empty() const {\n        return _sequence.empty();\n    }\n\
+    \n    const Sequence& sequence() const {\n        return _sequence;\n    }\n\n\
+    \    const std::vector<int>& suffix_array() const {\n        return _suffix_array;\n\
+    \    }\n\n    const std::vector<int>& rank() const {\n        return _rank;\n\
+    \    }\n\n    const std::vector<int>& lcp_array() const {\n        return _lcp;\n\
+    \    }\n\n    int lce(int i, int j) const {\n        int n = size();\n       \
+    \ assert(0 <= i && i <= n);\n        assert(0 <= j && j <= n);\n        if (i\
+    \ == j) return n - i;\n        if (i == n || j == n) return 0;\n\n        int\
+    \ left = _rank[i];\n        int right = _rank[j];\n        if (left > right) std::swap(left,\
+    \ right);\n        return range_min(left, right);\n    }\n\n    int lce(int i,\
+    \ int j, int limit) const {\n        assert(0 <= limit);\n        return std::min(lce(i,\
+    \ j), limit);\n    }\n\n    int lcp(int i, int j) const {\n        return lce(i,\
+    \ j);\n    }\n\n    int operator()(int i, int j) const {\n        return lce(i,\
+    \ j);\n    }\n\n    int compare_suffix(int i, int j) const {\n        int n =\
+    \ size();\n        assert(0 <= i && i <= n);\n        assert(0 <= j && j <= n);\n\
+    \        if (i == j) return 0;\n        int common = lce(i, j);\n        if (i\
+    \ + common == n && j + common == n) return 0;\n        if (i + common == n) return\
+    \ -1;\n        if (j + common == n) return 1;\n        return _sequence[i + common]\
+    \ < _sequence[j + common] ? -1 : 1;\n    }\n\n    int compare(int l1, int r1,\
+    \ int l2, int r2) const {\n        int n = size();\n        assert(0 <= l1 &&\
+    \ l1 <= r1 && r1 <= n);\n        assert(0 <= l2 && l2 <= r2 && r2 <= n);\n   \
+    \     int len1 = r1 - l1;\n        int len2 = r2 - l2;\n        int common = lce(l1,\
+    \ l2, std::min(len1, len2));\n        if (common == len1 && common == len2) return\
+    \ 0;\n        if (common == len1) return -1;\n        if (common == len2) return\
+    \ 1;\n        return _sequence[l1 + common] < _sequence[l2 + common] ? -1 : 1;\n\
+    \    }\n};\n\n}  // namespace string\n}  // namespace m1une\n\n\n#line 1 \"string/levenshtein_distance.hpp\"\
+    \n\n\n\n#line 7 \"string/levenshtein_distance.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ string {\n\nnamespace levenshtein_distance_detail {\n\ntemplate <class RowSequence,\
+    \ class ColumnSequence>\nint solve(const RowSequence& rows, const ColumnSequence&\
+    \ columns) {\n    int row_count = int(rows.size());\n    int column_count = int(columns.size());\n\
+    \    std::vector<int> distance(column_count + 1);\n    for (int column = 0; column\
+    \ <= column_count; column++) distance[column] = column;\n\n    for (int row =\
+    \ 1; row <= row_count; row++) {\n        int diagonal = distance[0];\n       \
+    \ distance[0] = row;\n        for (int column = 1; column <= column_count; column++)\
+    \ {\n            int above = distance[column];\n            int substitution =\
+    \ diagonal + (rows[row - 1] == columns[column - 1] ? 0 : 1);\n            distance[column]\
+    \ =\n                std::min({above + 1, distance[column - 1] + 1, substitution});\n\
+    \            diagonal = above;\n        }\n    }\n    return distance[column_count];\n\
+    }\n\ntemplate <class RowSequence, class ColumnSequence>\nint solve_bounded(const\
+    \ RowSequence& rows, const ColumnSequence& columns,\n                  int max_distance)\
+    \ {\n    int row_count = int(rows.size());\n    int column_count = int(columns.size());\n\
+    \    assert(column_count <= row_count);\n    if (row_count - column_count > max_distance)\
+    \ return max_distance + 1;\n    if (max_distance >= row_count) return solve(rows,\
+    \ columns);\n\n    int infinity = max_distance + 1;\n    int previous_left = 0;\n\
+    \    int previous_right = std::min(column_count, max_distance);\n    std::vector<int>\
+    \ previous(previous_right + 1);\n    for (int column = 0; column <= previous_right;\
+    \ column++) previous[column] = column;\n    std::vector<int> current;\n\n    for\
+    \ (int row = 1; row <= row_count; row++) {\n        int current_left = std::max(0,\
+    \ row - max_distance);\n        int current_right = int(std::min<long long>(column_count,\n\
+    \                                                    static_cast<long long>(row)\
+    \ + max_distance));\n        current.assign(current_right - current_left + 1,\
+    \ infinity);\n\n        for (int column = current_left; column <= current_right;\
+    \ column++) {\n            int best = infinity;\n            if (previous_left\
+    \ <= column && column <= previous_right) {\n                best = std::min(best,\
+    \ previous[column - previous_left] + 1);\n            }\n            if (current_left\
+    \ < column) {\n                best = std::min(best, current[column - current_left\
+    \ - 1] + 1);\n            }\n            if (0 < column && previous_left <= column\
     \ - 1 && column - 1 <= previous_right) {\n                int substitution = previous[column\
     \ - 1 - previous_left] +\n                                   (rows[row - 1] ==\
     \ columns[column - 1] ? 0 : 1);\n                best = std::min(best, substitution);\n\
@@ -366,91 +471,91 @@ data:
     \ pattern[matched]) matched++;\n        if (matched == m) {\n            occurrences.push_back(i\
     \ - m + 1);\n            matched = prefix[matched - 1];\n        }\n    }\n  \
     \  return occurrences;\n}\n\n}  // namespace string\n}  // namespace m1une\n\n\
-    \n#line 1 \"string/rolling_hash.hpp\"\n\n\n\n#line 5 \"string/rolling_hash.hpp\"\
-    \n#include <string>\n#line 8 \"string/rolling_hash.hpp\"\n\nnamespace m1une {\n\
-    namespace string {\n\n// Standard Rolling Hash for static strings.\n// Precomputes\
-    \ hashes to answer substring queries in O(1).\n// Provides advanced operations\
-    \ like LCP, lexicographical comparison, and string repetition in O(log N).\ntemplate\
-    \ <long long Base = 10007, long long Mod = (1LL << 61) - 1>\nstruct RollingHash\
-    \ {\n    std::string s;\n    std::vector<long long> hash;\n    std::vector<long\
-    \ long> power;\n\n    RollingHash() = default;\n\n    // Constructs the rolling\
-    \ hash table for the given string.\n    explicit RollingHash(const std::string&\
-    \ str) : s(str) {\n        int n = s.size();\n        hash.assign(n + 1, 0);\n\
-    \        power.assign(n + 1, 1);\n        for (int i = 0; i < n; ++i) {\n    \
-    \        // Use __int128_t to prevent overflow during multiplication\n       \
-    \     hash[i + 1] = (static_cast<__int128_t>(hash[i]) * Base + s[i]) % Mod;\n\
-    \            power[i + 1] = (static_cast<__int128_t>(power[i]) * Base) % Mod;\n\
-    \        }\n    }\n\n    // Returns the hash of the substring S[l..r) in O(1).\n\
-    \    long long get(int l, int r) const {\n        long long res = hash[r] - (static_cast<__int128_t>(hash[l])\
-    \ * power[r - l]) % Mod;\n        if (res < 0) res += Mod;\n        return res;\n\
-    \    }\n\n    // Returns the hash of the concatenated substrings S[l1..r1) and\
-    \ S[l2..r2).\n    long long concat(int l1, int r1, int l2, int r2) const {\n \
-    \       long long h1 = get(l1, r1);\n        long long h2 = get(l2, r2);\n   \
-    \     return combine(h1, h2, power[r2 - l2]);\n    }\n\n    // Calculates the\
-    \ Longest Common Prefix (LCP) length of S[l1..r1) and S[l2..r2) in O(log N).\n\
-    \    int lcp(int l1, int r1, int l2, int r2) const {\n        int len = std::min(r1\
-    \ - l1, r2 - l2);\n        int low = 0, high = len + 1;\n        while (high -\
-    \ low > 1) {\n            int mid = low + (high - low) / 2;\n            if (get(l1,\
-    \ l1 + mid) == get(l2, l2 + mid)) {\n                low = mid;\n            }\
-    \ else {\n                high = mid;\n            }\n        }\n        return\
-    \ low;\n    }\n\n    // Lexicographically compares S[l1..r1) and S[l2..r2) in\
-    \ O(log N).\n    // Returns -1 if S[l1..r1) < S[l2..r2), 0 if equal, and 1 if\
-    \ S[l1..r1) > S[l2..r2).\n    int compare(int l1, int r1, int l2, int r2) const\
-    \ {\n        int l = lcp(l1, r1, l2, r2);\n        bool end1 = (l1 + l == r1);\n\
-    \        bool end2 = (l2 + l == r2);\n        if (end1 && end2) return 0;\n  \
-    \      if (end1) return -1;\n        if (end2) return 1;\n        return s[l1\
-    \ + l] < s[l2 + l] ? -1 : 1;\n    }\n\n    // Returns the hash of the substring\
-    \ S[l..r) repeated 'k' times.\n    long long repeat(int l, int r, long long k)\
-    \ const {\n        long long h = get(l, r);\n        long long p = power[r - l];\n\
-    \        return repeat_hash(h, p, k);\n    }\n\n    // --- Static Helpers for\
-    \ dynamic processing and Monoid integration ---\n\n    // Computes the hash of\
-    \ a single string in O(N) time and O(1) space.\n    static long long compute_hash(const\
-    \ std::string& str) {\n        long long h = 0;\n        for (char c : str) {\n\
-    \            h = (static_cast<__int128_t>(h) * Base + c) % Mod;\n        }\n \
-    \       return h;\n    }\n\n    // Combines two hashes. Equivalent to concatenating\
-    \ string 'b' to the right of string 'a'.\n    static constexpr long long combine(long\
-    \ long h1, long long h2, long long base_power2) {\n        return (static_cast<__int128_t>(h1)\
-    \ * base_power2 + h2) % Mod;\n    }\n\n    // Returns the hash of a string (with\
-    \ hash 'h' and base_power 'p') repeated 'k' times.\n    static constexpr long\
-    \ long repeat_hash(long long h, long long p, long long k) {\n        long long\
-    \ res_h = 0;\n        long long res_p = 1;\n        long long cur_h = h;\n   \
-    \     long long cur_p = p;\n        while (k > 0) {\n            if (k & 1) {\n\
-    \                res_h = combine(res_h, cur_h, cur_p);\n                res_p\
-    \ = (static_cast<__int128_t>(res_p) * cur_p) % Mod;\n            }\n         \
-    \   cur_h = combine(cur_h, cur_h, cur_p);\n            cur_p = (static_cast<__int128_t>(cur_p)\
-    \ * cur_p) % Mod;\n            k >>= 1;\n        }\n        return res_h;\n  \
-    \  }\n\n    // Creates the state pair {hash_value, base_power} for a single character.\n\
-    \    static constexpr std::pair<long long, long long> make_single(long long c)\
-    \ {\n        return {c % Mod, Base % Mod};\n    }\n};\n\n}  // namespace string\n\
-    }  // namespace m1une\n\n\n#line 1 \"string/string_hash.hpp\"\n\n\n\n#line 5 \"\
-    string/string_hash.hpp\"\n#include <cstdint>\n#line 7 \"string/string_hash.hpp\"\
-    \n#include <string_view>\n\nnamespace m1une {\nnamespace string {\n\nstruct StringHash\
-    \ {\n    std::uint32_t first;\n    std::uint32_t second;\n    std::uint32_t first_power;\n\
-    \    std::uint32_t second_power;\n    std::size_t length;\n\n    friend constexpr\
-    \ bool operator==(const StringHash& left, const StringHash& right) {\n       \
-    \ return left.length == right.length && left.first == right.first && left.second\
-    \ == right.second;\n    }\n};\n\nnamespace string_hash_detail {\n\ninline constexpr\
-    \ std::uint64_t first_mod = 1'000'000'007;\ninline constexpr std::uint64_t second_mod\
-    \ = 1'000'000'009;\ninline constexpr std::uint64_t base = 911'382'323;\n\n}  //\
-    \ namespace string_hash_detail\n\n// Computes a double polynomial hash. Bytes\
-    \ are interpreted as unsigned.\nconstexpr StringHash hash_string(std::string_view\
-    \ value) {\n    using namespace string_hash_detail;\n    std::uint64_t first =\
-    \ 0;\n    std::uint64_t second = 0;\n    std::uint64_t first_power = 1;\n    std::uint64_t\
-    \ second_power = 1;\n    for (char character : value) {\n        std::uint64_t\
-    \ symbol = static_cast<unsigned char>(character) + std::uint64_t(1);\n       \
-    \ first = (first * base + symbol) % first_mod;\n        second = (second * base\
-    \ + symbol) % second_mod;\n        first_power = first_power * base % first_mod;\n\
-    \        second_power = second_power * base % second_mod;\n    }\n    return StringHash{\n\
-    \        static_cast<std::uint32_t>(first),\n        static_cast<std::uint32_t>(second),\n\
-    \        static_cast<std::uint32_t>(first_power),\n        static_cast<std::uint32_t>(second_power),\n\
-    \        value.size(),\n    };\n}\n\nconstexpr StringHash hash_string(const std::string&\
-    \ value) {\n    return hash_string(std::string_view(value));\n}\n\nconstexpr StringHash\
-    \ hash_string(const char* value) {\n    return hash_string(std::string_view(value));\n\
-    }\n\n// Returns the hash of the concatenation represented by `left` and `right`.\n\
-    constexpr StringHash concat_string_hash(const StringHash& left, const StringHash&\
-    \ right) {\n    using namespace string_hash_detail;\n    return StringHash{\n\
-    \        static_cast<std::uint32_t>((std::uint64_t(left.first) * right.first_power\
-    \ + right.first) % first_mod),\n        static_cast<std::uint32_t>((std::uint64_t(left.second)\
+    \n#line 1 \"string/rolling_hash.hpp\"\n\n\n\n#line 8 \"string/rolling_hash.hpp\"\
+    \n\nnamespace m1une {\nnamespace string {\n\n// Standard Rolling Hash for static\
+    \ strings.\n// Precomputes hashes to answer substring queries in O(1).\n// Provides\
+    \ advanced operations like LCP, lexicographical comparison, and string repetition\
+    \ in O(log N).\ntemplate <long long Base = 10007, long long Mod = (1LL << 61)\
+    \ - 1>\nstruct RollingHash {\n    std::string s;\n    std::vector<long long> hash;\n\
+    \    std::vector<long long> power;\n\n    RollingHash() = default;\n\n    // Constructs\
+    \ the rolling hash table for the given string.\n    explicit RollingHash(const\
+    \ std::string& str) : s(str) {\n        int n = s.size();\n        hash.assign(n\
+    \ + 1, 0);\n        power.assign(n + 1, 1);\n        for (int i = 0; i < n; ++i)\
+    \ {\n            // Use __int128_t to prevent overflow during multiplication\n\
+    \            hash[i + 1] = (static_cast<__int128_t>(hash[i]) * Base + s[i]) %\
+    \ Mod;\n            power[i + 1] = (static_cast<__int128_t>(power[i]) * Base)\
+    \ % Mod;\n        }\n    }\n\n    // Returns the hash of the substring S[l..r)\
+    \ in O(1).\n    long long get(int l, int r) const {\n        long long res = hash[r]\
+    \ - (static_cast<__int128_t>(hash[l]) * power[r - l]) % Mod;\n        if (res\
+    \ < 0) res += Mod;\n        return res;\n    }\n\n    // Returns the hash of the\
+    \ concatenated substrings S[l1..r1) and S[l2..r2).\n    long long concat(int l1,\
+    \ int r1, int l2, int r2) const {\n        long long h1 = get(l1, r1);\n     \
+    \   long long h2 = get(l2, r2);\n        return combine(h1, h2, power[r2 - l2]);\n\
+    \    }\n\n    // Calculates the Longest Common Prefix (LCP) length of S[l1..r1)\
+    \ and S[l2..r2) in O(log N).\n    int lcp(int l1, int r1, int l2, int r2) const\
+    \ {\n        int len = std::min(r1 - l1, r2 - l2);\n        int low = 0, high\
+    \ = len + 1;\n        while (high - low > 1) {\n            int mid = low + (high\
+    \ - low) / 2;\n            if (get(l1, l1 + mid) == get(l2, l2 + mid)) {\n   \
+    \             low = mid;\n            } else {\n                high = mid;\n\
+    \            }\n        }\n        return low;\n    }\n\n    // Lexicographically\
+    \ compares S[l1..r1) and S[l2..r2) in O(log N).\n    // Returns -1 if S[l1..r1)\
+    \ < S[l2..r2), 0 if equal, and 1 if S[l1..r1) > S[l2..r2).\n    int compare(int\
+    \ l1, int r1, int l2, int r2) const {\n        int l = lcp(l1, r1, l2, r2);\n\
+    \        bool end1 = (l1 + l == r1);\n        bool end2 = (l2 + l == r2);\n  \
+    \      if (end1 && end2) return 0;\n        if (end1) return -1;\n        if (end2)\
+    \ return 1;\n        return s[l1 + l] < s[l2 + l] ? -1 : 1;\n    }\n\n    // Returns\
+    \ the hash of the substring S[l..r) repeated 'k' times.\n    long long repeat(int\
+    \ l, int r, long long k) const {\n        long long h = get(l, r);\n        long\
+    \ long p = power[r - l];\n        return repeat_hash(h, p, k);\n    }\n\n    //\
+    \ --- Static Helpers for dynamic processing and Monoid integration ---\n\n   \
+    \ // Computes the hash of a single string in O(N) time and O(1) space.\n    static\
+    \ long long compute_hash(const std::string& str) {\n        long long h = 0;\n\
+    \        for (char c : str) {\n            h = (static_cast<__int128_t>(h) * Base\
+    \ + c) % Mod;\n        }\n        return h;\n    }\n\n    // Combines two hashes.\
+    \ Equivalent to concatenating string 'b' to the right of string 'a'.\n    static\
+    \ constexpr long long combine(long long h1, long long h2, long long base_power2)\
+    \ {\n        return (static_cast<__int128_t>(h1) * base_power2 + h2) % Mod;\n\
+    \    }\n\n    // Returns the hash of a string (with hash 'h' and base_power 'p')\
+    \ repeated 'k' times.\n    static constexpr long long repeat_hash(long long h,\
+    \ long long p, long long k) {\n        long long res_h = 0;\n        long long\
+    \ res_p = 1;\n        long long cur_h = h;\n        long long cur_p = p;\n   \
+    \     while (k > 0) {\n            if (k & 1) {\n                res_h = combine(res_h,\
+    \ cur_h, cur_p);\n                res_p = (static_cast<__int128_t>(res_p) * cur_p)\
+    \ % Mod;\n            }\n            cur_h = combine(cur_h, cur_h, cur_p);\n \
+    \           cur_p = (static_cast<__int128_t>(cur_p) * cur_p) % Mod;\n        \
+    \    k >>= 1;\n        }\n        return res_h;\n    }\n\n    // Creates the state\
+    \ pair {hash_value, base_power} for a single character.\n    static constexpr\
+    \ std::pair<long long, long long> make_single(long long c) {\n        return {c\
+    \ % Mod, Base % Mod};\n    }\n};\n\n}  // namespace string\n}  // namespace m1une\n\
+    \n\n#line 1 \"string/string_hash.hpp\"\n\n\n\n#line 5 \"string/string_hash.hpp\"\
+    \n#include <cstdint>\n#line 7 \"string/string_hash.hpp\"\n#include <string_view>\n\
+    \nnamespace m1une {\nnamespace string {\n\nstruct StringHash {\n    std::uint32_t\
+    \ first;\n    std::uint32_t second;\n    std::uint32_t first_power;\n    std::uint32_t\
+    \ second_power;\n    std::size_t length;\n\n    friend constexpr bool operator==(const\
+    \ StringHash& left, const StringHash& right) {\n        return left.length ==\
+    \ right.length && left.first == right.first && left.second == right.second;\n\
+    \    }\n};\n\nnamespace string_hash_detail {\n\ninline constexpr std::uint64_t\
+    \ first_mod = 1'000'000'007;\ninline constexpr std::uint64_t second_mod = 1'000'000'009;\n\
+    inline constexpr std::uint64_t base = 911'382'323;\n\n}  // namespace string_hash_detail\n\
+    \n// Computes a double polynomial hash. Bytes are interpreted as unsigned.\nconstexpr\
+    \ StringHash hash_string(std::string_view value) {\n    using namespace string_hash_detail;\n\
+    \    std::uint64_t first = 0;\n    std::uint64_t second = 0;\n    std::uint64_t\
+    \ first_power = 1;\n    std::uint64_t second_power = 1;\n    for (char character\
+    \ : value) {\n        std::uint64_t symbol = static_cast<unsigned char>(character)\
+    \ + std::uint64_t(1);\n        first = (first * base + symbol) % first_mod;\n\
+    \        second = (second * base + symbol) % second_mod;\n        first_power\
+    \ = first_power * base % first_mod;\n        second_power = second_power * base\
+    \ % second_mod;\n    }\n    return StringHash{\n        static_cast<std::uint32_t>(first),\n\
+    \        static_cast<std::uint32_t>(second),\n        static_cast<std::uint32_t>(first_power),\n\
+    \        static_cast<std::uint32_t>(second_power),\n        value.size(),\n  \
+    \  };\n}\n\nconstexpr StringHash hash_string(const std::string& value) {\n   \
+    \ return hash_string(std::string_view(value));\n}\n\nconstexpr StringHash hash_string(const\
+    \ char* value) {\n    return hash_string(std::string_view(value));\n}\n\n// Returns\
+    \ the hash of the concatenation represented by `left` and `right`.\nconstexpr\
+    \ StringHash concat_string_hash(const StringHash& left, const StringHash& right)\
+    \ {\n    using namespace string_hash_detail;\n    return StringHash{\n       \
+    \ static_cast<std::uint32_t>((std::uint64_t(left.first) * right.first_power +\
+    \ right.first) % first_mod),\n        static_cast<std::uint32_t>((std::uint64_t(left.second)\
     \ * right.second_power + right.second) % second_mod),\n        static_cast<std::uint32_t>(std::uint64_t(left.first_power)\
     \ * right.first_power % first_mod),\n        static_cast<std::uint32_t>(std::uint64_t(left.second_power)\
     \ * right.second_power % second_mod),\n        left.length + right.length,\n \
@@ -569,71 +674,19 @@ data:
     \            if (best_length < current_length) {\n                best_length\
     \ = current_length;\n                best_end = end;\n            }\n        }\n\
     \        return {best_end - best_length, best_end};\n    }\n};\n\n}  // namespace\
-    \ string\n}  // namespace m1une\n\n\n#line 1 \"string/suffix_array.hpp\"\n\n\n\
-    \n#line 6 \"string/suffix_array.hpp\"\n#include <numeric>\n#line 8 \"string/suffix_array.hpp\"\
-    \n#include <type_traits>\n#line 10 \"string/suffix_array.hpp\"\n\nnamespace m1une\
-    \ {\nnamespace string {\nnamespace detail {\n\ntemplate <class Sequence>\nstd::vector<int>\
-    \ suffix_array_impl(const Sequence& sequence) {\n    int n = int(sequence.size());\n\
-    \    if (n == 0) return {};\n\n    using Value = std::remove_cv_t<std::remove_reference_t<decltype(sequence[0])>>;\n\
-    \    std::vector<Value> sorted(sequence.begin(), sequence.end());\n    std::sort(sorted.begin(),\
-    \ sorted.end());\n    sorted.erase(std::unique(sorted.begin(), sorted.end()),\
-    \ sorted.end());\n\n    int length = n + 1;\n    std::vector<int> order(length);\n\
-    \    std::vector<int> rank(length);\n    std::vector<int> key(length);\n    key[n]\
-    \ = 0;\n    for (int i = 0; i < n; i++) {\n        key[i] = int(std::lower_bound(sorted.begin(),\
-    \ sorted.end(), sequence[i]) - sorted.begin()) + 1;\n    }\n\n    int alphabet\
-    \ = int(sorted.size()) + 1;\n    std::vector<int> count(std::max(length, alphabet),\
-    \ 0);\n    for (int value : key) count[value]++;\n    for (int i = 1; i < alphabet;\
-    \ i++) count[i] += count[i - 1];\n    for (int i = length - 1; i >= 0; i--) order[--count[key[i]]]\
-    \ = i;\n\n    int classes = 1;\n    rank[order[0]] = 0;\n    for (int i = 1; i\
-    \ < length; i++) {\n        if (key[order[i - 1]] != key[order[i]]) classes++;\n\
-    \        rank[order[i]] = classes - 1;\n    }\n\n    std::vector<int> shifted(length);\n\
-    \    std::vector<int> next_rank(length);\n    for (long long half = 1; half <\
-    \ length; half <<= 1) {\n        for (int i = 0; i < length; i++) {\n        \
-    \    long long position = order[i] - half;\n            if (position < 0) position\
-    \ += length;\n            shifted[i] = int(position);\n        }\n\n        count.assign(classes,\
-    \ 0);\n        for (int position : shifted) count[rank[position]]++;\n       \
-    \ for (int i = 1; i < classes; i++) count[i] += count[i - 1];\n        for (int\
-    \ i = length - 1; i >= 0; i--) {\n            int position = shifted[i];\n   \
-    \         order[--count[rank[position]]] = position;\n        }\n\n        int\
-    \ next_classes = 1;\n        next_rank[order[0]] = 0;\n        for (int i = 1;\
-    \ i < length; i++) {\n            int current = order[i];\n            int previous\
-    \ = order[i - 1];\n            int current_second = int((current + half) % length);\n\
-    \            int previous_second = int((previous + half) % length);\n        \
-    \    if (\n                rank[current] != rank[previous] ||\n              \
-    \  rank[current_second] != rank[previous_second]\n            ) {\n          \
-    \      next_classes++;\n            }\n            next_rank[current] = next_classes\
-    \ - 1;\n        }\n        rank.swap(next_rank);\n        classes = next_classes;\n\
-    \        if (classes == length) break;\n    }\n\n    std::vector<int> suffixes(n);\n\
-    \    for (int i = 0; i < n; i++) suffixes[i] = order[i + 1];\n    return suffixes;\n\
-    }\n\n}  // namespace detail\n\ntemplate <class Sequence>\nstd::vector<int> suffix_array(const\
-    \ Sequence& sequence) {\n    return detail::suffix_array_impl(sequence);\n}\n\n\
-    inline std::vector<int> suffix_array(const std::string& text) {\n    std::vector<unsigned\
-    \ char> values;\n    values.reserve(text.size());\n    for (unsigned char character\
-    \ : text) values.push_back(character);\n    return detail::suffix_array_impl(values);\n\
-    }\n\ntemplate <class Sequence>\nstd::vector<int> lcp_array(const Sequence& sequence,\
-    \ const std::vector<int>& suffixes) {\n    int n = int(sequence.size());\n   \
-    \ assert(int(suffixes.size()) == n);\n    if (n == 0) return {};\n\n    std::vector<int>\
-    \ rank(n);\n    for (int i = 0; i < n; i++) {\n        assert(0 <= suffixes[i]\
-    \ && suffixes[i] < n);\n        rank[suffixes[i]] = i;\n    }\n\n    std::vector<int>\
-    \ lcp(n - 1);\n    int common = 0;\n    for (int i = 0; i < n; i++) {\n      \
-    \  int position = rank[i];\n        if (position == n - 1) {\n            common\
-    \ = 0;\n            continue;\n        }\n        int j = suffixes[position +\
-    \ 1];\n        while (\n            i + common < n &&\n            j + common\
-    \ < n &&\n            sequence[i + common] == sequence[j + common]\n        )\
-    \ {\n            common++;\n        }\n        lcp[position] = common;\n     \
-    \   if (common > 0) common--;\n    }\n    return lcp;\n}\n\n}  // namespace string\n\
-    }  // namespace m1une\n\n\n#line 1 \"string/trie.hpp\"\n\n\n\n#line 9 \"string/trie.hpp\"\
-    \n\nnamespace m1une {\nnamespace string {\n\n// A multiset trie for a contiguous\
-    \ character alphabet.\ntemplate <int AlphabetSize = 26, int FirstCharacter = 'a'>\n\
-    struct Trie {\n    static_assert(0 < AlphabetSize);\n\n    using node_id = int;\n\
-    \    static constexpr node_id null_node = -1;\n\n    struct Node {\n        std::array<node_id,\
-    \ AlphabetSize> child;\n        int subtree_count;\n        int terminal_count;\n\
-    \n        Node() : subtree_count(0), terminal_count(0) {\n            child.fill(null_node);\n\
-    \        }\n    };\n\n   private:\n    std::vector<Node> _nodes;\n    int _distinct_size;\n\
-    \n    template <class Symbol>\n    static int symbol_index(const Symbol& symbol)\
-    \ {\n        int index = int(symbol) - FirstCharacter;\n        assert(0 <= index\
-    \ && index < AlphabetSize);\n        return index;\n    }\n\n    node_id new_node()\
-    \ {\n        assert(_nodes.size() < std::size_t(std::numeric_limits<int>::max()));\n\
+    \ string\n}  // namespace m1une\n\n\n#line 1 \"string/trie.hpp\"\n\n\n\n#line\
+    \ 9 \"string/trie.hpp\"\n\nnamespace m1une {\nnamespace string {\n\n// A multiset\
+    \ trie for a contiguous character alphabet.\ntemplate <int AlphabetSize = 26,\
+    \ int FirstCharacter = 'a'>\nstruct Trie {\n    static_assert(0 < AlphabetSize);\n\
+    \n    using node_id = int;\n    static constexpr node_id null_node = -1;\n\n \
+    \   struct Node {\n        std::array<node_id, AlphabetSize> child;\n        int\
+    \ subtree_count;\n        int terminal_count;\n\n        Node() : subtree_count(0),\
+    \ terminal_count(0) {\n            child.fill(null_node);\n        }\n    };\n\
+    \n   private:\n    std::vector<Node> _nodes;\n    int _distinct_size;\n\n    template\
+    \ <class Symbol>\n    static int symbol_index(const Symbol& symbol) {\n      \
+    \  int index = int(symbol) - FirstCharacter;\n        assert(0 <= index && index\
+    \ < AlphabetSize);\n        return index;\n    }\n\n    node_id new_node() {\n\
+    \        assert(_nodes.size() < std::size_t(std::numeric_limits<int>::max()));\n\
     \        _nodes.emplace_back();\n        return int(_nodes.size()) - 1;\n    }\n\
     \n    template <class Sequence>\n    node_id find_node(const Sequence& sequence)\
     \ const {\n        node_id node = 0;\n        for (const auto& symbol : sequence)\
@@ -709,7 +762,7 @@ data:
     \ + z[i] < n && sequence[z[i]] == sequence[i + z[i]]) {\n            z[i]++;\n\
     \        }\n        if (right < i + z[i]) {\n            left = i;\n         \
     \   right = i + z[i];\n        }\n    }\n    return z;\n}\n\n}  // namespace string\n\
-    }  // namespace m1une\n\n\n#line 16 \"string/all.hpp\"\n\n\n#line 4 \"verify/string/string_algorithms.test.cpp\"\
+    }  // namespace m1une\n\n\n#line 17 \"string/all.hpp\"\n\n\n#line 4 \"verify/string/string_algorithms.test.cpp\"\
     \n\n#line 8 \"verify/string/string_algorithms.test.cpp\"\n#include <iostream>\n\
     #line 12 \"verify/string/string_algorithms.test.cpp\"\n\nnamespace {\n\nvoid test_edge_cases()\
     \ {\n    std::string empty;\n    assert(m1une::string::z_algorithm(empty).empty());\n\
@@ -869,6 +922,8 @@ data:
   - string/all.hpp
   - string/aho_corasick.hpp
   - string/eertree.hpp
+  - string/lce.hpp
+  - string/suffix_array.hpp
   - string/levenshtein_distance.hpp
   - string/lyndon_factorization.hpp
   - string/manacher.hpp
@@ -876,13 +931,12 @@ data:
   - string/rolling_hash.hpp
   - string/string_hash.hpp
   - string/suffix_automaton.hpp
-  - string/suffix_array.hpp
   - string/trie.hpp
   - string/z_algorithm.hpp
   isVerificationFile: true
   path: verify/string/string_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-09 01:38:54+09:00'
+  timestamp: '2026-07-09 02:24:22+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/string/string_algorithms.test.cpp

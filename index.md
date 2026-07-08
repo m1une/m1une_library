@@ -865,6 +865,9 @@ data:
       path: string/eertree.hpp
       title: Eertree
     - icon: ':heavy_check_mark:'
+      path: string/lce.hpp
+      title: Longest Common Extension
+    - icon: ':heavy_check_mark:'
       path: string/levenshtein_distance.hpp
       title: Levenshtein Distance
     - icon: ':heavy_check_mark:'
@@ -1497,6 +1500,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/string/eertree.test.cpp
       title: verify/string/eertree.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/string/lce.test.cpp
+      title: verify/string/lce.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/string/levenshtein_distance.test.cpp
       title: verify/string/levenshtein_distance.test.cpp
