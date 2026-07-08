@@ -557,6 +557,9 @@ data:
       path: graph/tree/all.hpp
       title: Tree All
     - icon: ':heavy_check_mark:'
+      path: graph/tree/cartesian_tree.hpp
+      title: Cartesian Tree
+    - icon: ':heavy_check_mark:'
       path: graph/tree/centroid_decomposition.hpp
       title: Centroid Decomposition
     - icon: ':heavy_check_mark:'
@@ -1308,6 +1311,9 @@ data:
       title: verify/graph/flow/flow_algorithms.test.cpp
   - name: verify/graph/tree
     pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/tree/cartesian_tree.test.cpp
+      title: verify/graph/tree/cartesian_tree.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/graph/tree/dsu_on_tree.test.cpp
       title: verify/graph/tree/dsu_on_tree.test.cpp

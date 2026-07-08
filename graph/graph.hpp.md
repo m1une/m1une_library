@@ -72,6 +72,9 @@ data:
     path: graph/tree/all.hpp
     title: Tree All
   - icon: ':heavy_check_mark:'
+    path: graph/tree/cartesian_tree.hpp
+    title: Cartesian Tree
+  - icon: ':heavy_check_mark:'
     path: graph/tree/centroid_decomposition.hpp
     title: Centroid Decomposition
   - icon: ':heavy_check_mark:'
@@ -168,6 +171,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/range_edge_graph.test.cpp
     title: verify/graph/range_edge_graph.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/cartesian_tree.test.cpp
+    title: verify/graph/tree/cartesian_tree.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/tree/dsu_on_tree.test.cpp
     title: verify/graph/tree/dsu_on_tree.test.cpp
@@ -326,6 +332,7 @@ data:
   - graph/tree/sparse_table_lca.hpp
   - graph/tree/rooted_tree.hpp
   - graph/tree/rerooting_dp.hpp
+  - graph/tree/cartesian_tree.hpp
   - graph/tree/all.hpp
   - graph/tree/rerooting_static_top_tree.hpp
   - graph/tree/heavy_light_decomposition.hpp
@@ -366,6 +373,7 @@ data:
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
   - verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
+  - verify/graph/tree/cartesian_tree.test.cpp
   - verify/graph/tree/tree_algorithms.test.cpp
   - verify/graph/tree/tree_algorithms.test.cpp
   - verify/graph/tree/dsu_on_tree.test.cpp

@@ -8,6 +8,9 @@ data:
     path: graph/graph.hpp
     title: Graph
   - icon: ':heavy_check_mark:'
+    path: graph/tree/cartesian_tree.hpp
+    title: Cartesian Tree
+  - icon: ':heavy_check_mark:'
     path: graph/tree/centroid_decomposition.hpp
     title: Centroid Decomposition
   - icon: ':heavy_check_mark:'
@@ -71,44 +74,44 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"graph/tree/all.hpp\"\n\n\n\n#line 1 \"graph/tree/centroid_decomposition.hpp\"\
-    \n\n\n\n#include <algorithm>\n#include <vector>\n\n#line 1 \"graph/graph.hpp\"\
-    \n\n\n\n#include <cassert>\n#include <utility>\n#line 7 \"graph/graph.hpp\"\n\n\
-    namespace m1une {\nnamespace graph {\n\ntemplate <class T = int>\nstruct Edge\
-    \ {\n    using cost_type = T;\n\n    int from;\n    int to;\n    T cost;\n   \
-    \ int id;\n    bool alive;\n\n    Edge() : from(-1), to(-1), cost(T()), id(-1),\
-    \ alive(true) {}\n    Edge(int from_, int to_, T cost_ = T(1), int id_ = -1, bool\
-    \ alive_ = true)\n        : from(from_), to(to_), cost(cost_), id(id_), alive(alive_)\
-    \ {}\n\n    int other(int v) const {\n        assert(v == from || v == to);\n\
-    \        return from ^ to ^ v;\n    }\n};\n\ntemplate <class T = int>\nstruct\
-    \ Graph {\n    using edge_type = Edge<T>;\n    using cost_type = T;\n\n   private:\n\
-    \    int _n;\n    int _edge_count;\n    std::vector<std::vector<edge_type>> _g;\n\
-    \    std::vector<std::vector<std::pair<int, int>>> _edge_positions;\n\n   public:\n\
-    \    Graph() : _n(0), _edge_count(0) {}\n    explicit Graph(int n) : _n(n), _edge_count(0),\
-    \ _g(n) {\n        assert(0 <= n);\n    }\n\n    int size() const {\n        return\
-    \ _n;\n    }\n\n    bool empty() const {\n        return _n == 0;\n    }\n\n \
-    \   int edge_count() const {\n        return _edge_count;\n    }\n\n    int add_vertex()\
-    \ {\n        _g.emplace_back();\n        return _n++;\n    }\n\n    int add_directed_edge(int\
-    \ from, int to, T cost = T(1)) {\n        assert(0 <= from && from < _n);\n  \
-    \      assert(0 <= to && to < _n);\n        int id = _edge_count++;\n        int\
-    \ idx = int(_g[from].size());\n        _g[from].push_back(edge_type(from, to,\
-    \ cost, id));\n        _edge_positions.emplace_back();\n        _edge_positions.back().push_back({from,\
-    \ idx});\n        return id;\n    }\n\n    int add_edge(int u, int v, T cost =\
-    \ T(1)) {\n        assert(0 <= u && u < _n);\n        assert(0 <= v && v < _n);\n\
-    \        int id = _edge_count++;\n        int u_idx = int(_g[u].size());\n   \
-    \     int v_idx = int(_g[v].size());\n        _g[u].push_back(edge_type(u, v,\
-    \ cost, id));\n        _g[v].push_back(edge_type(v, u, cost, id));\n        _edge_positions.emplace_back();\n\
-    \        _edge_positions.back().push_back({u, u_idx});\n        _edge_positions.back().push_back({v,\
-    \ v_idx});\n        return id;\n    }\n\n    void set_edge_alive(int id, bool\
-    \ alive) {\n        assert(0 <= id && id < _edge_count);\n        for (auto [v,\
-    \ idx] : _edge_positions[id]) {\n            _g[v][idx].alive = alive;\n     \
-    \   }\n    }\n\n    void erase_edge(int id) {\n        set_edge_alive(id, false);\n\
-    \    }\n\n    void revive_edge(int id) {\n        set_edge_alive(id, true);\n\
-    \    }\n\n    bool is_edge_alive(int id) const {\n        assert(0 <= id && id\
-    \ < _edge_count);\n        assert(!_edge_positions[id].empty());\n        auto\
-    \ [v, idx] = _edge_positions[id][0];\n        return _g[v][idx].alive;\n    }\n\
-    \n    const std::vector<edge_type>& operator[](int v) const {\n        assert(0\
-    \ <= v && v < _n);\n        return _g[v];\n    }\n\n    std::vector<edge_type>&\
+  bundledCode: "#line 1 \"graph/tree/all.hpp\"\n\n\n\n#line 1 \"graph/tree/cartesian_tree.hpp\"\
+    \n\n\n\n#include <cassert>\n#include <cstddef>\n#include <functional>\n#include\
+    \ <limits>\n#include <utility>\n#include <vector>\n\n#line 1 \"graph/graph.hpp\"\
+    \n\n\n\n#line 7 \"graph/graph.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\n\
+    template <class T = int>\nstruct Edge {\n    using cost_type = T;\n\n    int from;\n\
+    \    int to;\n    T cost;\n    int id;\n    bool alive;\n\n    Edge() : from(-1),\
+    \ to(-1), cost(T()), id(-1), alive(true) {}\n    Edge(int from_, int to_, T cost_\
+    \ = T(1), int id_ = -1, bool alive_ = true)\n        : from(from_), to(to_), cost(cost_),\
+    \ id(id_), alive(alive_) {}\n\n    int other(int v) const {\n        assert(v\
+    \ == from || v == to);\n        return from ^ to ^ v;\n    }\n};\n\ntemplate <class\
+    \ T = int>\nstruct Graph {\n    using edge_type = Edge<T>;\n    using cost_type\
+    \ = T;\n\n   private:\n    int _n;\n    int _edge_count;\n    std::vector<std::vector<edge_type>>\
+    \ _g;\n    std::vector<std::vector<std::pair<int, int>>> _edge_positions;\n\n\
+    \   public:\n    Graph() : _n(0), _edge_count(0) {}\n    explicit Graph(int n)\
+    \ : _n(n), _edge_count(0), _g(n) {\n        assert(0 <= n);\n    }\n\n    int\
+    \ size() const {\n        return _n;\n    }\n\n    bool empty() const {\n    \
+    \    return _n == 0;\n    }\n\n    int edge_count() const {\n        return _edge_count;\n\
+    \    }\n\n    int add_vertex() {\n        _g.emplace_back();\n        return _n++;\n\
+    \    }\n\n    int add_directed_edge(int from, int to, T cost = T(1)) {\n     \
+    \   assert(0 <= from && from < _n);\n        assert(0 <= to && to < _n);\n   \
+    \     int id = _edge_count++;\n        int idx = int(_g[from].size());\n     \
+    \   _g[from].push_back(edge_type(from, to, cost, id));\n        _edge_positions.emplace_back();\n\
+    \        _edge_positions.back().push_back({from, idx});\n        return id;\n\
+    \    }\n\n    int add_edge(int u, int v, T cost = T(1)) {\n        assert(0 <=\
+    \ u && u < _n);\n        assert(0 <= v && v < _n);\n        int id = _edge_count++;\n\
+    \        int u_idx = int(_g[u].size());\n        int v_idx = int(_g[v].size());\n\
+    \        _g[u].push_back(edge_type(u, v, cost, id));\n        _g[v].push_back(edge_type(v,\
+    \ u, cost, id));\n        _edge_positions.emplace_back();\n        _edge_positions.back().push_back({u,\
+    \ u_idx});\n        _edge_positions.back().push_back({v, v_idx});\n        return\
+    \ id;\n    }\n\n    void set_edge_alive(int id, bool alive) {\n        assert(0\
+    \ <= id && id < _edge_count);\n        for (auto [v, idx] : _edge_positions[id])\
+    \ {\n            _g[v][idx].alive = alive;\n        }\n    }\n\n    void erase_edge(int\
+    \ id) {\n        set_edge_alive(id, false);\n    }\n\n    void revive_edge(int\
+    \ id) {\n        set_edge_alive(id, true);\n    }\n\n    bool is_edge_alive(int\
+    \ id) const {\n        assert(0 <= id && id < _edge_count);\n        assert(!_edge_positions[id].empty());\n\
+    \        auto [v, idx] = _edge_positions[id][0];\n        return _g[v][idx].alive;\n\
+    \    }\n\n    const std::vector<edge_type>& operator[](int v) const {\n      \
+    \  assert(0 <= v && v < _n);\n        return _g[v];\n    }\n\n    std::vector<edge_type>&\
     \ operator[](int v) {\n        assert(0 <= v && v < _n);\n        return _g[v];\n\
     \    }\n\n    const std::vector<std::vector<edge_type>>& adjacency() const {\n\
     \        return _g;\n    }\n\n    std::vector<std::vector<edge_type>>& adjacency()\
@@ -127,8 +130,44 @@ data:
     \ e.from, e.cost, e.id, e.alive));\n                if (0 <= e.id && e.id < _edge_count)\
     \ result._edge_positions[e.id].push_back({e.to, idx});\n            }\n      \
     \  }\n        return result;\n    }\n};\n\n}  // namespace graph\n}  // namespace\
-    \ m1une\n\n\n#line 8 \"graph/tree/centroid_decomposition.hpp\"\n\nnamespace m1une\
-    \ {\nnamespace tree {\n\ntemplate <class T = int>\nstruct CentroidDecomposition\
+    \ m1une\n\n\n#line 12 \"graph/tree/cartesian_tree.hpp\"\n\nnamespace m1une {\n\
+    namespace tree {\n\nstruct CartesianTree {\n    int root;\n    std::vector<int>\
+    \ parent;\n    std::vector<int> left;\n    std::vector<int> right;\n\n   private:\n\
+    \    int _n;\n\n    void check_vertex(int v) const {\n        assert(0 <= v &&\
+    \ v < _n);\n    }\n\n   public:\n    CartesianTree() : root(-1), _n(0) {}\n\n\
+    \    template <class T, class Compare = std::less<T>>\n    explicit CartesianTree(const\
+    \ std::vector<T>& a, Compare comp = Compare()) : root(-1), _n(0) {\n        build(a,\
+    \ comp);\n    }\n\n    template <class T, class Compare = std::less<T>>\n    void\
+    \ build(const std::vector<T>& a, Compare comp = Compare()) {\n        assert(a.size()\
+    \ <= static_cast<std::size_t>(std::numeric_limits<int>::max()));\n        _n =\
+    \ int(a.size());\n        root = -1;\n        parent.assign(_n, -1);\n       \
+    \ left.assign(_n, -1);\n        right.assign(_n, -1);\n\n        std::vector<int>\
+    \ stack;\n        stack.reserve(_n);\n        for (int i = 0; i < _n; i++) {\n\
+    \            int last = -1;\n            while (!stack.empty() && comp(a[i], a[stack.back()]))\
+    \ {\n                last = stack.back();\n                stack.pop_back();\n\
+    \            }\n            if (last != -1) {\n                left[i] = last;\n\
+    \                parent[last] = i;\n            }\n            if (!stack.empty())\
+    \ {\n                right[stack.back()] = i;\n                parent[i] = stack.back();\n\
+    \            }\n            stack.push_back(i);\n        }\n\n        if (!stack.empty())\
+    \ root = stack.front();\n    }\n\n    int size() const {\n        return _n;\n\
+    \    }\n\n    bool empty() const {\n        return _n == 0;\n    }\n\n    int\
+    \ parent_or_self(int v) const {\n        check_vertex(v);\n        return parent[v]\
+    \ == -1 ? v : parent[v];\n    }\n\n    std::vector<int> parent_with_root_self()\
+    \ const {\n        std::vector<int> result = parent;\n        if (root != -1)\
+    \ result[root] = root;\n        return result;\n    }\n\n    std::vector<std::pair<int,\
+    \ int>> edges() const {\n        std::vector<std::pair<int, int>> result;\n  \
+    \      if (_n == 0) return result;\n        result.reserve(_n - 1);\n        for\
+    \ (int v = 0; v < _n; v++) {\n            if (parent[v] != -1) result.emplace_back(parent[v],\
+    \ v);\n        }\n        return result;\n    }\n\n    m1une::graph::Graph<int>\
+    \ to_graph() const {\n        m1une::graph::Graph<int> g(_n);\n        for (int\
+    \ v = 0; v < _n; v++) {\n            if (parent[v] != -1) g.add_edge(parent[v],\
+    \ v);\n        }\n        return g;\n    }\n};\n\ntemplate <class T, class Compare\
+    \ = std::less<T>>\nCartesianTree cartesian_tree(const std::vector<T>& a, Compare\
+    \ comp = Compare()) {\n    CartesianTree result;\n    result.build(a, comp);\n\
+    \    return result;\n}\n\n}  // namespace tree\n}  // namespace m1une\n\n\n#line\
+    \ 1 \"graph/tree/centroid_decomposition.hpp\"\n\n\n\n#include <algorithm>\n#line\
+    \ 6 \"graph/tree/centroid_decomposition.hpp\"\n\n#line 8 \"graph/tree/centroid_decomposition.hpp\"\
+    \n\nnamespace m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct CentroidDecomposition\
     \ {\n    int n;\n    std::vector<int> parent;\n    std::vector<int> depth;\n \
     \   std::vector<int> order;\n    std::vector<int> roots;\n    std::vector<std::vector<int>>\
     \ children;\n\n   private:\n    std::vector<int> _subtree_size;\n    std::vector<int>\
@@ -679,8 +718,7 @@ data:
     \  }\n\n    std::vector<int> subtree_vertices(int v) const {\n        check_vertex(v);\n\
     \        return std::vector<int>(order.begin() + tin[v], order.begin() + tout[v]);\n\
     \    }\n};\n\n}  // namespace tree\n}  // namespace m1une\n\n\n#line 1 \"graph/tree/sparse_table_lca.hpp\"\
-    \n\n\n\n#line 6 \"graph/tree/sparse_table_lca.hpp\"\n#include <limits>\n#line\
-    \ 9 \"graph/tree/sparse_table_lca.hpp\"\n\n#line 1 \"ds/range_query/sparse_table.hpp\"\
+    \n\n\n\n#line 9 \"graph/tree/sparse_table_lca.hpp\"\n\n#line 1 \"ds/range_query/sparse_table.hpp\"\
     \n\n\n\n#include <bit>\n#line 6 \"ds/range_query/sparse_table.hpp\"\n#include\
     \ <concepts>\n#line 9 \"ds/range_query/sparse_table.hpp\"\n\n#line 1 \"monoid/concept.hpp\"\
     \n\n\n\n#line 5 \"monoid/concept.hpp\"\n\nnamespace m1une {\nnamespace monoid\
@@ -1093,12 +1131,14 @@ data:
     \ == n);\n    if (n == 0) return 0;\n    assert(0 <= root && root < n);\n    assert(int(graph.edges().size())\
     \ == n - 1);\n\n    RootedTree<T> rooted_tree(graph, root);\n    assert(int(rooted_tree.order.size())\
     \ == n);\n    return zero_one_on_tree(rooted_tree.parent, value);\n}\n\n}  //\
-    \ namespace tree\n}  // namespace m1une\n\n\n#line 17 \"graph/tree/all.hpp\"\n\
+    \ namespace tree\n}  // namespace m1une\n\n\n#line 18 \"graph/tree/all.hpp\"\n\
     \n\n"
   code: '#ifndef M1UNE_TREE_ALL_HPP
 
     #define M1UNE_TREE_ALL_HPP 1
 
+
+    #include "cartesian_tree.hpp"
 
     #include "centroid_decomposition.hpp"
 
@@ -1131,8 +1171,9 @@ data:
 
     '
   dependsOn:
-  - graph/tree/centroid_decomposition.hpp
+  - graph/tree/cartesian_tree.hpp
   - graph/graph.hpp
+  - graph/tree/centroid_decomposition.hpp
   - graph/tree/diameter.hpp
   - graph/tree/dsu_on_tree.hpp
   - graph/tree/heavy_light_decomposition.hpp
@@ -1151,7 +1192,7 @@ data:
   path: graph/tree/all.hpp
   requiredBy:
   - graph/all.hpp
-  timestamp: '2026-07-07 14:26:59+09:00'
+  timestamp: '2026-07-09 01:53:44+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
@@ -1165,14 +1206,16 @@ title: Tree All
 
 ## Overview
 
-`graph/tree/all.hpp` includes every tree header in this directory. The algorithms use
-`m1une::graph::Graph<T>` as their input container, so they compose with the
-existing graph library.
+`graph/tree/all.hpp` includes every tree header in this directory. Most
+algorithms use `m1une::graph::Graph<T>` as their input container, and
+sequence-derived helpers such as Cartesian tree can convert their result to the
+same graph container.
 
 ## Included Headers
 
 | Header | Contents |
 | --- | --- |
+| `graph/tree/cartesian_tree.hpp` | Cartesian tree construction from an array. |
 | `graph/tree/tree.hpp` | Core rooted tree and diameter bundle. |
 | `graph/tree/rooted_tree.hpp` | Rooted metadata, Euler intervals, LCA, jumps, paths, and distances. |
 | `graph/tree/sparse_table_lca.hpp` | Euler-tour sparse-table LCA with $O(1)$ queries. |

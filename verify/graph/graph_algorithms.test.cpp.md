@@ -104,6 +104,9 @@ data:
     path: graph/tree/all.hpp
     title: Tree All
   - icon: ':heavy_check_mark:'
+    path: graph/tree/cartesian_tree.hpp
+    title: Cartesian Tree
+  - icon: ':heavy_check_mark:'
     path: graph/tree/centroid_decomposition.hpp
     title: Centroid Decomposition
   - icon: ':heavy_check_mark:'
@@ -1665,39 +1668,75 @@ data:
     \ cost);\n        }\n        for (const auto& node : to_range_nodes(to_left, to_right))\
     \ {\n            _graph.add_directed_edge(auxiliary, node.vertex, T());\n    \
     \    }\n        return auxiliary;\n    }\n};\n\n}  // namespace graph\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"graph/tree/all.hpp\"\n\n\n\n#line 1 \"graph/tree/centroid_decomposition.hpp\"\
-    \n\n\n\n#line 6 \"graph/tree/centroid_decomposition.hpp\"\n\n#line 8 \"graph/tree/centroid_decomposition.hpp\"\
-    \n\nnamespace m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct CentroidDecomposition\
-    \ {\n    int n;\n    std::vector<int> parent;\n    std::vector<int> depth;\n \
-    \   std::vector<int> order;\n    std::vector<int> roots;\n    std::vector<std::vector<int>>\
-    \ children;\n\n   private:\n    std::vector<int> _subtree_size;\n    std::vector<int>\
-    \ _work_parent;\n    std::vector<char> _removed;\n\n    void build_component(const\
-    \ m1une::graph::Graph<T>& g, int start, int p, int d) {\n        std::vector<int>\
-    \ nodes;\n        std::vector<int> stack = {start};\n        _work_parent[start]\
-    \ = -2;\n        while (!stack.empty()) {\n            int v = stack.back();\n\
-    \            stack.pop_back();\n            nodes.push_back(v);\n            for\
-    \ (const auto& e : g[v]) {\n                if (!e.alive || _removed[e.to]) continue;\n\
-    \                if (_work_parent[e.to] != -1) continue;\n                _work_parent[e.to]\
-    \ = v;\n                stack.push_back(e.to);\n            }\n        }\n\n \
-    \       for (int v : nodes) _subtree_size[v] = 1;\n        for (int i = int(nodes.size())\
-    \ - 1; i >= 0; i--) {\n            int v = nodes[i];\n            if (_work_parent[v]\
-    \ >= 0) _subtree_size[_work_parent[v]] += _subtree_size[v];\n        }\n\n   \
-    \     int total = int(nodes.size());\n        int centroid = start;\n        int\
-    \ best = total + 1;\n        for (int v : nodes) {\n            int largest =\
-    \ total - _subtree_size[v];\n            for (const auto& e : g[v]) {\n      \
-    \          if (!e.alive || _removed[e.to]) continue;\n                if (_work_parent[e.to]\
-    \ == v) largest = std::max(largest, _subtree_size[e.to]);\n            }\n   \
-    \         if (largest < best) {\n                best = largest;\n           \
-    \     centroid = v;\n            }\n        }\n\n        for (int v : nodes) _work_parent[v]\
-    \ = -1;\n\n        parent[centroid] = p;\n        depth[centroid] = d;\n     \
-    \   order.push_back(centroid);\n        if (p == -1) {\n            roots.push_back(centroid);\n\
-    \        } else {\n            children[p].push_back(centroid);\n        }\n \
-    \       _removed[centroid] = true;\n\n        for (const auto& e : g[centroid])\
-    \ {\n            if (!e.alive || _removed[e.to]) continue;\n            build_component(g,\
-    \ e.to, centroid, d + 1);\n        }\n    }\n\n   public:\n    CentroidDecomposition()\
-    \ : n(0) {}\n    explicit CentroidDecomposition(const m1une::graph::Graph<T>&\
-    \ g) {\n        build(g);\n    }\n\n    void build(const m1une::graph::Graph<T>&\
-    \ g) {\n        n = g.size();\n        parent.assign(n, -1);\n        depth.assign(n,\
+    \ m1une\n\n\n#line 1 \"graph/tree/all.hpp\"\n\n\n\n#line 1 \"graph/tree/cartesian_tree.hpp\"\
+    \n\n\n\n#line 10 \"graph/tree/cartesian_tree.hpp\"\n\n#line 12 \"graph/tree/cartesian_tree.hpp\"\
+    \n\nnamespace m1une {\nnamespace tree {\n\nstruct CartesianTree {\n    int root;\n\
+    \    std::vector<int> parent;\n    std::vector<int> left;\n    std::vector<int>\
+    \ right;\n\n   private:\n    int _n;\n\n    void check_vertex(int v) const {\n\
+    \        assert(0 <= v && v < _n);\n    }\n\n   public:\n    CartesianTree() :\
+    \ root(-1), _n(0) {}\n\n    template <class T, class Compare = std::less<T>>\n\
+    \    explicit CartesianTree(const std::vector<T>& a, Compare comp = Compare())\
+    \ : root(-1), _n(0) {\n        build(a, comp);\n    }\n\n    template <class T,\
+    \ class Compare = std::less<T>>\n    void build(const std::vector<T>& a, Compare\
+    \ comp = Compare()) {\n        assert(a.size() <= static_cast<std::size_t>(std::numeric_limits<int>::max()));\n\
+    \        _n = int(a.size());\n        root = -1;\n        parent.assign(_n, -1);\n\
+    \        left.assign(_n, -1);\n        right.assign(_n, -1);\n\n        std::vector<int>\
+    \ stack;\n        stack.reserve(_n);\n        for (int i = 0; i < _n; i++) {\n\
+    \            int last = -1;\n            while (!stack.empty() && comp(a[i], a[stack.back()]))\
+    \ {\n                last = stack.back();\n                stack.pop_back();\n\
+    \            }\n            if (last != -1) {\n                left[i] = last;\n\
+    \                parent[last] = i;\n            }\n            if (!stack.empty())\
+    \ {\n                right[stack.back()] = i;\n                parent[i] = stack.back();\n\
+    \            }\n            stack.push_back(i);\n        }\n\n        if (!stack.empty())\
+    \ root = stack.front();\n    }\n\n    int size() const {\n        return _n;\n\
+    \    }\n\n    bool empty() const {\n        return _n == 0;\n    }\n\n    int\
+    \ parent_or_self(int v) const {\n        check_vertex(v);\n        return parent[v]\
+    \ == -1 ? v : parent[v];\n    }\n\n    std::vector<int> parent_with_root_self()\
+    \ const {\n        std::vector<int> result = parent;\n        if (root != -1)\
+    \ result[root] = root;\n        return result;\n    }\n\n    std::vector<std::pair<int,\
+    \ int>> edges() const {\n        std::vector<std::pair<int, int>> result;\n  \
+    \      if (_n == 0) return result;\n        result.reserve(_n - 1);\n        for\
+    \ (int v = 0; v < _n; v++) {\n            if (parent[v] != -1) result.emplace_back(parent[v],\
+    \ v);\n        }\n        return result;\n    }\n\n    m1une::graph::Graph<int>\
+    \ to_graph() const {\n        m1une::graph::Graph<int> g(_n);\n        for (int\
+    \ v = 0; v < _n; v++) {\n            if (parent[v] != -1) g.add_edge(parent[v],\
+    \ v);\n        }\n        return g;\n    }\n};\n\ntemplate <class T, class Compare\
+    \ = std::less<T>>\nCartesianTree cartesian_tree(const std::vector<T>& a, Compare\
+    \ comp = Compare()) {\n    CartesianTree result;\n    result.build(a, comp);\n\
+    \    return result;\n}\n\n}  // namespace tree\n}  // namespace m1une\n\n\n#line\
+    \ 1 \"graph/tree/centroid_decomposition.hpp\"\n\n\n\n#line 6 \"graph/tree/centroid_decomposition.hpp\"\
+    \n\n#line 8 \"graph/tree/centroid_decomposition.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ tree {\n\ntemplate <class T = int>\nstruct CentroidDecomposition {\n    int\
+    \ n;\n    std::vector<int> parent;\n    std::vector<int> depth;\n    std::vector<int>\
+    \ order;\n    std::vector<int> roots;\n    std::vector<std::vector<int>> children;\n\
+    \n   private:\n    std::vector<int> _subtree_size;\n    std::vector<int> _work_parent;\n\
+    \    std::vector<char> _removed;\n\n    void build_component(const m1une::graph::Graph<T>&\
+    \ g, int start, int p, int d) {\n        std::vector<int> nodes;\n        std::vector<int>\
+    \ stack = {start};\n        _work_parent[start] = -2;\n        while (!stack.empty())\
+    \ {\n            int v = stack.back();\n            stack.pop_back();\n      \
+    \      nodes.push_back(v);\n            for (const auto& e : g[v]) {\n       \
+    \         if (!e.alive || _removed[e.to]) continue;\n                if (_work_parent[e.to]\
+    \ != -1) continue;\n                _work_parent[e.to] = v;\n                stack.push_back(e.to);\n\
+    \            }\n        }\n\n        for (int v : nodes) _subtree_size[v] = 1;\n\
+    \        for (int i = int(nodes.size()) - 1; i >= 0; i--) {\n            int v\
+    \ = nodes[i];\n            if (_work_parent[v] >= 0) _subtree_size[_work_parent[v]]\
+    \ += _subtree_size[v];\n        }\n\n        int total = int(nodes.size());\n\
+    \        int centroid = start;\n        int best = total + 1;\n        for (int\
+    \ v : nodes) {\n            int largest = total - _subtree_size[v];\n        \
+    \    for (const auto& e : g[v]) {\n                if (!e.alive || _removed[e.to])\
+    \ continue;\n                if (_work_parent[e.to] == v) largest = std::max(largest,\
+    \ _subtree_size[e.to]);\n            }\n            if (largest < best) {\n  \
+    \              best = largest;\n                centroid = v;\n            }\n\
+    \        }\n\n        for (int v : nodes) _work_parent[v] = -1;\n\n        parent[centroid]\
+    \ = p;\n        depth[centroid] = d;\n        order.push_back(centroid);\n   \
+    \     if (p == -1) {\n            roots.push_back(centroid);\n        } else {\n\
+    \            children[p].push_back(centroid);\n        }\n        _removed[centroid]\
+    \ = true;\n\n        for (const auto& e : g[centroid]) {\n            if (!e.alive\
+    \ || _removed[e.to]) continue;\n            build_component(g, e.to, centroid,\
+    \ d + 1);\n        }\n    }\n\n   public:\n    CentroidDecomposition() : n(0)\
+    \ {}\n    explicit CentroidDecomposition(const m1une::graph::Graph<T>& g) {\n\
+    \        build(g);\n    }\n\n    void build(const m1une::graph::Graph<T>& g) {\n\
+    \        n = g.size();\n        parent.assign(n, -1);\n        depth.assign(n,\
     \ -1);\n        order.clear();\n        order.reserve(n);\n        roots.clear();\n\
     \        children.assign(n, {});\n        _subtree_size.assign(n, 0);\n      \
     \  _work_parent.assign(n, -1);\n        _removed.assign(n, false);\n\n       \
@@ -2627,7 +2666,7 @@ data:
     \ == n);\n    if (n == 0) return 0;\n    assert(0 <= root && root < n);\n    assert(int(graph.edges().size())\
     \ == n - 1);\n\n    RootedTree<T> rooted_tree(graph, root);\n    assert(int(rooted_tree.order.size())\
     \ == n);\n    return zero_one_on_tree(rooted_tree.parent, value);\n}\n\n}  //\
-    \ namespace tree\n}  // namespace m1une\n\n\n#line 17 \"graph/tree/all.hpp\"\n\
+    \ namespace tree\n}  // namespace m1une\n\n\n#line 18 \"graph/tree/all.hpp\"\n\
     \n\n#line 1 \"graph/undirected.hpp\"\n\n\n\n#line 1 \"graph/bipartite.hpp\"\n\n\
     \n\n#line 8 \"graph/bipartite.hpp\"\n\n#line 10 \"graph/bipartite.hpp\"\n\nnamespace\
     \ m1une {\nnamespace graph {\n\nstruct BipartiteResult {\n    bool is_bipartite;\n\
@@ -4135,8 +4174,9 @@ data:
   - graph/grid.hpp
   - graph/range_edge_graph.hpp
   - graph/tree/all.hpp
-  - graph/tree/centroid_decomposition.hpp
+  - graph/tree/cartesian_tree.hpp
   - graph/graph.hpp
+  - graph/tree/centroid_decomposition.hpp
   - graph/tree/diameter.hpp
   - graph/tree/dsu_on_tree.hpp
   - graph/tree/heavy_light_decomposition.hpp
@@ -4164,7 +4204,7 @@ data:
   isVerificationFile: true
   path: verify/graph/graph_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-07 14:26:59+09:00'
+  timestamp: '2026-07-09 01:53:44+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/graph_algorithms.test.cpp
