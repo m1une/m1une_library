@@ -60,7 +60,7 @@ short namespace segment after `m1une::`; nested directories are for browsing.
 | Directory | Use it for |
 | --- | --- |
 | `algo/sequence/` | Array and sequence algorithms such as LIS, inversion count, run-length encoding, and meet-in-the-middle subset sum. |
-| `algo/search/` | Search-over-answer helpers such as integer and floating-point binary search. |
+| `algo/search/` | Search-over-answer and unimodal optimization helpers. |
 | `algo/offline/` | Offline query processing such as Mo's algorithm. |
 | `algo/enumeration/` | Combinatorial traversal helpers such as Gray-code enumeration. |
 | `algo/dp/` | Domain-neutral DP helpers such as knapsack routines. |

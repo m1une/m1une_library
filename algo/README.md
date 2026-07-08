@@ -9,7 +9,7 @@ objects live under `ds/`.
 | Category | Headers |
 | --- | --- |
 | [`sequence/`](sequence/) | `lis.hpp`, `inversion_count.hpp`, `run_length_encoding.hpp`, `subset_sum.hpp`, and `all.hpp` |
-| [`search/`](search/) | `bisect.hpp`, `ternary_search.hpp`, and `all.hpp` |
+| [`search/`](search/) | `bisect.hpp`, `golden_section_search.hpp`, `ternary_search.hpp`, and `all.hpp` |
 | [`offline/`](offline/) | `mo.hpp`, `parallel_binary_search.hpp`, `cdq_divide_and_conquer.hpp`, and `all.hpp` |
 | [`enumeration/`](enumeration/) | `gray_code.hpp`, `submask.hpp`, `combination.hpp`, and `all.hpp` |
 | [`dp/`](dp/) | `knapsack.hpp` and `all.hpp` |
