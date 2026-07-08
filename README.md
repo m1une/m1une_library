@@ -31,7 +31,7 @@ without rewriting boilerplate during a contest.
 | `monoid/` | Reusable monoids for generic data structures such as `Segtree`. |
 | `acted_monoid/` | Acted monoids for lazy propagation structures such as `LazySegtree` and generic `SegtreeBeats`. |
 | `math/` | Number theory, modular arithmetic, combinatorics, bitwise transforms, FPS/polynomials, matrices, exact rationals, and integer arithmetic. |
-| `string/` | Z/KMP, edit distance, Manacher, eertrees, suffix automata/arrays, tries, Aho-Corasick, and string hashes. |
+| `string/` | Z/KMP, edit distance, Manacher, Lyndon factorization, eertrees, suffix automata/arrays, tries, Aho-Corasick, and string hashes. |
 | `utilities/` | Fast I/O, parsing, dice, 2D grid transforms, integer helpers, compression, random generation, stress testing, and general contest utilities. |
 | `verify/` | Online Judge Verify Helper tests. |
 | `docs/` | Markdown documentation for the public headers. |

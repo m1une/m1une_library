@@ -18,6 +18,9 @@ void test_edge_cases() {
     assert(m1une::string::prefix_function(empty).empty());
     assert(m1une::string::suffix_array(empty).empty());
     assert(m1une::string::lcp_array(empty, std::vector<int>()).empty());
+    assert(m1une::string::lyndon_factor_boundaries(empty) == std::vector<int>(1, 0));
+    assert(m1une::string::lyndon_factorization(empty).empty());
+    assert(m1une::string::minimum_cyclic_shift(empty) == 0);
 
     auto empty_palindromes = m1une::string::manacher(empty);
     assert(empty_palindromes.empty());
@@ -46,6 +49,11 @@ void test_edge_cases() {
         m1une::string::z_algorithm(values) ==
         std::vector<int>({3, 0, 1})
     );
+    assert(
+        m1une::string::lyndon_factor_boundaries(values) ==
+        std::vector<int>({0, 1, 3})
+    );
+    assert(m1une::string::minimum_cyclic_shift(values) == 1);
 
     std::string bytes;
     bytes.push_back(char(255));
@@ -152,6 +160,26 @@ void test_randomized() {
                 expected++;
             }
             assert(lcp[i] == expected);
+        }
+
+        std::vector<std::pair<int, int>> lyndon_factors =
+            m1une::string::lyndon_factorization(text);
+        int minimum_shift = m1une::string::minimum_cyclic_shift(text);
+        assert(
+            (n == 0 && minimum_shift == 0) ||
+            (0 <= minimum_shift && minimum_shift < n)
+        );
+        std::string restored;
+        std::vector<std::string> factor_words;
+        for (auto [left, right] : lyndon_factors) {
+            assert(0 <= left && left < right && right <= n);
+            std::string word = text.substr(left, right - left);
+            restored += word;
+            factor_words.push_back(word);
+        }
+        assert(restored == text);
+        for (int i = 0; i + 1 < int(factor_words.size()); i++) {
+            assert(!(factor_words[i] < factor_words[i + 1]));
         }
     }
 }
