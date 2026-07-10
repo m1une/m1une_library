@@ -1,6 +1,7 @@
 #ifndef M1UNE_FAST_IO_HPP
 #define M1UNE_FAST_IO_HPP 1
 
+#include <array>
 #include <cstddef>
 #include <cstdio>
 #include <iterator>
@@ -225,6 +226,15 @@ struct FastOutput {
     static constexpr int buffer_size = 1 << 20;
 
    private:
+    inline static constexpr auto digit_pairs = [] {
+        std::array<char, 200> result{};
+        for (int i = 0; i < 100; i++) {
+            result[2 * i] = char('0' + i / 10);
+            result[2 * i + 1] = char('0' + i % 10);
+        }
+        return result;
+    }();
+
     std::FILE* _stream;
     char _buffer[buffer_size];
     int _position;
@@ -295,12 +305,23 @@ struct FastOutput {
         }
 
         char digits[64];
-        int count = 0;
-        while (magnitude > 0) {
-            digits[count++] = char('0' + magnitude % 10);
-            magnitude /= 10;
+        int begin = 64;
+        while (magnitude >= 100) {
+            const Unsigned quotient = magnitude / 100;
+            const unsigned remainder = unsigned(magnitude - quotient * 100);
+            begin -= 2;
+            digits[begin] = digit_pairs[2 * remainder];
+            digits[begin + 1] = digit_pairs[2 * remainder + 1];
+            magnitude = quotient;
         }
-        while (count--) write_char(digits[count]);
+        if (magnitude < 10) {
+            digits[--begin] = char('0' + magnitude);
+        } else {
+            begin -= 2;
+            digits[begin] = digit_pairs[2 * unsigned(magnitude)];
+            digits[begin + 1] = digit_pairs[2 * unsigned(magnitude) + 1];
+        }
+        while (begin < 64) write_char(digits[begin++]);
     }
 
     template <class T>
