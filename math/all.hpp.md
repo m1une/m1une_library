@@ -2167,8 +2167,6 @@ You usually do not need to include this entire bundle:
 * Use `combinatorial_sequences.hpp` for Catalan, Bell, Stirling, partition, or
   derangement numbers.
 * Use `partition_function.hpp` when only integer partition numbers are needed.
-* Use the optional `partition_number_hrr.hpp` with FLINT for one exact,
-  isolated partition number at a large index. It is not part of this bundle.
 * Use `cyclotomic_polynomial.hpp` to construct the polynomial of primitive
   roots of unity of a given order.
 * Use `prime_sieve.hpp` when all queried integers are at most a manageable
