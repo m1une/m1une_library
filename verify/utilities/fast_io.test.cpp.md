@@ -89,33 +89,34 @@ data:
     \      if (!read(value)) return false;\n            }\n        }\n        return\
     \ true;\n    }\n\n    template <class First, class Second, class... Rest>\n  \
     \  bool read(First& first, Second& second, Rest&... rest) {\n        if (!read(first))\
-    \ return false;\n        return read(second, rest...);\n    }\n};\n\nstruct FastOutput\
-    \ {\n    static constexpr int buffer_size = 1 << 20;\n\n   private:\n    std::FILE*\
-    \ _stream;\n    char _buffer[buffer_size];\n    int _position;\n\n   public:\n\
-    \    explicit FastOutput(std::FILE* stream = stdout)\n        : _stream(stream),\
-    \ _position(0) {}\n\n    FastOutput(const FastOutput&) = delete;\n    FastOutput&\
-    \ operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n        flush();\n\
-    \    }\n\n    void flush() {\n        if (_position == 0) return;\n        std::fwrite(_buffer,\
-    \ 1, _position, _stream);\n        _position = 0;\n    }\n\n    void write_char(char\
-    \ c) {\n        if (_position == buffer_size) flush();\n        _buffer[_position++]\
-    \ = c;\n    }\n\n    void write(const char* s) {\n        while (*s != '\\0')\
-    \ write_char(*s++);\n    }\n\n    void write(const std::string& s) {\n       \
-    \ for (char c : s) write_char(c);\n    }\n\n    void write(char c) {\n       \
-    \ write_char(c);\n    }\n\n    void write(bool value) {\n        write_char(value\
-    \ ? '1' : '0');\n    }\n\n    template <class T>\n    std::enable_if_t<\n    \
-    \    std::is_integral_v<T>\n            && !std::is_same_v<std::remove_cv_t<T>,\
-    \ bool>\n            && !std::is_same_v<std::remove_cv_t<T>, char>\n    >\n  \
-    \  write(T value) {\n        using Raw = std::remove_cv_t<T>;\n        using Unsigned\
-    \ = std::make_unsigned_t<Raw>;\n\n        Unsigned magnitude;\n        if constexpr\
-    \ (std::is_signed_v<Raw>) {\n            if (value < 0) {\n                write_char('-');\n\
-    \                magnitude = Unsigned(0) - Unsigned(value);\n            } else\
-    \ {\n                magnitude = Unsigned(value);\n            }\n        } else\
-    \ {\n            magnitude = value;\n        }\n\n        if (magnitude == 0)\
-    \ {\n            write_char('0');\n            return;\n        }\n\n        char\
-    \ digits[64];\n        int count = 0;\n        while (magnitude > 0) {\n     \
-    \       digits[count++] = char('0' + magnitude % 10);\n            magnitude /=\
-    \ 10;\n        }\n        while (count--) write_char(digits[count]);\n    }\n\n\
-    \    template <class T>\n    std::enable_if_t<\n        internal::has_val_method_v<T>\n\
+    \ return false;\n        return read(second, rest...);\n    }\n\n    template\
+    \ <class T>\n    FastInput& operator>>(T& value) {\n        read(value);\n   \
+    \     return *this;\n    }\n};\n\nstruct FastOutput {\n    static constexpr int\
+    \ buffer_size = 1 << 20;\n\n   private:\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
+    \    int _position;\n\n   public:\n    explicit FastOutput(std::FILE* stream =\
+    \ stdout)\n        : _stream(stream), _position(0) {}\n\n    FastOutput(const\
+    \ FastOutput&) = delete;\n    FastOutput& operator=(const FastOutput&) = delete;\n\
+    \n    ~FastOutput() {\n        flush();\n    }\n\n    void flush() {\n       \
+    \ if (_position == 0) return;\n        std::fwrite(_buffer, 1, _position, _stream);\n\
+    \        _position = 0;\n    }\n\n    void write_char(char c) {\n        if (_position\
+    \ == buffer_size) flush();\n        _buffer[_position++] = c;\n    }\n\n    void\
+    \ write(const char* s) {\n        while (*s != '\\0') write_char(*s++);\n    }\n\
+    \n    void write(const std::string& s) {\n        for (char c : s) write_char(c);\n\
+    \    }\n\n    void write(char c) {\n        write_char(c);\n    }\n\n    void\
+    \ write(bool value) {\n        write_char(value ? '1' : '0');\n    }\n\n    template\
+    \ <class T>\n    std::enable_if_t<\n        std::is_integral_v<T>\n          \
+    \  && !std::is_same_v<std::remove_cv_t<T>, bool>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ char>\n    >\n    write(T value) {\n        using Raw = std::remove_cv_t<T>;\n\
+    \        using Unsigned = std::make_unsigned_t<Raw>;\n\n        Unsigned magnitude;\n\
+    \        if constexpr (std::is_signed_v<Raw>) {\n            if (value < 0) {\n\
+    \                write_char('-');\n                magnitude = Unsigned(0) - Unsigned(value);\n\
+    \            } else {\n                magnitude = Unsigned(value);\n        \
+    \    }\n        } else {\n            magnitude = value;\n        }\n\n      \
+    \  if (magnitude == 0) {\n            write_char('0');\n            return;\n\
+    \        }\n\n        char digits[64];\n        int count = 0;\n        while\
+    \ (magnitude > 0) {\n            digits[count++] = char('0' + magnitude % 10);\n\
+    \            magnitude /= 10;\n        }\n        while (count--) write_char(digits[count]);\n\
+    \    }\n\n    template <class T>\n    std::enable_if_t<\n        internal::has_val_method_v<T>\n\
     \            && !std::is_integral_v<T>\n            && !internal::is_range_v<T>\n\
     \    >\n    write(const T& value) {\n        write(value.val());\n    }\n\n  \
     \  template <class Range>\n    std::enable_if_t<\n        internal::is_range_v<Range>\n\
@@ -132,27 +133,11 @@ data:
     \ {\n        write(first);\n        ((write_char(' '), write(rest)), ...);\n \
     \   }\n\n    void println() {\n        write_char('\\n');\n    }\n\n    template\
     \ <class... Args>\n    void println(const Args&... args) {\n        print(args...);\n\
-    \        write_char('\\n');\n    }\n};\n\n}  // namespace utilities\n}  // namespace\
-    \ m1une\n\n\n#line 4 \"verify/utilities/fast_io.test.cpp\"\n\n#include <cassert>\n\
-    #line 8 \"verify/utilities/fast_io.test.cpp\"\n\nvoid test_fast_input() {\n  \
-    \  std::FILE* file = std::tmpfile();\n    assert(file != nullptr);\n    std::fputs(\"\
-    \ -123 456 token Z 1\\n\", file);\n    std::rewind(file);\n\n    m1une::utilities::FastInput\
-    \ input(file);\n    int a;\n    unsigned int b;\n    std::string s;\n    char\
-    \ c;\n    bool flag;\n    assert(input.read(a, b, s, c, flag));\n    assert(a\
-    \ == -123);\n    assert(b == 456);\n    assert(s == \"token\");\n    assert(c\
-    \ == 'Z');\n    assert(flag);\n    std::fclose(file);\n}\n\nvoid test_fast_output()\
-    \ {\n    std::FILE* file = std::tmpfile();\n    assert(file != nullptr);\n\n \
-    \   {\n        m1une::utilities::FastOutput output(file);\n        output.println(\"\
-    answer\", -42, 17u);\n        output.println(false);\n        output.flush();\n\
-    \    }\n\n    std::rewind(file);\n    char buffer[64];\n    std::size_t length\
-    \ = std::fread(buffer, 1, sizeof(buffer), file);\n    std::string result(buffer,\
-    \ buffer + length);\n    assert(result == \"answer -42 17\\n0\\n\");\n    std::fclose(file);\n\
-    }\n\nint main() {\n    test_fast_input();\n    test_fast_output();\n\n    m1une::utilities::FastInput\
-    \ input;\n    m1une::utilities::FastOutput output;\n\n    long long a, b;\n  \
-    \  input.read(a, b);\n    output.println(a + b);\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
-    ../../utilities/fast_io.hpp\"\n\n#include <cassert>\n#include <cstdio>\n#include\
-    \ <string>\n\nvoid test_fast_input() {\n    std::FILE* file = std::tmpfile();\n\
+    \        write_char('\\n');\n    }\n\n    template <class T>\n    FastOutput&\
+    \ operator<<(const T& value) {\n        write(value);\n        return *this;\n\
+    \    }\n};\n\n}  // namespace utilities\n}  // namespace m1une\n\n\n#line 4 \"\
+    verify/utilities/fast_io.test.cpp\"\n\n#include <cassert>\n#line 8 \"verify/utilities/fast_io.test.cpp\"\
+    \n#include <vector>\n\nvoid test_fast_input() {\n    std::FILE* file = std::tmpfile();\n\
     \    assert(file != nullptr);\n    std::fputs(\" -123 456 token Z 1\\n\", file);\n\
     \    std::rewind(file);\n\n    m1une::utilities::FastInput input(file);\n    int\
     \ a;\n    unsigned int b;\n    std::string s;\n    char c;\n    bool flag;\n \
@@ -164,16 +149,58 @@ data:
     \        output.flush();\n    }\n\n    std::rewind(file);\n    char buffer[64];\n\
     \    std::size_t length = std::fread(buffer, 1, sizeof(buffer), file);\n    std::string\
     \ result(buffer, buffer + length);\n    assert(result == \"answer -42 17\\n0\\\
-    n\");\n    std::fclose(file);\n}\n\nint main() {\n    test_fast_input();\n   \
-    \ test_fast_output();\n\n    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput\
-    \ output;\n\n    long long a, b;\n    input.read(a, b);\n    output.println(a\
-    \ + b);\n}\n"
+    n\");\n    std::fclose(file);\n}\n\nvoid test_stream_operators_and_vectors() {\n\
+    \    std::FILE* input_file = std::tmpfile();\n    assert(input_file != nullptr);\n\
+    \    std::fputs(\"2 3 1 2 3 4 5 6\", input_file);\n    std::rewind(input_file);\n\
+    \n    int h, w;\n    m1une::utilities::FastInput input(input_file);\n    input\
+    \ >> h >> w;\n    std::vector<std::vector<int>> matrix(h, std::vector<int>(w));\n\
+    \    input >> matrix;\n    assert(matrix[0][0] == 1);\n    assert(matrix[1][2]\
+    \ == 6);\n    std::fclose(input_file);\n\n    std::FILE* output_file = std::tmpfile();\n\
+    \    assert(output_file != nullptr);\n    {\n        m1une::utilities::FastOutput\
+    \ output(output_file);\n        output << \"matrix\\n\" << matrix << '\\n';\n\
+    \        output.flush();\n    }\n\n    std::rewind(output_file);\n    char buffer[64];\n\
+    \    std::size_t length = std::fread(buffer, 1, sizeof(buffer), output_file);\n\
+    \    std::string result(buffer, buffer + length);\n    assert(result == \"matrix\\\
+    n1 2 3\\n4 5 6\\n\");\n    std::fclose(output_file);\n}\n\nint main() {\n    test_fast_input();\n\
+    \    test_fast_output();\n    test_stream_operators_and_vectors();\n\n    m1une::utilities::FastInput\
+    \ input;\n    m1une::utilities::FastOutput output;\n\n    long long a, b;\n  \
+    \  input >> a >> b;\n    output << a + b << '\\n';\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
+    ../../utilities/fast_io.hpp\"\n\n#include <cassert>\n#include <cstdio>\n#include\
+    \ <string>\n#include <vector>\n\nvoid test_fast_input() {\n    std::FILE* file\
+    \ = std::tmpfile();\n    assert(file != nullptr);\n    std::fputs(\" -123 456\
+    \ token Z 1\\n\", file);\n    std::rewind(file);\n\n    m1une::utilities::FastInput\
+    \ input(file);\n    int a;\n    unsigned int b;\n    std::string s;\n    char\
+    \ c;\n    bool flag;\n    assert(input.read(a, b, s, c, flag));\n    assert(a\
+    \ == -123);\n    assert(b == 456);\n    assert(s == \"token\");\n    assert(c\
+    \ == 'Z');\n    assert(flag);\n    std::fclose(file);\n}\n\nvoid test_fast_output()\
+    \ {\n    std::FILE* file = std::tmpfile();\n    assert(file != nullptr);\n\n \
+    \   {\n        m1une::utilities::FastOutput output(file);\n        output.println(\"\
+    answer\", -42, 17u);\n        output.println(false);\n        output.flush();\n\
+    \    }\n\n    std::rewind(file);\n    char buffer[64];\n    std::size_t length\
+    \ = std::fread(buffer, 1, sizeof(buffer), file);\n    std::string result(buffer,\
+    \ buffer + length);\n    assert(result == \"answer -42 17\\n0\\n\");\n    std::fclose(file);\n\
+    }\n\nvoid test_stream_operators_and_vectors() {\n    std::FILE* input_file = std::tmpfile();\n\
+    \    assert(input_file != nullptr);\n    std::fputs(\"2 3 1 2 3 4 5 6\", input_file);\n\
+    \    std::rewind(input_file);\n\n    int h, w;\n    m1une::utilities::FastInput\
+    \ input(input_file);\n    input >> h >> w;\n    std::vector<std::vector<int>>\
+    \ matrix(h, std::vector<int>(w));\n    input >> matrix;\n    assert(matrix[0][0]\
+    \ == 1);\n    assert(matrix[1][2] == 6);\n    std::fclose(input_file);\n\n   \
+    \ std::FILE* output_file = std::tmpfile();\n    assert(output_file != nullptr);\n\
+    \    {\n        m1une::utilities::FastOutput output(output_file);\n        output\
+    \ << \"matrix\\n\" << matrix << '\\n';\n        output.flush();\n    }\n\n   \
+    \ std::rewind(output_file);\n    char buffer[64];\n    std::size_t length = std::fread(buffer,\
+    \ 1, sizeof(buffer), output_file);\n    std::string result(buffer, buffer + length);\n\
+    \    assert(result == \"matrix\\n1 2 3\\n4 5 6\\n\");\n    std::fclose(output_file);\n\
+    }\n\nint main() {\n    test_fast_input();\n    test_fast_output();\n    test_stream_operators_and_vectors();\n\
+    \n    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput output;\n\
+    \n    long long a, b;\n    input >> a >> b;\n    output << a + b << '\\n';\n}\n"
   dependsOn:
   - utilities/fast_io.hpp
   isVerificationFile: true
   path: verify/utilities/fast_io.test.cpp
   requiredBy: []
-  timestamp: '2026-06-27 04:39:45+09:00'
+  timestamp: '2026-07-10 21:00:13+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/utilities/fast_io.test.cpp

@@ -234,33 +234,34 @@ data:
     \      if (!read(value)) return false;\n            }\n        }\n        return\
     \ true;\n    }\n\n    template <class First, class Second, class... Rest>\n  \
     \  bool read(First& first, Second& second, Rest&... rest) {\n        if (!read(first))\
-    \ return false;\n        return read(second, rest...);\n    }\n};\n\nstruct FastOutput\
-    \ {\n    static constexpr int buffer_size = 1 << 20;\n\n   private:\n    std::FILE*\
-    \ _stream;\n    char _buffer[buffer_size];\n    int _position;\n\n   public:\n\
-    \    explicit FastOutput(std::FILE* stream = stdout)\n        : _stream(stream),\
-    \ _position(0) {}\n\n    FastOutput(const FastOutput&) = delete;\n    FastOutput&\
-    \ operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n        flush();\n\
-    \    }\n\n    void flush() {\n        if (_position == 0) return;\n        std::fwrite(_buffer,\
-    \ 1, _position, _stream);\n        _position = 0;\n    }\n\n    void write_char(char\
-    \ c) {\n        if (_position == buffer_size) flush();\n        _buffer[_position++]\
-    \ = c;\n    }\n\n    void write(const char* s) {\n        while (*s != '\\0')\
-    \ write_char(*s++);\n    }\n\n    void write(const std::string& s) {\n       \
-    \ for (char c : s) write_char(c);\n    }\n\n    void write(char c) {\n       \
-    \ write_char(c);\n    }\n\n    void write(bool value) {\n        write_char(value\
-    \ ? '1' : '0');\n    }\n\n    template <class T>\n    std::enable_if_t<\n    \
-    \    std::is_integral_v<T>\n            && !std::is_same_v<std::remove_cv_t<T>,\
-    \ bool>\n            && !std::is_same_v<std::remove_cv_t<T>, char>\n    >\n  \
-    \  write(T value) {\n        using Raw = std::remove_cv_t<T>;\n        using Unsigned\
-    \ = std::make_unsigned_t<Raw>;\n\n        Unsigned magnitude;\n        if constexpr\
-    \ (std::is_signed_v<Raw>) {\n            if (value < 0) {\n                write_char('-');\n\
-    \                magnitude = Unsigned(0) - Unsigned(value);\n            } else\
-    \ {\n                magnitude = Unsigned(value);\n            }\n        } else\
-    \ {\n            magnitude = value;\n        }\n\n        if (magnitude == 0)\
-    \ {\n            write_char('0');\n            return;\n        }\n\n        char\
-    \ digits[64];\n        int count = 0;\n        while (magnitude > 0) {\n     \
-    \       digits[count++] = char('0' + magnitude % 10);\n            magnitude /=\
-    \ 10;\n        }\n        while (count--) write_char(digits[count]);\n    }\n\n\
-    \    template <class T>\n    std::enable_if_t<\n        internal::has_val_method_v<T>\n\
+    \ return false;\n        return read(second, rest...);\n    }\n\n    template\
+    \ <class T>\n    FastInput& operator>>(T& value) {\n        read(value);\n   \
+    \     return *this;\n    }\n};\n\nstruct FastOutput {\n    static constexpr int\
+    \ buffer_size = 1 << 20;\n\n   private:\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
+    \    int _position;\n\n   public:\n    explicit FastOutput(std::FILE* stream =\
+    \ stdout)\n        : _stream(stream), _position(0) {}\n\n    FastOutput(const\
+    \ FastOutput&) = delete;\n    FastOutput& operator=(const FastOutput&) = delete;\n\
+    \n    ~FastOutput() {\n        flush();\n    }\n\n    void flush() {\n       \
+    \ if (_position == 0) return;\n        std::fwrite(_buffer, 1, _position, _stream);\n\
+    \        _position = 0;\n    }\n\n    void write_char(char c) {\n        if (_position\
+    \ == buffer_size) flush();\n        _buffer[_position++] = c;\n    }\n\n    void\
+    \ write(const char* s) {\n        while (*s != '\\0') write_char(*s++);\n    }\n\
+    \n    void write(const std::string& s) {\n        for (char c : s) write_char(c);\n\
+    \    }\n\n    void write(char c) {\n        write_char(c);\n    }\n\n    void\
+    \ write(bool value) {\n        write_char(value ? '1' : '0');\n    }\n\n    template\
+    \ <class T>\n    std::enable_if_t<\n        std::is_integral_v<T>\n          \
+    \  && !std::is_same_v<std::remove_cv_t<T>, bool>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ char>\n    >\n    write(T value) {\n        using Raw = std::remove_cv_t<T>;\n\
+    \        using Unsigned = std::make_unsigned_t<Raw>;\n\n        Unsigned magnitude;\n\
+    \        if constexpr (std::is_signed_v<Raw>) {\n            if (value < 0) {\n\
+    \                write_char('-');\n                magnitude = Unsigned(0) - Unsigned(value);\n\
+    \            } else {\n                magnitude = Unsigned(value);\n        \
+    \    }\n        } else {\n            magnitude = value;\n        }\n\n      \
+    \  if (magnitude == 0) {\n            write_char('0');\n            return;\n\
+    \        }\n\n        char digits[64];\n        int count = 0;\n        while\
+    \ (magnitude > 0) {\n            digits[count++] = char('0' + magnitude % 10);\n\
+    \            magnitude /= 10;\n        }\n        while (count--) write_char(digits[count]);\n\
+    \    }\n\n    template <class T>\n    std::enable_if_t<\n        internal::has_val_method_v<T>\n\
     \            && !std::is_integral_v<T>\n            && !internal::is_range_v<T>\n\
     \    >\n    write(const T& value) {\n        write(value.val());\n    }\n\n  \
     \  template <class Range>\n    std::enable_if_t<\n        internal::is_range_v<Range>\n\
@@ -277,33 +278,35 @@ data:
     \ {\n        write(first);\n        ((write_char(' '), write(rest)), ...);\n \
     \   }\n\n    void println() {\n        write_char('\\n');\n    }\n\n    template\
     \ <class... Args>\n    void println(const Args&... args) {\n        print(args...);\n\
-    \        write_char('\\n');\n    }\n};\n\n}  // namespace utilities\n}  // namespace\
-    \ m1une\n\n\n#line 12 \"verify/graph/tree/vertex_add_subtree_sum.test.cpp\"\n\n\
-    using m1une::graph::Graph;\n\nvoid test_euler_tour() {\n    Graph<int> empty_graph;\n\
-    \    m1une::tree::EulerTour<int> empty(empty_graph);\n    assert(empty.empty());\n\
-    \    assert(empty.root == -1);\n    assert(empty.visited_size() == 0);\n\n   \
-    \ Graph<long long> sample(7);\n    sample.add_edge(0, 1, 3);\n    sample.add_edge(0,\
-    \ 2, 2);\n    sample.add_edge(1, 3, 4);\n    sample.add_edge(1, 4, 1);\n    sample.add_edge(2,\
-    \ 5, 6);\n    sample.add_edge(5, 6, 2);\n\n    m1une::tree::EulerTour<long long>\
-    \ tour(sample, 0);\n    std::vector<int> expected_order = {0, 1, 3, 4, 2, 5, 6};\n\
-    \    std::vector<int> expected_children_zero = {1, 2};\n    std::vector<int> expected_subtree\
-    \ = {1, 3, 4};\n    assert(tour.size() == 7);\n    assert(tour.visited_size()\
-    \ == 7);\n    assert(tour.root == 0);\n    assert(tour.order == expected_order);\n\
-    \    assert(tour.children[0] == expected_children_zero);\n    assert(tour.parent[6]\
-    \ == 5);\n    assert(tour.parent_edge[6] == 5);\n    assert(tour.depth[6] == 3);\n\
-    \    assert(tour.dist[6] == 10);\n    assert(tour.subtree_size[0] == 7);\n   \
-    \ assert(tour.subtree_size[1] == 3);\n    assert(tour.is_ancestor(1, 4));\n  \
-    \  assert(!tour.is_ancestor(2, 4));\n    assert(tour.in_subtree(4, 1));\n    assert(tour.subtree_range(1).first\
-    \ == 1);\n    assert(tour.subtree_range(1).second == 4);\n    assert(tour.subtree_range(1,\
-    \ true).first == 2);\n    assert(tour.subtree_range(1, true).second == 4);\n \
-    \   assert(tour.subtree_vertices(1) == expected_subtree);\n\n    int subtree_sum\
-    \ = 0;\n    tour.for_each_subtree(1, [&](int vertex) {\n        subtree_sum +=\
-    \ vertex;\n    });\n    assert(subtree_sum == 8);\n\n    std::mt19937 random(123456789);\n\
-    \    for (int test = 0; test < 50; ++test) {\n        int n = 1 + int(random()\
-    \ % 40);\n        Graph<int> graph(n);\n        std::vector<int> parent(n, -1);\n\
-    \        for (int v = 1; v < n; ++v) {\n            parent[v] = int(random() %\
-    \ v);\n            graph.add_edge(parent[v], v);\n        }\n\n        m1une::tree::EulerTour<int>\
-    \ random_tour(graph, 0);\n        assert(random_tour.size() == n);\n        assert(random_tour.visited_size()\
+    \        write_char('\\n');\n    }\n\n    template <class T>\n    FastOutput&\
+    \ operator<<(const T& value) {\n        write(value);\n        return *this;\n\
+    \    }\n};\n\n}  // namespace utilities\n}  // namespace m1une\n\n\n#line 12 \"\
+    verify/graph/tree/vertex_add_subtree_sum.test.cpp\"\n\nusing m1une::graph::Graph;\n\
+    \nvoid test_euler_tour() {\n    Graph<int> empty_graph;\n    m1une::tree::EulerTour<int>\
+    \ empty(empty_graph);\n    assert(empty.empty());\n    assert(empty.root == -1);\n\
+    \    assert(empty.visited_size() == 0);\n\n    Graph<long long> sample(7);\n \
+    \   sample.add_edge(0, 1, 3);\n    sample.add_edge(0, 2, 2);\n    sample.add_edge(1,\
+    \ 3, 4);\n    sample.add_edge(1, 4, 1);\n    sample.add_edge(2, 5, 6);\n    sample.add_edge(5,\
+    \ 6, 2);\n\n    m1une::tree::EulerTour<long long> tour(sample, 0);\n    std::vector<int>\
+    \ expected_order = {0, 1, 3, 4, 2, 5, 6};\n    std::vector<int> expected_children_zero\
+    \ = {1, 2};\n    std::vector<int> expected_subtree = {1, 3, 4};\n    assert(tour.size()\
+    \ == 7);\n    assert(tour.visited_size() == 7);\n    assert(tour.root == 0);\n\
+    \    assert(tour.order == expected_order);\n    assert(tour.children[0] == expected_children_zero);\n\
+    \    assert(tour.parent[6] == 5);\n    assert(tour.parent_edge[6] == 5);\n   \
+    \ assert(tour.depth[6] == 3);\n    assert(tour.dist[6] == 10);\n    assert(tour.subtree_size[0]\
+    \ == 7);\n    assert(tour.subtree_size[1] == 3);\n    assert(tour.is_ancestor(1,\
+    \ 4));\n    assert(!tour.is_ancestor(2, 4));\n    assert(tour.in_subtree(4, 1));\n\
+    \    assert(tour.subtree_range(1).first == 1);\n    assert(tour.subtree_range(1).second\
+    \ == 4);\n    assert(tour.subtree_range(1, true).first == 2);\n    assert(tour.subtree_range(1,\
+    \ true).second == 4);\n    assert(tour.subtree_vertices(1) == expected_subtree);\n\
+    \n    int subtree_sum = 0;\n    tour.for_each_subtree(1, [&](int vertex) {\n \
+    \       subtree_sum += vertex;\n    });\n    assert(subtree_sum == 8);\n\n   \
+    \ std::mt19937 random(123456789);\n    for (int test = 0; test < 50; ++test) {\n\
+    \        int n = 1 + int(random() % 40);\n        Graph<int> graph(n);\n     \
+    \   std::vector<int> parent(n, -1);\n        for (int v = 1; v < n; ++v) {\n \
+    \           parent[v] = int(random() % v);\n            graph.add_edge(parent[v],\
+    \ v);\n        }\n\n        m1une::tree::EulerTour<int> random_tour(graph, 0);\n\
+    \        assert(random_tour.size() == n);\n        assert(random_tour.visited_size()\
     \ == n);\n\n        std::vector<int> expected_size(n, 1);\n        for (int v\
     \ = n - 1; v >= 1; --v) expected_size[parent[v]] += expected_size[v];\n      \
     \  assert(random_tour.subtree_size == expected_size);\n\n        for (int i =\
@@ -402,7 +405,7 @@ data:
   isVerificationFile: true
   path: verify/graph/tree/vertex_add_subtree_sum.test.cpp
   requiredBy: []
-  timestamp: '2026-07-09 03:02:06+09:00'
+  timestamp: '2026-07-10 21:00:13+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/tree/vertex_add_subtree_sum.test.cpp

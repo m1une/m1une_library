@@ -10,6 +10,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
+  - icon: ':heavy_check_mark:'
+    path: utilities/fast_io.hpp
+    title: Fast IO
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
   _isVerificationFailed: false
@@ -93,66 +96,82 @@ data:
     \ {\n        x >>= 1;\n        result++;\n    }\n    return result;\n}\n\ntemplate\
     \ <class Mint>\nstruct NttRoots {\n    static constexpr int max_base = two_adic_order(Mint::mod()\
     \ - 1);\n    std::array<Mint, max_base + 1> root;\n    std::array<Mint, max_base\
-    \ + 1> inverse_root;\n\n    NttRoots() {\n        constexpr uint32_t primitive_root\
+    \ + 1> inverse_root;\n    std::array<Mint, max_base> rate;\n    std::array<Mint,\
+    \ max_base> inverse_rate;\n\n    NttRoots() {\n        constexpr uint32_t primitive_root\
     \ = primitive_root_constexpr(Mint::mod());\n        for (int level = 1; level\
     \ <= max_base; level++) {\n            root[level] = Mint(primitive_root).pow((Mint::mod()\
     \ - 1) >> level);\n            inverse_root[level] = root[level].inv();\n    \
-    \    }\n    }\n};\n\ntemplate <class Mint>\nconst NttRoots<Mint>& ntt_roots()\
-    \ {\n    static const NttRoots<Mint> roots;\n    return roots;\n}\n\ntemplate\
-    \ <class Mint>\nvoid ntt(std::vector<Mint>& a, bool inverse) {\n    const int\
-    \ n = int(a.size());\n    assert(n > 0 && (n & (n - 1)) == 0);\n    assert((Mint::mod()\
-    \ - 1) % uint32_t(n) == 0);\n\n    for (int i = 1, j = 0; i < n; i++) {\n    \
-    \    int bit = n >> 1;\n        while (j & bit) {\n            j ^= bit;\n   \
-    \         bit >>= 1;\n        }\n        j ^= bit;\n        if (i < j) std::swap(a[i],\
-    \ a[j]);\n    }\n\n    const auto& roots = ntt_roots<Mint>();\n    int level =\
-    \ 1;\n    for (int len = 2; len <= n; len <<= 1, level++) {\n        const Mint\
-    \ step = inverse ? roots.inverse_root[level] : roots.root[level];\n        const\
-    \ int half = len >> 1;\n        for (int offset = 0; offset < n; offset += len)\
-    \ {\n            Mint w = 1;\n            for (int j = 0; j < half; j++) {\n \
-    \               Mint even = a[offset + j];\n                Mint odd = a[offset\
-    \ + j + half] * w;\n                a[offset + j] = even + odd;\n            \
-    \    a[offset + j + half] = even - odd;\n                w *= step;\n        \
-    \    }\n        }\n    }\n\n    if (inverse) {\n        const Mint inverse_n =\
-    \ Mint(n).inv();\n        for (Mint& value : a) value *= inverse_n;\n    }\n}\n\
-    \n}  // namespace internal\n\ntemplate <class Mint>\nstd::vector<Mint> convolution_naive(const\
-    \ std::vector<Mint>& a, const std::vector<Mint>& b) {\n    if (a.empty() || b.empty())\
-    \ return {};\n    std::vector<Mint> result(a.size() + b.size() - 1);\n    if (a.size()\
-    \ < b.size()) {\n        for (int i = 0; i < int(a.size()); i++) {\n         \
-    \   for (int j = 0; j < int(b.size()); j++) result[i + j] += a[i] * b[j];\n  \
-    \      }\n    } else {\n        for (int j = 0; j < int(b.size()); j++) {\n  \
-    \          for (int i = 0; i < int(a.size()); i++) result[i + j] += a[i] * b[j];\n\
-    \        }\n    }\n    return result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint>\
-    \ convolution_ntt(const std::vector<Mint>& a, const std::vector<Mint>& b) {\n\
-    \    const int result_size = int(a.size() + b.size() - 1);\n    int n = 1;\n \
-    \   while (n < result_size) n <<= 1;\n    assert((Mint::mod() - 1) % uint32_t(n)\
-    \ == 0);\n\n    std::vector<Mint> fa(a.begin(), a.end());\n    std::vector<Mint>\
-    \ fb(b.begin(), b.end());\n    fa.resize(n);\n    fb.resize(n);\n    internal::ntt(fa,\
-    \ false);\n    internal::ntt(fb, false);\n    for (int i = 0; i < n; i++) fa[i]\
-    \ *= fb[i];\n    internal::ntt(fa, true);\n    fa.resize(result_size);\n    return\
-    \ fa;\n}\n\ntemplate <class Mint>\nstd::vector<Mint> convolution(const std::vector<Mint>&\
+    \    }\n        Mint product = 1;\n        Mint inverse_product = 1;\n       \
+    \ for (int i = 0; i + 1 < max_base; i++) {\n            rate[i] = root[i + 2]\
+    \ * product;\n            inverse_rate[i] = inverse_root[i + 2] * inverse_product;\n\
+    \            product *= inverse_root[i + 2];\n            inverse_product *= root[i\
+    \ + 2];\n        }\n    }\n};\n\ntemplate <class Mint>\nconst NttRoots<Mint>&\
+    \ ntt_roots() {\n    static const NttRoots<Mint> roots;\n    return roots;\n}\n\
+    \ntemplate <class Mint>\nvoid ntt(std::vector<Mint>& a, bool inverse) {\n    const\
+    \ int n = int(a.size());\n    assert(n > 0 && (n & (n - 1)) == 0);\n    assert((Mint::mod()\
+    \ - 1) % uint32_t(n) == 0);\n\n    const auto& roots = ntt_roots<Mint>();\n  \
+    \  const int height = two_adic_order(uint32_t(n));\n    if (!inverse) {\n    \
+    \    // The transposed access order avoids bit reversal and changes the\n    \
+    \    // twiddle only once per block instead of once per butterfly.\n        for\
+    \ (int phase = 1; phase <= height; phase++) {\n            const int blocks =\
+    \ 1 << (phase - 1);\n            const int width = 1 << (height - phase);\n  \
+    \          Mint twiddle = 1;\n            for (int block = 0; block < blocks;\
+    \ block++) {\n                const int offset = block << (height - phase + 1);\n\
+    \                for (int i = 0; i < width; i++) {\n                    const\
+    \ Mint left = a[offset + i];\n                    const Mint right = a[offset\
+    \ + i + width] * twiddle;\n                    a[offset + i] = left + right;\n\
+    \                    a[offset + i + width] = left - right;\n                }\n\
+    \                if (block + 1 != blocks)\n                    twiddle *= roots.rate[__builtin_ctz(~uint32_t(block))];\n\
+    \            }\n        }\n    } else {\n        for (int phase = height; phase\
+    \ >= 1; phase--) {\n            const int blocks = 1 << (phase - 1);\n       \
+    \     const int width = 1 << (height - phase);\n            Mint twiddle = 1;\n\
+    \            for (int block = 0; block < blocks; block++) {\n                const\
+    \ int offset = block << (height - phase + 1);\n                for (int i = 0;\
+    \ i < width; i++) {\n                    const Mint left = a[offset + i];\n  \
+    \                  const Mint right = a[offset + i + width];\n               \
+    \     a[offset + i] = left + right;\n                    a[offset + i + width]\
+    \ = (left - right) * twiddle;\n                }\n                if (block +\
+    \ 1 != blocks)\n                    twiddle *= roots.inverse_rate[__builtin_ctz(~uint32_t(block))];\n\
+    \            }\n        }\n        const Mint inverse_n = Mint(n).inv();\n   \
+    \     for (Mint& value : a) value *= inverse_n;\n    }\n}\n\n}  // namespace internal\n\
+    \ntemplate <class Mint>\nstd::vector<Mint> convolution_naive(const std::vector<Mint>&\
     \ a, const std::vector<Mint>& b) {\n    if (a.empty() || b.empty()) return {};\n\
-    \    if (std::min(a.size(), b.size()) <= 32) return convolution_naive(a, b);\n\
-    \n    const int result_size = int(a.size() + b.size() - 1);\n    int n = 1;\n\
-    \    while (n < result_size) n <<= 1;\n    if ((Mint::mod() - 1) % uint32_t(n)\
-    \ == 0) return convolution_ntt(a, b);\n\n    using Mint1 = math::ModInt<167772161>;\n\
-    \    using Mint2 = math::ModInt<469762049>;\n    using Mint3 = math::ModInt<754974721>;\n\
-    \    assert(n <= (1 << 24));\n\n    [[maybe_unused]] const unsigned __int128 coefficient_bound\
-    \ =\n        static_cast<unsigned __int128>(std::min(a.size(), b.size())) * (Mint::mod()\
-    \ - 1) *\n        (Mint::mod() - 1);\n    [[maybe_unused]] const unsigned __int128\
-    \ crt_modulus =\n        static_cast<unsigned __int128>(Mint1::mod()) * Mint2::mod()\
-    \ * Mint3::mod();\n    assert(coefficient_bound < crt_modulus);\n\n    auto converted_convolution\
-    \ = [&]<class OtherMint>() {\n        std::vector<OtherMint> converted_a(a.size());\n\
-    \        std::vector<OtherMint> converted_b(b.size());\n        for (int i = 0;\
-    \ i < int(a.size()); i++) converted_a[i] = OtherMint(a[i].val());\n        for\
-    \ (int i = 0; i < int(b.size()); i++) converted_b[i] = OtherMint(b[i].val());\n\
-    \        return convolution_ntt(converted_a, converted_b);\n    };\n    std::vector<Mint1>\
-    \ c1 = converted_convolution.template operator()<Mint1>();\n    std::vector<Mint2>\
-    \ c2 = converted_convolution.template operator()<Mint2>();\n    std::vector<Mint3>\
-    \ c3 = converted_convolution.template operator()<Mint3>();\n    static const uint64_t\
-    \ inverse_mod1_mod2 = Mint2(Mint1::mod()).inv().val();\n    static const uint64_t\
-    \ mod1_mod3 = Mint1::mod() % Mint3::mod();\n    static const uint64_t mod1_mod2_mod3\
-    \ =\n        mod1_mod3 * (Mint2::mod() % Mint3::mod()) % Mint3::mod();\n    static\
-    \ const uint64_t inverse_mod1_mod2_mod3 = Mint3(uint32_t(mod1_mod2_mod3)).inv().val();\n\
+    \    std::vector<Mint> result(a.size() + b.size() - 1);\n    if (a.size() < b.size())\
+    \ {\n        for (int i = 0; i < int(a.size()); i++) {\n            for (int j\
+    \ = 0; j < int(b.size()); j++) result[i + j] += a[i] * b[j];\n        }\n    }\
+    \ else {\n        for (int j = 0; j < int(b.size()); j++) {\n            for (int\
+    \ i = 0; i < int(a.size()); i++) result[i + j] += a[i] * b[j];\n        }\n  \
+    \  }\n    return result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint> convolution_ntt(const\
+    \ std::vector<Mint>& a, const std::vector<Mint>& b) {\n    const int result_size\
+    \ = int(a.size() + b.size() - 1);\n    int n = 1;\n    while (n < result_size)\
+    \ n <<= 1;\n    assert((Mint::mod() - 1) % uint32_t(n) == 0);\n\n    std::vector<Mint>\
+    \ fa(a.begin(), a.end());\n    std::vector<Mint> fb(b.begin(), b.end());\n   \
+    \ fa.resize(n);\n    fb.resize(n);\n    internal::ntt(fa, false);\n    internal::ntt(fb,\
+    \ false);\n    for (int i = 0; i < n; i++) fa[i] *= fb[i];\n    internal::ntt(fa,\
+    \ true);\n    fa.resize(result_size);\n    return fa;\n}\n\ntemplate <class Mint>\n\
+    std::vector<Mint> convolution(const std::vector<Mint>& a, const std::vector<Mint>&\
+    \ b) {\n    if (a.empty() || b.empty()) return {};\n    if (std::min(a.size(),\
+    \ b.size()) <= 32) return convolution_naive(a, b);\n\n    const int result_size\
+    \ = int(a.size() + b.size() - 1);\n    int n = 1;\n    while (n < result_size)\
+    \ n <<= 1;\n    if ((Mint::mod() - 1) % uint32_t(n) == 0) return convolution_ntt(a,\
+    \ b);\n\n    using Mint1 = math::ModInt<167772161>;\n    using Mint2 = math::ModInt<469762049>;\n\
+    \    using Mint3 = math::ModInt<754974721>;\n    assert(n <= (1 << 24));\n\n \
+    \   [[maybe_unused]] const unsigned __int128 coefficient_bound =\n        static_cast<unsigned\
+    \ __int128>(std::min(a.size(), b.size())) * (Mint::mod() - 1) *\n        (Mint::mod()\
+    \ - 1);\n    [[maybe_unused]] const unsigned __int128 crt_modulus =\n        static_cast<unsigned\
+    \ __int128>(Mint1::mod()) * Mint2::mod() * Mint3::mod();\n    assert(coefficient_bound\
+    \ < crt_modulus);\n\n    auto converted_convolution = [&]<class OtherMint>() {\n\
+    \        std::vector<OtherMint> converted_a(a.size());\n        std::vector<OtherMint>\
+    \ converted_b(b.size());\n        for (int i = 0; i < int(a.size()); i++) converted_a[i]\
+    \ = OtherMint(a[i].val());\n        for (int i = 0; i < int(b.size()); i++) converted_b[i]\
+    \ = OtherMint(b[i].val());\n        return convolution_ntt(converted_a, converted_b);\n\
+    \    };\n    std::vector<Mint1> c1 = converted_convolution.template operator()<Mint1>();\n\
+    \    std::vector<Mint2> c2 = converted_convolution.template operator()<Mint2>();\n\
+    \    std::vector<Mint3> c3 = converted_convolution.template operator()<Mint3>();\n\
+    \    static const uint64_t inverse_mod1_mod2 = Mint2(Mint1::mod()).inv().val();\n\
+    \    static const uint64_t mod1_mod3 = Mint1::mod() % Mint3::mod();\n    static\
+    \ const uint64_t mod1_mod2_mod3 =\n        mod1_mod3 * (Mint2::mod() % Mint3::mod())\
+    \ % Mint3::mod();\n    static const uint64_t inverse_mod1_mod2_mod3 = Mint3(uint32_t(mod1_mod2_mod3)).inv().val();\n\
     \n    const uint64_t target_mod = Mint::mod();\n    const uint64_t mod1_target\
     \ = Mint1::mod() % target_mod;\n    const uint64_t mod1_mod2_target = mod1_target\
     \ * (Mint2::mod() % target_mod) % target_mod;\n    std::vector<Mint> result(result_size);\n\
@@ -167,30 +186,149 @@ data:
     \        value = (value + mod1_target * (first % target_mod)) % target_mod;\n\
     \        value = (value + mod1_mod2_target * (second % target_mod)) % target_mod;\n\
     \        result[i] = Mint::raw(uint32_t(value));\n    }\n    return result;\n\
-    }\n\n}  // namespace fps\n}  // namespace m1une\n\n\n#line 8 \"verify/math/fps/convolution_mod.test.cpp\"\
-    \n\nusing mint = m1une::math::modint998244353;\n\nint main() {\n    std::ios::sync_with_stdio(false);\n\
-    \    std::cin.tie(nullptr);\n\n    int n, m;\n    std::cin >> n >> m;\n    std::vector<mint>\
-    \ a(n), b(m);\n    for (mint& value : a) std::cin >> value;\n    for (mint& value\
-    \ : b) std::cin >> value;\n    std::vector<mint> result = m1une::fps::convolution(a,\
-    \ b);\n    for (int i = 0; i < int(result.size()); i++) {\n        if (i) std::cout\
-    \ << ' ';\n        std::cout << result[i];\n    }\n    std::cout << '\\n';\n}\n"
+    }\n\n}  // namespace fps\n}  // namespace m1une\n\n\n#line 1 \"utilities/fast_io.hpp\"\
+    \n\n\n\n#include <cstddef>\n#include <cstdio>\n#include <iterator>\n#include <string>\n\
+    #line 10 \"utilities/fast_io.hpp\"\n\nnamespace m1une {\nnamespace utilities {\n\
+    namespace internal {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class\
+    \ T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate <class T>\n\
+    struct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
+    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
+    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
+    \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
+    \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
+    \ std::void_t<typename std::remove_cv_t<std::remove_reference_t<T>>::value_type>>\
+    \ {\n    using type = typename std::remove_cv_t<std::remove_reference_t<T>>::value_type;\n\
+    };\n\ntemplate <class T>\nusing range_stored_value_t = typename range_stored_value<T>::type;\n\
+    \n// Treat strings and C strings as scalar output objects, not as ranges.\ntemplate\
+    \ <class T>\nstruct is_char_array : std::false_type {};\n\ntemplate <class T,\
+    \ std::size_t N>\nstruct is_char_array<T[N]>\n    : std::bool_constant<std::is_same_v<std::remove_cv_t<T>,\
+    \ char>> {};\n\ntemplate <class T>\nstruct is_string_like\n    : std::bool_constant<\n\
+    \          std::is_same_v<std::decay_t<T>, std::string>\n          || std::is_same_v<std::decay_t<T>,\
+    \ const char*>\n          || std::is_same_v<std::decay_t<T>, char*>\n        \
+    \  || is_char_array<std::remove_reference_t<T>>::value\n      > {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_string_like_v = is_string_like<T>::value;\n\
+    \n// ModInt-like type: x.val() is printable, and x can be assigned from long long.\n\
+    template <class T, class = void>\nstruct has_val_method : std::false_type {};\n\
+    \ntemplate <class T>\nstruct has_val_method<T, std::void_t<decltype(std::declval<const\
+    \ T&>().val())>>\n    : std::true_type {};\n\ntemplate <class T>\ninline constexpr\
+    \ bool has_val_method_v = has_val_method<T>::value;\n\n}  // namespace internal\n\
+    \nstruct FastInput {\n    static constexpr int buffer_size = 1 << 20;\n\n   private:\n\
+    \    std::FILE* _stream;\n    char _buffer[buffer_size];\n    int _position;\n\
+    \    int _length;\n\n   public:\n    explicit FastInput(std::FILE* stream = stdin)\n\
+    \        : _stream(stream), _position(0), _length(0) {}\n\n    FastInput(const\
+    \ FastInput&) = delete;\n    FastInput& operator=(const FastInput&) = delete;\n\
+    \n    int read_char_raw() {\n        if (_position == _length) {\n           \
+    \ _length = int(std::fread(_buffer, 1, buffer_size, _stream));\n            _position\
+    \ = 0;\n            if (_length == 0) return EOF;\n        }\n        return _buffer[_position++];\n\
+    \    }\n\n    bool skip_spaces() {\n        int c = read_char_raw();\n       \
+    \ while (c != EOF && c <= ' ') c = read_char_raw();\n        if (c == EOF) return\
+    \ false;\n        --_position;\n        return true;\n    }\n\n    bool read(char&\
+    \ value) {\n        if (!skip_spaces()) return false;\n        value = char(read_char_raw());\n\
+    \        return true;\n    }\n\n    bool read(std::string& value) {\n        if\
+    \ (!skip_spaces()) return false;\n        value.clear();\n        int c = read_char_raw();\n\
+    \        while (c != EOF && c > ' ') {\n            value.push_back(char(c));\n\
+    \            c = read_char_raw();\n        }\n        return true;\n    }\n\n\
+    \    bool read(bool& value) {\n        int x;\n        if (!read(x)) return false;\n\
+    \        value = x != 0;\n        return true;\n    }\n\n    template <class T>\n\
+    \    std::enable_if_t<\n        std::is_integral_v<T>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ bool>\n            && !std::is_same_v<std::remove_cv_t<T>, char>,\n        bool\n\
+    \    >\n    read(T& value) {\n        int c = read_char_raw();\n        while\
+    \ (c != EOF && c <= ' ') c = read_char_raw();\n        if (c == EOF) return false;\n\
+    \n        bool negative = false;\n        if (c == '-') {\n            negative\
+    \ = true;\n            c = read_char_raw();\n        }\n\n        if constexpr\
+    \ (std::is_signed_v<T>) {\n            T result = 0;\n            while ('0' <=\
+    \ c && c <= '9') {\n                int digit = c - '0';\n                result\
+    \ = negative ? result * 10 - digit : result * 10 + digit;\n                c =\
+    \ read_char_raw();\n            }\n            value = result;\n        } else\
+    \ {\n            T result = 0;\n            while ('0' <= c && c <= '9') {\n \
+    \               result = result * 10 + T(c - '0');\n                c = read_char_raw();\n\
+    \            }\n            value = negative ? T(0) - result : result;\n     \
+    \   }\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
+    \        internal::has_val_method_v<T>\n            && !std::is_integral_v<T>\n\
+    \            && !internal::is_range_v<T>,\n        bool\n    >\n    read(T& value)\
+    \ {\n        long long x;\n        if (!read(x)) return false;\n        value\
+    \ = T(x);\n        return true;\n    }\n\n    template <class Range>\n    std::enable_if_t<\n\
+    \        internal::is_range_v<Range>\n            && !internal::is_string_like_v<Range>,\n\
+    \        bool\n    >\n    read(Range& range) {\n        using StoredValue = internal::range_stored_value_t<Range>;\n\
+    \        constexpr bool nested = internal::is_range_v<StoredValue>\n         \
+    \                       && !internal::is_string_like_v<StoredValue>;\n\n     \
+    \   for (auto&& value : range) {\n            if constexpr (std::is_same_v<StoredValue,\
+    \ bool> && !nested) {\n                bool x;\n                if (!read(x))\
+    \ return false;\n                value = x;\n            } else {\n          \
+    \      if (!read(value)) return false;\n            }\n        }\n        return\
+    \ true;\n    }\n\n    template <class First, class Second, class... Rest>\n  \
+    \  bool read(First& first, Second& second, Rest&... rest) {\n        if (!read(first))\
+    \ return false;\n        return read(second, rest...);\n    }\n\n    template\
+    \ <class T>\n    FastInput& operator>>(T& value) {\n        read(value);\n   \
+    \     return *this;\n    }\n};\n\nstruct FastOutput {\n    static constexpr int\
+    \ buffer_size = 1 << 20;\n\n   private:\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
+    \    int _position;\n\n   public:\n    explicit FastOutput(std::FILE* stream =\
+    \ stdout)\n        : _stream(stream), _position(0) {}\n\n    FastOutput(const\
+    \ FastOutput&) = delete;\n    FastOutput& operator=(const FastOutput&) = delete;\n\
+    \n    ~FastOutput() {\n        flush();\n    }\n\n    void flush() {\n       \
+    \ if (_position == 0) return;\n        std::fwrite(_buffer, 1, _position, _stream);\n\
+    \        _position = 0;\n    }\n\n    void write_char(char c) {\n        if (_position\
+    \ == buffer_size) flush();\n        _buffer[_position++] = c;\n    }\n\n    void\
+    \ write(const char* s) {\n        while (*s != '\\0') write_char(*s++);\n    }\n\
+    \n    void write(const std::string& s) {\n        for (char c : s) write_char(c);\n\
+    \    }\n\n    void write(char c) {\n        write_char(c);\n    }\n\n    void\
+    \ write(bool value) {\n        write_char(value ? '1' : '0');\n    }\n\n    template\
+    \ <class T>\n    std::enable_if_t<\n        std::is_integral_v<T>\n          \
+    \  && !std::is_same_v<std::remove_cv_t<T>, bool>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ char>\n    >\n    write(T value) {\n        using Raw = std::remove_cv_t<T>;\n\
+    \        using Unsigned = std::make_unsigned_t<Raw>;\n\n        Unsigned magnitude;\n\
+    \        if constexpr (std::is_signed_v<Raw>) {\n            if (value < 0) {\n\
+    \                write_char('-');\n                magnitude = Unsigned(0) - Unsigned(value);\n\
+    \            } else {\n                magnitude = Unsigned(value);\n        \
+    \    }\n        } else {\n            magnitude = value;\n        }\n\n      \
+    \  if (magnitude == 0) {\n            write_char('0');\n            return;\n\
+    \        }\n\n        char digits[64];\n        int count = 0;\n        while\
+    \ (magnitude > 0) {\n            digits[count++] = char('0' + magnitude % 10);\n\
+    \            magnitude /= 10;\n        }\n        while (count--) write_char(digits[count]);\n\
+    \    }\n\n    template <class T>\n    std::enable_if_t<\n        internal::has_val_method_v<T>\n\
+    \            && !std::is_integral_v<T>\n            && !internal::is_range_v<T>\n\
+    \    >\n    write(const T& value) {\n        write(value.val());\n    }\n\n  \
+    \  template <class Range>\n    std::enable_if_t<\n        internal::is_range_v<Range>\n\
+    \            && !internal::is_string_like_v<Range>\n    >\n    write(const Range&\
+    \ range) {\n        using StoredValue = internal::range_stored_value_t<const Range>;\n\
+    \        constexpr bool nested = internal::is_range_v<StoredValue>\n         \
+    \                       && !internal::is_string_like_v<StoredValue>;\n\n     \
+    \   bool first = true;\n        for (const auto& value : range) {\n          \
+    \  if (!first) write_char(nested ? '\\n' : ' ');\n            first = false;\n\
+    \            if constexpr (std::is_same_v<StoredValue, bool> && !nested) {\n \
+    \               write(static_cast<bool>(value));\n            } else {\n     \
+    \           write(value);\n            }\n        }\n    }\n\n    template <class\
+    \ First, class... Rest>\n    void print(const First& first, const Rest&... rest)\
+    \ {\n        write(first);\n        ((write_char(' '), write(rest)), ...);\n \
+    \   }\n\n    void println() {\n        write_char('\\n');\n    }\n\n    template\
+    \ <class... Args>\n    void println(const Args&... args) {\n        print(args...);\n\
+    \        write_char('\\n');\n    }\n\n    template <class T>\n    FastOutput&\
+    \ operator<<(const T& value) {\n        write(value);\n        return *this;\n\
+    \    }\n};\n\n}  // namespace utilities\n}  // namespace m1une\n\n\n#line 9 \"\
+    verify/math/fps/convolution_mod.test.cpp\"\n\nusing mint = m1une::math::modint998244353;\n\
+    \nint main() {\n    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput\
+    \ output;\n\n    int n, m;\n    input.read(n, m);\n    std::vector<mint> a(n),\
+    \ b(m);\n    input.read(a);\n    input.read(b);\n    std::vector<mint> result\
+    \ = m1une::fps::convolution(a, b);\n    output.println(result);\n}\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/convolution_mod\"\n\n#include\
     \ <iostream>\n#include <vector>\n\n#include \"../../../math/fps/convolution.hpp\"\
-    \n#include \"../../../math/modint.hpp\"\n\nusing mint = m1une::math::modint998244353;\n\
-    \nint main() {\n    std::ios::sync_with_stdio(false);\n    std::cin.tie(nullptr);\n\
-    \n    int n, m;\n    std::cin >> n >> m;\n    std::vector<mint> a(n), b(m);\n\
-    \    for (mint& value : a) std::cin >> value;\n    for (mint& value : b) std::cin\
-    \ >> value;\n    std::vector<mint> result = m1une::fps::convolution(a, b);\n \
-    \   for (int i = 0; i < int(result.size()); i++) {\n        if (i) std::cout <<\
-    \ ' ';\n        std::cout << result[i];\n    }\n    std::cout << '\\n';\n}\n"
+    \n#include \"../../../math/modint.hpp\"\n#include \"../../../utilities/fast_io.hpp\"\
+    \n\nusing mint = m1une::math::modint998244353;\n\nint main() {\n    m1une::utilities::FastInput\
+    \ input;\n    m1une::utilities::FastOutput output;\n\n    int n, m;\n    input.read(n,\
+    \ m);\n    std::vector<mint> a(n), b(m);\n    input.read(a);\n    input.read(b);\n\
+    \    std::vector<mint> result = m1une::fps::convolution(a, b);\n    output.println(result);\n\
+    }\n"
   dependsOn:
   - math/fps/convolution.hpp
   - math/modint.hpp
   - math/modint.hpp
+  - utilities/fast_io.hpp
   isVerificationFile: true
   path: verify/math/fps/convolution_mod.test.cpp
   requiredBy: []
-  timestamp: '2026-07-07 14:26:59+09:00'
+  timestamp: '2026-07-10 21:00:13+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/fps/convolution_mod.test.cpp

@@ -210,33 +210,34 @@ data:
     \      if (!read(value)) return false;\n            }\n        }\n        return\
     \ true;\n    }\n\n    template <class First, class Second, class... Rest>\n  \
     \  bool read(First& first, Second& second, Rest&... rest) {\n        if (!read(first))\
-    \ return false;\n        return read(second, rest...);\n    }\n};\n\nstruct FastOutput\
-    \ {\n    static constexpr int buffer_size = 1 << 20;\n\n   private:\n    std::FILE*\
-    \ _stream;\n    char _buffer[buffer_size];\n    int _position;\n\n   public:\n\
-    \    explicit FastOutput(std::FILE* stream = stdout)\n        : _stream(stream),\
-    \ _position(0) {}\n\n    FastOutput(const FastOutput&) = delete;\n    FastOutput&\
-    \ operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n        flush();\n\
-    \    }\n\n    void flush() {\n        if (_position == 0) return;\n        std::fwrite(_buffer,\
-    \ 1, _position, _stream);\n        _position = 0;\n    }\n\n    void write_char(char\
-    \ c) {\n        if (_position == buffer_size) flush();\n        _buffer[_position++]\
-    \ = c;\n    }\n\n    void write(const char* s) {\n        while (*s != '\\0')\
-    \ write_char(*s++);\n    }\n\n    void write(const std::string& s) {\n       \
-    \ for (char c : s) write_char(c);\n    }\n\n    void write(char c) {\n       \
-    \ write_char(c);\n    }\n\n    void write(bool value) {\n        write_char(value\
-    \ ? '1' : '0');\n    }\n\n    template <class T>\n    std::enable_if_t<\n    \
-    \    std::is_integral_v<T>\n            && !std::is_same_v<std::remove_cv_t<T>,\
-    \ bool>\n            && !std::is_same_v<std::remove_cv_t<T>, char>\n    >\n  \
-    \  write(T value) {\n        using Raw = std::remove_cv_t<T>;\n        using Unsigned\
-    \ = std::make_unsigned_t<Raw>;\n\n        Unsigned magnitude;\n        if constexpr\
-    \ (std::is_signed_v<Raw>) {\n            if (value < 0) {\n                write_char('-');\n\
-    \                magnitude = Unsigned(0) - Unsigned(value);\n            } else\
-    \ {\n                magnitude = Unsigned(value);\n            }\n        } else\
-    \ {\n            magnitude = value;\n        }\n\n        if (magnitude == 0)\
-    \ {\n            write_char('0');\n            return;\n        }\n\n        char\
-    \ digits[64];\n        int count = 0;\n        while (magnitude > 0) {\n     \
-    \       digits[count++] = char('0' + magnitude % 10);\n            magnitude /=\
-    \ 10;\n        }\n        while (count--) write_char(digits[count]);\n    }\n\n\
-    \    template <class T>\n    std::enable_if_t<\n        internal::has_val_method_v<T>\n\
+    \ return false;\n        return read(second, rest...);\n    }\n\n    template\
+    \ <class T>\n    FastInput& operator>>(T& value) {\n        read(value);\n   \
+    \     return *this;\n    }\n};\n\nstruct FastOutput {\n    static constexpr int\
+    \ buffer_size = 1 << 20;\n\n   private:\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
+    \    int _position;\n\n   public:\n    explicit FastOutput(std::FILE* stream =\
+    \ stdout)\n        : _stream(stream), _position(0) {}\n\n    FastOutput(const\
+    \ FastOutput&) = delete;\n    FastOutput& operator=(const FastOutput&) = delete;\n\
+    \n    ~FastOutput() {\n        flush();\n    }\n\n    void flush() {\n       \
+    \ if (_position == 0) return;\n        std::fwrite(_buffer, 1, _position, _stream);\n\
+    \        _position = 0;\n    }\n\n    void write_char(char c) {\n        if (_position\
+    \ == buffer_size) flush();\n        _buffer[_position++] = c;\n    }\n\n    void\
+    \ write(const char* s) {\n        while (*s != '\\0') write_char(*s++);\n    }\n\
+    \n    void write(const std::string& s) {\n        for (char c : s) write_char(c);\n\
+    \    }\n\n    void write(char c) {\n        write_char(c);\n    }\n\n    void\
+    \ write(bool value) {\n        write_char(value ? '1' : '0');\n    }\n\n    template\
+    \ <class T>\n    std::enable_if_t<\n        std::is_integral_v<T>\n          \
+    \  && !std::is_same_v<std::remove_cv_t<T>, bool>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ char>\n    >\n    write(T value) {\n        using Raw = std::remove_cv_t<T>;\n\
+    \        using Unsigned = std::make_unsigned_t<Raw>;\n\n        Unsigned magnitude;\n\
+    \        if constexpr (std::is_signed_v<Raw>) {\n            if (value < 0) {\n\
+    \                write_char('-');\n                magnitude = Unsigned(0) - Unsigned(value);\n\
+    \            } else {\n                magnitude = Unsigned(value);\n        \
+    \    }\n        } else {\n            magnitude = value;\n        }\n\n      \
+    \  if (magnitude == 0) {\n            write_char('0');\n            return;\n\
+    \        }\n\n        char digits[64];\n        int count = 0;\n        while\
+    \ (magnitude > 0) {\n            digits[count++] = char('0' + magnitude % 10);\n\
+    \            magnitude /= 10;\n        }\n        while (count--) write_char(digits[count]);\n\
+    \    }\n\n    template <class T>\n    std::enable_if_t<\n        internal::has_val_method_v<T>\n\
     \            && !std::is_integral_v<T>\n            && !internal::is_range_v<T>\n\
     \    >\n    write(const T& value) {\n        write(value.val());\n    }\n\n  \
     \  template <class Range>\n    std::enable_if_t<\n        internal::is_range_v<Range>\n\
@@ -253,10 +254,11 @@ data:
     \ {\n        write(first);\n        ((write_char(' '), write(rest)), ...);\n \
     \   }\n\n    void println() {\n        write_char('\\n');\n    }\n\n    template\
     \ <class... Args>\n    void println(const Args&... args) {\n        print(args...);\n\
-    \        write_char('\\n');\n    }\n};\n\n}  // namespace utilities\n}  // namespace\
-    \ m1une\n\n\n#line 5 \"verify/ds/range_query/range_inversion_count.test.cpp\"\n\
-    \n#line 7 \"verify/ds/range_query/range_inversion_count.test.cpp\"\n#include <cstdint>\n\
-    #include <iostream>\n#line 10 \"verify/ds/range_query/range_inversion_count.test.cpp\"\
+    \        write_char('\\n');\n    }\n\n    template <class T>\n    FastOutput&\
+    \ operator<<(const T& value) {\n        write(value);\n        return *this;\n\
+    \    }\n};\n\n}  // namespace utilities\n}  // namespace m1une\n\n\n#line 5 \"\
+    verify/ds/range_query/range_inversion_count.test.cpp\"\n\n#line 7 \"verify/ds/range_query/range_inversion_count.test.cpp\"\
+    \n#include <cstdint>\n#include <iostream>\n#line 10 \"verify/ds/range_query/range_inversion_count.test.cpp\"\
     \n\nnamespace {\n\n[[maybe_unused]] long long brute(\n    const std::vector<int>&\
     \ values,\n    int left,\n    int right\n) {\n    long long result = 0;\n    for\
     \ (int first = left; first < right; ++first) {\n        for (int second = first\
@@ -308,7 +310,7 @@ data:
   isVerificationFile: true
   path: verify/ds/range_query/range_inversion_count.test.cpp
   requiredBy: []
-  timestamp: '2026-07-10 17:55:06+09:00'
+  timestamp: '2026-07-10 21:00:13+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/range_query/range_inversion_count.test.cpp

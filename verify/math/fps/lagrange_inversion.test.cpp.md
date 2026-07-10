@@ -103,66 +103,82 @@ data:
     \ {\n        x >>= 1;\n        result++;\n    }\n    return result;\n}\n\ntemplate\
     \ <class Mint>\nstruct NttRoots {\n    static constexpr int max_base = two_adic_order(Mint::mod()\
     \ - 1);\n    std::array<Mint, max_base + 1> root;\n    std::array<Mint, max_base\
-    \ + 1> inverse_root;\n\n    NttRoots() {\n        constexpr uint32_t primitive_root\
+    \ + 1> inverse_root;\n    std::array<Mint, max_base> rate;\n    std::array<Mint,\
+    \ max_base> inverse_rate;\n\n    NttRoots() {\n        constexpr uint32_t primitive_root\
     \ = primitive_root_constexpr(Mint::mod());\n        for (int level = 1; level\
     \ <= max_base; level++) {\n            root[level] = Mint(primitive_root).pow((Mint::mod()\
     \ - 1) >> level);\n            inverse_root[level] = root[level].inv();\n    \
-    \    }\n    }\n};\n\ntemplate <class Mint>\nconst NttRoots<Mint>& ntt_roots()\
-    \ {\n    static const NttRoots<Mint> roots;\n    return roots;\n}\n\ntemplate\
-    \ <class Mint>\nvoid ntt(std::vector<Mint>& a, bool inverse) {\n    const int\
-    \ n = int(a.size());\n    assert(n > 0 && (n & (n - 1)) == 0);\n    assert((Mint::mod()\
-    \ - 1) % uint32_t(n) == 0);\n\n    for (int i = 1, j = 0; i < n; i++) {\n    \
-    \    int bit = n >> 1;\n        while (j & bit) {\n            j ^= bit;\n   \
-    \         bit >>= 1;\n        }\n        j ^= bit;\n        if (i < j) std::swap(a[i],\
-    \ a[j]);\n    }\n\n    const auto& roots = ntt_roots<Mint>();\n    int level =\
-    \ 1;\n    for (int len = 2; len <= n; len <<= 1, level++) {\n        const Mint\
-    \ step = inverse ? roots.inverse_root[level] : roots.root[level];\n        const\
-    \ int half = len >> 1;\n        for (int offset = 0; offset < n; offset += len)\
-    \ {\n            Mint w = 1;\n            for (int j = 0; j < half; j++) {\n \
-    \               Mint even = a[offset + j];\n                Mint odd = a[offset\
-    \ + j + half] * w;\n                a[offset + j] = even + odd;\n            \
-    \    a[offset + j + half] = even - odd;\n                w *= step;\n        \
-    \    }\n        }\n    }\n\n    if (inverse) {\n        const Mint inverse_n =\
-    \ Mint(n).inv();\n        for (Mint& value : a) value *= inverse_n;\n    }\n}\n\
-    \n}  // namespace internal\n\ntemplate <class Mint>\nstd::vector<Mint> convolution_naive(const\
-    \ std::vector<Mint>& a, const std::vector<Mint>& b) {\n    if (a.empty() || b.empty())\
-    \ return {};\n    std::vector<Mint> result(a.size() + b.size() - 1);\n    if (a.size()\
-    \ < b.size()) {\n        for (int i = 0; i < int(a.size()); i++) {\n         \
-    \   for (int j = 0; j < int(b.size()); j++) result[i + j] += a[i] * b[j];\n  \
-    \      }\n    } else {\n        for (int j = 0; j < int(b.size()); j++) {\n  \
-    \          for (int i = 0; i < int(a.size()); i++) result[i + j] += a[i] * b[j];\n\
-    \        }\n    }\n    return result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint>\
-    \ convolution_ntt(const std::vector<Mint>& a, const std::vector<Mint>& b) {\n\
-    \    const int result_size = int(a.size() + b.size() - 1);\n    int n = 1;\n \
-    \   while (n < result_size) n <<= 1;\n    assert((Mint::mod() - 1) % uint32_t(n)\
-    \ == 0);\n\n    std::vector<Mint> fa(a.begin(), a.end());\n    std::vector<Mint>\
-    \ fb(b.begin(), b.end());\n    fa.resize(n);\n    fb.resize(n);\n    internal::ntt(fa,\
-    \ false);\n    internal::ntt(fb, false);\n    for (int i = 0; i < n; i++) fa[i]\
-    \ *= fb[i];\n    internal::ntt(fa, true);\n    fa.resize(result_size);\n    return\
-    \ fa;\n}\n\ntemplate <class Mint>\nstd::vector<Mint> convolution(const std::vector<Mint>&\
+    \    }\n        Mint product = 1;\n        Mint inverse_product = 1;\n       \
+    \ for (int i = 0; i + 1 < max_base; i++) {\n            rate[i] = root[i + 2]\
+    \ * product;\n            inverse_rate[i] = inverse_root[i + 2] * inverse_product;\n\
+    \            product *= inverse_root[i + 2];\n            inverse_product *= root[i\
+    \ + 2];\n        }\n    }\n};\n\ntemplate <class Mint>\nconst NttRoots<Mint>&\
+    \ ntt_roots() {\n    static const NttRoots<Mint> roots;\n    return roots;\n}\n\
+    \ntemplate <class Mint>\nvoid ntt(std::vector<Mint>& a, bool inverse) {\n    const\
+    \ int n = int(a.size());\n    assert(n > 0 && (n & (n - 1)) == 0);\n    assert((Mint::mod()\
+    \ - 1) % uint32_t(n) == 0);\n\n    const auto& roots = ntt_roots<Mint>();\n  \
+    \  const int height = two_adic_order(uint32_t(n));\n    if (!inverse) {\n    \
+    \    // The transposed access order avoids bit reversal and changes the\n    \
+    \    // twiddle only once per block instead of once per butterfly.\n        for\
+    \ (int phase = 1; phase <= height; phase++) {\n            const int blocks =\
+    \ 1 << (phase - 1);\n            const int width = 1 << (height - phase);\n  \
+    \          Mint twiddle = 1;\n            for (int block = 0; block < blocks;\
+    \ block++) {\n                const int offset = block << (height - phase + 1);\n\
+    \                for (int i = 0; i < width; i++) {\n                    const\
+    \ Mint left = a[offset + i];\n                    const Mint right = a[offset\
+    \ + i + width] * twiddle;\n                    a[offset + i] = left + right;\n\
+    \                    a[offset + i + width] = left - right;\n                }\n\
+    \                if (block + 1 != blocks)\n                    twiddle *= roots.rate[__builtin_ctz(~uint32_t(block))];\n\
+    \            }\n        }\n    } else {\n        for (int phase = height; phase\
+    \ >= 1; phase--) {\n            const int blocks = 1 << (phase - 1);\n       \
+    \     const int width = 1 << (height - phase);\n            Mint twiddle = 1;\n\
+    \            for (int block = 0; block < blocks; block++) {\n                const\
+    \ int offset = block << (height - phase + 1);\n                for (int i = 0;\
+    \ i < width; i++) {\n                    const Mint left = a[offset + i];\n  \
+    \                  const Mint right = a[offset + i + width];\n               \
+    \     a[offset + i] = left + right;\n                    a[offset + i + width]\
+    \ = (left - right) * twiddle;\n                }\n                if (block +\
+    \ 1 != blocks)\n                    twiddle *= roots.inverse_rate[__builtin_ctz(~uint32_t(block))];\n\
+    \            }\n        }\n        const Mint inverse_n = Mint(n).inv();\n   \
+    \     for (Mint& value : a) value *= inverse_n;\n    }\n}\n\n}  // namespace internal\n\
+    \ntemplate <class Mint>\nstd::vector<Mint> convolution_naive(const std::vector<Mint>&\
     \ a, const std::vector<Mint>& b) {\n    if (a.empty() || b.empty()) return {};\n\
-    \    if (std::min(a.size(), b.size()) <= 32) return convolution_naive(a, b);\n\
-    \n    const int result_size = int(a.size() + b.size() - 1);\n    int n = 1;\n\
-    \    while (n < result_size) n <<= 1;\n    if ((Mint::mod() - 1) % uint32_t(n)\
-    \ == 0) return convolution_ntt(a, b);\n\n    using Mint1 = math::ModInt<167772161>;\n\
-    \    using Mint2 = math::ModInt<469762049>;\n    using Mint3 = math::ModInt<754974721>;\n\
-    \    assert(n <= (1 << 24));\n\n    [[maybe_unused]] const unsigned __int128 coefficient_bound\
-    \ =\n        static_cast<unsigned __int128>(std::min(a.size(), b.size())) * (Mint::mod()\
-    \ - 1) *\n        (Mint::mod() - 1);\n    [[maybe_unused]] const unsigned __int128\
-    \ crt_modulus =\n        static_cast<unsigned __int128>(Mint1::mod()) * Mint2::mod()\
-    \ * Mint3::mod();\n    assert(coefficient_bound < crt_modulus);\n\n    auto converted_convolution\
-    \ = [&]<class OtherMint>() {\n        std::vector<OtherMint> converted_a(a.size());\n\
-    \        std::vector<OtherMint> converted_b(b.size());\n        for (int i = 0;\
-    \ i < int(a.size()); i++) converted_a[i] = OtherMint(a[i].val());\n        for\
-    \ (int i = 0; i < int(b.size()); i++) converted_b[i] = OtherMint(b[i].val());\n\
-    \        return convolution_ntt(converted_a, converted_b);\n    };\n    std::vector<Mint1>\
-    \ c1 = converted_convolution.template operator()<Mint1>();\n    std::vector<Mint2>\
-    \ c2 = converted_convolution.template operator()<Mint2>();\n    std::vector<Mint3>\
-    \ c3 = converted_convolution.template operator()<Mint3>();\n    static const uint64_t\
-    \ inverse_mod1_mod2 = Mint2(Mint1::mod()).inv().val();\n    static const uint64_t\
-    \ mod1_mod3 = Mint1::mod() % Mint3::mod();\n    static const uint64_t mod1_mod2_mod3\
-    \ =\n        mod1_mod3 * (Mint2::mod() % Mint3::mod()) % Mint3::mod();\n    static\
-    \ const uint64_t inverse_mod1_mod2_mod3 = Mint3(uint32_t(mod1_mod2_mod3)).inv().val();\n\
+    \    std::vector<Mint> result(a.size() + b.size() - 1);\n    if (a.size() < b.size())\
+    \ {\n        for (int i = 0; i < int(a.size()); i++) {\n            for (int j\
+    \ = 0; j < int(b.size()); j++) result[i + j] += a[i] * b[j];\n        }\n    }\
+    \ else {\n        for (int j = 0; j < int(b.size()); j++) {\n            for (int\
+    \ i = 0; i < int(a.size()); i++) result[i + j] += a[i] * b[j];\n        }\n  \
+    \  }\n    return result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint> convolution_ntt(const\
+    \ std::vector<Mint>& a, const std::vector<Mint>& b) {\n    const int result_size\
+    \ = int(a.size() + b.size() - 1);\n    int n = 1;\n    while (n < result_size)\
+    \ n <<= 1;\n    assert((Mint::mod() - 1) % uint32_t(n) == 0);\n\n    std::vector<Mint>\
+    \ fa(a.begin(), a.end());\n    std::vector<Mint> fb(b.begin(), b.end());\n   \
+    \ fa.resize(n);\n    fb.resize(n);\n    internal::ntt(fa, false);\n    internal::ntt(fb,\
+    \ false);\n    for (int i = 0; i < n; i++) fa[i] *= fb[i];\n    internal::ntt(fa,\
+    \ true);\n    fa.resize(result_size);\n    return fa;\n}\n\ntemplate <class Mint>\n\
+    std::vector<Mint> convolution(const std::vector<Mint>& a, const std::vector<Mint>&\
+    \ b) {\n    if (a.empty() || b.empty()) return {};\n    if (std::min(a.size(),\
+    \ b.size()) <= 32) return convolution_naive(a, b);\n\n    const int result_size\
+    \ = int(a.size() + b.size() - 1);\n    int n = 1;\n    while (n < result_size)\
+    \ n <<= 1;\n    if ((Mint::mod() - 1) % uint32_t(n) == 0) return convolution_ntt(a,\
+    \ b);\n\n    using Mint1 = math::ModInt<167772161>;\n    using Mint2 = math::ModInt<469762049>;\n\
+    \    using Mint3 = math::ModInt<754974721>;\n    assert(n <= (1 << 24));\n\n \
+    \   [[maybe_unused]] const unsigned __int128 coefficient_bound =\n        static_cast<unsigned\
+    \ __int128>(std::min(a.size(), b.size())) * (Mint::mod() - 1) *\n        (Mint::mod()\
+    \ - 1);\n    [[maybe_unused]] const unsigned __int128 crt_modulus =\n        static_cast<unsigned\
+    \ __int128>(Mint1::mod()) * Mint2::mod() * Mint3::mod();\n    assert(coefficient_bound\
+    \ < crt_modulus);\n\n    auto converted_convolution = [&]<class OtherMint>() {\n\
+    \        std::vector<OtherMint> converted_a(a.size());\n        std::vector<OtherMint>\
+    \ converted_b(b.size());\n        for (int i = 0; i < int(a.size()); i++) converted_a[i]\
+    \ = OtherMint(a[i].val());\n        for (int i = 0; i < int(b.size()); i++) converted_b[i]\
+    \ = OtherMint(b[i].val());\n        return convolution_ntt(converted_a, converted_b);\n\
+    \    };\n    std::vector<Mint1> c1 = converted_convolution.template operator()<Mint1>();\n\
+    \    std::vector<Mint2> c2 = converted_convolution.template operator()<Mint2>();\n\
+    \    std::vector<Mint3> c3 = converted_convolution.template operator()<Mint3>();\n\
+    \    static const uint64_t inverse_mod1_mod2 = Mint2(Mint1::mod()).inv().val();\n\
+    \    static const uint64_t mod1_mod3 = Mint1::mod() % Mint3::mod();\n    static\
+    \ const uint64_t mod1_mod2_mod3 =\n        mod1_mod3 * (Mint2::mod() % Mint3::mod())\
+    \ % Mint3::mod();\n    static const uint64_t inverse_mod1_mod2_mod3 = Mint3(uint32_t(mod1_mod2_mod3)).inv().val();\n\
     \n    const uint64_t target_mod = Mint::mod();\n    const uint64_t mod1_target\
     \ = Mint1::mod() % target_mod;\n    const uint64_t mod1_mod2_target = mod1_target\
     \ * (Mint2::mod() % target_mod) % target_mod;\n    std::vector<Mint> result(result_size);\n\
@@ -245,7 +261,25 @@ data:
     \ assert(degree >= 0);\n        if (degree == 0) return {};\n        assert(!this->empty()\
     \ && (*this)[0] != Mint(0));\n\n        Fps result(1, (*this)[0].inv());\n   \
     \     for (int size = 1; size < degree; size <<= 1) {\n            const int next_size\
-    \ = std::min(size << 1, degree);\n            Fps product = this->pre(next_size)\
+    \ = std::min(size << 1, degree);\n            const int transform_size = size\
+    \ << 1;\n            if (size >= 32 && (Mint::mod() - 1) % uint32_t(transform_size)\
+    \ == 0) {\n                // Newton's g <- g(2-fg), restricted to the newly determined\n\
+    \                // half.  Keeping g in the frequency domain avoids two general\n\
+    \                // convolutions and their 2x larger padding.\n              \
+    \  std::vector<Mint> transformed_f(transform_size);\n                std::copy_n(this->begin(),\
+    \ std::min<int>(this->size(), next_size),\n                            transformed_f.begin());\n\
+    \                std::vector<Mint> transformed_g(transform_size);\n          \
+    \      std::copy(result.begin(), result.end(), transformed_g.begin());\n     \
+    \           internal::ntt(transformed_f, false);\n                internal::ntt(transformed_g,\
+    \ false);\n\n                std::vector<Mint> error(transform_size);\n      \
+    \          for (int i = 0; i < transform_size; i++)\n                    error[i]\
+    \ = transformed_f[i] * transformed_g[i];\n                internal::ntt(error,\
+    \ true);\n                std::fill(error.begin(), error.begin() + size, Mint(0));\n\
+    \                internal::ntt(error, false);\n                for (int i = 0;\
+    \ i < transform_size; i++) error[i] *= transformed_g[i];\n                internal::ntt(error,\
+    \ true);\n\n                result.resize(next_size);\n                for (int\
+    \ i = size; i < next_size; i++) result[i] = Mint(0) - error[i];\n            \
+    \    continue;\n            }\n            Fps product = this->pre(next_size)\
     \ * result;\n            product.resize(next_size);\n            for (Mint& value\
     \ : product) value = Mint(0) - value;\n            product[0] += Mint(2);\n  \
     \          result = (result * product).pre(next_size);\n        }\n        return\
@@ -411,7 +445,7 @@ data:
   isVerificationFile: true
   path: verify/math/fps/lagrange_inversion.test.cpp
   requiredBy: []
-  timestamp: '2026-07-07 14:26:59+09:00'
+  timestamp: '2026-07-10 20:52:30+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/fps/lagrange_inversion.test.cpp
