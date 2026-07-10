@@ -22,6 +22,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
+  - icon: ':heavy_check_mark:'
+    path: math/partition_function.hpp
+    title: Partition Function
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
   _isVerificationFailed: false
@@ -434,7 +437,20 @@ data:
     \        assert(maximum >= 0);\n        assert(static_cast<uint64_t>(maximum)\
     \ + 1 < Mint::mod());\n        return maximum;\n    }\n\n    Combinatorics<Mint>\
     \ combinations_;\n    std::vector<Mint> numbers_;\n};\n\n}  // namespace math\n\
-    }  // namespace m1une\n\n\n#line 11 \"math/combinatorial_sequences.hpp\"\n\nnamespace\
+    }  // namespace m1une\n\n\n#line 1 \"math/partition_function.hpp\"\n\n\n\n#line\
+    \ 5 \"math/partition_function.hpp\"\n\n#line 8 \"math/partition_function.hpp\"\
+    \n\nnamespace m1une {\nnamespace math {\n\n// Returns p(0), p(1), ..., p(maximum),\
+    \ where p(n) is the number of integer\n// partitions of n.\ntemplate <class Mint>\n\
+    std::vector<Mint> partition_function(int maximum) {\n    assert(maximum >= 0);\n\
+    \n    using Fps = fps::FormalPowerSeries<Mint>;\n    Fps denominator(maximum +\
+    \ 1);\n    denominator[0] = 1;\n    for (long long k = 1;; k++) {\n        long\
+    \ long first = k * (3 * k - 1) / 2;\n        long long second = k * (3 * k + 1)\
+    \ / 2;\n        if (first > maximum) break;\n\n        Mint sign = (k & 1) ? Mint(-1)\
+    \ : Mint(1);\n        denominator[int(first)] += sign;\n        if (second <=\
+    \ maximum) denominator[int(second)] += sign;\n    }\n    return denominator.inv(maximum\
+    \ + 1);\n}\n\ntemplate <class Mint>\nstd::vector<Mint> partition_numbers(int maximum)\
+    \ {\n    return partition_function<Mint>(maximum);\n}\n\n}  // namespace math\n\
+    }  // namespace m1une\n\n\n#line 12 \"math/combinatorial_sequences.hpp\"\n\nnamespace\
     \ m1une {\nnamespace math {\n\ntemplate <class Mint>\nstd::vector<Mint> catalan_numbers(int\
     \ maximum) {\n    assert(maximum >= 0);\n    assert(static_cast<uint64_t>(maximum)\
     \ + 1 < Mint::mod());\n\n    std::vector<Mint> inverse(maximum + 2);\n    inverse[1]\
@@ -458,19 +474,12 @@ data:
     \ * combinations.inverse_factorial(i);\n        signs[i] = combinations.inverse_factorial(i);\n\
     \        if (i & 1) signs[i] = Mint(0) - signs[i];\n    }\n\n    std::vector<Mint>\
     \ result = fps::convolution(powers, signs);\n    result.resize(n + 1);\n    return\
-    \ result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint> partition_numbers(int\
-    \ maximum) {\n    assert(maximum >= 0);\n\n    using Fps = fps::FormalPowerSeries<Mint>;\n\
-    \    Fps denominator(maximum + 1);\n    denominator[0] = 1;\n    for (long long\
-    \ k = 1;; k++) {\n        const long long first = k * (3 * k - 1) / 2;\n     \
-    \   const long long second = k * (3 * k + 1) / 2;\n        if (first > maximum)\
-    \ break;\n\n        const Mint sign = (k & 1) ? Mint(-1) : Mint(1);\n        denominator[int(first)]\
-    \ += sign;\n        if (second <= maximum) denominator[int(second)] += sign;\n\
-    \    }\n    return denominator.inv(maximum + 1);\n}\n\ntemplate <class Mint>\n\
-    std::vector<Mint> derangement_numbers(int maximum) {\n    assert(maximum >= 0);\n\
-    \n    std::vector<Mint> result(maximum + 1);\n    result[0] = 1;\n    if (maximum\
-    \ >= 1) result[1] = 0;\n    for (int n = 2; n <= maximum; n++) {\n        result[n]\
-    \ = Mint(n - 1) * (result[n - 1] + result[n - 2]);\n    }\n    return result;\n\
-    }\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line 8 \"verify/math/stirling_number_of_the_second_kind.test.cpp\"\
+    \ result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint> derangement_numbers(int\
+    \ maximum) {\n    assert(maximum >= 0);\n\n    std::vector<Mint> result(maximum\
+    \ + 1);\n    result[0] = 1;\n    if (maximum >= 1) result[1] = 0;\n    for (int\
+    \ n = 2; n <= maximum; n++) {\n        result[n] = Mint(n - 1) * (result[n - 1]\
+    \ + result[n - 2]);\n    }\n    return result;\n}\n\n}  // namespace math\n} \
+    \ // namespace m1une\n\n\n#line 8 \"verify/math/stirling_number_of_the_second_kind.test.cpp\"\
     \n\nusing Mint = m1une::math::modint998244353;\n\nint main() {\n    std::ios::sync_with_stdio(false);\n\
     \    std::cin.tie(nullptr);\n\n    int n;\n    std::cin >> n;\n    const std::vector<Mint>\
     \ values =\n        m1une::math::stirling_numbers_second_kind<Mint>(n);\n    for\
@@ -491,11 +500,12 @@ data:
   - math/modint.hpp
   - math/bernoulli.hpp
   - math/combinatorics.hpp
+  - math/partition_function.hpp
   - math/modint.hpp
   isVerificationFile: true
   path: verify/math/stirling_number_of_the_second_kind.test.cpp
   requiredBy: []
-  timestamp: '2026-07-07 14:26:59+09:00'
+  timestamp: '2026-07-10 19:00:10+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/stirling_number_of_the_second_kind.test.cpp

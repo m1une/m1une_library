@@ -658,6 +658,12 @@ data:
       path: math/number_theory.hpp
       title: Number Theory
     - icon: ':heavy_check_mark:'
+      path: math/partition_function.hpp
+      title: Partition Function
+    - icon: ':warning:'
+      path: math/partition_number_hrr.hpp
+      title: Isolated Partition Number (HRR)
+    - icon: ':heavy_check_mark:'
       path: math/prime_factorization.hpp
       title: 64-bit Prime Factorization
     - icon: ':heavy_check_mark:'
@@ -1421,6 +1427,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/partition_function.test.cpp
       title: verify/math/partition_function.test.cpp
+    - icon: ':x:'
+      path: verify/math/partition_number_hrr.test.cpp
+      title: verify/math/partition_number_hrr.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/primality_test.test.cpp
       title: verify/math/primality_test.test.cpp

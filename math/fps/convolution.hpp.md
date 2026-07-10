@@ -47,6 +47,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/fps/multipoint_evaluation.hpp
     title: Multipoint Evaluation and Interpolation
+  - icon: ':heavy_check_mark:'
+    path: math/partition_function.hpp
+    title: Partition Function
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/graph/cow_game.test.cpp
@@ -379,6 +382,7 @@ data:
   isVerificationFile: false
   path: math/fps/convolution.hpp
   requiredBy:
+  - math/partition_function.hpp
   - math/combinatorial_sequences.hpp
   - math/all.hpp
   - math/bernoulli.hpp

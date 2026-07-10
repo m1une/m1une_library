@@ -44,6 +44,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/fps/multipoint_evaluation.hpp
     title: Multipoint Evaluation and Interpolation
+  - icon: ':heavy_check_mark:'
+    path: math/partition_function.hpp
+    title: Partition Function
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/algo/sequence/number_of_subsequences.test.cpp
@@ -334,6 +337,7 @@ data:
   isVerificationFile: false
   path: math/modint.hpp
   requiredBy:
+  - math/partition_function.hpp
   - math/combinatorial_sequences.hpp
   - math/all.hpp
   - math/all.hpp

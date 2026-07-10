@@ -83,6 +83,9 @@ data:
     path: math/number_theory.hpp
     title: Number Theory
   - icon: ':heavy_check_mark:'
+    path: math/partition_function.hpp
+    title: Partition Function
+  - icon: ':heavy_check_mark:'
     path: math/prime_factorization.hpp
     title: 64-bit Prime Factorization
   - icon: ':heavy_check_mark:'
@@ -672,10 +675,22 @@ data:
     \ T bit_ceil(T n) {\n    if (n <= 1) return 1;\n    T x = 1;\n    while (x < n)\
     \ x <<= 1;\n    return x;\n}\n\n}  // namespace math\n}  // namespace m1une\n\n\
     \n#line 1 \"math/combinatorial_sequences.hpp\"\n\n\n\n#line 7 \"math/combinatorial_sequences.hpp\"\
-    \n\n#line 11 \"math/combinatorial_sequences.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ math {\n\ntemplate <class Mint>\nstd::vector<Mint> catalan_numbers(int maximum)\
-    \ {\n    assert(maximum >= 0);\n    assert(static_cast<uint64_t>(maximum) + 1\
-    \ < Mint::mod());\n\n    std::vector<Mint> inverse(maximum + 2);\n    inverse[1]\
+    \n\n#line 1 \"math/partition_function.hpp\"\n\n\n\n#line 5 \"math/partition_function.hpp\"\
+    \n\n#line 8 \"math/partition_function.hpp\"\n\nnamespace m1une {\nnamespace math\
+    \ {\n\n// Returns p(0), p(1), ..., p(maximum), where p(n) is the number of integer\n\
+    // partitions of n.\ntemplate <class Mint>\nstd::vector<Mint> partition_function(int\
+    \ maximum) {\n    assert(maximum >= 0);\n\n    using Fps = fps::FormalPowerSeries<Mint>;\n\
+    \    Fps denominator(maximum + 1);\n    denominator[0] = 1;\n    for (long long\
+    \ k = 1;; k++) {\n        long long first = k * (3 * k - 1) / 2;\n        long\
+    \ long second = k * (3 * k + 1) / 2;\n        if (first > maximum) break;\n\n\
+    \        Mint sign = (k & 1) ? Mint(-1) : Mint(1);\n        denominator[int(first)]\
+    \ += sign;\n        if (second <= maximum) denominator[int(second)] += sign;\n\
+    \    }\n    return denominator.inv(maximum + 1);\n}\n\ntemplate <class Mint>\n\
+    std::vector<Mint> partition_numbers(int maximum) {\n    return partition_function<Mint>(maximum);\n\
+    }\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line 12 \"math/combinatorial_sequences.hpp\"\
+    \n\nnamespace m1une {\nnamespace math {\n\ntemplate <class Mint>\nstd::vector<Mint>\
+    \ catalan_numbers(int maximum) {\n    assert(maximum >= 0);\n    assert(static_cast<uint64_t>(maximum)\
+    \ + 1 < Mint::mod());\n\n    std::vector<Mint> inverse(maximum + 2);\n    inverse[1]\
     \ = 1;\n    for (int i = 2; i <= maximum + 1; i++) {\n        inverse[i] = Mint(0)\
     \ - Mint(Mint::mod() / uint32_t(i)) * inverse[Mint::mod() % uint32_t(i)];\n  \
     \  }\n\n    std::vector<Mint> result(maximum + 1);\n    result[0] = 1;\n    for\
@@ -696,20 +711,13 @@ data:
     \ * combinations.inverse_factorial(i);\n        signs[i] = combinations.inverse_factorial(i);\n\
     \        if (i & 1) signs[i] = Mint(0) - signs[i];\n    }\n\n    std::vector<Mint>\
     \ result = fps::convolution(powers, signs);\n    result.resize(n + 1);\n    return\
-    \ result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint> partition_numbers(int\
-    \ maximum) {\n    assert(maximum >= 0);\n\n    using Fps = fps::FormalPowerSeries<Mint>;\n\
-    \    Fps denominator(maximum + 1);\n    denominator[0] = 1;\n    for (long long\
-    \ k = 1;; k++) {\n        const long long first = k * (3 * k - 1) / 2;\n     \
-    \   const long long second = k * (3 * k + 1) / 2;\n        if (first > maximum)\
-    \ break;\n\n        const Mint sign = (k & 1) ? Mint(-1) : Mint(1);\n        denominator[int(first)]\
-    \ += sign;\n        if (second <= maximum) denominator[int(second)] += sign;\n\
-    \    }\n    return denominator.inv(maximum + 1);\n}\n\ntemplate <class Mint>\n\
-    std::vector<Mint> derangement_numbers(int maximum) {\n    assert(maximum >= 0);\n\
-    \n    std::vector<Mint> result(maximum + 1);\n    result[0] = 1;\n    if (maximum\
-    \ >= 1) result[1] = 0;\n    for (int n = 2; n <= maximum; n++) {\n        result[n]\
-    \ = Mint(n - 1) * (result[n - 1] + result[n - 2]);\n    }\n    return result;\n\
-    }\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line 1 \"math/cyclotomic_polynomial.hpp\"\
-    \n\n\n\n#line 9 \"math/cyclotomic_polynomial.hpp\"\n\n#line 1 \"math/prime_factorization.hpp\"\
+    \ result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint> derangement_numbers(int\
+    \ maximum) {\n    assert(maximum >= 0);\n\n    std::vector<Mint> result(maximum\
+    \ + 1);\n    result[0] = 1;\n    if (maximum >= 1) result[1] = 0;\n    for (int\
+    \ n = 2; n <= maximum; n++) {\n        result[n] = Mint(n - 1) * (result[n - 1]\
+    \ + result[n - 2]);\n    }\n    return result;\n}\n\n}  // namespace math\n} \
+    \ // namespace m1une\n\n\n#line 1 \"math/cyclotomic_polynomial.hpp\"\n\n\n\n#line\
+    \ 9 \"math/cyclotomic_polynomial.hpp\"\n\n#line 1 \"math/prime_factorization.hpp\"\
     \n\n\n\n#line 10 \"math/prime_factorization.hpp\"\n\nnamespace m1une {\nnamespace\
     \ math {\n\nnamespace internal {\n\ninline uint64_t multiply_mod(uint64_t a, uint64_t\
     \ b, uint64_t mod) {\n    return static_cast<uint64_t>(static_cast<unsigned __int128>(a)\
@@ -2022,7 +2030,7 @@ data:
     \ value) {\n    if (value == 0) return true;\n    for (const auto& factor : prime_factorize(value))\
     \ {\n        if (factor.first % 4 == 3 && (factor.second & 1) != 0) return false;\n\
     \    }\n    return true;\n}\n\n}  // namespace math\n}  // namespace m1une\n\n\
-    \n#line 28 \"math/all.hpp\"\n\n\n#line 12 \"verify/math/math_algorithms.test.cpp\"\
+    \n#line 29 \"math/all.hpp\"\n\n\n#line 12 \"verify/math/math_algorithms.test.cpp\"\
     \n\nlong long floor_div(long long numerator, long long denominator) {\n    long\
     \ long quotient = numerator / denominator;\n    if (numerator % denominator <\
     \ 0) quotient--;\n    return quotient;\n}\n\nvoid test_number_theory() {\n   \
@@ -2368,6 +2376,7 @@ data:
   - math/zeta_mobius_transform.hpp
   - math/bit_ceil.hpp
   - math/combinatorial_sequences.hpp
+  - math/partition_function.hpp
   - math/cyclotomic_polynomial.hpp
   - math/prime_factorization.hpp
   - math/generalized_floor_sum.hpp
@@ -2397,7 +2406,7 @@ data:
   isVerificationFile: true
   path: verify/math/math_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-07 21:49:48+09:00'
+  timestamp: '2026-07-10 19:00:10+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/math_algorithms.test.cpp

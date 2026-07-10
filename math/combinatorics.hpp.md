@@ -43,9 +43,6 @@ data:
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/math/partition_function.test.cpp
-    title: verify/math/partition_function.test.cpp
-  - icon: ':heavy_check_mark:'
     path: verify/math/stirling_number_of_the_second_kind.test.cpp
     title: verify/math/stirling_number_of_the_second_kind.test.cpp
   _isVerificationFailed: false
@@ -132,7 +129,6 @@ data:
   verifiedWith:
   - verify/math/bernoulli_utilities.test.cpp
   - verify/math/bell_number.test.cpp
-  - verify/math/partition_function.test.cpp
   - verify/math/math_algorithms.test.cpp
   - verify/math/stirling_number_of_the_second_kind.test.cpp
   - verify/math/bernoulli_number.test.cpp

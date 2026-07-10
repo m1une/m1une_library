@@ -16,6 +16,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
+  - icon: ':heavy_check_mark:'
+    path: math/partition_function.hpp
+    title: Partition Function
   _extendedRequiredBy:
   - icon: ':heavy_check_mark:'
     path: math/all.hpp
@@ -27,9 +30,6 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/math/partition_function.test.cpp
-    title: verify/math/partition_function.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/stirling_number_of_the_second_kind.test.cpp
     title: verify/math/stirling_number_of_the_second_kind.test.cpp
@@ -438,7 +438,20 @@ data:
     \        assert(maximum >= 0);\n        assert(static_cast<uint64_t>(maximum)\
     \ + 1 < Mint::mod());\n        return maximum;\n    }\n\n    Combinatorics<Mint>\
     \ combinations_;\n    std::vector<Mint> numbers_;\n};\n\n}  // namespace math\n\
-    }  // namespace m1une\n\n\n#line 11 \"math/combinatorial_sequences.hpp\"\n\nnamespace\
+    }  // namespace m1une\n\n\n#line 1 \"math/partition_function.hpp\"\n\n\n\n#line\
+    \ 5 \"math/partition_function.hpp\"\n\n#line 8 \"math/partition_function.hpp\"\
+    \n\nnamespace m1une {\nnamespace math {\n\n// Returns p(0), p(1), ..., p(maximum),\
+    \ where p(n) is the number of integer\n// partitions of n.\ntemplate <class Mint>\n\
+    std::vector<Mint> partition_function(int maximum) {\n    assert(maximum >= 0);\n\
+    \n    using Fps = fps::FormalPowerSeries<Mint>;\n    Fps denominator(maximum +\
+    \ 1);\n    denominator[0] = 1;\n    for (long long k = 1;; k++) {\n        long\
+    \ long first = k * (3 * k - 1) / 2;\n        long long second = k * (3 * k + 1)\
+    \ / 2;\n        if (first > maximum) break;\n\n        Mint sign = (k & 1) ? Mint(-1)\
+    \ : Mint(1);\n        denominator[int(first)] += sign;\n        if (second <=\
+    \ maximum) denominator[int(second)] += sign;\n    }\n    return denominator.inv(maximum\
+    \ + 1);\n}\n\ntemplate <class Mint>\nstd::vector<Mint> partition_numbers(int maximum)\
+    \ {\n    return partition_function<Mint>(maximum);\n}\n\n}  // namespace math\n\
+    }  // namespace m1une\n\n\n#line 12 \"math/combinatorial_sequences.hpp\"\n\nnamespace\
     \ m1une {\nnamespace math {\n\ntemplate <class Mint>\nstd::vector<Mint> catalan_numbers(int\
     \ maximum) {\n    assert(maximum >= 0);\n    assert(static_cast<uint64_t>(maximum)\
     \ + 1 < Mint::mod());\n\n    std::vector<Mint> inverse(maximum + 2);\n    inverse[1]\
@@ -462,73 +475,60 @@ data:
     \ * combinations.inverse_factorial(i);\n        signs[i] = combinations.inverse_factorial(i);\n\
     \        if (i & 1) signs[i] = Mint(0) - signs[i];\n    }\n\n    std::vector<Mint>\
     \ result = fps::convolution(powers, signs);\n    result.resize(n + 1);\n    return\
-    \ result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint> partition_numbers(int\
-    \ maximum) {\n    assert(maximum >= 0);\n\n    using Fps = fps::FormalPowerSeries<Mint>;\n\
-    \    Fps denominator(maximum + 1);\n    denominator[0] = 1;\n    for (long long\
-    \ k = 1;; k++) {\n        const long long first = k * (3 * k - 1) / 2;\n     \
-    \   const long long second = k * (3 * k + 1) / 2;\n        if (first > maximum)\
-    \ break;\n\n        const Mint sign = (k & 1) ? Mint(-1) : Mint(1);\n        denominator[int(first)]\
-    \ += sign;\n        if (second <= maximum) denominator[int(second)] += sign;\n\
-    \    }\n    return denominator.inv(maximum + 1);\n}\n\ntemplate <class Mint>\n\
-    std::vector<Mint> derangement_numbers(int maximum) {\n    assert(maximum >= 0);\n\
-    \n    std::vector<Mint> result(maximum + 1);\n    result[0] = 1;\n    if (maximum\
-    \ >= 1) result[1] = 0;\n    for (int n = 2; n <= maximum; n++) {\n        result[n]\
-    \ = Mint(n - 1) * (result[n - 1] + result[n - 2]);\n    }\n    return result;\n\
-    }\n\n}  // namespace math\n}  // namespace m1une\n\n\n"
+    \ result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint> derangement_numbers(int\
+    \ maximum) {\n    assert(maximum >= 0);\n\n    std::vector<Mint> result(maximum\
+    \ + 1);\n    result[0] = 1;\n    if (maximum >= 1) result[1] = 0;\n    for (int\
+    \ n = 2; n <= maximum; n++) {\n        result[n] = Mint(n - 1) * (result[n - 1]\
+    \ + result[n - 2]);\n    }\n    return result;\n}\n\n}  // namespace math\n} \
+    \ // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_MATH_COMBINATORIAL_SEQUENCES_HPP\n#define M1UNE_MATH_COMBINATORIAL_SEQUENCES_HPP\
     \ 1\n\n#include <cassert>\n#include <cstdint>\n#include <vector>\n\n#include \"\
     fps/formal_power_series.hpp\"\n#include \"bernoulli.hpp\"\n#include \"combinatorics.hpp\"\
-    \n\nnamespace m1une {\nnamespace math {\n\ntemplate <class Mint>\nstd::vector<Mint>\
-    \ catalan_numbers(int maximum) {\n    assert(maximum >= 0);\n    assert(static_cast<uint64_t>(maximum)\
-    \ + 1 < Mint::mod());\n\n    std::vector<Mint> inverse(maximum + 2);\n    inverse[1]\
-    \ = 1;\n    for (int i = 2; i <= maximum + 1; i++) {\n        inverse[i] = Mint(0)\
-    \ - Mint(Mint::mod() / uint32_t(i)) * inverse[Mint::mod() % uint32_t(i)];\n  \
-    \  }\n\n    std::vector<Mint> result(maximum + 1);\n    result[0] = 1;\n    for\
-    \ (int n = 0; n < maximum; n++) {\n        result[n + 1] = result[n] * Mint(2)\
-    \ * Mint(2LL * n + 1) * inverse[n + 2];\n    }\n    return result;\n}\n\ntemplate\
-    \ <class Mint>\nstd::vector<Mint> bell_numbers(int maximum) {\n    assert(maximum\
-    \ >= 0);\n    assert(static_cast<uint64_t>(maximum) < Mint::mod());\n\n    using\
-    \ Fps = fps::FormalPowerSeries<Mint>;\n    Combinatorics<Mint> combinations(maximum);\n\
-    \    Fps exponent(maximum + 1);\n    for (int i = 1; i <= maximum; i++) {\n  \
-    \      exponent[i] = combinations.inverse_factorial(i);\n    }\n\n    Fps generating_function\
-    \ = exponent.exp(maximum + 1);\n    std::vector<Mint> result(maximum + 1);\n \
-    \   for (int i = 0; i <= maximum; i++) {\n        result[i] = generating_function[i]\
-    \ * combinations.factorial(i);\n    }\n    return result;\n}\n\ntemplate <class\
-    \ Mint>\nstd::vector<Mint> stirling_numbers_second_kind(int n) {\n    assert(n\
-    \ >= 0);\n    assert(static_cast<uint64_t>(n) < Mint::mod());\n\n    Combinatorics<Mint>\
-    \ combinations(n);\n    std::vector<Mint> powers(n + 1);\n    std::vector<Mint>\
-    \ signs(n + 1);\n    for (int i = 0; i <= n; i++) {\n        powers[i] = Mint(i).pow(n)\
-    \ * combinations.inverse_factorial(i);\n        signs[i] = combinations.inverse_factorial(i);\n\
-    \        if (i & 1) signs[i] = Mint(0) - signs[i];\n    }\n\n    std::vector<Mint>\
-    \ result = fps::convolution(powers, signs);\n    result.resize(n + 1);\n    return\
-    \ result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint> partition_numbers(int\
-    \ maximum) {\n    assert(maximum >= 0);\n\n    using Fps = fps::FormalPowerSeries<Mint>;\n\
-    \    Fps denominator(maximum + 1);\n    denominator[0] = 1;\n    for (long long\
-    \ k = 1;; k++) {\n        const long long first = k * (3 * k - 1) / 2;\n     \
-    \   const long long second = k * (3 * k + 1) / 2;\n        if (first > maximum)\
-    \ break;\n\n        const Mint sign = (k & 1) ? Mint(-1) : Mint(1);\n        denominator[int(first)]\
-    \ += sign;\n        if (second <= maximum) denominator[int(second)] += sign;\n\
-    \    }\n    return denominator.inv(maximum + 1);\n}\n\ntemplate <class Mint>\n\
-    std::vector<Mint> derangement_numbers(int maximum) {\n    assert(maximum >= 0);\n\
-    \n    std::vector<Mint> result(maximum + 1);\n    result[0] = 1;\n    if (maximum\
-    \ >= 1) result[1] = 0;\n    for (int n = 2; n <= maximum; n++) {\n        result[n]\
-    \ = Mint(n - 1) * (result[n - 1] + result[n - 2]);\n    }\n    return result;\n\
-    }\n\n}  // namespace math\n}  // namespace m1une\n\n#endif  // M1UNE_MATH_COMBINATORIAL_SEQUENCES_HPP\n"
+    \n#include \"partition_function.hpp\"\n\nnamespace m1une {\nnamespace math {\n\
+    \ntemplate <class Mint>\nstd::vector<Mint> catalan_numbers(int maximum) {\n  \
+    \  assert(maximum >= 0);\n    assert(static_cast<uint64_t>(maximum) + 1 < Mint::mod());\n\
+    \n    std::vector<Mint> inverse(maximum + 2);\n    inverse[1] = 1;\n    for (int\
+    \ i = 2; i <= maximum + 1; i++) {\n        inverse[i] = Mint(0) - Mint(Mint::mod()\
+    \ / uint32_t(i)) * inverse[Mint::mod() % uint32_t(i)];\n    }\n\n    std::vector<Mint>\
+    \ result(maximum + 1);\n    result[0] = 1;\n    for (int n = 0; n < maximum; n++)\
+    \ {\n        result[n + 1] = result[n] * Mint(2) * Mint(2LL * n + 1) * inverse[n\
+    \ + 2];\n    }\n    return result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint>\
+    \ bell_numbers(int maximum) {\n    assert(maximum >= 0);\n    assert(static_cast<uint64_t>(maximum)\
+    \ < Mint::mod());\n\n    using Fps = fps::FormalPowerSeries<Mint>;\n    Combinatorics<Mint>\
+    \ combinations(maximum);\n    Fps exponent(maximum + 1);\n    for (int i = 1;\
+    \ i <= maximum; i++) {\n        exponent[i] = combinations.inverse_factorial(i);\n\
+    \    }\n\n    Fps generating_function = exponent.exp(maximum + 1);\n    std::vector<Mint>\
+    \ result(maximum + 1);\n    for (int i = 0; i <= maximum; i++) {\n        result[i]\
+    \ = generating_function[i] * combinations.factorial(i);\n    }\n    return result;\n\
+    }\n\ntemplate <class Mint>\nstd::vector<Mint> stirling_numbers_second_kind(int\
+    \ n) {\n    assert(n >= 0);\n    assert(static_cast<uint64_t>(n) < Mint::mod());\n\
+    \n    Combinatorics<Mint> combinations(n);\n    std::vector<Mint> powers(n + 1);\n\
+    \    std::vector<Mint> signs(n + 1);\n    for (int i = 0; i <= n; i++) {\n   \
+    \     powers[i] = Mint(i).pow(n) * combinations.inverse_factorial(i);\n      \
+    \  signs[i] = combinations.inverse_factorial(i);\n        if (i & 1) signs[i]\
+    \ = Mint(0) - signs[i];\n    }\n\n    std::vector<Mint> result = fps::convolution(powers,\
+    \ signs);\n    result.resize(n + 1);\n    return result;\n}\n\ntemplate <class\
+    \ Mint>\nstd::vector<Mint> derangement_numbers(int maximum) {\n    assert(maximum\
+    \ >= 0);\n\n    std::vector<Mint> result(maximum + 1);\n    result[0] = 1;\n \
+    \   if (maximum >= 1) result[1] = 0;\n    for (int n = 2; n <= maximum; n++) {\n\
+    \        result[n] = Mint(n - 1) * (result[n - 1] + result[n - 2]);\n    }\n \
+    \   return result;\n}\n\n}  // namespace math\n}  // namespace m1une\n\n#endif\
+    \  // M1UNE_MATH_COMBINATORIAL_SEQUENCES_HPP\n"
   dependsOn:
   - math/fps/formal_power_series.hpp
   - math/fps/convolution.hpp
   - math/modint.hpp
   - math/bernoulli.hpp
   - math/combinatorics.hpp
+  - math/partition_function.hpp
   isVerificationFile: false
   path: math/combinatorial_sequences.hpp
   requiredBy:
   - math/all.hpp
-  timestamp: '2026-07-07 14:26:59+09:00'
+  timestamp: '2026-07-10 19:00:10+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/bell_number.test.cpp
-  - verify/math/partition_function.test.cpp
   - verify/math/math_algorithms.test.cpp
   - verify/math/stirling_number_of_the_second_kind.test.cpp
 documentation_of: math/combinatorial_sequences.hpp
@@ -743,7 +743,8 @@ $$
 
 Euler's pentagonal number theorem gives a sparse denominator, which the
 implementation inverts with formal power series. Therefore
-`partition_numbers<Mint>(maximum)` runs in
+`partition_function<Mint>(maximum)` and its compatibility alias
+`partition_numbers<Mint>(maximum)` run in
 $O(\text{maximum} \log \text{maximum})$ time.
 
 ## Derangements
