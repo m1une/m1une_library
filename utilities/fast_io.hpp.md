@@ -13,6 +13,9 @@ data:
     path: verify/ds/range_query/range_lis_query.test.cpp
     title: verify/ds/range_query/range_lis_query.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/range_query/static_range_mode_query.test.cpp
+    title: verify/ds/range_query/static_range_mode_query.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/tree/vertex_add_subtree_sum.test.cpp
     title: verify/graph/tree/vertex_add_subtree_sum.test.cpp
   - icon: ':heavy_check_mark:'
@@ -270,6 +273,7 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/utilities/fast_io.test.cpp
+  - verify/ds/range_query/static_range_mode_query.test.cpp
   - verify/ds/range_query/range_inversion_count.test.cpp
   - verify/ds/range_query/fenwick_tree.test.cpp
   - verify/ds/range_query/range_lis_query.test.cpp

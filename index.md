@@ -352,6 +352,9 @@ data:
       path: ds/range_query/sqrt_tree.hpp
       title: Sqrt Tree
     - icon: ':heavy_check_mark:'
+      path: ds/range_query/static_range_mode_query.hpp
+      title: Static Range Mode Query
+    - icon: ':heavy_check_mark:'
       path: ds/range_query/wavelet_matrix.hpp
       title: Wavelet Matrix
     - icon: ':heavy_check_mark:'
@@ -1181,6 +1184,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/ds/range_query/sqrt_tree.test.cpp
       title: verify/ds/range_query/sqrt_tree.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/range_query/static_range_mode_query.test.cpp
+      title: verify/ds/range_query/static_range_mode_query.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/ds/range_query/wavelet_matrix.test.cpp
       title: verify/ds/range_query/wavelet_matrix.test.cpp
