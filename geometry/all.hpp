@@ -12,5 +12,6 @@
 #include "point.hpp"
 #include "polygon.hpp"
 #include "ray.hpp"
+#include "rectangle_union_area.hpp"
 
 #endif  // M1UNE_GEOMETRY_ALL_HPP

@@ -20,6 +20,7 @@ documentation_of: ../../geometry/all.hpp
 | `geometry/manhattan_mst.hpp` | Manhattan minimum spanning tree for integral points in $O(N\log N)$. |
 | `geometry/line.hpp` | Lines, segments, projection, intersection, and distances. |
 | `geometry/ray.hpp` | Rays, containment, projection, intersections, and distances with other linear objects. |
+| `geometry/rectangle_union_area.hpp` | Exact union area of axis-aligned rectangles in $O(N\log N)$. |
 | `geometry/polygon.hpp` | Area, centroids, triangulation, containment, ray queries, intersection, clipping, and Minkowski sums. |
 | `geometry/circle.hpp` | Circle relations, line/ray intersections, and ray reflection. |
 
