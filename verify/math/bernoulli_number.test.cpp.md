@@ -36,21 +36,21 @@ data:
     \n\n\n\n#include <algorithm>\n#line 7 \"math/fps/formal_power_series.hpp\"\n#include\
     \ <optional>\n#include <utility>\n#line 10 \"math/fps/formal_power_series.hpp\"\
     \n\n#line 1 \"math/fps/convolution.hpp\"\n\n\n\n#line 5 \"math/fps/convolution.hpp\"\
-    \n#include <array>\n#line 10 \"math/fps/convolution.hpp\"\n\n#if defined(__GNUC__)\
-    \ && !defined(__clang__) && (defined(__x86_64__) || defined(__i386__))\n#include\
-    \ <immintrin.h>\n#define M1UNE_FPS_HAS_X86_SIMD 1\n#endif\n\n#line 1 \"math/modint.hpp\"\
-    \n\n\n\n#line 6 \"math/modint.hpp\"\n#include <type_traits>\n#line 8 \"math/modint.hpp\"\
-    \n\nnamespace m1une {\nnamespace math {\n\ntemplate <uint32_t Modulus>\nstruct\
-    \ ModInt {\n    static_assert(0 < Modulus, \"Modulus must be positive\");\n\n\
-    \   private:\n    uint32_t _v;\n\n   public:\n    static constexpr uint32_t mod()\
-    \ {\n        return Modulus;\n    }\n\n    static constexpr ModInt raw(uint32_t\
-    \ v) noexcept {\n        ModInt x;\n        x._v = v;\n        return x;\n   \
-    \ }\n\n    constexpr ModInt() noexcept : _v(0) {}\n\n    template <class Integer,\
-    \ std::enable_if_t<std::is_integral_v<Integer>, int> = 0>\n    constexpr ModInt(Integer\
-    \ v) noexcept {\n        if constexpr (std::is_signed_v<Integer>) {\n        \
-    \    int64_t x = static_cast<int64_t>(v) % static_cast<int64_t>(Modulus);\n  \
-    \          if (x < 0) x += Modulus;\n            _v = static_cast<uint32_t>(x);\n\
-    \        } else {\n            _v = static_cast<uint32_t>(static_cast<uint64_t>(v)\
+    \n#include <array>\n#line 10 \"math/fps/convolution.hpp\"\n\n#if ((defined(__GNUC__)\
+    \ && !defined(__clang__)) || defined(M1UNE_FPS_TEST_X86_SIMD)) && \\\n    (defined(__x86_64__)\
+    \ || defined(__i386__))\n#include <immintrin.h>\n#define M1UNE_FPS_HAS_X86_SIMD\
+    \ 1\n#endif\n\n#line 1 \"math/modint.hpp\"\n\n\n\n#line 6 \"math/modint.hpp\"\n\
+    #include <type_traits>\n#line 8 \"math/modint.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ math {\n\ntemplate <uint32_t Modulus>\nstruct ModInt {\n    static_assert(0\
+    \ < Modulus, \"Modulus must be positive\");\n\n   private:\n    uint32_t _v;\n\
+    \n   public:\n    static constexpr uint32_t mod() {\n        return Modulus;\n\
+    \    }\n\n    static constexpr ModInt raw(uint32_t v) noexcept {\n        ModInt\
+    \ x;\n        x._v = v;\n        return x;\n    }\n\n    constexpr ModInt() noexcept\
+    \ : _v(0) {}\n\n    template <class Integer, std::enable_if_t<std::is_integral_v<Integer>,\
+    \ int> = 0>\n    constexpr ModInt(Integer v) noexcept {\n        if constexpr\
+    \ (std::is_signed_v<Integer>) {\n            int64_t x = static_cast<int64_t>(v)\
+    \ % static_cast<int64_t>(Modulus);\n            if (x < 0) x += Modulus;\n   \
+    \         _v = static_cast<uint32_t>(x);\n        } else {\n            _v = static_cast<uint32_t>(static_cast<uint64_t>(v)\
     \ % Modulus);\n        }\n    }\n\n    constexpr uint32_t val() const noexcept\
     \ {\n        return _v;\n    }\n\n    constexpr ModInt& operator++() noexcept\
     \ {\n        _v++;\n        if (_v == Modulus) _v = 0;\n        return *this;\n\
@@ -88,7 +88,7 @@ data:
     \ ModInt& rhs) {\n        long long v;\n        is >> v;\n        rhs = ModInt(v);\n\
     \        return is;\n    }\n};\n\nusing modint998244353 = ModInt<998244353>;\n\
     using modint1000000007 = ModInt<1000000007>;\n\n}  // namespace math\n}  // namespace\
-    \ m1une\n\n\n#line 17 \"math/fps/convolution.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ m1une\n\n\n#line 18 \"math/fps/convolution.hpp\"\n\nnamespace m1une {\nnamespace\
     \ fps {\n\nnamespace internal {\n\nconstexpr uint32_t primitive_root_constexpr(uint32_t\
     \ mod) {\n    if (mod == 2) return 1;\n    if (mod == 167772161) return 3;\n \
     \   if (mod == 469762049) return 3;\n    if (mod == 754974721) return 11;\n  \
@@ -196,16 +196,17 @@ data:
     \n#pragma GCC push_options\n#pragma GCC target(\"avx2,bmi\")\n\nstruct Montgomery998Simd\
     \ {\n    static constexpr uint32_t mod = 998244353;\n    static constexpr uint32_t\
     \ mod2 = 2 * mod;\n    uint32_t negative_inverse;\n    uint32_t r;\n    uint32_t\
-    \ r2;\n    __m256i modulus;\n    __m256i inverse;\n\n    Montgomery998Simd()\n\
-    \        : negative_inverse(1),\n          r(uint32_t((uint64_t(1) << 32) % mod)),\n\
-    \          r2(uint32_t(uint64_t(r) * r % mod)) {\n        for (int i = 0; i <\
-    \ 5; i++) negative_inverse *= 2 + negative_inverse * mod;\n        modulus = _mm256_set1_epi32(int(mod));\n\
+    \ r2;\n    __m256i modulus;\n    __m256i modulus2;\n    __m256i inverse;\n\n \
+    \   Montgomery998Simd()\n        : negative_inverse(1),\n          r(uint32_t((uint64_t(1)\
+    \ << 32) % mod)),\n          r2(uint32_t(uint64_t(r) * r % mod)) {\n        for\
+    \ (int i = 0; i < 5; i++) negative_inverse *= 2 + negative_inverse * mod;\n  \
+    \      modulus = _mm256_set1_epi32(int(mod));\n        modulus2 = _mm256_set1_epi32(int(mod2));\n\
     \        inverse = _mm256_set1_epi32(int(negative_inverse));\n    }\n\n    uint32_t\
     \ shrink(uint32_t value) const {\n        return std::min(value, value - mod);\n\
     \    }\n\n    uint32_t reduce(uint64_t value) const {\n        return uint32_t((value\
     \ + uint64_t(uint32_t(value) * negative_inverse) * mod) >> 32);\n    }\n\n   \
-    \ uint32_t multiply(uint32_t lhs, uint32_t rhs) const {\n        return shrink(reduce(uint64_t(lhs)\
-    \ * rhs));\n    }\n\n    uint32_t encode(uint32_t value) const {\n        return\
+    \ uint32_t multiply(uint32_t lhs, uint32_t rhs) const {\n        return reduce(uint64_t(lhs)\
+    \ * rhs);\n    }\n\n    uint32_t encode(uint32_t value) const {\n        return\
     \ multiply(value, r2);\n    }\n\n    __m256i shrink(__m256i value) const {\n \
     \       return _mm256_min_epu32(value, _mm256_sub_epi32(value, modulus));\n  \
     \  }\n\n    __m256i multiply(__m256i lhs, __m256i rhs) const {\n        const\
@@ -216,28 +217,123 @@ data:
     \ = _mm256_mul_epu32(odd, inverse);\n        even_correction = _mm256_mul_epu32(even_correction,\
     \ modulus);\n        odd_correction = _mm256_mul_epu32(odd_correction, modulus);\n\
     \        even = _mm256_add_epi64(even, even_correction);\n        odd = _mm256_add_epi64(odd,\
-    \ odd_correction);\n        return shrink(_mm256_or_si256(_mm256_bsrli_epi128(even,\
-    \ 4), odd));\n    }\n\n    __m256i add(__m256i lhs, __m256i rhs) const {\n   \
-    \     return shrink(_mm256_add_epi32(lhs, rhs));\n    }\n\n    __m256i subtract(__m256i\
-    \ lhs, __m256i rhs) const {\n        const __m256i difference = _mm256_sub_epi32(lhs,\
+    \ odd_correction);\n        return _mm256_or_si256(_mm256_bsrli_epi128(even, 4),\
+    \ odd);\n    }\n\n    __m256i add(__m256i lhs, __m256i rhs) const {\n        const\
+    \ __m256i sum = _mm256_add_epi32(lhs, rhs);\n        return _mm256_min_epu32(sum,\
+    \ _mm256_sub_epi32(sum, modulus2));\n    }\n\n    __m256i subtract(__m256i lhs,\
+    \ __m256i rhs) const {\n        const __m256i difference = _mm256_sub_epi32(lhs,\
     \ rhs);\n        return _mm256_min_epu32(difference, _mm256_add_epi32(difference,\
-    \ modulus));\n    }\n};\n\ntemplate <class Mint>\n__attribute__((target(\"avx2,bmi\"\
-    ), hot))\nvoid ntt_998244353_simd(uint32_t* data, int n, bool inverse, bool normalize\
-    \ = true) {\n    static const Montgomery998Simd montgomery;\n    const auto& roots\
-    \ = ntt_roots<Mint>();\n    const int height = two_adic_order(uint32_t(n));\n\n\
-    \    if (!inverse) {\n        for (int phase = 1; phase <= height; phase++) {\n\
-    \            const int blocks = 1 << (phase - 1);\n            const int width\
-    \ = 1 << (height - phase);\n            uint32_t twiddle = montgomery.r;\n   \
-    \         for (int block = 0; block < blocks; block++) {\n                const\
-    \ int offset = block << (height - phase + 1);\n                const __m256i vector_twiddle\
+    \ modulus2));\n    }\n};\n\ntemplate <class Mint>\nstruct Montgomery998NttRoots\
+    \ {\n    std::array<uint32_t, 24> rate{};\n    std::array<uint32_t, 24> inverse_rate{};\n\
+    \    std::array<uint32_t, 24> rate_radix4{};\n    std::array<uint32_t, 24> inverse_rate_radix4{};\n\
+    \    uint32_t imaginary;\n    uint32_t inverse_imaginary;\n\n    Montgomery998NttRoots()\
+    \ {\n        const Montgomery998Simd montgomery;\n        const auto& roots =\
+    \ ntt_roots<Mint>();\n        for (int i = 0; i < NttRoots<Mint>::max_base; i++)\
+    \ {\n            rate[i] = montgomery.encode(roots.rate[i].val());\n         \
+    \   inverse_rate[i] = montgomery.encode(roots.inverse_rate[i].val());\n      \
+    \      rate_radix4[i] = montgomery.encode(roots.rate_radix4[i].val());\n     \
+    \       inverse_rate_radix4[i] =\n                montgomery.encode(roots.inverse_rate_radix4[i].val());\n\
+    \        }\n        imaginary = montgomery.encode(roots.root[2].val());\n    \
+    \    inverse_imaginary = montgomery.encode(roots.inverse_root[2].val());\n   \
+    \ }\n};\n\ntemplate <class Mint>\n__attribute__((target(\"avx2,bmi\"), hot))\n\
+    void ntt_998244353_simd(uint32_t* data, int n, bool inverse, bool normalize =\
+    \ true) {\n    static const Montgomery998Simd montgomery;\n    static const Montgomery998NttRoots<Mint>\
+    \ roots;\n    const int height = two_adic_order(uint32_t(n));\n\n    if (!inverse)\
+    \ {\n        for (int phase = 1; phase <= height; phase++) {\n            const\
+    \ int blocks = 1 << (phase - 1);\n            const int width = 1 << (height -\
+    \ phase);\n            uint32_t twiddle = montgomery.r;\n            if (width\
+    \ >= 16 && phase < height) {\n                const int radix_width = width >>\
+    \ 1;\n                const uint32_t imaginary = roots.imaginary;\n          \
+    \      const __m256i vector_imaginary = _mm256_set1_epi32(int(imaginary));\n \
+    \               for (int block = 0; block < blocks; block++) {\n             \
+    \       const uint32_t twiddle2 = montgomery.multiply(twiddle, twiddle);\n   \
+    \                 const uint32_t twiddle3 = montgomery.multiply(twiddle2, twiddle);\n\
+    \                    const __m256i vector_twiddle = _mm256_set1_epi32(int(twiddle));\n\
+    \                    const __m256i vector_twiddle2 = _mm256_set1_epi32(int(twiddle2));\n\
+    \                    const __m256i vector_twiddle3 = _mm256_set1_epi32(int(twiddle3));\n\
+    \                    const int offset = block << (height - phase + 1);\n     \
+    \               for (int i = 0; i < radix_width; i += 8) {\n                 \
+    \       const __m256i a0 = _mm256_loadu_si256(\n                            reinterpret_cast<const\
+    \ __m256i*>(data + offset + i));\n                        const __m256i loaded_a1\
+    \ = _mm256_loadu_si256(\n                            reinterpret_cast<const __m256i*>(\n\
+    \                                data + offset + radix_width + i));\n        \
+    \                const __m256i loaded_a2 = _mm256_loadu_si256(\n             \
+    \               reinterpret_cast<const __m256i*>(\n                          \
+    \      data + offset + 2 * radix_width + i));\n                        const __m256i\
+    \ loaded_a3 = _mm256_loadu_si256(\n                            reinterpret_cast<const\
+    \ __m256i*>(\n                                data + offset + 3 * radix_width\
+    \ + i));\n                        const __m256i a1 = block == 0\n            \
+    \                                   ? loaded_a1\n                            \
+    \                   : montgomery.multiply(loaded_a1, vector_twiddle);\n      \
+    \                  const __m256i a2 = block == 0\n                           \
+    \                    ? loaded_a2\n                                           \
+    \    : montgomery.multiply(loaded_a2, vector_twiddle2);\n                    \
+    \    const __m256i a3 = block == 0\n                                         \
+    \      ? loaded_a3\n                                               : montgomery.multiply(loaded_a3,\
+    \ vector_twiddle3);\n                        const __m256i a0a2 = montgomery.add(a0,\
+    \ a2);\n                        const __m256i a0na2 = montgomery.subtract(a0,\
+    \ a2);\n                        const __m256i a1a3 = montgomery.add(a1, a3);\n\
+    \                        const __m256i a1na3i = montgomery.multiply(\n       \
+    \                     montgomery.subtract(a1, a3), vector_imaginary);\n      \
+    \                  _mm256_storeu_si256(reinterpret_cast<__m256i*>(data + offset\
+    \ + i),\n                                           montgomery.add(a0a2, a1a3));\n\
+    \                        _mm256_storeu_si256(reinterpret_cast<__m256i*>(\n   \
+    \                                            data + offset + radix_width + i),\n\
+    \                                           montgomery.subtract(a0a2, a1a3));\n\
+    \                        _mm256_storeu_si256(reinterpret_cast<__m256i*>(\n   \
+    \                                            data + offset + 2 * radix_width +\
+    \ i),\n                                           montgomery.add(a0na2, a1na3i));\n\
+    \                        _mm256_storeu_si256(reinterpret_cast<__m256i*>(\n   \
+    \                                            data + offset + 3 * radix_width +\
+    \ i),\n                                           montgomery.subtract(a0na2, a1na3i));\n\
+    \                    }\n                    if (block + 1 != blocks) {\n     \
+    \                   twiddle = montgomery.multiply(\n                         \
+    \   twiddle, roots.rate_radix4[__builtin_ctz(~uint32_t(block))]);\n          \
+    \          }\n                }\n                phase++;\n                continue;\n\
+    \            }\n            if (width < 8) {\n                const int blocks_per_vector\
+    \ = 8 / (width << 1);\n                for (int block = 0; block < blocks; block\
+    \ += blocks_per_vector) {\n                    alignas(32) uint32_t twiddles[8];\n\
+    \                    for (int local = 0; local < blocks_per_vector; local++) {\n\
+    \                        const int begin = local * (width << 1);\n           \
+    \             for (int lane = 0; lane < (width << 1); lane++)\n              \
+    \              twiddles[begin + lane] = twiddle;\n                        const\
+    \ int current = block + local;\n                        if (current + 1 != blocks)\
+    \ {\n                            twiddle = montgomery.multiply(\n            \
+    \                    twiddle, roots.rate[__builtin_ctz(~uint32_t(current))]);\n\
+    \                        }\n                    }\n                    const int\
+    \ offset = block * (width << 1);\n                    const __m256i values = _mm256_loadu_si256(\n\
+    \                        reinterpret_cast<const __m256i*>(data + offset));\n \
+    \                   __m256i lhs;\n                    __m256i rhs;\n         \
+    \           if (width == 4) {\n                        lhs = _mm256_permute2x128_si256(values,\
+    \ values, 0x00);\n                        rhs = _mm256_permute2x128_si256(values,\
+    \ values, 0x11);\n                    } else if (width == 2) {\n             \
+    \           lhs = _mm256_shuffle_epi32(values, 0x44);\n                      \
+    \  rhs = _mm256_shuffle_epi32(values, 0xee);\n                    } else {\n \
+    \                       lhs = _mm256_shuffle_epi32(values, 0xa0);\n          \
+    \              rhs = _mm256_shuffle_epi32(values, 0xf5);\n                   \
+    \ }\n                    const __m256i vector_twiddle = _mm256_load_si256(\n \
+    \                       reinterpret_cast<const __m256i*>(twiddles));\n       \
+    \             rhs = montgomery.multiply(rhs, vector_twiddle);\n              \
+    \      const __m256i sums = montgomery.add(lhs, rhs);\n                    const\
+    \ __m256i differences = montgomery.subtract(lhs, rhs);\n                    const\
+    \ __m256i result = width == 4\n                                              \
+    \ ? _mm256_blend_epi32(sums, differences, 0xf0)\n                            \
+    \               : width == 2\n                                               ?\
+    \ _mm256_blend_epi32(sums, differences, 0xcc)\n                              \
+    \                 : _mm256_blend_epi32(sums, differences, 0xaa);\n           \
+    \         _mm256_storeu_si256(reinterpret_cast<__m256i*>(data + offset), result);\n\
+    \                }\n                continue;\n            }\n            for\
+    \ (int block = 0; block < blocks; block++) {\n                const int offset\
+    \ = block << (height - phase + 1);\n                const __m256i vector_twiddle\
     \ = _mm256_set1_epi32(int(twiddle));\n                int i = 0;\n           \
     \     for (; i + 8 <= width; i += 8) {\n                    const __m256i lhs\
     \ = _mm256_loadu_si256(\n                        reinterpret_cast<const __m256i*>(data\
     \ + offset + i));\n                    const __m256i rhs = _mm256_loadu_si256(\n\
     \                        reinterpret_cast<const __m256i*>(data + offset + width\
-    \ + i));\n                    const __m256i weighted_rhs = montgomery.multiply(rhs,\
-    \ vector_twiddle);\n                    _mm256_storeu_si256(reinterpret_cast<__m256i*>(data\
-    \ + offset + i),\n                                       montgomery.add(lhs, weighted_rhs));\n\
+    \ + i));\n                    const __m256i weighted_rhs =\n                 \
+    \       block == 0 ? rhs : montgomery.multiply(rhs, vector_twiddle);\n       \
+    \             _mm256_storeu_si256(reinterpret_cast<__m256i*>(data + offset + i),\n\
+    \                                       montgomery.add(lhs, weighted_rhs));\n\
     \                    _mm256_storeu_si256(reinterpret_cast<__m256i*>(data + offset\
     \ + width + i),\n                                       montgomery.subtract(lhs,\
     \ weighted_rhs));\n                }\n                for (; i < width; i++) {\n\
@@ -250,24 +346,100 @@ data:
     \                                              : lhs + Montgomery998Simd::mod\
     \ - weighted_rhs;\n                    data[offset + i] = sum;\n             \
     \       data[offset + width + i] = difference;\n                }\n          \
-    \      if (block + 1 != blocks) {\n                    const uint32_t rate = montgomery.encode(\n\
-    \                        roots.rate[__builtin_ctz(~uint32_t(block))].val());\n\
-    \                    twiddle = montgomery.multiply(twiddle, rate);\n         \
-    \       }\n            }\n        }\n    } else {\n        for (int phase = height;\
-    \ phase >= 1; phase--) {\n            const int blocks = 1 << (phase - 1);\n \
-    \           const int width = 1 << (height - phase);\n            uint32_t twiddle\
-    \ = montgomery.r;\n            for (int block = 0; block < blocks; block++) {\n\
-    \                const int offset = block << (height - phase + 1);\n         \
-    \       const __m256i vector_twiddle = _mm256_set1_epi32(int(twiddle));\n    \
-    \            int i = 0;\n                for (; i + 8 <= width; i += 8) {\n  \
-    \                  const __m256i lhs = _mm256_loadu_si256(\n                 \
-    \       reinterpret_cast<const __m256i*>(data + offset + i));\n              \
-    \      const __m256i rhs = _mm256_loadu_si256(\n                        reinterpret_cast<const\
-    \ __m256i*>(data + offset + width + i));\n                    _mm256_storeu_si256(reinterpret_cast<__m256i*>(data\
+    \      if (block + 1 != blocks) {\n                    twiddle = montgomery.multiply(\n\
+    \                        twiddle, roots.rate[__builtin_ctz(~uint32_t(block))]);\n\
+    \                }\n            }\n        }\n    } else {\n        for (int phase\
+    \ = height; phase >= 1; phase--) {\n            const int blocks = 1 << (phase\
+    \ - 1);\n            const int width = 1 << (height - phase);\n            uint32_t\
+    \ twiddle = montgomery.r;\n            if (width >= 8 && phase >= 2) {\n     \
+    \           const int radix_blocks = blocks >> 1;\n                const uint32_t\
+    \ inverse_imaginary = roots.inverse_imaginary;\n                const __m256i\
+    \ vector_inverse_imaginary =\n                    _mm256_set1_epi32(int(inverse_imaginary));\n\
+    \                for (int block = 0; block < radix_blocks; block++) {\n      \
+    \              const uint32_t twiddle2 = montgomery.multiply(twiddle, twiddle);\n\
+    \                    const uint32_t twiddle3 = montgomery.multiply(twiddle2, twiddle);\n\
+    \                    const __m256i vector_twiddle = _mm256_set1_epi32(int(twiddle));\n\
+    \                    const __m256i vector_twiddle2 = _mm256_set1_epi32(int(twiddle2));\n\
+    \                    const __m256i vector_twiddle3 = _mm256_set1_epi32(int(twiddle3));\n\
+    \                    const int offset = block << (height - phase + 2);\n     \
+    \               for (int i = 0; i < width; i += 8) {\n                       \
+    \ const __m256i a0 = _mm256_loadu_si256(\n                            reinterpret_cast<const\
+    \ __m256i*>(data + offset + i));\n                        const __m256i a1 = _mm256_loadu_si256(\n\
+    \                            reinterpret_cast<const __m256i*>(data + offset +\
+    \ width + i));\n                        const __m256i a2 = _mm256_loadu_si256(reinterpret_cast<const\
+    \ __m256i*>(\n                            data + offset + 2 * width + i));\n \
+    \                       const __m256i a3 = _mm256_loadu_si256(reinterpret_cast<const\
+    \ __m256i*>(\n                            data + offset + 3 * width + i));\n \
+    \                       const __m256i a0a1 = montgomery.add(a0, a1);\n       \
+    \                 const __m256i a0na1 = montgomery.subtract(a0, a1);\n       \
+    \                 const __m256i a2a3 = montgomery.add(a2, a3);\n             \
+    \           const __m256i a2na3i = montgomery.multiply(\n                    \
+    \        montgomery.subtract(a2, a3), vector_inverse_imaginary);\n           \
+    \             _mm256_storeu_si256(reinterpret_cast<__m256i*>(data + offset + i),\n\
+    \                                           montgomery.add(a0a1, a2a3));\n   \
+    \                     const __m256i output1 = montgomery.add(a0na1, a2na3i);\n\
+    \                        const __m256i output2 = montgomery.subtract(a0a1, a2a3);\n\
+    \                        const __m256i output3 = montgomery.subtract(a0na1, a2na3i);\n\
+    \                        _mm256_storeu_si256(\n                            reinterpret_cast<__m256i*>(data\
+    \ + offset + width + i),\n                            block == 0 ? output1\n \
+    \                                      : montgomery.multiply(output1, vector_twiddle));\n\
+    \                        _mm256_storeu_si256(\n                            reinterpret_cast<__m256i*>(data\
+    \ + offset + 2 * width + i),\n                            block == 0 ? output2\n\
+    \                                       : montgomery.multiply(output2, vector_twiddle2));\n\
+    \                        _mm256_storeu_si256(\n                            reinterpret_cast<__m256i*>(data\
+    \ + offset + 3 * width + i),\n                            block == 0 ? output3\n\
+    \                                       : montgomery.multiply(output3, vector_twiddle3));\n\
+    \                    }\n                    if (block + 1 != radix_blocks) {\n\
+    \                        twiddle = montgomery.multiply(\n                    \
+    \        twiddle, roots.inverse_rate_radix4[\n                               \
+    \           __builtin_ctz(~uint32_t(block))]);\n                    }\n      \
+    \          }\n                phase--;\n                continue;\n          \
+    \  }\n            if (width < 8) {\n                const int blocks_per_vector\
+    \ = 8 / (width << 1);\n                for (int block = 0; block < blocks; block\
+    \ += blocks_per_vector) {\n                    alignas(32) uint32_t twiddles[8];\n\
+    \                    for (int local = 0; local < blocks_per_vector; local++) {\n\
+    \                        const int begin = local * (width << 1);\n           \
+    \             for (int lane = 0; lane < (width << 1); lane++)\n              \
+    \              twiddles[begin + lane] = twiddle;\n                        const\
+    \ int current = block + local;\n                        if (current + 1 != blocks)\
+    \ {\n                            twiddle = montgomery.multiply(\n            \
+    \                    twiddle,\n                                roots.inverse_rate[__builtin_ctz(~uint32_t(current))]);\n\
+    \                        }\n                    }\n                    const int\
+    \ offset = block * (width << 1);\n                    const __m256i values = _mm256_loadu_si256(\n\
+    \                        reinterpret_cast<const __m256i*>(data + offset));\n \
+    \                   __m256i lhs;\n                    __m256i rhs;\n         \
+    \           if (width == 4) {\n                        lhs = _mm256_permute2x128_si256(values,\
+    \ values, 0x00);\n                        rhs = _mm256_permute2x128_si256(values,\
+    \ values, 0x11);\n                    } else if (width == 2) {\n             \
+    \           lhs = _mm256_shuffle_epi32(values, 0x44);\n                      \
+    \  rhs = _mm256_shuffle_epi32(values, 0xee);\n                    } else {\n \
+    \                       lhs = _mm256_shuffle_epi32(values, 0xa0);\n          \
+    \              rhs = _mm256_shuffle_epi32(values, 0xf5);\n                   \
+    \ }\n                    const __m256i sums = montgomery.add(lhs, rhs);\n    \
+    \                const __m256i vector_twiddle = _mm256_load_si256(\n         \
+    \               reinterpret_cast<const __m256i*>(twiddles));\n               \
+    \     const __m256i differences = montgomery.multiply(\n                     \
+    \   montgomery.subtract(lhs, rhs), vector_twiddle);\n                    const\
+    \ __m256i result = width == 4\n                                              \
+    \ ? _mm256_blend_epi32(sums, differences, 0xf0)\n                            \
+    \               : width == 2\n                                               ?\
+    \ _mm256_blend_epi32(sums, differences, 0xcc)\n                              \
+    \                 : _mm256_blend_epi32(sums, differences, 0xaa);\n           \
+    \         _mm256_storeu_si256(reinterpret_cast<__m256i*>(data + offset), result);\n\
+    \                }\n                continue;\n            }\n            for\
+    \ (int block = 0; block < blocks; block++) {\n                const int offset\
+    \ = block << (height - phase + 1);\n                const __m256i vector_twiddle\
+    \ = _mm256_set1_epi32(int(twiddle));\n                int i = 0;\n           \
+    \     for (; i + 8 <= width; i += 8) {\n                    const __m256i lhs\
+    \ = _mm256_loadu_si256(\n                        reinterpret_cast<const __m256i*>(data\
+    \ + offset + i));\n                    const __m256i rhs = _mm256_loadu_si256(\n\
+    \                        reinterpret_cast<const __m256i*>(data + offset + width\
+    \ + i));\n                    _mm256_storeu_si256(reinterpret_cast<__m256i*>(data\
     \ + offset + i),\n                                       montgomery.add(lhs, rhs));\n\
-    \                    _mm256_storeu_si256(reinterpret_cast<__m256i*>(data + offset\
-    \ + width + i),\n                                       montgomery.multiply(montgomery.subtract(lhs,\
-    \ rhs),\n                                                           vector_twiddle));\n\
+    \                    const __m256i difference = montgomery.subtract(lhs, rhs);\n\
+    \                    _mm256_storeu_si256(\n                        reinterpret_cast<__m256i*>(data\
+    \ + offset + width + i),\n                        block == 0 ? difference\n  \
+    \                                 : montgomery.multiply(difference, vector_twiddle));\n\
     \                }\n                for (; i < width; i++) {\n               \
     \     const uint32_t lhs = data[offset + i];\n                    const uint32_t\
     \ rhs = data[offset + width + i];\n                    uint32_t sum = lhs + rhs;\n\
@@ -275,14 +447,13 @@ data:
     \                    uint32_t difference = lhs >= rhs ? lhs - rhs : lhs + Montgomery998Simd::mod\
     \ - rhs;\n                    data[offset + i] = sum;\n                    data[offset\
     \ + width + i] = montgomery.multiply(difference, twiddle);\n                }\n\
-    \                if (block + 1 != blocks) {\n                    const uint32_t\
-    \ rate = montgomery.encode(\n                        roots.inverse_rate[__builtin_ctz(~uint32_t(block))].val());\n\
-    \                    twiddle = montgomery.multiply(twiddle, rate);\n         \
-    \       }\n            }\n        }\n        if (normalize) {\n            const\
-    \ uint32_t scale = montgomery.encode(Mint(n).inv().val());\n            const\
-    \ __m256i vector_scale = _mm256_set1_epi32(int(scale));\n            int i = 0;\n\
-    \            for (; i + 8 <= n; i += 8) {\n                __m256i values =\n\
-    \                    _mm256_loadu_si256(reinterpret_cast<const __m256i*>(data\
+    \                if (block + 1 != blocks) {\n                    twiddle = montgomery.multiply(\n\
+    \                        twiddle, roots.inverse_rate[__builtin_ctz(~uint32_t(block))]);\n\
+    \                }\n            }\n        }\n        if (normalize) {\n     \
+    \       const uint32_t scale = montgomery.encode(Mint(n).inv().val());\n     \
+    \       const __m256i vector_scale = _mm256_set1_epi32(int(scale));\n        \
+    \    int i = 0;\n            for (; i + 8 <= n; i += 8) {\n                __m256i\
+    \ values =\n                    _mm256_loadu_si256(reinterpret_cast<const __m256i*>(data\
     \ + i));\n                _mm256_storeu_si256(reinterpret_cast<__m256i*>(data\
     \ + i),\n                                   montgomery.multiply(values, vector_scale));\n\
     \            }\n            for (; i < n; i++) data[i] = montgomery.multiply(data[i],\
@@ -310,27 +481,28 @@ data:
     \ transformed_b[i]);\n        transformed_a[i] = montgomery.multiply(product,\
     \ inverse_n_r2);\n    }\n    ntt_998244353_simd<Mint>(transformed_a.data(), n,\
     \ true, false);\n\n    std::vector<Mint> result(result_size);\n    for (int j\
-    \ = 0; j < result_size; j++) result[j] = Mint::raw(transformed_a[j]);\n    return\
-    \ result;\n}\n\n#pragma GCC pop_options\n\n#endif\n\n}  // namespace internal\n\
-    \ntemplate <class Mint>\nstd::vector<Mint> convolution_naive(const std::vector<Mint>&\
-    \ a, const std::vector<Mint>& b) {\n    if (a.empty() || b.empty()) return {};\n\
-    \    std::vector<Mint> result(a.size() + b.size() - 1);\n    if (a.size() < b.size())\
-    \ {\n        for (int i = 0; i < int(a.size()); i++) {\n            for (int j\
-    \ = 0; j < int(b.size()); j++) result[i + j] += a[i] * b[j];\n        }\n    }\
-    \ else {\n        for (int j = 0; j < int(b.size()); j++) {\n            for (int\
-    \ i = 0; i < int(a.size()); i++) result[i + j] += a[i] * b[j];\n        }\n  \
-    \  }\n    return result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint> convolution_ntt(const\
-    \ std::vector<Mint>& a, const std::vector<Mint>& b) {\n    const int result_size\
-    \ = int(a.size() + b.size() - 1);\n    int n = 1;\n    while (n < result_size)\
-    \ n <<= 1;\n    assert((Mint::mod() - 1) % uint32_t(n) == 0);\n\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n\
-    \    if constexpr (Mint::mod() == 998244353) {\n        if (n >= 64 && __builtin_cpu_supports(\"\
-    avx2\"))\n            return internal::convolution_998244353_simd(a, b);\n   \
-    \ }\n#endif\n\n    // Allocate the padded buffers directly.  Constructing from\
-    \ the inputs and\n    // then resizing used to allocate and copy both large operands\
-    \ twice.\n    std::vector<Mint> fa(n);\n    std::vector<Mint> fb(n);\n    std::copy(a.begin(),\
-    \ a.end(), fa.begin());\n    std::copy(b.begin(), b.end(), fb.begin());\n    internal::ntt(fa,\
-    \ false);\n    internal::ntt(fb, false);\n    const Mint inverse_n = Mint(n).inv();\n\
-    \    for (int i = 0; i < n; i++) fa[i] *= fb[i] * inverse_n;\n    internal::ntt(fa,\
+    \ = 0; j < result_size; j++)\n        result[j] = Mint::raw(montgomery.shrink(transformed_a[j]));\n\
+    \    return result;\n}\n\n#pragma GCC pop_options\n\n#endif\n\n}  // namespace\
+    \ internal\n\ntemplate <class Mint>\nstd::vector<Mint> convolution_naive(const\
+    \ std::vector<Mint>& a, const std::vector<Mint>& b) {\n    if (a.empty() || b.empty())\
+    \ return {};\n    std::vector<Mint> result(a.size() + b.size() - 1);\n    if (a.size()\
+    \ < b.size()) {\n        for (int i = 0; i < int(a.size()); i++) {\n         \
+    \   for (int j = 0; j < int(b.size()); j++) result[i + j] += a[i] * b[j];\n  \
+    \      }\n    } else {\n        for (int j = 0; j < int(b.size()); j++) {\n  \
+    \          for (int i = 0; i < int(a.size()); i++) result[i + j] += a[i] * b[j];\n\
+    \        }\n    }\n    return result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint>\
+    \ convolution_ntt(const std::vector<Mint>& a, const std::vector<Mint>& b) {\n\
+    \    const int result_size = int(a.size() + b.size() - 1);\n    int n = 1;\n \
+    \   while (n < result_size) n <<= 1;\n    assert((Mint::mod() - 1) % uint32_t(n)\
+    \ == 0);\n\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n    if constexpr (Mint::mod() == 998244353)\
+    \ {\n        if (n >= 64 && __builtin_cpu_supports(\"avx2\"))\n            return\
+    \ internal::convolution_998244353_simd(a, b);\n    }\n#endif\n\n    // Allocate\
+    \ the padded buffers directly.  Constructing from the inputs and\n    // then\
+    \ resizing used to allocate and copy both large operands twice.\n    std::vector<Mint>\
+    \ fa(n);\n    std::vector<Mint> fb(n);\n    std::copy(a.begin(), a.end(), fa.begin());\n\
+    \    std::copy(b.begin(), b.end(), fb.begin());\n    internal::ntt(fa, false);\n\
+    \    internal::ntt(fb, false);\n    const Mint inverse_n = Mint(n).inv();\n  \
+    \  for (int i = 0; i < n; i++) fa[i] *= fb[i] * inverse_n;\n    internal::ntt(fa,\
     \ true, false);\n    fa.resize(result_size);\n    return fa;\n}\n\ntemplate <class\
     \ Mint>\nstd::vector<Mint> convolution(const std::vector<Mint>& a, const std::vector<Mint>&\
     \ b) {\n    if (a.empty() || b.empty()) return {};\n    if (std::min(a.size(),\
@@ -661,7 +833,7 @@ data:
   isVerificationFile: true
   path: verify/math/bernoulli_number.test.cpp
   requiredBy: []
-  timestamp: '2026-07-11 02:27:38+09:00'
+  timestamp: '2026-07-11 02:39:09+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/bernoulli_number.test.cpp

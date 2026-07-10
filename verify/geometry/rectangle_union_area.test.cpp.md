@@ -172,12 +172,12 @@ data:
     \            );\n            tree.add(bottom, top, events[next].delta);\n    \
     \        next++;\n        }\n        previous_x = x;\n        event_index = next;\n\
     \    }\n    return area;\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\
-    \n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#include <cstddef>\n#include <cstdio>\n\
-    #include <iterator>\n#include <string>\n#line 9 \"utilities/fast_io.hpp\"\n#include\
-    \ <utility>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal {\n\
-    \n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct\
-    \ is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
-    \    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
+    \n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#include <array>\n#include <cstddef>\n\
+    #include <cstdio>\n#include <iterator>\n#include <string>\n#line 10 \"utilities/fast_io.hpp\"\
+    \n#include <utility>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal\
+    \ {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\n\
+    struct is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T,\
+    \ std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
     >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
     \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
@@ -248,30 +248,40 @@ data:
     \ return false;\n        return read(second, rest...);\n    }\n\n    template\
     \ <class T>\n    FastInput& operator>>(T& value) {\n        read(value);\n   \
     \     return *this;\n    }\n};\n\nstruct FastOutput {\n    static constexpr int\
-    \ buffer_size = 1 << 20;\n\n   private:\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
-    \    int _position;\n\n   public:\n    explicit FastOutput(std::FILE* stream =\
-    \ stdout)\n        : _stream(stream), _position(0) {}\n\n    FastOutput(const\
-    \ FastOutput&) = delete;\n    FastOutput& operator=(const FastOutput&) = delete;\n\
-    \n    ~FastOutput() {\n        flush();\n    }\n\n    void flush() {\n       \
-    \ if (_position == 0) return;\n        std::fwrite(_buffer, 1, _position, _stream);\n\
-    \        _position = 0;\n    }\n\n    void write_char(char c) {\n        if (_position\
-    \ == buffer_size) flush();\n        _buffer[_position++] = c;\n    }\n\n    void\
-    \ write(const char* s) {\n        while (*s != '\\0') write_char(*s++);\n    }\n\
-    \n    void write(const std::string& s) {\n        for (char c : s) write_char(c);\n\
-    \    }\n\n    void write(char c) {\n        write_char(c);\n    }\n\n    void\
-    \ write(bool value) {\n        write_char(value ? '1' : '0');\n    }\n\n    template\
-    \ <class T>\n    std::enable_if_t<\n        std::is_integral_v<T>\n          \
-    \  && !std::is_same_v<std::remove_cv_t<T>, bool>\n            && !std::is_same_v<std::remove_cv_t<T>,\
-    \ char>\n    >\n    write(T value) {\n        using Raw = std::remove_cv_t<T>;\n\
-    \        using Unsigned = std::make_unsigned_t<Raw>;\n\n        Unsigned magnitude;\n\
-    \        if constexpr (std::is_signed_v<Raw>) {\n            if (value < 0) {\n\
-    \                write_char('-');\n                magnitude = Unsigned(0) - Unsigned(value);\n\
-    \            } else {\n                magnitude = Unsigned(value);\n        \
-    \    }\n        } else {\n            magnitude = value;\n        }\n\n      \
-    \  if (magnitude == 0) {\n            write_char('0');\n            return;\n\
-    \        }\n\n        char digits[64];\n        int count = 0;\n        while\
-    \ (magnitude > 0) {\n            digits[count++] = char('0' + magnitude % 10);\n\
-    \            magnitude /= 10;\n        }\n        while (count--) write_char(digits[count]);\n\
+    \ buffer_size = 1 << 20;\n\n   private:\n    inline static constexpr auto digit_pairs\
+    \ = [] {\n        std::array<char, 200> result{};\n        for (int i = 0; i <\
+    \ 100; i++) {\n            result[2 * i] = char('0' + i / 10);\n            result[2\
+    \ * i + 1] = char('0' + i % 10);\n        }\n        return result;\n    }();\n\
+    \n    std::FILE* _stream;\n    char _buffer[buffer_size];\n    int _position;\n\
+    \n   public:\n    explicit FastOutput(std::FILE* stream = stdout)\n        : _stream(stream),\
+    \ _position(0) {}\n\n    FastOutput(const FastOutput&) = delete;\n    FastOutput&\
+    \ operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n        flush();\n\
+    \    }\n\n    void flush() {\n        if (_position == 0) return;\n        std::fwrite(_buffer,\
+    \ 1, _position, _stream);\n        _position = 0;\n    }\n\n    void write_char(char\
+    \ c) {\n        if (_position == buffer_size) flush();\n        _buffer[_position++]\
+    \ = c;\n    }\n\n    void write(const char* s) {\n        while (*s != '\\0')\
+    \ write_char(*s++);\n    }\n\n    void write(const std::string& s) {\n       \
+    \ for (char c : s) write_char(c);\n    }\n\n    void write(char c) {\n       \
+    \ write_char(c);\n    }\n\n    void write(bool value) {\n        write_char(value\
+    \ ? '1' : '0');\n    }\n\n    template <class T>\n    std::enable_if_t<\n    \
+    \    std::is_integral_v<T>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ bool>\n            && !std::is_same_v<std::remove_cv_t<T>, char>\n    >\n  \
+    \  write(T value) {\n        using Raw = std::remove_cv_t<T>;\n        using Unsigned\
+    \ = std::make_unsigned_t<Raw>;\n\n        Unsigned magnitude;\n        if constexpr\
+    \ (std::is_signed_v<Raw>) {\n            if (value < 0) {\n                write_char('-');\n\
+    \                magnitude = Unsigned(0) - Unsigned(value);\n            } else\
+    \ {\n                magnitude = Unsigned(value);\n            }\n        } else\
+    \ {\n            magnitude = value;\n        }\n\n        if (magnitude == 0)\
+    \ {\n            write_char('0');\n            return;\n        }\n\n        char\
+    \ digits[64];\n        int begin = 64;\n        while (magnitude >= 100) {\n \
+    \           const Unsigned quotient = magnitude / 100;\n            const unsigned\
+    \ remainder = unsigned(magnitude - quotient * 100);\n            begin -= 2;\n\
+    \            digits[begin] = digit_pairs[2 * remainder];\n            digits[begin\
+    \ + 1] = digit_pairs[2 * remainder + 1];\n            magnitude = quotient;\n\
+    \        }\n        if (magnitude < 10) {\n            digits[--begin] = char('0'\
+    \ + magnitude);\n        } else {\n            begin -= 2;\n            digits[begin]\
+    \ = digit_pairs[2 * unsigned(magnitude)];\n            digits[begin + 1] = digit_pairs[2\
+    \ * unsigned(magnitude) + 1];\n        }\n        while (begin < 64) write_char(digits[begin++]);\n\
     \    }\n\n    template <class T>\n    std::enable_if_t<\n        internal::has_val_method_v<T>\n\
     \            && !std::is_integral_v<T>\n            && !internal::is_range_v<T>\n\
     \    >\n    write(const T& value) {\n        write(value.val());\n    }\n\n  \
@@ -380,7 +390,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/rectangle_union_area.test.cpp
   requiredBy: []
-  timestamp: '2026-07-10 21:00:13+09:00'
+  timestamp: '2026-07-11 02:39:09+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/rectangle_union_area.test.cpp
