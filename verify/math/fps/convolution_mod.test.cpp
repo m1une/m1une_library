@@ -5,22 +5,19 @@
 
 #include "../../../math/fps/convolution.hpp"
 #include "../../../math/modint.hpp"
+#include "../../../utilities/fast_io.hpp"
 
 using mint = m1une::math::modint998244353;
 
 int main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
+    m1une::utilities::FastInput input;
+    m1une::utilities::FastOutput output;
 
     int n, m;
-    std::cin >> n >> m;
+    input.read(n, m);
     std::vector<mint> a(n), b(m);
-    for (mint& value : a) std::cin >> value;
-    for (mint& value : b) std::cin >> value;
+    input.read(a);
+    input.read(b);
     std::vector<mint> result = m1une::fps::convolution(a, b);
-    for (int i = 0; i < int(result.size()); i++) {
-        if (i) std::cout << ' ';
-        std::cout << result[i];
-    }
-    std::cout << '\n';
+    output.println(result);
 }
