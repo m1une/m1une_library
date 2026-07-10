@@ -1,8 +1,14 @@
 ---
 data:
   _extendedDependsOn: []
-  _extendedRequiredBy: []
+  _extendedRequiredBy:
+  - icon: ':heavy_check_mark:'
+    path: ds/range_query/range_lis_query.hpp
+    title: Static Range LIS Query
   _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/range_query/range_lis_query.test.cpp
+    title: verify/ds/range_query/range_lis_query.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/ds/range_query/wavelet_matrix.test.cpp
     title: verify/ds/range_query/wavelet_matrix.test.cpp
@@ -208,10 +214,12 @@ data:
   dependsOn: []
   isVerificationFile: false
   path: ds/range_query/wavelet_matrix.hpp
-  requiredBy: []
+  requiredBy:
+  - ds/range_query/range_lis_query.hpp
   timestamp: '2026-06-21 02:25:15+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/ds/range_query/range_lis_query.test.cpp
   - verify/ds/range_query/wavelet_matrix.test.cpp
 documentation_of: ds/range_query/wavelet_matrix.hpp
 layout: document
