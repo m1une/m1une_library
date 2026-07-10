@@ -4,6 +4,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdio>
+#include <cstring>
 #include <iterator>
 #include <string>
 #include <type_traits>
@@ -87,6 +88,17 @@ struct FastInput {
     int _position;
     int _length;
 
+    bool prepare_number() {
+        if (_length - _position >= 32) return true;
+        const int remaining = _length - _position;
+        if (remaining > 0) std::memmove(_buffer, _buffer + _position, remaining);
+        const int added = int(std::fread(_buffer + remaining, 1, buffer_size - remaining, _stream));
+        _position = 0;
+        _length = remaining + added;
+        if (_length < buffer_size) _buffer[_length] = '\0';
+        return _length != 0;
+    }
+
    public:
     explicit FastInput(std::FILE* stream = stdin)
         : _stream(stream), _position(0), _length(0) {}
@@ -143,14 +155,14 @@ struct FastInput {
         bool
     >
     read(T& value) {
-        int c = read_char_raw();
-        while (c != EOF && c <= ' ') c = read_char_raw();
-        if (c == EOF) return false;
+        if (!prepare_number()) return false;
+        int c = static_cast<unsigned char>(_buffer[_position++]);
+        while (c <= ' ') c = static_cast<unsigned char>(_buffer[_position++]);
 
         bool negative = false;
         if (c == '-') {
             negative = true;
-            c = read_char_raw();
+            c = static_cast<unsigned char>(_buffer[_position++]);
         }
 
         if constexpr (std::is_signed_v<T>) {
@@ -158,17 +170,18 @@ struct FastInput {
             while ('0' <= c && c <= '9') {
                 int digit = c - '0';
                 result = negative ? result * 10 - digit : result * 10 + digit;
-                c = read_char_raw();
+                c = static_cast<unsigned char>(_buffer[_position++]);
             }
             value = result;
         } else {
             T result = 0;
             while ('0' <= c && c <= '9') {
                 result = result * 10 + T(c - '0');
-                c = read_char_raw();
+                c = static_cast<unsigned char>(_buffer[_position++]);
             }
             value = negative ? T(0) - result : result;
         }
+        if (_position > _length) _position = _length;
         return true;
     }
 
@@ -226,11 +239,14 @@ struct FastOutput {
     static constexpr int buffer_size = 1 << 20;
 
    private:
-    inline static constexpr auto digit_pairs = [] {
-        std::array<char, 200> result{};
-        for (int i = 0; i < 100; i++) {
-            result[2 * i] = char('0' + i / 10);
-            result[2 * i + 1] = char('0' + i % 10);
+    inline static constexpr auto digit_quads = [] {
+        std::array<char, 40000> result{};
+        for (int i = 0; i < 10000; i++) {
+            int value = i;
+            for (int j = 3; j >= 0; j--) {
+                result[4 * i + j] = char('0' + value % 10);
+                value /= 10;
+            }
         }
         return result;
     }();
@@ -304,24 +320,23 @@ struct FastOutput {
             return;
         }
 
-        char digits[64];
-        int begin = 64;
-        while (magnitude >= 100) {
-            const Unsigned quotient = magnitude / 100;
-            const unsigned remainder = unsigned(magnitude - quotient * 100);
-            begin -= 2;
-            digits[begin] = digit_pairs[2 * remainder];
-            digits[begin + 1] = digit_pairs[2 * remainder + 1];
+        unsigned chunks[16];
+        int count = 0;
+        while (magnitude >= 10000) {
+            const Unsigned quotient = magnitude / 10000;
+            chunks[count++] = unsigned(magnitude - quotient * 10000);
             magnitude = quotient;
         }
-        if (magnitude < 10) {
-            digits[--begin] = char('0' + magnitude);
-        } else {
-            begin -= 2;
-            digits[begin] = digit_pairs[2 * unsigned(magnitude)];
-            digits[begin + 1] = digit_pairs[2 * unsigned(magnitude) + 1];
+        if (_position > buffer_size - 64) flush();
+        const unsigned leading = unsigned(magnitude);
+        const char* first = digit_quads.data() + 4 * leading;
+        int skip = leading < 10 ? 3 : leading < 100 ? 2 : leading < 1000 ? 1 : 0;
+        for (; skip < 4; skip++) _buffer[_position++] = first[skip];
+        while (count--) {
+            const char* digits = digit_quads.data() + 4 * chunks[count];
+            std::memcpy(_buffer + _position, digits, 4);
+            _position += 4;
         }
-        while (begin < 64) write_char(digits[begin++]);
     }
 
     template <class T>

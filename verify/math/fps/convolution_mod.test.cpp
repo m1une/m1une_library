@@ -1,7 +1,6 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/convolution_mod"
 
-#pragma GCC optimize("O3,unroll-loops")
-#pragma GCC target("avx2")
+#pragma GCC optimize("O3")
 
 #include <iostream>
 #include <vector>
