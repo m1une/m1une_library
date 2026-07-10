@@ -213,6 +213,12 @@ struct FastInput {
         if (!read(first)) return false;
         return read(second, rest...);
     }
+
+    template <class T>
+    FastInput& operator>>(T& value) {
+        read(value);
+        return *this;
+    }
 };
 
 struct FastOutput {
@@ -343,6 +349,12 @@ struct FastOutput {
     void println(const Args&... args) {
         print(args...);
         write_char('\n');
+    }
+
+    template <class T>
+    FastOutput& operator<<(const T& value) {
+        write(value);
+        return *this;
     }
 };
 
