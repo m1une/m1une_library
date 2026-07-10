@@ -4,6 +4,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdio>
+#include <cstdint>
 #include <cstring>
 #include <iterator>
 #include <string>
@@ -76,6 +77,17 @@ struct has_val_method<T, std::void_t<decltype(std::declval<const T&>().val())>>
 
 template <class T>
 inline constexpr bool has_val_method_v = has_val_method<T>::value;
+
+template <class T, class = void>
+struct has_static_mod_raw : std::false_type {};
+
+template <class T>
+struct has_static_mod_raw<
+    T, std::void_t<decltype(T::mod()), decltype(T::raw(std::declval<uint32_t>()))>>
+    : std::true_type {};
+
+template <class T>
+inline constexpr bool has_static_mod_raw_v = has_static_mod_raw<T>::value;
 
 }  // namespace internal
 
@@ -168,15 +180,29 @@ struct FastInput {
         if constexpr (std::is_signed_v<T>) {
             T result = 0;
             while ('0' <= c && c <= '9') {
-                int digit = c - '0';
-                result = negative ? result * 10 - digit : result * 10 + digit;
+                const int first = c - '0';
+                const int second = static_cast<unsigned char>(_buffer[_position]) - '0';
+                if (0 <= second && second <= 9) {
+                    result = negative ? result * 100 - (first * 10 + second)
+                                      : result * 100 + (first * 10 + second);
+                    ++_position;
+                } else {
+                    result = negative ? result * 10 - first : result * 10 + first;
+                }
                 c = static_cast<unsigned char>(_buffer[_position++]);
             }
             value = result;
         } else {
             T result = 0;
             while ('0' <= c && c <= '9') {
-                result = result * 10 + T(c - '0');
+                const unsigned first = unsigned(c - '0');
+                const int second = static_cast<unsigned char>(_buffer[_position]) - '0';
+                if (0 <= second && second <= 9) {
+                    result = result * 100 + T(first * 10 + unsigned(second));
+                    ++_position;
+                } else {
+                    result = result * 10 + T(first);
+                }
                 c = static_cast<unsigned char>(_buffer[_position++]);
             }
             value = negative ? T(0) - result : result;
@@ -195,7 +221,15 @@ struct FastInput {
     read(T& value) {
         long long x;
         if (!read(x)) return false;
-        value = T(x);
+        if constexpr (internal::has_static_mod_raw_v<T>) {
+            if (x >= 0 && uint64_t(x) < uint64_t(T::mod())) {
+                value = T::raw(uint32_t(x));
+            } else {
+                value = T(x);
+            }
+        } else {
+            value = T(x);
+        }
         return true;
     }
 
@@ -239,7 +273,7 @@ struct FastOutput {
     static constexpr int buffer_size = 1 << 20;
 
    private:
-    inline static constexpr auto digit_quads = [] {
+    inline static const auto digit_quads = [] {
         std::array<char, 40000> result{};
         for (int i = 0; i < 10000; i++) {
             int value = i;
