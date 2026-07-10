@@ -210,7 +210,8 @@ $$
 
 Euler's pentagonal number theorem gives a sparse denominator, which the
 implementation inverts with formal power series. Therefore
-`partition_numbers<Mint>(maximum)` runs in
+`partition_function<Mint>(maximum)` and its compatibility alias
+`partition_numbers<Mint>(maximum)` run in
 $O(\text{maximum} \log \text{maximum})$ time.
 
 ## Derangements

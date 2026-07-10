@@ -32,6 +32,9 @@ You usually do not need to include this entire bundle:
   sums, and polynomial discrete integration.
 * Use `combinatorial_sequences.hpp` for Catalan, Bell, Stirling, partition, or
   derangement numbers.
+* Use `partition_function.hpp` when only integer partition numbers are needed.
+* Use the optional `partition_number_hrr.hpp` with FLINT for one exact,
+  isolated partition number at a large index. It is not part of this bundle.
 * Use `cyclotomic_polynomial.hpp` to construct the polynomial of primitive
   roots of unity of a given order.
 * Use `prime_sieve.hpp` when all queried integers are at most a manageable
@@ -77,6 +80,7 @@ few unused headers do not matter.
 | `math/cyclotomic_polynomial.hpp` | Integer coefficients of cyclotomic polynomials. |
 | `math/generalized_floor_sum.hpp` | Polynomial moments of a linear floor sequence using monoid floor sum. |
 | `math/number_theory.hpp` | Extended GCD, modular power and inverse, CRT, and floor sum. |
+| `math/partition_function.hpp` | Integer partition numbers via Euler's pentagonal theorem and FPS inversion. |
 | `math/prime_sieve.hpp` | Linear sieve with smallest prime factors. |
 | `math/prime_factorization.hpp` | Deterministic 64-bit primality test and Pollard-Rho factorization. |
 | `math/primitive_root.hpp` | Smallest primitive root modulo an integer, when one exists. |

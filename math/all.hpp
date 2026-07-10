@@ -15,6 +15,7 @@
 #include "matrix/all.hpp"
 #include "modint.hpp"
 #include "number_theory.hpp"
+#include "partition_function.hpp"
 #include "prime_factorization.hpp"
 #include "primitive_root.hpp"
 #include "prime_sieve.hpp"

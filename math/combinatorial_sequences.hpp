@@ -8,6 +8,7 @@
 #include "fps/formal_power_series.hpp"
 #include "bernoulli.hpp"
 #include "combinatorics.hpp"
+#include "partition_function.hpp"
 
 namespace m1une {
 namespace math {
@@ -68,25 +69,6 @@ std::vector<Mint> stirling_numbers_second_kind(int n) {
     std::vector<Mint> result = fps::convolution(powers, signs);
     result.resize(n + 1);
     return result;
-}
-
-template <class Mint>
-std::vector<Mint> partition_numbers(int maximum) {
-    assert(maximum >= 0);
-
-    using Fps = fps::FormalPowerSeries<Mint>;
-    Fps denominator(maximum + 1);
-    denominator[0] = 1;
-    for (long long k = 1;; k++) {
-        const long long first = k * (3 * k - 1) / 2;
-        const long long second = k * (3 * k + 1) / 2;
-        if (first > maximum) break;
-
-        const Mint sign = (k & 1) ? Mint(-1) : Mint(1);
-        denominator[int(first)] += sign;
-        if (second <= maximum) denominator[int(second)] += sign;
-    }
-    return denominator.inv(maximum + 1);
 }
 
 template <class Mint>
