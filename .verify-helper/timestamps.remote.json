@@ -9,6 +9,7 @@
 "verify/algo/search/bisect.test.cpp": "2026-07-07 21:49:48 +0900",
 "verify/algo/search/golden_section_search.test.cpp": "2026-07-09 00:39:09 +0900",
 "verify/algo/search/ternary_search.test.cpp": "2026-07-07 22:10:04 +0900",
+"verify/algo/sequence/number_of_subsequences.test.cpp": "2026-07-10 18:48:41 +0900",
 "verify/algo/sequence/sequence_algorithms.test.cpp": "2026-07-07 21:49:48 +0900",
 "verify/algo/sequence/subset_sum.test.cpp": "2026-07-07 21:49:48 +0900",
 "verify/convex/alien_trick.test.cpp": "2026-07-07 18:38:36 +0900",
