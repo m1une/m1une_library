@@ -69,6 +69,8 @@ struct NttRoots {
     std::array<Mint, max_base + 1> inverse_root;
     std::array<Mint, max_base> rate;
     std::array<Mint, max_base> inverse_rate;
+    std::array<Mint, max_base> rate_radix4;
+    std::array<Mint, max_base> inverse_rate_radix4;
 
     NttRoots() {
         constexpr uint32_t primitive_root = primitive_root_constexpr(Mint::mod());
@@ -84,6 +86,14 @@ struct NttRoots {
             product *= inverse_root[i + 2];
             inverse_product *= root[i + 2];
         }
+        product = 1;
+        inverse_product = 1;
+        for (int i = 0; i + 2 < max_base; i++) {
+            rate_radix4[i] = root[i + 3] * product;
+            inverse_rate_radix4[i] = inverse_root[i + 3] * inverse_product;
+            product *= inverse_root[i + 3];
+            inverse_product *= root[i + 3];
+        }
     }
 };
 
@@ -94,7 +104,10 @@ const NttRoots<Mint>& ntt_roots() {
 }
 
 template <class Mint>
-void ntt(std::vector<Mint>& a, bool inverse) {
+#if defined(__GNUC__) && !defined(__clang__) && (defined(__x86_64__) || defined(__i386__))
+__attribute__((target("avx2,bmi,bmi2,lzcnt"), optimize("O3,unroll-loops"), hot, flatten))
+#endif
+void ntt(std::vector<Mint>& a, bool inverse, bool normalize = true) {
     const int n = int(a.size());
     assert(n > 0 && (n & (n - 1)) == 0);
     assert((Mint::mod() - 1) % uint32_t(n) == 0);
@@ -102,43 +115,106 @@ void ntt(std::vector<Mint>& a, bool inverse) {
     const auto& roots = ntt_roots<Mint>();
     const int height = two_adic_order(uint32_t(n));
     if (!inverse) {
-        // The transposed access order avoids bit reversal and changes the
-        // twiddle only once per block instead of once per butterfly.
-        for (int phase = 1; phase <= height; phase++) {
-            const int blocks = 1 << (phase - 1);
-            const int width = 1 << (height - phase);
-            Mint twiddle = 1;
-            for (int block = 0; block < blocks; block++) {
-                const int offset = block << (height - phase + 1);
-                for (int i = 0; i < width; i++) {
-                    const Mint left = a[offset + i];
-                    const Mint right = a[offset + i + width] * twiddle;
-                    a[offset + i] = left + right;
-                    a[offset + i + width] = left - right;
+        int phase = 0;
+        while (phase < height) {
+            if (height - phase == 1) {
+                const int width = 1 << (height - phase - 1);
+                Mint twiddle = 1;
+                for (int block = 0; block < (1 << phase); block++) {
+                    const int offset = block << (height - phase);
+                    for (int i = 0; i < width; i++) {
+                        const Mint left = a[offset + i];
+                        const Mint right = a[offset + i + width] * twiddle;
+                        a[offset + i] = left + right;
+                        a[offset + i + width] = left - right;
+                    }
+                    if (block + 1 != (1 << phase))
+                        twiddle *= roots.rate[__builtin_ctz(~uint32_t(block))];
                 }
-                if (block + 1 != blocks)
-                    twiddle *= roots.rate[__builtin_ctz(~uint32_t(block))];
+                phase++;
+                continue;
             }
+
+            const int width = 1 << (height - phase - 2);
+            Mint twiddle = 1;
+            const Mint imaginary = roots.root[2];
+            for (int block = 0; block < (1 << phase); block++) {
+                const Mint twiddle2 = twiddle * twiddle;
+                const Mint twiddle3 = twiddle2 * twiddle;
+                const int offset = block << (height - phase);
+                for (int i = 0; i < width; i++) {
+                    const uint64_t mod2 = uint64_t(Mint::mod()) * Mint::mod();
+                    const uint64_t a0 = a[offset + i].val();
+                    const uint64_t a1 = uint64_t(a[offset + i + width].val()) * twiddle.val();
+                    const uint64_t a2 =
+                        uint64_t(a[offset + i + 2 * width].val()) * twiddle2.val();
+                    const uint64_t a3 =
+                        uint64_t(a[offset + i + 3 * width].val()) * twiddle3.val();
+                    const uint64_t a1na3i =
+                        uint64_t(Mint(a1 + mod2 - a3).val()) * imaginary.val();
+                    const uint64_t negative_a2 = mod2 - a2;
+                    a[offset + i] = Mint(a0 + a2 + a1 + a3);
+                    a[offset + i + width] = Mint(a0 + a2 + 2 * mod2 - a1 - a3);
+                    a[offset + i + 2 * width] = Mint(a0 + negative_a2 + a1na3i);
+                    a[offset + i + 3 * width] = Mint(a0 + negative_a2 + mod2 - a1na3i);
+                }
+                if (block + 1 != (1 << phase))
+                    twiddle *= roots.rate_radix4[__builtin_ctz(~uint32_t(block))];
+            }
+            phase += 2;
         }
     } else {
-        for (int phase = height; phase >= 1; phase--) {
-            const int blocks = 1 << (phase - 1);
+        int phase = height;
+        while (phase > 0) {
+            if (phase == 1) {
+                const int width = 1 << (height - phase);
+                Mint twiddle = 1;
+                for (int block = 0; block < (1 << (phase - 1)); block++) {
+                    const int offset = block << (height - phase + 1);
+                    for (int i = 0; i < width; i++) {
+                        const Mint left = a[offset + i];
+                        const Mint right = a[offset + i + width];
+                        a[offset + i] = left + right;
+                        a[offset + i + width] = (left - right) * twiddle;
+                    }
+                    if (block + 1 != (1 << (phase - 1)))
+                        twiddle *= roots.inverse_rate[__builtin_ctz(~uint32_t(block))];
+                }
+                phase--;
+                continue;
+            }
+
             const int width = 1 << (height - phase);
             Mint twiddle = 1;
-            for (int block = 0; block < blocks; block++) {
-                const int offset = block << (height - phase + 1);
+            const Mint inverse_imaginary = roots.inverse_root[2];
+            for (int block = 0; block < (1 << (phase - 2)); block++) {
+                const Mint twiddle2 = twiddle * twiddle;
+                const Mint twiddle3 = twiddle2 * twiddle;
+                const int offset = block << (height - phase + 2);
                 for (int i = 0; i < width; i++) {
-                    const Mint left = a[offset + i];
-                    const Mint right = a[offset + i + width];
-                    a[offset + i] = left + right;
-                    a[offset + i + width] = (left - right) * twiddle;
+                    const uint64_t a0 = a[offset + i].val();
+                    const uint64_t a1 = a[offset + i + width].val();
+                    const uint64_t a2 = a[offset + i + 2 * width].val();
+                    const uint64_t a3 = a[offset + i + 3 * width].val();
+                    const uint64_t a2na3i =
+                        uint64_t(Mint((Mint::mod() + a2 - a3) * inverse_imaginary.val()).val());
+                    a[offset + i] = Mint(a0 + a1 + a2 + a3);
+                    a[offset + i + width] =
+                        Mint((a0 + Mint::mod() - a1 + a2na3i) * twiddle.val());
+                    a[offset + i + 2 * width] = Mint(
+                        (a0 + a1 + 2ULL * Mint::mod() - a2 - a3) * twiddle2.val());
+                    a[offset + i + 3 * width] = Mint(
+                        (a0 + Mint::mod() - a1 + Mint::mod() - a2na3i) * twiddle3.val());
                 }
-                if (block + 1 != blocks)
-                    twiddle *= roots.inverse_rate[__builtin_ctz(~uint32_t(block))];
+                if (block + 1 != (1 << (phase - 2)))
+                    twiddle *= roots.inverse_rate_radix4[__builtin_ctz(~uint32_t(block))];
             }
+            phase -= 2;
         }
-        const Mint inverse_n = Mint(n).inv();
-        for (Mint& value : a) value *= inverse_n;
+        if (normalize) {
+            const Mint inverse_n = Mint(n).inv();
+            for (Mint& value : a) value *= inverse_n;
+        }
     }
 }
 
@@ -161,20 +237,26 @@ std::vector<Mint> convolution_naive(const std::vector<Mint>& a, const std::vecto
 }
 
 template <class Mint>
+#if defined(__GNUC__) && !defined(__clang__) && (defined(__x86_64__) || defined(__i386__))
+__attribute__((target("avx2,bmi,bmi2,lzcnt"), optimize("O3,unroll-loops"), hot, flatten))
+#endif
 std::vector<Mint> convolution_ntt(const std::vector<Mint>& a, const std::vector<Mint>& b) {
     const int result_size = int(a.size() + b.size() - 1);
     int n = 1;
     while (n < result_size) n <<= 1;
     assert((Mint::mod() - 1) % uint32_t(n) == 0);
 
-    std::vector<Mint> fa(a.begin(), a.end());
-    std::vector<Mint> fb(b.begin(), b.end());
-    fa.resize(n);
-    fb.resize(n);
+    // Allocate the padded buffers directly.  Constructing from the inputs and
+    // then resizing used to allocate and copy both large operands twice.
+    std::vector<Mint> fa(n);
+    std::vector<Mint> fb(n);
+    std::copy(a.begin(), a.end(), fa.begin());
+    std::copy(b.begin(), b.end(), fb.begin());
     internal::ntt(fa, false);
     internal::ntt(fb, false);
-    for (int i = 0; i < n; i++) fa[i] *= fb[i];
-    internal::ntt(fa, true);
+    const Mint inverse_n = Mint(n).inv();
+    for (int i = 0; i < n; i++) fa[i] *= fb[i] * inverse_n;
+    internal::ntt(fa, true, false);
     fa.resize(result_size);
     return fa;
 }

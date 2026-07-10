@@ -1,5 +1,8 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/convolution_mod"
 
+#pragma GCC optimize("O3")
+// #pragma GCC target("avx2")
+
 #include <iostream>
 #include <vector>
 
