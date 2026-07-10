@@ -352,6 +352,9 @@ data:
       path: ds/range_query/sqrt_tree.hpp
       title: Sqrt Tree
     - icon: ':heavy_check_mark:'
+      path: ds/range_query/static_range_count_distinct.hpp
+      title: Static Range Count Distinct
+    - icon: ':heavy_check_mark:'
       path: ds/range_query/static_range_mode_query.hpp
       title: Static Range Mode Query
     - icon: ':heavy_check_mark:'
@@ -1184,6 +1187,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/ds/range_query/sqrt_tree.test.cpp
       title: verify/ds/range_query/sqrt_tree.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/range_query/static_range_count_distinct.test.cpp
+      title: verify/ds/range_query/static_range_count_distinct.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/ds/range_query/static_range_mode_query.test.cpp
       title: verify/ds/range_query/static_range_mode_query.test.cpp

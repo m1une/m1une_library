@@ -13,6 +13,9 @@ data:
     path: verify/ds/range_query/range_lis_query.test.cpp
     title: verify/ds/range_query/range_lis_query.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/range_query/static_range_count_distinct.test.cpp
+    title: verify/ds/range_query/static_range_count_distinct.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/range_query/static_range_mode_query.test.cpp
     title: verify/ds/range_query/static_range_mode_query.test.cpp
   - icon: ':heavy_check_mark:'
@@ -277,6 +280,7 @@ data:
   - verify/ds/range_query/range_inversion_count.test.cpp
   - verify/ds/range_query/fenwick_tree.test.cpp
   - verify/ds/range_query/range_lis_query.test.cpp
+  - verify/ds/range_query/static_range_count_distinct.test.cpp
   - verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
   - verify/graph/tree/vertex_add_subtree_sum.test.cpp
 documentation_of: utilities/fast_io.hpp
