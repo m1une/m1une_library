@@ -454,6 +454,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: geometry/ray.hpp
       title: Rays
+    - icon: ':heavy_check_mark:'
+      path: geometry/rectangle_union_area.hpp
+      title: Area of Union of Rectangles
   - name: graph
     pages:
     - icon: ':heavy_check_mark:'
@@ -1296,6 +1299,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/geometry/ray.test.cpp
       title: verify/geometry/ray.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/geometry/rectangle_union_area.test.cpp
+      title: verify/geometry/rectangle_union_area.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/geometry/segment_intersection.test.cpp
       title: verify/geometry/segment_intersection.test.cpp

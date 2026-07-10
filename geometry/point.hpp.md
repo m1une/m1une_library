@@ -32,6 +32,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: geometry/ray.hpp
     title: Rays
+  - icon: ':heavy_check_mark:'
+    path: geometry/rectangle_union_area.hpp
+    title: Area of Union of Rectangles
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/angle_sort.test.cpp
@@ -75,6 +78,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/ray.test.cpp
     title: verify/geometry/ray.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/rectangle_union_area.test.cpp
+    title: verify/geometry/rectangle_union_area.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/segment_intersection.test.cpp
     title: verify/geometry/segment_intersection.test.cpp
@@ -261,6 +267,7 @@ data:
   - geometry/angle_sort.hpp
   - geometry/farthest_pair.hpp
   - geometry/manhattan_mst.hpp
+  - geometry/rectangle_union_area.hpp
   - geometry/polygon.hpp
   - geometry/half_plane_intersection.hpp
   timestamp: '2026-06-21 12:04:47+09:00'
@@ -268,6 +275,7 @@ data:
   verifiedWith:
   - verify/geometry/half_plane_intersection.test.cpp
   - verify/geometry/polygon_area.test.cpp
+  - verify/geometry/rectangle_union_area.test.cpp
   - verify/geometry/circle_line_intersection.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/segment_intersection.test.cpp

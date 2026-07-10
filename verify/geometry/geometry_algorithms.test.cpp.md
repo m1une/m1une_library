@@ -41,6 +41,9 @@ data:
     path: geometry/ray.hpp
     title: Rays
   - icon: ':heavy_check_mark:'
+    path: geometry/rectangle_union_area.hpp
+    title: Area of Union of Rectangles
+  - icon: ':heavy_check_mark:'
     path: utilities/bigint.hpp
     title: BigInt
   _extendedRequiredBy: []
@@ -154,10 +157,11 @@ data:
   - geometry/manhattan_mst.hpp
   - ds/dsu/dsu.hpp
   - geometry/polygon.hpp
+  - geometry/rectangle_union_area.hpp
   isVerificationFile: true
   path: verify/geometry/geometry_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-07 22:43:27+09:00'
+  timestamp: '2026-07-10 18:39:32+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/geometry_algorithms.test.cpp

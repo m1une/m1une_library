@@ -38,6 +38,9 @@ data:
     path: geometry/ray.hpp
     title: Rays
   - icon: ':heavy_check_mark:'
+    path: geometry/rectangle_union_area.hpp
+    title: Area of Union of Rectangles
+  - icon: ':heavy_check_mark:'
     path: utilities/bigint.hpp
     title: BigInt
   _extendedRequiredBy: []
@@ -89,6 +92,8 @@ data:
 
     #include "ray.hpp"
 
+    #include "rectangle_union_area.hpp"
+
 
     #endif  // M1UNE_GEOMETRY_ALL_HPP
 
@@ -107,10 +112,11 @@ data:
   - geometry/manhattan_mst.hpp
   - ds/dsu/dsu.hpp
   - geometry/polygon.hpp
+  - geometry/rectangle_union_area.hpp
   isVerificationFile: false
   path: geometry/all.hpp
   requiredBy: []
-  timestamp: '2026-07-07 22:43:27+09:00'
+  timestamp: '2026-07-10 18:39:32+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp
@@ -136,6 +142,7 @@ title: Geometry Bundle
 | `geometry/manhattan_mst.hpp` | Manhattan minimum spanning tree for integral points in $O(N\log N)$. |
 | `geometry/line.hpp` | Lines, segments, projection, intersection, and distances. |
 | `geometry/ray.hpp` | Rays, containment, projection, intersections, and distances with other linear objects. |
+| `geometry/rectangle_union_area.hpp` | Exact union area of axis-aligned rectangles in $O(N\log N)$. |
 | `geometry/polygon.hpp` | Area, centroids, triangulation, containment, ray queries, intersection, clipping, and Minkowski sums. |
 | `geometry/circle.hpp` | Circle relations, line/ray intersections, and ray reflection. |
 
