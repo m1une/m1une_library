@@ -4,10 +4,10 @@ data:
   - icon: ':heavy_check_mark:'
     path: algo/sequence/number_of_subsequences.hpp
     title: Number of Subsequences
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/modint.hpp
     title: ModInt
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: utilities/fast_io.hpp
     title: Fast IO
   _extendedRequiredBy: []

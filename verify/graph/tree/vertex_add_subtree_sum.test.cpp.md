@@ -13,7 +13,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/tree/euler_tour.hpp
     title: Euler Tour
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: utilities/fast_io.hpp
     title: Fast IO
   _extendedRequiredBy: []

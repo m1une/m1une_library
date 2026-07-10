@@ -4,7 +4,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: ds/range_query/range_inversion_count.hpp
     title: Static Range Inversion Count
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: utilities/fast_io.hpp
     title: Fast IO
   _extendedRequiredBy: []

@@ -1,13 +1,13 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/convolution.hpp
     title: Convolution
   - icon: ':heavy_check_mark:'
     path: math/fps/formal_power_series.hpp
     title: Formal Power Series
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/modint.hpp
     title: ModInt
   _extendedRequiredBy:
@@ -37,14 +37,16 @@ data:
     \n\n\n\n#line 7 \"math/fps/formal_power_series.hpp\"\n#include <optional>\n#include\
     \ <utility>\n#include <vector>\n\n#line 1 \"math/fps/convolution.hpp\"\n\n\n\n\
     #line 5 \"math/fps/convolution.hpp\"\n#include <array>\n#line 10 \"math/fps/convolution.hpp\"\
-    \n\n#line 1 \"math/modint.hpp\"\n\n\n\n#line 5 \"math/modint.hpp\"\n#include <iostream>\n\
-    #include <type_traits>\n#line 8 \"math/modint.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ math {\n\ntemplate <uint32_t Modulus>\nstruct ModInt {\n    static_assert(0\
-    \ < Modulus, \"Modulus must be positive\");\n\n   private:\n    uint32_t _v;\n\
-    \n   public:\n    static constexpr uint32_t mod() {\n        return Modulus;\n\
-    \    }\n\n    static constexpr ModInt raw(uint32_t v) noexcept {\n        ModInt\
-    \ x;\n        x._v = v;\n        return x;\n    }\n\n    constexpr ModInt() noexcept\
-    \ : _v(0) {}\n\n    template <class Integer, std::enable_if_t<std::is_integral_v<Integer>,\
+    \n\n#if defined(__GNUC__) && !defined(__clang__) && (defined(__x86_64__) || defined(__i386__))\n\
+    #include <immintrin.h>\n#define M1UNE_FPS_HAS_X86_SIMD 1\n#endif\n\n#line 1 \"\
+    math/modint.hpp\"\n\n\n\n#line 5 \"math/modint.hpp\"\n#include <iostream>\n#include\
+    \ <type_traits>\n#line 8 \"math/modint.hpp\"\n\nnamespace m1une {\nnamespace math\
+    \ {\n\ntemplate <uint32_t Modulus>\nstruct ModInt {\n    static_assert(0 < Modulus,\
+    \ \"Modulus must be positive\");\n\n   private:\n    uint32_t _v;\n\n   public:\n\
+    \    static constexpr uint32_t mod() {\n        return Modulus;\n    }\n\n   \
+    \ static constexpr ModInt raw(uint32_t v) noexcept {\n        ModInt x;\n    \
+    \    x._v = v;\n        return x;\n    }\n\n    constexpr ModInt() noexcept :\
+    \ _v(0) {}\n\n    template <class Integer, std::enable_if_t<std::is_integral_v<Integer>,\
     \ int> = 0>\n    constexpr ModInt(Integer v) noexcept {\n        if constexpr\
     \ (std::is_signed_v<Integer>) {\n            int64_t x = static_cast<int64_t>(v)\
     \ % static_cast<int64_t>(Modulus);\n            if (x < 0) x += Modulus;\n   \
@@ -86,7 +88,7 @@ data:
     \ ModInt& rhs) {\n        long long v;\n        is >> v;\n        rhs = ModInt(v);\n\
     \        return is;\n    }\n};\n\nusing modint998244353 = ModInt<998244353>;\n\
     using modint1000000007 = ModInt<1000000007>;\n\n}  // namespace math\n}  // namespace\
-    \ m1une\n\n\n#line 12 \"math/fps/convolution.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ m1une\n\n\n#line 17 \"math/fps/convolution.hpp\"\n\nnamespace m1une {\nnamespace\
     \ fps {\n\nnamespace internal {\n\nconstexpr uint32_t primitive_root_constexpr(uint32_t\
     \ mod) {\n    if (mod == 2) return 1;\n    if (mod == 167772161) return 3;\n \
     \   if (mod == 469762049) return 3;\n    if (mod == 754974721) return 11;\n  \
@@ -122,12 +124,10 @@ data:
     \ inverse_product;\n            product *= inverse_root[i + 3];\n            inverse_product\
     \ *= root[i + 3];\n        }\n    }\n};\n\ntemplate <class Mint>\nconst NttRoots<Mint>&\
     \ ntt_roots() {\n    static const NttRoots<Mint> roots;\n    return roots;\n}\n\
-    \ntemplate <class Mint>\n#if defined(__GNUC__) && !defined(__clang__) && (defined(__x86_64__)\
-    \ || defined(__i386__))\n__attribute__((target(\"avx2,bmi,bmi2,lzcnt\"), optimize(\"\
-    O3,unroll-loops\"), hot, flatten))\n#endif\nvoid ntt(std::vector<Mint>& a, bool\
-    \ inverse, bool normalize = true) {\n    const int n = int(a.size());\n    assert(n\
-    \ > 0 && (n & (n - 1)) == 0);\n    assert((Mint::mod() - 1) % uint32_t(n) == 0);\n\
-    \n    const auto& roots = ntt_roots<Mint>();\n    const int height = two_adic_order(uint32_t(n));\n\
+    \ntemplate <class Mint>\nvoid ntt(std::vector<Mint>& a, bool inverse, bool normalize\
+    \ = true) {\n    const int n = int(a.size());\n    assert(n > 0 && (n & (n - 1))\
+    \ == 0);\n    assert((Mint::mod() - 1) % uint32_t(n) == 0);\n\n    const auto&\
+    \ roots = ntt_roots<Mint>();\n    const int height = two_adic_order(uint32_t(n));\n\
     \    if (!inverse) {\n        int phase = 0;\n        while (phase < height) {\n\
     \            if (height - phase == 1) {\n                const int width = 1 <<\
     \ (height - phase - 1);\n                Mint twiddle = 1;\n                for\
@@ -192,22 +192,141 @@ data:
     \                 twiddle *= roots.inverse_rate_radix4[__builtin_ctz(~uint32_t(block))];\n\
     \            }\n            phase -= 2;\n        }\n        if (normalize) {\n\
     \            const Mint inverse_n = Mint(n).inv();\n            for (Mint& value\
-    \ : a) value *= inverse_n;\n        }\n    }\n}\n\n}  // namespace internal\n\n\
-    template <class Mint>\nstd::vector<Mint> convolution_naive(const std::vector<Mint>&\
+    \ : a) value *= inverse_n;\n        }\n    }\n}\n\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n\
+    \n#pragma GCC push_options\n#pragma GCC target(\"avx2,bmi\")\n\nstruct Montgomery998Simd\
+    \ {\n    static constexpr uint32_t mod = 998244353;\n    static constexpr uint32_t\
+    \ mod2 = 2 * mod;\n    uint32_t negative_inverse;\n    uint32_t r;\n    uint32_t\
+    \ r2;\n    __m256i modulus;\n    __m256i inverse;\n\n    Montgomery998Simd()\n\
+    \        : negative_inverse(1),\n          r(uint32_t((uint64_t(1) << 32) % mod)),\n\
+    \          r2(uint32_t(uint64_t(r) * r % mod)) {\n        for (int i = 0; i <\
+    \ 5; i++) negative_inverse *= 2 + negative_inverse * mod;\n        modulus = _mm256_set1_epi32(int(mod));\n\
+    \        inverse = _mm256_set1_epi32(int(negative_inverse));\n    }\n\n    uint32_t\
+    \ shrink(uint32_t value) const {\n        return std::min(value, value - mod);\n\
+    \    }\n\n    uint32_t reduce(uint64_t value) const {\n        return uint32_t((value\
+    \ + uint64_t(uint32_t(value) * negative_inverse) * mod) >> 32);\n    }\n\n   \
+    \ uint32_t multiply(uint32_t lhs, uint32_t rhs) const {\n        return shrink(reduce(uint64_t(lhs)\
+    \ * rhs));\n    }\n\n    uint32_t encode(uint32_t value) const {\n        return\
+    \ multiply(value, r2);\n    }\n\n    __m256i shrink(__m256i value) const {\n \
+    \       return _mm256_min_epu32(value, _mm256_sub_epi32(value, modulus));\n  \
+    \  }\n\n    __m256i multiply(__m256i lhs, __m256i rhs) const {\n        const\
+    \ __m256i lhs_odd = _mm256_bsrli_epi128(lhs, 4);\n        const __m256i rhs_odd\
+    \ = _mm256_bsrli_epi128(rhs, 4);\n        __m256i even = _mm256_mul_epu32(lhs,\
+    \ rhs);\n        __m256i odd = _mm256_mul_epu32(lhs_odd, rhs_odd);\n        __m256i\
+    \ even_correction = _mm256_mul_epu32(even, inverse);\n        __m256i odd_correction\
+    \ = _mm256_mul_epu32(odd, inverse);\n        even_correction = _mm256_mul_epu32(even_correction,\
+    \ modulus);\n        odd_correction = _mm256_mul_epu32(odd_correction, modulus);\n\
+    \        even = _mm256_add_epi64(even, even_correction);\n        odd = _mm256_add_epi64(odd,\
+    \ odd_correction);\n        return shrink(_mm256_or_si256(_mm256_bsrli_epi128(even,\
+    \ 4), odd));\n    }\n\n    __m256i add(__m256i lhs, __m256i rhs) const {\n   \
+    \     return shrink(_mm256_add_epi32(lhs, rhs));\n    }\n\n    __m256i subtract(__m256i\
+    \ lhs, __m256i rhs) const {\n        const __m256i difference = _mm256_sub_epi32(lhs,\
+    \ rhs);\n        return _mm256_min_epu32(difference, _mm256_add_epi32(difference,\
+    \ modulus));\n    }\n};\n\ntemplate <class Mint>\n__attribute__((target(\"avx2,bmi\"\
+    ), hot))\nvoid ntt_998244353_simd(uint32_t* data, int n, bool inverse, bool normalize\
+    \ = true) {\n    static const Montgomery998Simd montgomery;\n    const auto& roots\
+    \ = ntt_roots<Mint>();\n    const int height = two_adic_order(uint32_t(n));\n\n\
+    \    if (!inverse) {\n        for (int phase = 1; phase <= height; phase++) {\n\
+    \            const int blocks = 1 << (phase - 1);\n            const int width\
+    \ = 1 << (height - phase);\n            uint32_t twiddle = montgomery.r;\n   \
+    \         for (int block = 0; block < blocks; block++) {\n                const\
+    \ int offset = block << (height - phase + 1);\n                const __m256i vector_twiddle\
+    \ = _mm256_set1_epi32(int(twiddle));\n                int i = 0;\n           \
+    \     for (; i + 8 <= width; i += 8) {\n                    const __m256i lhs\
+    \ = _mm256_loadu_si256(\n                        reinterpret_cast<const __m256i*>(data\
+    \ + offset + i));\n                    const __m256i rhs = _mm256_loadu_si256(\n\
+    \                        reinterpret_cast<const __m256i*>(data + offset + width\
+    \ + i));\n                    const __m256i weighted_rhs = montgomery.multiply(rhs,\
+    \ vector_twiddle);\n                    _mm256_storeu_si256(reinterpret_cast<__m256i*>(data\
+    \ + offset + i),\n                                       montgomery.add(lhs, weighted_rhs));\n\
+    \                    _mm256_storeu_si256(reinterpret_cast<__m256i*>(data + offset\
+    \ + width + i),\n                                       montgomery.subtract(lhs,\
+    \ weighted_rhs));\n                }\n                for (; i < width; i++) {\n\
+    \                    const uint32_t lhs = data[offset + i];\n                \
+    \    const uint32_t rhs = data[offset + width + i];\n                    const\
+    \ uint32_t weighted_rhs = montgomery.multiply(rhs, twiddle);\n               \
+    \     uint32_t sum = lhs + weighted_rhs;\n                    if (sum >= Montgomery998Simd::mod)\
+    \ sum -= Montgomery998Simd::mod;\n                    uint32_t difference = lhs\
+    \ >= weighted_rhs\n                                              ? lhs - weighted_rhs\n\
+    \                                              : lhs + Montgomery998Simd::mod\
+    \ - weighted_rhs;\n                    data[offset + i] = sum;\n             \
+    \       data[offset + width + i] = difference;\n                }\n          \
+    \      if (block + 1 != blocks) {\n                    const uint32_t rate = montgomery.encode(\n\
+    \                        roots.rate[__builtin_ctz(~uint32_t(block))].val());\n\
+    \                    twiddle = montgomery.multiply(twiddle, rate);\n         \
+    \       }\n            }\n        }\n    } else {\n        for (int phase = height;\
+    \ phase >= 1; phase--) {\n            const int blocks = 1 << (phase - 1);\n \
+    \           const int width = 1 << (height - phase);\n            uint32_t twiddle\
+    \ = montgomery.r;\n            for (int block = 0; block < blocks; block++) {\n\
+    \                const int offset = block << (height - phase + 1);\n         \
+    \       const __m256i vector_twiddle = _mm256_set1_epi32(int(twiddle));\n    \
+    \            int i = 0;\n                for (; i + 8 <= width; i += 8) {\n  \
+    \                  const __m256i lhs = _mm256_loadu_si256(\n                 \
+    \       reinterpret_cast<const __m256i*>(data + offset + i));\n              \
+    \      const __m256i rhs = _mm256_loadu_si256(\n                        reinterpret_cast<const\
+    \ __m256i*>(data + offset + width + i));\n                    _mm256_storeu_si256(reinterpret_cast<__m256i*>(data\
+    \ + offset + i),\n                                       montgomery.add(lhs, rhs));\n\
+    \                    _mm256_storeu_si256(reinterpret_cast<__m256i*>(data + offset\
+    \ + width + i),\n                                       montgomery.multiply(montgomery.subtract(lhs,\
+    \ rhs),\n                                                           vector_twiddle));\n\
+    \                }\n                for (; i < width; i++) {\n               \
+    \     const uint32_t lhs = data[offset + i];\n                    const uint32_t\
+    \ rhs = data[offset + width + i];\n                    uint32_t sum = lhs + rhs;\n\
+    \                    if (sum >= Montgomery998Simd::mod) sum -= Montgomery998Simd::mod;\n\
+    \                    uint32_t difference = lhs >= rhs ? lhs - rhs : lhs + Montgomery998Simd::mod\
+    \ - rhs;\n                    data[offset + i] = sum;\n                    data[offset\
+    \ + width + i] = montgomery.multiply(difference, twiddle);\n                }\n\
+    \                if (block + 1 != blocks) {\n                    const uint32_t\
+    \ rate = montgomery.encode(\n                        roots.inverse_rate[__builtin_ctz(~uint32_t(block))].val());\n\
+    \                    twiddle = montgomery.multiply(twiddle, rate);\n         \
+    \       }\n            }\n        }\n        if (normalize) {\n            const\
+    \ uint32_t scale = montgomery.encode(Mint(n).inv().val());\n            const\
+    \ __m256i vector_scale = _mm256_set1_epi32(int(scale));\n            int i = 0;\n\
+    \            for (; i + 8 <= n; i += 8) {\n                __m256i values =\n\
+    \                    _mm256_loadu_si256(reinterpret_cast<const __m256i*>(data\
+    \ + i));\n                _mm256_storeu_si256(reinterpret_cast<__m256i*>(data\
+    \ + i),\n                                   montgomery.multiply(values, vector_scale));\n\
+    \            }\n            for (; i < n; i++) data[i] = montgomery.multiply(data[i],\
+    \ scale);\n        }\n    }\n}\n\ntemplate <class Mint>\n__attribute__((target(\"\
+    avx2,bmi\"), hot))\nstd::vector<Mint> convolution_998244353_simd(const std::vector<Mint>&\
+    \ a,\n                                             const std::vector<Mint>& b)\
+    \ {\n    const int result_size = int(a.size() + b.size() - 1);\n    int n = 1;\n\
+    \    while (n < result_size) n <<= 1;\n    std::vector<uint32_t> transformed_a(n);\n\
+    \    std::vector<uint32_t> transformed_b(n);\n    for (int i = 0; i < int(a.size());\
+    \ i++) transformed_a[i] = a[i].val();\n    for (int i = 0; i < int(b.size());\
+    \ i++) transformed_b[i] = b[i].val();\n    ntt_998244353_simd<Mint>(transformed_a.data(),\
+    \ n, false);\n    ntt_998244353_simd<Mint>(transformed_b.data(), n, false);\n\n\
+    \    static const Montgomery998Simd montgomery;\n    // A normal-by-normal Montgomery\
+    \ product is off by R^-1.  Scaling the\n    // inverse transform by n^-1 R compensates\
+    \ for it without another pass.\n    const uint32_t inverse_n_montgomery = montgomery.encode(Mint(n).inv().val());\n\
+    \    const uint32_t inverse_n_r2 = montgomery.multiply(inverse_n_montgomery, montgomery.r2);\n\
+    \    const __m256i vector_scale = _mm256_set1_epi32(int(inverse_n_r2));\n    int\
+    \ i = 0;\n    for (; i + 8 <= n; i += 8) {\n        const __m256i lhs =\n    \
+    \        _mm256_loadu_si256(reinterpret_cast<const __m256i*>(transformed_a.data()\
+    \ + i));\n        const __m256i rhs =\n            _mm256_loadu_si256(reinterpret_cast<const\
+    \ __m256i*>(transformed_b.data() + i));\n        __m256i product = montgomery.multiply(lhs,\
+    \ rhs);\n        product = montgomery.multiply(product, vector_scale);\n     \
+    \   _mm256_storeu_si256(reinterpret_cast<__m256i*>(transformed_a.data() + i),\
+    \ product);\n    }\n    for (; i < n; i++) {\n        uint32_t product = montgomery.multiply(transformed_a[i],\
+    \ transformed_b[i]);\n        transformed_a[i] = montgomery.multiply(product,\
+    \ inverse_n_r2);\n    }\n    ntt_998244353_simd<Mint>(transformed_a.data(), n,\
+    \ true, false);\n\n    std::vector<Mint> result(result_size);\n    for (int j\
+    \ = 0; j < result_size; j++) result[j] = Mint::raw(transformed_a[j]);\n    return\
+    \ result;\n}\n\n#pragma GCC pop_options\n\n#endif\n\n}  // namespace internal\n\
+    \ntemplate <class Mint>\nstd::vector<Mint> convolution_naive(const std::vector<Mint>&\
     \ a, const std::vector<Mint>& b) {\n    if (a.empty() || b.empty()) return {};\n\
     \    std::vector<Mint> result(a.size() + b.size() - 1);\n    if (a.size() < b.size())\
     \ {\n        for (int i = 0; i < int(a.size()); i++) {\n            for (int j\
     \ = 0; j < int(b.size()); j++) result[i + j] += a[i] * b[j];\n        }\n    }\
     \ else {\n        for (int j = 0; j < int(b.size()); j++) {\n            for (int\
     \ i = 0; i < int(a.size()); i++) result[i + j] += a[i] * b[j];\n        }\n  \
-    \  }\n    return result;\n}\n\ntemplate <class Mint>\n#if defined(__GNUC__) &&\
-    \ !defined(__clang__) && (defined(__x86_64__) || defined(__i386__))\n__attribute__((target(\"\
-    avx2,bmi,bmi2,lzcnt\"), optimize(\"O3,unroll-loops\"), hot, flatten))\n#endif\n\
-    std::vector<Mint> convolution_ntt(const std::vector<Mint>& a, const std::vector<Mint>&\
-    \ b) {\n    const int result_size = int(a.size() + b.size() - 1);\n    int n =\
-    \ 1;\n    while (n < result_size) n <<= 1;\n    assert((Mint::mod() - 1) % uint32_t(n)\
-    \ == 0);\n\n    // Allocate the padded buffers directly.  Constructing from the\
-    \ inputs and\n    // then resizing used to allocate and copy both large operands\
+    \  }\n    return result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint> convolution_ntt(const\
+    \ std::vector<Mint>& a, const std::vector<Mint>& b) {\n    const int result_size\
+    \ = int(a.size() + b.size() - 1);\n    int n = 1;\n    while (n < result_size)\
+    \ n <<= 1;\n    assert((Mint::mod() - 1) % uint32_t(n) == 0);\n\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n\
+    \    if constexpr (Mint::mod() == 998244353) {\n        if (n >= 64 && __builtin_cpu_supports(\"\
+    avx2\"))\n            return internal::convolution_998244353_simd(a, b);\n   \
+    \ }\n#endif\n\n    // Allocate the padded buffers directly.  Constructing from\
+    \ the inputs and\n    // then resizing used to allocate and copy both large operands\
     \ twice.\n    std::vector<Mint> fa(n);\n    std::vector<Mint> fb(n);\n    std::copy(a.begin(),\
     \ a.end(), fa.begin());\n    std::copy(b.begin(), b.end(), fb.begin());\n    internal::ntt(fa,\
     \ false);\n    internal::ntt(fb, false);\n    const Mint inverse_n = Mint(n).inv();\n\
@@ -250,7 +369,8 @@ data:
     \        value = (value + mod1_target * (first % target_mod)) % target_mod;\n\
     \        value = (value + mod1_mod2_target * (second % target_mod)) % target_mod;\n\
     \        result[i] = Mint::raw(uint32_t(value));\n    }\n    return result;\n\
-    }\n\n}  // namespace fps\n}  // namespace m1une\n\n\n#line 12 \"math/fps/formal_power_series.hpp\"\
+    }\n\n}  // namespace fps\n}  // namespace m1une\n\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n\
+    #undef M1UNE_FPS_HAS_X86_SIMD\n#endif\n\n\n#line 12 \"math/fps/formal_power_series.hpp\"\
     \n\nnamespace m1une {\nnamespace fps {\n\nnamespace internal {\n\ntemplate <class\
     \ Mint>\nstd::optional<Mint> modular_square_root(Mint value) {\n    const uint32_t\
     \ mod = Mint::mod();\n    if (value == Mint(0)) return Mint(0);\n    if (mod ==\
@@ -453,7 +573,7 @@ data:
   requiredBy:
   - math/all.hpp
   - math/fps/all.hpp
-  timestamp: '2026-07-10 21:34:58+09:00'
+  timestamp: '2026-07-11 02:27:38+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp

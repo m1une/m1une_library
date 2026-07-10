@@ -27,7 +27,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/tree/vertex_add_subtree_sum.test.cpp
     title: verify/graph/tree/vertex_add_subtree_sum.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/fps/convolution_mod.test.cpp
     title: verify/math/fps/convolution_mod.test.cpp
   - icon: ':heavy_check_mark:'
@@ -36,9 +36,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/utilities/fast_io.test.cpp
     title: verify/utilities/fast_io.test.cpp
-  _isVerificationFailed: false
+  _isVerificationFailed: true
   _pathExtension: hpp
-  _verificationStatusIcon: ':heavy_check_mark:'
+  _verificationStatusIcon: ':question:'
   attributes:
     links: []
   bundledCode: "#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#include <cstddef>\n#include\
@@ -286,7 +286,7 @@ data:
   path: utilities/fast_io.hpp
   requiredBy: []
   timestamp: '2026-07-10 21:00:13+09:00'
-  verificationStatus: LIBRARY_ALL_AC
+  verificationStatus: LIBRARY_SOME_WA
   verifiedWith:
   - verify/algo/sequence/number_of_subsequences.test.cpp
   - verify/utilities/fast_io.test.cpp

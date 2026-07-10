@@ -651,7 +651,7 @@ data:
     - icon: ':heavy_check_mark:'
       path: math/lucas.hpp
       title: Lucas's Theorem
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/modint.hpp
       title: ModInt
     - icon: ':heavy_check_mark:'
@@ -695,7 +695,7 @@ data:
     - icon: ':heavy_check_mark:'
       path: math/fps/all.hpp
       title: Formal Power Series All
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/fps/convolution.hpp
       title: Convolution
     - icon: ':heavy_check_mark:'
@@ -941,7 +941,7 @@ data:
     - icon: ':heavy_check_mark:'
       path: utilities/dynamic_bitset.hpp
       title: Dynamic Bitset
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: utilities/fast_io.hpp
       title: Fast IO
     - icon: ':heavy_check_mark:'
@@ -1462,7 +1462,7 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/fps/convolution_ll.test.cpp
       title: verify/math/fps/convolution_ll.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: verify/math/fps/convolution_mod.test.cpp
       title: verify/math/fps/convolution_mod.test.cpp
     - icon: ':heavy_check_mark:'
