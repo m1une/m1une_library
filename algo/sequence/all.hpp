@@ -3,6 +3,7 @@
 
 #include "inversion_count.hpp"
 #include "lis.hpp"
+#include "number_of_subsequences.hpp"
 #include "run_length_encoding.hpp"
 #include "subset_sum.hpp"
 
