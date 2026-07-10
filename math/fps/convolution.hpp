@@ -67,12 +67,22 @@ struct NttRoots {
     static constexpr int max_base = two_adic_order(Mint::mod() - 1);
     std::array<Mint, max_base + 1> root;
     std::array<Mint, max_base + 1> inverse_root;
+    std::array<Mint, max_base> rate;
+    std::array<Mint, max_base> inverse_rate;
 
     NttRoots() {
         constexpr uint32_t primitive_root = primitive_root_constexpr(Mint::mod());
         for (int level = 1; level <= max_base; level++) {
             root[level] = Mint(primitive_root).pow((Mint::mod() - 1) >> level);
             inverse_root[level] = root[level].inv();
+        }
+        Mint product = 1;
+        Mint inverse_product = 1;
+        for (int i = 0; i + 1 < max_base; i++) {
+            rate[i] = root[i + 2] * product;
+            inverse_rate[i] = inverse_root[i + 2] * inverse_product;
+            product *= inverse_root[i + 2];
+            inverse_product *= root[i + 2];
         }
     }
 };
@@ -89,34 +99,44 @@ void ntt(std::vector<Mint>& a, bool inverse) {
     assert(n > 0 && (n & (n - 1)) == 0);
     assert((Mint::mod() - 1) % uint32_t(n) == 0);
 
-    for (int i = 1, j = 0; i < n; i++) {
-        int bit = n >> 1;
-        while (j & bit) {
-            j ^= bit;
-            bit >>= 1;
-        }
-        j ^= bit;
-        if (i < j) std::swap(a[i], a[j]);
-    }
-
     const auto& roots = ntt_roots<Mint>();
-    int level = 1;
-    for (int len = 2; len <= n; len <<= 1, level++) {
-        const Mint step = inverse ? roots.inverse_root[level] : roots.root[level];
-        const int half = len >> 1;
-        for (int offset = 0; offset < n; offset += len) {
-            Mint w = 1;
-            for (int j = 0; j < half; j++) {
-                Mint even = a[offset + j];
-                Mint odd = a[offset + j + half] * w;
-                a[offset + j] = even + odd;
-                a[offset + j + half] = even - odd;
-                w *= step;
+    const int height = two_adic_order(uint32_t(n));
+    if (!inverse) {
+        // The transposed access order avoids bit reversal and changes the
+        // twiddle only once per block instead of once per butterfly.
+        for (int phase = 1; phase <= height; phase++) {
+            const int blocks = 1 << (phase - 1);
+            const int width = 1 << (height - phase);
+            Mint twiddle = 1;
+            for (int block = 0; block < blocks; block++) {
+                const int offset = block << (height - phase + 1);
+                for (int i = 0; i < width; i++) {
+                    const Mint left = a[offset + i];
+                    const Mint right = a[offset + i + width] * twiddle;
+                    a[offset + i] = left + right;
+                    a[offset + i + width] = left - right;
+                }
+                if (block + 1 != blocks)
+                    twiddle *= roots.rate[__builtin_ctz(~uint32_t(block))];
             }
         }
-    }
-
-    if (inverse) {
+    } else {
+        for (int phase = height; phase >= 1; phase--) {
+            const int blocks = 1 << (phase - 1);
+            const int width = 1 << (height - phase);
+            Mint twiddle = 1;
+            for (int block = 0; block < blocks; block++) {
+                const int offset = block << (height - phase + 1);
+                for (int i = 0; i < width; i++) {
+                    const Mint left = a[offset + i];
+                    const Mint right = a[offset + i + width];
+                    a[offset + i] = left + right;
+                    a[offset + i + width] = (left - right) * twiddle;
+                }
+                if (block + 1 != blocks)
+                    twiddle *= roots.inverse_rate[__builtin_ctz(~uint32_t(block))];
+            }
+        }
         const Mint inverse_n = Mint(n).inv();
         for (Mint& value : a) value *= inverse_n;
     }

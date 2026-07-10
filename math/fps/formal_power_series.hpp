@@ -203,6 +203,32 @@ struct FormalPowerSeries : std::vector<Mint> {
         Fps result(1, (*this)[0].inv());
         for (int size = 1; size < degree; size <<= 1) {
             const int next_size = std::min(size << 1, degree);
+            const int transform_size = size << 1;
+            if (size >= 32 && (Mint::mod() - 1) % uint32_t(transform_size) == 0) {
+                // Newton's g <- g(2-fg), restricted to the newly determined
+                // half.  Keeping g in the frequency domain avoids two general
+                // convolutions and their 2x larger padding.
+                std::vector<Mint> transformed_f(transform_size);
+                std::copy_n(this->begin(), std::min<int>(this->size(), next_size),
+                            transformed_f.begin());
+                std::vector<Mint> transformed_g(transform_size);
+                std::copy(result.begin(), result.end(), transformed_g.begin());
+                internal::ntt(transformed_f, false);
+                internal::ntt(transformed_g, false);
+
+                std::vector<Mint> error(transform_size);
+                for (int i = 0; i < transform_size; i++)
+                    error[i] = transformed_f[i] * transformed_g[i];
+                internal::ntt(error, true);
+                std::fill(error.begin(), error.begin() + size, Mint(0));
+                internal::ntt(error, false);
+                for (int i = 0; i < transform_size; i++) error[i] *= transformed_g[i];
+                internal::ntt(error, true);
+
+                result.resize(next_size);
+                for (int i = size; i < next_size; i++) result[i] = Mint(0) - error[i];
+                continue;
+            }
             Fps product = this->pre(next_size) * result;
             product.resize(next_size);
             for (Mint& value : product) value = Mint(0) - value;
