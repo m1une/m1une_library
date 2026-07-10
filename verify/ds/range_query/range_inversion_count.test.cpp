@@ -32,8 +32,8 @@ void test_randomized() {
         return state;
     };
 
-    for (int trial = 0; trial < 3000; ++trial) {
-        int size = int(random() % 100);
+    for (int trial = 0; trial < 500; ++trial) {
+        int size = int(random() % 36);
         std::vector<int> values(size);
         for (int& value : values) value = int(random() % 20);
         m1une::ds::RangeInversionCount<int> structure(values);
@@ -53,18 +53,18 @@ void test_randomized() {
 }  // namespace
 
 int main() {
-    // test_randomized();
+    test_randomized();
 
     m1une::utilities::FastInput input;
     m1une::utilities::FastOutput output;
 
-    int n, query_count;
+    int n = 0, query_count = 0;
     input.read(n, query_count);
     std::vector<int> values(n);
     for (int& value : values) input.read(value);
     m1une::ds::RangeInversionCount<int> structure(values);
     while (query_count--) {
-        int left, right;
+        int left = 0, right = 0;
         input.read(left, right);
         output.println(structure.query(left, right));
     }

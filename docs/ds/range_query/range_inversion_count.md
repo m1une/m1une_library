@@ -46,13 +46,15 @@ are counted by a linear merge of sorted boundary pieces.
 
 ## Methods
 
-| Method | Description |
-| --- | --- |
-| `RangeInversionCount(values)` | Builds the static structure. |
-| `query(left, right)` | Returns inversions in `[left, right)`. |
-| `inversion_count(left, right)` | Alias of `query`. |
-| `size()`, `empty()` | Return the array size and whether it is empty. |
-| `block_size()` | Returns the selected decomposition block size. |
+| Method | Complexity | Description |
+| --- | --- | --- |
+| `RangeInversionCount()` | $O(1)$ | Constructs an empty structure. |
+| `explicit RangeInversionCount(const std::vector<T>& values)` | $O(N\sqrt N)$ | Builds the static structure. |
+| `long long query(int left, int right) const` | $O(\sqrt N)$ | Returns inversions in `[left, right)`. |
+| `long long inversion_count(int left, int right) const` | $O(\sqrt N)$ | Alias of `query`. |
+| `int size() const` | $O(1)$ | Returns the array size. |
+| `bool empty() const` | $O(1)$ | Returns whether the array is empty. |
+| `int block_size() const` | $O(1)$ | Returns the selected decomposition block size. |
 
 ## Example
 
