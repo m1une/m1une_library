@@ -10,7 +10,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/matrix/matrix.hpp
     title: Dense Matrix
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
   _extendedRequiredBy: []

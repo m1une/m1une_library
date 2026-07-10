@@ -4,10 +4,10 @@ data:
   - icon: ':heavy_check_mark:'
     path: algo/sequence/number_of_subsequences.hpp
     title: Number of Subsequences
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: utilities/fast_io.hpp
     title: Fast IO
   _extendedRequiredBy: []
@@ -87,11 +87,11 @@ data:
     \        return is;\n    }\n};\n\nusing modint998244353 = ModInt<998244353>;\n\
     using modint1000000007 = ModInt<1000000007>;\n\n}  // namespace math\n}  // namespace\
     \ m1une\n\n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#include <array>\n#include\
-    \ <cstddef>\n#include <cstdio>\n#include <cstring>\n#include <iterator>\n#include\
-    \ <string>\n#line 12 \"utilities/fast_io.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ utilities {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\n\
-    template <class T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate\
-    \ <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
+    \ <cstddef>\n#include <cstdio>\n#line 8 \"utilities/fast_io.hpp\"\n#include <cstring>\n\
+    #include <iterator>\n#include <string>\n#line 13 \"utilities/fast_io.hpp\"\n\n\
+    namespace m1une {\nnamespace utilities {\nnamespace internal {\n\n// Detect std::begin(x),\
+    \ std::end(x).\ntemplate <class T, class = void>\nstruct is_range : std::false_type\
+    \ {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
     \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
     \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
     \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
@@ -113,33 +113,36 @@ data:
     template <class T, class = void>\nstruct has_val_method : std::false_type {};\n\
     \ntemplate <class T>\nstruct has_val_method<T, std::void_t<decltype(std::declval<const\
     \ T&>().val())>>\n    : std::true_type {};\n\ntemplate <class T>\ninline constexpr\
-    \ bool has_val_method_v = has_val_method<T>::value;\n\n}  // namespace internal\n\
-    \nstruct FastInput {\n    static constexpr int buffer_size = 1 << 20;\n\n   private:\n\
-    \    std::FILE* _stream;\n    char _buffer[buffer_size];\n    int _position;\n\
-    \    int _length;\n\n    bool prepare_number() {\n        if (_length - _position\
-    \ >= 32) return true;\n        const int remaining = _length - _position;\n  \
-    \      if (remaining > 0) std::memmove(_buffer, _buffer + _position, remaining);\n\
-    \        const int added = int(std::fread(_buffer + remaining, 1, buffer_size\
-    \ - remaining, _stream));\n        _position = 0;\n        _length = remaining\
-    \ + added;\n        if (_length < buffer_size) _buffer[_length] = '\\0';\n   \
-    \     return _length != 0;\n    }\n\n   public:\n    explicit FastInput(std::FILE*\
-    \ stream = stdin)\n        : _stream(stream), _position(0), _length(0) {}\n\n\
-    \    FastInput(const FastInput&) = delete;\n    FastInput& operator=(const FastInput&)\
-    \ = delete;\n\n    int read_char_raw() {\n        if (_position == _length) {\n\
-    \            _length = int(std::fread(_buffer, 1, buffer_size, _stream));\n  \
-    \          _position = 0;\n            if (_length == 0) return EOF;\n       \
-    \ }\n        return _buffer[_position++];\n    }\n\n    bool skip_spaces() {\n\
-    \        int c = read_char_raw();\n        while (c != EOF && c <= ' ') c = read_char_raw();\n\
-    \        if (c == EOF) return false;\n        --_position;\n        return true;\n\
-    \    }\n\n    bool read(char& value) {\n        if (!skip_spaces()) return false;\n\
-    \        value = char(read_char_raw());\n        return true;\n    }\n\n    bool\
-    \ read(std::string& value) {\n        if (!skip_spaces()) return false;\n    \
-    \    value.clear();\n        int c = read_char_raw();\n        while (c != EOF\
-    \ && c > ' ') {\n            value.push_back(char(c));\n            c = read_char_raw();\n\
-    \        }\n        return true;\n    }\n\n    bool read(bool& value) {\n    \
-    \    int x;\n        if (!read(x)) return false;\n        value = x != 0;\n  \
-    \      return true;\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
-    \        std::is_integral_v<T>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ bool has_val_method_v = has_val_method<T>::value;\n\ntemplate <class T, class\
+    \ = void>\nstruct has_static_mod_raw : std::false_type {};\n\ntemplate <class\
+    \ T>\nstruct has_static_mod_raw<\n    T, std::void_t<decltype(T::mod()), decltype(T::raw(std::declval<uint32_t>()))>>\n\
+    \    : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool has_static_mod_raw_v\
+    \ = has_static_mod_raw<T>::value;\n\n}  // namespace internal\n\nstruct FastInput\
+    \ {\n    static constexpr int buffer_size = 1 << 20;\n\n   private:\n    std::FILE*\
+    \ _stream;\n    char _buffer[buffer_size];\n    int _position;\n    int _length;\n\
+    \n    bool prepare_number() {\n        if (_length - _position >= 32) return true;\n\
+    \        const int remaining = _length - _position;\n        if (remaining > 0)\
+    \ std::memmove(_buffer, _buffer + _position, remaining);\n        const int added\
+    \ = int(std::fread(_buffer + remaining, 1, buffer_size - remaining, _stream));\n\
+    \        _position = 0;\n        _length = remaining + added;\n        if (_length\
+    \ < buffer_size) _buffer[_length] = '\\0';\n        return _length != 0;\n   \
+    \ }\n\n   public:\n    explicit FastInput(std::FILE* stream = stdin)\n       \
+    \ : _stream(stream), _position(0), _length(0) {}\n\n    FastInput(const FastInput&)\
+    \ = delete;\n    FastInput& operator=(const FastInput&) = delete;\n\n    int read_char_raw()\
+    \ {\n        if (_position == _length) {\n            _length = int(std::fread(_buffer,\
+    \ 1, buffer_size, _stream));\n            _position = 0;\n            if (_length\
+    \ == 0) return EOF;\n        }\n        return _buffer[_position++];\n    }\n\n\
+    \    bool skip_spaces() {\n        int c = read_char_raw();\n        while (c\
+    \ != EOF && c <= ' ') c = read_char_raw();\n        if (c == EOF) return false;\n\
+    \        --_position;\n        return true;\n    }\n\n    bool read(char& value)\
+    \ {\n        if (!skip_spaces()) return false;\n        value = char(read_char_raw());\n\
+    \        return true;\n    }\n\n    bool read(std::string& value) {\n        if\
+    \ (!skip_spaces()) return false;\n        value.clear();\n        int c = read_char_raw();\n\
+    \        while (c != EOF && c > ' ') {\n            value.push_back(char(c));\n\
+    \            c = read_char_raw();\n        }\n        return true;\n    }\n\n\
+    \    bool read(bool& value) {\n        int x;\n        if (!read(x)) return false;\n\
+    \        value = x != 0;\n        return true;\n    }\n\n    template <class T>\n\
+    \    std::enable_if_t<\n        std::is_integral_v<T>\n            && !std::is_same_v<std::remove_cv_t<T>,\
     \ bool>\n            && !std::is_same_v<std::remove_cv_t<T>, char>,\n        bool\n\
     \    >\n    read(T& value) {\n        if (!prepare_number()) return false;\n \
     \       int c = static_cast<unsigned char>(_buffer[_position++]);\n        while\
@@ -147,21 +150,34 @@ data:
     \ bool negative = false;\n        if (c == '-') {\n            negative = true;\n\
     \            c = static_cast<unsigned char>(_buffer[_position++]);\n        }\n\
     \n        if constexpr (std::is_signed_v<T>) {\n            T result = 0;\n  \
-    \          while ('0' <= c && c <= '9') {\n                int digit = c - '0';\n\
-    \                result = negative ? result * 10 - digit : result * 10 + digit;\n\
-    \                c = static_cast<unsigned char>(_buffer[_position++]);\n     \
-    \       }\n            value = result;\n        } else {\n            T result\
-    \ = 0;\n            while ('0' <= c && c <= '9') {\n                result = result\
-    \ * 10 + T(c - '0');\n                c = static_cast<unsigned char>(_buffer[_position++]);\n\
-    \            }\n            value = negative ? T(0) - result : result;\n     \
-    \   }\n        if (_position > _length) _position = _length;\n        return true;\n\
-    \    }\n\n    template <class T>\n    std::enable_if_t<\n        internal::has_val_method_v<T>\n\
-    \            && !std::is_integral_v<T>\n            && !internal::is_range_v<T>,\n\
+    \          while ('0' <= c && c <= '9') {\n                const int first = c\
+    \ - '0';\n                const int second = static_cast<unsigned char>(_buffer[_position])\
+    \ - '0';\n                if (0 <= second && second <= 9) {\n                \
+    \    result = negative ? result * 100 - (first * 10 + second)\n              \
+    \                        : result * 100 + (first * 10 + second);\n           \
+    \         ++_position;\n                } else {\n                    result =\
+    \ negative ? result * 10 - first : result * 10 + first;\n                }\n \
+    \               c = static_cast<unsigned char>(_buffer[_position++]);\n      \
+    \      }\n            value = result;\n        } else {\n            T result\
+    \ = 0;\n            while ('0' <= c && c <= '9') {\n                const unsigned\
+    \ first = unsigned(c - '0');\n                const int second = static_cast<unsigned\
+    \ char>(_buffer[_position]) - '0';\n                if (0 <= second && second\
+    \ <= 9) {\n                    result = result * 100 + T(first * 10 + unsigned(second));\n\
+    \                    ++_position;\n                } else {\n                \
+    \    result = result * 10 + T(first);\n                }\n                c =\
+    \ static_cast<unsigned char>(_buffer[_position++]);\n            }\n         \
+    \   value = negative ? T(0) - result : result;\n        }\n        if (_position\
+    \ > _length) _position = _length;\n        return true;\n    }\n\n    template\
+    \ <class T>\n    std::enable_if_t<\n        internal::has_val_method_v<T>\n  \
+    \          && !std::is_integral_v<T>\n            && !internal::is_range_v<T>,\n\
     \        bool\n    >\n    read(T& value) {\n        long long x;\n        if (!read(x))\
-    \ return false;\n        value = T(x);\n        return true;\n    }\n\n    template\
-    \ <class Range>\n    std::enable_if_t<\n        internal::is_range_v<Range>\n\
-    \            && !internal::is_string_like_v<Range>,\n        bool\n    >\n   \
-    \ read(Range& range) {\n        using StoredValue = internal::range_stored_value_t<Range>;\n\
+    \ return false;\n        if constexpr (internal::has_static_mod_raw_v<T>) {\n\
+    \            if (x >= 0 && uint64_t(x) < uint64_t(T::mod())) {\n             \
+    \   value = T::raw(uint32_t(x));\n            } else {\n                value\
+    \ = T(x);\n            }\n        } else {\n            value = T(x);\n      \
+    \  }\n        return true;\n    }\n\n    template <class Range>\n    std::enable_if_t<\n\
+    \        internal::is_range_v<Range>\n            && !internal::is_string_like_v<Range>,\n\
+    \        bool\n    >\n    read(Range& range) {\n        using StoredValue = internal::range_stored_value_t<Range>;\n\
     \        constexpr bool nested = internal::is_range_v<StoredValue>\n         \
     \                       && !internal::is_string_like_v<StoredValue>;\n\n     \
     \   for (auto&& value : range) {\n            if constexpr (std::is_same_v<StoredValue,\
@@ -173,7 +189,7 @@ data:
     \ return false;\n        return read(second, rest...);\n    }\n\n    template\
     \ <class T>\n    FastInput& operator>>(T& value) {\n        read(value);\n   \
     \     return *this;\n    }\n};\n\nstruct FastOutput {\n    static constexpr int\
-    \ buffer_size = 1 << 20;\n\n   private:\n    inline static constexpr auto digit_quads\
+    \ buffer_size = 1 << 20;\n\n   private:\n    inline static const auto digit_quads\
     \ = [] {\n        std::array<char, 40000> result{};\n        for (int i = 0; i\
     \ < 10000; i++) {\n            int value = i;\n            for (int j = 3; j >=\
     \ 0; j--) {\n                result[4 * i + j] = char('0' + value % 10);\n   \
@@ -281,7 +297,7 @@ data:
   isVerificationFile: true
   path: verify/algo/sequence/number_of_subsequences.test.cpp
   requiredBy: []
-  timestamp: '2026-07-11 02:52:00+09:00'
+  timestamp: '2026-07-11 03:19:37+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/algo/sequence/number_of_subsequences.test.cpp

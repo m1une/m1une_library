@@ -651,7 +651,7 @@ data:
     - icon: ':heavy_check_mark:'
       path: math/lucas.hpp
       title: Lucas's Theorem
-    - icon: ':question:'
+    - icon: ':heavy_check_mark:'
       path: math/modint.hpp
       title: ModInt
     - icon: ':heavy_check_mark:'
@@ -695,7 +695,7 @@ data:
     - icon: ':heavy_check_mark:'
       path: math/fps/all.hpp
       title: Formal Power Series All
-    - icon: ':question:'
+    - icon: ':heavy_check_mark:'
       path: math/fps/convolution.hpp
       title: Convolution
     - icon: ':heavy_check_mark:'
@@ -721,9 +721,9 @@ data:
       title: Multipoint Evaluation and Interpolation
   - name: math/fps/internal
     pages:
-    - icon: ':question:'
-      path: math/fps/internal/ntt998_fast.hpp
-      title: math/fps/internal/ntt998_fast.hpp
+    - icon: ':heavy_check_mark:'
+      path: math/fps/internal/ntt998_faster.hpp
+      title: math/fps/internal/ntt998_faster.hpp
   - name: math/matrix
     pages:
     - icon: ':heavy_check_mark:'
@@ -946,7 +946,7 @@ data:
     - icon: ':heavy_check_mark:'
       path: utilities/dynamic_bitset.hpp
       title: Dynamic Bitset
-    - icon: ':question:'
+    - icon: ':heavy_check_mark:'
       path: utilities/fast_io.hpp
       title: Fast IO
     - icon: ':heavy_check_mark:'
@@ -1467,7 +1467,7 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/fps/convolution_ll.test.cpp
       title: verify/math/fps/convolution_ll.test.cpp
-    - icon: ':x:'
+    - icon: ':heavy_check_mark:'
       path: verify/math/fps/convolution_mod.test.cpp
       title: verify/math/fps/convolution_mod.test.cpp
     - icon: ':heavy_check_mark:'

@@ -28,7 +28,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/fps/all.hpp
     title: Formal Power Series All
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/convolution.hpp
     title: Convolution
   - icon: ':heavy_check_mark:'
@@ -46,9 +46,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/fps/half_gcd.hpp
     title: Polynomial Half-GCD
-  - icon: ':question:'
-    path: math/fps/internal/ntt998_fast.hpp
-    title: math/fps/internal/ntt998_fast.hpp
+  - icon: ':heavy_check_mark:'
+    path: math/fps/internal/ntt998_faster.hpp
+    title: math/fps/internal/ntt998_faster.hpp
   - icon: ':heavy_check_mark:'
     path: math/fps/lagrange_inversion.hpp
     title: Lagrange Inversion Formula
@@ -76,10 +76,10 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/matrix/matrix.hpp
     title: Dense Matrix
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
   - icon: ':heavy_check_mark:'
@@ -142,7 +142,7 @@ data:
     \  [Previous line repeated 1 more time]\n  File \"/home/runner/.local/lib/python3.12/site-packages/onlinejudge_verify/languages/cplusplus_bundle.py\"\
     , line 400, in update\n    raise BundleErrorAt(path, i + 1, \"unable to process\
     \ #include in #if / #ifdef / #ifndef other than include guards\")\nonlinejudge_verify.languages.cplusplus_bundle.BundleErrorAt:\
-    \ math/fps/convolution.hpp: line 17: unable to process #include in #if / #ifdef\
+    \ math/fps/convolution.hpp: line 19: unable to process #include in #if / #ifdef\
     \ / #ifndef other than include guards\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <algorithm>\n\
     #include <cassert>\n#include <cstdint>\n#include <iostream>\n#include <numeric>\n\
@@ -318,7 +318,7 @@ data:
   - math/bernoulli.hpp
   - math/fps/formal_power_series.hpp
   - math/fps/convolution.hpp
-  - math/fps/internal/ntt998_fast.hpp
+  - math/fps/internal/ntt998_faster.hpp
   - math/modint.hpp
   - math/combinatorics.hpp
   - math/bitwise_convolution.hpp
@@ -355,7 +355,7 @@ data:
   isVerificationFile: true
   path: verify/math/math_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-11 02:52:00+09:00'
+  timestamp: '2026-07-11 03:19:37+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/math_algorithms.test.cpp

@@ -160,19 +160,19 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/combinatorics.hpp
     title: Combinatorics
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/convolution.hpp
     title: Convolution
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/convolution.hpp
     title: Convolution
   - icon: ':heavy_check_mark:'
     path: math/fps/formal_power_series.hpp
     title: Formal Power Series
-  - icon: ':question:'
-    path: math/fps/internal/ntt998_fast.hpp
-    title: math/fps/internal/ntt998_fast.hpp
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
+    path: math/fps/internal/ntt998_faster.hpp
+    title: math/fps/internal/ntt998_faster.hpp
+  - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
   - icon: ':heavy_check_mark:'
@@ -206,7 +206,7 @@ data:
     \  File \"/home/runner/.local/lib/python3.12/site-packages/onlinejudge_verify/languages/cplusplus_bundle.py\"\
     , line 400, in update\n    raise BundleErrorAt(path, i + 1, \"unable to process\
     \ #include in #if / #ifdef / #ifndef other than include guards\")\nonlinejudge_verify.languages.cplusplus_bundle.BundleErrorAt:\
-    \ math/fps/convolution.hpp: line 17: unable to process #include in #if / #ifdef\
+    \ math/fps/convolution.hpp: line 19: unable to process #include in #if / #ifdef\
     \ / #ifndef other than include guards\n"
   code: '#ifndef M1UNE_GRAPH_ALL_HPP
 
@@ -240,7 +240,7 @@ data:
   dependsOn:
   - graph/counting.hpp
   - math/fps/convolution.hpp
-  - math/fps/internal/ntt998_fast.hpp
+  - math/fps/internal/ntt998_faster.hpp
   - math/modint.hpp
   - math/fps/formal_power_series.hpp
   - math/fps/convolution.hpp
@@ -300,7 +300,7 @@ data:
   isVerificationFile: false
   path: graph/all.hpp
   requiredBy: []
-  timestamp: '2026-07-11 02:52:00+09:00'
+  timestamp: '2026-07-11 03:19:37+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp

@@ -1,13 +1,13 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/convolution.hpp
     title: Convolution
-  - icon: ':question:'
-    path: math/fps/internal/ntt998_fast.hpp
-    title: math/fps/internal/ntt998_fast.hpp
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
+    path: math/fps/internal/ntt998_faster.hpp
+    title: math/fps/internal/ntt998_faster.hpp
+  - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
   _extendedRequiredBy:
@@ -126,7 +126,7 @@ data:
     \  File \"/home/runner/.local/lib/python3.12/site-packages/onlinejudge_verify/languages/cplusplus_bundle.py\"\
     , line 400, in update\n    raise BundleErrorAt(path, i + 1, \"unable to process\
     \ #include in #if / #ifdef / #ifndef other than include guards\")\nonlinejudge_verify.languages.cplusplus_bundle.BundleErrorAt:\
-    \ math/fps/convolution.hpp: line 17: unable to process #include in #if / #ifdef\
+    \ math/fps/convolution.hpp: line 19: unable to process #include in #if / #ifdef\
     \ / #ifndef other than include guards\n"
   code: "#ifndef M1UNE_FPS_FORMAL_POWER_SERIES_HPP\n#define M1UNE_FPS_FORMAL_POWER_SERIES_HPP\
     \ 1\n\n#include <algorithm>\n#include <cassert>\n#include <cstdint>\n#include\
@@ -285,7 +285,7 @@ data:
     \ namespace fps\n}  // namespace m1une\n\n#endif  // M1UNE_FPS_FORMAL_POWER_SERIES_HPP\n"
   dependsOn:
   - math/fps/convolution.hpp
-  - math/fps/internal/ntt998_fast.hpp
+  - math/fps/internal/ntt998_faster.hpp
   - math/modint.hpp
   isVerificationFile: false
   path: math/fps/formal_power_series.hpp
@@ -302,7 +302,7 @@ data:
   - math/fps/linear_recurrence.hpp
   - graph/all.hpp
   - graph/counting.hpp
-  timestamp: '2026-07-11 02:52:00+09:00'
+  timestamp: '2026-07-11 03:19:37+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/bernoulli_utilities.test.cpp

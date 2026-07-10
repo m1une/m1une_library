@@ -1,26 +1,26 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/convolution.hpp
     title: Convolution
-  - icon: ':question:'
-    path: math/fps/internal/ntt998_fast.hpp
-    title: math/fps/internal/ntt998_fast.hpp
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
+    path: math/fps/internal/ntt998_faster.hpp
+    title: math/fps/internal/ntt998_faster.hpp
+  - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: utilities/fast_io.hpp
     title: Fast IO
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
-  _isVerificationFailed: true
+  _isVerificationFailed: false
   _pathExtension: cpp
-  _verificationStatusIcon: ':x:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
     PROBLEM: https://judge.yosupo.jp/problem/convolution_mod
@@ -36,7 +36,7 @@ data:
     \  File \"/home/runner/.local/lib/python3.12/site-packages/onlinejudge_verify/languages/cplusplus_bundle.py\"\
     , line 400, in update\n    raise BundleErrorAt(path, i + 1, \"unable to process\
     \ #include in #if / #ifdef / #ifndef other than include guards\")\nonlinejudge_verify.languages.cplusplus_bundle.BundleErrorAt:\
-    \ math/fps/convolution.hpp: line 17: unable to process #include in #if / #ifdef\
+    \ math/fps/convolution.hpp: line 19: unable to process #include in #if / #ifdef\
     \ / #ifndef other than include guards\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/convolution_mod\"\n\n#pragma\
     \ GCC optimize(\"O3\")\n\n#include <iostream>\n#include <vector>\n\n#include \"\
@@ -48,15 +48,15 @@ data:
     \ = m1une::fps::convolution(a, b);\n    output.println(result);\n}\n"
   dependsOn:
   - math/fps/convolution.hpp
-  - math/fps/internal/ntt998_fast.hpp
+  - math/fps/internal/ntt998_faster.hpp
   - math/modint.hpp
   - math/modint.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
   path: verify/math/fps/convolution_mod.test.cpp
   requiredBy: []
-  timestamp: '2026-07-11 02:52:00+09:00'
-  verificationStatus: TEST_WRONG_ANSWER
+  timestamp: '2026-07-11 03:19:37+09:00'
+  verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/fps/convolution_mod.test.cpp
 layout: document

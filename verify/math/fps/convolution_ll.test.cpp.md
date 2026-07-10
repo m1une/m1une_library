@@ -1,16 +1,16 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/convolution.hpp
     title: Convolution
   - icon: ':heavy_check_mark:'
     path: math/fps/convolution_ll.hpp
     title: Long Long Convolution
-  - icon: ':question:'
-    path: math/fps/internal/ntt998_fast.hpp
-    title: math/fps/internal/ntt998_fast.hpp
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
+    path: math/fps/internal/ntt998_faster.hpp
+    title: math/fps/internal/ntt998_faster.hpp
+  - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
   _extendedRequiredBy: []
@@ -35,7 +35,7 @@ data:
     \  File \"/home/runner/.local/lib/python3.12/site-packages/onlinejudge_verify/languages/cplusplus_bundle.py\"\
     , line 400, in update\n    raise BundleErrorAt(path, i + 1, \"unable to process\
     \ #include in #if / #ifdef / #ifndef other than include guards\")\nonlinejudge_verify.languages.cplusplus_bundle.BundleErrorAt:\
-    \ math/fps/convolution.hpp: line 17: unable to process #include in #if / #ifdef\
+    \ math/fps/convolution.hpp: line 19: unable to process #include in #if / #ifdef\
     \ / #ifndef other than include guards\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
     ../../../math/fps/convolution_ll.hpp\"\n\n#include <cassert>\n#include <cstdint>\n\
@@ -77,12 +77,12 @@ data:
   dependsOn:
   - math/fps/convolution_ll.hpp
   - math/fps/convolution.hpp
-  - math/fps/internal/ntt998_fast.hpp
+  - math/fps/internal/ntt998_faster.hpp
   - math/modint.hpp
   isVerificationFile: true
   path: verify/math/fps/convolution_ll.test.cpp
   requiredBy: []
-  timestamp: '2026-07-11 02:52:00+09:00'
+  timestamp: '2026-07-11 03:19:37+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/fps/convolution_ll.test.cpp

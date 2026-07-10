@@ -23,7 +23,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/fps/all.hpp
     title: Formal Power Series All
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/convolution.hpp
     title: Convolution
   - icon: ':heavy_check_mark:'
@@ -120,10 +120,10 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/fps/convolution_ll.test.cpp
     title: verify/math/fps/convolution_ll.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/convolution_mod.test.cpp
     title: verify/math/fps/convolution_mod.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/convolution_mod.test.cpp
     title: verify/math/fps/convolution_mod.test.cpp
   - icon: ':heavy_check_mark:'
@@ -228,9 +228,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/matroid/matroids.test.cpp
     title: verify/matroid/matroids.test.cpp
-  _isVerificationFailed: true
+  _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':question:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"math/modint.hpp\"\n\n\n\n#include <cstdint>\n#include <iostream>\n\
@@ -353,7 +353,7 @@ data:
   - graph/all.hpp
   - graph/counting.hpp
   timestamp: '2026-07-01 14:11:51+09:00'
-  verificationStatus: LIBRARY_SOME_WA
+  verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/algo/sequence/number_of_subsequences.test.cpp
   - verify/ds/dynamic_tree/rake_compress_link_cut_tree.test.cpp
