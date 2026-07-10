@@ -302,7 +302,7 @@ data:
   - math/fps/linear_recurrence.hpp
   - graph/all.hpp
   - graph/counting.hpp
-  timestamp: '2026-07-11 03:19:37+09:00'
+  timestamp: '2026-07-11 03:31:13+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/bernoulli_utilities.test.cpp

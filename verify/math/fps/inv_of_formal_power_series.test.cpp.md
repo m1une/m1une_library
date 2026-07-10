@@ -57,7 +57,7 @@ data:
   isVerificationFile: true
   path: verify/math/fps/inv_of_formal_power_series.test.cpp
   requiredBy: []
-  timestamp: '2026-07-11 03:19:37+09:00'
+  timestamp: '2026-07-11 03:31:13+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/fps/inv_of_formal_power_series.test.cpp
