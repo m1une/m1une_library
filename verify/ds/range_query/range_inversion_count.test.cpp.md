@@ -264,19 +264,19 @@ data:
     \        }\n    }\n    return result;\n}\n\nvoid test_randomized() {\n    std::uint64_t\
     \ state = 1511;\n    auto random = [&state]() {\n        state ^= state << 7;\n\
     \        state ^= state >> 9;\n        return state;\n    };\n\n    for (int trial\
-    \ = 0; trial < 3000; ++trial) {\n        int size = int(random() % 100);\n   \
-    \     std::vector<int> values(size);\n        for (int& value : values) value\
-    \ = int(random() % 20);\n        m1une::ds::RangeInversionCount<int> structure(values);\n\
+    \ = 0; trial < 500; ++trial) {\n        int size = int(random() % 36);\n     \
+    \   std::vector<int> values(size);\n        for (int& value : values) value =\
+    \ int(random() % 20);\n        m1une::ds::RangeInversionCount<int> structure(values);\n\
     \        assert(structure.size() == size);\n\n        for (int left = 0; left\
     \ <= size; ++left) {\n            for (int right = left; right <= size; ++right)\
     \ {\n                assert(\n                    structure.query(left, right)\n\
     \                    == brute(values, left, right)\n                );\n     \
-    \       }\n        }\n    }\n}\n\n}  // namespace\n\nint main() {\n    // test_randomized();\n\
+    \       }\n        }\n    }\n}\n\n}  // namespace\n\nint main() {\n    test_randomized();\n\
     \n    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput output;\n\
-    \n    int n, query_count;\n    input.read(n, query_count);\n    std::vector<int>\
+    \n    int n = 0, query_count = 0;\n    input.read(n, query_count);\n    std::vector<int>\
     \ values(n);\n    for (int& value : values) input.read(value);\n    m1une::ds::RangeInversionCount<int>\
-    \ structure(values);\n    while (query_count--) {\n        int left, right;\n\
-    \        input.read(left, right);\n        output.println(structure.query(left,\
+    \ structure(values);\n    while (query_count--) {\n        int left = 0, right\
+    \ = 0;\n        input.read(left, right);\n        output.println(structure.query(left,\
     \ right));\n    }\n}\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/static_range_inversions_query\"\
     \n\n#include \"../../../ds/range_query/range_inversion_count.hpp\"\n#include \"\
@@ -288,19 +288,19 @@ data:
     \ += values[first] > values[second];\n        }\n    }\n    return result;\n}\n\
     \nvoid test_randomized() {\n    std::uint64_t state = 1511;\n    auto random =\
     \ [&state]() {\n        state ^= state << 7;\n        state ^= state >> 9;\n \
-    \       return state;\n    };\n\n    for (int trial = 0; trial < 3000; ++trial)\
-    \ {\n        int size = int(random() % 100);\n        std::vector<int> values(size);\n\
+    \       return state;\n    };\n\n    for (int trial = 0; trial < 500; ++trial)\
+    \ {\n        int size = int(random() % 36);\n        std::vector<int> values(size);\n\
     \        for (int& value : values) value = int(random() % 20);\n        m1une::ds::RangeInversionCount<int>\
     \ structure(values);\n        assert(structure.size() == size);\n\n        for\
     \ (int left = 0; left <= size; ++left) {\n            for (int right = left; right\
     \ <= size; ++right) {\n                assert(\n                    structure.query(left,\
     \ right)\n                    == brute(values, left, right)\n                );\n\
-    \            }\n        }\n    }\n}\n\n}  // namespace\n\nint main() {\n    //\
-    \ test_randomized();\n\n    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput\
-    \ output;\n\n    int n, query_count;\n    input.read(n, query_count);\n    std::vector<int>\
+    \            }\n        }\n    }\n}\n\n}  // namespace\n\nint main() {\n    test_randomized();\n\
+    \n    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput output;\n\
+    \n    int n = 0, query_count = 0;\n    input.read(n, query_count);\n    std::vector<int>\
     \ values(n);\n    for (int& value : values) input.read(value);\n    m1une::ds::RangeInversionCount<int>\
-    \ structure(values);\n    while (query_count--) {\n        int left, right;\n\
-    \        input.read(left, right);\n        output.println(structure.query(left,\
+    \ structure(values);\n    while (query_count--) {\n        int left = 0, right\
+    \ = 0;\n        input.read(left, right);\n        output.println(structure.query(left,\
     \ right));\n    }\n}\n"
   dependsOn:
   - ds/range_query/range_inversion_count.hpp
@@ -308,7 +308,7 @@ data:
   isVerificationFile: true
   path: verify/ds/range_query/range_inversion_count.test.cpp
   requiredBy: []
-  timestamp: '2026-06-27 04:39:45+09:00'
+  timestamp: '2026-07-10 17:55:06+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/range_query/range_inversion_count.test.cpp
