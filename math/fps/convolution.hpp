@@ -8,6 +8,11 @@
 #include <utility>
 #include <vector>
 
+#if defined(__GNUC__) && !defined(__clang__) && (defined(__x86_64__) || defined(__i386__))
+#include <immintrin.h>
+#define M1UNE_FPS_HAS_X86_SIMD 1
+#endif
+
 #include "../modint.hpp"
 
 namespace m1une {
@@ -104,9 +109,6 @@ const NttRoots<Mint>& ntt_roots() {
 }
 
 template <class Mint>
-#if defined(__GNUC__) && !defined(__clang__) && (defined(__x86_64__) || defined(__i386__))
-__attribute__((target("avx2,bmi,bmi2,lzcnt"), optimize("O3,unroll-loops"), hot, flatten))
-#endif
 void ntt(std::vector<Mint>& a, bool inverse, bool normalize = true) {
     const int n = int(a.size());
     assert(n > 0 && (n & (n - 1)) == 0);
@@ -218,6 +220,215 @@ void ntt(std::vector<Mint>& a, bool inverse, bool normalize = true) {
     }
 }
 
+#ifdef M1UNE_FPS_HAS_X86_SIMD
+
+#pragma GCC push_options
+#pragma GCC target("avx2,bmi")
+
+struct Montgomery998Simd {
+    static constexpr uint32_t mod = 998244353;
+    static constexpr uint32_t mod2 = 2 * mod;
+    uint32_t negative_inverse;
+    uint32_t r;
+    uint32_t r2;
+    __m256i modulus;
+    __m256i inverse;
+
+    Montgomery998Simd()
+        : negative_inverse(1),
+          r(uint32_t((uint64_t(1) << 32) % mod)),
+          r2(uint32_t(uint64_t(r) * r % mod)) {
+        for (int i = 0; i < 5; i++) negative_inverse *= 2 + negative_inverse * mod;
+        modulus = _mm256_set1_epi32(int(mod));
+        inverse = _mm256_set1_epi32(int(negative_inverse));
+    }
+
+    uint32_t shrink(uint32_t value) const {
+        return std::min(value, value - mod);
+    }
+
+    uint32_t reduce(uint64_t value) const {
+        return uint32_t((value + uint64_t(uint32_t(value) * negative_inverse) * mod) >> 32);
+    }
+
+    uint32_t multiply(uint32_t lhs, uint32_t rhs) const {
+        return shrink(reduce(uint64_t(lhs) * rhs));
+    }
+
+    uint32_t encode(uint32_t value) const {
+        return multiply(value, r2);
+    }
+
+    __m256i shrink(__m256i value) const {
+        return _mm256_min_epu32(value, _mm256_sub_epi32(value, modulus));
+    }
+
+    __m256i multiply(__m256i lhs, __m256i rhs) const {
+        const __m256i lhs_odd = _mm256_bsrli_epi128(lhs, 4);
+        const __m256i rhs_odd = _mm256_bsrli_epi128(rhs, 4);
+        __m256i even = _mm256_mul_epu32(lhs, rhs);
+        __m256i odd = _mm256_mul_epu32(lhs_odd, rhs_odd);
+        __m256i even_correction = _mm256_mul_epu32(even, inverse);
+        __m256i odd_correction = _mm256_mul_epu32(odd, inverse);
+        even_correction = _mm256_mul_epu32(even_correction, modulus);
+        odd_correction = _mm256_mul_epu32(odd_correction, modulus);
+        even = _mm256_add_epi64(even, even_correction);
+        odd = _mm256_add_epi64(odd, odd_correction);
+        return shrink(_mm256_or_si256(_mm256_bsrli_epi128(even, 4), odd));
+    }
+
+    __m256i add(__m256i lhs, __m256i rhs) const {
+        return shrink(_mm256_add_epi32(lhs, rhs));
+    }
+
+    __m256i subtract(__m256i lhs, __m256i rhs) const {
+        const __m256i difference = _mm256_sub_epi32(lhs, rhs);
+        return _mm256_min_epu32(difference, _mm256_add_epi32(difference, modulus));
+    }
+};
+
+template <class Mint>
+__attribute__((target("avx2,bmi"), hot))
+void ntt_998244353_simd(uint32_t* data, int n, bool inverse, bool normalize = true) {
+    static const Montgomery998Simd montgomery;
+    const auto& roots = ntt_roots<Mint>();
+    const int height = two_adic_order(uint32_t(n));
+
+    if (!inverse) {
+        for (int phase = 1; phase <= height; phase++) {
+            const int blocks = 1 << (phase - 1);
+            const int width = 1 << (height - phase);
+            uint32_t twiddle = montgomery.r;
+            for (int block = 0; block < blocks; block++) {
+                const int offset = block << (height - phase + 1);
+                const __m256i vector_twiddle = _mm256_set1_epi32(int(twiddle));
+                int i = 0;
+                for (; i + 8 <= width; i += 8) {
+                    const __m256i lhs = _mm256_loadu_si256(
+                        reinterpret_cast<const __m256i*>(data + offset + i));
+                    const __m256i rhs = _mm256_loadu_si256(
+                        reinterpret_cast<const __m256i*>(data + offset + width + i));
+                    const __m256i weighted_rhs = montgomery.multiply(rhs, vector_twiddle);
+                    _mm256_storeu_si256(reinterpret_cast<__m256i*>(data + offset + i),
+                                       montgomery.add(lhs, weighted_rhs));
+                    _mm256_storeu_si256(reinterpret_cast<__m256i*>(data + offset + width + i),
+                                       montgomery.subtract(lhs, weighted_rhs));
+                }
+                for (; i < width; i++) {
+                    const uint32_t lhs = data[offset + i];
+                    const uint32_t rhs = data[offset + width + i];
+                    const uint32_t weighted_rhs = montgomery.multiply(rhs, twiddle);
+                    uint32_t sum = lhs + weighted_rhs;
+                    if (sum >= Montgomery998Simd::mod) sum -= Montgomery998Simd::mod;
+                    uint32_t difference = lhs >= weighted_rhs
+                                              ? lhs - weighted_rhs
+                                              : lhs + Montgomery998Simd::mod - weighted_rhs;
+                    data[offset + i] = sum;
+                    data[offset + width + i] = difference;
+                }
+                if (block + 1 != blocks) {
+                    const uint32_t rate = montgomery.encode(
+                        roots.rate[__builtin_ctz(~uint32_t(block))].val());
+                    twiddle = montgomery.multiply(twiddle, rate);
+                }
+            }
+        }
+    } else {
+        for (int phase = height; phase >= 1; phase--) {
+            const int blocks = 1 << (phase - 1);
+            const int width = 1 << (height - phase);
+            uint32_t twiddle = montgomery.r;
+            for (int block = 0; block < blocks; block++) {
+                const int offset = block << (height - phase + 1);
+                const __m256i vector_twiddle = _mm256_set1_epi32(int(twiddle));
+                int i = 0;
+                for (; i + 8 <= width; i += 8) {
+                    const __m256i lhs = _mm256_loadu_si256(
+                        reinterpret_cast<const __m256i*>(data + offset + i));
+                    const __m256i rhs = _mm256_loadu_si256(
+                        reinterpret_cast<const __m256i*>(data + offset + width + i));
+                    _mm256_storeu_si256(reinterpret_cast<__m256i*>(data + offset + i),
+                                       montgomery.add(lhs, rhs));
+                    _mm256_storeu_si256(reinterpret_cast<__m256i*>(data + offset + width + i),
+                                       montgomery.multiply(montgomery.subtract(lhs, rhs),
+                                                           vector_twiddle));
+                }
+                for (; i < width; i++) {
+                    const uint32_t lhs = data[offset + i];
+                    const uint32_t rhs = data[offset + width + i];
+                    uint32_t sum = lhs + rhs;
+                    if (sum >= Montgomery998Simd::mod) sum -= Montgomery998Simd::mod;
+                    uint32_t difference = lhs >= rhs ? lhs - rhs : lhs + Montgomery998Simd::mod - rhs;
+                    data[offset + i] = sum;
+                    data[offset + width + i] = montgomery.multiply(difference, twiddle);
+                }
+                if (block + 1 != blocks) {
+                    const uint32_t rate = montgomery.encode(
+                        roots.inverse_rate[__builtin_ctz(~uint32_t(block))].val());
+                    twiddle = montgomery.multiply(twiddle, rate);
+                }
+            }
+        }
+        if (normalize) {
+            const uint32_t scale = montgomery.encode(Mint(n).inv().val());
+            const __m256i vector_scale = _mm256_set1_epi32(int(scale));
+            int i = 0;
+            for (; i + 8 <= n; i += 8) {
+                __m256i values =
+                    _mm256_loadu_si256(reinterpret_cast<const __m256i*>(data + i));
+                _mm256_storeu_si256(reinterpret_cast<__m256i*>(data + i),
+                                   montgomery.multiply(values, vector_scale));
+            }
+            for (; i < n; i++) data[i] = montgomery.multiply(data[i], scale);
+        }
+    }
+}
+
+template <class Mint>
+__attribute__((target("avx2,bmi"), hot))
+std::vector<Mint> convolution_998244353_simd(const std::vector<Mint>& a,
+                                             const std::vector<Mint>& b) {
+    const int result_size = int(a.size() + b.size() - 1);
+    int n = 1;
+    while (n < result_size) n <<= 1;
+    std::vector<uint32_t> transformed_a(n);
+    std::vector<uint32_t> transformed_b(n);
+    for (int i = 0; i < int(a.size()); i++) transformed_a[i] = a[i].val();
+    for (int i = 0; i < int(b.size()); i++) transformed_b[i] = b[i].val();
+    ntt_998244353_simd<Mint>(transformed_a.data(), n, false);
+    ntt_998244353_simd<Mint>(transformed_b.data(), n, false);
+
+    static const Montgomery998Simd montgomery;
+    // A normal-by-normal Montgomery product is off by R^-1.  Scaling the
+    // inverse transform by n^-1 R compensates for it without another pass.
+    const uint32_t inverse_n_montgomery = montgomery.encode(Mint(n).inv().val());
+    const uint32_t inverse_n_r2 = montgomery.multiply(inverse_n_montgomery, montgomery.r2);
+    const __m256i vector_scale = _mm256_set1_epi32(int(inverse_n_r2));
+    int i = 0;
+    for (; i + 8 <= n; i += 8) {
+        const __m256i lhs =
+            _mm256_loadu_si256(reinterpret_cast<const __m256i*>(transformed_a.data() + i));
+        const __m256i rhs =
+            _mm256_loadu_si256(reinterpret_cast<const __m256i*>(transformed_b.data() + i));
+        __m256i product = montgomery.multiply(lhs, rhs);
+        product = montgomery.multiply(product, vector_scale);
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(transformed_a.data() + i), product);
+    }
+    for (; i < n; i++) {
+        uint32_t product = montgomery.multiply(transformed_a[i], transformed_b[i]);
+        transformed_a[i] = montgomery.multiply(product, inverse_n_r2);
+    }
+    ntt_998244353_simd<Mint>(transformed_a.data(), n, true, false);
+
+    std::vector<Mint> result(result_size);
+    for (int j = 0; j < result_size; j++) result[j] = Mint::raw(transformed_a[j]);
+    return result;
+}
+
+#pragma GCC pop_options
+
+#endif
+
 }  // namespace internal
 
 template <class Mint>
@@ -237,14 +448,18 @@ std::vector<Mint> convolution_naive(const std::vector<Mint>& a, const std::vecto
 }
 
 template <class Mint>
-#if defined(__GNUC__) && !defined(__clang__) && (defined(__x86_64__) || defined(__i386__))
-__attribute__((target("avx2,bmi,bmi2,lzcnt"), optimize("O3,unroll-loops"), hot, flatten))
-#endif
 std::vector<Mint> convolution_ntt(const std::vector<Mint>& a, const std::vector<Mint>& b) {
     const int result_size = int(a.size() + b.size() - 1);
     int n = 1;
     while (n < result_size) n <<= 1;
     assert((Mint::mod() - 1) % uint32_t(n) == 0);
+
+#ifdef M1UNE_FPS_HAS_X86_SIMD
+    if constexpr (Mint::mod() == 998244353) {
+        if (n >= 64 && __builtin_cpu_supports("avx2"))
+            return internal::convolution_998244353_simd(a, b);
+    }
+#endif
 
     // Allocate the padded buffers directly.  Constructing from the inputs and
     // then resizing used to allocate and copy both large operands twice.
@@ -326,5 +541,9 @@ std::vector<Mint> convolution(const std::vector<Mint>& a, const std::vector<Mint
 
 }  // namespace fps
 }  // namespace m1une
+
+#ifdef M1UNE_FPS_HAS_X86_SIMD
+#undef M1UNE_FPS_HAS_X86_SIMD
+#endif
 
 #endif  // M1UNE_FPS_CONVOLUTION_HPP
