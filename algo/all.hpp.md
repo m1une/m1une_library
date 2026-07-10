@@ -53,6 +53,9 @@ data:
     path: algo/sequence/lis.hpp
     title: Longest Increasing Subsequence (LIS)
   - icon: ':heavy_check_mark:'
+    path: algo/sequence/number_of_subsequences.hpp
+    title: Number of Subsequences
+  - icon: ':heavy_check_mark:'
     path: algo/sequence/run_length_encoding.hpp
     title: Run Length Encoding
   - icon: ':heavy_check_mark:'
@@ -449,30 +452,44 @@ data:
     \    while (current != -1) {\n        result.push_back(current);\n        current\
     \ = predecessor[current];\n    }\n    std::reverse(result.begin(), result.end());\n\
     \    return result;\n}\n\n}  // namespace algo\n}  // namespace m1une\n\n\n#line\
-    \ 1 \"algo/sequence/run_length_encoding.hpp\"\n\n\n\n#line 7 \"algo/sequence/run_length_encoding.hpp\"\
-    \n\nnamespace m1une {\nnamespace algo {\n\ntemplate <typename Container>\nauto\
-    \ run_length_encoding(const Container& values) {\n    using T = typename Container::value_type;\n\
-    \    std::vector<std::pair<T, long long>> result;\n\n    auto it = std::begin(values);\n\
-    \    auto last = std::end(values);\n    if (it == last) {\n        return result;\n\
-    \    }\n\n    T current = *it;\n    long long count = 0;\n    for (; it != last;\
-    \ ++it) {\n        if (*it == current) {\n            ++count;\n        } else\
-    \ {\n            result.emplace_back(current, count);\n            current = *it;\n\
-    \            count = 1;\n        }\n    }\n    result.emplace_back(current, count);\n\
-    \    return result;\n}\n\n}  // namespace algo\n}  // namespace m1une\n\n\n#line\
-    \ 1 \"algo/sequence/subset_sum.hpp\"\n\n\n\n#line 8 \"algo/sequence/subset_sum.hpp\"\
-    \n\nnamespace m1une {\nnamespace algo {\n\nnamespace internal {\n\ntemplate <typename\
-    \ T>\nstd::vector<T> enumerate_sorted_subset_sums(\n    const std::vector<T>&\
-    \ values,\n    int left,\n    int right\n) {\n    std::vector<T> sums(1, T{});\n\
-    \    std::vector<T> merged;\n\n    for (int i = left; i < right; ++i) {\n    \
-    \    const std::size_t size = sums.size();\n        merged.clear();\n        merged.reserve(size\
-    \ * 2);\n\n        std::size_t without = 0;\n        std::size_t with = 0;\n \
-    \       while (without < size && with < size) {\n            const T with_current\
-    \ = sums[with] + values[i];\n            if (with_current < sums[without]) {\n\
-    \                merged.push_back(with_current);\n                ++with;\n  \
-    \          } else {\n                merged.push_back(sums[without]);\n      \
-    \          ++without;\n            }\n        }\n        while (without < size)\
-    \ {\n            merged.push_back(sums[without]);\n            ++without;\n  \
-    \      }\n        while (with < size) {\n            merged.push_back(sums[with]\
+    \ 1 \"algo/sequence/number_of_subsequences.hpp\"\n\n\n\n#line 6 \"algo/sequence/number_of_subsequences.hpp\"\
+    \n\nnamespace m1une {\nnamespace algo {\n\n// Returns the number of distinct nonempty\
+    \ subsequences.\ntemplate <class Mint, class T>\nMint number_of_distinct_subsequences(const\
+    \ std::vector<T>& values) {\n    std::vector<T> compressed = values;\n    std::sort(compressed.begin(),\
+    \ compressed.end());\n    compressed.erase(\n        std::unique(compressed.begin(),\
+    \ compressed.end()),\n        compressed.end()\n    );\n\n    std::vector<Mint>\
+    \ previous_total(compressed.size(), Mint(0));\n    Mint total = 1;\n    for (const\
+    \ T& value : values) {\n        int rank = int(\n            std::lower_bound(\n\
+    \                compressed.begin(),\n                compressed.end(),\n    \
+    \            value\n            ) - compressed.begin()\n        );\n        Mint\
+    \ old_total = total;\n        total = total + total - previous_total[rank];\n\
+    \        previous_total[rank] = old_total;\n    }\n    return total - Mint(1);\n\
+    }\n\ntemplate <class Mint, class T>\nMint number_of_subsequences(const std::vector<T>&\
+    \ values) {\n    return number_of_distinct_subsequences<Mint>(values);\n}\n\n\
+    }  // namespace algo\n}  // namespace m1une\n\n\n#line 1 \"algo/sequence/run_length_encoding.hpp\"\
+    \n\n\n\n#line 7 \"algo/sequence/run_length_encoding.hpp\"\n\nnamespace m1une {\n\
+    namespace algo {\n\ntemplate <typename Container>\nauto run_length_encoding(const\
+    \ Container& values) {\n    using T = typename Container::value_type;\n    std::vector<std::pair<T,\
+    \ long long>> result;\n\n    auto it = std::begin(values);\n    auto last = std::end(values);\n\
+    \    if (it == last) {\n        return result;\n    }\n\n    T current = *it;\n\
+    \    long long count = 0;\n    for (; it != last; ++it) {\n        if (*it ==\
+    \ current) {\n            ++count;\n        } else {\n            result.emplace_back(current,\
+    \ count);\n            current = *it;\n            count = 1;\n        }\n   \
+    \ }\n    result.emplace_back(current, count);\n    return result;\n}\n\n}  //\
+    \ namespace algo\n}  // namespace m1une\n\n\n#line 1 \"algo/sequence/subset_sum.hpp\"\
+    \n\n\n\n#line 8 \"algo/sequence/subset_sum.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ algo {\n\nnamespace internal {\n\ntemplate <typename T>\nstd::vector<T> enumerate_sorted_subset_sums(\n\
+    \    const std::vector<T>& values,\n    int left,\n    int right\n) {\n    std::vector<T>\
+    \ sums(1, T{});\n    std::vector<T> merged;\n\n    for (int i = left; i < right;\
+    \ ++i) {\n        const std::size_t size = sums.size();\n        merged.clear();\n\
+    \        merged.reserve(size * 2);\n\n        std::size_t without = 0;\n     \
+    \   std::size_t with = 0;\n        while (without < size && with < size) {\n \
+    \           const T with_current = sums[with] + values[i];\n            if (with_current\
+    \ < sums[without]) {\n                merged.push_back(with_current);\n      \
+    \          ++with;\n            } else {\n                merged.push_back(sums[without]);\n\
+    \                ++without;\n            }\n        }\n        while (without\
+    \ < size) {\n            merged.push_back(sums[without]);\n            ++without;\n\
+    \        }\n        while (with < size) {\n            merged.push_back(sums[with]\
     \ + values[i]);\n            ++with;\n        }\n        sums.swap(merged);\n\
     \    }\n\n    return sums;\n}\n\n}  // namespace internal\n\n// Returns the sorted\
     \ subset sums of values[0, n / 2) and values[n / 2, n).\ntemplate <typename T>\n\
@@ -489,7 +506,7 @@ data:
     \   --right_count;\n        }\n        if (right_count == 0) break;\n\n      \
     \  const T candidate = left + right_sums[right_count - 1];\n        if (answer\
     \ < candidate) answer = candidate;\n    }\n    return answer;\n}\n\n}  // namespace\
-    \ algo\n}  // namespace m1une\n\n\n#line 8 \"algo/sequence/all.hpp\"\n\n\n#line\
+    \ algo\n}  // namespace m1une\n\n\n#line 9 \"algo/sequence/all.hpp\"\n\n\n#line\
     \ 9 \"algo/all.hpp\"\n\n\n"
   code: '#ifndef M1UNE_ALGO_ALL_HPP
 
@@ -528,12 +545,13 @@ data:
   - algo/sequence/all.hpp
   - algo/sequence/inversion_count.hpp
   - algo/sequence/lis.hpp
+  - algo/sequence/number_of_subsequences.hpp
   - algo/sequence/run_length_encoding.hpp
   - algo/sequence/subset_sum.hpp
   isVerificationFile: false
   path: algo/all.hpp
   requiredBy: []
-  timestamp: '2026-07-09 00:39:09+09:00'
+  timestamp: '2026-07-10 18:48:41+09:00'
   verificationStatus: LIBRARY_NO_TESTS
   verifiedWith: []
 documentation_of: algo/all.hpp

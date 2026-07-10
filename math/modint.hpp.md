@@ -46,6 +46,9 @@ data:
     title: Multipoint Evaluation and Interpolation
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/algo/sequence/number_of_subsequences.test.cpp
+    title: verify/algo/sequence/number_of_subsequences.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/dynamic_array/dynamic_lazy_monoid_array.test.cpp
     title: verify/ds/dynamic_array/dynamic_lazy_monoid_array.test.cpp
   - icon: ':heavy_check_mark:'
@@ -348,6 +351,7 @@ data:
   timestamp: '2026-07-01 14:11:51+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/algo/sequence/number_of_subsequences.test.cpp
   - verify/ds/dynamic_tree/rake_compress_link_cut_tree.test.cpp
   - verify/ds/dynamic_tree/yosupo_point_set_tree_path_composite_sum.test.cpp
   - verify/ds/dynamic_array/dynamic_lazy_monoid_array.test.cpp

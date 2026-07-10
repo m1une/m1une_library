@@ -151,6 +151,9 @@ data:
       path: algo/sequence/lis.hpp
       title: Longest Increasing Subsequence (LIS)
     - icon: ':heavy_check_mark:'
+      path: algo/sequence/number_of_subsequences.hpp
+      title: Number of Subsequences
+    - icon: ':heavy_check_mark:'
       path: algo/sequence/run_length_encoding.hpp
       title: Run Length Encoding
     - icon: ':heavy_check_mark:'
@@ -1003,6 +1006,9 @@ data:
       title: verify/algo/search/ternary_search.test.cpp
   - name: verify/algo/sequence
     pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/algo/sequence/number_of_subsequences.test.cpp
+      title: verify/algo/sequence/number_of_subsequences.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/algo/sequence/sequence_algorithms.test.cpp
       title: verify/algo/sequence/sequence_algorithms.test.cpp

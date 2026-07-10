@@ -4,6 +4,9 @@ data:
   _extendedRequiredBy: []
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/algo/sequence/number_of_subsequences.test.cpp
+    title: verify/algo/sequence/number_of_subsequences.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/range_query/fenwick_tree.test.cpp
     title: verify/ds/range_query/fenwick_tree.test.cpp
   - icon: ':heavy_check_mark:'
@@ -278,6 +281,7 @@ data:
   timestamp: '2026-06-27 04:39:45+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/algo/sequence/number_of_subsequences.test.cpp
   - verify/utilities/fast_io.test.cpp
   - verify/geometry/rectangle_union_area.test.cpp
   - verify/ds/range_query/static_range_mode_query.test.cpp
