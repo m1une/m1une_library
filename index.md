@@ -719,6 +719,11 @@ data:
     - icon: ':heavy_check_mark:'
       path: math/fps/multipoint_evaluation.hpp
       title: Multipoint Evaluation and Interpolation
+  - name: math/fps/internal
+    pages:
+    - icon: ':question:'
+      path: math/fps/internal/ntt998_fast.hpp
+      title: math/fps/internal/ntt998_fast.hpp
   - name: math/matrix
     pages:
     - icon: ':heavy_check_mark:'
