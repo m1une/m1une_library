@@ -1,21 +1,26 @@
 ---
 title: Persistent Ordered Set
-documentation_of: ../../../ds/ordered_set/persistent_ordered_set.hpp
+documentation_of: ../../../ds/bst/persistent_ordered_set.hpp
 ---
 
 ## Overview
 
-`PersistentOrderedSet` is a path-copying randomized binary search tree for sets. Updates return a new set and leave the old version available, like a persistent version of `OrderedSet`.
+`PersistentOrderedSet` is a path-copying red-black tree for sets. Updates,
+splits, and merges return new versions and leave every input version available.
 
-Its underlying tree uses an indexed, block-contiguous node pool rather than per-node pointers.
-The pool is append-only and is released when the last related version is destroyed.
+Its underlying tree uses a specialization-wide indexed, chunked node pool
+rather than per-node pointers. The append-only pool is released when the program
+exits.
 
-Pointers returned by bound and predecessor/successor methods remain valid while the version they came from is alive.
+Pointers returned by bound and predecessor/successor methods remain valid for
+the remainder of the program.
 
 ## Template Parameters
 
 * `T`: The key type.
 * `Compare`: Ordering predicate. Defaults to `std::less<T>`.
+
+Trees passed to `merge` must use equivalent comparator state.
 
 ## Constructors
 
@@ -38,7 +43,7 @@ Pointers returned by bound and predecessor/successor methods remain valid while 
 | `int size() const` | Returns the number of keys. | $O(1)$ |
 | `int unique_size() const` | Alias for `size()`. | $O(1)$ |
 | `bool empty() const` | Returns whether the set is empty. | $O(1)$ |
-| `PersistentOrderedSet clear() const` | Returns an empty set with the same comparator and random state. | $O(1)$ |
+| `PersistentOrderedSet clear() const` | Returns an empty set with the same comparator. | $O(1)$ |
 | `PersistentOrderedSet insert(T key) const` | Returns a new set with `key` inserted; if `key` exists, returns an equivalent set. | $O(\log N)$ |
 | `PersistentOrderedSet erase(const T& key) const` | Returns a new set with `key` removed if it exists. | $O(\log N)$ |
 | `bool contains(const T& key) const` | Returns whether `key` exists. | $O(\log N)$ |
@@ -55,12 +60,14 @@ Pointers returned by bound and predecessor/successor methods remain valid while 
 | `const T* max_le(const T& key) const` | Returns the largest key less than or equal to `key`, or `nullptr`. | $O(\log N)$ |
 | `const T* max_lt(const T& key) const` | Returns the largest key strictly less than `key`, or `nullptr`. | $O(\log N)$ |
 | `const T* min() const`, `const T* max() const` | Returns the minimum or maximum key, or `nullptr` if the set is empty. | $O(\log N)$ |
+| `std::pair<PersistentOrderedSet, PersistentOrderedSet> split(const T& key) const` | Returns `{less, greater_equal}` without changing this version. | $O(\log N)$ |
+| `PersistentOrderedSet merge(const PersistentOrderedSet& other) const` | Returns the union without changing either version. Requires every key in `*this` to be smaller than every key in `other`. | $O(\log(N + M))$ |
 | `std::vector<T> to_vector() const` | Returns all keys in sorted order. | $O(N)$ |
 
 ## Example
 
 ```cpp
-#include "ds/ordered_set/persistent_ordered_set.hpp"
+#include "ds/bst/persistent_ordered_set.hpp"
 
 #include <iostream>
 
@@ -68,6 +75,8 @@ int main() {
     m1une::ds::PersistentOrderedSet<int> a;
     auto b = a.insert(3).insert(1).insert(3);
     auto c = b.erase(3);
+    auto [small, large] = b.split(3);
+    auto joined = small.merge(large);
 
     std::cout << a.size() << "\n";  // 0
     std::cout << b.size() << "\n";  // 2

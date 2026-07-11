@@ -1,7 +1,8 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/ordered_set"
 
-#include "../../../ds/ordered_set/ordered_set.hpp"
+#include "../../../ds/bst/persistent_ordered_set.hpp"
 
+#include <cassert>
 #include <iostream>
 
 void fast_io() {
@@ -12,14 +13,24 @@ void fast_io() {
 int main() {
     fast_io();
 
+    m1une::ds::PersistentOrderedSet<int> pointer_test = {1, 3, 5};
+    const int* stable_pointer = pointer_test.lower_bound(3);
+    auto pointer_test_next = pointer_test;
+    for (int x = 10; x < 1000; x++) pointer_test_next = pointer_test_next.insert(x);
+    assert(stable_pointer && *stable_pointer == 3);
+    auto [small, large] = pointer_test_next.split(500);
+    auto joined = small.merge(large);
+    assert(pointer_test_next.size() == joined.size());
+    assert(pointer_test_next.to_vector() == joined.to_vector());
+
     int N, Q;
     std::cin >> N >> Q;
 
-    m1une::ds::OrderedSet<int> st;
+    m1une::ds::PersistentOrderedSet<int> st;
     for (int i = 0; i < N; i++) {
         int a;
         std::cin >> a;
-        st.insert(a);
+        st = st.insert(a);
     }
 
     while (Q--) {
@@ -27,9 +38,9 @@ int main() {
         std::cin >> type >> x;
 
         if (type == 0) {
-            st.insert(x);
+            st = st.insert(x);
         } else if (type == 1) {
-            st.erase(x);
+            st = st.erase(x);
         } else if (type == 2) {
             if (st.size() < x) {
                 std::cout << -1 << '\n';

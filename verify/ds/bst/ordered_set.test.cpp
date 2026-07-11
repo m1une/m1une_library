@@ -1,9 +1,10 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/ordered_set"
 
-#include "../../../ds/ordered_set/persistent_ordered_set.hpp"
+#include "../../../ds/bst/ordered_set.hpp"
 
 #include <cassert>
 #include <iostream>
+#include <utility>
 
 void fast_io() {
     std::ios_base::sync_with_stdio(false);
@@ -13,20 +14,19 @@ void fast_io() {
 int main() {
     fast_io();
 
-    m1une::ds::PersistentOrderedSet<int> pointer_test = {1, 3, 5};
-    const int* stable_pointer = pointer_test.lower_bound(3);
-    auto pointer_test_next = pointer_test;
-    for (int x = 10; x < 1000; x++) pointer_test_next = pointer_test_next.insert(x);
-    assert(stable_pointer && *stable_pointer == 3);
+    m1une::ds::OrderedSet<int> split_test = {1, 3, 5};
+    auto [small, large] = std::move(split_test).split(3);
+    split_test = std::move(small).merge(std::move(large));
+    assert(split_test.size() == 3 && split_test.kth(1) == 3);
 
     int N, Q;
     std::cin >> N >> Q;
 
-    m1une::ds::PersistentOrderedSet<int> st;
+    m1une::ds::OrderedSet<int> st;
     for (int i = 0; i < N; i++) {
         int a;
         std::cin >> a;
-        st = st.insert(a);
+        st.insert(a);
     }
 
     while (Q--) {
@@ -34,9 +34,9 @@ int main() {
         std::cin >> type >> x;
 
         if (type == 0) {
-            st = st.insert(x);
+            st.insert(x);
         } else if (type == 1) {
-            st = st.erase(x);
+            st.erase(x);
         } else if (type == 2) {
             if (st.size() < x) {
                 std::cout << -1 << '\n';

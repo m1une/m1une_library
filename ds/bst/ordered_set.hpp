@@ -16,6 +16,8 @@ struct OrderedSet {
    private:
     OrderedMultiset<T, Compare> data;
 
+    explicit OrderedSet(OrderedMultiset<T, Compare> multiset) : data(std::move(multiset)) {}
+
    public:
     explicit OrderedSet(Compare compare) : data(std::move(compare)) {}
 
@@ -125,6 +127,15 @@ struct OrderedSet {
 
     const T* max() const {
         return data.max();
+    }
+
+    std::pair<OrderedSet, OrderedSet> split(const T& key) && {
+        auto [l, r] = std::move(data).split(key);
+        return {OrderedSet(std::move(l)), OrderedSet(std::move(r))};
+    }
+
+    OrderedSet merge(OrderedSet other) && {
+        return OrderedSet(std::move(data).merge(std::move(other.data)));
     }
 
     std::vector<T> to_vector() const {

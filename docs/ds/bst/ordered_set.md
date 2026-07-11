@@ -1,11 +1,15 @@
 ---
 title: Ordered Set
-documentation_of: ../../../ds/ordered_set/ordered_set.hpp
+documentation_of: ../../../ds/bst/ordered_set.hpp
 ---
 
 ## Overview
 
 `OrderedSet` is a randomized binary search tree for sets. It keeps unique keys only, like `std::set`, and also supports order-statistics queries such as k-th element and rank.
+
+`split(key)` consumes a tree and partitions it into keys `< key` and keys
+`>= key`. `merge(other)` consumes two trees whose key ranges are strictly
+ordered.
 
 Pointers returned by bound and predecessor/successor methods remain valid until the set is modified.
 
@@ -13,6 +17,8 @@ Pointers returned by bound and predecessor/successor methods remain valid until 
 
 * `T`: The key type.
 * `Compare`: Ordering predicate. Defaults to `std::less<T>`.
+
+Trees passed to `merge` must use equivalent comparator state.
 
 ## Constructors
 
@@ -52,20 +58,26 @@ Pointers returned by bound and predecessor/successor methods remain valid until 
 | `const T* max_le(const T& key) const` | Returns the largest key less than or equal to `key`, or `nullptr`. | $O(\log N)$ |
 | `const T* max_lt(const T& key) const` | Returns the largest key strictly less than `key`, or `nullptr`. | $O(\log N)$ |
 | `const T* min() const`, `const T* max() const` | Returns the minimum or maximum key, or `nullptr` if the set is empty. | $O(\log N)$ |
+| `std::pair<OrderedSet, OrderedSet> split(const T& key) &&` | Consumes the set and returns `{less, greater_equal}`. | Expected $O(\log N)$ |
+| `OrderedSet merge(OrderedSet other) &&` | Consumes both sets and returns their union. Requires every key in `*this` to be smaller than every key in `other`. | Expected $O(\log(N + M))$ |
 | `std::vector<T> to_vector() const` | Returns all keys in sorted order. | $O(N)$ |
 
 ## Example
 
 ```cpp
-#include "ds/ordered_set/ordered_set.hpp"
+#include "ds/bst/ordered_set.hpp"
 
 #include <iostream>
+#include <utility>
 
 int main() {
     m1une::ds::OrderedSet<int> st = {3, 1, 3, 5};
 
     st.insert(2);
     st.erase(3);
+
+    auto [small, large] = std::move(st).split(4);
+    st = std::move(small).merge(std::move(large));
 
     std::cout << st.kth(1) << "\n";           // 2
     std::cout << st.order_of_key(5) << "\n";  // 2

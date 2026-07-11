@@ -132,6 +132,15 @@ struct PersistentOrderedSet {
         return data.max();
     }
 
+    std::pair<PersistentOrderedSet, PersistentOrderedSet> split(const T& key) const {
+        auto [l, r] = data.split(key);
+        return {PersistentOrderedSet(std::move(l)), PersistentOrderedSet(std::move(r))};
+    }
+
+    PersistentOrderedSet merge(const PersistentOrderedSet& other) const {
+        return PersistentOrderedSet(data.merge(other.data));
+    }
+
     std::vector<T> to_vector() const {
         return data.to_vector();
     }

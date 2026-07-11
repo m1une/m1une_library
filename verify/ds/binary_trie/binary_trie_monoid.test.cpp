@@ -1,6 +1,6 @@
-#define PROBLEM "https://judge.yosupo.jp/problem/aplusb"
+#define PROBLEM "https://judge.yosupo.jp/problem/set_xor_min"
 
-#include "../../../ds/ordered_set/binary_trie_monoid.hpp"
+#include "../../../ds/binary_trie/binary_trie_monoid.hpp"
 #include "../../../monoid/add.hpp"
 #include "../../../monoid/mul.hpp"
 
@@ -232,7 +232,21 @@ int main() {
     basic_test();
     randomized_test();
 
-    long long a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    using Sum = m1une::monoid::Add<int>;
+    m1une::ds::BinaryTrieMonoid<Sum, std::uint32_t, 30> trie;
+
+    int q;
+    std::cin >> q;
+    while (q--) {
+        int type;
+        std::uint32_t value;
+        std::cin >> type >> value;
+        if (type == 0) {
+            if (!trie.contains(value)) trie.insert(value, 0);
+        } else if (type == 1) {
+            trie.erase_all(value);
+        } else {
+            std::cout << trie.min_xor(value) << '\n';
+        }
+    }
 }

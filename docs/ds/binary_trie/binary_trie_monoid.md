@@ -1,6 +1,6 @@
 ---
 title: Binary Trie with Monoid
-documentation_of: ../../../ds/ordered_set/binary_trie_monoid.hpp
+documentation_of: ../../../ds/binary_trie/binary_trie_monoid.hpp
 ---
 
 ## Overview
@@ -116,7 +116,7 @@ xor operand.
 ## Example
 
 ```cpp
-#include "ds/ordered_set/binary_trie_monoid.hpp"
+#include "ds/binary_trie/binary_trie_monoid.hpp"
 #include "monoid/mul.hpp"
 
 #include <cstdint>

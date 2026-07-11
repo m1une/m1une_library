@@ -1,31 +1,40 @@
 ---
-title: Ordered Multiset
-documentation_of: ../../../ds/ordered_set/ordered_multiset.hpp
+title: Persistent Ordered Multiset
+documentation_of: ../../../ds/bst/persistent_ordered_multiset.hpp
 ---
 
 ## Overview
 
-`OrderedMultiset` is a randomized binary search tree for multisets. It stores equal keys as one node with a multiplicity, so it supports standard multiset operations plus order-statistics queries such as k-th element and rank.
+`PersistentOrderedMultiset` is a path-copying red-black tree for multisets.
+Updates, splits, and merges return new versions and leave every input version
+available. Equal keys are stored as one leaf with a multiplicity.
 
-Pointers returned by bound and predecessor/successor methods remain valid until the multiset is modified.
+Nodes are stored in a specialization-wide append-only chunked pool and refer to
+children by integer index. This avoids per-node allocation and reference-counted
+child pointers. The pool is released when the program exits.
+
+Pointers returned by bound and predecessor/successor methods remain valid for
+the remainder of the program.
 
 ## Template Parameters
 
 * `T`: The key type.
 * `Compare`: Ordering predicate. Defaults to `std::less<T>`.
 
+Trees passed to `merge` must use equivalent comparator state.
+
 ## Constructors
 
-* `OrderedMultiset()`
+* `PersistentOrderedMultiset()`
   Constructs an empty multiset. ($O(1)$)
 
-* `OrderedMultiset(Compare compare)`
+* `PersistentOrderedMultiset(Compare compare)`
   Constructs an empty multiset with a custom comparator. ($O(1)$)
 
-* `OrderedMultiset(std::initializer_list<T> init)`
+* `PersistentOrderedMultiset(std::initializer_list<T> init)`
   Constructs a multiset from an initializer list. ($O(N \log N)$)
 
-* `OrderedMultiset(Iterator first, Iterator last)`
+* `PersistentOrderedMultiset(Iterator first, Iterator last)`
   Constructs a multiset from a range. ($O(N \log N)$)
 
 ## Methods
@@ -35,11 +44,11 @@ Pointers returned by bound and predecessor/successor methods remain valid until 
 | `int size() const` | Returns the total number of elements, including duplicates. | $O(1)$ |
 | `int unique_size() const` | Returns the number of distinct keys. | $O(1)$ |
 | `bool empty() const` | Returns whether the multiset is empty. | $O(1)$ |
-| `void clear()` | Removes all elements. | $O(1)$ |
-| `void insert(T key, int multiplicity = 1)` | Inserts `multiplicity` copies of `key`. | $O(\log N)$ |
-| `bool erase_one(const T& key)` | Removes one copy of `key`; returns whether an element was removed. | $O(\log N)$ |
-| `bool erase(const T& key)` | Alias for `erase_one(key)`. | $O(\log N)$ |
-| `int erase_all(const T& key)` | Removes all copies of `key` and returns the number removed. | $O(\log N)$ |
+| `PersistentOrderedMultiset clear() const` | Returns an empty multiset with the same comparator. | $O(1)$ |
+| `PersistentOrderedMultiset insert(T key, int multiplicity = 1) const` | Returns a new multiset with `multiplicity` copies of `key` inserted. | $O(\log N)$ |
+| `PersistentOrderedMultiset erase_one(const T& key) const` | Returns a new multiset with one copy of `key` removed if it exists. | $O(\log N)$ |
+| `PersistentOrderedMultiset erase(const T& key) const` | Alias for `erase_one(key)`. | $O(\log N)$ |
+| `PersistentOrderedMultiset erase_all(const T& key) const` | Returns a new multiset with all copies of `key` removed if it exists. | $O(\log N)$ |
 | `bool contains(const T& key) const` | Returns whether `key` exists. | $O(\log N)$ |
 | `int count(const T& key) const` | Returns the multiplicity of `key`. | $O(\log N)$ |
 | `const T* find_by_order(int k) const` | Returns a pointer to the 0-indexed `k`-th smallest element. Requires `0 <= k < size()`. | $O(\log N)$ |
@@ -54,26 +63,26 @@ Pointers returned by bound and predecessor/successor methods remain valid until 
 | `const T* max_le(const T& key) const` | Returns the largest element less than or equal to `key`, or `nullptr`. | $O(\log N)$ |
 | `const T* max_lt(const T& key) const` | Returns the largest element strictly less than `key`, or `nullptr`. | $O(\log N)$ |
 | `const T* min() const`, `const T* max() const` | Returns the minimum or maximum element, or `nullptr` if the multiset is empty. | $O(\log N)$ |
+| `std::pair<PersistentOrderedMultiset, PersistentOrderedMultiset> split(const T& key) const` | Returns `{less, greater_equal}` without changing this version. | $O(\log N)$ |
+| `PersistentOrderedMultiset merge(const PersistentOrderedMultiset& other) const` | Returns the union without changing either version. Requires every key in `*this` to be smaller than every key in `other`. | $O(\log(N + M))$ |
 | `std::vector<T> to_vector() const` | Returns all elements in sorted order, including duplicates. | $O(N)$ |
 
 ## Example
 
 ```cpp
-#include "ds/ordered_set/ordered_multiset.hpp"
+#include "ds/bst/persistent_ordered_multiset.hpp"
 
 #include <iostream>
 
 int main() {
-    m1une::ds::OrderedMultiset<int> ms = {3, 1, 3, 5};
+    m1une::ds::PersistentOrderedMultiset<int> a;
+    auto b = a.insert(3).insert(1).insert(3);
+    auto c = b.erase_one(3);
+    auto [small, large] = b.split(3);
+    auto joined = small.merge(large);
 
-    ms.insert(2);
-    ms.erase_one(3);
-
-    std::cout << ms.kth(2) << "\n";           // 3
-    std::cout << ms.order_of_key(4) << "\n";  // 3
-
-    if (auto p = ms.max_le(4)) {
-        std::cout << *p << "\n";              // 3
-    }
+    std::cout << a.size() << "\n";  // 0
+    std::cout << b.count(3) << "\n";  // 2
+    std::cout << c.count(3) << "\n";  // 1
 }
 ```

@@ -1,6 +1,6 @@
 ---
 title: Binary Trie
-documentation_of: ../../../ds/ordered_set/binary_trie.hpp
+documentation_of: ../../../ds/binary_trie/binary_trie.hpp
 ---
 
 ## Overview
@@ -79,7 +79,7 @@ Here $K$ is the allocated node count. Erasing does not reclaim nodes.
 ## Example
 
 ```cpp
-#include "ds/ordered_set/binary_trie.hpp"
+#include "ds/binary_trie/binary_trie.hpp"
 
 #include <cstdint>
 #include <iostream>
