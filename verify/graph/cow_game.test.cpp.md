@@ -47,6 +47,9 @@ data:
     path: graph/dominator_tree.hpp
     title: Dominator Tree
   - icon: ':heavy_check_mark:'
+    path: graph/eulerian_trail.hpp
+    title: Eulerian Trail
+  - icon: ':heavy_check_mark:'
     path: graph/flow/bounded_flow.hpp
     title: Bounded Flow
   - icon: ':heavy_check_mark:'
@@ -295,6 +298,7 @@ data:
   - graph/directed.hpp
   - graph/cycle_detection.hpp
   - graph/graph.hpp
+  - graph/eulerian_trail.hpp
   - graph/scc.hpp
   - graph/shortest_path.hpp
   - graph/bellman_ford.hpp
@@ -349,7 +353,7 @@ data:
   isVerificationFile: true
   path: verify/graph/cow_game.test.cpp
   requiredBy: []
-  timestamp: '2026-07-11 19:47:32+09:00'
+  timestamp: '2026-07-11 20:05:57+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/cow_game.test.cpp

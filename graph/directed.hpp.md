@@ -20,6 +20,9 @@ data:
     path: graph/dijkstra.hpp
     title: Dijkstra
   - icon: ':heavy_check_mark:'
+    path: graph/eulerian_trail.hpp
+    title: Eulerian Trail
+  - icon: ':heavy_check_mark:'
     path: graph/graph.hpp
     title: Graph
   - icon: ':heavy_check_mark:'
@@ -151,17 +154,100 @@ data:
     \ }\n        color[v] = 2;\n        return false;\n    };\n\n    for (int v =\
     \ 0; v < n; v++) {\n        if (color[v] == 0 && dfs(dfs, v, -1)) break;\n   \
     \ }\n    return result;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\n\
-    \n#line 1 \"graph/scc.hpp\"\n\n\n\n#line 8 \"graph/scc.hpp\"\n\n#line 10 \"graph/scc.hpp\"\
-    \n\nnamespace m1une {\nnamespace graph {\n\nstruct SccResult {\n    int count;\n\
-    \    std::vector<int> comp;\n    std::vector<std::vector<int>> groups;\n\n   \
-    \ bool same(int u, int v) const {\n        assert(0 <= u && u < int(comp.size()));\n\
-    \        assert(0 <= v && v < int(comp.size()));\n        return comp[u] == comp[v];\n\
-    \    }\n\n    template <class T>\n    Graph<int> dag(const Graph<T>& g) const\
-    \ {\n        std::vector<std::pair<int, int>> edges;\n        for (int v = 0;\
-    \ v < g.size(); v++) {\n            for (const auto& e : g[v]) {\n           \
-    \     if (!e.alive) continue;\n                int a = comp[e.from], b = comp[e.to];\n\
-    \                if (a != b) edges.emplace_back(a, b);\n            }\n      \
-    \  }\n        std::sort(edges.begin(), edges.end());\n        edges.erase(std::unique(edges.begin(),\
+    \n#line 1 \"graph/eulerian_trail.hpp\"\n\n\n\n#line 6 \"graph/eulerian_trail.hpp\"\
+    \n#include <optional>\n#line 9 \"graph/eulerian_trail.hpp\"\n\n#line 11 \"graph/eulerian_trail.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\nstruct EulerianTrail {\n    std::vector<int>\
+    \ vertices;\n    std::vector<int> edge_ids;\n\n    int edge_count() const {\n\
+    \        return int(edge_ids.size());\n    }\n\n    bool is_circuit() const {\n\
+    \        return vertices.empty() || vertices.front() == vertices.back();\n   \
+    \ }\n};\n\nnamespace internal {\n\ntemplate <class T>\nstd::optional<EulerianTrail>\
+    \ hierholzer(\n    const Graph<T>& graph,\n    int start,\n    int active_edge_count\n\
+    ) {\n    EulerianTrail result;\n    if (active_edge_count == 0) {\n        if\
+    \ (start != -1) result.vertices.push_back(start);\n        return result;\n  \
+    \  }\n\n    assert(0 <= start && start < graph.size());\n    std::vector<char>\
+    \ used(graph.edge_count(), false);\n    std::vector<int> cursor(graph.size(),\
+    \ 0);\n    std::vector<int> vertex_stack(1, start);\n    std::vector<int> incoming_edge_stack(1,\
+    \ -1);\n    std::vector<int> reversed_vertices;\n    std::vector<int> reversed_edges;\n\
+    \    reversed_vertices.reserve(active_edge_count + 1);\n    reversed_edges.reserve(active_edge_count);\n\
+    \n    while (!vertex_stack.empty()) {\n        const int vertex = vertex_stack.back();\n\
+    \        while (cursor[vertex] < int(graph[vertex].size())) {\n            const\
+    \ Edge<T>& edge = graph[vertex][cursor[vertex]];\n            if (edge.alive &&\
+    \ !used[edge.id]) break;\n            cursor[vertex]++;\n        }\n\n       \
+    \ if (cursor[vertex] < int(graph[vertex].size())) {\n            const Edge<T>&\
+    \ edge = graph[vertex][cursor[vertex]++];\n            used[edge.id] = true;\n\
+    \            vertex_stack.push_back(edge.to);\n            incoming_edge_stack.push_back(edge.id);\n\
+    \            continue;\n        }\n\n        reversed_vertices.push_back(vertex);\n\
+    \        const int incoming_edge = incoming_edge_stack.back();\n        if (incoming_edge\
+    \ != -1) reversed_edges.push_back(incoming_edge);\n        vertex_stack.pop_back();\n\
+    \        incoming_edge_stack.pop_back();\n    }\n\n    if (int(reversed_edges.size())\
+    \ != active_edge_count) return std::nullopt;\n    std::reverse(reversed_vertices.begin(),\
+    \ reversed_vertices.end());\n    std::reverse(reversed_edges.begin(), reversed_edges.end());\n\
+    \    result.vertices = std::move(reversed_vertices);\n    result.edge_ids = std::move(reversed_edges);\n\
+    \    return result;\n}\n\ntemplate <class T>\nstd::vector<int> edge_incidence_count(const\
+    \ Graph<T>& graph) {\n    std::vector<int> count(graph.edge_count(), 0);\n   \
+    \ for (int vertex = 0; vertex < graph.size(); vertex++) {\n        for (const\
+    \ Edge<T>& edge : graph[vertex]) {\n            if (!edge.alive) continue;\n \
+    \           assert(0 <= edge.id && edge.id < graph.edge_count());\n          \
+    \  count[edge.id]++;\n        }\n    }\n    return count;\n}\n\n}  // namespace\
+    \ internal\n\ntemplate <class T>\nstd::optional<EulerianTrail> directed_eulerian_trail(\n\
+    \    const Graph<T>& graph,\n    int start = -1\n) {\n    assert(start == -1 ||\
+    \ (0 <= start && start < graph.size()));\n    const int n = graph.size();\n  \
+    \  std::vector<int> incidence = internal::edge_incidence_count(graph);\n    std::vector<int>\
+    \ in_degree(n, 0);\n    std::vector<int> out_degree(n, 0);\n    int active_edge_count\
+    \ = 0;\n    for (int vertex = 0; vertex < n; vertex++) {\n        for (const Edge<T>&\
+    \ edge : graph[vertex]) {\n            if (!edge.alive) continue;\n          \
+    \  out_degree[vertex]++;\n            in_degree[edge.to]++;\n        }\n    }\n\
+    \    for (int count : incidence) {\n        if (count == 0) continue;\n      \
+    \  assert(count == 1);\n        active_edge_count++;\n    }\n\n    int required_start\
+    \ = -1;\n    int required_end = -1;\n    for (int vertex = 0; vertex < n; vertex++)\
+    \ {\n        const int difference = out_degree[vertex] - in_degree[vertex];\n\
+    \        if (difference == 1) {\n            if (required_start != -1) return\
+    \ std::nullopt;\n            required_start = vertex;\n        } else if (difference\
+    \ == -1) {\n            if (required_end != -1) return std::nullopt;\n       \
+    \     required_end = vertex;\n        } else if (difference != 0) {\n        \
+    \    return std::nullopt;\n        }\n    }\n    if ((required_start == -1) !=\
+    \ (required_end == -1)) return std::nullopt;\n\n    int chosen_start = start;\n\
+    \    if (active_edge_count == 0) {\n        if (chosen_start == -1 && n > 0) chosen_start\
+    \ = 0;\n        return internal::hierholzer(graph, chosen_start, 0);\n    }\n\
+    \    if (required_start != -1) {\n        if (chosen_start != -1 && chosen_start\
+    \ != required_start) return std::nullopt;\n        chosen_start = required_start;\n\
+    \    } else if (chosen_start == -1) {\n        for (int vertex = 0; vertex < n;\
+    \ vertex++) {\n            if (out_degree[vertex] > 0) {\n                chosen_start\
+    \ = vertex;\n                break;\n            }\n        }\n    } else if (out_degree[chosen_start]\
+    \ == 0) {\n        return std::nullopt;\n    }\n    return internal::hierholzer(graph,\
+    \ chosen_start, active_edge_count);\n}\n\ntemplate <class T>\nstd::optional<EulerianTrail>\
+    \ undirected_eulerian_trail(\n    const Graph<T>& graph,\n    int start = -1\n\
+    ) {\n    assert(start == -1 || (0 <= start && start < graph.size()));\n    const\
+    \ int n = graph.size();\n    std::vector<int> incidence = internal::edge_incidence_count(graph);\n\
+    \    std::vector<int> degree(n, 0);\n    int active_edge_count = 0;\n    for (int\
+    \ vertex = 0; vertex < n; vertex++) {\n        for (const Edge<T>& edge : graph[vertex])\
+    \ {\n            if (edge.alive) degree[vertex]++;\n        }\n    }\n    for\
+    \ (int count : incidence) {\n        if (count == 0) continue;\n        assert(count\
+    \ == 2);\n        active_edge_count++;\n    }\n\n    std::vector<int> odd;\n \
+    \   for (int vertex = 0; vertex < n; vertex++) {\n        if (degree[vertex] &\
+    \ 1) odd.push_back(vertex);\n    }\n    if (!odd.empty() && odd.size() != 2) return\
+    \ std::nullopt;\n\n    int chosen_start = start;\n    if (active_edge_count ==\
+    \ 0) {\n        if (chosen_start == -1 && n > 0) chosen_start = 0;\n        return\
+    \ internal::hierholzer(graph, chosen_start, 0);\n    }\n    if (odd.size() ==\
+    \ 2) {\n        if (chosen_start != -1 && chosen_start != odd[0] && chosen_start\
+    \ != odd[1]) {\n            return std::nullopt;\n        }\n        if (chosen_start\
+    \ == -1) chosen_start = odd[0];\n    } else if (chosen_start == -1) {\n      \
+    \  for (int vertex = 0; vertex < n; vertex++) {\n            if (degree[vertex]\
+    \ > 0) {\n                chosen_start = vertex;\n                break;\n   \
+    \         }\n        }\n    } else if (degree[chosen_start] == 0) {\n        return\
+    \ std::nullopt;\n    }\n    return internal::hierholzer(graph, chosen_start, active_edge_count);\n\
+    }\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/scc.hpp\"\
+    \n\n\n\n#line 8 \"graph/scc.hpp\"\n\n#line 10 \"graph/scc.hpp\"\n\nnamespace m1une\
+    \ {\nnamespace graph {\n\nstruct SccResult {\n    int count;\n    std::vector<int>\
+    \ comp;\n    std::vector<std::vector<int>> groups;\n\n    bool same(int u, int\
+    \ v) const {\n        assert(0 <= u && u < int(comp.size()));\n        assert(0\
+    \ <= v && v < int(comp.size()));\n        return comp[u] == comp[v];\n    }\n\n\
+    \    template <class T>\n    Graph<int> dag(const Graph<T>& g) const {\n     \
+    \   std::vector<std::pair<int, int>> edges;\n        for (int v = 0; v < g.size();\
+    \ v++) {\n            for (const auto& e : g[v]) {\n                if (!e.alive)\
+    \ continue;\n                int a = comp[e.from], b = comp[e.to];\n         \
+    \       if (a != b) edges.emplace_back(a, b);\n            }\n        }\n    \
+    \    std::sort(edges.begin(), edges.end());\n        edges.erase(std::unique(edges.begin(),\
     \ edges.end()), edges.end());\n\n        Graph<int> result(count);\n        for\
     \ (auto [a, b] : edges) result.add_directed_edge(a, b);\n        return result;\n\
     \    }\n};\n\ntemplate <class T>\nSccResult strongly_connected_components(const\
@@ -242,22 +328,21 @@ data:
     \         que.push(e.to);\n        }\n    }\n\n    return result;\n}\n\ntemplate\
     \ <class T>\nBfsResult bfs(const Graph<T>& g, int s) {\n    return bfs(g, std::vector<int>{s});\n\
     }\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/cow_game.hpp\"\
-    \n\n\n\n#line 6 \"graph/cow_game.hpp\"\n#include <optional>\n#include <type_traits>\n\
-    #line 10 \"graph/cow_game.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\ntemplate\
-    \ <class T>\nstruct CowGameConstraint {\n    int from;\n    int to;\n    T upper_bound;\n\
-    };\n\ntemplate <class T>\nstruct CowGameSolution {\n    bool feasible = false;\n\
-    \    std::vector<T> value;\n\n    bool is_feasible() const {\n        return feasible;\n\
-    \    }\n};\n\ntemplate <class T>\nstruct CowGameUpperBounds {\n    bool feasible;\n\
-    \    std::vector<T> upper_bound;\n    T inf;\n\n    bool is_feasible() const {\n\
-    \        return feasible;\n    }\n\n    bool bounded(int variable) const {\n \
-    \       assert(0 <= variable && variable < int(upper_bound.size()));\n       \
-    \ return feasible && upper_bound[variable] != inf;\n    }\n};\n\ntemplate <class\
-    \ T>\nstruct CowGameDifferenceBounds {\n    bool feasible;\n    std::optional<T>\
-    \ lower_bound;\n    std::optional<T> upper_bound;\n\n    bool is_feasible() const\
-    \ {\n        return feasible;\n    }\n\n    bool bounded_below() const {\n   \
-    \     return feasible && lower_bound.has_value();\n    }\n\n    bool bounded_above()\
-    \ const {\n        return feasible && upper_bound.has_value();\n    }\n};\n\n\
-    template <class T>\nclass CowGame {\n    static_assert(std::is_arithmetic_v<T>\
+    \n\n\n\n#line 7 \"graph/cow_game.hpp\"\n#include <type_traits>\n#line 10 \"graph/cow_game.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\ntemplate <class T>\nstruct CowGameConstraint\
+    \ {\n    int from;\n    int to;\n    T upper_bound;\n};\n\ntemplate <class T>\n\
+    struct CowGameSolution {\n    bool feasible = false;\n    std::vector<T> value;\n\
+    \n    bool is_feasible() const {\n        return feasible;\n    }\n};\n\ntemplate\
+    \ <class T>\nstruct CowGameUpperBounds {\n    bool feasible;\n    std::vector<T>\
+    \ upper_bound;\n    T inf;\n\n    bool is_feasible() const {\n        return feasible;\n\
+    \    }\n\n    bool bounded(int variable) const {\n        assert(0 <= variable\
+    \ && variable < int(upper_bound.size()));\n        return feasible && upper_bound[variable]\
+    \ != inf;\n    }\n};\n\ntemplate <class T>\nstruct CowGameDifferenceBounds {\n\
+    \    bool feasible;\n    std::optional<T> lower_bound;\n    std::optional<T> upper_bound;\n\
+    \n    bool is_feasible() const {\n        return feasible;\n    }\n\n    bool\
+    \ bounded_below() const {\n        return feasible && lower_bound.has_value();\n\
+    \    }\n\n    bool bounded_above() const {\n        return feasible && upper_bound.has_value();\n\
+    \    }\n};\n\ntemplate <class T>\nclass CowGame {\n    static_assert(std::is_arithmetic_v<T>\
     \ && std::is_signed_v<T>);\n\n    struct RelaxationResult {\n        bool has_negative_cycle;\n\
     \        std::vector<T> dist;\n    };\n\n    int _n;\n    std::vector<CowGameConstraint<T>>\
     \ _constraints;\n    mutable bool _solution_cached = false;\n    mutable CowGameSolution<T>\
@@ -530,7 +615,7 @@ data:
     \    assert(_solved && _satisfiable);\n        return _answer;\n    }\n\n    bool\
     \ value(int variable) const {\n        assert(_solved && _satisfiable);\n    \
     \    assert(0 <= variable && variable < _n);\n        return _answer[variable];\n\
-    \    }\n};\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 10 \"graph/directed.hpp\"\
+    \    }\n};\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 11 \"graph/directed.hpp\"\
     \n\n\n"
   code: '#ifndef M1UNE_GRAPH_DIRECTED_HPP
 
@@ -538,6 +623,8 @@ data:
 
 
     #include "cycle_detection.hpp"
+
+    #include "eulerian_trail.hpp"
 
     #include "graph.hpp"
 
@@ -556,6 +643,7 @@ data:
   dependsOn:
   - graph/cycle_detection.hpp
   - graph/graph.hpp
+  - graph/eulerian_trail.hpp
   - graph/scc.hpp
   - graph/shortest_path.hpp
   - graph/bellman_ford.hpp
@@ -571,7 +659,7 @@ data:
   path: graph/directed.hpp
   requiredBy:
   - graph/all.hpp
-  timestamp: '2026-07-11 19:47:32+09:00'
+  timestamp: '2026-07-11 20:05:57+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
@@ -599,6 +687,7 @@ depends on edge direction.
 | `graph/scc.hpp` | Directed only | Strongly connected components and condensation DAG. |
 | `graph/two_sat.hpp` | Implication graph | 2-SAT clauses, satisfiability, and one assignment. |
 | `graph/cycle_detection.hpp` | Directed and undirected variants | Use `find_directed_cycle(g)` for directed graphs. |
+| `graph/eulerian_trail.hpp` | Directed and undirected variants | Use `directed_eulerian_trail(g)` for directed graphs. |
 
 ## Complexity
 

@@ -44,6 +44,9 @@ data:
     path: graph/dominator_tree.hpp
     title: Dominator Tree
   - icon: ':heavy_check_mark:'
+    path: graph/eulerian_trail.hpp
+    title: Eulerian Trail
+  - icon: ':heavy_check_mark:'
     path: graph/flow/bounded_flow.hpp
     title: Bounded Flow
   - icon: ':heavy_check_mark:'
@@ -258,6 +261,7 @@ data:
   - graph/directed.hpp
   - graph/cycle_detection.hpp
   - graph/graph.hpp
+  - graph/eulerian_trail.hpp
   - graph/scc.hpp
   - graph/shortest_path.hpp
   - graph/bellman_ford.hpp
@@ -312,7 +316,7 @@ data:
   isVerificationFile: false
   path: graph/all.hpp
   requiredBy: []
-  timestamp: '2026-07-11 19:47:32+09:00'
+  timestamp: '2026-07-11 20:05:57+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
@@ -367,6 +371,7 @@ Public namespaces stay flat and short: general graph helpers use
 | `graph/namori.hpp` | Undirected Namori graph | Decomposes each unicyclic component into its cycle and attached rooted trees. |
 | `graph/connected_components.hpp` | Direction ignored | Weak/ordinary connected components. |
 | `graph/cycle_detection.hpp` | Directed and undirected variants | Finds one cycle with the matching function. |
+| `graph/eulerian_trail.hpp` | Directed and undirected variants | Hierholzer Eulerian trails with original edge IDs. |
 | `graph/kruskal.hpp` | Undirected only | Minimum spanning forest. |
 
 ## Example

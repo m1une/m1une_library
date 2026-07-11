@@ -39,6 +39,9 @@ data:
     path: graph/dominator_tree.hpp
     title: Dominator Tree
   - icon: ':heavy_check_mark:'
+    path: graph/eulerian_trail.hpp
+    title: Eulerian Trail
+  - icon: ':heavy_check_mark:'
     path: graph/general_matching.hpp
     title: General Matching
   - icon: ':heavy_check_mark:'
@@ -147,6 +150,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/dominator_tree.test.cpp
     title: verify/graph/dominator_tree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/eulerian_trail_directed.test.cpp
+    title: verify/graph/eulerian_trail_directed.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/eulerian_trail_undirected.test.cpp
+    title: verify/graph/eulerian_trail_undirected.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/graph_algorithms.test.cpp
     title: verify/graph/graph_algorithms.test.cpp
@@ -347,6 +356,7 @@ data:
   - graph/minimum_steiner_tree.hpp
   - graph/bellman_ford.hpp
   - graph/dag_shortest_path.hpp
+  - graph/eulerian_trail.hpp
   - graph/namori.hpp
   - graph/tree/zero_one_on_tree.hpp
   - graph/tree/centroid_decomposition.hpp
@@ -395,6 +405,8 @@ data:
   - verify/graph/library_checker_general_matching.test.cpp
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/eulerian_trail_undirected.test.cpp
+  - verify/graph/eulerian_trail_directed.test.cpp
   - verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
   - verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
   - verify/graph/tree/cartesian_tree.test.cpp
