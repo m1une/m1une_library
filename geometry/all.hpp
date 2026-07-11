@@ -3,6 +3,7 @@
 
 #include "angle_sort.hpp"
 #include "circle.hpp"
+#include "closest_pair.hpp"
 #include "convex_hull.hpp"
 #include "farthest_pair.hpp"
 #include "half_plane_intersection.hpp"
