@@ -9,5 +9,6 @@
 #include "lagrange_inversion.hpp"
 #include "linear_recurrence.hpp"
 #include "multipoint_evaluation.hpp"
+#include "polynomial_factorization.hpp"
 
 #endif  // M1UNE_FPS_ALL_HPP
