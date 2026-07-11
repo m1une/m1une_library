@@ -14,6 +14,7 @@
 #include "fps/all.hpp"
 #include "matrix/all.hpp"
 #include "modint.hpp"
+#include "modular_square_root.hpp"
 #include "number_theory.hpp"
 #include "partition_function.hpp"
 #include "prime_factorization.hpp"

@@ -8,51 +8,11 @@
 #include <utility>
 #include <vector>
 
+#include "../modular_square_root.hpp"
 #include "convolution.hpp"
 
 namespace m1une {
 namespace fps {
-
-namespace internal {
-
-template <class Mint>
-std::optional<Mint> modular_square_root(Mint value) {
-    const uint32_t mod = Mint::mod();
-    if (value == Mint(0)) return Mint(0);
-    if (mod == 2) return value;
-    if (value.pow((mod - 1) / 2) != Mint(1)) return std::nullopt;
-    if (mod % 4 == 3) return value.pow((mod + 1) / 4);
-
-    uint32_t q = mod - 1;
-    int s = 0;
-    while ((q & 1) == 0) {
-        q >>= 1;
-        s++;
-    }
-
-    Mint z = 2;
-    while (z.pow((mod - 1) / 2) == Mint(1)) ++z;
-    Mint c = z.pow(q);
-    Mint x = value.pow((q + 1) / 2);
-    Mint t = value.pow(q);
-    int m = s;
-    while (t != Mint(1)) {
-        int i = 1;
-        Mint squared = t * t;
-        while (squared != Mint(1)) {
-            squared *= squared;
-            i++;
-        }
-        Mint b = c.pow(uint64_t(1) << (m - i - 1));
-        x *= b;
-        c = b * b;
-        t *= c;
-        m = i;
-    }
-    return x;
-}
-
-}  // namespace internal
 
 template <class Mint>
 struct FormalPowerSeries : std::vector<Mint> {
@@ -298,7 +258,7 @@ struct FormalPowerSeries : std::vector<Mint> {
         if (first & 1) return std::nullopt;
 
         const int shift = first / 2;
-        auto leading_root = internal::modular_square_root((*this)[first]);
+        auto leading_root = m1une::math::modular_square_root((*this)[first]);
         if (!leading_root.has_value()) return std::nullopt;
 
         const int result_degree = degree - shift;
