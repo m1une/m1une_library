@@ -655,6 +655,9 @@ data:
       path: math/modint.hpp
       title: ModInt
     - icon: ':heavy_check_mark:'
+      path: math/modular_square_root.hpp
+      title: Modular Square Root
+    - icon: ':heavy_check_mark:'
       path: math/number_theory.hpp
       title: Number Theory
     - icon: ':heavy_check_mark:'
@@ -1426,6 +1429,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/modint.test.cpp
       title: verify/math/modint.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/modular_square_root.test.cpp
+      title: verify/math/modular_square_root.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/partition_function.test.cpp
       title: verify/math/partition_function.test.cpp

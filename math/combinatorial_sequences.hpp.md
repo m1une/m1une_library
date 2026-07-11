@@ -20,6 +20,9 @@ data:
     path: math/modint.hpp
     title: ModInt
   - icon: ':heavy_check_mark:'
+    path: math/modular_square_root.hpp
+    title: Modular Square Root
+  - icon: ':heavy_check_mark:'
     path: math/partition_function.hpp
     title: Partition Function
   _extendedRequiredBy:
@@ -90,6 +93,7 @@ data:
     \  // M1UNE_MATH_COMBINATORIAL_SEQUENCES_HPP\n"
   dependsOn:
   - math/fps/formal_power_series.hpp
+  - math/modular_square_root.hpp
   - math/fps/convolution.hpp
   - math/fps/internal/ntt998_faster.hpp
   - math/modint.hpp
@@ -100,7 +104,7 @@ data:
   path: math/combinatorial_sequences.hpp
   requiredBy:
   - math/all.hpp
-  timestamp: '2026-07-11 03:31:13+09:00'
+  timestamp: '2026-07-11 19:26:27+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/bell_number.test.cpp

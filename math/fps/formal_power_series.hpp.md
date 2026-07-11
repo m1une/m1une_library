@@ -10,6 +10,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
+  - icon: ':heavy_check_mark:'
+    path: math/modular_square_root.hpp
+    title: Modular Square Root
   _extendedRequiredBy:
   - icon: ':heavy_check_mark:'
     path: graph/all.hpp
@@ -130,23 +133,11 @@ data:
     \ / #ifndef other than include guards\n"
   code: "#ifndef M1UNE_FPS_FORMAL_POWER_SERIES_HPP\n#define M1UNE_FPS_FORMAL_POWER_SERIES_HPP\
     \ 1\n\n#include <algorithm>\n#include <cassert>\n#include <cstdint>\n#include\
-    \ <optional>\n#include <utility>\n#include <vector>\n\n#include \"convolution.hpp\"\
-    \n\nnamespace m1une {\nnamespace fps {\n\nnamespace internal {\n\ntemplate <class\
-    \ Mint>\nstd::optional<Mint> modular_square_root(Mint value) {\n    const uint32_t\
-    \ mod = Mint::mod();\n    if (value == Mint(0)) return Mint(0);\n    if (mod ==\
-    \ 2) return value;\n    if (value.pow((mod - 1) / 2) != Mint(1)) return std::nullopt;\n\
-    \    if (mod % 4 == 3) return value.pow((mod + 1) / 4);\n\n    uint32_t q = mod\
-    \ - 1;\n    int s = 0;\n    while ((q & 1) == 0) {\n        q >>= 1;\n       \
-    \ s++;\n    }\n\n    Mint z = 2;\n    while (z.pow((mod - 1) / 2) == Mint(1))\
-    \ ++z;\n    Mint c = z.pow(q);\n    Mint x = value.pow((q + 1) / 2);\n    Mint\
-    \ t = value.pow(q);\n    int m = s;\n    while (t != Mint(1)) {\n        int i\
-    \ = 1;\n        Mint squared = t * t;\n        while (squared != Mint(1)) {\n\
-    \            squared *= squared;\n            i++;\n        }\n        Mint b\
-    \ = c.pow(uint64_t(1) << (m - i - 1));\n        x *= b;\n        c = b * b;\n\
-    \        t *= c;\n        m = i;\n    }\n    return x;\n}\n\n}  // namespace internal\n\
-    \ntemplate <class Mint>\nstruct FormalPowerSeries : std::vector<Mint> {\n    using\
-    \ std::vector<Mint>::vector;\n    using Fps = FormalPowerSeries;\n\n    FormalPowerSeries()\
-    \ = default;\n    FormalPowerSeries(const std::vector<Mint>& values) : std::vector<Mint>(values)\
+    \ <optional>\n#include <utility>\n#include <vector>\n\n#include \"../modular_square_root.hpp\"\
+    \n#include \"convolution.hpp\"\n\nnamespace m1une {\nnamespace fps {\n\ntemplate\
+    \ <class Mint>\nstruct FormalPowerSeries : std::vector<Mint> {\n    using std::vector<Mint>::vector;\n\
+    \    using Fps = FormalPowerSeries;\n\n    FormalPowerSeries() = default;\n  \
+    \  FormalPowerSeries(const std::vector<Mint>& values) : std::vector<Mint>(values)\
     \ {}\n    FormalPowerSeries(std::vector<Mint>&& values) : std::vector<Mint>(std::move(values))\
     \ {}\n\n    Fps& shrink() {\n        while (!this->empty() && this->back() ==\
     \ Mint(0)) this->pop_back();\n        return *this;\n    }\n\n    Fps pre(int\
@@ -249,7 +240,7 @@ data:
     \ == Mint(0)) first++;\n        if (first == int(this->size())) return Fps(degree);\n\
     \        if (first >= degree) return Fps(degree);\n        if (first & 1) return\
     \ std::nullopt;\n\n        const int shift = first / 2;\n        auto leading_root\
-    \ = internal::modular_square_root((*this)[first]);\n        if (!leading_root.has_value())\
+    \ = m1une::math::modular_square_root((*this)[first]);\n        if (!leading_root.has_value())\
     \ return std::nullopt;\n\n        const int result_degree = degree - shift;\n\
     \        Fps normalized = (*this >> first) / (*this)[first];\n        Fps result\
     \ = (normalized.log(result_degree) / Mint(2)).exp(result_degree);\n        result\
@@ -284,6 +275,7 @@ data:
     \ - 1 - i] * inverse_factorial[i];\n        return result;\n    }\n};\n\n}  //\
     \ namespace fps\n}  // namespace m1une\n\n#endif  // M1UNE_FPS_FORMAL_POWER_SERIES_HPP\n"
   dependsOn:
+  - math/modular_square_root.hpp
   - math/fps/convolution.hpp
   - math/fps/internal/ntt998_faster.hpp
   - math/modint.hpp
@@ -302,7 +294,7 @@ data:
   - math/fps/linear_recurrence.hpp
   - graph/all.hpp
   - graph/counting.hpp
-  timestamp: '2026-07-11 03:31:13+09:00'
+  timestamp: '2026-07-11 19:26:27+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/bernoulli_utilities.test.cpp

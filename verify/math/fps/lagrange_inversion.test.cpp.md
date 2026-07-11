@@ -19,6 +19,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
+  - icon: ':heavy_check_mark:'
+    path: math/modular_square_root.hpp
+    title: Modular Square Root
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
   _isVerificationFailed: false
@@ -85,6 +88,7 @@ data:
   dependsOn:
   - math/fps/lagrange_inversion.hpp
   - math/fps/formal_power_series.hpp
+  - math/modular_square_root.hpp
   - math/fps/convolution.hpp
   - math/fps/internal/ntt998_faster.hpp
   - math/modint.hpp
@@ -92,7 +96,7 @@ data:
   isVerificationFile: true
   path: verify/math/fps/lagrange_inversion.test.cpp
   requiredBy: []
-  timestamp: '2026-07-11 03:31:13+09:00'
+  timestamp: '2026-07-11 19:26:27+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/fps/lagrange_inversion.test.cpp

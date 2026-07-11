@@ -31,6 +31,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
+  - icon: ':heavy_check_mark:'
+    path: math/modular_square_root.hpp
+    title: Modular Square Root
   _extendedRequiredBy:
   - icon: ':heavy_check_mark:'
     path: math/all.hpp
@@ -91,6 +94,7 @@ data:
   - math/fps/convolution_ll.hpp
   - math/fps/floating_point_convolution.hpp
   - math/fps/formal_power_series.hpp
+  - math/modular_square_root.hpp
   - math/fps/half_gcd.hpp
   - math/fps/lagrange_inversion.hpp
   - math/fps/linear_recurrence.hpp
@@ -99,7 +103,7 @@ data:
   path: math/fps/all.hpp
   requiredBy:
   - math/all.hpp
-  timestamp: '2026-07-11 03:31:13+09:00'
+  timestamp: '2026-07-11 19:26:27+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp

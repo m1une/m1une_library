@@ -13,6 +13,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
+  - icon: ':heavy_check_mark:'
+    path: math/modular_square_root.hpp
+    title: Modular Square Root
   _extendedRequiredBy:
   - icon: ':heavy_check_mark:'
     path: math/all.hpp
@@ -80,6 +83,7 @@ data:
     \ index);\n}\n\n}  // namespace fps\n}  // namespace m1une\n\n#endif  // M1UNE_FPS_LINEAR_RECURRENCE_HPP\n"
   dependsOn:
   - math/fps/formal_power_series.hpp
+  - math/modular_square_root.hpp
   - math/fps/convolution.hpp
   - math/fps/internal/ntt998_faster.hpp
   - math/modint.hpp
@@ -88,7 +92,7 @@ data:
   requiredBy:
   - math/all.hpp
   - math/fps/all.hpp
-  timestamp: '2026-07-11 03:31:13+09:00'
+  timestamp: '2026-07-11 19:26:27+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp

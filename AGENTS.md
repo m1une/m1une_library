@@ -71,3 +71,5 @@ rg -n "\\{\\{" .
 
 The command should report no matches unless the occurrence is intentionally
 protected from Liquid rendering.
+
+Check /.vscode to get the compiler path and compile options.

@@ -80,6 +80,12 @@ data:
     path: math/modint.hpp
     title: ModInt
   - icon: ':heavy_check_mark:'
+    path: math/modular_square_root.hpp
+    title: Modular Square Root
+  - icon: ':heavy_check_mark:'
+    path: math/modular_square_root.hpp
+    title: Modular Square Root
+  - icon: ':heavy_check_mark:'
     path: math/number_theory.hpp
     title: Number Theory
   - icon: ':heavy_check_mark:'
@@ -172,6 +178,8 @@ data:
 
     #include "modint.hpp"
 
+    #include "modular_square_root.hpp"
+
     #include "number_theory.hpp"
 
     #include "partition_function.hpp"
@@ -204,6 +212,7 @@ data:
   - math/base_n.hpp
   - math/bernoulli.hpp
   - math/fps/formal_power_series.hpp
+  - math/modular_square_root.hpp
   - math/fps/convolution.hpp
   - math/fps/internal/ntt998_faster.hpp
   - math/modint.hpp
@@ -230,6 +239,7 @@ data:
   - math/matrix/linear_algebra.hpp
   - math/matrix/matrix.hpp
   - math/modint.hpp
+  - math/modular_square_root.hpp
   - math/number_theory.hpp
   - math/primitive_root.hpp
   - math/prime_sieve.hpp
@@ -242,7 +252,7 @@ data:
   isVerificationFile: false
   path: math/all.hpp
   requiredBy: []
-  timestamp: '2026-07-11 03:31:13+09:00'
+  timestamp: '2026-07-11 19:26:27+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
@@ -264,6 +274,7 @@ FPS helpers use `m1une::fps`, and dense matrix helpers use `m1une::matrix`.
 You usually do not need to include this entire bundle:
 
 * Use `modint.hpp` for arithmetic modulo a fixed number such as `998244353`.
+* Use `modular_square_root.hpp` to solve `x * x = value (mod prime)`.
 * Use `base_n.hpp` to convert nonnegative integers to and from arbitrary-base
   digit sequences.
 * Use `bitwise_convolution.hpp` for OR, AND, or XOR convolution over mask
@@ -319,6 +330,7 @@ few unused headers do not matter.
 | `math/integer_arithmetic.hpp` | Exact integer square roots and overflow-aware powers. |
 | `math/lucas.hpp` | Lucas's theorem for huge binomial arguments modulo a small prime. |
 | `math/modint.hpp` | Static modular integer type. |
+| `math/modular_square_root.hpp` | Modular square roots for prime moduli using Tonelli-Shanks. |
 | `math/fps/all.hpp` | Convolution, formal power series, polynomial algorithms, and linear recurrences. |
 | `math/matrix/all.hpp` | Dense matrices, powers, Gaussian elimination, determinant, inverse, and linear systems. |
 | `math/combinatorics.hpp` | Factorials, binomial coefficients, permutations, and multiset counts. |

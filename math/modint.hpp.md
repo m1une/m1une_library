@@ -211,6 +211,9 @@ data:
     path: verify/math/modint.test.cpp
     title: verify/math/modint.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/modular_square_root.test.cpp
+    title: verify/math/modular_square_root.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/partition_function.test.cpp
     title: verify/math/partition_function.test.cpp
   - icon: ':heavy_check_mark:'
@@ -406,6 +409,7 @@ data:
   - verify/math/matrix/matrix_product.test.cpp
   - verify/math/stirling_number_of_the_second_kind.test.cpp
   - verify/math/stirling_number_of_the_second_kind.test.cpp
+  - verify/math/modular_square_root.test.cpp
   - verify/math/modint.test.cpp
   - verify/math/bernoulli_number.test.cpp
   - verify/math/bernoulli_number.test.cpp
