@@ -17,6 +17,9 @@ data:
     path: graph/bfs.hpp
     title: BFS
   - icon: ':heavy_check_mark:'
+    path: graph/biconnected_components.hpp
+    title: Biconnected Components
+  - icon: ':heavy_check_mark:'
     path: graph/bipartite.hpp
     title: Bipartite Graph
   - icon: ':heavy_check_mark:'
@@ -330,6 +333,7 @@ data:
   - graph/tree/zero_one_on_tree.hpp
   - graph/undirected.hpp
   - graph/bipartite.hpp
+  - graph/biconnected_components.hpp
   - graph/connected_components.hpp
   - ds/dsu/dsu.hpp
   - graph/general_matching.hpp
@@ -341,7 +345,7 @@ data:
   isVerificationFile: true
   path: verify/graph/cow_game.test.cpp
   requiredBy: []
-  timestamp: '2026-07-11 19:26:27+09:00'
+  timestamp: '2026-07-11 19:39:37+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/cow_game.test.cpp

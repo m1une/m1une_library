@@ -11,6 +11,9 @@ data:
     path: graph/bfs.hpp
     title: BFS
   - icon: ':heavy_check_mark:'
+    path: graph/biconnected_components.hpp
+    title: Biconnected Components
+  - icon: ':heavy_check_mark:'
     path: graph/bipartite.hpp
     title: Bipartite Graph
   - icon: ':heavy_check_mark:'
@@ -294,7 +297,78 @@ data:
     \        int id = result.matching.add_edge(left, right);\n        if (int(result.original_edge_id.size())\
     \ <= id) result.original_edge_id.resize(id + 1);\n        result.original_edge_id[id]\
     \ = e.id;\n    }\n\n    return result;\n}\n\n}  // namespace graph\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"graph/connected_components.hpp\"\n\n\n\n#line 6 \"graph/connected_components.hpp\"\
+    \ m1une\n\n\n#line 1 \"graph/biconnected_components.hpp\"\n\n\n\n#line 6 \"graph/biconnected_components.hpp\"\
+    \n\n#line 8 \"graph/biconnected_components.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ graph {\n\nstruct BiconnectedComponentsResult {\n    std::vector<std::vector<int>>\
+    \ components;\n    std::vector<std::vector<int>> edge_components;\n    std::vector<int>\
+    \ component_of_edge;\n    std::vector<std::vector<int>> vertex_components;\n \
+    \   std::vector<int> articulation;\n    std::vector<int> ord;\n    std::vector<int>\
+    \ low;\n\n    int component_count() const {\n        return int(components.size());\n\
+    \    }\n\n    bool is_articulation(int vertex) const {\n        assert(0 <= vertex\
+    \ && vertex < int(vertex_components.size()));\n        return vertex_components[vertex].size()\
+    \ >= 2;\n    }\n};\n\n// Decomposes an undirected graph into maximal vertex-biconnected\
+    \ blocks.\n// Every active edge belongs to exactly one block. Isolated vertices\
+    \ form\n// singleton blocks, and articulation vertices occur in multiple blocks.\n\
+    template <class T>\nBiconnectedComponentsResult biconnected_components(const Graph<T>&\
+    \ graph) {\n    const int n = graph.size();\n    const int edge_count = graph.edge_count();\n\
+    \n    BiconnectedComponentsResult result;\n    result.component_of_edge.assign(edge_count,\
+    \ -1);\n    result.vertex_components.assign(n, {});\n    result.ord.assign(n,\
+    \ -1);\n    result.low.assign(n, -1);\n\n    std::vector<int> edge_from(edge_count,\
+    \ -1);\n    std::vector<int> edge_to(edge_count, -1);\n    std::vector<int> incidence_count(edge_count,\
+    \ 0);\n    std::vector<int> alive_degree(n, 0);\n    for (int vertex = 0; vertex\
+    \ < n; vertex++) {\n        for (const Edge<T>& edge : graph[vertex]) {\n    \
+    \        if (!edge.alive) continue;\n            assert(0 <= edge.id && edge.id\
+    \ < edge_count);\n            alive_degree[vertex]++;\n            if (incidence_count[edge.id]\
+    \ == 0) {\n                edge_from[edge.id] = edge.from;\n                edge_to[edge.id]\
+    \ = edge.to;\n            }\n            incidence_count[edge.id]++;\n       \
+    \ }\n    }\n#ifndef NDEBUG\n    for (int edge_id = 0; edge_id < edge_count; edge_id++)\
+    \ {\n        if (incidence_count[edge_id] == 0) continue;\n        assert(incidence_count[edge_id]\
+    \ == 2);\n        assert(edge_from[edge_id] != edge_to[edge_id]);\n    }\n#endif\n\
+    \n    std::vector<int> parent(n, -1);\n    std::vector<int> parent_edge(n, -1);\n\
+    \    std::vector<int> next_edge(n, 0);\n    std::vector<int> dfs_stack;\n    std::vector<int>\
+    \ edge_stack;\n    std::vector<int> vertex_mark(n, -1);\n    int timer = 0;\n\n\
+    \    auto add_singleton = [&](int vertex) {\n        const int component = result.component_count();\n\
+    \        result.components.push_back(std::vector<int>(1, vertex));\n        result.edge_components.emplace_back();\n\
+    \        result.vertex_components[vertex].push_back(component);\n    };\n\n  \
+    \  auto extract_component = [&](int stopping_edge) {\n        const int component\
+    \ = result.component_count();\n        result.components.emplace_back();\n   \
+    \     result.edge_components.emplace_back();\n        std::vector<int>& vertices\
+    \ = result.components.back();\n        std::vector<int>& edges = result.edge_components.back();\n\
+    \n        while (true) {\n            assert(!edge_stack.empty());\n         \
+    \   const int edge_id = edge_stack.back();\n            edge_stack.pop_back();\n\
+    \            edges.push_back(edge_id);\n            result.component_of_edge[edge_id]\
+    \ = component;\n\n            const int endpoints[2] = {edge_from[edge_id], edge_to[edge_id]};\n\
+    \            for (int vertex : endpoints) {\n                if (vertex_mark[vertex]\
+    \ == component) continue;\n                vertex_mark[vertex] = component;\n\
+    \                vertices.push_back(vertex);\n            }\n            if (edge_id\
+    \ == stopping_edge) break;\n        }\n        for (int vertex : vertices) {\n\
+    \            result.vertex_components[vertex].push_back(component);\n        }\n\
+    \    };\n\n    for (int root = 0; root < n; root++) {\n        if (result.ord[root]\
+    \ != -1) continue;\n        if (alive_degree[root] == 0) {\n            result.ord[root]\
+    \ = result.low[root] = timer++;\n            add_singleton(root);\n          \
+    \  continue;\n        }\n\n        result.ord[root] = result.low[root] = timer++;\n\
+    \        dfs_stack.push_back(root);\n        while (!dfs_stack.empty()) {\n  \
+    \          const int vertex = dfs_stack.back();\n            if (next_edge[vertex]\
+    \ < int(graph[vertex].size())) {\n                const Edge<T>& edge = graph[vertex][next_edge[vertex]++];\n\
+    \                if (!edge.alive || edge.id == parent_edge[vertex]) continue;\n\
+    \                const int to = edge.to;\n                if (result.ord[to] ==\
+    \ -1) {\n                    parent[to] = vertex;\n                    parent_edge[to]\
+    \ = edge.id;\n                    edge_stack.push_back(edge.id);\n           \
+    \         result.ord[to] = result.low[to] = timer++;\n                    dfs_stack.push_back(to);\n\
+    \                } else if (result.ord[to] < result.ord[vertex]) {\n         \
+    \           edge_stack.push_back(edge.id);\n                    if (result.ord[to]\
+    \ < result.low[vertex]) {\n                        result.low[vertex] = result.ord[to];\n\
+    \                    }\n                }\n                continue;\n       \
+    \     }\n\n            dfs_stack.pop_back();\n            const int parent_vertex\
+    \ = parent[vertex];\n            if (parent_vertex == -1) {\n                assert(edge_stack.empty());\n\
+    \                continue;\n            }\n            if (result.low[vertex]\
+    \ < result.low[parent_vertex]) {\n                result.low[parent_vertex] =\
+    \ result.low[vertex];\n            }\n            if (result.ord[parent_vertex]\
+    \ <= result.low[vertex]) {\n                extract_component(parent_edge[vertex]);\n\
+    \            }\n        }\n    }\n\n    for (int vertex = 0; vertex < n; vertex++)\
+    \ {\n        if (result.is_articulation(vertex)) result.articulation.push_back(vertex);\n\
+    \    }\n    return result;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\
+    \n\n#line 1 \"graph/connected_components.hpp\"\n\n\n\n#line 6 \"graph/connected_components.hpp\"\
     \n\n#line 1 \"ds/dsu/dsu.hpp\"\n\n\n\n#include <algorithm>\n#include <numeric>\n\
     #line 7 \"ds/dsu/dsu.hpp\"\n\nnamespace m1une {\nnamespace ds {\n\nstruct Dsu\
     \ {\n   private:\n    int _n;\n    // parent_or_size[i] is the parent of i if\
@@ -1489,7 +1563,7 @@ data:
     }\n\ntemplate <class T>\nZeroOneBfsResult zero_one_bfs(const Graph<T>& g, int\
     \ s, int inf = std::numeric_limits<int>::max() / 2) {\n    return zero_one_bfs(g,\
     \ std::vector<int>{s}, inf);\n}\n\n}  // namespace graph\n}  // namespace m1une\n\
-    \n\n#line 11 \"graph/shortest_path.hpp\"\n\n\n#line 16 \"graph/undirected.hpp\"\
+    \n\n#line 11 \"graph/shortest_path.hpp\"\n\n\n#line 17 \"graph/undirected.hpp\"\
     \n\n\n"
   code: '#ifndef M1UNE_GRAPH_UNDIRECTED_HPP
 
@@ -1497,6 +1571,8 @@ data:
 
 
     #include "bipartite.hpp"
+
+    #include "biconnected_components.hpp"
 
     #include "connected_components.hpp"
 
@@ -1527,6 +1603,7 @@ data:
   dependsOn:
   - graph/bipartite.hpp
   - graph/graph.hpp
+  - graph/biconnected_components.hpp
   - graph/connected_components.hpp
   - ds/dsu/dsu.hpp
   - graph/cycle_detection.hpp
@@ -1550,7 +1627,7 @@ data:
   path: graph/undirected.hpp
   requiredBy:
   - graph/all.hpp
-  timestamp: '2026-07-03 15:26:21+09:00'
+  timestamp: '2026-07-11 19:39:37+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
@@ -1577,6 +1654,7 @@ where direction should not matter.
 | --- | --- | --- |
 | `graph/shortest_path.hpp` | Mixed shortest-path bundle | Use BFS, 0-1 BFS, Dijkstra, Bellman-Ford, and Warshall-Floyd on undirected graphs built with `add_edge`; DAG shortest path is directed-only. |
 | `graph/lowlink.hpp` | Undirected only | Articulation points and bridges. |
+| `graph/biconnected_components.hpp` | Undirected only | Vertex-biconnected blocks, articulation points, and block incidence. |
 | `graph/kruskal.hpp` | Undirected only | Minimum spanning forest. |
 | `graph/bipartite.hpp` | Direction ignored / explicit bipartite sides | Two-colorability, maximum matching, minimum vertex cover, maximum independent set, and minimum edge cover. |
 | `graph/general_matching.hpp` | Undirected only | Maximum-cardinality matching and minimum edge cover in general undirected graphs. |

@@ -15,6 +15,9 @@ data:
     path: graph/bfs.hpp
     title: BFS
   - icon: ':heavy_check_mark:'
+    path: graph/biconnected_components.hpp
+    title: Biconnected Components
+  - icon: ':heavy_check_mark:'
     path: graph/bipartite.hpp
     title: Bipartite Graph
   - icon: ':heavy_check_mark:'
@@ -126,6 +129,9 @@ data:
     path: graph/zero_one_bfs.hpp
     title: 0-1 BFS
   _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/biconnected_components.test.cpp
+    title: verify/graph/biconnected_components.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/cow_game.test.cpp
     title: verify/graph/cow_game.test.cpp
@@ -363,6 +369,7 @@ data:
   - graph/cycle_detection.hpp
   - graph/bfs.hpp
   - graph/warshall_floyd.hpp
+  - graph/biconnected_components.hpp
   - graph/undirected.hpp
   - graph/directed.hpp
   - graph/shortest_path.hpp
@@ -392,6 +399,7 @@ data:
   - verify/graph/tree/dsu_on_tree.test.cpp
   - verify/graph/tree/zero_one_on_tree.test.cpp
   - verify/graph/tree/zero_one_on_tree.test.cpp
+  - verify/graph/biconnected_components.test.cpp
   - verify/graph/dominator_tree.test.cpp
   - verify/graph/dominator_tree.test.cpp
   - verify/graph/graph_algorithms.test.cpp

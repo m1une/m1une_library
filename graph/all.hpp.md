@@ -14,6 +14,9 @@ data:
     path: graph/bfs.hpp
     title: BFS
   - icon: ':heavy_check_mark:'
+    path: graph/biconnected_components.hpp
+    title: Biconnected Components
+  - icon: ':heavy_check_mark:'
     path: graph/bipartite.hpp
     title: Bipartite Graph
   - icon: ':heavy_check_mark:'
@@ -293,6 +296,7 @@ data:
   - graph/tree/zero_one_on_tree.hpp
   - graph/undirected.hpp
   - graph/bipartite.hpp
+  - graph/biconnected_components.hpp
   - graph/connected_components.hpp
   - ds/dsu/dsu.hpp
   - graph/general_matching.hpp
@@ -304,7 +308,7 @@ data:
   isVerificationFile: false
   path: graph/all.hpp
   requiredBy: []
-  timestamp: '2026-07-11 19:26:27+09:00'
+  timestamp: '2026-07-11 19:39:37+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
@@ -350,6 +354,7 @@ Public namespaces stay flat and short: general graph helpers use
 | `graph/scc.hpp` | Directed only | Strongly connected components and condensation DAG. |
 | `graph/two_sat.hpp` | Implication graph | 2-SAT clauses, satisfiability, and one assignment. |
 | `graph/lowlink.hpp` | Undirected only | Articulation points and bridges. |
+| `graph/biconnected_components.hpp` | Undirected only | Vertex-biconnected blocks, articulation points, and block incidence. |
 | `graph/bipartite.hpp` | Direction ignored / explicit bipartite sides | Two-colorability, maximum matching, minimum vertex cover, maximum independent set, and minimum edge cover. |
 | `graph/general_matching.hpp` | Undirected only | Maximum-cardinality matching and minimum edge cover in general undirected graphs. |
 | `graph/maximum_clique.hpp` | Direction ignored | Exact maximum clique, maximum independent set, and minimum vertex cover with bitset branch-and-bound. |

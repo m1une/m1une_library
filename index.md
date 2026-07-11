@@ -472,6 +472,9 @@ data:
       path: graph/bfs.hpp
       title: BFS
     - icon: ':heavy_check_mark:'
+      path: graph/biconnected_components.hpp
+      title: Biconnected Components
+    - icon: ':heavy_check_mark:'
       path: graph/bipartite.hpp
       title: Bipartite Graph
     - icon: ':heavy_check_mark:'
@@ -1327,6 +1330,9 @@ data:
       title: verify/geometry/segment_intersection.test.cpp
   - name: verify/graph
     pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/biconnected_components.test.cpp
+      title: verify/graph/biconnected_components.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/graph/cow_game.test.cpp
       title: verify/graph/cow_game.test.cpp
