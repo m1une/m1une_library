@@ -23,6 +23,9 @@ data:
     path: math/cyclotomic_polynomial.hpp
     title: Cyclotomic Polynomial
   - icon: ':heavy_check_mark:'
+    path: math/discrete_logarithm.hpp
+    title: Discrete Logarithm
+  - icon: ':heavy_check_mark:'
     path: math/fps/all.hpp
     title: Formal Power Series All
   - icon: ':heavy_check_mark:'
@@ -169,6 +172,8 @@ data:
 
     #include "cyclotomic_polynomial.hpp"
 
+    #include "discrete_logarithm.hpp"
+
     #include "generalized_floor_sum.hpp"
 
     #include "integer_arithmetic.hpp"
@@ -227,6 +232,7 @@ data:
   - math/partition_function.hpp
   - math/cyclotomic_polynomial.hpp
   - math/prime_factorization.hpp
+  - math/discrete_logarithm.hpp
   - math/generalized_floor_sum.hpp
   - math/integer_arithmetic.hpp
   - math/lucas.hpp
@@ -256,7 +262,7 @@ data:
   isVerificationFile: false
   path: math/all.hpp
   requiredBy: []
-  timestamp: '2026-07-11 19:34:52+09:00'
+  timestamp: '2026-07-11 19:59:46+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
@@ -279,6 +285,8 @@ You usually do not need to include this entire bundle:
 
 * Use `modint.hpp` for arithmetic modulo a fixed number such as `998244353`.
 * Use `modular_square_root.hpp` to solve `x * x = value (mod prime)`.
+* Use `discrete_logarithm.hpp` to solve `base^x = target (mod mod)` for the
+  smallest nonnegative exponent.
 * Use `base_n.hpp` to convert nonnegative integers to and from arbitrary-base
   digit sequences.
 * Use `bitwise_convolution.hpp` for OR, AND, or XOR convolution over mask
@@ -340,6 +348,7 @@ few unused headers do not matter.
 | `math/combinatorics.hpp` | Factorials, binomial coefficients, permutations, and multiset counts. |
 | `math/combinatorial_sequences.hpp` | Fast standard counting sequences and special numbers. |
 | `math/cyclotomic_polynomial.hpp` | Integer coefficients of cyclotomic polynomials. |
+| `math/discrete_logarithm.hpp` | Extended baby-step--giant-step for discrete logarithms modulo any positive integer. |
 | `math/generalized_floor_sum.hpp` | Polynomial moments of a linear floor sequence using monoid floor sum. |
 | `math/number_theory.hpp` | Extended GCD, modular power and inverse, CRT, and floor sum. |
 | `math/partition_function.hpp` | Integer partition numbers via Euler's pentagonal theorem and FPS inversion. |

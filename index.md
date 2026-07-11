@@ -652,6 +652,9 @@ data:
       path: math/cyclotomic_polynomial.hpp
       title: Cyclotomic Polynomial
     - icon: ':heavy_check_mark:'
+      path: math/discrete_logarithm.hpp
+      title: Discrete Logarithm
+    - icon: ':heavy_check_mark:'
       path: math/generalized_floor_sum.hpp
       title: Generalized Floor Sum
     - icon: ':heavy_check_mark:'
@@ -1423,6 +1426,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/cyclotomic_polynomial.test.cpp
       title: verify/math/cyclotomic_polynomial.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/discrete_logarithm.test.cpp
+      title: verify/math/discrete_logarithm.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/enumerate_primes.test.cpp
       title: verify/math/enumerate_primes.test.cpp

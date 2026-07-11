@@ -26,6 +26,9 @@ data:
     path: math/cyclotomic_polynomial.hpp
     title: Cyclotomic Polynomial
   - icon: ':heavy_check_mark:'
+    path: math/discrete_logarithm.hpp
+    title: Discrete Logarithm
+  - icon: ':heavy_check_mark:'
     path: math/fps/all.hpp
     title: Formal Power Series All
   - icon: ':heavy_check_mark:'
@@ -338,6 +341,7 @@ data:
   - math/partition_function.hpp
   - math/cyclotomic_polynomial.hpp
   - math/prime_factorization.hpp
+  - math/discrete_logarithm.hpp
   - math/generalized_floor_sum.hpp
   - math/integer_arithmetic.hpp
   - math/lucas.hpp
@@ -367,7 +371,7 @@ data:
   isVerificationFile: true
   path: verify/math/math_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-11 19:34:52+09:00'
+  timestamp: '2026-07-11 19:59:46+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/math_algorithms.test.cpp
