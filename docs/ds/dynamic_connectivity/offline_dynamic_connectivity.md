@@ -9,7 +9,7 @@ documentation_of: ../../../ds/dynamic_connectivity/offline_dynamic_connectivity.
 connectivity queries in chronological order, then answers every query together
 with `solve()`.
 
-Each edge lifetime is inserted into a segment tree over time. A rollback DSU
+Each edge lifetime is inserted into a segment tree over time. `RollbackDsu`
 traverses that tree, adding exactly the edges active at each query and restoring
 its previous state when leaving a segment. Segment-tree edge lists use one
 compact contiguous allocation instead of one allocation per node.

@@ -6,6 +6,8 @@
 #include <utility>
 #include <vector>
 
+#include "../dsu/rollback_dsu.hpp"
+
 namespace m1une {
 namespace ds {
 
@@ -23,46 +25,6 @@ struct OfflineDynamicConnectivity {
         int u;
         int v;
         int time;
-    };
-
-    struct RollbackDsu {
-        std::vector<int> parent_or_size;
-        std::vector<std::pair<int, int>> history;
-
-        explicit RollbackDsu(int n) : parent_or_size(n, -1) {}
-
-        int leader(int v) const {
-            while (parent_or_size[v] >= 0) v = parent_or_size[v];
-            return v;
-        }
-
-        bool same(int u, int v) const {
-            return leader(u) == leader(v);
-        }
-
-        void merge(int u, int v) {
-            u = leader(u);
-            v = leader(v);
-            if (u == v) return;
-            if (-parent_or_size[u] < -parent_or_size[v]) std::swap(u, v);
-            history.emplace_back(v, parent_or_size[v]);
-            parent_or_size[u] += parent_or_size[v];
-            parent_or_size[v] = u;
-        }
-
-        int snapshot() const {
-            return int(history.size());
-        }
-
-        void rollback(int snapshot) {
-            while (int(history.size()) > snapshot) {
-                auto [v, old_size] = history.back();
-                history.pop_back();
-                int parent = parent_or_size[v];
-                parent_or_size[parent] -= old_size;
-                parent_or_size[v] = old_size;
-            }
-        }
     };
 
     int _n;
@@ -211,7 +173,7 @@ struct OfflineDynamicConnectivity {
             query_at[_queries[query_id].time] = query_id;
         }
         RollbackDsu dsu(_n);
-        dsu.history.reserve(std::min<std::size_t>(_n, stored_edges.size()));
+        dsu.reserve_history(int(std::min<std::size_t>(_n, stored_edges.size())));
         dfs(offset, stored_edges, query_at, answer, dsu, 1, base);
         return answer;
     }
