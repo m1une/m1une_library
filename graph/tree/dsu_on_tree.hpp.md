@@ -56,8 +56,8 @@ data:
     \        _edge_positions.back().push_back({from, idx});\n        return id;\n\
     \    }\n\n    int add_edge(int u, int v, T cost = T(1)) {\n        assert(0 <=\
     \ u && u < _n);\n        assert(0 <= v && v < _n);\n        int id = _edge_count++;\n\
-    \        int u_idx = int(_g[u].size());\n        int v_idx = int(_g[v].size());\n\
-    \        _g[u].push_back(edge_type(u, v, cost, id));\n        _g[v].push_back(edge_type(v,\
+    \        int u_idx = int(_g[u].size());\n        _g[u].push_back(edge_type(u,\
+    \ v, cost, id));\n        int v_idx = int(_g[v].size());\n        _g[v].push_back(edge_type(v,\
     \ u, cost, id));\n        _edge_positions.emplace_back();\n        _edge_positions.back().push_back({u,\
     \ u_idx});\n        _edge_positions.back().push_back({v, v_idx});\n        return\
     \ id;\n    }\n\n    void set_edge_alive(int id, bool alive) {\n        assert(0\
@@ -232,7 +232,7 @@ data:
   requiredBy:
   - graph/tree/all.hpp
   - graph/all.hpp
-  timestamp: '2026-07-07 14:26:59+09:00'
+  timestamp: '2026-07-11 19:47:32+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp

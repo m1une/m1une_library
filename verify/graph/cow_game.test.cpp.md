@@ -152,6 +152,9 @@ data:
     path: graph/tree/zero_one_on_tree.hpp
     title: 01 on Tree
   - icon: ':heavy_check_mark:'
+    path: graph/two_edge_connected_components.hpp
+    title: Two-Edge-Connected Components
+  - icon: ':heavy_check_mark:'
     path: graph/two_sat.hpp
     title: Two-Satisfiability
   - icon: ':heavy_check_mark:'
@@ -342,10 +345,11 @@ data:
   - graph/maximum_clique.hpp
   - graph/minimum_steiner_tree.hpp
   - graph/namori.hpp
+  - graph/two_edge_connected_components.hpp
   isVerificationFile: true
   path: verify/graph/cow_game.test.cpp
   requiredBy: []
-  timestamp: '2026-07-11 19:39:37+09:00'
+  timestamp: '2026-07-11 19:47:32+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/cow_game.test.cpp

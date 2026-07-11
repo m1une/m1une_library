@@ -62,6 +62,9 @@ data:
     path: graph/topological_sort.hpp
     title: Topological Sort
   - icon: ':heavy_check_mark:'
+    path: graph/two_edge_connected_components.hpp
+    title: Two-Edge-Connected Components
+  - icon: ':heavy_check_mark:'
     path: graph/warshall_floyd.hpp
     title: Warshall-Floyd
   - icon: ':heavy_check_mark:'
@@ -111,8 +114,8 @@ data:
     \        _edge_positions.back().push_back({from, idx});\n        return id;\n\
     \    }\n\n    int add_edge(int u, int v, T cost = T(1)) {\n        assert(0 <=\
     \ u && u < _n);\n        assert(0 <= v && v < _n);\n        int id = _edge_count++;\n\
-    \        int u_idx = int(_g[u].size());\n        int v_idx = int(_g[v].size());\n\
-    \        _g[u].push_back(edge_type(u, v, cost, id));\n        _g[v].push_back(edge_type(v,\
+    \        int u_idx = int(_g[u].size());\n        _g[u].push_back(edge_type(u,\
+    \ v, cost, id));\n        int v_idx = int(_g[v].size());\n        _g[v].push_back(edge_type(v,\
     \ u, cost, id));\n        _edge_positions.emplace_back();\n        _edge_positions.back().push_back({u,\
     \ u_idx});\n        _edge_positions.back().push_back({v, v_idx});\n        return\
     \ id;\n    }\n\n    void set_edge_alive(int id, bool alive) {\n        assert(0\
@@ -1563,8 +1566,72 @@ data:
     }\n\ntemplate <class T>\nZeroOneBfsResult zero_one_bfs(const Graph<T>& g, int\
     \ s, int inf = std::numeric_limits<int>::max() / 2) {\n    return zero_one_bfs(g,\
     \ std::vector<int>{s}, inf);\n}\n\n}  // namespace graph\n}  // namespace m1une\n\
-    \n\n#line 11 \"graph/shortest_path.hpp\"\n\n\n#line 17 \"graph/undirected.hpp\"\
-    \n\n\n"
+    \n\n#line 11 \"graph/shortest_path.hpp\"\n\n\n#line 1 \"graph/two_edge_connected_components.hpp\"\
+    \n\n\n\n#line 6 \"graph/two_edge_connected_components.hpp\"\n\n#line 8 \"graph/two_edge_connected_components.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\nstruct TwoEdgeConnectedBridge {\n\
+    \    int from;\n    int to;\n    int edge_id;\n};\n\nstruct TwoEdgeConnectedComponentsResult\
+    \ {\n    std::vector<std::vector<int>> components;\n    std::vector<int> component_of_vertex;\n\
+    \    std::vector<int> bridge_ids;\n    std::vector<char> bridge;\n    std::vector<TwoEdgeConnectedBridge>\
+    \ bridge_forest_edges;\n    std::vector<int> ord;\n    std::vector<int> low;\n\
+    \n    int component_count() const {\n        return int(components.size());\n\
+    \    }\n\n    bool same(int first, int second) const {\n        assert(0 <= first\
+    \ && first < int(component_of_vertex.size()));\n        assert(0 <= second &&\
+    \ second < int(component_of_vertex.size()));\n        return component_of_vertex[first]\
+    \ == component_of_vertex[second];\n    }\n\n    bool is_bridge(int edge_id) const\
+    \ {\n        assert(0 <= edge_id && edge_id < int(bridge.size()));\n        return\
+    \ bridge[edge_id];\n    }\n};\n\n// Removes every active bridge and returns the\
+    \ remaining connected components.\n// The first lowlink traversal and the component\
+    \ traversal are both iterative.\ntemplate <class T>\nTwoEdgeConnectedComponentsResult\
+    \ two_edge_connected_components(\n    const Graph<T>& graph\n) {\n    const int\
+    \ n = graph.size();\n    const int edge_count = graph.edge_count();\n\n    TwoEdgeConnectedComponentsResult\
+    \ result;\n    result.component_of_vertex.assign(n, -1);\n    result.bridge.assign(edge_count,\
+    \ false);\n    result.ord.assign(n, -1);\n    result.low.assign(n, -1);\n\n  \
+    \  std::vector<int> edge_from(edge_count, -1);\n    std::vector<int> edge_to(edge_count,\
+    \ -1);\n    std::vector<int> incidence_count(edge_count, 0);\n    for (int vertex\
+    \ = 0; vertex < n; vertex++) {\n        for (const Edge<T>& edge : graph[vertex])\
+    \ {\n            if (!edge.alive) continue;\n            assert(0 <= edge.id &&\
+    \ edge.id < edge_count);\n            if (incidence_count[edge.id] == 0) {\n \
+    \               edge_from[edge.id] = edge.from;\n                edge_to[edge.id]\
+    \ = edge.to;\n            }\n            incidence_count[edge.id]++;\n       \
+    \ }\n    }\n#ifndef NDEBUG\n    for (int edge_id = 0; edge_id < edge_count; edge_id++)\
+    \ {\n        if (incidence_count[edge_id] != 0) assert(incidence_count[edge_id]\
+    \ == 2);\n    }\n#endif\n\n    std::vector<int> parent(n, -1);\n    std::vector<int>\
+    \ parent_edge(n, -1);\n    std::vector<int> next_edge(n, 0);\n    std::vector<int>\
+    \ stack;\n    int timer = 0;\n\n    for (int root = 0; root < n; root++) {\n \
+    \       if (result.ord[root] != -1) continue;\n        result.ord[root] = result.low[root]\
+    \ = timer++;\n        stack.push_back(root);\n        while (!stack.empty()) {\n\
+    \            const int vertex = stack.back();\n            if (next_edge[vertex]\
+    \ < int(graph[vertex].size())) {\n                const Edge<T>& edge = graph[vertex][next_edge[vertex]++];\n\
+    \                if (!edge.alive || edge.id == parent_edge[vertex]) continue;\n\
+    \                const int to = edge.to;\n                if (result.ord[to] ==\
+    \ -1) {\n                    parent[to] = vertex;\n                    parent_edge[to]\
+    \ = edge.id;\n                    result.ord[to] = result.low[to] = timer++;\n\
+    \                    stack.push_back(to);\n                } else if (result.ord[to]\
+    \ < result.low[vertex]) {\n                    result.low[vertex] = result.ord[to];\n\
+    \                }\n                continue;\n            }\n\n            stack.pop_back();\n\
+    \            const int parent_vertex = parent[vertex];\n            if (parent_vertex\
+    \ == -1) continue;\n            if (result.low[vertex] < result.low[parent_vertex])\
+    \ {\n                result.low[parent_vertex] = result.low[vertex];\n       \
+    \     }\n            if (result.ord[parent_vertex] < result.low[vertex]) {\n \
+    \               result.bridge[parent_edge[vertex]] = true;\n            }\n  \
+    \      }\n    }\n\n    for (int root = 0; root < n; root++) {\n        if (result.component_of_vertex[root]\
+    \ != -1) continue;\n        const int component = result.component_count();\n\
+    \        result.components.emplace_back();\n        result.component_of_vertex[root]\
+    \ = component;\n        stack.push_back(root);\n        while (!stack.empty())\
+    \ {\n            const int vertex = stack.back();\n            stack.pop_back();\n\
+    \            result.components.back().push_back(vertex);\n            for (const\
+    \ Edge<T>& edge : graph[vertex]) {\n                if (!edge.alive || result.bridge[edge.id])\
+    \ continue;\n                if (result.component_of_vertex[edge.to] != -1) continue;\n\
+    \                result.component_of_vertex[edge.to] = component;\n          \
+    \      stack.push_back(edge.to);\n            }\n        }\n    }\n\n    for (int\
+    \ edge_id = 0; edge_id < edge_count; edge_id++) {\n        if (!result.bridge[edge_id])\
+    \ continue;\n        result.bridge_ids.push_back(edge_id);\n        const int\
+    \ first_component = result.component_of_vertex[edge_from[edge_id]];\n        const\
+    \ int second_component = result.component_of_vertex[edge_to[edge_id]];\n     \
+    \   assert(first_component != second_component);\n        result.bridge_forest_edges.push_back(\n\
+    \            TwoEdgeConnectedBridge{first_component, second_component, edge_id});\n\
+    \    }\n    return result;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\
+    \n\n#line 18 \"graph/undirected.hpp\"\n\n\n"
   code: '#ifndef M1UNE_GRAPH_UNDIRECTED_HPP
 
     #define M1UNE_GRAPH_UNDIRECTED_HPP 1
@@ -1596,6 +1663,8 @@ data:
 
     #include "shortest_path.hpp"
 
+    #include "two_edge_connected_components.hpp"
+
 
     #endif  // M1UNE_GRAPH_UNDIRECTED_HPP
 
@@ -1623,11 +1692,12 @@ data:
   - graph/dijkstra.hpp
   - graph/warshall_floyd.hpp
   - graph/zero_one_bfs.hpp
+  - graph/two_edge_connected_components.hpp
   isVerificationFile: false
   path: graph/undirected.hpp
   requiredBy:
   - graph/all.hpp
-  timestamp: '2026-07-11 19:39:37+09:00'
+  timestamp: '2026-07-11 19:47:32+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
@@ -1655,6 +1725,7 @@ where direction should not matter.
 | `graph/shortest_path.hpp` | Mixed shortest-path bundle | Use BFS, 0-1 BFS, Dijkstra, Bellman-Ford, and Warshall-Floyd on undirected graphs built with `add_edge`; DAG shortest path is directed-only. |
 | `graph/lowlink.hpp` | Undirected only | Articulation points and bridges. |
 | `graph/biconnected_components.hpp` | Undirected only | Vertex-biconnected blocks, articulation points, and block incidence. |
+| `graph/two_edge_connected_components.hpp` | Undirected only | Two-edge-connected components, bridges, and the contracted bridge forest. |
 | `graph/kruskal.hpp` | Undirected only | Minimum spanning forest. |
 | `graph/bipartite.hpp` | Direction ignored / explicit bipartite sides | Two-colorability, maximum matching, minimum vertex cover, maximum independent set, and minimum edge cover. |
 | `graph/general_matching.hpp` | Undirected only | Maximum-cardinality matching and minimum edge cover in general undirected graphs. |

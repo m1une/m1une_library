@@ -120,6 +120,9 @@ data:
     path: graph/tree/zero_one_on_tree.hpp
     title: 01 on Tree
   - icon: ':heavy_check_mark:'
+    path: graph/two_edge_connected_components.hpp
+    title: Two-Edge-Connected Components
+  - icon: ':heavy_check_mark:'
     path: graph/undirected.hpp
     title: Undirected Graph Algorithms
   - icon: ':heavy_check_mark:'
@@ -213,6 +216,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/tree/zero_one_on_tree.test.cpp
     title: verify/graph/tree/zero_one_on_tree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/two_edge_connected_components.test.cpp
+    title: verify/graph/two_edge_connected_components.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -241,8 +247,8 @@ data:
     \        _edge_positions.back().push_back({from, idx});\n        return id;\n\
     \    }\n\n    int add_edge(int u, int v, T cost = T(1)) {\n        assert(0 <=\
     \ u && u < _n);\n        assert(0 <= v && v < _n);\n        int id = _edge_count++;\n\
-    \        int u_idx = int(_g[u].size());\n        int v_idx = int(_g[v].size());\n\
-    \        _g[u].push_back(edge_type(u, v, cost, id));\n        _g[v].push_back(edge_type(v,\
+    \        int u_idx = int(_g[u].size());\n        _g[u].push_back(edge_type(u,\
+    \ v, cost, id));\n        int v_idx = int(_g[v].size());\n        _g[v].push_back(edge_type(v,\
     \ u, cost, id));\n        _edge_positions.emplace_back();\n        _edge_positions.back().push_back({u,\
     \ u_idx});\n        _edge_positions.back().push_back({v, v_idx});\n        return\
     \ id;\n    }\n\n    void set_edge_alive(int id, bool alive) {\n        assert(0\
@@ -296,8 +302,8 @@ data:
     \        _edge_positions.back().push_back({from, idx});\n        return id;\n\
     \    }\n\n    int add_edge(int u, int v, T cost = T(1)) {\n        assert(0 <=\
     \ u && u < _n);\n        assert(0 <= v && v < _n);\n        int id = _edge_count++;\n\
-    \        int u_idx = int(_g[u].size());\n        int v_idx = int(_g[v].size());\n\
-    \        _g[u].push_back(edge_type(u, v, cost, id));\n        _g[v].push_back(edge_type(v,\
+    \        int u_idx = int(_g[u].size());\n        _g[u].push_back(edge_type(u,\
+    \ v, cost, id));\n        int v_idx = int(_g[v].size());\n        _g[v].push_back(edge_type(v,\
     \ u, cost, id));\n        _edge_positions.emplace_back();\n        _edge_positions.back().push_back({u,\
     \ u_idx});\n        _edge_positions.back().push_back({v, v_idx});\n        return\
     \ id;\n    }\n\n    void set_edge_alive(int id, bool alive) {\n        assert(0\
@@ -359,6 +365,7 @@ data:
   - graph/tree/tree.hpp
   - graph/tree/diameter.hpp
   - graph/dominator_tree.hpp
+  - graph/two_edge_connected_components.hpp
   - graph/connected_components.hpp
   - graph/all.hpp
   - graph/all.hpp
@@ -374,7 +381,7 @@ data:
   - graph/directed.hpp
   - graph/shortest_path.hpp
   - graph/general_matching.hpp
-  timestamp: '2026-06-17 14:06:24+09:00'
+  timestamp: '2026-07-11 19:47:32+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/library_checker_maximum_independent_set.test.cpp
@@ -405,6 +412,7 @@ data:
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/namori.test.cpp
+  - verify/graph/two_edge_connected_components.test.cpp
 documentation_of: graph/graph.hpp
 layout: document
 title: Graph

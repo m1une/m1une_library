@@ -98,8 +98,8 @@ data:
     \ idx});\n        return id;\n    }\n\n    int add_edge(int u, int v, T cost =\
     \ T(1)) {\n        assert(0 <= u && u < _n);\n        assert(0 <= v && v < _n);\n\
     \        int id = _edge_count++;\n        int u_idx = int(_g[u].size());\n   \
-    \     int v_idx = int(_g[v].size());\n        _g[u].push_back(edge_type(u, v,\
-    \ cost, id));\n        _g[v].push_back(edge_type(v, u, cost, id));\n        _edge_positions.emplace_back();\n\
+    \     _g[u].push_back(edge_type(u, v, cost, id));\n        int v_idx = int(_g[v].size());\n\
+    \        _g[v].push_back(edge_type(v, u, cost, id));\n        _edge_positions.emplace_back();\n\
     \        _edge_positions.back().push_back({u, u_idx});\n        _edge_positions.back().push_back({v,\
     \ v_idx});\n        return id;\n    }\n\n    void set_edge_alive(int id, bool\
     \ alive) {\n        assert(0 <= id && id < _edge_count);\n        for (auto [v,\
@@ -1844,7 +1844,7 @@ data:
   isVerificationFile: true
   path: verify/graph/tree/tree_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-09 03:02:06+09:00'
+  timestamp: '2026-07-11 19:47:32+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/tree/tree_algorithms.test.cpp

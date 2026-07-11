@@ -149,6 +149,9 @@ data:
     path: graph/tree/zero_one_on_tree.hpp
     title: 01 on Tree
   - icon: ':heavy_check_mark:'
+    path: graph/two_edge_connected_components.hpp
+    title: Two-Edge-Connected Components
+  - icon: ':heavy_check_mark:'
     path: graph/two_sat.hpp
     title: Two-Satisfiability
   - icon: ':heavy_check_mark:'
@@ -305,10 +308,11 @@ data:
   - graph/maximum_clique.hpp
   - graph/minimum_steiner_tree.hpp
   - graph/namori.hpp
+  - graph/two_edge_connected_components.hpp
   isVerificationFile: false
   path: graph/all.hpp
   requiredBy: []
-  timestamp: '2026-07-11 19:39:37+09:00'
+  timestamp: '2026-07-11 19:47:32+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
@@ -355,6 +359,7 @@ Public namespaces stay flat and short: general graph helpers use
 | `graph/two_sat.hpp` | Implication graph | 2-SAT clauses, satisfiability, and one assignment. |
 | `graph/lowlink.hpp` | Undirected only | Articulation points and bridges. |
 | `graph/biconnected_components.hpp` | Undirected only | Vertex-biconnected blocks, articulation points, and block incidence. |
+| `graph/two_edge_connected_components.hpp` | Undirected only | Two-edge-connected components, bridges, and the contracted bridge forest. |
 | `graph/bipartite.hpp` | Direction ignored / explicit bipartite sides | Two-colorability, maximum matching, minimum vertex cover, maximum independent set, and minimum edge cover. |
 | `graph/general_matching.hpp` | Undirected only | Maximum-cardinality matching and minimum edge cover in general undirected graphs. |
 | `graph/maximum_clique.hpp` | Direction ignored | Exact maximum clique, maximum independent set, and minimum vertex cover with bitset branch-and-bound. |
