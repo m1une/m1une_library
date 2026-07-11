@@ -13,9 +13,13 @@
 namespace m1une {
 namespace ds {
 
+template <typename T, typename Compare>
+struct OrderedSet;
+
 template <typename T, typename Compare = std::less<T>>
 struct OrderedMultiset {
    private:
+    friend struct OrderedSet<T, Compare>;
     struct Node {
         T key;
         int priority;
@@ -160,6 +164,25 @@ struct OrderedMultiset {
         return t;
     }
 
+    Node* insert_unique_impl(Node* t, T& key, bool& inserted) {
+        if (t == nullptr) {
+            inserted = true;
+            return new_node(std::move(key), 1);
+        }
+        if (equal(key, t->key)) return t;
+        if (comp(key, t->key)) {
+            t->l = insert_unique_impl(t->l, key, inserted);
+            if (!inserted) return t;
+            if (t->l->priority > t->priority) rotate_right(t);
+        } else {
+            t->r = insert_unique_impl(t->r, key, inserted);
+            if (!inserted) return t;
+            if (t->r->priority > t->priority) rotate_left(t);
+        }
+        update(t);
+        return t;
+    }
+
     bool erase_one_impl(Node*& t, const T& key) {
         if (t == nullptr) return false;
         bool erased;
@@ -176,8 +199,9 @@ struct OrderedMultiset {
         } else {
             erased = erase_one_impl(t->r, key);
         }
+        if (!erased) return false;
         update(t);
-        return erased;
+        return true;
     }
 
     int erase_all_impl(Node*& t, const T& key) {
@@ -193,6 +217,7 @@ struct OrderedMultiset {
         } else {
             erased = erase_all_impl(t->r, key);
         }
+        if (erased == 0) return 0;
         update(t);
         return erased;
     }
@@ -347,6 +372,14 @@ struct OrderedMultiset {
         root = insert_impl(root, key, multiplicity);
     }
 
+   private:
+    bool insert_unique(T key) {
+        bool inserted = false;
+        root = insert_unique_impl(root, key, inserted);
+        return inserted;
+    }
+
+   public:
     bool erase_one(const T& key) { return erase_one_impl(root, key); }
     bool erase(const T& key) { return erase_one(key); }
     int erase_all(const T& key) { return erase_all_impl(root, key); }

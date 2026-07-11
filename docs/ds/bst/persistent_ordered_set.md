@@ -59,7 +59,7 @@ Trees passed to `merge` must use equivalent comparator state.
 | `const T* upper_bound(const T& key) const`, `const T* min_gt(const T& key) const` | Returns the smallest key strictly greater than `key`, or `nullptr`. | $O(\log N)$ |
 | `const T* max_le(const T& key) const` | Returns the largest key less than or equal to `key`, or `nullptr`. | $O(\log N)$ |
 | `const T* max_lt(const T& key) const` | Returns the largest key strictly less than `key`, or `nullptr`. | $O(\log N)$ |
-| `const T* min() const`, `const T* max() const` | Returns the minimum or maximum key, or `nullptr` if the set is empty. | $O(\log N)$ |
+| `const T* min() const`, `const T* max() const` | Returns the minimum or maximum key, or `nullptr` if the set is empty. | $O(1)$ |
 | `std::pair<PersistentOrderedSet, PersistentOrderedSet> split(const T& key) const` | Returns `{less, greater_equal}` without changing this version. | $O(\log N)$ |
 | `PersistentOrderedSet merge(const PersistentOrderedSet& other) const` | Returns the union without changing either version. Requires every key in `*this` to be smaller than every key in `other`. | $O(\log(N + M))$ |
 | `std::vector<T> to_vector() const` | Returns all keys in sorted order. | $O(N)$ |

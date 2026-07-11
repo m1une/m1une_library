@@ -56,8 +56,7 @@ struct PersistentOrderedSet {
     }
 
     PersistentOrderedSet insert(T key) const {
-        if (data.contains(key)) return *this;
-        return PersistentOrderedSet(data.insert(std::move(key)));
+        return PersistentOrderedSet(data.insert_unique(std::move(key)));
     }
 
     PersistentOrderedSet erase(const T& key) const {

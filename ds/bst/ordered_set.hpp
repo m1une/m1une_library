@@ -52,9 +52,7 @@ struct OrderedSet {
     }
 
     bool insert(T key) {
-        if (data.contains(key)) return false;
-        data.insert(std::move(key));
-        return true;
+        return data.insert_unique(std::move(key));
     }
 
     bool erase(const T& key) {
