@@ -12,6 +12,9 @@ data:
     path: graph/tree/all.hpp
     title: Tree All
   - icon: ':heavy_check_mark:'
+    path: graph/tree/range_contour_query.hpp
+    title: Range Contour Query on Tree
+  - icon: ':heavy_check_mark:'
     path: graph/tree/tree.hpp
     title: Tree
   - icon: ':heavy_check_mark:'
@@ -30,6 +33,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/tree/tree_algorithms.test.cpp
     title: verify/graph/tree/tree_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
+    title: verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/vertex_get_range_contour_add_on_tree.test.cpp
+    title: verify/graph/tree/vertex_get_range_contour_add_on_tree.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/tree/zero_one_on_tree.test.cpp
     title: verify/graph/tree/zero_one_on_tree.test.cpp
@@ -255,6 +264,7 @@ data:
   requiredBy:
   - graph/tree/zero_one_on_tree.hpp
   - graph/tree/all.hpp
+  - graph/tree/range_contour_query.hpp
   - graph/tree/tree.hpp
   - graph/all.hpp
   timestamp: '2026-07-11 19:47:32+09:00'
@@ -262,6 +272,8 @@ data:
   verifiedWith:
   - verify/graph/cow_game.test.cpp
   - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
+  - verify/graph/tree/vertex_get_range_contour_add_on_tree.test.cpp
   - verify/graph/tree/tree_algorithms.test.cpp
   - verify/graph/tree/zero_one_on_tree.test.cpp
   - verify/graph/graph_algorithms.test.cpp

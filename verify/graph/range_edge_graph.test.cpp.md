@@ -131,6 +131,9 @@ data:
     path: graph/tree/heavy_light_decomposition.hpp
     title: Heavy Light Decomposition
   - icon: ':heavy_check_mark:'
+    path: graph/tree/range_contour_query.hpp
+    title: Range Contour Query on Tree
+  - icon: ':heavy_check_mark:'
     path: graph/tree/rerooting_dp.hpp
     title: Rerooting DP
   - icon: ':heavy_check_mark:'
@@ -193,6 +196,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/modular_square_root.hpp
     title: Modular Square Root
+  - icon: ':heavy_check_mark:'
+    path: monoid/add.hpp
+    title: Add Monoid
+  - icon: ':heavy_check_mark:'
+    path: monoid/concept.hpp
+    title: Monoid Concept
   - icon: ':heavy_check_mark:'
     path: monoid/concept.hpp
     title: Monoid Concept
@@ -330,9 +339,12 @@ data:
   - graph/tree/dsu_on_tree.hpp
   - graph/tree/euler_tour.hpp
   - graph/tree/heavy_light_decomposition.hpp
+  - graph/tree/range_contour_query.hpp
+  - monoid/add.hpp
+  - monoid/concept.hpp
+  - graph/tree/rooted_tree.hpp
   - graph/tree/rerooting_dp.hpp
   - graph/tree/rerooting_static_top_tree.hpp
-  - graph/tree/rooted_tree.hpp
   - graph/tree/sparse_table_lca.hpp
   - ds/range_query/sparse_table.hpp
   - monoid/concept.hpp
@@ -356,7 +368,7 @@ data:
   isVerificationFile: true
   path: verify/graph/range_edge_graph.test.cpp
   requiredBy: []
-  timestamp: '2026-07-11 20:23:59+09:00'
+  timestamp: '2026-07-12 04:12:02+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/range_edge_graph.test.cpp

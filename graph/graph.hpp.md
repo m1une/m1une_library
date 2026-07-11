@@ -99,6 +99,9 @@ data:
     path: graph/tree/heavy_light_decomposition.hpp
     title: Heavy Light Decomposition
   - icon: ':heavy_check_mark:'
+    path: graph/tree/range_contour_query.hpp
+    title: Range Contour Query on Tree
+  - icon: ':heavy_check_mark:'
     path: graph/tree/rerooting_dp.hpp
     title: Rerooting DP
   - icon: ':heavy_check_mark:'
@@ -220,11 +223,17 @@ data:
     path: verify/graph/tree/tree_algorithms.test.cpp
     title: verify/graph/tree/tree_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
+    title: verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/tree/vertex_add_subtree_sum.test.cpp
     title: verify/graph/tree/vertex_add_subtree_sum.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/tree/vertex_add_subtree_sum.test.cpp
     title: verify/graph/tree/vertex_add_subtree_sum.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/vertex_get_range_contour_add_on_tree.test.cpp
+    title: verify/graph/tree/vertex_get_range_contour_add_on_tree.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/tree/zero_one_on_tree.test.cpp
     title: verify/graph/tree/zero_one_on_tree.test.cpp
@@ -372,6 +381,7 @@ data:
   - graph/tree/cartesian_tree.hpp
   - graph/tree/all.hpp
   - graph/tree/euler_tour.hpp
+  - graph/tree/range_contour_query.hpp
   - graph/tree/rerooting_static_top_tree.hpp
   - graph/tree/heavy_light_decomposition.hpp
   - graph/tree/static_top_tree.hpp
@@ -416,7 +426,9 @@ data:
   - verify/graph/eulerian_trail_directed.test.cpp
   - verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
   - verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
+  - verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
   - verify/graph/tree/cartesian_tree.test.cpp
+  - verify/graph/tree/vertex_get_range_contour_add_on_tree.test.cpp
   - verify/graph/tree/vertex_add_subtree_sum.test.cpp
   - verify/graph/tree/vertex_add_subtree_sum.test.cpp
   - verify/graph/tree/tree_algorithms.test.cpp

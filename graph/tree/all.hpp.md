@@ -26,6 +26,9 @@ data:
     path: graph/tree/heavy_light_decomposition.hpp
     title: Heavy Light Decomposition
   - icon: ':heavy_check_mark:'
+    path: graph/tree/range_contour_query.hpp
+    title: Range Contour Query on Tree
+  - icon: ':heavy_check_mark:'
     path: graph/tree/rerooting_dp.hpp
     title: Rerooting DP
   - icon: ':heavy_check_mark:'
@@ -52,6 +55,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/tree/zero_one_on_tree.hpp
     title: 01 on Tree
+  - icon: ':heavy_check_mark:'
+    path: monoid/add.hpp
+    title: Add Monoid
+  - icon: ':heavy_check_mark:'
+    path: monoid/concept.hpp
+    title: Monoid Concept
   - icon: ':heavy_check_mark:'
     path: monoid/concept.hpp
     title: Monoid Concept
@@ -440,10 +449,246 @@ data:
     \        return result;\n    }\n\n    template <class F>\n    void for_each_path(int\
     \ u, int v, F f, bool edge = false) const {\n        for (auto seg : path_segments(u,\
     \ v, edge)) f(seg.l, seg.r, seg.reversed);\n    }\n};\n\n}  // namespace tree\n\
-    }  // namespace m1une\n\n\n#line 1 \"graph/tree/rerooting_dp.hpp\"\n\n\n\n#line\
-    \ 5 \"graph/tree/rerooting_dp.hpp\"\n\n#line 7 \"graph/tree/rerooting_dp.hpp\"\
-    \n\nnamespace m1une {\nnamespace tree {\n\ntemplate <class T, class DP, class\
-    \ Merge, class AddVertex, class AddEdge>\nstd::vector<DP> rerooting_dp(const m1une::graph::Graph<T>&\
+    }  // namespace m1une\n\n\n#line 1 \"graph/tree/range_contour_query.hpp\"\n\n\n\
+    \n#line 7 \"graph/tree/range_contour_query.hpp\"\n\n#line 1 \"monoid/add.hpp\"\
+    \n\n\n\nnamespace m1une {\nnamespace monoid {\n\n// Monoid for addition (Range\
+    \ Sum).\ntemplate <typename T>\nstruct Add {\n    using value_type = T;\n\n  \
+    \  // Returns the identity element for addition, which is 0.\n    static constexpr\
+    \ T id() {\n        return T(0);\n    }\n\n    // Returns the sum of a and b.\n\
+    \    static constexpr T op(const T& a, const T& b) {\n        return a + b;\n\
+    \    }\n\n    static constexpr T inv(const T& x) {\n        return -x;\n    }\n\
+    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 1 \"monoid/concept.hpp\"\
+    \n\n\n\n#include <concepts>\n\nnamespace m1une {\nnamespace monoid {\n\n// Concept\
+    \ to check if a type satisfies the requirements of a Monoid.\n// A Monoid must\
+    \ have a `value_type`, an identity element `id()`, and an associative binary operation\
+    \ `op()`.\ntemplate <typename M>\nconcept IsMonoid = requires(typename M::value_type\
+    \ a, typename M::value_type b) {\n    // 1. Must define `value_type`\n    typename\
+    \ M::value_type;\n\n    // 2. Must have a static method `id()` returning `value_type`\n\
+    \    { M::id() } -> std::same_as<typename M::value_type>;\n\n    // 3. Must have\
+    \ a static method `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
+    \ M::value_type>;\n};\n\n// Concept for commutative group monoids.\n// A type\
+    \ satisfying this concept must also obey commutativity and inverse laws.\ntemplate\
+    \ <typename M>\nconcept IsCommutativeGroup = IsMonoid<M> && requires(typename\
+    \ M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename M::value_type>;\n\
+    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 1 \"graph/tree/rooted_tree.hpp\"\
+    \n\n\n\n#line 7 \"graph/tree/rooted_tree.hpp\"\n\n#line 9 \"graph/tree/rooted_tree.hpp\"\
+    \n\nnamespace m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct RootedTree\
+    \ {\n    using cost_type = T;\n    using edge_type = m1une::graph::Edge<T>;\n\n\
+    \    int root;\n    std::vector<int> parent;\n    std::vector<int> parent_edge;\n\
+    \    std::vector<int> depth;\n    std::vector<T> dist;\n    std::vector<int> subtree_size;\n\
+    \    std::vector<int> tin;\n    std::vector<int> tout;\n    std::vector<int> order;\n\
+    \    std::vector<std::vector<int>> up;\n\n   private:\n    int _n;\n    int _log;\n\
+    \n    void check_vertex(int v) const {\n        assert(0 <= v && v < _n);\n  \
+    \      assert(tin[v] != -1);\n    }\n\n   public:\n    RootedTree() : root(-1),\
+    \ _n(0), _log(0) {}\n    explicit RootedTree(const m1une::graph::Graph<T>& g,\
+    \ int root_ = 0) {\n        build(g, root_);\n    }\n\n    void build(const m1une::graph::Graph<T>&\
+    \ g, int root_ = 0) {\n        _n = g.size();\n        root = _n == 0 ? -1 : root_;\n\
+    \        _log = 1;\n        while ((1U << _log) <= (unsigned int)(std::max(1,\
+    \ _n))) _log++;\n\n        parent.assign(_n, -1);\n        parent_edge.assign(_n,\
+    \ -1);\n        depth.assign(_n, 0);\n        dist.assign(_n, T(0));\n       \
+    \ subtree_size.assign(_n, 0);\n        tin.assign(_n, -1);\n        tout.assign(_n,\
+    \ -1);\n        order.clear();\n        order.reserve(_n);\n        up.assign(_log,\
+    \ std::vector<int>(_n, -1));\n\n        if (_n == 0) return;\n        assert(0\
+    \ <= root && root < _n);\n\n        struct Frame {\n            int v;\n     \
+    \       int state;\n        };\n\n        std::vector<char> visited(_n, false);\n\
+    \        std::vector<Frame> stack;\n        stack.push_back({root, 0});\n    \
+    \    visited[root] = true;\n        int timer = 0;\n\n        while (!stack.empty())\
+    \ {\n            Frame frame = stack.back();\n            stack.pop_back();\n\
+    \            int v = frame.v;\n            if (frame.state == 0) {\n         \
+    \       tin[v] = timer++;\n                order.push_back(v);\n             \
+    \   up[0][v] = parent[v];\n                for (int k = 1; k < _log; k++) {\n\
+    \                    int p = up[k - 1][v];\n                    up[k][v] = p ==\
+    \ -1 ? -1 : up[k - 1][p];\n                }\n\n                stack.push_back({v,\
+    \ 1});\n                const auto& adj = g[v];\n                for (int i =\
+    \ int(adj.size()) - 1; i >= 0; i--) {\n                    const auto& e = adj[i];\n\
+    \                    if (!e.alive) continue;\n                    if (visited[e.to])\
+    \ continue;\n                    visited[e.to] = true;\n                    parent[e.to]\
+    \ = v;\n                    parent_edge[e.to] = e.id;\n                    depth[e.to]\
+    \ = depth[v] + 1;\n                    dist[e.to] = dist[v] + e.cost;\n      \
+    \              stack.push_back({e.to, 0});\n                }\n            } else\
+    \ {\n                subtree_size[v]++;\n                if (parent[v] != -1)\
+    \ subtree_size[parent[v]] += subtree_size[v];\n                tout[v] = timer;\n\
+    \            }\n        }\n    }\n\n    int size() const {\n        return _n;\n\
+    \    }\n\n    bool empty() const {\n        return _n == 0;\n    }\n\n    int\
+    \ log() const {\n        return _log;\n    }\n\n    bool is_ancestor(int u, int\
+    \ v) const {\n        check_vertex(u);\n        check_vertex(v);\n        return\
+    \ tin[u] <= tin[v] && tout[v] <= tout[u];\n    }\n\n    bool in_subtree(int v,\
+    \ int u) const {\n        return is_ancestor(u, v);\n    }\n\n    int kth_ancestor(int\
+    \ v, int k) const {\n        check_vertex(v);\n        assert(0 <= k);\n     \
+    \   int bit = 0;\n        while (k > 0 && v != -1) {\n            if (k & 1) {\n\
+    \                if (_log <= bit) return -1;\n                v = up[bit][v];\n\
+    \            }\n            k >>= 1;\n            bit++;\n        }\n        return\
+    \ v;\n    }\n\n    int lca(int u, int v) const {\n        check_vertex(u);\n \
+    \       check_vertex(v);\n        if (depth[u] < depth[v]) std::swap(u, v);\n\
+    \        u = kth_ancestor(u, depth[u] - depth[v]);\n        if (u == v) return\
+    \ u;\n        for (int k = _log - 1; k >= 0; k--) {\n            if (up[k][u]\
+    \ != up[k][v]) {\n                u = up[k][u];\n                v = up[k][v];\n\
+    \            }\n        }\n        return parent[u];\n    }\n\n    int dist_edges(int\
+    \ u, int v) const {\n        int w = lca(u, v);\n        return depth[u] + depth[v]\
+    \ - 2 * depth[w];\n    }\n\n    T dist_cost(int u, int v) const {\n        int\
+    \ w = lca(u, v);\n        return dist[u] + dist[v] - dist[w] - dist[w];\n    }\n\
+    \n    int jump(int from, int to, int k) const {\n        check_vertex(from);\n\
+    \        check_vertex(to);\n        assert(0 <= k);\n        int w = lca(from,\
+    \ to);\n        int up_len = depth[from] - depth[w];\n        int down_len = depth[to]\
+    \ - depth[w];\n        if (up_len + down_len < k) return -1;\n        if (k <=\
+    \ up_len) return kth_ancestor(from, k);\n        return kth_ancestor(to, down_len\
+    \ - (k - up_len));\n    }\n\n    std::vector<int> path(int u, int v) const {\n\
+    \        check_vertex(u);\n        check_vertex(v);\n        int w = lca(u, v);\n\
+    \        std::vector<int> a, b;\n        for (int x = u; x != w; x = parent[x])\
+    \ a.push_back(x);\n        a.push_back(w);\n        for (int x = v; x != w; x\
+    \ = parent[x]) b.push_back(x);\n        std::reverse(b.begin(), b.end());\n  \
+    \      a.insert(a.end(), b.begin(), b.end());\n        return a;\n    }\n\n  \
+    \  std::vector<int> path_edges(int u, int v) const {\n        check_vertex(u);\n\
+    \        check_vertex(v);\n        int w = lca(u, v);\n        std::vector<int>\
+    \ a, b;\n        for (int x = u; x != w; x = parent[x]) a.push_back(parent_edge[x]);\n\
+    \        for (int x = v; x != w; x = parent[x]) b.push_back(parent_edge[x]);\n\
+    \        std::reverse(b.begin(), b.end());\n        a.insert(a.end(), b.begin(),\
+    \ b.end());\n        return a;\n    }\n\n    std::pair<int, int> subtree_range(int\
+    \ v) const {\n        check_vertex(v);\n        return {tin[v], tout[v]};\n  \
+    \  }\n\n    std::vector<int> subtree_vertices(int v) const {\n        check_vertex(v);\n\
+    \        return std::vector<int>(order.begin() + tin[v], order.begin() + tout[v]);\n\
+    \    }\n};\n\n}  // namespace tree\n}  // namespace m1une\n\n\n#line 13 \"graph/tree/range_contour_query.hpp\"\
+    \n\nnamespace m1une {\nnamespace tree {\n\nnamespace internal {\n\nstruct RangeContourPathEntry\
+    \ {\n    int centroid;\n    int distance;\n    int subtree;\n};\n\nstruct RangeContourLayout\
+    \ {\n    int n = 0;\n    std::vector<std::vector<RangeContourPathEntry>> path;\n\
+    \    std::vector<int> all_size;\n    std::vector<int> subtree_size;\n\n    template\
+    \ <class EdgeCost>\n    void build(const m1une::graph::Graph<EdgeCost>& graph)\
+    \ {\n        n = graph.size();\n        path.assign(n, {});\n        all_size.assign(n,\
+    \ 0);\n        subtree_size.assign(n, 0);\n        if (n == 0) return;\n\n#ifndef\
+    \ NDEBUG\n        std::vector<int> incidence(graph.edge_count(), 0);\n       \
+    \ for (int vertex = 0; vertex < n; vertex++) {\n            for (const auto& edge\
+    \ : graph[vertex]) {\n                if (!edge.alive) continue;\n           \
+    \     assert(0 <= edge.id && edge.id < graph.edge_count());\n                incidence[edge.id]++;\n\
+    \            }\n        }\n        int active_edges = 0;\n        for (int count\
+    \ : incidence) {\n            if (count == 0) continue;\n            assert(count\
+    \ == 2);\n            active_edges++;\n        }\n        assert(active_edges\
+    \ == n - 1);\n#endif\n\n        RootedTree<EdgeCost> rooted(graph, 0);\n     \
+    \   assert(int(rooted.order.size()) == n);\n        CentroidDecomposition<EdgeCost>\
+    \ decomposition(graph);\n\n        for (int vertex = 0; vertex < n; vertex++)\
+    \ {\n            int previous = -1;\n            for (\n                int centroid\
+    \ = vertex;\n                centroid != -1;\n                centroid = decomposition.parent[centroid]\n\
+    \            ) {\n                int distance = rooted.dist_edges(vertex, centroid);\n\
+    \                path[vertex].push_back(\n                    RangeContourPathEntry{centroid,\
+    \ distance, previous}\n                );\n                all_size[centroid]\
+    \ = std::max(\n                    all_size[centroid],\n                    distance\
+    \ + 1\n                );\n                if (previous != -1) {\n           \
+    \         subtree_size[previous] = std::max(\n                        subtree_size[previous],\n\
+    \                        distance + 1\n                    );\n              \
+    \  }\n                previous = centroid;\n            }\n        }\n    }\n\
+    };\n\ntemplate <m1une::monoid::IsCommutativeGroup Group>\nclass RangeContourFenwick\
+    \ {\n   public:\n    using T = typename Group::value_type;\n\n   private:\n  \
+    \  int _n = 0;\n    std::vector<T> _data;\n\n    T prefix_product(int right) const\
+    \ {\n        T result = Group::id();\n        while (right > 0) {\n          \
+    \  result = Group::op(result, _data[right]);\n            right -= right & -right;\n\
+    \        }\n        return result;\n    }\n\n   public:\n    RangeContourFenwick()\
+    \ : _data(1, Group::id()) {}\n\n    explicit RangeContourFenwick(int n)\n    \
+    \    : _n(n), _data(n + 1, Group::id()) {\n        assert(0 <= n);\n    }\n\n\
+    \    int size() const {\n        return _n;\n    }\n\n    void apply(int index,\
+    \ const T& value) {\n        assert(0 <= index && index < _n);\n        for (index++;\
+    \ index <= _n; index += index & -index) {\n            _data[index] = Group::op(_data[index],\
+    \ value);\n        }\n    }\n\n    T product(int left, int right) const {\n  \
+    \      left = std::max(left, 0);\n        right = std::min(right, _n);\n     \
+    \   if (right <= left) return Group::id();\n        return Group::op(\n      \
+    \      Group::inv(prefix_product(left)),\n            prefix_product(right)\n\
+    \        );\n    }\n\n    void range_apply(int left, int right, const T& value)\
+    \ {\n        left = std::max(left, 0);\n        right = std::min(right, _n);\n\
+    \        if (right <= left) return;\n        apply(left, value);\n        if (right\
+    \ < _n) apply(right, Group::inv(value));\n    }\n\n    T get(int index) const\
+    \ {\n        assert(0 <= index && index < _n);\n        return prefix_product(index\
+    \ + 1);\n    }\n};\n\n}  // namespace internal\n\ntemplate <m1une::monoid::IsCommutativeGroup\
+    \ Group>\nclass VertexApplyRangeContourProduct {\n   public:\n    using T = typename\
+    \ Group::value_type;\n\n   private:\n    internal::RangeContourLayout _layout;\n\
+    \    std::vector<T> _value;\n    std::vector<internal::RangeContourFenwick<Group>>\
+    \ _all;\n    std::vector<internal::RangeContourFenwick<Group>> _subtree;\n\n \
+    \   void check_vertex(int vertex) const {\n        assert(0 <= vertex && vertex\
+    \ < size());\n    }\n\n   public:\n    VertexApplyRangeContourProduct() = default;\n\
+    \n    template <class EdgeCost>\n    explicit VertexApplyRangeContourProduct(\n\
+    \        const m1une::graph::Graph<EdgeCost>& graph,\n        const std::vector<T>&\
+    \ initial = {}\n    ) {\n        build(graph, initial);\n    }\n\n    template\
+    \ <class EdgeCost>\n    void build(\n        const m1une::graph::Graph<EdgeCost>&\
+    \ graph,\n        const std::vector<T>& initial = {}\n    ) {\n        assert(initial.empty()\
+    \ || int(initial.size()) == graph.size());\n        _layout.build(graph);\n  \
+    \      const int n = _layout.n;\n        _value.assign(n, Group::id());\n    \
+    \    _all.assign(n, internal::RangeContourFenwick<Group>());\n        _subtree.assign(n,\
+    \ internal::RangeContourFenwick<Group>());\n        for (int index = 0; index\
+    \ < n; index++) {\n            _all[index] =\n                internal::RangeContourFenwick<Group>(_layout.all_size[index]);\n\
+    \            _subtree[index] =\n                internal::RangeContourFenwick<Group>(\n\
+    \                    _layout.subtree_size[index]\n                );\n       \
+    \ }\n        if (!initial.empty()) {\n            for (int vertex = 0; vertex\
+    \ < n; vertex++) {\n                apply(vertex, initial[vertex]);\n        \
+    \    }\n        }\n    }\n\n    int size() const {\n        return _layout.n;\n\
+    \    }\n\n    bool empty() const {\n        return size() == 0;\n    }\n\n   \
+    \ T get(int vertex) const {\n        check_vertex(vertex);\n        return _value[vertex];\n\
+    \    }\n\n    void apply(int vertex, const T& value) {\n        check_vertex(vertex);\n\
+    \        _value[vertex] = Group::op(_value[vertex], value);\n        for (const\
+    \ auto& entry : _layout.path[vertex]) {\n            _all[entry.centroid].apply(entry.distance,\
+    \ value);\n            if (entry.subtree != -1) {\n                _subtree[entry.subtree].apply(entry.distance,\
+    \ value);\n            }\n        }\n    }\n\n    void set(int vertex, const T&\
+    \ value) {\n        check_vertex(vertex);\n        apply(vertex, Group::op(Group::inv(_value[vertex]),\
+    \ value));\n    }\n\n    T prod(int vertex, int left_distance, int right_distance)\
+    \ const {\n        check_vertex(vertex);\n        assert(0 <= left_distance &&\
+    \ left_distance <= right_distance);\n        T result = Group::id();\n       \
+    \ for (const auto& entry : _layout.path[vertex]) {\n            int left = left_distance\
+    \ - entry.distance;\n            int right = right_distance - entry.distance;\n\
+    \            result = Group::op(\n                result,\n                _all[entry.centroid].product(left,\
+    \ right)\n            );\n            if (entry.subtree != -1) {\n           \
+    \     result = Group::op(\n                    result,\n                    Group::inv(\n\
+    \                        _subtree[entry.subtree].product(left, right)\n      \
+    \              )\n                );\n            }\n        }\n        return\
+    \ result;\n    }\n};\n\ntemplate <m1une::monoid::IsCommutativeGroup Group>\nclass\
+    \ VertexGetRangeContourApply {\n   public:\n    using T = typename Group::value_type;\n\
+    \n   private:\n    internal::RangeContourLayout _layout;\n    std::vector<T> _base;\n\
+    \    std::vector<internal::RangeContourFenwick<Group>> _all;\n    std::vector<internal::RangeContourFenwick<Group>>\
+    \ _subtree;\n\n    void check_vertex(int vertex) const {\n        assert(0 <=\
+    \ vertex && vertex < size());\n    }\n\n   public:\n    VertexGetRangeContourApply()\
+    \ = default;\n\n    template <class EdgeCost>\n    explicit VertexGetRangeContourApply(\n\
+    \        const m1une::graph::Graph<EdgeCost>& graph,\n        const std::vector<T>&\
+    \ initial = {}\n    ) {\n        build(graph, initial);\n    }\n\n    template\
+    \ <class EdgeCost>\n    void build(\n        const m1une::graph::Graph<EdgeCost>&\
+    \ graph,\n        const std::vector<T>& initial = {}\n    ) {\n        assert(initial.empty()\
+    \ || int(initial.size()) == graph.size());\n        _layout.build(graph);\n  \
+    \      const int n = _layout.n;\n        _base = initial.empty() ? std::vector<T>(n,\
+    \ Group::id()) : initial;\n        _all.assign(n, internal::RangeContourFenwick<Group>());\n\
+    \        _subtree.assign(n, internal::RangeContourFenwick<Group>());\n       \
+    \ for (int index = 0; index < n; index++) {\n            _all[index] =\n     \
+    \           internal::RangeContourFenwick<Group>(_layout.all_size[index]);\n \
+    \           _subtree[index] =\n                internal::RangeContourFenwick<Group>(\n\
+    \                    _layout.subtree_size[index]\n                );\n       \
+    \ }\n    }\n\n    int size() const {\n        return _layout.n;\n    }\n\n   \
+    \ bool empty() const {\n        return size() == 0;\n    }\n\n    T get(int vertex)\
+    \ const {\n        check_vertex(vertex);\n        T result = _base[vertex];\n\
+    \        for (const auto& entry : _layout.path[vertex]) {\n            result\
+    \ = Group::op(\n                result,\n                _all[entry.centroid].get(entry.distance)\n\
+    \            );\n            if (entry.subtree != -1) {\n                result\
+    \ = Group::op(\n                    result,\n                    Group::inv(\n\
+    \                        _subtree[entry.subtree].get(entry.distance)\n       \
+    \             )\n                );\n            }\n        }\n        return\
+    \ result;\n    }\n\n    void point_apply(int vertex, const T& value) {\n     \
+    \   check_vertex(vertex);\n        _base[vertex] = Group::op(_base[vertex], value);\n\
+    \    }\n\n    void set(int vertex, const T& value) {\n        check_vertex(vertex);\n\
+    \        _base[vertex] = Group::op(\n            _base[vertex],\n            Group::op(Group::inv(get(vertex)),\
+    \ value)\n        );\n    }\n\n    void apply(\n        int vertex,\n        int\
+    \ left_distance,\n        int right_distance,\n        const T& value\n    ) {\n\
+    \        check_vertex(vertex);\n        assert(0 <= left_distance && left_distance\
+    \ <= right_distance);\n        for (const auto& entry : _layout.path[vertex])\
+    \ {\n            int left = left_distance - entry.distance;\n            int right\
+    \ = right_distance - entry.distance;\n            _all[entry.centroid].range_apply(left,\
+    \ right, value);\n            if (entry.subtree != -1) {\n                _subtree[entry.subtree].range_apply(left,\
+    \ right, value);\n            }\n        }\n    }\n};\n\ntemplate <class T>\n\
+    class VertexAddRangeContourSum\n    : public VertexApplyRangeContourProduct<m1une::monoid::Add<T>>\
+    \ {\n   private:\n    using Base = VertexApplyRangeContourProduct<m1une::monoid::Add<T>>;\n\
+    \n   public:\n    using Base::Base;\n\n    void add(int vertex, const T& delta)\
+    \ {\n        Base::apply(vertex, delta);\n    }\n\n    T sum(int vertex, int left_distance,\
+    \ int right_distance) const {\n        return Base::prod(vertex, left_distance,\
+    \ right_distance);\n    }\n};\n\ntemplate <class T>\nclass VertexGetRangeContourAdd\n\
+    \    : public VertexGetRangeContourApply<m1une::monoid::Add<T>> {\n   private:\n\
+    \    using Base = VertexGetRangeContourApply<m1une::monoid::Add<T>>;\n\n   public:\n\
+    \    using Base::Base;\n\n    void add(int vertex, const T& delta) {\n       \
+    \ Base::point_apply(vertex, delta);\n    }\n};\n\n}  // namespace tree\n}  //\
+    \ namespace m1une\n\n\n#line 1 \"graph/tree/rerooting_dp.hpp\"\n\n\n\n#line 5\
+    \ \"graph/tree/rerooting_dp.hpp\"\n\n#line 7 \"graph/tree/rerooting_dp.hpp\"\n\
+    \nnamespace m1une {\nnamespace tree {\n\ntemplate <class T, class DP, class Merge,\
+    \ class AddVertex, class AddEdge>\nstd::vector<DP> rerooting_dp(const m1une::graph::Graph<T>&\
     \ g, DP id, Merge merge, AddVertex add_vertex,\n                             AddEdge\
     \ add_edge) {\n    int n = g.size();\n    std::vector<int> parent(n, -2), parent_edge(n,\
     \ -1), order;\n    order.reserve(n);\n    for (int root = 0; root < n; root++)\
@@ -689,103 +934,12 @@ data:
     \          Rake, AddEdgeDown, AddEdgeUp, AddVertex)\n    -> RerootingStaticTopTree<T,\
     \ Vertex, std::invoke_result_t<AddVertex, Point, Vertex, int>, Point, CompressDown,\n\
     \                              CompressUp, Rake, AddEdgeDown, AddEdgeUp, AddVertex>;\n\
-    \n}  // namespace tree\n}  // namespace m1une\n\n\n#line 1 \"graph/tree/rooted_tree.hpp\"\
-    \n\n\n\n#line 7 \"graph/tree/rooted_tree.hpp\"\n\n#line 9 \"graph/tree/rooted_tree.hpp\"\
-    \n\nnamespace m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct RootedTree\
-    \ {\n    using cost_type = T;\n    using edge_type = m1une::graph::Edge<T>;\n\n\
-    \    int root;\n    std::vector<int> parent;\n    std::vector<int> parent_edge;\n\
-    \    std::vector<int> depth;\n    std::vector<T> dist;\n    std::vector<int> subtree_size;\n\
-    \    std::vector<int> tin;\n    std::vector<int> tout;\n    std::vector<int> order;\n\
-    \    std::vector<std::vector<int>> up;\n\n   private:\n    int _n;\n    int _log;\n\
-    \n    void check_vertex(int v) const {\n        assert(0 <= v && v < _n);\n  \
-    \      assert(tin[v] != -1);\n    }\n\n   public:\n    RootedTree() : root(-1),\
-    \ _n(0), _log(0) {}\n    explicit RootedTree(const m1une::graph::Graph<T>& g,\
-    \ int root_ = 0) {\n        build(g, root_);\n    }\n\n    void build(const m1une::graph::Graph<T>&\
-    \ g, int root_ = 0) {\n        _n = g.size();\n        root = _n == 0 ? -1 : root_;\n\
-    \        _log = 1;\n        while ((1U << _log) <= (unsigned int)(std::max(1,\
-    \ _n))) _log++;\n\n        parent.assign(_n, -1);\n        parent_edge.assign(_n,\
-    \ -1);\n        depth.assign(_n, 0);\n        dist.assign(_n, T(0));\n       \
-    \ subtree_size.assign(_n, 0);\n        tin.assign(_n, -1);\n        tout.assign(_n,\
-    \ -1);\n        order.clear();\n        order.reserve(_n);\n        up.assign(_log,\
-    \ std::vector<int>(_n, -1));\n\n        if (_n == 0) return;\n        assert(0\
-    \ <= root && root < _n);\n\n        struct Frame {\n            int v;\n     \
-    \       int state;\n        };\n\n        std::vector<char> visited(_n, false);\n\
-    \        std::vector<Frame> stack;\n        stack.push_back({root, 0});\n    \
-    \    visited[root] = true;\n        int timer = 0;\n\n        while (!stack.empty())\
-    \ {\n            Frame frame = stack.back();\n            stack.pop_back();\n\
-    \            int v = frame.v;\n            if (frame.state == 0) {\n         \
-    \       tin[v] = timer++;\n                order.push_back(v);\n             \
-    \   up[0][v] = parent[v];\n                for (int k = 1; k < _log; k++) {\n\
-    \                    int p = up[k - 1][v];\n                    up[k][v] = p ==\
-    \ -1 ? -1 : up[k - 1][p];\n                }\n\n                stack.push_back({v,\
-    \ 1});\n                const auto& adj = g[v];\n                for (int i =\
-    \ int(adj.size()) - 1; i >= 0; i--) {\n                    const auto& e = adj[i];\n\
-    \                    if (!e.alive) continue;\n                    if (visited[e.to])\
-    \ continue;\n                    visited[e.to] = true;\n                    parent[e.to]\
-    \ = v;\n                    parent_edge[e.to] = e.id;\n                    depth[e.to]\
-    \ = depth[v] + 1;\n                    dist[e.to] = dist[v] + e.cost;\n      \
-    \              stack.push_back({e.to, 0});\n                }\n            } else\
-    \ {\n                subtree_size[v]++;\n                if (parent[v] != -1)\
-    \ subtree_size[parent[v]] += subtree_size[v];\n                tout[v] = timer;\n\
-    \            }\n        }\n    }\n\n    int size() const {\n        return _n;\n\
-    \    }\n\n    bool empty() const {\n        return _n == 0;\n    }\n\n    int\
-    \ log() const {\n        return _log;\n    }\n\n    bool is_ancestor(int u, int\
-    \ v) const {\n        check_vertex(u);\n        check_vertex(v);\n        return\
-    \ tin[u] <= tin[v] && tout[v] <= tout[u];\n    }\n\n    bool in_subtree(int v,\
-    \ int u) const {\n        return is_ancestor(u, v);\n    }\n\n    int kth_ancestor(int\
-    \ v, int k) const {\n        check_vertex(v);\n        assert(0 <= k);\n     \
-    \   int bit = 0;\n        while (k > 0 && v != -1) {\n            if (k & 1) {\n\
-    \                if (_log <= bit) return -1;\n                v = up[bit][v];\n\
-    \            }\n            k >>= 1;\n            bit++;\n        }\n        return\
-    \ v;\n    }\n\n    int lca(int u, int v) const {\n        check_vertex(u);\n \
-    \       check_vertex(v);\n        if (depth[u] < depth[v]) std::swap(u, v);\n\
-    \        u = kth_ancestor(u, depth[u] - depth[v]);\n        if (u == v) return\
-    \ u;\n        for (int k = _log - 1; k >= 0; k--) {\n            if (up[k][u]\
-    \ != up[k][v]) {\n                u = up[k][u];\n                v = up[k][v];\n\
-    \            }\n        }\n        return parent[u];\n    }\n\n    int dist_edges(int\
-    \ u, int v) const {\n        int w = lca(u, v);\n        return depth[u] + depth[v]\
-    \ - 2 * depth[w];\n    }\n\n    T dist_cost(int u, int v) const {\n        int\
-    \ w = lca(u, v);\n        return dist[u] + dist[v] - dist[w] - dist[w];\n    }\n\
-    \n    int jump(int from, int to, int k) const {\n        check_vertex(from);\n\
-    \        check_vertex(to);\n        assert(0 <= k);\n        int w = lca(from,\
-    \ to);\n        int up_len = depth[from] - depth[w];\n        int down_len = depth[to]\
-    \ - depth[w];\n        if (up_len + down_len < k) return -1;\n        if (k <=\
-    \ up_len) return kth_ancestor(from, k);\n        return kth_ancestor(to, down_len\
-    \ - (k - up_len));\n    }\n\n    std::vector<int> path(int u, int v) const {\n\
-    \        check_vertex(u);\n        check_vertex(v);\n        int w = lca(u, v);\n\
-    \        std::vector<int> a, b;\n        for (int x = u; x != w; x = parent[x])\
-    \ a.push_back(x);\n        a.push_back(w);\n        for (int x = v; x != w; x\
-    \ = parent[x]) b.push_back(x);\n        std::reverse(b.begin(), b.end());\n  \
-    \      a.insert(a.end(), b.begin(), b.end());\n        return a;\n    }\n\n  \
-    \  std::vector<int> path_edges(int u, int v) const {\n        check_vertex(u);\n\
-    \        check_vertex(v);\n        int w = lca(u, v);\n        std::vector<int>\
-    \ a, b;\n        for (int x = u; x != w; x = parent[x]) a.push_back(parent_edge[x]);\n\
-    \        for (int x = v; x != w; x = parent[x]) b.push_back(parent_edge[x]);\n\
-    \        std::reverse(b.begin(), b.end());\n        a.insert(a.end(), b.begin(),\
-    \ b.end());\n        return a;\n    }\n\n    std::pair<int, int> subtree_range(int\
-    \ v) const {\n        check_vertex(v);\n        return {tin[v], tout[v]};\n  \
-    \  }\n\n    std::vector<int> subtree_vertices(int v) const {\n        check_vertex(v);\n\
-    \        return std::vector<int>(order.begin() + tin[v], order.begin() + tout[v]);\n\
-    \    }\n};\n\n}  // namespace tree\n}  // namespace m1une\n\n\n#line 1 \"graph/tree/sparse_table_lca.hpp\"\
+    \n}  // namespace tree\n}  // namespace m1une\n\n\n#line 1 \"graph/tree/sparse_table_lca.hpp\"\
     \n\n\n\n#line 9 \"graph/tree/sparse_table_lca.hpp\"\n\n#line 1 \"ds/range_query/sparse_table.hpp\"\
-    \n\n\n\n#include <bit>\n#line 6 \"ds/range_query/sparse_table.hpp\"\n#include\
-    \ <concepts>\n#line 9 \"ds/range_query/sparse_table.hpp\"\n\n#line 1 \"monoid/concept.hpp\"\
-    \n\n\n\n#line 5 \"monoid/concept.hpp\"\n\nnamespace m1une {\nnamespace monoid\
-    \ {\n\n// Concept to check if a type satisfies the requirements of a Monoid.\n\
-    // A Monoid must have a `value_type`, an identity element `id()`, and an associative\
-    \ binary operation `op()`.\ntemplate <typename M>\nconcept IsMonoid = requires(typename\
-    \ M::value_type a, typename M::value_type b) {\n    // 1. Must define `value_type`\n\
-    \    typename M::value_type;\n\n    // 2. Must have a static method `id()` returning\
-    \ `value_type`\n    { M::id() } -> std::same_as<typename M::value_type>;\n\n \
-    \   // 3. Must have a static method `op(a, b)` returning `value_type`\n    { M::op(a,\
-    \ b) } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for commutative\
-    \ group monoids.\n// A type satisfying this concept must also obey commutativity\
-    \ and inverse laws.\ntemplate <typename M>\nconcept IsCommutativeGroup = IsMonoid<M>\
-    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line\
-    \ 11 \"ds/range_query/sparse_table.hpp\"\n\nnamespace m1une {\nnamespace ds {\n\
-    \n// A Sparse Table utilizing C++20 Concepts for type safety.\n// It requires\
-    \ a Monoid struct that satisfies `m1une::monoid::IsMonoid`.\n// [IMPORTANT] For\
+    \n\n\n\n#include <bit>\n#line 9 \"ds/range_query/sparse_table.hpp\"\n\n#line 11\
+    \ \"ds/range_query/sparse_table.hpp\"\n\nnamespace m1une {\nnamespace ds {\n\n\
+    // A Sparse Table utilizing C++20 Concepts for type safety.\n// It requires a\
+    \ Monoid struct that satisfies `m1une::monoid::IsMonoid`.\n// [IMPORTANT] For\
     \ O(1) range queries to work correctly, the monoid operation MUST be idempotent.\n\
     // i.e., Monoid::op(x, x) == x must hold (e.g., Min, Max, GCD, Bitwise AND/OR).\n\
     template <m1une::monoid::IsMonoid Monoid>\nstruct SparseTable {\n    using T =\
@@ -1180,7 +1334,7 @@ data:
     \ == n);\n    if (n == 0) return 0;\n    assert(0 <= root && root < n);\n    assert(int(graph.edges().size())\
     \ == n - 1);\n\n    RootedTree<T> rooted_tree(graph, root);\n    assert(int(rooted_tree.order.size())\
     \ == n);\n    return zero_one_on_tree(rooted_tree.parent, value);\n}\n\n}  //\
-    \ namespace tree\n}  // namespace m1une\n\n\n#line 19 \"graph/tree/all.hpp\"\n\
+    \ namespace tree\n}  // namespace m1une\n\n\n#line 20 \"graph/tree/all.hpp\"\n\
     \n\n"
   code: '#ifndef M1UNE_TREE_ALL_HPP
 
@@ -1198,6 +1352,8 @@ data:
     #include "euler_tour.hpp"
 
     #include "heavy_light_decomposition.hpp"
+
+    #include "range_contour_query.hpp"
 
     #include "rerooting_dp.hpp"
 
@@ -1229,9 +1385,12 @@ data:
   - graph/tree/dsu_on_tree.hpp
   - graph/tree/euler_tour.hpp
   - graph/tree/heavy_light_decomposition.hpp
+  - graph/tree/range_contour_query.hpp
+  - monoid/add.hpp
+  - monoid/concept.hpp
+  - graph/tree/rooted_tree.hpp
   - graph/tree/rerooting_dp.hpp
   - graph/tree/rerooting_static_top_tree.hpp
-  - graph/tree/rooted_tree.hpp
   - graph/tree/sparse_table_lca.hpp
   - ds/range_query/sparse_table.hpp
   - monoid/concept.hpp
@@ -1244,7 +1403,7 @@ data:
   path: graph/tree/all.hpp
   requiredBy:
   - graph/all.hpp
-  timestamp: '2026-07-11 19:47:32+09:00'
+  timestamp: '2026-07-12 04:12:02+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
@@ -1273,6 +1432,7 @@ same graph container.
 | `graph/tree/rooted_tree.hpp` | Rooted metadata, Euler intervals, LCA, jumps, paths, and distances. |
 | `graph/tree/sparse_table_lca.hpp` | Euler-tour sparse-table LCA with $O(1)$ queries. |
 | `graph/tree/heavy_light_decomposition.hpp` | HLD order, path segments, subtree ranges, LCA, and jumps. |
+| `graph/tree/range_contour_query.hpp` | Commutative-group contour products and applications by unweighted tree distance, with additive wrappers. |
 | `graph/tree/diameter.hpp` | Weighted tree/forest diameter path. |
 | `graph/tree/tree_hash.hpp` | Probabilistic rooted-subtree and unrooted-tree isomorphism hashes. |
 | `graph/tree/dsu_on_tree.hpp` | Iterative small-to-large subtree processing with user callbacks. |

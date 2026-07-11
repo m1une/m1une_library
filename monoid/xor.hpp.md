@@ -9,6 +9,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/dsu/potentialized_dsu.test.cpp
     title: verify/ds/dsu/potentialized_dsu.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
+    title: verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/vertex_get_range_contour_add_on_tree.test.cpp
+    title: verify/graph/tree/vertex_get_range_contour_add_on_tree.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -39,6 +45,8 @@ data:
   verifiedWith:
   - verify/ds/dsu/persistent_potentialized_dsu.test.cpp
   - verify/ds/dsu/potentialized_dsu.test.cpp
+  - verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
+  - verify/graph/tree/vertex_get_range_contour_add_on_tree.test.cpp
 documentation_of: monoid/xor.hpp
 layout: document
 title: Bitwise XOR Monoid
