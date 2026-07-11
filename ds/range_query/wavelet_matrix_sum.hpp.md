@@ -1,8 +1,14 @@
 ---
 data:
   _extendedDependsOn: []
-  _extendedRequiredBy: []
+  _extendedRequiredBy:
+  - icon: ':heavy_check_mark:'
+    path: ds/range_query/static_rectangle_sum.hpp
+    title: Static Rectangle Sum
   _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/range_query/static_rectangle_sum.test.cpp
+    title: verify/ds/range_query/static_rectangle_sum.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/ds/range_query/wavelet_matrix_sum.test.cpp
     title: verify/ds/range_query/wavelet_matrix_sum.test.cpp
@@ -313,11 +319,13 @@ data:
   dependsOn: []
   isVerificationFile: false
   path: ds/range_query/wavelet_matrix_sum.hpp
-  requiredBy: []
+  requiredBy:
+  - ds/range_query/static_rectangle_sum.hpp
   timestamp: '2026-06-21 02:25:15+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/range_query/wavelet_matrix_sum.test.cpp
+  - verify/ds/range_query/static_rectangle_sum.test.cpp
 documentation_of: ds/range_query/wavelet_matrix_sum.hpp
 layout: document
 title: Wavelet Matrix with Sums
