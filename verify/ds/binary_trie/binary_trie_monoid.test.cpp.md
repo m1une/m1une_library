@@ -2,7 +2,7 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: ds/ordered_set/binary_trie_monoid.hpp
+    path: ds/binary_trie/binary_trie_monoid.hpp
     title: Binary Trie with Monoid
   - icon: ':heavy_check_mark:'
     path: monoid/add.hpp
@@ -20,11 +20,11 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://judge.yosupo.jp/problem/aplusb
+    PROBLEM: https://judge.yosupo.jp/problem/set_xor_min
     links:
-    - https://judge.yosupo.jp/problem/aplusb
-  bundledCode: "#line 1 \"verify/ds/ordered_set/binary_trie_monoid.test.cpp\"\n#define\
-    \ PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#line 1 \"ds/ordered_set/binary_trie_monoid.hpp\"\
+    - https://judge.yosupo.jp/problem/set_xor_min
+  bundledCode: "#line 1 \"verify/ds/binary_trie/binary_trie_monoid.test.cpp\"\n#define\
+    \ PROBLEM \"https://judge.yosupo.jp/problem/set_xor_min\"\n\n#line 1 \"ds/binary_trie/binary_trie_monoid.hpp\"\
     \n\n\n\n#include <cassert>\n#include <cstdint>\n#include <initializer_list>\n\
     #include <limits>\n#include <type_traits>\n#include <utility>\n#include <vector>\n\
     \n#line 1 \"monoid/concept.hpp\"\n\n\n\n#include <concepts>\n\nnamespace m1une\
@@ -40,7 +40,7 @@ data:
     \ satisfying this concept must also obey commutativity and inverse laws.\ntemplate\
     \ <typename M>\nconcept IsCommutativeGroup = IsMonoid<M> && requires(typename\
     \ M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename M::value_type>;\n\
-    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 13 \"ds/ordered_set/binary_trie_monoid.hpp\"\
+    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 13 \"ds/binary_trie/binary_trie_monoid.hpp\"\
     \n\nnamespace m1une {\nnamespace ds {\n\ntemplate <m1une::monoid::IsMonoid Monoid,\n\
     \          typename UInt = std::uint32_t,\n          int BitWidth = std::numeric_limits<UInt>::digits>\n\
     struct BinaryTrieMonoid {\n    using T = typename Monoid::value_type;\n\n    static_assert(std::is_integral_v<UInt>);\n\
@@ -244,9 +244,9 @@ data:
     \ which is 1.\n    static constexpr T id() {\n        return T(1);\n    }\n\n\
     \    // Returns the product of a and b.\n    static constexpr T op(const T& a,\
     \ const T& b) {\n        return a * b;\n    }\n};\n\n}  // namespace monoid\n\
-    }  // namespace m1une\n\n\n#line 6 \"verify/ds/ordered_set/binary_trie_monoid.test.cpp\"\
-    \n\n#include <algorithm>\n#line 10 \"verify/ds/ordered_set/binary_trie_monoid.test.cpp\"\
-    \n#include <iostream>\n#line 13 \"verify/ds/ordered_set/binary_trie_monoid.test.cpp\"\
+    }  // namespace m1une\n\n\n#line 6 \"verify/ds/binary_trie/binary_trie_monoid.test.cpp\"\
+    \n\n#include <algorithm>\n#line 10 \"verify/ds/binary_trie/binary_trie_monoid.test.cpp\"\
+    \n#include <iostream>\n#line 13 \"verify/ds/binary_trie/binary_trie_monoid.test.cpp\"\
     \n\nvoid basic_test() {\n    using Product = m1une::monoid::Mul<long long>;\n\
     \    using ProductTrie =\n        m1une::ds::BinaryTrieMonoid<Product, std::uint32_t,\
     \ 10>;\n\n    ProductTrie product;\n    product.reserve(64);\n    const auto one_node\
@@ -356,10 +356,15 @@ data:
     \  long long expected_all_prod = 0;\n        for (const auto& entry : entries)\
     \ {\n            expected_all_prod += entry.second;\n        }\n        assert(trie.all_prod()\
     \ == expected_all_prod);\n    }\n}\n\nint main() {\n    basic_test();\n    randomized_test();\n\
-    \n    long long a, b;\n    std::cin >> a >> b;\n    std::cout << a + b << '\\\
-    n';\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
-    ../../../ds/ordered_set/binary_trie_monoid.hpp\"\n#include \"../../../monoid/add.hpp\"\
+    \n    using Sum = m1une::monoid::Add<int>;\n    m1une::ds::BinaryTrieMonoid<Sum,\
+    \ std::uint32_t, 30> trie;\n\n    int q;\n    std::cin >> q;\n    while (q--)\
+    \ {\n        int type;\n        std::uint32_t value;\n        std::cin >> type\
+    \ >> value;\n        if (type == 0) {\n            if (!trie.contains(value))\
+    \ trie.insert(value, 0);\n        } else if (type == 1) {\n            trie.erase_all(value);\n\
+    \        } else {\n            std::cout << trie.min_xor(value) << '\\n';\n  \
+    \      }\n    }\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/set_xor_min\"\n\n#include\
+    \ \"../../../ds/binary_trie/binary_trie_monoid.hpp\"\n#include \"../../../monoid/add.hpp\"\
     \n#include \"../../../monoid/mul.hpp\"\n\n#include <algorithm>\n#include <cassert>\n\
     #include <cstdint>\n#include <iostream>\n#include <utility>\n#include <vector>\n\
     \nvoid basic_test() {\n    using Product = m1une::monoid::Mul<long long>;\n  \
@@ -471,23 +476,28 @@ data:
     \  long long expected_all_prod = 0;\n        for (const auto& entry : entries)\
     \ {\n            expected_all_prod += entry.second;\n        }\n        assert(trie.all_prod()\
     \ == expected_all_prod);\n    }\n}\n\nint main() {\n    basic_test();\n    randomized_test();\n\
-    \n    long long a, b;\n    std::cin >> a >> b;\n    std::cout << a + b << '\\\
-    n';\n}\n"
+    \n    using Sum = m1une::monoid::Add<int>;\n    m1une::ds::BinaryTrieMonoid<Sum,\
+    \ std::uint32_t, 30> trie;\n\n    int q;\n    std::cin >> q;\n    while (q--)\
+    \ {\n        int type;\n        std::uint32_t value;\n        std::cin >> type\
+    \ >> value;\n        if (type == 0) {\n            if (!trie.contains(value))\
+    \ trie.insert(value, 0);\n        } else if (type == 1) {\n            trie.erase_all(value);\n\
+    \        } else {\n            std::cout << trie.min_xor(value) << '\\n';\n  \
+    \      }\n    }\n}\n"
   dependsOn:
-  - ds/ordered_set/binary_trie_monoid.hpp
+  - ds/binary_trie/binary_trie_monoid.hpp
   - monoid/concept.hpp
   - monoid/add.hpp
   - monoid/mul.hpp
   isVerificationFile: true
-  path: verify/ds/ordered_set/binary_trie_monoid.test.cpp
+  path: verify/ds/binary_trie/binary_trie_monoid.test.cpp
   requiredBy: []
-  timestamp: '2026-06-22 15:33:45+09:00'
+  timestamp: '2026-07-12 04:39:25+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/ds/ordered_set/binary_trie_monoid.test.cpp
+documentation_of: verify/ds/binary_trie/binary_trie_monoid.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/ds/ordered_set/binary_trie_monoid.test.cpp
-- /verify/verify/ds/ordered_set/binary_trie_monoid.test.cpp.html
-title: verify/ds/ordered_set/binary_trie_monoid.test.cpp
+- /verify/verify/ds/binary_trie/binary_trie_monoid.test.cpp
+- /verify/verify/ds/binary_trie/binary_trie_monoid.test.cpp.html
+title: verify/ds/binary_trie/binary_trie_monoid.test.cpp
 ---

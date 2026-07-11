@@ -4,8 +4,8 @@ data:
   _extendedRequiredBy: []
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
-    path: verify/ds/ordered_set/binary_trie_monoid.test.cpp
-    title: verify/ds/ordered_set/binary_trie_monoid.test.cpp
+    path: verify/ds/binary_trie/binary_trie_monoid.test.cpp
+    title: verify/ds/binary_trie/binary_trie_monoid.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -32,7 +32,7 @@ data:
   timestamp: '2026-06-13 20:51:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/ordered_set/binary_trie_monoid.test.cpp
+  - verify/ds/binary_trie/binary_trie_monoid.test.cpp
 documentation_of: monoid/mul.hpp
 layout: document
 title: Multiply Monoid

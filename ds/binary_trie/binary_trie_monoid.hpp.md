@@ -7,14 +7,14 @@ data:
   _extendedRequiredBy: []
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
-    path: verify/ds/ordered_set/binary_trie_monoid.test.cpp
-    title: verify/ds/ordered_set/binary_trie_monoid.test.cpp
+    path: verify/ds/binary_trie/binary_trie_monoid.test.cpp
+    title: verify/ds/binary_trie/binary_trie_monoid.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"ds/ordered_set/binary_trie_monoid.hpp\"\n\n\n\n#include\
+  bundledCode: "#line 1 \"ds/binary_trie/binary_trie_monoid.hpp\"\n\n\n\n#include\
     \ <cassert>\n#include <cstdint>\n#include <initializer_list>\n#include <limits>\n\
     #include <type_traits>\n#include <utility>\n#include <vector>\n\n#line 1 \"monoid/concept.hpp\"\
     \n\n\n\n#include <concepts>\n\nnamespace m1une {\nnamespace monoid {\n\n// Concept\
@@ -29,7 +29,7 @@ data:
     \ satisfying this concept must also obey commutativity and inverse laws.\ntemplate\
     \ <typename M>\nconcept IsCommutativeGroup = IsMonoid<M> && requires(typename\
     \ M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename M::value_type>;\n\
-    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 13 \"ds/ordered_set/binary_trie_monoid.hpp\"\
+    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 13 \"ds/binary_trie/binary_trie_monoid.hpp\"\
     \n\nnamespace m1une {\nnamespace ds {\n\ntemplate <m1une::monoid::IsMonoid Monoid,\n\
     \          typename UInt = std::uint32_t,\n          int BitWidth = std::numeric_limits<UInt>::digits>\n\
     struct BinaryTrieMonoid {\n    using T = typename Monoid::value_type;\n\n    static_assert(std::is_integral_v<UInt>);\n\
@@ -418,13 +418,13 @@ data:
   dependsOn:
   - monoid/concept.hpp
   isVerificationFile: false
-  path: ds/ordered_set/binary_trie_monoid.hpp
+  path: ds/binary_trie/binary_trie_monoid.hpp
   requiredBy: []
-  timestamp: '2026-06-22 15:33:45+09:00'
+  timestamp: '2026-07-12 04:39:25+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/ordered_set/binary_trie_monoid.test.cpp
-documentation_of: ds/ordered_set/binary_trie_monoid.hpp
+  - verify/ds/binary_trie/binary_trie_monoid.test.cpp
+documentation_of: ds/binary_trie/binary_trie_monoid.hpp
 layout: document
 title: Binary Trie with Monoid
 ---
@@ -542,7 +542,7 @@ xor operand.
 ## Example
 
 ```cpp
-#include "ds/ordered_set/binary_trie_monoid.hpp"
+#include "ds/binary_trie/binary_trie_monoid.hpp"
 #include "monoid/mul.hpp"
 
 #include <cstdint>

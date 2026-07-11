@@ -19,6 +19,9 @@ data:
     title: Range Contour Query on Tree
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/ds/binary_trie/binary_trie_monoid.test.cpp
+    title: verify/ds/binary_trie/binary_trie_monoid.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/dsu/dsu_monoid.test.cpp
     title: verify/ds/dsu/dsu_monoid.test.cpp
   - icon: ':heavy_check_mark:'
@@ -39,9 +42,6 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/dynamic_tree/path_link_cut_tree.test.cpp
     title: verify/ds/dynamic_tree/path_link_cut_tree.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/ds/ordered_set/binary_trie_monoid.test.cpp
-    title: verify/ds/ordered_set/binary_trie_monoid.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/ds/range_query/disjoint_sparse_table.test.cpp
     title: verify/ds/range_query/disjoint_sparse_table.test.cpp
@@ -129,8 +129,8 @@ data:
   - verify/ds/dynamic_tree/link_cut_tree.test.cpp
   - verify/ds/dynamic_tree/path_link_cut_tree.test.cpp
   - verify/ds/dynamic_array/dynamic_monoid_array.test.cpp
-  - verify/ds/ordered_set/binary_trie_monoid.test.cpp
   - verify/ds/dynamic_connectivity/dynamic_connectivity.test.cpp
+  - verify/ds/binary_trie/binary_trie_monoid.test.cpp
   - verify/ds/range_query/sqrt_tree.test.cpp
   - verify/ds/range_query/disjoint_sparse_table.test.cpp
   - verify/ds/segtree/dual_segtree_2d.test.cpp

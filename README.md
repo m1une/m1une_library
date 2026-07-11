@@ -88,7 +88,8 @@ plumbing live in `utilities/`.
 | `ds/segtree/` | Dense and dynamic segment trees, lazy propagation, dual segment trees, and persistent variants. |
 | `ds/range_query/` | Objects built for repeated range queries, including cumulative sums, range LIS/modes and distinct counting, Fenwick trees, static sparse-table queries, and wavelet matrices. |
 | `ds/dynamic_array/` | Implicit-treap sequences with insertion, deletion, reversal, aggregation, or persistence. |
-| `ds/ordered_set/` | Ordered sets and multisets, including persistent variants and binary tries with optional monoid aggregates. |
+| `ds/bst/` | Ordered sets and multisets, including persistent red-black-tree variants and split/merge APIs. |
+| `ds/binary_trie/` | Binary tries for integer xor queries and optional monoid aggregates. |
 | `ds/dynamic_tree/` | Link-cut trees and rake-compress trees for changing forests. |
 | `ds/dynamic_connectivity/` | Online and offline connectivity under edge insertions and deletions. |
 | `ds/heap/` | Meldable priority queues. |

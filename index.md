@@ -213,6 +213,28 @@ data:
     - icon: ':heavy_check_mark:'
       path: convex/monge/smawk.hpp
       title: SMAWK
+  - name: ds/binary_trie
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: ds/binary_trie/binary_trie.hpp
+      title: Binary Trie
+    - icon: ':heavy_check_mark:'
+      path: ds/binary_trie/binary_trie_monoid.hpp
+      title: Binary Trie with Monoid
+  - name: ds/bst
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: ds/bst/ordered_multiset.hpp
+      title: Ordered Multiset
+    - icon: ':heavy_check_mark:'
+      path: ds/bst/ordered_set.hpp
+      title: Ordered Set
+    - icon: ':heavy_check_mark:'
+      path: ds/bst/persistent_ordered_multiset.hpp
+      title: Persistent Ordered Multiset
+    - icon: ':heavy_check_mark:'
+      path: ds/bst/persistent_ordered_set.hpp
+      title: Persistent Ordered Set
   - name: ds/dsu
     pages:
     - icon: ':heavy_check_mark:'
@@ -305,26 +327,6 @@ data:
     - icon: ':heavy_check_mark:'
       path: ds/interval_set/interval_set.hpp
       title: Interval Set
-  - name: ds/ordered_set
-    pages:
-    - icon: ':heavy_check_mark:'
-      path: ds/ordered_set/binary_trie.hpp
-      title: Binary Trie
-    - icon: ':heavy_check_mark:'
-      path: ds/ordered_set/binary_trie_monoid.hpp
-      title: Binary Trie with Monoid
-    - icon: ':heavy_check_mark:'
-      path: ds/ordered_set/ordered_multiset.hpp
-      title: Ordered Multiset
-    - icon: ':heavy_check_mark:'
-      path: ds/ordered_set/ordered_set.hpp
-      title: Ordered Set
-    - icon: ':heavy_check_mark:'
-      path: ds/ordered_set/persistent_ordered_multiset.hpp
-      title: Persistent Ordered Multiset
-    - icon: ':heavy_check_mark:'
-      path: ds/ordered_set/persistent_ordered_set.hpp
-      title: Persistent Ordered Set
   - name: ds/range_query
     pages:
     - icon: ':heavy_check_mark:'
@@ -1093,6 +1095,28 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/convex/monge/monge_dp_optimization.test.cpp
       title: verify/convex/monge/monge_dp_optimization.test.cpp
+  - name: verify/ds/binary_trie
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/binary_trie/binary_trie.test.cpp
+      title: verify/ds/binary_trie/binary_trie.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/binary_trie/binary_trie_monoid.test.cpp
+      title: verify/ds/binary_trie/binary_trie_monoid.test.cpp
+  - name: verify/ds/bst
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/bst/ordered_multiset.test.cpp
+      title: verify/ds/bst/ordered_multiset.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/bst/ordered_set.test.cpp
+      title: verify/ds/bst/ordered_set.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/bst/persistent_ordered_multiset.test.cpp
+      title: verify/ds/bst/persistent_ordered_multiset.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/bst/persistent_ordered_set.test.cpp
+      title: verify/ds/bst/persistent_ordered_set.test.cpp
   - name: verify/ds/dsu
     pages:
     - icon: ':heavy_check_mark:'
@@ -1191,26 +1215,6 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/ds/interval_set/interval_set.test.cpp
       title: verify/ds/interval_set/interval_set.test.cpp
-  - name: verify/ds/ordered_set
-    pages:
-    - icon: ':heavy_check_mark:'
-      path: verify/ds/ordered_set/binary_trie.test.cpp
-      title: verify/ds/ordered_set/binary_trie.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/ds/ordered_set/binary_trie_monoid.test.cpp
-      title: verify/ds/ordered_set/binary_trie_monoid.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/ds/ordered_set/ordered_multiset.test.cpp
-      title: verify/ds/ordered_set/ordered_multiset.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/ds/ordered_set/ordered_set.test.cpp
-      title: verify/ds/ordered_set/ordered_set.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/ds/ordered_set/persistent_ordered_multiset.test.cpp
-      title: verify/ds/ordered_set/persistent_ordered_multiset.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/ds/ordered_set/persistent_ordered_set.test.cpp
-      title: verify/ds/ordered_set/persistent_ordered_set.test.cpp
   - name: verify/ds/range_query
     pages:
     - icon: ':heavy_check_mark:'

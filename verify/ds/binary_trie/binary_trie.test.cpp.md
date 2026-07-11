@@ -2,7 +2,7 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: ds/ordered_set/binary_trie.hpp
+    path: ds/binary_trie/binary_trie.hpp
     title: Binary Trie
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
@@ -14,8 +14,8 @@ data:
     PROBLEM: https://judge.yosupo.jp/problem/set_xor_min
     links:
     - https://judge.yosupo.jp/problem/set_xor_min
-  bundledCode: "#line 1 \"verify/ds/ordered_set/binary_trie.test.cpp\"\n#define PROBLEM\
-    \ \"https://judge.yosupo.jp/problem/set_xor_min\"\n\n#line 1 \"ds/ordered_set/binary_trie.hpp\"\
+  bundledCode: "#line 1 \"verify/ds/binary_trie/binary_trie.test.cpp\"\n#define PROBLEM\
+    \ \"https://judge.yosupo.jp/problem/set_xor_min\"\n\n#line 1 \"ds/binary_trie/binary_trie.hpp\"\
     \n\n\n\n#include <cassert>\n#include <cstdint>\n#include <initializer_list>\n\
     #include <limits>\n#include <type_traits>\n#include <vector>\n\nnamespace m1une\
     \ {\nnamespace ds {\n\ntemplate <typename UInt = std::uint32_t, int BitWidth =\
@@ -124,10 +124,10 @@ data:
     \       std::vector<UInt> result;\n        result.reserve(size());\n        for\
     \ (int k = 0; k < size(); ++k) {\n            result.push_back(kth(k));\n    \
     \    }\n        return result;\n    }\n};\n\n}  // namespace ds\n}  // namespace\
-    \ m1une\n\n\n#line 4 \"verify/ds/ordered_set/binary_trie.test.cpp\"\n\n#include\
-    \ <algorithm>\n#line 8 \"verify/ds/ordered_set/binary_trie.test.cpp\"\n#include\
+    \ m1une\n\n\n#line 4 \"verify/ds/binary_trie/binary_trie.test.cpp\"\n\n#include\
+    \ <algorithm>\n#line 8 \"verify/ds/binary_trie/binary_trie.test.cpp\"\n#include\
     \ <iostream>\n#include <iterator>\n#include <set>\n#include <utility>\n#line 13\
-    \ \"verify/ds/ordered_set/binary_trie.test.cpp\"\n\nvoid unit_test() {\n    using\
+    \ \"verify/ds/binary_trie/binary_trie.test.cpp\"\n\nvoid unit_test() {\n    using\
     \ Trie = m1une::ds::BinaryTrie<std::uint32_t, 10>;\n\n    Trie basic;\n    basic.reserve(64);\n\
     \    const auto five_node = basic.insert(5, 3);\n    basic.insert(9);\n    assert(basic.root()\
     \ == 0);\n    assert(basic.find(5) == five_node);\n    assert(basic.find(7) ==\
@@ -191,7 +191,7 @@ data:
     \        } else {\n            std::cout << trie.min_xor(value) << '\\n';\n  \
     \      }\n    }\n}\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/set_xor_min\"\n\n#include\
-    \ \"../../../ds/ordered_set/binary_trie.hpp\"\n\n#include <algorithm>\n#include\
+    \ \"../../../ds/binary_trie/binary_trie.hpp\"\n\n#include <algorithm>\n#include\
     \ <cassert>\n#include <cstdint>\n#include <iostream>\n#include <iterator>\n#include\
     \ <set>\n#include <utility>\n#include <vector>\n\nvoid unit_test() {\n    using\
     \ Trie = m1une::ds::BinaryTrie<std::uint32_t, 10>;\n\n    Trie basic;\n    basic.reserve(64);\n\
@@ -257,17 +257,17 @@ data:
     \        } else {\n            std::cout << trie.min_xor(value) << '\\n';\n  \
     \      }\n    }\n}\n"
   dependsOn:
-  - ds/ordered_set/binary_trie.hpp
+  - ds/binary_trie/binary_trie.hpp
   isVerificationFile: true
-  path: verify/ds/ordered_set/binary_trie.test.cpp
+  path: verify/ds/binary_trie/binary_trie.test.cpp
   requiredBy: []
-  timestamp: '2026-06-22 15:33:45+09:00'
+  timestamp: '2026-07-12 04:39:25+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/ds/ordered_set/binary_trie.test.cpp
+documentation_of: verify/ds/binary_trie/binary_trie.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/ds/ordered_set/binary_trie.test.cpp
-- /verify/verify/ds/ordered_set/binary_trie.test.cpp.html
-title: verify/ds/ordered_set/binary_trie.test.cpp
+- /verify/verify/ds/binary_trie/binary_trie.test.cpp
+- /verify/verify/ds/binary_trie/binary_trie.test.cpp.html
+title: verify/ds/binary_trie/binary_trie.test.cpp
 ---

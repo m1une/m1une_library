@@ -11,7 +11,8 @@ one-shot sequence computations such as LIS are in `algo/sequence/`.
 | [`segtree/`](segtree/) | Dense, dynamic, lazy, dual, generic Beats, specialized chmin/chmax/add, and persistent variants, including `segtree_2d.hpp` and `dual_segtree_2d.hpp` |
 | [`range_query/`](range_query/) | Repeated range-query objects: 1D/2D/3D cumulative sums, static weighted rectangle sums, SWAG, static range inversions/LIS/modes and distinct counting, monoid and custom-state square-root decomposition, Fenwick tree, sqrt/sparse tables, and wavelet matrices |
 | [`dynamic_array/`](dynamic_array/) | Dynamic and persistent implicit-treap arrays, with optional monoid or lazy aggregation |
-| [`ordered_set/`](ordered_set/) | Ordered sets, multisets, and binary tries for integer xor queries and monoid aggregates |
+| [`bst/`](bst/) | Ordered sets and multisets implemented with randomized BSTs, plus persistent red-black-tree variants with split and merge |
+| [`binary_trie/`](binary_trie/) | Binary tries for integer xor queries and monoid aggregates |
 | [`dynamic_tree/`](dynamic_tree/) | Link-cut tree, path-oriented variants, and rake-compress link-cut tree |
 | [`dynamic_connectivity/`](dynamic_connectivity/) | Online and offline fully dynamic undirected connectivity |
 | [`heap/`](heap/) | Pairing-based meldable priority queue |

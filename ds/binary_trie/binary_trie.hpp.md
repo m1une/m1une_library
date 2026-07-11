@@ -4,14 +4,14 @@ data:
   _extendedRequiredBy: []
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
-    path: verify/ds/ordered_set/binary_trie.test.cpp
-    title: verify/ds/ordered_set/binary_trie.test.cpp
+    path: verify/ds/binary_trie/binary_trie.test.cpp
+    title: verify/ds/binary_trie/binary_trie.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"ds/ordered_set/binary_trie.hpp\"\n\n\n\n#include <cassert>\n\
+  bundledCode: "#line 1 \"ds/binary_trie/binary_trie.hpp\"\n\n\n\n#include <cassert>\n\
     #include <cstdint>\n#include <initializer_list>\n#include <limits>\n#include <type_traits>\n\
     #include <vector>\n\nnamespace m1une {\nnamespace ds {\n\ntemplate <typename UInt\
     \ = std::uint32_t, int BitWidth = std::numeric_limits<UInt>::digits>\nstruct BinaryTrie\
@@ -233,13 +233,13 @@ data:
     \ m1une\n\n#endif  // M1UNE_DS_BINARY_TRIE_HPP\n"
   dependsOn: []
   isVerificationFile: false
-  path: ds/ordered_set/binary_trie.hpp
+  path: ds/binary_trie/binary_trie.hpp
   requiredBy: []
-  timestamp: '2026-06-22 15:33:45+09:00'
+  timestamp: '2026-07-12 04:39:25+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/ordered_set/binary_trie.test.cpp
-documentation_of: ds/ordered_set/binary_trie.hpp
+  - verify/ds/binary_trie/binary_trie.test.cpp
+documentation_of: ds/binary_trie/binary_trie.hpp
 layout: document
 title: Binary Trie
 ---
@@ -320,7 +320,7 @@ Here $K$ is the allocated node count. Erasing does not reclaim nodes.
 ## Example
 
 ```cpp
-#include "ds/ordered_set/binary_trie.hpp"
+#include "ds/binary_trie/binary_trie.hpp"
 
 #include <cstdint>
 #include <iostream>
