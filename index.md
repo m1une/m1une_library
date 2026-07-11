@@ -722,6 +722,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: math/fps/multipoint_evaluation.hpp
       title: Multipoint Evaluation and Interpolation
+    - icon: ':heavy_check_mark:'
+      path: math/fps/polynomial_factorization.hpp
+      title: Polynomial Factorization
   - name: math/fps/internal
     pages:
     - icon: ':heavy_check_mark:'
@@ -1500,6 +1503,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/fps/multipoint_evaluation.test.cpp
       title: verify/math/fps/multipoint_evaluation.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/fps/polynomial_factorization.test.cpp
+      title: verify/math/fps/polynomial_factorization.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/fps/polynomial_interpolation.test.cpp
       title: verify/math/fps/polynomial_interpolation.test.cpp

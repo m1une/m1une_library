@@ -29,6 +29,9 @@ data:
     path: math/fps/multipoint_evaluation.hpp
     title: Multipoint Evaluation and Interpolation
   - icon: ':heavy_check_mark:'
+    path: math/fps/polynomial_factorization.hpp
+    title: Polynomial Factorization
+  - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
   - icon: ':heavy_check_mark:'
@@ -83,6 +86,8 @@ data:
 
     #include "multipoint_evaluation.hpp"
 
+    #include "polynomial_factorization.hpp"
+
 
     #endif  // M1UNE_FPS_ALL_HPP
 
@@ -99,11 +104,12 @@ data:
   - math/fps/lagrange_inversion.hpp
   - math/fps/linear_recurrence.hpp
   - math/fps/multipoint_evaluation.hpp
+  - math/fps/polynomial_factorization.hpp
   isVerificationFile: false
   path: math/fps/all.hpp
   requiredBy:
   - math/all.hpp
-  timestamp: '2026-07-11 19:26:27+09:00'
+  timestamp: '2026-07-11 19:34:52+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
@@ -129,3 +135,4 @@ title: Formal Power Series All
 | `math/fps/lagrange_inversion.hpp` | Coefficients from the Lagrange inversion and Lagrange-Bürmann formulas. |
 | `math/fps/linear_recurrence.hpp` | Berlekamp-Massey and linear-recurrence term evaluation. |
 | `math/fps/multipoint_evaluation.hpp` | Multipoint evaluation and polynomial interpolation. |
+| `math/fps/polynomial_factorization.hpp` | Factorization into monic irreducible polynomials over a prime field. |

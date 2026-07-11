@@ -45,6 +45,9 @@ data:
     path: math/fps/multipoint_evaluation.hpp
     title: Multipoint Evaluation and Interpolation
   - icon: ':heavy_check_mark:'
+    path: math/fps/polynomial_factorization.hpp
+    title: Polynomial Factorization
+  - icon: ':heavy_check_mark:'
     path: math/partition_function.hpp
     title: Partition Function
   _extendedVerifiedWith:
@@ -168,6 +171,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/fps/multipoint_evaluation.test.cpp
     title: verify/math/fps/multipoint_evaluation.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/fps/polynomial_factorization.test.cpp
+    title: verify/math/fps/polynomial_factorization.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/fps/polynomial_factorization.test.cpp
+    title: verify/math/fps/polynomial_factorization.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/fps/polynomial_interpolation.test.cpp
     title: verify/math/fps/polynomial_interpolation.test.cpp
@@ -353,6 +362,7 @@ data:
   - math/fps/multipoint_evaluation.hpp
   - math/fps/linear_recurrence.hpp
   - math/fps/convolution.hpp
+  - math/fps/polynomial_factorization.hpp
   - graph/all.hpp
   - graph/counting.hpp
   timestamp: '2026-07-01 14:11:51+09:00'
@@ -389,6 +399,8 @@ data:
   - verify/math/fps/pow_of_formal_power_series.test.cpp
   - verify/math/fps/polynomial_interpolation.test.cpp
   - verify/math/fps/polynomial_interpolation.test.cpp
+  - verify/math/fps/polynomial_factorization.test.cpp
+  - verify/math/fps/polynomial_factorization.test.cpp
   - verify/math/fps/convolution_ll.test.cpp
   - verify/math/fps/exp_of_formal_power_series.test.cpp
   - verify/math/fps/exp_of_formal_power_series.test.cpp

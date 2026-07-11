@@ -59,6 +59,9 @@ data:
     path: math/fps/multipoint_evaluation.hpp
     title: Multipoint Evaluation and Interpolation
   - icon: ':heavy_check_mark:'
+    path: math/fps/polynomial_factorization.hpp
+    title: Polynomial Factorization
+  - icon: ':heavy_check_mark:'
     path: math/generalized_floor_sum.hpp
     title: Generalized Floor Sum
   - icon: ':heavy_check_mark:'
@@ -346,6 +349,7 @@ data:
   - math/fps/lagrange_inversion.hpp
   - math/fps/linear_recurrence.hpp
   - math/fps/multipoint_evaluation.hpp
+  - math/fps/polynomial_factorization.hpp
   - math/matrix/all.hpp
   - math/matrix/linear_algebra.hpp
   - math/matrix/matrix.hpp
@@ -363,7 +367,7 @@ data:
   isVerificationFile: true
   path: verify/math/math_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-11 19:26:27+09:00'
+  timestamp: '2026-07-11 19:34:52+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/math_algorithms.test.cpp
