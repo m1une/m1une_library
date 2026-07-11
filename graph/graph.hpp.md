@@ -36,6 +36,9 @@ data:
     path: graph/directed.hpp
     title: Directed Graph Algorithms
   - icon: ':heavy_check_mark:'
+    path: graph/directed_mst.hpp
+    title: Directed Minimum Spanning Tree
+  - icon: ':heavy_check_mark:'
     path: graph/dominator_tree.hpp
     title: Dominator Tree
   - icon: ':heavy_check_mark:'
@@ -144,6 +147,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/cow_game.test.cpp
     title: verify/graph/cow_game.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/directed_mst.test.cpp
+    title: verify/graph/directed_mst.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/dominator_tree.test.cpp
     title: verify/graph/dominator_tree.test.cpp
@@ -389,6 +395,7 @@ data:
   - graph/biconnected_components.hpp
   - graph/undirected.hpp
   - graph/directed.hpp
+  - graph/directed_mst.hpp
   - graph/shortest_path.hpp
   - graph/general_matching.hpp
   timestamp: '2026-07-11 19:47:32+09:00'
@@ -424,6 +431,7 @@ data:
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/namori.test.cpp
+  - verify/graph/directed_mst.test.cpp
   - verify/graph/two_edge_connected_components.test.cpp
 documentation_of: graph/graph.hpp
 layout: document

@@ -502,6 +502,9 @@ data:
       path: graph/directed.hpp
       title: Directed Graph Algorithms
     - icon: ':heavy_check_mark:'
+      path: graph/directed_mst.hpp
+      title: Directed Minimum Spanning Tree
+    - icon: ':heavy_check_mark:'
       path: graph/dominator_tree.hpp
       title: Dominator Tree
     - icon: ':heavy_check_mark:'
@@ -1351,6 +1354,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/graph/cow_game.test.cpp
       title: verify/graph/cow_game.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/directed_mst.test.cpp
+      title: verify/graph/directed_mst.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/graph/dominator_tree.test.cpp
       title: verify/graph/dominator_tree.test.cpp

@@ -41,6 +41,9 @@ data:
     path: graph/directed.hpp
     title: Directed Graph Algorithms
   - icon: ':heavy_check_mark:'
+    path: graph/directed_mst.hpp
+    title: Directed Minimum Spanning Tree
+  - icon: ':heavy_check_mark:'
     path: graph/dominator_tree.hpp
     title: Dominator Tree
   - icon: ':heavy_check_mark:'
@@ -261,6 +264,7 @@ data:
   - graph/directed.hpp
   - graph/cycle_detection.hpp
   - graph/graph.hpp
+  - graph/directed_mst.hpp
   - graph/eulerian_trail.hpp
   - graph/scc.hpp
   - graph/shortest_path.hpp
@@ -316,7 +320,7 @@ data:
   isVerificationFile: false
   path: graph/all.hpp
   requiredBy: []
-  timestamp: '2026-07-11 20:05:57+09:00'
+  timestamp: '2026-07-11 20:23:59+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
@@ -359,6 +363,7 @@ Public namespaces stay flat and short: general graph helpers use
 | `graph/grid.hpp` | Undirected graph builder | Helper for converting 2D grid cells to graph vertex ids. |
 | `graph/topological_sort.hpp` | Directed only | DAG ordering and cycle check. |
 | `graph/dominator_tree.hpp` | Directed rooted graph | Lengauer-Tarjan immediate dominators and dominator tree. |
+| `graph/directed_mst.hpp` | Directed rooted graph | Minimum-cost spanning arborescence with edge reconstruction. |
 | `graph/scc.hpp` | Directed only | Strongly connected components and condensation DAG. |
 | `graph/two_sat.hpp` | Implication graph | 2-SAT clauses, satisfiability, and one assignment. |
 | `graph/lowlink.hpp` | Undirected only | Articulation points and bridges. |
