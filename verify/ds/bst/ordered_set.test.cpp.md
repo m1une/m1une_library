@@ -22,18 +22,20 @@ data:
     \n\n\n\n#line 1 \"ds/bst/ordered_multiset.hpp\"\n\n\n\n#include <cassert>\n#include\
     \ <chrono>\n#include <cstdint>\n#include <functional>\n#include <initializer_list>\n\
     #include <memory>\n#include <utility>\n#include <vector>\n\nnamespace m1une {\n\
-    namespace ds {\n\ntemplate <typename T, typename Compare = std::less<T>>\nstruct\
-    \ OrderedMultiset {\n   private:\n    struct Node {\n        T key;\n        int\
-    \ priority;\n        int count;\n        int size;\n        int distinct_size;\n\
-    \        Node* l;\n        Node* r;\n\n        Node(T value, int node_priority,\
-    \ int multiplicity)\n            : key(std::move(value)),\n              priority(node_priority),\n\
-    \              count(multiplicity),\n              size(multiplicity),\n     \
-    \         distinct_size(1),\n              l(nullptr),\n              r(nullptr)\
-    \ {}\n    };\n\n    static constexpr int pool_block_bits = 14;\n    static constexpr\
-    \ int pool_block_size = 1 << pool_block_bits;\n\n    struct Pool {\n        std::vector<std::vector<Node>>\
-    \ blocks;\n\n        template <class... Args>\n        Node* emplace(Args&&...\
-    \ args) {\n            if (blocks.empty() || int(blocks.back().size()) == pool_block_size)\
-    \ {\n                blocks.emplace_back();\n                blocks.back().reserve(pool_block_size);\n\
+    namespace ds {\n\ntemplate <typename T, typename Compare>\nstruct OrderedSet;\n\
+    \ntemplate <typename T, typename Compare = std::less<T>>\nstruct OrderedMultiset\
+    \ {\n   private:\n    friend struct OrderedSet<T, Compare>;\n    struct Node {\n\
+    \        T key;\n        int priority;\n        int count;\n        int size;\n\
+    \        int distinct_size;\n        Node* l;\n        Node* r;\n\n        Node(T\
+    \ value, int node_priority, int multiplicity)\n            : key(std::move(value)),\n\
+    \              priority(node_priority),\n              count(multiplicity),\n\
+    \              size(multiplicity),\n              distinct_size(1),\n        \
+    \      l(nullptr),\n              r(nullptr) {}\n    };\n\n    static constexpr\
+    \ int pool_block_bits = 14;\n    static constexpr int pool_block_size = 1 << pool_block_bits;\n\
+    \n    struct Pool {\n        std::vector<std::vector<Node>> blocks;\n\n      \
+    \  template <class... Args>\n        Node* emplace(Args&&... args) {\n       \
+    \     if (blocks.empty() || int(blocks.back().size()) == pool_block_size) {\n\
+    \                blocks.emplace_back();\n                blocks.back().reserve(pool_block_size);\n\
     \            }\n            blocks.back().emplace_back(std::forward<Args>(args)...);\n\
     \            return &blocks.back().back();\n        }\n    };\n\n    struct Ownership\
     \ {\n        std::shared_ptr<Pool> pool;\n        std::shared_ptr<Ownership> l;\n\
@@ -75,25 +77,34 @@ data:
     \       if (t->l->priority > t->priority) rotate_right(t);\n        } else {\n\
     \            t->r = insert_impl(t->r, key, multiplicity);\n            if (t->r->priority\
     \ > t->priority) rotate_left(t);\n        }\n        update(t);\n        return\
+    \ t;\n    }\n\n    Node* insert_unique_impl(Node* t, T& key, bool& inserted) {\n\
+    \        if (t == nullptr) {\n            inserted = true;\n            return\
+    \ new_node(std::move(key), 1);\n        }\n        if (equal(key, t->key)) return\
+    \ t;\n        if (comp(key, t->key)) {\n            t->l = insert_unique_impl(t->l,\
+    \ key, inserted);\n            if (!inserted) return t;\n            if (t->l->priority\
+    \ > t->priority) rotate_right(t);\n        } else {\n            t->r = insert_unique_impl(t->r,\
+    \ key, inserted);\n            if (!inserted) return t;\n            if (t->r->priority\
+    \ > t->priority) rotate_left(t);\n        }\n        update(t);\n        return\
     \ t;\n    }\n\n    bool erase_one_impl(Node*& t, const T& key) {\n        if (t\
     \ == nullptr) return false;\n        bool erased;\n        if (equal(key, t->key))\
     \ {\n            if (t->count > 1) {\n                --t->count;\n          \
     \      erased = true;\n            } else {\n                t = merge_nodes(t->l,\
     \ t->r);\n                return true;\n            }\n        } else if (comp(key,\
     \ t->key)) {\n            erased = erase_one_impl(t->l, key);\n        } else\
-    \ {\n            erased = erase_one_impl(t->r, key);\n        }\n        update(t);\n\
-    \        return erased;\n    }\n\n    int erase_all_impl(Node*& t, const T& key)\
-    \ {\n        if (t == nullptr) return 0;\n        int erased;\n        if (equal(key,\
-    \ t->key)) {\n            erased = t->count;\n            t = merge_nodes(t->l,\
-    \ t->r);\n            return erased;\n        }\n        if (comp(key, t->key))\
-    \ {\n            erased = erase_all_impl(t->l, key);\n        } else {\n     \
-    \       erased = erase_all_impl(t->r, key);\n        }\n        update(t);\n \
-    \       return erased;\n    }\n\n    static const T* kth_impl(const Node* t, int\
-    \ k) {\n        while (t != nullptr) {\n            int left_size = subtree_size(t->l);\n\
-    \            if (k < left_size) {\n                t = t->l;\n            } else\
-    \ if (k < left_size + t->count) {\n                return &t->key;\n         \
-    \   } else {\n                k -= left_size + t->count;\n                t =\
-    \ t->r;\n            }\n        }\n        return nullptr;\n    }\n\n    int count_impl(const\
+    \ {\n            erased = erase_one_impl(t->r, key);\n        }\n        if (!erased)\
+    \ return false;\n        update(t);\n        return true;\n    }\n\n    int erase_all_impl(Node*&\
+    \ t, const T& key) {\n        if (t == nullptr) return 0;\n        int erased;\n\
+    \        if (equal(key, t->key)) {\n            erased = t->count;\n         \
+    \   t = merge_nodes(t->l, t->r);\n            return erased;\n        }\n    \
+    \    if (comp(key, t->key)) {\n            erased = erase_all_impl(t->l, key);\n\
+    \        } else {\n            erased = erase_all_impl(t->r, key);\n        }\n\
+    \        if (erased == 0) return 0;\n        update(t);\n        return erased;\n\
+    \    }\n\n    static const T* kth_impl(const Node* t, int k) {\n        while\
+    \ (t != nullptr) {\n            int left_size = subtree_size(t->l);\n        \
+    \    if (k < left_size) {\n                t = t->l;\n            } else if (k\
+    \ < left_size + t->count) {\n                return &t->key;\n            } else\
+    \ {\n                k -= left_size + t->count;\n                t = t->r;\n \
+    \           }\n        }\n        return nullptr;\n    }\n\n    int count_impl(const\
     \ Node* t, const T& key) const {\n        while (t != nullptr) {\n           \
     \ if (equal(key, t->key)) return t->count;\n            t = comp(key, t->key)\
     \ ? t->l : t->r;\n        }\n        return 0;\n    }\n\n    int order_of_key_impl(const\
@@ -148,8 +159,10 @@ data:
     \        ownership = std::make_shared<Ownership>(allocation_pool);\n        root\
     \ = nullptr;\n    }\n\n    void insert(T key, int multiplicity = 1) {\n      \
     \  assert(multiplicity > 0);\n        root = insert_impl(root, key, multiplicity);\n\
-    \    }\n\n    bool erase_one(const T& key) { return erase_one_impl(root, key);\
-    \ }\n    bool erase(const T& key) { return erase_one(key); }\n    int erase_all(const\
+    \    }\n\n   private:\n    bool insert_unique(T key) {\n        bool inserted\
+    \ = false;\n        root = insert_unique_impl(root, key, inserted);\n        return\
+    \ inserted;\n    }\n\n   public:\n    bool erase_one(const T& key) { return erase_one_impl(root,\
+    \ key); }\n    bool erase(const T& key) { return erase_one(key); }\n    int erase_all(const\
     \ T& key) { return erase_all_impl(root, key); }\n    bool contains(const T& key)\
     \ const { return count(key) > 0; }\n    int count(const T& key) const { return\
     \ count_impl(root, key); }\n\n    const T* find_by_order(int k) const {\n    \
@@ -195,17 +208,16 @@ data:
     \ const {\n        return data.size();\n    }\n\n    int unique_size() const {\n\
     \        return data.size();\n    }\n\n    bool empty() const {\n        return\
     \ data.empty();\n    }\n\n    void clear() {\n        data.clear();\n    }\n\n\
-    \    bool insert(T key) {\n        if (data.contains(key)) return false;\n   \
-    \     data.insert(std::move(key));\n        return true;\n    }\n\n    bool erase(const\
-    \ T& key) {\n        return data.erase(key);\n    }\n\n    bool contains(const\
-    \ T& key) const {\n        return data.contains(key);\n    }\n\n    int count(const\
-    \ T& key) const {\n        return contains(key) ? 1 : 0;\n    }\n\n    const T*\
-    \ find_by_order(int k) const {\n        return data.find_by_order(k);\n    }\n\
-    \n    T kth(int k) const {\n        return data.kth(k);\n    }\n\n    int order_of_key(const\
-    \ T& key) const {\n        return data.order_of_key(key);\n    }\n\n    int count_less(const\
-    \ T& key) const {\n        return data.count_less(key);\n    }\n\n    int count_less_equal(const\
-    \ T& key) const {\n        return data.count_less_equal(key);\n    }\n\n    int\
-    \ count_greater(const T& key) const {\n        return data.count_greater(key);\n\
+    \    bool insert(T key) {\n        return data.insert_unique(std::move(key));\n\
+    \    }\n\n    bool erase(const T& key) {\n        return data.erase(key);\n  \
+    \  }\n\n    bool contains(const T& key) const {\n        return data.contains(key);\n\
+    \    }\n\n    int count(const T& key) const {\n        return contains(key) ?\
+    \ 1 : 0;\n    }\n\n    const T* find_by_order(int k) const {\n        return data.find_by_order(k);\n\
+    \    }\n\n    T kth(int k) const {\n        return data.kth(k);\n    }\n\n   \
+    \ int order_of_key(const T& key) const {\n        return data.order_of_key(key);\n\
+    \    }\n\n    int count_less(const T& key) const {\n        return data.count_less(key);\n\
+    \    }\n\n    int count_less_equal(const T& key) const {\n        return data.count_less_equal(key);\n\
+    \    }\n\n    int count_greater(const T& key) const {\n        return data.count_greater(key);\n\
     \    }\n\n    int count_greater_equal(const T& key) const {\n        return data.count_greater_equal(key);\n\
     \    }\n\n    const T* lower_bound(const T& key) const {\n        return data.lower_bound(key);\n\
     \    }\n\n    const T* upper_bound(const T& key) const {\n        return data.upper_bound(key);\n\
@@ -263,7 +275,7 @@ data:
   isVerificationFile: true
   path: verify/ds/bst/ordered_set.test.cpp
   requiredBy: []
-  timestamp: '2026-07-12 04:39:25+09:00'
+  timestamp: '2026-07-12 04:52:54+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/bst/ordered_set.test.cpp
