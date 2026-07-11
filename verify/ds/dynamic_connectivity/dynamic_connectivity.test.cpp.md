@@ -2,6 +2,9 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
+    path: ds/dsu/rollback_dsu.hpp
+    title: Rollback DSU
+  - icon: ':heavy_check_mark:'
     path: ds/dynamic_connectivity/all.hpp
     title: Dynamic Connectivity
   - icon: ':heavy_check_mark:'
@@ -35,34 +38,63 @@ data:
     #include <vector>\n\n#line 1 \"ds/dynamic_connectivity/all.hpp\"\n\n\n\n#line\
     \ 1 \"ds/dynamic_connectivity/offline_dynamic_connectivity.hpp\"\n\n\n\n#include\
     \ <algorithm>\n#line 8 \"ds/dynamic_connectivity/offline_dynamic_connectivity.hpp\"\
+    \n\n#line 1 \"ds/dsu/rollback_dsu.hpp\"\n\n\n\n#line 7 \"ds/dsu/rollback_dsu.hpp\"\
+    \n\nnamespace m1une {\nnamespace ds {\n\nstruct RollbackDsu {\n   private:\n \
+    \   struct HistoryEntry {\n        int first;\n        int first_value;\n    \
+    \    int second;\n        int second_value;\n    };\n\n    int _n;\n    int _component_count;\n\
+    \    std::vector<int> parent_or_size;\n    std::vector<HistoryEntry> history;\n\
+    \n    static int check_size(int n) {\n        assert(0 <= n);\n        return\
+    \ n;\n    }\n\n   public:\n    RollbackDsu() : RollbackDsu(0) {}\n\n    explicit\
+    \ RollbackDsu(int n)\n        : _n(check_size(n)), _component_count(_n), parent_or_size(_n,\
+    \ -1) {}\n\n    int size() const {\n        return _n;\n    }\n\n    bool empty()\
+    \ const {\n        return _n == 0;\n    }\n\n    int component_count() const {\n\
+    \        return _component_count;\n    }\n\n    int history_size() const {\n \
+    \       return int(history.size());\n    }\n\n    void reserve_history(int count)\
+    \ {\n        assert(0 <= count);\n        history.reserve(count);\n    }\n\n \
+    \   int leader(int vertex) const {\n        assert(0 <= vertex && vertex < _n);\n\
+    \        while (parent_or_size[vertex] >= 0) vertex = parent_or_size[vertex];\n\
+    \        return vertex;\n    }\n\n    bool same(int first, int second) const {\n\
+    \        return leader(first) == leader(second);\n    }\n\n    int group_size(int\
+    \ vertex) const {\n        return -parent_or_size[leader(vertex)];\n    }\n\n\
+    \    int size(int vertex) const {\n        return group_size(vertex);\n    }\n\
+    \n    bool merge(int first, int second) {\n        first = leader(first);\n  \
+    \      second = leader(second);\n        if (first == second) {\n            history.push_back(HistoryEntry{-1,\
+    \ 0, -1, 0});\n            return false;\n        }\n        if (-parent_or_size[first]\
+    \ < -parent_or_size[second]) {\n            std::swap(first, second);\n      \
+    \  }\n        history.push_back(HistoryEntry{\n            first, parent_or_size[first],\
+    \ second, parent_or_size[second]\n        });\n        parent_or_size[first] +=\
+    \ parent_or_size[second];\n        parent_or_size[second] = first;\n        _component_count--;\n\
+    \        return true;\n    }\n\n    bool undo() {\n        if (history.empty())\
+    \ return false;\n        const HistoryEntry entry = history.back();\n        history.pop_back();\n\
+    \        if (entry.first == -1) return true;\n        parent_or_size[entry.first]\
+    \ = entry.first_value;\n        parent_or_size[entry.second] = entry.second_value;\n\
+    \        _component_count++;\n        return true;\n    }\n\n    int snapshot()\
+    \ const {\n        return history_size();\n    }\n\n    void rollback(int state)\
+    \ {\n        assert(0 <= state && state <= history_size());\n        while (history_size()\
+    \ > state) undo();\n    }\n\n    std::vector<std::vector<int>> groups() const\
+    \ {\n        std::vector<int> leader_buffer(_n);\n        std::vector<int> group_sizes(_n,\
+    \ 0);\n        for (int vertex = 0; vertex < _n; vertex++) {\n            leader_buffer[vertex]\
+    \ = leader(vertex);\n            group_sizes[leader_buffer[vertex]]++;\n     \
+    \   }\n        std::vector<std::vector<int>> result(_n);\n        for (int vertex\
+    \ = 0; vertex < _n; vertex++) {\n            result[vertex].reserve(group_sizes[vertex]);\n\
+    \        }\n        for (int vertex = 0; vertex < _n; vertex++) {\n          \
+    \  result[leader_buffer[vertex]].push_back(vertex);\n        }\n        result.erase(\n\
+    \            std::remove_if(\n                result.begin(), result.end(),\n\
+    \                [](const std::vector<int>& group) { return group.empty(); }\n\
+    \            ),\n            result.end()\n        );\n        return result;\n\
+    \    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n#line 10 \"ds/dynamic_connectivity/offline_dynamic_connectivity.hpp\"\
     \n\nnamespace m1une {\nnamespace ds {\n\nstruct OfflineDynamicConnectivity {\n\
     \   private:\n    struct Edge {\n        int u;\n        int v;\n        int begin;\n\
     \        int end;\n        bool alive;\n    };\n\n    struct Query {\n       \
-    \ int u;\n        int v;\n        int time;\n    };\n\n    struct RollbackDsu\
-    \ {\n        std::vector<int> parent_or_size;\n        std::vector<std::pair<int,\
-    \ int>> history;\n\n        explicit RollbackDsu(int n) : parent_or_size(n, -1)\
-    \ {}\n\n        int leader(int v) const {\n            while (parent_or_size[v]\
-    \ >= 0) v = parent_or_size[v];\n            return v;\n        }\n\n        bool\
-    \ same(int u, int v) const {\n            return leader(u) == leader(v);\n   \
-    \     }\n\n        void merge(int u, int v) {\n            u = leader(u);\n  \
-    \          v = leader(v);\n            if (u == v) return;\n            if (-parent_or_size[u]\
-    \ < -parent_or_size[v]) std::swap(u, v);\n            history.emplace_back(v,\
-    \ parent_or_size[v]);\n            parent_or_size[u] += parent_or_size[v];\n \
-    \           parent_or_size[v] = u;\n        }\n\n        int snapshot() const\
-    \ {\n            return int(history.size());\n        }\n\n        void rollback(int\
-    \ snapshot) {\n            while (int(history.size()) > snapshot) {\n        \
-    \        auto [v, old_size] = history.back();\n                history.pop_back();\n\
-    \                int parent = parent_or_size[v];\n                parent_or_size[parent]\
-    \ -= old_size;\n                parent_or_size[v] = old_size;\n            }\n\
-    \        }\n    };\n\n    int _n;\n    int _time = 0;\n    std::vector<Edge> _edges;\n\
-    \    std::vector<Query> _queries;\n\n    void dfs(\n        const std::vector<int>&\
-    \ offset,\n        const std::vector<std::pair<int, int>>& stored_edges,\n   \
-    \     const std::vector<int>& query_at,\n        std::vector<bool>& answer,\n\
-    \        RollbackDsu& dsu,\n        int node,\n        int base\n    ) const {\n\
-    \        int snapshot = dsu.snapshot();\n        for (int i = offset[node]; i\
-    \ < offset[node + 1]; i++) {\n            auto [u, v] = stored_edges[i];\n   \
-    \         dsu.merge(u, v);\n        }\n        if (node >= base) {\n         \
-    \   int query_id = query_at[node - base];\n            if (query_id != -1) {\n\
+    \ int u;\n        int v;\n        int time;\n    };\n\n    int _n;\n    int _time\
+    \ = 0;\n    std::vector<Edge> _edges;\n    std::vector<Query> _queries;\n\n  \
+    \  void dfs(\n        const std::vector<int>& offset,\n        const std::vector<std::pair<int,\
+    \ int>>& stored_edges,\n        const std::vector<int>& query_at,\n        std::vector<bool>&\
+    \ answer,\n        RollbackDsu& dsu,\n        int node,\n        int base\n  \
+    \  ) const {\n        int snapshot = dsu.snapshot();\n        for (int i = offset[node];\
+    \ i < offset[node + 1]; i++) {\n            auto [u, v] = stored_edges[i];\n \
+    \           dsu.merge(u, v);\n        }\n        if (node >= base) {\n       \
+    \     int query_id = query_at[node - base];\n            if (query_id != -1) {\n\
     \                const Query& query = _queries[query_id];\n                answer[query_id]\
     \ = dsu.same(query.u, query.v);\n            }\n        } else {\n           \
     \ dfs(offset, stored_edges, query_at, answer, dsu, 2 * node, base);\n        \
@@ -112,8 +144,8 @@ data:
     \ edge.v};\n                left /= 2;\n                right /= 2;\n        \
     \    }\n        }\n        std::vector<int> query_at(base, -1);\n        for (int\
     \ query_id = 0; query_id < int(_queries.size()); query_id++) {\n            query_at[_queries[query_id].time]\
-    \ = query_id;\n        }\n        RollbackDsu dsu(_n);\n        dsu.history.reserve(std::min<std::size_t>(_n,\
-    \ stored_edges.size()));\n        dfs(offset, stored_edges, query_at, answer,\
+    \ = query_id;\n        }\n        RollbackDsu dsu(_n);\n        dsu.reserve_history(int(std::min<std::size_t>(_n,\
+    \ stored_edges.size())));\n        dfs(offset, stored_edges, query_at, answer,\
     \ dsu, 1, base);\n        return answer;\n    }\n};\n\n}  // namespace ds\n} \
     \ // namespace m1une\n\n\n#line 1 \"ds/dynamic_connectivity/online_dynamic_connectivity.hpp\"\
     \n\n\n\n#line 6 \"ds/dynamic_connectivity/online_dynamic_connectivity.hpp\"\n\
@@ -655,6 +687,7 @@ data:
   dependsOn:
   - ds/dynamic_connectivity/all.hpp
   - ds/dynamic_connectivity/offline_dynamic_connectivity.hpp
+  - ds/dsu/rollback_dsu.hpp
   - ds/dynamic_connectivity/online_dynamic_connectivity.hpp
   - monoid/add.hpp
   - ds/dynamic_tree/link_cut_tree.hpp
@@ -662,7 +695,7 @@ data:
   isVerificationFile: true
   path: verify/ds/dynamic_connectivity/dynamic_connectivity.test.cpp
   requiredBy: []
-  timestamp: '2026-06-23 11:30:22+09:00'
+  timestamp: '2026-07-11 19:52:35+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/dynamic_connectivity/dynamic_connectivity.test.cpp

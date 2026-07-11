@@ -233,6 +233,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: ds/dsu/potentialized_dsu.hpp
       title: Potentialized DSU
+    - icon: ':heavy_check_mark:'
+      path: ds/dsu/rollback_dsu.hpp
+      title: Rollback DSU
   - name: ds/dynamic_array
     pages:
     - icon: ':heavy_check_mark:'
@@ -1092,6 +1095,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/ds/dsu/potentialized_dsu.test.cpp
       title: verify/ds/dsu/potentialized_dsu.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/dsu/rollback_dsu.test.cpp
+      title: verify/ds/dsu/rollback_dsu.test.cpp
   - name: verify/ds/dynamic_array
     pages:
     - icon: ':heavy_check_mark:'
