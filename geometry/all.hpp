@@ -10,6 +10,7 @@
 #include "lattice_point_count.hpp"
 #include "line.hpp"
 #include "manhattan_mst.hpp"
+#include "minimum_enclosing_circle.hpp"
 #include "point.hpp"
 #include "polygon.hpp"
 #include "ray.hpp"
