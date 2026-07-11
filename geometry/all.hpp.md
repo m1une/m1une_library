@@ -11,6 +11,9 @@ data:
     path: geometry/circle.hpp
     title: Circles
   - icon: ':heavy_check_mark:'
+    path: geometry/closest_pair.hpp
+    title: Closest Pair of Points
+  - icon: ':heavy_check_mark:'
     path: geometry/convex_hull.hpp
     title: Convex Hull
   - icon: ':heavy_check_mark:'
@@ -74,6 +77,8 @@ data:
 
     #include "circle.hpp"
 
+    #include "closest_pair.hpp"
+
     #include "convex_hull.hpp"
 
     #include "farthest_pair.hpp"
@@ -104,6 +109,7 @@ data:
   - geometry/circle.hpp
   - geometry/ray.hpp
   - geometry/line.hpp
+  - geometry/closest_pair.hpp
   - geometry/convex_hull.hpp
   - geometry/farthest_pair.hpp
   - geometry/half_plane_intersection.hpp
@@ -116,7 +122,7 @@ data:
   isVerificationFile: false
   path: geometry/all.hpp
   requiredBy: []
-  timestamp: '2026-07-10 18:39:32+09:00'
+  timestamp: '2026-07-11 20:28:42+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp
@@ -135,6 +141,7 @@ title: Geometry Bundle
 | --- | --- |
 | `geometry/angle_sort.hpp` | Atan-free counterclockwise angle sorting around an arbitrary origin. |
 | `geometry/point.hpp` | Points, vectors, dot/cross products, exact orientation, distance, and rotation. |
+| `geometry/closest_pair.hpp` | Euclidean closest pair with original indices in $O(N\log N)$. |
 | `geometry/convex_hull.hpp` | Monotone-chain convex hull with optional boundary-collinear points. |
 | `geometry/farthest_pair.hpp` | Euclidean farthest pair with original indices in $O(N\log N)$. |
 | `geometry/half_plane_intersection.hpp` | Bounded intersection polygon of directed closed half-planes in $O(N\log N)$. |

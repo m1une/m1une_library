@@ -434,6 +434,9 @@ data:
       path: geometry/circle.hpp
       title: Circles
     - icon: ':heavy_check_mark:'
+      path: geometry/closest_pair.hpp
+      title: Closest Pair of Points
+    - icon: ':heavy_check_mark:'
       path: geometry/convex_hull.hpp
       title: Convex Hull
     - icon: ':heavy_check_mark:'
@@ -1304,6 +1307,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/geometry/circle_ray.test.cpp
       title: verify/geometry/circle_ray.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/geometry/closest_pair.test.cpp
+      title: verify/geometry/closest_pair.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/geometry/convex_hull.test.cpp
       title: verify/geometry/convex_hull.test.cpp

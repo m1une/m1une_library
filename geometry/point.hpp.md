@@ -12,6 +12,9 @@ data:
     path: geometry/circle.hpp
     title: Circles
   - icon: ':heavy_check_mark:'
+    path: geometry/closest_pair.hpp
+    title: Closest Pair of Points
+  - icon: ':heavy_check_mark:'
     path: geometry/convex_hull.hpp
     title: Convex Hull
   - icon: ':heavy_check_mark:'
@@ -45,6 +48,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/circle_ray.test.cpp
     title: verify/geometry/circle_ray.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/closest_pair.test.cpp
+    title: verify/geometry/closest_pair.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/convex_hull.test.cpp
     title: verify/geometry/convex_hull.test.cpp
@@ -266,6 +272,7 @@ data:
   - geometry/line.hpp
   - geometry/angle_sort.hpp
   - geometry/farthest_pair.hpp
+  - geometry/closest_pair.hpp
   - geometry/manhattan_mst.hpp
   - geometry/rectangle_union_area.hpp
   - geometry/polygon.hpp
@@ -274,6 +281,7 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/half_plane_intersection.test.cpp
+  - verify/geometry/closest_pair.test.cpp
   - verify/geometry/polygon_area.test.cpp
   - verify/geometry/rectangle_union_area.test.cpp
   - verify/geometry/circle_line_intersection.test.cpp
