@@ -14,5 +14,6 @@
 #include "minimum_steiner_tree.hpp"
 #include "namori.hpp"
 #include "shortest_path.hpp"
+#include "two_edge_connected_components.hpp"
 
 #endif  // M1UNE_GRAPH_UNDIRECTED_HPP

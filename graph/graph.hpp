@@ -78,8 +78,8 @@ struct Graph {
         assert(0 <= v && v < _n);
         int id = _edge_count++;
         int u_idx = int(_g[u].size());
-        int v_idx = int(_g[v].size());
         _g[u].push_back(edge_type(u, v, cost, id));
+        int v_idx = int(_g[v].size());
         _g[v].push_back(edge_type(v, u, cost, id));
         _edge_positions.emplace_back();
         _edge_positions.back().push_back({u, u_idx});
