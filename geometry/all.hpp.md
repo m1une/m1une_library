@@ -32,6 +32,9 @@ data:
     path: geometry/manhattan_mst.hpp
     title: Manhattan Minimum Spanning Tree
   - icon: ':heavy_check_mark:'
+    path: geometry/minimum_enclosing_circle.hpp
+    title: Minimum Enclosing Circle
+  - icon: ':heavy_check_mark:'
     path: geometry/point.hpp
     title: 2D Point and Predicates
   - icon: ':heavy_check_mark:'
@@ -91,6 +94,8 @@ data:
 
     #include "manhattan_mst.hpp"
 
+    #include "minimum_enclosing_circle.hpp"
+
     #include "point.hpp"
 
     #include "polygon.hpp"
@@ -117,12 +122,13 @@ data:
   - utilities/bigint.hpp
   - geometry/manhattan_mst.hpp
   - ds/dsu/dsu.hpp
+  - geometry/minimum_enclosing_circle.hpp
   - geometry/polygon.hpp
   - geometry/rectangle_union_area.hpp
   isVerificationFile: false
   path: geometry/all.hpp
   requiredBy: []
-  timestamp: '2026-07-11 20:28:42+09:00'
+  timestamp: '2026-07-11 20:41:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp
@@ -147,6 +153,7 @@ title: Geometry Bundle
 | `geometry/half_plane_intersection.hpp` | Bounded intersection polygon of directed closed half-planes in $O(N\log N)$. |
 | `geometry/lattice_point_count.hpp` | Exact lattice-point counting in a bounded intersection of integer linear inequalities. |
 | `geometry/manhattan_mst.hpp` | Manhattan minimum spanning tree for integral points in $O(N\log N)$. |
+| `geometry/minimum_enclosing_circle.hpp` | Randomized linear-time minimum enclosing circle with support indices. |
 | `geometry/line.hpp` | Lines, segments, projection, intersection, and distances. |
 | `geometry/ray.hpp` | Rays, containment, projection, intersections, and distances with other linear objects. |
 | `geometry/rectangle_union_area.hpp` | Exact union area of axis-aligned rectangles in $O(N\log N)$. |

@@ -35,6 +35,9 @@ data:
     path: geometry/manhattan_mst.hpp
     title: Manhattan Minimum Spanning Tree
   - icon: ':heavy_check_mark:'
+    path: geometry/minimum_enclosing_circle.hpp
+    title: Minimum Enclosing Circle
+  - icon: ':heavy_check_mark:'
     path: geometry/point.hpp
     title: 2D Point and Predicates
   - icon: ':heavy_check_mark:'
@@ -160,12 +163,13 @@ data:
   - utilities/bigint.hpp
   - geometry/manhattan_mst.hpp
   - ds/dsu/dsu.hpp
+  - geometry/minimum_enclosing_circle.hpp
   - geometry/polygon.hpp
   - geometry/rectangle_union_area.hpp
   isVerificationFile: true
   path: verify/geometry/geometry_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-11 20:28:42+09:00'
+  timestamp: '2026-07-11 20:41:48+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/geometry_algorithms.test.cpp

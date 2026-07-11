@@ -15,6 +15,9 @@ data:
     path: geometry/half_plane_intersection.hpp
     title: Half-Plane Intersection
   - icon: ':heavy_check_mark:'
+    path: geometry/minimum_enclosing_circle.hpp
+    title: Minimum Enclosing Circle
+  - icon: ':heavy_check_mark:'
     path: geometry/polygon.hpp
     title: Polygons
   - icon: ':heavy_check_mark:'
@@ -36,6 +39,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/half_plane_intersection_random.test.cpp
     title: verify/geometry/half_plane_intersection_random.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/minimum_enclosing_circle.test.cpp
+    title: verify/geometry/minimum_enclosing_circle.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/point_in_polygon.test.cpp
     title: verify/geometry/point_in_polygon.test.cpp
@@ -352,6 +358,7 @@ data:
   isVerificationFile: false
   path: geometry/line.hpp
   requiredBy:
+  - geometry/minimum_enclosing_circle.hpp
   - geometry/ray.hpp
   - geometry/circle.hpp
   - geometry/all.hpp
@@ -363,6 +370,7 @@ data:
   - verify/geometry/half_plane_intersection.test.cpp
   - verify/geometry/polygon_area.test.cpp
   - verify/geometry/circle_line_intersection.test.cpp
+  - verify/geometry/minimum_enclosing_circle.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/segment_intersection.test.cpp
   - verify/geometry/circle_ray.test.cpp

@@ -15,6 +15,9 @@ data:
     path: geometry/circle.hpp
     title: Circles
   - icon: ':heavy_check_mark:'
+    path: geometry/minimum_enclosing_circle.hpp
+    title: Minimum Enclosing Circle
+  - icon: ':heavy_check_mark:'
     path: geometry/polygon.hpp
     title: Polygons
   _extendedVerifiedWith:
@@ -27,6 +30,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/geometry_algorithms.test.cpp
     title: verify/geometry/geometry_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/minimum_enclosing_circle.test.cpp
+    title: verify/geometry/minimum_enclosing_circle.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/point_in_polygon.test.cpp
     title: verify/geometry/point_in_polygon.test.cpp
@@ -555,6 +561,7 @@ data:
   isVerificationFile: false
   path: geometry/ray.hpp
   requiredBy:
+  - geometry/minimum_enclosing_circle.hpp
   - geometry/circle.hpp
   - geometry/all.hpp
   - geometry/polygon.hpp
@@ -563,6 +570,7 @@ data:
   verifiedWith:
   - verify/geometry/polygon_area.test.cpp
   - verify/geometry/circle_line_intersection.test.cpp
+  - verify/geometry/minimum_enclosing_circle.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/circle_ray.test.cpp
   - verify/geometry/point_in_polygon.test.cpp

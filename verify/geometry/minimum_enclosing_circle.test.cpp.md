@@ -2,47 +2,42 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
+    path: geometry/circle.hpp
+    title: Circles
+  - icon: ':heavy_check_mark:'
     path: geometry/line.hpp
     title: Lines and Segments
+  - icon: ':heavy_check_mark:'
+    path: geometry/minimum_enclosing_circle.hpp
+    title: Minimum Enclosing Circle
   - icon: ':heavy_check_mark:'
     path: geometry/point.hpp
     title: 2D Point and Predicates
   - icon: ':heavy_check_mark:'
     path: geometry/ray.hpp
     title: Rays
-  _extendedRequiredBy:
-  - icon: ':heavy_check_mark:'
-    path: geometry/all.hpp
-    title: Geometry Bundle
-  - icon: ':heavy_check_mark:'
-    path: geometry/minimum_enclosing_circle.hpp
-    title: Minimum Enclosing Circle
-  _extendedVerifiedWith:
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/circle_line_intersection.test.cpp
-    title: verify/geometry/circle_line_intersection.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/circle_ray.test.cpp
-    title: verify/geometry/circle_ray.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/geometry_algorithms.test.cpp
-    title: verify/geometry/geometry_algorithms.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/minimum_enclosing_circle.test.cpp
-    title: verify/geometry/minimum_enclosing_circle.test.cpp
+  _extendedRequiredBy: []
+  _extendedVerifiedWith: []
   _isVerificationFailed: false
-  _pathExtension: hpp
+  _pathExtension: cpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
-    links: []
-  bundledCode: "#line 1 \"geometry/circle.hpp\"\n\n\n\n#include <algorithm>\n#include\
-    \ <cassert>\n#include <cmath>\n#include <optional>\n#include <vector>\n\n#line\
+    '*NOT_SPECIAL_COMMENTS*': ''
+    PROBLEM: https://judge.yosupo.jp/problem/minimum_enclosing_circle
+    links:
+    - https://judge.yosupo.jp/problem/minimum_enclosing_circle
+  bundledCode: "#line 1 \"verify/geometry/minimum_enclosing_circle.test.cpp\"\n#define\
+    \ PROBLEM \"https://judge.yosupo.jp/problem/minimum_enclosing_circle\"\n\n#line\
+    \ 1 \"geometry/minimum_enclosing_circle.hpp\"\n\n\n\n#include <algorithm>\n#include\
+    \ <array>\n#include <cassert>\n#include <cmath>\n#include <cstdint>\n#include\
+    \ <numeric>\n#include <optional>\n#include <type_traits>\n#include <vector>\n\n\
+    #line 1 \"geometry/circle.hpp\"\n\n\n\n#line 9 \"geometry/circle.hpp\"\n\n#line\
     \ 1 \"geometry/ray.hpp\"\n\n\n\n#line 7 \"geometry/ray.hpp\"\n\n#line 1 \"geometry/line.hpp\"\
     \n\n\n\n#line 8 \"geometry/line.hpp\"\n\n#line 1 \"geometry/point.hpp\"\n\n\n\n\
-    #line 5 \"geometry/point.hpp\"\n#include <concepts>\n#line 7 \"geometry/point.hpp\"\
-    \n#include <type_traits>\n\nnamespace m1une {\nnamespace geometry {\n\ntemplate\
-    \ <typename T>\nconcept Coordinate = std::is_arithmetic_v<T> && !std::same_as<std::remove_cv_t<T>,\
-    \ bool>;\n\ntemplate <Coordinate T>\nusing wide_type = std::conditional_t<std::integral<T>,\
+    #line 5 \"geometry/point.hpp\"\n#include <concepts>\n#line 8 \"geometry/point.hpp\"\
+    \n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <typename T>\nconcept\
+    \ Coordinate = std::is_arithmetic_v<T> && !std::same_as<std::remove_cv_t<T>, bool>;\n\
+    \ntemplate <Coordinate T>\nusing wide_type = std::conditional_t<std::integral<T>,\
     \ __int128_t, long double>;\n\ntemplate <Coordinate T>\nstruct Point {\n    T\
     \ x;\n    T y;\n\n    constexpr Point() : x(0), y(0) {}\n    constexpr Point(T\
     \ x_value, T y_value) : x(x_value), y(y_value) {}\n\n    template <Coordinate\
@@ -469,188 +464,297 @@ data:
     \ {base};\n\n    Point<long double> perpendicular(-unit.y, unit.x);\n    Point<long\
     \ double> a = base - perpendicular * height;\n    Point<long double> b = base\
     \ + perpendicular * height;\n    if (b < a) std::swap(a, b);\n    return {a, b};\n\
-    }\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_GEOMETRY_CIRCLE_HPP\n#define M1UNE_GEOMETRY_CIRCLE_HPP 1\n\n\
-    #include <algorithm>\n#include <cassert>\n#include <cmath>\n#include <optional>\n\
-    #include <vector>\n\n#include \"ray.hpp\"\n\nnamespace m1une {\nnamespace geometry\
-    \ {\n\ntemplate <Coordinate T>\nstruct Circle {\n    Point<T> center;\n    T radius;\n\
-    };\n\nenum class CircleRelation {\n    Separate,\n    ExternallyTangent,\n   \
-    \ Intersecting,\n    InternallyTangent,\n    Contained,\n    Coincident,\n};\n\
-    \ntemplate <Coordinate T>\nCircleRelation circle_relation(\n    const Circle<T>&\
-    \ first,\n    const Circle<T>& second,\n    long double eps = 1e-12L\n) {\n  \
-    \  assert(first.radius >= 0);\n    assert(second.radius >= 0);\n    long double\
-    \ d = geometry::distance(first.center, second.center);\n    long double r1 = static_cast<long\
-    \ double>(first.radius);\n    long double r2 = static_cast<long double>(second.radius);\n\
-    \    long double sum = r1 + r2;\n    long double difference = std::fabs(r1 - r2);\n\
-    \    if (d <= eps && difference <= eps) return CircleRelation::Coincident;\n \
-    \   if (sum < d - eps) return CircleRelation::Separate;\n    if (std::fabs(d -\
-    \ sum) <= eps) return CircleRelation::ExternallyTangent;\n    if (d < difference\
-    \ - eps) return CircleRelation::Contained;\n    if (std::fabs(d - difference)\
-    \ <= eps) return CircleRelation::InternallyTangent;\n    return CircleRelation::Intersecting;\n\
-    }\n\ntemplate <Coordinate T>\nstd::vector<Point<long double>> circle_line_intersections(\n\
-    \    const Circle<T>& circle,\n    const Line<T>& line,\n    long double eps =\
-    \ 1e-12L\n) {\n    assert(circle.radius >= 0);\n    assert(line.a != line.b);\n\
-    \    Point<long double> foot = projection(line, circle.center);\n    long double\
-    \ radius = static_cast<long double>(circle.radius);\n    long double distance_to_line\
-    \ = geometry::distance(line, circle.center);\n    if (radius < distance_to_line\
-    \ - eps) return {};\n\n    Point<long double> direction =\n        Point<long\
-    \ double>(line.b) - Point<long double>(line.a);\n    direction = normalized(direction);\n\
-    \    long double offset_squared =\n        std::max(0.0L, radius * radius - distance_to_line\
-    \ * distance_to_line);\n    long double offset = std::sqrt(offset_squared);\n\
-    \    if (offset <= eps) return {foot};\n\n    Point<long double> first = foot\
-    \ - direction * offset;\n    Point<long double> second = foot + direction * offset;\n\
-    \    if (second < first) std::swap(first, second);\n    return {first, second};\n\
-    }\n\ntemplate <Coordinate C, Coordinate R>\nstd::vector<Point<long double>> circle_ray_intersections(\n\
-    \    const Circle<C>& circle,\n    const Ray<R>& ray,\n    long double eps = 1e-12L\n\
-    ) {\n    assert(circle.radius >= 0);\n    assert(ray.origin != ray.through);\n\
-    \n    Point<long double> origin(ray.origin);\n    Point<long double> direction\
-    \ =\n        Point<long double>(ray.through) - origin;\n    Point<long double>\
-    \ offset = origin - Point<long double>(circle.center);\n    long double radius\
-    \ = static_cast<long double>(circle.radius);\n    long double quadratic = dot(direction,\
-    \ direction);\n    long double linear = 2.0L * dot(offset, direction);\n    long\
-    \ double constant = dot(offset, offset) - radius * radius;\n    long double discriminant\
-    \ =\n        linear * linear - 4.0L * quadratic * constant;\n    if (discriminant\
-    \ < -eps) return {};\n\n    discriminant = std::max(0.0L, discriminant);\n   \
-    \ long double root = std::sqrt(discriminant);\n    long double first_ratio = (-linear\
-    \ - root) / (2.0L * quadratic);\n    long double second_ratio = (-linear + root)\
-    \ / (2.0L * quadratic);\n\n    std::vector<Point<long double>> result;\n    if\
-    \ (first_ratio >= -eps) {\n        if (first_ratio < 0) first_ratio = 0;\n   \
-    \     result.push_back(origin + direction * first_ratio);\n    }\n    if (\n \
-    \       second_ratio >= -eps &&\n        root > eps\n    ) {\n        if (second_ratio\
-    \ < 0) second_ratio = 0;\n        result.push_back(origin + direction * second_ratio);\n\
-    \    }\n    return result;\n}\n\ntemplate <Coordinate C, Coordinate R>\nstd::vector<Point<long\
-    \ double>> circle_ray_intersections(\n    const Ray<R>& ray,\n    const Circle<C>&\
-    \ circle,\n    long double eps = 1e-12L\n) {\n    return circle_ray_intersections(circle,\
-    \ ray, eps);\n}\n\ntemplate <Coordinate C, Coordinate R>\nstd::optional<Point<long\
-    \ double>> first_circle_ray_intersection(\n    const Circle<C>& circle,\n    const\
-    \ Ray<R>& ray,\n    long double eps = 1e-12L\n) {\n    std::vector<Point<long\
-    \ double>> points =\n        circle_ray_intersections(circle, ray, eps);\n   \
-    \ if (points.empty()) return std::nullopt;\n    return points.front();\n}\n\n\
-    template <Coordinate C, Coordinate R>\nbool intersects(\n    const Circle<C>&\
-    \ circle,\n    const Ray<R>& ray,\n    long double eps = 1e-12L\n) {\n    return\
-    \ !circle_ray_intersections(circle, ray, eps).empty();\n}\n\ntemplate <Coordinate\
-    \ C, Coordinate R>\nbool intersects(\n    const Ray<R>& ray,\n    const Circle<C>&\
-    \ circle,\n    long double eps = 1e-12L\n) {\n    return intersects(circle, ray,\
-    \ eps);\n}\n\ntemplate <Coordinate R, Coordinate H, Coordinate C>\nRay<long double>\
-    \ reflected_ray(\n    const Ray<R>& incoming,\n    const Point<H>& hit,\n    const\
-    \ Circle<C>& circle,\n    long double eps = 1e-12L\n) {\n    assert(incoming.origin\
-    \ != incoming.through);\n    assert(static_cast<long double>(circle.radius) >\
-    \ eps);\n    assert(\n        std::fabs(\n            geometry::distance(\n  \
-    \              Point<long double>(hit),\n                Point<long double>(circle.center)\n\
-    \            ) -\n            static_cast<long double>(circle.radius)\n      \
-    \  ) <= eps\n    );\n\n    Point<long double> hit_point(hit);\n    Point<long\
-    \ double> normal =\n        hit_point - Point<long double>(circle.center);\n \
-    \   Point<long double> tangent_direction(-normal.y, normal.x);\n    Line<long\
-    \ double> tangent{\n        hit_point,\n        hit_point + tangent_direction\n\
-    \    };\n    Point<long double> incoming_direction =\n        Point<long double>(incoming.through)\
-    \ -\n        Point<long double>(incoming.origin);\n    Point<long double> translated\
-    \ = hit_point + incoming_direction;\n    return Ray<long double>{\n        hit_point,\n\
-    \        reflection(tangent, translated)\n    };\n}\n\ntemplate <Coordinate T>\n\
-    std::vector<Point<long double>> circle_intersections(\n    const Circle<T>& first,\n\
-    \    const Circle<T>& second,\n    long double eps = 1e-12L\n) {\n    assert(first.radius\
-    \ >= 0);\n    assert(second.radius >= 0);\n    CircleRelation relation = circle_relation(first,\
-    \ second, eps);\n    if (\n        relation == CircleRelation::Separate ||\n \
-    \       relation == CircleRelation::Contained ||\n        relation == CircleRelation::Coincident\n\
-    \    ) {\n        return {};\n    }\n\n    Point<long double> c1(first.center);\n\
-    \    Point<long double> c2(second.center);\n    Point<long double> direction =\
-    \ c2 - c1;\n    long double d = norm(direction);\n    long double r1 = static_cast<long\
-    \ double>(first.radius);\n    long double r2 = static_cast<long double>(second.radius);\n\
-    \    long double along = (r1 * r1 - r2 * r2 + d * d) / (2 * d);\n    long double\
-    \ height_squared = std::max(0.0L, r1 * r1 - along * along);\n    Point<long double>\
-    \ unit = direction / d;\n    Point<long double> base = c1 + unit * along;\n  \
-    \  long double height = std::sqrt(height_squared);\n    if (height <= eps) return\
-    \ {base};\n\n    Point<long double> perpendicular(-unit.y, unit.x);\n    Point<long\
-    \ double> a = base - perpendicular * height;\n    Point<long double> b = base\
-    \ + perpendicular * height;\n    if (b < a) std::swap(a, b);\n    return {a, b};\n\
-    }\n\n}  // namespace geometry\n}  // namespace m1une\n\n#endif  // M1UNE_GEOMETRY_CIRCLE_HPP\n"
+    }\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 15 \"geometry/minimum_enclosing_circle.hpp\"\
+    \n\nnamespace m1une {\nnamespace geometry {\n\nstruct MinimumEnclosingCircle {\n\
+    \    Circle<long double> circle;\n    std::vector<int> support;\n};\n\nnamespace\
+    \ internal {\n\nstruct MinimumEnclosingCircleSupport {\n    int size = 0;\n  \
+    \  std::array<int, 3> index = {-1, -1, -1};\n};\n\ntemplate <Coordinate T>\nCircle<long\
+    \ double> circle_from_support(\n    const std::vector<Point<T>>& points,\n   \
+    \ const MinimumEnclosingCircleSupport& support\n) {\n    assert(1 <= support.size\
+    \ && support.size <= 3);\n    Point<long double> first(points[support.index[0]]);\n\
+    \    if (support.size == 1) return Circle<long double>{first, 0.0L};\n\n    Point<long\
+    \ double> second(points[support.index[1]]);\n    if (support.size == 2) {\n  \
+    \      Point<long double> center = (first + second) / 2.0L;\n        return Circle<long\
+    \ double>{center, distance(first, second) / 2.0L};\n    }\n\n    Point<long double>\
+    \ third(points[support.index[2]]);\n    long double denominator = 2.0L * cross(first,\
+    \ second, third);\n    assert(denominator != 0.0L);\n    long double first_norm\
+    \ = norm2(first);\n    long double second_norm = norm2(second);\n    long double\
+    \ third_norm = norm2(third);\n    Point<long double> center(\n        (\n    \
+    \        first_norm * (second.y - third.y) +\n            second_norm * (third.y\
+    \ - first.y) +\n            third_norm * (first.y - second.y)\n        ) / denominator,\n\
+    \        (\n            first_norm * (third.x - second.x) +\n            second_norm\
+    \ * (first.x - third.x) +\n            third_norm * (second.x - first.x)\n   \
+    \     ) / denominator\n    );\n    return Circle<long double>{center, distance(center,\
+    \ first)};\n}\n\ntemplate <Coordinate T>\nvoid reduce_collinear_support(\n   \
+    \ const std::vector<Point<T>>& points,\n    MinimumEnclosingCircleSupport& support\n\
+    ) {\n    if (support.size != 3) return;\n    const Point<T>& first = points[support.index[0]];\n\
+    \    const Point<T>& second = points[support.index[1]];\n    const Point<T>& third\
+    \ = points[support.index[2]];\n    if (cross(first, second, third) != 0) return;\n\
+    \n    wide_type<T> first_second = distance2(first, second);\n    wide_type<T>\
+    \ second_third = distance2(second, third);\n    wide_type<T> first_third = distance2(first,\
+    \ third);\n    if (first_second >= second_third && first_second >= first_third)\
+    \ {\n        support.size = 2;\n    } else if (second_third >= first_second &&\
+    \ second_third >= first_third) {\n        support.size = 2;\n        support.index[0]\
+    \ = support.index[1];\n        support.index[1] = support.index[2];\n    } else\
+    \ {\n        support.size = 2;\n        support.index[1] = support.index[2];\n\
+    \    }\n}\n\ntemplate <Coordinate T>\nbool support_contains(\n    const std::vector<Point<T>>&\
+    \ points,\n    const MinimumEnclosingCircleSupport& support,\n    int point_index,\n\
+    \    long double eps\n) {\n    if (support.size == 0) return false;\n    const\
+    \ Point<T>& point = points[point_index];\n    const Point<T>& first = points[support.index[0]];\n\
+    \    if (support.size == 1) return point == first;\n\n    if constexpr (std::integral<T>)\
+    \ {\n        using W = wide_type<T>;\n        const Point<T>& second = points[support.index[1]];\n\
+    \        if (support.size == 2) {\n            W ux = W(2) * W(point.x) - W(first.x)\
+    \ - W(second.x);\n            W uy = W(2) * W(point.y) - W(first.y) - W(second.y);\n\
+    \            W dx = W(first.x) - W(second.x);\n            W dy = W(first.y) -\
+    \ W(second.y);\n            return ux * ux + uy * uy <= dx * dx + dy * dy;\n \
+    \       }\n\n        const Point<T>& third = points[support.index[2]];\n     \
+    \   W ax = W(first.x) - W(point.x);\n        W ay = W(first.y) - W(point.y);\n\
+    \        W bx = W(second.x) - W(point.x);\n        W by = W(second.y) - W(point.y);\n\
+    \        W cx = W(third.x) - W(point.x);\n        W cy = W(third.y) - W(point.y);\n\
+    \        W a_norm = ax * ax + ay * ay;\n        W b_norm = bx * bx + by * by;\n\
+    \        W c_norm = cx * cx + cy * cy;\n        W determinant =\n            ax\
+    \ * (by * c_norm - cy * b_norm) -\n            ay * (bx * c_norm - cx * b_norm)\
+    \ +\n            a_norm * (bx * cy - by * cx);\n        W direction = cross(first,\
+    \ second, third);\n        return direction > 0 ? determinant >= 0 : determinant\
+    \ <= 0;\n    } else {\n        Circle<long double> circle = circle_from_support(points,\
+    \ support);\n        long double squared = distance2(Point<long double>(point),\
+    \ circle.center);\n        long double radius_squared = circle.radius * circle.radius;\n\
+    \        long double tolerance = eps * std::max(1.0L, radius_squared);\n     \
+    \   return squared <= radius_squared + tolerance;\n    }\n}\n\ninline std::uint64_t\
+    \ minimum_enclosing_circle_random(std::uint64_t& state) {\n    state ^= state\
+    \ << 7;\n    state ^= state >> 9;\n    return state;\n}\n\n}  // namespace internal\n\
+    \n// Returns the unique minimum circle containing every input point.\ntemplate\
+    \ <Coordinate T>\nstd::optional<MinimumEnclosingCircle> minimum_enclosing_circle(\n\
+    \    const std::vector<Point<T>>& points,\n    long double eps = 1e-12L\n) {\n\
+    \    if (points.empty()) return std::nullopt;\n    assert(eps >= 0.0L);\n\n  \
+    \  const int n = int(points.size());\n    std::vector<int> order(n);\n    std::iota(order.begin(),\
+    \ order.end(), 0);\n    std::uint64_t state = 0x9e3779b97f4a7c15ULL;\n    for\
+    \ (int index = n - 1; index >= 1; index--) {\n        int other = int(\n     \
+    \       internal::minimum_enclosing_circle_random(state) %\n            std::uint64_t(index\
+    \ + 1)\n        );\n        std::swap(order[index], order[other]);\n    }\n\n\
+    \    internal::MinimumEnclosingCircleSupport support;\n    for (int first = 0;\
+    \ first < n; first++) {\n        if (internal::support_contains(points, support,\
+    \ order[first], eps)) {\n            continue;\n        }\n        support.size\
+    \ = 1;\n        support.index[0] = order[first];\n        for (int second = 0;\
+    \ second < first; second++) {\n            if (internal::support_contains(points,\
+    \ support, order[second], eps)) {\n                continue;\n            }\n\
+    \            support.size = 2;\n            support.index[0] = order[first];\n\
+    \            support.index[1] = order[second];\n            for (int third = 0;\
+    \ third < second; third++) {\n                if (internal::support_contains(\n\
+    \                        points,\n                        support,\n         \
+    \               order[third],\n                        eps\n                 \
+    \   )) {\n                    continue;\n                }\n                support.size\
+    \ = 3;\n                support.index[0] = order[first];\n                support.index[1]\
+    \ = order[second];\n                support.index[2] = order[third];\n       \
+    \         internal::reduce_collinear_support(points, support);\n            }\n\
+    \        }\n    }\n\n    MinimumEnclosingCircle result;\n    result.circle = internal::circle_from_support(points,\
+    \ support);\n    result.support.assign(\n        support.index.begin(),\n    \
+    \    support.index.begin() + support.size\n    );\n    std::sort(result.support.begin(),\
+    \ result.support.end());\n    return result;\n}\n\n}  // namespace geometry\n\
+    }  // namespace m1une\n\n\n#line 4 \"verify/geometry/minimum_enclosing_circle.test.cpp\"\
+    \n\n#line 9 \"verify/geometry/minimum_enclosing_circle.test.cpp\"\n#include <iostream>\n\
+    #line 12 \"verify/geometry/minimum_enclosing_circle.test.cpp\"\n\nnamespace {\n\
+    \nusing Point = m1une::geometry::Point<long long>;\nusing Circle = m1une::geometry::Circle<long\
+    \ double>;\n\nbool contains(const Circle& circle, const Point& point) {\n    long\
+    \ double squared = m1une::geometry::distance2(\n        circle.center,\n     \
+    \   m1une::geometry::Point<long double>(point)\n    );\n    long double radius_squared\
+    \ = circle.radius * circle.radius;\n    return squared <= radius_squared + 1e-9L\
+    \ * std::max(1.0L, radius_squared);\n}\n\nCircle diameter_circle(const Point&\
+    \ first, const Point& second) {\n    m1une::geometry::Point<long double> a(first);\n\
+    \    m1une::geometry::Point<long double> b(second);\n    auto center = (a + b)\
+    \ / 2.0L;\n    return Circle{center, m1une::geometry::distance(a, b) / 2.0L};\n\
+    }\n\nstd::optional<Circle> circumcircle(\n    const Point& first,\n    const Point&\
+    \ second,\n    const Point& third\n) {\n    m1une::geometry::Point<long double>\
+    \ a(first);\n    m1une::geometry::Point<long double> b(second);\n    m1une::geometry::Point<long\
+    \ double> c(third);\n    long double denominator = 2.0L * m1une::geometry::cross(a,\
+    \ b, c);\n    if (denominator == 0.0L) return std::nullopt;\n    long double a_norm\
+    \ = m1une::geometry::norm2(a);\n    long double b_norm = m1une::geometry::norm2(b);\n\
+    \    long double c_norm = m1une::geometry::norm2(c);\n    m1une::geometry::Point<long\
+    \ double> center(\n        (\n            a_norm * (b.y - c.y) +\n           \
+    \ b_norm * (c.y - a.y) +\n            c_norm * (a.y - b.y)\n        ) / denominator,\n\
+    \        (\n            a_norm * (c.x - b.x) +\n            b_norm * (a.x - c.x)\
+    \ +\n            c_norm * (b.x - a.x)\n        ) / denominator\n    );\n    return\
+    \ Circle{center, m1une::geometry::distance(center, a)};\n}\n\nstd::optional<Circle>\
+    \ brute_force(const std::vector<Point>& points) {\n    if (points.empty()) return\
+    \ std::nullopt;\n    std::optional<Circle> answer;\n    auto consider = [&points,\
+    \ &answer](const Circle& candidate) {\n        for (const Point& point : points)\
+    \ {\n            if (!contains(candidate, point)) return;\n        }\n       \
+    \ if (!answer || candidate.radius < answer->radius) answer = candidate;\n    };\n\
+    \n    for (const Point& point : points) {\n        consider(Circle{\n        \
+    \    m1une::geometry::Point<long double>(point),\n            0.0L\n        });\n\
+    \    }\n    for (int first = 0; first < int(points.size()); first++) {\n     \
+    \   for (int second = first + 1; second < int(points.size()); second++) {\n  \
+    \          consider(diameter_circle(points[first], points[second]));\n       \
+    \ }\n    }\n    for (int first = 0; first < int(points.size()); first++) {\n \
+    \       for (int second = first + 1; second < int(points.size()); second++) {\n\
+    \            for (int third = second + 1; third < int(points.size()); third++)\
+    \ {\n                auto candidate = circumcircle(\n                    points[first],\n\
+    \                    points[second],\n                    points[third]\n    \
+    \            );\n                if (candidate) consider(*candidate);\n      \
+    \      }\n        }\n    }\n    return answer;\n}\n\nvoid check(const std::vector<Point>&\
+    \ points) {\n    auto expected = brute_force(points);\n    auto actual = m1une::geometry::minimum_enclosing_circle(points);\n\
+    \    assert(expected.has_value() == actual.has_value());\n    if (!actual) return;\n\
+    \n    assert(1 <= int(actual->support.size()));\n    assert(int(actual->support.size())\
+    \ <= 3);\n    assert(std::is_sorted(actual->support.begin(), actual->support.end()));\n\
+    \    for (int index : actual->support) {\n        assert(0 <= index && index <\
+    \ int(points.size()));\n        long double boundary_distance = m1une::geometry::distance(\n\
+    \            actual->circle.center,\n            m1une::geometry::Point<long double>(points[index])\n\
+    \        );\n        assert(\n            std::fabs(boundary_distance - actual->circle.radius)\
+    \ <=\n            1e-8L * std::max(1.0L, actual->circle.radius)\n        );\n\
+    \    }\n    for (const Point& point : points) assert(contains(actual->circle,\
+    \ point));\n    assert(\n        std::fabs(actual->circle.radius - expected->radius)\
+    \ <=\n        1e-8L * std::max(1.0L, expected->radius)\n    );\n    assert(\n\
+    \        m1une::geometry::distance(\n            actual->circle.center,\n    \
+    \        expected->center\n        ) <= 1e-8L * std::max(1.0L, expected->radius)\n\
+    \    );\n}\n\nvoid randomized_test() {\n    check({});\n    check({Point(2, 5)});\n\
+    \    check({Point(1, 1), Point(1, 1), Point(1, 1)});\n    check({Point(0, 0),\
+    \ Point(4, 0), Point(2, 1)});\n    check({Point(-3, 0), Point(0, 0), Point(8,\
+    \ 0)});\n\n    std::uint64_t state = 277;\n    auto random = [&state]() {\n  \
+    \      state ^= state << 7;\n        state ^= state >> 9;\n        return state;\n\
+    \    };\n    for (int trial = 0; trial < 1000; trial++) {\n        int size =\
+    \ int(random() % 10);\n        std::vector<Point> points;\n        points.reserve(size);\n\
+    \        for (int index = 0; index < size; index++) {\n            points.emplace_back(\n\
+    \                static_cast<long long>(random() % 21) - 10,\n               \
+    \ static_cast<long long>(random() % 21) - 10\n            );\n        }\n    \
+    \    check(points);\n    }\n\n    using FloatingPoint = m1une::geometry::Point<long\
+    \ double>;\n    std::vector<FloatingPoint> floating_points;\n    floating_points.emplace_back(0.0L,\
+    \ 0.0L);\n    floating_points.emplace_back(2.0L, 0.0L);\n    floating_points.emplace_back(1.0L,\
+    \ 1.0L);\n    auto floating_answer =\n        m1une::geometry::minimum_enclosing_circle(floating_points);\n\
+    \    assert(floating_answer.has_value());\n    assert(std::fabs(floating_answer->circle.center.x\
+    \ - 1.0L) <= 1e-12L);\n    assert(std::fabs(floating_answer->circle.center.y)\
+    \ <= 1e-12L);\n    assert(std::fabs(floating_answer->circle.radius - 1.0L) <=\
+    \ 1e-12L);\n}\n\nbool on_boundary(\n    const std::vector<Point>& points,\n  \
+    \  const std::vector<int>& support,\n    int point_index\n) {\n    const Point&\
+    \ point = points[point_index];\n    const Point& first = points[support[0]];\n\
+    \    if (support.size() == 1) return point == first;\n\n    using W = __int128_t;\n\
+    \    const Point& second = points[support[1]];\n    if (support.size() == 2) {\n\
+    \        W ux = W(2) * W(point.x) - W(first.x) - W(second.x);\n        W uy =\
+    \ W(2) * W(point.y) - W(first.y) - W(second.y);\n        W dx = W(first.x) - W(second.x);\n\
+    \        W dy = W(first.y) - W(second.y);\n        return ux * ux + uy * uy ==\
+    \ dx * dx + dy * dy;\n    }\n\n    const Point& third = points[support[2]];\n\
+    \    W ax = W(first.x) - W(point.x);\n    W ay = W(first.y) - W(point.y);\n  \
+    \  W bx = W(second.x) - W(point.x);\n    W by = W(second.y) - W(point.y);\n  \
+    \  W cx = W(third.x) - W(point.x);\n    W cy = W(third.y) - W(point.y);\n    W\
+    \ a_norm = ax * ax + ay * ay;\n    W b_norm = bx * bx + by * by;\n    W c_norm\
+    \ = cx * cx + cy * cy;\n    W determinant =\n        ax * (by * c_norm - cy *\
+    \ b_norm) -\n        ay * (bx * c_norm - cx * b_norm) +\n        a_norm * (bx\
+    \ * cy - by * cx);\n    return determinant == 0;\n}\n\n}  // namespace\n\nint\
+    \ main() {\n    randomized_test();\n\n    std::ios::sync_with_stdio(false);\n\
+    \    std::cin.tie(nullptr);\n\n    int n;\n    std::cin >> n;\n    std::vector<Point>\
+    \ points(n);\n    for (Point& point : points) std::cin >> point.x >> point.y;\n\
+    \n    auto answer = m1une::geometry::minimum_enclosing_circle(points);\n    assert(answer.has_value());\n\
+    \    for (int index = 0; index < n; index++) {\n        std::cout << (on_boundary(points,\
+    \ answer->support, index) ? '1' : '0');\n    }\n    std::cout << '\\n';\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/minimum_enclosing_circle\"\
+    \n\n#include \"../../geometry/minimum_enclosing_circle.hpp\"\n\n#include <algorithm>\n\
+    #include <cassert>\n#include <cmath>\n#include <cstdint>\n#include <iostream>\n\
+    #include <optional>\n#include <vector>\n\nnamespace {\n\nusing Point = m1une::geometry::Point<long\
+    \ long>;\nusing Circle = m1une::geometry::Circle<long double>;\n\nbool contains(const\
+    \ Circle& circle, const Point& point) {\n    long double squared = m1une::geometry::distance2(\n\
+    \        circle.center,\n        m1une::geometry::Point<long double>(point)\n\
+    \    );\n    long double radius_squared = circle.radius * circle.radius;\n   \
+    \ return squared <= radius_squared + 1e-9L * std::max(1.0L, radius_squared);\n\
+    }\n\nCircle diameter_circle(const Point& first, const Point& second) {\n    m1une::geometry::Point<long\
+    \ double> a(first);\n    m1une::geometry::Point<long double> b(second);\n    auto\
+    \ center = (a + b) / 2.0L;\n    return Circle{center, m1une::geometry::distance(a,\
+    \ b) / 2.0L};\n}\n\nstd::optional<Circle> circumcircle(\n    const Point& first,\n\
+    \    const Point& second,\n    const Point& third\n) {\n    m1une::geometry::Point<long\
+    \ double> a(first);\n    m1une::geometry::Point<long double> b(second);\n    m1une::geometry::Point<long\
+    \ double> c(third);\n    long double denominator = 2.0L * m1une::geometry::cross(a,\
+    \ b, c);\n    if (denominator == 0.0L) return std::nullopt;\n    long double a_norm\
+    \ = m1une::geometry::norm2(a);\n    long double b_norm = m1une::geometry::norm2(b);\n\
+    \    long double c_norm = m1une::geometry::norm2(c);\n    m1une::geometry::Point<long\
+    \ double> center(\n        (\n            a_norm * (b.y - c.y) +\n           \
+    \ b_norm * (c.y - a.y) +\n            c_norm * (a.y - b.y)\n        ) / denominator,\n\
+    \        (\n            a_norm * (c.x - b.x) +\n            b_norm * (a.x - c.x)\
+    \ +\n            c_norm * (b.x - a.x)\n        ) / denominator\n    );\n    return\
+    \ Circle{center, m1une::geometry::distance(center, a)};\n}\n\nstd::optional<Circle>\
+    \ brute_force(const std::vector<Point>& points) {\n    if (points.empty()) return\
+    \ std::nullopt;\n    std::optional<Circle> answer;\n    auto consider = [&points,\
+    \ &answer](const Circle& candidate) {\n        for (const Point& point : points)\
+    \ {\n            if (!contains(candidate, point)) return;\n        }\n       \
+    \ if (!answer || candidate.radius < answer->radius) answer = candidate;\n    };\n\
+    \n    for (const Point& point : points) {\n        consider(Circle{\n        \
+    \    m1une::geometry::Point<long double>(point),\n            0.0L\n        });\n\
+    \    }\n    for (int first = 0; first < int(points.size()); first++) {\n     \
+    \   for (int second = first + 1; second < int(points.size()); second++) {\n  \
+    \          consider(diameter_circle(points[first], points[second]));\n       \
+    \ }\n    }\n    for (int first = 0; first < int(points.size()); first++) {\n \
+    \       for (int second = first + 1; second < int(points.size()); second++) {\n\
+    \            for (int third = second + 1; third < int(points.size()); third++)\
+    \ {\n                auto candidate = circumcircle(\n                    points[first],\n\
+    \                    points[second],\n                    points[third]\n    \
+    \            );\n                if (candidate) consider(*candidate);\n      \
+    \      }\n        }\n    }\n    return answer;\n}\n\nvoid check(const std::vector<Point>&\
+    \ points) {\n    auto expected = brute_force(points);\n    auto actual = m1une::geometry::minimum_enclosing_circle(points);\n\
+    \    assert(expected.has_value() == actual.has_value());\n    if (!actual) return;\n\
+    \n    assert(1 <= int(actual->support.size()));\n    assert(int(actual->support.size())\
+    \ <= 3);\n    assert(std::is_sorted(actual->support.begin(), actual->support.end()));\n\
+    \    for (int index : actual->support) {\n        assert(0 <= index && index <\
+    \ int(points.size()));\n        long double boundary_distance = m1une::geometry::distance(\n\
+    \            actual->circle.center,\n            m1une::geometry::Point<long double>(points[index])\n\
+    \        );\n        assert(\n            std::fabs(boundary_distance - actual->circle.radius)\
+    \ <=\n            1e-8L * std::max(1.0L, actual->circle.radius)\n        );\n\
+    \    }\n    for (const Point& point : points) assert(contains(actual->circle,\
+    \ point));\n    assert(\n        std::fabs(actual->circle.radius - expected->radius)\
+    \ <=\n        1e-8L * std::max(1.0L, expected->radius)\n    );\n    assert(\n\
+    \        m1une::geometry::distance(\n            actual->circle.center,\n    \
+    \        expected->center\n        ) <= 1e-8L * std::max(1.0L, expected->radius)\n\
+    \    );\n}\n\nvoid randomized_test() {\n    check({});\n    check({Point(2, 5)});\n\
+    \    check({Point(1, 1), Point(1, 1), Point(1, 1)});\n    check({Point(0, 0),\
+    \ Point(4, 0), Point(2, 1)});\n    check({Point(-3, 0), Point(0, 0), Point(8,\
+    \ 0)});\n\n    std::uint64_t state = 277;\n    auto random = [&state]() {\n  \
+    \      state ^= state << 7;\n        state ^= state >> 9;\n        return state;\n\
+    \    };\n    for (int trial = 0; trial < 1000; trial++) {\n        int size =\
+    \ int(random() % 10);\n        std::vector<Point> points;\n        points.reserve(size);\n\
+    \        for (int index = 0; index < size; index++) {\n            points.emplace_back(\n\
+    \                static_cast<long long>(random() % 21) - 10,\n               \
+    \ static_cast<long long>(random() % 21) - 10\n            );\n        }\n    \
+    \    check(points);\n    }\n\n    using FloatingPoint = m1une::geometry::Point<long\
+    \ double>;\n    std::vector<FloatingPoint> floating_points;\n    floating_points.emplace_back(0.0L,\
+    \ 0.0L);\n    floating_points.emplace_back(2.0L, 0.0L);\n    floating_points.emplace_back(1.0L,\
+    \ 1.0L);\n    auto floating_answer =\n        m1une::geometry::minimum_enclosing_circle(floating_points);\n\
+    \    assert(floating_answer.has_value());\n    assert(std::fabs(floating_answer->circle.center.x\
+    \ - 1.0L) <= 1e-12L);\n    assert(std::fabs(floating_answer->circle.center.y)\
+    \ <= 1e-12L);\n    assert(std::fabs(floating_answer->circle.radius - 1.0L) <=\
+    \ 1e-12L);\n}\n\nbool on_boundary(\n    const std::vector<Point>& points,\n  \
+    \  const std::vector<int>& support,\n    int point_index\n) {\n    const Point&\
+    \ point = points[point_index];\n    const Point& first = points[support[0]];\n\
+    \    if (support.size() == 1) return point == first;\n\n    using W = __int128_t;\n\
+    \    const Point& second = points[support[1]];\n    if (support.size() == 2) {\n\
+    \        W ux = W(2) * W(point.x) - W(first.x) - W(second.x);\n        W uy =\
+    \ W(2) * W(point.y) - W(first.y) - W(second.y);\n        W dx = W(first.x) - W(second.x);\n\
+    \        W dy = W(first.y) - W(second.y);\n        return ux * ux + uy * uy ==\
+    \ dx * dx + dy * dy;\n    }\n\n    const Point& third = points[support[2]];\n\
+    \    W ax = W(first.x) - W(point.x);\n    W ay = W(first.y) - W(point.y);\n  \
+    \  W bx = W(second.x) - W(point.x);\n    W by = W(second.y) - W(point.y);\n  \
+    \  W cx = W(third.x) - W(point.x);\n    W cy = W(third.y) - W(point.y);\n    W\
+    \ a_norm = ax * ax + ay * ay;\n    W b_norm = bx * bx + by * by;\n    W c_norm\
+    \ = cx * cx + cy * cy;\n    W determinant =\n        ax * (by * c_norm - cy *\
+    \ b_norm) -\n        ay * (bx * c_norm - cx * b_norm) +\n        a_norm * (bx\
+    \ * cy - by * cx);\n    return determinant == 0;\n}\n\n}  // namespace\n\nint\
+    \ main() {\n    randomized_test();\n\n    std::ios::sync_with_stdio(false);\n\
+    \    std::cin.tie(nullptr);\n\n    int n;\n    std::cin >> n;\n    std::vector<Point>\
+    \ points(n);\n    for (Point& point : points) std::cin >> point.x >> point.y;\n\
+    \n    auto answer = m1une::geometry::minimum_enclosing_circle(points);\n    assert(answer.has_value());\n\
+    \    for (int index = 0; index < n; index++) {\n        std::cout << (on_boundary(points,\
+    \ answer->support, index) ? '1' : '0');\n    }\n    std::cout << '\\n';\n}\n"
   dependsOn:
+  - geometry/minimum_enclosing_circle.hpp
+  - geometry/circle.hpp
   - geometry/ray.hpp
   - geometry/line.hpp
   - geometry/point.hpp
-  isVerificationFile: false
-  path: geometry/circle.hpp
-  requiredBy:
-  - geometry/minimum_enclosing_circle.hpp
-  - geometry/all.hpp
-  timestamp: '2026-06-21 12:04:47+09:00'
-  verificationStatus: LIBRARY_ALL_AC
-  verifiedWith:
-  - verify/geometry/circle_line_intersection.test.cpp
-  - verify/geometry/minimum_enclosing_circle.test.cpp
-  - verify/geometry/geometry_algorithms.test.cpp
-  - verify/geometry/circle_ray.test.cpp
-documentation_of: geometry/circle.hpp
+  isVerificationFile: true
+  path: verify/geometry/minimum_enclosing_circle.test.cpp
+  requiredBy: []
+  timestamp: '2026-07-11 20:41:48+09:00'
+  verificationStatus: TEST_ACCEPTED
+  verifiedWith: []
+documentation_of: verify/geometry/minimum_enclosing_circle.test.cpp
 layout: document
-title: Circles
+redirect_from:
+- /verify/verify/geometry/minimum_enclosing_circle.test.cpp
+- /verify/verify/geometry/minimum_enclosing_circle.test.cpp.html
+title: verify/geometry/minimum_enclosing_circle.test.cpp
 ---
-
-## Overview
-
-This header provides circle relationships, intersection points with lines,
-rays, and other circles, and physical ray reflection. Constructed points use
-`long double`.
-
-## Types
-
-```cpp
-template <Coordinate T>
-struct Circle {
-    Point<T> center;
-    T radius;
-};
-```
-
-Radii must be nonnegative.
-
-`CircleRelation` has these cases:
-
-* `Separate`
-* `ExternallyTangent`
-* `Intersecting`
-* `InternallyTangent`
-* `Contained`
-* `Coincident`
-
-## Functions
-
-| Function | Description | Complexity |
-| --- | --- | --- |
-| `circle_relation(first, second, eps)` | Classifies two circles. | $O(1)$ |
-| `circle_line_intersections(circle, line, eps)` | Returns zero, one, or two intersection points in lexicographic order. | $O(1)$ |
-| `circle_ray_intersections(circle, ray, eps)` | Returns zero, one, or two intersections ordered from the ray origin. Both argument orders are supported. | $O(1)$ |
-| `first_circle_ray_intersection(circle, ray, eps)` | Returns the first intersection along the ray, or `nullopt`. | $O(1)$ |
-| `intersects(circle, ray, eps)` | Tests whether a circle boundary and ray intersect. Both argument orders are supported. | $O(1)$ |
-| `reflected_ray(incoming, hit, circle, eps)` | Returns the outgoing ray after reflection from the circle at `hit`. | $O(1)$ |
-| `circle_intersections(first, second, eps)` | Returns zero, one, or two intersection points in lexicographic order. Coincident circles return an empty vector because intersections are not unique. | $O(1)$ |
-
-`circle_ray_intersections` intersects the ray with the circle boundary, not its
-filled disk. A ray starting inside the circle therefore has one forward
-intersection. A tangent has one intersection, and intersections behind the ray
-origin are omitted.
-
-`reflected_ray` reflects the incoming direction across the tangent line at
-`hit`, so the angle of incidence equals the angle of reflection. `hit` must lie
-on the circle. The radius must be positive because a zero-radius circle has no
-defined tangent.
-
-## Example
-
-```cpp
-#include "geometry/circle.hpp"
-
-#include <iostream>
-
-int main() {
-    using namespace m1une::geometry;
-    Circle<double> circle;
-    circle.center = Point<double>(0, 0);
-    circle.radius = 2;
-
-    Line<double> line;
-    line.a = Point<double>(-3, 0);
-    line.b = Point<double>(3, 0);
-
-    auto intersections = circle_line_intersections(circle, line);
-    std::cout << intersections.size() << "\n"; // 2
-}
-```
