@@ -5,7 +5,7 @@ documentation_of: ../../../ds/bst/ordered_set.hpp
 
 ## Overview
 
-`OrderedSet` is an AVL tree for sets. It keeps unique keys only, like
+`OrderedSet` is a weight-balanced binary search tree for sets. It keeps unique keys only, like
 `std::set`, and also supports order-statistics queries such as k-th element and
 rank. Nodes come from a recyclable block arena, so insertion and erasure avoid
 general-purpose per-node allocation.

@@ -1,7 +1,6 @@
 #ifndef M1UNE_ORDERED_SET_HPP
 #define M1UNE_ORDERED_SET_HPP 1
 
-#include <algorithm>
 #include <cassert>
 #include <functional>
 #include <initializer_list>
@@ -18,12 +17,11 @@ struct OrderedSet {
     struct Node {
         T key;
         int size;
-        int height;
         Node* l;
         Node* r;
 
         explicit Node(T value)
-            : key(std::move(value)), size(1), height(1), l(nullptr), r(nullptr) {}
+            : key(std::move(value)), size(1), l(nullptr), r(nullptr) {}
     };
 
     static constexpr int pool_block_size = 1 << 15;
@@ -63,17 +61,12 @@ struct OrderedSet {
         return t == nullptr ? 0 : t->size;
     }
 
-    static int subtree_height(const Node* t) {
-        return t == nullptr ? 0 : t->height;
-    }
-
     Node* new_node(T key) {
         return pool.emplace(std::move(key));
     }
 
     static void update(Node* t) {
         t->size = 1 + subtree_size(t->l) + subtree_size(t->r);
-        t->height = 1 + std::max(subtree_height(t->l), subtree_height(t->r));
     }
 
     static Node* rotate_right(Node* t) {
@@ -96,29 +89,32 @@ struct OrderedSet {
 
     static Node* balance(Node* t) {
         if (t == nullptr) return nullptr;
-        update(t);
-        const int balance_factor = subtree_height(t->l) - subtree_height(t->r);
-        if (balance_factor > 1) {
-            if (subtree_height(t->l->l) < subtree_height(t->l->r)) {
+        const int left_size = subtree_size(t->l);
+        const int right_size = subtree_size(t->r);
+        if (left_size + right_size > 1 && left_size > 3LL * right_size) {
+            if (subtree_size(t->l->r) >= 2LL * subtree_size(t->l->l)) {
                 t->l = rotate_left(t->l);
             }
             return rotate_right(t);
         }
-        if (balance_factor < -1) {
-            if (subtree_height(t->r->r) < subtree_height(t->r->l)) {
+        if (left_size + right_size > 1 && right_size > 3LL * left_size) {
+            if (subtree_size(t->r->l) >= 2LL * subtree_size(t->r->r)) {
                 t->r = rotate_right(t->r);
             }
             return rotate_left(t);
         }
+        update(t);
         return t;
     }
 
     static Node* join_with_root(Node* l, Node* middle, Node* r) {
-        if (subtree_height(l) > subtree_height(r) + 1) {
+        const int left_size = subtree_size(l);
+        const int right_size = subtree_size(r);
+        if (left_size > 3LL * (right_size + 1)) {
             l->r = join_with_root(l->r, middle, r);
             return balance(l);
         }
-        if (subtree_height(r) > subtree_height(l) + 1) {
+        if (right_size > 3LL * (left_size + 1)) {
             r->l = join_with_root(l, middle, r->l);
             return balance(r);
         }
@@ -157,58 +153,37 @@ struct OrderedSet {
         return {l, join_with_root(r, t, right)};
     }
 
-    Node* insert_impl(Node* t, T& key, bool& inserted, bool& grew) {
+    Node* insert_impl(Node* t, T& key, bool& inserted) {
         if (t == nullptr) {
             inserted = true;
-            grew = true;
             return new_node(std::move(key));
         }
-        const int old_height = t->height;
         if (comp(key, t->key)) {
-            t->l = insert_impl(t->l, key, inserted, grew);
+            t->l = insert_impl(t->l, key, inserted);
         } else if (comp(t->key, key)) {
-            t->r = insert_impl(t->r, key, inserted, grew);
+            t->r = insert_impl(t->r, key, inserted);
         } else {
-            grew = false;
             return t;
         }
         if (!inserted) return t;
-        if (!grew) {
-            ++t->size;
-            return t;
-        }
-        t = balance(t);
-        grew = t->height > old_height;
-        return t;
+        return balance(t);
     }
 
-    Node* erase_impl(Node* t, const T& key, bool& erased, bool& shrunk) {
-        if (t == nullptr) {
-            shrunk = false;
-            return nullptr;
-        }
-        const int old_height = t->height;
+    Node* erase_impl(Node* t, const T& key, bool& erased) {
+        if (t == nullptr) return nullptr;
         if (comp(key, t->key)) {
-            t->l = erase_impl(t->l, key, erased, shrunk);
+            t->l = erase_impl(t->l, key, erased);
         } else if (comp(t->key, key)) {
-            t->r = erase_impl(t->r, key, erased, shrunk);
+            t->r = erase_impl(t->r, key, erased);
         } else {
             erased = true;
             Node* l = t->l;
             Node* r = t->r;
             pool.recycle(t);
-            Node* result = merge_nodes(l, r);
-            shrunk = subtree_height(result) < old_height;
-            return result;
+            return merge_nodes(l, r);
         }
         if (!erased) return t;
-        if (!shrunk) {
-            --t->size;
-            return t;
-        }
-        t = balance(t);
-        shrunk = t->height < old_height;
-        return t;
+        return balance(t);
     }
 
     static const T* kth_impl(const Node* t, int k) {
@@ -355,15 +330,13 @@ struct OrderedSet {
 
     bool insert(T key) {
         bool inserted = false;
-        bool grew = false;
-        root = insert_impl(root, key, inserted, grew);
+        root = insert_impl(root, key, inserted);
         return inserted;
     }
 
     bool erase(const T& key) {
         bool erased = false;
-        bool shrunk = false;
-        root = erase_impl(root, key, erased, shrunk);
+        root = erase_impl(root, key, erased);
         return erased;
     }
 

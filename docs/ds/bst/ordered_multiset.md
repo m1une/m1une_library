@@ -5,7 +5,7 @@ documentation_of: ../../../ds/bst/ordered_multiset.hpp
 
 ## Overview
 
-`OrderedMultiset` is an AVL tree for multisets. It stores equal keys as one node
+`OrderedMultiset` is a weight-balanced binary search tree for multisets. It stores equal keys as one node
 with a multiplicity, so it supports standard multiset operations plus
 order-statistics queries such as k-th element and rank. Nodes come from a
 recyclable block arena, avoiding general-purpose per-node allocation.
