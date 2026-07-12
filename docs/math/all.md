@@ -23,6 +23,7 @@ You usually do not need to include this entire bundle:
   digit sequences.
 * Use `bitwise_convolution.hpp` for OR, AND, or XOR convolution over mask
   indices.
+* Use `subset_convolution.hpp` to combine values indexed by disjoint submasks.
 * Use `xor_basis.hpp` to maintain the XOR span of a set of unsigned integers.
 * Use `generalized_floor_sum.hpp` for polynomial moments of
   `floor((a * i + b) / mod)`.
@@ -101,4 +102,5 @@ few unused headers do not matter.
 | `math/totient_sum.hpp` | Summatory Euler totient function. |
 | `math/rational.hpp` | Exact normalized rational arithmetic over signed integers. |
 | `math/stern_brocot_tree.hpp` | Compressed Stern-Brocot paths and tree navigation. |
+| `math/subset_convolution.hpp` | Ranked-zeta subset convolution over disjoint masks. |
 | `math/zeta_mobius_transform.hpp` | Subset, superset, divisor, and multiple zeta/Mobius transforms. |

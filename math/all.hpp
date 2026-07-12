@@ -26,6 +26,7 @@
 #include "rational.hpp"
 #include "repunit.hpp"
 #include "stern_brocot_tree.hpp"
+#include "subset_convolution.hpp"
 #include "tetration.hpp"
 #include "totient_sum.hpp"
 #include "two_square_sum.hpp"
