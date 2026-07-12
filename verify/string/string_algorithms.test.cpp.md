@@ -35,6 +35,9 @@ data:
     path: string/rolling_hash.hpp
     title: Static Rolling Hash
   - icon: ':heavy_check_mark:'
+    path: string/runs.hpp
+    title: Runs
+  - icon: ':heavy_check_mark:'
     path: string/string_hash.hpp
     title: String Hash
   - icon: ':heavy_check_mark:'
@@ -627,35 +630,94 @@ data:
     \ pair {hash_value, base_power} for a single character.\n    static constexpr\
     \ std::pair<long long, long long> make_single(long long c) {\n        return {c\
     \ % Mod, Base % Mod};\n    }\n};\n\n}  // namespace string\n}  // namespace m1une\n\
-    \n\n#line 1 \"string/string_hash.hpp\"\n\n\n\n#line 5 \"string/string_hash.hpp\"\
-    \n#include <cstdint>\n#line 7 \"string/string_hash.hpp\"\n#include <string_view>\n\
-    \nnamespace m1une {\nnamespace string {\n\nstruct StringHash {\n    std::uint32_t\
-    \ first;\n    std::uint32_t second;\n    std::uint32_t first_power;\n    std::uint32_t\
-    \ second_power;\n    std::size_t length;\n\n    friend constexpr bool operator==(const\
-    \ StringHash& left, const StringHash& right) {\n        return left.length ==\
-    \ right.length && left.first == right.first && left.second == right.second;\n\
-    \    }\n};\n\nnamespace string_hash_detail {\n\ninline constexpr std::uint64_t\
-    \ first_mod = 1'000'000'007;\ninline constexpr std::uint64_t second_mod = 1'000'000'009;\n\
-    inline constexpr std::uint64_t base = 911'382'323;\n\n}  // namespace string_hash_detail\n\
-    \n// Computes a double polynomial hash. Bytes are interpreted as unsigned.\nconstexpr\
-    \ StringHash hash_string(std::string_view value) {\n    using namespace string_hash_detail;\n\
-    \    std::uint64_t first = 0;\n    std::uint64_t second = 0;\n    std::uint64_t\
-    \ first_power = 1;\n    std::uint64_t second_power = 1;\n    for (char character\
-    \ : value) {\n        std::uint64_t symbol = static_cast<unsigned char>(character)\
-    \ + std::uint64_t(1);\n        first = (first * base + symbol) % first_mod;\n\
-    \        second = (second * base + symbol) % second_mod;\n        first_power\
-    \ = first_power * base % first_mod;\n        second_power = second_power * base\
-    \ % second_mod;\n    }\n    return StringHash{\n        static_cast<std::uint32_t>(first),\n\
-    \        static_cast<std::uint32_t>(second),\n        static_cast<std::uint32_t>(first_power),\n\
-    \        static_cast<std::uint32_t>(second_power),\n        value.size(),\n  \
-    \  };\n}\n\nconstexpr StringHash hash_string(const std::string& value) {\n   \
-    \ return hash_string(std::string_view(value));\n}\n\nconstexpr StringHash hash_string(const\
-    \ char* value) {\n    return hash_string(std::string_view(value));\n}\n\n// Returns\
-    \ the hash of the concatenation represented by `left` and `right`.\nconstexpr\
-    \ StringHash concat_string_hash(const StringHash& left, const StringHash& right)\
-    \ {\n    using namespace string_hash_detail;\n    return StringHash{\n       \
-    \ static_cast<std::uint32_t>((std::uint64_t(left.first) * right.first_power +\
-    \ right.first) % first_mod),\n        static_cast<std::uint32_t>((std::uint64_t(left.second)\
+    \n\n#line 1 \"string/runs.hpp\"\n\n\n\n#line 5 \"string/runs.hpp\"\n#include <set>\n\
+    #line 8 \"string/runs.hpp\"\n\nnamespace m1une {\nnamespace string {\n\nstruct\
+    \ Run {\n    int period;\n    int left;\n    int right;\n\n    bool operator==(const\
+    \ Run&) const = default;\n};\n\nnamespace internal {\n\ntemplate <class Sequence>\n\
+    class RunEnumerator {\n   private:\n    const Sequence& _sequence;\n    int _size;\n\
+    \    std::vector<std::vector<std::pair<int, int>>> _candidates;\n\n    template\
+    \ <class Access>\n    static std::vector<int> z_algorithm(int length, Access access)\
+    \ {\n        std::vector<int> z(length + 1, 0);\n        if (length == 0) return\
+    \ z;\n        z[0] = length;\n        int left = 0;\n        int right = 0;\n\
+    \        for (int i = 1; i < length; i++) {\n            if (i < right) z[i] =\
+    \ std::min(right - i, z[i - left]);\n            while (\n                i +\
+    \ z[i] < length &&\n                access(z[i]) == access(i + z[i])\n       \
+    \     ) {\n                z[i]++;\n            }\n            if (right < i +\
+    \ z[i]) {\n                left = i;\n                right = i + z[i];\n    \
+    \        }\n        }\n        return z;\n    }\n\n    decltype(auto) element(int\
+    \ index, bool reversed) const {\n        int original_index = reversed ? _size\
+    \ - 1 - index : index;\n        return _sequence[original_index];\n    }\n\n \
+    \   void add_candidate(int period, int left, int right, bool reversed) {\n   \
+    \     if (reversed) {\n            left = _size - left;\n            right = _size\
+    \ - right;\n            std::swap(left, right);\n        }\n        _candidates[period].emplace_back(left,\
+    \ right);\n    }\n\n    void collect(int range_left, int range_right, int phase,\
+    \ bool reversed) {\n        if (range_right - range_left <= 1) return;\n     \
+    \   int middle = (range_left + range_right + phase) / 2;\n        collect(range_left,\
+    \ middle, phase, reversed);\n        collect(middle, range_right, phase, reversed);\n\
+    \n        int left_length = middle - range_left;\n        int right_length = range_right\
+    \ - middle;\n        std::vector<int> left_z = z_algorithm(left_length, [&](int\
+    \ index) -> decltype(auto) {\n            return element(middle - 1 - index, reversed);\n\
+    \        });\n\n        int combined_length = right_length + range_right - range_left;\n\
+    \        std::vector<int> right_z = z_algorithm(combined_length, [&](int index)\
+    \ -> decltype(auto) {\n            if (index < right_length) return element(middle\
+    \ + index, reversed);\n            return element(range_left + index - right_length,\
+    \ reversed);\n        });\n\n        for (int start = middle - 1; start >= range_left;\
+    \ start--) {\n            int period = middle - start;\n            int extend_left\
+    \ = std::min(start - range_left, left_z[period]);\n            int extend_right\
+    \ = std::min(\n                range_right - middle,\n                right_z[range_right\
+    \ - range_left - period]\n            );\n            int left = start - extend_left;\n\
+    \            int right = middle + extend_right;\n            if (right - left\
+    \ >= 2 * period) {\n                add_candidate(period, left, right, reversed);\n\
+    \            }\n        }\n    }\n\n   public:\n    explicit RunEnumerator(const\
+    \ Sequence& sequence)\n        : _sequence(sequence),\n          _size(int(sequence.size())),\n\
+    \          _candidates(_size / 2 + 1) {}\n\n    std::vector<Run> enumerate() {\n\
+    \        collect(0, _size, 0, true);\n        collect(0, _size, 1, false);\n\n\
+    \        std::set<std::pair<int, int>> used_intervals;\n        std::vector<Run>\
+    \ result;\n        for (int period = 1; period <= _size / 2; period++) {\n   \
+    \         std::vector<std::pair<int, int>>& candidates = _candidates[period];\n\
+    \            std::sort(\n                candidates.begin(),\n               \
+    \ candidates.end(),\n                [](const auto& first, const auto& second)\
+    \ {\n                    if (first.first != second.first) {\n                \
+    \        return first.first < second.first;\n                    }\n         \
+    \           return first.second > second.second;\n                }\n        \
+    \    );\n\n            int farthest_right = -1;\n            for (const auto&\
+    \ interval : candidates) {\n                if (interval.second <= farthest_right)\
+    \ continue;\n                farthest_right = interval.second;\n             \
+    \   if (!used_intervals.insert(interval).second) continue;\n                result.push_back(Run{period,\
+    \ interval.first, interval.second});\n            }\n        }\n        return\
+    \ result;\n    }\n};\n\n}  // namespace internal\n\n// Returns all runs as (minimum\
+    \ period, maximal half-open interval),\n// sorted lexicographically by (period,\
+    \ left, right).\ntemplate <class Sequence>\nstd::vector<Run> enumerate_runs(const\
+    \ Sequence& sequence) {\n    return internal::RunEnumerator<Sequence>(sequence).enumerate();\n\
+    }\n\n}  // namespace string\n}  // namespace m1une\n\n\n#line 1 \"string/string_hash.hpp\"\
+    \n\n\n\n#line 5 \"string/string_hash.hpp\"\n#include <cstdint>\n#line 7 \"string/string_hash.hpp\"\
+    \n#include <string_view>\n\nnamespace m1une {\nnamespace string {\n\nstruct StringHash\
+    \ {\n    std::uint32_t first;\n    std::uint32_t second;\n    std::uint32_t first_power;\n\
+    \    std::uint32_t second_power;\n    std::size_t length;\n\n    friend constexpr\
+    \ bool operator==(const StringHash& left, const StringHash& right) {\n       \
+    \ return left.length == right.length && left.first == right.first && left.second\
+    \ == right.second;\n    }\n};\n\nnamespace string_hash_detail {\n\ninline constexpr\
+    \ std::uint64_t first_mod = 1'000'000'007;\ninline constexpr std::uint64_t second_mod\
+    \ = 1'000'000'009;\ninline constexpr std::uint64_t base = 911'382'323;\n\n}  //\
+    \ namespace string_hash_detail\n\n// Computes a double polynomial hash. Bytes\
+    \ are interpreted as unsigned.\nconstexpr StringHash hash_string(std::string_view\
+    \ value) {\n    using namespace string_hash_detail;\n    std::uint64_t first =\
+    \ 0;\n    std::uint64_t second = 0;\n    std::uint64_t first_power = 1;\n    std::uint64_t\
+    \ second_power = 1;\n    for (char character : value) {\n        std::uint64_t\
+    \ symbol = static_cast<unsigned char>(character) + std::uint64_t(1);\n       \
+    \ first = (first * base + symbol) % first_mod;\n        second = (second * base\
+    \ + symbol) % second_mod;\n        first_power = first_power * base % first_mod;\n\
+    \        second_power = second_power * base % second_mod;\n    }\n    return StringHash{\n\
+    \        static_cast<std::uint32_t>(first),\n        static_cast<std::uint32_t>(second),\n\
+    \        static_cast<std::uint32_t>(first_power),\n        static_cast<std::uint32_t>(second_power),\n\
+    \        value.size(),\n    };\n}\n\nconstexpr StringHash hash_string(const std::string&\
+    \ value) {\n    return hash_string(std::string_view(value));\n}\n\nconstexpr StringHash\
+    \ hash_string(const char* value) {\n    return hash_string(std::string_view(value));\n\
+    }\n\n// Returns the hash of the concatenation represented by `left` and `right`.\n\
+    constexpr StringHash concat_string_hash(const StringHash& left, const StringHash&\
+    \ right) {\n    using namespace string_hash_detail;\n    return StringHash{\n\
+    \        static_cast<std::uint32_t>((std::uint64_t(left.first) * right.first_power\
+    \ + right.first) % first_mod),\n        static_cast<std::uint32_t>((std::uint64_t(left.second)\
     \ * right.second_power + right.second) % second_mod),\n        static_cast<std::uint32_t>(std::uint64_t(left.first_power)\
     \ * right.first_power % first_mod),\n        static_cast<std::uint32_t>(std::uint64_t(left.second_power)\
     \ * right.second_power % second_mod),\n        left.length + right.length,\n \
@@ -862,7 +924,7 @@ data:
     \ + z[i] < n && sequence[z[i]] == sequence[i + z[i]]) {\n            z[i]++;\n\
     \        }\n        if (right < i + z[i]) {\n            left = i;\n         \
     \   right = i + z[i];\n        }\n    }\n    return z;\n}\n\n}  // namespace string\n\
-    }  // namespace m1une\n\n\n#line 19 \"string/all.hpp\"\n\n\n#line 4 \"verify/string/string_algorithms.test.cpp\"\
+    }  // namespace m1une\n\n\n#line 20 \"string/all.hpp\"\n\n\n#line 4 \"verify/string/string_algorithms.test.cpp\"\
     \n\n#line 8 \"verify/string/string_algorithms.test.cpp\"\n#include <iostream>\n\
     #line 12 \"verify/string/string_algorithms.test.cpp\"\n\nnamespace {\n\nvoid test_edge_cases()\
     \ {\n    std::string empty;\n    assert(m1une::string::z_algorithm(empty).empty());\n\
@@ -1031,6 +1093,7 @@ data:
   - string/manacher.hpp
   - string/prefix_function.hpp
   - string/rolling_hash.hpp
+  - string/runs.hpp
   - string/string_hash.hpp
   - string/suffix_automaton.hpp
   - string/trie.hpp
@@ -1038,7 +1101,7 @@ data:
   isVerificationFile: true
   path: verify/string/string_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-09 02:44:58+09:00'
+  timestamp: '2026-07-13 04:16:09+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/string/string_algorithms.test.cpp

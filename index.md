@@ -971,6 +971,9 @@ data:
       path: string/rolling_hash.hpp
       title: Static Rolling Hash
     - icon: ':heavy_check_mark:'
+      path: string/runs.hpp
+      title: Runs
+    - icon: ':heavy_check_mark:'
       path: string/string_hash.hpp
       title: String Hash
     - icon: ':heavy_check_mark:'
@@ -1695,6 +1698,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/string/prefix_function.test.cpp
       title: verify/string/prefix_function.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/string/runs.test.cpp
+      title: verify/string/runs.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/string/string_algorithms.test.cpp
       title: verify/string/string_algorithms.test.cpp
