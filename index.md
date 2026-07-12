@@ -540,6 +540,9 @@ data:
       path: graph/grid.hpp
       title: Grid
     - icon: ':heavy_check_mark:'
+      path: graph/k_shortest_walk.hpp
+      title: K-Shortest Walk
+    - icon: ':heavy_check_mark:'
       path: graph/kruskal.hpp
       title: Kruskal
     - icon: ':heavy_check_mark:'
@@ -1424,6 +1427,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/graph/graph_counting.test.cpp
       title: verify/graph/graph_counting.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/k_shortest_walk.test.cpp
+      title: verify/graph/k_shortest_walk.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/graph/library_checker_general_matching.test.cpp
       title: verify/graph/library_checker_general_matching.test.cpp

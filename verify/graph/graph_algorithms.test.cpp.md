@@ -89,6 +89,9 @@ data:
     path: graph/grid.hpp
     title: Grid
   - icon: ':heavy_check_mark:'
+    path: graph/k_shortest_walk.hpp
+    title: K-Shortest Walk
+  - icon: ':heavy_check_mark:'
     path: graph/kruskal.hpp
     title: Kruskal
   - icon: ':heavy_check_mark:'
@@ -502,6 +505,7 @@ data:
   - graph/dag_shortest_path.hpp
   - graph/topological_sort.hpp
   - graph/dijkstra.hpp
+  - graph/k_shortest_walk.hpp
   - graph/warshall_floyd.hpp
   - graph/zero_one_bfs.hpp
   - graph/two_sat.hpp
@@ -553,7 +557,7 @@ data:
   isVerificationFile: true
   path: verify/graph/graph_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-13 03:53:33+09:00'
+  timestamp: '2026-07-13 04:00:23+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/graph_algorithms.test.cpp
