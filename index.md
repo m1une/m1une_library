@@ -256,6 +256,9 @@ data:
       path: ds/dsu/potentialized_dsu.hpp
       title: Potentialized DSU
     - icon: ':heavy_check_mark:'
+      path: ds/dsu/range_parallel_dsu.hpp
+      title: Range-Parallel DSU
+    - icon: ':heavy_check_mark:'
       path: ds/dsu/rollback_dsu.hpp
       title: Rollback DSU
   - name: ds/dynamic_array
@@ -1194,6 +1197,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/ds/dsu/potentialized_dsu.test.cpp
       title: verify/ds/dsu/potentialized_dsu.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/dsu/range_parallel_dsu.test.cpp
+      title: verify/ds/dsu/range_parallel_dsu.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/ds/dsu/rollback_dsu.test.cpp
       title: verify/ds/dsu/rollback_dsu.test.cpp

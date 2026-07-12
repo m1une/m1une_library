@@ -25,6 +25,9 @@ data:
     path: verify/ds/dsu/dsu.test.cpp
     title: verify/ds/dsu/dsu.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/dsu/range_parallel_dsu.test.cpp
+    title: verify/ds/dsu/range_parallel_dsu.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/geometry_algorithms.test.cpp
     title: verify/geometry/geometry_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
@@ -120,6 +123,7 @@ data:
   - verify/geometry/manhattan_mst.test.cpp
   - verify/geometry/manhattan_mst.test.cpp
   - verify/ds/dsu/dsu.test.cpp
+  - verify/ds/dsu/range_parallel_dsu.test.cpp
   - verify/graph/cow_game.test.cpp
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/graph_algorithms.test.cpp

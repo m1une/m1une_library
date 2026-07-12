@@ -76,6 +76,9 @@ data:
     path: verify/algo/sequence/number_of_subsequences.test.cpp
     title: verify/algo/sequence/number_of_subsequences.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/dsu/range_parallel_dsu.test.cpp
+    title: verify/ds/dsu/range_parallel_dsu.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/dynamic_array/dynamic_lazy_monoid_array.test.cpp
     title: verify/ds/dynamic_array/dynamic_lazy_monoid_array.test.cpp
   - icon: ':heavy_check_mark:'
@@ -448,6 +451,7 @@ data:
   - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
   - verify/ds/segtree/segtree_beats.test.cpp
   - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
+  - verify/ds/dsu/range_parallel_dsu.test.cpp
   - verify/string/string_algorithms.test.cpp
   - verify/string/wildcard_pattern_matching.test.cpp
   - verify/math/subset_convolution.test.cpp
