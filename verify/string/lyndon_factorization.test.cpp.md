@@ -4,6 +4,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: string/lyndon_factorization.hpp
     title: Lyndon Factorization
+  - icon: ':heavy_check_mark:'
+    path: string/minimum_rotation.hpp
+    title: Minimum Rotation
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
   _isVerificationFailed: false
@@ -16,9 +19,23 @@ data:
     - https://judge.yosupo.jp/problem/lyndon_factorization
   bundledCode: "#line 1 \"verify/string/lyndon_factorization.test.cpp\"\n#define PROBLEM\
     \ \"https://judge.yosupo.jp/problem/lyndon_factorization\"\n\n#line 1 \"string/lyndon_factorization.hpp\"\
-    \n\n\n\n#include <utility>\n#include <vector>\n\nnamespace m1une {\nnamespace\
-    \ string {\n\n// Returns boundaries 0 = a[0] < a[1] < ... < a[k] = sequence.size()\n\
-    // of the Lyndon factorization.\ntemplate <class Sequence>\nstd::vector<int> lyndon_factor_boundaries(const\
+    \n\n\n\n#include <utility>\n#include <vector>\n\n#line 1 \"string/minimum_rotation.hpp\"\
+    \n\n\n\nnamespace m1une {\nnamespace string {\n\n// Returns the smallest starting\
+    \ index of a lexicographically minimum cyclic shift.\ntemplate <class Sequence>\n\
+    int minimum_cyclic_shift(const Sequence& sequence) {\n    const int size = int(sequence.size());\n\
+    \    if (size == 0) return 0;\n\n    auto less = [&](int left, int right) {\n\
+    \        return sequence[left < size ? left : left - size] <\n               sequence[right\
+    \ < size ? right : right - size];\n    };\n\n    int answer = 0;\n    int start\
+    \ = 0;\n    while (start < size) {\n        answer = start;\n        int scan\
+    \ = start + 1;\n        int matched = start;\n        while (scan < 2 * size &&\
+    \ !less(scan, matched)) {\n            if (less(matched, scan)) {\n          \
+    \      matched = start;\n            } else {\n                matched++;\n  \
+    \          }\n            scan++;\n        }\n\n        const int period = scan\
+    \ - matched;\n        while (start <= matched) start += period;\n    }\n    return\
+    \ answer;\n}\n\n}  // namespace string\n}  // namespace m1une\n\n\n#line 8 \"\
+    string/lyndon_factorization.hpp\"\n\nnamespace m1une {\nnamespace string {\n\n\
+    // Returns boundaries 0 = a[0] < a[1] < ... < a[k] = sequence.size()\n// of the\
+    \ Lyndon factorization.\ntemplate <class Sequence>\nstd::vector<int> lyndon_factor_boundaries(const\
     \ Sequence& sequence) {\n    int n = int(sequence.size());\n    std::vector<int>\
     \ boundaries;\n    boundaries.push_back(0);\n\n    int i = 0;\n    while (i <\
     \ n) {\n        int j = i + 1;\n        int k = i;\n        while (j < n && !(sequence[j]\
@@ -32,18 +49,8 @@ data:
     \ boundaries = lyndon_factor_boundaries(sequence);\n    std::vector<std::pair<int,\
     \ int>> factors;\n    factors.reserve(boundaries.size() - 1);\n    for (int i\
     \ = 0; i + 1 < int(boundaries.size()); i++) {\n        factors.emplace_back(boundaries[i],\
-    \ boundaries[i + 1]);\n    }\n    return factors;\n}\n\n// Returns the smallest\
-    \ starting index of a lexicographically minimum cyclic shift.\ntemplate <class\
-    \ Sequence>\nint minimum_cyclic_shift(const Sequence& sequence) {\n    int n =\
-    \ int(sequence.size());\n    if (n == 0) return 0;\n\n    auto less = [&](int\
-    \ left, int right) {\n        return sequence[left < n ? left : left - n] <\n\
-    \               sequence[right < n ? right : right - n];\n    };\n\n    int answer\
-    \ = 0;\n    int i = 0;\n    while (i < n) {\n        answer = i;\n        int\
-    \ j = i + 1;\n        int k = i;\n        while (j < 2 * n && !less(j, k)) {\n\
-    \            if (less(k, j)) {\n                k = i;\n            } else {\n\
-    \                k++;\n            }\n            j++;\n        }\n\n        int\
-    \ length = j - k;\n        while (i <= k) i += length;\n    }\n    return answer;\n\
-    }\n\n}  // namespace string\n}  // namespace m1une\n\n\n#line 4 \"verify/string/lyndon_factorization.test.cpp\"\
+    \ boundaries[i + 1]);\n    }\n    return factors;\n}\n\n}  // namespace string\n\
+    }  // namespace m1une\n\n\n#line 4 \"verify/string/lyndon_factorization.test.cpp\"\
     \n\n#include <cassert>\n#include <cstdint>\n#include <iostream>\n#include <string>\n\
     #line 11 \"verify/string/lyndon_factorization.test.cpp\"\n\nnamespace {\n\nbool\
     \ is_strictly_smaller_rotation(const std::string& word, int offset) {\n    int\
@@ -178,10 +185,11 @@ data:
     }\n"
   dependsOn:
   - string/lyndon_factorization.hpp
+  - string/minimum_rotation.hpp
   isVerificationFile: true
   path: verify/string/lyndon_factorization.test.cpp
   requiredBy: []
-  timestamp: '2026-07-09 01:38:54+09:00'
+  timestamp: '2026-07-13 05:39:37+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/string/lyndon_factorization.test.cpp

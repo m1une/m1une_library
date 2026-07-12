@@ -41,6 +41,9 @@ data:
     path: string/manacher.hpp
     title: Manacher Algorithm
   - icon: ':heavy_check_mark:'
+    path: string/minimum_rotation.hpp
+    title: Minimum Rotation
+  - icon: ':heavy_check_mark:'
     path: string/rolling_hash.hpp
     title: Static Rolling Hash
   - icon: ':heavy_check_mark:'
@@ -179,6 +182,7 @@ data:
   - string/longest_common_subsequence.hpp
   - string/longest_common_substring.hpp
   - string/lyndon_factorization.hpp
+  - string/minimum_rotation.hpp
   - string/manacher.hpp
   - string/rolling_hash.hpp
   - string/runs.hpp
@@ -193,7 +197,7 @@ data:
   isVerificationFile: true
   path: verify/string/string_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-13 04:27:33+09:00'
+  timestamp: '2026-07-13 05:39:37+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/string/string_algorithms.test.cpp

@@ -38,6 +38,9 @@ data:
     path: string/manacher.hpp
     title: Manacher Algorithm
   - icon: ':heavy_check_mark:'
+    path: string/minimum_rotation.hpp
+    title: Minimum Rotation
+  - icon: ':heavy_check_mark:'
     path: string/rolling_hash.hpp
     title: Static Rolling Hash
   - icon: ':heavy_check_mark:'
@@ -108,6 +111,8 @@ data:
 
     #include "manacher.hpp"
 
+    #include "minimum_rotation.hpp"
+
     #include "rolling_hash.hpp"
 
     #include "runs.hpp"
@@ -138,6 +143,7 @@ data:
   - string/longest_common_subsequence.hpp
   - string/longest_common_substring.hpp
   - string/lyndon_factorization.hpp
+  - string/minimum_rotation.hpp
   - string/manacher.hpp
   - string/rolling_hash.hpp
   - string/runs.hpp
@@ -152,7 +158,7 @@ data:
   isVerificationFile: false
   path: string/all.hpp
   requiredBy: []
-  timestamp: '2026-07-13 04:27:33+09:00'
+  timestamp: '2026-07-13 05:39:37+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/string/string_algorithms.test.cpp
@@ -181,6 +187,7 @@ contest when convenience matters more.
 | `string/lyndon_factorization.hpp` | Duval's linear-time Lyndon factorization. |
 | `string/z_algorithm.hpp` | Linear-time Z array. |
 | `string/manacher.hpp` | Odd/even palindrome radii and substring checks. |
+| `string/minimum_rotation.hpp` | Earliest lexicographically minimum cyclic shift in linear time. |
 | `string/suffix_automaton.hpp` | Online suffix automaton for substring queries and occurrence classes. |
 | `string/suffix_array.hpp` | Suffix array and LCP array. |
 | `string/trie.hpp` | Contiguous-alphabet multiset trie with prefix queries. |

@@ -989,6 +989,9 @@ data:
       path: string/manacher.hpp
       title: Manacher Algorithm
     - icon: ':heavy_check_mark:'
+      path: string/minimum_rotation.hpp
+      title: Minimum Rotation
+    - icon: ':heavy_check_mark:'
       path: string/rolling_hash.hpp
       title: Static Rolling Hash
     - icon: ':heavy_check_mark:'
@@ -1743,6 +1746,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/string/manacher.test.cpp
       title: verify/string/manacher.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/string/minimum_rotation.test.cpp
+      title: verify/string/minimum_rotation.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/string/runs.test.cpp
       title: verify/string/runs.test.cpp
