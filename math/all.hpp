@@ -29,6 +29,7 @@
 #include "tetration.hpp"
 #include "totient_sum.hpp"
 #include "two_square_sum.hpp"
+#include "xor_basis.hpp"
 #include "zeta_mobius_transform.hpp"
 
 #endif  // M1UNE_MATH_ALL_HPP

@@ -23,6 +23,7 @@ You usually do not need to include this entire bundle:
   digit sequences.
 * Use `bitwise_convolution.hpp` for OR, AND, or XOR convolution over mask
   indices.
+* Use `xor_basis.hpp` to maintain the XOR span of a set of unsigned integers.
 * Use `generalized_floor_sum.hpp` for polynomial moments of
   `floor((a * i + b) / mod)`.
 * Use `zeta_mobius_transform.hpp` for subset, superset, divisor, and multiple
@@ -95,6 +96,7 @@ few unused headers do not matter.
 | `math/primitive_root.hpp` | Smallest primitive root modulo an integer, when one exists. |
 | `math/repunit.hpp` | Repunits, repdigits, digit-block concatenation, and divisibility lengths. |
 | `math/two_square_sum.hpp` | Enumerates representations as a sum of two non-negative squares. |
+| `math/xor_basis.hpp` | XOR linear basis with membership, optimization, merging, and ordered enumeration. |
 | `math/tetration.hpp` | Modular tetration, arbitrary power towers, and bounded tower comparison. |
 | `math/totient_sum.hpp` | Summatory Euler totient function. |
 | `math/rational.hpp` | Exact normalized rational arithmetic over signed integers. |

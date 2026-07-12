@@ -30,7 +30,7 @@ without rewriting boilerplate during a contest.
 | `ds/` | Categorized data structures for range queries, online/offline dynamic connectivity, dynamic sequences and trees, ordered sets, heaps, intervals, and hash tables. |
 | `monoid/` | Reusable monoids for generic data structures such as `Segtree`. |
 | `acted_monoid/` | Acted monoids for lazy propagation structures such as `LazySegtree` and generic `SegtreeBeats`. |
-| `math/` | Number theory, modular arithmetic, combinatorics and partition functions, bitwise transforms, FPS/polynomials, matrices, exact rationals, and integer arithmetic. |
+| `math/` | Number theory, modular arithmetic, combinatorics and partition functions, XOR bases and bitwise transforms, FPS/polynomials, matrices, exact rationals, and integer arithmetic. |
 | `string/` | Z/KMP, wildcard matching, edit distance, Manacher, Lyndon factorization, run enumeration, longest common extension/subsequence/substring, eertrees, suffix automata/arrays, tries, Aho-Corasick, and string hashes. |
 | `utilities/` | Fast I/O, parsing, dice, 2D grid transforms, integer helpers, compression, random generation, stress testing, and general contest utilities. |
 | `verify/` | Online Judge Verify Helper tests. |
