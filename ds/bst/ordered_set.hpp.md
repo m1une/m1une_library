@@ -11,53 +11,52 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"ds/bst/ordered_set.hpp\"\n\n\n\n#include <algorithm>\n#include\
-    \ <cassert>\n#include <functional>\n#include <initializer_list>\n#include <memory>\n\
-    #include <utility>\n#include <vector>\n\nnamespace m1une {\nnamespace ds {\n\n\
-    template <typename T, typename Compare = std::less<T>>\nstruct OrderedSet {\n\
-    \   private:\n    struct Node {\n        T key;\n        int size;\n        int\
-    \ height;\n        Node* l;\n        Node* r;\n\n        explicit Node(T value)\n\
-    \            : key(std::move(value)), size(1), height(1), l(nullptr), r(nullptr)\
-    \ {}\n    };\n\n    static constexpr int pool_block_size = 1 << 15;\n\n    struct\
-    \ Pool {\n        std::vector<std::vector<Node>> blocks;\n        std::vector<Node*>\
-    \ free_nodes;\n\n        template <class... Args>\n        Node* emplace(Args&&...\
-    \ args) {\n            if (!free_nodes.empty()) {\n                Node* result\
-    \ = free_nodes.back();\n                free_nodes.pop_back();\n             \
-    \   std::destroy_at(result);\n                std::construct_at(result, std::forward<Args>(args)...);\n\
-    \                return result;\n            }\n            if (blocks.empty()\
-    \ || int(blocks.back().size()) == pool_block_size) {\n                blocks.emplace_back();\n\
-    \                blocks.back().reserve(pool_block_size);\n            }\n    \
-    \        blocks.back().emplace_back(std::forward<Args>(args)...);\n          \
-    \  return &blocks.back().back();\n        }\n\n        void recycle(Node* node)\
-    \ {\n            free_nodes.push_back(node);\n        }\n    };\n\n    inline\
+  bundledCode: "#line 1 \"ds/bst/ordered_set.hpp\"\n\n\n\n#include <cassert>\n#include\
+    \ <functional>\n#include <initializer_list>\n#include <memory>\n#include <utility>\n\
+    #include <vector>\n\nnamespace m1une {\nnamespace ds {\n\ntemplate <typename T,\
+    \ typename Compare = std::less<T>>\nstruct OrderedSet {\n   private:\n    struct\
+    \ Node {\n        T key;\n        int size;\n        Node* l;\n        Node* r;\n\
+    \n        explicit Node(T value)\n            : key(std::move(value)), size(1),\
+    \ l(nullptr), r(nullptr) {}\n    };\n\n    static constexpr int pool_block_size\
+    \ = 1 << 15;\n\n    struct Pool {\n        std::vector<std::vector<Node>> blocks;\n\
+    \        std::vector<Node*> free_nodes;\n\n        template <class... Args>\n\
+    \        Node* emplace(Args&&... args) {\n            if (!free_nodes.empty())\
+    \ {\n                Node* result = free_nodes.back();\n                free_nodes.pop_back();\n\
+    \                std::destroy_at(result);\n                std::construct_at(result,\
+    \ std::forward<Args>(args)...);\n                return result;\n            }\n\
+    \            if (blocks.empty() || int(blocks.back().size()) == pool_block_size)\
+    \ {\n                blocks.emplace_back();\n                blocks.back().reserve(pool_block_size);\n\
+    \            }\n            blocks.back().emplace_back(std::forward<Args>(args)...);\n\
+    \            return &blocks.back().back();\n        }\n\n        void recycle(Node*\
+    \ node) {\n            free_nodes.push_back(node);\n        }\n    };\n\n    inline\
     \ static Pool pool;\n\n    Node* root;\n    Compare comp;\n\n    static int subtree_size(const\
-    \ Node* t) {\n        return t == nullptr ? 0 : t->size;\n    }\n\n    static\
-    \ int subtree_height(const Node* t) {\n        return t == nullptr ? 0 : t->height;\n\
-    \    }\n\n    Node* new_node(T key) {\n        return pool.emplace(std::move(key));\n\
-    \    }\n\n    static void update(Node* t) {\n        t->size = 1 + subtree_size(t->l)\
-    \ + subtree_size(t->r);\n        t->height = 1 + std::max(subtree_height(t->l),\
-    \ subtree_height(t->r));\n    }\n\n    static Node* rotate_right(Node* t) {\n\
-    \        Node* s = t->l;\n        t->l = s->r;\n        s->r = t;\n        update(t);\n\
-    \        update(s);\n        return s;\n    }\n\n    static Node* rotate_left(Node*\
-    \ t) {\n        Node* s = t->r;\n        t->r = s->l;\n        s->l = t;\n   \
-    \     update(t);\n        update(s);\n        return s;\n    }\n\n    static Node*\
-    \ balance(Node* t) {\n        if (t == nullptr) return nullptr;\n        update(t);\n\
-    \        const int balance_factor = subtree_height(t->l) - subtree_height(t->r);\n\
-    \        if (balance_factor > 1) {\n            if (subtree_height(t->l->l) <\
-    \ subtree_height(t->l->r)) {\n                t->l = rotate_left(t->l);\n    \
-    \        }\n            return rotate_right(t);\n        }\n        if (balance_factor\
-    \ < -1) {\n            if (subtree_height(t->r->r) < subtree_height(t->r->l))\
-    \ {\n                t->r = rotate_right(t->r);\n            }\n            return\
-    \ rotate_left(t);\n        }\n        return t;\n    }\n\n    static Node* join_with_root(Node*\
-    \ l, Node* middle, Node* r) {\n        if (subtree_height(l) > subtree_height(r)\
-    \ + 1) {\n            l->r = join_with_root(l->r, middle, r);\n            return\
-    \ balance(l);\n        }\n        if (subtree_height(r) > subtree_height(l) +\
-    \ 1) {\n            r->l = join_with_root(l, middle, r->l);\n            return\
-    \ balance(r);\n        }\n        middle->l = l;\n        middle->r = r;\n   \
-    \     return balance(middle);\n    }\n\n    static Node* detach_max(Node* t, Node*&\
-    \ maximum) {\n        if (t->r == nullptr) {\n            maximum = t;\n     \
-    \       return t->l;\n        }\n        t->r = detach_max(t->r, maximum);\n \
-    \       return balance(t);\n    }\n\n    static Node* merge_nodes(Node* l, Node*\
+    \ Node* t) {\n        return t == nullptr ? 0 : t->size;\n    }\n\n    Node* new_node(T\
+    \ key) {\n        return pool.emplace(std::move(key));\n    }\n\n    static void\
+    \ update(Node* t) {\n        t->size = 1 + subtree_size(t->l) + subtree_size(t->r);\n\
+    \    }\n\n    static Node* rotate_right(Node* t) {\n        Node* s = t->l;\n\
+    \        t->l = s->r;\n        s->r = t;\n        update(t);\n        update(s);\n\
+    \        return s;\n    }\n\n    static Node* rotate_left(Node* t) {\n       \
+    \ Node* s = t->r;\n        t->r = s->l;\n        s->l = t;\n        update(t);\n\
+    \        update(s);\n        return s;\n    }\n\n    static Node* balance(Node*\
+    \ t) {\n        if (t == nullptr) return nullptr;\n        const int left_size\
+    \ = subtree_size(t->l);\n        const int right_size = subtree_size(t->r);\n\
+    \        if (left_size + right_size > 1 && left_size > 3LL * right_size) {\n \
+    \           if (subtree_size(t->l->r) >= 2LL * subtree_size(t->l->l)) {\n    \
+    \            t->l = rotate_left(t->l);\n            }\n            return rotate_right(t);\n\
+    \        }\n        if (left_size + right_size > 1 && right_size > 3LL * left_size)\
+    \ {\n            if (subtree_size(t->r->l) >= 2LL * subtree_size(t->r->r)) {\n\
+    \                t->r = rotate_right(t->r);\n            }\n            return\
+    \ rotate_left(t);\n        }\n        update(t);\n        return t;\n    }\n\n\
+    \    static Node* join_with_root(Node* l, Node* middle, Node* r) {\n        const\
+    \ int left_size = subtree_size(l);\n        const int right_size = subtree_size(r);\n\
+    \        if (left_size > 3LL * (right_size + 1)) {\n            l->r = join_with_root(l->r,\
+    \ middle, r);\n            return balance(l);\n        }\n        if (right_size\
+    \ > 3LL * (left_size + 1)) {\n            r->l = join_with_root(l, middle, r->l);\n\
+    \            return balance(r);\n        }\n        middle->l = l;\n        middle->r\
+    \ = r;\n        return balance(middle);\n    }\n\n    static Node* detach_max(Node*\
+    \ t, Node*& maximum) {\n        if (t->r == nullptr) {\n            maximum =\
+    \ t;\n            return t->l;\n        }\n        t->r = detach_max(t->r, maximum);\n\
+    \        return balance(t);\n    }\n\n    static Node* merge_nodes(Node* l, Node*\
     \ r) {\n        if (l == nullptr || r == nullptr) return l == nullptr ? r : l;\n\
     \        Node* middle;\n        l = detach_max(l, middle);\n        return join_with_root(l,\
     \ middle, r);\n    }\n\n    std::pair<Node*, Node*> split_nodes(Node* t, const\
@@ -67,39 +66,32 @@ data:
     \ split_nodes(right, key);\n            return {join_with_root(left, t, l), r};\n\
     \        }\n        auto [l, r] = split_nodes(left, key);\n        return {l,\
     \ join_with_root(r, t, right)};\n    }\n\n    Node* insert_impl(Node* t, T& key,\
-    \ bool& inserted, bool& grew) {\n        if (t == nullptr) {\n            inserted\
-    \ = true;\n            grew = true;\n            return new_node(std::move(key));\n\
-    \        }\n        const int old_height = t->height;\n        if (comp(key, t->key))\
-    \ {\n            t->l = insert_impl(t->l, key, inserted, grew);\n        } else\
-    \ if (comp(t->key, key)) {\n            t->r = insert_impl(t->r, key, inserted,\
-    \ grew);\n        } else {\n            grew = false;\n            return t;\n\
-    \        }\n        if (!inserted) return t;\n        if (!grew) {\n         \
-    \   ++t->size;\n            return t;\n        }\n        t = balance(t);\n  \
-    \      grew = t->height > old_height;\n        return t;\n    }\n\n    Node* erase_impl(Node*\
-    \ t, const T& key, bool& erased, bool& shrunk) {\n        if (t == nullptr) {\n\
-    \            shrunk = false;\n            return nullptr;\n        }\n       \
-    \ const int old_height = t->height;\n        if (comp(key, t->key)) {\n      \
-    \      t->l = erase_impl(t->l, key, erased, shrunk);\n        } else if (comp(t->key,\
-    \ key)) {\n            t->r = erase_impl(t->r, key, erased, shrunk);\n       \
-    \ } else {\n            erased = true;\n            Node* l = t->l;\n        \
-    \    Node* r = t->r;\n            pool.recycle(t);\n            Node* result =\
-    \ merge_nodes(l, r);\n            shrunk = subtree_height(result) < old_height;\n\
-    \            return result;\n        }\n        if (!erased) return t;\n     \
-    \   if (!shrunk) {\n            --t->size;\n            return t;\n        }\n\
-    \        t = balance(t);\n        shrunk = t->height < old_height;\n        return\
-    \ t;\n    }\n\n    static const T* kth_impl(const Node* t, int k) {\n        while\
-    \ (t != nullptr) {\n            const int left_size = subtree_size(t->l);\n  \
-    \          if (k < left_size) {\n                t = t->l;\n            } else\
-    \ if (k == left_size) {\n                return &t->key;\n            } else {\n\
-    \                k -= left_size + 1;\n                t = t->r;\n            }\n\
-    \        }\n        return nullptr;\n    }\n\n    int order_of_key_impl(const\
-    \ Node* t, const T& key, bool upper) const {\n        int result = 0;\n      \
-    \  while (t != nullptr) {\n            const bool take = upper ? !comp(key, t->key)\
-    \ : comp(t->key, key);\n            if (take) {\n                result += subtree_size(t->l)\
-    \ + 1;\n                t = t->r;\n            } else {\n                t = t->l;\n\
-    \            }\n        }\n        return result;\n    }\n\n    const T* lower_bound_impl(const\
-    \ Node* t, const T& key, bool strict) const {\n        const T* result = nullptr;\n\
-    \        while (t != nullptr) {\n            const bool candidate = strict ? comp(key,\
+    \ bool& inserted) {\n        if (t == nullptr) {\n            inserted = true;\n\
+    \            return new_node(std::move(key));\n        }\n        if (comp(key,\
+    \ t->key)) {\n            t->l = insert_impl(t->l, key, inserted);\n        }\
+    \ else if (comp(t->key, key)) {\n            t->r = insert_impl(t->r, key, inserted);\n\
+    \        } else {\n            return t;\n        }\n        if (!inserted) return\
+    \ t;\n        return balance(t);\n    }\n\n    Node* erase_impl(Node* t, const\
+    \ T& key, bool& erased) {\n        if (t == nullptr) return nullptr;\n       \
+    \ if (comp(key, t->key)) {\n            t->l = erase_impl(t->l, key, erased);\n\
+    \        } else if (comp(t->key, key)) {\n            t->r = erase_impl(t->r,\
+    \ key, erased);\n        } else {\n            erased = true;\n            Node*\
+    \ l = t->l;\n            Node* r = t->r;\n            pool.recycle(t);\n     \
+    \       return merge_nodes(l, r);\n        }\n        if (!erased) return t;\n\
+    \        return balance(t);\n    }\n\n    static const T* kth_impl(const Node*\
+    \ t, int k) {\n        while (t != nullptr) {\n            const int left_size\
+    \ = subtree_size(t->l);\n            if (k < left_size) {\n                t =\
+    \ t->l;\n            } else if (k == left_size) {\n                return &t->key;\n\
+    \            } else {\n                k -= left_size + 1;\n                t\
+    \ = t->r;\n            }\n        }\n        return nullptr;\n    }\n\n    int\
+    \ order_of_key_impl(const Node* t, const T& key, bool upper) const {\n       \
+    \ int result = 0;\n        while (t != nullptr) {\n            const bool take\
+    \ = upper ? !comp(key, t->key) : comp(t->key, key);\n            if (take) {\n\
+    \                result += subtree_size(t->l) + 1;\n                t = t->r;\n\
+    \            } else {\n                t = t->l;\n            }\n        }\n \
+    \       return result;\n    }\n\n    const T* lower_bound_impl(const Node* t,\
+    \ const T& key, bool strict) const {\n        const T* result = nullptr;\n   \
+    \     while (t != nullptr) {\n            const bool candidate = strict ? comp(key,\
     \ t->key) : !comp(t->key, key);\n            if (candidate) {\n              \
     \  result = &t->key;\n                t = t->l;\n            } else {\n      \
     \          t = t->r;\n            }\n        }\n        return result;\n    }\n\
@@ -139,12 +131,11 @@ data:
     \    int unique_size() const { return size(); }\n    bool empty() const { return\
     \ root == nullptr; }\n\n    void clear() {\n        recycle_impl(root);\n    \
     \    root = nullptr;\n    }\n\n    bool insert(T key) {\n        bool inserted\
-    \ = false;\n        bool grew = false;\n        root = insert_impl(root, key,\
-    \ inserted, grew);\n        return inserted;\n    }\n\n    bool erase(const T&\
-    \ key) {\n        bool erased = false;\n        bool shrunk = false;\n       \
-    \ root = erase_impl(root, key, erased, shrunk);\n        return erased;\n    }\n\
-    \n    bool contains(const T& key) const { return contains_impl(root, key); }\n\
-    \    int count(const T& key) const { return contains(key) ? 1 : 0; }\n\n    const\
+    \ = false;\n        root = insert_impl(root, key, inserted);\n        return inserted;\n\
+    \    }\n\n    bool erase(const T& key) {\n        bool erased = false;\n     \
+    \   root = erase_impl(root, key, erased);\n        return erased;\n    }\n\n \
+    \   bool contains(const T& key) const { return contains_impl(root, key); }\n \
+    \   int count(const T& key) const { return contains(key) ? 1 : 0; }\n\n    const\
     \ T* find_by_order(int k) const {\n        assert(0 <= k && k < size());\n   \
     \     return kth_impl(root, k);\n    }\n\n    T kth(int k) const { return *find_by_order(k);\
     \ }\n    int order_of_key(const T& key) const { return order_of_key_impl(root,\
@@ -170,52 +161,51 @@ data:
     \  result.reserve(size());\n        dump_impl(root, result);\n        return result;\n\
     \    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_ORDERED_SET_HPP\n#define M1UNE_ORDERED_SET_HPP 1\n\n#include\
-    \ <algorithm>\n#include <cassert>\n#include <functional>\n#include <initializer_list>\n\
-    #include <memory>\n#include <utility>\n#include <vector>\n\nnamespace m1une {\n\
-    namespace ds {\n\ntemplate <typename T, typename Compare = std::less<T>>\nstruct\
-    \ OrderedSet {\n   private:\n    struct Node {\n        T key;\n        int size;\n\
-    \        int height;\n        Node* l;\n        Node* r;\n\n        explicit Node(T\
-    \ value)\n            : key(std::move(value)), size(1), height(1), l(nullptr),\
-    \ r(nullptr) {}\n    };\n\n    static constexpr int pool_block_size = 1 << 15;\n\
-    \n    struct Pool {\n        std::vector<std::vector<Node>> blocks;\n        std::vector<Node*>\
-    \ free_nodes;\n\n        template <class... Args>\n        Node* emplace(Args&&...\
-    \ args) {\n            if (!free_nodes.empty()) {\n                Node* result\
-    \ = free_nodes.back();\n                free_nodes.pop_back();\n             \
-    \   std::destroy_at(result);\n                std::construct_at(result, std::forward<Args>(args)...);\n\
-    \                return result;\n            }\n            if (blocks.empty()\
-    \ || int(blocks.back().size()) == pool_block_size) {\n                blocks.emplace_back();\n\
-    \                blocks.back().reserve(pool_block_size);\n            }\n    \
-    \        blocks.back().emplace_back(std::forward<Args>(args)...);\n          \
-    \  return &blocks.back().back();\n        }\n\n        void recycle(Node* node)\
-    \ {\n            free_nodes.push_back(node);\n        }\n    };\n\n    inline\
+    \ <cassert>\n#include <functional>\n#include <initializer_list>\n#include <memory>\n\
+    #include <utility>\n#include <vector>\n\nnamespace m1une {\nnamespace ds {\n\n\
+    template <typename T, typename Compare = std::less<T>>\nstruct OrderedSet {\n\
+    \   private:\n    struct Node {\n        T key;\n        int size;\n        Node*\
+    \ l;\n        Node* r;\n\n        explicit Node(T value)\n            : key(std::move(value)),\
+    \ size(1), l(nullptr), r(nullptr) {}\n    };\n\n    static constexpr int pool_block_size\
+    \ = 1 << 15;\n\n    struct Pool {\n        std::vector<std::vector<Node>> blocks;\n\
+    \        std::vector<Node*> free_nodes;\n\n        template <class... Args>\n\
+    \        Node* emplace(Args&&... args) {\n            if (!free_nodes.empty())\
+    \ {\n                Node* result = free_nodes.back();\n                free_nodes.pop_back();\n\
+    \                std::destroy_at(result);\n                std::construct_at(result,\
+    \ std::forward<Args>(args)...);\n                return result;\n            }\n\
+    \            if (blocks.empty() || int(blocks.back().size()) == pool_block_size)\
+    \ {\n                blocks.emplace_back();\n                blocks.back().reserve(pool_block_size);\n\
+    \            }\n            blocks.back().emplace_back(std::forward<Args>(args)...);\n\
+    \            return &blocks.back().back();\n        }\n\n        void recycle(Node*\
+    \ node) {\n            free_nodes.push_back(node);\n        }\n    };\n\n    inline\
     \ static Pool pool;\n\n    Node* root;\n    Compare comp;\n\n    static int subtree_size(const\
-    \ Node* t) {\n        return t == nullptr ? 0 : t->size;\n    }\n\n    static\
-    \ int subtree_height(const Node* t) {\n        return t == nullptr ? 0 : t->height;\n\
-    \    }\n\n    Node* new_node(T key) {\n        return pool.emplace(std::move(key));\n\
-    \    }\n\n    static void update(Node* t) {\n        t->size = 1 + subtree_size(t->l)\
-    \ + subtree_size(t->r);\n        t->height = 1 + std::max(subtree_height(t->l),\
-    \ subtree_height(t->r));\n    }\n\n    static Node* rotate_right(Node* t) {\n\
-    \        Node* s = t->l;\n        t->l = s->r;\n        s->r = t;\n        update(t);\n\
-    \        update(s);\n        return s;\n    }\n\n    static Node* rotate_left(Node*\
-    \ t) {\n        Node* s = t->r;\n        t->r = s->l;\n        s->l = t;\n   \
-    \     update(t);\n        update(s);\n        return s;\n    }\n\n    static Node*\
-    \ balance(Node* t) {\n        if (t == nullptr) return nullptr;\n        update(t);\n\
-    \        const int balance_factor = subtree_height(t->l) - subtree_height(t->r);\n\
-    \        if (balance_factor > 1) {\n            if (subtree_height(t->l->l) <\
-    \ subtree_height(t->l->r)) {\n                t->l = rotate_left(t->l);\n    \
-    \        }\n            return rotate_right(t);\n        }\n        if (balance_factor\
-    \ < -1) {\n            if (subtree_height(t->r->r) < subtree_height(t->r->l))\
-    \ {\n                t->r = rotate_right(t->r);\n            }\n            return\
-    \ rotate_left(t);\n        }\n        return t;\n    }\n\n    static Node* join_with_root(Node*\
-    \ l, Node* middle, Node* r) {\n        if (subtree_height(l) > subtree_height(r)\
-    \ + 1) {\n            l->r = join_with_root(l->r, middle, r);\n            return\
-    \ balance(l);\n        }\n        if (subtree_height(r) > subtree_height(l) +\
-    \ 1) {\n            r->l = join_with_root(l, middle, r->l);\n            return\
-    \ balance(r);\n        }\n        middle->l = l;\n        middle->r = r;\n   \
-    \     return balance(middle);\n    }\n\n    static Node* detach_max(Node* t, Node*&\
-    \ maximum) {\n        if (t->r == nullptr) {\n            maximum = t;\n     \
-    \       return t->l;\n        }\n        t->r = detach_max(t->r, maximum);\n \
-    \       return balance(t);\n    }\n\n    static Node* merge_nodes(Node* l, Node*\
+    \ Node* t) {\n        return t == nullptr ? 0 : t->size;\n    }\n\n    Node* new_node(T\
+    \ key) {\n        return pool.emplace(std::move(key));\n    }\n\n    static void\
+    \ update(Node* t) {\n        t->size = 1 + subtree_size(t->l) + subtree_size(t->r);\n\
+    \    }\n\n    static Node* rotate_right(Node* t) {\n        Node* s = t->l;\n\
+    \        t->l = s->r;\n        s->r = t;\n        update(t);\n        update(s);\n\
+    \        return s;\n    }\n\n    static Node* rotate_left(Node* t) {\n       \
+    \ Node* s = t->r;\n        t->r = s->l;\n        s->l = t;\n        update(t);\n\
+    \        update(s);\n        return s;\n    }\n\n    static Node* balance(Node*\
+    \ t) {\n        if (t == nullptr) return nullptr;\n        const int left_size\
+    \ = subtree_size(t->l);\n        const int right_size = subtree_size(t->r);\n\
+    \        if (left_size + right_size > 1 && left_size > 3LL * right_size) {\n \
+    \           if (subtree_size(t->l->r) >= 2LL * subtree_size(t->l->l)) {\n    \
+    \            t->l = rotate_left(t->l);\n            }\n            return rotate_right(t);\n\
+    \        }\n        if (left_size + right_size > 1 && right_size > 3LL * left_size)\
+    \ {\n            if (subtree_size(t->r->l) >= 2LL * subtree_size(t->r->r)) {\n\
+    \                t->r = rotate_right(t->r);\n            }\n            return\
+    \ rotate_left(t);\n        }\n        update(t);\n        return t;\n    }\n\n\
+    \    static Node* join_with_root(Node* l, Node* middle, Node* r) {\n        const\
+    \ int left_size = subtree_size(l);\n        const int right_size = subtree_size(r);\n\
+    \        if (left_size > 3LL * (right_size + 1)) {\n            l->r = join_with_root(l->r,\
+    \ middle, r);\n            return balance(l);\n        }\n        if (right_size\
+    \ > 3LL * (left_size + 1)) {\n            r->l = join_with_root(l, middle, r->l);\n\
+    \            return balance(r);\n        }\n        middle->l = l;\n        middle->r\
+    \ = r;\n        return balance(middle);\n    }\n\n    static Node* detach_max(Node*\
+    \ t, Node*& maximum) {\n        if (t->r == nullptr) {\n            maximum =\
+    \ t;\n            return t->l;\n        }\n        t->r = detach_max(t->r, maximum);\n\
+    \        return balance(t);\n    }\n\n    static Node* merge_nodes(Node* l, Node*\
     \ r) {\n        if (l == nullptr || r == nullptr) return l == nullptr ? r : l;\n\
     \        Node* middle;\n        l = detach_max(l, middle);\n        return join_with_root(l,\
     \ middle, r);\n    }\n\n    std::pair<Node*, Node*> split_nodes(Node* t, const\
@@ -225,39 +215,32 @@ data:
     \ split_nodes(right, key);\n            return {join_with_root(left, t, l), r};\n\
     \        }\n        auto [l, r] = split_nodes(left, key);\n        return {l,\
     \ join_with_root(r, t, right)};\n    }\n\n    Node* insert_impl(Node* t, T& key,\
-    \ bool& inserted, bool& grew) {\n        if (t == nullptr) {\n            inserted\
-    \ = true;\n            grew = true;\n            return new_node(std::move(key));\n\
-    \        }\n        const int old_height = t->height;\n        if (comp(key, t->key))\
-    \ {\n            t->l = insert_impl(t->l, key, inserted, grew);\n        } else\
-    \ if (comp(t->key, key)) {\n            t->r = insert_impl(t->r, key, inserted,\
-    \ grew);\n        } else {\n            grew = false;\n            return t;\n\
-    \        }\n        if (!inserted) return t;\n        if (!grew) {\n         \
-    \   ++t->size;\n            return t;\n        }\n        t = balance(t);\n  \
-    \      grew = t->height > old_height;\n        return t;\n    }\n\n    Node* erase_impl(Node*\
-    \ t, const T& key, bool& erased, bool& shrunk) {\n        if (t == nullptr) {\n\
-    \            shrunk = false;\n            return nullptr;\n        }\n       \
-    \ const int old_height = t->height;\n        if (comp(key, t->key)) {\n      \
-    \      t->l = erase_impl(t->l, key, erased, shrunk);\n        } else if (comp(t->key,\
-    \ key)) {\n            t->r = erase_impl(t->r, key, erased, shrunk);\n       \
-    \ } else {\n            erased = true;\n            Node* l = t->l;\n        \
-    \    Node* r = t->r;\n            pool.recycle(t);\n            Node* result =\
-    \ merge_nodes(l, r);\n            shrunk = subtree_height(result) < old_height;\n\
-    \            return result;\n        }\n        if (!erased) return t;\n     \
-    \   if (!shrunk) {\n            --t->size;\n            return t;\n        }\n\
-    \        t = balance(t);\n        shrunk = t->height < old_height;\n        return\
-    \ t;\n    }\n\n    static const T* kth_impl(const Node* t, int k) {\n        while\
-    \ (t != nullptr) {\n            const int left_size = subtree_size(t->l);\n  \
-    \          if (k < left_size) {\n                t = t->l;\n            } else\
-    \ if (k == left_size) {\n                return &t->key;\n            } else {\n\
-    \                k -= left_size + 1;\n                t = t->r;\n            }\n\
-    \        }\n        return nullptr;\n    }\n\n    int order_of_key_impl(const\
-    \ Node* t, const T& key, bool upper) const {\n        int result = 0;\n      \
-    \  while (t != nullptr) {\n            const bool take = upper ? !comp(key, t->key)\
-    \ : comp(t->key, key);\n            if (take) {\n                result += subtree_size(t->l)\
-    \ + 1;\n                t = t->r;\n            } else {\n                t = t->l;\n\
-    \            }\n        }\n        return result;\n    }\n\n    const T* lower_bound_impl(const\
-    \ Node* t, const T& key, bool strict) const {\n        const T* result = nullptr;\n\
-    \        while (t != nullptr) {\n            const bool candidate = strict ? comp(key,\
+    \ bool& inserted) {\n        if (t == nullptr) {\n            inserted = true;\n\
+    \            return new_node(std::move(key));\n        }\n        if (comp(key,\
+    \ t->key)) {\n            t->l = insert_impl(t->l, key, inserted);\n        }\
+    \ else if (comp(t->key, key)) {\n            t->r = insert_impl(t->r, key, inserted);\n\
+    \        } else {\n            return t;\n        }\n        if (!inserted) return\
+    \ t;\n        return balance(t);\n    }\n\n    Node* erase_impl(Node* t, const\
+    \ T& key, bool& erased) {\n        if (t == nullptr) return nullptr;\n       \
+    \ if (comp(key, t->key)) {\n            t->l = erase_impl(t->l, key, erased);\n\
+    \        } else if (comp(t->key, key)) {\n            t->r = erase_impl(t->r,\
+    \ key, erased);\n        } else {\n            erased = true;\n            Node*\
+    \ l = t->l;\n            Node* r = t->r;\n            pool.recycle(t);\n     \
+    \       return merge_nodes(l, r);\n        }\n        if (!erased) return t;\n\
+    \        return balance(t);\n    }\n\n    static const T* kth_impl(const Node*\
+    \ t, int k) {\n        while (t != nullptr) {\n            const int left_size\
+    \ = subtree_size(t->l);\n            if (k < left_size) {\n                t =\
+    \ t->l;\n            } else if (k == left_size) {\n                return &t->key;\n\
+    \            } else {\n                k -= left_size + 1;\n                t\
+    \ = t->r;\n            }\n        }\n        return nullptr;\n    }\n\n    int\
+    \ order_of_key_impl(const Node* t, const T& key, bool upper) const {\n       \
+    \ int result = 0;\n        while (t != nullptr) {\n            const bool take\
+    \ = upper ? !comp(key, t->key) : comp(t->key, key);\n            if (take) {\n\
+    \                result += subtree_size(t->l) + 1;\n                t = t->r;\n\
+    \            } else {\n                t = t->l;\n            }\n        }\n \
+    \       return result;\n    }\n\n    const T* lower_bound_impl(const Node* t,\
+    \ const T& key, bool strict) const {\n        const T* result = nullptr;\n   \
+    \     while (t != nullptr) {\n            const bool candidate = strict ? comp(key,\
     \ t->key) : !comp(t->key, key);\n            if (candidate) {\n              \
     \  result = &t->key;\n                t = t->l;\n            } else {\n      \
     \          t = t->r;\n            }\n        }\n        return result;\n    }\n\
@@ -297,12 +280,11 @@ data:
     \    int unique_size() const { return size(); }\n    bool empty() const { return\
     \ root == nullptr; }\n\n    void clear() {\n        recycle_impl(root);\n    \
     \    root = nullptr;\n    }\n\n    bool insert(T key) {\n        bool inserted\
-    \ = false;\n        bool grew = false;\n        root = insert_impl(root, key,\
-    \ inserted, grew);\n        return inserted;\n    }\n\n    bool erase(const T&\
-    \ key) {\n        bool erased = false;\n        bool shrunk = false;\n       \
-    \ root = erase_impl(root, key, erased, shrunk);\n        return erased;\n    }\n\
-    \n    bool contains(const T& key) const { return contains_impl(root, key); }\n\
-    \    int count(const T& key) const { return contains(key) ? 1 : 0; }\n\n    const\
+    \ = false;\n        root = insert_impl(root, key, inserted);\n        return inserted;\n\
+    \    }\n\n    bool erase(const T& key) {\n        bool erased = false;\n     \
+    \   root = erase_impl(root, key, erased);\n        return erased;\n    }\n\n \
+    \   bool contains(const T& key) const { return contains_impl(root, key); }\n \
+    \   int count(const T& key) const { return contains(key) ? 1 : 0; }\n\n    const\
     \ T* find_by_order(int k) const {\n        assert(0 <= k && k < size());\n   \
     \     return kth_impl(root, k);\n    }\n\n    T kth(int k) const { return *find_by_order(k);\
     \ }\n    int order_of_key(const T& key) const { return order_of_key_impl(root,\
@@ -331,7 +313,7 @@ data:
   isVerificationFile: false
   path: ds/bst/ordered_set.hpp
   requiredBy: []
-  timestamp: '2026-07-13 02:53:34+09:00'
+  timestamp: '2026-07-13 03:01:19+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/bst/ordered_set.test.cpp
@@ -342,7 +324,7 @@ title: Ordered Set
 
 ## Overview
 
-`OrderedSet` is an AVL tree for sets. It keeps unique keys only, like
+`OrderedSet` is a weight-balanced binary search tree for sets. It keeps unique keys only, like
 `std::set`, and also supports order-statistics queries such as k-th element and
 rank. Nodes come from a recyclable block arena, so insertion and erasure avoid
 general-purpose per-node allocation.
