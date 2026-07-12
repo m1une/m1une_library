@@ -738,6 +738,9 @@ data:
       path: math/stern_brocot_tree.hpp
       title: Stern-Brocot Tree
     - icon: ':heavy_check_mark:'
+      path: math/subset_convolution.hpp
+      title: Subset Convolution
+    - icon: ':heavy_check_mark:'
       path: math/tetration.hpp
       title: Tetration
     - icon: ':heavy_check_mark:'
@@ -1583,6 +1586,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/stirling_number_of_the_second_kind.test.cpp
       title: verify/math/stirling_number_of_the_second_kind.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/subset_convolution.test.cpp
+      title: verify/math/subset_convolution.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/sum_of_multiplicative_function.test.cpp
       title: verify/math/sum_of_multiplicative_function.test.cpp

@@ -250,6 +250,9 @@ data:
     path: verify/math/stirling_number_of_the_second_kind.test.cpp
     title: verify/math/stirling_number_of_the_second_kind.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/subset_convolution.test.cpp
+    title: verify/math/subset_convolution.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/sum_of_multiplicative_function.test.cpp
     title: verify/math/sum_of_multiplicative_function.test.cpp
   - icon: ':heavy_check_mark:'
@@ -403,6 +406,7 @@ data:
   - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
   - verify/string/string_algorithms.test.cpp
   - verify/string/wildcard_pattern_matching.test.cpp
+  - verify/math/subset_convolution.test.cpp
   - verify/math/prefix_sum_of_binom.test.cpp
   - verify/math/generalized_floor_sum.test.cpp
   - verify/math/bitwise_convolution.test.cpp

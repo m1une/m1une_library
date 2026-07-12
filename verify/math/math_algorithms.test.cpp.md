@@ -125,6 +125,9 @@ data:
     path: math/stern_brocot_tree.hpp
     title: Stern-Brocot Tree
   - icon: ':heavy_check_mark:'
+    path: math/subset_convolution.hpp
+    title: Subset Convolution
+  - icon: ':heavy_check_mark:'
     path: math/tetration.hpp
     title: Tetration
   - icon: ':heavy_check_mark:'
@@ -376,6 +379,7 @@ data:
   - math/rational.hpp
   - math/repunit.hpp
   - math/stern_brocot_tree.hpp
+  - math/subset_convolution.hpp
   - math/tetration.hpp
   - math/totient_sum.hpp
   - math/two_square_sum.hpp
@@ -383,7 +387,7 @@ data:
   isVerificationFile: true
   path: verify/math/math_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-13 05:12:04+09:00'
+  timestamp: '2026-07-13 05:19:17+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/math_algorithms.test.cpp

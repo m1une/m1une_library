@@ -122,6 +122,9 @@ data:
     path: math/stern_brocot_tree.hpp
     title: Stern-Brocot Tree
   - icon: ':heavy_check_mark:'
+    path: math/subset_convolution.hpp
+    title: Subset Convolution
+  - icon: ':heavy_check_mark:'
     path: math/tetration.hpp
     title: Tetration
   - icon: ':heavy_check_mark:'
@@ -217,6 +220,8 @@ data:
 
     #include "stern_brocot_tree.hpp"
 
+    #include "subset_convolution.hpp"
+
     #include "tetration.hpp"
 
     #include "totient_sum.hpp"
@@ -273,6 +278,7 @@ data:
   - math/rational.hpp
   - math/repunit.hpp
   - math/stern_brocot_tree.hpp
+  - math/subset_convolution.hpp
   - math/tetration.hpp
   - math/totient_sum.hpp
   - math/two_square_sum.hpp
@@ -280,7 +286,7 @@ data:
   isVerificationFile: false
   path: math/all.hpp
   requiredBy: []
-  timestamp: '2026-07-13 05:12:04+09:00'
+  timestamp: '2026-07-13 05:19:17+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
@@ -309,6 +315,7 @@ You usually do not need to include this entire bundle:
   digit sequences.
 * Use `bitwise_convolution.hpp` for OR, AND, or XOR convolution over mask
   indices.
+* Use `subset_convolution.hpp` to combine values indexed by disjoint submasks.
 * Use `xor_basis.hpp` to maintain the XOR span of a set of unsigned integers.
 * Use `generalized_floor_sum.hpp` for polynomial moments of
   `floor((a * i + b) / mod)`.
@@ -387,4 +394,5 @@ few unused headers do not matter.
 | `math/totient_sum.hpp` | Summatory Euler totient function. |
 | `math/rational.hpp` | Exact normalized rational arithmetic over signed integers. |
 | `math/stern_brocot_tree.hpp` | Compressed Stern-Brocot paths and tree navigation. |
+| `math/subset_convolution.hpp` | Ranked-zeta subset convolution over disjoint masks. |
 | `math/zeta_mobius_transform.hpp` | Subset, superset, divisor, and multiple zeta/Mobius transforms. |
