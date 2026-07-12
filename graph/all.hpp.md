@@ -13,13 +13,13 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/bfs.hpp
     title: BFS
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: graph/biconnected_components.hpp
     title: Biconnected Components
   - icon: ':heavy_check_mark:'
     path: graph/bipartite.hpp
     title: Bipartite Graph
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: graph/block_cut_tree.hpp
     title: Block-Cut Tree
   - icon: ':heavy_check_mark:'
@@ -76,10 +76,10 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/general_matching.hpp
     title: General Matching
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: graph/graph.hpp
     title: Graph
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: graph/graph.hpp
     title: Graph
   - icon: ':heavy_check_mark:'

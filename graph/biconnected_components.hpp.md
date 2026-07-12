@@ -1,14 +1,14 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: graph/graph.hpp
     title: Graph
   _extendedRequiredBy:
   - icon: ':heavy_check_mark:'
     path: graph/all.hpp
     title: Graph All
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: graph/block_cut_tree.hpp
     title: Block-Cut Tree
   - icon: ':heavy_check_mark:'
@@ -18,7 +18,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/biconnected_components.test.cpp
     title: verify/graph/biconnected_components.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/graph/block_cut_tree.test.cpp
     title: verify/graph/block_cut_tree.test.cpp
   - icon: ':heavy_check_mark:'
@@ -30,9 +30,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/range_edge_graph.test.cpp
     title: verify/graph/range_edge_graph.test.cpp
-  _isVerificationFailed: true
+  _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':question:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"graph/biconnected_components.hpp\"\n\n\n\n#include <cassert>\n\
@@ -242,7 +242,7 @@ data:
   - graph/block_cut_tree.hpp
   - graph/undirected.hpp
   timestamp: '2026-07-11 19:47:32+09:00'
-  verificationStatus: LIBRARY_SOME_WA
+  verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
   - verify/graph/range_edge_graph.test.cpp

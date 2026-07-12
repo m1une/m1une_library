@@ -4,10 +4,10 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/chromatic_number.hpp
     title: Chromatic Number
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: graph/graph.hpp
     title: Graph
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: graph/graph.hpp
     title: Graph
   _extendedRequiredBy: []

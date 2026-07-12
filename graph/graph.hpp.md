@@ -14,13 +14,13 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/bfs.hpp
     title: BFS
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: graph/biconnected_components.hpp
     title: Biconnected Components
   - icon: ':heavy_check_mark:'
     path: graph/bipartite.hpp
     title: Bipartite Graph
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: graph/block_cut_tree.hpp
     title: Block-Cut Tree
   - icon: ':heavy_check_mark:'
@@ -153,7 +153,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/biconnected_components.test.cpp
     title: verify/graph/biconnected_components.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/graph/block_cut_tree.test.cpp
     title: verify/graph/block_cut_tree.test.cpp
   - icon: ':heavy_check_mark:'
@@ -270,9 +270,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/two_edge_connected_components.test.cpp
     title: verify/graph/two_edge_connected_components.test.cpp
-  _isVerificationFailed: true
+  _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':question:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"graph/graph.hpp\"\n\n\n\n#include <cassert>\n#include <utility>\n\
@@ -439,7 +439,7 @@ data:
   - graph/shortest_path.hpp
   - graph/general_matching.hpp
   timestamp: '2026-07-11 19:47:32+09:00'
-  verificationStatus: LIBRARY_SOME_WA
+  verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/library_checker_maximum_independent_set.test.cpp
   - verify/graph/library_checker_maximum_independent_set.test.cpp

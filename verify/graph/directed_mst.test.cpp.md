@@ -4,7 +4,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/directed_mst.hpp
     title: Directed Minimum Spanning Tree
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: graph/graph.hpp
     title: Graph
   _extendedRequiredBy: []

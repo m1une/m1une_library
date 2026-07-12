@@ -1,66 +1,66 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: graph/biconnected_components.hpp
     title: Biconnected Components
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: graph/block_cut_tree.hpp
     title: Block-Cut Tree
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: graph/graph.hpp
     title: Graph
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
-  _isVerificationFailed: true
+  _isVerificationFailed: false
   _pathExtension: cpp
-  _verificationStatusIcon: ':x:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
     PROBLEM: https://judge.yosupo.jp/problem/biconnected_components
     links:
     - https://judge.yosupo.jp/problem/biconnected_components
   bundledCode: "#line 1 \"verify/graph/block_cut_tree.test.cpp\"\n#define PROBLEM\
-    \ \"https://judge.yosupo.jp/problem/biconnected_components\"\n\n#include <algorithm>\n\
-    #include <cassert>\n#include <iostream>\n#include <random>\n#include <vector>\n\
-    \n#line 1 \"graph/block_cut_tree.hpp\"\n\n\n\n#line 6 \"graph/block_cut_tree.hpp\"\
-    \n\n#line 1 \"graph/biconnected_components.hpp\"\n\n\n\n#line 6 \"graph/biconnected_components.hpp\"\
-    \n\n#line 1 \"graph/graph.hpp\"\n\n\n\n#line 5 \"graph/graph.hpp\"\n#include <utility>\n\
-    #line 7 \"graph/graph.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\ntemplate\
-    \ <class T = int>\nstruct Edge {\n    using cost_type = T;\n\n    int from;\n\
-    \    int to;\n    T cost;\n    int id;\n    bool alive;\n\n    Edge() : from(-1),\
-    \ to(-1), cost(T()), id(-1), alive(true) {}\n    Edge(int from_, int to_, T cost_\
-    \ = T(1), int id_ = -1, bool alive_ = true)\n        : from(from_), to(to_), cost(cost_),\
-    \ id(id_), alive(alive_) {}\n\n    int other(int v) const {\n        assert(v\
-    \ == from || v == to);\n        return from ^ to ^ v;\n    }\n};\n\ntemplate <class\
-    \ T = int>\nstruct Graph {\n    using edge_type = Edge<T>;\n    using cost_type\
-    \ = T;\n\n   private:\n    int _n;\n    int _edge_count;\n    std::vector<std::vector<edge_type>>\
-    \ _g;\n    std::vector<std::vector<std::pair<int, int>>> _edge_positions;\n\n\
-    \   public:\n    Graph() : _n(0), _edge_count(0) {}\n    explicit Graph(int n)\
-    \ : _n(n), _edge_count(0), _g(n) {\n        assert(0 <= n);\n    }\n\n    int\
-    \ size() const {\n        return _n;\n    }\n\n    bool empty() const {\n    \
-    \    return _n == 0;\n    }\n\n    int edge_count() const {\n        return _edge_count;\n\
-    \    }\n\n    int add_vertex() {\n        _g.emplace_back();\n        return _n++;\n\
-    \    }\n\n    int add_directed_edge(int from, int to, T cost = T(1)) {\n     \
-    \   assert(0 <= from && from < _n);\n        assert(0 <= to && to < _n);\n   \
-    \     int id = _edge_count++;\n        int idx = int(_g[from].size());\n     \
-    \   _g[from].push_back(edge_type(from, to, cost, id));\n        _edge_positions.emplace_back();\n\
-    \        _edge_positions.back().push_back({from, idx});\n        return id;\n\
-    \    }\n\n    int add_edge(int u, int v, T cost = T(1)) {\n        assert(0 <=\
-    \ u && u < _n);\n        assert(0 <= v && v < _n);\n        int id = _edge_count++;\n\
-    \        int u_idx = int(_g[u].size());\n        _g[u].push_back(edge_type(u,\
-    \ v, cost, id));\n        int v_idx = int(_g[v].size());\n        _g[v].push_back(edge_type(v,\
-    \ u, cost, id));\n        _edge_positions.emplace_back();\n        _edge_positions.back().push_back({u,\
-    \ u_idx});\n        _edge_positions.back().push_back({v, v_idx});\n        return\
-    \ id;\n    }\n\n    void set_edge_alive(int id, bool alive) {\n        assert(0\
-    \ <= id && id < _edge_count);\n        for (auto [v, idx] : _edge_positions[id])\
-    \ {\n            _g[v][idx].alive = alive;\n        }\n    }\n\n    void erase_edge(int\
-    \ id) {\n        set_edge_alive(id, false);\n    }\n\n    void revive_edge(int\
-    \ id) {\n        set_edge_alive(id, true);\n    }\n\n    bool is_edge_alive(int\
-    \ id) const {\n        assert(0 <= id && id < _edge_count);\n        assert(!_edge_positions[id].empty());\n\
-    \        auto [v, idx] = _edge_positions[id][0];\n        return _g[v][idx].alive;\n\
-    \    }\n\n    const std::vector<edge_type>& operator[](int v) const {\n      \
-    \  assert(0 <= v && v < _n);\n        return _g[v];\n    }\n\n    std::vector<edge_type>&\
+    \ \"https://judge.yosupo.jp/problem/biconnected_components\"\n\n#include <cassert>\n\
+    #include <iostream>\n#include <random>\n#include <vector>\n\n#line 1 \"graph/block_cut_tree.hpp\"\
+    \n\n\n\n#line 6 \"graph/block_cut_tree.hpp\"\n\n#line 1 \"graph/biconnected_components.hpp\"\
+    \n\n\n\n#line 6 \"graph/biconnected_components.hpp\"\n\n#line 1 \"graph/graph.hpp\"\
+    \n\n\n\n#line 5 \"graph/graph.hpp\"\n#include <utility>\n#line 7 \"graph/graph.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\ntemplate <class T = int>\nstruct Edge\
+    \ {\n    using cost_type = T;\n\n    int from;\n    int to;\n    T cost;\n   \
+    \ int id;\n    bool alive;\n\n    Edge() : from(-1), to(-1), cost(T()), id(-1),\
+    \ alive(true) {}\n    Edge(int from_, int to_, T cost_ = T(1), int id_ = -1, bool\
+    \ alive_ = true)\n        : from(from_), to(to_), cost(cost_), id(id_), alive(alive_)\
+    \ {}\n\n    int other(int v) const {\n        assert(v == from || v == to);\n\
+    \        return from ^ to ^ v;\n    }\n};\n\ntemplate <class T = int>\nstruct\
+    \ Graph {\n    using edge_type = Edge<T>;\n    using cost_type = T;\n\n   private:\n\
+    \    int _n;\n    int _edge_count;\n    std::vector<std::vector<edge_type>> _g;\n\
+    \    std::vector<std::vector<std::pair<int, int>>> _edge_positions;\n\n   public:\n\
+    \    Graph() : _n(0), _edge_count(0) {}\n    explicit Graph(int n) : _n(n), _edge_count(0),\
+    \ _g(n) {\n        assert(0 <= n);\n    }\n\n    int size() const {\n        return\
+    \ _n;\n    }\n\n    bool empty() const {\n        return _n == 0;\n    }\n\n \
+    \   int edge_count() const {\n        return _edge_count;\n    }\n\n    int add_vertex()\
+    \ {\n        _g.emplace_back();\n        return _n++;\n    }\n\n    int add_directed_edge(int\
+    \ from, int to, T cost = T(1)) {\n        assert(0 <= from && from < _n);\n  \
+    \      assert(0 <= to && to < _n);\n        int id = _edge_count++;\n        int\
+    \ idx = int(_g[from].size());\n        _g[from].push_back(edge_type(from, to,\
+    \ cost, id));\n        _edge_positions.emplace_back();\n        _edge_positions.back().push_back({from,\
+    \ idx});\n        return id;\n    }\n\n    int add_edge(int u, int v, T cost =\
+    \ T(1)) {\n        assert(0 <= u && u < _n);\n        assert(0 <= v && v < _n);\n\
+    \        int id = _edge_count++;\n        int u_idx = int(_g[u].size());\n   \
+    \     _g[u].push_back(edge_type(u, v, cost, id));\n        int v_idx = int(_g[v].size());\n\
+    \        _g[v].push_back(edge_type(v, u, cost, id));\n        _edge_positions.emplace_back();\n\
+    \        _edge_positions.back().push_back({u, u_idx});\n        _edge_positions.back().push_back({v,\
+    \ v_idx});\n        return id;\n    }\n\n    void set_edge_alive(int id, bool\
+    \ alive) {\n        assert(0 <= id && id < _edge_count);\n        for (auto [v,\
+    \ idx] : _edge_positions[id]) {\n            _g[v][idx].alive = alive;\n     \
+    \   }\n    }\n\n    void erase_edge(int id) {\n        set_edge_alive(id, false);\n\
+    \    }\n\n    void revive_edge(int id) {\n        set_edge_alive(id, true);\n\
+    \    }\n\n    bool is_edge_alive(int id) const {\n        assert(0 <= id && id\
+    \ < _edge_count);\n        assert(!_edge_positions[id].empty());\n        auto\
+    \ [v, idx] = _edge_positions[id][0];\n        return _g[v][idx].alive;\n    }\n\
+    \n    const std::vector<edge_type>& operator[](int v) const {\n        assert(0\
+    \ <= v && v < _n);\n        return _g[v];\n    }\n\n    std::vector<edge_type>&\
     \ operator[](int v) {\n        assert(0 <= v && v < _n);\n        return _g[v];\n\
     \    }\n\n    const std::vector<std::vector<edge_type>>& adjacency() const {\n\
     \        return _g;\n    }\n\n    std::vector<std::vector<edge_type>>& adjacency()\
@@ -182,28 +182,31 @@ data:
     \            result.forest[block_node].push_back(node);\n        }\n    }\n  \
     \  return result;\n}\n\ntemplate <class T>\nBlockCutTreeResult block_cut_tree(const\
     \ Graph<T>& graph) {\n    return block_cut_tree(biconnected_components(graph));\n\
-    }\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 10 \"verify/graph/block_cut_tree.test.cpp\"\
+    }\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 9 \"verify/graph/block_cut_tree.test.cpp\"\
     \n\nnamespace {\n\n#ifndef NDEBUG\nvoid verify_block_cut_tree(const m1une::graph::BiconnectedComponentsResult&\
     \ bcc) {\n    const auto actual = m1une::graph::block_cut_tree(bcc);\n    const\
     \ int n = int(bcc.vertex_components.size());\n    const int block_count = bcc.component_count();\n\
     \    assert(actual.block_count() == block_count);\n    assert(actual.node_count()\
-    \ == block_count + int(bcc.articulation.size()));\n\n    int degree_sum = 0;\n\
-    \    for (int node = 0; node < actual.node_count(); node++) {\n        assert(actual.is_block_node(node)\
-    \ != actual.is_articulation_node(node));\n        degree_sum += int(actual.forest[node].size());\n\
-    \        for (int to : actual.forest[node]) {\n            assert(0 <= to && to\
-    \ < actual.node_count());\n            assert(actual.is_block_node(node) != actual.is_block_node(to));\n\
-    \            assert(std::count(actual.forest[to].begin(), actual.forest[to].end(),\
-    \ node) == 1);\n        }\n    }\n\n    int incidence_count = 0;\n    for (int\
-    \ vertex = 0; vertex < n; vertex++) {\n        const bool articulation = bcc.is_articulation(vertex);\n\
-    \        const int node = actual.node_of_vertex[vertex];\n        assert(0 <=\
-    \ node && node < actual.node_count());\n        if (articulation) {\n        \
-    \    assert(actual.node_of_articulation[vertex] == node);\n            assert(actual.articulation_of_node[node]\
-    \ == vertex);\n            assert(actual.forest[node].size() == bcc.vertex_components[vertex].size());\n\
-    \            for (int block : bcc.vertex_components[vertex]) {\n             \
-    \   assert(std::count(actual.forest[node].begin(), actual.forest[node].end(),\
-    \ block) == 1);\n                incidence_count++;\n            }\n        }\
-    \ else {\n            assert(actual.node_of_articulation[vertex] == -1);\n   \
-    \         assert(bcc.vertex_components[vertex].size() == 1);\n            assert(node\
+    \ == block_count + int(bcc.articulation.size()));\n\n    std::vector<std::vector<int>>\
+    \ expected_forest(actual.node_count());\n    int incidence_count = 0;\n    for\
+    \ (int vertex = 0; vertex < n; vertex++) {\n        if (!bcc.is_articulation(vertex))\
+    \ continue;\n        const int node = actual.node_of_articulation[vertex];\n \
+    \       for (int block : bcc.vertex_components[vertex]) {\n            expected_forest[node].push_back(block);\n\
+    \            expected_forest[block].push_back(node);\n            incidence_count++;\n\
+    \        }\n    }\n    assert(actual.forest == expected_forest);\n\n    int degree_sum\
+    \ = 0;\n    for (int node = 0; node < actual.node_count(); node++) {\n       \
+    \ assert(actual.is_block_node(node) != actual.is_articulation_node(node));\n \
+    \       degree_sum += int(actual.forest[node].size());\n        for (int to :\
+    \ actual.forest[node]) {\n            assert(0 <= to && to < actual.node_count());\n\
+    \            assert(actual.is_block_node(node) != actual.is_block_node(to));\n\
+    \        }\n    }\n\n    for (int vertex = 0; vertex < n; vertex++) {\n      \
+    \  const bool articulation = bcc.is_articulation(vertex);\n        const int node\
+    \ = actual.node_of_vertex[vertex];\n        assert(0 <= node && node < actual.node_count());\n\
+    \        if (articulation) {\n            assert(actual.node_of_articulation[vertex]\
+    \ == node);\n            assert(actual.articulation_of_node[node] == vertex);\n\
+    \            assert(actual.forest[node].size() == bcc.vertex_components[vertex].size());\n\
+    \        } else {\n            assert(actual.node_of_articulation[vertex] == -1);\n\
+    \            assert(bcc.vertex_components[vertex].size() == 1);\n            assert(node\
     \ == actual.node_of_block[bcc.vertex_components[vertex][0]]);\n        }\n   \
     \ }\n    assert(degree_sum == 2 * incidence_count);\n\n    std::vector<int> parent(actual.node_count(),\
     \ -1);\n    std::vector<int> stack;\n    for (int root = 0; root < actual.node_count();\
@@ -238,29 +241,32 @@ data:
     \        std::cout << component.size();\n        for (int vertex : component)\
     \ std::cout << ' ' << vertex;\n        std::cout << '\\n';\n    }\n}\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/biconnected_components\"\
-    \n\n#include <algorithm>\n#include <cassert>\n#include <iostream>\n#include <random>\n\
-    #include <vector>\n\n#include \"../../graph/block_cut_tree.hpp\"\n\nnamespace\
-    \ {\n\n#ifndef NDEBUG\nvoid verify_block_cut_tree(const m1une::graph::BiconnectedComponentsResult&\
-    \ bcc) {\n    const auto actual = m1une::graph::block_cut_tree(bcc);\n    const\
-    \ int n = int(bcc.vertex_components.size());\n    const int block_count = bcc.component_count();\n\
+    \n\n#include <cassert>\n#include <iostream>\n#include <random>\n#include <vector>\n\
+    \n#include \"../../graph/block_cut_tree.hpp\"\n\nnamespace {\n\n#ifndef NDEBUG\n\
+    void verify_block_cut_tree(const m1une::graph::BiconnectedComponentsResult& bcc)\
+    \ {\n    const auto actual = m1une::graph::block_cut_tree(bcc);\n    const int\
+    \ n = int(bcc.vertex_components.size());\n    const int block_count = bcc.component_count();\n\
     \    assert(actual.block_count() == block_count);\n    assert(actual.node_count()\
-    \ == block_count + int(bcc.articulation.size()));\n\n    int degree_sum = 0;\n\
-    \    for (int node = 0; node < actual.node_count(); node++) {\n        assert(actual.is_block_node(node)\
-    \ != actual.is_articulation_node(node));\n        degree_sum += int(actual.forest[node].size());\n\
-    \        for (int to : actual.forest[node]) {\n            assert(0 <= to && to\
-    \ < actual.node_count());\n            assert(actual.is_block_node(node) != actual.is_block_node(to));\n\
-    \            assert(std::count(actual.forest[to].begin(), actual.forest[to].end(),\
-    \ node) == 1);\n        }\n    }\n\n    int incidence_count = 0;\n    for (int\
-    \ vertex = 0; vertex < n; vertex++) {\n        const bool articulation = bcc.is_articulation(vertex);\n\
-    \        const int node = actual.node_of_vertex[vertex];\n        assert(0 <=\
-    \ node && node < actual.node_count());\n        if (articulation) {\n        \
-    \    assert(actual.node_of_articulation[vertex] == node);\n            assert(actual.articulation_of_node[node]\
-    \ == vertex);\n            assert(actual.forest[node].size() == bcc.vertex_components[vertex].size());\n\
-    \            for (int block : bcc.vertex_components[vertex]) {\n             \
-    \   assert(std::count(actual.forest[node].begin(), actual.forest[node].end(),\
-    \ block) == 1);\n                incidence_count++;\n            }\n        }\
-    \ else {\n            assert(actual.node_of_articulation[vertex] == -1);\n   \
-    \         assert(bcc.vertex_components[vertex].size() == 1);\n            assert(node\
+    \ == block_count + int(bcc.articulation.size()));\n\n    std::vector<std::vector<int>>\
+    \ expected_forest(actual.node_count());\n    int incidence_count = 0;\n    for\
+    \ (int vertex = 0; vertex < n; vertex++) {\n        if (!bcc.is_articulation(vertex))\
+    \ continue;\n        const int node = actual.node_of_articulation[vertex];\n \
+    \       for (int block : bcc.vertex_components[vertex]) {\n            expected_forest[node].push_back(block);\n\
+    \            expected_forest[block].push_back(node);\n            incidence_count++;\n\
+    \        }\n    }\n    assert(actual.forest == expected_forest);\n\n    int degree_sum\
+    \ = 0;\n    for (int node = 0; node < actual.node_count(); node++) {\n       \
+    \ assert(actual.is_block_node(node) != actual.is_articulation_node(node));\n \
+    \       degree_sum += int(actual.forest[node].size());\n        for (int to :\
+    \ actual.forest[node]) {\n            assert(0 <= to && to < actual.node_count());\n\
+    \            assert(actual.is_block_node(node) != actual.is_block_node(to));\n\
+    \        }\n    }\n\n    for (int vertex = 0; vertex < n; vertex++) {\n      \
+    \  const bool articulation = bcc.is_articulation(vertex);\n        const int node\
+    \ = actual.node_of_vertex[vertex];\n        assert(0 <= node && node < actual.node_count());\n\
+    \        if (articulation) {\n            assert(actual.node_of_articulation[vertex]\
+    \ == node);\n            assert(actual.articulation_of_node[node] == vertex);\n\
+    \            assert(actual.forest[node].size() == bcc.vertex_components[vertex].size());\n\
+    \        } else {\n            assert(actual.node_of_articulation[vertex] == -1);\n\
+    \            assert(bcc.vertex_components[vertex].size() == 1);\n            assert(node\
     \ == actual.node_of_block[bcc.vertex_components[vertex][0]]);\n        }\n   \
     \ }\n    assert(degree_sum == 2 * incidence_count);\n\n    std::vector<int> parent(actual.node_count(),\
     \ -1);\n    std::vector<int> stack;\n    for (int root = 0; root < actual.node_count();\
@@ -301,8 +307,8 @@ data:
   isVerificationFile: true
   path: verify/graph/block_cut_tree.test.cpp
   requiredBy: []
-  timestamp: '2026-07-13 03:42:12+09:00'
-  verificationStatus: TEST_WRONG_ANSWER
+  timestamp: '2026-07-13 04:31:14+09:00'
+  verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/block_cut_tree.test.cpp
 layout: document
