@@ -1,13 +1,16 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: graph/graph.hpp
     title: Graph
   _extendedRequiredBy:
   - icon: ':heavy_check_mark:'
     path: graph/all.hpp
     title: Graph All
+  - icon: ':question:'
+    path: graph/block_cut_tree.hpp
+    title: Block-Cut Tree
   - icon: ':heavy_check_mark:'
     path: graph/undirected.hpp
     title: Undirected Graph Algorithms
@@ -15,6 +18,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/biconnected_components.test.cpp
     title: verify/graph/biconnected_components.test.cpp
+  - icon: ':x:'
+    path: verify/graph/block_cut_tree.test.cpp
+    title: verify/graph/block_cut_tree.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/cow_game.test.cpp
     title: verify/graph/cow_game.test.cpp
@@ -24,9 +30,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/range_edge_graph.test.cpp
     title: verify/graph/range_edge_graph.test.cpp
-  _isVerificationFailed: false
+  _isVerificationFailed: true
   _pathExtension: hpp
-  _verificationStatusIcon: ':heavy_check_mark:'
+  _verificationStatusIcon: ':question:'
   attributes:
     links: []
   bundledCode: "#line 1 \"graph/biconnected_components.hpp\"\n\n\n\n#include <cassert>\n\
@@ -233,13 +239,15 @@ data:
   path: graph/biconnected_components.hpp
   requiredBy:
   - graph/all.hpp
+  - graph/block_cut_tree.hpp
   - graph/undirected.hpp
   timestamp: '2026-07-11 19:47:32+09:00'
-  verificationStatus: LIBRARY_ALL_AC
+  verificationStatus: LIBRARY_SOME_WA
   verifiedWith:
   - verify/graph/cow_game.test.cpp
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/biconnected_components.test.cpp
+  - verify/graph/block_cut_tree.test.cpp
   - verify/graph/graph_algorithms.test.cpp
 documentation_of: graph/biconnected_components.hpp
 layout: document
@@ -253,9 +261,8 @@ blocks. Every active edge belongs to exactly one block. An articulation vertex
 belongs to two or more blocks, while an isolated vertex forms a singleton
 block with no edges.
 
-The incidence lists can be used directly to build a block-cut forest: create
-one node for each block, retain one node for each articulation vertex, and add
-an incidence edge for every block listed in `vertex_components[vertex]`.
+Pass the result to `block_cut_tree` from `graph/block_cut_tree.hpp` to build the
+block-cut forest and original-vertex-to-node mappings.
 
 ## Graph Requirements
 

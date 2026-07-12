@@ -488,12 +488,15 @@ data:
     - icon: ':heavy_check_mark:'
       path: graph/bfs.hpp
       title: BFS
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: graph/biconnected_components.hpp
       title: Biconnected Components
     - icon: ':heavy_check_mark:'
       path: graph/bipartite.hpp
       title: Bipartite Graph
+    - icon: ':question:'
+      path: graph/block_cut_tree.hpp
+      title: Block-Cut Tree
     - icon: ':heavy_check_mark:'
       path: graph/connected_components.hpp
       title: Connected Components
@@ -527,7 +530,7 @@ data:
     - icon: ':heavy_check_mark:'
       path: graph/general_matching.hpp
       title: General Matching
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: graph/graph.hpp
       title: Graph
     - icon: ':heavy_check_mark:'
@@ -692,6 +695,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: math/modular_square_root.hpp
       title: Modular Square Root
+    - icon: ':heavy_check_mark:'
+      path: math/multiplicative_function_prefix_sum.hpp
+      title: Multiplicative Function Prefix Sum
     - icon: ':heavy_check_mark:'
       path: math/number_theory.hpp
       title: Number Theory
@@ -1385,6 +1391,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/graph/biconnected_components.test.cpp
       title: verify/graph/biconnected_components.test.cpp
+    - icon: ':x:'
+      path: verify/graph/block_cut_tree.test.cpp
+      title: verify/graph/block_cut_tree.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/graph/cow_game.test.cpp
       title: verify/graph/cow_game.test.cpp
@@ -1538,6 +1547,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/stirling_number_of_the_second_kind.test.cpp
       title: verify/math/stirling_number_of_the_second_kind.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/sum_of_multiplicative_function.test.cpp
+      title: verify/math/sum_of_multiplicative_function.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/tetration.test.cpp
       title: verify/math/tetration.test.cpp

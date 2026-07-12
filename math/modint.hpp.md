@@ -244,6 +244,9 @@ data:
     path: verify/math/stirling_number_of_the_second_kind.test.cpp
     title: verify/math/stirling_number_of_the_second_kind.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/sum_of_multiplicative_function.test.cpp
+    title: verify/math/sum_of_multiplicative_function.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/matroid/matroids.test.cpp
     title: verify/matroid/matroids.test.cpp
   _isVerificationFailed: false
@@ -426,6 +429,7 @@ data:
   - verify/math/matrix/inverse_matrix.test.cpp
   - verify/math/matrix/matrix.test.cpp
   - verify/math/matrix/matrix_product.test.cpp
+  - verify/math/sum_of_multiplicative_function.test.cpp
   - verify/math/stirling_number_of_the_second_kind.test.cpp
   - verify/math/stirling_number_of_the_second_kind.test.cpp
   - verify/math/prefix_sum_of_binom_randomized.test.cpp

@@ -92,6 +92,9 @@ data:
     path: math/modular_square_root.hpp
     title: Modular Square Root
   - icon: ':heavy_check_mark:'
+    path: math/multiplicative_function_prefix_sum.hpp
+    title: Multiplicative Function Prefix Sum
+  - icon: ':heavy_check_mark:'
     path: math/number_theory.hpp
     title: Number Theory
   - icon: ':heavy_check_mark:'
@@ -191,6 +194,8 @@ data:
 
     #include "modular_square_root.hpp"
 
+    #include "multiplicative_function_prefix_sum.hpp"
+
     #include "number_theory.hpp"
 
     #include "partition_function.hpp"
@@ -255,6 +260,7 @@ data:
   - math/matrix/matrix.hpp
   - math/modint.hpp
   - math/modular_square_root.hpp
+  - math/multiplicative_function_prefix_sum.hpp
   - math/number_theory.hpp
   - math/prefix_sum_of_binom.hpp
   - math/primitive_root.hpp
@@ -268,7 +274,7 @@ data:
   isVerificationFile: false
   path: math/all.hpp
   requiredBy: []
-  timestamp: '2026-07-13 03:08:36+09:00'
+  timestamp: '2026-07-13 03:44:35+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
@@ -328,6 +334,8 @@ You usually do not need to include this entire bundle:
 * Use `repunit.hpp` for a repeated-one numeral or geometric sum in an
   arbitrary base.
 * Use `tetration.hpp` for modular tetration and arbitrary power towers.
+* Use `multiplicative_function_prefix_sum.hpp` for Min_25 summation of a
+  multiplicative function from its prime-power values.
 * Use `totient_sum.hpp` for summatory Euler totient queries.
 * Use `rational.hpp` for normalized exact fractions.
 * Use `stern_brocot_tree.hpp` for positive rational tree paths, ancestors, and
@@ -351,6 +359,7 @@ few unused headers do not matter.
 | `math/lucas.hpp` | Lucas's theorem for huge binomial arguments modulo a small prime. |
 | `math/modint.hpp` | Static modular integer type. |
 | `math/modular_square_root.hpp` | Modular square roots for prime moduli using Tonelli-Shanks. |
+| `math/multiplicative_function_prefix_sum.hpp` | Min_25 prefix sums of a multiplicative function. |
 | `math/fps/all.hpp` | Convolution, formal power series, polynomial algorithms, and linear recurrences. |
 | `math/matrix/all.hpp` | Dense matrices, powers, Gaussian elimination, determinant, inverse, and linear systems. |
 | `math/combinatorics.hpp` | Factorials, binomial coefficients, permutations, and multiset counts. |

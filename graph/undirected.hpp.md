@@ -10,12 +10,15 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/bfs.hpp
     title: BFS
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: graph/biconnected_components.hpp
     title: Biconnected Components
   - icon: ':heavy_check_mark:'
     path: graph/bipartite.hpp
     title: Bipartite Graph
+  - icon: ':question:'
+    path: graph/block_cut_tree.hpp
+    title: Block-Cut Tree
   - icon: ':heavy_check_mark:'
     path: graph/connected_components.hpp
     title: Connected Components
@@ -37,7 +40,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/general_matching.hpp
     title: General Matching
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: graph/graph.hpp
     title: Graph
   - icon: ':heavy_check_mark:'
@@ -374,31 +377,66 @@ data:
     \            }\n        }\n    }\n\n    for (int vertex = 0; vertex < n; vertex++)\
     \ {\n        if (result.is_articulation(vertex)) result.articulation.push_back(vertex);\n\
     \    }\n    return result;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\
-    \n\n#line 1 \"graph/connected_components.hpp\"\n\n\n\n#line 6 \"graph/connected_components.hpp\"\
-    \n\n#line 1 \"ds/dsu/dsu.hpp\"\n\n\n\n#include <algorithm>\n#include <numeric>\n\
-    #line 7 \"ds/dsu/dsu.hpp\"\n\nnamespace m1une {\nnamespace ds {\n\nstruct Dsu\
-    \ {\n   private:\n    int _n;\n    // parent_or_size[i] is the parent of i if\
-    \ it's >= 0.\n    // If it's < 0, then i is a root and -parent_or_size[i] is the\
-    \ size of the group.\n    std::vector<int> parent_or_size;\n\n   public:\n   \
-    \ Dsu() : _n(0) {}\n    explicit Dsu(int n) : _n(n), parent_or_size(n, -1) {}\n\
-    \n    // Merges the group containing 'a' with the group containing 'b'.\n    //\
-    \ Returns the leader of the merged group.\n    int merge(int a, int b) {\n   \
-    \     int x = leader(a), y = leader(b);\n        if (x == y) return x;\n     \
-    \   // Union by size\n        if (-parent_or_size[x] < -parent_or_size[y]) std::swap(x,\
-    \ y);\n        parent_or_size[x] += parent_or_size[y];\n        parent_or_size[y]\
-    \ = x;\n        return x;\n    }\n\n    // Returns true if 'a' and 'b' belong\
-    \ to the same group.\n    bool same(int a, int b) {\n        return leader(a)\
-    \ == leader(b);\n    }\n\n    // Returns the leader (representative) of the group\
-    \ containing 'a'.\n    int leader(int a) {\n        if (parent_or_size[a] < 0)\
-    \ return a;\n        // Path compression\n        return parent_or_size[a] = leader(parent_or_size[a]);\n\
-    \    }\n\n    // Returns the size of the group containing 'a'.\n    int size(int\
-    \ a) {\n        return -parent_or_size[leader(a)];\n    }\n\n    // Returns a\
-    \ list of all groups, where each group is a vector of its elements.\n    std::vector<std::vector<int>>\
-    \ groups() {\n        std::vector<int> leader_buf(_n), group_size(_n);\n     \
-    \   for (int i = 0; i < _n; i++) {\n            leader_buf[i] = leader(i);\n \
-    \           group_size[leader_buf[i]]++;\n        }\n        std::vector<std::vector<int>>\
-    \ result(_n);\n        for (int i = 0; i < _n; i++) {\n            result[i].reserve(group_size[i]);\n\
-    \        }\n        for (int i = 0; i < _n; i++) {\n            result[leader_buf[i]].push_back(i);\n\
+    \n\n#line 1 \"graph/block_cut_tree.hpp\"\n\n\n\n#line 6 \"graph/block_cut_tree.hpp\"\
+    \n\n#line 8 \"graph/block_cut_tree.hpp\"\n\nnamespace m1une {\nnamespace graph\
+    \ {\n\nstruct BlockCutTreeResult {\n    std::vector<std::vector<int>> forest;\n\
+    \    std::vector<int> node_of_block;\n    std::vector<int> node_of_articulation;\n\
+    \    std::vector<int> node_of_vertex;\n    std::vector<int> block_of_node;\n \
+    \   std::vector<int> articulation_of_node;\n\n    int node_count() const {\n \
+    \       return int(forest.size());\n    }\n\n    int block_count() const {\n \
+    \       return int(node_of_block.size());\n    }\n\n    bool is_block_node(int\
+    \ node) const {\n        assert(0 <= node && node < node_count());\n        return\
+    \ block_of_node[node] != -1;\n    }\n\n    bool is_articulation_node(int node)\
+    \ const {\n        assert(0 <= node && node < node_count());\n        return articulation_of_node[node]\
+    \ != -1;\n    }\n};\n\n// Builds the block-cut forest of a biconnected-components\
+    \ decomposition.\n// Block nodes have IDs [0, block_count); articulation nodes\
+    \ follow them.\ninline BlockCutTreeResult block_cut_tree(\n    const BiconnectedComponentsResult&\
+    \ biconnected\n) {\n    const int vertex_count = int(biconnected.vertex_components.size());\n\
+    \    const int block_count = biconnected.component_count();\n\n    BlockCutTreeResult\
+    \ result;\n    result.node_of_block.resize(block_count);\n    result.node_of_articulation.assign(vertex_count,\
+    \ -1);\n    result.node_of_vertex.assign(vertex_count, -1);\n    result.forest.resize(block_count);\n\
+    \    result.block_of_node.resize(block_count);\n    result.articulation_of_node.assign(block_count,\
+    \ -1);\n    for (int block = 0; block < block_count; block++) {\n        result.node_of_block[block]\
+    \ = block;\n        result.block_of_node[block] = block;\n    }\n\n    for (int\
+    \ vertex = 0; vertex < vertex_count; vertex++) {\n        const std::vector<int>&\
+    \ blocks = biconnected.vertex_components[vertex];\n        assert(!blocks.empty());\n\
+    \        if (blocks.size() == 1) {\n            assert(0 <= blocks[0] && blocks[0]\
+    \ < block_count);\n            result.node_of_vertex[vertex] = result.node_of_block[blocks[0]];\n\
+    \            continue;\n        }\n\n        const int node = result.node_count();\n\
+    \        result.node_of_articulation[vertex] = node;\n        result.node_of_vertex[vertex]\
+    \ = node;\n        result.forest.emplace_back();\n        result.block_of_node.push_back(-1);\n\
+    \        result.articulation_of_node.push_back(vertex);\n        for (int block\
+    \ : blocks) {\n            assert(0 <= block && block < block_count);\n      \
+    \      const int block_node = result.node_of_block[block];\n            result.forest[node].push_back(block_node);\n\
+    \            result.forest[block_node].push_back(node);\n        }\n    }\n  \
+    \  return result;\n}\n\ntemplate <class T>\nBlockCutTreeResult block_cut_tree(const\
+    \ Graph<T>& graph) {\n    return block_cut_tree(biconnected_components(graph));\n\
+    }\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/connected_components.hpp\"\
+    \n\n\n\n#line 6 \"graph/connected_components.hpp\"\n\n#line 1 \"ds/dsu/dsu.hpp\"\
+    \n\n\n\n#include <algorithm>\n#include <numeric>\n#line 7 \"ds/dsu/dsu.hpp\"\n\
+    \nnamespace m1une {\nnamespace ds {\n\nstruct Dsu {\n   private:\n    int _n;\n\
+    \    // parent_or_size[i] is the parent of i if it's >= 0.\n    // If it's < 0,\
+    \ then i is a root and -parent_or_size[i] is the size of the group.\n    std::vector<int>\
+    \ parent_or_size;\n\n   public:\n    Dsu() : _n(0) {}\n    explicit Dsu(int n)\
+    \ : _n(n), parent_or_size(n, -1) {}\n\n    // Merges the group containing 'a'\
+    \ with the group containing 'b'.\n    // Returns the leader of the merged group.\n\
+    \    int merge(int a, int b) {\n        int x = leader(a), y = leader(b);\n  \
+    \      if (x == y) return x;\n        // Union by size\n        if (-parent_or_size[x]\
+    \ < -parent_or_size[y]) std::swap(x, y);\n        parent_or_size[x] += parent_or_size[y];\n\
+    \        parent_or_size[y] = x;\n        return x;\n    }\n\n    // Returns true\
+    \ if 'a' and 'b' belong to the same group.\n    bool same(int a, int b) {\n  \
+    \      return leader(a) == leader(b);\n    }\n\n    // Returns the leader (representative)\
+    \ of the group containing 'a'.\n    int leader(int a) {\n        if (parent_or_size[a]\
+    \ < 0) return a;\n        // Path compression\n        return parent_or_size[a]\
+    \ = leader(parent_or_size[a]);\n    }\n\n    // Returns the size of the group\
+    \ containing 'a'.\n    int size(int a) {\n        return -parent_or_size[leader(a)];\n\
+    \    }\n\n    // Returns a list of all groups, where each group is a vector of\
+    \ its elements.\n    std::vector<std::vector<int>> groups() {\n        std::vector<int>\
+    \ leader_buf(_n), group_size(_n);\n        for (int i = 0; i < _n; i++) {\n  \
+    \          leader_buf[i] = leader(i);\n            group_size[leader_buf[i]]++;\n\
+    \        }\n        std::vector<std::vector<int>> result(_n);\n        for (int\
+    \ i = 0; i < _n; i++) {\n            result[i].reserve(group_size[i]);\n     \
+    \   }\n        for (int i = 0; i < _n; i++) {\n            result[leader_buf[i]].push_back(i);\n\
     \        }\n        result.erase(std::remove_if(result.begin(), result.end(),\
     \ [&](const std::vector<int>& v) { return v.empty(); }),\n                   \
     \  result.end());\n        return result;\n    }\n};\n\n}  // namespace ds\n}\
@@ -1716,7 +1754,7 @@ data:
     \   assert(first_component != second_component);\n        result.bridge_forest_edges.push_back(\n\
     \            TwoEdgeConnectedBridge{first_component, second_component, edge_id});\n\
     \    }\n    return result;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\
-    \n\n#line 19 \"graph/undirected.hpp\"\n\n\n"
+    \n\n#line 20 \"graph/undirected.hpp\"\n\n\n"
   code: '#ifndef M1UNE_GRAPH_UNDIRECTED_HPP
 
     #define M1UNE_GRAPH_UNDIRECTED_HPP 1
@@ -1725,6 +1763,8 @@ data:
     #include "bipartite.hpp"
 
     #include "biconnected_components.hpp"
+
+    #include "block_cut_tree.hpp"
 
     #include "connected_components.hpp"
 
@@ -1760,6 +1800,7 @@ data:
   - graph/bipartite.hpp
   - graph/graph.hpp
   - graph/biconnected_components.hpp
+  - graph/block_cut_tree.hpp
   - graph/connected_components.hpp
   - ds/dsu/dsu.hpp
   - graph/cycle_detection.hpp
@@ -1785,7 +1826,7 @@ data:
   path: graph/undirected.hpp
   requiredBy:
   - graph/all.hpp
-  timestamp: '2026-07-11 20:05:57+09:00'
+  timestamp: '2026-07-13 03:42:12+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
@@ -1813,6 +1854,7 @@ where direction should not matter.
 | `graph/shortest_path.hpp` | Mixed shortest-path bundle | Use BFS, 0-1 BFS, Dijkstra, Bellman-Ford, and Warshall-Floyd on undirected graphs built with `add_edge`; DAG shortest path is directed-only. |
 | `graph/lowlink.hpp` | Undirected only | Articulation points and bridges. |
 | `graph/biconnected_components.hpp` | Undirected only | Vertex-biconnected blocks, articulation points, and block incidence. |
+| `graph/block_cut_tree.hpp` | Undirected only | Block-cut forest and original-vertex-to-node mappings. |
 | `graph/two_edge_connected_components.hpp` | Undirected only | Two-edge-connected components, bridges, and the contracted bridge forest. |
 | `graph/kruskal.hpp` | Undirected only | Minimum spanning forest. |
 | `graph/bipartite.hpp` | Direction ignored / explicit bipartite sides | Two-colorability, maximum matching, minimum vertex cover, maximum independent set, and minimum edge cover. |

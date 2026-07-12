@@ -95,6 +95,9 @@ data:
     path: math/modular_square_root.hpp
     title: Modular Square Root
   - icon: ':heavy_check_mark:'
+    path: math/multiplicative_function_prefix_sum.hpp
+    title: Multiplicative Function Prefix Sum
+  - icon: ':heavy_check_mark:'
     path: math/number_theory.hpp
     title: Number Theory
   - icon: ':heavy_check_mark:'
@@ -362,6 +365,7 @@ data:
   - math/matrix/matrix.hpp
   - math/modint.hpp
   - math/modular_square_root.hpp
+  - math/multiplicative_function_prefix_sum.hpp
   - math/number_theory.hpp
   - math/prefix_sum_of_binom.hpp
   - math/primitive_root.hpp
@@ -375,7 +379,7 @@ data:
   isVerificationFile: true
   path: verify/math/math_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-13 03:08:36+09:00'
+  timestamp: '2026-07-13 03:44:35+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/math_algorithms.test.cpp
