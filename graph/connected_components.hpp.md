@@ -31,24 +31,32 @@ data:
     links: []
   bundledCode: "#line 1 \"graph/connected_components.hpp\"\n\n\n\n#include <cassert>\n\
     #include <vector>\n\n#line 1 \"ds/dsu/dsu.hpp\"\n\n\n\n#include <algorithm>\n\
-    #include <numeric>\n#line 7 \"ds/dsu/dsu.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ ds {\n\nstruct Dsu {\n   private:\n    int _n;\n    // parent_or_size[i] is\
-    \ the parent of i if it's >= 0.\n    // If it's < 0, then i is a root and -parent_or_size[i]\
-    \ is the size of the group.\n    std::vector<int> parent_or_size;\n\n   public:\n\
-    \    Dsu() : _n(0) {}\n    explicit Dsu(int n) : _n(n), parent_or_size(n, -1)\
-    \ {}\n\n    // Merges the group containing 'a' with the group containing 'b'.\n\
-    \    // Returns the leader of the merged group.\n    int merge(int a, int b) {\n\
-    \        int x = leader(a), y = leader(b);\n        if (x == y) return x;\n  \
-    \      // Union by size\n        if (-parent_or_size[x] < -parent_or_size[y])\
-    \ std::swap(x, y);\n        parent_or_size[x] += parent_or_size[y];\n        parent_or_size[y]\
-    \ = x;\n        return x;\n    }\n\n    // Returns true if 'a' and 'b' belong\
-    \ to the same group.\n    bool same(int a, int b) {\n        return leader(a)\
-    \ == leader(b);\n    }\n\n    // Returns the leader (representative) of the group\
-    \ containing 'a'.\n    int leader(int a) {\n        if (parent_or_size[a] < 0)\
-    \ return a;\n        // Path compression\n        return parent_or_size[a] = leader(parent_or_size[a]);\n\
-    \    }\n\n    // Returns the size of the group containing 'a'.\n    int size(int\
-    \ a) {\n        return -parent_or_size[leader(a)];\n    }\n\n    // Returns a\
-    \ list of all groups, where each group is a vector of its elements.\n    std::vector<std::vector<int>>\
+    #include <numeric>\n#include <utility>\n#line 8 \"ds/dsu/dsu.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace ds {\n\nstruct Dsu {\n   private:\n    int _n;\n    // parent_or_size[i]\
+    \ is the parent of i if it's >= 0.\n    // If it's < 0, then i is a root and -parent_or_size[i]\
+    \ is the size of the group.\n    std::vector<int> parent_or_size;\n\n    // Returns\
+    \ {new leader, absorbed leader}. The absorbed leader is -1 when\n    // both vertices\
+    \ already belong to the same component.\n    std::pair<int, int> merge_leaders(int\
+    \ a, int b) {\n        int x = leader(a), y = leader(b);\n        if (x == y)\
+    \ return {x, -1};\n        if (-parent_or_size[x] < -parent_or_size[y]) std::swap(x,\
+    \ y);\n        parent_or_size[x] += parent_or_size[y];\n        parent_or_size[y]\
+    \ = x;\n        return {x, y};\n    }\n\n   public:\n    Dsu() : _n(0) {}\n  \
+    \  explicit Dsu(int n) : _n(n), parent_or_size(n, -1) {}\n\n    // Merges the\
+    \ group containing 'a' with the group containing 'b'.\n    // Returns the leader\
+    \ of the merged group.\n    int merge(int a, int b) {\n        return merge_leaders(a,\
+    \ b).first;\n    }\n\n    // Invokes callback(new_leader, absorbed_leader) after\
+    \ an actual merge.\n    // Returns the leader of the merged group.\n    template\
+    \ <class Callback>\n    int merge(int a, int b, Callback&& callback) {\n     \
+    \   std::pair<int, int> merged = merge_leaders(a, b);\n        if (merged.second\
+    \ != -1) callback(merged.first, merged.second);\n        return merged.first;\n\
+    \    }\n\n    // Returns true if 'a' and 'b' belong to the same group.\n    bool\
+    \ same(int a, int b) {\n        return leader(a) == leader(b);\n    }\n\n    //\
+    \ Returns the leader (representative) of the group containing 'a'.\n    int leader(int\
+    \ a) {\n        if (parent_or_size[a] < 0) return a;\n        // Path compression\n\
+    \        return parent_or_size[a] = leader(parent_or_size[a]);\n    }\n\n    //\
+    \ Returns the size of the group containing 'a'.\n    int size(int a) {\n     \
+    \   return -parent_or_size[leader(a)];\n    }\n\n    // Returns a list of all\
+    \ groups, where each group is a vector of its elements.\n    std::vector<std::vector<int>>\
     \ groups() {\n        std::vector<int> leader_buf(_n), group_size(_n);\n     \
     \   for (int i = 0; i < _n; i++) {\n            leader_buf[i] = leader(i);\n \
     \           group_size[leader_buf[i]]++;\n        }\n        std::vector<std::vector<int>>\
@@ -57,42 +65,42 @@ data:
     \        }\n        result.erase(std::remove_if(result.begin(), result.end(),\
     \ [&](const std::vector<int>& v) { return v.empty(); }),\n                   \
     \  result.end());\n        return result;\n    }\n};\n\n}  // namespace ds\n}\
-    \  // namespace m1une\n\n\n#line 1 \"graph/graph.hpp\"\n\n\n\n#line 5 \"graph/graph.hpp\"\
-    \n#include <utility>\n#line 7 \"graph/graph.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ graph {\n\ntemplate <class T = int>\nstruct Edge {\n    using cost_type = T;\n\
-    \n    int from;\n    int to;\n    T cost;\n    int id;\n    bool alive;\n\n  \
-    \  Edge() : from(-1), to(-1), cost(T()), id(-1), alive(true) {}\n    Edge(int\
-    \ from_, int to_, T cost_ = T(1), int id_ = -1, bool alive_ = true)\n        :\
-    \ from(from_), to(to_), cost(cost_), id(id_), alive(alive_) {}\n\n    int other(int\
-    \ v) const {\n        assert(v == from || v == to);\n        return from ^ to\
-    \ ^ v;\n    }\n};\n\ntemplate <class T = int>\nstruct Graph {\n    using edge_type\
-    \ = Edge<T>;\n    using cost_type = T;\n\n   private:\n    int _n;\n    int _edge_count;\n\
-    \    std::vector<std::vector<edge_type>> _g;\n    std::vector<std::vector<std::pair<int,\
-    \ int>>> _edge_positions;\n\n   public:\n    Graph() : _n(0), _edge_count(0) {}\n\
-    \    explicit Graph(int n) : _n(n), _edge_count(0), _g(n) {\n        assert(0\
-    \ <= n);\n    }\n\n    int size() const {\n        return _n;\n    }\n\n    bool\
-    \ empty() const {\n        return _n == 0;\n    }\n\n    int edge_count() const\
-    \ {\n        return _edge_count;\n    }\n\n    int add_vertex() {\n        _g.emplace_back();\n\
-    \        return _n++;\n    }\n\n    int add_directed_edge(int from, int to, T\
-    \ cost = T(1)) {\n        assert(0 <= from && from < _n);\n        assert(0 <=\
-    \ to && to < _n);\n        int id = _edge_count++;\n        int idx = int(_g[from].size());\n\
-    \        _g[from].push_back(edge_type(from, to, cost, id));\n        _edge_positions.emplace_back();\n\
-    \        _edge_positions.back().push_back({from, idx});\n        return id;\n\
-    \    }\n\n    int add_edge(int u, int v, T cost = T(1)) {\n        assert(0 <=\
-    \ u && u < _n);\n        assert(0 <= v && v < _n);\n        int id = _edge_count++;\n\
-    \        int u_idx = int(_g[u].size());\n        _g[u].push_back(edge_type(u,\
-    \ v, cost, id));\n        int v_idx = int(_g[v].size());\n        _g[v].push_back(edge_type(v,\
-    \ u, cost, id));\n        _edge_positions.emplace_back();\n        _edge_positions.back().push_back({u,\
-    \ u_idx});\n        _edge_positions.back().push_back({v, v_idx});\n        return\
-    \ id;\n    }\n\n    void set_edge_alive(int id, bool alive) {\n        assert(0\
-    \ <= id && id < _edge_count);\n        for (auto [v, idx] : _edge_positions[id])\
-    \ {\n            _g[v][idx].alive = alive;\n        }\n    }\n\n    void erase_edge(int\
-    \ id) {\n        set_edge_alive(id, false);\n    }\n\n    void revive_edge(int\
-    \ id) {\n        set_edge_alive(id, true);\n    }\n\n    bool is_edge_alive(int\
-    \ id) const {\n        assert(0 <= id && id < _edge_count);\n        assert(!_edge_positions[id].empty());\n\
-    \        auto [v, idx] = _edge_positions[id][0];\n        return _g[v][idx].alive;\n\
-    \    }\n\n    const std::vector<edge_type>& operator[](int v) const {\n      \
-    \  assert(0 <= v && v < _n);\n        return _g[v];\n    }\n\n    std::vector<edge_type>&\
+    \  // namespace m1une\n\n\n#line 1 \"graph/graph.hpp\"\n\n\n\n#line 7 \"graph/graph.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\ntemplate <class T = int>\nstruct Edge\
+    \ {\n    using cost_type = T;\n\n    int from;\n    int to;\n    T cost;\n   \
+    \ int id;\n    bool alive;\n\n    Edge() : from(-1), to(-1), cost(T()), id(-1),\
+    \ alive(true) {}\n    Edge(int from_, int to_, T cost_ = T(1), int id_ = -1, bool\
+    \ alive_ = true)\n        : from(from_), to(to_), cost(cost_), id(id_), alive(alive_)\
+    \ {}\n\n    int other(int v) const {\n        assert(v == from || v == to);\n\
+    \        return from ^ to ^ v;\n    }\n};\n\ntemplate <class T = int>\nstruct\
+    \ Graph {\n    using edge_type = Edge<T>;\n    using cost_type = T;\n\n   private:\n\
+    \    int _n;\n    int _edge_count;\n    std::vector<std::vector<edge_type>> _g;\n\
+    \    std::vector<std::vector<std::pair<int, int>>> _edge_positions;\n\n   public:\n\
+    \    Graph() : _n(0), _edge_count(0) {}\n    explicit Graph(int n) : _n(n), _edge_count(0),\
+    \ _g(n) {\n        assert(0 <= n);\n    }\n\n    int size() const {\n        return\
+    \ _n;\n    }\n\n    bool empty() const {\n        return _n == 0;\n    }\n\n \
+    \   int edge_count() const {\n        return _edge_count;\n    }\n\n    int add_vertex()\
+    \ {\n        _g.emplace_back();\n        return _n++;\n    }\n\n    int add_directed_edge(int\
+    \ from, int to, T cost = T(1)) {\n        assert(0 <= from && from < _n);\n  \
+    \      assert(0 <= to && to < _n);\n        int id = _edge_count++;\n        int\
+    \ idx = int(_g[from].size());\n        _g[from].push_back(edge_type(from, to,\
+    \ cost, id));\n        _edge_positions.emplace_back();\n        _edge_positions.back().push_back({from,\
+    \ idx});\n        return id;\n    }\n\n    int add_edge(int u, int v, T cost =\
+    \ T(1)) {\n        assert(0 <= u && u < _n);\n        assert(0 <= v && v < _n);\n\
+    \        int id = _edge_count++;\n        int u_idx = int(_g[u].size());\n   \
+    \     _g[u].push_back(edge_type(u, v, cost, id));\n        int v_idx = int(_g[v].size());\n\
+    \        _g[v].push_back(edge_type(v, u, cost, id));\n        _edge_positions.emplace_back();\n\
+    \        _edge_positions.back().push_back({u, u_idx});\n        _edge_positions.back().push_back({v,\
+    \ v_idx});\n        return id;\n    }\n\n    void set_edge_alive(int id, bool\
+    \ alive) {\n        assert(0 <= id && id < _edge_count);\n        for (auto [v,\
+    \ idx] : _edge_positions[id]) {\n            _g[v][idx].alive = alive;\n     \
+    \   }\n    }\n\n    void erase_edge(int id) {\n        set_edge_alive(id, false);\n\
+    \    }\n\n    void revive_edge(int id) {\n        set_edge_alive(id, true);\n\
+    \    }\n\n    bool is_edge_alive(int id) const {\n        assert(0 <= id && id\
+    \ < _edge_count);\n        assert(!_edge_positions[id].empty());\n        auto\
+    \ [v, idx] = _edge_positions[id][0];\n        return _g[v][idx].alive;\n    }\n\
+    \n    const std::vector<edge_type>& operator[](int v) const {\n        assert(0\
+    \ <= v && v < _n);\n        return _g[v];\n    }\n\n    std::vector<edge_type>&\
     \ operator[](int v) {\n        assert(0 <= v && v < _n);\n        return _g[v];\n\
     \    }\n\n    const std::vector<std::vector<edge_type>>& adjacency() const {\n\
     \        return _g;\n    }\n\n    std::vector<std::vector<edge_type>>& adjacency()\
@@ -151,7 +159,7 @@ data:
   requiredBy:
   - graph/all.hpp
   - graph/undirected.hpp
-  timestamp: '2026-07-11 19:47:32+09:00'
+  timestamp: '2026-07-13 06:09:24+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp

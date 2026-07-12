@@ -51,24 +51,32 @@ data:
   attributes:
     links: []
   bundledCode: "#line 1 \"ds/dsu/dsu.hpp\"\n\n\n\n#include <algorithm>\n#include <numeric>\n\
-    #include <vector>\n\nnamespace m1une {\nnamespace ds {\n\nstruct Dsu {\n   private:\n\
-    \    int _n;\n    // parent_or_size[i] is the parent of i if it's >= 0.\n    //\
-    \ If it's < 0, then i is a root and -parent_or_size[i] is the size of the group.\n\
-    \    std::vector<int> parent_or_size;\n\n   public:\n    Dsu() : _n(0) {}\n  \
+    #include <utility>\n#include <vector>\n\nnamespace m1une {\nnamespace ds {\n\n\
+    struct Dsu {\n   private:\n    int _n;\n    // parent_or_size[i] is the parent\
+    \ of i if it's >= 0.\n    // If it's < 0, then i is a root and -parent_or_size[i]\
+    \ is the size of the group.\n    std::vector<int> parent_or_size;\n\n    // Returns\
+    \ {new leader, absorbed leader}. The absorbed leader is -1 when\n    // both vertices\
+    \ already belong to the same component.\n    std::pair<int, int> merge_leaders(int\
+    \ a, int b) {\n        int x = leader(a), y = leader(b);\n        if (x == y)\
+    \ return {x, -1};\n        if (-parent_or_size[x] < -parent_or_size[y]) std::swap(x,\
+    \ y);\n        parent_or_size[x] += parent_or_size[y];\n        parent_or_size[y]\
+    \ = x;\n        return {x, y};\n    }\n\n   public:\n    Dsu() : _n(0) {}\n  \
     \  explicit Dsu(int n) : _n(n), parent_or_size(n, -1) {}\n\n    // Merges the\
     \ group containing 'a' with the group containing 'b'.\n    // Returns the leader\
-    \ of the merged group.\n    int merge(int a, int b) {\n        int x = leader(a),\
-    \ y = leader(b);\n        if (x == y) return x;\n        // Union by size\n  \
-    \      if (-parent_or_size[x] < -parent_or_size[y]) std::swap(x, y);\n       \
-    \ parent_or_size[x] += parent_or_size[y];\n        parent_or_size[y] = x;\n  \
-    \      return x;\n    }\n\n    // Returns true if 'a' and 'b' belong to the same\
-    \ group.\n    bool same(int a, int b) {\n        return leader(a) == leader(b);\n\
-    \    }\n\n    // Returns the leader (representative) of the group containing 'a'.\n\
-    \    int leader(int a) {\n        if (parent_or_size[a] < 0) return a;\n     \
-    \   // Path compression\n        return parent_or_size[a] = leader(parent_or_size[a]);\n\
-    \    }\n\n    // Returns the size of the group containing 'a'.\n    int size(int\
-    \ a) {\n        return -parent_or_size[leader(a)];\n    }\n\n    // Returns a\
-    \ list of all groups, where each group is a vector of its elements.\n    std::vector<std::vector<int>>\
+    \ of the merged group.\n    int merge(int a, int b) {\n        return merge_leaders(a,\
+    \ b).first;\n    }\n\n    // Invokes callback(new_leader, absorbed_leader) after\
+    \ an actual merge.\n    // Returns the leader of the merged group.\n    template\
+    \ <class Callback>\n    int merge(int a, int b, Callback&& callback) {\n     \
+    \   std::pair<int, int> merged = merge_leaders(a, b);\n        if (merged.second\
+    \ != -1) callback(merged.first, merged.second);\n        return merged.first;\n\
+    \    }\n\n    // Returns true if 'a' and 'b' belong to the same group.\n    bool\
+    \ same(int a, int b) {\n        return leader(a) == leader(b);\n    }\n\n    //\
+    \ Returns the leader (representative) of the group containing 'a'.\n    int leader(int\
+    \ a) {\n        if (parent_or_size[a] < 0) return a;\n        // Path compression\n\
+    \        return parent_or_size[a] = leader(parent_or_size[a]);\n    }\n\n    //\
+    \ Returns the size of the group containing 'a'.\n    int size(int a) {\n     \
+    \   return -parent_or_size[leader(a)];\n    }\n\n    // Returns a list of all\
+    \ groups, where each group is a vector of its elements.\n    std::vector<std::vector<int>>\
     \ groups() {\n        std::vector<int> leader_buf(_n), group_size(_n);\n     \
     \   for (int i = 0; i < _n; i++) {\n            leader_buf[i] = leader(i);\n \
     \           group_size[leader_buf[i]]++;\n        }\n        std::vector<std::vector<int>>\
@@ -79,24 +87,32 @@ data:
     \  result.end());\n        return result;\n    }\n};\n\n}  // namespace ds\n}\
     \  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_DSU_HPP\n#define M1UNE_DSU_HPP 1\n\n#include <algorithm>\n\
-    #include <numeric>\n#include <vector>\n\nnamespace m1une {\nnamespace ds {\n\n\
-    struct Dsu {\n   private:\n    int _n;\n    // parent_or_size[i] is the parent\
-    \ of i if it's >= 0.\n    // If it's < 0, then i is a root and -parent_or_size[i]\
-    \ is the size of the group.\n    std::vector<int> parent_or_size;\n\n   public:\n\
-    \    Dsu() : _n(0) {}\n    explicit Dsu(int n) : _n(n), parent_or_size(n, -1)\
-    \ {}\n\n    // Merges the group containing 'a' with the group containing 'b'.\n\
-    \    // Returns the leader of the merged group.\n    int merge(int a, int b) {\n\
-    \        int x = leader(a), y = leader(b);\n        if (x == y) return x;\n  \
-    \      // Union by size\n        if (-parent_or_size[x] < -parent_or_size[y])\
-    \ std::swap(x, y);\n        parent_or_size[x] += parent_or_size[y];\n        parent_or_size[y]\
-    \ = x;\n        return x;\n    }\n\n    // Returns true if 'a' and 'b' belong\
-    \ to the same group.\n    bool same(int a, int b) {\n        return leader(a)\
-    \ == leader(b);\n    }\n\n    // Returns the leader (representative) of the group\
-    \ containing 'a'.\n    int leader(int a) {\n        if (parent_or_size[a] < 0)\
-    \ return a;\n        // Path compression\n        return parent_or_size[a] = leader(parent_or_size[a]);\n\
-    \    }\n\n    // Returns the size of the group containing 'a'.\n    int size(int\
-    \ a) {\n        return -parent_or_size[leader(a)];\n    }\n\n    // Returns a\
-    \ list of all groups, where each group is a vector of its elements.\n    std::vector<std::vector<int>>\
+    #include <numeric>\n#include <utility>\n#include <vector>\n\nnamespace m1une {\n\
+    namespace ds {\n\nstruct Dsu {\n   private:\n    int _n;\n    // parent_or_size[i]\
+    \ is the parent of i if it's >= 0.\n    // If it's < 0, then i is a root and -parent_or_size[i]\
+    \ is the size of the group.\n    std::vector<int> parent_or_size;\n\n    // Returns\
+    \ {new leader, absorbed leader}. The absorbed leader is -1 when\n    // both vertices\
+    \ already belong to the same component.\n    std::pair<int, int> merge_leaders(int\
+    \ a, int b) {\n        int x = leader(a), y = leader(b);\n        if (x == y)\
+    \ return {x, -1};\n        if (-parent_or_size[x] < -parent_or_size[y]) std::swap(x,\
+    \ y);\n        parent_or_size[x] += parent_or_size[y];\n        parent_or_size[y]\
+    \ = x;\n        return {x, y};\n    }\n\n   public:\n    Dsu() : _n(0) {}\n  \
+    \  explicit Dsu(int n) : _n(n), parent_or_size(n, -1) {}\n\n    // Merges the\
+    \ group containing 'a' with the group containing 'b'.\n    // Returns the leader\
+    \ of the merged group.\n    int merge(int a, int b) {\n        return merge_leaders(a,\
+    \ b).first;\n    }\n\n    // Invokes callback(new_leader, absorbed_leader) after\
+    \ an actual merge.\n    // Returns the leader of the merged group.\n    template\
+    \ <class Callback>\n    int merge(int a, int b, Callback&& callback) {\n     \
+    \   std::pair<int, int> merged = merge_leaders(a, b);\n        if (merged.second\
+    \ != -1) callback(merged.first, merged.second);\n        return merged.first;\n\
+    \    }\n\n    // Returns true if 'a' and 'b' belong to the same group.\n    bool\
+    \ same(int a, int b) {\n        return leader(a) == leader(b);\n    }\n\n    //\
+    \ Returns the leader (representative) of the group containing 'a'.\n    int leader(int\
+    \ a) {\n        if (parent_or_size[a] < 0) return a;\n        // Path compression\n\
+    \        return parent_or_size[a] = leader(parent_or_size[a]);\n    }\n\n    //\
+    \ Returns the size of the group containing 'a'.\n    int size(int a) {\n     \
+    \   return -parent_or_size[leader(a)];\n    }\n\n    // Returns a list of all\
+    \ groups, where each group is a vector of its elements.\n    std::vector<std::vector<int>>\
     \ groups() {\n        std::vector<int> leader_buf(_n), group_size(_n);\n     \
     \   for (int i = 0; i < _n; i++) {\n            leader_buf[i] = leader(i);\n \
     \           group_size[leader_buf[i]]++;\n        }\n        std::vector<std::vector<int>>\
@@ -116,7 +132,7 @@ data:
   - graph/connected_components.hpp
   - graph/all.hpp
   - graph/undirected.hpp
-  timestamp: '2026-06-20 20:27:35+09:00'
+  timestamp: '2026-07-13 06:09:24+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp
@@ -142,6 +158,25 @@ It is implemented using **Path Compression** and **Union by Size**, achieving an
 
 * `N` is the number of elements.
 
+## Interface
+
+```cpp
+struct Dsu {
+    Dsu();
+    explicit Dsu(int n);
+
+    int merge(int a, int b);
+
+    template <class Callback>
+    int merge(int a, int b, Callback&& callback);
+
+    bool same(int a, int b);
+    int leader(int a);
+    int size(int a);
+    std::vector<std::vector<int>> groups();
+};
+```
+
 ## Methods
 
 | Method | Description | Complexity |
@@ -149,29 +184,64 @@ It is implemented using **Path Compression** and **Union by Size**, achieving an
 | `Dsu()` | Creates an empty DSU. | $O(1)$ |
 | `explicit Dsu(int n)` | Creates `n` singleton sets. | $O(N)$ |
 | `int merge(int a, int b)` | Merges the sets containing `a` and `b`; returns the leader of the merged set. | Amortized $O(\alpha(N))$ |
+| `int merge(int a, int b, Callback&& callback)` | Merges two sets, invokes the callback after an actual merge, and returns the new leader. | Amortized $O(\alpha(N))$ plus callback work |
 | `bool same(int a, int b)` | Returns whether `a` and `b` are in the same set. | Amortized $O(\alpha(N))$ |
 | `int leader(int a)` | Returns the representative of the set containing `a`. | Amortized $O(\alpha(N))$ |
 | `int size(int a)` | Returns the size of the set containing `a`. | Amortized $O(\alpha(N))$ |
 | `std::vector<std::vector<int>> groups()` | Returns all sets as vectors of element indices. | $O(N \alpha(N))$ |
+
+## Merge Callback
+
+The callback overload invokes
+
+```cpp
+callback(new_leader, absorbed_leader);
+```
+
+after two previously distinct components have been merged. At callback time,
+`new_leader` is already the combined component's leader and
+`leader(absorbed_leader) == new_leader`. If the vertices were already
+connected, the callback is not invoked.
+
+This is useful for external component aggregates. Store each aggregate at its
+leader, merge the two entries in the callback, and query through the current
+leader:
+
+```cpp
+std::vector<long long> sum = initial_values;
+
+auto combine = [&](int new_leader, int absorbed_leader) {
+    sum[new_leader] += sum[absorbed_leader];
+};
+
+dsu.merge(a, b, combine);
+long long component_sum = sum[dsu.leader(vertex)];
+```
+
+The entry at `absorbed_leader` becomes stale and does not need to be cleared,
+because that vertex cannot become a leader again.
 
 ## Example
 
 ```cpp
 #include "ds/dsu/dsu.hpp"
 #include <iostream>
+#include <vector>
 
 int main() {
-    // Create DSU with 5 elements (0 to 4)
     m1une::ds::Dsu dsu(5);
+    std::vector<int> sum = {1, 2, 3, 4, 5};
 
-    dsu.merge(0, 1);
-    dsu.merge(2, 3);
-    dsu.merge(1, 2);
+    auto combine = [&](int new_leader, int absorbed_leader) {
+        sum[new_leader] += sum[absorbed_leader];
+    };
 
-    std::cout << (dsu.same(0, 3) ? "Same" : "Different") << "\n"; // Output: Same
-    std::cout << (dsu.same(0, 4) ? "Same" : "Different") << "\n"; // Output: Different
-    std::cout << "Size of group 0: " << dsu.size(0) << "\n";      // Output: 4
+    dsu.merge(0, 1, combine);
+    dsu.merge(2, 3, combine);
+    dsu.merge(1, 2, combine);
 
-    return 0;
+    std::cout << dsu.same(0, 3) << '\n';  // 1
+    std::cout << dsu.size(0) << '\n';  // 4
+    std::cout << sum[dsu.leader(3)] << '\n';  // 1 + 2 + 3 + 4 = 10
 }
 ```
