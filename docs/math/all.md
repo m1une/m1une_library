@@ -54,6 +54,8 @@ You usually do not need to include this entire bundle:
 * Use `repunit.hpp` for a repeated-one numeral or geometric sum in an
   arbitrary base.
 * Use `tetration.hpp` for modular tetration and arbitrary power towers.
+* Use `multiplicative_function_prefix_sum.hpp` for Min_25 summation of a
+  multiplicative function from its prime-power values.
 * Use `totient_sum.hpp` for summatory Euler totient queries.
 * Use `rational.hpp` for normalized exact fractions.
 * Use `stern_brocot_tree.hpp` for positive rational tree paths, ancestors, and
@@ -77,6 +79,7 @@ few unused headers do not matter.
 | `math/lucas.hpp` | Lucas's theorem for huge binomial arguments modulo a small prime. |
 | `math/modint.hpp` | Static modular integer type. |
 | `math/modular_square_root.hpp` | Modular square roots for prime moduli using Tonelli-Shanks. |
+| `math/multiplicative_function_prefix_sum.hpp` | Min_25 prefix sums of a multiplicative function. |
 | `math/fps/all.hpp` | Convolution, formal power series, polynomial algorithms, and linear recurrences. |
 | `math/matrix/all.hpp` | Dense matrices, powers, Gaussian elimination, determinant, inverse, and linear systems. |
 | `math/combinatorics.hpp` | Factorials, binomial coefficients, permutations, and multiset counts. |

@@ -16,6 +16,7 @@
 #include "matrix/all.hpp"
 #include "modint.hpp"
 #include "modular_square_root.hpp"
+#include "multiplicative_function_prefix_sum.hpp"
 #include "number_theory.hpp"
 #include "partition_function.hpp"
 #include "prefix_sum_of_binom.hpp"
