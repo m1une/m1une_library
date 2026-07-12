@@ -3,6 +3,7 @@
 
 #include "base_n.hpp"
 #include "bernoulli.hpp"
+#include "binomial_coefficient_mod.hpp"
 #include "bitwise_convolution.hpp"
 #include "bit_ceil.hpp"
 #include "combinatorics.hpp"

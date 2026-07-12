@@ -31,6 +31,8 @@ You usually do not need to include this entire bundle:
   transforms.
 * Use `combinatorics.hpp` for many factorial, combination, or permutation
   queries under a prime modulus.
+* Use `binomial_coefficient_mod.hpp` for huge binomial arguments modulo one
+  fixed prime-power or composite modulus.
 * Use `lucas.hpp` for binomial coefficients with huge arguments modulo a small
   prime.
 * Use `bernoulli.hpp` for Bernoulli numbers, Bernoulli polynomials, Faulhaber
@@ -75,6 +77,7 @@ few unused headers do not matter.
 | --- | --- |
 | `math/base_n.hpp` | Checked conversion between integers and arbitrary-base digits. |
 | `math/bernoulli.hpp` | Bernoulli numbers and polynomials, power sums, and polynomial discrete integration. |
+| `math/binomial_coefficient_mod.hpp` | Binomial coefficients with 64-bit arguments modulo a fixed arbitrary modulus. |
 | `math/bitwise_convolution.hpp` | OR, AND, XOR convolutions and the Walsh-Hadamard transform. |
 | `math/bit_ceil.hpp` | Smallest power of two at least a given value. |
 | `math/integer_arithmetic.hpp` | Exact integer square roots and overflow-aware powers. |
