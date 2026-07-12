@@ -4,6 +4,7 @@
 #include "bipartite.hpp"
 #include "biconnected_components.hpp"
 #include "block_cut_tree.hpp"
+#include "chromatic_number.hpp"
 #include "connected_components.hpp"
 #include "cycle_detection.hpp"
 #include "eulerian_trail.hpp"
