@@ -26,6 +26,7 @@ contest when convenience matters more.
 | `string/suffix_automaton.hpp` | Online suffix automaton for substring queries and occurrence classes. |
 | `string/suffix_array.hpp` | Suffix array and LCP array. |
 | `string/trie.hpp` | Contiguous-alphabet multiset trie with prefix queries. |
+| `string/wildcard_pattern_matching.hpp` | Exact wildcard matching at every text alignment. |
 | `string/rolling_hash.hpp` | Static substring hashing, LCP, and comparison. |
 | `string/runs.hpp` | Enumerates maximal periodic substrings and their minimum periods. |
 | `string/string_hash.hpp` | Double whole-string hashing and constant-time hash concatenation. |
