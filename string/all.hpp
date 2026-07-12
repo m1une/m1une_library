@@ -10,6 +10,7 @@
 #include "longest_common_substring.hpp"
 #include "lyndon_factorization.hpp"
 #include "manacher.hpp"
+#include "minimum_rotation.hpp"
 #include "rolling_hash.hpp"
 #include "runs.hpp"
 #include "string_hash.hpp"

@@ -9,9 +9,9 @@ The Lyndon factorization decomposes a sequence into a lexicographically
 non-increasing sequence of Lyndon words. It is useful in string ordering,
 minimal rotations, runs, and suffix-related algorithms.
 
-The implementation uses Duval's algorithm. The minimum cyclic shift helper uses
-the same idea and returns the earliest starting position among equal minimum
-rotations.
+The implementation uses Duval's algorithm. Including this header also includes
+`minimum_rotation.hpp` for compatibility, so `minimum_cyclic_shift` remains
+available to existing users.
 
 All functions are generic over indexable sequences such as `std::string` and
 `std::vector<int>`. Elements are compared with `operator<`.
@@ -22,7 +22,7 @@ All functions are generic over indexable sequences such as `std::string` and
 | --- | --- | --- |
 | `vector<int> lyndon_factor_boundaries(const Sequence& sequence)` | Returns boundaries `0 = a[0] < a[1] < ... < a[k] = N`. | $O(N)$ |
 | `vector<pair<int, int>> lyndon_factorization(const Sequence& sequence)` | Returns the factor intervals as half-open ranges `[left, right)`. | $O(N)$ |
-| `int minimum_cyclic_shift(const Sequence& sequence)` | Returns the smallest starting index of a lexicographically minimum cyclic shift. | $O(N)$ |
+| `int minimum_cyclic_shift(const Sequence& sequence)` | Compatibility re-export from `minimum_rotation.hpp`; returns the earliest minimum cyclic shift. | $O(N)$ |
 
 For an empty sequence, `lyndon_factor_boundaries` returns `{0}`,
 `lyndon_factorization` returns an empty vector, and `minimum_cyclic_shift`

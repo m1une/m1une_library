@@ -4,6 +4,8 @@
 #include <utility>
 #include <vector>
 
+#include "minimum_rotation.hpp"
+
 namespace m1une {
 namespace string {
 
@@ -47,38 +49,6 @@ std::vector<std::pair<int, int>> lyndon_factorization(const Sequence& sequence) 
         factors.emplace_back(boundaries[i], boundaries[i + 1]);
     }
     return factors;
-}
-
-// Returns the smallest starting index of a lexicographically minimum cyclic shift.
-template <class Sequence>
-int minimum_cyclic_shift(const Sequence& sequence) {
-    int n = int(sequence.size());
-    if (n == 0) return 0;
-
-    auto less = [&](int left, int right) {
-        return sequence[left < n ? left : left - n] <
-               sequence[right < n ? right : right - n];
-    };
-
-    int answer = 0;
-    int i = 0;
-    while (i < n) {
-        answer = i;
-        int j = i + 1;
-        int k = i;
-        while (j < 2 * n && !less(j, k)) {
-            if (less(k, j)) {
-                k = i;
-            } else {
-                k++;
-            }
-            j++;
-        }
-
-        int length = j - k;
-        while (i <= k) i += length;
-    }
-    return answer;
 }
 
 }  // namespace string
