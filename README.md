@@ -92,7 +92,7 @@ plumbing live in `utilities/`.
 | `ds/binary_trie/` | Binary tries for integer xor queries and optional monoid aggregates. |
 | `ds/dynamic_tree/` | Link-cut trees and rake-compress trees for changing forests. |
 | `ds/dynamic_connectivity/` | Online and offline connectivity under edge insertions and deletions. |
-| `ds/heap/` | Meldable priority queues. |
+| `ds/heap/` | Double-ended and meldable priority queues. |
 | `ds/interval_set/` | Disjoint interval maintenance. |
 | `ds/hash_table/` | Hash maps and hash sets. |
 
