@@ -54,6 +54,7 @@
 "verify/ds/hash_table/hash_map.test.cpp": "2026-06-27 03:13:10 +0900",
 "verify/ds/hash_table/hash_map_associative_array.test.cpp": "2026-06-21 04:34:53 +0900",
 "verify/ds/hash_table/hash_set.test.cpp": "2026-06-27 03:02:09 +0900",
+"verify/ds/heap/double_ended_priority_queue.test.cpp": "2026-07-13 05:54:43 +0900",
 "verify/ds/heap/meldable_heap.test.cpp": "2026-06-23 02:41:38 +0900",
 "verify/ds/interval_set/interval_set.test.cpp": "2026-06-21 17:44:01 +0900",
 "verify/ds/range_query/cumulative_sum.test.cpp": "2026-07-03 14:46:35 +0900",
