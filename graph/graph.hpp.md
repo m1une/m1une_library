@@ -24,6 +24,9 @@ data:
     path: graph/block_cut_tree.hpp
     title: Block-Cut Tree
   - icon: ':heavy_check_mark:'
+    path: graph/chromatic_number.hpp
+    title: Chromatic Number
+  - icon: ':heavy_check_mark:'
     path: graph/connected_components.hpp
     title: Connected Components
   - icon: ':heavy_check_mark:'
@@ -150,6 +153,18 @@ data:
   - icon: ':x:'
     path: verify/graph/block_cut_tree.test.cpp
     title: verify/graph/block_cut_tree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/chromatic_number.test.cpp
+    title: verify/graph/chromatic_number.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/chromatic_number.test.cpp
+    title: verify/graph/chromatic_number.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/chromatic_number_randomized.test.cpp
+    title: verify/graph/chromatic_number_randomized.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/chromatic_number_randomized.test.cpp
+    title: verify/graph/chromatic_number_randomized.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/cow_game.test.cpp
     title: verify/graph/cow_game.test.cpp
@@ -377,6 +392,7 @@ data:
   - graph/minimum_steiner_tree.hpp
   - graph/bellman_ford.hpp
   - graph/dag_shortest_path.hpp
+  - graph/chromatic_number.hpp
   - graph/eulerian_trail.hpp
   - graph/namori.hpp
   - graph/tree/zero_one_on_tree.hpp
@@ -447,10 +463,14 @@ data:
   - verify/graph/biconnected_components.test.cpp
   - verify/graph/dominator_tree.test.cpp
   - verify/graph/dominator_tree.test.cpp
+  - verify/graph/chromatic_number_randomized.test.cpp
+  - verify/graph/chromatic_number_randomized.test.cpp
   - verify/graph/block_cut_tree.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/namori.test.cpp
+  - verify/graph/chromatic_number.test.cpp
+  - verify/graph/chromatic_number.test.cpp
   - verify/graph/directed_mst.test.cpp
   - verify/graph/two_edge_connected_components.test.cpp
 documentation_of: graph/graph.hpp

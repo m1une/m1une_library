@@ -498,6 +498,9 @@ data:
       path: graph/block_cut_tree.hpp
       title: Block-Cut Tree
     - icon: ':heavy_check_mark:'
+      path: graph/chromatic_number.hpp
+      title: Chromatic Number
+    - icon: ':heavy_check_mark:'
       path: graph/connected_components.hpp
       title: Connected Components
     - icon: ':heavy_check_mark:'
@@ -1394,6 +1397,12 @@ data:
     - icon: ':x:'
       path: verify/graph/block_cut_tree.test.cpp
       title: verify/graph/block_cut_tree.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/chromatic_number.test.cpp
+      title: verify/graph/chromatic_number.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/chromatic_number_randomized.test.cpp
+      title: verify/graph/chromatic_number_randomized.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/graph/cow_game.test.cpp
       title: verify/graph/cow_game.test.cpp

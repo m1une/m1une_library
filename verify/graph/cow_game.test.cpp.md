@@ -26,6 +26,9 @@ data:
     path: graph/block_cut_tree.hpp
     title: Block-Cut Tree
   - icon: ':heavy_check_mark:'
+    path: graph/chromatic_number.hpp
+    title: Chromatic Number
+  - icon: ':heavy_check_mark:'
     path: graph/connected_components.hpp
     title: Connected Components
   - icon: ':heavy_check_mark:'
@@ -361,6 +364,7 @@ data:
   - graph/bipartite.hpp
   - graph/biconnected_components.hpp
   - graph/block_cut_tree.hpp
+  - graph/chromatic_number.hpp
   - graph/connected_components.hpp
   - ds/dsu/dsu.hpp
   - graph/general_matching.hpp
@@ -373,7 +377,7 @@ data:
   isVerificationFile: true
   path: verify/graph/cow_game.test.cpp
   requiredBy: []
-  timestamp: '2026-07-13 03:42:12+09:00'
+  timestamp: '2026-07-13 03:53:33+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/cow_game.test.cpp

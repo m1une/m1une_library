@@ -20,6 +20,9 @@ data:
     path: graph/block_cut_tree.hpp
     title: Block-Cut Tree
   - icon: ':heavy_check_mark:'
+    path: graph/chromatic_number.hpp
+    title: Chromatic Number
+  - icon: ':heavy_check_mark:'
     path: graph/connected_components.hpp
     title: Connected Components
   - icon: ':heavy_check_mark:'
@@ -411,7 +414,41 @@ data:
     \            result.forest[block_node].push_back(node);\n        }\n    }\n  \
     \  return result;\n}\n\ntemplate <class T>\nBlockCutTreeResult block_cut_tree(const\
     \ Graph<T>& graph) {\n    return block_cut_tree(biconnected_components(graph));\n\
-    }\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/connected_components.hpp\"\
+    }\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/chromatic_number.hpp\"\
+    \n\n\n\n#include <array>\n#include <bit>\n#line 7 \"graph/chromatic_number.hpp\"\
+    \n#include <cstdint>\n#line 9 \"graph/chromatic_number.hpp\"\n\n#line 11 \"graph/chromatic_number.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\nnamespace detail {\n\nstruct ChromaticResidues\
+    \ {\n    static constexpr std::array<std::uint32_t, 14> mod = {\n        1000000007,\
+    \ 1000000009, 998244353, 985661441, 943718401, 935329793, 918552577,\n       \
+    \ 897581057,  880803841,  754974721, 645922817, 595591169, 469762049, 167772161,\n\
+    \    };\n\n    std::array<std::uint32_t, 14> value;\n\n    explicit ChromaticResidues(std::uint32_t\
+    \ x = 0) {\n        value.fill(x);\n    }\n\n    void multiply(std::uint32_t x)\
+    \ {\n        for (int i = 0; i < int(mod.size()); i++) {\n            value[i]\
+    \ = std::uint32_t(std::uint64_t(value[i]) * x % mod[i]);\n        }\n    }\n};\n\
+    \n}  // namespace detail\n\ntemplate <class T>\nint chromatic_number(const Graph<T>&\
+    \ g) {\n    int n = g.size();\n    assert(n <= 20);\n    if (n == 0) return 0;\n\
+    \n    std::vector<std::uint32_t> adjacent(n, 0);\n    for (const auto& e : g.edges())\
+    \ {\n        if (e.from == e.to) continue;\n        adjacent[e.from] |= std::uint32_t(1)\
+    \ << e.to;\n        adjacent[e.to] |= std::uint32_t(1) << e.from;\n    }\n\n \
+    \   std::uint32_t subset_count = std::uint32_t(1) << n;\n    std::vector<std::uint32_t>\
+    \ independent_count(subset_count, 0);\n    independent_count[0] = 1;\n    for\
+    \ (std::uint32_t mask = 1; mask < subset_count; mask++) {\n        int v = std::countr_zero(mask);\n\
+    \        std::uint32_t rest = mask ^ (std::uint32_t(1) << v);\n        independent_count[mask]\
+    \ =\n            independent_count[rest] + independent_count[rest & ~adjacent[v]];\n\
+    \    }\n\n    std::vector<detail::ChromaticResidues> power(subset_count, detail::ChromaticResidues(1));\n\
+    \    for (int colors = 1; colors <= n; colors++) {\n        std::array<std::uint32_t,\
+    \ 14> sum = {};\n        for (std::uint32_t mask = 0; mask < subset_count; mask++)\
+    \ {\n            power[mask].multiply(independent_count[mask]);\n            bool\
+    \ positive = ((n - std::popcount(mask)) & 1) == 0;\n            for (int i = 0;\
+    \ i < int(sum.size()); i++) {\n                std::uint32_t x = power[mask].value[i];\n\
+    \                if (positive) {\n                    sum[i] += x;\n         \
+    \           if (sum[i] >= detail::ChromaticResidues::mod[i]) {\n             \
+    \           sum[i] -= detail::ChromaticResidues::mod[i];\n                   \
+    \ }\n                } else {\n                    sum[i] = (sum[i] >= x ? sum[i]\
+    \ - x\n                                          : sum[i] + detail::ChromaticResidues::mod[i]\
+    \ - x);\n                }\n            }\n        }\n        for (std::uint32_t\
+    \ x : sum) {\n            if (x != 0) return colors;\n        }\n    }\n    return\
+    \ n;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/connected_components.hpp\"\
     \n\n\n\n#line 6 \"graph/connected_components.hpp\"\n\n#line 1 \"ds/dsu/dsu.hpp\"\
     \n\n\n\n#include <algorithm>\n#include <numeric>\n#line 7 \"ds/dsu/dsu.hpp\"\n\
     \nnamespace m1une {\nnamespace ds {\n\nstruct Dsu {\n   private:\n    int _n;\n\
@@ -894,21 +931,21 @@ data:
     \        if (int(result.original_edge_id.size()) <= id) result.original_edge_id.resize(id\
     \ + 1);\n        result.original_edge_id[id] = e.id;\n    }\n    return result;\n\
     }\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/grid.hpp\"\
-    \n\n\n\n#include <array>\n#line 8 \"graph/grid.hpp\"\n\n#line 10 \"graph/grid.hpp\"\
-    \n\nnamespace m1une {\nnamespace graph {\n\nstruct Grid {\n   private:\n    int\
-    \ _h;\n    int _w;\n\n   public:\n    static constexpr std::array<int, 4> di4\
-    \ = {-1, 0, 1, 0};\n    static constexpr std::array<int, 4> dj4 = {0, 1, 0, -1};\n\
-    \    static constexpr std::array<int, 8> di8 = {-1, -1, -1, 0, 0, 1, 1, 1};\n\
-    \    static constexpr std::array<int, 8> dj8 = {-1, 0, 1, -1, 1, -1, 0, 1};\n\n\
-    \    Grid() : _h(0), _w(0) {}\n    Grid(int h, int w) : _h(h), _w(w) {\n     \
-    \   assert(0 <= h);\n        assert(0 <= w);\n    }\n\n    int height() const\
-    \ {\n        return _h;\n    }\n\n    int width() const {\n        return _w;\n\
-    \    }\n\n    int size() const {\n        return _h * _w;\n    }\n\n    bool empty()\
-    \ const {\n        return size() == 0;\n    }\n\n    bool inside(int i, int j)\
-    \ const {\n        return 0 <= i && i < _h && 0 <= j && j < _w;\n    }\n\n   \
-    \ int id(int i, int j) const {\n        assert(inside(i, j));\n        return\
-    \ i * _w + j;\n    }\n\n    std::pair<int, int> pos(int v) const {\n        assert(0\
-    \ <= v && v < size());\n        return {v / _w, v % _w};\n    }\n\n    std::vector<std::pair<int,\
+    \n\n\n\n#line 8 \"graph/grid.hpp\"\n\n#line 10 \"graph/grid.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace graph {\n\nstruct Grid {\n   private:\n    int _h;\n    int\
+    \ _w;\n\n   public:\n    static constexpr std::array<int, 4> di4 = {-1, 0, 1,\
+    \ 0};\n    static constexpr std::array<int, 4> dj4 = {0, 1, 0, -1};\n    static\
+    \ constexpr std::array<int, 8> di8 = {-1, -1, -1, 0, 0, 1, 1, 1};\n    static\
+    \ constexpr std::array<int, 8> dj8 = {-1, 0, 1, -1, 1, -1, 0, 1};\n\n    Grid()\
+    \ : _h(0), _w(0) {}\n    Grid(int h, int w) : _h(h), _w(w) {\n        assert(0\
+    \ <= h);\n        assert(0 <= w);\n    }\n\n    int height() const {\n       \
+    \ return _h;\n    }\n\n    int width() const {\n        return _w;\n    }\n\n\
+    \    int size() const {\n        return _h * _w;\n    }\n\n    bool empty() const\
+    \ {\n        return size() == 0;\n    }\n\n    bool inside(int i, int j) const\
+    \ {\n        return 0 <= i && i < _h && 0 <= j && j < _w;\n    }\n\n    int id(int\
+    \ i, int j) const {\n        assert(inside(i, j));\n        return i * _w + j;\n\
+    \    }\n\n    std::pair<int, int> pos(int v) const {\n        assert(0 <= v &&\
+    \ v < size());\n        return {v / _w, v % _w};\n    }\n\n    std::vector<std::pair<int,\
     \ int>> adj4(int i, int j) const {\n        assert(inside(i, j));\n        std::vector<std::pair<int,\
     \ int>> result;\n        result.reserve(4);\n        for (int k = 0; k < 4; k++)\
     \ {\n            int ni = i + di4[k], nj = j + dj4[k];\n            if (inside(ni,\
@@ -1110,16 +1147,16 @@ data:
     \    }\n    return result;\n}\n\ntemplate <class T>\nint minimum_vertex_cover_size(const\
     \ Graph<T>& g) {\n    return minimum_vertex_cover(g).size();\n}\n\n}  // namespace\
     \ graph\n}  // namespace m1une\n\n\n#line 1 \"graph/minimum_steiner_tree.hpp\"\
-    \n\n\n\n#line 5 \"graph/minimum_steiner_tree.hpp\"\n#include <bit>\n#line 7 \"\
-    graph/minimum_steiner_tree.hpp\"\n#include <cstddef>\n#include <functional>\n\
-    #include <limits>\n#line 12 \"graph/minimum_steiner_tree.hpp\"\n#include <type_traits>\n\
-    #line 15 \"graph/minimum_steiner_tree.hpp\"\n\n#line 17 \"graph/minimum_steiner_tree.hpp\"\
-    \n\nnamespace m1une {\nnamespace graph {\n\ntemplate <class Cost>\nstruct MinimumSteinerTreeResult\
-    \ {\n    Cost cost;\n    std::vector<int> edge_ids;\n    std::vector<int> vertices;\n\
-    };\n\nnamespace internal {\n\ninline std::vector<int> steiner_terminals(int n,\
-    \ std::vector<int> terminals) {\n    for (int v : terminals) assert(0 <= v &&\
-    \ v < n);\n    std::sort(terminals.begin(), terminals.end());\n    terminals.erase(std::unique(terminals.begin(),\
-    \ terminals.end()), terminals.end());\n    assert(terminals.size() < std::numeric_limits<std::size_t>::digits);\n\
+    \n\n\n\n#line 7 \"graph/minimum_steiner_tree.hpp\"\n#include <cstddef>\n#include\
+    \ <functional>\n#include <limits>\n#line 12 \"graph/minimum_steiner_tree.hpp\"\
+    \n#include <type_traits>\n#line 15 \"graph/minimum_steiner_tree.hpp\"\n\n#line\
+    \ 17 \"graph/minimum_steiner_tree.hpp\"\n\nnamespace m1une {\nnamespace graph\
+    \ {\n\ntemplate <class Cost>\nstruct MinimumSteinerTreeResult {\n    Cost cost;\n\
+    \    std::vector<int> edge_ids;\n    std::vector<int> vertices;\n};\n\nnamespace\
+    \ internal {\n\ninline std::vector<int> steiner_terminals(int n, std::vector<int>\
+    \ terminals) {\n    for (int v : terminals) assert(0 <= v && v < n);\n    std::sort(terminals.begin(),\
+    \ terminals.end());\n    terminals.erase(std::unique(terminals.begin(), terminals.end()),\
+    \ terminals.end());\n    assert(terminals.size() < std::numeric_limits<std::size_t>::digits);\n\
     \    return terminals;\n}\n\ntemplate <class Cost>\nstruct MinimumSteinerTreeDp\
     \ {\n    Cost cost;\n    Cost inf;\n    std::size_t states;\n    std::size_t width;\n\
     \    std::vector<Cost> dp;\n    std::vector<int> terminals;\n};\n\ntemplate <class\
@@ -1754,7 +1791,7 @@ data:
     \   assert(first_component != second_component);\n        result.bridge_forest_edges.push_back(\n\
     \            TwoEdgeConnectedBridge{first_component, second_component, edge_id});\n\
     \    }\n    return result;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\
-    \n\n#line 20 \"graph/undirected.hpp\"\n\n\n"
+    \n\n#line 21 \"graph/undirected.hpp\"\n\n\n"
   code: '#ifndef M1UNE_GRAPH_UNDIRECTED_HPP
 
     #define M1UNE_GRAPH_UNDIRECTED_HPP 1
@@ -1765,6 +1802,8 @@ data:
     #include "biconnected_components.hpp"
 
     #include "block_cut_tree.hpp"
+
+    #include "chromatic_number.hpp"
 
     #include "connected_components.hpp"
 
@@ -1801,6 +1840,7 @@ data:
   - graph/graph.hpp
   - graph/biconnected_components.hpp
   - graph/block_cut_tree.hpp
+  - graph/chromatic_number.hpp
   - graph/connected_components.hpp
   - ds/dsu/dsu.hpp
   - graph/cycle_detection.hpp
@@ -1826,7 +1866,7 @@ data:
   path: graph/undirected.hpp
   requiredBy:
   - graph/all.hpp
-  timestamp: '2026-07-13 03:42:12+09:00'
+  timestamp: '2026-07-13 03:53:33+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
@@ -1860,6 +1900,7 @@ where direction should not matter.
 | `graph/bipartite.hpp` | Direction ignored / explicit bipartite sides | Two-colorability, maximum matching, minimum vertex cover, maximum independent set, and minimum edge cover. |
 | `graph/general_matching.hpp` | Undirected only | Maximum-cardinality matching and minimum edge cover in general undirected graphs. |
 | `graph/maximum_clique.hpp` | Direction ignored | Exact maximum clique, maximum independent set, and minimum vertex cover with bitset branch-and-bound. |
+| `graph/chromatic_number.hpp` | Direction ignored | Exact chromatic number for graphs with at most 20 vertices. |
 | `graph/minimum_steiner_tree.hpp` | Undirected only | Exact edge- and vertex-weighted minimum Steiner-tree costs and reconstruction for a small terminal set. |
 | `graph/namori.hpp` | Undirected Namori graph | Ordered cycles and the trees attached to them. |
 | `graph/connected_components.hpp` | Direction ignored | Weak/ordinary connected components. |
