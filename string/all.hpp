@@ -11,6 +11,7 @@
 #include "manacher.hpp"
 #include "prefix_function.hpp"
 #include "rolling_hash.hpp"
+#include "runs.hpp"
 #include "string_hash.hpp"
 #include "suffix_automaton.hpp"
 #include "suffix_array.hpp"
