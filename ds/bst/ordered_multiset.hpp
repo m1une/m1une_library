@@ -1,9 +1,8 @@
 #ifndef M1UNE_ORDERED_MULTISET_HPP
 #define M1UNE_ORDERED_MULTISET_HPP 1
 
+#include <algorithm>
 #include <cassert>
-#include <chrono>
-#include <cstdint>
 #include <functional>
 #include <initializer_list>
 #include <memory>
@@ -13,40 +12,43 @@
 namespace m1une {
 namespace ds {
 
-template <typename T, typename Compare>
-struct OrderedSet;
-
 template <typename T, typename Compare = std::less<T>>
 struct OrderedMultiset {
    private:
-    friend struct OrderedSet<T, Compare>;
     struct Node {
         T key;
-        int priority;
         int count;
         int size;
         int distinct_size;
+        int height;
         Node* l;
         Node* r;
 
-        Node(T value, int node_priority, int multiplicity)
+        Node(T value, int multiplicity)
             : key(std::move(value)),
-              priority(node_priority),
               count(multiplicity),
               size(multiplicity),
               distinct_size(1),
+              height(1),
               l(nullptr),
               r(nullptr) {}
     };
 
-    static constexpr int pool_block_bits = 14;
-    static constexpr int pool_block_size = 1 << pool_block_bits;
+    static constexpr int pool_block_size = 1 << 14;
 
     struct Pool {
         std::vector<std::vector<Node>> blocks;
+        std::vector<Node*> free_nodes;
 
         template <class... Args>
         Node* emplace(Args&&... args) {
+            if (!free_nodes.empty()) {
+                Node* result = free_nodes.back();
+                free_nodes.pop_back();
+                std::destroy_at(result);
+                std::construct_at(result, std::forward<Args>(args)...);
+                return result;
+            }
             if (blocks.empty() || int(blocks.back().size()) == pool_block_size) {
                 blocks.emplace_back();
                 blocks.back().reserve(pool_block_size);
@@ -54,22 +56,15 @@ struct OrderedMultiset {
             blocks.back().emplace_back(std::forward<Args>(args)...);
             return &blocks.back().back();
         }
+
+        void recycle(Node* node) {
+            free_nodes.push_back(node);
+        }
     };
 
-    struct Ownership {
-        std::shared_ptr<Pool> pool;
-        std::shared_ptr<Ownership> l;
-        std::shared_ptr<Ownership> r;
+    inline static Pool pool;
 
-        explicit Ownership(std::shared_ptr<Pool> node_pool) : pool(std::move(node_pool)) {}
-        Ownership(std::shared_ptr<Ownership> left, std::shared_ptr<Ownership> right)
-            : l(std::move(left)), r(std::move(right)) {}
-    };
-
-    std::shared_ptr<Pool> allocation_pool;
-    std::shared_ptr<Ownership> ownership;
     Node* root;
-    std::uint32_t rng_state;
     Compare comp;
 
     static int subtree_size(const Node* t) {
@@ -80,151 +75,175 @@ struct OrderedMultiset {
         return t == nullptr ? 0 : t->distinct_size;
     }
 
+    static int subtree_height(const Node* t) {
+        return t == nullptr ? 0 : t->height;
+    }
+
     bool equal(const T& a, const T& b) const {
         return !comp(a, b) && !comp(b, a);
     }
 
-    int next_priority() {
-        rng_state ^= rng_state << 13;
-        rng_state ^= rng_state >> 17;
-        rng_state ^= rng_state << 5;
-        if (rng_state == 0) rng_state = 1;
-        return int(rng_state);
-    }
-
     Node* new_node(T key, int multiplicity) {
-        return allocation_pool->emplace(std::move(key), next_priority(), multiplicity);
+        return pool.emplace(std::move(key), multiplicity);
     }
 
     static void update(Node* t) {
-        if (t == nullptr) return;
         t->size = t->count + subtree_size(t->l) + subtree_size(t->r);
         t->distinct_size = 1 + subtree_distinct_size(t->l) + subtree_distinct_size(t->r);
+        t->height = 1 + std::max(subtree_height(t->l), subtree_height(t->r));
     }
 
-    static Node* merge_nodes(Node* l, Node* r) {
-        if (l == nullptr || r == nullptr) return l == nullptr ? r : l;
-        if (l->priority > r->priority) {
-            l->r = merge_nodes(l->r, r);
-            update(l);
-            return l;
-        }
-        r->l = merge_nodes(l, r->l);
-        update(r);
-        return r;
-    }
-
-    std::pair<Node*, Node*> split_nodes(Node* t, const T& key) {
-        if (t == nullptr) return {nullptr, nullptr};
-        if (comp(t->key, key)) {
-            auto [l, r] = split_nodes(t->r, key);
-            t->r = l;
-            update(t);
-            return {t, r};
-        }
-        auto [l, r] = split_nodes(t->l, key);
-        t->l = r;
-        update(t);
-        return {l, t};
-    }
-
-    void rotate_right(Node*& t) {
+    static Node* rotate_right(Node* t) {
         Node* s = t->l;
         t->l = s->r;
         s->r = t;
         update(t);
         update(s);
-        t = s;
+        return s;
     }
 
-    void rotate_left(Node*& t) {
+    static Node* rotate_left(Node* t) {
         Node* s = t->r;
         t->r = s->l;
         s->l = t;
         update(t);
         update(s);
-        t = s;
+        return s;
     }
 
-    Node* insert_impl(Node* t, T& key, int multiplicity) {
-        if (t == nullptr) return new_node(std::move(key), multiplicity);
-        if (equal(key, t->key)) {
+    static Node* balance(Node* t) {
+        if (t == nullptr) return nullptr;
+        update(t);
+        const int balance_factor = subtree_height(t->l) - subtree_height(t->r);
+        if (balance_factor > 1) {
+            if (subtree_height(t->l->l) < subtree_height(t->l->r)) {
+                t->l = rotate_left(t->l);
+            }
+            return rotate_right(t);
+        }
+        if (balance_factor < -1) {
+            if (subtree_height(t->r->r) < subtree_height(t->r->l)) {
+                t->r = rotate_right(t->r);
+            }
+            return rotate_left(t);
+        }
+        return t;
+    }
+
+    static Node* join_with_root(Node* l, Node* middle, Node* r) {
+        if (subtree_height(l) > subtree_height(r) + 1) {
+            l->r = join_with_root(l->r, middle, r);
+            return balance(l);
+        }
+        if (subtree_height(r) > subtree_height(l) + 1) {
+            r->l = join_with_root(l, middle, r->l);
+            return balance(r);
+        }
+        middle->l = l;
+        middle->r = r;
+        return balance(middle);
+    }
+
+    static Node* detach_max(Node* t, Node*& maximum) {
+        if (t->r == nullptr) {
+            maximum = t;
+            return t->l;
+        }
+        t->r = detach_max(t->r, maximum);
+        return balance(t);
+    }
+
+    static Node* merge_nodes(Node* l, Node* r) {
+        if (l == nullptr || r == nullptr) return l == nullptr ? r : l;
+        Node* middle;
+        l = detach_max(l, middle);
+        return join_with_root(l, middle, r);
+    }
+
+    std::pair<Node*, Node*> split_nodes(Node* t, const T& key) {
+        if (t == nullptr) return {nullptr, nullptr};
+        Node* left = t->l;
+        Node* right = t->r;
+        t->l = nullptr;
+        t->r = nullptr;
+        if (comp(t->key, key)) {
+            auto [l, r] = split_nodes(right, key);
+            return {join_with_root(left, t, l), r};
+        }
+        auto [l, r] = split_nodes(left, key);
+        return {l, join_with_root(r, t, right)};
+    }
+
+    Node* insert_impl(Node* t, T& key, int multiplicity, bool& new_key, bool& grew) {
+        if (t == nullptr) {
+            new_key = true;
+            grew = true;
+            return new_node(std::move(key), multiplicity);
+        }
+        const int old_height = t->height;
+        if (comp(key, t->key)) {
+            t->l = insert_impl(t->l, key, multiplicity, new_key, grew);
+        } else if (comp(t->key, key)) {
+            t->r = insert_impl(t->r, key, multiplicity, new_key, grew);
+        } else {
             t->count += multiplicity;
-            update(t);
+            t->size += multiplicity;
+            new_key = false;
+            grew = false;
             return t;
         }
-        if (comp(key, t->key)) {
-            t->l = insert_impl(t->l, key, multiplicity);
-            if (t->l->priority > t->priority) rotate_right(t);
-        } else {
-            t->r = insert_impl(t->r, key, multiplicity);
-            if (t->r->priority > t->priority) rotate_left(t);
+        if (!grew) {
+            t->size += multiplicity;
+            t->distinct_size += int(new_key);
+            return t;
         }
-        update(t);
+        t = balance(t);
+        grew = t->height > old_height;
         return t;
     }
 
-    Node* insert_unique_impl(Node* t, T& key, bool& inserted) {
+    Node* erase_impl(Node* t, const T& key, bool erase_all,
+                     int& erased, bool& removed_key, bool& shrunk) {
         if (t == nullptr) {
-            inserted = true;
-            return new_node(std::move(key), 1);
+            shrunk = false;
+            return nullptr;
         }
-        if (equal(key, t->key)) return t;
+        const int old_height = t->height;
         if (comp(key, t->key)) {
-            t->l = insert_unique_impl(t->l, key, inserted);
-            if (!inserted) return t;
-            if (t->l->priority > t->priority) rotate_right(t);
+            t->l = erase_impl(t->l, key, erase_all, erased, removed_key, shrunk);
+        } else if (comp(t->key, key)) {
+            t->r = erase_impl(t->r, key, erase_all, erased, removed_key, shrunk);
+        } else if (!erase_all && t->count > 1) {
+            --t->count;
+            --t->size;
+            erased = 1;
+            removed_key = false;
+            shrunk = false;
+            return t;
         } else {
-            t->r = insert_unique_impl(t->r, key, inserted);
-            if (!inserted) return t;
-            if (t->r->priority > t->priority) rotate_left(t);
-        }
-        update(t);
-        return t;
-    }
-
-    bool erase_one_impl(Node*& t, const T& key) {
-        if (t == nullptr) return false;
-        bool erased;
-        if (equal(key, t->key)) {
-            if (t->count > 1) {
-                --t->count;
-                erased = true;
-            } else {
-                t = merge_nodes(t->l, t->r);
-                return true;
-            }
-        } else if (comp(key, t->key)) {
-            erased = erase_one_impl(t->l, key);
-        } else {
-            erased = erase_one_impl(t->r, key);
-        }
-        if (!erased) return false;
-        update(t);
-        return true;
-    }
-
-    int erase_all_impl(Node*& t, const T& key) {
-        if (t == nullptr) return 0;
-        int erased;
-        if (equal(key, t->key)) {
             erased = t->count;
-            t = merge_nodes(t->l, t->r);
-            return erased;
+            removed_key = true;
+            Node* l = t->l;
+            Node* r = t->r;
+            pool.recycle(t);
+            Node* result = merge_nodes(l, r);
+            shrunk = subtree_height(result) < old_height;
+            return result;
         }
-        if (comp(key, t->key)) {
-            erased = erase_all_impl(t->l, key);
-        } else {
-            erased = erase_all_impl(t->r, key);
+        if (erased == 0) return t;
+        if (!shrunk) {
+            t->size -= erased;
+            t->distinct_size -= int(removed_key);
+            return t;
         }
-        if (erased == 0) return 0;
-        update(t);
-        return erased;
+        t = balance(t);
+        shrunk = t->height < old_height;
+        return t;
     }
 
     static const T* kth_impl(const Node* t, int k) {
         while (t != nullptr) {
-            int left_size = subtree_size(t->l);
+            const int left_size = subtree_size(t->l);
             if (k < left_size) {
                 t = t->l;
             } else if (k < left_size + t->count) {
@@ -239,8 +258,13 @@ struct OrderedMultiset {
 
     int count_impl(const Node* t, const T& key) const {
         while (t != nullptr) {
-            if (equal(key, t->key)) return t->count;
-            t = comp(key, t->key) ? t->l : t->r;
+            if (comp(key, t->key)) {
+                t = t->l;
+            } else if (comp(t->key, key)) {
+                t = t->r;
+            } else {
+                return t->count;
+            }
         }
         return 0;
     }
@@ -294,54 +318,49 @@ struct OrderedMultiset {
         dump_impl(t->r, result);
     }
 
+    static void recycle_impl(Node* t) {
+        if (t == nullptr) return;
+        recycle_impl(t->l);
+        recycle_impl(t->r);
+        pool.recycle(t);
+    }
+
     Node* clone_impl(const Node* t) {
         if (t == nullptr) return nullptr;
-        Node* result = allocation_pool->emplace(t->key, t->priority, t->count);
+        Node* result = new_node(t->key, t->count);
         result->l = clone_impl(t->l);
         result->r = clone_impl(t->r);
         update(result);
         return result;
     }
 
-    OrderedMultiset(Node* node, std::uint32_t state, Compare compare,
-                    std::shared_ptr<Pool> node_pool, std::shared_ptr<Ownership> node_ownership)
-        : allocation_pool(std::move(node_pool)),
-          ownership(std::move(node_ownership)),
-          root(node),
-          rng_state(state),
-          comp(std::move(compare)) {}
+    OrderedMultiset(Node* node, Compare compare) : root(node), comp(std::move(compare)) {}
 
    public:
-    explicit OrderedMultiset(Compare compare)
-        : allocation_pool(std::make_shared<Pool>()),
-          ownership(std::make_shared<Ownership>(allocation_pool)),
-          root(nullptr),
-          rng_state(std::uint32_t(std::chrono::steady_clock::now().time_since_epoch().count())),
-          comp(std::move(compare)) {
-        if (rng_state == 0) rng_state = 1;
-    }
-
+    explicit OrderedMultiset(Compare compare) : root(nullptr), comp(std::move(compare)) {}
     OrderedMultiset() : OrderedMultiset(Compare()) {}
 
-    OrderedMultiset(std::initializer_list<T> init, Compare compare = Compare()) : OrderedMultiset(std::move(compare)) {
+    OrderedMultiset(std::initializer_list<T> init, Compare compare = Compare())
+        : OrderedMultiset(std::move(compare)) {
         for (const T& x : init) insert(x);
     }
 
     template <typename Iterator>
-    OrderedMultiset(Iterator first, Iterator last, Compare compare = Compare()) : OrderedMultiset(std::move(compare)) {
+    OrderedMultiset(Iterator first, Iterator last, Compare compare = Compare())
+        : OrderedMultiset(std::move(compare)) {
         while (first != last) insert(*first++);
     }
 
-    OrderedMultiset(const OrderedMultiset& other)
-        : allocation_pool(std::make_shared<Pool>()),
-          ownership(std::make_shared<Ownership>(allocation_pool)),
-          root(nullptr),
-          rng_state(other.rng_state),
-          comp(other.comp) {
+    OrderedMultiset(const OrderedMultiset& other) : root(nullptr), comp(other.comp) {
         root = clone_impl(other.root);
     }
 
-    OrderedMultiset(OrderedMultiset&&) noexcept = default;
+    OrderedMultiset(OrderedMultiset&& other) noexcept
+        : root(std::exchange(other.root, nullptr)), comp(std::move(other.comp)) {}
+
+    ~OrderedMultiset() {
+        recycle_impl(root);
+    }
 
     OrderedMultiset& operator=(OrderedMultiset other) {
         swap(other);
@@ -350,10 +369,7 @@ struct OrderedMultiset {
 
     void swap(OrderedMultiset& other) noexcept {
         using std::swap;
-        swap(allocation_pool, other.allocation_pool);
-        swap(ownership, other.ownership);
         swap(root, other.root);
-        swap(rng_state, other.rng_state);
         swap(comp, other.comp);
     }
 
@@ -362,27 +378,35 @@ struct OrderedMultiset {
     bool empty() const { return root == nullptr; }
 
     void clear() {
-        allocation_pool = std::make_shared<Pool>();
-        ownership = std::make_shared<Ownership>(allocation_pool);
+        recycle_impl(root);
         root = nullptr;
     }
 
     void insert(T key, int multiplicity = 1) {
         assert(multiplicity > 0);
-        root = insert_impl(root, key, multiplicity);
+        bool new_key = false;
+        bool grew = false;
+        root = insert_impl(root, key, multiplicity, new_key, grew);
     }
 
-   private:
-    bool insert_unique(T key) {
-        bool inserted = false;
-        root = insert_unique_impl(root, key, inserted);
-        return inserted;
+    bool erase_one(const T& key) {
+        int erased = 0;
+        bool removed_key = false;
+        bool shrunk = false;
+        root = erase_impl(root, key, false, erased, removed_key, shrunk);
+        return erased != 0;
     }
 
-   public:
-    bool erase_one(const T& key) { return erase_one_impl(root, key); }
     bool erase(const T& key) { return erase_one(key); }
-    int erase_all(const T& key) { return erase_all_impl(root, key); }
+
+    int erase_all(const T& key) {
+        int erased = 0;
+        bool removed_key = false;
+        bool shrunk = false;
+        root = erase_impl(root, key, true, erased, removed_key, shrunk);
+        return erased;
+    }
+
     bool contains(const T& key) const { return count(key) > 0; }
     int count(const T& key) const { return count_impl(root, key); }
 
@@ -409,19 +433,13 @@ struct OrderedMultiset {
     std::pair<OrderedMultiset, OrderedMultiset> split(const T& key) && {
         auto [l, r] = split_nodes(root, key);
         root = nullptr;
-        return {OrderedMultiset(l, rng_state, comp, allocation_pool, ownership),
-                OrderedMultiset(r, rng_state, std::move(comp),
-                                std::move(allocation_pool), std::move(ownership))};
+        return {OrderedMultiset(l, comp), OrderedMultiset(r, std::move(comp))};
     }
 
     OrderedMultiset merge(OrderedMultiset other) && {
         assert(empty() || other.empty() || comp(*max(), *other.min()));
         root = merge_nodes(root, other.root);
         other.root = nullptr;
-        if (ownership != other.ownership) {
-            ownership = std::make_shared<Ownership>(std::move(ownership),
-                                                    std::move(other.ownership));
-        }
         return std::move(*this);
     }
 

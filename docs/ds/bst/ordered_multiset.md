@@ -5,7 +5,14 @@ documentation_of: ../../../ds/bst/ordered_multiset.hpp
 
 ## Overview
 
-`OrderedMultiset` is a randomized binary search tree for multisets. It stores equal keys as one node with a multiplicity, so it supports standard multiset operations plus order-statistics queries such as k-th element and rank.
+`OrderedMultiset` is an AVL tree for multisets. It stores equal keys as one node
+with a multiplicity, so it supports standard multiset operations plus
+order-statistics queries such as k-th element and rank. Nodes come from a
+recyclable block arena, avoiding general-purpose per-node allocation.
+
+The arena is shared by each `OrderedMultiset<T, Compare>` specialization.
+Erased or destroyed nodes are reused, while the arena's peak capacity is
+retained until program exit.
 
 `split(key)` consumes a tree and partitions it into keys `< key` and keys
 `>= key`. `merge(other)` consumes two trees whose key ranges are strictly
@@ -41,7 +48,7 @@ Trees passed to `merge` must use equivalent comparator state.
 | `int size() const` | Returns the total number of elements, including duplicates. | $O(1)$ |
 | `int unique_size() const` | Returns the number of distinct keys. | $O(1)$ |
 | `bool empty() const` | Returns whether the multiset is empty. | $O(1)$ |
-| `void clear()` | Removes all elements. | $O(1)$ |
+| `void clear()` | Removes all elements and returns their nodes to the arena. | $O(N)$ |
 | `void insert(T key, int multiplicity = 1)` | Inserts `multiplicity` copies of `key`. | $O(\log N)$ |
 | `bool erase_one(const T& key)` | Removes one copy of `key`; returns whether an element was removed. | $O(\log N)$ |
 | `bool erase(const T& key)` | Alias for `erase_one(key)`. | $O(\log N)$ |
@@ -60,8 +67,8 @@ Trees passed to `merge` must use equivalent comparator state.
 | `const T* max_le(const T& key) const` | Returns the largest element less than or equal to `key`, or `nullptr`. | $O(\log N)$ |
 | `const T* max_lt(const T& key) const` | Returns the largest element strictly less than `key`, or `nullptr`. | $O(\log N)$ |
 | `const T* min() const`, `const T* max() const` | Returns the minimum or maximum element, or `nullptr` if the multiset is empty. | $O(\log N)$ |
-| `std::pair<OrderedMultiset, OrderedMultiset> split(const T& key) &&` | Consumes the multiset and returns `{less, greater_equal}`. | Expected $O(\log N)$ |
-| `OrderedMultiset merge(OrderedMultiset other) &&` | Consumes both multisets and returns their union. Requires every key in `*this` to be smaller than every key in `other`. | Expected $O(\log(N + M))$ |
+| `std::pair<OrderedMultiset, OrderedMultiset> split(const T& key) &&` | Consumes the multiset and returns `{less, greater_equal}`. | $O(\log N)$ |
+| `OrderedMultiset merge(OrderedMultiset other) &&` | Consumes both multisets and returns their union. Requires every key in `*this` to be smaller than every key in `other`. | $O(\log(N + M))$ |
 | `std::vector<T> to_vector() const` | Returns all elements in sorted order, including duplicates. | $O(N)$ |
 
 ## Example

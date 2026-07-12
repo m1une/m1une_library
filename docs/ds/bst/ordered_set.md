@@ -5,7 +5,14 @@ documentation_of: ../../../ds/bst/ordered_set.hpp
 
 ## Overview
 
-`OrderedSet` is a randomized binary search tree for sets. It keeps unique keys only, like `std::set`, and also supports order-statistics queries such as k-th element and rank.
+`OrderedSet` is an AVL tree for sets. It keeps unique keys only, like
+`std::set`, and also supports order-statistics queries such as k-th element and
+rank. Nodes come from a recyclable block arena, so insertion and erasure avoid
+general-purpose per-node allocation.
+
+The arena is shared by each `OrderedSet<T, Compare>` specialization. Erased or
+destroyed nodes are reused, while the arena's peak capacity is retained until
+program exit.
 
 `split(key)` consumes a tree and partitions it into keys `< key` and keys
 `>= key`. `merge(other)` consumes two trees whose key ranges are strictly
@@ -41,7 +48,7 @@ Trees passed to `merge` must use equivalent comparator state.
 | `int size() const` | Returns the number of keys. | $O(1)$ |
 | `int unique_size() const` | Alias for `size()`. | $O(1)$ |
 | `bool empty() const` | Returns whether the set is empty. | $O(1)$ |
-| `void clear()` | Removes all keys. | $O(1)$ |
+| `void clear()` | Removes all keys and returns their nodes to the arena. | $O(N)$ |
 | `bool insert(T key)` | Inserts `key`; returns whether a new key was inserted. | $O(\log N)$ |
 | `bool erase(const T& key)` | Removes `key`; returns whether a key was removed. | $O(\log N)$ |
 | `bool contains(const T& key) const` | Returns whether `key` exists. | $O(\log N)$ |
@@ -58,8 +65,8 @@ Trees passed to `merge` must use equivalent comparator state.
 | `const T* max_le(const T& key) const` | Returns the largest key less than or equal to `key`, or `nullptr`. | $O(\log N)$ |
 | `const T* max_lt(const T& key) const` | Returns the largest key strictly less than `key`, or `nullptr`. | $O(\log N)$ |
 | `const T* min() const`, `const T* max() const` | Returns the minimum or maximum key, or `nullptr` if the set is empty. | $O(\log N)$ |
-| `std::pair<OrderedSet, OrderedSet> split(const T& key) &&` | Consumes the set and returns `{less, greater_equal}`. | Expected $O(\log N)$ |
-| `OrderedSet merge(OrderedSet other) &&` | Consumes both sets and returns their union. Requires every key in `*this` to be smaller than every key in `other`. | Expected $O(\log(N + M))$ |
+| `std::pair<OrderedSet, OrderedSet> split(const T& key) &&` | Consumes the set and returns `{less, greater_equal}`. | $O(\log N)$ |
+| `OrderedSet merge(OrderedSet other) &&` | Consumes both sets and returns their union. Requires every key in `*this` to be smaller than every key in `other`. | $O(\log(N + M))$ |
 | `std::vector<T> to_vector() const` | Returns all keys in sorted order. | $O(N)$ |
 
 ## Example
