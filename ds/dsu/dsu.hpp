@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <numeric>
+#include <utility>
 #include <vector>
 
 namespace m1une {
@@ -15,6 +16,17 @@ struct Dsu {
     // If it's < 0, then i is a root and -parent_or_size[i] is the size of the group.
     std::vector<int> parent_or_size;
 
+    // Returns {new leader, absorbed leader}. The absorbed leader is -1 when
+    // both vertices already belong to the same component.
+    std::pair<int, int> merge_leaders(int a, int b) {
+        int x = leader(a), y = leader(b);
+        if (x == y) return {x, -1};
+        if (-parent_or_size[x] < -parent_or_size[y]) std::swap(x, y);
+        parent_or_size[x] += parent_or_size[y];
+        parent_or_size[y] = x;
+        return {x, y};
+    }
+
    public:
     Dsu() : _n(0) {}
     explicit Dsu(int n) : _n(n), parent_or_size(n, -1) {}
@@ -22,13 +34,16 @@ struct Dsu {
     // Merges the group containing 'a' with the group containing 'b'.
     // Returns the leader of the merged group.
     int merge(int a, int b) {
-        int x = leader(a), y = leader(b);
-        if (x == y) return x;
-        // Union by size
-        if (-parent_or_size[x] < -parent_or_size[y]) std::swap(x, y);
-        parent_or_size[x] += parent_or_size[y];
-        parent_or_size[y] = x;
-        return x;
+        return merge_leaders(a, b).first;
+    }
+
+    // Invokes callback(new_leader, absorbed_leader) after an actual merge.
+    // Returns the leader of the merged group.
+    template <class Callback>
+    int merge(int a, int b, Callback&& callback) {
+        std::pair<int, int> merged = merge_leaders(a, b);
+        if (merged.second != -1) callback(merged.first, merged.second);
+        return merged.first;
     }
 
     // Returns true if 'a' and 'b' belong to the same group.
