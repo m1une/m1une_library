@@ -22,13 +22,14 @@ Public namespaces stay flat and short: general graph helpers use
 | `graph/flow/flow.hpp` | Flow networks | Max flow, min-cost flow, bounded flow, bounded min-cost flow, and Gomory-Hu trees. |
 | `graph/counting.hpp` | Counting formulas | Counts common labeled graph classes, tournaments, DAGs, and unlabeled trees by vertex number. |
 | `graph/range_edge_graph.hpp` | Directed graph builder | Compact point-to-range, range-to-point, and range-to-range edges using segment trees. |
-| `graph/shortest_path.hpp` | Direction-respecting / DAG-specific | Cow game difference constraints, BFS, 0-1 BFS, DAG shortest path, Dijkstra, Bellman-Ford, and Warshall-Floyd. |
+| `graph/shortest_path.hpp` | Direction-respecting / DAG-specific | Cow game difference constraints, BFS, 0-1 BFS, DAG shortest path, Dijkstra, k-shortest walk, Bellman-Ford, and Warshall-Floyd. |
 | `graph/directed.hpp` | Directed-oriented bundle | Directed algorithms plus shortest paths. |
 | `graph/undirected.hpp` | Undirected-oriented bundle | Undirected algorithms plus shortest paths and grid helpers. |
 | `graph/bfs.hpp` | Direction-respecting | Unweighted shortest paths. |
 | `graph/zero_one_bfs.hpp` | Direction-respecting | Shortest paths with edge costs `0` or `1`. |
 | `graph/dag_shortest_path.hpp` | Directed DAG only | Shortest paths in a DAG, including negative edge costs. |
 | `graph/dijkstra.hpp` | Direction-respecting | Non-negative weighted shortest paths. |
+| `graph/k_shortest_walk.hpp` | Direction-respecting | The first `k` walk lengths with non-negative edge costs. |
 | `graph/bellman_ford.hpp` | Direction-respecting | Shortest paths with negative edges and negative-cycle marking. |
 | `graph/cow_game.hpp` | Difference constraints | Feasibility, assignments, and tight bounds for systems of difference inequalities. |
 | `graph/warshall_floyd.hpp` | Direction-respecting | All-pairs shortest paths. |

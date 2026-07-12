@@ -6,6 +6,7 @@
 #include "cow_game.hpp"
 #include "dag_shortest_path.hpp"
 #include "dijkstra.hpp"
+#include "k_shortest_walk.hpp"
 #include "warshall_floyd.hpp"
 #include "zero_one_bfs.hpp"
 

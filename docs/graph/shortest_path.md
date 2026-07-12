@@ -20,6 +20,7 @@ is `dag_shortest_path`, which is specifically for directed acyclic graphs.
 | `graph/zero_one_bfs.hpp` | Direction-respecting | Shortest paths with edge costs `0` or `1`. |
 | `graph/dag_shortest_path.hpp` | Directed DAG only | Shortest paths in a DAG, including negative edge costs. |
 | `graph/dijkstra.hpp` | Direction-respecting | Non-negative weighted shortest paths. |
+| `graph/k_shortest_walk.hpp` | Direction-respecting | The first `k` walk lengths with non-negative edge costs. |
 | `graph/bellman_ford.hpp` | Direction-respecting | Shortest paths with negative edges. |
 | `graph/warshall_floyd.hpp` | Direction-respecting | All-pairs shortest paths. |
 
