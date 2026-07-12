@@ -59,6 +59,7 @@
 "verify/ds/range_query/cumulative_sum.test.cpp": "2026-07-03 14:46:35 +0900",
 "verify/ds/range_query/disjoint_sparse_table.test.cpp": "2026-06-21 04:34:53 +0900",
 "verify/ds/range_query/fenwick_tree.test.cpp": "2026-07-11 03:19:37 +0900",
+"verify/ds/range_query/fenwick_tree_2d.test.cpp": "2026-07-13 05:35:46 +0900",
 "verify/ds/range_query/range_inversion_count.test.cpp": "2026-07-11 03:19:37 +0900",
 "verify/ds/range_query/range_lis_query.test.cpp": "2026-07-11 03:19:37 +0900",
 "verify/ds/range_query/sliding_window_aggregation.test.cpp": "2026-06-23 02:38:21 +0900",
