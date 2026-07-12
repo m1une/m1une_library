@@ -35,6 +35,7 @@
 "verify/ds/dsu/persistent_dsu_library_checker.test.cpp": "2026-06-21 04:34:53 +0900",
 "verify/ds/dsu/persistent_potentialized_dsu.test.cpp": "2026-06-27 02:52:37 +0900",
 "verify/ds/dsu/potentialized_dsu.test.cpp": "2026-06-27 02:52:37 +0900",
+"verify/ds/dsu/range_parallel_dsu.test.cpp": "2026-07-13 06:05:18 +0900",
 "verify/ds/dsu/rollback_dsu.test.cpp": "2026-07-11 19:52:35 +0900",
 "verify/ds/dynamic_array/dynamic_array.test.cpp": "2026-06-21 04:34:53 +0900",
 "verify/ds/dynamic_array/dynamic_lazy_monoid_array.test.cpp": "2026-07-01 14:11:51 +0900",
