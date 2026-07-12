@@ -86,7 +86,7 @@ plumbing live in `utilities/`.
 | --- | --- |
 | `ds/dsu/` | Connectivity, component aggregation, potentials, and persistent union-find. |
 | `ds/segtree/` | Dense and dynamic segment trees, lazy propagation, dual segment trees, and persistent variants. |
-| `ds/range_query/` | Objects built for repeated range queries, including cumulative sums, range LIS/modes and distinct counting, Fenwick trees, static sparse-table queries, and wavelet matrices. |
+| `ds/range_query/` | Objects built for repeated range queries, including cumulative sums, range LIS/modes and distinct counting, Fenwick trees, static sparse-table queries, and ordinary or multidimensional wavelet matrices. |
 | `ds/dynamic_array/` | Implicit-treap sequences with insertion, deletion, reversal, aggregation, or persistence. |
 | `ds/bst/` | Weight-balanced ordered sets and multisets, plus persistent red-black-tree variants with split/merge APIs. |
 | `ds/binary_trie/` | Binary tries for integer xor queries and optional monoid aggregates. |

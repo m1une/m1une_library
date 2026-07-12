@@ -9,7 +9,7 @@ one-shot sequence computations such as LIS are in `algo/sequence/`.
 | --- | --- |
 | [`dsu/`](dsu/) | `dsu.hpp`, `rollback_dsu.hpp`, `dsu_monoid.hpp`, `potentialized_dsu.hpp`, `persistent_dsu.hpp`, `persistent_potentialized_dsu.hpp`, `partially_persistent_dsu.hpp` |
 | [`segtree/`](segtree/) | Dense, dynamic, lazy, dual, generic Beats, specialized chmin/chmax/add, and persistent variants, including `segtree_2d.hpp` and `dual_segtree_2d.hpp` |
-| [`range_query/`](range_query/) | Repeated range-query objects: 1D/2D/3D cumulative sums, static weighted rectangle sums, SWAG, static range inversions/LIS/modes and distinct counting, monoid and custom-state square-root decomposition, Fenwick tree, sqrt/sparse tables, and wavelet matrices |
+| [`range_query/`](range_query/) | Repeated range-query objects: 1D/2D/3D cumulative sums, static weighted rectangle sums, SWAG, static range inversions/LIS/modes and distinct counting, monoid and custom-state square-root decomposition, Fenwick tree, sqrt/sparse tables, ordinary wavelet matrices, and multidimensional wavelet matrices for pair sequences |
 | [`dynamic_array/`](dynamic_array/) | Dynamic and persistent implicit-treap arrays, with optional monoid or lazy aggregation |
 | [`bst/`](bst/) | Weight-balanced ordered sets and multisets, plus persistent red-black-tree variants with split and merge |
 | [`binary_trie/`](binary_trie/) | Binary tries for integer xor queries and monoid aggregates |
