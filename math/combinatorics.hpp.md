@@ -308,7 +308,8 @@ methods shown as `const` do not modify the object.
   factorial is zero modulo the modulus and cannot be inverted.
 * `binom(n, k)` and `perm(n, k)` return zero when `k < 0` or `k > n`.
 * This class does not directly handle huge `n` with small `k`, or combinations
-  modulo a composite number.
+  modulo a composite number. Use `BinomialCoefficientMod` from
+  `math/binomial_coefficient_mod.hpp` for that case.
 
 ## Example
 

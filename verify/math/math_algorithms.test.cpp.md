@@ -11,6 +11,9 @@ data:
     path: math/bernoulli.hpp
     title: Bernoulli Numbers and Power Sums
   - icon: ':heavy_check_mark:'
+    path: math/binomial_coefficient_mod.hpp
+    title: Binomial Coefficient Modulo an Arbitrary Modulus
+  - icon: ':heavy_check_mark:'
     path: math/bit_ceil.hpp
     title: Bit Ceil
   - icon: ':heavy_check_mark:'
@@ -349,6 +352,8 @@ data:
   - math/fps/internal/ntt998_faster.hpp
   - math/modint.hpp
   - math/combinatorics.hpp
+  - math/binomial_coefficient_mod.hpp
+  - math/number_theory.hpp
   - math/bitwise_convolution.hpp
   - math/zeta_mobius_transform.hpp
   - math/bit_ceil.hpp
@@ -376,7 +381,6 @@ data:
   - math/modint.hpp
   - math/modular_square_root.hpp
   - math/multiplicative_function_prefix_sum.hpp
-  - math/number_theory.hpp
   - math/prefix_sum_of_binom.hpp
   - math/primitive_root.hpp
   - math/prime_sieve.hpp
@@ -391,7 +395,7 @@ data:
   isVerificationFile: true
   path: verify/math/math_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-13 05:25:31+09:00'
+  timestamp: '2026-07-13 05:49:34+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/math_algorithms.test.cpp

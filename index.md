@@ -681,6 +681,9 @@ data:
       path: math/bernoulli.hpp
       title: Bernoulli Numbers and Power Sums
     - icon: ':heavy_check_mark:'
+      path: math/binomial_coefficient_mod.hpp
+      title: Binomial Coefficient Modulo an Arbitrary Modulus
+    - icon: ':heavy_check_mark:'
       path: math/bit_ceil.hpp
       title: Bit Ceil
     - icon: ':heavy_check_mark:'
@@ -1541,6 +1544,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/bernoulli_utilities.test.cpp
       title: verify/math/bernoulli_utilities.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/binomial_coefficient_mod.test.cpp
+      title: verify/math/binomial_coefficient_mod.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/bitwise_convolution.test.cpp
       title: verify/math/bitwise_convolution.test.cpp

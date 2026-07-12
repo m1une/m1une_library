@@ -8,6 +8,9 @@ data:
     path: math/bernoulli.hpp
     title: Bernoulli Numbers and Power Sums
   - icon: ':heavy_check_mark:'
+    path: math/binomial_coefficient_mod.hpp
+    title: Binomial Coefficient Modulo an Arbitrary Modulus
+  - icon: ':heavy_check_mark:'
     path: math/bit_ceil.hpp
     title: Bit Ceil
   - icon: ':heavy_check_mark:'
@@ -177,6 +180,8 @@ data:
 
     #include "bernoulli.hpp"
 
+    #include "binomial_coefficient_mod.hpp"
+
     #include "bitwise_convolution.hpp"
 
     #include "bit_ceil.hpp"
@@ -248,6 +253,8 @@ data:
   - math/fps/internal/ntt998_faster.hpp
   - math/modint.hpp
   - math/combinatorics.hpp
+  - math/binomial_coefficient_mod.hpp
+  - math/number_theory.hpp
   - math/bitwise_convolution.hpp
   - math/zeta_mobius_transform.hpp
   - math/bit_ceil.hpp
@@ -275,7 +282,6 @@ data:
   - math/modint.hpp
   - math/modular_square_root.hpp
   - math/multiplicative_function_prefix_sum.hpp
-  - math/number_theory.hpp
   - math/prefix_sum_of_binom.hpp
   - math/primitive_root.hpp
   - math/prime_sieve.hpp
@@ -290,7 +296,7 @@ data:
   isVerificationFile: false
   path: math/all.hpp
   requiredBy: []
-  timestamp: '2026-07-13 05:25:31+09:00'
+  timestamp: '2026-07-13 05:49:34+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
@@ -327,6 +333,8 @@ You usually do not need to include this entire bundle:
   transforms.
 * Use `combinatorics.hpp` for many factorial, combination, or permutation
   queries under a prime modulus.
+* Use `binomial_coefficient_mod.hpp` for huge binomial arguments modulo one
+  fixed prime-power or composite modulus.
 * Use `lucas.hpp` for binomial coefficients with huge arguments modulo a small
   prime.
 * Use `bernoulli.hpp` for Bernoulli numbers, Bernoulli polynomials, Faulhaber
@@ -371,6 +379,7 @@ few unused headers do not matter.
 | --- | --- |
 | `math/base_n.hpp` | Checked conversion between integers and arbitrary-base digits. |
 | `math/bernoulli.hpp` | Bernoulli numbers and polynomials, power sums, and polynomial discrete integration. |
+| `math/binomial_coefficient_mod.hpp` | Binomial coefficients with 64-bit arguments modulo a fixed arbitrary modulus. |
 | `math/bitwise_convolution.hpp` | OR, AND, XOR convolutions and the Walsh-Hadamard transform. |
 | `math/bit_ceil.hpp` | Smallest power of two at least a given value. |
 | `math/integer_arithmetic.hpp` | Exact integer square roots and overflow-aware powers. |
