@@ -564,6 +564,9 @@ data:
       path: graph/range_edge_graph.hpp
       title: Range Edge Graph
     - icon: ':heavy_check_mark:'
+      path: graph/replacement_paths.hpp
+      title: Replacement Paths
+    - icon: ':heavy_check_mark:'
       path: graph/scc.hpp
       title: Strongly Connected Components
     - icon: ':heavy_check_mark:'
@@ -1460,6 +1463,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/graph/range_edge_graph.test.cpp
       title: verify/graph/range_edge_graph.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/replacement_paths.test.cpp
+      title: verify/graph/replacement_paths.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/graph/two_edge_connected_components.test.cpp
       title: verify/graph/two_edge_connected_components.test.cpp

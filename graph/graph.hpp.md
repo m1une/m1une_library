@@ -78,6 +78,9 @@ data:
     path: graph/range_edge_graph.hpp
     title: Range Edge Graph
   - icon: ':heavy_check_mark:'
+    path: graph/replacement_paths.hpp
+    title: Replacement Paths
+  - icon: ':heavy_check_mark:'
     path: graph/scc.hpp
     title: Strongly Connected Components
   - icon: ':heavy_check_mark:'
@@ -228,6 +231,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/range_edge_graph.test.cpp
     title: verify/graph/range_edge_graph.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/replacement_paths.test.cpp
+    title: verify/graph/replacement_paths.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/tree/cartesian_tree.test.cpp
     title: verify/graph/tree/cartesian_tree.test.cpp
@@ -389,6 +395,7 @@ data:
   isVerificationFile: false
   path: graph/graph.hpp
   requiredBy:
+  - graph/replacement_paths.hpp
   - graph/maximum_clique.hpp
   - graph/dijkstra.hpp
   - graph/scc.hpp
@@ -472,6 +479,7 @@ data:
   - verify/graph/dominator_tree.test.cpp
   - verify/graph/chromatic_number_randomized.test.cpp
   - verify/graph/chromatic_number_randomized.test.cpp
+  - verify/graph/replacement_paths.test.cpp
   - verify/graph/block_cut_tree.test.cpp
   - verify/graph/k_shortest_walk.test.cpp
   - verify/graph/graph_algorithms.test.cpp

@@ -110,6 +110,9 @@ data:
     path: graph/range_edge_graph.hpp
     title: Range Edge Graph
   - icon: ':heavy_check_mark:'
+    path: graph/replacement_paths.hpp
+    title: Replacement Paths
+  - icon: ':heavy_check_mark:'
     path: graph/scc.hpp
     title: Strongly Connected Components
   - icon: ':heavy_check_mark:'
@@ -342,6 +345,7 @@ data:
   - graph/flow/gomory_hu.hpp
   - graph/grid.hpp
   - graph/range_edge_graph.hpp
+  - graph/replacement_paths.hpp
   - graph/tree/all.hpp
   - graph/tree/cartesian_tree.hpp
   - graph/graph.hpp
@@ -381,7 +385,7 @@ data:
   isVerificationFile: true
   path: verify/graph/cow_game.test.cpp
   requiredBy: []
-  timestamp: '2026-07-13 04:00:23+09:00'
+  timestamp: '2026-07-13 05:03:41+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/cow_game.test.cpp

@@ -107,6 +107,9 @@ data:
     path: graph/range_edge_graph.hpp
     title: Range Edge Graph
   - icon: ':heavy_check_mark:'
+    path: graph/replacement_paths.hpp
+    title: Replacement Paths
+  - icon: ':heavy_check_mark:'
     path: graph/scc.hpp
     title: Strongly Connected Components
   - icon: ':heavy_check_mark:'
@@ -260,6 +263,8 @@ data:
 
     #include "range_edge_graph.hpp"
 
+    #include "replacement_paths.hpp"
+
     #include "shortest_path.hpp"
 
     #include "tree/all.hpp"
@@ -305,6 +310,7 @@ data:
   - graph/flow/gomory_hu.hpp
   - graph/grid.hpp
   - graph/range_edge_graph.hpp
+  - graph/replacement_paths.hpp
   - graph/tree/all.hpp
   - graph/tree/cartesian_tree.hpp
   - graph/graph.hpp
@@ -344,7 +350,7 @@ data:
   isVerificationFile: false
   path: graph/all.hpp
   requiredBy: []
-  timestamp: '2026-07-13 04:00:23+09:00'
+  timestamp: '2026-07-13 05:03:41+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
@@ -400,6 +406,7 @@ Public namespaces stay flat and short: general graph helpers use
 | `graph/maximum_clique.hpp` | Direction ignored | Exact maximum clique, maximum independent set, and minimum vertex cover with bitset branch-and-bound. |
 | `graph/chromatic_number.hpp` | Direction ignored | Exact chromatic number for graphs with at most 20 vertices. |
 | `graph/minimum_steiner_tree.hpp` | Undirected only | Exact edge- and vertex-weighted minimum Steiner-tree costs and reconstruction for a small terminal set. |
+| `graph/replacement_paths.hpp` | Undirected positive-weight graphs | Edge- and vertex-failure replacement distances along one fixed shortest path. |
 | `graph/namori.hpp` | Undirected Namori graph | Decomposes each unicyclic component into its cycle and attached rooted trees. |
 | `graph/connected_components.hpp` | Direction ignored | Weak/ordinary connected components. |
 | `graph/cycle_detection.hpp` | Directed and undirected variants | Finds one cycle with the matching function. |

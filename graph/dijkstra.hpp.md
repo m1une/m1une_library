@@ -12,6 +12,9 @@ data:
     path: graph/directed.hpp
     title: Directed Graph Algorithms
   - icon: ':heavy_check_mark:'
+    path: graph/replacement_paths.hpp
+    title: Replacement Paths
+  - icon: ':heavy_check_mark:'
     path: graph/shortest_path.hpp
     title: Shortest Path
   - icon: ':heavy_check_mark:'
@@ -27,6 +30,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/range_edge_graph.test.cpp
     title: verify/graph/range_edge_graph.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/replacement_paths.test.cpp
+    title: verify/graph/replacement_paths.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -146,6 +152,7 @@ data:
   isVerificationFile: false
   path: graph/dijkstra.hpp
   requiredBy:
+  - graph/replacement_paths.hpp
   - graph/all.hpp
   - graph/undirected.hpp
   - graph/directed.hpp
@@ -155,6 +162,7 @@ data:
   verifiedWith:
   - verify/graph/cow_game.test.cpp
   - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/replacement_paths.test.cpp
   - verify/graph/graph_algorithms.test.cpp
 documentation_of: graph/dijkstra.hpp
 layout: document
