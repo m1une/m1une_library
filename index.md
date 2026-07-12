@@ -348,6 +348,9 @@ data:
       path: ds/range_query/sliding_window_aggregation.hpp
       title: Sliding Window Aggregation
     - icon: ':heavy_check_mark:'
+      path: ds/range_query/sliding_window_aggregation_deque.hpp
+      title: Sliding Window Aggregation Deque
+    - icon: ':heavy_check_mark:'
       path: ds/range_query/sparse_table.hpp
       title: Sparse Table
     - icon: ':heavy_check_mark:'
@@ -1259,6 +1262,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/ds/range_query/sliding_window_aggregation.test.cpp
       title: verify/ds/range_query/sliding_window_aggregation.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/range_query/sliding_window_aggregation_deque.test.cpp
+      title: verify/ds/range_query/sliding_window_aggregation_deque.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/ds/range_query/sparse_table.test.cpp
       title: verify/ds/range_query/sparse_table.test.cpp
