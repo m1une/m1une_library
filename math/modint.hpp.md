@@ -50,6 +50,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/partition_function.hpp
     title: Partition Function
+  - icon: ':heavy_check_mark:'
+    path: string/all.hpp
+    title: String Algorithms Bundle
+  - icon: ':heavy_check_mark:'
+    path: string/wildcard_pattern_matching.hpp
+    title: Wildcard Pattern Matching
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/algo/sequence/number_of_subsequences.test.cpp
@@ -249,6 +255,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/matroid/matroids.test.cpp
     title: verify/matroid/matroids.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/string/string_algorithms.test.cpp
+    title: verify/string/string_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/string/wildcard_pattern_matching.test.cpp
+    title: verify/string/wildcard_pattern_matching.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -358,6 +370,8 @@ data:
   isVerificationFile: false
   path: math/modint.hpp
   requiredBy:
+  - string/all.hpp
+  - string/wildcard_pattern_matching.hpp
   - math/partition_function.hpp
   - math/combinatorial_sequences.hpp
   - math/all.hpp
@@ -387,6 +401,8 @@ data:
   - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
   - verify/ds/segtree/segtree_beats.test.cpp
   - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
+  - verify/string/string_algorithms.test.cpp
+  - verify/string/wildcard_pattern_matching.test.cpp
   - verify/math/prefix_sum_of_binom.test.cpp
   - verify/math/generalized_floor_sum.test.cpp
   - verify/math/bitwise_convolution.test.cpp

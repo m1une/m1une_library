@@ -47,6 +47,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/partition_function.hpp
     title: Partition Function
+  - icon: ':heavy_check_mark:'
+    path: string/all.hpp
+    title: String Algorithms Bundle
+  - icon: ':heavy_check_mark:'
+    path: string/wildcard_pattern_matching.hpp
+    title: Wildcard Pattern Matching
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/graph/cow_game.test.cpp
@@ -117,6 +123,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/stirling_number_of_the_second_kind.test.cpp
     title: verify/math/stirling_number_of_the_second_kind.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/string/string_algorithms.test.cpp
+    title: verify/string/string_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/string/wildcard_pattern_matching.test.cpp
+    title: verify/string/wildcard_pattern_matching.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -575,6 +587,8 @@ data:
   isVerificationFile: false
   path: math/fps/internal/ntt998_faster.hpp
   requiredBy:
+  - string/all.hpp
+  - string/wildcard_pattern_matching.hpp
   - math/partition_function.hpp
   - math/combinatorial_sequences.hpp
   - math/all.hpp
@@ -593,6 +607,8 @@ data:
   timestamp: '2026-07-11 03:19:37+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/string/string_algorithms.test.cpp
+  - verify/string/wildcard_pattern_matching.test.cpp
   - verify/math/bernoulli_utilities.test.cpp
   - verify/math/bell_number.test.cpp
   - verify/math/partition_function.test.cpp

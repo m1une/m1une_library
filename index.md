@@ -986,6 +986,9 @@ data:
       path: string/trie.hpp
       title: Trie
     - icon: ':heavy_check_mark:'
+      path: string/wildcard_pattern_matching.hpp
+      title: Wildcard Pattern Matching
+    - icon: ':heavy_check_mark:'
       path: string/z_algorithm.hpp
       title: Z Algorithm
   - name: utilities
@@ -1716,6 +1719,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/string/trie.test.cpp
       title: verify/string/trie.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/string/wildcard_pattern_matching.test.cpp
+      title: verify/string/wildcard_pattern_matching.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/string/yosupo_zalgorithm.test.cpp
       title: verify/string/yosupo_zalgorithm.test.cpp
