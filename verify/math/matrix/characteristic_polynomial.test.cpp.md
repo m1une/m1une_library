@@ -10,43 +10,41 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/matrix/matrix.hpp
     title: Dense Matrix
-  _extendedRequiredBy:
   - icon: ':heavy_check_mark:'
-    path: math/all.hpp
-    title: Math All
-  _extendedVerifiedWith:
-  - icon: ':heavy_check_mark:'
-    path: verify/math/math_algorithms.test.cpp
-    title: verify/math/math_algorithms.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/math/matrix/matrix.test.cpp
-    title: verify/math/matrix/matrix.test.cpp
+    path: math/modint.hpp
+    title: ModInt
+  _extendedRequiredBy: []
+  _extendedVerifiedWith: []
   _isVerificationFailed: false
-  _pathExtension: hpp
+  _pathExtension: cpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
-    links: []
-  bundledCode: "#line 1 \"math/matrix/all.hpp\"\n\n\n\n#line 1 \"math/matrix/characteristic_polynomial.hpp\"\
-    \n\n\n\n#include <cassert>\n#include <cstddef>\n#include <utility>\n#include <vector>\n\
-    \n#line 1 \"math/matrix/matrix.hpp\"\n\n\n\n#line 6 \"math/matrix/matrix.hpp\"\
-    \n#include <cstdint>\n#line 9 \"math/matrix/matrix.hpp\"\n\nnamespace m1une {\n\
-    namespace matrix {\n\ntemplate <class T>\nclass Matrix {\n   private:\n    int\
-    \ _rows;\n    int _cols;\n    std::vector<T> _data;\n\n    static std::size_t\
-    \ storage_size(int rows, int cols) {\n        assert(rows >= 0);\n        assert(cols\
-    \ >= 0);\n        return std::size_t(rows) * std::size_t(cols);\n    }\n\n   public:\n\
-    \    using value_type = T;\n\n    Matrix() : _rows(0), _cols(0) {}\n\n    Matrix(int\
-    \ rows, int cols, const T& value = T())\n        : _rows(rows), _cols(cols), _data(storage_size(rows,\
-    \ cols), value) {}\n\n    Matrix(int rows, int cols, std::vector<T> values)\n\
-    \        : _rows(rows), _cols(cols), _data(std::move(values)) {\n        assert(rows\
-    \ >= 0);\n        assert(cols >= 0);\n        assert(_data.size() == std::size_t(rows)\
-    \ * std::size_t(cols));\n    }\n\n    explicit Matrix(const std::vector<std::vector<T>>&\
-    \ values)\n        : _rows(int(values.size())), _cols(values.empty() ? 0 : int(values[0].size())),\n\
-    \          _data(storage_size(_rows, _cols)) {\n        for (int row = 0; row\
-    \ < _rows; row++) {\n            assert(int(values[std::size_t(row)].size()) ==\
-    \ _cols);\n            for (int col = 0; col < _cols; col++) {\n             \
-    \   (*this)[row][col] = values[std::size_t(row)][std::size_t(col)];\n        \
-    \    }\n        }\n    }\n\n    int rows() const {\n        return _rows;\n  \
-    \  }\n\n    int cols() const {\n        return _cols;\n    }\n\n    bool empty()\
+    '*NOT_SPECIAL_COMMENTS*': ''
+    PROBLEM: https://judge.yosupo.jp/problem/characteristic_polynomial
+    links:
+    - https://judge.yosupo.jp/problem/characteristic_polynomial
+  bundledCode: "#line 1 \"verify/math/matrix/characteristic_polynomial.test.cpp\"\n\
+    #define PROBLEM \"https://judge.yosupo.jp/problem/characteristic_polynomial\"\n\
+    \n#line 1 \"math/matrix/characteristic_polynomial.hpp\"\n\n\n\n#include <cassert>\n\
+    #include <cstddef>\n#include <utility>\n#include <vector>\n\n#line 1 \"math/matrix/matrix.hpp\"\
+    \n\n\n\n#line 6 \"math/matrix/matrix.hpp\"\n#include <cstdint>\n#line 9 \"math/matrix/matrix.hpp\"\
+    \n\nnamespace m1une {\nnamespace matrix {\n\ntemplate <class T>\nclass Matrix\
+    \ {\n   private:\n    int _rows;\n    int _cols;\n    std::vector<T> _data;\n\n\
+    \    static std::size_t storage_size(int rows, int cols) {\n        assert(rows\
+    \ >= 0);\n        assert(cols >= 0);\n        return std::size_t(rows) * std::size_t(cols);\n\
+    \    }\n\n   public:\n    using value_type = T;\n\n    Matrix() : _rows(0), _cols(0)\
+    \ {}\n\n    Matrix(int rows, int cols, const T& value = T())\n        : _rows(rows),\
+    \ _cols(cols), _data(storage_size(rows, cols), value) {}\n\n    Matrix(int rows,\
+    \ int cols, std::vector<T> values)\n        : _rows(rows), _cols(cols), _data(std::move(values))\
+    \ {\n        assert(rows >= 0);\n        assert(cols >= 0);\n        assert(_data.size()\
+    \ == std::size_t(rows) * std::size_t(cols));\n    }\n\n    explicit Matrix(const\
+    \ std::vector<std::vector<T>>& values)\n        : _rows(int(values.size())), _cols(values.empty()\
+    \ ? 0 : int(values[0].size())),\n          _data(storage_size(_rows, _cols)) {\n\
+    \        for (int row = 0; row < _rows; row++) {\n            assert(int(values[std::size_t(row)].size())\
+    \ == _cols);\n            for (int col = 0; col < _cols; col++) {\n          \
+    \      (*this)[row][col] = values[std::size_t(row)][std::size_t(col)];\n     \
+    \       }\n        }\n    }\n\n    int rows() const {\n        return _rows;\n\
+    \    }\n\n    int cols() const {\n        return _cols;\n    }\n\n    bool empty()\
     \ const {\n        return _rows == 0 || _cols == 0;\n    }\n\n    std::vector<T>&\
     \ data() {\n        return _data;\n    }\n\n    const std::vector<T>& data() const\
     \ {\n        return _data;\n    }\n\n    T* operator[](int row) {\n        assert(0\
@@ -247,48 +245,140 @@ data:
     \  direction[std::size_t(pivot_col)] = T() - augmented[row][free_col];\n     \
     \   }\n        result.nullspace_basis.push_back(std::move(direction));\n    }\n\
     \    return result;\n}\n\n}  // namespace matrix\n}  // namespace m1une\n\n\n\
-    #line 7 \"math/matrix/all.hpp\"\n\n\n"
-  code: '#ifndef M1UNE_MATRIX_ALL_HPP
-
-    #define M1UNE_MATRIX_ALL_HPP 1
-
-
-    #include "characteristic_polynomial.hpp"
-
-    #include "linear_algebra.hpp"
-
-    #include "matrix.hpp"
-
-
-    #endif  // M1UNE_MATRIX_ALL_HPP
-
-    '
+    #line 1 \"math/modint.hpp\"\n\n\n\n#line 5 \"math/modint.hpp\"\n#include <iostream>\n\
+    #line 8 \"math/modint.hpp\"\n\nnamespace m1une {\nnamespace math {\n\ntemplate\
+    \ <uint32_t Modulus>\nstruct ModInt {\n    static_assert(0 < Modulus, \"Modulus\
+    \ must be positive\");\n\n   private:\n    uint32_t _v;\n\n   public:\n    static\
+    \ constexpr uint32_t mod() {\n        return Modulus;\n    }\n\n    static constexpr\
+    \ ModInt raw(uint32_t v) noexcept {\n        ModInt x;\n        x._v = v;\n  \
+    \      return x;\n    }\n\n    constexpr ModInt() noexcept : _v(0) {}\n\n    template\
+    \ <class Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>\n  \
+    \  constexpr ModInt(Integer v) noexcept {\n        if constexpr (std::is_signed_v<Integer>)\
+    \ {\n            int64_t x = static_cast<int64_t>(v) % static_cast<int64_t>(Modulus);\n\
+    \            if (x < 0) x += Modulus;\n            _v = static_cast<uint32_t>(x);\n\
+    \        } else {\n            _v = static_cast<uint32_t>(static_cast<uint64_t>(v)\
+    \ % Modulus);\n        }\n    }\n\n    constexpr uint32_t val() const noexcept\
+    \ {\n        return _v;\n    }\n\n    constexpr ModInt& operator++() noexcept\
+    \ {\n        _v++;\n        if (_v == Modulus) _v = 0;\n        return *this;\n\
+    \    }\n\n    constexpr ModInt& operator--() noexcept {\n        if (_v == 0)\
+    \ _v = Modulus;\n        _v--;\n        return *this;\n    }\n\n    constexpr\
+    \ ModInt operator++(int) noexcept {\n        ModInt res = *this;\n        ++*this;\n\
+    \        return res;\n    }\n\n    constexpr ModInt operator--(int) noexcept {\n\
+    \        ModInt res = *this;\n        --*this;\n        return res;\n    }\n\n\
+    \    constexpr ModInt& operator+=(const ModInt& rhs) noexcept {\n        _v +=\
+    \ rhs._v;\n        if (_v >= Modulus) _v -= Modulus;\n        return *this;\n\
+    \    }\n\n    constexpr ModInt& operator-=(const ModInt& rhs) noexcept {\n   \
+    \     _v -= rhs._v;\n        if (_v >= Modulus) _v += Modulus;\n        return\
+    \ *this;\n    }\n\n    constexpr ModInt& operator*=(const ModInt& rhs) noexcept\
+    \ {\n        uint64_t z = _v;\n        z *= rhs._v;\n        _v = static_cast<uint32_t>(z\
+    \ % Modulus);\n        return *this;\n    }\n\n    constexpr ModInt& operator/=(const\
+    \ ModInt& rhs) noexcept {\n        return *this *= rhs.inv();\n    }\n\n    constexpr\
+    \ ModInt operator+(const ModInt& rhs) const noexcept {\n        return ModInt(*this)\
+    \ += rhs;\n    }\n    constexpr ModInt operator-(const ModInt& rhs) const noexcept\
+    \ {\n        return ModInt(*this) -= rhs;\n    }\n    constexpr ModInt operator*(const\
+    \ ModInt& rhs) const noexcept {\n        return ModInt(*this) *= rhs;\n    }\n\
+    \    constexpr ModInt operator/(const ModInt& rhs) const noexcept {\n        return\
+    \ ModInt(*this) /= rhs;\n    }\n\n    constexpr bool operator==(const ModInt&\
+    \ rhs) const noexcept {\n        return _v == rhs._v;\n    }\n    constexpr bool\
+    \ operator!=(const ModInt& rhs) const noexcept {\n        return _v != rhs._v;\n\
+    \    }\n\n    constexpr ModInt pow(long long n) const noexcept {\n        ModInt\
+    \ res = raw(1), x = *this;\n        while (n > 0) {\n            if (n & 1) res\
+    \ *= x;\n            x *= x;\n            n >>= 1;\n        }\n        return\
+    \ res;\n    }\n\n    constexpr ModInt inv() const noexcept {\n        int64_t\
+    \ a = _v, b = Modulus, u = 1, v = 0;\n        while (b) {\n            int64_t\
+    \ t = a / b;\n            a -= t * b;\n            std::swap(a, b);\n        \
+    \    u -= t * v;\n            std::swap(u, v);\n        }\n        if (u < 0)\
+    \ u += Modulus;\n        return raw(static_cast<uint32_t>(u));\n    }\n\n    friend\
+    \ std::ostream& operator<<(std::ostream& os, const ModInt& rhs) {\n        return\
+    \ os << rhs._v;\n    }\n\n    friend std::istream& operator>>(std::istream& is,\
+    \ ModInt& rhs) {\n        long long v;\n        is >> v;\n        rhs = ModInt(v);\n\
+    \        return is;\n    }\n};\n\nusing modint998244353 = ModInt<998244353>;\n\
+    using modint1000000007 = ModInt<1000000007>;\n\n}  // namespace math\n}  // namespace\
+    \ m1une\n\n\n#line 6 \"verify/math/matrix/characteristic_polynomial.test.cpp\"\
+    \n\n#line 12 \"verify/math/matrix/characteristic_polynomial.test.cpp\"\n\nnamespace\
+    \ {\n\nusing mint = m1une::math::modint998244353;\nusing Matrix = m1une::matrix::Matrix<mint>;\n\
+    \nmint evaluate(const std::vector<mint>& polynomial, mint point) {\n    mint result\
+    \ = 0;\n    for (auto iterator = polynomial.rbegin(); iterator != polynomial.rend();\
+    \ ++iterator) {\n        result = result * point + *iterator;\n    }\n    return\
+    \ result;\n}\n\nvoid check_by_evaluation(const Matrix& matrix, const std::vector<mint>&\
+    \ polynomial) {\n    assert(polynomial.size() == std::size_t(matrix.rows() + 1));\n\
+    \    assert(polynomial.back() == mint(1));\n    for (int value = -3; value <=\
+    \ 3; value++) {\n        Matrix shifted = Matrix::identity(matrix.rows()) * mint(value)\
+    \ - matrix;\n        assert(\n            evaluate(polynomial, mint(value)) ==\n\
+    \            m1une::matrix::determinant(shifted)\n        );\n    }\n}\n\nvoid\
+    \ test_edge_cases() {\n    Matrix empty(0, 0);\n    std::vector<mint> one{mint(1)};\n\
+    \    assert(m1une::matrix::characteristic_polynomial(empty) == one);\n\n    Matrix\
+    \ single(1, 1);\n    single[0][0] = 7;\n    std::vector<mint> expected{mint(-7),\
+    \ mint(1)};\n    assert(m1une::matrix::characteristic_polynomial(single) == expected);\n\
+    \n    Matrix zero(5, 5);\n    std::vector<mint> zero_polynomial(6);\n    zero_polynomial[5]\
+    \ = 1;\n    assert(\n        m1une::matrix::characteristic_polynomial(zero) ==\
+    \ zero_polynomial\n    );\n}\n\nvoid test_randomized() {\n    std::uint64_t state\
+    \ = 0xb4ca731d9e6205f8ULL;\n    auto random = [&state]() {\n        state ^= state\
+    \ << 7;\n        state ^= state >> 9;\n        return state;\n    };\n\n    for\
+    \ (int trial = 0; trial < 1000; trial++) {\n        const int size = int(random()\
+    \ % 7);\n        Matrix matrix(size, size);\n        for (mint& value : matrix.data())\
+    \ {\n            value = int(random() % 15) - 7;\n        }\n        const std::vector<mint>\
+    \ polynomial =\n            m1une::matrix::characteristic_polynomial(matrix);\n\
+    \        check_by_evaluation(matrix, polynomial);\n    }\n}\n\n}  // namespace\n\
+    \nint main() {\n    test_edge_cases();\n    test_randomized();\n\n    int size;\n\
+    \    std::cin >> size;\n    Matrix matrix(size, size);\n    for (int row = 0;\
+    \ row < size; row++) {\n        for (int col = 0; col < size; col++) {\n     \
+    \       std::cin >> matrix[row][col];\n        }\n    }\n\n    const std::vector<mint>\
+    \ polynomial =\n        m1une::matrix::characteristic_polynomial(std::move(matrix));\n\
+    \    for (int degree = 0; degree <= size; degree++) {\n        if (degree != 0)\
+    \ std::cout << ' ';\n        std::cout << polynomial[std::size_t(degree)];\n \
+    \   }\n    std::cout << '\\n';\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/characteristic_polynomial\"\
+    \n\n#include \"../../../math/matrix/characteristic_polynomial.hpp\"\n#include\
+    \ \"../../../math/matrix/linear_algebra.hpp\"\n#include \"../../../math/modint.hpp\"\
+    \n\n#include <cassert>\n#include <cstdint>\n#include <iostream>\n#include <utility>\n\
+    #include <vector>\n\nnamespace {\n\nusing mint = m1une::math::modint998244353;\n\
+    using Matrix = m1une::matrix::Matrix<mint>;\n\nmint evaluate(const std::vector<mint>&\
+    \ polynomial, mint point) {\n    mint result = 0;\n    for (auto iterator = polynomial.rbegin();\
+    \ iterator != polynomial.rend(); ++iterator) {\n        result = result * point\
+    \ + *iterator;\n    }\n    return result;\n}\n\nvoid check_by_evaluation(const\
+    \ Matrix& matrix, const std::vector<mint>& polynomial) {\n    assert(polynomial.size()\
+    \ == std::size_t(matrix.rows() + 1));\n    assert(polynomial.back() == mint(1));\n\
+    \    for (int value = -3; value <= 3; value++) {\n        Matrix shifted = Matrix::identity(matrix.rows())\
+    \ * mint(value) - matrix;\n        assert(\n            evaluate(polynomial, mint(value))\
+    \ ==\n            m1une::matrix::determinant(shifted)\n        );\n    }\n}\n\n\
+    void test_edge_cases() {\n    Matrix empty(0, 0);\n    std::vector<mint> one{mint(1)};\n\
+    \    assert(m1une::matrix::characteristic_polynomial(empty) == one);\n\n    Matrix\
+    \ single(1, 1);\n    single[0][0] = 7;\n    std::vector<mint> expected{mint(-7),\
+    \ mint(1)};\n    assert(m1une::matrix::characteristic_polynomial(single) == expected);\n\
+    \n    Matrix zero(5, 5);\n    std::vector<mint> zero_polynomial(6);\n    zero_polynomial[5]\
+    \ = 1;\n    assert(\n        m1une::matrix::characteristic_polynomial(zero) ==\
+    \ zero_polynomial\n    );\n}\n\nvoid test_randomized() {\n    std::uint64_t state\
+    \ = 0xb4ca731d9e6205f8ULL;\n    auto random = [&state]() {\n        state ^= state\
+    \ << 7;\n        state ^= state >> 9;\n        return state;\n    };\n\n    for\
+    \ (int trial = 0; trial < 1000; trial++) {\n        const int size = int(random()\
+    \ % 7);\n        Matrix matrix(size, size);\n        for (mint& value : matrix.data())\
+    \ {\n            value = int(random() % 15) - 7;\n        }\n        const std::vector<mint>\
+    \ polynomial =\n            m1une::matrix::characteristic_polynomial(matrix);\n\
+    \        check_by_evaluation(matrix, polynomial);\n    }\n}\n\n}  // namespace\n\
+    \nint main() {\n    test_edge_cases();\n    test_randomized();\n\n    int size;\n\
+    \    std::cin >> size;\n    Matrix matrix(size, size);\n    for (int row = 0;\
+    \ row < size; row++) {\n        for (int col = 0; col < size; col++) {\n     \
+    \       std::cin >> matrix[row][col];\n        }\n    }\n\n    const std::vector<mint>\
+    \ polynomial =\n        m1une::matrix::characteristic_polynomial(std::move(matrix));\n\
+    \    for (int degree = 0; degree <= size; degree++) {\n        if (degree != 0)\
+    \ std::cout << ' ';\n        std::cout << polynomial[std::size_t(degree)];\n \
+    \   }\n    std::cout << '\\n';\n}\n"
   dependsOn:
   - math/matrix/characteristic_polynomial.hpp
   - math/matrix/matrix.hpp
   - math/matrix/linear_algebra.hpp
-  isVerificationFile: false
-  path: math/matrix/all.hpp
-  requiredBy:
-  - math/all.hpp
+  - math/modint.hpp
+  isVerificationFile: true
+  path: verify/math/matrix/characteristic_polynomial.test.cpp
+  requiredBy: []
   timestamp: '2026-07-13 05:25:31+09:00'
-  verificationStatus: LIBRARY_ALL_AC
-  verifiedWith:
-  - verify/math/math_algorithms.test.cpp
-  - verify/math/matrix/matrix.test.cpp
-documentation_of: math/matrix/all.hpp
+  verificationStatus: TEST_ACCEPTED
+  verifiedWith: []
+documentation_of: verify/math/matrix/characteristic_polynomial.test.cpp
 layout: document
-title: Matrix Bundle
+redirect_from:
+- /verify/verify/math/matrix/characteristic_polynomial.test.cpp
+- /verify/verify/math/matrix/characteristic_polynomial.test.cpp.html
+title: verify/math/matrix/characteristic_polynomial.test.cpp
 ---
-
-## Overview
-
-`math/matrix/all.hpp` includes the complete dense matrix module.
-
-## Included Headers
-
-| Header | Contents |
-| --- | --- |
-| `math/matrix/characteristic_polynomial.hpp` | Characteristic polynomial of a square matrix over a field. |
-| `math/matrix/matrix.hpp` | Row-major dense matrices, arithmetic, multiplication, transposition, matrix-vector products, and powers. |
-| `math/matrix/linear_algebra.hpp` | Gaussian elimination, rank, determinant, inverse, and linear systems. |

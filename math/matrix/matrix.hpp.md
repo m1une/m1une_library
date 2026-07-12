@@ -9,12 +9,18 @@ data:
     path: math/matrix/all.hpp
     title: Matrix Bundle
   - icon: ':heavy_check_mark:'
+    path: math/matrix/characteristic_polynomial.hpp
+    title: Characteristic Polynomial
+  - icon: ':heavy_check_mark:'
     path: math/matrix/linear_algebra.hpp
     title: Matrix Linear Algebra
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/matrix/characteristic_polynomial.test.cpp
+    title: verify/math/matrix/characteristic_polynomial.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/matrix/inverse_matrix.test.cpp
     title: verify/math/matrix/inverse_matrix.test.cpp
@@ -206,6 +212,7 @@ data:
   path: math/matrix/matrix.hpp
   requiredBy:
   - math/all.hpp
+  - math/matrix/characteristic_polynomial.hpp
   - math/matrix/all.hpp
   - math/matrix/linear_algebra.hpp
   timestamp: '2026-07-07 14:26:59+09:00'
@@ -213,6 +220,7 @@ data:
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
   - verify/math/matrix/inverse_matrix.test.cpp
+  - verify/math/matrix/characteristic_polynomial.test.cpp
   - verify/math/matrix/matrix.test.cpp
   - verify/math/matrix/matrix_product.test.cpp
 documentation_of: math/matrix/matrix.hpp

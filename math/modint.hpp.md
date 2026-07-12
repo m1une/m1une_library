@@ -214,6 +214,9 @@ data:
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/matrix/characteristic_polynomial.test.cpp
+    title: verify/math/matrix/characteristic_polynomial.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/matrix/inverse_matrix.test.cpp
     title: verify/math/matrix/inverse_matrix.test.cpp
   - icon: ':heavy_check_mark:'
@@ -447,6 +450,7 @@ data:
   - verify/math/fps/fps_algorithms.test.cpp
   - verify/math/fps/fps_algorithms.test.cpp
   - verify/math/matrix/inverse_matrix.test.cpp
+  - verify/math/matrix/characteristic_polynomial.test.cpp
   - verify/math/matrix/matrix.test.cpp
   - verify/math/matrix/matrix_product.test.cpp
   - verify/math/sum_of_multiplicative_function.test.cpp

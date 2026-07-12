@@ -798,6 +798,9 @@ data:
       path: math/matrix/all.hpp
       title: Matrix Bundle
     - icon: ':heavy_check_mark:'
+      path: math/matrix/characteristic_polynomial.hpp
+      title: Characteristic Polynomial
+    - icon: ':heavy_check_mark:'
       path: math/matrix/linear_algebra.hpp
       title: Matrix Linear Algebra
     - icon: ':heavy_check_mark:'
@@ -1659,6 +1662,9 @@ data:
       title: verify/math/fps/pow_of_formal_power_series.test.cpp
   - name: verify/math/matrix
     pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/math/matrix/characteristic_polynomial.test.cpp
+      title: verify/math/matrix/characteristic_polynomial.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/matrix/inverse_matrix.test.cpp
       title: verify/math/matrix/inverse_matrix.test.cpp

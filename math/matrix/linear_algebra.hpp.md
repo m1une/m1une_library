@@ -16,6 +16,9 @@ data:
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/matrix/characteristic_polynomial.test.cpp
+    title: verify/math/matrix/characteristic_polynomial.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/matrix/inverse_matrix.test.cpp
     title: verify/math/matrix/inverse_matrix.test.cpp
   - icon: ':heavy_check_mark:'
@@ -328,6 +331,7 @@ data:
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
   - verify/math/matrix/inverse_matrix.test.cpp
+  - verify/math/matrix/characteristic_polynomial.test.cpp
   - verify/math/matrix/matrix.test.cpp
 documentation_of: math/matrix/linear_algebra.hpp
 layout: document

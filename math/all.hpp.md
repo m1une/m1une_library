@@ -74,6 +74,9 @@ data:
     path: math/matrix/all.hpp
     title: Matrix Bundle
   - icon: ':heavy_check_mark:'
+    path: math/matrix/characteristic_polynomial.hpp
+    title: Characteristic Polynomial
+  - icon: ':heavy_check_mark:'
     path: math/matrix/linear_algebra.hpp
     title: Matrix Linear Algebra
   - icon: ':heavy_check_mark:'
@@ -266,8 +269,9 @@ data:
   - math/fps/multipoint_evaluation.hpp
   - math/fps/polynomial_factorization.hpp
   - math/matrix/all.hpp
-  - math/matrix/linear_algebra.hpp
+  - math/matrix/characteristic_polynomial.hpp
   - math/matrix/matrix.hpp
+  - math/matrix/linear_algebra.hpp
   - math/modint.hpp
   - math/modular_square_root.hpp
   - math/multiplicative_function_prefix_sum.hpp
@@ -286,7 +290,7 @@ data:
   isVerificationFile: false
   path: math/all.hpp
   requiredBy: []
-  timestamp: '2026-07-13 05:19:17+09:00'
+  timestamp: '2026-07-13 05:25:31+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp

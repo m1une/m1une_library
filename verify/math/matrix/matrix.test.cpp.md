@@ -5,6 +5,9 @@ data:
     path: math/matrix/all.hpp
     title: Matrix Bundle
   - icon: ':heavy_check_mark:'
+    path: math/matrix/characteristic_polynomial.hpp
+    title: Characteristic Polynomial
+  - icon: ':heavy_check_mark:'
     path: math/matrix/linear_algebra.hpp
     title: Matrix Linear Algebra
   - icon: ':heavy_check_mark:'
@@ -73,27 +76,26 @@ data:
     \ ModInt& rhs) {\n        long long v;\n        is >> v;\n        rhs = ModInt(v);\n\
     \        return is;\n    }\n};\n\nusing modint998244353 = ModInt<998244353>;\n\
     using modint1000000007 = ModInt<1000000007>;\n\n}  // namespace math\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"math/matrix/all.hpp\"\n\n\n\n#line 1 \"math/matrix/linear_algebra.hpp\"\
-    \n\n\n\n#include <optional>\n#line 6 \"math/matrix/linear_algebra.hpp\"\n#include\
-    \ <vector>\n\n#line 1 \"math/matrix/matrix.hpp\"\n\n\n\n#include <cassert>\n#include\
-    \ <cstddef>\n#line 9 \"math/matrix/matrix.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ matrix {\n\ntemplate <class T>\nclass Matrix {\n   private:\n    int _rows;\n\
-    \    int _cols;\n    std::vector<T> _data;\n\n    static std::size_t storage_size(int\
-    \ rows, int cols) {\n        assert(rows >= 0);\n        assert(cols >= 0);\n\
-    \        return std::size_t(rows) * std::size_t(cols);\n    }\n\n   public:\n\
-    \    using value_type = T;\n\n    Matrix() : _rows(0), _cols(0) {}\n\n    Matrix(int\
-    \ rows, int cols, const T& value = T())\n        : _rows(rows), _cols(cols), _data(storage_size(rows,\
-    \ cols), value) {}\n\n    Matrix(int rows, int cols, std::vector<T> values)\n\
-    \        : _rows(rows), _cols(cols), _data(std::move(values)) {\n        assert(rows\
-    \ >= 0);\n        assert(cols >= 0);\n        assert(_data.size() == std::size_t(rows)\
-    \ * std::size_t(cols));\n    }\n\n    explicit Matrix(const std::vector<std::vector<T>>&\
-    \ values)\n        : _rows(int(values.size())), _cols(values.empty() ? 0 : int(values[0].size())),\n\
-    \          _data(storage_size(_rows, _cols)) {\n        for (int row = 0; row\
-    \ < _rows; row++) {\n            assert(int(values[std::size_t(row)].size()) ==\
-    \ _cols);\n            for (int col = 0; col < _cols; col++) {\n             \
-    \   (*this)[row][col] = values[std::size_t(row)][std::size_t(col)];\n        \
-    \    }\n        }\n    }\n\n    int rows() const {\n        return _rows;\n  \
-    \  }\n\n    int cols() const {\n        return _cols;\n    }\n\n    bool empty()\
+    \ m1une\n\n\n#line 1 \"math/matrix/all.hpp\"\n\n\n\n#line 1 \"math/matrix/characteristic_polynomial.hpp\"\
+    \n\n\n\n#include <cassert>\n#include <cstddef>\n#line 7 \"math/matrix/characteristic_polynomial.hpp\"\
+    \n#include <vector>\n\n#line 1 \"math/matrix/matrix.hpp\"\n\n\n\n#line 9 \"math/matrix/matrix.hpp\"\
+    \n\nnamespace m1une {\nnamespace matrix {\n\ntemplate <class T>\nclass Matrix\
+    \ {\n   private:\n    int _rows;\n    int _cols;\n    std::vector<T> _data;\n\n\
+    \    static std::size_t storage_size(int rows, int cols) {\n        assert(rows\
+    \ >= 0);\n        assert(cols >= 0);\n        return std::size_t(rows) * std::size_t(cols);\n\
+    \    }\n\n   public:\n    using value_type = T;\n\n    Matrix() : _rows(0), _cols(0)\
+    \ {}\n\n    Matrix(int rows, int cols, const T& value = T())\n        : _rows(rows),\
+    \ _cols(cols), _data(storage_size(rows, cols), value) {}\n\n    Matrix(int rows,\
+    \ int cols, std::vector<T> values)\n        : _rows(rows), _cols(cols), _data(std::move(values))\
+    \ {\n        assert(rows >= 0);\n        assert(cols >= 0);\n        assert(_data.size()\
+    \ == std::size_t(rows) * std::size_t(cols));\n    }\n\n    explicit Matrix(const\
+    \ std::vector<std::vector<T>>& values)\n        : _rows(int(values.size())), _cols(values.empty()\
+    \ ? 0 : int(values[0].size())),\n          _data(storage_size(_rows, _cols)) {\n\
+    \        for (int row = 0; row < _rows; row++) {\n            assert(int(values[std::size_t(row)].size())\
+    \ == _cols);\n            for (int col = 0; col < _cols; col++) {\n          \
+    \      (*this)[row][col] = values[std::size_t(row)][std::size_t(col)];\n     \
+    \       }\n        }\n    }\n\n    int rows() const {\n        return _rows;\n\
+    \    }\n\n    int cols() const {\n        return _cols;\n    }\n\n    bool empty()\
     \ const {\n        return _rows == 0 || _cols == 0;\n    }\n\n    std::vector<T>&\
     \ data() {\n        return _data;\n    }\n\n    const std::vector<T>& data() const\
     \ {\n        return _data;\n    }\n\n    T* operator[](int row) {\n        assert(0\
@@ -160,31 +162,65 @@ data:
     \        Matrix base = *this;\n        while (exponent > 0) {\n            if\
     \ (exponent & 1) result *= base;\n            exponent >>= 1;\n            if\
     \ (exponent > 0) base *= base;\n        }\n        return result;\n    }\n};\n\
-    \n}  // namespace matrix\n}  // namespace m1une\n\n\n#line 9 \"math/matrix/linear_algebra.hpp\"\
-    \n\nnamespace m1une {\nnamespace matrix {\n\ntemplate <class T>\nconstexpr T default_epsilon()\
-    \ {\n    if constexpr (std::is_floating_point_v<T>) {\n        return T(1e-10);\n\
-    \    } else {\n        return T();\n    }\n}\n\nnamespace detail {\n\ntemplate\
-    \ <class T>\nT matrix_abs(T value) {\n    return value < T() ? T() - value : value;\n\
-    }\n\ntemplate <class T>\nbool is_zero(const T& value, const T& eps) {\n    if\
-    \ constexpr (std::is_floating_point_v<T>) {\n        return matrix_abs(value)\
-    \ <= eps;\n    } else {\n        (void)eps;\n        return value == T();\n  \
-    \  }\n}\n\ntemplate <class T>\nint choose_pivot(const Matrix<T>& matrix, int first_row,\
-    \ int col, const T& eps) {\n    int pivot = -1;\n    if constexpr (std::is_floating_point_v<T>)\
-    \ {\n        for (int row = first_row; row < matrix.rows(); row++) {\n       \
-    \     if (is_zero(matrix[row][col], eps)) continue;\n            if (pivot ==\
-    \ -1 || matrix_abs(matrix[pivot][col]) < matrix_abs(matrix[row][col])) {\n   \
-    \             pivot = row;\n            }\n        }\n    } else {\n        for\
-    \ (int row = first_row; row < matrix.rows(); row++) {\n            if (!is_zero(matrix[row][col],\
-    \ eps)) {\n                pivot = row;\n                break;\n            }\n\
-    \        }\n    }\n    return pivot;\n}\n\ntemplate <class T>\nstd::vector<int>\
-    \ row_reduce(Matrix<T>& matrix, int pivot_col_limit, const T& eps,\n         \
-    \                   bool reduced) {\n    std::vector<int> pivot_columns;\n   \
-    \ int pivot_row = 0;\n    for (int col = 0; col < pivot_col_limit && pivot_row\
-    \ < matrix.rows(); col++) {\n        int pivot = choose_pivot(matrix, pivot_row,\
-    \ col, eps);\n        if (pivot == -1) continue;\n        matrix.swap_rows(pivot_row,\
-    \ pivot);\n\n        const T pivot_value = matrix[pivot_row][col];\n        if\
-    \ (reduced) {\n            for (int j = col; j < matrix.cols(); j++) matrix[pivot_row][j]\
-    \ /= pivot_value;\n        }\n\n        const int first_row = reduced ? 0 : pivot_row\
+    \n}  // namespace matrix\n}  // namespace m1une\n\n\n#line 10 \"math/matrix/characteristic_polynomial.hpp\"\
+    \n\nnamespace m1une {\nnamespace matrix {\n\ntemplate <class T>\nstd::vector<T>\
+    \ characteristic_polynomial(Matrix<T> matrix) {\n    assert(matrix.rows() == matrix.cols());\n\
+    \    const int size = matrix.rows();\n\n    for (int col = 0; col + 2 < size;\
+    \ col++) {\n        int pivot = col + 1;\n        while (pivot < size && matrix[pivot][col]\
+    \ == T()) pivot++;\n        if (pivot == size) continue;\n\n        if (pivot\
+    \ != col + 1) {\n            matrix.swap_rows(pivot, col + 1);\n            for\
+    \ (int row = 0; row < size; row++) {\n                std::swap(matrix[row][pivot],\
+    \ matrix[row][col + 1]);\n            }\n        }\n\n        const T inverse_pivot\
+    \ = T(1) / matrix[col + 1][col];\n        for (int row = col + 2; row < size;\
+    \ row++) {\n            if (matrix[row][col] == T()) continue;\n            const\
+    \ T factor = matrix[row][col] * inverse_pivot;\n            for (int j = col;\
+    \ j < size; j++) {\n                matrix[row][j] -= factor * matrix[col + 1][j];\n\
+    \            }\n            for (int i = 0; i < size; i++) {\n               \
+    \ matrix[i][col + 1] += factor * matrix[i][row];\n            }\n        }\n \
+    \   }\n\n    std::vector<std::vector<T>> polynomial(std::size_t(size + 1));\n\
+    \    polynomial[0].assign(1, T(1));\n    for (int leading_size = 1; leading_size\
+    \ <= size; leading_size++) {\n        const int last = leading_size - 1;\n   \
+    \     polynomial[std::size_t(leading_size)].assign(\n            std::size_t(leading_size\
+    \ + 1),\n            T()\n        );\n        const std::vector<T>& previous =\n\
+    \            polynomial[std::size_t(leading_size - 1)];\n        std::vector<T>&\
+    \ current = polynomial[std::size_t(leading_size)];\n\n        for (int degree\
+    \ = 0; degree < leading_size; degree++) {\n            current[std::size_t(degree)]\
+    \ -=\n                previous[std::size_t(degree)] * matrix[last][last];\n  \
+    \          current[std::size_t(degree + 1)] +=\n                previous[std::size_t(degree)];\n\
+    \        }\n\n        T subdiagonal_product = T(1);\n        for (int row = last\
+    \ - 1; row >= 0; row--) {\n            subdiagonal_product *= matrix[row + 1][row];\n\
+    \            const T factor = subdiagonal_product * matrix[row][last];\n     \
+    \       if (factor == T()) continue;\n            for (int degree = 0; degree\
+    \ <= row; degree++) {\n                current[std::size_t(degree)] -=\n     \
+    \               factor * polynomial[std::size_t(row)][std::size_t(degree)];\n\
+    \            }\n        }\n    }\n    return polynomial[std::size_t(size)];\n\
+    }\n\n}  // namespace matrix\n}  // namespace m1une\n\n\n#line 1 \"math/matrix/linear_algebra.hpp\"\
+    \n\n\n\n#include <optional>\n#line 7 \"math/matrix/linear_algebra.hpp\"\n\n#line\
+    \ 9 \"math/matrix/linear_algebra.hpp\"\n\nnamespace m1une {\nnamespace matrix\
+    \ {\n\ntemplate <class T>\nconstexpr T default_epsilon() {\n    if constexpr (std::is_floating_point_v<T>)\
+    \ {\n        return T(1e-10);\n    } else {\n        return T();\n    }\n}\n\n\
+    namespace detail {\n\ntemplate <class T>\nT matrix_abs(T value) {\n    return\
+    \ value < T() ? T() - value : value;\n}\n\ntemplate <class T>\nbool is_zero(const\
+    \ T& value, const T& eps) {\n    if constexpr (std::is_floating_point_v<T>) {\n\
+    \        return matrix_abs(value) <= eps;\n    } else {\n        (void)eps;\n\
+    \        return value == T();\n    }\n}\n\ntemplate <class T>\nint choose_pivot(const\
+    \ Matrix<T>& matrix, int first_row, int col, const T& eps) {\n    int pivot =\
+    \ -1;\n    if constexpr (std::is_floating_point_v<T>) {\n        for (int row\
+    \ = first_row; row < matrix.rows(); row++) {\n            if (is_zero(matrix[row][col],\
+    \ eps)) continue;\n            if (pivot == -1 || matrix_abs(matrix[pivot][col])\
+    \ < matrix_abs(matrix[row][col])) {\n                pivot = row;\n          \
+    \  }\n        }\n    } else {\n        for (int row = first_row; row < matrix.rows();\
+    \ row++) {\n            if (!is_zero(matrix[row][col], eps)) {\n             \
+    \   pivot = row;\n                break;\n            }\n        }\n    }\n  \
+    \  return pivot;\n}\n\ntemplate <class T>\nstd::vector<int> row_reduce(Matrix<T>&\
+    \ matrix, int pivot_col_limit, const T& eps,\n                            bool\
+    \ reduced) {\n    std::vector<int> pivot_columns;\n    int pivot_row = 0;\n  \
+    \  for (int col = 0; col < pivot_col_limit && pivot_row < matrix.rows(); col++)\
+    \ {\n        int pivot = choose_pivot(matrix, pivot_row, col, eps);\n        if\
+    \ (pivot == -1) continue;\n        matrix.swap_rows(pivot_row, pivot);\n\n   \
+    \     const T pivot_value = matrix[pivot_row][col];\n        if (reduced) {\n\
+    \            for (int j = col; j < matrix.cols(); j++) matrix[pivot_row][j] /=\
+    \ pivot_value;\n        }\n\n        const int first_row = reduced ? 0 : pivot_row\
     \ + 1;\n        for (int row = first_row; row < matrix.rows(); row++) {\n    \
     \        if (row == pivot_row || is_zero(matrix[row][col], eps)) continue;\n \
     \           T factor = matrix[row][col];\n            if (!reduced) factor /=\
@@ -260,7 +296,7 @@ data:
     \  direction[std::size_t(pivot_col)] = T() - augmented[row][free_col];\n     \
     \   }\n        result.nullspace_basis.push_back(std::move(direction));\n    }\n\
     \    return result;\n}\n\n}  // namespace matrix\n}  // namespace m1une\n\n\n\
-    #line 6 \"math/matrix/all.hpp\"\n\n\n#line 5 \"verify/math/matrix/matrix.test.cpp\"\
+    #line 7 \"math/matrix/all.hpp\"\n\n\n#line 5 \"verify/math/matrix/matrix.test.cpp\"\
     \n\n#line 7 \"verify/math/matrix/matrix.test.cpp\"\n#include <cmath>\n#line 11\
     \ \"verify/math/matrix/matrix.test.cpp\"\n\nnamespace {\n\nusing mint = m1une::math::modint998244353;\n\
     using m1une::matrix::Matrix;\n\ntemplate <class T>\nvoid assert_product_is_identity(const\
@@ -464,12 +500,13 @@ data:
   dependsOn:
   - math/modint.hpp
   - math/matrix/all.hpp
-  - math/matrix/linear_algebra.hpp
+  - math/matrix/characteristic_polynomial.hpp
   - math/matrix/matrix.hpp
+  - math/matrix/linear_algebra.hpp
   isVerificationFile: true
   path: verify/math/matrix/matrix.test.cpp
   requiredBy: []
-  timestamp: '2026-07-07 14:26:59+09:00'
+  timestamp: '2026-07-13 05:25:31+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/matrix/matrix.test.cpp
