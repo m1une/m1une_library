@@ -16,6 +16,7 @@
 #include "maximum_clique.hpp"
 #include "minimum_steiner_tree.hpp"
 #include "namori.hpp"
+#include "replacement_paths.hpp"
 #include "shortest_path.hpp"
 #include "two_edge_connected_components.hpp"
 

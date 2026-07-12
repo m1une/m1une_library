@@ -8,6 +8,7 @@
 #include "graph.hpp"
 #include "grid.hpp"
 #include "range_edge_graph.hpp"
+#include "replacement_paths.hpp"
 #include "shortest_path.hpp"
 #include "tree/all.hpp"
 #include "undirected.hpp"

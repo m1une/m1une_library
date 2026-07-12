@@ -28,6 +28,7 @@ where direction should not matter.
 | `graph/maximum_clique.hpp` | Direction ignored | Exact maximum clique, maximum independent set, and minimum vertex cover with bitset branch-and-bound. |
 | `graph/chromatic_number.hpp` | Direction ignored | Exact chromatic number for graphs with at most 20 vertices. |
 | `graph/minimum_steiner_tree.hpp` | Undirected only | Exact edge- and vertex-weighted minimum Steiner-tree costs and reconstruction for a small terminal set. |
+| `graph/replacement_paths.hpp` | Undirected positive-weight graphs | Edge- and vertex-failure replacement distances along one fixed shortest path. |
 | `graph/namori.hpp` | Undirected Namori graph | Ordered cycles and the trees attached to them. |
 | `graph/connected_components.hpp` | Direction ignored | Weak/ordinary connected components. |
 | `graph/cycle_detection.hpp` | Directed and undirected variants | Use `find_undirected_cycle(g)` for undirected graphs. |
