@@ -4,6 +4,7 @@
 #include "cartesian_tree.hpp"
 #include "centroid_decomposition.hpp"
 #include "diameter.hpp"
+#include "distance_frequency.hpp"
 #include "dsu_on_tree.hpp"
 #include "euler_tour.hpp"
 #include "heavy_light_decomposition.hpp"

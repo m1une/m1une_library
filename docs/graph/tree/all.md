@@ -22,6 +22,7 @@ same graph container.
 | `graph/tree/heavy_light_decomposition.hpp` | HLD order, path segments, subtree ranges, LCA, and jumps. |
 | `graph/tree/range_contour_query.hpp` | Commutative-group contour products and applications by unweighted tree distance, with additive wrappers. |
 | `graph/tree/diameter.hpp` | Weighted tree/forest diameter path. |
+| `graph/tree/distance_frequency.hpp` | Counts unordered vertex pairs at every unweighted tree distance. |
 | `graph/tree/tree_hash.hpp` | Probabilistic rooted-subtree and unrooted-tree isomorphism hashes. |
 | `graph/tree/dsu_on_tree.hpp` | Iterative small-to-large subtree processing with user callbacks. |
 | `graph/tree/rerooting_dp.hpp` | Generic rerooting DP helper. |
