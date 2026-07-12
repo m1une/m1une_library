@@ -1,5 +1,5 @@
-#ifndef M1UNE_STRING_PREFIX_FUNCTION_HPP
-#define M1UNE_STRING_PREFIX_FUNCTION_HPP 1
+#ifndef M1UNE_STRING_KMP_HPP
+#define M1UNE_STRING_KMP_HPP 1
 
 #include <vector>
 
@@ -53,4 +53,4 @@ std::vector<int> kmp_search(const Text& text, const Pattern& pattern) {
 }  // namespace string
 }  // namespace m1une
 
-#endif  // M1UNE_STRING_PREFIX_FUNCTION_HPP
+#endif  // M1UNE_STRING_KMP_HPP

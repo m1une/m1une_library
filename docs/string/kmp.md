@@ -1,14 +1,13 @@
 ---
-title: Prefix Function and KMP
-documentation_of: ../../string/prefix_function.hpp
+title: Knuth-Morris-Pratt
+documentation_of: ../../string/kmp.hpp
 ---
 
 ## Overview
 
 The prefix function stores, for every prefix ending at position `i`, the length
-of its longest proper prefix that is also a suffix. It is the preprocessing
-step for Knuth-Morris-Pratt pattern matching and is also useful for borders and
-periods.
+of its longest proper prefix that is also a suffix. Knuth-Morris-Pratt uses it
+to find every occurrence of a pattern without backing up in the text.
 
 Both functions are generic over indexable sequences with comparable elements.
 
@@ -24,7 +23,7 @@ An empty pattern occurs at every position from `0` through `text.size()`.
 ## Example
 
 ```cpp
-#include "string/prefix_function.hpp"
+#include "string/kmp.hpp"
 
 #include <iostream>
 #include <string>

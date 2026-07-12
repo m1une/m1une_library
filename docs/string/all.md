@@ -16,12 +16,12 @@ contest when convenience matters more.
 | `string/aho_corasick.hpp` | Multi-pattern matching with failure links and occurrence counting. |
 | `string/eertree.hpp` | Online palindromic tree with suffix and series links. |
 | `string/levenshtein_distance.hpp` | Unit-cost edit distance in linear auxiliary memory. |
+| `string/kmp.hpp` | Prefix function and linear-time KMP occurrence search. |
 | `string/longest_common_extension.hpp` | Static longest-common-extension queries and substring comparisons. |
 | `string/longest_common_subsequence.hpp` | Finds one longest subsequence common to two sequences. |
 | `string/longest_common_substring.hpp` | Finds one longest substring common to two sequences. |
 | `string/lyndon_factorization.hpp` | Duval's linear-time Lyndon factorization. |
 | `string/z_algorithm.hpp` | Linear-time Z array. |
-| `string/prefix_function.hpp` | Prefix function and KMP occurrence search. |
 | `string/manacher.hpp` | Odd/even palindrome radii and substring checks. |
 | `string/suffix_automaton.hpp` | Online suffix automaton for substring queries and occurrence classes. |
 | `string/suffix_array.hpp` | Suffix array and LCP array. |
