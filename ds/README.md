@@ -15,7 +15,7 @@ one-shot sequence computations such as LIS are in `algo/sequence/`.
 | [`binary_trie/`](binary_trie/) | Binary tries for integer xor queries and monoid aggregates |
 | [`dynamic_tree/`](dynamic_tree/) | Link-cut tree, path-oriented variants, and rake-compress link-cut tree |
 | [`dynamic_connectivity/`](dynamic_connectivity/) | Online and offline fully dynamic undirected connectivity |
-| [`heap/`](heap/) | Pairing-based meldable priority queue |
+| [`heap/`](heap/) | Array-based double-ended priority queue and pairing-based meldable priority queue |
 | [`interval_set/`](interval_set/) | Disjoint interval set with insertion, deletion, and covered-point queries |
 | [`hash_table/`](hash_table/) | `hash_map.hpp`, `hash_set.hpp`, and their shared implementation |
 

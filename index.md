@@ -320,6 +320,9 @@ data:
   - name: ds/heap
     pages:
     - icon: ':heavy_check_mark:'
+      path: ds/heap/double_ended_priority_queue.hpp
+      title: Double-Ended Priority Queue
+    - icon: ':heavy_check_mark:'
       path: ds/heap/meldable_heap.hpp
       title: Meldable Heap
   - name: ds/interval_set
@@ -1258,6 +1261,9 @@ data:
       title: verify/ds/hash_table/hash_set.test.cpp
   - name: verify/ds/heap
     pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/heap/double_ended_priority_queue.test.cpp
+      title: verify/ds/heap/double_ended_priority_queue.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/ds/heap/meldable_heap.test.cpp
       title: verify/ds/heap/meldable_heap.test.cpp
