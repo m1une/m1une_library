@@ -18,6 +18,7 @@
 #include "modular_square_root.hpp"
 #include "number_theory.hpp"
 #include "partition_function.hpp"
+#include "prefix_sum_of_binom.hpp"
 #include "prime_factorization.hpp"
 #include "primitive_root.hpp"
 #include "prime_sieve.hpp"

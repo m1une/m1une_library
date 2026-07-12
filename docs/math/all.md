@@ -36,6 +36,8 @@ You usually do not need to include this entire bundle:
 * Use `combinatorial_sequences.hpp` for Catalan, Bell, Stirling, partition, or
   derangement numbers.
 * Use `partition_function.hpp` when only integer partition numbers are needed.
+* Use `prefix_sum_of_binom.hpp` for online or offline queries of
+  $\sum_{k=0}^{m-1}\binom{n}{k}$.
 * Use `cyclotomic_polynomial.hpp` to construct the polynomial of primitive
   roots of unity of a given order.
 * Use `prime_sieve.hpp` when all queried integers are at most a manageable
@@ -84,6 +86,7 @@ few unused headers do not matter.
 | `math/generalized_floor_sum.hpp` | Polynomial moments of a linear floor sequence using monoid floor sum. |
 | `math/number_theory.hpp` | Extended GCD, modular power and inverse, CRT, and floor sum. |
 | `math/partition_function.hpp` | Integer partition numbers via Euler's pentagonal theorem and FPS inversion. |
+| `math/prefix_sum_of_binom.hpp` | Online and offline prefix sums of binomial coefficients. |
 | `math/prime_sieve.hpp` | Linear sieve with smallest prime factors. |
 | `math/prime_factorization.hpp` | Deterministic 64-bit primality test and Pollard-Rho factorization. |
 | `math/primitive_root.hpp` | Smallest primitive root modulo an integer, when one exists. |
