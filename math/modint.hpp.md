@@ -6,8 +6,23 @@ data:
     path: graph/all.hpp
     title: Graph All
   - icon: ':heavy_check_mark:'
+    path: graph/all.hpp
+    title: Graph All
+  - icon: ':heavy_check_mark:'
     path: graph/counting.hpp
     title: Graph Counting
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/all.hpp
+    title: Tree All
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/all.hpp
+    title: Tree All
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/distance_frequency.hpp
+    title: Tree Distance Frequency
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/distance_frequency.hpp
+    title: Tree Distance Frequency
   - icon: ':heavy_check_mark:'
     path: math/all.hpp
     title: Math All
@@ -91,6 +106,12 @@ data:
     path: verify/graph/cow_game.test.cpp
     title: verify/graph/cow_game.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/cow_game.test.cpp
+    title: verify/graph/cow_game.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/graph_algorithms.test.cpp
+    title: verify/graph/graph_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/graph_algorithms.test.cpp
     title: verify/graph/graph_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
@@ -102,6 +123,21 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/range_edge_graph.test.cpp
     title: verify/graph/range_edge_graph.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/range_edge_graph.test.cpp
+    title: verify/graph/range_edge_graph.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/distance_frequency.test.cpp
+    title: verify/graph/tree/distance_frequency.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/distance_frequency.test.cpp
+    title: verify/graph/tree/distance_frequency.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/tree_algorithms.test.cpp
+    title: verify/graph/tree/tree_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/tree_algorithms.test.cpp
+    title: verify/graph/tree/tree_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/bell_number.test.cpp
     title: verify/math/bell_number.test.cpp
@@ -392,6 +428,11 @@ data:
   - math/fps/linear_recurrence.hpp
   - math/fps/convolution.hpp
   - math/fps/polynomial_factorization.hpp
+  - graph/tree/all.hpp
+  - graph/tree/all.hpp
+  - graph/tree/distance_frequency.hpp
+  - graph/tree/distance_frequency.hpp
+  - graph/all.hpp
   - graph/all.hpp
   - graph/counting.hpp
   timestamp: '2026-07-01 14:11:51+09:00'
@@ -463,9 +504,16 @@ data:
   - verify/math/bernoulli_number.test.cpp
   - verify/matroid/matroids.test.cpp
   - verify/graph/cow_game.test.cpp
+  - verify/graph/cow_game.test.cpp
   - verify/graph/graph_counting.test.cpp
   - verify/graph/graph_counting.test.cpp
   - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/tree/tree_algorithms.test.cpp
+  - verify/graph/tree/tree_algorithms.test.cpp
+  - verify/graph/tree/distance_frequency.test.cpp
+  - verify/graph/tree/distance_frequency.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
   - verify/graph/graph_algorithms.test.cpp
 documentation_of: math/modint.hpp
 layout: document

@@ -102,6 +102,9 @@ data:
     path: graph/tree/diameter.hpp
     title: Tree Diameter
   - icon: ':heavy_check_mark:'
+    path: graph/tree/distance_frequency.hpp
+    title: Tree Distance Frequency
+  - icon: ':heavy_check_mark:'
     path: graph/tree/dsu_on_tree.hpp
     title: DSU on Tree
   - icon: ':heavy_check_mark:'
@@ -237,6 +240,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/tree/cartesian_tree.test.cpp
     title: verify/graph/tree/cartesian_tree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/distance_frequency.test.cpp
+    title: verify/graph/tree/distance_frequency.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/distance_frequency.test.cpp
+    title: verify/graph/tree/distance_frequency.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/tree/dsu_on_tree.test.cpp
     title: verify/graph/tree/dsu_on_tree.test.cpp
@@ -419,6 +428,7 @@ data:
   - graph/tree/euler_tour.hpp
   - graph/tree/range_contour_query.hpp
   - graph/tree/rerooting_static_top_tree.hpp
+  - graph/tree/distance_frequency.hpp
   - graph/tree/heavy_light_decomposition.hpp
   - graph/tree/static_top_tree.hpp
   - graph/tree/dsu_on_tree.hpp
@@ -470,6 +480,8 @@ data:
   - verify/graph/tree/vertex_add_subtree_sum.test.cpp
   - verify/graph/tree/tree_algorithms.test.cpp
   - verify/graph/tree/tree_algorithms.test.cpp
+  - verify/graph/tree/distance_frequency.test.cpp
+  - verify/graph/tree/distance_frequency.test.cpp
   - verify/graph/tree/dsu_on_tree.test.cpp
   - verify/graph/tree/dsu_on_tree.test.cpp
   - verify/graph/tree/zero_one_on_tree.test.cpp

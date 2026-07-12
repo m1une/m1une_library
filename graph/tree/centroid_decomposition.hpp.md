@@ -12,6 +12,9 @@ data:
     path: graph/tree/all.hpp
     title: Tree All
   - icon: ':heavy_check_mark:'
+    path: graph/tree/distance_frequency.hpp
+    title: Tree Distance Frequency
+  - icon: ':heavy_check_mark:'
     path: graph/tree/range_contour_query.hpp
     title: Range Contour Query on Tree
   _extendedVerifiedWith:
@@ -24,6 +27,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/range_edge_graph.test.cpp
     title: verify/graph/range_edge_graph.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/distance_frequency.test.cpp
+    title: verify/graph/tree/distance_frequency.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/tree/tree_algorithms.test.cpp
     title: verify/graph/tree/tree_algorithms.test.cpp
@@ -181,6 +187,7 @@ data:
   requiredBy:
   - graph/tree/all.hpp
   - graph/tree/range_contour_query.hpp
+  - graph/tree/distance_frequency.hpp
   - graph/all.hpp
   timestamp: '2026-07-11 19:47:32+09:00'
   verificationStatus: LIBRARY_ALL_AC
@@ -190,6 +197,7 @@ data:
   - verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
   - verify/graph/tree/vertex_get_range_contour_add_on_tree.test.cpp
   - verify/graph/tree/tree_algorithms.test.cpp
+  - verify/graph/tree/distance_frequency.test.cpp
   - verify/graph/graph_algorithms.test.cpp
 documentation_of: graph/tree/centroid_decomposition.hpp
 layout: document

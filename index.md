@@ -625,6 +625,9 @@ data:
       path: graph/tree/diameter.hpp
       title: Tree Diameter
     - icon: ':heavy_check_mark:'
+      path: graph/tree/distance_frequency.hpp
+      title: Tree Distance Frequency
+    - icon: ':heavy_check_mark:'
       path: graph/tree/dsu_on_tree.hpp
       title: DSU on Tree
     - icon: ':heavy_check_mark:'
@@ -1491,6 +1494,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/graph/tree/cartesian_tree.test.cpp
       title: verify/graph/tree/cartesian_tree.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/tree/distance_frequency.test.cpp
+      title: verify/graph/tree/distance_frequency.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/graph/tree/dsu_on_tree.test.cpp
       title: verify/graph/tree/dsu_on_tree.test.cpp

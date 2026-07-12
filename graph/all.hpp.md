@@ -131,6 +131,9 @@ data:
     path: graph/tree/diameter.hpp
     title: Tree Diameter
   - icon: ':heavy_check_mark:'
+    path: graph/tree/distance_frequency.hpp
+    title: Tree Distance Frequency
+  - icon: ':heavy_check_mark:'
     path: graph/tree/dsu_on_tree.hpp
     title: DSU on Tree
   - icon: ':heavy_check_mark:'
@@ -194,11 +197,17 @@ data:
     path: math/fps/convolution.hpp
     title: Convolution
   - icon: ':heavy_check_mark:'
+    path: math/fps/convolution.hpp
+    title: Convolution
+  - icon: ':heavy_check_mark:'
     path: math/fps/formal_power_series.hpp
     title: Formal Power Series
   - icon: ':heavy_check_mark:'
     path: math/fps/internal/ntt998_faster.hpp
     title: math/fps/internal/ntt998_faster.hpp
+  - icon: ':heavy_check_mark:'
+    path: math/modint.hpp
+    title: ModInt
   - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
@@ -316,6 +325,9 @@ data:
   - graph/graph.hpp
   - graph/tree/centroid_decomposition.hpp
   - graph/tree/diameter.hpp
+  - graph/tree/distance_frequency.hpp
+  - math/fps/convolution.hpp
+  - math/modint.hpp
   - graph/tree/dsu_on_tree.hpp
   - graph/tree/euler_tour.hpp
   - graph/tree/heavy_light_decomposition.hpp
@@ -350,7 +362,7 @@ data:
   isVerificationFile: false
   path: graph/all.hpp
   requiredBy: []
-  timestamp: '2026-07-13 05:03:41+09:00'
+  timestamp: '2026-07-13 05:31:21+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
@@ -376,7 +388,7 @@ Public namespaces stay flat and short: general graph helpers use
 | Header | Graph orientation | Contents |
 | --- | --- | --- |
 | `graph/graph.hpp` | Container | `Graph<T>` and `Edge<T>` adjacency-list container. |
-| `graph/tree/all.hpp` | Tree algorithms | Euler tours, rooted-tree metadata, LCA, HLD, Cartesian tree construction, virtual trees, tree hashing, rerooting DP, static top trees, and centroid decomposition. |
+| `graph/tree/all.hpp` | Tree algorithms | Euler tours, rooted-tree metadata, LCA, HLD, distance frequencies, Cartesian trees, virtual trees, tree hashing, rerooting DP, static top trees, and centroid decomposition. |
 | `graph/flow/flow.hpp` | Flow networks | Max flow, min-cost flow, bounded flow, bounded min-cost flow, and Gomory-Hu trees. |
 | `graph/counting.hpp` | Counting formulas | Counts common labeled graph classes, tournaments, DAGs, and unlabeled trees by vertex number. |
 | `graph/range_edge_graph.hpp` | Directed graph builder | Compact point-to-range, range-to-point, and range-to-range edges using segment trees. |

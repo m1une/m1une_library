@@ -134,6 +134,9 @@ data:
     path: graph/tree/diameter.hpp
     title: Tree Diameter
   - icon: ':heavy_check_mark:'
+    path: graph/tree/distance_frequency.hpp
+    title: Tree Distance Frequency
+  - icon: ':heavy_check_mark:'
     path: graph/tree/dsu_on_tree.hpp
     title: DSU on Tree
   - icon: ':heavy_check_mark:'
@@ -197,11 +200,17 @@ data:
     path: math/fps/convolution.hpp
     title: Convolution
   - icon: ':heavy_check_mark:'
+    path: math/fps/convolution.hpp
+    title: Convolution
+  - icon: ':heavy_check_mark:'
     path: math/fps/formal_power_series.hpp
     title: Formal Power Series
   - icon: ':heavy_check_mark:'
     path: math/fps/internal/ntt998_faster.hpp
     title: math/fps/internal/ntt998_faster.hpp
+  - icon: ':heavy_check_mark:'
+    path: math/modint.hpp
+    title: ModInt
   - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
@@ -527,6 +536,9 @@ data:
   - graph/graph.hpp
   - graph/tree/centroid_decomposition.hpp
   - graph/tree/diameter.hpp
+  - graph/tree/distance_frequency.hpp
+  - math/fps/convolution.hpp
+  - math/modint.hpp
   - graph/tree/dsu_on_tree.hpp
   - graph/tree/euler_tour.hpp
   - graph/tree/heavy_light_decomposition.hpp
@@ -561,7 +573,7 @@ data:
   isVerificationFile: true
   path: verify/graph/graph_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-13 05:03:41+09:00'
+  timestamp: '2026-07-13 05:31:21+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/graph_algorithms.test.cpp
