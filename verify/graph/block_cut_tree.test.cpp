@@ -1,6 +1,5 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/biconnected_components"
 
-#include <algorithm>
 #include <cassert>
 #include <iostream>
 #include <random>
@@ -18,6 +17,19 @@ void verify_block_cut_tree(const m1une::graph::BiconnectedComponentsResult& bcc)
     assert(actual.block_count() == block_count);
     assert(actual.node_count() == block_count + int(bcc.articulation.size()));
 
+    std::vector<std::vector<int>> expected_forest(actual.node_count());
+    int incidence_count = 0;
+    for (int vertex = 0; vertex < n; vertex++) {
+        if (!bcc.is_articulation(vertex)) continue;
+        const int node = actual.node_of_articulation[vertex];
+        for (int block : bcc.vertex_components[vertex]) {
+            expected_forest[node].push_back(block);
+            expected_forest[block].push_back(node);
+            incidence_count++;
+        }
+    }
+    assert(actual.forest == expected_forest);
+
     int degree_sum = 0;
     for (int node = 0; node < actual.node_count(); node++) {
         assert(actual.is_block_node(node) != actual.is_articulation_node(node));
@@ -25,11 +37,9 @@ void verify_block_cut_tree(const m1une::graph::BiconnectedComponentsResult& bcc)
         for (int to : actual.forest[node]) {
             assert(0 <= to && to < actual.node_count());
             assert(actual.is_block_node(node) != actual.is_block_node(to));
-            assert(std::count(actual.forest[to].begin(), actual.forest[to].end(), node) == 1);
         }
     }
 
-    int incidence_count = 0;
     for (int vertex = 0; vertex < n; vertex++) {
         const bool articulation = bcc.is_articulation(vertex);
         const int node = actual.node_of_vertex[vertex];
@@ -38,10 +48,6 @@ void verify_block_cut_tree(const m1une::graph::BiconnectedComponentsResult& bcc)
             assert(actual.node_of_articulation[vertex] == node);
             assert(actual.articulation_of_node[node] == vertex);
             assert(actual.forest[node].size() == bcc.vertex_components[vertex].size());
-            for (int block : bcc.vertex_components[vertex]) {
-                assert(std::count(actual.forest[node].begin(), actual.forest[node].end(), block) == 1);
-                incidence_count++;
-            }
         } else {
             assert(actual.node_of_articulation[vertex] == -1);
             assert(bcc.vertex_components[vertex].size() == 1);
