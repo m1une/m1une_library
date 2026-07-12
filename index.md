@@ -947,6 +947,9 @@ data:
       path: string/eertree.hpp
       title: Eertree
     - icon: ':heavy_check_mark:'
+      path: string/kmp.hpp
+      title: Knuth-Morris-Pratt
+    - icon: ':heavy_check_mark:'
       path: string/levenshtein_distance.hpp
       title: Levenshtein Distance
     - icon: ':heavy_check_mark:'
@@ -964,9 +967,6 @@ data:
     - icon: ':heavy_check_mark:'
       path: string/manacher.hpp
       title: Manacher Algorithm
-    - icon: ':heavy_check_mark:'
-      path: string/prefix_function.hpp
-      title: Prefix Function and KMP
     - icon: ':heavy_check_mark:'
       path: string/rolling_hash.hpp
       title: Static Rolling Hash
@@ -1681,6 +1681,9 @@ data:
       path: verify/string/eertree.test.cpp
       title: verify/string/eertree.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/string/kmp.test.cpp
+      title: verify/string/kmp.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/string/levenshtein_distance.test.cpp
       title: verify/string/levenshtein_distance.test.cpp
     - icon: ':heavy_check_mark:'
@@ -1698,9 +1701,6 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/string/manacher.test.cpp
       title: verify/string/manacher.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/string/prefix_function.test.cpp
-      title: verify/string/prefix_function.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/string/runs.test.cpp
       title: verify/string/runs.test.cpp

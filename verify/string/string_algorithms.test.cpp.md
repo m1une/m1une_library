@@ -20,6 +20,9 @@ data:
     path: string/eertree.hpp
     title: Eertree
   - icon: ':heavy_check_mark:'
+    path: string/kmp.hpp
+    title: Knuth-Morris-Pratt
+  - icon: ':heavy_check_mark:'
     path: string/levenshtein_distance.hpp
     title: Levenshtein Distance
   - icon: ':heavy_check_mark:'
@@ -37,9 +40,6 @@ data:
   - icon: ':heavy_check_mark:'
     path: string/manacher.hpp
     title: Manacher Algorithm
-  - icon: ':heavy_check_mark:'
-    path: string/prefix_function.hpp
-    title: Prefix Function and KMP
   - icon: ':heavy_check_mark:'
     path: string/rolling_hash.hpp
     title: Static Rolling Hash
@@ -172,6 +172,7 @@ data:
   - string/all.hpp
   - string/aho_corasick.hpp
   - string/eertree.hpp
+  - string/kmp.hpp
   - string/levenshtein_distance.hpp
   - string/longest_common_extension.hpp
   - string/suffix_array.hpp
@@ -179,7 +180,6 @@ data:
   - string/longest_common_substring.hpp
   - string/lyndon_factorization.hpp
   - string/manacher.hpp
-  - string/prefix_function.hpp
   - string/rolling_hash.hpp
   - string/runs.hpp
   - string/string_hash.hpp
@@ -193,7 +193,7 @@ data:
   isVerificationFile: true
   path: verify/string/string_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-13 04:21:37+09:00'
+  timestamp: '2026-07-13 04:27:33+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/string/string_algorithms.test.cpp

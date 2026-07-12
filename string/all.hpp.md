@@ -17,6 +17,9 @@ data:
     path: string/eertree.hpp
     title: Eertree
   - icon: ':heavy_check_mark:'
+    path: string/kmp.hpp
+    title: Knuth-Morris-Pratt
+  - icon: ':heavy_check_mark:'
     path: string/levenshtein_distance.hpp
     title: Levenshtein Distance
   - icon: ':heavy_check_mark:'
@@ -34,9 +37,6 @@ data:
   - icon: ':heavy_check_mark:'
     path: string/manacher.hpp
     title: Manacher Algorithm
-  - icon: ':heavy_check_mark:'
-    path: string/prefix_function.hpp
-    title: Prefix Function and KMP
   - icon: ':heavy_check_mark:'
     path: string/rolling_hash.hpp
     title: Static Rolling Hash
@@ -94,6 +94,8 @@ data:
 
     #include "eertree.hpp"
 
+    #include "kmp.hpp"
+
     #include "levenshtein_distance.hpp"
 
     #include "longest_common_extension.hpp"
@@ -105,8 +107,6 @@ data:
     #include "lyndon_factorization.hpp"
 
     #include "manacher.hpp"
-
-    #include "prefix_function.hpp"
 
     #include "rolling_hash.hpp"
 
@@ -131,6 +131,7 @@ data:
   dependsOn:
   - string/aho_corasick.hpp
   - string/eertree.hpp
+  - string/kmp.hpp
   - string/levenshtein_distance.hpp
   - string/longest_common_extension.hpp
   - string/suffix_array.hpp
@@ -138,7 +139,6 @@ data:
   - string/longest_common_substring.hpp
   - string/lyndon_factorization.hpp
   - string/manacher.hpp
-  - string/prefix_function.hpp
   - string/rolling_hash.hpp
   - string/runs.hpp
   - string/string_hash.hpp
@@ -152,7 +152,7 @@ data:
   isVerificationFile: false
   path: string/all.hpp
   requiredBy: []
-  timestamp: '2026-07-13 04:21:37+09:00'
+  timestamp: '2026-07-13 04:27:33+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/string/string_algorithms.test.cpp
@@ -174,12 +174,12 @@ contest when convenience matters more.
 | `string/aho_corasick.hpp` | Multi-pattern matching with failure links and occurrence counting. |
 | `string/eertree.hpp` | Online palindromic tree with suffix and series links. |
 | `string/levenshtein_distance.hpp` | Unit-cost edit distance in linear auxiliary memory. |
+| `string/kmp.hpp` | Prefix function and linear-time KMP occurrence search. |
 | `string/longest_common_extension.hpp` | Static longest-common-extension queries and substring comparisons. |
 | `string/longest_common_subsequence.hpp` | Finds one longest subsequence common to two sequences. |
 | `string/longest_common_substring.hpp` | Finds one longest substring common to two sequences. |
 | `string/lyndon_factorization.hpp` | Duval's linear-time Lyndon factorization. |
 | `string/z_algorithm.hpp` | Linear-time Z array. |
-| `string/prefix_function.hpp` | Prefix function and KMP occurrence search. |
 | `string/manacher.hpp` | Odd/even palindrome radii and substring checks. |
 | `string/suffix_automaton.hpp` | Online suffix automaton for substring queries and occurrence classes. |
 | `string/suffix_array.hpp` | Suffix array and LCP array. |
