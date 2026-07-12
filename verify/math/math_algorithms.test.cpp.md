@@ -134,6 +134,9 @@ data:
     path: math/two_square_sum.hpp
     title: Sum of Two Squares
   - icon: ':heavy_check_mark:'
+    path: math/xor_basis.hpp
+    title: XOR Basis
+  - icon: ':heavy_check_mark:'
     path: math/zeta_mobius_transform.hpp
     title: Zeta and Mobius Transform
   _extendedRequiredBy: []
@@ -376,10 +379,11 @@ data:
   - math/tetration.hpp
   - math/totient_sum.hpp
   - math/two_square_sum.hpp
+  - math/xor_basis.hpp
   isVerificationFile: true
   path: verify/math/math_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-13 03:44:35+09:00'
+  timestamp: '2026-07-13 05:12:04+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/math_algorithms.test.cpp

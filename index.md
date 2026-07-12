@@ -747,6 +747,9 @@ data:
       path: math/two_square_sum.hpp
       title: Sum of Two Squares
     - icon: ':heavy_check_mark:'
+      path: math/xor_basis.hpp
+      title: XOR Basis
+    - icon: ':heavy_check_mark:'
       path: math/zeta_mobius_transform.hpp
       title: Zeta and Mobius Transform
   - name: math/fps
@@ -1589,6 +1592,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/two_square_sum.test.cpp
       title: verify/math/two_square_sum.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/xor_basis.test.cpp
+      title: verify/math/xor_basis.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/yosupo_factorize.test.cpp
       title: verify/math/yosupo_factorize.test.cpp
