@@ -10,9 +10,8 @@ blocks. Every active edge belongs to exactly one block. An articulation vertex
 belongs to two or more blocks, while an isolated vertex forms a singleton
 block with no edges.
 
-The incidence lists can be used directly to build a block-cut forest: create
-one node for each block, retain one node for each articulation vertex, and add
-an incidence edge for every block listed in `vertex_components[vertex]`.
+Pass the result to `block_cut_tree` from `graph/block_cut_tree.hpp` to build the
+block-cut forest and original-vertex-to-node mappings.
 
 ## Graph Requirements
 
