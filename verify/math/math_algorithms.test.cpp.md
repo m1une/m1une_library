@@ -101,6 +101,9 @@ data:
     path: math/partition_function.hpp
     title: Partition Function
   - icon: ':heavy_check_mark:'
+    path: math/prefix_sum_of_binom.hpp
+    title: Prefix Sum of Binomial Coefficients
+  - icon: ':heavy_check_mark:'
     path: math/prime_factorization.hpp
     title: 64-bit Prime Factorization
   - icon: ':heavy_check_mark:'
@@ -360,6 +363,7 @@ data:
   - math/modint.hpp
   - math/modular_square_root.hpp
   - math/number_theory.hpp
+  - math/prefix_sum_of_binom.hpp
   - math/primitive_root.hpp
   - math/prime_sieve.hpp
   - math/rational.hpp
@@ -371,7 +375,7 @@ data:
   isVerificationFile: true
   path: verify/math/math_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-11 19:59:46+09:00'
+  timestamp: '2026-07-13 03:08:36+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/math_algorithms.test.cpp

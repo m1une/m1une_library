@@ -17,6 +17,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/combinatorial_sequences.hpp
     title: Combinatorial Sequences
+  - icon: ':heavy_check_mark:'
+    path: math/prefix_sum_of_binom.hpp
+    title: Prefix Sum of Binomial Coefficients
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/graph/cow_game.test.cpp
@@ -42,6 +45,15 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/prefix_sum_of_binom.test.cpp
+    title: verify/math/prefix_sum_of_binom.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/prefix_sum_of_binom_randomized.test.cpp
+    title: verify/math/prefix_sum_of_binom_randomized.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/prefix_sum_of_binom_randomized.test.cpp
+    title: verify/math/prefix_sum_of_binom_randomized.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/stirling_number_of_the_second_kind.test.cpp
     title: verify/math/stirling_number_of_the_second_kind.test.cpp
@@ -120,6 +132,7 @@ data:
   path: math/combinatorics.hpp
   requiredBy:
   - math/combinatorial_sequences.hpp
+  - math/prefix_sum_of_binom.hpp
   - math/all.hpp
   - math/bernoulli.hpp
   - graph/all.hpp
@@ -127,10 +140,13 @@ data:
   timestamp: '2026-06-20 09:18:49+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/math/prefix_sum_of_binom.test.cpp
   - verify/math/bernoulli_utilities.test.cpp
   - verify/math/bell_number.test.cpp
   - verify/math/math_algorithms.test.cpp
   - verify/math/stirling_number_of_the_second_kind.test.cpp
+  - verify/math/prefix_sum_of_binom_randomized.test.cpp
+  - verify/math/prefix_sum_of_binom_randomized.test.cpp
   - verify/math/bernoulli_number.test.cpp
   - verify/graph/cow_game.test.cpp
   - verify/graph/graph_counting.test.cpp

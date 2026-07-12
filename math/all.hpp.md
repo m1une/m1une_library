@@ -98,6 +98,9 @@ data:
     path: math/partition_function.hpp
     title: Partition Function
   - icon: ':heavy_check_mark:'
+    path: math/prefix_sum_of_binom.hpp
+    title: Prefix Sum of Binomial Coefficients
+  - icon: ':heavy_check_mark:'
     path: math/prime_factorization.hpp
     title: 64-bit Prime Factorization
   - icon: ':heavy_check_mark:'
@@ -192,6 +195,8 @@ data:
 
     #include "partition_function.hpp"
 
+    #include "prefix_sum_of_binom.hpp"
+
     #include "prime_factorization.hpp"
 
     #include "primitive_root.hpp"
@@ -251,6 +256,7 @@ data:
   - math/modint.hpp
   - math/modular_square_root.hpp
   - math/number_theory.hpp
+  - math/prefix_sum_of_binom.hpp
   - math/primitive_root.hpp
   - math/prime_sieve.hpp
   - math/rational.hpp
@@ -262,7 +268,7 @@ data:
   isVerificationFile: false
   path: math/all.hpp
   requiredBy: []
-  timestamp: '2026-07-11 19:59:46+09:00'
+  timestamp: '2026-07-13 03:08:36+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
@@ -304,6 +310,8 @@ You usually do not need to include this entire bundle:
 * Use `combinatorial_sequences.hpp` for Catalan, Bell, Stirling, partition, or
   derangement numbers.
 * Use `partition_function.hpp` when only integer partition numbers are needed.
+* Use `prefix_sum_of_binom.hpp` for online or offline queries of
+  $\sum_{k=0}^{m-1}\binom{n}{k}$.
 * Use `cyclotomic_polynomial.hpp` to construct the polynomial of primitive
   roots of unity of a given order.
 * Use `prime_sieve.hpp` when all queried integers are at most a manageable
@@ -352,6 +360,7 @@ few unused headers do not matter.
 | `math/generalized_floor_sum.hpp` | Polynomial moments of a linear floor sequence using monoid floor sum. |
 | `math/number_theory.hpp` | Extended GCD, modular power and inverse, CRT, and floor sum. |
 | `math/partition_function.hpp` | Integer partition numbers via Euler's pentagonal theorem and FPS inversion. |
+| `math/prefix_sum_of_binom.hpp` | Online and offline prefix sums of binomial coefficients. |
 | `math/prime_sieve.hpp` | Linear sieve with smallest prime factors. |
 | `math/prime_factorization.hpp` | Deterministic 64-bit primality test and Pollard-Rho factorization. |
 | `math/primitive_root.hpp` | Smallest primitive root modulo an integer, when one exists. |

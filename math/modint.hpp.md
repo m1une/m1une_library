@@ -229,6 +229,12 @@ data:
     path: verify/math/partition_function.test.cpp
     title: verify/math/partition_function.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/prefix_sum_of_binom.test.cpp
+    title: verify/math/prefix_sum_of_binom.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/prefix_sum_of_binom_randomized.test.cpp
+    title: verify/math/prefix_sum_of_binom_randomized.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/repunit.test.cpp
     title: verify/math/repunit.test.cpp
   - icon: ':heavy_check_mark:'
@@ -378,6 +384,7 @@ data:
   - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
   - verify/ds/segtree/segtree_beats.test.cpp
   - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
+  - verify/math/prefix_sum_of_binom.test.cpp
   - verify/math/generalized_floor_sum.test.cpp
   - verify/math/bitwise_convolution.test.cpp
   - verify/math/lucas.test.cpp
@@ -421,6 +428,7 @@ data:
   - verify/math/matrix/matrix_product.test.cpp
   - verify/math/stirling_number_of_the_second_kind.test.cpp
   - verify/math/stirling_number_of_the_second_kind.test.cpp
+  - verify/math/prefix_sum_of_binom_randomized.test.cpp
   - verify/math/modular_square_root.test.cpp
   - verify/math/modint.test.cpp
   - verify/math/bernoulli_number.test.cpp

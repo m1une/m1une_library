@@ -696,6 +696,9 @@ data:
       path: math/partition_function.hpp
       title: Partition Function
     - icon: ':heavy_check_mark:'
+      path: math/prefix_sum_of_binom.hpp
+      title: Prefix Sum of Binomial Coefficients
+    - icon: ':heavy_check_mark:'
       path: math/prime_factorization.hpp
       title: 64-bit Prime Factorization
     - icon: ':heavy_check_mark:'
@@ -1508,6 +1511,12 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/partition_function.test.cpp
       title: verify/math/partition_function.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/prefix_sum_of_binom.test.cpp
+      title: verify/math/prefix_sum_of_binom.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/prefix_sum_of_binom_randomized.test.cpp
+      title: verify/math/prefix_sum_of_binom_randomized.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/primality_test.test.cpp
       title: verify/math/primality_test.test.cpp
