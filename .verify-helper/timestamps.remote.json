@@ -70,6 +70,7 @@
 "verify/ds/range_query/static_range_mode_query.test.cpp": "2026-07-11 03:19:37 +0900",
 "verify/ds/range_query/static_rectangle_sum.test.cpp": "2026-07-12 04:19:22 +0900",
 "verify/ds/range_query/wavelet_matrix.test.cpp": "2026-06-21 04:34:53 +0900",
+"verify/ds/range_query/wavelet_matrix_2d.test.cpp": "2026-07-13 03:27:27 +0900",
 "verify/ds/range_query/wavelet_matrix_sum.test.cpp": "2026-06-21 04:34:53 +0900",
 "verify/ds/segtree/chmin_chmax_add_segtree.test.cpp": "2026-07-02 21:23:03 +0900",
 "verify/ds/segtree/dual_segtree.test.cpp": "2026-07-01 14:11:51 +0900",
