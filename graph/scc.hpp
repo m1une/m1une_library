@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstddef>
 #include <utility>
 #include <vector>
 
@@ -43,47 +44,62 @@ struct SccResult {
 
 template <class T>
 SccResult strongly_connected_components(const Graph<T>& g) {
-    int n = g.size();
-    std::vector<int> ord(n, -1), low(n, 0), comp(n, -1), stack;
-    std::vector<char> in_stack(n, false);
-    std::vector<std::vector<int>> groups;
-    int now = 0;
-
-    auto dfs = [&](auto self, int v) -> void {
-        ord[v] = low[v] = now++;
-        stack.push_back(v);
-        in_stack[v] = true;
-
-        for (const auto& e : g[v]) {
-            if (!e.alive) continue;
-            int to = e.to;
-            if (ord[to] == -1) {
-                self(self, to);
-                low[v] = std::min(low[v], low[to]);
-            } else if (in_stack[to]) {
-                low[v] = std::min(low[v], ord[to]);
-            }
+    const int n = g.size();
+    std::vector<std::vector<int>> reverse_graph(n);
+    for (int vertex = 0; vertex < n; vertex++) {
+        for (const auto& edge : g[vertex]) {
+            if (edge.alive) reverse_graph[edge.to].push_back(vertex);
         }
-
-        if (low[v] != ord[v]) return;
-        std::vector<int> group;
-        while (true) {
-            int u = stack.back();
-            stack.pop_back();
-            in_stack[u] = false;
-            group.push_back(u);
-            if (u == v) break;
-        }
-        groups.push_back(std::move(group));
-    };
-
-    for (int v = 0; v < n; v++) {
-        if (ord[v] == -1) dfs(dfs, v);
     }
 
-    std::reverse(groups.begin(), groups.end());
-    for (int i = 0; i < int(groups.size()); i++) {
-        for (int v : groups[i]) comp[v] = i;
+    std::vector<char> seen(n, false);
+    std::vector<int> order;
+    order.reserve(n);
+    std::vector<std::pair<int, std::size_t>> dfs_stack;
+    for (int start = 0; start < n; start++) {
+        if (seen[start]) continue;
+        seen[start] = true;
+        dfs_stack.emplace_back(start, 0);
+        while (!dfs_stack.empty()) {
+            int vertex = dfs_stack.back().first;
+            std::size_t& edge_index = dfs_stack.back().second;
+            while (edge_index < g[vertex].size() &&
+                   !g[vertex][edge_index].alive) {
+                edge_index++;
+            }
+            if (edge_index == g[vertex].size()) {
+                order.push_back(vertex);
+                dfs_stack.pop_back();
+                continue;
+            }
+            const int to = g[vertex][edge_index++].to;
+            if (!seen[to]) {
+                seen[to] = true;
+                dfs_stack.emplace_back(to, 0);
+            }
+        }
+    }
+
+    std::vector<int> comp(n, -1);
+    std::vector<std::vector<int>> groups;
+    std::vector<int> stack;
+    for (auto iterator = order.rbegin(); iterator != order.rend(); ++iterator) {
+        const int start = *iterator;
+        if (comp[start] != -1) continue;
+        const int component = int(groups.size());
+        groups.emplace_back();
+        comp[start] = component;
+        stack.push_back(start);
+        while (!stack.empty()) {
+            const int vertex = stack.back();
+            stack.pop_back();
+            groups.back().push_back(vertex);
+            for (int to : reverse_graph[vertex]) {
+                if (comp[to] != -1) continue;
+                comp[to] = component;
+                stack.push_back(to);
+            }
+        }
     }
 
     return SccResult{int(groups.size()), std::move(comp), std::move(groups)};
