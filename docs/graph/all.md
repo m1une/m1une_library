@@ -44,6 +44,8 @@ Public namespaces stay flat and short: general graph helpers use
 | `graph/block_cut_tree.hpp` | Undirected only | Block-cut forest and original-vertex-to-node mappings. |
 | `graph/two_edge_connected_components.hpp` | Undirected only | Two-edge-connected components, bridges, and the contracted bridge forest. |
 | `graph/three_edge_connected_components.hpp` | Undirected only | Linear-time three-edge-connected vertex decomposition. |
+| `graph/chordal_graph_recognition.hpp` | Direction ignored | Linear-time recognition with a perfect elimination ordering or induced-cycle certificate. |
+| `graph/complement_connected_components.hpp` | Direction ignored | Linear-time connected components of the complement graph without constructing it. |
 | `graph/bipartite.hpp` | Direction ignored / explicit bipartite sides | Two-colorability, matching, vertex/edge covers, independent sets, and optimal bipartite edge coloring. |
 | `graph/general_matching.hpp` | Undirected only | Maximum-cardinality matching and minimum edge cover in general undirected graphs. |
 | `graph/general_weighted_matching.hpp` | Undirected only | Maximum-total-weight matching in general undirected graphs. |
