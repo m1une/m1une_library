@@ -7,6 +7,7 @@
 #include "chromatic_number.hpp"
 #include "connected_components.hpp"
 #include "cycle_detection.hpp"
+#include "enumerate_triangles.hpp"
 #include "eulerian_trail.hpp"
 #include "general_matching.hpp"
 #include "graph.hpp"
