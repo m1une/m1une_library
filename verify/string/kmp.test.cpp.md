@@ -1,7 +1,7 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/kmp.hpp
     title: Knuth-Morris-Pratt
   _extendedRequiredBy: []

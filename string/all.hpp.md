@@ -1,77 +1,77 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/convolution.hpp
     title: Convolution
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/internal/ntt998_faster.hpp
     title: math/fps/internal/ntt998_faster.hpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/modint.hpp
     title: ModInt
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/aho_corasick.hpp
     title: Aho-Corasick
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/eertree.hpp
     title: Eertree
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/kmp.hpp
     title: Knuth-Morris-Pratt
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/levenshtein_distance.hpp
     title: Levenshtein Distance
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/longest_common_extension.hpp
     title: Longest Common Extension
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/longest_common_subsequence.hpp
     title: Longest Common Subsequence
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/longest_common_substring.hpp
     title: Longest Common Substring
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/lyndon_factorization.hpp
     title: Lyndon Factorization
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/manacher.hpp
     title: Manacher Algorithm
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/minimum_rotation.hpp
     title: Minimum Rotation
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/rolling_hash.hpp
     title: Static Rolling Hash
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/runs.hpp
     title: Runs
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/string_hash.hpp
     title: String Hash
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/suffix_array.hpp
     title: Suffix Array and LCP Array
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/suffix_automaton.hpp
     title: Suffix Automaton
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/trie.hpp
     title: Trie
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: string/wildcard_pattern_matching.hpp
     title: Wildcard Pattern Matching
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/z_algorithm.hpp
     title: Z Algorithm
   _extendedRequiredBy: []
   _extendedVerifiedWith:
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/string/string_algorithms.test.cpp
     title: verify/string/string_algorithms.test.cpp
-  _isVerificationFailed: false
+  _isVerificationFailed: true
   _pathExtension: hpp
-  _verificationStatusIcon: ':heavy_check_mark:'
+  _verificationStatusIcon: ':x:'
   attributes:
     links: []
   bundledCode: "Traceback (most recent call last):\n  File \"/home/runner/.local/lib/python3.12/site-packages/onlinejudge_verify/documentation/build.py\"\
@@ -158,8 +158,8 @@ data:
   isVerificationFile: false
   path: string/all.hpp
   requiredBy: []
-  timestamp: '2026-07-13 05:39:37+09:00'
-  verificationStatus: LIBRARY_ALL_AC
+  timestamp: '2026-07-13 21:13:17+09:00'
+  verificationStatus: LIBRARY_ALL_WA
   verifiedWith:
   - verify/string/string_algorithms.test.cpp
 documentation_of: string/all.hpp

@@ -1,49 +1,49 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/all.hpp
     title: Formal Power Series All
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/composition.hpp
     title: Formal Power Series Composition
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/convolution.hpp
     title: Convolution
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/convolution_ll.hpp
     title: Long Long Convolution
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/floating_point_convolution.hpp
     title: Floating-Point Convolution
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/formal_power_series.hpp
     title: Formal Power Series
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/half_gcd.hpp
     title: Polynomial Half-GCD
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/internal/ntt998_faster.hpp
     title: math/fps/internal/ntt998_faster.hpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/lagrange_inversion.hpp
     title: Lagrange Inversion Formula
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/linear_recurrence.hpp
     title: Linear Recurrence and Bostan-Mori
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/multipoint_evaluation.hpp
     title: Multipoint Evaluation and Interpolation
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/polynomial_factorization.hpp
     title: Polynomial Factorization
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/modint.hpp
     title: ModInt
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/modint.hpp
     title: ModInt
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/modular_square_root.hpp
     title: Modular Square Root
   _extendedRequiredBy: []
@@ -151,7 +151,7 @@ data:
   isVerificationFile: true
   path: verify/math/fps/fps_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-13 20:54:00+09:00'
+  timestamp: '2026-07-13 21:13:17+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/fps/fps_algorithms.test.cpp

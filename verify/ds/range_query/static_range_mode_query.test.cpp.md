@@ -4,7 +4,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: ds/range_query/static_range_mode_query.hpp
     title: Static Range Mode Query
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: utilities/fast_io.hpp
     title: Fast IO
   _extendedRequiredBy: []

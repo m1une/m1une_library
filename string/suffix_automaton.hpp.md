@@ -2,19 +2,19 @@
 data:
   _extendedDependsOn: []
   _extendedRequiredBy:
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: string/all.hpp
     title: String Algorithms Bundle
   _extendedVerifiedWith:
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/string/string_algorithms.test.cpp
     title: verify/string/string_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/string/suffix_automaton.test.cpp
     title: verify/string/suffix_automaton.test.cpp
-  _isVerificationFailed: false
+  _isVerificationFailed: true
   _pathExtension: hpp
-  _verificationStatusIcon: ':heavy_check_mark:'
+  _verificationStatusIcon: ':question:'
   attributes:
     links: []
   bundledCode: "#line 1 \"string/suffix_automaton.hpp\"\n\n\n\n#include <algorithm>\n\
@@ -233,7 +233,7 @@ data:
   requiredBy:
   - string/all.hpp
   timestamp: '2026-06-23 12:05:51+09:00'
-  verificationStatus: LIBRARY_ALL_AC
+  verificationStatus: LIBRARY_SOME_WA
   verifiedWith:
   - verify/string/suffix_automaton.test.cpp
   - verify/string/string_algorithms.test.cpp

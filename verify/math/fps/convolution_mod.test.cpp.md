@@ -1,19 +1,19 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/convolution.hpp
     title: Convolution
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/internal/ntt998_faster.hpp
     title: math/fps/internal/ntt998_faster.hpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/modint.hpp
     title: ModInt
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/modint.hpp
     title: ModInt
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: utilities/fast_io.hpp
     title: Fast IO
   _extendedRequiredBy: []
@@ -55,7 +55,7 @@ data:
   isVerificationFile: true
   path: verify/math/fps/convolution_mod.test.cpp
   requiredBy: []
-  timestamp: '2026-07-11 03:31:13+09:00'
+  timestamp: '2026-07-13 21:13:17+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/fps/convolution_mod.test.cpp

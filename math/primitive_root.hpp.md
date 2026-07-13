@@ -1,20 +1,29 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/prime_factorization.hpp
     title: 64-bit Prime Factorization
   _extendedRequiredBy:
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: math/all.hpp
     title: Math All
+  - icon: ':x:'
+    path: math/multivariate_convolution.hpp
+    title: Multidimensional Convolution
   _extendedVerifiedWith:
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
-  _isVerificationFailed: false
+  - icon: ':x:'
+    path: verify/math/multivariate_convolution_cyclic.test.cpp
+    title: verify/math/multivariate_convolution_cyclic.test.cpp
+  - icon: ':x:'
+    path: verify/math/multivariate_convolution_truncated.test.cpp
+    title: verify/math/multivariate_convolution_truncated.test.cpp
+  _isVerificationFailed: true
   _pathExtension: hpp
-  _verificationStatusIcon: ':heavy_check_mark:'
+  _verificationStatusIcon: ':x:'
   attributes:
     links: []
   bundledCode: "#line 1 \"math/primitive_root.hpp\"\n\n\n\n#include <cassert>\n#include\
@@ -133,9 +142,12 @@ data:
   path: math/primitive_root.hpp
   requiredBy:
   - math/all.hpp
+  - math/multivariate_convolution.hpp
   timestamp: '2026-06-24 15:25:00+09:00'
-  verificationStatus: LIBRARY_ALL_AC
+  verificationStatus: LIBRARY_ALL_WA
   verifiedWith:
+  - verify/math/multivariate_convolution_cyclic.test.cpp
+  - verify/math/multivariate_convolution_truncated.test.cpp
   - verify/math/math_algorithms.test.cpp
 documentation_of: math/primitive_root.hpp
 layout: document

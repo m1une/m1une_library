@@ -1,29 +1,29 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/convolution.hpp
     title: Convolution
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/internal/ntt998_faster.hpp
     title: math/fps/internal/ntt998_faster.hpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/modint.hpp
     title: ModInt
   _extendedRequiredBy:
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: string/all.hpp
     title: String Algorithms Bundle
   _extendedVerifiedWith:
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/string/string_algorithms.test.cpp
     title: verify/string/string_algorithms.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/string/wildcard_pattern_matching.test.cpp
     title: verify/string/wildcard_pattern_matching.test.cpp
-  _isVerificationFailed: false
+  _isVerificationFailed: true
   _pathExtension: hpp
-  _verificationStatusIcon: ':heavy_check_mark:'
+  _verificationStatusIcon: ':x:'
   attributes:
     links: []
   bundledCode: "Traceback (most recent call last):\n  File \"/home/runner/.local/lib/python3.12/site-packages/onlinejudge_verify/documentation/build.py\"\
@@ -82,8 +82,8 @@ data:
   path: string/wildcard_pattern_matching.hpp
   requiredBy:
   - string/all.hpp
-  timestamp: '2026-07-13 04:21:37+09:00'
-  verificationStatus: LIBRARY_ALL_AC
+  timestamp: '2026-07-13 21:13:17+09:00'
+  verificationStatus: LIBRARY_ALL_WA
   verifiedWith:
   - verify/string/string_algorithms.test.cpp
   - verify/string/wildcard_pattern_matching.test.cpp

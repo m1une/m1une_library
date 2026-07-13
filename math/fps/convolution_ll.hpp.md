@@ -1,20 +1,20 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/convolution.hpp
     title: Convolution
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/internal/ntt998_faster.hpp
     title: math/fps/internal/ntt998_faster.hpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/modint.hpp
     title: ModInt
   _extendedRequiredBy:
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: math/all.hpp
     title: Math All
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/all.hpp
     title: Formal Power Series All
   _extendedVerifiedWith:
@@ -24,12 +24,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/fps/fps_algorithms.test.cpp
     title: verify/math/fps/fps_algorithms.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
-  _isVerificationFailed: false
+  _isVerificationFailed: true
   _pathExtension: hpp
-  _verificationStatusIcon: ':heavy_check_mark:'
+  _verificationStatusIcon: ':question:'
   attributes:
     links: []
   bundledCode: "Traceback (most recent call last):\n  File \"/home/runner/.local/lib/python3.12/site-packages/onlinejudge_verify/documentation/build.py\"\
@@ -95,8 +95,8 @@ data:
   requiredBy:
   - math/all.hpp
   - math/fps/all.hpp
-  timestamp: '2026-07-11 03:31:13+09:00'
-  verificationStatus: LIBRARY_ALL_AC
+  timestamp: '2026-07-13 21:13:17+09:00'
+  verificationStatus: LIBRARY_SOME_WA
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
   - verify/math/fps/convolution_ll.test.cpp

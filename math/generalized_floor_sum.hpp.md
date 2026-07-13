@@ -2,22 +2,22 @@
 data:
   _extendedDependsOn: []
   _extendedRequiredBy:
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: math/all.hpp
     title: Math All
   _extendedVerifiedWith:
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/generalized_floor_sum.test.cpp
     title: verify/math/generalized_floor_sum.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/yukicoder_2362.test.cpp
     title: verify/math/yukicoder_2362.test.cpp
-  _isVerificationFailed: false
+  _isVerificationFailed: true
   _pathExtension: hpp
-  _verificationStatusIcon: ':heavy_check_mark:'
+  _verificationStatusIcon: ':question:'
   attributes:
     links: []
   bundledCode: "#line 1 \"math/generalized_floor_sum.hpp\"\n\n\n\n#include <array>\n\
@@ -292,7 +292,7 @@ data:
   requiredBy:
   - math/all.hpp
   timestamp: '2026-07-07 02:47:56+09:00'
-  verificationStatus: LIBRARY_ALL_AC
+  verificationStatus: LIBRARY_SOME_WA
   verifiedWith:
   - verify/math/generalized_floor_sum.test.cpp
   - verify/math/yukicoder_2362.test.cpp

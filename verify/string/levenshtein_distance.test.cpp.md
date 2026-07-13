@@ -1,7 +1,7 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/levenshtein_distance.hpp
     title: Levenshtein Distance
   _extendedRequiredBy: []

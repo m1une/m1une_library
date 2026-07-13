@@ -14,52 +14,55 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/tree/distance_frequency.hpp
     title: Tree Distance Frequency
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: math/all.hpp
     title: Math All
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/bernoulli.hpp
     title: Bernoulli Numbers and Power Sums
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/combinatorial_sequences.hpp
     title: Combinatorial Sequences
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/all.hpp
     title: Formal Power Series All
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/composition.hpp
     title: Formal Power Series Composition
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/convolution.hpp
     title: Convolution
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/convolution_ll.hpp
     title: Long Long Convolution
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/formal_power_series.hpp
     title: Formal Power Series
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/half_gcd.hpp
     title: Polynomial Half-GCD
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/lagrange_inversion.hpp
     title: Lagrange Inversion Formula
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/linear_recurrence.hpp
     title: Linear Recurrence and Bostan-Mori
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/multipoint_evaluation.hpp
     title: Multipoint Evaluation and Interpolation
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/polynomial_factorization.hpp
     title: Polynomial Factorization
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
+    path: math/multivariate_convolution.hpp
+    title: Multidimensional Convolution
+  - icon: ':question:'
     path: math/partition_function.hpp
     title: Partition Function
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: string/all.hpp
     title: String Algorithms Bundle
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: string/wildcard_pattern_matching.hpp
     title: Wildcard Pattern Matching
   _extendedVerifiedWith:
@@ -132,24 +135,30 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/fps/pow_of_formal_power_series.test.cpp
     title: verify/math/fps/pow_of_formal_power_series.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
+    path: verify/math/multivariate_convolution_cyclic.test.cpp
+    title: verify/math/multivariate_convolution_cyclic.test.cpp
+  - icon: ':x:'
+    path: verify/math/multivariate_convolution_truncated.test.cpp
+    title: verify/math/multivariate_convolution_truncated.test.cpp
+  - icon: ':x:'
     path: verify/math/partition_function.test.cpp
     title: verify/math/partition_function.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/stirling_number_of_the_second_kind.test.cpp
     title: verify/math/stirling_number_of_the_second_kind.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/string/string_algorithms.test.cpp
     title: verify/string/string_algorithms.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/string/wildcard_pattern_matching.test.cpp
     title: verify/string/wildcard_pattern_matching.test.cpp
-  _isVerificationFailed: false
+  _isVerificationFailed: true
   _pathExtension: hpp
-  _verificationStatusIcon: ':heavy_check_mark:'
+  _verificationStatusIcon: ':question:'
   attributes:
     links: []
   bundledCode: "#line 1 \"math/fps/internal/ntt998_faster.hpp\"\n\n\n\n#include <algorithm>\n\
@@ -621,18 +630,21 @@ data:
   - math/fps/linear_recurrence.hpp
   - math/fps/convolution.hpp
   - math/fps/polynomial_factorization.hpp
+  - math/multivariate_convolution.hpp
   - graph/tree/all.hpp
   - graph/tree/distance_frequency.hpp
   - graph/all.hpp
   - graph/counting.hpp
   timestamp: '2026-07-11 03:19:37+09:00'
-  verificationStatus: LIBRARY_ALL_AC
+  verificationStatus: LIBRARY_SOME_WA
   verifiedWith:
   - verify/string/string_algorithms.test.cpp
   - verify/string/wildcard_pattern_matching.test.cpp
+  - verify/math/multivariate_convolution_cyclic.test.cpp
   - verify/math/bernoulli_utilities.test.cpp
   - verify/math/bell_number.test.cpp
   - verify/math/partition_function.test.cpp
+  - verify/math/multivariate_convolution_truncated.test.cpp
   - verify/math/math_algorithms.test.cpp
   - verify/math/fps/inv_of_formal_power_series.test.cpp
   - verify/math/fps/half_gcd.test.cpp

@@ -1,77 +1,77 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/convolution.hpp
     title: Convolution
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/internal/ntt998_faster.hpp
     title: math/fps/internal/ntt998_faster.hpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/modint.hpp
     title: ModInt
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/aho_corasick.hpp
     title: Aho-Corasick
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: string/all.hpp
     title: String Algorithms Bundle
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/eertree.hpp
     title: Eertree
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/kmp.hpp
     title: Knuth-Morris-Pratt
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/levenshtein_distance.hpp
     title: Levenshtein Distance
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/longest_common_extension.hpp
     title: Longest Common Extension
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/longest_common_subsequence.hpp
     title: Longest Common Subsequence
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/longest_common_substring.hpp
     title: Longest Common Substring
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/lyndon_factorization.hpp
     title: Lyndon Factorization
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/manacher.hpp
     title: Manacher Algorithm
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/minimum_rotation.hpp
     title: Minimum Rotation
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/rolling_hash.hpp
     title: Static Rolling Hash
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/runs.hpp
     title: Runs
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/string_hash.hpp
     title: String Hash
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/suffix_array.hpp
     title: Suffix Array and LCP Array
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/suffix_automaton.hpp
     title: Suffix Automaton
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/trie.hpp
     title: Trie
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: string/wildcard_pattern_matching.hpp
     title: Wildcard Pattern Matching
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/z_algorithm.hpp
     title: Z Algorithm
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
-  _isVerificationFailed: false
+  _isVerificationFailed: true
   _pathExtension: cpp
-  _verificationStatusIcon: ':heavy_check_mark:'
+  _verificationStatusIcon: ':x:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
     PROBLEM: https://judge.yosupo.jp/problem/aplusb
@@ -197,8 +197,8 @@ data:
   isVerificationFile: true
   path: verify/string/string_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-13 05:39:37+09:00'
-  verificationStatus: TEST_ACCEPTED
+  timestamp: '2026-07-13 21:13:17+09:00'
+  verificationStatus: TEST_WRONG_ANSWER
   verifiedWith: []
 documentation_of: verify/string/string_algorithms.test.cpp
 layout: document

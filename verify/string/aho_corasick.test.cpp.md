@@ -1,7 +1,7 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/aho_corasick.hpp
     title: Aho-Corasick
   _extendedRequiredBy: []

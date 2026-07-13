@@ -1,10 +1,10 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/lyndon_factorization.hpp
     title: Lyndon Factorization
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/minimum_rotation.hpp
     title: Minimum Rotation
   _extendedRequiredBy: []

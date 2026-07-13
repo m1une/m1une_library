@@ -13,16 +13,16 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/tree/distance_frequency.hpp
     title: Tree Distance Frequency
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/convolution.hpp
     title: Convolution
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/internal/ntt998_faster.hpp
     title: math/fps/internal/ntt998_faster.hpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/modint.hpp
     title: ModInt
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/modint.hpp
     title: ModInt
   _extendedRequiredBy: []
@@ -108,7 +108,7 @@ data:
   isVerificationFile: true
   path: verify/graph/tree/distance_frequency.test.cpp
   requiredBy: []
-  timestamp: '2026-07-13 05:31:21+09:00'
+  timestamp: '2026-07-13 21:13:17+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/tree/distance_frequency.test.cpp

@@ -4,10 +4,10 @@ data:
   - icon: ':heavy_check_mark:'
     path: algo/sequence/number_of_subsequences.hpp
     title: Number of Subsequences
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/modint.hpp
     title: ModInt
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: utilities/fast_io.hpp
     title: Fast IO
   _extendedRequiredBy: []
@@ -37,17 +37,17 @@ data:
     }\n\ntemplate <class Mint, class T>\nMint number_of_subsequences(const std::vector<T>&\
     \ values) {\n    return number_of_distinct_subsequences<Mint>(values);\n}\n\n\
     }  // namespace algo\n}  // namespace m1une\n\n\n#line 1 \"math/modint.hpp\"\n\
-    \n\n\n#include <cstdint>\n#include <iostream>\n#include <type_traits>\n#include\
-    \ <utility>\n\nnamespace m1une {\nnamespace math {\n\ntemplate <uint32_t Modulus>\n\
-    struct ModInt {\n    static_assert(0 < Modulus, \"Modulus must be positive\");\n\
-    \n   private:\n    uint32_t _v;\n\n   public:\n    static constexpr uint32_t mod()\
-    \ {\n        return Modulus;\n    }\n\n    static constexpr ModInt raw(uint32_t\
-    \ v) noexcept {\n        ModInt x;\n        x._v = v;\n        return x;\n   \
-    \ }\n\n    constexpr ModInt() noexcept : _v(0) {}\n\n    template <class Integer,\
-    \ std::enable_if_t<std::is_integral_v<Integer>, int> = 0>\n    constexpr ModInt(Integer\
-    \ v) noexcept {\n        if constexpr (std::is_signed_v<Integer>) {\n        \
-    \    int64_t x = static_cast<int64_t>(v) % static_cast<int64_t>(Modulus);\n  \
-    \          if (x < 0) x += Modulus;\n            _v = static_cast<uint32_t>(x);\n\
+    \n\n\n#include <cassert>\n#include <cstdint>\n#include <iostream>\n#include <type_traits>\n\
+    #include <utility>\n\nnamespace m1une {\nnamespace math {\n\ntemplate <uint32_t\
+    \ Modulus>\nstruct ModInt {\n    static_assert(0 < Modulus, \"Modulus must be\
+    \ positive\");\n\n   private:\n    uint32_t _v;\n\n   public:\n    static constexpr\
+    \ uint32_t mod() {\n        return Modulus;\n    }\n\n    static constexpr ModInt\
+    \ raw(uint32_t v) noexcept {\n        ModInt x;\n        x._v = v;\n        return\
+    \ x;\n    }\n\n    constexpr ModInt() noexcept : _v(0) {}\n\n    template <class\
+    \ Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>\n    constexpr\
+    \ ModInt(Integer v) noexcept {\n        if constexpr (std::is_signed_v<Integer>)\
+    \ {\n            int64_t x = static_cast<int64_t>(v) % static_cast<int64_t>(Modulus);\n\
+    \            if (x < 0) x += Modulus;\n            _v = static_cast<uint32_t>(x);\n\
     \        } else {\n            _v = static_cast<uint32_t>(static_cast<uint64_t>(v)\
     \ % Modulus);\n        }\n    }\n\n    constexpr uint32_t val() const noexcept\
     \ {\n        return _v;\n    }\n\n    constexpr ModInt& operator++() noexcept\
@@ -85,11 +85,61 @@ data:
     \ os << rhs._v;\n    }\n\n    friend std::istream& operator>>(std::istream& is,\
     \ ModInt& rhs) {\n        long long v;\n        is >> v;\n        rhs = ModInt(v);\n\
     \        return is;\n    }\n};\n\nusing modint998244353 = ModInt<998244353>;\n\
-    using modint1000000007 = ModInt<1000000007>;\n\n}  // namespace math\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#include <array>\n#include\
-    \ <cstddef>\n#include <cstdio>\n#line 8 \"utilities/fast_io.hpp\"\n#include <cstring>\n\
-    #include <iterator>\n#include <string>\n#line 13 \"utilities/fast_io.hpp\"\n\n\
-    namespace m1une {\nnamespace utilities {\nnamespace internal {\n\n// Detect std::begin(x),\
+    using modint1000000007 = ModInt<1000000007>;\n\ntemplate <int Id = 0>\nstruct\
+    \ DynamicModInt {\n   private:\n    uint32_t _v;\n    inline static uint32_t _mod\
+    \ = 1;\n\n   public:\n    static uint32_t mod() noexcept {\n        return _mod;\n\
+    \    }\n\n    static void set_mod(uint32_t modulus) noexcept {\n        assert(modulus\
+    \ > 0);\n        assert(modulus <= uint32_t(1) << 31);\n        _mod = modulus;\n\
+    \    }\n\n    static DynamicModInt raw(uint32_t v) noexcept {\n        assert(v\
+    \ < _mod);\n        DynamicModInt x;\n        x._v = v;\n        return x;\n \
+    \   }\n\n    DynamicModInt() noexcept : _v(0) {}\n\n    template <class Integer,\
+    \ std::enable_if_t<std::is_integral_v<Integer>, int> = 0>\n    DynamicModInt(Integer\
+    \ v) noexcept {\n        if constexpr (std::is_signed_v<Integer>) {\n        \
+    \    int64_t x = static_cast<int64_t>(v) % static_cast<int64_t>(_mod);\n     \
+    \       if (x < 0) x += _mod;\n            _v = static_cast<uint32_t>(x);\n  \
+    \      } else {\n            _v = static_cast<uint32_t>(static_cast<uint64_t>(v)\
+    \ % _mod);\n        }\n    }\n\n    uint32_t val() const noexcept {\n        return\
+    \ _v;\n    }\n\n    DynamicModInt& operator++() noexcept {\n        _v++;\n  \
+    \      if (_v == _mod) _v = 0;\n        return *this;\n    }\n\n    DynamicModInt&\
+    \ operator--() noexcept {\n        if (_v == 0) _v = _mod;\n        _v--;\n  \
+    \      return *this;\n    }\n\n    DynamicModInt operator++(int) noexcept {\n\
+    \        DynamicModInt result = *this;\n        ++*this;\n        return result;\n\
+    \    }\n\n    DynamicModInt operator--(int) noexcept {\n        DynamicModInt\
+    \ result = *this;\n        --*this;\n        return result;\n    }\n\n    DynamicModInt&\
+    \ operator+=(const DynamicModInt& rhs) noexcept {\n        _v += rhs._v;\n   \
+    \     if (_v >= _mod) _v -= _mod;\n        return *this;\n    }\n\n    DynamicModInt&\
+    \ operator-=(const DynamicModInt& rhs) noexcept {\n        _v -= rhs._v;\n   \
+    \     if (_v >= _mod) _v += _mod;\n        return *this;\n    }\n\n    DynamicModInt&\
+    \ operator*=(const DynamicModInt& rhs) noexcept {\n        _v = static_cast<uint32_t>(uint64_t(_v)\
+    \ * rhs._v % _mod);\n        return *this;\n    }\n\n    DynamicModInt& operator/=(const\
+    \ DynamicModInt& rhs) noexcept {\n        return *this *= rhs.inv();\n    }\n\n\
+    \    DynamicModInt operator+(const DynamicModInt& rhs) const noexcept {\n    \
+    \    return DynamicModInt(*this) += rhs;\n    }\n\n    DynamicModInt operator-(const\
+    \ DynamicModInt& rhs) const noexcept {\n        return DynamicModInt(*this) -=\
+    \ rhs;\n    }\n\n    DynamicModInt operator*(const DynamicModInt& rhs) const noexcept\
+    \ {\n        return DynamicModInt(*this) *= rhs;\n    }\n\n    DynamicModInt operator/(const\
+    \ DynamicModInt& rhs) const noexcept {\n        return DynamicModInt(*this) /=\
+    \ rhs;\n    }\n\n    bool operator==(const DynamicModInt& rhs) const noexcept\
+    \ {\n        return _v == rhs._v;\n    }\n\n    bool operator!=(const DynamicModInt&\
+    \ rhs) const noexcept {\n        return _v != rhs._v;\n    }\n\n    DynamicModInt\
+    \ pow(long long exponent) const noexcept {\n        assert(exponent >= 0);\n \
+    \       DynamicModInt result = raw(1 % _mod);\n        DynamicModInt base = *this;\n\
+    \        while (exponent > 0) {\n            if (exponent & 1) result *= base;\n\
+    \            base *= base;\n            exponent >>= 1;\n        }\n        return\
+    \ result;\n    }\n\n    DynamicModInt inv() const noexcept {\n        int64_t\
+    \ a = _v, b = _mod, u = 1, v = 0;\n        while (b) {\n            int64_t quotient\
+    \ = a / b;\n            a -= quotient * b;\n            std::swap(a, b);\n   \
+    \         u -= quotient * v;\n            std::swap(u, v);\n        }\n      \
+    \  assert(a == 1);\n        u %= _mod;\n        if (u < 0) u += _mod;\n      \
+    \  return raw(static_cast<uint32_t>(u));\n    }\n\n    friend std::ostream& operator<<(std::ostream&\
+    \ os, const DynamicModInt& rhs) {\n        return os << rhs._v;\n    }\n\n   \
+    \ friend std::istream& operator>>(std::istream& is, DynamicModInt& rhs) {\n  \
+    \      long long value;\n        is >> value;\n        rhs = DynamicModInt(value);\n\
+    \        return is;\n    }\n};\n\n}  // namespace math\n}  // namespace m1une\n\
+    \n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#include <array>\n#include <cstddef>\n\
+    #include <cstdio>\n#line 8 \"utilities/fast_io.hpp\"\n#include <cstring>\n#include\
+    \ <iterator>\n#include <string>\n#line 13 \"utilities/fast_io.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace utilities {\nnamespace internal {\n\n// Detect std::begin(x),\
     \ std::end(x).\ntemplate <class T, class = void>\nstruct is_range : std::false_type\
     \ {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
     \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
@@ -244,14 +294,14 @@ data:
     \        write_char('\\n');\n    }\n\n    template <class T>\n    FastOutput&\
     \ operator<<(const T& value) {\n        write(value);\n        return *this;\n\
     \    }\n};\n\n}  // namespace utilities\n}  // namespace m1une\n\n\n#line 6 \"\
-    verify/algo/sequence/number_of_subsequences.test.cpp\"\n\n#include <cassert>\n\
-    #line 9 \"verify/algo/sequence/number_of_subsequences.test.cpp\"\n#include <set>\n\
-    #line 12 \"verify/algo/sequence/number_of_subsequences.test.cpp\"\n\nnamespace\
-    \ {\n\nusing Mint = m1une::math::ModInt<998244353>;\n\nlong long brute(const std::vector<int>&\
-    \ values) {\n    std::set<std::vector<int>> subsequences;\n    int n = int(values.size());\n\
-    \    for (int mask = 1; mask < (1 << n); mask++) {\n        std::vector<int> subsequence;\n\
-    \        for (int i = 0; i < n; i++) {\n            if (mask >> i & 1) subsequence.push_back(values[i]);\n\
-    \        }\n        subsequences.insert(std::move(subsequence));\n    }\n    return\
+    verify/algo/sequence/number_of_subsequences.test.cpp\"\n\n#line 9 \"verify/algo/sequence/number_of_subsequences.test.cpp\"\
+    \n#include <set>\n#line 12 \"verify/algo/sequence/number_of_subsequences.test.cpp\"\
+    \n\nnamespace {\n\nusing Mint = m1une::math::ModInt<998244353>;\n\nlong long brute(const\
+    \ std::vector<int>& values) {\n    std::set<std::vector<int>> subsequences;\n\
+    \    int n = int(values.size());\n    for (int mask = 1; mask < (1 << n); mask++)\
+    \ {\n        std::vector<int> subsequence;\n        for (int i = 0; i < n; i++)\
+    \ {\n            if (mask >> i & 1) subsequence.push_back(values[i]);\n      \
+    \  }\n        subsequences.insert(std::move(subsequence));\n    }\n    return\
     \ static_cast<long long>(subsequences.size());\n}\n\nvoid test_randomized() {\n\
     \    std::vector<int> empty;\n    assert(m1une::algo::number_of_subsequences<Mint>(empty)\
     \ == Mint(0));\n\n    std::uint64_t state = 1732050807ULL;\n    auto random =\
@@ -297,7 +347,7 @@ data:
   isVerificationFile: true
   path: verify/algo/sequence/number_of_subsequences.test.cpp
   requiredBy: []
-  timestamp: '2026-07-11 03:19:37+09:00'
+  timestamp: '2026-07-13 21:13:17+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/algo/sequence/number_of_subsequences.test.cpp

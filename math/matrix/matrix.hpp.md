@@ -2,37 +2,37 @@
 data:
   _extendedDependsOn: []
   _extendedRequiredBy:
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: math/all.hpp
     title: Math All
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: math/matrix/all.hpp
     title: Matrix Bundle
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: math/matrix/characteristic_polynomial.hpp
     title: Characteristic Polynomial
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: math/matrix/linear_algebra.hpp
     title: Matrix Linear Algebra
   _extendedVerifiedWith:
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/matrix/characteristic_polynomial.test.cpp
     title: verify/math/matrix/characteristic_polynomial.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/matrix/inverse_matrix.test.cpp
     title: verify/math/matrix/inverse_matrix.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/matrix/matrix.test.cpp
     title: verify/math/matrix/matrix.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/matrix/matrix_product.test.cpp
     title: verify/math/matrix/matrix_product.test.cpp
-  _isVerificationFailed: false
+  _isVerificationFailed: true
   _pathExtension: hpp
-  _verificationStatusIcon: ':heavy_check_mark:'
+  _verificationStatusIcon: ':x:'
   attributes:
     links: []
   bundledCode: "#line 1 \"math/matrix/matrix.hpp\"\n\n\n\n#include <cassert>\n#include\
@@ -216,7 +216,7 @@ data:
   - math/matrix/all.hpp
   - math/matrix/linear_algebra.hpp
   timestamp: '2026-07-07 14:26:59+09:00'
-  verificationStatus: LIBRARY_ALL_AC
+  verificationStatus: LIBRARY_ALL_WA
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
   - verify/math/matrix/inverse_matrix.test.cpp

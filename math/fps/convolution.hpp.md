@@ -1,10 +1,10 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/internal/ntt998_faster.hpp
     title: math/fps/internal/ntt998_faster.hpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/modint.hpp
     title: ModInt
   _extendedRequiredBy:
@@ -29,49 +29,55 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/tree/distance_frequency.hpp
     title: Tree Distance Frequency
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: math/all.hpp
     title: Math All
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
+    path: math/all.hpp
+    title: Math All
+  - icon: ':question:'
     path: math/bernoulli.hpp
     title: Bernoulli Numbers and Power Sums
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/combinatorial_sequences.hpp
     title: Combinatorial Sequences
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/all.hpp
     title: Formal Power Series All
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/composition.hpp
     title: Formal Power Series Composition
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/convolution_ll.hpp
     title: Long Long Convolution
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/formal_power_series.hpp
     title: Formal Power Series
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/half_gcd.hpp
     title: Polynomial Half-GCD
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/lagrange_inversion.hpp
     title: Lagrange Inversion Formula
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/linear_recurrence.hpp
     title: Linear Recurrence and Bostan-Mori
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/multipoint_evaluation.hpp
     title: Multipoint Evaluation and Interpolation
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: math/fps/polynomial_factorization.hpp
     title: Polynomial Factorization
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
+    path: math/multivariate_convolution.hpp
+    title: Multidimensional Convolution
+  - icon: ':question:'
     path: math/partition_function.hpp
     title: Partition Function
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: string/all.hpp
     title: String Algorithms Bundle
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: string/wildcard_pattern_matching.hpp
     title: Wildcard Pattern Matching
   _extendedVerifiedWith:
@@ -165,24 +171,33 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/fps/pow_of_formal_power_series.test.cpp
     title: verify/math/fps/pow_of_formal_power_series.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
+    path: verify/math/math_algorithms.test.cpp
+    title: verify/math/math_algorithms.test.cpp
+  - icon: ':x:'
+    path: verify/math/multivariate_convolution_cyclic.test.cpp
+    title: verify/math/multivariate_convolution_cyclic.test.cpp
+  - icon: ':x:'
+    path: verify/math/multivariate_convolution_truncated.test.cpp
+    title: verify/math/multivariate_convolution_truncated.test.cpp
+  - icon: ':x:'
     path: verify/math/partition_function.test.cpp
     title: verify/math/partition_function.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/stirling_number_of_the_second_kind.test.cpp
     title: verify/math/stirling_number_of_the_second_kind.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/string/string_algorithms.test.cpp
     title: verify/string/string_algorithms.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/string/wildcard_pattern_matching.test.cpp
     title: verify/string/wildcard_pattern_matching.test.cpp
-  _isVerificationFailed: false
+  _isVerificationFailed: true
   _pathExtension: hpp
-  _verificationStatusIcon: ':heavy_check_mark:'
+  _verificationStatusIcon: ':question:'
   attributes:
     links: []
   bundledCode: "Traceback (most recent call last):\n  File \"/home/runner/.local/lib/python3.12/site-packages/onlinejudge_verify/documentation/build.py\"\
@@ -202,7 +217,10 @@ data:
     \ || defined(__i386__))\n#include <immintrin.h>\n#define M1UNE_FPS_HAS_X86_SIMD\
     \ 1\n#pragma GCC push_options\n#pragma GCC target(\"avx2,bmi\")\n#include \"internal/ntt998_faster.hpp\"\
     \n#pragma GCC pop_options\n#endif\n\n#include \"../modint.hpp\"\n\nnamespace m1une\
-    \ {\nnamespace fps {\n\nnamespace internal {\n\nconstexpr uint32_t primitive_root_constexpr(uint32_t\
+    \ {\nnamespace fps {\n\nnamespace internal {\n\ntemplate <class Mint, class =\
+    \ void>\nstruct has_static_modulus : std::false_type {};\n\ntemplate <class Mint>\n\
+    struct has_static_modulus<\n    Mint, std::void_t<decltype(std::integral_constant<uint32_t,\
+    \ Mint::mod()>{})>>\n    : std::true_type {};\n\nconstexpr uint32_t primitive_root_constexpr(uint32_t\
     \ mod) {\n    if (mod == 2) return 1;\n    if (mod == 167772161) return 3;\n \
     \   if (mod == 469762049) return 3;\n    if (mod == 754974721) return 11;\n  \
     \  if (mod == 998244353) return 3;\n    if (mod == 1224736769) return 3;\n\n \
@@ -358,8 +376,9 @@ data:
     \ b) {\n    if (a.empty() || b.empty()) return {};\n    if (std::min(a.size(),\
     \ b.size()) <= 32) return convolution_naive(a, b);\n\n    const int result_size\
     \ = int(a.size() + b.size() - 1);\n    int n = 1;\n    while (n < result_size)\
-    \ n <<= 1;\n    if ((Mint::mod() - 1) % uint32_t(n) == 0) return convolution_ntt(a,\
-    \ b);\n\n    using Mint1 = math::ModInt<167772161>;\n    using Mint2 = math::ModInt<469762049>;\n\
+    \ n <<= 1;\n    if constexpr (internal::has_static_modulus<Mint>::value) {\n \
+    \       if ((Mint::mod() - 1) % uint32_t(n) == 0) return convolution_ntt(a, b);\n\
+    \    }\n\n    using Mint1 = math::ModInt<167772161>;\n    using Mint2 = math::ModInt<469762049>;\n\
     \    using Mint3 = math::ModInt<754974721>;\n    assert(n <= (1 << 24));\n\n \
     \   [[maybe_unused]] const unsigned __int128 coefficient_bound =\n        static_cast<unsigned\
     \ __int128>(std::min(a.size(), b.size())) * (Mint::mod() - 1) *\n        (Mint::mod()\
@@ -404,6 +423,7 @@ data:
   - math/partition_function.hpp
   - math/combinatorial_sequences.hpp
   - math/all.hpp
+  - math/all.hpp
   - math/bernoulli.hpp
   - math/fps/half_gcd.hpp
   - math/fps/composition.hpp
@@ -414,6 +434,7 @@ data:
   - math/fps/multipoint_evaluation.hpp
   - math/fps/linear_recurrence.hpp
   - math/fps/polynomial_factorization.hpp
+  - math/multivariate_convolution.hpp
   - graph/tree/all.hpp
   - graph/tree/distance_frequency.hpp
   - graph/all.hpp
@@ -421,14 +442,17 @@ data:
   - graph/all.hpp
   - graph/counting.hpp
   - graph/counting.hpp
-  timestamp: '2026-07-11 03:31:13+09:00'
-  verificationStatus: LIBRARY_ALL_AC
+  timestamp: '2026-07-13 21:13:17+09:00'
+  verificationStatus: LIBRARY_SOME_WA
   verifiedWith:
   - verify/string/string_algorithms.test.cpp
   - verify/string/wildcard_pattern_matching.test.cpp
+  - verify/math/multivariate_convolution_cyclic.test.cpp
   - verify/math/bernoulli_utilities.test.cpp
   - verify/math/bell_number.test.cpp
   - verify/math/partition_function.test.cpp
+  - verify/math/multivariate_convolution_truncated.test.cpp
+  - verify/math/math_algorithms.test.cpp
   - verify/math/math_algorithms.test.cpp
   - verify/math/fps/inv_of_formal_power_series.test.cpp
   - verify/math/fps/half_gcd.test.cpp

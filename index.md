@@ -683,177 +683,180 @@ data:
       title: 01 on Tree
   - name: math
     pages:
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: math/all.hpp
       title: Math All
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/base_n.hpp
       title: Base-N Numbers
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/bernoulli.hpp
       title: Bernoulli Numbers and Power Sums
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/binomial_coefficient_mod.hpp
       title: Binomial Coefficient Modulo an Arbitrary Modulus
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/bit_ceil.hpp
       title: Bit Ceil
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/bitwise_convolution.hpp
       title: Bitwise Convolution
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/combinatorial_sequences.hpp
       title: Combinatorial Sequences
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/combinatorics.hpp
       title: Combinatorics
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/cyclotomic_polynomial.hpp
       title: Cyclotomic Polynomial
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/discrete_logarithm.hpp
       title: Discrete Logarithm
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/generalized_floor_sum.hpp
       title: Generalized Floor Sum
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/integer_arithmetic.hpp
       title: Integer Square Root and Power
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: math/lucas.hpp
       title: Lucas's Theorem
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/modint.hpp
       title: ModInt
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/modular_square_root.hpp
       title: Modular Square Root
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: math/multiplicative_function_prefix_sum.hpp
       title: Multiplicative Function Prefix Sum
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
+      path: math/multivariate_convolution.hpp
+      title: Multidimensional Convolution
+    - icon: ':question:'
       path: math/number_theory.hpp
       title: Number Theory
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/partition_function.hpp
       title: Partition Function
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: math/prefix_sum_of_binom.hpp
       title: Prefix Sum of Binomial Coefficients
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/prime_factorization.hpp
       title: 64-bit Prime Factorization
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/prime_sieve.hpp
       title: Prime Sieve
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: math/primitive_root.hpp
       title: Primitive Root
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/rational.hpp
       title: Rational Number
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: math/repunit.hpp
       title: Repunit
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/stern_brocot_tree.hpp
       title: Stern-Brocot Tree
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: math/subset_convolution.hpp
       title: Subset Convolution
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/tetration.hpp
       title: Tetration
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: math/totient_sum.hpp
       title: Totient Sum
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/two_square_sum.hpp
       title: Sum of Two Squares
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/xor_basis.hpp
       title: XOR Basis
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/zeta_mobius_transform.hpp
       title: Zeta and Mobius Transform
   - name: math/fps
     pages:
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/fps/all.hpp
       title: Formal Power Series All
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/fps/composition.hpp
       title: Formal Power Series Composition
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/fps/convolution.hpp
       title: Convolution
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/fps/convolution_ll.hpp
       title: Long Long Convolution
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/fps/floating_point_convolution.hpp
       title: Floating-Point Convolution
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/fps/formal_power_series.hpp
       title: Formal Power Series
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/fps/half_gcd.hpp
       title: Polynomial Half-GCD
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/fps/lagrange_inversion.hpp
       title: Lagrange Inversion Formula
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/fps/linear_recurrence.hpp
       title: Linear Recurrence and Bostan-Mori
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/fps/multipoint_evaluation.hpp
       title: Multipoint Evaluation and Interpolation
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/fps/polynomial_factorization.hpp
       title: Polynomial Factorization
   - name: math/fps/internal
     pages:
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/fps/internal/ntt998_faster.hpp
       title: math/fps/internal/ntt998_faster.hpp
   - name: math/matrix
     pages:
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: math/matrix/all.hpp
       title: Matrix Bundle
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: math/matrix/bit_matrix.hpp
       title: Bit Matrix
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: math/matrix/characteristic_polynomial.hpp
       title: Characteristic Polynomial
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: math/matrix/linear_algebra.hpp
       title: Matrix Linear Algebra
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: math/matrix/matrix.hpp
       title: Dense Matrix
   - name: matroid
     pages:
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: matroid/all.hpp
       title: Matroid All
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: matroid/graphic_matroid.hpp
       title: Graphic Matroid
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: matroid/linear_matroid.hpp
       title: Linear Matroid
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: matroid/matroid_intersection.hpp
       title: Matroid Intersection
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: matroid/partition_matroid.hpp
       title: Partition Matroid
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: matroid/uniform_matroid.hpp
       title: Uniform Matroid
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: matroid/weighted_matroid_intersection.hpp
       title: Weighted Matroid Intersection
   - name: monoid
@@ -979,61 +982,61 @@ data:
       title: Simplex Algorithm
   - name: string
     pages:
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: string/aho_corasick.hpp
       title: Aho-Corasick
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: string/all.hpp
       title: String Algorithms Bundle
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: string/eertree.hpp
       title: Eertree
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: string/kmp.hpp
       title: Knuth-Morris-Pratt
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: string/levenshtein_distance.hpp
       title: Levenshtein Distance
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: string/longest_common_extension.hpp
       title: Longest Common Extension
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: string/longest_common_subsequence.hpp
       title: Longest Common Subsequence
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: string/longest_common_substring.hpp
       title: Longest Common Substring
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: string/lyndon_factorization.hpp
       title: Lyndon Factorization
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: string/manacher.hpp
       title: Manacher Algorithm
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: string/minimum_rotation.hpp
       title: Minimum Rotation
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: string/rolling_hash.hpp
       title: Static Rolling Hash
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: string/runs.hpp
       title: Runs
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: string/string_hash.hpp
       title: String Hash
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: string/suffix_array.hpp
       title: Suffix Array and LCP Array
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: string/suffix_automaton.hpp
       title: Suffix Automaton
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: string/trie.hpp
       title: Trie
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: string/wildcard_pattern_matching.hpp
       title: Wildcard Pattern Matching
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: string/z_algorithm.hpp
       title: Z Algorithm
   - name: utilities
@@ -1053,7 +1056,7 @@ data:
     - icon: ':heavy_check_mark:'
       path: utilities/dynamic_bitset.hpp
       title: Dynamic Bitset
-    - icon: ':heavy_check_mark:'
+    - icon: ':question:'
       path: utilities/fast_io.hpp
       title: Fast IO
     - icon: ':heavy_check_mark:'
@@ -1616,31 +1619,37 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/floor_sum.test.cpp
       title: verify/math/floor_sum.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: verify/math/generalized_floor_sum.test.cpp
       title: verify/math/generalized_floor_sum.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/integer_arithmetic.test.cpp
       title: verify/math/integer_arithmetic.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: verify/math/lucas.test.cpp
       title: verify/math/lucas.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: verify/math/math_algorithms.test.cpp
       title: verify/math/math_algorithms.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: verify/math/modint.test.cpp
       title: verify/math/modint.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: verify/math/modular_square_root.test.cpp
       title: verify/math/modular_square_root.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
+      path: verify/math/multivariate_convolution_cyclic.test.cpp
+      title: verify/math/multivariate_convolution_cyclic.test.cpp
+    - icon: ':x:'
+      path: verify/math/multivariate_convolution_truncated.test.cpp
+      title: verify/math/multivariate_convolution_truncated.test.cpp
+    - icon: ':x:'
       path: verify/math/partition_function.test.cpp
       title: verify/math/partition_function.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: verify/math/prefix_sum_of_binom.test.cpp
       title: verify/math/prefix_sum_of_binom.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: verify/math/prefix_sum_of_binom_randomized.test.cpp
       title: verify/math/prefix_sum_of_binom_randomized.test.cpp
     - icon: ':heavy_check_mark:'
@@ -1649,19 +1658,19 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/rational.test.cpp
       title: verify/math/rational.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: verify/math/repunit.test.cpp
       title: verify/math/repunit.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/stern_brocot_tree.test.cpp
       title: verify/math/stern_brocot_tree.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: verify/math/stirling_number_of_the_second_kind.test.cpp
       title: verify/math/stirling_number_of_the_second_kind.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: verify/math/subset_convolution.test.cpp
       title: verify/math/subset_convolution.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: verify/math/sum_of_multiplicative_function.test.cpp
       title: verify/math/sum_of_multiplicative_function.test.cpp
     - icon: ':heavy_check_mark:'
@@ -1746,16 +1755,16 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/matrix/bit_matrix_rank.test.cpp
       title: verify/math/matrix/bit_matrix_rank.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: verify/math/matrix/characteristic_polynomial.test.cpp
       title: verify/math/matrix/characteristic_polynomial.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: verify/math/matrix/inverse_matrix.test.cpp
       title: verify/math/matrix/inverse_matrix.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: verify/math/matrix/matrix.test.cpp
       title: verify/math/matrix/matrix.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: verify/math/matrix/matrix_product.test.cpp
       title: verify/math/matrix/matrix_product.test.cpp
   - name: verify/matroid
@@ -1763,7 +1772,7 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/matroid/matroid_intersection.test.cpp
       title: verify/matroid/matroid_intersection.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: verify/matroid/matroids.test.cpp
       title: verify/matroid/matroids.test.cpp
     - icon: ':heavy_check_mark:'
@@ -1821,7 +1830,7 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/string/runs.test.cpp
       title: verify/string/runs.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: verify/string/string_algorithms.test.cpp
       title: verify/string/string_algorithms.test.cpp
     - icon: ':heavy_check_mark:'
@@ -1836,7 +1845,7 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/string/trie.test.cpp
       title: verify/string/trie.test.cpp
-    - icon: ':heavy_check_mark:'
+    - icon: ':x:'
       path: verify/string/wildcard_pattern_matching.test.cpp
       title: verify/string/wildcard_pattern_matching.test.cpp
     - icon: ':heavy_check_mark:'

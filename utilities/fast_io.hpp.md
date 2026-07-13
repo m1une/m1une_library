@@ -33,12 +33,18 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
     title: verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
+  - icon: ':x:'
+    path: verify/math/multivariate_convolution_cyclic.test.cpp
+    title: verify/math/multivariate_convolution_cyclic.test.cpp
+  - icon: ':x:'
+    path: verify/math/multivariate_convolution_truncated.test.cpp
+    title: verify/math/multivariate_convolution_truncated.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/utilities/fast_io.test.cpp
     title: verify/utilities/fast_io.test.cpp
-  _isVerificationFailed: false
+  _isVerificationFailed: true
   _pathExtension: hpp
-  _verificationStatusIcon: ':heavy_check_mark:'
+  _verificationStatusIcon: ':question:'
   attributes:
     links: []
   bundledCode: "#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#include <array>\n#include\
@@ -362,7 +368,7 @@ data:
   path: utilities/fast_io.hpp
   requiredBy: []
   timestamp: '2026-07-11 03:19:37+09:00'
-  verificationStatus: LIBRARY_ALL_AC
+  verificationStatus: LIBRARY_SOME_WA
   verifiedWith:
   - verify/algo/sequence/number_of_subsequences.test.cpp
   - verify/utilities/fast_io.test.cpp
@@ -372,6 +378,8 @@ data:
   - verify/ds/range_query/fenwick_tree.test.cpp
   - verify/ds/range_query/range_lis_query.test.cpp
   - verify/ds/range_query/static_range_count_distinct.test.cpp
+  - verify/math/multivariate_convolution_cyclic.test.cpp
+  - verify/math/multivariate_convolution_truncated.test.cpp
   - verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
   - verify/math/fps/convolution_mod.test.cpp
   - verify/graph/tree/vertex_add_subtree_sum.test.cpp

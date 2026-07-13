@@ -2,10 +2,10 @@
 data:
   _extendedDependsOn: []
   _extendedRequiredBy:
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: string/all.hpp
     title: String Algorithms Bundle
-  - icon: ':heavy_check_mark:'
+  - icon: ':question:'
     path: string/lyndon_factorization.hpp
     title: Lyndon Factorization
   _extendedVerifiedWith:
@@ -15,12 +15,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/string/minimum_rotation.test.cpp
     title: verify/string/minimum_rotation.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/string/string_algorithms.test.cpp
     title: verify/string/string_algorithms.test.cpp
-  _isVerificationFailed: false
+  _isVerificationFailed: true
   _pathExtension: hpp
-  _verificationStatusIcon: ':heavy_check_mark:'
+  _verificationStatusIcon: ':question:'
   attributes:
     links: []
   bundledCode: "#line 1 \"string/minimum_rotation.hpp\"\n\n\n\nnamespace m1une {\n\
@@ -58,7 +58,7 @@ data:
   - string/all.hpp
   - string/lyndon_factorization.hpp
   timestamp: '2026-07-13 05:39:37+09:00'
-  verificationStatus: LIBRARY_ALL_AC
+  verificationStatus: LIBRARY_SOME_WA
   verifiedWith:
   - verify/string/minimum_rotation.test.cpp
   - verify/string/lyndon_factorization.test.cpp
