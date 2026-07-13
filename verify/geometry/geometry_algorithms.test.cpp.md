@@ -23,6 +23,9 @@ data:
     path: geometry/convex_layers.hpp
     title: Convex Layers
   - icon: ':heavy_check_mark:'
+    path: geometry/euclidean_mst.hpp
+    title: Euclidean Minimum Spanning Tree
+  - icon: ':heavy_check_mark:'
     path: geometry/farthest_pair.hpp
     title: Farthest Pair of Points
   - icon: ':heavy_check_mark:'
@@ -161,19 +164,20 @@ data:
   - geometry/closest_pair.hpp
   - geometry/convex_hull.hpp
   - geometry/convex_layers.hpp
+  - geometry/euclidean_mst.hpp
+  - ds/dsu/dsu.hpp
   - geometry/farthest_pair.hpp
   - geometry/half_plane_intersection.hpp
   - geometry/lattice_point_count.hpp
   - utilities/bigint.hpp
   - geometry/manhattan_mst.hpp
-  - ds/dsu/dsu.hpp
   - geometry/minimum_enclosing_circle.hpp
   - geometry/polygon.hpp
   - geometry/rectangle_union_area.hpp
   isVerificationFile: true
   path: verify/geometry/geometry_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-13 20:32:52+09:00'
+  timestamp: '2026-07-14 00:51:53+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/geometry_algorithms.test.cpp

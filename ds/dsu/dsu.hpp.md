@@ -6,6 +6,9 @@ data:
     path: geometry/all.hpp
     title: Geometry Bundle
   - icon: ':heavy_check_mark:'
+    path: geometry/euclidean_mst.hpp
+    title: Euclidean Minimum Spanning Tree
+  - icon: ':heavy_check_mark:'
     path: geometry/manhattan_mst.hpp
     title: Manhattan Minimum Spanning Tree
   - icon: ':heavy_check_mark:'
@@ -27,6 +30,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/dsu/range_parallel_dsu.test.cpp
     title: verify/ds/dsu/range_parallel_dsu.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/euclidean_mst.test.cpp
+    title: verify/geometry/euclidean_mst.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/euclidean_mst.test.cpp
+    title: verify/geometry/euclidean_mst.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/geometry_algorithms.test.cpp
     title: verify/geometry/geometry_algorithms.test.cpp
@@ -131,6 +140,7 @@ data:
   requiredBy:
   - geometry/all.hpp
   - geometry/manhattan_mst.hpp
+  - geometry/euclidean_mst.hpp
   - graph/kruskal.hpp
   - graph/connected_components.hpp
   - graph/all.hpp
@@ -139,6 +149,8 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp
+  - verify/geometry/euclidean_mst.test.cpp
+  - verify/geometry/euclidean_mst.test.cpp
   - verify/geometry/manhattan_mst.test.cpp
   - verify/geometry/manhattan_mst.test.cpp
   - verify/ds/dsu/dsu.test.cpp

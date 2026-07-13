@@ -21,6 +21,9 @@ data:
     path: geometry/convex_layers.hpp
     title: Convex Layers
   - icon: ':heavy_check_mark:'
+    path: geometry/euclidean_mst.hpp
+    title: Euclidean Minimum Spanning Tree
+  - icon: ':heavy_check_mark:'
     path: geometry/farthest_pair.hpp
     title: Farthest Pair of Points
   - icon: ':heavy_check_mark:'
@@ -66,6 +69,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/convex_layers.test.cpp
     title: verify/geometry/convex_layers.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/euclidean_mst.test.cpp
+    title: verify/geometry/euclidean_mst.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/farthest_pair.test.cpp
     title: verify/geometry/farthest_pair.test.cpp
@@ -293,6 +299,7 @@ data:
   - geometry/manhattan_mst.hpp
   - geometry/rectangle_union_area.hpp
   - geometry/polygon.hpp
+  - geometry/euclidean_mst.hpp
   - geometry/half_plane_intersection.hpp
   timestamp: '2026-06-21 12:04:47+09:00'
   verificationStatus: LIBRARY_ALL_AC
@@ -305,6 +312,7 @@ data:
   - verify/geometry/minimum_enclosing_circle.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/segment_intersection.test.cpp
+  - verify/geometry/euclidean_mst.test.cpp
   - verify/geometry/circle_ray.test.cpp
   - verify/geometry/half_plane_intersection_random.test.cpp
   - verify/geometry/convex_layers.test.cpp

@@ -20,6 +20,9 @@ data:
     path: geometry/convex_layers.hpp
     title: Convex Layers
   - icon: ':heavy_check_mark:'
+    path: geometry/euclidean_mst.hpp
+    title: Euclidean Minimum Spanning Tree
+  - icon: ':heavy_check_mark:'
     path: geometry/farthest_pair.hpp
     title: Farthest Pair of Points
   - icon: ':heavy_check_mark:'
@@ -89,6 +92,8 @@ data:
 
     #include "convex_layers.hpp"
 
+    #include "euclidean_mst.hpp"
+
     #include "farthest_pair.hpp"
 
     #include "half_plane_intersection.hpp"
@@ -122,19 +127,20 @@ data:
   - geometry/closest_pair.hpp
   - geometry/convex_hull.hpp
   - geometry/convex_layers.hpp
+  - geometry/euclidean_mst.hpp
+  - ds/dsu/dsu.hpp
   - geometry/farthest_pair.hpp
   - geometry/half_plane_intersection.hpp
   - geometry/lattice_point_count.hpp
   - utilities/bigint.hpp
   - geometry/manhattan_mst.hpp
-  - ds/dsu/dsu.hpp
   - geometry/minimum_enclosing_circle.hpp
   - geometry/polygon.hpp
   - geometry/rectangle_union_area.hpp
   isVerificationFile: false
   path: geometry/all.hpp
   requiredBy: []
-  timestamp: '2026-07-13 20:32:52+09:00'
+  timestamp: '2026-07-14 00:51:53+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp
@@ -156,6 +162,7 @@ title: Geometry Bundle
 | `geometry/closest_pair.hpp` | Euclidean closest pair with original indices in $O(N\log N)$. |
 | `geometry/convex_hull.hpp` | Monotone-chain convex hull with optional boundary-collinear points. |
 | `geometry/convex_layers.hpp` | Onion decomposition into successive convex-hull boundaries in $O(N\log^2 N)$. |
+| `geometry/euclidean_mst.hpp` | Euclidean minimum spanning tree for integral points in $O(N\log N)$. |
 | `geometry/farthest_pair.hpp` | Euclidean farthest pair with original indices in $O(N\log N)$. |
 | `geometry/half_plane_intersection.hpp` | Bounded intersection polygon of directed closed half-planes in $O(N\log N)$. |
 | `geometry/lattice_point_count.hpp` | Exact lattice-point counting in a bounded intersection of integer linear inequalities. |
