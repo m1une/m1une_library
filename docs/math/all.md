@@ -24,6 +24,8 @@ You usually do not need to include this entire bundle:
 * Use `bitwise_convolution.hpp` for OR, AND, or XOR convolution over mask
   indices.
 * Use `subset_convolution.hpp` to combine values indexed by disjoint submasks.
+* Use `multivariate_convolution.hpp` for truncated or cyclic convolution of
+  flattened multidimensional arrays.
 * Use `xor_basis.hpp` to maintain the XOR span of a set of unsigned integers.
 * Use `generalized_floor_sum.hpp` for polynomial moments of
   `floor((a * i + b) / mod)`.
@@ -82,8 +84,9 @@ few unused headers do not matter.
 | `math/bit_ceil.hpp` | Smallest power of two at least a given value. |
 | `math/integer_arithmetic.hpp` | Exact integer square roots and overflow-aware powers. |
 | `math/lucas.hpp` | Lucas's theorem for huge binomial arguments modulo a small prime. |
-| `math/modint.hpp` | Static modular integer type. |
+| `math/modint.hpp` | Static and tagged dynamic modular integer types. |
 | `math/modular_square_root.hpp` | Modular square roots for prime moduli using Tonelli-Shanks. |
+| `math/multivariate_convolution.hpp` | Truncated and cyclic multidimensional convolution. |
 | `math/multiplicative_function_prefix_sum.hpp` | Min_25 prefix sums of a multiplicative function. |
 | `math/fps/all.hpp` | Convolution, formal power series, polynomial algorithms, and linear recurrences. |
 | `math/matrix/all.hpp` | Dense and packed GF(2) matrices, powers, Gaussian elimination, determinant, inverse, and linear systems. |

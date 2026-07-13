@@ -1,6 +1,7 @@
 #ifndef M1UNE_MATH_MODINT_HPP
 #define M1UNE_MATH_MODINT_HPP 1
 
+#include <cassert>
 #include <cstdint>
 #include <iostream>
 #include <type_traits>
@@ -148,6 +149,155 @@ struct ModInt {
 
 using modint998244353 = ModInt<998244353>;
 using modint1000000007 = ModInt<1000000007>;
+
+template <int Id = 0>
+struct DynamicModInt {
+   private:
+    uint32_t _v;
+    inline static uint32_t _mod = 1;
+
+   public:
+    static uint32_t mod() noexcept {
+        return _mod;
+    }
+
+    static void set_mod(uint32_t modulus) noexcept {
+        assert(modulus > 0);
+        assert(modulus <= uint32_t(1) << 31);
+        _mod = modulus;
+    }
+
+    static DynamicModInt raw(uint32_t v) noexcept {
+        assert(v < _mod);
+        DynamicModInt x;
+        x._v = v;
+        return x;
+    }
+
+    DynamicModInt() noexcept : _v(0) {}
+
+    template <class Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>
+    DynamicModInt(Integer v) noexcept {
+        if constexpr (std::is_signed_v<Integer>) {
+            int64_t x = static_cast<int64_t>(v) % static_cast<int64_t>(_mod);
+            if (x < 0) x += _mod;
+            _v = static_cast<uint32_t>(x);
+        } else {
+            _v = static_cast<uint32_t>(static_cast<uint64_t>(v) % _mod);
+        }
+    }
+
+    uint32_t val() const noexcept {
+        return _v;
+    }
+
+    DynamicModInt& operator++() noexcept {
+        _v++;
+        if (_v == _mod) _v = 0;
+        return *this;
+    }
+
+    DynamicModInt& operator--() noexcept {
+        if (_v == 0) _v = _mod;
+        _v--;
+        return *this;
+    }
+
+    DynamicModInt operator++(int) noexcept {
+        DynamicModInt result = *this;
+        ++*this;
+        return result;
+    }
+
+    DynamicModInt operator--(int) noexcept {
+        DynamicModInt result = *this;
+        --*this;
+        return result;
+    }
+
+    DynamicModInt& operator+=(const DynamicModInt& rhs) noexcept {
+        _v += rhs._v;
+        if (_v >= _mod) _v -= _mod;
+        return *this;
+    }
+
+    DynamicModInt& operator-=(const DynamicModInt& rhs) noexcept {
+        _v -= rhs._v;
+        if (_v >= _mod) _v += _mod;
+        return *this;
+    }
+
+    DynamicModInt& operator*=(const DynamicModInt& rhs) noexcept {
+        _v = static_cast<uint32_t>(uint64_t(_v) * rhs._v % _mod);
+        return *this;
+    }
+
+    DynamicModInt& operator/=(const DynamicModInt& rhs) noexcept {
+        return *this *= rhs.inv();
+    }
+
+    DynamicModInt operator+(const DynamicModInt& rhs) const noexcept {
+        return DynamicModInt(*this) += rhs;
+    }
+
+    DynamicModInt operator-(const DynamicModInt& rhs) const noexcept {
+        return DynamicModInt(*this) -= rhs;
+    }
+
+    DynamicModInt operator*(const DynamicModInt& rhs) const noexcept {
+        return DynamicModInt(*this) *= rhs;
+    }
+
+    DynamicModInt operator/(const DynamicModInt& rhs) const noexcept {
+        return DynamicModInt(*this) /= rhs;
+    }
+
+    bool operator==(const DynamicModInt& rhs) const noexcept {
+        return _v == rhs._v;
+    }
+
+    bool operator!=(const DynamicModInt& rhs) const noexcept {
+        return _v != rhs._v;
+    }
+
+    DynamicModInt pow(long long exponent) const noexcept {
+        assert(exponent >= 0);
+        DynamicModInt result = raw(1 % _mod);
+        DynamicModInt base = *this;
+        while (exponent > 0) {
+            if (exponent & 1) result *= base;
+            base *= base;
+            exponent >>= 1;
+        }
+        return result;
+    }
+
+    DynamicModInt inv() const noexcept {
+        int64_t a = _v, b = _mod, u = 1, v = 0;
+        while (b) {
+            int64_t quotient = a / b;
+            a -= quotient * b;
+            std::swap(a, b);
+            u -= quotient * v;
+            std::swap(u, v);
+        }
+        assert(a == 1);
+        u %= _mod;
+        if (u < 0) u += _mod;
+        return raw(static_cast<uint32_t>(u));
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const DynamicModInt& rhs) {
+        return os << rhs._v;
+    }
+
+    friend std::istream& operator>>(std::istream& is, DynamicModInt& rhs) {
+        long long value;
+        is >> value;
+        rhs = DynamicModInt(value);
+        return is;
+    }
+};
 
 }  // namespace math
 }  // namespace m1une

@@ -27,6 +27,14 @@ namespace fps {
 
 namespace internal {
 
+template <class Mint, class = void>
+struct has_static_modulus : std::false_type {};
+
+template <class Mint>
+struct has_static_modulus<
+    Mint, std::void_t<decltype(std::integral_constant<uint32_t, Mint::mod()>{})>>
+    : std::true_type {};
+
 constexpr uint32_t primitive_root_constexpr(uint32_t mod) {
     if (mod == 2) return 1;
     if (mod == 167772161) return 3;
@@ -334,7 +342,9 @@ std::vector<Mint> convolution(const std::vector<Mint>& a, const std::vector<Mint
     const int result_size = int(a.size() + b.size() - 1);
     int n = 1;
     while (n < result_size) n <<= 1;
-    if ((Mint::mod() - 1) % uint32_t(n) == 0) return convolution_ntt(a, b);
+    if constexpr (internal::has_static_modulus<Mint>::value) {
+        if ((Mint::mod() - 1) % uint32_t(n) == 0) return convolution_ntt(a, b);
+    }
 
     using Mint1 = math::ModInt<167772161>;
     using Mint2 = math::ModInt<469762049>;

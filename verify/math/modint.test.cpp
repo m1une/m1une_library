@@ -50,8 +50,24 @@ void test_integral_construction() {
     assert(from_random.val() < 100);
 }
 
+void test_dynamic_modint() {
+    using dynamic_mint = m1une::math::DynamicModInt<0>;
+    using other_dynamic_mint = m1une::math::DynamicModInt<1>;
+    dynamic_mint::set_mod(11);
+    other_dynamic_mint::set_mod(7);
+
+    assert(dynamic_mint(-1).val() == 10);
+    assert((dynamic_mint(8) + dynamic_mint(7)).val() == 4);
+    assert((dynamic_mint(8) - dynamic_mint(10)).val() == 9);
+    assert((dynamic_mint(8) * dynamic_mint(7)).val() == 1);
+    assert(dynamic_mint(3).pow(5).val() == 1);
+    assert(dynamic_mint(3).inv().val() == 4);
+    assert(other_dynamic_mint(8).val() == 1);
+}
+
 int main() {
     test_integral_construction();
+    test_dynamic_modint();
 
     long long a, b;
     std::cin >> a >> b;

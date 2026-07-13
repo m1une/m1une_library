@@ -11,7 +11,8 @@ Two integers represent the same modular value when their difference is
 divisible by the modulus. For example, modulo `7`, the values `2`, `9`, and
 `-5` are equivalent.
 
-`ModInt<7>` stores all of them as the normalized representative `2`.
+`ModInt<7>` stores all of them as the normalized representative `2`. Use
+`DynamicModInt<id>` instead when the modulus is known only at runtime.
 
 ## Division and Modular Inverses
 
@@ -34,10 +35,19 @@ moduli such as `998244353` and `1000000007` are common in counting problems.
 ```cpp
 template <uint32_t Modulus>
 struct ModInt;
+
+template <int Id = 0>
+struct DynamicModInt;
 ```
 
 `Modulus` is a compile-time `uint32_t` value. `ModInt<Modulus>` is the value
 type returned by arithmetic operators and by `pow`, `inv`, and `raw`.
+
+`Id` distinguishes independent dynamic-modulus types. Every
+`DynamicModInt<Id>` value shares one modulus, set by
+`DynamicModInt<Id>::set_mod(modulus)`. Change it only when no existing value of
+that type will be used again. The dynamic modulus must be in
+`[1, 2^31]`.
 
 ## Type Aliases
 
@@ -51,6 +61,8 @@ For convenience, the library provides the following common type aliases:
 | --- | --- | --- |
 | `ModInt()` | Initializes the value to `0`. | $O(1)$ |
 | `template<class Integer> ModInt(Integer v)` | Initializes from any standard integral type. Negative values are normalized, and wide unsigned values are reduced without narrowing first. | $O(1)$ |
+| `DynamicModInt()` | Initializes the value to `0` under the current modulus. | $O(1)$ |
+| `template<class Integer> DynamicModInt(Integer v)` | Initializes and normalizes an integer under the current modulus. | $O(1)$ |
 
 The integral constructor accepts types such as `int`, `long long`,
 `unsigned long`, and `std::mt19937::result_type` without ambiguous overloads.
@@ -64,6 +76,12 @@ The integral constructor accepts types such as `int`, `long long`,
 | `ModInt inv() const` | Computes the modular inverse by the extended Euclidean algorithm. The value and modulus must be coprime. | $O(\log(\text{Modulus}))$ |
 | `static uint32_t mod()` | Returns the modulus associated with this type. | $O(1)$ |
 | `static ModInt raw(uint32_t v)` | Constructs directly from `v` without applying `% Modulus`. Use only when `v < Modulus`. | $O(1)$ |
+| `static void DynamicModInt::set_mod(uint32_t modulus)` | Sets the modulus shared by this tagged dynamic type. | $O(1)$ |
+| `static uint32_t DynamicModInt::mod()` | Returns the current dynamic modulus. | $O(1)$ |
+| `static DynamicModInt DynamicModInt::raw(uint32_t v)` | Constructs directly from a normalized value. | $O(1)$ |
+
+`DynamicModInt` provides the same `val`, `pow`, `inv`, arithmetic, comparison,
+increment, decrement, and stream interfaces as `ModInt`.
 
 ## Operators
 
