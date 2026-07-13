@@ -26,8 +26,14 @@ new versions while older versions remain available.
 | `std::vector<T> to_vector(int l, int r)` | Returns the elements in `[l, r)`. | $O(\log N + r - l)$ |
 | `PersistentLazySegtree apply(int p, F f)` | Returns a new version where `f` is applied to index `p`. | $O(\log N)$ |
 | `PersistentLazySegtree apply(int l, int r, F f)` | Returns a new version where `f` is applied to every element in `[l, r)`. | $O(\log N)$ |
+| `PersistentLazySegtree copy_range_from(const PersistentLazySegtree& source, int l, int r)` | Returns a new version whose `[l, r)` is copied from `source`. | $O(\log N)$ |
 | `int max_right<G>(int l, G g)` | Returns the largest `r` such that `g(prod(l, r))` is `true`. | $O(\log N)$ |
 | `int min_left<G>(int r, G g)` | Returns the smallest `l` such that `g(prod(l, r))` is `true`. | $O(\log N)$ |
+
+`copy_range_from` requires both versions to have the same size and to descend
+from the same initial tree, so that they share a node pool. Neither input
+version is mutated. The returned version uses the receiver outside `[l, r)`
+and `source` inside `[l, r)`.
 
 ## Example
 
@@ -43,8 +49,10 @@ int main() {
 
     Seg seg(std::vector<long long>{1, 2, 3, 4});
     Seg next = seg.apply(1, 3, 10);
+    Seg mixed = seg.copy_range_from(next, 2, 4);
 
     std::cout << seg.prod(0, 4).sum << "\n";   // 10
     std::cout << next.prod(0, 4).sum << "\n";  // 30
+    std::cout << mixed.prod(0, 4).sum << "\n"; // 20
 }
 ```

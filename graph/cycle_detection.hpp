@@ -2,6 +2,7 @@
 #define M1UNE_GRAPH_CYCLE_DETECTION_HPP 1
 
 #include <algorithm>
+#include <cstddef>
 #include <vector>
 
 #include "graph.hpp"
@@ -43,59 +44,97 @@ template <class T>
 Cycle find_directed_cycle(const Graph<T>& g) {
     int n = g.size();
     std::vector<int> color(n, 0), parent(n, -1), parent_edge(n, -1);
-    Cycle result;
-
-    auto dfs = [&](auto self, int v) -> bool {
-        color[v] = 1;
-        for (const auto& e : g[v]) {
-            if (!e.alive) continue;
-            if (color[e.to] == 0) {
-                parent[e.to] = v;
-                parent_edge[e.to] = e.id;
-                if (self(self, e.to)) return true;
-            } else if (color[e.to] == 1) {
-                result = restore_cycle(v, e.to, e.id, parent, parent_edge);
-                return true;
-            }
-        }
-        color[v] = 2;
-        return false;
+    struct Frame {
+        int vertex;
+        std::size_t next_edge;
     };
 
-    for (int v = 0; v < n; v++) {
-        if (color[v] == 0 && dfs(dfs, v)) break;
+    std::vector<Frame> stack;
+    stack.reserve(n);
+    for (int start = 0; start < n; start++) {
+        if (color[start] != 0) continue;
+        color[start] = 1;
+        stack.push_back(Frame{start, 0});
+        while (!stack.empty()) {
+            Frame& frame = stack.back();
+            const int vertex = frame.vertex;
+            const auto& adjacency = g[vertex];
+            while (
+                frame.next_edge < adjacency.size() &&
+                !adjacency[frame.next_edge].alive
+            ) {
+                frame.next_edge++;
+            }
+            if (frame.next_edge == adjacency.size()) {
+                color[vertex] = 2;
+                stack.pop_back();
+                continue;
+            }
+
+            const auto& edge = adjacency[frame.next_edge++];
+            const int to = edge.to;
+            const int edge_id = edge.id;
+            if (color[to] == 0) {
+                parent[to] = vertex;
+                parent_edge[to] = edge_id;
+                color[to] = 1;
+                stack.push_back(Frame{to, 0});
+            } else if (color[to] == 1) {
+                return restore_cycle(vertex, to, edge_id, parent, parent_edge);
+            }
+        }
     }
-    return result;
+    return Cycle();
 }
 
 template <class T>
 Cycle find_undirected_cycle(const Graph<T>& g) {
     int n = g.size();
     std::vector<int> color(n, 0), parent(n, -1), parent_edge(n, -1);
-    Cycle result;
-
-    auto dfs = [&](auto self, int v, int pe) -> bool {
-        color[v] = 1;
-        for (const auto& e : g[v]) {
-            if (!e.alive) continue;
-            if (e.id == pe) continue;
-            if (color[e.to] == 0) {
-                parent[e.to] = v;
-                parent_edge[e.to] = e.id;
-                if (self(self, e.to, e.id)) return true;
-            } else if (color[e.to] == 1) {
-                result = restore_cycle(v, e.to, e.id, parent, parent_edge);
-                return true;
-            }
-        }
-        color[v] = 2;
-        return false;
+    struct Frame {
+        int vertex;
+        std::size_t next_edge;
     };
 
-    for (int v = 0; v < n; v++) {
-        if (color[v] == 0 && dfs(dfs, v, -1)) break;
+    std::vector<Frame> stack;
+    stack.reserve(n);
+    for (int start = 0; start < n; start++) {
+        if (color[start] != 0) continue;
+        color[start] = 1;
+        stack.push_back(Frame{start, 0});
+        while (!stack.empty()) {
+            Frame& frame = stack.back();
+            const int vertex = frame.vertex;
+            const auto& adjacency = g[vertex];
+            while (
+                frame.next_edge < adjacency.size() &&
+                (
+                    !adjacency[frame.next_edge].alive ||
+                    adjacency[frame.next_edge].id == parent_edge[vertex]
+                )
+            ) {
+                frame.next_edge++;
+            }
+            if (frame.next_edge == adjacency.size()) {
+                color[vertex] = 2;
+                stack.pop_back();
+                continue;
+            }
+
+            const auto& edge = adjacency[frame.next_edge++];
+            const int to = edge.to;
+            const int edge_id = edge.id;
+            if (color[to] == 0) {
+                parent[to] = vertex;
+                parent_edge[to] = edge_id;
+                color[to] = 1;
+                stack.push_back(Frame{to, 0});
+            } else if (color[to] == 1) {
+                return restore_cycle(vertex, to, edge_id, parent, parent_edge);
+            }
+        }
     }
-    return result;
+    return Cycle();
 }
 
 }  // namespace graph

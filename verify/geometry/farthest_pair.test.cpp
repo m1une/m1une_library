@@ -1,4 +1,4 @@
-#define PROBLEM "https://judge.yosupo.jp/problem/aplusb"
+#define PROBLEM "https://judge.yosupo.jp/problem/furthest_pair"
 
 #include "../../geometry/farthest_pair.hpp"
 
@@ -93,7 +93,20 @@ int main() {
     test_fixed();
     test_randomized();
 
-    long long a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    int test_count;
+    std::cin >> test_count;
+    while (test_count--) {
+        int size;
+        std::cin >> size;
+        std::vector<Point> points;
+        points.reserve(size);
+        for (int index = 0; index < size; index++) {
+            long long x, y;
+            std::cin >> x >> y;
+            points.emplace_back(x, y);
+        }
+        auto result = m1une::geometry::farthest_pair(points);
+        assert(result.has_value());
+        std::cout << result->first << ' ' << result->second << '\n';
+    }
 }

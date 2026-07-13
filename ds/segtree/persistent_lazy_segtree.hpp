@@ -127,11 +127,16 @@ struct PersistentLazySegtree {
     }
 
     void push(int t, int l, int r) const {
-        Node& node = (*_pool)[t];
-        if (!node.has_lazy) return;
+        if (!(*_pool)[t].has_lazy) return;
+        F lazy = (*_pool)[t].lazy;
+        int left = (*_pool)[t].l;
+        int right = (*_pool)[t].r;
         int m = (l + r) >> 1;
-        node.l = all_apply_clone(node.l, node.lazy);
-        node.r = all_apply_clone(node.r, shift_operator(node.lazy, m - l));
+        left = all_apply_clone(left, lazy);
+        right = all_apply_clone(right, shift_operator(lazy, m - l));
+        Node& node = (*_pool)[t];
+        node.l = left;
+        node.r = right;
         node.lazy = ActedMonoid::op_id();
         node.has_lazy = false;
     }
@@ -174,6 +179,38 @@ struct PersistentLazySegtree {
         (*_pool)[t].r = apply_node((*_pool)[t].r, m, r, ql, qr, f);
         update(t);
         return t;
+    }
+
+    int copy_range_node(int target, int source, int l, int r, int ql, int qr) const {
+        if (qr <= l || r <= ql) return target;
+        if (ql <= l && r <= qr) return source;
+
+        target = clone_node(target);
+        source = clone_node(source);
+        push(target, l, r);
+        push(source, l, r);
+
+        int m = (l + r) >> 1;
+        int left = copy_range_node(
+            (*_pool)[target].l,
+            (*_pool)[source].l,
+            l,
+            m,
+            ql,
+            qr
+        );
+        int right = copy_range_node(
+            (*_pool)[target].r,
+            (*_pool)[source].r,
+            m,
+            r,
+            ql,
+            qr
+        );
+        (*_pool)[target].l = left;
+        (*_pool)[target].r = right;
+        update(target);
+        return target;
     }
 
     T prod_node(int t, int l, int r, int ql, int qr, const F& inherited) const {
@@ -321,6 +358,19 @@ struct PersistentLazySegtree {
         assert(0 <= l && l <= r && r <= _n);
         if (l == r) return *this;
         return PersistentLazySegtree(_n, apply_node(_root, 0, _n, l, r, f), _pool);
+    }
+
+    PersistentLazySegtree copy_range_from(
+        const PersistentLazySegtree& source,
+        int l,
+        int r
+    ) const {
+        assert(_n == source._n);
+        assert(_pool == source._pool);
+        assert(0 <= l && l <= r && r <= _n);
+        if (l == r) return *this;
+        int root = copy_range_node(_root, source._root, 0, _n, l, r);
+        return PersistentLazySegtree(_n, root, _pool);
     }
 
     template <class G>

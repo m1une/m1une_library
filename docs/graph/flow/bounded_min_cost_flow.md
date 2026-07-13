@@ -32,15 +32,14 @@ Directed flow network. An edge added by
 
 ## How It Works
 
-First, lower bounds are subtracted. For an edge `u -> v` with lower bound `L`,
-upper bound `U`, and cost `C`, the solver sends `L` units as a fixed part and
-leaves residual capacity `U - L`.
-
-Then it handles costs. If a residual edge has negative cost, the solver starts
-by saturating it, because that can only improve the cost before balance
-constraints are repaired. This may make vertex balances wrong, so the remaining
-problem is solved on the residual graph with a super source and super sink.
-All residual costs in that repair step are non-negative.
+The solver uses capacity scaling. At scale `delta`, it saturates negative
+reduced-cost residual edges in multiples of `delta`, then repeatedly runs a
+multi-source shortest-path search from vertices with excess balance and pushes
+flow to deficit vertices. Halving `delta` gradually restores exact feasibility;
+the final `delta = 1` phase also establishes optimal residual reduced costs.
+Unlike a plain successive-shortest-path implementation, the number of phases
+depends logarithmically on capacity magnitudes, so exponentially many small
+augmentations are avoided.
 
 The returned `Result::cost` is the total cost on the original edges:
 
@@ -50,6 +49,10 @@ sum(edge.flow * edge.cost)
 
 If the balance constraints cannot be satisfied, the solver returns
 `std::nullopt`.
+
+`Cap` must be a signed integer type. `Cost` must support signed exact
+arithmetic, ordering, and `std::numeric_limits`. All capacities, intermediate
+potential values, and products `flow * cost` must fit their respective types.
 
 ## How to Use It
 
@@ -75,9 +78,21 @@ The result contains these members:
 | --- | --- | --- |
 | `edges` | `std::vector<ResultEdge>` | Original edges with selected minimum-cost flow. |
 | `balance` | `std::vector<Cap>` | Vertex balances used for this solve. |
+| `potential` | `std::vector<Cost>` | A dual potential certificate for the selected flow. |
 | `cost` | `Cost` | Total cost `sum(flow * cost)` of the selected flow. |
 | `get_edge` | `ResultEdge get_edge(int i) const` | Returns result edge `i`. |
 | `flow` | `Cap flow(int i) const` | Returns selected flow on edge `i`. |
+
+For every returned edge `e`, `potential` satisfies the residual reduced-cost
+conditions:
+
+* if `e.flow < e.upper`, then
+  `e.cost + potential[e.from] - potential[e.to] >= 0`;
+* if `e.lower < e.flow`, then
+  `e.cost + potential[e.from] - potential[e.to] <= 0`.
+
+Together with feasibility, these inequalities certify that the returned flow
+has minimum cost.
 
 ## Edge Fields
 
@@ -107,12 +122,12 @@ The result contains these members:
 | `add_demand` | `void add_demand(int v, Cap demand)` | Adds non-negative demand to vertex `v`. | $O(1)$ |
 | `balance` | `Cap balance(int v) const` | Returns `balance[v]`. | $O(1)$ |
 | `balances` | `const std::vector<Cap>& balances() const` | Returns all balances. | $O(1)$ |
-| `min_cost_flow` | `std::optional<Result> min_cost_flow() const` | Solves using stored balances. | $O(N \cdot M + F \cdot M \log N)$ |
-| `min_cost_flow` | `std::optional<Result> min_cost_flow(const std::vector<Cap>& balance) const` | Solves using explicit balances. | $O(N \cdot M + F \cdot M \log N)$ |
-| `min_cost_st_flow` | `std::optional<Result> min_cost_st_flow(int s, int t, Cap flow_value) const` | Solves exact `s-t` flow with value `flow_value`. | $O(N \cdot M + F \cdot M \log N)$ |
+| `min_cost_flow` | `std::optional<Result> min_cost_flow() const` | Solves using stored balances. | $O(M \log U \cdot (M + N \log N))$ |
+| `min_cost_flow` | `std::optional<Result> min_cost_flow(const std::vector<Cap>& balance) const` | Solves using explicit balances. | $O(M \log U \cdot (M + N \log N))$ |
+| `min_cost_st_flow` | `std::optional<Result> min_cost_st_flow(int s, int t, Cap flow_value) const` | Solves exact `s-t` flow with value `flow_value`. | $O(M \log U \cdot (M + N \log N))$ |
 
-Here, `F` is the number of augmentations made by the internal
-`MinCostFlow<Cap, Cost>` repair step.
+Here, `U` is the maximum absolute edge bound or vertex balance, with
+`U >= 1`.
 
 ## Alias
 
