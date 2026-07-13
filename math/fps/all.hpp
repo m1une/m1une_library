@@ -12,5 +12,6 @@
 #include "linear_recurrence.hpp"
 #include "multipoint_evaluation.hpp"
 #include "polynomial_factorization.hpp"
+#include "sparse_formal_power_series.hpp"
 
 #endif  // M1UNE_FPS_ALL_HPP

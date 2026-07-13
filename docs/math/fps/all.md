@@ -22,3 +22,4 @@ documentation_of: ../../../math/fps/all.hpp
 | `math/fps/linear_recurrence.hpp` | Berlekamp-Massey and linear-recurrence term evaluation. |
 | `math/fps/multipoint_evaluation.hpp` | Multipoint evaluation and polynomial interpolation. |
 | `math/fps/polynomial_factorization.hpp` | Factorization into monic irreducible polynomials over a prime field. |
+| `math/fps/sparse_formal_power_series.hpp` | Sparse inverse, logarithm, exponential, power, and square root. |
