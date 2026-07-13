@@ -5,6 +5,7 @@
 #include "circle.hpp"
 #include "closest_pair.hpp"
 #include "convex_hull.hpp"
+#include "convex_layers.hpp"
 #include "farthest_pair.hpp"
 #include "half_plane_intersection.hpp"
 #include "lattice_point_count.hpp"
