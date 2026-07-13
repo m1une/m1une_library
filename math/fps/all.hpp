@@ -2,6 +2,7 @@
 #define M1UNE_FPS_ALL_HPP 1
 
 #include "composition.hpp"
+#include "compositional_inverse.hpp"
 #include "convolution.hpp"
 #include "convolution_ll.hpp"
 #include "floating_point_convolution.hpp"
