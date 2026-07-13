@@ -109,6 +109,9 @@ data:
       path: algo/enumeration/gray_code.hpp
       title: Gray Code
     - icon: ':heavy_check_mark:'
+      path: algo/enumeration/segtree_range.hpp
+      title: Segment Tree Range Split
+    - icon: ':heavy_check_mark:'
       path: algo/enumeration/submask.hpp
       title: Submask Enumeration
   - name: algo/offline
@@ -1112,6 +1115,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/algo/enumeration/gray_code.test.cpp
       title: verify/algo/enumeration/gray_code.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/algo/enumeration/segtree_range.test.cpp
+      title: verify/algo/enumeration/segtree_range.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/algo/enumeration/submask.test.cpp
       title: verify/algo/enumeration/submask.test.cpp

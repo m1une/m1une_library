@@ -8,6 +8,9 @@ data:
     path: algo/enumeration/gray_code.hpp
     title: Gray Code
   - icon: ':heavy_check_mark:'
+    path: algo/enumeration/segtree_range.hpp
+    title: Segment Tree Range Split
+  - icon: ':heavy_check_mark:'
     path: algo/enumeration/submask.hpp
     title: Submask Enumeration
   _extendedRequiredBy:
@@ -67,10 +70,27 @@ data:
     \ << bit_count;\n    std::vector<UInt> result(size);\n    for (std::size_t index\
     \ = 0; index < size; ++index) {\n        result[index] = gray_encode(static_cast<UInt>(index));\n\
     \    }\n    return result;\n}\n\n}  // namespace algo\n}  // namespace m1une\n\
-    \n\n#line 1 \"algo/enumeration/submask.hpp\"\n\n\n\n#line 8 \"algo/enumeration/submask.hpp\"\
-    \n\nnamespace m1une {\nnamespace algo {\n\nnamespace internal {\n\ntemplate <std::unsigned_integral\
-    \ UInt>\nrequires(!std::same_as<std::remove_cv_t<UInt>, bool>)\nUInt submask_low_bits(int\
-    \ bit_count) {\n    constexpr int digits = std::numeric_limits<UInt>::digits;\n\
+    \n\n#line 1 \"algo/enumeration/segtree_range.hpp\"\n\n\n\n#include <bit>\n#line\
+    \ 8 \"algo/enumeration/segtree_range.hpp\"\n#include <utility>\n#line 10 \"algo/enumeration/segtree_range.hpp\"\
+    \n\nnamespace m1une {\nnamespace algo {\n\n// Splits [left, right) into maximal\
+    \ segment-tree ranges from left to right.\ntemplate <std::integral Int>\nrequires(!std::same_as<std::remove_cv_t<Int>,\
+    \ bool>)\nstd::vector<std::pair<Int, Int>> split_segtree_range(Int left, Int right)\
+    \ {\n    if constexpr (std::signed_integral<Int>) assert(Int(0) <= left);\n  \
+    \  assert(left <= right);\n    if constexpr (std::signed_integral<Int>) {\n  \
+    \      if (left < 0) return {};\n    }\n    if (right < left) return {};\n\n \
+    \   using UInt = std::make_unsigned_t<Int>;\n    UInt position = static_cast<UInt>(left);\n\
+    \    const UInt end = static_cast<UInt>(right);\n    std::vector<std::pair<Int,\
+    \ Int>> result;\n    if (position == end) return result;\n    result.reserve(2\
+    \ * std::bit_width(end - position));\n\n    while (position < end) {\n       \
+    \ UInt length = std::bit_floor(end - position);\n        if (position != 0) {\n\
+    \            const UInt alignment = position & (~position + UInt(1));\n      \
+    \      if (alignment < length) length = alignment;\n        }\n        const UInt\
+    \ next = position + length;\n        result.emplace_back(\n            static_cast<Int>(position),\
+    \ static_cast<Int>(next)\n        );\n        position = next;\n    }\n    return\
+    \ result;\n}\n\n}  // namespace algo\n}  // namespace m1une\n\n\n#line 1 \"algo/enumeration/submask.hpp\"\
+    \n\n\n\n#line 8 \"algo/enumeration/submask.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ algo {\n\nnamespace internal {\n\ntemplate <std::unsigned_integral UInt>\nrequires(!std::same_as<std::remove_cv_t<UInt>,\
+    \ bool>)\nUInt submask_low_bits(int bit_count) {\n    constexpr int digits = std::numeric_limits<UInt>::digits;\n\
     \    assert(0 <= bit_count && bit_count <= digits);\n    if (bit_count == digits)\
     \ return ~UInt(0);\n    return (UInt(1) << bit_count) - UInt(1);\n}\n\n}  // namespace\
     \ internal\n\ntemplate <std::unsigned_integral UInt, class F>\nrequires(!std::same_as<std::remove_cv_t<UInt>,\
@@ -85,7 +105,7 @@ data:
     \ UInt universe = internal::submask_low_bits<UInt>(bit_count);\n    assert((mask\
     \ & ~universe) == 0);\n    const UInt free_bits = universe ^ mask;\n    for_each_submask(free_bits,\
     \ [&](UInt added_bits) {\n        f(mask | added_bits);\n    });\n}\n\n}  // namespace\
-    \ algo\n}  // namespace m1une\n\n\n#line 7 \"algo/enumeration/all.hpp\"\n\n\n"
+    \ algo\n}  // namespace m1une\n\n\n#line 8 \"algo/enumeration/all.hpp\"\n\n\n"
   code: '#ifndef M1UNE_ALGO_ENUMERATION_ALL_HPP
 
     #define M1UNE_ALGO_ENUMERATION_ALL_HPP 1
@@ -94,6 +114,8 @@ data:
     #include "combination.hpp"
 
     #include "gray_code.hpp"
+
+    #include "segtree_range.hpp"
 
     #include "submask.hpp"
 
@@ -104,12 +126,13 @@ data:
   dependsOn:
   - algo/enumeration/combination.hpp
   - algo/enumeration/gray_code.hpp
+  - algo/enumeration/segtree_range.hpp
   - algo/enumeration/submask.hpp
   isVerificationFile: false
   path: algo/enumeration/all.hpp
   requiredBy:
   - algo/all.hpp
-  timestamp: '2026-07-07 22:10:04+09:00'
+  timestamp: '2026-07-14 01:43:56+09:00'
   verificationStatus: LIBRARY_NO_TESTS
   verifiedWith: []
 documentation_of: algo/enumeration/all.hpp
@@ -127,5 +150,6 @@ spaces. The public namespace is `m1une::algo`.
 | Header | Contents |
 | --- | --- |
 | `algo/enumeration/gray_code.hpp` | Binary-reflected Gray-code encoding, decoding, and enumeration. |
+| `algo/enumeration/segtree_range.hpp` | Decomposition into maximal aligned segment-tree ranges. |
 | `algo/enumeration/submask.hpp` | Submask and supermask enumeration helpers. |
 | `algo/enumeration/combination.hpp` | Fixed-size subset mask generation helpers. |
