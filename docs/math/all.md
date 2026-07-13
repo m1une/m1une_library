@@ -68,7 +68,8 @@ You usually do not need to include this entire bundle:
   LCA operations.
 * Use `fps/` for formal power series, convolution, multipoint evaluation,
   interpolation, and linear recurrences.
-* Use `matrix/` for dense matrices and linear algebra.
+* Use `matrix/` for dense matrices, Pfaffians, hafnians, sparse determinants,
+  and linear algebra.
 
 `math/all.hpp` is convenient during a contest when compile time and including a
 few unused headers do not matter.
@@ -89,7 +90,7 @@ few unused headers do not matter.
 | `math/multivariate_convolution.hpp` | Truncated and cyclic multidimensional convolution. |
 | `math/multiplicative_function_prefix_sum.hpp` | Min_25 prefix sums of a multiplicative function. |
 | `math/fps/all.hpp` | Convolution, formal power series, polynomial algorithms, and linear recurrences. |
-| `math/matrix/all.hpp` | Dense and packed GF(2) matrices, powers, Gaussian elimination, determinant, inverse, and linear systems. |
+| `math/matrix/all.hpp` | Dense and packed GF(2) matrices, Pfaffian, hafnian, sparse determinant, Gaussian elimination, inverse, and linear systems. |
 | `math/combinatorics.hpp` | Factorials, binomial coefficients, permutations, and multiset counts. |
 | `math/combinatorial_sequences.hpp` | Fast standard counting sequences and special numbers. |
 | `math/cyclotomic_polynomial.hpp` | Integer coefficients of cyclotomic polynomials. |
