@@ -776,7 +776,7 @@ data:
     \   candidate = following;\n            }\n        }\n    }\n    result.count\
     \ = int(result.groups.size());\n    return result;\n}\n\n}  // namespace graph\n\
     }  // namespace m1une\n\n\n#line 1 \"graph/cycle_detection.hpp\"\n\n\n\n#line\
-    \ 6 \"graph/cycle_detection.hpp\"\n\n#line 8 \"graph/cycle_detection.hpp\"\n\n\
+    \ 7 \"graph/cycle_detection.hpp\"\n\n#line 9 \"graph/cycle_detection.hpp\"\n\n\
     namespace m1une {\nnamespace graph {\n\nstruct Cycle {\n    std::vector<int> vertices;\n\
     \    std::vector<int> edge_ids;\n\n    bool empty() const {\n        return vertices.empty();\n\
     \    }\n};\n\ninline Cycle restore_cycle(int from, int to, int closing_edge, const\
@@ -791,69 +791,86 @@ data:
     \ middle_edges.begin(), middle_edges.end());\n    result.edge_ids.push_back(closing_edge);\n\
     \    return result;\n}\n\ntemplate <class T>\nCycle find_directed_cycle(const\
     \ Graph<T>& g) {\n    int n = g.size();\n    std::vector<int> color(n, 0), parent(n,\
-    \ -1), parent_edge(n, -1);\n    Cycle result;\n\n    auto dfs = [&](auto self,\
-    \ int v) -> bool {\n        color[v] = 1;\n        for (const auto& e : g[v])\
-    \ {\n            if (!e.alive) continue;\n            if (color[e.to] == 0) {\n\
-    \                parent[e.to] = v;\n                parent_edge[e.to] = e.id;\n\
-    \                if (self(self, e.to)) return true;\n            } else if (color[e.to]\
-    \ == 1) {\n                result = restore_cycle(v, e.to, e.id, parent, parent_edge);\n\
-    \                return true;\n            }\n        }\n        color[v] = 2;\n\
-    \        return false;\n    };\n\n    for (int v = 0; v < n; v++) {\n        if\
-    \ (color[v] == 0 && dfs(dfs, v)) break;\n    }\n    return result;\n}\n\ntemplate\
-    \ <class T>\nCycle find_undirected_cycle(const Graph<T>& g) {\n    int n = g.size();\n\
-    \    std::vector<int> color(n, 0), parent(n, -1), parent_edge(n, -1);\n    Cycle\
-    \ result;\n\n    auto dfs = [&](auto self, int v, int pe) -> bool {\n        color[v]\
-    \ = 1;\n        for (const auto& e : g[v]) {\n            if (!e.alive) continue;\n\
-    \            if (e.id == pe) continue;\n            if (color[e.to] == 0) {\n\
-    \                parent[e.to] = v;\n                parent_edge[e.to] = e.id;\n\
-    \                if (self(self, e.to, e.id)) return true;\n            } else\
-    \ if (color[e.to] == 1) {\n                result = restore_cycle(v, e.to, e.id,\
-    \ parent, parent_edge);\n                return true;\n            }\n       \
-    \ }\n        color[v] = 2;\n        return false;\n    };\n\n    for (int v =\
-    \ 0; v < n; v++) {\n        if (color[v] == 0 && dfs(dfs, v, -1)) break;\n   \
-    \ }\n    return result;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\n\
-    \n#line 1 \"graph/enumerate_triangles.hpp\"\n\n\n\n#line 7 \"graph/enumerate_triangles.hpp\"\
-    \n\n#line 9 \"graph/enumerate_triangles.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ graph {\n\ntemplate <class T, class Callback>\nvoid enumerate_triangles(const\
-    \ Graph<T>& graph, Callback&& callback) {\n    const int n = graph.size();\n \
-    \   const std::vector<Edge<T>> edges = graph.edges();\n\n    std::vector<int>\
-    \ degree(n, 0);\n    for (const Edge<T>& edge : edges) {\n        assert(edge.from\
-    \ != edge.to);\n        degree[edge.from]++;\n        degree[edge.to]++;\n   \
-    \ }\n\n    std::vector<std::vector<int>> oriented(n);\n    for (const Edge<T>&\
-    \ edge : edges) {\n        int from = edge.from;\n        int to = edge.to;\n\
-    \        if (degree[from] > degree[to] ||\n            (degree[from] == degree[to]\
-    \ && from > to)) {\n            std::swap(from, to);\n        }\n        oriented[from].push_back(to);\n\
-    \    }\n\n    std::vector<int> marked(n, -1);\n    for (int vertex = 0; vertex\
-    \ < n; vertex++) {\n        for (int to : oriented[vertex]) marked[to] = vertex;\n\
-    \        for (int middle : oriented[vertex]) {\n            for (int to : oriented[middle])\
-    \ {\n                if (marked[to] != vertex) continue;\n                int\
-    \ first = vertex;\n                int second = middle;\n                int third\
-    \ = to;\n                if (first > second) std::swap(first, second);\n     \
-    \           if (second > third) std::swap(second, third);\n                if\
-    \ (first > second) std::swap(first, second);\n                callback(first,\
-    \ second, third);\n            }\n        }\n    }\n}\n\n}  // namespace graph\n\
-    }  // namespace m1une\n\n\n#line 1 \"graph/eulerian_trail.hpp\"\n\n\n\n#line 9\
-    \ \"graph/eulerian_trail.hpp\"\n\n#line 11 \"graph/eulerian_trail.hpp\"\n\nnamespace\
-    \ m1une {\nnamespace graph {\n\nstruct EulerianTrail {\n    std::vector<int> vertices;\n\
-    \    std::vector<int> edge_ids;\n\n    int edge_count() const {\n        return\
-    \ int(edge_ids.size());\n    }\n\n    bool is_circuit() const {\n        return\
-    \ vertices.empty() || vertices.front() == vertices.back();\n    }\n};\n\nnamespace\
-    \ internal {\n\ntemplate <class T>\nstd::optional<EulerianTrail> hierholzer(\n\
-    \    const Graph<T>& graph,\n    int start,\n    int active_edge_count\n) {\n\
-    \    EulerianTrail result;\n    if (active_edge_count == 0) {\n        if (start\
-    \ != -1) result.vertices.push_back(start);\n        return result;\n    }\n\n\
-    \    assert(0 <= start && start < graph.size());\n    std::vector<char> used(graph.edge_count(),\
-    \ false);\n    std::vector<int> cursor(graph.size(), 0);\n    std::vector<int>\
-    \ vertex_stack(1, start);\n    std::vector<int> incoming_edge_stack(1, -1);\n\
-    \    std::vector<int> reversed_vertices;\n    std::vector<int> reversed_edges;\n\
-    \    reversed_vertices.reserve(active_edge_count + 1);\n    reversed_edges.reserve(active_edge_count);\n\
-    \n    while (!vertex_stack.empty()) {\n        const int vertex = vertex_stack.back();\n\
-    \        while (cursor[vertex] < int(graph[vertex].size())) {\n            const\
-    \ Edge<T>& edge = graph[vertex][cursor[vertex]];\n            if (edge.alive &&\
-    \ !used[edge.id]) break;\n            cursor[vertex]++;\n        }\n\n       \
-    \ if (cursor[vertex] < int(graph[vertex].size())) {\n            const Edge<T>&\
-    \ edge = graph[vertex][cursor[vertex]++];\n            used[edge.id] = true;\n\
-    \            vertex_stack.push_back(edge.to);\n            incoming_edge_stack.push_back(edge.id);\n\
+    \ -1), parent_edge(n, -1);\n    struct Frame {\n        int vertex;\n        std::size_t\
+    \ next_edge;\n    };\n\n    std::vector<Frame> stack;\n    stack.reserve(n);\n\
+    \    for (int start = 0; start < n; start++) {\n        if (color[start] != 0)\
+    \ continue;\n        color[start] = 1;\n        stack.push_back(Frame{start, 0});\n\
+    \        while (!stack.empty()) {\n            Frame& frame = stack.back();\n\
+    \            const int vertex = frame.vertex;\n            const auto& adjacency\
+    \ = g[vertex];\n            while (\n                frame.next_edge < adjacency.size()\
+    \ &&\n                !adjacency[frame.next_edge].alive\n            ) {\n   \
+    \             frame.next_edge++;\n            }\n            if (frame.next_edge\
+    \ == adjacency.size()) {\n                color[vertex] = 2;\n               \
+    \ stack.pop_back();\n                continue;\n            }\n\n            const\
+    \ auto& edge = adjacency[frame.next_edge++];\n            const int to = edge.to;\n\
+    \            const int edge_id = edge.id;\n            if (color[to] == 0) {\n\
+    \                parent[to] = vertex;\n                parent_edge[to] = edge_id;\n\
+    \                color[to] = 1;\n                stack.push_back(Frame{to, 0});\n\
+    \            } else if (color[to] == 1) {\n                return restore_cycle(vertex,\
+    \ to, edge_id, parent, parent_edge);\n            }\n        }\n    }\n    return\
+    \ Cycle();\n}\n\ntemplate <class T>\nCycle find_undirected_cycle(const Graph<T>&\
+    \ g) {\n    int n = g.size();\n    std::vector<int> color(n, 0), parent(n, -1),\
+    \ parent_edge(n, -1);\n    struct Frame {\n        int vertex;\n        std::size_t\
+    \ next_edge;\n    };\n\n    std::vector<Frame> stack;\n    stack.reserve(n);\n\
+    \    for (int start = 0; start < n; start++) {\n        if (color[start] != 0)\
+    \ continue;\n        color[start] = 1;\n        stack.push_back(Frame{start, 0});\n\
+    \        while (!stack.empty()) {\n            Frame& frame = stack.back();\n\
+    \            const int vertex = frame.vertex;\n            const auto& adjacency\
+    \ = g[vertex];\n            while (\n                frame.next_edge < adjacency.size()\
+    \ &&\n                (\n                    !adjacency[frame.next_edge].alive\
+    \ ||\n                    adjacency[frame.next_edge].id == parent_edge[vertex]\n\
+    \                )\n            ) {\n                frame.next_edge++;\n    \
+    \        }\n            if (frame.next_edge == adjacency.size()) {\n         \
+    \       color[vertex] = 2;\n                stack.pop_back();\n              \
+    \  continue;\n            }\n\n            const auto& edge = adjacency[frame.next_edge++];\n\
+    \            const int to = edge.to;\n            const int edge_id = edge.id;\n\
+    \            if (color[to] == 0) {\n                parent[to] = vertex;\n   \
+    \             parent_edge[to] = edge_id;\n                color[to] = 1;\n   \
+    \             stack.push_back(Frame{to, 0});\n            } else if (color[to]\
+    \ == 1) {\n                return restore_cycle(vertex, to, edge_id, parent, parent_edge);\n\
+    \            }\n        }\n    }\n    return Cycle();\n}\n\n}  // namespace graph\n\
+    }  // namespace m1une\n\n\n#line 1 \"graph/enumerate_triangles.hpp\"\n\n\n\n#line\
+    \ 7 \"graph/enumerate_triangles.hpp\"\n\n#line 9 \"graph/enumerate_triangles.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\ntemplate <class T, class Callback>\n\
+    void enumerate_triangles(const Graph<T>& graph, Callback&& callback) {\n    const\
+    \ int n = graph.size();\n    const std::vector<Edge<T>> edges = graph.edges();\n\
+    \n    std::vector<int> degree(n, 0);\n    for (const Edge<T>& edge : edges) {\n\
+    \        assert(edge.from != edge.to);\n        degree[edge.from]++;\n       \
+    \ degree[edge.to]++;\n    }\n\n    std::vector<std::vector<int>> oriented(n);\n\
+    \    for (const Edge<T>& edge : edges) {\n        int from = edge.from;\n    \
+    \    int to = edge.to;\n        if (degree[from] > degree[to] ||\n           \
+    \ (degree[from] == degree[to] && from > to)) {\n            std::swap(from, to);\n\
+    \        }\n        oriented[from].push_back(to);\n    }\n\n    std::vector<int>\
+    \ marked(n, -1);\n    for (int vertex = 0; vertex < n; vertex++) {\n        for\
+    \ (int to : oriented[vertex]) marked[to] = vertex;\n        for (int middle :\
+    \ oriented[vertex]) {\n            for (int to : oriented[middle]) {\n       \
+    \         if (marked[to] != vertex) continue;\n                int first = vertex;\n\
+    \                int second = middle;\n                int third = to;\n     \
+    \           if (first > second) std::swap(first, second);\n                if\
+    \ (second > third) std::swap(second, third);\n                if (first > second)\
+    \ std::swap(first, second);\n                callback(first, second, third);\n\
+    \            }\n        }\n    }\n}\n\n}  // namespace graph\n}  // namespace\
+    \ m1une\n\n\n#line 1 \"graph/eulerian_trail.hpp\"\n\n\n\n#line 9 \"graph/eulerian_trail.hpp\"\
+    \n\n#line 11 \"graph/eulerian_trail.hpp\"\n\nnamespace m1une {\nnamespace graph\
+    \ {\n\nstruct EulerianTrail {\n    std::vector<int> vertices;\n    std::vector<int>\
+    \ edge_ids;\n\n    int edge_count() const {\n        return int(edge_ids.size());\n\
+    \    }\n\n    bool is_circuit() const {\n        return vertices.empty() || vertices.front()\
+    \ == vertices.back();\n    }\n};\n\nnamespace internal {\n\ntemplate <class T>\n\
+    std::optional<EulerianTrail> hierholzer(\n    const Graph<T>& graph,\n    int\
+    \ start,\n    int active_edge_count\n) {\n    EulerianTrail result;\n    if (active_edge_count\
+    \ == 0) {\n        if (start != -1) result.vertices.push_back(start);\n      \
+    \  return result;\n    }\n\n    assert(0 <= start && start < graph.size());\n\
+    \    std::vector<char> used(graph.edge_count(), false);\n    std::vector<int>\
+    \ cursor(graph.size(), 0);\n    std::vector<int> vertex_stack(1, start);\n   \
+    \ std::vector<int> incoming_edge_stack(1, -1);\n    std::vector<int> reversed_vertices;\n\
+    \    std::vector<int> reversed_edges;\n    reversed_vertices.reserve(active_edge_count\
+    \ + 1);\n    reversed_edges.reserve(active_edge_count);\n\n    while (!vertex_stack.empty())\
+    \ {\n        const int vertex = vertex_stack.back();\n        while (cursor[vertex]\
+    \ < int(graph[vertex].size())) {\n            const Edge<T>& edge = graph[vertex][cursor[vertex]];\n\
+    \            if (edge.alive && !used[edge.id]) break;\n            cursor[vertex]++;\n\
+    \        }\n\n        if (cursor[vertex] < int(graph[vertex].size())) {\n    \
+    \        const Edge<T>& edge = graph[vertex][cursor[vertex]++];\n            used[edge.id]\
+    \ = true;\n            vertex_stack.push_back(edge.to);\n            incoming_edge_stack.push_back(edge.id);\n\
     \            continue;\n        }\n\n        reversed_vertices.push_back(vertex);\n\
     \        const int incoming_edge = incoming_edge_stack.back();\n        if (incoming_edge\
     \ != -1) reversed_edges.push_back(incoming_edge);\n        vertex_stack.pop_back();\n\
@@ -3025,7 +3042,7 @@ data:
   path: graph/undirected.hpp
   requiredBy:
   - graph/all.hpp
-  timestamp: '2026-07-14 02:59:03+09:00'
+  timestamp: '2026-07-14 03:22:23+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp

@@ -208,6 +208,18 @@ data:
     path: verify/graph/cow_game.test.cpp
     title: verify/graph/cow_game.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/cycle_detection.test.cpp
+    title: verify/graph/cycle_detection.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/cycle_detection.test.cpp
+    title: verify/graph/cycle_detection.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/cycle_detection_undirected.test.cpp
+    title: verify/graph/cycle_detection_undirected.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/cycle_detection_undirected.test.cpp
+    title: verify/graph/cycle_detection_undirected.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/directed_mst.test.cpp
     title: verify/graph/directed_mst.test.cpp
   - icon: ':heavy_check_mark:'
@@ -543,6 +555,8 @@ data:
   - verify/graph/bipartite_matching.test.cpp
   - verify/graph/three_edge_connected_components.test.cpp
   - verify/graph/eulerian_trail_undirected.test.cpp
+  - verify/graph/cycle_detection_undirected.test.cpp
+  - verify/graph/cycle_detection_undirected.test.cpp
   - verify/graph/eulerian_trail_directed.test.cpp
   - verify/graph/minimum_spanning_tree.test.cpp
   - verify/graph/minimum_spanning_tree.test.cpp
@@ -569,6 +583,8 @@ data:
   - verify/graph/chromatic_number_randomized.test.cpp
   - verify/graph/chromatic_number_randomized.test.cpp
   - verify/graph/replacement_paths.test.cpp
+  - verify/graph/cycle_detection.test.cpp
+  - verify/graph/cycle_detection.test.cpp
   - verify/graph/block_cut_tree.test.cpp
   - verify/graph/k_shortest_walk.test.cpp
   - verify/graph/enumerate_triangles.test.cpp

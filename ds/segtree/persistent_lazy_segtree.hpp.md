@@ -83,15 +83,17 @@ data:
     \        node.has_lazy = true;\n    }\n\n    int all_apply_clone(int t, const\
     \ F& f) const {\n        int res = clone_node(t);\n        all_apply_to_node(res,\
     \ f);\n        return res;\n    }\n\n    void push(int t, int l, int r) const\
-    \ {\n        Node& node = (*_pool)[t];\n        if (!node.has_lazy) return;\n\
-    \        int m = (l + r) >> 1;\n        node.l = all_apply_clone(node.l, node.lazy);\n\
-    \        node.r = all_apply_clone(node.r, shift_operator(node.lazy, m - l));\n\
-    \        node.lazy = ActedMonoid::op_id();\n        node.has_lazy = false;\n \
-    \   }\n\n    void update(int t) const {\n        Node& node = (*_pool)[t];\n \
-    \       node.val = ActedMonoid::op((*_pool)[node.l].val, (*_pool)[node.r].val);\n\
-    \    }\n\n    int set_node(int t, int l, int r, int p, T value) const {\n    \
-    \    t = clone_node(t);\n        if (r - l == 1) {\n            Node& node = (*_pool)[t];\n\
-    \            node.val = std::move(value);\n            node.lazy = ActedMonoid::op_id();\n\
+    \ {\n        if (!(*_pool)[t].has_lazy) return;\n        F lazy = (*_pool)[t].lazy;\n\
+    \        int left = (*_pool)[t].l;\n        int right = (*_pool)[t].r;\n     \
+    \   int m = (l + r) >> 1;\n        left = all_apply_clone(left, lazy);\n     \
+    \   right = all_apply_clone(right, shift_operator(lazy, m - l));\n        Node&\
+    \ node = (*_pool)[t];\n        node.l = left;\n        node.r = right;\n     \
+    \   node.lazy = ActedMonoid::op_id();\n        node.has_lazy = false;\n    }\n\
+    \n    void update(int t) const {\n        Node& node = (*_pool)[t];\n        node.val\
+    \ = ActedMonoid::op((*_pool)[node.l].val, (*_pool)[node.r].val);\n    }\n\n  \
+    \  int set_node(int t, int l, int r, int p, T value) const {\n        t = clone_node(t);\n\
+    \        if (r - l == 1) {\n            Node& node = (*_pool)[t];\n          \
+    \  node.val = std::move(value);\n            node.lazy = ActedMonoid::op_id();\n\
     \            node.has_lazy = false;\n            return t;\n        }\n      \
     \  push(t, l, r);\n        int m = (l + r) >> 1;\n        if (p < m) {\n     \
     \       (*_pool)[t].l = set_node((*_pool)[t].l, l, m, p, std::move(value));\n\
@@ -103,33 +105,44 @@ data:
     \ l - ql));\n            return t;\n        }\n        push(t, l, r);\n      \
     \  int m = (l + r) >> 1;\n        (*_pool)[t].l = apply_node((*_pool)[t].l, l,\
     \ m, ql, qr, f);\n        (*_pool)[t].r = apply_node((*_pool)[t].r, m, r, ql,\
-    \ qr, f);\n        update(t);\n        return t;\n    }\n\n    T prod_node(int\
-    \ t, int l, int r, int ql, int qr, const F& inherited) const {\n        if (!t\
-    \ || qr <= l || r <= ql) return ActedMonoid::id();\n        const Node& node =\
-    \ (*_pool)[t];\n        if (ql <= l && r <= qr) return mapping_at(inherited, node.val,\
-    \ 0);\n        int m = (l + r) >> 1;\n        return ActedMonoid::op(prod_node(node.l,\
-    \ l, m, ql, qr, compose_for_child(inherited, node, 0)),\n                    \
-    \           prod_node(node.r, m, r, ql, qr, compose_for_child(inherited, node,\
-    \ m - l)));\n    }\n\n    void collect_node(int t, int l, int r, int ql, int qr,\
-    \ const F& inherited, std::vector<T>& res) const {\n        if (!t || qr <= l\
-    \ || r <= ql) return;\n        const Node& node = (*_pool)[t];\n        if (r\
-    \ - l == 1) {\n            res.push_back(mapping_at(inherited, node.val, 0));\n\
-    \            return;\n        }\n        int m = (l + r) >> 1;\n        collect_node(node.l,\
-    \ l, m, ql, qr, compose_for_child(inherited, node, 0), res);\n        collect_node(node.r,\
-    \ m, r, ql, qr, compose_for_child(inherited, node, m - l), res);\n    }\n\n  \
-    \  template <class G>\n    int max_right_node(int t, int l, int r, int ql, T&\
-    \ sm, const F& inherited, G& g) const {\n        if (r <= ql) return r;\n    \
-    \    const Node& node = (*_pool)[t];\n        if (ql <= l) {\n            T nxt\
-    \ = ActedMonoid::op(sm, mapping_at(inherited, node.val, 0));\n            if (g(nxt))\
-    \ {\n                sm = std::move(nxt);\n                return r;\n       \
-    \     }\n            if (r - l == 1) return l;\n        }\n        int m = (l\
-    \ + r) >> 1;\n        int res = max_right_node(node.l, l, m, ql, sm, compose_for_child(inherited,\
-    \ node, 0), g);\n        if (res < m) return res;\n        return max_right_node(node.r,\
-    \ m, r, ql, sm, compose_for_child(inherited, node, m - l), g);\n    }\n\n    template\
-    \ <class G>\n    int min_left_node(int t, int l, int r, int qr, T& sm, const F&\
-    \ inherited, G& g) const {\n        if (qr <= l) return l;\n        const Node&\
-    \ node = (*_pool)[t];\n        if (r <= qr) {\n            T nxt = ActedMonoid::op(mapping_at(inherited,\
-    \ node.val, 0), sm);\n            if (g(nxt)) {\n                sm = std::move(nxt);\n\
+    \ qr, f);\n        update(t);\n        return t;\n    }\n\n    int copy_range_node(int\
+    \ target, int source, int l, int r, int ql, int qr) const {\n        if (qr <=\
+    \ l || r <= ql) return target;\n        if (ql <= l && r <= qr) return source;\n\
+    \n        target = clone_node(target);\n        source = clone_node(source);\n\
+    \        push(target, l, r);\n        push(source, l, r);\n\n        int m = (l\
+    \ + r) >> 1;\n        int left = copy_range_node(\n            (*_pool)[target].l,\n\
+    \            (*_pool)[source].l,\n            l,\n            m,\n           \
+    \ ql,\n            qr\n        );\n        int right = copy_range_node(\n    \
+    \        (*_pool)[target].r,\n            (*_pool)[source].r,\n            m,\n\
+    \            r,\n            ql,\n            qr\n        );\n        (*_pool)[target].l\
+    \ = left;\n        (*_pool)[target].r = right;\n        update(target);\n    \
+    \    return target;\n    }\n\n    T prod_node(int t, int l, int r, int ql, int\
+    \ qr, const F& inherited) const {\n        if (!t || qr <= l || r <= ql) return\
+    \ ActedMonoid::id();\n        const Node& node = (*_pool)[t];\n        if (ql\
+    \ <= l && r <= qr) return mapping_at(inherited, node.val, 0);\n        int m =\
+    \ (l + r) >> 1;\n        return ActedMonoid::op(prod_node(node.l, l, m, ql, qr,\
+    \ compose_for_child(inherited, node, 0)),\n                               prod_node(node.r,\
+    \ m, r, ql, qr, compose_for_child(inherited, node, m - l)));\n    }\n\n    void\
+    \ collect_node(int t, int l, int r, int ql, int qr, const F& inherited, std::vector<T>&\
+    \ res) const {\n        if (!t || qr <= l || r <= ql) return;\n        const Node&\
+    \ node = (*_pool)[t];\n        if (r - l == 1) {\n            res.push_back(mapping_at(inherited,\
+    \ node.val, 0));\n            return;\n        }\n        int m = (l + r) >> 1;\n\
+    \        collect_node(node.l, l, m, ql, qr, compose_for_child(inherited, node,\
+    \ 0), res);\n        collect_node(node.r, m, r, ql, qr, compose_for_child(inherited,\
+    \ node, m - l), res);\n    }\n\n    template <class G>\n    int max_right_node(int\
+    \ t, int l, int r, int ql, T& sm, const F& inherited, G& g) const {\n        if\
+    \ (r <= ql) return r;\n        const Node& node = (*_pool)[t];\n        if (ql\
+    \ <= l) {\n            T nxt = ActedMonoid::op(sm, mapping_at(inherited, node.val,\
+    \ 0));\n            if (g(nxt)) {\n                sm = std::move(nxt);\n    \
+    \            return r;\n            }\n            if (r - l == 1) return l;\n\
+    \        }\n        int m = (l + r) >> 1;\n        int res = max_right_node(node.l,\
+    \ l, m, ql, sm, compose_for_child(inherited, node, 0), g);\n        if (res <\
+    \ m) return res;\n        return max_right_node(node.r, m, r, ql, sm, compose_for_child(inherited,\
+    \ node, m - l), g);\n    }\n\n    template <class G>\n    int min_left_node(int\
+    \ t, int l, int r, int qr, T& sm, const F& inherited, G& g) const {\n        if\
+    \ (qr <= l) return l;\n        const Node& node = (*_pool)[t];\n        if (r\
+    \ <= qr) {\n            T nxt = ActedMonoid::op(mapping_at(inherited, node.val,\
+    \ 0), sm);\n            if (g(nxt)) {\n                sm = std::move(nxt);\n\
     \                return l;\n            }\n            if (r - l == 1) return\
     \ r;\n        }\n        int m = (l + r) >> 1;\n        int res = min_left_node(node.r,\
     \ m, r, qr, sm, compose_for_child(inherited, node, m - l), g);\n        if (m\
@@ -169,15 +182,20 @@ data:
     \  return apply(p, p + 1, f);\n    }\n\n    PersistentLazySegtree apply(int l,\
     \ int r, const F& f) const {\n        assert(0 <= l && l <= r && r <= _n);\n \
     \       if (l == r) return *this;\n        return PersistentLazySegtree(_n, apply_node(_root,\
-    \ 0, _n, l, r, f), _pool);\n    }\n\n    template <class G>\n    int max_right(int\
-    \ l, G g) const {\n        assert(0 <= l && l <= _n);\n        assert(g(ActedMonoid::id()));\n\
-    \        if (l == _n) return _n;\n        T sm = ActedMonoid::id();\n        return\
-    \ max_right_node(_root, 0, _n, l, sm, ActedMonoid::op_id(), g);\n    }\n\n   \
-    \ template <class G>\n    int min_left(int r, G g) const {\n        assert(0 <=\
-    \ r && r <= _n);\n        assert(g(ActedMonoid::id()));\n        if (r == 0) return\
-    \ 0;\n        T sm = ActedMonoid::id();\n        return min_left_node(_root, 0,\
-    \ _n, r, sm, ActedMonoid::op_id(), g);\n    }\n};\n\n}  // namespace ds\n}  //\
-    \ namespace m1une\n\n\n"
+    \ 0, _n, l, r, f), _pool);\n    }\n\n    PersistentLazySegtree copy_range_from(\n\
+    \        const PersistentLazySegtree& source,\n        int l,\n        int r\n\
+    \    ) const {\n        assert(_n == source._n);\n        assert(_pool == source._pool);\n\
+    \        assert(0 <= l && l <= r && r <= _n);\n        if (l == r) return *this;\n\
+    \        int root = copy_range_node(_root, source._root, 0, _n, l, r);\n     \
+    \   return PersistentLazySegtree(_n, root, _pool);\n    }\n\n    template <class\
+    \ G>\n    int max_right(int l, G g) const {\n        assert(0 <= l && l <= _n);\n\
+    \        assert(g(ActedMonoid::id()));\n        if (l == _n) return _n;\n    \
+    \    T sm = ActedMonoid::id();\n        return max_right_node(_root, 0, _n, l,\
+    \ sm, ActedMonoid::op_id(), g);\n    }\n\n    template <class G>\n    int min_left(int\
+    \ r, G g) const {\n        assert(0 <= r && r <= _n);\n        assert(g(ActedMonoid::id()));\n\
+    \        if (r == 0) return 0;\n        T sm = ActedMonoid::id();\n        return\
+    \ min_left_node(_root, 0, _n, r, sm, ActedMonoid::op_id(), g);\n    }\n};\n\n\
+    }  // namespace ds\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_PERSISTENT_LAZY_SEGTREE_HPP\n#define M1UNE_PERSISTENT_LAZY_SEGTREE_HPP\
     \ 1\n\n#include <cassert>\n#include <concepts>\n#include <memory>\n#include <utility>\n\
     #include <vector>\n\n#include \"../../acted_monoid/concept.hpp\"\n\nnamespace\
@@ -231,15 +249,17 @@ data:
     \        node.has_lazy = true;\n    }\n\n    int all_apply_clone(int t, const\
     \ F& f) const {\n        int res = clone_node(t);\n        all_apply_to_node(res,\
     \ f);\n        return res;\n    }\n\n    void push(int t, int l, int r) const\
-    \ {\n        Node& node = (*_pool)[t];\n        if (!node.has_lazy) return;\n\
-    \        int m = (l + r) >> 1;\n        node.l = all_apply_clone(node.l, node.lazy);\n\
-    \        node.r = all_apply_clone(node.r, shift_operator(node.lazy, m - l));\n\
-    \        node.lazy = ActedMonoid::op_id();\n        node.has_lazy = false;\n \
-    \   }\n\n    void update(int t) const {\n        Node& node = (*_pool)[t];\n \
-    \       node.val = ActedMonoid::op((*_pool)[node.l].val, (*_pool)[node.r].val);\n\
-    \    }\n\n    int set_node(int t, int l, int r, int p, T value) const {\n    \
-    \    t = clone_node(t);\n        if (r - l == 1) {\n            Node& node = (*_pool)[t];\n\
-    \            node.val = std::move(value);\n            node.lazy = ActedMonoid::op_id();\n\
+    \ {\n        if (!(*_pool)[t].has_lazy) return;\n        F lazy = (*_pool)[t].lazy;\n\
+    \        int left = (*_pool)[t].l;\n        int right = (*_pool)[t].r;\n     \
+    \   int m = (l + r) >> 1;\n        left = all_apply_clone(left, lazy);\n     \
+    \   right = all_apply_clone(right, shift_operator(lazy, m - l));\n        Node&\
+    \ node = (*_pool)[t];\n        node.l = left;\n        node.r = right;\n     \
+    \   node.lazy = ActedMonoid::op_id();\n        node.has_lazy = false;\n    }\n\
+    \n    void update(int t) const {\n        Node& node = (*_pool)[t];\n        node.val\
+    \ = ActedMonoid::op((*_pool)[node.l].val, (*_pool)[node.r].val);\n    }\n\n  \
+    \  int set_node(int t, int l, int r, int p, T value) const {\n        t = clone_node(t);\n\
+    \        if (r - l == 1) {\n            Node& node = (*_pool)[t];\n          \
+    \  node.val = std::move(value);\n            node.lazy = ActedMonoid::op_id();\n\
     \            node.has_lazy = false;\n            return t;\n        }\n      \
     \  push(t, l, r);\n        int m = (l + r) >> 1;\n        if (p < m) {\n     \
     \       (*_pool)[t].l = set_node((*_pool)[t].l, l, m, p, std::move(value));\n\
@@ -251,33 +271,44 @@ data:
     \ l - ql));\n            return t;\n        }\n        push(t, l, r);\n      \
     \  int m = (l + r) >> 1;\n        (*_pool)[t].l = apply_node((*_pool)[t].l, l,\
     \ m, ql, qr, f);\n        (*_pool)[t].r = apply_node((*_pool)[t].r, m, r, ql,\
-    \ qr, f);\n        update(t);\n        return t;\n    }\n\n    T prod_node(int\
-    \ t, int l, int r, int ql, int qr, const F& inherited) const {\n        if (!t\
-    \ || qr <= l || r <= ql) return ActedMonoid::id();\n        const Node& node =\
-    \ (*_pool)[t];\n        if (ql <= l && r <= qr) return mapping_at(inherited, node.val,\
-    \ 0);\n        int m = (l + r) >> 1;\n        return ActedMonoid::op(prod_node(node.l,\
-    \ l, m, ql, qr, compose_for_child(inherited, node, 0)),\n                    \
-    \           prod_node(node.r, m, r, ql, qr, compose_for_child(inherited, node,\
-    \ m - l)));\n    }\n\n    void collect_node(int t, int l, int r, int ql, int qr,\
-    \ const F& inherited, std::vector<T>& res) const {\n        if (!t || qr <= l\
-    \ || r <= ql) return;\n        const Node& node = (*_pool)[t];\n        if (r\
-    \ - l == 1) {\n            res.push_back(mapping_at(inherited, node.val, 0));\n\
-    \            return;\n        }\n        int m = (l + r) >> 1;\n        collect_node(node.l,\
-    \ l, m, ql, qr, compose_for_child(inherited, node, 0), res);\n        collect_node(node.r,\
-    \ m, r, ql, qr, compose_for_child(inherited, node, m - l), res);\n    }\n\n  \
-    \  template <class G>\n    int max_right_node(int t, int l, int r, int ql, T&\
-    \ sm, const F& inherited, G& g) const {\n        if (r <= ql) return r;\n    \
-    \    const Node& node = (*_pool)[t];\n        if (ql <= l) {\n            T nxt\
-    \ = ActedMonoid::op(sm, mapping_at(inherited, node.val, 0));\n            if (g(nxt))\
-    \ {\n                sm = std::move(nxt);\n                return r;\n       \
-    \     }\n            if (r - l == 1) return l;\n        }\n        int m = (l\
-    \ + r) >> 1;\n        int res = max_right_node(node.l, l, m, ql, sm, compose_for_child(inherited,\
-    \ node, 0), g);\n        if (res < m) return res;\n        return max_right_node(node.r,\
-    \ m, r, ql, sm, compose_for_child(inherited, node, m - l), g);\n    }\n\n    template\
-    \ <class G>\n    int min_left_node(int t, int l, int r, int qr, T& sm, const F&\
-    \ inherited, G& g) const {\n        if (qr <= l) return l;\n        const Node&\
-    \ node = (*_pool)[t];\n        if (r <= qr) {\n            T nxt = ActedMonoid::op(mapping_at(inherited,\
-    \ node.val, 0), sm);\n            if (g(nxt)) {\n                sm = std::move(nxt);\n\
+    \ qr, f);\n        update(t);\n        return t;\n    }\n\n    int copy_range_node(int\
+    \ target, int source, int l, int r, int ql, int qr) const {\n        if (qr <=\
+    \ l || r <= ql) return target;\n        if (ql <= l && r <= qr) return source;\n\
+    \n        target = clone_node(target);\n        source = clone_node(source);\n\
+    \        push(target, l, r);\n        push(source, l, r);\n\n        int m = (l\
+    \ + r) >> 1;\n        int left = copy_range_node(\n            (*_pool)[target].l,\n\
+    \            (*_pool)[source].l,\n            l,\n            m,\n           \
+    \ ql,\n            qr\n        );\n        int right = copy_range_node(\n    \
+    \        (*_pool)[target].r,\n            (*_pool)[source].r,\n            m,\n\
+    \            r,\n            ql,\n            qr\n        );\n        (*_pool)[target].l\
+    \ = left;\n        (*_pool)[target].r = right;\n        update(target);\n    \
+    \    return target;\n    }\n\n    T prod_node(int t, int l, int r, int ql, int\
+    \ qr, const F& inherited) const {\n        if (!t || qr <= l || r <= ql) return\
+    \ ActedMonoid::id();\n        const Node& node = (*_pool)[t];\n        if (ql\
+    \ <= l && r <= qr) return mapping_at(inherited, node.val, 0);\n        int m =\
+    \ (l + r) >> 1;\n        return ActedMonoid::op(prod_node(node.l, l, m, ql, qr,\
+    \ compose_for_child(inherited, node, 0)),\n                               prod_node(node.r,\
+    \ m, r, ql, qr, compose_for_child(inherited, node, m - l)));\n    }\n\n    void\
+    \ collect_node(int t, int l, int r, int ql, int qr, const F& inherited, std::vector<T>&\
+    \ res) const {\n        if (!t || qr <= l || r <= ql) return;\n        const Node&\
+    \ node = (*_pool)[t];\n        if (r - l == 1) {\n            res.push_back(mapping_at(inherited,\
+    \ node.val, 0));\n            return;\n        }\n        int m = (l + r) >> 1;\n\
+    \        collect_node(node.l, l, m, ql, qr, compose_for_child(inherited, node,\
+    \ 0), res);\n        collect_node(node.r, m, r, ql, qr, compose_for_child(inherited,\
+    \ node, m - l), res);\n    }\n\n    template <class G>\n    int max_right_node(int\
+    \ t, int l, int r, int ql, T& sm, const F& inherited, G& g) const {\n        if\
+    \ (r <= ql) return r;\n        const Node& node = (*_pool)[t];\n        if (ql\
+    \ <= l) {\n            T nxt = ActedMonoid::op(sm, mapping_at(inherited, node.val,\
+    \ 0));\n            if (g(nxt)) {\n                sm = std::move(nxt);\n    \
+    \            return r;\n            }\n            if (r - l == 1) return l;\n\
+    \        }\n        int m = (l + r) >> 1;\n        int res = max_right_node(node.l,\
+    \ l, m, ql, sm, compose_for_child(inherited, node, 0), g);\n        if (res <\
+    \ m) return res;\n        return max_right_node(node.r, m, r, ql, sm, compose_for_child(inherited,\
+    \ node, m - l), g);\n    }\n\n    template <class G>\n    int min_left_node(int\
+    \ t, int l, int r, int qr, T& sm, const F& inherited, G& g) const {\n        if\
+    \ (qr <= l) return l;\n        const Node& node = (*_pool)[t];\n        if (r\
+    \ <= qr) {\n            T nxt = ActedMonoid::op(mapping_at(inherited, node.val,\
+    \ 0), sm);\n            if (g(nxt)) {\n                sm = std::move(nxt);\n\
     \                return l;\n            }\n            if (r - l == 1) return\
     \ r;\n        }\n        int m = (l + r) >> 1;\n        int res = min_left_node(node.r,\
     \ m, r, qr, sm, compose_for_child(inherited, node, m - l), g);\n        if (m\
@@ -317,21 +348,26 @@ data:
     \  return apply(p, p + 1, f);\n    }\n\n    PersistentLazySegtree apply(int l,\
     \ int r, const F& f) const {\n        assert(0 <= l && l <= r && r <= _n);\n \
     \       if (l == r) return *this;\n        return PersistentLazySegtree(_n, apply_node(_root,\
-    \ 0, _n, l, r, f), _pool);\n    }\n\n    template <class G>\n    int max_right(int\
-    \ l, G g) const {\n        assert(0 <= l && l <= _n);\n        assert(g(ActedMonoid::id()));\n\
-    \        if (l == _n) return _n;\n        T sm = ActedMonoid::id();\n        return\
-    \ max_right_node(_root, 0, _n, l, sm, ActedMonoid::op_id(), g);\n    }\n\n   \
-    \ template <class G>\n    int min_left(int r, G g) const {\n        assert(0 <=\
-    \ r && r <= _n);\n        assert(g(ActedMonoid::id()));\n        if (r == 0) return\
-    \ 0;\n        T sm = ActedMonoid::id();\n        return min_left_node(_root, 0,\
-    \ _n, r, sm, ActedMonoid::op_id(), g);\n    }\n};\n\n}  // namespace ds\n}  //\
-    \ namespace m1une\n\n#endif  // M1UNE_PERSISTENT_LAZY_SEGTREE_HPP\n"
+    \ 0, _n, l, r, f), _pool);\n    }\n\n    PersistentLazySegtree copy_range_from(\n\
+    \        const PersistentLazySegtree& source,\n        int l,\n        int r\n\
+    \    ) const {\n        assert(_n == source._n);\n        assert(_pool == source._pool);\n\
+    \        assert(0 <= l && l <= r && r <= _n);\n        if (l == r) return *this;\n\
+    \        int root = copy_range_node(_root, source._root, 0, _n, l, r);\n     \
+    \   return PersistentLazySegtree(_n, root, _pool);\n    }\n\n    template <class\
+    \ G>\n    int max_right(int l, G g) const {\n        assert(0 <= l && l <= _n);\n\
+    \        assert(g(ActedMonoid::id()));\n        if (l == _n) return _n;\n    \
+    \    T sm = ActedMonoid::id();\n        return max_right_node(_root, 0, _n, l,\
+    \ sm, ActedMonoid::op_id(), g);\n    }\n\n    template <class G>\n    int min_left(int\
+    \ r, G g) const {\n        assert(0 <= r && r <= _n);\n        assert(g(ActedMonoid::id()));\n\
+    \        if (r == 0) return 0;\n        T sm = ActedMonoid::id();\n        return\
+    \ min_left_node(_root, 0, _n, r, sm, ActedMonoid::op_id(), g);\n    }\n};\n\n\
+    }  // namespace ds\n}  // namespace m1une\n\n#endif  // M1UNE_PERSISTENT_LAZY_SEGTREE_HPP\n"
   dependsOn:
   - acted_monoid/concept.hpp
   isVerificationFile: false
   path: ds/segtree/persistent_lazy_segtree.hpp
   requiredBy: []
-  timestamp: '2026-06-21 04:34:53+09:00'
+  timestamp: '2026-07-14 03:22:23+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/segtree/persistent_lazy_segtree.test.cpp
@@ -363,8 +399,14 @@ new versions while older versions remain available.
 | `std::vector<T> to_vector(int l, int r)` | Returns the elements in `[l, r)`. | $O(\log N + r - l)$ |
 | `PersistentLazySegtree apply(int p, F f)` | Returns a new version where `f` is applied to index `p`. | $O(\log N)$ |
 | `PersistentLazySegtree apply(int l, int r, F f)` | Returns a new version where `f` is applied to every element in `[l, r)`. | $O(\log N)$ |
+| `PersistentLazySegtree copy_range_from(const PersistentLazySegtree& source, int l, int r)` | Returns a new version whose `[l, r)` is copied from `source`. | $O(\log N)$ |
 | `int max_right<G>(int l, G g)` | Returns the largest `r` such that `g(prod(l, r))` is `true`. | $O(\log N)$ |
 | `int min_left<G>(int r, G g)` | Returns the smallest `l` such that `g(prod(l, r))` is `true`. | $O(\log N)$ |
+
+`copy_range_from` requires both versions to have the same size and to descend
+from the same initial tree, so that they share a node pool. Neither input
+version is mutated. The returned version uses the receiver outside `[l, r)`
+and `source` inside `[l, r)`.
 
 ## Example
 
@@ -380,8 +422,10 @@ int main() {
 
     Seg seg(std::vector<long long>{1, 2, 3, 4});
     Seg next = seg.apply(1, 3, 10);
+    Seg mixed = seg.copy_range_from(next, 2, 4);
 
     std::cout << seg.prod(0, 4).sum << "\n";   // 10
     std::cout << next.prod(0, 4).sum << "\n";  // 30
+    std::cout << mixed.prod(0, 4).sum << "\n"; // 20
 }
 ```

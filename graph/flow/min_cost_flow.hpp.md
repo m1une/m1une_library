@@ -6,9 +6,6 @@ data:
     path: graph/all.hpp
     title: Graph All
   - icon: ':heavy_check_mark:'
-    path: graph/flow/bounded_min_cost_flow.hpp
-    title: Bounded Min Cost Flow
-  - icon: ':heavy_check_mark:'
     path: graph/flow/flow.hpp
     title: Flow
   _extendedVerifiedWith:
@@ -173,7 +170,6 @@ data:
   requiredBy:
   - graph/all.hpp
   - graph/flow/flow.hpp
-  - graph/flow/bounded_min_cost_flow.hpp
   timestamp: '2026-07-07 14:26:59+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:

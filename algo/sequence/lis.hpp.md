@@ -10,6 +10,9 @@ data:
     title: Sequence Algorithms All
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/algo/sequence/longest_increasing_subsequence.test.cpp
+    title: verify/algo/sequence/longest_increasing_subsequence.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/algo/sequence/sequence_algorithms.test.cpp
     title: verify/algo/sequence/sequence_algorithms.test.cpp
   _isVerificationFailed: false
@@ -66,6 +69,7 @@ data:
   timestamp: '2026-07-07 21:49:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/algo/sequence/longest_increasing_subsequence.test.cpp
   - verify/algo/sequence/sequence_algorithms.test.cpp
 documentation_of: algo/sequence/lis.hpp
 layout: document

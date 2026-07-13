@@ -9,6 +9,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/sum_of_totient_function.test.cpp
+    title: verify/math/sum_of_totient_function.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -95,6 +98,7 @@ data:
   timestamp: '2026-06-24 21:43:10+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/math/sum_of_totient_function.test.cpp
   - verify/math/math_algorithms.test.cpp
 documentation_of: math/totient_sum.hpp
 layout: document

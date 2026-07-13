@@ -17,11 +17,11 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://judge.yosupo.jp/problem/aplusb
+    PROBLEM: https://judge.yosupo.jp/problem/furthest_pair
     links:
-    - https://judge.yosupo.jp/problem/aplusb
+    - https://judge.yosupo.jp/problem/furthest_pair
   bundledCode: "#line 1 \"verify/geometry/farthest_pair.test.cpp\"\n#define PROBLEM\
-    \ \"https://judge.yosupo.jp/problem/aplusb\"\n\n#line 1 \"geometry/farthest_pair.hpp\"\
+    \ \"https://judge.yosupo.jp/problem/furthest_pair\"\n\n#line 1 \"geometry/farthest_pair.hpp\"\
     \n\n\n\n#include <algorithm>\n#include <cstddef>\n#include <map>\n#include <optional>\n\
     #include <utility>\n#include <vector>\n\n#line 1 \"geometry/convex_hull.hpp\"\n\
     \n\n\n#line 8 \"geometry/convex_hull.hpp\"\n\n#line 1 \"geometry/point.hpp\"\n\
@@ -200,10 +200,15 @@ data:
     \            static_cast<long long>(random() % 31) - 15,\n                static_cast<long\
     \ long>(random() % 31) - 15\n            );\n        }\n        check(points);\n\
     \    }\n}\n\n}  // namespace\n\nint main() {\n    test_fixed();\n    test_randomized();\n\
-    \n    long long a, b;\n    std::cin >> a >> b;\n    std::cout << a + b << '\\\
-    n';\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
-    ../../geometry/farthest_pair.hpp\"\n\n#include <cassert>\n#include <cstdint>\n\
+    \n    int test_count;\n    std::cin >> test_count;\n    while (test_count--) {\n\
+    \        int size;\n        std::cin >> size;\n        std::vector<Point> points;\n\
+    \        points.reserve(size);\n        for (int index = 0; index < size; index++)\
+    \ {\n            long long x, y;\n            std::cin >> x >> y;\n          \
+    \  points.emplace_back(x, y);\n        }\n        auto result = m1une::geometry::farthest_pair(points);\n\
+    \        assert(result.has_value());\n        std::cout << result->first << '\
+    \ ' << result->second << '\\n';\n    }\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/furthest_pair\"\n\n#include\
+    \ \"../../geometry/farthest_pair.hpp\"\n\n#include <cassert>\n#include <cstdint>\n\
     #include <iostream>\n#include <optional>\n#include <utility>\n#include <vector>\n\
     \nnamespace {\n\nusing Point = m1une::geometry::Point<long long>;\nusing Result\
     \ = m1une::geometry::FarthestPair<long long>;\n\nstd::optional<Result> brute_force(const\
@@ -237,8 +242,13 @@ data:
     \            static_cast<long long>(random() % 31) - 15,\n                static_cast<long\
     \ long>(random() % 31) - 15\n            );\n        }\n        check(points);\n\
     \    }\n}\n\n}  // namespace\n\nint main() {\n    test_fixed();\n    test_randomized();\n\
-    \n    long long a, b;\n    std::cin >> a >> b;\n    std::cout << a + b << '\\\
-    n';\n}\n"
+    \n    int test_count;\n    std::cin >> test_count;\n    while (test_count--) {\n\
+    \        int size;\n        std::cin >> size;\n        std::vector<Point> points;\n\
+    \        points.reserve(size);\n        for (int index = 0; index < size; index++)\
+    \ {\n            long long x, y;\n            std::cin >> x >> y;\n          \
+    \  points.emplace_back(x, y);\n        }\n        auto result = m1une::geometry::farthest_pair(points);\n\
+    \        assert(result.has_value());\n        std::cout << result->first << '\
+    \ ' << result->second << '\\n';\n    }\n}\n"
   dependsOn:
   - geometry/farthest_pair.hpp
   - geometry/convex_hull.hpp
@@ -246,7 +256,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/farthest_pair.test.cpp
   requiredBy: []
-  timestamp: '2026-07-01 22:47:11+09:00'
+  timestamp: '2026-07-14 03:22:23+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/farthest_pair.test.cpp

@@ -1167,6 +1167,9 @@ data:
   - name: verify/algo/sequence
     pages:
     - icon: ':heavy_check_mark:'
+      path: verify/algo/sequence/longest_increasing_subsequence.test.cpp
+      title: verify/algo/sequence/longest_increasing_subsequence.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/algo/sequence/number_of_subsequences.test.cpp
       title: verify/algo/sequence/number_of_subsequences.test.cpp
     - icon: ':heavy_check_mark:'
@@ -1548,6 +1551,12 @@ data:
       path: verify/graph/cow_game.test.cpp
       title: verify/graph/cow_game.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/graph/cycle_detection.test.cpp
+      title: verify/graph/cycle_detection.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/cycle_detection_undirected.test.cpp
+      title: verify/graph/cycle_detection_undirected.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/graph/directed_mst.test.cpp
       title: verify/graph/directed_mst.test.cpp
     - icon: ':heavy_check_mark:'
@@ -1618,6 +1627,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/graph/flow/flow_algorithms.test.cpp
       title: verify/graph/flow/flow_algorithms.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/flow/min_cost_b_flow.test.cpp
+      title: verify/graph/flow/min_cost_b_flow.test.cpp
   - name: verify/graph/tree
     pages:
     - icon: ':heavy_check_mark:'
@@ -1743,6 +1755,9 @@ data:
       path: verify/math/sum_of_multiplicative_function.test.cpp
       title: verify/math/sum_of_multiplicative_function.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/math/sum_of_totient_function.test.cpp
+      title: verify/math/sum_of_totient_function.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/math/tetration.test.cpp
       title: verify/math/tetration.test.cpp
     - icon: ':heavy_check_mark:'
@@ -1858,14 +1873,23 @@ data:
       path: verify/math/matrix/matrix.test.cpp
       title: verify/math/matrix/matrix.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/math/matrix/matrix_det.test.cpp
+      title: verify/math/matrix/matrix_det.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/math/matrix/matrix_product.test.cpp
       title: verify/math/matrix/matrix_product.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/matrix/matrix_rank.test.cpp
+      title: verify/math/matrix/matrix_rank.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/matrix/pfaffian.test.cpp
       title: verify/math/matrix/pfaffian.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/matrix/sparse_determinant.test.cpp
       title: verify/math/matrix/sparse_determinant.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/matrix/system_of_linear_equations.test.cpp
+      title: verify/math/matrix/system_of_linear_equations.test.cpp
   - name: verify/matroid
     pages:
     - icon: ':heavy_check_mark:'

@@ -37,14 +37,23 @@ data:
     path: verify/math/matrix/matrix.test.cpp
     title: verify/math/matrix/matrix.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/matrix/matrix_det.test.cpp
+    title: verify/math/matrix/matrix_det.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/matrix/matrix_product.test.cpp
     title: verify/math/matrix/matrix_product.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/matrix/matrix_rank.test.cpp
+    title: verify/math/matrix/matrix_rank.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/matrix/pfaffian.test.cpp
     title: verify/math/matrix/pfaffian.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/matrix/sparse_determinant.test.cpp
     title: verify/math/matrix/sparse_determinant.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/matrix/system_of_linear_equations.test.cpp
+    title: verify/math/matrix/system_of_linear_equations.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -239,9 +248,12 @@ data:
   - verify/math/matrix/hafnian.test.cpp
   - verify/math/matrix/inverse_matrix.test.cpp
   - verify/math/matrix/pfaffian.test.cpp
+  - verify/math/matrix/matrix_det.test.cpp
+  - verify/math/matrix/system_of_linear_equations.test.cpp
   - verify/math/matrix/characteristic_polynomial.test.cpp
   - verify/math/matrix/sparse_determinant.test.cpp
   - verify/math/matrix/matrix.test.cpp
+  - verify/math/matrix/matrix_rank.test.cpp
   - verify/math/matrix/matrix_product.test.cpp
 documentation_of: math/matrix/matrix.hpp
 layout: document
