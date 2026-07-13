@@ -1,7 +1,7 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/xor_basis.hpp
     title: XOR Basis
   _extendedRequiredBy: []

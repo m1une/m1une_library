@@ -1,7 +1,7 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: string/suffix_automaton.hpp
     title: Suffix Automaton
   _extendedRequiredBy: []

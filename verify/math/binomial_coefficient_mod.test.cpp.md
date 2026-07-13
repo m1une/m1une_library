@@ -1,10 +1,10 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/binomial_coefficient_mod.hpp
     title: Binomial Coefficient Modulo an Arbitrary Modulus
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/number_theory.hpp
     title: Number Theory
   _extendedRequiredBy: []

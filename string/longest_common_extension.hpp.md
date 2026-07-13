@@ -1,23 +1,23 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: string/suffix_array.hpp
     title: Suffix Array and LCP Array
   _extendedRequiredBy:
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: string/all.hpp
     title: String Algorithms Bundle
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/string/longest_common_extension.test.cpp
     title: verify/string/longest_common_extension.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/string/string_algorithms.test.cpp
     title: verify/string/string_algorithms.test.cpp
-  _isVerificationFailed: true
+  _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':question:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"string/longest_common_extension.hpp\"\n\n\n\n#include <algorithm>\n\
@@ -187,7 +187,7 @@ data:
   requiredBy:
   - string/all.hpp
   timestamp: '2026-07-09 02:40:33+09:00'
-  verificationStatus: LIBRARY_SOME_WA
+  verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/string/string_algorithms.test.cpp
   - verify/string/longest_common_extension.test.cpp

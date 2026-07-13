@@ -1,35 +1,35 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: matroid/all.hpp
     title: Matroid All
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: matroid/graphic_matroid.hpp
     title: Graphic Matroid
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: matroid/linear_matroid.hpp
     title: Linear Matroid
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: matroid/matroid_intersection.hpp
     title: Matroid Intersection
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: matroid/partition_matroid.hpp
     title: Partition Matroid
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: matroid/uniform_matroid.hpp
     title: Uniform Matroid
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: matroid/weighted_matroid_intersection.hpp
     title: Weighted Matroid Intersection
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
-  _isVerificationFailed: true
+  _isVerificationFailed: false
   _pathExtension: cpp
-  _verificationStatusIcon: ':x:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
     PROBLEM: https://judge.yosupo.jp/problem/aplusb
@@ -517,7 +517,7 @@ data:
   path: verify/matroid/matroids.test.cpp
   requiredBy: []
   timestamp: '2026-07-13 21:13:17+09:00'
-  verificationStatus: TEST_WRONG_ANSWER
+  verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/matroid/matroids.test.cpp
 layout: document

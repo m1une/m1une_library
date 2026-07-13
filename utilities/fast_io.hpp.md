@@ -33,21 +33,21 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/fps/convolution_mod_large.test.cpp
     title: verify/math/fps/convolution_mod_large.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
     title: verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/multivariate_convolution_cyclic.test.cpp
     title: verify/math/multivariate_convolution_cyclic.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/multivariate_convolution_truncated.test.cpp
     title: verify/math/multivariate_convolution_truncated.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/utilities/fast_io.test.cpp
     title: verify/utilities/fast_io.test.cpp
-  _isVerificationFailed: true
+  _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':question:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#include <array>\n#include\
@@ -371,7 +371,7 @@ data:
   path: utilities/fast_io.hpp
   requiredBy: []
   timestamp: '2026-07-11 03:19:37+09:00'
-  verificationStatus: LIBRARY_SOME_WA
+  verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/algo/sequence/number_of_subsequences.test.cpp
   - verify/utilities/fast_io.test.cpp

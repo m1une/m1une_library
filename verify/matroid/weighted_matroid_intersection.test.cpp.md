@@ -1,13 +1,13 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: matroid/graphic_matroid.hpp
     title: Graphic Matroid
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: matroid/partition_matroid.hpp
     title: Partition Matroid
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: matroid/weighted_matroid_intersection.hpp
     title: Weighted Matroid Intersection
   _extendedRequiredBy: []

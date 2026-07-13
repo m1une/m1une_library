@@ -1,7 +1,7 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: utilities/fast_io.hpp
     title: Fast IO
   _extendedRequiredBy: []

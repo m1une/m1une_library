@@ -1,7 +1,7 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: string/minimum_rotation.hpp
     title: Minimum Rotation
   _extendedRequiredBy: []

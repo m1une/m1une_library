@@ -1,7 +1,7 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/discrete_logarithm.hpp
     title: Discrete Logarithm
   _extendedRequiredBy: []

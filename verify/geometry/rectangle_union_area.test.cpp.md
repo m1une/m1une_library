@@ -7,7 +7,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: geometry/rectangle_union_area.hpp
     title: Area of Union of Rectangles
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: utilities/fast_io.hpp
     title: Fast IO
   _extendedRequiredBy: []

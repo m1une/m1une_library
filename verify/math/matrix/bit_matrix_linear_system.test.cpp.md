@@ -1,7 +1,7 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/matrix/bit_matrix.hpp
     title: Bit Matrix
   _extendedRequiredBy: []

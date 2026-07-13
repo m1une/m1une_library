@@ -8,43 +8,43 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/counting.hpp
     title: Graph Counting
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: math/all.hpp
     title: Math All
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: math/all.hpp
     title: Math All
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/bernoulli.hpp
     title: Bernoulli Numbers and Power Sums
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/combinatorial_sequences.hpp
     title: Combinatorial Sequences
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/all.hpp
     title: Formal Power Series All
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/composition.hpp
     title: Formal Power Series Composition
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/formal_power_series.hpp
     title: Formal Power Series
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/half_gcd.hpp
     title: Polynomial Half-GCD
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/lagrange_inversion.hpp
     title: Lagrange Inversion Formula
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/linear_recurrence.hpp
     title: Linear Recurrence and Bostan-Mori
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/multipoint_evaluation.hpp
     title: Multipoint Evaluation and Interpolation
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/polynomial_factorization.hpp
     title: Polynomial Factorization
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/partition_function.hpp
     title: Partition Function
   _extendedVerifiedWith:
@@ -81,48 +81,48 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/fps/half_gcd.test.cpp
     title: verify/math/fps/half_gcd.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/inv_of_formal_power_series.test.cpp
     title: verify/math/fps/inv_of_formal_power_series.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
     title: verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/lagrange_inversion.test.cpp
     title: verify/math/fps/lagrange_inversion.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/multipoint_evaluation.test.cpp
     title: verify/math/fps/multipoint_evaluation.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/polynomial_factorization.test.cpp
     title: verify/math/fps/polynomial_factorization.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/polynomial_interpolation.test.cpp
     title: verify/math/fps/polynomial_interpolation.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/polynomial_taylor_shift.test.cpp
     title: verify/math/fps/polynomial_taylor_shift.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/pow_of_formal_power_series.test.cpp
     title: verify/math/fps/pow_of_formal_power_series.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/modular_square_root.test.cpp
     title: verify/math/modular_square_root.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/partition_function.test.cpp
     title: verify/math/partition_function.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/stirling_number_of_the_second_kind.test.cpp
     title: verify/math/stirling_number_of_the_second_kind.test.cpp
-  _isVerificationFailed: true
+  _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':question:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"math/modular_square_root.hpp\"\n\n\n\n#include <cassert>\n\
@@ -219,7 +219,7 @@ data:
   - graph/all.hpp
   - graph/counting.hpp
   timestamp: '2026-07-11 19:26:27+09:00'
-  verificationStatus: LIBRARY_SOME_WA
+  verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/bernoulli_utilities.test.cpp
   - verify/math/bell_number.test.cpp

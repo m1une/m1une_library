@@ -8,16 +8,16 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/counting.hpp
     title: Graph Counting
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: math/all.hpp
     title: Math All
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/bernoulli.hpp
     title: Bernoulli Numbers and Power Sums
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/combinatorial_sequences.hpp
     title: Combinatorial Sequences
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: math/prefix_sum_of_binom.hpp
     title: Prefix Sum of Binomial Coefficients
   _extendedVerifiedWith:
@@ -42,24 +42,24 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/bernoulli_utilities.test.cpp
     title: verify/math/bernoulli_utilities.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/prefix_sum_of_binom.test.cpp
     title: verify/math/prefix_sum_of_binom.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/prefix_sum_of_binom_randomized.test.cpp
     title: verify/math/prefix_sum_of_binom_randomized.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/prefix_sum_of_binom_randomized.test.cpp
     title: verify/math/prefix_sum_of_binom_randomized.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/stirling_number_of_the_second_kind.test.cpp
     title: verify/math/stirling_number_of_the_second_kind.test.cpp
-  _isVerificationFailed: true
+  _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':question:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"math/combinatorics.hpp\"\n\n\n\n#include <cassert>\n#include\
@@ -138,7 +138,7 @@ data:
   - graph/all.hpp
   - graph/counting.hpp
   timestamp: '2026-06-20 09:18:49+09:00'
-  verificationStatus: LIBRARY_SOME_WA
+  verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/prefix_sum_of_binom.test.cpp
   - verify/math/bernoulli_utilities.test.cpp

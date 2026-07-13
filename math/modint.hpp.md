@@ -23,58 +23,58 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/tree/distance_frequency.hpp
     title: Tree Distance Frequency
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: math/all.hpp
     title: Math All
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: math/all.hpp
     title: Math All
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/bernoulli.hpp
     title: Bernoulli Numbers and Power Sums
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/combinatorial_sequences.hpp
     title: Combinatorial Sequences
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/all.hpp
     title: Formal Power Series All
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/composition.hpp
     title: Formal Power Series Composition
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/convolution.hpp
     title: Convolution
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/convolution_ll.hpp
     title: Long Long Convolution
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/formal_power_series.hpp
     title: Formal Power Series
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/half_gcd.hpp
     title: Polynomial Half-GCD
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/lagrange_inversion.hpp
     title: Lagrange Inversion Formula
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/linear_recurrence.hpp
     title: Linear Recurrence and Bostan-Mori
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/multipoint_evaluation.hpp
     title: Multipoint Evaluation and Interpolation
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/fps/polynomial_factorization.hpp
     title: Polynomial Factorization
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: math/multivariate_convolution.hpp
     title: Multidimensional Convolution
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/partition_function.hpp
     title: Partition Function
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: string/all.hpp
     title: String Algorithms Bundle
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: string/wildcard_pattern_matching.hpp
     title: Wildcard Pattern Matching
   _extendedVerifiedWith:
@@ -210,135 +210,135 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/fps/half_gcd.test.cpp
     title: verify/math/fps/half_gcd.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/inv_of_formal_power_series.test.cpp
     title: verify/math/fps/inv_of_formal_power_series.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/inv_of_formal_power_series.test.cpp
     title: verify/math/fps/inv_of_formal_power_series.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
     title: verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
     title: verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/lagrange_inversion.test.cpp
     title: verify/math/fps/lagrange_inversion.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/lagrange_inversion.test.cpp
     title: verify/math/fps/lagrange_inversion.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/multipoint_evaluation.test.cpp
     title: verify/math/fps/multipoint_evaluation.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/multipoint_evaluation.test.cpp
     title: verify/math/fps/multipoint_evaluation.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/polynomial_factorization.test.cpp
     title: verify/math/fps/polynomial_factorization.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/polynomial_factorization.test.cpp
     title: verify/math/fps/polynomial_factorization.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/polynomial_interpolation.test.cpp
     title: verify/math/fps/polynomial_interpolation.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/polynomial_interpolation.test.cpp
     title: verify/math/fps/polynomial_interpolation.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/polynomial_taylor_shift.test.cpp
     title: verify/math/fps/polynomial_taylor_shift.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/polynomial_taylor_shift.test.cpp
     title: verify/math/fps/polynomial_taylor_shift.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/pow_of_formal_power_series.test.cpp
     title: verify/math/fps/pow_of_formal_power_series.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/pow_of_formal_power_series.test.cpp
     title: verify/math/fps/pow_of_formal_power_series.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/generalized_floor_sum.test.cpp
     title: verify/math/generalized_floor_sum.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/lucas.test.cpp
     title: verify/math/lucas.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/matrix/characteristic_polynomial.test.cpp
     title: verify/math/matrix/characteristic_polynomial.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/matrix/inverse_matrix.test.cpp
     title: verify/math/matrix/inverse_matrix.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/matrix/matrix.test.cpp
     title: verify/math/matrix/matrix.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/matrix/matrix_product.test.cpp
     title: verify/math/matrix/matrix_product.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/modint.test.cpp
     title: verify/math/modint.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/modular_square_root.test.cpp
     title: verify/math/modular_square_root.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/multivariate_convolution_cyclic.test.cpp
     title: verify/math/multivariate_convolution_cyclic.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/multivariate_convolution_cyclic.test.cpp
     title: verify/math/multivariate_convolution_cyclic.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/multivariate_convolution_truncated.test.cpp
     title: verify/math/multivariate_convolution_truncated.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/multivariate_convolution_truncated.test.cpp
     title: verify/math/multivariate_convolution_truncated.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/partition_function.test.cpp
     title: verify/math/partition_function.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/partition_function.test.cpp
     title: verify/math/partition_function.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/prefix_sum_of_binom.test.cpp
     title: verify/math/prefix_sum_of_binom.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/prefix_sum_of_binom_randomized.test.cpp
     title: verify/math/prefix_sum_of_binom_randomized.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/repunit.test.cpp
     title: verify/math/repunit.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/stirling_number_of_the_second_kind.test.cpp
     title: verify/math/stirling_number_of_the_second_kind.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/stirling_number_of_the_second_kind.test.cpp
     title: verify/math/stirling_number_of_the_second_kind.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/subset_convolution.test.cpp
     title: verify/math/subset_convolution.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/sum_of_multiplicative_function.test.cpp
     title: verify/math/sum_of_multiplicative_function.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/matroid/matroids.test.cpp
     title: verify/matroid/matroids.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/string/string_algorithms.test.cpp
     title: verify/string/string_algorithms.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/string/wildcard_pattern_matching.test.cpp
     title: verify/string/wildcard_pattern_matching.test.cpp
-  _isVerificationFailed: true
+  _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':question:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"math/modint.hpp\"\n\n\n\n#include <cassert>\n#include <cstdint>\n\
@@ -572,7 +572,7 @@ data:
   - graph/all.hpp
   - graph/counting.hpp
   timestamp: '2026-07-13 21:13:17+09:00'
-  verificationStatus: LIBRARY_SOME_WA
+  verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/algo/sequence/number_of_subsequences.test.cpp
   - verify/ds/dynamic_tree/rake_compress_link_cut_tree.test.cpp

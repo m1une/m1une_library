@@ -2,19 +2,19 @@
 data:
   _extendedDependsOn: []
   _extendedRequiredBy:
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: matroid/all.hpp
     title: Matroid All
   _extendedVerifiedWith:
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/matroid/matroids.test.cpp
     title: verify/matroid/matroids.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/matroid/weighted_matroid_intersection.test.cpp
     title: verify/matroid/weighted_matroid_intersection.test.cpp
-  _isVerificationFailed: true
+  _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':question:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"matroid/weighted_matroid_intersection.hpp\"\n\n\n\n#include\
@@ -315,7 +315,7 @@ data:
   requiredBy:
   - matroid/all.hpp
   timestamp: '2026-07-01 14:47:47+09:00'
-  verificationStatus: LIBRARY_SOME_WA
+  verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/matroid/matroids.test.cpp
   - verify/matroid/weighted_matroid_intersection.test.cpp

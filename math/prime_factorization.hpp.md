@@ -2,22 +2,22 @@
 data:
   _extendedDependsOn: []
   _extendedRequiredBy:
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: math/all.hpp
     title: Math All
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/cyclotomic_polynomial.hpp
     title: Cyclotomic Polynomial
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: math/multivariate_convolution.hpp
     title: Multidimensional Convolution
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: math/primitive_root.hpp
     title: Primitive Root
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/tetration.hpp
     title: Tetration
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/two_square_sum.hpp
     title: Sum of Two Squares
   _extendedVerifiedWith:
@@ -27,13 +27,13 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/factorize.test.cpp
     title: verify/math/factorize.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/multivariate_convolution_cyclic.test.cpp
     title: verify/math/multivariate_convolution_cyclic.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/math/multivariate_convolution_truncated.test.cpp
     title: verify/math/multivariate_convolution_truncated.test.cpp
   - icon: ':heavy_check_mark:'
@@ -48,9 +48,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/yosupo_factorize.test.cpp
     title: verify/math/yosupo_factorize.test.cpp
-  _isVerificationFailed: true
+  _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':question:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"math/prime_factorization.hpp\"\n\n\n\n#include <algorithm>\n\
@@ -216,7 +216,7 @@ data:
   - math/multivariate_convolution.hpp
   - math/two_square_sum.hpp
   timestamp: '2026-06-20 09:18:49+09:00'
-  verificationStatus: LIBRARY_SOME_WA
+  verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/two_square_sum.test.cpp
   - verify/math/tetration.test.cpp

@@ -7,7 +7,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: ds/dsu/range_parallel_dsu.hpp
     title: Range-Parallel DSU
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
   _extendedRequiredBy: []

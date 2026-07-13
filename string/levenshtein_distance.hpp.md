@@ -2,19 +2,19 @@
 data:
   _extendedDependsOn: []
   _extendedRequiredBy:
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: string/all.hpp
     title: String Algorithms Bundle
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/string/levenshtein_distance.test.cpp
     title: verify/string/levenshtein_distance.test.cpp
-  - icon: ':x:'
+  - icon: ':heavy_check_mark:'
     path: verify/string/string_algorithms.test.cpp
     title: verify/string/string_algorithms.test.cpp
-  _isVerificationFailed: true
+  _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':question:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"string/levenshtein_distance.hpp\"\n\n\n\n#include <algorithm>\n\
@@ -126,7 +126,7 @@ data:
   requiredBy:
   - string/all.hpp
   timestamp: '2026-07-01 21:56:39+09:00'
-  verificationStatus: LIBRARY_SOME_WA
+  verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/string/string_algorithms.test.cpp
   - verify/string/levenshtein_distance.test.cpp

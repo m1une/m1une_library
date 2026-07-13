@@ -4,7 +4,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: ds/range_query/fenwick_tree.hpp
     title: Fenwick Tree (Binary Indexed Tree)
-  - icon: ':question:'
+  - icon: ':heavy_check_mark:'
     path: utilities/fast_io.hpp
     title: Fast IO
   _extendedRequiredBy: []

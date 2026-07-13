@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/m1une/library/workflows/verify/badge.svg)](https://github.com/m1une/library/actions)  [![GitHub Pages](https://img.shields.io/static/v1?label=GitHub+Pages&message=m1une's+library+&color=brightgreen&logo=github)](https://m1une.github.io/m1une_library/)
+[![verify](https://github.com/m1une/m1une_library/actions/workflows/verify.yml/badge.svg?branch=main)](https://github.com/m1une/m1une_library/actions/workflows/verify.yml)  [![GitHub Pages](https://img.shields.io/static/v1?label=GitHub+Pages&message=m1une's+library+&color=brightgreen&logo=github)](https://m1une.github.io/m1une_library/)
 
 # m1une's library
 
