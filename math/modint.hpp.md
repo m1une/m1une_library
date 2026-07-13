@@ -69,6 +69,9 @@ data:
     path: math/fps/polynomial_factorization.hpp
     title: Polynomial Factorization
   - icon: ':heavy_check_mark:'
+    path: math/fps/sparse_formal_power_series.hpp
+    title: Sparse Formal Power Series
+  - icon: ':heavy_check_mark:'
     path: math/multivariate_convolution.hpp
     title: Multidimensional Convolution
   - icon: ':heavy_check_mark:'
@@ -208,6 +211,12 @@ data:
     path: verify/math/fps/exp_of_formal_power_series.test.cpp
     title: verify/math/fps/exp_of_formal_power_series.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/fps/exp_of_formal_power_series_sparse.test.cpp
+    title: verify/math/fps/exp_of_formal_power_series_sparse.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/fps/exp_of_formal_power_series_sparse.test.cpp
+    title: verify/math/fps/exp_of_formal_power_series_sparse.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/fps_algorithms.test.cpp
     title: verify/math/fps/fps_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
@@ -226,6 +235,12 @@ data:
     path: verify/math/fps/inv_of_formal_power_series.test.cpp
     title: verify/math/fps/inv_of_formal_power_series.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/fps/inv_of_formal_power_series_sparse.test.cpp
+    title: verify/math/fps/inv_of_formal_power_series_sparse.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/fps/inv_of_formal_power_series_sparse.test.cpp
+    title: verify/math/fps/inv_of_formal_power_series_sparse.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
     title: verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
   - icon: ':heavy_check_mark:'
@@ -237,6 +252,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/fps/lagrange_inversion.test.cpp
     title: verify/math/fps/lagrange_inversion.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/fps/log_of_formal_power_series_sparse.test.cpp
+    title: verify/math/fps/log_of_formal_power_series_sparse.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/fps/log_of_formal_power_series_sparse.test.cpp
+    title: verify/math/fps/log_of_formal_power_series_sparse.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/fps/multipoint_evaluation.test.cpp
     title: verify/math/fps/multipoint_evaluation.test.cpp
@@ -267,6 +288,18 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/fps/pow_of_formal_power_series.test.cpp
     title: verify/math/fps/pow_of_formal_power_series.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/fps/pow_of_formal_power_series_sparse.test.cpp
+    title: verify/math/fps/pow_of_formal_power_series_sparse.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/fps/pow_of_formal_power_series_sparse.test.cpp
+    title: verify/math/fps/pow_of_formal_power_series_sparse.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/fps/sqrt_of_formal_power_series_sparse.test.cpp
+    title: verify/math/fps/sqrt_of_formal_power_series_sparse.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/fps/sqrt_of_formal_power_series_sparse.test.cpp
+    title: verify/math/fps/sqrt_of_formal_power_series_sparse.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/generalized_floor_sum.test.cpp
     title: verify/math/generalized_floor_sum.test.cpp
@@ -562,6 +595,7 @@ data:
   - math/all.hpp
   - math/all.hpp
   - math/bernoulli.hpp
+  - math/fps/sparse_formal_power_series.hpp
   - math/fps/half_gcd.hpp
   - math/fps/composition.hpp
   - math/fps/compositional_inverse.hpp
@@ -631,16 +665,26 @@ data:
   - verify/math/fps/convolution_ll.test.cpp
   - verify/math/fps/exp_of_formal_power_series.test.cpp
   - verify/math/fps/exp_of_formal_power_series.test.cpp
+  - verify/math/fps/inv_of_formal_power_series_sparse.test.cpp
+  - verify/math/fps/inv_of_formal_power_series_sparse.test.cpp
+  - verify/math/fps/exp_of_formal_power_series_sparse.test.cpp
+  - verify/math/fps/exp_of_formal_power_series_sparse.test.cpp
   - verify/math/fps/multipoint_evaluation.test.cpp
   - verify/math/fps/multipoint_evaluation.test.cpp
+  - verify/math/fps/sqrt_of_formal_power_series_sparse.test.cpp
+  - verify/math/fps/sqrt_of_formal_power_series_sparse.test.cpp
   - verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
   - verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
+  - verify/math/fps/log_of_formal_power_series_sparse.test.cpp
+  - verify/math/fps/log_of_formal_power_series_sparse.test.cpp
   - verify/math/fps/convolution_mod.test.cpp
   - verify/math/fps/convolution_mod.test.cpp
   - verify/math/fps/compositional_inverse.test.cpp
   - verify/math/fps/compositional_inverse.test.cpp
   - verify/math/fps/polynomial_taylor_shift.test.cpp
   - verify/math/fps/polynomial_taylor_shift.test.cpp
+  - verify/math/fps/pow_of_formal_power_series_sparse.test.cpp
+  - verify/math/fps/pow_of_formal_power_series_sparse.test.cpp
   - verify/math/fps/composition.test.cpp
   - verify/math/fps/composition.test.cpp
   - verify/math/fps/lagrange_inversion.test.cpp

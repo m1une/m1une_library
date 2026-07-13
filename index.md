@@ -817,6 +817,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: math/fps/polynomial_factorization.hpp
       title: Polynomial Factorization
+    - icon: ':heavy_check_mark:'
+      path: math/fps/sparse_formal_power_series.hpp
+      title: Sparse Formal Power Series
   - name: math/fps/internal
     pages:
     - icon: ':heavy_check_mark:'
@@ -1718,6 +1721,9 @@ data:
       path: verify/math/fps/exp_of_formal_power_series.test.cpp
       title: verify/math/fps/exp_of_formal_power_series.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/math/fps/exp_of_formal_power_series_sparse.test.cpp
+      title: verify/math/fps/exp_of_formal_power_series_sparse.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/math/fps/floating_point_convolution.test.cpp
       title: verify/math/fps/floating_point_convolution.test.cpp
     - icon: ':heavy_check_mark:'
@@ -1730,11 +1736,17 @@ data:
       path: verify/math/fps/inv_of_formal_power_series.test.cpp
       title: verify/math/fps/inv_of_formal_power_series.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/math/fps/inv_of_formal_power_series_sparse.test.cpp
+      title: verify/math/fps/inv_of_formal_power_series_sparse.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
       title: verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/fps/lagrange_inversion.test.cpp
       title: verify/math/fps/lagrange_inversion.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/fps/log_of_formal_power_series_sparse.test.cpp
+      title: verify/math/fps/log_of_formal_power_series_sparse.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/fps/multipoint_evaluation.test.cpp
       title: verify/math/fps/multipoint_evaluation.test.cpp
@@ -1750,6 +1762,12 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/fps/pow_of_formal_power_series.test.cpp
       title: verify/math/fps/pow_of_formal_power_series.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/fps/pow_of_formal_power_series_sparse.test.cpp
+      title: verify/math/fps/pow_of_formal_power_series_sparse.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/fps/sqrt_of_formal_power_series_sparse.test.cpp
+      title: verify/math/fps/sqrt_of_formal_power_series_sparse.test.cpp
   - name: verify/math/matrix
     pages:
     - icon: ':heavy_check_mark:'

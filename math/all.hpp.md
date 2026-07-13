@@ -74,6 +74,9 @@ data:
     path: math/fps/polynomial_factorization.hpp
     title: Polynomial Factorization
   - icon: ':heavy_check_mark:'
+    path: math/fps/sparse_formal_power_series.hpp
+    title: Sparse Formal Power Series
+  - icon: ':heavy_check_mark:'
     path: math/generalized_floor_sum.hpp
     title: Generalized Floor Sum
   - icon: ':heavy_check_mark:'
@@ -2264,9 +2267,102 @@ data:
     \ && merged.back().polynomial == factor.polynomial) {\n            merged.back().multiplicity\
     \ += factor.multiplicity;\n        } else {\n            merged.push_back(std::move(factor));\n\
     \        }\n    }\n    return {leading_coefficient, std::move(merged)};\n}\n\n\
-    }  // namespace fps\n}  // namespace m1une\n\n\n#line 15 \"math/fps/all.hpp\"\n\
-    \n\n#line 1 \"math/matrix/all.hpp\"\n\n\n\n#line 1 \"math/matrix/bit_matrix.hpp\"\
-    \n\n\n\n#line 10 \"math/matrix/bit_matrix.hpp\"\n#include <string>\n#include <string_view>\n\
+    }  // namespace fps\n}  // namespace m1une\n\n\n#line 1 \"math/fps/sparse_formal_power_series.hpp\"\
+    \n\n\n\n#line 9 \"math/fps/sparse_formal_power_series.hpp\"\n\n#line 11 \"math/fps/sparse_formal_power_series.hpp\"\
+    \n\nnamespace m1une {\nnamespace fps {\n\ntemplate <class Mint>\nusing SparseFormalPowerSeries\
+    \ = std::vector<std::pair<int, Mint>>;\n\nnamespace internal {\n\ntemplate <class\
+    \ Mint>\nvoid assert_valid_sparse_fps(const SparseFormalPowerSeries<Mint>& terms,\
+    \ int degree) {\n    int previous_degree = -1;\n    for (const auto& [term_degree,\
+    \ coefficient] : terms) {\n        assert(0 <= term_degree && previous_degree\
+    \ < term_degree && term_degree < degree);\n        assert(coefficient != Mint(0));\n\
+    \        previous_degree = term_degree;\n    }\n}\n\ntemplate <class Mint>\nstd::vector<Mint>\
+    \ sparse_integer_inverses(int degree) {\n    assert(degree >= 0 && uint32_t(degree)\
+    \ < Mint::mod());\n    std::vector<Mint> inverse(degree);\n    if (degree <= 1)\
+    \ return inverse;\n    inverse[1] = Mint(1);\n    for (int i = 2; i < degree;\
+    \ i++) {\n        const uint32_t quotient = Mint::mod() / uint32_t(i);\n     \
+    \   const uint32_t remainder = Mint::mod() % uint32_t(i);\n        inverse[i]\
+    \ = Mint(0) - Mint(quotient) * inverse[remainder];\n    }\n    return inverse;\n\
+    }\n\ntemplate <class Mint>\nFormalPowerSeries<Mint> sparse_unit_pow(const SparseFormalPowerSeries<Mint>&\
+    \ terms,\n                                        Mint exponent, int degree) {\n\
+    \    assert(degree > 0 && !terms.empty());\n    assert(terms[0].first == 0 &&\
+    \ terms[0].second == Mint(1));\n    std::vector<Mint> inverse = sparse_integer_inverses<Mint>(degree);\n\
+    \    FormalPowerSeries<Mint> result(degree);\n    result[0] = Mint(1);\n    for\
+    \ (int n = 1; n < degree; n++) {\n        Mint coefficient = 0;\n        for (int\
+    \ i = 1; i < int(terms.size()) && terms[i].first <= n; i++) {\n            const\
+    \ auto& [d, value] = terms[i];\n            coefficient += value * result[n -\
+    \ d] *\n                           (exponent * Mint(d) - Mint(n - d));\n     \
+    \   }\n        result[n] = coefficient * inverse[n];\n    }\n    return result;\n\
+    }\n\n}  // namespace internal\n\ntemplate <class Mint>\nFormalPowerSeries<Mint>\
+    \ sparse_fps_inv(const SparseFormalPowerSeries<Mint>& terms,\n               \
+    \                        int degree) {\n    assert(degree >= 0);\n    if (degree\
+    \ == 0) return {};\n    internal::assert_valid_sparse_fps(terms, degree);\n  \
+    \  assert(!terms.empty() && terms[0].first == 0);\n\n    const Mint inverse_constant\
+    \ = terms[0].second.inv();\n    FormalPowerSeries<Mint> result(degree);\n    result[0]\
+    \ = inverse_constant;\n    for (int n = 1; n < degree; n++) {\n        Mint coefficient\
+    \ = 0;\n        for (int i = 1; i < int(terms.size()) && terms[i].first <= n;\
+    \ i++) {\n            coefficient -= terms[i].second * result[n - terms[i].first];\n\
+    \        }\n        result[n] = coefficient * inverse_constant;\n    }\n    return\
+    \ result;\n}\n\ntemplate <class Mint>\nFormalPowerSeries<Mint> sparse_fps_log(const\
+    \ SparseFormalPowerSeries<Mint>& terms,\n                                    \
+    \   int degree) {\n    assert(degree >= 0);\n    if (degree == 0) return {};\n\
+    \    assert(uint32_t(degree) < Mint::mod());\n    internal::assert_valid_sparse_fps(terms,\
+    \ degree);\n    assert(!terms.empty() && terms[0].first == 0 && terms[0].second\
+    \ == Mint(1));\n\n    std::vector<Mint> inverse = internal::sparse_integer_inverses<Mint>(degree);\n\
+    \    FormalPowerSeries<Mint> result(degree);\n    for (int n = 0; n + 1 < degree;\
+    \ n++) {\n        Mint derivative_quotient = 0;\n        for (int i = 1; i < int(terms.size())\
+    \ && terms[i].first <= n + 1; i++) {\n            const auto& [d, value] = terms[i];\n\
+    \            if (d == n + 1) derivative_quotient += Mint(d) * value;\n       \
+    \     if (d <= n) {\n                derivative_quotient -=\n                \
+    \    value * Mint(n - d + 1) * result[n - d + 1];\n            }\n        }\n\
+    \        result[n + 1] = derivative_quotient * inverse[n + 1];\n    }\n    return\
+    \ result;\n}\n\ntemplate <class Mint>\nFormalPowerSeries<Mint> sparse_fps_exp(const\
+    \ SparseFormalPowerSeries<Mint>& terms,\n                                    \
+    \   int degree) {\n    assert(degree >= 0);\n    if (degree == 0) return {};\n\
+    \    assert(uint32_t(degree) < Mint::mod());\n    internal::assert_valid_sparse_fps(terms,\
+    \ degree);\n    assert(terms.empty() || terms[0].first > 0);\n\n    std::vector<Mint>\
+    \ inverse = internal::sparse_integer_inverses<Mint>(degree);\n    FormalPowerSeries<Mint>\
+    \ result(degree);\n    result[0] = Mint(1);\n    for (int n = 1; n < degree; n++)\
+    \ {\n        Mint coefficient = 0;\n        for (const auto& [d, value] : terms)\
+    \ {\n            if (d > n) break;\n            coefficient += Mint(d) * value\
+    \ * result[n - d];\n        }\n        result[n] = coefficient * inverse[n];\n\
+    \    }\n    return result;\n}\n\ntemplate <class Mint>\nFormalPowerSeries<Mint>\
+    \ sparse_fps_pow(const SparseFormalPowerSeries<Mint>& terms,\n               \
+    \                        long long exponent, int degree) {\n    assert(exponent\
+    \ >= 0 && degree >= 0);\n    if (degree == 0) return {};\n    assert(uint32_t(degree)\
+    \ < Mint::mod());\n    internal::assert_valid_sparse_fps(terms, degree);\n   \
+    \ if (exponent == 0) {\n        FormalPowerSeries<Mint> result(degree);\n    \
+    \    result[0] = Mint(1);\n        return result;\n    }\n    if (terms.empty())\
+    \ return FormalPowerSeries<Mint>(degree);\n\n    const int leading_degree = terms[0].first;\n\
+    \    if (leading_degree > 0 && exponent > (degree - 1) / leading_degree) {\n \
+    \       return FormalPowerSeries<Mint>(degree);\n    }\n    const int offset =\
+    \ int(leading_degree * exponent);\n    const int normalized_degree = degree -\
+    \ offset;\n    const Mint leading = terms[0].second;\n    const Mint inverse_leading\
+    \ = leading.inv();\n    SparseFormalPowerSeries<Mint> normalized;\n    normalized.reserve(terms.size());\n\
+    \    for (const auto& [d, value] : terms) {\n        if (d - leading_degree >=\
+    \ normalized_degree) break;\n        normalized.emplace_back(d - leading_degree,\
+    \ value * inverse_leading);\n    }\n\n    FormalPowerSeries<Mint> unit =\n   \
+    \     internal::sparse_unit_pow(normalized, Mint(exponent), normalized_degree);\n\
+    \    const Mint scale = leading.pow(exponent);\n    FormalPowerSeries<Mint> result(degree);\n\
+    \    for (int i = 0; i < normalized_degree; i++) result[offset + i] = unit[i]\
+    \ * scale;\n    return result;\n}\n\ntemplate <class Mint>\nstd::optional<FormalPowerSeries<Mint>>\
+    \ sparse_fps_sqrt(\n    const SparseFormalPowerSeries<Mint>& terms, int degree)\
+    \ {\n    assert(degree >= 0);\n    if (degree == 0) return FormalPowerSeries<Mint>();\n\
+    \    assert(uint32_t(degree) < Mint::mod());\n    internal::assert_valid_sparse_fps(terms,\
+    \ degree);\n    assert(Mint(2) != Mint(0));\n    if (terms.empty()) return FormalPowerSeries<Mint>(degree);\n\
+    \n    const int leading_degree = terms[0].first;\n    if (leading_degree & 1)\
+    \ return std::nullopt;\n    auto leading_root = m1une::math::modular_square_root(terms[0].second);\n\
+    \    if (!leading_root.has_value()) return std::nullopt;\n\n    const int normalized_degree\
+    \ = degree - leading_degree;\n    const Mint inverse_leading = terms[0].second.inv();\n\
+    \    SparseFormalPowerSeries<Mint> normalized;\n    normalized.reserve(terms.size());\n\
+    \    for (const auto& [d, value] : terms) {\n        normalized.emplace_back(d\
+    \ - leading_degree, value * inverse_leading);\n    }\n    FormalPowerSeries<Mint>\
+    \ unit = internal::sparse_unit_pow(\n        normalized, Mint(2).inv(), normalized_degree);\n\
+    \n    FormalPowerSeries<Mint> result(degree);\n    const int offset = leading_degree\
+    \ / 2;\n    for (int i = 0; i < normalized_degree; i++) {\n        result[offset\
+    \ + i] = unit[i] * *leading_root;\n    }\n    return result;\n}\n\n}  // namespace\
+    \ fps\n}  // namespace m1une\n\n\n#line 16 \"math/fps/all.hpp\"\n\n\n#line 1 \"\
+    math/matrix/all.hpp\"\n\n\n\n#line 1 \"math/matrix/bit_matrix.hpp\"\n\n\n\n#line\
+    \ 10 \"math/matrix/bit_matrix.hpp\"\n#include <string>\n#include <string_view>\n\
     #line 14 \"math/matrix/bit_matrix.hpp\"\n\nnamespace m1une {\nnamespace matrix\
     \ {\n\nclass BitMatrix {\n   private:\n    int _rows;\n    int _cols;\n    int\
     \ _blocks;\n    std::vector<std::uint64_t> _data;\n\n    static int block_count(int\
@@ -3616,6 +3712,7 @@ data:
   - math/fps/linear_recurrence.hpp
   - math/fps/multipoint_evaluation.hpp
   - math/fps/polynomial_factorization.hpp
+  - math/fps/sparse_formal_power_series.hpp
   - math/matrix/all.hpp
   - math/matrix/bit_matrix.hpp
   - math/matrix/characteristic_polynomial.hpp
@@ -3640,7 +3737,7 @@ data:
   isVerificationFile: false
   path: math/all.hpp
   requiredBy: []
-  timestamp: '2026-07-14 00:30:03+09:00'
+  timestamp: '2026-07-14 00:40:39+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
