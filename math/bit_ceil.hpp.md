@@ -3,6 +3,9 @@ data:
   _extendedDependsOn: []
   _extendedRequiredBy:
   - icon: ':heavy_check_mark:'
+    path: ds/range_query/merge_sort_tree.hpp
+    title: Merge Sort Tree
+  - icon: ':heavy_check_mark:'
     path: ds/range_query/range_sort_range_composite.hpp
     title: Range Sort Range Composite
   - icon: ':heavy_check_mark:'
@@ -27,6 +30,12 @@ data:
     path: math/all.hpp
     title: Math All
   _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/range_query/merge_sort_tree.test.cpp
+    title: verify/ds/range_query/merge_sort_tree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/range_query/merge_sort_tree_sum.test.cpp
+    title: verify/ds/range_query/merge_sort_tree_sum.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/ds/range_query/range_sort_range_composite.test.cpp
     title: verify/ds/range_query/range_sort_range_composite.test.cpp
@@ -68,6 +77,7 @@ data:
   isVerificationFile: false
   path: math/bit_ceil.hpp
   requiredBy:
+  - ds/range_query/merge_sort_tree.hpp
   - ds/range_query/range_sort_range_composite.hpp
   - ds/segtree/dual_segtree_2d.hpp
   - ds/segtree/segtree.hpp
@@ -79,6 +89,8 @@ data:
   timestamp: '2026-06-15 01:47:39+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/ds/range_query/merge_sort_tree.test.cpp
+  - verify/ds/range_query/merge_sort_tree_sum.test.cpp
   - verify/ds/range_query/range_sort_range_composite.test.cpp
   - verify/ds/segtree/dual_segtree_2d.test.cpp
   - verify/ds/segtree/dual_segtree.test.cpp

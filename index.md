@@ -348,6 +348,9 @@ data:
       path: ds/range_query/fenwick_tree_2d.hpp
       title: Fenwick Tree 2D
     - icon: ':heavy_check_mark:'
+      path: ds/range_query/merge_sort_tree.hpp
+      title: Merge Sort Tree
+    - icon: ':heavy_check_mark:'
       path: ds/range_query/range_inversion_count.hpp
       title: Static Range Inversion Count
     - icon: ':heavy_check_mark:'
@@ -1322,6 +1325,12 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/ds/range_query/fenwick_tree_2d.test.cpp
       title: verify/ds/range_query/fenwick_tree_2d.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/range_query/merge_sort_tree.test.cpp
+      title: verify/ds/range_query/merge_sort_tree.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/range_query/merge_sort_tree_sum.test.cpp
+      title: verify/ds/range_query/merge_sort_tree_sum.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/ds/range_query/range_inversion_count.test.cpp
       title: verify/ds/range_query/range_inversion_count.test.cpp
