@@ -45,6 +45,7 @@ Public namespaces stay flat and short: general graph helpers use
 | `graph/two_edge_connected_components.hpp` | Undirected only | Two-edge-connected components, bridges, and the contracted bridge forest. |
 | `graph/bipartite.hpp` | Direction ignored / explicit bipartite sides | Two-colorability, matching, vertex/edge covers, independent sets, and optimal bipartite edge coloring. |
 | `graph/general_matching.hpp` | Undirected only | Maximum-cardinality matching and minimum edge cover in general undirected graphs. |
+| `graph/general_weighted_matching.hpp` | Undirected only | Maximum-total-weight matching in general undirected graphs. |
 | `graph/maximum_clique.hpp` | Direction ignored | Exact maximum clique, maximum independent set, and minimum vertex cover with bitset branch-and-bound. |
 | `graph/chromatic_number.hpp` | Direction ignored | Exact chromatic number for graphs with at most 20 vertices. |
 | `graph/minimum_steiner_tree.hpp` | Undirected only | Exact edge- and vertex-weighted minimum Steiner-tree costs and reconstruction for a small terminal set. |
