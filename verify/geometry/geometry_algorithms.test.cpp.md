@@ -20,6 +20,9 @@ data:
     path: geometry/convex_hull.hpp
     title: Convex Hull
   - icon: ':heavy_check_mark:'
+    path: geometry/convex_layers.hpp
+    title: Convex Layers
+  - icon: ':heavy_check_mark:'
     path: geometry/farthest_pair.hpp
     title: Farthest Pair of Points
   - icon: ':heavy_check_mark:'
@@ -157,6 +160,7 @@ data:
   - geometry/line.hpp
   - geometry/closest_pair.hpp
   - geometry/convex_hull.hpp
+  - geometry/convex_layers.hpp
   - geometry/farthest_pair.hpp
   - geometry/half_plane_intersection.hpp
   - geometry/lattice_point_count.hpp
@@ -169,7 +173,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/geometry_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-13 06:09:24+09:00'
+  timestamp: '2026-07-13 20:32:52+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/geometry_algorithms.test.cpp

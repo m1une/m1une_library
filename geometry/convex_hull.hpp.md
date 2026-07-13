@@ -19,6 +19,9 @@ data:
     path: verify/geometry/convex_hull.test.cpp
     title: verify/geometry/convex_hull.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/convex_layers.test.cpp
+    title: verify/geometry/convex_layers.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/farthest_pair.test.cpp
     title: verify/geometry/farthest_pair.test.cpp
   - icon: ':heavy_check_mark:'
@@ -180,6 +183,7 @@ data:
   verifiedWith:
   - verify/geometry/polygon_area.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
+  - verify/geometry/convex_layers.test.cpp
   - verify/geometry/point_in_polygon.test.cpp
   - verify/geometry/convex_hull.test.cpp
   - verify/geometry/polygon_operations.test.cpp

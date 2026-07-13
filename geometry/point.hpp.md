@@ -18,6 +18,9 @@ data:
     path: geometry/convex_hull.hpp
     title: Convex Hull
   - icon: ':heavy_check_mark:'
+    path: geometry/convex_layers.hpp
+    title: Convex Layers
+  - icon: ':heavy_check_mark:'
     path: geometry/farthest_pair.hpp
     title: Farthest Pair of Points
   - icon: ':heavy_check_mark:'
@@ -57,6 +60,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/convex_hull.test.cpp
     title: verify/geometry/convex_hull.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/convex_layers.test.cpp
+    title: verify/geometry/convex_layers.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/convex_layers.test.cpp
+    title: verify/geometry/convex_layers.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/farthest_pair.test.cpp
     title: verify/geometry/farthest_pair.test.cpp
@@ -272,6 +281,7 @@ data:
   path: geometry/point.hpp
   requiredBy:
   - geometry/minimum_enclosing_circle.hpp
+  - geometry/convex_layers.hpp
   - geometry/ray.hpp
   - geometry/circle.hpp
   - geometry/all.hpp
@@ -297,6 +307,8 @@ data:
   - verify/geometry/segment_intersection.test.cpp
   - verify/geometry/circle_ray.test.cpp
   - verify/geometry/half_plane_intersection_random.test.cpp
+  - verify/geometry/convex_layers.test.cpp
+  - verify/geometry/convex_layers.test.cpp
   - verify/geometry/manhattan_mst.test.cpp
   - verify/geometry/point_in_polygon.test.cpp
   - verify/geometry/convex_hull.test.cpp

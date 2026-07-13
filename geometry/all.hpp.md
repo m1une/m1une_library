@@ -17,6 +17,9 @@ data:
     path: geometry/convex_hull.hpp
     title: Convex Hull
   - icon: ':heavy_check_mark:'
+    path: geometry/convex_layers.hpp
+    title: Convex Layers
+  - icon: ':heavy_check_mark:'
     path: geometry/farthest_pair.hpp
     title: Farthest Pair of Points
   - icon: ':heavy_check_mark:'
@@ -84,6 +87,8 @@ data:
 
     #include "convex_hull.hpp"
 
+    #include "convex_layers.hpp"
+
     #include "farthest_pair.hpp"
 
     #include "half_plane_intersection.hpp"
@@ -116,6 +121,7 @@ data:
   - geometry/line.hpp
   - geometry/closest_pair.hpp
   - geometry/convex_hull.hpp
+  - geometry/convex_layers.hpp
   - geometry/farthest_pair.hpp
   - geometry/half_plane_intersection.hpp
   - geometry/lattice_point_count.hpp
@@ -128,7 +134,7 @@ data:
   isVerificationFile: false
   path: geometry/all.hpp
   requiredBy: []
-  timestamp: '2026-07-13 06:09:24+09:00'
+  timestamp: '2026-07-13 20:32:52+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp
@@ -149,6 +155,7 @@ title: Geometry Bundle
 | `geometry/point.hpp` | Points, vectors, dot/cross products, exact orientation, distance, and rotation. |
 | `geometry/closest_pair.hpp` | Euclidean closest pair with original indices in $O(N\log N)$. |
 | `geometry/convex_hull.hpp` | Monotone-chain convex hull with optional boundary-collinear points. |
+| `geometry/convex_layers.hpp` | Onion decomposition into successive convex-hull boundaries in $O(N\log^2 N)$. |
 | `geometry/farthest_pair.hpp` | Euclidean farthest pair with original indices in $O(N\log N)$. |
 | `geometry/half_plane_intersection.hpp` | Bounded intersection polygon of directed closed half-planes in $O(N\log N)$. |
 | `geometry/lattice_point_count.hpp` | Exact lattice-point counting in a bounded intersection of integer linear inequalities. |
