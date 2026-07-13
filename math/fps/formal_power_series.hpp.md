@@ -36,6 +36,9 @@ data:
     path: math/fps/all.hpp
     title: Formal Power Series All
   - icon: ':heavy_check_mark:'
+    path: math/fps/composition.hpp
+    title: Formal Power Series Composition
+  - icon: ':heavy_check_mark:'
     path: math/fps/half_gcd.hpp
     title: Polynomial Half-GCD
   - icon: ':heavy_check_mark:'
@@ -75,6 +78,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/bernoulli_utilities.test.cpp
     title: verify/math/bernoulli_utilities.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/fps/composition.test.cpp
+    title: verify/math/fps/composition.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/fps/exp_of_formal_power_series.test.cpp
     title: verify/math/fps/exp_of_formal_power_series.test.cpp
@@ -294,6 +300,7 @@ data:
   - math/all.hpp
   - math/bernoulli.hpp
   - math/fps/half_gcd.hpp
+  - math/fps/composition.hpp
   - math/fps/all.hpp
   - math/fps/lagrange_inversion.hpp
   - math/fps/multipoint_evaluation.hpp
@@ -318,6 +325,7 @@ data:
   - verify/math/fps/multipoint_evaluation.test.cpp
   - verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
   - verify/math/fps/polynomial_taylor_shift.test.cpp
+  - verify/math/fps/composition.test.cpp
   - verify/math/fps/lagrange_inversion.test.cpp
   - verify/math/fps/fps_algorithms.test.cpp
   - verify/math/stirling_number_of_the_second_kind.test.cpp

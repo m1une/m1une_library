@@ -39,6 +39,9 @@ data:
     path: math/fps/all.hpp
     title: Formal Power Series All
   - icon: ':heavy_check_mark:'
+    path: math/fps/composition.hpp
+    title: Formal Power Series Composition
+  - icon: ':heavy_check_mark:'
     path: math/fps/convolution.hpp
     title: Convolution
   - icon: ':heavy_check_mark:'
@@ -165,6 +168,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/cyclotomic_polynomial.test.cpp
     title: verify/math/cyclotomic_polynomial.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/fps/composition.test.cpp
+    title: verify/math/fps/composition.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/fps/composition.test.cpp
+    title: verify/math/fps/composition.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/fps/convolution_ll.test.cpp
     title: verify/math/fps/convolution_ll.test.cpp
@@ -423,6 +432,7 @@ data:
   - math/all.hpp
   - math/bernoulli.hpp
   - math/fps/half_gcd.hpp
+  - math/fps/composition.hpp
   - math/fps/formal_power_series.hpp
   - math/fps/convolution_ll.hpp
   - math/fps/all.hpp
@@ -490,6 +500,8 @@ data:
   - verify/math/fps/convolution_mod.test.cpp
   - verify/math/fps/polynomial_taylor_shift.test.cpp
   - verify/math/fps/polynomial_taylor_shift.test.cpp
+  - verify/math/fps/composition.test.cpp
+  - verify/math/fps/composition.test.cpp
   - verify/math/fps/lagrange_inversion.test.cpp
   - verify/math/fps/lagrange_inversion.test.cpp
   - verify/math/fps/fps_algorithms.test.cpp

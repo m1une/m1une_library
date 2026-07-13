@@ -782,6 +782,9 @@ data:
       path: math/fps/all.hpp
       title: Formal Power Series All
     - icon: ':heavy_check_mark:'
+      path: math/fps/composition.hpp
+      title: Formal Power Series Composition
+    - icon: ':heavy_check_mark:'
       path: math/fps/convolution.hpp
       title: Convolution
     - icon: ':heavy_check_mark:'
@@ -1684,6 +1687,9 @@ data:
       title: verify/math/zeta_mobius_transform.test.cpp
   - name: verify/math/fps
     pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/math/fps/composition.test.cpp
+      title: verify/math/fps/composition.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/fps/convolution_ll.test.cpp
       title: verify/math/fps/convolution_ll.test.cpp

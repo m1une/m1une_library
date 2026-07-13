@@ -2,6 +2,9 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
+    path: math/fps/composition.hpp
+    title: Formal Power Series Composition
+  - icon: ':heavy_check_mark:'
     path: math/fps/convolution.hpp
     title: Convolution
   - icon: ':heavy_check_mark:'
@@ -61,6 +64,10 @@ data:
     , line 187, in bundle\n    bundler.update(path)\n  File \"/home/runner/.local/lib/python3.12/site-packages/onlinejudge_verify/languages/cplusplus_bundle.py\"\
     , line 401, in update\n    self.update(self._resolve(pathlib.Path(included), included_from=path))\n\
     \  File \"/home/runner/.local/lib/python3.12/site-packages/onlinejudge_verify/languages/cplusplus_bundle.py\"\
+    , line 401, in update\n    self.update(self._resolve(pathlib.Path(included), included_from=path))\n\
+    \  File \"/home/runner/.local/lib/python3.12/site-packages/onlinejudge_verify/languages/cplusplus_bundle.py\"\
+    , line 401, in update\n    self.update(self._resolve(pathlib.Path(included), included_from=path))\n\
+    \  File \"/home/runner/.local/lib/python3.12/site-packages/onlinejudge_verify/languages/cplusplus_bundle.py\"\
     , line 400, in update\n    raise BundleErrorAt(path, i + 1, \"unable to process\
     \ #include in #if / #ifdef / #ifndef other than include guards\")\nonlinejudge_verify.languages.cplusplus_bundle.BundleErrorAt:\
     \ math/fps/convolution.hpp: line 19: unable to process #include in #if / #ifdef\
@@ -69,6 +76,8 @@ data:
 
     #define M1UNE_FPS_ALL_HPP 1
 
+
+    #include "composition.hpp"
 
     #include "convolution.hpp"
 
@@ -93,13 +102,14 @@ data:
 
     '
   dependsOn:
+  - math/fps/composition.hpp
+  - math/fps/formal_power_series.hpp
+  - math/modular_square_root.hpp
   - math/fps/convolution.hpp
   - math/fps/internal/ntt998_faster.hpp
   - math/modint.hpp
   - math/fps/convolution_ll.hpp
   - math/fps/floating_point_convolution.hpp
-  - math/fps/formal_power_series.hpp
-  - math/modular_square_root.hpp
   - math/fps/half_gcd.hpp
   - math/fps/lagrange_inversion.hpp
   - math/fps/linear_recurrence.hpp
@@ -109,7 +119,7 @@ data:
   path: math/fps/all.hpp
   requiredBy:
   - math/all.hpp
-  timestamp: '2026-07-11 19:34:52+09:00'
+  timestamp: '2026-07-13 20:54:00+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
@@ -127,6 +137,7 @@ title: Formal Power Series All
 
 | Header | Contents |
 | --- | --- |
+| `math/fps/composition.hpp` | Fast truncated formal power series composition. |
 | `math/fps/convolution.hpp` | Naive, NTT, and CRT-based convolution. |
 | `math/fps/convolution_ll.hpp` | Exact signed 64-bit convolution using three NTT primes. |
 | `math/fps/floating_point_convolution.hpp` | FFT convolution for real, complex, and rounded integral coefficients. |

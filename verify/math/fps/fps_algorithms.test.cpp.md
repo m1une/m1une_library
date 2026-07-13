@@ -5,6 +5,9 @@ data:
     path: math/fps/all.hpp
     title: Formal Power Series All
   - icon: ':heavy_check_mark:'
+    path: math/fps/composition.hpp
+    title: Formal Power Series Composition
+  - icon: ':heavy_check_mark:'
     path: math/fps/convolution.hpp
     title: Convolution
   - icon: ':heavy_check_mark:'
@@ -63,6 +66,8 @@ data:
     \  File \"/home/runner/.local/lib/python3.12/site-packages/onlinejudge_verify/languages/cplusplus_bundle.py\"\
     , line 401, in update\n    self.update(self._resolve(pathlib.Path(included), included_from=path))\n\
     \  File \"/home/runner/.local/lib/python3.12/site-packages/onlinejudge_verify/languages/cplusplus_bundle.py\"\
+    , line 401, in update\n    self.update(self._resolve(pathlib.Path(included), included_from=path))\n\
+    \  [Previous line repeated 1 more time]\n  File \"/home/runner/.local/lib/python3.12/site-packages/onlinejudge_verify/languages/cplusplus_bundle.py\"\
     , line 400, in update\n    raise BundleErrorAt(path, i + 1, \"unable to process\
     \ #include in #if / #ifdef / #ifndef other than include guards\")\nonlinejudge_verify.languages.cplusplus_bundle.BundleErrorAt:\
     \ math/fps/convolution.hpp: line 19: unable to process #include in #if / #ifdef\
@@ -129,13 +134,14 @@ data:
     }\n"
   dependsOn:
   - math/fps/all.hpp
+  - math/fps/composition.hpp
+  - math/fps/formal_power_series.hpp
+  - math/modular_square_root.hpp
   - math/fps/convolution.hpp
   - math/fps/internal/ntt998_faster.hpp
   - math/modint.hpp
   - math/fps/convolution_ll.hpp
   - math/fps/floating_point_convolution.hpp
-  - math/fps/formal_power_series.hpp
-  - math/modular_square_root.hpp
   - math/fps/half_gcd.hpp
   - math/fps/lagrange_inversion.hpp
   - math/fps/linear_recurrence.hpp
@@ -145,7 +151,7 @@ data:
   isVerificationFile: true
   path: verify/math/fps/fps_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-11 19:34:52+09:00'
+  timestamp: '2026-07-13 20:54:00+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/fps/fps_algorithms.test.cpp

@@ -32,6 +32,9 @@ data:
     path: math/fps/all.hpp
     title: Formal Power Series All
   - icon: ':heavy_check_mark:'
+    path: math/fps/composition.hpp
+    title: Formal Power Series Composition
+  - icon: ':heavy_check_mark:'
     path: math/fps/convolution.hpp
     title: Convolution
   - icon: ':heavy_check_mark:'
@@ -270,9 +273,10 @@ data:
   - math/integer_arithmetic.hpp
   - math/lucas.hpp
   - math/fps/all.hpp
+  - math/fps/composition.hpp
+  - math/fps/formal_power_series.hpp
   - math/fps/convolution_ll.hpp
   - math/fps/floating_point_convolution.hpp
-  - math/fps/formal_power_series.hpp
   - math/fps/half_gcd.hpp
   - math/fps/lagrange_inversion.hpp
   - math/fps/linear_recurrence.hpp
@@ -300,7 +304,7 @@ data:
   isVerificationFile: false
   path: math/all.hpp
   requiredBy: []
-  timestamp: '2026-07-13 20:43:05+09:00'
+  timestamp: '2026-07-13 20:54:00+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
