@@ -3,6 +3,9 @@ data:
   _extendedDependsOn: []
   _extendedRequiredBy:
   - icon: ':heavy_check_mark:'
+    path: ds/range_query/range_sort_range_composite.hpp
+    title: Range Sort Range Composite
+  - icon: ':heavy_check_mark:'
     path: ds/segtree/dual_segtree.hpp
     title: Dual Segment Tree
   - icon: ':heavy_check_mark:'
@@ -24,6 +27,9 @@ data:
     path: math/all.hpp
     title: Math All
   _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/range_query/range_sort_range_composite.test.cpp
+    title: verify/ds/range_query/range_sort_range_composite.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/dual_segtree.test.cpp
     title: verify/ds/segtree/dual_segtree.test.cpp
@@ -62,6 +68,7 @@ data:
   isVerificationFile: false
   path: math/bit_ceil.hpp
   requiredBy:
+  - ds/range_query/range_sort_range_composite.hpp
   - ds/segtree/dual_segtree_2d.hpp
   - ds/segtree/segtree.hpp
   - ds/segtree/lazy_segtree.hpp
@@ -72,6 +79,7 @@ data:
   timestamp: '2026-06-15 01:47:39+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/ds/range_query/range_sort_range_composite.test.cpp
   - verify/ds/segtree/dual_segtree_2d.test.cpp
   - verify/ds/segtree/dual_segtree.test.cpp
   - verify/ds/segtree/segtree_2d.test.cpp

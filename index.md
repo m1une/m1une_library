@@ -354,6 +354,9 @@ data:
       path: ds/range_query/range_lis_query.hpp
       title: Static Range LIS Query
     - icon: ':heavy_check_mark:'
+      path: ds/range_query/range_sort_range_composite.hpp
+      title: Range Sort Range Composite
+    - icon: ':heavy_check_mark:'
       path: ds/range_query/sliding_window_aggregation.hpp
       title: Sliding Window Aggregation
     - icon: ':heavy_check_mark:'
@@ -1325,6 +1328,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/ds/range_query/range_lis_query.test.cpp
       title: verify/ds/range_query/range_lis_query.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/range_query/range_sort_range_composite.test.cpp
+      title: verify/ds/range_query/range_sort_range_composite.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/ds/range_query/sliding_window_aggregation.test.cpp
       title: verify/ds/range_query/sliding_window_aggregation.test.cpp

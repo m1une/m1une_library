@@ -36,6 +36,12 @@ data:
     path: ds/range_query/disjoint_sparse_table.hpp
     title: Disjoint Sparse Table
   - icon: ':heavy_check_mark:'
+    path: ds/range_query/range_sort_range_composite.hpp
+    title: Range Sort Range Composite
+  - icon: ':heavy_check_mark:'
+    path: ds/range_query/range_sort_range_composite.hpp
+    title: Range Sort Range Composite
+  - icon: ':heavy_check_mark:'
     path: ds/range_query/sliding_window_aggregation.hpp
     title: Sliding Window Aggregation
   - icon: ':heavy_check_mark:'
@@ -138,6 +144,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/range_query/disjoint_sparse_table.test.cpp
     title: verify/ds/range_query/disjoint_sparse_table.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/range_query/range_sort_range_composite.test.cpp
+    title: verify/ds/range_query/range_sort_range_composite.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/range_query/range_sort_range_composite.test.cpp
+    title: verify/ds/range_query/range_sort_range_composite.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/ds/range_query/sliding_window_aggregation.test.cpp
     title: verify/ds/range_query/sliding_window_aggregation.test.cpp
@@ -262,6 +274,8 @@ data:
   - ds/binary_trie/binary_trie_monoid.hpp
   - ds/range_query/sqrt_decomposition.hpp
   - ds/range_query/disjoint_sparse_table.hpp
+  - ds/range_query/range_sort_range_composite.hpp
+  - ds/range_query/range_sort_range_composite.hpp
   - ds/range_query/sliding_window_aggregation.hpp
   - ds/range_query/sparse_table.hpp
   - ds/range_query/sqrt_tree.hpp
@@ -299,6 +313,8 @@ data:
   - verify/ds/binary_trie/binary_trie_monoid.test.cpp
   - verify/ds/range_query/sliding_window_aggregation.test.cpp
   - verify/ds/range_query/sqrt_decomposition.test.cpp
+  - verify/ds/range_query/range_sort_range_composite.test.cpp
+  - verify/ds/range_query/range_sort_range_composite.test.cpp
   - verify/ds/range_query/sliding_window_aggregation_deque.test.cpp
   - verify/ds/range_query/sqrt_tree.test.cpp
   - verify/ds/range_query/sparse_table.test.cpp

@@ -7,8 +7,14 @@ data:
   - icon: ':heavy_check_mark:'
     path: monoid/concept.hpp
     title: Monoid Concept
-  _extendedRequiredBy: []
+  _extendedRequiredBy:
+  - icon: ':heavy_check_mark:'
+    path: ds/range_query/range_sort_range_composite.hpp
+    title: Range Sort Range Composite
   _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/range_query/range_sort_range_composite.test.cpp
+    title: verify/ds/range_query/range_sort_range_composite.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/segtree.test.cpp
     title: verify/ds/segtree/segtree.test.cpp
@@ -201,10 +207,12 @@ data:
   - monoid/concept.hpp
   isVerificationFile: false
   path: ds/segtree/segtree.hpp
-  requiredBy: []
+  requiredBy:
+  - ds/range_query/range_sort_range_composite.hpp
   timestamp: '2026-06-21 04:34:53+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/ds/range_query/range_sort_range_composite.test.cpp
   - verify/ds/segtree/segtree.test.cpp
 documentation_of: ds/segtree/segtree.hpp
 layout: document
