@@ -319,6 +319,9 @@ data:
     path: verify/math/matrix/characteristic_polynomial.test.cpp
     title: verify/math/matrix/characteristic_polynomial.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/matrix/hafnian.test.cpp
+    title: verify/math/matrix/hafnian.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/matrix/inverse_matrix.test.cpp
     title: verify/math/matrix/inverse_matrix.test.cpp
   - icon: ':heavy_check_mark:'
@@ -327,6 +330,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/matrix/matrix_product.test.cpp
     title: verify/math/matrix/matrix_product.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/matrix/pfaffian.test.cpp
+    title: verify/math/matrix/pfaffian.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/matrix/sparse_determinant.test.cpp
+    title: verify/math/matrix/sparse_determinant.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/modint.test.cpp
     title: verify/math/modint.test.cpp
@@ -695,8 +704,11 @@ data:
   - verify/math/fps/lagrange_inversion.test.cpp
   - verify/math/fps/fps_algorithms.test.cpp
   - verify/math/fps/fps_algorithms.test.cpp
+  - verify/math/matrix/hafnian.test.cpp
   - verify/math/matrix/inverse_matrix.test.cpp
+  - verify/math/matrix/pfaffian.test.cpp
   - verify/math/matrix/characteristic_polynomial.test.cpp
+  - verify/math/matrix/sparse_determinant.test.cpp
   - verify/math/matrix/matrix.test.cpp
   - verify/math/matrix/matrix_product.test.cpp
   - verify/math/sum_of_multiplicative_function.test.cpp

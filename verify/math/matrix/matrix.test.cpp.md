@@ -11,11 +11,20 @@ data:
     path: math/matrix/characteristic_polynomial.hpp
     title: Characteristic Polynomial
   - icon: ':heavy_check_mark:'
+    path: math/matrix/hafnian.hpp
+    title: Hafnian
+  - icon: ':heavy_check_mark:'
     path: math/matrix/linear_algebra.hpp
     title: Matrix Linear Algebra
   - icon: ':heavy_check_mark:'
     path: math/matrix/matrix.hpp
     title: Dense Matrix
+  - icon: ':heavy_check_mark:'
+    path: math/matrix/pfaffian.hpp
+    title: Pfaffian
+  - icon: ':heavy_check_mark:'
+    path: math/matrix/sparse_determinant.hpp
+    title: Sparse Determinant
   - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
@@ -443,6 +452,46 @@ data:
     \ <= row; degree++) {\n                current[std::size_t(degree)] -=\n     \
     \               factor * polynomial[std::size_t(row)][std::size_t(degree)];\n\
     \            }\n        }\n    }\n    return polynomial[std::size_t(size)];\n\
+    }\n\n}  // namespace matrix\n}  // namespace m1une\n\n\n#line 1 \"math/matrix/hafnian.hpp\"\
+    \n\n\n\n#line 7 \"math/matrix/hafnian.hpp\"\n\n#line 9 \"math/matrix/hafnian.hpp\"\
+    \n\nnamespace m1une {\nnamespace matrix {\nnamespace internal {\n\ntemplate <class\
+    \ T>\nclass HafnianSolver {\n    using Polynomial = std::vector<T>;\n    using\
+    \ PolynomialMatrix = std::vector<std::vector<Polynomial>>;\n\n    int _degree;\n\
+    \n    void add_shifted_product(Polynomial& result, const Polynomial& first,\n\
+    \                             const Polynomial& second) const {\n        for (int\
+    \ first_degree = 0; first_degree < _degree; first_degree++) {\n            for\
+    \ (int second_degree = 0;\n                 first_degree + second_degree + 1 <\
+    \ _degree;\n                 second_degree++) {\n                result[first_degree\
+    \ + second_degree + 1] +=\n                    first[first_degree] * second[second_degree];\n\
+    \            }\n        }\n    }\n\n    Polynomial solve(PolynomialMatrix matrix)\
+    \ const {\n        if (matrix.empty()) {\n            Polynomial result(_degree);\n\
+    \            result[0] = T(1);\n            return result;\n        }\n\n    \
+    \    std::vector<Polynomial> first = std::move(matrix.back());\n        matrix.pop_back();\n\
+    \        std::vector<Polynomial> second = std::move(matrix.back());\n        matrix.pop_back();\n\
+    \        const int remaining = int(matrix.size());\n        Polynomial first_to_pair\
+    \ = std::move(first[remaining]);\n\n        Polynomial result = solve(matrix);\n\
+    \        for (T& coefficient : result) coefficient = T() - coefficient;\n\n  \
+    \      for (int row = 0; row < remaining; row++) {\n            for (int col =\
+    \ 0; col < row; col++) {\n                add_shifted_product(matrix[row][col],\
+    \ first[row], second[col]);\n                add_shifted_product(matrix[row][col],\
+    \ second[row], first[col]);\n            }\n        }\n\n        Polynomial with_connections\
+    \ = solve(std::move(matrix));\n        add_shifted_product(result, first_to_pair,\
+    \ with_connections);\n        for (int degree = 0; degree < _degree; degree++)\
+    \ {\n            result[degree] += with_connections[degree];\n        }\n    \
+    \    return result;\n    }\n\n   public:\n    explicit HafnianSolver(int size)\
+    \ : _degree(size / 2 + 1) {}\n\n    T operator()(const Matrix<T>& matrix) const\
+    \ {\n        const int size = matrix.rows();\n        PolynomialMatrix polynomial_matrix(size);\n\
+    \        for (int row = 0; row < size; row++) {\n            polynomial_matrix[row].assign(row,\
+    \ Polynomial(_degree));\n            for (int col = 0; col < row; col++) {\n \
+    \               polynomial_matrix[row][col][0] = matrix[row][col];\n         \
+    \   }\n        }\n        return solve(std::move(polynomial_matrix)).back();\n\
+    \    }\n};\n\n}  // namespace internal\n\n// Returns the hafnian of an even-dimensional\
+    \ symmetric zero-diagonal matrix.\ntemplate <class T>\nT hafnian(const Matrix<T>&\
+    \ matrix) {\n    assert(matrix.rows() == matrix.cols());\n    const int size =\
+    \ matrix.rows();\n    assert(size % 2 == 0);\n\n#ifndef NDEBUG\n    for (int row\
+    \ = 0; row < size; row++) {\n        assert(matrix[row][row] == T());\n      \
+    \  for (int col = row + 1; col < size; col++) {\n            assert(matrix[row][col]\
+    \ == matrix[col][row]);\n        }\n    }\n#endif\n\n    return internal::HafnianSolver<T>(size)(matrix);\n\
     }\n\n}  // namespace matrix\n}  // namespace m1une\n\n\n#line 1 \"math/matrix/linear_algebra.hpp\"\
     \n\n\n\n#line 7 \"math/matrix/linear_algebra.hpp\"\n\n#line 9 \"math/matrix/linear_algebra.hpp\"\
     \n\nnamespace m1une {\nnamespace matrix {\n\ntemplate <class T>\nconstexpr T default_epsilon()\
@@ -544,7 +593,85 @@ data:
     \  direction[std::size_t(pivot_col)] = T() - augmented[row][free_col];\n     \
     \   }\n        result.nullspace_basis.push_back(std::move(direction));\n    }\n\
     \    return result;\n}\n\n}  // namespace matrix\n}  // namespace m1une\n\n\n\
-    #line 8 \"math/matrix/all.hpp\"\n\n\n#line 5 \"verify/math/matrix/matrix.test.cpp\"\
+    #line 1 \"math/matrix/pfaffian.hpp\"\n\n\n\n#line 6 \"math/matrix/pfaffian.hpp\"\
+    \n\n#line 8 \"math/matrix/pfaffian.hpp\"\n\nnamespace m1une {\nnamespace matrix\
+    \ {\n\n// Returns the Pfaffian of an even-dimensional alternating matrix over\
+    \ a field.\ntemplate <class T>\nT pfaffian(Matrix<T> matrix) {\n    assert(matrix.rows()\
+    \ == matrix.cols());\n    const int size = matrix.rows();\n    assert(size % 2\
+    \ == 0);\n\n#ifndef NDEBUG\n    for (int row = 0; row < size; row++) {\n     \
+    \   assert(matrix[row][row] == T());\n        for (int col = row + 1; col < size;\
+    \ col++) {\n            assert(matrix[row][col] == T() - matrix[col][row]);\n\
+    \        }\n    }\n#endif\n\n    T result = T(1);\n    for (int first = 0; first\
+    \ < size; first += 2) {\n        int pivot = first + 1;\n        while (pivot\
+    \ < size && matrix[first][pivot] == T()) pivot++;\n        if (pivot == size)\
+    \ return T();\n\n        if (pivot != first + 1) {\n            matrix.swap_rows(pivot,\
+    \ first + 1);\n            for (int row = 0; row < size; row++) {\n          \
+    \      std::swap(matrix[row][pivot], matrix[row][first + 1]);\n            }\n\
+    \            result = T() - result;\n        }\n\n        const int second = first\
+    \ + 1;\n        const T pivot_value = matrix[first][second];\n        result *=\
+    \ pivot_value;\n        const T inverse_pivot = T(1) / pivot_value;\n\n      \
+    \  for (int row = second + 1; row < size; row++) {\n            for (int col =\
+    \ row + 1; col < size; col++) {\n                matrix[row][col] +=\n       \
+    \             (matrix[second][row] * matrix[first][col] -\n                  \
+    \   matrix[first][row] * matrix[second][col]) *\n                    inverse_pivot;\n\
+    \                matrix[col][row] = T() - matrix[row][col];\n            }\n \
+    \       }\n    }\n    return result;\n}\n\n}  // namespace matrix\n}  // namespace\
+    \ m1une\n\n\n#line 1 \"math/matrix/sparse_determinant.hpp\"\n\n\n\n#line 8 \"\
+    math/matrix/sparse_determinant.hpp\"\n\nnamespace m1une {\nnamespace matrix {\n\
+    \ntemplate <class T>\nstruct SparseMatrixEntry {\n    int row;\n    int col;\n\
+    \    T value;\n};\n\nnamespace internal {\n\nstruct SparseDeterminantRandom {\n\
+    \    std::uint64_t state;\n\n    explicit SparseDeterminantRandom(std::uint64_t\
+    \ seed) : state(seed) {}\n\n    std::uint64_t operator()() {\n        std::uint64_t\
+    \ value = (state += 0x9e3779b97f4a7c15ULL);\n        value = (value ^ (value >>\
+    \ 30)) * 0xbf58476d1ce4e5b9ULL;\n        value = (value ^ (value >> 27)) * 0x94d049bb133111ebULL;\n\
+    \        return value ^ (value >> 31);\n    }\n};\n\ntemplate <class T>\nstd::vector<T>\
+    \ berlekamp_massey(const std::vector<T>& sequence) {\n    std::vector<T> recurrence(1,\
+    \ T(1));\n    std::vector<T> previous(1, T(1));\n    int degree = 0;\n    int\
+    \ shift = 1;\n    T previous_discrepancy = T(1);\n\n    for (int index = 0; index\
+    \ < int(sequence.size()); index++) {\n        T discrepancy = sequence[index];\n\
+    \        for (int i = 1; i <= degree; i++) {\n            discrepancy += recurrence[i]\
+    \ * sequence[index - i];\n        }\n        if (discrepancy == T()) {\n     \
+    \       shift++;\n            continue;\n        }\n\n        const T factor =\
+    \ discrepancy / previous_discrepancy;\n        std::vector<T> old_recurrence =\
+    \ recurrence;\n        if (int(recurrence.size()) < int(previous.size()) + shift)\
+    \ {\n            recurrence.resize(previous.size() + std::size_t(shift), T());\n\
+    \        }\n        for (int i = 0; i < int(previous.size()); i++) {\n       \
+    \     recurrence[i + shift] -= factor * previous[i];\n        }\n\n        if\
+    \ (2 * degree <= index) {\n            degree = index + 1 - degree;\n        \
+    \    previous = std::move(old_recurrence);\n            previous_discrepancy =\
+    \ discrepancy;\n            shift = 1;\n        } else {\n            shift++;\n\
+    \        }\n    }\n    recurrence.resize(std::size_t(degree + 1));\n    return\
+    \ recurrence;\n}\n\n}  // namespace internal\n\n// Randomized black-box determinant\
+    \ over a finite field. random_nonzero must\n// return independent nonzero field\
+    \ elements.\ntemplate <class T, class RandomValue>\nT sparse_determinant_with_randomizer(\n\
+    \    int size, const std::vector<SparseMatrixEntry<T>>& entries,\n    RandomValue\
+    \ random_nonzero\n) {\n    assert(size >= 0);\n    for (const SparseMatrixEntry<T>&\
+    \ entry : entries) {\n        assert(0 <= entry.row && entry.row < size);\n  \
+    \      assert(0 <= entry.col && entry.col < size);\n    }\n    if (size == 0)\
+    \ return T(1);\n\n    auto random_vector = [&]() {\n        std::vector<T> result(size);\n\
+    \        for (T& value : result) {\n            value = random_nonzero();\n  \
+    \          assert(value != T());\n        }\n        return result;\n    };\n\n\
+    \    while (true) {\n        std::vector<T> diagonal = random_vector();\n    \
+    \    std::vector<T> left = random_vector();\n        std::vector<T> state = random_vector();\n\
+    \        std::vector<T> sequence(std::size_t(2 * size));\n\n        for (int step\
+    \ = 0; step < 2 * size; step++) {\n            for (int i = 0; i < size; i++)\
+    \ sequence[step] += left[i] * state[i];\n            for (int i = 0; i < size;\
+    \ i++) state[i] *= diagonal[i];\n\n            std::vector<T> next(size);\n  \
+    \          for (const SparseMatrixEntry<T>& entry : entries) {\n             \
+    \   next[entry.row] += entry.value * state[entry.col];\n            }\n      \
+    \      state = std::move(next);\n        }\n\n        std::vector<T> recurrence\
+    \ = internal::berlekamp_massey(sequence);\n        if (recurrence.back() == T())\
+    \ return T();\n        if (int(recurrence.size()) != size + 1) continue;\n\n \
+    \       T determinant = recurrence.back();\n        if (size % 2 == 1) determinant\
+    \ = T() - determinant;\n        for (const T& value : diagonal) determinant /=\
+    \ value;\n        return determinant;\n    }\n}\n\ntemplate <class T>\nT sparse_determinant(\n\
+    \    int size, const std::vector<SparseMatrixEntry<T>>& entries,\n    std::uint64_t\
+    \ seed = 0x243f6a8885a308d3ULL\n) {\n    const std::uint64_t modulus = T::mod();\n\
+    \    assert(modulus > 1);\n    internal::SparseDeterminantRandom random(seed);\n\
+    \    auto random_nonzero = [&]() {\n        return T(1 + random() % (modulus -\
+    \ 1));\n    };\n    return sparse_determinant_with_randomizer<T>(size, entries,\
+    \ random_nonzero);\n}\n\n}  // namespace matrix\n}  // namespace m1une\n\n\n#line\
+    \ 11 \"math/matrix/all.hpp\"\n\n\n#line 5 \"verify/math/matrix/matrix.test.cpp\"\
     \n\n#line 7 \"verify/math/matrix/matrix.test.cpp\"\n#include <cmath>\n#line 11\
     \ \"verify/math/matrix/matrix.test.cpp\"\n\nnamespace {\n\nusing mint = m1une::math::modint998244353;\n\
     using m1une::matrix::Matrix;\n\ntemplate <class T>\nvoid assert_product_is_identity(const\
@@ -751,11 +878,14 @@ data:
   - math/matrix/bit_matrix.hpp
   - math/matrix/characteristic_polynomial.hpp
   - math/matrix/matrix.hpp
+  - math/matrix/hafnian.hpp
   - math/matrix/linear_algebra.hpp
+  - math/matrix/pfaffian.hpp
+  - math/matrix/sparse_determinant.hpp
   isVerificationFile: true
   path: verify/math/matrix/matrix.test.cpp
   requiredBy: []
-  timestamp: '2026-07-13 21:13:17+09:00'
+  timestamp: '2026-07-14 02:42:28+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/matrix/matrix.test.cpp

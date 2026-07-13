@@ -12,8 +12,14 @@ data:
     path: math/matrix/characteristic_polynomial.hpp
     title: Characteristic Polynomial
   - icon: ':heavy_check_mark:'
+    path: math/matrix/hafnian.hpp
+    title: Hafnian
+  - icon: ':heavy_check_mark:'
     path: math/matrix/linear_algebra.hpp
     title: Matrix Linear Algebra
+  - icon: ':heavy_check_mark:'
+    path: math/matrix/pfaffian.hpp
+    title: Pfaffian
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/math/math_algorithms.test.cpp
@@ -21,6 +27,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/matrix/characteristic_polynomial.test.cpp
     title: verify/math/matrix/characteristic_polynomial.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/matrix/hafnian.test.cpp
+    title: verify/math/matrix/hafnian.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/matrix/inverse_matrix.test.cpp
     title: verify/math/matrix/inverse_matrix.test.cpp
@@ -30,6 +39,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/matrix/matrix_product.test.cpp
     title: verify/math/matrix/matrix_product.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/matrix/pfaffian.test.cpp
+    title: verify/math/matrix/pfaffian.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/matrix/sparse_determinant.test.cpp
+    title: verify/math/matrix/sparse_determinant.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -213,14 +228,19 @@ data:
   requiredBy:
   - math/all.hpp
   - math/matrix/characteristic_polynomial.hpp
+  - math/matrix/hafnian.hpp
   - math/matrix/all.hpp
   - math/matrix/linear_algebra.hpp
+  - math/matrix/pfaffian.hpp
   timestamp: '2026-07-07 14:26:59+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
+  - verify/math/matrix/hafnian.test.cpp
   - verify/math/matrix/inverse_matrix.test.cpp
+  - verify/math/matrix/pfaffian.test.cpp
   - verify/math/matrix/characteristic_polynomial.test.cpp
+  - verify/math/matrix/sparse_determinant.test.cpp
   - verify/math/matrix/matrix.test.cpp
   - verify/math/matrix/matrix_product.test.cpp
 documentation_of: math/matrix/matrix.hpp

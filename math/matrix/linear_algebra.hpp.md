@@ -24,6 +24,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/matrix/matrix.test.cpp
     title: verify/math/matrix/matrix.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/matrix/pfaffian.test.cpp
+    title: verify/math/matrix/pfaffian.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/matrix/sparse_determinant.test.cpp
+    title: verify/math/matrix/sparse_determinant.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -331,7 +337,9 @@ data:
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
   - verify/math/matrix/inverse_matrix.test.cpp
+  - verify/math/matrix/pfaffian.test.cpp
   - verify/math/matrix/characteristic_polynomial.test.cpp
+  - verify/math/matrix/sparse_determinant.test.cpp
   - verify/math/matrix/matrix.test.cpp
 documentation_of: math/matrix/linear_algebra.hpp
 layout: document

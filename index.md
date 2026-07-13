@@ -855,11 +855,20 @@ data:
       path: math/matrix/characteristic_polynomial.hpp
       title: Characteristic Polynomial
     - icon: ':heavy_check_mark:'
+      path: math/matrix/hafnian.hpp
+      title: Hafnian
+    - icon: ':heavy_check_mark:'
       path: math/matrix/linear_algebra.hpp
       title: Matrix Linear Algebra
     - icon: ':heavy_check_mark:'
       path: math/matrix/matrix.hpp
       title: Dense Matrix
+    - icon: ':heavy_check_mark:'
+      path: math/matrix/pfaffian.hpp
+      title: Pfaffian
+    - icon: ':heavy_check_mark:'
+      path: math/matrix/sparse_determinant.hpp
+      title: Sparse Determinant
   - name: matroid
     pages:
     - icon: ':heavy_check_mark:'
@@ -1828,6 +1837,9 @@ data:
       path: verify/math/matrix/characteristic_polynomial.test.cpp
       title: verify/math/matrix/characteristic_polynomial.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/math/matrix/hafnian.test.cpp
+      title: verify/math/matrix/hafnian.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/math/matrix/inverse_matrix.test.cpp
       title: verify/math/matrix/inverse_matrix.test.cpp
     - icon: ':heavy_check_mark:'
@@ -1836,6 +1848,12 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/matrix/matrix_product.test.cpp
       title: verify/math/matrix/matrix_product.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/matrix/pfaffian.test.cpp
+      title: verify/math/matrix/pfaffian.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/matrix/sparse_determinant.test.cpp
+      title: verify/math/matrix/sparse_determinant.test.cpp
   - name: verify/matroid
     pages:
     - icon: ':heavy_check_mark:'
