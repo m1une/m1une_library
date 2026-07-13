@@ -15,6 +15,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/convex/li_chao_tree.test.cpp
     title: verify/convex/li_chao_tree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/convex/li_chao_tree_segment.test.cpp
+    title: verify/convex/li_chao_tree_segment.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -125,6 +128,7 @@ data:
   verifiedWith:
   - verify/convex/li_chao_tree.test.cpp
   - verify/convex/convex_hull_trick.test.cpp
+  - verify/convex/li_chao_tree_segment.test.cpp
 documentation_of: convex/convex_hull_trick.hpp
 layout: document
 title: Convex Hull Trick

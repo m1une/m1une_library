@@ -12,6 +12,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/convex/li_chao_tree.test.cpp
     title: verify/convex/li_chao_tree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/convex/li_chao_tree_segment.test.cpp
+    title: verify/convex/li_chao_tree_segment.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -217,6 +220,7 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/convex/li_chao_tree.test.cpp
+  - verify/convex/li_chao_tree_segment.test.cpp
 documentation_of: convex/li_chao_tree.hpp
 layout: document
 title: Li Chao Tree

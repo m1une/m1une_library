@@ -13,6 +13,9 @@ data:
     title: Undirected Graph Algorithms
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/graph/bipartite_matching.test.cpp
+    title: verify/graph/bipartite_matching.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/cow_game.test.cpp
     title: verify/graph/cow_game.test.cpp
   - icon: ':heavy_check_mark:'
@@ -408,6 +411,7 @@ data:
   verifiedWith:
   - verify/graph/cow_game.test.cpp
   - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/bipartite_matching.test.cpp
   - verify/graph/graph_algorithms.test.cpp
 documentation_of: graph/bipartite.hpp
 layout: document

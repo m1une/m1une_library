@@ -21,18 +21,21 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/range_edge_graph.test.cpp
     title: verify/graph/range_edge_graph.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/scc.test.cpp
+    title: verify/graph/scc.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"graph/scc.hpp\"\n\n\n\n#include <algorithm>\n#include <cassert>\n\
-    #include <utility>\n#include <vector>\n\n#line 1 \"graph/graph.hpp\"\n\n\n\n#line\
-    \ 7 \"graph/graph.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\ntemplate <class\
-    \ T = int>\nstruct Edge {\n    using cost_type = T;\n\n    int from;\n    int\
-    \ to;\n    T cost;\n    int id;\n    bool alive;\n\n    Edge() : from(-1), to(-1),\
-    \ cost(T()), id(-1), alive(true) {}\n    Edge(int from_, int to_, T cost_ = T(1),\
-    \ int id_ = -1, bool alive_ = true)\n        : from(from_), to(to_), cost(cost_),\
+    #include <cstddef>\n#include <utility>\n#include <vector>\n\n#line 1 \"graph/graph.hpp\"\
+    \n\n\n\n#line 7 \"graph/graph.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\n\
+    template <class T = int>\nstruct Edge {\n    using cost_type = T;\n\n    int from;\n\
+    \    int to;\n    T cost;\n    int id;\n    bool alive;\n\n    Edge() : from(-1),\
+    \ to(-1), cost(T()), id(-1), alive(true) {}\n    Edge(int from_, int to_, T cost_\
+    \ = T(1), int id_ = -1, bool alive_ = true)\n        : from(from_), to(to_), cost(cost_),\
     \ id(id_), alive(alive_) {}\n\n    int other(int v) const {\n        assert(v\
     \ == from || v == to);\n        return from ^ to ^ v;\n    }\n};\n\ntemplate <class\
     \ T = int>\nstruct Graph {\n    using edge_type = Edge<T>;\n    using cost_type\
@@ -81,7 +84,7 @@ data:
     \ e.from, e.cost, e.id, e.alive));\n                if (0 <= e.id && e.id < _edge_count)\
     \ result._edge_positions[e.id].push_back({e.to, idx});\n            }\n      \
     \  }\n        return result;\n    }\n};\n\n}  // namespace graph\n}  // namespace\
-    \ m1une\n\n\n#line 10 \"graph/scc.hpp\"\n\nnamespace m1une {\nnamespace graph\
+    \ m1une\n\n\n#line 11 \"graph/scc.hpp\"\n\nnamespace m1une {\nnamespace graph\
     \ {\n\nstruct SccResult {\n    int count;\n    std::vector<int> comp;\n    std::vector<std::vector<int>>\
     \ groups;\n\n    bool same(int u, int v) const {\n        assert(0 <= u && u <\
     \ int(comp.size()));\n        assert(0 <= v && v < int(comp.size()));\n      \
@@ -94,57 +97,76 @@ data:
     \        edges.erase(std::unique(edges.begin(), edges.end()), edges.end());\n\n\
     \        Graph<int> result(count);\n        for (auto [a, b] : edges) result.add_directed_edge(a,\
     \ b);\n        return result;\n    }\n};\n\ntemplate <class T>\nSccResult strongly_connected_components(const\
-    \ Graph<T>& g) {\n    int n = g.size();\n    std::vector<int> ord(n, -1), low(n,\
-    \ 0), comp(n, -1), stack;\n    std::vector<char> in_stack(n, false);\n    std::vector<std::vector<int>>\
-    \ groups;\n    int now = 0;\n\n    auto dfs = [&](auto self, int v) -> void {\n\
-    \        ord[v] = low[v] = now++;\n        stack.push_back(v);\n        in_stack[v]\
-    \ = true;\n\n        for (const auto& e : g[v]) {\n            if (!e.alive) continue;\n\
-    \            int to = e.to;\n            if (ord[to] == -1) {\n              \
-    \  self(self, to);\n                low[v] = std::min(low[v], low[to]);\n    \
-    \        } else if (in_stack[to]) {\n                low[v] = std::min(low[v],\
-    \ ord[to]);\n            }\n        }\n\n        if (low[v] != ord[v]) return;\n\
-    \        std::vector<int> group;\n        while (true) {\n            int u =\
-    \ stack.back();\n            stack.pop_back();\n            in_stack[u] = false;\n\
-    \            group.push_back(u);\n            if (u == v) break;\n        }\n\
-    \        groups.push_back(std::move(group));\n    };\n\n    for (int v = 0; v\
-    \ < n; v++) {\n        if (ord[v] == -1) dfs(dfs, v);\n    }\n\n    std::reverse(groups.begin(),\
-    \ groups.end());\n    for (int i = 0; i < int(groups.size()); i++) {\n       \
-    \ for (int v : groups[i]) comp[v] = i;\n    }\n\n    return SccResult{int(groups.size()),\
-    \ std::move(comp), std::move(groups)};\n}\n\n}  // namespace graph\n}  // namespace\
-    \ m1une\n\n\n"
+    \ Graph<T>& g) {\n    const int n = g.size();\n    std::vector<std::vector<int>>\
+    \ reverse_graph(n);\n    for (int vertex = 0; vertex < n; vertex++) {\n      \
+    \  for (const auto& edge : g[vertex]) {\n            if (edge.alive) reverse_graph[edge.to].push_back(vertex);\n\
+    \        }\n    }\n\n    std::vector<char> seen(n, false);\n    std::vector<int>\
+    \ order;\n    order.reserve(n);\n    std::vector<std::pair<int, std::size_t>>\
+    \ dfs_stack;\n    for (int start = 0; start < n; start++) {\n        if (seen[start])\
+    \ continue;\n        seen[start] = true;\n        dfs_stack.emplace_back(start,\
+    \ 0);\n        while (!dfs_stack.empty()) {\n            int vertex = dfs_stack.back().first;\n\
+    \            std::size_t& edge_index = dfs_stack.back().second;\n            while\
+    \ (edge_index < g[vertex].size() &&\n                   !g[vertex][edge_index].alive)\
+    \ {\n                edge_index++;\n            }\n            if (edge_index\
+    \ == g[vertex].size()) {\n                order.push_back(vertex);\n         \
+    \       dfs_stack.pop_back();\n                continue;\n            }\n    \
+    \        const int to = g[vertex][edge_index++].to;\n            if (!seen[to])\
+    \ {\n                seen[to] = true;\n                dfs_stack.emplace_back(to,\
+    \ 0);\n            }\n        }\n    }\n\n    std::vector<int> comp(n, -1);\n\
+    \    std::vector<std::vector<int>> groups;\n    std::vector<int> stack;\n    for\
+    \ (auto iterator = order.rbegin(); iterator != order.rend(); ++iterator) {\n \
+    \       const int start = *iterator;\n        if (comp[start] != -1) continue;\n\
+    \        const int component = int(groups.size());\n        groups.emplace_back();\n\
+    \        comp[start] = component;\n        stack.push_back(start);\n        while\
+    \ (!stack.empty()) {\n            const int vertex = stack.back();\n         \
+    \   stack.pop_back();\n            groups.back().push_back(vertex);\n        \
+    \    for (int to : reverse_graph[vertex]) {\n                if (comp[to] != -1)\
+    \ continue;\n                comp[to] = component;\n                stack.push_back(to);\n\
+    \            }\n        }\n    }\n\n    return SccResult{int(groups.size()), std::move(comp),\
+    \ std::move(groups)};\n}\n\n}  // namespace graph\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_GRAPH_SCC_HPP\n#define M1UNE_GRAPH_SCC_HPP 1\n\n#include <algorithm>\n\
-    #include <cassert>\n#include <utility>\n#include <vector>\n\n#include \"graph.hpp\"\
-    \n\nnamespace m1une {\nnamespace graph {\n\nstruct SccResult {\n    int count;\n\
-    \    std::vector<int> comp;\n    std::vector<std::vector<int>> groups;\n\n   \
-    \ bool same(int u, int v) const {\n        assert(0 <= u && u < int(comp.size()));\n\
-    \        assert(0 <= v && v < int(comp.size()));\n        return comp[u] == comp[v];\n\
-    \    }\n\n    template <class T>\n    Graph<int> dag(const Graph<T>& g) const\
-    \ {\n        std::vector<std::pair<int, int>> edges;\n        for (int v = 0;\
-    \ v < g.size(); v++) {\n            for (const auto& e : g[v]) {\n           \
-    \     if (!e.alive) continue;\n                int a = comp[e.from], b = comp[e.to];\n\
-    \                if (a != b) edges.emplace_back(a, b);\n            }\n      \
-    \  }\n        std::sort(edges.begin(), edges.end());\n        edges.erase(std::unique(edges.begin(),\
-    \ edges.end()), edges.end());\n\n        Graph<int> result(count);\n        for\
-    \ (auto [a, b] : edges) result.add_directed_edge(a, b);\n        return result;\n\
-    \    }\n};\n\ntemplate <class T>\nSccResult strongly_connected_components(const\
-    \ Graph<T>& g) {\n    int n = g.size();\n    std::vector<int> ord(n, -1), low(n,\
-    \ 0), comp(n, -1), stack;\n    std::vector<char> in_stack(n, false);\n    std::vector<std::vector<int>>\
-    \ groups;\n    int now = 0;\n\n    auto dfs = [&](auto self, int v) -> void {\n\
-    \        ord[v] = low[v] = now++;\n        stack.push_back(v);\n        in_stack[v]\
-    \ = true;\n\n        for (const auto& e : g[v]) {\n            if (!e.alive) continue;\n\
-    \            int to = e.to;\n            if (ord[to] == -1) {\n              \
-    \  self(self, to);\n                low[v] = std::min(low[v], low[to]);\n    \
-    \        } else if (in_stack[to]) {\n                low[v] = std::min(low[v],\
-    \ ord[to]);\n            }\n        }\n\n        if (low[v] != ord[v]) return;\n\
-    \        std::vector<int> group;\n        while (true) {\n            int u =\
-    \ stack.back();\n            stack.pop_back();\n            in_stack[u] = false;\n\
-    \            group.push_back(u);\n            if (u == v) break;\n        }\n\
-    \        groups.push_back(std::move(group));\n    };\n\n    for (int v = 0; v\
-    \ < n; v++) {\n        if (ord[v] == -1) dfs(dfs, v);\n    }\n\n    std::reverse(groups.begin(),\
-    \ groups.end());\n    for (int i = 0; i < int(groups.size()); i++) {\n       \
-    \ for (int v : groups[i]) comp[v] = i;\n    }\n\n    return SccResult{int(groups.size()),\
-    \ std::move(comp), std::move(groups)};\n}\n\n}  // namespace graph\n}  // namespace\
-    \ m1une\n\n#endif  // M1UNE_GRAPH_SCC_HPP\n"
+    #include <cassert>\n#include <cstddef>\n#include <utility>\n#include <vector>\n\
+    \n#include \"graph.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\nstruct SccResult\
+    \ {\n    int count;\n    std::vector<int> comp;\n    std::vector<std::vector<int>>\
+    \ groups;\n\n    bool same(int u, int v) const {\n        assert(0 <= u && u <\
+    \ int(comp.size()));\n        assert(0 <= v && v < int(comp.size()));\n      \
+    \  return comp[u] == comp[v];\n    }\n\n    template <class T>\n    Graph<int>\
+    \ dag(const Graph<T>& g) const {\n        std::vector<std::pair<int, int>> edges;\n\
+    \        for (int v = 0; v < g.size(); v++) {\n            for (const auto& e\
+    \ : g[v]) {\n                if (!e.alive) continue;\n                int a =\
+    \ comp[e.from], b = comp[e.to];\n                if (a != b) edges.emplace_back(a,\
+    \ b);\n            }\n        }\n        std::sort(edges.begin(), edges.end());\n\
+    \        edges.erase(std::unique(edges.begin(), edges.end()), edges.end());\n\n\
+    \        Graph<int> result(count);\n        for (auto [a, b] : edges) result.add_directed_edge(a,\
+    \ b);\n        return result;\n    }\n};\n\ntemplate <class T>\nSccResult strongly_connected_components(const\
+    \ Graph<T>& g) {\n    const int n = g.size();\n    std::vector<std::vector<int>>\
+    \ reverse_graph(n);\n    for (int vertex = 0; vertex < n; vertex++) {\n      \
+    \  for (const auto& edge : g[vertex]) {\n            if (edge.alive) reverse_graph[edge.to].push_back(vertex);\n\
+    \        }\n    }\n\n    std::vector<char> seen(n, false);\n    std::vector<int>\
+    \ order;\n    order.reserve(n);\n    std::vector<std::pair<int, std::size_t>>\
+    \ dfs_stack;\n    for (int start = 0; start < n; start++) {\n        if (seen[start])\
+    \ continue;\n        seen[start] = true;\n        dfs_stack.emplace_back(start,\
+    \ 0);\n        while (!dfs_stack.empty()) {\n            int vertex = dfs_stack.back().first;\n\
+    \            std::size_t& edge_index = dfs_stack.back().second;\n            while\
+    \ (edge_index < g[vertex].size() &&\n                   !g[vertex][edge_index].alive)\
+    \ {\n                edge_index++;\n            }\n            if (edge_index\
+    \ == g[vertex].size()) {\n                order.push_back(vertex);\n         \
+    \       dfs_stack.pop_back();\n                continue;\n            }\n    \
+    \        const int to = g[vertex][edge_index++].to;\n            if (!seen[to])\
+    \ {\n                seen[to] = true;\n                dfs_stack.emplace_back(to,\
+    \ 0);\n            }\n        }\n    }\n\n    std::vector<int> comp(n, -1);\n\
+    \    std::vector<std::vector<int>> groups;\n    std::vector<int> stack;\n    for\
+    \ (auto iterator = order.rbegin(); iterator != order.rend(); ++iterator) {\n \
+    \       const int start = *iterator;\n        if (comp[start] != -1) continue;\n\
+    \        const int component = int(groups.size());\n        groups.emplace_back();\n\
+    \        comp[start] = component;\n        stack.push_back(start);\n        while\
+    \ (!stack.empty()) {\n            const int vertex = stack.back();\n         \
+    \   stack.pop_back();\n            groups.back().push_back(vertex);\n        \
+    \    for (int to : reverse_graph[vertex]) {\n                if (comp[to] != -1)\
+    \ continue;\n                comp[to] = component;\n                stack.push_back(to);\n\
+    \            }\n        }\n    }\n\n    return SccResult{int(groups.size()), std::move(comp),\
+    \ std::move(groups)};\n}\n\n}  // namespace graph\n}  // namespace m1une\n\n#endif\
+    \  // M1UNE_GRAPH_SCC_HPP\n"
   dependsOn:
   - graph/graph.hpp
   isVerificationFile: false
@@ -152,12 +174,13 @@ data:
   requiredBy:
   - graph/all.hpp
   - graph/directed.hpp
-  timestamp: '2026-07-11 19:47:32+09:00'
+  timestamp: '2026-07-13 20:12:50+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/scc.test.cpp
 documentation_of: graph/scc.hpp
 layout: document
 title: Strongly Connected Components

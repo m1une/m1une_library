@@ -27,6 +27,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/tree/tree_algorithms.test.cpp
     title: verify/graph/tree/tree_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/tree_diameter.test.cpp
+    title: verify/graph/tree/tree_diameter.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -174,6 +177,7 @@ data:
   - verify/graph/cow_game.test.cpp
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/tree/tree_algorithms.test.cpp
+  - verify/graph/tree/tree_diameter.test.cpp
   - verify/graph/graph_algorithms.test.cpp
 documentation_of: graph/tree/diameter.hpp
 layout: document

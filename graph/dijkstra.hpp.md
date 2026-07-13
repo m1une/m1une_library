@@ -33,6 +33,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/replacement_paths.test.cpp
     title: verify/graph/replacement_paths.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/shortest_path.test.cpp
+    title: verify/graph/shortest_path.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -161,6 +164,7 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
+  - verify/graph/shortest_path.test.cpp
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/replacement_paths.test.cpp
   - verify/graph/graph_algorithms.test.cpp

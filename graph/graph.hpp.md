@@ -160,6 +160,9 @@ data:
     path: verify/graph/biconnected_components.test.cpp
     title: verify/graph/biconnected_components.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/bipartite_matching.test.cpp
+    title: verify/graph/bipartite_matching.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/block_cut_tree.test.cpp
     title: verify/graph/block_cut_tree.test.cpp
   - icon: ':heavy_check_mark:'
@@ -223,6 +226,12 @@ data:
     path: verify/graph/library_checker_maximum_independent_set.test.cpp
     title: verify/graph/library_checker_maximum_independent_set.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/minimum_spanning_tree.test.cpp
+    title: verify/graph/minimum_spanning_tree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/minimum_spanning_tree.test.cpp
+    title: verify/graph/minimum_spanning_tree.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/minimum_steiner_tree.test.cpp
     title: verify/graph/minimum_steiner_tree.test.cpp
   - icon: ':heavy_check_mark:'
@@ -237,6 +246,18 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/replacement_paths.test.cpp
     title: verify/graph/replacement_paths.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/scc.test.cpp
+    title: verify/graph/scc.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/scc.test.cpp
+    title: verify/graph/scc.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/shortest_path.test.cpp
+    title: verify/graph/shortest_path.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/shortest_path.test.cpp
+    title: verify/graph/shortest_path.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/tree/cartesian_tree.test.cpp
     title: verify/graph/tree/cartesian_tree.test.cpp
@@ -264,6 +285,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/tree/tree_algorithms.test.cpp
     title: verify/graph/tree/tree_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/tree_diameter.test.cpp
+    title: verify/graph/tree/tree_diameter.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/tree_diameter.test.cpp
+    title: verify/graph/tree/tree_diameter.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
     title: verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
@@ -467,10 +494,15 @@ data:
   - verify/graph/minimum_steiner_tree.test.cpp
   - verify/graph/library_checker_general_matching.test.cpp
   - verify/graph/library_checker_general_matching.test.cpp
+  - verify/graph/shortest_path.test.cpp
+  - verify/graph/shortest_path.test.cpp
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/bipartite_matching.test.cpp
   - verify/graph/eulerian_trail_undirected.test.cpp
   - verify/graph/eulerian_trail_directed.test.cpp
+  - verify/graph/minimum_spanning_tree.test.cpp
+  - verify/graph/minimum_spanning_tree.test.cpp
   - verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
   - verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
   - verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
@@ -480,6 +512,8 @@ data:
   - verify/graph/tree/vertex_add_subtree_sum.test.cpp
   - verify/graph/tree/tree_algorithms.test.cpp
   - verify/graph/tree/tree_algorithms.test.cpp
+  - verify/graph/tree/tree_diameter.test.cpp
+  - verify/graph/tree/tree_diameter.test.cpp
   - verify/graph/tree/distance_frequency.test.cpp
   - verify/graph/tree/distance_frequency.test.cpp
   - verify/graph/tree/dsu_on_tree.test.cpp
@@ -501,6 +535,8 @@ data:
   - verify/graph/chromatic_number.test.cpp
   - verify/graph/directed_mst.test.cpp
   - verify/graph/two_edge_connected_components.test.cpp
+  - verify/graph/scc.test.cpp
+  - verify/graph/scc.test.cpp
 documentation_of: graph/graph.hpp
 layout: document
 title: Graph

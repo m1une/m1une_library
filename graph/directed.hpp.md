@@ -393,39 +393,49 @@ data:
     \         }\n        }\n    } else if (degree[chosen_start] == 0) {\n        return\
     \ std::nullopt;\n    }\n    return internal::hierholzer(graph, chosen_start, active_edge_count);\n\
     }\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/scc.hpp\"\
-    \n\n\n\n#line 8 \"graph/scc.hpp\"\n\n#line 10 \"graph/scc.hpp\"\n\nnamespace m1une\
-    \ {\nnamespace graph {\n\nstruct SccResult {\n    int count;\n    std::vector<int>\
-    \ comp;\n    std::vector<std::vector<int>> groups;\n\n    bool same(int u, int\
-    \ v) const {\n        assert(0 <= u && u < int(comp.size()));\n        assert(0\
-    \ <= v && v < int(comp.size()));\n        return comp[u] == comp[v];\n    }\n\n\
-    \    template <class T>\n    Graph<int> dag(const Graph<T>& g) const {\n     \
-    \   std::vector<std::pair<int, int>> edges;\n        for (int v = 0; v < g.size();\
-    \ v++) {\n            for (const auto& e : g[v]) {\n                if (!e.alive)\
-    \ continue;\n                int a = comp[e.from], b = comp[e.to];\n         \
-    \       if (a != b) edges.emplace_back(a, b);\n            }\n        }\n    \
-    \    std::sort(edges.begin(), edges.end());\n        edges.erase(std::unique(edges.begin(),\
-    \ edges.end()), edges.end());\n\n        Graph<int> result(count);\n        for\
-    \ (auto [a, b] : edges) result.add_directed_edge(a, b);\n        return result;\n\
-    \    }\n};\n\ntemplate <class T>\nSccResult strongly_connected_components(const\
-    \ Graph<T>& g) {\n    int n = g.size();\n    std::vector<int> ord(n, -1), low(n,\
-    \ 0), comp(n, -1), stack;\n    std::vector<char> in_stack(n, false);\n    std::vector<std::vector<int>>\
-    \ groups;\n    int now = 0;\n\n    auto dfs = [&](auto self, int v) -> void {\n\
-    \        ord[v] = low[v] = now++;\n        stack.push_back(v);\n        in_stack[v]\
-    \ = true;\n\n        for (const auto& e : g[v]) {\n            if (!e.alive) continue;\n\
-    \            int to = e.to;\n            if (ord[to] == -1) {\n              \
-    \  self(self, to);\n                low[v] = std::min(low[v], low[to]);\n    \
-    \        } else if (in_stack[to]) {\n                low[v] = std::min(low[v],\
-    \ ord[to]);\n            }\n        }\n\n        if (low[v] != ord[v]) return;\n\
-    \        std::vector<int> group;\n        while (true) {\n            int u =\
-    \ stack.back();\n            stack.pop_back();\n            in_stack[u] = false;\n\
-    \            group.push_back(u);\n            if (u == v) break;\n        }\n\
-    \        groups.push_back(std::move(group));\n    };\n\n    for (int v = 0; v\
-    \ < n; v++) {\n        if (ord[v] == -1) dfs(dfs, v);\n    }\n\n    std::reverse(groups.begin(),\
-    \ groups.end());\n    for (int i = 0; i < int(groups.size()); i++) {\n       \
-    \ for (int v : groups[i]) comp[v] = i;\n    }\n\n    return SccResult{int(groups.size()),\
-    \ std::move(comp), std::move(groups)};\n}\n\n}  // namespace graph\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"graph/shortest_path.hpp\"\n\n\n\n#line 1 \"graph/bellman_ford.hpp\"\
-    \n\n\n\n#line 6 \"graph/bellman_ford.hpp\"\n#include <limits>\n#include <queue>\n\
+    \n\n\n\n#line 6 \"graph/scc.hpp\"\n#include <cstddef>\n#line 9 \"graph/scc.hpp\"\
+    \n\n#line 11 \"graph/scc.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\nstruct\
+    \ SccResult {\n    int count;\n    std::vector<int> comp;\n    std::vector<std::vector<int>>\
+    \ groups;\n\n    bool same(int u, int v) const {\n        assert(0 <= u && u <\
+    \ int(comp.size()));\n        assert(0 <= v && v < int(comp.size()));\n      \
+    \  return comp[u] == comp[v];\n    }\n\n    template <class T>\n    Graph<int>\
+    \ dag(const Graph<T>& g) const {\n        std::vector<std::pair<int, int>> edges;\n\
+    \        for (int v = 0; v < g.size(); v++) {\n            for (const auto& e\
+    \ : g[v]) {\n                if (!e.alive) continue;\n                int a =\
+    \ comp[e.from], b = comp[e.to];\n                if (a != b) edges.emplace_back(a,\
+    \ b);\n            }\n        }\n        std::sort(edges.begin(), edges.end());\n\
+    \        edges.erase(std::unique(edges.begin(), edges.end()), edges.end());\n\n\
+    \        Graph<int> result(count);\n        for (auto [a, b] : edges) result.add_directed_edge(a,\
+    \ b);\n        return result;\n    }\n};\n\ntemplate <class T>\nSccResult strongly_connected_components(const\
+    \ Graph<T>& g) {\n    const int n = g.size();\n    std::vector<std::vector<int>>\
+    \ reverse_graph(n);\n    for (int vertex = 0; vertex < n; vertex++) {\n      \
+    \  for (const auto& edge : g[vertex]) {\n            if (edge.alive) reverse_graph[edge.to].push_back(vertex);\n\
+    \        }\n    }\n\n    std::vector<char> seen(n, false);\n    std::vector<int>\
+    \ order;\n    order.reserve(n);\n    std::vector<std::pair<int, std::size_t>>\
+    \ dfs_stack;\n    for (int start = 0; start < n; start++) {\n        if (seen[start])\
+    \ continue;\n        seen[start] = true;\n        dfs_stack.emplace_back(start,\
+    \ 0);\n        while (!dfs_stack.empty()) {\n            int vertex = dfs_stack.back().first;\n\
+    \            std::size_t& edge_index = dfs_stack.back().second;\n            while\
+    \ (edge_index < g[vertex].size() &&\n                   !g[vertex][edge_index].alive)\
+    \ {\n                edge_index++;\n            }\n            if (edge_index\
+    \ == g[vertex].size()) {\n                order.push_back(vertex);\n         \
+    \       dfs_stack.pop_back();\n                continue;\n            }\n    \
+    \        const int to = g[vertex][edge_index++].to;\n            if (!seen[to])\
+    \ {\n                seen[to] = true;\n                dfs_stack.emplace_back(to,\
+    \ 0);\n            }\n        }\n    }\n\n    std::vector<int> comp(n, -1);\n\
+    \    std::vector<std::vector<int>> groups;\n    std::vector<int> stack;\n    for\
+    \ (auto iterator = order.rbegin(); iterator != order.rend(); ++iterator) {\n \
+    \       const int start = *iterator;\n        if (comp[start] != -1) continue;\n\
+    \        const int component = int(groups.size());\n        groups.emplace_back();\n\
+    \        comp[start] = component;\n        stack.push_back(start);\n        while\
+    \ (!stack.empty()) {\n            const int vertex = stack.back();\n         \
+    \   stack.pop_back();\n            groups.back().push_back(vertex);\n        \
+    \    for (int to : reverse_graph[vertex]) {\n                if (comp[to] != -1)\
+    \ continue;\n                comp[to] = component;\n                stack.push_back(to);\n\
+    \            }\n        }\n    }\n\n    return SccResult{int(groups.size()), std::move(comp),\
+    \ std::move(groups)};\n}\n\n}  // namespace graph\n}  // namespace m1une\n\n\n\
+    #line 1 \"graph/shortest_path.hpp\"\n\n\n\n#line 1 \"graph/bellman_ford.hpp\"\n\
+    \n\n\n#line 6 \"graph/bellman_ford.hpp\"\n#include <limits>\n#include <queue>\n\
     #line 9 \"graph/bellman_ford.hpp\"\n\n#line 11 \"graph/bellman_ford.hpp\"\n\n\
     namespace m1une {\nnamespace graph {\n\ntemplate <class T>\nstruct BellmanFordResult\
     \ {\n    std::vector<T> dist;\n    std::vector<int> parent;\n    std::vector<int>\
@@ -765,27 +775,26 @@ data:
     \ s, int inf = std::numeric_limits<int>::max() / 2) {\n    return zero_one_bfs(g,\
     \ std::vector<int>{s}, inf);\n}\n\n}  // namespace graph\n}  // namespace m1une\n\
     \n\n#line 12 \"graph/shortest_path.hpp\"\n\n\n#line 1 \"graph/two_sat.hpp\"\n\n\
-    \n\n#line 5 \"graph/two_sat.hpp\"\n#include <cstddef>\n#line 9 \"graph/two_sat.hpp\"\
-    \n\nnamespace m1une {\nnamespace graph {\n\n// A 2-SAT solver using iterative\
-    \ strongly connected components.\nstruct TwoSat {\n   private:\n    struct Csr\
-    \ {\n        std::vector<int> start;\n        std::vector<int> to;\n    };\n\n\
-    \    int _n;\n    std::vector<std::pair<int, int>> _edges;\n    bool _solved;\n\
-    \    bool _satisfiable;\n    std::vector<bool> _answer;\n\n    int node(int variable,\
-    \ bool value) const {\n        assert(0 <= variable && variable < _n);\n     \
-    \   return 2 * variable + int(value);\n    }\n\n    void add_edge(int from, int\
-    \ to) {\n        _edges.emplace_back(from, to);\n        _solved = false;\n  \
-    \      _answer.clear();\n    }\n\n    Csr build_csr(bool reverse) const {\n  \
-    \      int vertices = 2 * _n;\n        Csr graph;\n        graph.start.assign(vertices\
-    \ + 1, 0);\n        graph.to.resize(_edges.size());\n\n        for (auto [from,\
-    \ to] : _edges) {\n            int source = reverse ? to : from;\n           \
-    \ graph.start[source + 1]++;\n        }\n        for (int v = 0; v < vertices;\
-    \ v++) {\n            graph.start[v + 1] += graph.start[v];\n        }\n\n   \
-    \     std::vector<int> cursor = graph.start;\n        for (auto [from, to] : _edges)\
-    \ {\n            int source = reverse ? to : from;\n            int target = reverse\
-    \ ? from : to;\n            graph.to[cursor[source]++] = target;\n        }\n\
-    \        return graph;\n    }\n\n   public:\n    TwoSat() : TwoSat(0) {}\n\n \
-    \   explicit TwoSat(int n)\n        : _n(n), _solved(false), _satisfiable(false)\
-    \ {\n        assert(0 <= n);\n        assert(n <= std::numeric_limits<int>::max()\
+    \n\n#line 9 \"graph/two_sat.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\n\
+    // A 2-SAT solver using iterative strongly connected components.\nstruct TwoSat\
+    \ {\n   private:\n    struct Csr {\n        std::vector<int> start;\n        std::vector<int>\
+    \ to;\n    };\n\n    int _n;\n    std::vector<std::pair<int, int>> _edges;\n \
+    \   bool _solved;\n    bool _satisfiable;\n    std::vector<bool> _answer;\n\n\
+    \    int node(int variable, bool value) const {\n        assert(0 <= variable\
+    \ && variable < _n);\n        return 2 * variable + int(value);\n    }\n\n   \
+    \ void add_edge(int from, int to) {\n        _edges.emplace_back(from, to);\n\
+    \        _solved = false;\n        _answer.clear();\n    }\n\n    Csr build_csr(bool\
+    \ reverse) const {\n        int vertices = 2 * _n;\n        Csr graph;\n     \
+    \   graph.start.assign(vertices + 1, 0);\n        graph.to.resize(_edges.size());\n\
+    \n        for (auto [from, to] : _edges) {\n            int source = reverse ?\
+    \ to : from;\n            graph.start[source + 1]++;\n        }\n        for (int\
+    \ v = 0; v < vertices; v++) {\n            graph.start[v + 1] += graph.start[v];\n\
+    \        }\n\n        std::vector<int> cursor = graph.start;\n        for (auto\
+    \ [from, to] : _edges) {\n            int source = reverse ? to : from;\n    \
+    \        int target = reverse ? from : to;\n            graph.to[cursor[source]++]\
+    \ = target;\n        }\n        return graph;\n    }\n\n   public:\n    TwoSat()\
+    \ : TwoSat(0) {}\n\n    explicit TwoSat(int n)\n        : _n(n), _solved(false),\
+    \ _satisfiable(false) {\n        assert(0 <= n);\n        assert(n <= std::numeric_limits<int>::max()\
     \ / 2);\n    }\n\n    int size() const {\n        return _n;\n    }\n\n    bool\
     \ empty() const {\n        return _n == 0;\n    }\n\n    // Reserves space for\
     \ approximately `clause_count` two-literal clauses.\n    void reserve(std::size_t\
@@ -886,7 +895,7 @@ data:
   path: graph/directed.hpp
   requiredBy:
   - graph/all.hpp
-  timestamp: '2026-07-13 04:00:23+09:00'
+  timestamp: '2026-07-13 20:12:50+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
