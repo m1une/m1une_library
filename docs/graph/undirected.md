@@ -22,6 +22,7 @@ where direction should not matter.
 | `graph/biconnected_components.hpp` | Undirected only | Vertex-biconnected blocks, articulation points, and block incidence. |
 | `graph/block_cut_tree.hpp` | Undirected only | Block-cut forest and original-vertex-to-node mappings. |
 | `graph/two_edge_connected_components.hpp` | Undirected only | Two-edge-connected components, bridges, and the contracted bridge forest. |
+| `graph/three_edge_connected_components.hpp` | Undirected only | Linear-time three-edge-connected vertex decomposition. |
 | `graph/kruskal.hpp` | Undirected only | Minimum spanning forest. |
 | `graph/bipartite.hpp` | Direction ignored / explicit bipartite sides | Two-colorability, maximum matching, minimum vertex cover, maximum independent set, and minimum edge cover. |
 | `graph/general_matching.hpp` | Undirected only | Maximum-cardinality matching and minimum edge cover in general undirected graphs. |

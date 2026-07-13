@@ -20,6 +20,7 @@
 #include "namori.hpp"
 #include "replacement_paths.hpp"
 #include "shortest_path.hpp"
+#include "three_edge_connected_components.hpp"
 #include "two_edge_connected_components.hpp"
 
 #endif  // M1UNE_GRAPH_UNDIRECTED_HPP
