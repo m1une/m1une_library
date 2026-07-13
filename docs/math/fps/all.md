@@ -11,6 +11,7 @@ documentation_of: ../../../math/fps/all.hpp
 
 | Header | Contents |
 | --- | --- |
+| `math/fps/composition.hpp` | Fast truncated formal power series composition. |
 | `math/fps/convolution.hpp` | Naive, NTT, and CRT-based convolution. |
 | `math/fps/convolution_ll.hpp` | Exact signed 64-bit convolution using three NTT primes. |
 | `math/fps/floating_point_convolution.hpp` | FFT convolution for real, complex, and rounded integral coefficients. |
