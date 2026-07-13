@@ -124,6 +124,12 @@ data:
     path: verify/ds/segtree/segtree_beats.test.cpp
     title: verify/ds/segtree/segtree_beats.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/counting_spanning_tree_directed.test.cpp
+    title: verify/graph/counting_spanning_tree_directed.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/counting_spanning_tree_undirected.test.cpp
+    title: verify/graph/counting_spanning_tree_undirected.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/cow_game.test.cpp
     title: verify/graph/cow_game.test.cpp
   - icon: ':heavy_check_mark:'
@@ -746,8 +752,10 @@ data:
   - verify/graph/tree/tree_algorithms.test.cpp
   - verify/graph/tree/distance_frequency.test.cpp
   - verify/graph/tree/distance_frequency.test.cpp
+  - verify/graph/counting_spanning_tree_directed.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/counting_spanning_tree_undirected.test.cpp
 documentation_of: math/modint.hpp
 layout: document
 title: ModInt

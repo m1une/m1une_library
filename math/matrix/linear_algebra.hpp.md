@@ -6,12 +6,39 @@ data:
     title: Dense Matrix
   _extendedRequiredBy:
   - icon: ':heavy_check_mark:'
+    path: graph/all.hpp
+    title: Graph All
+  - icon: ':heavy_check_mark:'
+    path: graph/directed.hpp
+    title: Directed Graph Algorithms
+  - icon: ':heavy_check_mark:'
+    path: graph/matrix_tree_theorem.hpp
+    title: Matrix-Tree Theorem
+  - icon: ':heavy_check_mark:'
+    path: graph/undirected.hpp
+    title: Undirected Graph Algorithms
+  - icon: ':heavy_check_mark:'
     path: math/all.hpp
     title: Math All
   - icon: ':heavy_check_mark:'
     path: math/matrix/all.hpp
     title: Matrix Bundle
   _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/counting_spanning_tree_directed.test.cpp
+    title: verify/graph/counting_spanning_tree_directed.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/counting_spanning_tree_undirected.test.cpp
+    title: verify/graph/counting_spanning_tree_undirected.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/cow_game.test.cpp
+    title: verify/graph/cow_game.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/graph_algorithms.test.cpp
+    title: verify/graph/graph_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/range_edge_graph.test.cpp
+    title: verify/graph/range_edge_graph.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
@@ -341,6 +368,10 @@ data:
   requiredBy:
   - math/all.hpp
   - math/matrix/all.hpp
+  - graph/all.hpp
+  - graph/matrix_tree_theorem.hpp
+  - graph/undirected.hpp
+  - graph/directed.hpp
   timestamp: '2026-07-07 14:26:59+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
@@ -353,6 +384,11 @@ data:
   - verify/math/matrix/sparse_determinant.test.cpp
   - verify/math/matrix/matrix.test.cpp
   - verify/math/matrix/matrix_rank.test.cpp
+  - verify/graph/cow_game.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/counting_spanning_tree_directed.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/counting_spanning_tree_undirected.test.cpp
 documentation_of: math/matrix/linear_algebra.hpp
 layout: document
 title: Matrix Linear Algebra

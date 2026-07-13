@@ -588,6 +588,9 @@ data:
       path: graph/lowlink.hpp
       title: LowLink
     - icon: ':heavy_check_mark:'
+      path: graph/matrix_tree_theorem.hpp
+      title: Matrix-Tree Theorem
+    - icon: ':heavy_check_mark:'
       path: graph/maximum_clique.hpp
       title: Maximum Clique, Independent Set, and Vertex Cover
     - icon: ':heavy_check_mark:'
@@ -1547,6 +1550,12 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/graph/complement_connected_components.test.cpp
       title: verify/graph/complement_connected_components.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/counting_spanning_tree_directed.test.cpp
+      title: verify/graph/counting_spanning_tree_directed.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/counting_spanning_tree_undirected.test.cpp
+      title: verify/graph/counting_spanning_tree_undirected.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/graph/cow_game.test.cpp
       title: verify/graph/cow_game.test.cpp

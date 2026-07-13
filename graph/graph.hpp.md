@@ -78,6 +78,9 @@ data:
     path: graph/lowlink.hpp
     title: LowLink
   - icon: ':heavy_check_mark:'
+    path: graph/matrix_tree_theorem.hpp
+    title: Matrix-Tree Theorem
+  - icon: ':heavy_check_mark:'
     path: graph/maximum_clique.hpp
     title: Maximum Clique, Independent Set, and Vertex Cover
   - icon: ':heavy_check_mark:'
@@ -201,6 +204,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/complement_connected_components.test.cpp
     title: verify/graph/complement_connected_components.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/counting_spanning_tree_directed.test.cpp
+    title: verify/graph/counting_spanning_tree_directed.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/counting_spanning_tree_undirected.test.cpp
+    title: verify/graph/counting_spanning_tree_undirected.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/cow_game.test.cpp
     title: verify/graph/cow_game.test.cpp
@@ -518,6 +527,7 @@ data:
   - graph/all.hpp
   - graph/all.hpp
   - graph/lowlink.hpp
+  - graph/matrix_tree_theorem.hpp
   - graph/zero_one_bfs.hpp
   - graph/block_cut_tree.hpp
   - graph/complement_connected_components.hpp
@@ -586,6 +596,7 @@ data:
   - verify/graph/cycle_detection.test.cpp
   - verify/graph/cycle_detection.test.cpp
   - verify/graph/block_cut_tree.test.cpp
+  - verify/graph/counting_spanning_tree_directed.test.cpp
   - verify/graph/k_shortest_walk.test.cpp
   - verify/graph/enumerate_triangles.test.cpp
   - verify/graph/enumerate_triangles.test.cpp
@@ -601,6 +612,7 @@ data:
   - verify/graph/general_weighted_matching.test.cpp
   - verify/graph/scc.test.cpp
   - verify/graph/scc.test.cpp
+  - verify/graph/counting_spanning_tree_undirected.test.cpp
 documentation_of: graph/graph.hpp
 layout: document
 title: Graph
