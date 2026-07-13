@@ -15,6 +15,9 @@ data:
     path: graph/all.hpp
     title: Graph All
   - icon: ':heavy_check_mark:'
+    path: graph/complement_connected_components.hpp
+    title: Complement-Graph Connected Components
+  - icon: ':heavy_check_mark:'
     path: graph/connected_components.hpp
     title: Connected Components
   - icon: ':heavy_check_mark:'
@@ -45,6 +48,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/manhattan_mst.test.cpp
     title: verify/geometry/manhattan_mst.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/complement_connected_components.test.cpp
+    title: verify/graph/complement_connected_components.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/cow_game.test.cpp
     title: verify/graph/cow_game.test.cpp
@@ -144,6 +150,7 @@ data:
   - graph/kruskal.hpp
   - graph/connected_components.hpp
   - graph/all.hpp
+  - graph/complement_connected_components.hpp
   - graph/undirected.hpp
   timestamp: '2026-07-13 06:09:24+09:00'
   verificationStatus: LIBRARY_ALL_AC
@@ -159,6 +166,7 @@ data:
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/minimum_spanning_tree.test.cpp
   - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/complement_connected_components.test.cpp
 documentation_of: ds/dsu/dsu.hpp
 layout: document
 title: DSU (Disjoint Set Union)

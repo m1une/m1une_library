@@ -24,8 +24,14 @@ data:
     path: graph/block_cut_tree.hpp
     title: Block-Cut Tree
   - icon: ':heavy_check_mark:'
+    path: graph/chordal_graph_recognition.hpp
+    title: Chordal Graph Recognition
+  - icon: ':heavy_check_mark:'
     path: graph/chromatic_number.hpp
     title: Chromatic Number
+  - icon: ':heavy_check_mark:'
+    path: graph/complement_connected_components.hpp
+    title: Complement-Graph Connected Components
   - icon: ':heavy_check_mark:'
     path: graph/connected_components.hpp
     title: Connected Components
@@ -178,6 +184,9 @@ data:
     path: verify/graph/block_cut_tree.test.cpp
     title: verify/graph/block_cut_tree.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/chordal_graph_recognition.test.cpp
+    title: verify/graph/chordal_graph_recognition.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/chromatic_number.test.cpp
     title: verify/graph/chromatic_number.test.cpp
   - icon: ':heavy_check_mark:'
@@ -189,6 +198,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/chromatic_number_randomized.test.cpp
     title: verify/graph/chromatic_number_randomized.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/complement_connected_components.test.cpp
+    title: verify/graph/complement_connected_components.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/cow_game.test.cpp
     title: verify/graph/cow_game.test.cpp
@@ -496,10 +508,12 @@ data:
   - graph/lowlink.hpp
   - graph/zero_one_bfs.hpp
   - graph/block_cut_tree.hpp
+  - graph/complement_connected_components.hpp
   - graph/general_weighted_matching.hpp
   - graph/grid.hpp
   - graph/topological_sort.hpp
   - graph/cycle_detection.hpp
+  - graph/chordal_graph_recognition.hpp
   - graph/bfs.hpp
   - graph/warshall_floyd.hpp
   - graph/biconnected_components.hpp
@@ -521,6 +535,7 @@ data:
   - verify/graph/minimum_steiner_tree.test.cpp
   - verify/graph/library_checker_general_matching.test.cpp
   - verify/graph/library_checker_general_matching.test.cpp
+  - verify/graph/chordal_graph_recognition.test.cpp
   - verify/graph/shortest_path.test.cpp
   - verify/graph/shortest_path.test.cpp
   - verify/graph/range_edge_graph.test.cpp
@@ -561,6 +576,7 @@ data:
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/bipartite_edge_coloring.test.cpp
+  - verify/graph/complement_connected_components.test.cpp
   - verify/graph/namori.test.cpp
   - verify/graph/chromatic_number.test.cpp
   - verify/graph/chromatic_number.test.cpp

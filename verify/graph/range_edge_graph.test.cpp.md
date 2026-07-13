@@ -26,8 +26,14 @@ data:
     path: graph/block_cut_tree.hpp
     title: Block-Cut Tree
   - icon: ':heavy_check_mark:'
+    path: graph/chordal_graph_recognition.hpp
+    title: Chordal Graph Recognition
+  - icon: ':heavy_check_mark:'
     path: graph/chromatic_number.hpp
     title: Chromatic Number
+  - icon: ':heavy_check_mark:'
+    path: graph/complement_connected_components.hpp
+    title: Complement-Graph Connected Components
   - icon: ':heavy_check_mark:'
     path: graph/connected_components.hpp
     title: Connected Components
@@ -4395,7 +4401,76 @@ data:
     \            result.forest[block_node].push_back(node);\n        }\n    }\n  \
     \  return result;\n}\n\ntemplate <class T>\nBlockCutTreeResult block_cut_tree(const\
     \ Graph<T>& graph) {\n    return block_cut_tree(biconnected_components(graph));\n\
-    }\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/chromatic_number.hpp\"\
+    }\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/chordal_graph_recognition.hpp\"\
+    \n\n\n\n#line 9 \"graph/chordal_graph_recognition.hpp\"\n\n#line 11 \"graph/chordal_graph_recognition.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\nstruct ChordalGraphResult {\n    bool\
+    \ is_chordal;\n    std::vector<int> perfect_elimination_order;\n    std::vector<int>\
+    \ induced_cycle;\n};\n\nnamespace internal {\n\nclass MaximumCardinalitySearch\
+    \ {\n    std::vector<int> _head;\n    std::vector<int> _next;\n    std::vector<int>\
+    \ _previous;\n    std::vector<int> _weight;\n\n    void erase(int vertex) {\n\
+    \        const int weight = _weight[vertex];\n        if (_previous[vertex] ==\
+    \ -1) {\n            _head[weight] = _next[vertex];\n        } else {\n      \
+    \      _next[_previous[vertex]] = _next[vertex];\n        }\n        if (_next[vertex]\
+    \ != -1) _previous[_next[vertex]] = _previous[vertex];\n    }\n\n    void insert(int\
+    \ vertex) {\n        const int weight = _weight[vertex];\n        _previous[vertex]\
+    \ = -1;\n        _next[vertex] = _head[weight];\n        if (_head[weight] !=\
+    \ -1) _previous[_head[weight]] = vertex;\n        _head[weight] = vertex;\n  \
+    \  }\n\n   public:\n    explicit MaximumCardinalitySearch(int size)\n        :\
+    \ _head(size + 1, -1),\n          _next(size, -1),\n          _previous(size,\
+    \ -1),\n          _weight(size, 0) {\n        for (int vertex = 0; vertex < size;\
+    \ vertex++) insert(vertex);\n    }\n\n    std::vector<int> run(const std::vector<std::vector<int>>&\
+    \ adjacency) {\n        const int size = int(adjacency.size());\n        std::vector<int>\
+    \ order;\n        order.reserve(size);\n        std::vector<char> selected(size,\
+    \ false);\n        std::vector<int> seen_neighbor(size, -1);\n        int maximum_weight\
+    \ = 0;\n\n        while (int(order.size()) < size) {\n            while (_head[maximum_weight]\
+    \ == -1) maximum_weight--;\n            const int vertex = _head[maximum_weight];\n\
+    \            erase(vertex);\n            selected[vertex] = true;\n          \
+    \  order.push_back(vertex);\n\n            for (int to : adjacency[vertex]) {\n\
+    \                if (to == vertex || selected[to] || seen_neighbor[to] == vertex)\
+    \ continue;\n                seen_neighbor[to] = vertex;\n                erase(to);\n\
+    \                _weight[to]++;\n                insert(to);\n               \
+    \ maximum_weight = std::max(maximum_weight, _weight[to]);\n            }\n   \
+    \     }\n        return order;\n    }\n};\n\ninline std::vector<int> chordless_cycle(\n\
+    \    const std::vector<std::vector<int>>& adjacency, int vertex, int first,\n\
+    \    int second\n) {\n    const int size = int(adjacency.size());\n    std::vector<char>\
+    \ forbidden(size, false);\n    for (int to : adjacency[vertex]) forbidden[to]\
+    \ = true;\n    forbidden[vertex] = true;\n    forbidden[first] = false;\n    forbidden[second]\
+    \ = false;\n\n    std::vector<int> parent(size, -1);\n    std::queue<int> queue;\n\
+    \    parent[first] = first;\n    queue.push(first);\n    while (!queue.empty()\
+    \ && parent[second] == -1) {\n        const int current = queue.front();\n   \
+    \     queue.pop();\n        for (int to : adjacency[current]) {\n            if\
+    \ (forbidden[to] || parent[to] != -1) continue;\n            parent[to] = current;\n\
+    \            queue.push(to);\n        }\n    }\n    assert(parent[second] != -1);\n\
+    \n    std::vector<int> path;\n    for (int current = second; current != first;\
+    \ current = parent[current]) {\n        path.push_back(current);\n    }\n    path.push_back(first);\n\
+    \    std::reverse(path.begin(), path.end());\n\n    std::vector<int> cycle;\n\
+    \    cycle.reserve(path.size() + 1);\n    cycle.push_back(vertex);\n    cycle.insert(cycle.end(),\
+    \ path.begin(), path.end());\n    return cycle;\n}\n\n}  // namespace internal\n\
+    \n// Recognizes a chordal graph. On success, returns a perfect elimination\n//\
+    \ ordering; on failure, returns an induced cycle of length at least four.\ntemplate\
+    \ <class T>\nChordalGraphResult chordal_graph_recognition(const Graph<T>& graph)\
+    \ {\n    const int size = graph.size();\n    std::vector<std::vector<int>> adjacency(size);\n\
+    \    for (const Edge<T>& edge : graph.edges()) {\n        if (edge.from == edge.to)\
+    \ continue;\n        adjacency[edge.from].push_back(edge.to);\n        adjacency[edge.to].push_back(edge.from);\n\
+    \    }\n\n    std::vector<int> order = internal::MaximumCardinalitySearch(size).run(adjacency);\n\
+    \    std::vector<int> position(size);\n    for (int index = 0; index < size; index++)\
+    \ position[order[index]] = index;\n\n    std::vector<int> parent(size, -1);\n\
+    \    std::vector<std::vector<int>> children(size);\n    for (int vertex = 0; vertex\
+    \ < size; vertex++) {\n        for (int to : adjacency[vertex]) {\n          \
+    \  if (position[to] < position[vertex] &&\n                (parent[vertex] ==\
+    \ -1 || position[parent[vertex]] < position[to])) {\n                parent[vertex]\
+    \ = to;\n            }\n        }\n        if (parent[vertex] != -1) children[parent[vertex]].push_back(vertex);\n\
+    \    }\n\n    std::vector<int> adjacent_stamp(size, -1);\n    for (int center\
+    \ = 0; center < size; center++) {\n        for (int to : adjacency[center]) adjacent_stamp[to]\
+    \ = center;\n        for (int vertex : children[center]) {\n            for (int\
+    \ to : adjacency[vertex]) {\n                if (position[to] >= position[center]\
+    \ || adjacent_stamp[to] == center) continue;\n                return ChordalGraphResult{\n\
+    \                    false,\n                    {},\n                    internal::chordless_cycle(adjacency,\
+    \ vertex, to, center),\n                };\n            }\n        }\n    }\n\n\
+    \    std::reverse(order.begin(), order.end());\n    return ChordalGraphResult{true,\
+    \ std::move(order), {}};\n}\n\ntemplate <class T>\nbool is_chordal(const Graph<T>&\
+    \ graph) {\n    return chordal_graph_recognition(graph).is_chordal;\n}\n\n}  //\
+    \ namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/chromatic_number.hpp\"\
     \n\n\n\n#line 9 \"graph/chromatic_number.hpp\"\n\n#line 11 \"graph/chromatic_number.hpp\"\
     \n\nnamespace m1une {\nnamespace graph {\n\nnamespace detail {\n\nstruct ChromaticResidues\
     \ {\n    static constexpr std::array<std::uint32_t, 14> mod = {\n        1000000007,\
@@ -4428,7 +4503,8 @@ data:
     \ - x\n                                          : sum[i] + detail::ChromaticResidues::mod[i]\
     \ - x);\n                }\n            }\n        }\n        for (std::uint32_t\
     \ x : sum) {\n            if (x != 0) return colors;\n        }\n    }\n    return\
-    \ n;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/connected_components.hpp\"\
+    \ n;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/complement_connected_components.hpp\"\
+    \n\n\n\n#line 6 \"graph/complement_connected_components.hpp\"\n\n#line 1 \"graph/connected_components.hpp\"\
     \n\n\n\n#line 6 \"graph/connected_components.hpp\"\n\n#line 1 \"ds/dsu/dsu.hpp\"\
     \n\n\n\n#line 5 \"ds/dsu/dsu.hpp\"\n#include <numeric>\n#line 8 \"ds/dsu/dsu.hpp\"\
     \n\nnamespace m1une {\nnamespace ds {\n\nstruct Dsu {\n   private:\n    int _n;\n\
@@ -4479,52 +4555,84 @@ data:
     \   }\n        int c = leader_to_comp[leader];\n        result.comp[v] = c;\n\
     \        result.groups[c].push_back(v);\n    }\n    result.count = int(result.groups.size());\n\
     \n    return result;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\n\n\
-    #line 1 \"graph/enumerate_triangles.hpp\"\n\n\n\n#line 7 \"graph/enumerate_triangles.hpp\"\
-    \n\n#line 9 \"graph/enumerate_triangles.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ graph {\n\ntemplate <class T, class Callback>\nvoid enumerate_triangles(const\
-    \ Graph<T>& graph, Callback&& callback) {\n    const int n = graph.size();\n \
-    \   const std::vector<Edge<T>> edges = graph.edges();\n\n    std::vector<int>\
-    \ degree(n, 0);\n    for (const Edge<T>& edge : edges) {\n        assert(edge.from\
-    \ != edge.to);\n        degree[edge.from]++;\n        degree[edge.to]++;\n   \
-    \ }\n\n    std::vector<std::vector<int>> oriented(n);\n    for (const Edge<T>&\
-    \ edge : edges) {\n        int from = edge.from;\n        int to = edge.to;\n\
-    \        if (degree[from] > degree[to] ||\n            (degree[from] == degree[to]\
-    \ && from > to)) {\n            std::swap(from, to);\n        }\n        oriented[from].push_back(to);\n\
-    \    }\n\n    std::vector<int> marked(n, -1);\n    for (int vertex = 0; vertex\
-    \ < n; vertex++) {\n        for (int to : oriented[vertex]) marked[to] = vertex;\n\
-    \        for (int middle : oriented[vertex]) {\n            for (int to : oriented[middle])\
-    \ {\n                if (marked[to] != vertex) continue;\n                int\
-    \ first = vertex;\n                int second = middle;\n                int third\
-    \ = to;\n                if (first > second) std::swap(first, second);\n     \
-    \           if (second > third) std::swap(second, third);\n                if\
-    \ (first > second) std::swap(first, second);\n                callback(first,\
-    \ second, third);\n            }\n        }\n    }\n}\n\n}  // namespace graph\n\
-    }  // namespace m1une\n\n\n#line 1 \"graph/general_matching.hpp\"\n\n\n\n#line\
-    \ 9 \"graph/general_matching.hpp\"\n\n#line 11 \"graph/general_matching.hpp\"\n\
-    \nnamespace m1une {\nnamespace graph {\n\nstruct GeneralMatching {\n    struct\
-    \ Edge {\n        int from;\n        int to;\n        int id;\n        bool alive;\n\
-    \n        int other(int v) const {\n            assert(v == from || v == to);\n\
-    \            return from ^ to ^ v;\n        }\n    };\n\n    struct Pair {\n \
-    \       int from;\n        int to;\n        int edge_id;\n    };\n\n   private:\n\
-    \    int _n;\n    std::vector<Edge> _edges;\n    std::vector<std::vector<int>>\
-    \ _adj;\n    std::vector<int> _mate;\n    std::vector<int> _mate_edge;\n    bool\
-    \ _calculated;\n\n    void invalidate() {\n        _calculated = false;\n    }\n\
-    \n    void ensure_matching() {\n        if (!_calculated) max_matching();\n  \
-    \  }\n\n    bool is_matched_edge(int id) const {\n        const auto& e = _edges[id];\n\
-    \        return _mate[e.from] == e.to && _mate_edge[e.from] == id;\n    }\n\n\
-    \    enum MatchingLabel : char {\n        even_label,\n        odd_label,\n  \
-    \      unlabeled\n    };\n\n    struct MutablePartition {\n        std::vector<int>\
-    \ parent;\n        std::vector<int> rank;\n        std::vector<int> representative;\n\
-    \n        MutablePartition() = default;\n\n        explicit MutablePartition(int\
-    \ n) {\n            reset(n);\n        }\n\n        void reset(int n) {\n    \
-    \        parent.resize(n);\n            rank.assign(n, 0);\n            representative.resize(n);\n\
-    \            for (int i = 0; i < n; i++) {\n                parent[i] = i;\n \
-    \               representative[i] = i;\n            }\n        }\n\n        int\
-    \ root(int v) {\n            if (parent[v] == v) return v;\n            return\
-    \ parent[v] = root(parent[v]);\n        }\n\n        int operator()(int v) {\n\
-    \            return representative[root(v)];\n        }\n\n        void unite(int\
-    \ a, int b) {\n            int ra = root(a);\n            int rb = root(b);\n\
-    \            if (ra == rb) return;\n            if (rank[ra] < rank[rb]) std::swap(ra,\
+    #line 8 \"graph/complement_connected_components.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ graph {\n\n// Computes connected components after complementing the underlying\
+    \ simple\n// undirected graph, without constructing the complement graph.\ntemplate\
+    \ <class T>\nConnectedComponents complement_connected_components(const Graph<T>&\
+    \ graph) {\n    const int size = graph.size();\n    std::vector<std::vector<int>>\
+    \ adjacency(size);\n    for (const Edge<T>& edge : graph.edges()) {\n        if\
+    \ (edge.from == edge.to) continue;\n        adjacency[edge.from].push_back(edge.to);\n\
+    \        adjacency[edge.to].push_back(edge.from);\n    }\n\n    const int sentinel\
+    \ = size;\n    std::vector<int> next(size + 1);\n    std::vector<int> previous(size\
+    \ + 1);\n    if (size == 0) {\n        next[sentinel] = previous[sentinel] = sentinel;\n\
+    \    } else {\n        next[sentinel] = 0;\n        previous[sentinel] = size\
+    \ - 1;\n        for (int vertex = 0; vertex < size; vertex++) {\n            next[vertex]\
+    \ = (vertex + 1 == size ? sentinel : vertex + 1);\n            previous[vertex]\
+    \ = (vertex == 0 ? sentinel : vertex - 1);\n        }\n    }\n\n    auto erase\
+    \ = [&](int vertex) {\n        next[previous[vertex]] = next[vertex];\n      \
+    \  previous[next[vertex]] = previous[vertex];\n    };\n\n    ConnectedComponents\
+    \ result;\n    result.comp.assign(size, -1);\n    std::vector<int> neighbor_stamp(size,\
+    \ -1);\n    std::queue<int> queue;\n\n    while (next[sentinel] != sentinel) {\n\
+    \        const int root = next[sentinel];\n        erase(root);\n        const\
+    \ int component = int(result.groups.size());\n        result.groups.emplace_back();\n\
+    \        result.groups.back().push_back(root);\n        result.comp[root] = component;\n\
+    \        queue.push(root);\n\n        while (!queue.empty()) {\n            const\
+    \ int vertex = queue.front();\n            queue.pop();\n            for (int\
+    \ to : adjacency[vertex]) neighbor_stamp[to] = vertex;\n\n            int candidate\
+    \ = next[sentinel];\n            while (candidate != sentinel) {\n           \
+    \     const int following = next[candidate];\n                if (neighbor_stamp[candidate]\
+    \ != vertex) {\n                    erase(candidate);\n                    result.comp[candidate]\
+    \ = component;\n                    result.groups.back().push_back(candidate);\n\
+    \                    queue.push(candidate);\n                }\n             \
+    \   candidate = following;\n            }\n        }\n    }\n    result.count\
+    \ = int(result.groups.size());\n    return result;\n}\n\n}  // namespace graph\n\
+    }  // namespace m1une\n\n\n#line 1 \"graph/enumerate_triangles.hpp\"\n\n\n\n#line\
+    \ 7 \"graph/enumerate_triangles.hpp\"\n\n#line 9 \"graph/enumerate_triangles.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\ntemplate <class T, class Callback>\n\
+    void enumerate_triangles(const Graph<T>& graph, Callback&& callback) {\n    const\
+    \ int n = graph.size();\n    const std::vector<Edge<T>> edges = graph.edges();\n\
+    \n    std::vector<int> degree(n, 0);\n    for (const Edge<T>& edge : edges) {\n\
+    \        assert(edge.from != edge.to);\n        degree[edge.from]++;\n       \
+    \ degree[edge.to]++;\n    }\n\n    std::vector<std::vector<int>> oriented(n);\n\
+    \    for (const Edge<T>& edge : edges) {\n        int from = edge.from;\n    \
+    \    int to = edge.to;\n        if (degree[from] > degree[to] ||\n           \
+    \ (degree[from] == degree[to] && from > to)) {\n            std::swap(from, to);\n\
+    \        }\n        oriented[from].push_back(to);\n    }\n\n    std::vector<int>\
+    \ marked(n, -1);\n    for (int vertex = 0; vertex < n; vertex++) {\n        for\
+    \ (int to : oriented[vertex]) marked[to] = vertex;\n        for (int middle :\
+    \ oriented[vertex]) {\n            for (int to : oriented[middle]) {\n       \
+    \         if (marked[to] != vertex) continue;\n                int first = vertex;\n\
+    \                int second = middle;\n                int third = to;\n     \
+    \           if (first > second) std::swap(first, second);\n                if\
+    \ (second > third) std::swap(second, third);\n                if (first > second)\
+    \ std::swap(first, second);\n                callback(first, second, third);\n\
+    \            }\n        }\n    }\n}\n\n}  // namespace graph\n}  // namespace\
+    \ m1une\n\n\n#line 1 \"graph/general_matching.hpp\"\n\n\n\n#line 9 \"graph/general_matching.hpp\"\
+    \n\n#line 11 \"graph/general_matching.hpp\"\n\nnamespace m1une {\nnamespace graph\
+    \ {\n\nstruct GeneralMatching {\n    struct Edge {\n        int from;\n      \
+    \  int to;\n        int id;\n        bool alive;\n\n        int other(int v) const\
+    \ {\n            assert(v == from || v == to);\n            return from ^ to ^\
+    \ v;\n        }\n    };\n\n    struct Pair {\n        int from;\n        int to;\n\
+    \        int edge_id;\n    };\n\n   private:\n    int _n;\n    std::vector<Edge>\
+    \ _edges;\n    std::vector<std::vector<int>> _adj;\n    std::vector<int> _mate;\n\
+    \    std::vector<int> _mate_edge;\n    bool _calculated;\n\n    void invalidate()\
+    \ {\n        _calculated = false;\n    }\n\n    void ensure_matching() {\n   \
+    \     if (!_calculated) max_matching();\n    }\n\n    bool is_matched_edge(int\
+    \ id) const {\n        const auto& e = _edges[id];\n        return _mate[e.from]\
+    \ == e.to && _mate_edge[e.from] == id;\n    }\n\n    enum MatchingLabel : char\
+    \ {\n        even_label,\n        odd_label,\n        unlabeled\n    };\n\n  \
+    \  struct MutablePartition {\n        std::vector<int> parent;\n        std::vector<int>\
+    \ rank;\n        std::vector<int> representative;\n\n        MutablePartition()\
+    \ = default;\n\n        explicit MutablePartition(int n) {\n            reset(n);\n\
+    \        }\n\n        void reset(int n) {\n            parent.resize(n);\n   \
+    \         rank.assign(n, 0);\n            representative.resize(n);\n        \
+    \    for (int i = 0; i < n; i++) {\n                parent[i] = i;\n         \
+    \       representative[i] = i;\n            }\n        }\n\n        int root(int\
+    \ v) {\n            if (parent[v] == v) return v;\n            return parent[v]\
+    \ = root(parent[v]);\n        }\n\n        int operator()(int v) {\n         \
+    \   return representative[root(v)];\n        }\n\n        void unite(int a, int\
+    \ b) {\n            int ra = root(a);\n            int rb = root(b);\n       \
+    \     if (ra == rb) return;\n            if (rank[ra] < rank[rb]) std::swap(ra,\
     \ rb);\n            parent[rb] = ra;\n            if (rank[ra] == rank[rb]) rank[ra]++;\n\
     \        }\n\n        void make_rep(int v) {\n            representative[root(v)]\
     \ = v;\n        }\n    };\n\n    struct EdgeBucketQueue {\n        std::vector<std::vector<int>>\
@@ -5964,7 +6072,7 @@ data:
     \   assert(first_component != second_component);\n        result.bridge_forest_edges.push_back(\n\
     \            TwoEdgeConnectedBridge{first_component, second_component, edge_id});\n\
     \    }\n    return result;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\
-    \n\n#line 25 \"graph/undirected.hpp\"\n\n\n#line 15 \"graph/all.hpp\"\n\n\n#line\
+    \n\n#line 27 \"graph/undirected.hpp\"\n\n\n#line 15 \"graph/all.hpp\"\n\n\n#line\
     \ 10 \"verify/graph/range_edge_graph.test.cpp\"\n\nusing RangeEdgeGraph = m1une::graph::RangeEdgeGraph<long\
     \ long>;\n\nvoid test_basic() {\n    RangeEdgeGraph range_graph(6);\n    assert(range_graph.size()\
     \ == 6);\n    for (int i = 0; i < 6; i++) assert(range_graph.point_vertex(i) ==\
@@ -6159,7 +6267,9 @@ data:
   - graph/bipartite.hpp
   - graph/biconnected_components.hpp
   - graph/block_cut_tree.hpp
+  - graph/chordal_graph_recognition.hpp
   - graph/chromatic_number.hpp
+  - graph/complement_connected_components.hpp
   - graph/connected_components.hpp
   - ds/dsu/dsu.hpp
   - graph/enumerate_triangles.hpp
@@ -6175,7 +6285,7 @@ data:
   isVerificationFile: true
   path: verify/graph/range_edge_graph.test.cpp
   requiredBy: []
-  timestamp: '2026-07-14 02:26:02+09:00'
+  timestamp: '2026-07-14 02:59:03+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/range_edge_graph.test.cpp

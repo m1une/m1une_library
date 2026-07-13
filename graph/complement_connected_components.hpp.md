@@ -5,15 +5,15 @@ data:
     path: ds/dsu/dsu.hpp
     title: DSU (Disjoint Set Union)
   - icon: ':heavy_check_mark:'
+    path: graph/connected_components.hpp
+    title: Connected Components
+  - icon: ':heavy_check_mark:'
     path: graph/graph.hpp
     title: Graph
   _extendedRequiredBy:
   - icon: ':heavy_check_mark:'
     path: graph/all.hpp
     title: Graph All
-  - icon: ':heavy_check_mark:'
-    path: graph/complement_connected_components.hpp
-    title: Complement-Graph Connected Components
   - icon: ':heavy_check_mark:'
     path: graph/undirected.hpp
     title: Undirected Graph Algorithms
@@ -35,11 +35,13 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"graph/connected_components.hpp\"\n\n\n\n#include <cassert>\n\
-    #include <vector>\n\n#line 1 \"ds/dsu/dsu.hpp\"\n\n\n\n#include <algorithm>\n\
-    #include <numeric>\n#include <utility>\n#line 8 \"ds/dsu/dsu.hpp\"\n\nnamespace\
-    \ m1une {\nnamespace ds {\n\nstruct Dsu {\n   private:\n    int _n;\n    // parent_or_size[i]\
-    \ is the parent of i if it's >= 0.\n    // If it's < 0, then i is a root and -parent_or_size[i]\
+  bundledCode: "#line 1 \"graph/complement_connected_components.hpp\"\n\n\n\n#include\
+    \ <queue>\n#include <vector>\n\n#line 1 \"graph/connected_components.hpp\"\n\n\
+    \n\n#include <cassert>\n#line 6 \"graph/connected_components.hpp\"\n\n#line 1\
+    \ \"ds/dsu/dsu.hpp\"\n\n\n\n#include <algorithm>\n#include <numeric>\n#include\
+    \ <utility>\n#line 8 \"ds/dsu/dsu.hpp\"\n\nnamespace m1une {\nnamespace ds {\n\
+    \nstruct Dsu {\n   private:\n    int _n;\n    // parent_or_size[i] is the parent\
+    \ of i if it's >= 0.\n    // If it's < 0, then i is a root and -parent_or_size[i]\
     \ is the size of the group.\n    std::vector<int> parent_or_size;\n\n    // Returns\
     \ {new leader, absorbed leader}. The absorbed leader is -1 when\n    // both vertices\
     \ already belong to the same component.\n    std::pair<int, int> merge_leaders(int\
@@ -139,101 +141,156 @@ data:
     \ int(result.groups.size());\n            result.groups.push_back({});\n     \
     \   }\n        int c = leader_to_comp[leader];\n        result.comp[v] = c;\n\
     \        result.groups[c].push_back(v);\n    }\n    result.count = int(result.groups.size());\n\
-    \n    return result;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_GRAPH_CONNECTED_COMPONENTS_HPP\n#define M1UNE_GRAPH_CONNECTED_COMPONENTS_HPP\
-    \ 1\n\n#include <cassert>\n#include <vector>\n\n#include \"../ds/dsu/dsu.hpp\"\
-    \n#include \"graph.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\nstruct ConnectedComponents\
-    \ {\n    int count;\n    std::vector<int> comp;\n    std::vector<std::vector<int>>\
-    \ groups;\n\n    bool same(int u, int v) const {\n        assert(0 <= u && u <\
-    \ int(comp.size()));\n        assert(0 <= v && v < int(comp.size()));\n      \
-    \  return comp[u] == comp[v];\n    }\n};\n\ntemplate <class T>\nConnectedComponents\
-    \ connected_components(const Graph<T>& g) {\n    int n = g.size();\n    m1une::ds::Dsu\
-    \ dsu(n);\n    for (const auto& e : g.edges()) dsu.merge(e.from, e.to);\n\n  \
-    \  ConnectedComponents result;\n    result.comp.assign(n, 0);\n    std::vector<int>\
-    \ leader_to_comp(n, -1);\n    for (int v = 0; v < n; v++) {\n        int leader\
-    \ = dsu.leader(v);\n        if (leader_to_comp[leader] == -1) {\n            leader_to_comp[leader]\
-    \ = int(result.groups.size());\n            result.groups.push_back({});\n   \
-    \     }\n        int c = leader_to_comp[leader];\n        result.comp[v] = c;\n\
-    \        result.groups[c].push_back(v);\n    }\n    result.count = int(result.groups.size());\n\
-    \n    return result;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\n#endif\
-    \  // M1UNE_GRAPH_CONNECTED_COMPONENTS_HPP\n"
+    \n    return result;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\n\n\
+    #line 8 \"graph/complement_connected_components.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ graph {\n\n// Computes connected components after complementing the underlying\
+    \ simple\n// undirected graph, without constructing the complement graph.\ntemplate\
+    \ <class T>\nConnectedComponents complement_connected_components(const Graph<T>&\
+    \ graph) {\n    const int size = graph.size();\n    std::vector<std::vector<int>>\
+    \ adjacency(size);\n    for (const Edge<T>& edge : graph.edges()) {\n        if\
+    \ (edge.from == edge.to) continue;\n        adjacency[edge.from].push_back(edge.to);\n\
+    \        adjacency[edge.to].push_back(edge.from);\n    }\n\n    const int sentinel\
+    \ = size;\n    std::vector<int> next(size + 1);\n    std::vector<int> previous(size\
+    \ + 1);\n    if (size == 0) {\n        next[sentinel] = previous[sentinel] = sentinel;\n\
+    \    } else {\n        next[sentinel] = 0;\n        previous[sentinel] = size\
+    \ - 1;\n        for (int vertex = 0; vertex < size; vertex++) {\n            next[vertex]\
+    \ = (vertex + 1 == size ? sentinel : vertex + 1);\n            previous[vertex]\
+    \ = (vertex == 0 ? sentinel : vertex - 1);\n        }\n    }\n\n    auto erase\
+    \ = [&](int vertex) {\n        next[previous[vertex]] = next[vertex];\n      \
+    \  previous[next[vertex]] = previous[vertex];\n    };\n\n    ConnectedComponents\
+    \ result;\n    result.comp.assign(size, -1);\n    std::vector<int> neighbor_stamp(size,\
+    \ -1);\n    std::queue<int> queue;\n\n    while (next[sentinel] != sentinel) {\n\
+    \        const int root = next[sentinel];\n        erase(root);\n        const\
+    \ int component = int(result.groups.size());\n        result.groups.emplace_back();\n\
+    \        result.groups.back().push_back(root);\n        result.comp[root] = component;\n\
+    \        queue.push(root);\n\n        while (!queue.empty()) {\n            const\
+    \ int vertex = queue.front();\n            queue.pop();\n            for (int\
+    \ to : adjacency[vertex]) neighbor_stamp[to] = vertex;\n\n            int candidate\
+    \ = next[sentinel];\n            while (candidate != sentinel) {\n           \
+    \     const int following = next[candidate];\n                if (neighbor_stamp[candidate]\
+    \ != vertex) {\n                    erase(candidate);\n                    result.comp[candidate]\
+    \ = component;\n                    result.groups.back().push_back(candidate);\n\
+    \                    queue.push(candidate);\n                }\n             \
+    \   candidate = following;\n            }\n        }\n    }\n    result.count\
+    \ = int(result.groups.size());\n    return result;\n}\n\n}  // namespace graph\n\
+    }  // namespace m1une\n\n\n"
+  code: "#ifndef M1UNE_GRAPH_COMPLEMENT_CONNECTED_COMPONENTS_HPP\n#define M1UNE_GRAPH_COMPLEMENT_CONNECTED_COMPONENTS_HPP\
+    \ 1\n\n#include <queue>\n#include <vector>\n\n#include \"connected_components.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\n// Computes connected components after\
+    \ complementing the underlying simple\n// undirected graph, without constructing\
+    \ the complement graph.\ntemplate <class T>\nConnectedComponents complement_connected_components(const\
+    \ Graph<T>& graph) {\n    const int size = graph.size();\n    std::vector<std::vector<int>>\
+    \ adjacency(size);\n    for (const Edge<T>& edge : graph.edges()) {\n        if\
+    \ (edge.from == edge.to) continue;\n        adjacency[edge.from].push_back(edge.to);\n\
+    \        adjacency[edge.to].push_back(edge.from);\n    }\n\n    const int sentinel\
+    \ = size;\n    std::vector<int> next(size + 1);\n    std::vector<int> previous(size\
+    \ + 1);\n    if (size == 0) {\n        next[sentinel] = previous[sentinel] = sentinel;\n\
+    \    } else {\n        next[sentinel] = 0;\n        previous[sentinel] = size\
+    \ - 1;\n        for (int vertex = 0; vertex < size; vertex++) {\n            next[vertex]\
+    \ = (vertex + 1 == size ? sentinel : vertex + 1);\n            previous[vertex]\
+    \ = (vertex == 0 ? sentinel : vertex - 1);\n        }\n    }\n\n    auto erase\
+    \ = [&](int vertex) {\n        next[previous[vertex]] = next[vertex];\n      \
+    \  previous[next[vertex]] = previous[vertex];\n    };\n\n    ConnectedComponents\
+    \ result;\n    result.comp.assign(size, -1);\n    std::vector<int> neighbor_stamp(size,\
+    \ -1);\n    std::queue<int> queue;\n\n    while (next[sentinel] != sentinel) {\n\
+    \        const int root = next[sentinel];\n        erase(root);\n        const\
+    \ int component = int(result.groups.size());\n        result.groups.emplace_back();\n\
+    \        result.groups.back().push_back(root);\n        result.comp[root] = component;\n\
+    \        queue.push(root);\n\n        while (!queue.empty()) {\n            const\
+    \ int vertex = queue.front();\n            queue.pop();\n            for (int\
+    \ to : adjacency[vertex]) neighbor_stamp[to] = vertex;\n\n            int candidate\
+    \ = next[sentinel];\n            while (candidate != sentinel) {\n           \
+    \     const int following = next[candidate];\n                if (neighbor_stamp[candidate]\
+    \ != vertex) {\n                    erase(candidate);\n                    result.comp[candidate]\
+    \ = component;\n                    result.groups.back().push_back(candidate);\n\
+    \                    queue.push(candidate);\n                }\n             \
+    \   candidate = following;\n            }\n        }\n    }\n    result.count\
+    \ = int(result.groups.size());\n    return result;\n}\n\n}  // namespace graph\n\
+    }  // namespace m1une\n\n#endif  // M1UNE_GRAPH_COMPLEMENT_CONNECTED_COMPONENTS_HPP\n"
   dependsOn:
+  - graph/connected_components.hpp
   - ds/dsu/dsu.hpp
   - graph/graph.hpp
   isVerificationFile: false
-  path: graph/connected_components.hpp
+  path: graph/complement_connected_components.hpp
   requiredBy:
   - graph/all.hpp
-  - graph/complement_connected_components.hpp
   - graph/undirected.hpp
-  timestamp: '2026-07-13 06:09:24+09:00'
+  timestamp: '2026-07-14 02:59:03+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/complement_connected_components.test.cpp
-documentation_of: graph/connected_components.hpp
+documentation_of: graph/complement_connected_components.hpp
 layout: document
-title: Connected Components
+title: Complement-Graph Connected Components
 ---
 
 ## Overview
 
-Connected components with edge direction ignored. For directed graphs, this is
-the weakly connected component decomposition. For strongly connected components,
-use `strongly_connected_components`.
+`complement_connected_components` partitions the vertices into connected
+components of the complement graph. Two distinct vertices are adjacent in the
+complement exactly when they are not adjacent in the input graph.
 
-Two vertices are in the same connected component if there is a path between
-them after ignoring edge directions. Internally this function uses DSU, merging
-the endpoints of every logical edge.
+The complement can have quadratically many edges. This implementation scans an
+intrusive list of unassigned vertices and never constructs those edges, keeping
+the running time and memory linear in the input size.
 
-Use this when you need to split a graph into independent pieces, count
-components, check ordinary connectivity, or process each connected block
-separately.
+## Graph Interpretation
 
-## Graph Orientation
+Every active edge of `Graph<T>` is treated as an undirected edge, regardless of
+how it was inserted. Self-loops are ignored. Parallel edges are treated as one
+edge, so they do not change the result.
 
-Direction is ignored. On a directed graph, this computes weakly connected
-components. For strongly connected components, use `strongly_connected_components`.
+Edge costs are ignored. The graph is not mutated.
 
-## How to Use It
+## API
 
-Call `connected_components(g)`.
+The function reuses `ConnectedComponents`, the result type of the ordinary
+`connected_components` function.
 
-The result contains these members:
+```cpp
+struct ConnectedComponents {
+    int count;
+    std::vector<int> comp;
+    std::vector<std::vector<int>> groups;
 
-| Member | Type / Signature | Meaning |
+    bool same(int first, int second) const;
+};
+
+template <class T>
+ConnectedComponents complement_connected_components(const Graph<T>& graph);
+```
+
+| Member or function | Description | Complexity |
 | --- | --- | --- |
-| `count` | `int` | Number of connected components. |
-| `comp` | `std::vector<int>` | `comp[v]` is the component id of vertex `v`. |
-| `groups` | `std::vector<std::vector<int>>` | `groups[c]` is the list of vertices in component `c`. |
-| `same` | `bool same(int u, int v) const` | Returns whether `u` and `v` are in the same component. |
+| `count` | Number of complement-graph components. | $O(1)$ |
+| `comp[v]` | Component containing vertex `v`. | $O(1)$ |
+| `groups[c]` | Vertices in component `c`; their order is unspecified. | -- |
+| `same(first, second)` | Whether two vertices belong to the same complement-graph component. | $O(1)$ |
+| `complement_connected_components(graph)` | Computes the complete partition without building the complement. | $O(N+M)$ time and memory |
 
-For undirected graphs, build with `add_edge`. For directed graphs, remember that
-the decomposition is weak connectivity; reachability direction is ignored.
-
-## Functions
-
-| Function | Signature | Description | Complexity |
-| --- | --- | --- | --- |
-| `connected_components` | `template <class T> ConnectedComponents connected_components(const Graph<T>& g)` | Returns component ids and groups. | $O(N + M)$ |
+For an empty graph, `count` is `0` and both vectors are empty.
 
 ## Example
 
 ```cpp
-#include "graph/connected_components.hpp"
+#include "graph/complement_connected_components.hpp"
 #include "graph/graph.hpp"
+
 #include <iostream>
 
 int main() {
-    m1une::graph::Graph<> g(5);
-    g.add_edge(0, 1);
-    g.add_edge(2, 3);
+    m1une::graph::Graph<> graph(4);
+    graph.add_edge(0, 1);
+    graph.add_edge(0, 2);
+    graph.add_edge(0, 3);
 
-    auto cc = m1une::graph::connected_components(g);
-    std::cout << cc.count << "\n";      // 3
-    std::cout << cc.same(0, 1) << "\n"; // 1
-    std::cout << cc.same(0, 2) << "\n"; // 0
+    auto result = m1une::graph::complement_connected_components(graph);
+    std::cout << result.count << "\n";      // 2
+    std::cout << result.same(1, 3) << "\n";  // 1
+    std::cout << result.same(0, 1) << "\n";  // 0
 }
 ```
