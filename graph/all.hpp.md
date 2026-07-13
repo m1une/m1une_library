@@ -3977,7 +3977,7 @@ data:
     \ == n);\n    return zero_one_on_tree(rooted_tree.parent, value);\n}\n\n}  //\
     \ namespace tree\n}  // namespace m1une\n\n\n#line 21 \"graph/tree/all.hpp\"\n\
     \n\n#line 1 \"graph/undirected.hpp\"\n\n\n\n#line 1 \"graph/bipartite.hpp\"\n\n\
-    \n\n#line 8 \"graph/bipartite.hpp\"\n\n#line 10 \"graph/bipartite.hpp\"\n\nnamespace\
+    \n\n#line 13 \"graph/bipartite.hpp\"\n\n#line 15 \"graph/bipartite.hpp\"\n\nnamespace\
     \ m1une {\nnamespace graph {\n\nstruct BipartiteResult {\n    bool is_bipartite;\n\
     \    std::vector<int> color;\n    std::vector<int> left_vertices;\n    std::vector<int>\
     \ right_vertices;\n    std::vector<int> left_id;\n    std::vector<int> right_id;\n\
@@ -4131,8 +4131,161 @@ data:
     \ parts.left_id[e.to];\n            right = parts.right_id[e.from];\n        }\n\
     \        int id = result.matching.add_edge(left, right);\n        if (int(result.original_edge_id.size())\
     \ <= id) result.original_edge_id.resize(id + 1);\n        result.original_edge_id[id]\
-    \ = e.id;\n    }\n\n    return result;\n}\n\n}  // namespace graph\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"graph/biconnected_components.hpp\"\n\n\n\n#line 6 \"graph/biconnected_components.hpp\"\
+    \ = e.id;\n    }\n\n    return result;\n}\n\nstruct BipartiteEdgeColoringResult\
+    \ {\n    int color_count;\n    std::vector<int> color;\n};\n\nnamespace detail\
+    \ {\n\nstruct BipartiteEdgeColoringGroups {\n    int count;\n    std::vector<int>\
+    \ group;\n};\n\ninline BipartiteEdgeColoringGroups group_vertices(\n    const\
+    \ std::vector<int>& degree,\n    int maximum_degree\n) {\n    BipartiteEdgeColoringGroups\
+    \ result;\n    result.count = 0;\n    result.group.assign(degree.size(), -1);\n\
+    \    int current_degree = 0;\n    for (int vertex = 0; vertex < int(degree.size());\
+    \ vertex++) {\n        if (degree[vertex] == 0) continue;\n        if (result.count\
+    \ == 0 || current_degree + degree[vertex] > maximum_degree) {\n            result.count++;\n\
+    \            current_degree = 0;\n        }\n        result.group[vertex] = result.count\
+    \ - 1;\n        current_degree += degree[vertex];\n    }\n    return result;\n\
+    }\n\nclass BipartiteEdgeColoringSolver {\n   private:\n    int _side_size;\n \
+    \   int _original_edge_count;\n    std::vector<int> _left;\n    std::vector<int>\
+    \ _right;\n    std::vector<int> _color;\n    std::vector<int> _used_stamp;\n \
+    \   int _stamp;\n\n    int other_endpoint(int vertex, int edge) const {\n    \
+    \    if (vertex < _side_size) return _side_size + _right[edge];\n        return\
+    \ _left[edge];\n    }\n\n    std::vector<int> perfect_matching(const std::vector<int>&\
+    \ edge_ids) const {\n        std::vector<std::vector<int>> adjacency(_side_size);\n\
+    \        for (int edge : edge_ids) adjacency[_left[edge]].push_back(edge);\n\n\
+    \        std::vector<int> right_match(_side_size, -1);\n        std::vector<int>\
+    \ left_match_edge(_side_size, -1);\n        int matching_size = 0;\n        for\
+    \ (int left = 0; left < _side_size; left++) {\n            for (int edge : adjacency[left])\
+    \ {\n                int right = _right[edge];\n                if (right_match[right]\
+    \ != -1) continue;\n                right_match[right] = left;\n             \
+    \   left_match_edge[left] = edge;\n                matching_size++;\n        \
+    \        break;\n            }\n        }\n\n        std::vector<int> distance(_side_size);\n\
+    \        std::vector<int> next_edge(_side_size);\n        std::vector<int> left_stack;\n\
+    \        std::vector<int> path_edges;\n        left_stack.reserve(_side_size);\n\
+    \        path_edges.reserve(_side_size);\n\n        while (matching_size < _side_size)\
+    \ {\n            std::queue<int> queue;\n            std::fill(distance.begin(),\
+    \ distance.end(), -1);\n            for (int left = 0; left < _side_size; left++)\
+    \ {\n                if (left_match_edge[left] != -1) continue;\n            \
+    \    distance[left] = 0;\n                queue.push(left);\n            }\n\n\
+    \            bool reachable_free_right = false;\n            while (!queue.empty())\
+    \ {\n                int left = queue.front();\n                queue.pop();\n\
+    \                for (int edge : adjacency[left]) {\n                    int next_left\
+    \ = right_match[_right[edge]];\n                    if (next_left == -1) {\n \
+    \                       reachable_free_right = true;\n                    } else\
+    \ if (distance[next_left] == -1) {\n                        distance[next_left]\
+    \ = distance[left] + 1;\n                        queue.push(next_left);\n    \
+    \                }\n                }\n            }\n            assert(reachable_free_right);\n\
+    \n            std::fill(next_edge.begin(), next_edge.end(), 0);\n            int\
+    \ augmented = 0;\n            for (int root = 0; root < _side_size; root++) {\n\
+    \                if (left_match_edge[root] != -1 || distance[root] == -1) continue;\n\
+    \                left_stack.clear();\n                path_edges.clear();\n  \
+    \              left_stack.push_back(root);\n                bool found = false;\n\
+    \n                while (!left_stack.empty() && !found) {\n                  \
+    \  int left = left_stack.back();\n                    bool advanced = false;\n\
+    \                    while (next_edge[left] < int(adjacency[left].size())) {\n\
+    \                        int edge = adjacency[left][next_edge[left]++];\n    \
+    \                    int right = _right[edge];\n                        int next_left\
+    \ = right_match[right];\n                        if (next_left == -1) {\n    \
+    \                        left_match_edge[left] = edge;\n                     \
+    \       right_match[right] = left;\n                            for (int index\
+    \ = int(path_edges.size()) - 1; index >= 0; index--) {\n                     \
+    \           int path_edge = path_edges[index];\n                             \
+    \   int path_left = left_stack[index];\n                                left_match_edge[path_left]\
+    \ = path_edge;\n                                right_match[_right[path_edge]]\
+    \ = path_left;\n                            }\n                            found\
+    \ = true;\n                            break;\n                        }\n   \
+    \                     if (distance[next_left] != distance[left] + 1) continue;\n\
+    \                        path_edges.push_back(edge);\n                       \
+    \ left_stack.push_back(next_left);\n                        advanced = true;\n\
+    \                        break;\n                    }\n                    if\
+    \ (found || advanced) continue;\n                    distance[left] = -1;\n  \
+    \                  left_stack.pop_back();\n                    if (path_edges.size()\
+    \ == left_stack.size() && !path_edges.empty()) {\n                        path_edges.pop_back();\n\
+    \                    }\n                }\n                if (found) augmented++;\n\
+    \            }\n            assert(augmented > 0);\n            matching_size\
+    \ += augmented;\n        }\n\n        return left_match_edge;\n    }\n\n    std::pair<std::vector<int>,\
+    \ std::vector<int>> split_even(\n        const std::vector<int>& edge_ids\n  \
+    \  ) {\n        std::vector<std::vector<int>> incidence(std::size_t(2) * _side_size);\n\
+    \        for (int edge : edge_ids) {\n            incidence[_left[edge]].push_back(edge);\n\
+    \            incidence[_side_size + _right[edge]].push_back(edge);\n        }\n\
+    \n        _stamp++;\n        assert(_stamp > 0);\n        std::vector<int> next_edge(std::size_t(2)\
+    \ * _side_size, 0);\n        std::vector<int> first;\n        std::vector<int>\
+    \ second;\n        first.reserve(edge_ids.size() / 2);\n        second.reserve(edge_ids.size()\
+    \ / 2);\n\n        for (int start = 0; start < 2 * _side_size; start++) {\n  \
+    \          while (true) {\n                while (next_edge[start] < int(incidence[start].size())\
+    \ &&\n                       _used_stamp[incidence[start][next_edge[start]]] ==\
+    \ _stamp) {\n                    next_edge[start]++;\n                }\n    \
+    \            if (next_edge[start] == int(incidence[start].size())) break;\n\n\
+    \                int vertex = start;\n                bool parity = false;\n \
+    \               do {\n                    while (next_edge[vertex] < int(incidence[vertex].size())\
+    \ &&\n                           _used_stamp[incidence[vertex][next_edge[vertex]]]\
+    \ == _stamp) {\n                        next_edge[vertex]++;\n               \
+    \     }\n                    assert(next_edge[vertex] < int(incidence[vertex].size()));\n\
+    \                    int edge = incidence[vertex][next_edge[vertex]++];\n    \
+    \                _used_stamp[edge] = _stamp;\n                    if (!parity)\
+    \ {\n                        first.push_back(edge);\n                    } else\
+    \ {\n                        second.push_back(edge);\n                    }\n\
+    \                    parity = !parity;\n                    vertex = other_endpoint(vertex,\
+    \ edge);\n                } while (vertex != start);\n                assert(!parity);\n\
+    \            }\n        }\n        assert(first.size() == second.size());\n  \
+    \      return {std::move(first), std::move(second)};\n    }\n\n    void color_regular(const\
+    \ std::vector<int>& edge_ids, int degree, int offset) {\n        assert(std::size_t(_side_size)\
+    \ * std::size_t(degree) == edge_ids.size());\n        if (degree == 0) return;\n\
+    \        if (degree == 1) {\n            for (int edge : edge_ids) {\n       \
+    \         if (edge < _original_edge_count) _color[edge] = offset;\n          \
+    \  }\n            return;\n        }\n\n        if (degree % 2 == 1) {\n     \
+    \       std::vector<int> matching = perfect_matching(edge_ids);\n            _stamp++;\n\
+    \            assert(_stamp > 0);\n            for (int edge : matching) {\n  \
+    \              _used_stamp[edge] = _stamp;\n                if (edge < _original_edge_count)\
+    \ _color[edge] = offset;\n            }\n            std::vector<int> remaining;\n\
+    \            remaining.reserve(edge_ids.size() - matching.size());\n         \
+    \   for (int edge : edge_ids) {\n                if (_used_stamp[edge] != _stamp)\
+    \ remaining.push_back(edge);\n            }\n            color_regular(remaining,\
+    \ degree - 1, offset + 1);\n            return;\n        }\n\n        auto [first,\
+    \ second] = split_even(edge_ids);\n        color_regular(first, degree / 2, offset);\n\
+    \        color_regular(second, degree / 2, offset + degree / 2);\n    }\n\n  \
+    \ public:\n    BipartiteEdgeColoringSolver(\n        int side_size,\n        int\
+    \ original_edge_count,\n        std::vector<int> left,\n        std::vector<int>\
+    \ right\n    )\n        : _side_size(side_size),\n          _original_edge_count(original_edge_count),\n\
+    \          _left(std::move(left)),\n          _right(std::move(right)),\n    \
+    \      _color(original_edge_count, -1),\n          _used_stamp(_left.size(), 0),\n\
+    \          _stamp(0) {}\n\n    std::vector<int> solve(int degree) {\n        std::vector<int>\
+    \ edge_ids(_left.size());\n        for (int edge = 0; edge < int(edge_ids.size());\
+    \ edge++) edge_ids[edge] = edge;\n        color_regular(edge_ids, degree, 0);\n\
+    \        for (int color : _color) assert(0 <= color && color < degree);\n    \
+    \    return _color;\n    }\n};\n\n}  // namespace detail\n\n// Returns an optimal\
+    \ edge coloring of a bipartite multigraph.\ninline BipartiteEdgeColoringResult\
+    \ bipartite_edge_coloring(\n    int left_size,\n    int right_size,\n    const\
+    \ std::vector<std::pair<int, int>>& edges\n) {\n    assert(left_size >= 0);\n\
+    \    assert(right_size >= 0);\n    assert(edges.size() <= std::size_t(std::numeric_limits<int>::max()));\n\
+    \n    std::vector<int> left_degree(left_size, 0);\n    std::vector<int> right_degree(right_size,\
+    \ 0);\n    int maximum_degree = 0;\n    for (auto [left, right] : edges) {\n \
+    \       assert(0 <= left && left < left_size);\n        assert(0 <= right && right\
+    \ < right_size);\n        left_degree[left]++;\n        right_degree[right]++;\n\
+    \        maximum_degree = std::max(maximum_degree, left_degree[left]);\n     \
+    \   maximum_degree = std::max(maximum_degree, right_degree[right]);\n    }\n\n\
+    \    BipartiteEdgeColoringResult result;\n    result.color_count = maximum_degree;\n\
+    \    if (edges.empty()) return result;\n\n    detail::BipartiteEdgeColoringGroups\
+    \ left_groups =\n        detail::group_vertices(left_degree, maximum_degree);\n\
+    \    detail::BipartiteEdgeColoringGroups right_groups =\n        detail::group_vertices(right_degree,\
+    \ maximum_degree);\n    int side_size = std::max(left_groups.count, right_groups.count);\n\
+    \n    std::vector<int> contracted_left;\n    std::vector<int> contracted_right;\n\
+    \    contracted_left.reserve(std::size_t(3) * edges.size());\n    contracted_right.reserve(std::size_t(3)\
+    \ * edges.size());\n    std::vector<int> contracted_left_degree(side_size, 0);\n\
+    \    std::vector<int> contracted_right_degree(side_size, 0);\n    for (auto [left,\
+    \ right] : edges) {\n        int contracted_left_vertex = left_groups.group[left];\n\
+    \        int contracted_right_vertex = right_groups.group[right];\n        contracted_left.push_back(contracted_left_vertex);\n\
+    \        contracted_right.push_back(contracted_right_vertex);\n        contracted_left_degree[contracted_left_vertex]++;\n\
+    \        contracted_right_degree[contracted_right_vertex]++;\n    }\n\n    int\
+    \ left = 0;\n    int right = 0;\n    while (true) {\n        while (left < side_size\
+    \ && contracted_left_degree[left] == maximum_degree) left++;\n        while (right\
+    \ < side_size && contracted_right_degree[right] == maximum_degree) right++;\n\
+    \        if (left == side_size || right == side_size) break;\n        contracted_left.push_back(left);\n\
+    \        contracted_right.push_back(right);\n        contracted_left_degree[left]++;\n\
+    \        contracted_right_degree[right]++;\n    }\n    assert(left == side_size\
+    \ && right == side_size);\n    assert(contracted_left.size() == std::size_t(side_size)\
+    \ * std::size_t(maximum_degree));\n\n    detail::BipartiteEdgeColoringSolver solver(\n\
+    \        side_size,\n        int(edges.size()),\n        std::move(contracted_left),\n\
+    \        std::move(contracted_right)\n    );\n    result.color = solver.solve(maximum_degree);\n\
+    \    return result;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line\
+    \ 1 \"graph/biconnected_components.hpp\"\n\n\n\n#line 6 \"graph/biconnected_components.hpp\"\
     \n\n#line 8 \"graph/biconnected_components.hpp\"\n\nnamespace m1une {\nnamespace\
     \ graph {\n\nstruct BiconnectedComponentsResult {\n    std::vector<std::vector<int>>\
     \ components;\n    std::vector<std::vector<int>> edge_components;\n    std::vector<int>\
@@ -5310,7 +5463,7 @@ data:
   isVerificationFile: false
   path: graph/all.hpp
   requiredBy: []
-  timestamp: '2026-07-13 23:28:27+09:00'
+  timestamp: '2026-07-14 01:19:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
@@ -5361,7 +5514,7 @@ Public namespaces stay flat and short: general graph helpers use
 | `graph/biconnected_components.hpp` | Undirected only | Vertex-biconnected blocks, articulation points, and block incidence. |
 | `graph/block_cut_tree.hpp` | Undirected only | Block-cut forest and original-vertex-to-node mappings. |
 | `graph/two_edge_connected_components.hpp` | Undirected only | Two-edge-connected components, bridges, and the contracted bridge forest. |
-| `graph/bipartite.hpp` | Direction ignored / explicit bipartite sides | Two-colorability, maximum matching, minimum vertex cover, maximum independent set, and minimum edge cover. |
+| `graph/bipartite.hpp` | Direction ignored / explicit bipartite sides | Two-colorability, matching, vertex/edge covers, independent sets, and optimal bipartite edge coloring. |
 | `graph/general_matching.hpp` | Undirected only | Maximum-cardinality matching and minimum edge cover in general undirected graphs. |
 | `graph/maximum_clique.hpp` | Direction ignored | Exact maximum clique, maximum independent set, and minimum vertex cover with bitset branch-and-bound. |
 | `graph/chromatic_number.hpp` | Direction ignored | Exact chromatic number for graphs with at most 20 vertices. |

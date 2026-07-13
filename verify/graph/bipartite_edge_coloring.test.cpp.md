@@ -14,50 +14,49 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://judge.yosupo.jp/problem/bipartitematching
+    PROBLEM: https://judge.yosupo.jp/problem/bipartite_edge_coloring
     links:
-    - https://judge.yosupo.jp/problem/bipartitematching
-  bundledCode: "#line 1 \"verify/graph/bipartite_matching.test.cpp\"\n#define PROBLEM\
-    \ \"https://judge.yosupo.jp/problem/bipartitematching\"\n\n#include <iostream>\n\
-    #include <vector>\n\n#line 1 \"graph/bipartite.hpp\"\n\n\n\n#include <algorithm>\n\
-    #include <cassert>\n#include <cstddef>\n#include <cstdint>\n#include <limits>\n\
-    #include <optional>\n#include <queue>\n#include <utility>\n#line 13 \"graph/bipartite.hpp\"\
-    \n\n#line 1 \"graph/graph.hpp\"\n\n\n\n#line 7 \"graph/graph.hpp\"\n\nnamespace\
-    \ m1une {\nnamespace graph {\n\ntemplate <class T = int>\nstruct Edge {\n    using\
-    \ cost_type = T;\n\n    int from;\n    int to;\n    T cost;\n    int id;\n   \
-    \ bool alive;\n\n    Edge() : from(-1), to(-1), cost(T()), id(-1), alive(true)\
-    \ {}\n    Edge(int from_, int to_, T cost_ = T(1), int id_ = -1, bool alive_ =\
-    \ true)\n        : from(from_), to(to_), cost(cost_), id(id_), alive(alive_) {}\n\
-    \n    int other(int v) const {\n        assert(v == from || v == to);\n      \
-    \  return from ^ to ^ v;\n    }\n};\n\ntemplate <class T = int>\nstruct Graph\
-    \ {\n    using edge_type = Edge<T>;\n    using cost_type = T;\n\n   private:\n\
-    \    int _n;\n    int _edge_count;\n    std::vector<std::vector<edge_type>> _g;\n\
-    \    std::vector<std::vector<std::pair<int, int>>> _edge_positions;\n\n   public:\n\
-    \    Graph() : _n(0), _edge_count(0) {}\n    explicit Graph(int n) : _n(n), _edge_count(0),\
-    \ _g(n) {\n        assert(0 <= n);\n    }\n\n    int size() const {\n        return\
-    \ _n;\n    }\n\n    bool empty() const {\n        return _n == 0;\n    }\n\n \
-    \   int edge_count() const {\n        return _edge_count;\n    }\n\n    int add_vertex()\
-    \ {\n        _g.emplace_back();\n        return _n++;\n    }\n\n    int add_directed_edge(int\
-    \ from, int to, T cost = T(1)) {\n        assert(0 <= from && from < _n);\n  \
-    \      assert(0 <= to && to < _n);\n        int id = _edge_count++;\n        int\
-    \ idx = int(_g[from].size());\n        _g[from].push_back(edge_type(from, to,\
-    \ cost, id));\n        _edge_positions.emplace_back();\n        _edge_positions.back().push_back({from,\
-    \ idx});\n        return id;\n    }\n\n    int add_edge(int u, int v, T cost =\
-    \ T(1)) {\n        assert(0 <= u && u < _n);\n        assert(0 <= v && v < _n);\n\
-    \        int id = _edge_count++;\n        int u_idx = int(_g[u].size());\n   \
-    \     _g[u].push_back(edge_type(u, v, cost, id));\n        int v_idx = int(_g[v].size());\n\
-    \        _g[v].push_back(edge_type(v, u, cost, id));\n        _edge_positions.emplace_back();\n\
-    \        _edge_positions.back().push_back({u, u_idx});\n        _edge_positions.back().push_back({v,\
-    \ v_idx});\n        return id;\n    }\n\n    void set_edge_alive(int id, bool\
-    \ alive) {\n        assert(0 <= id && id < _edge_count);\n        for (auto [v,\
-    \ idx] : _edge_positions[id]) {\n            _g[v][idx].alive = alive;\n     \
-    \   }\n    }\n\n    void erase_edge(int id) {\n        set_edge_alive(id, false);\n\
-    \    }\n\n    void revive_edge(int id) {\n        set_edge_alive(id, true);\n\
-    \    }\n\n    bool is_edge_alive(int id) const {\n        assert(0 <= id && id\
-    \ < _edge_count);\n        assert(!_edge_positions[id].empty());\n        auto\
-    \ [v, idx] = _edge_positions[id][0];\n        return _g[v][idx].alive;\n    }\n\
-    \n    const std::vector<edge_type>& operator[](int v) const {\n        assert(0\
-    \ <= v && v < _n);\n        return _g[v];\n    }\n\n    std::vector<edge_type>&\
+    - https://judge.yosupo.jp/problem/bipartite_edge_coloring
+  bundledCode: "#line 1 \"verify/graph/bipartite_edge_coloring.test.cpp\"\n#define\
+    \ PROBLEM \"https://judge.yosupo.jp/problem/bipartite_edge_coloring\"\n\n#line\
+    \ 1 \"graph/bipartite.hpp\"\n\n\n\n#include <algorithm>\n#include <cassert>\n\
+    #include <cstddef>\n#include <cstdint>\n#include <limits>\n#include <optional>\n\
+    #include <queue>\n#include <utility>\n#include <vector>\n\n#line 1 \"graph/graph.hpp\"\
+    \n\n\n\n#line 7 \"graph/graph.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\n\
+    template <class T = int>\nstruct Edge {\n    using cost_type = T;\n\n    int from;\n\
+    \    int to;\n    T cost;\n    int id;\n    bool alive;\n\n    Edge() : from(-1),\
+    \ to(-1), cost(T()), id(-1), alive(true) {}\n    Edge(int from_, int to_, T cost_\
+    \ = T(1), int id_ = -1, bool alive_ = true)\n        : from(from_), to(to_), cost(cost_),\
+    \ id(id_), alive(alive_) {}\n\n    int other(int v) const {\n        assert(v\
+    \ == from || v == to);\n        return from ^ to ^ v;\n    }\n};\n\ntemplate <class\
+    \ T = int>\nstruct Graph {\n    using edge_type = Edge<T>;\n    using cost_type\
+    \ = T;\n\n   private:\n    int _n;\n    int _edge_count;\n    std::vector<std::vector<edge_type>>\
+    \ _g;\n    std::vector<std::vector<std::pair<int, int>>> _edge_positions;\n\n\
+    \   public:\n    Graph() : _n(0), _edge_count(0) {}\n    explicit Graph(int n)\
+    \ : _n(n), _edge_count(0), _g(n) {\n        assert(0 <= n);\n    }\n\n    int\
+    \ size() const {\n        return _n;\n    }\n\n    bool empty() const {\n    \
+    \    return _n == 0;\n    }\n\n    int edge_count() const {\n        return _edge_count;\n\
+    \    }\n\n    int add_vertex() {\n        _g.emplace_back();\n        return _n++;\n\
+    \    }\n\n    int add_directed_edge(int from, int to, T cost = T(1)) {\n     \
+    \   assert(0 <= from && from < _n);\n        assert(0 <= to && to < _n);\n   \
+    \     int id = _edge_count++;\n        int idx = int(_g[from].size());\n     \
+    \   _g[from].push_back(edge_type(from, to, cost, id));\n        _edge_positions.emplace_back();\n\
+    \        _edge_positions.back().push_back({from, idx});\n        return id;\n\
+    \    }\n\n    int add_edge(int u, int v, T cost = T(1)) {\n        assert(0 <=\
+    \ u && u < _n);\n        assert(0 <= v && v < _n);\n        int id = _edge_count++;\n\
+    \        int u_idx = int(_g[u].size());\n        _g[u].push_back(edge_type(u,\
+    \ v, cost, id));\n        int v_idx = int(_g[v].size());\n        _g[v].push_back(edge_type(v,\
+    \ u, cost, id));\n        _edge_positions.emplace_back();\n        _edge_positions.back().push_back({u,\
+    \ u_idx});\n        _edge_positions.back().push_back({v, v_idx});\n        return\
+    \ id;\n    }\n\n    void set_edge_alive(int id, bool alive) {\n        assert(0\
+    \ <= id && id < _edge_count);\n        for (auto [v, idx] : _edge_positions[id])\
+    \ {\n            _g[v][idx].alive = alive;\n        }\n    }\n\n    void erase_edge(int\
+    \ id) {\n        set_edge_alive(id, false);\n    }\n\n    void revive_edge(int\
+    \ id) {\n        set_edge_alive(id, true);\n    }\n\n    bool is_edge_alive(int\
+    \ id) const {\n        assert(0 <= id && id < _edge_count);\n        assert(!_edge_positions[id].empty());\n\
+    \        auto [v, idx] = _edge_positions[id][0];\n        return _g[v][idx].alive;\n\
+    \    }\n\n    const std::vector<edge_type>& operator[](int v) const {\n      \
+    \  assert(0 <= v && v < _n);\n        return _g[v];\n    }\n\n    std::vector<edge_type>&\
     \ operator[](int v) {\n        assert(0 <= v && v < _n);\n        return _g[v];\n\
     \    }\n\n    const std::vector<std::vector<edge_type>>& adjacency() const {\n\
     \        return _g;\n    }\n\n    std::vector<std::vector<edge_type>>& adjacency()\
@@ -384,38 +383,104 @@ data:
     \        side_size,\n        int(edges.size()),\n        std::move(contracted_left),\n\
     \        std::move(contracted_right)\n    );\n    result.color = solver.solve(maximum_degree);\n\
     \    return result;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line\
-    \ 7 \"verify/graph/bipartite_matching.test.cpp\"\n\nint main() {\n    std::ios::sync_with_stdio(false);\n\
-    \    std::cin.tie(nullptr);\n\n    int left_size, right_size, edge_count;\n  \
-    \  std::cin >> left_size >> right_size >> edge_count;\n    m1une::graph::BipartiteMatching\
-    \ matching(left_size, right_size);\n    for (int i = 0; i < edge_count; i++) {\n\
-    \        int left, right;\n        std::cin >> left >> right;\n        matching.add_edge(left,\
-    \ right);\n    }\n\n    std::vector<m1une::graph::BipartiteMatching::Pair> result\
-    \ =\n        matching.matching();\n    std::cout << result.size() << '\\n';\n\
-    \    for (const auto& pair : result) {\n        std::cout << pair.left << ' '\
-    \ << pair.right << '\\n';\n    }\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/bipartitematching\"\n\n\
-    #include <iostream>\n#include <vector>\n\n#include \"../../graph/bipartite.hpp\"\
-    \n\nint main() {\n    std::ios::sync_with_stdio(false);\n    std::cin.tie(nullptr);\n\
-    \n    int left_size, right_size, edge_count;\n    std::cin >> left_size >> right_size\
-    \ >> edge_count;\n    m1une::graph::BipartiteMatching matching(left_size, right_size);\n\
-    \    for (int i = 0; i < edge_count; i++) {\n        int left, right;\n      \
-    \  std::cin >> left >> right;\n        matching.add_edge(left, right);\n    }\n\
-    \n    std::vector<m1une::graph::BipartiteMatching::Pair> result =\n        matching.matching();\n\
-    \    std::cout << result.size() << '\\n';\n    for (const auto& pair : result)\
-    \ {\n        std::cout << pair.left << ' ' << pair.right << '\\n';\n    }\n}\n"
+    \ 4 \"verify/graph/bipartite_edge_coloring.test.cpp\"\n\n#line 8 \"verify/graph/bipartite_edge_coloring.test.cpp\"\
+    \n#include <iostream>\n#line 11 \"verify/graph/bipartite_edge_coloring.test.cpp\"\
+    \n\nnamespace {\n\nvoid check(\n    int left_size,\n    int right_size,\n    const\
+    \ std::vector<std::pair<int, int>>& edges\n) {\n    std::vector<int> left_degree(left_size,\
+    \ 0);\n    std::vector<int> right_degree(right_size, 0);\n    int maximum_degree\
+    \ = 0;\n    for (auto [left, right] : edges) {\n        left_degree[left]++;\n\
+    \        right_degree[right]++;\n        maximum_degree = std::max(maximum_degree,\
+    \ left_degree[left]);\n        maximum_degree = std::max(maximum_degree, right_degree[right]);\n\
+    \    }\n\n    auto result = m1une::graph::bipartite_edge_coloring(left_size, right_size,\
+    \ edges);\n    assert(result.color_count == maximum_degree);\n    assert(result.color.size()\
+    \ == edges.size());\n    std::vector<std::vector<char>> left_used(\n        left_size,\n\
+    \        std::vector<char>(maximum_degree, false)\n    );\n    std::vector<std::vector<char>>\
+    \ right_used(\n        right_size,\n        std::vector<char>(maximum_degree,\
+    \ false)\n    );\n    for (int edge = 0; edge < int(edges.size()); edge++) {\n\
+    \        auto [left, right] = edges[edge];\n        int color = result.color[edge];\n\
+    \        assert(0 <= color && color < maximum_degree);\n        assert(!left_used[left][color]);\n\
+    \        assert(!right_used[right][color]);\n        left_used[left][color] =\
+    \ true;\n        right_used[right][color] = true;\n    }\n}\n\nvoid test_fixed()\
+    \ {\n    check(0, 0, std::vector<std::pair<int, int>>());\n\n    std::vector<std::pair<int,\
+    \ int>> star;\n    for (int right = 0; right < 20; right++) star.emplace_back(0,\
+    \ right);\n    check(1, 20, star);\n\n    std::vector<std::pair<int, int>> parallel;\n\
+    \    for (int edge = 0; edge < 15; edge++) parallel.emplace_back(0, 0);\n    check(1,\
+    \ 1, parallel);\n\n    std::vector<std::pair<int, int>> complete;\n    for (int\
+    \ left = 0; left < 7; left++) {\n        for (int right = 0; right < 7; right++)\
+    \ complete.emplace_back(left, right);\n    }\n    check(7, 7, complete);\n}\n\n\
+    void test_randomized() {\n    std::uint64_t state = 393393;\n    auto random =\
+    \ [&state]() {\n        state ^= state << 7;\n        state ^= state >> 9;\n \
+    \       return state;\n    };\n\n    for (int trial = 0; trial < 3000; trial++)\
+    \ {\n        int left_size = 1 + int(random() % 10);\n        int right_size =\
+    \ 1 + int(random() % 10);\n        int edge_count = int(random() % 50);\n    \
+    \    std::vector<std::pair<int, int>> edges;\n        edges.reserve(edge_count);\n\
+    \        for (int edge = 0; edge < edge_count; edge++) {\n            edges.emplace_back(\n\
+    \                int(random() % left_size),\n                int(random() % right_size)\n\
+    \            );\n        }\n        check(left_size, right_size, edges);\n   \
+    \ }\n}\n\n}  // namespace\n\nint main() {\n    test_fixed();\n    test_randomized();\n\
+    \n    std::ios::sync_with_stdio(false);\n    std::cin.tie(nullptr);\n\n    int\
+    \ left_size, right_size, edge_count;\n    std::cin >> left_size >> right_size\
+    \ >> edge_count;\n    std::vector<std::pair<int, int>> edges(edge_count);\n  \
+    \  for (auto& [left, right] : edges) std::cin >> left >> right;\n\n    auto result\
+    \ = m1une::graph::bipartite_edge_coloring(left_size, right_size, edges);\n   \
+    \ std::cout << result.color_count << '\\n';\n    for (int color : result.color)\
+    \ std::cout << color << '\\n';\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/bipartite_edge_coloring\"\
+    \n\n#include \"../../graph/bipartite.hpp\"\n\n#include <algorithm>\n#include <cassert>\n\
+    #include <cstdint>\n#include <iostream>\n#include <utility>\n#include <vector>\n\
+    \nnamespace {\n\nvoid check(\n    int left_size,\n    int right_size,\n    const\
+    \ std::vector<std::pair<int, int>>& edges\n) {\n    std::vector<int> left_degree(left_size,\
+    \ 0);\n    std::vector<int> right_degree(right_size, 0);\n    int maximum_degree\
+    \ = 0;\n    for (auto [left, right] : edges) {\n        left_degree[left]++;\n\
+    \        right_degree[right]++;\n        maximum_degree = std::max(maximum_degree,\
+    \ left_degree[left]);\n        maximum_degree = std::max(maximum_degree, right_degree[right]);\n\
+    \    }\n\n    auto result = m1une::graph::bipartite_edge_coloring(left_size, right_size,\
+    \ edges);\n    assert(result.color_count == maximum_degree);\n    assert(result.color.size()\
+    \ == edges.size());\n    std::vector<std::vector<char>> left_used(\n        left_size,\n\
+    \        std::vector<char>(maximum_degree, false)\n    );\n    std::vector<std::vector<char>>\
+    \ right_used(\n        right_size,\n        std::vector<char>(maximum_degree,\
+    \ false)\n    );\n    for (int edge = 0; edge < int(edges.size()); edge++) {\n\
+    \        auto [left, right] = edges[edge];\n        int color = result.color[edge];\n\
+    \        assert(0 <= color && color < maximum_degree);\n        assert(!left_used[left][color]);\n\
+    \        assert(!right_used[right][color]);\n        left_used[left][color] =\
+    \ true;\n        right_used[right][color] = true;\n    }\n}\n\nvoid test_fixed()\
+    \ {\n    check(0, 0, std::vector<std::pair<int, int>>());\n\n    std::vector<std::pair<int,\
+    \ int>> star;\n    for (int right = 0; right < 20; right++) star.emplace_back(0,\
+    \ right);\n    check(1, 20, star);\n\n    std::vector<std::pair<int, int>> parallel;\n\
+    \    for (int edge = 0; edge < 15; edge++) parallel.emplace_back(0, 0);\n    check(1,\
+    \ 1, parallel);\n\n    std::vector<std::pair<int, int>> complete;\n    for (int\
+    \ left = 0; left < 7; left++) {\n        for (int right = 0; right < 7; right++)\
+    \ complete.emplace_back(left, right);\n    }\n    check(7, 7, complete);\n}\n\n\
+    void test_randomized() {\n    std::uint64_t state = 393393;\n    auto random =\
+    \ [&state]() {\n        state ^= state << 7;\n        state ^= state >> 9;\n \
+    \       return state;\n    };\n\n    for (int trial = 0; trial < 3000; trial++)\
+    \ {\n        int left_size = 1 + int(random() % 10);\n        int right_size =\
+    \ 1 + int(random() % 10);\n        int edge_count = int(random() % 50);\n    \
+    \    std::vector<std::pair<int, int>> edges;\n        edges.reserve(edge_count);\n\
+    \        for (int edge = 0; edge < edge_count; edge++) {\n            edges.emplace_back(\n\
+    \                int(random() % left_size),\n                int(random() % right_size)\n\
+    \            );\n        }\n        check(left_size, right_size, edges);\n   \
+    \ }\n}\n\n}  // namespace\n\nint main() {\n    test_fixed();\n    test_randomized();\n\
+    \n    std::ios::sync_with_stdio(false);\n    std::cin.tie(nullptr);\n\n    int\
+    \ left_size, right_size, edge_count;\n    std::cin >> left_size >> right_size\
+    \ >> edge_count;\n    std::vector<std::pair<int, int>> edges(edge_count);\n  \
+    \  for (auto& [left, right] : edges) std::cin >> left >> right;\n\n    auto result\
+    \ = m1une::graph::bipartite_edge_coloring(left_size, right_size, edges);\n   \
+    \ std::cout << result.color_count << '\\n';\n    for (int color : result.color)\
+    \ std::cout << color << '\\n';\n}\n"
   dependsOn:
   - graph/bipartite.hpp
   - graph/graph.hpp
   isVerificationFile: true
-  path: verify/graph/bipartite_matching.test.cpp
+  path: verify/graph/bipartite_edge_coloring.test.cpp
   requiredBy: []
   timestamp: '2026-07-14 01:19:48+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/graph/bipartite_matching.test.cpp
+documentation_of: verify/graph/bipartite_edge_coloring.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/graph/bipartite_matching.test.cpp
-- /verify/verify/graph/bipartite_matching.test.cpp.html
-title: verify/graph/bipartite_matching.test.cpp
+- /verify/verify/graph/bipartite_edge_coloring.test.cpp
+- /verify/verify/graph/bipartite_edge_coloring.test.cpp.html
+title: verify/graph/bipartite_edge_coloring.test.cpp
 ---

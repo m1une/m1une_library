@@ -1488,6 +1488,9 @@ data:
       path: verify/graph/biconnected_components.test.cpp
       title: verify/graph/biconnected_components.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/graph/bipartite_edge_coloring.test.cpp
+      title: verify/graph/bipartite_edge_coloring.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/graph/bipartite_matching.test.cpp
       title: verify/graph/bipartite_matching.test.cpp
     - icon: ':heavy_check_mark:'
