@@ -819,6 +819,9 @@ data:
       path: math/matrix/all.hpp
       title: Matrix Bundle
     - icon: ':heavy_check_mark:'
+      path: math/matrix/bit_matrix.hpp
+      title: Bit Matrix
+    - icon: ':heavy_check_mark:'
       path: math/matrix/characteristic_polynomial.hpp
       title: Characteristic Polynomial
     - icon: ':heavy_check_mark:'
@@ -1725,6 +1728,18 @@ data:
       title: verify/math/fps/pow_of_formal_power_series.test.cpp
   - name: verify/math/matrix
     pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/math/matrix/bit_matrix_inverse.test.cpp
+      title: verify/math/matrix/bit_matrix_inverse.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/matrix/bit_matrix_linear_system.test.cpp
+      title: verify/math/matrix/bit_matrix_linear_system.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/matrix/bit_matrix_product.test.cpp
+      title: verify/math/matrix/bit_matrix_product.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/matrix/bit_matrix_rank.test.cpp
+      title: verify/math/matrix/bit_matrix_rank.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/matrix/characteristic_polynomial.test.cpp
       title: verify/math/matrix/characteristic_polynomial.test.cpp

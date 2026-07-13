@@ -77,6 +77,9 @@ data:
     path: math/matrix/all.hpp
     title: Matrix Bundle
   - icon: ':heavy_check_mark:'
+    path: math/matrix/bit_matrix.hpp
+    title: Bit Matrix
+  - icon: ':heavy_check_mark:'
     path: math/matrix/characteristic_polynomial.hpp
     title: Characteristic Polynomial
   - icon: ':heavy_check_mark:'
@@ -276,6 +279,7 @@ data:
   - math/fps/multipoint_evaluation.hpp
   - math/fps/polynomial_factorization.hpp
   - math/matrix/all.hpp
+  - math/matrix/bit_matrix.hpp
   - math/matrix/characteristic_polynomial.hpp
   - math/matrix/matrix.hpp
   - math/matrix/linear_algebra.hpp
@@ -296,7 +300,7 @@ data:
   isVerificationFile: false
   path: math/all.hpp
   requiredBy: []
-  timestamp: '2026-07-13 05:49:34+09:00'
+  timestamp: '2026-07-13 20:43:05+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
@@ -388,7 +392,7 @@ few unused headers do not matter.
 | `math/modular_square_root.hpp` | Modular square roots for prime moduli using Tonelli-Shanks. |
 | `math/multiplicative_function_prefix_sum.hpp` | Min_25 prefix sums of a multiplicative function. |
 | `math/fps/all.hpp` | Convolution, formal power series, polynomial algorithms, and linear recurrences. |
-| `math/matrix/all.hpp` | Dense matrices, powers, Gaussian elimination, determinant, inverse, and linear systems. |
+| `math/matrix/all.hpp` | Dense and packed GF(2) matrices, powers, Gaussian elimination, determinant, inverse, and linear systems. |
 | `math/combinatorics.hpp` | Factorials, binomial coefficients, permutations, and multiset counts. |
 | `math/combinatorial_sequences.hpp` | Fast standard counting sequences and special numbers. |
 | `math/cyclotomic_polynomial.hpp` | Integer coefficients of cyclotomic polynomials. |

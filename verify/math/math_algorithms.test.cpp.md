@@ -80,6 +80,9 @@ data:
     path: math/matrix/all.hpp
     title: Matrix Bundle
   - icon: ':heavy_check_mark:'
+    path: math/matrix/bit_matrix.hpp
+    title: Bit Matrix
+  - icon: ':heavy_check_mark:'
     path: math/matrix/characteristic_polynomial.hpp
     title: Characteristic Polynomial
   - icon: ':heavy_check_mark:'
@@ -375,6 +378,7 @@ data:
   - math/fps/multipoint_evaluation.hpp
   - math/fps/polynomial_factorization.hpp
   - math/matrix/all.hpp
+  - math/matrix/bit_matrix.hpp
   - math/matrix/characteristic_polynomial.hpp
   - math/matrix/matrix.hpp
   - math/matrix/linear_algebra.hpp
@@ -395,7 +399,7 @@ data:
   isVerificationFile: true
   path: verify/math/math_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-13 05:49:34+09:00'
+  timestamp: '2026-07-13 20:43:05+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/math_algorithms.test.cpp
