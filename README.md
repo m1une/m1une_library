@@ -62,7 +62,7 @@ short namespace segment after `m1une::`; nested directories are for browsing.
 | `algo/sequence/` | Array and sequence algorithms such as LIS, inversion count, distinct-subsequence counting, run-length encoding, and meet-in-the-middle subset sum. |
 | `algo/search/` | Search-over-answer and unimodal optimization helpers. |
 | `algo/offline/` | Offline query processing such as Mo's algorithm. |
-| `algo/enumeration/` | Combinatorial traversal helpers such as Gray-code enumeration. |
+| `algo/enumeration/` | Enumeration helpers for combinations, bitmasks, Gray codes, and aligned segment-tree ranges. |
 | `algo/dp/` | Domain-neutral DP helpers such as knapsack routines. |
 
 Rule of thumb: if you call a function once and use its returned result directly,

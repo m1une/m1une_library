@@ -3,6 +3,7 @@
 
 #include "combination.hpp"
 #include "gray_code.hpp"
+#include "segtree_range.hpp"
 #include "submask.hpp"
 
 #endif  // M1UNE_ALGO_ENUMERATION_ALL_HPP
