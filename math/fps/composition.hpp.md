@@ -23,10 +23,16 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/fps/all.hpp
     title: Formal Power Series All
+  - icon: ':heavy_check_mark:'
+    path: math/fps/compositional_inverse.hpp
+    title: Compositional Inverse of Formal Power Series
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/math/fps/composition.test.cpp
     title: verify/math/fps/composition.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/fps/compositional_inverse.test.cpp
+    title: verify/math/fps/compositional_inverse.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/fps/fps_algorithms.test.cpp
     title: verify/math/fps/fps_algorithms.test.cpp
@@ -1021,11 +1027,13 @@ data:
   path: math/fps/composition.hpp
   requiredBy:
   - math/all.hpp
+  - math/fps/compositional_inverse.hpp
   - math/fps/all.hpp
   timestamp: '2026-07-13 23:28:27+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
+  - verify/math/fps/compositional_inverse.test.cpp
   - verify/math/fps/composition.test.cpp
   - verify/math/fps/fps_algorithms.test.cpp
 documentation_of: math/fps/composition.hpp

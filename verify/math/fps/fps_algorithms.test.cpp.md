@@ -8,6 +8,9 @@ data:
     path: math/fps/composition.hpp
     title: Formal Power Series Composition
   - icon: ':heavy_check_mark:'
+    path: math/fps/compositional_inverse.hpp
+    title: Compositional Inverse of Formal Power Series
+  - icon: ':heavy_check_mark:'
     path: math/fps/convolution.hpp
     title: Convolution
   - icon: ':heavy_check_mark:'
@@ -949,11 +952,30 @@ data:
     \ std::move(denominator));\n\n    FormalPowerSeries<Mint> result(degree);\n  \
     \  for (int i = 0; i < degree; i++) result[i] = transposed[i][0];\n    std::reverse(result.begin(),\
     \ result.end());\n    return result;\n}\n\n}  // namespace fps\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"math/fps/convolution_ll.hpp\"\n\n\n\n#line 6 \"math/fps/convolution_ll.hpp\"\
-    \n#include <limits>\n#line 8 \"math/fps/convolution_ll.hpp\"\n\n#line 11 \"math/fps/convolution_ll.hpp\"\
-    \n\nnamespace m1une {\nnamespace fps {\n\n// Exact convolution of signed 64-bit\
-    \ coefficients.\n// Every result coefficient must fit in long long.\ninline std::vector<long\
-    \ long> convolution_ll(\n    const std::vector<long long>& first,\n    const std::vector<long\
+    \ m1une\n\n\n#line 1 \"math/fps/compositional_inverse.hpp\"\n\n\n\n#line 6 \"\
+    math/fps/compositional_inverse.hpp\"\n\n#line 8 \"math/fps/compositional_inverse.hpp\"\
+    \n\nnamespace m1une {\nnamespace fps {\n\ntemplate <class Mint>\nFormalPowerSeries<Mint>\
+    \ compositional_inverse(const FormalPowerSeries<Mint>& f,\n                  \
+    \                            int degree = -1) {\n    using Fps = FormalPowerSeries<Mint>;\n\
+    \    if (degree < 0) degree = int(f.size());\n    assert(degree >= 0);\n    if\
+    \ (degree == 0) return {};\n    assert(f.size() >= 2 && f[0] == Mint(0) && f[1]\
+    \ != Mint(0));\n\n    Fps result(2);\n    result[1] = f[1].inv();\n    if (degree\
+    \ == 1) return result.pre(1);\n\n    for (int size = 2; size < degree;) {\n  \
+    \      const int next_size = std::min(size << 1, degree);\n        Fps composed\
+    \ = compose(f.pre(next_size), result, next_size);\n        const int correction_size\
+    \ = next_size - size;\n        Fps inverse_derivative = composed.derivative().inv(correction_size);\n\
+    \        composed[1] -= Mint(1);\n        Fps inverse_jacobian =\n           \
+    \ (result.derivative().pre(correction_size) * inverse_derivative)\n          \
+    \      .pre(correction_size);\n        Fps correction = ((composed >> size) *\
+    \ inverse_jacobian).pre(correction_size);\n        correction <<= size;\n\n  \
+    \      result = result.pre(next_size) - correction;\n        result.resize(next_size);\n\
+    \        size = next_size;\n    }\n    return result.pre(degree);\n}\n\n}  //\
+    \ namespace fps\n}  // namespace m1une\n\n\n#line 1 \"math/fps/convolution_ll.hpp\"\
+    \n\n\n\n#line 6 \"math/fps/convolution_ll.hpp\"\n#include <limits>\n#line 8 \"\
+    math/fps/convolution_ll.hpp\"\n\n#line 11 \"math/fps/convolution_ll.hpp\"\n\n\
+    namespace m1une {\nnamespace fps {\n\n// Exact convolution of signed 64-bit coefficients.\n\
+    // Every result coefficient must fit in long long.\ninline std::vector<long long>\
+    \ convolution_ll(\n    const std::vector<long long>& first,\n    const std::vector<long\
     \ long>& second\n) {\n    if (first.empty() || second.empty()) return {};\n  \
     \  std::size_t result_size = first.size() + second.size() - 1;\n    assert(result_size\
     \ <= (std::size_t(1) << 24));\n\n    using Mint1 = math::ModInt<167772161>;\n\
@@ -1329,7 +1351,7 @@ data:
     \ && merged.back().polynomial == factor.polynomial) {\n            merged.back().multiplicity\
     \ += factor.multiplicity;\n        } else {\n            merged.push_back(std::move(factor));\n\
     \        }\n    }\n    return {leading_coefficient, std::move(merged)};\n}\n\n\
-    }  // namespace fps\n}  // namespace m1une\n\n\n#line 14 \"math/fps/all.hpp\"\n\
+    }  // namespace fps\n}  // namespace m1une\n\n\n#line 15 \"math/fps/all.hpp\"\n\
     \n\n#line 11 \"verify/math/fps/fps_algorithms.test.cpp\"\n\nusing mint = m1une::math::modint998244353;\n\
     using mint1e9 = m1une::math::modint1000000007;\nusing Fps = m1une::fps::FormalPowerSeries<mint>;\n\
     \ntemplate <class Mint>\nvoid assert_equal(const std::vector<Mint>& lhs, const\
@@ -1459,6 +1481,7 @@ data:
   - math/fps/convolution.hpp
   - math/fps/internal/ntt998_faster.hpp
   - math/modint.hpp
+  - math/fps/compositional_inverse.hpp
   - math/fps/convolution_ll.hpp
   - math/fps/floating_point_convolution.hpp
   - math/fps/half_gcd.hpp
@@ -1470,7 +1493,7 @@ data:
   isVerificationFile: true
   path: verify/math/fps/fps_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-13 23:28:27+09:00'
+  timestamp: '2026-07-14 00:30:03+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/fps/fps_algorithms.test.cpp

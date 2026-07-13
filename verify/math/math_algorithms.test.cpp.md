@@ -38,6 +38,9 @@ data:
     path: math/fps/composition.hpp
     title: Formal Power Series Composition
   - icon: ':heavy_check_mark:'
+    path: math/fps/compositional_inverse.hpp
+    title: Compositional Inverse of Formal Power Series
+  - icon: ':heavy_check_mark:'
     path: math/fps/convolution.hpp
     title: Convolution
   - icon: ':heavy_check_mark:'
@@ -1866,35 +1869,54 @@ data:
     \ std::move(denominator));\n\n    FormalPowerSeries<Mint> result(degree);\n  \
     \  for (int i = 0; i < degree; i++) result[i] = transposed[i][0];\n    std::reverse(result.begin(),\
     \ result.end());\n    return result;\n}\n\n}  // namespace fps\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"math/fps/convolution_ll.hpp\"\n\n\n\n#line 8 \"math/fps/convolution_ll.hpp\"\
-    \n\n#line 11 \"math/fps/convolution_ll.hpp\"\n\nnamespace m1une {\nnamespace fps\
-    \ {\n\n// Exact convolution of signed 64-bit coefficients.\n// Every result coefficient\
-    \ must fit in long long.\ninline std::vector<long long> convolution_ll(\n    const\
-    \ std::vector<long long>& first,\n    const std::vector<long long>& second\n)\
-    \ {\n    if (first.empty() || second.empty()) return {};\n    std::size_t result_size\
-    \ = first.size() + second.size() - 1;\n    assert(result_size <= (std::size_t(1)\
-    \ << 24));\n\n    using Mint1 = math::ModInt<167772161>;\n    using Mint2 = math::ModInt<469762049>;\n\
-    \    using Mint3 = math::ModInt<754974721>;\n\n    auto convolve = [&]<class Mint>()\
-    \ {\n        std::vector<Mint> converted_first(first.size());\n        std::vector<Mint>\
-    \ converted_second(second.size());\n        for (int index = 0; index < int(first.size());\
-    \ index++) {\n            converted_first[index] = Mint(first[index]);\n     \
-    \   }\n        for (int index = 0; index < int(second.size()); index++) {\n  \
-    \          converted_second[index] = Mint(second[index]);\n        }\n       \
-    \ return convolution(converted_first, converted_second);\n    };\n\n    std::vector<Mint1>\
-    \ result1 = convolve.template operator()<Mint1>();\n    std::vector<Mint2> result2\
-    \ = convolve.template operator()<Mint2>();\n    std::vector<Mint3> result3 = convolve.template\
-    \ operator()<Mint3>();\n\n    static const std::uint64_t inverse_mod1_mod2 =\n\
-    \        Mint2(Mint1::mod()).inv().val();\n    static const std::uint64_t mod1_mod2\
-    \ =\n        std::uint64_t(Mint1::mod()) * Mint2::mod();\n    static const std::uint64_t\
-    \ inverse_mod1_mod2_mod3 =\n        Mint3(mod1_mod2 % Mint3::mod()).inv().val();\n\
-    \    static const unsigned __int128 crt_modulus =\n        static_cast<unsigned\
-    \ __int128>(mod1_mod2) * Mint3::mod();\n\n    std::vector<long long> result(result_size);\n\
-    \    for (int index = 0; index < int(result_size); index++) {\n        std::uint64_t\
-    \ residue1 = result1[index].val();\n        std::uint64_t residue2 = result2[index].val();\n\
-    \        std::uint64_t residue3 = result3[index].val();\n\n        std::uint64_t\
-    \ second_digit =\n            (residue2 + Mint2::mod() - residue1 % Mint2::mod())\
-    \ %\n            Mint2::mod();\n        second_digit = second_digit * inverse_mod1_mod2\
-    \ % Mint2::mod();\n        std::uint64_t first_two =\n            residue1 + std::uint64_t(Mint1::mod())\
+    \ m1une\n\n\n#line 1 \"math/fps/compositional_inverse.hpp\"\n\n\n\n#line 6 \"\
+    math/fps/compositional_inverse.hpp\"\n\n#line 8 \"math/fps/compositional_inverse.hpp\"\
+    \n\nnamespace m1une {\nnamespace fps {\n\ntemplate <class Mint>\nFormalPowerSeries<Mint>\
+    \ compositional_inverse(const FormalPowerSeries<Mint>& f,\n                  \
+    \                            int degree = -1) {\n    using Fps = FormalPowerSeries<Mint>;\n\
+    \    if (degree < 0) degree = int(f.size());\n    assert(degree >= 0);\n    if\
+    \ (degree == 0) return {};\n    assert(f.size() >= 2 && f[0] == Mint(0) && f[1]\
+    \ != Mint(0));\n\n    Fps result(2);\n    result[1] = f[1].inv();\n    if (degree\
+    \ == 1) return result.pre(1);\n\n    for (int size = 2; size < degree;) {\n  \
+    \      const int next_size = std::min(size << 1, degree);\n        Fps composed\
+    \ = compose(f.pre(next_size), result, next_size);\n        const int correction_size\
+    \ = next_size - size;\n        Fps inverse_derivative = composed.derivative().inv(correction_size);\n\
+    \        composed[1] -= Mint(1);\n        Fps inverse_jacobian =\n           \
+    \ (result.derivative().pre(correction_size) * inverse_derivative)\n          \
+    \      .pre(correction_size);\n        Fps correction = ((composed >> size) *\
+    \ inverse_jacobian).pre(correction_size);\n        correction <<= size;\n\n  \
+    \      result = result.pre(next_size) - correction;\n        result.resize(next_size);\n\
+    \        size = next_size;\n    }\n    return result.pre(degree);\n}\n\n}  //\
+    \ namespace fps\n}  // namespace m1une\n\n\n#line 1 \"math/fps/convolution_ll.hpp\"\
+    \n\n\n\n#line 8 \"math/fps/convolution_ll.hpp\"\n\n#line 11 \"math/fps/convolution_ll.hpp\"\
+    \n\nnamespace m1une {\nnamespace fps {\n\n// Exact convolution of signed 64-bit\
+    \ coefficients.\n// Every result coefficient must fit in long long.\ninline std::vector<long\
+    \ long> convolution_ll(\n    const std::vector<long long>& first,\n    const std::vector<long\
+    \ long>& second\n) {\n    if (first.empty() || second.empty()) return {};\n  \
+    \  std::size_t result_size = first.size() + second.size() - 1;\n    assert(result_size\
+    \ <= (std::size_t(1) << 24));\n\n    using Mint1 = math::ModInt<167772161>;\n\
+    \    using Mint2 = math::ModInt<469762049>;\n    using Mint3 = math::ModInt<754974721>;\n\
+    \n    auto convolve = [&]<class Mint>() {\n        std::vector<Mint> converted_first(first.size());\n\
+    \        std::vector<Mint> converted_second(second.size());\n        for (int\
+    \ index = 0; index < int(first.size()); index++) {\n            converted_first[index]\
+    \ = Mint(first[index]);\n        }\n        for (int index = 0; index < int(second.size());\
+    \ index++) {\n            converted_second[index] = Mint(second[index]);\n   \
+    \     }\n        return convolution(converted_first, converted_second);\n    };\n\
+    \n    std::vector<Mint1> result1 = convolve.template operator()<Mint1>();\n  \
+    \  std::vector<Mint2> result2 = convolve.template operator()<Mint2>();\n    std::vector<Mint3>\
+    \ result3 = convolve.template operator()<Mint3>();\n\n    static const std::uint64_t\
+    \ inverse_mod1_mod2 =\n        Mint2(Mint1::mod()).inv().val();\n    static const\
+    \ std::uint64_t mod1_mod2 =\n        std::uint64_t(Mint1::mod()) * Mint2::mod();\n\
+    \    static const std::uint64_t inverse_mod1_mod2_mod3 =\n        Mint3(mod1_mod2\
+    \ % Mint3::mod()).inv().val();\n    static const unsigned __int128 crt_modulus\
+    \ =\n        static_cast<unsigned __int128>(mod1_mod2) * Mint3::mod();\n\n   \
+    \ std::vector<long long> result(result_size);\n    for (int index = 0; index <\
+    \ int(result_size); index++) {\n        std::uint64_t residue1 = result1[index].val();\n\
+    \        std::uint64_t residue2 = result2[index].val();\n        std::uint64_t\
+    \ residue3 = result3[index].val();\n\n        std::uint64_t second_digit =\n \
+    \           (residue2 + Mint2::mod() - residue1 % Mint2::mod()) %\n          \
+    \  Mint2::mod();\n        second_digit = second_digit * inverse_mod1_mod2 % Mint2::mod();\n\
+    \        std::uint64_t first_two =\n            residue1 + std::uint64_t(Mint1::mod())\
     \ * second_digit;\n\n        std::uint64_t third_digit =\n            (residue3\
     \ + Mint3::mod() - first_two % Mint3::mod()) %\n            Mint3::mod();\n  \
     \      third_digit =\n            third_digit * inverse_mod1_mod2_mod3 % Mint3::mod();\n\
@@ -2245,7 +2267,7 @@ data:
     \ && merged.back().polynomial == factor.polynomial) {\n            merged.back().multiplicity\
     \ += factor.multiplicity;\n        } else {\n            merged.push_back(std::move(factor));\n\
     \        }\n    }\n    return {leading_coefficient, std::move(merged)};\n}\n\n\
-    }  // namespace fps\n}  // namespace m1une\n\n\n#line 14 \"math/fps/all.hpp\"\n\
+    }  // namespace fps\n}  // namespace m1une\n\n\n#line 15 \"math/fps/all.hpp\"\n\
     \n\n#line 1 \"math/matrix/all.hpp\"\n\n\n\n#line 1 \"math/matrix/bit_matrix.hpp\"\
     \n\n\n\n#line 10 \"math/matrix/bit_matrix.hpp\"\n#include <string>\n#include <string_view>\n\
     #line 14 \"math/matrix/bit_matrix.hpp\"\n\nnamespace m1une {\nnamespace matrix\
@@ -3848,6 +3870,7 @@ data:
   - math/fps/all.hpp
   - math/fps/composition.hpp
   - math/fps/formal_power_series.hpp
+  - math/fps/compositional_inverse.hpp
   - math/fps/convolution_ll.hpp
   - math/fps/floating_point_convolution.hpp
   - math/fps/half_gcd.hpp
@@ -3879,7 +3902,7 @@ data:
   isVerificationFile: true
   path: verify/math/math_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-13 23:28:27+09:00'
+  timestamp: '2026-07-14 00:30:03+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/math_algorithms.test.cpp

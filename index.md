@@ -788,6 +788,9 @@ data:
       path: math/fps/composition.hpp
       title: Formal Power Series Composition
     - icon: ':heavy_check_mark:'
+      path: math/fps/compositional_inverse.hpp
+      title: Compositional Inverse of Formal Power Series
+    - icon: ':heavy_check_mark:'
       path: math/fps/convolution.hpp
       title: Convolution
     - icon: ':heavy_check_mark:'
@@ -1699,6 +1702,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/fps/composition.test.cpp
       title: verify/math/fps/composition.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/fps/compositional_inverse.test.cpp
+      title: verify/math/fps/compositional_inverse.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/fps/convolution_ll.test.cpp
       title: verify/math/fps/convolution_ll.test.cpp
