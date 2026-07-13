@@ -18,6 +18,7 @@
 #include "kruskal.hpp"
 #include "lowlink.hpp"
 #include "maximum_clique.hpp"
+#include "matrix_tree_theorem.hpp"
 #include "minimum_steiner_tree.hpp"
 #include "namori.hpp"
 #include "replacement_paths.hpp"
