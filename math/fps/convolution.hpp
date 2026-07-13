@@ -334,6 +334,185 @@ std::vector<Mint> convolution_ntt(const std::vector<Mint>& a, const std::vector<
     return fa;
 }
 
+namespace internal {
+
+template <class Mint>
+std::vector<Mint> convolution_998244353_blocked_scalar(const std::vector<Mint>& a,
+                                                       const std::vector<Mint>& b,
+                                                       int transform_size) {
+    assert(Mint::mod() == 998244353);
+    assert(transform_size >= 2 && (transform_size & (transform_size - 1)) == 0);
+    assert((Mint::mod() - 1) % uint32_t(transform_size) == 0);
+
+    const int block_size = transform_size / 2;
+    const int a_blocks = int((a.size() + block_size - 1) / block_size);
+    const int b_blocks = int((b.size() + block_size - 1) / block_size);
+
+    auto transform_blocks = [&](const std::vector<Mint>& values, int block_count) {
+        std::vector<std::vector<Mint>> blocks;
+        blocks.reserve(block_count);
+        for (int block = 0; block < block_count; block++) {
+            const int begin = block * block_size;
+            const int count = std::min(block_size, int(values.size()) - begin);
+            std::vector<Mint> transformed(transform_size);
+            std::copy_n(values.begin() + begin, count, transformed.begin());
+            ntt(transformed, false);
+            blocks.emplace_back(std::move(transformed));
+        }
+        return blocks;
+    };
+
+    std::vector<std::vector<Mint>> transformed_a = transform_blocks(a, a_blocks);
+    std::vector<std::vector<Mint>> transformed_b = transform_blocks(b, b_blocks);
+    const int result_size = int(a.size() + b.size() - 1);
+    std::vector<Mint> result(result_size);
+    std::vector<Mint> transformed_result(transform_size);
+    for (int diagonal = 0; diagonal < a_blocks + b_blocks - 1; diagonal++) {
+        std::fill(transformed_result.begin(), transformed_result.end(), Mint(0));
+        const int first_a = std::max(0, diagonal - (b_blocks - 1));
+        const int last_a = std::min(a_blocks - 1, diagonal);
+        for (int a_block = first_a; a_block <= last_a; a_block++) {
+            const int b_block = diagonal - a_block;
+            for (int i = 0; i < transform_size; i++)
+                transformed_result[i] +=
+                    transformed_a[a_block][i] * transformed_b[b_block][i];
+        }
+        ntt(transformed_result, true);
+
+        const int output_offset = diagonal * block_size;
+        const int output_count = std::min(transform_size, result_size - output_offset);
+        for (int i = 0; i < output_count; i++)
+            result[output_offset + i] += transformed_result[i];
+    }
+    return result;
+}
+
+#ifdef M1UNE_FPS_HAS_X86_SIMD
+
+class AlignedUint32Buffer {
+   private:
+    uint32_t* data_;
+
+   public:
+    explicit AlignedUint32Buffer(std::size_t size)
+        : data_(static_cast<uint32_t*>(
+              ::operator new[](sizeof(uint32_t) * size, std::align_val_t(32)))) {}
+
+    AlignedUint32Buffer(const AlignedUint32Buffer&) = delete;
+    AlignedUint32Buffer& operator=(const AlignedUint32Buffer&) = delete;
+
+    AlignedUint32Buffer(AlignedUint32Buffer&& other) noexcept : data_(other.data_) {
+        other.data_ = nullptr;
+    }
+
+    AlignedUint32Buffer& operator=(AlignedUint32Buffer&& other) noexcept {
+        if (this == &other) return *this;
+        ::operator delete[](data_, std::align_val_t(32));
+        data_ = other.data_;
+        other.data_ = nullptr;
+        return *this;
+    }
+
+    ~AlignedUint32Buffer() {
+        ::operator delete[](data_, std::align_val_t(32));
+    }
+
+    uint32_t* data() {
+        return data_;
+    }
+
+    const uint32_t* data() const {
+        return data_;
+    }
+};
+
+template <class Mint>
+__attribute__((target("avx2,bmi"), hot))
+std::vector<Mint> convolution_998244353_blocked_simd(const std::vector<Mint>& a,
+                                                     const std::vector<Mint>& b,
+                                                     int transform_size) {
+    assert(Mint::mod() == 998244353);
+    assert(transform_size >= 64 && (transform_size & (transform_size - 1)) == 0);
+    assert((Mint::mod() - 1) % uint32_t(transform_size) == 0);
+
+    const int block_size = transform_size / 2;
+    const int a_blocks = int((a.size() + block_size - 1) / block_size);
+    const int b_blocks = int((b.size() + block_size - 1) / block_size);
+    static constexpr fast998_v2::FNTT32_info transform(998244353);
+    const std::size_t vector_size = std::size_t(transform_size) / 8;
+
+    auto transform_blocks = [&](const std::vector<Mint>& values, int block_count) {
+        std::vector<AlignedUint32Buffer> blocks;
+        blocks.reserve(block_count);
+        for (int block = 0; block < block_count; block++) {
+            const int begin = block * block_size;
+            const int count = std::min(block_size, int(values.size()) - begin);
+            AlignedUint32Buffer transformed(transform_size);
+            if constexpr (std::is_same_v<Mint, math::ModInt<998244353>>) {
+                static_assert(sizeof(Mint) == sizeof(uint32_t) &&
+                              std::is_trivially_copyable_v<Mint>);
+                std::memcpy(transformed.data(), values.data() + begin,
+                            sizeof(uint32_t) * count);
+            } else {
+                for (int i = 0; i < count; i++)
+                    transformed.data()[i] = values[begin + i].val();
+            }
+            std::memset(transformed.data() + count, 0,
+                        sizeof(uint32_t) * (transform_size - count));
+            fast998_v2::vector_dif(reinterpret_cast<__m256i*>(transformed.data()),
+                                   vector_size, &transform);
+            blocks.emplace_back(std::move(transformed));
+        }
+        return blocks;
+    };
+
+    std::vector<AlignedUint32Buffer> transformed_a = transform_blocks(a, a_blocks);
+    std::vector<AlignedUint32Buffer> transformed_b = transform_blocks(b, b_blocks);
+    const int result_size = int(a.size() + b.size() - 1);
+    std::vector<Mint> result(result_size);
+    AlignedUint32Buffer transformed_result(transform_size);
+    for (int diagonal = 0; diagonal < a_blocks + b_blocks - 1; diagonal++) {
+        std::memset(transformed_result.data(), 0, sizeof(uint32_t) * transform_size);
+        const int first_a = std::max(0, diagonal - (b_blocks - 1));
+        const int last_a = std::min(a_blocks - 1, diagonal);
+        for (int a_block = first_a; a_block <= last_a; a_block++) {
+            const int b_block = diagonal - a_block;
+            fast998_v2::vector_convolution_accumulate(
+                reinterpret_cast<__m256i*>(transformed_result.data()),
+                reinterpret_cast<const __m256i*>(transformed_a[a_block].data()),
+                reinterpret_cast<const __m256i*>(transformed_b[b_block].data()),
+                vector_size, &transform);
+        }
+        fast998_v2::vector_dit<true>(
+            reinterpret_cast<__m256i*>(transformed_result.data()), vector_size,
+            &transform);
+
+        const int output_offset = diagonal * block_size;
+        const int output_count = std::min(transform_size, result_size - output_offset);
+        for (int i = 0; i < output_count; i++) {
+            uint32_t value = result[output_offset + i].val() + transformed_result.data()[i];
+            if (value >= Mint::mod()) value -= Mint::mod();
+            result[output_offset + i] = Mint::raw(value);
+        }
+    }
+    return result;
+}
+
+#endif
+
+template <class Mint>
+std::vector<Mint> convolution_998244353_blocked(const std::vector<Mint>& a,
+                                                const std::vector<Mint>& b,
+                                                int transform_size = 1 << 23) {
+#ifdef M1UNE_FPS_HAS_X86_SIMD
+    if (transform_size >= 64 && __builtin_cpu_supports("avx2"))
+        return convolution_998244353_blocked_simd(a, b, transform_size);
+#endif
+    return convolution_998244353_blocked_scalar(a, b, transform_size);
+}
+
+}  // namespace internal
+
 template <class Mint>
 std::vector<Mint> convolution(const std::vector<Mint>& a, const std::vector<Mint>& b) {
     if (a.empty() || b.empty()) return {};
@@ -343,6 +522,10 @@ std::vector<Mint> convolution(const std::vector<Mint>& a, const std::vector<Mint
     int n = 1;
     while (n < result_size) n <<= 1;
     if constexpr (internal::has_static_modulus<Mint>::value) {
+        if constexpr (Mint::mod() == 998244353) {
+            if (n > (1 << 23))
+                return internal::convolution_998244353_blocked(a, b);
+        }
         if ((Mint::mod() - 1) % uint32_t(n) == 0) return convolution_ntt(a, b);
     }
 

@@ -28,6 +28,8 @@ void test_convolution() {
         for (mint& value : a) value = mint(static_cast<uint32_t>(rng()));
         for (mint& value : b) value = mint(static_cast<uint32_t>(rng()));
         assert_equal(m1une::fps::convolution(a, b), m1une::fps::convolution_naive(a, b));
+        assert_equal(m1une::fps::internal::convolution_998244353_blocked(a, b, 64),
+                     m1une::fps::convolution_naive(a, b));
     }
 
     std::vector<mint1e9> a(70), b(65);

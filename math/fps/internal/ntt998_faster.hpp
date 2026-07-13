@@ -364,8 +364,8 @@ template<bool shrk=false>inline void vector_dit(I256*const f,idt n,const FNTT32_
         }
     }
 }
-//f[0,8) = fx * f[0,8) * g[0,8) (mod x^8 - ww)
-[[gnu::always_inline]] inline void convolve8(I256*f,const I256*g,I256 ww,I256 fx,I256 Niv,I256 Mod,I256 Mod2){
+// Returns fx * f[0,8) * g[0,8) (mod x^8 - ww).
+[[gnu::always_inline]] inline I256 convolve8(const I256*f,const I256*g,I256 ww,I256 fx,I256 Niv,I256 Mod,I256 Mod2){
     const auto raa=load256(f),rbb=load256(g);
     const auto taa=shrk32(raa,Mod2),bb=shrk32(mul_bsm(rbb,fx,Niv,Mod),Mod);
     const auto aw=shrk32(mul_bsm(taa,ww,Niv,Mod),Mod);
@@ -406,7 +406,7 @@ template<bool shrk=false>inline void vector_dit(I256*const f,idt n,const FNTT32_
     res00=_mm256_add_epi64(res00,res10);
     res01=_mm256_add_epi64(res01,res11);
 
-    store256(f,shrk32(reduce(res00,res01,Niv,Mod),Mod2));
+    return shrk32(reduce(res00,res01,Niv,Mod),Mod2);
 }
 inline void vector_convolution_direct(I256*f,const I256*g,idt lm,const FNTT32_info*const info){
     u32 RR=info->one;
@@ -414,7 +414,20 @@ inline void vector_convolution_direct(I256*f,const I256*g,idt lm,const FNTT32_in
     const auto Fx=_mm256_set1_epi32(mul_s((mod-((mod-1)>>(__builtin_ctzll(lm)))),info->r3,niv,mod));
     const auto Niv=_mm256_set1_epi32(niv),Mod=_mm256_set1_epi32(mod),Mod2=_mm256_set1_epi32(info->mod2);
     for(idt i=0;i<lm;++i){
-        convolve8(f+i,g+i,_mm256_set1_epi32(RR),Fx,Niv,Mod,Mod2);
+        store256(f+i,convolve8(f+i,g+i,_mm256_set1_epi32(RR),Fx,Niv,Mod,Mod2));
+        RR=mul(RR,info->RT1[__builtin_ctzll(~i)],niv,mod);
+    }
+}
+inline void vector_convolution_accumulate(I256*const result,const I256*const f,
+                                          const I256*const g,idt lm,
+                                          const FNTT32_info*const info){
+    u32 RR=info->one;
+    const auto mod=info->mod,niv=info->niv;
+    const auto Fx=_mm256_set1_epi32(mul_s((mod-((mod-1)>>(__builtin_ctzll(lm)))),info->r3,niv,mod));
+    const auto Niv=_mm256_set1_epi32(niv),Mod=_mm256_set1_epi32(mod),Mod2=_mm256_set1_epi32(info->mod2);
+    for(idt i=0;i<lm;++i){
+        const auto product=convolve8(f+i,g+i,_mm256_set1_epi32(RR),Fx,Niv,Mod,Mod2);
+        store256(result+i,add32(load256(result+i),product,Mod2));
         RR=mul(RR,info->RT1[__builtin_ctzll(~i)],niv,mod);
     }
 }
