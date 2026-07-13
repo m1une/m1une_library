@@ -21,5 +21,22 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         YUKICODER_TOKEN: ${{ secrets.YUKICODER_TOKEN }}
+      # The default 600-second budget can expire after a widely used header
+      # changes, so use both runner cores and leave enough time to refresh every
+      # affected verification timestamp.
+      run: oj-verify run -j 2 --timeout 2400
+
+    - name: Check verification completeness
+      run: |
+        expected="$(git ls-files 'verify/**/*.test.cpp' | wc -l)"
+        verified="$(jq length .verify-helper/timestamps.remote.json)"
+        if [ "$verified" -ne "$expected" ]; then
+          echo "::error::Only $verified of $expected verification files completed."
+          exit 1
+        fi
+
+    - name: Generate documentation
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GH_PAT: ${{ secrets.GH_PAT }}
-      run: oj-verify all
+      run: oj-verify docs -j 2

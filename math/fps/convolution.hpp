@@ -16,7 +16,10 @@
 #define M1UNE_FPS_HAS_X86_SIMD 1
 #pragma GCC push_options
 #pragma GCC target("avx2,bmi")
+#endif
+
 #include "internal/ntt998_faster.hpp"
+#ifdef M1UNE_FPS_HAS_X86_SIMD
 #pragma GCC pop_options
 #endif
 

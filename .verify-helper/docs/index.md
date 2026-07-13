@@ -1,6 +1,6 @@
 [![m1une](https://img.shields.io/endpoint?url=https%3A%2F%2Fatcoder-badges.now.sh%2Fapi%2Fatcoder%2Fjson%2Fm1une)](https://atcoder.jp/users/m1une)
 [![m1une](https://img.shields.io/endpoint?url=https%3A%2F%2Fatcoder-badges.now.sh%2Fapi%2Fcodeforces%2Fjson%2Fm1une)](https://codeforces.com/profile/m1une)
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/m1une/library?style=flat-square)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/m1une/m1une_library?style=flat-square)
 
 This is a C++ library for competitive programming authored by m1une. I made this library to use it for my own, but you may copy any code from this library for competitive programming purposes.
 

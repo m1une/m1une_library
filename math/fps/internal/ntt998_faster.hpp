@@ -1,6 +1,8 @@
 #ifndef M1UNE_FPS_INTERNAL_NTT998_FASTER_HPP
 #define M1UNE_FPS_INTERNAL_NTT998_FASTER_HPP 1
 
+#ifdef M1UNE_FPS_HAS_X86_SIMD
+
 #include <algorithm>
 #include <array>
 #include <cstdint>
@@ -436,5 +438,7 @@ inline void vector_convolution_accumulate(I256*const result,const I256*const f,
 }  // namespace internal
 }  // namespace fps
 }  // namespace m1une
+
+#endif  // M1UNE_FPS_HAS_X86_SIMD
 
 #endif  // M1UNE_FPS_INTERNAL_NTT998_FASTER_HPP
