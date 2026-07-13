@@ -86,7 +86,7 @@ few unused headers do not matter.
 | `math/modular_square_root.hpp` | Modular square roots for prime moduli using Tonelli-Shanks. |
 | `math/multiplicative_function_prefix_sum.hpp` | Min_25 prefix sums of a multiplicative function. |
 | `math/fps/all.hpp` | Convolution, formal power series, polynomial algorithms, and linear recurrences. |
-| `math/matrix/all.hpp` | Dense matrices, powers, Gaussian elimination, determinant, inverse, and linear systems. |
+| `math/matrix/all.hpp` | Dense and packed GF(2) matrices, powers, Gaussian elimination, determinant, inverse, and linear systems. |
 | `math/combinatorics.hpp` | Factorials, binomial coefficients, permutations, and multiset counts. |
 | `math/combinatorial_sequences.hpp` | Fast standard counting sequences and special numbers. |
 | `math/cyclotomic_polynomial.hpp` | Integer coefficients of cyclotomic polynomials. |
