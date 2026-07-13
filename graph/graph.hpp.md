@@ -57,6 +57,9 @@ data:
     path: graph/general_matching.hpp
     title: General Matching
   - icon: ':heavy_check_mark:'
+    path: graph/general_weighted_matching.hpp
+    title: General Weighted Matching
+  - icon: ':heavy_check_mark:'
     path: graph/grid.hpp
     title: Grid
   - icon: ':heavy_check_mark:'
@@ -210,6 +213,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/eulerian_trail_undirected.test.cpp
     title: verify/graph/eulerian_trail_undirected.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/general_weighted_matching.test.cpp
+    title: verify/graph/general_weighted_matching.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/graph_algorithms.test.cpp
     title: verify/graph/graph_algorithms.test.cpp
@@ -484,6 +490,7 @@ data:
   - graph/lowlink.hpp
   - graph/zero_one_bfs.hpp
   - graph/block_cut_tree.hpp
+  - graph/general_weighted_matching.hpp
   - graph/grid.hpp
   - graph/topological_sort.hpp
   - graph/cycle_detection.hpp
@@ -551,6 +558,7 @@ data:
   - verify/graph/chromatic_number.test.cpp
   - verify/graph/directed_mst.test.cpp
   - verify/graph/two_edge_connected_components.test.cpp
+  - verify/graph/general_weighted_matching.test.cpp
   - verify/graph/scc.test.cpp
   - verify/graph/scc.test.cpp
 documentation_of: graph/graph.hpp
