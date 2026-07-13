@@ -93,6 +93,9 @@ data:
     path: graph/shortest_path.hpp
     title: Shortest Path
   - icon: ':heavy_check_mark:'
+    path: graph/three_edge_connected_components.hpp
+    title: Three-Edge-Connected Components
+  - icon: ':heavy_check_mark:'
     path: graph/topological_sort.hpp
     title: Topological Sort
   - icon: ':heavy_check_mark:'
@@ -276,6 +279,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/shortest_path.test.cpp
     title: verify/graph/shortest_path.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/three_edge_connected_components.test.cpp
+    title: verify/graph/three_edge_connected_components.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/tree/cartesian_tree.test.cpp
     title: verify/graph/tree/cartesian_tree.test.cpp
@@ -500,6 +506,7 @@ data:
   - graph/undirected.hpp
   - graph/directed.hpp
   - graph/directed_mst.hpp
+  - graph/three_edge_connected_components.hpp
   - graph/shortest_path.hpp
   - graph/general_matching.hpp
   timestamp: '2026-07-11 19:47:32+09:00'
@@ -519,6 +526,7 @@ data:
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/bipartite_matching.test.cpp
+  - verify/graph/three_edge_connected_components.test.cpp
   - verify/graph/eulerian_trail_undirected.test.cpp
   - verify/graph/eulerian_trail_directed.test.cpp
   - verify/graph/minimum_spanning_tree.test.cpp

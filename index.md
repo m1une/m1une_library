@@ -603,6 +603,9 @@ data:
       path: graph/shortest_path.hpp
       title: Shortest Path
     - icon: ':heavy_check_mark:'
+      path: graph/three_edge_connected_components.hpp
+      title: Three-Edge-Connected Components
+    - icon: ':heavy_check_mark:'
       path: graph/topological_sort.hpp
       title: Topological Sort
     - icon: ':heavy_check_mark:'
@@ -1580,6 +1583,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/graph/shortest_path.test.cpp
       title: verify/graph/shortest_path.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/three_edge_connected_components.test.cpp
+      title: verify/graph/three_edge_connected_components.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/graph/two_edge_connected_components.test.cpp
       title: verify/graph/two_edge_connected_components.test.cpp
