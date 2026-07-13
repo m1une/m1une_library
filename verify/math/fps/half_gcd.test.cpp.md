@@ -108,7 +108,7 @@ data:
   isVerificationFile: true
   path: verify/math/fps/half_gcd.test.cpp
   requiredBy: []
-  timestamp: '2026-07-13 21:13:17+09:00'
+  timestamp: '2026-07-13 23:10:39+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/fps/half_gcd.test.cpp

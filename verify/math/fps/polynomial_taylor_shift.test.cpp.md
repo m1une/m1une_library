@@ -21,9 +21,9 @@ data:
     title: Modular Square Root
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
-  _isVerificationFailed: false
+  _isVerificationFailed: true
   _pathExtension: cpp
-  _verificationStatusIcon: ':heavy_check_mark:'
+  _verificationStatusIcon: ':x:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
     PROBLEM: https://judge.yosupo.jp/problem/polynomial_taylor_shift
@@ -62,8 +62,8 @@ data:
   isVerificationFile: true
   path: verify/math/fps/polynomial_taylor_shift.test.cpp
   requiredBy: []
-  timestamp: '2026-07-13 21:13:17+09:00'
-  verificationStatus: TEST_ACCEPTED
+  timestamp: '2026-07-13 23:10:39+09:00'
+  verificationStatus: TEST_WRONG_ANSWER
   verifiedWith: []
 documentation_of: verify/math/fps/polynomial_taylor_shift.test.cpp
 layout: document

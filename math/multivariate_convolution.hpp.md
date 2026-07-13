@@ -157,7 +157,7 @@ data:
   path: math/multivariate_convolution.hpp
   requiredBy:
   - math/all.hpp
-  timestamp: '2026-07-13 21:13:17+09:00'
+  timestamp: '2026-07-13 23:10:39+09:00'
   verificationStatus: LIBRARY_ALL_WA
   verifiedWith:
   - verify/math/multivariate_convolution_cyclic.test.cpp

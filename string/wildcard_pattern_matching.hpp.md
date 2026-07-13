@@ -82,7 +82,7 @@ data:
   path: string/wildcard_pattern_matching.hpp
   requiredBy:
   - string/all.hpp
-  timestamp: '2026-07-13 21:13:17+09:00'
+  timestamp: '2026-07-13 23:10:39+09:00'
   verificationStatus: LIBRARY_ALL_WA
   verifiedWith:
   - verify/string/string_algorithms.test.cpp

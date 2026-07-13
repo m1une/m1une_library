@@ -103,6 +103,9 @@ data:
     path: verify/math/fps/convolution_mod.test.cpp
     title: verify/math/fps/convolution_mod.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/fps/convolution_mod_large.test.cpp
+    title: verify/math/fps/convolution_mod_large.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/exp_of_formal_power_series.test.cpp
     title: verify/math/fps/exp_of_formal_power_series.test.cpp
   - icon: ':heavy_check_mark:'
@@ -111,28 +114,28 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/fps/half_gcd.test.cpp
     title: verify/math/fps/half_gcd.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/fps/inv_of_formal_power_series.test.cpp
     title: verify/math/fps/inv_of_formal_power_series.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
     title: verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/fps/lagrange_inversion.test.cpp
     title: verify/math/fps/lagrange_inversion.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/fps/multipoint_evaluation.test.cpp
     title: verify/math/fps/multipoint_evaluation.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/fps/polynomial_factorization.test.cpp
     title: verify/math/fps/polynomial_factorization.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/fps/polynomial_interpolation.test.cpp
     title: verify/math/fps/polynomial_interpolation.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/fps/polynomial_taylor_shift.test.cpp
     title: verify/math/fps/polynomial_taylor_shift.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/fps/pow_of_formal_power_series.test.cpp
     title: verify/math/fps/pow_of_formal_power_series.test.cpp
   - icon: ':x:'
@@ -355,10 +358,11 @@ data:
     \            if constexpr(shrk){\n                const auto h0=shrk32(g0,Mod),h1=shrk32(g1,Mod);\n\
     \                store256(p0,h0),store256(p1,h1);\n            }\n           \
     \ else{\n                store256(p0,g0),store256(p1,g1);\n            }\n   \
-    \     }\n    }\n}\n//f[0,8) = fx * f[0,8) * g[0,8) (mod x^8 - ww)\n[[gnu::always_inline]]\
-    \ inline void convolve8(I256*f,const I256*g,I256 ww,I256 fx,I256 Niv,I256 Mod,I256\
-    \ Mod2){\n    const auto raa=load256(f),rbb=load256(g);\n    const auto taa=shrk32(raa,Mod2),bb=shrk32(mul_bsm(rbb,fx,Niv,Mod),Mod);\n\
-    \    const auto aw=shrk32(mul_bsm(taa,ww,Niv,Mod),Mod);\n    const auto aa=shrk32(taa,Mod);\n\
+    \     }\n    }\n}\n// Returns fx * f[0,8) * g[0,8) (mod x^8 - ww).\n[[gnu::always_inline]]\
+    \ inline I256 convolve8(const I256*f,const I256*g,I256 ww,I256 fx,I256 Niv,I256\
+    \ Mod,I256 Mod2){\n    const auto raa=load256(f),rbb=load256(g);\n    const auto\
+    \ taa=shrk32(raa,Mod2),bb=shrk32(mul_bsm(rbb,fx,Niv,Mod),Mod);\n    const auto\
+    \ aw=shrk32(mul_bsm(taa,ww,Niv,Mod),Mod);\n    const auto aa=shrk32(taa,Mod);\n\
     \    const auto awa=_mm256_permute2x128_si256(aa,aw,3);\n    \n    const auto\
     \ b0=_mm256_permute4x64_epi64(bb,0x00),b1=_mm256_shuffle_epi32(b0,_MM_PERM_CDAB);\n\
     \    const auto a0=aa,a1=_mm256_srli_epi64(a0,32);\n    const auto aw7=_mm256_alignr_epi8(aa,awa,12);\n\
@@ -377,14 +381,21 @@ data:
     \    res00=_mm256_add_epi64(res00,_mm256_mul_epu32(aw2,b6));\n    res01=_mm256_add_epi64(res01,_mm256_mul_epu32(aw3,b6));\n\
     \    res10=_mm256_add_epi64(res10,_mm256_mul_epu32(aw1,b7));\n    res11=_mm256_add_epi64(res11,_mm256_mul_epu32(aw2,b7));\n\
     \n    res00=_mm256_add_epi64(res00,res10);\n    res01=_mm256_add_epi64(res01,res11);\n\
-    \n    store256(f,shrk32(reduce(res00,res01,Niv,Mod),Mod2));\n}\ninline void vector_convolution_direct(I256*f,const\
+    \n    return shrk32(reduce(res00,res01,Niv,Mod),Mod2);\n}\ninline void vector_convolution_direct(I256*f,const\
     \ I256*g,idt lm,const FNTT32_info*const info){\n    u32 RR=info->one;\n    const\
     \ auto mod=info->mod,niv=info->niv;\n    const auto Fx=_mm256_set1_epi32(mul_s((mod-((mod-1)>>(__builtin_ctzll(lm)))),info->r3,niv,mod));\n\
     \    const auto Niv=_mm256_set1_epi32(niv),Mod=_mm256_set1_epi32(mod),Mod2=_mm256_set1_epi32(info->mod2);\n\
-    \    for(idt i=0;i<lm;++i){\n        convolve8(f+i,g+i,_mm256_set1_epi32(RR),Fx,Niv,Mod,Mod2);\n\
-    \        RR=mul(RR,info->RT1[__builtin_ctzll(~i)],niv,mod);\n    }\n}\n\n}  //\
-    \ namespace fast998_v2\n}  // namespace internal\n}  // namespace fps\n}  // namespace\
-    \ m1une\n\n\n"
+    \    for(idt i=0;i<lm;++i){\n        store256(f+i,convolve8(f+i,g+i,_mm256_set1_epi32(RR),Fx,Niv,Mod,Mod2));\n\
+    \        RR=mul(RR,info->RT1[__builtin_ctzll(~i)],niv,mod);\n    }\n}\ninline\
+    \ void vector_convolution_accumulate(I256*const result,const I256*const f,\n \
+    \                                         const I256*const g,idt lm,\n       \
+    \                                   const FNTT32_info*const info){\n    u32 RR=info->one;\n\
+    \    const auto mod=info->mod,niv=info->niv;\n    const auto Fx=_mm256_set1_epi32(mul_s((mod-((mod-1)>>(__builtin_ctzll(lm)))),info->r3,niv,mod));\n\
+    \    const auto Niv=_mm256_set1_epi32(niv),Mod=_mm256_set1_epi32(mod),Mod2=_mm256_set1_epi32(info->mod2);\n\
+    \    for(idt i=0;i<lm;++i){\n        const auto product=convolve8(f+i,g+i,_mm256_set1_epi32(RR),Fx,Niv,Mod,Mod2);\n\
+    \        store256(result+i,add32(load256(result+i),product,Mod2));\n        RR=mul(RR,info->RT1[__builtin_ctzll(~i)],niv,mod);\n\
+    \    }\n}\n\n}  // namespace fast998_v2\n}  // namespace internal\n}  // namespace\
+    \ fps\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_FPS_INTERNAL_NTT998_FASTER_HPP\n#define M1UNE_FPS_INTERNAL_NTT998_FASTER_HPP\
     \ 1\n\n#include <algorithm>\n#include <array>\n#include <cstdint>\n\n#include\
     \ <immintrin.h>\n\nnamespace m1une {\nnamespace fps {\nnamespace internal {\n\
@@ -580,10 +591,11 @@ data:
     \            if constexpr(shrk){\n                const auto h0=shrk32(g0,Mod),h1=shrk32(g1,Mod);\n\
     \                store256(p0,h0),store256(p1,h1);\n            }\n           \
     \ else{\n                store256(p0,g0),store256(p1,g1);\n            }\n   \
-    \     }\n    }\n}\n//f[0,8) = fx * f[0,8) * g[0,8) (mod x^8 - ww)\n[[gnu::always_inline]]\
-    \ inline void convolve8(I256*f,const I256*g,I256 ww,I256 fx,I256 Niv,I256 Mod,I256\
-    \ Mod2){\n    const auto raa=load256(f),rbb=load256(g);\n    const auto taa=shrk32(raa,Mod2),bb=shrk32(mul_bsm(rbb,fx,Niv,Mod),Mod);\n\
-    \    const auto aw=shrk32(mul_bsm(taa,ww,Niv,Mod),Mod);\n    const auto aa=shrk32(taa,Mod);\n\
+    \     }\n    }\n}\n// Returns fx * f[0,8) * g[0,8) (mod x^8 - ww).\n[[gnu::always_inline]]\
+    \ inline I256 convolve8(const I256*f,const I256*g,I256 ww,I256 fx,I256 Niv,I256\
+    \ Mod,I256 Mod2){\n    const auto raa=load256(f),rbb=load256(g);\n    const auto\
+    \ taa=shrk32(raa,Mod2),bb=shrk32(mul_bsm(rbb,fx,Niv,Mod),Mod);\n    const auto\
+    \ aw=shrk32(mul_bsm(taa,ww,Niv,Mod),Mod);\n    const auto aa=shrk32(taa,Mod);\n\
     \    const auto awa=_mm256_permute2x128_si256(aa,aw,3);\n    \n    const auto\
     \ b0=_mm256_permute4x64_epi64(bb,0x00),b1=_mm256_shuffle_epi32(b0,_MM_PERM_CDAB);\n\
     \    const auto a0=aa,a1=_mm256_srli_epi64(a0,32);\n    const auto aw7=_mm256_alignr_epi8(aa,awa,12);\n\
@@ -602,14 +614,21 @@ data:
     \    res00=_mm256_add_epi64(res00,_mm256_mul_epu32(aw2,b6));\n    res01=_mm256_add_epi64(res01,_mm256_mul_epu32(aw3,b6));\n\
     \    res10=_mm256_add_epi64(res10,_mm256_mul_epu32(aw1,b7));\n    res11=_mm256_add_epi64(res11,_mm256_mul_epu32(aw2,b7));\n\
     \n    res00=_mm256_add_epi64(res00,res10);\n    res01=_mm256_add_epi64(res01,res11);\n\
-    \n    store256(f,shrk32(reduce(res00,res01,Niv,Mod),Mod2));\n}\ninline void vector_convolution_direct(I256*f,const\
+    \n    return shrk32(reduce(res00,res01,Niv,Mod),Mod2);\n}\ninline void vector_convolution_direct(I256*f,const\
     \ I256*g,idt lm,const FNTT32_info*const info){\n    u32 RR=info->one;\n    const\
     \ auto mod=info->mod,niv=info->niv;\n    const auto Fx=_mm256_set1_epi32(mul_s((mod-((mod-1)>>(__builtin_ctzll(lm)))),info->r3,niv,mod));\n\
     \    const auto Niv=_mm256_set1_epi32(niv),Mod=_mm256_set1_epi32(mod),Mod2=_mm256_set1_epi32(info->mod2);\n\
-    \    for(idt i=0;i<lm;++i){\n        convolve8(f+i,g+i,_mm256_set1_epi32(RR),Fx,Niv,Mod,Mod2);\n\
-    \        RR=mul(RR,info->RT1[__builtin_ctzll(~i)],niv,mod);\n    }\n}\n\n}  //\
-    \ namespace fast998_v2\n}  // namespace internal\n}  // namespace fps\n}  // namespace\
-    \ m1une\n\n#endif  // M1UNE_FPS_INTERNAL_NTT998_FASTER_HPP\n"
+    \    for(idt i=0;i<lm;++i){\n        store256(f+i,convolve8(f+i,g+i,_mm256_set1_epi32(RR),Fx,Niv,Mod,Mod2));\n\
+    \        RR=mul(RR,info->RT1[__builtin_ctzll(~i)],niv,mod);\n    }\n}\ninline\
+    \ void vector_convolution_accumulate(I256*const result,const I256*const f,\n \
+    \                                         const I256*const g,idt lm,\n       \
+    \                                   const FNTT32_info*const info){\n    u32 RR=info->one;\n\
+    \    const auto mod=info->mod,niv=info->niv;\n    const auto Fx=_mm256_set1_epi32(mul_s((mod-((mod-1)>>(__builtin_ctzll(lm)))),info->r3,niv,mod));\n\
+    \    const auto Niv=_mm256_set1_epi32(niv),Mod=_mm256_set1_epi32(mod),Mod2=_mm256_set1_epi32(info->mod2);\n\
+    \    for(idt i=0;i<lm;++i){\n        const auto product=convolve8(f+i,g+i,_mm256_set1_epi32(RR),Fx,Niv,Mod,Mod2);\n\
+    \        store256(result+i,add32(load256(result+i),product,Mod2));\n        RR=mul(RR,info->RT1[__builtin_ctzll(~i)],niv,mod);\n\
+    \    }\n}\n\n}  // namespace fast998_v2\n}  // namespace internal\n}  // namespace\
+    \ fps\n}  // namespace m1une\n\n#endif  // M1UNE_FPS_INTERNAL_NTT998_FASTER_HPP\n"
   dependsOn: []
   isVerificationFile: false
   path: math/fps/internal/ntt998_faster.hpp
@@ -635,7 +654,7 @@ data:
   - graph/tree/distance_frequency.hpp
   - graph/all.hpp
   - graph/counting.hpp
-  timestamp: '2026-07-11 03:19:37+09:00'
+  timestamp: '2026-07-13 23:10:39+09:00'
   verificationStatus: LIBRARY_SOME_WA
   verifiedWith:
   - verify/string/string_algorithms.test.cpp
@@ -646,6 +665,7 @@ data:
   - verify/math/partition_function.test.cpp
   - verify/math/multivariate_convolution_truncated.test.cpp
   - verify/math/math_algorithms.test.cpp
+  - verify/math/fps/convolution_mod_large.test.cpp
   - verify/math/fps/inv_of_formal_power_series.test.cpp
   - verify/math/fps/half_gcd.test.cpp
   - verify/math/fps/pow_of_formal_power_series.test.cpp

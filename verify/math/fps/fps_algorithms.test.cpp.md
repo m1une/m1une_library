@@ -85,9 +85,11 @@ data:
     \        std::vector<mint> a(n), b(m);\n        for (mint& value : a) value =\
     \ mint(static_cast<uint32_t>(rng()));\n        for (mint& value : b) value = mint(static_cast<uint32_t>(rng()));\n\
     \        assert_equal(m1une::fps::convolution(a, b), m1une::fps::convolution_naive(a,\
-    \ b));\n    }\n\n    std::vector<mint1e9> a(70), b(65);\n    for (mint1e9& value\
-    \ : a) value = mint1e9(static_cast<uint32_t>(rng()));\n    for (mint1e9& value\
-    \ : b) value = mint1e9(static_cast<uint32_t>(rng()));\n    assert_equal(m1une::fps::convolution(a,\
+    \ b));\n        assert_equal(m1une::fps::internal::convolution_998244353_blocked(a,\
+    \ b, 64),\n                     m1une::fps::convolution_naive(a, b));\n    }\n\
+    \n    std::vector<mint1e9> a(70), b(65);\n    for (mint1e9& value : a) value =\
+    \ mint1e9(static_cast<uint32_t>(rng()));\n    for (mint1e9& value : b) value =\
+    \ mint1e9(static_cast<uint32_t>(rng()));\n    assert_equal(m1une::fps::convolution(a,\
     \ b), m1une::fps::convolution_naive(a, b));\n}\n\nvoid test_series_functions()\
     \ {\n    Fps f(96);\n    f[0] = 1;\n    for (int i = 1; i < int(f.size()); i++)\
     \ f[i] = mint(i * i + 7);\n\n    Fps inverse = f.inv();\n    Fps identity = (f\
@@ -151,7 +153,7 @@ data:
   isVerificationFile: true
   path: verify/math/fps/fps_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-13 21:13:17+09:00'
+  timestamp: '2026-07-13 23:10:39+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/fps/fps_algorithms.test.cpp

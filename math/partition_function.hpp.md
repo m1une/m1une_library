@@ -80,7 +80,7 @@ data:
   requiredBy:
   - math/combinatorial_sequences.hpp
   - math/all.hpp
-  timestamp: '2026-07-13 21:13:17+09:00'
+  timestamp: '2026-07-13 23:10:39+09:00'
   verificationStatus: LIBRARY_SOME_WA
   verifiedWith:
   - verify/math/bell_number.test.cpp

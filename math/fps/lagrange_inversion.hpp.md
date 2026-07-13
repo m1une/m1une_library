@@ -27,7 +27,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/fps/fps_algorithms.test.cpp
     title: verify/math/fps/fps_algorithms.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/fps/lagrange_inversion.test.cpp
     title: verify/math/fps/lagrange_inversion.test.cpp
   - icon: ':x:'
@@ -85,7 +85,7 @@ data:
   requiredBy:
   - math/all.hpp
   - math/fps/all.hpp
-  timestamp: '2026-07-13 21:13:17+09:00'
+  timestamp: '2026-07-13 23:10:39+09:00'
   verificationStatus: LIBRARY_SOME_WA
   verifiedWith:
   - verify/math/math_algorithms.test.cpp

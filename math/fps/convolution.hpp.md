@@ -139,6 +139,9 @@ data:
     path: verify/math/fps/convolution_mod.test.cpp
     title: verify/math/fps/convolution_mod.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/fps/convolution_mod_large.test.cpp
+    title: verify/math/fps/convolution_mod_large.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/exp_of_formal_power_series.test.cpp
     title: verify/math/fps/exp_of_formal_power_series.test.cpp
   - icon: ':heavy_check_mark:'
@@ -147,28 +150,28 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/fps/half_gcd.test.cpp
     title: verify/math/fps/half_gcd.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/fps/inv_of_formal_power_series.test.cpp
     title: verify/math/fps/inv_of_formal_power_series.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
     title: verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/fps/lagrange_inversion.test.cpp
     title: verify/math/fps/lagrange_inversion.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/fps/multipoint_evaluation.test.cpp
     title: verify/math/fps/multipoint_evaluation.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/fps/polynomial_factorization.test.cpp
     title: verify/math/fps/polynomial_factorization.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/fps/polynomial_interpolation.test.cpp
     title: verify/math/fps/polynomial_interpolation.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/fps/polynomial_taylor_shift.test.cpp
     title: verify/math/fps/polynomial_taylor_shift.test.cpp
-  - icon: ':heavy_check_mark:'
+  - icon: ':x:'
     path: verify/math/fps/pow_of_formal_power_series.test.cpp
     title: verify/math/fps/pow_of_formal_power_series.test.cpp
   - icon: ':x:'
@@ -371,31 +374,131 @@ data:
     \ a.end(), fa.begin());\n    std::copy(b.begin(), b.end(), fb.begin());\n    internal::ntt(fa,\
     \ false);\n    internal::ntt(fb, false);\n    const Mint inverse_n = Mint(n).inv();\n\
     \    for (int i = 0; i < n; i++) fa[i] *= fb[i] * inverse_n;\n    internal::ntt(fa,\
-    \ true, false);\n    fa.resize(result_size);\n    return fa;\n}\n\ntemplate <class\
-    \ Mint>\nstd::vector<Mint> convolution(const std::vector<Mint>& a, const std::vector<Mint>&\
+    \ true, false);\n    fa.resize(result_size);\n    return fa;\n}\n\nnamespace internal\
+    \ {\n\ntemplate <class Mint>\nstd::vector<Mint> convolution_998244353_blocked_scalar(const\
+    \ std::vector<Mint>& a,\n                                                    \
+    \   const std::vector<Mint>& b,\n                                            \
+    \           int transform_size) {\n    assert(Mint::mod() == 998244353);\n   \
+    \ assert(transform_size >= 2 && (transform_size & (transform_size - 1)) == 0);\n\
+    \    assert((Mint::mod() - 1) % uint32_t(transform_size) == 0);\n\n    const int\
+    \ block_size = transform_size / 2;\n    const int a_blocks = int((a.size() + block_size\
+    \ - 1) / block_size);\n    const int b_blocks = int((b.size() + block_size - 1)\
+    \ / block_size);\n\n    auto transform_blocks = [&](const std::vector<Mint>& values,\
+    \ int block_count) {\n        std::vector<std::vector<Mint>> blocks;\n       \
+    \ blocks.reserve(block_count);\n        for (int block = 0; block < block_count;\
+    \ block++) {\n            const int begin = block * block_size;\n            const\
+    \ int count = std::min(block_size, int(values.size()) - begin);\n            std::vector<Mint>\
+    \ transformed(transform_size);\n            std::copy_n(values.begin() + begin,\
+    \ count, transformed.begin());\n            ntt(transformed, false);\n       \
+    \     blocks.emplace_back(std::move(transformed));\n        }\n        return\
+    \ blocks;\n    };\n\n    std::vector<std::vector<Mint>> transformed_a = transform_blocks(a,\
+    \ a_blocks);\n    std::vector<std::vector<Mint>> transformed_b = transform_blocks(b,\
+    \ b_blocks);\n    const int result_size = int(a.size() + b.size() - 1);\n    std::vector<Mint>\
+    \ result(result_size);\n    std::vector<Mint> transformed_result(transform_size);\n\
+    \    for (int diagonal = 0; diagonal < a_blocks + b_blocks - 1; diagonal++) {\n\
+    \        std::fill(transformed_result.begin(), transformed_result.end(), Mint(0));\n\
+    \        const int first_a = std::max(0, diagonal - (b_blocks - 1));\n       \
+    \ const int last_a = std::min(a_blocks - 1, diagonal);\n        for (int a_block\
+    \ = first_a; a_block <= last_a; a_block++) {\n            const int b_block =\
+    \ diagonal - a_block;\n            for (int i = 0; i < transform_size; i++)\n\
+    \                transformed_result[i] +=\n                    transformed_a[a_block][i]\
+    \ * transformed_b[b_block][i];\n        }\n        ntt(transformed_result, true);\n\
+    \n        const int output_offset = diagonal * block_size;\n        const int\
+    \ output_count = std::min(transform_size, result_size - output_offset);\n    \
+    \    for (int i = 0; i < output_count; i++)\n            result[output_offset\
+    \ + i] += transformed_result[i];\n    }\n    return result;\n}\n\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n\
+    \nclass AlignedUint32Buffer {\n   private:\n    uint32_t* data_;\n\n   public:\n\
+    \    explicit AlignedUint32Buffer(std::size_t size)\n        : data_(static_cast<uint32_t*>(\n\
+    \              ::operator new[](sizeof(uint32_t) * size, std::align_val_t(32))))\
+    \ {}\n\n    AlignedUint32Buffer(const AlignedUint32Buffer&) = delete;\n    AlignedUint32Buffer&\
+    \ operator=(const AlignedUint32Buffer&) = delete;\n\n    AlignedUint32Buffer(AlignedUint32Buffer&&\
+    \ other) noexcept : data_(other.data_) {\n        other.data_ = nullptr;\n   \
+    \ }\n\n    AlignedUint32Buffer& operator=(AlignedUint32Buffer&& other) noexcept\
+    \ {\n        if (this == &other) return *this;\n        ::operator delete[](data_,\
+    \ std::align_val_t(32));\n        data_ = other.data_;\n        other.data_ =\
+    \ nullptr;\n        return *this;\n    }\n\n    ~AlignedUint32Buffer() {\n   \
+    \     ::operator delete[](data_, std::align_val_t(32));\n    }\n\n    uint32_t*\
+    \ data() {\n        return data_;\n    }\n\n    const uint32_t* data() const {\n\
+    \        return data_;\n    }\n};\n\ntemplate <class Mint>\n__attribute__((target(\"\
+    avx2,bmi\"), hot))\nstd::vector<Mint> convolution_998244353_blocked_simd(const\
+    \ std::vector<Mint>& a,\n                                                    \
+    \ const std::vector<Mint>& b,\n                                              \
+    \       int transform_size) {\n    assert(Mint::mod() == 998244353);\n    assert(transform_size\
+    \ >= 64 && (transform_size & (transform_size - 1)) == 0);\n    assert((Mint::mod()\
+    \ - 1) % uint32_t(transform_size) == 0);\n\n    const int block_size = transform_size\
+    \ / 2;\n    const int a_blocks = int((a.size() + block_size - 1) / block_size);\n\
+    \    const int b_blocks = int((b.size() + block_size - 1) / block_size);\n   \
+    \ static constexpr fast998_v2::FNTT32_info transform(998244353);\n    const std::size_t\
+    \ vector_size = std::size_t(transform_size) / 8;\n\n    auto transform_blocks\
+    \ = [&](const std::vector<Mint>& values, int block_count) {\n        std::vector<AlignedUint32Buffer>\
+    \ blocks;\n        blocks.reserve(block_count);\n        for (int block = 0; block\
+    \ < block_count; block++) {\n            const int begin = block * block_size;\n\
+    \            const int count = std::min(block_size, int(values.size()) - begin);\n\
+    \            AlignedUint32Buffer transformed(transform_size);\n            if\
+    \ constexpr (std::is_same_v<Mint, math::ModInt<998244353>>) {\n              \
+    \  static_assert(sizeof(Mint) == sizeof(uint32_t) &&\n                       \
+    \       std::is_trivially_copyable_v<Mint>);\n                std::memcpy(transformed.data(),\
+    \ values.data() + begin,\n                            sizeof(uint32_t) * count);\n\
+    \            } else {\n                for (int i = 0; i < count; i++)\n     \
+    \               transformed.data()[i] = values[begin + i].val();\n           \
+    \ }\n            std::memset(transformed.data() + count, 0,\n                \
+    \        sizeof(uint32_t) * (transform_size - count));\n            fast998_v2::vector_dif(reinterpret_cast<__m256i*>(transformed.data()),\n\
+    \                                   vector_size, &transform);\n            blocks.emplace_back(std::move(transformed));\n\
+    \        }\n        return blocks;\n    };\n\n    std::vector<AlignedUint32Buffer>\
+    \ transformed_a = transform_blocks(a, a_blocks);\n    std::vector<AlignedUint32Buffer>\
+    \ transformed_b = transform_blocks(b, b_blocks);\n    const int result_size =\
+    \ int(a.size() + b.size() - 1);\n    std::vector<Mint> result(result_size);\n\
+    \    AlignedUint32Buffer transformed_result(transform_size);\n    for (int diagonal\
+    \ = 0; diagonal < a_blocks + b_blocks - 1; diagonal++) {\n        std::memset(transformed_result.data(),\
+    \ 0, sizeof(uint32_t) * transform_size);\n        const int first_a = std::max(0,\
+    \ diagonal - (b_blocks - 1));\n        const int last_a = std::min(a_blocks -\
+    \ 1, diagonal);\n        for (int a_block = first_a; a_block <= last_a; a_block++)\
+    \ {\n            const int b_block = diagonal - a_block;\n            fast998_v2::vector_convolution_accumulate(\n\
+    \                reinterpret_cast<__m256i*>(transformed_result.data()),\n    \
+    \            reinterpret_cast<const __m256i*>(transformed_a[a_block].data()),\n\
+    \                reinterpret_cast<const __m256i*>(transformed_b[b_block].data()),\n\
+    \                vector_size, &transform);\n        }\n        fast998_v2::vector_dit<true>(\n\
+    \            reinterpret_cast<__m256i*>(transformed_result.data()), vector_size,\n\
+    \            &transform);\n\n        const int output_offset = diagonal * block_size;\n\
+    \        const int output_count = std::min(transform_size, result_size - output_offset);\n\
+    \        for (int i = 0; i < output_count; i++) {\n            uint32_t value\
+    \ = result[output_offset + i].val() + transformed_result.data()[i];\n        \
+    \    if (value >= Mint::mod()) value -= Mint::mod();\n            result[output_offset\
+    \ + i] = Mint::raw(value);\n        }\n    }\n    return result;\n}\n\n#endif\n\
+    \ntemplate <class Mint>\nstd::vector<Mint> convolution_998244353_blocked(const\
+    \ std::vector<Mint>& a,\n                                                const\
+    \ std::vector<Mint>& b,\n                                                int transform_size\
+    \ = 1 << 23) {\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n    if (transform_size >= 64 &&\
+    \ __builtin_cpu_supports(\"avx2\"))\n        return convolution_998244353_blocked_simd(a,\
+    \ b, transform_size);\n#endif\n    return convolution_998244353_blocked_scalar(a,\
+    \ b, transform_size);\n}\n\n}  // namespace internal\n\ntemplate <class Mint>\n\
+    std::vector<Mint> convolution(const std::vector<Mint>& a, const std::vector<Mint>&\
     \ b) {\n    if (a.empty() || b.empty()) return {};\n    if (std::min(a.size(),\
     \ b.size()) <= 32) return convolution_naive(a, b);\n\n    const int result_size\
     \ = int(a.size() + b.size() - 1);\n    int n = 1;\n    while (n < result_size)\
     \ n <<= 1;\n    if constexpr (internal::has_static_modulus<Mint>::value) {\n \
-    \       if ((Mint::mod() - 1) % uint32_t(n) == 0) return convolution_ntt(a, b);\n\
-    \    }\n\n    using Mint1 = math::ModInt<167772161>;\n    using Mint2 = math::ModInt<469762049>;\n\
-    \    using Mint3 = math::ModInt<754974721>;\n    assert(n <= (1 << 24));\n\n \
-    \   [[maybe_unused]] const unsigned __int128 coefficient_bound =\n        static_cast<unsigned\
-    \ __int128>(std::min(a.size(), b.size())) * (Mint::mod() - 1) *\n        (Mint::mod()\
-    \ - 1);\n    [[maybe_unused]] const unsigned __int128 crt_modulus =\n        static_cast<unsigned\
-    \ __int128>(Mint1::mod()) * Mint2::mod() * Mint3::mod();\n    assert(coefficient_bound\
-    \ < crt_modulus);\n\n    auto converted_convolution = [&]<class OtherMint>() {\n\
-    \        std::vector<OtherMint> converted_a(a.size());\n        std::vector<OtherMint>\
-    \ converted_b(b.size());\n        for (int i = 0; i < int(a.size()); i++) converted_a[i]\
-    \ = OtherMint(a[i].val());\n        for (int i = 0; i < int(b.size()); i++) converted_b[i]\
-    \ = OtherMint(b[i].val());\n        return convolution_ntt(converted_a, converted_b);\n\
-    \    };\n    std::vector<Mint1> c1 = converted_convolution.template operator()<Mint1>();\n\
-    \    std::vector<Mint2> c2 = converted_convolution.template operator()<Mint2>();\n\
-    \    std::vector<Mint3> c3 = converted_convolution.template operator()<Mint3>();\n\
-    \    static const uint64_t inverse_mod1_mod2 = Mint2(Mint1::mod()).inv().val();\n\
-    \    static const uint64_t mod1_mod3 = Mint1::mod() % Mint3::mod();\n    static\
-    \ const uint64_t mod1_mod2_mod3 =\n        mod1_mod3 * (Mint2::mod() % Mint3::mod())\
-    \ % Mint3::mod();\n    static const uint64_t inverse_mod1_mod2_mod3 = Mint3(uint32_t(mod1_mod2_mod3)).inv().val();\n\
+    \       if constexpr (Mint::mod() == 998244353) {\n            if (n > (1 << 23))\n\
+    \                return internal::convolution_998244353_blocked(a, b);\n     \
+    \   }\n        if ((Mint::mod() - 1) % uint32_t(n) == 0) return convolution_ntt(a,\
+    \ b);\n    }\n\n    using Mint1 = math::ModInt<167772161>;\n    using Mint2 =\
+    \ math::ModInt<469762049>;\n    using Mint3 = math::ModInt<754974721>;\n    assert(n\
+    \ <= (1 << 24));\n\n    [[maybe_unused]] const unsigned __int128 coefficient_bound\
+    \ =\n        static_cast<unsigned __int128>(std::min(a.size(), b.size())) * (Mint::mod()\
+    \ - 1) *\n        (Mint::mod() - 1);\n    [[maybe_unused]] const unsigned __int128\
+    \ crt_modulus =\n        static_cast<unsigned __int128>(Mint1::mod()) * Mint2::mod()\
+    \ * Mint3::mod();\n    assert(coefficient_bound < crt_modulus);\n\n    auto converted_convolution\
+    \ = [&]<class OtherMint>() {\n        std::vector<OtherMint> converted_a(a.size());\n\
+    \        std::vector<OtherMint> converted_b(b.size());\n        for (int i = 0;\
+    \ i < int(a.size()); i++) converted_a[i] = OtherMint(a[i].val());\n        for\
+    \ (int i = 0; i < int(b.size()); i++) converted_b[i] = OtherMint(b[i].val());\n\
+    \        return convolution_ntt(converted_a, converted_b);\n    };\n    std::vector<Mint1>\
+    \ c1 = converted_convolution.template operator()<Mint1>();\n    std::vector<Mint2>\
+    \ c2 = converted_convolution.template operator()<Mint2>();\n    std::vector<Mint3>\
+    \ c3 = converted_convolution.template operator()<Mint3>();\n    static const uint64_t\
+    \ inverse_mod1_mod2 = Mint2(Mint1::mod()).inv().val();\n    static const uint64_t\
+    \ mod1_mod3 = Mint1::mod() % Mint3::mod();\n    static const uint64_t mod1_mod2_mod3\
+    \ =\n        mod1_mod3 * (Mint2::mod() % Mint3::mod()) % Mint3::mod();\n    static\
+    \ const uint64_t inverse_mod1_mod2_mod3 = Mint3(uint32_t(mod1_mod2_mod3)).inv().val();\n\
     \n    const uint64_t target_mod = Mint::mod();\n    const uint64_t mod1_target\
     \ = Mint1::mod() % target_mod;\n    const uint64_t mod1_mod2_target = mod1_target\
     \ * (Mint2::mod() % target_mod) % target_mod;\n    std::vector<Mint> result(result_size);\n\
@@ -442,7 +545,7 @@ data:
   - graph/all.hpp
   - graph/counting.hpp
   - graph/counting.hpp
-  timestamp: '2026-07-13 21:13:17+09:00'
+  timestamp: '2026-07-13 23:10:39+09:00'
   verificationStatus: LIBRARY_SOME_WA
   verifiedWith:
   - verify/string/string_algorithms.test.cpp
@@ -454,6 +557,7 @@ data:
   - verify/math/multivariate_convolution_truncated.test.cpp
   - verify/math/math_algorithms.test.cpp
   - verify/math/math_algorithms.test.cpp
+  - verify/math/fps/convolution_mod_large.test.cpp
   - verify/math/fps/inv_of_formal_power_series.test.cpp
   - verify/math/fps/half_gcd.test.cpp
   - verify/math/fps/pow_of_formal_power_series.test.cpp
@@ -500,6 +604,8 @@ The implementation automatically chooses between:
 
 * a quadratic loop for small inputs;
 * one NTT convolution when the modulus supports the required transform length;
+* block NTT convolution under `998244353` when the result is longer than
+  $2^{23}$ coefficients;
 * three NTT convolutions plus CRT reconstruction for moduli such as
   `1000000007`.
 
@@ -515,17 +621,40 @@ template <class Mint>
 std::vector<Mint> convolution_naive(
     const std::vector<Mint>& a,
     const std::vector<Mint>& b);
+
+template <class Mint>
+std::vector<Mint> convolution_ntt(
+    const std::vector<Mint>& a,
+    const std::vector<Mint>& b);
 ```
 
 `convolution(a, b)[k]` is the sum of `a[i] * b[j]` over all `i + j = k`.
 If either input is empty, the result is empty.
 
+`convolution_ntt` directly selects the single-NTT implementation. Both inputs
+must be nonempty, and the smallest power of two at least
+`a.size() + b.size() - 1` must divide `Mint::mod() - 1`. Prefer `convolution`
+unless this precondition is already known.
+
 ## Complexity
 
-Let `n = a.size() + b.size()`.
+Let $A$ and $B$ be the input sizes, $R=A+B-1$, and $L$ be the smallest power of
+two with $L\ge R$.
 
-* `convolution`: $O(n \log n)$ for large inputs.
-* `convolution_naive`: $O(|a| \cdot |b|)$.
+| Function | Time | Memory including result |
+|---|---:|---:|
+| `convolution_naive` | $O(AB)$ | $O(R)$ for the returned vector |
+| `convolution_ntt` | $O(L\log L)$ | $O(L)$ |
+| `convolution` (one NTT or CRT) | $O(L\log L)$ | $O(L)$ |
+
+All functions return a new vector and do not modify either input. Their
+additional memory usage is linear in the processed coefficient count. For
+`998244353`, inputs as large as the Library Checker `convolution_mod_large`
+limit ($2^{24}$ coefficients each) are split into blocks and processed with
+$T=2^{23}$-point NTTs. If $P=\lceil 2A/T\rceil$ and
+$Q=\lceil 2B/T\rceil$ are the block counts, this path takes
+$O((P+Q)T\log T+PQT)$ time and $O((P+Q)T+R)$ memory including the returned
+vector. Under the stated Library Checker bounds, $P,Q\le4$.
 
 For an NTT-friendly modulus, the transform length must divide
 `Mint::mod() - 1`. The CRT fallback supports transform lengths up to
