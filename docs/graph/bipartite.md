@@ -22,6 +22,10 @@ matching-related algorithms:
 * maximum independent set;
 * minimum edge cover.
 
+Use `bipartite_edge_coloring(left_size, right_size, edges)` when the two sides
+are known and you want an optimal proper edge coloring. Parallel edges are
+supported.
+
 Use `make_bipartite_matching(g)` when you have a `Graph<T>` and want to build
 that matching graph from its two-coloring.
 
@@ -131,6 +135,7 @@ least one incident edge; otherwise the method returns `std::nullopt`.
 | `bipartite` | `template <class T> BipartiteResult bipartite(const Graph<T>& g)` | Returns a bipartite flag and colors. | $O(N + M)$ |
 | `is_bipartite` | `template <class T> bool is_bipartite(const Graph<T>& g)` | Returns only the bipartite flag. | $O(N + M)$ |
 | `make_bipartite_matching` | `template <class T> std::optional<BipartiteMatchingGraph> make_bipartite_matching(const Graph<T>& g)` | Builds a `BipartiteMatching` from a bipartite `Graph<T>`, or returns `std::nullopt`. | $O(N + M)$ |
+| `bipartite_edge_coloring` | `BipartiteEdgeColoringResult bipartite_edge_coloring(int left_size, int right_size, const std::vector<std::pair<int, int>>& edges)` | Returns an optimal coloring of an explicitly separated bipartite multigraph. | $O(L+R+M\sqrt{M/\Delta+1}\log(\Delta+1))$ |
 
 ## Matching Methods
 
@@ -157,12 +162,40 @@ least one incident edge; otherwise the method returns `std::nullopt`.
 | `maximum_independent_set` | `BipartiteVertexSet maximum_independent_set()` | Returns a maximum independent set. | $O(M \sqrt{L + R})$ if not computed |
 | `minimum_edge_cover` | `std::optional<std::vector<int>> minimum_edge_cover()` | Returns edge ids of a minimum edge cover, or `std::nullopt` if an isolated vertex exists. | $O(M \sqrt{L + R})$ if not computed |
 
+## Bipartite Edge Coloring
+
+`bipartite_edge_coloring` assigns colors to the edges of a bipartite multigraph
+so incident edges always have different colors. It uses exactly $\Delta$
+colors, where $\Delta$ is the maximum vertex degree, and is therefore optimal
+by Konig's line-coloring theorem.
+
+The result type is:
+
+```cpp
+struct BipartiteEdgeColoringResult {
+    int color_count;
+    std::vector<int> color;
+};
+```
+
+For every input edge `i`, `color[i]` lies in `[0, color_count)`. Input and
+output edge order are identical. With no edges, `color_count` is zero and
+`color` is empty.
+
+The algorithm groups vertices into $O(M/\Delta)$ supervertices and completes
+the graph to a balanced $\Delta$-regular bipartite multigraph. Even-degree
+regular graphs are halved along alternating Euler circuits. At odd degrees,
+Hopcroft-Karp extracts a perfect matching as one color class before recursion.
+Dummy-edge colors are discarded. Memory usage is $O(L+R+M)$.
+
 ## Example
 
 ```cpp
 #include "graph/bipartite.hpp"
 #include "graph/graph.hpp"
 #include <iostream>
+#include <utility>
+#include <vector>
 
 int main() {
     m1une::graph::Graph<> g(4);
@@ -186,5 +219,12 @@ int main() {
     std::cout << bm.max_matching() << "\n";  // 2
     auto cover = bm.minimum_vertex_cover();
     std::cout << cover.size() << "\n";       // 2
+
+    std::vector<std::pair<int, int>> edges;
+    edges.emplace_back(0, 0);
+    edges.emplace_back(0, 1);
+    edges.emplace_back(1, 0);
+    auto coloring = m1une::graph::bipartite_edge_coloring(2, 2, edges);
+    std::cout << coloring.color_count << "\n";  // 2
 }
 ```

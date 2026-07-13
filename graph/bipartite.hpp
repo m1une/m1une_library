@@ -1,9 +1,14 @@
 #ifndef M1UNE_GRAPH_BIPARTITE_HPP
 #define M1UNE_GRAPH_BIPARTITE_HPP 1
 
+#include <algorithm>
 #include <cassert>
+#include <cstddef>
+#include <cstdint>
+#include <limits>
 #include <optional>
 #include <queue>
+#include <utility>
 #include <vector>
 
 #include "graph.hpp"
@@ -429,6 +434,332 @@ std::optional<BipartiteMatchingGraph> make_bipartite_matching(const Graph<T>& g)
         result.original_edge_id[id] = e.id;
     }
 
+    return result;
+}
+
+struct BipartiteEdgeColoringResult {
+    int color_count;
+    std::vector<int> color;
+};
+
+namespace detail {
+
+struct BipartiteEdgeColoringGroups {
+    int count;
+    std::vector<int> group;
+};
+
+inline BipartiteEdgeColoringGroups group_vertices(
+    const std::vector<int>& degree,
+    int maximum_degree
+) {
+    BipartiteEdgeColoringGroups result;
+    result.count = 0;
+    result.group.assign(degree.size(), -1);
+    int current_degree = 0;
+    for (int vertex = 0; vertex < int(degree.size()); vertex++) {
+        if (degree[vertex] == 0) continue;
+        if (result.count == 0 || current_degree + degree[vertex] > maximum_degree) {
+            result.count++;
+            current_degree = 0;
+        }
+        result.group[vertex] = result.count - 1;
+        current_degree += degree[vertex];
+    }
+    return result;
+}
+
+class BipartiteEdgeColoringSolver {
+   private:
+    int _side_size;
+    int _original_edge_count;
+    std::vector<int> _left;
+    std::vector<int> _right;
+    std::vector<int> _color;
+    std::vector<int> _used_stamp;
+    int _stamp;
+
+    int other_endpoint(int vertex, int edge) const {
+        if (vertex < _side_size) return _side_size + _right[edge];
+        return _left[edge];
+    }
+
+    std::vector<int> perfect_matching(const std::vector<int>& edge_ids) const {
+        std::vector<std::vector<int>> adjacency(_side_size);
+        for (int edge : edge_ids) adjacency[_left[edge]].push_back(edge);
+
+        std::vector<int> right_match(_side_size, -1);
+        std::vector<int> left_match_edge(_side_size, -1);
+        int matching_size = 0;
+        for (int left = 0; left < _side_size; left++) {
+            for (int edge : adjacency[left]) {
+                int right = _right[edge];
+                if (right_match[right] != -1) continue;
+                right_match[right] = left;
+                left_match_edge[left] = edge;
+                matching_size++;
+                break;
+            }
+        }
+
+        std::vector<int> distance(_side_size);
+        std::vector<int> next_edge(_side_size);
+        std::vector<int> left_stack;
+        std::vector<int> path_edges;
+        left_stack.reserve(_side_size);
+        path_edges.reserve(_side_size);
+
+        while (matching_size < _side_size) {
+            std::queue<int> queue;
+            std::fill(distance.begin(), distance.end(), -1);
+            for (int left = 0; left < _side_size; left++) {
+                if (left_match_edge[left] != -1) continue;
+                distance[left] = 0;
+                queue.push(left);
+            }
+
+            bool reachable_free_right = false;
+            while (!queue.empty()) {
+                int left = queue.front();
+                queue.pop();
+                for (int edge : adjacency[left]) {
+                    int next_left = right_match[_right[edge]];
+                    if (next_left == -1) {
+                        reachable_free_right = true;
+                    } else if (distance[next_left] == -1) {
+                        distance[next_left] = distance[left] + 1;
+                        queue.push(next_left);
+                    }
+                }
+            }
+            assert(reachable_free_right);
+
+            std::fill(next_edge.begin(), next_edge.end(), 0);
+            int augmented = 0;
+            for (int root = 0; root < _side_size; root++) {
+                if (left_match_edge[root] != -1 || distance[root] == -1) continue;
+                left_stack.clear();
+                path_edges.clear();
+                left_stack.push_back(root);
+                bool found = false;
+
+                while (!left_stack.empty() && !found) {
+                    int left = left_stack.back();
+                    bool advanced = false;
+                    while (next_edge[left] < int(adjacency[left].size())) {
+                        int edge = adjacency[left][next_edge[left]++];
+                        int right = _right[edge];
+                        int next_left = right_match[right];
+                        if (next_left == -1) {
+                            left_match_edge[left] = edge;
+                            right_match[right] = left;
+                            for (int index = int(path_edges.size()) - 1; index >= 0; index--) {
+                                int path_edge = path_edges[index];
+                                int path_left = left_stack[index];
+                                left_match_edge[path_left] = path_edge;
+                                right_match[_right[path_edge]] = path_left;
+                            }
+                            found = true;
+                            break;
+                        }
+                        if (distance[next_left] != distance[left] + 1) continue;
+                        path_edges.push_back(edge);
+                        left_stack.push_back(next_left);
+                        advanced = true;
+                        break;
+                    }
+                    if (found || advanced) continue;
+                    distance[left] = -1;
+                    left_stack.pop_back();
+                    if (path_edges.size() == left_stack.size() && !path_edges.empty()) {
+                        path_edges.pop_back();
+                    }
+                }
+                if (found) augmented++;
+            }
+            assert(augmented > 0);
+            matching_size += augmented;
+        }
+
+        return left_match_edge;
+    }
+
+    std::pair<std::vector<int>, std::vector<int>> split_even(
+        const std::vector<int>& edge_ids
+    ) {
+        std::vector<std::vector<int>> incidence(std::size_t(2) * _side_size);
+        for (int edge : edge_ids) {
+            incidence[_left[edge]].push_back(edge);
+            incidence[_side_size + _right[edge]].push_back(edge);
+        }
+
+        _stamp++;
+        assert(_stamp > 0);
+        std::vector<int> next_edge(std::size_t(2) * _side_size, 0);
+        std::vector<int> first;
+        std::vector<int> second;
+        first.reserve(edge_ids.size() / 2);
+        second.reserve(edge_ids.size() / 2);
+
+        for (int start = 0; start < 2 * _side_size; start++) {
+            while (true) {
+                while (next_edge[start] < int(incidence[start].size()) &&
+                       _used_stamp[incidence[start][next_edge[start]]] == _stamp) {
+                    next_edge[start]++;
+                }
+                if (next_edge[start] == int(incidence[start].size())) break;
+
+                int vertex = start;
+                bool parity = false;
+                do {
+                    while (next_edge[vertex] < int(incidence[vertex].size()) &&
+                           _used_stamp[incidence[vertex][next_edge[vertex]]] == _stamp) {
+                        next_edge[vertex]++;
+                    }
+                    assert(next_edge[vertex] < int(incidence[vertex].size()));
+                    int edge = incidence[vertex][next_edge[vertex]++];
+                    _used_stamp[edge] = _stamp;
+                    if (!parity) {
+                        first.push_back(edge);
+                    } else {
+                        second.push_back(edge);
+                    }
+                    parity = !parity;
+                    vertex = other_endpoint(vertex, edge);
+                } while (vertex != start);
+                assert(!parity);
+            }
+        }
+        assert(first.size() == second.size());
+        return {std::move(first), std::move(second)};
+    }
+
+    void color_regular(const std::vector<int>& edge_ids, int degree, int offset) {
+        assert(std::size_t(_side_size) * std::size_t(degree) == edge_ids.size());
+        if (degree == 0) return;
+        if (degree == 1) {
+            for (int edge : edge_ids) {
+                if (edge < _original_edge_count) _color[edge] = offset;
+            }
+            return;
+        }
+
+        if (degree % 2 == 1) {
+            std::vector<int> matching = perfect_matching(edge_ids);
+            _stamp++;
+            assert(_stamp > 0);
+            for (int edge : matching) {
+                _used_stamp[edge] = _stamp;
+                if (edge < _original_edge_count) _color[edge] = offset;
+            }
+            std::vector<int> remaining;
+            remaining.reserve(edge_ids.size() - matching.size());
+            for (int edge : edge_ids) {
+                if (_used_stamp[edge] != _stamp) remaining.push_back(edge);
+            }
+            color_regular(remaining, degree - 1, offset + 1);
+            return;
+        }
+
+        auto [first, second] = split_even(edge_ids);
+        color_regular(first, degree / 2, offset);
+        color_regular(second, degree / 2, offset + degree / 2);
+    }
+
+   public:
+    BipartiteEdgeColoringSolver(
+        int side_size,
+        int original_edge_count,
+        std::vector<int> left,
+        std::vector<int> right
+    )
+        : _side_size(side_size),
+          _original_edge_count(original_edge_count),
+          _left(std::move(left)),
+          _right(std::move(right)),
+          _color(original_edge_count, -1),
+          _used_stamp(_left.size(), 0),
+          _stamp(0) {}
+
+    std::vector<int> solve(int degree) {
+        std::vector<int> edge_ids(_left.size());
+        for (int edge = 0; edge < int(edge_ids.size()); edge++) edge_ids[edge] = edge;
+        color_regular(edge_ids, degree, 0);
+        for (int color : _color) assert(0 <= color && color < degree);
+        return _color;
+    }
+};
+
+}  // namespace detail
+
+// Returns an optimal edge coloring of a bipartite multigraph.
+inline BipartiteEdgeColoringResult bipartite_edge_coloring(
+    int left_size,
+    int right_size,
+    const std::vector<std::pair<int, int>>& edges
+) {
+    assert(left_size >= 0);
+    assert(right_size >= 0);
+    assert(edges.size() <= std::size_t(std::numeric_limits<int>::max()));
+
+    std::vector<int> left_degree(left_size, 0);
+    std::vector<int> right_degree(right_size, 0);
+    int maximum_degree = 0;
+    for (auto [left, right] : edges) {
+        assert(0 <= left && left < left_size);
+        assert(0 <= right && right < right_size);
+        left_degree[left]++;
+        right_degree[right]++;
+        maximum_degree = std::max(maximum_degree, left_degree[left]);
+        maximum_degree = std::max(maximum_degree, right_degree[right]);
+    }
+
+    BipartiteEdgeColoringResult result;
+    result.color_count = maximum_degree;
+    if (edges.empty()) return result;
+
+    detail::BipartiteEdgeColoringGroups left_groups =
+        detail::group_vertices(left_degree, maximum_degree);
+    detail::BipartiteEdgeColoringGroups right_groups =
+        detail::group_vertices(right_degree, maximum_degree);
+    int side_size = std::max(left_groups.count, right_groups.count);
+
+    std::vector<int> contracted_left;
+    std::vector<int> contracted_right;
+    contracted_left.reserve(std::size_t(3) * edges.size());
+    contracted_right.reserve(std::size_t(3) * edges.size());
+    std::vector<int> contracted_left_degree(side_size, 0);
+    std::vector<int> contracted_right_degree(side_size, 0);
+    for (auto [left, right] : edges) {
+        int contracted_left_vertex = left_groups.group[left];
+        int contracted_right_vertex = right_groups.group[right];
+        contracted_left.push_back(contracted_left_vertex);
+        contracted_right.push_back(contracted_right_vertex);
+        contracted_left_degree[contracted_left_vertex]++;
+        contracted_right_degree[contracted_right_vertex]++;
+    }
+
+    int left = 0;
+    int right = 0;
+    while (true) {
+        while (left < side_size && contracted_left_degree[left] == maximum_degree) left++;
+        while (right < side_size && contracted_right_degree[right] == maximum_degree) right++;
+        if (left == side_size || right == side_size) break;
+        contracted_left.push_back(left);
+        contracted_right.push_back(right);
+        contracted_left_degree[left]++;
+        contracted_right_degree[right]++;
+    }
+    assert(left == side_size && right == side_size);
+    assert(contracted_left.size() == std::size_t(side_size) * std::size_t(maximum_degree));
+
+    detail::BipartiteEdgeColoringSolver solver(
+        side_size,
+        int(edges.size()),
+        std::move(contracted_left),
+        std::move(contracted_right)
+    );
+    result.color = solver.solve(maximum_degree);
     return result;
 }
 
