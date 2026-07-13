@@ -38,6 +38,9 @@ data:
     path: graph/dijkstra.hpp
     title: Dijkstra
   - icon: ':heavy_check_mark:'
+    path: graph/enumerate_triangles.hpp
+    title: Enumerate Triangles
+  - icon: ':heavy_check_mark:'
     path: graph/eulerian_trail.hpp
     title: Eulerian Trail
   - icon: ':heavy_check_mark:'
@@ -541,28 +544,48 @@ data:
     \             return true;\n            }\n        }\n        color[v] = 2;\n\
     \        return false;\n    };\n\n    for (int v = 0; v < n; v++) {\n        if\
     \ (color[v] == 0 && dfs(dfs, v, -1)) break;\n    }\n    return result;\n}\n\n\
-    }  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/eulerian_trail.hpp\"\
-    \n\n\n\n#line 9 \"graph/eulerian_trail.hpp\"\n\n#line 11 \"graph/eulerian_trail.hpp\"\
-    \n\nnamespace m1une {\nnamespace graph {\n\nstruct EulerianTrail {\n    std::vector<int>\
-    \ vertices;\n    std::vector<int> edge_ids;\n\n    int edge_count() const {\n\
-    \        return int(edge_ids.size());\n    }\n\n    bool is_circuit() const {\n\
-    \        return vertices.empty() || vertices.front() == vertices.back();\n   \
-    \ }\n};\n\nnamespace internal {\n\ntemplate <class T>\nstd::optional<EulerianTrail>\
-    \ hierholzer(\n    const Graph<T>& graph,\n    int start,\n    int active_edge_count\n\
-    ) {\n    EulerianTrail result;\n    if (active_edge_count == 0) {\n        if\
-    \ (start != -1) result.vertices.push_back(start);\n        return result;\n  \
-    \  }\n\n    assert(0 <= start && start < graph.size());\n    std::vector<char>\
-    \ used(graph.edge_count(), false);\n    std::vector<int> cursor(graph.size(),\
-    \ 0);\n    std::vector<int> vertex_stack(1, start);\n    std::vector<int> incoming_edge_stack(1,\
-    \ -1);\n    std::vector<int> reversed_vertices;\n    std::vector<int> reversed_edges;\n\
-    \    reversed_vertices.reserve(active_edge_count + 1);\n    reversed_edges.reserve(active_edge_count);\n\
-    \n    while (!vertex_stack.empty()) {\n        const int vertex = vertex_stack.back();\n\
-    \        while (cursor[vertex] < int(graph[vertex].size())) {\n            const\
-    \ Edge<T>& edge = graph[vertex][cursor[vertex]];\n            if (edge.alive &&\
-    \ !used[edge.id]) break;\n            cursor[vertex]++;\n        }\n\n       \
-    \ if (cursor[vertex] < int(graph[vertex].size())) {\n            const Edge<T>&\
-    \ edge = graph[vertex][cursor[vertex]++];\n            used[edge.id] = true;\n\
-    \            vertex_stack.push_back(edge.to);\n            incoming_edge_stack.push_back(edge.id);\n\
+    }  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/enumerate_triangles.hpp\"\
+    \n\n\n\n#line 7 \"graph/enumerate_triangles.hpp\"\n\n#line 9 \"graph/enumerate_triangles.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\ntemplate <class T, class Callback>\n\
+    void enumerate_triangles(const Graph<T>& graph, Callback&& callback) {\n    const\
+    \ int n = graph.size();\n    const std::vector<Edge<T>> edges = graph.edges();\n\
+    \n    std::vector<int> degree(n, 0);\n    for (const Edge<T>& edge : edges) {\n\
+    \        assert(edge.from != edge.to);\n        degree[edge.from]++;\n       \
+    \ degree[edge.to]++;\n    }\n\n    std::vector<std::vector<int>> oriented(n);\n\
+    \    for (const Edge<T>& edge : edges) {\n        int from = edge.from;\n    \
+    \    int to = edge.to;\n        if (degree[from] > degree[to] ||\n           \
+    \ (degree[from] == degree[to] && from > to)) {\n            std::swap(from, to);\n\
+    \        }\n        oriented[from].push_back(to);\n    }\n\n    std::vector<int>\
+    \ marked(n, -1);\n    for (int vertex = 0; vertex < n; vertex++) {\n        for\
+    \ (int to : oriented[vertex]) marked[to] = vertex;\n        for (int middle :\
+    \ oriented[vertex]) {\n            for (int to : oriented[middle]) {\n       \
+    \         if (marked[to] != vertex) continue;\n                int first = vertex;\n\
+    \                int second = middle;\n                int third = to;\n     \
+    \           if (first > second) std::swap(first, second);\n                if\
+    \ (second > third) std::swap(second, third);\n                if (first > second)\
+    \ std::swap(first, second);\n                callback(first, second, third);\n\
+    \            }\n        }\n    }\n}\n\n}  // namespace graph\n}  // namespace\
+    \ m1une\n\n\n#line 1 \"graph/eulerian_trail.hpp\"\n\n\n\n#line 9 \"graph/eulerian_trail.hpp\"\
+    \n\n#line 11 \"graph/eulerian_trail.hpp\"\n\nnamespace m1une {\nnamespace graph\
+    \ {\n\nstruct EulerianTrail {\n    std::vector<int> vertices;\n    std::vector<int>\
+    \ edge_ids;\n\n    int edge_count() const {\n        return int(edge_ids.size());\n\
+    \    }\n\n    bool is_circuit() const {\n        return vertices.empty() || vertices.front()\
+    \ == vertices.back();\n    }\n};\n\nnamespace internal {\n\ntemplate <class T>\n\
+    std::optional<EulerianTrail> hierholzer(\n    const Graph<T>& graph,\n    int\
+    \ start,\n    int active_edge_count\n) {\n    EulerianTrail result;\n    if (active_edge_count\
+    \ == 0) {\n        if (start != -1) result.vertices.push_back(start);\n      \
+    \  return result;\n    }\n\n    assert(0 <= start && start < graph.size());\n\
+    \    std::vector<char> used(graph.edge_count(), false);\n    std::vector<int>\
+    \ cursor(graph.size(), 0);\n    std::vector<int> vertex_stack(1, start);\n   \
+    \ std::vector<int> incoming_edge_stack(1, -1);\n    std::vector<int> reversed_vertices;\n\
+    \    std::vector<int> reversed_edges;\n    reversed_vertices.reserve(active_edge_count\
+    \ + 1);\n    reversed_edges.reserve(active_edge_count);\n\n    while (!vertex_stack.empty())\
+    \ {\n        const int vertex = vertex_stack.back();\n        while (cursor[vertex]\
+    \ < int(graph[vertex].size())) {\n            const Edge<T>& edge = graph[vertex][cursor[vertex]];\n\
+    \            if (edge.alive && !used[edge.id]) break;\n            cursor[vertex]++;\n\
+    \        }\n\n        if (cursor[vertex] < int(graph[vertex].size())) {\n    \
+    \        const Edge<T>& edge = graph[vertex][cursor[vertex]++];\n            used[edge.id]\
+    \ = true;\n            vertex_stack.push_back(edge.to);\n            incoming_edge_stack.push_back(edge.id);\n\
     \            continue;\n        }\n\n        reversed_vertices.push_back(vertex);\n\
     \        const int incoming_edge = incoming_edge_stack.back();\n        if (incoming_edge\
     \ != -1) reversed_edges.push_back(incoming_edge);\n        vertex_stack.pop_back();\n\
@@ -2034,7 +2057,7 @@ data:
     \   assert(first_component != second_component);\n        result.bridge_forest_edges.push_back(\n\
     \            TwoEdgeConnectedBridge{first_component, second_component, edge_id});\n\
     \    }\n    return result;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\
-    \n\n#line 22 \"graph/undirected.hpp\"\n\n\n"
+    \n\n#line 23 \"graph/undirected.hpp\"\n\n\n"
   code: '#ifndef M1UNE_GRAPH_UNDIRECTED_HPP
 
     #define M1UNE_GRAPH_UNDIRECTED_HPP 1
@@ -2051,6 +2074,8 @@ data:
     #include "connected_components.hpp"
 
     #include "cycle_detection.hpp"
+
+    #include "enumerate_triangles.hpp"
 
     #include "eulerian_trail.hpp"
 
@@ -2089,6 +2114,7 @@ data:
   - graph/connected_components.hpp
   - ds/dsu/dsu.hpp
   - graph/cycle_detection.hpp
+  - graph/enumerate_triangles.hpp
   - graph/eulerian_trail.hpp
   - graph/general_matching.hpp
   - graph/grid.hpp
@@ -2113,7 +2139,7 @@ data:
   path: graph/undirected.hpp
   requiredBy:
   - graph/all.hpp
-  timestamp: '2026-07-13 06:09:24+09:00'
+  timestamp: '2026-07-13 20:21:50+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
@@ -2153,6 +2179,7 @@ where direction should not matter.
 | `graph/namori.hpp` | Undirected Namori graph | Ordered cycles and the trees attached to them. |
 | `graph/connected_components.hpp` | Direction ignored | Weak/ordinary connected components. |
 | `graph/cycle_detection.hpp` | Directed and undirected variants | Use `find_undirected_cycle(g)` for undirected graphs. |
+| `graph/enumerate_triangles.hpp` | Direction ignored | Enumerates every triangle through a callback. |
 | `graph/eulerian_trail.hpp` | Directed and undirected variants | Use `undirected_eulerian_trail(g)` for undirected graphs. |
 | `graph/grid.hpp` | Undirected graph builder | Builds 4/8-neighbor grid graphs. |
 

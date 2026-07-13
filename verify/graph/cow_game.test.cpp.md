@@ -56,6 +56,9 @@ data:
     path: graph/dominator_tree.hpp
     title: Dominator Tree
   - icon: ':heavy_check_mark:'
+    path: graph/enumerate_triangles.hpp
+    title: Enumerate Triangles
+  - icon: ':heavy_check_mark:'
     path: graph/eulerian_trail.hpp
     title: Eulerian Trail
   - icon: ':heavy_check_mark:'
@@ -387,6 +390,7 @@ data:
   - graph/chromatic_number.hpp
   - graph/connected_components.hpp
   - ds/dsu/dsu.hpp
+  - graph/enumerate_triangles.hpp
   - graph/general_matching.hpp
   - graph/kruskal.hpp
   - graph/lowlink.hpp
@@ -397,7 +401,7 @@ data:
   isVerificationFile: true
   path: verify/graph/cow_game.test.cpp
   requiredBy: []
-  timestamp: '2026-07-13 20:12:50+09:00'
+  timestamp: '2026-07-13 20:21:50+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/cow_game.test.cpp

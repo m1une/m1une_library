@@ -540,6 +540,9 @@ data:
       path: graph/dominator_tree.hpp
       title: Dominator Tree
     - icon: ':heavy_check_mark:'
+      path: graph/enumerate_triangles.hpp
+      title: Enumerate Triangles
+    - icon: ':heavy_check_mark:'
       path: graph/eulerian_trail.hpp
       title: Eulerian Trail
     - icon: ':heavy_check_mark:'
@@ -1472,6 +1475,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/graph/dominator_tree.test.cpp
       title: verify/graph/dominator_tree.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/enumerate_triangles.test.cpp
+      title: verify/graph/enumerate_triangles.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/graph/eulerian_trail_directed.test.cpp
       title: verify/graph/eulerian_trail_directed.test.cpp

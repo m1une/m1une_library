@@ -48,6 +48,9 @@ data:
     path: graph/dominator_tree.hpp
     title: Dominator Tree
   - icon: ':heavy_check_mark:'
+    path: graph/enumerate_triangles.hpp
+    title: Enumerate Triangles
+  - icon: ':heavy_check_mark:'
     path: graph/eulerian_trail.hpp
     title: Eulerian Trail
   - icon: ':heavy_check_mark:'
@@ -192,6 +195,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/dominator_tree.test.cpp
     title: verify/graph/dominator_tree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/enumerate_triangles.test.cpp
+    title: verify/graph/enumerate_triangles.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/enumerate_triangles.test.cpp
+    title: verify/graph/enumerate_triangles.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/eulerian_trail_directed.test.cpp
     title: verify/graph/eulerian_trail_directed.test.cpp
@@ -438,6 +447,7 @@ data:
   - graph/kruskal.hpp
   - graph/range_edge_graph.hpp
   - graph/bipartite.hpp
+  - graph/enumerate_triangles.hpp
   - graph/minimum_steiner_tree.hpp
   - graph/bellman_ford.hpp
   - graph/k_shortest_walk.hpp
@@ -528,6 +538,8 @@ data:
   - verify/graph/replacement_paths.test.cpp
   - verify/graph/block_cut_tree.test.cpp
   - verify/graph/k_shortest_walk.test.cpp
+  - verify/graph/enumerate_triangles.test.cpp
+  - verify/graph/enumerate_triangles.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/namori.test.cpp
