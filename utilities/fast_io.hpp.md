@@ -7,6 +7,9 @@ data:
     path: verify/algo/sequence/number_of_subsequences.test.cpp
     title: verify/algo/sequence/number_of_subsequences.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/bst/predecessor_set.test.cpp
+    title: verify/ds/bst/predecessor_set.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/range_query/fenwick_tree.test.cpp
     title: verify/ds/range_query/fenwick_tree.test.cpp
   - icon: ':heavy_check_mark:'
@@ -381,6 +384,7 @@ data:
   - verify/ds/range_query/fenwick_tree.test.cpp
   - verify/ds/range_query/range_lis_query.test.cpp
   - verify/ds/range_query/static_range_count_distinct.test.cpp
+  - verify/ds/bst/predecessor_set.test.cpp
   - verify/math/multivariate_convolution_cyclic.test.cpp
   - verify/math/multivariate_convolution_truncated.test.cpp
   - verify/math/fps/convolution_mod_large.test.cpp

@@ -238,6 +238,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: ds/bst/persistent_ordered_set.hpp
       title: Persistent Ordered Set
+    - icon: ':heavy_check_mark:'
+      path: ds/bst/predecessor_set.hpp
+      title: Predecessor Set
   - name: ds/dsu
     pages:
     - icon: ':heavy_check_mark:'
@@ -1243,6 +1246,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/ds/bst/persistent_ordered_set.test.cpp
       title: verify/ds/bst/persistent_ordered_set.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/bst/predecessor_set.test.cpp
+      title: verify/ds/bst/predecessor_set.test.cpp
   - name: verify/ds/dsu
     pages:
     - icon: ':heavy_check_mark:'
