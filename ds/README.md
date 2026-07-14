@@ -16,6 +16,7 @@ one-shot sequence computations such as LIS are in `algo/sequence/`.
 | [`dynamic_tree/`](dynamic_tree/) | Link-cut tree, path-oriented variants, and rake-compress link-cut tree |
 | [`dynamic_connectivity/`](dynamic_connectivity/) | Online and offline fully dynamic undirected connectivity |
 | [`heap/`](heap/) | Array-based double-ended priority queue and pairing-based meldable priority queue |
+| [`deque/`](deque/) | Purely persistent real-time double-ended queue |
 | [`queue/`](queue/) | Purely persistent real-time FIFO queue |
 | [`stack/`](stack/) | Purely persistent constant-time LIFO stack |
 | [`interval_set/`](interval_set/) | Disjoint interval set with insertion, deletion, and covered-point queries |
