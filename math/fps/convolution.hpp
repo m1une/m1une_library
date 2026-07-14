@@ -276,11 +276,7 @@ std::vector<Mint> convolution_998244353_simd(const std::vector<Mint>& a,
                                  &transform);
 
     std::vector<Mint> result(result_size);
-    if constexpr (std::is_same_v<Mint, math::ModInt<998244353>>) {
-        std::memcpy(result.data(), transformed_a, sizeof(uint32_t) * result_size);
-    } else {
-        for (int j = 0; j < result_size; j++) result[j] = Mint::raw(transformed_a[j]);
-    }
+    for (int j = 0; j < result_size; j++) result[j] = Mint::raw(transformed_a[j]);
     ::operator delete[](transformed_a, std::align_val_t(32));
     ::operator delete[](transformed_b, std::align_val_t(32));
     return result;
