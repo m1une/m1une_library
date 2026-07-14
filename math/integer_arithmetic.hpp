@@ -38,6 +38,20 @@ constexpr std::optional<T> checked_multiply(T first, T second) {
     return T(first * second);
 }
 
+template <std::unsigned_integral T>
+constexpr bool kth_power_leq(T base, unsigned exponent, T limit) {
+    assert(exponent > 0);
+    if (base <= 1) return base <= limit;
+
+    const T multiplication_limit = limit / base;
+    T product = 1;
+    for (unsigned i = 0; i < exponent; i++) {
+        if (product > multiplication_limit) return false;
+        product *= base;
+    }
+    return true;
+}
+
 }  // namespace integer_arithmetic_detail
 
 // Returns floor(sqrt(value)) exactly, without floating-point arithmetic.
@@ -76,6 +90,55 @@ constexpr T ceil_sqrt(T value) {
         return result;
     }
     return result + 1;
+}
+
+// Returns floor(value^(1 / degree)) exactly, without floating-point arithmetic.
+template <std::integral T, std::integral Degree>
+requires(
+    !std::same_as<std::remove_cv_t<T>, bool>
+    && !std::same_as<std::remove_cv_t<Degree>, bool>
+)
+constexpr T floor_kth_root(T value, Degree degree) {
+    if constexpr (std::signed_integral<T>) {
+        assert(0 <= value);
+        if (value < 0) return T();
+    }
+    assert(0 < degree);
+    if (degree <= 0) return T();
+    if (value <= 1 || degree == 1) return value;
+    if (degree == 2) return isqrt(value);
+
+    using U = std::make_unsigned_t<T>;
+    using UDegree = std::make_unsigned_t<Degree>;
+    constexpr int digits = std::numeric_limits<U>::digits;
+    const UDegree unsigned_degree = static_cast<UDegree>(degree);
+    if (unsigned_degree >= static_cast<UDegree>(digits)) return T(1);
+    const unsigned exponent = static_cast<unsigned>(unsigned_degree);
+    const U unsigned_value = static_cast<U>(value);
+
+    int bit_width = 0;
+    for (U remaining = unsigned_value; remaining != 0; remaining >>= 1) {
+        bit_width++;
+    }
+    const int root_bits =
+        (bit_width + static_cast<int>(exponent) - 1) /
+        static_cast<int>(exponent);
+
+    U low = 1;
+    U high = U(1) << root_bits;
+    while (high - low > 1) {
+        const U middle = low + (high - low) / 2;
+        if (
+            integer_arithmetic_detail::kth_power_leq(
+                middle, exponent, unsigned_value
+            )
+        ) {
+            low = middle;
+        } else {
+            high = middle;
+        }
+    }
+    return static_cast<T>(low);
 }
 
 // Returns base^exponent, or nullopt when the result does not fit in T.

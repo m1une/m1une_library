@@ -1,4 +1,4 @@
-#define PROBLEM "https://judge.yosupo.jp/problem/aplusb"
+#define PROBLEM "https://judge.yosupo.jp/problem/kth_root_integer"
 
 #include "../../math/integer_arithmetic.hpp"
 
@@ -45,6 +45,40 @@ void test_boundaries() {
     static_assert(m1une::math::ceil_sqrt(signed_maximum) == 3037000500LL);
 }
 
+void test_kth_roots() {
+    using m1une::math::checked_ipow;
+    using m1une::math::floor_kth_root;
+    constexpr std::uint64_t maximum =
+        std::numeric_limits<std::uint64_t>::max();
+
+    static_assert(floor_kth_root(0ULL, 1) == 0);
+    static_assert(floor_kth_root(1ULL, 64) == 1);
+    static_assert(floor_kth_root(7ULL, 3) == 1);
+    static_assert(floor_kth_root(8ULL, 3) == 2);
+    static_assert(floor_kth_root(80ULL, 4) == 2);
+    static_assert(floor_kth_root(81ULL, 4) == 3);
+    static_assert(floor_kth_root(maximum, 1) == maximum);
+    static_assert(floor_kth_root(maximum, 2) == 4294967295ULL);
+    static_assert(floor_kth_root(maximum, 3) == 2642245ULL);
+    static_assert(floor_kth_root(maximum, 64) == 1);
+    static_assert(
+        floor_kth_root(std::numeric_limits<long long>::max(), 3U)
+        == 2097151LL
+    );
+
+    for (std::uint64_t value = 0; value <= 10000; value++) {
+        for (unsigned degree = 1; degree <= 16; degree++) {
+            std::uint64_t root = floor_kth_root(value, degree);
+            std::optional<std::uint64_t> power = checked_ipow(root, degree);
+            assert(power.has_value() && *power <= value);
+
+            std::optional<std::uint64_t> next_power =
+                checked_ipow(root + 1, degree);
+            assert(!next_power.has_value() || value < *next_power);
+        }
+    }
+}
+
 void test_powers() {
     using m1une::math::checked_ipow;
     using m1une::math::ipow;
@@ -89,9 +123,15 @@ int main() {
     test_square_roots<long long>();
     test_square_roots<unsigned long long>();
     test_boundaries();
+    test_kth_roots();
     test_powers();
 
-    long long a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    int test_count;
+    std::cin >> test_count;
+    while (test_count--) {
+        std::uint64_t value;
+        int degree;
+        std::cin >> value >> degree;
+        std::cout << m1une::math::floor_kth_root(value, degree) << '\n';
+    }
 }

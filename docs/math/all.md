@@ -56,7 +56,7 @@ You usually do not need to include this entire bundle:
   `n = a * a + b * b`.
 * Use `number_theory.hpp` for extended GCD, modular inverses, simultaneous
   remainder constraints, and sums involving floor division.
-* Use `integer_arithmetic.hpp` for exact integer square roots and powers.
+* Use `integer_arithmetic.hpp` for exact integer roots and powers.
 * Use `repunit.hpp` for a repeated-one numeral or geometric sum in an
   arbitrary base.
 * Use `tetration.hpp` for modular tetration and arbitrary power towers.
@@ -83,7 +83,7 @@ few unused headers do not matter.
 | `math/binomial_coefficient_mod.hpp` | Binomial coefficients with 64-bit arguments modulo a fixed arbitrary modulus. |
 | `math/bitwise_convolution.hpp` | OR, AND, XOR convolutions and the Walsh-Hadamard transform. |
 | `math/bit_ceil.hpp` | Smallest power of two at least a given value. |
-| `math/integer_arithmetic.hpp` | Exact integer square roots and overflow-aware powers. |
+| `math/integer_arithmetic.hpp` | Exact integer square/k-th roots and overflow-aware powers. |
 | `math/lucas.hpp` | Lucas's theorem for huge binomial arguments modulo a small prime. |
 | `math/modint.hpp` | Static and tagged dynamic modular integer types. |
 | `math/modular_square_root.hpp` | Modular square roots for prime moduli using Tonelli-Shanks. |
