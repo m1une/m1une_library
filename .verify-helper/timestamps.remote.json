@@ -31,6 +31,7 @@
 "verify/ds/bst/ordered_set.test.cpp": "2026-07-13 03:01:19 +0900",
 "verify/ds/bst/persistent_ordered_multiset.test.cpp": "2026-07-12 04:52:54 +0900",
 "verify/ds/bst/persistent_ordered_set.test.cpp": "2026-07-12 04:52:54 +0900",
+"verify/ds/bst/predecessor_set.test.cpp": "2026-07-15 01:33:35 +0900",
 "verify/ds/dsu/dsu.test.cpp": "2026-07-13 06:09:24 +0900",
 "verify/ds/dsu/dsu_monoid.test.cpp": "2026-06-21 04:34:53 +0900",
 "verify/ds/dsu/partially_persistent_dsu.test.cpp": "2026-06-27 02:52:37 +0900",
