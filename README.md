@@ -94,6 +94,7 @@ plumbing live in `utilities/`.
 | `ds/dynamic_connectivity/` | Online and offline connectivity under edge insertions and deletions. |
 | `ds/heap/` | Double-ended and meldable priority queues. |
 | `ds/queue/` | Purely persistent real-time FIFO queues. |
+| `ds/stack/` | Purely persistent constant-time LIFO stacks. |
 | `ds/interval_set/` | Disjoint interval maintenance. |
 | `ds/hash_table/` | Hash maps and hash sets. |
 
