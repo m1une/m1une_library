@@ -2,8 +2,10 @@
 #define M1UNE_FAST_IO_HPP 1
 
 #include <array>
+#include <charconv>
 #include <cstddef>
 #include <cstdio>
+#include <cstdlib>
 #include <cstdint>
 #include <cstring>
 #include <iterator>
@@ -212,6 +214,56 @@ struct FastInput {
     }
 
     template <class T>
+    std::enable_if_t<std::is_floating_point_v<T>, bool>
+    read(T& value) {
+        if (!skip_spaces()) return false;
+        int c = read_char_raw();
+        bool negative = false;
+        if (c == '-' || c == '+') {
+            negative = c == '-';
+            c = read_char_raw();
+        }
+
+        long double result = 0;
+        while ('0' <= c && c <= '9') {
+            result = result * 10 + (c - '0');
+            c = read_char_raw();
+        }
+        if (c == '.') {
+            long double place = 0.1L;
+            c = read_char_raw();
+            while ('0' <= c && c <= '9') {
+                result += (c - '0') * place;
+                place *= 0.1L;
+                c = read_char_raw();
+            }
+        }
+        if (c == 'e' || c == 'E') {
+            c = read_char_raw();
+            bool exponent_negative = false;
+            if (c == '-' || c == '+') {
+                exponent_negative = c == '-';
+                c = read_char_raw();
+            }
+            int exponent = 0;
+            while ('0' <= c && c <= '9') {
+                exponent = exponent * 10 + (c - '0');
+                c = read_char_raw();
+            }
+            long double scale = 1;
+            long double power = 10;
+            while (exponent > 0) {
+                if (exponent & 1) scale *= power;
+                power *= power;
+                exponent >>= 1;
+            }
+            result = exponent_negative ? result / scale : result * scale;
+        }
+        value = static_cast<T>(negative ? -result : result);
+        return true;
+    }
+
+    template <class T>
     std::enable_if_t<
         internal::has_val_method_v<T>
             && !std::is_integral_v<T>
@@ -264,7 +316,7 @@ struct FastInput {
 
     template <class T>
     FastInput& operator>>(T& value) {
-        read(value);
+        if (!read(value)) std::abort();
         return *this;
     }
 };
@@ -288,10 +340,15 @@ struct FastOutput {
     std::FILE* _stream;
     char _buffer[buffer_size];
     int _position;
+    int _precision;
+    std::chars_format _float_format;
 
    public:
     explicit FastOutput(std::FILE* stream = stdout)
-        : _stream(stream), _position(0) {}
+        : _stream(stream),
+          _position(0),
+          _precision(6),
+          _float_format(std::chars_format::general) {}
 
     FastOutput(const FastOutput&) = delete;
     FastOutput& operator=(const FastOutput&) = delete;
@@ -325,6 +382,23 @@ struct FastOutput {
 
     void write(bool value) {
         write_char(value ? '1' : '0');
+    }
+
+    template <class T>
+    std::enable_if_t<std::is_floating_point_v<T>>
+    write(T value) {
+        char digits[128];
+        auto [end, error] = std::to_chars(
+            digits,
+            digits + sizeof(digits),
+            value,
+            _float_format,
+            _precision
+        );
+        if (error != std::errc()) std::abort();
+        for (const char* pointer = digits; pointer != end; pointer++) {
+            write_char(*pointer);
+        }
     }
 
     template <class T>
@@ -413,6 +487,20 @@ struct FastOutput {
 
     void println() {
         write_char('\n');
+    }
+
+    void set_precision(int precision) {
+        _precision = precision;
+    }
+
+    void set_fixed(int precision = 6) {
+        _float_format = std::chars_format::fixed;
+        _precision = precision;
+    }
+
+    void set_general(int precision = 6) {
+        _float_format = std::chars_format::general;
+        _precision = precision;
     }
 
     template <class... Args>

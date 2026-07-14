@@ -23,10 +23,10 @@ All names are in `m1une::utilities`.
 
 ## Supported types
 
-Both operators support integral types, `bool`, `char`, `std::string`, and
-ModInt-like types. A ModInt-like type must provide `value.val()` for output and
-be constructible from `long long` for input. Output additionally accepts
-null-terminated C strings.
+Both operators support integral and floating-point types, `bool`, `char`,
+`std::string`, and ModInt-like types. A ModInt-like type must provide
+`value.val()` for output and be constructible from `long long` for input.
+Output additionally accepts null-terminated C strings.
 
 Ranges recognized by `std::begin` and `std::end` are also supported, including
 ordinary arrays, `std::array`, and nested containers. Strings are treated as
@@ -86,8 +86,9 @@ nested-range boundary and a space between scalar values.
 | `int read_char_raw()` | Reads the next byte without skipping whitespace, or returns `EOF`. | Amortized $O(1)$ |
 | `bool skip_spaces()` | Skips whitespace and reports whether a token remains. | Linear in skipped input |
 
-`operator>>` is intended for valid contest input and does not expose a failure
-state. Use `read(...)` when EOF or malformed/missing input must be detected.
+`operator>>` is intended for valid contest input and aborts if an expected token
+is missing. Use `read(...)` when EOF or malformed/missing input must be
+detected.
 
 ### `FastOutput`
 
@@ -99,6 +100,9 @@ state. Use `read(...)` when EOF or malformed/missing input must be detected.
 | `void print(a, b, ...)` | Writes several values separated by spaces. | Linear in produced output |
 | `void println(a, b, ...)` | Calls `print`, then writes a newline. | Linear in produced output |
 | `void println()` | Writes a newline. | Amortized $O(1)$ |
+| `void set_precision(int precision)` | Changes the number of significant or fractional digits used for floating-point output. | $O(1)$ |
+| `void set_fixed(int precision = 6)` | Selects fixed-point output with `precision` fractional digits. | $O(1)$ |
+| `void set_general(int precision = 6)` | Selects general floating-point output with `precision` significant digits. | $O(1)$ |
 | `void flush()` | Writes all buffered bytes to the underlying stream. | Linear in buffered output |
 
 Pending output is flushed by the destructor. Standard iostream manipulators
