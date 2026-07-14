@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <random>
 #include <vector>
 
@@ -230,12 +230,15 @@ void test_randomized() {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_constructors();
     test_point_and_global_operations();
     test_bitwise_operations();
     test_randomized();
 
     long long a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    fast_input >> a >> b;
+    fast_output << a + b << '\n';
 }

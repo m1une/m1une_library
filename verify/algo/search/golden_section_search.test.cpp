@@ -2,7 +2,7 @@
 
 #include <cassert>
 #include <cmath>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <random>
 #include <vector>
 
@@ -225,6 +225,9 @@ void test_random_quadratics() {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_integer_argmin();
     test_integer_argmax();
     test_random_integer_arrays();
@@ -235,6 +238,6 @@ int main() {
     test_random_quadratics();
 
     long long a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    fast_input >> a >> b;
+    fast_output << a + b << '\n';
 }

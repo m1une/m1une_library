@@ -1,7 +1,7 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/partition_function"
 
 #include <cassert>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <vector>
 
 #include "../../math/modint.hpp"
@@ -26,18 +26,17 @@ void test_against_naive() {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_against_naive();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int n;
-    std::cin >> n;
+    fast_input >> n;
     const std::vector<Mint> values =
         m1une::math::partition_function<Mint>(n);
     for (int i = 0; i <= n; i++) {
-        if (i) std::cout << ' ';
-        std::cout << values[i];
+        if (i) fast_output << ' ';
+        fast_output << values[i];
     }
-    std::cout << '\n';
+    fast_output << '\n';
 }

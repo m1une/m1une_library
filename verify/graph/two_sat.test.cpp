@@ -5,7 +5,7 @@
 #include <cassert>
 #include <cstdint>
 #include <cstdlib>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <tuple>
 #include <vector>
 
@@ -106,8 +106,8 @@ void test_randomized() {
 }  // namespace
 
 int main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
 
     test_helpers();
     test_randomized();
@@ -115,27 +115,27 @@ int main() {
     char p;
     std::string cnf;
     int n, m;
-    std::cin >> p >> cnf >> n >> m;
+    fast_input >> p >> cnf >> n >> m;
 
     m1une::graph::TwoSat sat(n);
     sat.reserve(std::size_t(m));
     for (int clause = 0; clause < m; clause++) {
         int a, b, zero;
-        std::cin >> a >> b >> zero;
+        fast_input >> a >> b >> zero;
         assert(zero == 0);
         sat.add_clause(std::abs(a) - 1, 0 < a, std::abs(b) - 1, 0 < b);
     }
 
     if (!sat.satisfiable()) {
-        std::cout << "s UNSATISFIABLE\n";
+        fast_output << "s UNSATISFIABLE\n";
         return 0;
     }
 
-    std::cout << "s SATISFIABLE\n";
-    std::cout << "v";
+    fast_output << "s SATISFIABLE\n";
+    fast_output << "v";
     const std::vector<bool>& answer = sat.answer();
     for (int i = 0; i < n; i++) {
-        std::cout << " " << (answer[i] ? i + 1 : -(i + 1));
+        fast_output << " " << (answer[i] ? i + 1 : -(i + 1));
     }
-    std::cout << " 0\n";
+    fast_output << " 0\n";
 }

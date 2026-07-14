@@ -3,23 +3,25 @@
 
 #include "../../geometry/circle.hpp"
 
-#include <iomanip>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     using namespace m1une::geometry;
     Circle<long double> circle;
-    std::cin >> circle.center.x >> circle.center.y >> circle.radius;
+    fast_input >> circle.center.x >> circle.center.y >> circle.radius;
 
     int q;
-    std::cin >> q;
-    std::cout << std::fixed << std::setprecision(15);
+    fast_input >> q;
+    fast_output.set_fixed(15);
     while (q--) {
         Line<long double> line;
-        std::cin >> line.a.x >> line.a.y >> line.b.x >> line.b.y;
+        fast_input >> line.a.x >> line.a.y >> line.b.x >> line.b.y;
         auto points = circle_line_intersections(circle, line);
         if (points.size() == 1) points.push_back(points[0]);
-        std::cout << points[0].x << " " << points[0].y << " "
+        fast_output << points[0].x << " " << points[0].y << " "
                   << points[1].x << " " << points[1].y << '\n';
     }
 }

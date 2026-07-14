@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cassert>
 #include <functional>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <numeric>
 #include <random>
 #include <string>
@@ -62,14 +62,17 @@ void randomized_test() {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     randomized_test();
 
     int n;
-    std::cin >> n;
+    fast_input >> n;
     Graph<int> g(n);
     for (int v = 1; v < n; v++) {
         int parent;
-        std::cin >> parent;
+        fast_input >> parent;
         g.add_edge(parent, v);
     }
 
@@ -87,10 +90,10 @@ int main() {
         label[order[i]] = classes - 1;
     }
 
-    std::cout << classes << '\n';
+    fast_output << classes << '\n';
     for (int v = 0; v < n; v++) {
-        if (v != 0) std::cout << ' ';
-        std::cout << label[v];
+        if (v != 0) fast_output << ' ';
+        fast_output << label[v];
     }
-    std::cout << '\n';
+    fast_output << '\n';
 }

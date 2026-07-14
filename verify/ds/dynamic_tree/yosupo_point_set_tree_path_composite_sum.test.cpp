@@ -1,6 +1,6 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/point_set_tree_path_composite_sum"
 
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <vector>
 
 #include "../../../ds/dynamic_tree/rake_compress_link_cut_tree.hpp"
@@ -66,22 +66,21 @@ struct PointSetTreePathCompositeSum {
 };
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     using TreeDP = PointSetTreePathCompositeSum<mint>;
     using VertexValue = typename TreeDP::VertexValue;
     using EdgeValue = typename TreeDP::EdgeValue;
     using LCT = m1une::ds::RakeCompressLinkCutTree<TreeDP>;
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int n, q;
-    std::cin >> n >> q;
+    fast_input >> n >> q;
 
     LCT lct;
     std::vector<int> vertex_id(n);
     for (int i = 0; i < n; i++) {
         mint a;
-        std::cin >> a;
+        fast_input >> a;
         vertex_id[i] = lct.add_vertex(VertexValue{a});
     }
 
@@ -89,25 +88,25 @@ int main() {
     for (int i = 0; i + 1 < n; i++) {
         int u, v;
         mint b, c;
-        std::cin >> u >> v >> b >> c;
+        fast_input >> u >> v >> b >> c;
         edge_id[i] = lct.add_edge(vertex_id[u], vertex_id[v], EdgeValue{b, c});
     }
 
     for (int i = 0; i < q; i++) {
         int type;
-        std::cin >> type;
+        fast_input >> type;
         int root;
         if (type == 0) {
             int w;
             mint x;
-            std::cin >> w >> x >> root;
+            fast_input >> w >> x >> root;
             lct.set_vertex(vertex_id[w], VertexValue{x});
         } else {
             int e;
             mint y, z;
-            std::cin >> e >> y >> z >> root;
+            fast_input >> e >> y >> z >> root;
             lct.set_edge(edge_id[e], EdgeValue{y, z});
         }
-        std::cout << lct.component_prod(vertex_id[root]).s << '\n';
+        fast_output << lct.component_prod(vertex_id[root]).s << '\n';
     }
 }

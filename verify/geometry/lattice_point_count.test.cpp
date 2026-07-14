@@ -4,7 +4,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <limits>
 #include <vector>
 
@@ -137,11 +137,14 @@ void test_randomized_against_naive() {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_examples_and_degenerate_regions();
     test_large_coordinates_and_floor_sum();
     test_randomized_against_naive();
 
     long long a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    fast_input >> a >> b;
+    fast_output << a + b << '\n';
 }

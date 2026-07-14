@@ -3,7 +3,7 @@
 #include "../../utilities/dice.hpp"
 
 #include <cassert>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <string>
 #include <vector>
 
@@ -95,17 +95,20 @@ void test_invalid_nets() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_decorated_rotation();
     test_net_and_distance();
     test_invalid_nets();
 
-    int count;
-    while (std::cin >> count && count != 0) {
+    int count = 0;
+    while (fast_input.read(count) && count != 0) {
         std::vector<ArrowDice> dice;
         dice.reserve(static_cast<std::size_t>(count));
         for (int index = 0; index < count; ++index) {
             std::vector<std::string> net(5);
-            for (std::string& row : net) std::cin >> row;
+            for (std::string& row : net) fast_input >> row;
             dice.emplace_back(ArrowDice::from_net(net));
         }
 
@@ -113,9 +116,9 @@ int main() {
             for (int right = 0; right < count; ++right) {
                 std::size_t left_index = static_cast<std::size_t>(left);
                 std::size_t right_index = static_cast<std::size_t>(right);
-                std::cout << dice[left_index].distance(dice[right_index]);
+                fast_output << dice[left_index].distance(dice[right_index]);
             }
-            std::cout << '\n';
+            fast_output << '\n';
         }
     }
 }

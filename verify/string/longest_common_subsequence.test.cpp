@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <string>
 #include <vector>
 
@@ -117,17 +117,16 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_fixed();
     test_randomized();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int q;
-    std::cin >> q;
+    fast_input >> q;
     while (q--) {
         std::string first, second;
-        std::cin >> first >> second;
-        std::cout << m1une::string::longest_common_subsequence_length(first, second) << '\n';
+        fast_input >> first >> second;
+        fast_output << m1une::string::longest_common_subsequence_length(first, second) << '\n';
     }
 }

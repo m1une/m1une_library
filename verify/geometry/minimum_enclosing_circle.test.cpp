@@ -6,7 +6,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <optional>
 #include <vector>
 
@@ -206,20 +206,19 @@ bool on_boundary(
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     randomized_test();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int n;
-    std::cin >> n;
+    fast_input >> n;
     std::vector<Point> points(n);
-    for (Point& point : points) std::cin >> point.x >> point.y;
+    for (Point& point : points) fast_input >> point.x >> point.y;
 
     auto answer = m1une::geometry::minimum_enclosing_circle(points);
     assert(answer.has_value());
     for (int index = 0; index < n; index++) {
-        std::cout << (on_boundary(points, answer->support, index) ? '1' : '0');
+        fast_output << (on_boundary(points, answer->support, index) ? '1' : '0');
     }
-    std::cout << '\n';
+    fast_output << '\n';
 }

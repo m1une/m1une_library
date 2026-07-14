@@ -6,7 +6,7 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <random>
 #include <utility>
 #include <vector>
@@ -181,32 +181,31 @@ void self_test() {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     self_test();
 
     using Add = m1une::monoid::Add<long long>;
     using Dsu = m1une::ds::PersistentPotentializedDsu<Add>;
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int n, q;
-    std::cin >> n >> q;
+    fast_input >> n >> q;
     Dsu dsu(n);
 
     while (q--) {
         int type, x, y;
-        std::cin >> type >> x >> y;
+        fast_input >> type >> x >> y;
         if (type == 0) {
             long long z;
-            std::cin >> z;
+            fast_input >> z;
             auto [next, ok] = dsu.merge(x, y, z);
             (void)ok;
             dsu = next;
         } else {
             if (dsu.same(x, y)) {
-                std::cout << dsu.diff(x, y) << '\n';
+                fast_output << dsu.diff(x, y) << '\n';
             } else {
-                std::cout << "?\n";
+                fast_output << "?\n";
             }
         }
     }

@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <vector>
 
 #include "../../../acted_monoid/range_add_range_sum.hpp"
@@ -130,12 +130,15 @@ void test_affine_order() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_versions();
     test_arithmetic_progression();
     test_randomized();
     test_affine_order();
 
     long long a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    fast_input >> a >> b;
+    fast_output << a + b << '\n';
 }

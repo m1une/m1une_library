@@ -1,22 +1,22 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/matrix_rank_mod_2"
 
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <string>
 #include <utility>
 
 #include "../../../math/matrix/bit_matrix.hpp"
 
 int main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
 
     int rows, cols;
-    std::cin >> rows >> cols;
+    fast_input >> rows >> cols;
     m1une::matrix::BitMatrix matrix(rows, cols);
     std::string bits;
     for (int row = 0; row < rows; row++) {
-        std::cin >> bits;
+        fast_input >> bits;
         matrix.set_row(row, bits);
     }
-    std::cout << m1une::matrix::matrix_rank(std::move(matrix)) << '\n';
+    fast_output << m1une::matrix::matrix_rank(std::move(matrix)) << '\n';
 }

@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <queue>
 #include <vector>
 
@@ -142,27 +142,26 @@ void test_deep_graph() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_fixed();
     test_randomized();
     test_deep_graph();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int n, edge_count;
-    std::cin >> n >> edge_count;
+    fast_input >> n >> edge_count;
     Graph graph(n);
     while (edge_count--) {
         int from, to;
-        std::cin >> from >> to;
+        fast_input >> from >> to;
         graph.add_edge(from, to);
     }
 
     Result result = m1une::graph::three_edge_connected_components(graph);
-    std::cout << result.component_count() << '\n';
+    fast_output << result.component_count() << '\n';
     for (const auto& component : result.components) {
-        std::cout << component.size();
-        for (int vertex : component) std::cout << ' ' << vertex;
-        std::cout << '\n';
+        fast_output << component.size();
+        for (int vertex : component) fast_output << ' ' << vertex;
+        fast_output << '\n';
     }
 }

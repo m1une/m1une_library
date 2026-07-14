@@ -2,24 +2,24 @@
 
 #include "../../string/manacher.hpp"
 
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <string>
 
 int main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
 
     std::string text;
-    std::cin >> text;
+    fast_input >> text;
     m1une::string::ManacherResult result = m1une::string::manacher(text);
 
     for (int center = 0; center < 2 * int(text.size()) - 1; center++) {
-        if (center != 0) std::cout << ' ';
+        if (center != 0) fast_output << ' ';
         if (center & 1) {
-            std::cout << 2 * result.even[(center + 1) / 2];
+            fast_output << 2 * result.even[(center + 1) / 2];
         } else {
-            std::cout << 2 * result.odd[center / 2] - 1;
+            fast_output << 2 * result.odd[center / 2] - 1;
         }
     }
-    std::cout << '\n';
+    fast_output << '\n';
 }

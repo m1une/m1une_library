@@ -3,21 +3,23 @@
 
 #include "../../geometry/line.hpp"
 
-#include <iomanip>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     using namespace m1une::geometry;
     Line<long double> line;
-    std::cin >> line.a.x >> line.a.y >> line.b.x >> line.b.y;
+    fast_input >> line.a.x >> line.a.y >> line.b.x >> line.b.y;
 
     int q;
-    std::cin >> q;
-    std::cout << std::fixed << std::setprecision(15);
+    fast_input >> q;
+    fast_output.set_fixed(15);
     while (q--) {
         Point<long double> point;
-        std::cin >> point.x >> point.y;
+        fast_input >> point.x >> point.y;
         Point<long double> result = projection(line, point);
-        std::cout << result.x << " " << result.y << '\n';
+        fast_output << result.x << " " << result.y << '\n';
     }
 }

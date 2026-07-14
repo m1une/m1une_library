@@ -2,7 +2,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <vector>
 
 #include "../../math/binomial_coefficient_mod.hpp"
@@ -47,19 +47,19 @@ void test_large_arguments() {
 }  // namespace
 
 int main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
 
     test_against_pascal_triangle();
     test_large_arguments();
 
     int query_count;
     uint32_t modulus;
-    std::cin >> query_count >> modulus;
+    fast_input >> query_count >> modulus;
     m1une::math::BinomialCoefficientMod combinations(modulus);
     while (query_count--) {
         uint64_t n, k;
-        std::cin >> n >> k;
-        std::cout << combinations.binom(n, k) << '\n';
+        fast_input >> n >> k;
+        fast_output << combinations.binom(n, k) << '\n';
     }
 }

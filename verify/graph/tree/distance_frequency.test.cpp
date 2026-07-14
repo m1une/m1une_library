@@ -5,7 +5,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <queue>
 #include <vector>
 
@@ -98,23 +98,26 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_edge_cases();
     test_randomized();
 
     int size;
-    std::cin >> size;
+    fast_input >> size;
     Graph tree(size);
     for (int edge = 0; edge + 1 < size; edge++) {
         int first, second;
-        std::cin >> first >> second;
+        fast_input >> first >> second;
         tree.add_edge(first, second);
     }
 
     const std::vector<long long> frequency =
         m1une::tree::tree_distance_frequency(tree);
     for (int distance = 1; distance < size; distance++) {
-        if (distance != 1) std::cout << ' ';
-        std::cout << frequency[static_cast<std::size_t>(distance)];
+        if (distance != 1) fast_output << ' ';
+        fast_output << frequency[static_cast<std::size_t>(distance)];
     }
-    std::cout << '\n';
+    fast_output << '\n';
 }

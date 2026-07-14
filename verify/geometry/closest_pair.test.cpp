@@ -4,7 +4,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <optional>
 #include <utility>
 #include <vector>
@@ -102,22 +102,21 @@ void randomized_test() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     fixed_test();
     randomized_test();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int test_count;
-    std::cin >> test_count;
+    fast_input >> test_count;
     while (test_count--) {
         int n;
-        std::cin >> n;
+        fast_input >> n;
         std::vector<Point> points(n);
-        for (Point& point : points) std::cin >> point.x >> point.y;
+        for (Point& point : points) fast_input >> point.x >> point.y;
 
         auto answer = m1une::geometry::closest_pair(points);
         assert(answer.has_value());
-        std::cout << answer->first << ' ' << answer->second << '\n';
+        fast_output << answer->first << ' ' << answer->second << '\n';
     }
 }

@@ -1,5 +1,7 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/general_matching"
 
+#include "../../utilities/fast_io.hpp"
+
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -7,19 +9,19 @@ using namespace std;
 #include "../../graph/general_matching.hpp"
 
 int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
 
     int N, M;
-    cin >> N >> M;
+    fast_input >> N >> M;
     m1une::graph::GeneralMatching gm(N);
     while (M--) {
         int u, v;
-        cin >> u >> v;
+        fast_input >> u >> v;
         gm.add_edge(u, v);
     }
-    cout << gm.max_matching() << '\n';
+    fast_output << gm.max_matching() << '\n';
     for (auto p : gm.matching()) {
-        cout << p.from << ' ' << p.to << '\n';
+        fast_output << p.from << ' ' << p.to << '\n';
     }
 }

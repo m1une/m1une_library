@@ -2,7 +2,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <vector>
 
 #include "../../math/modint.hpp"
@@ -53,17 +53,17 @@ void test_small() {
 }
 
 int main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
 
     test_small();
 
     int test_count;
-    std::cin >> test_count;
+    fast_input >> test_count;
     while (test_count--) {
         uint64_t n;
         Mint a, b;
-        std::cin >> n >> a >> b;
-        std::cout << solve(n, a, b) << '\n';
+        fast_input >> n >> a >> b;
+        fast_output << solve(n, a, b) << '\n';
     }
 }

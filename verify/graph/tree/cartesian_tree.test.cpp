@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cassert>
 #include <functional>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <random>
 #include <vector>
 
@@ -121,21 +121,21 @@ void run_local_tests() {
 }
 
 int main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
 
     run_local_tests();
 
     int n;
-    std::cin >> n;
+    fast_input >> n;
     std::vector<long long> a(n);
-    for (int i = 0; i < n; i++) std::cin >> a[i];
+    for (int i = 0; i < n; i++) fast_input >> a[i];
 
     m1une::tree::CartesianTree tree(a);
     std::vector<int> parent = tree.parent_with_root_self();
     for (int i = 0; i < n; i++) {
-        if (i) std::cout << ' ';
-        std::cout << parent[i];
+        if (i) fast_output << ' ';
+        fast_output << parent[i];
     }
-    std::cout << '\n';
+    fast_output << '\n';
 }

@@ -2,17 +2,20 @@
 
 #include "../../geometry/line.hpp"
 
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     using namespace m1une::geometry;
     int q;
-    std::cin >> q;
+    fast_input >> q;
     while (q--) {
         Segment<long long> first;
         Segment<long long> second;
-        std::cin >> first.a.x >> first.a.y >> first.b.x >> first.b.y;
-        std::cin >> second.a.x >> second.a.y >> second.b.x >> second.b.y;
-        std::cout << intersects(first, second) << '\n';
+        fast_input >> first.a.x >> first.a.y >> first.b.x >> first.b.y;
+        fast_input >> second.a.x >> second.a.y >> second.b.x >> second.b.y;
+        fast_output << intersects(first, second) << '\n';
     }
 }

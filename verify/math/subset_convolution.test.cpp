@@ -5,7 +5,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <vector>
 
 namespace {
@@ -66,30 +66,33 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_edge_cases();
     test_randomized();
 
     int bit_count;
-    std::cin >> bit_count;
+    fast_input >> bit_count;
     int size = 1 << bit_count;
     using mint = m1une::math::modint998244353;
     std::vector<mint> first(size), second(size);
     for (mint& value : first) {
         long long input;
-        std::cin >> input;
+        fast_input >> input;
         value = input;
     }
     for (mint& value : second) {
         long long input;
-        std::cin >> input;
+        fast_input >> input;
         value = input;
     }
 
     std::vector<mint> result =
         m1une::math::subset_convolution(first, second);
     for (int mask = 0; mask < size; ++mask) {
-        if (mask != 0) std::cout << ' ';
-        std::cout << result[mask].val();
+        if (mask != 0) fast_output << ' ';
+        fast_output << result[mask].val();
     }
-    std::cout << '\n';
+    fast_output << '\n';
 }

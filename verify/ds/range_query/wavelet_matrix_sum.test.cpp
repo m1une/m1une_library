@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <limits>
 #include <numeric>
 #include <utility>
@@ -130,22 +130,22 @@ void test_randomized() {
 }  // namespace
 
 int main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
 
     test_value_sums();
     test_weighted_ties();
     test_randomized();
 
     int n, q;
-    std::cin >> n >> q;
+    fast_input >> n >> q;
     std::vector<long long> values(n);
-    for (long long& value : values) std::cin >> value;
+    for (long long& value : values) fast_input >> value;
 
     m1une::ds::WaveletMatrixSum<long long> matrix(values);
     for (int query = 0; query < q; query++) {
         int l, r, k;
-        std::cin >> l >> r >> k;
-        std::cout << matrix.kth_smallest(l, r, k) << '\n';
+        fast_input >> l >> r >> k;
+        fast_output << matrix.kth_smallest(l, r, k) << '\n';
     }
 }

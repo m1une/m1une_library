@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <map>
 #include <set>
 #include <string>
@@ -140,14 +140,13 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_features();
     test_randomized();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     std::string text;
-    std::cin >> text;
+    fast_input >> text;
     m1une::string::SuffixAutomaton<> automaton(text);
-    std::cout << automaton.distinct_substring_count() << '\n';
+    fast_output << automaton.distinct_substring_count() << '\n';
 }

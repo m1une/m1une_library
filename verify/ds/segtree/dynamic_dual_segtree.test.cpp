@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <utility>
 #include <vector>
 
@@ -62,8 +62,8 @@ void test_randomized() {
 }  // namespace
 
 int main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
 
     test_randomized();
 
@@ -71,13 +71,13 @@ int main() {
     using Affine = m1une::monoid::Affine<mint>;
 
     int n, q;
-    std::cin >> n >> q;
+    fast_input >> n >> q;
     m1une::ds::DynamicDualSegtree<Affine, int> seg(0, n, Affine::id());
     seg.reserve(std::size_t(4) * std::size_t(n + q));
 
     for (int i = 0; i < n; i++) {
         long long x;
-        std::cin >> x;
+        fast_input >> x;
         Affine::value_type value;
         value.first = mint(0);
         value.second = mint(x);
@@ -86,19 +86,19 @@ int main() {
 
     for (int query = 0; query < q; query++) {
         int type;
-        std::cin >> type;
+        fast_input >> type;
         if (type == 0) {
             int l, r;
             long long b, c;
-            std::cin >> l >> r >> b >> c;
+            fast_input >> l >> r >> b >> c;
             Affine::value_type f;
             f.first = mint(b);
             f.second = mint(c);
             seg.apply(l, r, f);
         } else {
             int p;
-            std::cin >> p;
-            std::cout << seg.get(p).second << '\n';
+            fast_input >> p;
+            fast_output << seg.get(p).second << '\n';
         }
     }
 }

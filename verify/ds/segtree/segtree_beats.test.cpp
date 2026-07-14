@@ -3,7 +3,7 @@
 #include "../../../ds/segtree/segtree_beats.hpp"
 
 #include <cassert>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <utility>
 #include <vector>
 
@@ -23,13 +23,13 @@ struct RangeAffineRangeSumBeats
 };
 
 int main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
 
     int n, q;
-    std::cin >> n >> q;
+    fast_input >> n >> q;
     std::vector<long long> values(n);
-    for (long long& value : values) std::cin >> value;
+    for (long long& value : values) fast_input >> value;
 
     m1une::ds::SegtreeBeats<RangeAffineRangeSumBeats> seg(values);
     assert(seg.size() == n);
@@ -37,13 +37,13 @@ int main() {
 
     while (q--) {
         int type, left, right;
-        std::cin >> type >> left >> right;
+        fast_input >> type >> left >> right;
         if (type == 0) {
             long long b, c;
-            std::cin >> b >> c;
+            fast_input >> b >> c;
             seg.apply(left, right, std::pair<mint, mint>(b, c));
         } else {
-            std::cout << seg.prod(left, right).sum << '\n';
+            fast_output << seg.prod(left, right).sum << '\n';
         }
     }
 }

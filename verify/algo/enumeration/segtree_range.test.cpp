@@ -5,7 +5,7 @@
 #include <bit>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <limits>
 #include <random>
 #include <utility>
@@ -102,30 +102,29 @@ void randomized_tests() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     fixed_tests();
     exhaustive_tests();
     randomized_tests();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int n, query_count;
-    if (!(std::cin >> n >> query_count)) return 0;
+    if (!fast_input.read(n, query_count)) return 0;
     std::vector<long long> prefix_sum(n + 1);
     for (int i = 0; i < n; ++i) {
         long long value;
-        std::cin >> value;
+        fast_input >> value;
         prefix_sum[i + 1] = prefix_sum[i] + value;
     }
 
     while (query_count--) {
         int left, right;
-        std::cin >> left >> right;
+        fast_input >> left >> right;
         long long answer = 0;
         for (auto [range_left, range_right] :
              m1une::algo::split_segtree_range(left, right)) {
             answer += prefix_sum[range_right] - prefix_sum[range_left];
         }
-        std::cout << answer << '\n';
+        fast_output << answer << '\n';
     }
 }

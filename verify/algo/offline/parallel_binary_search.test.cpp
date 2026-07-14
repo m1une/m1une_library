@@ -1,7 +1,7 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/aplusb"
 
 #include <cassert>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <vector>
 
 #include "../../../algo/offline/parallel_binary_search.hpp"
@@ -30,9 +30,12 @@ void test_parallel_binary_search() {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_parallel_binary_search();
 
     long long a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    fast_input >> a >> b;
+    fast_output << a + b << '\n';
 }

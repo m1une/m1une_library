@@ -2,18 +2,18 @@
 
 #include "../../string/kmp.hpp"
 
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <string>
 
 int main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
 
     std::string text;
     std::string pattern;
-    std::cin >> text >> pattern;
+    fast_input >> text >> pattern;
 
     for (int position : m1une::string::kmp_search(text, pattern)) {
-        std::cout << position << '\n';
+        fast_output << position << '\n';
     }
 }

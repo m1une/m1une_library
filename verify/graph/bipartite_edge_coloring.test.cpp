@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <utility>
 #include <vector>
 
@@ -93,18 +93,17 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_fixed();
     test_randomized();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int left_size, right_size, edge_count;
-    std::cin >> left_size >> right_size >> edge_count;
+    fast_input >> left_size >> right_size >> edge_count;
     std::vector<std::pair<int, int>> edges(edge_count);
-    for (auto& [left, right] : edges) std::cin >> left >> right;
+    for (auto& [left, right] : edges) fast_input >> left >> right;
 
     auto result = m1une::graph::bipartite_edge_coloring(left_size, right_size, edges);
-    std::cout << result.color_count << '\n';
-    for (int color : result.color) std::cout << color << '\n';
+    fast_output << result.color_count << '\n';
+    for (int color : result.color) fast_output << color << '\n';
 }

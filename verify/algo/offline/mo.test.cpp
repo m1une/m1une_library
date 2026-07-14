@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <vector>
 
 #include "../../../ds/range_query/fenwick_tree.hpp"
@@ -165,18 +165,21 @@ void test_directional_callbacks() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_randomized();
     test_directional_callbacks();
 
     int n, q;
-    std::cin >> n >> q;
+    fast_input >> n >> q;
     std::vector<int> values(n);
-    for (int& value : values) std::cin >> value;
+    for (int& value : values) fast_input >> value;
     std::vector<std::pair<int, int>> ranges(q);
     for (auto& range : ranges) {
-        std::cin >> range.first >> range.second;
+        fast_input >> range.first >> range.second;
     }
     for (long long answer : inversion_queries(values, ranges)) {
-        std::cout << answer << '\n';
+        fast_output << answer << '\n';
     }
 }

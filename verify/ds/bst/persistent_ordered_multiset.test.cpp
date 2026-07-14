@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <set>
 #include <vector>
 
@@ -47,23 +47,20 @@ void randomized_test() {
     }
 }
 
-void fast_io() {
-    std::ios_base::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-}
-
 int main() {
-    fast_io();
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     randomized_test();
 
     int N, Q;
-    std::cin >> N >> Q;
+    fast_input >> N >> Q;
 
     std::vector<int> a(N);
     std::vector<int> xs;
     xs.reserve(N);
     for (int i = 0; i < N; i++) {
-        std::cin >> a[i];
+        fast_input >> a[i];
         xs.push_back(a[i]);
     }
 
@@ -79,7 +76,7 @@ int main() {
 
     while (Q--) {
         int l, r, k;
-        std::cin >> l >> r >> k;
+        fast_input >> l >> r >> k;
 
         int ok = int(xs.size()) - 1;
         int ng = -1;
@@ -93,6 +90,6 @@ int main() {
             }
         }
 
-        std::cout << xs[ok] << '\n';
+        fast_output << xs[ok] << '\n';
     }
 }

@@ -6,7 +6,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <vector>
 
 namespace {
@@ -99,15 +99,18 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_fixed();
     test_randomized();
 
     int n;
-    std::cin >> n;
+    fast_input >> n;
     std::vector<Point> points(n);
-    for (Point& point : points) std::cin >> point.x >> point.y;
+    for (Point& point : points) fast_input >> point.x >> point.y;
     m1une::geometry::sort_by_angle(points);
     for (const Point& point : points) {
-        std::cout << point.x << ' ' << point.y << '\n';
+        fast_output << point.x << ' ' << point.y << '\n';
     }
 }

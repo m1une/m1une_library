@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <limits>
 #include <vector>
 
@@ -127,25 +127,24 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_fixed();
     test_randomized();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int n, edge_count;
-    std::cin >> n >> edge_count;
+    fast_input >> n >> edge_count;
     Matching graph(n);
     while (edge_count--) {
         int from, to, cost;
-        std::cin >> from >> to >> cost;
+        fast_input >> from >> to >> cost;
         graph.add_edge(from, to, cost);
     }
 
     long long weight = graph.max_weight_matching();
     auto matching = graph.matching();
-    std::cout << matching.size() << ' ' << weight << '\n';
+    fast_output << matching.size() << ' ' << weight << '\n';
     for (const auto& pair : matching) {
-        std::cout << pair.from << ' ' << pair.to << '\n';
+        fast_output << pair.from << ' ' << pair.to << '\n';
     }
 }

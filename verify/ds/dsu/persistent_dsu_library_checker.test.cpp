@@ -1,5 +1,7 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/persistent_unionfind"
 
+#include "../../../utilities/fast_io.hpp"
+
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -7,19 +9,20 @@ using namespace std;
 using namespace m1une::ds;
 
 int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     int N, Q;
-    cin >> N >> Q;
+    fast_input >> N >> Q;
     vector<PersistentDsu> dsus;
     dsus.push_back(PersistentDsu(N));
     while (Q--) {
         int t, k, u, v;
-        cin >> t >> k >> u >> v;
+        fast_input >> t >> k >> u >> v;
         if (t == 0) {
             dsus.push_back(dsus[k + 1].merge(u, v));
         } else {
-            cout << int(dsus[k + 1].same(u, v)) << '\n';
+            fast_output << int(dsus[k + 1].same(u, v)) << '\n';
             dsus.push_back(PersistentDsu(0));
         }
     }

@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <utility>
 #include <vector>
 
@@ -52,23 +52,22 @@ void test_selected_large_values() {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_small_values();
     test_selected_large_values();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int query_count;
-    std::cin >> query_count;
+    fast_input >> query_count;
     while (query_count--) {
         uint64_t value;
-        std::cin >> value;
+        fast_input >> value;
         const std::vector<std::pair<uint64_t, uint64_t>> pairs =
             m1une::math::two_square_sum(value);
 
-        std::cout << pairs.size() << '\n';
+        fast_output << pairs.size() << '\n';
         for (const auto& pair : pairs) {
-            std::cout << pair.first << ' ' << pair.second << '\n';
+            fast_output << pair.first << ' ' << pair.second << '\n';
         }
     }
 }

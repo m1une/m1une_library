@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <limits>
 #include <vector>
 
@@ -137,27 +137,26 @@ void test_against_bruteforce() {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_hungarian_min();
     test_hungarian_max();
     test_against_bruteforce();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int n;
-    std::cin >> n;
+    fast_input >> n;
     std::vector<std::vector<long long>> cost(n, std::vector<long long>(n));
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            std::cin >> cost[i][j];
+            fast_input >> cost[i][j];
         }
     }
 
     auto result = m1une::opt::hungarian_min(cost);
-    std::cout << result.cost << '\n';
+    fast_output << result.cost << '\n';
     for (int i = 0; i < n; i++) {
-        if (i) std::cout << ' ';
-        std::cout << result.row_to_col[i];
+        if (i) fast_output << ' ';
+        fast_output << result.row_to_col[i];
     }
-    std::cout << '\n';
+    fast_output << '\n';
 }

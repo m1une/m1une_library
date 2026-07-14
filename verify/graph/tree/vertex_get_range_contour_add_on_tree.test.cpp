@@ -5,7 +5,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <queue>
 #include <vector>
 
@@ -141,35 +141,34 @@ void xor_group_test() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     randomized_test();
     xor_group_test();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int n, query_count;
-    std::cin >> n >> query_count;
+    fast_input >> n >> query_count;
     std::vector<long long> initial(n);
-    for (long long& value : initial) std::cin >> value;
+    for (long long& value : initial) fast_input >> value;
 
     m1une::graph::Graph<> graph(n);
     for (int index = 0; index + 1 < n; index++) {
         int first, second;
-        std::cin >> first >> second;
+        fast_input >> first >> second;
         graph.add_edge(first, second);
     }
     m1une::tree::VertexGetRangeContourAdd<long long> contour(graph, initial);
 
     while (query_count--) {
         int type, vertex;
-        std::cin >> type >> vertex;
+        fast_input >> type >> vertex;
         if (type == 0) {
             int left, right;
             long long delta;
-            std::cin >> left >> right >> delta;
+            fast_input >> left >> right >> delta;
             contour.apply(vertex, left, right, delta);
         } else {
-            std::cout << contour.get(vertex) << '\n';
+            fast_output << contour.get(vertex) << '\n';
         }
     }
 }

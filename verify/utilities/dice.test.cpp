@@ -4,7 +4,7 @@
 
 #include <array>
 #include <cassert>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <set>
 #include <string>
 
@@ -105,13 +105,16 @@ void test_opposites() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_rolls();
     test_orientations();
     test_equivalence();
     test_opposites();
 
     std::array<int, 6> input;
-    for (int& value : input) std::cin >> value;
+    for (int& value : input) fast_input >> value;
 
     Dice<int> die(
         input[0],
@@ -123,12 +126,12 @@ int main() {
     );
 
     std::string commands;
-    std::cin >> commands;
+    fast_input >> commands;
     for (char command : commands) {
         if (command == 'N') die.roll_north();
         if (command == 'S') die.roll_south();
         if (command == 'E') die.roll_east();
         if (command == 'W') die.roll_west();
     }
-    std::cout << die.top() << '\n';
+    fast_output << die.top() << '\n';
 }

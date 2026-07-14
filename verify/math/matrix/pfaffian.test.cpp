@@ -6,7 +6,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <vector>
 
 namespace {
@@ -78,15 +78,18 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_edge_cases();
     test_randomized();
 
     int half_size;
-    std::cin >> half_size;
+    fast_input >> half_size;
     const int size = 2 * half_size;
     Matrix matrix(size, size);
     for (int row = 0; row < size; row++) {
-        for (int col = 0; col < size; col++) std::cin >> matrix[row][col];
+        for (int col = 0; col < size; col++) fast_input >> matrix[row][col];
     }
-    std::cout << m1une::matrix::pfaffian(std::move(matrix)) << '\n';
+    fast_output << m1une::matrix::pfaffian(std::move(matrix)) << '\n';
 }

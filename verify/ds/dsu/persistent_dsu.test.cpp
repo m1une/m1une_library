@@ -4,7 +4,7 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <random>
 #include <utility>
 #include <vector>
@@ -121,25 +121,24 @@ void self_test() {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     self_test();
 
     using Dsu = m1une::ds::PersistentDsu;
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int n, q;
-    std::cin >> n >> q;
+    fast_input >> n >> q;
     std::vector<Dsu> dsus;
     dsus.push_back(Dsu(n));
     while (q--) {
         int type, k, u, v;
-        std::cin >> type >> k >> u >> v;
+        fast_input >> type >> k >> u >> v;
         const Dsu& base = dsus[k + 1];
         if (type == 0) {
             dsus.push_back(base.merge(u, v));
         } else {
-            std::cout << int(base.same(u, v)) << '\n';
+            fast_output << int(base.same(u, v)) << '\n';
             dsus.push_back(Dsu());
         }
     }

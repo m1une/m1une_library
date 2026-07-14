@@ -3,34 +3,37 @@
 #include "../../graph/cycle_detection.hpp"
 #include "../../graph/graph.hpp"
 
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     int vertex_count, edge_count;
-    std::cin >> vertex_count >> edge_count;
+    fast_input >> vertex_count >> edge_count;
     m1une::graph::Graph<> graph(vertex_count);
     for (int edge = 0; edge < edge_count; edge++) {
         int first, second;
-        std::cin >> first >> second;
+        fast_input >> first >> second;
         graph.add_edge(first, second);
     }
 
     m1une::graph::Cycle cycle = m1une::graph::find_undirected_cycle(graph);
     if (cycle.empty()) {
-        std::cout << -1 << '\n';
+        fast_output << -1 << '\n';
         return 0;
     }
 
     const int length = int(cycle.edge_ids.size());
-    std::cout << length << '\n';
+    fast_output << length << '\n';
     for (int i = 0; i < length; i++) {
-        if (i != 0) std::cout << ' ';
-        std::cout << cycle.vertices[i];
+        if (i != 0) fast_output << ' ';
+        fast_output << cycle.vertices[i];
     }
-    std::cout << '\n';
+    fast_output << '\n';
     for (int i = 0; i < length; i++) {
-        if (i != 0) std::cout << ' ';
-        std::cout << cycle.edge_ids[i];
+        if (i != 0) fast_output << ' ';
+        fast_output << cycle.edge_ids[i];
     }
-    std::cout << '\n';
+    fast_output << '\n';
 }

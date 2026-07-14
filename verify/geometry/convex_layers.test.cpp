@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <limits>
 #include <vector>
 
@@ -87,18 +87,17 @@ void test_coordinate_types() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_coordinate_types();
     test_randomized();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int point_count;
-    std::cin >> point_count;
+    fast_input >> point_count;
     std::vector<Point> points(point_count);
-    for (Point& point : points) std::cin >> point.x >> point.y;
+    for (Point& point : points) fast_input >> point.x >> point.y;
 
     for (int layer : m1une::geometry::convex_layers(points)) {
-        std::cout << layer << '\n';
+        fast_output << layer << '\n';
     }
 }

@@ -5,7 +5,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <vector>
 
 using Mint = m1une::math::modint998244353;
@@ -140,12 +140,15 @@ void test_arithmetic_progressions() {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_numbers_and_polynomials();
     test_power_sums();
     test_polynomial_sums_randomized();
     test_arithmetic_progressions();
 
     long long a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    fast_input >> a >> b;
+    fast_output << a + b << '\n';
 }

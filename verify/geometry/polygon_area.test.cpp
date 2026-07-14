@@ -2,16 +2,18 @@
 
 #include "../../geometry/polygon.hpp"
 
-#include <iomanip>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <vector>
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     using namespace m1une::geometry;
     int n;
-    std::cin >> n;
+    fast_input >> n;
     std::vector<Point<long long>> polygon(n);
-    for (auto& point : polygon) std::cin >> point.x >> point.y;
-    std::cout << std::fixed << std::setprecision(1)
-              << polygon_area(polygon) << '\n';
+    for (auto& point : polygon) fast_input >> point.x >> point.y;
+    fast_output.set_fixed(1);
+    fast_output << polygon_area(polygon) << '\n';
 }

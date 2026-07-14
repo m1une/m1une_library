@@ -5,7 +5,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <vector>
 
 namespace {
@@ -56,6 +56,9 @@ void test_large_arguments() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_prime<2>();
     test_prime<3>();
     test_prime<5>();
@@ -65,6 +68,6 @@ int main() {
     test_large_arguments();
 
     long long a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    fast_input >> a >> b;
+    fast_output << a + b << '\n';
 }

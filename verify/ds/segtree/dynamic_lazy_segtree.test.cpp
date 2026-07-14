@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <vector>
 
 #include "../../../acted_monoid/range_add_range_sum.hpp"
@@ -170,8 +170,8 @@ void test_affine_order() {
 }  // namespace
 
 int main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
 
     test_range_add();
     test_arithmetic_progression();
@@ -182,31 +182,31 @@ int main() {
     using AM = m1une::acted_monoid::RangeAffineRangeSum<mint>;
 
     int n, q;
-    std::cin >> n >> q;
+    fast_input >> n >> q;
     m1une::ds::DynamicLazySegtree<AM, int> seg(0, n, AM::make(0));
     seg.reserve(std::size_t(4) * std::size_t(n + q));
 
     for (int i = 0; i < n; i++) {
         long long x;
-        std::cin >> x;
+        fast_input >> x;
         seg.set(i, AM::make(mint(x)));
     }
 
     for (int query = 0; query < q; query++) {
         int type;
-        std::cin >> type;
+        fast_input >> type;
         if (type == 0) {
             int l, r;
             long long b, c;
-            std::cin >> l >> r >> b >> c;
+            fast_input >> l >> r >> b >> c;
             AM::operator_type f;
             f.first = mint(b);
             f.second = mint(c);
             seg.apply(l, r, f);
         } else {
             int l, r;
-            std::cin >> l >> r;
-            std::cout << seg.prod(l, r).sum << '\n';
+            fast_input >> l >> r;
+            fast_output << seg.prod(l, r).sum << '\n';
         }
     }
 }

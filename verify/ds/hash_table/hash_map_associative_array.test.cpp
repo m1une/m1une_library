@@ -1,5 +1,7 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/associative_array"
 
+#include "../../../utilities/fast_io.hpp"
+
 #include <bits/stdc++.h>
 using namespace std;
 using ll = long long;
@@ -7,22 +9,23 @@ using ll = long long;
 #include "../../../ds/hash_table/hash_map.hpp"
 
 int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     int Q;
-    cin >> Q;
+    fast_input >> Q;
     m1une::ds::HashMap<ll, ll> mp;
     while (Q--) {
         int t;
-        cin >> t;
+        fast_input >> t;
         if (t == 0) {
             ll k, v;
-            cin >> k >> v;
+            fast_input >> k >> v;
             mp[k] = v;
         } else {
             ll k;
-            cin >> k;
-            cout << mp[k] << '\n';
+            fast_input >> k;
+            fast_output << mp[k] << '\n';
         }
     }
 }

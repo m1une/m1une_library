@@ -4,7 +4,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <string>
 #include <utility>
 #include <vector>
@@ -158,18 +158,17 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_edge_cases();
     test_randomized();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     std::string text;
-    std::cin >> text;
+    fast_input >> text;
     std::vector<int> boundaries = m1une::string::lyndon_factor_boundaries(text);
     for (int i = 0; i < int(boundaries.size()); i++) {
-        if (i > 0) std::cout << ' ';
-        std::cout << boundaries[i];
+        if (i > 0) fast_output << ' ';
+        fast_output << boundaries[i];
     }
-    std::cout << '\n';
+    fast_output << '\n';
 }

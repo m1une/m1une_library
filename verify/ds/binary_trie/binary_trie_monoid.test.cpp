@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <utility>
 #include <vector>
 
@@ -229,6 +229,9 @@ void randomized_test() {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     basic_test();
     randomized_test();
 
@@ -236,17 +239,17 @@ int main() {
     m1une::ds::BinaryTrieMonoid<Sum, std::uint32_t, 30> trie;
 
     int q;
-    std::cin >> q;
+    fast_input >> q;
     while (q--) {
         int type;
         std::uint32_t value;
-        std::cin >> type >> value;
+        fast_input >> type >> value;
         if (type == 0) {
             if (!trie.contains(value)) trie.insert(value, 0);
         } else if (type == 1) {
             trie.erase_all(value);
         } else {
-            std::cout << trie.min_xor(value) << '\n';
+            fast_output << trie.min_xor(value) << '\n';
         }
     }
 }

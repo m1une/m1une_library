@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <utility>
 #include <vector>
 
@@ -125,25 +125,24 @@ void randomized_test() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
 #ifndef NDEBUG
     randomized_test();
 #endif
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int n, query_count;
-    std::cin >> n >> query_count;
+    fast_input >> n >> query_count;
     std::vector<std::pair<int, long long>> values(n);
     for (auto& value : values) {
         value.first = 0;
-        std::cin >> value.second;
+        fast_input >> value.second;
     }
 
     m1une::ds::WaveletMatrix2D<int, long long> matrix(values);
     while (query_count--) {
         int l, r, k;
-        std::cin >> l >> r >> k;
-        std::cout << matrix.quantile(l, r, 0, 1, k) << '\n';
+        fast_input >> l >> r >> k;
+        fast_output << matrix.quantile(l, r, 0, 1, k) << '\n';
     }
 }

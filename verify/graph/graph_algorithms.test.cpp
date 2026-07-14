@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <set>
 #include <string>
 #include <vector>
@@ -615,6 +615,9 @@ void test_grid() {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_graph_container();
     test_edge_alive();
     test_bfs();
@@ -633,6 +636,6 @@ int main() {
     test_kruskal();
     test_grid();
     long long a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    fast_input >> a >> b;
+    fast_output << a + b << '\n';
 }

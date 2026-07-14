@@ -6,7 +6,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <vector>
 
 #include "../../ds/dsu/dsu.hpp"
@@ -115,21 +115,24 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_fixed();
     test_randomized();
 
     int n;
-    std::cin >> n;
+    fast_input >> n;
     std::vector<Point> points;
     points.reserve(n);
     for (int i = 0; i < n; i++) {
         long long x, y;
-        std::cin >> x >> y;
+        fast_input >> x >> y;
         points.emplace_back(x, y);
     }
 
     auto mst = m1une::geometry::euclidean_mst(points);
     for (const auto& edge : mst.edges) {
-        std::cout << edge.from << ' ' << edge.to << '\n';
+        fast_output << edge.from << ' ' << edge.to << '\n';
     }
 }

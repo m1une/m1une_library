@@ -1,19 +1,19 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/primality_test"
 
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 
 #include "../../math/prime_factorization.hpp"
 
 int main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
 
     int query_count;
-    std::cin >> query_count;
+    fast_input >> query_count;
     while (query_count--) {
         uint64_t value;
-        std::cin >> value;
-        std::cout << (m1une::math::is_prime(value) ? "Yes" : "No") << '\n';
+        fast_input >> value;
+        fast_output << (m1une::math::is_prime(value) ? "Yes" : "No") << '\n';
     }
 }

@@ -3,18 +3,21 @@
 #include "../../math/modint.hpp"
 #include "../../math/prefix_sum_of_binom.hpp"
 
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <utility>
 #include <vector>
 
 using Mint = m1une::math::modint998244353;
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     int test_count;
-    std::cin >> test_count;
+    fast_input >> test_count;
     std::vector<std::pair<int, int>> queries(test_count);
     for (auto& query : queries) {
-        std::cin >> query.first >> query.second;
+        fast_input >> query.first >> query.second;
     }
 
     m1une::math::OfflinePrefixSumOfBinom<Mint> prefix;
@@ -26,6 +29,6 @@ int main() {
 
     for (int i = 0; i < test_count; i++) {
         const int n = queries[i].first;
-        std::cout << answers[i] * (Mint(2).pow(n) - Mint(1)) << '\n';
+        fast_output << answers[i] * (Mint(2).pow(n) - Mint(1)) << '\n';
     }
 }

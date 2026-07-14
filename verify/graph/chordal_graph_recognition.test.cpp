@@ -4,7 +4,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <vector>
 
 namespace {
@@ -146,36 +146,35 @@ void test_deep_graph() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_fixed();
     test_randomized();
     test_deep_graph();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int size, edge_count;
-    std::cin >> size >> edge_count;
+    fast_input >> size >> edge_count;
     Graph graph(size);
     while (edge_count--) {
         int first, second;
-        std::cin >> first >> second;
+        fast_input >> first >> second;
         graph.add_edge(first, second);
     }
 
     Result result = m1une::graph::chordal_graph_recognition(graph);
     if (result.is_chordal) {
-        std::cout << "YES\n";
+        fast_output << "YES\n";
         for (int index = 0; index < size; index++) {
-            if (index != 0) std::cout << ' ';
-            std::cout << result.perfect_elimination_order[index];
+            if (index != 0) fast_output << ' ';
+            fast_output << result.perfect_elimination_order[index];
         }
-        std::cout << '\n';
+        fast_output << '\n';
     } else {
-        std::cout << "NO\n" << result.induced_cycle.size() << '\n';
+        fast_output << "NO\n" << result.induced_cycle.size() << '\n';
         for (int index = 0; index < int(result.induced_cycle.size()); index++) {
-            if (index != 0) std::cout << ' ';
-            std::cout << result.induced_cycle[index];
+            if (index != 0) fast_output << ' ';
+            fast_output << result.induced_cycle[index];
         }
-        std::cout << '\n';
+        fast_output << '\n';
     }
 }

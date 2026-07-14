@@ -2,23 +2,23 @@
 
 #include "../../../ds/range_query/merge_sort_tree.hpp"
 
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <vector>
 
 int main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
 
     int n, query_count;
-    std::cin >> n >> query_count;
+    fast_input >> n >> query_count;
     std::vector<int> values(n);
-    for (int& value : values) std::cin >> value;
+    for (int& value : values) fast_input >> value;
 
     m1une::ds::MergeSortTree<int, long long> tree(values);
     while (query_count--) {
         int left, right, upper;
-        std::cin >> left >> right >> upper;
-        std::cout << tree.count_less_equal(left, right, upper) << ' '
+        fast_input >> left >> right >> upper;
+        fast_output << tree.count_less_equal(left, right, upper) << ' '
                   << tree.sum_less_equal(left, right, upper) << '\n';
     }
 }

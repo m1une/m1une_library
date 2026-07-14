@@ -1,7 +1,7 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/static_range_sum"
 
 #include <cassert>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <random>
 #include <utility>
 #include <vector>
@@ -105,22 +105,21 @@ void test_3d() {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_empty();
     test_2d();
     test_3d();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int n, q;
-    if (!(std::cin >> n >> q)) return 0;
+    if (!fast_input.read(n, q)) return 0;
     std::vector<long long> values(n);
-    for (long long& value : values) std::cin >> value;
+    for (long long& value : values) fast_input >> value;
 
     m1une::ds::CumulativeSum<long long> sums(values);
     while (q--) {
         int l, r;
-        std::cin >> l >> r;
-        std::cout << sums.sum(l, r) << '\n';
+        fast_input >> l >> r;
+        fast_output << sums.sum(l, r) << '\n';
     }
 }

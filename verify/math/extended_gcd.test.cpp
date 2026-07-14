@@ -6,7 +6,7 @@
 #include <array>
 #include <cassert>
 #include <cstdlib>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <limits>
 #include <numeric>
 #include <tuple>
@@ -73,13 +73,16 @@ std::pair<long long, long long> normalize_for_aoj(long long a, long long b,
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
 #ifndef NDEBUG
     randomized_test();
 #endif
 
     long long a, b;
-    std::cin >> a >> b;
+    fast_input >> a >> b;
     const auto [gcd, x, y] = m1une::math::extended_gcd(a, b);
     const auto answer = normalize_for_aoj(a, b, gcd, x, y);
-    std::cout << answer.first << ' ' << answer.second << '\n';
+    fast_output << answer.first << ' ' << answer.second << '\n';
 }

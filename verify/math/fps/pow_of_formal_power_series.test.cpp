@@ -1,7 +1,7 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/pow_of_formal_power_series"
 
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 
 #include "../../../math/fps/formal_power_series.hpp"
 #include "../../../math/modint.hpp"
@@ -10,18 +10,18 @@ using mint = m1une::math::modint998244353;
 using Fps = m1une::fps::FormalPowerSeries<mint>;
 
 int main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
 
     int n;
     long long exponent;
-    std::cin >> n >> exponent;
+    fast_input >> n >> exponent;
     Fps a(n);
-    for (mint& value : a) std::cin >> value;
+    for (mint& value : a) fast_input >> value;
     Fps result = a.pow(exponent);
     for (int i = 0; i < n; i++) {
-        if (i) std::cout << ' ';
-        std::cout << result[i];
+        if (i) fast_output << ' ';
+        fast_output << result[i];
     }
-    std::cout << '\n';
+    fast_output << '\n';
 }

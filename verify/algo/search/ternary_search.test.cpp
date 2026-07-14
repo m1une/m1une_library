@@ -2,7 +2,7 @@
 
 #include <cassert>
 #include <cmath>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 
 #include "../../../algo/search/ternary_search.hpp"
 
@@ -40,10 +40,13 @@ void test_real_ternary_search() {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_integer_ternary_search();
     test_real_ternary_search();
 
     long long a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    fast_input >> a >> b;
+    fast_output << a + b << '\n';
 }

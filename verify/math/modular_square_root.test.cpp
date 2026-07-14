@@ -2,7 +2,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 
 #include "../../math/modint.hpp"
 #include "../../math/modular_square_root.hpp"
@@ -43,23 +43,22 @@ void exhaustive_test() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
 #ifndef NDEBUG
     exhaustive_test();
 #endif
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int query_count;
-    std::cin >> query_count;
+    fast_input >> query_count;
     while (query_count--) {
         uint64_t value, prime;
-        std::cin >> value >> prime;
+        fast_input >> value >> prime;
         auto root = m1une::math::modular_square_root(value, prime);
         if (root.has_value()) {
-            std::cout << *root << '\n';
+            fast_output << *root << '\n';
         } else {
-            std::cout << -1 << '\n';
+            fast_output << -1 << '\n';
         }
     }
 }

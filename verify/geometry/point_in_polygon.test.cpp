@@ -2,21 +2,24 @@
 
 #include "../../geometry/polygon.hpp"
 
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <vector>
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     using namespace m1une::geometry;
     int n;
-    std::cin >> n;
+    fast_input >> n;
     std::vector<Point<long long>> polygon(n);
-    for (auto& point : polygon) std::cin >> point.x >> point.y;
+    for (auto& point : polygon) fast_input >> point.x >> point.y;
 
     int q;
-    std::cin >> q;
+    fast_input >> q;
     while (q--) {
         Point<long long> point;
-        std::cin >> point.x >> point.y;
-        std::cout << int(point_in_polygon(polygon, point)) << '\n';
+        fast_input >> point.x >> point.y;
+        fast_output << int(point_in_polygon(polygon, point)) << '\n';
     }
 }

@@ -5,7 +5,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <iterator>
 #include <limits>
 #include <optional>
@@ -205,6 +205,9 @@ void test_bulk_integer_parsing() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_cursor_and_text();
     test_checkpoints();
     test_integers();
@@ -212,11 +215,14 @@ int main() {
     test_random_expressions();
     test_bulk_integer_parsing();
 
-    std::istreambuf_iterator<char> input_begin(std::cin);
-    std::istreambuf_iterator<char> input_end;
-    std::string input(input_begin, input_end);
-    Parser parser(input);
+    std::string input_text;
+    int character = fast_input.read_char_raw();
+    while (character != EOF) {
+        input_text.push_back(char(character));
+        character = fast_input.read_char_raw();
+    }
+    Parser parser(input_text);
     long long a = parser.integer<long long>();
     long long b = parser.integer<long long>();
-    std::cout << a + b << '\n';
+    fast_output << a + b << '\n';
 }

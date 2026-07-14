@@ -5,12 +5,15 @@
 #include "../../math/prefix_sum_of_binom.hpp"
 
 #include <cassert>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <vector>
 
 using Mint = m1une::math::modint998244353;
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     constexpr int maximum = 300;
     m1une::math::Combinatorics<Mint> combinations(maximum);
     m1une::math::PrefixSumOfBinom<Mint> online(maximum);
@@ -35,6 +38,6 @@ int main() {
     assert(offline.empty());
 
     long long a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    fast_input >> a >> b;
+    fast_output << a + b << '\n';
 }

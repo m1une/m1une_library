@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <string>
 #include <vector>
 
@@ -127,16 +127,15 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_fixed();
     test_randomized();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     std::string first, second;
-    std::cin >> first >> second;
+    fast_input >> first >> second;
 
     auto result = m1une::string::longest_common_substring(first, second);
-    std::cout << result.first_left << ' ' << result.first_right << ' '
+    fast_output << result.first_left << ' ' << result.first_right << ' '
               << result.second_left << ' ' << result.second_right << '\n';
 }

@@ -5,7 +5,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <vector>
 
 namespace {
@@ -115,29 +115,32 @@ void test_modint() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_transforms();
     test_randomized();
     test_modint();
 
     int n;
-    std::cin >> n;
+    fast_input >> n;
     int size = 1 << n;
     using mint = m1une::math::modint998244353;
     std::vector<mint> a(size), b(size);
     for (int i = 0; i < size; i++) {
         long long x;
-        std::cin >> x;
+        fast_input >> x;
         a[i] = x;
     }
     for (int i = 0; i < size; i++) {
         long long x;
-        std::cin >> x;
+        fast_input >> x;
         b[i] = x;
     }
     std::vector<mint> c = bitwise_xor_convolution(a, b);
     for (int i = 0; i < size; i++) {
-        if (i) std::cout << ' ';
-        std::cout << c[i].val();
+        if (i) fast_output << ' ';
+        fast_output << c[i].val();
     }
-    std::cout << '\n';
+    fast_output << '\n';
 }

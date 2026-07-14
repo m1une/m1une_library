@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cassert>
 #include <functional>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <limits>
 #include <queue>
 #include <random>
@@ -229,6 +229,9 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_only_path_and_trivial();
     test_parallel_edges_and_inactive_edges();
     test_detour_intervals_and_disconnections();
@@ -236,6 +239,6 @@ int main() {
     test_randomized();
 
     int a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    fast_input >> a >> b;
+    fast_output << a + b << '\n';
 }

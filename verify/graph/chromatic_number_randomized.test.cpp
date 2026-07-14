@@ -1,7 +1,7 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/aplusb"
 
 #include <cassert>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <random>
 #include <vector>
 
@@ -33,6 +33,9 @@ int naive_chromatic_number(const std::vector<std::vector<char>>& adjacent) {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     {
         m1une::graph::Graph<> cycle(5);
         for (int v = 0; v < 5; v++) cycle.add_directed_edge(v, (v + 1) % 5);
@@ -60,6 +63,6 @@ int main() {
     }
 
     int a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    fast_input >> a >> b;
+    fast_output << a + b << '\n';
 }

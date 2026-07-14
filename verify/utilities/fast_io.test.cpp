@@ -10,7 +10,7 @@
 void test_fast_input() {
     std::FILE* file = std::tmpfile();
     assert(file != nullptr);
-    std::fputs(" -123 456 token Z 1\n", file);
+    std::fputs(" -123 456 token Z 1 -12.5 6.25e2\n", file);
     std::rewind(file);
 
     m1une::utilities::FastInput input(file);
@@ -19,12 +19,16 @@ void test_fast_input() {
     std::string s;
     char c;
     bool flag;
-    assert(input.read(a, b, s, c, flag));
+    double decimal;
+    long double exponent;
+    assert(input.read(a, b, s, c, flag, decimal, exponent));
     assert(a == -123);
     assert(b == 456);
     assert(s == "token");
     assert(c == 'Z');
     assert(flag);
+    assert(decimal == -12.5);
+    assert(exponent == 625.0L);
     std::fclose(file);
 }
 
@@ -36,6 +40,8 @@ void test_fast_output() {
         m1une::utilities::FastOutput output(file);
         output.println("answer", -42, 17u);
         output.println(false);
+        output.set_fixed(2);
+        output.println(1.25);
         output.flush();
     }
 
@@ -43,7 +49,7 @@ void test_fast_output() {
     char buffer[64];
     std::size_t length = std::fread(buffer, 1, sizeof(buffer), file);
     std::string result(buffer, buffer + length);
-    assert(result == "answer -42 17\n0\n");
+    assert(result == "answer -42 17\n0\n1.25\n");
     std::fclose(file);
 }
 

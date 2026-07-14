@@ -3,12 +3,15 @@
 #include "../../../ds/segtree/persistent_dual_segtree.hpp"
 
 #include <cassert>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <vector>
 
 #include "../../../monoid/add.hpp"
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     using Add = m1une::monoid::Add<long long>;
     using Seg = m1une::ds::PersistentDualSegtree<Add>;
 
@@ -46,6 +49,6 @@ int main() {
     assert(seg4.get(3) == 20);
 
     long long a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    fast_input >> a >> b;
+    fast_output << a + b << '\n';
 }

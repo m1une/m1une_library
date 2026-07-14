@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <numeric>
 #include <vector>
 
@@ -99,31 +99,34 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_randomized();
 
     int n, q;
-    std::cin >> n >> q;
+    fast_input >> n >> q;
     std::vector<long long> values(n);
-    for (long long& value : values) std::cin >> value;
+    for (long long& value : values) fast_input >> value;
     m1une::ds::ChminChmaxAddSegtree<long long> seg(values);
 
     while (q--) {
         int type, left, right;
-        std::cin >> type >> left >> right;
+        fast_input >> type >> left >> right;
         if (type == 0) {
             long long value;
-            std::cin >> value;
+            fast_input >> value;
             seg.chmin(left, right, value);
         } else if (type == 1) {
             long long value;
-            std::cin >> value;
+            fast_input >> value;
             seg.chmax(left, right, value);
         } else if (type == 2) {
             long long value;
-            std::cin >> value;
+            fast_input >> value;
             seg.add(left, right, value);
         } else {
-            std::cout << seg.sum(left, right) << '\n';
+            fast_output << seg.sum(left, right) << '\n';
         }
     }
 }

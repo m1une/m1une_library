@@ -3,7 +3,7 @@
 #include "../../../ds/hash_table/hash_set.hpp"
 
 #include <cassert>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -51,21 +51,20 @@ void self_test() {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     self_test();
-
-    std::ios_base::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int n;
-    std::cin >> n;
+    fast_input >> n;
     m1une::ds::HashSet<std::string> dictionary;
     while (n--) {
         std::string command, word;
-        std::cin >> command >> word;
+        fast_input >> command >> word;
         if (command == "insert") {
             dictionary.insert(word);
         } else {
-            std::cout << (dictionary.contains(word) ? "yes" : "no") << '\n';
+            fast_output << (dictionary.contains(word) ? "yes" : "no") << '\n';
         }
     }
 }

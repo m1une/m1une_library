@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <string>
 #include <vector>
 
@@ -81,10 +81,13 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_edge_cases();
     test_randomized();
 
     std::string first, second;
-    std::cin >> first >> second;
-    std::cout << m1une::string::levenshtein_distance(first, second) << '\n';
+    fast_input >> first >> second;
+    fast_output << m1une::string::levenshtein_distance(first, second) << '\n';
 }

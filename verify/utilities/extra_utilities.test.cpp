@@ -1,7 +1,7 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/aplusb"
 
 #include <cassert>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <stdexcept>
 #include <vector>
 
@@ -62,11 +62,14 @@ void test_y_combinator() {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_chmin_chmax();
     test_compressor();
     test_y_combinator();
 
     long long a, b;
-    cin >> a >> b;
-    cout << a + b << '\n';
+    fast_input >> a >> b;
+    fast_output << a + b << '\n';
 }

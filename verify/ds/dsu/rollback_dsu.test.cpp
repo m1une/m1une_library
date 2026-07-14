@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <numeric>
 #include <random>
 #include <utility>
@@ -94,15 +94,14 @@ struct Query {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
 #ifndef NDEBUG
     randomized_test();
 #endif
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int vertex_count, query_count;
-    std::cin >> vertex_count >> query_count;
+    fast_input >> vertex_count >> query_count;
     std::vector<std::vector<int>> children(query_count + 1);
     std::vector<Operation> operation(query_count + 1, Operation{-1, -1});
     std::vector<std::vector<Query>> queries(query_count + 1);
@@ -110,7 +109,7 @@ int main() {
 
     for (int query = 0; query < query_count; query++) {
         int type, parent, first, second;
-        std::cin >> type >> parent >> first >> second;
+        fast_input >> type >> parent >> first >> second;
         const int parent_node = parent + 1;
         if (type == 0) {
             const int node = query + 1;
@@ -142,5 +141,5 @@ int main() {
         }
     }
 
-    for (int value : answer) std::cout << value << '\n';
+    for (int value : answer) fast_output << value << '\n';
 }

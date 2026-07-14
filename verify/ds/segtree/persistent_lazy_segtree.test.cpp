@@ -3,7 +3,7 @@
 #include "../../../ds/segtree/persistent_lazy_segtree.hpp"
 
 #include <cassert>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <optional>
 #include <utility>
 #include <vector>
@@ -73,6 +73,9 @@ void test_range_add() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_range_add();
 
     using mint = m1une::math::modint998244353;
@@ -80,19 +83,19 @@ int main() {
     using Seg = m1une::ds::PersistentLazySegtree<AM>;
 
     int size, query_count;
-    std::cin >> size >> query_count;
+    fast_input >> size >> query_count;
     std::vector<mint> initial(size);
-    for (mint& value : initial) std::cin >> value;
+    for (mint& value : initial) fast_input >> value;
 
     std::vector<std::optional<Seg>> versions(query_count + 1);
     versions[0].emplace(initial);
     for (int query = 0; query < query_count; query++) {
         int type, version, left, right;
-        std::cin >> type >> version;
+        fast_input >> type >> version;
         version++;
         if (type == 0) {
             mint multiplier, addition;
-            std::cin >> left >> right >> multiplier >> addition;
+            fast_input >> left >> right >> multiplier >> addition;
             versions[query + 1] = versions[version]->apply(
                 left,
                 right,
@@ -100,7 +103,7 @@ int main() {
             );
         } else if (type == 1) {
             int source;
-            std::cin >> source >> left >> right;
+            fast_input >> source >> left >> right;
             source++;
             versions[query + 1] = versions[version]->copy_range_from(
                 *versions[source],
@@ -108,8 +111,8 @@ int main() {
                 right
             );
         } else {
-            std::cin >> left >> right;
-            std::cout << versions[version]->prod(left, right).sum << '\n';
+            fast_input >> left >> right;
+            fast_output << versions[version]->prod(left, right).sum << '\n';
         }
     }
 }

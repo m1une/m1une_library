@@ -4,7 +4,7 @@
 
 #include <cassert>
 #include <functional>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <queue>
 #include <random>
 #include <utility>
@@ -79,19 +79,22 @@ void randomized_test() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     deterministic_test();
     randomized_test();
 
     int n, m, source, target, k;
-    std::cin >> n >> m >> source >> target >> k;
+    fast_input >> n >> m >> source >> target >> k;
     m1une::graph::Graph<long long> graph(n);
     for (int edge = 0; edge < m; edge++) {
         int from, to;
         long long cost;
-        std::cin >> from >> to >> cost;
+        fast_input >> from >> to >> cost;
         graph.add_directed_edge(from, to, cost);
     }
     auto answer = m1une::graph::k_shortest_walk(graph, source, target, k);
     answer.resize(k, -1);
-    for (long long value : answer) std::cout << value << "\n";
+    for (long long value : answer) fast_output << value << "\n";
 }

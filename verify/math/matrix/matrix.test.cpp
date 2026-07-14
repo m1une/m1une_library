@@ -6,7 +6,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <vector>
 
 namespace {
@@ -234,6 +234,9 @@ void test_randomized_exact() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_construction_and_arithmetic();
     test_power();
     test_row_reduction();
@@ -243,6 +246,6 @@ int main() {
     test_randomized_exact();
 
     long long a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    fast_input >> a >> b;
+    fast_output << a + b << '\n';
 }

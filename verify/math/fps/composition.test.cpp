@@ -1,7 +1,7 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/composition_of_formal_power_series_large"
 
 #include <cassert>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <random>
 
 #include "../../../math/fps/composition.hpp"
@@ -49,21 +49,21 @@ void randomized_test() {
 }
 
 int main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
 
     randomized_test();
 
     int n;
-    std::cin >> n;
+    fast_input >> n;
     Fps f(n), g(n);
-    for (mint& value : f) std::cin >> value;
-    for (mint& value : g) std::cin >> value;
+    for (mint& value : f) fast_input >> value;
+    for (mint& value : g) fast_input >> value;
 
     Fps result = m1une::fps::compose(f, g, n);
     for (int i = 0; i < n; i++) {
-        if (i) std::cout << ' ';
-        std::cout << result[i];
+        if (i) fast_output << ' ';
+        fast_output << result[i];
     }
-    std::cout << '\n';
+    fast_output << '\n';
 }

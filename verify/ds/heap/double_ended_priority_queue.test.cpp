@@ -3,7 +3,7 @@
 #include <cassert>
 #include <cstdint>
 #include <functional>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <iterator>
 #include <set>
 #include <vector>
@@ -92,32 +92,32 @@ void test_randomized() {
 }  // namespace
 
 int main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
 
     test_fixed();
     test_randomized();
 
     int initial_size, query_count;
-    std::cin >> initial_size >> query_count;
+    fast_input >> initial_size >> query_count;
     m1une::ds::DoubleEndedPriorityQueue<int> queue;
     for (int i = 0; i < initial_size; i++) {
         int value;
-        std::cin >> value;
+        fast_input >> value;
         queue.push(value);
     }
     while (query_count--) {
         int type;
-        std::cin >> type;
+        fast_input >> type;
         if (type == 0) {
             int value;
-            std::cin >> value;
+            fast_input >> value;
             queue.push(value);
         } else if (type == 1) {
-            std::cout << queue.min() << '\n';
+            fast_output << queue.min() << '\n';
             queue.pop_min();
         } else {
-            std::cout << queue.max() << '\n';
+            fast_output << queue.max() << '\n';
             queue.pop_max();
         }
     }

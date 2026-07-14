@@ -1,5 +1,7 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/range_affine_point_get"
 
+#include "../../../utilities/fast_io.hpp"
+
 #include "../../../ds/segtree/dual_segtree.hpp"
 
 #include <bits/stdc++.h>
@@ -13,13 +15,16 @@ using Affine = m1une::monoid::Affine<mint>;
 using namespace std;
 using ll = long long;
 
-void solve() {
+void solve(
+    m1une::utilities::FastInput& fast_input,
+    m1une::utilities::FastOutput& fast_output
+) {
     ll N, Q;
-    cin >> N >> Q;
+    fast_input >> N >> Q;
     vector<Affine::value_type> a(N);
     for (int i = 0; i < N; ++i) {
         ll x;
-        cin >> x;
+        fast_input >> x;
         a[i] = {0, x};
     }
 
@@ -33,22 +38,23 @@ void solve() {
     }
     for (int q = 0; q < Q; ++q) {
         ll t;
-        cin >> t;
+        fast_input >> t;
         if (t == 0) {
             ll l, r, b, c;
-            cin >> l >> r >> b >> c;
+            fast_input >> l >> r >> b >> c;
             seg.apply(l, r, {b, c});
         } else {
             ll i;
-            cin >> i;
-            cout << seg.get(i).second << '\n';
+            fast_input >> i;
+            fast_output << seg.get(i).second << '\n';
         }
     }
 }
 
 int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-    solve();
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
+    solve(fast_input, fast_output);
     return 0;
 }

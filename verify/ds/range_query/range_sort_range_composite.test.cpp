@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <tuple>
 #include <utility>
 #include <vector>
@@ -143,35 +143,34 @@ struct Query {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_randomized();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int n, q;
-    std::cin >> n >> q;
+    fast_input >> n >> q;
     std::vector<int> keys(n);
     std::vector<Function> functions(n);
     std::vector<int> all_keys;
     all_keys.reserve(n + q);
     for (int i = 0; i < n; i++) {
         int a, b;
-        std::cin >> keys[i] >> a >> b;
+        fast_input >> keys[i] >> a >> b;
         functions[i] = {Mint(a), Mint(b)};
         all_keys.push_back(keys[i]);
     }
 
     std::vector<Query> queries(q);
     for (auto& query : queries) {
-        std::cin >> query.type;
+        fast_input >> query.type;
         if (query.type == 0) {
-            std::cin >> query.first >> query.second >> query.third >> query.fourth;
+            fast_input >> query.first >> query.second >> query.third >> query.fourth;
             all_keys.push_back(query.second);
         } else if (query.type == 1) {
-            std::cin >> query.first >> query.second >> query.third;
+            fast_input >> query.first >> query.second >> query.third;
             query.fourth = 0;
         } else {
-            std::cin >> query.first >> query.second;
+            fast_input >> query.first >> query.second;
             query.third = query.fourth = 0;
         }
     }
@@ -193,7 +192,7 @@ int main() {
         } else if (query.type == 1) {
             Function function = data.prod(query.first, query.second);
             Mint answer = function.first * Mint(query.third) + function.second;
-            std::cout << answer << '\n';
+            fast_output << answer << '\n';
         } else if (query.type == 2) {
             data.sort_ascending(query.first, query.second);
         } else {

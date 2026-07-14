@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <random>
 #include <vector>
 
@@ -83,21 +83,24 @@ void randomized_test() {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     basic_test();
     randomized_test();
 
     int n;
-    std::cin >> n;
+    fast_input >> n;
     std::vector<long long> values(n);
-    for (long long& value : values) std::cin >> value;
+    for (long long& value : values) fast_input >> value;
 
     int query_count;
-    std::cin >> query_count;
+    fast_input >> query_count;
     while (query_count--) {
         long long target;
-        std::cin >> target;
+        fast_input >> target;
         const bool found =
             m1une::algo::maximum_subset_sum(values, target) == target;
-        std::cout << (found ? "yes" : "no") << '\n';
+        fast_output << (found ? "yes" : "no") << '\n';
     }
 }

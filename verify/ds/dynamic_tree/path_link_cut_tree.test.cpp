@@ -1,7 +1,7 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/aplusb"
 
 #include <cassert>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <string>
 #include <vector>
 
@@ -99,11 +99,14 @@ void test_edge_nodes() {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_vertex_sum();
     test_path_order();
     test_edge_nodes();
 
     long long a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    fast_input >> a >> b;
+    fast_output << a + b << '\n';
 }

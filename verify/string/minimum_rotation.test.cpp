@@ -4,7 +4,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <string>
 #include <vector>
 
@@ -89,11 +89,14 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_edge_cases();
     test_exhaustive();
     test_randomized();
 
     long long first, second;
-    std::cin >> first >> second;
-    std::cout << first + second << '\n';
+    fast_input >> first >> second;
+    fast_output << first + second << '\n';
 }

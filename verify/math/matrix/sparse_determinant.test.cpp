@@ -6,7 +6,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <vector>
 
 namespace {
@@ -76,18 +76,21 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_edge_cases();
     test_randomized();
 
     int size, entry_count;
-    std::cin >> size >> entry_count;
+    fast_input >> size >> entry_count;
     std::vector<Entry> entries;
     entries.reserve(entry_count);
     while (entry_count--) {
         int row, col;
         mint value;
-        std::cin >> row >> col >> value;
+        fast_input >> row >> col >> value;
         entries.push_back(Entry{row, col, value});
     }
-    std::cout << m1une::matrix::sparse_determinant(size, entries) << '\n';
+    fast_output << m1une::matrix::sparse_determinant(size, entries) << '\n';
 }

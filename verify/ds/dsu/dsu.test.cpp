@@ -1,5 +1,7 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/unionfind"
 
+#include "../../../utilities/fast_io.hpp"
+
 #include <bits/stdc++.h>
 #include <cassert>
 #include "../../../ds/dsu/dsu.hpp"
@@ -35,20 +37,21 @@ void test_callback() {
 }  // namespace
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_callback();
 
     int N, Q;
-    cin >> N >> Q;
+    fast_input >> N >> Q;
     m1une::ds::Dsu dsu(N);
     for (int q = 0; q < Q; ++q) {
         int t, u, v;
-        cin >> t >> u >> v;
+        fast_input >> t >> u >> v;
         if (t == 0) {
             dsu.merge(u, v);
         } else {
-            cout << (int)dsu.same(u, v) << '\n';
+            fast_output << (int)dsu.same(u, v) << '\n';
         }
     }
 }

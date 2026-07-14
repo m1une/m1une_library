@@ -3,11 +3,14 @@
 #include "../../../ds/interval_set/interval_set.hpp"
 
 #include <cassert>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     long long A, B;
-    std::cin >> A >> B;
+    fast_input >> A >> B;
 
     m1une::ds::IntervalSet<int> st;
     st.insert(1, 5);
@@ -32,5 +35,5 @@ int main() {
     assert(st.mex(4) == 4);
     assert(st.mex(6) == 8);
 
-    std::cout << A + B << '\n';
+    fast_output << A + B << '\n';
 }

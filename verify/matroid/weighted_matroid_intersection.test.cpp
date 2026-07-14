@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <random>
 #include <utility>
 #include <vector>
@@ -184,11 +184,14 @@ void test_random_weighted_matroids() {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_weighted_exchange();
     test_equal_weights();
     test_random_weighted_matroids();
 
     long long a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    fast_input >> a >> b;
+    fast_output << a + b << '\n';
 }

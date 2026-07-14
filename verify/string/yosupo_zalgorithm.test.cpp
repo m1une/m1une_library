@@ -1,23 +1,20 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/zalgorithm"
 
 #include "../../string/z_algorithm.hpp"
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <string>
 
-void fast_io() {
-    std::ios_base::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-}
-
 int main() {
-    fast_io();
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     std::string S;
-    std::cin >> S;
+    fast_input >> S;
     std::vector<int> z = m1une::string::z_algorithm(S);
     for (int i = 0; i < int(z.size()); ++i) {
-        std::cout << z[i] << (i + 1 == int(z.size()) ? "" : " ");
+        fast_output << z[i] << (i + 1 == int(z.size()) ? "" : " ");
     }
-    std::cout << "\n";
+    fast_output << "\n";
 
     return 0;
 }

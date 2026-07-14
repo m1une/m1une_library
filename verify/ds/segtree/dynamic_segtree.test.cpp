@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <limits>
 #include <string>
 #include <vector>
@@ -148,13 +148,13 @@ void test_library_features() {
 }  // namespace
 
 int main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
 
     test_library_features();
 
     int n, q;
-    std::cin >> n >> q;
+    fast_input >> n >> q;
 
     using Sum = m1une::monoid::Add<long long>;
     m1une::ds::DynamicSegtree<Sum, int> seg(n);
@@ -162,22 +162,22 @@ int main() {
 
     for (int i = 0; i < n; i++) {
         long long x;
-        std::cin >> x;
+        fast_input >> x;
         seg.set(i, x);
     }
 
     for (int query = 0; query < q; query++) {
         int type;
-        std::cin >> type;
+        fast_input >> type;
         if (type == 0) {
             int p;
             long long x;
-            std::cin >> p >> x;
+            fast_input >> p >> x;
             seg.set(p, seg.get(p) + x);
         } else {
             int l, r;
-            std::cin >> l >> r;
-            std::cout << seg.prod(l, r) << '\n';
+            fast_input >> l >> r;
+            fast_output << seg.prod(l, r) << '\n';
         }
     }
 }

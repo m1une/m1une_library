@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <limits>
 #include <optional>
 
@@ -114,6 +114,9 @@ void test_powers() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_square_roots<signed char>();
     test_square_roots<unsigned char>();
     test_square_roots<short>();
@@ -127,11 +130,11 @@ int main() {
     test_powers();
 
     int test_count;
-    std::cin >> test_count;
+    fast_input >> test_count;
     while (test_count--) {
         std::uint64_t value;
         int degree;
-        std::cin >> value >> degree;
-        std::cout << m1une::math::floor_kth_root(value, degree) << '\n';
+        fast_input >> value >> degree;
+        fast_output << m1une::math::floor_kth_root(value, degree) << '\n';
     }
 }

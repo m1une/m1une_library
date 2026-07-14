@@ -4,7 +4,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <queue>
 #include <vector>
 
@@ -134,27 +134,26 @@ void test_large_sparse_graph() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_fixed();
     test_randomized();
     test_large_sparse_graph();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int size, edge_count;
-    std::cin >> size >> edge_count;
+    fast_input >> size >> edge_count;
     Graph graph(size);
     while (edge_count--) {
         int first, second;
-        std::cin >> first >> second;
+        fast_input >> first >> second;
         graph.add_edge(first, second);
     }
 
     Result result = m1une::graph::complement_connected_components(graph);
-    std::cout << result.count << '\n';
+    fast_output << result.count << '\n';
     for (const auto& component : result.groups) {
-        std::cout << component.size();
-        for (int vertex : component) std::cout << ' ' << vertex;
-        std::cout << '\n';
+        fast_output << component.size();
+        for (int vertex : component) fast_output << ' ' << vertex;
+        fast_output << '\n';
     }
 }

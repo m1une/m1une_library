@@ -4,7 +4,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <map>
 #include <tuple>
 #include <utility>
@@ -115,30 +115,33 @@ struct Query {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_edge_cases();
     test_randomized();
 
     int point_count, query_count;
-    std::cin >> point_count >> query_count;
+    fast_input >> point_count >> query_count;
     std::vector<std::tuple<int, int, long long>> initial(
         static_cast<std::size_t>(point_count)
     );
     std::vector<Point> points;
     points.reserve(static_cast<std::size_t>(point_count + query_count));
     for (auto& [x, y, weight] : initial) {
-        std::cin >> x >> y >> weight;
+        fast_input >> x >> y >> weight;
         points.emplace_back(x, y);
     }
 
     std::vector<Query> queries(static_cast<std::size_t>(query_count));
     for (Query& query : queries) {
-        std::cin >> query.type;
+        fast_input >> query.type;
         if (query.type == 0) {
-            std::cin >> query.first >> query.second >> query.value;
+            fast_input >> query.first >> query.second >> query.value;
             query.third = query.fourth = 0;
             points.emplace_back(query.first, query.second);
         } else {
-            std::cin >> query.first >> query.second >> query.third >> query.fourth;
+            fast_input >> query.first >> query.second >> query.third >> query.fourth;
             query.value = 0;
         }
     }
@@ -150,7 +153,7 @@ int main() {
         if (query.type == 0) {
             fenwick.add(query.first, query.second, query.value);
         } else {
-            std::cout << fenwick.sum(
+            fast_output << fenwick.sum(
                 query.first,
                 query.third,
                 query.second,

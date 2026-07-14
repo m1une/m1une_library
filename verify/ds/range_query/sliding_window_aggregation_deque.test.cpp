@@ -5,7 +5,7 @@
 #include <cassert>
 #include <cstdint>
 #include <deque>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <string>
 #include <vector>
 
@@ -119,18 +119,21 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_fixed();
     test_randomized();
 
     int query_count;
-    std::cin >> query_count;
+    fast_input >> query_count;
     m1une::ds::SwagDeque<Affine> deque;
     while (query_count--) {
         int type;
-        std::cin >> type;
+        fast_input >> type;
         if (type == 0 || type == 1) {
             Affine::value_type function;
-            std::cin >> function.a >> function.b;
+            fast_input >> function.a >> function.b;
             if (type == 0) {
                 deque.push_front(function);
             } else {
@@ -142,9 +145,9 @@ int main() {
             deque.pop_back();
         } else {
             long long x;
-            std::cin >> x;
+            fast_input >> x;
             auto function = deque.prod();
-            std::cout << (function.a * x + function.b) % mod << '\n';
+            fast_output << (function.a * x + function.b) % mod << '\n';
         }
     }
 }

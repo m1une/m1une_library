@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <string>
 #include <vector>
 
@@ -101,17 +101,16 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_edge_cases();
     test_randomized();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     std::string text;
-    std::cin >> text;
+    fast_input >> text;
     std::vector<m1une::string::Run> runs = m1une::string::enumerate_runs(text);
-    std::cout << runs.size() << '\n';
+    fast_output << runs.size() << '\n';
     for (const auto& run : runs) {
-        std::cout << run.period << ' ' << run.left << ' ' << run.right << '\n';
+        fast_output << run.period << ' ' << run.left << ' ' << run.right << '\n';
     }
 }

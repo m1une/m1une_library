@@ -1,7 +1,7 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/eulerian_trail_undirected"
 
 #include <cassert>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <optional>
 #include <random>
 #include <utility>
@@ -88,44 +88,47 @@ void randomized_test() {
 }
 #endif
 
-void print(const std::optional<m1une::graph::EulerianTrail>& trail) {
+void print(
+    const std::optional<m1une::graph::EulerianTrail>& trail,
+    m1une::utilities::FastOutput& fast_output
+) {
     if (!trail.has_value()) {
-        std::cout << "No\n";
+        fast_output << "No\n";
         return;
     }
-    std::cout << "Yes\n";
+    fast_output << "Yes\n";
     for (int index = 0; index < int(trail->vertices.size()); index++) {
-        if (index) std::cout << ' ';
-        std::cout << trail->vertices[index];
+        if (index) fast_output << ' ';
+        fast_output << trail->vertices[index];
     }
-    std::cout << '\n';
+    fast_output << '\n';
     for (int index = 0; index < int(trail->edge_ids.size()); index++) {
-        if (index) std::cout << ' ';
-        std::cout << trail->edge_ids[index];
+        if (index) fast_output << ' ';
+        fast_output << trail->edge_ids[index];
     }
-    std::cout << '\n';
+    fast_output << '\n';
 }
 
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
 #ifndef NDEBUG
     randomized_test();
 #endif
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int test_count;
-    std::cin >> test_count;
+    fast_input >> test_count;
     while (test_count--) {
         int vertex_count, edge_count;
-        std::cin >> vertex_count >> edge_count;
+        fast_input >> vertex_count >> edge_count;
         m1une::graph::Graph<> graph(vertex_count);
         for (int edge = 0; edge < edge_count; edge++) {
             int first, second;
-            std::cin >> first >> second;
+            fast_input >> first >> second;
             graph.add_edge(first, second);
         }
-        print(m1une::graph::undirected_eulerian_trail(graph));
+        print(m1une::graph::undirected_eulerian_trail(graph), fast_output);
     }
 }

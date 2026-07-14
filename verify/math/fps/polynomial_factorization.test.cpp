@@ -2,7 +2,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <type_traits>
 #include <vector>
 
@@ -167,32 +167,31 @@ void focused_tests() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
 #ifndef NDEBUG
     focused_tests();
 #endif
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int degree;
     uint32_t prime;
-    std::cin >> degree >> prime;
+    fast_input >> degree >> prime;
     DynamicModInt::set_mod(prime);
 
     Fps<DynamicModInt> polynomial(degree + 1);
     for (DynamicModInt& coefficient : polynomial) {
         uint32_t value;
-        std::cin >> value;
+        fast_input >> value;
         coefficient = DynamicModInt(value);
     }
 
     auto result = m1une::fps::polynomial_factorize(std::move(polynomial));
-    std::cout << result.factors.size() << '\n';
+    fast_output << result.factors.size() << '\n';
     for (const auto& factor : result.factors) {
-        std::cout << factor.multiplicity << ' ' << factor.polynomial.size() - 1;
+        fast_output << factor.multiplicity << ' ' << factor.polynomial.size() - 1;
         for (DynamicModInt coefficient : factor.polynomial) {
-            std::cout << ' ' << coefficient.val();
+            fast_output << ' ' << coefficient.val();
         }
-        std::cout << '\n';
+        fast_output << '\n';
     }
 }

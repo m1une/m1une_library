@@ -3,7 +3,7 @@
 #include "../../../ds/hash_table/hash_map.hpp"
 
 #include <cassert>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <string>
 #include <unordered_map>
 
@@ -67,24 +67,23 @@ void self_test() {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     self_test();
-
-    std::ios_base::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int q;
-    std::cin >> q;
+    fast_input >> q;
     m1une::ds::HashMap<long long, long long> map;
     while (q--) {
         int type;
         long long key;
-        std::cin >> type >> key;
+        fast_input >> type >> key;
         if (type == 0) {
             long long value;
-            std::cin >> value;
+            fast_input >> value;
             map[key] = value;
         } else {
-            std::cout << map[key] << '\n';
+            fast_output << map[key] << '\n';
         }
     }
 }

@@ -4,7 +4,7 @@
 #include "../../../monoid/add.hpp"
 
 #include <cassert>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <string>
 #include <vector>
 
@@ -21,6 +21,9 @@ struct StringMonoid {
 };
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     using Sum = m1une::monoid::Add<long long>;
 
     m1une::ds::DsuMonoid<Sum> dsu(std::vector<int>{1, 2, 3, 4, 5});
@@ -70,6 +73,6 @@ int main() {
     assert(empty.empty());
 
     long long x, y;
-    std::cin >> x >> y;
-    std::cout << x + y << '\n';
+    fast_input >> x >> y;
+    fast_output << x + y << '\n';
 }

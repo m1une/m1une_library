@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <map>
 #include <random>
 #include <tuple>
@@ -89,32 +89,32 @@ void randomized_test() {
 #endif
 
 int main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
 
 #ifndef NDEBUG
     randomized_test();
 #endif
 
     int n, q;
-    std::cin >> n >> q;
+    fast_input >> n >> q;
     std::vector<std::tuple<int, int, long long>> initial(n);
     std::vector<std::pair<int, int>> points;
     points.reserve(n + q);
     for (auto& [x, y, weight] : initial) {
-        std::cin >> x >> y >> weight;
+        fast_input >> x >> y >> weight;
         points.emplace_back(x, y);
     }
 
     std::vector<Query> queries(q);
     for (Query& query : queries) {
-        std::cin >> query.type;
+        fast_input >> query.type;
         if (query.type == 0) {
-            std::cin >> query.first >> query.second >> query.value;
+            fast_input >> query.first >> query.second >> query.value;
             query.third = query.fourth = 0;
             points.emplace_back(query.first, query.second);
         } else {
-            std::cin >> query.first >> query.second >> query.third >> query.fourth;
+            fast_input >> query.first >> query.second >> query.third >> query.fourth;
             query.value = 0;
         }
     }
@@ -129,7 +129,7 @@ int main() {
             long long current = seg.get(query.first, query.second);
             seg.set(query.first, query.second, current + query.value);
         } else {
-            std::cout << seg.prod(query.first, query.third, query.second, query.fourth)
+            fast_output << seg.prod(query.first, query.third, query.second, query.fourth)
                       << '\n';
         }
     }

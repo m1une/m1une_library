@@ -3,23 +3,25 @@
 #include "../../geometry/half_plane_intersection.hpp"
 
 #include <cmath>
-#include <iomanip>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <vector>
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     using namespace m1une::geometry;
     using PointType = Point<long double>;
 
-    std::cout << std::fixed << std::setprecision(6);
+    fast_output.set_fixed(6);
     while (true) {
         int n;
-        std::cin >> n;
+        fast_input >> n;
         if (n == 0) break;
 
         std::vector<PointType> polygon(n);
         for (PointType& point : polygon) {
-            std::cin >> point.x >> point.y;
+            fast_input >> point.x >> point.y;
         }
 
         long double lower = 0;
@@ -46,6 +48,6 @@ int main() {
                 lower = middle;
             }
         }
-        std::cout << lower << '\n';
+        fast_output << lower << '\n';
     }
 }

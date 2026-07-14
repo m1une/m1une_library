@@ -4,32 +4,35 @@
 #include "../../../utilities/int128.hpp"
 
 #include <cassert>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     using Flow = long long;
     using Cost = __int128_t;
     using Solver = m1une::flow::BoundedMinCostFlow<Flow, Cost>;
 
     int vertex_count, edge_count;
-    std::cin >> vertex_count >> edge_count;
+    fast_input >> vertex_count >> edge_count;
     Solver solver(vertex_count);
     for (int vertex = 0; vertex < vertex_count; vertex++) {
         Flow balance;
-        std::cin >> balance;
+        fast_input >> balance;
         solver.set_balance(vertex, balance);
     }
     for (int edge = 0; edge < edge_count; edge++) {
         int from, to;
         Flow lower, upper;
         long long cost;
-        std::cin >> from >> to >> lower >> upper >> cost;
+        fast_input >> from >> to >> lower >> upper >> cost;
         solver.add_edge(from, to, lower, upper, Cost(cost));
     }
 
     auto result = solver.min_cost_flow();
     if (!result.has_value()) {
-        std::cout << "infeasible\n";
+        fast_output << "infeasible\n";
         return 0;
     }
 
@@ -41,7 +44,7 @@ int main() {
         if (edge.lower < edge.flow) assert(reduced_cost <= Cost(0));
     }
 
-    std::cout << result->cost << '\n';
-    for (Cost potential : result->potential) std::cout << potential << '\n';
-    for (const auto& edge : result->edges) std::cout << edge.flow << '\n';
+    fast_output << result->cost << '\n';
+    for (Cost potential : result->potential) fast_output << potential << '\n';
+    for (const auto& edge : result->edges) fast_output << edge.flow << '\n';
 }

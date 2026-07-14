@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <string>
 #include <vector>
 
@@ -125,14 +125,13 @@ std::vector<int> combine_strings(const std::string& first, const std::string& se
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_fixed();
     test_randomized();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     std::string first, second;
-    std::cin >> first >> second;
+    fast_input >> first >> second;
 
     int n = int(first.size());
     int m = int(second.size());
@@ -165,6 +164,6 @@ int main() {
         }
     }
 
-    std::cout << best_first << ' ' << best_first + best_length << ' '
+    fast_output << best_first << ' ' << best_first + best_length << ' '
               << best_second << ' ' << best_second + best_length << '\n';
 }

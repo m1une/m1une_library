@@ -5,7 +5,7 @@
 
 #include <bit>
 #include <cassert>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <random>
 #include <vector>
 
@@ -92,15 +92,18 @@ void run_focused_tests() {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     run_focused_tests();
 
     int vertex_count, edge_count, root;
-    std::cin >> vertex_count >> edge_count >> root;
+    fast_input >> vertex_count >> edge_count >> root;
     m1une::graph::Graph<int> graph(vertex_count);
     for (int edge = 0; edge < edge_count; edge++) {
         int from, to;
-        std::cin >> from >> to;
+        fast_input >> from >> to;
         graph.add_directed_edge(from, to);
     }
-    std::cout << m1une::graph::count_out_arborescences<mint>(graph, root) << '\n';
+    fast_output << m1une::graph::count_out_arborescences<mint>(graph, root) << '\n';
 }

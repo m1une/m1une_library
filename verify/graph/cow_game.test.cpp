@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <limits>
 #include <vector>
 
@@ -146,6 +146,9 @@ void test_against_warshall_floyd() {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_basic_constraints();
     test_infeasible();
     test_unbounded();
@@ -153,6 +156,6 @@ int main() {
     test_against_warshall_floyd();
 
     long long a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    fast_input >> a >> b;
+    fast_output << a + b << '\n';
 }

@@ -4,7 +4,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <string>
 #include <vector>
 
@@ -105,29 +105,32 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_fixed();
     test_randomized();
 
     int n, q;
-    std::cin >> n >> q;
+    fast_input >> n >> q;
     std::vector<Affine::value_type> values(n);
-    for (auto& value : values) std::cin >> value.a >> value.b;
+    for (auto& value : values) fast_input >> value.a >> value.b;
     m1une::ds::SqrtDecomposition<Affine> blocks(values);
 
     while (q--) {
         int type;
-        std::cin >> type;
+        fast_input >> type;
         if (type == 0) {
             int index;
             Affine::value_type value;
-            std::cin >> index >> value.a >> value.b;
+            fast_input >> index >> value.a >> value.b;
             blocks.set(index, value);
         } else {
             int left, right;
             long long x;
-            std::cin >> left >> right >> x;
+            fast_input >> left >> right >> x;
             auto function = blocks.prod(left, right);
-            std::cout << (function.a * x + function.b) % mod << '\n';
+            fast_output << (function.a * x + function.b) % mod << '\n';
         }
     }
 }

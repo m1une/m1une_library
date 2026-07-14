@@ -3,7 +3,7 @@
 #include "../../graph/directed_mst.hpp"
 
 #include <cassert>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <optional>
 #include <queue>
 #include <random>
@@ -177,27 +177,26 @@ void randomized_test() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     randomized_test();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int n, m, root;
-    std::cin >> n >> m >> root;
+    fast_input >> n >> m >> root;
     m1une::graph::Graph<long long> graph(n);
     for (int index = 0; index < m; index++) {
         int from, to;
         long long cost;
-        std::cin >> from >> to >> cost;
+        fast_input >> from >> to >> cost;
         graph.add_directed_edge(from, to, cost);
     }
 
     auto answer = m1une::graph::directed_mst(graph, root);
     assert(answer.has_value());
-    std::cout << answer->cost << '\n';
+    fast_output << answer->cost << '\n';
     for (int vertex = 0; vertex < n; vertex++) {
-        if (vertex) std::cout << ' ';
-        std::cout << answer->parent[vertex];
+        if (vertex) fast_output << ' ';
+        fast_output << answer->parent[vertex];
     }
-    std::cout << '\n';
+    fast_output << '\n';
 }

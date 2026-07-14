@@ -2,7 +2,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <vector>
 
 #include "../../../ds/dsu/dsu.hpp"
@@ -82,17 +82,17 @@ void test_overloads() {
 }  // namespace
 
 int main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
 
     test_randomized();
     test_overloads();
 
     using Mint = m1une::math::modint998244353;
     int size, query_count;
-    std::cin >> size >> query_count;
+    fast_input >> size >> query_count;
     std::vector<Mint> component_sum(size);
-    for (Mint& value : component_sum) std::cin >> value;
+    for (Mint& value : component_sum) fast_input >> value;
 
     m1une::ds::RangeParallelDsu dsu(size);
     Mint answer = 0;
@@ -103,8 +103,8 @@ int main() {
 
     while (query_count--) {
         int length, first, second;
-        std::cin >> length >> first >> second;
+        fast_input >> length >> first >> second;
         dsu.merge(first, second, length, on_merge);
-        std::cout << answer << '\n';
+        fast_output << answer << '\n';
     }
 }

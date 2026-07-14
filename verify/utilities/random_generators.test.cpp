@@ -4,7 +4,7 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <numeric>
 #include <set>
 #include <string>
@@ -221,6 +221,9 @@ void test_weighted_graphs_and_dags() {
 #endif
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
 #ifndef NDEBUG
     test_basic_generators();
     test_trees();
@@ -229,6 +232,6 @@ int main() {
 #endif
 
     long long a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    fast_input >> a >> b;
+    fast_output << a + b << '\n';
 }

@@ -4,7 +4,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <vector>
 
 #include "../../graph/graph.hpp"
@@ -171,21 +171,24 @@ void test_long_path() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_randomized();
     test_long_path();
 
     int n, m, root;
-    std::cin >> n >> m >> root;
+    fast_input >> n >> m >> root;
     m1une::graph::Graph<> graph(n);
     while (m--) {
         int from, to;
-        std::cin >> from >> to;
+        fast_input >> from >> to;
         graph.add_directed_edge(from, to);
     }
     auto result = m1une::graph::dominator_tree(graph, root);
     for (int vertex = 0; vertex < n; ++vertex) {
-        if (vertex) std::cout << ' ';
-        std::cout << result.immediate_dominator[vertex];
+        if (vertex) fast_output << ' ';
+        fast_output << result.immediate_dominator[vertex];
     }
-    std::cout << '\n';
+    fast_output << '\n';
 }

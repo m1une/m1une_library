@@ -4,7 +4,7 @@
 #include <array>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <vector>
 
 #include "../../graph/enumerate_triangles.hpp"
@@ -77,20 +77,19 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_randomized();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int vertex_count, edge_count;
-    std::cin >> vertex_count >> edge_count;
+    fast_input >> vertex_count >> edge_count;
     std::vector<long long> value(vertex_count);
-    for (long long& x : value) std::cin >> x;
+    for (long long& x : value) fast_input >> x;
 
     m1une::graph::Graph<> graph(vertex_count);
     for (int i = 0; i < edge_count; i++) {
         int first, second;
-        std::cin >> first >> second;
+        fast_input >> first >> second;
         graph.add_edge(first, second);
     }
 
@@ -105,5 +104,5 @@ int main() {
             if (answer >= modulus) answer -= modulus;
         }
     );
-    std::cout << answer << '\n';
+    fast_output << answer << '\n';
 }

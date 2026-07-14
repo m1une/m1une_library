@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <limits>
 #include <numeric>
 #include <optional>
@@ -387,17 +387,20 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_examples_and_failures();
     test_randomized();
 
     int height, width;
-    while (std::cin >> height >> width, height != 0) {
+    while (fast_input >> height >> width, height != 0) {
         m1une::graph::Graph<int> graph(height * width);
         std::vector<int> terminals;
         for (int row = 0; row < height; row++) {
             for (int column = 0; column < width; column++) {
                 int required;
-                std::cin >> required;
+                fast_input >> required;
                 const int vertex = row * width + column;
                 if (row > 0) graph.add_edge(vertex, vertex - width);
                 if (column > 0) graph.add_edge(vertex, vertex - 1);
@@ -408,6 +411,6 @@ int main() {
         auto weighted = m1une::graph::minimum_steiner_tree(graph, terminals);
         auto unweighted = m1une::graph::minimum_steiner_tree_unweighted(graph, terminals);
         assert(weighted && unweighted && *weighted == *unweighted);
-        std::cout << height * width - *unweighted - 1 << '\n';
+        fast_output << height * width - *unweighted - 1 << '\n';
     }
 }

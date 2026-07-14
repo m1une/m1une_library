@@ -1,7 +1,7 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/inv_of_polynomials"
 
 #include <cassert>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <optional>
 #include <random>
 
@@ -82,28 +82,28 @@ void test_randomized() {
 }
 
 int main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
 
     test_randomized();
 
     int n, m;
-    std::cin >> n >> m;
+    fast_input >> n >> m;
     Fps polynomial(n), modulus(m);
-    for (mint& value : polynomial) std::cin >> value;
-    for (mint& value : modulus) std::cin >> value;
+    for (mint& value : polynomial) fast_input >> value;
+    for (mint& value : modulus) fast_input >> value;
 
     std::optional<Fps> inverse = m1une::fps::polynomial_inv_mod(polynomial, modulus);
     if (!inverse.has_value()) {
-        std::cout << -1 << '\n';
+        fast_output << -1 << '\n';
         return 0;
     }
 
-    std::cout << inverse->size() << '\n';
+    fast_output << inverse->size() << '\n';
     if (inverse->empty()) return 0;
     for (int i = 0; i < int(inverse->size()); i++) {
-        if (i) std::cout << ' ';
-        std::cout << (*inverse)[i];
+        if (i) fast_output << ' ';
+        fast_output << (*inverse)[i];
     }
-    std::cout << '\n';
+    fast_output << '\n';
 }

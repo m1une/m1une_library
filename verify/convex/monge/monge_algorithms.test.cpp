@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cassert>
 #include <functional>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <limits>
 #include <vector>
 
@@ -355,6 +355,9 @@ void test_structured_convolutions() {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_smawk_monge();
     test_smawk_totally_monotone_and_ties();
     test_smawk_max();
@@ -364,6 +367,6 @@ int main() {
     test_structured_convolutions();
 
     long long a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    fast_input >> a >> b;
+    fast_output << a + b << '\n';
 }

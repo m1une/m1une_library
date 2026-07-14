@@ -6,7 +6,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 
 namespace {
 
@@ -256,6 +256,9 @@ void test_randomized_against_long_segments() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_line_segment();
     test_ray_point_and_line();
     test_ray_segment();
@@ -263,6 +266,6 @@ int main() {
     test_randomized_against_long_segments();
 
     long long a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    fast_input >> a >> b;
+    fast_output << a + b << '\n';
 }

@@ -5,7 +5,7 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <map>
 #include <random>
 #include <tuple>
@@ -106,18 +106,18 @@ void randomized_test() {
 #endif
 
 int main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
 
 #ifndef NDEBUG
     randomized_test();
 #endif
 
     int n, q;
-    std::cin >> n >> q;
+    fast_input >> n >> q;
     std::vector<Rectangle> initial(n);
     for (Rectangle& rectangle : initial) {
-        std::cin >> rectangle.left >> rectangle.lower >> rectangle.right >> rectangle.upper
+        fast_input >> rectangle.left >> rectangle.lower >> rectangle.right >> rectangle.upper
                  >> rectangle.value;
     }
 
@@ -125,14 +125,14 @@ int main() {
     std::vector<std::pair<int, int>> points;
     points.reserve(q);
     for (Operation& operation : operations) {
-        std::cin >> operation.type;
+        fast_input >> operation.type;
         if (operation.type == 0) {
             Rectangle& rectangle = operation.rectangle;
-            std::cin >> rectangle.left >> rectangle.lower >> rectangle.right >> rectangle.upper
+            fast_input >> rectangle.left >> rectangle.lower >> rectangle.right >> rectangle.upper
                      >> rectangle.value;
             operation.x = operation.y = 0;
         } else {
-            std::cin >> operation.x >> operation.y;
+            fast_input >> operation.x >> operation.y;
             operation.rectangle = Rectangle{0, 0, 0, 0, 0};
             points.emplace_back(operation.x, operation.y);
         }
@@ -150,7 +150,7 @@ int main() {
             seg.apply(rectangle.left, rectangle.right, rectangle.lower, rectangle.upper,
                       rectangle.value);
         } else {
-            std::cout << seg.get(operation.x, operation.y) << '\n';
+            fast_output << seg.get(operation.x, operation.y) << '\n';
         }
     }
 }

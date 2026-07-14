@@ -3,22 +3,19 @@
 #include "../../../ds/segtree/segtree.hpp"
 #include "../../../monoid/add.hpp"
 #include <cassert>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <vector>
 
-void fast_io() {
-    std::ios_base::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-}
-
 int main() {
-    fast_io();
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     int n, q;
-    std::cin >> n >> q;
+    fast_input >> n >> q;
 
     std::vector<long long> a(n);
     for (int i = 0; i < n; i++) {
-        std::cin >> a[i];
+        fast_input >> a[i];
     }
 
     m1une::ds::Segtree<m1une::monoid::Add<long long>> seg(a);
@@ -29,16 +26,16 @@ int main() {
 
     for (int i = 0; i < q; i++) {
         int type;
-        std::cin >> type;
+        fast_input >> type;
         if (type == 0) {
             int p;
             long long x;
-            std::cin >> p >> x;
+            fast_input >> p >> x;
             seg.set(p, seg.get(p) + x);
         } else {
             int l, r;
-            std::cin >> l >> r;
-            std::cout << seg.prod(l, r) << "\n";
+            fast_input >> l >> r;
+            fast_output << seg.prod(l, r) << "\n";
         }
     }
 

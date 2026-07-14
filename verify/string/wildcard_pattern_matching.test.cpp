@@ -4,7 +4,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <string>
 #include <vector>
 
@@ -94,16 +94,15 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_edge_cases();
     test_randomized();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     std::string text, pattern;
-    std::cin >> text >> pattern;
+    fast_input >> text >> pattern;
     std::vector<bool> matches =
         m1une::string::wildcard_pattern_matching(text, pattern);
-    for (bool matches_here : matches) std::cout << int(matches_here);
-    std::cout << '\n';
+    for (bool matches_here : matches) fast_output << int(matches_here);
+    fast_output << '\n';
 }

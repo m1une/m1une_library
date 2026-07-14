@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <limits>
 #include <optional>
 #include <vector>
@@ -92,30 +92,33 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_randomized();
 
     int line_count, query_count;
-    std::cin >> line_count >> query_count;
+    fast_input >> line_count >> query_count;
     constexpr long long left = -1'000'000'000LL;
     constexpr long long right = 1'000'000'001LL;
     m1une::convex::MinLiChaoTree<long long> tree(left, right);
     for (int index = 0; index < line_count; ++index) {
         long long slope, intercept;
-        std::cin >> slope >> intercept;
+        fast_input >> slope >> intercept;
         tree.add_line(slope, intercept);
     }
 
     while (query_count--) {
         int type;
-        std::cin >> type;
+        fast_input >> type;
         if (type == 0) {
             long long slope, intercept;
-            std::cin >> slope >> intercept;
+            fast_input >> slope >> intercept;
             tree.add_line(slope, intercept);
         } else {
             long long x;
-            std::cin >> x;
-            std::cout << static_cast<long long>(tree.get(x)) << '\n';
+            fast_input >> x;
+            fast_output << static_cast<long long>(tree.get(x)) << '\n';
         }
     }
 }

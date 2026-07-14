@@ -1,5 +1,7 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/lca"
 
+#include "../../utilities/fast_io.hpp"
+
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -7,20 +9,21 @@ using namespace std;
 #include "../../graph/tree/sparse_table_lca.hpp"
 
 int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     int N, Q;
-    cin >> N >> Q;
+    fast_input >> N >> Q;
     m1une::graph::Graph<> g(N);
     for (int i = 1; i < N; ++i) {
         int p;
-        cin >> p;
+        fast_input >> p;
         g.add_edge(p, i);
     }
     m1une::tree::SparseTableLca<> lca(g, 0);
     while (Q--) {
         int u, v;
-        cin >> u >> v;
-        cout << lca.lca(u, v) << '\n';
+        fast_input >> u >> v;
+        fast_output << lca.lca(u, v) << '\n';
     }
 }

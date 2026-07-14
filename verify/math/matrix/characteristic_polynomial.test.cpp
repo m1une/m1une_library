@@ -6,7 +6,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <utility>
 #include <vector>
 
@@ -76,23 +76,26 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_edge_cases();
     test_randomized();
 
     int size;
-    std::cin >> size;
+    fast_input >> size;
     Matrix matrix(size, size);
     for (int row = 0; row < size; row++) {
         for (int col = 0; col < size; col++) {
-            std::cin >> matrix[row][col];
+            fast_input >> matrix[row][col];
         }
     }
 
     const std::vector<mint> polynomial =
         m1une::matrix::characteristic_polynomial(std::move(matrix));
     for (int degree = 0; degree <= size; degree++) {
-        if (degree != 0) std::cout << ' ';
-        std::cout << polynomial[std::size_t(degree)];
+        if (degree != 0) fast_output << ' ';
+        fast_output << polynomial[std::size_t(degree)];
     }
-    std::cout << '\n';
+    fast_output << '\n';
 }

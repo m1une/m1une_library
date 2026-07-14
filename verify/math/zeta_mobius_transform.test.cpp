@@ -5,7 +5,7 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <vector>
 
 namespace {
@@ -97,6 +97,9 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_subset_transforms();
     check(std::vector<long long>());
     check(std::vector<long long>{7});
@@ -105,6 +108,6 @@ int main() {
     test_randomized();
 
     long long a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    fast_input >> a >> b;
+    fast_output << a + b << '\n';
 }

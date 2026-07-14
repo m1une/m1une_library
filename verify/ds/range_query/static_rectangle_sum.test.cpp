@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <tuple>
 #include <vector>
 
@@ -76,26 +76,25 @@ void randomized_test() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     randomized_test();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int n, query_count;
-    std::cin >> n >> query_count;
+    fast_input >> n >> query_count;
     std::vector<Point> points;
     points.reserve(n);
     for (int index = 0; index < n; index++) {
         int x, y;
         long long weight;
-        std::cin >> x >> y >> weight;
+        fast_input >> x >> y >> weight;
         points.emplace_back(x, y, weight);
     }
 
     Query rectangle_sum(points);
     while (query_count--) {
         int left, lower, right, upper;
-        std::cin >> left >> lower >> right >> upper;
-        std::cout << rectangle_sum.sum(left, right, lower, upper) << '\n';
+        fast_input >> left >> lower >> right >> upper;
+        fast_output << rectangle_sum.sum(left, right, lower, upper) << '\n';
     }
 }

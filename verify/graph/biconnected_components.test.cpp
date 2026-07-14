@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <random>
 #include <vector>
 
@@ -117,28 +117,27 @@ void parallel_and_inactive_test() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
 #ifndef NDEBUG
     randomized_test();
     parallel_and_inactive_test();
 #endif
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int vertex_count, edge_count;
-    std::cin >> vertex_count >> edge_count;
+    fast_input >> vertex_count >> edge_count;
     m1une::graph::Graph<> graph(vertex_count);
     for (int i = 0; i < edge_count; i++) {
         int first, second;
-        std::cin >> first >> second;
+        fast_input >> first >> second;
         graph.add_edge(first, second);
     }
 
     auto result = m1une::graph::biconnected_components(graph);
-    std::cout << result.component_count() << '\n';
+    fast_output << result.component_count() << '\n';
     for (const std::vector<int>& component : result.components) {
-        std::cout << component.size();
-        for (int vertex : component) std::cout << ' ' << vertex;
-        std::cout << '\n';
+        fast_output << component.size();
+        for (int vertex : component) fast_output << ' ' << vertex;
+        fast_output << '\n';
     }
 }

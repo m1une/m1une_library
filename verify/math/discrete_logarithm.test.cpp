@@ -2,7 +2,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <optional>
 #include <vector>
 
@@ -52,23 +52,22 @@ void exhaustive_test() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
 #ifndef NDEBUG
     exhaustive_test();
 #endif
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int query_count;
-    std::cin >> query_count;
+    fast_input >> query_count;
     while (query_count--) {
         uint64_t base, target, mod;
-        std::cin >> base >> target >> mod;
+        fast_input >> base >> target >> mod;
         auto answer = m1une::math::discrete_logarithm(base, target, mod);
         if (answer.has_value()) {
-            std::cout << *answer << '\n';
+            fast_output << *answer << '\n';
         } else {
-            std::cout << -1 << '\n';
+            fast_output << -1 << '\n';
         }
     }
 }

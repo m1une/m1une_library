@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <map>
 #include <set>
 #include <string>
@@ -140,14 +140,13 @@ int library_checker_id(int id) {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_features();
     test_randomized();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     std::string text;
-    std::cin >> text;
+    fast_input >> text;
     m1une::string::Eertree<> tree(text);
 
     std::vector<int> parent(tree.node_count(), -1);
@@ -159,15 +158,15 @@ int main() {
         }
     }
 
-    std::cout << tree.size() << '\n';
+    fast_output << tree.size() << '\n';
     for (int id = 2; id < tree.node_count(); id++) {
-        std::cout << library_checker_id(parent[id]) - 1 << ' '
+        fast_output << library_checker_id(parent[id]) - 1 << ' '
                   << library_checker_id(tree.node(id).suffix_link) - 1 << '\n';
     }
     const auto& longest_suffix = tree.longest_suffix_nodes();
     for (int i = 0; i < int(longest_suffix.size()); i++) {
-        if (i) std::cout << ' ';
-        std::cout << longest_suffix[i] - 1;
+        if (i) fast_output << ' ';
+        fast_output << longest_suffix[i] - 1;
     }
-    std::cout << '\n';
+    fast_output << '\n';
 }

@@ -4,7 +4,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <string>
 #include <vector>
 
@@ -92,18 +92,21 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_fixed();
     test_randomized();
 
     int n, q;
-    std::cin >> n >> q;
+    fast_input >> n >> q;
     std::vector<long long> values(n);
-    for (long long& value : values) std::cin >> value;
+    for (long long& value : values) fast_input >> value;
 
     m1une::ds::SqrtTree<m1une::monoid::Add<long long>> tree(values);
     while (q--) {
         int left, right;
-        std::cin >> left >> right;
-        std::cout << tree.prod(left, right) << '\n';
+        fast_input >> left >> right;
+        fast_output << tree.prod(left, right) << '\n';
     }
 }

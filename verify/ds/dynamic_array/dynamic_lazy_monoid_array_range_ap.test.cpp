@@ -4,7 +4,7 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <numeric>
 #include <random>
 #include <utility>
@@ -38,6 +38,9 @@ void assert_all_ranges(Array& a, const std::vector<long long>& expected) {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     {
         Array a(std::vector<long long>{0, 0, 0, 0});
         a.apply(1, 4, {2, 3});
@@ -109,6 +112,6 @@ int main() {
     }
 
     long long x, y;
-    std::cin >> x >> y;
-    std::cout << x + y << '\n';
+    fast_input >> x >> y;
+    fast_output << x + y << '\n';
 }

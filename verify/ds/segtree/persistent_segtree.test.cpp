@@ -3,12 +3,15 @@
 #include "../../../ds/segtree/persistent_segtree.hpp"
 
 #include <cassert>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <vector>
 
 #include "../../../monoid/add.hpp"
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     using Seg = m1une::ds::PersistentSegtree<m1une::monoid::Add<long long>>;
 
     Seg seg(std::vector<long long>{1, 2, 3, 4, 5});
@@ -50,6 +53,6 @@ int main() {
     assert(seg1.min_left(5, [](long long x) { return x <= 9; }) == 3);
 
     long long a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    fast_input >> a >> b;
+    fast_output << a + b << '\n';
 }

@@ -5,7 +5,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <numeric>
 #include <optional>
 #include <random>
@@ -196,6 +196,9 @@ void randomized_tests() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     fixed_tests();
     exhaustive_tests();
     randomized_tests();
@@ -203,6 +206,6 @@ int main() {
     minimum_length_tests();
 
     long long a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    fast_input >> a >> b;
+    fast_output << a + b << '\n';
 }

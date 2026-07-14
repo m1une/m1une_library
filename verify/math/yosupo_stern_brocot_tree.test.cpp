@@ -1,5 +1,7 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/stern_brocot_tree"
 
+#include "../../utilities/fast_io.hpp"
+
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -7,36 +9,37 @@ using namespace std;
 using ll = long long;
 
 int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     ll T;
-    cin >> T;
+    fast_input >> T;
     while (T--) {
         string s;
-        cin >> s;
+        fast_input >> s;
         if (s == "ENCODE_PATH") {
             ll a, b;
-            cin >> a >> b;
+            fast_input >> a >> b;
             auto path = m1une::math::stern_brocot_path(a, b);
             auto& runs = path.runs;
-            cout << runs.size();
+            fast_output << runs.size();
             for (auto& dir : runs) {
                 if (dir.direction == m1une::math::SternBrocotDirection::Left) {
-                    cout << " L " << dir.count;
+                    fast_output << " L " << dir.count;
                 } else {
-                    cout << " R " << dir.count;
+                    fast_output << " R " << dir.count;
                 }
             }
-            cout << '\n';
+            fast_output << '\n';
         } else if (s == "DECODE_PATH") {
             m1une::math::SternBrocotPath path;
             ll k;
-            cin >> k;
+            fast_input >> k;
             while (k--) {
                 char c;
-                cin >> c;
+                fast_input >> c;
                 ll n;
-                cin >> n;
+                fast_input >> n;
                 if (c == 'L') {
                     path.push(m1une::math::SternBrocotDirection::Left, n);
                 } else if (c == 'R') {
@@ -46,28 +49,28 @@ int main() {
                 }
             }
             auto r = m1une::math::stern_brocot_decode(path);
-            cout << r.numerator() << ' ' << r.denominator() << '\n';
+            fast_output << r.numerator() << ' ' << r.denominator() << '\n';
         } else if (s == "LCA") {
             ll a, b, c, d;
-            cin >> a >> b >> c >> d;
+            fast_input >> a >> b >> c >> d;
             auto r = m1une::math::stern_brocot_lca(a, b, c, d);
-            cout << r.numerator() << ' ' << r.denominator() << '\n';
+            fast_output << r.numerator() << ' ' << r.denominator() << '\n';
         } else if (s == "ANCESTOR") {
             ll k, a, b;
-            cin >> k >> a >> b;
+            fast_input >> k >> a >> b;
             ll d = m1une::math::stern_brocot_depth(a, b);
             if (d < k) {
-                cout << "-1\n";
+                fast_output << "-1\n";
             } else {
                 auto r = m1une::math::stern_brocot_ancestor(a, b, d - k);
-                cout << r.numerator() << ' ' << r.denominator() << '\n';
+                fast_output << r.numerator() << ' ' << r.denominator() << '\n';
             }
         } else if (s == "RANGE") {
             ll a, b;
-            cin >> a >> b;
+            fast_input >> a >> b;
             auto path = m1une::math::stern_brocot_path(a, b);
             auto bound = m1une::math::stern_brocot_bounds(path);
-            cout << bound.left.first << ' ' << bound.left.second << ' ' << bound.right.first << ' ' << bound.right.second
+            fast_output << bound.left.first << ' ' << bound.left.second << ' ' << bound.right.first << ' ' << bound.right.second
                  << '\n';
         } else {
             exit(1);

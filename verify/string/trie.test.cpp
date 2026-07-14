@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <map>
 #include <string>
 #include <vector>
@@ -143,23 +143,23 @@ void test_randomized() {
 }  // namespace
 
 int main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
 
     test_features();
     test_randomized();
 
     int q;
-    std::cin >> q;
+    fast_input >> q;
     m1une::string::Trie<26, 'A'> trie;
     while (q--) {
         std::string command;
         std::string word;
-        std::cin >> command >> word;
+        fast_input >> command >> word;
         if (command == "insert") {
             trie.insert(word);
         } else {
-            std::cout << (trie.contains(word) ? "yes" : "no") << '\n';
+            fast_output << (trie.contains(word) ? "yes" : "no") << '\n';
         }
     }
 }

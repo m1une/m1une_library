@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <string>
 #include <tuple>
 #include <vector>
@@ -146,31 +146,30 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_fixed();
     test_randomized();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int n;
-    std::cin >> n;
+    fast_input >> n;
     m1une::string::AhoCorasick<> automaton;
     for (int i = 0; i < n; i++) {
         std::string pattern;
-        std::cin >> pattern;
+        fast_input >> pattern;
         automaton.insert(pattern);
     }
     automaton.build();
 
     int node_count = int(automaton.node_count());
-    std::cout << node_count << '\n';
+    fast_output << node_count << '\n';
     for (int id = 1; id < node_count; id++) {
         const auto& node = automaton.node(id);
-        std::cout << node.parent << ' ' << node.failure << '\n';
+        fast_output << node.parent << ' ' << node.failure << '\n';
     }
     for (int i = 0; i < n; i++) {
-        if (i) std::cout << ' ';
-        std::cout << automaton.pattern_node(i);
+        if (i) fast_output << ' ';
+        fast_output << automaton.pattern_node(i);
     }
-    std::cout << '\n';
+    fast_output << '\n';
 }

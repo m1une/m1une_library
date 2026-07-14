@@ -3,15 +3,18 @@
 #include "../../geometry/convex_hull.hpp"
 
 #include <algorithm>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <vector>
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     using namespace m1une::geometry;
     int n;
-    std::cin >> n;
+    fast_input >> n;
     std::vector<Point<long long>> points(n);
-    for (auto& point : points) std::cin >> point.x >> point.y;
+    for (auto& point : points) fast_input >> point.x >> point.y;
 
     std::vector<Point<long long>> hull = convex_hull(points, true);
     int start = int(std::min_element(
@@ -23,9 +26,9 @@ int main() {
         }
     ) - hull.begin());
 
-    std::cout << hull.size() << '\n';
+    fast_output << hull.size() << '\n';
     for (int offset = 0; offset < int(hull.size()); offset++) {
         const auto& point = hull[(start + offset) % hull.size()];
-        std::cout << point.x << " " << point.y << '\n';
+        fast_output << point.x << " " << point.y << '\n';
     }
 }

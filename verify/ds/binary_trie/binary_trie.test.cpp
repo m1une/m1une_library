@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <iterator>
 #include <set>
 #include <utility>
@@ -121,26 +121,26 @@ void unit_test() {
 }
 
 int main() {
-    std::ios_base::sync_with_stdio(false);
-    std::cin.tie(nullptr);
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
 
     unit_test();
 
     int query_count;
-    std::cin >> query_count;
+    fast_input >> query_count;
 
     m1une::ds::BinaryTrie<std::uint32_t, 30> trie;
     while (query_count--) {
         int type;
         std::uint32_t value;
-        std::cin >> type >> value;
+        fast_input >> type >> value;
 
         if (type == 0) {
             if (!trie.contains(value)) trie.insert(value);
         } else if (type == 1) {
             trie.erase(value);
         } else {
-            std::cout << trie.min_xor(value) << '\n';
+            fast_output << trie.min_xor(value) << '\n';
         }
     }
 }

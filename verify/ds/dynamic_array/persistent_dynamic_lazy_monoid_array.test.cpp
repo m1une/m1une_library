@@ -4,7 +4,7 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <numeric>
 #include <random>
 #include <string>
@@ -61,6 +61,9 @@ long long sum_range(const std::vector<long long>& a, int l, int r) {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     using StringArray = m1une::ds::PersistentDynamicLazyMonoidArray<StringNoopActedMonoid>;
     StringArray s = {"a", "b", "c", "d"};
     StringArray sr = s.reverse(1, 4);
@@ -179,6 +182,6 @@ int main() {
     }
 
     long long x, y;
-    std::cin >> x >> y;
-    std::cout << x + y << '\n';
+    fast_input >> x >> y;
+    fast_output << x + y << '\n';
 }

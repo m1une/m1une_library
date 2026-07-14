@@ -1,7 +1,6 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/kth_term_of_linearly_recurrent_sequence"
 
 #include <cstdint>
-#include <iostream>
 #include <vector>
 
 #include "../../../utilities/fast_io.hpp"

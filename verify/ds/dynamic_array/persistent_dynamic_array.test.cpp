@@ -4,12 +4,15 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <random>
 #include <utility>
 #include <vector>
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     using Array = m1une::ds::PersistentDynamicArray<int>;
 
     Array a = {1, 2, 3, 4, 5};
@@ -133,6 +136,6 @@ int main() {
     }
 
     long long x, y;
-    std::cin >> x >> y;
-    std::cout << x + y << '\n';
+    fast_input >> x >> y;
+    fast_output << x + y << '\n';
 }

@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iostream>
+#include "../../utilities/fast_io.hpp"
 #include <numeric>
 #include <vector>
 
@@ -288,14 +288,17 @@ void test_unlabeled_trees() {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_undirected_counts();
     test_directed_counts();
     test_tournament_counts();
     test_unlabeled_trees();
 
     long long a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    fast_input >> a >> b;
+    fast_output << a + b << '\n';
     return 0;
 }
 

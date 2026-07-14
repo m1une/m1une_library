@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <limits>
 #include <vector>
 
@@ -162,12 +162,15 @@ void test_larsch_shortest_path() {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_divide_and_conquer_dp();
     test_knuth_optimization();
     test_larsch_triangular_matrix();
     test_larsch_shortest_path();
 
     long long a, b;
-    std::cin >> a >> b;
-    std::cout << a + b << '\n';
+    fast_input >> a >> b;
+    fast_output << a + b << '\n';
 }

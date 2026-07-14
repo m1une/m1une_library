@@ -1,6 +1,9 @@
 #define PROBLEM "https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=2858"
 
+#include "../../utilities/fast_io.hpp"
+
 #include <bits/stdc++.h>
+#include <cassert>
 using namespace std;
 
 #include "../../utilities/shifted_array.hpp"
@@ -68,9 +71,12 @@ long long solve(long long l, long long r) {
 }
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_shifted_array_edges();
 
     long long l, r;
-    cin >> l >> r;
-    cout << solve(l, r) << endl;
+    fast_input >> l >> r;
+    fast_output << solve(l, r) << '\n';
 }

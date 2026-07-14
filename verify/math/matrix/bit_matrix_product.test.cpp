@@ -2,7 +2,7 @@
 
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <optional>
 #include <string>
 #include <vector>
@@ -138,11 +138,15 @@ void test_randomized() {
     }
 }
 
-BitMatrix read_matrix(int rows, int cols) {
+BitMatrix read_matrix(
+    int rows,
+    int cols,
+    m1une::utilities::FastInput& fast_input
+) {
     BitMatrix matrix(rows, cols);
     std::string bits;
     for (int row = 0; row < rows; row++) {
-        std::cin >> bits;
+        fast_input >> bits;
         matrix.set_row(row, bits);
     }
     return matrix;
@@ -151,18 +155,17 @@ BitMatrix read_matrix(int rows, int cols) {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_basic();
     test_randomized();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int rows, middle, cols;
-    std::cin >> rows >> middle >> cols;
-    BitMatrix first = read_matrix(rows, middle);
-    BitMatrix second = read_matrix(middle, cols);
+    fast_input >> rows >> middle >> cols;
+    BitMatrix first = read_matrix(rows, middle, fast_input);
+    BitMatrix second = read_matrix(middle, cols, fast_input);
     BitMatrix result = first * second;
     for (int row = 0; row < rows; row++) {
-        std::cout << result.row_string(row) << '\n';
+        fast_output << result.row_string(row) << '\n';
     }
 }

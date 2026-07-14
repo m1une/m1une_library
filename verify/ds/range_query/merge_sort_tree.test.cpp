@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include <iostream>
+#include "../../../utilities/fast_io.hpp"
 #include <optional>
 #include <string>
 #include <vector>
@@ -117,21 +117,20 @@ void test_randomized() {
 }  // namespace
 
 int main() {
+    m1une::utilities::FastInput fast_input;
+    m1une::utilities::FastOutput fast_output;
+
     test_fixed();
     test_randomized();
-
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
-
     int n, query_count;
-    std::cin >> n >> query_count;
+    fast_input >> n >> query_count;
     std::vector<int> values(n);
-    for (int& value : values) std::cin >> value;
+    for (int& value : values) fast_input >> value;
 
     m1une::ds::MergeSortTree<int> tree(values);
     while (query_count--) {
         int left, right, value;
-        std::cin >> left >> right >> value;
-        std::cout << tree.count(left, right, value) << '\n';
+        fast_input >> left >> right >> value;
+        fast_output << tree.count(left, right, value) << '\n';
     }
 }
