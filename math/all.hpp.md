@@ -81,7 +81,7 @@ data:
     title: Generalized Floor Sum
   - icon: ':heavy_check_mark:'
     path: math/integer_arithmetic.hpp
-    title: Integer Square Root and Power
+    title: Integer Roots and Powers
   - icon: ':heavy_check_mark:'
     path: math/lucas.hpp
     title: Lucas's Theorem
@@ -1740,9 +1740,14 @@ data:
     \            }\n        } else if (first < 0) {\n            if (0 < second) {\n\
     \                if (first < minimum / second) return std::nullopt;\n        \
     \    } else if (second < maximum / first) {\n                return std::nullopt;\n\
-    \            }\n        }\n    }\n    return T(first * second);\n}\n\n}  // namespace\
-    \ integer_arithmetic_detail\n\n// Returns floor(sqrt(value)) exactly, without\
-    \ floating-point arithmetic.\ntemplate <std::integral T>\nrequires(!std::same_as<std::remove_cv_t<T>,\
+    \            }\n        }\n    }\n    return T(first * second);\n}\n\ntemplate\
+    \ <std::unsigned_integral T>\nconstexpr bool kth_power_leq(T base, unsigned exponent,\
+    \ T limit) {\n    assert(exponent > 0);\n    if (base <= 1) return base <= limit;\n\
+    \n    const T multiplication_limit = limit / base;\n    T product = 1;\n    for\
+    \ (unsigned i = 0; i < exponent; i++) {\n        if (product > multiplication_limit)\
+    \ return false;\n        product *= base;\n    }\n    return true;\n}\n\n}  //\
+    \ namespace integer_arithmetic_detail\n\n// Returns floor(sqrt(value)) exactly,\
+    \ without floating-point arithmetic.\ntemplate <std::integral T>\nrequires(!std::same_as<std::remove_cv_t<T>,\
     \ bool>)\nconstexpr T isqrt(T value) {\n    if constexpr (std::signed_integral<T>)\
     \ assert(0 <= value);\n    if (value <= 1) return value;\n\n    T low = 1;\n \
     \   T high = value / 2 + 1;\n    while (low < high) {\n        T middle = low\
@@ -1754,7 +1759,27 @@ data:
     \ <std::integral T>\nrequires(!std::same_as<std::remove_cv_t<T>, bool>)\nconstexpr\
     \ T ceil_sqrt(T value) {\n    T result = isqrt(value);\n    if (result == 0) return\
     \ 0;\n    if (result != 0 && value / result == result && value % result == 0)\
-    \ {\n        return result;\n    }\n    return result + 1;\n}\n\n// Returns base^exponent,\
+    \ {\n        return result;\n    }\n    return result + 1;\n}\n\n// Returns floor(value^(1\
+    \ / degree)) exactly, without floating-point arithmetic.\ntemplate <std::integral\
+    \ T, std::integral Degree>\nrequires(\n    !std::same_as<std::remove_cv_t<T>,\
+    \ bool>\n    && !std::same_as<std::remove_cv_t<Degree>, bool>\n)\nconstexpr T\
+    \ floor_kth_root(T value, Degree degree) {\n    if constexpr (std::signed_integral<T>)\
+    \ {\n        assert(0 <= value);\n        if (value < 0) return T();\n    }\n\
+    \    assert(0 < degree);\n    if (degree <= 0) return T();\n    if (value <= 1\
+    \ || degree == 1) return value;\n    if (degree == 2) return isqrt(value);\n\n\
+    \    using U = std::make_unsigned_t<T>;\n    using UDegree = std::make_unsigned_t<Degree>;\n\
+    \    constexpr int digits = std::numeric_limits<U>::digits;\n    const UDegree\
+    \ unsigned_degree = static_cast<UDegree>(degree);\n    if (unsigned_degree >=\
+    \ static_cast<UDegree>(digits)) return T(1);\n    const unsigned exponent = static_cast<unsigned>(unsigned_degree);\n\
+    \    const U unsigned_value = static_cast<U>(value);\n\n    int bit_width = 0;\n\
+    \    for (U remaining = unsigned_value; remaining != 0; remaining >>= 1) {\n \
+    \       bit_width++;\n    }\n    const int root_bits =\n        (bit_width + static_cast<int>(exponent)\
+    \ - 1) /\n        static_cast<int>(exponent);\n\n    U low = 1;\n    U high =\
+    \ U(1) << root_bits;\n    while (high - low > 1) {\n        const U middle = low\
+    \ + (high - low) / 2;\n        if (\n            integer_arithmetic_detail::kth_power_leq(\n\
+    \                middle, exponent, unsigned_value\n            )\n        ) {\n\
+    \            low = middle;\n        } else {\n            high = middle;\n   \
+    \     }\n    }\n    return static_cast<T>(low);\n}\n\n// Returns base^exponent,\
     \ or nullopt when the result does not fit in T.\ntemplate <std::integral T, std::unsigned_integral\
     \ Exponent>\nrequires(\n    !std::same_as<std::remove_cv_t<T>, bool>\n    && !std::same_as<std::remove_cv_t<Exponent>,\
     \ bool>\n)\nconstexpr std::optional<T> checked_ipow(T base, Exponent exponent)\
@@ -3867,7 +3892,7 @@ data:
   isVerificationFile: false
   path: math/all.hpp
   requiredBy: []
-  timestamp: '2026-07-14 02:42:28+09:00'
+  timestamp: '2026-07-15 01:09:58+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
@@ -3929,7 +3954,7 @@ You usually do not need to include this entire bundle:
   `n = a * a + b * b`.
 * Use `number_theory.hpp` for extended GCD, modular inverses, simultaneous
   remainder constraints, and sums involving floor division.
-* Use `integer_arithmetic.hpp` for exact integer square roots and powers.
+* Use `integer_arithmetic.hpp` for exact integer roots and powers.
 * Use `repunit.hpp` for a repeated-one numeral or geometric sum in an
   arbitrary base.
 * Use `tetration.hpp` for modular tetration and arbitrary power towers.
@@ -3956,7 +3981,7 @@ few unused headers do not matter.
 | `math/binomial_coefficient_mod.hpp` | Binomial coefficients with 64-bit arguments modulo a fixed arbitrary modulus. |
 | `math/bitwise_convolution.hpp` | OR, AND, XOR convolutions and the Walsh-Hadamard transform. |
 | `math/bit_ceil.hpp` | Smallest power of two at least a given value. |
-| `math/integer_arithmetic.hpp` | Exact integer square roots and overflow-aware powers. |
+| `math/integer_arithmetic.hpp` | Exact integer square/k-th roots and overflow-aware powers. |
 | `math/lucas.hpp` | Lucas's theorem for huge binomial arguments modulo a small prime. |
 | `math/modint.hpp` | Static and tagged dynamic modular integer types. |
 | `math/modular_square_root.hpp` | Modular square roots for prime moduli using Tonelli-Shanks. |

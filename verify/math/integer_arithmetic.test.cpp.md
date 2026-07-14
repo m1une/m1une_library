@@ -3,7 +3,7 @@ data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
     path: math/integer_arithmetic.hpp
-    title: Integer Square Root and Power
+    title: Integer Roots and Powers
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
   _isVerificationFailed: false
@@ -11,11 +11,11 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://judge.yosupo.jp/problem/aplusb
+    PROBLEM: https://judge.yosupo.jp/problem/kth_root_integer
     links:
-    - https://judge.yosupo.jp/problem/aplusb
+    - https://judge.yosupo.jp/problem/kth_root_integer
   bundledCode: "#line 1 \"verify/math/integer_arithmetic.test.cpp\"\n#define PROBLEM\
-    \ \"https://judge.yosupo.jp/problem/aplusb\"\n\n#line 1 \"math/integer_arithmetic.hpp\"\
+    \ \"https://judge.yosupo.jp/problem/kth_root_integer\"\n\n#line 1 \"math/integer_arithmetic.hpp\"\
     \n\n\n\n#include <cassert>\n#include <concepts>\n#include <limits>\n#include <optional>\n\
     #include <type_traits>\n\nnamespace m1une {\nnamespace math {\n\nnamespace integer_arithmetic_detail\
     \ {\n\ntemplate <std::integral T>\nrequires(!std::same_as<std::remove_cv_t<T>,\
@@ -29,9 +29,14 @@ data:
     \            }\n        } else if (first < 0) {\n            if (0 < second) {\n\
     \                if (first < minimum / second) return std::nullopt;\n        \
     \    } else if (second < maximum / first) {\n                return std::nullopt;\n\
-    \            }\n        }\n    }\n    return T(first * second);\n}\n\n}  // namespace\
-    \ integer_arithmetic_detail\n\n// Returns floor(sqrt(value)) exactly, without\
-    \ floating-point arithmetic.\ntemplate <std::integral T>\nrequires(!std::same_as<std::remove_cv_t<T>,\
+    \            }\n        }\n    }\n    return T(first * second);\n}\n\ntemplate\
+    \ <std::unsigned_integral T>\nconstexpr bool kth_power_leq(T base, unsigned exponent,\
+    \ T limit) {\n    assert(exponent > 0);\n    if (base <= 1) return base <= limit;\n\
+    \n    const T multiplication_limit = limit / base;\n    T product = 1;\n    for\
+    \ (unsigned i = 0; i < exponent; i++) {\n        if (product > multiplication_limit)\
+    \ return false;\n        product *= base;\n    }\n    return true;\n}\n\n}  //\
+    \ namespace integer_arithmetic_detail\n\n// Returns floor(sqrt(value)) exactly,\
+    \ without floating-point arithmetic.\ntemplate <std::integral T>\nrequires(!std::same_as<std::remove_cv_t<T>,\
     \ bool>)\nconstexpr T isqrt(T value) {\n    if constexpr (std::signed_integral<T>)\
     \ assert(0 <= value);\n    if (value <= 1) return value;\n\n    T low = 1;\n \
     \   T high = value / 2 + 1;\n    while (low < high) {\n        T middle = low\
@@ -43,7 +48,27 @@ data:
     \ <std::integral T>\nrequires(!std::same_as<std::remove_cv_t<T>, bool>)\nconstexpr\
     \ T ceil_sqrt(T value) {\n    T result = isqrt(value);\n    if (result == 0) return\
     \ 0;\n    if (result != 0 && value / result == result && value % result == 0)\
-    \ {\n        return result;\n    }\n    return result + 1;\n}\n\n// Returns base^exponent,\
+    \ {\n        return result;\n    }\n    return result + 1;\n}\n\n// Returns floor(value^(1\
+    \ / degree)) exactly, without floating-point arithmetic.\ntemplate <std::integral\
+    \ T, std::integral Degree>\nrequires(\n    !std::same_as<std::remove_cv_t<T>,\
+    \ bool>\n    && !std::same_as<std::remove_cv_t<Degree>, bool>\n)\nconstexpr T\
+    \ floor_kth_root(T value, Degree degree) {\n    if constexpr (std::signed_integral<T>)\
+    \ {\n        assert(0 <= value);\n        if (value < 0) return T();\n    }\n\
+    \    assert(0 < degree);\n    if (degree <= 0) return T();\n    if (value <= 1\
+    \ || degree == 1) return value;\n    if (degree == 2) return isqrt(value);\n\n\
+    \    using U = std::make_unsigned_t<T>;\n    using UDegree = std::make_unsigned_t<Degree>;\n\
+    \    constexpr int digits = std::numeric_limits<U>::digits;\n    const UDegree\
+    \ unsigned_degree = static_cast<UDegree>(degree);\n    if (unsigned_degree >=\
+    \ static_cast<UDegree>(digits)) return T(1);\n    const unsigned exponent = static_cast<unsigned>(unsigned_degree);\n\
+    \    const U unsigned_value = static_cast<U>(value);\n\n    int bit_width = 0;\n\
+    \    for (U remaining = unsigned_value; remaining != 0; remaining >>= 1) {\n \
+    \       bit_width++;\n    }\n    const int root_bits =\n        (bit_width + static_cast<int>(exponent)\
+    \ - 1) /\n        static_cast<int>(exponent);\n\n    U low = 1;\n    U high =\
+    \ U(1) << root_bits;\n    while (high - low > 1) {\n        const U middle = low\
+    \ + (high - low) / 2;\n        if (\n            integer_arithmetic_detail::kth_power_leq(\n\
+    \                middle, exponent, unsigned_value\n            )\n        ) {\n\
+    \            low = middle;\n        } else {\n            high = middle;\n   \
+    \     }\n    }\n    return static_cast<T>(low);\n}\n\n// Returns base^exponent,\
     \ or nullopt when the result does not fit in T.\ntemplate <std::integral T, std::unsigned_integral\
     \ Exponent>\nrequires(\n    !std::same_as<std::remove_cv_t<T>, bool>\n    && !std::same_as<std::remove_cv_t<Exponent>,\
     \ bool>\n)\nconstexpr std::optional<T> checked_ipow(T base, Exponent exponent)\
@@ -85,13 +110,29 @@ data:
     \    static_assert(m1une::math::isqrt(root * root) == root);\n\n    constexpr\
     \ long long signed_maximum =\n        std::numeric_limits<long long>::max();\n\
     \    static_assert(m1une::math::isqrt(signed_maximum) == 3037000499LL);\n    static_assert(m1une::math::ceil_sqrt(signed_maximum)\
-    \ == 3037000500LL);\n}\n\nvoid test_powers() {\n    using m1une::math::checked_ipow;\n\
-    \    using m1une::math::ipow;\n\n    static_assert(ipow(0LL, 0U) == 1);\n    static_assert(ipow(2LL,\
-    \ 10U) == 1024);\n    static_assert(ipow(-3LL, 3U) == -27);\n    static_assert(ipow(-3LL,\
-    \ 4U) == 81);\n    static_assert(\n        ipow(-2LL, 63U) == std::numeric_limits<long\
-    \ long>::min()\n    );\n    static_assert(!checked_ipow(2LL, 63U).has_value());\n\
-    \    static_assert(!checked_ipow(-2LL, 64U).has_value());\n    static_assert(!checked_ipow(10ULL,\
-    \ 20U).has_value());\n    static_assert(checked_ipow(10ULL, 19U) == std::optional(10000000000000000000ULL));\n\
+    \ == 3037000500LL);\n}\n\nvoid test_kth_roots() {\n    using m1une::math::checked_ipow;\n\
+    \    using m1une::math::floor_kth_root;\n    constexpr std::uint64_t maximum =\n\
+    \        std::numeric_limits<std::uint64_t>::max();\n\n    static_assert(floor_kth_root(0ULL,\
+    \ 1) == 0);\n    static_assert(floor_kth_root(1ULL, 64) == 1);\n    static_assert(floor_kth_root(7ULL,\
+    \ 3) == 1);\n    static_assert(floor_kth_root(8ULL, 3) == 2);\n    static_assert(floor_kth_root(80ULL,\
+    \ 4) == 2);\n    static_assert(floor_kth_root(81ULL, 4) == 3);\n    static_assert(floor_kth_root(maximum,\
+    \ 1) == maximum);\n    static_assert(floor_kth_root(maximum, 2) == 4294967295ULL);\n\
+    \    static_assert(floor_kth_root(maximum, 3) == 2642245ULL);\n    static_assert(floor_kth_root(maximum,\
+    \ 64) == 1);\n    static_assert(\n        floor_kth_root(std::numeric_limits<long\
+    \ long>::max(), 3U)\n        == 2097151LL\n    );\n\n    for (std::uint64_t value\
+    \ = 0; value <= 10000; value++) {\n        for (unsigned degree = 1; degree <=\
+    \ 16; degree++) {\n            std::uint64_t root = floor_kth_root(value, degree);\n\
+    \            std::optional<std::uint64_t> power = checked_ipow(root, degree);\n\
+    \            assert(power.has_value() && *power <= value);\n\n            std::optional<std::uint64_t>\
+    \ next_power =\n                checked_ipow(root + 1, degree);\n            assert(!next_power.has_value()\
+    \ || value < *next_power);\n        }\n    }\n}\n\nvoid test_powers() {\n    using\
+    \ m1une::math::checked_ipow;\n    using m1une::math::ipow;\n\n    static_assert(ipow(0LL,\
+    \ 0U) == 1);\n    static_assert(ipow(2LL, 10U) == 1024);\n    static_assert(ipow(-3LL,\
+    \ 3U) == -27);\n    static_assert(ipow(-3LL, 4U) == 81);\n    static_assert(\n\
+    \        ipow(-2LL, 63U) == std::numeric_limits<long long>::min()\n    );\n  \
+    \  static_assert(!checked_ipow(2LL, 63U).has_value());\n    static_assert(!checked_ipow(-2LL,\
+    \ 64U).has_value());\n    static_assert(!checked_ipow(10ULL, 20U).has_value());\n\
+    \    static_assert(checked_ipow(10ULL, 19U) == std::optional(10000000000000000000ULL));\n\
     \    static_assert(\n        checked_ipow(std::numeric_limits<long long>::min(),\
     \ 1U)\n        == std::optional(std::numeric_limits<long long>::min())\n    );\n\
     \    static_assert(\n        !checked_ipow(std::numeric_limits<long long>::min(),\
@@ -103,13 +144,15 @@ data:
     \ char>();\n    test_square_roots<short>();\n    test_square_roots<unsigned short>();\n\
     \    test_square_roots<int>();\n    test_square_roots<unsigned int>();\n    test_square_roots<long\
     \ long>();\n    test_square_roots<unsigned long long>();\n    test_boundaries();\n\
-    \    test_powers();\n\n    long long a, b;\n    std::cin >> a >> b;\n    std::cout\
-    \ << a + b << '\\n';\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
-    ../../math/integer_arithmetic.hpp\"\n\n#include <algorithm>\n#include <cassert>\n\
-    #include <cstdint>\n#include <iostream>\n#include <limits>\n#include <optional>\n\
-    \nnamespace {\n\ntemplate <class T>\nvoid test_square_roots() {\n    using U =\
-    \ std::make_unsigned_t<T>;\n    U limit = std::min<U>(std::numeric_limits<T>::max(),\
+    \    test_kth_roots();\n    test_powers();\n\n    int test_count;\n    std::cin\
+    \ >> test_count;\n    while (test_count--) {\n        std::uint64_t value;\n \
+    \       int degree;\n        std::cin >> value >> degree;\n        std::cout <<\
+    \ m1une::math::floor_kth_root(value, degree) << '\\n';\n    }\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/kth_root_integer\"\n\n\
+    #include \"../../math/integer_arithmetic.hpp\"\n\n#include <algorithm>\n#include\
+    \ <cassert>\n#include <cstdint>\n#include <iostream>\n#include <limits>\n#include\
+    \ <optional>\n\nnamespace {\n\ntemplate <class T>\nvoid test_square_roots() {\n\
+    \    using U = std::make_unsigned_t<T>;\n    U limit = std::min<U>(std::numeric_limits<T>::max(),\
     \ U(100000));\n    for (U value = 0;; ++value) {\n        T input = static_cast<T>(value);\n\
     \        [[maybe_unused]] T floor = m1une::math::isqrt(input);\n        [[maybe_unused]]\
     \ T ceiling = m1une::math::ceil_sqrt(input);\n        assert(floor <= input /\
@@ -124,13 +167,29 @@ data:
     \    static_assert(m1une::math::isqrt(root * root) == root);\n\n    constexpr\
     \ long long signed_maximum =\n        std::numeric_limits<long long>::max();\n\
     \    static_assert(m1une::math::isqrt(signed_maximum) == 3037000499LL);\n    static_assert(m1une::math::ceil_sqrt(signed_maximum)\
-    \ == 3037000500LL);\n}\n\nvoid test_powers() {\n    using m1une::math::checked_ipow;\n\
-    \    using m1une::math::ipow;\n\n    static_assert(ipow(0LL, 0U) == 1);\n    static_assert(ipow(2LL,\
-    \ 10U) == 1024);\n    static_assert(ipow(-3LL, 3U) == -27);\n    static_assert(ipow(-3LL,\
-    \ 4U) == 81);\n    static_assert(\n        ipow(-2LL, 63U) == std::numeric_limits<long\
-    \ long>::min()\n    );\n    static_assert(!checked_ipow(2LL, 63U).has_value());\n\
-    \    static_assert(!checked_ipow(-2LL, 64U).has_value());\n    static_assert(!checked_ipow(10ULL,\
-    \ 20U).has_value());\n    static_assert(checked_ipow(10ULL, 19U) == std::optional(10000000000000000000ULL));\n\
+    \ == 3037000500LL);\n}\n\nvoid test_kth_roots() {\n    using m1une::math::checked_ipow;\n\
+    \    using m1une::math::floor_kth_root;\n    constexpr std::uint64_t maximum =\n\
+    \        std::numeric_limits<std::uint64_t>::max();\n\n    static_assert(floor_kth_root(0ULL,\
+    \ 1) == 0);\n    static_assert(floor_kth_root(1ULL, 64) == 1);\n    static_assert(floor_kth_root(7ULL,\
+    \ 3) == 1);\n    static_assert(floor_kth_root(8ULL, 3) == 2);\n    static_assert(floor_kth_root(80ULL,\
+    \ 4) == 2);\n    static_assert(floor_kth_root(81ULL, 4) == 3);\n    static_assert(floor_kth_root(maximum,\
+    \ 1) == maximum);\n    static_assert(floor_kth_root(maximum, 2) == 4294967295ULL);\n\
+    \    static_assert(floor_kth_root(maximum, 3) == 2642245ULL);\n    static_assert(floor_kth_root(maximum,\
+    \ 64) == 1);\n    static_assert(\n        floor_kth_root(std::numeric_limits<long\
+    \ long>::max(), 3U)\n        == 2097151LL\n    );\n\n    for (std::uint64_t value\
+    \ = 0; value <= 10000; value++) {\n        for (unsigned degree = 1; degree <=\
+    \ 16; degree++) {\n            std::uint64_t root = floor_kth_root(value, degree);\n\
+    \            std::optional<std::uint64_t> power = checked_ipow(root, degree);\n\
+    \            assert(power.has_value() && *power <= value);\n\n            std::optional<std::uint64_t>\
+    \ next_power =\n                checked_ipow(root + 1, degree);\n            assert(!next_power.has_value()\
+    \ || value < *next_power);\n        }\n    }\n}\n\nvoid test_powers() {\n    using\
+    \ m1une::math::checked_ipow;\n    using m1une::math::ipow;\n\n    static_assert(ipow(0LL,\
+    \ 0U) == 1);\n    static_assert(ipow(2LL, 10U) == 1024);\n    static_assert(ipow(-3LL,\
+    \ 3U) == -27);\n    static_assert(ipow(-3LL, 4U) == 81);\n    static_assert(\n\
+    \        ipow(-2LL, 63U) == std::numeric_limits<long long>::min()\n    );\n  \
+    \  static_assert(!checked_ipow(2LL, 63U).has_value());\n    static_assert(!checked_ipow(-2LL,\
+    \ 64U).has_value());\n    static_assert(!checked_ipow(10ULL, 20U).has_value());\n\
+    \    static_assert(checked_ipow(10ULL, 19U) == std::optional(10000000000000000000ULL));\n\
     \    static_assert(\n        checked_ipow(std::numeric_limits<long long>::min(),\
     \ 1U)\n        == std::optional(std::numeric_limits<long long>::min())\n    );\n\
     \    static_assert(\n        !checked_ipow(std::numeric_limits<long long>::min(),\
@@ -142,14 +201,16 @@ data:
     \ char>();\n    test_square_roots<short>();\n    test_square_roots<unsigned short>();\n\
     \    test_square_roots<int>();\n    test_square_roots<unsigned int>();\n    test_square_roots<long\
     \ long>();\n    test_square_roots<unsigned long long>();\n    test_boundaries();\n\
-    \    test_powers();\n\n    long long a, b;\n    std::cin >> a >> b;\n    std::cout\
-    \ << a + b << '\\n';\n}\n"
+    \    test_kth_roots();\n    test_powers();\n\n    int test_count;\n    std::cin\
+    \ >> test_count;\n    while (test_count--) {\n        std::uint64_t value;\n \
+    \       int degree;\n        std::cin >> value >> degree;\n        std::cout <<\
+    \ m1une::math::floor_kth_root(value, degree) << '\\n';\n    }\n}\n"
   dependsOn:
   - math/integer_arithmetic.hpp
   isVerificationFile: true
   path: verify/math/integer_arithmetic.test.cpp
   requiredBy: []
-  timestamp: '2026-06-23 02:33:09+09:00'
+  timestamp: '2026-07-15 01:09:58+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/integer_arithmetic.test.cpp

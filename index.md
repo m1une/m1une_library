@@ -745,7 +745,7 @@ data:
       title: Generalized Floor Sum
     - icon: ':heavy_check_mark:'
       path: math/integer_arithmetic.hpp
-      title: Integer Square Root and Power
+      title: Integer Roots and Powers
     - icon: ':heavy_check_mark:'
       path: math/lucas.hpp
       title: Lucas's Theorem
