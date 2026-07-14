@@ -10,7 +10,12 @@
 void test_fast_input() {
     std::FILE* file = std::tmpfile();
     assert(file != nullptr);
-    std::fputs(" -123 456 token Z 1 -12.5 6.25e2\n", file);
+    std::fputs(
+        " -123 456 token Z 1 -12.5 6.25e2 "
+        "-170141183460469231731687303715884105728 "
+        "340282366920938463463374607431768211455\n",
+        file
+    );
     std::rewind(file);
 
     m1une::utilities::FastInput input(file);
@@ -21,7 +26,11 @@ void test_fast_input() {
     bool flag;
     double decimal;
     long double exponent;
-    assert(input.read(a, b, s, c, flag, decimal, exponent));
+    __int128_t signed_wide;
+    __uint128_t unsigned_wide;
+    assert(input.read(
+        a, b, s, c, flag, decimal, exponent, signed_wide, unsigned_wide
+    ));
     assert(a == -123);
     assert(b == 456);
     assert(s == "token");
@@ -29,6 +38,10 @@ void test_fast_input() {
     assert(flag);
     assert(decimal == -12.5);
     assert(exponent == 625.0L);
+    __int128_t signed_minimum = -(__int128_t(1) << 126);
+    signed_minimum *= 2;
+    assert(signed_wide == signed_minimum);
+    assert(unsigned_wide == ~__uint128_t(0));
     std::fclose(file);
 }
 
@@ -42,14 +55,23 @@ void test_fast_output() {
         output.println(false);
         output.set_fixed(2);
         output.println(1.25);
+        __int128_t signed_minimum = -(__int128_t(1) << 126);
+        signed_minimum *= 2;
+        output.println(signed_minimum);
+        output.println(~__uint128_t(0));
         output.flush();
     }
 
     std::rewind(file);
-    char buffer[64];
+    char buffer[256];
     std::size_t length = std::fread(buffer, 1, sizeof(buffer), file);
     std::string result(buffer, buffer + length);
-    assert(result == "answer -42 17\n0\n1.25\n");
+    assert(
+        result
+        == "answer -42 17\n0\n1.25\n"
+           "-170141183460469231731687303715884105728\n"
+           "340282366920938463463374607431768211455\n"
+    );
     std::fclose(file);
 }
 

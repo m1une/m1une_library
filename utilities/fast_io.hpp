@@ -91,6 +91,38 @@ struct has_static_mod_raw<
 template <class T>
 inline constexpr bool has_static_mod_raw_v = has_static_mod_raw<T>::value;
 
+// libstdc++ before GCC 16 does not classify __int128 as an integral type in
+// strict ISO modes such as -std=c++23. Keep the fast-I/O interface independent
+// of that implementation detail.
+template <class T>
+inline constexpr bool is_integral_v =
+    std::is_integral_v<T>
+    || std::is_same_v<std::remove_cv_t<T>, __int128_t>
+    || std::is_same_v<std::remove_cv_t<T>, __uint128_t>;
+
+template <class T>
+inline constexpr bool is_signed_v =
+    std::is_signed_v<T>
+    || std::is_same_v<std::remove_cv_t<T>, __int128_t>;
+
+template <class T>
+struct make_unsigned {
+    using type = std::make_unsigned_t<T>;
+};
+
+template <>
+struct make_unsigned<__int128_t> {
+    using type = __uint128_t;
+};
+
+template <>
+struct make_unsigned<__uint128_t> {
+    using type = __uint128_t;
+};
+
+template <class T>
+using make_unsigned_t = typename make_unsigned<std::remove_cv_t<T>>::type;
+
 }  // namespace internal
 
 struct FastInput {
@@ -103,7 +135,7 @@ struct FastInput {
     int _length;
 
     bool prepare_number() {
-        if (_length - _position >= 32) return true;
+        if (_length - _position >= 64) return true;
         const int remaining = _length - _position;
         if (remaining > 0) std::memmove(_buffer, _buffer + _position, remaining);
         const int added = int(std::fread(_buffer + remaining, 1, buffer_size - remaining, _stream));
@@ -163,7 +195,7 @@ struct FastInput {
 
     template <class T>
     std::enable_if_t<
-        std::is_integral_v<T>
+        internal::is_integral_v<T>
             && !std::is_same_v<std::remove_cv_t<T>, bool>
             && !std::is_same_v<std::remove_cv_t<T>, char>,
         bool
@@ -179,7 +211,7 @@ struct FastInput {
             c = static_cast<unsigned char>(_buffer[_position++]);
         }
 
-        if constexpr (std::is_signed_v<T>) {
+        if constexpr (internal::is_signed_v<T>) {
             T result = 0;
             while ('0' <= c && c <= '9') {
                 const int first = c - '0';
@@ -266,7 +298,7 @@ struct FastInput {
     template <class T>
     std::enable_if_t<
         internal::has_val_method_v<T>
-            && !std::is_integral_v<T>
+            && !internal::is_integral_v<T>
             && !internal::is_range_v<T>,
         bool
     >
@@ -403,16 +435,16 @@ struct FastOutput {
 
     template <class T>
     std::enable_if_t<
-        std::is_integral_v<T>
+        internal::is_integral_v<T>
             && !std::is_same_v<std::remove_cv_t<T>, bool>
             && !std::is_same_v<std::remove_cv_t<T>, char>
     >
     write(T value) {
         using Raw = std::remove_cv_t<T>;
-        using Unsigned = std::make_unsigned_t<Raw>;
+        using Unsigned = internal::make_unsigned_t<Raw>;
 
         Unsigned magnitude;
-        if constexpr (std::is_signed_v<Raw>) {
+        if constexpr (internal::is_signed_v<Raw>) {
             if (value < 0) {
                 write_char('-');
                 magnitude = Unsigned(0) - Unsigned(value);
@@ -450,7 +482,7 @@ struct FastOutput {
     template <class T>
     std::enable_if_t<
         internal::has_val_method_v<T>
-            && !std::is_integral_v<T>
+            && !internal::is_integral_v<T>
             && !internal::is_range_v<T>
     >
     write(const T& value) {

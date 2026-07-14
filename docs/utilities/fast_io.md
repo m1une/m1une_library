@@ -23,10 +23,11 @@ All names are in `m1une::utilities`.
 
 ## Supported types
 
-Both operators support integral and floating-point types, `bool`, `char`,
-`std::string`, and ModInt-like types. A ModInt-like type must provide
-`value.val()` for output and be constructible from `long long` for input.
-Output additionally accepts null-terminated C strings.
+Both operators support integral and floating-point types, including GCC/Clang
+`__int128_t` and `__uint128_t`, as well as `bool`, `char`, `std::string`, and
+ModInt-like types. A ModInt-like type must provide `value.val()` for output and
+be constructible from `long long` for input. Output additionally accepts
+null-terminated C strings.
 
 Ranges recognized by `std::begin` and `std::end` are also supported, including
 ordinary arrays, `std::array`, and nested containers. Strings are treated as
