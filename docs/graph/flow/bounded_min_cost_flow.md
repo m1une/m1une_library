@@ -5,9 +5,9 @@ documentation_of: ../../../graph/flow/bounded_min_cost_flow.hpp
 
 ## Overview
 
-`BoundedMinCostFlow<Cap, Cost, TotalCost = Cost>` finds a minimum-cost feasible
-flow with lower and upper bounds on each edge. It is the costed version of
-`BoundedFlow<Cap>`. `BMinCostFlow<Cap, Cost, TotalCost>` is an alias of the
+`BoundedMinCostFlow<Cap, Cost, TotalCost = Cost, PivotLimitFactor = 8>` finds
+a minimum-cost feasible flow with lower and upper bounds on each edge. It is
+the costed version of `BoundedFlow<Cap>`. `BMinCostFlow` is an alias of the
 same type.
 
 For this library, vertex balance means:
@@ -32,16 +32,28 @@ Directed flow network. An edge added by
 
 ## How It Works
 
-The solver uses the network simplex method with an artificial-root initial
-basis. It repeatedly pivots a negative reduced-cost residual edge into the
-spanning-tree basis and removes a saturated tree edge. A candidate-list pivot
-rule reuses promising edges for several minor iterations before scanning the
-residual edges again. This approach has very small constants and is especially
-fast on the sparse and medium-sized flow networks common in contests.
+The solver first uses the network simplex method with an artificial-root
+initial basis. It repeatedly pivots a negative reduced-cost residual edge into
+the spanning-tree basis and removes a saturated tree edge. A candidate-list
+pivot rule reuses promising edges for several minor iterations before scanning
+the residual edges again. This approach has very small constants and is
+especially fast on the sparse and medium-sized flow networks common in
+contests.
 
-After no negative reduced-cost residual edge remains, the artificial edges
-determine feasibility. The tree potentials directly provide the returned dual
-certificate.
+Network simplex alone has no polynomial pivot bound. Therefore, after
+`PivotLimitFactor * (N + M + 1)` pivots, `min_cost_flow` discards the partial
+basis and restarts from the original instance with a polynomial capacity-scaling
+solver. The default factor is `8`. Because the pivot budget is linear in the
+input graph size, the hybrid algorithm retains a polynomial worst-case bound.
+
+`min_cost_flow_polynomial` skips network simplex and directly uses capacity
+scaling. It is useful for inputs known to be adversarial to simplex. Setting
+`PivotLimitFactor` to `0` also makes the hybrid fall back as soon as its first
+pivot would be required.
+
+On the simplex path, the artificial edges determine feasibility and the tree
+potentials provide the returned dual certificate. On the capacity-scaling path,
+the certificate is reconstructed from the final residual graph.
 
 The returned `Result::cost` is the total cost on the original edges:
 
@@ -53,7 +65,8 @@ If the balance constraints cannot be satisfied, the solver returns
 `std::nullopt`.
 
 `Cap` must be a signed integer type. `Cost` must support signed exact
-arithmetic and ordering. `TotalCost` is the accumulator type for the final
+arithmetic, ordering, and `std::numeric_limits<Cost>::max()`. `TotalCost` is
+the accumulator type for the final
 `sum(flow * cost)` and defaults to `Cost`. All capacities must fit `Cap`;
 intermediate potential values and the artificial cost
 `1 + sum(abs(edge.cost))`, as well as reduced-cost arithmetic, must fit `Cost`;
@@ -78,9 +91,12 @@ Use these balance helpers for `b`-flow:
 Then call `min_cost_flow()`. It returns `std::nullopt` if no feasible flow
 exists.
 
+Call `min_cost_flow_polynomial()` instead to bypass the simplex fast path.
+
 For an exact `s-t` flow of value `F`, call `min_cost_st_flow(s, t, F)`. This
 adds temporary balances `balance[s] += F` and `balance[t] -= F`, then minimizes
-the total cost among feasible flows with that exact value.
+the total cost among feasible flows with that exact value. The direct
+capacity-scaling version is `min_cost_st_flow_polynomial(s, t, F)`.
 
 The result contains these members:
 
@@ -133,19 +149,24 @@ has minimum cost.
 | `add_demand` | `void add_demand(int v, Cap demand)` | Adds non-negative demand to vertex `v`. | $O(1)$ |
 | `balance` | `Cap balance(int v) const` | Returns `balance[v]`. | $O(1)$ |
 | `balances` | `const std::vector<Cap>& balances() const` | Returns all balances. | $O(1)$ |
-| `min_cost_flow` | `std::optional<Result> min_cost_flow() const` | Solves using stored balances. | $O(N + M + P(N + M))$ |
-| `min_cost_flow` | `std::optional<Result> min_cost_flow(const std::vector<Cap>& balance) const` | Solves using explicit balances. | $O(N + M + P(N + M))$ |
-| `min_cost_st_flow` | `std::optional<Result> min_cost_st_flow(int s, int t, Cap flow_value) const` | Solves exact `s-t` flow with value `flow_value`. | $O(N + M + P(N + M))$ |
+| `min_cost_flow` | `std::optional<Result> min_cost_flow() const` | Solves stored balances with simplex and polynomial fallback. | $O((N + M)^2 + M \log U (M + N \log N))$ worst case |
+| `min_cost_flow` | `std::optional<Result> min_cost_flow(const std::vector<Cap>& balance) const` | Solves explicit balances with simplex and polynomial fallback. | $O((N + M)^2 + M \log U (M + N \log N))$ worst case |
+| `min_cost_flow_polynomial` | `std::optional<Result> min_cost_flow_polynomial() const` | Solves stored balances directly with capacity scaling. | $O(M \log U (M + N \log N) + NM)$ |
+| `min_cost_flow_polynomial` | `std::optional<Result> min_cost_flow_polynomial(const std::vector<Cap>& balance) const` | Solves explicit balances directly with capacity scaling. | $O(M \log U (M + N \log N) + NM)$ |
+| `min_cost_st_flow` | `std::optional<Result> min_cost_st_flow(int s, int t, Cap flow_value) const` | Solves exact `s-t` flow with value `flow_value`. | $O((N + M)^2 + M \log U (M + N \log N))$ worst case |
+| `min_cost_st_flow_polynomial` | `std::optional<Result> min_cost_st_flow_polynomial(int s, int t, Cap flow_value) const` | Solves exact `s-t` flow directly with capacity scaling. | $O(M \log U (M + N \log N) + NM)$ |
 
-Here, `P` is the number of network-simplex pivots. As with the simplex method
-in general, `P` has no polynomial worst-case bound; the candidate-list rule is
-chosen for strong practical performance.
+Here, `P <= PivotLimitFactor * (N + M + 1)` is the number of network-simplex
+pivots completed before termination or fallback. `U` is the maximum absolute
+capacity or balance, with a minimum value of two. Without fallback, the actual
+time is $O(N + M + P(N + M))$. Thus the default hybrid keeps the simplex fast
+path while having the polynomial worst-case bounds shown above.
 
 ## Alias
 
 | Alias | Type |
 | --- | --- |
-| `BMinCostFlow<Cap, Cost, TotalCost>` | `BoundedMinCostFlow<Cap, Cost, TotalCost>` |
+| `BMinCostFlow<Cap, Cost, TotalCost, PivotLimitFactor>` | `BoundedMinCostFlow<Cap, Cost, TotalCost, PivotLimitFactor>` |
 
 ## Example
 

@@ -184,6 +184,9 @@ void test_bounded_min_cost_flow() {
     assert(exact->flow(e01) == 3);
     assert(exact->flow(e12) == 3);
     assert(exact->flow(e02) == 0);
+    auto exact_polynomial = st.min_cost_st_flow_polynomial(0, 2, 3);
+    assert(exact_polynomial.has_value());
+    assert(exact_polynomial->cost == 9);
     std::vector<long long> balance(3, 0);
     for (const auto& edge : exact->edges) {
         assert(edge.lower <= edge.flow && edge.flow <= edge.upper);
@@ -222,6 +225,19 @@ void test_bounded_min_cost_flow() {
     assert(circulation->flow(c01) == 1);
     assert(circulation->flow(c10) == 1);
     assert(circulation->cost == -2);
+    auto polynomial_circulation = cycle.min_cost_flow_polynomial();
+    assert(polynomial_circulation.has_value());
+    assert(polynomial_circulation->cost == -2);
+
+    using ImmediateFallback = m1une::flow::BoundedMinCostFlow<
+        long long, long long, long long, 0
+    >;
+    ImmediateFallback fallback_cycle(2);
+    fallback_cycle.add_edge(0, 1, 0, 1, -5);
+    fallback_cycle.add_edge(1, 0, 0, 1, 3);
+    auto fallback_circulation = fallback_cycle.min_cost_flow();
+    assert(fallback_circulation.has_value());
+    assert(fallback_circulation->cost == -2);
 
     m1une::flow::BoundedMinCostFlow<long long, long long> impossible(2);
     impossible.add_edge(0, 1, 0, 1, 0);
@@ -300,29 +316,37 @@ void test_bounded_min_cost_flow() {
         };
         enumerate(enumerate, 0);
 
-        auto result = solver.min_cost_flow(required_balance);
-        assert(result.has_value() == feasible);
-        if (!result.has_value()) continue;
-        assert(result->cost == best_cost);
+        auto validate_result = [&](const auto& result) {
+            assert(result.has_value() == feasible);
+            if (!result.has_value()) return;
+            assert(result->cost == best_cost);
 
-        std::vector<long long> actual_balance(n, 0);
-        for (const auto& edge : result->edges) {
-            assert(edge.lower <= edge.flow && edge.flow <= edge.upper);
-            actual_balance[edge.from] += edge.flow;
-            actual_balance[edge.to] -= edge.flow;
-            long long reduced_cost =
-                edge.cost
-                + result->potential[edge.from] - result->potential[edge.to];
-            if (edge.flow < edge.upper) assert(0 <= reduced_cost);
-            if (edge.lower < edge.flow) assert(reduced_cost <= 0);
-        }
-        assert(actual_balance == required_balance);
+            std::vector<long long> actual_balance(n, 0);
+            for (const auto& edge : result->edges) {
+                assert(edge.lower <= edge.flow && edge.flow <= edge.upper);
+                actual_balance[edge.from] += edge.flow;
+                actual_balance[edge.to] -= edge.flow;
+                long long reduced_cost =
+                    edge.cost
+                    + result->potential[edge.from]
+                    - result->potential[edge.to];
+                if (edge.flow < edge.upper) assert(0 <= reduced_cost);
+                if (edge.lower < edge.flow) assert(reduced_cost <= 0);
+            }
+            assert(actual_balance == required_balance);
+        };
+
+        validate_result(solver.min_cost_flow(required_balance));
+        validate_result(solver.min_cost_flow_polynomial(required_balance));
     }
 
     m1une::flow::BMinCostFlow<long long, long long> alias(1);
     assert(alias.size() == 1);
     m1une::flow::BMinCostFlow<long long, long long, __int128_t> wide_alias(1);
     assert(wide_alias.size() == 1);
+    m1une::flow::BMinCostFlow<long long, long long, long long, 0>
+        fallback_alias(1);
+    assert(fallback_alias.size() == 1);
 }
 
 void test_min_cost_flow() {
