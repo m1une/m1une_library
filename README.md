@@ -121,16 +121,24 @@ long long answer = seg.prod(0, 3);  // 1 + 10 + 3
 ```
 
 To shrink an expanded submission, run the dependency-free compressor. It removes
-comments and redundant whitespace and conservatively shortens variable names:
+comments and redundant whitespace, shortens file-owned variables, fields, types,
+namespaces, and unqualified functions, and introduces profitable short aliases
+for builtin types, namespaces, and standard templates such as `std::vector` and
+`std::pair`:
 
 ```sh
 python3 compressor.py bundled.cpp -o submission.cpp --stats
 ```
 
-Pass `--no-rename` to keep all identifiers unchanged. The compressor preserves
-the C++ preprocessing-token stream across removed whitespace, handles comments
-and escaped newlines in translation-phase order, and preserves preprocessor
-lines, user-defined literals, string and character literals, and raw strings.
+The default aggressive mode assumes the input is a self-contained translation
+unit whose names are not consumed by another file. Pass `--no-rename` to keep all
+identifiers unchanged and disable generated aliases. Line-control directives
+(`#line` and compiler line markers) and duplicate unconditional direct includes
+are removed in both modes. The compressor
+preserves the C++ preprocessing-token stream across removed whitespace, handles
+comments and escaped newlines in translation-phase order, and preserves other
+preprocessor directives, user-defined literals, string and character literals,
+and raw strings.
 
 ## Documentation Conventions
 
