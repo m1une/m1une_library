@@ -35,6 +35,151 @@ struct MaxFlow {
     std::vector<Position> _pos;
     std::vector<std::vector<InternalEdge>> _g;
 
+    Cap push_relabel(int s, int t) {
+        const int dead = 2 * _n;
+        const int unreachable = _n + 1;
+        std::vector<Cap> excess(_n, Cap(0));
+        std::vector<int> state(8 * std::size_t(_n) + 2);
+        int* height = state.data();
+        int* height_count = height + _n;
+        int* current = height_count + dead + 1;
+        int* queue = current + _n;
+        int* next = queue + _n;
+        int* bucket_head = next + _n;
+        std::vector<char> active(_n, false);
+        int highest = -1;
+        long long work = 0;
+        long long arc_count = 0;
+        for (const auto& edges : _g) arc_count += int(edges.size());
+        const long long work_limit = std::max(1LL, 4 * arc_count + _n);
+
+        auto activate = [&](int v) {
+            if (v == s || v == t || active[v] || excess[v] == Cap(0) ||
+                height[v] >= dead) {
+                return;
+            }
+            active[v] = true;
+            next[v] = bucket_head[height[v]];
+            bucket_head[height[v]] = v;
+            highest = std::max(highest, height[v]);
+        };
+
+        auto rebuild_buckets = [&]() {
+            std::fill(bucket_head, bucket_head + dead + 1, -1);
+            std::fill(active.begin(), active.end(), false);
+            highest = -1;
+            for (int v = 0; v < _n; v++) activate(v);
+        };
+
+        auto global_relabel = [&]() {
+            std::fill(height, height + _n, unreachable);
+            std::fill(height_count, height_count + dead + 1, 0);
+            std::fill(current, current + _n, 0);
+            int head = 0;
+            int tail = 0;
+            height[t] = 0;
+            height[s] = _n;
+            queue[tail++] = t;
+            while (head != tail) {
+                int v = queue[head++];
+                for (const auto& e : _g[v]) {
+                    if (e.to == s || height[e.to] != unreachable) continue;
+                    const auto& reverse = _g[e.to][e.rev];
+                    if (reverse.cap == Cap(0)) continue;
+                    height[e.to] = height[v] + 1;
+                    queue[tail++] = e.to;
+                }
+            }
+            for (int v = 0; v < _n; v++) height_count[height[v]]++;
+            rebuild_buckets();
+            work = 0;
+        };
+
+        auto gap = [&](int empty_height) {
+            for (int v = 0; v < _n; v++) {
+                if (v == s || v == t || height[v] <= empty_height ||
+                    height[v] >= _n) {
+                    continue;
+                }
+                height_count[height[v]]--;
+                height[v] = unreachable;
+                height_count[height[v]]++;
+                current[v] = 0;
+            }
+            rebuild_buckets();
+        };
+
+        auto relabel = [&](int v) -> bool {
+            int old_height = height[v];
+            int new_height = dead;
+            work += int(_g[v].size());
+            for (const auto& e : _g[v]) {
+                if (e.cap != Cap(0)) {
+                    new_height = std::min(new_height, height[e.to] + 1);
+                }
+            }
+            height_count[old_height]--;
+            height[v] = std::min(new_height, dead);
+            height_count[height[v]]++;
+            current[v] = 0;
+            if (old_height < _n && height_count[old_height] == 0) {
+                gap(old_height);
+                return true;
+            }
+            return false;
+        };
+
+        auto push = [&](int v, InternalEdge& e) {
+            Cap sent = std::min(excess[v], e.cap);
+            bool was_zero = excess[e.to] == Cap(0);
+            e.cap -= sent;
+            _g[e.to][e.rev].cap += sent;
+            excess[v] -= sent;
+            excess[e.to] += sent;
+            if (was_zero) activate(e.to);
+        };
+
+        auto discharge = [&](int v) {
+            while (excess[v] != Cap(0) && height[v] < dead) {
+                if (current[v] == int(_g[v].size())) {
+                    if (relabel(v)) return;
+                    continue;
+                }
+                auto& e = _g[v][current[v]];
+                work++;
+                if (e.cap != Cap(0) && height[v] == height[e.to] + 1) {
+                    push(v, e);
+                } else {
+                    current[v]++;
+                }
+            }
+            activate(v);
+        };
+
+        for (auto& e : _g[s]) {
+            if (e.to == s || e.cap == Cap(0)) continue;
+            Cap sent = e.cap;
+            e.cap = Cap(0);
+            _g[e.to][e.rev].cap += sent;
+            excess[e.to] += sent;
+        }
+        global_relabel();
+
+        while (highest >= 0) {
+            if (bucket_head[highest] == -1) {
+                highest--;
+                continue;
+            }
+            int v = bucket_head[highest];
+            bucket_head[highest] = next[v];
+            if (!active[v] || height[v] != highest) continue;
+            active[v] = false;
+            discharge(v);
+            if (work >= work_limit) global_relabel();
+        }
+        return excess[t];
+    }
+
    public:
     MaxFlow() : MaxFlow(0) {}
 
@@ -58,9 +203,19 @@ struct MaxFlow {
             return;
         }
         const std::size_t average_degree =
-            (2 * std::size_t(edge_count) + std::size_t(_n) - 1)
+            (3 * std::size_t(edge_count) + std::size_t(_n) - 1)
             / std::size_t(_n);
         for (auto& edges : _g) edges.reserve(average_degree);
+    }
+
+    void reserve_edges(int edge_count, const std::vector<int>& degrees) {
+        assert(0 <= edge_count);
+        assert(int(degrees.size()) == _n);
+        _pos.reserve(edge_count);
+        for (int v = 0; v < _n; v++) {
+            assert(0 <= degrees[v]);
+            _g[v].reserve(degrees[v]);
+        }
     }
 
     int add_edge(int from, int to, Cap cap) {
@@ -144,6 +299,13 @@ struct MaxFlow {
         return max_flow(s, t, std::numeric_limits<Cap>::max());
     }
 
+    Cap max_flow_push_relabel(int s, int t) {
+        assert(0 <= s && s < _n);
+        assert(0 <= t && t < _n);
+        assert(s != t);
+        return push_relabel(s, t);
+    }
+
     Cap max_flow(int s, int t, Cap flow_limit) {
         assert(0 <= s && s < _n);
         assert(0 <= t && t < _n);
@@ -162,7 +324,7 @@ struct MaxFlow {
             while (head != tail) {
                 int v = queue[head++];
                 for (const auto& e : _g[v]) {
-                    if (e.cap == Cap(0) || level[e.to] != -1) continue;
+                    if (level[e.to] != -1 || e.cap == Cap(0)) continue;
                     level[e.to] = level[v] + 1;
                     if (e.to == t) return true;
                     queue[tail++] = e.to;
@@ -175,9 +337,11 @@ struct MaxFlow {
             if (v == s) return up;
             Cap result = Cap(0);
             const int current_level = level[v];
-            for (int& i = iter[v]; i < int(_g[v].size()); i++) {
-                auto& e = _g[v][i];
-                if (current_level <= level[e.to]) continue;
+            auto& edges = _g[v];
+            const int edge_count = int(edges.size());
+            for (int& i = iter[v]; i < edge_count; i++) {
+                auto& e = edges[i];
+                if (level[e.to] + 1 != current_level) continue;
                 auto& reverse = _g[e.to][e.rev];
                 if (reverse.cap == Cap(0)) continue;
                 Cap d = self(

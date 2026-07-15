@@ -43,7 +43,7 @@ void test_max_flow() {
     assert(changed.flow == 1);
 
     m1une::flow::MaxFlow<long long> undirected(2);
-    undirected.reserve_edges(1);
+    undirected.reserve_edges(1, std::vector<int>{1, 1});
     int undirected_id = undirected.add_undirected_edge(0, 1, 7);
     undirected.change_edge(undirected_id, 7, -3);
     auto initial_undirected = undirected.get_edge(undirected_id);
@@ -71,7 +71,9 @@ void test_max_flow() {
         int m = int(random() % 13);
         std::vector<InputEdge> input_edges;
         m1une::flow::MaxFlow<long long> flow(n);
+        m1une::flow::MaxFlow<long long> push_relabel_flow(n);
         flow.reserve_edges(m);
+        push_relabel_flow.reserve_edges(m);
         for (int edge = 0; edge < m; edge++) {
             InputEdge input{
                 int(random() % n),
@@ -82,8 +84,10 @@ void test_max_flow() {
             input_edges.push_back(input);
             if (input.undirected) {
                 flow.add_undirected_edge(input.from, input.to, input.cap);
+                push_relabel_flow.add_undirected_edge(input.from, input.to, input.cap);
             } else {
                 flow.add_edge(input.from, input.to, input.cap);
+                push_relabel_flow.add_edge(input.from, input.to, input.cap);
             }
         }
 
@@ -104,24 +108,35 @@ void test_max_flow() {
 
         long long result = flow.max_flow(0, n - 1);
         assert(result == expected);
-        std::vector<long long> net_flow(n, 0);
-        for (int edge = 0; edge < m; edge++) {
-            auto result_edge = flow.get_edge(edge);
-            assert(result_edge.cap == input_edges[edge].cap);
-            if (input_edges[edge].undirected) {
-                assert(-result_edge.cap <= result_edge.flow);
-            } else {
-                assert(0 <= result_edge.flow);
+        long long push_relabel_result =
+            push_relabel_flow.max_flow_push_relabel(0, n - 1);
+        assert(push_relabel_result == expected);
+
+        auto validate = [&](const auto& solved_flow, long long solved_value) {
+            std::vector<long long> net_flow(n, 0);
+            for (int edge = 0; edge < m; edge++) {
+                auto result_edge = solved_flow.get_edge(edge);
+                assert(result_edge.cap == input_edges[edge].cap);
+                if (input_edges[edge].undirected) {
+                    assert(-result_edge.cap <= result_edge.flow);
+                } else {
+                    assert(0 <= result_edge.flow);
+                }
+                assert(result_edge.flow <= result_edge.cap);
+                net_flow[result_edge.from] += result_edge.flow;
+                net_flow[result_edge.to] -= result_edge.flow;
             }
-            assert(result_edge.flow <= result_edge.cap);
-            net_flow[result_edge.from] += result_edge.flow;
-            net_flow[result_edge.to] -= result_edge.flow;
-        }
-        assert(net_flow[0] == result);
-        assert(net_flow[n - 1] == -result);
-        for (int vertex = 1; vertex + 1 < n; vertex++) {
-            assert(net_flow[vertex] == 0);
-        }
+            assert(net_flow[0] == solved_value);
+            assert(net_flow[n - 1] == -solved_value);
+            for (int vertex = 1; vertex + 1 < n; vertex++) {
+                assert(net_flow[vertex] == 0);
+            }
+        };
+        validate(flow, result);
+        validate(push_relabel_flow, push_relabel_result);
+        assert(flow.max_flow_push_relabel(0, n - 1) == 0);
+        assert(push_relabel_flow.max_flow_push_relabel(0, n - 1) == 0);
+        assert(push_relabel_flow.max_flow(0, n - 1) == 0);
     }
 }
 

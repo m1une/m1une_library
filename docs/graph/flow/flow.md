@@ -19,7 +19,7 @@ pair. Other directed-flow classes represent it with two directed edges.
 | `graph/flow/bounded_flow.hpp` | Directed flow network | Feasible flow with lower/upper bounds, balances, and negative flow intervals. |
 | `graph/flow/bounded_min_cost_flow.hpp` | Directed flow network | Minimum-cost feasible flow with lower/upper bounds, balances, and negative flow intervals. |
 | `graph/flow/gomory_hu.hpp` | Undirected capacitated graph | Gomory-Hu cut tree and pairwise minimum-cut queries. |
-| `graph/flow/max_flow.hpp` | Directed or shared-capacity undirected network | Optimized Dinic maximum flow and minimum cut. |
+| `graph/flow/max_flow.hpp` | Directed or shared-capacity undirected network | Optimized Dinic and highest-label push-relabel maximum flow, plus minimum cut. |
 | `graph/flow/min_cost_flow.hpp` | Directed flow network | Minimum-cost flow with potentials. |
 
 ## Complexity

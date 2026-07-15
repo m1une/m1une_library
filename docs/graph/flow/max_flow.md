@@ -13,6 +13,12 @@ repeatedly builds a level graph with an array queue and sends blocking flow by
 traversing the level graph backward from the sink. Dead-end pruning and
 current-edge pointers avoid revisiting exhausted vertices and edges.
 
+For capacity-heavy graphs, the class also provides an explicit highest-label
+push-relabel solver with global relabeling and the gap heuristic. Neither
+algorithm wins on every graph family, so `max_flow` keeps Dinic as the
+predictable default and `max_flow_push_relabel` is available for workloads
+where benchmarking shows an advantage.
+
 ## Graph Orientation
 
 Directed flow network. An edge added by `add_edge(from, to, cap)` can send flow
@@ -36,10 +42,16 @@ Capacities must be non-negative. `add_undirected_edge` requires a signed `Cap`;
 its residual capacity may reach `2 * cap`, which must also fit `Cap`.
 
 When the edge count is known, call `reserve_edges(m)` before adding edges. In
-addition to reserving edge metadata, it reserves the average residual degree
-for every vertex when the graph is dense enough for that to be useful. This
-avoids most small adjacency-list allocations without allocating one buffer per
-vertex on extremely sparse graphs.
+addition to reserving edge metadata, it reserves adjacency capacity with some
+headroom above the average residual degree when the graph is dense enough for
+that to be useful. This avoids most small adjacency-list reallocations without
+allocating one buffer per vertex on extremely sparse graphs.
+
+If every endpoint degree is already known, the overload
+`reserve_edges(m, degrees)` reserves exact adjacency capacities. Each original
+edge contributes one to each endpoint's degree; a self-loop contributes two to
+its one endpoint. This overload is useful when edges are already stored in an
+input array, but the one-argument overload is usually nearly as fast.
 
 You can call `max_flow(s, t, flow_limit)` when only up to `flow_limit` units are
 needed.
@@ -61,7 +73,8 @@ needed.
 | Constructor | `explicit MaxFlow(int n)` | Creates a graph with `n` vertices. | $O(N)$ |
 | `size` | `int size() const` | Returns the number of vertices. | $O(1)$ |
 | `edge_count` | `int edge_count() const` | Returns the number of original edges. | $O(1)$ |
-| `reserve_edges` | `void reserve_edges(int edge_count)` | Reserves edge metadata and average adjacency capacity. | $O(N + M)$ when reallocation occurs |
+| `reserve_edges` | `void reserve_edges(int edge_count)` | Reserves edge metadata and adjacency capacity with average-degree headroom. | $O(N + M)$ when reallocation occurs |
+| `reserve_edges` | `void reserve_edges(int edge_count, const std::vector<int>& degrees)` | Reserves edge metadata and exact residual adjacency capacities. | $O(N + M)$ when reallocation occurs |
 | `add_edge` | `int add_edge(int from, int to, Cap cap)` | Adds a directed edge and returns its edge id. | Amortized $O(1)$ |
 | `add_undirected_edge` | `int add_undirected_edge(int first, int second, Cap cap)` | Adds a bidirectional edge with shared capacity and returns its id. | Amortized $O(1)$ |
 | `get_edge` | `Edge get_edge(int i) const` | Returns the current state of original edge `i`. | $O(1)$ |
@@ -69,6 +82,7 @@ needed.
 | `change_edge` | `void change_edge(int i, Cap new_cap, Cap new_flow)` | Replaces edge `i`'s capacity and current flow; undirected flow may be negative. | $O(1)$ |
 | `max_flow` | `Cap max_flow(int s, int t)` | Sends maximum flow from `s` to `t`. | $O(N^2 M)$ in general; see below |
 | `max_flow` | `Cap max_flow(int s, int t, Cap flow_limit)` | Sends at most `flow_limit` additional flow. | $O(N^2 M)$ in general; see below |
+| `max_flow_push_relabel` | `Cap max_flow_push_relabel(int s, int t)` | Sends maximum additional flow with highest-label push-relabel. | $O(N^2 M)$ conservatively |
 | `min_cut` | `std::vector<bool> min_cut(int s) const` | Returns vertices reachable from `s` in the residual graph. | $O(N + M)$ |
 
 ## Time Complexity of `max_flow`
@@ -158,6 +172,21 @@ $O(N+(F_{call}+1)M)$. Here, $F_{call}$ is at most `flow_limit`. Every call
 returns only the **additional** flow sent during that call. Since the residual
 graph is preserved, calling `max_flow` again continues from the current flow
 rather than recomputing it from scratch.
+
+## Push-Relabel Alternative
+
+`max_flow_push_relabel(s, t)` uses highest-label active-vertex selection, flat
+buckets, current-edge pointers, global relabeling, and the gap heuristic. The
+conservative general bound is $O(N^2M)$, including calls on a residual graph
+that already contains flow.
+
+Push-relabel often performs well on high-capacity networks where Dinic needs
+several level-graph phases. Dinic is commonly faster on path-like, unit, and
+layered networks. The difference can be large in either direction, so use
+`max_flow` unless a representative benchmark supports choosing the
+push-relabel method. Both methods return only the additional flow sent and
+leave a valid residual graph, so `get_edge`, `edges`, and `min_cut` behave the
+same afterward.
 
 ## Minimum Cut
 
