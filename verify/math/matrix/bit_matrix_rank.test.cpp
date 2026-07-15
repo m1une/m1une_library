@@ -13,10 +13,12 @@ int main() {
     int rows, cols;
     fast_input >> rows >> cols;
     m1une::matrix::BitMatrix matrix(rows, cols);
-    std::string bits;
-    for (int row = 0; row < rows; row++) {
-        fast_input >> bits;
-        matrix.set_row(row, bits);
+    if (cols > 0) {
+        std::string bits;
+        for (int row = 0; row < rows; row++) {
+            fast_input >> bits;
+            matrix.set_row(row, bits);
+        }
     }
     fast_output << m1une::matrix::matrix_rank(std::move(matrix)) << '\n';
 }
