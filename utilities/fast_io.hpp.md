@@ -436,6 +436,9 @@ data:
     path: verify/graph/flow/flow_algorithms.test.cpp
     title: verify/graph/flow/flow_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/flow/max_flow.test.cpp
+    title: verify/graph/flow/max_flow.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/flow/min_cost_b_flow.test.cpp
     title: verify/graph/flow/min_cost_b_flow.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1543,6 +1546,7 @@ data:
   - verify/graph/scc.test.cpp
   - verify/graph/flow/min_cost_b_flow.test.cpp
   - verify/graph/flow/flow_algorithms.test.cpp
+  - verify/graph/flow/max_flow.test.cpp
   - verify/graph/counting_spanning_tree_undirected.test.cpp
   - verify/convex/slope_trick.test.cpp
   - verify/convex/monge/max_plus_convolution_concave_concave.test.cpp

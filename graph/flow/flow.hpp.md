@@ -41,61 +41,91 @@ data:
   bundledCode: "#line 1 \"graph/flow/flow.hpp\"\n\n\n\n#line 1 \"graph/flow/bounded_flow.hpp\"\
     \n\n\n\n#include <cassert>\n#include <optional>\n#include <vector>\n\n#line 1\
     \ \"graph/flow/max_flow.hpp\"\n\n\n\n#include <algorithm>\n#line 6 \"graph/flow/max_flow.hpp\"\
-    \n#include <limits>\n#include <queue>\n#include <utility>\n#line 10 \"graph/flow/max_flow.hpp\"\
-    \n\nnamespace m1une {\nnamespace flow {\n\ntemplate <class Cap>\nstruct MaxFlow\
+    \n#include <cstddef>\n#include <limits>\n#line 9 \"graph/flow/max_flow.hpp\"\n\
+    \nnamespace m1une {\nnamespace flow {\n\ntemplate <class Cap>\nstruct MaxFlow\
     \ {\n    struct Edge {\n        int from;\n        int to;\n        Cap cap;\n\
     \        Cap flow;\n    };\n\n   private:\n    struct InternalEdge {\n       \
-    \ int to;\n        int rev;\n        Cap cap;\n    };\n\n    int _n;\n    std::vector<std::pair<int,\
-    \ int>> _pos;\n    std::vector<std::vector<InternalEdge>> _g;\n\n   public:\n\
-    \    MaxFlow() : MaxFlow(0) {}\n\n    explicit MaxFlow(int n) : _n(n), _g(n) {\n\
-    \        assert(0 <= n);\n    }\n\n    int size() const {\n        return _n;\n\
-    \    }\n\n    int edge_count() const {\n        return int(_pos.size());\n   \
-    \ }\n\n    int add_edge(int from, int to, Cap cap) {\n        assert(0 <= from\
+    \ int to;\n        int rev;\n        Cap cap;\n    };\n\n    struct Position {\n\
+    \        int from;\n        int edge;\n    };\n\n    int _n;\n    std::vector<Position>\
+    \ _pos;\n    std::vector<std::vector<InternalEdge>> _g;\n\n   public:\n    MaxFlow()\
+    \ : MaxFlow(0) {}\n\n    explicit MaxFlow(int n) : _n(n), _g(n) {\n        assert(0\
+    \ <= n);\n    }\n\n    int size() const {\n        return _n;\n    }\n\n    int\
+    \ edge_count() const {\n        return int(_pos.size());\n    }\n\n    void reserve_edges(int\
+    \ edge_count) {\n        assert(0 <= edge_count);\n        _pos.reserve(edge_count);\n\
+    \        if (_n == 0 || edge_count == 0 ||\n            2 * std::size_t(edge_count)\
+    \ < std::size_t(_n)) {\n            return;\n        }\n        const std::size_t\
+    \ average_degree =\n            (2 * std::size_t(edge_count) + std::size_t(_n)\
+    \ - 1)\n            / std::size_t(_n);\n        for (auto& edges : _g) edges.reserve(average_degree);\n\
+    \    }\n\n    int add_edge(int from, int to, Cap cap) {\n        assert(0 <= from\
     \ && from < _n);\n        assert(0 <= to && to < _n);\n        assert(Cap(0) <=\
     \ cap);\n        int id = int(_pos.size());\n        int from_id = int(_g[from].size());\n\
     \        int to_id = int(_g[to].size());\n        if (from == to) to_id++;\n \
-    \       _pos.emplace_back(from, from_id);\n        _g[from].push_back(InternalEdge{to,\
+    \       _pos.push_back(Position{from, from_id});\n        _g[from].push_back(InternalEdge{to,\
     \ to_id, cap});\n        _g[to].push_back(InternalEdge{from, from_id, Cap(0)});\n\
-    \        return id;\n    }\n\n    Edge get_edge(int i) const {\n        assert(0\
-    \ <= i && i < int(_pos.size()));\n        auto [from, idx] = _pos[i];\n      \
-    \  const auto& e = _g[from][idx];\n        const auto& re = _g[e.to][e.rev];\n\
-    \        return Edge{from, e.to, e.cap + re.cap, re.cap};\n    }\n\n    std::vector<Edge>\
-    \ edges() const {\n        std::vector<Edge> result;\n        result.reserve(_pos.size());\n\
+    \        return id;\n    }\n\n    int add_undirected_edge(int first, int second,\
+    \ Cap cap) {\n        static_assert(std::numeric_limits<Cap>::is_signed);\n  \
+    \      assert(0 <= first && first < _n);\n        assert(0 <= second && second\
+    \ < _n);\n        assert(Cap(0) <= cap);\n        assert(cap <= std::numeric_limits<Cap>::max()\
+    \ / Cap(2));\n        int id = int(_pos.size());\n        int first_id = int(_g[first].size());\n\
+    \        int second_id = int(_g[second].size());\n        if (first == second)\
+    \ second_id++;\n        _pos.push_back(Position{first, ~first_id});\n        _g[first].push_back(InternalEdge{second,\
+    \ second_id, cap});\n        _g[second].push_back(InternalEdge{first, first_id,\
+    \ cap});\n        return id;\n    }\n\n    Edge get_edge(int i) const {\n    \
+    \    assert(0 <= i && i < int(_pos.size()));\n        const auto& position = _pos[i];\n\
+    \        int from = position.from;\n        bool undirected = position.edge <\
+    \ 0;\n        int idx = undirected ? ~position.edge : position.edge;\n       \
+    \ const auto& e = _g[from][idx];\n        const auto& re = _g[e.to][e.rev];\n\
+    \        if (undirected) {\n            return Edge{\n                from,\n\
+    \                e.to,\n                (e.cap + re.cap) / Cap(2),\n         \
+    \       (re.cap - e.cap) / Cap(2)\n            };\n        }\n        return Edge{from,\
+    \ e.to, e.cap + re.cap, re.cap};\n    }\n\n    std::vector<Edge> edges() const\
+    \ {\n        std::vector<Edge> result;\n        result.reserve(_pos.size());\n\
     \        for (int i = 0; i < int(_pos.size()); i++) result.push_back(get_edge(i));\n\
     \        return result;\n    }\n\n    void change_edge(int i, Cap new_cap, Cap\
     \ new_flow) {\n        assert(0 <= i && i < int(_pos.size()));\n        assert(Cap(0)\
-    \ <= new_flow && new_flow <= new_cap);\n        auto [from, idx] = _pos[i];\n\
-    \        auto& e = _g[from][idx];\n        auto& re = _g[e.to][e.rev];\n     \
-    \   e.cap = new_cap - new_flow;\n        re.cap = new_flow;\n    }\n\n    Cap\
-    \ max_flow(int s, int t) {\n        return max_flow(s, t, std::numeric_limits<Cap>::max());\n\
-    \    }\n\n    Cap max_flow(int s, int t, Cap flow_limit) {\n        assert(0 <=\
-    \ s && s < _n);\n        assert(0 <= t && t < _n);\n        assert(s != t);\n\n\
-    \        std::vector<int> level(_n), iter(_n);\n        auto bfs = [&]() -> bool\
-    \ {\n            std::fill(level.begin(), level.end(), -1);\n            std::queue<int>\
-    \ que;\n            level[s] = 0;\n            que.push(s);\n            while\
-    \ (!que.empty()) {\n                int v = que.front();\n                que.pop();\n\
-    \                for (const auto& e : _g[v]) {\n                    if (e.cap\
-    \ == Cap(0) || level[e.to] != -1) continue;\n                    level[e.to] =\
-    \ level[v] + 1;\n                    if (e.to == t) return true;\n           \
-    \         que.push(e.to);\n                }\n            }\n            return\
-    \ level[t] != -1;\n        };\n\n        auto dfs = [&](auto self, int v, Cap\
-    \ up) -> Cap {\n            if (v == t) return up;\n            for (int& i =\
-    \ iter[v]; i < int(_g[v].size()); i++) {\n                auto& e = _g[v][i];\n\
-    \                if (e.cap == Cap(0) || level[v] >= level[e.to]) continue;\n \
-    \               Cap d = self(self, e.to, std::min(up, e.cap));\n             \
-    \   if (d == Cap(0)) continue;\n                e.cap -= d;\n                _g[e.to][e.rev].cap\
-    \ += d;\n                return d;\n            }\n            return Cap(0);\n\
+    \ <= new_cap);\n        auto& position = _pos[i];\n        int from = position.from;\n\
+    \        bool undirected = position.edge < 0;\n        int idx = undirected ?\
+    \ ~position.edge : position.edge;\n        auto& e = _g[from][idx];\n        auto&\
+    \ re = _g[e.to][e.rev];\n        if (undirected) {\n            assert(new_cap\
+    \ <= std::numeric_limits<Cap>::max() / Cap(2));\n            assert(-new_cap <=\
+    \ new_flow && new_flow <= new_cap);\n            e.cap = new_cap - new_flow;\n\
+    \            re.cap = new_cap + new_flow;\n        } else {\n            assert(Cap(0)\
+    \ <= new_flow && new_flow <= new_cap);\n            e.cap = new_cap - new_flow;\n\
+    \            re.cap = new_flow;\n        }\n    }\n\n    Cap max_flow(int s, int\
+    \ t) {\n        return max_flow(s, t, std::numeric_limits<Cap>::max());\n    }\n\
+    \n    Cap max_flow(int s, int t, Cap flow_limit) {\n        assert(0 <= s && s\
+    \ < _n);\n        assert(0 <= t && t < _n);\n        assert(s != t);\n\n     \
+    \   std::vector<int> work(3 * std::size_t(_n));\n        int* level = work.data();\n\
+    \        int* iter = level + _n;\n        int* queue = iter + _n;\n        auto\
+    \ bfs = [&]() -> bool {\n            std::fill(level, level + _n, -1);\n     \
+    \       int head = 0;\n            int tail = 0;\n            level[s] = 0;\n\
+    \            queue[tail++] = s;\n            while (head != tail) {\n        \
+    \        int v = queue[head++];\n                for (const auto& e : _g[v]) {\n\
+    \                    if (e.cap == Cap(0) || level[e.to] != -1) continue;\n   \
+    \                 level[e.to] = level[v] + 1;\n                    if (e.to ==\
+    \ t) return true;\n                    queue[tail++] = e.to;\n               \
+    \ }\n            }\n            return level[t] != -1;\n        };\n\n       \
+    \ auto dfs = [&](auto&& self, int v, Cap up) -> Cap {\n            if (v == s)\
+    \ return up;\n            Cap result = Cap(0);\n            const int current_level\
+    \ = level[v];\n            for (int& i = iter[v]; i < int(_g[v].size()); i++)\
+    \ {\n                auto& e = _g[v][i];\n                if (current_level <=\
+    \ level[e.to]) continue;\n                auto& reverse = _g[e.to][e.rev];\n \
+    \               if (reverse.cap == Cap(0)) continue;\n                Cap d =\
+    \ self(\n                    self,\n                    e.to,\n              \
+    \      std::min(up - result, reverse.cap)\n                );\n              \
+    \  if (d == Cap(0)) continue;\n                e.cap += d;\n                reverse.cap\
+    \ -= d;\n                result += d;\n                if (result == up) return\
+    \ result;\n            }\n            level[v] = _n;\n            return result;\n\
     \        };\n\n        Cap flow = 0;\n        while (flow < flow_limit && bfs())\
-    \ {\n            std::fill(iter.begin(), iter.end(), 0);\n            while (flow\
-    \ < flow_limit) {\n                Cap f = dfs(dfs, s, flow_limit - flow);\n \
-    \               if (f == Cap(0)) break;\n                flow += f;\n        \
-    \    }\n        }\n        return flow;\n    }\n\n    std::vector<bool> min_cut(int\
-    \ s) const {\n        assert(0 <= s && s < _n);\n        std::vector<bool> visited(_n,\
-    \ false);\n        std::queue<int> que;\n        visited[s] = true;\n        que.push(s);\n\
-    \        while (!que.empty()) {\n            int v = que.front();\n          \
-    \  que.pop();\n            for (const auto& e : _g[v]) {\n                if (e.cap\
-    \ == Cap(0) || visited[e.to]) continue;\n                visited[e.to] = true;\n\
-    \                que.push(e.to);\n            }\n        }\n        return visited;\n\
+    \ {\n            std::fill(iter, iter + _n, 0);\n            flow += dfs(dfs,\
+    \ t, flow_limit - flow);\n        }\n        return flow;\n    }\n\n    std::vector<bool>\
+    \ min_cut(int s) const {\n        assert(0 <= s && s < _n);\n        std::vector<bool>\
+    \ visited(_n, false);\n        std::vector<int> queue(_n);\n        int head =\
+    \ 0;\n        int tail = 0;\n        visited[s] = true;\n        queue[tail++]\
+    \ = s;\n        while (head != tail) {\n            int v = queue[head++];\n \
+    \           for (const auto& e : _g[v]) {\n                if (e.cap == Cap(0)\
+    \ || visited[e.to]) continue;\n                visited[e.to] = true;\n       \
+    \         queue[tail++] = e.to;\n            }\n        }\n        return visited;\n\
     \    }\n};\n\n}  // namespace flow\n}  // namespace m1une\n\n\n#line 9 \"graph/flow/bounded_flow.hpp\"\
     \n\nnamespace m1une {\nnamespace flow {\n\ntemplate <class Cap>\nstruct BoundedFlow\
     \ {\n    struct Edge {\n        int from;\n        int to;\n        Cap lower;\n\
@@ -150,43 +180,44 @@ data:
     \        balance[t] -= flow_value;\n        return feasible_flow(balance);\n \
     \   }\n};\n\ntemplate <class Cap>\nusing BFlow = BoundedFlow<Cap>;\n\n}  // namespace\
     \ flow\n}  // namespace m1une\n\n\n#line 1 \"graph/flow/bounded_min_cost_flow.hpp\"\
-    \n\n\n\n#line 6 \"graph/flow/bounded_min_cost_flow.hpp\"\n#include <cstddef>\n\
-    #include <cmath>\n#include <functional>\n#line 14 \"graph/flow/bounded_min_cost_flow.hpp\"\
-    \n\nnamespace m1une {\nnamespace flow {\n\ntemplate <\n    class Cap,\n    class\
-    \ Cost,\n    class TotalCost = Cost,\n    std::size_t PivotLimitFactor = 8\n>\n\
-    struct BoundedMinCostFlow {\n    static_assert(std::numeric_limits<Cap>::is_integer);\n\
-    \    static_assert(std::numeric_limits<Cap>::is_signed);\n    static_assert(std::numeric_limits<Cost>::is_specialized);\n\
-    \    static_assert(std::numeric_limits<Cost>::is_signed);\n\n    struct Edge {\n\
-    \        int from;\n        int to;\n        Cap lower;\n        Cap upper;\n\
-    \        Cost cost;\n    };\n\n    struct ResultEdge {\n        int from;\n  \
-    \      int to;\n        Cap lower;\n        Cap upper;\n        Cap flow;\n  \
-    \      Cost cost;\n    };\n\n    struct Result {\n        std::vector<ResultEdge>\
-    \ edges;\n        std::vector<Cap> balance;\n        std::vector<Cost> potential;\n\
-    \        TotalCost cost;\n\n        ResultEdge get_edge(int i) const {\n     \
-    \       assert(0 <= i && i < int(edges.size()));\n            return edges[i];\n\
-    \        }\n\n        Cap flow(int i) const {\n            assert(0 <= i && i\
-    \ < int(edges.size()));\n            return edges[i].flow;\n        }\n    };\n\
-    \n   private:\n    struct NetworkEdge {\n        int to;\n        Cap cap;\n \
-    \       Cost cost;\n    };\n\n    struct NetworkSimplexSolver {\n        enum\
-    \ class Status {\n            optimal,\n            infeasible,\n            pivot_limit_reached,\n\
-    \        };\n\n        struct Parent {\n            int vertex;\n            int\
-    \ edge;\n            Cap up;\n            Cap down;\n        };\n\n        int\
-    \ n;\n        std::vector<NetworkEdge> edges;\n        std::vector<Cap> excess;\n\
-    \        std::vector<Cost> potential;\n        std::size_t pivot_count = 0;\n\n\
-    \        NetworkSimplexSolver(int vertex_count, const std::vector<Cap>& balance)\n\
-    \            : n(vertex_count), excess(balance) {}\n\n        void reserve_edges(int\
-    \ edge_count) {\n            edges.reserve(2 * (edge_count + n));\n        }\n\
-    \n        int add_edge(int from, int to, Cap lower, Cap upper, Cost cost) {\n\
-    \            int id = int(edges.size()) / 2;\n            edges.push_back(NetworkEdge{to,\
-    \ upper - lower, cost});\n            edges.push_back(NetworkEdge{from, Cap(0),\
-    \ -cost});\n            excess[from] -= lower;\n            excess[to] += lower;\n\
-    \            return id;\n        }\n\n        Status solve(std::size_t pivot_limit)\
-    \ {\n            pivot_count = 0;\n            const int original_edge_count =\
-    \ int(edges.size());\n            potential.assign(n + 1, Cost(0));\n\n      \
-    \      Cost artificial_cost = Cost(1);\n            for (int edge = 0; edge <\
-    \ original_edge_count; edge += 2) {\n                artificial_cost += edges[edge].cost\
-    \ < Cost(0)\n                    ? -edges[edge].cost : edges[edge].cost;\n   \
-    \         }\n\n            std::vector<Parent> parent(n);\n            edges.reserve(original_edge_count\
+    \n\n\n\n#line 7 \"graph/flow/bounded_min_cost_flow.hpp\"\n#include <cmath>\n#include\
+    \ <functional>\n#line 11 \"graph/flow/bounded_min_cost_flow.hpp\"\n#include <queue>\n\
+    #include <utility>\n#line 14 \"graph/flow/bounded_min_cost_flow.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace flow {\n\ntemplate <\n    class Cap,\n    class Cost,\n \
+    \   class TotalCost = Cost,\n    std::size_t PivotLimitFactor = 8\n>\nstruct BoundedMinCostFlow\
+    \ {\n    static_assert(std::numeric_limits<Cap>::is_integer);\n    static_assert(std::numeric_limits<Cap>::is_signed);\n\
+    \    static_assert(std::numeric_limits<Cost>::is_specialized);\n    static_assert(std::numeric_limits<Cost>::is_signed);\n\
+    \n    struct Edge {\n        int from;\n        int to;\n        Cap lower;\n\
+    \        Cap upper;\n        Cost cost;\n    };\n\n    struct ResultEdge {\n \
+    \       int from;\n        int to;\n        Cap lower;\n        Cap upper;\n \
+    \       Cap flow;\n        Cost cost;\n    };\n\n    struct Result {\n       \
+    \ std::vector<ResultEdge> edges;\n        std::vector<Cap> balance;\n        std::vector<Cost>\
+    \ potential;\n        TotalCost cost;\n\n        ResultEdge get_edge(int i) const\
+    \ {\n            assert(0 <= i && i < int(edges.size()));\n            return\
+    \ edges[i];\n        }\n\n        Cap flow(int i) const {\n            assert(0\
+    \ <= i && i < int(edges.size()));\n            return edges[i].flow;\n       \
+    \ }\n    };\n\n   private:\n    struct NetworkEdge {\n        int to;\n      \
+    \  Cap cap;\n        Cost cost;\n    };\n\n    struct NetworkSimplexSolver {\n\
+    \        enum class Status {\n            optimal,\n            infeasible,\n\
+    \            pivot_limit_reached,\n        };\n\n        struct Parent {\n   \
+    \         int vertex;\n            int edge;\n            Cap up;\n          \
+    \  Cap down;\n        };\n\n        int n;\n        std::vector<NetworkEdge> edges;\n\
+    \        std::vector<Cap> excess;\n        std::vector<Cost> potential;\n    \
+    \    std::size_t pivot_count = 0;\n\n        NetworkSimplexSolver(int vertex_count,\
+    \ const std::vector<Cap>& balance)\n            : n(vertex_count), excess(balance)\
+    \ {}\n\n        void reserve_edges(int edge_count) {\n            edges.reserve(2\
+    \ * (edge_count + n));\n        }\n\n        int add_edge(int from, int to, Cap\
+    \ lower, Cap upper, Cost cost) {\n            int id = int(edges.size()) / 2;\n\
+    \            edges.push_back(NetworkEdge{to, upper - lower, cost});\n        \
+    \    edges.push_back(NetworkEdge{from, Cap(0), -cost});\n            excess[from]\
+    \ -= lower;\n            excess[to] += lower;\n            return id;\n      \
+    \  }\n\n        Status solve(std::size_t pivot_limit) {\n            pivot_count\
+    \ = 0;\n            const int original_edge_count = int(edges.size());\n     \
+    \       potential.assign(n + 1, Cost(0));\n\n            Cost artificial_cost\
+    \ = Cost(1);\n            for (int edge = 0; edge < original_edge_count; edge\
+    \ += 2) {\n                artificial_cost += edges[edge].cost < Cost(0)\n   \
+    \                 ? -edges[edge].cost : edges[edge].cost;\n            }\n\n \
+    \           std::vector<Parent> parent(n);\n            edges.reserve(original_edge_count\
     \ + 2 * n);\n            for (int vertex = 0; vertex < n; vertex++) {\n      \
     \          if (excess[vertex] >= Cap(0)) {\n                    edges.push_back(NetworkEdge{n,\
     \ Cap(0), artificial_cost});\n                    edges.push_back(NetworkEdge{vertex,\
@@ -761,7 +792,7 @@ data:
   path: graph/flow/flow.hpp
   requiredBy:
   - graph/all.hpp
-  timestamp: '2026-07-15 13:35:29+09:00'
+  timestamp: '2026-07-15 21:34:05+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
@@ -775,11 +806,12 @@ title: Flow
 
 ## Overview
 
-`graph/flow/flow.hpp` includes flow-network algorithms. Flow networks are directed:
-an edge `u -> v` only sends flow from `u` to `v`.
+`graph/flow/flow.hpp` includes flow-network algorithms. Flow networks are
+directed: an edge `u -> v` only sends flow from `u` to `v`.
 
-For an undirected capacity between `u` and `v`, add two directed edges,
-`u -> v` and `v -> u`.
+For an undirected capacity between `u` and `v`, `MaxFlow` provides
+`add_undirected_edge(u, v, cap)`, which stores one shared-capacity residual
+pair. Other directed-flow classes represent it with two directed edges.
 
 ## Included Headers
 
@@ -788,7 +820,7 @@ For an undirected capacity between `u` and `v`, add two directed edges,
 | `graph/flow/bounded_flow.hpp` | Directed flow network | Feasible flow with lower/upper bounds, balances, and negative flow intervals. |
 | `graph/flow/bounded_min_cost_flow.hpp` | Directed flow network | Minimum-cost feasible flow with lower/upper bounds, balances, and negative flow intervals. |
 | `graph/flow/gomory_hu.hpp` | Undirected capacitated graph | Gomory-Hu cut tree and pairwise minimum-cut queries. |
-| `graph/flow/max_flow.hpp` | Directed flow network | Dinic maximum flow and minimum cut. |
+| `graph/flow/max_flow.hpp` | Directed or shared-capacity undirected network | Optimized Dinic maximum flow and minimum cut. |
 | `graph/flow/min_cost_flow.hpp` | Directed flow network | Minimum-cost flow with potentials. |
 
 ## Complexity
