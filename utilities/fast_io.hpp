@@ -12,6 +12,7 @@
 #include <string>
 #include <type_traits>
 #include <utility>
+#include <unistd.h>
 
 namespace m1une {
 namespace utilities {
@@ -133,6 +134,51 @@ struct FastInput {
     char _buffer[buffer_size];
     int _position;
     int _length;
+    bool _terminal;
+
+    bool refill() {
+        _position = 0;
+        if (_terminal) {
+            if (std::fgets(_buffer, buffer_size, _stream) == nullptr) {
+                _length = 0;
+                return false;
+            }
+            _length = int(std::strlen(_buffer));
+        } else {
+            _length = int(std::fread(_buffer, 1, buffer_size, _stream));
+        }
+        return _length != 0;
+    }
+
+    template <class T>
+    bool read_integer_from_terminal(T& value) {
+        if (!skip_spaces()) return false;
+        int c = read_char_raw();
+
+        bool negative = false;
+        if (c == '-') {
+            negative = true;
+            c = read_char_raw();
+        }
+
+        if constexpr (internal::is_signed_v<T>) {
+            T result = 0;
+            while ('0' <= c && c <= '9') {
+                result = negative ? result * 10 - (c - '0')
+                                  : result * 10 + (c - '0');
+                c = read_char_raw();
+            }
+            value = result;
+        } else {
+            T result = 0;
+            while ('0' <= c && c <= '9') {
+                result = result * 10 + T(c - '0');
+                c = read_char_raw();
+            }
+            value = negative ? T(0) - result : result;
+        }
+        return true;
+    }
 
     bool prepare_number() {
         if (_length - _position >= 64) return true;
@@ -147,17 +193,16 @@ struct FastInput {
 
    public:
     explicit FastInput(std::FILE* stream = stdin)
-        : _stream(stream), _position(0), _length(0) {}
+        : _stream(stream),
+          _position(0),
+          _length(0),
+          _terminal(::isatty(::fileno(stream)) != 0) {}
 
     FastInput(const FastInput&) = delete;
     FastInput& operator=(const FastInput&) = delete;
 
     int read_char_raw() {
-        if (_position == _length) {
-            _length = int(std::fread(_buffer, 1, buffer_size, _stream));
-            _position = 0;
-            if (_length == 0) return EOF;
-        }
+        if (_position == _length && !refill()) return EOF;
         return _buffer[_position++];
     }
 
@@ -201,6 +246,7 @@ struct FastInput {
         bool
     >
     read(T& value) {
+        if (_terminal) return read_integer_from_terminal(value);
         if (!prepare_number()) return false;
         int c = static_cast<unsigned char>(_buffer[_position++]);
         while (c <= ' ') c = static_cast<unsigned char>(_buffer[_position++]);

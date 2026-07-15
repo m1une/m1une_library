@@ -8,7 +8,9 @@ documentation_of: ../../utilities/fast_io.hpp
 `FastInput` and `FastOutput` are buffered replacements for `std::cin` and
 `std::cout`. They provide familiar, chainable `operator>>` and `operator<<`
 syntax while using `std::FILE*` internally. By default they read from `stdin`
-and write to `stdout`.
+and write to `stdout`. Terminal input is read one line at a time, so entered
+values become available as soon as Enter is pressed; redirected input keeps the
+larger high-throughput buffer.
 
 ```cpp
 FastInput input;
