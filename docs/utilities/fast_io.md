@@ -67,13 +67,21 @@ Elements are processed in iteration order. Nested ranges are processed
 recursively, so the matrix above is read in row-major order. Empty ranges read
 nothing. `std::vector<bool>` is supported.
 
-For output, elements of a one-dimensional range are separated by spaces. When
-the elements are themselves ranges, they are separated by newlines:
+For output, elements of a one-dimensional range are separated by spaces by
+default. Change that separator when a different layout is useful:
 
 ```cpp
-output << a << '\n';
+output << a << '\n';                    // 1 2 3
+output.set_range_separator('\n');
+output << a << '\n';                    // One element per line
+output.set_range_separator(' ');        // Restore the default
 output << matrix << '\n';
 ```
+
+When elements are themselves ranges, they are always separated by newlines.
+The configured separator is used recursively between scalar elements. It also
+separates pairs stored in a range, while the two members of each pair remain
+space-separated; this makes newline mode convenient for edge lists.
 
 For `a = {1, 2, 3}` and a two-row matrix, the result is:
 
@@ -85,7 +93,7 @@ For `a = {1, 2, 3}` and a two-row matrix, the result is:
 
 No trailing separator is written by the range itself. Add `<< '\n'` when a
 final newline is wanted. Higher-dimensional ranges use a newline at every
-nested-range boundary and a space between scalar values.
+nested-range boundary and the configured separator between scalar values.
 
 ## Interface
 
@@ -117,6 +125,7 @@ detected.
 | `void set_precision(int precision)` | Changes the number of significant or fractional digits used for floating-point output. | $O(1)$ |
 | `void set_fixed(int precision = 6)` | Selects fixed-point output with `precision` fractional digits. | $O(1)$ |
 | `void set_general(int precision = 6)` | Selects general floating-point output with `precision` significant digits. | $O(1)$ |
+| `void set_range_separator(char separator)` | Changes the separator between non-range elements of ranges. | $O(1)$ |
 | `void flush()` | Writes all buffered bytes to the underlying stream. | Linear in buffered output |
 
 Pending output is flushed by the destructor. Standard iostream manipulators

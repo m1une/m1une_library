@@ -121,16 +121,21 @@ void test_stream_operators_ranges_and_pairs() {
         output << item << '\n';
         output << pairs << '\n';
         output << grouped << '\n';
+        output.set_range_separator('\n');
+        output << pairs << '\n';
+        output.set_range_separator(' ');
+        output << grouped.first << '\n';
         output.flush();
     }
 
     std::rewind(output_file);
-    char buffer[64];
+    char buffer[128];
     std::size_t length = std::fread(buffer, 1, sizeof(buffer), output_file);
     std::string result(buffer, buffer + length);
     assert(
         result
         == "matrix\n1 2 3\n4 5 6\nlabel 7\n8 9 10 11\n12 13 14\n"
+           "8 9\n10 11\n12 13\n"
     );
     std::fclose(output_file);
 }

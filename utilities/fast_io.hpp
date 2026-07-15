@@ -426,13 +426,15 @@ struct FastOutput {
     int _position;
     int _precision;
     std::chars_format _float_format;
+    char _range_separator;
 
    public:
     explicit FastOutput(std::FILE* stream = stdout)
         : _stream(stream),
           _position(0),
           _precision(6),
-          _float_format(std::chars_format::general) {}
+          _float_format(std::chars_format::general),
+          _range_separator(' ') {}
 
     FastOutput(const FastOutput&) = delete;
     FastOutput& operator=(const FastOutput&) = delete;
@@ -560,7 +562,7 @@ struct FastOutput {
 
         bool first = true;
         for (const auto& value : range) {
-            if (!first) write_char(nested ? '\n' : ' ');
+            if (!first) write_char(nested ? '\n' : _range_separator);
             first = false;
             if constexpr (std::is_same_v<StoredValue, bool> && !nested) {
                 write(static_cast<bool>(value));
@@ -592,6 +594,10 @@ struct FastOutput {
     void set_general(int precision = 6) {
         _float_format = std::chars_format::general;
         _precision = precision;
+    }
+
+    void set_range_separator(char separator) {
+        _range_separator = separator;
     }
 
     template <class... Args>
