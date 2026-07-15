@@ -930,6 +930,34 @@ capacity or balance, with a minimum value of two. Without fallback, the actual
 time is $O(N + M + P(N + M))$. Thus the default hybrid keeps the simplex fast
 path while having the polynomial worst-case bounds shown above.
 
+Average-case complexity depends on the input distribution. Let $\bar P$ be the
+expected number of simplex pivots and let $q$ be the probability that the pivot
+limit is reached. The expected time is
+
+$$
+O\left(
+N + M + \bar P(N + M)
++ q\left(M \log U (M + N \log N) + NM\right)
+\right).
+$$
+
+For typical contest inputs the fallback is rare, so the practical average is
+$O(N + M + \bar P(N + M))$.
+
+As empirical intuition, with the current candidate-list rule on the 54 official
+Library Checker `min_cost_b_flow` cases, the pivot count had median `16.5`, mean
+`627`, and maximum `2104`. On the ten 1000-edge `large_random` cases the mean
+was `1924` pivots, while the ten 1000-edge `goto` cases averaged `968`. Thus a
+useful practical estimate on the larger cases is $\bar P \approx M$ to $2M$,
+giving the coarse average bound $O(M(N + M))$. For comparison, the default
+budget is `8808` pivots when `N = 100` and `M = 1000`.
+
+The observed running time is usually better than that coarse bound suggests:
+candidate lists avoid a full edge scan before every pivot, and a pivot normally
+touches only a short tree path and a small rerooted subtree. The theoretical
+$O(N + M)$ work per pivot is therefore rarely fully realized. These figures are
+measurements, not a distribution-independent guarantee on $\bar P$.
+
 ## Alias
 
 | Alias | Type |
