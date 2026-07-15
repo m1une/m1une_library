@@ -1682,6 +1682,9 @@ data:
       path: verify/graph/flow/max_flow.test.cpp
       title: verify/graph/flow/max_flow.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/graph/flow/max_flow_push_relabel.test.cpp
+      title: verify/graph/flow/max_flow_push_relabel.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/graph/flow/min_cost_b_flow.test.cpp
       title: verify/graph/flow/min_cost_b_flow.test.cpp
   - name: verify/graph/tree

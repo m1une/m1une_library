@@ -44,18 +44,86 @@ data:
     \    struct InternalEdge {\n        int to;\n        int rev;\n        Cap cap;\n\
     \    };\n\n    struct Position {\n        int from;\n        int edge;\n    };\n\
     \n    int _n;\n    std::vector<Position> _pos;\n    std::vector<std::vector<InternalEdge>>\
-    \ _g;\n\n   public:\n    MaxFlow() : MaxFlow(0) {}\n\n    explicit MaxFlow(int\
-    \ n) : _n(n), _g(n) {\n        assert(0 <= n);\n    }\n\n    int size() const\
-    \ {\n        return _n;\n    }\n\n    int edge_count() const {\n        return\
-    \ int(_pos.size());\n    }\n\n    void reserve_edges(int edge_count) {\n     \
-    \   assert(0 <= edge_count);\n        _pos.reserve(edge_count);\n        if (_n\
-    \ == 0 || edge_count == 0 ||\n            2 * std::size_t(edge_count) < std::size_t(_n))\
-    \ {\n            return;\n        }\n        const std::size_t average_degree\
-    \ =\n            (2 * std::size_t(edge_count) + std::size_t(_n) - 1)\n       \
-    \     / std::size_t(_n);\n        for (auto& edges : _g) edges.reserve(average_degree);\n\
-    \    }\n\n    int add_edge(int from, int to, Cap cap) {\n        assert(0 <= from\
-    \ && from < _n);\n        assert(0 <= to && to < _n);\n        assert(Cap(0) <=\
-    \ cap);\n        int id = int(_pos.size());\n        int from_id = int(_g[from].size());\n\
+    \ _g;\n\n    Cap push_relabel(int s, int t) {\n        const int dead = 2 * _n;\n\
+    \        const int unreachable = _n + 1;\n        std::vector<Cap> excess(_n,\
+    \ Cap(0));\n        std::vector<int> state(8 * std::size_t(_n) + 2);\n       \
+    \ int* height = state.data();\n        int* height_count = height + _n;\n    \
+    \    int* current = height_count + dead + 1;\n        int* queue = current + _n;\n\
+    \        int* next = queue + _n;\n        int* bucket_head = next + _n;\n    \
+    \    std::vector<char> active(_n, false);\n        int highest = -1;\n       \
+    \ long long work = 0;\n        long long arc_count = 0;\n        for (const auto&\
+    \ edges : _g) arc_count += int(edges.size());\n        const long long work_limit\
+    \ = std::max(1LL, 4 * arc_count + _n);\n\n        auto activate = [&](int v) {\n\
+    \            if (v == s || v == t || active[v] || excess[v] == Cap(0) ||\n   \
+    \             height[v] >= dead) {\n                return;\n            }\n \
+    \           active[v] = true;\n            next[v] = bucket_head[height[v]];\n\
+    \            bucket_head[height[v]] = v;\n            highest = std::max(highest,\
+    \ height[v]);\n        };\n\n        auto rebuild_buckets = [&]() {\n        \
+    \    std::fill(bucket_head, bucket_head + dead + 1, -1);\n            std::fill(active.begin(),\
+    \ active.end(), false);\n            highest = -1;\n            for (int v = 0;\
+    \ v < _n; v++) activate(v);\n        };\n\n        auto global_relabel = [&]()\
+    \ {\n            std::fill(height, height + _n, unreachable);\n            std::fill(height_count,\
+    \ height_count + dead + 1, 0);\n            std::fill(current, current + _n, 0);\n\
+    \            int head = 0;\n            int tail = 0;\n            height[t] =\
+    \ 0;\n            height[s] = _n;\n            queue[tail++] = t;\n          \
+    \  while (head != tail) {\n                int v = queue[head++];\n          \
+    \      for (const auto& e : _g[v]) {\n                    if (e.to == s || height[e.to]\
+    \ != unreachable) continue;\n                    const auto& reverse = _g[e.to][e.rev];\n\
+    \                    if (reverse.cap == Cap(0)) continue;\n                  \
+    \  height[e.to] = height[v] + 1;\n                    queue[tail++] = e.to;\n\
+    \                }\n            }\n            for (int v = 0; v < _n; v++) height_count[height[v]]++;\n\
+    \            rebuild_buckets();\n            work = 0;\n        };\n\n       \
+    \ auto gap = [&](int empty_height) {\n            for (int v = 0; v < _n; v++)\
+    \ {\n                if (v == s || v == t || height[v] <= empty_height ||\n  \
+    \                  height[v] >= _n) {\n                    continue;\n       \
+    \         }\n                height_count[height[v]]--;\n                height[v]\
+    \ = unreachable;\n                height_count[height[v]]++;\n               \
+    \ current[v] = 0;\n            }\n            rebuild_buckets();\n        };\n\
+    \n        auto relabel = [&](int v) -> bool {\n            int old_height = height[v];\n\
+    \            int new_height = dead;\n            work += int(_g[v].size());\n\
+    \            for (const auto& e : _g[v]) {\n                if (e.cap != Cap(0))\
+    \ {\n                    new_height = std::min(new_height, height[e.to] + 1);\n\
+    \                }\n            }\n            height_count[old_height]--;\n \
+    \           height[v] = std::min(new_height, dead);\n            height_count[height[v]]++;\n\
+    \            current[v] = 0;\n            if (old_height < _n && height_count[old_height]\
+    \ == 0) {\n                gap(old_height);\n                return true;\n  \
+    \          }\n            return false;\n        };\n\n        auto push = [&](int\
+    \ v, InternalEdge& e) {\n            Cap sent = std::min(excess[v], e.cap);\n\
+    \            bool was_zero = excess[e.to] == Cap(0);\n            e.cap -= sent;\n\
+    \            _g[e.to][e.rev].cap += sent;\n            excess[v] -= sent;\n  \
+    \          excess[e.to] += sent;\n            if (was_zero) activate(e.to);\n\
+    \        };\n\n        auto discharge = [&](int v) {\n            while (excess[v]\
+    \ != Cap(0) && height[v] < dead) {\n                if (current[v] == int(_g[v].size()))\
+    \ {\n                    if (relabel(v)) return;\n                    continue;\n\
+    \                }\n                auto& e = _g[v][current[v]];\n           \
+    \     work++;\n                if (e.cap != Cap(0) && height[v] == height[e.to]\
+    \ + 1) {\n                    push(v, e);\n                } else {\n        \
+    \            current[v]++;\n                }\n            }\n            activate(v);\n\
+    \        };\n\n        for (auto& e : _g[s]) {\n            if (e.to == s || e.cap\
+    \ == Cap(0)) continue;\n            Cap sent = e.cap;\n            e.cap = Cap(0);\n\
+    \            _g[e.to][e.rev].cap += sent;\n            excess[e.to] += sent;\n\
+    \        }\n        global_relabel();\n\n        while (highest >= 0) {\n    \
+    \        if (bucket_head[highest] == -1) {\n                highest--;\n     \
+    \           continue;\n            }\n            int v = bucket_head[highest];\n\
+    \            bucket_head[highest] = next[v];\n            if (!active[v] || height[v]\
+    \ != highest) continue;\n            active[v] = false;\n            discharge(v);\n\
+    \            if (work >= work_limit) global_relabel();\n        }\n        return\
+    \ excess[t];\n    }\n\n   public:\n    MaxFlow() : MaxFlow(0) {}\n\n    explicit\
+    \ MaxFlow(int n) : _n(n), _g(n) {\n        assert(0 <= n);\n    }\n\n    int size()\
+    \ const {\n        return _n;\n    }\n\n    int edge_count() const {\n       \
+    \ return int(_pos.size());\n    }\n\n    void reserve_edges(int edge_count) {\n\
+    \        assert(0 <= edge_count);\n        _pos.reserve(edge_count);\n       \
+    \ if (_n == 0 || edge_count == 0 ||\n            2 * std::size_t(edge_count) <\
+    \ std::size_t(_n)) {\n            return;\n        }\n        const std::size_t\
+    \ average_degree =\n            (3 * std::size_t(edge_count) + std::size_t(_n)\
+    \ - 1)\n            / std::size_t(_n);\n        for (auto& edges : _g) edges.reserve(average_degree);\n\
+    \    }\n\n    void reserve_edges(int edge_count, const std::vector<int>& degrees)\
+    \ {\n        assert(0 <= edge_count);\n        assert(int(degrees.size()) == _n);\n\
+    \        _pos.reserve(edge_count);\n        for (int v = 0; v < _n; v++) {\n \
+    \           assert(0 <= degrees[v]);\n            _g[v].reserve(degrees[v]);\n\
+    \        }\n    }\n\n    int add_edge(int from, int to, Cap cap) {\n        assert(0\
+    \ <= from && from < _n);\n        assert(0 <= to && to < _n);\n        assert(Cap(0)\
+    \ <= cap);\n        int id = int(_pos.size());\n        int from_id = int(_g[from].size());\n\
     \        int to_id = int(_g[to].size());\n        if (from == to) to_id++;\n \
     \       _pos.push_back(Position{from, from_id});\n        _g[from].push_back(InternalEdge{to,\
     \ to_id, cap});\n        _g[to].push_back(InternalEdge{from, from_id, Cap(0)});\n\
@@ -90,41 +158,45 @@ data:
     \ <= new_flow && new_flow <= new_cap);\n            e.cap = new_cap - new_flow;\n\
     \            re.cap = new_flow;\n        }\n    }\n\n    Cap max_flow(int s, int\
     \ t) {\n        return max_flow(s, t, std::numeric_limits<Cap>::max());\n    }\n\
-    \n    Cap max_flow(int s, int t, Cap flow_limit) {\n        assert(0 <= s && s\
-    \ < _n);\n        assert(0 <= t && t < _n);\n        assert(s != t);\n\n     \
-    \   std::vector<int> work(3 * std::size_t(_n));\n        int* level = work.data();\n\
-    \        int* iter = level + _n;\n        int* queue = iter + _n;\n        auto\
-    \ bfs = [&]() -> bool {\n            std::fill(level, level + _n, -1);\n     \
-    \       int head = 0;\n            int tail = 0;\n            level[s] = 0;\n\
-    \            queue[tail++] = s;\n            while (head != tail) {\n        \
-    \        int v = queue[head++];\n                for (const auto& e : _g[v]) {\n\
-    \                    if (e.cap == Cap(0) || level[e.to] != -1) continue;\n   \
-    \                 level[e.to] = level[v] + 1;\n                    if (e.to ==\
-    \ t) return true;\n                    queue[tail++] = e.to;\n               \
-    \ }\n            }\n            return level[t] != -1;\n        };\n\n       \
-    \ auto dfs = [&](auto&& self, int v, Cap up) -> Cap {\n            if (v == s)\
-    \ return up;\n            Cap result = Cap(0);\n            const int current_level\
-    \ = level[v];\n            for (int& i = iter[v]; i < int(_g[v].size()); i++)\
-    \ {\n                auto& e = _g[v][i];\n                if (current_level <=\
-    \ level[e.to]) continue;\n                auto& reverse = _g[e.to][e.rev];\n \
-    \               if (reverse.cap == Cap(0)) continue;\n                Cap d =\
-    \ self(\n                    self,\n                    e.to,\n              \
-    \      std::min(up - result, reverse.cap)\n                );\n              \
-    \  if (d == Cap(0)) continue;\n                e.cap += d;\n                reverse.cap\
-    \ -= d;\n                result += d;\n                if (result == up) return\
-    \ result;\n            }\n            level[v] = _n;\n            return result;\n\
-    \        };\n\n        Cap flow = 0;\n        while (flow < flow_limit && bfs())\
-    \ {\n            std::fill(iter, iter + _n, 0);\n            flow += dfs(dfs,\
-    \ t, flow_limit - flow);\n        }\n        return flow;\n    }\n\n    std::vector<bool>\
-    \ min_cut(int s) const {\n        assert(0 <= s && s < _n);\n        std::vector<bool>\
-    \ visited(_n, false);\n        std::vector<int> queue(_n);\n        int head =\
-    \ 0;\n        int tail = 0;\n        visited[s] = true;\n        queue[tail++]\
-    \ = s;\n        while (head != tail) {\n            int v = queue[head++];\n \
-    \           for (const auto& e : _g[v]) {\n                if (e.cap == Cap(0)\
-    \ || visited[e.to]) continue;\n                visited[e.to] = true;\n       \
-    \         queue[tail++] = e.to;\n            }\n        }\n        return visited;\n\
-    \    }\n};\n\n}  // namespace flow\n}  // namespace m1une\n\n\n#line 9 \"graph/flow/bounded_flow.hpp\"\
-    \n\nnamespace m1une {\nnamespace flow {\n\ntemplate <class Cap>\nstruct BoundedFlow\
+    \n    Cap max_flow_push_relabel(int s, int t) {\n        assert(0 <= s && s <\
+    \ _n);\n        assert(0 <= t && t < _n);\n        assert(s != t);\n        return\
+    \ push_relabel(s, t);\n    }\n\n    Cap max_flow(int s, int t, Cap flow_limit)\
+    \ {\n        assert(0 <= s && s < _n);\n        assert(0 <= t && t < _n);\n  \
+    \      assert(s != t);\n\n        std::vector<int> work(3 * std::size_t(_n));\n\
+    \        int* level = work.data();\n        int* iter = level + _n;\n        int*\
+    \ queue = iter + _n;\n        auto bfs = [&]() -> bool {\n            std::fill(level,\
+    \ level + _n, -1);\n            int head = 0;\n            int tail = 0;\n   \
+    \         level[s] = 0;\n            queue[tail++] = s;\n            while (head\
+    \ != tail) {\n                int v = queue[head++];\n                for (const\
+    \ auto& e : _g[v]) {\n                    if (level[e.to] != -1 || e.cap == Cap(0))\
+    \ continue;\n                    level[e.to] = level[v] + 1;\n               \
+    \     if (e.to == t) return true;\n                    queue[tail++] = e.to;\n\
+    \                }\n            }\n            return level[t] != -1;\n      \
+    \  };\n\n        auto dfs = [&](auto&& self, int v, Cap up) -> Cap {\n       \
+    \     if (v == s) return up;\n            Cap result = Cap(0);\n            const\
+    \ int current_level = level[v];\n            auto& edges = _g[v];\n          \
+    \  const int edge_count = int(edges.size());\n            for (int& i = iter[v];\
+    \ i < edge_count; i++) {\n                auto& e = edges[i];\n              \
+    \  if (level[e.to] + 1 != current_level) continue;\n                auto& reverse\
+    \ = _g[e.to][e.rev];\n                if (reverse.cap == Cap(0)) continue;\n \
+    \               Cap d = self(\n                    self,\n                   \
+    \ e.to,\n                    std::min(up - result, reverse.cap)\n            \
+    \    );\n                if (d == Cap(0)) continue;\n                e.cap +=\
+    \ d;\n                reverse.cap -= d;\n                result += d;\n      \
+    \          if (result == up) return result;\n            }\n            level[v]\
+    \ = _n;\n            return result;\n        };\n\n        Cap flow = 0;\n   \
+    \     while (flow < flow_limit && bfs()) {\n            std::fill(iter, iter +\
+    \ _n, 0);\n            flow += dfs(dfs, t, flow_limit - flow);\n        }\n  \
+    \      return flow;\n    }\n\n    std::vector<bool> min_cut(int s) const {\n \
+    \       assert(0 <= s && s < _n);\n        std::vector<bool> visited(_n, false);\n\
+    \        std::vector<int> queue(_n);\n        int head = 0;\n        int tail\
+    \ = 0;\n        visited[s] = true;\n        queue[tail++] = s;\n        while\
+    \ (head != tail) {\n            int v = queue[head++];\n            for (const\
+    \ auto& e : _g[v]) {\n                if (e.cap == Cap(0) || visited[e.to]) continue;\n\
+    \                visited[e.to] = true;\n                queue[tail++] = e.to;\n\
+    \            }\n        }\n        return visited;\n    }\n};\n\n}  // namespace\
+    \ flow\n}  // namespace m1une\n\n\n#line 9 \"graph/flow/bounded_flow.hpp\"\n\n\
+    namespace m1une {\nnamespace flow {\n\ntemplate <class Cap>\nstruct BoundedFlow\
     \ {\n    struct Edge {\n        int from;\n        int to;\n        Cap lower;\n\
     \        Cap upper;\n    };\n\n    struct ResultEdge {\n        int from;\n  \
     \      int to;\n        Cap lower;\n        Cap upper;\n        Cap flow;\n  \
@@ -974,25 +1046,29 @@ data:
     \ == 2);\n\n    auto cut = mf.min_cut(0);\n    assert(cut[0]);\n    assert(!cut[3]);\n\
     \n    mf.change_edge(e0, 3, 1);\n    auto changed = mf.get_edge(e0);\n    assert(changed.cap\
     \ == 3);\n    assert(changed.flow == 1);\n\n    m1une::flow::MaxFlow<long long>\
-    \ undirected(2);\n    undirected.reserve_edges(1);\n    int undirected_id = undirected.add_undirected_edge(0,\
-    \ 1, 7);\n    undirected.change_edge(undirected_id, 7, -3);\n    auto initial_undirected\
-    \ = undirected.get_edge(undirected_id);\n    assert(initial_undirected.cap ==\
-    \ 7);\n    assert(initial_undirected.flow == -3);\n    assert(undirected.max_flow(0,\
-    \ 1) == 10);\n    assert(undirected.get_edge(undirected_id).flow == 7);\n\n  \
-    \  m1une::flow::MaxFlow<long long> limited(2);\n    int limited_id = limited.add_edge(0,\
-    \ 1, 10);\n    assert(limited.max_flow(0, 1, 4) == 4);\n    assert(limited.get_edge(limited_id).flow\
-    \ == 4);\n    assert(limited.max_flow(0, 1) == 6);\n    assert(limited.get_edge(limited_id).flow\
-    \ == 10);\n\n    struct InputEdge {\n        int from;\n        int to;\n    \
-    \    long long cap;\n        bool undirected;\n    };\n    std::mt19937 random(19260817);\n\
-    \    for (int iteration = 0; iteration < 500; iteration++) {\n        int n =\
-    \ 2 + int(random() % 6);\n        int m = int(random() % 13);\n        std::vector<InputEdge>\
-    \ input_edges;\n        m1une::flow::MaxFlow<long long> flow(n);\n        flow.reserve_edges(m);\n\
+    \ undirected(2);\n    undirected.reserve_edges(1, std::vector<int>{1, 1});\n \
+    \   int undirected_id = undirected.add_undirected_edge(0, 1, 7);\n    undirected.change_edge(undirected_id,\
+    \ 7, -3);\n    auto initial_undirected = undirected.get_edge(undirected_id);\n\
+    \    assert(initial_undirected.cap == 7);\n    assert(initial_undirected.flow\
+    \ == -3);\n    assert(undirected.max_flow(0, 1) == 10);\n    assert(undirected.get_edge(undirected_id).flow\
+    \ == 7);\n\n    m1une::flow::MaxFlow<long long> limited(2);\n    int limited_id\
+    \ = limited.add_edge(0, 1, 10);\n    assert(limited.max_flow(0, 1, 4) == 4);\n\
+    \    assert(limited.get_edge(limited_id).flow == 4);\n    assert(limited.max_flow(0,\
+    \ 1) == 6);\n    assert(limited.get_edge(limited_id).flow == 10);\n\n    struct\
+    \ InputEdge {\n        int from;\n        int to;\n        long long cap;\n  \
+    \      bool undirected;\n    };\n    std::mt19937 random(19260817);\n    for (int\
+    \ iteration = 0; iteration < 500; iteration++) {\n        int n = 2 + int(random()\
+    \ % 6);\n        int m = int(random() % 13);\n        std::vector<InputEdge> input_edges;\n\
+    \        m1une::flow::MaxFlow<long long> flow(n);\n        m1une::flow::MaxFlow<long\
+    \ long> push_relabel_flow(n);\n        flow.reserve_edges(m);\n        push_relabel_flow.reserve_edges(m);\n\
     \        for (int edge = 0; edge < m; edge++) {\n            InputEdge input{\n\
     \                int(random() % n),\n                int(random() % n),\n    \
     \            1 + static_cast<long long>(random() % 10),\n                bool(random()\
     \ & 1)\n            };\n            input_edges.push_back(input);\n          \
     \  if (input.undirected) {\n                flow.add_undirected_edge(input.from,\
+    \ input.to, input.cap);\n                push_relabel_flow.add_undirected_edge(input.from,\
     \ input.to, input.cap);\n            } else {\n                flow.add_edge(input.from,\
+    \ input.to, input.cap);\n                push_relabel_flow.add_edge(input.from,\
     \ input.to, input.cap);\n            }\n        }\n\n        long long expected\
     \ = std::numeric_limits<long long>::max();\n        for (int mask = 0; mask <\
     \ (1 << n); mask++) {\n            if ((mask & 1) == 0 || (mask >> (n - 1) & 1)\
@@ -1003,16 +1079,23 @@ data:
     \ && !from_side && to_side) {\n                    capacity += edge.cap;\n   \
     \             }\n            }\n            expected = std::min(expected, capacity);\n\
     \        }\n\n        long long result = flow.max_flow(0, n - 1);\n        assert(result\
-    \ == expected);\n        std::vector<long long> net_flow(n, 0);\n        for (int\
-    \ edge = 0; edge < m; edge++) {\n            auto result_edge = flow.get_edge(edge);\n\
-    \            assert(result_edge.cap == input_edges[edge].cap);\n            if\
-    \ (input_edges[edge].undirected) {\n                assert(-result_edge.cap <=\
-    \ result_edge.flow);\n            } else {\n                assert(0 <= result_edge.flow);\n\
-    \            }\n            assert(result_edge.flow <= result_edge.cap);\n   \
-    \         net_flow[result_edge.from] += result_edge.flow;\n            net_flow[result_edge.to]\
-    \ -= result_edge.flow;\n        }\n        assert(net_flow[0] == result);\n  \
-    \      assert(net_flow[n - 1] == -result);\n        for (int vertex = 1; vertex\
-    \ + 1 < n; vertex++) {\n            assert(net_flow[vertex] == 0);\n        }\n\
+    \ == expected);\n        long long push_relabel_result =\n            push_relabel_flow.max_flow_push_relabel(0,\
+    \ n - 1);\n        assert(push_relabel_result == expected);\n\n        auto validate\
+    \ = [&](const auto& solved_flow, long long solved_value) {\n            std::vector<long\
+    \ long> net_flow(n, 0);\n            for (int edge = 0; edge < m; edge++) {\n\
+    \                auto result_edge = solved_flow.get_edge(edge);\n            \
+    \    assert(result_edge.cap == input_edges[edge].cap);\n                if (input_edges[edge].undirected)\
+    \ {\n                    assert(-result_edge.cap <= result_edge.flow);\n     \
+    \           } else {\n                    assert(0 <= result_edge.flow);\n   \
+    \             }\n                assert(result_edge.flow <= result_edge.cap);\n\
+    \                net_flow[result_edge.from] += result_edge.flow;\n           \
+    \     net_flow[result_edge.to] -= result_edge.flow;\n            }\n         \
+    \   assert(net_flow[0] == solved_value);\n            assert(net_flow[n - 1] ==\
+    \ -solved_value);\n            for (int vertex = 1; vertex + 1 < n; vertex++)\
+    \ {\n                assert(net_flow[vertex] == 0);\n            }\n        };\n\
+    \        validate(flow, result);\n        validate(push_relabel_flow, push_relabel_result);\n\
+    \        assert(flow.max_flow_push_relabel(0, n - 1) == 0);\n        assert(push_relabel_flow.max_flow_push_relabel(0,\
+    \ n - 1) == 0);\n        assert(push_relabel_flow.max_flow(0, n - 1) == 0);\n\
     \    }\n}\n\nvoid test_gomory_hu() {\n    m1une::flow::GomoryHu<long long> gh(4);\n\
     \    gh.add_edge(0, 1, 3);\n    gh.add_edge(1, 2, 2);\n    gh.add_edge(0, 2, 1);\n\
     \    gh.add_edge(2, 3, 4);\n    gh.build();\n    assert(gh.size() == 4);\n   \
@@ -1183,25 +1266,29 @@ data:
     \ == 2);\n\n    auto cut = mf.min_cut(0);\n    assert(cut[0]);\n    assert(!cut[3]);\n\
     \n    mf.change_edge(e0, 3, 1);\n    auto changed = mf.get_edge(e0);\n    assert(changed.cap\
     \ == 3);\n    assert(changed.flow == 1);\n\n    m1une::flow::MaxFlow<long long>\
-    \ undirected(2);\n    undirected.reserve_edges(1);\n    int undirected_id = undirected.add_undirected_edge(0,\
-    \ 1, 7);\n    undirected.change_edge(undirected_id, 7, -3);\n    auto initial_undirected\
-    \ = undirected.get_edge(undirected_id);\n    assert(initial_undirected.cap ==\
-    \ 7);\n    assert(initial_undirected.flow == -3);\n    assert(undirected.max_flow(0,\
-    \ 1) == 10);\n    assert(undirected.get_edge(undirected_id).flow == 7);\n\n  \
-    \  m1une::flow::MaxFlow<long long> limited(2);\n    int limited_id = limited.add_edge(0,\
-    \ 1, 10);\n    assert(limited.max_flow(0, 1, 4) == 4);\n    assert(limited.get_edge(limited_id).flow\
-    \ == 4);\n    assert(limited.max_flow(0, 1) == 6);\n    assert(limited.get_edge(limited_id).flow\
-    \ == 10);\n\n    struct InputEdge {\n        int from;\n        int to;\n    \
-    \    long long cap;\n        bool undirected;\n    };\n    std::mt19937 random(19260817);\n\
-    \    for (int iteration = 0; iteration < 500; iteration++) {\n        int n =\
-    \ 2 + int(random() % 6);\n        int m = int(random() % 13);\n        std::vector<InputEdge>\
-    \ input_edges;\n        m1une::flow::MaxFlow<long long> flow(n);\n        flow.reserve_edges(m);\n\
+    \ undirected(2);\n    undirected.reserve_edges(1, std::vector<int>{1, 1});\n \
+    \   int undirected_id = undirected.add_undirected_edge(0, 1, 7);\n    undirected.change_edge(undirected_id,\
+    \ 7, -3);\n    auto initial_undirected = undirected.get_edge(undirected_id);\n\
+    \    assert(initial_undirected.cap == 7);\n    assert(initial_undirected.flow\
+    \ == -3);\n    assert(undirected.max_flow(0, 1) == 10);\n    assert(undirected.get_edge(undirected_id).flow\
+    \ == 7);\n\n    m1une::flow::MaxFlow<long long> limited(2);\n    int limited_id\
+    \ = limited.add_edge(0, 1, 10);\n    assert(limited.max_flow(0, 1, 4) == 4);\n\
+    \    assert(limited.get_edge(limited_id).flow == 4);\n    assert(limited.max_flow(0,\
+    \ 1) == 6);\n    assert(limited.get_edge(limited_id).flow == 10);\n\n    struct\
+    \ InputEdge {\n        int from;\n        int to;\n        long long cap;\n  \
+    \      bool undirected;\n    };\n    std::mt19937 random(19260817);\n    for (int\
+    \ iteration = 0; iteration < 500; iteration++) {\n        int n = 2 + int(random()\
+    \ % 6);\n        int m = int(random() % 13);\n        std::vector<InputEdge> input_edges;\n\
+    \        m1une::flow::MaxFlow<long long> flow(n);\n        m1une::flow::MaxFlow<long\
+    \ long> push_relabel_flow(n);\n        flow.reserve_edges(m);\n        push_relabel_flow.reserve_edges(m);\n\
     \        for (int edge = 0; edge < m; edge++) {\n            InputEdge input{\n\
     \                int(random() % n),\n                int(random() % n),\n    \
     \            1 + static_cast<long long>(random() % 10),\n                bool(random()\
     \ & 1)\n            };\n            input_edges.push_back(input);\n          \
     \  if (input.undirected) {\n                flow.add_undirected_edge(input.from,\
+    \ input.to, input.cap);\n                push_relabel_flow.add_undirected_edge(input.from,\
     \ input.to, input.cap);\n            } else {\n                flow.add_edge(input.from,\
+    \ input.to, input.cap);\n                push_relabel_flow.add_edge(input.from,\
     \ input.to, input.cap);\n            }\n        }\n\n        long long expected\
     \ = std::numeric_limits<long long>::max();\n        for (int mask = 0; mask <\
     \ (1 << n); mask++) {\n            if ((mask & 1) == 0 || (mask >> (n - 1) & 1)\
@@ -1212,16 +1299,23 @@ data:
     \ && !from_side && to_side) {\n                    capacity += edge.cap;\n   \
     \             }\n            }\n            expected = std::min(expected, capacity);\n\
     \        }\n\n        long long result = flow.max_flow(0, n - 1);\n        assert(result\
-    \ == expected);\n        std::vector<long long> net_flow(n, 0);\n        for (int\
-    \ edge = 0; edge < m; edge++) {\n            auto result_edge = flow.get_edge(edge);\n\
-    \            assert(result_edge.cap == input_edges[edge].cap);\n            if\
-    \ (input_edges[edge].undirected) {\n                assert(-result_edge.cap <=\
-    \ result_edge.flow);\n            } else {\n                assert(0 <= result_edge.flow);\n\
-    \            }\n            assert(result_edge.flow <= result_edge.cap);\n   \
-    \         net_flow[result_edge.from] += result_edge.flow;\n            net_flow[result_edge.to]\
-    \ -= result_edge.flow;\n        }\n        assert(net_flow[0] == result);\n  \
-    \      assert(net_flow[n - 1] == -result);\n        for (int vertex = 1; vertex\
-    \ + 1 < n; vertex++) {\n            assert(net_flow[vertex] == 0);\n        }\n\
+    \ == expected);\n        long long push_relabel_result =\n            push_relabel_flow.max_flow_push_relabel(0,\
+    \ n - 1);\n        assert(push_relabel_result == expected);\n\n        auto validate\
+    \ = [&](const auto& solved_flow, long long solved_value) {\n            std::vector<long\
+    \ long> net_flow(n, 0);\n            for (int edge = 0; edge < m; edge++) {\n\
+    \                auto result_edge = solved_flow.get_edge(edge);\n            \
+    \    assert(result_edge.cap == input_edges[edge].cap);\n                if (input_edges[edge].undirected)\
+    \ {\n                    assert(-result_edge.cap <= result_edge.flow);\n     \
+    \           } else {\n                    assert(0 <= result_edge.flow);\n   \
+    \             }\n                assert(result_edge.flow <= result_edge.cap);\n\
+    \                net_flow[result_edge.from] += result_edge.flow;\n           \
+    \     net_flow[result_edge.to] -= result_edge.flow;\n            }\n         \
+    \   assert(net_flow[0] == solved_value);\n            assert(net_flow[n - 1] ==\
+    \ -solved_value);\n            for (int vertex = 1; vertex + 1 < n; vertex++)\
+    \ {\n                assert(net_flow[vertex] == 0);\n            }\n        };\n\
+    \        validate(flow, result);\n        validate(push_relabel_flow, push_relabel_result);\n\
+    \        assert(flow.max_flow_push_relabel(0, n - 1) == 0);\n        assert(push_relabel_flow.max_flow_push_relabel(0,\
+    \ n - 1) == 0);\n        assert(push_relabel_flow.max_flow(0, n - 1) == 0);\n\
     \    }\n}\n\nvoid test_gomory_hu() {\n    m1une::flow::GomoryHu<long long> gh(4);\n\
     \    gh.add_edge(0, 1, 3);\n    gh.add_edge(1, 2, 2);\n    gh.add_edge(0, 2, 1);\n\
     \    gh.add_edge(2, 3, 4);\n    gh.build();\n    assert(gh.size() == 4);\n   \
@@ -1389,7 +1483,7 @@ data:
   isVerificationFile: true
   path: verify/graph/flow/flow_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-15 21:34:05+09:00'
+  timestamp: '2026-07-15 22:14:59+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/flow/flow_algorithms.test.cpp

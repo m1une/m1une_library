@@ -17,15 +17,15 @@ data:
     PROBLEM: https://onlinejudge.u-aizu.ac.jp/problems/GRL_6_A
     links:
     - https://onlinejudge.u-aizu.ac.jp/problems/GRL_6_A
-  bundledCode: "#line 1 \"verify/graph/flow/max_flow.test.cpp\"\n#define PROBLEM \"\
-    https://onlinejudge.u-aizu.ac.jp/problems/GRL_6_A\"\n\n#line 1 \"graph/flow/max_flow.hpp\"\
-    \n\n\n\n#include <algorithm>\n#include <cassert>\n#include <cstddef>\n#include\
-    \ <limits>\n#include <vector>\n\nnamespace m1une {\nnamespace flow {\n\ntemplate\
-    \ <class Cap>\nstruct MaxFlow {\n    struct Edge {\n        int from;\n      \
-    \  int to;\n        Cap cap;\n        Cap flow;\n    };\n\n   private:\n    struct\
-    \ InternalEdge {\n        int to;\n        int rev;\n        Cap cap;\n    };\n\
-    \n    struct Position {\n        int from;\n        int edge;\n    };\n\n    int\
-    \ _n;\n    std::vector<Position> _pos;\n    std::vector<std::vector<InternalEdge>>\
+  bundledCode: "#line 1 \"verify/graph/flow/max_flow_push_relabel.test.cpp\"\n#define\
+    \ PROBLEM \"https://onlinejudge.u-aizu.ac.jp/problems/GRL_6_A\"\n\n#line 1 \"\
+    graph/flow/max_flow.hpp\"\n\n\n\n#include <algorithm>\n#include <cassert>\n#include\
+    \ <cstddef>\n#include <limits>\n#include <vector>\n\nnamespace m1une {\nnamespace\
+    \ flow {\n\ntemplate <class Cap>\nstruct MaxFlow {\n    struct Edge {\n      \
+    \  int from;\n        int to;\n        Cap cap;\n        Cap flow;\n    };\n\n\
+    \   private:\n    struct InternalEdge {\n        int to;\n        int rev;\n \
+    \       Cap cap;\n    };\n\n    struct Position {\n        int from;\n       \
+    \ int edge;\n    };\n\n    int _n;\n    std::vector<Position> _pos;\n    std::vector<std::vector<InternalEdge>>\
     \ _g;\n\n    Cap push_relabel(int s, int t) {\n        const int dead = 2 * _n;\n\
     \        const int unreachable = _n + 1;\n        std::vector<Cap> excess(_n,\
     \ Cap(0));\n        std::vector<int> state(8 * std::size_t(_n) + 2);\n       \
@@ -380,13 +380,13 @@ data:
     \ {\n        print(args...);\n        write_char('\\n');\n    }\n\n    template\
     \ <class T>\n    FastOutput& operator<<(const T& value) {\n        write(value);\n\
     \        return *this;\n    }\n};\n\n}  // namespace utilities\n}  // namespace\
-    \ m1une\n\n\n#line 5 \"verify/graph/flow/max_flow.test.cpp\"\n\nint main() {\n\
-    \    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput output;\n\
-    \n    int vertex_count, edge_count;\n    input >> vertex_count >> edge_count;\n\
+    \ m1une\n\n\n#line 5 \"verify/graph/flow/max_flow_push_relabel.test.cpp\"\n\n\
+    int main() {\n    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput\
+    \ output;\n\n    int vertex_count, edge_count;\n    input >> vertex_count >> edge_count;\n\
     \    m1une::flow::MaxFlow<long long> flow(vertex_count);\n    flow.reserve_edges(edge_count);\n\
     \    for (int edge = 0; edge < edge_count; edge++) {\n        int from, to;\n\
     \        long long capacity;\n        input >> from >> to >> capacity;\n     \
-    \   flow.add_edge(from, to, capacity);\n    }\n    output << flow.max_flow(0,\
+    \   flow.add_edge(from, to, capacity);\n    }\n    output << flow.max_flow_push_relabel(0,\
     \ vertex_count - 1) << '\\n';\n}\n"
   code: "#define PROBLEM \"https://onlinejudge.u-aizu.ac.jp/problems/GRL_6_A\"\n\n\
     #include \"../../../graph/flow/max_flow.hpp\"\n#include \"../../../utilities/fast_io.hpp\"\
@@ -395,21 +395,21 @@ data:
     \    m1une::flow::MaxFlow<long long> flow(vertex_count);\n    flow.reserve_edges(edge_count);\n\
     \    for (int edge = 0; edge < edge_count; edge++) {\n        int from, to;\n\
     \        long long capacity;\n        input >> from >> to >> capacity;\n     \
-    \   flow.add_edge(from, to, capacity);\n    }\n    output << flow.max_flow(0,\
+    \   flow.add_edge(from, to, capacity);\n    }\n    output << flow.max_flow_push_relabel(0,\
     \ vertex_count - 1) << '\\n';\n}\n"
   dependsOn:
   - graph/flow/max_flow.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
-  path: verify/graph/flow/max_flow.test.cpp
+  path: verify/graph/flow/max_flow_push_relabel.test.cpp
   requiredBy: []
   timestamp: '2026-07-15 22:14:59+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/graph/flow/max_flow.test.cpp
+documentation_of: verify/graph/flow/max_flow_push_relabel.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/graph/flow/max_flow.test.cpp
-- /verify/verify/graph/flow/max_flow.test.cpp.html
-title: verify/graph/flow/max_flow.test.cpp
+- /verify/verify/graph/flow/max_flow_push_relabel.test.cpp
+- /verify/verify/graph/flow/max_flow_push_relabel.test.cpp.html
+title: verify/graph/flow/max_flow_push_relabel.test.cpp
 ---
