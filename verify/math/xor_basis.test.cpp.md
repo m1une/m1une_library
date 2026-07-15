@@ -65,12 +65,13 @@ data:
     \n\n\n\n#line 5 \"utilities/fast_io.hpp\"\n#include <charconv>\n#include <cstddef>\n\
     #include <cstdio>\n#include <cstdlib>\n#line 10 \"utilities/fast_io.hpp\"\n#include\
     \ <cstring>\n#line 12 \"utilities/fast_io.hpp\"\n#include <string>\n#include <type_traits>\n\
-    #include <utility>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal\
-    \ {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\n\
-    struct is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T,\
-    \ std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
-    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
-    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    #include <utility>\n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities\
+    \ {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class\
+    \ T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate <class T>\n\
+    struct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
+    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
+    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
     \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
     \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
@@ -106,61 +107,77 @@ data:
     };\n\ntemplate <class T>\nusing make_unsigned_t = typename make_unsigned<std::remove_cv_t<T>>::type;\n\
     \n}  // namespace internal\n\nstruct FastInput {\n    static constexpr int buffer_size\
     \ = 1 << 20;\n\n   private:\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
-    \    int _position;\n    int _length;\n\n    bool prepare_number() {\n       \
-    \ if (_length - _position >= 64) return true;\n        const int remaining = _length\
-    \ - _position;\n        if (remaining > 0) std::memmove(_buffer, _buffer + _position,\
-    \ remaining);\n        const int added = int(std::fread(_buffer + remaining, 1,\
-    \ buffer_size - remaining, _stream));\n        _position = 0;\n        _length\
-    \ = remaining + added;\n        if (_length < buffer_size) _buffer[_length] =\
-    \ '\\0';\n        return _length != 0;\n    }\n\n   public:\n    explicit FastInput(std::FILE*\
-    \ stream = stdin)\n        : _stream(stream), _position(0), _length(0) {}\n\n\
-    \    FastInput(const FastInput&) = delete;\n    FastInput& operator=(const FastInput&)\
-    \ = delete;\n\n    int read_char_raw() {\n        if (_position == _length) {\n\
-    \            _length = int(std::fread(_buffer, 1, buffer_size, _stream));\n  \
-    \          _position = 0;\n            if (_length == 0) return EOF;\n       \
-    \ }\n        return _buffer[_position++];\n    }\n\n    bool skip_spaces() {\n\
-    \        int c = read_char_raw();\n        while (c != EOF && c <= ' ') c = read_char_raw();\n\
-    \        if (c == EOF) return false;\n        --_position;\n        return true;\n\
-    \    }\n\n    bool read(char& value) {\n        if (!skip_spaces()) return false;\n\
-    \        value = char(read_char_raw());\n        return true;\n    }\n\n    bool\
-    \ read(std::string& value) {\n        if (!skip_spaces()) return false;\n    \
-    \    value.clear();\n        int c = read_char_raw();\n        while (c != EOF\
-    \ && c > ' ') {\n            value.push_back(char(c));\n            c = read_char_raw();\n\
-    \        }\n        return true;\n    }\n\n    bool read(bool& value) {\n    \
-    \    int x;\n        if (!read(x)) return false;\n        value = x != 0;\n  \
-    \      return true;\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
+    \    int _position;\n    int _length;\n    bool _terminal;\n\n    bool refill()\
+    \ {\n        _position = 0;\n        if (_terminal) {\n            if (std::fgets(_buffer,\
+    \ buffer_size, _stream) == nullptr) {\n                _length = 0;\n        \
+    \        return false;\n            }\n            _length = int(std::strlen(_buffer));\n\
+    \        } else {\n            _length = int(std::fread(_buffer, 1, buffer_size,\
+    \ _stream));\n        }\n        return _length != 0;\n    }\n\n    template <class\
+    \ T>\n    bool read_integer_from_terminal(T& value) {\n        if (!skip_spaces())\
+    \ return false;\n        int c = read_char_raw();\n\n        bool negative = false;\n\
+    \        if (c == '-') {\n            negative = true;\n            c = read_char_raw();\n\
+    \        }\n\n        if constexpr (internal::is_signed_v<T>) {\n            T\
+    \ result = 0;\n            while ('0' <= c && c <= '9') {\n                result\
+    \ = negative ? result * 10 - (c - '0')\n                                  : result\
+    \ * 10 + (c - '0');\n                c = read_char_raw();\n            }\n   \
+    \         value = result;\n        } else {\n            T result = 0;\n     \
+    \       while ('0' <= c && c <= '9') {\n                result = result * 10 +\
+    \ T(c - '0');\n                c = read_char_raw();\n            }\n         \
+    \   value = negative ? T(0) - result : result;\n        }\n        return true;\n\
+    \    }\n\n    bool prepare_number() {\n        if (_length - _position >= 64)\
+    \ return true;\n        const int remaining = _length - _position;\n        if\
+    \ (remaining > 0) std::memmove(_buffer, _buffer + _position, remaining);\n   \
+    \     const int added = int(std::fread(_buffer + remaining, 1, buffer_size - remaining,\
+    \ _stream));\n        _position = 0;\n        _length = remaining + added;\n \
+    \       if (_length < buffer_size) _buffer[_length] = '\\0';\n        return _length\
+    \ != 0;\n    }\n\n   public:\n    explicit FastInput(std::FILE* stream = stdin)\n\
+    \        : _stream(stream),\n          _position(0),\n          _length(0),\n\
+    \          _terminal(::isatty(::fileno(stream)) != 0) {}\n\n    FastInput(const\
+    \ FastInput&) = delete;\n    FastInput& operator=(const FastInput&) = delete;\n\
+    \n    int read_char_raw() {\n        if (_position == _length && !refill()) return\
+    \ EOF;\n        return _buffer[_position++];\n    }\n\n    bool skip_spaces()\
+    \ {\n        int c = read_char_raw();\n        while (c != EOF && c <= ' ') c\
+    \ = read_char_raw();\n        if (c == EOF) return false;\n        --_position;\n\
+    \        return true;\n    }\n\n    bool read(char& value) {\n        if (!skip_spaces())\
+    \ return false;\n        value = char(read_char_raw());\n        return true;\n\
+    \    }\n\n    bool read(std::string& value) {\n        if (!skip_spaces()) return\
+    \ false;\n        value.clear();\n        int c = read_char_raw();\n        while\
+    \ (c != EOF && c > ' ') {\n            value.push_back(char(c));\n           \
+    \ c = read_char_raw();\n        }\n        return true;\n    }\n\n    bool read(bool&\
+    \ value) {\n        int x;\n        if (!read(x)) return false;\n        value\
+    \ = x != 0;\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
     \        internal::is_integral_v<T>\n            && !std::is_same_v<std::remove_cv_t<T>,\
     \ bool>\n            && !std::is_same_v<std::remove_cv_t<T>, char>,\n        bool\n\
-    \    >\n    read(T& value) {\n        if (!prepare_number()) return false;\n \
-    \       int c = static_cast<unsigned char>(_buffer[_position++]);\n        while\
-    \ (c <= ' ') c = static_cast<unsigned char>(_buffer[_position++]);\n\n       \
-    \ bool negative = false;\n        if (c == '-') {\n            negative = true;\n\
-    \            c = static_cast<unsigned char>(_buffer[_position++]);\n        }\n\
-    \n        if constexpr (internal::is_signed_v<T>) {\n            T result = 0;\n\
-    \            while ('0' <= c && c <= '9') {\n                const int first =\
-    \ c - '0';\n                const int second = static_cast<unsigned char>(_buffer[_position])\
+    \    >\n    read(T& value) {\n        if (_terminal) return read_integer_from_terminal(value);\n\
+    \        if (!prepare_number()) return false;\n        int c = static_cast<unsigned\
+    \ char>(_buffer[_position++]);\n        while (c <= ' ') c = static_cast<unsigned\
+    \ char>(_buffer[_position++]);\n\n        bool negative = false;\n        if (c\
+    \ == '-') {\n            negative = true;\n            c = static_cast<unsigned\
+    \ char>(_buffer[_position++]);\n        }\n\n        if constexpr (internal::is_signed_v<T>)\
+    \ {\n            T result = 0;\n            while ('0' <= c && c <= '9') {\n \
+    \               const int first = c - '0';\n                const int second =\
+    \ static_cast<unsigned char>(_buffer[_position]) - '0';\n                if (0\
+    \ <= second && second <= 9) {\n                    result = negative ? result\
+    \ * 100 - (first * 10 + second)\n                                      : result\
+    \ * 100 + (first * 10 + second);\n                    ++_position;\n         \
+    \       } else {\n                    result = negative ? result * 10 - first\
+    \ : result * 10 + first;\n                }\n                c = static_cast<unsigned\
+    \ char>(_buffer[_position++]);\n            }\n            value = result;\n \
+    \       } else {\n            T result = 0;\n            while ('0' <= c && c\
+    \ <= '9') {\n                const unsigned first = unsigned(c - '0');\n     \
+    \           const int second = static_cast<unsigned char>(_buffer[_position])\
     \ - '0';\n                if (0 <= second && second <= 9) {\n                \
-    \    result = negative ? result * 100 - (first * 10 + second)\n              \
-    \                        : result * 100 + (first * 10 + second);\n           \
-    \         ++_position;\n                } else {\n                    result =\
-    \ negative ? result * 10 - first : result * 10 + first;\n                }\n \
-    \               c = static_cast<unsigned char>(_buffer[_position++]);\n      \
-    \      }\n            value = result;\n        } else {\n            T result\
-    \ = 0;\n            while ('0' <= c && c <= '9') {\n                const unsigned\
-    \ first = unsigned(c - '0');\n                const int second = static_cast<unsigned\
-    \ char>(_buffer[_position]) - '0';\n                if (0 <= second && second\
-    \ <= 9) {\n                    result = result * 100 + T(first * 10 + unsigned(second));\n\
-    \                    ++_position;\n                } else {\n                \
-    \    result = result * 10 + T(first);\n                }\n                c =\
-    \ static_cast<unsigned char>(_buffer[_position++]);\n            }\n         \
-    \   value = negative ? T(0) - result : result;\n        }\n        if (_position\
-    \ > _length) _position = _length;\n        return true;\n    }\n\n    template\
-    \ <class T>\n    std::enable_if_t<std::is_floating_point_v<T>, bool>\n    read(T&\
-    \ value) {\n        if (!skip_spaces()) return false;\n        int c = read_char_raw();\n\
-    \        bool negative = false;\n        if (c == '-' || c == '+') {\n       \
-    \     negative = c == '-';\n            c = read_char_raw();\n        }\n\n  \
-    \      long double result = 0;\n        while ('0' <= c && c <= '9') {\n     \
-    \       result = result * 10 + (c - '0');\n            c = read_char_raw();\n\
+    \    result = result * 100 + T(first * 10 + unsigned(second));\n             \
+    \       ++_position;\n                } else {\n                    result = result\
+    \ * 10 + T(first);\n                }\n                c = static_cast<unsigned\
+    \ char>(_buffer[_position++]);\n            }\n            value = negative ?\
+    \ T(0) - result : result;\n        }\n        if (_position > _length) _position\
+    \ = _length;\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>,\
+    \ bool>\n    read(T& value) {\n        if (!skip_spaces()) return false;\n   \
+    \     int c = read_char_raw();\n        bool negative = false;\n        if (c\
+    \ == '-' || c == '+') {\n            negative = c == '-';\n            c = read_char_raw();\n\
+    \        }\n\n        long double result = 0;\n        while ('0' <= c && c <=\
+    \ '9') {\n            result = result * 10 + (c - '0');\n            c = read_char_raw();\n\
     \        }\n        if (c == '.') {\n            long double place = 0.1L;\n \
     \           c = read_char_raw();\n            while ('0' <= c && c <= '9') {\n\
     \                result += (c - '0') * place;\n                place *= 0.1L;\n\
@@ -183,7 +200,9 @@ data:
     \ < uint64_t(T::mod())) {\n                value = T::raw(uint32_t(x));\n    \
     \        } else {\n                value = T(x);\n            }\n        } else\
     \ {\n            value = T(x);\n        }\n        return true;\n    }\n\n   \
-    \ template <class Range>\n    std::enable_if_t<\n        internal::is_range_v<Range>\n\
+    \ template <class First, class Second>\n    bool read(std::pair<First, Second>&\
+    \ value) {\n        if (!read(value.first)) return false;\n        return read(value.second);\n\
+    \    }\n\n    template <class Range>\n    std::enable_if_t<\n        internal::is_range_v<Range>\n\
     \            && !internal::is_string_like_v<Range>,\n        bool\n    >\n   \
     \ read(Range& range) {\n        using StoredValue = internal::range_stored_value_t<Range>;\n\
     \        constexpr bool nested = internal::is_range_v<StoredValue>\n         \
@@ -204,24 +223,26 @@ data:
     \ + value % 10);\n                value /= 10;\n            }\n        }\n   \
     \     return result;\n    }();\n\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
     \    int _position;\n    int _precision;\n    std::chars_format _float_format;\n\
-    \n   public:\n    explicit FastOutput(std::FILE* stream = stdout)\n        : _stream(stream),\n\
-    \          _position(0),\n          _precision(6),\n          _float_format(std::chars_format::general)\
-    \ {}\n\n    FastOutput(const FastOutput&) = delete;\n    FastOutput& operator=(const\
-    \ FastOutput&) = delete;\n\n    ~FastOutput() {\n        flush();\n    }\n\n \
-    \   void flush() {\n        if (_position == 0) return;\n        std::fwrite(_buffer,\
-    \ 1, _position, _stream);\n        _position = 0;\n    }\n\n    void write_char(char\
-    \ c) {\n        if (_position == buffer_size) flush();\n        _buffer[_position++]\
-    \ = c;\n    }\n\n    void write(const char* s) {\n        while (*s != '\\0')\
-    \ write_char(*s++);\n    }\n\n    void write(const std::string& s) {\n       \
-    \ for (char c : s) write_char(c);\n    }\n\n    void write(char c) {\n       \
-    \ write_char(c);\n    }\n\n    void write(bool value) {\n        write_char(value\
-    \ ? '1' : '0');\n    }\n\n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>>\n\
-    \    write(T value) {\n        char digits[128];\n        auto [end, error] =\
-    \ std::to_chars(\n            digits,\n            digits + sizeof(digits),\n\
-    \            value,\n            _float_format,\n            _precision\n    \
-    \    );\n        if (error != std::errc()) std::abort();\n        for (const char*\
-    \ pointer = digits; pointer != end; pointer++) {\n            write_char(*pointer);\n\
-    \        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n        internal::is_integral_v<T>\n\
+    \    char _range_separator;\n\n   public:\n    explicit FastOutput(std::FILE*\
+    \ stream = stdout)\n        : _stream(stream),\n          _position(0),\n    \
+    \      _precision(6),\n          _float_format(std::chars_format::general),\n\
+    \          _range_separator(' ') {}\n\n    FastOutput(const FastOutput&) = delete;\n\
+    \    FastOutput& operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n\
+    \        flush();\n    }\n\n    void flush() {\n        if (_position == 0) return;\n\
+    \        std::fwrite(_buffer, 1, _position, _stream);\n        _position = 0;\n\
+    \    }\n\n    void write_char(char c) {\n        if (_position == buffer_size)\
+    \ flush();\n        _buffer[_position++] = c;\n    }\n\n    void write(const char*\
+    \ s) {\n        while (*s != '\\0') write_char(*s++);\n    }\n\n    void write(const\
+    \ std::string& s) {\n        for (char c : s) write_char(c);\n    }\n\n    void\
+    \ write(char c) {\n        write_char(c);\n    }\n\n    void write(bool value)\
+    \ {\n        write_char(value ? '1' : '0');\n    }\n\n    template <class T>\n\
+    \    std::enable_if_t<std::is_floating_point_v<T>>\n    write(T value) {\n   \
+    \     char digits[128];\n        auto [end, error] = std::to_chars(\n        \
+    \    digits,\n            digits + sizeof(digits),\n            value,\n     \
+    \       _float_format,\n            _precision\n        );\n        if (error\
+    \ != std::errc()) std::abort();\n        for (const char* pointer = digits; pointer\
+    \ != end; pointer++) {\n            write_char(*pointer);\n        }\n    }\n\n\
+    \    template <class T>\n    std::enable_if_t<\n        internal::is_integral_v<T>\n\
     \            && !std::is_same_v<std::remove_cv_t<T>, bool>\n            && !std::is_same_v<std::remove_cv_t<T>,\
     \ char>\n    >\n    write(T value) {\n        using Raw = std::remove_cv_t<T>;\n\
     \        using Unsigned = internal::make_unsigned_t<Raw>;\n\n        Unsigned\
@@ -243,65 +264,69 @@ data:
     \ += 4;\n        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n \
     \       internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
     \            && !internal::is_range_v<T>\n    >\n    write(const T& value) {\n\
-    \        write(value.val());\n    }\n\n    template <class Range>\n    std::enable_if_t<\n\
-    \        internal::is_range_v<Range>\n            && !internal::is_string_like_v<Range>\n\
-    \    >\n    write(const Range& range) {\n        using StoredValue = internal::range_stored_value_t<const\
-    \ Range>;\n        constexpr bool nested = internal::is_range_v<StoredValue>\n\
-    \                                && !internal::is_string_like_v<StoredValue>;\n\
-    \n        bool first = true;\n        for (const auto& value : range) {\n    \
-    \        if (!first) write_char(nested ? '\\n' : ' ');\n            first = false;\n\
-    \            if constexpr (std::is_same_v<StoredValue, bool> && !nested) {\n \
-    \               write(static_cast<bool>(value));\n            } else {\n     \
-    \           write(value);\n            }\n        }\n    }\n\n    template <class\
-    \ First, class... Rest>\n    void print(const First& first, const Rest&... rest)\
-    \ {\n        write(first);\n        ((write_char(' '), write(rest)), ...);\n \
-    \   }\n\n    void println() {\n        write_char('\\n');\n    }\n\n    void set_precision(int\
-    \ precision) {\n        _precision = precision;\n    }\n\n    void set_fixed(int\
-    \ precision = 6) {\n        _float_format = std::chars_format::fixed;\n      \
-    \  _precision = precision;\n    }\n\n    void set_general(int precision = 6) {\n\
-    \        _float_format = std::chars_format::general;\n        _precision = precision;\n\
-    \    }\n\n    template <class... Args>\n    void println(const Args&... args)\
-    \ {\n        print(args...);\n        write_char('\\n');\n    }\n\n    template\
-    \ <class T>\n    FastOutput& operator<<(const T& value) {\n        write(value);\n\
-    \        return *this;\n    }\n};\n\n}  // namespace utilities\n}  // namespace\
-    \ m1une\n\n\n#line 9 \"verify/math/xor_basis.test.cpp\"\n#include <random>\n#line\
-    \ 11 \"verify/math/xor_basis.test.cpp\"\n\nnamespace {\n\nusing Basis = m1une::math::XorBasis<uint64_t>;\n\
-    \nstd::vector<uint64_t> enumerate(const std::vector<uint64_t>& values) {\n   \
-    \ std::vector<uint64_t> result;\n    result.reserve(std::size_t(1) << values.size());\n\
-    \    for (uint64_t mask = 0; mask < (uint64_t(1) << values.size()); mask++) {\n\
-    \        uint64_t value = 0;\n        for (int i = 0; i < int(values.size());\
-    \ i++) {\n            if (((mask >> i) & 1) != 0) value ^= values[i];\n      \
-    \  }\n        result.push_back(value);\n    }\n    std::sort(result.begin(), result.end());\n\
-    \    result.erase(std::unique(result.begin(), result.end()), result.end());\n\
-    \    return result;\n}\n\nvoid test_basic() {\n    Basis basis{3, 5, 6, 0};\n\
-    \    assert(basis.rank() == 2);\n    assert(!basis.empty());\n    assert(basis.contains(0));\n\
-    \    assert(basis.contains(3));\n    assert(basis.contains(5));\n    assert(basis.contains(6));\n\
-    \    assert(!basis.contains(1));\n    assert(!basis.insert(6));\n    assert(basis.min_xor(4)\
-    \ == 1);\n    assert(basis.max_xor() == 6);\n    assert(basis.max_xor(8) == 14);\n\
-    \n    const std::vector<uint64_t> expected{0, 3, 5, 6};\n    for (uint64_t i =\
-    \ 0; i < expected.size(); i++) {\n        assert(basis.kth_smallest(i) == expected[i]);\n\
-    \    }\n\n    Basis other{1, 8, 9};\n    assert(basis.merge(other) == 2);\n  \
-    \  assert(basis.rank() == 4);\n    assert(basis.contains(15));\n    basis.clear();\n\
-    \    assert(basis.empty());\n    assert(basis.vectors().empty());\n}\n\nvoid test_randomized()\
-    \ {\n    std::mt19937_64 random(123456789);\n    for (int trial = 0; trial < 2000;\
-    \ trial++) {\n        const int size = int(random() % 11);\n        std::vector<uint64_t>\
-    \ values(size);\n        for (uint64_t& value : values) value = random() & 1023;\n\
-    \n        Basis basis(values.begin(), values.end());\n        const std::vector<uint64_t>\
-    \ span = enumerate(values);\n        assert(span.size() == (std::size_t(1) <<\
-    \ basis.rank()));\n        assert(int(basis.vectors().size()) == basis.rank());\n\
-    \n        for (uint64_t value = 0; value < 1024; value++) {\n            const\
-    \ bool expected = std::binary_search(span.begin(), span.end(), value);\n     \
-    \       assert(basis.contains(value) == expected);\n        }\n        for (std::size_t\
-    \ i = 0; i < span.size(); i++) {\n            assert(basis.kth_smallest(i) ==\
-    \ span[i]);\n        }\n\n        for (int query = 0; query < 20; query++) {\n\
-    \            const uint64_t seed = random() & 2047;\n            uint64_t expected_min\
-    \ = ~uint64_t(0);\n            uint64_t expected_max = 0;\n            for (uint64_t\
-    \ value : span) {\n                expected_min = std::min(expected_min, seed\
-    \ ^ value);\n                expected_max = std::max(expected_max, seed ^ value);\n\
-    \            }\n            assert(basis.min_xor(seed) == expected_min);\n   \
-    \         assert(basis.max_xor(seed) == expected_max);\n        }\n    }\n}\n\n\
-    void test_full_rank() {\n    m1une::math::XorBasis<uint8_t> basis;\n    for (int\
-    \ bit = 0; bit < 8; bit++) basis.insert(uint8_t(1U << bit));\n    assert(basis.rank()\
+    \        write(value.val());\n    }\n\n    template <class First, class Second>\n\
+    \    void write(const std::pair<First, Second>& value) {\n        write(value.first);\n\
+    \        write_char(' ');\n        write(value.second);\n    }\n\n    template\
+    \ <class Range>\n    std::enable_if_t<\n        internal::is_range_v<Range>\n\
+    \            && !internal::is_string_like_v<Range>\n    >\n    write(const Range&\
+    \ range) {\n        using StoredValue = internal::range_stored_value_t<const Range>;\n\
+    \        constexpr bool nested = internal::is_range_v<StoredValue>\n         \
+    \                       && !internal::is_string_like_v<StoredValue>;\n\n     \
+    \   bool first = true;\n        for (const auto& value : range) {\n          \
+    \  if (!first) write_char(nested ? '\\n' : _range_separator);\n            first\
+    \ = false;\n            if constexpr (std::is_same_v<StoredValue, bool> && !nested)\
+    \ {\n                write(static_cast<bool>(value));\n            } else {\n\
+    \                write(value);\n            }\n        }\n    }\n\n    template\
+    \ <class First, class... Rest>\n    void print(const First& first, const Rest&...\
+    \ rest) {\n        write(first);\n        ((write_char(' '), write(rest)), ...);\n\
+    \    }\n\n    void println() {\n        write_char('\\n');\n    }\n\n    void\
+    \ set_precision(int precision) {\n        _precision = precision;\n    }\n\n \
+    \   void set_fixed(int precision = 6) {\n        _float_format = std::chars_format::fixed;\n\
+    \        _precision = precision;\n    }\n\n    void set_general(int precision\
+    \ = 6) {\n        _float_format = std::chars_format::general;\n        _precision\
+    \ = precision;\n    }\n\n    void set_range_separator(char separator) {\n    \
+    \    _range_separator = separator;\n    }\n\n    template <class... Args>\n  \
+    \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
+    n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
+    \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
+    \ utilities\n}  // namespace m1une\n\n\n#line 9 \"verify/math/xor_basis.test.cpp\"\
+    \n#include <random>\n#line 11 \"verify/math/xor_basis.test.cpp\"\n\nnamespace\
+    \ {\n\nusing Basis = m1une::math::XorBasis<uint64_t>;\n\nstd::vector<uint64_t>\
+    \ enumerate(const std::vector<uint64_t>& values) {\n    std::vector<uint64_t>\
+    \ result;\n    result.reserve(std::size_t(1) << values.size());\n    for (uint64_t\
+    \ mask = 0; mask < (uint64_t(1) << values.size()); mask++) {\n        uint64_t\
+    \ value = 0;\n        for (int i = 0; i < int(values.size()); i++) {\n       \
+    \     if (((mask >> i) & 1) != 0) value ^= values[i];\n        }\n        result.push_back(value);\n\
+    \    }\n    std::sort(result.begin(), result.end());\n    result.erase(std::unique(result.begin(),\
+    \ result.end()), result.end());\n    return result;\n}\n\nvoid test_basic() {\n\
+    \    Basis basis{3, 5, 6, 0};\n    assert(basis.rank() == 2);\n    assert(!basis.empty());\n\
+    \    assert(basis.contains(0));\n    assert(basis.contains(3));\n    assert(basis.contains(5));\n\
+    \    assert(basis.contains(6));\n    assert(!basis.contains(1));\n    assert(!basis.insert(6));\n\
+    \    assert(basis.min_xor(4) == 1);\n    assert(basis.max_xor() == 6);\n    assert(basis.max_xor(8)\
+    \ == 14);\n\n    const std::vector<uint64_t> expected{0, 3, 5, 6};\n    for (uint64_t\
+    \ i = 0; i < expected.size(); i++) {\n        assert(basis.kth_smallest(i) ==\
+    \ expected[i]);\n    }\n\n    Basis other{1, 8, 9};\n    assert(basis.merge(other)\
+    \ == 2);\n    assert(basis.rank() == 4);\n    assert(basis.contains(15));\n  \
+    \  basis.clear();\n    assert(basis.empty());\n    assert(basis.vectors().empty());\n\
+    }\n\nvoid test_randomized() {\n    std::mt19937_64 random(123456789);\n    for\
+    \ (int trial = 0; trial < 2000; trial++) {\n        const int size = int(random()\
+    \ % 11);\n        std::vector<uint64_t> values(size);\n        for (uint64_t&\
+    \ value : values) value = random() & 1023;\n\n        Basis basis(values.begin(),\
+    \ values.end());\n        const std::vector<uint64_t> span = enumerate(values);\n\
+    \        assert(span.size() == (std::size_t(1) << basis.rank()));\n        assert(int(basis.vectors().size())\
+    \ == basis.rank());\n\n        for (uint64_t value = 0; value < 1024; value++)\
+    \ {\n            const bool expected = std::binary_search(span.begin(), span.end(),\
+    \ value);\n            assert(basis.contains(value) == expected);\n        }\n\
+    \        for (std::size_t i = 0; i < span.size(); i++) {\n            assert(basis.kth_smallest(i)\
+    \ == span[i]);\n        }\n\n        for (int query = 0; query < 20; query++)\
+    \ {\n            const uint64_t seed = random() & 2047;\n            uint64_t\
+    \ expected_min = ~uint64_t(0);\n            uint64_t expected_max = 0;\n     \
+    \       for (uint64_t value : span) {\n                expected_min = std::min(expected_min,\
+    \ seed ^ value);\n                expected_max = std::max(expected_max, seed ^\
+    \ value);\n            }\n            assert(basis.min_xor(seed) == expected_min);\n\
+    \            assert(basis.max_xor(seed) == expected_max);\n        }\n    }\n\
+    }\n\nvoid test_full_rank() {\n    m1une::math::XorBasis<uint8_t> basis;\n    for\
+    \ (int bit = 0; bit < 8; bit++) basis.insert(uint8_t(1U << bit));\n    assert(basis.rank()\
     \ == 8);\n    for (int value = 0; value < 256; value++) {\n        assert(basis.kth_smallest(uint8_t(value))\
     \ == uint8_t(value));\n    }\n}\n\n}  // namespace\n\nint main() {\n    m1une::utilities::FastInput\
     \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n\n    test_basic();\n\
@@ -357,7 +382,7 @@ data:
   isVerificationFile: true
   path: verify/math/xor_basis.test.cpp
   requiredBy: []
-  timestamp: '2026-07-15 03:24:36+09:00'
+  timestamp: '2026-07-16 04:26:38+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/xor_basis.test.cpp

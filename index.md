@@ -171,8 +171,14 @@ data:
       path: expander.py
       title: expander.py
     - icon: ':warning:'
-      path: template.cpp
-      title: template.cpp
+      path: main.cpp
+      title: main.cpp
+    - icon: ':warning:'
+      path: pch.hpp
+      title: pch.hpp
+    - icon: ':heavy_check_mark:'
+      path: template.hpp
+      title: template.hpp
   - name: convex
     pages:
     - icon: ':heavy_check_mark:'
@@ -2069,6 +2075,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/utilities/shifted_array.test.cpp
       title: verify/utilities/shifted_array.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/utilities/template_fast_io.test.cpp
+      title: verify/utilities/template_fast_io.test.cpp
 layout: toppage
 ---
 [![m1une](https://img.shields.io/endpoint?url=https%3A%2F%2Fatcoder-badges.now.sh%2Fapi%2Fatcoder%2Fjson%2Fm1une)](https://atcoder.jp/users/m1une)
