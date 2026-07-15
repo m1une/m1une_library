@@ -1,3 +1,5 @@
+#ifndef M1UNE_TEMPLATE_HPP
+#define M1UNE_TEMPLATE_HPP 1
 #include <bits/stdc++.h>
 // #include <bits/extc++.h>
 using namespace std;
@@ -298,3 +300,4 @@ void Yes() {
 void No() {
     cout << "No" << '\n';
 }
+#endif  // M1UNE_TEMPLATE_HPP
