@@ -1,8 +1,25 @@
 #ifndef M1UNE_TEMPLATE_HPP
 #define M1UNE_TEMPLATE_HPP 1
 #include <bits/stdc++.h>
+#include "utilities/fast_io.hpp"
 // #include <bits/extc++.h>
 using namespace std;
+
+namespace m1une {
+namespace template_io {
+
+inline utilities::FastInput& input() {
+    static utilities::FastInput instance;
+    return instance;
+}
+
+inline utilities::FastOutput& output() {
+    static utilities::FastOutput instance;
+    return instance;
+}
+
+}  // namespace template_io
+}  // namespace m1une
 
 using ll = long long;
 using u32 = unsigned int;
@@ -241,63 +258,26 @@ constexpr auto max(T... a) {
     return max(initializer_list<common_type_t<T...>>{a...});
 }
 
-void print() {
-    cout << '\n';
-}
-template <class T>
-void print(const T& a) {
-    cout << a << '\n';
-}
-template <class T, class... Ts>
-void print(const T& a, const Ts&... b) {
-    cout << a;
-    (cout << ... << (cout << ' ', b));
-    cout << '\n';
-}
-template <class T>
-void print(vector<T>& a) {
-    for (int i = 0; i < (int)a.size(); ++i) {
-        cout << a[i] << " \n"[i == (int)a.size() - 1];
-    }
-}
-template <class T>
-void print(vector<T>&& a) {
-    for (int i = 0; i < (int)a.size(); ++i) {
-        cout << a[i] << " \n"[i == (int)a.size() - 1];
-    }
-}
-template <class T>
-void print(vector<vector<T>>& a) {
-    for (int i = 0; i < (int)a.size(); ++i) {
-        for (int j = 0; j < (int)a[i].size(); ++j) {
-            cout << a[i][j] << " \n"[j == (int)a[i].size() - 1];
-        }
-    }
-}
-template <class T>
-void print(vector<vector<T>>&& a) {
-    for (int i = 0; i < (int)a.size(); ++i) {
-        for (int j = 0; j < (int)a[i].size(); ++j) {
-            cout << a[i][j] << " \n"[j == (int)a[i].size() - 1];
-        }
-    }
+template <class... Ts>
+void print(const Ts&... values) {
+    m1une::template_io::output().println(values...);
 }
 void YESNO(bool b) {
-    cout << (b ? "YES" : "NO") << '\n';
+    m1une::template_io::output().println(b ? "YES" : "NO");
 }
 void YesNo(bool b) {
-    cout << (b ? "Yes" : "No") << '\n';
+    m1une::template_io::output().println(b ? "Yes" : "No");
 }
 void YES() {
-    cout << "YES" << '\n';
+    m1une::template_io::output().println("YES");
 }
 void NO() {
-    cout << "NO" << '\n';
+    m1une::template_io::output().println("NO");
 }
 void Yes() {
-    cout << "Yes" << '\n';
+    m1une::template_io::output().println("Yes");
 }
 void No() {
-    cout << "No" << '\n';
+    m1une::template_io::output().println("No");
 }
 #endif  // M1UNE_TEMPLATE_HPP

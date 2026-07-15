@@ -1,7 +1,7 @@
 #include "pch.hpp"
 
-m1une::utilities::FastInput fastin;
-m1une::utilities::FastOutput fastout;
+auto& fastin = m1une::template_io::input();
+auto& fastout = m1une::template_io::output();
 
 void solve() {
 

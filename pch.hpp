@@ -22,6 +22,5 @@
 #endif
 
 #include "template.hpp"
-#include "utilities/fast_io.hpp"
 
 #endif  // M1UNE_PCH_HPP
