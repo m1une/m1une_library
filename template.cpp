@@ -320,10 +320,10 @@ void No() {
 #endif
 
 #include "utilities/fast_io.hpp"
+m1une::utilities::FastInput fastin;
+m1une::utilities::FastOutput fastout;
 
 //----------------------------------------------------------------
-m1une::utilities::FastInput fastin;
-m1une::utilites::FastOutput fastout;
 
 void solve() {
     
