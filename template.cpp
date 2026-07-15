@@ -319,17 +319,17 @@ void No() {
 #define CPP_DUMP_DEFINE_DANGEROUS_EXPORT_OBJECT(...)
 #endif
 
+#include "utilities/fast_io.hpp"
+
 //----------------------------------------------------------------
+m1une::utilities::FastInput fastin;
+m1une::utilites::FastOutput fastout;
 
 void solve() {
-    ll N;
-    cin >> N;
+    
 }
 
 int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-    cout << fixed << setprecision(20);
     CPP_DUMP_SET_OPTION(max_line_width, 80);
     CPP_DUMP_SET_OPTION(log_label_func, cpp_dump::log_label::filename());
     CPP_DUMP_SET_OPTION(enable_asterisk, true);
