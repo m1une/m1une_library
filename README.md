@@ -128,7 +128,9 @@ python3 compressor.py bundled.cpp -o submission.cpp --stats
 ```
 
 Pass `--no-rename` to keep all identifiers unchanged. The compressor preserves
-preprocessor lines, string and character literals, and raw strings.
+the C++ preprocessing-token stream across removed whitespace, handles comments
+and escaped newlines in translation-phase order, and preserves preprocessor
+lines, user-defined literals, string and character literals, and raw strings.
 
 ## Documentation Conventions
 

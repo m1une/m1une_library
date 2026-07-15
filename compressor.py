@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """A small, dependency-free C++ source minifier for contest submissions.
 
-The minifier removes comments and unnecessary whitespace.  By default it also
-shortens identifiers which look like variable declarations.  Renaming is
-deliberately conservative: macros, types, functions, labels, qualified names,
-and member names are left alone.
+The minifier removes comments and whitespace without changing the C++ token
+stream.  By default it also shortens identifiers which look like variable
+declarations.  Renaming is deliberately conservative: macros, types,
+functions, labels, qualified names, and member names are left alone.
 """
 
 from __future__ import annotations
@@ -30,7 +30,8 @@ CPP_KEYWORDS = {
     "signed", "sizeof", "static", "static_assert", "static_cast", "struct",
     "switch", "template", "this", "thread_local", "throw", "true", "try",
     "typedef", "typeid", "typename", "union", "unsigned", "using", "virtual",
-    "void", "volatile", "wchar_t", "while", "xor", "xor_eq",
+    "void", "volatile", "wchar_t", "while", "xor", "xor_eq", "import",
+    "module",
 }
 
 BUILTIN_TYPES = {
@@ -59,11 +60,6 @@ PUNCTUATORS = (
     "-", "*", "/", "%", "^", "&", "|", "~", "!", "=", "<", ">", ",",
 )
 
-MULTI_PUNCTUATORS = {p for p in PUNCTUATORS if len(p) > 1} | {"//", "/*"}
-PUNCTUATOR_PREFIXES = {
-    p[:i] for p in MULTI_PUNCTUATORS for i in range(2, len(p) + 1)
-}
-
 
 @dataclass(frozen=True)
 class Token:
@@ -71,20 +67,71 @@ class Token:
     text: str
 
 
-def _quoted_end(source: str, start: int) -> int | None:
-    """Return the end of a string/character/raw literal starting at start."""
+def _is_identifier_start(ch: str) -> bool:
+    # '$' is a widely supported GCC/Clang extension and is useful to recognize
+    # even though portable C++ identifiers do not contain it.
+    return ch in "_$" or ch.isalpha() or (ord(ch) >= 128 and not ch.isspace())
+
+
+def _is_identifier_continue(ch: str) -> bool:
+    return _is_identifier_start(ch) or ch.isdigit()
+
+
+def _number_end(source: str, start: int) -> int:
+    """Return the end of a preprocessing number starting at ``start``."""
+    i = start + 1
+    while i < len(source):
+        current = source[i]
+        if _is_identifier_continue(current) or current == ".":
+            i += 1
+        elif (
+            current == "'"
+            and i + 1 < len(source)
+            and _is_identifier_continue(source[i + 1])
+        ):
+            i += 2
+        elif current in "+-" and source[i - 1] in "eEpP":
+            i += 1
+        else:
+            break
+    return i
+
+
+def _raw_literal_bounds(source: str, start: int) -> tuple[int, int, int] | None:
+    """Return ``(open_paren, close_paren, end)`` for a raw literal."""
     prefixes = ("u8R\"", "uR\"", "UR\"", "LR\"", "R\"")
     raw_prefix = next((p for p in prefixes if source.startswith(p, start)), None)
-    if raw_prefix is not None:
-        delimiter_start = start + len(raw_prefix)
-        open_paren = source.find("(", delimiter_start)
-        if open_paren == -1 or open_paren - delimiter_start > 16:
-            return None
-        delimiter = source[delimiter_start:open_paren]
-        if any(ch.isspace() or ch in "()\\" for ch in delimiter):
-            return None
-        close = source.find(")" + delimiter + "\"", open_paren + 1)
-        return len(source) if close == -1 else close + len(delimiter) + 2
+    if raw_prefix is None:
+        return None
+    delimiter_start = start + len(raw_prefix)
+    open_paren = source.find("(", delimiter_start)
+    if open_paren == -1 or open_paren - delimiter_start > 16:
+        return None
+    delimiter = source[delimiter_start:open_paren]
+    if any(ch.isspace() or ch in "()\\" for ch in delimiter):
+        return None
+    close_paren = source.find(")" + delimiter + "\"", open_paren + 1)
+    if close_paren == -1:
+        return None
+    end = close_paren + len(delimiter) + 2
+    while end < len(source) and _is_identifier_continue(source[end]):
+        end += 1
+    return open_paren, close_paren, end
+
+
+def _quoted_end(source: str, start: int) -> int | None:
+    """Return the end of a string/character/raw literal starting at start.
+
+    An immediately adjacent user-defined-literal suffix is part of the token.
+    """
+    raw_bounds = _raw_literal_bounds(source, start)
+    if raw_bounds is not None:
+        return raw_bounds[2]
+    if any(source.startswith(p, start) for p in ("u8R\"", "uR\"", "UR\"", "LR\"", "R\"")):
+        # It looks like a raw literal but is malformed or unterminated.  The
+        # compiler will diagnose it; treating the remainder as one token keeps
+        # the minifier from compounding the error.
+        return len(source)
 
     prefixes = ("u8\"", "u\"", "U\"", "L\"", "\"", "u'", "U'", "L'", "'")
     prefix = next((p for p in prefixes if source.startswith(p, start)), None)
@@ -96,15 +143,146 @@ def _quoted_end(source: str, start: int) -> int | None:
         if source[i] == "\\":
             i += 2
         elif source[i] == quote:
-            return i + 1
+            end = i + 1
+            while end < len(source) and _is_identifier_continue(source[end]):
+                end += 1
+            return end
         else:
             i += 1
     return len(source)
 
 
+def _splice_lines(source: str) -> str:
+    """Perform phase-2 line splicing while restoring raw-string contents."""
+    spliced: list[str] = []
+    origins: list[int] = []
+    i = 0
+    while i < len(source):
+        if source[i] == "\\":
+            if source.startswith("\r\n", i + 1):
+                i += 3
+                continue
+            if i + 1 < len(source) and source[i + 1] in "\r\n":
+                i += 2
+                continue
+        spliced.append(source[i])
+        origins.append(i)
+        i += 1
+
+    phase_two = "".join(spliced)
+    output: list[str] = []
+    copied_until = 0
+    i = 0
+    while i < len(phase_two):
+        if phase_two.startswith("//", i):
+            newline = phase_two.find("\n", i + 2)
+            i = len(phase_two) if newline == -1 else newline
+            continue
+        if phase_two.startswith("/*", i):
+            close = phase_two.find("*/", i + 2)
+            i = len(phase_two) if close == -1 else close + 2
+            continue
+        if phase_two[i].isdigit() or (
+            phase_two[i] == "."
+            and i + 1 < len(phase_two)
+            and phase_two[i + 1].isdigit()
+        ):
+            i = _number_end(phase_two, i)
+            continue
+
+        raw_bounds = _raw_literal_bounds(phase_two, i)
+        if raw_bounds is not None:
+            open_paren, close_paren, end = raw_bounds
+            output.append(phase_two[copied_until:open_paren + 1])
+            original_open = origins[open_paren]
+            original_close = origins[close_paren]
+            output.append(source[original_open + 1:original_close])
+            output.append(phase_two[close_paren:end])
+            copied_until = end
+            i = end
+            continue
+
+        literal_end = _quoted_end(phase_two, i)
+        if literal_end is not None:
+            i = literal_end
+            continue
+        if _is_identifier_start(phase_two[i]):
+            i += 1
+            while i < len(phase_two) and _is_identifier_continue(phase_two[i]):
+                i += 1
+            continue
+        i += 1
+
+    output.append(phase_two[copied_until:])
+    return "".join(output)
+
+
+def _prepare_source(source: str) -> str:
+    """Apply the translation phases needed before preprocessing-token lexing."""
+    # Line splicing precedes comment recognition.  C++ restores transformations
+    # within raw-string contents after recognizing the raw literal.
+    source = source.replace("\r\n", "\n").replace("\r", "\n")
+    source = _splice_lines(source)
+
+    # Comments are replaced by one space in translation phase 3.  In
+    # particular, newlines *inside* a block comment do not terminate a
+    # preprocessing directive.
+    output: list[str] = []
+    i = 0
+    while i < len(source):
+        if source[i].isdigit() or (
+            source[i] == "." and i + 1 < len(source) and source[i + 1].isdigit()
+        ):
+            end = _number_end(source, i)
+            output.append(source[i:end])
+            i = end
+            continue
+        literal_end = _quoted_end(source, i)
+        if literal_end is not None:
+            output.append(source[i:literal_end])
+            i = literal_end
+            continue
+        if source.startswith("//", i):
+            output.append(" ")
+            newline = source.find("\n", i + 2)
+            i = len(source) if newline == -1 else newline
+            continue
+        if source.startswith("/*", i):
+            output.append(" ")
+            close = source.find("*/", i + 2)
+            i = len(source) if close == -1 else close + 2
+            continue
+        output.append(source[i])
+        i += 1
+    return "".join(output)
+
+
+def _directive_end(source: str, start: int) -> int:
+    """Return the end of a preprocessing directive, including its newline."""
+    i = start
+    while i < len(source):
+        if source[i] == "\n":
+            return i + 1
+        if source[i].isdigit() or (
+            source[i] == "." and i + 1 < len(source) and source[i + 1].isdigit()
+        ):
+            i = _number_end(source, i)
+            continue
+        literal_end = _quoted_end(source, i)
+        if literal_end is not None:
+            i = literal_end
+            continue
+        if _is_identifier_start(source[i]):
+            i += 1
+            while i < len(source) and _is_identifier_continue(source[i]):
+                i += 1
+            continue
+        i += 1
+    return len(source)
+
+
 def tokenize(source: str) -> list[Token]:
-    # C++ removes escaped newlines before recognizing comments or tokens.
-    source = source.replace("\\\r\n", "").replace("\\\n", "")
+    source = _prepare_source(source)
     tokens: list[Token] = []
     i = 0
     at_line_start = True
@@ -120,65 +298,30 @@ def tokenize(source: str) -> list[Token]:
             i += 1
             continue
 
-        if at_line_start and ch == "#":
+        if at_line_start and (ch == "#" or source.startswith("%:", i)):
             start = i
-            while i < n:
-                newline = source.find("\n", i)
-                if newline == -1:
-                    i = n
-                    break
-                backslashes = 0
-                j = newline - 1
-                while j >= start and source[j] == "\\":
-                    backslashes += 1
-                    j -= 1
-                i = newline + 1
-                if backslashes % 2 == 0:
-                    break
+            i = _directive_end(source, i)
             tokens.append(Token("directive", source[start:i].rstrip()))
             at_line_start = True
             continue
 
         at_line_start = False
-        if source.startswith("//", i):
-            newline = source.find("\n", i + 2)
-            i = n if newline == -1 else newline + 1
-            at_line_start = True
-            continue
-        if source.startswith("/*", i):
-            close = source.find("*/", i + 2)
-            if close == -1:
-                i = n
-            else:
-                segment = source[i:close + 2]
-                at_line_start = segment.endswith("\n")
-                i = close + 2
-            continue
-
         literal_end = _quoted_end(source, i)
         if literal_end is not None:
             tokens.append(Token("literal", source[i:literal_end]))
             i = literal_end
             continue
 
-        if ch.isalpha() or ch == "_":
+        if _is_identifier_start(ch):
             j = i + 1
-            while j < n and (source[j].isalnum() or source[j] == "_"):
+            while j < n and _is_identifier_continue(source[j]):
                 j += 1
             tokens.append(Token("identifier", source[i:j]))
             i = j
             continue
 
         if ch.isdigit() or (ch == "." and i + 1 < n and source[i + 1].isdigit()):
-            j = i + 1
-            while j < n:
-                current = source[j]
-                if current.isalnum() or current in "_.'":
-                    j += 1
-                elif current in "+-" and source[j - 1] in "eEpP":
-                    j += 1
-                else:
-                    break
+            j = _number_end(source, i)
             tokens.append(Token("number", source[i:j]))
             i = j
             continue
@@ -247,7 +390,7 @@ def _directive_identifiers(tokens: list[Token]) -> set[str]:
     result: set[str] = set()
     for token in tokens:
         if token.kind == "directive":
-            result.update(re.findall(r"[A-Za-z_][A-Za-z_0-9]*", token.text))
+            result.update(re.findall(r"(?:[^\W\d]|[_$])(?:\w|[$])*", token.text))
     return result
 
 
@@ -372,16 +515,12 @@ def variable_renames(tokens: list[Token]) -> dict[str, str]:
 def _needs_space(previous: Token, current: Token) -> bool:
     if previous.kind == "directive" or current.kind == "directive":
         return False
-    if previous.text[-1].isalnum() or previous.text[-1] == "_":
-        if current.text[0].isalnum() or current.text[0] == "_":
-            return True
-    if previous.kind == "number" and current.kind == "identifier":
-        return True
-    if previous.text == "." and current.text[0].isdigit():
-        return True
-    if previous.kind == "number" and current.text in {"+", "-"} and previous.text[-1] in "eEpP":
-        return True
-    return previous.text + current.text in PUNCTUATOR_PREFIXES
+    # Re-lexing the boundary is more reliable than maintaining a growing list
+    # of special cases for pp-numbers, literal prefixes, digraphs, comments,
+    # and multi-character punctuators.  Each token participates in at most two
+    # such checks, so the total amount of text examined remains linear.
+    combined = tokenize(previous.text + current.text)
+    return combined != [previous, current]
 
 
 def minify(source: str, rename: bool = True) -> tuple[str, dict[str, str]]:
@@ -406,7 +545,8 @@ def minify(source: str, rename: bool = True) -> tuple[str, dict[str, str]]:
         output.append(token.text)
         previous = token
 
-    return "".join(output).rstrip() + "\n", renames
+    result = "".join(output).rstrip()
+    return (result + "\n" if result else ""), renames
 
 
 def main() -> int:
@@ -425,9 +565,11 @@ def main() -> int:
         sys.stdout.write(result)
 
     if args.stats:
-        reduction = 0.0 if not source else 100.0 * (len(source) - len(result)) / len(source)
+        source_size = len(source.encode("utf-8"))
+        result_size = len(result.encode("utf-8"))
+        reduction = 0.0 if not source_size else 100.0 * (source_size - result_size) / source_size
         print(
-            f"{len(source)} -> {len(result)} bytes ({reduction:.1f}% smaller), "
+            f"{source_size} -> {result_size} bytes ({reduction:.1f}% smaller), "
             f"renamed {len(renames)} identifiers",
             file=sys.stderr,
         )
