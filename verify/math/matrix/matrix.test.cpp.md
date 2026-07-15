@@ -28,6 +28,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
+  - icon: ':heavy_check_mark:'
+    path: utilities/fast_io.hpp
+    title: Fast IO
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
   _isVerificationFailed: false
@@ -672,8 +675,314 @@ data:
     \ 1));\n    };\n    return sparse_determinant_with_randomizer<T>(size, entries,\
     \ random_nonzero);\n}\n\n}  // namespace matrix\n}  // namespace m1une\n\n\n#line\
     \ 11 \"math/matrix/all.hpp\"\n\n\n#line 5 \"verify/math/matrix/matrix.test.cpp\"\
-    \n\n#line 7 \"verify/math/matrix/matrix.test.cpp\"\n#include <cmath>\n#line 11\
-    \ \"verify/math/matrix/matrix.test.cpp\"\n\nnamespace {\n\nusing mint = m1une::math::modint998244353;\n\
+    \n\n#line 7 \"verify/math/matrix/matrix.test.cpp\"\n#include <cmath>\n#line 1\
+    \ \"utilities/fast_io.hpp\"\n\n\n\n#include <array>\n#include <charconv>\n#line\
+    \ 7 \"utilities/fast_io.hpp\"\n#include <cstdio>\n#include <cstdlib>\n#line 10\
+    \ \"utilities/fast_io.hpp\"\n#include <cstring>\n#include <iterator>\n#line 15\
+    \ \"utilities/fast_io.hpp\"\n\nnamespace m1une {\nnamespace utilities {\nnamespace\
+    \ internal {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class T, class\
+    \ = void>\nstruct is_range : std::false_type {};\n\ntemplate <class T>\nstruct\
+    \ is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n  \
+    \  decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
+    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
+    \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
+    \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
+    \ std::void_t<typename std::remove_cv_t<std::remove_reference_t<T>>::value_type>>\
+    \ {\n    using type = typename std::remove_cv_t<std::remove_reference_t<T>>::value_type;\n\
+    };\n\ntemplate <class T>\nusing range_stored_value_t = typename range_stored_value<T>::type;\n\
+    \n// Treat strings and C strings as scalar output objects, not as ranges.\ntemplate\
+    \ <class T>\nstruct is_char_array : std::false_type {};\n\ntemplate <class T,\
+    \ std::size_t N>\nstruct is_char_array<T[N]>\n    : std::bool_constant<std::is_same_v<std::remove_cv_t<T>,\
+    \ char>> {};\n\ntemplate <class T>\nstruct is_string_like\n    : std::bool_constant<\n\
+    \          std::is_same_v<std::decay_t<T>, std::string>\n          || std::is_same_v<std::decay_t<T>,\
+    \ const char*>\n          || std::is_same_v<std::decay_t<T>, char*>\n        \
+    \  || is_char_array<std::remove_reference_t<T>>::value\n      > {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_string_like_v = is_string_like<T>::value;\n\
+    \n// ModInt-like type: x.val() is printable, and x can be assigned from long long.\n\
+    template <class T, class = void>\nstruct has_val_method : std::false_type {};\n\
+    \ntemplate <class T>\nstruct has_val_method<T, std::void_t<decltype(std::declval<const\
+    \ T&>().val())>>\n    : std::true_type {};\n\ntemplate <class T>\ninline constexpr\
+    \ bool has_val_method_v = has_val_method<T>::value;\n\ntemplate <class T, class\
+    \ = void>\nstruct has_static_mod_raw : std::false_type {};\n\ntemplate <class\
+    \ T>\nstruct has_static_mod_raw<\n    T, std::void_t<decltype(T::mod()), decltype(T::raw(std::declval<uint32_t>()))>>\n\
+    \    : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool has_static_mod_raw_v\
+    \ = has_static_mod_raw<T>::value;\n\n// libstdc++ before GCC 16 does not classify\
+    \ __int128 as an integral type in\n// strict ISO modes such as -std=c++23. Keep\
+    \ the fast-I/O interface independent\n// of that implementation detail.\ntemplate\
+    \ <class T>\ninline constexpr bool is_integral_v =\n    std::is_integral_v<T>\n\
+    \    || std::is_same_v<std::remove_cv_t<T>, __int128_t>\n    || std::is_same_v<std::remove_cv_t<T>,\
+    \ __uint128_t>;\n\ntemplate <class T>\ninline constexpr bool is_signed_v =\n \
+    \   std::is_signed_v<T>\n    || std::is_same_v<std::remove_cv_t<T>, __int128_t>;\n\
+    \ntemplate <class T>\nstruct make_unsigned {\n    using type = std::make_unsigned_t<T>;\n\
+    };\n\ntemplate <>\nstruct make_unsigned<__int128_t> {\n    using type = __uint128_t;\n\
+    };\n\ntemplate <>\nstruct make_unsigned<__uint128_t> {\n    using type = __uint128_t;\n\
+    };\n\ntemplate <class T>\nusing make_unsigned_t = typename make_unsigned<std::remove_cv_t<T>>::type;\n\
+    \n}  // namespace internal\n\nstruct FastInput {\n    static constexpr int buffer_size\
+    \ = 1 << 20;\n\n   private:\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
+    \    int _position;\n    int _length;\n\n    bool prepare_number() {\n       \
+    \ if (_length - _position >= 64) return true;\n        const int remaining = _length\
+    \ - _position;\n        if (remaining > 0) std::memmove(_buffer, _buffer + _position,\
+    \ remaining);\n        const int added = int(std::fread(_buffer + remaining, 1,\
+    \ buffer_size - remaining, _stream));\n        _position = 0;\n        _length\
+    \ = remaining + added;\n        if (_length < buffer_size) _buffer[_length] =\
+    \ '\\0';\n        return _length != 0;\n    }\n\n   public:\n    explicit FastInput(std::FILE*\
+    \ stream = stdin)\n        : _stream(stream), _position(0), _length(0) {}\n\n\
+    \    FastInput(const FastInput&) = delete;\n    FastInput& operator=(const FastInput&)\
+    \ = delete;\n\n    int read_char_raw() {\n        if (_position == _length) {\n\
+    \            _length = int(std::fread(_buffer, 1, buffer_size, _stream));\n  \
+    \          _position = 0;\n            if (_length == 0) return EOF;\n       \
+    \ }\n        return _buffer[_position++];\n    }\n\n    bool skip_spaces() {\n\
+    \        int c = read_char_raw();\n        while (c != EOF && c <= ' ') c = read_char_raw();\n\
+    \        if (c == EOF) return false;\n        --_position;\n        return true;\n\
+    \    }\n\n    bool read(char& value) {\n        if (!skip_spaces()) return false;\n\
+    \        value = char(read_char_raw());\n        return true;\n    }\n\n    bool\
+    \ read(std::string& value) {\n        if (!skip_spaces()) return false;\n    \
+    \    value.clear();\n        int c = read_char_raw();\n        while (c != EOF\
+    \ && c > ' ') {\n            value.push_back(char(c));\n            c = read_char_raw();\n\
+    \        }\n        return true;\n    }\n\n    bool read(bool& value) {\n    \
+    \    int x;\n        if (!read(x)) return false;\n        value = x != 0;\n  \
+    \      return true;\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
+    \        internal::is_integral_v<T>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ bool>\n            && !std::is_same_v<std::remove_cv_t<T>, char>,\n        bool\n\
+    \    >\n    read(T& value) {\n        if (!prepare_number()) return false;\n \
+    \       int c = static_cast<unsigned char>(_buffer[_position++]);\n        while\
+    \ (c <= ' ') c = static_cast<unsigned char>(_buffer[_position++]);\n\n       \
+    \ bool negative = false;\n        if (c == '-') {\n            negative = true;\n\
+    \            c = static_cast<unsigned char>(_buffer[_position++]);\n        }\n\
+    \n        if constexpr (internal::is_signed_v<T>) {\n            T result = 0;\n\
+    \            while ('0' <= c && c <= '9') {\n                const int first =\
+    \ c - '0';\n                const int second = static_cast<unsigned char>(_buffer[_position])\
+    \ - '0';\n                if (0 <= second && second <= 9) {\n                \
+    \    result = negative ? result * 100 - (first * 10 + second)\n              \
+    \                        : result * 100 + (first * 10 + second);\n           \
+    \         ++_position;\n                } else {\n                    result =\
+    \ negative ? result * 10 - first : result * 10 + first;\n                }\n \
+    \               c = static_cast<unsigned char>(_buffer[_position++]);\n      \
+    \      }\n            value = result;\n        } else {\n            T result\
+    \ = 0;\n            while ('0' <= c && c <= '9') {\n                const unsigned\
+    \ first = unsigned(c - '0');\n                const int second = static_cast<unsigned\
+    \ char>(_buffer[_position]) - '0';\n                if (0 <= second && second\
+    \ <= 9) {\n                    result = result * 100 + T(first * 10 + unsigned(second));\n\
+    \                    ++_position;\n                } else {\n                \
+    \    result = result * 10 + T(first);\n                }\n                c =\
+    \ static_cast<unsigned char>(_buffer[_position++]);\n            }\n         \
+    \   value = negative ? T(0) - result : result;\n        }\n        if (_position\
+    \ > _length) _position = _length;\n        return true;\n    }\n\n    template\
+    \ <class T>\n    std::enable_if_t<std::is_floating_point_v<T>, bool>\n    read(T&\
+    \ value) {\n        if (!skip_spaces()) return false;\n        int c = read_char_raw();\n\
+    \        bool negative = false;\n        if (c == '-' || c == '+') {\n       \
+    \     negative = c == '-';\n            c = read_char_raw();\n        }\n\n  \
+    \      long double result = 0;\n        while ('0' <= c && c <= '9') {\n     \
+    \       result = result * 10 + (c - '0');\n            c = read_char_raw();\n\
+    \        }\n        if (c == '.') {\n            long double place = 0.1L;\n \
+    \           c = read_char_raw();\n            while ('0' <= c && c <= '9') {\n\
+    \                result += (c - '0') * place;\n                place *= 0.1L;\n\
+    \                c = read_char_raw();\n            }\n        }\n        if (c\
+    \ == 'e' || c == 'E') {\n            c = read_char_raw();\n            bool exponent_negative\
+    \ = false;\n            if (c == '-' || c == '+') {\n                exponent_negative\
+    \ = c == '-';\n                c = read_char_raw();\n            }\n         \
+    \   int exponent = 0;\n            while ('0' <= c && c <= '9') {\n          \
+    \      exponent = exponent * 10 + (c - '0');\n                c = read_char_raw();\n\
+    \            }\n            long double scale = 1;\n            long double power\
+    \ = 10;\n            while (exponent > 0) {\n                if (exponent & 1)\
+    \ scale *= power;\n                power *= power;\n                exponent >>=\
+    \ 1;\n            }\n            result = exponent_negative ? result / scale :\
+    \ result * scale;\n        }\n        value = static_cast<T>(negative ? -result\
+    \ : result);\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
+    \        internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
+    \            && !internal::is_range_v<T>,\n        bool\n    >\n    read(T& value)\
+    \ {\n        long long x;\n        if (!read(x)) return false;\n        if constexpr\
+    \ (internal::has_static_mod_raw_v<T>) {\n            if (x >= 0 && uint64_t(x)\
+    \ < uint64_t(T::mod())) {\n                value = T::raw(uint32_t(x));\n    \
+    \        } else {\n                value = T(x);\n            }\n        } else\
+    \ {\n            value = T(x);\n        }\n        return true;\n    }\n\n   \
+    \ template <class Range>\n    std::enable_if_t<\n        internal::is_range_v<Range>\n\
+    \            && !internal::is_string_like_v<Range>,\n        bool\n    >\n   \
+    \ read(Range& range) {\n        using StoredValue = internal::range_stored_value_t<Range>;\n\
+    \        constexpr bool nested = internal::is_range_v<StoredValue>\n         \
+    \                       && !internal::is_string_like_v<StoredValue>;\n\n     \
+    \   for (auto&& value : range) {\n            if constexpr (std::is_same_v<StoredValue,\
+    \ bool> && !nested) {\n                bool x;\n                if (!read(x))\
+    \ return false;\n                value = x;\n            } else {\n          \
+    \      if (!read(value)) return false;\n            }\n        }\n        return\
+    \ true;\n    }\n\n    template <class First, class Second, class... Rest>\n  \
+    \  bool read(First& first, Second& second, Rest&... rest) {\n        if (!read(first))\
+    \ return false;\n        return read(second, rest...);\n    }\n\n    template\
+    \ <class T>\n    FastInput& operator>>(T& value) {\n        if (!read(value))\
+    \ std::abort();\n        return *this;\n    }\n};\n\nstruct FastOutput {\n   \
+    \ static constexpr int buffer_size = 1 << 20;\n\n   private:\n    inline static\
+    \ const auto digit_quads = [] {\n        std::array<char, 40000> result{};\n \
+    \       for (int i = 0; i < 10000; i++) {\n            int value = i;\n      \
+    \      for (int j = 3; j >= 0; j--) {\n                result[4 * i + j] = char('0'\
+    \ + value % 10);\n                value /= 10;\n            }\n        }\n   \
+    \     return result;\n    }();\n\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
+    \    int _position;\n    int _precision;\n    std::chars_format _float_format;\n\
+    \n   public:\n    explicit FastOutput(std::FILE* stream = stdout)\n        : _stream(stream),\n\
+    \          _position(0),\n          _precision(6),\n          _float_format(std::chars_format::general)\
+    \ {}\n\n    FastOutput(const FastOutput&) = delete;\n    FastOutput& operator=(const\
+    \ FastOutput&) = delete;\n\n    ~FastOutput() {\n        flush();\n    }\n\n \
+    \   void flush() {\n        if (_position == 0) return;\n        std::fwrite(_buffer,\
+    \ 1, _position, _stream);\n        _position = 0;\n    }\n\n    void write_char(char\
+    \ c) {\n        if (_position == buffer_size) flush();\n        _buffer[_position++]\
+    \ = c;\n    }\n\n    void write(const char* s) {\n        while (*s != '\\0')\
+    \ write_char(*s++);\n    }\n\n    void write(const std::string& s) {\n       \
+    \ for (char c : s) write_char(c);\n    }\n\n    void write(char c) {\n       \
+    \ write_char(c);\n    }\n\n    void write(bool value) {\n        write_char(value\
+    \ ? '1' : '0');\n    }\n\n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>>\n\
+    \    write(T value) {\n        char digits[128];\n        auto [end, error] =\
+    \ std::to_chars(\n            digits,\n            digits + sizeof(digits),\n\
+    \            value,\n            _float_format,\n            _precision\n    \
+    \    );\n        if (error != std::errc()) std::abort();\n        for (const char*\
+    \ pointer = digits; pointer != end; pointer++) {\n            write_char(*pointer);\n\
+    \        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n        internal::is_integral_v<T>\n\
+    \            && !std::is_same_v<std::remove_cv_t<T>, bool>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ char>\n    >\n    write(T value) {\n        using Raw = std::remove_cv_t<T>;\n\
+    \        using Unsigned = internal::make_unsigned_t<Raw>;\n\n        Unsigned\
+    \ magnitude;\n        if constexpr (internal::is_signed_v<Raw>) {\n          \
+    \  if (value < 0) {\n                write_char('-');\n                magnitude\
+    \ = Unsigned(0) - Unsigned(value);\n            } else {\n                magnitude\
+    \ = Unsigned(value);\n            }\n        } else {\n            magnitude =\
+    \ value;\n        }\n\n        if (magnitude == 0) {\n            write_char('0');\n\
+    \            return;\n        }\n\n        unsigned chunks[16];\n        int count\
+    \ = 0;\n        while (magnitude >= 10000) {\n            const Unsigned quotient\
+    \ = magnitude / 10000;\n            chunks[count++] = unsigned(magnitude - quotient\
+    \ * 10000);\n            magnitude = quotient;\n        }\n        if (_position\
+    \ > buffer_size - 64) flush();\n        const unsigned leading = unsigned(magnitude);\n\
+    \        const char* first = digit_quads.data() + 4 * leading;\n        int skip\
+    \ = leading < 10 ? 3 : leading < 100 ? 2 : leading < 1000 ? 1 : 0;\n        for\
+    \ (; skip < 4; skip++) _buffer[_position++] = first[skip];\n        while (count--)\
+    \ {\n            const char* digits = digit_quads.data() + 4 * chunks[count];\n\
+    \            std::memcpy(_buffer + _position, digits, 4);\n            _position\
+    \ += 4;\n        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n \
+    \       internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
+    \            && !internal::is_range_v<T>\n    >\n    write(const T& value) {\n\
+    \        write(value.val());\n    }\n\n    template <class Range>\n    std::enable_if_t<\n\
+    \        internal::is_range_v<Range>\n            && !internal::is_string_like_v<Range>\n\
+    \    >\n    write(const Range& range) {\n        using StoredValue = internal::range_stored_value_t<const\
+    \ Range>;\n        constexpr bool nested = internal::is_range_v<StoredValue>\n\
+    \                                && !internal::is_string_like_v<StoredValue>;\n\
+    \n        bool first = true;\n        for (const auto& value : range) {\n    \
+    \        if (!first) write_char(nested ? '\\n' : ' ');\n            first = false;\n\
+    \            if constexpr (std::is_same_v<StoredValue, bool> && !nested) {\n \
+    \               write(static_cast<bool>(value));\n            } else {\n     \
+    \           write(value);\n            }\n        }\n    }\n\n    template <class\
+    \ First, class... Rest>\n    void print(const First& first, const Rest&... rest)\
+    \ {\n        write(first);\n        ((write_char(' '), write(rest)), ...);\n \
+    \   }\n\n    void println() {\n        write_char('\\n');\n    }\n\n    void set_precision(int\
+    \ precision) {\n        _precision = precision;\n    }\n\n    void set_fixed(int\
+    \ precision = 6) {\n        _float_format = std::chars_format::fixed;\n      \
+    \  _precision = precision;\n    }\n\n    void set_general(int precision = 6) {\n\
+    \        _float_format = std::chars_format::general;\n        _precision = precision;\n\
+    \    }\n\n    template <class... Args>\n    void println(const Args&... args)\
+    \ {\n        print(args...);\n        write_char('\\n');\n    }\n\n    template\
+    \ <class T>\n    FastOutput& operator<<(const T& value) {\n        write(value);\n\
+    \        return *this;\n    }\n};\n\n}  // namespace utilities\n}  // namespace\
+    \ m1une\n\n\n#line 11 \"verify/math/matrix/matrix.test.cpp\"\n\nnamespace {\n\n\
+    using mint = m1une::math::modint998244353;\nusing m1une::matrix::Matrix;\n\ntemplate\
+    \ <class T>\nvoid assert_product_is_identity(const Matrix<T>& first, const Matrix<T>&\
+    \ second) {\n    assert(first.rows() == first.cols());\n    assert(first * second\
+    \ == Matrix<T>::identity(first.rows()));\n}\n\nvoid test_construction_and_arithmetic()\
+    \ {\n    Matrix<long long> first(2, 3);\n    long long value = 1;\n    for (int\
+    \ row = 0; row < first.rows(); row++) {\n        for (int col = 0; col < first.cols();\
+    \ col++) first[row][col] = value++;\n    }\n\n    Matrix<long long> second(3,\
+    \ 2);\n    second[0][0] = 7;\n    second[0][1] = 8;\n    second[1][0] = 9;\n \
+    \   second[1][1] = 10;\n    second[2][0] = 11;\n    second[2][1] = 12;\n\n   \
+    \ Matrix<long long> product = first * second;\n    assert(product.rows() == 2);\n\
+    \    assert(product.cols() == 2);\n    assert(product[0][0] == 58);\n    assert(product[0][1]\
+    \ == 64);\n    assert(product[1][0] == 139);\n    assert(product[1][1] == 154);\n\
+    \n    Matrix<long long> transposed = first.transposed();\n    assert(transposed.rows()\
+    \ == 3);\n    assert(transposed.cols() == 2);\n    assert(transposed[2][1] ==\
+    \ 6);\n\n    Matrix<long long> sum = first + first;\n    assert(sum[1][2] == 12);\n\
+    \    assert((sum - first) == first);\n    assert((first * 3LL)[1][1] == 15);\n\
+    \n    std::vector<long long> column = {1, 2, 3};\n    std::vector<long long> column_product\
+    \ = first * column;\n    assert(column_product == std::vector<long long>({14,\
+    \ 32}));\n    std::vector<long long> row = {2, -1};\n    std::vector<long long>\
+    \ row_product = row * first;\n    assert(row_product == std::vector<long long>({-2,\
+    \ -1, 0}));\n\n    Matrix<long long> flat(2, 2, std::vector<long long>({1, 2,\
+    \ 3, 4}));\n    assert(flat[1][0] == 3);\n    Matrix<long long> zero_inner_left(2,\
+    \ 0);\n    Matrix<long long> zero_inner_right(0, 3);\n    Matrix<long long> zero_product\
+    \ = zero_inner_left * zero_inner_right;\n    assert(zero_product == Matrix<long\
+    \ long>(2, 3));\n}\n\nvoid test_power() {\n    Matrix<mint> fibonacci(2, 2);\n\
+    \    fibonacci[0][0] = 1;\n    fibonacci[0][1] = 1;\n    fibonacci[1][0] = 1;\n\
+    \    assert(fibonacci.pow(0) == Matrix<mint>::identity(2));\n    Matrix<mint>\
+    \ tenth = fibonacci.pow(10);\n    assert(tenth[0][1] == mint(55));\n    assert(tenth[0][0]\
+    \ == mint(89));\n}\n\nvoid test_row_reduction() {\n    Matrix<mint> matrix(3,\
+    \ 4);\n    matrix[0][0] = 1;\n    matrix[0][1] = 2;\n    matrix[0][2] = 1;\n \
+    \   matrix[0][3] = 4;\n    matrix[1][0] = 2;\n    matrix[1][1] = 4;\n    matrix[1][2]\
+    \ = 2;\n    matrix[1][3] = 8;\n    matrix[2][1] = 1;\n    matrix[2][2] = 1;\n\
+    \    matrix[2][3] = 3;\n\n    assert(m1une::matrix::matrix_rank(matrix) == 2);\n\
+    \    auto reduced = m1une::matrix::reduced_row_echelon_form(matrix);\n    assert(reduced.rank()\
+    \ == 2);\n    assert(reduced.pivot_columns == std::vector<int>({0, 1}));\n   \
+    \ assert(reduced.matrix[0][0] == mint(1));\n    assert(reduced.matrix[0][1] ==\
+    \ mint(0));\n    assert(reduced.matrix[1][0] == mint(0));\n    assert(reduced.matrix[1][1]\
+    \ == mint(1));\n}\n\nvoid test_determinant_and_inverse() {\n    Matrix<mint> matrix(3,\
+    \ 3);\n    matrix[0][0] = 2;\n    matrix[0][1] = 1;\n    matrix[0][2] = 3;\n \
+    \   matrix[1][0] = 1;\n    matrix[1][2] = 4;\n    matrix[2][0] = 5;\n    matrix[2][1]\
+    \ = 2;\n    matrix[2][2] = 1;\n    assert(m1une::matrix::determinant(matrix) ==\
+    \ mint(9));\n\n    auto inv = m1une::matrix::inverse(matrix);\n    assert(inv.has_value());\n\
+    \    assert_product_is_identity(matrix, *inv);\n\n    Matrix<mint> singular(2,\
+    \ 2);\n    singular[0][0] = 1;\n    singular[0][1] = 2;\n    singular[1][0] =\
+    \ 2;\n    singular[1][1] = 4;\n    assert(m1une::matrix::determinant(singular)\
+    \ == mint(0));\n    assert(!m1une::matrix::inverse(singular).has_value());\n \
+    \   assert(m1une::matrix::determinant(Matrix<mint>(0, 0)) == mint(1));\n}\n\n\
+    void test_linear_systems() {\n    Matrix<mint> unique(2, 2);\n    unique[0][0]\
+    \ = 2;\n    unique[0][1] = 1;\n    unique[1][0] = 1;\n    unique[1][1] = 3;\n\
+    \    auto solved = m1une::matrix::solve_linear_system(unique, std::vector<mint>({5,\
+    \ 7}));\n    assert(solved.consistent);\n    assert(solved.has_unique_solution());\n\
+    \    assert(unique * solved.particular_solution == std::vector<mint>({5, 7}));\n\
+    \n    Matrix<mint> underdetermined(2, 3);\n    underdetermined[0][0] = 1;\n  \
+    \  underdetermined[0][1] = 1;\n    underdetermined[0][2] = 1;\n    underdetermined[1][0]\
+    \ = 2;\n    underdetermined[1][1] = 2;\n    underdetermined[1][2] = 2;\n    auto\
+    \ many =\n        m1une::matrix::solve_linear_system(underdetermined, std::vector<mint>({3,\
+    \ 6}));\n    assert(many.consistent);\n    assert(many.rank() == 1);\n    assert(many.nullity()\
+    \ == 2);\n    assert(underdetermined * many.particular_solution == std::vector<mint>({3,\
+    \ 6}));\n    for (const auto& direction : many.nullspace_basis) {\n        assert(underdetermined\
+    \ * direction == std::vector<mint>({0, 0}));\n    }\n\n    auto none =\n     \
+    \   m1une::matrix::solve_linear_system(underdetermined, std::vector<mint>({3,\
+    \ 7}));\n    assert(!none.consistent);\n\n    Matrix<mint> no_equations(0, 3);\n\
+    \    auto unconstrained =\n        m1une::matrix::solve_linear_system(no_equations,\
+    \ std::vector<mint>());\n    assert(unconstrained.consistent);\n    assert(unconstrained.rank()\
+    \ == 0);\n    assert(unconstrained.nullity() == 3);\n\n    Matrix<mint> no_variables(2,\
+    \ 0);\n    auto empty_solution =\n        m1une::matrix::solve_linear_system(no_variables,\
+    \ std::vector<mint>({0, 0}));\n    assert(empty_solution.has_unique_solution());\n\
+    \    auto impossible =\n        m1une::matrix::solve_linear_system(no_variables,\
+    \ std::vector<mint>({0, 1}));\n    assert(!impossible.consistent);\n}\n\nvoid\
+    \ test_floating_point() {\n    Matrix<double> matrix(2, 2);\n    matrix[0][0]\
+    \ = 1e-14;\n    matrix[0][1] = 1;\n    matrix[1][0] = 1;\n    matrix[1][1] = 1;\n\
+    \    assert(m1une::matrix::matrix_rank(matrix) == 2);\n    assert(std::fabs(m1une::matrix::determinant(matrix)\
+    \ + 1.0) < 1e-9);\n    auto inv = m1une::matrix::inverse(matrix);\n    assert(inv.has_value());\n\
+    \    Matrix<double> product = matrix * *inv;\n    for (int row = 0; row < 2; row++)\
+    \ {\n        for (int col = 0; col < 2; col++) {\n            const double expected\
+    \ = row == col ? 1.0 : 0.0;\n            assert(std::fabs(product[row][col] -\
+    \ expected) < 1e-9);\n        }\n    }\n}\n\nvoid test_randomized_exact() {\n\
+    \    std::uint64_t state = 0x81a5b4c3d2e1f097ULL;\n    auto random = [&state]()\
+    \ {\n        state ^= state << 7;\n        state ^= state >> 9;\n        return\
+    \ state;\n    };\n\n    for (int trial = 0; trial < 500; trial++) {\n        const\
+    \ int size = 1 + int(random() % 6);\n        Matrix<mint> lower = Matrix<mint>::identity(size);\n\
+    \        Matrix<mint> upper = Matrix<mint>::identity(size);\n        for (int\
+    \ row = 0; row < size; row++) {\n            lower[row][row] = mint(1 + int(random()\
+    \ % 100));\n            upper[row][row] = mint(1 + int(random() % 100));\n   \
+    \         for (int col = 0; col < row; col++) {\n                lower[row][col]\
+    \ = mint(int(random() % 21) - 10);\n            }\n            for (int col =\
+    \ row + 1; col < size; col++) {\n                upper[row][col] = mint(int(random()\
+    \ % 21) - 10);\n            }\n        }\n        Matrix<mint> matrix = lower\
+    \ * upper;\n        auto inv = m1une::matrix::inverse(matrix);\n        assert(inv.has_value());\n\
+    \        assert_product_is_identity(matrix, *inv);\n        assert(m1une::matrix::matrix_rank(matrix)\
+    \ == size);\n        mint expected_determinant = 1;\n        for (int i = 0; i\
+    \ < size; i++) {\n            expected_determinant *= lower[i][i] * upper[i][i];\n\
+    \        }\n        assert(m1une::matrix::determinant(matrix) == expected_determinant);\n\
+    \    }\n}\n\n}  // namespace\n\nint main() {\n    m1une::utilities::FastInput\
+    \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n\n    test_construction_and_arithmetic();\n\
+    \    test_power();\n    test_row_reduction();\n    test_determinant_and_inverse();\n\
+    \    test_linear_systems();\n    test_floating_point();\n    test_randomized_exact();\n\
+    \n    long long a, b;\n    fast_input >> a >> b;\n    fast_output << a + b <<\
+    \ '\\n';\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
+    ../../../math/modint.hpp\"\n#include \"../../../math/matrix/all.hpp\"\n\n#include\
+    \ <cassert>\n#include <cmath>\n#include <cstdint>\n#include \"../../../utilities/fast_io.hpp\"\
+    \n#include <vector>\n\nnamespace {\n\nusing mint = m1une::math::modint998244353;\n\
     using m1une::matrix::Matrix;\n\ntemplate <class T>\nvoid assert_product_is_identity(const\
     \ Matrix<T>& first, const Matrix<T>& second) {\n    assert(first.rows() == first.cols());\n\
     \    assert(first * second == Matrix<T>::identity(first.rows()));\n}\n\nvoid test_construction_and_arithmetic()\
@@ -766,112 +1075,12 @@ data:
     \ == size);\n        mint expected_determinant = 1;\n        for (int i = 0; i\
     \ < size; i++) {\n            expected_determinant *= lower[i][i] * upper[i][i];\n\
     \        }\n        assert(m1une::matrix::determinant(matrix) == expected_determinant);\n\
-    \    }\n}\n\n}  // namespace\n\nint main() {\n    test_construction_and_arithmetic();\n\
+    \    }\n}\n\n}  // namespace\n\nint main() {\n    m1une::utilities::FastInput\
+    \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n\n    test_construction_and_arithmetic();\n\
     \    test_power();\n    test_row_reduction();\n    test_determinant_and_inverse();\n\
     \    test_linear_systems();\n    test_floating_point();\n    test_randomized_exact();\n\
-    \n    long long a, b;\n    std::cin >> a >> b;\n    std::cout << a + b << '\\\
-    n';\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
-    ../../../math/modint.hpp\"\n#include \"../../../math/matrix/all.hpp\"\n\n#include\
-    \ <cassert>\n#include <cmath>\n#include <cstdint>\n#include <iostream>\n#include\
-    \ <vector>\n\nnamespace {\n\nusing mint = m1une::math::modint998244353;\nusing\
-    \ m1une::matrix::Matrix;\n\ntemplate <class T>\nvoid assert_product_is_identity(const\
-    \ Matrix<T>& first, const Matrix<T>& second) {\n    assert(first.rows() == first.cols());\n\
-    \    assert(first * second == Matrix<T>::identity(first.rows()));\n}\n\nvoid test_construction_and_arithmetic()\
-    \ {\n    Matrix<long long> first(2, 3);\n    long long value = 1;\n    for (int\
-    \ row = 0; row < first.rows(); row++) {\n        for (int col = 0; col < first.cols();\
-    \ col++) first[row][col] = value++;\n    }\n\n    Matrix<long long> second(3,\
-    \ 2);\n    second[0][0] = 7;\n    second[0][1] = 8;\n    second[1][0] = 9;\n \
-    \   second[1][1] = 10;\n    second[2][0] = 11;\n    second[2][1] = 12;\n\n   \
-    \ Matrix<long long> product = first * second;\n    assert(product.rows() == 2);\n\
-    \    assert(product.cols() == 2);\n    assert(product[0][0] == 58);\n    assert(product[0][1]\
-    \ == 64);\n    assert(product[1][0] == 139);\n    assert(product[1][1] == 154);\n\
-    \n    Matrix<long long> transposed = first.transposed();\n    assert(transposed.rows()\
-    \ == 3);\n    assert(transposed.cols() == 2);\n    assert(transposed[2][1] ==\
-    \ 6);\n\n    Matrix<long long> sum = first + first;\n    assert(sum[1][2] == 12);\n\
-    \    assert((sum - first) == first);\n    assert((first * 3LL)[1][1] == 15);\n\
-    \n    std::vector<long long> column = {1, 2, 3};\n    std::vector<long long> column_product\
-    \ = first * column;\n    assert(column_product == std::vector<long long>({14,\
-    \ 32}));\n    std::vector<long long> row = {2, -1};\n    std::vector<long long>\
-    \ row_product = row * first;\n    assert(row_product == std::vector<long long>({-2,\
-    \ -1, 0}));\n\n    Matrix<long long> flat(2, 2, std::vector<long long>({1, 2,\
-    \ 3, 4}));\n    assert(flat[1][0] == 3);\n    Matrix<long long> zero_inner_left(2,\
-    \ 0);\n    Matrix<long long> zero_inner_right(0, 3);\n    Matrix<long long> zero_product\
-    \ = zero_inner_left * zero_inner_right;\n    assert(zero_product == Matrix<long\
-    \ long>(2, 3));\n}\n\nvoid test_power() {\n    Matrix<mint> fibonacci(2, 2);\n\
-    \    fibonacci[0][0] = 1;\n    fibonacci[0][1] = 1;\n    fibonacci[1][0] = 1;\n\
-    \    assert(fibonacci.pow(0) == Matrix<mint>::identity(2));\n    Matrix<mint>\
-    \ tenth = fibonacci.pow(10);\n    assert(tenth[0][1] == mint(55));\n    assert(tenth[0][0]\
-    \ == mint(89));\n}\n\nvoid test_row_reduction() {\n    Matrix<mint> matrix(3,\
-    \ 4);\n    matrix[0][0] = 1;\n    matrix[0][1] = 2;\n    matrix[0][2] = 1;\n \
-    \   matrix[0][3] = 4;\n    matrix[1][0] = 2;\n    matrix[1][1] = 4;\n    matrix[1][2]\
-    \ = 2;\n    matrix[1][3] = 8;\n    matrix[2][1] = 1;\n    matrix[2][2] = 1;\n\
-    \    matrix[2][3] = 3;\n\n    assert(m1une::matrix::matrix_rank(matrix) == 2);\n\
-    \    auto reduced = m1une::matrix::reduced_row_echelon_form(matrix);\n    assert(reduced.rank()\
-    \ == 2);\n    assert(reduced.pivot_columns == std::vector<int>({0, 1}));\n   \
-    \ assert(reduced.matrix[0][0] == mint(1));\n    assert(reduced.matrix[0][1] ==\
-    \ mint(0));\n    assert(reduced.matrix[1][0] == mint(0));\n    assert(reduced.matrix[1][1]\
-    \ == mint(1));\n}\n\nvoid test_determinant_and_inverse() {\n    Matrix<mint> matrix(3,\
-    \ 3);\n    matrix[0][0] = 2;\n    matrix[0][1] = 1;\n    matrix[0][2] = 3;\n \
-    \   matrix[1][0] = 1;\n    matrix[1][2] = 4;\n    matrix[2][0] = 5;\n    matrix[2][1]\
-    \ = 2;\n    matrix[2][2] = 1;\n    assert(m1une::matrix::determinant(matrix) ==\
-    \ mint(9));\n\n    auto inv = m1une::matrix::inverse(matrix);\n    assert(inv.has_value());\n\
-    \    assert_product_is_identity(matrix, *inv);\n\n    Matrix<mint> singular(2,\
-    \ 2);\n    singular[0][0] = 1;\n    singular[0][1] = 2;\n    singular[1][0] =\
-    \ 2;\n    singular[1][1] = 4;\n    assert(m1une::matrix::determinant(singular)\
-    \ == mint(0));\n    assert(!m1une::matrix::inverse(singular).has_value());\n \
-    \   assert(m1une::matrix::determinant(Matrix<mint>(0, 0)) == mint(1));\n}\n\n\
-    void test_linear_systems() {\n    Matrix<mint> unique(2, 2);\n    unique[0][0]\
-    \ = 2;\n    unique[0][1] = 1;\n    unique[1][0] = 1;\n    unique[1][1] = 3;\n\
-    \    auto solved = m1une::matrix::solve_linear_system(unique, std::vector<mint>({5,\
-    \ 7}));\n    assert(solved.consistent);\n    assert(solved.has_unique_solution());\n\
-    \    assert(unique * solved.particular_solution == std::vector<mint>({5, 7}));\n\
-    \n    Matrix<mint> underdetermined(2, 3);\n    underdetermined[0][0] = 1;\n  \
-    \  underdetermined[0][1] = 1;\n    underdetermined[0][2] = 1;\n    underdetermined[1][0]\
-    \ = 2;\n    underdetermined[1][1] = 2;\n    underdetermined[1][2] = 2;\n    auto\
-    \ many =\n        m1une::matrix::solve_linear_system(underdetermined, std::vector<mint>({3,\
-    \ 6}));\n    assert(many.consistent);\n    assert(many.rank() == 1);\n    assert(many.nullity()\
-    \ == 2);\n    assert(underdetermined * many.particular_solution == std::vector<mint>({3,\
-    \ 6}));\n    for (const auto& direction : many.nullspace_basis) {\n        assert(underdetermined\
-    \ * direction == std::vector<mint>({0, 0}));\n    }\n\n    auto none =\n     \
-    \   m1une::matrix::solve_linear_system(underdetermined, std::vector<mint>({3,\
-    \ 7}));\n    assert(!none.consistent);\n\n    Matrix<mint> no_equations(0, 3);\n\
-    \    auto unconstrained =\n        m1une::matrix::solve_linear_system(no_equations,\
-    \ std::vector<mint>());\n    assert(unconstrained.consistent);\n    assert(unconstrained.rank()\
-    \ == 0);\n    assert(unconstrained.nullity() == 3);\n\n    Matrix<mint> no_variables(2,\
-    \ 0);\n    auto empty_solution =\n        m1une::matrix::solve_linear_system(no_variables,\
-    \ std::vector<mint>({0, 0}));\n    assert(empty_solution.has_unique_solution());\n\
-    \    auto impossible =\n        m1une::matrix::solve_linear_system(no_variables,\
-    \ std::vector<mint>({0, 1}));\n    assert(!impossible.consistent);\n}\n\nvoid\
-    \ test_floating_point() {\n    Matrix<double> matrix(2, 2);\n    matrix[0][0]\
-    \ = 1e-14;\n    matrix[0][1] = 1;\n    matrix[1][0] = 1;\n    matrix[1][1] = 1;\n\
-    \    assert(m1une::matrix::matrix_rank(matrix) == 2);\n    assert(std::fabs(m1une::matrix::determinant(matrix)\
-    \ + 1.0) < 1e-9);\n    auto inv = m1une::matrix::inverse(matrix);\n    assert(inv.has_value());\n\
-    \    Matrix<double> product = matrix * *inv;\n    for (int row = 0; row < 2; row++)\
-    \ {\n        for (int col = 0; col < 2; col++) {\n            const double expected\
-    \ = row == col ? 1.0 : 0.0;\n            assert(std::fabs(product[row][col] -\
-    \ expected) < 1e-9);\n        }\n    }\n}\n\nvoid test_randomized_exact() {\n\
-    \    std::uint64_t state = 0x81a5b4c3d2e1f097ULL;\n    auto random = [&state]()\
-    \ {\n        state ^= state << 7;\n        state ^= state >> 9;\n        return\
-    \ state;\n    };\n\n    for (int trial = 0; trial < 500; trial++) {\n        const\
-    \ int size = 1 + int(random() % 6);\n        Matrix<mint> lower = Matrix<mint>::identity(size);\n\
-    \        Matrix<mint> upper = Matrix<mint>::identity(size);\n        for (int\
-    \ row = 0; row < size; row++) {\n            lower[row][row] = mint(1 + int(random()\
-    \ % 100));\n            upper[row][row] = mint(1 + int(random() % 100));\n   \
-    \         for (int col = 0; col < row; col++) {\n                lower[row][col]\
-    \ = mint(int(random() % 21) - 10);\n            }\n            for (int col =\
-    \ row + 1; col < size; col++) {\n                upper[row][col] = mint(int(random()\
-    \ % 21) - 10);\n            }\n        }\n        Matrix<mint> matrix = lower\
-    \ * upper;\n        auto inv = m1une::matrix::inverse(matrix);\n        assert(inv.has_value());\n\
-    \        assert_product_is_identity(matrix, *inv);\n        assert(m1une::matrix::matrix_rank(matrix)\
-    \ == size);\n        mint expected_determinant = 1;\n        for (int i = 0; i\
-    \ < size; i++) {\n            expected_determinant *= lower[i][i] * upper[i][i];\n\
-    \        }\n        assert(m1une::matrix::determinant(matrix) == expected_determinant);\n\
-    \    }\n}\n\n}  // namespace\n\nint main() {\n    test_construction_and_arithmetic();\n\
-    \    test_power();\n    test_row_reduction();\n    test_determinant_and_inverse();\n\
-    \    test_linear_systems();\n    test_floating_point();\n    test_randomized_exact();\n\
-    \n    long long a, b;\n    std::cin >> a >> b;\n    std::cout << a + b << '\\\
-    n';\n}\n"
+    \n    long long a, b;\n    fast_input >> a >> b;\n    fast_output << a + b <<\
+    \ '\\n';\n}\n"
   dependsOn:
   - math/modint.hpp
   - math/matrix/all.hpp
@@ -882,10 +1091,11 @@ data:
   - math/matrix/linear_algebra.hpp
   - math/matrix/pfaffian.hpp
   - math/matrix/sparse_determinant.hpp
+  - utilities/fast_io.hpp
   isVerificationFile: true
   path: verify/math/matrix/matrix.test.cpp
   requiredBy: []
-  timestamp: '2026-07-14 02:42:28+09:00'
+  timestamp: '2026-07-15 03:24:36+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/matrix/matrix.test.cpp

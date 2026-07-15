@@ -150,188 +150,226 @@ data:
     \        balance[t] -= flow_value;\n        return feasible_flow(balance);\n \
     \   }\n};\n\ntemplate <class Cap>\nusing BFlow = BoundedFlow<Cap>;\n\n}  // namespace\
     \ flow\n}  // namespace m1une\n\n\n#line 1 \"graph/flow/bounded_min_cost_flow.hpp\"\
-    \n\n\n\n#line 6 \"graph/flow/bounded_min_cost_flow.hpp\"\n#include <functional>\n\
-    #line 12 \"graph/flow/bounded_min_cost_flow.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ flow {\n\ntemplate <class Cap, class Cost>\nstruct BoundedMinCostFlow {\n  \
-    \  static_assert(std::numeric_limits<Cap>::is_integer);\n    static_assert(std::numeric_limits<Cap>::is_signed);\n\
+    \n\n\n\n#line 6 \"graph/flow/bounded_min_cost_flow.hpp\"\n#include <cmath>\n#line\
+    \ 11 \"graph/flow/bounded_min_cost_flow.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ flow {\n\ntemplate <class Cap, class Cost, class TotalCost = Cost>\nstruct BoundedMinCostFlow\
+    \ {\n    static_assert(std::numeric_limits<Cap>::is_integer);\n    static_assert(std::numeric_limits<Cap>::is_signed);\n\
     \n    struct Edge {\n        int from;\n        int to;\n        Cap lower;\n\
     \        Cap upper;\n        Cost cost;\n    };\n\n    struct ResultEdge {\n \
     \       int from;\n        int to;\n        Cap lower;\n        Cap upper;\n \
     \       Cap flow;\n        Cost cost;\n    };\n\n    struct Result {\n       \
     \ std::vector<ResultEdge> edges;\n        std::vector<Cap> balance;\n        std::vector<Cost>\
-    \ potential;\n        Cost cost;\n\n        ResultEdge get_edge(int i) const {\n\
-    \            assert(0 <= i && i < int(edges.size()));\n            return edges[i];\n\
-    \        }\n\n        Cap flow(int i) const {\n            assert(0 <= i && i\
-    \ < int(edges.size()));\n            return edges[i].flow;\n        }\n    };\n\
-    \n   private:\n    struct ScalingEdge {\n        int to;\n        int rev;\n \
-    \       Cap cap;\n        Cap flow;\n        Cost cost;\n    };\n\n    struct\
-    \ ScalingSolver {\n        int n;\n        std::vector<std::vector<ScalingEdge>>\
-    \ graph;\n        std::vector<std::pair<int, int>> positions;\n        std::vector<Cap>\
-    \ excess;\n        std::vector<Cost> potential;\n        std::vector<Cost> dist;\n\
-    \        std::vector<int> parent_vertex;\n        std::vector<int> parent_edge;\n\
-    \        std::vector<int> excess_vertices;\n        std::vector<int> deficit_vertices;\n\
-    \        Cost farthest = Cost(0);\n\n        ScalingSolver(int vertex_count, const\
-    \ std::vector<Cap>& balance)\n            : n(vertex_count), graph(vertex_count),\
-    \ excess(balance),\n              potential(vertex_count, Cost(0)) {}\n\n    \
-    \    int add_edge(int from, int to, Cap lower, Cap upper, Cost cost) {\n     \
-    \       int id = int(positions.size());\n            int from_id = int(graph[from].size());\n\
-    \            int to_id = int(graph[to].size());\n            if (from == to) to_id++;\n\
-    \            positions.emplace_back(from, from_id);\n            graph[from].push_back(ScalingEdge{to,\
-    \ to_id, upper, Cap(0), cost});\n            graph[to].push_back(ScalingEdge{from,\
-    \ from_id, -lower, Cap(0), -cost});\n            return id;\n        }\n\n   \
-    \     Cap residual_capacity(int from, int edge_id) const {\n            const\
-    \ auto& edge = graph[from][edge_id];\n            return edge.cap - edge.flow;\n\
-    \        }\n\n        Cost residual_cost(int from, const ScalingEdge& edge) const\
-    \ {\n            return edge.cost + potential[from] - potential[edge.to];\n  \
-    \      }\n\n        void push(int from, int edge_id, Cap amount) {\n         \
-    \   auto& edge = graph[from][edge_id];\n            edge.flow += amount;\n   \
-    \         graph[edge.to][edge.rev].flow -= amount;\n        }\n\n        void\
-    \ saturate_negative(Cap delta) {\n            excess_vertices.clear();\n     \
-    \       deficit_vertices.clear();\n            for (int from = 0; from < n; from++)\
-    \ {\n                for (int edge_id = 0; edge_id < int(graph[from].size());\
-    \ edge_id++) {\n                    const auto& edge = graph[from][edge_id];\n\
-    \                    Cap residual = edge.cap - edge.flow;\n                  \
-    \  residual -= residual % delta;\n                    if (residual_cost(from,\
-    \ edge) < Cost(0) || residual < Cap(0)) {\n                        int to = edge.to;\n\
-    \                        push(from, edge_id, residual);\n                    \
-    \    excess[from] -= residual;\n                        excess[to] += residual;\n\
-    \                    }\n                }\n            }\n            for (int\
-    \ vertex = 0; vertex < n; vertex++) {\n                if (excess[vertex] > Cap(0))\
-    \ {\n                    excess_vertices.push_back(vertex);\n                }\
-    \ else if (excess[vertex] < Cap(0)) {\n                    deficit_vertices.push_back(vertex);\n\
-    \                }\n            }\n        }\n\n        bool dual(Cap delta) {\n\
-    \            excess_vertices.erase(\n                std::remove_if(\n       \
-    \             excess_vertices.begin(), excess_vertices.end(),\n              \
-    \      [&](int vertex) { return excess[vertex] < delta; }\n                ),\n\
-    \                excess_vertices.end()\n            );\n            deficit_vertices.erase(\n\
-    \                std::remove_if(\n                    deficit_vertices.begin(),\
-    \ deficit_vertices.end(),\n                    [&](int vertex) { return excess[vertex]\
-    \ > -delta; }\n                ),\n                deficit_vertices.end()\n  \
-    \          );\n\n            const Cost unreachable = std::numeric_limits<Cost>::max();\n\
-    \            dist.assign(n, unreachable);\n            parent_vertex.assign(n,\
-    \ -1);\n            parent_edge.assign(n, -1);\n            using QueueEntry =\
-    \ std::pair<Cost, int>;\n            std::priority_queue<\n                QueueEntry,\
-    \ std::vector<QueueEntry>, std::greater<QueueEntry>\n            > queue;\n  \
-    \          for (int vertex : excess_vertices) {\n                dist[vertex]\
-    \ = Cost(0);\n                queue.emplace(Cost(0), vertex);\n            }\n\
-    \n            farthest = Cost(0);\n            int reached_deficits = 0;\n   \
-    \         while (!queue.empty()) {\n                auto [distance, from] = queue.top();\n\
-    \                queue.pop();\n                if (dist[from] != distance) continue;\n\
-    \                farthest = distance;\n                if (excess[from] <= -delta)\
-    \ reached_deficits++;\n                if (reached_deficits >= int(deficit_vertices.size()))\
-    \ break;\n\n                for (int edge_id = 0; edge_id < int(graph[from].size());\
-    \ edge_id++) {\n                    const auto& edge = graph[from][edge_id];\n\
-    \                    if (edge.cap - edge.flow < delta) continue;\n           \
-    \         Cost next_distance = distance + residual_cost(from, edge);\n       \
-    \             if (next_distance >= dist[edge.to]) continue;\n                \
-    \    dist[edge.to] = next_distance;\n                    parent_vertex[edge.to]\
-    \ = from;\n                    parent_edge[edge.to] = edge_id;\n             \
-    \       queue.emplace(next_distance, edge.to);\n                }\n          \
-    \  }\n\n            for (int vertex = 0; vertex < n; vertex++) {\n           \
-    \     potential[vertex] += std::min(dist[vertex], farthest);\n            }\n\
-    \            return reached_deficits > 0;\n        }\n\n        void primal(Cap\
-    \ delta) {\n            for (int sink : deficit_vertices) {\n                if\
-    \ (dist[sink] > farthest) continue;\n                Cap amount = -excess[sink];\n\
-    \                int root = sink;\n                while (parent_edge[root] !=\
-    \ -1) {\n                    int from = parent_vertex[root];\n               \
-    \     amount = std::min(amount, residual_capacity(from, parent_edge[root]));\n\
-    \                    root = from;\n                }\n                amount =\
-    \ std::min(amount, excess[root]);\n                amount -= amount % delta;\n\
-    \                if (amount <= Cap(0)) continue;\n\n                int vertex\
-    \ = sink;\n                while (parent_edge[vertex] != -1) {\n             \
-    \       int from = parent_vertex[vertex];\n                    int edge_id = parent_edge[vertex];\n\
-    \                    push(from, edge_id, amount);\n                    if (residual_capacity(from,\
-    \ edge_id) == Cap(0)) {\n                        parent_edge[vertex] = -1;\n \
-    \                   }\n                    vertex = from;\n                }\n\
-    \                excess[sink] += amount;\n                excess[root] -= amount;\n\
-    \            }\n        }\n\n        bool solve() {\n            Cap scale_bound\
-    \ = Cap(1);\n            for (Cap value : excess) {\n                scale_bound\
-    \ = std::max(scale_bound, value);\n                scale_bound = std::max(scale_bound,\
-    \ -value);\n            }\n            for (const auto& edges : graph) {\n   \
-    \             for (const auto& edge : edges) {\n                    Cap residual\
-    \ = edge.cap - edge.flow;\n                    scale_bound = std::max(scale_bound,\
-    \ residual);\n                    scale_bound = std::max(scale_bound, -residual);\n\
-    \                }\n            }\n\n            Cap delta = Cap(1);\n       \
-    \     while (delta <= scale_bound / Cap(2)) delta *= Cap(2);\n            while\
-    \ (true) {\n                saturate_negative(delta);\n                while (dual(delta))\
-    \ primal(delta);\n                if (delta == Cap(1)) break;\n              \
-    \  delta /= Cap(2);\n            }\n            return excess_vertices.empty()\
-    \ && deficit_vertices.empty();\n        }\n\n        Cap edge_flow(int edge_id)\
-    \ const {\n            auto [from, index] = positions[edge_id];\n            return\
-    \ graph[from][index].flow;\n        }\n    };\n\n    int _n;\n    std::vector<Edge>\
-    \ _edges;\n    std::vector<Cap> _balance;\n\n    std::vector<Cost> residual_potential(\n\
-    \        const std::vector<ResultEdge>& edges\n    ) const {\n        std::vector<Cost>\
-    \ potential(_n, Cost(0));\n        bool updated = false;\n        for (int iteration\
-    \ = 0; iteration < _n; iteration++) {\n            updated = false;\n        \
-    \    for (const ResultEdge& edge : edges) {\n                if (\n          \
-    \          edge.flow < edge.upper &&\n                    potential[edge.to] >\
-    \ potential[edge.from] + edge.cost\n                ) {\n                    potential[edge.to]\
-    \ = potential[edge.from] + edge.cost;\n                    updated = true;\n \
-    \               }\n                if (\n                    edge.lower < edge.flow\
-    \ &&\n                    potential[edge.from] > potential[edge.to] - edge.cost\n\
-    \                ) {\n                    potential[edge.from] = potential[edge.to]\
-    \ - edge.cost;\n                    updated = true;\n                }\n     \
-    \       }\n            if (!updated) break;\n        }\n        assert(!updated);\n\
-    \        return potential;\n    }\n\n   public:\n    BoundedMinCostFlow() : BoundedMinCostFlow(0)\
-    \ {}\n\n    explicit BoundedMinCostFlow(int n) : _n(n), _balance(n, Cap(0)) {\n\
-    \        assert(0 <= n);\n    }\n\n    int size() const {\n        return _n;\n\
-    \    }\n\n    int edge_count() const {\n        return int(_edges.size());\n \
-    \   }\n\n    int add_edge(int from, int to, Cap lower, Cap upper, Cost cost) {\n\
-    \        assert(0 <= from && from < _n);\n        assert(0 <= to && to < _n);\n\
-    \        assert(lower <= upper);\n        int id = int(_edges.size());\n     \
-    \   _edges.push_back(Edge{from, to, lower, upper, cost});\n        return id;\n\
-    \    }\n\n    Edge get_edge(int i) const {\n        assert(0 <= i && i < int(_edges.size()));\n\
-    \        return _edges[i];\n    }\n\n    std::vector<Edge> edges() const {\n \
-    \       return _edges;\n    }\n\n    void set_balance(int v, Cap b) {\n      \
-    \  assert(0 <= v && v < _n);\n        _balance[v] = b;\n    }\n\n    void add_balance(int\
-    \ v, Cap b) {\n        assert(0 <= v && v < _n);\n        _balance[v] += b;\n\
-    \    }\n\n    void add_supply(int v, Cap supply) {\n        assert(Cap(0) <= supply);\n\
-    \        add_balance(v, supply);\n    }\n\n    void add_demand(int v, Cap demand)\
-    \ {\n        assert(Cap(0) <= demand);\n        add_balance(v, -demand);\n   \
-    \ }\n\n    Cap balance(int v) const {\n        assert(0 <= v && v < _n);\n   \
-    \     return _balance[v];\n    }\n\n    const std::vector<Cap>& balances() const\
-    \ {\n        return _balance;\n    }\n\n    std::optional<Result> min_cost_flow()\
-    \ const {\n        return min_cost_flow(_balance);\n    }\n\n    std::optional<Result>\
-    \ min_cost_flow(const std::vector<Cap>& balance) const {\n        assert(int(balance.size())\
-    \ == _n);\n        Cap balance_sum = Cap(0);\n        for (Cap value : balance)\
-    \ balance_sum += value;\n        if (balance_sum != Cap(0)) return std::nullopt;\n\
-    \n        ScalingSolver solver(_n, balance);\n        for (const auto& edge :\
-    \ _edges) {\n            solver.add_edge(edge.from, edge.to, edge.lower, edge.upper,\
-    \ edge.cost);\n        }\n        if (!solver.solve()) return std::nullopt;\n\n\
-    \        Result result;\n        result.balance = balance;\n        result.cost\
-    \ = Cost(0);\n        result.edges.reserve(_edges.size());\n        for (int i\
-    \ = 0; i < int(_edges.size()); i++) {\n            const auto& e = _edges[i];\n\
-    \            Cap flow = solver.edge_flow(i);\n            result.cost += Cost(flow)\
-    \ * e.cost;\n            result.edges.push_back(ResultEdge{e.from, e.to, e.lower,\
-    \ e.upper, flow, e.cost});\n        }\n        result.potential = residual_potential(result.edges);\n\
-    \        return result;\n    }\n\n    std::optional<Result> min_cost_st_flow(int\
-    \ s, int t, Cap flow_value) const {\n        assert(0 <= s && s < _n);\n     \
-    \   assert(0 <= t && t < _n);\n        assert(s != t);\n        std::vector<Cap>\
-    \ balance = _balance;\n        balance[s] += flow_value;\n        balance[t] -=\
-    \ flow_value;\n        return min_cost_flow(balance);\n    }\n};\n\ntemplate <class\
-    \ Cap, class Cost>\nusing BMinCostFlow = BoundedMinCostFlow<Cap, Cost>;\n\n} \
-    \ // namespace flow\n}  // namespace m1une\n\n\n#line 1 \"graph/flow/gomory_hu.hpp\"\
-    \n\n\n\n#line 9 \"graph/flow/gomory_hu.hpp\"\n\nnamespace m1une {\nnamespace flow\
-    \ {\n\ntemplate <class Cap>\nstruct GomoryHu {\n    struct Edge {\n        int\
-    \ u;\n        int v;\n        Cap cap;\n    };\n\n   private:\n    struct FlowEdge\
-    \ {\n        int to;\n        int rev;\n        Cap cap;\n        Cap initial_cap;\n\
-    \    };\n\n    int _n;\n    bool _built = false;\n    std::vector<Edge> _edges;\n\
-    \    std::vector<Edge> _tree_edges;\n    std::vector<int> _parent;\n    std::vector<Cap>\
-    \ _cut_value;\n    std::vector<std::vector<std::pair<int, Cap>>> _tree;\n    std::vector<std::vector<int>>\
-    \ _up;\n    std::vector<std::vector<Cap>> _minimum;\n    std::vector<int> _depth;\n\
-    \n    std::vector<std::vector<FlowEdge>> _graph;\n    std::vector<Cap> _excess;\n\
-    \    std::vector<int> _height;\n    std::vector<int> _height_count;\n    std::vector<int>\
-    \ _current;\n    std::vector<bool> _active;\n    std::vector<std::vector<int>>\
-    \ _buckets;\n    std::vector<int> _queue;\n    int _highest;\n    long long _work;\n\
-    \    long long _work_limit;\n\n    void add_flow_edge(int u, int v, Cap cap) {\n\
-    \        if (u == v || cap == Cap(0)) return;\n        int ui = int(_graph[u].size());\n\
-    \        int vi = int(_graph[v].size());\n        _graph[u].push_back(FlowEdge{v,\
-    \ vi, cap, cap});\n        _graph[v].push_back(FlowEdge{u, ui, cap, cap});\n \
-    \   }\n\n    void reset_flow() {\n        for (auto& edges : _graph) {\n     \
-    \       for (auto& edge : edges) edge.cap = edge.initial_cap;\n        }\n   \
-    \ }\n\n    void activate(int v, int s, int t) {\n        int dead = 2 * _n;\n\
-    \        if (v == s || v == t || _active[v] || _excess[v] == Cap(0) || _height[v]\
-    \ >= dead) return;\n        _active[v] = true;\n        _buckets[_height[v]].push_back(v);\n\
+    \ potential;\n        TotalCost cost;\n\n        ResultEdge get_edge(int i) const\
+    \ {\n            assert(0 <= i && i < int(edges.size()));\n            return\
+    \ edges[i];\n        }\n\n        Cap flow(int i) const {\n            assert(0\
+    \ <= i && i < int(edges.size()));\n            return edges[i].flow;\n       \
+    \ }\n    };\n\n   private:\n    struct NetworkEdge {\n        int to;\n      \
+    \  Cap cap;\n        Cost cost;\n    };\n\n    struct NetworkSimplexSolver {\n\
+    \        struct Parent {\n            int vertex;\n            int edge;\n   \
+    \         Cap up;\n            Cap down;\n        };\n\n        int n;\n     \
+    \   std::vector<NetworkEdge> edges;\n        std::vector<Cap> excess;\n      \
+    \  std::vector<Cost> potential;\n\n        NetworkSimplexSolver(int vertex_count,\
+    \ const std::vector<Cap>& balance)\n            : n(vertex_count), excess(balance)\
+    \ {}\n\n        void reserve_edges(int edge_count) {\n            edges.reserve(2\
+    \ * (edge_count + n));\n        }\n\n        int add_edge(int from, int to, Cap\
+    \ lower, Cap upper, Cost cost) {\n            int id = int(edges.size()) / 2;\n\
+    \            edges.push_back(NetworkEdge{to, upper - lower, cost});\n        \
+    \    edges.push_back(NetworkEdge{from, Cap(0), -cost});\n            excess[from]\
+    \ -= lower;\n            excess[to] += lower;\n            return id;\n      \
+    \  }\n\n        bool solve() {\n            const int original_edge_count = int(edges.size());\n\
+    \            potential.assign(n + 1, Cost(0));\n\n            Cost artificial_cost\
+    \ = Cost(1);\n            for (int edge = 0; edge < original_edge_count; edge\
+    \ += 2) {\n                artificial_cost += edges[edge].cost < Cost(0)\n   \
+    \                 ? -edges[edge].cost : edges[edge].cost;\n            }\n\n \
+    \           std::vector<Parent> parent(n);\n            edges.reserve(original_edge_count\
+    \ + 2 * n);\n            for (int vertex = 0; vertex < n; vertex++) {\n      \
+    \          if (excess[vertex] >= Cap(0)) {\n                    edges.push_back(NetworkEdge{n,\
+    \ Cap(0), artificial_cost});\n                    edges.push_back(NetworkEdge{vertex,\
+    \ excess[vertex], -artificial_cost});\n                    potential[vertex] =\
+    \ -artificial_cost;\n                } else {\n                    edges.push_back(NetworkEdge{n,\
+    \ -excess[vertex], -artificial_cost});\n                    edges.push_back(NetworkEdge{vertex,\
+    \ Cap(0), artificial_cost});\n                    potential[vertex] = artificial_cost;\n\
+    \                }\n                int edge = int(edges.size()) - 2;\n      \
+    \          parent[vertex] = Parent{\n                    n, edge, edges[edge].cap,\
+    \ edges[edge ^ 1].cap\n                };\n            }\n\n            std::vector<int>\
+    \ depth(n + 1, 1);\n            depth[n] = 0;\n            std::vector<int> next(2\
+    \ * (n + 1));\n            std::vector<int> previous(2 * (n + 1));\n         \
+    \   auto connect = [&](int first, int second) {\n                next[first] =\
+    \ second;\n                previous[second] = first;\n            };\n       \
+    \     for (int vertex = 0; vertex <= n; vertex++) {\n                connect(2\
+    \ * vertex, 2 * vertex + 1);\n            }\n            for (int vertex = 0;\
+    \ vertex < n; vertex++) {\n                connect(2 * vertex + 1, next[2 * n]);\n\
+    \                connect(2 * n, 2 * vertex);\n            }\n\n            auto\
+    \ push_flow = [&](int entering_edge) {\n                const int first = edges[entering_edge\
+    \ ^ 1].to;\n                const int second = edges[entering_edge].to;\n    \
+    \            const Cost cycle_cost =\n                    edges[entering_edge].cost\n\
+    \                    + potential[first] - potential[second];\n\n             \
+    \   Cap amount = edges[entering_edge].cap;\n                bool leave_first_side\
+    \ = true;\n                int leaving_vertex = second;\n\n                int\
+    \ first_ancestor = first;\n                int second_ancestor = second;\n   \
+    \             auto move_first_up = [&] {\n                    if (parent[first_ancestor].down\
+    \ < amount) {\n                        amount = parent[first_ancestor].down;\n\
+    \                        leaving_vertex = first_ancestor;\n                  \
+    \      leave_first_side = true;\n                    }\n                    first_ancestor\
+    \ = parent[first_ancestor].vertex;\n                };\n                auto move_second_up\
+    \ = [&] {\n                    if (parent[second_ancestor].up <= amount) {\n \
+    \                       amount = parent[second_ancestor].up;\n               \
+    \         leaving_vertex = second_ancestor;\n                        leave_first_side\
+    \ = false;\n                    }\n                    second_ancestor = parent[second_ancestor].vertex;\n\
+    \                };\n                if (depth[first_ancestor] >= depth[second_ancestor])\
+    \ {\n                    int difference = depth[first_ancestor] - depth[second_ancestor];\n\
+    \                    for (int i = 0; i < difference; i++) move_first_up();\n \
+    \               } else {\n                    int difference = depth[second_ancestor]\
+    \ - depth[first_ancestor];\n                    for (int i = 0; i < difference;\
+    \ i++) move_second_up();\n                }\n                while (first_ancestor\
+    \ != second_ancestor) {\n                    move_first_up();\n              \
+    \      move_second_up();\n                }\n                const int ancestor\
+    \ = first_ancestor;\n\n                if (amount != Cap(0)) {\n             \
+    \       int vertex = first;\n                    while (vertex != ancestor) {\n\
+    \                        parent[vertex].up += amount;\n                      \
+    \  parent[vertex].down -= amount;\n                        vertex = parent[vertex].vertex;\n\
+    \                    }\n                    vertex = second;\n               \
+    \     while (vertex != ancestor) {\n                        parent[vertex].up\
+    \ -= amount;\n                        parent[vertex].down += amount;\n       \
+    \                 vertex = parent[vertex].vertex;\n                    }\n   \
+    \             }\n\n                int vertex = first;\n                int new_parent\
+    \ = second;\n                std::pair<Cap, Cap> parent_capacities{\n        \
+    \            edges[entering_edge].cap - amount,\n                    edges[entering_edge\
+    \ ^ 1].cap + amount\n                };\n                Cost potential_difference\
+    \ = -cycle_cost;\n                if (!leave_first_side) {\n                 \
+    \   std::swap(vertex, new_parent);\n                    std::swap(parent_capacities.first,\
+    \ parent_capacities.second);\n                    potential_difference = -potential_difference;\n\
+    \                }\n                int parent_edge = entering_edge ^ (leave_first_side\
+    \ ? 0 : 1);\n\n                while (new_parent != leaving_vertex) {\n      \
+    \              int new_depth = depth[new_parent];\n                    int tour_index\
+    \ = 2 * vertex;\n                    while (tour_index != 2 * vertex + 1) {\n\
+    \                        if ((tour_index & 1) == 0) {\n                      \
+    \      new_depth++;\n                            potential[tour_index / 2] +=\
+    \ potential_difference;\n                            depth[tour_index / 2] = new_depth;\n\
+    \                        } else {\n                            new_depth--;\n\
+    \                        }\n                        tour_index = next[tour_index];\n\
+    \                    }\n\n                    connect(previous[2 * vertex], next[2\
+    \ * vertex + 1]);\n                    connect(2 * vertex + 1, next[2 * new_parent]);\n\
+    \                    connect(2 * new_parent, 2 * vertex);\n\n                \
+    \    std::swap(parent[vertex].edge, parent_edge);\n                    parent_edge\
+    \ ^= 1;\n                    std::swap(parent[vertex].up, parent_capacities.first);\n\
+    \                    std::swap(parent[vertex].down, parent_capacities.second);\n\
+    \                    std::swap(parent_capacities.first, parent_capacities.second);\n\
+    \n                    int old_parent = parent[vertex].vertex;\n              \
+    \      parent[vertex].vertex = new_parent;\n                    new_parent = vertex;\n\
+    \                    vertex = old_parent;\n                }\n               \
+    \ edges[parent_edge].cap = parent_capacities.first;\n                edges[parent_edge\
+    \ ^ 1].cap = parent_capacities.second;\n            };\n\n            const int\
+    \ candidate_limit = std::max(\n                int(0.2 * std::sqrt(double(original_edge_count))),\
+    \ 10\n            );\n            const int minor_limit = std::max(candidate_limit\
+    \ / 10, 3);\n            std::vector<int> candidates;\n            candidates.reserve(candidate_limit);\n\
+    \n            auto minor_pivot = [&] {\n                Cost best_cost = Cost(0);\n\
+    \                int best_edge = -1;\n                int index = 0;\n       \
+    \         while (index < int(candidates.size())) {\n                    int edge\
+    \ = candidates[index];\n                    if (edges[edge].cap == Cap(0)) {\n\
+    \                        candidates[index] = candidates.back();\n            \
+    \            candidates.pop_back();\n                        continue;\n     \
+    \               }\n                    Cost reduced_cost =\n                 \
+    \       edges[edge].cost\n                        + potential[edges[edge ^ 1].to]\n\
+    \                        - potential[edges[edge].to];\n                    if\
+    \ (reduced_cost >= Cost(0)) {\n                        candidates[index] = candidates.back();\n\
+    \                        candidates.pop_back();\n                        continue;\n\
+    \                    }\n                    if (reduced_cost < best_cost) {\n\
+    \                        best_cost = reduced_cost;\n                        best_edge\
+    \ = edge;\n                    }\n                    index++;\n             \
+    \   }\n                if (best_edge == -1) return false;\n                push_flow(best_edge);\n\
+    \                return true;\n            };\n\n            int edge = 0;\n \
+    \           while (true) {\n                for (int iteration = 0; iteration\
+    \ < minor_limit; iteration++) {\n                    if (!minor_pivot()) break;\n\
+    \                }\n\n                Cost best_cost = Cost(0);\n            \
+    \    int best_edge = -1;\n                candidates.clear();\n              \
+    \  for (int scanned = 0; scanned < int(edges.size()); scanned++) {\n         \
+    \           if (edges[edge].cap != Cap(0)) {\n                        Cost reduced_cost\
+    \ =\n                            edges[edge].cost\n                          \
+    \  + potential[edges[edge ^ 1].to]\n                            - potential[edges[edge].to];\n\
+    \                        if (reduced_cost < Cost(0)) {\n                     \
+    \       if (reduced_cost < best_cost) {\n                                best_cost\
+    \ = reduced_cost;\n                                best_edge = edge;\n       \
+    \                     }\n                            candidates.push_back(edge);\n\
+    \                            if (int(candidates.size()) == candidate_limit) break;\n\
+    \                        }\n                    }\n                    edge++;\n\
+    \                    if (edge == int(edges.size())) edge = 0;\n              \
+    \  }\n                if (candidates.empty()) break;\n                push_flow(best_edge);\n\
+    \            }\n\n            for (int vertex = 0; vertex < n; vertex++) {\n \
+    \               edges[parent[vertex].edge].cap = parent[vertex].up;\n        \
+    \        edges[parent[vertex].edge ^ 1].cap = parent[vertex].down;\n         \
+    \   }\n\n            bool feasible = true;\n            for (int vertex = 0; vertex\
+    \ < n; vertex++) {\n                int artificial_edge = original_edge_count\
+    \ + 2 * vertex;\n                if (\n                    (excess[vertex] >=\
+    \ Cap(0)\n                        && edges[artificial_edge ^ 1].cap != Cap(0))\n\
+    \                    || (excess[vertex] < Cap(0)\n                        && edges[artificial_edge].cap\
+    \ != Cap(0))\n                ) {\n                    feasible = false;\n   \
+    \                 break;\n                }\n            }\n            potential.pop_back();\n\
+    \            return feasible;\n        }\n\n        Cap edge_flow(int edge_id,\
+    \ Cap lower) const {\n            return lower + edges[2 * edge_id + 1].cap;\n\
+    \        }\n    };\n\n    int _n;\n    std::vector<Edge> _edges;\n    std::vector<Cap>\
+    \ _balance;\n\n   public:\n    BoundedMinCostFlow() : BoundedMinCostFlow(0) {}\n\
+    \n    explicit BoundedMinCostFlow(int n) : _n(n), _balance(n, Cap(0)) {\n    \
+    \    assert(0 <= n);\n    }\n\n    int size() const {\n        return _n;\n  \
+    \  }\n\n    int edge_count() const {\n        return int(_edges.size());\n   \
+    \ }\n\n    void reserve_edges(int edge_count) {\n        assert(0 <= edge_count);\n\
+    \        _edges.reserve(edge_count);\n    }\n\n    int add_edge(int from, int\
+    \ to, Cap lower, Cap upper, Cost cost) {\n        assert(0 <= from && from < _n);\n\
+    \        assert(0 <= to && to < _n);\n        assert(lower <= upper);\n      \
+    \  int id = int(_edges.size());\n        _edges.push_back(Edge{from, to, lower,\
+    \ upper, cost});\n        return id;\n    }\n\n    Edge get_edge(int i) const\
+    \ {\n        assert(0 <= i && i < int(_edges.size()));\n        return _edges[i];\n\
+    \    }\n\n    std::vector<Edge> edges() const {\n        return _edges;\n    }\n\
+    \n    void set_balance(int v, Cap b) {\n        assert(0 <= v && v < _n);\n  \
+    \      _balance[v] = b;\n    }\n\n    void add_balance(int v, Cap b) {\n     \
+    \   assert(0 <= v && v < _n);\n        _balance[v] += b;\n    }\n\n    void add_supply(int\
+    \ v, Cap supply) {\n        assert(Cap(0) <= supply);\n        add_balance(v,\
+    \ supply);\n    }\n\n    void add_demand(int v, Cap demand) {\n        assert(Cap(0)\
+    \ <= demand);\n        add_balance(v, -demand);\n    }\n\n    Cap balance(int\
+    \ v) const {\n        assert(0 <= v && v < _n);\n        return _balance[v];\n\
+    \    }\n\n    const std::vector<Cap>& balances() const {\n        return _balance;\n\
+    \    }\n\n    std::optional<Result> min_cost_flow() const {\n        return min_cost_flow(_balance);\n\
+    \    }\n\n    std::optional<Result> min_cost_flow(const std::vector<Cap>& balance)\
+    \ const {\n        assert(int(balance.size()) == _n);\n        Cap balance_sum\
+    \ = Cap(0);\n        for (Cap value : balance) balance_sum += value;\n       \
+    \ if (balance_sum != Cap(0)) return std::nullopt;\n\n        NetworkSimplexSolver\
+    \ solver(_n, balance);\n        solver.reserve_edges(int(_edges.size()));\n  \
+    \      for (const auto& edge : _edges) {\n            solver.add_edge(edge.from,\
+    \ edge.to, edge.lower, edge.upper, edge.cost);\n        }\n        if (!solver.solve())\
+    \ return std::nullopt;\n\n        Result result;\n        result.balance = balance;\n\
+    \        result.cost = TotalCost(0);\n        result.edges.reserve(_edges.size());\n\
+    \        for (int i = 0; i < int(_edges.size()); i++) {\n            const auto&\
+    \ e = _edges[i];\n            Cap flow = solver.edge_flow(i, e.lower);\n     \
+    \       result.cost += TotalCost(flow) * TotalCost(e.cost);\n            result.edges.push_back(ResultEdge{e.from,\
+    \ e.to, e.lower, e.upper, flow, e.cost});\n        }\n        result.potential\
+    \ = std::move(solver.potential);\n        return result;\n    }\n\n    std::optional<Result>\
+    \ min_cost_st_flow(int s, int t, Cap flow_value) const {\n        assert(0 <=\
+    \ s && s < _n);\n        assert(0 <= t && t < _n);\n        assert(s != t);\n\
+    \        std::vector<Cap> balance = _balance;\n        balance[s] += flow_value;\n\
+    \        balance[t] -= flow_value;\n        return min_cost_flow(balance);\n \
+    \   }\n};\n\ntemplate <class Cap, class Cost, class TotalCost = Cost>\nusing BMinCostFlow\
+    \ = BoundedMinCostFlow<Cap, Cost, TotalCost>;\n\n}  // namespace flow\n}  // namespace\
+    \ m1une\n\n\n#line 1 \"graph/flow/gomory_hu.hpp\"\n\n\n\n#line 9 \"graph/flow/gomory_hu.hpp\"\
+    \n\nnamespace m1une {\nnamespace flow {\n\ntemplate <class Cap>\nstruct GomoryHu\
+    \ {\n    struct Edge {\n        int u;\n        int v;\n        Cap cap;\n   \
+    \ };\n\n   private:\n    struct FlowEdge {\n        int to;\n        int rev;\n\
+    \        Cap cap;\n        Cap initial_cap;\n    };\n\n    int _n;\n    bool _built\
+    \ = false;\n    std::vector<Edge> _edges;\n    std::vector<Edge> _tree_edges;\n\
+    \    std::vector<int> _parent;\n    std::vector<Cap> _cut_value;\n    std::vector<std::vector<std::pair<int,\
+    \ Cap>>> _tree;\n    std::vector<std::vector<int>> _up;\n    std::vector<std::vector<Cap>>\
+    \ _minimum;\n    std::vector<int> _depth;\n\n    std::vector<std::vector<FlowEdge>>\
+    \ _graph;\n    std::vector<Cap> _excess;\n    std::vector<int> _height;\n    std::vector<int>\
+    \ _height_count;\n    std::vector<int> _current;\n    std::vector<bool> _active;\n\
+    \    std::vector<std::vector<int>> _buckets;\n    std::vector<int> _queue;\n \
+    \   int _highest;\n    long long _work;\n    long long _work_limit;\n\n    void\
+    \ add_flow_edge(int u, int v, Cap cap) {\n        if (u == v || cap == Cap(0))\
+    \ return;\n        int ui = int(_graph[u].size());\n        int vi = int(_graph[v].size());\n\
+    \        _graph[u].push_back(FlowEdge{v, vi, cap, cap});\n        _graph[v].push_back(FlowEdge{u,\
+    \ ui, cap, cap});\n    }\n\n    void reset_flow() {\n        for (auto& edges\
+    \ : _graph) {\n            for (auto& edge : edges) edge.cap = edge.initial_cap;\n\
+    \        }\n    }\n\n    void activate(int v, int s, int t) {\n        int dead\
+    \ = 2 * _n;\n        if (v == s || v == t || _active[v] || _excess[v] == Cap(0)\
+    \ || _height[v] >= dead) return;\n        _active[v] = true;\n        _buckets[_height[v]].push_back(v);\n\
     \        _highest = std::max(_highest, _height[v]);\n    }\n\n    void rebuild_buckets(int\
     \ s, int t) {\n        for (auto& bucket : _buckets) bucket.clear();\n       \
     \ std::fill(_active.begin(), _active.end(), false);\n        _highest = -1;\n\
@@ -465,12 +503,13 @@ data:
     \            v = _up[k][v];\n        }\n        result = std::min(result, _minimum[0][u]);\n\
     \        result = std::min(result, _minimum[0][v]);\n        return result;\n\
     \    }\n};\n\n}  // namespace flow\n}  // namespace m1une\n\n\n#line 1 \"graph/flow/min_cost_flow.hpp\"\
-    \n\n\n\n#line 11 \"graph/flow/min_cost_flow.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ flow {\n\ntemplate <class Cap, class Cost>\nstruct MinCostFlow {\n    struct\
-    \ Edge {\n        int from;\n        int to;\n        Cap cap;\n        Cap flow;\n\
-    \        Cost cost;\n    };\n\n   private:\n    struct InternalEdge {\n      \
-    \  int to;\n        int rev;\n        Cap cap;\n        Cost cost;\n    };\n\n\
-    \    int _n;\n    std::vector<std::pair<int, int>> _pos;\n    std::vector<std::vector<InternalEdge>>\
+    \n\n\n\n#line 6 \"graph/flow/min_cost_flow.hpp\"\n#include <functional>\n#line\
+    \ 11 \"graph/flow/min_cost_flow.hpp\"\n\nnamespace m1une {\nnamespace flow {\n\
+    \ntemplate <class Cap, class Cost>\nstruct MinCostFlow {\n    struct Edge {\n\
+    \        int from;\n        int to;\n        Cap cap;\n        Cap flow;\n   \
+    \     Cost cost;\n    };\n\n   private:\n    struct InternalEdge {\n        int\
+    \ to;\n        int rev;\n        Cap cap;\n        Cost cost;\n    };\n\n    int\
+    \ _n;\n    std::vector<std::pair<int, int>> _pos;\n    std::vector<std::vector<InternalEdge>>\
     \ _g;\n\n    void init_potential(int s, std::vector<Cost>& potential, Cost cost_inf)\
     \ const {\n        potential.assign(_n, cost_inf);\n        potential[s] = Cost(0);\n\
     \        for (int iter = 0; iter < _n - 1; iter++) {\n            bool updated\
@@ -562,7 +601,7 @@ data:
   path: graph/flow/flow.hpp
   requiredBy:
   - graph/all.hpp
-  timestamp: '2026-07-14 03:22:23+09:00'
+  timestamp: '2026-07-15 10:41:04+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp

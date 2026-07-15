@@ -7,6 +7,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: utilities/bigint.hpp
     title: BigInt
+  - icon: ':heavy_check_mark:'
+    path: utilities/fast_io.hpp
+    title: Fast IO
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
   _isVerificationFailed: false
@@ -31,9 +34,9 @@ data:
     \ / #ifdef / #ifndef other than include guards\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
     ../../geometry/lattice_point_count.hpp\"\n\n#include <cassert>\n#include <cstdint>\n\
-    #include <iostream>\n#include <limits>\n#include <vector>\n\nusing Inequality\
-    \ = m1une::geometry::LinearInequality<long long>;\n\n__int128 count(const std::vector<Inequality>&\
-    \ inequalities) {\n    return m1une::geometry::count_lattice_points(inequalities);\n\
+    #include \"../../utilities/fast_io.hpp\"\n#include <limits>\n#include <vector>\n\
+    \nusing Inequality = m1une::geometry::LinearInequality<long long>;\n\n__int128\
+    \ count(const std::vector<Inequality>& inequalities) {\n    return m1une::geometry::count_lattice_points(inequalities);\n\
     }\n\nvoid test_examples_and_degenerate_regions() {\n    std::vector<Inequality>\
     \ triangle;\n    triangle.push_back(Inequality{-1, 0, 0});\n    triangle.push_back(Inequality{0,\
     \ -1, 0});\n    triangle.push_back(Inequality{1, 1, 2});\n    assert(count(triangle)\
@@ -90,16 +93,18 @@ data:
     \         valid = false;\n                        break;\n                   \
     \ }\n                }\n                expected += valid;\n            }\n  \
     \      }\n        assert(count(inequalities) == expected);\n    }\n}\n\nint main()\
-    \ {\n    test_examples_and_degenerate_regions();\n    test_large_coordinates_and_floor_sum();\n\
-    \    test_randomized_against_naive();\n\n    long long a, b;\n    std::cin >>\
-    \ a >> b;\n    std::cout << a + b << '\\n';\n}\n"
+    \ {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
+    \ fast_output;\n\n    test_examples_and_degenerate_regions();\n    test_large_coordinates_and_floor_sum();\n\
+    \    test_randomized_against_naive();\n\n    long long a, b;\n    fast_input >>\
+    \ a >> b;\n    fast_output << a + b << '\\n';\n}\n"
   dependsOn:
   - geometry/lattice_point_count.hpp
   - utilities/bigint.hpp
+  - utilities/fast_io.hpp
   isVerificationFile: true
   path: verify/geometry/lattice_point_count.test.cpp
   requiredBy: []
-  timestamp: '2026-07-07 22:43:27+09:00'
+  timestamp: '2026-07-15 03:24:36+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/lattice_point_count.test.cpp

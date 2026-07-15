@@ -555,24 +555,22 @@ data:
     \    reinterpret_cast<__m256i*>(transformed_a),\n        reinterpret_cast<const\
     \ __m256i*>(transformed_b), vector_size, &transform);\n    fast998_v2::vector_dit<true>(reinterpret_cast<__m256i*>(transformed_a),\
     \ vector_size,\n                                 &transform);\n\n    std::vector<Mint>\
-    \ result(result_size);\n    if constexpr (std::is_same_v<Mint, math::ModInt<998244353>>)\
-    \ {\n        std::memcpy(result.data(), transformed_a, sizeof(uint32_t) * result_size);\n\
-    \    } else {\n        for (int j = 0; j < result_size; j++) result[j] = Mint::raw(transformed_a[j]);\n\
-    \    }\n    ::operator delete[](transformed_a, std::align_val_t(32));\n    ::operator\
-    \ delete[](transformed_b, std::align_val_t(32));\n    return result;\n}\n\n#pragma\
-    \ GCC pop_options\n\n#endif\n\n}  // namespace internal\n\ntemplate <class Mint>\n\
-    std::vector<Mint> convolution_naive(const std::vector<Mint>& a, const std::vector<Mint>&\
-    \ b) {\n    if (a.empty() || b.empty()) return {};\n    std::vector<Mint> result(a.size()\
-    \ + b.size() - 1);\n    if (a.size() < b.size()) {\n        for (int i = 0; i\
-    \ < int(a.size()); i++) {\n            for (int j = 0; j < int(b.size()); j++)\
-    \ result[i + j] += a[i] * b[j];\n        }\n    } else {\n        for (int j =\
-    \ 0; j < int(b.size()); j++) {\n            for (int i = 0; i < int(a.size());\
-    \ i++) result[i + j] += a[i] * b[j];\n        }\n    }\n    return result;\n}\n\
-    \ntemplate <class Mint>\nstd::vector<Mint> convolution_ntt(const std::vector<Mint>&\
-    \ a, const std::vector<Mint>& b) {\n    const int result_size = int(a.size() +\
-    \ b.size() - 1);\n    int n = 1;\n    while (n < result_size) n <<= 1;\n    assert((Mint::mod()\
-    \ - 1) % uint32_t(n) == 0);\n\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n    if constexpr\
-    \ (Mint::mod() == 998244353) {\n        if (n >= 64 && __builtin_cpu_supports(\"\
+    \ result(result_size);\n    for (int j = 0; j < result_size; j++) result[j] =\
+    \ Mint::raw(transformed_a[j]);\n    ::operator delete[](transformed_a, std::align_val_t(32));\n\
+    \    ::operator delete[](transformed_b, std::align_val_t(32));\n    return result;\n\
+    }\n\n#pragma GCC pop_options\n\n#endif\n\n}  // namespace internal\n\ntemplate\
+    \ <class Mint>\nstd::vector<Mint> convolution_naive(const std::vector<Mint>& a,\
+    \ const std::vector<Mint>& b) {\n    if (a.empty() || b.empty()) return {};\n\
+    \    std::vector<Mint> result(a.size() + b.size() - 1);\n    if (a.size() < b.size())\
+    \ {\n        for (int i = 0; i < int(a.size()); i++) {\n            for (int j\
+    \ = 0; j < int(b.size()); j++) result[i + j] += a[i] * b[j];\n        }\n    }\
+    \ else {\n        for (int j = 0; j < int(b.size()); j++) {\n            for (int\
+    \ i = 0; i < int(a.size()); i++) result[i + j] += a[i] * b[j];\n        }\n  \
+    \  }\n    return result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint> convolution_ntt(const\
+    \ std::vector<Mint>& a, const std::vector<Mint>& b) {\n    const int result_size\
+    \ = int(a.size() + b.size() - 1);\n    int n = 1;\n    while (n < result_size)\
+    \ n <<= 1;\n    assert((Mint::mod() - 1) % uint32_t(n) == 0);\n\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n\
+    \    if constexpr (Mint::mod() == 998244353) {\n        if (n >= 64 && __builtin_cpu_supports(\"\
     avx2\"))\n            return internal::convolution_998244353_simd(a, b);\n   \
     \ }\n#endif\n\n    // Allocate the padded buffers directly.  Constructing from\
     \ the inputs and\n    // then resizing used to allocate and copy both large operands\
@@ -1076,7 +1074,7 @@ data:
   requiredBy:
   - math/combinatorial_sequences.hpp
   - math/all.hpp
-  timestamp: '2026-07-13 23:28:27+09:00'
+  timestamp: '2026-07-15 03:06:59+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/bernoulli_utilities.test.cpp

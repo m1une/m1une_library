@@ -241,6 +241,11 @@ data:
     - icon: ':heavy_check_mark:'
       path: ds/bst/predecessor_set.hpp
       title: Predecessor Set
+  - name: ds/deque
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: ds/deque/persistent_deque.hpp
+      title: Persistent Deque
   - name: ds/dsu
     pages:
     - icon: ':heavy_check_mark:'
@@ -339,6 +344,11 @@ data:
     - icon: ':heavy_check_mark:'
       path: ds/interval_set/interval_set.hpp
       title: Interval Set
+  - name: ds/queue
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: ds/queue/persistent_queue.hpp
+      title: Persistent Queue
   - name: ds/range_query
     pages:
     - icon: ':heavy_check_mark:'
@@ -457,6 +467,11 @@ data:
     - icon: ':heavy_check_mark:'
       path: ds/segtree/segtree_beats.hpp
       title: Generic Segment Tree Beats!
+  - name: ds/stack
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: ds/stack/persistent_stack.hpp
+      title: Persistent Stack
   - name: geometry
     pages:
     - icon: ':heavy_check_mark:'
@@ -1249,6 +1264,11 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/ds/bst/predecessor_set.test.cpp
       title: verify/ds/bst/predecessor_set.test.cpp
+  - name: verify/ds/deque
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/deque/persistent_deque.test.cpp
+      title: verify/ds/deque/persistent_deque.test.cpp
   - name: verify/ds/dsu
     pages:
     - icon: ':heavy_check_mark:'
@@ -1353,6 +1373,11 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/ds/interval_set/interval_set.test.cpp
       title: verify/ds/interval_set/interval_set.test.cpp
+  - name: verify/ds/queue
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/queue/persistent_queue.test.cpp
+      title: verify/ds/queue/persistent_queue.test.cpp
   - name: verify/ds/range_query
     pages:
     - icon: ':heavy_check_mark:'
@@ -1471,6 +1496,11 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/ds/segtree/segtree_beats.test.cpp
       title: verify/ds/segtree/segtree_beats.test.cpp
+  - name: verify/ds/stack
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/stack/persistent_stack.test.cpp
+      title: verify/ds/stack/persistent_stack.test.cpp
   - name: verify/geometry
     pages:
     - icon: ':heavy_check_mark:'

@@ -58,6 +58,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: utilities/bigint.hpp
     title: BigInt
+  - icon: ':heavy_check_mark:'
+    path: utilities/fast_io.hpp
+    title: Fast IO
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
   _isVerificationFailed: false
@@ -84,9 +87,9 @@ data:
     \ / #ifdef / #ifndef other than include guards\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
     ../../geometry/all.hpp\"\n\n#include <algorithm>\n#include <cassert>\n#include\
-    \ <cmath>\n#include <cstdint>\n#include <iostream>\n#include <vector>\n\nnamespace\
-    \ {\n\nbool close(long double a, long double b) {\n    return std::fabs(a - b)\
-    \ <= 1e-10L;\n}\n\nvoid test_basic() {\n    using namespace m1une::geometry;\n\
+    \ <cmath>\n#include <cstdint>\n#include \"../../utilities/fast_io.hpp\"\n#include\
+    \ <vector>\n\nnamespace {\n\nbool close(long double a, long double b) {\n    return\
+    \ std::fabs(a - b) <= 1e-10L;\n}\n\nvoid test_basic() {\n    using namespace m1une::geometry;\n\
     \    using P = Point<long long>;\n\n    P a(0, 0);\n    P b(3, 0);\n    P c(1,\
     \ 2);\n    assert(cross(a, b, c) == 6);\n    assert(orientation(a, b, c) == 1);\n\
     \    assert(orientation(a, c, b) == -1);\n    assert(collinear(a, P(1, 0), b));\n\
@@ -152,8 +155,10 @@ data:
     \ hull[0];\n                segment.b = hull[1];\n                assert(on_segment(segment,\
     \ point));\n            } else if (hull.size() == 1) {\n                assert(point\
     \ == hull[0]);\n            }\n        }\n    }\n}\n\n}  // namespace\n\nint main()\
-    \ {\n    test_basic();\n    test_randomized_hulls();\n\n    long long a, b;\n\
-    \    std::cin >> a >> b;\n    std::cout << a + b << '\\n';\n}\n"
+    \ {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
+    \ fast_output;\n\n    test_basic();\n    test_randomized_hulls();\n\n    long\
+    \ long a, b;\n    fast_input >> a >> b;\n    fast_output << a + b << '\\n';\n\
+    }\n"
   dependsOn:
   - geometry/all.hpp
   - geometry/angle_sort.hpp
@@ -174,10 +179,11 @@ data:
   - geometry/minimum_enclosing_circle.hpp
   - geometry/polygon.hpp
   - geometry/rectangle_union_area.hpp
+  - utilities/fast_io.hpp
   isVerificationFile: true
   path: verify/geometry/geometry_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-14 00:51:53+09:00'
+  timestamp: '2026-07-15 03:24:36+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/geometry_algorithms.test.cpp
