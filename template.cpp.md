@@ -1,6 +1,9 @@
 ---
 data:
-  _extendedDependsOn: []
+  _extendedDependsOn:
+  - icon: ':heavy_check_mark:'
+    path: utilities/fast_io.hpp
+    title: Fast IO
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
   _isVerificationFailed: false
@@ -129,17 +132,18 @@ data:
     #include \"cpp-dump/cpp-dump.hpp\"\n#define dump(...) cpp_dump(__VA_ARGS__)\n\
     #else\n#define dump(...)\n#define CPP_DUMP_SET_OPTION(...)\n#define CPP_DUMP_DEFINE_EXPORT_OBJECT(...)\n\
     #define CPP_DUMP_DEFINE_EXPORT_ENUM(...)\n#define CPP_DUMP_DEFINE_DANGEROUS_EXPORT_OBJECT(...)\n\
-    #endif\n\n//----------------------------------------------------------------\n\
-    \nvoid solve() {\n    ll N;\n    cin >> N;\n}\n\nint main() {\n    ios::sync_with_stdio(false);\n\
-    \    cin.tie(nullptr);\n    cout << fixed << setprecision(20);\n    CPP_DUMP_SET_OPTION(max_line_width,\
+    #endif\n\n#include \"utilities/fast_io.hpp\"\n\n//----------------------------------------------------------------\n\
+    m1une::utilities::FastInput fastin;\nm1une::utilites::FastOutput fastout;\n\n\
+    void solve() {\n    \n}\n\nint main() {\n    CPP_DUMP_SET_OPTION(max_line_width,\
     \ 80);\n    CPP_DUMP_SET_OPTION(log_label_func, cpp_dump::log_label::filename());\n\
     \    CPP_DUMP_SET_OPTION(enable_asterisk, true);\n    int T = 1;\n    // cin >>\
     \ T;\n    while (T--) solve();\n    return 0;\n}\n"
-  dependsOn: []
+  dependsOn:
+  - utilities/fast_io.hpp
   isVerificationFile: false
   path: template.cpp
   requiredBy: []
-  timestamp: '2026-07-02 20:35:27+09:00'
+  timestamp: '2026-07-16 03:54:24+09:00'
   verificationStatus: LIBRARY_NO_TESTS
   verifiedWith: []
 documentation_of: template.cpp
