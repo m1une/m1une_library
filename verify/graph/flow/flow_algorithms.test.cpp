@@ -497,6 +497,141 @@ void test_min_cost_flow() {
         std::pair<long long, long long>{2, 7},
     };
     assert(slope == expected_slope);
+
+    std::mt19937 random(31415926);
+    for (int iteration = 0; iteration < 200; iteration++) {
+        int n = 2 + int(random() % 7);
+        int m = int(random() % 30);
+        long long flow_limit = random() % 16;
+        m1une::flow::MinCostFlow<long long, long long> tested(n);
+        m1une::flow::BoundedMinCostFlow<long long, long long> expected(n);
+        m1une::flow::MaxFlow<long long> maximum(n);
+        tested.reserve_edges(m);
+        expected.reserve_edges(m);
+        maximum.reserve_edges(m);
+        for (int edge = 0; edge < m; edge++) {
+            int from = int(random() % (n - 1));
+            int to = from + 1 + int(random() % (n - from - 1));
+            long long cap = random() % 6;
+            long long cost = int(random() % 21) - 10;
+            tested.add_edge(from, to, cap, cost);
+            expected.add_edge(from, to, 0, cap, cost);
+            maximum.add_edge(from, to, cap);
+        }
+        long long sent = maximum.max_flow(0, n - 1, flow_limit);
+        auto expected_result = expected.min_cost_st_flow(0, n - 1, sent);
+        assert(expected_result.has_value());
+        auto tested_result = tested.flow(0, n - 1, flow_limit);
+        assert(tested_result.first == sent);
+        assert(tested_result.second == expected_result->cost);
+    }
+
+    // At least eight terminal arcs are required, exercising the guarded
+    // one-shot network-simplex path rather than successive shortest paths.
+    m1une::flow::MinCostFlow<long long, long long> fast(10);
+    m1une::flow::MinCostFlow<long long, long long> reference(10);
+    fast.reserve_edges(64);
+    reference.reserve_edges(64);
+    for (int v = 1; v <= 8; v++) {
+        fast.add_edge(0, v, 1, v);
+        fast.add_edge(v, 9, 1, 10 - v);
+        reference.add_edge(0, v, 1, v);
+        reference.add_edge(v, 9, 1, 10 - v);
+    }
+    while (fast.edge_count() < 64) {
+        int from = 1 + fast.edge_count() % 8;
+        int to = 1 + (fast.edge_count() * 3 + 1) % 8;
+        if (from == to) to = to == 8 ? 1 : to + 1;
+        fast.add_edge(from, to, 1, 100);
+        reference.add_edge(from, to, 1, 100);
+    }
+    auto fast_result = fast.flow(0, 9, 10);
+    auto reference_result = reference.slope(0, 9, 10).back();
+    assert(fast_result == reference_result);
+    std::pair<long long, long long> expected_fast_result(8, 80);
+    assert(fast_result == expected_fast_result);
+    assert(fast.flow(0, 9).first == 0);
+
+    // After one shortest-path augmentation, a limit below both remaining
+    // terminal capacities exercises the exact residual s-t solve without
+    // terminal contraction, including negative-cost reverse arcs.
+    m1une::flow::MinCostFlow<long long, long long> partial(12);
+    m1une::flow::MinCostFlow<long long, long long> partial_reference(12);
+    for (int v = 1; v <= 10; v++) {
+        partial.add_edge(0, v, 1, v);
+        partial.add_edge(v, 11, 1, 0);
+        partial_reference.add_edge(0, v, 1, v);
+        partial_reference.add_edge(v, 11, 1, 0);
+    }
+    while (partial.edge_count() < 64) {
+        int from = 1 + partial.edge_count() % 10;
+        int to = 1 + (partial.edge_count() * 7 + 1) % 10;
+        if (from == to) to = to == 10 ? 1 : to + 1;
+        partial.add_edge(from, to, 1, 100);
+        partial_reference.add_edge(from, to, 1, 100);
+    }
+    assert(
+        partial.flow(0, 11, 1) ==
+        partial_reference.slope(0, 11, 1).back()
+    );
+    assert(
+        partial.flow(0, 11, 8) ==
+        partial_reference.slope(0, 11, 8).back()
+    );
+    assert(partial.flow(0, 11) == partial_reference.slope(0, 11).back());
+
+    // The terminal cut permits eight units but an internal bottleneck permits
+    // only four, exercising the max-flow fallback before the exact-cost solve.
+    m1une::flow::MinCostFlow<long long, long long> bottleneck(20);
+    for (int v = 1; v <= 8; v++) {
+        bottleneck.add_edge(0, v, 1, 0);
+        bottleneck.add_edge(v, 9, 1, 0);
+        bottleneck.add_edge(10, v + 10, 1, 0);
+        bottleneck.add_edge(v + 10, 19, 1, 0);
+    }
+    bottleneck.add_edge(9, 10, 4, 1);
+    while (bottleneck.edge_count() < 64) {
+        int from = 1 + bottleneck.edge_count() % 8;
+        int to = 1 + (bottleneck.edge_count() * 5 + 1) % 8;
+        if (from == to) to = to == 8 ? 1 : to + 1;
+        bottleneck.add_edge(from, to, 1, 100);
+    }
+    std::pair<long long, long long> expected_bottleneck(4, 4);
+    assert(bottleneck.flow(0, 19, 8) == expected_bottleneck);
+
+    // Randomized comparisons cover the terminal-contraction optimization on
+    // feasible non-negative-cost instances.
+    for (int iteration = 0; iteration < 100; iteration++) {
+        constexpr int n = 18;
+        m1une::flow::MinCostFlow<long long, long long> adaptive(n);
+        m1une::flow::MinCostFlow<long long, long long> shortest_paths(n);
+        adaptive.reserve_edges(80);
+        shortest_paths.reserve_edges(80);
+        for (int v = 1; v <= 8; v++) {
+            long long first_cost = random() % 11;
+            long long middle_cost = random() % 11;
+            long long last_cost = random() % 11;
+            adaptive.add_edge(0, v, 1, first_cost);
+            adaptive.add_edge(v, v + 8, 1, middle_cost);
+            adaptive.add_edge(v + 8, 17, 1, last_cost);
+            shortest_paths.add_edge(0, v, 1, first_cost);
+            shortest_paths.add_edge(v, v + 8, 1, middle_cost);
+            shortest_paths.add_edge(v + 8, 17, 1, last_cost);
+        }
+        while (adaptive.edge_count() < 80) {
+            int from = 1 + int(random() % 16);
+            int to = 1 + int(random() % 16);
+            if (from == to) to = to == 16 ? 1 : to + 1;
+            long long cap = 1 + random() % 3;
+            long long cost = random() % 21;
+            adaptive.add_edge(from, to, cap, cost);
+            shortest_paths.add_edge(from, to, cap, cost);
+        }
+        assert(
+            adaptive.flow(0, 17, 8) ==
+            shortest_paths.slope(0, 17, 8).back()
+        );
+    }
 }
 
 int main() {
