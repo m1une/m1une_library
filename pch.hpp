@@ -3,10 +3,14 @@
 
 #ifdef LOCAL
 #define _GLIBCXX_DEBUG
+#if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC optimize("O0")
+#endif
 #else
+#if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC optimize("O3")
 #pragma GCC optimize("unroll-loops")
+#endif
 #endif
 
 #ifdef LOCAL

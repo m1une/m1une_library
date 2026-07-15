@@ -1,8 +1,105 @@
 #ifndef M1UNE_TEMPLATE_HPP
 #define M1UNE_TEMPLATE_HPP 1
-#include <bits/stdc++.h>
+
+#include <algorithm>
+#include <any>
+#include <array>
+#include <atomic>
+#include <barrier>
+#include <bit>
+#include <bitset>
+#include <cassert>
+#include <cctype>
+#include <cerrno>
+#include <cfenv>
+#include <cfloat>
+#include <charconv>
+#include <chrono>
+#include <cinttypes>
+#include <climits>
+#include <clocale>
+#include <cmath>
+#include <codecvt>
+#include <compare>
+#include <complex>
+#include <concepts>
+#include <condition_variable>
+#include <coroutine>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
+#include <csetjmp>
+#include <csignal>
+#include <cstdarg>
+#include <cstddef>
+#include <cstring>
+#include <ctime>
+#include <cuchar>
+#include <cwchar>
+#include <cwctype>
+#include <deque>
+#include <exception>
+#include <execution>
+#include <filesystem>
+#include <format>
+#include <forward_list>
+#include <fstream>
+#include <functional>
+#include <future>
+#include <iomanip>
+#include <initializer_list>
+#include <iostream>
+#include <ios>
+#include <iosfwd>
+#include <istream>
+#include <iterator>
+#include <latch>
+#include <limits>
+#include <list>
+#include <locale>
+#include <map>
+#include <memory>
+#include <memory_resource>
+#include <mutex>
+#include <new>
+#include <numbers>
+#include <numeric>
+#include <optional>
+#include <ostream>
+#include <queue>
+#include <random>
+#include <ranges>
+#include <ratio>
+#include <regex>
+#include <scoped_allocator>
+#include <semaphore>
+#include <set>
+#include <shared_mutex>
+#include <source_location>
+#include <span>
+#include <sstream>
+#include <stack>
+#include <stdexcept>
+#include <stop_token>
+#include <streambuf>
+#include <string>
+#include <string_view>
+#include <syncstream>
+#include <system_error>
+#include <thread>
+#include <tuple>
+#include <type_traits>
+#include <typeindex>
+#include <typeinfo>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
+#include <valarray>
+#include <variant>
+#include <vector>
+#include <version>
+
 #include "utilities/fast_io.hpp"
-// #include <bits/extc++.h>
 using namespace std;
 
 namespace m1une {
@@ -26,7 +123,9 @@ using u32 = unsigned int;
 using u64 = unsigned long long;
 using i128 = __int128;
 using u128 = unsigned __int128;
+#ifdef __SIZEOF_FLOAT128__
 using f128 = __float128;
+#endif
 
 template <class T>
 constexpr T infty = 0;
