@@ -15,99 +15,163 @@ data:
     \  File \"/home/runner/.local/lib/python3.12/site-packages/onlinejudge_verify/languages/python.py\"\
     , line 96, in bundle\n    raise NotImplementedError\nNotImplementedError\n"
   code: "#!/usr/bin/env python3\n\"\"\"A small, dependency-free C++ source minifier\
-    \ for contest submissions.\n\nThe minifier removes comments and unnecessary whitespace.\
-    \  By default it also\nshortens identifiers which look like variable declarations.\
-    \  Renaming is\ndeliberately conservative: macros, types, functions, labels, qualified\
-    \ names,\nand member names are left alone.\n\"\"\"\n\nfrom __future__ import annotations\n\
-    \nimport argparse\nimport re\nimport sys\nfrom dataclasses import dataclass\n\
-    from pathlib import Path\n\n\nCPP_KEYWORDS = {\n    \"alignas\", \"alignof\",\
-    \ \"and\", \"and_eq\", \"asm\", \"auto\", \"bitand\",\n    \"bitor\", \"bool\"\
-    , \"break\", \"case\", \"catch\", \"char\", \"char8_t\",\n    \"char16_t\", \"\
-    char32_t\", \"class\", \"compl\", \"concept\", \"const\",\n    \"consteval\",\
-    \ \"constexpr\", \"constinit\", \"const_cast\", \"continue\",\n    \"co_await\"\
-    , \"co_return\", \"co_yield\", \"decltype\", \"default\", \"delete\",\n    \"\
-    do\", \"double\", \"dynamic_cast\", \"else\", \"enum\", \"explicit\", \"export\"\
-    ,\n    \"extern\", \"false\", \"float\", \"for\", \"friend\", \"goto\", \"if\"\
-    , \"inline\",\n    \"int\", \"long\", \"mutable\", \"namespace\", \"new\", \"\
-    noexcept\", \"not\",\n    \"not_eq\", \"nullptr\", \"operator\", \"or\", \"or_eq\"\
-    , \"private\", \"protected\",\n    \"public\", \"register\", \"reinterpret_cast\"\
-    , \"requires\", \"return\", \"short\",\n    \"signed\", \"sizeof\", \"static\"\
-    , \"static_assert\", \"static_cast\", \"struct\",\n    \"switch\", \"template\"\
-    , \"this\", \"thread_local\", \"throw\", \"true\", \"try\",\n    \"typedef\",\
-    \ \"typeid\", \"typename\", \"union\", \"unsigned\", \"using\", \"virtual\",\n\
-    \    \"void\", \"volatile\", \"wchar_t\", \"while\", \"xor\", \"xor_eq\",\n}\n\
-    \nBUILTIN_TYPES = {\n    \"auto\", \"bool\", \"char\", \"char8_t\", \"char16_t\"\
-    , \"char32_t\", \"double\",\n    \"float\", \"int\", \"long\", \"short\", \"signed\"\
-    , \"unsigned\", \"void\",\n    \"wchar_t\", \"size_t\", \"ptrdiff_t\", \"int8_t\"\
-    , \"int16_t\", \"int32_t\",\n    \"int64_t\", \"uint8_t\", \"uint16_t\", \"uint32_t\"\
-    , \"uint64_t\", \"__int128\",\n    \"__int128_t\", \"__uint128_t\",\n}\n\nCOMMON_TYPES\
-    \ = {\n    \"array\", \"bitset\", \"deque\", \"function\", \"initializer_list\"\
-    , \"list\",\n    \"map\", \"multimap\", \"multiset\", \"optional\", \"pair\",\
-    \ \"priority_queue\",\n    \"queue\", \"set\", \"span\", \"stack\", \"string\"\
-    , \"string_view\", \"tuple\",\n    \"unordered_map\", \"unordered_multimap\",\
-    \ \"unordered_multiset\",\n    \"unordered_set\", \"variant\", \"vector\",\n}\n\
-    \nCV_AND_POINTER = {\"const\", \"volatile\", \"constexpr\", \"static\", \"mutable\"\
-    , \"*\", \"&\", \"&&\"}\n\nPUNCTUATORS = (\n    \"%:%:\", \"<<=\", \">>=\", \"\
-    <=>\", \"->*\", \"...\", \"##\", \"::\", \".*\", \"->\",\n    \"++\", \"--\",\
-    \ \"<<\", \">>\", \"<=\", \">=\", \"==\", \"!=\", \"&&\", \"||\", \"*=\",\n  \
-    \  \"/=\", \"%=\", \"+=\", \"-=\", \"&=\", \"^=\", \"|=\", \"<:\", \":>\", \"\
-    <%\", \"%>\",\n    \"%:\", \"{\", \"}\", \"[\", \"]\", \"(\", \")\", \"#\", \"\
-    ;\", \":\", \"?\", \".\", \"+\",\n    \"-\", \"*\", \"/\", \"%\", \"^\", \"&\"\
-    , \"|\", \"~\", \"!\", \"=\", \"<\", \">\", \",\",\n)\n\nMULTI_PUNCTUATORS = {p\
-    \ for p in PUNCTUATORS if len(p) > 1} | {\"//\", \"/*\"}\nPUNCTUATOR_PREFIXES\
-    \ = {\n    p[:i] for p in MULTI_PUNCTUATORS for i in range(2, len(p) + 1)\n}\n\
-    \n\n@dataclass(frozen=True)\nclass Token:\n    kind: str\n    text: str\n\n\n\
-    def _quoted_end(source: str, start: int) -> int | None:\n    \"\"\"Return the\
-    \ end of a string/character/raw literal starting at start.\"\"\"\n    prefixes\
-    \ = (\"u8R\\\"\", \"uR\\\"\", \"UR\\\"\", \"LR\\\"\", \"R\\\"\")\n    raw_prefix\
-    \ = next((p for p in prefixes if source.startswith(p, start)), None)\n    if raw_prefix\
-    \ is not None:\n        delimiter_start = start + len(raw_prefix)\n        open_paren\
-    \ = source.find(\"(\", delimiter_start)\n        if open_paren == -1 or open_paren\
-    \ - delimiter_start > 16:\n            return None\n        delimiter = source[delimiter_start:open_paren]\n\
-    \        if any(ch.isspace() or ch in \"()\\\\\" for ch in delimiter):\n     \
-    \       return None\n        close = source.find(\")\" + delimiter + \"\\\"\"\
-    , open_paren + 1)\n        return len(source) if close == -1 else close + len(delimiter)\
-    \ + 2\n\n    prefixes = (\"u8\\\"\", \"u\\\"\", \"U\\\"\", \"L\\\"\", \"\\\"\"\
-    , \"u'\", \"U'\", \"L'\", \"'\")\n    prefix = next((p for p in prefixes if source.startswith(p,\
-    \ start)), None)\n    if prefix is None:\n        return None\n    quote = prefix[-1]\n\
-    \    i = start + len(prefix)\n    while i < len(source):\n        if source[i]\
-    \ == \"\\\\\":\n            i += 2\n        elif source[i] == quote:\n       \
-    \     return i + 1\n        else:\n            i += 1\n    return len(source)\n\
-    \n\ndef tokenize(source: str) -> list[Token]:\n    # C++ removes escaped newlines\
-    \ before recognizing comments or tokens.\n    source = source.replace(\"\\\\\\\
-    r\\n\", \"\").replace(\"\\\\\\n\", \"\")\n    tokens: list[Token] = []\n    i\
-    \ = 0\n    at_line_start = True\n    n = len(source)\n\n    while i < n:\n   \
-    \     ch = source[i]\n        if ch in \" \\t\\v\\f\\r\":\n            i += 1\n\
-    \            continue\n        if ch == \"\\n\":\n            at_line_start =\
-    \ True\n            i += 1\n            continue\n\n        if at_line_start and\
-    \ ch == \"#\":\n            start = i\n            while i < n:\n            \
-    \    newline = source.find(\"\\n\", i)\n                if newline == -1:\n  \
-    \                  i = n\n                    break\n                backslashes\
-    \ = 0\n                j = newline - 1\n                while j >= start and source[j]\
-    \ == \"\\\\\":\n                    backslashes += 1\n                    j -=\
-    \ 1\n                i = newline + 1\n                if backslashes % 2 == 0:\n\
-    \                    break\n            tokens.append(Token(\"directive\", source[start:i].rstrip()))\n\
-    \            at_line_start = True\n            continue\n\n        at_line_start\
-    \ = False\n        if source.startswith(\"//\", i):\n            newline = source.find(\"\
-    \\n\", i + 2)\n            i = n if newline == -1 else newline + 1\n         \
-    \   at_line_start = True\n            continue\n        if source.startswith(\"\
-    /*\", i):\n            close = source.find(\"*/\", i + 2)\n            if close\
-    \ == -1:\n                i = n\n            else:\n                segment =\
-    \ source[i:close + 2]\n                at_line_start = segment.endswith(\"\\n\"\
-    )\n                i = close + 2\n            continue\n\n        literal_end\
-    \ = _quoted_end(source, i)\n        if literal_end is not None:\n            tokens.append(Token(\"\
+    \ for contest submissions.\n\nThe minifier removes comments and whitespace without\
+    \ changing the C++ token\nstream.  By default it also shortens identifiers which\
+    \ look like variable\ndeclarations.  Renaming is deliberately conservative: macros,\
+    \ types,\nfunctions, labels, qualified names, and member names are left alone.\n\
+    \"\"\"\n\nfrom __future__ import annotations\n\nimport argparse\nimport re\nimport\
+    \ sys\nfrom dataclasses import dataclass\nfrom pathlib import Path\n\n\nCPP_KEYWORDS\
+    \ = {\n    \"alignas\", \"alignof\", \"and\", \"and_eq\", \"asm\", \"auto\", \"\
+    bitand\",\n    \"bitor\", \"bool\", \"break\", \"case\", \"catch\", \"char\",\
+    \ \"char8_t\",\n    \"char16_t\", \"char32_t\", \"class\", \"compl\", \"concept\"\
+    , \"const\",\n    \"consteval\", \"constexpr\", \"constinit\", \"const_cast\"\
+    , \"continue\",\n    \"co_await\", \"co_return\", \"co_yield\", \"decltype\",\
+    \ \"default\", \"delete\",\n    \"do\", \"double\", \"dynamic_cast\", \"else\"\
+    , \"enum\", \"explicit\", \"export\",\n    \"extern\", \"false\", \"float\", \"\
+    for\", \"friend\", \"goto\", \"if\", \"inline\",\n    \"int\", \"long\", \"mutable\"\
+    , \"namespace\", \"new\", \"noexcept\", \"not\",\n    \"not_eq\", \"nullptr\"\
+    , \"operator\", \"or\", \"or_eq\", \"private\", \"protected\",\n    \"public\"\
+    , \"register\", \"reinterpret_cast\", \"requires\", \"return\", \"short\",\n \
+    \   \"signed\", \"sizeof\", \"static\", \"static_assert\", \"static_cast\", \"\
+    struct\",\n    \"switch\", \"template\", \"this\", \"thread_local\", \"throw\"\
+    , \"true\", \"try\",\n    \"typedef\", \"typeid\", \"typename\", \"union\", \"\
+    unsigned\", \"using\", \"virtual\",\n    \"void\", \"volatile\", \"wchar_t\",\
+    \ \"while\", \"xor\", \"xor_eq\", \"import\",\n    \"module\",\n}\n\nBUILTIN_TYPES\
+    \ = {\n    \"auto\", \"bool\", \"char\", \"char8_t\", \"char16_t\", \"char32_t\"\
+    , \"double\",\n    \"float\", \"int\", \"long\", \"short\", \"signed\", \"unsigned\"\
+    , \"void\",\n    \"wchar_t\", \"size_t\", \"ptrdiff_t\", \"int8_t\", \"int16_t\"\
+    , \"int32_t\",\n    \"int64_t\", \"uint8_t\", \"uint16_t\", \"uint32_t\", \"uint64_t\"\
+    , \"__int128\",\n    \"__int128_t\", \"__uint128_t\",\n}\n\nCOMMON_TYPES = {\n\
+    \    \"array\", \"bitset\", \"deque\", \"function\", \"initializer_list\", \"\
+    list\",\n    \"map\", \"multimap\", \"multiset\", \"optional\", \"pair\", \"priority_queue\"\
+    ,\n    \"queue\", \"set\", \"span\", \"stack\", \"string\", \"string_view\", \"\
+    tuple\",\n    \"unordered_map\", \"unordered_multimap\", \"unordered_multiset\"\
+    ,\n    \"unordered_set\", \"variant\", \"vector\",\n}\n\nCV_AND_POINTER = {\"\
+    const\", \"volatile\", \"constexpr\", \"static\", \"mutable\", \"*\", \"&\", \"\
+    &&\"}\n\nPUNCTUATORS = (\n    \"%:%:\", \"<<=\", \">>=\", \"<=>\", \"->*\", \"\
+    ...\", \"##\", \"::\", \".*\", \"->\",\n    \"++\", \"--\", \"<<\", \">>\", \"\
+    <=\", \">=\", \"==\", \"!=\", \"&&\", \"||\", \"*=\",\n    \"/=\", \"%=\", \"\
+    +=\", \"-=\", \"&=\", \"^=\", \"|=\", \"<:\", \":>\", \"<%\", \"%>\",\n    \"\
+    %:\", \"{\", \"}\", \"[\", \"]\", \"(\", \")\", \"#\", \";\", \":\", \"?\", \"\
+    .\", \"+\",\n    \"-\", \"*\", \"/\", \"%\", \"^\", \"&\", \"|\", \"~\", \"!\"\
+    , \"=\", \"<\", \">\", \",\",\n)\n\n\n@dataclass(frozen=True)\nclass Token:\n\
+    \    kind: str\n    text: str\n\n\ndef _is_identifier_start(ch: str) -> bool:\n\
+    \    # '$' is a widely supported GCC/Clang extension and is useful to recognize\n\
+    \    # even though portable C++ identifiers do not contain it.\n    return ch\
+    \ in \"_$\" or ch.isalpha() or (ord(ch) >= 128 and not ch.isspace())\n\n\ndef\
+    \ _is_identifier_continue(ch: str) -> bool:\n    return _is_identifier_start(ch)\
+    \ or ch.isdigit()\n\n\ndef _number_end(source: str, start: int) -> int:\n    \"\
+    \"\"Return the end of a preprocessing number starting at ``start``.\"\"\"\n  \
+    \  i = start + 1\n    while i < len(source):\n        current = source[i]\n  \
+    \      if _is_identifier_continue(current) or current == \".\":\n            i\
+    \ += 1\n        elif (\n            current == \"'\"\n            and i + 1 <\
+    \ len(source)\n            and _is_identifier_continue(source[i + 1])\n      \
+    \  ):\n            i += 2\n        elif current in \"+-\" and source[i - 1] in\
+    \ \"eEpP\":\n            i += 1\n        else:\n            break\n    return\
+    \ i\n\n\ndef _raw_literal_bounds(source: str, start: int) -> tuple[int, int, int]\
+    \ | None:\n    \"\"\"Return ``(open_paren, close_paren, end)`` for a raw literal.\"\
+    \"\"\n    prefixes = (\"u8R\\\"\", \"uR\\\"\", \"UR\\\"\", \"LR\\\"\", \"R\\\"\
+    \")\n    raw_prefix = next((p for p in prefixes if source.startswith(p, start)),\
+    \ None)\n    if raw_prefix is None:\n        return None\n    delimiter_start\
+    \ = start + len(raw_prefix)\n    open_paren = source.find(\"(\", delimiter_start)\n\
+    \    if open_paren == -1 or open_paren - delimiter_start > 16:\n        return\
+    \ None\n    delimiter = source[delimiter_start:open_paren]\n    if any(ch.isspace()\
+    \ or ch in \"()\\\\\" for ch in delimiter):\n        return None\n    close_paren\
+    \ = source.find(\")\" + delimiter + \"\\\"\", open_paren + 1)\n    if close_paren\
+    \ == -1:\n        return None\n    end = close_paren + len(delimiter) + 2\n  \
+    \  while end < len(source) and _is_identifier_continue(source[end]):\n       \
+    \ end += 1\n    return open_paren, close_paren, end\n\n\ndef _quoted_end(source:\
+    \ str, start: int) -> int | None:\n    \"\"\"Return the end of a string/character/raw\
+    \ literal starting at start.\n\n    An immediately adjacent user-defined-literal\
+    \ suffix is part of the token.\n    \"\"\"\n    raw_bounds = _raw_literal_bounds(source,\
+    \ start)\n    if raw_bounds is not None:\n        return raw_bounds[2]\n    if\
+    \ any(source.startswith(p, start) for p in (\"u8R\\\"\", \"uR\\\"\", \"UR\\\"\"\
+    , \"LR\\\"\", \"R\\\"\")):\n        # It looks like a raw literal but is malformed\
+    \ or unterminated.  The\n        # compiler will diagnose it; treating the remainder\
+    \ as one token keeps\n        # the minifier from compounding the error.\n   \
+    \     return len(source)\n\n    prefixes = (\"u8\\\"\", \"u\\\"\", \"U\\\"\",\
+    \ \"L\\\"\", \"\\\"\", \"u'\", \"U'\", \"L'\", \"'\")\n    prefix = next((p for\
+    \ p in prefixes if source.startswith(p, start)), None)\n    if prefix is None:\n\
+    \        return None\n    quote = prefix[-1]\n    i = start + len(prefix)\n  \
+    \  while i < len(source):\n        if source[i] == \"\\\\\":\n            i +=\
+    \ 2\n        elif source[i] == quote:\n            end = i + 1\n            while\
+    \ end < len(source) and _is_identifier_continue(source[end]):\n              \
+    \  end += 1\n            return end\n        else:\n            i += 1\n    return\
+    \ len(source)\n\n\ndef _splice_lines(source: str) -> str:\n    \"\"\"Perform phase-2\
+    \ line splicing while restoring raw-string contents.\"\"\"\n    spliced: list[str]\
+    \ = []\n    origins: list[int] = []\n    i = 0\n    while i < len(source):\n \
+    \       if source[i] == \"\\\\\":\n            if source.startswith(\"\\r\\n\"\
+    , i + 1):\n                i += 3\n                continue\n            if i\
+    \ + 1 < len(source) and source[i + 1] in \"\\r\\n\":\n                i += 2\n\
+    \                continue\n        spliced.append(source[i])\n        origins.append(i)\n\
+    \        i += 1\n\n    phase_two = \"\".join(spliced)\n    output: list[str] =\
+    \ []\n    copied_until = 0\n    i = 0\n    while i < len(phase_two):\n       \
+    \ if phase_two.startswith(\"//\", i):\n            newline = phase_two.find(\"\
+    \\n\", i + 2)\n            i = len(phase_two) if newline == -1 else newline\n\
+    \            continue\n        if phase_two.startswith(\"/*\", i):\n         \
+    \   close = phase_two.find(\"*/\", i + 2)\n            i = len(phase_two) if close\
+    \ == -1 else close + 2\n            continue\n        if phase_two[i].isdigit()\
+    \ or (\n            phase_two[i] == \".\"\n            and i + 1 < len(phase_two)\n\
+    \            and phase_two[i + 1].isdigit()\n        ):\n            i = _number_end(phase_two,\
+    \ i)\n            continue\n\n        raw_bounds = _raw_literal_bounds(phase_two,\
+    \ i)\n        if raw_bounds is not None:\n            open_paren, close_paren,\
+    \ end = raw_bounds\n            output.append(phase_two[copied_until:open_paren\
+    \ + 1])\n            original_open = origins[open_paren]\n            original_close\
+    \ = origins[close_paren]\n            output.append(source[original_open + 1:original_close])\n\
+    \            output.append(phase_two[close_paren:end])\n            copied_until\
+    \ = end\n            i = end\n            continue\n\n        literal_end = _quoted_end(phase_two,\
+    \ i)\n        if literal_end is not None:\n            i = literal_end\n     \
+    \       continue\n        if _is_identifier_start(phase_two[i]):\n           \
+    \ i += 1\n            while i < len(phase_two) and _is_identifier_continue(phase_two[i]):\n\
+    \                i += 1\n            continue\n        i += 1\n\n    output.append(phase_two[copied_until:])\n\
+    \    return \"\".join(output)\n\n\ndef _prepare_source(source: str) -> str:\n\
+    \    \"\"\"Apply the translation phases needed before preprocessing-token lexing.\"\
+    \"\"\n    # Line splicing precedes comment recognition.  C++ restores transformations\n\
+    \    # within raw-string contents after recognizing the raw literal.\n    source\
+    \ = source.replace(\"\\r\\n\", \"\\n\").replace(\"\\r\", \"\\n\")\n    source\
+    \ = _splice_lines(source)\n\n    # Comments are replaced by one space in translation\
+    \ phase 3.  In\n    # particular, newlines *inside* a block comment do not terminate\
+    \ a\n    # preprocessing directive.\n    output: list[str] = []\n    i = 0\n \
+    \   while i < len(source):\n        if source[i].isdigit() or (\n            source[i]\
+    \ == \".\" and i + 1 < len(source) and source[i + 1].isdigit()\n        ):\n \
+    \           end = _number_end(source, i)\n            output.append(source[i:end])\n\
+    \            i = end\n            continue\n        literal_end = _quoted_end(source,\
+    \ i)\n        if literal_end is not None:\n            output.append(source[i:literal_end])\n\
+    \            i = literal_end\n            continue\n        if source.startswith(\"\
+    //\", i):\n            output.append(\" \")\n            newline = source.find(\"\
+    \\n\", i + 2)\n            i = len(source) if newline == -1 else newline\n   \
+    \         continue\n        if source.startswith(\"/*\", i):\n            output.append(\"\
+    \ \")\n            close = source.find(\"*/\", i + 2)\n            i = len(source)\
+    \ if close == -1 else close + 2\n            continue\n        output.append(source[i])\n\
+    \        i += 1\n    return \"\".join(output)\n\n\ndef _directive_end(source:\
+    \ str, start: int) -> int:\n    \"\"\"Return the end of a preprocessing directive,\
+    \ including its newline.\"\"\"\n    i = start\n    while i < len(source):\n  \
+    \      if source[i] == \"\\n\":\n            return i + 1\n        if source[i].isdigit()\
+    \ or (\n            source[i] == \".\" and i + 1 < len(source) and source[i +\
+    \ 1].isdigit()\n        ):\n            i = _number_end(source, i)\n         \
+    \   continue\n        literal_end = _quoted_end(source, i)\n        if literal_end\
+    \ is not None:\n            i = literal_end\n            continue\n        if\
+    \ _is_identifier_start(source[i]):\n            i += 1\n            while i <\
+    \ len(source) and _is_identifier_continue(source[i]):\n                i += 1\n\
+    \            continue\n        i += 1\n    return len(source)\n\n\ndef tokenize(source:\
+    \ str) -> list[Token]:\n    source = _prepare_source(source)\n    tokens: list[Token]\
+    \ = []\n    i = 0\n    at_line_start = True\n    n = len(source)\n\n    while\
+    \ i < n:\n        ch = source[i]\n        if ch in \" \\t\\v\\f\\r\":\n      \
+    \      i += 1\n            continue\n        if ch == \"\\n\":\n            at_line_start\
+    \ = True\n            i += 1\n            continue\n\n        if at_line_start\
+    \ and (ch == \"#\" or source.startswith(\"%:\", i)):\n            start = i\n\
+    \            i = _directive_end(source, i)\n            tokens.append(Token(\"\
+    directive\", source[start:i].rstrip()))\n            at_line_start = True\n  \
+    \          continue\n\n        at_line_start = False\n        literal_end = _quoted_end(source,\
+    \ i)\n        if literal_end is not None:\n            tokens.append(Token(\"\
     literal\", source[i:literal_end]))\n            i = literal_end\n            continue\n\
-    \n        if ch.isalpha() or ch == \"_\":\n            j = i + 1\n           \
-    \ while j < n and (source[j].isalnum() or source[j] == \"_\"):\n             \
-    \   j += 1\n            tokens.append(Token(\"identifier\", source[i:j]))\n  \
-    \          i = j\n            continue\n\n        if ch.isdigit() or (ch == \"\
-    .\" and i + 1 < n and source[i + 1].isdigit()):\n            j = i + 1\n     \
-    \       while j < n:\n                current = source[j]\n                if\
-    \ current.isalnum() or current in \"_.'\":\n                    j += 1\n     \
-    \           elif current in \"+-\" and source[j - 1] in \"eEpP\":\n          \
-    \          j += 1\n                else:\n                    break\n        \
-    \    tokens.append(Token(\"number\", source[i:j]))\n            i = j\n      \
-    \      continue\n\n        punctuator = next((p for p in PUNCTUATORS if source.startswith(p,\
+    \n        if _is_identifier_start(ch):\n            j = i + 1\n            while\
+    \ j < n and _is_identifier_continue(source[j]):\n                j += 1\n    \
+    \        tokens.append(Token(\"identifier\", source[i:j]))\n            i = j\n\
+    \            continue\n\n        if ch.isdigit() or (ch == \".\" and i + 1 < n\
+    \ and source[i + 1].isdigit()):\n            j = _number_end(source, i)\n    \
+    \        tokens.append(Token(\"number\", source[i:j]))\n            i = j\n  \
+    \          continue\n\n        punctuator = next((p for p in PUNCTUATORS if source.startswith(p,\
     \ i)), ch)\n        tokens.append(Token(\"punct\", punctuator))\n        i +=\
     \ len(punctuator)\n\n    return tokens\n\n\ndef _matching_left(tokens: list[Token],\
     \ right: int, opening: str, closing: str) -> int | None:\n    depth = 0\n    for\
@@ -137,8 +201,8 @@ data:
     \ left is not None and left > 0 and tokens[left - 1].text == \"decltype\"\n  \
     \  return False\n\n\ndef _directive_identifiers(tokens: list[Token]) -> set[str]:\n\
     \    result: set[str] = set()\n    for token in tokens:\n        if token.kind\
-    \ == \"directive\":\n            result.update(re.findall(r\"[A-Za-z_][A-Za-z_0-9]*\"\
-    , token.text))\n    return result\n\n\ndef variable_renames(tokens: list[Token])\
+    \ == \"directive\":\n            result.update(re.findall(r\"(?:[^\\W\\d]|[_$])(?:\\\
+    w|[$])*\", token.text))\n    return result\n\n\ndef variable_renames(tokens: list[Token])\
     \ -> dict[str, str]:\n    \"\"\"Build a conservative, global variable-name replacement\
     \ map.\"\"\"\n    known_types = _known_types(tokens)\n    candidates: set[str]\
     \ = set()\n    declaration_indices: list[int] = []\n\n    for i, token in enumerate(tokens):\n\
@@ -202,14 +266,13 @@ data:
     \ in renames.values():\n            new = next(names)\n        if len(new) < len(old):\n\
     \            renames[old] = new\n    return renames\n\n\ndef _needs_space(previous:\
     \ Token, current: Token) -> bool:\n    if previous.kind == \"directive\" or current.kind\
-    \ == \"directive\":\n        return False\n    if previous.text[-1].isalnum()\
-    \ or previous.text[-1] == \"_\":\n        if current.text[0].isalnum() or current.text[0]\
-    \ == \"_\":\n            return True\n    if previous.kind == \"number\" and current.kind\
-    \ == \"identifier\":\n        return True\n    if previous.text == \".\" and current.text[0].isdigit():\n\
-    \        return True\n    if previous.kind == \"number\" and current.text in {\"\
-    +\", \"-\"} and previous.text[-1] in \"eEpP\":\n        return True\n    return\
-    \ previous.text + current.text in PUNCTUATOR_PREFIXES\n\n\ndef minify(source:\
-    \ str, rename: bool = True) -> tuple[str, dict[str, str]]:\n    tokens = tokenize(source)\n\
+    \ == \"directive\":\n        return False\n    # Re-lexing the boundary is more\
+    \ reliable than maintaining a growing list\n    # of special cases for pp-numbers,\
+    \ literal prefixes, digraphs, comments,\n    # and multi-character punctuators.\
+    \  Each token participates in at most two\n    # such checks, so the total amount\
+    \ of text examined remains linear.\n    combined = tokenize(previous.text + current.text)\n\
+    \    return combined != [previous, current]\n\n\ndef minify(source: str, rename:\
+    \ bool = True) -> tuple[str, dict[str, str]]:\n    tokens = tokenize(source)\n\
     \    renames = variable_renames(tokens) if rename else {}\n    output: list[str]\
     \ = []\n    previous: Token | None = None\n\n    for original in tokens:\n   \
     \     token = original\n        if token.kind == \"identifier\" and token.text\
@@ -218,23 +281,25 @@ data:
     \\n\"):\n                output.append(\"\\n\")\n            output.append(token.text\
     \ + \"\\n\")\n            previous = None\n            continue\n        if previous\
     \ is not None and _needs_space(previous, token):\n            output.append(\"\
-    \ \")\n        output.append(token.text)\n        previous = token\n\n    return\
-    \ \"\".join(output).rstrip() + \"\\n\", renames\n\n\ndef main() -> int:\n    parser\
-    \ = argparse.ArgumentParser(description=\"Minify C++ source code for contest submissions.\"\
-    )\n    parser.add_argument(\"input\", nargs=\"?\", type=Path, help=\"input file\
-    \ (default: stdin)\")\n    parser.add_argument(\"-o\", \"--output\", type=Path,\
-    \ help=\"output file (default: stdout)\")\n    parser.add_argument(\"--no-rename\"\
-    , action=\"store_true\", help=\"only remove comments and whitespace\")\n    parser.add_argument(\"\
-    --stats\", action=\"store_true\", help=\"print size and rename statistics to stderr\"\
-    )\n    args = parser.parse_args()\n\n    source = args.input.read_text(encoding=\"\
-    utf-8\") if args.input else sys.stdin.read()\n    result, renames = minify(source,\
-    \ rename=not args.no_rename)\n    if args.output:\n        args.output.write_text(result,\
-    \ encoding=\"utf-8\")\n    else:\n        sys.stdout.write(result)\n\n    if args.stats:\n\
-    \        reduction = 0.0 if not source else 100.0 * (len(source) - len(result))\
-    \ / len(source)\n        print(\n            f\"{len(source)} -> {len(result)}\
-    \ bytes ({reduction:.1f}% smaller), \"\n            f\"renamed {len(renames)}\
-    \ identifiers\",\n            file=sys.stderr,\n        )\n    return 0\n\n\n\
-    if __name__ == \"__main__\":\n    raise SystemExit(main())\n"
+    \ \")\n        output.append(token.text)\n        previous = token\n\n    result\
+    \ = \"\".join(output).rstrip()\n    return (result + \"\\n\" if result else \"\
+    \"), renames\n\n\ndef main() -> int:\n    parser = argparse.ArgumentParser(description=\"\
+    Minify C++ source code for contest submissions.\")\n    parser.add_argument(\"\
+    input\", nargs=\"?\", type=Path, help=\"input file (default: stdin)\")\n    parser.add_argument(\"\
+    -o\", \"--output\", type=Path, help=\"output file (default: stdout)\")\n    parser.add_argument(\"\
+    --no-rename\", action=\"store_true\", help=\"only remove comments and whitespace\"\
+    )\n    parser.add_argument(\"--stats\", action=\"store_true\", help=\"print size\
+    \ and rename statistics to stderr\")\n    args = parser.parse_args()\n\n    source\
+    \ = args.input.read_text(encoding=\"utf-8\") if args.input else sys.stdin.read()\n\
+    \    result, renames = minify(source, rename=not args.no_rename)\n    if args.output:\n\
+    \        args.output.write_text(result, encoding=\"utf-8\")\n    else:\n     \
+    \   sys.stdout.write(result)\n\n    if args.stats:\n        source_size = len(source.encode(\"\
+    utf-8\"))\n        result_size = len(result.encode(\"utf-8\"))\n        reduction\
+    \ = 0.0 if not source_size else 100.0 * (source_size - result_size) / source_size\n\
+    \        print(\n            f\"{source_size} -> {result_size} bytes ({reduction:.1f}%\
+    \ smaller), \"\n            f\"renamed {len(renames)} identifiers\",\n       \
+    \     file=sys.stderr,\n        )\n    return 0\n\n\nif __name__ == \"__main__\"\
+    :\n    raise SystemExit(main())\n"
   dependsOn: []
   isVerificationFile: false
   path: compressor.py
