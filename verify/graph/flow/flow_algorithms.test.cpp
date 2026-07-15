@@ -228,6 +228,85 @@ void test_bounded_min_cost_flow() {
     impossible.add_demand(1, 2);
     assert(!impossible.min_cost_flow().has_value());
 
+    std::mt19937 random(987654321);
+    for (int iteration = 0; iteration < 500; iteration++) {
+        int n = 1 + int(random() % 4);
+        int m = int(random() % 7);
+        struct SmallEdge {
+            int from;
+            int to;
+            long long lower;
+            long long upper;
+            long long cost;
+        };
+        std::vector<SmallEdge> edges;
+        m1une::flow::BoundedMinCostFlow<long long, long long> solver(n);
+        for (int i = 0; i < m; i++) {
+            int from = int(random() % n);
+            int to = int(random() % n);
+            long long lower = static_cast<long long>(random() % 5) - 2;
+            long long upper = lower + static_cast<long long>(random() % 4);
+            long long cost = static_cast<long long>(random() % 9) - 4;
+            edges.push_back(SmallEdge{from, to, lower, upper, cost});
+            solver.add_edge(from, to, lower, upper, cost);
+        }
+
+        std::vector<long long> required_balance(n, 0);
+        long long balance_sum = 0;
+        for (int vertex = 0; vertex + 1 < n; vertex++) {
+            required_balance[vertex] =
+                static_cast<long long>(random() % 7) - 3;
+            balance_sum += required_balance[vertex];
+        }
+        required_balance.back() = -balance_sum;
+
+        bool feasible = false;
+        long long best_cost = 0;
+        std::vector<long long> flow(m);
+        auto enumerate = [&](auto&& self, int edge_id) -> void {
+            if (edge_id != m) {
+                for (
+                    flow[edge_id] = edges[edge_id].lower;
+                    flow[edge_id] <= edges[edge_id].upper;
+                    flow[edge_id]++
+                ) {
+                    self(self, edge_id + 1);
+                }
+                return;
+            }
+
+            std::vector<long long> actual_balance(n, 0);
+            long long cost = 0;
+            for (int i = 0; i < m; i++) {
+                actual_balance[edges[i].from] += flow[i];
+                actual_balance[edges[i].to] -= flow[i];
+                cost += flow[i] * edges[i].cost;
+            }
+            if (actual_balance != required_balance) return;
+            if (!feasible || cost < best_cost) best_cost = cost;
+            feasible = true;
+        };
+        enumerate(enumerate, 0);
+
+        auto result = solver.min_cost_flow(required_balance);
+        assert(result.has_value() == feasible);
+        if (!result.has_value()) continue;
+        assert(result->cost == best_cost);
+
+        std::vector<long long> actual_balance(n, 0);
+        for (const auto& edge : result->edges) {
+            assert(edge.lower <= edge.flow && edge.flow <= edge.upper);
+            actual_balance[edge.from] += edge.flow;
+            actual_balance[edge.to] -= edge.flow;
+            long long reduced_cost =
+                edge.cost
+                + result->potential[edge.from] - result->potential[edge.to];
+            if (edge.flow < edge.upper) assert(0 <= reduced_cost);
+            if (edge.lower < edge.flow) assert(reduced_cost <= 0);
+        }
+        assert(actual_balance == required_balance);
+    }
+
     m1une::flow::BMinCostFlow<long long, long long> alias(1);
     assert(alias.size() == 1);
 }

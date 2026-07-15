@@ -32,14 +32,16 @@ Directed flow network. An edge added by
 
 ## How It Works
 
-The solver uses capacity scaling. At scale `delta`, it saturates negative
-reduced-cost residual edges in multiples of `delta`, then repeatedly runs a
-multi-source shortest-path search from vertices with excess balance and pushes
-flow to deficit vertices. Halving `delta` gradually restores exact feasibility;
-the final `delta = 1` phase also establishes optimal residual reduced costs.
-Unlike a plain successive-shortest-path implementation, the number of phases
-depends logarithmically on capacity magnitudes, so exponentially many small
-augmentations are avoided.
+The solver uses the network simplex method with an artificial-root initial
+basis. It repeatedly pivots a negative reduced-cost residual edge into the
+spanning-tree basis and removes a saturated tree edge. A candidate-list pivot
+rule reuses promising edges for several minor iterations before scanning the
+residual edges again. This approach has very small constants and is especially
+fast on the sparse and medium-sized flow networks common in contests.
+
+After no negative reduced-cost residual edge remains, the artificial edges
+determine feasibility. The tree potentials directly provide the returned dual
+certificate.
 
 The returned `Result::cost` is the total cost on the original edges:
 
@@ -51,8 +53,9 @@ If the balance constraints cannot be satisfied, the solver returns
 `std::nullopt`.
 
 `Cap` must be a signed integer type. `Cost` must support signed exact
-arithmetic, ordering, and `std::numeric_limits`. All capacities, intermediate
-potential values, and products `flow * cost` must fit their respective types.
+arithmetic and ordering. All capacities, intermediate potential values, the
+artificial cost `1 + sum(abs(edge.cost))`, and products `flow * cost` must fit
+their respective types.
 
 ## How to Use It
 
@@ -122,12 +125,13 @@ has minimum cost.
 | `add_demand` | `void add_demand(int v, Cap demand)` | Adds non-negative demand to vertex `v`. | $O(1)$ |
 | `balance` | `Cap balance(int v) const` | Returns `balance[v]`. | $O(1)$ |
 | `balances` | `const std::vector<Cap>& balances() const` | Returns all balances. | $O(1)$ |
-| `min_cost_flow` | `std::optional<Result> min_cost_flow() const` | Solves using stored balances. | $O(M \log U \cdot (M + N \log N))$ |
-| `min_cost_flow` | `std::optional<Result> min_cost_flow(const std::vector<Cap>& balance) const` | Solves using explicit balances. | $O(M \log U \cdot (M + N \log N))$ |
-| `min_cost_st_flow` | `std::optional<Result> min_cost_st_flow(int s, int t, Cap flow_value) const` | Solves exact `s-t` flow with value `flow_value`. | $O(M \log U \cdot (M + N \log N))$ |
+| `min_cost_flow` | `std::optional<Result> min_cost_flow() const` | Solves using stored balances. | $O(N + M + P(N + M))$ |
+| `min_cost_flow` | `std::optional<Result> min_cost_flow(const std::vector<Cap>& balance) const` | Solves using explicit balances. | $O(N + M + P(N + M))$ |
+| `min_cost_st_flow` | `std::optional<Result> min_cost_st_flow(int s, int t, Cap flow_value) const` | Solves exact `s-t` flow with value `flow_value`. | $O(N + M + P(N + M))$ |
 
-Here, `U` is the maximum absolute edge bound or vertex balance, with
-`U >= 1`.
+Here, `P` is the number of network-simplex pivots. As with the simplex method
+in general, `P` has no polynomial worst-case bound; the candidate-list rule is
+chosen for strong practical performance.
 
 ## Alias
 
