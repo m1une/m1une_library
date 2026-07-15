@@ -25,10 +25,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         YUKICODER_TOKEN: ${{ secrets.YUKICODER_TOKEN }}
-      # The default 600-second budget can expire after a widely used header
-      # changes, so use both runner cores and leave enough time to refresh every
-      # affected verification timestamp.
-      run: oj-verify run -j 2 --timeout 2400
+      # A widely used header can invalidate every verification target. Use both
+      # runner cores and leave enough time to refresh the complete timestamp set.
+      run: oj-verify run -j 2 --timeout 7200
 
     - name: Check verification completeness
       run: |
