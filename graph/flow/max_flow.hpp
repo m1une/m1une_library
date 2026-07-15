@@ -36,6 +36,24 @@ struct MaxFlow {
     std::vector<std::vector<InternalEdge>> _g;
 
     Cap push_relabel(int s, int t) {
+        const std::size_t edge_count = _pos.size();
+        const std::size_t source_degree = _g[s].size();
+        const std::size_t sink_degree = _g[t].size();
+        const std::size_t terminal_degree =
+            std::min(source_degree, sink_degree);
+        const bool dense = edge_count >= 5 * std::size_t(_n);
+        const std::size_t wide_threshold =
+            4 * (edge_count / std::size_t(_n) + 1);
+        // Reverse input order defeats several ordering-sensitive hard cases,
+        // while forward order is substantially better on ordinary random
+        // graphs with medium-width terminals.
+        const bool reverse_scan =
+            terminal_degree > wide_threshold ||
+            (terminal_degree <= 4 &&
+             (dense ||
+              (source_degree == 2 && sink_degree == 2) ||
+              (terminal_degree == 1 &&
+               edge_count >= 2 * std::size_t(_n))));
         const int dead = 2 * _n;
         const int unreachable = _n + 1;
         std::vector<Cap> excess(_n, Cap(0));
@@ -49,9 +67,12 @@ struct MaxFlow {
         std::vector<char> active(_n, false);
         int highest = -1;
         long long work = 0;
-        long long arc_count = 0;
-        for (const auto& edges : _g) arc_count += int(edges.size());
-        const long long work_limit = std::max(1LL, 4 * arc_count + _n);
+        const long long arc_count =
+            2LL * static_cast<long long>(_pos.size());
+        const long long work_limit = std::max(
+            1LL,
+            (reverse_scan ? 3 : 4) * arc_count + _n
+        );
 
         auto activate = [&](int v) {
             if (v == s || v == t || active[v] || excess[v] == Cap(0) ||
@@ -74,7 +95,9 @@ struct MaxFlow {
         auto global_relabel = [&]() {
             std::fill(height, height + _n, unreachable);
             std::fill(height_count, height_count + dead + 1, 0);
-            std::fill(current, current + _n, 0);
+            for (int v = 0; v < _n; v++) {
+                current[v] = reverse_scan ? int(_g[v].size()) - 1 : 0;
+            }
             int head = 0;
             int tail = 0;
             height[t] = 0;
@@ -104,7 +127,7 @@ struct MaxFlow {
                 height_count[height[v]]--;
                 height[v] = unreachable;
                 height_count[height[v]]++;
-                current[v] = 0;
+                current[v] = reverse_scan ? int(_g[v].size()) - 1 : 0;
             }
             rebuild_buckets();
         };
@@ -121,7 +144,7 @@ struct MaxFlow {
             height_count[old_height]--;
             height[v] = std::min(new_height, dead);
             height_count[height[v]]++;
-            current[v] = 0;
+            current[v] = reverse_scan ? int(_g[v].size()) - 1 : 0;
             if (old_height < _n && height_count[old_height] == 0) {
                 gap(old_height);
                 return true;
@@ -139,9 +162,15 @@ struct MaxFlow {
             if (was_zero) activate(e.to);
         };
 
-        auto discharge = [&](int v) {
+        auto discharge = [&]<bool Reverse>(int v) {
             while (excess[v] != Cap(0) && height[v] < dead) {
-                if (current[v] == int(_g[v].size())) {
+                bool exhausted_edges;
+                if constexpr (Reverse) {
+                    exhausted_edges = current[v] < 0;
+                } else {
+                    exhausted_edges = current[v] == int(_g[v].size());
+                }
+                if (exhausted_edges) {
                     if (relabel(v)) return;
                     continue;
                 }
@@ -150,7 +179,11 @@ struct MaxFlow {
                 if (e.cap != Cap(0) && height[v] == height[e.to] + 1) {
                     push(v, e);
                 } else {
-                    current[v]++;
+                    if constexpr (Reverse) {
+                        current[v]--;
+                    } else {
+                        current[v]++;
+                    }
                 }
             }
             activate(v);
@@ -174,10 +207,86 @@ struct MaxFlow {
             bucket_head[highest] = next[v];
             if (!active[v] || height[v] != highest) continue;
             active[v] = false;
-            discharge(v);
+            if (reverse_scan) {
+                discharge.template operator()<true>(v);
+            } else {
+                discharge.template operator()<false>(v);
+            }
             if (work >= work_limit) global_relabel();
         }
         return excess[t];
+    }
+
+    Cap dinic_phases(
+        int s,
+        int t,
+        Cap flow_limit,
+        int phase_limit,
+        bool& exhausted
+    ) {
+        std::vector<int> work(3 * std::size_t(_n));
+        int* level = work.data();
+        int* iter = level + _n;
+        int* queue = iter + _n;
+        auto bfs = [&]() -> bool {
+            std::fill(level, level + _n, -1);
+            int head = 0;
+            int tail = 0;
+            level[s] = 0;
+            queue[tail++] = s;
+            while (head != tail) {
+                int v = queue[head++];
+                const auto& edges = _g[v];
+                for (const auto& e : edges) {
+                    if (level[e.to] != -1 || e.cap == Cap(0)) continue;
+                    level[e.to] = level[v] + 1;
+                    if (e.to == t) return true;
+                    queue[tail++] = e.to;
+                }
+            }
+            return false;
+        };
+
+        auto dfs = [&](auto&& self, int v, Cap up) -> Cap {
+            if (v == s) return up;
+            Cap result = Cap(0);
+            const int current_level = level[v];
+            auto& edges = _g[v];
+            const int edge_count = int(edges.size());
+            for (int& i = iter[v]; i < edge_count; i++) {
+                auto& e = edges[i];
+                if (level[e.to] + 1 != current_level) continue;
+                auto& reverse = _g[e.to][e.rev];
+                if (reverse.cap == Cap(0)) continue;
+                Cap d = self(
+                    self,
+                    e.to,
+                    std::min(up - result, reverse.cap)
+                );
+                if (d == Cap(0)) continue;
+                e.cap += d;
+                reverse.cap -= d;
+                result += d;
+                if (result == up) return result;
+            }
+            level[v] = _n;
+            return result;
+        };
+
+        Cap flow = Cap(0);
+        int phases = 0;
+        exhausted = false;
+        while (flow < flow_limit && phases < phase_limit) {
+            if (!bfs()) {
+                exhausted = true;
+                break;
+            }
+            std::fill(iter, iter + _n, 0);
+            flow += dfs(dfs, t, flow_limit - flow);
+            phases++;
+        }
+        if (flow == flow_limit) exhausted = true;
+        return flow;
     }
 
    public:
@@ -296,7 +405,51 @@ struct MaxFlow {
     }
 
     Cap max_flow(int s, int t) {
-        return max_flow(s, t, std::numeric_limits<Cap>::max());
+        assert(0 <= s && s < _n);
+        assert(0 <= t && t < _n);
+        assert(s != t);
+        bool exhausted;
+        const std::size_t edge_count = _pos.size();
+        const std::size_t terminal_degree =
+            std::min(_g[s].size(), _g[t].size());
+        const bool dense = edge_count >= 5 * std::size_t(_n);
+        const bool sparse_narrow_terminals =
+            edge_count >= std::size_t(_n) &&
+            2 <= _g[s].size() && _g[s].size() <= 4 &&
+            2 <= _g[t].size() && _g[t].size() <= 4;
+        // Only pay for a possible push-relabel handoff on graph shapes where
+        // many Dinic phases are a realistic risk.
+        const bool use_hybrid =
+            (dense || sparse_narrow_terminals) &&
+            terminal_degree <= 4 * (edge_count / std::size_t(_n) + 1);
+        if (!use_hybrid) {
+            return max_flow(s, t, std::numeric_limits<Cap>::max());
+        }
+        int phase_limit = dense ? 4 : 8;
+        bool small_terminal_capacities = true;
+        const int terminals[2] = {s, t};
+        for (int v : terminals) {
+            for (const auto& e : _g[v]) {
+                if (Cap(2) < e.cap ||
+                    Cap(2) < _g[e.to][e.rev].cap) {
+                    small_terminal_capacities = false;
+                    break;
+                }
+            }
+            if (!small_terminal_capacities) break;
+        }
+        if (small_terminal_capacities) {
+            return max_flow(s, t, std::numeric_limits<Cap>::max());
+        }
+        Cap flow = dinic_phases(
+            s,
+            t,
+            std::numeric_limits<Cap>::max(),
+            phase_limit,
+            exhausted
+        );
+        if (!exhausted) flow += push_relabel(s, t);
+        return flow;
     }
 
     Cap max_flow_push_relabel(int s, int t) {

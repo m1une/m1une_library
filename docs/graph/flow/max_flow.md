@@ -8,16 +8,20 @@ documentation_of: ../../../graph/flow/max_flow.hpp
 `MaxFlow<Cap>` computes the maximum amount of flow that can be sent from a
 source vertex `s` to a sink vertex `t` in a directed capacitated graph.
 
-This implementation uses a constant-factor optimized Dinic algorithm. It
-repeatedly builds a level graph with an array queue and sends blocking flow by
-traversing the level graph backward from the sink. Dead-end pruning and
-current-edge pointers avoid revisiting exhausted vertices and edges.
+The unlimited `max_flow` overload uses an adaptive Dinic/push-relabel solver.
+It keeps the constant-factor optimized Dinic path on graphs where it is
+usually strongest. On narrow-terminal graphs that survive a small number of
+Dinic phases, it continues from the same residual graph with highest-label
+push-relabel. This avoids Dinic's bad many-phase behavior without paying the
+push-relabel setup cost on most path-like, low-flow, unit-capacity, or
+wide-terminal networks.
 
-For capacity-heavy graphs, the class also provides an explicit highest-label
-push-relabel solver with global relabeling and the gap heuristic. Neither
-algorithm wins on every graph family, so `max_flow` keeps Dinic as the
-predictable default and `max_flow_push_relabel` is available for workloads
-where benchmarking shows an advantage.
+Dinic builds level graphs with an array queue and sends blocking flow by
+traversing each level graph backward from the sink. Push-relabel uses flat
+highest-label buckets, order-adaptive adjacency scans, global relabeling, and
+the gap heuristic. The limited-flow overload remains pure Dinic, and
+`max_flow_push_relabel` exposes the push-relabel implementation directly when
+a representative workload favors it.
 
 ## Graph Orientation
 
@@ -91,12 +95,9 @@ Here, $N$ is the number of vertices and $M$ is the number of original edges.
 The residual graph stores two directed residual edges for each original edge,
 including an edge added by `add_undirected_edge`.
 
-Dinic's algorithm works in phases. Each phase first uses BFS to construct a
-level graph in $O(N + M)$ time, then uses DFS with current-edge pointers to
-find a blocking flow. A blocking-flow computation takes $O(NM)$ time in the
-general case. After a blocking flow is found, the shortest residual distance
-from `s` to `t` strictly increases, so there are fewer than $N$ phases. This
-gives the general bound
+The unlimited overload runs either pure Dinic or a constant number of Dinic
+phases followed by highest-label push-relabel. Both alternatives have the
+general worst-case bound
 
 $$
 O(N^2 M).
@@ -105,10 +106,26 @@ $$
 This bound counts each `Cap` arithmetic or comparison operation as $O(1)$ and
 does not depend on the numerical size of the capacities.
 
+The dispatch uses only $N$, $M$, the two terminal adjacency lists, their
+residual capacities, and whether the first few Dinic phases finish the flow.
+It does not inspect all edges or copy the graph. Dense graphs with narrow
+terminals may switch after four phases. A conservative sparse narrow-terminal
+case may switch after eight. Small-capacity terminal networks and
+wide-terminal graphs stay on Dinic. These thresholds are performance
+heuristics; they do not affect correctness or the $O(N^2M)$ bound.
+
+The `flow_limit` overload is pure Dinic. Each phase first uses BFS to construct
+a level graph in $O(N + M)$ time, then uses DFS with current-edge pointers to
+find a blocking flow. A blocking-flow computation takes $O(NM)$ time in the
+general case. After a blocking flow is found, the shortest residual distance
+from `s` to `t` strictly increases, so there are fewer than $N$ phases. This
+also gives the general bound $O(N^2M)$.
+
 ### Bounds for Integer Capacities
 
-When every capacity is an integer, several additional bounds hold for this
-current-edge implementation. Let $u_e$ be the capacity of edge $e$, and define
+When every capacity is an integer, several additional bounds hold for the
+pure-Dinic `flow_limit` overload and whenever the unlimited overload stays on
+Dinic. Let $u_e$ be the capacity of edge $e$, and define
 
 $$
 \bar{u} = \frac{1}{M}\sum_e u_e,
@@ -149,8 +166,9 @@ $\bar{c}$ by $g$ in these bounds. When using `flow_limit`, it must be scaled as
 well. Scaling all these values by $g$ does not change which paths and edges
 Dinic's algorithm processes.
 
-For unit-capacity graphs, $\bar{u}=U=1$. Combining the two edge-capacity bounds
-gives the standard result
+For unit-capacity graphs, $\bar{u}=U=1$. The unlimited overload keeps these
+graphs on Dinic. Combining the two edge-capacity bounds gives the standard
+result
 
 $$
 O\left(M \min\left(N^{2/3}, \sqrt{M}\right)\right).
@@ -176,17 +194,18 @@ rather than recomputing it from scratch.
 ## Push-Relabel Alternative
 
 `max_flow_push_relabel(s, t)` uses highest-label active-vertex selection, flat
-buckets, current-edge pointers, global relabeling, and the gap heuristic. The
-conservative general bound is $O(N^2M)$, including calls on a residual graph
-that already contains flow.
+buckets, order-adaptive current-edge scans, global relabeling, and the gap
+heuristic. The conservative general bound is $O(N^2M)$, including calls on a
+residual graph that already contains flow.
 
 Push-relabel often performs well on high-capacity networks where Dinic needs
 several level-graph phases. Dinic is commonly faster on path-like, unit, and
-layered networks. The difference can be large in either direction, so use
-`max_flow` unless a representative benchmark supports choosing the
-push-relabel method. Both methods return only the additional flow sent and
-leave a valid residual graph, so `get_edge`, `edges`, and `min_cut` behave the
-same afterward.
+layered networks. The difference can be large in either direction, so the
+unlimited `max_flow` overload performs a guarded automatic handoff. Use the
+explicit method when a representative benchmark shows that starting directly
+with push-relabel is faster. Both methods return only the additional flow sent
+and leave a valid residual graph, so `get_edge`, `edges`, and `min_cut` behave
+the same afterward.
 
 ## Minimum Cut
 

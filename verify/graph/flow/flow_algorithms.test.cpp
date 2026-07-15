@@ -59,6 +59,26 @@ void test_max_flow() {
     assert(limited.max_flow(0, 1) == 6);
     assert(limited.get_edge(limited_id).flow == 10);
 
+    // Five different path lengths force the unlimited overload past its
+    // initial Dinic phases and exercise the push-relabel handoff.
+    m1une::flow::MaxFlow<long long> hybrid(17);
+    int next_vertex = 1;
+    for (int length = 2; length <= 6; length++) {
+        int from = 0;
+        for (int edge = 0; edge < length; edge++) {
+            int to = edge + 1 == length ? 16 : next_vertex++;
+            hybrid.add_edge(from, to, 3);
+            from = to;
+        }
+    }
+    assert(next_vertex == 16);
+    while (hybrid.edge_count() < 85) {
+        int v = 1 + hybrid.edge_count() % 15;
+        hybrid.add_edge(v, v, 0);
+    }
+    assert(hybrid.max_flow(0, 16) == 15);
+    assert(hybrid.max_flow(0, 16) == 0);
+
     struct InputEdge {
         int from;
         int to;
