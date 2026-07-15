@@ -5,10 +5,10 @@ documentation_of: ../../../graph/flow/bounded_min_cost_flow.hpp
 
 ## Overview
 
-`BoundedMinCostFlow<Cap, Cost>` finds a minimum-cost feasible flow with lower
-and upper bounds on each edge. It is the costed version of `BoundedFlow<Cap>`.
-`BMinCostFlow<Cap, Cost>` is an alias of
-`BoundedMinCostFlow<Cap, Cost>`.
+`BoundedMinCostFlow<Cap, Cost, TotalCost = Cost>` finds a minimum-cost feasible
+flow with lower and upper bounds on each edge. It is the costed version of
+`BoundedFlow<Cap>`. `BMinCostFlow<Cap, Cost, TotalCost>` is an alias of the
+same type.
 
 For this library, vertex balance means:
 
@@ -53,9 +53,16 @@ If the balance constraints cannot be satisfied, the solver returns
 `std::nullopt`.
 
 `Cap` must be a signed integer type. `Cost` must support signed exact
-arithmetic and ordering. All capacities, intermediate potential values, the
-artificial cost `1 + sum(abs(edge.cost))`, and products `flow * cost` must fit
-their respective types.
+arithmetic and ordering. `TotalCost` is the accumulator type for the final
+`sum(flow * cost)` and defaults to `Cost`. All capacities must fit `Cap`;
+intermediate potential values and the artificial cost
+`1 + sum(abs(edge.cost))`, as well as reduced-cost arithmetic, must fit `Cost`;
+the total must fit `TotalCost`.
+
+When only the total may overflow the unit-cost type, use a wider third template
+argument. For example, `BoundedMinCostFlow<long long, long long, __int128_t>`
+keeps the network-simplex hot path in 64-bit arithmetic and accumulates the
+answer in 128 bits.
 
 ## How to Use It
 
@@ -82,7 +89,7 @@ The result contains these members:
 | `edges` | `std::vector<ResultEdge>` | Original edges with selected minimum-cost flow. |
 | `balance` | `std::vector<Cap>` | Vertex balances used for this solve. |
 | `potential` | `std::vector<Cost>` | A dual potential certificate for the selected flow. |
-| `cost` | `Cost` | Total cost `sum(flow * cost)` of the selected flow. |
+| `cost` | `TotalCost` | Total cost `sum(flow * cost)` of the selected flow. |
 | `get_edge` | `ResultEdge get_edge(int i) const` | Returns result edge `i`. |
 | `flow` | `Cap flow(int i) const` | Returns selected flow on edge `i`. |
 
@@ -116,6 +123,7 @@ has minimum cost.
 | Constructor | `explicit BoundedMinCostFlow(int n)` | Creates a graph with `n` vertices. | $O(N)$ |
 | `size` | `int size() const` | Returns the number of vertices. | $O(1)$ |
 | `edge_count` | `int edge_count() const` | Returns the number of edges. | $O(1)$ |
+| `reserve_edges` | `void reserve_edges(int edge_count)` | Reserves storage when the number of edges is known in advance. | $O(M)$ when reallocation occurs |
 | `add_edge` | `int add_edge(int from, int to, Cap lower, Cap upper, Cost cost)` | Adds an edge with bounds and cost, then returns its id. | Amortized $O(1)$ |
 | `get_edge` | `Edge get_edge(int i) const` | Returns original edge `i`. | $O(1)$ |
 | `edges` | `std::vector<Edge> edges() const` | Returns all original edges. | $O(M)$ |
@@ -137,7 +145,7 @@ chosen for strong practical performance.
 
 | Alias | Type |
 | --- | --- |
-| `BMinCostFlow<Cap, Cost>` | `BoundedMinCostFlow<Cap, Cost>` |
+| `BMinCostFlow<Cap, Cost, TotalCost>` | `BoundedMinCostFlow<Cap, Cost, TotalCost>` |
 
 ## Example
 

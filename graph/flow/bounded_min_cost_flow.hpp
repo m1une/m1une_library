@@ -12,7 +12,7 @@
 namespace m1une {
 namespace flow {
 
-template <class Cap, class Cost>
+template <class Cap, class Cost, class TotalCost = Cost>
 struct BoundedMinCostFlow {
     static_assert(std::numeric_limits<Cap>::is_integer);
     static_assert(std::numeric_limits<Cap>::is_signed);
@@ -38,7 +38,7 @@ struct BoundedMinCostFlow {
         std::vector<ResultEdge> edges;
         std::vector<Cap> balance;
         std::vector<Cost> potential;
-        Cost cost;
+        TotalCost cost;
 
         ResultEdge get_edge(int i) const {
             assert(0 <= i && i < int(edges.size()));
@@ -68,7 +68,6 @@ struct BoundedMinCostFlow {
 
         int n;
         std::vector<NetworkEdge> edges;
-        std::vector<Cap> lower_bounds;
         std::vector<Cap> excess;
         std::vector<Cost> potential;
 
@@ -77,14 +76,12 @@ struct BoundedMinCostFlow {
 
         void reserve_edges(int edge_count) {
             edges.reserve(2 * (edge_count + n));
-            lower_bounds.reserve(edge_count);
         }
 
         int add_edge(int from, int to, Cap lower, Cap upper, Cost cost) {
-            int id = int(lower_bounds.size());
+            int id = int(edges.size()) / 2;
             edges.push_back(NetworkEdge{to, upper - lower, cost});
             edges.push_back(NetworkEdge{from, Cap(0), -cost});
-            lower_bounds.push_back(lower);
             excess[from] -= lower;
             excess[to] += lower;
             return id;
@@ -329,8 +326,8 @@ struct BoundedMinCostFlow {
             return feasible;
         }
 
-        Cap edge_flow(int edge_id) const {
-            return lower_bounds[edge_id] + edges[2 * edge_id + 1].cap;
+        Cap edge_flow(int edge_id, Cap lower) const {
+            return lower + edges[2 * edge_id + 1].cap;
         }
     };
 
@@ -351,6 +348,11 @@ struct BoundedMinCostFlow {
 
     int edge_count() const {
         return int(_edges.size());
+    }
+
+    void reserve_edges(int edge_count) {
+        assert(0 <= edge_count);
+        _edges.reserve(edge_count);
     }
 
     int add_edge(int from, int to, Cap lower, Cap upper, Cost cost) {
@@ -419,12 +421,12 @@ struct BoundedMinCostFlow {
 
         Result result;
         result.balance = balance;
-        result.cost = Cost(0);
+        result.cost = TotalCost(0);
         result.edges.reserve(_edges.size());
         for (int i = 0; i < int(_edges.size()); i++) {
             const auto& e = _edges[i];
-            Cap flow = solver.edge_flow(i);
-            result.cost += Cost(flow) * e.cost;
+            Cap flow = solver.edge_flow(i, e.lower);
+            result.cost += TotalCost(flow) * TotalCost(e.cost);
             result.edges.push_back(ResultEdge{e.from, e.to, e.lower, e.upper, flow, e.cost});
         }
         result.potential = std::move(solver.potential);
@@ -442,8 +444,8 @@ struct BoundedMinCostFlow {
     }
 };
 
-template <class Cap, class Cost>
-using BMinCostFlow = BoundedMinCostFlow<Cap, Cost>;
+template <class Cap, class Cost, class TotalCost = Cost>
+using BMinCostFlow = BoundedMinCostFlow<Cap, Cost, TotalCost>;
 
 }  // namespace flow
 }  // namespace m1une

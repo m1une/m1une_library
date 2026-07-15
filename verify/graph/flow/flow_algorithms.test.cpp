@@ -173,6 +173,7 @@ void test_bounded_flow() {
 
 void test_bounded_min_cost_flow() {
     m1une::flow::BoundedMinCostFlow<long long, long long> st(3);
+    st.reserve_edges(3);
     int e01 = st.add_edge(0, 1, 1, 3, 2);
     int e12 = st.add_edge(1, 2, 1, 3, 1);
     int e02 = st.add_edge(0, 2, 0, 3, 10);
@@ -227,6 +228,17 @@ void test_bounded_min_cost_flow() {
     impossible.add_supply(0, 2);
     impossible.add_demand(1, 2);
     assert(!impossible.min_cost_flow().has_value());
+
+    using WideCostFlow = m1une::flow::BoundedMinCostFlow<
+        long long, long long, __int128_t
+    >;
+    WideCostFlow wide_cost(1);
+    wide_cost.reserve_edges(1);
+    constexpr long long trillion = 1000000000000LL;
+    wide_cost.add_edge(0, 0, trillion, trillion, trillion);
+    auto wide_result = wide_cost.min_cost_flow();
+    assert(wide_result.has_value());
+    assert(wide_result->cost == __int128_t(trillion) * trillion);
 
     std::mt19937 random(987654321);
     for (int iteration = 0; iteration < 500; iteration++) {
@@ -309,6 +321,8 @@ void test_bounded_min_cost_flow() {
 
     m1une::flow::BMinCostFlow<long long, long long> alias(1);
     assert(alias.size() == 1);
+    m1une::flow::BMinCostFlow<long long, long long, __int128_t> wide_alias(1);
+    assert(wide_alias.size() == 1);
 }
 
 void test_min_cost_flow() {

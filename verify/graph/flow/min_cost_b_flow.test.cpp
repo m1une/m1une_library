@@ -11,12 +11,14 @@ int main() {
     m1une::utilities::FastOutput fast_output;
 
     using Flow = long long;
-    using Cost = __int128_t;
-    using Solver = m1une::flow::BoundedMinCostFlow<Flow, Cost>;
+    using Cost = long long;
+    using TotalCost = __int128_t;
+    using Solver = m1une::flow::BoundedMinCostFlow<Flow, Cost, TotalCost>;
 
     int vertex_count, edge_count;
     fast_input >> vertex_count >> edge_count;
     Solver solver(vertex_count);
+    solver.reserve_edges(edge_count);
     for (int vertex = 0; vertex < vertex_count; vertex++) {
         Flow balance;
         fast_input >> balance;
@@ -27,7 +29,7 @@ int main() {
         Flow lower, upper;
         long long cost;
         fast_input >> from >> to >> lower >> upper >> cost;
-        solver.add_edge(from, to, lower, upper, Cost(cost));
+        solver.add_edge(from, to, lower, upper, cost);
     }
 
     auto result = solver.min_cost_flow();
