@@ -8,15 +8,20 @@ documentation_of: ../../../graph/flow/max_flow.hpp
 `MaxFlow<Cap>` computes the maximum amount of flow that can be sent from a
 source vertex `s` to a sink vertex `t` in a directed capacitated graph.
 
-This implementation uses Dinic's algorithm. It repeatedly builds a level graph
-with BFS and sends blocking flow with DFS. It is the standard choice for many
-competitive programming max-flow tasks, including bipartite matching,
-edge-disjoint paths, and minimum `s-t` cut problems.
+This implementation uses a constant-factor optimized Dinic algorithm. It
+repeatedly builds a level graph with an array queue and sends blocking flow by
+traversing the level graph backward from the sink. Dead-end pruning and
+current-edge pointers avoid revisiting exhausted vertices and edges.
 
 ## Graph Orientation
 
 Directed flow network. An edge added by `add_edge(from, to, cap)` can send flow
-only from `from` to `to`. For an undirected capacity, add both directions.
+only from `from` to `to`.
+
+For a bidirectional edge with one shared capacity, use
+`add_undirected_edge(first, second, cap)`. It stores only two residual edges,
+half as many as two calls to `add_edge`. This is the intended interface for
+SPOJ FASTFLOW-style pipe networks.
 
 The graph is stateful. Running `max_flow` changes residual capacities and
 stores the resulting flow. Use `get_edge` or `edges` after running it to inspect
@@ -27,8 +32,14 @@ how much flow passed through each original edge.
 Create `MaxFlow<Cap> mf(n)`, add directed edges with capacities, and call
 `mf.max_flow(s, t)`.
 
-Capacities must be non-negative. If you want an undirected capacity between
-`u` and `v`, add two directed edges.
+Capacities must be non-negative. `add_undirected_edge` requires a signed `Cap`;
+its residual capacity may reach `2 * cap`, which must also fit `Cap`.
+
+When the edge count is known, call `reserve_edges(m)` before adding edges. In
+addition to reserving edge metadata, it reserves the average residual degree
+for every vertex when the graph is dense enough for that to be useful. This
+avoids most small adjacency-list allocations without allocating one buffer per
+vertex on extremely sparse graphs.
 
 You can call `max_flow(s, t, flow_limit)` when only up to `flow_limit` units are
 needed.
@@ -40,7 +51,7 @@ needed.
 | `from` | `int` | Original edge source. |
 | `to` | `int` | Original edge destination. |
 | `cap` | `Cap` | Original capacity currently assigned to this edge. |
-| `flow` | `Cap` | Flow currently sent through this edge. |
+| `flow` | `Cap` | Flow from `from` to `to`; it may be negative for an undirected edge. |
 
 ## Methods
 
@@ -50,10 +61,12 @@ needed.
 | Constructor | `explicit MaxFlow(int n)` | Creates a graph with `n` vertices. | $O(N)$ |
 | `size` | `int size() const` | Returns the number of vertices. | $O(1)$ |
 | `edge_count` | `int edge_count() const` | Returns the number of original edges. | $O(1)$ |
+| `reserve_edges` | `void reserve_edges(int edge_count)` | Reserves edge metadata and average adjacency capacity. | $O(N + M)$ when reallocation occurs |
 | `add_edge` | `int add_edge(int from, int to, Cap cap)` | Adds a directed edge and returns its edge id. | Amortized $O(1)$ |
+| `add_undirected_edge` | `int add_undirected_edge(int first, int second, Cap cap)` | Adds a bidirectional edge with shared capacity and returns its id. | Amortized $O(1)$ |
 | `get_edge` | `Edge get_edge(int i) const` | Returns the current state of original edge `i`. | $O(1)$ |
 | `edges` | `std::vector<Edge> edges() const` | Returns all original edges with current flow. | $O(M)$ |
-| `change_edge` | `void change_edge(int i, Cap new_cap, Cap new_flow)` | Replaces edge `i`'s capacity and current flow. | $O(1)$ |
+| `change_edge` | `void change_edge(int i, Cap new_cap, Cap new_flow)` | Replaces edge `i`'s capacity and current flow; undirected flow may be negative. | $O(1)$ |
 | `max_flow` | `Cap max_flow(int s, int t)` | Sends maximum flow from `s` to `t`. | $O(N^2 M)$ in general; see below |
 | `max_flow` | `Cap max_flow(int s, int t, Cap flow_limit)` | Sends at most `flow_limit` additional flow. | $O(N^2 M)$ in general; see below |
 | `min_cut` | `std::vector<bool> min_cut(int s) const` | Returns vertices reachable from `s` in the residual graph. | $O(N + M)$ |
@@ -62,7 +75,7 @@ needed.
 
 Here, $N$ is the number of vertices and $M$ is the number of original edges.
 The residual graph stores two directed residual edges for each original edge,
-which changes only constant factors.
+including an edge added by `add_undirected_edge`.
 
 Dinic's algorithm works in phases. Each phase first uses BFS to construct a
 level graph in $O(N + M)$ time, then uses DFS with current-edge pointers to
@@ -160,6 +173,7 @@ After running max flow, `min_cut(s)` returns the source side of a minimum
 
 int main() {
     m1une::flow::MaxFlow<long long> mf(4);
+    mf.reserve_edges(5);
     mf.add_edge(0, 1, 2);
     mf.add_edge(0, 2, 1);
     mf.add_edge(1, 2, 1);

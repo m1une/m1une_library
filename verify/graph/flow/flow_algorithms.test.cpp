@@ -1,12 +1,13 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/aplusb"
 
 #include <cassert>
-#include "../../../utilities/fast_io.hpp"
+#include <limits>
 #include <random>
 #include <utility>
 #include <vector>
 
 #include "../../../graph/flow/flow.hpp"
+#include "../../../utilities/fast_io.hpp"
 
 void test_max_flow() {
     m1une::flow::MaxFlow<long long> mf(4);
@@ -40,6 +41,88 @@ void test_max_flow() {
     auto changed = mf.get_edge(e0);
     assert(changed.cap == 3);
     assert(changed.flow == 1);
+
+    m1une::flow::MaxFlow<long long> undirected(2);
+    undirected.reserve_edges(1);
+    int undirected_id = undirected.add_undirected_edge(0, 1, 7);
+    undirected.change_edge(undirected_id, 7, -3);
+    auto initial_undirected = undirected.get_edge(undirected_id);
+    assert(initial_undirected.cap == 7);
+    assert(initial_undirected.flow == -3);
+    assert(undirected.max_flow(0, 1) == 10);
+    assert(undirected.get_edge(undirected_id).flow == 7);
+
+    m1une::flow::MaxFlow<long long> limited(2);
+    int limited_id = limited.add_edge(0, 1, 10);
+    assert(limited.max_flow(0, 1, 4) == 4);
+    assert(limited.get_edge(limited_id).flow == 4);
+    assert(limited.max_flow(0, 1) == 6);
+    assert(limited.get_edge(limited_id).flow == 10);
+
+    struct InputEdge {
+        int from;
+        int to;
+        long long cap;
+        bool undirected;
+    };
+    std::mt19937 random(19260817);
+    for (int iteration = 0; iteration < 500; iteration++) {
+        int n = 2 + int(random() % 6);
+        int m = int(random() % 13);
+        std::vector<InputEdge> input_edges;
+        m1une::flow::MaxFlow<long long> flow(n);
+        flow.reserve_edges(m);
+        for (int edge = 0; edge < m; edge++) {
+            InputEdge input{
+                int(random() % n),
+                int(random() % n),
+                1 + static_cast<long long>(random() % 10),
+                bool(random() & 1)
+            };
+            input_edges.push_back(input);
+            if (input.undirected) {
+                flow.add_undirected_edge(input.from, input.to, input.cap);
+            } else {
+                flow.add_edge(input.from, input.to, input.cap);
+            }
+        }
+
+        long long expected = std::numeric_limits<long long>::max();
+        for (int mask = 0; mask < (1 << n); mask++) {
+            if ((mask & 1) == 0 || (mask >> (n - 1) & 1) != 0) continue;
+            long long capacity = 0;
+            for (const auto& edge : input_edges) {
+                bool from_side = mask >> edge.from & 1;
+                bool to_side = mask >> edge.to & 1;
+                if (from_side && !to_side) capacity += edge.cap;
+                if (edge.undirected && !from_side && to_side) {
+                    capacity += edge.cap;
+                }
+            }
+            expected = std::min(expected, capacity);
+        }
+
+        long long result = flow.max_flow(0, n - 1);
+        assert(result == expected);
+        std::vector<long long> net_flow(n, 0);
+        for (int edge = 0; edge < m; edge++) {
+            auto result_edge = flow.get_edge(edge);
+            assert(result_edge.cap == input_edges[edge].cap);
+            if (input_edges[edge].undirected) {
+                assert(-result_edge.cap <= result_edge.flow);
+            } else {
+                assert(0 <= result_edge.flow);
+            }
+            assert(result_edge.flow <= result_edge.cap);
+            net_flow[result_edge.from] += result_edge.flow;
+            net_flow[result_edge.to] -= result_edge.flow;
+        }
+        assert(net_flow[0] == result);
+        assert(net_flow[n - 1] == -result);
+        for (int vertex = 1; vertex + 1 < n; vertex++) {
+            assert(net_flow[vertex] == 0);
+        }
+    }
 }
 
 void test_gomory_hu() {

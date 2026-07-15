@@ -3,9 +3,8 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstddef>
 #include <limits>
-#include <queue>
-#include <utility>
 #include <vector>
 
 namespace m1une {
@@ -27,8 +26,13 @@ struct MaxFlow {
         Cap cap;
     };
 
+    struct Position {
+        int from;
+        int edge;
+    };
+
     int _n;
-    std::vector<std::pair<int, int>> _pos;
+    std::vector<Position> _pos;
     std::vector<std::vector<InternalEdge>> _g;
 
    public:
@@ -46,6 +50,19 @@ struct MaxFlow {
         return int(_pos.size());
     }
 
+    void reserve_edges(int edge_count) {
+        assert(0 <= edge_count);
+        _pos.reserve(edge_count);
+        if (_n == 0 || edge_count == 0 ||
+            2 * std::size_t(edge_count) < std::size_t(_n)) {
+            return;
+        }
+        const std::size_t average_degree =
+            (2 * std::size_t(edge_count) + std::size_t(_n) - 1)
+            / std::size_t(_n);
+        for (auto& edges : _g) edges.reserve(average_degree);
+    }
+
     int add_edge(int from, int to, Cap cap) {
         assert(0 <= from && from < _n);
         assert(0 <= to && to < _n);
@@ -54,17 +71,44 @@ struct MaxFlow {
         int from_id = int(_g[from].size());
         int to_id = int(_g[to].size());
         if (from == to) to_id++;
-        _pos.emplace_back(from, from_id);
+        _pos.push_back(Position{from, from_id});
         _g[from].push_back(InternalEdge{to, to_id, cap});
         _g[to].push_back(InternalEdge{from, from_id, Cap(0)});
         return id;
     }
 
+    int add_undirected_edge(int first, int second, Cap cap) {
+        static_assert(std::numeric_limits<Cap>::is_signed);
+        assert(0 <= first && first < _n);
+        assert(0 <= second && second < _n);
+        assert(Cap(0) <= cap);
+        assert(cap <= std::numeric_limits<Cap>::max() / Cap(2));
+        int id = int(_pos.size());
+        int first_id = int(_g[first].size());
+        int second_id = int(_g[second].size());
+        if (first == second) second_id++;
+        _pos.push_back(Position{first, ~first_id});
+        _g[first].push_back(InternalEdge{second, second_id, cap});
+        _g[second].push_back(InternalEdge{first, first_id, cap});
+        return id;
+    }
+
     Edge get_edge(int i) const {
         assert(0 <= i && i < int(_pos.size()));
-        auto [from, idx] = _pos[i];
+        const auto& position = _pos[i];
+        int from = position.from;
+        bool undirected = position.edge < 0;
+        int idx = undirected ? ~position.edge : position.edge;
         const auto& e = _g[from][idx];
         const auto& re = _g[e.to][e.rev];
+        if (undirected) {
+            return Edge{
+                from,
+                e.to,
+                (e.cap + re.cap) / Cap(2),
+                (re.cap - e.cap) / Cap(2)
+            };
+        }
         return Edge{from, e.to, e.cap + re.cap, re.cap};
     }
 
@@ -77,12 +121,23 @@ struct MaxFlow {
 
     void change_edge(int i, Cap new_cap, Cap new_flow) {
         assert(0 <= i && i < int(_pos.size()));
-        assert(Cap(0) <= new_flow && new_flow <= new_cap);
-        auto [from, idx] = _pos[i];
+        assert(Cap(0) <= new_cap);
+        auto& position = _pos[i];
+        int from = position.from;
+        bool undirected = position.edge < 0;
+        int idx = undirected ? ~position.edge : position.edge;
         auto& e = _g[from][idx];
         auto& re = _g[e.to][e.rev];
-        e.cap = new_cap - new_flow;
-        re.cap = new_flow;
+        if (undirected) {
+            assert(new_cap <= std::numeric_limits<Cap>::max() / Cap(2));
+            assert(-new_cap <= new_flow && new_flow <= new_cap);
+            e.cap = new_cap - new_flow;
+            re.cap = new_cap + new_flow;
+        } else {
+            assert(Cap(0) <= new_flow && new_flow <= new_cap);
+            e.cap = new_cap - new_flow;
+            re.cap = new_flow;
+        }
     }
 
     Cap max_flow(int s, int t) {
@@ -94,47 +149,56 @@ struct MaxFlow {
         assert(0 <= t && t < _n);
         assert(s != t);
 
-        std::vector<int> level(_n), iter(_n);
+        std::vector<int> work(3 * std::size_t(_n));
+        int* level = work.data();
+        int* iter = level + _n;
+        int* queue = iter + _n;
         auto bfs = [&]() -> bool {
-            std::fill(level.begin(), level.end(), -1);
-            std::queue<int> que;
+            std::fill(level, level + _n, -1);
+            int head = 0;
+            int tail = 0;
             level[s] = 0;
-            que.push(s);
-            while (!que.empty()) {
-                int v = que.front();
-                que.pop();
+            queue[tail++] = s;
+            while (head != tail) {
+                int v = queue[head++];
                 for (const auto& e : _g[v]) {
                     if (e.cap == Cap(0) || level[e.to] != -1) continue;
                     level[e.to] = level[v] + 1;
                     if (e.to == t) return true;
-                    que.push(e.to);
+                    queue[tail++] = e.to;
                 }
             }
             return level[t] != -1;
         };
 
-        auto dfs = [&](auto self, int v, Cap up) -> Cap {
-            if (v == t) return up;
+        auto dfs = [&](auto&& self, int v, Cap up) -> Cap {
+            if (v == s) return up;
+            Cap result = Cap(0);
+            const int current_level = level[v];
             for (int& i = iter[v]; i < int(_g[v].size()); i++) {
                 auto& e = _g[v][i];
-                if (e.cap == Cap(0) || level[v] >= level[e.to]) continue;
-                Cap d = self(self, e.to, std::min(up, e.cap));
+                if (current_level <= level[e.to]) continue;
+                auto& reverse = _g[e.to][e.rev];
+                if (reverse.cap == Cap(0)) continue;
+                Cap d = self(
+                    self,
+                    e.to,
+                    std::min(up - result, reverse.cap)
+                );
                 if (d == Cap(0)) continue;
-                e.cap -= d;
-                _g[e.to][e.rev].cap += d;
-                return d;
+                e.cap += d;
+                reverse.cap -= d;
+                result += d;
+                if (result == up) return result;
             }
-            return Cap(0);
+            level[v] = _n;
+            return result;
         };
 
         Cap flow = 0;
         while (flow < flow_limit && bfs()) {
-            std::fill(iter.begin(), iter.end(), 0);
-            while (flow < flow_limit) {
-                Cap f = dfs(dfs, s, flow_limit - flow);
-                if (f == Cap(0)) break;
-                flow += f;
-            }
+            std::fill(iter, iter + _n, 0);
+            flow += dfs(dfs, t, flow_limit - flow);
         }
         return flow;
     }
@@ -142,16 +206,17 @@ struct MaxFlow {
     std::vector<bool> min_cut(int s) const {
         assert(0 <= s && s < _n);
         std::vector<bool> visited(_n, false);
-        std::queue<int> que;
+        std::vector<int> queue(_n);
+        int head = 0;
+        int tail = 0;
         visited[s] = true;
-        que.push(s);
-        while (!que.empty()) {
-            int v = que.front();
-            que.pop();
+        queue[tail++] = s;
+        while (head != tail) {
+            int v = queue[head++];
             for (const auto& e : _g[v]) {
                 if (e.cap == Cap(0) || visited[e.to]) continue;
                 visited[e.to] = true;
-                que.push(e.to);
+                queue[tail++] = e.to;
             }
         }
         return visited;
