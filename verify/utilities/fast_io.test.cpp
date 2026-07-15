@@ -5,6 +5,7 @@
 #include <cassert>
 #include <cstdio>
 #include <string>
+#include <utility>
 #include <vector>
 
 void test_fast_input() {
@@ -75,10 +76,13 @@ void test_fast_output() {
     std::fclose(file);
 }
 
-void test_stream_operators_and_vectors() {
+void test_stream_operators_ranges_and_pairs() {
     std::FILE* input_file = std::tmpfile();
     assert(input_file != nullptr);
-    std::fputs("2 3 1 2 3 4 5 6", input_file);
+    std::fputs(
+        "2 3 1 2 3 4 5 6 label 7 8 9 10 11 12 13 14",
+        input_file
+    );
     std::rewind(input_file);
 
     int h, w;
@@ -88,6 +92,25 @@ void test_stream_operators_and_vectors() {
     input >> matrix;
     assert(matrix[0][0] == 1);
     assert(matrix[1][2] == 6);
+
+    std::pair<std::string, int> item;
+    input >> item;
+    assert(item.first == "label");
+    assert(item.second == 7);
+
+    std::vector<std::pair<int, int>> pairs(2);
+    input >> pairs;
+    const std::pair<int, int> expected_first(8, 9);
+    const std::pair<int, int> expected_second(10, 11);
+    assert(pairs[0] == expected_first);
+    assert(pairs[1] == expected_second);
+
+    std::pair<std::vector<int>, int> grouped;
+    grouped.first.resize(2);
+    input >> grouped;
+    assert(grouped.first[0] == 12);
+    assert(grouped.first[1] == 13);
+    assert(grouped.second == 14);
     std::fclose(input_file);
 
     std::FILE* output_file = std::tmpfile();
@@ -95,6 +118,9 @@ void test_stream_operators_and_vectors() {
     {
         m1une::utilities::FastOutput output(output_file);
         output << "matrix\n" << matrix << '\n';
+        output << item << '\n';
+        output << pairs << '\n';
+        output << grouped << '\n';
         output.flush();
     }
 
@@ -102,14 +128,17 @@ void test_stream_operators_and_vectors() {
     char buffer[64];
     std::size_t length = std::fread(buffer, 1, sizeof(buffer), output_file);
     std::string result(buffer, buffer + length);
-    assert(result == "matrix\n1 2 3\n4 5 6\n");
+    assert(
+        result
+        == "matrix\n1 2 3\n4 5 6\nlabel 7\n8 9 10 11\n12 13 14\n"
+    );
     std::fclose(output_file);
 }
 
 int main() {
     test_fast_input();
     test_fast_output();
-    test_stream_operators_and_vectors();
+    test_stream_operators_ranges_and_pairs();
 
     m1une::utilities::FastInput input;
     m1une::utilities::FastOutput output;

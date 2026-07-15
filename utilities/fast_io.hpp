@@ -363,6 +363,12 @@ struct FastInput {
         return true;
     }
 
+    template <class First, class Second>
+    bool read(std::pair<First, Second>& value) {
+        if (!read(value.first)) return false;
+        return read(value.second);
+    }
+
     template <class Range>
     std::enable_if_t<
         internal::is_range_v<Range>
@@ -533,6 +539,13 @@ struct FastOutput {
     >
     write(const T& value) {
         write(value.val());
+    }
+
+    template <class First, class Second>
+    void write(const std::pair<First, Second>& value) {
+        write(value.first);
+        write_char(' ');
+        write(value.second);
     }
 
     template <class Range>
