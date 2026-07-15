@@ -492,15 +492,15 @@ data:
   isVerificationFile: false
   path: graph/shortest_path.hpp
   requiredBy:
+  - graph/directed.hpp
   - graph/all.hpp
   - graph/undirected.hpp
-  - graph/directed.hpp
   timestamp: '2026-07-13 04:00:23+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/graph/graph_algorithms.test.cpp
   - verify/graph/cow_game.test.cpp
   - verify/graph/range_edge_graph.test.cpp
-  - verify/graph/graph_algorithms.test.cpp
 documentation_of: graph/shortest_path.hpp
 layout: document
 title: Shortest Path

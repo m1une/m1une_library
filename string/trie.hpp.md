@@ -183,8 +183,8 @@ data:
   timestamp: '2026-06-22 15:33:45+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/string/string_algorithms.test.cpp
   - verify/string/trie.test.cpp
+  - verify/string/string_algorithms.test.cpp
 documentation_of: string/trie.hpp
 layout: document
 title: Trie

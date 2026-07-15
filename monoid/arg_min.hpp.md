@@ -49,8 +49,8 @@ data:
   isVerificationFile: false
   path: monoid/arg_min.hpp
   requiredBy:
-  - acted_monoid/range_add_range_arg_min.hpp
   - monoid/arg_max.hpp
+  - acted_monoid/range_add_range_arg_min.hpp
   timestamp: '2026-06-15 02:20:43+09:00'
   verificationStatus: LIBRARY_NO_TESTS
   verifiedWith: []

@@ -341,15 +341,15 @@ data:
   isVerificationFile: false
   path: graph/flow/gomory_hu.hpp
   requiredBy:
-  - graph/all.hpp
   - graph/flow/flow.hpp
+  - graph/all.hpp
   timestamp: '2026-07-07 14:26:59+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/graph/flow/flow_algorithms.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
   - verify/graph/cow_game.test.cpp
   - verify/graph/range_edge_graph.test.cpp
-  - verify/graph/graph_algorithms.test.cpp
-  - verify/graph/flow/flow_algorithms.test.cpp
 documentation_of: graph/flow/gomory_hu.hpp
 layout: document
 title: Gomory-Hu Tree

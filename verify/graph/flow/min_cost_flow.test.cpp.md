@@ -2,365 +2,69 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: graph/flow/bounded_flow.hpp
-    title: Bounded Flow
-  - icon: ':heavy_check_mark:'
     path: graph/flow/bounded_min_cost_flow.hpp
     title: Bounded Min Cost Flow
-  - icon: ':heavy_check_mark:'
-    path: graph/flow/gomory_hu.hpp
-    title: Gomory-Hu Tree
   - icon: ':heavy_check_mark:'
     path: graph/flow/max_flow.hpp
     title: Max Flow
   - icon: ':heavy_check_mark:'
     path: graph/flow/min_cost_flow.hpp
     title: Min Cost Flow
-  _extendedRequiredBy:
   - icon: ':heavy_check_mark:'
-    path: graph/all.hpp
-    title: Graph All
-  _extendedVerifiedWith:
-  - icon: ':heavy_check_mark:'
-    path: verify/graph/cow_game.test.cpp
-    title: verify/graph/cow_game.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/graph/flow/flow_algorithms.test.cpp
-    title: verify/graph/flow/flow_algorithms.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/graph/graph_algorithms.test.cpp
-    title: verify/graph/graph_algorithms.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/graph/range_edge_graph.test.cpp
-    title: verify/graph/range_edge_graph.test.cpp
+    path: utilities/fast_io.hpp
+    title: Fast IO
+  _extendedRequiredBy: []
+  _extendedVerifiedWith: []
   _isVerificationFailed: false
-  _pathExtension: hpp
+  _pathExtension: cpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
-    links: []
-  bundledCode: "#line 1 \"graph/flow/flow.hpp\"\n\n\n\n#line 1 \"graph/flow/bounded_flow.hpp\"\
-    \n\n\n\n#include <cassert>\n#include <optional>\n#include <vector>\n\n#line 1\
-    \ \"graph/flow/max_flow.hpp\"\n\n\n\n#include <algorithm>\n#line 6 \"graph/flow/max_flow.hpp\"\
-    \n#include <cstddef>\n#include <limits>\n#line 9 \"graph/flow/max_flow.hpp\"\n\
-    \nnamespace m1une {\nnamespace flow {\n\ntemplate <class Cap>\nstruct MaxFlow\
-    \ {\n    struct Edge {\n        int from;\n        int to;\n        Cap cap;\n\
-    \        Cap flow;\n    };\n\n   private:\n    struct InternalEdge {\n       \
-    \ int to;\n        int rev;\n        Cap cap;\n    };\n\n    struct Position {\n\
-    \        int from;\n        int edge;\n    };\n\n    int _n;\n    std::vector<Position>\
-    \ _pos;\n    std::vector<std::vector<InternalEdge>> _g;\n\n    Cap push_relabel(int\
-    \ s, int t) {\n        const std::size_t edge_count = _pos.size();\n        const\
-    \ std::size_t source_degree = _g[s].size();\n        const std::size_t sink_degree\
-    \ = _g[t].size();\n        const std::size_t terminal_degree =\n            std::min(source_degree,\
-    \ sink_degree);\n        const bool dense = edge_count >= 5 * std::size_t(_n);\n\
-    \        const std::size_t wide_threshold =\n            4 * (edge_count / std::size_t(_n)\
-    \ + 1);\n        // Reverse input order defeats several ordering-sensitive hard\
-    \ cases,\n        // while forward order is substantially better on ordinary random\n\
-    \        // graphs with medium-width terminals.\n        const bool reverse_scan\
-    \ =\n            terminal_degree > wide_threshold ||\n            (terminal_degree\
-    \ <= 4 &&\n             (dense ||\n              (source_degree == 2 && sink_degree\
-    \ == 2) ||\n              (terminal_degree == 1 &&\n               edge_count\
-    \ >= 2 * std::size_t(_n))));\n        const int dead = 2 * _n;\n        const\
-    \ int unreachable = _n + 1;\n        std::vector<Cap> excess(_n, Cap(0));\n  \
-    \      std::vector<int> state(8 * std::size_t(_n) + 2);\n        int* height =\
-    \ state.data();\n        int* height_count = height + _n;\n        int* current\
-    \ = height_count + dead + 1;\n        int* queue = current + _n;\n        int*\
-    \ next = queue + _n;\n        int* bucket_head = next + _n;\n        std::vector<char>\
-    \ active(_n, false);\n        int highest = -1;\n        long long work = 0;\n\
-    \        const long long arc_count =\n            2LL * static_cast<long long>(_pos.size());\n\
-    \        const long long work_limit = std::max(\n            1LL,\n          \
-    \  (reverse_scan ? 3 : 4) * arc_count + _n\n        );\n\n        auto activate\
-    \ = [&](int v) {\n            if (v == s || v == t || active[v] || excess[v] ==\
-    \ Cap(0) ||\n                height[v] >= dead) {\n                return;\n \
-    \           }\n            active[v] = true;\n            next[v] = bucket_head[height[v]];\n\
-    \            bucket_head[height[v]] = v;\n            highest = std::max(highest,\
-    \ height[v]);\n        };\n\n        auto rebuild_buckets = [&]() {\n        \
-    \    std::fill(bucket_head, bucket_head + dead + 1, -1);\n            std::fill(active.begin(),\
-    \ active.end(), false);\n            highest = -1;\n            for (int v = 0;\
-    \ v < _n; v++) activate(v);\n        };\n\n        auto global_relabel = [&]()\
-    \ {\n            std::fill(height, height + _n, unreachable);\n            std::fill(height_count,\
-    \ height_count + dead + 1, 0);\n            for (int v = 0; v < _n; v++) {\n \
-    \               current[v] = reverse_scan ? int(_g[v].size()) - 1 : 0;\n     \
-    \       }\n            int head = 0;\n            int tail = 0;\n            height[t]\
-    \ = 0;\n            height[s] = _n;\n            queue[tail++] = t;\n        \
-    \    while (head != tail) {\n                int v = queue[head++];\n        \
-    \        for (const auto& e : _g[v]) {\n                    if (e.to == s || height[e.to]\
-    \ != unreachable) continue;\n                    const auto& reverse = _g[e.to][e.rev];\n\
-    \                    if (reverse.cap == Cap(0)) continue;\n                  \
-    \  height[e.to] = height[v] + 1;\n                    queue[tail++] = e.to;\n\
-    \                }\n            }\n            for (int v = 0; v < _n; v++) height_count[height[v]]++;\n\
-    \            rebuild_buckets();\n            work = 0;\n        };\n\n       \
-    \ auto gap = [&](int empty_height) {\n            for (int v = 0; v < _n; v++)\
-    \ {\n                if (v == s || v == t || height[v] <= empty_height ||\n  \
-    \                  height[v] >= _n) {\n                    continue;\n       \
-    \         }\n                height_count[height[v]]--;\n                height[v]\
-    \ = unreachable;\n                height_count[height[v]]++;\n               \
-    \ current[v] = reverse_scan ? int(_g[v].size()) - 1 : 0;\n            }\n    \
-    \        rebuild_buckets();\n        };\n\n        auto relabel = [&](int v) ->\
-    \ bool {\n            int old_height = height[v];\n            int new_height\
-    \ = dead;\n            work += int(_g[v].size());\n            for (const auto&\
-    \ e : _g[v]) {\n                if (e.cap != Cap(0)) {\n                    new_height\
-    \ = std::min(new_height, height[e.to] + 1);\n                }\n            }\n\
-    \            height_count[old_height]--;\n            height[v] = std::min(new_height,\
-    \ dead);\n            height_count[height[v]]++;\n            current[v] = reverse_scan\
-    \ ? int(_g[v].size()) - 1 : 0;\n            if (old_height < _n && height_count[old_height]\
-    \ == 0) {\n                gap(old_height);\n                return true;\n  \
-    \          }\n            return false;\n        };\n\n        auto push = [&](int\
-    \ v, InternalEdge& e) {\n            Cap sent = std::min(excess[v], e.cap);\n\
-    \            bool was_zero = excess[e.to] == Cap(0);\n            e.cap -= sent;\n\
-    \            _g[e.to][e.rev].cap += sent;\n            excess[v] -= sent;\n  \
-    \          excess[e.to] += sent;\n            if (was_zero) activate(e.to);\n\
-    \        };\n\n        auto discharge = [&]<bool Reverse>(int v) {\n         \
-    \   while (excess[v] != Cap(0) && height[v] < dead) {\n                bool exhausted_edges;\n\
-    \                if constexpr (Reverse) {\n                    exhausted_edges\
-    \ = current[v] < 0;\n                } else {\n                    exhausted_edges\
-    \ = current[v] == int(_g[v].size());\n                }\n                if (exhausted_edges)\
-    \ {\n                    if (relabel(v)) return;\n                    continue;\n\
-    \                }\n                auto& e = _g[v][current[v]];\n           \
-    \     work++;\n                if (e.cap != Cap(0) && height[v] == height[e.to]\
-    \ + 1) {\n                    push(v, e);\n                } else {\n        \
-    \            if constexpr (Reverse) {\n                        current[v]--;\n\
-    \                    } else {\n                        current[v]++;\n       \
-    \             }\n                }\n            }\n            activate(v);\n\
-    \        };\n\n        for (auto& e : _g[s]) {\n            if (e.to == s || e.cap\
-    \ == Cap(0)) continue;\n            Cap sent = e.cap;\n            e.cap = Cap(0);\n\
-    \            _g[e.to][e.rev].cap += sent;\n            excess[e.to] += sent;\n\
-    \        }\n        global_relabel();\n\n        while (highest >= 0) {\n    \
-    \        if (bucket_head[highest] == -1) {\n                highest--;\n     \
-    \           continue;\n            }\n            int v = bucket_head[highest];\n\
-    \            bucket_head[highest] = next[v];\n            if (!active[v] || height[v]\
-    \ != highest) continue;\n            active[v] = false;\n            if (reverse_scan)\
-    \ {\n                discharge.template operator()<true>(v);\n            } else\
-    \ {\n                discharge.template operator()<false>(v);\n            }\n\
-    \            if (work >= work_limit) global_relabel();\n        }\n        return\
-    \ excess[t];\n    }\n\n    Cap dinic_phases(\n        int s,\n        int t,\n\
-    \        Cap flow_limit,\n        int phase_limit,\n        bool& exhausted\n\
-    \    ) {\n        std::vector<int> work(3 * std::size_t(_n));\n        int* level\
-    \ = work.data();\n        int* iter = level + _n;\n        int* queue = iter +\
-    \ _n;\n        auto bfs = [&]() -> bool {\n            std::fill(level, level\
-    \ + _n, -1);\n            int head = 0;\n            int tail = 0;\n         \
-    \   level[s] = 0;\n            queue[tail++] = s;\n            while (head !=\
-    \ tail) {\n                int v = queue[head++];\n                const auto&\
-    \ edges = _g[v];\n                for (const auto& e : edges) {\n            \
-    \        if (level[e.to] != -1 || e.cap == Cap(0)) continue;\n               \
-    \     level[e.to] = level[v] + 1;\n                    if (e.to == t) return true;\n\
-    \                    queue[tail++] = e.to;\n                }\n            }\n\
-    \            return false;\n        };\n\n        auto dfs = [&](auto&& self,\
-    \ int v, Cap up) -> Cap {\n            if (v == s) return up;\n            Cap\
-    \ result = Cap(0);\n            const int current_level = level[v];\n        \
-    \    auto& edges = _g[v];\n            const int edge_count = int(edges.size());\n\
-    \            for (int& i = iter[v]; i < edge_count; i++) {\n                auto&\
-    \ e = edges[i];\n                if (level[e.to] + 1 != current_level) continue;\n\
-    \                auto& reverse = _g[e.to][e.rev];\n                if (reverse.cap\
-    \ == Cap(0)) continue;\n                Cap d = self(\n                    self,\n\
-    \                    e.to,\n                    std::min(up - result, reverse.cap)\n\
-    \                );\n                if (d == Cap(0)) continue;\n            \
-    \    e.cap += d;\n                reverse.cap -= d;\n                result +=\
-    \ d;\n                if (result == up) return result;\n            }\n      \
-    \      level[v] = _n;\n            return result;\n        };\n\n        Cap flow\
-    \ = Cap(0);\n        int phases = 0;\n        exhausted = false;\n        while\
-    \ (flow < flow_limit && phases < phase_limit) {\n            if (!bfs()) {\n \
-    \               exhausted = true;\n                break;\n            }\n   \
-    \         std::fill(iter, iter + _n, 0);\n            flow += dfs(dfs, t, flow_limit\
-    \ - flow);\n            phases++;\n        }\n        if (flow == flow_limit)\
-    \ exhausted = true;\n        return flow;\n    }\n\n   public:\n    MaxFlow()\
-    \ : MaxFlow(0) {}\n\n    explicit MaxFlow(int n) : _n(n), _g(n) {\n        assert(0\
-    \ <= n);\n    }\n\n    int size() const {\n        return _n;\n    }\n\n    int\
-    \ edge_count() const {\n        return int(_pos.size());\n    }\n\n    void reserve_edges(int\
-    \ edge_count) {\n        assert(0 <= edge_count);\n        _pos.reserve(edge_count);\n\
-    \        if (_n == 0 || edge_count == 0 ||\n            2 * std::size_t(edge_count)\
-    \ < std::size_t(_n)) {\n            return;\n        }\n        const std::size_t\
-    \ average_degree =\n            (3 * std::size_t(edge_count) + std::size_t(_n)\
-    \ - 1)\n            / std::size_t(_n);\n        for (auto& edges : _g) edges.reserve(average_degree);\n\
-    \    }\n\n    void reserve_edges(int edge_count, const std::vector<int>& degrees)\
-    \ {\n        assert(0 <= edge_count);\n        assert(int(degrees.size()) == _n);\n\
-    \        _pos.reserve(edge_count);\n        for (int v = 0; v < _n; v++) {\n \
-    \           assert(0 <= degrees[v]);\n            _g[v].reserve(degrees[v]);\n\
-    \        }\n    }\n\n    int add_edge(int from, int to, Cap cap) {\n        assert(0\
-    \ <= from && from < _n);\n        assert(0 <= to && to < _n);\n        assert(Cap(0)\
-    \ <= cap);\n        int id = int(_pos.size());\n        int from_id = int(_g[from].size());\n\
-    \        int to_id = int(_g[to].size());\n        if (from == to) to_id++;\n \
-    \       _pos.push_back(Position{from, from_id});\n        _g[from].push_back(InternalEdge{to,\
-    \ to_id, cap});\n        _g[to].push_back(InternalEdge{from, from_id, Cap(0)});\n\
-    \        return id;\n    }\n\n    int add_undirected_edge(int first, int second,\
-    \ Cap cap) {\n        static_assert(std::numeric_limits<Cap>::is_signed);\n  \
-    \      assert(0 <= first && first < _n);\n        assert(0 <= second && second\
-    \ < _n);\n        assert(Cap(0) <= cap);\n        assert(cap <= std::numeric_limits<Cap>::max()\
-    \ / Cap(2));\n        int id = int(_pos.size());\n        int first_id = int(_g[first].size());\n\
-    \        int second_id = int(_g[second].size());\n        if (first == second)\
-    \ second_id++;\n        _pos.push_back(Position{first, ~first_id});\n        _g[first].push_back(InternalEdge{second,\
-    \ second_id, cap});\n        _g[second].push_back(InternalEdge{first, first_id,\
-    \ cap});\n        return id;\n    }\n\n    Edge get_edge(int i) const {\n    \
-    \    assert(0 <= i && i < int(_pos.size()));\n        const auto& position = _pos[i];\n\
-    \        int from = position.from;\n        bool undirected = position.edge <\
-    \ 0;\n        int idx = undirected ? ~position.edge : position.edge;\n       \
-    \ const auto& e = _g[from][idx];\n        const auto& re = _g[e.to][e.rev];\n\
-    \        if (undirected) {\n            return Edge{\n                from,\n\
-    \                e.to,\n                (e.cap + re.cap) / Cap(2),\n         \
-    \       (re.cap - e.cap) / Cap(2)\n            };\n        }\n        return Edge{from,\
-    \ e.to, e.cap + re.cap, re.cap};\n    }\n\n    std::vector<Edge> edges() const\
-    \ {\n        std::vector<Edge> result;\n        result.reserve(_pos.size());\n\
-    \        for (int i = 0; i < int(_pos.size()); i++) result.push_back(get_edge(i));\n\
-    \        return result;\n    }\n\n    void change_edge(int i, Cap new_cap, Cap\
-    \ new_flow) {\n        assert(0 <= i && i < int(_pos.size()));\n        assert(Cap(0)\
-    \ <= new_cap);\n        auto& position = _pos[i];\n        int from = position.from;\n\
-    \        bool undirected = position.edge < 0;\n        int idx = undirected ?\
-    \ ~position.edge : position.edge;\n        auto& e = _g[from][idx];\n        auto&\
-    \ re = _g[e.to][e.rev];\n        if (undirected) {\n            assert(new_cap\
-    \ <= std::numeric_limits<Cap>::max() / Cap(2));\n            assert(-new_cap <=\
-    \ new_flow && new_flow <= new_cap);\n            e.cap = new_cap - new_flow;\n\
-    \            re.cap = new_cap + new_flow;\n        } else {\n            assert(Cap(0)\
-    \ <= new_flow && new_flow <= new_cap);\n            e.cap = new_cap - new_flow;\n\
-    \            re.cap = new_flow;\n        }\n    }\n\n    Cap max_flow(int s, int\
-    \ t) {\n        assert(0 <= s && s < _n);\n        assert(0 <= t && t < _n);\n\
-    \        assert(s != t);\n        bool exhausted;\n        const std::size_t edge_count\
-    \ = _pos.size();\n        const std::size_t terminal_degree =\n            std::min(_g[s].size(),\
-    \ _g[t].size());\n        const bool dense = edge_count >= 5 * std::size_t(_n);\n\
-    \        const bool sparse_narrow_terminals =\n            edge_count >= std::size_t(_n)\
-    \ &&\n            2 <= _g[s].size() && _g[s].size() <= 4 &&\n            2 <=\
-    \ _g[t].size() && _g[t].size() <= 4;\n        // Only pay for a possible push-relabel\
-    \ handoff on graph shapes where\n        // many Dinic phases are a realistic\
-    \ risk.\n        const bool use_hybrid =\n            (dense || sparse_narrow_terminals)\
-    \ &&\n            terminal_degree <= 4 * (edge_count / std::size_t(_n) + 1);\n\
-    \        if (!use_hybrid) {\n            return max_flow(s, t, std::numeric_limits<Cap>::max());\n\
-    \        }\n        int phase_limit = dense ? 4 : 8;\n        bool small_terminal_capacities\
-    \ = true;\n        const int terminals[2] = {s, t};\n        for (int v : terminals)\
-    \ {\n            for (const auto& e : _g[v]) {\n                if (Cap(2) < e.cap\
-    \ ||\n                    Cap(2) < _g[e.to][e.rev].cap) {\n                  \
-    \  small_terminal_capacities = false;\n                    break;\n          \
-    \      }\n            }\n            if (!small_terminal_capacities) break;\n\
-    \        }\n        if (small_terminal_capacities) {\n            return max_flow(s,\
-    \ t, std::numeric_limits<Cap>::max());\n        }\n        Cap flow = dinic_phases(\n\
-    \            s,\n            t,\n            std::numeric_limits<Cap>::max(),\n\
-    \            phase_limit,\n            exhausted\n        );\n        if (!exhausted)\
-    \ flow += push_relabel(s, t);\n        return flow;\n    }\n\n    Cap max_flow_push_relabel(int\
-    \ s, int t) {\n        assert(0 <= s && s < _n);\n        assert(0 <= t && t <\
-    \ _n);\n        assert(s != t);\n        return push_relabel(s, t);\n    }\n\n\
-    \    Cap max_flow(int s, int t, Cap flow_limit) {\n        assert(0 <= s && s\
-    \ < _n);\n        assert(0 <= t && t < _n);\n        assert(s != t);\n\n     \
-    \   std::vector<int> work(3 * std::size_t(_n));\n        int* level = work.data();\n\
-    \        int* iter = level + _n;\n        int* queue = iter + _n;\n        auto\
-    \ bfs = [&]() -> bool {\n            std::fill(level, level + _n, -1);\n     \
-    \       int head = 0;\n            int tail = 0;\n            level[s] = 0;\n\
-    \            queue[tail++] = s;\n            while (head != tail) {\n        \
-    \        int v = queue[head++];\n                for (const auto& e : _g[v]) {\n\
-    \                    if (level[e.to] != -1 || e.cap == Cap(0)) continue;\n   \
-    \                 level[e.to] = level[v] + 1;\n                    if (e.to ==\
-    \ t) return true;\n                    queue[tail++] = e.to;\n               \
-    \ }\n            }\n            return level[t] != -1;\n        };\n\n       \
-    \ auto dfs = [&](auto&& self, int v, Cap up) -> Cap {\n            if (v == s)\
-    \ return up;\n            Cap result = Cap(0);\n            const int current_level\
-    \ = level[v];\n            auto& edges = _g[v];\n            const int edge_count\
-    \ = int(edges.size());\n            for (int& i = iter[v]; i < edge_count; i++)\
-    \ {\n                auto& e = edges[i];\n                if (level[e.to] + 1\
-    \ != current_level) continue;\n                auto& reverse = _g[e.to][e.rev];\n\
-    \                if (reverse.cap == Cap(0)) continue;\n                Cap d =\
-    \ self(\n                    self,\n                    e.to,\n              \
-    \      std::min(up - result, reverse.cap)\n                );\n              \
-    \  if (d == Cap(0)) continue;\n                e.cap += d;\n                reverse.cap\
-    \ -= d;\n                result += d;\n                if (result == up) return\
-    \ result;\n            }\n            level[v] = _n;\n            return result;\n\
-    \        };\n\n        Cap flow = 0;\n        while (flow < flow_limit && bfs())\
-    \ {\n            std::fill(iter, iter + _n, 0);\n            flow += dfs(dfs,\
-    \ t, flow_limit - flow);\n        }\n        return flow;\n    }\n\n    std::vector<bool>\
-    \ min_cut(int s) const {\n        assert(0 <= s && s < _n);\n        std::vector<bool>\
-    \ visited(_n, false);\n        std::vector<int> queue(_n);\n        int head =\
-    \ 0;\n        int tail = 0;\n        visited[s] = true;\n        queue[tail++]\
-    \ = s;\n        while (head != tail) {\n            int v = queue[head++];\n \
-    \           for (const auto& e : _g[v]) {\n                if (e.cap == Cap(0)\
-    \ || visited[e.to]) continue;\n                visited[e.to] = true;\n       \
-    \         queue[tail++] = e.to;\n            }\n        }\n        return visited;\n\
-    \    }\n};\n\n}  // namespace flow\n}  // namespace m1une\n\n\n#line 9 \"graph/flow/bounded_flow.hpp\"\
-    \n\nnamespace m1une {\nnamespace flow {\n\ntemplate <class Cap>\nstruct BoundedFlow\
-    \ {\n    struct Edge {\n        int from;\n        int to;\n        Cap lower;\n\
-    \        Cap upper;\n    };\n\n    struct ResultEdge {\n        int from;\n  \
+    '*NOT_SPECIAL_COMMENTS*': ''
+    PROBLEM: https://onlinejudge.u-aizu.ac.jp/problems/GRL_6_B
+    links:
+    - https://onlinejudge.u-aizu.ac.jp/problems/GRL_6_B
+  bundledCode: "#line 1 \"verify/graph/flow/min_cost_flow.test.cpp\"\n#define PROBLEM\
+    \ \"https://onlinejudge.u-aizu.ac.jp/problems/GRL_6_B\"\n\n#line 1 \"graph/flow/min_cost_flow.hpp\"\
+    \n\n\n\n#include <algorithm>\n#include <array>\n#include <bit>\n#include <cassert>\n\
+    #include <cstddef>\n#include <functional>\n#include <limits>\n#include <optional>\n\
+    #include <type_traits>\n#include <utility>\n#include <vector>\n\n#line 1 \"graph/flow/bounded_min_cost_flow.hpp\"\
+    \n\n\n\n#line 7 \"graph/flow/bounded_min_cost_flow.hpp\"\n#include <cmath>\n#line\
+    \ 11 \"graph/flow/bounded_min_cost_flow.hpp\"\n#include <queue>\n#line 14 \"graph/flow/bounded_min_cost_flow.hpp\"\
+    \n\nnamespace m1une {\nnamespace flow {\n\ntemplate <\n    class Cap,\n    class\
+    \ Cost,\n    class TotalCost = Cost,\n    std::size_t PivotLimitFactor = 8\n>\n\
+    struct BoundedMinCostFlow {\n    static_assert(std::numeric_limits<Cap>::is_integer);\n\
+    \    static_assert(std::numeric_limits<Cap>::is_signed);\n    static_assert(std::numeric_limits<Cost>::is_specialized);\n\
+    \    static_assert(std::numeric_limits<Cost>::is_signed);\n\n    struct Edge {\n\
+    \        int from;\n        int to;\n        Cap lower;\n        Cap upper;\n\
+    \        Cost cost;\n    };\n\n    struct ResultEdge {\n        int from;\n  \
     \      int to;\n        Cap lower;\n        Cap upper;\n        Cap flow;\n  \
-    \  };\n\n    struct Result {\n        std::vector<ResultEdge> edges;\n       \
-    \ std::vector<Cap> balance;\n\n        ResultEdge get_edge(int i) const {\n  \
-    \          assert(0 <= i && i < int(edges.size()));\n            return edges[i];\n\
+    \      Cost cost;\n    };\n\n    struct Result {\n        std::vector<ResultEdge>\
+    \ edges;\n        std::vector<Cap> balance;\n        std::vector<Cost> potential;\n\
+    \        TotalCost cost;\n\n        ResultEdge get_edge(int i) const {\n     \
+    \       assert(0 <= i && i < int(edges.size()));\n            return edges[i];\n\
     \        }\n\n        Cap flow(int i) const {\n            assert(0 <= i && i\
     \ < int(edges.size()));\n            return edges[i].flow;\n        }\n    };\n\
-    \n   private:\n    int _n;\n    std::vector<Edge> _edges;\n    std::vector<Cap>\
-    \ _balance;\n\n   public:\n    BoundedFlow() : BoundedFlow(0) {}\n\n    explicit\
-    \ BoundedFlow(int n) : _n(n), _balance(n, Cap(0)) {\n        assert(0 <= n);\n\
-    \    }\n\n    int size() const {\n        return _n;\n    }\n\n    int edge_count()\
-    \ const {\n        return int(_edges.size());\n    }\n\n    int add_edge(int from,\
-    \ int to, Cap lower, Cap upper) {\n        assert(0 <= from && from < _n);\n \
-    \       assert(0 <= to && to < _n);\n        assert(lower <= upper);\n       \
-    \ int id = int(_edges.size());\n        _edges.push_back(Edge{from, to, lower,\
-    \ upper});\n        return id;\n    }\n\n    Edge get_edge(int i) const {\n  \
-    \      assert(0 <= i && i < int(_edges.size()));\n        return _edges[i];\n\
-    \    }\n\n    std::vector<Edge> edges() const {\n        return _edges;\n    }\n\
-    \n    void set_balance(int v, Cap b) {\n        assert(0 <= v && v < _n);\n  \
-    \      _balance[v] = b;\n    }\n\n    void add_balance(int v, Cap b) {\n     \
-    \   assert(0 <= v && v < _n);\n        _balance[v] += b;\n    }\n\n    void add_supply(int\
-    \ v, Cap supply) {\n        assert(Cap(0) <= supply);\n        add_balance(v,\
-    \ supply);\n    }\n\n    void add_demand(int v, Cap demand) {\n        assert(Cap(0)\
-    \ <= demand);\n        add_balance(v, -demand);\n    }\n\n    Cap balance(int\
-    \ v) const {\n        assert(0 <= v && v < _n);\n        return _balance[v];\n\
-    \    }\n\n    const std::vector<Cap>& balances() const {\n        return _balance;\n\
-    \    }\n\n    std::optional<Result> feasible_flow() const {\n        return feasible_flow(_balance);\n\
-    \    }\n\n    std::optional<Result> feasible_flow(const std::vector<Cap>& balance)\
-    \ const {\n        assert(int(balance.size()) == _n);\n        int ss = _n, tt\
-    \ = _n + 1;\n        MaxFlow<Cap> mf(_n + 2);\n        std::vector<int> edge_ids;\n\
-    \        edge_ids.reserve(_edges.size());\n\n        std::vector<Cap> need = balance;\n\
-    \        for (const auto& e : _edges) {\n            edge_ids.push_back(mf.add_edge(e.from,\
-    \ e.to, e.upper - e.lower));\n            need[e.from] -= e.lower;\n         \
-    \   need[e.to] += e.lower;\n        }\n\n        Cap positive_sum = Cap(0), negative_sum\
-    \ = Cap(0);\n        for (int v = 0; v < _n; v++) {\n            if (need[v] >\
-    \ Cap(0)) {\n                positive_sum += need[v];\n                mf.add_edge(ss,\
-    \ v, need[v]);\n            } else if (need[v] < Cap(0)) {\n                negative_sum\
-    \ += -need[v];\n                mf.add_edge(v, tt, -need[v]);\n            }\n\
-    \        }\n        if (positive_sum != negative_sum) return std::nullopt;\n \
-    \       if (mf.max_flow(ss, tt) != positive_sum) return std::nullopt;\n\n    \
-    \    Result result;\n        result.balance = balance;\n        result.edges.reserve(_edges.size());\n\
-    \        for (int i = 0; i < int(_edges.size()); i++) {\n            auto used\
-    \ = mf.get_edge(edge_ids[i]).flow;\n            const auto& e = _edges[i];\n \
-    \           result.edges.push_back(ResultEdge{e.from, e.to, e.lower, e.upper,\
-    \ e.lower + used});\n        }\n        return result;\n    }\n\n    std::optional<Result>\
-    \ feasible_st_flow(int s, int t, Cap flow_value) const {\n        assert(0 <=\
-    \ s && s < _n);\n        assert(0 <= t && t < _n);\n        assert(s != t);\n\
-    \        std::vector<Cap> balance = _balance;\n        balance[s] += flow_value;\n\
-    \        balance[t] -= flow_value;\n        return feasible_flow(balance);\n \
-    \   }\n};\n\ntemplate <class Cap>\nusing BFlow = BoundedFlow<Cap>;\n\n}  // namespace\
-    \ flow\n}  // namespace m1une\n\n\n#line 1 \"graph/flow/bounded_min_cost_flow.hpp\"\
-    \n\n\n\n#line 7 \"graph/flow/bounded_min_cost_flow.hpp\"\n#include <cmath>\n#include\
-    \ <functional>\n#line 11 \"graph/flow/bounded_min_cost_flow.hpp\"\n#include <queue>\n\
-    #include <utility>\n#line 14 \"graph/flow/bounded_min_cost_flow.hpp\"\n\nnamespace\
-    \ m1une {\nnamespace flow {\n\ntemplate <\n    class Cap,\n    class Cost,\n \
-    \   class TotalCost = Cost,\n    std::size_t PivotLimitFactor = 8\n>\nstruct BoundedMinCostFlow\
-    \ {\n    static_assert(std::numeric_limits<Cap>::is_integer);\n    static_assert(std::numeric_limits<Cap>::is_signed);\n\
-    \    static_assert(std::numeric_limits<Cost>::is_specialized);\n    static_assert(std::numeric_limits<Cost>::is_signed);\n\
-    \n    struct Edge {\n        int from;\n        int to;\n        Cap lower;\n\
-    \        Cap upper;\n        Cost cost;\n    };\n\n    struct ResultEdge {\n \
-    \       int from;\n        int to;\n        Cap lower;\n        Cap upper;\n \
-    \       Cap flow;\n        Cost cost;\n    };\n\n    struct Result {\n       \
-    \ std::vector<ResultEdge> edges;\n        std::vector<Cap> balance;\n        std::vector<Cost>\
-    \ potential;\n        TotalCost cost;\n\n        ResultEdge get_edge(int i) const\
-    \ {\n            assert(0 <= i && i < int(edges.size()));\n            return\
-    \ edges[i];\n        }\n\n        Cap flow(int i) const {\n            assert(0\
-    \ <= i && i < int(edges.size()));\n            return edges[i].flow;\n       \
-    \ }\n    };\n\n   private:\n    struct NetworkEdge {\n        int to;\n      \
-    \  Cap cap;\n        Cost cost;\n    };\n\n    struct NetworkSimplexSolver {\n\
-    \        enum class Status {\n            optimal,\n            infeasible,\n\
-    \            pivot_limit_reached,\n        };\n\n        struct Parent {\n   \
-    \         int vertex;\n            int edge;\n            Cap up;\n          \
-    \  Cap down;\n        };\n\n        int n;\n        std::vector<NetworkEdge> edges;\n\
-    \        std::vector<Cap> excess;\n        std::vector<Cost> potential;\n    \
-    \    std::size_t pivot_count = 0;\n\n        NetworkSimplexSolver(int vertex_count,\
-    \ const std::vector<Cap>& balance)\n            : n(vertex_count), excess(balance)\
-    \ {}\n\n        void reserve_edges(int edge_count) {\n            edges.reserve(2\
-    \ * (edge_count + n));\n        }\n\n        int add_edge(int from, int to, Cap\
-    \ lower, Cap upper, Cost cost) {\n            int id = int(edges.size()) / 2;\n\
-    \            edges.push_back(NetworkEdge{to, upper - lower, cost});\n        \
-    \    edges.push_back(NetworkEdge{from, Cap(0), -cost});\n            excess[from]\
-    \ -= lower;\n            excess[to] += lower;\n            return id;\n      \
-    \  }\n\n        Status solve(std::size_t pivot_limit) {\n            pivot_count\
-    \ = 0;\n            const int original_edge_count = int(edges.size());\n     \
-    \       potential.assign(n + 1, Cost(0));\n\n            Cost artificial_cost\
-    \ = Cost(1);\n            for (int edge = 0; edge < original_edge_count; edge\
-    \ += 2) {\n                artificial_cost += edges[edge].cost < Cost(0)\n   \
-    \                 ? -edges[edge].cost : edges[edge].cost;\n            }\n\n \
-    \           std::vector<Parent> parent(n);\n            edges.reserve(original_edge_count\
+    \n   private:\n    struct NetworkEdge {\n        int to;\n        Cap cap;\n \
+    \       Cost cost;\n    };\n\n    struct NetworkSimplexSolver {\n        enum\
+    \ class Status {\n            optimal,\n            infeasible,\n            pivot_limit_reached,\n\
+    \        };\n\n        struct Parent {\n            int vertex;\n            int\
+    \ edge;\n            Cap up;\n            Cap down;\n        };\n\n        int\
+    \ n;\n        std::vector<NetworkEdge> edges;\n        std::vector<Cap> excess;\n\
+    \        std::vector<Cost> potential;\n        std::size_t pivot_count = 0;\n\n\
+    \        NetworkSimplexSolver(int vertex_count, const std::vector<Cap>& balance)\n\
+    \            : n(vertex_count), excess(balance) {}\n\n        void reserve_edges(int\
+    \ edge_count) {\n            edges.reserve(2 * (edge_count + n));\n        }\n\
+    \n        int add_edge(int from, int to, Cap lower, Cap upper, Cost cost) {\n\
+    \            int id = int(edges.size()) / 2;\n            edges.push_back(NetworkEdge{to,\
+    \ upper - lower, cost});\n            edges.push_back(NetworkEdge{from, Cap(0),\
+    \ -cost});\n            excess[from] -= lower;\n            excess[to] += lower;\n\
+    \            return id;\n        }\n\n        Status solve(std::size_t pivot_limit)\
+    \ {\n            pivot_count = 0;\n            const int original_edge_count =\
+    \ int(edges.size());\n            potential.assign(n + 1, Cost(0));\n\n      \
+    \      Cost artificial_cost = Cost(1);\n            for (int edge = 0; edge <\
+    \ original_edge_count; edge += 2) {\n                artificial_cost += edges[edge].cost\
+    \ < Cost(0)\n                    ? -edges[edge].cost : edges[edge].cost;\n   \
+    \         }\n\n            std::vector<Parent> parent(n);\n            edges.reserve(original_edge_count\
     \ + 2 * n);\n            for (int vertex = 0; vertex < n; vertex++) {\n      \
     \          if (excess[vertex] >= Cap(0)) {\n                    edges.push_back(NetworkEdge{n,\
     \ Cap(0), artificial_cost});\n                    edges.push_back(NetworkEdge{vertex,\
@@ -683,168 +387,240 @@ data:
     \    }\n};\n\ntemplate <\n    class Cap,\n    class Cost,\n    class TotalCost\
     \ = Cost,\n    std::size_t PivotLimitFactor = 8\n>\nusing BMinCostFlow = BoundedMinCostFlow<\n\
     \    Cap,\n    Cost,\n    TotalCost,\n    PivotLimitFactor\n>;\n\n}  // namespace\
-    \ flow\n}  // namespace m1une\n\n\n#line 1 \"graph/flow/gomory_hu.hpp\"\n\n\n\n\
-    #line 9 \"graph/flow/gomory_hu.hpp\"\n\nnamespace m1une {\nnamespace flow {\n\n\
-    template <class Cap>\nstruct GomoryHu {\n    struct Edge {\n        int u;\n \
-    \       int v;\n        Cap cap;\n    };\n\n   private:\n    struct FlowEdge {\n\
-    \        int to;\n        int rev;\n        Cap cap;\n        Cap initial_cap;\n\
-    \    };\n\n    int _n;\n    bool _built = false;\n    std::vector<Edge> _edges;\n\
-    \    std::vector<Edge> _tree_edges;\n    std::vector<int> _parent;\n    std::vector<Cap>\
-    \ _cut_value;\n    std::vector<std::vector<std::pair<int, Cap>>> _tree;\n    std::vector<std::vector<int>>\
-    \ _up;\n    std::vector<std::vector<Cap>> _minimum;\n    std::vector<int> _depth;\n\
-    \n    std::vector<std::vector<FlowEdge>> _graph;\n    std::vector<Cap> _excess;\n\
-    \    std::vector<int> _height;\n    std::vector<int> _height_count;\n    std::vector<int>\
-    \ _current;\n    std::vector<bool> _active;\n    std::vector<std::vector<int>>\
-    \ _buckets;\n    std::vector<int> _queue;\n    int _highest;\n    long long _work;\n\
-    \    long long _work_limit;\n\n    void add_flow_edge(int u, int v, Cap cap) {\n\
-    \        if (u == v || cap == Cap(0)) return;\n        int ui = int(_graph[u].size());\n\
-    \        int vi = int(_graph[v].size());\n        _graph[u].push_back(FlowEdge{v,\
-    \ vi, cap, cap});\n        _graph[v].push_back(FlowEdge{u, ui, cap, cap});\n \
-    \   }\n\n    void reset_flow() {\n        for (auto& edges : _graph) {\n     \
-    \       for (auto& edge : edges) edge.cap = edge.initial_cap;\n        }\n   \
-    \ }\n\n    void activate(int v, int s, int t) {\n        int dead = 2 * _n;\n\
-    \        if (v == s || v == t || _active[v] || _excess[v] == Cap(0) || _height[v]\
-    \ >= dead) return;\n        _active[v] = true;\n        _buckets[_height[v]].push_back(v);\n\
-    \        _highest = std::max(_highest, _height[v]);\n    }\n\n    void rebuild_buckets(int\
-    \ s, int t) {\n        for (auto& bucket : _buckets) bucket.clear();\n       \
-    \ std::fill(_active.begin(), _active.end(), false);\n        _highest = -1;\n\
-    \        for (int v = 0; v < _n; v++) activate(v, s, t);\n    }\n\n    void global_relabel(int\
-    \ s, int t) {\n        int dead = 2 * _n;\n        int unreachable = _n + 1;\n\
-    \        std::fill(_height.begin(), _height.end(), unreachable);\n        std::fill(_height_count.begin(),\
-    \ _height_count.end(), 0);\n        std::fill(_current.begin(), _current.end(),\
-    \ 0);\n\n        int head = 0;\n        int tail = 0;\n        _height[t] = 0;\n\
-    \        _height[s] = _n;\n        _queue[tail++] = t;\n        while (head <\
-    \ tail) {\n            int v = _queue[head++];\n            for (const auto& edge\
-    \ : _graph[v]) {\n                const FlowEdge& reverse = _graph[edge.to][edge.rev];\n\
-    \                if (reverse.cap == Cap(0) || _height[edge.to] != unreachable)\
-    \ continue;\n                _height[edge.to] = _height[v] + 1;\n            \
-    \    _queue[tail++] = edge.to;\n            }\n        }\n        for (int v =\
-    \ 0; v < _n; v++) {\n            _height[v] = std::min(_height[v], dead);\n  \
-    \          _height_count[_height[v]]++;\n        }\n        rebuild_buckets(s,\
-    \ t);\n        _work = 0;\n    }\n\n    void push(int v, FlowEdge& edge, int s,\
-    \ int t) {\n        if (edge.cap == Cap(0) || _height[v] != _height[edge.to] +\
-    \ 1) return;\n        Cap sent = std::min(_excess[v], edge.cap);\n        if (sent\
-    \ == Cap(0)) return;\n        bool was_zero = _excess[edge.to] == Cap(0);\n  \
-    \      edge.cap -= sent;\n        _graph[edge.to][edge.rev].cap += sent;\n   \
-    \     _excess[v] -= sent;\n        _excess[edge.to] += sent;\n        if (was_zero)\
-    \ activate(edge.to, s, t);\n    }\n\n    void gap(int height, int s, int t) {\n\
-    \        int unreachable = _n + 1;\n        for (int v = 0; v < _n; v++) {\n \
-    \           if (v == s || v == t || _height[v] <= height || _height[v] >= _n)\
-    \ continue;\n            _height_count[_height[v]]--;\n            _height[v]\
-    \ = unreachable;\n            _height_count[_height[v]]++;\n            _current[v]\
-    \ = 0;\n        }\n        rebuild_buckets(s, t);\n    }\n\n    bool relabel(int\
-    \ v, int s, int t) {\n        int dead = 2 * _n;\n        int old_height = _height[v];\n\
-    \        int new_height = dead;\n        _work += int(_graph[v].size());\n   \
-    \     for (const auto& edge : _graph[v]) {\n            if (edge.cap != Cap(0))\
-    \ new_height = std::min(new_height, _height[edge.to] + 1);\n        }\n      \
-    \  _height_count[old_height]--;\n        _height[v] = std::min(new_height, dead);\n\
-    \        _height_count[_height[v]]++;\n        _current[v] = 0;\n        if (old_height\
-    \ < _n && _height_count[old_height] == 0) {\n            gap(old_height, s, t);\n\
-    \            return true;\n        }\n        return false;\n    }\n\n    void\
-    \ discharge(int v, int s, int t) {\n        while (_excess[v] != Cap(0) && _height[v]\
-    \ < 2 * _n) {\n            if (_current[v] == int(_graph[v].size())) {\n     \
-    \           if (relabel(v, s, t)) return;\n                continue;\n       \
-    \     }\n            FlowEdge& edge = _graph[v][_current[v]];\n            _work++;\n\
-    \            if (edge.cap != Cap(0) && _height[v] == _height[edge.to] + 1) {\n\
-    \                push(v, edge, s, t);\n            } else {\n                _current[v]++;\n\
-    \            }\n        }\n        activate(v, s, t);\n    }\n\n    Cap max_flow(int\
-    \ s, int t) {\n        reset_flow();\n        std::fill(_excess.begin(), _excess.end(),\
-    \ Cap(0));\n        for (auto& edge : _graph[s]) {\n            Cap sent = edge.cap;\n\
-    \            if (sent == Cap(0)) continue;\n            edge.cap = Cap(0);\n \
-    \           _graph[edge.to][edge.rev].cap += sent;\n            _excess[edge.to]\
-    \ += sent;\n        }\n        global_relabel(s, t);\n\n        while (_highest\
-    \ >= 0) {\n            if (_buckets[_highest].empty()) {\n                _highest--;\n\
-    \                continue;\n            }\n            int v = _buckets[_highest].back();\n\
-    \            _buckets[_highest].pop_back();\n            if (!_active[v] || _height[v]\
-    \ != _highest) continue;\n            _active[v] = false;\n            discharge(v,\
-    \ s, t);\n            if (_work >= _work_limit) global_relabel(s, t);\n      \
-    \  }\n        return _excess[t];\n    }\n\n    std::vector<bool> source_side(int\
-    \ s) {\n        std::vector<bool> visited(_n, false);\n        int head = 0;\n\
-    \        int tail = 0;\n        visited[s] = true;\n        _queue[tail++] = s;\n\
-    \        while (head < tail) {\n            int v = _queue[head++];\n        \
-    \    for (const auto& edge : _graph[v]) {\n                if (edge.cap == Cap(0)\
-    \ || visited[edge.to]) continue;\n                visited[edge.to] = true;\n \
-    \               _queue[tail++] = edge.to;\n            }\n        }\n        return\
-    \ visited;\n    }\n\n    void build_query_table() {\n        int log = 1;\n  \
-    \      while ((1LL << log) <= std::max(1, _n)) log++;\n        const Cap infinity\
-    \ = std::numeric_limits<Cap>::max();\n        _up.assign(log, std::vector<int>(_n,\
-    \ 0));\n        _minimum.assign(log, std::vector<Cap>(_n, infinity));\n      \
-    \  _depth.assign(_n, 0);\n        if (_n == 0) return;\n\n        std::vector<int>\
-    \ order;\n        order.reserve(_n);\n        order.push_back(0);\n        for\
-    \ (int i = 0; i < int(order.size()); i++) {\n            int v = order[i];\n \
-    \           for (auto [to, cap] : _tree[v]) {\n                if (to == _up[0][v]\
-    \ && v != 0) continue;\n                _up[0][to] = v;\n                _minimum[0][to]\
-    \ = cap;\n                _depth[to] = _depth[v] + 1;\n                order.push_back(to);\n\
-    \            }\n        }\n        for (int k = 1; k < log; k++) {\n         \
-    \   for (int v = 0; v < _n; v++) {\n                int middle = _up[k - 1][v];\n\
-    \                _up[k][v] = _up[k - 1][middle];\n                _minimum[k][v]\
-    \ = std::min(_minimum[k - 1][v], _minimum[k - 1][middle]);\n            }\n  \
-    \      }\n    }\n\n   public:\n    GomoryHu() : GomoryHu(0) {}\n\n    explicit\
-    \ GomoryHu(int n) : _n(n) {\n        assert(0 <= n);\n    }\n\n    int size()\
-    \ const {\n        return _n;\n    }\n\n    int edge_count() const {\n       \
-    \ return int(_edges.size());\n    }\n\n    int add_edge(int u, int v, Cap cap)\
-    \ {\n        assert(0 <= u && u < _n);\n        assert(0 <= v && v < _n);\n  \
-    \      assert(Cap(0) <= cap);\n        _built = false;\n        int id = int(_edges.size());\n\
-    \        _edges.push_back(Edge{u, v, cap});\n        return id;\n    }\n\n   \
-    \ void build() {\n        std::vector<Edge> flow_edges;\n        flow_edges.reserve(_edges.size());\n\
-    \        for (auto edge : _edges) {\n            if (edge.u == edge.v || edge.cap\
-    \ == Cap(0)) continue;\n            if (edge.u > edge.v) std::swap(edge.u, edge.v);\n\
-    \            flow_edges.push_back(edge);\n        }\n        std::sort(flow_edges.begin(),\
-    \ flow_edges.end(), [](const Edge& lhs, const Edge& rhs) {\n            return\
-    \ std::pair<int, int>(lhs.u, lhs.v) < std::pair<int, int>(rhs.u, rhs.v);\n   \
-    \     });\n        int unique_edges = 0;\n        for (const auto& edge : flow_edges)\
-    \ {\n            if (unique_edges > 0 && flow_edges[unique_edges - 1].u == edge.u\
-    \ &&\n                flow_edges[unique_edges - 1].v == edge.v) {\n          \
-    \      flow_edges[unique_edges - 1].cap += edge.cap;\n            } else {\n \
-    \               flow_edges[unique_edges++] = edge;\n            }\n        }\n\
-    \        flow_edges.resize(unique_edges);\n\n        _graph.assign(_n, {});\n\
-    \        std::vector<int> degree(_n, 0);\n        for (const auto& edge : flow_edges)\
-    \ {\n            degree[edge.u]++;\n            degree[edge.v]++;\n        }\n\
-    \        for (int v = 0; v < _n; v++) _graph[v].reserve(degree[v]);\n        for\
-    \ (const auto& edge : flow_edges) add_flow_edge(edge.u, edge.v, edge.cap);\n \
-    \       _excess.resize(_n);\n        _height.resize(_n);\n        _height_count.resize(2\
-    \ * _n + 1);\n        _current.resize(_n);\n        _active.resize(_n);\n    \
-    \    _buckets.resize(2 * _n + 1);\n        _queue.resize(_n);\n        long long\
-    \ arc_count = 0;\n        for (const auto& edges : _graph) arc_count += int(edges.size());\n\
-    \        _work_limit = std::max(1LL, 4 * arc_count + _n);\n\n        _parent.assign(_n,\
-    \ 0);\n        _cut_value.assign(_n, std::numeric_limits<Cap>::max());\n     \
-    \   for (int s = 1; s < _n; s++) {\n            int t = _parent[s];\n        \
-    \    Cap flow = max_flow(s, t);\n            std::vector<bool> cut = source_side(s);\n\
-    \            for (int v = s + 1; v < _n; v++) {\n                if (_parent[v]\
-    \ == t && cut[v]) _parent[v] = s;\n            }\n            if (cut[_parent[t]])\
-    \ {\n                _parent[s] = _parent[t];\n                _parent[t] = s;\n\
-    \                _cut_value[s] = _cut_value[t];\n                _cut_value[t]\
-    \ = flow;\n            } else {\n                _cut_value[s] = flow;\n     \
-    \       }\n        }\n\n        _tree.assign(_n, {});\n        _tree_edges.clear();\n\
-    \        if (_n > 0) _tree_edges.reserve(_n - 1);\n        for (int v = 1; v <\
-    \ _n; v++) {\n            int p = _parent[v];\n            Cap cap = _cut_value[v];\n\
-    \            _tree_edges.push_back(Edge{v, p, cap});\n            _tree[v].emplace_back(p,\
-    \ cap);\n            _tree[p].emplace_back(v, cap);\n        }\n        build_query_table();\n\
-    \        _built = true;\n    }\n\n    const std::vector<Edge>& tree_edges() const\
-    \ {\n        assert(_built);\n        return _tree_edges;\n    }\n\n    const\
-    \ std::vector<int>& parent() const {\n        assert(_built);\n        return\
-    \ _parent;\n    }\n\n    const std::vector<Cap>& cut_values() const {\n      \
-    \  assert(_built);\n        return _cut_value;\n    }\n\n    Cap min_cut(int u,\
-    \ int v) const {\n        assert(_built);\n        assert(0 <= u && u < _n);\n\
-    \        assert(0 <= v && v < _n);\n        assert(u != v);\n        Cap result\
-    \ = std::numeric_limits<Cap>::max();\n        if (_depth[u] < _depth[v]) std::swap(u,\
-    \ v);\n        int difference = _depth[u] - _depth[v];\n        for (int k = 0;\
-    \ difference > 0; k++, difference >>= 1) {\n            if ((difference & 1) ==\
-    \ 0) continue;\n            result = std::min(result, _minimum[k][u]);\n     \
-    \       u = _up[k][u];\n        }\n        if (u == v) return result;\n      \
-    \  for (int k = int(_up.size()) - 1; k >= 0; k--) {\n            if (_up[k][u]\
-    \ == _up[k][v]) continue;\n            result = std::min(result, _minimum[k][u]);\n\
-    \            result = std::min(result, _minimum[k][v]);\n            u = _up[k][u];\n\
-    \            v = _up[k][v];\n        }\n        result = std::min(result, _minimum[0][u]);\n\
-    \        result = std::min(result, _minimum[0][v]);\n        return result;\n\
-    \    }\n};\n\n}  // namespace flow\n}  // namespace m1une\n\n\n#line 1 \"graph/flow/min_cost_flow.hpp\"\
-    \n\n\n\n#line 5 \"graph/flow/min_cost_flow.hpp\"\n#include <array>\n#include <bit>\n\
-    #line 12 \"graph/flow/min_cost_flow.hpp\"\n#include <type_traits>\n#line 15 \"\
-    graph/flow/min_cost_flow.hpp\"\n\n#line 18 \"graph/flow/min_cost_flow.hpp\"\n\n\
-    namespace m1une {\nnamespace flow {\n\ntemplate <class Cap, class Cost>\nstruct\
-    \ MinCostFlow {\n    struct Edge {\n        int from;\n        int to;\n     \
-    \   Cap cap;\n        Cap flow;\n        Cost cost;\n    };\n\n   private:\n \
-    \   struct InternalEdge {\n        int to;\n        int rev;\n        Cap cap;\n\
+    \ flow\n}  // namespace m1une\n\n\n#line 1 \"graph/flow/max_flow.hpp\"\n\n\n\n\
+    #line 9 \"graph/flow/max_flow.hpp\"\n\nnamespace m1une {\nnamespace flow {\n\n\
+    template <class Cap>\nstruct MaxFlow {\n    struct Edge {\n        int from;\n\
+    \        int to;\n        Cap cap;\n        Cap flow;\n    };\n\n   private:\n\
+    \    struct InternalEdge {\n        int to;\n        int rev;\n        Cap cap;\n\
+    \    };\n\n    struct Position {\n        int from;\n        int edge;\n    };\n\
+    \n    int _n;\n    std::vector<Position> _pos;\n    std::vector<std::vector<InternalEdge>>\
+    \ _g;\n\n    Cap push_relabel(int s, int t) {\n        const std::size_t edge_count\
+    \ = _pos.size();\n        const std::size_t source_degree = _g[s].size();\n  \
+    \      const std::size_t sink_degree = _g[t].size();\n        const std::size_t\
+    \ terminal_degree =\n            std::min(source_degree, sink_degree);\n     \
+    \   const bool dense = edge_count >= 5 * std::size_t(_n);\n        const std::size_t\
+    \ wide_threshold =\n            4 * (edge_count / std::size_t(_n) + 1);\n    \
+    \    // Reverse input order defeats several ordering-sensitive hard cases,\n \
+    \       // while forward order is substantially better on ordinary random\n  \
+    \      // graphs with medium-width terminals.\n        const bool reverse_scan\
+    \ =\n            terminal_degree > wide_threshold ||\n            (terminal_degree\
+    \ <= 4 &&\n             (dense ||\n              (source_degree == 2 && sink_degree\
+    \ == 2) ||\n              (terminal_degree == 1 &&\n               edge_count\
+    \ >= 2 * std::size_t(_n))));\n        const int dead = 2 * _n;\n        const\
+    \ int unreachable = _n + 1;\n        std::vector<Cap> excess(_n, Cap(0));\n  \
+    \      std::vector<int> state(8 * std::size_t(_n) + 2);\n        int* height =\
+    \ state.data();\n        int* height_count = height + _n;\n        int* current\
+    \ = height_count + dead + 1;\n        int* queue = current + _n;\n        int*\
+    \ next = queue + _n;\n        int* bucket_head = next + _n;\n        std::vector<char>\
+    \ active(_n, false);\n        int highest = -1;\n        long long work = 0;\n\
+    \        const long long arc_count =\n            2LL * static_cast<long long>(_pos.size());\n\
+    \        const long long work_limit = std::max(\n            1LL,\n          \
+    \  (reverse_scan ? 3 : 4) * arc_count + _n\n        );\n\n        auto activate\
+    \ = [&](int v) {\n            if (v == s || v == t || active[v] || excess[v] ==\
+    \ Cap(0) ||\n                height[v] >= dead) {\n                return;\n \
+    \           }\n            active[v] = true;\n            next[v] = bucket_head[height[v]];\n\
+    \            bucket_head[height[v]] = v;\n            highest = std::max(highest,\
+    \ height[v]);\n        };\n\n        auto rebuild_buckets = [&]() {\n        \
+    \    std::fill(bucket_head, bucket_head + dead + 1, -1);\n            std::fill(active.begin(),\
+    \ active.end(), false);\n            highest = -1;\n            for (int v = 0;\
+    \ v < _n; v++) activate(v);\n        };\n\n        auto global_relabel = [&]()\
+    \ {\n            std::fill(height, height + _n, unreachable);\n            std::fill(height_count,\
+    \ height_count + dead + 1, 0);\n            for (int v = 0; v < _n; v++) {\n \
+    \               current[v] = reverse_scan ? int(_g[v].size()) - 1 : 0;\n     \
+    \       }\n            int head = 0;\n            int tail = 0;\n            height[t]\
+    \ = 0;\n            height[s] = _n;\n            queue[tail++] = t;\n        \
+    \    while (head != tail) {\n                int v = queue[head++];\n        \
+    \        for (const auto& e : _g[v]) {\n                    if (e.to == s || height[e.to]\
+    \ != unreachable) continue;\n                    const auto& reverse = _g[e.to][e.rev];\n\
+    \                    if (reverse.cap == Cap(0)) continue;\n                  \
+    \  height[e.to] = height[v] + 1;\n                    queue[tail++] = e.to;\n\
+    \                }\n            }\n            for (int v = 0; v < _n; v++) height_count[height[v]]++;\n\
+    \            rebuild_buckets();\n            work = 0;\n        };\n\n       \
+    \ auto gap = [&](int empty_height) {\n            for (int v = 0; v < _n; v++)\
+    \ {\n                if (v == s || v == t || height[v] <= empty_height ||\n  \
+    \                  height[v] >= _n) {\n                    continue;\n       \
+    \         }\n                height_count[height[v]]--;\n                height[v]\
+    \ = unreachable;\n                height_count[height[v]]++;\n               \
+    \ current[v] = reverse_scan ? int(_g[v].size()) - 1 : 0;\n            }\n    \
+    \        rebuild_buckets();\n        };\n\n        auto relabel = [&](int v) ->\
+    \ bool {\n            int old_height = height[v];\n            int new_height\
+    \ = dead;\n            work += int(_g[v].size());\n            for (const auto&\
+    \ e : _g[v]) {\n                if (e.cap != Cap(0)) {\n                    new_height\
+    \ = std::min(new_height, height[e.to] + 1);\n                }\n            }\n\
+    \            height_count[old_height]--;\n            height[v] = std::min(new_height,\
+    \ dead);\n            height_count[height[v]]++;\n            current[v] = reverse_scan\
+    \ ? int(_g[v].size()) - 1 : 0;\n            if (old_height < _n && height_count[old_height]\
+    \ == 0) {\n                gap(old_height);\n                return true;\n  \
+    \          }\n            return false;\n        };\n\n        auto push = [&](int\
+    \ v, InternalEdge& e) {\n            Cap sent = std::min(excess[v], e.cap);\n\
+    \            bool was_zero = excess[e.to] == Cap(0);\n            e.cap -= sent;\n\
+    \            _g[e.to][e.rev].cap += sent;\n            excess[v] -= sent;\n  \
+    \          excess[e.to] += sent;\n            if (was_zero) activate(e.to);\n\
+    \        };\n\n        auto discharge = [&]<bool Reverse>(int v) {\n         \
+    \   while (excess[v] != Cap(0) && height[v] < dead) {\n                bool exhausted_edges;\n\
+    \                if constexpr (Reverse) {\n                    exhausted_edges\
+    \ = current[v] < 0;\n                } else {\n                    exhausted_edges\
+    \ = current[v] == int(_g[v].size());\n                }\n                if (exhausted_edges)\
+    \ {\n                    if (relabel(v)) return;\n                    continue;\n\
+    \                }\n                auto& e = _g[v][current[v]];\n           \
+    \     work++;\n                if (e.cap != Cap(0) && height[v] == height[e.to]\
+    \ + 1) {\n                    push(v, e);\n                } else {\n        \
+    \            if constexpr (Reverse) {\n                        current[v]--;\n\
+    \                    } else {\n                        current[v]++;\n       \
+    \             }\n                }\n            }\n            activate(v);\n\
+    \        };\n\n        for (auto& e : _g[s]) {\n            if (e.to == s || e.cap\
+    \ == Cap(0)) continue;\n            Cap sent = e.cap;\n            e.cap = Cap(0);\n\
+    \            _g[e.to][e.rev].cap += sent;\n            excess[e.to] += sent;\n\
+    \        }\n        global_relabel();\n\n        while (highest >= 0) {\n    \
+    \        if (bucket_head[highest] == -1) {\n                highest--;\n     \
+    \           continue;\n            }\n            int v = bucket_head[highest];\n\
+    \            bucket_head[highest] = next[v];\n            if (!active[v] || height[v]\
+    \ != highest) continue;\n            active[v] = false;\n            if (reverse_scan)\
+    \ {\n                discharge.template operator()<true>(v);\n            } else\
+    \ {\n                discharge.template operator()<false>(v);\n            }\n\
+    \            if (work >= work_limit) global_relabel();\n        }\n        return\
+    \ excess[t];\n    }\n\n    Cap dinic_phases(\n        int s,\n        int t,\n\
+    \        Cap flow_limit,\n        int phase_limit,\n        bool& exhausted\n\
+    \    ) {\n        std::vector<int> work(3 * std::size_t(_n));\n        int* level\
+    \ = work.data();\n        int* iter = level + _n;\n        int* queue = iter +\
+    \ _n;\n        auto bfs = [&]() -> bool {\n            std::fill(level, level\
+    \ + _n, -1);\n            int head = 0;\n            int tail = 0;\n         \
+    \   level[s] = 0;\n            queue[tail++] = s;\n            while (head !=\
+    \ tail) {\n                int v = queue[head++];\n                const auto&\
+    \ edges = _g[v];\n                for (const auto& e : edges) {\n            \
+    \        if (level[e.to] != -1 || e.cap == Cap(0)) continue;\n               \
+    \     level[e.to] = level[v] + 1;\n                    if (e.to == t) return true;\n\
+    \                    queue[tail++] = e.to;\n                }\n            }\n\
+    \            return false;\n        };\n\n        auto dfs = [&](auto&& self,\
+    \ int v, Cap up) -> Cap {\n            if (v == s) return up;\n            Cap\
+    \ result = Cap(0);\n            const int current_level = level[v];\n        \
+    \    auto& edges = _g[v];\n            const int edge_count = int(edges.size());\n\
+    \            for (int& i = iter[v]; i < edge_count; i++) {\n                auto&\
+    \ e = edges[i];\n                if (level[e.to] + 1 != current_level) continue;\n\
+    \                auto& reverse = _g[e.to][e.rev];\n                if (reverse.cap\
+    \ == Cap(0)) continue;\n                Cap d = self(\n                    self,\n\
+    \                    e.to,\n                    std::min(up - result, reverse.cap)\n\
+    \                );\n                if (d == Cap(0)) continue;\n            \
+    \    e.cap += d;\n                reverse.cap -= d;\n                result +=\
+    \ d;\n                if (result == up) return result;\n            }\n      \
+    \      level[v] = _n;\n            return result;\n        };\n\n        Cap flow\
+    \ = Cap(0);\n        int phases = 0;\n        exhausted = false;\n        while\
+    \ (flow < flow_limit && phases < phase_limit) {\n            if (!bfs()) {\n \
+    \               exhausted = true;\n                break;\n            }\n   \
+    \         std::fill(iter, iter + _n, 0);\n            flow += dfs(dfs, t, flow_limit\
+    \ - flow);\n            phases++;\n        }\n        if (flow == flow_limit)\
+    \ exhausted = true;\n        return flow;\n    }\n\n   public:\n    MaxFlow()\
+    \ : MaxFlow(0) {}\n\n    explicit MaxFlow(int n) : _n(n), _g(n) {\n        assert(0\
+    \ <= n);\n    }\n\n    int size() const {\n        return _n;\n    }\n\n    int\
+    \ edge_count() const {\n        return int(_pos.size());\n    }\n\n    void reserve_edges(int\
+    \ edge_count) {\n        assert(0 <= edge_count);\n        _pos.reserve(edge_count);\n\
+    \        if (_n == 0 || edge_count == 0 ||\n            2 * std::size_t(edge_count)\
+    \ < std::size_t(_n)) {\n            return;\n        }\n        const std::size_t\
+    \ average_degree =\n            (3 * std::size_t(edge_count) + std::size_t(_n)\
+    \ - 1)\n            / std::size_t(_n);\n        for (auto& edges : _g) edges.reserve(average_degree);\n\
+    \    }\n\n    void reserve_edges(int edge_count, const std::vector<int>& degrees)\
+    \ {\n        assert(0 <= edge_count);\n        assert(int(degrees.size()) == _n);\n\
+    \        _pos.reserve(edge_count);\n        for (int v = 0; v < _n; v++) {\n \
+    \           assert(0 <= degrees[v]);\n            _g[v].reserve(degrees[v]);\n\
+    \        }\n    }\n\n    int add_edge(int from, int to, Cap cap) {\n        assert(0\
+    \ <= from && from < _n);\n        assert(0 <= to && to < _n);\n        assert(Cap(0)\
+    \ <= cap);\n        int id = int(_pos.size());\n        int from_id = int(_g[from].size());\n\
+    \        int to_id = int(_g[to].size());\n        if (from == to) to_id++;\n \
+    \       _pos.push_back(Position{from, from_id});\n        _g[from].push_back(InternalEdge{to,\
+    \ to_id, cap});\n        _g[to].push_back(InternalEdge{from, from_id, Cap(0)});\n\
+    \        return id;\n    }\n\n    int add_undirected_edge(int first, int second,\
+    \ Cap cap) {\n        static_assert(std::numeric_limits<Cap>::is_signed);\n  \
+    \      assert(0 <= first && first < _n);\n        assert(0 <= second && second\
+    \ < _n);\n        assert(Cap(0) <= cap);\n        assert(cap <= std::numeric_limits<Cap>::max()\
+    \ / Cap(2));\n        int id = int(_pos.size());\n        int first_id = int(_g[first].size());\n\
+    \        int second_id = int(_g[second].size());\n        if (first == second)\
+    \ second_id++;\n        _pos.push_back(Position{first, ~first_id});\n        _g[first].push_back(InternalEdge{second,\
+    \ second_id, cap});\n        _g[second].push_back(InternalEdge{first, first_id,\
+    \ cap});\n        return id;\n    }\n\n    Edge get_edge(int i) const {\n    \
+    \    assert(0 <= i && i < int(_pos.size()));\n        const auto& position = _pos[i];\n\
+    \        int from = position.from;\n        bool undirected = position.edge <\
+    \ 0;\n        int idx = undirected ? ~position.edge : position.edge;\n       \
+    \ const auto& e = _g[from][idx];\n        const auto& re = _g[e.to][e.rev];\n\
+    \        if (undirected) {\n            return Edge{\n                from,\n\
+    \                e.to,\n                (e.cap + re.cap) / Cap(2),\n         \
+    \       (re.cap - e.cap) / Cap(2)\n            };\n        }\n        return Edge{from,\
+    \ e.to, e.cap + re.cap, re.cap};\n    }\n\n    std::vector<Edge> edges() const\
+    \ {\n        std::vector<Edge> result;\n        result.reserve(_pos.size());\n\
+    \        for (int i = 0; i < int(_pos.size()); i++) result.push_back(get_edge(i));\n\
+    \        return result;\n    }\n\n    void change_edge(int i, Cap new_cap, Cap\
+    \ new_flow) {\n        assert(0 <= i && i < int(_pos.size()));\n        assert(Cap(0)\
+    \ <= new_cap);\n        auto& position = _pos[i];\n        int from = position.from;\n\
+    \        bool undirected = position.edge < 0;\n        int idx = undirected ?\
+    \ ~position.edge : position.edge;\n        auto& e = _g[from][idx];\n        auto&\
+    \ re = _g[e.to][e.rev];\n        if (undirected) {\n            assert(new_cap\
+    \ <= std::numeric_limits<Cap>::max() / Cap(2));\n            assert(-new_cap <=\
+    \ new_flow && new_flow <= new_cap);\n            e.cap = new_cap - new_flow;\n\
+    \            re.cap = new_cap + new_flow;\n        } else {\n            assert(Cap(0)\
+    \ <= new_flow && new_flow <= new_cap);\n            e.cap = new_cap - new_flow;\n\
+    \            re.cap = new_flow;\n        }\n    }\n\n    Cap max_flow(int s, int\
+    \ t) {\n        assert(0 <= s && s < _n);\n        assert(0 <= t && t < _n);\n\
+    \        assert(s != t);\n        bool exhausted;\n        const std::size_t edge_count\
+    \ = _pos.size();\n        const std::size_t terminal_degree =\n            std::min(_g[s].size(),\
+    \ _g[t].size());\n        const bool dense = edge_count >= 5 * std::size_t(_n);\n\
+    \        const bool sparse_narrow_terminals =\n            edge_count >= std::size_t(_n)\
+    \ &&\n            2 <= _g[s].size() && _g[s].size() <= 4 &&\n            2 <=\
+    \ _g[t].size() && _g[t].size() <= 4;\n        // Only pay for a possible push-relabel\
+    \ handoff on graph shapes where\n        // many Dinic phases are a realistic\
+    \ risk.\n        const bool use_hybrid =\n            (dense || sparse_narrow_terminals)\
+    \ &&\n            terminal_degree <= 4 * (edge_count / std::size_t(_n) + 1);\n\
+    \        if (!use_hybrid) {\n            return max_flow(s, t, std::numeric_limits<Cap>::max());\n\
+    \        }\n        int phase_limit = dense ? 4 : 8;\n        bool small_terminal_capacities\
+    \ = true;\n        const int terminals[2] = {s, t};\n        for (int v : terminals)\
+    \ {\n            for (const auto& e : _g[v]) {\n                if (Cap(2) < e.cap\
+    \ ||\n                    Cap(2) < _g[e.to][e.rev].cap) {\n                  \
+    \  small_terminal_capacities = false;\n                    break;\n          \
+    \      }\n            }\n            if (!small_terminal_capacities) break;\n\
+    \        }\n        if (small_terminal_capacities) {\n            return max_flow(s,\
+    \ t, std::numeric_limits<Cap>::max());\n        }\n        Cap flow = dinic_phases(\n\
+    \            s,\n            t,\n            std::numeric_limits<Cap>::max(),\n\
+    \            phase_limit,\n            exhausted\n        );\n        if (!exhausted)\
+    \ flow += push_relabel(s, t);\n        return flow;\n    }\n\n    Cap max_flow_push_relabel(int\
+    \ s, int t) {\n        assert(0 <= s && s < _n);\n        assert(0 <= t && t <\
+    \ _n);\n        assert(s != t);\n        return push_relabel(s, t);\n    }\n\n\
+    \    Cap max_flow(int s, int t, Cap flow_limit) {\n        assert(0 <= s && s\
+    \ < _n);\n        assert(0 <= t && t < _n);\n        assert(s != t);\n\n     \
+    \   std::vector<int> work(3 * std::size_t(_n));\n        int* level = work.data();\n\
+    \        int* iter = level + _n;\n        int* queue = iter + _n;\n        auto\
+    \ bfs = [&]() -> bool {\n            std::fill(level, level + _n, -1);\n     \
+    \       int head = 0;\n            int tail = 0;\n            level[s] = 0;\n\
+    \            queue[tail++] = s;\n            while (head != tail) {\n        \
+    \        int v = queue[head++];\n                for (const auto& e : _g[v]) {\n\
+    \                    if (level[e.to] != -1 || e.cap == Cap(0)) continue;\n   \
+    \                 level[e.to] = level[v] + 1;\n                    if (e.to ==\
+    \ t) return true;\n                    queue[tail++] = e.to;\n               \
+    \ }\n            }\n            return level[t] != -1;\n        };\n\n       \
+    \ auto dfs = [&](auto&& self, int v, Cap up) -> Cap {\n            if (v == s)\
+    \ return up;\n            Cap result = Cap(0);\n            const int current_level\
+    \ = level[v];\n            auto& edges = _g[v];\n            const int edge_count\
+    \ = int(edges.size());\n            for (int& i = iter[v]; i < edge_count; i++)\
+    \ {\n                auto& e = edges[i];\n                if (level[e.to] + 1\
+    \ != current_level) continue;\n                auto& reverse = _g[e.to][e.rev];\n\
+    \                if (reverse.cap == Cap(0)) continue;\n                Cap d =\
+    \ self(\n                    self,\n                    e.to,\n              \
+    \      std::min(up - result, reverse.cap)\n                );\n              \
+    \  if (d == Cap(0)) continue;\n                e.cap += d;\n                reverse.cap\
+    \ -= d;\n                result += d;\n                if (result == up) return\
+    \ result;\n            }\n            level[v] = _n;\n            return result;\n\
+    \        };\n\n        Cap flow = 0;\n        while (flow < flow_limit && bfs())\
+    \ {\n            std::fill(iter, iter + _n, 0);\n            flow += dfs(dfs,\
+    \ t, flow_limit - flow);\n        }\n        return flow;\n    }\n\n    std::vector<bool>\
+    \ min_cut(int s) const {\n        assert(0 <= s && s < _n);\n        std::vector<bool>\
+    \ visited(_n, false);\n        std::vector<int> queue(_n);\n        int head =\
+    \ 0;\n        int tail = 0;\n        visited[s] = true;\n        queue[tail++]\
+    \ = s;\n        while (head != tail) {\n            int v = queue[head++];\n \
+    \           for (const auto& e : _g[v]) {\n                if (e.cap == Cap(0)\
+    \ || visited[e.to]) continue;\n                visited[e.to] = true;\n       \
+    \         queue[tail++] = e.to;\n            }\n        }\n        return visited;\n\
+    \    }\n};\n\n}  // namespace flow\n}  // namespace m1une\n\n\n#line 18 \"graph/flow/min_cost_flow.hpp\"\
+    \n\nnamespace m1une {\nnamespace flow {\n\ntemplate <class Cap, class Cost>\n\
+    struct MinCostFlow {\n    struct Edge {\n        int from;\n        int to;\n\
+    \        Cap cap;\n        Cap flow;\n        Cost cost;\n    };\n\n   private:\n\
+    \    struct InternalEdge {\n        int to;\n        int rev;\n        Cap cap;\n\
     \        Cost cost;\n    };\n\n    int _n;\n    std::vector<std::pair<int, int>>\
     \ _pos;\n    std::vector<std::vector<InternalEdge>> _g;\n    bool _has_negative_cost;\n\
     \    bool _has_flow;\n\n    template <class Key>\n    struct RadixHeap {\n   \
@@ -1067,69 +843,245 @@ data:
     \ += add;\n            }\n\n            flow += add;\n            cost += Cost(add)\
     \ * path_cost;\n            result.emplace_back(flow, cost);\n        }\n\n  \
     \      _has_flow = _has_flow || flow != Cap(0);\n        return result;\n    }\n\
-    };\n\n}  // namespace flow\n}  // namespace m1une\n\n\n#line 9 \"graph/flow/flow.hpp\"\
-    \n\n\n"
-  code: '#ifndef M1UNE_FLOW_FLOW_HPP
-
-    #define M1UNE_FLOW_FLOW_HPP 1
-
-
-    #include "bounded_flow.hpp"
-
-    #include "bounded_min_cost_flow.hpp"
-
-    #include "gomory_hu.hpp"
-
-    #include "max_flow.hpp"
-
-    #include "min_cost_flow.hpp"
-
-
-    #endif  // M1UNE_FLOW_FLOW_HPP
-
-    '
+    };\n\n}  // namespace flow\n}  // namespace m1une\n\n\n#line 1 \"utilities/fast_io.hpp\"\
+    \n\n\n\n#line 5 \"utilities/fast_io.hpp\"\n#include <charconv>\n#line 7 \"utilities/fast_io.hpp\"\
+    \n#include <cstdio>\n#include <cstdlib>\n#include <cstdint>\n#include <cstring>\n\
+    #include <iterator>\n#include <string>\n#line 15 \"utilities/fast_io.hpp\"\n\n\
+    namespace m1une {\nnamespace utilities {\nnamespace internal {\n\n// Detect std::begin(x),\
+    \ std::end(x).\ntemplate <class T, class = void>\nstruct is_range : std::false_type\
+    \ {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
+    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
+    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
+    \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
+    \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
+    \ std::void_t<typename std::remove_cv_t<std::remove_reference_t<T>>::value_type>>\
+    \ {\n    using type = typename std::remove_cv_t<std::remove_reference_t<T>>::value_type;\n\
+    };\n\ntemplate <class T>\nusing range_stored_value_t = typename range_stored_value<T>::type;\n\
+    \n// Treat strings and C strings as scalar output objects, not as ranges.\ntemplate\
+    \ <class T>\nstruct is_char_array : std::false_type {};\n\ntemplate <class T,\
+    \ std::size_t N>\nstruct is_char_array<T[N]>\n    : std::bool_constant<std::is_same_v<std::remove_cv_t<T>,\
+    \ char>> {};\n\ntemplate <class T>\nstruct is_string_like\n    : std::bool_constant<\n\
+    \          std::is_same_v<std::decay_t<T>, std::string>\n          || std::is_same_v<std::decay_t<T>,\
+    \ const char*>\n          || std::is_same_v<std::decay_t<T>, char*>\n        \
+    \  || is_char_array<std::remove_reference_t<T>>::value\n      > {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_string_like_v = is_string_like<T>::value;\n\
+    \n// ModInt-like type: x.val() is printable, and x can be assigned from long long.\n\
+    template <class T, class = void>\nstruct has_val_method : std::false_type {};\n\
+    \ntemplate <class T>\nstruct has_val_method<T, std::void_t<decltype(std::declval<const\
+    \ T&>().val())>>\n    : std::true_type {};\n\ntemplate <class T>\ninline constexpr\
+    \ bool has_val_method_v = has_val_method<T>::value;\n\ntemplate <class T, class\
+    \ = void>\nstruct has_static_mod_raw : std::false_type {};\n\ntemplate <class\
+    \ T>\nstruct has_static_mod_raw<\n    T, std::void_t<decltype(T::mod()), decltype(T::raw(std::declval<uint32_t>()))>>\n\
+    \    : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool has_static_mod_raw_v\
+    \ = has_static_mod_raw<T>::value;\n\n// libstdc++ before GCC 16 does not classify\
+    \ __int128 as an integral type in\n// strict ISO modes such as -std=c++23. Keep\
+    \ the fast-I/O interface independent\n// of that implementation detail.\ntemplate\
+    \ <class T>\ninline constexpr bool is_integral_v =\n    std::is_integral_v<T>\n\
+    \    || std::is_same_v<std::remove_cv_t<T>, __int128_t>\n    || std::is_same_v<std::remove_cv_t<T>,\
+    \ __uint128_t>;\n\ntemplate <class T>\ninline constexpr bool is_signed_v =\n \
+    \   std::is_signed_v<T>\n    || std::is_same_v<std::remove_cv_t<T>, __int128_t>;\n\
+    \ntemplate <class T>\nstruct make_unsigned {\n    using type = std::make_unsigned_t<T>;\n\
+    };\n\ntemplate <>\nstruct make_unsigned<__int128_t> {\n    using type = __uint128_t;\n\
+    };\n\ntemplate <>\nstruct make_unsigned<__uint128_t> {\n    using type = __uint128_t;\n\
+    };\n\ntemplate <class T>\nusing make_unsigned_t = typename make_unsigned<std::remove_cv_t<T>>::type;\n\
+    \n}  // namespace internal\n\nstruct FastInput {\n    static constexpr int buffer_size\
+    \ = 1 << 20;\n\n   private:\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
+    \    int _position;\n    int _length;\n\n    bool prepare_number() {\n       \
+    \ if (_length - _position >= 64) return true;\n        const int remaining = _length\
+    \ - _position;\n        if (remaining > 0) std::memmove(_buffer, _buffer + _position,\
+    \ remaining);\n        const int added = int(std::fread(_buffer + remaining, 1,\
+    \ buffer_size - remaining, _stream));\n        _position = 0;\n        _length\
+    \ = remaining + added;\n        if (_length < buffer_size) _buffer[_length] =\
+    \ '\\0';\n        return _length != 0;\n    }\n\n   public:\n    explicit FastInput(std::FILE*\
+    \ stream = stdin)\n        : _stream(stream), _position(0), _length(0) {}\n\n\
+    \    FastInput(const FastInput&) = delete;\n    FastInput& operator=(const FastInput&)\
+    \ = delete;\n\n    int read_char_raw() {\n        if (_position == _length) {\n\
+    \            _length = int(std::fread(_buffer, 1, buffer_size, _stream));\n  \
+    \          _position = 0;\n            if (_length == 0) return EOF;\n       \
+    \ }\n        return _buffer[_position++];\n    }\n\n    bool skip_spaces() {\n\
+    \        int c = read_char_raw();\n        while (c != EOF && c <= ' ') c = read_char_raw();\n\
+    \        if (c == EOF) return false;\n        --_position;\n        return true;\n\
+    \    }\n\n    bool read(char& value) {\n        if (!skip_spaces()) return false;\n\
+    \        value = char(read_char_raw());\n        return true;\n    }\n\n    bool\
+    \ read(std::string& value) {\n        if (!skip_spaces()) return false;\n    \
+    \    value.clear();\n        int c = read_char_raw();\n        while (c != EOF\
+    \ && c > ' ') {\n            value.push_back(char(c));\n            c = read_char_raw();\n\
+    \        }\n        return true;\n    }\n\n    bool read(bool& value) {\n    \
+    \    int x;\n        if (!read(x)) return false;\n        value = x != 0;\n  \
+    \      return true;\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
+    \        internal::is_integral_v<T>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ bool>\n            && !std::is_same_v<std::remove_cv_t<T>, char>,\n        bool\n\
+    \    >\n    read(T& value) {\n        if (!prepare_number()) return false;\n \
+    \       int c = static_cast<unsigned char>(_buffer[_position++]);\n        while\
+    \ (c <= ' ') c = static_cast<unsigned char>(_buffer[_position++]);\n\n       \
+    \ bool negative = false;\n        if (c == '-') {\n            negative = true;\n\
+    \            c = static_cast<unsigned char>(_buffer[_position++]);\n        }\n\
+    \n        if constexpr (internal::is_signed_v<T>) {\n            T result = 0;\n\
+    \            while ('0' <= c && c <= '9') {\n                const int first =\
+    \ c - '0';\n                const int second = static_cast<unsigned char>(_buffer[_position])\
+    \ - '0';\n                if (0 <= second && second <= 9) {\n                \
+    \    result = negative ? result * 100 - (first * 10 + second)\n              \
+    \                        : result * 100 + (first * 10 + second);\n           \
+    \         ++_position;\n                } else {\n                    result =\
+    \ negative ? result * 10 - first : result * 10 + first;\n                }\n \
+    \               c = static_cast<unsigned char>(_buffer[_position++]);\n      \
+    \      }\n            value = result;\n        } else {\n            T result\
+    \ = 0;\n            while ('0' <= c && c <= '9') {\n                const unsigned\
+    \ first = unsigned(c - '0');\n                const int second = static_cast<unsigned\
+    \ char>(_buffer[_position]) - '0';\n                if (0 <= second && second\
+    \ <= 9) {\n                    result = result * 100 + T(first * 10 + unsigned(second));\n\
+    \                    ++_position;\n                } else {\n                \
+    \    result = result * 10 + T(first);\n                }\n                c =\
+    \ static_cast<unsigned char>(_buffer[_position++]);\n            }\n         \
+    \   value = negative ? T(0) - result : result;\n        }\n        if (_position\
+    \ > _length) _position = _length;\n        return true;\n    }\n\n    template\
+    \ <class T>\n    std::enable_if_t<std::is_floating_point_v<T>, bool>\n    read(T&\
+    \ value) {\n        if (!skip_spaces()) return false;\n        int c = read_char_raw();\n\
+    \        bool negative = false;\n        if (c == '-' || c == '+') {\n       \
+    \     negative = c == '-';\n            c = read_char_raw();\n        }\n\n  \
+    \      long double result = 0;\n        while ('0' <= c && c <= '9') {\n     \
+    \       result = result * 10 + (c - '0');\n            c = read_char_raw();\n\
+    \        }\n        if (c == '.') {\n            long double place = 0.1L;\n \
+    \           c = read_char_raw();\n            while ('0' <= c && c <= '9') {\n\
+    \                result += (c - '0') * place;\n                place *= 0.1L;\n\
+    \                c = read_char_raw();\n            }\n        }\n        if (c\
+    \ == 'e' || c == 'E') {\n            c = read_char_raw();\n            bool exponent_negative\
+    \ = false;\n            if (c == '-' || c == '+') {\n                exponent_negative\
+    \ = c == '-';\n                c = read_char_raw();\n            }\n         \
+    \   int exponent = 0;\n            while ('0' <= c && c <= '9') {\n          \
+    \      exponent = exponent * 10 + (c - '0');\n                c = read_char_raw();\n\
+    \            }\n            long double scale = 1;\n            long double power\
+    \ = 10;\n            while (exponent > 0) {\n                if (exponent & 1)\
+    \ scale *= power;\n                power *= power;\n                exponent >>=\
+    \ 1;\n            }\n            result = exponent_negative ? result / scale :\
+    \ result * scale;\n        }\n        value = static_cast<T>(negative ? -result\
+    \ : result);\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
+    \        internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
+    \            && !internal::is_range_v<T>,\n        bool\n    >\n    read(T& value)\
+    \ {\n        long long x;\n        if (!read(x)) return false;\n        if constexpr\
+    \ (internal::has_static_mod_raw_v<T>) {\n            if (x >= 0 && uint64_t(x)\
+    \ < uint64_t(T::mod())) {\n                value = T::raw(uint32_t(x));\n    \
+    \        } else {\n                value = T(x);\n            }\n        } else\
+    \ {\n            value = T(x);\n        }\n        return true;\n    }\n\n   \
+    \ template <class Range>\n    std::enable_if_t<\n        internal::is_range_v<Range>\n\
+    \            && !internal::is_string_like_v<Range>,\n        bool\n    >\n   \
+    \ read(Range& range) {\n        using StoredValue = internal::range_stored_value_t<Range>;\n\
+    \        constexpr bool nested = internal::is_range_v<StoredValue>\n         \
+    \                       && !internal::is_string_like_v<StoredValue>;\n\n     \
+    \   for (auto&& value : range) {\n            if constexpr (std::is_same_v<StoredValue,\
+    \ bool> && !nested) {\n                bool x;\n                if (!read(x))\
+    \ return false;\n                value = x;\n            } else {\n          \
+    \      if (!read(value)) return false;\n            }\n        }\n        return\
+    \ true;\n    }\n\n    template <class First, class Second, class... Rest>\n  \
+    \  bool read(First& first, Second& second, Rest&... rest) {\n        if (!read(first))\
+    \ return false;\n        return read(second, rest...);\n    }\n\n    template\
+    \ <class T>\n    FastInput& operator>>(T& value) {\n        if (!read(value))\
+    \ std::abort();\n        return *this;\n    }\n};\n\nstruct FastOutput {\n   \
+    \ static constexpr int buffer_size = 1 << 20;\n\n   private:\n    inline static\
+    \ const auto digit_quads = [] {\n        std::array<char, 40000> result{};\n \
+    \       for (int i = 0; i < 10000; i++) {\n            int value = i;\n      \
+    \      for (int j = 3; j >= 0; j--) {\n                result[4 * i + j] = char('0'\
+    \ + value % 10);\n                value /= 10;\n            }\n        }\n   \
+    \     return result;\n    }();\n\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
+    \    int _position;\n    int _precision;\n    std::chars_format _float_format;\n\
+    \n   public:\n    explicit FastOutput(std::FILE* stream = stdout)\n        : _stream(stream),\n\
+    \          _position(0),\n          _precision(6),\n          _float_format(std::chars_format::general)\
+    \ {}\n\n    FastOutput(const FastOutput&) = delete;\n    FastOutput& operator=(const\
+    \ FastOutput&) = delete;\n\n    ~FastOutput() {\n        flush();\n    }\n\n \
+    \   void flush() {\n        if (_position == 0) return;\n        std::fwrite(_buffer,\
+    \ 1, _position, _stream);\n        _position = 0;\n    }\n\n    void write_char(char\
+    \ c) {\n        if (_position == buffer_size) flush();\n        _buffer[_position++]\
+    \ = c;\n    }\n\n    void write(const char* s) {\n        while (*s != '\\0')\
+    \ write_char(*s++);\n    }\n\n    void write(const std::string& s) {\n       \
+    \ for (char c : s) write_char(c);\n    }\n\n    void write(char c) {\n       \
+    \ write_char(c);\n    }\n\n    void write(bool value) {\n        write_char(value\
+    \ ? '1' : '0');\n    }\n\n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>>\n\
+    \    write(T value) {\n        char digits[128];\n        auto [end, error] =\
+    \ std::to_chars(\n            digits,\n            digits + sizeof(digits),\n\
+    \            value,\n            _float_format,\n            _precision\n    \
+    \    );\n        if (error != std::errc()) std::abort();\n        for (const char*\
+    \ pointer = digits; pointer != end; pointer++) {\n            write_char(*pointer);\n\
+    \        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n        internal::is_integral_v<T>\n\
+    \            && !std::is_same_v<std::remove_cv_t<T>, bool>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ char>\n    >\n    write(T value) {\n        using Raw = std::remove_cv_t<T>;\n\
+    \        using Unsigned = internal::make_unsigned_t<Raw>;\n\n        Unsigned\
+    \ magnitude;\n        if constexpr (internal::is_signed_v<Raw>) {\n          \
+    \  if (value < 0) {\n                write_char('-');\n                magnitude\
+    \ = Unsigned(0) - Unsigned(value);\n            } else {\n                magnitude\
+    \ = Unsigned(value);\n            }\n        } else {\n            magnitude =\
+    \ value;\n        }\n\n        if (magnitude == 0) {\n            write_char('0');\n\
+    \            return;\n        }\n\n        unsigned chunks[16];\n        int count\
+    \ = 0;\n        while (magnitude >= 10000) {\n            const Unsigned quotient\
+    \ = magnitude / 10000;\n            chunks[count++] = unsigned(magnitude - quotient\
+    \ * 10000);\n            magnitude = quotient;\n        }\n        if (_position\
+    \ > buffer_size - 64) flush();\n        const unsigned leading = unsigned(magnitude);\n\
+    \        const char* first = digit_quads.data() + 4 * leading;\n        int skip\
+    \ = leading < 10 ? 3 : leading < 100 ? 2 : leading < 1000 ? 1 : 0;\n        for\
+    \ (; skip < 4; skip++) _buffer[_position++] = first[skip];\n        while (count--)\
+    \ {\n            const char* digits = digit_quads.data() + 4 * chunks[count];\n\
+    \            std::memcpy(_buffer + _position, digits, 4);\n            _position\
+    \ += 4;\n        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n \
+    \       internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
+    \            && !internal::is_range_v<T>\n    >\n    write(const T& value) {\n\
+    \        write(value.val());\n    }\n\n    template <class Range>\n    std::enable_if_t<\n\
+    \        internal::is_range_v<Range>\n            && !internal::is_string_like_v<Range>\n\
+    \    >\n    write(const Range& range) {\n        using StoredValue = internal::range_stored_value_t<const\
+    \ Range>;\n        constexpr bool nested = internal::is_range_v<StoredValue>\n\
+    \                                && !internal::is_string_like_v<StoredValue>;\n\
+    \n        bool first = true;\n        for (const auto& value : range) {\n    \
+    \        if (!first) write_char(nested ? '\\n' : ' ');\n            first = false;\n\
+    \            if constexpr (std::is_same_v<StoredValue, bool> && !nested) {\n \
+    \               write(static_cast<bool>(value));\n            } else {\n     \
+    \           write(value);\n            }\n        }\n    }\n\n    template <class\
+    \ First, class... Rest>\n    void print(const First& first, const Rest&... rest)\
+    \ {\n        write(first);\n        ((write_char(' '), write(rest)), ...);\n \
+    \   }\n\n    void println() {\n        write_char('\\n');\n    }\n\n    void set_precision(int\
+    \ precision) {\n        _precision = precision;\n    }\n\n    void set_fixed(int\
+    \ precision = 6) {\n        _float_format = std::chars_format::fixed;\n      \
+    \  _precision = precision;\n    }\n\n    void set_general(int precision = 6) {\n\
+    \        _float_format = std::chars_format::general;\n        _precision = precision;\n\
+    \    }\n\n    template <class... Args>\n    void println(const Args&... args)\
+    \ {\n        print(args...);\n        write_char('\\n');\n    }\n\n    template\
+    \ <class T>\n    FastOutput& operator<<(const T& value) {\n        write(value);\n\
+    \        return *this;\n    }\n};\n\n}  // namespace utilities\n}  // namespace\
+    \ m1une\n\n\n#line 5 \"verify/graph/flow/min_cost_flow.test.cpp\"\n\nint main()\
+    \ {\n    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput\
+    \ output;\n\n    int vertex_count, edge_count;\n    long long required_flow;\n\
+    \    input >> vertex_count >> edge_count >> required_flow;\n    m1une::flow::MinCostFlow<long\
+    \ long, long long> flow(vertex_count);\n    flow.reserve_edges(edge_count);\n\
+    \    for (int edge = 0; edge < edge_count; edge++) {\n        int from, to;\n\
+    \        long long capacity, cost;\n        input >> from >> to >> capacity >>\
+    \ cost;\n        flow.add_edge(from, to, capacity, cost);\n    }\n    auto [sent,\
+    \ cost] = flow.flow(0, vertex_count - 1, required_flow);\n    output << (sent\
+    \ == required_flow ? cost : -1) << '\\n';\n}\n"
+  code: "#define PROBLEM \"https://onlinejudge.u-aizu.ac.jp/problems/GRL_6_B\"\n\n\
+    #include \"../../../graph/flow/min_cost_flow.hpp\"\n#include \"../../../utilities/fast_io.hpp\"\
+    \n\nint main() {\n    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput\
+    \ output;\n\n    int vertex_count, edge_count;\n    long long required_flow;\n\
+    \    input >> vertex_count >> edge_count >> required_flow;\n    m1une::flow::MinCostFlow<long\
+    \ long, long long> flow(vertex_count);\n    flow.reserve_edges(edge_count);\n\
+    \    for (int edge = 0; edge < edge_count; edge++) {\n        int from, to;\n\
+    \        long long capacity, cost;\n        input >> from >> to >> capacity >>\
+    \ cost;\n        flow.add_edge(from, to, capacity, cost);\n    }\n    auto [sent,\
+    \ cost] = flow.flow(0, vertex_count - 1, required_flow);\n    output << (sent\
+    \ == required_flow ? cost : -1) << '\\n';\n}\n"
   dependsOn:
-  - graph/flow/bounded_flow.hpp
-  - graph/flow/max_flow.hpp
-  - graph/flow/bounded_min_cost_flow.hpp
-  - graph/flow/gomory_hu.hpp
   - graph/flow/min_cost_flow.hpp
-  isVerificationFile: false
-  path: graph/flow/flow.hpp
-  requiredBy:
-  - graph/all.hpp
+  - graph/flow/bounded_min_cost_flow.hpp
+  - graph/flow/max_flow.hpp
+  - utilities/fast_io.hpp
+  isVerificationFile: true
+  path: verify/graph/flow/min_cost_flow.test.cpp
+  requiredBy: []
   timestamp: '2026-07-16 02:08:45+09:00'
-  verificationStatus: LIBRARY_ALL_AC
-  verifiedWith:
-  - verify/graph/flow/flow_algorithms.test.cpp
-  - verify/graph/graph_algorithms.test.cpp
-  - verify/graph/cow_game.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
-documentation_of: graph/flow/flow.hpp
+  verificationStatus: TEST_ACCEPTED
+  verifiedWith: []
+documentation_of: verify/graph/flow/min_cost_flow.test.cpp
 layout: document
-title: Flow
+redirect_from:
+- /verify/verify/graph/flow/min_cost_flow.test.cpp
+- /verify/verify/graph/flow/min_cost_flow.test.cpp.html
+title: verify/graph/flow/min_cost_flow.test.cpp
 ---
-
-## Overview
-
-`graph/flow/flow.hpp` includes flow-network algorithms. Flow networks are
-directed: an edge `u -> v` only sends flow from `u` to `v`.
-
-For an undirected capacity between `u` and `v`, `MaxFlow` provides
-`add_undirected_edge(u, v, cap)`, which stores one shared-capacity residual
-pair. Other directed-flow classes represent it with two directed edges.
-
-## Included Headers
-
-| Header | Graph orientation | Contents |
-| --- | --- | --- |
-| `graph/flow/bounded_flow.hpp` | Directed flow network | Feasible flow with lower/upper bounds, balances, and negative flow intervals. |
-| `graph/flow/bounded_min_cost_flow.hpp` | Directed flow network | Minimum-cost feasible flow with lower/upper bounds, balances, and negative flow intervals. |
-| `graph/flow/gomory_hu.hpp` | Undirected capacitated graph | Gomory-Hu cut tree and pairwise minimum-cut queries. |
-| `graph/flow/max_flow.hpp` | Directed or shared-capacity undirected network | Optimized Dinic and highest-label push-relabel maximum flow, plus minimum cut. |
-| `graph/flow/min_cost_flow.hpp` | Directed flow network | Minimum-cost flow with potentials. |
-
-## Complexity
-
-This header is an include bundle and provides no runtime operation by itself.
-See the included algorithm pages for public interfaces and complexities.

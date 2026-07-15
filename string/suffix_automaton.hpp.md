@@ -235,8 +235,8 @@ data:
   timestamp: '2026-06-23 12:05:51+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/string/suffix_automaton.test.cpp
   - verify/string/string_algorithms.test.cpp
+  - verify/string/suffix_automaton.test.cpp
 documentation_of: string/suffix_automaton.hpp
 layout: document
 title: Suffix Automaton

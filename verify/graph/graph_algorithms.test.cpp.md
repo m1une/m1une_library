@@ -3332,73 +3332,235 @@ data:
     \            v = _up[k][v];\n        }\n        result = std::min(result, _minimum[0][u]);\n\
     \        result = std::min(result, _minimum[0][v]);\n        return result;\n\
     \    }\n};\n\n}  // namespace flow\n}  // namespace m1une\n\n\n#line 1 \"graph/flow/min_cost_flow.hpp\"\
-    \n\n\n\n#line 11 \"graph/flow/min_cost_flow.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ flow {\n\ntemplate <class Cap, class Cost>\nstruct MinCostFlow {\n    struct\
-    \ Edge {\n        int from;\n        int to;\n        Cap cap;\n        Cap flow;\n\
-    \        Cost cost;\n    };\n\n   private:\n    struct InternalEdge {\n      \
-    \  int to;\n        int rev;\n        Cap cap;\n        Cost cost;\n    };\n\n\
-    \    int _n;\n    std::vector<std::pair<int, int>> _pos;\n    std::vector<std::vector<InternalEdge>>\
-    \ _g;\n\n    void init_potential(int s, std::vector<Cost>& potential, Cost cost_inf)\
-    \ const {\n        potential.assign(_n, cost_inf);\n        potential[s] = Cost(0);\n\
-    \        for (int iter = 0; iter < _n - 1; iter++) {\n            bool updated\
-    \ = false;\n            for (int v = 0; v < _n; v++) {\n                if (potential[v]\
-    \ == cost_inf) continue;\n                for (const auto& e : _g[v]) {\n    \
-    \                if (e.cap == Cap(0)) continue;\n                    Cost nd =\
-    \ potential[v] + e.cost;\n                    if (nd < potential[e.to]) {\n  \
-    \                      potential[e.to] = nd;\n                        updated\
-    \ = true;\n                    }\n                }\n            }\n         \
-    \   if (!updated) break;\n        }\n        for (int v = 0; v < _n; v++) {\n\
-    \            if (potential[v] == cost_inf) potential[v] = Cost(0);\n        }\n\
-    \    }\n\n   public:\n    MinCostFlow() : MinCostFlow(0) {}\n\n    explicit MinCostFlow(int\
-    \ n) : _n(n), _g(n) {\n        assert(0 <= n);\n    }\n\n    int size() const\
-    \ {\n        return _n;\n    }\n\n    int edge_count() const {\n        return\
-    \ int(_pos.size());\n    }\n\n    int add_edge(int from, int to, Cap cap, Cost\
-    \ cost) {\n        assert(0 <= from && from < _n);\n        assert(0 <= to &&\
-    \ to < _n);\n        assert(Cap(0) <= cap);\n        int id = int(_pos.size());\n\
-    \        int from_id = int(_g[from].size());\n        int to_id = int(_g[to].size());\n\
-    \        if (from == to) to_id++;\n        _pos.emplace_back(from, from_id);\n\
-    \        _g[from].push_back(InternalEdge{to, to_id, cap, cost});\n        _g[to].push_back(InternalEdge{from,\
-    \ from_id, Cap(0), -cost});\n        return id;\n    }\n\n    Edge get_edge(int\
-    \ i) const {\n        assert(0 <= i && i < int(_pos.size()));\n        auto [from,\
-    \ idx] = _pos[i];\n        const auto& e = _g[from][idx];\n        const auto&\
-    \ re = _g[e.to][e.rev];\n        return Edge{from, e.to, e.cap + re.cap, re.cap,\
-    \ e.cost};\n    }\n\n    std::vector<Edge> edges() const {\n        std::vector<Edge>\
-    \ result;\n        result.reserve(_pos.size());\n        for (int i = 0; i < int(_pos.size());\
-    \ i++) result.push_back(get_edge(i));\n        return result;\n    }\n\n    std::pair<Cap,\
-    \ Cost> flow(int s, int t) {\n        return flow(s, t, std::numeric_limits<Cap>::max());\n\
-    \    }\n\n    std::pair<Cap, Cost> flow(int s, int t, Cap flow_limit) {\n    \
-    \    auto result = slope(s, t, flow_limit);\n        return result.back();\n \
-    \   }\n\n    std::vector<std::pair<Cap, Cost>> slope(int s, int t) {\n       \
-    \ return slope(s, t, std::numeric_limits<Cap>::max());\n    }\n\n    std::vector<std::pair<Cap,\
+    \n\n\n\n#line 6 \"graph/flow/min_cost_flow.hpp\"\n#include <bit>\n#line 15 \"\
+    graph/flow/min_cost_flow.hpp\"\n\n#line 18 \"graph/flow/min_cost_flow.hpp\"\n\n\
+    namespace m1une {\nnamespace flow {\n\ntemplate <class Cap, class Cost>\nstruct\
+    \ MinCostFlow {\n    struct Edge {\n        int from;\n        int to;\n     \
+    \   Cap cap;\n        Cap flow;\n        Cost cost;\n    };\n\n   private:\n \
+    \   struct InternalEdge {\n        int to;\n        int rev;\n        Cap cap;\n\
+    \        Cost cost;\n    };\n\n    int _n;\n    std::vector<std::pair<int, int>>\
+    \ _pos;\n    std::vector<std::vector<InternalEdge>> _g;\n    bool _has_negative_cost;\n\
+    \    bool _has_flow;\n\n    template <class Key>\n    struct RadixHeap {\n   \
+    \     using Unsigned = std::make_unsigned_t<Key>;\n        static constexpr int\
+    \ bits = std::numeric_limits<Unsigned>::digits;\n\n        std::array<std::vector<std::pair<Unsigned,\
+    \ int>>, bits + 1> bucket;\n        Unsigned last = 0;\n        std::size_t count\
+    \ = 0;\n\n        static int index(Unsigned first, Unsigned second) {\n      \
+    \      return int(std::bit_width(first ^ second));\n        }\n\n        void\
+    \ clear() {\n            for (auto& values : bucket) values.clear();\n       \
+    \     last = 0;\n            count = 0;\n        }\n\n        bool empty() const\
+    \ {\n            return count == 0;\n        }\n\n        void push(Key key, int\
+    \ vertex) {\n            Unsigned value = static_cast<Unsigned>(key);\n      \
+    \      assert(last <= value);\n            bucket[index(value, last)].emplace_back(value,\
+    \ vertex);\n            count++;\n        }\n\n        std::pair<Key, int> pop()\
+    \ {\n            if (bucket[0].empty()) {\n                int i = 1;\n      \
+    \          while (bucket[i].empty()) i++;\n                last = bucket[i][0].first;\n\
+    \                for (const auto& value : bucket[i]) {\n                    last\
+    \ = std::min(last, value.first);\n                }\n                for (const\
+    \ auto& value : bucket[i]) {\n                    bucket[index(value.first, last)].push_back(value);\n\
+    \                }\n                bucket[i].clear();\n            }\n      \
+    \      auto [key, vertex] = bucket[0].back();\n            bucket[0].pop_back();\n\
+    \            count--;\n            return {static_cast<Key>(key), vertex};\n \
+    \       }\n    };\n\n    template <class Key>\n    struct BinaryHeap {\n     \
+    \   using Value = std::pair<Key, int>;\n        std::vector<Value> heap;\n\n \
+    \       void clear() {\n            heap.clear();\n        }\n\n        bool empty()\
+    \ const {\n            return heap.empty();\n        }\n\n        void push(Key\
+    \ key, int vertex) {\n            heap.emplace_back(key, vertex);\n          \
+    \  std::push_heap(heap.begin(), heap.end(), std::greater<Value>());\n        }\n\
+    \n        Value pop() {\n            std::pop_heap(heap.begin(), heap.end(), std::greater<Value>());\n\
+    \            Value result = heap.back();\n            heap.pop_back();\n     \
+    \       return result;\n        }\n    };\n\n    template <\n        class Key,\n\
+    \        bool UseRadix =\n            std::numeric_limits<Key>::is_integer &&\
+    \ sizeof(Key) <= 8\n    >\n    struct HeapSelector {\n        using Type = BinaryHeap<Key>;\n\
+    \    };\n\n    template <class Key>\n    struct HeapSelector<Key, true> {\n  \
+    \      using Type = RadixHeap<Key>;\n    };\n\n    bool use_network_simplex(int\
+    \ s, int t, Cap flow_limit) const {\n        if (_has_negative_cost) return false;\n\
+    \        if (_pos.size() < 64) return false;\n        auto add_saturated = [](Cap\
+    \ first, Cap second) {\n            const Cap maximum = std::numeric_limits<Cap>::max();\n\
+    \            return maximum - first < second ? maximum : first + second;\n   \
+    \     };\n        struct TerminalCapacity {\n            Cap total = Cap(0);\n\
+    \            std::array<Cap, 7> largest{};\n        };\n        auto add_capacity\
+    \ = [&](TerminalCapacity& terminal, Cap cap) {\n            terminal.total = add_saturated(terminal.total,\
+    \ cap);\n            for (Cap& current : terminal.largest) {\n               \
+    \ if (cap <= current) break;\n                std::swap(cap, current);\n     \
+    \       }\n        };\n        TerminalCapacity source;\n        for (const auto&\
+    \ e : _g[s]) {\n            if (e.to == s) continue;\n            add_capacity(source,\
+    \ e.cap);\n        }\n        TerminalCapacity sink;\n        for (const auto&\
+    \ e : _g[t]) {\n            if (e.to == t) continue;\n            Cap cap = _g[e.to][e.rev].cap;\n\
+    \            add_capacity(sink, cap);\n        }\n        Cap target = std::min(\n\
+    \            flow_limit,\n            std::min(source.total, sink.total)\n   \
+    \     );\n        if (target == Cap(0)) return false;\n        auto requires_eight_arcs\
+    \ = [&](const TerminalCapacity& terminal) {\n            Cap sum = Cap(0);\n \
+    \           for (Cap cap : terminal.largest) {\n                sum = add_saturated(sum,\
+    \ cap);\n            }\n            return sum < target;\n        };\n       \
+    \ return requires_eight_arcs(source) && requires_eight_arcs(sink);\n    }\n\n\
+    \    std::pair<Cap, Cost> network_simplex_flow(\n        int s,\n        int t,\n\
+    \        Cap flow_limit\n    ) {\n        struct ResidualArc {\n            int\
+    \ edge;\n            bool reverse;\n        };\n\n        using Solver = BoundedMinCostFlow<Cap,\
+    \ Cost, Cost>;\n        std::vector<ResidualArc> arcs;\n        arcs.reserve(2\
+    \ * _pos.size());\n        for (int i = 0; i < int(_pos.size()); i++) {\n    \
+    \        auto [from, idx] = _pos[i];\n            const auto& e = _g[from][idx];\n\
+    \            const auto& reverse = _g[e.to][e.rev];\n            if (e.cap !=\
+    \ Cap(0)) {\n                arcs.push_back(ResidualArc{i, false});\n        \
+    \    }\n            if (reverse.cap != Cap(0)) {\n                arcs.push_back(ResidualArc{i,\
+    \ true});\n            }\n        }\n\n        auto add_saturated = [](Cap first,\
+    \ Cap second, bool& exact) {\n            const Cap maximum = std::numeric_limits<Cap>::max();\n\
+    \            if (maximum - first < second) {\n                exact = false;\n\
+    \                return maximum;\n            }\n            return first + second;\n\
+    \        };\n        bool source_capacity_exact = true;\n        Cap source_capacity\
+    \ = Cap(0);\n        for (const auto& e : _g[s]) {\n            if (e.to == s)\
+    \ continue;\n            source_capacity = add_saturated(\n                source_capacity,\n\
+    \                e.cap,\n                source_capacity_exact\n            );\n\
+    \        }\n        bool sink_capacity_exact = true;\n        Cap sink_capacity\
+    \ = Cap(0);\n        for (const auto& e : _g[t]) {\n            if (e.to == t)\
+    \ continue;\n            sink_capacity = add_saturated(\n                sink_capacity,\n\
+    \                _g[e.to][e.rev].cap,\n                sink_capacity_exact\n \
+    \           );\n        }\n        Cap target = std::min(\n            flow_limit,\n\
+    \            std::min(source_capacity, sink_capacity)\n        );\n        if\
+    \ (target == Cap(0)) return {Cap(0), Cost(0)};\n\n        struct ArcData {\n \
+    \           int from;\n            int to;\n            Cap cap;\n           \
+    \ Cost cost;\n        };\n        auto arc_data = [&](const ResidualArc& arc)\
+    \ {\n            auto [from, idx] = _pos[arc.edge];\n            const auto& e\
+    \ = _g[from][idx];\n            const auto& reverse = _g[e.to][e.rev];\n     \
+    \       return arc.reverse\n                ? ArcData{e.to, from, reverse.cap,\
+    \ reverse.cost}\n                : ArcData{from, e.to, e.cap, e.cost};\n     \
+    \   };\n        auto apply_flow = [&](const ResidualArc& arc, Cap amount) {\n\
+    \            auto [from, idx] = _pos[arc.edge];\n            auto& e = _g[from][idx];\n\
+    \            auto& reverse = _g[e.to][e.rev];\n            if (arc.reverse) {\n\
+    \                reverse.cap -= amount;\n                e.cap += amount;\n  \
+    \          } else {\n                e.cap -= amount;\n                reverse.cap\
+    \ += amount;\n            }\n        };\n\n        bool target_infeasible = false;\n\
+    \        if (\n            source_capacity_exact && sink_capacity_exact &&\n \
+    \           target == source_capacity && target == sink_capacity\n        ) {\n\
+    \            Solver terminal_solver(_n);\n            terminal_solver.reserve_edges(int(arcs.size()));\n\
+    \            std::vector<Cap> balance(_n, Cap(0));\n            std::vector<int>\
+    \ internal_arcs;\n            std::vector<int> fixed_arcs;\n            internal_arcs.reserve(arcs.size());\n\
+    \            fixed_arcs.reserve(_g[s].size() + _g[t].size());\n            Cost\
+    \ fixed_cost = Cost(0);\n            for (int i = 0; i < int(arcs.size()); i++)\
+    \ {\n                ArcData data = arc_data(arcs[i]);\n                if (data.from\
+    \ == s) {\n                    if (data.to == s) continue;\n                 \
+    \   fixed_arcs.push_back(i);\n                    fixed_cost += Cost(data.cap)\
+    \ * data.cost;\n                    if (data.to != t) balance[data.to] += data.cap;\n\
+    \                } else if (data.to == t) {\n                    if (data.from\
+    \ == t) continue;\n                    fixed_arcs.push_back(i);\n            \
+    \        fixed_cost += Cost(data.cap) * data.cost;\n                    balance[data.from]\
+    \ -= data.cap;\n                } else if (data.to != s && data.from != t) {\n\
+    \                    terminal_solver.add_edge(\n                        data.from,\n\
+    \                        data.to,\n                        Cap(0),\n         \
+    \               data.cap,\n                        data.cost\n               \
+    \     );\n                    internal_arcs.push_back(i);\n                }\n\
+    \            }\n            auto terminal_result = terminal_solver.min_cost_flow(balance);\n\
+    \            if (terminal_result) {\n                for (int i : fixed_arcs)\
+    \ {\n                    apply_flow(arcs[i], arc_data(arcs[i]).cap);\n       \
+    \         }\n                for (int i = 0; i < int(internal_arcs.size()); i++)\
+    \ {\n                    apply_flow(\n                        arcs[internal_arcs[i]],\n\
+    \                        terminal_result->flow(i)\n                    );\n  \
+    \              }\n                _has_flow = true;\n                return {target,\
+    \ fixed_cost + terminal_result->cost};\n            }\n            target_infeasible\
+    \ = true;\n        }\n\n        Solver solver(_n);\n        solver.reserve_edges(int(arcs.size()));\n\
+    \        for (const auto& arc : arcs) {\n            ArcData data = arc_data(arc);\n\
+    \            solver.add_edge(\n                data.from,\n                data.to,\n\
+    \                Cap(0),\n                data.cap,\n                data.cost\n\
+    \            );\n        }\n        Cap sent = target;\n        std::optional<typename\
+    \ Solver::Result> result;\n        if (\n            !target_infeasible &&\n \
+    \           target != std::numeric_limits<Cap>::max()\n        ) {\n         \
+    \   result = solver.min_cost_st_flow(s, t, target);\n        }\n        if (!result)\
+    \ {\n            MaxFlow<Cap> feasible(_n);\n            feasible.reserve_edges(int(arcs.size()));\n\
+    \            for (const auto& arc : arcs) {\n                auto [from, idx]\
+    \ = _pos[arc.edge];\n                const auto& e = _g[from][idx];\n        \
+    \        const auto& reverse = _g[e.to][e.rev];\n                if (arc.reverse)\
+    \ {\n                    feasible.add_edge(e.to, from, reverse.cap);\n       \
+    \         } else {\n                    feasible.add_edge(from, e.to, e.cap);\n\
+    \                }\n            }\n            sent = feasible.max_flow(s, t,\
+    \ target);\n            if (sent == Cap(0)) return {Cap(0), Cost(0)};\n      \
+    \      result = solver.min_cost_st_flow(s, t, sent);\n        }\n        assert(result.has_value());\n\
+    \        for (int i = 0; i < int(arcs.size()); i++) {\n            auto [from,\
+    \ idx] = _pos[arcs[i].edge];\n            auto& e = _g[from][idx];\n         \
+    \   auto& reverse = _g[e.to][e.rev];\n            Cap amount = result->flow(i);\n\
+    \            if (arcs[i].reverse) {\n                reverse.cap -= amount;\n\
+    \                e.cap += amount;\n            } else {\n                e.cap\
+    \ -= amount;\n                reverse.cap += amount;\n            }\n        }\n\
+    \        _has_flow = true;\n        return {sent, result->cost};\n    }\n\n  \
+    \  void init_potential(int s, std::vector<Cost>& potential, Cost cost_inf) const\
+    \ {\n        if (!_has_negative_cost && !_has_flow) {\n            potential.assign(_n,\
+    \ Cost(0));\n            return;\n        }\n        potential.assign(_n, cost_inf);\n\
+    \        potential[s] = Cost(0);\n        for (int iter = 0; iter < _n - 1; iter++)\
+    \ {\n            bool updated = false;\n            for (int v = 0; v < _n; v++)\
+    \ {\n                if (potential[v] == cost_inf) continue;\n               \
+    \ for (const auto& e : _g[v]) {\n                    if (e.cap == Cap(0)) continue;\n\
+    \                    Cost nd = potential[v] + e.cost;\n                    if\
+    \ (nd < potential[e.to]) {\n                        potential[e.to] = nd;\n  \
+    \                      updated = true;\n                    }\n              \
+    \  }\n            }\n            if (!updated) break;\n        }\n        for\
+    \ (int v = 0; v < _n; v++) {\n            if (potential[v] == cost_inf) potential[v]\
+    \ = Cost(0);\n        }\n    }\n\n   public:\n    MinCostFlow() : MinCostFlow(0)\
+    \ {}\n\n    explicit MinCostFlow(int n)\n        : _n(n), _g(n), _has_negative_cost(false),\
+    \ _has_flow(false) {\n        assert(0 <= n);\n    }\n\n    int size() const {\n\
+    \        return _n;\n    }\n\n    int edge_count() const {\n        return int(_pos.size());\n\
+    \    }\n\n    void reserve_edges(int edge_count) {\n        assert(0 <= edge_count);\n\
+    \        _pos.reserve(edge_count);\n        if (_n == 0 || edge_count == 0 ||\n\
+    \            2 * std::size_t(edge_count) < std::size_t(_n)) {\n            return;\n\
+    \        }\n        const std::size_t average_degree =\n            (3 * std::size_t(edge_count)\
+    \ + std::size_t(_n) - 1)\n            / std::size_t(_n);\n        for (auto& edges\
+    \ : _g) edges.reserve(average_degree);\n    }\n\n    void reserve_edges(int edge_count,\
+    \ const std::vector<int>& degrees) {\n        assert(0 <= edge_count);\n     \
+    \   assert(int(degrees.size()) == _n);\n        _pos.reserve(edge_count);\n  \
+    \      for (int v = 0; v < _n; v++) {\n            assert(0 <= degrees[v]);\n\
+    \            _g[v].reserve(degrees[v]);\n        }\n    }\n\n    int add_edge(int\
+    \ from, int to, Cap cap, Cost cost) {\n        assert(0 <= from && from < _n);\n\
+    \        assert(0 <= to && to < _n);\n        assert(Cap(0) <= cap);\n       \
+    \ _has_negative_cost = _has_negative_cost || cost < Cost(0);\n        int id =\
+    \ int(_pos.size());\n        int from_id = int(_g[from].size());\n        int\
+    \ to_id = int(_g[to].size());\n        if (from == to) to_id++;\n        _pos.emplace_back(from,\
+    \ from_id);\n        _g[from].push_back(InternalEdge{to, to_id, cap, cost});\n\
+    \        _g[to].push_back(InternalEdge{from, from_id, Cap(0), -cost});\n     \
+    \   return id;\n    }\n\n    Edge get_edge(int i) const {\n        assert(0 <=\
+    \ i && i < int(_pos.size()));\n        auto [from, idx] = _pos[i];\n        const\
+    \ auto& e = _g[from][idx];\n        const auto& re = _g[e.to][e.rev];\n      \
+    \  return Edge{from, e.to, e.cap + re.cap, re.cap, e.cost};\n    }\n\n    std::vector<Edge>\
+    \ edges() const {\n        std::vector<Edge> result;\n        result.reserve(_pos.size());\n\
+    \        for (int i = 0; i < int(_pos.size()); i++) result.push_back(get_edge(i));\n\
+    \        return result;\n    }\n\n    std::pair<Cap, Cost> flow(int s, int t)\
+    \ {\n        return flow(s, t, std::numeric_limits<Cap>::max());\n    }\n\n  \
+    \  std::pair<Cap, Cost> flow(int s, int t, Cap flow_limit) {\n        assert(0\
+    \ <= s && s < _n);\n        assert(0 <= t && t < _n);\n        assert(s != t);\n\
+    \        assert(Cap(0) <= flow_limit);\n        if (flow_limit == Cap(0)) return\
+    \ {Cap(0), Cost(0)};\n        if constexpr (\n            std::numeric_limits<Cap>::is_integer\
+    \ &&\n            std::numeric_limits<Cap>::is_signed &&\n            std::numeric_limits<Cost>::is_signed\n\
+    \        ) {\n            if (use_network_simplex(s, t, flow_limit)) {\n     \
+    \           return network_simplex_flow(s, t, flow_limit);\n            }\n  \
+    \      }\n        auto result = slope(s, t, flow_limit);\n        return result.back();\n\
+    \    }\n\n    std::vector<std::pair<Cap, Cost>> slope(int s, int t) {\n      \
+    \  return slope(s, t, std::numeric_limits<Cap>::max());\n    }\n\n    std::vector<std::pair<Cap,\
     \ Cost>> slope(int s, int t, Cap flow_limit) {\n        assert(0 <= s && s < _n);\n\
-    \        assert(0 <= t && t < _n);\n        assert(s != t);\n\n        const Cost\
-    \ cost_inf = std::numeric_limits<Cost>::max() / Cost(4);\n        std::vector<Cost>\
-    \ potential, dist(_n);\n        std::vector<int> prev_v(_n), prev_e(_n);\n   \
-    \     init_potential(s, potential, cost_inf);\n\n        std::vector<std::pair<Cap,\
-    \ Cost>> result;\n        result.emplace_back(Cap(0), Cost(0));\n        Cap flow\
-    \ = 0;\n        Cost cost = 0;\n\n        while (flow < flow_limit) {\n      \
-    \      std::fill(dist.begin(), dist.end(), cost_inf);\n            dist[s] = Cost(0);\n\
-    \            using P = std::pair<Cost, int>;\n            std::priority_queue<P,\
-    \ std::vector<P>, std::greater<P>> que;\n            que.emplace(Cost(0), s);\n\
-    \n            while (!que.empty()) {\n                auto [d, v] = que.top();\n\
-    \                que.pop();\n                if (dist[v] != d) continue;\n   \
-    \             for (int i = 0; i < int(_g[v].size()); i++) {\n                \
-    \    const auto& e = _g[v][i];\n                    if (e.cap == Cap(0)) continue;\n\
+    \        assert(0 <= t && t < _n);\n        assert(s != t);\n        assert(Cap(0)\
+    \ <= flow_limit);\n\n        const Cost cost_inf = std::numeric_limits<Cost>::max()\
+    \ / Cost(4);\n        std::vector<Cost> potential, dist(_n);\n        std::vector<int>\
+    \ prev_v(_n), prev_e(_n);\n        std::vector<int> settled;\n        settled.reserve(_n);\n\
+    \        typename HeapSelector<Cost>::Type que;\n        init_potential(s, potential,\
+    \ cost_inf);\n\n        std::vector<std::pair<Cap, Cost>> result;\n        result.emplace_back(Cap(0),\
+    \ Cost(0));\n        Cap flow = 0;\n        Cost cost = 0;\n\n        while (flow\
+    \ < flow_limit) {\n            std::fill(dist.begin(), dist.end(), cost_inf);\n\
+    \            dist[s] = Cost(0);\n            settled.clear();\n            que.clear();\n\
+    \            que.push(Cost(0), s);\n\n            while (!que.empty()) {\n   \
+    \             auto [d, v] = que.pop();\n                if (dist[v] != d) continue;\n\
+    \                settled.push_back(v);\n                if (v == t) break;\n \
+    \               for (int i = 0; i < int(_g[v].size()); i++) {\n              \
+    \      const auto& e = _g[v][i];\n                    if (e.cap == Cap(0)) continue;\n\
     \                    Cost nd = d + e.cost + potential[v] - potential[e.to];\n\
     \                    if (nd >= dist[e.to]) continue;\n                    dist[e.to]\
     \ = nd;\n                    prev_v[e.to] = v;\n                    prev_e[e.to]\
-    \ = i;\n                    que.emplace(nd, e.to);\n                }\n      \
-    \      }\n\n            if (dist[t] == cost_inf) break;\n            for (int\
-    \ v = 0; v < _n; v++) {\n                if (dist[v] != cost_inf) potential[v]\
-    \ += dist[v];\n            }\n\n            Cap add = flow_limit - flow;\n   \
-    \         for (int v = t; v != s; v = prev_v[v]) {\n                add = std::min(add,\
-    \ _g[prev_v[v]][prev_e[v]].cap);\n            }\n            Cost path_cost =\
-    \ potential[t] - potential[s];\n            for (int v = t; v != s; v = prev_v[v])\
-    \ {\n                auto& e = _g[prev_v[v]][prev_e[v]];\n                e.cap\
-    \ -= add;\n                _g[e.to][e.rev].cap += add;\n            }\n\n    \
-    \        flow += add;\n            cost += Cost(add) * path_cost;\n          \
-    \  result.emplace_back(flow, cost);\n        }\n\n        return result;\n   \
-    \ }\n};\n\n}  // namespace flow\n}  // namespace m1une\n\n\n#line 9 \"graph/flow/flow.hpp\"\
+    \ = i;\n                    que.push(nd, e.to);\n                }\n         \
+    \   }\n\n            if (dist[t] == cost_inf) break;\n            for (int v :\
+    \ settled) {\n                potential[v] += dist[v] - dist[t];\n           \
+    \ }\n\n            Cap add = flow_limit - flow;\n            for (int v = t; v\
+    \ != s; v = prev_v[v]) {\n                add = std::min(add, _g[prev_v[v]][prev_e[v]].cap);\n\
+    \            }\n            Cost path_cost = potential[t] - potential[s];\n  \
+    \          for (int v = t; v != s; v = prev_v[v]) {\n                auto& e =\
+    \ _g[prev_v[v]][prev_e[v]];\n                e.cap -= add;\n                _g[e.to][e.rev].cap\
+    \ += add;\n            }\n\n            flow += add;\n            cost += Cost(add)\
+    \ * path_cost;\n            result.emplace_back(flow, cost);\n        }\n\n  \
+    \      _has_flow = _has_flow || flow != Cap(0);\n        return result;\n    }\n\
+    };\n\n}  // namespace flow\n}  // namespace m1une\n\n\n#line 9 \"graph/flow/flow.hpp\"\
     \n\n\n#line 1 \"graph/grid.hpp\"\n\n\n\n#line 8 \"graph/grid.hpp\"\n\n#line 10\
     \ \"graph/grid.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\nstruct Grid {\n\
     \   private:\n    int _h;\n    int _w;\n\n   public:\n    static constexpr std::array<int,\
@@ -4523,57 +4685,57 @@ data:
     \                              CompressUp, Rake, AddEdgeDown, AddEdgeUp, AddVertex>;\n\
     \n}  // namespace tree\n}  // namespace m1une\n\n\n#line 1 \"graph/tree/sparse_table_lca.hpp\"\
     \n\n\n\n#line 9 \"graph/tree/sparse_table_lca.hpp\"\n\n#line 1 \"ds/range_query/sparse_table.hpp\"\
-    \n\n\n\n#include <bit>\n#line 9 \"ds/range_query/sparse_table.hpp\"\n\n#line 11\
-    \ \"ds/range_query/sparse_table.hpp\"\n\nnamespace m1une {\nnamespace ds {\n\n\
-    // A Sparse Table utilizing C++20 Concepts for type safety.\n// It requires a\
-    \ Monoid struct that satisfies `m1une::monoid::IsMonoid`.\n// [IMPORTANT] For\
-    \ O(1) range queries to work correctly, the monoid operation MUST be idempotent.\n\
-    // i.e., Monoid::op(x, x) == x must hold (e.g., Min, Max, GCD, Bitwise AND/OR).\n\
-    template <m1une::monoid::IsMonoid Monoid>\nstruct SparseTable {\n    using T =\
-    \ typename Monoid::value_type;\n\n   private:\n    int _n;\n    std::vector<std::vector<T>>\
-    \ _st;\n\n   public:\n    // Constructs an empty sparse table.\n    SparseTable()\
-    \ : _n(0) {}\n\n    // Constructs a sparse table from an existing vector in O(N\
-    \ log N) time.\n    explicit SparseTable(const std::vector<T>& v) : _n(int(v.size()))\
-    \ {\n        if (_n == 0) return;\n\n        // Compute the maximum power of 2\
-    \ needed\n        int max_log = std::bit_width((unsigned int)_n);\n        _st.assign(max_log,\
-    \ std::vector<T>(_n));\n\n        // Initialize the base level\n        for (int\
-    \ i = 0; i < _n; i++) {\n            _st[0][i] = v[i];\n        }\n\n        //\
-    \ Build the sparse table\n        for (int k = 1; k < max_log; k++) {\n      \
-    \      for (int i = 0; i + (1 << k) <= _n; i++) {\n                _st[k][i] =\
-    \ Monoid::op(_st[k - 1][i], _st[k - 1][i + (1 << (k - 1))]);\n            }\n\
-    \        }\n    }\n    explicit SparseTable(std::vector<T>&& v) : _n(int(v.size()))\
-    \ {\n        if (_n == 0) return;\n\n        int max_log = std::bit_width((unsigned\
-    \ int)_n);\n        _st.assign(max_log, std::vector<T>(_n));\n\n        for (int\
-    \ i = 0; i < _n; i++) {\n            _st[0][i] = std::move(v[i]);\n        }\n\
-    \n        for (int k = 1; k < max_log; k++) {\n            for (int i = 0; i +\
-    \ (1 << k) <= _n; i++) {\n                _st[k][i] = Monoid::op(_st[k - 1][i],\
-    \ _st[k - 1][i + (1 << (k - 1))]);\n            }\n        }\n    }\n\n    //\
-    \ Constructs a sparse table from a vector of a different type U.\n    // It automatically\
-    \ adapts to the Monoid's initialization requirements:\n    // 1. Monoid::make(val)\
-    \ if it exists.\n    // 2. Monoid::make(val, index) if the monoid requires global\
-    \ indices.\n    // 3. static_cast<T>(val) as a fallback for simple monoids.\n\
-    \    template <typename U>\n    requires (!std::same_as<U, T>) && (\n        requires(U\
-    \ x) { Monoid::make(x); } ||\n        requires(U x, int i) { Monoid::make(x, i);\
-    \ } ||\n        std::convertible_to<U, T>\n    )\n    explicit SparseTable(const\
-    \ std::vector<U>& v) : _n(int(v.size())) {\n        if (_n == 0) return;\n\n \
-    \       int max_log = std::bit_width((unsigned int)_n);\n        _st.assign(max_log,\
-    \ std::vector<T>(_n));\n\n        // Compile-time branching based on the available\
-    \ make() signature\n        for (int i = 0; i < _n; i++) {\n            if constexpr\
-    \ (requires(U x) { Monoid::make(x); }) {\n                _st[0][i] = Monoid::make(v[i]);\n\
-    \            } else if constexpr (requires(U x, int idx) { Monoid::make(x, idx);\
-    \ }) {\n                _st[0][i] = Monoid::make(v[i], i);\n            } else\
-    \ {\n                _st[0][i] = static_cast<T>(v[i]);\n            }\n      \
-    \  }\n        for (int k = 1; k < max_log; k++) {\n            for (int i = 0;\
-    \ i + (1 << k) <= _n; i++) {\n                _st[k][i] = Monoid::op(_st[k - 1][i],\
-    \ _st[k - 1][i + (1 << (k - 1))]);\n            }\n        }\n    }\n\n    //\
-    \ Returns the product (result of the monoid operation) in the range [l, r) in\
-    \ O(1) time.\n    // Requires the monoid operation to be idempotent.\n    T prod(int\
-    \ l, int r) const {\n        assert(0 <= l && l <= r && r <= _n);\n        if\
-    \ (l == r) return Monoid::id();\n\n        // Calculate the largest power of 2\
-    \ less than or equal to the interval length\n        int k = std::bit_width((unsigned\
-    \ int)(r - l)) - 1;\n        return Monoid::op(_st[k][l], _st[k][r - (1 << k)]);\n\
-    \    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n#line 12 \"graph/tree/sparse_table_lca.hpp\"\
-    \n\nnamespace m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct SparseTableLca\
+    \n\n\n\n#line 9 \"ds/range_query/sparse_table.hpp\"\n\n#line 11 \"ds/range_query/sparse_table.hpp\"\
+    \n\nnamespace m1une {\nnamespace ds {\n\n// A Sparse Table utilizing C++20 Concepts\
+    \ for type safety.\n// It requires a Monoid struct that satisfies `m1une::monoid::IsMonoid`.\n\
+    // [IMPORTANT] For O(1) range queries to work correctly, the monoid operation\
+    \ MUST be idempotent.\n// i.e., Monoid::op(x, x) == x must hold (e.g., Min, Max,\
+    \ GCD, Bitwise AND/OR).\ntemplate <m1une::monoid::IsMonoid Monoid>\nstruct SparseTable\
+    \ {\n    using T = typename Monoid::value_type;\n\n   private:\n    int _n;\n\
+    \    std::vector<std::vector<T>> _st;\n\n   public:\n    // Constructs an empty\
+    \ sparse table.\n    SparseTable() : _n(0) {}\n\n    // Constructs a sparse table\
+    \ from an existing vector in O(N log N) time.\n    explicit SparseTable(const\
+    \ std::vector<T>& v) : _n(int(v.size())) {\n        if (_n == 0) return;\n\n \
+    \       // Compute the maximum power of 2 needed\n        int max_log = std::bit_width((unsigned\
+    \ int)_n);\n        _st.assign(max_log, std::vector<T>(_n));\n\n        // Initialize\
+    \ the base level\n        for (int i = 0; i < _n; i++) {\n            _st[0][i]\
+    \ = v[i];\n        }\n\n        // Build the sparse table\n        for (int k\
+    \ = 1; k < max_log; k++) {\n            for (int i = 0; i + (1 << k) <= _n; i++)\
+    \ {\n                _st[k][i] = Monoid::op(_st[k - 1][i], _st[k - 1][i + (1 <<\
+    \ (k - 1))]);\n            }\n        }\n    }\n    explicit SparseTable(std::vector<T>&&\
+    \ v) : _n(int(v.size())) {\n        if (_n == 0) return;\n\n        int max_log\
+    \ = std::bit_width((unsigned int)_n);\n        _st.assign(max_log, std::vector<T>(_n));\n\
+    \n        for (int i = 0; i < _n; i++) {\n            _st[0][i] = std::move(v[i]);\n\
+    \        }\n\n        for (int k = 1; k < max_log; k++) {\n            for (int\
+    \ i = 0; i + (1 << k) <= _n; i++) {\n                _st[k][i] = Monoid::op(_st[k\
+    \ - 1][i], _st[k - 1][i + (1 << (k - 1))]);\n            }\n        }\n    }\n\
+    \n    // Constructs a sparse table from a vector of a different type U.\n    //\
+    \ It automatically adapts to the Monoid's initialization requirements:\n    //\
+    \ 1. Monoid::make(val) if it exists.\n    // 2. Monoid::make(val, index) if the\
+    \ monoid requires global indices.\n    // 3. static_cast<T>(val) as a fallback\
+    \ for simple monoids.\n    template <typename U>\n    requires (!std::same_as<U,\
+    \ T>) && (\n        requires(U x) { Monoid::make(x); } ||\n        requires(U\
+    \ x, int i) { Monoid::make(x, i); } ||\n        std::convertible_to<U, T>\n  \
+    \  )\n    explicit SparseTable(const std::vector<U>& v) : _n(int(v.size())) {\n\
+    \        if (_n == 0) return;\n\n        int max_log = std::bit_width((unsigned\
+    \ int)_n);\n        _st.assign(max_log, std::vector<T>(_n));\n\n        // Compile-time\
+    \ branching based on the available make() signature\n        for (int i = 0; i\
+    \ < _n; i++) {\n            if constexpr (requires(U x) { Monoid::make(x); })\
+    \ {\n                _st[0][i] = Monoid::make(v[i]);\n            } else if constexpr\
+    \ (requires(U x, int idx) { Monoid::make(x, idx); }) {\n                _st[0][i]\
+    \ = Monoid::make(v[i], i);\n            } else {\n                _st[0][i] =\
+    \ static_cast<T>(v[i]);\n            }\n        }\n        for (int k = 1; k <\
+    \ max_log; k++) {\n            for (int i = 0; i + (1 << k) <= _n; i++) {\n  \
+    \              _st[k][i] = Monoid::op(_st[k - 1][i], _st[k - 1][i + (1 << (k -\
+    \ 1))]);\n            }\n        }\n    }\n\n    // Returns the product (result\
+    \ of the monoid operation) in the range [l, r) in O(1) time.\n    // Requires\
+    \ the monoid operation to be idempotent.\n    T prod(int l, int r) const {\n \
+    \       assert(0 <= l && l <= r && r <= _n);\n        if (l == r) return Monoid::id();\n\
+    \n        // Calculate the largest power of 2 less than or equal to the interval\
+    \ length\n        int k = std::bit_width((unsigned int)(r - l)) - 1;\n       \
+    \ return Monoid::op(_st[k][l], _st[k][r - (1 << k)]);\n    }\n};\n\n}  // namespace\
+    \ ds\n}  // namespace m1une\n\n\n#line 12 \"graph/tree/sparse_table_lca.hpp\"\n\
+    \nnamespace m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct SparseTableLca\
     \ {\n    using cost_type = T;\n    using edge_type = m1une::graph::Edge<T>;\n\n\
     \    int root;\n    std::vector<int> parent;\n    std::vector<int> parent_edge;\n\
     \    std::vector<int> depth;\n    std::vector<T> dist;\n    std::vector<int> subtree_size;\n\
@@ -7580,7 +7742,7 @@ data:
   isVerificationFile: true
   path: verify/graph/graph_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-15 23:21:59+09:00'
+  timestamp: '2026-07-16 02:08:45+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/graph_algorithms.test.cpp

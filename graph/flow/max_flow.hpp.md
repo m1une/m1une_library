@@ -12,6 +12,9 @@ data:
     path: graph/flow/flow.hpp
     title: Flow
   - icon: ':heavy_check_mark:'
+    path: graph/flow/min_cost_flow.hpp
+    title: Min Cost Flow
+  - icon: ':heavy_check_mark:'
     path: optimization/all.hpp
     title: Optimization All
   - icon: ':heavy_check_mark:'
@@ -30,6 +33,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/flow/max_flow_push_relabel.test.cpp
     title: verify/graph/flow/max_flow_push_relabel.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/flow/min_cost_flow.test.cpp
+    title: verify/graph/flow/min_cost_flow.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/graph_algorithms.test.cpp
     title: verify/graph/graph_algorithms.test.cpp
@@ -514,23 +520,25 @@ data:
   isVerificationFile: false
   path: graph/flow/max_flow.hpp
   requiredBy:
-  - optimization/project_selection.hpp
-  - optimization/all.hpp
-  - graph/all.hpp
-  - graph/flow/flow.hpp
   - graph/flow/bounded_flow.hpp
+  - graph/flow/min_cost_flow.hpp
+  - graph/flow/flow.hpp
+  - graph/all.hpp
+  - optimization/all.hpp
+  - optimization/project_selection.hpp
   timestamp: '2026-07-15 23:21:59+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/optimization/project_selection.test.cpp
-  - verify/optimization/integer_lp.test.cpp
-  - verify/optimization/simplex.test.cpp
-  - verify/graph/cow_game.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
-  - verify/graph/graph_algorithms.test.cpp
   - verify/graph/flow/max_flow_push_relabel.test.cpp
   - verify/graph/flow/flow_algorithms.test.cpp
+  - verify/graph/flow/min_cost_flow.test.cpp
   - verify/graph/flow/max_flow.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/cow_game.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/optimization/simplex.test.cpp
+  - verify/optimization/project_selection.test.cpp
+  - verify/optimization/integer_lp.test.cpp
 documentation_of: graph/flow/max_flow.hpp
 layout: document
 title: Max Flow
