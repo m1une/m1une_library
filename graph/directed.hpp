@@ -2,6 +2,7 @@
 #define M1UNE_GRAPH_DIRECTED_HPP 1
 
 #include "cycle_detection.hpp"
+#include "dfs.hpp"
 #include "directed_mst.hpp"
 #include "eulerian_trail.hpp"
 #include "graph.hpp"

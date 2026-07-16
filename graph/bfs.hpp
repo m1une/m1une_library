@@ -3,7 +3,10 @@
 
 #include <algorithm>
 #include <cassert>
+#include <concepts>
+#include <functional>
 #include <queue>
+#include <utility>
 #include <vector>
 
 #include "graph.hpp"
@@ -30,8 +33,28 @@ struct BfsResult {
     }
 };
 
-template <class T>
-BfsResult bfs(const Graph<T>& g, const std::vector<int>& sources) {
+namespace bfs_detail {
+
+template <class Callback>
+concept BfsCallback =
+    std::invocable<Callback&, int, int> ||
+    std::invocable<Callback&, int>;
+
+template <BfsCallback Callback>
+void invoke_callback(Callback& callback, int vertex, int parent) {
+    if constexpr (std::invocable<Callback&, int, int>) {
+        std::invoke(callback, vertex, parent);
+    } else {
+        std::invoke(callback, vertex);
+    }
+}
+
+template <class T, class Callback>
+BfsResult run_bfs(
+    const Graph<T>& g,
+    const std::vector<int>& sources,
+    Callback& callback
+) {
     int n = g.size();
     BfsResult result;
     result.dist.assign(n, -1);
@@ -43,6 +66,7 @@ BfsResult bfs(const Graph<T>& g, const std::vector<int>& sources) {
         assert(0 <= s && s < n);
         if (result.dist[s] != -1) continue;
         result.dist[s] = 0;
+        invoke_callback(callback, s, -1);
         que.push(s);
     }
 
@@ -55,6 +79,7 @@ BfsResult bfs(const Graph<T>& g, const std::vector<int>& sources) {
             result.dist[e.to] = result.dist[v] + 1;
             result.parent[e.to] = v;
             result.parent_edge[e.to] = e.id;
+            invoke_callback(callback, e.to, v);
             que.push(e.to);
         }
     }
@@ -62,9 +87,37 @@ BfsResult bfs(const Graph<T>& g, const std::vector<int>& sources) {
     return result;
 }
 
+}  // namespace bfs_detail
+
+template <class T>
+BfsResult bfs(const Graph<T>& g, const std::vector<int>& sources) {
+    auto callback = [](int) {};
+    return bfs_detail::run_bfs(g, sources, callback);
+}
+
 template <class T>
 BfsResult bfs(const Graph<T>& g, int s) {
     return bfs(g, std::vector<int>{s});
+}
+
+template <class T, class Callback>
+requires bfs_detail::BfsCallback<Callback>
+BfsResult bfs(
+    const Graph<T>& g,
+    const std::vector<int>& sources,
+    Callback&& callback
+) {
+    return bfs_detail::run_bfs(g, sources, callback);
+}
+
+template <class T, class Callback>
+requires bfs_detail::BfsCallback<Callback>
+BfsResult bfs(const Graph<T>& g, int source, Callback&& callback) {
+    return bfs(
+        g,
+        std::vector<int>{source},
+        std::forward<Callback>(callback)
+    );
 }
 
 }  // namespace graph

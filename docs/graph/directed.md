@@ -16,6 +16,7 @@ depends on edge direction.
 | Header | Graph orientation | Contents |
 | --- | --- | --- |
 | `graph/shortest_path.hpp` | Direction-respecting / DAG-specific | BFS, 0-1 BFS, DAG shortest path, Dijkstra, Bellman-Ford, and Warshall-Floyd. |
+| `graph/dfs.hpp` | Direction-respecting | Iterative DFS forests with parent paths, timestamps, and traversal orders. |
 | `graph/topological_sort.hpp` | Directed only | DAG ordering and directed cycle check. |
 | `graph/directed_mst.hpp` | Directed rooted graph | Minimum-cost spanning arborescence with edge reconstruction. |
 | `graph/matrix_tree_theorem.hpp` | Directed rooted graph | Counts weighted inward and outward spanning arborescences. |

@@ -24,6 +24,22 @@ Call `bfs(g, s)` for one source, or `bfs(g, sources)` when several vertices
 should start at distance `0`. Multi-source BFS is useful for problems like
 "distance to the nearest special vertex".
 
+The callback overloads invoke a callback exactly once when a vertex is
+discovered. Sources are reported in the supplied order, followed by other
+vertices in queue-insertion order, so callback distances are nondecreasing.
+They still return the complete `BfsResult`. The callback must not mutate the
+graph.
+
+The primary callback signature is:
+
+```cpp
+callback(int vertex, int parent);
+```
+
+`parent` is the BFS-tree parent of `vertex`, or `-1` when `vertex` is a source.
+For convenience, `callback(int vertex)` is also accepted when parent
+information is not needed.
+
 The result contains these members:
 
 | Member | Type / Signature | Meaning |
@@ -40,13 +56,19 @@ The result contains these members:
 | --- | --- | --- | --- |
 | `bfs` | `template <class T> BfsResult bfs(const Graph<T>& g, int s)` | Runs BFS from one source. | $O(N + M)$ |
 | `bfs` | `template <class T> BfsResult bfs(const Graph<T>& g, const std::vector<int>& sources)` | Runs multi-source BFS. | $O(N + M)$ |
+| `bfs` | `template <class T, class Callback> BfsResult bfs(const Graph<T>& g, int source, Callback&& callback)` | Runs single-source BFS and invokes the callback on discovery. | $O(N + M + RF)$ |
+| `bfs` | `template <class T, class Callback> BfsResult bfs(const Graph<T>& g, const std::vector<int>& sources, Callback&& callback)` | Runs multi-source BFS and invokes the callback on discovery. | $O(N + M + RF)$ |
+
+Here, `R` is the number of reached vertices and `F` is the cost of one callback.
 
 ## Example
 
 ```cpp
 #include "graph/bfs.hpp"
 #include "graph/graph.hpp"
+#include <cassert>
 #include <iostream>
+#include <vector>
 
 int main() {
     m1une::graph::Graph<> g(4);
@@ -54,7 +76,15 @@ int main() {
     g.add_edge(1, 2);
     g.add_edge(0, 3);
 
-    auto res = m1une::graph::bfs(g, 0);
+    std::vector<int> discovered;
+    auto res = m1une::graph::bfs(
+        g,
+        0,
+        [&](int vertex, int parent) {
+            discovered.push_back(vertex);
+            if (vertex == 0) assert(parent == -1);
+        }
+    );
     std::cout << res.dist[2] << "\n";  // 2
 
     for (int v : res.path(2)) {

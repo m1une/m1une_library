@@ -27,6 +27,7 @@ Public namespaces stay flat and short: general graph helpers use
 | `graph/directed.hpp` | Directed-oriented bundle | Directed algorithms plus shortest paths. |
 | `graph/undirected.hpp` | Undirected-oriented bundle | Undirected algorithms plus shortest paths and grid helpers. |
 | `graph/bfs.hpp` | Direction-respecting | Unweighted shortest paths. |
+| `graph/dfs.hpp` | Direction-respecting | Iterative DFS forests with parent paths, timestamps, and traversal orders. |
 | `graph/zero_one_bfs.hpp` | Direction-respecting | Shortest paths with edge costs `0` or `1`. |
 | `graph/dag_shortest_path.hpp` | Directed DAG only | Shortest paths in a DAG, including negative edge costs. |
 | `graph/dijkstra.hpp` | Direction-respecting | Non-negative weighted shortest paths. |
