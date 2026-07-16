@@ -2,6 +2,7 @@
 #define M1UNE_STRING_ALL_HPP 1
 
 #include "aho_corasick.hpp"
+#include "deque_eertree.hpp"
 #include "eertree.hpp"
 #include "kmp.hpp"
 #include "levenshtein_distance.hpp"

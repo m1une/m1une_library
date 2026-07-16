@@ -14,6 +14,7 @@ contest when convenience matters more.
 | Header | Contents |
 | --- | --- |
 | `string/aho_corasick.hpp` | Multi-pattern matching with failure links and occurrence counting. |
+| `string/deque_eertree.hpp` | Double-ended palindromic tree with dynamic distinct and longest-end queries. |
 | `string/eertree.hpp` | Online palindromic tree with suffix and series links. |
 | `string/levenshtein_distance.hpp` | Unit-cost edit distance in linear auxiliary memory. |
 | `string/kmp.hpp` | Prefix function and linear-time KMP occurrence search. |
