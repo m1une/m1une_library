@@ -155,6 +155,9 @@ data:
     path: math/repunit.hpp
     title: Repunit
   - icon: ':heavy_check_mark:'
+    path: math/set_power_series.hpp
+    title: Set Power Series
+  - icon: ':heavy_check_mark:'
     path: math/stern_brocot_tree.hpp
     title: Stern-Brocot Tree
   - icon: ':heavy_check_mark:'
@@ -3632,15 +3635,140 @@ data:
     \ = (\n            static_cast<unsigned __int128>(remainder) * base + 1\n    \
     \    ) % divisor;\n        if (remainder == 0) return length;\n    }\n    return\
     \ std::nullopt;\n}\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line 1\
-    \ \"math/stern_brocot_tree.hpp\"\n\n\n\n#line 10 \"math/stern_brocot_tree.hpp\"\
-    \n\n#line 12 \"math/stern_brocot_tree.hpp\"\n\nnamespace m1une {\nnamespace math\
-    \ {\n\nenum class SternBrocotDirection {\n    Left,\n    Right,\n};\n\nstruct\
-    \ SternBrocotRun {\n    SternBrocotDirection direction;\n    uint64_t count;\n\
-    \n    friend bool operator==(const SternBrocotRun&, const SternBrocotRun&) = default;\n\
-    };\n\nstruct SternBrocotPath {\n    std::vector<SternBrocotRun> runs;\n\n    bool\
-    \ empty() const {\n        return runs.empty();\n    }\n\n    uint64_t depth()\
-    \ const {\n        uint64_t result = 0;\n        for (const SternBrocotRun& run\
-    \ : runs) {\n            assert(run.count <= std::numeric_limits<uint64_t>::max()\
+    \ \"math/set_power_series.hpp\"\n\n\n\n#line 11 \"math/set_power_series.hpp\"\n\
+    \n#line 1 \"math/subset_convolution.hpp\"\n\n\n\n#line 10 \"math/subset_convolution.hpp\"\
+    \n\nnamespace m1une {\nnamespace math {\n\ntemplate <typename T>\nstd::vector<T>\
+    \ subset_convolution(\n    std::vector<T> first,\n    std::vector<T> second\n\
+    ) {\n    assert(first.size() == second.size());\n    if (first.empty()) return\
+    \ {};\n    assert((first.size() & (first.size() - 1)) == 0);\n\n    const std::size_t\
+    \ size = first.size();\n    std::size_t bit_count = 0;\n    while ((std::size_t(1)\
+    \ << bit_count) < size) ++bit_count;\n    const std::size_t rank_count = bit_count\
+    \ + 1;\n\n    std::vector<T> first_ranked(size * rank_count);\n    std::vector<T>\
+    \ second_ranked(size * rank_count);\n    for (std::size_t mask = 0; mask < size;\
+    \ ++mask) {\n        const std::size_t rank = std::popcount(mask);\n        first_ranked[mask\
+    \ * rank_count + rank] = std::move(first[mask]);\n        second_ranked[mask *\
+    \ rank_count + rank] = std::move(second[mask]);\n    }\n\n    for (std::size_t\
+    \ bit = 1; bit < size; bit <<= 1) {\n        for (std::size_t mask = 0; mask <\
+    \ size; ++mask) {\n            if ((mask & bit) == 0) continue;\n            const\
+    \ std::size_t destination = mask * rank_count;\n            const std::size_t\
+    \ source = (mask ^ bit) * rank_count;\n            for (std::size_t rank = 0;\
+    \ rank < rank_count; ++rank) {\n                first_ranked[destination + rank]\
+    \ +=\n                    first_ranked[source + rank];\n                second_ranked[destination\
+    \ + rank] +=\n                    second_ranked[source + rank];\n            }\n\
+    \        }\n    }\n\n    std::vector<T> product(rank_count);\n    for (std::size_t\
+    \ mask = 0; mask < size; ++mask) {\n        for (T& value : product) value = T{};\n\
+    \        const std::size_t offset = mask * rank_count;\n        const std::size_t\
+    \ rank_limit = std::popcount(mask);\n        for (std::size_t left = 0; left <=\
+    \ rank_limit; ++left) {\n            const std::size_t right_limit =\n       \
+    \         std::min(rank_limit, bit_count - left);\n            for (std::size_t\
+    \ right = 0; right <= right_limit; ++right) {\n                product[left +\
+    \ right] +=\n                    first_ranked[offset + left] *\n             \
+    \       second_ranked[offset + right];\n            }\n        }\n        for\
+    \ (std::size_t rank = 0; rank < rank_count; ++rank) {\n            first_ranked[offset\
+    \ + rank] = std::move(product[rank]);\n        }\n    }\n\n    for (std::size_t\
+    \ bit = 1; bit < size; bit <<= 1) {\n        for (std::size_t mask = 0; mask <\
+    \ size; ++mask) {\n            if ((mask & bit) == 0) continue;\n            const\
+    \ std::size_t destination = mask * rank_count;\n            const std::size_t\
+    \ source = (mask ^ bit) * rank_count;\n            for (std::size_t rank = 0;\
+    \ rank < rank_count; ++rank) {\n                first_ranked[destination + rank]\
+    \ -=\n                    first_ranked[source + rank];\n            }\n      \
+    \  }\n    }\n\n    std::vector<T> result(size);\n    for (std::size_t mask = 0;\
+    \ mask < size; ++mask) {\n        result[mask] = std::move(\n            first_ranked[mask\
+    \ * rank_count + std::popcount(mask)]\n        );\n    }\n    return result;\n\
+    }\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line 13 \"math/set_power_series.hpp\"\
+    \n\nnamespace m1une {\nnamespace math {\n\nnamespace set_power_series_detail {\n\
+    \ninline bool is_power_of_two(std::size_t size) {\n    return size != 0 && (size\
+    \ & (size - 1)) == 0;\n}\n\ntemplate <class T>\nstd::vector<T> divide(\n    const\
+    \ std::vector<T>& numerator,\n    const std::vector<T>& denominator\n) {\n   \
+    \ assert(numerator.size() == denominator.size());\n    assert(is_power_of_two(numerator.size()));\n\
+    \    assert(denominator[0] != T{});\n\n    const std::size_t size = numerator.size();\n\
+    \    const int bit_count = std::countr_zero(size);\n    const std::size_t rank_count\
+    \ = std::size_t(bit_count) + 1;\n    std::vector<T> denominator_ranked(size *\
+    \ rank_count);\n    std::vector<T> quotient_ranked(size * rank_count);\n\n   \
+    \ for (std::size_t mask = 0; mask < size; mask++) {\n        std::size_t rank\
+    \ = std::popcount(mask);\n        denominator_ranked[mask * rank_count + rank]\
+    \ = denominator[mask];\n    }\n    for (std::size_t bit = 1; bit < size; bit <<=\
+    \ 1) {\n        for (std::size_t mask = 0; mask < size; mask++) {\n          \
+    \  if ((mask & bit) == 0) continue;\n            std::size_t source_mask = mask\
+    \ ^ bit;\n            std::size_t source = source_mask * rank_count;\n       \
+    \     std::size_t destination = mask * rank_count;\n            std::size_t rank_limit\
+    \ = std::popcount(source_mask);\n            for (std::size_t rank = 0; rank <=\
+    \ rank_limit; rank++) {\n                denominator_ranked[destination + rank]\
+    \ +=\n                    denominator_ranked[source + rank];\n            }\n\
+    \        }\n    }\n\n    const T inverse_constant = T(1) / denominator[0];\n \
+    \   std::vector<T> transformed_product(size);\n    std::vector<T> quotient(size);\n\
+    \    for (int rank = 0; rank <= bit_count; rank++) {\n        std::fill(\n   \
+    \         transformed_product.begin(),\n            transformed_product.end(),\n\
+    \            T{}\n        );\n        for (std::size_t mask = 0; mask < size;\
+    \ mask++) {\n            std::size_t offset = mask * rank_count;\n           \
+    \ for (int left_rank = 0; left_rank <= rank; left_rank++) {\n                transformed_product[mask]\
+    \ +=\n                    denominator_ranked[offset + left_rank] *\n         \
+    \           quotient_ranked[offset + rank - left_rank];\n            }\n     \
+    \   }\n\n        for (std::size_t bit = 1; bit < size; bit <<= 1) {\n        \
+    \    for (std::size_t mask = 0; mask < size; mask++) {\n                if (mask\
+    \ & bit) {\n                    transformed_product[mask] -=\n               \
+    \         transformed_product[mask ^ bit];\n                }\n            }\n\
+    \        }\n\n        for (std::size_t mask = 0; mask < size; mask++) {\n    \
+    \        if (int(std::popcount(mask)) != rank) continue;\n            quotient[mask]\
+    \ =\n                (numerator[mask] - transformed_product[mask]) *\n       \
+    \         inverse_constant;\n            quotient_ranked[mask * rank_count + rank]\
+    \ = quotient[mask];\n        }\n\n        for (std::size_t bit = 1; bit < size;\
+    \ bit <<= 1) {\n            for (std::size_t mask = 0; mask < size; mask++) {\n\
+    \                if (mask & bit) {\n                    quotient_ranked[mask *\
+    \ rank_count + rank] +=\n                        quotient_ranked[(mask ^ bit)\
+    \ * rank_count + rank];\n                }\n            }\n        }\n    }\n\
+    \    return quotient;\n}\n\ntemplate <class T>\nstd::vector<T> normalized_power(std::vector<T>\
+    \ series, T exponent) {\n    assert(is_power_of_two(series.size()));\n    assert(series[0]\
+    \ == T(1));\n    std::vector<T> logarithm(series.size());\n    logarithm[0] =\
+    \ T{};\n    for (std::size_t half = 1; half < series.size(); half <<= 1) {\n \
+    \       std::vector<T> low(series.begin(), series.begin() + half);\n        std::vector<T>\
+    \ high(\n            series.begin() + half,\n            series.begin() + 2 *\
+    \ half\n        );\n        std::vector<T> next = divide(high, low);\n       \
+    \ std::move(next.begin(), next.end(), logarithm.begin() + half);\n    }\n    for\
+    \ (T& value : logarithm) value *= exponent;\n\n    std::vector<T> result(1, T(1));\n\
+    \    result.reserve(series.size());\n    for (std::size_t half = 1; half < series.size();\
+    \ half <<= 1) {\n        std::vector<T> high(\n            logarithm.begin() +\
+    \ half,\n            logarithm.begin() + 2 * half\n        );\n        std::vector<T>\
+    \ next = subset_convolution(std::move(high), result);\n        result.insert(\n\
+    \            result.end(),\n            std::make_move_iterator(next.begin()),\n\
+    \            std::make_move_iterator(next.end())\n        );\n    }\n    return\
+    \ result;\n}\n\n}  // namespace set_power_series_detail\n\n// Returns numerator\
+    \ / denominator under subset convolution.\ntemplate <class T>\nstd::vector<T>\
+    \ set_power_series_divide(\n    const std::vector<T>& numerator,\n    const std::vector<T>&\
+    \ denominator\n) {\n    return set_power_series_detail::divide(numerator, denominator);\n\
+    }\n\ntemplate <class T>\nstd::vector<T> set_power_series_inverse(const std::vector<T>&\
+    \ series) {\n    assert(set_power_series_detail::is_power_of_two(series.size()));\n\
+    \    std::vector<T> identity(series.size());\n    identity[0] = T(1);\n    return\
+    \ set_power_series_divide(identity, series);\n}\n\ntemplate <class T>\nstd::vector<T>\
+    \ set_power_series_exp(const std::vector<T>& series) {\n    assert(set_power_series_detail::is_power_of_two(series.size()));\n\
+    \    assert(series[0] == T{});\n    std::vector<T> result(1, T(1));\n    result.reserve(series.size());\n\
+    \    for (std::size_t half = 1; half < series.size(); half <<= 1) {\n        std::vector<T>\
+    \ high(\n            series.begin() + half,\n            series.begin() + 2 *\
+    \ half\n        );\n        std::vector<T> next = subset_convolution(std::move(high),\
+    \ result);\n        result.insert(\n            result.end(),\n            std::make_move_iterator(next.begin()),\n\
+    \            std::make_move_iterator(next.end())\n        );\n    }\n    return\
+    \ result;\n}\n\ntemplate <class T>\nstd::vector<T> set_power_series_log(const\
+    \ std::vector<T>& series) {\n    assert(set_power_series_detail::is_power_of_two(series.size()));\n\
+    \    assert(series[0] == T(1));\n    std::vector<T> result(series.size());\n \
+    \   for (std::size_t half = 1; half < series.size(); half <<= 1) {\n        std::vector<T>\
+    \ low(series.begin(), series.begin() + half);\n        std::vector<T> high(\n\
+    \            series.begin() + half,\n            series.begin() + 2 * half\n \
+    \       );\n        std::vector<T> next = set_power_series_divide(high, low);\n\
+    \        std::move(next.begin(), next.end(), result.begin() + half);\n    }\n\
+    \    return result;\n}\n\ntemplate <class T>\nstd::vector<T> set_power_series_pow(\n\
+    \    const std::vector<T>& series,\n    long long exponent\n) {\n    return set_power_series_detail::normalized_power(\n\
+    \        series,\n        T(exponent)\n    );\n}\n\ntemplate <class T>\nstd::vector<T>\
+    \ set_power_series_sqrt(const std::vector<T>& series) {\n    return set_power_series_detail::normalized_power(\n\
+    \        series,\n        T(1) / T(2)\n    );\n}\n\n}  // namespace math\n}  //\
+    \ namespace m1une\n\n\n#line 1 \"math/stern_brocot_tree.hpp\"\n\n\n\n#line 10\
+    \ \"math/stern_brocot_tree.hpp\"\n\n#line 12 \"math/stern_brocot_tree.hpp\"\n\n\
+    namespace m1une {\nnamespace math {\n\nenum class SternBrocotDirection {\n   \
+    \ Left,\n    Right,\n};\n\nstruct SternBrocotRun {\n    SternBrocotDirection direction;\n\
+    \    uint64_t count;\n\n    friend bool operator==(const SternBrocotRun&, const\
+    \ SternBrocotRun&) = default;\n};\n\nstruct SternBrocotPath {\n    std::vector<SternBrocotRun>\
+    \ runs;\n\n    bool empty() const {\n        return runs.empty();\n    }\n\n \
+    \   uint64_t depth() const {\n        uint64_t result = 0;\n        for (const\
+    \ SternBrocotRun& run : runs) {\n            assert(run.count <= std::numeric_limits<uint64_t>::max()\
     \ - result);\n            result += run.count;\n        }\n        return result;\n\
     \    }\n\n    void push(SternBrocotDirection direction, uint64_t count = 1) {\n\
     \        if (count == 0) return;\n        if (!runs.empty() && runs.back().direction\
@@ -3728,67 +3856,27 @@ data:
     \ <= maximum);\n        assert(right_denominator <= maximum);\n    }\n    SternBrocotBounds<T>\
     \ result;\n    result.left = {T(left_numerator), T(left_denominator)};\n    result.right\
     \ = {T(right_numerator), T(right_denominator)};\n    return result;\n}\n\n}  //\
-    \ namespace math\n}  // namespace m1une\n\n\n#line 1 \"math/subset_convolution.hpp\"\
-    \n\n\n\n#line 10 \"math/subset_convolution.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ math {\n\ntemplate <typename T>\nstd::vector<T> subset_convolution(\n    std::vector<T>\
-    \ first,\n    std::vector<T> second\n) {\n    assert(first.size() == second.size());\n\
-    \    if (first.empty()) return {};\n    assert((first.size() & (first.size() -\
-    \ 1)) == 0);\n\n    const std::size_t size = first.size();\n    std::size_t bit_count\
-    \ = 0;\n    while ((std::size_t(1) << bit_count) < size) ++bit_count;\n    const\
-    \ std::size_t rank_count = bit_count + 1;\n\n    std::vector<T> first_ranked(size\
-    \ * rank_count);\n    std::vector<T> second_ranked(size * rank_count);\n    for\
-    \ (std::size_t mask = 0; mask < size; ++mask) {\n        const std::size_t rank\
-    \ = std::popcount(mask);\n        first_ranked[mask * rank_count + rank] = std::move(first[mask]);\n\
-    \        second_ranked[mask * rank_count + rank] = std::move(second[mask]);\n\
-    \    }\n\n    for (std::size_t bit = 1; bit < size; bit <<= 1) {\n        for\
-    \ (std::size_t mask = 0; mask < size; ++mask) {\n            if ((mask & bit)\
-    \ == 0) continue;\n            const std::size_t destination = mask * rank_count;\n\
-    \            const std::size_t source = (mask ^ bit) * rank_count;\n         \
-    \   for (std::size_t rank = 0; rank < rank_count; ++rank) {\n                first_ranked[destination\
-    \ + rank] +=\n                    first_ranked[source + rank];\n             \
-    \   second_ranked[destination + rank] +=\n                    second_ranked[source\
-    \ + rank];\n            }\n        }\n    }\n\n    std::vector<T> product(rank_count);\n\
-    \    for (std::size_t mask = 0; mask < size; ++mask) {\n        for (T& value\
-    \ : product) value = T{};\n        const std::size_t offset = mask * rank_count;\n\
-    \        const std::size_t rank_limit = std::popcount(mask);\n        for (std::size_t\
-    \ left = 0; left <= rank_limit; ++left) {\n            const std::size_t right_limit\
-    \ =\n                std::min(rank_limit, bit_count - left);\n            for\
-    \ (std::size_t right = 0; right <= right_limit; ++right) {\n                product[left\
-    \ + right] +=\n                    first_ranked[offset + left] *\n           \
-    \         second_ranked[offset + right];\n            }\n        }\n        for\
-    \ (std::size_t rank = 0; rank < rank_count; ++rank) {\n            first_ranked[offset\
-    \ + rank] = std::move(product[rank]);\n        }\n    }\n\n    for (std::size_t\
-    \ bit = 1; bit < size; bit <<= 1) {\n        for (std::size_t mask = 0; mask <\
-    \ size; ++mask) {\n            if ((mask & bit) == 0) continue;\n            const\
-    \ std::size_t destination = mask * rank_count;\n            const std::size_t\
-    \ source = (mask ^ bit) * rank_count;\n            for (std::size_t rank = 0;\
-    \ rank < rank_count; ++rank) {\n                first_ranked[destination + rank]\
-    \ -=\n                    first_ranked[source + rank];\n            }\n      \
-    \  }\n    }\n\n    std::vector<T> result(size);\n    for (std::size_t mask = 0;\
-    \ mask < size; ++mask) {\n        result[mask] = std::move(\n            first_ranked[mask\
-    \ * rank_count + std::popcount(mask)]\n        );\n    }\n    return result;\n\
-    }\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line 1 \"math/tetration.hpp\"\
-    \n\n\n\n#line 9 \"math/tetration.hpp\"\n\n#line 11 \"math/tetration.hpp\"\n\n\
-    namespace m1une {\nnamespace math {\n\nnamespace tetration_detail {\n\ntemplate\
-    \ <std::integral T>\nrequires(!std::same_as<std::remove_cv_t<T>, bool>)\nuint64_t\
-    \ to_uint64(T value) {\n    if constexpr (std::signed_integral<T>) {\n       \
-    \ assert(value >= 0);\n    }\n    return static_cast<uint64_t>(value);\n}\n\n\
-    inline uint64_t multiply_mod(uint64_t first, uint64_t second, uint64_t mod) {\n\
-    \    return static_cast<uint64_t>(\n        static_cast<__uint128_t>(first) *\
-    \ second % mod\n    );\n}\n\ninline uint64_t pow_mod(uint64_t base, __uint128_t\
-    \ exponent, uint64_t mod) {\n    assert(mod >= 1);\n    if (mod == 1) return 0;\n\
-    \    base %= mod;\n    uint64_t result = 1 % mod;\n    while (exponent > 0) {\n\
-    \        if ((exponent & 1) != 0) result = multiply_mod(result, base, mod);\n\
-    \        base = multiply_mod(base, base, mod);\n        exponent >>= 1;\n    }\n\
-    \    return result;\n}\n\ninline uint64_t pow_bounded(uint64_t base, uint64_t\
-    \ exponent, uint64_t limit) {\n    if (limit == 0) return 0;\n    __uint128_t\
-    \ result = 1;\n    for (uint64_t i = 0; i < exponent; i++) {\n        result *=\
-    \ base;\n        if (result >= limit) return limit;\n    }\n    return static_cast<uint64_t>(result);\n\
-    }\n\ninline uint64_t exponent_threshold(uint64_t base, uint64_t limit) {\n   \
-    \ assert(base >= 2);\n    if (limit <= 1) return 0;\n\n    uint64_t exponent =\
-    \ 0;\n    uint64_t value = 1;\n    while (value < limit) {\n        exponent++;\n\
-    \        if (value > limit / base) return exponent;\n        value *= base;\n\
-    \    }\n    return exponent;\n}\n\ninline uint64_t tetration_bounded_unsigned(uint64_t\
+    \ namespace math\n}  // namespace m1une\n\n\n#line 1 \"math/tetration.hpp\"\n\n\
+    \n\n#line 9 \"math/tetration.hpp\"\n\n#line 11 \"math/tetration.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace math {\n\nnamespace tetration_detail {\n\ntemplate <std::integral\
+    \ T>\nrequires(!std::same_as<std::remove_cv_t<T>, bool>)\nuint64_t to_uint64(T\
+    \ value) {\n    if constexpr (std::signed_integral<T>) {\n        assert(value\
+    \ >= 0);\n    }\n    return static_cast<uint64_t>(value);\n}\n\ninline uint64_t\
+    \ multiply_mod(uint64_t first, uint64_t second, uint64_t mod) {\n    return static_cast<uint64_t>(\n\
+    \        static_cast<__uint128_t>(first) * second % mod\n    );\n}\n\ninline uint64_t\
+    \ pow_mod(uint64_t base, __uint128_t exponent, uint64_t mod) {\n    assert(mod\
+    \ >= 1);\n    if (mod == 1) return 0;\n    base %= mod;\n    uint64_t result =\
+    \ 1 % mod;\n    while (exponent > 0) {\n        if ((exponent & 1) != 0) result\
+    \ = multiply_mod(result, base, mod);\n        base = multiply_mod(base, base,\
+    \ mod);\n        exponent >>= 1;\n    }\n    return result;\n}\n\ninline uint64_t\
+    \ pow_bounded(uint64_t base, uint64_t exponent, uint64_t limit) {\n    if (limit\
+    \ == 0) return 0;\n    __uint128_t result = 1;\n    for (uint64_t i = 0; i < exponent;\
+    \ i++) {\n        result *= base;\n        if (result >= limit) return limit;\n\
+    \    }\n    return static_cast<uint64_t>(result);\n}\n\ninline uint64_t exponent_threshold(uint64_t\
+    \ base, uint64_t limit) {\n    assert(base >= 2);\n    if (limit <= 1) return\
+    \ 0;\n\n    uint64_t exponent = 0;\n    uint64_t value = 1;\n    while (value\
+    \ < limit) {\n        exponent++;\n        if (value > limit / base) return exponent;\n\
+    \        value *= base;\n    }\n    return exponent;\n}\n\ninline uint64_t tetration_bounded_unsigned(uint64_t\
     \ base, uint64_t height, uint64_t limit) {\n    if (limit == 0) return 0;\n  \
     \  if (height == 0) return limit < 1 ? limit : 1;\n    if (height == 1) return\
     \ base < limit ? base : limit;\n\n    if (base == 0) {\n        const uint64_t\
@@ -3986,7 +4074,7 @@ data:
     \        for (UInt value : basis_) {\n            if (value != 0) result.push_back(value);\n\
     \        }\n        return result;\n    }\n\nprivate:\n    std::array<UInt, bit_width>\
     \ basis_{};\n    int rank_ = 0;\n};\n\n}  // namespace math\n}  // namespace m1une\n\
-    \n\n#line 37 \"math/all.hpp\"\n\n\n#line 12 \"verify/math/math_algorithms.test.cpp\"\
+    \n\n#line 38 \"math/all.hpp\"\n\n\n#line 12 \"verify/math/math_algorithms.test.cpp\"\
     \n\nlong long floor_div(long long numerator, long long denominator) {\n    long\
     \ long quotient = numerator / denominator;\n    if (numerator % denominator <\
     \ 0) quotient--;\n    return quotient;\n}\n\nvoid test_number_theory() {\n   \
@@ -4376,8 +4464,9 @@ data:
   - math/prime_sieve.hpp
   - math/rational.hpp
   - math/repunit.hpp
-  - math/stern_brocot_tree.hpp
+  - math/set_power_series.hpp
   - math/subset_convolution.hpp
+  - math/stern_brocot_tree.hpp
   - math/tetration.hpp
   - math/totient_sum.hpp
   - math/two_square_sum.hpp
@@ -4385,7 +4474,7 @@ data:
   isVerificationFile: true
   path: verify/math/math_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-16 17:56:33+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/math_algorithms.test.cpp

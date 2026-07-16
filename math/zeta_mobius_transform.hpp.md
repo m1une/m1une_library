@@ -154,9 +154,9 @@ data:
   timestamp: '2026-06-22 22:56:44+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/math/bitwise_convolution.test.cpp
   - verify/math/math_algorithms.test.cpp
   - verify/math/zeta_mobius_transform.test.cpp
-  - verify/math/bitwise_convolution.test.cpp
 documentation_of: math/zeta_mobius_transform.hpp
 layout: document
 title: Zeta and Mobius Transform

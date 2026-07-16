@@ -813,6 +813,9 @@ data:
       path: math/repunit.hpp
       title: Repunit
     - icon: ':heavy_check_mark:'
+      path: math/set_power_series.hpp
+      title: Set Power Series
+    - icon: ':heavy_check_mark:'
       path: math/stern_brocot_tree.hpp
       title: Stern-Brocot Tree
     - icon: ':heavy_check_mark:'
@@ -1808,6 +1811,12 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/repunit.test.cpp
       title: verify/math/repunit.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/set_power_series_exp.test.cpp
+      title: verify/math/set_power_series_exp.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/set_power_series_log.test.cpp
+      title: verify/math/set_power_series_log.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/stern_brocot_tree.test.cpp
       title: verify/math/stern_brocot_tree.test.cpp

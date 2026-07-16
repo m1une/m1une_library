@@ -141,16 +141,16 @@ data:
   isVerificationFile: false
   path: string/suffix_array.hpp
   requiredBy:
+  - string/longest_common_extension.hpp
   - string/all.hpp
   - string/longest_common_substring.hpp
-  - string/longest_common_extension.hpp
   timestamp: '2026-06-21 02:43:08+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/string/longest_common_extension.test.cpp
   - verify/string/string_algorithms.test.cpp
-  - verify/string/longest_common_substring.test.cpp
+  - verify/string/longest_common_extension.test.cpp
   - verify/string/suffix_array.test.cpp
+  - verify/string/longest_common_substring.test.cpp
 documentation_of: string/suffix_array.hpp
 layout: document
 title: Suffix Array and LCP Array
