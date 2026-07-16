@@ -49,6 +49,20 @@ void test_edge_cases() {
     unsigned_values.push_back(7);
     m1une::ds::WaveletMatrix<unsigned int> unsigned_matrix(unsigned_values);
     assert(unsigned_matrix.kth_smallest(0, 3, 2) == std::numeric_limits<unsigned int>::max());
+
+    std::vector<long long> equal_values(80, -1234567890123LL);
+    m1une::ds::WaveletMatrix<long long> equal_matrix(equal_values);
+    assert(equal_matrix.access(37) == -1234567890123LL);
+    assert(equal_matrix.rank(-1234567890123LL, 7, 63) == 56);
+    assert(equal_matrix.rank(-1234567890122LL, 0, 80) == 0);
+    assert(equal_matrix.kth_smallest(4, 70, 32) == -1234567890123LL);
+    assert(equal_matrix.range_freq(0, 80, -1234567890123LL) == 0);
+    assert(equal_matrix.range_freq(0, 80, -1234567890122LL) == 80);
+
+    std::vector<signed char> byte_values = {-120, -3, 5, 100};
+    m1une::ds::WaveletMatrix<signed char> byte_matrix(byte_values);
+    assert(byte_matrix.kth_smallest(0, 4, 2) == 5);
+    assert(byte_matrix.range_freq(0, 4, static_cast<signed char>(6)) == 3);
 }
 
 void test_randomized() {
@@ -61,16 +75,21 @@ void test_randomized() {
 
     for (int trial = 0; trial < 80; trial++) {
         int n = int(random() % 80);
+        int offset = trial % 3 == 0
+                         ? 1000000000
+                         : (trial % 3 == 1 ? -1000000000 : 0);
         std::vector<int> values(n);
-        for (int& value : values) value = int(random() % 101) - 50;
+        for (int& value : values) {
+            value = offset + int(random() % 101) - 50;
+        }
         m1une::ds::WaveletMatrix<int> matrix(values);
 
         for (int query = 0; query < 500; query++) {
             int l = int(random() % std::uint64_t(n + 1));
             int r = int(random() % std::uint64_t(n + 1));
             if (r < l) std::swap(l, r);
-            int x = int(random() % 121) - 60;
-            int y = int(random() % 121) - 60;
+            int x = offset + int(random() % 121) - 60;
+            int y = offset + int(random() % 121) - 60;
             if (y < x) std::swap(x, y);
 
             [[maybe_unused]] int rank = 0;

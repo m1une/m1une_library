@@ -55,10 +55,6 @@ class WaveletMatrix2D {
             }
             return result;
         }
-
-        int rank0(int r) const {
-            return r - rank1(r);
-        }
     };
 
     class RankWaveletMatrix {
@@ -79,15 +75,15 @@ class WaveletMatrix2D {
 
             int result = 0;
             for (int level = 0; level < _log; level++) {
-                int l0 = _matrix[level].rank0(l);
-                int r0 = _matrix[level].rank0(r);
+                int l1 = _matrix[level].rank1(l);
+                int r1 = _matrix[level].rank1(r);
                 if (bit(upper, level)) {
-                    result += r0 - l0;
-                    l = _zero_count[level] + _matrix[level].rank1(l);
-                    r = _zero_count[level] + _matrix[level].rank1(r);
+                    result += (r - l) - (r1 - l1);
+                    l = _zero_count[level] + l1;
+                    r = _zero_count[level] + r1;
                 } else {
-                    l = l0;
-                    r = r0;
+                    l -= l1;
+                    r -= r1;
                 }
             }
             return result;
@@ -126,12 +122,16 @@ class WaveletMatrix2D {
 
             for (int level = 0; level < _log; level++) {
                 _matrix.emplace_back(_n);
+                int zeros = 0;
                 for (int i = 0; i < _n; i++) {
-                    if (bit(current[i], level)) _matrix.back().set(i);
+                    if (bit(current[i], level)) {
+                        _matrix.back().set(i);
+                    } else {
+                        zeros++;
+                    }
                 }
                 _matrix.back().build();
 
-                int zeros = _matrix.back().rank0(_n);
                 _zero_count[level] = zeros;
                 int zero_position = 0;
                 int one_position = zeros;
@@ -230,8 +230,10 @@ class WaveletMatrix2D {
 
         int result = 0;
         for (int level = 0; level < _log; level++) {
-            int l0 = _matrix[level].rank0(l);
-            int r0 = _matrix[level].rank0(r);
+            int l1 = _matrix[level].rank1(l);
+            int r1 = _matrix[level].rank1(r);
+            int l0 = l - l1;
+            int r0 = r - r1;
             if (bit(second_upper, level)) {
                 result += _zero_first_matrix[level].range_freq(
                     l0,
@@ -239,8 +241,8 @@ class WaveletMatrix2D {
                     first_lower,
                     first_upper
                 );
-                l = _zero_count[level] + _matrix[level].rank1(l);
-                r = _zero_count[level] + _matrix[level].rank1(r);
+                l = _zero_count[level] + l1;
+                r = _zero_count[level] + r1;
             } else {
                 l = l0;
                 r = r0;
@@ -315,12 +317,16 @@ class WaveletMatrix2D {
 
         for (int level = 0; level < _log; level++) {
             _matrix.emplace_back(_n);
+            int zeros = 0;
             for (int i = 0; i < _n; i++) {
-                if (bit(current_second[i], level)) _matrix.back().set(i);
+                if (bit(current_second[i], level)) {
+                    _matrix.back().set(i);
+                } else {
+                    zeros++;
+                }
             }
             _matrix.back().build();
 
-            int zeros = _matrix.back().rank0(_n);
             _zero_count[level] = zeros;
             int zero_position = 0;
             int one_position = zeros;
@@ -411,8 +417,10 @@ class WaveletMatrix2D {
 
         int second_rank = 0;
         for (int level = 0; level < _log; level++) {
-            int l0 = _matrix[level].rank0(l);
-            int r0 = _matrix[level].rank0(r);
+            int l1 = _matrix[level].rank1(l);
+            int r1 = _matrix[level].rank1(r);
+            int l0 = l - l1;
+            int r0 = r - r1;
             int zeros = _zero_first_matrix[level].range_freq(
                 l0,
                 r0,
@@ -425,8 +433,8 @@ class WaveletMatrix2D {
             } else {
                 k -= zeros;
                 second_rank |= 1 << (_log - 1 - level);
-                l = _zero_count[level] + _matrix[level].rank1(l);
-                r = _zero_count[level] + _matrix[level].rank1(r);
+                l = _zero_count[level] + l1;
+                r = _zero_count[level] + r1;
             }
         }
         return _second_coordinates[second_rank];

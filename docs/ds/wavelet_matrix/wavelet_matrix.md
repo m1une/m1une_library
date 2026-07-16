@@ -12,21 +12,23 @@ frequency queries, and predecessor/successor searches.
 Each level uses a packed bitvector with constant-time prefix rank. Signed values
 are ordered by flipping their sign bit internally, so negative values and the
 full range of the selected integer type work without coordinate compression.
+Leading bits shared by every value are omitted.
 
 ## Template Parameter
 
 * `T`: A non-`bool` integral type.
 
-The implementation uses every value bit. Let $B$ be the bit width of `T`, such
-as 32 for `int` or 64 for `long long`.
+Let $B$ be the bit width of `T`, such as 32 for `int` or 64 for `long long`.
+Let $L$ be the bit width of the exclusive-or of the minimum and maximum
+internally encoded values. Thus $0 \le L \le B$; equal values have $L = 0$.
 
 ## Construction
 
 * `WaveletMatrix()`: creates an empty matrix.
 * `WaveletMatrix(const std::vector<T>& values)`: builds from `values`.
 
-Construction takes $O(NB)$ time and $O(NB)$ bits for level bitvectors, plus
-rank metadata.
+Construction takes $O(NL + N)$ time and $O(NL)$ bits for level bitvectors,
+plus rank metadata and $O(N)$ temporary storage.
 
 ## Methods
 
@@ -36,16 +38,16 @@ All index ranges are half-open.
 | --- | --- | --- |
 | `int size()` | Returns the sequence length. | $O(1)$ |
 | `bool empty()` | Returns whether the sequence is empty. | $O(1)$ |
-| `T access(int p)` | Returns the value at index `p`. | $O(B)$ |
-| `T operator[](int p)` | Equivalent to `access(p)`. | $O(B)$ |
-| `int rank(T x, int r)` | Counts occurrences of `x` in `[0, r)`. | $O(B)$ |
-| `int rank(T x, int l, int r)` | Counts occurrences of `x` in `[l, r)`. | $O(B)$ |
-| `T kth_smallest(int l, int r, int k)` | Returns the zero-based `k`-th smallest value in `[l, r)`. | $O(B)$ |
-| `T kth_largest(int l, int r, int k)` | Returns the zero-based `k`-th largest value in `[l, r)`. | $O(B)$ |
-| `int range_freq(int l, int r, T upper)` | Counts values less than `upper` in `[l, r)`. | $O(B)$ |
-| `int range_freq(int l, int r, T lower, T upper)` | Counts values in `[lower, upper)` within `[l, r)`. | $O(B)$ |
-| `optional<T> prev_value(int l, int r, T upper)` | Returns the greatest value less than `upper`, or `nullopt`. | $O(B)$ |
-| `optional<T> next_value(int l, int r, T lower)` | Returns the smallest value at least `lower`, or `nullopt`. | $O(B)$ |
+| `T access(int p)` | Returns the value at index `p`. | $O(L)$ |
+| `T operator[](int p)` | Equivalent to `access(p)`. | $O(L)$ |
+| `int rank(T x, int r)` | Counts occurrences of `x` in `[0, r)`. | $O(L)$ |
+| `int rank(T x, int l, int r)` | Counts occurrences of `x` in `[l, r)`. | $O(L)$ |
+| `T kth_smallest(int l, int r, int k)` | Returns the zero-based `k`-th smallest value in `[l, r)`. | $O(L)$ |
+| `T kth_largest(int l, int r, int k)` | Returns the zero-based `k`-th largest value in `[l, r)`. | $O(L)$ |
+| `int range_freq(int l, int r, T upper)` | Counts values less than `upper` in `[l, r)`. | $O(L)$ |
+| `int range_freq(int l, int r, T lower, T upper)` | Counts values in `[lower, upper)` within `[l, r)`. | $O(L)$ |
+| `optional<T> prev_value(int l, int r, T upper)` | Returns the greatest value less than `upper`, or `nullopt`. | $O(L)$ |
+| `optional<T> next_value(int l, int r, T lower)` | Returns the smallest value at least `lower`, or `nullopt`. | $O(L)$ |
 
 `kth_smallest` and `kth_largest` require `0 <= k < r - l`.
 

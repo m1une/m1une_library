@@ -59,6 +59,18 @@ void test_weighted_ties() {
     assert(matrix.sum_k_smallest(0, 4, 3) == 70);
     assert(matrix.sum_k_largest(0, 4, 1) == 30);
     assert(matrix.sum_k_largest(0, 4, 2) == 40);
+
+    std::vector<int> equal_values(4, 1000000000);
+    m1une::ds::WaveletMatrixSum<int, long long> equal_matrix(
+        equal_values,
+        weights
+    );
+    assert(equal_matrix.access(2) == 1000000000);
+    assert(equal_matrix.rank(1000000000, 1, 4) == 3);
+    assert(equal_matrix.rank(999999999, 0, 4) == 0);
+    assert(equal_matrix.range_sum(1, 4, 1000000001) == 90);
+    assert(equal_matrix.sum_k_smallest(0, 4, 2) == 30);
+    assert(equal_matrix.sum_k_largest(0, 4, 2) == 70);
 }
 
 void test_randomized() {
@@ -71,10 +83,13 @@ void test_randomized() {
 
     for (int trial = 0; trial < 70; trial++) {
         int n = int(random() % 70);
+        int offset = trial % 3 == 0
+                         ? 1000000000
+                         : (trial % 3 == 1 ? -1000000000 : 0);
         std::vector<int> values(n);
         std::vector<long long> weights(n);
         for (int i = 0; i < n; i++) {
-            values[i] = int(random() % 61) - 30;
+            values[i] = offset + int(random() % 61) - 30;
             weights[i] = static_cast<long long>(random() % 101) - 50;
         }
         m1une::ds::WaveletMatrixSum<int, long long> matrix(values, weights);
@@ -83,8 +98,8 @@ void test_randomized() {
             int l = int(random() % std::uint64_t(n + 1));
             int r = int(random() % std::uint64_t(n + 1));
             if (r < l) std::swap(l, r);
-            int lower = int(random() % 81) - 40;
-            int upper = int(random() % 81) - 40;
+            int lower = offset + int(random() % 81) - 40;
+            int upper = offset + int(random() % 81) - 40;
             if (upper < lower) std::swap(lower, upper);
 
             [[maybe_unused]] long long total = 0;

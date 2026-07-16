@@ -24,10 +24,11 @@ struct WaveletMatrixSum {
     using unsigned_type = std::make_unsigned_t<T>;
 
    private:
-    static constexpr int bit_width = std::numeric_limits<unsigned_type>::digits;
+    static constexpr int value_bit_width =
+        std::numeric_limits<unsigned_type>::digits;
     static constexpr unsigned_type sign_mask = [] {
         if constexpr (std::signed_integral<T>) {
-            return unsigned_type(1) << (bit_width - 1);
+            return unsigned_type(1) << (value_bit_width - 1);
         } else {
             return unsigned_type(0);
         }
@@ -68,13 +69,13 @@ struct WaveletMatrixSum {
             }
             return result;
         }
-
-        int rank0(int r) const {
-            return r - rank1(r);
-        }
     };
 
     int _n;
+    int _log;
+    unsigned_type _key_prefix;
+    unsigned_type _min_key;
+    unsigned_type _max_key;
     std::vector<BitVector> _matrix;
     std::vector<int> _zero_count;
     std::vector<std::vector<Sum>> _zero_prefix;
@@ -100,8 +101,8 @@ struct WaveletMatrixSum {
         }
     }
 
-    static bool bit(unsigned_type value, int level) {
-        return (value >> (bit_width - 1 - level)) & unsigned_type(1);
+    bool bit(unsigned_type value, int level) const {
+        return (value >> (_log - 1 - level)) & unsigned_type(1);
     }
 
     Sum zero_sum(int level, int l, int r) const {
@@ -109,34 +110,42 @@ struct WaveletMatrixSum {
     }
 
     Sum sum_less_encoded(int l, int r, unsigned_type upper) const {
+        if (_n == 0 || upper <= _min_key) return Sum{};
+        if (upper > _max_key) {
+            return _original_prefix[r] - _original_prefix[l];
+        }
+
         Sum result{};
-        for (int level = 0; level < bit_width; level++) {
-            int l0 = _matrix[level].rank0(l);
-            int r0 = _matrix[level].rank0(r);
+        for (int level = 0; level < _log; level++) {
+            int l1 = _matrix[level].rank1(l);
+            int r1 = _matrix[level].rank1(r);
             if (bit(upper, level)) {
                 result = result + zero_sum(level, l, r);
-                l = _zero_count[level] + _matrix[level].rank1(l);
-                r = _zero_count[level] + _matrix[level].rank1(r);
+                l = _zero_count[level] + l1;
+                r = _zero_count[level] + r1;
             } else {
-                l = l0;
-                r = r0;
+                l -= l1;
+                r -= r1;
             }
         }
         return result;
     }
 
     int count_less_encoded(int l, int r, unsigned_type upper) const {
+        if (_n == 0 || upper <= _min_key) return 0;
+        if (upper > _max_key) return r - l;
+
         int result = 0;
-        for (int level = 0; level < bit_width; level++) {
-            int l0 = _matrix[level].rank0(l);
-            int r0 = _matrix[level].rank0(r);
+        for (int level = 0; level < _log; level++) {
+            int l1 = _matrix[level].rank1(l);
+            int r1 = _matrix[level].rank1(r);
             if (bit(upper, level)) {
-                result += r0 - l0;
-                l = _zero_count[level] + _matrix[level].rank1(l);
-                r = _zero_count[level] + _matrix[level].rank1(r);
+                result += (r - l) - (r1 - l1);
+                l = _zero_count[level] + l1;
+                r = _zero_count[level] + r1;
             } else {
-                l = l0;
-                r = r0;
+                l -= l1;
+                r -= r1;
             }
         }
         return result;
@@ -155,24 +164,41 @@ struct WaveletMatrixSum {
         for (int i = 0; i < _n; i++) {
             _original_prefix[i + 1] = _original_prefix[i] + weights[i];
         }
+        if (_n == 0) {
+            _final_prefix.assign(1, Sum{});
+            return;
+        }
 
-        _matrix.reserve(bit_width);
-        _zero_prefix.reserve(bit_width);
-        for (int level = 0; level < bit_width; level++) {
+        _min_key = current_keys[0];
+        _max_key = current_keys[0];
+        for (unsigned_type key : current_keys) {
+            if (key < _min_key) _min_key = key;
+            if (_max_key < key) _max_key = key;
+        }
+        _log = int(std::bit_width(unsigned_type(_min_key ^ _max_key)));
+        if (_log != value_bit_width) {
+            _key_prefix = (_min_key >> _log) << _log;
+        }
+        _zero_count.assign(_log, 0);
+
+        _matrix.reserve(_log);
+        _zero_prefix.reserve(_log);
+        for (int level = 0; level < _log; level++) {
             _matrix.emplace_back(_n);
             _zero_prefix.emplace_back(std::size_t(_n) + 1, Sum{});
+            int zeros = 0;
             for (int i = 0; i < _n; i++) {
                 bool one = bit(current_keys[i], level);
                 if (one) _matrix.back().set(i);
                 _zero_prefix.back()[i + 1] = _zero_prefix.back()[i];
                 if (!one) {
+                    zeros++;
                     _zero_prefix.back()[i + 1] =
                         _zero_prefix.back()[i + 1] + current_weights[i];
                 }
             }
             _matrix.back().build();
 
-            int zeros = _matrix.back().rank0(_n);
             _zero_count[level] = zeros;
             int zero_pos = 0;
             int one_pos = zeros;
@@ -200,17 +226,20 @@ struct WaveletMatrixSum {
    public:
     WaveletMatrixSum()
         : _n(0),
-          _matrix(bit_width),
-          _zero_count(bit_width, 0),
-          _zero_prefix(bit_width, std::vector<Sum>(1, Sum{})),
+          _log(0),
+          _key_prefix(0),
+          _min_key(0),
+          _max_key(0),
           _original_prefix(1, Sum{}),
           _final_prefix(1, Sum{}) {}
 
     explicit WaveletMatrixSum(const std::vector<T>& values)
         requires std::convertible_to<T, Sum>
         : _n(int(values.size())),
-          _matrix(),
-          _zero_count(bit_width, 0) {
+          _log(0),
+          _key_prefix(0),
+          _min_key(0),
+          _max_key(0) {
         std::vector<Sum> weights;
         weights.reserve(values.size());
         for (T value : values) weights.push_back(static_cast<Sum>(value));
@@ -221,8 +250,10 @@ struct WaveletMatrixSum {
         const std::vector<T>& values,
         const std::vector<Sum>& weights
     ) : _n(int(values.size())),
-        _matrix(),
-        _zero_count(bit_width, 0) {
+        _log(0),
+        _key_prefix(0),
+        _min_key(0),
+        _max_key(0) {
         build(values, weights);
     }
 
@@ -236,14 +267,15 @@ struct WaveletMatrixSum {
 
     T access(int p) const {
         assert(0 <= p && p < _n);
-        unsigned_type key = 0;
-        for (int level = 0; level < bit_width; level++) {
+        unsigned_type key = _key_prefix;
+        for (int level = 0; level < _log; level++) {
+            int ones_before = _matrix[level].rank1(p);
             bool one = _matrix[level].get(p);
             if (one) {
-                key |= unsigned_type(1) << (bit_width - 1 - level);
-                p = _zero_count[level] + _matrix[level].rank1(p);
+                key |= unsigned_type(1) << (_log - 1 - level);
+                p = _zero_count[level] + ones_before;
             } else {
-                p = _matrix[level].rank0(p);
+                p -= ones_before;
             }
         }
         return decode(key);
@@ -261,13 +293,16 @@ struct WaveletMatrixSum {
     int rank(T value, int l, int r) const {
         assert(0 <= l && l <= r && r <= _n);
         unsigned_type key = encode(value);
-        for (int level = 0; level < bit_width; level++) {
+        if (_n == 0 || key < _min_key || _max_key < key) return 0;
+        for (int level = 0; level < _log; level++) {
+            int l1 = _matrix[level].rank1(l);
+            int r1 = _matrix[level].rank1(r);
             if (bit(key, level)) {
-                l = _zero_count[level] + _matrix[level].rank1(l);
-                r = _zero_count[level] + _matrix[level].rank1(r);
+                l = _zero_count[level] + l1;
+                r = _zero_count[level] + r1;
             } else {
-                l = _matrix[level].rank0(l);
-                r = _matrix[level].rank0(r);
+                l -= l1;
+                r -= r1;
             }
         }
         return r - l;
@@ -276,19 +311,21 @@ struct WaveletMatrixSum {
     T kth_smallest(int l, int r, int k) const {
         assert(0 <= l && l <= r && r <= _n);
         assert(0 <= k && k < r - l);
-        unsigned_type key = 0;
-        for (int level = 0; level < bit_width; level++) {
-            int l0 = _matrix[level].rank0(l);
-            int r0 = _matrix[level].rank0(r);
+        unsigned_type key = _key_prefix;
+        for (int level = 0; level < _log; level++) {
+            int l1 = _matrix[level].rank1(l);
+            int r1 = _matrix[level].rank1(r);
+            int l0 = l - l1;
+            int r0 = r - r1;
             int zeros = r0 - l0;
             if (k < zeros) {
                 l = l0;
                 r = r0;
             } else {
                 k -= zeros;
-                key |= unsigned_type(1) << (bit_width - 1 - level);
-                l = _zero_count[level] + _matrix[level].rank1(l);
-                r = _zero_count[level] + _matrix[level].rank1(r);
+                key |= unsigned_type(1) << (_log - 1 - level);
+                l = _zero_count[level] + l1;
+                r = _zero_count[level] + r1;
             }
         }
         return decode(key);
@@ -345,9 +382,11 @@ struct WaveletMatrixSum {
         assert(0 <= l && l <= r && r <= _n);
         assert(0 <= k && k <= r - l);
         Sum result{};
-        for (int level = 0; level < bit_width; level++) {
-            int l0 = _matrix[level].rank0(l);
-            int r0 = _matrix[level].rank0(r);
+        for (int level = 0; level < _log; level++) {
+            int l1 = _matrix[level].rank1(l);
+            int r1 = _matrix[level].rank1(r);
+            int l0 = l - l1;
+            int r0 = r - r1;
             int zeros = r0 - l0;
             if (k < zeros) {
                 l = l0;
@@ -355,8 +394,8 @@ struct WaveletMatrixSum {
             } else {
                 result = result + zero_sum(level, l, r);
                 k -= zeros;
-                l = _zero_count[level] + _matrix[level].rank1(l);
-                r = _zero_count[level] + _matrix[level].rank1(r);
+                l = _zero_count[level] + l1;
+                r = _zero_count[level] + r1;
             }
         }
         return result + (_final_prefix[l + k] - _final_prefix[l]);
