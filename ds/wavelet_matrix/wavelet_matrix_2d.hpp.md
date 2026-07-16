@@ -4,22 +4,22 @@ data:
   _extendedRequiredBy: []
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
-    path: verify/ds/range_query/wavelet_matrix_2d.test.cpp
-    title: verify/ds/range_query/wavelet_matrix_2d.test.cpp
+    path: verify/ds/wavelet_matrix/wavelet_matrix_2d.test.cpp
+    title: verify/ds/wavelet_matrix/wavelet_matrix_2d.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"ds/range_query/wavelet_matrix_2d.hpp\"\n\n\n\n#include <algorithm>\n\
-    #include <bit>\n#include <cassert>\n#include <cstdint>\n#include <utility>\n#include\
-    \ <vector>\n\nnamespace m1une {\nnamespace ds {\n\n// A static wavelet matrix\
-    \ for a sequence of pairs.\n//\n// Besides the index range, queries can restrict\
-    \ the first component and count\n// or select by the second component. This corresponds\
-    \ to orthogonal queries in\n// the three dimensions (index, first, second).\n\
-    template <class X, class Y = X>\nclass WaveletMatrix2D {\n   public:\n    using\
-    \ first_type = X;\n    using second_type = Y;\n    using value_type = std::pair<X,\
-    \ Y>;\n\n   private:\n    struct BitVector {\n        std::vector<std::uint64_t>\
+  bundledCode: "#line 1 \"ds/wavelet_matrix/wavelet_matrix_2d.hpp\"\n\n\n\n#include\
+    \ <algorithm>\n#include <bit>\n#include <cassert>\n#include <cstdint>\n#include\
+    \ <utility>\n#include <vector>\n\nnamespace m1une {\nnamespace ds {\n\n// A static\
+    \ wavelet matrix for a sequence of pairs.\n//\n// Besides the index range, queries\
+    \ can restrict the first component and count\n// or select by the second component.\
+    \ This corresponds to orthogonal queries in\n// the three dimensions (index, first,\
+    \ second).\ntemplate <class X, class Y = X>\nclass WaveletMatrix2D {\n   public:\n\
+    \    using first_type = X;\n    using second_type = Y;\n    using value_type =\
+    \ std::pair<X, Y>;\n\n   private:\n    struct BitVector {\n        std::vector<std::uint64_t>\
     \ bits;\n        std::vector<int> prefix;\n\n        BitVector() = default;\n\n\
     \        explicit BitVector(int n)\n            : bits((std::size_t(n) + 63) >>\
     \ 6, 0),\n              prefix(bits.size() + 1, 0) {}\n\n        void set(int\
@@ -176,7 +176,7 @@ data:
     \ + _matrix[level].rank1(l);\n                r = _zero_count[level] + _matrix[level].rank1(r);\n\
     \            }\n        }\n        return _second_coordinates[second_rank];\n\
     \    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_WAVELET_MATRIX_2D_HPP\n#define M1UNE_WAVELET_MATRIX_2D_HPP\
+  code: "#ifndef M1UNE_DS_WAVELET_MATRIX_WAVELET_MATRIX_2D_HPP\n#define M1UNE_DS_WAVELET_MATRIX_WAVELET_MATRIX_2D_HPP\
     \ 1\n\n#include <algorithm>\n#include <bit>\n#include <cassert>\n#include <cstdint>\n\
     #include <utility>\n#include <vector>\n\nnamespace m1une {\nnamespace ds {\n\n\
     // A static wavelet matrix for a sequence of pairs.\n//\n// Besides the index\
@@ -341,16 +341,16 @@ data:
     \           second_rank |= 1 << (_log - 1 - level);\n                l = _zero_count[level]\
     \ + _matrix[level].rank1(l);\n                r = _zero_count[level] + _matrix[level].rank1(r);\n\
     \            }\n        }\n        return _second_coordinates[second_rank];\n\
-    \    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n#endif  // M1UNE_WAVELET_MATRIX_2D_HPP\n"
+    \    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n#endif  // M1UNE_DS_WAVELET_MATRIX_WAVELET_MATRIX_2D_HPP\n"
   dependsOn: []
   isVerificationFile: false
-  path: ds/range_query/wavelet_matrix_2d.hpp
+  path: ds/wavelet_matrix/wavelet_matrix_2d.hpp
   requiredBy: []
-  timestamp: '2026-07-13 03:27:27+09:00'
+  timestamp: '2026-07-16 18:02:32+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/range_query/wavelet_matrix_2d.test.cpp
-documentation_of: ds/range_query/wavelet_matrix_2d.hpp
+  - verify/ds/wavelet_matrix/wavelet_matrix_2d.test.cpp
+documentation_of: ds/wavelet_matrix/wavelet_matrix_2d.hpp
 layout: document
 title: Wavelet Matrix 2D
 ---
@@ -456,7 +456,7 @@ not mutate the structure.
 ## Example
 
 ```cpp
-#include "ds/range_query/wavelet_matrix_2d.hpp"
+#include "ds/wavelet_matrix/wavelet_matrix_2d.hpp"
 
 #include <cassert>
 #include <utility>

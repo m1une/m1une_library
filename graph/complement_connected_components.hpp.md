@@ -219,9 +219,9 @@ data:
   timestamp: '2026-07-14 02:59:03+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/graph/graph_algorithms.test.cpp
   - verify/graph/cow_game.test.cpp
   - verify/graph/range_edge_graph.test.cpp
-  - verify/graph/graph_algorithms.test.cpp
   - verify/graph/complement_connected_components.test.cpp
 documentation_of: graph/complement_connected_components.hpp
 layout: document

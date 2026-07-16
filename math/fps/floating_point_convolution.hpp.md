@@ -151,8 +151,8 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
-  - verify/math/fps/floating_point_convolution.test.cpp
   - verify/math/fps/fps_algorithms.test.cpp
+  - verify/math/fps/floating_point_convolution.test.cpp
 documentation_of: math/fps/floating_point_convolution.hpp
 layout: document
 title: Floating-Point Convolution

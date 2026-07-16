@@ -2,7 +2,7 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: ds/range_query/wavelet_matrix.hpp
+    path: ds/wavelet_matrix/wavelet_matrix.hpp
     title: Wavelet Matrix
   _extendedRequiredBy: []
   _extendedVerifiedWith:
@@ -14,7 +14,7 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"ds/range_query/range_lis_query.hpp\"\n\n\n\n#line 1 \"ds/range_query/wavelet_matrix.hpp\"\
+  bundledCode: "#line 1 \"ds/range_query/range_lis_query.hpp\"\n\n\n\n#line 1 \"ds/wavelet_matrix/wavelet_matrix.hpp\"\
     \n\n\n\n#include <bit>\n#include <cassert>\n#include <concepts>\n#include <cstdint>\n\
     #include <limits>\n#include <optional>\n#include <type_traits>\n#include <utility>\n\
     #include <vector>\n\nnamespace m1une {\nnamespace ds {\n\n// A static wavelet\
@@ -218,39 +218,39 @@ data:
     \  }\n\n    int lis_length(int left, int right) const {\n        return query(left,\
     \ right);\n    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_DS_RANGE_QUERY_RANGE_LIS_QUERY_HPP\n#define M1UNE_DS_RANGE_QUERY_RANGE_LIS_QUERY_HPP\
-    \ 1\n\n#include \"wavelet_matrix.hpp\"\n\n#include <algorithm>\n#include <cassert>\n\
-    #include <numeric>\n#include <utility>\n#include <vector>\n\nnamespace m1une {\n\
-    namespace ds {\n\nnamespace range_lis_query_internal {\n\nconstexpr int none =\
-    \ -1;\nusing Permutation = std::vector<int>;\nusing Iterator = Permutation::iterator;\n\
-    \ninline Permutation inverse(const Permutation& permutation) {\n    int n = int(permutation.size());\n\
-    \    Permutation result(n, none);\n    for (int i = 0; i < n; i++) {\n       \
-    \ if (permutation[i] != none) result[permutation[i]] = i;\n    }\n    return result;\n\
-    }\n\n// Distance multiplication of two unit-Monge matrices, represented by their\n\
-    // permutations. `workspace` must have the size used by subunit_monge_product.\n\
-    inline void unit_monge_product(\n    int n,\n    Iterator workspace,\n    Iterator\
-    \ first,\n    Iterator second\n) {\n    if (n == 1) {\n        workspace[0] =\
-    \ 0;\n        return;\n    }\n\n    Iterator result_row = workspace;\n    workspace\
-    \ += n;\n    Iterator result_column = workspace;\n    workspace += n;\n\n    auto\
-    \ map_half = [=](int length, const auto& belongs, const auto& map) {\n       \
-    \ Iterator first_half = workspace;\n        Iterator first_position = workspace\
-    \ + length;\n        Iterator second_half = workspace + 2 * length;\n        Iterator\
-    \ second_position = workspace + 3 * length;\n\n        auto split = [=](Iterator\
-    \ source, Iterator half, Iterator position) {\n            for (int i = 0; i <\
-    \ n; i++) {\n                if (belongs(source[i])) {\n                    *half++\
-    \ = map(source[i]);\n                    *position++ = i;\n                }\n\
-    \            }\n        };\n        split(first, first_half, first_position);\n\
-    \        split(second, second_half, second_position);\n\n        Iterator product\
-    \ = workspace + 4 * length;\n        unit_monge_product(\n            length,\n\
-    \            product,\n            first_half,\n            second_half\n    \
-    \    );\n        for (int i = 0; i < length; i++) {\n            int row = first_position[i];\n\
-    \            int column = second_position[product[i]];\n            result_row[row]\
-    \ = column;\n            result_column[column] = row;\n        }\n    };\n\n \
-    \   int middle = n / 2;\n    map_half(\n        middle,\n        [middle](int\
-    \ value) { return value < middle; },\n        [](int value) { return value; }\n\
-    \    );\n    map_half(\n        n - middle,\n        [middle](int value) { return\
-    \ value >= middle; },\n        [middle](int value) { return value - middle; }\n\
-    \    );\n\n    struct DiagonalIterator {\n        int delta = 0;\n        int\
-    \ column = 0;\n    };\n\n    int row = n;\n    auto move_right = [&](DiagonalIterator&\
+    \ 1\n\n#include \"../wavelet_matrix/wavelet_matrix.hpp\"\n\n#include <algorithm>\n\
+    #include <cassert>\n#include <numeric>\n#include <utility>\n#include <vector>\n\
+    \nnamespace m1une {\nnamespace ds {\n\nnamespace range_lis_query_internal {\n\n\
+    constexpr int none = -1;\nusing Permutation = std::vector<int>;\nusing Iterator\
+    \ = Permutation::iterator;\n\ninline Permutation inverse(const Permutation& permutation)\
+    \ {\n    int n = int(permutation.size());\n    Permutation result(n, none);\n\
+    \    for (int i = 0; i < n; i++) {\n        if (permutation[i] != none) result[permutation[i]]\
+    \ = i;\n    }\n    return result;\n}\n\n// Distance multiplication of two unit-Monge\
+    \ matrices, represented by their\n// permutations. `workspace` must have the size\
+    \ used by subunit_monge_product.\ninline void unit_monge_product(\n    int n,\n\
+    \    Iterator workspace,\n    Iterator first,\n    Iterator second\n) {\n    if\
+    \ (n == 1) {\n        workspace[0] = 0;\n        return;\n    }\n\n    Iterator\
+    \ result_row = workspace;\n    workspace += n;\n    Iterator result_column = workspace;\n\
+    \    workspace += n;\n\n    auto map_half = [=](int length, const auto& belongs,\
+    \ const auto& map) {\n        Iterator first_half = workspace;\n        Iterator\
+    \ first_position = workspace + length;\n        Iterator second_half = workspace\
+    \ + 2 * length;\n        Iterator second_position = workspace + 3 * length;\n\n\
+    \        auto split = [=](Iterator source, Iterator half, Iterator position) {\n\
+    \            for (int i = 0; i < n; i++) {\n                if (belongs(source[i]))\
+    \ {\n                    *half++ = map(source[i]);\n                    *position++\
+    \ = i;\n                }\n            }\n        };\n        split(first, first_half,\
+    \ first_position);\n        split(second, second_half, second_position);\n\n \
+    \       Iterator product = workspace + 4 * length;\n        unit_monge_product(\n\
+    \            length,\n            product,\n            first_half,\n        \
+    \    second_half\n        );\n        for (int i = 0; i < length; i++) {\n   \
+    \         int row = first_position[i];\n            int column = second_position[product[i]];\n\
+    \            result_row[row] = column;\n            result_column[column] = row;\n\
+    \        }\n    };\n\n    int middle = n / 2;\n    map_half(\n        middle,\n\
+    \        [middle](int value) { return value < middle; },\n        [](int value)\
+    \ { return value; }\n    );\n    map_half(\n        n - middle,\n        [middle](int\
+    \ value) { return value >= middle; },\n        [middle](int value) { return value\
+    \ - middle; }\n    );\n\n    struct DiagonalIterator {\n        int delta = 0;\n\
+    \        int column = 0;\n    };\n\n    int row = n;\n    auto move_right = [&](DiagonalIterator&\
     \ iterator) {\n        if (second[iterator.column] < middle) {\n            if\
     \ (result_column[iterator.column] >= row) iterator.delta++;\n        } else {\n\
     \            if (result_column[iterator.column] < row) iterator.delta++;\n   \
@@ -326,11 +326,11 @@ data:
     \ right);\n    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n#endif  //\
     \ M1UNE_DS_RANGE_QUERY_RANGE_LIS_QUERY_HPP\n"
   dependsOn:
-  - ds/range_query/wavelet_matrix.hpp
+  - ds/wavelet_matrix/wavelet_matrix.hpp
   isVerificationFile: false
   path: ds/range_query/range_lis_query.hpp
   requiredBy: []
-  timestamp: '2026-07-10 18:02:28+09:00'
+  timestamp: '2026-07-16 18:02:32+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/range_query/range_lis_query.test.cpp

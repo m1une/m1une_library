@@ -43,8 +43,8 @@ data:
   timestamp: '2026-06-17 21:06:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/dsu/persistent_potentialized_dsu.test.cpp
   - verify/ds/dsu/potentialized_dsu.test.cpp
+  - verify/ds/dsu/persistent_potentialized_dsu.test.cpp
   - verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
   - verify/graph/tree/vertex_get_range_contour_add_on_tree.test.cpp
 documentation_of: monoid/xor.hpp

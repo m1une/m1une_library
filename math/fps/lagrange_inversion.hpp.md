@@ -905,8 +905,8 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
-  - verify/math/fps/lagrange_inversion.test.cpp
   - verify/math/fps/fps_algorithms.test.cpp
+  - verify/math/fps/lagrange_inversion.test.cpp
 documentation_of: math/fps/lagrange_inversion.hpp
 layout: document
 title: Lagrange Inversion Formula

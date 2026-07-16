@@ -2,7 +2,7 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: ds/range_query/wavelet_matrix_sum.hpp
+    path: ds/wavelet_matrix/wavelet_matrix_sum.hpp
     title: Wavelet Matrix with Sums
   - icon: ':heavy_check_mark:'
     path: utilities/fast_io.hpp
@@ -17,14 +17,14 @@ data:
     PROBLEM: https://judge.yosupo.jp/problem/range_kth_smallest
     links:
     - https://judge.yosupo.jp/problem/range_kth_smallest
-  bundledCode: "#line 1 \"verify/ds/range_query/wavelet_matrix_sum.test.cpp\"\n#define\
-    \ PROBLEM \"https://judge.yosupo.jp/problem/range_kth_smallest\"\n\n#line 1 \"\
-    ds/range_query/wavelet_matrix_sum.hpp\"\n\n\n\n#include <bit>\n#include <cassert>\n\
-    #include <concepts>\n#include <cstdint>\n#include <limits>\n#include <optional>\n\
-    #include <type_traits>\n#include <utility>\n#include <vector>\n\nnamespace m1une\
-    \ {\nnamespace ds {\n\n// A static wavelet matrix with additive weights.\n// By\
-    \ default, each value is also used as its weight.\ntemplate <std::integral T,\
-    \ typename Sum = T>\nrequires(!std::same_as<std::remove_cv_t<T>, bool>)\nstruct\
+  bundledCode: "#line 1 \"verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp\"\n\
+    #define PROBLEM \"https://judge.yosupo.jp/problem/range_kth_smallest\"\n\n#line\
+    \ 1 \"ds/wavelet_matrix/wavelet_matrix_sum.hpp\"\n\n\n\n#include <bit>\n#include\
+    \ <cassert>\n#include <concepts>\n#include <cstdint>\n#include <limits>\n#include\
+    \ <optional>\n#include <type_traits>\n#include <utility>\n#include <vector>\n\n\
+    namespace m1une {\nnamespace ds {\n\n// A static wavelet matrix with additive\
+    \ weights.\n// By default, each value is also used as its weight.\ntemplate <std::integral\
+    \ T, typename Sum = T>\nrequires(!std::same_as<std::remove_cv_t<T>, bool>)\nstruct\
     \ WaveletMatrixSum {\n    using value_type = T;\n    using sum_type = Sum;\n \
     \   using unsigned_type = std::make_unsigned_t<T>;\n\n   private:\n    static\
     \ constexpr int bit_width = std::numeric_limits<unsigned_type>::digits;\n    static\
@@ -168,7 +168,7 @@ data:
     \ l, int r, int k) const {\n        assert(0 <= l && l <= r && r <= _n);\n   \
     \     assert(0 <= k && k <= r - l);\n        return range_sum(l, r) - sum_k_smallest(l,\
     \ r, r - l - k);\n    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n\
-    #line 4 \"verify/ds/range_query/wavelet_matrix_sum.test.cpp\"\n\n#include <algorithm>\n\
+    #line 4 \"verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp\"\n\n#include <algorithm>\n\
     #line 1 \"utilities/fast_io.hpp\"\n\n\n\n#include <array>\n#include <charconv>\n\
     #include <cstddef>\n#include <cstdio>\n#include <cstdlib>\n#line 10 \"utilities/fast_io.hpp\"\
     \n#include <cstring>\n#include <iterator>\n#include <string>\n#line 15 \"utilities/fast_io.hpp\"\
@@ -395,8 +395,8 @@ data:
     \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
     n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 10 \"verify/ds/range_query/wavelet_matrix_sum.test.cpp\"\
-    \n#include <numeric>\n#line 13 \"verify/ds/range_query/wavelet_matrix_sum.test.cpp\"\
+    \ utilities\n}  // namespace m1une\n\n\n#line 10 \"verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp\"\
+    \n#include <numeric>\n#line 13 \"verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp\"\
     \n\nnamespace {\n\nvoid test_value_sums() {\n    std::vector<long long> values;\n\
     \    values.push_back(std::numeric_limits<long long>::min());\n    values.push_back(-5);\n\
     \    values.push_back(0);\n    values.push_back(-5);\n    values.push_back(std::numeric_limits<long\
@@ -461,7 +461,7 @@ data:
     \ l, r, k;\n        fast_input >> l >> r >> k;\n        fast_output << matrix.kth_smallest(l,\
     \ r, k) << '\\n';\n    }\n}\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/range_kth_smallest\"\n\n\
-    #include \"../../../ds/range_query/wavelet_matrix_sum.hpp\"\n\n#include <algorithm>\n\
+    #include \"../../../ds/wavelet_matrix/wavelet_matrix_sum.hpp\"\n\n#include <algorithm>\n\
     #include <cassert>\n#include <cstdint>\n#include \"../../../utilities/fast_io.hpp\"\
     \n#include <limits>\n#include <numeric>\n#include <utility>\n#include <vector>\n\
     \nnamespace {\n\nvoid test_value_sums() {\n    std::vector<long long> values;\n\
@@ -528,18 +528,18 @@ data:
     \ l, r, k;\n        fast_input >> l >> r >> k;\n        fast_output << matrix.kth_smallest(l,\
     \ r, k) << '\\n';\n    }\n}\n"
   dependsOn:
-  - ds/range_query/wavelet_matrix_sum.hpp
+  - ds/wavelet_matrix/wavelet_matrix_sum.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
-  path: verify/ds/range_query/wavelet_matrix_sum.test.cpp
+  path: verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-16 18:02:32+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/ds/range_query/wavelet_matrix_sum.test.cpp
+documentation_of: verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/ds/range_query/wavelet_matrix_sum.test.cpp
-- /verify/verify/ds/range_query/wavelet_matrix_sum.test.cpp.html
-title: verify/ds/range_query/wavelet_matrix_sum.test.cpp
+- /verify/verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp
+- /verify/verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp.html
+title: verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp
 ---

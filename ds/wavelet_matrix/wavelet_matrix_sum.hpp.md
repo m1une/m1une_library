@@ -10,14 +10,14 @@ data:
     path: verify/ds/range_query/static_rectangle_sum.test.cpp
     title: verify/ds/range_query/static_rectangle_sum.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/ds/range_query/wavelet_matrix_sum.test.cpp
-    title: verify/ds/range_query/wavelet_matrix_sum.test.cpp
+    path: verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp
+    title: verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"ds/range_query/wavelet_matrix_sum.hpp\"\n\n\n\n#include\
+  bundledCode: "#line 1 \"ds/wavelet_matrix/wavelet_matrix_sum.hpp\"\n\n\n\n#include\
     \ <bit>\n#include <cassert>\n#include <concepts>\n#include <cstdint>\n#include\
     \ <limits>\n#include <optional>\n#include <type_traits>\n#include <utility>\n\
     #include <vector>\n\nnamespace m1une {\nnamespace ds {\n\n// A static wavelet\
@@ -166,7 +166,7 @@ data:
     \ l, int r, int k) const {\n        assert(0 <= l && l <= r && r <= _n);\n   \
     \     assert(0 <= k && k <= r - l);\n        return range_sum(l, r) - sum_k_smallest(l,\
     \ r, r - l - k);\n    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_WAVELET_MATRIX_SUM_HPP\n#define M1UNE_WAVELET_MATRIX_SUM_HPP\
+  code: "#ifndef M1UNE_DS_WAVELET_MATRIX_WAVELET_MATRIX_SUM_HPP\n#define M1UNE_DS_WAVELET_MATRIX_WAVELET_MATRIX_SUM_HPP\
     \ 1\n\n#include <bit>\n#include <cassert>\n#include <concepts>\n#include <cstdint>\n\
     #include <limits>\n#include <optional>\n#include <type_traits>\n#include <utility>\n\
     #include <vector>\n\nnamespace m1une {\nnamespace ds {\n\n// A static wavelet\
@@ -315,18 +315,18 @@ data:
     \ l, int r, int k) const {\n        assert(0 <= l && l <= r && r <= _n);\n   \
     \     assert(0 <= k && k <= r - l);\n        return range_sum(l, r) - sum_k_smallest(l,\
     \ r, r - l - k);\n    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n#endif\
-    \  // M1UNE_WAVELET_MATRIX_SUM_HPP\n"
+    \  // M1UNE_DS_WAVELET_MATRIX_WAVELET_MATRIX_SUM_HPP\n"
   dependsOn: []
   isVerificationFile: false
-  path: ds/range_query/wavelet_matrix_sum.hpp
+  path: ds/wavelet_matrix/wavelet_matrix_sum.hpp
   requiredBy:
   - ds/range_query/static_rectangle_sum.hpp
-  timestamp: '2026-06-21 02:25:15+09:00'
+  timestamp: '2026-07-16 18:02:32+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/range_query/wavelet_matrix_sum.test.cpp
   - verify/ds/range_query/static_rectangle_sum.test.cpp
-documentation_of: ds/range_query/wavelet_matrix_sum.hpp
+  - verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp
+documentation_of: ds/wavelet_matrix/wavelet_matrix_sum.hpp
 layout: document
 title: Wavelet Matrix with Sums
 ---
@@ -401,7 +401,7 @@ index order, while `sum_k_largest` selects them in reverse original index order.
 ## Example
 
 ```cpp
-#include "ds/range_query/wavelet_matrix_sum.hpp"
+#include "ds/wavelet_matrix/wavelet_matrix_sum.hpp"
 
 #include <iostream>
 #include <vector>

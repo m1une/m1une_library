@@ -5,7 +5,7 @@ data:
     path: ds/range_query/static_rectangle_sum.hpp
     title: Static Rectangle Sum
   - icon: ':heavy_check_mark:'
-    path: ds/range_query/wavelet_matrix_sum.hpp
+    path: ds/wavelet_matrix/wavelet_matrix_sum.hpp
     title: Wavelet Matrix with Sums
   - icon: ':heavy_check_mark:'
     path: utilities/fast_io.hpp
@@ -24,21 +24,22 @@ data:
     #define PROBLEM \"https://judge.yosupo.jp/problem/rectangle_sum\"\n\n#line 1 \"\
     ds/range_query/static_rectangle_sum.hpp\"\n\n\n\n#include <algorithm>\n#include\
     \ <cassert>\n#include <tuple>\n#include <utility>\n#include <vector>\n\n#line\
-    \ 1 \"ds/range_query/wavelet_matrix_sum.hpp\"\n\n\n\n#include <bit>\n#line 6 \"\
-    ds/range_query/wavelet_matrix_sum.hpp\"\n#include <concepts>\n#include <cstdint>\n\
-    #include <limits>\n#include <optional>\n#include <type_traits>\n#line 13 \"ds/range_query/wavelet_matrix_sum.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\n\n// A static wavelet matrix with additive\
-    \ weights.\n// By default, each value is also used as its weight.\ntemplate <std::integral\
-    \ T, typename Sum = T>\nrequires(!std::same_as<std::remove_cv_t<T>, bool>)\nstruct\
-    \ WaveletMatrixSum {\n    using value_type = T;\n    using sum_type = Sum;\n \
-    \   using unsigned_type = std::make_unsigned_t<T>;\n\n   private:\n    static\
-    \ constexpr int bit_width = std::numeric_limits<unsigned_type>::digits;\n    static\
-    \ constexpr unsigned_type sign_mask = [] {\n        if constexpr (std::signed_integral<T>)\
-    \ {\n            return unsigned_type(1) << (bit_width - 1);\n        } else {\n\
-    \            return unsigned_type(0);\n        }\n    }();\n\n    struct BitVector\
-    \ {\n        std::vector<std::uint64_t> bits;\n        std::vector<int> prefix;\n\
-    \n        BitVector() = default;\n\n        explicit BitVector(int n)\n      \
-    \      : bits((std::size_t(n) + 63) >> 6, 0),\n              prefix(bits.size()\
+    \ 1 \"ds/wavelet_matrix/wavelet_matrix_sum.hpp\"\n\n\n\n#include <bit>\n#line\
+    \ 6 \"ds/wavelet_matrix/wavelet_matrix_sum.hpp\"\n#include <concepts>\n#include\
+    \ <cstdint>\n#include <limits>\n#include <optional>\n#include <type_traits>\n\
+    #line 13 \"ds/wavelet_matrix/wavelet_matrix_sum.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ ds {\n\n// A static wavelet matrix with additive weights.\n// By default, each\
+    \ value is also used as its weight.\ntemplate <std::integral T, typename Sum =\
+    \ T>\nrequires(!std::same_as<std::remove_cv_t<T>, bool>)\nstruct WaveletMatrixSum\
+    \ {\n    using value_type = T;\n    using sum_type = Sum;\n    using unsigned_type\
+    \ = std::make_unsigned_t<T>;\n\n   private:\n    static constexpr int bit_width\
+    \ = std::numeric_limits<unsigned_type>::digits;\n    static constexpr unsigned_type\
+    \ sign_mask = [] {\n        if constexpr (std::signed_integral<T>) {\n       \
+    \     return unsigned_type(1) << (bit_width - 1);\n        } else {\n        \
+    \    return unsigned_type(0);\n        }\n    }();\n\n    struct BitVector {\n\
+    \        std::vector<std::uint64_t> bits;\n        std::vector<int> prefix;\n\n\
+    \        BitVector() = default;\n\n        explicit BitVector(int n)\n       \
+    \     : bits((std::size_t(n) + 63) >> 6, 0),\n              prefix(bits.size()\
     \ + 1, 0) {}\n\n        void set(int p) {\n            bits[std::size_t(p) >>\
     \ 6] |= std::uint64_t(1) << (p & 63);\n        }\n\n        void build() {\n \
     \           for (std::size_t i = 0; i < bits.size(); i++) {\n                prefix[i\
@@ -533,12 +534,12 @@ data:
     \ upper) << '\\n';\n    }\n}\n"
   dependsOn:
   - ds/range_query/static_rectangle_sum.hpp
-  - ds/range_query/wavelet_matrix_sum.hpp
+  - ds/wavelet_matrix/wavelet_matrix_sum.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
   path: verify/ds/range_query/static_rectangle_sum.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-16 18:02:32+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/range_query/static_rectangle_sum.test.cpp

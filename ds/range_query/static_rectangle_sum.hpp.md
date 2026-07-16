@@ -2,7 +2,7 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: ds/range_query/wavelet_matrix_sum.hpp
+    path: ds/wavelet_matrix/wavelet_matrix_sum.hpp
     title: Wavelet Matrix with Sums
   _extendedRequiredBy: []
   _extendedVerifiedWith:
@@ -16,10 +16,10 @@ data:
     links: []
   bundledCode: "#line 1 \"ds/range_query/static_rectangle_sum.hpp\"\n\n\n\n#include\
     \ <algorithm>\n#include <cassert>\n#include <tuple>\n#include <utility>\n#include\
-    \ <vector>\n\n#line 1 \"ds/range_query/wavelet_matrix_sum.hpp\"\n\n\n\n#include\
-    \ <bit>\n#line 6 \"ds/range_query/wavelet_matrix_sum.hpp\"\n#include <concepts>\n\
+    \ <vector>\n\n#line 1 \"ds/wavelet_matrix/wavelet_matrix_sum.hpp\"\n\n\n\n#include\
+    \ <bit>\n#line 6 \"ds/wavelet_matrix/wavelet_matrix_sum.hpp\"\n#include <concepts>\n\
     #include <cstdint>\n#include <limits>\n#include <optional>\n#include <type_traits>\n\
-    #line 13 \"ds/range_query/wavelet_matrix_sum.hpp\"\n\nnamespace m1une {\nnamespace\
+    #line 13 \"ds/wavelet_matrix/wavelet_matrix_sum.hpp\"\n\nnamespace m1une {\nnamespace\
     \ ds {\n\n// A static wavelet matrix with additive weights.\n// By default, each\
     \ value is also used as its weight.\ntemplate <std::integral T, typename Sum =\
     \ T>\nrequires(!std::same_as<std::remove_cv_t<T>, bool>)\nstruct WaveletMatrixSum\
@@ -224,14 +224,14 @@ data:
     \    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_STATIC_RECTANGLE_SUM_HPP\n#define M1UNE_STATIC_RECTANGLE_SUM_HPP\
     \ 1\n\n#include <algorithm>\n#include <cassert>\n#include <tuple>\n#include <utility>\n\
-    #include <vector>\n\n#include \"wavelet_matrix_sum.hpp\"\n\nnamespace m1une {\n\
-    namespace ds {\n\ntemplate <class X, class Y = X, class Sum = long long>\nclass\
-    \ StaticRectangleSum {\n   public:\n    using x_type = X;\n    using y_type =\
-    \ Y;\n    using sum_type = Sum;\n    using weighted_point_type = std::tuple<X,\
-    \ Y, Sum>;\n\n   private:\n    std::vector<X> _x_coordinates;\n    std::vector<Y>\
-    \ _y_coordinates;\n    WaveletMatrixSum<int, Sum> _matrix;\n\n   public:\n   \
-    \ StaticRectangleSum() = default;\n\n    explicit StaticRectangleSum(\n      \
-    \  const std::vector<weighted_point_type>& points\n    ) {\n        build(points);\n\
+    #include <vector>\n\n#include \"../wavelet_matrix/wavelet_matrix_sum.hpp\"\n\n\
+    namespace m1une {\nnamespace ds {\n\ntemplate <class X, class Y = X, class Sum\
+    \ = long long>\nclass StaticRectangleSum {\n   public:\n    using x_type = X;\n\
+    \    using y_type = Y;\n    using sum_type = Sum;\n    using weighted_point_type\
+    \ = std::tuple<X, Y, Sum>;\n\n   private:\n    std::vector<X> _x_coordinates;\n\
+    \    std::vector<Y> _y_coordinates;\n    WaveletMatrixSum<int, Sum> _matrix;\n\
+    \n   public:\n    StaticRectangleSum() = default;\n\n    explicit StaticRectangleSum(\n\
+    \        const std::vector<weighted_point_type>& points\n    ) {\n        build(points);\n\
     \    }\n\n    StaticRectangleSum(\n        const std::vector<X>& x_coordinates,\n\
     \        const std::vector<Y>& y_coordinates,\n        const std::vector<Sum>&\
     \ weights\n    ) {\n        build(x_coordinates, y_coordinates, weights);\n  \
@@ -282,11 +282,11 @@ data:
     \        );\n        return _matrix.range_sum(x_left, x_right, y_lower, y_upper);\n\
     \    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n#endif  // M1UNE_STATIC_RECTANGLE_SUM_HPP\n"
   dependsOn:
-  - ds/range_query/wavelet_matrix_sum.hpp
+  - ds/wavelet_matrix/wavelet_matrix_sum.hpp
   isVerificationFile: false
   path: ds/range_query/static_rectangle_sum.hpp
   requiredBy: []
-  timestamp: '2026-07-12 04:19:22+09:00'
+  timestamp: '2026-07-16 18:02:32+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/range_query/static_rectangle_sum.test.cpp

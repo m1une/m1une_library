@@ -2,7 +2,7 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: ds/range_query/wavelet_matrix_2d.hpp
+    path: ds/wavelet_matrix/wavelet_matrix_2d.hpp
     title: Wavelet Matrix 2D
   - icon: ':heavy_check_mark:'
     path: utilities/fast_io.hpp
@@ -17,23 +17,23 @@ data:
     PROBLEM: https://judge.yosupo.jp/problem/range_kth_smallest
     links:
     - https://judge.yosupo.jp/problem/range_kth_smallest
-  bundledCode: "#line 1 \"verify/ds/range_query/wavelet_matrix_2d.test.cpp\"\n#define\
-    \ PROBLEM \"https://judge.yosupo.jp/problem/range_kth_smallest\"\n\n#line 1 \"\
-    ds/range_query/wavelet_matrix_2d.hpp\"\n\n\n\n#include <algorithm>\n#include <bit>\n\
-    #include <cassert>\n#include <cstdint>\n#include <utility>\n#include <vector>\n\
-    \nnamespace m1une {\nnamespace ds {\n\n// A static wavelet matrix for a sequence\
-    \ of pairs.\n//\n// Besides the index range, queries can restrict the first component\
-    \ and count\n// or select by the second component. This corresponds to orthogonal\
-    \ queries in\n// the three dimensions (index, first, second).\ntemplate <class\
-    \ X, class Y = X>\nclass WaveletMatrix2D {\n   public:\n    using first_type =\
-    \ X;\n    using second_type = Y;\n    using value_type = std::pair<X, Y>;\n\n\
-    \   private:\n    struct BitVector {\n        std::vector<std::uint64_t> bits;\n\
-    \        std::vector<int> prefix;\n\n        BitVector() = default;\n\n      \
-    \  explicit BitVector(int n)\n            : bits((std::size_t(n) + 63) >> 6, 0),\n\
-    \              prefix(bits.size() + 1, 0) {}\n\n        void set(int p) {\n  \
-    \          bits[std::size_t(p) >> 6] |= std::uint64_t(1) << (p & 63);\n      \
-    \  }\n\n        void build() {\n            for (std::size_t i = 0; i < bits.size();\
-    \ i++) {\n                prefix[i + 1] = prefix[i] + std::popcount(bits[i]);\n\
+  bundledCode: "#line 1 \"verify/ds/wavelet_matrix/wavelet_matrix_2d.test.cpp\"\n\
+    #define PROBLEM \"https://judge.yosupo.jp/problem/range_kth_smallest\"\n\n#line\
+    \ 1 \"ds/wavelet_matrix/wavelet_matrix_2d.hpp\"\n\n\n\n#include <algorithm>\n\
+    #include <bit>\n#include <cassert>\n#include <cstdint>\n#include <utility>\n#include\
+    \ <vector>\n\nnamespace m1une {\nnamespace ds {\n\n// A static wavelet matrix\
+    \ for a sequence of pairs.\n//\n// Besides the index range, queries can restrict\
+    \ the first component and count\n// or select by the second component. This corresponds\
+    \ to orthogonal queries in\n// the three dimensions (index, first, second).\n\
+    template <class X, class Y = X>\nclass WaveletMatrix2D {\n   public:\n    using\
+    \ first_type = X;\n    using second_type = Y;\n    using value_type = std::pair<X,\
+    \ Y>;\n\n   private:\n    struct BitVector {\n        std::vector<std::uint64_t>\
+    \ bits;\n        std::vector<int> prefix;\n\n        BitVector() = default;\n\n\
+    \        explicit BitVector(int n)\n            : bits((std::size_t(n) + 63) >>\
+    \ 6, 0),\n              prefix(bits.size() + 1, 0) {}\n\n        void set(int\
+    \ p) {\n            bits[std::size_t(p) >> 6] |= std::uint64_t(1) << (p & 63);\n\
+    \        }\n\n        void build() {\n            for (std::size_t i = 0; i <\
+    \ bits.size(); i++) {\n                prefix[i + 1] = prefix[i] + std::popcount(bits[i]);\n\
     \            }\n        }\n\n        int rank1(int r) const {\n            std::size_t\
     \ word = std::size_t(r) >> 6;\n            int offset = r & 63;\n            int\
     \ result = prefix[word];\n            if (offset != 0) {\n                result\
@@ -183,7 +183,7 @@ data:
     \           second_rank |= 1 << (_log - 1 - level);\n                l = _zero_count[level]\
     \ + _matrix[level].rank1(l);\n                r = _zero_count[level] + _matrix[level].rank1(r);\n\
     \            }\n        }\n        return _second_coordinates[second_rank];\n\
-    \    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n#line 4 \"verify/ds/range_query/wavelet_matrix_2d.test.cpp\"\
+    \    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n#line 4 \"verify/ds/wavelet_matrix/wavelet_matrix_2d.test.cpp\"\
     \n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#include <array>\n#include <charconv>\n\
     #include <cstddef>\n#include <cstdio>\n#include <cstdlib>\n#line 10 \"utilities/fast_io.hpp\"\
     \n#include <cstring>\n#include <iterator>\n#include <string>\n#include <type_traits>\n\
@@ -411,7 +411,7 @@ data:
     \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
     n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 11 \"verify/ds/range_query/wavelet_matrix_2d.test.cpp\"\
+    \ utilities\n}  // namespace m1une\n\n\n#line 11 \"verify/ds/wavelet_matrix/wavelet_matrix_2d.test.cpp\"\
     \n\nnamespace {\n\nusing Matrix = m1une::ds::WaveletMatrix2D<int, int>;\n\n#ifndef\
     \ NDEBUG\nvoid randomized_test() {\n    Matrix empty;\n    assert(empty.empty());\n\
     \    assert(empty.size() == 0);\n    assert(empty.count(0, 0, -10, 10, -10, 10)\
@@ -468,7 +468,7 @@ data:
     \ r >> k;\n        fast_output << matrix.quantile(l, r, 0, 1, k) << '\\n';\n \
     \   }\n}\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/range_kth_smallest\"\n\n\
-    #include \"../../../ds/range_query/wavelet_matrix_2d.hpp\"\n\n#include <algorithm>\n\
+    #include \"../../../ds/wavelet_matrix/wavelet_matrix_2d.hpp\"\n\n#include <algorithm>\n\
     #include <cassert>\n#include <cstdint>\n#include \"../../../utilities/fast_io.hpp\"\
     \n#include <utility>\n#include <vector>\n\nnamespace {\n\nusing Matrix = m1une::ds::WaveletMatrix2D<int,\
     \ int>;\n\n#ifndef NDEBUG\nvoid randomized_test() {\n    Matrix empty;\n    assert(empty.empty());\n\
@@ -526,18 +526,18 @@ data:
     \ r >> k;\n        fast_output << matrix.quantile(l, r, 0, 1, k) << '\\n';\n \
     \   }\n}\n"
   dependsOn:
-  - ds/range_query/wavelet_matrix_2d.hpp
+  - ds/wavelet_matrix/wavelet_matrix_2d.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
-  path: verify/ds/range_query/wavelet_matrix_2d.test.cpp
+  path: verify/ds/wavelet_matrix/wavelet_matrix_2d.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-16 18:02:32+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/ds/range_query/wavelet_matrix_2d.test.cpp
+documentation_of: verify/ds/wavelet_matrix/wavelet_matrix_2d.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/ds/range_query/wavelet_matrix_2d.test.cpp
-- /verify/verify/ds/range_query/wavelet_matrix_2d.test.cpp.html
-title: verify/ds/range_query/wavelet_matrix_2d.test.cpp
+- /verify/verify/ds/wavelet_matrix/wavelet_matrix_2d.test.cpp
+- /verify/verify/ds/wavelet_matrix/wavelet_matrix_2d.test.cpp.html
+title: verify/ds/wavelet_matrix/wavelet_matrix_2d.test.cpp
 ---

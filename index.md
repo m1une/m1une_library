@@ -411,15 +411,6 @@ data:
     - icon: ':heavy_check_mark:'
       path: ds/range_query/static_rectangle_sum.hpp
       title: Static Rectangle Sum
-    - icon: ':heavy_check_mark:'
-      path: ds/range_query/wavelet_matrix.hpp
-      title: Wavelet Matrix
-    - icon: ':heavy_check_mark:'
-      path: ds/range_query/wavelet_matrix_2d.hpp
-      title: Wavelet Matrix 2D
-    - icon: ':heavy_check_mark:'
-      path: ds/range_query/wavelet_matrix_sum.hpp
-      title: Wavelet Matrix with Sums
   - name: ds/segtree
     pages:
     - icon: ':heavy_check_mark:'
@@ -478,6 +469,17 @@ data:
     - icon: ':heavy_check_mark:'
       path: ds/stack/persistent_stack.hpp
       title: Persistent Stack
+  - name: ds/wavelet_matrix
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: ds/wavelet_matrix/wavelet_matrix.hpp
+      title: Wavelet Matrix
+    - icon: ':heavy_check_mark:'
+      path: ds/wavelet_matrix/wavelet_matrix_2d.hpp
+      title: Wavelet Matrix 2D
+    - icon: ':heavy_check_mark:'
+      path: ds/wavelet_matrix/wavelet_matrix_sum.hpp
+      title: Wavelet Matrix with Sums
   - name: geometry
     pages:
     - icon: ':heavy_check_mark:'
@@ -1446,15 +1448,6 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/ds/range_query/static_rectangle_sum.test.cpp
       title: verify/ds/range_query/static_rectangle_sum.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/ds/range_query/wavelet_matrix.test.cpp
-      title: verify/ds/range_query/wavelet_matrix.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/ds/range_query/wavelet_matrix_2d.test.cpp
-      title: verify/ds/range_query/wavelet_matrix_2d.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/ds/range_query/wavelet_matrix_sum.test.cpp
-      title: verify/ds/range_query/wavelet_matrix_sum.test.cpp
   - name: verify/ds/segtree
     pages:
     - icon: ':heavy_check_mark:'
@@ -1510,6 +1503,17 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/ds/stack/persistent_stack.test.cpp
       title: verify/ds/stack/persistent_stack.test.cpp
+  - name: verify/ds/wavelet_matrix
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/wavelet_matrix/wavelet_matrix.test.cpp
+      title: verify/ds/wavelet_matrix/wavelet_matrix.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/wavelet_matrix/wavelet_matrix_2d.test.cpp
+      title: verify/ds/wavelet_matrix/wavelet_matrix_2d.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp
+      title: verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp
   - name: verify/geometry
     pages:
     - icon: ':heavy_check_mark:'

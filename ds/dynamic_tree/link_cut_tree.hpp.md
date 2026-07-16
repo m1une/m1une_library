@@ -535,13 +535,13 @@ data:
   isVerificationFile: false
   path: ds/dynamic_tree/link_cut_tree.hpp
   requiredBy:
-  - ds/dynamic_connectivity/online_dynamic_connectivity.hpp
   - ds/dynamic_connectivity/all.hpp
+  - ds/dynamic_connectivity/online_dynamic_connectivity.hpp
   timestamp: '2026-06-21 04:34:53+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/dynamic_tree/link_cut_tree.test.cpp
   - verify/ds/dynamic_connectivity/dynamic_connectivity.test.cpp
+  - verify/ds/dynamic_tree/link_cut_tree.test.cpp
 documentation_of: ds/dynamic_tree/link_cut_tree.hpp
 layout: document
 title: Link-Cut Tree

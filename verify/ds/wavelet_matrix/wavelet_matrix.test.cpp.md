@@ -2,7 +2,7 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: ds/range_query/wavelet_matrix.hpp
+    path: ds/wavelet_matrix/wavelet_matrix.hpp
     title: Wavelet Matrix
   - icon: ':heavy_check_mark:'
     path: utilities/fast_io.hpp
@@ -17,9 +17,9 @@ data:
     PROBLEM: https://judge.yosupo.jp/problem/range_kth_smallest
     links:
     - https://judge.yosupo.jp/problem/range_kth_smallest
-  bundledCode: "#line 1 \"verify/ds/range_query/wavelet_matrix.test.cpp\"\n#define\
+  bundledCode: "#line 1 \"verify/ds/wavelet_matrix/wavelet_matrix.test.cpp\"\n#define\
     \ PROBLEM \"https://judge.yosupo.jp/problem/range_kth_smallest\"\n\n#line 1 \"\
-    ds/range_query/wavelet_matrix.hpp\"\n\n\n\n#include <bit>\n#include <cassert>\n\
+    ds/wavelet_matrix/wavelet_matrix.hpp\"\n\n\n\n#include <bit>\n#include <cassert>\n\
     #include <concepts>\n#include <cstdint>\n#include <limits>\n#include <optional>\n\
     #include <type_traits>\n#include <utility>\n#include <vector>\n\nnamespace m1une\
     \ {\nnamespace ds {\n\n// A static wavelet matrix for integral values.\ntemplate\
@@ -114,12 +114,12 @@ data:
     \ const {\n        assert(0 <= l && l <= r && r <= _n);\n        int count = range_freq(l,\
     \ r, lower);\n        if (count == r - l) return std::nullopt;\n        return\
     \ kth_smallest(l, r, count);\n    }\n};\n\n}  // namespace ds\n}  // namespace\
-    \ m1une\n\n\n#line 4 \"verify/ds/range_query/wavelet_matrix.test.cpp\"\n\n#include\
-    \ <algorithm>\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#include <array>\n#include\
-    \ <charconv>\n#include <cstddef>\n#include <cstdio>\n#include <cstdlib>\n#line\
-    \ 10 \"utilities/fast_io.hpp\"\n#include <cstring>\n#include <iterator>\n#include\
-    \ <string>\n#line 15 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n\nnamespace\
-    \ m1une {\nnamespace utilities {\nnamespace internal {\n\n// Detect std::begin(x),\
+    \ m1une\n\n\n#line 4 \"verify/ds/wavelet_matrix/wavelet_matrix.test.cpp\"\n\n\
+    #include <algorithm>\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#include <array>\n\
+    #include <charconv>\n#include <cstddef>\n#include <cstdio>\n#include <cstdlib>\n\
+    #line 10 \"utilities/fast_io.hpp\"\n#include <cstring>\n#include <iterator>\n\
+    #include <string>\n#line 15 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n\n\
+    namespace m1une {\nnamespace utilities {\nnamespace internal {\n\n// Detect std::begin(x),\
     \ std::end(x).\ntemplate <class T, class = void>\nstruct is_range : std::false_type\
     \ {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
     \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
@@ -342,7 +342,7 @@ data:
     \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
     n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 12 \"verify/ds/range_query/wavelet_matrix.test.cpp\"\
+    \ utilities\n}  // namespace m1une\n\n\n#line 12 \"verify/ds/wavelet_matrix/wavelet_matrix.test.cpp\"\
     \n\nnamespace {\n\nvoid test_edge_cases() {\n    m1une::ds::WaveletMatrix<long\
     \ long> empty;\n    assert(empty.empty());\n    assert(empty.size() == 0);\n\n\
     \    std::vector<long long> values;\n    values.push_back(std::numeric_limits<long\
@@ -398,7 +398,7 @@ data:
     \   int l, r, k;\n        fast_input >> l >> r >> k;\n        fast_output << matrix.kth_smallest(l,\
     \ r, k) << '\\n';\n    }\n}\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/range_kth_smallest\"\n\n\
-    #include \"../../../ds/range_query/wavelet_matrix.hpp\"\n\n#include <algorithm>\n\
+    #include \"../../../ds/wavelet_matrix/wavelet_matrix.hpp\"\n\n#include <algorithm>\n\
     #include <cassert>\n#include <cstdint>\n#include \"../../../utilities/fast_io.hpp\"\
     \n#include <limits>\n#include <optional>\n#include <vector>\n\nnamespace {\n\n\
     void test_edge_cases() {\n    m1une::ds::WaveletMatrix<long long> empty;\n   \
@@ -456,18 +456,18 @@ data:
     \   int l, r, k;\n        fast_input >> l >> r >> k;\n        fast_output << matrix.kth_smallest(l,\
     \ r, k) << '\\n';\n    }\n}\n"
   dependsOn:
-  - ds/range_query/wavelet_matrix.hpp
+  - ds/wavelet_matrix/wavelet_matrix.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
-  path: verify/ds/range_query/wavelet_matrix.test.cpp
+  path: verify/ds/wavelet_matrix/wavelet_matrix.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-16 18:02:32+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/ds/range_query/wavelet_matrix.test.cpp
+documentation_of: verify/ds/wavelet_matrix/wavelet_matrix.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/ds/range_query/wavelet_matrix.test.cpp
-- /verify/verify/ds/range_query/wavelet_matrix.test.cpp.html
-title: verify/ds/range_query/wavelet_matrix.test.cpp
+- /verify/verify/ds/wavelet_matrix/wavelet_matrix.test.cpp
+- /verify/verify/ds/wavelet_matrix/wavelet_matrix.test.cpp.html
+title: verify/ds/wavelet_matrix/wavelet_matrix.test.cpp
 ---

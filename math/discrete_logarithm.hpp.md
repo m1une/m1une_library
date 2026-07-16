@@ -125,8 +125,8 @@ data:
   timestamp: '2026-07-11 19:59:46+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/discrete_logarithm.test.cpp
   - verify/math/math_algorithms.test.cpp
+  - verify/math/discrete_logarithm.test.cpp
 documentation_of: math/discrete_logarithm.hpp
 layout: document
 title: Discrete Logarithm

@@ -2,7 +2,7 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: ds/range_query/wavelet_matrix.hpp
+    path: ds/wavelet_matrix/wavelet_matrix.hpp
     title: Wavelet Matrix
   _extendedRequiredBy: []
   _extendedVerifiedWith:
@@ -15,7 +15,7 @@ data:
   attributes:
     links: []
   bundledCode: "#line 1 \"ds/range_query/static_range_count_distinct.hpp\"\n\n\n\n\
-    #line 1 \"ds/range_query/wavelet_matrix.hpp\"\n\n\n\n#include <bit>\n#include\
+    #line 1 \"ds/wavelet_matrix/wavelet_matrix.hpp\"\n\n\n\n#include <bit>\n#include\
     \ <cassert>\n#include <concepts>\n#include <cstdint>\n#include <limits>\n#include\
     \ <optional>\n#include <type_traits>\n#include <utility>\n#include <vector>\n\n\
     namespace m1une {\nnamespace ds {\n\n// A static wavelet matrix for integral values.\n\
@@ -134,34 +134,35 @@ data:
     \   return query(left, right);\n    }\n};\n\n}  // namespace ds\n}  // namespace\
     \ m1une\n\n\n"
   code: "#ifndef M1UNE_DS_RANGE_QUERY_STATIC_RANGE_COUNT_DISTINCT_HPP\n#define M1UNE_DS_RANGE_QUERY_STATIC_RANGE_COUNT_DISTINCT_HPP\
-    \ 1\n\n#include \"wavelet_matrix.hpp\"\n\n#include <algorithm>\n#include <cassert>\n\
-    #include <vector>\n\nnamespace m1une {\nnamespace ds {\n\n// Counts distinct values\
-    \ in static half-open ranges.\ntemplate <class T>\nstruct StaticRangeCountDistinct\
-    \ {\n   private:\n    int _n;\n    WaveletMatrix<int> _previous;\n\n   public:\n\
-    \    StaticRangeCountDistinct() : _n(0), _previous() {}\n\n    explicit StaticRangeCountDistinct(const\
-    \ std::vector<T>& values)\n        : _n(int(values.size())), _previous() {\n \
-    \       if (_n == 0) return;\n\n        std::vector<T> compressed = values;\n\
-    \        std::sort(compressed.begin(), compressed.end());\n        compressed.erase(\n\
-    \            std::unique(compressed.begin(), compressed.end()),\n            compressed.end()\n\
-    \        );\n\n        std::vector<int> last(compressed.size(), -1);\n       \
-    \ std::vector<int> previous(_n);\n        for (int i = 0; i < _n; i++) {\n   \
-    \         int rank = int(\n                std::lower_bound(\n               \
-    \     compressed.begin(),\n                    compressed.end(),\n           \
-    \         values[i]\n                ) - compressed.begin()\n            );\n\
-    \            previous[i] = last[rank];\n            last[rank] = i;\n        }\n\
-    \        _previous = WaveletMatrix<int>(previous);\n    }\n\n    int size() const\
-    \ {\n        return _n;\n    }\n\n    bool empty() const {\n        return _n\
-    \ == 0;\n    }\n\n    int query(int left, int right) const {\n        assert(0\
-    \ <= left && left <= right && right <= _n);\n        if (left == right) return\
-    \ 0;\n        return _previous.range_freq(left, right, left);\n    }\n\n    int\
-    \ count_distinct(int left, int right) const {\n        return query(left, right);\n\
-    \    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n#endif  // M1UNE_DS_RANGE_QUERY_STATIC_RANGE_COUNT_DISTINCT_HPP\n"
+    \ 1\n\n#include \"../wavelet_matrix/wavelet_matrix.hpp\"\n\n#include <algorithm>\n\
+    #include <cassert>\n#include <vector>\n\nnamespace m1une {\nnamespace ds {\n\n\
+    // Counts distinct values in static half-open ranges.\ntemplate <class T>\nstruct\
+    \ StaticRangeCountDistinct {\n   private:\n    int _n;\n    WaveletMatrix<int>\
+    \ _previous;\n\n   public:\n    StaticRangeCountDistinct() : _n(0), _previous()\
+    \ {}\n\n    explicit StaticRangeCountDistinct(const std::vector<T>& values)\n\
+    \        : _n(int(values.size())), _previous() {\n        if (_n == 0) return;\n\
+    \n        std::vector<T> compressed = values;\n        std::sort(compressed.begin(),\
+    \ compressed.end());\n        compressed.erase(\n            std::unique(compressed.begin(),\
+    \ compressed.end()),\n            compressed.end()\n        );\n\n        std::vector<int>\
+    \ last(compressed.size(), -1);\n        std::vector<int> previous(_n);\n     \
+    \   for (int i = 0; i < _n; i++) {\n            int rank = int(\n            \
+    \    std::lower_bound(\n                    compressed.begin(),\n            \
+    \        compressed.end(),\n                    values[i]\n                ) -\
+    \ compressed.begin()\n            );\n            previous[i] = last[rank];\n\
+    \            last[rank] = i;\n        }\n        _previous = WaveletMatrix<int>(previous);\n\
+    \    }\n\n    int size() const {\n        return _n;\n    }\n\n    bool empty()\
+    \ const {\n        return _n == 0;\n    }\n\n    int query(int left, int right)\
+    \ const {\n        assert(0 <= left && left <= right && right <= _n);\n      \
+    \  if (left == right) return 0;\n        return _previous.range_freq(left, right,\
+    \ left);\n    }\n\n    int count_distinct(int left, int right) const {\n     \
+    \   return query(left, right);\n    }\n};\n\n}  // namespace ds\n}  // namespace\
+    \ m1une\n\n#endif  // M1UNE_DS_RANGE_QUERY_STATIC_RANGE_COUNT_DISTINCT_HPP\n"
   dependsOn:
-  - ds/range_query/wavelet_matrix.hpp
+  - ds/wavelet_matrix/wavelet_matrix.hpp
   isVerificationFile: false
   path: ds/range_query/static_range_count_distinct.hpp
   requiredBy: []
-  timestamp: '2026-07-10 18:34:17+09:00'
+  timestamp: '2026-07-16 18:02:32+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/range_query/static_range_count_distinct.test.cpp

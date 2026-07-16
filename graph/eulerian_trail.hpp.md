@@ -261,17 +261,17 @@ data:
   isVerificationFile: false
   path: graph/eulerian_trail.hpp
   requiredBy:
+  - graph/directed.hpp
   - graph/all.hpp
   - graph/undirected.hpp
-  - graph/directed.hpp
   timestamp: '2026-07-11 20:05:57+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/graph/graph_algorithms.test.cpp
   - verify/graph/cow_game.test.cpp
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/eulerian_trail_undirected.test.cpp
   - verify/graph/eulerian_trail_directed.test.cpp
-  - verify/graph/graph_algorithms.test.cpp
 documentation_of: graph/eulerian_trail.hpp
 layout: document
 title: Eulerian Trail

@@ -624,146 +624,146 @@ data:
   isVerificationFile: false
   path: math/modint.hpp
   requiredBy:
-  - string/all.hpp
-  - string/wildcard_pattern_matching.hpp
+  - math/all.hpp
+  - math/all.hpp
   - math/partition_function.hpp
   - math/combinatorial_sequences.hpp
-  - math/all.hpp
-  - math/all.hpp
-  - math/bernoulli.hpp
   - math/fps/sparse_formal_power_series.hpp
   - math/fps/half_gcd.hpp
   - math/fps/composition.hpp
+  - math/fps/convolution_ll.hpp
+  - math/fps/lagrange_inversion.hpp
+  - math/fps/all.hpp
   - math/fps/compositional_inverse.hpp
   - math/fps/formal_power_series.hpp
-  - math/fps/convolution_ll.hpp
-  - math/fps/all.hpp
-  - math/fps/lagrange_inversion.hpp
   - math/fps/multipoint_evaluation.hpp
-  - math/fps/linear_recurrence.hpp
-  - math/fps/convolution.hpp
   - math/fps/polynomial_factorization.hpp
+  - math/fps/convolution.hpp
+  - math/fps/linear_recurrence.hpp
+  - math/bernoulli.hpp
   - math/multivariate_convolution.hpp
-  - graph/tree/all.hpp
-  - graph/tree/all.hpp
-  - graph/tree/distance_frequency.hpp
-  - graph/tree/distance_frequency.hpp
-  - graph/all.hpp
-  - graph/all.hpp
   - graph/counting.hpp
+  - graph/all.hpp
+  - graph/all.hpp
+  - graph/tree/all.hpp
+  - graph/tree/all.hpp
+  - graph/tree/distance_frequency.hpp
+  - graph/tree/distance_frequency.hpp
+  - string/wildcard_pattern_matching.hpp
+  - string/all.hpp
   timestamp: '2026-07-13 21:13:17+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/algo/sequence/number_of_subsequences.test.cpp
-  - verify/ds/dynamic_tree/rake_compress_link_cut_tree.test.cpp
-  - verify/ds/dynamic_tree/yosupo_point_set_tree_path_composite_sum.test.cpp
-  - verify/ds/dynamic_array/dynamic_lazy_monoid_array.test.cpp
+  - verify/math/math_algorithms.test.cpp
+  - verify/math/math_algorithms.test.cpp
+  - verify/math/repunit.test.cpp
+  - verify/math/matrix/inverse_matrix.test.cpp
+  - verify/math/matrix/system_of_linear_equations.test.cpp
+  - verify/math/matrix/matrix.test.cpp
+  - verify/math/matrix/matrix_det.test.cpp
+  - verify/math/matrix/sparse_determinant.test.cpp
+  - verify/math/matrix/matrix_product.test.cpp
+  - verify/math/matrix/pfaffian.test.cpp
+  - verify/math/matrix/matrix_rank.test.cpp
+  - verify/math/matrix/hafnian.test.cpp
+  - verify/math/matrix/characteristic_polynomial.test.cpp
+  - verify/math/partition_function.test.cpp
+  - verify/math/partition_function.test.cpp
+  - verify/math/cyclotomic_polynomial.test.cpp
+  - verify/math/modular_square_root.test.cpp
+  - verify/math/set_power_series_log.test.cpp
+  - verify/math/modint.test.cpp
+  - verify/math/subset_convolution.test.cpp
+  - verify/math/fps/pow_of_formal_power_series_sparse.test.cpp
+  - verify/math/fps/pow_of_formal_power_series_sparse.test.cpp
+  - verify/math/fps/sqrt_of_formal_power_series_sparse.test.cpp
+  - verify/math/fps/sqrt_of_formal_power_series_sparse.test.cpp
+  - verify/math/fps/convolution_mod_large.test.cpp
+  - verify/math/fps/convolution_mod_large.test.cpp
+  - verify/math/fps/exp_of_formal_power_series.test.cpp
+  - verify/math/fps/exp_of_formal_power_series.test.cpp
+  - verify/math/fps/fps_algorithms.test.cpp
+  - verify/math/fps/fps_algorithms.test.cpp
+  - verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
+  - verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
+  - verify/math/fps/polynomial_factorization.test.cpp
+  - verify/math/fps/polynomial_factorization.test.cpp
+  - verify/math/fps/polynomial_taylor_shift.test.cpp
+  - verify/math/fps/polynomial_taylor_shift.test.cpp
+  - verify/math/fps/multipoint_evaluation.test.cpp
+  - verify/math/fps/multipoint_evaluation.test.cpp
+  - verify/math/fps/inv_of_formal_power_series.test.cpp
+  - verify/math/fps/inv_of_formal_power_series.test.cpp
+  - verify/math/fps/compositional_inverse.test.cpp
+  - verify/math/fps/compositional_inverse.test.cpp
+  - verify/math/fps/lagrange_inversion.test.cpp
+  - verify/math/fps/lagrange_inversion.test.cpp
+  - verify/math/fps/polynomial_interpolation.test.cpp
+  - verify/math/fps/polynomial_interpolation.test.cpp
+  - verify/math/fps/half_gcd.test.cpp
+  - verify/math/fps/half_gcd.test.cpp
+  - verify/math/fps/convolution_mod.test.cpp
+  - verify/math/fps/convolution_mod.test.cpp
+  - verify/math/fps/pow_of_formal_power_series.test.cpp
+  - verify/math/fps/pow_of_formal_power_series.test.cpp
+  - verify/math/fps/convolution_ll.test.cpp
+  - verify/math/fps/log_of_formal_power_series_sparse.test.cpp
+  - verify/math/fps/log_of_formal_power_series_sparse.test.cpp
+  - verify/math/fps/inv_of_formal_power_series_sparse.test.cpp
+  - verify/math/fps/inv_of_formal_power_series_sparse.test.cpp
+  - verify/math/fps/exp_of_formal_power_series_sparse.test.cpp
+  - verify/math/fps/exp_of_formal_power_series_sparse.test.cpp
+  - verify/math/fps/composition.test.cpp
+  - verify/math/fps/composition.test.cpp
+  - verify/math/generalized_floor_sum.test.cpp
+  - verify/math/sum_of_multiplicative_function.test.cpp
+  - verify/math/lucas.test.cpp
+  - verify/math/multivariate_convolution_cyclic.test.cpp
+  - verify/math/multivariate_convolution_cyclic.test.cpp
+  - verify/math/prefix_sum_of_binom.test.cpp
+  - verify/math/stirling_number_of_the_second_kind.test.cpp
+  - verify/math/stirling_number_of_the_second_kind.test.cpp
+  - verify/math/multivariate_convolution_truncated.test.cpp
+  - verify/math/multivariate_convolution_truncated.test.cpp
+  - verify/math/bernoulli_utilities.test.cpp
+  - verify/math/bernoulli_utilities.test.cpp
+  - verify/math/bell_number.test.cpp
+  - verify/math/bell_number.test.cpp
+  - verify/math/set_power_series_exp.test.cpp
+  - verify/math/prefix_sum_of_binom_randomized.test.cpp
+  - verify/math/bernoulli_number.test.cpp
+  - verify/math/bernoulli_number.test.cpp
+  - verify/math/bitwise_convolution.test.cpp
+  - verify/matroid/matroids.test.cpp
   - verify/ds/range_query/range_sort_range_composite.test.cpp
-  - verify/ds/segtree/dual_segtree.test.cpp
-  - verify/ds/segtree/dynamic_dual_segtree.test.cpp
-  - verify/ds/segtree/lazy_segtree.test.cpp
-  - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
   - verify/ds/segtree/persistent_lazy_segtree.test.cpp
+  - verify/ds/segtree/lazy_segtree.test.cpp
+  - verify/ds/segtree/dual_segtree.test.cpp
   - verify/ds/segtree/segtree_beats.test.cpp
+  - verify/ds/segtree/dynamic_dual_segtree.test.cpp
+  - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
   - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
   - verify/ds/dsu/range_parallel_dsu.test.cpp
-  - verify/string/string_algorithms.test.cpp
-  - verify/string/wildcard_pattern_matching.test.cpp
-  - verify/math/subset_convolution.test.cpp
-  - verify/math/prefix_sum_of_binom.test.cpp
-  - verify/math/generalized_floor_sum.test.cpp
-  - verify/math/bitwise_convolution.test.cpp
-  - verify/math/multivariate_convolution_cyclic.test.cpp
-  - verify/math/multivariate_convolution_cyclic.test.cpp
-  - verify/math/lucas.test.cpp
-  - verify/math/bernoulli_utilities.test.cpp
-  - verify/math/bernoulli_utilities.test.cpp
-  - verify/math/bell_number.test.cpp
-  - verify/math/bell_number.test.cpp
-  - verify/math/partition_function.test.cpp
-  - verify/math/partition_function.test.cpp
-  - verify/math/multivariate_convolution_truncated.test.cpp
-  - verify/math/multivariate_convolution_truncated.test.cpp
-  - verify/math/repunit.test.cpp
-  - verify/math/math_algorithms.test.cpp
-  - verify/math/math_algorithms.test.cpp
-  - verify/math/cyclotomic_polynomial.test.cpp
-  - verify/math/set_power_series_exp.test.cpp
-  - verify/math/fps/convolution_mod_large.test.cpp
-  - verify/math/fps/convolution_mod_large.test.cpp
-  - verify/math/fps/inv_of_formal_power_series.test.cpp
-  - verify/math/fps/inv_of_formal_power_series.test.cpp
-  - verify/math/fps/half_gcd.test.cpp
-  - verify/math/fps/half_gcd.test.cpp
-  - verify/math/fps/pow_of_formal_power_series.test.cpp
-  - verify/math/fps/pow_of_formal_power_series.test.cpp
-  - verify/math/fps/polynomial_interpolation.test.cpp
-  - verify/math/fps/polynomial_interpolation.test.cpp
-  - verify/math/fps/polynomial_factorization.test.cpp
-  - verify/math/fps/polynomial_factorization.test.cpp
-  - verify/math/fps/convolution_ll.test.cpp
-  - verify/math/fps/exp_of_formal_power_series.test.cpp
-  - verify/math/fps/exp_of_formal_power_series.test.cpp
-  - verify/math/fps/inv_of_formal_power_series_sparse.test.cpp
-  - verify/math/fps/inv_of_formal_power_series_sparse.test.cpp
-  - verify/math/fps/exp_of_formal_power_series_sparse.test.cpp
-  - verify/math/fps/exp_of_formal_power_series_sparse.test.cpp
-  - verify/math/fps/multipoint_evaluation.test.cpp
-  - verify/math/fps/multipoint_evaluation.test.cpp
-  - verify/math/fps/sqrt_of_formal_power_series_sparse.test.cpp
-  - verify/math/fps/sqrt_of_formal_power_series_sparse.test.cpp
-  - verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
-  - verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
-  - verify/math/fps/log_of_formal_power_series_sparse.test.cpp
-  - verify/math/fps/log_of_formal_power_series_sparse.test.cpp
-  - verify/math/fps/convolution_mod.test.cpp
-  - verify/math/fps/convolution_mod.test.cpp
-  - verify/math/fps/compositional_inverse.test.cpp
-  - verify/math/fps/compositional_inverse.test.cpp
-  - verify/math/fps/polynomial_taylor_shift.test.cpp
-  - verify/math/fps/polynomial_taylor_shift.test.cpp
-  - verify/math/fps/pow_of_formal_power_series_sparse.test.cpp
-  - verify/math/fps/pow_of_formal_power_series_sparse.test.cpp
-  - verify/math/fps/composition.test.cpp
-  - verify/math/fps/composition.test.cpp
-  - verify/math/fps/lagrange_inversion.test.cpp
-  - verify/math/fps/lagrange_inversion.test.cpp
-  - verify/math/fps/fps_algorithms.test.cpp
-  - verify/math/fps/fps_algorithms.test.cpp
-  - verify/math/matrix/hafnian.test.cpp
-  - verify/math/matrix/inverse_matrix.test.cpp
-  - verify/math/matrix/pfaffian.test.cpp
-  - verify/math/matrix/matrix_det.test.cpp
-  - verify/math/matrix/system_of_linear_equations.test.cpp
-  - verify/math/matrix/characteristic_polynomial.test.cpp
-  - verify/math/matrix/sparse_determinant.test.cpp
-  - verify/math/matrix/matrix.test.cpp
-  - verify/math/matrix/matrix_rank.test.cpp
-  - verify/math/matrix/matrix_product.test.cpp
-  - verify/math/sum_of_multiplicative_function.test.cpp
-  - verify/math/stirling_number_of_the_second_kind.test.cpp
-  - verify/math/stirling_number_of_the_second_kind.test.cpp
-  - verify/math/prefix_sum_of_binom_randomized.test.cpp
-  - verify/math/set_power_series_log.test.cpp
-  - verify/math/modular_square_root.test.cpp
-  - verify/math/modint.test.cpp
-  - verify/math/bernoulli_number.test.cpp
-  - verify/math/bernoulli_number.test.cpp
-  - verify/matroid/matroids.test.cpp
-  - verify/graph/cow_game.test.cpp
-  - verify/graph/cow_game.test.cpp
-  - verify/graph/graph_counting.test.cpp
-  - verify/graph/graph_counting.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
-  - verify/graph/tree/tree_algorithms.test.cpp
-  - verify/graph/tree/tree_algorithms.test.cpp
-  - verify/graph/tree/distance_frequency.test.cpp
-  - verify/graph/tree/distance_frequency.test.cpp
-  - verify/graph/counting_spanning_tree_directed.test.cpp
+  - verify/ds/dynamic_array/dynamic_lazy_monoid_array.test.cpp
+  - verify/ds/dynamic_tree/yosupo_point_set_tree_path_composite_sum.test.cpp
+  - verify/ds/dynamic_tree/rake_compress_link_cut_tree.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/counting_spanning_tree_undirected.test.cpp
+  - verify/graph/cow_game.test.cpp
+  - verify/graph/cow_game.test.cpp
+  - verify/graph/counting_spanning_tree_directed.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/tree/tree_algorithms.test.cpp
+  - verify/graph/tree/tree_algorithms.test.cpp
+  - verify/graph/tree/distance_frequency.test.cpp
+  - verify/graph/tree/distance_frequency.test.cpp
+  - verify/graph/graph_counting.test.cpp
+  - verify/graph/graph_counting.test.cpp
+  - verify/string/string_algorithms.test.cpp
+  - verify/string/wildcard_pattern_matching.test.cpp
+  - verify/algo/sequence/number_of_subsequences.test.cpp
 documentation_of: math/modint.hpp
 layout: document
 title: ModInt

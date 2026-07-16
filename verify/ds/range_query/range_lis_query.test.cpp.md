@@ -5,7 +5,7 @@ data:
     path: ds/range_query/range_lis_query.hpp
     title: Static Range LIS Query
   - icon: ':heavy_check_mark:'
-    path: ds/range_query/wavelet_matrix.hpp
+    path: ds/wavelet_matrix/wavelet_matrix.hpp
     title: Wavelet Matrix
   - icon: ':heavy_check_mark:'
     path: utilities/fast_io.hpp
@@ -22,7 +22,7 @@ data:
     - https://judge.yosupo.jp/problem/static_range_lis_query
   bundledCode: "#line 1 \"verify/ds/range_query/range_lis_query.test.cpp\"\n#define\
     \ PROBLEM \"https://judge.yosupo.jp/problem/static_range_lis_query\"\n\n#line\
-    \ 1 \"ds/range_query/range_lis_query.hpp\"\n\n\n\n#line 1 \"ds/range_query/wavelet_matrix.hpp\"\
+    \ 1 \"ds/range_query/range_lis_query.hpp\"\n\n\n\n#line 1 \"ds/wavelet_matrix/wavelet_matrix.hpp\"\
     \n\n\n\n#include <bit>\n#include <cassert>\n#include <concepts>\n#include <cstdint>\n\
     #include <limits>\n#include <optional>\n#include <type_traits>\n#include <utility>\n\
     #include <vector>\n\nnamespace m1une {\nnamespace ds {\n\n// A static wavelet\
@@ -508,12 +508,12 @@ data:
     \    output.println(structure.query(left, right));\n    }\n}\n"
   dependsOn:
   - ds/range_query/range_lis_query.hpp
-  - ds/range_query/wavelet_matrix.hpp
+  - ds/wavelet_matrix/wavelet_matrix.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
   path: verify/ds/range_query/range_lis_query.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-16 18:02:32+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/range_query/range_lis_query.test.cpp

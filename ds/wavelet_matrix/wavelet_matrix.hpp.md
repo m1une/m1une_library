@@ -16,14 +16,14 @@ data:
     path: verify/ds/range_query/static_range_count_distinct.test.cpp
     title: verify/ds/range_query/static_range_count_distinct.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/ds/range_query/wavelet_matrix.test.cpp
-    title: verify/ds/range_query/wavelet_matrix.test.cpp
+    path: verify/ds/wavelet_matrix/wavelet_matrix.test.cpp
+    title: verify/ds/wavelet_matrix/wavelet_matrix.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"ds/range_query/wavelet_matrix.hpp\"\n\n\n\n#include <bit>\n\
+  bundledCode: "#line 1 \"ds/wavelet_matrix/wavelet_matrix.hpp\"\n\n\n\n#include <bit>\n\
     #include <cassert>\n#include <concepts>\n#include <cstdint>\n#include <limits>\n\
     #include <optional>\n#include <type_traits>\n#include <utility>\n#include <vector>\n\
     \nnamespace m1une {\nnamespace ds {\n\n// A static wavelet matrix for integral\
@@ -120,8 +120,8 @@ data:
     \ r, lower);\n        if (count == r - l) return std::nullopt;\n        return\
     \ kth_smallest(l, r, count);\n    }\n};\n\n}  // namespace ds\n}  // namespace\
     \ m1une\n\n\n"
-  code: "#ifndef M1UNE_WAVELET_MATRIX_HPP\n#define M1UNE_WAVELET_MATRIX_HPP 1\n\n\
-    #include <bit>\n#include <cassert>\n#include <concepts>\n#include <cstdint>\n\
+  code: "#ifndef M1UNE_DS_WAVELET_MATRIX_WAVELET_MATRIX_HPP\n#define M1UNE_DS_WAVELET_MATRIX_WAVELET_MATRIX_HPP\
+    \ 1\n\n#include <bit>\n#include <cassert>\n#include <concepts>\n#include <cstdint>\n\
     #include <limits>\n#include <optional>\n#include <type_traits>\n#include <utility>\n\
     #include <vector>\n\nnamespace m1une {\nnamespace ds {\n\n// A static wavelet\
     \ matrix for integral values.\ntemplate <std::integral T>\nrequires(!std::same_as<std::remove_cv_t<T>,\
@@ -216,20 +216,20 @@ data:
     \ const {\n        assert(0 <= l && l <= r && r <= _n);\n        int count = range_freq(l,\
     \ r, lower);\n        if (count == r - l) return std::nullopt;\n        return\
     \ kth_smallest(l, r, count);\n    }\n};\n\n}  // namespace ds\n}  // namespace\
-    \ m1une\n\n#endif  // M1UNE_WAVELET_MATRIX_HPP\n"
+    \ m1une\n\n#endif  // M1UNE_DS_WAVELET_MATRIX_WAVELET_MATRIX_HPP\n"
   dependsOn: []
   isVerificationFile: false
-  path: ds/range_query/wavelet_matrix.hpp
+  path: ds/wavelet_matrix/wavelet_matrix.hpp
   requiredBy:
-  - ds/range_query/static_range_count_distinct.hpp
   - ds/range_query/range_lis_query.hpp
-  timestamp: '2026-06-21 02:25:15+09:00'
+  - ds/range_query/static_range_count_distinct.hpp
+  timestamp: '2026-07-16 18:02:32+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/range_query/range_lis_query.test.cpp
   - verify/ds/range_query/static_range_count_distinct.test.cpp
-  - verify/ds/range_query/wavelet_matrix.test.cpp
-documentation_of: ds/range_query/wavelet_matrix.hpp
+  - verify/ds/range_query/range_lis_query.test.cpp
+  - verify/ds/wavelet_matrix/wavelet_matrix.test.cpp
+documentation_of: ds/wavelet_matrix/wavelet_matrix.hpp
 layout: document
 title: Wavelet Matrix
 ---
@@ -285,7 +285,7 @@ For range sums or weights attached to values, use `WaveletMatrixSum`.
 ## Example
 
 ```cpp
-#include "ds/range_query/wavelet_matrix.hpp"
+#include "ds/wavelet_matrix/wavelet_matrix.hpp"
 
 #include <iostream>
 #include <vector>

@@ -238,17 +238,17 @@ data:
   isVerificationFile: false
   path: graph/biconnected_components.hpp
   requiredBy:
-  - graph/all.hpp
   - graph/block_cut_tree.hpp
+  - graph/all.hpp
   - graph/undirected.hpp
   timestamp: '2026-07-11 19:47:32+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/graph/graph_algorithms.test.cpp
   - verify/graph/cow_game.test.cpp
   - verify/graph/range_edge_graph.test.cpp
-  - verify/graph/biconnected_components.test.cpp
   - verify/graph/block_cut_tree.test.cpp
-  - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/biconnected_components.test.cpp
 documentation_of: graph/biconnected_components.hpp
 layout: document
 title: Biconnected Components
