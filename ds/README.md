@@ -10,7 +10,7 @@ one-shot sequence computations such as LIS are in `algo/sequence/`.
 | [`dsu/`](dsu/) | Ordinary, rollback, aggregate, potentialized, persistent, partially persistent, and range-parallel union-find variants |
 | [`segtree/`](segtree/) | Dense, dynamic, lazy, dual, generic Beats, specialized chmin/chmax/add, and persistent variants, including `segtree_2d.hpp` and `dual_segtree_2d.hpp` |
 | [`range_query/`](range_query/) | Repeated range-query objects: cumulative sums, Fenwick trees, SWAG, static inversions/LIS/modes/majorities, sqrt and merge-sort trees, and range-sort range-product queries |
-| [`wavelet_matrix/`](wavelet_matrix/) | Static wavelet matrices for range order statistics, weighted range sums, and multidimensional orthogonal queries |
+| [`wavelet_matrix/`](wavelet_matrix/) | Static and dynamic wavelet matrices for range order statistics, frequencies, weighted range sums, and multidimensional orthogonal queries |
 | [`dynamic_array/`](dynamic_array/) | Dynamic and persistent implicit-treap arrays, with optional monoid or lazy aggregation |
 | [`bst/`](bst/) | Weight-balanced ordered sets and multisets, a fixed-universe predecessor set, and persistent red-black-tree variants with split and merge |
 | [`binary_trie/`](binary_trie/) | Binary tries for integer xor queries and monoid aggregates |
