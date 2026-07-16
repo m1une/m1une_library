@@ -150,26 +150,43 @@ data:
     \    return result;\n}\n\ntemplate <class T>\nBellmanFordResult<T> bellman_ford(const\
     \ Graph<T>& g, int s, T inf = std::numeric_limits<T>::max() / T(4)) {\n    return\
     \ bellman_ford(g, std::vector<int>{s}, inf);\n}\n\n}  // namespace graph\n}  //\
-    \ namespace m1une\n\n\n#line 1 \"graph/bfs.hpp\"\n\n\n\n#line 8 \"graph/bfs.hpp\"\
-    \n\n#line 10 \"graph/bfs.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\nstruct\
-    \ BfsResult {\n    std::vector<int> dist;\n    std::vector<int> parent;\n    std::vector<int>\
+    \ namespace m1une\n\n\n#line 1 \"graph/bfs.hpp\"\n\n\n\n#line 6 \"graph/bfs.hpp\"\
+    \n#include <concepts>\n#include <functional>\n#line 11 \"graph/bfs.hpp\"\n\n#line\
+    \ 13 \"graph/bfs.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\nstruct BfsResult\
+    \ {\n    std::vector<int> dist;\n    std::vector<int> parent;\n    std::vector<int>\
     \ parent_edge;\n\n    bool reachable(int v) const {\n        assert(0 <= v &&\
     \ v < int(dist.size()));\n        return dist[v] != -1;\n    }\n\n    std::vector<int>\
     \ path(int t) const {\n        assert(reachable(t));\n        std::vector<int>\
     \ result;\n        for (int v = t; v != -1; v = parent[v]) result.push_back(v);\n\
     \        std::reverse(result.begin(), result.end());\n        return result;\n\
-    \    }\n};\n\ntemplate <class T>\nBfsResult bfs(const Graph<T>& g, const std::vector<int>&\
-    \ sources) {\n    int n = g.size();\n    BfsResult result;\n    result.dist.assign(n,\
-    \ -1);\n    result.parent.assign(n, -1);\n    result.parent_edge.assign(n, -1);\n\
-    \n    std::queue<int> que;\n    for (int s : sources) {\n        assert(0 <= s\
-    \ && s < n);\n        if (result.dist[s] != -1) continue;\n        result.dist[s]\
-    \ = 0;\n        que.push(s);\n    }\n\n    while (!que.empty()) {\n        int\
-    \ v = que.front();\n        que.pop();\n        for (const auto& e : g[v]) {\n\
-    \            if (!e.alive) continue;\n            if (result.dist[e.to] != -1)\
-    \ continue;\n            result.dist[e.to] = result.dist[v] + 1;\n           \
-    \ result.parent[e.to] = v;\n            result.parent_edge[e.to] = e.id;\n   \
-    \         que.push(e.to);\n        }\n    }\n\n    return result;\n}\n\ntemplate\
-    \ <class T>\nBfsResult bfs(const Graph<T>& g, int s) {\n    return bfs(g, std::vector<int>{s});\n\
+    \    }\n};\n\nnamespace bfs_detail {\n\ntemplate <class Callback>\nconcept BfsCallback\
+    \ =\n    std::invocable<Callback&, int, int> ||\n    std::invocable<Callback&,\
+    \ int>;\n\ntemplate <BfsCallback Callback>\nvoid invoke_callback(Callback& callback,\
+    \ int vertex, int parent) {\n    if constexpr (std::invocable<Callback&, int,\
+    \ int>) {\n        std::invoke(callback, vertex, parent);\n    } else {\n    \
+    \    std::invoke(callback, vertex);\n    }\n}\n\ntemplate <class T, class Callback>\n\
+    BfsResult run_bfs(\n    const Graph<T>& g,\n    const std::vector<int>& sources,\n\
+    \    Callback& callback\n) {\n    int n = g.size();\n    BfsResult result;\n \
+    \   result.dist.assign(n, -1);\n    result.parent.assign(n, -1);\n    result.parent_edge.assign(n,\
+    \ -1);\n\n    std::queue<int> que;\n    for (int s : sources) {\n        assert(0\
+    \ <= s && s < n);\n        if (result.dist[s] != -1) continue;\n        result.dist[s]\
+    \ = 0;\n        invoke_callback(callback, s, -1);\n        que.push(s);\n    }\n\
+    \n    while (!que.empty()) {\n        int v = que.front();\n        que.pop();\n\
+    \        for (const auto& e : g[v]) {\n            if (!e.alive) continue;\n \
+    \           if (result.dist[e.to] != -1) continue;\n            result.dist[e.to]\
+    \ = result.dist[v] + 1;\n            result.parent[e.to] = v;\n            result.parent_edge[e.to]\
+    \ = e.id;\n            invoke_callback(callback, e.to, v);\n            que.push(e.to);\n\
+    \        }\n    }\n\n    return result;\n}\n\n}  // namespace bfs_detail\n\ntemplate\
+    \ <class T>\nBfsResult bfs(const Graph<T>& g, const std::vector<int>& sources)\
+    \ {\n    auto callback = [](int) {};\n    return bfs_detail::run_bfs(g, sources,\
+    \ callback);\n}\n\ntemplate <class T>\nBfsResult bfs(const Graph<T>& g, int s)\
+    \ {\n    return bfs(g, std::vector<int>{s});\n}\n\ntemplate <class T, class Callback>\n\
+    requires bfs_detail::BfsCallback<Callback>\nBfsResult bfs(\n    const Graph<T>&\
+    \ g,\n    const std::vector<int>& sources,\n    Callback&& callback\n) {\n   \
+    \ return bfs_detail::run_bfs(g, sources, callback);\n}\n\ntemplate <class T, class\
+    \ Callback>\nrequires bfs_detail::BfsCallback<Callback>\nBfsResult bfs(const Graph<T>&\
+    \ g, int source, Callback&& callback) {\n    return bfs(\n        g,\n       \
+    \ std::vector<int>{source},\n        std::forward<Callback>(callback)\n    );\n\
     }\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/cow_game.hpp\"\
     \n\n\n\n#line 6 \"graph/cow_game.hpp\"\n#include <optional>\n#include <type_traits>\n\
     #line 10 \"graph/cow_game.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\ntemplate\
@@ -286,20 +303,20 @@ data:
     \ dag_shortest_path(\n    const Graph<T>& g, int s, T inf = std::numeric_limits<T>::max()\
     \ / T(4)) {\n    return dag_shortest_path(g, std::vector<int>{s}, inf);\n}\n\n\
     }  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/dijkstra.hpp\"\
-    \n\n\n\n#line 6 \"graph/dijkstra.hpp\"\n#include <functional>\n#line 11 \"graph/dijkstra.hpp\"\
-    \n\n#line 13 \"graph/dijkstra.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\n\
-    template <class T>\nstruct DijkstraResult {\n    std::vector<T> dist;\n    std::vector<int>\
-    \ parent;\n    std::vector<int> parent_edge;\n    T inf;\n\n    bool reachable(int\
-    \ v) const {\n        assert(0 <= v && v < int(dist.size()));\n        return\
-    \ dist[v] != inf;\n    }\n\n    std::vector<int> path(int t) const {\n       \
-    \ assert(reachable(t));\n        std::vector<int> result;\n        for (int v\
-    \ = t; v != -1; v = parent[v]) result.push_back(v);\n        std::reverse(result.begin(),\
-    \ result.end());\n        return result;\n    }\n};\n\ntemplate <class T>\nDijkstraResult<T>\
-    \ dijkstra(const Graph<T>& g, const std::vector<int>& sources,\n             \
-    \              T inf = std::numeric_limits<T>::max() / T(4)) {\n    int n = g.size();\n\
-    \    DijkstraResult<T> result;\n    result.dist.assign(n, inf);\n    result.parent.assign(n,\
-    \ -1);\n    result.parent_edge.assign(n, -1);\n    result.inf = inf;\n\n    using\
-    \ P = std::pair<T, int>;\n    std::priority_queue<P, std::vector<P>, std::greater<P>>\
+    \n\n\n\n#line 11 \"graph/dijkstra.hpp\"\n\n#line 13 \"graph/dijkstra.hpp\"\n\n\
+    namespace m1une {\nnamespace graph {\n\ntemplate <class T>\nstruct DijkstraResult\
+    \ {\n    std::vector<T> dist;\n    std::vector<int> parent;\n    std::vector<int>\
+    \ parent_edge;\n    T inf;\n\n    bool reachable(int v) const {\n        assert(0\
+    \ <= v && v < int(dist.size()));\n        return dist[v] != inf;\n    }\n\n  \
+    \  std::vector<int> path(int t) const {\n        assert(reachable(t));\n     \
+    \   std::vector<int> result;\n        for (int v = t; v != -1; v = parent[v])\
+    \ result.push_back(v);\n        std::reverse(result.begin(), result.end());\n\
+    \        return result;\n    }\n};\n\ntemplate <class T>\nDijkstraResult<T> dijkstra(const\
+    \ Graph<T>& g, const std::vector<int>& sources,\n                           T\
+    \ inf = std::numeric_limits<T>::max() / T(4)) {\n    int n = g.size();\n    DijkstraResult<T>\
+    \ result;\n    result.dist.assign(n, inf);\n    result.parent.assign(n, -1);\n\
+    \    result.parent_edge.assign(n, -1);\n    result.inf = inf;\n\n    using P =\
+    \ std::pair<T, int>;\n    std::priority_queue<P, std::vector<P>, std::greater<P>>\
     \ que;\n    for (int s : sources) {\n        assert(0 <= s && s < n);\n      \
     \  if (result.dist[s] == T(0)) continue;\n        result.dist[s] = T(0);\n   \
     \     que.emplace(T(0), s);\n    }\n\n    while (!que.empty()) {\n        auto\
@@ -495,7 +512,7 @@ data:
   - graph/all.hpp
   - graph/undirected.hpp
   - graph/directed.hpp
-  timestamp: '2026-07-13 04:00:23+09:00'
+  timestamp: '2026-07-16 19:40:55+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp

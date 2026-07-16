@@ -50,6 +50,9 @@ data:
     path: graph/dag_shortest_path.hpp
     title: DAG Shortest Path
   - icon: ':heavy_check_mark:'
+    path: graph/dfs.hpp
+    title: DFS
+  - icon: ':heavy_check_mark:'
     path: graph/dijkstra.hpp
     title: Dijkstra
   - icon: ':heavy_check_mark:'
@@ -1567,9 +1570,75 @@ data:
     \             stack.push_back(Frame{to, 0});\n            } else if (color[to]\
     \ == 1) {\n                return restore_cycle(vertex, to, edge_id, parent, parent_edge);\n\
     \            }\n        }\n    }\n    return Cycle();\n}\n\n}  // namespace graph\n\
-    }  // namespace m1une\n\n\n#line 1 \"graph/directed_mst.hpp\"\n\n\n\n#line 8 \"\
-    graph/directed_mst.hpp\"\n\n#line 10 \"graph/directed_mst.hpp\"\n\nnamespace m1une\
-    \ {\nnamespace graph {\n\ntemplate <class T>\nstruct DirectedMinimumSpanningTree\
+    }  // namespace m1une\n\n\n#line 1 \"graph/dfs.hpp\"\n\n\n\n#line 6 \"graph/dfs.hpp\"\
+    \n#include <concepts>\n#include <functional>\n#line 10 \"graph/dfs.hpp\"\n\n#line\
+    \ 12 \"graph/dfs.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\nstruct DfsResult\
+    \ {\n    std::vector<int> depth;\n    std::vector<int> parent;\n    std::vector<int>\
+    \ parent_edge;\n    std::vector<int> root;\n    std::vector<int> tin;\n    std::vector<int>\
+    \ tout;\n    std::vector<int> preorder;\n    std::vector<int> postorder;\n   \
+    \ std::vector<int> roots;\n\n    bool reachable(int vertex) const {\n        assert(0\
+    \ <= vertex && vertex < int(depth.size()));\n        return depth[vertex] != -1;\n\
+    \    }\n\n    int component_count() const {\n        return int(roots.size());\n\
+    \    }\n\n    std::vector<int> path(int target) const {\n        assert(reachable(target));\n\
+    \        std::vector<int> result;\n        for (int vertex = target; vertex !=\
+    \ -1; vertex = parent[vertex]) {\n            result.push_back(vertex);\n    \
+    \    }\n        std::reverse(result.begin(), result.end());\n        return result;\n\
+    \    }\n\n    bool is_ancestor(int ancestor, int vertex) const {\n        assert(0\
+    \ <= ancestor && ancestor < int(depth.size()));\n        assert(0 <= vertex &&\
+    \ vertex < int(depth.size()));\n        if (!reachable(ancestor) || !reachable(vertex))\
+    \ return false;\n        return tin[ancestor] <= tin[vertex] && tout[vertex] <=\
+    \ tout[ancestor];\n    }\n};\n\nnamespace dfs_detail {\n\ntemplate <class Callback>\n\
+    concept DfsCallback =\n    std::invocable<Callback&, int, int> ||\n    std::invocable<Callback&,\
+    \ int>;\n\ntemplate <DfsCallback Callback>\nvoid invoke_callback(Callback& callback,\
+    \ int vertex, int parent) {\n    if constexpr (std::invocable<Callback&, int,\
+    \ int>) {\n        std::invoke(callback, vertex, parent);\n    } else {\n    \
+    \    std::invoke(callback, vertex);\n    }\n}\n\ntemplate <class T, class Callback>\n\
+    DfsResult run_dfs(\n    const Graph<T>& graph,\n    const std::vector<int>& sources,\n\
+    \    bool complete_forest,\n    Callback& callback\n) {\n    const int n = graph.size();\n\
+    \    DfsResult result;\n    result.depth.assign(n, -1);\n    result.parent.assign(n,\
+    \ -1);\n    result.parent_edge.assign(n, -1);\n    result.root.assign(n, -1);\n\
+    \    result.tin.assign(n, -1);\n    result.tout.assign(n, -1);\n    result.preorder.reserve(n);\n\
+    \    result.postorder.reserve(n);\n    result.roots.reserve(n);\n\n    struct\
+    \ Frame {\n        int vertex;\n        int next_edge;\n    };\n    std::vector<Frame>\
+    \ stack;\n    stack.reserve(n);\n    int timer = 0;\n\n    auto traverse = [&](int\
+    \ source) {\n        assert(0 <= source && source < n);\n        if (result.reachable(source))\
+    \ return;\n\n        result.depth[source] = 0;\n        result.root[source] =\
+    \ source;\n        result.tin[source] = ++timer;\n        result.preorder.push_back(source);\n\
+    \        result.roots.push_back(source);\n        invoke_callback(callback, source,\
+    \ -1);\n        stack.push_back(Frame{source, 0});\n\n        while (!stack.empty())\
+    \ {\n            Frame& frame = stack.back();\n            int vertex = frame.vertex;\n\
+    \            if (frame.next_edge == int(graph[vertex].size())) {\n           \
+    \     result.tout[vertex] = ++timer;\n                result.postorder.push_back(vertex);\n\
+    \                stack.pop_back();\n                continue;\n            }\n\
+    \n            const Edge<T>& edge = graph[vertex][frame.next_edge++];\n      \
+    \      if (!edge.alive || result.reachable(edge.to)) continue;\n            result.depth[edge.to]\
+    \ = result.depth[vertex] + 1;\n            result.parent[edge.to] = vertex;\n\
+    \            result.parent_edge[edge.to] = edge.id;\n            result.root[edge.to]\
+    \ = result.root[vertex];\n            result.tin[edge.to] = ++timer;\n       \
+    \     result.preorder.push_back(edge.to);\n            invoke_callback(callback,\
+    \ edge.to, vertex);\n            stack.push_back(Frame{edge.to, 0});\n       \
+    \ }\n    };\n\n    for (int source : sources) traverse(source);\n    if (complete_forest)\
+    \ {\n        for (int vertex = 0; vertex < n; vertex++) traverse(vertex);\n  \
+    \  }\n    return result;\n}\n\n}  // namespace dfs_detail\n\ntemplate <class T>\n\
+    DfsResult dfs(const Graph<T>& graph, const std::vector<int>& sources) {\n    auto\
+    \ callback = [](int) {};\n    return dfs_detail::run_dfs(graph, sources, false,\
+    \ callback);\n}\n\ntemplate <class T>\nDfsResult dfs(const Graph<T>& graph, int\
+    \ source) {\n    return dfs(graph, std::vector<int>{source});\n}\n\ntemplate <class\
+    \ T>\nDfsResult dfs(const Graph<T>& graph) {\n    auto callback = [](int) {};\n\
+    \    return dfs_detail::run_dfs(\n        graph,\n        std::vector<int>(),\n\
+    \        true,\n        callback\n    );\n}\n\ntemplate <class T, class Callback>\n\
+    requires dfs_detail::DfsCallback<Callback>\nDfsResult dfs(\n    const Graph<T>&\
+    \ graph,\n    const std::vector<int>& sources,\n    Callback&& callback\n) {\n\
+    \    return dfs_detail::run_dfs(graph, sources, false, callback);\n}\n\ntemplate\
+    \ <class T, class Callback>\nrequires dfs_detail::DfsCallback<Callback>\nDfsResult\
+    \ dfs(const Graph<T>& graph, int source, Callback&& callback) {\n    return dfs(\n\
+    \        graph,\n        std::vector<int>{source},\n        std::forward<Callback>(callback)\n\
+    \    );\n}\n\ntemplate <class T, class Callback>\nrequires dfs_detail::DfsCallback<Callback>\n\
+    DfsResult dfs(const Graph<T>& graph, Callback&& callback) {\n    return dfs_detail::run_dfs(\n\
+    \        graph,\n        std::vector<int>(),\n        true,\n        callback\n\
+    \    );\n}\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/directed_mst.hpp\"\
+    \n\n\n\n#line 8 \"graph/directed_mst.hpp\"\n\n#line 10 \"graph/directed_mst.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\ntemplate <class T>\nstruct DirectedMinimumSpanningTree\
     \ {\n    T cost;\n    std::vector<int> parent;\n    std::vector<int> parent_edge;\n\
     \    std::vector<Edge<T>> edges;\n    int root;\n};\n\nnamespace internal {\n\n\
     template <class T>\nstruct DirectedMstEdge {\n    int from = -1;\n    int to =\
@@ -2116,26 +2185,42 @@ data:
     \    return result;\n}\n\ntemplate <class T>\nBellmanFordResult<T> bellman_ford(const\
     \ Graph<T>& g, int s, T inf = std::numeric_limits<T>::max() / T(4)) {\n    return\
     \ bellman_ford(g, std::vector<int>{s}, inf);\n}\n\n}  // namespace graph\n}  //\
-    \ namespace m1une\n\n\n#line 1 \"graph/bfs.hpp\"\n\n\n\n#line 8 \"graph/bfs.hpp\"\
-    \n\n#line 10 \"graph/bfs.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\nstruct\
+    \ namespace m1une\n\n\n#line 1 \"graph/bfs.hpp\"\n\n\n\n#line 11 \"graph/bfs.hpp\"\
+    \n\n#line 13 \"graph/bfs.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\nstruct\
     \ BfsResult {\n    std::vector<int> dist;\n    std::vector<int> parent;\n    std::vector<int>\
     \ parent_edge;\n\n    bool reachable(int v) const {\n        assert(0 <= v &&\
     \ v < int(dist.size()));\n        return dist[v] != -1;\n    }\n\n    std::vector<int>\
     \ path(int t) const {\n        assert(reachable(t));\n        std::vector<int>\
     \ result;\n        for (int v = t; v != -1; v = parent[v]) result.push_back(v);\n\
     \        std::reverse(result.begin(), result.end());\n        return result;\n\
-    \    }\n};\n\ntemplate <class T>\nBfsResult bfs(const Graph<T>& g, const std::vector<int>&\
-    \ sources) {\n    int n = g.size();\n    BfsResult result;\n    result.dist.assign(n,\
-    \ -1);\n    result.parent.assign(n, -1);\n    result.parent_edge.assign(n, -1);\n\
-    \n    std::queue<int> que;\n    for (int s : sources) {\n        assert(0 <= s\
-    \ && s < n);\n        if (result.dist[s] != -1) continue;\n        result.dist[s]\
-    \ = 0;\n        que.push(s);\n    }\n\n    while (!que.empty()) {\n        int\
-    \ v = que.front();\n        que.pop();\n        for (const auto& e : g[v]) {\n\
-    \            if (!e.alive) continue;\n            if (result.dist[e.to] != -1)\
-    \ continue;\n            result.dist[e.to] = result.dist[v] + 1;\n           \
-    \ result.parent[e.to] = v;\n            result.parent_edge[e.to] = e.id;\n   \
-    \         que.push(e.to);\n        }\n    }\n\n    return result;\n}\n\ntemplate\
-    \ <class T>\nBfsResult bfs(const Graph<T>& g, int s) {\n    return bfs(g, std::vector<int>{s});\n\
+    \    }\n};\n\nnamespace bfs_detail {\n\ntemplate <class Callback>\nconcept BfsCallback\
+    \ =\n    std::invocable<Callback&, int, int> ||\n    std::invocable<Callback&,\
+    \ int>;\n\ntemplate <BfsCallback Callback>\nvoid invoke_callback(Callback& callback,\
+    \ int vertex, int parent) {\n    if constexpr (std::invocable<Callback&, int,\
+    \ int>) {\n        std::invoke(callback, vertex, parent);\n    } else {\n    \
+    \    std::invoke(callback, vertex);\n    }\n}\n\ntemplate <class T, class Callback>\n\
+    BfsResult run_bfs(\n    const Graph<T>& g,\n    const std::vector<int>& sources,\n\
+    \    Callback& callback\n) {\n    int n = g.size();\n    BfsResult result;\n \
+    \   result.dist.assign(n, -1);\n    result.parent.assign(n, -1);\n    result.parent_edge.assign(n,\
+    \ -1);\n\n    std::queue<int> que;\n    for (int s : sources) {\n        assert(0\
+    \ <= s && s < n);\n        if (result.dist[s] != -1) continue;\n        result.dist[s]\
+    \ = 0;\n        invoke_callback(callback, s, -1);\n        que.push(s);\n    }\n\
+    \n    while (!que.empty()) {\n        int v = que.front();\n        que.pop();\n\
+    \        for (const auto& e : g[v]) {\n            if (!e.alive) continue;\n \
+    \           if (result.dist[e.to] != -1) continue;\n            result.dist[e.to]\
+    \ = result.dist[v] + 1;\n            result.parent[e.to] = v;\n            result.parent_edge[e.to]\
+    \ = e.id;\n            invoke_callback(callback, e.to, v);\n            que.push(e.to);\n\
+    \        }\n    }\n\n    return result;\n}\n\n}  // namespace bfs_detail\n\ntemplate\
+    \ <class T>\nBfsResult bfs(const Graph<T>& g, const std::vector<int>& sources)\
+    \ {\n    auto callback = [](int) {};\n    return bfs_detail::run_bfs(g, sources,\
+    \ callback);\n}\n\ntemplate <class T>\nBfsResult bfs(const Graph<T>& g, int s)\
+    \ {\n    return bfs(g, std::vector<int>{s});\n}\n\ntemplate <class T, class Callback>\n\
+    requires bfs_detail::BfsCallback<Callback>\nBfsResult bfs(\n    const Graph<T>&\
+    \ g,\n    const std::vector<int>& sources,\n    Callback&& callback\n) {\n   \
+    \ return bfs_detail::run_bfs(g, sources, callback);\n}\n\ntemplate <class T, class\
+    \ Callback>\nrequires bfs_detail::BfsCallback<Callback>\nBfsResult bfs(const Graph<T>&\
+    \ g, int source, Callback&& callback) {\n    return bfs(\n        g,\n       \
+    \ std::vector<int>{source},\n        std::forward<Callback>(callback)\n    );\n\
     }\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/cow_game.hpp\"\
     \n\n\n\n#line 10 \"graph/cow_game.hpp\"\n\nnamespace m1une {\nnamespace graph\
     \ {\n\ntemplate <class T>\nstruct CowGameConstraint {\n    int from;\n    int\
@@ -2251,20 +2336,20 @@ data:
     \ dag_shortest_path(\n    const Graph<T>& g, int s, T inf = std::numeric_limits<T>::max()\
     \ / T(4)) {\n    return dag_shortest_path(g, std::vector<int>{s}, inf);\n}\n\n\
     }  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/dijkstra.hpp\"\
-    \n\n\n\n#line 6 \"graph/dijkstra.hpp\"\n#include <functional>\n#line 11 \"graph/dijkstra.hpp\"\
-    \n\n#line 13 \"graph/dijkstra.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\n\
-    template <class T>\nstruct DijkstraResult {\n    std::vector<T> dist;\n    std::vector<int>\
-    \ parent;\n    std::vector<int> parent_edge;\n    T inf;\n\n    bool reachable(int\
-    \ v) const {\n        assert(0 <= v && v < int(dist.size()));\n        return\
-    \ dist[v] != inf;\n    }\n\n    std::vector<int> path(int t) const {\n       \
-    \ assert(reachable(t));\n        std::vector<int> result;\n        for (int v\
-    \ = t; v != -1; v = parent[v]) result.push_back(v);\n        std::reverse(result.begin(),\
-    \ result.end());\n        return result;\n    }\n};\n\ntemplate <class T>\nDijkstraResult<T>\
-    \ dijkstra(const Graph<T>& g, const std::vector<int>& sources,\n             \
-    \              T inf = std::numeric_limits<T>::max() / T(4)) {\n    int n = g.size();\n\
-    \    DijkstraResult<T> result;\n    result.dist.assign(n, inf);\n    result.parent.assign(n,\
-    \ -1);\n    result.parent_edge.assign(n, -1);\n    result.inf = inf;\n\n    using\
-    \ P = std::pair<T, int>;\n    std::priority_queue<P, std::vector<P>, std::greater<P>>\
+    \n\n\n\n#line 11 \"graph/dijkstra.hpp\"\n\n#line 13 \"graph/dijkstra.hpp\"\n\n\
+    namespace m1une {\nnamespace graph {\n\ntemplate <class T>\nstruct DijkstraResult\
+    \ {\n    std::vector<T> dist;\n    std::vector<int> parent;\n    std::vector<int>\
+    \ parent_edge;\n    T inf;\n\n    bool reachable(int v) const {\n        assert(0\
+    \ <= v && v < int(dist.size()));\n        return dist[v] != inf;\n    }\n\n  \
+    \  std::vector<int> path(int t) const {\n        assert(reachable(t));\n     \
+    \   std::vector<int> result;\n        for (int v = t; v != -1; v = parent[v])\
+    \ result.push_back(v);\n        std::reverse(result.begin(), result.end());\n\
+    \        return result;\n    }\n};\n\ntemplate <class T>\nDijkstraResult<T> dijkstra(const\
+    \ Graph<T>& g, const std::vector<int>& sources,\n                           T\
+    \ inf = std::numeric_limits<T>::max() / T(4)) {\n    int n = g.size();\n    DijkstraResult<T>\
+    \ result;\n    result.dist.assign(n, inf);\n    result.parent.assign(n, -1);\n\
+    \    result.parent_edge.assign(n, -1);\n    result.inf = inf;\n\n    using P =\
+    \ std::pair<T, int>;\n    std::priority_queue<P, std::vector<P>, std::greater<P>>\
     \ que;\n    for (int s : sources) {\n        assert(0 <= s && s < n);\n      \
     \  if (result.dist[s] == T(0)) continue;\n        result.dist[s] = T(0);\n   \
     \     que.emplace(T(0), s);\n    }\n\n    while (!que.empty()) {\n        auto\
@@ -2490,7 +2575,7 @@ data:
     \    assert(_solved && _satisfiable);\n        return _answer;\n    }\n\n    bool\
     \ value(int variable) const {\n        assert(_solved && _satisfiable);\n    \
     \    assert(0 <= variable && variable < _n);\n        return _answer[variable];\n\
-    \    }\n};\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 13 \"graph/directed.hpp\"\
+    \    }\n};\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 14 \"graph/directed.hpp\"\
     \n\n\n#line 1 \"graph/dominator_tree.hpp\"\n\n\n\n#line 7 \"graph/dominator_tree.hpp\"\
     \n\n#line 9 \"graph/dominator_tree.hpp\"\n\nnamespace m1une {\nnamespace graph\
     \ {\n\nstruct DominatorTree {\n    int root;\n    std::vector<int> immediate_dominator;\n\
@@ -4235,47 +4320,47 @@ data:
     \    static constexpr T op(const T& a, const T& b) {\n        return a + b;\n\
     \    }\n\n    static constexpr T inv(const T& x) {\n        return -x;\n    }\n\
     };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 1 \"monoid/concept.hpp\"\
-    \n\n\n\n#include <concepts>\n\nnamespace m1une {\nnamespace monoid {\n\n// Concept\
-    \ to check if a type satisfies the requirements of a Monoid.\n// A Monoid must\
-    \ have a `value_type`, an identity element `id()`, and an associative binary operation\
-    \ `op()`.\ntemplate <typename M>\nconcept IsMonoid = requires(typename M::value_type\
-    \ a, typename M::value_type b) {\n    // 1. Must define `value_type`\n    typename\
-    \ M::value_type;\n\n    // 2. Must have a static method `id()` returning `value_type`\n\
-    \    { M::id() } -> std::same_as<typename M::value_type>;\n\n    // 3. Must have\
-    \ a static method `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for commutative group monoids.\n// A type\
-    \ satisfying this concept must also obey commutativity and inverse laws.\ntemplate\
-    \ <typename M>\nconcept IsCommutativeGroup = IsMonoid<M> && requires(typename\
-    \ M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename M::value_type>;\n\
-    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 1 \"graph/tree/rooted_tree.hpp\"\
-    \n\n\n\n#line 7 \"graph/tree/rooted_tree.hpp\"\n\n#line 9 \"graph/tree/rooted_tree.hpp\"\
-    \n\nnamespace m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct RootedTree\
-    \ {\n    using cost_type = T;\n    using edge_type = m1une::graph::Edge<T>;\n\n\
-    \    int root;\n    std::vector<int> parent;\n    std::vector<int> parent_edge;\n\
-    \    std::vector<int> depth;\n    std::vector<T> dist;\n    std::vector<int> subtree_size;\n\
-    \    std::vector<int> tin;\n    std::vector<int> tout;\n    std::vector<int> order;\n\
-    \    std::vector<std::vector<int>> up;\n\n   private:\n    int _n;\n    int _log;\n\
-    \n    void check_vertex(int v) const {\n        assert(0 <= v && v < _n);\n  \
-    \      assert(tin[v] != -1);\n    }\n\n   public:\n    RootedTree() : root(-1),\
-    \ _n(0), _log(0) {}\n    explicit RootedTree(const m1une::graph::Graph<T>& g,\
-    \ int root_ = 0) {\n        build(g, root_);\n    }\n\n    void build(const m1une::graph::Graph<T>&\
-    \ g, int root_ = 0) {\n        _n = g.size();\n        root = _n == 0 ? -1 : root_;\n\
-    \        _log = 1;\n        while ((1U << _log) <= (unsigned int)(std::max(1,\
-    \ _n))) _log++;\n\n        parent.assign(_n, -1);\n        parent_edge.assign(_n,\
-    \ -1);\n        depth.assign(_n, 0);\n        dist.assign(_n, T(0));\n       \
-    \ subtree_size.assign(_n, 0);\n        tin.assign(_n, -1);\n        tout.assign(_n,\
-    \ -1);\n        order.clear();\n        order.reserve(_n);\n        up.assign(_log,\
-    \ std::vector<int>(_n, -1));\n\n        if (_n == 0) return;\n        assert(0\
-    \ <= root && root < _n);\n\n        struct Frame {\n            int v;\n     \
-    \       int state;\n        };\n\n        std::vector<char> visited(_n, false);\n\
-    \        std::vector<Frame> stack;\n        stack.push_back({root, 0});\n    \
-    \    visited[root] = true;\n        int timer = 0;\n\n        while (!stack.empty())\
-    \ {\n            Frame frame = stack.back();\n            stack.pop_back();\n\
-    \            int v = frame.v;\n            if (frame.state == 0) {\n         \
-    \       tin[v] = timer++;\n                order.push_back(v);\n             \
-    \   up[0][v] = parent[v];\n                for (int k = 1; k < _log; k++) {\n\
-    \                    int p = up[k - 1][v];\n                    up[k][v] = p ==\
-    \ -1 ? -1 : up[k - 1][p];\n                }\n\n                stack.push_back({v,\
+    \n\n\n\n#line 5 \"monoid/concept.hpp\"\n\nnamespace m1une {\nnamespace monoid\
+    \ {\n\n// Concept to check if a type satisfies the requirements of a Monoid.\n\
+    // A Monoid must have a `value_type`, an identity element `id()`, and an associative\
+    \ binary operation `op()`.\ntemplate <typename M>\nconcept IsMonoid = requires(typename\
+    \ M::value_type a, typename M::value_type b) {\n    // 1. Must define `value_type`\n\
+    \    typename M::value_type;\n\n    // 2. Must have a static method `id()` returning\
+    \ `value_type`\n    { M::id() } -> std::same_as<typename M::value_type>;\n\n \
+    \   // 3. Must have a static method `op(a, b)` returning `value_type`\n    { M::op(a,\
+    \ b) } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for commutative\
+    \ group monoids.\n// A type satisfying this concept must also obey commutativity\
+    \ and inverse laws.\ntemplate <typename M>\nconcept IsCommutativeGroup = IsMonoid<M>\
+    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
+    \ M::value_type>;\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line\
+    \ 1 \"graph/tree/rooted_tree.hpp\"\n\n\n\n#line 7 \"graph/tree/rooted_tree.hpp\"\
+    \n\n#line 9 \"graph/tree/rooted_tree.hpp\"\n\nnamespace m1une {\nnamespace tree\
+    \ {\n\ntemplate <class T = int>\nstruct RootedTree {\n    using cost_type = T;\n\
+    \    using edge_type = m1une::graph::Edge<T>;\n\n    int root;\n    std::vector<int>\
+    \ parent;\n    std::vector<int> parent_edge;\n    std::vector<int> depth;\n  \
+    \  std::vector<T> dist;\n    std::vector<int> subtree_size;\n    std::vector<int>\
+    \ tin;\n    std::vector<int> tout;\n    std::vector<int> order;\n    std::vector<std::vector<int>>\
+    \ up;\n\n   private:\n    int _n;\n    int _log;\n\n    void check_vertex(int\
+    \ v) const {\n        assert(0 <= v && v < _n);\n        assert(tin[v] != -1);\n\
+    \    }\n\n   public:\n    RootedTree() : root(-1), _n(0), _log(0) {}\n    explicit\
+    \ RootedTree(const m1une::graph::Graph<T>& g, int root_ = 0) {\n        build(g,\
+    \ root_);\n    }\n\n    void build(const m1une::graph::Graph<T>& g, int root_\
+    \ = 0) {\n        _n = g.size();\n        root = _n == 0 ? -1 : root_;\n     \
+    \   _log = 1;\n        while ((1U << _log) <= (unsigned int)(std::max(1, _n)))\
+    \ _log++;\n\n        parent.assign(_n, -1);\n        parent_edge.assign(_n, -1);\n\
+    \        depth.assign(_n, 0);\n        dist.assign(_n, T(0));\n        subtree_size.assign(_n,\
+    \ 0);\n        tin.assign(_n, -1);\n        tout.assign(_n, -1);\n        order.clear();\n\
+    \        order.reserve(_n);\n        up.assign(_log, std::vector<int>(_n, -1));\n\
+    \n        if (_n == 0) return;\n        assert(0 <= root && root < _n);\n\n  \
+    \      struct Frame {\n            int v;\n            int state;\n        };\n\
+    \n        std::vector<char> visited(_n, false);\n        std::vector<Frame> stack;\n\
+    \        stack.push_back({root, 0});\n        visited[root] = true;\n        int\
+    \ timer = 0;\n\n        while (!stack.empty()) {\n            Frame frame = stack.back();\n\
+    \            stack.pop_back();\n            int v = frame.v;\n            if (frame.state\
+    \ == 0) {\n                tin[v] = timer++;\n                order.push_back(v);\n\
+    \                up[0][v] = parent[v];\n                for (int k = 1; k < _log;\
+    \ k++) {\n                    int p = up[k - 1][v];\n                    up[k][v]\
+    \ = p == -1 ? -1 : up[k - 1][p];\n                }\n\n                stack.push_back({v,\
     \ 1});\n                const auto& adj = g[v];\n                for (int i =\
     \ int(adj.size()) - 1; i >= 0; i--) {\n                    const auto& e = adj[i];\n\
     \                    if (!e.alive) continue;\n                    if (visited[e.to])\
@@ -7257,7 +7342,7 @@ data:
     \   assert(first_component != second_component);\n        result.bridge_forest_edges.push_back(\n\
     \            TwoEdgeConnectedBridge{first_component, second_component, edge_id});\n\
     \    }\n    return result;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\
-    \n\n#line 29 \"graph/undirected.hpp\"\n\n\n#line 15 \"graph/all.hpp\"\n\n\n#line\
+    \n\n#line 30 \"graph/undirected.hpp\"\n\n\n#line 15 \"graph/all.hpp\"\n\n\n#line\
     \ 10 \"verify/graph/range_edge_graph.test.cpp\"\n\nusing RangeEdgeGraph = m1une::graph::RangeEdgeGraph<long\
     \ long>;\n\nvoid test_basic() {\n    RangeEdgeGraph range_graph(6);\n    assert(range_graph.size()\
     \ == 6);\n    for (int i = 0; i < 6; i++) assert(range_graph.point_vertex(i) ==\
@@ -7402,6 +7487,7 @@ data:
   - graph/directed.hpp
   - graph/cycle_detection.hpp
   - graph/graph.hpp
+  - graph/dfs.hpp
   - graph/directed_mst.hpp
   - graph/eulerian_trail.hpp
   - graph/matrix_tree_theorem.hpp
@@ -7477,7 +7563,7 @@ data:
   isVerificationFile: true
   path: verify/graph/range_edge_graph.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 19:22:46+09:00'
+  timestamp: '2026-07-16 19:40:55+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/range_edge_graph.test.cpp

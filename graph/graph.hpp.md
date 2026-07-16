@@ -42,6 +42,9 @@ data:
     path: graph/dag_shortest_path.hpp
     title: DAG Shortest Path
   - icon: ':heavy_check_mark:'
+    path: graph/dfs.hpp
+    title: DFS
+  - icon: ':heavy_check_mark:'
     path: graph/dijkstra.hpp
     title: Dijkstra
   - icon: ':heavy_check_mark:'
@@ -178,6 +181,12 @@ data:
     title: 0-1 BFS
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/graph/bfs.test.cpp
+    title: verify/graph/bfs.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/bfs.test.cpp
+    title: verify/graph/bfs.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/biconnected_components.test.cpp
     title: verify/graph/biconnected_components.test.cpp
   - icon: ':heavy_check_mark:'
@@ -231,6 +240,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/cycle_detection_undirected.test.cpp
     title: verify/graph/cycle_detection_undirected.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/dfs.test.cpp
+    title: verify/graph/dfs.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/dfs.test.cpp
+    title: verify/graph/dfs.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/directed_mst.test.cpp
     title: verify/graph/directed_mst.test.cpp
@@ -550,6 +565,7 @@ data:
   - graph/enumerate_cliques.hpp
   - graph/biconnected_components.hpp
   - graph/undirected.hpp
+  - graph/dfs.hpp
   - graph/directed.hpp
   - graph/directed_mst.hpp
   - graph/three_edge_connected_components.hpp
@@ -564,9 +580,13 @@ data:
   - verify/graph/cow_game.test.cpp
   - verify/graph/library_checker_lowest_common_ancestor.test.cpp
   - verify/graph/library_checker_lowest_common_ancestor.test.cpp
+  - verify/graph/dfs.test.cpp
+  - verify/graph/dfs.test.cpp
   - verify/graph/minimum_steiner_tree.test.cpp
   - verify/graph/library_checker_general_matching.test.cpp
   - verify/graph/library_checker_general_matching.test.cpp
+  - verify/graph/bfs.test.cpp
+  - verify/graph/bfs.test.cpp
   - verify/graph/chordal_graph_recognition.test.cpp
   - verify/graph/shortest_path.test.cpp
   - verify/graph/shortest_path.test.cpp

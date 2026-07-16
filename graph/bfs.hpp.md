@@ -19,6 +19,9 @@ data:
     title: Undirected Graph Algorithms
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/graph/bfs.test.cpp
+    title: verify/graph/bfs.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/cow_game.test.cpp
     title: verify/graph/cow_game.test.cpp
   - icon: ':heavy_check_mark:'
@@ -33,16 +36,16 @@ data:
   attributes:
     links: []
   bundledCode: "#line 1 \"graph/bfs.hpp\"\n\n\n\n#include <algorithm>\n#include <cassert>\n\
-    #include <queue>\n#include <vector>\n\n#line 1 \"graph/graph.hpp\"\n\n\n\n#line\
-    \ 5 \"graph/graph.hpp\"\n#include <utility>\n#line 7 \"graph/graph.hpp\"\n\nnamespace\
-    \ m1une {\nnamespace graph {\n\ntemplate <class T = int>\nstruct Edge {\n    using\
-    \ cost_type = T;\n\n    int from;\n    int to;\n    T cost;\n    int id;\n   \
-    \ bool alive;\n\n    Edge() : from(-1), to(-1), cost(T()), id(-1), alive(true)\
-    \ {}\n    Edge(int from_, int to_, T cost_ = T(1), int id_ = -1, bool alive_ =\
-    \ true)\n        : from(from_), to(to_), cost(cost_), id(id_), alive(alive_) {}\n\
-    \n    int other(int v) const {\n        assert(v == from || v == to);\n      \
-    \  return from ^ to ^ v;\n    }\n};\n\ntemplate <class T = int>\nstruct Graph\
-    \ {\n    using edge_type = Edge<T>;\n    using cost_type = T;\n\n   private:\n\
+    #include <concepts>\n#include <functional>\n#include <queue>\n#include <utility>\n\
+    #include <vector>\n\n#line 1 \"graph/graph.hpp\"\n\n\n\n#line 7 \"graph/graph.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\ntemplate <class T = int>\nstruct Edge\
+    \ {\n    using cost_type = T;\n\n    int from;\n    int to;\n    T cost;\n   \
+    \ int id;\n    bool alive;\n\n    Edge() : from(-1), to(-1), cost(T()), id(-1),\
+    \ alive(true) {}\n    Edge(int from_, int to_, T cost_ = T(1), int id_ = -1, bool\
+    \ alive_ = true)\n        : from(from_), to(to_), cost(cost_), id(id_), alive(alive_)\
+    \ {}\n\n    int other(int v) const {\n        assert(v == from || v == to);\n\
+    \        return from ^ to ^ v;\n    }\n};\n\ntemplate <class T = int>\nstruct\
+    \ Graph {\n    using edge_type = Edge<T>;\n    using cost_type = T;\n\n   private:\n\
     \    int _n;\n    int _edge_count;\n    std::vector<std::vector<edge_type>> _g;\n\
     \    std::vector<std::vector<std::pair<int, int>>> _edge_positions;\n\n   public:\n\
     \    Graph() : _n(0), _edge_count(0) {}\n    explicit Graph(int n) : _n(n), _edge_count(0),\
@@ -88,49 +91,82 @@ data:
     \ e.from, e.cost, e.id, e.alive));\n                if (0 <= e.id && e.id < _edge_count)\
     \ result._edge_positions[e.id].push_back({e.to, idx});\n            }\n      \
     \  }\n        return result;\n    }\n};\n\n}  // namespace graph\n}  // namespace\
-    \ m1une\n\n\n#line 10 \"graph/bfs.hpp\"\n\nnamespace m1une {\nnamespace graph\
+    \ m1une\n\n\n#line 13 \"graph/bfs.hpp\"\n\nnamespace m1une {\nnamespace graph\
     \ {\n\nstruct BfsResult {\n    std::vector<int> dist;\n    std::vector<int> parent;\n\
     \    std::vector<int> parent_edge;\n\n    bool reachable(int v) const {\n    \
     \    assert(0 <= v && v < int(dist.size()));\n        return dist[v] != -1;\n\
     \    }\n\n    std::vector<int> path(int t) const {\n        assert(reachable(t));\n\
     \        std::vector<int> result;\n        for (int v = t; v != -1; v = parent[v])\
     \ result.push_back(v);\n        std::reverse(result.begin(), result.end());\n\
-    \        return result;\n    }\n};\n\ntemplate <class T>\nBfsResult bfs(const\
-    \ Graph<T>& g, const std::vector<int>& sources) {\n    int n = g.size();\n   \
-    \ BfsResult result;\n    result.dist.assign(n, -1);\n    result.parent.assign(n,\
+    \        return result;\n    }\n};\n\nnamespace bfs_detail {\n\ntemplate <class\
+    \ Callback>\nconcept BfsCallback =\n    std::invocable<Callback&, int, int> ||\n\
+    \    std::invocable<Callback&, int>;\n\ntemplate <BfsCallback Callback>\nvoid\
+    \ invoke_callback(Callback& callback, int vertex, int parent) {\n    if constexpr\
+    \ (std::invocable<Callback&, int, int>) {\n        std::invoke(callback, vertex,\
+    \ parent);\n    } else {\n        std::invoke(callback, vertex);\n    }\n}\n\n\
+    template <class T, class Callback>\nBfsResult run_bfs(\n    const Graph<T>& g,\n\
+    \    const std::vector<int>& sources,\n    Callback& callback\n) {\n    int n\
+    \ = g.size();\n    BfsResult result;\n    result.dist.assign(n, -1);\n    result.parent.assign(n,\
     \ -1);\n    result.parent_edge.assign(n, -1);\n\n    std::queue<int> que;\n  \
     \  for (int s : sources) {\n        assert(0 <= s && s < n);\n        if (result.dist[s]\
-    \ != -1) continue;\n        result.dist[s] = 0;\n        que.push(s);\n    }\n\
-    \n    while (!que.empty()) {\n        int v = que.front();\n        que.pop();\n\
-    \        for (const auto& e : g[v]) {\n            if (!e.alive) continue;\n \
-    \           if (result.dist[e.to] != -1) continue;\n            result.dist[e.to]\
-    \ = result.dist[v] + 1;\n            result.parent[e.to] = v;\n            result.parent_edge[e.to]\
-    \ = e.id;\n            que.push(e.to);\n        }\n    }\n\n    return result;\n\
-    }\n\ntemplate <class T>\nBfsResult bfs(const Graph<T>& g, int s) {\n    return\
-    \ bfs(g, std::vector<int>{s});\n}\n\n}  // namespace graph\n}  // namespace m1une\n\
-    \n\n"
+    \ != -1) continue;\n        result.dist[s] = 0;\n        invoke_callback(callback,\
+    \ s, -1);\n        que.push(s);\n    }\n\n    while (!que.empty()) {\n       \
+    \ int v = que.front();\n        que.pop();\n        for (const auto& e : g[v])\
+    \ {\n            if (!e.alive) continue;\n            if (result.dist[e.to] !=\
+    \ -1) continue;\n            result.dist[e.to] = result.dist[v] + 1;\n       \
+    \     result.parent[e.to] = v;\n            result.parent_edge[e.to] = e.id;\n\
+    \            invoke_callback(callback, e.to, v);\n            que.push(e.to);\n\
+    \        }\n    }\n\n    return result;\n}\n\n}  // namespace bfs_detail\n\ntemplate\
+    \ <class T>\nBfsResult bfs(const Graph<T>& g, const std::vector<int>& sources)\
+    \ {\n    auto callback = [](int) {};\n    return bfs_detail::run_bfs(g, sources,\
+    \ callback);\n}\n\ntemplate <class T>\nBfsResult bfs(const Graph<T>& g, int s)\
+    \ {\n    return bfs(g, std::vector<int>{s});\n}\n\ntemplate <class T, class Callback>\n\
+    requires bfs_detail::BfsCallback<Callback>\nBfsResult bfs(\n    const Graph<T>&\
+    \ g,\n    const std::vector<int>& sources,\n    Callback&& callback\n) {\n   \
+    \ return bfs_detail::run_bfs(g, sources, callback);\n}\n\ntemplate <class T, class\
+    \ Callback>\nrequires bfs_detail::BfsCallback<Callback>\nBfsResult bfs(const Graph<T>&\
+    \ g, int source, Callback&& callback) {\n    return bfs(\n        g,\n       \
+    \ std::vector<int>{source},\n        std::forward<Callback>(callback)\n    );\n\
+    }\n\n}  // namespace graph\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_GRAPH_BFS_HPP\n#define M1UNE_GRAPH_BFS_HPP 1\n\n#include <algorithm>\n\
-    #include <cassert>\n#include <queue>\n#include <vector>\n\n#include \"graph.hpp\"\
-    \n\nnamespace m1une {\nnamespace graph {\n\nstruct BfsResult {\n    std::vector<int>\
-    \ dist;\n    std::vector<int> parent;\n    std::vector<int> parent_edge;\n\n \
-    \   bool reachable(int v) const {\n        assert(0 <= v && v < int(dist.size()));\n\
-    \        return dist[v] != -1;\n    }\n\n    std::vector<int> path(int t) const\
-    \ {\n        assert(reachable(t));\n        std::vector<int> result;\n       \
-    \ for (int v = t; v != -1; v = parent[v]) result.push_back(v);\n        std::reverse(result.begin(),\
-    \ result.end());\n        return result;\n    }\n};\n\ntemplate <class T>\nBfsResult\
-    \ bfs(const Graph<T>& g, const std::vector<int>& sources) {\n    int n = g.size();\n\
-    \    BfsResult result;\n    result.dist.assign(n, -1);\n    result.parent.assign(n,\
+    #include <cassert>\n#include <concepts>\n#include <functional>\n#include <queue>\n\
+    #include <utility>\n#include <vector>\n\n#include \"graph.hpp\"\n\nnamespace m1une\
+    \ {\nnamespace graph {\n\nstruct BfsResult {\n    std::vector<int> dist;\n   \
+    \ std::vector<int> parent;\n    std::vector<int> parent_edge;\n\n    bool reachable(int\
+    \ v) const {\n        assert(0 <= v && v < int(dist.size()));\n        return\
+    \ dist[v] != -1;\n    }\n\n    std::vector<int> path(int t) const {\n        assert(reachable(t));\n\
+    \        std::vector<int> result;\n        for (int v = t; v != -1; v = parent[v])\
+    \ result.push_back(v);\n        std::reverse(result.begin(), result.end());\n\
+    \        return result;\n    }\n};\n\nnamespace bfs_detail {\n\ntemplate <class\
+    \ Callback>\nconcept BfsCallback =\n    std::invocable<Callback&, int, int> ||\n\
+    \    std::invocable<Callback&, int>;\n\ntemplate <BfsCallback Callback>\nvoid\
+    \ invoke_callback(Callback& callback, int vertex, int parent) {\n    if constexpr\
+    \ (std::invocable<Callback&, int, int>) {\n        std::invoke(callback, vertex,\
+    \ parent);\n    } else {\n        std::invoke(callback, vertex);\n    }\n}\n\n\
+    template <class T, class Callback>\nBfsResult run_bfs(\n    const Graph<T>& g,\n\
+    \    const std::vector<int>& sources,\n    Callback& callback\n) {\n    int n\
+    \ = g.size();\n    BfsResult result;\n    result.dist.assign(n, -1);\n    result.parent.assign(n,\
     \ -1);\n    result.parent_edge.assign(n, -1);\n\n    std::queue<int> que;\n  \
     \  for (int s : sources) {\n        assert(0 <= s && s < n);\n        if (result.dist[s]\
-    \ != -1) continue;\n        result.dist[s] = 0;\n        que.push(s);\n    }\n\
-    \n    while (!que.empty()) {\n        int v = que.front();\n        que.pop();\n\
-    \        for (const auto& e : g[v]) {\n            if (!e.alive) continue;\n \
-    \           if (result.dist[e.to] != -1) continue;\n            result.dist[e.to]\
-    \ = result.dist[v] + 1;\n            result.parent[e.to] = v;\n            result.parent_edge[e.to]\
-    \ = e.id;\n            que.push(e.to);\n        }\n    }\n\n    return result;\n\
-    }\n\ntemplate <class T>\nBfsResult bfs(const Graph<T>& g, int s) {\n    return\
-    \ bfs(g, std::vector<int>{s});\n}\n\n}  // namespace graph\n}  // namespace m1une\n\
-    \n#endif  // M1UNE_GRAPH_BFS_HPP\n"
+    \ != -1) continue;\n        result.dist[s] = 0;\n        invoke_callback(callback,\
+    \ s, -1);\n        que.push(s);\n    }\n\n    while (!que.empty()) {\n       \
+    \ int v = que.front();\n        que.pop();\n        for (const auto& e : g[v])\
+    \ {\n            if (!e.alive) continue;\n            if (result.dist[e.to] !=\
+    \ -1) continue;\n            result.dist[e.to] = result.dist[v] + 1;\n       \
+    \     result.parent[e.to] = v;\n            result.parent_edge[e.to] = e.id;\n\
+    \            invoke_callback(callback, e.to, v);\n            que.push(e.to);\n\
+    \        }\n    }\n\n    return result;\n}\n\n}  // namespace bfs_detail\n\ntemplate\
+    \ <class T>\nBfsResult bfs(const Graph<T>& g, const std::vector<int>& sources)\
+    \ {\n    auto callback = [](int) {};\n    return bfs_detail::run_bfs(g, sources,\
+    \ callback);\n}\n\ntemplate <class T>\nBfsResult bfs(const Graph<T>& g, int s)\
+    \ {\n    return bfs(g, std::vector<int>{s});\n}\n\ntemplate <class T, class Callback>\n\
+    requires bfs_detail::BfsCallback<Callback>\nBfsResult bfs(\n    const Graph<T>&\
+    \ g,\n    const std::vector<int>& sources,\n    Callback&& callback\n) {\n   \
+    \ return bfs_detail::run_bfs(g, sources, callback);\n}\n\ntemplate <class T, class\
+    \ Callback>\nrequires bfs_detail::BfsCallback<Callback>\nBfsResult bfs(const Graph<T>&\
+    \ g, int source, Callback&& callback) {\n    return bfs(\n        g,\n       \
+    \ std::vector<int>{source},\n        std::forward<Callback>(callback)\n    );\n\
+    }\n\n}  // namespace graph\n}  // namespace m1une\n\n#endif  // M1UNE_GRAPH_BFS_HPP\n"
   dependsOn:
   - graph/graph.hpp
   isVerificationFile: false
@@ -140,10 +176,11 @@ data:
   - graph/undirected.hpp
   - graph/directed.hpp
   - graph/shortest_path.hpp
-  timestamp: '2026-07-11 19:47:32+09:00'
+  timestamp: '2026-07-16 19:40:55+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
+  - verify/graph/bfs.test.cpp
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/graph_algorithms.test.cpp
 documentation_of: graph/bfs.hpp
@@ -172,6 +209,22 @@ Call `bfs(g, s)` for one source, or `bfs(g, sources)` when several vertices
 should start at distance `0`. Multi-source BFS is useful for problems like
 "distance to the nearest special vertex".
 
+The callback overloads invoke a callback exactly once when a vertex is
+discovered. Sources are reported in the supplied order, followed by other
+vertices in queue-insertion order, so callback distances are nondecreasing.
+They still return the complete `BfsResult`. The callback must not mutate the
+graph.
+
+The primary callback signature is:
+
+```cpp
+callback(int vertex, int parent);
+```
+
+`parent` is the BFS-tree parent of `vertex`, or `-1` when `vertex` is a source.
+For convenience, `callback(int vertex)` is also accepted when parent
+information is not needed.
+
 The result contains these members:
 
 | Member | Type / Signature | Meaning |
@@ -188,13 +241,19 @@ The result contains these members:
 | --- | --- | --- | --- |
 | `bfs` | `template <class T> BfsResult bfs(const Graph<T>& g, int s)` | Runs BFS from one source. | $O(N + M)$ |
 | `bfs` | `template <class T> BfsResult bfs(const Graph<T>& g, const std::vector<int>& sources)` | Runs multi-source BFS. | $O(N + M)$ |
+| `bfs` | `template <class T, class Callback> BfsResult bfs(const Graph<T>& g, int source, Callback&& callback)` | Runs single-source BFS and invokes the callback on discovery. | $O(N + M + RF)$ |
+| `bfs` | `template <class T, class Callback> BfsResult bfs(const Graph<T>& g, const std::vector<int>& sources, Callback&& callback)` | Runs multi-source BFS and invokes the callback on discovery. | $O(N + M + RF)$ |
+
+Here, `R` is the number of reached vertices and `F` is the cost of one callback.
 
 ## Example
 
 ```cpp
 #include "graph/bfs.hpp"
 #include "graph/graph.hpp"
+#include <cassert>
 #include <iostream>
+#include <vector>
 
 int main() {
     m1une::graph::Graph<> g(4);
@@ -202,7 +261,15 @@ int main() {
     g.add_edge(1, 2);
     g.add_edge(0, 3);
 
-    auto res = m1une::graph::bfs(g, 0);
+    std::vector<int> discovered;
+    auto res = m1une::graph::bfs(
+        g,
+        0,
+        [&](int vertex, int parent) {
+            discovered.push_back(vertex);
+            if (vertex == 0) assert(parent == -1);
+        }
+    );
     std::cout << res.dist[2] << "\n";  // 2
 
     for (int v : res.path(2)) {

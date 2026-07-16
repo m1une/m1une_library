@@ -391,6 +391,9 @@ data:
     path: verify/geometry/segment_intersection.test.cpp
     title: verify/geometry/segment_intersection.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/bfs.test.cpp
+    title: verify/graph/bfs.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/biconnected_components.test.cpp
     title: verify/graph/biconnected_components.test.cpp
   - icon: ':heavy_check_mark:'
@@ -429,6 +432,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/cycle_detection_undirected.test.cpp
     title: verify/graph/cycle_detection_undirected.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/dfs.test.cpp
+    title: verify/graph/dfs.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/directed_mst.test.cpp
     title: verify/graph/directed_mst.test.cpp
@@ -1589,9 +1595,11 @@ data:
   - verify/graph/cow_game.test.cpp
   - verify/graph/library_checker_lowest_common_ancestor.test.cpp
   - verify/graph/graph_counting.test.cpp
+  - verify/graph/dfs.test.cpp
   - verify/graph/two_sat.test.cpp
   - verify/graph/minimum_steiner_tree.test.cpp
   - verify/graph/library_checker_general_matching.test.cpp
+  - verify/graph/bfs.test.cpp
   - verify/graph/chordal_graph_recognition.test.cpp
   - verify/graph/shortest_path.test.cpp
   - verify/graph/range_edge_graph.test.cpp

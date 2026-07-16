@@ -581,6 +581,9 @@ data:
       path: graph/dag_shortest_path.hpp
       title: DAG Shortest Path
     - icon: ':heavy_check_mark:'
+      path: graph/dfs.hpp
+      title: DFS
+    - icon: ':heavy_check_mark:'
       path: graph/dijkstra.hpp
       title: Dijkstra
     - icon: ':heavy_check_mark:'
@@ -1591,6 +1594,9 @@ data:
   - name: verify/graph
     pages:
     - icon: ':heavy_check_mark:'
+      path: verify/graph/bfs.test.cpp
+      title: verify/graph/bfs.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/graph/biconnected_components.test.cpp
       title: verify/graph/biconnected_components.test.cpp
     - icon: ':heavy_check_mark:'
@@ -1629,6 +1635,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/graph/cycle_detection_undirected.test.cpp
       title: verify/graph/cycle_detection_undirected.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/dfs.test.cpp
+      title: verify/graph/dfs.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/graph/directed_mst.test.cpp
       title: verify/graph/directed_mst.test.cpp
