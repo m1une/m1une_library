@@ -20,12 +20,17 @@ concept IsMonoid = requires(typename M::value_type a, typename M::value_type b) 
     { M::op(a, b) } -> std::same_as<typename M::value_type>;
 };
 
-// Concept for commutative group monoids.
-// A type satisfying this concept must also obey commutativity and inverse laws.
+// Concept for groups. A type satisfying this concept must also obey the group
+// laws; concepts can check the interface but not the algebraic properties.
 template <typename M>
-concept IsCommutativeGroup = IsMonoid<M> && requires(typename M::value_type a) {
+concept IsGroup = IsMonoid<M> && requires(typename M::value_type a) {
     { M::inv(a) } -> std::same_as<typename M::value_type>;
 };
+
+// Concept for commutative groups. Commutativity is a semantic requirement and
+// cannot be checked by a C++ concept.
+template <typename M>
+concept IsCommutativeGroup = IsGroup<M>;
 
 }  // namespace monoid
 }  // namespace m1une

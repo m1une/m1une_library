@@ -22,21 +22,25 @@ To satisfy `m1une::monoid::IsMonoid`, a type `M` must implement:
 * `using value_type = T;`
   The type stored by the monoid.
 
-* `static constexpr T id();`
+* `static T id();`
   Returns the identity element.
 
-* `static constexpr T op(const T& a, const T& b);`
+* `static T op(const T& a, const T& b);`
   Combines two values.
 
-## Commutative Group
+## Group
 
-`m1une::monoid::IsCommutativeGroup` extends `IsMonoid` with an inverse:
+`m1une::monoid::IsGroup` extends `IsMonoid` with an inverse:
 
-* `static constexpr T inv(const T& x);`
+* `static T inv(const T& x);`
   Returns the inverse of `x` with respect to `op`.
 
-The concept checks only that `inv` exists. The type should satisfy the
-group laws, and `op` should be commutative.
+The concept checks only that `inv` exists. The type must satisfy the group
+laws, but `op` does not need to be commutative.
+
+`m1une::monoid::IsCommutativeGroup` extends `IsGroup`. It has the same
+compile-time interface check because C++ concepts cannot prove commutativity;
+types used through it must additionally guarantee that `op(a, b) == op(b, a)`.
 
 ## Example
 
