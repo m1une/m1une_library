@@ -26,6 +26,7 @@
 #include "namori.hpp"
 #include "replacement_paths.hpp"
 #include "shortest_path.hpp"
+#include "st_numbering.hpp"
 #include "three_edge_connected_components.hpp"
 #include "two_edge_connected_components.hpp"
 

@@ -24,6 +24,7 @@ where direction should not matter.
 | `graph/block_cut_tree.hpp` | Undirected only | Block-cut forest and original-vertex-to-node mappings. |
 | `graph/two_edge_connected_components.hpp` | Undirected only | Two-edge-connected components, bridges, and the contracted bridge forest. |
 | `graph/three_edge_connected_components.hpp` | Undirected only | Linear-time three-edge-connected vertex decomposition. |
+| `graph/st_numbering.hpp` | Undirected only | Bipolar numbering between specified source and sink vertices. |
 | `graph/kruskal.hpp` | Undirected only | Minimum spanning forest. |
 | `graph/matrix_tree_theorem.hpp` | Undirected or directed | Counts weighted spanning trees with a Laplacian cofactor. |
 | `graph/bipartite.hpp` | Direction ignored / explicit bipartite sides | Two-colorability, maximum matching, minimum vertex cover, maximum independent set, and minimum edge cover. |

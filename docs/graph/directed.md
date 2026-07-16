@@ -21,6 +21,7 @@ depends on edge direction.
 | `graph/directed_mst.hpp` | Directed rooted graph | Minimum-cost spanning arborescence with edge reconstruction. |
 | `graph/matrix_tree_theorem.hpp` | Directed rooted graph | Counts weighted inward and outward spanning arborescences. |
 | `graph/scc.hpp` | Directed only | Strongly connected components and condensation DAG. |
+| `graph/incremental_scc.hpp` | Directed only | Offline SCC merge times under edge insertions. |
 | `graph/two_sat.hpp` | Implication graph | 2-SAT clauses, satisfiability, and one assignment. |
 | `graph/cycle_detection.hpp` | Directed and undirected variants | Use `find_directed_cycle(g)` for directed graphs. |
 | `graph/eulerian_trail.hpp` | Directed and undirected variants | Use `directed_eulerian_trail(g)` for directed graphs. |

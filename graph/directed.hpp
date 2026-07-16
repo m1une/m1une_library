@@ -6,6 +6,7 @@
 #include "directed_mst.hpp"
 #include "eulerian_trail.hpp"
 #include "graph.hpp"
+#include "incremental_scc.hpp"
 #include "matrix_tree_theorem.hpp"
 #include "scc.hpp"
 #include "shortest_path.hpp"

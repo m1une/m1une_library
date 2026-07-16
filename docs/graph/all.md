@@ -40,12 +40,14 @@ Public namespaces stay flat and short: general graph helpers use
 | `graph/dominator_tree.hpp` | Directed rooted graph | Lengauer-Tarjan immediate dominators and dominator tree. |
 | `graph/directed_mst.hpp` | Directed rooted graph | Minimum-cost spanning arborescence with edge reconstruction. |
 | `graph/scc.hpp` | Directed only | Strongly connected components and condensation DAG. |
+| `graph/incremental_scc.hpp` | Directed only | Offline SCC merge times under edge insertions. |
 | `graph/two_sat.hpp` | Implication graph | 2-SAT clauses, satisfiability, and one assignment. |
 | `graph/lowlink.hpp` | Undirected only | Articulation points and bridges. |
 | `graph/biconnected_components.hpp` | Undirected only | Vertex-biconnected blocks, articulation points, and block incidence. |
 | `graph/block_cut_tree.hpp` | Undirected only | Block-cut forest and original-vertex-to-node mappings. |
 | `graph/two_edge_connected_components.hpp` | Undirected only | Two-edge-connected components, bridges, and the contracted bridge forest. |
 | `graph/three_edge_connected_components.hpp` | Undirected only | Linear-time three-edge-connected vertex decomposition. |
+| `graph/st_numbering.hpp` | Undirected only | Bipolar numbering between specified source and sink vertices. |
 | `graph/chordal_graph_recognition.hpp` | Direction ignored | Linear-time recognition with a perfect elimination ordering or induced-cycle certificate. |
 | `graph/complement_connected_components.hpp` | Direction ignored | Linear-time connected components of the complement graph without constructing it. |
 | `graph/bipartite.hpp` | Direction ignored / explicit bipartite sides | Two-colorability, matching, vertex/edge covers, independent sets, and optimal bipartite edge coloring. |
