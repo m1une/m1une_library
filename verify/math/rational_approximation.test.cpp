@@ -59,11 +59,12 @@ void test_exhaustive() {
     }
 
     auto small = m1une::math::rational_approximation(1LL, 1LL, 2LL);
-    assert(small.lower == Fraction(0, 1));
-    assert(small.upper == Fraction(1, 1));
+    using SignedFraction = decltype(small)::fraction_type;
+    assert(small.lower == SignedFraction(0, 1));
+    assert(small.upper == SignedFraction(1, 1));
     auto large = m1une::math::rational_approximation(1LL, 2LL, 1LL);
-    assert(large.lower == Fraction(1, 1));
-    assert(large.upper == Fraction(1, 0));
+    assert(large.lower == SignedFraction(1, 1));
+    assert(large.upper == SignedFraction(1, 0));
 }
 
 }  // namespace
