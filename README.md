@@ -29,7 +29,7 @@ without rewriting boilerplate during a contest.
 | `geometry/` | 2D points, lines, rays, segments, polygons, rectangle-union area, convex hulls, half-plane intersection, lattice-point counting, and circles. |
 | `ds/` | Categorized data structures for range queries, online/offline dynamic connectivity, dynamic sequences and trees, ordered sets, heaps, intervals, and hash tables. |
 | `monoid/` | Reusable monoids for generic data structures such as `Segtree`. |
-| `acted_monoid/` | Acted monoids for lazy propagation structures such as `LazySegtree` and generic `SegtreeBeats`. |
+| `acted_monoid/` | Acted monoids for lazy propagation structures such as `LazySegtree` and generic `SegtreeBeats`, including generic range assignment/range product. |
 | `math/` | Number theory, modular arithmetic, combinatorics and partition functions, set power series and FPS/polynomials, XOR bases and bitwise transforms, matrices, exact rationals, and integer arithmetic. |
 | `string/` | Z/KMP, wildcard matching, edit distance, Manacher, minimum rotation, Lyndon factorization, run enumeration, longest common extension/subsequence/substring, eertrees, suffix automata/arrays, tries, Aho-Corasick, and string hashes. |
 | `utilities/` | Fast I/O, parsing, dice, 2D grid transforms, integer helpers, compression, random generation, stress testing, and general contest utilities. |
