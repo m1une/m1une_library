@@ -35,24 +35,27 @@ data:
     \    typename M::value_type;\n\n    // 2. Must have a static method `id()` returning\
     \ `value_type`\n    { M::id() } -> std::same_as<typename M::value_type>;\n\n \
     \   // 3. Must have a static method `op(a, b)` returning `value_type`\n    { M::op(a,\
-    \ b) } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for commutative\
-    \ group monoids.\n// A type satisfying this concept must also obey commutativity\
-    \ and inverse laws.\ntemplate <typename M>\nconcept IsCommutativeGroup = IsMonoid<M>\
-    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line\
-    \ 12 \"ds/dsu/dsu_monoid.hpp\"\n\nnamespace m1une {\nnamespace ds {\n\ntemplate\
-    \ <m1une::monoid::IsMonoid Monoid>\nstruct DsuMonoid {\n    using T = typename\
-    \ Monoid::value_type;\n\n   private:\n    int _n;\n    std::vector<int> parent_or_size;\n\
-    \    std::vector<T> _prod;\n\n    static int check_size(int n) {\n        assert(0\
-    \ <= n);\n        return n;\n    }\n\n    template <typename U>\n    static T\
-    \ make_value(const U& value, int index) {\n        if constexpr (requires(U x)\
-    \ { Monoid::make(x); }) {\n            return Monoid::make(value);\n        }\
-    \ else if constexpr (requires(U x, int i) { Monoid::make(x, i); }) {\n       \
-    \     return Monoid::make(value, index);\n        } else {\n            return\
-    \ static_cast<T>(value);\n        }\n    }\n\n   public:\n    DsuMonoid() : DsuMonoid(0)\
-    \ {}\n\n    explicit DsuMonoid(int n) : DsuMonoid(n, Monoid::id()) {}\n\n    DsuMonoid(int\
-    \ n, const T& value) : _n(check_size(n)), parent_or_size(_n, -1), _prod(_n, value)\
-    \ {}\n\n    explicit DsuMonoid(const std::vector<T>& v) : _n(int(v.size())), parent_or_size(_n,\
+    \ b) } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for groups.\
+    \ A type satisfying this concept must also obey the group\n// laws; concepts can\
+    \ check the interface but not the algebraic properties.\ntemplate <typename M>\n\
+    concept IsGroup = IsMonoid<M> && requires(typename M::value_type a) {\n    { M::inv(a)\
+    \ } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for commutative\
+    \ groups. Commutativity is a semantic requirement and\n// cannot be checked by\
+    \ a C++ concept.\ntemplate <typename M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\
+    \n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 12 \"ds/dsu/dsu_monoid.hpp\"\
+    \n\nnamespace m1une {\nnamespace ds {\n\ntemplate <m1une::monoid::IsMonoid Monoid>\n\
+    struct DsuMonoid {\n    using T = typename Monoid::value_type;\n\n   private:\n\
+    \    int _n;\n    std::vector<int> parent_or_size;\n    std::vector<T> _prod;\n\
+    \n    static int check_size(int n) {\n        assert(0 <= n);\n        return\
+    \ n;\n    }\n\n    template <typename U>\n    static T make_value(const U& value,\
+    \ int index) {\n        if constexpr (requires(U x) { Monoid::make(x); }) {\n\
+    \            return Monoid::make(value);\n        } else if constexpr (requires(U\
+    \ x, int i) { Monoid::make(x, i); }) {\n            return Monoid::make(value,\
+    \ index);\n        } else {\n            return static_cast<T>(value);\n     \
+    \   }\n    }\n\n   public:\n    DsuMonoid() : DsuMonoid(0) {}\n\n    explicit\
+    \ DsuMonoid(int n) : DsuMonoid(n, Monoid::id()) {}\n\n    DsuMonoid(int n, const\
+    \ T& value) : _n(check_size(n)), parent_or_size(_n, -1), _prod(_n, value) {}\n\
+    \n    explicit DsuMonoid(const std::vector<T>& v) : _n(int(v.size())), parent_or_size(_n,\
     \ -1), _prod(v) {}\n\n    explicit DsuMonoid(std::vector<T>&& v) : _n(int(v.size())),\
     \ parent_or_size(_n, -1), _prod(std::move(v)) {}\n\n    template <typename U>\n\
     \    requires (!std::same_as<U, T>) && (\n        requires(U x) { Monoid::make(x);\
@@ -390,7 +393,7 @@ data:
   isVerificationFile: true
   path: verify/ds/dsu/dsu_monoid.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-16 20:44:42+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/dsu/dsu_monoid.test.cpp

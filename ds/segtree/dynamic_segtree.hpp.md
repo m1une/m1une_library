@@ -80,79 +80,81 @@ data:
     \ Must have a static method `id()` returning `value_type`\n    { M::id() } ->\
     \ std::same_as<typename M::value_type>;\n\n    // 3. Must have a static method\
     \ `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for commutative group monoids.\n// A type\
-    \ satisfying this concept must also obey commutativity and inverse laws.\ntemplate\
-    \ <typename M>\nconcept IsCommutativeGroup = IsMonoid<M> && requires(typename\
-    \ M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename M::value_type>;\n\
-    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 16 \"ds/segtree/dynamic_segtree.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\n\n// A sparse segment tree over an integral\
-    \ half-open interval.\n// Nodes are allocated from a contiguous pool only when\
-    \ a position is touched.\ntemplate <m1une::monoid::IsMonoid Monoid, std::integral\
-    \ Index = long long>\nrequires(!std::same_as<std::remove_cv_t<Index>, bool>)\n\
-    struct DynamicSegtree {\n    using T = typename Monoid::value_type;\n    using\
-    \ index_type = Index;\n    using size_type = detail::dynamic_size_type<Index>;\n\
-    \n   private:\n    struct Node {\n        T val;\n        int left;\n        int\
-    \ right;\n\n        Node() : val(Monoid::id()), left(0), right(0) {}\n    };\n\
-    \n    static constexpr int path_capacity = std::numeric_limits<size_type>::digits\
-    \ + 1;\n\n    detail::UniformMonoidDomain<Monoid, Index> _domain;\n    int _root;\n\
-    \    std::vector<Node> _nodes;\n\n    int new_node() {\n        assert(_nodes.size()\
-    \ < std::size_t(std::numeric_limits<int>::max()));\n        _nodes.emplace_back();\n\
-    \        return int(_nodes.size()) - 1;\n    }\n\n    const T& value(int t, Index\
-    \ left, Index right, int depth) const {\n        if (t) return _nodes[t].val;\n\
-    \        return _domain.default_product(depth, left, right);\n    }\n\n    void\
-    \ update(int t, Index left, Index right, int depth) {\n        Index middle =\
-    \ std::midpoint(left, right);\n        _nodes[t].val = Monoid::op(\n         \
-    \   value(_nodes[t].left, left, middle, depth + 1),\n            value(_nodes[t].right,\
-    \ middle, right, depth + 1)\n        );\n    }\n\n    T prod_node(int t, Index\
-    \ l, Index r, int depth, Index ql, Index qr) const {\n        if (qr <= l || r\
-    \ <= ql) return Monoid::id();\n        if (ql <= l && r <= qr) return value(t,\
-    \ l, r, depth);\n        Index m = std::midpoint(l, r);\n        return Monoid::op(\n\
-    \            prod_node(t ? _nodes[t].left : 0, l, m, depth + 1, ql, qr),\n   \
-    \         prod_node(t ? _nodes[t].right : 0, m, r, depth + 1, ql, qr)\n      \
-    \  );\n    }\n\n    template <class F>\n    Index max_right_node(\n        int\
-    \ t,\n        Index l,\n        Index r,\n        int depth,\n        Index ql,\n\
-    \        T& sm,\n        F& f\n    ) const {\n        if (r <= ql) return r;\n\
-    \        if (ql <= l) {\n            T next = Monoid::op(sm, value(t, l, r, depth));\n\
-    \            if (f(next)) {\n                sm = std::move(next);\n         \
-    \       return r;\n            }\n            Index m = std::midpoint(l, r);\n\
-    \            if (m == l) return l;\n        }\n        Index m = std::midpoint(l,\
-    \ r);\n        Index res = max_right_node(\n            t ? _nodes[t].left : 0,\n\
-    \            l,\n            m,\n            depth + 1,\n            ql,\n   \
-    \         sm,\n            f\n        );\n        if (res < m) return res;\n \
-    \       return max_right_node(\n            t ? _nodes[t].right : 0,\n       \
-    \     m,\n            r,\n            depth + 1,\n            ql,\n          \
-    \  sm,\n            f\n        );\n    }\n\n    template <class F>\n    Index\
-    \ min_left_node(\n        int t,\n        Index l,\n        Index r,\n       \
-    \ int depth,\n        Index qr,\n        T& sm,\n        F& f\n    ) const {\n\
-    \        if (qr <= l) return l;\n        if (r <= qr) {\n            T next =\
-    \ Monoid::op(value(t, l, r, depth), sm);\n            if (f(next)) {\n       \
-    \         sm = std::move(next);\n                return l;\n            }\n  \
-    \          Index m = std::midpoint(l, r);\n            if (m == l) return r;\n\
-    \        }\n        Index m = std::midpoint(l, r);\n        Index res = min_left_node(\n\
-    \            t ? _nodes[t].right : 0,\n            m,\n            r,\n      \
-    \      depth + 1,\n            qr,\n            sm,\n            f\n        );\n\
-    \        if (m < res) return res;\n        return min_left_node(\n           \
-    \ t ? _nodes[t].left : 0,\n            l,\n            m,\n            depth +\
-    \ 1,\n            qr,\n            sm,\n            f\n        );\n    }\n\n \
-    \  public:\n    // Constructs an empty tree over [0, 0).\n    DynamicSegtree()\
-    \ : DynamicSegtree(Index(0), Index(0)) {}\n\n    // Constructs a tree over [0,\
-    \ n).\n    explicit DynamicSegtree(Index n) : DynamicSegtree(Index(0), n) {\n\
-    \        if constexpr (std::signed_integral<Index>) assert(Index(0) <= n);\n \
-    \   }\n\n    // Constructs a tree over [left, right).\n    DynamicSegtree(Index\
-    \ left, Index right)\n        : DynamicSegtree(left, right, Monoid::id()) {}\n\
-    \n    // Constructs a tree over [left, right) with every coordinate initialized\
-    \ to\n    // `initial_value`.\n    DynamicSegtree(Index left, Index right, T initial_value)\n\
-    \        : _domain(left, right, std::move(initial_value)), _root(0), _nodes(1)\
-    \ {}\n\n    // Returns the number of coordinates in the domain.\n    size_type\
-    \ size() const {\n        return _domain.size();\n    }\n\n    // Returns whether\
-    \ the coordinate domain is empty.\n    bool empty() const {\n        return _domain.empty();\n\
-    \    }\n\n    // Returns the left endpoint of the coordinate domain.\n    Index\
-    \ left_bound() const {\n        return _domain.left_bound();\n    }\n\n    //\
-    \ Returns the right endpoint of the coordinate domain.\n    Index right_bound()\
-    \ const {\n        return _domain.right_bound();\n    }\n\n    // Returns the\
-    \ value assigned to untouched coordinates.\n    const T& initial_value() const\
-    \ {\n        return _domain.initial_value();\n    }\n\n    // Reserves space for\
-    \ `node_capacity` allocated nodes.\n    void reserve(std::size_t node_capacity)\
+    \ M::value_type>;\n};\n\n// Concept for groups. A type satisfying this concept\
+    \ must also obey the group\n// laws; concepts can check the interface but not\
+    \ the algebraic properties.\ntemplate <typename M>\nconcept IsGroup = IsMonoid<M>\
+    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
+    \ M::value_type>;\n};\n\n// Concept for commutative groups. Commutativity is a\
+    \ semantic requirement and\n// cannot be checked by a C++ concept.\ntemplate <typename\
+    \ M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\n}  // namespace monoid\n}  //\
+    \ namespace m1une\n\n\n#line 16 \"ds/segtree/dynamic_segtree.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace ds {\n\n// A sparse segment tree over an integral half-open\
+    \ interval.\n// Nodes are allocated from a contiguous pool only when a position\
+    \ is touched.\ntemplate <m1une::monoid::IsMonoid Monoid, std::integral Index =\
+    \ long long>\nrequires(!std::same_as<std::remove_cv_t<Index>, bool>)\nstruct DynamicSegtree\
+    \ {\n    using T = typename Monoid::value_type;\n    using index_type = Index;\n\
+    \    using size_type = detail::dynamic_size_type<Index>;\n\n   private:\n    struct\
+    \ Node {\n        T val;\n        int left;\n        int right;\n\n        Node()\
+    \ : val(Monoid::id()), left(0), right(0) {}\n    };\n\n    static constexpr int\
+    \ path_capacity = std::numeric_limits<size_type>::digits + 1;\n\n    detail::UniformMonoidDomain<Monoid,\
+    \ Index> _domain;\n    int _root;\n    std::vector<Node> _nodes;\n\n    int new_node()\
+    \ {\n        assert(_nodes.size() < std::size_t(std::numeric_limits<int>::max()));\n\
+    \        _nodes.emplace_back();\n        return int(_nodes.size()) - 1;\n    }\n\
+    \n    const T& value(int t, Index left, Index right, int depth) const {\n    \
+    \    if (t) return _nodes[t].val;\n        return _domain.default_product(depth,\
+    \ left, right);\n    }\n\n    void update(int t, Index left, Index right, int\
+    \ depth) {\n        Index middle = std::midpoint(left, right);\n        _nodes[t].val\
+    \ = Monoid::op(\n            value(_nodes[t].left, left, middle, depth + 1),\n\
+    \            value(_nodes[t].right, middle, right, depth + 1)\n        );\n  \
+    \  }\n\n    T prod_node(int t, Index l, Index r, int depth, Index ql, Index qr)\
+    \ const {\n        if (qr <= l || r <= ql) return Monoid::id();\n        if (ql\
+    \ <= l && r <= qr) return value(t, l, r, depth);\n        Index m = std::midpoint(l,\
+    \ r);\n        return Monoid::op(\n            prod_node(t ? _nodes[t].left :\
+    \ 0, l, m, depth + 1, ql, qr),\n            prod_node(t ? _nodes[t].right : 0,\
+    \ m, r, depth + 1, ql, qr)\n        );\n    }\n\n    template <class F>\n    Index\
+    \ max_right_node(\n        int t,\n        Index l,\n        Index r,\n      \
+    \  int depth,\n        Index ql,\n        T& sm,\n        F& f\n    ) const {\n\
+    \        if (r <= ql) return r;\n        if (ql <= l) {\n            T next =\
+    \ Monoid::op(sm, value(t, l, r, depth));\n            if (f(next)) {\n       \
+    \         sm = std::move(next);\n                return r;\n            }\n  \
+    \          Index m = std::midpoint(l, r);\n            if (m == l) return l;\n\
+    \        }\n        Index m = std::midpoint(l, r);\n        Index res = max_right_node(\n\
+    \            t ? _nodes[t].left : 0,\n            l,\n            m,\n       \
+    \     depth + 1,\n            ql,\n            sm,\n            f\n        );\n\
+    \        if (res < m) return res;\n        return max_right_node(\n          \
+    \  t ? _nodes[t].right : 0,\n            m,\n            r,\n            depth\
+    \ + 1,\n            ql,\n            sm,\n            f\n        );\n    }\n\n\
+    \    template <class F>\n    Index min_left_node(\n        int t,\n        Index\
+    \ l,\n        Index r,\n        int depth,\n        Index qr,\n        T& sm,\n\
+    \        F& f\n    ) const {\n        if (qr <= l) return l;\n        if (r <=\
+    \ qr) {\n            T next = Monoid::op(value(t, l, r, depth), sm);\n       \
+    \     if (f(next)) {\n                sm = std::move(next);\n                return\
+    \ l;\n            }\n            Index m = std::midpoint(l, r);\n            if\
+    \ (m == l) return r;\n        }\n        Index m = std::midpoint(l, r);\n    \
+    \    Index res = min_left_node(\n            t ? _nodes[t].right : 0,\n      \
+    \      m,\n            r,\n            depth + 1,\n            qr,\n         \
+    \   sm,\n            f\n        );\n        if (m < res) return res;\n       \
+    \ return min_left_node(\n            t ? _nodes[t].left : 0,\n            l,\n\
+    \            m,\n            depth + 1,\n            qr,\n            sm,\n  \
+    \          f\n        );\n    }\n\n   public:\n    // Constructs an empty tree\
+    \ over [0, 0).\n    DynamicSegtree() : DynamicSegtree(Index(0), Index(0)) {}\n\
+    \n    // Constructs a tree over [0, n).\n    explicit DynamicSegtree(Index n)\
+    \ : DynamicSegtree(Index(0), n) {\n        if constexpr (std::signed_integral<Index>)\
+    \ assert(Index(0) <= n);\n    }\n\n    // Constructs a tree over [left, right).\n\
+    \    DynamicSegtree(Index left, Index right)\n        : DynamicSegtree(left, right,\
+    \ Monoid::id()) {}\n\n    // Constructs a tree over [left, right) with every coordinate\
+    \ initialized to\n    // `initial_value`.\n    DynamicSegtree(Index left, Index\
+    \ right, T initial_value)\n        : _domain(left, right, std::move(initial_value)),\
+    \ _root(0), _nodes(1) {}\n\n    // Returns the number of coordinates in the domain.\n\
+    \    size_type size() const {\n        return _domain.size();\n    }\n\n    //\
+    \ Returns whether the coordinate domain is empty.\n    bool empty() const {\n\
+    \        return _domain.empty();\n    }\n\n    // Returns the left endpoint of\
+    \ the coordinate domain.\n    Index left_bound() const {\n        return _domain.left_bound();\n\
+    \    }\n\n    // Returns the right endpoint of the coordinate domain.\n    Index\
+    \ right_bound() const {\n        return _domain.right_bound();\n    }\n\n    //\
+    \ Returns the value assigned to untouched coordinates.\n    const T& initial_value()\
+    \ const {\n        return _domain.initial_value();\n    }\n\n    // Reserves space\
+    \ for `node_capacity` allocated nodes.\n    void reserve(std::size_t node_capacity)\
     \ {\n        assert(node_capacity < std::numeric_limits<std::size_t>::max());\n\
     \        _nodes.reserve(node_capacity + 1);\n    }\n\n    // Returns the number\
     \ of allocated nodes, excluding the sentinel.\n    std::size_t node_count() const\
@@ -335,7 +337,7 @@ data:
   isVerificationFile: false
   path: ds/segtree/dynamic_segtree.hpp
   requiredBy: []
-  timestamp: '2026-06-23 01:19:04+09:00'
+  timestamp: '2026-07-16 20:44:42+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/segtree/dynamic_segtree.test.cpp

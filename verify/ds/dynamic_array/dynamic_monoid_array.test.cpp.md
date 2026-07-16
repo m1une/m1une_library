@@ -265,30 +265,32 @@ data:
     \    typename M::value_type;\n\n    // 2. Must have a static method `id()` returning\
     \ `value_type`\n    { M::id() } -> std::same_as<typename M::value_type>;\n\n \
     \   // 3. Must have a static method `op(a, b)` returning `value_type`\n    { M::op(a,\
-    \ b) } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for commutative\
-    \ group monoids.\n// A type satisfying this concept must also obey commutativity\
-    \ and inverse laws.\ntemplate <typename M>\nconcept IsCommutativeGroup = IsMonoid<M>\
-    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line\
-    \ 13 \"ds/dynamic_array/dynamic_monoid_array.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ ds {\n\ntemplate <m1une::monoid::IsMonoid Monoid>\nstruct DynamicMonoidArray\
-    \ {\n    using T = typename Monoid::value_type;\n\n   private:\n    struct Node\
-    \ {\n        T val;\n        T prod;\n        T rprod;\n        int priority;\n\
-    \        int count;\n        int l, r;\n        bool rev;\n\n        Node()\n\
-    \            : val(Monoid::id()),\n              prod(Monoid::id()),\n       \
-    \       rprod(Monoid::id()),\n              priority(0),\n              count(0),\n\
-    \              l(0),\n              r(0),\n              rev(false) {}\n\n   \
-    \     Node(T value, int node_priority)\n            : val(std::move(value)), prod(val),\
-    \ rprod(val), priority(node_priority), count(1), l(0), r(0), rev(false) {}\n \
-    \   };\n\n    std::vector<Node> pool;\n    int root;\n    std::uint32_t rng_state;\n\
-    \n    template <typename U>\n    static T make_value(const U& value) {\n     \
-    \   if constexpr (requires(U x) { Monoid::make(x); }) {\n            return Monoid::make(value);\n\
-    \        } else {\n            return static_cast<T>(value);\n        }\n    }\n\
-    \n    int new_node(T value) {\n        pool.push_back(Node(std::move(value), next_priority()));\n\
-    \        return int(pool.size()) - 1;\n    }\n\n    int next_priority() {\n  \
-    \      rng_state ^= rng_state << 13;\n        rng_state ^= rng_state >> 17;\n\
-    \        rng_state ^= rng_state << 5;\n        return int(rng_state);\n    }\n\
-    \n    void update(int t) {\n        if (!t) return;\n        int l = pool[t].l;\n\
+    \ b) } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for groups.\
+    \ A type satisfying this concept must also obey the group\n// laws; concepts can\
+    \ check the interface but not the algebraic properties.\ntemplate <typename M>\n\
+    concept IsGroup = IsMonoid<M> && requires(typename M::value_type a) {\n    { M::inv(a)\
+    \ } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for commutative\
+    \ groups. Commutativity is a semantic requirement and\n// cannot be checked by\
+    \ a C++ concept.\ntemplate <typename M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\
+    \n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 13 \"ds/dynamic_array/dynamic_monoid_array.hpp\"\
+    \n\nnamespace m1une {\nnamespace ds {\n\ntemplate <m1une::monoid::IsMonoid Monoid>\n\
+    struct DynamicMonoidArray {\n    using T = typename Monoid::value_type;\n\n  \
+    \ private:\n    struct Node {\n        T val;\n        T prod;\n        T rprod;\n\
+    \        int priority;\n        int count;\n        int l, r;\n        bool rev;\n\
+    \n        Node()\n            : val(Monoid::id()),\n              prod(Monoid::id()),\n\
+    \              rprod(Monoid::id()),\n              priority(0),\n            \
+    \  count(0),\n              l(0),\n              r(0),\n              rev(false)\
+    \ {}\n\n        Node(T value, int node_priority)\n            : val(std::move(value)),\
+    \ prod(val), rprod(val), priority(node_priority), count(1), l(0), r(0), rev(false)\
+    \ {}\n    };\n\n    std::vector<Node> pool;\n    int root;\n    std::uint32_t\
+    \ rng_state;\n\n    template <typename U>\n    static T make_value(const U& value)\
+    \ {\n        if constexpr (requires(U x) { Monoid::make(x); }) {\n           \
+    \ return Monoid::make(value);\n        } else {\n            return static_cast<T>(value);\n\
+    \        }\n    }\n\n    int new_node(T value) {\n        pool.push_back(Node(std::move(value),\
+    \ next_priority()));\n        return int(pool.size()) - 1;\n    }\n\n    int next_priority()\
+    \ {\n        rng_state ^= rng_state << 13;\n        rng_state ^= rng_state >>\
+    \ 17;\n        rng_state ^= rng_state << 5;\n        return int(rng_state);\n\
+    \    }\n\n    void update(int t) {\n        if (!t) return;\n        int l = pool[t].l;\n\
     \        int r = pool[t].r;\n        pool[t].count = 1 + pool[l].count + pool[r].count;\n\
     \        pool[t].prod = Monoid::op(Monoid::op(pool[l].prod, pool[t].val), pool[r].prod);\n\
     \        pool[t].rprod = Monoid::op(Monoid::op(pool[r].rprod, pool[t].val), pool[l].rprod);\n\
@@ -507,7 +509,7 @@ data:
   isVerificationFile: true
   path: verify/ds/dynamic_array/dynamic_monoid_array.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-16 20:44:42+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/dynamic_array/dynamic_monoid_array.test.cpp

@@ -3,6 +3,12 @@ data:
   _extendedDependsOn: []
   _extendedRequiredBy:
   - icon: ':heavy_check_mark:'
+    path: acted_monoid/range_update_range_product.hpp
+    title: Range Update Range Product
+  - icon: ':heavy_check_mark:'
+    path: acted_monoid/range_update_range_product.hpp
+    title: Range Update Range Product
+  - icon: ':heavy_check_mark:'
     path: ds/binary_trie/binary_trie_monoid.hpp
     title: Binary Trie with Monoid
   - icon: ':heavy_check_mark:'
@@ -110,7 +116,7 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/tree/virtual_tree.hpp
     title: Virtual Tree
-  - icon: ':warning:'
+  - icon: ':heavy_check_mark:'
     path: monoid/power.hpp
     title: Monoid Power
   _extendedVerifiedWith:
@@ -126,6 +132,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/dsu/potentialized_dsu.test.cpp
     title: verify/ds/dsu/potentialized_dsu.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp
+    title: verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/ds/dynamic_array/dynamic_monoid_array.test.cpp
     title: verify/ds/dynamic_array/dynamic_monoid_array.test.cpp
@@ -190,6 +199,12 @@ data:
     path: verify/ds/segtree/persistent_segtree.test.cpp
     title: verify/ds/segtree/persistent_segtree.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/segtree/range_update_range_product.test.cpp
+    title: verify/ds/segtree/range_update_range_product.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/segtree/range_update_range_product.test.cpp
+    title: verify/ds/segtree/range_update_range_product.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/segtree.test.cpp
     title: verify/ds/segtree/segtree.test.cpp
   - icon: ':heavy_check_mark:'
@@ -242,11 +257,14 @@ data:
     \ Must have a static method `id()` returning `value_type`\n    { M::id() } ->\
     \ std::same_as<typename M::value_type>;\n\n    // 3. Must have a static method\
     \ `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for commutative group monoids.\n// A type\
-    \ satisfying this concept must also obey commutativity and inverse laws.\ntemplate\
-    \ <typename M>\nconcept IsCommutativeGroup = IsMonoid<M> && requires(typename\
-    \ M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename M::value_type>;\n\
-    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n"
+    \ M::value_type>;\n};\n\n// Concept for groups. A type satisfying this concept\
+    \ must also obey the group\n// laws; concepts can check the interface but not\
+    \ the algebraic properties.\ntemplate <typename M>\nconcept IsGroup = IsMonoid<M>\
+    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
+    \ M::value_type>;\n};\n\n// Concept for commutative groups. Commutativity is a\
+    \ semantic requirement and\n// cannot be checked by a C++ concept.\ntemplate <typename\
+    \ M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\n}  // namespace monoid\n}  //\
+    \ namespace m1une\n\n\n"
   code: "#ifndef M1UNE_MONOID_CONCEPT_HPP\n#define M1UNE_MONOID_CONCEPT_HPP 1\n\n\
     #include <concepts>\n\nnamespace m1une {\nnamespace monoid {\n\n// Concept to\
     \ check if a type satisfies the requirements of a Monoid.\n// A Monoid must have\
@@ -256,11 +274,14 @@ data:
     \ M::value_type;\n\n    // 2. Must have a static method `id()` returning `value_type`\n\
     \    { M::id() } -> std::same_as<typename M::value_type>;\n\n    // 3. Must have\
     \ a static method `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for commutative group monoids.\n// A type\
-    \ satisfying this concept must also obey commutativity and inverse laws.\ntemplate\
-    \ <typename M>\nconcept IsCommutativeGroup = IsMonoid<M> && requires(typename\
-    \ M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename M::value_type>;\n\
-    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n#endif  // M1UNE_MONOID_CONCEPT_HPP\n"
+    \ M::value_type>;\n};\n\n// Concept for groups. A type satisfying this concept\
+    \ must also obey the group\n// laws; concepts can check the interface but not\
+    \ the algebraic properties.\ntemplate <typename M>\nconcept IsGroup = IsMonoid<M>\
+    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
+    \ M::value_type>;\n};\n\n// Concept for commutative groups. Commutativity is a\
+    \ semantic requirement and\n// cannot be checked by a C++ concept.\ntemplate <typename\
+    \ M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\n}  // namespace monoid\n}  //\
+    \ namespace m1une\n\n#endif  // M1UNE_MONOID_CONCEPT_HPP\n"
   dependsOn: []
   isVerificationFile: false
   path: monoid/concept.hpp
@@ -293,6 +314,8 @@ data:
   - ds/dsu/dsu_monoid.hpp
   - ds/dsu/potentialized_dsu.hpp
   - ds/dsu/persistent_potentialized_dsu.hpp
+  - acted_monoid/range_update_range_product.hpp
+  - acted_monoid/range_update_range_product.hpp
   - monoid/power.hpp
   - graph/tree/sparse_table_lca.hpp
   - graph/tree/all.hpp
@@ -302,7 +325,7 @@ data:
   - graph/tree/tree.hpp
   - graph/all.hpp
   - graph/all.hpp
-  timestamp: '2026-06-17 21:06:48+09:00'
+  timestamp: '2026-07-16 20:44:42+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/dynamic_tree/link_cut_tree.test.cpp
@@ -327,8 +350,11 @@ data:
   - verify/ds/segtree/dual_segtree.test.cpp
   - verify/ds/segtree/persistent_segtree.test.cpp
   - verify/ds/segtree/dynamic_dual_segtree.test.cpp
+  - verify/ds/segtree/range_update_range_product.test.cpp
+  - verify/ds/segtree/range_update_range_product.test.cpp
   - verify/ds/segtree/segtree_2d.test.cpp
   - verify/ds/segtree/segtree.test.cpp
+  - verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp
   - verify/ds/dsu/persistent_potentialized_dsu.test.cpp
   - verify/ds/dsu/dsu_monoid.test.cpp
   - verify/ds/dsu/potentialized_dsu.test.cpp
@@ -367,21 +393,25 @@ To satisfy `m1une::monoid::IsMonoid`, a type `M` must implement:
 * `using value_type = T;`
   The type stored by the monoid.
 
-* `static constexpr T id();`
+* `static T id();`
   Returns the identity element.
 
-* `static constexpr T op(const T& a, const T& b);`
+* `static T op(const T& a, const T& b);`
   Combines two values.
 
-## Commutative Group
+## Group
 
-`m1une::monoid::IsCommutativeGroup` extends `IsMonoid` with an inverse:
+`m1une::monoid::IsGroup` extends `IsMonoid` with an inverse:
 
-* `static constexpr T inv(const T& x);`
+* `static T inv(const T& x);`
   Returns the inverse of `x` with respect to `op`.
 
-The concept checks only that `inv` exists. The type should satisfy the
-group laws, and `op` should be commutative.
+The concept checks only that `inv` exists. The type must satisfy the group
+laws, but `op` does not need to be commutative.
+
+`m1une::monoid::IsCommutativeGroup` extends `IsGroup`. It has the same
+compile-time interface check because C++ concepts cannot prove commutativity;
+types used through it must additionally guarantee that `op(a, b) == op(b, a)`.
 
 ## Example
 

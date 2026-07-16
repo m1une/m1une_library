@@ -64,6 +64,12 @@ data:
     path: verify/ds/segtree/persistent_lazy_segtree.test.cpp
     title: verify/ds/segtree/persistent_lazy_segtree.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/segtree/range_update_range_product.test.cpp
+    title: verify/ds/segtree/range_update_range_product.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/segtree/range_update_range_product.test.cpp
+    title: verify/ds/segtree/range_update_range_product.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/segtree_beats.test.cpp
     title: verify/ds/segtree/segtree_beats.test.cpp
   _isVerificationFailed: false
@@ -128,6 +134,8 @@ data:
   - verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array_range_ap.test.cpp
   - verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array.test.cpp
   - verify/ds/dynamic_array/dynamic_lazy_monoid_array_range_ap.test.cpp
+  - verify/ds/segtree/range_update_range_product.test.cpp
+  - verify/ds/segtree/range_update_range_product.test.cpp
   - verify/ds/segtree/lazy_segtree.test.cpp
   - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
   - verify/ds/segtree/persistent_lazy_segtree.test.cpp

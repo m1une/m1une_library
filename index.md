@@ -72,6 +72,9 @@ data:
     - icon: ':warning:'
       path: acted_monoid/range_update_range_min.hpp
       title: Range Update Range Min
+    - icon: ':heavy_check_mark:'
+      path: acted_monoid/range_update_range_product.hpp
+      title: Range Update Range Product
     - icon: ':warning:'
       path: acted_monoid/range_update_range_sum.hpp
       title: Range Update Range Sum
@@ -1022,7 +1025,7 @@ data:
     - icon: ':warning:'
       path: monoid/permutation.hpp
       title: Permutation Monoid
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/power.hpp
       title: Monoid Power
     - icon: ':warning:'
@@ -1324,6 +1327,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/ds/dsu/rollback_dsu.test.cpp
       title: verify/ds/dsu/rollback_dsu.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp
+      title: verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp
   - name: verify/ds/dynamic_array
     pages:
     - icon: ':heavy_check_mark:'
@@ -1504,6 +1510,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/ds/segtree/persistent_segtree.test.cpp
       title: verify/ds/segtree/persistent_segtree.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/segtree/range_update_range_product.test.cpp
+      title: verify/ds/segtree/range_update_range_product.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/ds/segtree/segtree.test.cpp
       title: verify/ds/segtree/segtree.test.cpp

@@ -324,13 +324,16 @@ data:
     \ Must have a static method `id()` returning `value_type`\n    { M::id() } ->\
     \ std::same_as<typename M::value_type>;\n\n    // 3. Must have a static method\
     \ `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for commutative group monoids.\n// A type\
-    \ satisfying this concept must also obey commutativity and inverse laws.\ntemplate\
-    \ <typename M>\nconcept IsCommutativeGroup = IsMonoid<M> && requires(typename\
-    \ M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename M::value_type>;\n\
-    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 11 \"ds/range_query/sparse_table.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\n\n// A Sparse Table utilizing C++20 Concepts\
-    \ for type safety.\n// It requires a Monoid struct that satisfies `m1une::monoid::IsMonoid`.\n\
+    \ M::value_type>;\n};\n\n// Concept for groups. A type satisfying this concept\
+    \ must also obey the group\n// laws; concepts can check the interface but not\
+    \ the algebraic properties.\ntemplate <typename M>\nconcept IsGroup = IsMonoid<M>\
+    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
+    \ M::value_type>;\n};\n\n// Concept for commutative groups. Commutativity is a\
+    \ semantic requirement and\n// cannot be checked by a C++ concept.\ntemplate <typename\
+    \ M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\n}  // namespace monoid\n}  //\
+    \ namespace m1une\n\n\n#line 11 \"ds/range_query/sparse_table.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace ds {\n\n// A Sparse Table utilizing C++20 Concepts for type\
+    \ safety.\n// It requires a Monoid struct that satisfies `m1une::monoid::IsMonoid`.\n\
     // [IMPORTANT] For O(1) range queries to work correctly, the monoid operation\
     \ MUST be idempotent.\n// i.e., Monoid::op(x, x) == x must hold (e.g., Min, Max,\
     \ GCD, Bitwise AND/OR).\ntemplate <m1une::monoid::IsMonoid Monoid>\nstruct SparseTable\
@@ -458,7 +461,7 @@ data:
   isVerificationFile: true
   path: verify/graph/library_checker_lowest_common_ancestor.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-16 20:44:42+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/library_checker_lowest_common_ancestor.test.cpp

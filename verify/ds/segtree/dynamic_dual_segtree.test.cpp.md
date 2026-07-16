@@ -97,23 +97,26 @@ data:
     \ Must have a static method `id()` returning `value_type`\n    { M::id() } ->\
     \ std::same_as<typename M::value_type>;\n\n    // 3. Must have a static method\
     \ `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for commutative group monoids.\n// A type\
-    \ satisfying this concept must also obey commutativity and inverse laws.\ntemplate\
-    \ <typename M>\nconcept IsCommutativeGroup = IsMonoid<M> && requires(typename\
-    \ M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename M::value_type>;\n\
-    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 15 \"ds/segtree/dynamic_dual_segtree.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\n\n// A sparse dual segment tree over an\
-    \ integral half-open interval.\ntemplate <m1une::monoid::IsMonoid Monoid, std::integral\
-    \ Index = long long>\nrequires(!std::same_as<std::remove_cv_t<Index>, bool>)\n\
-    struct DynamicDualSegtree {\n    using T = typename Monoid::value_type;\n    using\
-    \ index_type = Index;\n    using size_type = detail::dynamic_size_type<Index>;\n\
-    \n   private:\n    struct Node {\n        T val;\n        int left;\n        int\
-    \ right;\n        bool has_lazy;\n\n        Node() : val(Monoid::id()), left(0),\
-    \ right(0), has_lazy(false) {}\n    };\n\n    Index _left;\n    Index _right;\n\
-    \    T _initial_value;\n    int _root;\n    std::vector<Node> _nodes;\n\n    int\
-    \ new_node() {\n        assert(_nodes.size() < std::size_t(std::numeric_limits<int>::max()));\n\
-    \        _nodes.emplace_back();\n        return int(_nodes.size()) - 1;\n    }\n\
-    \n    void all_apply(int& t, Index left, Index right, const T& x) {\n        if\
+    \ M::value_type>;\n};\n\n// Concept for groups. A type satisfying this concept\
+    \ must also obey the group\n// laws; concepts can check the interface but not\
+    \ the algebraic properties.\ntemplate <typename M>\nconcept IsGroup = IsMonoid<M>\
+    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
+    \ M::value_type>;\n};\n\n// Concept for commutative groups. Commutativity is a\
+    \ semantic requirement and\n// cannot be checked by a C++ concept.\ntemplate <typename\
+    \ M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\n}  // namespace monoid\n}  //\
+    \ namespace m1une\n\n\n#line 15 \"ds/segtree/dynamic_dual_segtree.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace ds {\n\n// A sparse dual segment tree over an integral half-open\
+    \ interval.\ntemplate <m1une::monoid::IsMonoid Monoid, std::integral Index = long\
+    \ long>\nrequires(!std::same_as<std::remove_cv_t<Index>, bool>)\nstruct DynamicDualSegtree\
+    \ {\n    using T = typename Monoid::value_type;\n    using index_type = Index;\n\
+    \    using size_type = detail::dynamic_size_type<Index>;\n\n   private:\n    struct\
+    \ Node {\n        T val;\n        int left;\n        int right;\n        bool\
+    \ has_lazy;\n\n        Node() : val(Monoid::id()), left(0), right(0), has_lazy(false)\
+    \ {}\n    };\n\n    Index _left;\n    Index _right;\n    T _initial_value;\n \
+    \   int _root;\n    std::vector<Node> _nodes;\n\n    int new_node() {\n      \
+    \  assert(_nodes.size() < std::size_t(std::numeric_limits<int>::max()));\n   \
+    \     _nodes.emplace_back();\n        return int(_nodes.size()) - 1;\n    }\n\n\
+    \    void all_apply(int& t, Index left, Index right, const T& x) {\n        if\
     \ (!t) t = new_node();\n        Node& node = _nodes[t];\n        if (std::midpoint(left,\
     \ right) == left) {\n            T value = node.has_lazy ? node.val : _initial_value;\n\
     \            node.val = Monoid::op(x, value);\n            node.has_lazy = true;\n\
@@ -616,7 +619,7 @@ data:
   isVerificationFile: true
   path: verify/ds/segtree/dynamic_dual_segtree.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-16 20:44:42+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/segtree/dynamic_dual_segtree.test.cpp

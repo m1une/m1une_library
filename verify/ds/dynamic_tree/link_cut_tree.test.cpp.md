@@ -265,16 +265,19 @@ data:
     \ Must have a static method `id()` returning `value_type`\n    { M::id() } ->\
     \ std::same_as<typename M::value_type>;\n\n    // 3. Must have a static method\
     \ `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for commutative group monoids.\n// A type\
-    \ satisfying this concept must also obey commutativity and inverse laws.\ntemplate\
-    \ <typename M>\nconcept IsCommutativeGroup = IsMonoid<M> && requires(typename\
-    \ M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename M::value_type>;\n\
-    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 11 \"ds/dynamic_tree/link_cut_tree.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\n\ntemplate <m1une::monoid::IsCommutativeGroup\
-    \ Group>\nstruct LinkCutTree {\n    using T = typename Group::value_type;\n\n\
-    \   private:\n    struct Node {\n        int left = -1;\n        int right = -1;\n\
-    \        int parent = -1;\n        bool rev = false;\n        int size = 1;\n\
-    \        int virtual_size = 0;\n        int all_size = 1;\n        T value = Group::id();\n\
+    \ M::value_type>;\n};\n\n// Concept for groups. A type satisfying this concept\
+    \ must also obey the group\n// laws; concepts can check the interface but not\
+    \ the algebraic properties.\ntemplate <typename M>\nconcept IsGroup = IsMonoid<M>\
+    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
+    \ M::value_type>;\n};\n\n// Concept for commutative groups. Commutativity is a\
+    \ semantic requirement and\n// cannot be checked by a C++ concept.\ntemplate <typename\
+    \ M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\n}  // namespace monoid\n}  //\
+    \ namespace m1une\n\n\n#line 11 \"ds/dynamic_tree/link_cut_tree.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace ds {\n\ntemplate <m1une::monoid::IsCommutativeGroup Group>\n\
+    struct LinkCutTree {\n    using T = typename Group::value_type;\n\n   private:\n\
+    \    struct Node {\n        int left = -1;\n        int right = -1;\n        int\
+    \ parent = -1;\n        bool rev = false;\n        int size = 1;\n        int\
+    \ virtual_size = 0;\n        int all_size = 1;\n        T value = Group::id();\n\
     \        T prod = Group::id();\n        T rev_prod = Group::id();\n        T virtual_prod\
     \ = Group::id();\n        T all_prod = Group::id();\n    };\n\n    struct EdgeInfo\
     \ {\n        int u = -1;\n        int v = -1;\n        int node = -1;\n      \
@@ -722,7 +725,7 @@ data:
   isVerificationFile: true
   path: verify/ds/dynamic_tree/link_cut_tree.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-16 20:44:42+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/dynamic_tree/link_cut_tree.test.cpp

@@ -31,16 +31,19 @@ data:
     \  // 2. Must have a static method `id()` returning `value_type`\n    { M::id()\
     \ } -> std::same_as<typename M::value_type>;\n\n    // 3. Must have a static method\
     \ `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for commutative group monoids.\n// A type\
-    \ satisfying this concept must also obey commutativity and inverse laws.\ntemplate\
-    \ <typename M>\nconcept IsCommutativeGroup = IsMonoid<M> && requires(typename\
-    \ M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename M::value_type>;\n\
-    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 12 \"ds/segtree/dual_segtree_2d.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\n\n// A static compressed 2D dual segment\
-    \ tree.\n// It supports rectangle monoid updates and point queries on registered\
-    \ points.\n// Monoid::op must be commutative.\ntemplate <class Monoid, class X\
-    \ = int, class Y = X>\nrequires m1une::monoid::IsMonoid<Monoid>\nstruct DualSegtree2D\
-    \ {\n    using T = typename Monoid::value_type;\n    using point_type = std::pair<X,\
+    \ M::value_type>;\n};\n\n// Concept for groups. A type satisfying this concept\
+    \ must also obey the group\n// laws; concepts can check the interface but not\
+    \ the algebraic properties.\ntemplate <typename M>\nconcept IsGroup = IsMonoid<M>\
+    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
+    \ M::value_type>;\n};\n\n// Concept for commutative groups. Commutativity is a\
+    \ semantic requirement and\n// cannot be checked by a C++ concept.\ntemplate <typename\
+    \ M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\n}  // namespace monoid\n}  //\
+    \ namespace m1une\n\n\n#line 12 \"ds/segtree/dual_segtree_2d.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace ds {\n\n// A static compressed 2D dual segment tree.\n//\
+    \ It supports rectangle monoid updates and point queries on registered points.\n\
+    // Monoid::op must be commutative.\ntemplate <class Monoid, class X = int, class\
+    \ Y = X>\nrequires m1une::monoid::IsMonoid<Monoid>\nstruct DualSegtree2D {\n \
+    \   using T = typename Monoid::value_type;\n    using point_type = std::pair<X,\
     \ Y>;\n    using weighted_point_type = std::tuple<X, Y, T>;\n\nprivate:\n    int\
     \ _n;\n    int _size;\n    int _point_count;\n    std::vector<X> _xs;\n    std::vector<std::vector<Y>>\
     \ _ys;\n    std::vector<std::vector<T>> _lazy;\n    std::vector<std::vector<T>>\
@@ -221,7 +224,7 @@ data:
   isVerificationFile: false
   path: ds/segtree/dual_segtree_2d.hpp
   requiredBy: []
-  timestamp: '2026-07-01 22:04:37+09:00'
+  timestamp: '2026-07-16 20:44:42+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/segtree/dual_segtree_2d.test.cpp

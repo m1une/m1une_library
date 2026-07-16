@@ -31,74 +31,77 @@ data:
     \ Must have a static method `id()` returning `value_type`\n    { M::id() } ->\
     \ std::same_as<typename M::value_type>;\n\n    // 3. Must have a static method\
     \ `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for commutative group monoids.\n// A type\
-    \ satisfying this concept must also obey commutativity and inverse laws.\ntemplate\
-    \ <typename M>\nconcept IsCommutativeGroup = IsMonoid<M> && requires(typename\
-    \ M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename M::value_type>;\n\
-    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 11 \"ds/segtree/dual_segtree.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\n\n// A generic Dual Segment Tree for range\
-    \ monoid updates and point queries.\ntemplate <m1une::monoid::IsMonoid Monoid>\n\
-    struct DualSegtree {\n    using T = typename Monoid::value_type;\n\n   private:\n\
-    \    int _n, _size, _log;\n    std::vector<T> _d;\n\n    void all_apply(int k,\
-    \ const T& x) {\n        _d[k] = Monoid::op(x, _d[k]);\n    }\n\n    void push(int\
-    \ k) {\n        all_apply(2 * k, _d[k]);\n        all_apply(2 * k + 1, _d[k]);\n\
-    \        _d[k] = Monoid::id();\n    }\n\n   public:\n    // Constructs an empty\
-    \ dual segment tree.\n    DualSegtree() : DualSegtree(0) {}\n\n    // Constructs\
-    \ a dual segment tree of size `n`, initialized with the identity element.\n  \
-    \  explicit DualSegtree(int n) : DualSegtree(std::vector<T>(n, Monoid::id()))\
-    \ {}\n\n    // Constructs a dual segment tree from an existing vector.\n    explicit\
-    \ DualSegtree(const std::vector<T>& v) : _n(int(v.size())) {\n        _size =\
-    \ m1une::math::bit_ceil((unsigned int)(_n));\n        _log = 0;\n        while\
-    \ ((1U << _log) < (unsigned int)(_size)) _log++;\n        _d.assign(2 * _size,\
-    \ Monoid::id());\n        for (int i = 0; i < _n; i++) _d[_size + i] = v[i];\n\
-    \    }\n    explicit DualSegtree(std::vector<T>&& v) : _n(int(v.size())) {\n \
-    \       _size = m1une::math::bit_ceil((unsigned int)(_n));\n        _log = 0;\n\
-    \        while ((1U << _log) < (unsigned int)(_size)) _log++;\n        _d.assign(2\
-    \ * _size, Monoid::id());\n        for (int i = 0; i < _n; i++) _d[_size + i]\
-    \ = std::move(v[i]);\n    }\n\n    // Constructs a dual segment tree from a vector\
-    \ of a different type U.\n    // It automatically adapts to the Monoid's initialization\
-    \ requirements:\n    // 1. Monoid::make(val) if it exists.\n    // 2. Monoid::make(val,\
-    \ index) if the monoid requires global indices.\n    // 3. static_cast<T>(val)\
-    \ as a fallback for simple monoids.\n    template <typename U>\n    requires (!std::same_as<U,\
-    \ T>) && (\n        requires(U x) { Monoid::make(x); } ||\n        requires(U\
-    \ x, int i) { Monoid::make(x, i); } ||\n        std::convertible_to<U, T>\n  \
-    \  )\n    explicit DualSegtree(const std::vector<U>& v) : _n(int(v.size())) {\n\
-    \        _size = m1une::math::bit_ceil((unsigned int)(_n));\n        _log = 0;\n\
-    \        while ((1U << _log) < (unsigned int)(_size)) _log++;\n        _d.assign(2\
-    \ * _size, Monoid::id());\n        for (int i = 0; i < _n; i++) {\n          \
-    \  if constexpr (requires(U x) { Monoid::make(x); }) {\n                _d[_size\
-    \ + i] = Monoid::make(v[i]);\n            } else if constexpr (requires(U x, int\
-    \ idx) { Monoid::make(x, idx); }) {\n                _d[_size + i] = Monoid::make(v[i],\
-    \ i);\n            } else {\n                _d[_size + i] = static_cast<T>(v[i]);\n\
-    \            }\n        }\n    }\n\n    // Returns the number of elements.\n \
-    \   int size() const {\n        return _n;\n    }\n\n    // Returns whether the\
-    \ tree is empty.\n    bool empty() const {\n        return _n == 0;\n    }\n\n\
-    \    // Assigns x to the p-th element after applying pending updates on its path.\n\
-    \    void set(int p, T x) {\n        assert(0 <= p && p < _n);\n        p += _size;\n\
-    \        for (int i = _log; i >= 1; i--) push(p >> i);\n        _d[p] = std::move(x);\n\
-    \    }\n\n    // Returns the value of the p-th element after applying pending\
-    \ updates on its path.\n    T get(int p) {\n        assert(0 <= p && p < _n);\n\
-    \        p += _size;\n        for (int i = _log; i >= 1; i--) push(p >> i);\n\
-    \        return _d[p];\n    }\n\n    // Returns the value of the p-th element.\n\
-    \    T operator[](int p) {\n        return get(p);\n    }\n\n    // Applies x\
-    \ to the p-th element.\n    void apply(int p, T x) {\n        assert(0 <= p &&\
-    \ p < _n);\n        p += _size;\n        for (int i = _log; i >= 1; i--) push(p\
-    \ >> i);\n        all_apply(p, x);\n    }\n\n    // Applies x to all elements\
-    \ in the range [l, r).\n    void apply(int l, int r, T x) {\n        assert(0\
-    \ <= l && l <= r && r <= _n);\n        if (l == r) return;\n\n        l += _size;\n\
-    \        r += _size;\n\n        for (int i = _log; i >= 1; i--) {\n          \
-    \  if (((l >> i) << i) != l) push(l >> i);\n            if (((r >> i) << i) !=\
-    \ r) push((r - 1) >> i);\n        }\n\n        while (l < r) {\n            if\
-    \ (l & 1) all_apply(l++, x);\n            if (r & 1) all_apply(--r, x);\n    \
-    \        l >>= 1;\n            r >>= 1;\n        }\n    }\n\n    // Returns all\
-    \ elements as a vector after applying all pending updates.\n    std::vector<T>\
-    \ to_vector() {\n        for (int k = 1; k < _size; k++) push(k);\n        std::vector<T>\
-    \ res;\n        res.reserve(_n);\n        for (int i = 0; i < _n; i++) res.push_back(_d[_size\
-    \ + i]);\n        return res;\n    }\n\n    // Returns the elements in the range\
-    \ [l, r) as a vector.\n    std::vector<T> to_vector(int l, int r) {\n        assert(0\
-    \ <= l && l <= r && r <= _n);\n        std::vector<T> res;\n        res.reserve(r\
-    \ - l);\n        for (int i = l; i < r; i++) res.push_back(get(i));\n        return\
-    \ res;\n    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n"
+    \ M::value_type>;\n};\n\n// Concept for groups. A type satisfying this concept\
+    \ must also obey the group\n// laws; concepts can check the interface but not\
+    \ the algebraic properties.\ntemplate <typename M>\nconcept IsGroup = IsMonoid<M>\
+    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
+    \ M::value_type>;\n};\n\n// Concept for commutative groups. Commutativity is a\
+    \ semantic requirement and\n// cannot be checked by a C++ concept.\ntemplate <typename\
+    \ M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\n}  // namespace monoid\n}  //\
+    \ namespace m1une\n\n\n#line 11 \"ds/segtree/dual_segtree.hpp\"\n\nnamespace m1une\
+    \ {\nnamespace ds {\n\n// A generic Dual Segment Tree for range monoid updates\
+    \ and point queries.\ntemplate <m1une::monoid::IsMonoid Monoid>\nstruct DualSegtree\
+    \ {\n    using T = typename Monoid::value_type;\n\n   private:\n    int _n, _size,\
+    \ _log;\n    std::vector<T> _d;\n\n    void all_apply(int k, const T& x) {\n \
+    \       _d[k] = Monoid::op(x, _d[k]);\n    }\n\n    void push(int k) {\n     \
+    \   all_apply(2 * k, _d[k]);\n        all_apply(2 * k + 1, _d[k]);\n        _d[k]\
+    \ = Monoid::id();\n    }\n\n   public:\n    // Constructs an empty dual segment\
+    \ tree.\n    DualSegtree() : DualSegtree(0) {}\n\n    // Constructs a dual segment\
+    \ tree of size `n`, initialized with the identity element.\n    explicit DualSegtree(int\
+    \ n) : DualSegtree(std::vector<T>(n, Monoid::id())) {}\n\n    // Constructs a\
+    \ dual segment tree from an existing vector.\n    explicit DualSegtree(const std::vector<T>&\
+    \ v) : _n(int(v.size())) {\n        _size = m1une::math::bit_ceil((unsigned int)(_n));\n\
+    \        _log = 0;\n        while ((1U << _log) < (unsigned int)(_size)) _log++;\n\
+    \        _d.assign(2 * _size, Monoid::id());\n        for (int i = 0; i < _n;\
+    \ i++) _d[_size + i] = v[i];\n    }\n    explicit DualSegtree(std::vector<T>&&\
+    \ v) : _n(int(v.size())) {\n        _size = m1une::math::bit_ceil((unsigned int)(_n));\n\
+    \        _log = 0;\n        while ((1U << _log) < (unsigned int)(_size)) _log++;\n\
+    \        _d.assign(2 * _size, Monoid::id());\n        for (int i = 0; i < _n;\
+    \ i++) _d[_size + i] = std::move(v[i]);\n    }\n\n    // Constructs a dual segment\
+    \ tree from a vector of a different type U.\n    // It automatically adapts to\
+    \ the Monoid's initialization requirements:\n    // 1. Monoid::make(val) if it\
+    \ exists.\n    // 2. Monoid::make(val, index) if the monoid requires global indices.\n\
+    \    // 3. static_cast<T>(val) as a fallback for simple monoids.\n    template\
+    \ <typename U>\n    requires (!std::same_as<U, T>) && (\n        requires(U x)\
+    \ { Monoid::make(x); } ||\n        requires(U x, int i) { Monoid::make(x, i);\
+    \ } ||\n        std::convertible_to<U, T>\n    )\n    explicit DualSegtree(const\
+    \ std::vector<U>& v) : _n(int(v.size())) {\n        _size = m1une::math::bit_ceil((unsigned\
+    \ int)(_n));\n        _log = 0;\n        while ((1U << _log) < (unsigned int)(_size))\
+    \ _log++;\n        _d.assign(2 * _size, Monoid::id());\n        for (int i = 0;\
+    \ i < _n; i++) {\n            if constexpr (requires(U x) { Monoid::make(x); })\
+    \ {\n                _d[_size + i] = Monoid::make(v[i]);\n            } else if\
+    \ constexpr (requires(U x, int idx) { Monoid::make(x, idx); }) {\n           \
+    \     _d[_size + i] = Monoid::make(v[i], i);\n            } else {\n         \
+    \       _d[_size + i] = static_cast<T>(v[i]);\n            }\n        }\n    }\n\
+    \n    // Returns the number of elements.\n    int size() const {\n        return\
+    \ _n;\n    }\n\n    // Returns whether the tree is empty.\n    bool empty() const\
+    \ {\n        return _n == 0;\n    }\n\n    // Assigns x to the p-th element after\
+    \ applying pending updates on its path.\n    void set(int p, T x) {\n        assert(0\
+    \ <= p && p < _n);\n        p += _size;\n        for (int i = _log; i >= 1; i--)\
+    \ push(p >> i);\n        _d[p] = std::move(x);\n    }\n\n    // Returns the value\
+    \ of the p-th element after applying pending updates on its path.\n    T get(int\
+    \ p) {\n        assert(0 <= p && p < _n);\n        p += _size;\n        for (int\
+    \ i = _log; i >= 1; i--) push(p >> i);\n        return _d[p];\n    }\n\n    //\
+    \ Returns the value of the p-th element.\n    T operator[](int p) {\n        return\
+    \ get(p);\n    }\n\n    // Applies x to the p-th element.\n    void apply(int\
+    \ p, T x) {\n        assert(0 <= p && p < _n);\n        p += _size;\n        for\
+    \ (int i = _log; i >= 1; i--) push(p >> i);\n        all_apply(p, x);\n    }\n\
+    \n    // Applies x to all elements in the range [l, r).\n    void apply(int l,\
+    \ int r, T x) {\n        assert(0 <= l && l <= r && r <= _n);\n        if (l ==\
+    \ r) return;\n\n        l += _size;\n        r += _size;\n\n        for (int i\
+    \ = _log; i >= 1; i--) {\n            if (((l >> i) << i) != l) push(l >> i);\n\
+    \            if (((r >> i) << i) != r) push((r - 1) >> i);\n        }\n\n    \
+    \    while (l < r) {\n            if (l & 1) all_apply(l++, x);\n            if\
+    \ (r & 1) all_apply(--r, x);\n            l >>= 1;\n            r >>= 1;\n   \
+    \     }\n    }\n\n    // Returns all elements as a vector after applying all pending\
+    \ updates.\n    std::vector<T> to_vector() {\n        for (int k = 1; k < _size;\
+    \ k++) push(k);\n        std::vector<T> res;\n        res.reserve(_n);\n     \
+    \   for (int i = 0; i < _n; i++) res.push_back(_d[_size + i]);\n        return\
+    \ res;\n    }\n\n    // Returns the elements in the range [l, r) as a vector.\n\
+    \    std::vector<T> to_vector(int l, int r) {\n        assert(0 <= l && l <= r\
+    \ && r <= _n);\n        std::vector<T> res;\n        res.reserve(r - l);\n   \
+    \     for (int i = l; i < r; i++) res.push_back(get(i));\n        return res;\n\
+    \    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_DUAL_SEGTREE_HPP\n#define M1UNE_DUAL_SEGTREE_HPP 1\n\n#include\
     \ <cassert>\n#include <concepts>\n#include <utility>\n#include <vector>\n\n#include\
     \ \"../../math/bit_ceil.hpp\"\n#include \"../../monoid/concept.hpp\"\n\nnamespace\
@@ -171,7 +174,7 @@ data:
   isVerificationFile: false
   path: ds/segtree/dual_segtree.hpp
   requiredBy: []
-  timestamp: '2026-06-21 04:34:53+09:00'
+  timestamp: '2026-07-16 20:44:42+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/segtree/dual_segtree.test.cpp

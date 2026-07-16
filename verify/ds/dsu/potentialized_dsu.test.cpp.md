@@ -38,37 +38,40 @@ data:
     \    typename M::value_type;\n\n    // 2. Must have a static method `id()` returning\
     \ `value_type`\n    { M::id() } -> std::same_as<typename M::value_type>;\n\n \
     \   // 3. Must have a static method `op(a, b)` returning `value_type`\n    { M::op(a,\
-    \ b) } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for commutative\
-    \ group monoids.\n// A type satisfying this concept must also obey commutativity\
-    \ and inverse laws.\ntemplate <typename M>\nconcept IsCommutativeGroup = IsMonoid<M>\
-    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line\
-    \ 11 \"ds/dsu/potentialized_dsu.hpp\"\n\nnamespace m1une {\nnamespace ds {\n\n\
-    template <m1une::monoid::IsCommutativeGroup Group>\nrequires std::equality_comparable<typename\
-    \ Group::value_type>\nstruct PotentializedDsu {\n    using T = typename Group::value_type;\n\
-    \n   private:\n    int _n;\n    std::vector<int> parent_or_size;\n    std::vector<T>\
-    \ diff_to_parent;\n\n    static int check_size(int n) {\n        assert(0 <= n);\n\
-    \        return n;\n    }\n\n   public:\n    PotentializedDsu() : PotentializedDsu(0)\
-    \ {}\n\n    explicit PotentializedDsu(int n) : _n(check_size(n)), parent_or_size(_n,\
-    \ -1), diff_to_parent(_n, Group::id()) {}\n\n    int size() const {\n        return\
-    \ _n;\n    }\n\n    bool empty() const {\n        return _n == 0;\n    }\n\n \
-    \   int leader(int a) {\n        assert(0 <= a && a < _n);\n        if (parent_or_size[a]\
-    \ < 0) return a;\n        int p = parent_or_size[a];\n        int r = leader(p);\n\
-    \        diff_to_parent[a] = Group::op(diff_to_parent[p], diff_to_parent[a]);\n\
-    \        return parent_or_size[a] = r;\n    }\n\n    int leader(int a) const {\n\
-    \        assert(0 <= a && a < _n);\n        while (parent_or_size[a] >= 0) a =\
-    \ parent_or_size[a];\n        return a;\n    }\n\n    bool same(int a, int b)\
-    \ {\n        return leader(a) == leader(b);\n    }\n\n    bool same(int a, int\
-    \ b) const {\n        return leader(a) == leader(b);\n    }\n\n    int group_size(int\
-    \ a) {\n        return -parent_or_size[leader(a)];\n    }\n\n    int group_size(int\
-    \ a) const {\n        return -parent_or_size[leader(a)];\n    }\n\n    int size(int\
-    \ a) {\n        return group_size(a);\n    }\n\n    int size(int a) const {\n\
-    \        return group_size(a);\n    }\n\n    T potential(int a) {\n        leader(a);\n\
-    \        return diff_to_parent[a];\n    }\n\n    T potential(int a) const {\n\
-    \        assert(0 <= a && a < _n);\n        T res = Group::id();\n        while\
-    \ (parent_or_size[a] >= 0) {\n            res = Group::op(diff_to_parent[a], res);\n\
-    \            a = parent_or_size[a];\n        }\n        return res;\n    }\n\n\
-    \    T diff(int a, int b) {\n        assert(same(a, b));\n        return Group::op(Group::inv(potential(a)),\
+    \ b) } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for groups.\
+    \ A type satisfying this concept must also obey the group\n// laws; concepts can\
+    \ check the interface but not the algebraic properties.\ntemplate <typename M>\n\
+    concept IsGroup = IsMonoid<M> && requires(typename M::value_type a) {\n    { M::inv(a)\
+    \ } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for commutative\
+    \ groups. Commutativity is a semantic requirement and\n// cannot be checked by\
+    \ a C++ concept.\ntemplate <typename M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\
+    \n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 11 \"ds/dsu/potentialized_dsu.hpp\"\
+    \n\nnamespace m1une {\nnamespace ds {\n\ntemplate <m1une::monoid::IsGroup Group>\n\
+    requires std::equality_comparable<typename Group::value_type>\nstruct PotentializedDsu\
+    \ {\n    using T = typename Group::value_type;\n\n   private:\n    int _n;\n \
+    \   std::vector<int> parent_or_size;\n    std::vector<T> diff_to_parent;\n\n \
+    \   static int check_size(int n) {\n        assert(0 <= n);\n        return n;\n\
+    \    }\n\n   public:\n    PotentializedDsu() : PotentializedDsu(0) {}\n\n    explicit\
+    \ PotentializedDsu(int n) : _n(check_size(n)), parent_or_size(_n, -1), diff_to_parent(_n,\
+    \ Group::id()) {}\n\n    int size() const {\n        return _n;\n    }\n\n   \
+    \ bool empty() const {\n        return _n == 0;\n    }\n\n    int leader(int a)\
+    \ {\n        assert(0 <= a && a < _n);\n        if (parent_or_size[a] < 0) return\
+    \ a;\n        int p = parent_or_size[a];\n        int r = leader(p);\n       \
+    \ diff_to_parent[a] = Group::op(diff_to_parent[p], diff_to_parent[a]);\n     \
+    \   return parent_or_size[a] = r;\n    }\n\n    int leader(int a) const {\n  \
+    \      assert(0 <= a && a < _n);\n        while (parent_or_size[a] >= 0) a = parent_or_size[a];\n\
+    \        return a;\n    }\n\n    bool same(int a, int b) {\n        return leader(a)\
+    \ == leader(b);\n    }\n\n    bool same(int a, int b) const {\n        return\
+    \ leader(a) == leader(b);\n    }\n\n    int group_size(int a) {\n        return\
+    \ -parent_or_size[leader(a)];\n    }\n\n    int group_size(int a) const {\n  \
+    \      return -parent_or_size[leader(a)];\n    }\n\n    int size(int a) {\n  \
+    \      return group_size(a);\n    }\n\n    int size(int a) const {\n        return\
+    \ group_size(a);\n    }\n\n    T potential(int a) {\n        leader(a);\n    \
+    \    return diff_to_parent[a];\n    }\n\n    T potential(int a) const {\n    \
+    \    assert(0 <= a && a < _n);\n        T res = Group::id();\n        while (parent_or_size[a]\
+    \ >= 0) {\n            res = Group::op(diff_to_parent[a], res);\n            a\
+    \ = parent_or_size[a];\n        }\n        return res;\n    }\n\n    T diff(int\
+    \ a, int b) {\n        assert(same(a, b));\n        return Group::op(Group::inv(potential(a)),\
     \ potential(b));\n    }\n\n    T diff(int a, int b) const {\n        assert(same(a,\
     \ b));\n        return Group::op(Group::inv(potential(a)), potential(b));\n  \
     \  }\n\n    bool merge(int a, int b, const T& w) {\n        assert(0 <= a && a\
@@ -406,7 +409,7 @@ data:
   isVerificationFile: true
   path: verify/ds/dsu/potentialized_dsu.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-16 20:44:54+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/dsu/potentialized_dsu.test.cpp

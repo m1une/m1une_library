@@ -35,26 +35,29 @@ data:
     \    typename M::value_type;\n\n    // 2. Must have a static method `id()` returning\
     \ `value_type`\n    { M::id() } -> std::same_as<typename M::value_type>;\n\n \
     \   // 3. Must have a static method `op(a, b)` returning `value_type`\n    { M::op(a,\
-    \ b) } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for commutative\
-    \ group monoids.\n// A type satisfying this concept must also obey commutativity\
-    \ and inverse laws.\ntemplate <typename M>\nconcept IsCommutativeGroup = IsMonoid<M>\
-    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line\
-    \ 12 \"ds/range_query/sqrt_tree.hpp\"\n\nnamespace m1une {\nnamespace ds {\n\n\
-    // Static Sqrt Tree with O(1) monoid-product queries.\ntemplate <m1une::monoid::IsMonoid\
-    \ Monoid>\nstruct SqrtTree {\n    using T = typename Monoid::value_type;\n\n \
-    \  private:\n    int _n;\n    std::size_t _padded_size;\n    std::vector<T> _values;\n\
-    \    std::vector<int> _layers;\n    std::vector<int> _layer_for_bit;\n    std::vector<std::vector<T>>\
-    \ _prefix;\n    std::vector<std::vector<T>> _suffix;\n    std::vector<std::vector<T>>\
-    \ _between;\n\n    template <class U>\n    static T make_value(const U& value,\
-    \ int index) {\n        if constexpr (requires(U x) { Monoid::make(x); }) {\n\
-    \            return Monoid::make(value);\n        } else if constexpr (requires(U\
-    \ x, int i) { Monoid::make(x, i); }) {\n            return Monoid::make(value,\
-    \ index);\n        } else {\n            return static_cast<T>(value);\n     \
-    \   }\n    }\n\n    void build_layers() {\n        _layers.clear();\n        _layer_for_bit.clear();\n\
-    \        if (_n <= 1) return;\n\n        int exponent = std::bit_width(_padded_size)\
-    \ - 1;\n        _layers.push_back(exponent);\n        while (_layers.back() !=\
-    \ 0) {\n            int current = _layers.back();\n            _layers.push_back(current\
+    \ b) } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for groups.\
+    \ A type satisfying this concept must also obey the group\n// laws; concepts can\
+    \ check the interface but not the algebraic properties.\ntemplate <typename M>\n\
+    concept IsGroup = IsMonoid<M> && requires(typename M::value_type a) {\n    { M::inv(a)\
+    \ } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for commutative\
+    \ groups. Commutativity is a semantic requirement and\n// cannot be checked by\
+    \ a C++ concept.\ntemplate <typename M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\
+    \n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 12 \"ds/range_query/sqrt_tree.hpp\"\
+    \n\nnamespace m1une {\nnamespace ds {\n\n// Static Sqrt Tree with O(1) monoid-product\
+    \ queries.\ntemplate <m1une::monoid::IsMonoid Monoid>\nstruct SqrtTree {\n   \
+    \ using T = typename Monoid::value_type;\n\n   private:\n    int _n;\n    std::size_t\
+    \ _padded_size;\n    std::vector<T> _values;\n    std::vector<int> _layers;\n\
+    \    std::vector<int> _layer_for_bit;\n    std::vector<std::vector<T>> _prefix;\n\
+    \    std::vector<std::vector<T>> _suffix;\n    std::vector<std::vector<T>> _between;\n\
+    \n    template <class U>\n    static T make_value(const U& value, int index) {\n\
+    \        if constexpr (requires(U x) { Monoid::make(x); }) {\n            return\
+    \ Monoid::make(value);\n        } else if constexpr (requires(U x, int i) { Monoid::make(x,\
+    \ i); }) {\n            return Monoid::make(value, index);\n        } else {\n\
+    \            return static_cast<T>(value);\n        }\n    }\n\n    void build_layers()\
+    \ {\n        _layers.clear();\n        _layer_for_bit.clear();\n        if (_n\
+    \ <= 1) return;\n\n        int exponent = std::bit_width(_padded_size) - 1;\n\
+    \        _layers.push_back(exponent);\n        while (_layers.back() != 0) {\n\
+    \            int current = _layers.back();\n            _layers.push_back(current\
     \ == 1 ? 0 : (current + 1) / 2);\n        }\n\n        _layer_for_bit.assign(exponent,\
     \ -1);\n        for (int layer = 0; layer + 1 < int(_layers.size()); ++layer)\
     \ {\n            for (\n                int bit = _layers[layer + 1];\n      \
@@ -459,7 +462,7 @@ data:
   isVerificationFile: true
   path: verify/ds/range_query/sqrt_tree.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-16 20:44:42+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/range_query/sqrt_tree.test.cpp

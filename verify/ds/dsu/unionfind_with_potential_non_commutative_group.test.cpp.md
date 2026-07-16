@@ -2,14 +2,14 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: ds/range_query/sparse_table.hpp
-    title: Sparse Table
+    path: ds/dsu/potentialized_dsu.hpp
+    title: Potentialized DSU
+  - icon: ':heavy_check_mark:'
+    path: math/modint.hpp
+    title: ModInt
   - icon: ':heavy_check_mark:'
     path: monoid/concept.hpp
     title: Monoid Concept
-  - icon: ':heavy_check_mark:'
-    path: monoid/min.hpp
-    title: Min Monoid
   - icon: ':heavy_check_mark:'
     path: utilities/fast_io.hpp
     title: Fast IO
@@ -20,13 +20,14 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://judge.yosupo.jp/problem/staticrmq
+    PROBLEM: https://judge.yosupo.jp/problem/unionfind_with_potential_non_commutative_group
     links:
-    - https://judge.yosupo.jp/problem/staticrmq
-  bundledCode: "#line 1 \"verify/ds/range_query/sparse_table.test.cpp\"\n#define PROBLEM\
-    \ \"https://judge.yosupo.jp/problem/staticrmq\"\n\n#line 1 \"ds/range_query/sparse_table.hpp\"\
-    \n\n\n\n#include <bit>\n#include <cassert>\n#include <concepts>\n#include <utility>\n\
-    #include <vector>\n\n#line 1 \"monoid/concept.hpp\"\n\n\n\n#line 5 \"monoid/concept.hpp\"\
+    - https://judge.yosupo.jp/problem/unionfind_with_potential_non_commutative_group
+  bundledCode: "#line 1 \"verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp\"\
+    \n#define PROBLEM \"https://judge.yosupo.jp/problem/unionfind_with_potential_non_commutative_group\"\
+    \n\n#include <array>\n\n#line 1 \"ds/dsu/potentialized_dsu.hpp\"\n\n\n\n#include\
+    \ <algorithm>\n#include <cassert>\n#include <concepts>\n#include <utility>\n#include\
+    \ <vector>\n\n#line 1 \"monoid/concept.hpp\"\n\n\n\n#line 5 \"monoid/concept.hpp\"\
     \n\nnamespace m1une {\nnamespace monoid {\n\n// Concept to check if a type satisfies\
     \ the requirements of a Monoid.\n// A Monoid must have a `value_type`, an identity\
     \ element `id()`, and an associative binary operation `op()`.\ntemplate <typename\
@@ -42,71 +43,167 @@ data:
     \ M::value_type>;\n};\n\n// Concept for commutative groups. Commutativity is a\
     \ semantic requirement and\n// cannot be checked by a C++ concept.\ntemplate <typename\
     \ M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\n}  // namespace monoid\n}  //\
-    \ namespace m1une\n\n\n#line 11 \"ds/range_query/sparse_table.hpp\"\n\nnamespace\
-    \ m1une {\nnamespace ds {\n\n// A Sparse Table utilizing C++20 Concepts for type\
-    \ safety.\n// It requires a Monoid struct that satisfies `m1une::monoid::IsMonoid`.\n\
-    // [IMPORTANT] For O(1) range queries to work correctly, the monoid operation\
-    \ MUST be idempotent.\n// i.e., Monoid::op(x, x) == x must hold (e.g., Min, Max,\
-    \ GCD, Bitwise AND/OR).\ntemplate <m1une::monoid::IsMonoid Monoid>\nstruct SparseTable\
-    \ {\n    using T = typename Monoid::value_type;\n\n   private:\n    int _n;\n\
-    \    std::vector<std::vector<T>> _st;\n\n   public:\n    // Constructs an empty\
-    \ sparse table.\n    SparseTable() : _n(0) {}\n\n    // Constructs a sparse table\
-    \ from an existing vector in O(N log N) time.\n    explicit SparseTable(const\
-    \ std::vector<T>& v) : _n(int(v.size())) {\n        if (_n == 0) return;\n\n \
-    \       // Compute the maximum power of 2 needed\n        int max_log = std::bit_width((unsigned\
-    \ int)_n);\n        _st.assign(max_log, std::vector<T>(_n));\n\n        // Initialize\
-    \ the base level\n        for (int i = 0; i < _n; i++) {\n            _st[0][i]\
-    \ = v[i];\n        }\n\n        // Build the sparse table\n        for (int k\
-    \ = 1; k < max_log; k++) {\n            for (int i = 0; i + (1 << k) <= _n; i++)\
-    \ {\n                _st[k][i] = Monoid::op(_st[k - 1][i], _st[k - 1][i + (1 <<\
-    \ (k - 1))]);\n            }\n        }\n    }\n    explicit SparseTable(std::vector<T>&&\
-    \ v) : _n(int(v.size())) {\n        if (_n == 0) return;\n\n        int max_log\
-    \ = std::bit_width((unsigned int)_n);\n        _st.assign(max_log, std::vector<T>(_n));\n\
-    \n        for (int i = 0; i < _n; i++) {\n            _st[0][i] = std::move(v[i]);\n\
-    \        }\n\n        for (int k = 1; k < max_log; k++) {\n            for (int\
-    \ i = 0; i + (1 << k) <= _n; i++) {\n                _st[k][i] = Monoid::op(_st[k\
-    \ - 1][i], _st[k - 1][i + (1 << (k - 1))]);\n            }\n        }\n    }\n\
-    \n    // Constructs a sparse table from a vector of a different type U.\n    //\
-    \ It automatically adapts to the Monoid's initialization requirements:\n    //\
-    \ 1. Monoid::make(val) if it exists.\n    // 2. Monoid::make(val, index) if the\
-    \ monoid requires global indices.\n    // 3. static_cast<T>(val) as a fallback\
-    \ for simple monoids.\n    template <typename U>\n    requires (!std::same_as<U,\
-    \ T>) && (\n        requires(U x) { Monoid::make(x); } ||\n        requires(U\
-    \ x, int i) { Monoid::make(x, i); } ||\n        std::convertible_to<U, T>\n  \
-    \  )\n    explicit SparseTable(const std::vector<U>& v) : _n(int(v.size())) {\n\
-    \        if (_n == 0) return;\n\n        int max_log = std::bit_width((unsigned\
-    \ int)_n);\n        _st.assign(max_log, std::vector<T>(_n));\n\n        // Compile-time\
-    \ branching based on the available make() signature\n        for (int i = 0; i\
-    \ < _n; i++) {\n            if constexpr (requires(U x) { Monoid::make(x); })\
-    \ {\n                _st[0][i] = Monoid::make(v[i]);\n            } else if constexpr\
-    \ (requires(U x, int idx) { Monoid::make(x, idx); }) {\n                _st[0][i]\
-    \ = Monoid::make(v[i], i);\n            } else {\n                _st[0][i] =\
-    \ static_cast<T>(v[i]);\n            }\n        }\n        for (int k = 1; k <\
-    \ max_log; k++) {\n            for (int i = 0; i + (1 << k) <= _n; i++) {\n  \
-    \              _st[k][i] = Monoid::op(_st[k - 1][i], _st[k - 1][i + (1 << (k -\
-    \ 1))]);\n            }\n        }\n    }\n\n    // Returns the product (result\
-    \ of the monoid operation) in the range [l, r) in O(1) time.\n    // Requires\
-    \ the monoid operation to be idempotent.\n    T prod(int l, int r) const {\n \
-    \       assert(0 <= l && l <= r && r <= _n);\n        if (l == r) return Monoid::id();\n\
-    \n        // Calculate the largest power of 2 less than or equal to the interval\
-    \ length\n        int k = std::bit_width((unsigned int)(r - l)) - 1;\n       \
-    \ return Monoid::op(_st[k][l], _st[k][r - (1 << k)]);\n    }\n};\n\n}  // namespace\
-    \ ds\n}  // namespace m1une\n\n\n#line 1 \"monoid/min.hpp\"\n\n\n\n#include <algorithm>\n\
-    #include <limits>\n\nnamespace m1une {\nnamespace monoid {\n\n// Monoid for minimum\
-    \ (Range Minimum).\n// The identity element defaults to the maximum possible value\
-    \ of type T, but can be overridden.\ntemplate <typename T, T Id = std::numeric_limits<T>::max()>\n\
-    struct Min {\n    using value_type = T;\n\n    // Returns the identity element\
-    \ for minimum.\n    static constexpr T id() {\n        return Id;\n    }\n\n \
-    \   // Returns the minimum of a and b.\n    static constexpr T op(const T& a,\
-    \ const T& b) {\n        return std::min(a, b);\n    }\n};\n\n}  // namespace\
-    \ monoid\n}  // namespace m1une\n\n\n#line 5 \"verify/ds/range_query/sparse_table.test.cpp\"\
-    \n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#include <array>\n#include <charconv>\n\
-    #include <cstddef>\n#include <cstdio>\n#include <cstdlib>\n#include <cstdint>\n\
-    #include <cstring>\n#include <iterator>\n#include <string>\n#include <type_traits>\n\
-    #line 15 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n\nnamespace m1une {\n\
-    namespace utilities {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\n\
-    template <class T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate\
-    \ <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
+    \ namespace m1une\n\n\n#line 11 \"ds/dsu/potentialized_dsu.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace ds {\n\ntemplate <m1une::monoid::IsGroup Group>\nrequires\
+    \ std::equality_comparable<typename Group::value_type>\nstruct PotentializedDsu\
+    \ {\n    using T = typename Group::value_type;\n\n   private:\n    int _n;\n \
+    \   std::vector<int> parent_or_size;\n    std::vector<T> diff_to_parent;\n\n \
+    \   static int check_size(int n) {\n        assert(0 <= n);\n        return n;\n\
+    \    }\n\n   public:\n    PotentializedDsu() : PotentializedDsu(0) {}\n\n    explicit\
+    \ PotentializedDsu(int n) : _n(check_size(n)), parent_or_size(_n, -1), diff_to_parent(_n,\
+    \ Group::id()) {}\n\n    int size() const {\n        return _n;\n    }\n\n   \
+    \ bool empty() const {\n        return _n == 0;\n    }\n\n    int leader(int a)\
+    \ {\n        assert(0 <= a && a < _n);\n        if (parent_or_size[a] < 0) return\
+    \ a;\n        int p = parent_or_size[a];\n        int r = leader(p);\n       \
+    \ diff_to_parent[a] = Group::op(diff_to_parent[p], diff_to_parent[a]);\n     \
+    \   return parent_or_size[a] = r;\n    }\n\n    int leader(int a) const {\n  \
+    \      assert(0 <= a && a < _n);\n        while (parent_or_size[a] >= 0) a = parent_or_size[a];\n\
+    \        return a;\n    }\n\n    bool same(int a, int b) {\n        return leader(a)\
+    \ == leader(b);\n    }\n\n    bool same(int a, int b) const {\n        return\
+    \ leader(a) == leader(b);\n    }\n\n    int group_size(int a) {\n        return\
+    \ -parent_or_size[leader(a)];\n    }\n\n    int group_size(int a) const {\n  \
+    \      return -parent_or_size[leader(a)];\n    }\n\n    int size(int a) {\n  \
+    \      return group_size(a);\n    }\n\n    int size(int a) const {\n        return\
+    \ group_size(a);\n    }\n\n    T potential(int a) {\n        leader(a);\n    \
+    \    return diff_to_parent[a];\n    }\n\n    T potential(int a) const {\n    \
+    \    assert(0 <= a && a < _n);\n        T res = Group::id();\n        while (parent_or_size[a]\
+    \ >= 0) {\n            res = Group::op(diff_to_parent[a], res);\n            a\
+    \ = parent_or_size[a];\n        }\n        return res;\n    }\n\n    T diff(int\
+    \ a, int b) {\n        assert(same(a, b));\n        return Group::op(Group::inv(potential(a)),\
+    \ potential(b));\n    }\n\n    T diff(int a, int b) const {\n        assert(same(a,\
+    \ b));\n        return Group::op(Group::inv(potential(a)), potential(b));\n  \
+    \  }\n\n    bool merge(int a, int b, const T& w) {\n        assert(0 <= a && a\
+    \ < _n);\n        assert(0 <= b && b < _n);\n        int x = leader(a);\n    \
+    \    int y = leader(b);\n        T pa = diff_to_parent[a], pb = diff_to_parent[b];\n\
+    \        if (x == y) return Group::op(Group::inv(pa), pb) == w;\n\n        T y_from_x\
+    \ = Group::op(Group::op(pa, w), Group::inv(pb));\n        if (-parent_or_size[x]\
+    \ < -parent_or_size[y]) {\n            std::swap(x, y);\n            y_from_x\
+    \ = Group::inv(y_from_x);\n        }\n        parent_or_size[x] += parent_or_size[y];\n\
+    \        parent_or_size[y] = x;\n        diff_to_parent[y] = std::move(y_from_x);\n\
+    \        return true;\n    }\n\n    std::vector<std::vector<int>> groups() {\n\
+    \        std::vector<int> leader_buf(_n), group_size(_n);\n        for (int i\
+    \ = 0; i < _n; i++) {\n            leader_buf[i] = leader(i);\n            group_size[leader_buf[i]]++;\n\
+    \        }\n        std::vector<std::vector<int>> result(_n);\n        for (int\
+    \ i = 0; i < _n; i++) {\n            result[i].reserve(group_size[i]);\n     \
+    \   }\n        for (int i = 0; i < _n; i++) {\n            result[leader_buf[i]].push_back(i);\n\
+    \        }\n        result.erase(std::remove_if(result.begin(), result.end(),\
+    \ [&](const std::vector<int>& v) { return v.empty(); }),\n                   \
+    \  result.end());\n        return result;\n    }\n\n    std::vector<std::vector<int>>\
+    \ groups() const {\n        std::vector<int> leader_buf(_n), group_size(_n);\n\
+    \        for (int i = 0; i < _n; i++) {\n            leader_buf[i] = leader(i);\n\
+    \            group_size[leader_buf[i]]++;\n        }\n        std::vector<std::vector<int>>\
+    \ result(_n);\n        for (int i = 0; i < _n; i++) {\n            result[i].reserve(group_size[i]);\n\
+    \        }\n        for (int i = 0; i < _n; i++) {\n            result[leader_buf[i]].push_back(i);\n\
+    \        }\n        result.erase(std::remove_if(result.begin(), result.end(),\
+    \ [&](const std::vector<int>& v) { return v.empty(); }),\n                   \
+    \  result.end());\n        return result;\n    }\n};\n\n}  // namespace ds\n}\
+    \  // namespace m1une\n\n\n#line 1 \"math/modint.hpp\"\n\n\n\n#line 5 \"math/modint.hpp\"\
+    \n#include <cstdint>\n#include <iostream>\n#include <type_traits>\n#line 9 \"\
+    math/modint.hpp\"\n\nnamespace m1une {\nnamespace math {\n\ntemplate <uint32_t\
+    \ Modulus>\nstruct ModInt {\n    static_assert(0 < Modulus, \"Modulus must be\
+    \ positive\");\n\n   private:\n    uint32_t _v;\n\n   public:\n    static constexpr\
+    \ uint32_t mod() {\n        return Modulus;\n    }\n\n    static constexpr ModInt\
+    \ raw(uint32_t v) noexcept {\n        ModInt x;\n        x._v = v;\n        return\
+    \ x;\n    }\n\n    constexpr ModInt() noexcept : _v(0) {}\n\n    template <class\
+    \ Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>\n    constexpr\
+    \ ModInt(Integer v) noexcept {\n        if constexpr (std::is_signed_v<Integer>)\
+    \ {\n            int64_t x = static_cast<int64_t>(v) % static_cast<int64_t>(Modulus);\n\
+    \            if (x < 0) x += Modulus;\n            _v = static_cast<uint32_t>(x);\n\
+    \        } else {\n            _v = static_cast<uint32_t>(static_cast<uint64_t>(v)\
+    \ % Modulus);\n        }\n    }\n\n    constexpr uint32_t val() const noexcept\
+    \ {\n        return _v;\n    }\n\n    constexpr ModInt& operator++() noexcept\
+    \ {\n        _v++;\n        if (_v == Modulus) _v = 0;\n        return *this;\n\
+    \    }\n\n    constexpr ModInt& operator--() noexcept {\n        if (_v == 0)\
+    \ _v = Modulus;\n        _v--;\n        return *this;\n    }\n\n    constexpr\
+    \ ModInt operator++(int) noexcept {\n        ModInt res = *this;\n        ++*this;\n\
+    \        return res;\n    }\n\n    constexpr ModInt operator--(int) noexcept {\n\
+    \        ModInt res = *this;\n        --*this;\n        return res;\n    }\n\n\
+    \    constexpr ModInt& operator+=(const ModInt& rhs) noexcept {\n        _v +=\
+    \ rhs._v;\n        if (_v >= Modulus) _v -= Modulus;\n        return *this;\n\
+    \    }\n\n    constexpr ModInt& operator-=(const ModInt& rhs) noexcept {\n   \
+    \     _v -= rhs._v;\n        if (_v >= Modulus) _v += Modulus;\n        return\
+    \ *this;\n    }\n\n    constexpr ModInt& operator*=(const ModInt& rhs) noexcept\
+    \ {\n        uint64_t z = _v;\n        z *= rhs._v;\n        _v = static_cast<uint32_t>(z\
+    \ % Modulus);\n        return *this;\n    }\n\n    constexpr ModInt& operator/=(const\
+    \ ModInt& rhs) noexcept {\n        return *this *= rhs.inv();\n    }\n\n    constexpr\
+    \ ModInt operator+(const ModInt& rhs) const noexcept {\n        return ModInt(*this)\
+    \ += rhs;\n    }\n    constexpr ModInt operator-(const ModInt& rhs) const noexcept\
+    \ {\n        return ModInt(*this) -= rhs;\n    }\n    constexpr ModInt operator*(const\
+    \ ModInt& rhs) const noexcept {\n        return ModInt(*this) *= rhs;\n    }\n\
+    \    constexpr ModInt operator/(const ModInt& rhs) const noexcept {\n        return\
+    \ ModInt(*this) /= rhs;\n    }\n\n    constexpr bool operator==(const ModInt&\
+    \ rhs) const noexcept {\n        return _v == rhs._v;\n    }\n    constexpr bool\
+    \ operator!=(const ModInt& rhs) const noexcept {\n        return _v != rhs._v;\n\
+    \    }\n\n    constexpr ModInt pow(long long n) const noexcept {\n        ModInt\
+    \ res = raw(1), x = *this;\n        while (n > 0) {\n            if (n & 1) res\
+    \ *= x;\n            x *= x;\n            n >>= 1;\n        }\n        return\
+    \ res;\n    }\n\n    constexpr ModInt inv() const noexcept {\n        int64_t\
+    \ a = _v, b = Modulus, u = 1, v = 0;\n        while (b) {\n            int64_t\
+    \ t = a / b;\n            a -= t * b;\n            std::swap(a, b);\n        \
+    \    u -= t * v;\n            std::swap(u, v);\n        }\n        if (u < 0)\
+    \ u += Modulus;\n        return raw(static_cast<uint32_t>(u));\n    }\n\n    friend\
+    \ std::ostream& operator<<(std::ostream& os, const ModInt& rhs) {\n        return\
+    \ os << rhs._v;\n    }\n\n    friend std::istream& operator>>(std::istream& is,\
+    \ ModInt& rhs) {\n        long long v;\n        is >> v;\n        rhs = ModInt(v);\n\
+    \        return is;\n    }\n};\n\nusing modint998244353 = ModInt<998244353>;\n\
+    using modint1000000007 = ModInt<1000000007>;\n\ntemplate <int Id = 0>\nstruct\
+    \ DynamicModInt {\n   private:\n    uint32_t _v;\n    inline static uint32_t _mod\
+    \ = 1;\n\n   public:\n    static uint32_t mod() noexcept {\n        return _mod;\n\
+    \    }\n\n    static void set_mod(uint32_t modulus) noexcept {\n        assert(modulus\
+    \ > 0);\n        assert(modulus <= uint32_t(1) << 31);\n        _mod = modulus;\n\
+    \    }\n\n    static DynamicModInt raw(uint32_t v) noexcept {\n        assert(v\
+    \ < _mod);\n        DynamicModInt x;\n        x._v = v;\n        return x;\n \
+    \   }\n\n    DynamicModInt() noexcept : _v(0) {}\n\n    template <class Integer,\
+    \ std::enable_if_t<std::is_integral_v<Integer>, int> = 0>\n    DynamicModInt(Integer\
+    \ v) noexcept {\n        if constexpr (std::is_signed_v<Integer>) {\n        \
+    \    int64_t x = static_cast<int64_t>(v) % static_cast<int64_t>(_mod);\n     \
+    \       if (x < 0) x += _mod;\n            _v = static_cast<uint32_t>(x);\n  \
+    \      } else {\n            _v = static_cast<uint32_t>(static_cast<uint64_t>(v)\
+    \ % _mod);\n        }\n    }\n\n    uint32_t val() const noexcept {\n        return\
+    \ _v;\n    }\n\n    DynamicModInt& operator++() noexcept {\n        _v++;\n  \
+    \      if (_v == _mod) _v = 0;\n        return *this;\n    }\n\n    DynamicModInt&\
+    \ operator--() noexcept {\n        if (_v == 0) _v = _mod;\n        _v--;\n  \
+    \      return *this;\n    }\n\n    DynamicModInt operator++(int) noexcept {\n\
+    \        DynamicModInt result = *this;\n        ++*this;\n        return result;\n\
+    \    }\n\n    DynamicModInt operator--(int) noexcept {\n        DynamicModInt\
+    \ result = *this;\n        --*this;\n        return result;\n    }\n\n    DynamicModInt&\
+    \ operator+=(const DynamicModInt& rhs) noexcept {\n        _v += rhs._v;\n   \
+    \     if (_v >= _mod) _v -= _mod;\n        return *this;\n    }\n\n    DynamicModInt&\
+    \ operator-=(const DynamicModInt& rhs) noexcept {\n        _v -= rhs._v;\n   \
+    \     if (_v >= _mod) _v += _mod;\n        return *this;\n    }\n\n    DynamicModInt&\
+    \ operator*=(const DynamicModInt& rhs) noexcept {\n        _v = static_cast<uint32_t>(uint64_t(_v)\
+    \ * rhs._v % _mod);\n        return *this;\n    }\n\n    DynamicModInt& operator/=(const\
+    \ DynamicModInt& rhs) noexcept {\n        return *this *= rhs.inv();\n    }\n\n\
+    \    DynamicModInt operator+(const DynamicModInt& rhs) const noexcept {\n    \
+    \    return DynamicModInt(*this) += rhs;\n    }\n\n    DynamicModInt operator-(const\
+    \ DynamicModInt& rhs) const noexcept {\n        return DynamicModInt(*this) -=\
+    \ rhs;\n    }\n\n    DynamicModInt operator*(const DynamicModInt& rhs) const noexcept\
+    \ {\n        return DynamicModInt(*this) *= rhs;\n    }\n\n    DynamicModInt operator/(const\
+    \ DynamicModInt& rhs) const noexcept {\n        return DynamicModInt(*this) /=\
+    \ rhs;\n    }\n\n    bool operator==(const DynamicModInt& rhs) const noexcept\
+    \ {\n        return _v == rhs._v;\n    }\n\n    bool operator!=(const DynamicModInt&\
+    \ rhs) const noexcept {\n        return _v != rhs._v;\n    }\n\n    DynamicModInt\
+    \ pow(long long exponent) const noexcept {\n        assert(exponent >= 0);\n \
+    \       DynamicModInt result = raw(1 % _mod);\n        DynamicModInt base = *this;\n\
+    \        while (exponent > 0) {\n            if (exponent & 1) result *= base;\n\
+    \            base *= base;\n            exponent >>= 1;\n        }\n        return\
+    \ result;\n    }\n\n    DynamicModInt inv() const noexcept {\n        int64_t\
+    \ a = _v, b = _mod, u = 1, v = 0;\n        while (b) {\n            int64_t quotient\
+    \ = a / b;\n            a -= quotient * b;\n            std::swap(a, b);\n   \
+    \         u -= quotient * v;\n            std::swap(u, v);\n        }\n      \
+    \  assert(a == 1);\n        u %= _mod;\n        if (u < 0) u += _mod;\n      \
+    \  return raw(static_cast<uint32_t>(u));\n    }\n\n    friend std::ostream& operator<<(std::ostream&\
+    \ os, const DynamicModInt& rhs) {\n        return os << rhs._v;\n    }\n\n   \
+    \ friend std::istream& operator>>(std::istream& is, DynamicModInt& rhs) {\n  \
+    \      long long value;\n        is >> value;\n        rhs = DynamicModInt(value);\n\
+    \        return is;\n    }\n};\n\n}  // namespace math\n}  // namespace m1une\n\
+    \n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 5 \"utilities/fast_io.hpp\"\
+    \n#include <charconv>\n#include <cstddef>\n#include <cstdio>\n#include <cstdlib>\n\
+    #line 10 \"utilities/fast_io.hpp\"\n#include <cstring>\n#include <iterator>\n\
+    #include <string>\n#line 15 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n\n\
+    namespace m1une {\nnamespace utilities {\nnamespace internal {\n\n// Detect std::begin(x),\
+    \ std::end(x).\ntemplate <class T, class = void>\nstruct is_range : std::false_type\
+    \ {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
     \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
     \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
     \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
@@ -327,39 +424,71 @@ data:
     \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
     n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 8 \"verify/ds/range_query/sparse_table.test.cpp\"\
-    \n\nint main() {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
-    \ fast_output;\n\n    int N, Q;\n    fast_input >> N >> Q;\n\n    std::vector<long\
-    \ long> A(N);\n    for (int i = 0; i < N; ++i) {\n        fast_input >> A[i];\n\
-    \    }\n\n    m1une::ds::SparseTable<m1une::monoid::Min<long long>> st(A);\n\n\
-    \    for (int q = 0; q < Q; ++q) {\n        int l, r;\n        fast_input >> l\
-    \ >> r;\n\n        fast_output << st.prod(l, r) << \"\\n\";\n    }\n\n    return\
-    \ 0;\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/staticrmq\"\n\n#include\
-    \ \"../../../ds/range_query/sparse_table.hpp\"\n#include \"../../../monoid/min.hpp\"\
-    \n\n#include \"../../../utilities/fast_io.hpp\"\n#include <vector>\n\nint main()\
-    \ {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
-    \ fast_output;\n\n    int N, Q;\n    fast_input >> N >> Q;\n\n    std::vector<long\
-    \ long> A(N);\n    for (int i = 0; i < N; ++i) {\n        fast_input >> A[i];\n\
-    \    }\n\n    m1une::ds::SparseTable<m1une::monoid::Min<long long>> st(A);\n\n\
-    \    for (int q = 0; q < Q; ++q) {\n        int l, r;\n        fast_input >> l\
-    \ >> r;\n\n        fast_output << st.prod(l, r) << \"\\n\";\n    }\n\n    return\
-    \ 0;\n}\n"
+    \ utilities\n}  // namespace m1une\n\n\n#line 8 \"verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp\"\
+    \n\nusing mint = m1une::math::modint998244353;\n\nstruct Matrix2Group {\n    using\
+    \ value_type = std::array<std::array<mint, 2>, 2>;\n\n    static value_type id()\
+    \ {\n        value_type result;\n        result[0][0] = 1;\n        result[1][1]\
+    \ = 1;\n        return result;\n    }\n\n    static value_type op(const value_type&\
+    \ first, const value_type& second) {\n        value_type result;\n        for\
+    \ (int i = 0; i < 2; i++) {\n            for (int k = 0; k < 2; k++) {\n     \
+    \           for (int j = 0; j < 2; j++) {\n                    result[i][j] +=\
+    \ first[i][k] * second[k][j];\n                }\n            }\n        }\n \
+    \       return result;\n    }\n\n    static value_type inv(const value_type& value)\
+    \ {\n        value_type result;\n        result[0][0] = value[1][1];\n       \
+    \ result[0][1] = mint(0) - value[0][1];\n        result[1][0] = mint(0) - value[1][0];\n\
+    \        result[1][1] = value[0][0];\n        return result;\n    }\n};\n\nstatic_assert(m1une::monoid::IsGroup<Matrix2Group>);\n\
+    \nint main() {\n    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput\
+    \ output;\n\n    int size = 0;\n    int query_count = 0;\n    input.read(size,\
+    \ query_count);\n    m1une::ds::PotentializedDsu<Matrix2Group> dsu(size);\n\n\
+    \    while (query_count--) {\n        int type = 0;\n        int u = 0;\n    \
+    \    int v = 0;\n        input.read(type, u, v);\n        if (type == 0) {\n \
+    \           Matrix2Group::value_type value;\n            for (auto& row : value)\
+    \ input.read(row);\n            output.println(dsu.merge(v, u, value));\n    \
+    \    } else if (!dsu.same(u, v)) {\n            output.println(-1);\n        }\
+    \ else {\n            Matrix2Group::value_type value = dsu.diff(v, u);\n     \
+    \       output.println(value[0][0], value[0][1], value[1][0], value[1][1]);\n\
+    \        }\n    }\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/unionfind_with_potential_non_commutative_group\"\
+    \n\n#include <array>\n\n#include \"../../../ds/dsu/potentialized_dsu.hpp\"\n#include\
+    \ \"../../../math/modint.hpp\"\n#include \"../../../utilities/fast_io.hpp\"\n\n\
+    using mint = m1une::math::modint998244353;\n\nstruct Matrix2Group {\n    using\
+    \ value_type = std::array<std::array<mint, 2>, 2>;\n\n    static value_type id()\
+    \ {\n        value_type result;\n        result[0][0] = 1;\n        result[1][1]\
+    \ = 1;\n        return result;\n    }\n\n    static value_type op(const value_type&\
+    \ first, const value_type& second) {\n        value_type result;\n        for\
+    \ (int i = 0; i < 2; i++) {\n            for (int k = 0; k < 2; k++) {\n     \
+    \           for (int j = 0; j < 2; j++) {\n                    result[i][j] +=\
+    \ first[i][k] * second[k][j];\n                }\n            }\n        }\n \
+    \       return result;\n    }\n\n    static value_type inv(const value_type& value)\
+    \ {\n        value_type result;\n        result[0][0] = value[1][1];\n       \
+    \ result[0][1] = mint(0) - value[0][1];\n        result[1][0] = mint(0) - value[1][0];\n\
+    \        result[1][1] = value[0][0];\n        return result;\n    }\n};\n\nstatic_assert(m1une::monoid::IsGroup<Matrix2Group>);\n\
+    \nint main() {\n    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput\
+    \ output;\n\n    int size = 0;\n    int query_count = 0;\n    input.read(size,\
+    \ query_count);\n    m1une::ds::PotentializedDsu<Matrix2Group> dsu(size);\n\n\
+    \    while (query_count--) {\n        int type = 0;\n        int u = 0;\n    \
+    \    int v = 0;\n        input.read(type, u, v);\n        if (type == 0) {\n \
+    \           Matrix2Group::value_type value;\n            for (auto& row : value)\
+    \ input.read(row);\n            output.println(dsu.merge(v, u, value));\n    \
+    \    } else if (!dsu.same(u, v)) {\n            output.println(-1);\n        }\
+    \ else {\n            Matrix2Group::value_type value = dsu.diff(v, u);\n     \
+    \       output.println(value[0][0], value[0][1], value[1][0], value[1][1]);\n\
+    \        }\n    }\n}\n"
   dependsOn:
-  - ds/range_query/sparse_table.hpp
+  - ds/dsu/potentialized_dsu.hpp
   - monoid/concept.hpp
-  - monoid/min.hpp
+  - math/modint.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
-  path: verify/ds/range_query/sparse_table.test.cpp
+  path: verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 20:44:42+09:00'
+  timestamp: '2026-07-16 20:44:54+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/ds/range_query/sparse_table.test.cpp
+documentation_of: verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/ds/range_query/sparse_table.test.cpp
-- /verify/verify/ds/range_query/sparse_table.test.cpp.html
-title: verify/ds/range_query/sparse_table.test.cpp
+- /verify/verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp
+- /verify/verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp.html
+title: verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp
 ---

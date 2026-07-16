@@ -32,35 +32,38 @@ data:
     \    typename M::value_type;\n\n    // 2. Must have a static method `id()` returning\
     \ `value_type`\n    { M::id() } -> std::same_as<typename M::value_type>;\n\n \
     \   // 3. Must have a static method `op(a, b)` returning `value_type`\n    { M::op(a,\
-    \ b) } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for commutative\
-    \ group monoids.\n// A type satisfying this concept must also obey commutativity\
-    \ and inverse laws.\ntemplate <typename M>\nconcept IsCommutativeGroup = IsMonoid<M>\
-    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line\
-    \ 10 \"ds/range_query/sliding_window_aggregation.hpp\"\n\nnamespace m1une {\n\
-    namespace ds {\n\n// A queue supporting the ordered product of all elements in\
-    \ amortized O(1).\ntemplate <m1une::monoid::IsMonoid Monoid>\nstruct SlidingWindowAggregation\
-    \ {\n    using T = typename Monoid::value_type;\n\n   private:\n    struct Entry\
-    \ {\n        T value;\n        T product;\n    };\n\n    std::vector<Entry> _front;\n\
-    \    std::vector<Entry> _back;\n\n    void move_to_front() {\n        if (!_front.empty())\
-    \ return;\n        while (!_back.empty()) {\n            T value = std::move(_back.back().value);\n\
-    \            _back.pop_back();\n            T product = _front.empty() ? value\
-    \ : Monoid::op(value, _front.back().product);\n            _front.push_back(Entry{\n\
-    \                std::move(value),\n                std::move(product),\n    \
-    \        });\n        }\n    }\n\n   public:\n    SlidingWindowAggregation() =\
-    \ default;\n\n    explicit SlidingWindowAggregation(const std::vector<T>& values)\
-    \ {\n        reserve(values.size());\n        for (const T& value : values) push(value);\n\
-    \    }\n\n    explicit SlidingWindowAggregation(std::vector<T>&& values) {\n \
-    \       reserve(values.size());\n        for (T& value : values) push(std::move(value));\n\
-    \    }\n\n    std::size_t size() const {\n        return _front.size() + _back.size();\n\
-    \    }\n\n    bool empty() const {\n        return _front.empty() && _back.empty();\n\
-    \    }\n\n    void reserve(std::size_t capacity) {\n        _front.reserve(capacity);\n\
-    \        _back.reserve(capacity);\n    }\n\n    void clear() {\n        _front.clear();\n\
-    \        _back.clear();\n    }\n\n    void push(T value) {\n        T product\
-    \ = _back.empty() ? value : Monoid::op(_back.back().product, value);\n       \
-    \ _back.push_back(Entry{\n            std::move(value),\n            std::move(product),\n\
-    \        });\n    }\n\n    void push_back(T value) {\n        push(std::move(value));\n\
-    \    }\n\n    // Removes the oldest element.\n    void pop() {\n        assert(!empty());\n\
+    \ b) } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for groups.\
+    \ A type satisfying this concept must also obey the group\n// laws; concepts can\
+    \ check the interface but not the algebraic properties.\ntemplate <typename M>\n\
+    concept IsGroup = IsMonoid<M> && requires(typename M::value_type a) {\n    { M::inv(a)\
+    \ } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for commutative\
+    \ groups. Commutativity is a semantic requirement and\n// cannot be checked by\
+    \ a C++ concept.\ntemplate <typename M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\
+    \n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 10 \"ds/range_query/sliding_window_aggregation.hpp\"\
+    \n\nnamespace m1une {\nnamespace ds {\n\n// A queue supporting the ordered product\
+    \ of all elements in amortized O(1).\ntemplate <m1une::monoid::IsMonoid Monoid>\n\
+    struct SlidingWindowAggregation {\n    using T = typename Monoid::value_type;\n\
+    \n   private:\n    struct Entry {\n        T value;\n        T product;\n    };\n\
+    \n    std::vector<Entry> _front;\n    std::vector<Entry> _back;\n\n    void move_to_front()\
+    \ {\n        if (!_front.empty()) return;\n        while (!_back.empty()) {\n\
+    \            T value = std::move(_back.back().value);\n            _back.pop_back();\n\
+    \            T product = _front.empty() ? value : Monoid::op(value, _front.back().product);\n\
+    \            _front.push_back(Entry{\n                std::move(value),\n    \
+    \            std::move(product),\n            });\n        }\n    }\n\n   public:\n\
+    \    SlidingWindowAggregation() = default;\n\n    explicit SlidingWindowAggregation(const\
+    \ std::vector<T>& values) {\n        reserve(values.size());\n        for (const\
+    \ T& value : values) push(value);\n    }\n\n    explicit SlidingWindowAggregation(std::vector<T>&&\
+    \ values) {\n        reserve(values.size());\n        for (T& value : values)\
+    \ push(std::move(value));\n    }\n\n    std::size_t size() const {\n        return\
+    \ _front.size() + _back.size();\n    }\n\n    bool empty() const {\n        return\
+    \ _front.empty() && _back.empty();\n    }\n\n    void reserve(std::size_t capacity)\
+    \ {\n        _front.reserve(capacity);\n        _back.reserve(capacity);\n   \
+    \ }\n\n    void clear() {\n        _front.clear();\n        _back.clear();\n \
+    \   }\n\n    void push(T value) {\n        T product = _back.empty() ? value :\
+    \ Monoid::op(_back.back().product, value);\n        _back.push_back(Entry{\n \
+    \           std::move(value),\n            std::move(product),\n        });\n\
+    \    }\n\n    void push_back(T value) {\n        push(std::move(value));\n   \
+    \ }\n\n    // Removes the oldest element.\n    void pop() {\n        assert(!empty());\n\
     \        move_to_front();\n        _front.pop_back();\n    }\n\n    void pop_front()\
     \ {\n        pop();\n    }\n\n    const T& front() {\n        assert(!empty());\n\
     \        move_to_front();\n        return _front.back().value;\n    }\n\n    const\
@@ -394,7 +397,7 @@ data:
   isVerificationFile: true
   path: verify/ds/range_query/sliding_window_aggregation.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-16 20:44:42+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/range_query/sliding_window_aggregation.test.cpp

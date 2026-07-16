@@ -264,22 +264,24 @@ data:
     \    typename M::value_type;\n\n    // 2. Must have a static method `id()` returning\
     \ `value_type`\n    { M::id() } -> std::same_as<typename M::value_type>;\n\n \
     \   // 3. Must have a static method `op(a, b)` returning `value_type`\n    { M::op(a,\
-    \ b) } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for commutative\
-    \ group monoids.\n// A type satisfying this concept must also obey commutativity\
-    \ and inverse laws.\ntemplate <typename M>\nconcept IsCommutativeGroup = IsMonoid<M>\
-    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line\
-    \ 11 \"ds/dynamic_tree/path_link_cut_tree.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ ds {\n\ntemplate <m1une::monoid::IsMonoid Monoid>\nstruct PathLinkCutTree {\n\
-    \    using T = typename Monoid::value_type;\n\n   private:\n    struct Node {\n\
-    \        int left = -1;\n        int right = -1;\n        int parent = -1;\n \
-    \       bool rev = false;\n        int size = 1;\n        T value = Monoid::id();\n\
-    \        T prod = Monoid::id();\n        T rev_prod = Monoid::id();\n    };\n\n\
-    \    struct EdgeInfo {\n        int u = -1;\n        int v = -1;\n        int\
-    \ node = -1;\n        bool alive = false;\n    };\n\n    std::vector<Node> _nodes;\n\
-    \    std::vector<EdgeInfo> _edges;\n    std::vector<int> _path_buffer;\n\n   \
-    \ static T make_node_value(const T& value, int) {\n        return value;\n   \
-    \ }\n\n    static T make_node_value(T&& value, int) {\n        return std::move(value);\n\
+    \ b) } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for groups.\
+    \ A type satisfying this concept must also obey the group\n// laws; concepts can\
+    \ check the interface but not the algebraic properties.\ntemplate <typename M>\n\
+    concept IsGroup = IsMonoid<M> && requires(typename M::value_type a) {\n    { M::inv(a)\
+    \ } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for commutative\
+    \ groups. Commutativity is a semantic requirement and\n// cannot be checked by\
+    \ a C++ concept.\ntemplate <typename M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\
+    \n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 11 \"ds/dynamic_tree/path_link_cut_tree.hpp\"\
+    \n\nnamespace m1une {\nnamespace ds {\n\ntemplate <m1une::monoid::IsMonoid Monoid>\n\
+    struct PathLinkCutTree {\n    using T = typename Monoid::value_type;\n\n   private:\n\
+    \    struct Node {\n        int left = -1;\n        int right = -1;\n        int\
+    \ parent = -1;\n        bool rev = false;\n        int size = 1;\n        T value\
+    \ = Monoid::id();\n        T prod = Monoid::id();\n        T rev_prod = Monoid::id();\n\
+    \    };\n\n    struct EdgeInfo {\n        int u = -1;\n        int v = -1;\n \
+    \       int node = -1;\n        bool alive = false;\n    };\n\n    std::vector<Node>\
+    \ _nodes;\n    std::vector<EdgeInfo> _edges;\n    std::vector<int> _path_buffer;\n\
+    \n    static T make_node_value(const T& value, int) {\n        return value;\n\
+    \    }\n\n    static T make_node_value(T&& value, int) {\n        return std::move(value);\n\
     \    }\n\n    template <class U>\n    requires (!std::same_as<U, T>) && (\n  \
     \      requires(U x) { Monoid::make(x); } ||\n        requires(U x, int i) { Monoid::make(x,\
     \ i); } ||\n        std::convertible_to<U, T>\n    )\n    static T make_node_value(const\
@@ -518,7 +520,7 @@ data:
   isVerificationFile: true
   path: verify/ds/dynamic_tree/path_link_cut_tree.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-16 20:44:42+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/dynamic_tree/path_link_cut_tree.test.cpp

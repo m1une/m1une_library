@@ -274,61 +274,64 @@ data:
     \    typename M::value_type;\n\n    // 2. Must have a static method `id()` returning\
     \ `value_type`\n    { M::id() } -> std::same_as<typename M::value_type>;\n\n \
     \   // 3. Must have a static method `op(a, b)` returning `value_type`\n    { M::op(a,\
-    \ b) } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for commutative\
-    \ group monoids.\n// A type satisfying this concept must also obey commutativity\
-    \ and inverse laws.\ntemplate <typename M>\nconcept IsCommutativeGroup = IsMonoid<M>\
-    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line\
-    \ 11 \"ds/range_query/sparse_table.hpp\"\n\nnamespace m1une {\nnamespace ds {\n\
-    \n// A Sparse Table utilizing C++20 Concepts for type safety.\n// It requires\
-    \ a Monoid struct that satisfies `m1une::monoid::IsMonoid`.\n// [IMPORTANT] For\
-    \ O(1) range queries to work correctly, the monoid operation MUST be idempotent.\n\
-    // i.e., Monoid::op(x, x) == x must hold (e.g., Min, Max, GCD, Bitwise AND/OR).\n\
-    template <m1une::monoid::IsMonoid Monoid>\nstruct SparseTable {\n    using T =\
-    \ typename Monoid::value_type;\n\n   private:\n    int _n;\n    std::vector<std::vector<T>>\
-    \ _st;\n\n   public:\n    // Constructs an empty sparse table.\n    SparseTable()\
-    \ : _n(0) {}\n\n    // Constructs a sparse table from an existing vector in O(N\
-    \ log N) time.\n    explicit SparseTable(const std::vector<T>& v) : _n(int(v.size()))\
-    \ {\n        if (_n == 0) return;\n\n        // Compute the maximum power of 2\
-    \ needed\n        int max_log = std::bit_width((unsigned int)_n);\n        _st.assign(max_log,\
-    \ std::vector<T>(_n));\n\n        // Initialize the base level\n        for (int\
-    \ i = 0; i < _n; i++) {\n            _st[0][i] = v[i];\n        }\n\n        //\
-    \ Build the sparse table\n        for (int k = 1; k < max_log; k++) {\n      \
-    \      for (int i = 0; i + (1 << k) <= _n; i++) {\n                _st[k][i] =\
-    \ Monoid::op(_st[k - 1][i], _st[k - 1][i + (1 << (k - 1))]);\n            }\n\
-    \        }\n    }\n    explicit SparseTable(std::vector<T>&& v) : _n(int(v.size()))\
-    \ {\n        if (_n == 0) return;\n\n        int max_log = std::bit_width((unsigned\
-    \ int)_n);\n        _st.assign(max_log, std::vector<T>(_n));\n\n        for (int\
-    \ i = 0; i < _n; i++) {\n            _st[0][i] = std::move(v[i]);\n        }\n\
-    \n        for (int k = 1; k < max_log; k++) {\n            for (int i = 0; i +\
-    \ (1 << k) <= _n; i++) {\n                _st[k][i] = Monoid::op(_st[k - 1][i],\
-    \ _st[k - 1][i + (1 << (k - 1))]);\n            }\n        }\n    }\n\n    //\
-    \ Constructs a sparse table from a vector of a different type U.\n    // It automatically\
-    \ adapts to the Monoid's initialization requirements:\n    // 1. Monoid::make(val)\
-    \ if it exists.\n    // 2. Monoid::make(val, index) if the monoid requires global\
-    \ indices.\n    // 3. static_cast<T>(val) as a fallback for simple monoids.\n\
-    \    template <typename U>\n    requires (!std::same_as<U, T>) && (\n        requires(U\
-    \ x) { Monoid::make(x); } ||\n        requires(U x, int i) { Monoid::make(x, i);\
-    \ } ||\n        std::convertible_to<U, T>\n    )\n    explicit SparseTable(const\
-    \ std::vector<U>& v) : _n(int(v.size())) {\n        if (_n == 0) return;\n\n \
-    \       int max_log = std::bit_width((unsigned int)_n);\n        _st.assign(max_log,\
-    \ std::vector<T>(_n));\n\n        // Compile-time branching based on the available\
-    \ make() signature\n        for (int i = 0; i < _n; i++) {\n            if constexpr\
-    \ (requires(U x) { Monoid::make(x); }) {\n                _st[0][i] = Monoid::make(v[i]);\n\
-    \            } else if constexpr (requires(U x, int idx) { Monoid::make(x, idx);\
-    \ }) {\n                _st[0][i] = Monoid::make(v[i], i);\n            } else\
-    \ {\n                _st[0][i] = static_cast<T>(v[i]);\n            }\n      \
-    \  }\n        for (int k = 1; k < max_log; k++) {\n            for (int i = 0;\
-    \ i + (1 << k) <= _n; i++) {\n                _st[k][i] = Monoid::op(_st[k - 1][i],\
-    \ _st[k - 1][i + (1 << (k - 1))]);\n            }\n        }\n    }\n\n    //\
-    \ Returns the product (result of the monoid operation) in the range [l, r) in\
-    \ O(1) time.\n    // Requires the monoid operation to be idempotent.\n    T prod(int\
-    \ l, int r) const {\n        assert(0 <= l && l <= r && r <= _n);\n        if\
-    \ (l == r) return Monoid::id();\n\n        // Calculate the largest power of 2\
-    \ less than or equal to the interval length\n        int k = std::bit_width((unsigned\
-    \ int)(r - l)) - 1;\n        return Monoid::op(_st[k][l], _st[k][r - (1 << k)]);\n\
-    \    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n#line 12 \"graph/tree/sparse_table_lca.hpp\"\
-    \n\nnamespace m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct SparseTableLca\
+    \ b) } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for groups.\
+    \ A type satisfying this concept must also obey the group\n// laws; concepts can\
+    \ check the interface but not the algebraic properties.\ntemplate <typename M>\n\
+    concept IsGroup = IsMonoid<M> && requires(typename M::value_type a) {\n    { M::inv(a)\
+    \ } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for commutative\
+    \ groups. Commutativity is a semantic requirement and\n// cannot be checked by\
+    \ a C++ concept.\ntemplate <typename M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\
+    \n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 11 \"ds/range_query/sparse_table.hpp\"\
+    \n\nnamespace m1une {\nnamespace ds {\n\n// A Sparse Table utilizing C++20 Concepts\
+    \ for type safety.\n// It requires a Monoid struct that satisfies `m1une::monoid::IsMonoid`.\n\
+    // [IMPORTANT] For O(1) range queries to work correctly, the monoid operation\
+    \ MUST be idempotent.\n// i.e., Monoid::op(x, x) == x must hold (e.g., Min, Max,\
+    \ GCD, Bitwise AND/OR).\ntemplate <m1une::monoid::IsMonoid Monoid>\nstruct SparseTable\
+    \ {\n    using T = typename Monoid::value_type;\n\n   private:\n    int _n;\n\
+    \    std::vector<std::vector<T>> _st;\n\n   public:\n    // Constructs an empty\
+    \ sparse table.\n    SparseTable() : _n(0) {}\n\n    // Constructs a sparse table\
+    \ from an existing vector in O(N log N) time.\n    explicit SparseTable(const\
+    \ std::vector<T>& v) : _n(int(v.size())) {\n        if (_n == 0) return;\n\n \
+    \       // Compute the maximum power of 2 needed\n        int max_log = std::bit_width((unsigned\
+    \ int)_n);\n        _st.assign(max_log, std::vector<T>(_n));\n\n        // Initialize\
+    \ the base level\n        for (int i = 0; i < _n; i++) {\n            _st[0][i]\
+    \ = v[i];\n        }\n\n        // Build the sparse table\n        for (int k\
+    \ = 1; k < max_log; k++) {\n            for (int i = 0; i + (1 << k) <= _n; i++)\
+    \ {\n                _st[k][i] = Monoid::op(_st[k - 1][i], _st[k - 1][i + (1 <<\
+    \ (k - 1))]);\n            }\n        }\n    }\n    explicit SparseTable(std::vector<T>&&\
+    \ v) : _n(int(v.size())) {\n        if (_n == 0) return;\n\n        int max_log\
+    \ = std::bit_width((unsigned int)_n);\n        _st.assign(max_log, std::vector<T>(_n));\n\
+    \n        for (int i = 0; i < _n; i++) {\n            _st[0][i] = std::move(v[i]);\n\
+    \        }\n\n        for (int k = 1; k < max_log; k++) {\n            for (int\
+    \ i = 0; i + (1 << k) <= _n; i++) {\n                _st[k][i] = Monoid::op(_st[k\
+    \ - 1][i], _st[k - 1][i + (1 << (k - 1))]);\n            }\n        }\n    }\n\
+    \n    // Constructs a sparse table from a vector of a different type U.\n    //\
+    \ It automatically adapts to the Monoid's initialization requirements:\n    //\
+    \ 1. Monoid::make(val) if it exists.\n    // 2. Monoid::make(val, index) if the\
+    \ monoid requires global indices.\n    // 3. static_cast<T>(val) as a fallback\
+    \ for simple monoids.\n    template <typename U>\n    requires (!std::same_as<U,\
+    \ T>) && (\n        requires(U x) { Monoid::make(x); } ||\n        requires(U\
+    \ x, int i) { Monoid::make(x, i); } ||\n        std::convertible_to<U, T>\n  \
+    \  )\n    explicit SparseTable(const std::vector<U>& v) : _n(int(v.size())) {\n\
+    \        if (_n == 0) return;\n\n        int max_log = std::bit_width((unsigned\
+    \ int)_n);\n        _st.assign(max_log, std::vector<T>(_n));\n\n        // Compile-time\
+    \ branching based on the available make() signature\n        for (int i = 0; i\
+    \ < _n; i++) {\n            if constexpr (requires(U x) { Monoid::make(x); })\
+    \ {\n                _st[0][i] = Monoid::make(v[i]);\n            } else if constexpr\
+    \ (requires(U x, int idx) { Monoid::make(x, idx); }) {\n                _st[0][i]\
+    \ = Monoid::make(v[i], i);\n            } else {\n                _st[0][i] =\
+    \ static_cast<T>(v[i]);\n            }\n        }\n        for (int k = 1; k <\
+    \ max_log; k++) {\n            for (int i = 0; i + (1 << k) <= _n; i++) {\n  \
+    \              _st[k][i] = Monoid::op(_st[k - 1][i], _st[k - 1][i + (1 << (k -\
+    \ 1))]);\n            }\n        }\n    }\n\n    // Returns the product (result\
+    \ of the monoid operation) in the range [l, r) in O(1) time.\n    // Requires\
+    \ the monoid operation to be idempotent.\n    T prod(int l, int r) const {\n \
+    \       assert(0 <= l && l <= r && r <= _n);\n        if (l == r) return Monoid::id();\n\
+    \n        // Calculate the largest power of 2 less than or equal to the interval\
+    \ length\n        int k = std::bit_width((unsigned int)(r - l)) - 1;\n       \
+    \ return Monoid::op(_st[k][l], _st[k][r - (1 << k)]);\n    }\n};\n\n}  // namespace\
+    \ ds\n}  // namespace m1une\n\n\n#line 12 \"graph/tree/sparse_table_lca.hpp\"\n\
+    \nnamespace m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct SparseTableLca\
     \ {\n    using cost_type = T;\n    using edge_type = m1une::graph::Edge<T>;\n\n\
     \    int root;\n    std::vector<int> parent;\n    std::vector<int> parent_edge;\n\
     \    std::vector<int> depth;\n    std::vector<T> dist;\n    std::vector<int> subtree_size;\n\
@@ -413,7 +416,7 @@ data:
   requiredBy:
   - graph/tree/all.hpp
   - graph/all.hpp
-  timestamp: '2026-07-11 19:47:32+09:00'
+  timestamp: '2026-07-16 20:44:42+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp

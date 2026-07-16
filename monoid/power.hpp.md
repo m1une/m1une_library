@@ -4,11 +4,17 @@ data:
   - icon: ':heavy_check_mark:'
     path: monoid/concept.hpp
     title: Monoid Concept
-  _extendedRequiredBy: []
-  _extendedVerifiedWith: []
+  _extendedRequiredBy:
+  - icon: ':heavy_check_mark:'
+    path: acted_monoid/range_update_range_product.hpp
+    title: Range Update Range Product
+  _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/segtree/range_update_range_product.test.cpp
+    title: verify/ds/segtree/range_update_range_product.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':warning:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"monoid/power.hpp\"\n\n\n\n#line 1 \"monoid/concept.hpp\"\
@@ -20,19 +26,22 @@ data:
     \ M::value_type;\n\n    // 2. Must have a static method `id()` returning `value_type`\n\
     \    { M::id() } -> std::same_as<typename M::value_type>;\n\n    // 3. Must have\
     \ a static method `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for commutative group monoids.\n// A type\
-    \ satisfying this concept must also obey commutativity and inverse laws.\ntemplate\
-    \ <typename M>\nconcept IsCommutativeGroup = IsMonoid<M> && requires(typename\
-    \ M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename M::value_type>;\n\
-    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 5 \"monoid/power.hpp\"\
-    \n\nnamespace m1une {\nnamespace monoid {\n\n// Computes a^n (a * a * ... * a,\
-    \ n times) for an element 'a' in Monoid 'M'.\n// Uses binary exponentiation to\
-    \ achieve O(log n) time complexity.\n// The template parameter 'M' is constrained\
-    \ by the 'IsMonoid' concept.\ntemplate <IsMonoid M>\nconstexpr typename M::value_type\
-    \ power(typename M::value_type a, long long n) {\n    typename M::value_type res\
-    \ = M::id();\n    while (n > 0) {\n        if (n & 1) {\n            res = M::op(res,\
-    \ a);\n        }\n        a = M::op(a, a);\n        n >>= 1;\n    }\n    return\
-    \ res;\n}\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n"
+    \ M::value_type>;\n};\n\n// Concept for groups. A type satisfying this concept\
+    \ must also obey the group\n// laws; concepts can check the interface but not\
+    \ the algebraic properties.\ntemplate <typename M>\nconcept IsGroup = IsMonoid<M>\
+    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
+    \ M::value_type>;\n};\n\n// Concept for commutative groups. Commutativity is a\
+    \ semantic requirement and\n// cannot be checked by a C++ concept.\ntemplate <typename\
+    \ M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\n}  // namespace monoid\n}  //\
+    \ namespace m1une\n\n\n#line 5 \"monoid/power.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ monoid {\n\n// Computes a^n (a * a * ... * a, n times) for an element 'a' in\
+    \ Monoid 'M'.\n// Uses binary exponentiation to achieve O(log n) time complexity.\n\
+    // The template parameter 'M' is constrained by the 'IsMonoid' concept.\ntemplate\
+    \ <IsMonoid M>\nconstexpr typename M::value_type power(typename M::value_type\
+    \ a, long long n) {\n    typename M::value_type res = M::id();\n    while (n >\
+    \ 0) {\n        if (n & 1) {\n            res = M::op(res, a);\n        }\n  \
+    \      a = M::op(a, a);\n        n >>= 1;\n    }\n    return res;\n}\n\n}  //\
+    \ namespace monoid\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_MONOID_POWER_HPP\n#define M1UNE_MONOID_POWER_HPP 1\n\n#include\
     \ \"concept.hpp\"\n\nnamespace m1une {\nnamespace monoid {\n\n// Computes a^n\
     \ (a * a * ... * a, n times) for an element 'a' in Monoid 'M'.\n// Uses binary\
@@ -47,10 +56,12 @@ data:
   - monoid/concept.hpp
   isVerificationFile: false
   path: monoid/power.hpp
-  requiredBy: []
-  timestamp: '2026-06-21 04:34:53+09:00'
-  verificationStatus: LIBRARY_NO_TESTS
-  verifiedWith: []
+  requiredBy:
+  - acted_monoid/range_update_range_product.hpp
+  timestamp: '2026-07-16 20:44:42+09:00'
+  verificationStatus: LIBRARY_ALL_AC
+  verifiedWith:
+  - verify/ds/segtree/range_update_range_product.test.cpp
 documentation_of: monoid/power.hpp
 layout: document
 title: Monoid Power

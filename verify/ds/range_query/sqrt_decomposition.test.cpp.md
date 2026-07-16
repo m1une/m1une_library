@@ -33,15 +33,18 @@ data:
     \  // 2. Must have a static method `id()` returning `value_type`\n    { M::id()\
     \ } -> std::same_as<typename M::value_type>;\n\n    // 3. Must have a static method\
     \ `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for commutative group monoids.\n// A type\
-    \ satisfying this concept must also obey commutativity and inverse laws.\ntemplate\
-    \ <typename M>\nconcept IsCommutativeGroup = IsMonoid<M> && requires(typename\
-    \ M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename M::value_type>;\n\
-    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 12 \"ds/range_query/sqrt_decomposition.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\n\n// Mutable square-root decomposition\
-    \ for point assignments and range products.\ntemplate <m1une::monoid::IsMonoid\
-    \ Monoid>\nstruct SqrtDecomposition {\n    using T = typename Monoid::value_type;\n\
-    \n   private:\n    int _n;\n    int _block_size;\n    int _block_count;\n    std::vector<T>\
+    \ M::value_type>;\n};\n\n// Concept for groups. A type satisfying this concept\
+    \ must also obey the group\n// laws; concepts can check the interface but not\
+    \ the algebraic properties.\ntemplate <typename M>\nconcept IsGroup = IsMonoid<M>\
+    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
+    \ M::value_type>;\n};\n\n// Concept for commutative groups. Commutativity is a\
+    \ semantic requirement and\n// cannot be checked by a C++ concept.\ntemplate <typename\
+    \ M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\n}  // namespace monoid\n}  //\
+    \ namespace m1une\n\n\n#line 12 \"ds/range_query/sqrt_decomposition.hpp\"\n\n\
+    namespace m1une {\nnamespace ds {\n\n// Mutable square-root decomposition for\
+    \ point assignments and range products.\ntemplate <m1une::monoid::IsMonoid Monoid>\n\
+    struct SqrtDecomposition {\n    using T = typename Monoid::value_type;\n\n   private:\n\
+    \    int _n;\n    int _block_size;\n    int _block_count;\n    std::vector<T>\
     \ _values;\n    std::vector<T> _block_product;\n\n    template <class U>\n   \
     \ static T make_value(const U& value, int index) {\n        if constexpr (requires(U\
     \ x) { Monoid::make(x); }) {\n            return Monoid::make(value);\n      \
@@ -436,7 +439,7 @@ data:
   isVerificationFile: true
   path: verify/ds/range_query/sqrt_decomposition.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-16 20:44:42+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/range_query/sqrt_decomposition.test.cpp

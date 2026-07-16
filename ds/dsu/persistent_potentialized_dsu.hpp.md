@@ -25,27 +25,29 @@ data:
     \ M::value_type;\n\n    // 2. Must have a static method `id()` returning `value_type`\n\
     \    { M::id() } -> std::same_as<typename M::value_type>;\n\n    // 3. Must have\
     \ a static method `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for commutative group monoids.\n// A type\
-    \ satisfying this concept must also obey commutativity and inverse laws.\ntemplate\
-    \ <typename M>\nconcept IsCommutativeGroup = IsMonoid<M> && requires(typename\
-    \ M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename M::value_type>;\n\
-    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 12 \"ds/dsu/persistent_potentialized_dsu.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\n\ntemplate <m1une::monoid::IsCommutativeGroup\
-    \ Group>\n    requires std::equality_comparable<typename Group::value_type>\n\
-    struct PersistentPotentializedDsu {\n    using T = typename Group::value_type;\n\
-    \n    struct Value {\n        int parent_or_size;\n        T diff_to_parent;\n\
-    \n        Value() : parent_or_size(0), diff_to_parent(Group::id()) {}\n      \
-    \  Value(int parent_or_size_, const T& diff_to_parent_)\n            : parent_or_size(parent_or_size_),\
-    \ diff_to_parent(diff_to_parent_) {}\n        Value(int parent_or_size_, T&& diff_to_parent_)\n\
-    \            : parent_or_size(parent_or_size_), diff_to_parent(std::move(diff_to_parent_))\
-    \ {}\n    };\n\n   private:\n    struct Node {\n        Value val;\n        int\
-    \ l, r;\n\n        Node() : val(), l(0), r(0) {}\n        explicit Node(const\
-    \ Value& value) : val(value), l(0), r(0) {}\n        explicit Node(Value&& value)\
-    \ : val(std::move(value)), l(0), r(0) {}\n        Node(const Value& value, int\
-    \ left, int right) : val(value), l(left), r(right) {}\n        Node(Value&& value,\
-    \ int left, int right) : val(std::move(value)), l(left), r(right) {}\n    };\n\
-    \n    int _n;\n    int _root;\n    std::shared_ptr<std::vector<Node>> _pool;\n\
-    \n    explicit PersistentPotentializedDsu(int n, int root, std::shared_ptr<std::vector<Node>>\
+    \ M::value_type>;\n};\n\n// Concept for groups. A type satisfying this concept\
+    \ must also obey the group\n// laws; concepts can check the interface but not\
+    \ the algebraic properties.\ntemplate <typename M>\nconcept IsGroup = IsMonoid<M>\
+    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
+    \ M::value_type>;\n};\n\n// Concept for commutative groups. Commutativity is a\
+    \ semantic requirement and\n// cannot be checked by a C++ concept.\ntemplate <typename\
+    \ M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\n}  // namespace monoid\n}  //\
+    \ namespace m1une\n\n\n#line 12 \"ds/dsu/persistent_potentialized_dsu.hpp\"\n\n\
+    namespace m1une {\nnamespace ds {\n\ntemplate <m1une::monoid::IsGroup Group>\n\
+    \    requires std::equality_comparable<typename Group::value_type>\nstruct PersistentPotentializedDsu\
+    \ {\n    using T = typename Group::value_type;\n\n    struct Value {\n       \
+    \ int parent_or_size;\n        T diff_to_parent;\n\n        Value() : parent_or_size(0),\
+    \ diff_to_parent(Group::id()) {}\n        Value(int parent_or_size_, const T&\
+    \ diff_to_parent_)\n            : parent_or_size(parent_or_size_), diff_to_parent(diff_to_parent_)\
+    \ {}\n        Value(int parent_or_size_, T&& diff_to_parent_)\n            : parent_or_size(parent_or_size_),\
+    \ diff_to_parent(std::move(diff_to_parent_)) {}\n    };\n\n   private:\n    struct\
+    \ Node {\n        Value val;\n        int l, r;\n\n        Node() : val(), l(0),\
+    \ r(0) {}\n        explicit Node(const Value& value) : val(value), l(0), r(0)\
+    \ {}\n        explicit Node(Value&& value) : val(std::move(value)), l(0), r(0)\
+    \ {}\n        Node(const Value& value, int left, int right) : val(value), l(left),\
+    \ r(right) {}\n        Node(Value&& value, int left, int right) : val(std::move(value)),\
+    \ l(left), r(right) {}\n    };\n\n    int _n;\n    int _root;\n    std::shared_ptr<std::vector<Node>>\
+    \ _pool;\n\n    explicit PersistentPotentializedDsu(int n, int root, std::shared_ptr<std::vector<Node>>\
     \ pool)\n        : _n(n), _root(root), _pool(std::move(pool)) {}\n\n    int new_node(const\
     \ Node& node) const {\n        _pool->push_back(node);\n        return int(_pool->size())\
     \ - 1;\n    }\n\n    int new_node(Node&& node) const {\n        _pool->push_back(std::move(node));\n\
@@ -107,22 +109,21 @@ data:
   code: "#ifndef M1UNE_PERSISTENT_POTENTIALIZED_DSU_HPP\n#define M1UNE_PERSISTENT_POTENTIALIZED_DSU_HPP\
     \ 1\n\n#include <algorithm>\n#include <cassert>\n#include <concepts>\n#include\
     \ <memory>\n#include <utility>\n#include <vector>\n\n#include \"../../monoid/concept.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\n\ntemplate <m1une::monoid::IsCommutativeGroup\
-    \ Group>\n    requires std::equality_comparable<typename Group::value_type>\n\
-    struct PersistentPotentializedDsu {\n    using T = typename Group::value_type;\n\
-    \n    struct Value {\n        int parent_or_size;\n        T diff_to_parent;\n\
-    \n        Value() : parent_or_size(0), diff_to_parent(Group::id()) {}\n      \
-    \  Value(int parent_or_size_, const T& diff_to_parent_)\n            : parent_or_size(parent_or_size_),\
-    \ diff_to_parent(diff_to_parent_) {}\n        Value(int parent_or_size_, T&& diff_to_parent_)\n\
-    \            : parent_or_size(parent_or_size_), diff_to_parent(std::move(diff_to_parent_))\
-    \ {}\n    };\n\n   private:\n    struct Node {\n        Value val;\n        int\
-    \ l, r;\n\n        Node() : val(), l(0), r(0) {}\n        explicit Node(const\
-    \ Value& value) : val(value), l(0), r(0) {}\n        explicit Node(Value&& value)\
-    \ : val(std::move(value)), l(0), r(0) {}\n        Node(const Value& value, int\
-    \ left, int right) : val(value), l(left), r(right) {}\n        Node(Value&& value,\
-    \ int left, int right) : val(std::move(value)), l(left), r(right) {}\n    };\n\
-    \n    int _n;\n    int _root;\n    std::shared_ptr<std::vector<Node>> _pool;\n\
-    \n    explicit PersistentPotentializedDsu(int n, int root, std::shared_ptr<std::vector<Node>>\
+    \n\nnamespace m1une {\nnamespace ds {\n\ntemplate <m1une::monoid::IsGroup Group>\n\
+    \    requires std::equality_comparable<typename Group::value_type>\nstruct PersistentPotentializedDsu\
+    \ {\n    using T = typename Group::value_type;\n\n    struct Value {\n       \
+    \ int parent_or_size;\n        T diff_to_parent;\n\n        Value() : parent_or_size(0),\
+    \ diff_to_parent(Group::id()) {}\n        Value(int parent_or_size_, const T&\
+    \ diff_to_parent_)\n            : parent_or_size(parent_or_size_), diff_to_parent(diff_to_parent_)\
+    \ {}\n        Value(int parent_or_size_, T&& diff_to_parent_)\n            : parent_or_size(parent_or_size_),\
+    \ diff_to_parent(std::move(diff_to_parent_)) {}\n    };\n\n   private:\n    struct\
+    \ Node {\n        Value val;\n        int l, r;\n\n        Node() : val(), l(0),\
+    \ r(0) {}\n        explicit Node(const Value& value) : val(value), l(0), r(0)\
+    \ {}\n        explicit Node(Value&& value) : val(std::move(value)), l(0), r(0)\
+    \ {}\n        Node(const Value& value, int left, int right) : val(value), l(left),\
+    \ r(right) {}\n        Node(Value&& value, int left, int right) : val(std::move(value)),\
+    \ l(left), r(right) {}\n    };\n\n    int _n;\n    int _root;\n    std::shared_ptr<std::vector<Node>>\
+    \ _pool;\n\n    explicit PersistentPotentializedDsu(int n, int root, std::shared_ptr<std::vector<Node>>\
     \ pool)\n        : _n(n), _root(root), _pool(std::move(pool)) {}\n\n    int new_node(const\
     \ Node& node) const {\n        _pool->push_back(node);\n        return int(_pool->size())\
     \ - 1;\n    }\n\n    int new_node(Node&& node) const {\n        _pool->push_back(std::move(node));\n\
@@ -186,7 +187,7 @@ data:
   isVerificationFile: false
   path: ds/dsu/persistent_potentialized_dsu.hpp
   requiredBy: []
-  timestamp: '2026-06-27 02:45:08+09:00'
+  timestamp: '2026-07-16 20:44:54+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/dsu/persistent_potentialized_dsu.test.cpp
@@ -198,13 +199,17 @@ title: Persistent Potentialized DSU
 ## Overview
 
 `PersistentPotentializedDsu` is a persistent weighted Union-Find over a
-commutative group. Merge operations return a new version and leave the old
-version available, while preserving potential differences inside each component.
+possibly noncommutative group. Merge operations return a new version and leave
+the old version available, while preserving potential differences inside each
+component.
 
 The template parameter is a type satisfying
-`m1une::monoid::IsCommutativeGroup`. The stored constraint for
+`m1une::monoid::IsGroup`. The stored constraint for
 `merge(a, b, w)` is `diff(a, b) == w`, where `diff(a, b)` is
 `Group::op(Group::inv(potential(a)), potential(b))`.
+
+Operation order is significant: if `P(v) = potential(v)`, the constraint is
+`inv(P(a)) * P(b) = w`, or equivalently `P(b) = P(a) * w`.
 
 For `m1une::monoid::Add<long long>`, this means:
 
@@ -221,7 +226,7 @@ for stable values.
 
 ## Template Parameters
 
-* `Group`: A type satisfying `m1une::monoid::IsCommutativeGroup`.
+* `Group`: A type satisfying `m1une::monoid::IsGroup`.
 
 The group value type must be equality comparable so repeated constraints can be
 checked for consistency.

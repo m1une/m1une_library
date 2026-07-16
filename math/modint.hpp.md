@@ -91,6 +91,9 @@ data:
     path: verify/ds/dsu/range_parallel_dsu.test.cpp
     title: verify/ds/dsu/range_parallel_dsu.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp
+    title: verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/dynamic_array/dynamic_lazy_monoid_array.test.cpp
     title: verify/ds/dynamic_array/dynamic_lazy_monoid_array.test.cpp
   - icon: ':heavy_check_mark:'
@@ -120,6 +123,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/persistent_lazy_segtree.test.cpp
     title: verify/ds/segtree/persistent_lazy_segtree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/segtree/range_update_range_product.test.cpp
+    title: verify/ds/segtree/range_update_range_product.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/segtree_beats.test.cpp
     title: verify/ds/segtree/segtree_beats.test.cpp
@@ -667,11 +673,13 @@ data:
   - verify/ds/range_query/range_sort_range_composite.test.cpp
   - verify/ds/segtree/dual_segtree.test.cpp
   - verify/ds/segtree/dynamic_dual_segtree.test.cpp
+  - verify/ds/segtree/range_update_range_product.test.cpp
   - verify/ds/segtree/lazy_segtree.test.cpp
   - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
   - verify/ds/segtree/persistent_lazy_segtree.test.cpp
   - verify/ds/segtree/segtree_beats.test.cpp
   - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
+  - verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp
   - verify/ds/dsu/range_parallel_dsu.test.cpp
   - verify/string/string_algorithms.test.cpp
   - verify/string/wildcard_pattern_matching.test.cpp

@@ -39,27 +39,29 @@ data:
     \  // 2. Must have a static method `id()` returning `value_type`\n    { M::id()\
     \ } -> std::same_as<typename M::value_type>;\n\n    // 3. Must have a static method\
     \ `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for commutative group monoids.\n// A type\
-    \ satisfying this concept must also obey commutativity and inverse laws.\ntemplate\
-    \ <typename M>\nconcept IsCommutativeGroup = IsMonoid<M> && requires(typename\
-    \ M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename M::value_type>;\n\
-    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 12 \"ds/dsu/persistent_potentialized_dsu.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\n\ntemplate <m1une::monoid::IsCommutativeGroup\
-    \ Group>\n    requires std::equality_comparable<typename Group::value_type>\n\
-    struct PersistentPotentializedDsu {\n    using T = typename Group::value_type;\n\
-    \n    struct Value {\n        int parent_or_size;\n        T diff_to_parent;\n\
-    \n        Value() : parent_or_size(0), diff_to_parent(Group::id()) {}\n      \
-    \  Value(int parent_or_size_, const T& diff_to_parent_)\n            : parent_or_size(parent_or_size_),\
-    \ diff_to_parent(diff_to_parent_) {}\n        Value(int parent_or_size_, T&& diff_to_parent_)\n\
-    \            : parent_or_size(parent_or_size_), diff_to_parent(std::move(diff_to_parent_))\
-    \ {}\n    };\n\n   private:\n    struct Node {\n        Value val;\n        int\
-    \ l, r;\n\n        Node() : val(), l(0), r(0) {}\n        explicit Node(const\
-    \ Value& value) : val(value), l(0), r(0) {}\n        explicit Node(Value&& value)\
-    \ : val(std::move(value)), l(0), r(0) {}\n        Node(const Value& value, int\
-    \ left, int right) : val(value), l(left), r(right) {}\n        Node(Value&& value,\
-    \ int left, int right) : val(std::move(value)), l(left), r(right) {}\n    };\n\
-    \n    int _n;\n    int _root;\n    std::shared_ptr<std::vector<Node>> _pool;\n\
-    \n    explicit PersistentPotentializedDsu(int n, int root, std::shared_ptr<std::vector<Node>>\
+    \ M::value_type>;\n};\n\n// Concept for groups. A type satisfying this concept\
+    \ must also obey the group\n// laws; concepts can check the interface but not\
+    \ the algebraic properties.\ntemplate <typename M>\nconcept IsGroup = IsMonoid<M>\
+    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
+    \ M::value_type>;\n};\n\n// Concept for commutative groups. Commutativity is a\
+    \ semantic requirement and\n// cannot be checked by a C++ concept.\ntemplate <typename\
+    \ M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\n}  // namespace monoid\n}  //\
+    \ namespace m1une\n\n\n#line 12 \"ds/dsu/persistent_potentialized_dsu.hpp\"\n\n\
+    namespace m1une {\nnamespace ds {\n\ntemplate <m1une::monoid::IsGroup Group>\n\
+    \    requires std::equality_comparable<typename Group::value_type>\nstruct PersistentPotentializedDsu\
+    \ {\n    using T = typename Group::value_type;\n\n    struct Value {\n       \
+    \ int parent_or_size;\n        T diff_to_parent;\n\n        Value() : parent_or_size(0),\
+    \ diff_to_parent(Group::id()) {}\n        Value(int parent_or_size_, const T&\
+    \ diff_to_parent_)\n            : parent_or_size(parent_or_size_), diff_to_parent(diff_to_parent_)\
+    \ {}\n        Value(int parent_or_size_, T&& diff_to_parent_)\n            : parent_or_size(parent_or_size_),\
+    \ diff_to_parent(std::move(diff_to_parent_)) {}\n    };\n\n   private:\n    struct\
+    \ Node {\n        Value val;\n        int l, r;\n\n        Node() : val(), l(0),\
+    \ r(0) {}\n        explicit Node(const Value& value) : val(value), l(0), r(0)\
+    \ {}\n        explicit Node(Value&& value) : val(std::move(value)), l(0), r(0)\
+    \ {}\n        Node(const Value& value, int left, int right) : val(value), l(left),\
+    \ r(right) {}\n        Node(Value&& value, int left, int right) : val(std::move(value)),\
+    \ l(left), r(right) {}\n    };\n\n    int _n;\n    int _root;\n    std::shared_ptr<std::vector<Node>>\
+    \ _pool;\n\n    explicit PersistentPotentializedDsu(int n, int root, std::shared_ptr<std::vector<Node>>\
     \ pool)\n        : _n(n), _root(root), _pool(std::move(pool)) {}\n\n    int new_node(const\
     \ Node& node) const {\n        _pool->push_back(node);\n        return int(_pool->size())\
     \ - 1;\n    }\n\n    int new_node(Node&& node) const {\n        _pool->push_back(std::move(node));\n\
@@ -132,16 +134,17 @@ data:
     \ T op(const T& a, const T& b) {\n        return a ^ b;\n    }\n\n    static constexpr\
     \ T inv(const T& x) {\n        return x;\n    }\n};\n\n}  // namespace monoid\n\
     }  // namespace m1une\n\n\n#line 6 \"verify/ds/dsu/persistent_potentialized_dsu.test.cpp\"\
-    \n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#include <array>\n#include <charconv>\n\
-    #include <cstddef>\n#include <cstdio>\n#include <cstdlib>\n#include <cstdint>\n\
-    #include <cstring>\n#include <iterator>\n#include <string>\n#include <type_traits>\n\
-    #line 15 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n\nnamespace m1une {\n\
-    namespace utilities {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\n\
-    template <class T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate\
-    \ <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
-    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
-    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
-    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    \n\n#line 8 \"verify/ds/dsu/persistent_potentialized_dsu.test.cpp\"\n#include\
+    \ <array>\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 5 \"utilities/fast_io.hpp\"\
+    \n#include <charconv>\n#include <cstddef>\n#include <cstdio>\n#include <cstdlib>\n\
+    #include <cstdint>\n#include <cstring>\n#include <iterator>\n#include <string>\n\
+    #include <type_traits>\n#line 15 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n\
+    \nnamespace m1une {\nnamespace utilities {\nnamespace internal {\n\n// Detect\
+    \ std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct is_range\
+    \ : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
+    \    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
+    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
+    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
     \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
     \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
@@ -359,9 +362,16 @@ data:
     \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
     n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 10 \"verify/ds/dsu/persistent_potentialized_dsu.test.cpp\"\
-    \n#include <random>\n#line 13 \"verify/ds/dsu/persistent_potentialized_dsu.test.cpp\"\
-    \n\ntemplate <class Group>\nstruct NaivePotentializedDsu {\n    using T = typename\
+    \ utilities\n}  // namespace m1une\n\n\n#line 11 \"verify/ds/dsu/persistent_potentialized_dsu.test.cpp\"\
+    \n#include <random>\n#line 14 \"verify/ds/dsu/persistent_potentialized_dsu.test.cpp\"\
+    \n\nstruct Permutation3Group {\n    using value_type = std::array<int, 3>;\n\n\
+    \    static value_type id() {\n        return {0, 1, 2};\n    }\n\n    static\
+    \ value_type op(const value_type& first, const value_type& second) {\n       \
+    \ value_type result;\n        for (int i = 0; i < 3; i++) result[i] = second[first[i]];\n\
+    \        return result;\n    }\n\n    static value_type inv(const value_type&\
+    \ value) {\n        value_type result;\n        for (int i = 0; i < 3; i++) result[value[i]]\
+    \ = i;\n        return result;\n    }\n};\n\nstatic_assert(m1une::monoid::IsGroup<Permutation3Group>);\n\
+    \ntemplate <class Group>\nstruct NaivePotentializedDsu {\n    using T = typename\
     \ Group::value_type;\n\n    std::vector<int> parent_or_size;\n    std::vector<T>\
     \ diff_to_parent;\n\n    explicit NaivePotentializedDsu(int n = 0) : parent_or_size(n,\
     \ -1), diff_to_parent(n, Group::id()) {}\n\n    std::pair<int, T> leader_and_potential(int\
@@ -410,25 +420,41 @@ data:
     \ xor_ok1] = xor_base.merge(0, 1, 5);\n    auto [xor_b, xor_ok2] = xor_a.merge(1,\
     \ 2, 6);\n    auto [xor_bad, xor_ok_bad] = xor_b.merge(0, 2, 2);\n    assert(xor_ok1);\n\
     \    assert(xor_ok2);\n    assert(!xor_ok_bad);\n    assert(xor_b.diff(0, 2) ==\
-    \ (5 ^ 6));\n    assert(xor_bad.diff(0, 2) == (5 ^ 6));\n\n    AddDsu empty;\n\
-    \    assert(empty.size() == 0);\n    assert(empty.empty());\n\n    std::mt19937\
-    \ rng(0);\n    constexpr int N = 25;\n    std::vector<std::pair<AddDsu, NaivePotentializedDsu<Add>>>\
-    \ versions;\n    versions.emplace_back(AddDsu(N), NaivePotentializedDsu<Add>(N));\n\
-    \n    for (int step = 0; step < 400; step++) {\n        int id = int(rng() % versions.size());\n\
-    \        AddDsu cur = versions[id].first;\n        NaivePotentializedDsu<Add>\
-    \ expected = versions[id].second;\n\n        for (int i = 0; i < N; i++) {\n \
-    \           assert(cur.group_size(i) == expected.group_size(i));\n           \
-    \ assert(cur.parent_or_size(i) == expected.parent_or_size[i]);\n            for\
-    \ (int j = 0; j < N; j++) {\n                assert(cur.same(i, j) == expected.same(i,\
-    \ j));\n                if (cur.same(i, j)) assert(cur.diff(i, j) == expected.diff(i,\
-    \ j));\n            }\n        }\n        assert(cur.groups() == expected.groups());\n\
-    \n        int u = int(rng() % N);\n        int v = int(rng() % N);\n        long\
-    \ long w = int(rng() % 21) - 10;\n        if (expected.same(u, v) && (rng() &\
-    \ 1)) w = expected.diff(u, v);\n\n        auto [next, ok] = cur.merge(u, v, w);\n\
-    \        auto [next_expected, expected_ok] = expected.merge(u, v, w);\n      \
-    \  assert(ok == expected_ok);\n\n        for (int i = 0; i < N; i++) {\n     \
-    \       assert(cur.group_size(i) == expected.group_size(i));\n            assert(next.group_size(i)\
-    \ == next_expected.group_size(i));\n            assert(next.parent_or_size(i)\
+    \ (5 ^ 6));\n    assert(xor_bad.diff(0, 2) == (5 ^ 6));\n\n    using Permutation\
+    \ = Permutation3Group::value_type;\n    using PermutationDsu =\n        m1une::ds::PersistentPotentializedDsu<Permutation3Group>;\n\
+    \    Permutation rotate = {1, 2, 0};\n    Permutation swap_last = {0, 2, 1};\n\
+    \    Permutation swap_first = {1, 0, 2};\n    assert(Permutation3Group::op(rotate,\
+    \ swap_last) !=\n           Permutation3Group::op(swap_last, rotate));\n\n   \
+    \ PermutationDsu permutation_base(4);\n    auto [permutation_a, permutation_ok1]\
+    \ =\n        permutation_base.merge(0, 1, rotate);\n    auto [permutation_b, permutation_ok2]\
+    \ =\n        permutation_a.merge(1, 2, swap_last);\n    auto [permutation_c, permutation_ok3]\
+    \ =\n        permutation_b.merge(3, 2, swap_first);\n    Permutation composed\
+    \ = Permutation3Group::op(rotate, swap_last);\n    auto [permutation_bad, permutation_bad_ok]\
+    \ =\n        permutation_c.merge(0, 2, Permutation3Group::op(swap_last, rotate));\n\
+    \    assert(permutation_ok1);\n    assert(permutation_ok2);\n    assert(permutation_ok3);\n\
+    \    assert(!permutation_bad_ok);\n    assert(!permutation_base.same(0, 1));\n\
+    \    assert(permutation_b.diff(0, 2) == composed);\n    assert(permutation_b.diff(2,\
+    \ 0) == Permutation3Group::inv(composed));\n    assert(permutation_c.diff(3, 2)\
+    \ == swap_first);\n    assert(permutation_c.diff(3, 0) == Permutation3Group::op(\n\
+    \        swap_first, Permutation3Group::inv(composed)\n    ));\n    assert(permutation_bad.diff(0,\
+    \ 2) == composed);\n\n    AddDsu empty;\n    assert(empty.size() == 0);\n    assert(empty.empty());\n\
+    \n    std::mt19937 rng(0);\n    constexpr int N = 25;\n    std::vector<std::pair<AddDsu,\
+    \ NaivePotentializedDsu<Add>>> versions;\n    versions.emplace_back(AddDsu(N),\
+    \ NaivePotentializedDsu<Add>(N));\n\n    for (int step = 0; step < 400; step++)\
+    \ {\n        int id = int(rng() % versions.size());\n        AddDsu cur = versions[id].first;\n\
+    \        NaivePotentializedDsu<Add> expected = versions[id].second;\n\n      \
+    \  for (int i = 0; i < N; i++) {\n            assert(cur.group_size(i) == expected.group_size(i));\n\
+    \            assert(cur.parent_or_size(i) == expected.parent_or_size[i]);\n  \
+    \          for (int j = 0; j < N; j++) {\n                assert(cur.same(i, j)\
+    \ == expected.same(i, j));\n                if (cur.same(i, j)) assert(cur.diff(i,\
+    \ j) == expected.diff(i, j));\n            }\n        }\n        assert(cur.groups()\
+    \ == expected.groups());\n\n        int u = int(rng() % N);\n        int v = int(rng()\
+    \ % N);\n        long long w = int(rng() % 21) - 10;\n        if (expected.same(u,\
+    \ v) && (rng() & 1)) w = expected.diff(u, v);\n\n        auto [next, ok] = cur.merge(u,\
+    \ v, w);\n        auto [next_expected, expected_ok] = expected.merge(u, v, w);\n\
+    \        assert(ok == expected_ok);\n\n        for (int i = 0; i < N; i++) {\n\
+    \            assert(cur.group_size(i) == expected.group_size(i));\n          \
+    \  assert(next.group_size(i) == next_expected.group_size(i));\n            assert(next.parent_or_size(i)\
     \ == next_expected.parent_or_size[i]);\n        }\n\n        versions.emplace_back(next,\
     \ next_expected);\n    }\n}\n\nint main() {\n    m1une::utilities::FastInput fast_input;\n\
     \    m1une::utilities::FastOutput fast_output;\n\n    self_test();\n\n    using\
@@ -443,17 +469,25 @@ data:
   code: "#define PROBLEM \"https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_1_B\"\
     \n\n#include \"../../../ds/dsu/persistent_potentialized_dsu.hpp\"\n#include \"\
     ../../../monoid/add.hpp\"\n#include \"../../../monoid/xor.hpp\"\n\n#include <algorithm>\n\
-    #include <cassert>\n#include \"../../../utilities/fast_io.hpp\"\n#include <random>\n\
-    #include <utility>\n#include <vector>\n\ntemplate <class Group>\nstruct NaivePotentializedDsu\
-    \ {\n    using T = typename Group::value_type;\n\n    std::vector<int> parent_or_size;\n\
-    \    std::vector<T> diff_to_parent;\n\n    explicit NaivePotentializedDsu(int\
-    \ n = 0) : parent_or_size(n, -1), diff_to_parent(n, Group::id()) {}\n\n    std::pair<int,\
-    \ T> leader_and_potential(int a) const {\n        T res = Group::id();\n     \
-    \   while (parent_or_size[a] >= 0) {\n            res = Group::op(diff_to_parent[a],\
-    \ res);\n            a = parent_or_size[a];\n        }\n        return {a, res};\n\
-    \    }\n\n    int leader(int a) const {\n        return leader_and_potential(a).first;\n\
-    \    }\n\n    bool same(int a, int b) const {\n        return leader(a) == leader(b);\n\
-    \    }\n\n    int group_size(int a) const {\n        return -parent_or_size[leader(a)];\n\
+    #include <array>\n#include <cassert>\n#include \"../../../utilities/fast_io.hpp\"\
+    \n#include <random>\n#include <utility>\n#include <vector>\n\nstruct Permutation3Group\
+    \ {\n    using value_type = std::array<int, 3>;\n\n    static value_type id()\
+    \ {\n        return {0, 1, 2};\n    }\n\n    static value_type op(const value_type&\
+    \ first, const value_type& second) {\n        value_type result;\n        for\
+    \ (int i = 0; i < 3; i++) result[i] = second[first[i]];\n        return result;\n\
+    \    }\n\n    static value_type inv(const value_type& value) {\n        value_type\
+    \ result;\n        for (int i = 0; i < 3; i++) result[value[i]] = i;\n       \
+    \ return result;\n    }\n};\n\nstatic_assert(m1une::monoid::IsGroup<Permutation3Group>);\n\
+    \ntemplate <class Group>\nstruct NaivePotentializedDsu {\n    using T = typename\
+    \ Group::value_type;\n\n    std::vector<int> parent_or_size;\n    std::vector<T>\
+    \ diff_to_parent;\n\n    explicit NaivePotentializedDsu(int n = 0) : parent_or_size(n,\
+    \ -1), diff_to_parent(n, Group::id()) {}\n\n    std::pair<int, T> leader_and_potential(int\
+    \ a) const {\n        T res = Group::id();\n        while (parent_or_size[a] >=\
+    \ 0) {\n            res = Group::op(diff_to_parent[a], res);\n            a =\
+    \ parent_or_size[a];\n        }\n        return {a, res};\n    }\n\n    int leader(int\
+    \ a) const {\n        return leader_and_potential(a).first;\n    }\n\n    bool\
+    \ same(int a, int b) const {\n        return leader(a) == leader(b);\n    }\n\n\
+    \    int group_size(int a) const {\n        return -parent_or_size[leader(a)];\n\
     \    }\n\n    T potential(int a) const {\n        return leader_and_potential(a).second;\n\
     \    }\n\n    T diff(int a, int b) const {\n        assert(same(a, b));\n    \
     \    return Group::op(Group::inv(potential(a)), potential(b));\n    }\n\n    std::pair<NaivePotentializedDsu,\
@@ -493,25 +527,41 @@ data:
     \ xor_ok1] = xor_base.merge(0, 1, 5);\n    auto [xor_b, xor_ok2] = xor_a.merge(1,\
     \ 2, 6);\n    auto [xor_bad, xor_ok_bad] = xor_b.merge(0, 2, 2);\n    assert(xor_ok1);\n\
     \    assert(xor_ok2);\n    assert(!xor_ok_bad);\n    assert(xor_b.diff(0, 2) ==\
-    \ (5 ^ 6));\n    assert(xor_bad.diff(0, 2) == (5 ^ 6));\n\n    AddDsu empty;\n\
-    \    assert(empty.size() == 0);\n    assert(empty.empty());\n\n    std::mt19937\
-    \ rng(0);\n    constexpr int N = 25;\n    std::vector<std::pair<AddDsu, NaivePotentializedDsu<Add>>>\
-    \ versions;\n    versions.emplace_back(AddDsu(N), NaivePotentializedDsu<Add>(N));\n\
-    \n    for (int step = 0; step < 400; step++) {\n        int id = int(rng() % versions.size());\n\
-    \        AddDsu cur = versions[id].first;\n        NaivePotentializedDsu<Add>\
-    \ expected = versions[id].second;\n\n        for (int i = 0; i < N; i++) {\n \
-    \           assert(cur.group_size(i) == expected.group_size(i));\n           \
-    \ assert(cur.parent_or_size(i) == expected.parent_or_size[i]);\n            for\
-    \ (int j = 0; j < N; j++) {\n                assert(cur.same(i, j) == expected.same(i,\
-    \ j));\n                if (cur.same(i, j)) assert(cur.diff(i, j) == expected.diff(i,\
-    \ j));\n            }\n        }\n        assert(cur.groups() == expected.groups());\n\
-    \n        int u = int(rng() % N);\n        int v = int(rng() % N);\n        long\
-    \ long w = int(rng() % 21) - 10;\n        if (expected.same(u, v) && (rng() &\
-    \ 1)) w = expected.diff(u, v);\n\n        auto [next, ok] = cur.merge(u, v, w);\n\
-    \        auto [next_expected, expected_ok] = expected.merge(u, v, w);\n      \
-    \  assert(ok == expected_ok);\n\n        for (int i = 0; i < N; i++) {\n     \
-    \       assert(cur.group_size(i) == expected.group_size(i));\n            assert(next.group_size(i)\
-    \ == next_expected.group_size(i));\n            assert(next.parent_or_size(i)\
+    \ (5 ^ 6));\n    assert(xor_bad.diff(0, 2) == (5 ^ 6));\n\n    using Permutation\
+    \ = Permutation3Group::value_type;\n    using PermutationDsu =\n        m1une::ds::PersistentPotentializedDsu<Permutation3Group>;\n\
+    \    Permutation rotate = {1, 2, 0};\n    Permutation swap_last = {0, 2, 1};\n\
+    \    Permutation swap_first = {1, 0, 2};\n    assert(Permutation3Group::op(rotate,\
+    \ swap_last) !=\n           Permutation3Group::op(swap_last, rotate));\n\n   \
+    \ PermutationDsu permutation_base(4);\n    auto [permutation_a, permutation_ok1]\
+    \ =\n        permutation_base.merge(0, 1, rotate);\n    auto [permutation_b, permutation_ok2]\
+    \ =\n        permutation_a.merge(1, 2, swap_last);\n    auto [permutation_c, permutation_ok3]\
+    \ =\n        permutation_b.merge(3, 2, swap_first);\n    Permutation composed\
+    \ = Permutation3Group::op(rotate, swap_last);\n    auto [permutation_bad, permutation_bad_ok]\
+    \ =\n        permutation_c.merge(0, 2, Permutation3Group::op(swap_last, rotate));\n\
+    \    assert(permutation_ok1);\n    assert(permutation_ok2);\n    assert(permutation_ok3);\n\
+    \    assert(!permutation_bad_ok);\n    assert(!permutation_base.same(0, 1));\n\
+    \    assert(permutation_b.diff(0, 2) == composed);\n    assert(permutation_b.diff(2,\
+    \ 0) == Permutation3Group::inv(composed));\n    assert(permutation_c.diff(3, 2)\
+    \ == swap_first);\n    assert(permutation_c.diff(3, 0) == Permutation3Group::op(\n\
+    \        swap_first, Permutation3Group::inv(composed)\n    ));\n    assert(permutation_bad.diff(0,\
+    \ 2) == composed);\n\n    AddDsu empty;\n    assert(empty.size() == 0);\n    assert(empty.empty());\n\
+    \n    std::mt19937 rng(0);\n    constexpr int N = 25;\n    std::vector<std::pair<AddDsu,\
+    \ NaivePotentializedDsu<Add>>> versions;\n    versions.emplace_back(AddDsu(N),\
+    \ NaivePotentializedDsu<Add>(N));\n\n    for (int step = 0; step < 400; step++)\
+    \ {\n        int id = int(rng() % versions.size());\n        AddDsu cur = versions[id].first;\n\
+    \        NaivePotentializedDsu<Add> expected = versions[id].second;\n\n      \
+    \  for (int i = 0; i < N; i++) {\n            assert(cur.group_size(i) == expected.group_size(i));\n\
+    \            assert(cur.parent_or_size(i) == expected.parent_or_size[i]);\n  \
+    \          for (int j = 0; j < N; j++) {\n                assert(cur.same(i, j)\
+    \ == expected.same(i, j));\n                if (cur.same(i, j)) assert(cur.diff(i,\
+    \ j) == expected.diff(i, j));\n            }\n        }\n        assert(cur.groups()\
+    \ == expected.groups());\n\n        int u = int(rng() % N);\n        int v = int(rng()\
+    \ % N);\n        long long w = int(rng() % 21) - 10;\n        if (expected.same(u,\
+    \ v) && (rng() & 1)) w = expected.diff(u, v);\n\n        auto [next, ok] = cur.merge(u,\
+    \ v, w);\n        auto [next_expected, expected_ok] = expected.merge(u, v, w);\n\
+    \        assert(ok == expected_ok);\n\n        for (int i = 0; i < N; i++) {\n\
+    \            assert(cur.group_size(i) == expected.group_size(i));\n          \
+    \  assert(next.group_size(i) == next_expected.group_size(i));\n            assert(next.parent_or_size(i)\
     \ == next_expected.parent_or_size[i]);\n        }\n\n        versions.emplace_back(next,\
     \ next_expected);\n    }\n}\n\nint main() {\n    m1une::utilities::FastInput fast_input;\n\
     \    m1une::utilities::FastOutput fast_output;\n\n    self_test();\n\n    using\
@@ -532,7 +582,7 @@ data:
   isVerificationFile: true
   path: verify/ds/dsu/persistent_potentialized_dsu.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-16 20:44:54+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/dsu/persistent_potentialized_dsu.test.cpp

@@ -142,6 +142,9 @@ data:
     path: verify/ds/dsu/rollback_dsu.test.cpp
     title: verify/ds/dsu/rollback_dsu.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp
+    title: verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/dynamic_array/dynamic_array.test.cpp
     title: verify/ds/dynamic_array/dynamic_array.test.cpp
   - icon: ':heavy_check_mark:'
@@ -303,6 +306,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/persistent_segtree.test.cpp
     title: verify/ds/segtree/persistent_segtree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/segtree/range_update_range_product.test.cpp
+    title: verify/ds/segtree/range_update_range_product.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/segtree.test.cpp
     title: verify/ds/segtree/segtree.test.cpp
@@ -1469,6 +1475,7 @@ data:
   - verify/ds/segtree/dual_segtree.test.cpp
   - verify/ds/segtree/persistent_segtree.test.cpp
   - verify/ds/segtree/dynamic_dual_segtree.test.cpp
+  - verify/ds/segtree/range_update_range_product.test.cpp
   - verify/ds/segtree/segtree_2d.test.cpp
   - verify/ds/segtree/lazy_segtree.test.cpp
   - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
@@ -1486,6 +1493,7 @@ data:
   - verify/ds/hash_table/hash_map.test.cpp
   - verify/ds/stack/persistent_stack.test.cpp
   - verify/ds/dsu/rollback_dsu.test.cpp
+  - verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp
   - verify/ds/dsu/persistent_dsu.test.cpp
   - verify/ds/dsu/dsu.test.cpp
   - verify/ds/dsu/persistent_potentialized_dsu.test.cpp

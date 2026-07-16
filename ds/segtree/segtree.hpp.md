@@ -37,13 +37,16 @@ data:
     \ Must have a static method `id()` returning `value_type`\n    { M::id() } ->\
     \ std::same_as<typename M::value_type>;\n\n    // 3. Must have a static method\
     \ `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for commutative group monoids.\n// A type\
-    \ satisfying this concept must also obey commutativity and inverse laws.\ntemplate\
-    \ <typename M>\nconcept IsCommutativeGroup = IsMonoid<M> && requires(typename\
-    \ M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename M::value_type>;\n\
-    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 11 \"ds/segtree/segtree.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\n\n// A generic Segment Tree utilizing C++20\
-    \ Concepts for type safety.\n// It requires a Monoid struct that satisfies `m1une::monoid::IsMonoid`.\n\
+    \ M::value_type>;\n};\n\n// Concept for groups. A type satisfying this concept\
+    \ must also obey the group\n// laws; concepts can check the interface but not\
+    \ the algebraic properties.\ntemplate <typename M>\nconcept IsGroup = IsMonoid<M>\
+    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
+    \ M::value_type>;\n};\n\n// Concept for commutative groups. Commutativity is a\
+    \ semantic requirement and\n// cannot be checked by a C++ concept.\ntemplate <typename\
+    \ M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\n}  // namespace monoid\n}  //\
+    \ namespace m1une\n\n\n#line 11 \"ds/segtree/segtree.hpp\"\n\nnamespace m1une\
+    \ {\nnamespace ds {\n\n// A generic Segment Tree utilizing C++20 Concepts for\
+    \ type safety.\n// It requires a Monoid struct that satisfies `m1une::monoid::IsMonoid`.\n\
     template <m1une::monoid::IsMonoid Monoid>\nstruct Segtree {\n    using T = typename\
     \ Monoid::value_type;\n\n   private:\n    int _n, _size, _log;\n    std::vector<T>\
     \ _d;\n\n    void update(int k) {\n        _d[k] = Monoid::op(_d[2 * k], _d[2\
@@ -209,7 +212,7 @@ data:
   path: ds/segtree/segtree.hpp
   requiredBy:
   - ds/range_query/range_sort_range_composite.hpp
-  timestamp: '2026-06-21 04:34:53+09:00'
+  timestamp: '2026-07-16 20:44:42+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/range_query/range_sort_range_composite.test.cpp

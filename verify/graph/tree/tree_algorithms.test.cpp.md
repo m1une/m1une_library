@@ -1398,15 +1398,18 @@ data:
     \ M::value_type;\n\n    // 2. Must have a static method `id()` returning `value_type`\n\
     \    { M::id() } -> std::same_as<typename M::value_type>;\n\n    // 3. Must have\
     \ a static method `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for commutative group monoids.\n// A type\
-    \ satisfying this concept must also obey commutativity and inverse laws.\ntemplate\
-    \ <typename M>\nconcept IsCommutativeGroup = IsMonoid<M> && requires(typename\
-    \ M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename M::value_type>;\n\
-    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 1 \"graph/tree/rooted_tree.hpp\"\
-    \n\n\n\n#line 7 \"graph/tree/rooted_tree.hpp\"\n\n#line 9 \"graph/tree/rooted_tree.hpp\"\
-    \n\nnamespace m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct RootedTree\
-    \ {\n    using cost_type = T;\n    using edge_type = m1une::graph::Edge<T>;\n\n\
-    \    int root;\n    std::vector<int> parent;\n    std::vector<int> parent_edge;\n\
+    \ M::value_type>;\n};\n\n// Concept for groups. A type satisfying this concept\
+    \ must also obey the group\n// laws; concepts can check the interface but not\
+    \ the algebraic properties.\ntemplate <typename M>\nconcept IsGroup = IsMonoid<M>\
+    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
+    \ M::value_type>;\n};\n\n// Concept for commutative groups. Commutativity is a\
+    \ semantic requirement and\n// cannot be checked by a C++ concept.\ntemplate <typename\
+    \ M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\n}  // namespace monoid\n}  //\
+    \ namespace m1une\n\n\n#line 1 \"graph/tree/rooted_tree.hpp\"\n\n\n\n#line 7 \"\
+    graph/tree/rooted_tree.hpp\"\n\n#line 9 \"graph/tree/rooted_tree.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct RootedTree {\n\
+    \    using cost_type = T;\n    using edge_type = m1une::graph::Edge<T>;\n\n  \
+    \  int root;\n    std::vector<int> parent;\n    std::vector<int> parent_edge;\n\
     \    std::vector<int> depth;\n    std::vector<T> dist;\n    std::vector<int> subtree_size;\n\
     \    std::vector<int> tin;\n    std::vector<int> tout;\n    std::vector<int> order;\n\
     \    std::vector<std::vector<int>> up;\n\n   private:\n    int _n;\n    int _log;\n\
@@ -2942,7 +2945,7 @@ data:
   isVerificationFile: true
   path: verify/graph/tree/tree_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-16 20:44:42+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/tree/tree_algorithms.test.cpp
