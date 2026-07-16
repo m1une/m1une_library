@@ -166,11 +166,11 @@ data:
   timestamp: '2026-07-13 03:53:33+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/graph/cow_game.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
   - verify/graph/chromatic_number_randomized.test.cpp
   - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/cow_game.test.cpp
   - verify/graph/chromatic_number.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
 documentation_of: graph/chromatic_number.hpp
 layout: document
 title: Chromatic Number

@@ -231,17 +231,17 @@ data:
   isVerificationFile: false
   path: graph/k_shortest_walk.hpp
   requiredBy:
-  - graph/all.hpp
-  - graph/undirected.hpp
   - graph/directed.hpp
   - graph/shortest_path.hpp
+  - graph/all.hpp
+  - graph/undirected.hpp
   timestamp: '2026-07-13 04:00:23+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/graph/graph_algorithms.test.cpp
   - verify/graph/cow_game.test.cpp
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/k_shortest_walk.test.cpp
-  - verify/graph/graph_algorithms.test.cpp
 documentation_of: graph/k_shortest_walk.hpp
 layout: document
 title: K-Shortest Walk

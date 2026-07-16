@@ -800,6 +800,9 @@ data:
       path: math/modint.hpp
       title: ModInt
     - icon: ':heavy_check_mark:'
+      path: math/modular_kth_root.hpp
+      title: Modular Kth Root
+    - icon: ':heavy_check_mark:'
       path: math/modular_square_root.hpp
       title: Modular Square Root
     - icon: ':heavy_check_mark:'
@@ -830,11 +833,17 @@ data:
       path: math/rational.hpp
       title: Rational Number
     - icon: ':heavy_check_mark:'
+      path: math/rational_approximation.hpp
+      title: Rational Approximation
+    - icon: ':heavy_check_mark:'
       path: math/repunit.hpp
       title: Repunit
     - icon: ':heavy_check_mark:'
       path: math/set_power_series.hpp
       title: Set Power Series
+    - icon: ':heavy_check_mark:'
+      path: math/squarefree_count.hpp
+      title: Squarefree Count
     - icon: ':heavy_check_mark:'
       path: math/stern_brocot_tree.hpp
       title: Stern-Brocot Tree
@@ -1110,6 +1119,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: string/minimum_rotation.hpp
       title: Minimum Rotation
+    - icon: ':heavy_check_mark:'
+      path: string/prefix_substring_lcs.hpp
+      title: Prefix-Substring LCS
     - icon: ':heavy_check_mark:'
       path: string/rolling_hash.hpp
       title: Static Rolling Hash
@@ -1834,6 +1846,9 @@ data:
       path: verify/math/modint.test.cpp
       title: verify/math/modint.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/math/modular_kth_root.test.cpp
+      title: verify/math/modular_kth_root.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/math/modular_square_root.test.cpp
       title: verify/math/modular_square_root.test.cpp
     - icon: ':heavy_check_mark:'
@@ -1858,6 +1873,9 @@ data:
       path: verify/math/rational.test.cpp
       title: verify/math/rational.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/math/rational_approximation.test.cpp
+      title: verify/math/rational_approximation.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/math/repunit.test.cpp
       title: verify/math/repunit.test.cpp
     - icon: ':heavy_check_mark:'
@@ -1866,6 +1884,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/set_power_series_log.test.cpp
       title: verify/math/set_power_series_log.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/squarefree_count.test.cpp
+      title: verify/math/squarefree_count.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/stern_brocot_tree.test.cpp
       title: verify/math/stern_brocot_tree.test.cpp
@@ -2080,6 +2101,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/string/minimum_rotation.test.cpp
       title: verify/string/minimum_rotation.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/string/prefix_substring_lcs.test.cpp
+      title: verify/string/prefix_substring_lcs.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/string/runs.test.cpp
       title: verify/string/runs.test.cpp

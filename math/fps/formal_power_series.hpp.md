@@ -1119,55 +1119,55 @@ data:
   isVerificationFile: false
   path: math/fps/formal_power_series.hpp
   requiredBy:
+  - math/all.hpp
+  - math/all.hpp
   - math/partition_function.hpp
   - math/combinatorial_sequences.hpp
-  - math/all.hpp
-  - math/all.hpp
-  - math/bernoulli.hpp
   - math/fps/sparse_formal_power_series.hpp
   - math/fps/half_gcd.hpp
   - math/fps/composition.hpp
-  - math/fps/compositional_inverse.hpp
-  - math/fps/all.hpp
   - math/fps/lagrange_inversion.hpp
+  - math/fps/all.hpp
+  - math/fps/compositional_inverse.hpp
   - math/fps/multipoint_evaluation.hpp
-  - math/fps/linear_recurrence.hpp
   - math/fps/polynomial_factorization.hpp
-  - graph/all.hpp
+  - math/fps/linear_recurrence.hpp
+  - math/bernoulli.hpp
   - graph/counting.hpp
+  - graph/all.hpp
   timestamp: '2026-07-15 03:06:59+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/bernoulli_utilities.test.cpp
-  - verify/math/bell_number.test.cpp
+  - verify/math/math_algorithms.test.cpp
+  - verify/math/math_algorithms.test.cpp
   - verify/math/partition_function.test.cpp
-  - verify/math/math_algorithms.test.cpp
-  - verify/math/math_algorithms.test.cpp
+  - verify/math/fps/pow_of_formal_power_series_sparse.test.cpp
+  - verify/math/fps/sqrt_of_formal_power_series_sparse.test.cpp
+  - verify/math/fps/exp_of_formal_power_series.test.cpp
+  - verify/math/fps/find_linear_recurrence.test.cpp
+  - verify/math/fps/fps_algorithms.test.cpp
+  - verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
+  - verify/math/fps/polynomial_factorization.test.cpp
+  - verify/math/fps/polynomial_taylor_shift.test.cpp
+  - verify/math/fps/multipoint_evaluation.test.cpp
   - verify/math/fps/inv_of_formal_power_series.test.cpp
+  - verify/math/fps/compositional_inverse.test.cpp
+  - verify/math/fps/lagrange_inversion.test.cpp
+  - verify/math/fps/polynomial_interpolation.test.cpp
   - verify/math/fps/half_gcd.test.cpp
   - verify/math/fps/pow_of_formal_power_series.test.cpp
-  - verify/math/fps/polynomial_interpolation.test.cpp
-  - verify/math/fps/polynomial_factorization.test.cpp
-  - verify/math/fps/exp_of_formal_power_series.test.cpp
+  - verify/math/fps/log_of_formal_power_series_sparse.test.cpp
   - verify/math/fps/inv_of_formal_power_series_sparse.test.cpp
   - verify/math/fps/exp_of_formal_power_series_sparse.test.cpp
-  - verify/math/fps/multipoint_evaluation.test.cpp
-  - verify/math/fps/sqrt_of_formal_power_series_sparse.test.cpp
-  - verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
-  - verify/math/fps/log_of_formal_power_series_sparse.test.cpp
-  - verify/math/fps/compositional_inverse.test.cpp
-  - verify/math/fps/polynomial_taylor_shift.test.cpp
-  - verify/math/fps/pow_of_formal_power_series_sparse.test.cpp
   - verify/math/fps/composition.test.cpp
-  - verify/math/fps/lagrange_inversion.test.cpp
-  - verify/math/fps/fps_algorithms.test.cpp
-  - verify/math/fps/find_linear_recurrence.test.cpp
   - verify/math/stirling_number_of_the_second_kind.test.cpp
+  - verify/math/bernoulli_utilities.test.cpp
+  - verify/math/bell_number.test.cpp
   - verify/math/bernoulli_number.test.cpp
-  - verify/graph/cow_game.test.cpp
-  - verify/graph/graph_counting.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
   - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/cow_game.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/graph_counting.test.cpp
 documentation_of: math/fps/formal_power_series.hpp
 layout: document
 title: Formal Power Series

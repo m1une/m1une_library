@@ -1039,9 +1039,9 @@ data:
   timestamp: '2026-07-01 22:47:11+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/geometry/polygon_area.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/point_in_polygon.test.cpp
+  - verify/geometry/polygon_area.test.cpp
   - verify/geometry/polygon_operations.test.cpp
 documentation_of: geometry/polygon.hpp
 layout: document

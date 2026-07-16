@@ -310,8 +310,8 @@ data:
   timestamp: '2026-06-21 04:34:53+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/segtree/range_update_range_product.test.cpp
   - verify/ds/segtree/lazy_segtree.test.cpp
+  - verify/ds/segtree/range_update_range_product.test.cpp
 documentation_of: ds/segtree/lazy_segtree.hpp
 layout: document
 title: Lazy Segment Tree

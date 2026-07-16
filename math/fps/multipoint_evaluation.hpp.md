@@ -952,9 +952,9 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
-  - verify/math/fps/polynomial_interpolation.test.cpp
-  - verify/math/fps/multipoint_evaluation.test.cpp
   - verify/math/fps/fps_algorithms.test.cpp
+  - verify/math/fps/multipoint_evaluation.test.cpp
+  - verify/math/fps/polynomial_interpolation.test.cpp
 documentation_of: math/fps/multipoint_evaluation.hpp
 layout: document
 title: Multipoint Evaluation and Interpolation

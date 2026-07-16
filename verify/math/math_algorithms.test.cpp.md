@@ -119,6 +119,9 @@ data:
     path: math/modint.hpp
     title: ModInt
   - icon: ':heavy_check_mark:'
+    path: math/modular_kth_root.hpp
+    title: Modular Kth Root
+  - icon: ':heavy_check_mark:'
     path: math/modular_square_root.hpp
     title: Modular Square Root
   - icon: ':heavy_check_mark:'
@@ -152,11 +155,17 @@ data:
     path: math/rational.hpp
     title: Rational Number
   - icon: ':heavy_check_mark:'
+    path: math/rational_approximation.hpp
+    title: Rational Approximation
+  - icon: ':heavy_check_mark:'
     path: math/repunit.hpp
     title: Repunit
   - icon: ':heavy_check_mark:'
     path: math/set_power_series.hpp
     title: Set Power Series
+  - icon: ':heavy_check_mark:'
+    path: math/squarefree_count.hpp
+    title: Squarefree Count
   - icon: ':heavy_check_mark:'
     path: math/stern_brocot_tree.hpp
     title: Stern-Brocot Tree
@@ -3179,8 +3188,104 @@ data:
     \    auto random_nonzero = [&]() {\n        return T(1 + random() % (modulus -\
     \ 1));\n    };\n    return sparse_determinant_with_randomizer<T>(size, entries,\
     \ random_nonzero);\n}\n\n}  // namespace matrix\n}  // namespace m1une\n\n\n#line\
-    \ 11 \"math/matrix/all.hpp\"\n\n\n#line 1 \"math/multivariate_convolution.hpp\"\
-    \n\n\n\n#line 9 \"math/multivariate_convolution.hpp\"\n\n#line 1 \"math/primitive_root.hpp\"\
+    \ 11 \"math/matrix/all.hpp\"\n\n\n#line 1 \"math/modular_kth_root.hpp\"\n\n\n\n\
+    #line 11 \"math/modular_kth_root.hpp\"\n\n#line 13 \"math/modular_kth_root.hpp\"\
+    \n\nnamespace m1une {\nnamespace math {\n\nnamespace modular_kth_root_detail {\n\
+    \ninline uint64_t multiply(uint64_t first, uint64_t second, uint64_t mod) {\n\
+    \    return static_cast<uint64_t>(static_cast<__uint128_t>(first) * second % mod);\n\
+    }\n\ninline uint64_t power(uint64_t base, uint64_t exponent, uint64_t mod) {\n\
+    \    uint64_t result = 1 % mod;\n    while (exponent != 0) {\n        if (exponent\
+    \ & 1) result = multiply(result, base, mod);\n        base = multiply(base, base,\
+    \ mod);\n        exponent >>= 1;\n    }\n    return result;\n}\n\ninline uint64_t\
+    \ integer_power(uint64_t base, int exponent) {\n    uint64_t result = 1;\n   \
+    \ for (int i = 0; i < exponent; i++) result *= base;\n    return result;\n}\n\n\
+    inline uint64_t inverse(uint64_t value, uint64_t mod) {\n    if (mod == 1) return\
+    \ 0;\n    value %= mod;\n    uint64_t old_remainder = mod;\n    uint64_t remainder\
+    \ = value;\n    __int128_t old_coefficient = 0;\n    __int128_t coefficient =\
+    \ 1;\n    while (remainder != 0) {\n        const uint64_t quotient = old_remainder\
+    \ / remainder;\n        const uint64_t next_remainder =\n            old_remainder\
+    \ - quotient * remainder;\n        old_remainder = remainder;\n        remainder\
+    \ = next_remainder;\n\n        const __int128_t next_coefficient =\n         \
+    \   old_coefficient - static_cast<__int128_t>(quotient) * coefficient;\n     \
+    \   old_coefficient = coefficient;\n        coefficient = next_coefficient;\n\
+    \    }\n    assert(old_remainder == 1);\n    old_coefficient %= static_cast<__int128_t>(mod);\n\
+    \    if (old_coefficient < 0) old_coefficient += mod;\n    return static_cast<uint64_t>(old_coefficient);\n\
+    }\n\ninline uint64_t extract_prime_power_root(\n    uint64_t value,\n    uint64_t\
+    \ root_prime,\n    int exponent,\n    uint64_t prime\n) {\n    uint64_t coprime_part\
+    \ = prime - 1;\n    int available_exponent = 0;\n    while (coprime_part % root_prime\
+    \ == 0) {\n        coprime_part /= root_prime;\n        available_exponent++;\n\
+    \    }\n    assert(exponent <= available_exponent);\n\n    const uint64_t root_prime_power\
+    \ = integer_power(root_prime, exponent);\n    const uint64_t inverse_coprime_part\
+    \ = inverse(\n        coprime_part, root_prime_power\n    );\n    const uint64_t\
+    \ residue = static_cast<uint64_t>(\n        static_cast<__uint128_t>(root_prime_power\
+    \ - 1) *\n        inverse_coprime_part % root_prime_power\n    );\n    const uint64_t\
+    \ root_exponent = static_cast<uint64_t>(\n        (static_cast<__uint128_t>(residue)\
+    \ * coprime_part + 1) /\n        root_prime_power\n    );\n    uint64_t root =\
+    \ power(value, root_exponent, prime);\n    if (exponent == available_exponent)\
+    \ return root;\n\n    uint64_t non_residue = 2;\n    while (power(non_residue,\
+    \ (prime - 1) / root_prime, prime) == 1) {\n        non_residue++;\n    }\n  \
+    \  const uint64_t generator = power(non_residue, coprime_part, prime);\n    const\
+    \ uint64_t digit_generator = power(\n        generator,\n        integer_power(root_prime,\
+    \ available_exponent - 1),\n        prime\n    );\n\n    const uint64_t step =\
+    \ isqrt(\n        static_cast<uint64_t>(available_exponent - exponent) * root_prime\n\
+    \    ) + 1;\n    const uint64_t giant_factor = power(digit_generator, step, prime);\n\
+    \    std::vector<std::pair<uint64_t, uint64_t>> baby_steps;\n    baby_steps.reserve(step\
+    \ + 1);\n    uint64_t current = 1;\n    for (uint64_t index = 0; index <= step;\
+    \ index++) {\n        baby_steps.emplace_back(current, index);\n        current\
+    \ = multiply(current, giant_factor, prime);\n    }\n    std::sort(baby_steps.begin(),\
+    \ baby_steps.end());\n\n    const uint64_t inverse_digit_generator = power(\n\
+    \        digit_generator, prime - 2, prime\n    );\n    for (int level = exponent;\
+    \ level < available_exponent; level++) {\n        const uint64_t root_power =\
+    \ power(root, root_prime_power, prime);\n        const uint64_t error = multiply(\n\
+    \            power(root_power, prime - 2, prime), value, prime\n        );\n \
+    \       uint64_t target = power(\n            error,\n            integer_power(root_prime,\
+    \ available_exponent - 1 - level),\n            prime\n        );\n\n        bool\
+    \ found = false;\n        uint64_t logarithm = 0;\n        for (uint64_t remainder\
+    \ = 0; remainder <= step; remainder++) {\n            auto iterator = std::upper_bound(\n\
+    \                baby_steps.begin(),\n                baby_steps.end(),\n    \
+    \            target,\n                [](uint64_t key, const std::pair<uint64_t,\
+    \ uint64_t>& entry) {\n                    return key < entry.first;\n       \
+    \         }\n            );\n            if (iterator != baby_steps.begin()) {\n\
+    \                --iterator;\n                if (iterator->first == target) {\n\
+    \                    logarithm = remainder + step * iterator->second;\n      \
+    \              found = true;\n                    break;\n                }\n\
+    \            }\n            target = multiply(target, inverse_digit_generator,\
+    \ prime);\n        }\n        assert(found);\n        if (!found) return 0;\n\n\
+    \        const uint64_t correction_exponent =\n            logarithm * integer_power(root_prime,\
+    \ level - exponent);\n        root = multiply(\n            root,\n          \
+    \  power(generator, correction_exponent, prime),\n            prime\n        );\n\
+    \    }\n    return root;\n}\n\n}  // namespace modular_kth_root_detail\n\n// Returns\
+    \ x such that x^degree = value (mod prime), or nullopt when no root\n// exists.\
+    \ The modulus must be prime.\ninline std::optional<uint64_t> modular_kth_root(\n\
+    \    uint64_t value,\n    uint64_t degree,\n    uint64_t prime\n) {\n    assert(prime\
+    \ >= 2);\n    value %= prime;\n    if (degree == 0) {\n        if (value == 1)\
+    \ return uint64_t(0);\n        return std::nullopt;\n    }\n    if (value == 0)\
+    \ return uint64_t(0);\n    if (prime == 2) return uint64_t(1);\n\n    const uint64_t\
+    \ group_order = prime - 1;\n    degree %= group_order;\n    const uint64_t common_divisor\
+    \ = std::gcd(degree, group_order);\n    if (\n        modular_kth_root_detail::power(\n\
+    \            value, group_order / common_divisor, prime\n        ) != 1\n    )\
+    \ {\n        return std::nullopt;\n    }\n\n    const uint64_t reduced_order =\
+    \ group_order / common_divisor;\n    uint64_t transformed = 1;\n    if (reduced_order\
+    \ != 1) {\n        const uint64_t inverse_degree = modular_kth_root_detail::inverse(\n\
+    \            degree / common_divisor, reduced_order\n        );\n        transformed\
+    \ = modular_kth_root_detail::power(\n            value, inverse_degree, prime\n\
+    \        );\n    }\n\n    uint64_t remaining = common_divisor;\n    int exponent\
+    \ = 0;\n    while ((remaining & 1) == 0) {\n        remaining >>= 1;\n       \
+    \ exponent++;\n    }\n    if (exponent != 0) {\n        transformed = modular_kth_root_detail::extract_prime_power_root(\n\
+    \            transformed, 2, exponent, prime\n        );\n    }\n    for (uint64_t\
+    \ divisor = 3; divisor <= remaining / divisor; divisor += 2) {\n        exponent\
+    \ = 0;\n        while (remaining % divisor == 0) {\n            remaining /= divisor;\n\
+    \            exponent++;\n        }\n        if (exponent != 0) {\n          \
+    \  transformed = modular_kth_root_detail::extract_prime_power_root(\n        \
+    \        transformed, divisor, exponent, prime\n            );\n        }\n  \
+    \  }\n    if (remaining != 1) {\n        transformed = modular_kth_root_detail::extract_prime_power_root(\n\
+    \            transformed, remaining, 1, prime\n        );\n    }\n    return transformed;\n\
+    }\n\ntemplate <class Mint>\nstd::optional<Mint> modular_kth_root(Mint value, uint64_t\
+    \ degree) {\n    auto root = modular_kth_root(\n        static_cast<uint64_t>(value.val()),\n\
+    \        degree,\n        static_cast<uint64_t>(Mint::mod())\n    );\n    if (!root.has_value())\
+    \ return std::nullopt;\n    return Mint(*root);\n}\n\n}  // namespace math\n}\
+    \  // namespace m1une\n\n\n#line 1 \"math/multivariate_convolution.hpp\"\n\n\n\
+    \n#line 9 \"math/multivariate_convolution.hpp\"\n\n#line 1 \"math/primitive_root.hpp\"\
     \n\n\n\n#line 9 \"math/primitive_root.hpp\"\n\n#line 11 \"math/primitive_root.hpp\"\
     \n\nnamespace m1une {\nnamespace math {\n\ninline bool has_primitive_root(uint64_t\
     \ mod) {\n    if (mod == 2 || mod == 4) return true;\n    if (mod < 2) return\
@@ -3603,41 +3708,97 @@ data:
     \ input;\n        }\n        value = Rational(numerator, denominator);\n     \
     \   return input;\n    }\n};\n\ntemplate <std::signed_integral T>\nconstexpr Rational<T>\
     \ abs(const Rational<T>& value) {\n    return value.abs();\n}\n\n}  // namespace\
-    \ math\n}  // namespace m1une\n\n\n#line 1 \"math/repunit.hpp\"\n\n\n\n#line 9\
-    \ \"math/repunit.hpp\"\n\nnamespace m1une {\nnamespace math {\n\ntemplate <class\
-    \ T>\nconstexpr std::pair<T, T> repunit_and_power(\n    std::uint64_t length,\n\
-    \    T base = T(10)\n) {\n    T result = T(0);\n    T result_power = T(1);\n \
-    \   T block = T(1);\n    T block_power = base;\n\n    while (length > 0) {\n \
-    \       if (length & 1) {\n            result = result * block_power + block;\n\
-    \            result_power = result_power * block_power;\n        }\n        block\
-    \ = block * block_power + block;\n        block_power = block_power * block_power;\n\
-    \        length >>= 1;\n    }\n    return std::make_pair(result, result_power);\n\
-    }\n\n// Returns 1 + base + ... + base^(length - 1).\n// The arithmetic, including\
-    \ any modular reduction, is performed by T.\ntemplate <class T>\nconstexpr T repunit(std::uint64_t\
-    \ length, T base = T(10)) {\n    return repunit_and_power<T>(length, base).first;\n\
-    }\n\ntemplate <class T>\nconstexpr T repdigit(std::uint64_t length, T digit, T\
-    \ base = T(10)) {\n    return digit * repunit<T>(length, base);\n}\n\ntemplate\
-    \ <class T>\nconstexpr T concatenate_digits(\n    T left,\n    T right,\n    std::uint64_t\
-    \ right_length,\n    T base = T(10)\n) {\n    return left * repunit_and_power<T>(right_length,\
-    \ base).second + right;\n}\n\nnamespace repunit_detail {\n\ninline std::uint64_t\
-    \ multiply_mod(\n    std::uint64_t left,\n    std::uint64_t right,\n    std::uint64_t\
-    \ mod\n) {\n    return static_cast<std::uint64_t>(\n        static_cast<unsigned\
-    \ __int128>(left) * right % mod\n    );\n}\n\ninline std::pair<std::uint64_t,\
-    \ std::uint64_t> repunit_and_power_mod(\n    std::uint64_t length,\n    std::uint64_t\
-    \ base,\n    std::uint64_t mod\n) {\n    if (mod == 1) return std::make_pair(0,\
-    \ 0);\n\n    std::uint64_t result = 0;\n    std::uint64_t result_power = 1;\n\
-    \    std::uint64_t block = 1;\n    std::uint64_t block_power = base % mod;\n \
-    \   while (length > 0) {\n        if (length & 1) {\n            result = (\n\
-    \                static_cast<unsigned __int128>(result) * block_power + block\n\
-    \            ) % mod;\n            result_power = multiply_mod(result_power, block_power,\
-    \ mod);\n        }\n        block = (\n            static_cast<unsigned __int128>(block)\
-    \ * block_power + block\n        ) % mod;\n        block_power = multiply_mod(block_power,\
-    \ block_power, mod);\n        length >>= 1;\n    }\n    return std::make_pair(result,\
-    \ result_power);\n}\n\n}  // namespace repunit_detail\n\ninline std::pair<std::uint64_t,\
-    \ std::uint64_t> repunit_and_power_mod(\n    std::uint64_t length,\n    std::uint64_t\
-    \ base,\n    std::uint64_t mod\n) {\n    assert(mod >= 1);\n    return repunit_detail::repunit_and_power_mod(length,\
-    \ base, mod);\n}\n\ninline std::uint64_t repunit_mod(\n    std::uint64_t length,\n\
-    \    std::uint64_t base,\n    std::uint64_t mod\n) {\n    return repunit_and_power_mod(length,\
+    \ math\n}  // namespace m1une\n\n\n#line 1 \"math/rational_approximation.hpp\"\
+    \n\n\n\n#line 10 \"math/rational_approximation.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ math {\n\ntemplate <std::integral T>\nrequires(!std::same_as<std::remove_cv_t<T>,\
+    \ bool>)\nstruct RationalApproximationResult {\n    using fraction_type = std::pair<T,\
+    \ T>;\n\n    fraction_type lower;\n    fraction_type upper;\n};\n\nnamespace rational_approximation_detail\
+    \ {\n\nusing Wide = __uint128_t;\n\nstruct Fraction {\n    Wide numerator;\n \
+    \   Wide denominator;\n};\n\ninline bool equal(\n    const Fraction& fraction,\n\
+    \    Wide numerator,\n    Wide denominator\n) {\n    return fraction.numerator\
+    \ * denominator ==\n           numerator * fraction.denominator;\n}\n\ninline\
+    \ Wide coordinate_bound(\n    Wide maximum,\n    Wide offset,\n    Wide step\n\
+    ) {\n    return step == 0 ? maximum : (maximum - offset) / step;\n}\n\ninline\
+    \ Fraction multiply_add(\n    const Fraction& first,\n    Wide multiplier,\n \
+    \   const Fraction& second\n) {\n    return {\n        first.numerator * multiplier\
+    \ + second.numerator,\n        first.denominator * multiplier + second.denominator\n\
+    \    };\n}\n\n}  // namespace rational_approximation_detail\n\n// Returns the\
+    \ closest reduced fractions below and above numerator/denominator\n// whose positive\
+    \ numerator and denominator are both at most maximum.\ntemplate <std::integral\
+    \ T>\nrequires(!std::same_as<std::remove_cv_t<T>, bool>)\nRationalApproximationResult<T>\
+    \ rational_approximation(\n    T maximum,\n    T numerator,\n    T denominator\n\
+    ) {\n    assert(maximum > 0);\n    assert(numerator > 0);\n    assert(denominator\
+    \ > 0);\n    static_assert(sizeof(T) <= sizeof(uint64_t));\n\n    using rational_approximation_detail::Fraction;\n\
+    \    using rational_approximation_detail::Wide;\n    using rational_approximation_detail::coordinate_bound;\n\
+    \    using rational_approximation_detail::equal;\n    using rational_approximation_detail::multiply_add;\n\
+    \n    const Wide limit = static_cast<std::make_unsigned_t<T>>(maximum);\n    const\
+    \ Wide target_numerator =\n        static_cast<std::make_unsigned_t<T>>(numerator);\n\
+    \    const Wide target_denominator =\n        static_cast<std::make_unsigned_t<T>>(denominator);\n\
+    \    Fraction lower{0, 1};\n    Fraction upper{1, 0};\n\n    while (true) {\n\
+    \        Wide lower_multiplier = limit;\n        lower_multiplier = std::min(\n\
+    \            lower_multiplier,\n            coordinate_bound(limit, lower.numerator,\
+    \ upper.numerator)\n        );\n        lower_multiplier = std::min(\n       \
+    \     lower_multiplier,\n            coordinate_bound(limit, lower.denominator,\
+    \ upper.denominator)\n        );\n        const Wide lower_slack =\n         \
+    \   target_numerator * lower.denominator -\n            lower.numerator * target_denominator;\n\
+    \        const Wide lower_step =\n            upper.numerator * target_denominator\
+    \ -\n            target_numerator * upper.denominator;\n        assert(lower_step\
+    \ != 0);\n        lower_multiplier = std::min(\n            lower_multiplier,\
+    \ lower_slack / lower_step\n        );\n        lower = multiply_add(upper, lower_multiplier,\
+    \ lower);\n        if (equal(lower, target_numerator, target_denominator)) {\n\
+    \            upper = lower;\n            break;\n        }\n\n        Wide upper_multiplier\
+    \ = limit;\n        upper_multiplier = std::min(\n            upper_multiplier,\n\
+    \            coordinate_bound(limit, upper.numerator, lower.numerator)\n     \
+    \   );\n        upper_multiplier = std::min(\n            upper_multiplier,\n\
+    \            coordinate_bound(limit, upper.denominator, lower.denominator)\n \
+    \       );\n        const Wide upper_slack =\n            upper.numerator * target_denominator\
+    \ -\n            target_numerator * upper.denominator;\n        const Wide upper_step\
+    \ =\n            target_numerator * lower.denominator -\n            lower.numerator\
+    \ * target_denominator;\n        assert(upper_step != 0);\n        upper_multiplier\
+    \ = std::min(\n            upper_multiplier, upper_slack / upper_step\n      \
+    \  );\n        upper = multiply_add(lower, upper_multiplier, upper);\n       \
+    \ if (equal(upper, target_numerator, target_denominator)) {\n            lower\
+    \ = upper;\n            break;\n        }\n\n        if (lower_multiplier == 0\
+    \ && upper_multiplier == 0) break;\n    }\n\n    RationalApproximationResult<T>\
+    \ result;\n    result.lower = {\n        static_cast<T>(lower.numerator),\n  \
+    \      static_cast<T>(lower.denominator)\n    };\n    result.upper = {\n     \
+    \   static_cast<T>(upper.numerator),\n        static_cast<T>(upper.denominator)\n\
+    \    };\n    return result;\n}\n\n}  // namespace math\n}  // namespace m1une\n\
+    \n\n#line 1 \"math/repunit.hpp\"\n\n\n\n#line 9 \"math/repunit.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace math {\n\ntemplate <class T>\nconstexpr std::pair<T, T> repunit_and_power(\n\
+    \    std::uint64_t length,\n    T base = T(10)\n) {\n    T result = T(0);\n  \
+    \  T result_power = T(1);\n    T block = T(1);\n    T block_power = base;\n\n\
+    \    while (length > 0) {\n        if (length & 1) {\n            result = result\
+    \ * block_power + block;\n            result_power = result_power * block_power;\n\
+    \        }\n        block = block * block_power + block;\n        block_power\
+    \ = block_power * block_power;\n        length >>= 1;\n    }\n    return std::make_pair(result,\
+    \ result_power);\n}\n\n// Returns 1 + base + ... + base^(length - 1).\n// The\
+    \ arithmetic, including any modular reduction, is performed by T.\ntemplate <class\
+    \ T>\nconstexpr T repunit(std::uint64_t length, T base = T(10)) {\n    return\
+    \ repunit_and_power<T>(length, base).first;\n}\n\ntemplate <class T>\nconstexpr\
+    \ T repdigit(std::uint64_t length, T digit, T base = T(10)) {\n    return digit\
+    \ * repunit<T>(length, base);\n}\n\ntemplate <class T>\nconstexpr T concatenate_digits(\n\
+    \    T left,\n    T right,\n    std::uint64_t right_length,\n    T base = T(10)\n\
+    ) {\n    return left * repunit_and_power<T>(right_length, base).second + right;\n\
+    }\n\nnamespace repunit_detail {\n\ninline std::uint64_t multiply_mod(\n    std::uint64_t\
+    \ left,\n    std::uint64_t right,\n    std::uint64_t mod\n) {\n    return static_cast<std::uint64_t>(\n\
+    \        static_cast<unsigned __int128>(left) * right % mod\n    );\n}\n\ninline\
+    \ std::pair<std::uint64_t, std::uint64_t> repunit_and_power_mod(\n    std::uint64_t\
+    \ length,\n    std::uint64_t base,\n    std::uint64_t mod\n) {\n    if (mod ==\
+    \ 1) return std::make_pair(0, 0);\n\n    std::uint64_t result = 0;\n    std::uint64_t\
+    \ result_power = 1;\n    std::uint64_t block = 1;\n    std::uint64_t block_power\
+    \ = base % mod;\n    while (length > 0) {\n        if (length & 1) {\n       \
+    \     result = (\n                static_cast<unsigned __int128>(result) * block_power\
+    \ + block\n            ) % mod;\n            result_power = multiply_mod(result_power,\
+    \ block_power, mod);\n        }\n        block = (\n            static_cast<unsigned\
+    \ __int128>(block) * block_power + block\n        ) % mod;\n        block_power\
+    \ = multiply_mod(block_power, block_power, mod);\n        length >>= 1;\n    }\n\
+    \    return std::make_pair(result, result_power);\n}\n\n}  // namespace repunit_detail\n\
+    \ninline std::pair<std::uint64_t, std::uint64_t> repunit_and_power_mod(\n    std::uint64_t\
+    \ length,\n    std::uint64_t base,\n    std::uint64_t mod\n) {\n    assert(mod\
+    \ >= 1);\n    return repunit_detail::repunit_and_power_mod(length, base, mod);\n\
+    }\n\ninline std::uint64_t repunit_mod(\n    std::uint64_t length,\n    std::uint64_t\
+    \ base,\n    std::uint64_t mod\n) {\n    return repunit_and_power_mod(length,\
     \ base, mod).first;\n}\n\ninline std::uint64_t repdigit_mod(\n    std::uint64_t\
     \ length,\n    std::uint64_t digit,\n    std::uint64_t base,\n    std::uint64_t\
     \ mod\n) {\n    assert(mod >= 1);\n    if (mod == 1) return 0;\n    return repunit_detail::multiply_mod(\n\
@@ -3780,15 +3941,64 @@ data:
     \        series,\n        T(exponent)\n    );\n}\n\ntemplate <class T>\nstd::vector<T>\
     \ set_power_series_sqrt(const std::vector<T>& series) {\n    return set_power_series_detail::normalized_power(\n\
     \        series,\n        T(1) / T(2)\n    );\n}\n\n}  // namespace math\n}  //\
-    \ namespace m1une\n\n\n#line 1 \"math/stern_brocot_tree.hpp\"\n\n\n\n#line 10\
-    \ \"math/stern_brocot_tree.hpp\"\n\n#line 12 \"math/stern_brocot_tree.hpp\"\n\n\
-    namespace m1une {\nnamespace math {\n\nenum class SternBrocotDirection {\n   \
-    \ Left,\n    Right,\n};\n\nstruct SternBrocotRun {\n    SternBrocotDirection direction;\n\
-    \    uint64_t count;\n\n    friend bool operator==(const SternBrocotRun&, const\
-    \ SternBrocotRun&) = default;\n};\n\nstruct SternBrocotPath {\n    std::vector<SternBrocotRun>\
-    \ runs;\n\n    bool empty() const {\n        return runs.empty();\n    }\n\n \
-    \   uint64_t depth() const {\n        uint64_t result = 0;\n        for (const\
-    \ SternBrocotRun& run : runs) {\n            assert(run.count <= std::numeric_limits<uint64_t>::max()\
+    \ namespace m1une\n\n\n#line 1 \"math/squarefree_count.hpp\"\n\n\n\n#line 9 \"\
+    math/squarefree_count.hpp\"\n\n#line 11 \"math/squarefree_count.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace math {\n\nnamespace squarefree_count_detail {\n\ninline std::vector<int>\
+    \ mobius_prefix(int limit) {\n    std::vector<std::int8_t> mobius(limit + 1, 0);\n\
+    \    if (limit >= 1) mobius[1] = 1;\n    {\n        std::vector<int> primes;\n\
+    \        std::vector<bool> composite(limit + 1, false);\n        for (int value\
+    \ = 2; value <= limit; value++) {\n            if (!composite[value]) {\n    \
+    \            primes.push_back(value);\n                mobius[value] = -1;\n \
+    \           }\n            for (int prime : primes) {\n                if (prime\
+    \ > limit / value) break;\n                const int product = prime * value;\n\
+    \                composite[product] = true;\n                if (value % prime\
+    \ == 0) {\n                    mobius[product] = 0;\n                    break;\n\
+    \                }\n                mobius[product] = static_cast<std::int8_t>(-mobius[value]);\n\
+    \            }\n        }\n    }\n\n    std::vector<int> prefix(limit + 1, 0);\n\
+    \    for (int value = 1; value <= limit; value++) {\n        prefix[value] = prefix[value\
+    \ - 1] + mobius[value];\n    }\n    return prefix;\n}\n\n}  // namespace squarefree_count_detail\n\
+    \n// Returns the number of square-free positive integers not greater than n.\n\
+    inline uint64_t count_squarefree(uint64_t n) {\n    if (n == 0) return 0;\n\n\
+    \    const uint64_t split = std::max<uint64_t>(1, floor_kth_root(n, 5U));\n  \
+    \  const uint64_t sieve_limit_u64 = isqrt(n / split);\n    assert(\n        sieve_limit_u64\
+    \ <=\n        static_cast<uint64_t>(std::numeric_limits<int>::max())\n    );\n\
+    \    const int sieve_limit = static_cast<int>(sieve_limit_u64);\n    const std::vector<int>\
+    \ mertens =\n        squarefree_count_detail::mobius_prefix(sieve_limit);\n\n\
+    \    __int128_t direct_sum = 0;\n    for (int divisor = 1; divisor <= sieve_limit;\
+    \ divisor++) {\n        direct_sum += static_cast<__int128_t>(\n            n\
+    \ / static_cast<uint64_t>(divisor) /\n            static_cast<uint64_t>(divisor)\n\
+    \        ) * (mertens[divisor] - mertens[divisor - 1]);\n    }\n\n    std::vector<std::int64_t>\
+    \ large_mertens;\n    large_mertens.reserve(split - 1);\n    std::int64_t large_mertens_sum\
+    \ = 0;\n    for (uint64_t index = split; index-- > 1;) {\n        const uint64_t\
+    \ argument = isqrt(n / index);\n        const uint64_t square_root = isqrt(argument);\n\
+    \        std::int64_t value = 1;\n\n        const uint64_t small_quotient_limit\
+    \ =\n            argument / (square_root + 1);\n        for (uint64_t quotient\
+    \ = 1;\n             quotient <= small_quotient_limit;\n             quotient++)\
+    \ {\n            const uint64_t multiplicity =\n                argument / quotient\
+    \ - argument / (quotient + 1);\n            value -= static_cast<std::int64_t>(multiplicity)\
+    \ *\n                     mertens[static_cast<int>(quotient)];\n        }\n  \
+    \      for (uint64_t divisor = 2; divisor <= square_root; divisor++) {\n     \
+    \       const uint64_t quotient = argument / divisor;\n            if (quotient\
+    \ <= sieve_limit_u64) {\n                value -= mertens[static_cast<int>(quotient)];\n\
+    \            } else {\n                const uint64_t previous_argument =\n  \
+    \                  index * divisor * divisor;\n                assert(previous_argument\
+    \ < split);\n                const uint64_t position = split - previous_argument\
+    \ - 1;\n                assert(position < large_mertens.size());\n           \
+    \     value -= large_mertens[position];\n            }\n        }\n        large_mertens.push_back(value);\n\
+    \        large_mertens_sum += value;\n    }\n\n    const std::int64_t grouped_sum\
+    \ =\n        large_mertens_sum -\n        static_cast<std::int64_t>(split - 1)\
+    \ * mertens[sieve_limit];\n    const __int128_t answer = direct_sum + grouped_sum;\n\
+    \    assert(answer >= 0);\n    assert(answer <= std::numeric_limits<uint64_t>::max());\n\
+    \    return static_cast<uint64_t>(answer);\n}\n\n}  // namespace math\n}  // namespace\
+    \ m1une\n\n\n#line 1 \"math/stern_brocot_tree.hpp\"\n\n\n\n#line 10 \"math/stern_brocot_tree.hpp\"\
+    \n\n#line 12 \"math/stern_brocot_tree.hpp\"\n\nnamespace m1une {\nnamespace math\
+    \ {\n\nenum class SternBrocotDirection {\n    Left,\n    Right,\n};\n\nstruct\
+    \ SternBrocotRun {\n    SternBrocotDirection direction;\n    uint64_t count;\n\
+    \n    friend bool operator==(const SternBrocotRun&, const SternBrocotRun&) = default;\n\
+    };\n\nstruct SternBrocotPath {\n    std::vector<SternBrocotRun> runs;\n\n    bool\
+    \ empty() const {\n        return runs.empty();\n    }\n\n    uint64_t depth()\
+    \ const {\n        uint64_t result = 0;\n        for (const SternBrocotRun& run\
+    \ : runs) {\n            assert(run.count <= std::numeric_limits<uint64_t>::max()\
     \ - result);\n            result += run.count;\n        }\n        return result;\n\
     \    }\n\n    void push(SternBrocotDirection direction, uint64_t count = 1) {\n\
     \        if (count == 0) return;\n        if (!runs.empty() && runs.back().direction\
@@ -4094,7 +4304,7 @@ data:
     \        for (UInt value : basis_) {\n            if (value != 0) result.push_back(value);\n\
     \        }\n        return result;\n    }\n\nprivate:\n    std::array<UInt, bit_width>\
     \ basis_{};\n    int rank_ = 0;\n};\n\n}  // namespace math\n}  // namespace m1une\n\
-    \n\n#line 38 \"math/all.hpp\"\n\n\n#line 12 \"verify/math/math_algorithms.test.cpp\"\
+    \n\n#line 41 \"math/all.hpp\"\n\n\n#line 12 \"verify/math/math_algorithms.test.cpp\"\
     \n\nlong long floor_div(long long numerator, long long denominator) {\n    long\
     \ long quotient = numerator / denominator;\n    if (numerator % denominator <\
     \ 0) quotient--;\n    return quotient;\n}\n\nvoid test_number_theory() {\n   \
@@ -4475,6 +4685,7 @@ data:
   - math/matrix/pfaffian.hpp
   - math/matrix/sparse_determinant.hpp
   - math/modint.hpp
+  - math/modular_kth_root.hpp
   - math/modular_square_root.hpp
   - math/multivariate_convolution.hpp
   - math/fps/convolution.hpp
@@ -4483,9 +4694,11 @@ data:
   - math/prefix_sum_of_binom.hpp
   - math/prime_sieve.hpp
   - math/rational.hpp
+  - math/rational_approximation.hpp
   - math/repunit.hpp
   - math/set_power_series.hpp
   - math/subset_convolution.hpp
+  - math/squarefree_count.hpp
   - math/stern_brocot_tree.hpp
   - math/tetration.hpp
   - math/totient_sum.hpp
@@ -4494,7 +4707,7 @@ data:
   isVerificationFile: true
   path: verify/math/math_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 20:26:13+09:00'
+  timestamp: '2026-07-16 21:30:39+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/math_algorithms.test.cpp

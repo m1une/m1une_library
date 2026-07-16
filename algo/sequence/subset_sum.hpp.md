@@ -84,8 +84,8 @@ data:
   isVerificationFile: false
   path: algo/sequence/subset_sum.hpp
   requiredBy:
-  - algo/all.hpp
   - algo/sequence/all.hpp
+  - algo/all.hpp
   timestamp: '2026-07-07 21:49:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:

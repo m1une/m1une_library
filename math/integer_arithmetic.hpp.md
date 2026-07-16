@@ -6,6 +6,12 @@ data:
     path: math/all.hpp
     title: Math All
   - icon: ':heavy_check_mark:'
+    path: math/modular_kth_root.hpp
+    title: Modular Kth Root
+  - icon: ':heavy_check_mark:'
+    path: math/squarefree_count.hpp
+    title: Squarefree Count
+  - icon: ':heavy_check_mark:'
     path: math/two_square_sum.hpp
     title: Sum of Two Squares
   _extendedVerifiedWith:
@@ -15,6 +21,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/modular_kth_root.test.cpp
+    title: verify/math/modular_kth_root.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/squarefree_count.test.cpp
+    title: verify/math/squarefree_count.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/two_square_sum.test.cpp
     title: verify/math/two_square_sum.test.cpp
@@ -183,14 +195,18 @@ data:
   path: math/integer_arithmetic.hpp
   requiredBy:
   - math/all.hpp
+  - math/squarefree_count.hpp
+  - math/modular_kth_root.hpp
   - math/two_square_sum.hpp
   timestamp: '2026-07-15 01:09:58+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/two_square_sum.test.cpp
-  - verify/math/two_square_sum.test.cpp
-  - verify/math/integer_arithmetic.test.cpp
   - verify/math/math_algorithms.test.cpp
+  - verify/math/integer_arithmetic.test.cpp
+  - verify/math/modular_kth_root.test.cpp
+  - verify/math/squarefree_count.test.cpp
+  - verify/math/two_square_sum.test.cpp
+  - verify/math/two_square_sum.test.cpp
 documentation_of: math/integer_arithmetic.hpp
 layout: document
 title: Integer Roots and Powers

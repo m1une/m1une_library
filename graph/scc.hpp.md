@@ -172,14 +172,14 @@ data:
   isVerificationFile: false
   path: graph/scc.hpp
   requiredBy:
-  - graph/all.hpp
   - graph/directed.hpp
+  - graph/all.hpp
   timestamp: '2026-07-13 20:12:50+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/graph/graph_algorithms.test.cpp
   - verify/graph/cow_game.test.cpp
   - verify/graph/range_edge_graph.test.cpp
-  - verify/graph/graph_algorithms.test.cpp
   - verify/graph/scc.test.cpp
 documentation_of: graph/scc.hpp
 layout: document
