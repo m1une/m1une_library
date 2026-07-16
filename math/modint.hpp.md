@@ -103,6 +103,9 @@ data:
     path: verify/ds/dynamic_tree/yosupo_point_set_tree_path_composite_sum.test.cpp
     title: verify/ds/dynamic_tree/yosupo_point_set_tree_path_composite_sum.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/range_query/offline_rectangle_add_rectangle_sum.test.cpp
+    title: verify/ds/range_query/offline_rectangle_add_rectangle_sum.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/range_query/range_sort_range_composite.test.cpp
     title: verify/ds/range_query/range_sort_range_composite.test.cpp
   - icon: ':heavy_check_mark:'
@@ -670,6 +673,7 @@ data:
   - verify/ds/dynamic_tree/rake_compress_link_cut_tree.test.cpp
   - verify/ds/dynamic_tree/yosupo_point_set_tree_path_composite_sum.test.cpp
   - verify/ds/dynamic_array/dynamic_lazy_monoid_array.test.cpp
+  - verify/ds/range_query/offline_rectangle_add_rectangle_sum.test.cpp
   - verify/ds/range_query/range_sort_range_composite.test.cpp
   - verify/ds/segtree/dual_segtree.test.cpp
   - verify/ds/segtree/dynamic_dual_segtree.test.cpp

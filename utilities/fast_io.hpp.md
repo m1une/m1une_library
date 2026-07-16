@@ -229,6 +229,9 @@ data:
     path: verify/ds/range_query/merge_sort_tree_sum.test.cpp
     title: verify/ds/range_query/merge_sort_tree_sum.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/range_query/offline_rectangle_add_rectangle_sum.test.cpp
+    title: verify/ds/range_query/offline_rectangle_add_rectangle_sum.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/range_query/range_inversion_count.test.cpp
     title: verify/ds/range_query/range_inversion_count.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1451,6 +1454,7 @@ data:
   - verify/ds/range_query/static_range_mode_query.test.cpp
   - verify/ds/range_query/range_inversion_count.test.cpp
   - verify/ds/range_query/sliding_window_aggregation.test.cpp
+  - verify/ds/range_query/offline_rectangle_add_rectangle_sum.test.cpp
   - verify/ds/range_query/merge_sort_tree.test.cpp
   - verify/ds/range_query/merge_sort_tree_sum.test.cpp
   - verify/ds/range_query/sqrt_decomposition.test.cpp
