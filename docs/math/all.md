@@ -17,6 +17,7 @@ You usually do not need to include this entire bundle:
 
 * Use `modint.hpp` for arithmetic modulo a fixed number such as `998244353`.
 * Use `modular_square_root.hpp` to solve `x * x = value (mod prime)`.
+* Use `modular_kth_root.hpp` to solve `x^k = value (mod prime)`.
 * Use `discrete_logarithm.hpp` to solve `base^x = target (mod mod)` for the
   smallest nonnegative exponent.
 * Use `base_n.hpp` to convert nonnegative integers to and from arbitrary-base
@@ -66,6 +67,10 @@ You usually do not need to include this entire bundle:
   multiplicative function from its prime-power values.
 * Use `totient_sum.hpp` for summatory Euler totient queries.
 * Use `rational.hpp` for normalized exact fractions.
+* Use `rational_approximation.hpp` for the closest fraction on each side under
+  numerator and denominator bounds.
+* Use `squarefree_count.hpp` to count square-free integers through a 64-bit
+  limit.
 * Use `stern_brocot_tree.hpp` for positive rational tree paths, ancestors, and
   LCA operations.
 * Use `fps/` for formal power series, convolution, multipoint evaluation,
@@ -88,6 +93,7 @@ few unused headers do not matter.
 | `math/integer_arithmetic.hpp` | Exact integer square/k-th roots and overflow-aware powers. |
 | `math/lucas.hpp` | Lucas's theorem for huge binomial arguments modulo a small prime. |
 | `math/modint.hpp` | Static and tagged dynamic modular integer types. |
+| `math/modular_kth_root.hpp` | Generalized Tonelli--Shanks kth roots modulo a prime. |
 | `math/modular_square_root.hpp` | Modular square roots for prime moduli using Tonelli-Shanks. |
 | `math/multivariate_convolution.hpp` | Truncated and cyclic multidimensional convolution. |
 | `math/multiplicative_function_prefix_sum.hpp` | Min_25 prefix sums of a multiplicative function. |
@@ -111,6 +117,8 @@ few unused headers do not matter.
 | `math/tetration.hpp` | Modular tetration, arbitrary power towers, and bounded tower comparison. |
 | `math/totient_sum.hpp` | Summatory Euler totient function. |
 | `math/rational.hpp` | Exact normalized rational arithmetic over signed integers. |
+| `math/rational_approximation.hpp` | Closest bounded fractions below and above a target rational. |
+| `math/squarefree_count.hpp` | Counts square-free integers in $O(n^{2/5})$. |
 | `math/stern_brocot_tree.hpp` | Compressed Stern-Brocot paths and tree navigation. |
 | `math/subset_convolution.hpp` | Ranked-zeta subset convolution over disjoint masks. |
 | `math/zeta_mobius_transform.hpp` | Subset, superset, divisor, and multiple zeta/Mobius transforms. |
