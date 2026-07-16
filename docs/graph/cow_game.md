@@ -71,6 +71,13 @@ convenient representative, not a uniquely normalized solution.
 The feasibility result is cached until another constraint is added, which
 avoids repeating the global negative-cycle check across bound queries.
 
+`bool can_use_dijkstra() const` reports whether a bound query can use Dijkstra
+without first running Bellman-Ford. It is immediately true while all primitive
+upper bounds are nonnegative. For a mixed-sign system, it becomes true after a
+successful `solve()` or `is_feasible()` call caches a Johnson potential. In a
+mixed-sign system, adding another constraint invalidates that potential until
+feasibility is checked again. An infeasible system reports false.
+
 ## Tight Difference Bounds
 
 `CowGameUpperBounds<T> tightest_upper_bounds(int source) const` returns all
@@ -117,6 +124,7 @@ bound is meaningful.
 | `constraint_count` | `int constraint_count() const` | Number of primitive upper-bound constraints. |
 | `get_constraint` | `const CowGameConstraint<T>& get_constraint(int id) const` | Returns one primitive constraint. |
 | `constraints` | `const std::vector<CowGameConstraint<T>>& constraints() const` | Returns all primitive constraints. |
+| `can_use_dijkstra` | `bool can_use_dijkstra() const` | Whether a bound query can skip Bellman-Ford and use Dijkstra. |
 
 ## Complexity
 
@@ -126,6 +134,7 @@ Let `N` be the number of variables and `M` the number of primitive constraints.
 | --- | --- | --- |
 | Construct with `N` variables | $O(N)$ | $O(N)$ |
 | Add or inspect one constraint | Amortized $O(1)$ | $O(1)$ |
+| `can_use_dijkstra` | $O(1)$ | $O(1)$ |
 | First `solve` or `is_feasible` after an addition, all upper bounds nonnegative | $O(N)$ | $O(N)$ |
 | First `solve` or `is_feasible` after an addition, negative upper bounds allowed | $O(NM)$ | $O(N)$ |
 | Cached `solve` / `is_feasible` | $O(N)$ / $O(1)$ | $O(N)$ returned / $O(1)$ |

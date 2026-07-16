@@ -51,12 +51,16 @@ void test_basic_constraints() {
 void test_infeasible() {
     CowGame game(2);
     game.add_lower_bound(1, 0, 5);
+    assert(!game.can_use_dijkstra());
     assert(game.is_feasible());
+    assert(game.can_use_dijkstra());
     assert(game.solve().is_feasible());
 
     game.add_upper_bound(1, 0, 3);
+    assert(!game.can_use_dijkstra());
 
     assert(!game.is_feasible());
+    assert(!game.can_use_dijkstra());
     assert(!game.solve().is_feasible());
     assert(!game.tightest_upper_bounds(0).is_feasible());
     assert(!game.difference_bounds(1, 0).is_feasible());
@@ -87,10 +91,12 @@ void test_unbounded() {
 
 void test_dijkstra_and_reweighting() {
     CowGame game(5);
+    assert(game.can_use_dijkstra());
     game.add_constraint(1, 0, 7);
     game.add_constraint(2, 0, 2);
     game.add_constraint(1, 2, 3);
     game.add_constraint(3, 1, 4);
+    assert(game.can_use_dijkstra());
 
     auto nonnegative_solution = game.solve();
     assert(nonnegative_solution.is_feasible());
@@ -103,8 +109,10 @@ void test_dijkstra_and_reweighting() {
     assert(nonnegative.upper_bound[3] == 9);
 
     game.add_constraint(4, 3, -2);
+    assert(!game.can_use_dijkstra());
     auto reweighted_solution = game.solve();
     assert(reweighted_solution.is_feasible());
+    assert(game.can_use_dijkstra());
     auto reweighted = game.difference_bounds(4, 0);
     assert(reweighted.bounded_above());
     assert(!reweighted.bounded_below());

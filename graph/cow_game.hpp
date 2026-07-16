@@ -204,6 +204,11 @@ class CowGame {
         return _constraints;
     }
 
+    bool can_use_dijkstra() const {
+        return !_has_negative_upper_bound ||
+               (_solution_cached && _cached_solution.feasible);
+    }
+
     int add_upper_bound(int a, int b, T upper_bound) {
         assert_variable(a);
         assert_variable(b);
