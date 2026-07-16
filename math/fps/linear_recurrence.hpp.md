@@ -25,6 +25,9 @@ data:
     title: Formal Power Series All
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/math/fps/find_linear_recurrence.test.cpp
+    title: verify/math/fps/find_linear_recurrence.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/fps_algorithms.test.cpp
     title: verify/math/fps/fps_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
@@ -39,9 +42,9 @@ data:
   attributes:
     links: []
   bundledCode: "#line 1 \"math/fps/linear_recurrence.hpp\"\n\n\n\n#include <cassert>\n\
-    #include <cstdint>\n#include <vector>\n\n#line 1 \"math/fps/formal_power_series.hpp\"\
-    \n\n\n\n#include <algorithm>\n#line 7 \"math/fps/formal_power_series.hpp\"\n#include\
-    \ <optional>\n#include <utility>\n#line 10 \"math/fps/formal_power_series.hpp\"\
+    #include <cstddef>\n#include <cstdint>\n#include <utility>\n#include <vector>\n\
+    \n#line 1 \"math/fps/formal_power_series.hpp\"\n\n\n\n#include <algorithm>\n#line\
+    \ 7 \"math/fps/formal_power_series.hpp\"\n#include <optional>\n#line 10 \"math/fps/formal_power_series.hpp\"\
     \n\n#line 1 \"math/modular_square_root.hpp\"\n\n\n\n#line 7 \"math/modular_square_root.hpp\"\
     \n\nnamespace m1une {\nnamespace math {\n\nnamespace internal {\n\ninline uint64_t\
     \ modular_square_root_multiply(uint64_t lhs, uint64_t rhs, uint64_t mod) {\n \
@@ -849,8 +852,28 @@ data:
     \      power *= shift;\n        }\n        Fps product = left * right;\n     \
     \   Fps result(n);\n        for (int i = 0; i < n; i++) result[i] = product[n\
     \ - 1 - i] * inverse_factorial[i];\n        return result;\n    }\n};\n\n}  //\
-    \ namespace fps\n}  // namespace m1une\n\n\n#line 9 \"math/fps/linear_recurrence.hpp\"\
-    \n\nnamespace m1une {\nnamespace fps {\n\ntemplate <class Mint>\nMint coefficient_of_rational(FormalPowerSeries<Mint>\
+    \ namespace fps\n}  // namespace m1une\n\n\n#line 11 \"math/fps/linear_recurrence.hpp\"\
+    \n\nnamespace m1une {\nnamespace fps {\n\n// Returns a shortest linear recurrence\
+    \ satisfied by the observed sequence.\n// The returned coefficients use\n// a[n]\
+    \ = recurrence[0] * a[n - 1] + ... + recurrence[d - 1] * a[n - d].\ntemplate <class\
+    \ Mint>\nstd::vector<Mint> berlekamp_massey(const std::vector<Mint>& sequence)\
+    \ {\n    std::vector<Mint> connection(1, Mint(1));\n    std::vector<Mint> previous(1,\
+    \ Mint(1));\n    int order = 0;\n    int shift = 1;\n    Mint previous_discrepancy\
+    \ = Mint(1);\n\n    for (int index = 0; index < int(sequence.size()); index++)\
+    \ {\n        Mint discrepancy = sequence[index];\n        for (int i = 1; i <=\
+    \ order; i++) {\n            discrepancy += connection[i] * sequence[index - i];\n\
+    \        }\n        if (discrepancy == Mint(0)) {\n            shift++;\n    \
+    \        continue;\n        }\n\n        const Mint scale = discrepancy / previous_discrepancy;\n\
+    \        std::vector<Mint> old_connection = connection;\n        if (connection.size()\
+    \ < previous.size() + std::size_t(shift)) {\n            connection.resize(previous.size()\
+    \ + std::size_t(shift));\n        }\n        for (int i = 0; i < int(previous.size());\
+    \ i++) {\n            connection[i + shift] -= scale * previous[i];\n        }\n\
+    \n        if (2 * order <= index) {\n            order = index + 1 - order;\n\
+    \            previous = std::move(old_connection);\n            previous_discrepancy\
+    \ = discrepancy;\n            shift = 1;\n        } else {\n            shift++;\n\
+    \        }\n    }\n\n    std::vector<Mint> recurrence(order);\n    for (int i\
+    \ = 0; i < order; i++) recurrence[i] = Mint(0) - connection[i + 1];\n    return\
+    \ recurrence;\n}\n\ntemplate <class Mint>\nMint coefficient_of_rational(FormalPowerSeries<Mint>\
     \ numerator,\n                             FormalPowerSeries<Mint> denominator,\
     \ uint64_t index) {\n    using Fps = FormalPowerSeries<Mint>;\n    assert(!denominator.empty()\
     \ && denominator[0] != Mint(0));\n\n    while (index > 0) {\n        Fps denominator_negative\
@@ -877,11 +900,31 @@ data:
     \    return coefficient_of_rational(std::move(numerator), std::move(denominator),\
     \ index);\n}\n\n}  // namespace fps\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_FPS_LINEAR_RECURRENCE_HPP\n#define M1UNE_FPS_LINEAR_RECURRENCE_HPP\
-    \ 1\n\n#include <cassert>\n#include <cstdint>\n#include <vector>\n\n#include \"\
-    formal_power_series.hpp\"\n\nnamespace m1une {\nnamespace fps {\n\ntemplate <class\
-    \ Mint>\nMint coefficient_of_rational(FormalPowerSeries<Mint> numerator,\n   \
-    \                          FormalPowerSeries<Mint> denominator, uint64_t index)\
-    \ {\n    using Fps = FormalPowerSeries<Mint>;\n    assert(!denominator.empty()\
+    \ 1\n\n#include <cassert>\n#include <cstddef>\n#include <cstdint>\n#include <utility>\n\
+    #include <vector>\n\n#include \"formal_power_series.hpp\"\n\nnamespace m1une {\n\
+    namespace fps {\n\n// Returns a shortest linear recurrence satisfied by the observed\
+    \ sequence.\n// The returned coefficients use\n// a[n] = recurrence[0] * a[n -\
+    \ 1] + ... + recurrence[d - 1] * a[n - d].\ntemplate <class Mint>\nstd::vector<Mint>\
+    \ berlekamp_massey(const std::vector<Mint>& sequence) {\n    std::vector<Mint>\
+    \ connection(1, Mint(1));\n    std::vector<Mint> previous(1, Mint(1));\n    int\
+    \ order = 0;\n    int shift = 1;\n    Mint previous_discrepancy = Mint(1);\n\n\
+    \    for (int index = 0; index < int(sequence.size()); index++) {\n        Mint\
+    \ discrepancy = sequence[index];\n        for (int i = 1; i <= order; i++) {\n\
+    \            discrepancy += connection[i] * sequence[index - i];\n        }\n\
+    \        if (discrepancy == Mint(0)) {\n            shift++;\n            continue;\n\
+    \        }\n\n        const Mint scale = discrepancy / previous_discrepancy;\n\
+    \        std::vector<Mint> old_connection = connection;\n        if (connection.size()\
+    \ < previous.size() + std::size_t(shift)) {\n            connection.resize(previous.size()\
+    \ + std::size_t(shift));\n        }\n        for (int i = 0; i < int(previous.size());\
+    \ i++) {\n            connection[i + shift] -= scale * previous[i];\n        }\n\
+    \n        if (2 * order <= index) {\n            order = index + 1 - order;\n\
+    \            previous = std::move(old_connection);\n            previous_discrepancy\
+    \ = discrepancy;\n            shift = 1;\n        } else {\n            shift++;\n\
+    \        }\n    }\n\n    std::vector<Mint> recurrence(order);\n    for (int i\
+    \ = 0; i < order; i++) recurrence[i] = Mint(0) - connection[i + 1];\n    return\
+    \ recurrence;\n}\n\ntemplate <class Mint>\nMint coefficient_of_rational(FormalPowerSeries<Mint>\
+    \ numerator,\n                             FormalPowerSeries<Mint> denominator,\
+    \ uint64_t index) {\n    using Fps = FormalPowerSeries<Mint>;\n    assert(!denominator.empty()\
     \ && denominator[0] != Mint(0));\n\n    while (index > 0) {\n        Fps denominator_negative\
     \ = denominator;\n        for (int i = 1; i < int(denominator_negative.size());\
     \ i += 2) {\n            denominator_negative[i] = Mint(0) - denominator_negative[i];\n\
@@ -916,45 +959,40 @@ data:
   requiredBy:
   - math/all.hpp
   - math/fps/all.hpp
-  timestamp: '2026-07-15 03:06:59+09:00'
+  timestamp: '2026-07-16 20:26:13+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
-  - verify/math/fps/fps_algorithms.test.cpp
   - verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
+  - verify/math/fps/fps_algorithms.test.cpp
+  - verify/math/fps/find_linear_recurrence.test.cpp
 documentation_of: math/fps/linear_recurrence.hpp
 layout: document
-title: Linear Recurrence and Bostan-Mori
+title: Linear Recurrences and Bostan-Mori
 ---
 
 ## Overview
 
-Computes a distant coefficient of a rational generating function with the
-Bostan-Mori algorithm. A convenience wrapper finds a term of a linear
-recurrence without constructing all preceding terms.
+This header discovers a shortest linear recurrence from observed terms with
+the Berlekamp--Massey algorithm. It also computes distant coefficients of
+rational generating functions with Bostan--Mori and provides a convenience
+wrapper for evaluating a known recurrence without constructing all preceding
+terms.
 
-## API
+`Mint` must represent a field and support construction from integers,
+arithmetic operations, division by a nonzero value, and equality comparison.
+The algorithms are primarily intended for modular arithmetic over a prime
+modulus.
 
-```cpp
-template <class Mint>
-Mint coefficient_of_rational(
-    FormalPowerSeries<Mint> numerator,
-    FormalPowerSeries<Mint> denominator,
-    uint64_t index);
-```
+## Methods
 
-Returns the coefficient of $x^\mathrm{index}$ in
-`numerator / denominator`. The denominator's constant term must be nonzero.
+| Signature | Description | Time |
+| --- | --- | --- |
+| `template <class Mint> std::vector<Mint> berlekamp_massey(const std::vector<Mint>& sequence)` | Returns a minimum-order recurrence fitting the observed sequence. | $O(N^2)$ |
+| `template <class Mint> Mint coefficient_of_rational(FormalPowerSeries<Mint> numerator, FormalPowerSeries<Mint> denominator, uint64_t index)` | Returns the coefficient of $x^\mathrm{index}$ in `numerator / denominator`. | $O(M(D) \log \mathrm{index})$ |
+| `template <class Mint> Mint linear_recurrence_kth(const std::vector<Mint>& initial, const std::vector<Mint>& recurrence, uint64_t index)` | Returns the indexed term of a known recurrence. | $O(M(D) \log \mathrm{index})$ |
 
-```cpp
-template <class Mint>
-Mint linear_recurrence_kth(
-    const std::vector<Mint>& initial,
-    const std::vector<Mint>& recurrence,
-    uint64_t index);
-```
-
-For recurrence order `d`, the convention is:
+All recurrence interfaces use the following convention for order `d`:
 
 ```text
 a[n] = recurrence[0] * a[n - 1]
@@ -963,13 +1001,23 @@ a[n] = recurrence[0] * a[n - 1]
      + recurrence[d - 1] * a[n - d]
 ```
 
-`initial` contains `a[0]` through `a[d - 1]`.
+`berlekamp_massey(sequence)` returns a recurrence of minimum order that
+reproduces every applicable term of the finite observed sequence. It returns
+an empty vector for an empty or all-zero sequence. When several minimum-order
+recurrences fit the observations, it may return any one of them.
 
-## Complexity
+`coefficient_of_rational(numerator, denominator, index)` returns the
+coefficient of $x^\mathrm{index}$ in `numerator / denominator`. The
+denominator's constant term must be nonzero.
 
-For recurrence order `d`, the running time is
-$O(d \log d \log \mathrm{index})$ and the working memory is
-$O(d)$ apart from convolution buffers.
+`linear_recurrence_kth(initial, recurrence, index)` returns `a[index]`.
+`initial` must contain exactly `a[0]` through `a[d - 1]`, where `d` is the
+recurrence order, and must be nonempty.
+
+Here $N$ is the number of observed terms, $D$ is the maximum polynomial or
+recurrence degree, and $M(D)$ is the cost of multiplying degree-$D$
+polynomials. Berlekamp--Massey uses $O(N)$ extra memory. The other functions
+use $O(D)$ extra memory apart from convolution buffers.
 
 ## Example
 
@@ -983,8 +1031,10 @@ $O(d)$ apart from convolution buffers.
 using mint = m1une::math::modint998244353;
 
 int main() {
-    std::vector<mint> initial = {0, 1};
-    std::vector<mint> recurrence = {1, 1};
+    std::vector<mint> observed = {0, 1, 1, 2, 3, 5, 8, 13};
+    std::vector<mint> recurrence = m1une::fps::berlekamp_massey(observed);
+    std::vector<mint> initial(observed.begin(),
+                              observed.begin() + recurrence.size());
     mint fibonacci_100 = m1une::fps::linear_recurrence_kth(
         initial, recurrence, 100);
     std::cout << fibonacci_100 << "\n";

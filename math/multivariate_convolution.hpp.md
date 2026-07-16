@@ -969,9 +969,9 @@ data:
   timestamp: '2026-07-15 03:06:59+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/math_algorithms.test.cpp
   - verify/math/multivariate_convolution_cyclic.test.cpp
   - verify/math/multivariate_convolution_truncated.test.cpp
+  - verify/math/math_algorithms.test.cpp
 documentation_of: math/multivariate_convolution.hpp
 layout: document
 title: Multidimensional Convolution

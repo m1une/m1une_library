@@ -112,15 +112,15 @@ data:
   isVerificationFile: false
   path: math/subset_convolution.hpp
   requiredBy:
-  - math/all.hpp
   - math/set_power_series.hpp
+  - math/all.hpp
   timestamp: '2026-07-13 05:19:17+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/math_algorithms.test.cpp
-  - verify/math/set_power_series_log.test.cpp
   - verify/math/subset_convolution.test.cpp
+  - verify/math/math_algorithms.test.cpp
   - verify/math/set_power_series_exp.test.cpp
+  - verify/math/set_power_series_log.test.cpp
 documentation_of: math/subset_convolution.hpp
 layout: document
 title: Subset Convolution

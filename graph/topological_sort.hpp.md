@@ -124,17 +124,17 @@ data:
   isVerificationFile: false
   path: graph/topological_sort.hpp
   requiredBy:
+  - graph/dag_shortest_path.hpp
+  - graph/all.hpp
+  - graph/undirected.hpp
   - graph/directed.hpp
   - graph/shortest_path.hpp
-  - graph/all.hpp
-  - graph/dag_shortest_path.hpp
-  - graph/undirected.hpp
   timestamp: '2026-07-11 19:47:32+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/graph/graph_algorithms.test.cpp
   - verify/graph/cow_game.test.cpp
   - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
 documentation_of: graph/topological_sort.hpp
 layout: document
 title: Topological Sort

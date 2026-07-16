@@ -906,16 +906,16 @@ data:
   isVerificationFile: false
   path: graph/tree/distance_frequency.hpp
   requiredBy:
-  - graph/all.hpp
   - graph/tree/all.hpp
+  - graph/all.hpp
   timestamp: '2026-07-15 03:06:59+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/graph/graph_algorithms.test.cpp
   - verify/graph/cow_game.test.cpp
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/tree/tree_algorithms.test.cpp
   - verify/graph/tree/distance_frequency.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
 documentation_of: graph/tree/distance_frequency.hpp
 layout: document
 title: Tree Distance Frequency

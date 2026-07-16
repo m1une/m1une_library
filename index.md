@@ -881,7 +881,7 @@ data:
       title: Lagrange Inversion Formula
     - icon: ':heavy_check_mark:'
       path: math/fps/linear_recurrence.hpp
-      title: Linear Recurrence and Bostan-Mori
+      title: Linear Recurrences and Bostan-Mori
     - icon: ':heavy_check_mark:'
       path: math/fps/multipoint_evaluation.hpp
       title: Multipoint Evaluation and Interpolation
@@ -1910,6 +1910,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/fps/exp_of_formal_power_series_sparse.test.cpp
       title: verify/math/fps/exp_of_formal_power_series_sparse.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/fps/find_linear_recurrence.test.cpp
+      title: verify/math/fps/find_linear_recurrence.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/fps/floating_point_convolution.test.cpp
       title: verify/math/fps/floating_point_convolution.test.cpp

@@ -33,7 +33,7 @@ data:
     title: Lagrange Inversion Formula
   - icon: ':heavy_check_mark:'
     path: math/fps/linear_recurrence.hpp
-    title: Linear Recurrence and Bostan-Mori
+    title: Linear Recurrences and Bostan-Mori
   - icon: ':heavy_check_mark:'
     path: math/fps/multipoint_evaluation.hpp
     title: Multipoint Evaluation and Interpolation
@@ -295,19 +295,20 @@ data:
     n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
     \ utilities\n}  // namespace m1une\n\n\n#line 6 \"verify/math/fps/fps_algorithms.test.cpp\"\
-    \n#include <random>\n#include <vector>\n\n#line 1 \"math/fps/all.hpp\"\n\n\n\n\
-    #line 1 \"math/fps/composition.hpp\"\n\n\n\n#include <algorithm>\n#line 10 \"\
-    math/fps/composition.hpp\"\n\n#line 1 \"math/fps/formal_power_series.hpp\"\n\n\
-    \n\n#line 7 \"math/fps/formal_power_series.hpp\"\n#include <optional>\n#line 10\
-    \ \"math/fps/formal_power_series.hpp\"\n\n#line 1 \"math/modular_square_root.hpp\"\
-    \n\n\n\n#line 7 \"math/modular_square_root.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ math {\n\nnamespace internal {\n\ninline uint64_t modular_square_root_multiply(uint64_t\
-    \ lhs, uint64_t rhs, uint64_t mod) {\n    return static_cast<uint64_t>(static_cast<unsigned\
-    \ __int128>(lhs) * rhs % mod);\n}\n\ninline uint64_t modular_square_root_power(uint64_t\
-    \ base, uint64_t exponent, uint64_t mod) {\n    uint64_t result = 1 % mod;\n \
-    \   while (exponent > 0) {\n        if (exponent & 1) result = modular_square_root_multiply(result,\
-    \ base, mod);\n        base = modular_square_root_multiply(base, base, mod);\n\
-    \        exponent >>= 1;\n    }\n    return result;\n}\n\n}  // namespace internal\n\
+    \n#include <random>\n#line 8 \"verify/math/fps/fps_algorithms.test.cpp\"\n#include\
+    \ <vector>\n\n#line 1 \"math/fps/all.hpp\"\n\n\n\n#line 1 \"math/fps/composition.hpp\"\
+    \n\n\n\n#include <algorithm>\n#line 10 \"math/fps/composition.hpp\"\n\n#line 1\
+    \ \"math/fps/formal_power_series.hpp\"\n\n\n\n#line 7 \"math/fps/formal_power_series.hpp\"\
+    \n#include <optional>\n#line 10 \"math/fps/formal_power_series.hpp\"\n\n#line\
+    \ 1 \"math/modular_square_root.hpp\"\n\n\n\n#line 7 \"math/modular_square_root.hpp\"\
+    \n\nnamespace m1une {\nnamespace math {\n\nnamespace internal {\n\ninline uint64_t\
+    \ modular_square_root_multiply(uint64_t lhs, uint64_t rhs, uint64_t mod) {\n \
+    \   return static_cast<uint64_t>(static_cast<unsigned __int128>(lhs) * rhs % mod);\n\
+    }\n\ninline uint64_t modular_square_root_power(uint64_t base, uint64_t exponent,\
+    \ uint64_t mod) {\n    uint64_t result = 1 % mod;\n    while (exponent > 0) {\n\
+    \        if (exponent & 1) result = modular_square_root_multiply(result, base,\
+    \ mod);\n        base = modular_square_root_multiply(base, base, mod);\n     \
+    \   exponent >>= 1;\n    }\n    return result;\n}\n\n}  // namespace internal\n\
     \n// Returns x such that x * x = value (mod prime), or nullopt when no such x\
     \ exists.\n// The modulus must be prime.\ninline std::optional<uint64_t> modular_square_root(uint64_t\
     \ value, uint64_t prime) {\n    assert(prime >= 2);\n    value %= prime;\n   \
@@ -1395,8 +1396,28 @@ data:
     \    for (int i = 0; i < degree && i + 1 < int(f.size()); i++) divided[i] = f[i\
     \ + 1];\n    FormalPowerSeries<Mint> phi = divided.inv(degree);\n    return lagrange_inversion_coefficient(phi,\
     \ degree);\n}\n\n}  // namespace fps\n}  // namespace m1une\n\n\n#line 1 \"math/fps/linear_recurrence.hpp\"\
-    \n\n\n\n#line 7 \"math/fps/linear_recurrence.hpp\"\n\n#line 9 \"math/fps/linear_recurrence.hpp\"\
-    \n\nnamespace m1une {\nnamespace fps {\n\ntemplate <class Mint>\nMint coefficient_of_rational(FormalPowerSeries<Mint>\
+    \n\n\n\n#line 9 \"math/fps/linear_recurrence.hpp\"\n\n#line 11 \"math/fps/linear_recurrence.hpp\"\
+    \n\nnamespace m1une {\nnamespace fps {\n\n// Returns a shortest linear recurrence\
+    \ satisfied by the observed sequence.\n// The returned coefficients use\n// a[n]\
+    \ = recurrence[0] * a[n - 1] + ... + recurrence[d - 1] * a[n - d].\ntemplate <class\
+    \ Mint>\nstd::vector<Mint> berlekamp_massey(const std::vector<Mint>& sequence)\
+    \ {\n    std::vector<Mint> connection(1, Mint(1));\n    std::vector<Mint> previous(1,\
+    \ Mint(1));\n    int order = 0;\n    int shift = 1;\n    Mint previous_discrepancy\
+    \ = Mint(1);\n\n    for (int index = 0; index < int(sequence.size()); index++)\
+    \ {\n        Mint discrepancy = sequence[index];\n        for (int i = 1; i <=\
+    \ order; i++) {\n            discrepancy += connection[i] * sequence[index - i];\n\
+    \        }\n        if (discrepancy == Mint(0)) {\n            shift++;\n    \
+    \        continue;\n        }\n\n        const Mint scale = discrepancy / previous_discrepancy;\n\
+    \        std::vector<Mint> old_connection = connection;\n        if (connection.size()\
+    \ < previous.size() + std::size_t(shift)) {\n            connection.resize(previous.size()\
+    \ + std::size_t(shift));\n        }\n        for (int i = 0; i < int(previous.size());\
+    \ i++) {\n            connection[i + shift] -= scale * previous[i];\n        }\n\
+    \n        if (2 * order <= index) {\n            order = index + 1 - order;\n\
+    \            previous = std::move(old_connection);\n            previous_discrepancy\
+    \ = discrepancy;\n            shift = 1;\n        } else {\n            shift++;\n\
+    \        }\n    }\n\n    std::vector<Mint> recurrence(order);\n    for (int i\
+    \ = 0; i < order; i++) recurrence[i] = Mint(0) - connection[i + 1];\n    return\
+    \ recurrence;\n}\n\ntemplate <class Mint>\nMint coefficient_of_rational(FormalPowerSeries<Mint>\
     \ numerator,\n                             FormalPowerSeries<Mint> denominator,\
     \ uint64_t index) {\n    using Fps = FormalPowerSeries<Mint>;\n    assert(!denominator.empty()\
     \ && denominator[0] != Mint(0));\n\n    while (index > 0) {\n        Fps denominator_negative\
@@ -1675,80 +1696,46 @@ data:
     \n    FormalPowerSeries<Mint> result(degree);\n    const int offset = leading_degree\
     \ / 2;\n    for (int i = 0; i < normalized_degree; i++) {\n        result[offset\
     \ + i] = unit[i] * *leading_root;\n    }\n    return result;\n}\n\n}  // namespace\
-    \ fps\n}  // namespace m1une\n\n\n#line 16 \"math/fps/all.hpp\"\n\n\n#line 11\
+    \ fps\n}  // namespace m1une\n\n\n#line 16 \"math/fps/all.hpp\"\n\n\n#line 12\
     \ \"verify/math/fps/fps_algorithms.test.cpp\"\n\nusing mint = m1une::math::modint998244353;\n\
     using mint1e9 = m1une::math::modint1000000007;\nusing Fps = m1une::fps::FormalPowerSeries<mint>;\n\
     \ntemplate <class Mint>\nvoid assert_equal(const std::vector<Mint>& lhs, const\
     \ std::vector<Mint>& rhs) {\n    assert(lhs.size() == rhs.size());\n    for (int\
-    \ i = 0; i < int(lhs.size()); i++) assert(lhs[i] == rhs[i]);\n}\n\nvoid test_convolution()\
-    \ {\n    std::mt19937 rng(712367);\n    for (int iteration = 0; iteration < 30;\
-    \ iteration++) {\n        int n = 33 + int(rng() % 70);\n        int m = 33 +\
-    \ int(rng() % 70);\n        std::vector<mint> a(n), b(m);\n        for (mint&\
-    \ value : a) value = mint(static_cast<uint32_t>(rng()));\n        for (mint& value\
-    \ : b) value = mint(static_cast<uint32_t>(rng()));\n        assert_equal(m1une::fps::convolution(a,\
-    \ b), m1une::fps::convolution_naive(a, b));\n        assert_equal(m1une::fps::internal::convolution_998244353_blocked(a,\
-    \ b, 64),\n                     m1une::fps::convolution_naive(a, b));\n    }\n\
-    \n    std::vector<mint1e9> a(70), b(65);\n    for (mint1e9& value : a) value =\
-    \ mint1e9(static_cast<uint32_t>(rng()));\n    for (mint1e9& value : b) value =\
-    \ mint1e9(static_cast<uint32_t>(rng()));\n    assert_equal(m1une::fps::convolution(a,\
-    \ b), m1une::fps::convolution_naive(a, b));\n}\n\nvoid test_series_functions()\
-    \ {\n    Fps f(96);\n    f[0] = 1;\n    for (int i = 1; i < int(f.size()); i++)\
-    \ f[i] = mint(i * i + 7);\n\n    Fps inverse = f.inv();\n    Fps identity = (f\
-    \ * inverse).pre(int(f.size()));\n    assert(identity[0] == mint(1));\n    for\
-    \ (int i = 1; i < int(identity.size()); i++) assert(identity[i] == mint(0));\n\
-    \n    Fps logarithm = f.log();\n    assert_equal(logarithm.exp(), f);\n    assert_equal(f.derivative().integral().pre(int(f.size()))\
-    \ + Fps(1, f[0]), f);\n\n    Fps cube = f.pow(3);\n    assert_equal(cube, ((f\
-    \ * f) * f).pre(int(f.size())));\n\n    Fps shifted(40);\n    shifted[4] = 9;\n\
-    \    for (int i = 5; i < int(shifted.size()); i++) shifted[i] = mint(i + 11);\n\
-    \    auto root = (shifted * shifted).pre(70).sqrt(70);\n    assert(root.has_value());\n\
-    \    assert_equal(((*root) * (*root)).pre(70), (shifted * shifted).pre(70));\n\
-    \n    Fps beyond_precision(8);\n    beyond_precision[5] = 1;\n    auto zero_root\
-    \ = beyond_precision.sqrt(5);\n    assert(zero_root.has_value());\n    assert_equal(*zero_root,\
-    \ Fps(5));\n\n    Fps odd_leading(8);\n    odd_leading[3] = 1;\n    assert(!odd_leading.sqrt(8).has_value());\n\
-    \n    Fps zero(20);\n    Fps one(20);\n    one[0] = 1;\n    assert_equal(zero.pow(0),\
-    \ one);\n    assert_equal(zero.pow(7), zero);\n}\n\nvoid test_polynomial_operations()\
-    \ {\n    Fps dividend(80), divisor(35);\n    for (int i = 0; i < int(dividend.size());\
-    \ i++) dividend[i] = mint(i * 17 + 3);\n    for (int i = 0; i < int(divisor.size());\
-    \ i++) divisor[i] = mint(i * 5 + 1);\n    auto division = dividend.divmod(divisor);\n\
-    \    Fps restored = division.first * divisor + division.second;\n    restored.resize(dividend.size());\n\
-    \    assert_equal(restored, dividend);\n    assert(division.second.size() < divisor.size());\n\
-    \n    mint shift = 12345;\n    Fps translated = dividend.taylor_shift(shift);\n\
-    \    for (int x = 0; x < 10; x++) {\n        assert(translated.evaluate(mint(x))\
-    \ == dividend.evaluate(mint(x) + shift));\n    }\n}\n\nvoid test_multipoint_and_recurrence()\
-    \ {\n    Fps polynomial(70);\n    for (int i = 0; i < int(polynomial.size());\
-    \ i++) polynomial[i] = mint(i * i * 13 + 5);\n    std::vector<mint> points(70);\n\
-    \    for (int i = 0; i < int(points.size()); i++) points[i] = mint(i * 3 + 1);\n\
-    \n    std::vector<mint> values = m1une::fps::multipoint_evaluate(polynomial, points);\n\
-    \    for (int i = 0; i < int(points.size()); i++) assert(values[i] == polynomial.evaluate(points[i]));\n\
-    \    Fps interpolated = m1une::fps::polynomial_interpolate(points, values);\n\
-    \    assert_equal(interpolated, polynomial);\n    std::vector<mint> one_point(1,\
-    \ mint(42));\n    std::vector<mint> one_value(1, mint(314));\n    assert_equal(m1une::fps::polynomial_interpolate(one_point,\
-    \ one_value), Fps(1, mint(314)));\n    assert(m1une::fps::multipoint_evaluate(Fps(),\
-    \ std::vector<mint>()).empty());\n\n    std::vector<mint> initial(2);\n    std::vector<mint>\
-    \ recurrence(2);\n    initial[0] = 0;\n    initial[1] = 1;\n    recurrence[0]\
-    \ = 1;\n    recurrence[1] = 1;\n    mint previous = 0;\n    mint current = 1;\n\
-    \    for (uint64_t index = 0; index < 200; index++) {\n        mint expected =\
-    \ index == 0 ? previous : current;\n        assert(m1une::fps::linear_recurrence_kth(initial,\
-    \ recurrence, index) == expected);\n        if (index > 0) {\n            mint\
-    \ next = previous + current;\n            previous = current;\n            current\
-    \ = next;\n        }\n    }\n}\n\nint main() {\n    m1une::utilities::FastInput\
-    \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n\n    test_convolution();\n\
-    \    test_series_functions();\n    test_polynomial_operations();\n    test_multipoint_and_recurrence();\n\
-    \n    long long a, b;\n    fast_input >> a >> b;\n    fast_output << a + b <<\
-    \ '\\n';\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <cassert>\n\
-    #include <cstdint>\n#include \"../../../utilities/fast_io.hpp\"\n#include <random>\n\
-    #include <vector>\n\n#include \"../../../math/fps/all.hpp\"\n#include \"../../../math/modint.hpp\"\
-    \n\nusing mint = m1une::math::modint998244353;\nusing mint1e9 = m1une::math::modint1000000007;\n\
-    using Fps = m1une::fps::FormalPowerSeries<mint>;\n\ntemplate <class Mint>\nvoid\
-    \ assert_equal(const std::vector<Mint>& lhs, const std::vector<Mint>& rhs) {\n\
-    \    assert(lhs.size() == rhs.size());\n    for (int i = 0; i < int(lhs.size());\
-    \ i++) assert(lhs[i] == rhs[i]);\n}\n\nvoid test_convolution() {\n    std::mt19937\
-    \ rng(712367);\n    for (int iteration = 0; iteration < 30; iteration++) {\n \
-    \       int n = 33 + int(rng() % 70);\n        int m = 33 + int(rng() % 70);\n\
-    \        std::vector<mint> a(n), b(m);\n        for (mint& value : a) value =\
-    \ mint(static_cast<uint32_t>(rng()));\n        for (mint& value : b) value = mint(static_cast<uint32_t>(rng()));\n\
-    \        assert_equal(m1une::fps::convolution(a, b), m1une::fps::convolution_naive(a,\
+    \ i = 0; i < int(lhs.size()); i++) assert(lhs[i] == rhs[i]);\n}\n\ntemplate <class\
+    \ Mint>\nbool has_recurrence_of_order(const std::vector<Mint>& sequence, int order)\
+    \ {\n    assert(0 <= order && order <= int(sequence.size()));\n    const int equation_count\
+    \ = int(sequence.size()) - order;\n    std::vector<std::vector<Mint>> matrix(\n\
+    \        equation_count, std::vector<Mint>(order + 1)\n    );\n    for (int row\
+    \ = 0; row < equation_count; row++) {\n        const int index = order + row;\n\
+    \        for (int i = 0; i < order; i++) {\n            matrix[row][i] = sequence[index\
+    \ - i - 1];\n        }\n        matrix[row][order] = sequence[index];\n    }\n\
+    \n    int pivot_row = 0;\n    for (int column = 0; column < order && pivot_row\
+    \ < equation_count; column++) {\n        int pivot = pivot_row;\n        while\
+    \ (pivot < equation_count && matrix[pivot][column] == Mint(0)) pivot++;\n    \
+    \    if (pivot == equation_count) continue;\n        std::swap(matrix[pivot_row],\
+    \ matrix[pivot]);\n\n        const Mint inverse = Mint(1) / matrix[pivot_row][column];\n\
+    \        for (int j = column; j <= order; j++) matrix[pivot_row][j] *= inverse;\n\
+    \        for (int row = pivot_row + 1; row < equation_count; row++) {\n      \
+    \      const Mint scale = matrix[row][column];\n            if (scale == Mint(0))\
+    \ continue;\n            for (int j = column; j <= order; j++) {\n           \
+    \     matrix[row][j] -= scale * matrix[pivot_row][j];\n            }\n       \
+    \ }\n        pivot_row++;\n    }\n\n    for (int row = pivot_row; row < equation_count;\
+    \ row++) {\n        bool all_zero = true;\n        for (int column = 0; column\
+    \ < order; column++) {\n            if (matrix[row][column] != Mint(0)) all_zero\
+    \ = false;\n        }\n        if (all_zero && matrix[row][order] != Mint(0))\
+    \ return false;\n    }\n    return true;\n}\n\ntemplate <class Mint>\nvoid assert_recurrence(const\
+    \ std::vector<Mint>& sequence,\n                       const std::vector<Mint>&\
+    \ recurrence) {\n    const int order = int(recurrence.size());\n    for (int index\
+    \ = order; index < int(sequence.size()); index++) {\n        Mint expected = 0;\n\
+    \        for (int i = 0; i < order; i++) {\n            expected += recurrence[i]\
+    \ * sequence[index - i - 1];\n        }\n        assert(sequence[index] == expected);\n\
+    \    }\n    for (int smaller = 0; smaller < order; smaller++) {\n        assert(!has_recurrence_of_order(sequence,\
+    \ smaller));\n    }\n}\n\nvoid test_convolution() {\n    std::mt19937 rng(712367);\n\
+    \    for (int iteration = 0; iteration < 30; iteration++) {\n        int n = 33\
+    \ + int(rng() % 70);\n        int m = 33 + int(rng() % 70);\n        std::vector<mint>\
+    \ a(n), b(m);\n        for (mint& value : a) value = mint(static_cast<uint32_t>(rng()));\n\
+    \        for (mint& value : b) value = mint(static_cast<uint32_t>(rng()));\n \
+    \       assert_equal(m1une::fps::convolution(a, b), m1une::fps::convolution_naive(a,\
     \ b));\n        assert_equal(m1une::fps::internal::convolution_998244353_blocked(a,\
     \ b, 64),\n                     m1une::fps::convolution_naive(a, b));\n    }\n\
     \n    std::vector<mint1e9> a(70), b(65);\n    for (mint1e9& value : a) value =\
@@ -1794,7 +1781,125 @@ data:
     \ index == 0 ? previous : current;\n        assert(m1une::fps::linear_recurrence_kth(initial,\
     \ recurrence, index) == expected);\n        if (index > 0) {\n            mint\
     \ next = previous + current;\n            previous = current;\n            current\
-    \ = next;\n        }\n    }\n}\n\nint main() {\n    m1une::utilities::FastInput\
+    \ = next;\n        }\n    }\n\n    assert(m1une::fps::berlekamp_massey(std::vector<mint>()).empty());\n\
+    \    assert(m1une::fps::berlekamp_massey(std::vector<mint>(20)).empty());\n\n\
+    \    std::vector<mint> fibonacci = {0, 1};\n    for (int i = 2; i < 30; i++) {\n\
+    \        fibonacci.push_back(fibonacci[i - 1] + fibonacci[i - 2]);\n    }\n  \
+    \  std::vector<mint> fibonacci_recurrence =\n        m1une::fps::berlekamp_massey(fibonacci);\n\
+    \    assert_equal(fibonacci_recurrence, std::vector<mint>{1, 1});\n\n    std::vector<mint>\
+    \ suffix_zero = {1, 0, 0, 0, 0, 0};\n    std::vector<mint> suffix_zero_recurrence\
+    \ =\n        m1une::fps::berlekamp_massey(suffix_zero);\n    assert_equal(suffix_zero_recurrence,\
+    \ std::vector<mint>{0});\n\n    std::mt19937 recurrence_rng(2481632);\n    for\
+    \ (int iteration = 0; iteration < 300; iteration++) {\n        const int size\
+    \ = int(recurrence_rng() % 17);\n        std::vector<mint> sequence(size);\n \
+    \       for (mint& value : sequence) value = mint(recurrence_rng() % 11);\n  \
+    \      std::vector<mint> found = m1une::fps::berlekamp_massey(sequence);\n   \
+    \     assert_recurrence(sequence, found);\n    }\n}\n\nint main() {\n    m1une::utilities::FastInput\
+    \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n\n    test_convolution();\n\
+    \    test_series_functions();\n    test_polynomial_operations();\n    test_multipoint_and_recurrence();\n\
+    \n    long long a, b;\n    fast_input >> a >> b;\n    fast_output << a + b <<\
+    \ '\\n';\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <cassert>\n\
+    #include <cstdint>\n#include \"../../../utilities/fast_io.hpp\"\n#include <random>\n\
+    #include <utility>\n#include <vector>\n\n#include \"../../../math/fps/all.hpp\"\
+    \n#include \"../../../math/modint.hpp\"\n\nusing mint = m1une::math::modint998244353;\n\
+    using mint1e9 = m1une::math::modint1000000007;\nusing Fps = m1une::fps::FormalPowerSeries<mint>;\n\
+    \ntemplate <class Mint>\nvoid assert_equal(const std::vector<Mint>& lhs, const\
+    \ std::vector<Mint>& rhs) {\n    assert(lhs.size() == rhs.size());\n    for (int\
+    \ i = 0; i < int(lhs.size()); i++) assert(lhs[i] == rhs[i]);\n}\n\ntemplate <class\
+    \ Mint>\nbool has_recurrence_of_order(const std::vector<Mint>& sequence, int order)\
+    \ {\n    assert(0 <= order && order <= int(sequence.size()));\n    const int equation_count\
+    \ = int(sequence.size()) - order;\n    std::vector<std::vector<Mint>> matrix(\n\
+    \        equation_count, std::vector<Mint>(order + 1)\n    );\n    for (int row\
+    \ = 0; row < equation_count; row++) {\n        const int index = order + row;\n\
+    \        for (int i = 0; i < order; i++) {\n            matrix[row][i] = sequence[index\
+    \ - i - 1];\n        }\n        matrix[row][order] = sequence[index];\n    }\n\
+    \n    int pivot_row = 0;\n    for (int column = 0; column < order && pivot_row\
+    \ < equation_count; column++) {\n        int pivot = pivot_row;\n        while\
+    \ (pivot < equation_count && matrix[pivot][column] == Mint(0)) pivot++;\n    \
+    \    if (pivot == equation_count) continue;\n        std::swap(matrix[pivot_row],\
+    \ matrix[pivot]);\n\n        const Mint inverse = Mint(1) / matrix[pivot_row][column];\n\
+    \        for (int j = column; j <= order; j++) matrix[pivot_row][j] *= inverse;\n\
+    \        for (int row = pivot_row + 1; row < equation_count; row++) {\n      \
+    \      const Mint scale = matrix[row][column];\n            if (scale == Mint(0))\
+    \ continue;\n            for (int j = column; j <= order; j++) {\n           \
+    \     matrix[row][j] -= scale * matrix[pivot_row][j];\n            }\n       \
+    \ }\n        pivot_row++;\n    }\n\n    for (int row = pivot_row; row < equation_count;\
+    \ row++) {\n        bool all_zero = true;\n        for (int column = 0; column\
+    \ < order; column++) {\n            if (matrix[row][column] != Mint(0)) all_zero\
+    \ = false;\n        }\n        if (all_zero && matrix[row][order] != Mint(0))\
+    \ return false;\n    }\n    return true;\n}\n\ntemplate <class Mint>\nvoid assert_recurrence(const\
+    \ std::vector<Mint>& sequence,\n                       const std::vector<Mint>&\
+    \ recurrence) {\n    const int order = int(recurrence.size());\n    for (int index\
+    \ = order; index < int(sequence.size()); index++) {\n        Mint expected = 0;\n\
+    \        for (int i = 0; i < order; i++) {\n            expected += recurrence[i]\
+    \ * sequence[index - i - 1];\n        }\n        assert(sequence[index] == expected);\n\
+    \    }\n    for (int smaller = 0; smaller < order; smaller++) {\n        assert(!has_recurrence_of_order(sequence,\
+    \ smaller));\n    }\n}\n\nvoid test_convolution() {\n    std::mt19937 rng(712367);\n\
+    \    for (int iteration = 0; iteration < 30; iteration++) {\n        int n = 33\
+    \ + int(rng() % 70);\n        int m = 33 + int(rng() % 70);\n        std::vector<mint>\
+    \ a(n), b(m);\n        for (mint& value : a) value = mint(static_cast<uint32_t>(rng()));\n\
+    \        for (mint& value : b) value = mint(static_cast<uint32_t>(rng()));\n \
+    \       assert_equal(m1une::fps::convolution(a, b), m1une::fps::convolution_naive(a,\
+    \ b));\n        assert_equal(m1une::fps::internal::convolution_998244353_blocked(a,\
+    \ b, 64),\n                     m1une::fps::convolution_naive(a, b));\n    }\n\
+    \n    std::vector<mint1e9> a(70), b(65);\n    for (mint1e9& value : a) value =\
+    \ mint1e9(static_cast<uint32_t>(rng()));\n    for (mint1e9& value : b) value =\
+    \ mint1e9(static_cast<uint32_t>(rng()));\n    assert_equal(m1une::fps::convolution(a,\
+    \ b), m1une::fps::convolution_naive(a, b));\n}\n\nvoid test_series_functions()\
+    \ {\n    Fps f(96);\n    f[0] = 1;\n    for (int i = 1; i < int(f.size()); i++)\
+    \ f[i] = mint(i * i + 7);\n\n    Fps inverse = f.inv();\n    Fps identity = (f\
+    \ * inverse).pre(int(f.size()));\n    assert(identity[0] == mint(1));\n    for\
+    \ (int i = 1; i < int(identity.size()); i++) assert(identity[i] == mint(0));\n\
+    \n    Fps logarithm = f.log();\n    assert_equal(logarithm.exp(), f);\n    assert_equal(f.derivative().integral().pre(int(f.size()))\
+    \ + Fps(1, f[0]), f);\n\n    Fps cube = f.pow(3);\n    assert_equal(cube, ((f\
+    \ * f) * f).pre(int(f.size())));\n\n    Fps shifted(40);\n    shifted[4] = 9;\n\
+    \    for (int i = 5; i < int(shifted.size()); i++) shifted[i] = mint(i + 11);\n\
+    \    auto root = (shifted * shifted).pre(70).sqrt(70);\n    assert(root.has_value());\n\
+    \    assert_equal(((*root) * (*root)).pre(70), (shifted * shifted).pre(70));\n\
+    \n    Fps beyond_precision(8);\n    beyond_precision[5] = 1;\n    auto zero_root\
+    \ = beyond_precision.sqrt(5);\n    assert(zero_root.has_value());\n    assert_equal(*zero_root,\
+    \ Fps(5));\n\n    Fps odd_leading(8);\n    odd_leading[3] = 1;\n    assert(!odd_leading.sqrt(8).has_value());\n\
+    \n    Fps zero(20);\n    Fps one(20);\n    one[0] = 1;\n    assert_equal(zero.pow(0),\
+    \ one);\n    assert_equal(zero.pow(7), zero);\n}\n\nvoid test_polynomial_operations()\
+    \ {\n    Fps dividend(80), divisor(35);\n    for (int i = 0; i < int(dividend.size());\
+    \ i++) dividend[i] = mint(i * 17 + 3);\n    for (int i = 0; i < int(divisor.size());\
+    \ i++) divisor[i] = mint(i * 5 + 1);\n    auto division = dividend.divmod(divisor);\n\
+    \    Fps restored = division.first * divisor + division.second;\n    restored.resize(dividend.size());\n\
+    \    assert_equal(restored, dividend);\n    assert(division.second.size() < divisor.size());\n\
+    \n    mint shift = 12345;\n    Fps translated = dividend.taylor_shift(shift);\n\
+    \    for (int x = 0; x < 10; x++) {\n        assert(translated.evaluate(mint(x))\
+    \ == dividend.evaluate(mint(x) + shift));\n    }\n}\n\nvoid test_multipoint_and_recurrence()\
+    \ {\n    Fps polynomial(70);\n    for (int i = 0; i < int(polynomial.size());\
+    \ i++) polynomial[i] = mint(i * i * 13 + 5);\n    std::vector<mint> points(70);\n\
+    \    for (int i = 0; i < int(points.size()); i++) points[i] = mint(i * 3 + 1);\n\
+    \n    std::vector<mint> values = m1une::fps::multipoint_evaluate(polynomial, points);\n\
+    \    for (int i = 0; i < int(points.size()); i++) assert(values[i] == polynomial.evaluate(points[i]));\n\
+    \    Fps interpolated = m1une::fps::polynomial_interpolate(points, values);\n\
+    \    assert_equal(interpolated, polynomial);\n    std::vector<mint> one_point(1,\
+    \ mint(42));\n    std::vector<mint> one_value(1, mint(314));\n    assert_equal(m1une::fps::polynomial_interpolate(one_point,\
+    \ one_value), Fps(1, mint(314)));\n    assert(m1une::fps::multipoint_evaluate(Fps(),\
+    \ std::vector<mint>()).empty());\n\n    std::vector<mint> initial(2);\n    std::vector<mint>\
+    \ recurrence(2);\n    initial[0] = 0;\n    initial[1] = 1;\n    recurrence[0]\
+    \ = 1;\n    recurrence[1] = 1;\n    mint previous = 0;\n    mint current = 1;\n\
+    \    for (uint64_t index = 0; index < 200; index++) {\n        mint expected =\
+    \ index == 0 ? previous : current;\n        assert(m1une::fps::linear_recurrence_kth(initial,\
+    \ recurrence, index) == expected);\n        if (index > 0) {\n            mint\
+    \ next = previous + current;\n            previous = current;\n            current\
+    \ = next;\n        }\n    }\n\n    assert(m1une::fps::berlekamp_massey(std::vector<mint>()).empty());\n\
+    \    assert(m1une::fps::berlekamp_massey(std::vector<mint>(20)).empty());\n\n\
+    \    std::vector<mint> fibonacci = {0, 1};\n    for (int i = 2; i < 30; i++) {\n\
+    \        fibonacci.push_back(fibonacci[i - 1] + fibonacci[i - 2]);\n    }\n  \
+    \  std::vector<mint> fibonacci_recurrence =\n        m1une::fps::berlekamp_massey(fibonacci);\n\
+    \    assert_equal(fibonacci_recurrence, std::vector<mint>{1, 1});\n\n    std::vector<mint>\
+    \ suffix_zero = {1, 0, 0, 0, 0, 0};\n    std::vector<mint> suffix_zero_recurrence\
+    \ =\n        m1une::fps::berlekamp_massey(suffix_zero);\n    assert_equal(suffix_zero_recurrence,\
+    \ std::vector<mint>{0});\n\n    std::mt19937 recurrence_rng(2481632);\n    for\
+    \ (int iteration = 0; iteration < 300; iteration++) {\n        const int size\
+    \ = int(recurrence_rng() % 17);\n        std::vector<mint> sequence(size);\n \
+    \       for (mint& value : sequence) value = mint(recurrence_rng() % 11);\n  \
+    \      std::vector<mint> found = m1une::fps::berlekamp_massey(sequence);\n   \
+    \     assert_recurrence(sequence, found);\n    }\n}\n\nint main() {\n    m1une::utilities::FastInput\
     \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n\n    test_convolution();\n\
     \    test_series_functions();\n    test_polynomial_operations();\n    test_multipoint_and_recurrence();\n\
     \n    long long a, b;\n    fast_input >> a >> b;\n    fast_output << a + b <<\
@@ -1821,7 +1926,7 @@ data:
   isVerificationFile: true
   path: verify/math/fps/fps_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-16 20:26:13+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/fps/fps_algorithms.test.cpp

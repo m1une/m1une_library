@@ -561,21 +561,21 @@ data:
   isVerificationFile: false
   path: geometry/ray.hpp
   requiredBy:
+  - geometry/minimum_enclosing_circle.hpp
+  - geometry/circle.hpp
   - geometry/all.hpp
   - geometry/polygon.hpp
-  - geometry/circle.hpp
-  - geometry/minimum_enclosing_circle.hpp
   timestamp: '2026-06-21 12:04:47+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/geometry/geometry_algorithms.test.cpp
-  - verify/geometry/ray.test.cpp
-  - verify/geometry/point_in_polygon.test.cpp
   - verify/geometry/polygon_area.test.cpp
-  - verify/geometry/circle_ray.test.cpp
-  - verify/geometry/polygon_operations.test.cpp
   - verify/geometry/circle_line_intersection.test.cpp
   - verify/geometry/minimum_enclosing_circle.test.cpp
+  - verify/geometry/geometry_algorithms.test.cpp
+  - verify/geometry/circle_ray.test.cpp
+  - verify/geometry/point_in_polygon.test.cpp
+  - verify/geometry/polygon_operations.test.cpp
+  - verify/geometry/ray.test.cpp
 documentation_of: geometry/ray.hpp
 layout: document
 title: Rays

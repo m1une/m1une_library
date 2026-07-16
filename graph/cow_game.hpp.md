@@ -186,16 +186,16 @@ data:
   isVerificationFile: false
   path: graph/cow_game.hpp
   requiredBy:
-  - graph/directed.hpp
-  - graph/shortest_path.hpp
   - graph/all.hpp
   - graph/undirected.hpp
+  - graph/directed.hpp
+  - graph/shortest_path.hpp
   timestamp: '2026-06-22 23:27:23+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/graph/graph_algorithms.test.cpp
   - verify/graph/cow_game.test.cpp
   - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
 documentation_of: graph/cow_game.hpp
 layout: document
 title: Cow Game (Difference Constraints)

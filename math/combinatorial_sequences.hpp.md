@@ -1064,9 +1064,9 @@ data:
   timestamp: '2026-07-15 03:06:59+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/math/bell_number.test.cpp
   - verify/math/math_algorithms.test.cpp
   - verify/math/stirling_number_of_the_second_kind.test.cpp
-  - verify/math/bell_number.test.cpp
 documentation_of: math/combinatorial_sequences.hpp
 layout: document
 title: Combinatorial Sequences

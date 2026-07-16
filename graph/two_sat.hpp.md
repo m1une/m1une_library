@@ -179,15 +179,15 @@ data:
   isVerificationFile: false
   path: graph/two_sat.hpp
   requiredBy:
-  - graph/directed.hpp
   - graph/all.hpp
+  - graph/directed.hpp
   timestamp: '2026-06-21 02:34:20+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/graph/graph_algorithms.test.cpp
   - verify/graph/cow_game.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
   - verify/graph/two_sat.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
 documentation_of: graph/two_sat.hpp
 layout: document
 title: Two-Satisfiability

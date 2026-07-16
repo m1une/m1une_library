@@ -233,8 +233,8 @@ data:
   timestamp: '2026-07-11 20:28:42+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/closest_pair.test.cpp
+  - verify/geometry/geometry_algorithms.test.cpp
 documentation_of: geometry/closest_pair.hpp
 layout: document
 title: Closest Pair of Points

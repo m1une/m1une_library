@@ -66,7 +66,7 @@ data:
     title: Lagrange Inversion Formula
   - icon: ':heavy_check_mark:'
     path: math/fps/linear_recurrence.hpp
-    title: Linear Recurrence and Bostan-Mori
+    title: Linear Recurrences and Bostan-Mori
   - icon: ':heavy_check_mark:'
     path: math/fps/multipoint_evaluation.hpp
     title: Multipoint Evaluation and Interpolation
@@ -2115,8 +2115,28 @@ data:
     \    for (int i = 0; i < degree && i + 1 < int(f.size()); i++) divided[i] = f[i\
     \ + 1];\n    FormalPowerSeries<Mint> phi = divided.inv(degree);\n    return lagrange_inversion_coefficient(phi,\
     \ degree);\n}\n\n}  // namespace fps\n}  // namespace m1une\n\n\n#line 1 \"math/fps/linear_recurrence.hpp\"\
-    \n\n\n\n#line 7 \"math/fps/linear_recurrence.hpp\"\n\n#line 9 \"math/fps/linear_recurrence.hpp\"\
-    \n\nnamespace m1une {\nnamespace fps {\n\ntemplate <class Mint>\nMint coefficient_of_rational(FormalPowerSeries<Mint>\
+    \n\n\n\n#line 9 \"math/fps/linear_recurrence.hpp\"\n\n#line 11 \"math/fps/linear_recurrence.hpp\"\
+    \n\nnamespace m1une {\nnamespace fps {\n\n// Returns a shortest linear recurrence\
+    \ satisfied by the observed sequence.\n// The returned coefficients use\n// a[n]\
+    \ = recurrence[0] * a[n - 1] + ... + recurrence[d - 1] * a[n - d].\ntemplate <class\
+    \ Mint>\nstd::vector<Mint> berlekamp_massey(const std::vector<Mint>& sequence)\
+    \ {\n    std::vector<Mint> connection(1, Mint(1));\n    std::vector<Mint> previous(1,\
+    \ Mint(1));\n    int order = 0;\n    int shift = 1;\n    Mint previous_discrepancy\
+    \ = Mint(1);\n\n    for (int index = 0; index < int(sequence.size()); index++)\
+    \ {\n        Mint discrepancy = sequence[index];\n        for (int i = 1; i <=\
+    \ order; i++) {\n            discrepancy += connection[i] * sequence[index - i];\n\
+    \        }\n        if (discrepancy == Mint(0)) {\n            shift++;\n    \
+    \        continue;\n        }\n\n        const Mint scale = discrepancy / previous_discrepancy;\n\
+    \        std::vector<Mint> old_connection = connection;\n        if (connection.size()\
+    \ < previous.size() + std::size_t(shift)) {\n            connection.resize(previous.size()\
+    \ + std::size_t(shift));\n        }\n        for (int i = 0; i < int(previous.size());\
+    \ i++) {\n            connection[i + shift] -= scale * previous[i];\n        }\n\
+    \n        if (2 * order <= index) {\n            order = index + 1 - order;\n\
+    \            previous = std::move(old_connection);\n            previous_discrepancy\
+    \ = discrepancy;\n            shift = 1;\n        } else {\n            shift++;\n\
+    \        }\n    }\n\n    std::vector<Mint> recurrence(order);\n    for (int i\
+    \ = 0; i < order; i++) recurrence[i] = Mint(0) - connection[i + 1];\n    return\
+    \ recurrence;\n}\n\ntemplate <class Mint>\nMint coefficient_of_rational(FormalPowerSeries<Mint>\
     \ numerator,\n                             FormalPowerSeries<Mint> denominator,\
     \ uint64_t index) {\n    using Fps = FormalPowerSeries<Mint>;\n    assert(!denominator.empty()\
     \ && denominator[0] != Mint(0));\n\n    while (index > 0) {\n        Fps denominator_negative\
@@ -3981,7 +4001,7 @@ data:
   isVerificationFile: false
   path: math/all.hpp
   requiredBy: []
-  timestamp: '2026-07-16 17:56:33+09:00'
+  timestamp: '2026-07-16 20:26:13+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp

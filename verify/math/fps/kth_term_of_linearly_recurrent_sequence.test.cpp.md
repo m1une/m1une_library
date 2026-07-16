@@ -12,7 +12,7 @@ data:
     title: math/fps/internal/ntt998_faster.hpp
   - icon: ':heavy_check_mark:'
     path: math/fps/linear_recurrence.hpp
-    title: Linear Recurrence and Bostan-Mori
+    title: Linear Recurrences and Bostan-Mori
   - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
@@ -265,7 +265,7 @@ data:
     n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
     \ utilities\n}  // namespace m1une\n\n\n#line 1 \"math/fps/linear_recurrence.hpp\"\
-    \n\n\n\n#include <cassert>\n#line 7 \"math/fps/linear_recurrence.hpp\"\n\n#line\
+    \n\n\n\n#include <cassert>\n#line 9 \"math/fps/linear_recurrence.hpp\"\n\n#line\
     \ 1 \"math/fps/formal_power_series.hpp\"\n\n\n\n#include <algorithm>\n#line 7\
     \ \"math/fps/formal_power_series.hpp\"\n#include <optional>\n#line 10 \"math/fps/formal_power_series.hpp\"\
     \n\n#line 1 \"math/modular_square_root.hpp\"\n\n\n\n#line 7 \"math/modular_square_root.hpp\"\
@@ -1074,8 +1074,28 @@ data:
     \      power *= shift;\n        }\n        Fps product = left * right;\n     \
     \   Fps result(n);\n        for (int i = 0; i < n; i++) result[i] = product[n\
     \ - 1 - i] * inverse_factorial[i];\n        return result;\n    }\n};\n\n}  //\
-    \ namespace fps\n}  // namespace m1une\n\n\n#line 9 \"math/fps/linear_recurrence.hpp\"\
-    \n\nnamespace m1une {\nnamespace fps {\n\ntemplate <class Mint>\nMint coefficient_of_rational(FormalPowerSeries<Mint>\
+    \ namespace fps\n}  // namespace m1une\n\n\n#line 11 \"math/fps/linear_recurrence.hpp\"\
+    \n\nnamespace m1une {\nnamespace fps {\n\n// Returns a shortest linear recurrence\
+    \ satisfied by the observed sequence.\n// The returned coefficients use\n// a[n]\
+    \ = recurrence[0] * a[n - 1] + ... + recurrence[d - 1] * a[n - d].\ntemplate <class\
+    \ Mint>\nstd::vector<Mint> berlekamp_massey(const std::vector<Mint>& sequence)\
+    \ {\n    std::vector<Mint> connection(1, Mint(1));\n    std::vector<Mint> previous(1,\
+    \ Mint(1));\n    int order = 0;\n    int shift = 1;\n    Mint previous_discrepancy\
+    \ = Mint(1);\n\n    for (int index = 0; index < int(sequence.size()); index++)\
+    \ {\n        Mint discrepancy = sequence[index];\n        for (int i = 1; i <=\
+    \ order; i++) {\n            discrepancy += connection[i] * sequence[index - i];\n\
+    \        }\n        if (discrepancy == Mint(0)) {\n            shift++;\n    \
+    \        continue;\n        }\n\n        const Mint scale = discrepancy / previous_discrepancy;\n\
+    \        std::vector<Mint> old_connection = connection;\n        if (connection.size()\
+    \ < previous.size() + std::size_t(shift)) {\n            connection.resize(previous.size()\
+    \ + std::size_t(shift));\n        }\n        for (int i = 0; i < int(previous.size());\
+    \ i++) {\n            connection[i + shift] -= scale * previous[i];\n        }\n\
+    \n        if (2 * order <= index) {\n            order = index + 1 - order;\n\
+    \            previous = std::move(old_connection);\n            previous_discrepancy\
+    \ = discrepancy;\n            shift = 1;\n        } else {\n            shift++;\n\
+    \        }\n    }\n\n    std::vector<Mint> recurrence(order);\n    for (int i\
+    \ = 0; i < order; i++) recurrence[i] = Mint(0) - connection[i + 1];\n    return\
+    \ recurrence;\n}\n\ntemplate <class Mint>\nMint coefficient_of_rational(FormalPowerSeries<Mint>\
     \ numerator,\n                             FormalPowerSeries<Mint> denominator,\
     \ uint64_t index) {\n    using Fps = FormalPowerSeries<Mint>;\n    assert(!denominator.empty()\
     \ && denominator[0] != Mint(0));\n\n    while (index > 0) {\n        Fps denominator_negative\
@@ -1102,8 +1122,8 @@ data:
     \    return coefficient_of_rational(std::move(numerator), std::move(denominator),\
     \ index);\n}\n\n}  // namespace fps\n}  // namespace m1une\n\n\n#line 9 \"verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp\"\
     \n\nusing mint = m1une::math::modint998244353;\n\nint main() {\n    m1une::utilities::FastInput\
-    \ input;\n    m1une::utilities::FastOutput output;\n\n    int order;\n    uint64_t\
-    \ index;\n    input.read(order, index);\n    std::vector<mint> initial(order),\
+    \ input;\n    m1une::utilities::FastOutput output;\n\n    int order = 0;\n   \
+    \ uint64_t index = 0;\n    input.read(order, index);\n    std::vector<mint> initial(order),\
     \ recurrence(order);\n    input.read(initial);\n    input.read(recurrence);\n\
     \    output.println(m1une::fps::linear_recurrence_kth(initial, recurrence, index));\n\
     }\n"
@@ -1111,8 +1131,8 @@ data:
     \n\n#include <cstdint>\n#include <vector>\n\n#include \"../../../utilities/fast_io.hpp\"\
     \n#include \"../../../math/fps/linear_recurrence.hpp\"\n#include \"../../../math/modint.hpp\"\
     \n\nusing mint = m1une::math::modint998244353;\n\nint main() {\n    m1une::utilities::FastInput\
-    \ input;\n    m1une::utilities::FastOutput output;\n\n    int order;\n    uint64_t\
-    \ index;\n    input.read(order, index);\n    std::vector<mint> initial(order),\
+    \ input;\n    m1une::utilities::FastOutput output;\n\n    int order = 0;\n   \
+    \ uint64_t index = 0;\n    input.read(order, index);\n    std::vector<mint> initial(order),\
     \ recurrence(order);\n    input.read(initial);\n    input.read(recurrence);\n\
     \    output.println(m1une::fps::linear_recurrence_kth(initial, recurrence, index));\n\
     }\n"
@@ -1128,7 +1148,7 @@ data:
   isVerificationFile: true
   path: verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-16 20:26:13+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp

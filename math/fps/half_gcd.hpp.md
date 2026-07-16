@@ -1012,8 +1012,8 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
-  - verify/math/fps/fps_algorithms.test.cpp
   - verify/math/fps/half_gcd.test.cpp
+  - verify/math/fps/fps_algorithms.test.cpp
 documentation_of: math/fps/half_gcd.hpp
 layout: document
 title: Polynomial Half-GCD

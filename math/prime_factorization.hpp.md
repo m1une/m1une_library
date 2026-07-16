@@ -209,23 +209,23 @@ data:
   isVerificationFile: false
   path: math/prime_factorization.hpp
   requiredBy:
-  - math/all.hpp
   - math/cyclotomic_polynomial.hpp
   - math/primitive_root.hpp
   - math/tetration.hpp
-  - math/two_square_sum.hpp
+  - math/all.hpp
   - math/multivariate_convolution.hpp
+  - math/two_square_sum.hpp
   timestamp: '2026-06-20 09:18:49+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/math_algorithms.test.cpp
-  - verify/math/cyclotomic_polynomial.test.cpp
-  - verify/math/yosupo_factorize.test.cpp
+  - verify/math/two_square_sum.test.cpp
+  - verify/math/tetration.test.cpp
   - verify/math/primality_test.test.cpp
   - verify/math/multivariate_convolution_cyclic.test.cpp
   - verify/math/multivariate_convolution_truncated.test.cpp
-  - verify/math/two_square_sum.test.cpp
-  - verify/math/tetration.test.cpp
+  - verify/math/yosupo_factorize.test.cpp
+  - verify/math/math_algorithms.test.cpp
+  - verify/math/cyclotomic_polynomial.test.cpp
   - verify/math/factorize.test.cpp
 documentation_of: math/prime_factorization.hpp
 layout: document

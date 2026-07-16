@@ -206,13 +206,13 @@ data:
   isVerificationFile: false
   path: math/rational.hpp
   requiredBy:
-  - math/stern_brocot_tree.hpp
   - math/all.hpp
+  - math/stern_brocot_tree.hpp
   timestamp: '2026-06-23 03:01:31+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/math_algorithms.test.cpp
   - verify/math/rational.test.cpp
+  - verify/math/math_algorithms.test.cpp
   - verify/math/yosupo_stern_brocot_tree.test.cpp
   - verify/math/stern_brocot_tree.test.cpp
 documentation_of: math/rational.hpp
