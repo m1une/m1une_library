@@ -88,9 +88,9 @@ data:
   timestamp: '2026-06-27 04:10:54+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/algo/offline/mo.test.cpp
   - verify/ds/range_query/fenwick_tree.test.cpp
   - verify/graph/tree/vertex_add_subtree_sum.test.cpp
-  - verify/algo/offline/mo.test.cpp
 documentation_of: ds/range_query/fenwick_tree.hpp
 layout: document
 title: Fenwick Tree (Binary Indexed Tree)

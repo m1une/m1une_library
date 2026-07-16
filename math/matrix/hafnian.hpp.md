@@ -199,14 +199,14 @@ data:
   isVerificationFile: false
   path: math/matrix/hafnian.hpp
   requiredBy:
-  - math/matrix/all.hpp
   - math/all.hpp
+  - math/matrix/all.hpp
   timestamp: '2026-07-14 02:42:28+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
-  - verify/math/matrix/matrix.test.cpp
   - verify/math/matrix/hafnian.test.cpp
+  - verify/math/matrix/matrix.test.cpp
 documentation_of: math/matrix/hafnian.hpp
 layout: document
 title: Hafnian

@@ -50,8 +50,8 @@ data:
   isVerificationFile: false
   path: monoid/min_count.hpp
   requiredBy:
-  - monoid/max_count.hpp
   - acted_monoid/range_add_range_min_count.hpp
+  - monoid/max_count.hpp
   timestamp: '2026-06-13 20:51:48+09:00'
   verificationStatus: LIBRARY_NO_TESTS
   verifiedWith: []

@@ -472,6 +472,9 @@ data:
   - name: ds/wavelet_matrix
     pages:
     - icon: ':heavy_check_mark:'
+      path: ds/wavelet_matrix/dynamic_wavelet_matrix.hpp
+      title: Dynamic Wavelet Matrix
+    - icon: ':heavy_check_mark:'
       path: ds/wavelet_matrix/wavelet_matrix.hpp
       title: Wavelet Matrix
     - icon: ':heavy_check_mark:'
@@ -1505,6 +1508,9 @@ data:
       title: verify/ds/stack/persistent_stack.test.cpp
   - name: verify/ds/wavelet_matrix
     pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/wavelet_matrix/dynamic_wavelet_matrix.test.cpp
+      title: verify/ds/wavelet_matrix/dynamic_wavelet_matrix.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/ds/wavelet_matrix/wavelet_matrix.test.cpp
       title: verify/ds/wavelet_matrix/wavelet_matrix.test.cpp

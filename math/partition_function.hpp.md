@@ -886,15 +886,15 @@ data:
   isVerificationFile: false
   path: math/partition_function.hpp
   requiredBy:
-  - math/all.hpp
   - math/combinatorial_sequences.hpp
+  - math/all.hpp
   timestamp: '2026-07-15 03:06:59+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/math_algorithms.test.cpp
-  - verify/math/partition_function.test.cpp
-  - verify/math/stirling_number_of_the_second_kind.test.cpp
   - verify/math/bell_number.test.cpp
+  - verify/math/partition_function.test.cpp
+  - verify/math/math_algorithms.test.cpp
+  - verify/math/stirling_number_of_the_second_kind.test.cpp
 documentation_of: math/partition_function.hpp
 layout: document
 title: Partition Function

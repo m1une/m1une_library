@@ -358,27 +358,27 @@ data:
   isVerificationFile: false
   path: geometry/line.hpp
   requiredBy:
-  - geometry/all.hpp
+  - geometry/minimum_enclosing_circle.hpp
   - geometry/ray.hpp
+  - geometry/circle.hpp
+  - geometry/all.hpp
   - geometry/polygon.hpp
   - geometry/half_plane_intersection.hpp
-  - geometry/circle.hpp
-  - geometry/minimum_enclosing_circle.hpp
   timestamp: '2026-06-21 12:04:47+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/geometry/geometry_algorithms.test.cpp
-  - verify/geometry/ray.test.cpp
-  - verify/geometry/point_in_polygon.test.cpp
+  - verify/geometry/half_plane_intersection.test.cpp
   - verify/geometry/polygon_area.test.cpp
+  - verify/geometry/circle_line_intersection.test.cpp
+  - verify/geometry/minimum_enclosing_circle.test.cpp
+  - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/segment_intersection.test.cpp
   - verify/geometry/circle_ray.test.cpp
+  - verify/geometry/half_plane_intersection_random.test.cpp
+  - verify/geometry/point_in_polygon.test.cpp
   - verify/geometry/polygon_operations.test.cpp
   - verify/geometry/projection.test.cpp
-  - verify/geometry/circle_line_intersection.test.cpp
-  - verify/geometry/half_plane_intersection.test.cpp
-  - verify/geometry/minimum_enclosing_circle.test.cpp
-  - verify/geometry/half_plane_intersection_random.test.cpp
+  - verify/geometry/ray.test.cpp
 documentation_of: geometry/line.hpp
 layout: document
 title: Lines and Segments
