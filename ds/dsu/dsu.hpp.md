@@ -58,6 +58,9 @@ data:
     path: verify/graph/graph_algorithms.test.cpp
     title: verify/graph/graph_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/incremental_scc.test.cpp
+    title: verify/graph/incremental_scc.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/minimum_spanning_tree.test.cpp
     title: verify/graph/minimum_spanning_tree.test.cpp
   - icon: ':heavy_check_mark:'
@@ -162,6 +165,7 @@ data:
   - verify/graph/minimum_spanning_tree.test.cpp
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/complement_connected_components.test.cpp
+  - verify/graph/incremental_scc.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/euclidean_mst.test.cpp
   - verify/geometry/euclidean_mst.test.cpp

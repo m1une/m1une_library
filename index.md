@@ -626,6 +626,9 @@ data:
       path: graph/grid.hpp
       title: Grid
     - icon: ':heavy_check_mark:'
+      path: graph/incremental_scc.hpp
+      title: Incremental Strongly Connected Components
+    - icon: ':heavy_check_mark:'
       path: graph/k_shortest_walk.hpp
       title: K-Shortest Walk
     - icon: ':heavy_check_mark:'
@@ -658,6 +661,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: graph/shortest_path.hpp
       title: Shortest Path
+    - icon: ':heavy_check_mark:'
+      path: graph/st_numbering.hpp
+      title: st-Numbering
     - icon: ':heavy_check_mark:'
       path: graph/three_edge_connected_components.hpp
       title: Three-Edge-Connected Components
@@ -1702,6 +1708,9 @@ data:
       path: verify/graph/graph_counting.test.cpp
       title: verify/graph/graph_counting.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/graph/incremental_scc.test.cpp
+      title: verify/graph/incremental_scc.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/graph/k_shortest_walk.test.cpp
       title: verify/graph/k_shortest_walk.test.cpp
     - icon: ':heavy_check_mark:'
@@ -1734,6 +1743,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/graph/shortest_path.test.cpp
       title: verify/graph/shortest_path.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/st_numbering.test.cpp
+      title: verify/graph/st_numbering.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/graph/three_edge_connected_components.test.cpp
       title: verify/graph/three_edge_connected_components.test.cpp

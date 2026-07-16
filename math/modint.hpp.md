@@ -157,6 +157,9 @@ data:
     path: verify/graph/graph_counting.test.cpp
     title: verify/graph/graph_counting.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/incremental_scc.test.cpp
+    title: verify/graph/incremental_scc.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/range_edge_graph.test.cpp
     title: verify/graph/range_edge_graph.test.cpp
   - icon: ':heavy_check_mark:'
@@ -785,6 +788,7 @@ data:
   - verify/graph/tree/distance_frequency.test.cpp
   - verify/graph/graph_counting.test.cpp
   - verify/graph/graph_counting.test.cpp
+  - verify/graph/incremental_scc.test.cpp
   - verify/string/string_algorithms.test.cpp
   - verify/string/wildcard_pattern_matching.test.cpp
   - verify/algo/sequence/number_of_subsequences.test.cpp

@@ -490,6 +490,9 @@ data:
     path: verify/graph/graph_counting.test.cpp
     title: verify/graph/graph_counting.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/incremental_scc.test.cpp
+    title: verify/graph/incremental_scc.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/k_shortest_walk.test.cpp
     title: verify/graph/k_shortest_walk.test.cpp
   - icon: ':heavy_check_mark:'
@@ -522,6 +525,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/shortest_path.test.cpp
     title: verify/graph/shortest_path.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/st_numbering.test.cpp
+    title: verify/graph/st_numbering.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/three_edge_connected_components.test.cpp
     title: verify/graph/three_edge_connected_components.test.cpp
@@ -1608,6 +1614,7 @@ data:
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/complement_connected_components.test.cpp
   - verify/graph/block_cut_tree.test.cpp
+  - verify/graph/st_numbering.test.cpp
   - verify/graph/enumerate_triangles.test.cpp
   - verify/graph/biconnected_components.test.cpp
   - verify/graph/eulerian_trail_undirected.test.cpp
@@ -1634,6 +1641,7 @@ data:
   - verify/graph/general_weighted_matching.test.cpp
   - verify/graph/library_checker_general_matching.test.cpp
   - verify/graph/graph_counting.test.cpp
+  - verify/graph/incremental_scc.test.cpp
   - verify/string/longest_common_extension.test.cpp
   - verify/string/trie.test.cpp
   - verify/string/levenshtein_distance.test.cpp

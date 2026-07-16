@@ -98,6 +98,9 @@ data:
     path: graph/shortest_path.hpp
     title: Shortest Path
   - icon: ':heavy_check_mark:'
+    path: graph/st_numbering.hpp
+    title: st-Numbering
+  - icon: ':heavy_check_mark:'
     path: graph/three_edge_connected_components.hpp
     title: Three-Edge-Connected Components
   - icon: ':heavy_check_mark:'
@@ -3295,18 +3298,77 @@ data:
     }\n\ntemplate <class T>\nZeroOneBfsResult zero_one_bfs(const Graph<T>& g, int\
     \ s, int inf = std::numeric_limits<int>::max() / 2) {\n    return zero_one_bfs(g,\
     \ std::vector<int>{s}, inf);\n}\n\n}  // namespace graph\n}  // namespace m1une\n\
-    \n\n#line 12 \"graph/shortest_path.hpp\"\n\n\n#line 1 \"graph/three_edge_connected_components.hpp\"\
-    \n\n\n\n#line 9 \"graph/three_edge_connected_components.hpp\"\n\n#line 11 \"graph/three_edge_connected_components.hpp\"\
-    \n\nnamespace m1une {\nnamespace graph {\n\nstruct ThreeEdgeConnectedComponentsResult\
-    \ {\n    std::vector<std::vector<int>> components;\n    std::vector<int> component_of_vertex;\n\
-    \n    int component_count() const {\n        return int(components.size());\n\
-    \    }\n\n    bool same(int first, int second) const {\n        assert(0 <= first\
-    \ && first < int(component_of_vertex.size()));\n        assert(0 <= second &&\
-    \ second < int(component_of_vertex.size()));\n        return component_of_vertex[first]\
-    \ == component_of_vertex[second];\n    }\n};\n\nnamespace internal {\n\n// Maintains\
-    \ every component as a circular linked list. Swapping two successors\n// concatenates\
-    \ two different lists in O(1) time.\nstruct ThreeEdgeComponentCycles {\n    std::vector<int>\
-    \ next;\n\n    explicit ThreeEdgeComponentCycles(int n) : next(n) {\n        std::iota(next.begin(),\
+    \n\n#line 12 \"graph/shortest_path.hpp\"\n\n\n#line 1 \"graph/st_numbering.hpp\"\
+    \n\n\n\n#line 6 \"graph/st_numbering.hpp\"\n\n#line 8 \"graph/st_numbering.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\n// Returns ranks p with p[source]\
+    \ = 0 and p[sink] = n - 1 such that every\n// other vertex has neighbors of both\
+    \ smaller and larger rank. Returns an empty\n// vector when no such numbering\
+    \ exists.\ntemplate <class T>\nstd::vector<int> st_numbering(\n    const Graph<T>&\
+    \ graph,\n    int source,\n    int sink\n) {\n    const int n = graph.size();\n\
+    \    assert(0 < n);\n    assert(0 <= source && source < n);\n    assert(0 <= sink\
+    \ && sink < n);\n    assert(source != sink);\n\n#ifndef NDEBUG\n    std::vector<int>\
+    \ incidence_count(graph.edge_count(), 0);\n    for (int vertex = 0; vertex < n;\
+    \ vertex++) {\n        for (const Edge<T>& edge : graph[vertex]) {\n         \
+    \   if (!edge.alive) continue;\n            assert(0 <= edge.id && edge.id < graph.edge_count());\n\
+    \            incidence_count[edge.id]++;\n        }\n    }\n    for (int edge_id\
+    \ = 0; edge_id < graph.edge_count(); edge_id++) {\n        if (graph.is_edge_alive(edge_id))\
+    \ {\n            assert(incidence_count[edge_id] == 2);\n        }\n    }\n#endif\n\
+    \n    std::vector<int> parent(n, -1);\n    std::vector<int> preorder(n, -1);\n\
+    \    std::vector<int> low_vertex(n, -1);\n    std::vector<int> next_edge(n, 0);\n\
+    \    std::vector<int> traversal;\n    traversal.reserve(n);\n\n    preorder[source]\
+    \ = 0;\n    low_vertex[source] = source;\n    traversal.push_back(source);\n \
+    \   preorder[sink] = 1;\n    low_vertex[sink] = sink;\n    traversal.push_back(sink);\n\
+    \n    std::vector<int> stack(1, sink);\n    while (!stack.empty()) {\n       \
+    \ const int vertex = stack.back();\n        if (next_edge[vertex] < int(graph[vertex].size()))\
+    \ {\n            const Edge<T>& edge = graph[vertex][next_edge[vertex]++];\n \
+    \           if (!edge.alive || edge.to == vertex) continue;\n            const\
+    \ int to = edge.to;\n            if (preorder[to] == -1) {\n                parent[to]\
+    \ = vertex;\n                preorder[to] = int(traversal.size());\n         \
+    \       low_vertex[to] = to;\n                traversal.push_back(to);\n     \
+    \           stack.push_back(to);\n            } else if (preorder[to] < preorder[low_vertex[vertex]])\
+    \ {\n                low_vertex[vertex] = to;\n            }\n            continue;\n\
+    \        }\n\n        stack.pop_back();\n        const int parent_vertex = parent[vertex];\n\
+    \        if (parent_vertex != -1 &&\n            preorder[low_vertex[vertex]]\
+    \ <\n                preorder[low_vertex[parent_vertex]]) {\n            low_vertex[parent_vertex]\
+    \ = low_vertex[vertex];\n        }\n    }\n    if (int(traversal.size()) != n)\
+    \ return {};\n\n    std::vector<int> next(n, -1);\n    std::vector<int> previous(n,\
+    \ -1);\n    std::vector<int> sign(n, 0);\n    next[source] = sink;\n    previous[sink]\
+    \ = source;\n    sign[source] = -1;\n\n    for (int index = 2; index < n; index++)\
+    \ {\n        const int vertex = traversal[index];\n        const int parent_vertex\
+    \ = parent[vertex];\n        assert(parent_vertex != -1);\n        if (sign[low_vertex[vertex]]\
+    \ == -1) {\n            const int before = previous[parent_vertex];\n        \
+    \    if (before == -1) return {};\n            next[before] = vertex;\n      \
+    \      next[vertex] = parent_vertex;\n            previous[vertex] = before;\n\
+    \            previous[parent_vertex] = vertex;\n            sign[parent_vertex]\
+    \ = 1;\n        } else {\n            const int after = next[parent_vertex];\n\
+    \            if (after == -1) return {};\n            next[parent_vertex] = vertex;\n\
+    \            next[vertex] = after;\n            previous[vertex] = parent_vertex;\n\
+    \            previous[after] = vertex;\n            sign[parent_vertex] = -1;\n\
+    \        }\n    }\n\n    std::vector<int> order;\n    order.reserve(n);\n    int\
+    \ vertex = source;\n    while (vertex != -1 && int(order.size()) <= n) {\n   \
+    \     order.push_back(vertex);\n        if (vertex == sink) break;\n        vertex\
+    \ = next[vertex];\n    }\n    if (int(order.size()) != n || order.back() != sink)\
+    \ return {};\n\n    std::vector<int> rank(n, -1);\n    for (int index = 0; index\
+    \ < n; index++) rank[order[index]] = index;\n\n    for (int index = 0; index <\
+    \ n; index++) {\n        const int current = order[index];\n        bool has_smaller\
+    \ = false;\n        bool has_larger = false;\n        for (const Edge<T>& edge\
+    \ : graph[current]) {\n            if (!edge.alive || edge.to == current) continue;\n\
+    \            has_smaller = has_smaller || rank[edge.to] < index;\n           \
+    \ has_larger = has_larger || index < rank[edge.to];\n        }\n        if (index\
+    \ > 0 && !has_smaller) return {};\n        if (index + 1 < n && !has_larger) return\
+    \ {};\n    }\n    return rank;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\
+    \n\n#line 1 \"graph/three_edge_connected_components.hpp\"\n\n\n\n#line 9 \"graph/three_edge_connected_components.hpp\"\
+    \n\n#line 11 \"graph/three_edge_connected_components.hpp\"\n\nnamespace m1une\
+    \ {\nnamespace graph {\n\nstruct ThreeEdgeConnectedComponentsResult {\n    std::vector<std::vector<int>>\
+    \ components;\n    std::vector<int> component_of_vertex;\n\n    int component_count()\
+    \ const {\n        return int(components.size());\n    }\n\n    bool same(int\
+    \ first, int second) const {\n        assert(0 <= first && first < int(component_of_vertex.size()));\n\
+    \        assert(0 <= second && second < int(component_of_vertex.size()));\n  \
+    \      return component_of_vertex[first] == component_of_vertex[second];\n   \
+    \ }\n};\n\nnamespace internal {\n\n// Maintains every component as a circular\
+    \ linked list. Swapping two successors\n// concatenates two different lists in\
+    \ O(1) time.\nstruct ThreeEdgeComponentCycles {\n    std::vector<int> next;\n\n\
+    \    explicit ThreeEdgeComponentCycles(int n) : next(n) {\n        std::iota(next.begin(),\
     \ next.end(), 0);\n    }\n\n    void unite(int first, int second) {\n        std::swap(next[first],\
     \ next[second]);\n    }\n\n    ThreeEdgeConnectedComponentsResult build_result()\
     \ const {\n        const int n = int(next.size());\n        ThreeEdgeConnectedComponentsResult\
@@ -3430,7 +3492,7 @@ data:
     \   assert(first_component != second_component);\n        result.bridge_forest_edges.push_back(\n\
     \            TwoEdgeConnectedBridge{first_component, second_component, edge_id});\n\
     \    }\n    return result;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\
-    \n\n#line 31 \"graph/undirected.hpp\"\n\n\n"
+    \n\n#line 32 \"graph/undirected.hpp\"\n\n\n"
   code: '#ifndef M1UNE_GRAPH_UNDIRECTED_HPP
 
     #define M1UNE_GRAPH_UNDIRECTED_HPP 1
@@ -3486,6 +3548,8 @@ data:
 
     #include "shortest_path.hpp"
 
+    #include "st_numbering.hpp"
+
     #include "three_edge_connected_components.hpp"
 
     #include "two_edge_connected_components.hpp"
@@ -3532,13 +3596,14 @@ data:
   - graph/k_shortest_walk.hpp
   - graph/warshall_floyd.hpp
   - graph/zero_one_bfs.hpp
+  - graph/st_numbering.hpp
   - graph/three_edge_connected_components.hpp
   - graph/two_edge_connected_components.hpp
   isVerificationFile: false
   path: graph/undirected.hpp
   requiredBy:
   - graph/all.hpp
-  timestamp: '2026-07-16 19:49:13+09:00'
+  timestamp: '2026-07-16 23:38:01+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/graph_algorithms.test.cpp
@@ -3570,6 +3635,7 @@ where direction should not matter.
 | `graph/block_cut_tree.hpp` | Undirected only | Block-cut forest and original-vertex-to-node mappings. |
 | `graph/two_edge_connected_components.hpp` | Undirected only | Two-edge-connected components, bridges, and the contracted bridge forest. |
 | `graph/three_edge_connected_components.hpp` | Undirected only | Linear-time three-edge-connected vertex decomposition. |
+| `graph/st_numbering.hpp` | Undirected only | Bipolar numbering between specified source and sink vertices. |
 | `graph/kruskal.hpp` | Undirected only | Minimum spanning forest. |
 | `graph/matrix_tree_theorem.hpp` | Undirected or directed | Counts weighted spanning trees with a Laplacian cofactor. |
 | `graph/bipartite.hpp` | Direction ignored / explicit bipartite sides | Two-colorability, maximum matching, minimum vertex cover, maximum independent set, and minimum edge cover. |

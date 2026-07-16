@@ -32,6 +32,9 @@ data:
     path: graph/graph.hpp
     title: Graph
   - icon: ':heavy_check_mark:'
+    path: graph/incremental_scc.hpp
+    title: Incremental Strongly Connected Components
+  - icon: ':heavy_check_mark:'
     path: graph/k_shortest_walk.hpp
     title: K-Shortest Walk
   - icon: ':heavy_check_mark:'
@@ -488,6 +491,90 @@ data:
     \ > 0) {\n                chosen_start = vertex;\n                break;\n   \
     \         }\n        }\n    } else if (degree[chosen_start] == 0) {\n        return\
     \ std::nullopt;\n    }\n    return internal::hierholzer(graph, chosen_start, active_edge_count);\n\
+    }\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/incremental_scc.hpp\"\
+    \n\n\n\n#line 9 \"graph/incremental_scc.hpp\"\n\n#line 11 \"graph/incremental_scc.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\nnamespace incremental_scc_detail {\n\
+    \nstruct EdgeEvent {\n    int id;\n    int from;\n    int to;\n};\n\ninline std::vector<int>\
+    \ component_ids(\n    int vertex_count,\n    const std::vector<EdgeEvent>& edges,\n\
+    \    int time\n) {\n    std::vector<int> begin(vertex_count + 1, 0);\n    std::vector<int>\
+    \ reverse_begin(vertex_count + 1, 0);\n    int edge_count = 0;\n    for (const\
+    \ EdgeEvent& edge : edges) {\n        if (edge.id >= time) continue;\n       \
+    \ begin[edge.from + 1]++;\n        reverse_begin[edge.to + 1]++;\n        edge_count++;\n\
+    \    }\n    for (int vertex = 0; vertex < vertex_count; vertex++) {\n        begin[vertex\
+    \ + 1] += begin[vertex];\n        reverse_begin[vertex + 1] += reverse_begin[vertex];\n\
+    \    }\n\n    std::vector<int> adjacency(edge_count);\n    std::vector<int> reverse_adjacency(edge_count);\n\
+    \    std::vector<int> cursor = begin;\n    std::vector<int> reverse_cursor = reverse_begin;\n\
+    \    for (const EdgeEvent& edge : edges) {\n        if (edge.id >= time) continue;\n\
+    \        adjacency[cursor[edge.from]++] = edge.to;\n        reverse_adjacency[reverse_cursor[edge.to]++]\
+    \ = edge.from;\n    }\n    std::vector<int>().swap(cursor);\n    std::vector<int>().swap(reverse_cursor);\n\
+    \n    std::vector<char> visited(vertex_count, false);\n    std::vector<int> next_position(begin.begin(),\
+    \ begin.end() - 1);\n    std::vector<int> order;\n    order.reserve(vertex_count);\n\
+    \    std::vector<int> stack;\n    for (int start = 0; start < vertex_count; start++)\
+    \ {\n        if (visited[start]) continue;\n        visited[start] = true;\n \
+    \       stack.push_back(start);\n        while (!stack.empty()) {\n          \
+    \  const int vertex = stack.back();\n            int& position = next_position[vertex];\n\
+    \            if (position < begin[vertex + 1]) {\n                const int to\
+    \ = adjacency[position++];\n                if (!visited[to]) {\n            \
+    \        visited[to] = true;\n                    stack.push_back(to);\n     \
+    \           }\n            } else {\n                order.push_back(vertex);\n\
+    \                stack.pop_back();\n            }\n        }\n    }\n\n    std::vector<int>\
+    \ component(vertex_count, -1);\n    int component_count = 0;\n    for (auto iterator\
+    \ = order.rbegin(); iterator != order.rend(); ++iterator) {\n        const int\
+    \ start = *iterator;\n        if (component[start] != -1) continue;\n        component[start]\
+    \ = component_count;\n        stack.push_back(start);\n        while (!stack.empty())\
+    \ {\n            const int vertex = stack.back();\n            stack.pop_back();\n\
+    \            for (int position = reverse_begin[vertex];\n                 position\
+    \ < reverse_begin[vertex + 1]; position++) {\n                const int to = reverse_adjacency[position];\n\
+    \                if (component[to] != -1) continue;\n                component[to]\
+    \ = component_count;\n                stack.push_back(to);\n            }\n  \
+    \      }\n        component_count++;\n    }\n    return component;\n}\n\n}  //\
+    \ namespace incremental_scc_detail\n\n// For every directed edge e, returns the\
+    \ first time t after e is inserted such\n// that its endpoints are in the same\
+    \ SCC. At time t, edges with IDs less than\n// t have been inserted. edge_count()\
+    \ + 1 means this never happens.\ntemplate <class T>\nstd::vector<int> incremental_scc(const\
+    \ Graph<T>& graph) {\n    using incremental_scc_detail::EdgeEvent;\n    using\
+    \ incremental_scc_detail::component_ids;\n\n    const int vertex_count = graph.size();\n\
+    \    const int edge_count = graph.edge_count();\n    const int never = edge_count\
+    \ + 1;\n    std::vector<int> merge_time(edge_count, never);\n    if (edge_count\
+    \ == 0) return merge_time;\n\n    std::vector<EdgeEvent> edges_by_id(edge_count);\n\
+    \    std::vector<char> initialized(edge_count, false);\n    for (int vertex =\
+    \ 0; vertex < vertex_count; vertex++) {\n        for (const Edge<T>& edge : graph[vertex])\
+    \ {\n            assert(0 <= edge.id && edge.id < edge_count);\n            assert(!initialized[edge.id]);\n\
+    \            if (initialized[edge.id]) continue;\n            initialized[edge.id]\
+    \ = true;\n            edges_by_id[edge.id] = EdgeEvent{edge.id, edge.from, edge.to};\n\
+    \        }\n    }\n\n    std::vector<EdgeEvent> events;\n    events.reserve(edge_count);\n\
+    \    for (int edge_id = 0; edge_id < edge_count; edge_id++) {\n        assert(initialized[edge_id]);\n\
+    \        if (graph.is_edge_alive(edge_id)) {\n            events.push_back(edges_by_id[edge_id]);\n\
+    \        }\n    }\n    std::vector<EdgeEvent>().swap(edges_by_id);\n    std::vector<char>().swap(initialized);\n\
+    \n    std::vector<int> new_index(vertex_count, -1);\n    auto divide = [&](\n\
+    \        auto&& self,\n        std::vector<EdgeEvent> current,\n        int left,\n\
+    \        int right\n    ) -> void {\n        if (current.empty() || right == left\
+    \ + 1) return;\n        const int middle = left + (right - left) / 2;\n\n    \
+    \    std::vector<int> touched;\n        touched.reserve(std::min(\n          \
+    \  std::size_t(vertex_count),\n            current.size() * 2\n        ));\n \
+    \       int compressed_count = 0;\n        for (const EdgeEvent& edge : current)\
+    \ {\n            if (new_index[edge.from] == -1) {\n                new_index[edge.from]\
+    \ = compressed_count++;\n                touched.push_back(edge.from);\n     \
+    \       }\n            if (new_index[edge.to] == -1) {\n                new_index[edge.to]\
+    \ = compressed_count++;\n                touched.push_back(edge.to);\n       \
+    \     }\n        }\n        for (EdgeEvent& edge : current) {\n            edge.from\
+    \ = new_index[edge.from];\n            edge.to = new_index[edge.to];\n       \
+    \ }\n        for (int vertex : touched) new_index[vertex] = -1;\n\n        std::vector<EdgeEvent>\
+    \ earlier;\n        std::vector<EdgeEvent> later;\n        earlier.reserve(current.size()\
+    \ / 2);\n        later.reserve(current.size() / 2);\n        {\n            std::vector<int>\
+    \ component =\n                component_ids(compressed_count, current, middle);\n\
+    \            for (const EdgeEvent& edge : current) {\n                const int\
+    \ from_component = component[edge.from];\n                const int to_component\
+    \ = component[edge.to];\n                if (edge.id < middle &&\n           \
+    \         from_component == to_component) {\n                    merge_time[edge.id]\
+    \ =\n                        std::min(merge_time[edge.id], middle);\n        \
+    \            earlier.push_back(edge);\n                } else {\n            \
+    \        later.push_back(EdgeEvent{\n                        edge.id,\n      \
+    \                  from_component,\n                        to_component\n   \
+    \                 });\n                }\n            }\n        }\n\n       \
+    \ std::vector<EdgeEvent>().swap(current);\n        self(self, std::move(earlier),\
+    \ left, middle);\n        self(self, std::move(later), middle, right);\n    };\n\
+    \    divide(divide, std::move(events), 0, edge_count + 1);\n    return merge_time;\n\
     }\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/matrix_tree_theorem.hpp\"\
     \n\n\n\n#line 7 \"graph/matrix_tree_theorem.hpp\"\n\n#line 1 \"math/matrix/linear_algebra.hpp\"\
     \n\n\n\n#line 5 \"math/matrix/linear_algebra.hpp\"\n#include <type_traits>\n#line\
@@ -1196,7 +1283,7 @@ data:
     \    assert(_solved && _satisfiable);\n        return _answer;\n    }\n\n    bool\
     \ value(int variable) const {\n        assert(_solved && _satisfiable);\n    \
     \    assert(0 <= variable && variable < _n);\n        return _answer[variable];\n\
-    \    }\n};\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 14 \"graph/directed.hpp\"\
+    \    }\n};\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 15 \"graph/directed.hpp\"\
     \n\n\n"
   code: '#ifndef M1UNE_GRAPH_DIRECTED_HPP
 
@@ -1212,6 +1299,8 @@ data:
     #include "eulerian_trail.hpp"
 
     #include "graph.hpp"
+
+    #include "incremental_scc.hpp"
 
     #include "matrix_tree_theorem.hpp"
 
@@ -1233,6 +1322,7 @@ data:
   - graph/dfs.hpp
   - graph/directed_mst.hpp
   - graph/eulerian_trail.hpp
+  - graph/incremental_scc.hpp
   - graph/matrix_tree_theorem.hpp
   - math/matrix/linear_algebra.hpp
   - math/matrix/matrix.hpp
@@ -1252,7 +1342,7 @@ data:
   path: graph/directed.hpp
   requiredBy:
   - graph/all.hpp
-  timestamp: '2026-07-16 19:40:55+09:00'
+  timestamp: '2026-07-16 23:38:01+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/graph_algorithms.test.cpp
@@ -1281,6 +1371,7 @@ depends on edge direction.
 | `graph/directed_mst.hpp` | Directed rooted graph | Minimum-cost spanning arborescence with edge reconstruction. |
 | `graph/matrix_tree_theorem.hpp` | Directed rooted graph | Counts weighted inward and outward spanning arborescences. |
 | `graph/scc.hpp` | Directed only | Strongly connected components and condensation DAG. |
+| `graph/incremental_scc.hpp` | Directed only | Offline SCC merge times under edge insertions. |
 | `graph/two_sat.hpp` | Implication graph | 2-SAT clauses, satisfiability, and one assignment. |
 | `graph/cycle_detection.hpp` | Directed and undirected variants | Use `find_directed_cycle(g)` for directed graphs. |
 | `graph/eulerian_trail.hpp` | Directed and undirected variants | Use `directed_eulerian_trail(g)` for directed graphs. |

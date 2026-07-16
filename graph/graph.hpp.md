@@ -78,6 +78,9 @@ data:
     path: graph/grid.hpp
     title: Grid
   - icon: ':heavy_check_mark:'
+    path: graph/incremental_scc.hpp
+    title: Incremental Strongly Connected Components
+  - icon: ':heavy_check_mark:'
     path: graph/k_shortest_walk.hpp
     title: K-Shortest Walk
   - icon: ':heavy_check_mark:'
@@ -110,6 +113,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/shortest_path.hpp
     title: Shortest Path
+  - icon: ':heavy_check_mark:'
+    path: graph/st_numbering.hpp
+    title: st-Numbering
   - icon: ':heavy_check_mark:'
     path: graph/three_edge_connected_components.hpp
     title: Three-Edge-Connected Components
@@ -292,6 +298,9 @@ data:
     path: verify/graph/graph_algorithms.test.cpp
     title: verify/graph/graph_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/incremental_scc.test.cpp
+    title: verify/graph/incremental_scc.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/k_shortest_walk.test.cpp
     title: verify/graph/k_shortest_walk.test.cpp
   - icon: ':heavy_check_mark:'
@@ -345,6 +354,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/shortest_path.test.cpp
     title: verify/graph/shortest_path.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/st_numbering.test.cpp
+    title: verify/graph/st_numbering.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/three_edge_connected_components.test.cpp
     title: verify/graph/three_edge_connected_components.test.cpp
@@ -521,6 +533,7 @@ data:
   isVerificationFile: false
   path: graph/graph.hpp
   requiredBy:
+  - graph/incremental_scc.hpp
   - graph/block_cut_tree.hpp
   - graph/enumerate_cliques.hpp
   - graph/dominator_tree.hpp
@@ -543,6 +556,7 @@ data:
   - graph/bellman_ford.hpp
   - graph/grid.hpp
   - graph/directed_mst.hpp
+  - graph/st_numbering.hpp
   - graph/dag_shortest_path.hpp
   - graph/general_weighted_matching.hpp
   - graph/range_edge_graph.hpp
@@ -621,6 +635,7 @@ data:
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/complement_connected_components.test.cpp
   - verify/graph/block_cut_tree.test.cpp
+  - verify/graph/st_numbering.test.cpp
   - verify/graph/enumerate_triangles.test.cpp
   - verify/graph/enumerate_triangles.test.cpp
   - verify/graph/biconnected_components.test.cpp
@@ -657,6 +672,7 @@ data:
   - verify/graph/general_weighted_matching.test.cpp
   - verify/graph/library_checker_general_matching.test.cpp
   - verify/graph/library_checker_general_matching.test.cpp
+  - verify/graph/incremental_scc.test.cpp
 documentation_of: graph/graph.hpp
 layout: document
 title: Graph

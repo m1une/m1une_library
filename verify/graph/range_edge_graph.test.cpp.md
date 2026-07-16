@@ -110,6 +110,9 @@ data:
     path: graph/grid.hpp
     title: Grid
   - icon: ':heavy_check_mark:'
+    path: graph/incremental_scc.hpp
+    title: Incremental Strongly Connected Components
+  - icon: ':heavy_check_mark:'
     path: graph/k_shortest_walk.hpp
     title: K-Shortest Walk
   - icon: ':heavy_check_mark:'
@@ -142,6 +145,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/shortest_path.hpp
     title: Shortest Path
+  - icon: ':heavy_check_mark:'
+    path: graph/st_numbering.hpp
+    title: st-Numbering
   - icon: ':heavy_check_mark:'
     path: graph/three_edge_connected_components.hpp
     title: Three-Edge-Connected Components
@@ -1871,6 +1877,90 @@ data:
     \ > 0) {\n                chosen_start = vertex;\n                break;\n   \
     \         }\n        }\n    } else if (degree[chosen_start] == 0) {\n        return\
     \ std::nullopt;\n    }\n    return internal::hierholzer(graph, chosen_start, active_edge_count);\n\
+    }\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/incremental_scc.hpp\"\
+    \n\n\n\n#line 9 \"graph/incremental_scc.hpp\"\n\n#line 11 \"graph/incremental_scc.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\nnamespace incremental_scc_detail {\n\
+    \nstruct EdgeEvent {\n    int id;\n    int from;\n    int to;\n};\n\ninline std::vector<int>\
+    \ component_ids(\n    int vertex_count,\n    const std::vector<EdgeEvent>& edges,\n\
+    \    int time\n) {\n    std::vector<int> begin(vertex_count + 1, 0);\n    std::vector<int>\
+    \ reverse_begin(vertex_count + 1, 0);\n    int edge_count = 0;\n    for (const\
+    \ EdgeEvent& edge : edges) {\n        if (edge.id >= time) continue;\n       \
+    \ begin[edge.from + 1]++;\n        reverse_begin[edge.to + 1]++;\n        edge_count++;\n\
+    \    }\n    for (int vertex = 0; vertex < vertex_count; vertex++) {\n        begin[vertex\
+    \ + 1] += begin[vertex];\n        reverse_begin[vertex + 1] += reverse_begin[vertex];\n\
+    \    }\n\n    std::vector<int> adjacency(edge_count);\n    std::vector<int> reverse_adjacency(edge_count);\n\
+    \    std::vector<int> cursor = begin;\n    std::vector<int> reverse_cursor = reverse_begin;\n\
+    \    for (const EdgeEvent& edge : edges) {\n        if (edge.id >= time) continue;\n\
+    \        adjacency[cursor[edge.from]++] = edge.to;\n        reverse_adjacency[reverse_cursor[edge.to]++]\
+    \ = edge.from;\n    }\n    std::vector<int>().swap(cursor);\n    std::vector<int>().swap(reverse_cursor);\n\
+    \n    std::vector<char> visited(vertex_count, false);\n    std::vector<int> next_position(begin.begin(),\
+    \ begin.end() - 1);\n    std::vector<int> order;\n    order.reserve(vertex_count);\n\
+    \    std::vector<int> stack;\n    for (int start = 0; start < vertex_count; start++)\
+    \ {\n        if (visited[start]) continue;\n        visited[start] = true;\n \
+    \       stack.push_back(start);\n        while (!stack.empty()) {\n          \
+    \  const int vertex = stack.back();\n            int& position = next_position[vertex];\n\
+    \            if (position < begin[vertex + 1]) {\n                const int to\
+    \ = adjacency[position++];\n                if (!visited[to]) {\n            \
+    \        visited[to] = true;\n                    stack.push_back(to);\n     \
+    \           }\n            } else {\n                order.push_back(vertex);\n\
+    \                stack.pop_back();\n            }\n        }\n    }\n\n    std::vector<int>\
+    \ component(vertex_count, -1);\n    int component_count = 0;\n    for (auto iterator\
+    \ = order.rbegin(); iterator != order.rend(); ++iterator) {\n        const int\
+    \ start = *iterator;\n        if (component[start] != -1) continue;\n        component[start]\
+    \ = component_count;\n        stack.push_back(start);\n        while (!stack.empty())\
+    \ {\n            const int vertex = stack.back();\n            stack.pop_back();\n\
+    \            for (int position = reverse_begin[vertex];\n                 position\
+    \ < reverse_begin[vertex + 1]; position++) {\n                const int to = reverse_adjacency[position];\n\
+    \                if (component[to] != -1) continue;\n                component[to]\
+    \ = component_count;\n                stack.push_back(to);\n            }\n  \
+    \      }\n        component_count++;\n    }\n    return component;\n}\n\n}  //\
+    \ namespace incremental_scc_detail\n\n// For every directed edge e, returns the\
+    \ first time t after e is inserted such\n// that its endpoints are in the same\
+    \ SCC. At time t, edges with IDs less than\n// t have been inserted. edge_count()\
+    \ + 1 means this never happens.\ntemplate <class T>\nstd::vector<int> incremental_scc(const\
+    \ Graph<T>& graph) {\n    using incremental_scc_detail::EdgeEvent;\n    using\
+    \ incremental_scc_detail::component_ids;\n\n    const int vertex_count = graph.size();\n\
+    \    const int edge_count = graph.edge_count();\n    const int never = edge_count\
+    \ + 1;\n    std::vector<int> merge_time(edge_count, never);\n    if (edge_count\
+    \ == 0) return merge_time;\n\n    std::vector<EdgeEvent> edges_by_id(edge_count);\n\
+    \    std::vector<char> initialized(edge_count, false);\n    for (int vertex =\
+    \ 0; vertex < vertex_count; vertex++) {\n        for (const Edge<T>& edge : graph[vertex])\
+    \ {\n            assert(0 <= edge.id && edge.id < edge_count);\n            assert(!initialized[edge.id]);\n\
+    \            if (initialized[edge.id]) continue;\n            initialized[edge.id]\
+    \ = true;\n            edges_by_id[edge.id] = EdgeEvent{edge.id, edge.from, edge.to};\n\
+    \        }\n    }\n\n    std::vector<EdgeEvent> events;\n    events.reserve(edge_count);\n\
+    \    for (int edge_id = 0; edge_id < edge_count; edge_id++) {\n        assert(initialized[edge_id]);\n\
+    \        if (graph.is_edge_alive(edge_id)) {\n            events.push_back(edges_by_id[edge_id]);\n\
+    \        }\n    }\n    std::vector<EdgeEvent>().swap(edges_by_id);\n    std::vector<char>().swap(initialized);\n\
+    \n    std::vector<int> new_index(vertex_count, -1);\n    auto divide = [&](\n\
+    \        auto&& self,\n        std::vector<EdgeEvent> current,\n        int left,\n\
+    \        int right\n    ) -> void {\n        if (current.empty() || right == left\
+    \ + 1) return;\n        const int middle = left + (right - left) / 2;\n\n    \
+    \    std::vector<int> touched;\n        touched.reserve(std::min(\n          \
+    \  std::size_t(vertex_count),\n            current.size() * 2\n        ));\n \
+    \       int compressed_count = 0;\n        for (const EdgeEvent& edge : current)\
+    \ {\n            if (new_index[edge.from] == -1) {\n                new_index[edge.from]\
+    \ = compressed_count++;\n                touched.push_back(edge.from);\n     \
+    \       }\n            if (new_index[edge.to] == -1) {\n                new_index[edge.to]\
+    \ = compressed_count++;\n                touched.push_back(edge.to);\n       \
+    \     }\n        }\n        for (EdgeEvent& edge : current) {\n            edge.from\
+    \ = new_index[edge.from];\n            edge.to = new_index[edge.to];\n       \
+    \ }\n        for (int vertex : touched) new_index[vertex] = -1;\n\n        std::vector<EdgeEvent>\
+    \ earlier;\n        std::vector<EdgeEvent> later;\n        earlier.reserve(current.size()\
+    \ / 2);\n        later.reserve(current.size() / 2);\n        {\n            std::vector<int>\
+    \ component =\n                component_ids(compressed_count, current, middle);\n\
+    \            for (const EdgeEvent& edge : current) {\n                const int\
+    \ from_component = component[edge.from];\n                const int to_component\
+    \ = component[edge.to];\n                if (edge.id < middle &&\n           \
+    \         from_component == to_component) {\n                    merge_time[edge.id]\
+    \ =\n                        std::min(merge_time[edge.id], middle);\n        \
+    \            earlier.push_back(edge);\n                } else {\n            \
+    \        later.push_back(EdgeEvent{\n                        edge.id,\n      \
+    \                  from_component,\n                        to_component\n   \
+    \                 });\n                }\n            }\n        }\n\n       \
+    \ std::vector<EdgeEvent>().swap(current);\n        self(self, std::move(earlier),\
+    \ left, middle);\n        self(self, std::move(later), middle, right);\n    };\n\
+    \    divide(divide, std::move(events), 0, edge_count + 1);\n    return merge_time;\n\
     }\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/matrix_tree_theorem.hpp\"\
     \n\n\n\n#line 7 \"graph/matrix_tree_theorem.hpp\"\n\n#line 1 \"math/matrix/linear_algebra.hpp\"\
     \n\n\n\n#line 7 \"math/matrix/linear_algebra.hpp\"\n\n#line 1 \"math/matrix/matrix.hpp\"\
@@ -2578,7 +2668,7 @@ data:
     \    assert(_solved && _satisfiable);\n        return _answer;\n    }\n\n    bool\
     \ value(int variable) const {\n        assert(_solved && _satisfiable);\n    \
     \    assert(0 <= variable && variable < _n);\n        return _answer[variable];\n\
-    \    }\n};\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 14 \"graph/directed.hpp\"\
+    \    }\n};\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 15 \"graph/directed.hpp\"\
     \n\n\n#line 1 \"graph/dominator_tree.hpp\"\n\n\n\n#line 7 \"graph/dominator_tree.hpp\"\
     \n\n#line 9 \"graph/dominator_tree.hpp\"\n\nnamespace m1une {\nnamespace graph\
     \ {\n\nstruct DominatorTree {\n    int root;\n    std::vector<int> immediate_dominator;\n\
@@ -7297,18 +7387,76 @@ data:
     \n    result.component_count = int(result.cycles.size());\n    return result;\n\
     }\n\ntemplate <class T>\nstd::optional<NamoriDecomposition<T>> decompose_namori(const\
     \ Graph<T>& graph) {\n    return namori_decomposition(graph);\n}\n\n}  // namespace\
-    \ graph\n}  // namespace m1une\n\n\n#line 1 \"graph/three_edge_connected_components.hpp\"\
-    \n\n\n\n#line 9 \"graph/three_edge_connected_components.hpp\"\n\n#line 11 \"graph/three_edge_connected_components.hpp\"\
-    \n\nnamespace m1une {\nnamespace graph {\n\nstruct ThreeEdgeConnectedComponentsResult\
-    \ {\n    std::vector<std::vector<int>> components;\n    std::vector<int> component_of_vertex;\n\
-    \n    int component_count() const {\n        return int(components.size());\n\
-    \    }\n\n    bool same(int first, int second) const {\n        assert(0 <= first\
-    \ && first < int(component_of_vertex.size()));\n        assert(0 <= second &&\
-    \ second < int(component_of_vertex.size()));\n        return component_of_vertex[first]\
-    \ == component_of_vertex[second];\n    }\n};\n\nnamespace internal {\n\n// Maintains\
-    \ every component as a circular linked list. Swapping two successors\n// concatenates\
-    \ two different lists in O(1) time.\nstruct ThreeEdgeComponentCycles {\n    std::vector<int>\
-    \ next;\n\n    explicit ThreeEdgeComponentCycles(int n) : next(n) {\n        std::iota(next.begin(),\
+    \ graph\n}  // namespace m1une\n\n\n#line 1 \"graph/st_numbering.hpp\"\n\n\n\n\
+    #line 6 \"graph/st_numbering.hpp\"\n\n#line 8 \"graph/st_numbering.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace graph {\n\n// Returns ranks p with p[source] = 0 and p[sink]\
+    \ = n - 1 such that every\n// other vertex has neighbors of both smaller and larger\
+    \ rank. Returns an empty\n// vector when no such numbering exists.\ntemplate <class\
+    \ T>\nstd::vector<int> st_numbering(\n    const Graph<T>& graph,\n    int source,\n\
+    \    int sink\n) {\n    const int n = graph.size();\n    assert(0 < n);\n    assert(0\
+    \ <= source && source < n);\n    assert(0 <= sink && sink < n);\n    assert(source\
+    \ != sink);\n\n#ifndef NDEBUG\n    std::vector<int> incidence_count(graph.edge_count(),\
+    \ 0);\n    for (int vertex = 0; vertex < n; vertex++) {\n        for (const Edge<T>&\
+    \ edge : graph[vertex]) {\n            if (!edge.alive) continue;\n          \
+    \  assert(0 <= edge.id && edge.id < graph.edge_count());\n            incidence_count[edge.id]++;\n\
+    \        }\n    }\n    for (int edge_id = 0; edge_id < graph.edge_count(); edge_id++)\
+    \ {\n        if (graph.is_edge_alive(edge_id)) {\n            assert(incidence_count[edge_id]\
+    \ == 2);\n        }\n    }\n#endif\n\n    std::vector<int> parent(n, -1);\n  \
+    \  std::vector<int> preorder(n, -1);\n    std::vector<int> low_vertex(n, -1);\n\
+    \    std::vector<int> next_edge(n, 0);\n    std::vector<int> traversal;\n    traversal.reserve(n);\n\
+    \n    preorder[source] = 0;\n    low_vertex[source] = source;\n    traversal.push_back(source);\n\
+    \    preorder[sink] = 1;\n    low_vertex[sink] = sink;\n    traversal.push_back(sink);\n\
+    \n    std::vector<int> stack(1, sink);\n    while (!stack.empty()) {\n       \
+    \ const int vertex = stack.back();\n        if (next_edge[vertex] < int(graph[vertex].size()))\
+    \ {\n            const Edge<T>& edge = graph[vertex][next_edge[vertex]++];\n \
+    \           if (!edge.alive || edge.to == vertex) continue;\n            const\
+    \ int to = edge.to;\n            if (preorder[to] == -1) {\n                parent[to]\
+    \ = vertex;\n                preorder[to] = int(traversal.size());\n         \
+    \       low_vertex[to] = to;\n                traversal.push_back(to);\n     \
+    \           stack.push_back(to);\n            } else if (preorder[to] < preorder[low_vertex[vertex]])\
+    \ {\n                low_vertex[vertex] = to;\n            }\n            continue;\n\
+    \        }\n\n        stack.pop_back();\n        const int parent_vertex = parent[vertex];\n\
+    \        if (parent_vertex != -1 &&\n            preorder[low_vertex[vertex]]\
+    \ <\n                preorder[low_vertex[parent_vertex]]) {\n            low_vertex[parent_vertex]\
+    \ = low_vertex[vertex];\n        }\n    }\n    if (int(traversal.size()) != n)\
+    \ return {};\n\n    std::vector<int> next(n, -1);\n    std::vector<int> previous(n,\
+    \ -1);\n    std::vector<int> sign(n, 0);\n    next[source] = sink;\n    previous[sink]\
+    \ = source;\n    sign[source] = -1;\n\n    for (int index = 2; index < n; index++)\
+    \ {\n        const int vertex = traversal[index];\n        const int parent_vertex\
+    \ = parent[vertex];\n        assert(parent_vertex != -1);\n        if (sign[low_vertex[vertex]]\
+    \ == -1) {\n            const int before = previous[parent_vertex];\n        \
+    \    if (before == -1) return {};\n            next[before] = vertex;\n      \
+    \      next[vertex] = parent_vertex;\n            previous[vertex] = before;\n\
+    \            previous[parent_vertex] = vertex;\n            sign[parent_vertex]\
+    \ = 1;\n        } else {\n            const int after = next[parent_vertex];\n\
+    \            if (after == -1) return {};\n            next[parent_vertex] = vertex;\n\
+    \            next[vertex] = after;\n            previous[vertex] = parent_vertex;\n\
+    \            previous[after] = vertex;\n            sign[parent_vertex] = -1;\n\
+    \        }\n    }\n\n    std::vector<int> order;\n    order.reserve(n);\n    int\
+    \ vertex = source;\n    while (vertex != -1 && int(order.size()) <= n) {\n   \
+    \     order.push_back(vertex);\n        if (vertex == sink) break;\n        vertex\
+    \ = next[vertex];\n    }\n    if (int(order.size()) != n || order.back() != sink)\
+    \ return {};\n\n    std::vector<int> rank(n, -1);\n    for (int index = 0; index\
+    \ < n; index++) rank[order[index]] = index;\n\n    for (int index = 0; index <\
+    \ n; index++) {\n        const int current = order[index];\n        bool has_smaller\
+    \ = false;\n        bool has_larger = false;\n        for (const Edge<T>& edge\
+    \ : graph[current]) {\n            if (!edge.alive || edge.to == current) continue;\n\
+    \            has_smaller = has_smaller || rank[edge.to] < index;\n           \
+    \ has_larger = has_larger || index < rank[edge.to];\n        }\n        if (index\
+    \ > 0 && !has_smaller) return {};\n        if (index + 1 < n && !has_larger) return\
+    \ {};\n    }\n    return rank;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\
+    \n\n#line 1 \"graph/three_edge_connected_components.hpp\"\n\n\n\n#line 9 \"graph/three_edge_connected_components.hpp\"\
+    \n\n#line 11 \"graph/three_edge_connected_components.hpp\"\n\nnamespace m1une\
+    \ {\nnamespace graph {\n\nstruct ThreeEdgeConnectedComponentsResult {\n    std::vector<std::vector<int>>\
+    \ components;\n    std::vector<int> component_of_vertex;\n\n    int component_count()\
+    \ const {\n        return int(components.size());\n    }\n\n    bool same(int\
+    \ first, int second) const {\n        assert(0 <= first && first < int(component_of_vertex.size()));\n\
+    \        assert(0 <= second && second < int(component_of_vertex.size()));\n  \
+    \      return component_of_vertex[first] == component_of_vertex[second];\n   \
+    \ }\n};\n\nnamespace internal {\n\n// Maintains every component as a circular\
+    \ linked list. Swapping two successors\n// concatenates two different lists in\
+    \ O(1) time.\nstruct ThreeEdgeComponentCycles {\n    std::vector<int> next;\n\n\
+    \    explicit ThreeEdgeComponentCycles(int n) : next(n) {\n        std::iota(next.begin(),\
     \ next.end(), 0);\n    }\n\n    void unite(int first, int second) {\n        std::swap(next[first],\
     \ next[second]);\n    }\n\n    ThreeEdgeConnectedComponentsResult build_result()\
     \ const {\n        const int n = int(next.size());\n        ThreeEdgeConnectedComponentsResult\
@@ -7432,7 +7580,7 @@ data:
     \   assert(first_component != second_component);\n        result.bridge_forest_edges.push_back(\n\
     \            TwoEdgeConnectedBridge{first_component, second_component, edge_id});\n\
     \    }\n    return result;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\
-    \n\n#line 31 \"graph/undirected.hpp\"\n\n\n#line 15 \"graph/all.hpp\"\n\n\n#line\
+    \n\n#line 32 \"graph/undirected.hpp\"\n\n\n#line 15 \"graph/all.hpp\"\n\n\n#line\
     \ 10 \"verify/graph/range_edge_graph.test.cpp\"\n\nusing RangeEdgeGraph = m1une::graph::RangeEdgeGraph<long\
     \ long>;\n\nvoid test_basic() {\n    RangeEdgeGraph range_graph(6);\n    assert(range_graph.size()\
     \ == 6);\n    for (int i = 0; i < 6; i++) assert(range_graph.point_vertex(i) ==\
@@ -7580,6 +7728,7 @@ data:
   - graph/dfs.hpp
   - graph/directed_mst.hpp
   - graph/eulerian_trail.hpp
+  - graph/incremental_scc.hpp
   - graph/matrix_tree_theorem.hpp
   - math/matrix/linear_algebra.hpp
   - math/matrix/matrix.hpp
@@ -7649,12 +7798,13 @@ data:
   - graph/maximum_clique.hpp
   - graph/minimum_steiner_tree.hpp
   - graph/namori.hpp
+  - graph/st_numbering.hpp
   - graph/three_edge_connected_components.hpp
   - graph/two_edge_connected_components.hpp
   isVerificationFile: true
   path: verify/graph/range_edge_graph.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 20:44:42+09:00'
+  timestamp: '2026-07-16 23:38:01+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/range_edge_graph.test.cpp
