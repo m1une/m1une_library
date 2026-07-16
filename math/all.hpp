@@ -27,6 +27,7 @@
 #include "prime_sieve.hpp"
 #include "rational.hpp"
 #include "repunit.hpp"
+#include "set_power_series.hpp"
 #include "stern_brocot_tree.hpp"
 #include "subset_convolution.hpp"
 #include "tetration.hpp"

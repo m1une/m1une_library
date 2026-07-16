@@ -24,6 +24,8 @@ You usually do not need to include this entire bundle:
 * Use `bitwise_convolution.hpp` for OR, AND, or XOR convolution over mask
   indices.
 * Use `subset_convolution.hpp` to combine values indexed by disjoint submasks.
+* Use `set_power_series.hpp` for inverse, division, exponential, logarithm,
+  integer powers, and normalized square roots under subset convolution.
 * Use `multivariate_convolution.hpp` for truncated or cyclic convolution of
   flattened multidimensional arrays.
 * Use `xor_basis.hpp` to maintain the XOR span of a set of unsigned integers.
@@ -103,6 +105,7 @@ few unused headers do not matter.
 | `math/prime_factorization.hpp` | Deterministic 64-bit primality test and Pollard-Rho factorization. |
 | `math/primitive_root.hpp` | Smallest primitive root modulo an integer, when one exists. |
 | `math/repunit.hpp` | Repunits, repdigits, digit-block concatenation, and divisibility lengths. |
+| `math/set_power_series.hpp` | Set-series division, inverse, exponential, logarithm, powers, and square roots. |
 | `math/two_square_sum.hpp` | Enumerates representations as a sum of two non-negative squares. |
 | `math/xor_basis.hpp` | XOR linear basis with membership, optimization, merging, and ordered enumeration. |
 | `math/tetration.hpp` | Modular tetration, arbitrary power towers, and bounded tower comparison. |
