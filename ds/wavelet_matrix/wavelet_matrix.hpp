@@ -1,6 +1,7 @@
 #ifndef M1UNE_DS_WAVELET_MATRIX_WAVELET_MATRIX_HPP
 #define M1UNE_DS_WAVELET_MATRIX_WAVELET_MATRIX_HPP 1
 
+#include <algorithm>
 #include <bit>
 #include <cassert>
 #include <concepts>
@@ -10,6 +11,10 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+
+#if defined(__AVX2__) || defined(__BMI2__)
+#include <immintrin.h>
+#endif
 
 namespace m1une {
 namespace ds {
@@ -39,15 +44,11 @@ struct WaveletMatrix {
         BitVector() = default;
 
         explicit BitVector(int n)
-            : bits((std::size_t(n) + 63) >> 6, 0),
-              prefix(bits.size() + 1, 0) {}
-
-        void set(int p) {
-            bits[std::size_t(p) >> 6] |= std::uint64_t(1) << (p & 63);
-        }
+            : bits(((std::size_t(n) + 63) >> 6) + 1, 0),
+              prefix(bits.size(), 0) {}
 
         void build() {
-            for (std::size_t i = 0; i < bits.size(); i++) {
+            for (std::size_t i = 0; i + 1 < bits.size(); i++) {
                 prefix[i + 1] = prefix[i] + std::popcount(bits[i]);
             }
         }
@@ -60,11 +61,17 @@ struct WaveletMatrix {
             std::size_t word = std::size_t(r) >> 6;
             int offset = r & 63;
             int result = prefix[word];
+#if defined(__BMI2__)
+            result += std::popcount(
+                _bzhi_u64(bits[word], static_cast<unsigned int>(offset))
+            );
+#else
             if (offset != 0) {
                 result += std::popcount(
                     bits[word] & ((std::uint64_t(1) << offset) - 1)
                 );
             }
+#endif
             return result;
         }
     };
@@ -98,6 +105,43 @@ struct WaveletMatrix {
 
     bool bit(unsigned_type value, int level) const {
         return (value >> (_log - 1 - level)) & unsigned_type(1);
+    }
+
+    static std::uint64_t extract_bits(
+        const unsigned_type* values,
+        int count,
+        int shift
+    ) {
+        std::uint64_t result = 0;
+        int i = 0;
+#if defined(__AVX2__)
+        if constexpr (sizeof(unsigned_type) == 8) {
+            __m128i left = _mm_cvtsi32_si128(63 - shift);
+            for (; i + 4 <= count; i += 4) {
+                __m256i data = _mm256_loadu_si256(
+                    reinterpret_cast<const __m256i*>(values + i)
+                );
+                data = _mm256_sll_epi64(data, left);
+                int mask = _mm256_movemask_pd(_mm256_castsi256_pd(data));
+                result |= std::uint64_t(mask) << i;
+            }
+        } else if constexpr (sizeof(unsigned_type) == 4) {
+            __m128i left = _mm_cvtsi32_si128(31 - shift);
+            for (; i + 8 <= count; i += 8) {
+                __m256i data = _mm256_loadu_si256(
+                    reinterpret_cast<const __m256i*>(values + i)
+                );
+                data = _mm256_sll_epi32(data, left);
+                int mask = _mm256_movemask_ps(_mm256_castsi256_ps(data));
+                result |= std::uint64_t(mask) << i;
+            }
+        }
+#endif
+        for (; i < count; i++) {
+            result |= std::uint64_t((values[i] >> shift) & unsigned_type(1))
+                      << i;
+        }
+        return result;
     }
 
     int count_less_encoded(int l, int r, unsigned_type upper) const {
@@ -147,31 +191,47 @@ struct WaveletMatrix {
         }
         _log = int(std::bit_width(unsigned_type(_min_key ^ _max_key)));
         if (_log != value_bit_width) {
-            _key_prefix = (_min_key >> _log) << _log;
+            _key_prefix = unsigned_type((_min_key >> _log) << _log);
         }
         _zero_count.assign(_log, 0);
 
         _matrix.reserve(_log);
         for (int level = 0; level < _log; level++) {
             _matrix.emplace_back(_n);
+            BitVector& bit_vector = _matrix.back();
+            int shift = _log - 1 - level;
             int zeros = 0;
-            for (int i = 0; i < _n; i++) {
-                if (bit(current[i], level)) {
-                    _matrix.back().set(i);
-                } else {
-                    zeros++;
-                }
+            for (int base = 0; base < _n; base += 64) {
+                int count = std::min(64, _n - base);
+                std::uint64_t word = extract_bits(
+                    current.data() + base,
+                    count,
+                    shift
+                );
+                bit_vector.bits[std::size_t(base) >> 6] = word;
+                zeros += count - std::popcount(word);
             }
-            _matrix.back().build();
+            bit_vector.build();
 
             _zero_count[level] = zeros;
             int zero_pos = 0;
             int one_pos = zeros;
-            for (unsigned_type value : current) {
-                if (bit(value, level)) {
-                    next[one_pos++] = value;
-                } else {
-                    next[zero_pos++] = value;
+            for (int base = 0; base < _n; base += 64) {
+                int count = std::min(64, _n - base);
+                std::uint64_t ones = bit_vector.bits[std::size_t(base) >> 6];
+                std::uint64_t valid = count == 64
+                                          ? ~std::uint64_t(0)
+                                          : (std::uint64_t(1) << count) - 1;
+                std::uint64_t zeroes = (~ones) & valid;
+                while (zeroes != 0) {
+                    int offset = std::countr_zero(zeroes);
+                    next[zero_pos++] = current[base + offset];
+                    zeroes &= zeroes - 1;
+                }
+                while (ones != 0) {
+                    int offset = std::countr_zero(ones);
+                    next[one_pos++] = current[base + offset];
+                    ones &= ones - 1;
                 }
             }
             current.swap(next);

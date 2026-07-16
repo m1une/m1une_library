@@ -29,6 +29,11 @@ level, the elements routed to the zero side form another wavelet matrix over
 their first components. These inner matrices restrict each outer rank step to
 the requested first-component interval.
 
+Packed levels are built one machine word at a time and partitioned from their
+zero and one masks. Temporary compressed-coordinate buffers are moved into
+inner matrices when possible. AVX2 bit extraction and BMI2 rank masking are
+used when enabled at compile time, with compact scalar fallbacks.
+
 The sequence is immutable after construction.
 
 ## Template Parameters and Types

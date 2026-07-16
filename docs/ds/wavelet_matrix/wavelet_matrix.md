@@ -14,6 +14,13 @@ are ordered by flipping their sign bit internally, so negative values and the
 full range of the selected integer type work without coordinate compression.
 Leading bits shared by every value are omitted.
 
+Construction packs each level one machine word at a time and performs stable
+partitioning by iterating the packed zero and one masks. This avoids an
+unpredictable branch for every input value. AVX2 is used for bit extraction and
+BMI2 for rank masking when those instruction sets are enabled at compile time;
+otherwise the same compact bit and prefix arrays use portable scalar
+operations.
+
 ## Template Parameter
 
 * `T`: A non-`bool` integral type.

@@ -20,6 +20,11 @@ additive data.
 Signed values are ordered across their full type range by an internal sign-bit
 transform. No coordinate compression is required.
 
+Levels are packed and stable-partitioned one machine word at a time, avoiding
+an unpredictable branch for every value. AVX2 bit extraction and BMI2 rank
+masking are selected when the corresponding instruction sets are enabled at
+compile time, with compact scalar fallbacks otherwise.
+
 ## Template Parameters
 
 * `T`: A non-`bool` integral value type used for ordering.
