@@ -307,13 +307,13 @@ data:
   isVerificationFile: false
   path: ds/wavelet_matrix/wavelet_matrix.hpp
   requiredBy:
-  - ds/range_query/static_range_count_distinct.hpp
   - ds/range_query/range_lis_query.hpp
+  - ds/range_query/static_range_count_distinct.hpp
   timestamp: '2026-07-16 18:47:36+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/range_query/range_lis_query.test.cpp
   - verify/ds/range_query/static_range_count_distinct.test.cpp
+  - verify/ds/range_query/range_lis_query.test.cpp
   - verify/ds/wavelet_matrix/wavelet_matrix.test.cpp
 documentation_of: ds/wavelet_matrix/wavelet_matrix.hpp
 layout: document

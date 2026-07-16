@@ -262,21 +262,21 @@ data:
   isVerificationFile: false
   path: graph/tree/rooted_tree.hpp
   requiredBy:
-  - graph/tree/zero_one_on_tree.hpp
-  - graph/tree/all.hpp
-  - graph/tree/range_contour_query.hpp
-  - graph/tree/tree.hpp
   - graph/all.hpp
+  - graph/tree/tree.hpp
+  - graph/tree/all.hpp
+  - graph/tree/zero_one_on_tree.hpp
+  - graph/tree/range_contour_query.hpp
   timestamp: '2026-07-11 19:47:32+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/graph/graph_algorithms.test.cpp
   - verify/graph/cow_game.test.cpp
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
-  - verify/graph/tree/vertex_get_range_contour_add_on_tree.test.cpp
   - verify/graph/tree/tree_algorithms.test.cpp
+  - verify/graph/tree/vertex_get_range_contour_add_on_tree.test.cpp
   - verify/graph/tree/zero_one_on_tree.test.cpp
-  - verify/graph/graph_algorithms.test.cpp
 documentation_of: graph/tree/rooted_tree.hpp
 layout: document
 title: Rooted Tree

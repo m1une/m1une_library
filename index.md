@@ -569,6 +569,9 @@ data:
       path: graph/connected_components.hpp
       title: Connected Components
     - icon: ':heavy_check_mark:'
+      path: graph/count_four_cycles.hpp
+      title: Count Four Cycles
+    - icon: ':heavy_check_mark:'
       path: graph/counting.hpp
       title: Graph Counting
     - icon: ':heavy_check_mark:'
@@ -1620,6 +1623,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/graph/complement_connected_components.test.cpp
       title: verify/graph/complement_connected_components.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/count_four_cycles.test.cpp
+      title: verify/graph/count_four_cycles.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/graph/counting_spanning_tree_directed.test.cpp
       title: verify/graph/counting_spanning_tree_directed.test.cpp

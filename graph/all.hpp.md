@@ -35,6 +35,9 @@ data:
     path: graph/connected_components.hpp
     title: Connected Components
   - icon: ':heavy_check_mark:'
+    path: graph/count_four_cycles.hpp
+    title: Count Four Cycles
+  - icon: ':heavy_check_mark:'
     path: graph/counting.hpp
     title: Graph Counting
   - icon: ':heavy_check_mark:'
@@ -5565,7 +5568,91 @@ data:
     \                    queue.push(candidate);\n                }\n             \
     \   candidate = following;\n            }\n        }\n    }\n    result.count\
     \ = int(result.groups.size());\n    return result;\n}\n\n}  // namespace graph\n\
-    }  // namespace m1une\n\n\n#line 1 \"graph/enumerate_cliques.hpp\"\n\n\n\n#line\
+    }  // namespace m1une\n\n\n#line 1 \"graph/count_four_cycles.hpp\"\n\n\n\n#line\
+    \ 6 \"graph/count_four_cycles.hpp\"\n#include <tuple>\n#line 9 \"graph/count_four_cycles.hpp\"\
+    \n\n#line 11 \"graph/count_four_cycles.hpp\"\n\nnamespace m1une {\nnamespace graph\
+    \ {\n\nnamespace four_cycle_detail {\n\n// Counts C4s containing one particular\
+    \ copy of each edge in a simple graph\n// whose edge weights represent parallel-edge\
+    \ multiplicities.\ninline std::vector<long long> count_simple_per_edge(\n    int\
+    \ vertex_count,\n    std::vector<int> first,\n    std::vector<int> second,\n \
+    \   const std::vector<long long>& multiplicity\n) {\n    const int edge_count\
+    \ = int(first.size());\n    assert(second.size() == first.size());\n    assert(multiplicity.size()\
+    \ == first.size());\n\n    std::vector<int> degree(vertex_count, 0);\n    for\
+    \ (int edge = 0; edge < edge_count; edge++) {\n        degree[first[edge]]++;\n\
+    \        degree[second[edge]]++;\n    }\n\n    int maximum_degree = 0;\n    for\
+    \ (int value : degree) maximum_degree = std::max(maximum_degree, value);\n   \
+    \ std::vector<int> degree_start(maximum_degree + 2, 0);\n    for (int value :\
+    \ degree) degree_start[value + 1]++;\n    for (int value = 0; value <= maximum_degree;\
+    \ value++) {\n        degree_start[value + 1] += degree_start[value];\n    }\n\
+    \    std::vector<int> cursor = degree_start;\n    std::vector<int> order(vertex_count);\n\
+    \    for (int vertex = 0; vertex < vertex_count; vertex++) {\n        order[cursor[degree[vertex]]++]\
+    \ = vertex;\n    }\n    std::vector<int> rank(vertex_count);\n    for (int i =\
+    \ 0; i < vertex_count; i++) rank[order[i]] = i;\n    for (int edge = 0; edge <\
+    \ edge_count; edge++) {\n        first[edge] = rank[first[edge]];\n        second[edge]\
+    \ = rank[second[edge]];\n        if (first[edge] < second[edge]) {\n         \
+    \   std::swap(first[edge], second[edge]);\n        }\n    }\n\n    std::vector<int>\
+    \ start(vertex_count + 1, 0);\n    for (int vertex = 0; vertex < vertex_count;\
+    \ vertex++) {\n        start[vertex + 1] = start[vertex] + degree[order[vertex]];\n\
+    \    }\n    std::vector<int> end = start;\n    std::vector<int> edge_at(2 * edge_count);\n\
+    \    std::vector<int> to(2 * edge_count);\n    for (int edge = 0; edge < edge_count;\
+    \ edge++) {\n        int position = end[first[edge]]++;\n        edge_at[position]\
+    \ = edge;\n        to[position] = second[edge];\n    }\n\n    std::vector<int>\
+    \ downward_end = end;\n    for (int vertex = 0; vertex < vertex_count; vertex++)\
+    \ {\n        for (int i = start[vertex]; i < downward_end[vertex]; i++) {\n  \
+    \          int edge = edge_at[i];\n            int neighbor = to[i];\n       \
+    \     int position = end[neighbor]++;\n            edge_at[position] = edge;\n\
+    \            to[position] = vertex;\n        }\n    }\n\n    std::vector<long\
+    \ long> path_count(vertex_count, 0);\n    std::vector<long long> result(edge_count,\
+    \ 0);\n    for (int vertex = vertex_count - 1; vertex >= 0; vertex--) {\n    \
+    \    for (int i = start[vertex]; i < end[vertex]; i++) {\n            int first_edge\
+    \ = edge_at[i];\n            int middle = to[i];\n            end[middle]--;\n\
+    \            for (int j = start[middle]; j < end[middle]; j++) {\n           \
+    \     int second_edge = edge_at[j];\n                int opposite = to[j];\n \
+    \               path_count[opposite] +=\n                    multiplicity[first_edge]\
+    \ * multiplicity[second_edge];\n            }\n        }\n\n        for (int i\
+    \ = start[vertex]; i < end[vertex]; i++) {\n            int first_edge = edge_at[i];\n\
+    \            int middle = to[i];\n            for (int j = start[middle]; j <\
+    \ end[middle]; j++) {\n                int second_edge = edge_at[j];\n       \
+    \         int opposite = to[j];\n                long long other_paths =\n   \
+    \                 path_count[opposite] -\n                    multiplicity[first_edge]\
+    \ * multiplicity[second_edge];\n                result[first_edge] +=\n      \
+    \              other_paths * multiplicity[second_edge];\n                result[second_edge]\
+    \ +=\n                    other_paths * multiplicity[first_edge];\n          \
+    \  }\n        }\n\n        for (int i = start[vertex]; i < end[vertex]; i++) {\n\
+    \            int middle = to[i];\n            for (int j = start[middle]; j <\
+    \ end[middle]; j++) {\n                path_count[to[j]] = 0;\n            }\n\
+    \        }\n    }\n    return result;\n}\n\n}  // namespace four_cycle_detail\n\
+    \n// Returns, for every graph edge id, the number of C4 subgraphs containing it.\n\
+    // Parallel active edges are distinct choices; inactive edges receive zero.\n\
+    template <class T>\nstd::vector<long long> count_four_cycles_per_edge(const Graph<T>&\
+    \ graph) {\n    struct ActiveEdge {\n        int first;\n        int second;\n\
+    \        int id;\n    };\n\n    std::vector<ActiveEdge> active_edges;\n    active_edges.reserve(graph.edge_count());\n\
+    \    for (const Edge<T>& edge : graph.edges()) {\n        assert(edge.from !=\
+    \ edge.to);\n        assert(0 <= edge.id && edge.id < graph.edge_count());\n \
+    \       if (edge.from == edge.to) continue;\n        active_edges.push_back(ActiveEdge{\n\
+    \            std::min(edge.from, edge.to),\n            std::max(edge.from, edge.to),\n\
+    \            edge.id\n        });\n    }\n    std::sort(\n        active_edges.begin(),\n\
+    \        active_edges.end(),\n        [](const ActiveEdge& left, const ActiveEdge&\
+    \ right) {\n            return std::tie(left.first, left.second) <\n         \
+    \          std::tie(right.first, right.second);\n        }\n    );\n\n    std::vector<int>\
+    \ first;\n    std::vector<int> second;\n    std::vector<long long> multiplicity;\n\
+    \    std::vector<int> group_of_edge(graph.edge_count(), -1);\n    first.reserve(active_edges.size());\n\
+    \    second.reserve(active_edges.size());\n    multiplicity.reserve(active_edges.size());\n\
+    \    for (const ActiveEdge& edge : active_edges) {\n        if (first.empty()\
+    \ || first.back() != edge.first ||\n            second.back() != edge.second)\
+    \ {\n            first.push_back(edge.first);\n            second.push_back(edge.second);\n\
+    \            multiplicity.push_back(0);\n        }\n        multiplicity.back()++;\n\
+    \        group_of_edge[edge.id] = int(first.size()) - 1;\n    }\n\n    std::vector<long\
+    \ long> simple_result =\n        four_cycle_detail::count_simple_per_edge(\n \
+    \           graph.size(),\n            std::move(first),\n            std::move(second),\n\
+    \            multiplicity\n        );\n    std::vector<long long> result(graph.edge_count(),\
+    \ 0);\n    for (const ActiveEdge& edge : active_edges) {\n        result[edge.id]\
+    \ = simple_result[group_of_edge[edge.id]];\n    }\n    return result;\n}\n\ntemplate\
+    \ <class T>\nlong long count_four_cycles(const Graph<T>& graph) {\n    std::vector<long\
+    \ long> per_edge = count_four_cycles_per_edge(graph);\n    long long incidence_count\
+    \ = 0;\n    for (long long count : per_edge) incidence_count += count;\n    assert(incidence_count\
+    \ % 4 == 0);\n    return incidence_count / 4;\n}\n\n}  // namespace graph\n} \
+    \ // namespace m1une\n\n\n#line 1 \"graph/enumerate_cliques.hpp\"\n\n\n\n#line\
     \ 8 \"graph/enumerate_cliques.hpp\"\n\n#line 10 \"graph/enumerate_cliques.hpp\"\
     \n\nnamespace m1une {\nnamespace graph {\n\n// Invokes callback once for every\
     \ nonempty clique. The callback receives a\n// const reference to a temporary\
@@ -7114,7 +7201,7 @@ data:
     \   assert(first_component != second_component);\n        result.bridge_forest_edges.push_back(\n\
     \            TwoEdgeConnectedBridge{first_component, second_component, edge_id});\n\
     \    }\n    return result;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\
-    \n\n#line 30 \"graph/undirected.hpp\"\n\n\n#line 15 \"graph/all.hpp\"\n\n\n"
+    \n\n#line 31 \"graph/undirected.hpp\"\n\n\n#line 15 \"graph/all.hpp\"\n\n\n"
   code: '#ifndef M1UNE_GRAPH_ALL_HPP
 
     #define M1UNE_GRAPH_ALL_HPP 1
@@ -7220,6 +7307,7 @@ data:
   - graph/complement_connected_components.hpp
   - graph/connected_components.hpp
   - ds/dsu/dsu.hpp
+  - graph/count_four_cycles.hpp
   - graph/enumerate_cliques.hpp
   - graph/enumerate_triangles.hpp
   - graph/general_matching.hpp
@@ -7234,12 +7322,12 @@ data:
   isVerificationFile: false
   path: graph/all.hpp
   requiredBy: []
-  timestamp: '2026-07-16 19:40:55+09:00'
+  timestamp: '2026-07-16 19:49:13+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/graph/graph_algorithms.test.cpp
   - verify/graph/cow_game.test.cpp
   - verify/graph/range_edge_graph.test.cpp
-  - verify/graph/graph_algorithms.test.cpp
 documentation_of: graph/all.hpp
 layout: document
 title: Graph All
@@ -7299,6 +7387,7 @@ Public namespaces stay flat and short: general graph helpers use
 | `graph/replacement_paths.hpp` | Undirected positive-weight graphs | Edge- and vertex-failure replacement distances along one fixed shortest path. |
 | `graph/namori.hpp` | Undirected Namori graph | Decomposes each unicyclic component into its cycle and attached rooted trees. |
 | `graph/connected_components.hpp` | Direction ignored | Weak/ordinary connected components. |
+| `graph/count_four_cycles.hpp` | Direction ignored | Counts four-cycles globally and for every edge, including parallel-edge choices. |
 | `graph/cycle_detection.hpp` | Directed and undirected variants | Finds one cycle with the matching function. |
 | `graph/enumerate_cliques.hpp` | Direction ignored | Enumerates every nonempty clique through a callback. |
 | `graph/enumerate_triangles.hpp` | Direction ignored | Enumerates every triangle through a callback. |

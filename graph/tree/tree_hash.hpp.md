@@ -226,16 +226,16 @@ data:
   isVerificationFile: false
   path: graph/tree/tree_hash.hpp
   requiredBy:
-  - graph/tree/all.hpp
   - graph/all.hpp
+  - graph/tree/all.hpp
   timestamp: '2026-07-11 19:47:32+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/graph/graph_algorithms.test.cpp
   - verify/graph/cow_game.test.cpp
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
   - verify/graph/tree/tree_algorithms.test.cpp
-  - verify/graph/graph_algorithms.test.cpp
 documentation_of: graph/tree/tree_hash.hpp
 layout: document
 title: Hash of Tree
