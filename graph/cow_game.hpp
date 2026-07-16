@@ -13,8 +13,8 @@ namespace graph {
 
 template <class T>
 struct CowGameConstraint {
-    int from;
-    int to;
+    int a;
+    int b;
     T upper_bound;
 };
 
@@ -74,6 +74,8 @@ class CowGame {
 
     int _n;
     std::vector<CowGameConstraint<T>> _constraints;
+    std::vector<std::vector<int>> _outgoing_constraints;
+    bool _has_negative_upper_bound = false;
     mutable bool _solution_cached = false;
     mutable CowGameSolution<T> _cached_solution;
 
@@ -87,14 +89,14 @@ class CowGame {
         return -value;
     }
 
-    RelaxationResult relax(std::vector<T> dist, T inf, bool skip_unreachable) const {
+    RelaxationResult check_feasibility() const {
+        std::vector<T> dist(_n, T());
         for (int iteration = 0; iteration < _n; iteration++) {
             bool updated = false;
             for (const auto& constraint : _constraints) {
-                if (skip_unreachable && dist[constraint.from] == inf) continue;
-                T candidate = dist[constraint.from] + constraint.upper_bound;
-                if (dist[constraint.to] <= candidate) continue;
-                dist[constraint.to] = candidate;
+                T candidate = dist[constraint.b] + constraint.upper_bound;
+                if (dist[constraint.a] <= candidate) continue;
+                dist[constraint.a] = candidate;
                 updated = true;
                 if (iteration == _n - 1) return RelaxationResult{true, std::move(dist)};
             }
@@ -103,20 +105,85 @@ class CowGame {
         return RelaxationResult{false, std::move(dist)};
     }
 
-    RelaxationResult check_feasibility() const {
-        return relax(std::vector<T>(_n, T()), T(), false);
-    }
-
-    RelaxationResult shortest_paths(int source, T inf) const {
+    std::vector<T> shortest_paths(int source, T inf) const {
+        const auto& potential = _cached_solution.value;
         std::vector<T> dist(_n, inf);
+        std::vector<int> heap;
+        // -1 is unseen, -2 is fixed, and every other value is a heap index.
+        std::vector<int> position(_n, -1);
+        heap.reserve(_n);
+
+        auto swap_heap = [&](int i, int j) {
+            std::swap(heap[i], heap[j]);
+            position[heap[i]] = i;
+            position[heap[j]] = j;
+        };
+        auto sift_up = [&](int i) {
+            while (i > 0) {
+                int parent = (i - 1) / 2;
+                if (dist[heap[parent]] <= dist[heap[i]]) break;
+                swap_heap(parent, i);
+                i = parent;
+            }
+        };
+        auto sift_down = [&](int i) {
+            while (2 * i + 1 < int(heap.size())) {
+                int child = 2 * i + 1;
+                if (child + 1 < int(heap.size()) &&
+                    dist[heap[child + 1]] < dist[heap[child]]) {
+                    child++;
+                }
+                if (dist[heap[i]] <= dist[heap[child]]) break;
+                swap_heap(i, child);
+                i = child;
+            }
+        };
+
         dist[source] = T();
-        return relax(std::move(dist), inf, true);
+        position[source] = 0;
+        heap.push_back(source);
+
+        while (!heap.empty()) {
+            int b = heap[0];
+            position[b] = -2;
+            int last = heap.back();
+            heap.pop_back();
+            if (!heap.empty()) {
+                heap[0] = last;
+                position[last] = 0;
+                sift_down(0);
+            }
+
+            for (int id : _outgoing_constraints[b]) {
+                const auto& constraint = _constraints[id];
+                T cost = constraint.upper_bound + potential[b] -
+                         potential[constraint.a];
+                assert(cost >= T());
+                T candidate = dist[b] + cost;
+                if (dist[constraint.a] <= candidate) continue;
+                dist[constraint.a] = candidate;
+                assert(position[constraint.a] != -2);
+                if (position[constraint.a] == -1) {
+                    position[constraint.a] = int(heap.size());
+                    heap.push_back(constraint.a);
+                }
+                sift_up(position[constraint.a]);
+            }
+        }
+
+        for (int v = 0; v < _n; v++) {
+            if (dist[v] == inf) continue;
+            dist[v] = dist[v] - potential[source] + potential[v];
+        }
+        return dist;
     }
 
    public:
     CowGame() : CowGame(0) {}
 
-    explicit CowGame(int variable_count) : _n(variable_count) {
+    explicit CowGame(int variable_count)
+        : _n(variable_count),
+          _outgoing_constraints(variable_count < 0 ? 0 : variable_count) {
         assert(variable_count >= 0);
     }
 
@@ -137,40 +204,48 @@ class CowGame {
         return _constraints;
     }
 
-    int add_upper_bound(int from, int to, T upper_bound) {
-        assert_variable(from);
-        assert_variable(to);
+    int add_upper_bound(int a, int b, T upper_bound) {
+        assert_variable(a);
+        assert_variable(b);
         int id = int(_constraints.size());
-        _constraints.push_back(CowGameConstraint<T>{from, to, upper_bound});
+        _constraints.push_back(CowGameConstraint<T>{a, b, upper_bound});
+        _outgoing_constraints[b].push_back(id);
+        _has_negative_upper_bound = _has_negative_upper_bound || upper_bound < T();
         _solution_cached = false;
         return id;
     }
 
-    int add_constraint(int from, int to, T upper_bound) {
-        return add_upper_bound(from, to, upper_bound);
+    int add_constraint(int a, int b, T upper_bound) {
+        return add_upper_bound(a, b, upper_bound);
     }
 
-    int add_lower_bound(int from, int to, T lower_bound) {
-        return add_upper_bound(to, from, negate(lower_bound));
+    int add_lower_bound(int a, int b, T lower_bound) {
+        return add_upper_bound(b, a, negate(lower_bound));
     }
 
-    void add_bounds(int from, int to, T lower_bound, T upper_bound) {
+    void add_bounds(int a, int b, T lower_bound, T upper_bound) {
         assert(lower_bound <= upper_bound);
-        add_lower_bound(from, to, lower_bound);
-        add_upper_bound(from, to, upper_bound);
+        add_lower_bound(a, b, lower_bound);
+        add_upper_bound(a, b, upper_bound);
     }
 
-    void add_equality(int from, int to, T difference) {
-        add_bounds(from, to, difference, difference);
+    void add_equality(int a, int b, T difference) {
+        add_bounds(a, b, difference, difference);
     }
 
     CowGameSolution<T> solve() const {
         if (_solution_cached) return _cached_solution;
 
-        auto result = check_feasibility();
-        _cached_solution.feasible = !result.has_negative_cycle;
-        _cached_solution.value.clear();
-        if (_cached_solution.feasible) _cached_solution.value = std::move(result.dist);
+        _cached_solution.feasible = true;
+        _cached_solution.value.assign(_n, T());
+        if (_has_negative_upper_bound) {
+            auto result = check_feasibility();
+            _cached_solution.feasible = !result.has_negative_cycle;
+            _cached_solution.value.clear();
+            if (_cached_solution.feasible) {
+                _cached_solution.value = std::move(result.dist);
+            }
+        }
         _solution_cached = true;
         return _cached_solution;
     }
@@ -189,23 +264,23 @@ class CowGame {
         result.upper_bound.assign(_n, inf);
         if (!result.feasible) return result;
 
-        result.upper_bound = shortest_paths(source, inf).dist;
+        result.upper_bound = shortest_paths(source, inf);
         return result;
     }
 
-    CowGameDifferenceBounds<T> difference_bounds(int from, int to) const {
-        assert_variable(from);
-        assert_variable(to);
+    CowGameDifferenceBounds<T> difference_bounds(int a, int b) const {
+        assert_variable(a);
+        assert_variable(b);
         T inf = std::numeric_limits<T>::max() / T(4);
         CowGameDifferenceBounds<T> result;
         result.feasible = is_feasible();
         if (!result.feasible) return result;
 
-        auto forward = shortest_paths(from, inf);
-        if (forward.dist[to] != inf) result.upper_bound = forward.dist[to];
+        auto upper = shortest_paths(b, inf);
+        if (upper[a] != inf) result.upper_bound = upper[a];
 
-        auto backward = shortest_paths(to, inf);
-        if (backward.dist[from] != inf) result.lower_bound = negate(backward.dist[from]);
+        auto lower = shortest_paths(a, inf);
+        if (lower[b] != inf) result.lower_bound = negate(lower[b]);
         return result;
     }
 };
