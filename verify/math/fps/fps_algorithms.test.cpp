@@ -4,6 +4,7 @@
 #include <cstdint>
 #include "../../../utilities/fast_io.hpp"
 #include <random>
+#include <utility>
 #include <vector>
 
 #include "../../../math/fps/all.hpp"
@@ -17,6 +18,66 @@ template <class Mint>
 void assert_equal(const std::vector<Mint>& lhs, const std::vector<Mint>& rhs) {
     assert(lhs.size() == rhs.size());
     for (int i = 0; i < int(lhs.size()); i++) assert(lhs[i] == rhs[i]);
+}
+
+template <class Mint>
+bool has_recurrence_of_order(const std::vector<Mint>& sequence, int order) {
+    assert(0 <= order && order <= int(sequence.size()));
+    const int equation_count = int(sequence.size()) - order;
+    std::vector<std::vector<Mint>> matrix(
+        equation_count, std::vector<Mint>(order + 1)
+    );
+    for (int row = 0; row < equation_count; row++) {
+        const int index = order + row;
+        for (int i = 0; i < order; i++) {
+            matrix[row][i] = sequence[index - i - 1];
+        }
+        matrix[row][order] = sequence[index];
+    }
+
+    int pivot_row = 0;
+    for (int column = 0; column < order && pivot_row < equation_count; column++) {
+        int pivot = pivot_row;
+        while (pivot < equation_count && matrix[pivot][column] == Mint(0)) pivot++;
+        if (pivot == equation_count) continue;
+        std::swap(matrix[pivot_row], matrix[pivot]);
+
+        const Mint inverse = Mint(1) / matrix[pivot_row][column];
+        for (int j = column; j <= order; j++) matrix[pivot_row][j] *= inverse;
+        for (int row = pivot_row + 1; row < equation_count; row++) {
+            const Mint scale = matrix[row][column];
+            if (scale == Mint(0)) continue;
+            for (int j = column; j <= order; j++) {
+                matrix[row][j] -= scale * matrix[pivot_row][j];
+            }
+        }
+        pivot_row++;
+    }
+
+    for (int row = pivot_row; row < equation_count; row++) {
+        bool all_zero = true;
+        for (int column = 0; column < order; column++) {
+            if (matrix[row][column] != Mint(0)) all_zero = false;
+        }
+        if (all_zero && matrix[row][order] != Mint(0)) return false;
+    }
+    return true;
+}
+
+template <class Mint>
+void assert_recurrence(const std::vector<Mint>& sequence,
+                       const std::vector<Mint>& recurrence) {
+    const int order = int(recurrence.size());
+    for (int index = order; index < int(sequence.size()); index++) {
+        Mint expected = 0;
+        for (int i = 0; i < order; i++) {
+            expected += recurrence[i] * sequence[index - i - 1];
+        }
+        assert(sequence[index] == expected);
+    }
+    for (int smaller = 0; smaller < order; smaller++) {
+        assert(!has_recurrence_of_order(sequence, smaller));
+    }
 }
 
 void test_convolution() {
@@ -127,6 +188,31 @@ void test_multipoint_and_recurrence() {
             previous = current;
             current = next;
         }
+    }
+
+    assert(m1une::fps::berlekamp_massey(std::vector<mint>()).empty());
+    assert(m1une::fps::berlekamp_massey(std::vector<mint>(20)).empty());
+
+    std::vector<mint> fibonacci = {0, 1};
+    for (int i = 2; i < 30; i++) {
+        fibonacci.push_back(fibonacci[i - 1] + fibonacci[i - 2]);
+    }
+    std::vector<mint> fibonacci_recurrence =
+        m1une::fps::berlekamp_massey(fibonacci);
+    assert_equal(fibonacci_recurrence, std::vector<mint>{1, 1});
+
+    std::vector<mint> suffix_zero = {1, 0, 0, 0, 0, 0};
+    std::vector<mint> suffix_zero_recurrence =
+        m1une::fps::berlekamp_massey(suffix_zero);
+    assert_equal(suffix_zero_recurrence, std::vector<mint>{0});
+
+    std::mt19937 recurrence_rng(2481632);
+    for (int iteration = 0; iteration < 300; iteration++) {
+        const int size = int(recurrence_rng() % 17);
+        std::vector<mint> sequence(size);
+        for (mint& value : sequence) value = mint(recurrence_rng() % 11);
+        std::vector<mint> found = m1une::fps::berlekamp_massey(sequence);
+        assert_recurrence(sequence, found);
     }
 }
 

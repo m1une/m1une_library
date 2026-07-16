@@ -2,13 +2,60 @@
 #define M1UNE_FPS_LINEAR_RECURRENCE_HPP 1
 
 #include <cassert>
+#include <cstddef>
 #include <cstdint>
+#include <utility>
 #include <vector>
 
 #include "formal_power_series.hpp"
 
 namespace m1une {
 namespace fps {
+
+// Returns a shortest linear recurrence satisfied by the observed sequence.
+// The returned coefficients use
+// a[n] = recurrence[0] * a[n - 1] + ... + recurrence[d - 1] * a[n - d].
+template <class Mint>
+std::vector<Mint> berlekamp_massey(const std::vector<Mint>& sequence) {
+    std::vector<Mint> connection(1, Mint(1));
+    std::vector<Mint> previous(1, Mint(1));
+    int order = 0;
+    int shift = 1;
+    Mint previous_discrepancy = Mint(1);
+
+    for (int index = 0; index < int(sequence.size()); index++) {
+        Mint discrepancy = sequence[index];
+        for (int i = 1; i <= order; i++) {
+            discrepancy += connection[i] * sequence[index - i];
+        }
+        if (discrepancy == Mint(0)) {
+            shift++;
+            continue;
+        }
+
+        const Mint scale = discrepancy / previous_discrepancy;
+        std::vector<Mint> old_connection = connection;
+        if (connection.size() < previous.size() + std::size_t(shift)) {
+            connection.resize(previous.size() + std::size_t(shift));
+        }
+        for (int i = 0; i < int(previous.size()); i++) {
+            connection[i + shift] -= scale * previous[i];
+        }
+
+        if (2 * order <= index) {
+            order = index + 1 - order;
+            previous = std::move(old_connection);
+            previous_discrepancy = discrepancy;
+            shift = 1;
+        } else {
+            shift++;
+        }
+    }
+
+    std::vector<Mint> recurrence(order);
+    for (int i = 0; i < order; i++) recurrence[i] = Mint(0) - connection[i + 1];
+    return recurrence;
+}
 
 template <class Mint>
 Mint coefficient_of_rational(FormalPowerSeries<Mint> numerator,

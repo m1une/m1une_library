@@ -13,8 +13,8 @@ int main() {
     m1une::utilities::FastInput input;
     m1une::utilities::FastOutput output;
 
-    int order;
-    uint64_t index;
+    int order = 0;
+    uint64_t index = 0;
     input.read(order, index);
     std::vector<mint> initial(order), recurrence(order);
     input.read(initial);
