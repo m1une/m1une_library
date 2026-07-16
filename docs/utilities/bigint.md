@@ -6,30 +6,51 @@ documentation_of: ../../utilities/bigint.hpp
 ## Overview
 
 An arbitrary-precision signed integer for competitive programming. Digits are
-stored in base $10^9$ blocks.
+stored in little-endian base-$10^9$ blocks.
 
-It supports arithmetic, comparisons, and standard stream input and output.
+Large products use exact number-theoretic convolution after splitting each
+block into base-$1000$ digits. Large quotients use a normalized Newton
+reciprocal and the same fast multiplication. Small inputs use schoolbook
+fallbacks to avoid transform overhead. No floating-point rounding is involved.
 
 ## Methods
 
 | Method / Operator | Description | Complexity |
 | --- | --- | --- |
 | `BigInt()` | Initializes the value to `0`. | $O(1)$ |
-| `BigInt(long long v)` | Initializes the BigInt from a standard 64-bit integer. | $O(1)$ |
-| `BigInt(const std::string& s)` | Parses a base-10 string (with optional `+`/`-` prefix). | $O(N)$ |
-| `std::string to_string() const` | Converts the BigInt back to a base-10 string. | $O(N)$ |
-| `BigInt abs() const` | Returns the absolute value of the BigInt. | $O(N)$ |
-| `operator+`, `operator+=` | Adds two BigInts. | $O(N)$ |
-| `operator-`, `operator-=` | Subtracts one BigInt from another. | $O(N)$ |
-| `operator*`, `operator*=` | Multiplies two BigInts (Standard Long Multiplication). | $O(N \cdot M)$ |
-| `operator/`, `operator/=` | Divides the BigInt by another (Integer division). | $O(N \cdot M)$ |
-| `operator%`, `operator%=` | Calculates the remainder of division by another BigInt. | $O(N \cdot M)$ |
-| `divmod(a, b)` | Returns `std::pair<BigInt, BigInt>` containing `{a / b, a % b}`. | $O(N \cdot M)$ |
-| Relational Operators | `<, >, <=, >=, ==, !=` are all fully supported. | $O(N)$ |
-| Stream Operators | `<<` (output) and `>>` (input) integration. | $O(N)$ |
+| `BigInt(long long value)` | Initializes from a signed 64-bit integer. | $O(1)$ |
+| `BigInt(const std::string& text)` | Parses decimal text with optional `+` or `-`. | $O(N)$ |
+| `BigInt& operator=(long long value)` | Assigns a signed 64-bit integer. | $O(1)$ |
+| `BigInt& operator=(const std::string& text)` | Assigns parsed decimal text. | $O(N)$ |
+| `void read(const std::string& text)` | Replaces the value with parsed decimal text. | $O(N)$ |
+| `void trim()` | Removes leading zero blocks and canonicalizes zero. | $O(N)$ |
+| `std::string to_string() const` | Returns the decimal representation. | $O(N)$ |
+| `bool is_zero() const` | Tests whether the value is zero. | $O(1)$ |
+| `BigInt operator-() const` | Returns the negated value. | $O(N)$ |
+| `BigInt abs() const` | Returns the absolute value. | $O(N)$ |
+| `operator+`, `operator+=` | Adds two values. | $O(N+M)$ |
+| `operator-`, `operator-=` | Subtracts two values. | $O(N+M)$ |
+| `BigInt& operator*=(int value)` | Multiplies by a machine integer. | $O(N)$ |
+| `operator*`, `operator*=(const BigInt&)` | Multiplies two values using exact convolution for large inputs. | $O((N+M)\log(N+M))$; $O(NM)$ for the small-input fallback |
+| `operator/`, `operator/=` | Returns the quotient, truncated toward zero. | $O(N\log N)$ on the Newton path; $O(NM)$ for the bounded fallback |
+| `operator%`, `operator%=` | Returns the remainder associated with truncated division. | Same as division |
+| `divmod(const BigInt& a, const BigInt& b)` | Returns `std::pair<BigInt, BigInt>` containing `a / b` and `a % b`. | Same as division |
+| `<`, `>`, `<=`, `>=`, `==`, `!=` | Compares two values. | $O(N+M)$ |
+| `operator<<`, `operator>>` | Writes or reads decimal text through standard streams. | $O(N)$ |
 
-Here, $N$ and $M$ denote the number of base-$10^9$ blocks in the operands.
-Division by zero throws `std::domain_error`.
+Here, $N$ is the number of base-$10^9$ blocks in the larger or dividend
+operand, and $M$ is the number in the other operand. Fast multiplication and
+division use $O(N+M)$ auxiliary memory.
+
+For compatibility, `a` (the limb vector) and `sign` remain public. Directly
+modified values must keep every limb in `[0, BASE)`, remove high zero limbs,
+and use a sign of `1` or `-1`; normal construction and arithmetic maintain
+these invariants automatically.
+
+Division is C++-style signed integer division: the quotient is truncated toward
+zero, `a == (a / b) * b + a % b`, the nonzero remainder has the sign of `a`,
+and its absolute value is smaller than `abs(b)`. Division by zero throws
+`std::domain_error`.
 
 ## Example
 
@@ -45,14 +66,14 @@ int main() {
 
     BigInt sum = a + b;
     BigInt diff = a - b;
-    BigInt prod = a * b;
+    BigInt product = a * b;
 
     // std::pair<BigInt, BigInt>
     auto [quotient, remainder] = divmod(a, b);
 
     std::cout << "Sum: " << sum << "\n";
     std::cout << "Difference: " << diff << "\n";
-    std::cout << "Product: " << prod << "\n";
+    std::cout << "Product: " << product << "\n";
     std::cout << "Quotient: " << quotient << " R: " << remainder << "\n";
 
     if (a > b) {
