@@ -1,6 +1,6 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/range_kth_smallest"
 
-#include "../../../ds/range_query/wavelet_matrix_2d.hpp"
+#include "../../../ds/wavelet_matrix/wavelet_matrix_2d.hpp"
 
 #include <algorithm>
 #include <cassert>

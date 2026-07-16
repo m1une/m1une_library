@@ -1,6 +1,6 @@
 ---
 title: Wavelet Matrix 2D
-documentation_of: ../../../ds/range_query/wavelet_matrix_2d.hpp
+documentation_of: ../../../ds/wavelet_matrix/wavelet_matrix_2d.hpp
 ---
 
 ## Overview
@@ -104,7 +104,7 @@ not mutate the structure.
 ## Example
 
 ```cpp
-#include "ds/range_query/wavelet_matrix_2d.hpp"
+#include "ds/wavelet_matrix/wavelet_matrix_2d.hpp"
 
 #include <cassert>
 #include <utility>

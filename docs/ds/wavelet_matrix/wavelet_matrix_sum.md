@@ -1,6 +1,6 @@
 ---
 title: Wavelet Matrix with Sums
-documentation_of: ../../../ds/range_query/wavelet_matrix_sum.hpp
+documentation_of: ../../../ds/wavelet_matrix/wavelet_matrix_sum.hpp
 ---
 
 ## Overview
@@ -73,7 +73,7 @@ index order, while `sum_k_largest` selects them in reverse original index order.
 ## Example
 
 ```cpp
-#include "ds/range_query/wavelet_matrix_sum.hpp"
+#include "ds/wavelet_matrix/wavelet_matrix_sum.hpp"
 
 #include <iostream>
 #include <vector>

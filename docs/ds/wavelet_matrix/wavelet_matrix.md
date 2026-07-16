@@ -1,6 +1,6 @@
 ---
 title: Wavelet Matrix
-documentation_of: ../../../ds/range_query/wavelet_matrix.hpp
+documentation_of: ../../../ds/wavelet_matrix/wavelet_matrix.hpp
 ---
 
 ## Overview
@@ -54,7 +54,7 @@ For range sums or weights attached to values, use `WaveletMatrixSum`.
 ## Example
 
 ```cpp
-#include "ds/range_query/wavelet_matrix.hpp"
+#include "ds/wavelet_matrix/wavelet_matrix.hpp"
 
 #include <iostream>
 #include <vector>

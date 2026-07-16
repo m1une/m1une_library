@@ -1,5 +1,5 @@
-#ifndef M1UNE_WAVELET_MATRIX_HPP
-#define M1UNE_WAVELET_MATRIX_HPP 1
+#ifndef M1UNE_DS_WAVELET_MATRIX_WAVELET_MATRIX_HPP
+#define M1UNE_DS_WAVELET_MATRIX_WAVELET_MATRIX_HPP 1
 
 #include <bit>
 #include <cassert>
@@ -253,4 +253,4 @@ struct WaveletMatrix {
 }  // namespace ds
 }  // namespace m1une
 
-#endif  // M1UNE_WAVELET_MATRIX_HPP
+#endif  // M1UNE_DS_WAVELET_MATRIX_WAVELET_MATRIX_HPP

@@ -1,5 +1,5 @@
-#ifndef M1UNE_WAVELET_MATRIX_2D_HPP
-#define M1UNE_WAVELET_MATRIX_2D_HPP 1
+#ifndef M1UNE_DS_WAVELET_MATRIX_WAVELET_MATRIX_2D_HPP
+#define M1UNE_DS_WAVELET_MATRIX_WAVELET_MATRIX_2D_HPP 1
 
 #include <algorithm>
 #include <bit>
@@ -436,4 +436,4 @@ class WaveletMatrix2D {
 }  // namespace ds
 }  // namespace m1une
 
-#endif  // M1UNE_WAVELET_MATRIX_2D_HPP
+#endif  // M1UNE_DS_WAVELET_MATRIX_WAVELET_MATRIX_2D_HPP

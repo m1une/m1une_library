@@ -1,5 +1,5 @@
-#ifndef M1UNE_WAVELET_MATRIX_SUM_HPP
-#define M1UNE_WAVELET_MATRIX_SUM_HPP 1
+#ifndef M1UNE_DS_WAVELET_MATRIX_WAVELET_MATRIX_SUM_HPP
+#define M1UNE_DS_WAVELET_MATRIX_WAVELET_MATRIX_SUM_HPP 1
 
 #include <bit>
 #include <cassert>
@@ -372,4 +372,4 @@ struct WaveletMatrixSum {
 }  // namespace ds
 }  // namespace m1une
 
-#endif  // M1UNE_WAVELET_MATRIX_SUM_HPP
+#endif  // M1UNE_DS_WAVELET_MATRIX_WAVELET_MATRIX_SUM_HPP

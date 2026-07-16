@@ -1,7 +1,7 @@
 #ifndef M1UNE_DS_RANGE_QUERY_RANGE_LIS_QUERY_HPP
 #define M1UNE_DS_RANGE_QUERY_RANGE_LIS_QUERY_HPP 1
 
-#include "wavelet_matrix.hpp"
+#include "../wavelet_matrix/wavelet_matrix.hpp"
 
 #include <algorithm>
 #include <cassert>

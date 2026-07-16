@@ -7,7 +7,7 @@
 #include <utility>
 #include <vector>
 
-#include "wavelet_matrix_sum.hpp"
+#include "../wavelet_matrix/wavelet_matrix_sum.hpp"
 
 namespace m1une {
 namespace ds {
