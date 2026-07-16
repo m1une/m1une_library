@@ -5,11 +5,34 @@
 #include "../../../monoid/xor.hpp"
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include "../../../utilities/fast_io.hpp"
 #include <random>
 #include <utility>
 #include <vector>
+
+struct Permutation3Group {
+    using value_type = std::array<int, 3>;
+
+    static value_type id() {
+        return {0, 1, 2};
+    }
+
+    static value_type op(const value_type& first, const value_type& second) {
+        value_type result;
+        for (int i = 0; i < 3; i++) result[i] = second[first[i]];
+        return result;
+    }
+
+    static value_type inv(const value_type& value) {
+        value_type result;
+        for (int i = 0; i < 3; i++) result[value[i]] = i;
+        return result;
+    }
+};
+
+static_assert(m1une::monoid::IsGroup<Permutation3Group>);
 
 template <class Group>
 struct NaivePotentializedDsu {
@@ -136,6 +159,38 @@ void self_test() {
     assert(!xor_ok_bad);
     assert(xor_b.diff(0, 2) == (5 ^ 6));
     assert(xor_bad.diff(0, 2) == (5 ^ 6));
+
+    using Permutation = Permutation3Group::value_type;
+    using PermutationDsu =
+        m1une::ds::PersistentPotentializedDsu<Permutation3Group>;
+    Permutation rotate = {1, 2, 0};
+    Permutation swap_last = {0, 2, 1};
+    Permutation swap_first = {1, 0, 2};
+    assert(Permutation3Group::op(rotate, swap_last) !=
+           Permutation3Group::op(swap_last, rotate));
+
+    PermutationDsu permutation_base(4);
+    auto [permutation_a, permutation_ok1] =
+        permutation_base.merge(0, 1, rotate);
+    auto [permutation_b, permutation_ok2] =
+        permutation_a.merge(1, 2, swap_last);
+    auto [permutation_c, permutation_ok3] =
+        permutation_b.merge(3, 2, swap_first);
+    Permutation composed = Permutation3Group::op(rotate, swap_last);
+    auto [permutation_bad, permutation_bad_ok] =
+        permutation_c.merge(0, 2, Permutation3Group::op(swap_last, rotate));
+    assert(permutation_ok1);
+    assert(permutation_ok2);
+    assert(permutation_ok3);
+    assert(!permutation_bad_ok);
+    assert(!permutation_base.same(0, 1));
+    assert(permutation_b.diff(0, 2) == composed);
+    assert(permutation_b.diff(2, 0) == Permutation3Group::inv(composed));
+    assert(permutation_c.diff(3, 2) == swap_first);
+    assert(permutation_c.diff(3, 0) == Permutation3Group::op(
+        swap_first, Permutation3Group::inv(composed)
+    ));
+    assert(permutation_bad.diff(0, 2) == composed);
 
     AddDsu empty;
     assert(empty.size() == 0);

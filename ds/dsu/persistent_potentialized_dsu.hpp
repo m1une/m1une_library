@@ -13,7 +13,7 @@
 namespace m1une {
 namespace ds {
 
-template <m1une::monoid::IsCommutativeGroup Group>
+template <m1une::monoid::IsGroup Group>
     requires std::equality_comparable<typename Group::value_type>
 struct PersistentPotentializedDsu {
     using T = typename Group::value_type;

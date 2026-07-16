@@ -6,13 +6,17 @@ documentation_of: ../../../ds/dsu/persistent_potentialized_dsu.hpp
 ## Overview
 
 `PersistentPotentializedDsu` is a persistent weighted Union-Find over a
-commutative group. Merge operations return a new version and leave the old
-version available, while preserving potential differences inside each component.
+possibly noncommutative group. Merge operations return a new version and leave
+the old version available, while preserving potential differences inside each
+component.
 
 The template parameter is a type satisfying
-`m1une::monoid::IsCommutativeGroup`. The stored constraint for
+`m1une::monoid::IsGroup`. The stored constraint for
 `merge(a, b, w)` is `diff(a, b) == w`, where `diff(a, b)` is
 `Group::op(Group::inv(potential(a)), potential(b))`.
+
+Operation order is significant: if `P(v) = potential(v)`, the constraint is
+`inv(P(a)) * P(b) = w`, or equivalently `P(b) = P(a) * w`.
 
 For `m1une::monoid::Add<long long>`, this means:
 
@@ -29,7 +33,7 @@ for stable values.
 
 ## Template Parameters
 
-* `Group`: A type satisfying `m1une::monoid::IsCommutativeGroup`.
+* `Group`: A type satisfying `m1une::monoid::IsGroup`.
 
 The group value type must be equality comparable so repeated constraints can be
 checked for consistency.
