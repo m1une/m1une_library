@@ -57,6 +57,7 @@ Public namespaces stay flat and short: general graph helpers use
 | `graph/namori.hpp` | Undirected Namori graph | Decomposes each unicyclic component into its cycle and attached rooted trees. |
 | `graph/connected_components.hpp` | Direction ignored | Weak/ordinary connected components. |
 | `graph/cycle_detection.hpp` | Directed and undirected variants | Finds one cycle with the matching function. |
+| `graph/enumerate_cliques.hpp` | Direction ignored | Enumerates every nonempty clique through a callback. |
 | `graph/enumerate_triangles.hpp` | Direction ignored | Enumerates every triangle through a callback. |
 | `graph/eulerian_trail.hpp` | Directed and undirected variants | Hierholzer Eulerian trails with original edge IDs. |
 | `graph/kruskal.hpp` | Undirected only | Minimum spanning forest. |

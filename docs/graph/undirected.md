@@ -35,6 +35,7 @@ where direction should not matter.
 | `graph/namori.hpp` | Undirected Namori graph | Ordered cycles and the trees attached to them. |
 | `graph/connected_components.hpp` | Direction ignored | Weak/ordinary connected components. |
 | `graph/cycle_detection.hpp` | Directed and undirected variants | Use `find_undirected_cycle(g)` for undirected graphs. |
+| `graph/enumerate_cliques.hpp` | Direction ignored | Enumerates every nonempty clique through a callback. |
 | `graph/enumerate_triangles.hpp` | Direction ignored | Enumerates every triangle through a callback. |
 | `graph/eulerian_trail.hpp` | Directed and undirected variants | Use `undirected_eulerian_trail(g)` for undirected graphs. |
 | `graph/grid.hpp` | Undirected graph builder | Builds 4/8-neighbor grid graphs. |

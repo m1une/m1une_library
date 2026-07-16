@@ -9,6 +9,7 @@
 #include "complement_connected_components.hpp"
 #include "connected_components.hpp"
 #include "cycle_detection.hpp"
+#include "enumerate_cliques.hpp"
 #include "enumerate_triangles.hpp"
 #include "eulerian_trail.hpp"
 #include "general_matching.hpp"
