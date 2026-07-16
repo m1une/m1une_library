@@ -67,8 +67,8 @@ data:
   timestamp: '2026-07-13 04:27:33+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/string/string_algorithms.test.cpp
   - verify/string/kmp.test.cpp
+  - verify/string/string_algorithms.test.cpp
 documentation_of: string/kmp.hpp
 layout: document
 title: Knuth-Morris-Pratt

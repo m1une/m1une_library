@@ -250,8 +250,8 @@ data:
   timestamp: '2026-07-10 18:39:32+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/rectangle_union_area.test.cpp
+  - verify/geometry/geometry_algorithms.test.cpp
 documentation_of: geometry/rectangle_union_area.hpp
 layout: document
 title: Area of Union of Rectangles

@@ -39,82 +39,83 @@ data:
     \ result = prefix[word];\n            if (offset != 0) {\n                result\
     \ += std::popcount(\n                    bits[word] & ((std::uint64_t(1) << offset)\
     \ - 1)\n                );\n            }\n            return result;\n      \
-    \  }\n\n        int rank0(int r) const {\n            return r - rank1(r);\n \
-    \       }\n    };\n\n    class RankWaveletMatrix {\n       private:\n        int\
-    \ _n = 0;\n        int _alphabet_size = 0;\n        int _log = 0;\n        std::vector<BitVector>\
+    \  }\n    };\n\n    class RankWaveletMatrix {\n       private:\n        int _n\
+    \ = 0;\n        int _alphabet_size = 0;\n        int _log = 0;\n        std::vector<BitVector>\
     \ _matrix;\n        std::vector<int> _zero_count;\n\n        bool bit(int value,\
     \ int level) const {\n            return (value >> (_log - 1 - level)) & 1;\n\
     \        }\n\n        int count_less(int l, int r, int upper) const {\n      \
     \      if (upper <= 0) return 0;\n            if (upper >= _alphabet_size) return\
     \ r - l;\n\n            int result = 0;\n            for (int level = 0; level\
-    \ < _log; level++) {\n                int l0 = _matrix[level].rank0(l);\n    \
-    \            int r0 = _matrix[level].rank0(r);\n                if (bit(upper,\
-    \ level)) {\n                    result += r0 - l0;\n                    l = _zero_count[level]\
-    \ + _matrix[level].rank1(l);\n                    r = _zero_count[level] + _matrix[level].rank1(r);\n\
-    \                } else {\n                    l = l0;\n                    r\
-    \ = r0;\n                }\n            }\n            return result;\n      \
-    \  }\n\n       public:\n        RankWaveletMatrix() = default;\n\n        RankWaveletMatrix(\n\
-    \            const std::vector<int>& values,\n            int alphabet_size\n\
-    \        ) {\n            build(values, alphabet_size);\n        }\n\n       \
-    \ void build(const std::vector<int>& values, int alphabet_size) {\n          \
-    \  assert(alphabet_size >= 0);\n            _n = int(values.size());\n       \
-    \     _alphabet_size = alphabet_size;\n            _log = alphabet_size == 0\n\
-    \                       ? 0\n                       : std::max(\n            \
-    \                 1,\n                             int(std::bit_width(unsigned(alphabet_size\
+    \ < _log; level++) {\n                int l1 = _matrix[level].rank1(l);\n    \
+    \            int r1 = _matrix[level].rank1(r);\n                if (bit(upper,\
+    \ level)) {\n                    result += (r - l) - (r1 - l1);\n            \
+    \        l = _zero_count[level] + l1;\n                    r = _zero_count[level]\
+    \ + r1;\n                } else {\n                    l -= l1;\n            \
+    \        r -= r1;\n                }\n            }\n            return result;\n\
+    \        }\n\n       public:\n        RankWaveletMatrix() = default;\n\n     \
+    \   RankWaveletMatrix(\n            const std::vector<int>& values,\n        \
+    \    int alphabet_size\n        ) {\n            build(values, alphabet_size);\n\
+    \        }\n\n        void build(const std::vector<int>& values, int alphabet_size)\
+    \ {\n            assert(alphabet_size >= 0);\n            _n = int(values.size());\n\
+    \            _alphabet_size = alphabet_size;\n            _log = alphabet_size\
+    \ == 0\n                       ? 0\n                       : std::max(\n     \
+    \                        1,\n                             int(std::bit_width(unsigned(alphabet_size\
     \ - 1)))\n                         );\n\n            _matrix.clear();\n      \
     \      _matrix.reserve(_log);\n            _zero_count.assign(_log, 0);\n    \
     \        std::vector<int> current(values);\n            std::vector<int> next(_n);\n\
     \            for (int value : values) {\n                assert(0 <= value &&\
     \ value < alphabet_size);\n                (void)value;\n            }\n\n   \
     \         for (int level = 0; level < _log; level++) {\n                _matrix.emplace_back(_n);\n\
-    \                for (int i = 0; i < _n; i++) {\n                    if (bit(current[i],\
-    \ level)) _matrix.back().set(i);\n                }\n                _matrix.back().build();\n\
-    \n                int zeros = _matrix.back().rank0(_n);\n                _zero_count[level]\
-    \ = zeros;\n                int zero_position = 0;\n                int one_position\
-    \ = zeros;\n                for (int value : current) {\n                    if\
-    \ (bit(value, level)) {\n                        next[one_position++] = value;\n\
-    \                    } else {\n                        next[zero_position++] =\
-    \ value;\n                    }\n                }\n                current.swap(next);\n\
-    \            }\n        }\n\n        int range_freq(int l, int r, int lower, int\
-    \ upper) const {\n            assert(0 <= l && l <= r && r <= _n);\n         \
-    \   if (upper <= lower) return 0;\n            return count_less(l, r, upper)\
-    \ - count_less(l, r, lower);\n        }\n    };\n\n    int _n = 0;\n    int _log\
-    \ = 0;\n    std::vector<value_type> _values;\n    std::vector<X> _first_coordinates;\n\
-    \    std::vector<Y> _second_coordinates;\n    RankWaveletMatrix _first_matrix;\n\
-    \    std::vector<BitVector> _matrix;\n    std::vector<int> _zero_count;\n    std::vector<RankWaveletMatrix>\
-    \ _zero_first_matrix;\n\n    template <class T>\n    static bool equal(const T&\
-    \ first, const T& second) {\n        return !(first < second) && !(second < first);\n\
-    \    }\n\n    template <class T>\n    static void sort_unique(std::vector<T>&\
-    \ values) {\n        std::sort(values.begin(), values.end());\n        values.erase(\n\
-    \            std::unique(\n                values.begin(),\n                values.end(),\n\
-    \                [](const T& first, const T& second) {\n                    return\
-    \ equal(first, second);\n                }\n            ),\n            values.end()\n\
-    \        );\n    }\n\n    bool bit(int value, int level) const {\n        return\
-    \ (value >> (_log - 1 - level)) & 1;\n    }\n\n    int first_lower_bound(const\
-    \ X& value) const {\n        return int(\n            std::lower_bound(\n    \
-    \            _first_coordinates.begin(),\n                _first_coordinates.end(),\n\
-    \                value\n            ) - _first_coordinates.begin()\n        );\n\
-    \    }\n\n    int second_lower_bound(const Y& value) const {\n        return int(\n\
-    \            std::lower_bound(\n                _second_coordinates.begin(),\n\
-    \                _second_coordinates.end(),\n                value\n         \
-    \   ) - _second_coordinates.begin()\n        );\n    }\n\n    int count_first_rank(\n\
-    \        int l,\n        int r,\n        int first_lower,\n        int first_upper\n\
-    \    ) const {\n        return _first_matrix.range_freq(l, r, first_lower, first_upper);\n\
-    \    }\n\n    int count_second_less(\n        int l,\n        int r,\n       \
-    \ int first_lower,\n        int first_upper,\n        int second_upper\n    )\
-    \ const {\n        if (second_upper <= 0) return 0;\n        if (second_upper\
-    \ >= int(_second_coordinates.size())) {\n            return count_first_rank(l,\
-    \ r, first_lower, first_upper);\n        }\n\n        int result = 0;\n      \
-    \  for (int level = 0; level < _log; level++) {\n            int l0 = _matrix[level].rank0(l);\n\
-    \            int r0 = _matrix[level].rank0(r);\n            if (bit(second_upper,\
+    \                int zeros = 0;\n                for (int i = 0; i < _n; i++)\
+    \ {\n                    if (bit(current[i], level)) {\n                     \
+    \   _matrix.back().set(i);\n                    } else {\n                   \
+    \     zeros++;\n                    }\n                }\n                _matrix.back().build();\n\
+    \n                _zero_count[level] = zeros;\n                int zero_position\
+    \ = 0;\n                int one_position = zeros;\n                for (int value\
+    \ : current) {\n                    if (bit(value, level)) {\n               \
+    \         next[one_position++] = value;\n                    } else {\n      \
+    \                  next[zero_position++] = value;\n                    }\n   \
+    \             }\n                current.swap(next);\n            }\n        }\n\
+    \n        int range_freq(int l, int r, int lower, int upper) const {\n       \
+    \     assert(0 <= l && l <= r && r <= _n);\n            if (upper <= lower) return\
+    \ 0;\n            return count_less(l, r, upper) - count_less(l, r, lower);\n\
+    \        }\n    };\n\n    int _n = 0;\n    int _log = 0;\n    std::vector<value_type>\
+    \ _values;\n    std::vector<X> _first_coordinates;\n    std::vector<Y> _second_coordinates;\n\
+    \    RankWaveletMatrix _first_matrix;\n    std::vector<BitVector> _matrix;\n \
+    \   std::vector<int> _zero_count;\n    std::vector<RankWaveletMatrix> _zero_first_matrix;\n\
+    \n    template <class T>\n    static bool equal(const T& first, const T& second)\
+    \ {\n        return !(first < second) && !(second < first);\n    }\n\n    template\
+    \ <class T>\n    static void sort_unique(std::vector<T>& values) {\n        std::sort(values.begin(),\
+    \ values.end());\n        values.erase(\n            std::unique(\n          \
+    \      values.begin(),\n                values.end(),\n                [](const\
+    \ T& first, const T& second) {\n                    return equal(first, second);\n\
+    \                }\n            ),\n            values.end()\n        );\n   \
+    \ }\n\n    bool bit(int value, int level) const {\n        return (value >> (_log\
+    \ - 1 - level)) & 1;\n    }\n\n    int first_lower_bound(const X& value) const\
+    \ {\n        return int(\n            std::lower_bound(\n                _first_coordinates.begin(),\n\
+    \                _first_coordinates.end(),\n                value\n          \
+    \  ) - _first_coordinates.begin()\n        );\n    }\n\n    int second_lower_bound(const\
+    \ Y& value) const {\n        return int(\n            std::lower_bound(\n    \
+    \            _second_coordinates.begin(),\n                _second_coordinates.end(),\n\
+    \                value\n            ) - _second_coordinates.begin()\n        );\n\
+    \    }\n\n    int count_first_rank(\n        int l,\n        int r,\n        int\
+    \ first_lower,\n        int first_upper\n    ) const {\n        return _first_matrix.range_freq(l,\
+    \ r, first_lower, first_upper);\n    }\n\n    int count_second_less(\n       \
+    \ int l,\n        int r,\n        int first_lower,\n        int first_upper,\n\
+    \        int second_upper\n    ) const {\n        if (second_upper <= 0) return\
+    \ 0;\n        if (second_upper >= int(_second_coordinates.size())) {\n       \
+    \     return count_first_rank(l, r, first_lower, first_upper);\n        }\n\n\
+    \        int result = 0;\n        for (int level = 0; level < _log; level++) {\n\
+    \            int l1 = _matrix[level].rank1(l);\n            int r1 = _matrix[level].rank1(r);\n\
+    \            int l0 = l - l1;\n            int r0 = r - r1;\n            if (bit(second_upper,\
     \ level)) {\n                result += _zero_first_matrix[level].range_freq(\n\
     \                    l0,\n                    r0,\n                    first_lower,\n\
     \                    first_upper\n                );\n                l = _zero_count[level]\
-    \ + _matrix[level].rank1(l);\n                r = _zero_count[level] + _matrix[level].rank1(r);\n\
-    \            } else {\n                l = l0;\n                r = r0;\n    \
-    \        }\n        }\n        return result;\n    }\n\n   public:\n    WaveletMatrix2D()\
-    \ = default;\n\n    explicit WaveletMatrix2D(const std::vector<value_type>& values)\
-    \ {\n        build(values);\n    }\n\n    explicit WaveletMatrix2D(std::vector<value_type>&&\
+    \ + l1;\n                r = _zero_count[level] + r1;\n            } else {\n\
+    \                l = l0;\n                r = r0;\n            }\n        }\n\
+    \        return result;\n    }\n\n   public:\n    WaveletMatrix2D() = default;\n\
+    \n    explicit WaveletMatrix2D(const std::vector<value_type>& values) {\n    \
+    \    build(values);\n    }\n\n    explicit WaveletMatrix2D(std::vector<value_type>&&\
     \ values) {\n        build(std::move(values));\n    }\n\n    WaveletMatrix2D(\n\
     \        const std::vector<X>& first,\n        const std::vector<Y>& second\n\
     \    ) {\n        build(first, second);\n    }\n\n    void build(std::vector<value_type>\
@@ -137,17 +138,18 @@ data:
     \ - 1)))\n        );\n        _matrix.clear();\n        _matrix.reserve(_log);\n\
     \        _zero_count.assign(_log, 0);\n        _zero_first_matrix.clear();\n \
     \       _zero_first_matrix.reserve(_log);\n\n        for (int level = 0; level\
-    \ < _log; level++) {\n            _matrix.emplace_back(_n);\n            for (int\
-    \ i = 0; i < _n; i++) {\n                if (bit(current_second[i], level)) _matrix.back().set(i);\n\
-    \            }\n            _matrix.back().build();\n\n            int zeros =\
-    \ _matrix.back().rank0(_n);\n            _zero_count[level] = zeros;\n       \
-    \     int zero_position = 0;\n            int one_position = zeros;\n        \
-    \    for (int i = 0; i < _n; i++) {\n                int position;\n         \
-    \       if (bit(current_second[i], level)) {\n                    position = one_position++;\n\
-    \                } else {\n                    position = zero_position++;\n \
-    \               }\n                next_first[position] = current_first[i];\n\
-    \                next_second[position] = current_second[i];\n            }\n\n\
-    \            std::vector<int> zero_first(\n                next_first.begin(),\n\
+    \ < _log; level++) {\n            _matrix.emplace_back(_n);\n            int zeros\
+    \ = 0;\n            for (int i = 0; i < _n; i++) {\n                if (bit(current_second[i],\
+    \ level)) {\n                    _matrix.back().set(i);\n                } else\
+    \ {\n                    zeros++;\n                }\n            }\n        \
+    \    _matrix.back().build();\n\n            _zero_count[level] = zeros;\n    \
+    \        int zero_position = 0;\n            int one_position = zeros;\n     \
+    \       for (int i = 0; i < _n; i++) {\n                int position;\n      \
+    \          if (bit(current_second[i], level)) {\n                    position\
+    \ = one_position++;\n                } else {\n                    position =\
+    \ zero_position++;\n                }\n                next_first[position] =\
+    \ current_first[i];\n                next_second[position] = current_second[i];\n\
+    \            }\n\n            std::vector<int> zero_first(\n                next_first.begin(),\n\
     \                next_first.begin() + zeros\n            );\n            _zero_first_matrix.emplace_back(zero_first,\
     \ first_size);\n            current_first.swap(next_first);\n            current_second.swap(next_second);\n\
     \        }\n    }\n\n    void build(\n        const std::vector<X>& first,\n \
@@ -175,15 +177,16 @@ data:
     \ first_lower_bound(first_upper);\n        int candidates = count_first_rank(l,\
     \ r, first_l, first_r);\n        assert(0 <= k && k < candidates);\n        (void)candidates;\n\
     \n        int second_rank = 0;\n        for (int level = 0; level < _log; level++)\
-    \ {\n            int l0 = _matrix[level].rank0(l);\n            int r0 = _matrix[level].rank0(r);\n\
-    \            int zeros = _zero_first_matrix[level].range_freq(\n             \
-    \   l0,\n                r0,\n                first_l,\n                first_r\n\
-    \            );\n            if (k < zeros) {\n                l = l0;\n     \
-    \           r = r0;\n            } else {\n                k -= zeros;\n     \
-    \           second_rank |= 1 << (_log - 1 - level);\n                l = _zero_count[level]\
-    \ + _matrix[level].rank1(l);\n                r = _zero_count[level] + _matrix[level].rank1(r);\n\
-    \            }\n        }\n        return _second_coordinates[second_rank];\n\
-    \    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n#line 4 \"verify/ds/wavelet_matrix/wavelet_matrix_2d.test.cpp\"\
+    \ {\n            int l1 = _matrix[level].rank1(l);\n            int r1 = _matrix[level].rank1(r);\n\
+    \            int l0 = l - l1;\n            int r0 = r - r1;\n            int zeros\
+    \ = _zero_first_matrix[level].range_freq(\n                l0,\n             \
+    \   r0,\n                first_l,\n                first_r\n            );\n \
+    \           if (k < zeros) {\n                l = l0;\n                r = r0;\n\
+    \            } else {\n                k -= zeros;\n                second_rank\
+    \ |= 1 << (_log - 1 - level);\n                l = _zero_count[level] + l1;\n\
+    \                r = _zero_count[level] + r1;\n            }\n        }\n    \
+    \    return _second_coordinates[second_rank];\n    }\n};\n\n}  // namespace ds\n\
+    }  // namespace m1une\n\n\n#line 4 \"verify/ds/wavelet_matrix/wavelet_matrix_2d.test.cpp\"\
     \n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#include <array>\n#include <charconv>\n\
     #include <cstddef>\n#include <cstdio>\n#include <cstdlib>\n#line 10 \"utilities/fast_io.hpp\"\
     \n#include <cstring>\n#include <iterator>\n#include <string>\n#include <type_traits>\n\
@@ -531,7 +534,7 @@ data:
   isVerificationFile: true
   path: verify/ds/wavelet_matrix/wavelet_matrix_2d.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 18:02:32+09:00'
+  timestamp: '2026-07-16 18:16:52+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/wavelet_matrix/wavelet_matrix_2d.test.cpp

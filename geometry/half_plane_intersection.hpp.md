@@ -510,8 +510,8 @@ data:
   timestamp: '2026-07-05 15:57:09+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/half_plane_intersection.test.cpp
+  - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/half_plane_intersection_random.test.cpp
 documentation_of: geometry/half_plane_intersection.hpp
 layout: document
