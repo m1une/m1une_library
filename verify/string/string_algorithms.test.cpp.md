@@ -17,6 +17,9 @@ data:
     path: string/all.hpp
     title: String Algorithms Bundle
   - icon: ':heavy_check_mark:'
+    path: string/deque_eertree.hpp
+    title: Deque Eertree
+  - icon: ':heavy_check_mark:'
     path: string/eertree.hpp
     title: Eertree
   - icon: ':heavy_check_mark:'
@@ -187,40 +190,176 @@ data:
     \ current : _bfs_order) {\n            for (int pattern_id : _nodes[current].pattern_ids)\
     \ {\n                result[pattern_id] = visits[current];\n            }\n  \
     \      }\n        return result;\n    }\n};\n\n}  // namespace string\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"string/eertree.hpp\"\n\n\n\n#line 8 \"string/eertree.hpp\"\
-    \n#include <utility>\n#line 10 \"string/eertree.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ string {\n\ntemplate <int AlphabetSize = 26, int FirstCharacter = 'a'>\nstruct\
-    \ Eertree {\n    static_assert(0 < AlphabetSize);\n\n    using node_id = int;\n\
-    \    static constexpr node_id even_root = 0;\n    static constexpr node_id odd_root\
-    \ = 1;\n    static constexpr node_id null_node = -1;\n\n    struct Node {\n  \
-    \      std::array<node_id, AlphabetSize> next;\n        node_id suffix_link;\n\
-    \        node_id series_link;\n        int length;\n        int diff;\n      \
-    \  int suffix_count;\n        int first_end;\n        long long suffix_occurrences;\n\
-    \n        Node(int length_value = 0, node_id suffix_link_value = even_root, node_id\
-    \ series_link_value = even_root)\n            : suffix_link(suffix_link_value),\n\
-    \              series_link(series_link_value),\n              length(length_value),\n\
-    \              diff(0),\n              suffix_count(0),\n              first_end(0),\n\
-    \              suffix_occurrences(0) {\n            next.fill(null_node);\n  \
-    \      }\n    };\n\n   private:\n    std::vector<Node> _nodes;\n    std::vector<int>\
-    \ _text;\n    std::vector<node_id> _longest_suffix;\n    node_id _last;\n\n  \
-    \  template <class Symbol>\n    static int symbol_index(const Symbol& symbol)\
-    \ {\n        int index = int(symbol) - FirstCharacter;\n        assert(0 <= index\
-    \ && index < AlphabetSize);\n        return index;\n    }\n\n    node_id find_extendable(node_id\
-    \ node, int position, int symbol) const {\n        while (true) {\n          \
-    \  int length = _nodes[node].length;\n            int left = position - length\
-    \ - 1;\n            if (0 <= left && _text[left] == symbol) return node;\n   \
-    \         node = _nodes[node].suffix_link;\n        }\n    }\n\n    node_id new_node(int\
-    \ length) {\n        assert(_nodes.size() < std::size_t(std::numeric_limits<int>::max()));\n\
-    \        _nodes.emplace_back(length);\n        return int(_nodes.size()) - 1;\n\
-    \    }\n\n   public:\n    Eertree() {\n        clear();\n    }\n\n    template\
-    \ <class Sequence>\n    explicit Eertree(const Sequence& sequence) {\n       \
-    \ clear();\n        build(sequence);\n    }\n\n    int size() const {\n      \
-    \  return int(_nodes.size()) - 2;\n    }\n\n    bool empty() const {\n       \
-    \ return size() == 0;\n    }\n\n    int node_count() const {\n        return int(_nodes.size());\n\
+    \ m1une\n\n\n#line 1 \"string/deque_eertree.hpp\"\n\n\n\n#line 7 \"string/deque_eertree.hpp\"\
+    \n#include <deque>\n#line 10 \"string/deque_eertree.hpp\"\n\nnamespace m1une {\n\
+    namespace string {\n\ntemplate <int AlphabetSize = 26, int FirstCharacter = 'a'>\n\
+    struct DequeEertree {\n    static_assert(0 < AlphabetSize);\n\n    using node_id\
+    \ = int;\n    static constexpr node_id odd_root = 0;\n    static constexpr node_id\
+    \ even_root = 1;\n    static constexpr node_id null_node = -1;\n\n   private:\n\
+    \    struct Node {\n        std::array<node_id, AlphabetSize> next;\n        node_id\
+    \ parent;\n        node_id suffix_link;\n        node_id quick_link;\n       \
+    \ int length;\n        int surface_count;\n        int suffix_link_children;\n\
+    \        bool active;\n\n        Node(\n            int length_value = 0,\n  \
+    \          node_id parent_value = null_node,\n            node_id suffix_link_value\
+    \ = null_node,\n            node_id quick_link_value = null_node\n        )\n\
+    \            : parent(parent_value),\n              suffix_link(suffix_link_value),\n\
+    \              quick_link(quick_link_value),\n              length(length_value),\n\
+    \              surface_count(0),\n              suffix_link_children(0),\n   \
+    \           active(true) {\n            next.fill(null_node);\n        }\n   \
+    \ };\n\n    struct Position {\n        int symbol;\n        node_id prefix_surface;\n\
+    \        node_id suffix_surface;\n    };\n\n    std::vector<Node> _nodes;\n  \
+    \  std::deque<Position> _text;\n    int _distinct_palindromes;\n\n    template\
+    \ <class Symbol>\n    static int symbol_index(const Symbol& value) {\n       \
+    \ int symbol = int(value) - FirstCharacter;\n        assert(0 <= symbol && symbol\
+    \ < AlphabetSize);\n        return symbol;\n    }\n\n    node_id new_node(node_id\
+    \ parent, node_id suffix_link, int length, int symbol) {\n        assert(_nodes.size()\
+    \ < std::size_t(std::numeric_limits<int>::max()));\n        node_id id = int(_nodes.size());\n\
+    \        _nodes.emplace_back(length, parent, suffix_link, odd_root);\n       \
+    \ _nodes[parent].next[symbol] = id;\n        _nodes[suffix_link].suffix_link_children++;\n\
+    \        _distinct_palindromes++;\n        return id;\n    }\n\n    void remove_node(node_id\
+    \ id, int symbol) {\n        Node& removed = _nodes[id];\n        assert(removed.active);\n\
+    \        assert(removed.surface_count == 0);\n        assert(removed.suffix_link_children\
+    \ == 0);\n        assert(_nodes[removed.parent].next[symbol] == id);\n       \
+    \ _nodes[removed.parent].next[symbol] = null_node;\n        _nodes[removed.suffix_link].suffix_link_children--;\n\
+    \        removed.active = false;\n        _distinct_palindromes--;\n    }\n\n\
+    \    node_id back_appendable(int symbol, node_id node) const {\n        int n\
+    \ = int(_text.size());\n        while (true) {\n            int length = _nodes[node].length;\n\
+    \            if (length == -1 || (length < n && _text[n - length - 1].symbol ==\
+    \ symbol)) {\n                return node;\n            }\n            node_id\
+    \ suffix = _nodes[node].suffix_link;\n            int suffix_length = _nodes[suffix].length;\n\
+    \            if (suffix_length == -1 || _text[n - suffix_length - 1].symbol ==\
+    \ symbol) {\n                return suffix;\n            }\n            node =\
+    \ _nodes[node].quick_link;\n        }\n    }\n\n    node_id front_appendable(int\
+    \ symbol, node_id node) const {\n        int n = int(_text.size());\n        while\
+    \ (true) {\n            int length = _nodes[node].length;\n            if (length\
+    \ == -1 || (length < n && _text[length].symbol == symbol)) {\n               \
+    \ return node;\n            }\n            node_id suffix = _nodes[node].suffix_link;\n\
+    \            int suffix_length = _nodes[suffix].length;\n            if (suffix_length\
+    \ == -1 || _text[suffix_length].symbol == symbol) {\n                return suffix;\n\
+    \            }\n            node = _nodes[node].quick_link;\n        }\n    }\n\
+    \n    node_id prefix_node() const {\n        return _text.empty() ? even_root\
+    \ : _text.front().prefix_surface;\n    }\n\n    node_id suffix_node() const {\n\
+    \        return _text.empty() ? even_root : _text.back().suffix_surface;\n   \
+    \ }\n\n    void initialize_roots() {\n        _nodes.clear();\n        _nodes.emplace_back(-1,\
+    \ odd_root, odd_root, odd_root);\n        _nodes.emplace_back(0, odd_root, odd_root,\
+    \ odd_root);\n        _distinct_palindromes = 0;\n    }\n\n   public:\n    DequeEertree()\
+    \ {\n        initialize_roots();\n    }\n\n    template <class Sequence>\n   \
+    \ explicit DequeEertree(const Sequence& sequence) {\n        initialize_roots();\n\
+    \        build(sequence);\n    }\n\n    int size() const {\n        return _distinct_palindromes;\n\
     \    }\n\n    int text_length() const {\n        return int(_text.size());\n \
-    \   }\n\n    node_id last() const {\n        return _last;\n    }\n\n    int longest_suffix_length()\
-    \ const {\n        return _nodes[_last].length;\n    }\n\n    const Node& node(node_id\
-    \ id) const {\n        assert(0 <= id && id < node_count());\n        return _nodes[id];\n\
+    \   }\n\n    bool empty() const {\n        return _text.empty();\n    }\n\n  \
+    \  int distinct_palindrome_count() const {\n        return _distinct_palindromes;\n\
+    \    }\n\n    int longest_prefix_length() const {\n        return _nodes[prefix_node()].length;\n\
+    \    }\n\n    int longest_suffix_length() const {\n        return _nodes[suffix_node()].length;\n\
+    \    }\n\n    void reserve(std::size_t operation_capacity) {\n        _nodes.reserve(operation_capacity\
+    \ + 2);\n    }\n\n    void clear() {\n        _text.clear();\n        initialize_roots();\n\
+    \    }\n\n    template <class Symbol>\n    void push_back(const Symbol& value)\
+    \ {\n        int symbol = symbol_index(value);\n        node_id parent = _text.empty()\
+    \ ? odd_root : back_appendable(symbol, suffix_node());\n        node_id palindrome\
+    \ = _nodes[parent].next[symbol];\n        node_id suffix = even_root;\n\n    \
+    \    if (palindrome == null_node) {\n            if (parent != odd_root) {\n \
+    \               node_id suffix_parent = back_appendable(symbol, _nodes[parent].suffix_link);\n\
+    \                suffix = _nodes[suffix_parent].next[symbol];\n              \
+    \  assert(suffix != null_node);\n            }\n        } else {\n           \
+    \ suffix = _nodes[palindrome].suffix_link;\n        }\n\n        _text.push_back(Position{symbol,\
+    \ even_root, even_root});\n        int n = int(_text.size());\n        if (palindrome\
+    \ == null_node) {\n            palindrome = new_node(parent, suffix, _nodes[parent].length\
+    \ + 2, symbol);\n\n            Node& created = _nodes[palindrome];\n         \
+    \   if (\n                _nodes[suffix].suffix_link != odd_root &&\n        \
+    \        _text[n - _nodes[suffix].length - 1].symbol ==\n                    _text[n\
+    \ - _nodes[_nodes[suffix].suffix_link].length - 1].symbol\n            ) {\n \
+    \               created.quick_link = _nodes[suffix].quick_link;\n            }\
+    \ else {\n                created.quick_link = _nodes[suffix].suffix_link;\n \
+    \           }\n        }\n\n        int left = n - _nodes[palindrome].length;\n\
+    \        _text.back().suffix_surface = palindrome;\n        _text[left].prefix_surface\
+    \ = palindrome;\n        if (\n            _nodes[suffix].length >= 1 &&\n   \
+    \         _text[left + _nodes[suffix].length - 1].suffix_surface == suffix\n \
+    \       ) {\n            _text[left + _nodes[suffix].length - 1].suffix_surface\
+    \ = even_root;\n        }\n        _nodes[palindrome].surface_count++;\n    }\n\
+    \n    template <class Symbol>\n    void push_front(const Symbol& value) {\n  \
+    \      int symbol = symbol_index(value);\n        node_id parent = _text.empty()\
+    \ ? odd_root : front_appendable(symbol, prefix_node());\n        node_id palindrome\
+    \ = _nodes[parent].next[symbol];\n        node_id suffix = even_root;\n\n    \
+    \    if (palindrome == null_node) {\n            if (parent != odd_root) {\n \
+    \               node_id suffix_parent = front_appendable(symbol, _nodes[parent].suffix_link);\n\
+    \                suffix = _nodes[suffix_parent].next[symbol];\n              \
+    \  assert(suffix != null_node);\n            }\n        } else {\n           \
+    \ suffix = _nodes[palindrome].suffix_link;\n        }\n\n        _text.push_front(Position{symbol,\
+    \ even_root, even_root});\n        if (palindrome == null_node) {\n          \
+    \  palindrome = new_node(parent, suffix, _nodes[parent].length + 2, symbol);\n\
+    \n            Node& created = _nodes[palindrome];\n            if (\n        \
+    \        _nodes[suffix].suffix_link != odd_root &&\n                _text[_nodes[suffix].length].symbol\
+    \ ==\n                    _text[_nodes[_nodes[suffix].suffix_link].length].symbol\n\
+    \            ) {\n                created.quick_link = _nodes[suffix].quick_link;\n\
+    \            } else {\n                created.quick_link = _nodes[suffix].suffix_link;\n\
+    \            }\n        }\n\n        _text.front().prefix_surface = palindrome;\n\
+    \        _text[_nodes[palindrome].length - 1].suffix_surface = palindrome;\n \
+    \       if (\n            _nodes[suffix].length >= 1 &&\n            _text[_nodes[palindrome].length\
+    \ - _nodes[suffix].length].prefix_surface == suffix\n        ) {\n           \
+    \ _text[_nodes[palindrome].length - _nodes[suffix].length].prefix_surface = even_root;\n\
+    \        }\n        _nodes[palindrome].surface_count++;\n    }\n\n    void pop_back()\
+    \ {\n        assert(!_text.empty());\n        node_id palindrome = suffix_node();\n\
+    \        node_id suffix = _nodes[palindrome].suffix_link;\n        int left =\
+    \ text_length() - _nodes[palindrome].length;\n        int suffix_end = left +\
+    \ _nodes[suffix].length - 1;\n\n        if (\n            _nodes[palindrome].length\
+    \ >= 2 &&\n            _nodes[_text[suffix_end].suffix_surface].length < _nodes[suffix].length\n\
+    \        ) {\n            _text[suffix_end].suffix_surface = suffix;\n       \
+    \     _text[left].prefix_surface = suffix;\n        } else {\n            _text[left].prefix_surface\
+    \ = even_root;\n        }\n\n        _nodes[palindrome].surface_count--;\n   \
+    \     int symbol = _text.back().symbol;\n        if (\n            _nodes[palindrome].surface_count\
+    \ == 0 &&\n            _nodes[palindrome].suffix_link_children == 0\n        )\
+    \ {\n            remove_node(palindrome, symbol);\n        }\n        _text.pop_back();\n\
+    \    }\n\n    void pop_front() {\n        assert(!_text.empty());\n        node_id\
+    \ palindrome = prefix_node();\n        node_id suffix = _nodes[palindrome].suffix_link;\n\
+    \        int suffix_start = _nodes[palindrome].length - _nodes[suffix].length;\n\
+    \n        if (\n            _nodes[palindrome].length >= 2 &&\n            _nodes[_text[suffix_start].prefix_surface].length\
+    \ < _nodes[suffix].length\n        ) {\n            _text[suffix_start].prefix_surface\
+    \ = suffix;\n            _text[_nodes[palindrome].length - 1].suffix_surface =\
+    \ suffix;\n        } else {\n            _text[_nodes[palindrome].length - 1].suffix_surface\
+    \ = even_root;\n        }\n\n        _nodes[palindrome].surface_count--;\n   \
+    \     int symbol = _text.front().symbol;\n        if (\n            _nodes[palindrome].surface_count\
+    \ == 0 &&\n            _nodes[palindrome].suffix_link_children == 0\n        )\
+    \ {\n            remove_node(palindrome, symbol);\n        }\n        _text.pop_front();\n\
+    \    }\n\n    template <class Sequence>\n    void build(const Sequence& sequence)\
+    \ {\n        for (const auto& symbol : sequence) push_back(symbol);\n    }\n};\n\
+    \ntemplate <int AlphabetSize = 26, int FirstCharacter = 'a'>\nusing DoubleEndedEertree\
+    \ = DequeEertree<AlphabetSize, FirstCharacter>;\n\ntemplate <int AlphabetSize\
+    \ = 26, int FirstCharacter = 'a'>\nusing DequePalindromicTree = DequeEertree<AlphabetSize,\
+    \ FirstCharacter>;\n\n}  // namespace string\n}  // namespace m1une\n\n\n#line\
+    \ 1 \"string/eertree.hpp\"\n\n\n\n#line 8 \"string/eertree.hpp\"\n#include <utility>\n\
+    #line 10 \"string/eertree.hpp\"\n\nnamespace m1une {\nnamespace string {\n\ntemplate\
+    \ <int AlphabetSize = 26, int FirstCharacter = 'a'>\nstruct Eertree {\n    static_assert(0\
+    \ < AlphabetSize);\n\n    using node_id = int;\n    static constexpr node_id even_root\
+    \ = 0;\n    static constexpr node_id odd_root = 1;\n    static constexpr node_id\
+    \ null_node = -1;\n\n    struct Node {\n        std::array<node_id, AlphabetSize>\
+    \ next;\n        node_id suffix_link;\n        node_id series_link;\n        int\
+    \ length;\n        int diff;\n        int suffix_count;\n        int first_end;\n\
+    \        long long suffix_occurrences;\n\n        Node(int length_value = 0, node_id\
+    \ suffix_link_value = even_root, node_id series_link_value = even_root)\n    \
+    \        : suffix_link(suffix_link_value),\n              series_link(series_link_value),\n\
+    \              length(length_value),\n              diff(0),\n              suffix_count(0),\n\
+    \              first_end(0),\n              suffix_occurrences(0) {\n        \
+    \    next.fill(null_node);\n        }\n    };\n\n   private:\n    std::vector<Node>\
+    \ _nodes;\n    std::vector<int> _text;\n    std::vector<node_id> _longest_suffix;\n\
+    \    node_id _last;\n\n    template <class Symbol>\n    static int symbol_index(const\
+    \ Symbol& symbol) {\n        int index = int(symbol) - FirstCharacter;\n     \
+    \   assert(0 <= index && index < AlphabetSize);\n        return index;\n    }\n\
+    \n    node_id find_extendable(node_id node, int position, int symbol) const {\n\
+    \        while (true) {\n            int length = _nodes[node].length;\n     \
+    \       int left = position - length - 1;\n            if (0 <= left && _text[left]\
+    \ == symbol) return node;\n            node = _nodes[node].suffix_link;\n    \
+    \    }\n    }\n\n    node_id new_node(int length) {\n        assert(_nodes.size()\
+    \ < std::size_t(std::numeric_limits<int>::max()));\n        _nodes.emplace_back(length);\n\
+    \        return int(_nodes.size()) - 1;\n    }\n\n   public:\n    Eertree() {\n\
+    \        clear();\n    }\n\n    template <class Sequence>\n    explicit Eertree(const\
+    \ Sequence& sequence) {\n        clear();\n        build(sequence);\n    }\n\n\
+    \    int size() const {\n        return int(_nodes.size()) - 2;\n    }\n\n   \
+    \ bool empty() const {\n        return size() == 0;\n    }\n\n    int node_count()\
+    \ const {\n        return int(_nodes.size());\n    }\n\n    int text_length()\
+    \ const {\n        return int(_text.size());\n    }\n\n    node_id last() const\
+    \ {\n        return _last;\n    }\n\n    int longest_suffix_length() const {\n\
+    \        return _nodes[_last].length;\n    }\n\n    const Node& node(node_id id)\
+    \ const {\n        assert(0 <= id && id < node_count());\n        return _nodes[id];\n\
     \    }\n\n    const std::vector<Node>& nodes() const {\n        return _nodes;\n\
     \    }\n\n    node_id longest_suffix_node(int prefix_length) const {\n       \
     \ assert(1 <= prefix_length && prefix_length <= text_length());\n        return\
@@ -1608,7 +1747,7 @@ data:
     \ left]);\n        while (i + z[i] < n && sequence[z[i]] == sequence[i + z[i]])\
     \ {\n            z[i]++;\n        }\n        if (right < i + z[i]) {\n       \
     \     left = i;\n            right = i + z[i];\n        }\n    }\n    return z;\n\
-    }\n\n}  // namespace string\n}  // namespace m1une\n\n\n#line 22 \"string/all.hpp\"\
+    }\n\n}  // namespace string\n}  // namespace m1une\n\n\n#line 23 \"string/all.hpp\"\
     \n\n\n#line 4 \"verify/string/string_algorithms.test.cpp\"\n\n#line 1 \"utilities/fast_io.hpp\"\
     \n\n\n\n#line 5 \"utilities/fast_io.hpp\"\n#include <charconv>\n#line 7 \"utilities/fast_io.hpp\"\
     \n#include <cstdio>\n#include <cstdlib>\n#line 11 \"utilities/fast_io.hpp\"\n\
@@ -1995,6 +2134,7 @@ data:
   dependsOn:
   - string/all.hpp
   - string/aho_corasick.hpp
+  - string/deque_eertree.hpp
   - string/eertree.hpp
   - string/kmp.hpp
   - string/levenshtein_distance.hpp
@@ -2019,7 +2159,7 @@ data:
   isVerificationFile: true
   path: verify/string/string_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-16 20:00:24+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/string/string_algorithms.test.cpp

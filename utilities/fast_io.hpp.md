@@ -808,6 +808,9 @@ data:
     path: verify/string/aoj_alds1_14_b.test.cpp
     title: verify/string/aoj_alds1_14_b.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/string/deque_eertree.test.cpp
+    title: verify/string/deque_eertree.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/string/eertree.test.cpp
     title: verify/string/eertree.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1619,6 +1622,7 @@ data:
   - verify/string/suffix_automaton.test.cpp
   - verify/string/string_hash.test.cpp
   - verify/string/runs.test.cpp
+  - verify/string/deque_eertree.test.cpp
   - verify/algo/enumeration/submask.test.cpp
   - verify/algo/enumeration/combination.test.cpp
   - verify/algo/enumeration/segtree_range.test.cpp
