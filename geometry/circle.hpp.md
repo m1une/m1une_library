@@ -570,15 +570,15 @@ data:
   isVerificationFile: false
   path: geometry/circle.hpp
   requiredBy:
-  - geometry/minimum_enclosing_circle.hpp
   - geometry/all.hpp
+  - geometry/minimum_enclosing_circle.hpp
   timestamp: '2026-06-21 12:04:47+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/geometry/circle_line_intersection.test.cpp
-  - verify/geometry/minimum_enclosing_circle.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/circle_ray.test.cpp
+  - verify/geometry/circle_line_intersection.test.cpp
+  - verify/geometry/minimum_enclosing_circle.test.cpp
 documentation_of: geometry/circle.hpp
 layout: document
 title: Circles

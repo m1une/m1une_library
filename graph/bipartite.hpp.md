@@ -718,11 +718,11 @@ data:
   timestamp: '2026-07-14 01:19:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/graph/cow_game.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
-  - verify/graph/bipartite_matching.test.cpp
   - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/cow_game.test.cpp
   - verify/graph/bipartite_edge_coloring.test.cpp
+  - verify/graph/bipartite_matching.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
 documentation_of: graph/bipartite.hpp
 layout: document
 title: Bipartite Graph

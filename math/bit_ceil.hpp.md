@@ -77,28 +77,28 @@ data:
   isVerificationFile: false
   path: math/bit_ceil.hpp
   requiredBy:
-  - ds/range_query/merge_sort_tree.hpp
-  - ds/range_query/range_sort_range_composite.hpp
-  - ds/segtree/dual_segtree_2d.hpp
-  - ds/segtree/segtree.hpp
-  - ds/segtree/lazy_segtree.hpp
-  - ds/segtree/segtree_2d.hpp
-  - ds/segtree/dual_segtree.hpp
-  - ds/segtree/segtree_beats.hpp
   - math/all.hpp
+  - ds/range_query/range_sort_range_composite.hpp
+  - ds/range_query/merge_sort_tree.hpp
+  - ds/segtree/dual_segtree.hpp
+  - ds/segtree/segtree_2d.hpp
+  - ds/segtree/dual_segtree_2d.hpp
+  - ds/segtree/lazy_segtree.hpp
+  - ds/segtree/segtree_beats.hpp
+  - ds/segtree/segtree.hpp
   timestamp: '2026-06-15 01:47:39+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/range_query/merge_sort_tree.test.cpp
-  - verify/ds/range_query/merge_sort_tree_sum.test.cpp
-  - verify/ds/range_query/range_sort_range_composite.test.cpp
-  - verify/ds/segtree/dual_segtree_2d.test.cpp
-  - verify/ds/segtree/dual_segtree.test.cpp
-  - verify/ds/segtree/segtree_2d.test.cpp
-  - verify/ds/segtree/lazy_segtree.test.cpp
-  - verify/ds/segtree/segtree_beats.test.cpp
-  - verify/ds/segtree/segtree.test.cpp
   - verify/math/math_algorithms.test.cpp
+  - verify/ds/range_query/merge_sort_tree.test.cpp
+  - verify/ds/range_query/range_sort_range_composite.test.cpp
+  - verify/ds/range_query/merge_sort_tree_sum.test.cpp
+  - verify/ds/segtree/lazy_segtree.test.cpp
+  - verify/ds/segtree/dual_segtree.test.cpp
+  - verify/ds/segtree/dual_segtree_2d.test.cpp
+  - verify/ds/segtree/segtree_2d.test.cpp
+  - verify/ds/segtree/segtree.test.cpp
+  - verify/ds/segtree/segtree_beats.test.cpp
 documentation_of: math/bit_ceil.hpp
 layout: document
 title: Bit Ceil

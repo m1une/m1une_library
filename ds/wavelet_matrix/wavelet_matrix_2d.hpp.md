@@ -13,7 +13,8 @@ data:
     links: []
   bundledCode: "#line 1 \"ds/wavelet_matrix/wavelet_matrix_2d.hpp\"\n\n\n\n#include\
     \ <algorithm>\n#include <bit>\n#include <cassert>\n#include <cstdint>\n#include\
-    \ <utility>\n#include <vector>\n\nnamespace m1une {\nnamespace ds {\n\n// A static\
+    \ <utility>\n#include <vector>\n\n#if defined(__AVX2__) || defined(__BMI2__)\n\
+    #include <immintrin.h>\n#endif\n\nnamespace m1une {\nnamespace ds {\n\n// A static\
     \ wavelet matrix for a sequence of pairs.\n//\n// Besides the index range, queries\
     \ can restrict the first component and count\n// or select by the second component.\
     \ This corresponds to orthogonal queries in\n// the three dimensions (index, first,\
@@ -21,57 +22,85 @@ data:
     \    using first_type = X;\n    using second_type = Y;\n    using value_type =\
     \ std::pair<X, Y>;\n\n   private:\n    struct BitVector {\n        std::vector<std::uint64_t>\
     \ bits;\n        std::vector<int> prefix;\n\n        BitVector() = default;\n\n\
-    \        explicit BitVector(int n)\n            : bits((std::size_t(n) + 63) >>\
-    \ 6, 0),\n              prefix(bits.size() + 1, 0) {}\n\n        void set(int\
-    \ p) {\n            bits[std::size_t(p) >> 6] |= std::uint64_t(1) << (p & 63);\n\
-    \        }\n\n        void build() {\n            for (std::size_t i = 0; i <\
-    \ bits.size(); i++) {\n                prefix[i + 1] = prefix[i] + std::popcount(bits[i]);\n\
-    \            }\n        }\n\n        int rank1(int r) const {\n            std::size_t\
-    \ word = std::size_t(r) >> 6;\n            int offset = r & 63;\n            int\
-    \ result = prefix[word];\n            if (offset != 0) {\n                result\
-    \ += std::popcount(\n                    bits[word] & ((std::uint64_t(1) << offset)\
-    \ - 1)\n                );\n            }\n            return result;\n      \
-    \  }\n    };\n\n    class RankWaveletMatrix {\n       private:\n        int _n\
-    \ = 0;\n        int _alphabet_size = 0;\n        int _log = 0;\n        std::vector<BitVector>\
-    \ _matrix;\n        std::vector<int> _zero_count;\n\n        bool bit(int value,\
-    \ int level) const {\n            return (value >> (_log - 1 - level)) & 1;\n\
-    \        }\n\n        int count_less(int l, int r, int upper) const {\n      \
-    \      if (upper <= 0) return 0;\n            if (upper >= _alphabet_size) return\
-    \ r - l;\n\n            int result = 0;\n            for (int level = 0; level\
-    \ < _log; level++) {\n                int l1 = _matrix[level].rank1(l);\n    \
-    \            int r1 = _matrix[level].rank1(r);\n                if (bit(upper,\
-    \ level)) {\n                    result += (r - l) - (r1 - l1);\n            \
-    \        l = _zero_count[level] + l1;\n                    r = _zero_count[level]\
-    \ + r1;\n                } else {\n                    l -= l1;\n            \
-    \        r -= r1;\n                }\n            }\n            return result;\n\
-    \        }\n\n       public:\n        RankWaveletMatrix() = default;\n\n     \
-    \   RankWaveletMatrix(\n            const std::vector<int>& values,\n        \
-    \    int alphabet_size\n        ) {\n            build(values, alphabet_size);\n\
-    \        }\n\n        void build(const std::vector<int>& values, int alphabet_size)\
-    \ {\n            assert(alphabet_size >= 0);\n            _n = int(values.size());\n\
-    \            _alphabet_size = alphabet_size;\n            _log = alphabet_size\
-    \ == 0\n                       ? 0\n                       : std::max(\n     \
-    \                        1,\n                             int(std::bit_width(unsigned(alphabet_size\
-    \ - 1)))\n                         );\n\n            _matrix.clear();\n      \
-    \      _matrix.reserve(_log);\n            _zero_count.assign(_log, 0);\n    \
-    \        std::vector<int> current(values);\n            std::vector<int> next(_n);\n\
-    \            for (int value : values) {\n                assert(0 <= value &&\
+    \        explicit BitVector(int n)\n            : bits(((std::size_t(n) + 63)\
+    \ >> 6) + 1, 0),\n              prefix(bits.size(), 0) {}\n\n        void build()\
+    \ {\n            for (std::size_t i = 0; i + 1 < bits.size(); i++) {\n       \
+    \         prefix[i + 1] = prefix[i] + std::popcount(bits[i]);\n            }\n\
+    \        }\n\n        int rank1(int r) const {\n            std::size_t word =\
+    \ std::size_t(r) >> 6;\n            int offset = r & 63;\n            int result\
+    \ = prefix[word];\n#if defined(__BMI2__)\n            result += std::popcount(\n\
+    \                _bzhi_u64(bits[word], static_cast<unsigned int>(offset))\n  \
+    \          );\n#else\n            if (offset != 0) {\n                result +=\
+    \ std::popcount(\n                    bits[word] & ((std::uint64_t(1) << offset)\
+    \ - 1)\n                );\n            }\n#endif\n            return result;\n\
+    \        }\n    };\n\n    static std::uint64_t extract_bits(\n        const int*\
+    \ values,\n        int count,\n        int shift\n    ) {\n        std::uint64_t\
+    \ result = 0;\n        int i = 0;\n#if defined(__AVX2__)\n        __m128i left\
+    \ = _mm_cvtsi32_si128(31 - shift);\n        for (; i + 8 <= count; i += 8) {\n\
+    \            __m256i data = _mm256_loadu_si256(\n                reinterpret_cast<const\
+    \ __m256i*>(values + i)\n            );\n            data = _mm256_sll_epi32(data,\
+    \ left);\n            int mask = _mm256_movemask_ps(_mm256_castsi256_ps(data));\n\
+    \            result |= std::uint64_t(mask) << i;\n        }\n#endif\n        for\
+    \ (; i < count; i++) {\n            result |= std::uint64_t((unsigned(values[i])\
+    \ >> shift) & 1) << i;\n        }\n        return result;\n    }\n\n    class\
+    \ RankWaveletMatrix {\n       private:\n        int _n = 0;\n        int _alphabet_size\
+    \ = 0;\n        int _log = 0;\n        std::vector<BitVector> _matrix;\n     \
+    \   std::vector<int> _zero_count;\n\n        bool bit(int value, int level) const\
+    \ {\n            return (value >> (_log - 1 - level)) & 1;\n        }\n\n    \
+    \    int count_less(int l, int r, int upper) const {\n            if (upper <=\
+    \ 0) return 0;\n            if (upper >= _alphabet_size) return r - l;\n\n   \
+    \         int result = 0;\n            for (int level = 0; level < _log; level++)\
+    \ {\n                int l1 = _matrix[level].rank1(l);\n                int r1\
+    \ = _matrix[level].rank1(r);\n                if (bit(upper, level)) {\n     \
+    \               result += (r - l) - (r1 - l1);\n                    l = _zero_count[level]\
+    \ + l1;\n                    r = _zero_count[level] + r1;\n                } else\
+    \ {\n                    l -= l1;\n                    r -= r1;\n            \
+    \    }\n            }\n            return result;\n        }\n\n        void build_owned(std::vector<int>\
+    \ current, int alphabet_size) {\n            assert(alphabet_size >= 0);\n   \
+    \         _n = int(current.size());\n            _alphabet_size = alphabet_size;\n\
+    \            _log = alphabet_size == 0\n                       ? 0\n         \
+    \              : std::max(\n                             1,\n                \
+    \             int(std::bit_width(unsigned(alphabet_size - 1)))\n             \
+    \            );\n\n            _matrix.clear();\n            _matrix.reserve(_log);\n\
+    \            _zero_count.assign(_log, 0);\n            std::vector<int> next(_n);\n\
+    \            for (int value : current) {\n                assert(0 <= value &&\
     \ value < alphabet_size);\n                (void)value;\n            }\n\n   \
     \         for (int level = 0; level < _log; level++) {\n                _matrix.emplace_back(_n);\n\
-    \                int zeros = 0;\n                for (int i = 0; i < _n; i++)\
-    \ {\n                    if (bit(current[i], level)) {\n                     \
-    \   _matrix.back().set(i);\n                    } else {\n                   \
-    \     zeros++;\n                    }\n                }\n                _matrix.back().build();\n\
-    \n                _zero_count[level] = zeros;\n                int zero_position\
-    \ = 0;\n                int one_position = zeros;\n                for (int value\
-    \ : current) {\n                    if (bit(value, level)) {\n               \
-    \         next[one_position++] = value;\n                    } else {\n      \
-    \                  next[zero_position++] = value;\n                    }\n   \
-    \             }\n                current.swap(next);\n            }\n        }\n\
-    \n        int range_freq(int l, int r, int lower, int upper) const {\n       \
-    \     assert(0 <= l && l <= r && r <= _n);\n            if (upper <= lower) return\
-    \ 0;\n            return count_less(l, r, upper) - count_less(l, r, lower);\n\
-    \        }\n    };\n\n    int _n = 0;\n    int _log = 0;\n    std::vector<value_type>\
+    \                BitVector& bit_vector = _matrix.back();\n                int\
+    \ shift = _log - 1 - level;\n                int zeros = 0;\n                for\
+    \ (int base = 0; base < _n; base += 64) {\n                    int count = std::min(64,\
+    \ _n - base);\n                    std::uint64_t word = WaveletMatrix2D::extract_bits(\n\
+    \                        current.data() + base,\n                        count,\n\
+    \                        shift\n                    );\n                    bit_vector.bits[std::size_t(base)\
+    \ >> 6] = word;\n                    zeros += count - std::popcount(word);\n \
+    \               }\n                bit_vector.build();\n\n                _zero_count[level]\
+    \ = zeros;\n                int zero_position = 0;\n                int one_position\
+    \ = zeros;\n                for (int base = 0; base < _n; base += 64) {\n    \
+    \                int count = std::min(64, _n - base);\n                    std::uint64_t\
+    \ ones =\n                        bit_vector.bits[std::size_t(base) >> 6];\n \
+    \                   std::uint64_t valid = count == 64\n                      \
+    \                        ? ~std::uint64_t(0)\n                               \
+    \               : (std::uint64_t(1) << count) - 1;\n                    std::uint64_t\
+    \ zeroes = (~ones) & valid;\n                    while (zeroes != 0) {\n     \
+    \                   int offset = std::countr_zero(zeroes);\n                 \
+    \       next[zero_position++] = current[base + offset];\n                    \
+    \    zeroes &= zeroes - 1;\n                    }\n                    while (ones\
+    \ != 0) {\n                        int offset = std::countr_zero(ones);\n    \
+    \                    next[one_position++] = current[base + offset];\n        \
+    \                ones &= ones - 1;\n                    }\n                }\n\
+    \                current.swap(next);\n            }\n        }\n\n       public:\n\
+    \        RankWaveletMatrix() = default;\n\n        RankWaveletMatrix(\n      \
+    \      const std::vector<int>& values,\n            int alphabet_size\n      \
+    \  ) {\n            build(values, alphabet_size);\n        }\n\n        RankWaveletMatrix(\n\
+    \            std::vector<int>&& values,\n            int alphabet_size\n     \
+    \   ) {\n            build(std::move(values), alphabet_size);\n        }\n\n \
+    \       void build(const std::vector<int>& values, int alphabet_size) {\n    \
+    \        build_owned(values, alphabet_size);\n        }\n\n        void build(std::vector<int>&&\
+    \ values, int alphabet_size) {\n            build_owned(std::move(values), alphabet_size);\n\
+    \        }\n\n        int range_freq(int l, int r, int lower, int upper) const\
+    \ {\n            assert(0 <= l && l <= r && r <= _n);\n            if (upper <=\
+    \ lower) return 0;\n            return count_less(l, r, upper) - count_less(l,\
+    \ r, lower);\n        }\n    };\n\n    int _n = 0;\n    int _log = 0;\n    std::vector<value_type>\
     \ _values;\n    std::vector<X> _first_coordinates;\n    std::vector<Y> _second_coordinates;\n\
     \    RankWaveletMatrix _first_matrix;\n    std::vector<BitVector> _matrix;\n \
     \   std::vector<int> _zero_count;\n    std::vector<RankWaveletMatrix> _zero_first_matrix;\n\
@@ -130,19 +159,33 @@ data:
     \ - 1)))\n        );\n        _matrix.clear();\n        _matrix.reserve(_log);\n\
     \        _zero_count.assign(_log, 0);\n        _zero_first_matrix.clear();\n \
     \       _zero_first_matrix.reserve(_log);\n\n        for (int level = 0; level\
-    \ < _log; level++) {\n            _matrix.emplace_back(_n);\n            int zeros\
-    \ = 0;\n            for (int i = 0; i < _n; i++) {\n                if (bit(current_second[i],\
-    \ level)) {\n                    _matrix.back().set(i);\n                } else\
-    \ {\n                    zeros++;\n                }\n            }\n        \
-    \    _matrix.back().build();\n\n            _zero_count[level] = zeros;\n    \
-    \        int zero_position = 0;\n            int one_position = zeros;\n     \
-    \       for (int i = 0; i < _n; i++) {\n                int position;\n      \
-    \          if (bit(current_second[i], level)) {\n                    position\
-    \ = one_position++;\n                } else {\n                    position =\
-    \ zero_position++;\n                }\n                next_first[position] =\
-    \ current_first[i];\n                next_second[position] = current_second[i];\n\
-    \            }\n\n            std::vector<int> zero_first(\n                next_first.begin(),\n\
-    \                next_first.begin() + zeros\n            );\n            _zero_first_matrix.emplace_back(zero_first,\
+    \ < _log; level++) {\n            _matrix.emplace_back(_n);\n            BitVector&\
+    \ bit_vector = _matrix.back();\n            int shift = _log - 1 - level;\n  \
+    \          int zeros = 0;\n            for (int base = 0; base < _n; base += 64)\
+    \ {\n                int count = std::min(64, _n - base);\n                std::uint64_t\
+    \ word = extract_bits(\n                    current_second.data() + base,\n  \
+    \                  count,\n                    shift\n                );\n   \
+    \             bit_vector.bits[std::size_t(base) >> 6] = word;\n              \
+    \  zeros += count - std::popcount(word);\n            }\n            bit_vector.build();\n\
+    \n            _zero_count[level] = zeros;\n            int zero_position = 0;\n\
+    \            int one_position = zeros;\n            for (int base = 0; base <\
+    \ _n; base += 64) {\n                int count = std::min(64, _n - base);\n  \
+    \              std::uint64_t ones = bit_vector.bits[std::size_t(base) >> 6];\n\
+    \                std::uint64_t valid = count == 64\n                         \
+    \                 ? ~std::uint64_t(0)\n                                      \
+    \    : (std::uint64_t(1) << count) - 1;\n                std::uint64_t zeroes\
+    \ = (~ones) & valid;\n                while (zeroes != 0) {\n                \
+    \    int offset = std::countr_zero(zeroes);\n                    next_first[zero_position]\
+    \ = current_first[base + offset];\n                    next_second[zero_position]\
+    \ = current_second[base + offset];\n                    zero_position++;\n   \
+    \                 zeroes &= zeroes - 1;\n                }\n                while\
+    \ (ones != 0) {\n                    int offset = std::countr_zero(ones);\n  \
+    \                  next_first[one_position] = current_first[base + offset];\n\
+    \                    next_second[one_position] = current_second[base + offset];\n\
+    \                    one_position++;\n                    ones &= ones - 1;\n\
+    \                }\n            }\n\n            std::vector<int> zero_first(\n\
+    \                next_first.begin(),\n                next_first.begin() + zeros\n\
+    \            );\n            _zero_first_matrix.emplace_back(std::move(zero_first),\
     \ first_size);\n            current_first.swap(next_first);\n            current_second.swap(next_second);\n\
     \        }\n    }\n\n    void build(\n        const std::vector<X>& first,\n \
     \       const std::vector<Y>& second\n    ) {\n        assert(first.size() ==\
@@ -181,66 +224,94 @@ data:
     }  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_DS_WAVELET_MATRIX_WAVELET_MATRIX_2D_HPP\n#define M1UNE_DS_WAVELET_MATRIX_WAVELET_MATRIX_2D_HPP\
     \ 1\n\n#include <algorithm>\n#include <bit>\n#include <cassert>\n#include <cstdint>\n\
-    #include <utility>\n#include <vector>\n\nnamespace m1une {\nnamespace ds {\n\n\
-    // A static wavelet matrix for a sequence of pairs.\n//\n// Besides the index\
-    \ range, queries can restrict the first component and count\n// or select by the\
-    \ second component. This corresponds to orthogonal queries in\n// the three dimensions\
-    \ (index, first, second).\ntemplate <class X, class Y = X>\nclass WaveletMatrix2D\
-    \ {\n   public:\n    using first_type = X;\n    using second_type = Y;\n    using\
-    \ value_type = std::pair<X, Y>;\n\n   private:\n    struct BitVector {\n     \
-    \   std::vector<std::uint64_t> bits;\n        std::vector<int> prefix;\n\n   \
-    \     BitVector() = default;\n\n        explicit BitVector(int n)\n          \
-    \  : bits((std::size_t(n) + 63) >> 6, 0),\n              prefix(bits.size() +\
-    \ 1, 0) {}\n\n        void set(int p) {\n            bits[std::size_t(p) >> 6]\
-    \ |= std::uint64_t(1) << (p & 63);\n        }\n\n        void build() {\n    \
-    \        for (std::size_t i = 0; i < bits.size(); i++) {\n                prefix[i\
-    \ + 1] = prefix[i] + std::popcount(bits[i]);\n            }\n        }\n\n   \
-    \     int rank1(int r) const {\n            std::size_t word = std::size_t(r)\
-    \ >> 6;\n            int offset = r & 63;\n            int result = prefix[word];\n\
-    \            if (offset != 0) {\n                result += std::popcount(\n  \
-    \                  bits[word] & ((std::uint64_t(1) << offset) - 1)\n         \
-    \       );\n            }\n            return result;\n        }\n    };\n\n \
-    \   class RankWaveletMatrix {\n       private:\n        int _n = 0;\n        int\
-    \ _alphabet_size = 0;\n        int _log = 0;\n        std::vector<BitVector> _matrix;\n\
-    \        std::vector<int> _zero_count;\n\n        bool bit(int value, int level)\
-    \ const {\n            return (value >> (_log - 1 - level)) & 1;\n        }\n\n\
-    \        int count_less(int l, int r, int upper) const {\n            if (upper\
-    \ <= 0) return 0;\n            if (upper >= _alphabet_size) return r - l;\n\n\
-    \            int result = 0;\n            for (int level = 0; level < _log; level++)\
+    #include <utility>\n#include <vector>\n\n#if defined(__AVX2__) || defined(__BMI2__)\n\
+    #include <immintrin.h>\n#endif\n\nnamespace m1une {\nnamespace ds {\n\n// A static\
+    \ wavelet matrix for a sequence of pairs.\n//\n// Besides the index range, queries\
+    \ can restrict the first component and count\n// or select by the second component.\
+    \ This corresponds to orthogonal queries in\n// the three dimensions (index, first,\
+    \ second).\ntemplate <class X, class Y = X>\nclass WaveletMatrix2D {\n   public:\n\
+    \    using first_type = X;\n    using second_type = Y;\n    using value_type =\
+    \ std::pair<X, Y>;\n\n   private:\n    struct BitVector {\n        std::vector<std::uint64_t>\
+    \ bits;\n        std::vector<int> prefix;\n\n        BitVector() = default;\n\n\
+    \        explicit BitVector(int n)\n            : bits(((std::size_t(n) + 63)\
+    \ >> 6) + 1, 0),\n              prefix(bits.size(), 0) {}\n\n        void build()\
+    \ {\n            for (std::size_t i = 0; i + 1 < bits.size(); i++) {\n       \
+    \         prefix[i + 1] = prefix[i] + std::popcount(bits[i]);\n            }\n\
+    \        }\n\n        int rank1(int r) const {\n            std::size_t word =\
+    \ std::size_t(r) >> 6;\n            int offset = r & 63;\n            int result\
+    \ = prefix[word];\n#if defined(__BMI2__)\n            result += std::popcount(\n\
+    \                _bzhi_u64(bits[word], static_cast<unsigned int>(offset))\n  \
+    \          );\n#else\n            if (offset != 0) {\n                result +=\
+    \ std::popcount(\n                    bits[word] & ((std::uint64_t(1) << offset)\
+    \ - 1)\n                );\n            }\n#endif\n            return result;\n\
+    \        }\n    };\n\n    static std::uint64_t extract_bits(\n        const int*\
+    \ values,\n        int count,\n        int shift\n    ) {\n        std::uint64_t\
+    \ result = 0;\n        int i = 0;\n#if defined(__AVX2__)\n        __m128i left\
+    \ = _mm_cvtsi32_si128(31 - shift);\n        for (; i + 8 <= count; i += 8) {\n\
+    \            __m256i data = _mm256_loadu_si256(\n                reinterpret_cast<const\
+    \ __m256i*>(values + i)\n            );\n            data = _mm256_sll_epi32(data,\
+    \ left);\n            int mask = _mm256_movemask_ps(_mm256_castsi256_ps(data));\n\
+    \            result |= std::uint64_t(mask) << i;\n        }\n#endif\n        for\
+    \ (; i < count; i++) {\n            result |= std::uint64_t((unsigned(values[i])\
+    \ >> shift) & 1) << i;\n        }\n        return result;\n    }\n\n    class\
+    \ RankWaveletMatrix {\n       private:\n        int _n = 0;\n        int _alphabet_size\
+    \ = 0;\n        int _log = 0;\n        std::vector<BitVector> _matrix;\n     \
+    \   std::vector<int> _zero_count;\n\n        bool bit(int value, int level) const\
+    \ {\n            return (value >> (_log - 1 - level)) & 1;\n        }\n\n    \
+    \    int count_less(int l, int r, int upper) const {\n            if (upper <=\
+    \ 0) return 0;\n            if (upper >= _alphabet_size) return r - l;\n\n   \
+    \         int result = 0;\n            for (int level = 0; level < _log; level++)\
     \ {\n                int l1 = _matrix[level].rank1(l);\n                int r1\
     \ = _matrix[level].rank1(r);\n                if (bit(upper, level)) {\n     \
     \               result += (r - l) - (r1 - l1);\n                    l = _zero_count[level]\
     \ + l1;\n                    r = _zero_count[level] + r1;\n                } else\
     \ {\n                    l -= l1;\n                    r -= r1;\n            \
-    \    }\n            }\n            return result;\n        }\n\n       public:\n\
-    \        RankWaveletMatrix() = default;\n\n        RankWaveletMatrix(\n      \
-    \      const std::vector<int>& values,\n            int alphabet_size\n      \
-    \  ) {\n            build(values, alphabet_size);\n        }\n\n        void build(const\
-    \ std::vector<int>& values, int alphabet_size) {\n            assert(alphabet_size\
-    \ >= 0);\n            _n = int(values.size());\n            _alphabet_size = alphabet_size;\n\
+    \    }\n            }\n            return result;\n        }\n\n        void build_owned(std::vector<int>\
+    \ current, int alphabet_size) {\n            assert(alphabet_size >= 0);\n   \
+    \         _n = int(current.size());\n            _alphabet_size = alphabet_size;\n\
     \            _log = alphabet_size == 0\n                       ? 0\n         \
     \              : std::max(\n                             1,\n                \
     \             int(std::bit_width(unsigned(alphabet_size - 1)))\n             \
     \            );\n\n            _matrix.clear();\n            _matrix.reserve(_log);\n\
-    \            _zero_count.assign(_log, 0);\n            std::vector<int> current(values);\n\
-    \            std::vector<int> next(_n);\n            for (int value : values)\
-    \ {\n                assert(0 <= value && value < alphabet_size);\n          \
-    \      (void)value;\n            }\n\n            for (int level = 0; level <\
-    \ _log; level++) {\n                _matrix.emplace_back(_n);\n              \
-    \  int zeros = 0;\n                for (int i = 0; i < _n; i++) {\n          \
-    \          if (bit(current[i], level)) {\n                        _matrix.back().set(i);\n\
-    \                    } else {\n                        zeros++;\n            \
-    \        }\n                }\n                _matrix.back().build();\n\n   \
-    \             _zero_count[level] = zeros;\n                int zero_position =\
-    \ 0;\n                int one_position = zeros;\n                for (int value\
-    \ : current) {\n                    if (bit(value, level)) {\n               \
-    \         next[one_position++] = value;\n                    } else {\n      \
-    \                  next[zero_position++] = value;\n                    }\n   \
-    \             }\n                current.swap(next);\n            }\n        }\n\
-    \n        int range_freq(int l, int r, int lower, int upper) const {\n       \
-    \     assert(0 <= l && l <= r && r <= _n);\n            if (upper <= lower) return\
-    \ 0;\n            return count_less(l, r, upper) - count_less(l, r, lower);\n\
-    \        }\n    };\n\n    int _n = 0;\n    int _log = 0;\n    std::vector<value_type>\
+    \            _zero_count.assign(_log, 0);\n            std::vector<int> next(_n);\n\
+    \            for (int value : current) {\n                assert(0 <= value &&\
+    \ value < alphabet_size);\n                (void)value;\n            }\n\n   \
+    \         for (int level = 0; level < _log; level++) {\n                _matrix.emplace_back(_n);\n\
+    \                BitVector& bit_vector = _matrix.back();\n                int\
+    \ shift = _log - 1 - level;\n                int zeros = 0;\n                for\
+    \ (int base = 0; base < _n; base += 64) {\n                    int count = std::min(64,\
+    \ _n - base);\n                    std::uint64_t word = WaveletMatrix2D::extract_bits(\n\
+    \                        current.data() + base,\n                        count,\n\
+    \                        shift\n                    );\n                    bit_vector.bits[std::size_t(base)\
+    \ >> 6] = word;\n                    zeros += count - std::popcount(word);\n \
+    \               }\n                bit_vector.build();\n\n                _zero_count[level]\
+    \ = zeros;\n                int zero_position = 0;\n                int one_position\
+    \ = zeros;\n                for (int base = 0; base < _n; base += 64) {\n    \
+    \                int count = std::min(64, _n - base);\n                    std::uint64_t\
+    \ ones =\n                        bit_vector.bits[std::size_t(base) >> 6];\n \
+    \                   std::uint64_t valid = count == 64\n                      \
+    \                        ? ~std::uint64_t(0)\n                               \
+    \               : (std::uint64_t(1) << count) - 1;\n                    std::uint64_t\
+    \ zeroes = (~ones) & valid;\n                    while (zeroes != 0) {\n     \
+    \                   int offset = std::countr_zero(zeroes);\n                 \
+    \       next[zero_position++] = current[base + offset];\n                    \
+    \    zeroes &= zeroes - 1;\n                    }\n                    while (ones\
+    \ != 0) {\n                        int offset = std::countr_zero(ones);\n    \
+    \                    next[one_position++] = current[base + offset];\n        \
+    \                ones &= ones - 1;\n                    }\n                }\n\
+    \                current.swap(next);\n            }\n        }\n\n       public:\n\
+    \        RankWaveletMatrix() = default;\n\n        RankWaveletMatrix(\n      \
+    \      const std::vector<int>& values,\n            int alphabet_size\n      \
+    \  ) {\n            build(values, alphabet_size);\n        }\n\n        RankWaveletMatrix(\n\
+    \            std::vector<int>&& values,\n            int alphabet_size\n     \
+    \   ) {\n            build(std::move(values), alphabet_size);\n        }\n\n \
+    \       void build(const std::vector<int>& values, int alphabet_size) {\n    \
+    \        build_owned(values, alphabet_size);\n        }\n\n        void build(std::vector<int>&&\
+    \ values, int alphabet_size) {\n            build_owned(std::move(values), alphabet_size);\n\
+    \        }\n\n        int range_freq(int l, int r, int lower, int upper) const\
+    \ {\n            assert(0 <= l && l <= r && r <= _n);\n            if (upper <=\
+    \ lower) return 0;\n            return count_less(l, r, upper) - count_less(l,\
+    \ r, lower);\n        }\n    };\n\n    int _n = 0;\n    int _log = 0;\n    std::vector<value_type>\
     \ _values;\n    std::vector<X> _first_coordinates;\n    std::vector<Y> _second_coordinates;\n\
     \    RankWaveletMatrix _first_matrix;\n    std::vector<BitVector> _matrix;\n \
     \   std::vector<int> _zero_count;\n    std::vector<RankWaveletMatrix> _zero_first_matrix;\n\
@@ -299,19 +370,33 @@ data:
     \ - 1)))\n        );\n        _matrix.clear();\n        _matrix.reserve(_log);\n\
     \        _zero_count.assign(_log, 0);\n        _zero_first_matrix.clear();\n \
     \       _zero_first_matrix.reserve(_log);\n\n        for (int level = 0; level\
-    \ < _log; level++) {\n            _matrix.emplace_back(_n);\n            int zeros\
-    \ = 0;\n            for (int i = 0; i < _n; i++) {\n                if (bit(current_second[i],\
-    \ level)) {\n                    _matrix.back().set(i);\n                } else\
-    \ {\n                    zeros++;\n                }\n            }\n        \
-    \    _matrix.back().build();\n\n            _zero_count[level] = zeros;\n    \
-    \        int zero_position = 0;\n            int one_position = zeros;\n     \
-    \       for (int i = 0; i < _n; i++) {\n                int position;\n      \
-    \          if (bit(current_second[i], level)) {\n                    position\
-    \ = one_position++;\n                } else {\n                    position =\
-    \ zero_position++;\n                }\n                next_first[position] =\
-    \ current_first[i];\n                next_second[position] = current_second[i];\n\
-    \            }\n\n            std::vector<int> zero_first(\n                next_first.begin(),\n\
-    \                next_first.begin() + zeros\n            );\n            _zero_first_matrix.emplace_back(zero_first,\
+    \ < _log; level++) {\n            _matrix.emplace_back(_n);\n            BitVector&\
+    \ bit_vector = _matrix.back();\n            int shift = _log - 1 - level;\n  \
+    \          int zeros = 0;\n            for (int base = 0; base < _n; base += 64)\
+    \ {\n                int count = std::min(64, _n - base);\n                std::uint64_t\
+    \ word = extract_bits(\n                    current_second.data() + base,\n  \
+    \                  count,\n                    shift\n                );\n   \
+    \             bit_vector.bits[std::size_t(base) >> 6] = word;\n              \
+    \  zeros += count - std::popcount(word);\n            }\n            bit_vector.build();\n\
+    \n            _zero_count[level] = zeros;\n            int zero_position = 0;\n\
+    \            int one_position = zeros;\n            for (int base = 0; base <\
+    \ _n; base += 64) {\n                int count = std::min(64, _n - base);\n  \
+    \              std::uint64_t ones = bit_vector.bits[std::size_t(base) >> 6];\n\
+    \                std::uint64_t valid = count == 64\n                         \
+    \                 ? ~std::uint64_t(0)\n                                      \
+    \    : (std::uint64_t(1) << count) - 1;\n                std::uint64_t zeroes\
+    \ = (~ones) & valid;\n                while (zeroes != 0) {\n                \
+    \    int offset = std::countr_zero(zeroes);\n                    next_first[zero_position]\
+    \ = current_first[base + offset];\n                    next_second[zero_position]\
+    \ = current_second[base + offset];\n                    zero_position++;\n   \
+    \                 zeroes &= zeroes - 1;\n                }\n                while\
+    \ (ones != 0) {\n                    int offset = std::countr_zero(ones);\n  \
+    \                  next_first[one_position] = current_first[base + offset];\n\
+    \                    next_second[one_position] = current_second[base + offset];\n\
+    \                    one_position++;\n                    ones &= ones - 1;\n\
+    \                }\n            }\n\n            std::vector<int> zero_first(\n\
+    \                next_first.begin(),\n                next_first.begin() + zeros\n\
+    \            );\n            _zero_first_matrix.emplace_back(std::move(zero_first),\
     \ first_size);\n            current_first.swap(next_first);\n            current_second.swap(next_second);\n\
     \        }\n    }\n\n    void build(\n        const std::vector<X>& first,\n \
     \       const std::vector<Y>& second\n    ) {\n        assert(first.size() ==\
@@ -352,7 +437,7 @@ data:
   isVerificationFile: false
   path: ds/wavelet_matrix/wavelet_matrix_2d.hpp
   requiredBy: []
-  timestamp: '2026-07-16 18:16:52+09:00'
+  timestamp: '2026-07-16 18:47:36+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/wavelet_matrix/wavelet_matrix_2d.test.cpp
@@ -386,6 +471,11 @@ An outer wavelet matrix is built on the second components. At every outer
 level, the elements routed to the zero side form another wavelet matrix over
 their first components. These inner matrices restrict each outer rank step to
 the requested first-component interval.
+
+Packed levels are built one machine word at a time and partitioned from their
+zero and one masks. Temporary compressed-coordinate buffers are moved into
+inner matrices when possible. AVX2 bit extraction and BMI2 rank masking are
+used when enabled at compile time, with compact scalar fallbacks.
 
 The sequence is immutable after construction.
 

@@ -488,131 +488,131 @@ data:
   isVerificationFile: false
   path: graph/graph.hpp
   requiredBy:
-  - graph/replacement_paths.hpp
-  - graph/maximum_clique.hpp
-  - graph/dijkstra.hpp
-  - graph/scc.hpp
-  - graph/kruskal.hpp
-  - graph/range_edge_graph.hpp
-  - graph/bipartite.hpp
-  - graph/enumerate_triangles.hpp
-  - graph/minimum_steiner_tree.hpp
-  - graph/bellman_ford.hpp
-  - graph/k_shortest_walk.hpp
-  - graph/dag_shortest_path.hpp
+  - graph/block_cut_tree.hpp
+  - graph/dominator_tree.hpp
+  - graph/directed.hpp
+  - graph/two_edge_connected_components.hpp
   - graph/chromatic_number.hpp
+  - graph/shortest_path.hpp
+  - graph/all.hpp
+  - graph/all.hpp
+  - graph/replacement_paths.hpp
+  - graph/dijkstra.hpp
+  - graph/general_matching.hpp
+  - graph/kruskal.hpp
+  - graph/lowlink.hpp
+  - graph/connected_components.hpp
+  - graph/k_shortest_walk.hpp
+  - graph/topological_sort.hpp
+  - graph/bfs.hpp
+  - graph/bellman_ford.hpp
+  - graph/grid.hpp
+  - graph/directed_mst.hpp
+  - graph/dag_shortest_path.hpp
+  - graph/general_weighted_matching.hpp
+  - graph/range_edge_graph.hpp
+  - graph/undirected.hpp
   - graph/eulerian_trail.hpp
+  - graph/complement_connected_components.hpp
+  - graph/bipartite.hpp
   - graph/namori.hpp
-  - graph/tree/zero_one_on_tree.hpp
-  - graph/tree/centroid_decomposition.hpp
+  - graph/tree/diameter.hpp
+  - graph/tree/tree.hpp
   - graph/tree/sparse_table_lca.hpp
-  - graph/tree/rooted_tree.hpp
-  - graph/tree/rerooting_dp.hpp
-  - graph/tree/cartesian_tree.hpp
-  - graph/tree/all.hpp
-  - graph/tree/euler_tour.hpp
-  - graph/tree/range_contour_query.hpp
-  - graph/tree/rerooting_static_top_tree.hpp
-  - graph/tree/distance_frequency.hpp
-  - graph/tree/heavy_light_decomposition.hpp
+  - graph/tree/virtual_tree.hpp
   - graph/tree/static_top_tree.hpp
+  - graph/tree/euler_tour.hpp
+  - graph/tree/rerooting_static_top_tree.hpp
+  - graph/tree/all.hpp
   - graph/tree/dsu_on_tree.hpp
   - graph/tree/tree_hash.hpp
-  - graph/tree/virtual_tree.hpp
-  - graph/tree/tree.hpp
-  - graph/tree/diameter.hpp
-  - graph/dominator_tree.hpp
-  - graph/two_edge_connected_components.hpp
-  - graph/connected_components.hpp
-  - graph/all.hpp
-  - graph/all.hpp
-  - graph/lowlink.hpp
+  - graph/tree/zero_one_on_tree.hpp
+  - graph/tree/cartesian_tree.hpp
+  - graph/tree/range_contour_query.hpp
+  - graph/tree/rooted_tree.hpp
+  - graph/tree/heavy_light_decomposition.hpp
+  - graph/tree/centroid_decomposition.hpp
+  - graph/tree/distance_frequency.hpp
+  - graph/tree/rerooting_dp.hpp
+  - graph/minimum_steiner_tree.hpp
   - graph/matrix_tree_theorem.hpp
+  - graph/maximum_clique.hpp
+  - graph/enumerate_triangles.hpp
   - graph/zero_one_bfs.hpp
-  - graph/block_cut_tree.hpp
-  - graph/complement_connected_components.hpp
-  - graph/general_weighted_matching.hpp
-  - graph/grid.hpp
-  - graph/topological_sort.hpp
+  - graph/scc.hpp
   - graph/cycle_detection.hpp
-  - graph/chordal_graph_recognition.hpp
-  - graph/bfs.hpp
-  - graph/warshall_floyd.hpp
   - graph/biconnected_components.hpp
-  - graph/undirected.hpp
-  - graph/directed.hpp
-  - graph/directed_mst.hpp
   - graph/three_edge_connected_components.hpp
-  - graph/shortest_path.hpp
-  - graph/general_matching.hpp
+  - graph/warshall_floyd.hpp
+  - graph/chordal_graph_recognition.hpp
   timestamp: '2026-07-11 19:47:32+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/graph/library_checker_maximum_independent_set.test.cpp
-  - verify/graph/library_checker_maximum_independent_set.test.cpp
-  - verify/graph/cow_game.test.cpp
-  - verify/graph/cow_game.test.cpp
-  - verify/graph/library_checker_lowest_common_ancestor.test.cpp
-  - verify/graph/library_checker_lowest_common_ancestor.test.cpp
+  - verify/graph/cycle_detection.test.cpp
+  - verify/graph/cycle_detection.test.cpp
+  - verify/graph/chromatic_number_randomized.test.cpp
+  - verify/graph/chromatic_number_randomized.test.cpp
   - verify/graph/minimum_steiner_tree.test.cpp
-  - verify/graph/library_checker_general_matching.test.cpp
-  - verify/graph/library_checker_general_matching.test.cpp
-  - verify/graph/chordal_graph_recognition.test.cpp
-  - verify/graph/shortest_path.test.cpp
-  - verify/graph/shortest_path.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
-  - verify/graph/bipartite_matching.test.cpp
-  - verify/graph/three_edge_connected_components.test.cpp
-  - verify/graph/eulerian_trail_undirected.test.cpp
-  - verify/graph/cycle_detection_undirected.test.cpp
-  - verify/graph/cycle_detection_undirected.test.cpp
-  - verify/graph/eulerian_trail_directed.test.cpp
-  - verify/graph/minimum_spanning_tree.test.cpp
-  - verify/graph/minimum_spanning_tree.test.cpp
-  - verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
-  - verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
-  - verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
-  - verify/graph/tree/cartesian_tree.test.cpp
-  - verify/graph/tree/vertex_get_range_contour_add_on_tree.test.cpp
-  - verify/graph/tree/vertex_add_subtree_sum.test.cpp
-  - verify/graph/tree/vertex_add_subtree_sum.test.cpp
-  - verify/graph/tree/tree_algorithms.test.cpp
-  - verify/graph/tree/tree_algorithms.test.cpp
-  - verify/graph/tree/tree_diameter.test.cpp
-  - verify/graph/tree/tree_diameter.test.cpp
-  - verify/graph/tree/distance_frequency.test.cpp
-  - verify/graph/tree/distance_frequency.test.cpp
-  - verify/graph/tree/dsu_on_tree.test.cpp
-  - verify/graph/tree/dsu_on_tree.test.cpp
-  - verify/graph/tree/zero_one_on_tree.test.cpp
-  - verify/graph/tree/zero_one_on_tree.test.cpp
-  - verify/graph/biconnected_components.test.cpp
-  - verify/graph/dominator_tree.test.cpp
-  - verify/graph/dominator_tree.test.cpp
-  - verify/graph/chromatic_number_randomized.test.cpp
-  - verify/graph/chromatic_number_randomized.test.cpp
-  - verify/graph/replacement_paths.test.cpp
-  - verify/graph/cycle_detection.test.cpp
-  - verify/graph/cycle_detection.test.cpp
-  - verify/graph/block_cut_tree.test.cpp
-  - verify/graph/counting_spanning_tree_directed.test.cpp
-  - verify/graph/k_shortest_walk.test.cpp
-  - verify/graph/enumerate_triangles.test.cpp
-  - verify/graph/enumerate_triangles.test.cpp
-  - verify/graph/graph_algorithms.test.cpp
-  - verify/graph/graph_algorithms.test.cpp
-  - verify/graph/bipartite_edge_coloring.test.cpp
-  - verify/graph/complement_connected_components.test.cpp
-  - verify/graph/namori.test.cpp
-  - verify/graph/chromatic_number.test.cpp
-  - verify/graph/chromatic_number.test.cpp
-  - verify/graph/directed_mst.test.cpp
+  - verify/graph/library_checker_maximum_independent_set.test.cpp
+  - verify/graph/library_checker_maximum_independent_set.test.cpp
   - verify/graph/two_edge_connected_components.test.cpp
-  - verify/graph/general_weighted_matching.test.cpp
-  - verify/graph/scc.test.cpp
-  - verify/graph/scc.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
   - verify/graph/counting_spanning_tree_undirected.test.cpp
+  - verify/graph/dominator_tree.test.cpp
+  - verify/graph/dominator_tree.test.cpp
+  - verify/graph/cow_game.test.cpp
+  - verify/graph/cow_game.test.cpp
+  - verify/graph/cycle_detection_undirected.test.cpp
+  - verify/graph/cycle_detection_undirected.test.cpp
+  - verify/graph/bipartite_edge_coloring.test.cpp
+  - verify/graph/counting_spanning_tree_directed.test.cpp
+  - verify/graph/shortest_path.test.cpp
+  - verify/graph/shortest_path.test.cpp
+  - verify/graph/namori.test.cpp
+  - verify/graph/bipartite_matching.test.cpp
+  - verify/graph/chromatic_number.test.cpp
+  - verify/graph/chromatic_number.test.cpp
+  - verify/graph/minimum_spanning_tree.test.cpp
+  - verify/graph/minimum_spanning_tree.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/complement_connected_components.test.cpp
+  - verify/graph/block_cut_tree.test.cpp
+  - verify/graph/enumerate_triangles.test.cpp
+  - verify/graph/enumerate_triangles.test.cpp
+  - verify/graph/biconnected_components.test.cpp
+  - verify/graph/eulerian_trail_undirected.test.cpp
+  - verify/graph/scc.test.cpp
+  - verify/graph/scc.test.cpp
+  - verify/graph/eulerian_trail_directed.test.cpp
+  - verify/graph/tree/dsu_on_tree.test.cpp
+  - verify/graph/tree/dsu_on_tree.test.cpp
+  - verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
+  - verify/graph/tree/tree_diameter.test.cpp
+  - verify/graph/tree/tree_diameter.test.cpp
+  - verify/graph/tree/vertex_add_subtree_sum.test.cpp
+  - verify/graph/tree/vertex_add_subtree_sum.test.cpp
+  - verify/graph/tree/cartesian_tree.test.cpp
+  - verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
+  - verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
+  - verify/graph/tree/tree_algorithms.test.cpp
+  - verify/graph/tree/tree_algorithms.test.cpp
+  - verify/graph/tree/distance_frequency.test.cpp
+  - verify/graph/tree/distance_frequency.test.cpp
+  - verify/graph/tree/vertex_get_range_contour_add_on_tree.test.cpp
+  - verify/graph/tree/zero_one_on_tree.test.cpp
+  - verify/graph/tree/zero_one_on_tree.test.cpp
+  - verify/graph/library_checker_lowest_common_ancestor.test.cpp
+  - verify/graph/library_checker_lowest_common_ancestor.test.cpp
+  - verify/graph/three_edge_connected_components.test.cpp
+  - verify/graph/chordal_graph_recognition.test.cpp
+  - verify/graph/directed_mst.test.cpp
+  - verify/graph/replacement_paths.test.cpp
+  - verify/graph/k_shortest_walk.test.cpp
+  - verify/graph/general_weighted_matching.test.cpp
+  - verify/graph/library_checker_general_matching.test.cpp
+  - verify/graph/library_checker_general_matching.test.cpp
 documentation_of: graph/graph.hpp
 layout: document
 title: Graph

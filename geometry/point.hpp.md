@@ -286,45 +286,45 @@ data:
   isVerificationFile: false
   path: geometry/point.hpp
   requiredBy:
-  - geometry/minimum_enclosing_circle.hpp
-  - geometry/convex_layers.hpp
-  - geometry/ray.hpp
-  - geometry/circle.hpp
-  - geometry/all.hpp
-  - geometry/convex_hull.hpp
-  - geometry/line.hpp
-  - geometry/angle_sort.hpp
   - geometry/farthest_pair.hpp
-  - geometry/closest_pair.hpp
-  - geometry/manhattan_mst.hpp
-  - geometry/rectangle_union_area.hpp
-  - geometry/polygon.hpp
   - geometry/euclidean_mst.hpp
+  - geometry/all.hpp
+  - geometry/closest_pair.hpp
+  - geometry/rectangle_union_area.hpp
+  - geometry/convex_hull.hpp
+  - geometry/manhattan_mst.hpp
+  - geometry/ray.hpp
+  - geometry/polygon.hpp
+  - geometry/convex_layers.hpp
+  - geometry/line.hpp
   - geometry/half_plane_intersection.hpp
+  - geometry/circle.hpp
+  - geometry/angle_sort.hpp
+  - geometry/minimum_enclosing_circle.hpp
   timestamp: '2026-06-21 12:04:47+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/geometry/half_plane_intersection.test.cpp
-  - verify/geometry/closest_pair.test.cpp
-  - verify/geometry/polygon_area.test.cpp
-  - verify/geometry/rectangle_union_area.test.cpp
-  - verify/geometry/circle_line_intersection.test.cpp
-  - verify/geometry/minimum_enclosing_circle.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
-  - verify/geometry/segment_intersection.test.cpp
-  - verify/geometry/euclidean_mst.test.cpp
-  - verify/geometry/circle_ray.test.cpp
-  - verify/geometry/half_plane_intersection_random.test.cpp
-  - verify/geometry/convex_layers.test.cpp
-  - verify/geometry/convex_layers.test.cpp
-  - verify/geometry/manhattan_mst.test.cpp
-  - verify/geometry/point_in_polygon.test.cpp
-  - verify/geometry/convex_hull.test.cpp
-  - verify/geometry/polygon_operations.test.cpp
-  - verify/geometry/projection.test.cpp
   - verify/geometry/ray.test.cpp
-  - verify/geometry/farthest_pair.test.cpp
   - verify/geometry/angle_sort.test.cpp
+  - verify/geometry/point_in_polygon.test.cpp
+  - verify/geometry/rectangle_union_area.test.cpp
+  - verify/geometry/euclidean_mst.test.cpp
+  - verify/geometry/convex_layers.test.cpp
+  - verify/geometry/convex_layers.test.cpp
+  - verify/geometry/farthest_pair.test.cpp
+  - verify/geometry/polygon_area.test.cpp
+  - verify/geometry/segment_intersection.test.cpp
+  - verify/geometry/circle_ray.test.cpp
+  - verify/geometry/polygon_operations.test.cpp
+  - verify/geometry/convex_hull.test.cpp
+  - verify/geometry/closest_pair.test.cpp
+  - verify/geometry/manhattan_mst.test.cpp
+  - verify/geometry/projection.test.cpp
+  - verify/geometry/circle_line_intersection.test.cpp
+  - verify/geometry/half_plane_intersection.test.cpp
+  - verify/geometry/minimum_enclosing_circle.test.cpp
+  - verify/geometry/half_plane_intersection_random.test.cpp
 documentation_of: geometry/point.hpp
 layout: document
 title: 2D Point and Predicates

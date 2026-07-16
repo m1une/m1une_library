@@ -53,8 +53,8 @@ data:
   isVerificationFile: false
   path: algo/sequence/number_of_subsequences.hpp
   requiredBy:
-  - algo/all.hpp
   - algo/sequence/all.hpp
+  - algo/all.hpp
   timestamp: '2026-07-10 18:48:41+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:

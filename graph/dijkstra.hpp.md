@@ -155,19 +155,19 @@ data:
   isVerificationFile: false
   path: graph/dijkstra.hpp
   requiredBy:
-  - graph/replacement_paths.hpp
-  - graph/all.hpp
-  - graph/undirected.hpp
   - graph/directed.hpp
   - graph/shortest_path.hpp
+  - graph/all.hpp
+  - graph/replacement_paths.hpp
+  - graph/undirected.hpp
   timestamp: '2026-07-11 19:47:32+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/graph/graph_algorithms.test.cpp
   - verify/graph/cow_game.test.cpp
   - verify/graph/shortest_path.test.cpp
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/replacement_paths.test.cpp
-  - verify/graph/graph_algorithms.test.cpp
 documentation_of: graph/dijkstra.hpp
 layout: document
 title: Dijkstra

@@ -428,17 +428,17 @@ data:
   isVerificationFile: false
   path: math/matrix/bit_matrix.hpp
   requiredBy:
-  - math/all.hpp
   - math/matrix/all.hpp
+  - math/all.hpp
   timestamp: '2026-07-13 20:43:05+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
+  - verify/math/matrix/bit_matrix_product.test.cpp
   - verify/math/matrix/bit_matrix_inverse.test.cpp
   - verify/math/matrix/bit_matrix_rank.test.cpp
-  - verify/math/matrix/bit_matrix_product.test.cpp
-  - verify/math/matrix/bit_matrix_linear_system.test.cpp
   - verify/math/matrix/matrix.test.cpp
+  - verify/math/matrix/bit_matrix_linear_system.test.cpp
 documentation_of: math/matrix/bit_matrix.hpp
 layout: document
 title: Bit Matrix

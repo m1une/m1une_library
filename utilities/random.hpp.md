@@ -353,10 +353,10 @@ data:
   timestamp: '2026-07-01 22:42:42+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/utilities/random_testing.test.cpp
+  - verify/utilities/basic_utilities.test.cpp
   - verify/utilities/random_generators.test.cpp
   - verify/utilities/grid_transform.test.cpp
-  - verify/utilities/basic_utilities.test.cpp
-  - verify/utilities/random_testing.test.cpp
 documentation_of: utilities/random.hpp
 layout: document
 title: Random
