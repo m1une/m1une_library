@@ -100,6 +100,7 @@
 "verify/ds/segtree/segtree_2d.test.cpp": "2026-07-16 04:26:38 +0900",
 "verify/ds/segtree/segtree_beats.test.cpp": "2026-07-16 04:26:38 +0900",
 "verify/ds/stack/persistent_stack.test.cpp": "2026-07-16 04:26:38 +0900",
+"verify/ds/wavelet_matrix/dynamic_wavelet_matrix.test.cpp": "2026-07-16 19:05:45 +0900",
 "verify/ds/wavelet_matrix/wavelet_matrix.test.cpp": "2026-07-16 18:47:36 +0900",
 "verify/ds/wavelet_matrix/wavelet_matrix_2d.test.cpp": "2026-07-16 18:47:36 +0900",
 "verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp": "2026-07-16 18:47:36 +0900",
