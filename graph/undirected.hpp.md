@@ -44,6 +44,9 @@ data:
     path: graph/dijkstra.hpp
     title: Dijkstra
   - icon: ':heavy_check_mark:'
+    path: graph/enumerate_cliques.hpp
+    title: Enumerate Cliques
+  - icon: ':heavy_check_mark:'
     path: graph/enumerate_triangles.hpp
     title: Enumerate Triangles
   - icon: ':heavy_check_mark:'
@@ -838,8 +841,71 @@ data:
     \             stack.push_back(Frame{to, 0});\n            } else if (color[to]\
     \ == 1) {\n                return restore_cycle(vertex, to, edge_id, parent, parent_edge);\n\
     \            }\n        }\n    }\n    return Cycle();\n}\n\n}  // namespace graph\n\
-    }  // namespace m1une\n\n\n#line 1 \"graph/enumerate_triangles.hpp\"\n\n\n\n#line\
-    \ 7 \"graph/enumerate_triangles.hpp\"\n\n#line 9 \"graph/enumerate_triangles.hpp\"\
+    }  // namespace m1une\n\n\n#line 1 \"graph/enumerate_cliques.hpp\"\n\n\n\n#line\
+    \ 8 \"graph/enumerate_cliques.hpp\"\n\n#line 10 \"graph/enumerate_cliques.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\n// Invokes callback once for every\
+    \ nonempty clique. The callback receives a\n// const reference to a temporary\
+    \ vector that is reused after it returns.\ntemplate <class T, class Callback>\n\
+    void enumerate_cliques(const Graph<T>& graph, Callback&& callback) {\n    const\
+    \ int n = graph.size();\n    std::vector<std::vector<int>> adjacency(n);\n   \
+    \ for (const Edge<T>& edge : graph.edges()) {\n        assert(edge.from != edge.to);\n\
+    \        if (edge.from == edge.to) continue;\n        adjacency[edge.from].push_back(edge.to);\n\
+    \        adjacency[edge.to].push_back(edge.from);\n    }\n\n    for (std::vector<int>&\
+    \ neighbors : adjacency) {\n        std::sort(neighbors.begin(), neighbors.end());\n\
+    #ifndef NDEBUG\n        for (int i = 1; i < int(neighbors.size()); i++) {\n  \
+    \          assert(neighbors[i - 1] != neighbors[i]);\n        }\n#endif\n    \
+    \    neighbors.erase(\n            std::unique(neighbors.begin(), neighbors.end()),\n\
+    \            neighbors.end()\n        );\n    }\n\n    int maximum_degree = 0;\n\
+    \    std::vector<int> degree(n);\n    for (int vertex = 0; vertex < n; vertex++)\
+    \ {\n        degree[vertex] = int(adjacency[vertex].size());\n        maximum_degree\
+    \ = std::max(maximum_degree, degree[vertex]);\n    }\n\n    // Compute a degeneracy\
+    \ ordering in linear time. A clique is assigned to\n    // its first vertex in\
+    \ this ordering, and all its other vertices are among\n    // that vertex's forward\
+    \ neighbors.\n    std::vector<std::vector<int>> bucket(maximum_degree + 1);\n\
+    \    for (int vertex = 0; vertex < n; vertex++) {\n        bucket[degree[vertex]].push_back(vertex);\n\
+    \    }\n    std::vector<char> active(n, true);\n    std::vector<std::vector<int>>\
+    \ forward(n);\n    int minimum_degree = 0;\n    int degeneracy = 0;\n    for (int\
+    \ removed = 0; removed < n; removed++) {\n        while (true) {\n           \
+    \ while (bucket[minimum_degree].empty()) minimum_degree++;\n            int vertex\
+    \ = bucket[minimum_degree].back();\n            if (active[vertex] && degree[vertex]\
+    \ == minimum_degree) break;\n            bucket[minimum_degree].pop_back();\n\
+    \        }\n\n        int vertex = bucket[minimum_degree].back();\n        bucket[minimum_degree].pop_back();\n\
+    \        active[vertex] = false;\n        degeneracy = std::max(degeneracy, minimum_degree);\n\
+    \        forward[vertex].reserve(minimum_degree);\n        for (int to : adjacency[vertex])\
+    \ {\n            if (!active[to]) continue;\n            forward[vertex].push_back(to);\n\
+    \            degree[to]--;\n            bucket[degree[to]].push_back(to);\n  \
+    \          minimum_degree = std::min(minimum_degree, degree[to]);\n        }\n\
+    \    }\n\n    std::vector<int> clique;\n    clique.reserve(degeneracy + 1);\n\
+    \    std::vector<std::vector<int>> candidates(degeneracy + 1);\n    for (int vertex\
+    \ = 0; vertex < n; vertex++) {\n        const std::vector<int>& neighbors = forward[vertex];\n\
+    \        const int neighbor_count = int(neighbors.size());\n\n        clique.clear();\n\
+    \        clique.push_back(vertex);\n        callback(std::as_const(clique));\n\
+    \        if (neighbor_count == 0) continue;\n\n        std::vector<char> connected(\n\
+    \            std::size_t(neighbor_count) * neighbor_count,\n            false\n\
+    \        );\n        for (int first = 0; first < neighbor_count; first++) {\n\
+    \            for (int second = first + 1; second < neighbor_count; second++) {\n\
+    \                bool adjacent = std::binary_search(\n                    adjacency[neighbors[first]].begin(),\n\
+    \                    adjacency[neighbors[first]].end(),\n                    neighbors[second]\n\
+    \                );\n                connected[std::size_t(first) * neighbor_count\
+    \ + second] =\n                    adjacent;\n                connected[std::size_t(second)\
+    \ * neighbor_count + first] =\n                    adjacent;\n            }\n\
+    \        }\n\n        candidates[0].resize(neighbor_count);\n        for (int\
+    \ i = 0; i < neighbor_count; i++) candidates[0][i] = i;\n        auto enumerate\
+    \ = [&](auto&& self, int depth) -> void {\n            const std::vector<int>&\
+    \ current = candidates[depth];\n            for (int position = 0; position <\
+    \ int(current.size()); position++) {\n                int chosen = current[position];\n\
+    \                clique.push_back(neighbors[chosen]);\n                callback(std::as_const(clique));\n\
+    \n                std::vector<int>& next = candidates[depth + 1];\n          \
+    \      next.clear();\n                for (int next_position = position + 1;\n\
+    \                     next_position < int(current.size());\n                 \
+    \    next_position++) {\n                    int candidate = current[next_position];\n\
+    \                    if (connected[\n                            std::size_t(chosen)\
+    \ * neighbor_count + candidate\n                        ]) {\n               \
+    \         next.push_back(candidate);\n                    }\n                }\n\
+    \                if (!next.empty()) self(self, depth + 1);\n                clique.pop_back();\n\
+    \            }\n        };\n        enumerate(enumerate, 0);\n    }\n}\n\n}  //\
+    \ namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/enumerate_triangles.hpp\"\
+    \n\n\n\n#line 7 \"graph/enumerate_triangles.hpp\"\n\n#line 9 \"graph/enumerate_triangles.hpp\"\
     \n\nnamespace m1une {\nnamespace graph {\n\ntemplate <class T, class Callback>\n\
     void enumerate_triangles(const Graph<T>& graph, Callback&& callback) {\n    const\
     \ int n = graph.size();\n    const std::vector<Edge<T>> edges = graph.edges();\n\
@@ -3193,7 +3259,7 @@ data:
     \   assert(first_component != second_component);\n        result.bridge_forest_edges.push_back(\n\
     \            TwoEdgeConnectedBridge{first_component, second_component, edge_id});\n\
     \    }\n    return result;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\
-    \n\n#line 28 \"graph/undirected.hpp\"\n\n\n"
+    \n\n#line 29 \"graph/undirected.hpp\"\n\n\n"
   code: '#ifndef M1UNE_GRAPH_UNDIRECTED_HPP
 
     #define M1UNE_GRAPH_UNDIRECTED_HPP 1
@@ -3214,6 +3280,8 @@ data:
     #include "connected_components.hpp"
 
     #include "cycle_detection.hpp"
+
+    #include "enumerate_cliques.hpp"
 
     #include "enumerate_triangles.hpp"
 
@@ -3262,6 +3330,7 @@ data:
   - graph/connected_components.hpp
   - ds/dsu/dsu.hpp
   - graph/cycle_detection.hpp
+  - graph/enumerate_cliques.hpp
   - graph/enumerate_triangles.hpp
   - graph/eulerian_trail.hpp
   - graph/general_matching.hpp
@@ -3292,7 +3361,7 @@ data:
   path: graph/undirected.hpp
   requiredBy:
   - graph/all.hpp
-  timestamp: '2026-07-14 04:31:50+09:00'
+  timestamp: '2026-07-16 19:22:46+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
@@ -3335,6 +3404,7 @@ where direction should not matter.
 | `graph/namori.hpp` | Undirected Namori graph | Ordered cycles and the trees attached to them. |
 | `graph/connected_components.hpp` | Direction ignored | Weak/ordinary connected components. |
 | `graph/cycle_detection.hpp` | Directed and undirected variants | Use `find_undirected_cycle(g)` for undirected graphs. |
+| `graph/enumerate_cliques.hpp` | Direction ignored | Enumerates every nonempty clique through a callback. |
 | `graph/enumerate_triangles.hpp` | Direction ignored | Enumerates every triangle through a callback. |
 | `graph/eulerian_trail.hpp` | Directed and undirected variants | Use `undirected_eulerian_trail(g)` for undirected graphs. |
 | `graph/grid.hpp` | Undirected graph builder | Builds 4/8-neighbor grid graphs. |

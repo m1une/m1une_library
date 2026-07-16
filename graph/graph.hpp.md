@@ -54,6 +54,9 @@ data:
     path: graph/dominator_tree.hpp
     title: Dominator Tree
   - icon: ':heavy_check_mark:'
+    path: graph/enumerate_cliques.hpp
+    title: Enumerate Cliques
+  - icon: ':heavy_check_mark:'
     path: graph/enumerate_triangles.hpp
     title: Enumerate Triangles
   - icon: ':heavy_check_mark:'
@@ -237,6 +240,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/dominator_tree.test.cpp
     title: verify/graph/dominator_tree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/enumerate_cliques.test.cpp
+    title: verify/graph/enumerate_cliques.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/enumerate_cliques.test.cpp
+    title: verify/graph/enumerate_cliques.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/enumerate_triangles.test.cpp
     title: verify/graph/enumerate_triangles.test.cpp
@@ -538,6 +547,7 @@ data:
   - graph/chordal_graph_recognition.hpp
   - graph/bfs.hpp
   - graph/warshall_floyd.hpp
+  - graph/enumerate_cliques.hpp
   - graph/biconnected_components.hpp
   - graph/undirected.hpp
   - graph/directed.hpp
@@ -612,6 +622,8 @@ data:
   - verify/graph/general_weighted_matching.test.cpp
   - verify/graph/scc.test.cpp
   - verify/graph/scc.test.cpp
+  - verify/graph/enumerate_cliques.test.cpp
+  - verify/graph/enumerate_cliques.test.cpp
   - verify/graph/counting_spanning_tree_undirected.test.cpp
 documentation_of: graph/graph.hpp
 layout: document

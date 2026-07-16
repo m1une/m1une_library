@@ -436,6 +436,9 @@ data:
     path: verify/graph/dominator_tree.test.cpp
     title: verify/graph/dominator_tree.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/enumerate_cliques.test.cpp
+    title: verify/graph/enumerate_cliques.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/enumerate_triangles.test.cpp
     title: verify/graph/enumerate_triangles.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1631,6 +1634,7 @@ data:
   - verify/graph/flow/flow_algorithms.test.cpp
   - verify/graph/flow/max_flow.test.cpp
   - verify/graph/flow/min_cost_flow.test.cpp
+  - verify/graph/enumerate_cliques.test.cpp
   - verify/graph/counting_spanning_tree_undirected.test.cpp
   - verify/convex/slope_trick.test.cpp
   - verify/convex/monge/max_plus_convolution_concave_concave.test.cpp
