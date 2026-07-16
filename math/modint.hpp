@@ -113,11 +113,13 @@ struct ModInt {
     }
 
     constexpr ModInt pow(long long n) const noexcept {
-        ModInt res = raw(1), x = *this;
-        while (n > 0) {
-            if (n & 1) res *= x;
+        ModInt res = raw(1 % Modulus);
+        ModInt x = n < 0 ? inv() : *this;
+        uint64_t exponent = n < 0 ? uint64_t(-(n + 1)) + 1 : uint64_t(n);
+        while (exponent > 0) {
+            if (exponent & 1) res *= x;
             x *= x;
-            n >>= 1;
+            exponent >>= 1;
         }
         return res;
     }
@@ -131,6 +133,8 @@ struct ModInt {
             u -= t * v;
             std::swap(u, v);
         }
+        assert(a == 1);
+        u %= Modulus;
         if (u < 0) u += Modulus;
         return raw(static_cast<uint32_t>(u));
     }
@@ -261,13 +265,14 @@ struct DynamicModInt {
     }
 
     DynamicModInt pow(long long exponent) const noexcept {
-        assert(exponent >= 0);
         DynamicModInt result = raw(1 % _mod);
-        DynamicModInt base = *this;
-        while (exponent > 0) {
-            if (exponent & 1) result *= base;
+        DynamicModInt base = exponent < 0 ? inv() : *this;
+        uint64_t magnitude =
+            exponent < 0 ? uint64_t(-(exponent + 1)) + 1 : uint64_t(exponent);
+        while (magnitude > 0) {
+            if (magnitude & 1) result *= base;
             base *= base;
-            exponent >>= 1;
+            magnitude >>= 1;
         }
         return result;
     }

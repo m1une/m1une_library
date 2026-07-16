@@ -72,7 +72,7 @@ The integral constructor accepts types such as `int`, `long long`,
 | Method | Description | Complexity |
 | --- | --- | --- |
 | `uint32_t val() const` | Returns the stored value in `[0, Modulus - 1]`. | $O(1)$ |
-| `ModInt pow(long long n) const` | Computes the `n`-th power by binary exponentiation. | $O(\log n)$ |
+| `ModInt pow(long long n) const` | Computes the `n`-th power by binary exponentiation. For negative `n`, raises the modular inverse to the absolute magnitude of `n`. | $O(\log (\lvert n\rvert + 1))$ |
 | `ModInt inv() const` | Computes the modular inverse by the extended Euclidean algorithm. The value and modulus must be coprime. | $O(\log(\text{Modulus}))$ |
 | `static uint32_t mod()` | Returns the modulus associated with this type. | $O(1)$ |
 | `static ModInt raw(uint32_t v)` | Constructs directly from `v` without applying `% Modulus`. Use only when `v < Modulus`. | $O(1)$ |
@@ -82,6 +82,10 @@ The integral constructor accepts types such as `int`, `long long`,
 
 `DynamicModInt` provides the same `val`, `pow`, `inv`, arithmetic, comparison,
 increment, decrement, and stream interfaces as `ModInt`.
+
+A negative exponent requires the value to have a modular inverse. This includes
+the full `long long` range, so `pow(LLONG_MIN)` is supported without signed
+overflow.
 
 ## Operators
 
@@ -118,6 +122,9 @@ int main() {
     // Power
     mint d = a.pow(100);
     std::cout << "a^100 = " << d << "\n";
+
+    mint inverse_cube = mint(5).pow(-3);
+    std::cout << "5^-3 = " << inverse_cube << "\n";
 
     // Modular inverse & Division
     mint e = mint(5).inv();
