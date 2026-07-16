@@ -35,6 +35,7 @@ where direction should not matter.
 | `graph/replacement_paths.hpp` | Undirected positive-weight graphs | Edge- and vertex-failure replacement distances along one fixed shortest path. |
 | `graph/namori.hpp` | Undirected Namori graph | Ordered cycles and the trees attached to them. |
 | `graph/connected_components.hpp` | Direction ignored | Weak/ordinary connected components. |
+| `graph/count_four_cycles.hpp` | Direction ignored | Counts four-cycles globally and for every edge, including parallel-edge choices. |
 | `graph/cycle_detection.hpp` | Directed and undirected variants | Use `find_undirected_cycle(g)` for undirected graphs. |
 | `graph/enumerate_cliques.hpp` | Direction ignored | Enumerates every nonempty clique through a callback. |
 | `graph/enumerate_triangles.hpp` | Direction ignored | Enumerates every triangle through a callback. |

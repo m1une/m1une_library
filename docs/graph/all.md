@@ -57,6 +57,7 @@ Public namespaces stay flat and short: general graph helpers use
 | `graph/replacement_paths.hpp` | Undirected positive-weight graphs | Edge- and vertex-failure replacement distances along one fixed shortest path. |
 | `graph/namori.hpp` | Undirected Namori graph | Decomposes each unicyclic component into its cycle and attached rooted trees. |
 | `graph/connected_components.hpp` | Direction ignored | Weak/ordinary connected components. |
+| `graph/count_four_cycles.hpp` | Direction ignored | Counts four-cycles globally and for every edge, including parallel-edge choices. |
 | `graph/cycle_detection.hpp` | Directed and undirected variants | Finds one cycle with the matching function. |
 | `graph/enumerate_cliques.hpp` | Direction ignored | Enumerates every nonempty clique through a callback. |
 | `graph/enumerate_triangles.hpp` | Direction ignored | Enumerates every triangle through a callback. |

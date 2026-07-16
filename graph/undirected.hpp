@@ -8,6 +8,7 @@
 #include "chromatic_number.hpp"
 #include "complement_connected_components.hpp"
 #include "connected_components.hpp"
+#include "count_four_cycles.hpp"
 #include "cycle_detection.hpp"
 #include "dfs.hpp"
 #include "enumerate_cliques.hpp"
