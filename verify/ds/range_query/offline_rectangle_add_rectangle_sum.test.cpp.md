@@ -261,13 +261,13 @@ data:
     \ is, DynamicModInt& rhs) {\n        long long value;\n        is >> value;\n\
     \        rhs = DynamicModInt(value);\n        return is;\n    }\n};\n\n}  // namespace\
     \ math\n}  // namespace m1une\n\n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#include\
-    \ <array>\n#include <charconv>\n#include <cstddef>\n#include <cstdio>\n#include\
-    \ <cstdlib>\n#line 10 \"utilities/fast_io.hpp\"\n#include <cstring>\n#include\
-    \ <iterator>\n#include <string>\n#line 15 \"utilities/fast_io.hpp\"\n#include\
-    \ <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal {\n\
-    \n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct\
-    \ is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
-    \    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
+    \ <array>\n#include <cerrno>\n#include <charconv>\n#include <cstddef>\n#include\
+    \ <cstdio>\n#include <cstdlib>\n#line 11 \"utilities/fast_io.hpp\"\n#include <cstring>\n\
+    #include <iterator>\n#include <string>\n#include <sys/stat.h>\n#line 17 \"utilities/fast_io.hpp\"\
+    \n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal\
+    \ {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\n\
+    struct is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T,\
+    \ std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
     >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
     \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
@@ -305,14 +305,16 @@ data:
     };\n\ntemplate <class T>\nusing make_unsigned_t = typename make_unsigned<std::remove_cv_t<T>>::type;\n\
     \n}  // namespace internal\n\nstruct FastInput {\n    static constexpr int buffer_size\
     \ = 1 << 20;\n\n   private:\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
-    \    int _position;\n    int _length;\n    bool _terminal;\n\n    bool refill()\
-    \ {\n        _position = 0;\n        if (_terminal) {\n            if (std::fgets(_buffer,\
-    \ buffer_size, _stream) == nullptr) {\n                _length = 0;\n        \
-    \        return false;\n            }\n            _length = int(std::strlen(_buffer));\n\
-    \        } else {\n            _length = int(std::fread(_buffer, 1, buffer_size,\
-    \ _stream));\n        }\n        return _length != 0;\n    }\n\n    template <class\
-    \ T>\n    bool read_integer_from_terminal(T& value) {\n        if (!skip_spaces())\
-    \ return false;\n        int c = read_char_raw();\n\n        bool negative = false;\n\
+    \    int _position;\n    int _length;\n    int _file_descriptor;\n    bool _streaming;\n\
+    \n    bool refill() {\n        _position = 0;\n        if (_streaming) {\n   \
+    \         ssize_t length;\n            do {\n                length = ::read(_file_descriptor,\
+    \ _buffer, buffer_size);\n            } while (length < 0 && errno == EINTR);\n\
+    \            if (length <= 0) {\n                _length = 0;\n              \
+    \  return false;\n            }\n            _length = int(length);\n        }\
+    \ else {\n            _length = int(std::fread(_buffer, 1, buffer_size, _stream));\n\
+    \        }\n        return _length != 0;\n    }\n\n    template <class T>\n  \
+    \  bool read_integer_from_stream(T& value) {\n        if (!skip_spaces()) return\
+    \ false;\n        int c = read_char_raw();\n\n        bool negative = false;\n\
     \        if (c == '-') {\n            negative = true;\n            c = read_char_raw();\n\
     \        }\n\n        if constexpr (internal::is_signed_v<T>) {\n            T\
     \ result = 0;\n            while ('0' <= c && c <= '9') {\n                result\
@@ -330,7 +332,10 @@ data:
     \       if (_length < buffer_size) _buffer[_length] = '\\0';\n        return _length\
     \ != 0;\n    }\n\n   public:\n    explicit FastInput(std::FILE* stream = stdin)\n\
     \        : _stream(stream),\n          _position(0),\n          _length(0),\n\
-    \          _terminal(::isatty(::fileno(stream)) != 0) {}\n\n    FastInput(const\
+    \          _file_descriptor(::fileno(stream)),\n          _streaming([&] {\n \
+    \             struct stat status;\n              return _file_descriptor >= 0\n\
+    \                     && ::fstat(_file_descriptor, &status) == 0\n           \
+    \          && !S_ISREG(status.st_mode);\n          }()) {}\n\n    FastInput(const\
     \ FastInput&) = delete;\n    FastInput& operator=(const FastInput&) = delete;\n\
     \n    int read_char_raw() {\n        if (_position == _length && !refill()) return\
     \ EOF;\n        return _buffer[_position++];\n    }\n\n    bool skip_spaces()\
@@ -346,7 +351,7 @@ data:
     \ = x != 0;\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
     \        internal::is_integral_v<T>\n            && !std::is_same_v<std::remove_cv_t<T>,\
     \ bool>\n            && !std::is_same_v<std::remove_cv_t<T>, char>,\n        bool\n\
-    \    >\n    read(T& value) {\n        if (_terminal) return read_integer_from_terminal(value);\n\
+    \    >\n    read(T& value) {\n        if (_streaming) return read_integer_from_stream(value);\n\
     \        if (!prepare_number()) return false;\n        int c = static_cast<unsigned\
     \ char>(_buffer[_position++]);\n        while (c <= ' ') c = static_cast<unsigned\
     \ char>(_buffer[_position++]);\n\n        bool negative = false;\n        if (c\
@@ -426,21 +431,21 @@ data:
     \      _precision(6),\n          _float_format(std::chars_format::general),\n\
     \          _range_separator(' ') {}\n\n    FastOutput(const FastOutput&) = delete;\n\
     \    FastOutput& operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n\
-    \        flush();\n    }\n\n    void flush() {\n        if (_position == 0) return;\n\
-    \        std::fwrite(_buffer, 1, _position, _stream);\n        _position = 0;\n\
-    \    }\n\n    void write_char(char c) {\n        if (_position == buffer_size)\
-    \ flush();\n        _buffer[_position++] = c;\n    }\n\n    void write(const char*\
-    \ s) {\n        while (*s != '\\0') write_char(*s++);\n    }\n\n    void write(const\
-    \ std::string& s) {\n        for (char c : s) write_char(c);\n    }\n\n    void\
-    \ write(char c) {\n        write_char(c);\n    }\n\n    void write(bool value)\
-    \ {\n        write_char(value ? '1' : '0');\n    }\n\n    template <class T>\n\
-    \    std::enable_if_t<std::is_floating_point_v<T>>\n    write(T value) {\n   \
-    \     char digits[128];\n        auto [end, error] = std::to_chars(\n        \
-    \    digits,\n            digits + sizeof(digits),\n            value,\n     \
-    \       _float_format,\n            _precision\n        );\n        if (error\
-    \ != std::errc()) std::abort();\n        for (const char* pointer = digits; pointer\
-    \ != end; pointer++) {\n            write_char(*pointer);\n        }\n    }\n\n\
-    \    template <class T>\n    std::enable_if_t<\n        internal::is_integral_v<T>\n\
+    \        flush();\n    }\n\n    void flush() {\n        if (_position != 0) {\n\
+    \            std::fwrite(_buffer, 1, _position, _stream);\n            _position\
+    \ = 0;\n        }\n        std::fflush(_stream);\n    }\n\n    void write_char(char\
+    \ c) {\n        if (_position == buffer_size) flush();\n        _buffer[_position++]\
+    \ = c;\n    }\n\n    void write(const char* s) {\n        while (*s != '\\0')\
+    \ write_char(*s++);\n    }\n\n    void write(const std::string& s) {\n       \
+    \ for (char c : s) write_char(c);\n    }\n\n    void write(char c) {\n       \
+    \ write_char(c);\n    }\n\n    void write(bool value) {\n        write_char(value\
+    \ ? '1' : '0');\n    }\n\n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>>\n\
+    \    write(T value) {\n        char digits[128];\n        auto [end, error] =\
+    \ std::to_chars(\n            digits,\n            digits + sizeof(digits),\n\
+    \            value,\n            _float_format,\n            _precision\n    \
+    \    );\n        if (error != std::errc()) std::abort();\n        for (const char*\
+    \ pointer = digits; pointer != end; pointer++) {\n            write_char(*pointer);\n\
+    \        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n        internal::is_integral_v<T>\n\
     \            && !std::is_same_v<std::remove_cv_t<T>, bool>\n            && !std::is_same_v<std::remove_cv_t<T>,\
     \ char>\n    >\n    write(T value) {\n        using Raw = std::remove_cv_t<T>;\n\
     \        using Unsigned = internal::make_unsigned_t<Raw>;\n\n        Unsigned\
@@ -616,7 +621,7 @@ data:
   isVerificationFile: true
   path: verify/ds/range_query/offline_rectangle_add_rectangle_sum.test.cpp
   requiredBy: []
-  timestamp: '2026-07-17 04:56:02+09:00'
+  timestamp: '2026-07-17 22:34:46+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/range_query/offline_rectangle_add_rectangle_sum.test.cpp

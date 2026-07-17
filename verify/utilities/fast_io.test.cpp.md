@@ -16,15 +16,16 @@ data:
     - https://judge.yosupo.jp/problem/aplusb
   bundledCode: "#line 1 \"verify/utilities/fast_io.test.cpp\"\n#define PROBLEM \"\
     https://judge.yosupo.jp/problem/aplusb\"\n\n#line 1 \"utilities/fast_io.hpp\"\n\
-    \n\n\n#include <array>\n#include <charconv>\n#include <cstddef>\n#include <cstdio>\n\
-    #include <cstdlib>\n#include <cstdint>\n#include <cstring>\n#include <iterator>\n\
-    #include <string>\n#include <type_traits>\n#include <utility>\n#include <unistd.h>\n\
-    \nnamespace m1une {\nnamespace utilities {\nnamespace internal {\n\n// Detect\
-    \ std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct is_range\
-    \ : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
-    \    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
-    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
-    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    \n\n\n#include <array>\n#include <cerrno>\n#include <charconv>\n#include <cstddef>\n\
+    #include <cstdio>\n#include <cstdlib>\n#include <cstdint>\n#include <cstring>\n\
+    #include <iterator>\n#include <string>\n#include <sys/stat.h>\n#include <type_traits>\n\
+    #include <utility>\n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities\
+    \ {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class\
+    \ T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate <class T>\n\
+    struct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
+    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
+    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
     \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
     \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
@@ -60,14 +61,16 @@ data:
     };\n\ntemplate <class T>\nusing make_unsigned_t = typename make_unsigned<std::remove_cv_t<T>>::type;\n\
     \n}  // namespace internal\n\nstruct FastInput {\n    static constexpr int buffer_size\
     \ = 1 << 20;\n\n   private:\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
-    \    int _position;\n    int _length;\n    bool _terminal;\n\n    bool refill()\
-    \ {\n        _position = 0;\n        if (_terminal) {\n            if (std::fgets(_buffer,\
-    \ buffer_size, _stream) == nullptr) {\n                _length = 0;\n        \
-    \        return false;\n            }\n            _length = int(std::strlen(_buffer));\n\
-    \        } else {\n            _length = int(std::fread(_buffer, 1, buffer_size,\
-    \ _stream));\n        }\n        return _length != 0;\n    }\n\n    template <class\
-    \ T>\n    bool read_integer_from_terminal(T& value) {\n        if (!skip_spaces())\
-    \ return false;\n        int c = read_char_raw();\n\n        bool negative = false;\n\
+    \    int _position;\n    int _length;\n    int _file_descriptor;\n    bool _streaming;\n\
+    \n    bool refill() {\n        _position = 0;\n        if (_streaming) {\n   \
+    \         ssize_t length;\n            do {\n                length = ::read(_file_descriptor,\
+    \ _buffer, buffer_size);\n            } while (length < 0 && errno == EINTR);\n\
+    \            if (length <= 0) {\n                _length = 0;\n              \
+    \  return false;\n            }\n            _length = int(length);\n        }\
+    \ else {\n            _length = int(std::fread(_buffer, 1, buffer_size, _stream));\n\
+    \        }\n        return _length != 0;\n    }\n\n    template <class T>\n  \
+    \  bool read_integer_from_stream(T& value) {\n        if (!skip_spaces()) return\
+    \ false;\n        int c = read_char_raw();\n\n        bool negative = false;\n\
     \        if (c == '-') {\n            negative = true;\n            c = read_char_raw();\n\
     \        }\n\n        if constexpr (internal::is_signed_v<T>) {\n            T\
     \ result = 0;\n            while ('0' <= c && c <= '9') {\n                result\
@@ -85,7 +88,10 @@ data:
     \       if (_length < buffer_size) _buffer[_length] = '\\0';\n        return _length\
     \ != 0;\n    }\n\n   public:\n    explicit FastInput(std::FILE* stream = stdin)\n\
     \        : _stream(stream),\n          _position(0),\n          _length(0),\n\
-    \          _terminal(::isatty(::fileno(stream)) != 0) {}\n\n    FastInput(const\
+    \          _file_descriptor(::fileno(stream)),\n          _streaming([&] {\n \
+    \             struct stat status;\n              return _file_descriptor >= 0\n\
+    \                     && ::fstat(_file_descriptor, &status) == 0\n           \
+    \          && !S_ISREG(status.st_mode);\n          }()) {}\n\n    FastInput(const\
     \ FastInput&) = delete;\n    FastInput& operator=(const FastInput&) = delete;\n\
     \n    int read_char_raw() {\n        if (_position == _length && !refill()) return\
     \ EOF;\n        return _buffer[_position++];\n    }\n\n    bool skip_spaces()\
@@ -101,7 +107,7 @@ data:
     \ = x != 0;\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
     \        internal::is_integral_v<T>\n            && !std::is_same_v<std::remove_cv_t<T>,\
     \ bool>\n            && !std::is_same_v<std::remove_cv_t<T>, char>,\n        bool\n\
-    \    >\n    read(T& value) {\n        if (_terminal) return read_integer_from_terminal(value);\n\
+    \    >\n    read(T& value) {\n        if (_streaming) return read_integer_from_stream(value);\n\
     \        if (!prepare_number()) return false;\n        int c = static_cast<unsigned\
     \ char>(_buffer[_position++]);\n        while (c <= ' ') c = static_cast<unsigned\
     \ char>(_buffer[_position++]);\n\n        bool negative = false;\n        if (c\
@@ -181,21 +187,21 @@ data:
     \      _precision(6),\n          _float_format(std::chars_format::general),\n\
     \          _range_separator(' ') {}\n\n    FastOutput(const FastOutput&) = delete;\n\
     \    FastOutput& operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n\
-    \        flush();\n    }\n\n    void flush() {\n        if (_position == 0) return;\n\
-    \        std::fwrite(_buffer, 1, _position, _stream);\n        _position = 0;\n\
-    \    }\n\n    void write_char(char c) {\n        if (_position == buffer_size)\
-    \ flush();\n        _buffer[_position++] = c;\n    }\n\n    void write(const char*\
-    \ s) {\n        while (*s != '\\0') write_char(*s++);\n    }\n\n    void write(const\
-    \ std::string& s) {\n        for (char c : s) write_char(c);\n    }\n\n    void\
-    \ write(char c) {\n        write_char(c);\n    }\n\n    void write(bool value)\
-    \ {\n        write_char(value ? '1' : '0');\n    }\n\n    template <class T>\n\
-    \    std::enable_if_t<std::is_floating_point_v<T>>\n    write(T value) {\n   \
-    \     char digits[128];\n        auto [end, error] = std::to_chars(\n        \
-    \    digits,\n            digits + sizeof(digits),\n            value,\n     \
-    \       _float_format,\n            _precision\n        );\n        if (error\
-    \ != std::errc()) std::abort();\n        for (const char* pointer = digits; pointer\
-    \ != end; pointer++) {\n            write_char(*pointer);\n        }\n    }\n\n\
-    \    template <class T>\n    std::enable_if_t<\n        internal::is_integral_v<T>\n\
+    \        flush();\n    }\n\n    void flush() {\n        if (_position != 0) {\n\
+    \            std::fwrite(_buffer, 1, _position, _stream);\n            _position\
+    \ = 0;\n        }\n        std::fflush(_stream);\n    }\n\n    void write_char(char\
+    \ c) {\n        if (_position == buffer_size) flush();\n        _buffer[_position++]\
+    \ = c;\n    }\n\n    void write(const char* s) {\n        while (*s != '\\0')\
+    \ write_char(*s++);\n    }\n\n    void write(const std::string& s) {\n       \
+    \ for (char c : s) write_char(c);\n    }\n\n    void write(char c) {\n       \
+    \ write_char(c);\n    }\n\n    void write(bool value) {\n        write_char(value\
+    \ ? '1' : '0');\n    }\n\n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>>\n\
+    \    write(T value) {\n        char digits[128];\n        auto [end, error] =\
+    \ std::to_chars(\n            digits,\n            digits + sizeof(digits),\n\
+    \            value,\n            _float_format,\n            _precision\n    \
+    \    );\n        if (error != std::errc()) std::abort();\n        for (const char*\
+    \ pointer = digits; pointer != end; pointer++) {\n            write_char(*pointer);\n\
+    \        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n        internal::is_integral_v<T>\n\
     \            && !std::is_same_v<std::remove_cv_t<T>, bool>\n            && !std::is_same_v<std::remove_cv_t<T>,\
     \ char>\n    >\n    write(T value) {\n        using Raw = std::remove_cv_t<T>;\n\
     \        using Unsigned = internal::make_unsigned_t<Raw>;\n\n        Unsigned\
@@ -243,7 +249,9 @@ data:
     n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
     \ utilities\n}  // namespace m1une\n\n\n#line 4 \"verify/utilities/fast_io.test.cpp\"\
-    \n\n#include <cassert>\n#line 9 \"verify/utilities/fast_io.test.cpp\"\n#include\
+    \n\n#include <cassert>\n#line 7 \"verify/utilities/fast_io.test.cpp\"\n#include\
+    \ <poll.h>\n#include <signal.h>\n#line 10 \"verify/utilities/fast_io.test.cpp\"\
+    \n#include <sys/wait.h>\n#line 13 \"verify/utilities/fast_io.test.cpp\"\n#include\
     \ <vector>\n\nvoid test_fast_input() {\n    std::FILE* file = std::tmpfile();\n\
     \    assert(file != nullptr);\n    std::fputs(\n        \" -123 456 token Z 1\
     \ -12.5 6.25e2 \"\n        \"-170141183460469231731687303715884105728 \"\n   \
@@ -257,9 +265,28 @@ data:
     \   assert(flag);\n    assert(decimal == -12.5);\n    assert(exponent == 625.0L);\n\
     \    __int128_t signed_minimum = -(__int128_t(1) << 126);\n    signed_minimum\
     \ *= 2;\n    assert(signed_wide == signed_minimum);\n    assert(unsigned_wide\
-    \ == ~__uint128_t(0));\n    std::fclose(file);\n}\n\nvoid test_fast_output() {\n\
-    \    std::FILE* file = std::tmpfile();\n    assert(file != nullptr);\n\n    {\n\
-    \        m1une::utilities::FastOutput output(file);\n        output.println(\"\
+    \ == ~__uint128_t(0));\n    std::fclose(file);\n}\n\nvoid test_pipe_input_does_not_wait_for_eof()\
+    \ {\n    int request[2];\n    int response[2];\n    assert(::pipe(request) ==\
+    \ 0);\n    assert(::pipe(response) == 0);\n\n    const pid_t child = ::fork();\n\
+    \    assert(child >= 0);\n    if (child == 0) {\n        ::close(request[1]);\n\
+    \        ::close(response[0]);\n        std::FILE* stream = ::fdopen(request[0],\
+    \ \"r\");\n        if (stream == nullptr) _exit(1);\n\n        m1une::utilities::FastInput\
+    \ input(stream);\n        int value;\n        const bool ok = input.read(value)\
+    \ && value == 123456789;\n        if (ok) {\n            const char byte = 'x';\n\
+    \            if (::write(response[1], &byte, 1) != 1) _exit(1);\n        }\n \
+    \       std::fclose(stream);\n        ::close(response[1]);\n        _exit(ok\
+    \ ? 0 : 1);\n    }\n\n    ::close(request[0]);\n    ::close(response[1]);\n  \
+    \  const char query[] = \"123456789\\n\";\n    assert(\n        ::write(request[1],\
+    \ query, sizeof(query) - 1)\n        == ssize_t(sizeof(query) - 1)\n    );\n\n\
+    \    pollfd event;\n    event.fd = response[0];\n    event.events = POLLIN;\n\
+    \    event.revents = 0;\n    const int ready = ::poll(&event, 1, 1000);\n\n  \
+    \  ::close(request[1]);\n    if (ready <= 0) ::kill(child, SIGKILL);\n    int\
+    \ status;\n    assert(::waitpid(child, &status, 0) == child);\n    assert(ready\
+    \ == 1);\n    assert((event.revents & POLLIN) != 0);\n    char byte;\n    assert(::read(response[0],\
+    \ &byte, 1) == 1);\n    assert(byte == 'x');\n    assert(WIFEXITED(status) &&\
+    \ WEXITSTATUS(status) == 0);\n    ::close(response[0]);\n}\n\nvoid test_fast_output()\
+    \ {\n    std::FILE* file = std::tmpfile();\n    assert(file != nullptr);\n\n \
+    \   {\n        m1une::utilities::FastOutput output(file);\n        output.println(\"\
     answer\", -42, 17u);\n        output.println(false);\n        output.set_fixed(2);\n\
     \        output.println(1.25);\n        __int128_t signed_minimum = -(__int128_t(1)\
     \ << 126);\n        signed_minimum *= 2;\n        output.println(signed_minimum);\n\
@@ -268,7 +295,18 @@ data:
     \ 1, sizeof(buffer), file);\n    std::string result(buffer, buffer + length);\n\
     \    assert(\n        result\n        == \"answer -42 17\\n0\\n1.25\\n\"\n   \
     \        \"-170141183460469231731687303715884105728\\n\"\n           \"340282366920938463463374607431768211455\\\
-    n\"\n    );\n    std::fclose(file);\n}\n\nvoid test_stream_operators_ranges_and_pairs()\
+    n\"\n    );\n    std::fclose(file);\n}\n\nvoid test_output_flush_reaches_pipe()\
+    \ {\n    int descriptors[2];\n    assert(::pipe(descriptors) == 0);\n    std::FILE*\
+    \ stream = ::fdopen(descriptors[1], \"w\");\n    assert(stream != nullptr);\n\n\
+    \    {\n        m1une::utilities::FastOutput output(stream);\n        output <<\
+    \ \"? 987654321\\n\";\n        output.flush();\n\n        pollfd event;\n    \
+    \    event.fd = descriptors[0];\n        event.events = POLLIN;\n        event.revents\
+    \ = 0;\n        assert(::poll(&event, 1, 1000) == 1);\n        assert((event.revents\
+    \ & POLLIN) != 0);\n\n        const char expected[] = \"? 987654321\\n\";\n  \
+    \      char actual[sizeof(expected) - 1];\n        assert(\n            ::read(descriptors[0],\
+    \ actual, sizeof(actual))\n            == ssize_t(sizeof(actual))\n        );\n\
+    \        assert(std::string(actual, actual + sizeof(actual)) == expected);\n \
+    \   }\n\n    std::fclose(stream);\n    ::close(descriptors[0]);\n}\n\nvoid test_stream_operators_ranges_and_pairs()\
     \ {\n    std::FILE* input_file = std::tmpfile();\n    assert(input_file != nullptr);\n\
     \    std::fputs(\n        \"2 3 1 2 3 4 5 6 label 7 8 9 10 11 12 13 14\",\n  \
     \      input_file\n    );\n    std::rewind(input_file);\n\n    int h, w;\n   \
@@ -294,14 +332,16 @@ data:
     \ buffer + length);\n    assert(\n        result\n        == \"matrix\\n1 2 3\\\
     n4 5 6\\nlabel 7\\n8 9 10 11\\n12 13 14\\n\"\n           \"8 9\\n10 11\\n12 13\\\
     n\"\n    );\n    std::fclose(output_file);\n}\n\nint main() {\n    test_fast_input();\n\
-    \    test_fast_output();\n    test_stream_operators_ranges_and_pairs();\n\n  \
-    \  m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput output;\n\
-    \n    long long a, b;\n    input >> a >> b;\n    output << a + b << '\\n';\n}\n"
+    \    test_pipe_input_does_not_wait_for_eof();\n    test_fast_output();\n    test_output_flush_reaches_pipe();\n\
+    \    test_stream_operators_ranges_and_pairs();\n\n    m1une::utilities::FastInput\
+    \ input;\n    m1une::utilities::FastOutput output;\n\n    long long a, b;\n  \
+    \  input >> a >> b;\n    output << a + b << '\\n';\n}\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
     ../../utilities/fast_io.hpp\"\n\n#include <cassert>\n#include <cstdio>\n#include\
-    \ <string>\n#include <utility>\n#include <vector>\n\nvoid test_fast_input() {\n\
-    \    std::FILE* file = std::tmpfile();\n    assert(file != nullptr);\n    std::fputs(\n\
-    \        \" -123 456 token Z 1 -12.5 6.25e2 \"\n        \"-170141183460469231731687303715884105728\
+    \ <poll.h>\n#include <signal.h>\n#include <string>\n#include <sys/wait.h>\n#include\
+    \ <unistd.h>\n#include <utility>\n#include <vector>\n\nvoid test_fast_input()\
+    \ {\n    std::FILE* file = std::tmpfile();\n    assert(file != nullptr);\n   \
+    \ std::fputs(\n        \" -123 456 token Z 1 -12.5 6.25e2 \"\n        \"-170141183460469231731687303715884105728\
     \ \"\n        \"340282366920938463463374607431768211455\\n\",\n        file\n\
     \    );\n    std::rewind(file);\n\n    m1une::utilities::FastInput input(file);\n\
     \    int a;\n    unsigned int b;\n    std::string s;\n    char c;\n    bool flag;\n\
@@ -312,9 +352,28 @@ data:
     \   assert(flag);\n    assert(decimal == -12.5);\n    assert(exponent == 625.0L);\n\
     \    __int128_t signed_minimum = -(__int128_t(1) << 126);\n    signed_minimum\
     \ *= 2;\n    assert(signed_wide == signed_minimum);\n    assert(unsigned_wide\
-    \ == ~__uint128_t(0));\n    std::fclose(file);\n}\n\nvoid test_fast_output() {\n\
-    \    std::FILE* file = std::tmpfile();\n    assert(file != nullptr);\n\n    {\n\
-    \        m1une::utilities::FastOutput output(file);\n        output.println(\"\
+    \ == ~__uint128_t(0));\n    std::fclose(file);\n}\n\nvoid test_pipe_input_does_not_wait_for_eof()\
+    \ {\n    int request[2];\n    int response[2];\n    assert(::pipe(request) ==\
+    \ 0);\n    assert(::pipe(response) == 0);\n\n    const pid_t child = ::fork();\n\
+    \    assert(child >= 0);\n    if (child == 0) {\n        ::close(request[1]);\n\
+    \        ::close(response[0]);\n        std::FILE* stream = ::fdopen(request[0],\
+    \ \"r\");\n        if (stream == nullptr) _exit(1);\n\n        m1une::utilities::FastInput\
+    \ input(stream);\n        int value;\n        const bool ok = input.read(value)\
+    \ && value == 123456789;\n        if (ok) {\n            const char byte = 'x';\n\
+    \            if (::write(response[1], &byte, 1) != 1) _exit(1);\n        }\n \
+    \       std::fclose(stream);\n        ::close(response[1]);\n        _exit(ok\
+    \ ? 0 : 1);\n    }\n\n    ::close(request[0]);\n    ::close(response[1]);\n  \
+    \  const char query[] = \"123456789\\n\";\n    assert(\n        ::write(request[1],\
+    \ query, sizeof(query) - 1)\n        == ssize_t(sizeof(query) - 1)\n    );\n\n\
+    \    pollfd event;\n    event.fd = response[0];\n    event.events = POLLIN;\n\
+    \    event.revents = 0;\n    const int ready = ::poll(&event, 1, 1000);\n\n  \
+    \  ::close(request[1]);\n    if (ready <= 0) ::kill(child, SIGKILL);\n    int\
+    \ status;\n    assert(::waitpid(child, &status, 0) == child);\n    assert(ready\
+    \ == 1);\n    assert((event.revents & POLLIN) != 0);\n    char byte;\n    assert(::read(response[0],\
+    \ &byte, 1) == 1);\n    assert(byte == 'x');\n    assert(WIFEXITED(status) &&\
+    \ WEXITSTATUS(status) == 0);\n    ::close(response[0]);\n}\n\nvoid test_fast_output()\
+    \ {\n    std::FILE* file = std::tmpfile();\n    assert(file != nullptr);\n\n \
+    \   {\n        m1une::utilities::FastOutput output(file);\n        output.println(\"\
     answer\", -42, 17u);\n        output.println(false);\n        output.set_fixed(2);\n\
     \        output.println(1.25);\n        __int128_t signed_minimum = -(__int128_t(1)\
     \ << 126);\n        signed_minimum *= 2;\n        output.println(signed_minimum);\n\
@@ -323,7 +382,18 @@ data:
     \ 1, sizeof(buffer), file);\n    std::string result(buffer, buffer + length);\n\
     \    assert(\n        result\n        == \"answer -42 17\\n0\\n1.25\\n\"\n   \
     \        \"-170141183460469231731687303715884105728\\n\"\n           \"340282366920938463463374607431768211455\\\
-    n\"\n    );\n    std::fclose(file);\n}\n\nvoid test_stream_operators_ranges_and_pairs()\
+    n\"\n    );\n    std::fclose(file);\n}\n\nvoid test_output_flush_reaches_pipe()\
+    \ {\n    int descriptors[2];\n    assert(::pipe(descriptors) == 0);\n    std::FILE*\
+    \ stream = ::fdopen(descriptors[1], \"w\");\n    assert(stream != nullptr);\n\n\
+    \    {\n        m1une::utilities::FastOutput output(stream);\n        output <<\
+    \ \"? 987654321\\n\";\n        output.flush();\n\n        pollfd event;\n    \
+    \    event.fd = descriptors[0];\n        event.events = POLLIN;\n        event.revents\
+    \ = 0;\n        assert(::poll(&event, 1, 1000) == 1);\n        assert((event.revents\
+    \ & POLLIN) != 0);\n\n        const char expected[] = \"? 987654321\\n\";\n  \
+    \      char actual[sizeof(expected) - 1];\n        assert(\n            ::read(descriptors[0],\
+    \ actual, sizeof(actual))\n            == ssize_t(sizeof(actual))\n        );\n\
+    \        assert(std::string(actual, actual + sizeof(actual)) == expected);\n \
+    \   }\n\n    std::fclose(stream);\n    ::close(descriptors[0]);\n}\n\nvoid test_stream_operators_ranges_and_pairs()\
     \ {\n    std::FILE* input_file = std::tmpfile();\n    assert(input_file != nullptr);\n\
     \    std::fputs(\n        \"2 3 1 2 3 4 5 6 label 7 8 9 10 11 12 13 14\",\n  \
     \      input_file\n    );\n    std::rewind(input_file);\n\n    int h, w;\n   \
@@ -349,15 +419,16 @@ data:
     \ buffer + length);\n    assert(\n        result\n        == \"matrix\\n1 2 3\\\
     n4 5 6\\nlabel 7\\n8 9 10 11\\n12 13 14\\n\"\n           \"8 9\\n10 11\\n12 13\\\
     n\"\n    );\n    std::fclose(output_file);\n}\n\nint main() {\n    test_fast_input();\n\
-    \    test_fast_output();\n    test_stream_operators_ranges_and_pairs();\n\n  \
-    \  m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput output;\n\
-    \n    long long a, b;\n    input >> a >> b;\n    output << a + b << '\\n';\n}\n"
+    \    test_pipe_input_does_not_wait_for_eof();\n    test_fast_output();\n    test_output_flush_reaches_pipe();\n\
+    \    test_stream_operators_ranges_and_pairs();\n\n    m1une::utilities::FastInput\
+    \ input;\n    m1une::utilities::FastOutput output;\n\n    long long a, b;\n  \
+    \  input >> a >> b;\n    output << a + b << '\\n';\n}\n"
   dependsOn:
   - utilities/fast_io.hpp
   isVerificationFile: true
   path: verify/utilities/fast_io.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-17 22:34:46+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/utilities/fast_io.test.cpp
