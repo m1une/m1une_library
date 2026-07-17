@@ -275,242 +275,16 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://judge.yosupo.jp/problem/aplusb
+    PROBLEM: https://judge.yosupo.jp/problem/shortest_path
     links:
-    - https://judge.yosupo.jp/problem/aplusb
-  bundledCode: "#line 1 \"verify/graph/cow_game.test.cpp\"\n#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\
-    \n\n#include <algorithm>\n#include <cassert>\n#line 1 \"utilities/fast_io.hpp\"\
-    \n\n\n\n#include <array>\n#include <charconv>\n#include <cstddef>\n#include <cstdio>\n\
-    #include <cstdlib>\n#include <cstdint>\n#include <cstring>\n#include <iterator>\n\
-    #include <string>\n#include <type_traits>\n#include <utility>\n#include <unistd.h>\n\
-    \nnamespace m1une {\nnamespace utilities {\nnamespace internal {\n\n// Detect\
-    \ std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct is_range\
-    \ : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
-    \    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
-    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
-    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
-    \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
-    \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
-    \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
-    \ std::void_t<typename std::remove_cv_t<std::remove_reference_t<T>>::value_type>>\
-    \ {\n    using type = typename std::remove_cv_t<std::remove_reference_t<T>>::value_type;\n\
-    };\n\ntemplate <class T>\nusing range_stored_value_t = typename range_stored_value<T>::type;\n\
-    \n// Treat strings and C strings as scalar output objects, not as ranges.\ntemplate\
-    \ <class T>\nstruct is_char_array : std::false_type {};\n\ntemplate <class T,\
-    \ std::size_t N>\nstruct is_char_array<T[N]>\n    : std::bool_constant<std::is_same_v<std::remove_cv_t<T>,\
-    \ char>> {};\n\ntemplate <class T>\nstruct is_string_like\n    : std::bool_constant<\n\
-    \          std::is_same_v<std::decay_t<T>, std::string>\n          || std::is_same_v<std::decay_t<T>,\
-    \ const char*>\n          || std::is_same_v<std::decay_t<T>, char*>\n        \
-    \  || is_char_array<std::remove_reference_t<T>>::value\n      > {};\n\ntemplate\
-    \ <class T>\ninline constexpr bool is_string_like_v = is_string_like<T>::value;\n\
-    \n// ModInt-like type: x.val() is printable, and x can be assigned from long long.\n\
-    template <class T, class = void>\nstruct has_val_method : std::false_type {};\n\
-    \ntemplate <class T>\nstruct has_val_method<T, std::void_t<decltype(std::declval<const\
-    \ T&>().val())>>\n    : std::true_type {};\n\ntemplate <class T>\ninline constexpr\
-    \ bool has_val_method_v = has_val_method<T>::value;\n\ntemplate <class T, class\
-    \ = void>\nstruct has_static_mod_raw : std::false_type {};\n\ntemplate <class\
-    \ T>\nstruct has_static_mod_raw<\n    T, std::void_t<decltype(T::mod()), decltype(T::raw(std::declval<uint32_t>()))>>\n\
-    \    : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool has_static_mod_raw_v\
-    \ = has_static_mod_raw<T>::value;\n\n// libstdc++ before GCC 16 does not classify\
-    \ __int128 as an integral type in\n// strict ISO modes such as -std=c++23. Keep\
-    \ the fast-I/O interface independent\n// of that implementation detail.\ntemplate\
-    \ <class T>\ninline constexpr bool is_integral_v =\n    std::is_integral_v<T>\n\
-    \    || std::is_same_v<std::remove_cv_t<T>, __int128_t>\n    || std::is_same_v<std::remove_cv_t<T>,\
-    \ __uint128_t>;\n\ntemplate <class T>\ninline constexpr bool is_signed_v =\n \
-    \   std::is_signed_v<T>\n    || std::is_same_v<std::remove_cv_t<T>, __int128_t>;\n\
-    \ntemplate <class T>\nstruct make_unsigned {\n    using type = std::make_unsigned_t<T>;\n\
-    };\n\ntemplate <>\nstruct make_unsigned<__int128_t> {\n    using type = __uint128_t;\n\
-    };\n\ntemplate <>\nstruct make_unsigned<__uint128_t> {\n    using type = __uint128_t;\n\
-    };\n\ntemplate <class T>\nusing make_unsigned_t = typename make_unsigned<std::remove_cv_t<T>>::type;\n\
-    \n}  // namespace internal\n\nstruct FastInput {\n    static constexpr int buffer_size\
-    \ = 1 << 20;\n\n   private:\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
-    \    int _position;\n    int _length;\n    bool _terminal;\n\n    bool refill()\
-    \ {\n        _position = 0;\n        if (_terminal) {\n            if (std::fgets(_buffer,\
-    \ buffer_size, _stream) == nullptr) {\n                _length = 0;\n        \
-    \        return false;\n            }\n            _length = int(std::strlen(_buffer));\n\
-    \        } else {\n            _length = int(std::fread(_buffer, 1, buffer_size,\
-    \ _stream));\n        }\n        return _length != 0;\n    }\n\n    template <class\
-    \ T>\n    bool read_integer_from_terminal(T& value) {\n        if (!skip_spaces())\
-    \ return false;\n        int c = read_char_raw();\n\n        bool negative = false;\n\
-    \        if (c == '-') {\n            negative = true;\n            c = read_char_raw();\n\
-    \        }\n\n        if constexpr (internal::is_signed_v<T>) {\n            T\
-    \ result = 0;\n            while ('0' <= c && c <= '9') {\n                result\
-    \ = negative ? result * 10 - (c - '0')\n                                  : result\
-    \ * 10 + (c - '0');\n                c = read_char_raw();\n            }\n   \
-    \         value = result;\n        } else {\n            T result = 0;\n     \
-    \       while ('0' <= c && c <= '9') {\n                result = result * 10 +\
-    \ T(c - '0');\n                c = read_char_raw();\n            }\n         \
-    \   value = negative ? T(0) - result : result;\n        }\n        return true;\n\
-    \    }\n\n    bool prepare_number() {\n        if (_length - _position >= 64)\
-    \ return true;\n        const int remaining = _length - _position;\n        if\
-    \ (remaining > 0) std::memmove(_buffer, _buffer + _position, remaining);\n   \
-    \     const int added = int(std::fread(_buffer + remaining, 1, buffer_size - remaining,\
-    \ _stream));\n        _position = 0;\n        _length = remaining + added;\n \
-    \       if (_length < buffer_size) _buffer[_length] = '\\0';\n        return _length\
-    \ != 0;\n    }\n\n   public:\n    explicit FastInput(std::FILE* stream = stdin)\n\
-    \        : _stream(stream),\n          _position(0),\n          _length(0),\n\
-    \          _terminal(::isatty(::fileno(stream)) != 0) {}\n\n    FastInput(const\
-    \ FastInput&) = delete;\n    FastInput& operator=(const FastInput&) = delete;\n\
-    \n    int read_char_raw() {\n        if (_position == _length && !refill()) return\
-    \ EOF;\n        return _buffer[_position++];\n    }\n\n    bool skip_spaces()\
-    \ {\n        int c = read_char_raw();\n        while (c != EOF && c <= ' ') c\
-    \ = read_char_raw();\n        if (c == EOF) return false;\n        --_position;\n\
-    \        return true;\n    }\n\n    bool read(char& value) {\n        if (!skip_spaces())\
-    \ return false;\n        value = char(read_char_raw());\n        return true;\n\
-    \    }\n\n    bool read(std::string& value) {\n        if (!skip_spaces()) return\
-    \ false;\n        value.clear();\n        int c = read_char_raw();\n        while\
-    \ (c != EOF && c > ' ') {\n            value.push_back(char(c));\n           \
-    \ c = read_char_raw();\n        }\n        return true;\n    }\n\n    bool read(bool&\
-    \ value) {\n        int x;\n        if (!read(x)) return false;\n        value\
-    \ = x != 0;\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
-    \        internal::is_integral_v<T>\n            && !std::is_same_v<std::remove_cv_t<T>,\
-    \ bool>\n            && !std::is_same_v<std::remove_cv_t<T>, char>,\n        bool\n\
-    \    >\n    read(T& value) {\n        if (_terminal) return read_integer_from_terminal(value);\n\
-    \        if (!prepare_number()) return false;\n        int c = static_cast<unsigned\
-    \ char>(_buffer[_position++]);\n        while (c <= ' ') c = static_cast<unsigned\
-    \ char>(_buffer[_position++]);\n\n        bool negative = false;\n        if (c\
-    \ == '-') {\n            negative = true;\n            c = static_cast<unsigned\
-    \ char>(_buffer[_position++]);\n        }\n\n        if constexpr (internal::is_signed_v<T>)\
-    \ {\n            T result = 0;\n            while ('0' <= c && c <= '9') {\n \
-    \               const int first = c - '0';\n                const int second =\
-    \ static_cast<unsigned char>(_buffer[_position]) - '0';\n                if (0\
-    \ <= second && second <= 9) {\n                    result = negative ? result\
-    \ * 100 - (first * 10 + second)\n                                      : result\
-    \ * 100 + (first * 10 + second);\n                    ++_position;\n         \
-    \       } else {\n                    result = negative ? result * 10 - first\
-    \ : result * 10 + first;\n                }\n                c = static_cast<unsigned\
-    \ char>(_buffer[_position++]);\n            }\n            value = result;\n \
-    \       } else {\n            T result = 0;\n            while ('0' <= c && c\
-    \ <= '9') {\n                const unsigned first = unsigned(c - '0');\n     \
-    \           const int second = static_cast<unsigned char>(_buffer[_position])\
-    \ - '0';\n                if (0 <= second && second <= 9) {\n                \
-    \    result = result * 100 + T(first * 10 + unsigned(second));\n             \
-    \       ++_position;\n                } else {\n                    result = result\
-    \ * 10 + T(first);\n                }\n                c = static_cast<unsigned\
-    \ char>(_buffer[_position++]);\n            }\n            value = negative ?\
-    \ T(0) - result : result;\n        }\n        if (_position > _length) _position\
-    \ = _length;\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>,\
-    \ bool>\n    read(T& value) {\n        if (!skip_spaces()) return false;\n   \
-    \     int c = read_char_raw();\n        bool negative = false;\n        if (c\
-    \ == '-' || c == '+') {\n            negative = c == '-';\n            c = read_char_raw();\n\
-    \        }\n\n        long double result = 0;\n        while ('0' <= c && c <=\
-    \ '9') {\n            result = result * 10 + (c - '0');\n            c = read_char_raw();\n\
-    \        }\n        if (c == '.') {\n            long double place = 0.1L;\n \
-    \           c = read_char_raw();\n            while ('0' <= c && c <= '9') {\n\
-    \                result += (c - '0') * place;\n                place *= 0.1L;\n\
-    \                c = read_char_raw();\n            }\n        }\n        if (c\
-    \ == 'e' || c == 'E') {\n            c = read_char_raw();\n            bool exponent_negative\
-    \ = false;\n            if (c == '-' || c == '+') {\n                exponent_negative\
-    \ = c == '-';\n                c = read_char_raw();\n            }\n         \
-    \   int exponent = 0;\n            while ('0' <= c && c <= '9') {\n          \
-    \      exponent = exponent * 10 + (c - '0');\n                c = read_char_raw();\n\
-    \            }\n            long double scale = 1;\n            long double power\
-    \ = 10;\n            while (exponent > 0) {\n                if (exponent & 1)\
-    \ scale *= power;\n                power *= power;\n                exponent >>=\
-    \ 1;\n            }\n            result = exponent_negative ? result / scale :\
-    \ result * scale;\n        }\n        value = static_cast<T>(negative ? -result\
-    \ : result);\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
-    \        internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
-    \            && !internal::is_range_v<T>,\n        bool\n    >\n    read(T& value)\
-    \ {\n        long long x;\n        if (!read(x)) return false;\n        if constexpr\
-    \ (internal::has_static_mod_raw_v<T>) {\n            if (x >= 0 && uint64_t(x)\
-    \ < uint64_t(T::mod())) {\n                value = T::raw(uint32_t(x));\n    \
-    \        } else {\n                value = T(x);\n            }\n        } else\
-    \ {\n            value = T(x);\n        }\n        return true;\n    }\n\n   \
-    \ template <class First, class Second>\n    bool read(std::pair<First, Second>&\
-    \ value) {\n        if (!read(value.first)) return false;\n        return read(value.second);\n\
-    \    }\n\n    template <class Range>\n    std::enable_if_t<\n        internal::is_range_v<Range>\n\
-    \            && !internal::is_string_like_v<Range>,\n        bool\n    >\n   \
-    \ read(Range& range) {\n        using StoredValue = internal::range_stored_value_t<Range>;\n\
-    \        constexpr bool nested = internal::is_range_v<StoredValue>\n         \
-    \                       && !internal::is_string_like_v<StoredValue>;\n\n     \
-    \   for (auto&& value : range) {\n            if constexpr (std::is_same_v<StoredValue,\
-    \ bool> && !nested) {\n                bool x;\n                if (!read(x))\
-    \ return false;\n                value = x;\n            } else {\n          \
-    \      if (!read(value)) return false;\n            }\n        }\n        return\
-    \ true;\n    }\n\n    template <class First, class Second, class... Rest>\n  \
-    \  bool read(First& first, Second& second, Rest&... rest) {\n        if (!read(first))\
-    \ return false;\n        return read(second, rest...);\n    }\n\n    template\
-    \ <class T>\n    FastInput& operator>>(T& value) {\n        if (!read(value))\
-    \ std::abort();\n        return *this;\n    }\n};\n\nstruct FastOutput {\n   \
-    \ static constexpr int buffer_size = 1 << 20;\n\n   private:\n    inline static\
-    \ const auto digit_quads = [] {\n        std::array<char, 40000> result{};\n \
-    \       for (int i = 0; i < 10000; i++) {\n            int value = i;\n      \
-    \      for (int j = 3; j >= 0; j--) {\n                result[4 * i + j] = char('0'\
-    \ + value % 10);\n                value /= 10;\n            }\n        }\n   \
-    \     return result;\n    }();\n\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
-    \    int _position;\n    int _precision;\n    std::chars_format _float_format;\n\
-    \    char _range_separator;\n\n   public:\n    explicit FastOutput(std::FILE*\
-    \ stream = stdout)\n        : _stream(stream),\n          _position(0),\n    \
-    \      _precision(6),\n          _float_format(std::chars_format::general),\n\
-    \          _range_separator(' ') {}\n\n    FastOutput(const FastOutput&) = delete;\n\
-    \    FastOutput& operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n\
-    \        flush();\n    }\n\n    void flush() {\n        if (_position == 0) return;\n\
-    \        std::fwrite(_buffer, 1, _position, _stream);\n        _position = 0;\n\
-    \    }\n\n    void write_char(char c) {\n        if (_position == buffer_size)\
-    \ flush();\n        _buffer[_position++] = c;\n    }\n\n    void write(const char*\
-    \ s) {\n        while (*s != '\\0') write_char(*s++);\n    }\n\n    void write(const\
-    \ std::string& s) {\n        for (char c : s) write_char(c);\n    }\n\n    void\
-    \ write(char c) {\n        write_char(c);\n    }\n\n    void write(bool value)\
-    \ {\n        write_char(value ? '1' : '0');\n    }\n\n    template <class T>\n\
-    \    std::enable_if_t<std::is_floating_point_v<T>>\n    write(T value) {\n   \
-    \     char digits[128];\n        auto [end, error] = std::to_chars(\n        \
-    \    digits,\n            digits + sizeof(digits),\n            value,\n     \
-    \       _float_format,\n            _precision\n        );\n        if (error\
-    \ != std::errc()) std::abort();\n        for (const char* pointer = digits; pointer\
-    \ != end; pointer++) {\n            write_char(*pointer);\n        }\n    }\n\n\
-    \    template <class T>\n    std::enable_if_t<\n        internal::is_integral_v<T>\n\
-    \            && !std::is_same_v<std::remove_cv_t<T>, bool>\n            && !std::is_same_v<std::remove_cv_t<T>,\
-    \ char>\n    >\n    write(T value) {\n        using Raw = std::remove_cv_t<T>;\n\
-    \        using Unsigned = internal::make_unsigned_t<Raw>;\n\n        Unsigned\
-    \ magnitude;\n        if constexpr (internal::is_signed_v<Raw>) {\n          \
-    \  if (value < 0) {\n                write_char('-');\n                magnitude\
-    \ = Unsigned(0) - Unsigned(value);\n            } else {\n                magnitude\
-    \ = Unsigned(value);\n            }\n        } else {\n            magnitude =\
-    \ value;\n        }\n\n        if (magnitude == 0) {\n            write_char('0');\n\
-    \            return;\n        }\n\n        unsigned chunks[16];\n        int count\
-    \ = 0;\n        while (magnitude >= 10000) {\n            const Unsigned quotient\
-    \ = magnitude / 10000;\n            chunks[count++] = unsigned(magnitude - quotient\
-    \ * 10000);\n            magnitude = quotient;\n        }\n        if (_position\
-    \ > buffer_size - 64) flush();\n        const unsigned leading = unsigned(magnitude);\n\
-    \        const char* first = digit_quads.data() + 4 * leading;\n        int skip\
-    \ = leading < 10 ? 3 : leading < 100 ? 2 : leading < 1000 ? 1 : 0;\n        for\
-    \ (; skip < 4; skip++) _buffer[_position++] = first[skip];\n        while (count--)\
-    \ {\n            const char* digits = digit_quads.data() + 4 * chunks[count];\n\
-    \            std::memcpy(_buffer + _position, digits, 4);\n            _position\
-    \ += 4;\n        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n \
-    \       internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
-    \            && !internal::is_range_v<T>\n    >\n    write(const T& value) {\n\
-    \        write(value.val());\n    }\n\n    template <class First, class Second>\n\
-    \    void write(const std::pair<First, Second>& value) {\n        write(value.first);\n\
-    \        write_char(' ');\n        write(value.second);\n    }\n\n    template\
-    \ <class Range>\n    std::enable_if_t<\n        internal::is_range_v<Range>\n\
-    \            && !internal::is_string_like_v<Range>\n    >\n    write(const Range&\
-    \ range) {\n        using StoredValue = internal::range_stored_value_t<const Range>;\n\
-    \        constexpr bool nested = internal::is_range_v<StoredValue>\n         \
-    \                       && !internal::is_string_like_v<StoredValue>;\n\n     \
-    \   bool first = true;\n        for (const auto& value : range) {\n          \
-    \  if (!first) write_char(nested ? '\\n' : _range_separator);\n            first\
-    \ = false;\n            if constexpr (std::is_same_v<StoredValue, bool> && !nested)\
-    \ {\n                write(static_cast<bool>(value));\n            } else {\n\
-    \                write(value);\n            }\n        }\n    }\n\n    template\
-    \ <class First, class... Rest>\n    void print(const First& first, const Rest&...\
-    \ rest) {\n        write(first);\n        ((write_char(' '), write(rest)), ...);\n\
-    \    }\n\n    void println() {\n        write_char('\\n');\n    }\n\n    void\
-    \ set_precision(int precision) {\n        _precision = precision;\n    }\n\n \
-    \   void set_fixed(int precision = 6) {\n        _float_format = std::chars_format::fixed;\n\
-    \        _precision = precision;\n    }\n\n    void set_general(int precision\
-    \ = 6) {\n        _float_format = std::chars_format::general;\n        _precision\
-    \ = precision;\n    }\n\n    void set_range_separator(char separator) {\n    \
-    \    _range_separator = separator;\n    }\n\n    template <class... Args>\n  \
-    \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
-    n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
-    \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 6 \"verify/graph/cow_game.test.cpp\"\
-    \n#include <limits>\n#include <vector>\n\n#line 1 \"graph/all.hpp\"\n\n\n\n#line\
-    \ 1 \"graph/counting.hpp\"\n\n\n\n#line 6 \"graph/counting.hpp\"\n#include <optional>\n\
-    #line 9 \"graph/counting.hpp\"\n\n#line 1 \"math/fps/convolution.hpp\"\n\n\n\n\
-    #line 9 \"math/fps/convolution.hpp\"\n#include <new>\n#line 13 \"math/fps/convolution.hpp\"\
+    - https://judge.yosupo.jp/problem/shortest_path
+  bundledCode: "#line 1 \"verify/graph/cow_game.test.cpp\"\n#define PROBLEM \"https://judge.yosupo.jp/problem/shortest_path\"\
+    \n\n#include <algorithm>\n#include <cassert>\n#include <limits>\n#include <queue>\n\
+    #include <utility>\n#include <vector>\n\n#line 1 \"graph/all.hpp\"\n\n\n\n#line\
+    \ 1 \"graph/counting.hpp\"\n\n\n\n#line 5 \"graph/counting.hpp\"\n#include <cstdint>\n\
+    #include <optional>\n#line 9 \"graph/counting.hpp\"\n\n#line 1 \"math/fps/convolution.hpp\"\
+    \n\n\n\n#line 5 \"math/fps/convolution.hpp\"\n#include <array>\n#line 8 \"math/fps/convolution.hpp\"\
+    \n#include <cstring>\n#include <new>\n#include <type_traits>\n#line 13 \"math/fps/convolution.hpp\"\
     \n\n#if defined(__GNUC__) && !defined(__clang__) && (defined(__x86_64__) || defined(__i386__))\n\
     #include <immintrin.h>\n#define M1UNE_FPS_HAS_X86_SIMD 1\n#pragma GCC push_options\n\
     #pragma GCC target(\"avx2,bmi\")\n#endif\n\n#line 1 \"math/fps/internal/ntt998_faster.hpp\"\
@@ -784,16 +558,18 @@ data:
     \ rhs) const noexcept {\n        return _v == rhs._v;\n    }\n    constexpr bool\
     \ operator!=(const ModInt& rhs) const noexcept {\n        return _v != rhs._v;\n\
     \    }\n\n    constexpr ModInt pow(long long n) const noexcept {\n        ModInt\
-    \ res = raw(1), x = *this;\n        while (n > 0) {\n            if (n & 1) res\
-    \ *= x;\n            x *= x;\n            n >>= 1;\n        }\n        return\
-    \ res;\n    }\n\n    constexpr ModInt inv() const noexcept {\n        int64_t\
-    \ a = _v, b = Modulus, u = 1, v = 0;\n        while (b) {\n            int64_t\
-    \ t = a / b;\n            a -= t * b;\n            std::swap(a, b);\n        \
-    \    u -= t * v;\n            std::swap(u, v);\n        }\n        if (u < 0)\
-    \ u += Modulus;\n        return raw(static_cast<uint32_t>(u));\n    }\n\n    friend\
-    \ std::ostream& operator<<(std::ostream& os, const ModInt& rhs) {\n        return\
-    \ os << rhs._v;\n    }\n\n    friend std::istream& operator>>(std::istream& is,\
-    \ ModInt& rhs) {\n        long long v;\n        is >> v;\n        rhs = ModInt(v);\n\
+    \ res = raw(1 % Modulus);\n        ModInt x = n < 0 ? inv() : *this;\n       \
+    \ uint64_t exponent = n < 0 ? uint64_t(-(n + 1)) + 1 : uint64_t(n);\n        while\
+    \ (exponent > 0) {\n            if (exponent & 1) res *= x;\n            x *=\
+    \ x;\n            exponent >>= 1;\n        }\n        return res;\n    }\n\n \
+    \   constexpr ModInt inv() const noexcept {\n        int64_t a = _v, b = Modulus,\
+    \ u = 1, v = 0;\n        while (b) {\n            int64_t t = a / b;\n       \
+    \     a -= t * b;\n            std::swap(a, b);\n            u -= t * v;\n   \
+    \         std::swap(u, v);\n        }\n        assert(a == 1);\n        u %= Modulus;\n\
+    \        if (u < 0) u += Modulus;\n        return raw(static_cast<uint32_t>(u));\n\
+    \    }\n\n    friend std::ostream& operator<<(std::ostream& os, const ModInt&\
+    \ rhs) {\n        return os << rhs._v;\n    }\n\n    friend std::istream& operator>>(std::istream&\
+    \ is, ModInt& rhs) {\n        long long v;\n        is >> v;\n        rhs = ModInt(v);\n\
     \        return is;\n    }\n};\n\nusing modint998244353 = ModInt<998244353>;\n\
     using modint1000000007 = ModInt<1000000007>;\n\ntemplate <int Id = 0>\nstruct\
     \ DynamicModInt {\n   private:\n    uint32_t _v;\n    inline static uint32_t _mod\
@@ -832,25 +608,26 @@ data:
     \ rhs;\n    }\n\n    bool operator==(const DynamicModInt& rhs) const noexcept\
     \ {\n        return _v == rhs._v;\n    }\n\n    bool operator!=(const DynamicModInt&\
     \ rhs) const noexcept {\n        return _v != rhs._v;\n    }\n\n    DynamicModInt\
-    \ pow(long long exponent) const noexcept {\n        assert(exponent >= 0);\n \
-    \       DynamicModInt result = raw(1 % _mod);\n        DynamicModInt base = *this;\n\
-    \        while (exponent > 0) {\n            if (exponent & 1) result *= base;\n\
-    \            base *= base;\n            exponent >>= 1;\n        }\n        return\
-    \ result;\n    }\n\n    DynamicModInt inv() const noexcept {\n        int64_t\
-    \ a = _v, b = _mod, u = 1, v = 0;\n        while (b) {\n            int64_t quotient\
-    \ = a / b;\n            a -= quotient * b;\n            std::swap(a, b);\n   \
-    \         u -= quotient * v;\n            std::swap(u, v);\n        }\n      \
-    \  assert(a == 1);\n        u %= _mod;\n        if (u < 0) u += _mod;\n      \
-    \  return raw(static_cast<uint32_t>(u));\n    }\n\n    friend std::ostream& operator<<(std::ostream&\
-    \ os, const DynamicModInt& rhs) {\n        return os << rhs._v;\n    }\n\n   \
-    \ friend std::istream& operator>>(std::istream& is, DynamicModInt& rhs) {\n  \
-    \      long long value;\n        is >> value;\n        rhs = DynamicModInt(value);\n\
-    \        return is;\n    }\n};\n\n}  // namespace math\n}  // namespace m1une\n\
-    \n\n#line 27 \"math/fps/convolution.hpp\"\n\nnamespace m1une {\nnamespace fps\
-    \ {\n\nnamespace internal {\n\ntemplate <class Mint, class = void>\nstruct has_static_modulus\
-    \ : std::false_type {};\n\ntemplate <class Mint>\nstruct has_static_modulus<\n\
-    \    Mint, std::void_t<decltype(std::integral_constant<uint32_t, Mint::mod()>{})>>\n\
-    \    : std::true_type {};\n\nconstexpr uint32_t primitive_root_constexpr(uint32_t\
+    \ pow(long long exponent) const noexcept {\n        DynamicModInt result = raw(1\
+    \ % _mod);\n        DynamicModInt base = exponent < 0 ? inv() : *this;\n     \
+    \   uint64_t magnitude =\n            exponent < 0 ? uint64_t(-(exponent + 1))\
+    \ + 1 : uint64_t(exponent);\n        while (magnitude > 0) {\n            if (magnitude\
+    \ & 1) result *= base;\n            base *= base;\n            magnitude >>= 1;\n\
+    \        }\n        return result;\n    }\n\n    DynamicModInt inv() const noexcept\
+    \ {\n        int64_t a = _v, b = _mod, u = 1, v = 0;\n        while (b) {\n  \
+    \          int64_t quotient = a / b;\n            a -= quotient * b;\n       \
+    \     std::swap(a, b);\n            u -= quotient * v;\n            std::swap(u,\
+    \ v);\n        }\n        assert(a == 1);\n        u %= _mod;\n        if (u <\
+    \ 0) u += _mod;\n        return raw(static_cast<uint32_t>(u));\n    }\n\n    friend\
+    \ std::ostream& operator<<(std::ostream& os, const DynamicModInt& rhs) {\n   \
+    \     return os << rhs._v;\n    }\n\n    friend std::istream& operator>>(std::istream&\
+    \ is, DynamicModInt& rhs) {\n        long long value;\n        is >> value;\n\
+    \        rhs = DynamicModInt(value);\n        return is;\n    }\n};\n\n}  // namespace\
+    \ math\n}  // namespace m1une\n\n\n#line 27 \"math/fps/convolution.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace fps {\n\nnamespace internal {\n\ntemplate <class Mint, class\
+    \ = void>\nstruct has_static_modulus : std::false_type {};\n\ntemplate <class\
+    \ Mint>\nstruct has_static_modulus<\n    Mint, std::void_t<decltype(std::integral_constant<uint32_t,\
+    \ Mint::mod()>{})>>\n    : std::true_type {};\n\nconstexpr uint32_t primitive_root_constexpr(uint32_t\
     \ mod) {\n    if (mod == 2) return 1;\n    if (mod == 167772161) return 3;\n \
     \   if (mod == 469762049) return 3;\n    if (mod == 754974721) return 11;\n  \
     \  if (mod == 998244353) return 3;\n    if (mod == 1224736769) return 3;\n\n \
@@ -1471,42 +1248,43 @@ data:
     \ - rooted_square[n] * half;\n        if ((n & 1) == 0) result[n] += rooted[n\
     \ / 2] * half;\n    }\n    return result;\n}\n\n}  // namespace graph\n}  // namespace\
     \ m1une\n\n\n#line 1 \"graph/directed.hpp\"\n\n\n\n#line 1 \"graph/cycle_detection.hpp\"\
-    \n\n\n\n#line 7 \"graph/cycle_detection.hpp\"\n\n#line 1 \"graph/graph.hpp\"\n\
-    \n\n\n#line 7 \"graph/graph.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\n\
-    template <class T = int>\nstruct Edge {\n    using cost_type = T;\n\n    int from;\n\
-    \    int to;\n    T cost;\n    int id;\n    bool alive;\n\n    Edge() : from(-1),\
-    \ to(-1), cost(T()), id(-1), alive(true) {}\n    Edge(int from_, int to_, T cost_\
-    \ = T(1), int id_ = -1, bool alive_ = true)\n        : from(from_), to(to_), cost(cost_),\
-    \ id(id_), alive(alive_) {}\n\n    int other(int v) const {\n        assert(v\
-    \ == from || v == to);\n        return from ^ to ^ v;\n    }\n};\n\ntemplate <class\
-    \ T = int>\nstruct Graph {\n    using edge_type = Edge<T>;\n    using cost_type\
-    \ = T;\n\n   private:\n    int _n;\n    int _edge_count;\n    std::vector<std::vector<edge_type>>\
-    \ _g;\n    std::vector<std::vector<std::pair<int, int>>> _edge_positions;\n\n\
-    \   public:\n    Graph() : _n(0), _edge_count(0) {}\n    explicit Graph(int n)\
-    \ : _n(n), _edge_count(0), _g(n) {\n        assert(0 <= n);\n    }\n\n    int\
-    \ size() const {\n        return _n;\n    }\n\n    bool empty() const {\n    \
-    \    return _n == 0;\n    }\n\n    int edge_count() const {\n        return _edge_count;\n\
-    \    }\n\n    int add_vertex() {\n        _g.emplace_back();\n        return _n++;\n\
-    \    }\n\n    int add_directed_edge(int from, int to, T cost = T(1)) {\n     \
-    \   assert(0 <= from && from < _n);\n        assert(0 <= to && to < _n);\n   \
-    \     int id = _edge_count++;\n        int idx = int(_g[from].size());\n     \
-    \   _g[from].push_back(edge_type(from, to, cost, id));\n        _edge_positions.emplace_back();\n\
-    \        _edge_positions.back().push_back({from, idx});\n        return id;\n\
-    \    }\n\n    int add_edge(int u, int v, T cost = T(1)) {\n        assert(0 <=\
-    \ u && u < _n);\n        assert(0 <= v && v < _n);\n        int id = _edge_count++;\n\
-    \        int u_idx = int(_g[u].size());\n        _g[u].push_back(edge_type(u,\
-    \ v, cost, id));\n        int v_idx = int(_g[v].size());\n        _g[v].push_back(edge_type(v,\
-    \ u, cost, id));\n        _edge_positions.emplace_back();\n        _edge_positions.back().push_back({u,\
-    \ u_idx});\n        _edge_positions.back().push_back({v, v_idx});\n        return\
-    \ id;\n    }\n\n    void set_edge_alive(int id, bool alive) {\n        assert(0\
-    \ <= id && id < _edge_count);\n        for (auto [v, idx] : _edge_positions[id])\
-    \ {\n            _g[v][idx].alive = alive;\n        }\n    }\n\n    void erase_edge(int\
-    \ id) {\n        set_edge_alive(id, false);\n    }\n\n    void revive_edge(int\
-    \ id) {\n        set_edge_alive(id, true);\n    }\n\n    bool is_edge_alive(int\
-    \ id) const {\n        assert(0 <= id && id < _edge_count);\n        assert(!_edge_positions[id].empty());\n\
-    \        auto [v, idx] = _edge_positions[id][0];\n        return _g[v][idx].alive;\n\
-    \    }\n\n    const std::vector<edge_type>& operator[](int v) const {\n      \
-    \  assert(0 <= v && v < _n);\n        return _g[v];\n    }\n\n    std::vector<edge_type>&\
+    \n\n\n\n#line 5 \"graph/cycle_detection.hpp\"\n#include <cstddef>\n#line 7 \"\
+    graph/cycle_detection.hpp\"\n\n#line 1 \"graph/graph.hpp\"\n\n\n\n#line 7 \"graph/graph.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\ntemplate <class T = int>\nstruct Edge\
+    \ {\n    using cost_type = T;\n\n    int from;\n    int to;\n    T cost;\n   \
+    \ int id;\n    bool alive;\n\n    Edge() : from(-1), to(-1), cost(T()), id(-1),\
+    \ alive(true) {}\n    Edge(int from_, int to_, T cost_ = T(1), int id_ = -1, bool\
+    \ alive_ = true)\n        : from(from_), to(to_), cost(cost_), id(id_), alive(alive_)\
+    \ {}\n\n    int other(int v) const {\n        assert(v == from || v == to);\n\
+    \        return from ^ to ^ v;\n    }\n};\n\ntemplate <class T = int>\nstruct\
+    \ Graph {\n    using edge_type = Edge<T>;\n    using cost_type = T;\n\n   private:\n\
+    \    int _n;\n    int _edge_count;\n    std::vector<std::vector<edge_type>> _g;\n\
+    \    std::vector<std::vector<std::pair<int, int>>> _edge_positions;\n\n   public:\n\
+    \    Graph() : _n(0), _edge_count(0) {}\n    explicit Graph(int n) : _n(n), _edge_count(0),\
+    \ _g(n) {\n        assert(0 <= n);\n    }\n\n    int size() const {\n        return\
+    \ _n;\n    }\n\n    bool empty() const {\n        return _n == 0;\n    }\n\n \
+    \   int edge_count() const {\n        return _edge_count;\n    }\n\n    int add_vertex()\
+    \ {\n        _g.emplace_back();\n        return _n++;\n    }\n\n    int add_directed_edge(int\
+    \ from, int to, T cost = T(1)) {\n        assert(0 <= from && from < _n);\n  \
+    \      assert(0 <= to && to < _n);\n        int id = _edge_count++;\n        int\
+    \ idx = int(_g[from].size());\n        _g[from].push_back(edge_type(from, to,\
+    \ cost, id));\n        _edge_positions.emplace_back();\n        _edge_positions.back().push_back({from,\
+    \ idx});\n        return id;\n    }\n\n    int add_edge(int u, int v, T cost =\
+    \ T(1)) {\n        assert(0 <= u && u < _n);\n        assert(0 <= v && v < _n);\n\
+    \        int id = _edge_count++;\n        int u_idx = int(_g[u].size());\n   \
+    \     _g[u].push_back(edge_type(u, v, cost, id));\n        int v_idx = int(_g[v].size());\n\
+    \        _g[v].push_back(edge_type(v, u, cost, id));\n        _edge_positions.emplace_back();\n\
+    \        _edge_positions.back().push_back({u, u_idx});\n        _edge_positions.back().push_back({v,\
+    \ v_idx});\n        return id;\n    }\n\n    void set_edge_alive(int id, bool\
+    \ alive) {\n        assert(0 <= id && id < _edge_count);\n        for (auto [v,\
+    \ idx] : _edge_positions[id]) {\n            _g[v][idx].alive = alive;\n     \
+    \   }\n    }\n\n    void erase_edge(int id) {\n        set_edge_alive(id, false);\n\
+    \    }\n\n    void revive_edge(int id) {\n        set_edge_alive(id, true);\n\
+    \    }\n\n    bool is_edge_alive(int id) const {\n        assert(0 <= id && id\
+    \ < _edge_count);\n        assert(!_edge_positions[id].empty());\n        auto\
+    \ [v, idx] = _edge_positions[id][0];\n        return _g[v][idx].alive;\n    }\n\
+    \n    const std::vector<edge_type>& operator[](int v) const {\n        assert(0\
+    \ <= v && v < _n);\n        return _g[v];\n    }\n\n    std::vector<edge_type>&\
     \ operator[](int v) {\n        assert(0 <= v && v < _n);\n        return _g[v];\n\
     \    }\n\n    const std::vector<std::vector<edge_type>>& adjacency() const {\n\
     \        return _g;\n    }\n\n    std::vector<std::vector<edge_type>>& adjacency()\
@@ -2239,15 +2017,14 @@ data:
     \            }\n        }\n    }\n\n    return SccResult{int(groups.size()), std::move(comp),\
     \ std::move(groups)};\n}\n\n}  // namespace graph\n}  // namespace m1une\n\n\n\
     #line 1 \"graph/shortest_path.hpp\"\n\n\n\n#line 1 \"graph/bellman_ford.hpp\"\n\
-    \n\n\n#line 7 \"graph/bellman_ford.hpp\"\n#include <queue>\n#line 9 \"graph/bellman_ford.hpp\"\
-    \n\n#line 11 \"graph/bellman_ford.hpp\"\n\nnamespace m1une {\nnamespace graph\
-    \ {\n\ntemplate <class T>\nstruct BellmanFordResult {\n    std::vector<T> dist;\n\
-    \    std::vector<int> parent;\n    std::vector<int> parent_edge;\n    std::vector<bool>\
-    \ negative;\n    T inf;\n    bool has_negative_cycle;\n\n    bool reachable(int\
-    \ v) const {\n        assert(0 <= v && v < int(dist.size()));\n        return\
-    \ dist[v] != inf;\n    }\n\n    bool affected_by_negative_cycle(int v) const {\n\
-    \        assert(0 <= v && v < int(negative.size()));\n        return negative[v];\n\
-    \    }\n\n    std::vector<int> path(int t) const {\n        assert(reachable(t));\n\
+    \n\n\n#line 9 \"graph/bellman_ford.hpp\"\n\n#line 11 \"graph/bellman_ford.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\ntemplate <class T>\nstruct BellmanFordResult\
+    \ {\n    std::vector<T> dist;\n    std::vector<int> parent;\n    std::vector<int>\
+    \ parent_edge;\n    std::vector<bool> negative;\n    T inf;\n    bool has_negative_cycle;\n\
+    \n    bool reachable(int v) const {\n        assert(0 <= v && v < int(dist.size()));\n\
+    \        return dist[v] != inf;\n    }\n\n    bool affected_by_negative_cycle(int\
+    \ v) const {\n        assert(0 <= v && v < int(negative.size()));\n        return\
+    \ negative[v];\n    }\n\n    std::vector<int> path(int t) const {\n        assert(reachable(t));\n\
     \        assert(!affected_by_negative_cycle(t));\n        std::vector<int> result;\n\
     \        for (int v = t; v != -1; v = parent[v]) result.push_back(v);\n      \
     \  std::reverse(result.begin(), result.end());\n        return result;\n    }\n\
@@ -2315,10 +2092,10 @@ data:
     \ std::vector<int>{source},\n        std::forward<Callback>(callback)\n    );\n\
     }\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/cow_game.hpp\"\
     \n\n\n\n#line 10 \"graph/cow_game.hpp\"\n\nnamespace m1une {\nnamespace graph\
-    \ {\n\ntemplate <class T>\nstruct CowGameConstraint {\n    int from;\n    int\
-    \ to;\n    T upper_bound;\n};\n\ntemplate <class T>\nstruct CowGameSolution {\n\
-    \    bool feasible = false;\n    std::vector<T> value;\n\n    bool is_feasible()\
-    \ const {\n        return feasible;\n    }\n};\n\ntemplate <class T>\nstruct CowGameUpperBounds\
+    \ {\n\ntemplate <class T>\nstruct CowGameConstraint {\n    int a;\n    int b;\n\
+    \    T upper_bound;\n};\n\ntemplate <class T>\nstruct CowGameSolution {\n    bool\
+    \ feasible = false;\n    std::vector<T> value;\n\n    bool is_feasible() const\
+    \ {\n        return feasible;\n    }\n};\n\ntemplate <class T>\nstruct CowGameUpperBounds\
     \ {\n    bool feasible;\n    std::vector<T> upper_bound;\n    T inf;\n\n    bool\
     \ is_feasible() const {\n        return feasible;\n    }\n\n    bool bounded(int\
     \ variable) const {\n        assert(0 <= variable && variable < int(upper_bound.size()));\n\
@@ -2331,61 +2108,95 @@ data:
     template <class T>\nclass CowGame {\n    static_assert(std::is_arithmetic_v<T>\
     \ && std::is_signed_v<T>);\n\n    struct RelaxationResult {\n        bool has_negative_cycle;\n\
     \        std::vector<T> dist;\n    };\n\n    int _n;\n    std::vector<CowGameConstraint<T>>\
-    \ _constraints;\n    mutable bool _solution_cached = false;\n    mutable CowGameSolution<T>\
-    \ _cached_solution;\n\n    void assert_variable(int variable) const {\n      \
-    \  (void)variable;\n        assert(0 <= variable && variable < _n);\n    }\n\n\
-    \    T negate(T value) const {\n        assert(value != std::numeric_limits<T>::lowest());\n\
-    \        return -value;\n    }\n\n    RelaxationResult relax(std::vector<T> dist,\
-    \ T inf, bool skip_unreachable) const {\n        for (int iteration = 0; iteration\
-    \ < _n; iteration++) {\n            bool updated = false;\n            for (const\
-    \ auto& constraint : _constraints) {\n                if (skip_unreachable &&\
-    \ dist[constraint.from] == inf) continue;\n                T candidate = dist[constraint.from]\
-    \ + constraint.upper_bound;\n                if (dist[constraint.to] <= candidate)\
-    \ continue;\n                dist[constraint.to] = candidate;\n              \
-    \  updated = true;\n                if (iteration == _n - 1) return RelaxationResult{true,\
-    \ std::move(dist)};\n            }\n            if (!updated) break;\n       \
-    \ }\n        return RelaxationResult{false, std::move(dist)};\n    }\n\n    RelaxationResult\
-    \ check_feasibility() const {\n        return relax(std::vector<T>(_n, T()), T(),\
-    \ false);\n    }\n\n    RelaxationResult shortest_paths(int source, T inf) const\
-    \ {\n        std::vector<T> dist(_n, inf);\n        dist[source] = T();\n    \
-    \    return relax(std::move(dist), inf, true);\n    }\n\n   public:\n    CowGame()\
-    \ : CowGame(0) {}\n\n    explicit CowGame(int variable_count) : _n(variable_count)\
-    \ {\n        assert(variable_count >= 0);\n    }\n\n    int size() const {\n \
-    \       return _n;\n    }\n\n    int constraint_count() const {\n        return\
-    \ int(_constraints.size());\n    }\n\n    const CowGameConstraint<T>& get_constraint(int\
-    \ id) const {\n        assert(0 <= id && id < int(_constraints.size()));\n   \
-    \     return _constraints[id];\n    }\n\n    const std::vector<CowGameConstraint<T>>&\
-    \ constraints() const {\n        return _constraints;\n    }\n\n    int add_upper_bound(int\
-    \ from, int to, T upper_bound) {\n        assert_variable(from);\n        assert_variable(to);\n\
-    \        int id = int(_constraints.size());\n        _constraints.push_back(CowGameConstraint<T>{from,\
-    \ to, upper_bound});\n        _solution_cached = false;\n        return id;\n\
-    \    }\n\n    int add_constraint(int from, int to, T upper_bound) {\n        return\
-    \ add_upper_bound(from, to, upper_bound);\n    }\n\n    int add_lower_bound(int\
-    \ from, int to, T lower_bound) {\n        return add_upper_bound(to, from, negate(lower_bound));\n\
-    \    }\n\n    void add_bounds(int from, int to, T lower_bound, T upper_bound)\
-    \ {\n        assert(lower_bound <= upper_bound);\n        add_lower_bound(from,\
-    \ to, lower_bound);\n        add_upper_bound(from, to, upper_bound);\n    }\n\n\
-    \    void add_equality(int from, int to, T difference) {\n        add_bounds(from,\
-    \ to, difference, difference);\n    }\n\n    CowGameSolution<T> solve() const\
-    \ {\n        if (_solution_cached) return _cached_solution;\n\n        auto result\
-    \ = check_feasibility();\n        _cached_solution.feasible = !result.has_negative_cycle;\n\
-    \        _cached_solution.value.clear();\n        if (_cached_solution.feasible)\
-    \ _cached_solution.value = std::move(result.dist);\n        _solution_cached =\
-    \ true;\n        return _cached_solution;\n    }\n\n    bool is_feasible() const\
+    \ _constraints;\n    std::vector<std::vector<int>> _outgoing_constraints;\n  \
+    \  bool _has_negative_upper_bound = false;\n    mutable bool _solution_cached\
+    \ = false;\n    mutable CowGameSolution<T> _cached_solution;\n\n    void assert_variable(int\
+    \ variable) const {\n        (void)variable;\n        assert(0 <= variable &&\
+    \ variable < _n);\n    }\n\n    T negate(T value) const {\n        assert(value\
+    \ != std::numeric_limits<T>::lowest());\n        return -value;\n    }\n\n   \
+    \ RelaxationResult check_feasibility() const {\n        std::vector<T> dist(_n,\
+    \ T());\n        for (int iteration = 0; iteration < _n; iteration++) {\n    \
+    \        bool updated = false;\n            for (const auto& constraint : _constraints)\
+    \ {\n                T candidate = dist[constraint.b] + constraint.upper_bound;\n\
+    \                if (dist[constraint.a] <= candidate) continue;\n            \
+    \    dist[constraint.a] = candidate;\n                updated = true;\n      \
+    \          if (iteration == _n - 1) return RelaxationResult{true, std::move(dist)};\n\
+    \            }\n            if (!updated) break;\n        }\n        return RelaxationResult{false,\
+    \ std::move(dist)};\n    }\n\n    std::vector<T> shortest_paths(int source, T\
+    \ inf) const {\n        const auto& potential = _cached_solution.value;\n    \
+    \    std::vector<T> dist(_n, inf);\n        std::vector<int> heap;\n        //\
+    \ -1 is unseen, -2 is fixed, and every other value is a heap index.\n        std::vector<int>\
+    \ position(_n, -1);\n        heap.reserve(_n);\n\n        auto swap_heap = [&](int\
+    \ i, int j) {\n            std::swap(heap[i], heap[j]);\n            position[heap[i]]\
+    \ = i;\n            position[heap[j]] = j;\n        };\n        auto sift_up =\
+    \ [&](int i) {\n            while (i > 0) {\n                int parent = (i -\
+    \ 1) / 2;\n                if (dist[heap[parent]] <= dist[heap[i]]) break;\n \
+    \               swap_heap(parent, i);\n                i = parent;\n         \
+    \   }\n        };\n        auto sift_down = [&](int i) {\n            while (2\
+    \ * i + 1 < int(heap.size())) {\n                int child = 2 * i + 1;\n    \
+    \            if (child + 1 < int(heap.size()) &&\n                    dist[heap[child\
+    \ + 1]] < dist[heap[child]]) {\n                    child++;\n               \
+    \ }\n                if (dist[heap[i]] <= dist[heap[child]]) break;\n        \
+    \        swap_heap(i, child);\n                i = child;\n            }\n   \
+    \     };\n\n        dist[source] = T();\n        position[source] = 0;\n     \
+    \   heap.push_back(source);\n\n        while (!heap.empty()) {\n            int\
+    \ b = heap[0];\n            position[b] = -2;\n            int last = heap.back();\n\
+    \            heap.pop_back();\n            if (!heap.empty()) {\n            \
+    \    heap[0] = last;\n                position[last] = 0;\n                sift_down(0);\n\
+    \            }\n\n            for (int id : _outgoing_constraints[b]) {\n    \
+    \            const auto& constraint = _constraints[id];\n                T cost\
+    \ = constraint.upper_bound + potential[b] -\n                         potential[constraint.a];\n\
+    \                assert(cost >= T());\n                T candidate = dist[b] +\
+    \ cost;\n                if (dist[constraint.a] <= candidate) continue;\n    \
+    \            dist[constraint.a] = candidate;\n                assert(position[constraint.a]\
+    \ != -2);\n                if (position[constraint.a] == -1) {\n             \
+    \       position[constraint.a] = int(heap.size());\n                    heap.push_back(constraint.a);\n\
+    \                }\n                sift_up(position[constraint.a]);\n       \
+    \     }\n        }\n\n        for (int v = 0; v < _n; v++) {\n            if (dist[v]\
+    \ == inf) continue;\n            dist[v] = dist[v] - potential[source] + potential[v];\n\
+    \        }\n        return dist;\n    }\n\n   public:\n    CowGame() : CowGame(0)\
+    \ {}\n\n    explicit CowGame(int variable_count)\n        : _n(variable_count),\n\
+    \          _outgoing_constraints(variable_count < 0 ? 0 : variable_count) {\n\
+    \        assert(variable_count >= 0);\n    }\n\n    int size() const {\n     \
+    \   return _n;\n    }\n\n    int constraint_count() const {\n        return int(_constraints.size());\n\
+    \    }\n\n    const CowGameConstraint<T>& get_constraint(int id) const {\n   \
+    \     assert(0 <= id && id < int(_constraints.size()));\n        return _constraints[id];\n\
+    \    }\n\n    const std::vector<CowGameConstraint<T>>& constraints() const {\n\
+    \        return _constraints;\n    }\n\n    bool can_use_dijkstra() const {\n\
+    \        return !_has_negative_upper_bound ||\n               (_solution_cached\
+    \ && _cached_solution.feasible);\n    }\n\n    int add_upper_bound(int a, int\
+    \ b, T upper_bound) {\n        assert_variable(a);\n        assert_variable(b);\n\
+    \        int id = int(_constraints.size());\n        _constraints.push_back(CowGameConstraint<T>{a,\
+    \ b, upper_bound});\n        _outgoing_constraints[b].push_back(id);\n       \
+    \ _has_negative_upper_bound = _has_negative_upper_bound || upper_bound < T();\n\
+    \        _solution_cached = false;\n        return id;\n    }\n\n    int add_constraint(int\
+    \ a, int b, T upper_bound) {\n        return add_upper_bound(a, b, upper_bound);\n\
+    \    }\n\n    int add_lower_bound(int a, int b, T lower_bound) {\n        return\
+    \ add_upper_bound(b, a, negate(lower_bound));\n    }\n\n    void add_bounds(int\
+    \ a, int b, T lower_bound, T upper_bound) {\n        assert(lower_bound <= upper_bound);\n\
+    \        add_lower_bound(a, b, lower_bound);\n        add_upper_bound(a, b, upper_bound);\n\
+    \    }\n\n    void add_equality(int a, int b, T difference) {\n        add_bounds(a,\
+    \ b, difference, difference);\n    }\n\n    CowGameSolution<T> solve() const {\n\
+    \        if (_solution_cached) return _cached_solution;\n\n        _cached_solution.feasible\
+    \ = true;\n        _cached_solution.value.assign(_n, T());\n        if (_has_negative_upper_bound)\
+    \ {\n            auto result = check_feasibility();\n            _cached_solution.feasible\
+    \ = !result.has_negative_cycle;\n            _cached_solution.value.clear();\n\
+    \            if (_cached_solution.feasible) {\n                _cached_solution.value\
+    \ = std::move(result.dist);\n            }\n        }\n        _solution_cached\
+    \ = true;\n        return _cached_solution;\n    }\n\n    bool is_feasible() const\
     \ {\n        if (!_solution_cached) (void)solve();\n        return _cached_solution.feasible;\n\
     \    }\n\n    CowGameUpperBounds<T> tightest_upper_bounds(int source) const {\n\
     \        assert_variable(source);\n        T inf = std::numeric_limits<T>::max()\
     \ / T(4);\n        CowGameUpperBounds<T> result;\n        result.feasible = is_feasible();\n\
     \        result.inf = inf;\n        result.upper_bound.assign(_n, inf);\n    \
     \    if (!result.feasible) return result;\n\n        result.upper_bound = shortest_paths(source,\
-    \ inf).dist;\n        return result;\n    }\n\n    CowGameDifferenceBounds<T>\
-    \ difference_bounds(int from, int to) const {\n        assert_variable(from);\n\
-    \        assert_variable(to);\n        T inf = std::numeric_limits<T>::max() /\
-    \ T(4);\n        CowGameDifferenceBounds<T> result;\n        result.feasible =\
-    \ is_feasible();\n        if (!result.feasible) return result;\n\n        auto\
-    \ forward = shortest_paths(from, inf);\n        if (forward.dist[to] != inf) result.upper_bound\
-    \ = forward.dist[to];\n\n        auto backward = shortest_paths(to, inf);\n  \
-    \      if (backward.dist[from] != inf) result.lower_bound = negate(backward.dist[from]);\n\
+    \ inf);\n        return result;\n    }\n\n    CowGameDifferenceBounds<T> difference_bounds(int\
+    \ a, int b) const {\n        assert_variable(a);\n        assert_variable(b);\n\
+    \        T inf = std::numeric_limits<T>::max() / T(4);\n        CowGameDifferenceBounds<T>\
+    \ result;\n        result.feasible = is_feasible();\n        if (!result.feasible)\
+    \ return result;\n\n        auto upper = shortest_paths(b, inf);\n        if (upper[a]\
+    \ != inf) result.upper_bound = upper[a];\n\n        auto lower = shortest_paths(a,\
+    \ inf);\n        if (lower[b] != inf) result.lower_bound = negate(lower[b]);\n\
     \        return result;\n    }\n};\n\ntemplate <class T>\nusing DifferenceConstraints\
     \ = CowGame<T>;\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"\
     graph/dag_shortest_path.hpp\"\n\n\n\n#line 9 \"graph/dag_shortest_path.hpp\"\n\
@@ -7580,140 +7391,436 @@ data:
     \            TwoEdgeConnectedBridge{first_component, second_component, edge_id});\n\
     \    }\n    return result;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\
     \n\n#line 32 \"graph/undirected.hpp\"\n\n\n#line 15 \"graph/all.hpp\"\n\n\n#line\
-    \ 10 \"verify/graph/cow_game.test.cpp\"\n\nusing CowGame = m1une::graph::CowGame<long\
-    \ long>;\n\nvoid test_basic_constraints() {\n    CowGame game(4);\n    int first\
-    \ = game.add_upper_bound(0, 1, 5);\n    game.add_lower_bound(0, 1, 2);\n    game.add_bounds(1,\
-    \ 2, -1, 4);\n    game.add_equality(2, 3, 3);\n\n    assert(game.size() == 4);\n\
-    \    assert(game.constraint_count() == 6);\n    assert(game.get_constraint(first).from\
-    \ == 0);\n    assert(game.get_constraint(first).to == 1);\n    assert(game.get_constraint(first).upper_bound\
-    \ == 5);\n\n    auto solution = game.solve();\n    assert(solution.is_feasible());\n\
-    \    assert(solution.value.size() == 4);\n    for (const auto& constraint : game.constraints())\
-    \ {\n        assert(solution.value[constraint.to] - solution.value[constraint.from]\
-    \ <=\n               constraint.upper_bound);\n    }\n\n    auto bounds = game.difference_bounds(0,\
-    \ 3);\n    assert(bounds.is_feasible());\n    assert(bounds.bounded_below());\n\
-    \    assert(bounds.bounded_above());\n    assert(*bounds.lower_bound == 4);\n\
-    \    assert(*bounds.upper_bound == 12);\n\n    auto all = game.tightest_upper_bounds(0);\n\
-    \    assert(all.is_feasible());\n    assert(all.bounded(0));\n    assert(all.bounded(3));\n\
-    \    assert(all.upper_bound[0] == 0);\n    assert(all.upper_bound[3] == 12);\n\
-    }\n\nvoid test_infeasible() {\n    CowGame game(2);\n    game.add_lower_bound(0,\
-    \ 1, 5);\n    assert(game.is_feasible());\n    assert(game.solve().is_feasible());\n\
-    \n    game.add_upper_bound(0, 1, 3);\n\n    assert(!game.is_feasible());\n   \
+    \ 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 5 \"utilities/fast_io.hpp\"\n#include\
+    \ <charconv>\n#line 7 \"utilities/fast_io.hpp\"\n#include <cstdio>\n#include <cstdlib>\n\
+    #line 11 \"utilities/fast_io.hpp\"\n#include <iterator>\n#include <string>\n#line\
+    \ 15 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n\nnamespace m1une {\nnamespace\
+    \ utilities {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\n\
+    template <class T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate\
+    \ <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
+    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
+    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
+    \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
+    \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
+    \ std::void_t<typename std::remove_cv_t<std::remove_reference_t<T>>::value_type>>\
+    \ {\n    using type = typename std::remove_cv_t<std::remove_reference_t<T>>::value_type;\n\
+    };\n\ntemplate <class T>\nusing range_stored_value_t = typename range_stored_value<T>::type;\n\
+    \n// Treat strings and C strings as scalar output objects, not as ranges.\ntemplate\
+    \ <class T>\nstruct is_char_array : std::false_type {};\n\ntemplate <class T,\
+    \ std::size_t N>\nstruct is_char_array<T[N]>\n    : std::bool_constant<std::is_same_v<std::remove_cv_t<T>,\
+    \ char>> {};\n\ntemplate <class T>\nstruct is_string_like\n    : std::bool_constant<\n\
+    \          std::is_same_v<std::decay_t<T>, std::string>\n          || std::is_same_v<std::decay_t<T>,\
+    \ const char*>\n          || std::is_same_v<std::decay_t<T>, char*>\n        \
+    \  || is_char_array<std::remove_reference_t<T>>::value\n      > {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_string_like_v = is_string_like<T>::value;\n\
+    \n// ModInt-like type: x.val() is printable, and x can be assigned from long long.\n\
+    template <class T, class = void>\nstruct has_val_method : std::false_type {};\n\
+    \ntemplate <class T>\nstruct has_val_method<T, std::void_t<decltype(std::declval<const\
+    \ T&>().val())>>\n    : std::true_type {};\n\ntemplate <class T>\ninline constexpr\
+    \ bool has_val_method_v = has_val_method<T>::value;\n\ntemplate <class T, class\
+    \ = void>\nstruct has_static_mod_raw : std::false_type {};\n\ntemplate <class\
+    \ T>\nstruct has_static_mod_raw<\n    T, std::void_t<decltype(T::mod()), decltype(T::raw(std::declval<uint32_t>()))>>\n\
+    \    : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool has_static_mod_raw_v\
+    \ = has_static_mod_raw<T>::value;\n\n// libstdc++ before GCC 16 does not classify\
+    \ __int128 as an integral type in\n// strict ISO modes such as -std=c++23. Keep\
+    \ the fast-I/O interface independent\n// of that implementation detail.\ntemplate\
+    \ <class T>\ninline constexpr bool is_integral_v =\n    std::is_integral_v<T>\n\
+    \    || std::is_same_v<std::remove_cv_t<T>, __int128_t>\n    || std::is_same_v<std::remove_cv_t<T>,\
+    \ __uint128_t>;\n\ntemplate <class T>\ninline constexpr bool is_signed_v =\n \
+    \   std::is_signed_v<T>\n    || std::is_same_v<std::remove_cv_t<T>, __int128_t>;\n\
+    \ntemplate <class T>\nstruct make_unsigned {\n    using type = std::make_unsigned_t<T>;\n\
+    };\n\ntemplate <>\nstruct make_unsigned<__int128_t> {\n    using type = __uint128_t;\n\
+    };\n\ntemplate <>\nstruct make_unsigned<__uint128_t> {\n    using type = __uint128_t;\n\
+    };\n\ntemplate <class T>\nusing make_unsigned_t = typename make_unsigned<std::remove_cv_t<T>>::type;\n\
+    \n}  // namespace internal\n\nstruct FastInput {\n    static constexpr int buffer_size\
+    \ = 1 << 20;\n\n   private:\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
+    \    int _position;\n    int _length;\n    bool _terminal;\n\n    bool refill()\
+    \ {\n        _position = 0;\n        if (_terminal) {\n            if (std::fgets(_buffer,\
+    \ buffer_size, _stream) == nullptr) {\n                _length = 0;\n        \
+    \        return false;\n            }\n            _length = int(std::strlen(_buffer));\n\
+    \        } else {\n            _length = int(std::fread(_buffer, 1, buffer_size,\
+    \ _stream));\n        }\n        return _length != 0;\n    }\n\n    template <class\
+    \ T>\n    bool read_integer_from_terminal(T& value) {\n        if (!skip_spaces())\
+    \ return false;\n        int c = read_char_raw();\n\n        bool negative = false;\n\
+    \        if (c == '-') {\n            negative = true;\n            c = read_char_raw();\n\
+    \        }\n\n        if constexpr (internal::is_signed_v<T>) {\n            T\
+    \ result = 0;\n            while ('0' <= c && c <= '9') {\n                result\
+    \ = negative ? result * 10 - (c - '0')\n                                  : result\
+    \ * 10 + (c - '0');\n                c = read_char_raw();\n            }\n   \
+    \         value = result;\n        } else {\n            T result = 0;\n     \
+    \       while ('0' <= c && c <= '9') {\n                result = result * 10 +\
+    \ T(c - '0');\n                c = read_char_raw();\n            }\n         \
+    \   value = negative ? T(0) - result : result;\n        }\n        return true;\n\
+    \    }\n\n    bool prepare_number() {\n        if (_length - _position >= 64)\
+    \ return true;\n        const int remaining = _length - _position;\n        if\
+    \ (remaining > 0) std::memmove(_buffer, _buffer + _position, remaining);\n   \
+    \     const int added = int(std::fread(_buffer + remaining, 1, buffer_size - remaining,\
+    \ _stream));\n        _position = 0;\n        _length = remaining + added;\n \
+    \       if (_length < buffer_size) _buffer[_length] = '\\0';\n        return _length\
+    \ != 0;\n    }\n\n   public:\n    explicit FastInput(std::FILE* stream = stdin)\n\
+    \        : _stream(stream),\n          _position(0),\n          _length(0),\n\
+    \          _terminal(::isatty(::fileno(stream)) != 0) {}\n\n    FastInput(const\
+    \ FastInput&) = delete;\n    FastInput& operator=(const FastInput&) = delete;\n\
+    \n    int read_char_raw() {\n        if (_position == _length && !refill()) return\
+    \ EOF;\n        return _buffer[_position++];\n    }\n\n    bool skip_spaces()\
+    \ {\n        int c = read_char_raw();\n        while (c != EOF && c <= ' ') c\
+    \ = read_char_raw();\n        if (c == EOF) return false;\n        --_position;\n\
+    \        return true;\n    }\n\n    bool read(char& value) {\n        if (!skip_spaces())\
+    \ return false;\n        value = char(read_char_raw());\n        return true;\n\
+    \    }\n\n    bool read(std::string& value) {\n        if (!skip_spaces()) return\
+    \ false;\n        value.clear();\n        int c = read_char_raw();\n        while\
+    \ (c != EOF && c > ' ') {\n            value.push_back(char(c));\n           \
+    \ c = read_char_raw();\n        }\n        return true;\n    }\n\n    bool read(bool&\
+    \ value) {\n        int x;\n        if (!read(x)) return false;\n        value\
+    \ = x != 0;\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
+    \        internal::is_integral_v<T>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ bool>\n            && !std::is_same_v<std::remove_cv_t<T>, char>,\n        bool\n\
+    \    >\n    read(T& value) {\n        if (_terminal) return read_integer_from_terminal(value);\n\
+    \        if (!prepare_number()) return false;\n        int c = static_cast<unsigned\
+    \ char>(_buffer[_position++]);\n        while (c <= ' ') c = static_cast<unsigned\
+    \ char>(_buffer[_position++]);\n\n        bool negative = false;\n        if (c\
+    \ == '-') {\n            negative = true;\n            c = static_cast<unsigned\
+    \ char>(_buffer[_position++]);\n        }\n\n        if constexpr (internal::is_signed_v<T>)\
+    \ {\n            T result = 0;\n            while ('0' <= c && c <= '9') {\n \
+    \               const int first = c - '0';\n                const int second =\
+    \ static_cast<unsigned char>(_buffer[_position]) - '0';\n                if (0\
+    \ <= second && second <= 9) {\n                    result = negative ? result\
+    \ * 100 - (first * 10 + second)\n                                      : result\
+    \ * 100 + (first * 10 + second);\n                    ++_position;\n         \
+    \       } else {\n                    result = negative ? result * 10 - first\
+    \ : result * 10 + first;\n                }\n                c = static_cast<unsigned\
+    \ char>(_buffer[_position++]);\n            }\n            value = result;\n \
+    \       } else {\n            T result = 0;\n            while ('0' <= c && c\
+    \ <= '9') {\n                const unsigned first = unsigned(c - '0');\n     \
+    \           const int second = static_cast<unsigned char>(_buffer[_position])\
+    \ - '0';\n                if (0 <= second && second <= 9) {\n                \
+    \    result = result * 100 + T(first * 10 + unsigned(second));\n             \
+    \       ++_position;\n                } else {\n                    result = result\
+    \ * 10 + T(first);\n                }\n                c = static_cast<unsigned\
+    \ char>(_buffer[_position++]);\n            }\n            value = negative ?\
+    \ T(0) - result : result;\n        }\n        if (_position > _length) _position\
+    \ = _length;\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>,\
+    \ bool>\n    read(T& value) {\n        if (!skip_spaces()) return false;\n   \
+    \     int c = read_char_raw();\n        bool negative = false;\n        if (c\
+    \ == '-' || c == '+') {\n            negative = c == '-';\n            c = read_char_raw();\n\
+    \        }\n\n        long double result = 0;\n        while ('0' <= c && c <=\
+    \ '9') {\n            result = result * 10 + (c - '0');\n            c = read_char_raw();\n\
+    \        }\n        if (c == '.') {\n            long double place = 0.1L;\n \
+    \           c = read_char_raw();\n            while ('0' <= c && c <= '9') {\n\
+    \                result += (c - '0') * place;\n                place *= 0.1L;\n\
+    \                c = read_char_raw();\n            }\n        }\n        if (c\
+    \ == 'e' || c == 'E') {\n            c = read_char_raw();\n            bool exponent_negative\
+    \ = false;\n            if (c == '-' || c == '+') {\n                exponent_negative\
+    \ = c == '-';\n                c = read_char_raw();\n            }\n         \
+    \   int exponent = 0;\n            while ('0' <= c && c <= '9') {\n          \
+    \      exponent = exponent * 10 + (c - '0');\n                c = read_char_raw();\n\
+    \            }\n            long double scale = 1;\n            long double power\
+    \ = 10;\n            while (exponent > 0) {\n                if (exponent & 1)\
+    \ scale *= power;\n                power *= power;\n                exponent >>=\
+    \ 1;\n            }\n            result = exponent_negative ? result / scale :\
+    \ result * scale;\n        }\n        value = static_cast<T>(negative ? -result\
+    \ : result);\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
+    \        internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
+    \            && !internal::is_range_v<T>,\n        bool\n    >\n    read(T& value)\
+    \ {\n        long long x;\n        if (!read(x)) return false;\n        if constexpr\
+    \ (internal::has_static_mod_raw_v<T>) {\n            if (x >= 0 && uint64_t(x)\
+    \ < uint64_t(T::mod())) {\n                value = T::raw(uint32_t(x));\n    \
+    \        } else {\n                value = T(x);\n            }\n        } else\
+    \ {\n            value = T(x);\n        }\n        return true;\n    }\n\n   \
+    \ template <class First, class Second>\n    bool read(std::pair<First, Second>&\
+    \ value) {\n        if (!read(value.first)) return false;\n        return read(value.second);\n\
+    \    }\n\n    template <class Range>\n    std::enable_if_t<\n        internal::is_range_v<Range>\n\
+    \            && !internal::is_string_like_v<Range>,\n        bool\n    >\n   \
+    \ read(Range& range) {\n        using StoredValue = internal::range_stored_value_t<Range>;\n\
+    \        constexpr bool nested = internal::is_range_v<StoredValue>\n         \
+    \                       && !internal::is_string_like_v<StoredValue>;\n\n     \
+    \   for (auto&& value : range) {\n            if constexpr (std::is_same_v<StoredValue,\
+    \ bool> && !nested) {\n                bool x;\n                if (!read(x))\
+    \ return false;\n                value = x;\n            } else {\n          \
+    \      if (!read(value)) return false;\n            }\n        }\n        return\
+    \ true;\n    }\n\n    template <class First, class Second, class... Rest>\n  \
+    \  bool read(First& first, Second& second, Rest&... rest) {\n        if (!read(first))\
+    \ return false;\n        return read(second, rest...);\n    }\n\n    template\
+    \ <class T>\n    FastInput& operator>>(T& value) {\n        if (!read(value))\
+    \ std::abort();\n        return *this;\n    }\n};\n\nstruct FastOutput {\n   \
+    \ static constexpr int buffer_size = 1 << 20;\n\n   private:\n    inline static\
+    \ const auto digit_quads = [] {\n        std::array<char, 40000> result{};\n \
+    \       for (int i = 0; i < 10000; i++) {\n            int value = i;\n      \
+    \      for (int j = 3; j >= 0; j--) {\n                result[4 * i + j] = char('0'\
+    \ + value % 10);\n                value /= 10;\n            }\n        }\n   \
+    \     return result;\n    }();\n\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
+    \    int _position;\n    int _precision;\n    std::chars_format _float_format;\n\
+    \    char _range_separator;\n\n   public:\n    explicit FastOutput(std::FILE*\
+    \ stream = stdout)\n        : _stream(stream),\n          _position(0),\n    \
+    \      _precision(6),\n          _float_format(std::chars_format::general),\n\
+    \          _range_separator(' ') {}\n\n    FastOutput(const FastOutput&) = delete;\n\
+    \    FastOutput& operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n\
+    \        flush();\n    }\n\n    void flush() {\n        if (_position == 0) return;\n\
+    \        std::fwrite(_buffer, 1, _position, _stream);\n        _position = 0;\n\
+    \    }\n\n    void write_char(char c) {\n        if (_position == buffer_size)\
+    \ flush();\n        _buffer[_position++] = c;\n    }\n\n    void write(const char*\
+    \ s) {\n        while (*s != '\\0') write_char(*s++);\n    }\n\n    void write(const\
+    \ std::string& s) {\n        for (char c : s) write_char(c);\n    }\n\n    void\
+    \ write(char c) {\n        write_char(c);\n    }\n\n    void write(bool value)\
+    \ {\n        write_char(value ? '1' : '0');\n    }\n\n    template <class T>\n\
+    \    std::enable_if_t<std::is_floating_point_v<T>>\n    write(T value) {\n   \
+    \     char digits[128];\n        auto [end, error] = std::to_chars(\n        \
+    \    digits,\n            digits + sizeof(digits),\n            value,\n     \
+    \       _float_format,\n            _precision\n        );\n        if (error\
+    \ != std::errc()) std::abort();\n        for (const char* pointer = digits; pointer\
+    \ != end; pointer++) {\n            write_char(*pointer);\n        }\n    }\n\n\
+    \    template <class T>\n    std::enable_if_t<\n        internal::is_integral_v<T>\n\
+    \            && !std::is_same_v<std::remove_cv_t<T>, bool>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ char>\n    >\n    write(T value) {\n        using Raw = std::remove_cv_t<T>;\n\
+    \        using Unsigned = internal::make_unsigned_t<Raw>;\n\n        Unsigned\
+    \ magnitude;\n        if constexpr (internal::is_signed_v<Raw>) {\n          \
+    \  if (value < 0) {\n                write_char('-');\n                magnitude\
+    \ = Unsigned(0) - Unsigned(value);\n            } else {\n                magnitude\
+    \ = Unsigned(value);\n            }\n        } else {\n            magnitude =\
+    \ value;\n        }\n\n        if (magnitude == 0) {\n            write_char('0');\n\
+    \            return;\n        }\n\n        unsigned chunks[16];\n        int count\
+    \ = 0;\n        while (magnitude >= 10000) {\n            const Unsigned quotient\
+    \ = magnitude / 10000;\n            chunks[count++] = unsigned(magnitude - quotient\
+    \ * 10000);\n            magnitude = quotient;\n        }\n        if (_position\
+    \ > buffer_size - 64) flush();\n        const unsigned leading = unsigned(magnitude);\n\
+    \        const char* first = digit_quads.data() + 4 * leading;\n        int skip\
+    \ = leading < 10 ? 3 : leading < 100 ? 2 : leading < 1000 ? 1 : 0;\n        for\
+    \ (; skip < 4; skip++) _buffer[_position++] = first[skip];\n        while (count--)\
+    \ {\n            const char* digits = digit_quads.data() + 4 * chunks[count];\n\
+    \            std::memcpy(_buffer + _position, digits, 4);\n            _position\
+    \ += 4;\n        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n \
+    \       internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
+    \            && !internal::is_range_v<T>\n    >\n    write(const T& value) {\n\
+    \        write(value.val());\n    }\n\n    template <class First, class Second>\n\
+    \    void write(const std::pair<First, Second>& value) {\n        write(value.first);\n\
+    \        write_char(' ');\n        write(value.second);\n    }\n\n    template\
+    \ <class Range>\n    std::enable_if_t<\n        internal::is_range_v<Range>\n\
+    \            && !internal::is_string_like_v<Range>\n    >\n    write(const Range&\
+    \ range) {\n        using StoredValue = internal::range_stored_value_t<const Range>;\n\
+    \        constexpr bool nested = internal::is_range_v<StoredValue>\n         \
+    \                       && !internal::is_string_like_v<StoredValue>;\n\n     \
+    \   bool first = true;\n        for (const auto& value : range) {\n          \
+    \  if (!first) write_char(nested ? '\\n' : _range_separator);\n            first\
+    \ = false;\n            if constexpr (std::is_same_v<StoredValue, bool> && !nested)\
+    \ {\n                write(static_cast<bool>(value));\n            } else {\n\
+    \                write(value);\n            }\n        }\n    }\n\n    template\
+    \ <class First, class... Rest>\n    void print(const First& first, const Rest&...\
+    \ rest) {\n        write(first);\n        ((write_char(' '), write(rest)), ...);\n\
+    \    }\n\n    void println() {\n        write_char('\\n');\n    }\n\n    void\
+    \ set_precision(int precision) {\n        _precision = precision;\n    }\n\n \
+    \   void set_fixed(int precision = 6) {\n        _float_format = std::chars_format::fixed;\n\
+    \        _precision = precision;\n    }\n\n    void set_general(int precision\
+    \ = 6) {\n        _float_format = std::chars_format::general;\n        _precision\
+    \ = precision;\n    }\n\n    void set_range_separator(char separator) {\n    \
+    \    _range_separator = separator;\n    }\n\n    template <class... Args>\n  \
+    \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
+    n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
+    \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
+    \ utilities\n}  // namespace m1une\n\n\n#line 12 \"verify/graph/cow_game.test.cpp\"\
+    \n\nusing CowGame = m1une::graph::CowGame<long long>;\n\nvoid test_basic_constraints()\
+    \ {\n    CowGame game(4);\n    int first = game.add_upper_bound(1, 0, 5);\n  \
+    \  game.add_lower_bound(1, 0, 2);\n    game.add_bounds(2, 1, -1, 4);\n    game.add_equality(3,\
+    \ 2, 3);\n\n    assert(game.size() == 4);\n    assert(game.constraint_count()\
+    \ == 6);\n    assert(game.get_constraint(first).a == 1);\n    assert(game.get_constraint(first).b\
+    \ == 0);\n    assert(game.get_constraint(first).upper_bound == 5);\n\n    auto\
+    \ solution = game.solve();\n    assert(solution.is_feasible());\n    assert(solution.value.size()\
+    \ == 4);\n    for (const auto& constraint : game.constraints()) {\n        assert(solution.value[constraint.a]\
+    \ - solution.value[constraint.b] <=\n               constraint.upper_bound);\n\
+    \    }\n\n    auto bounds = game.difference_bounds(3, 0);\n    assert(bounds.is_feasible());\n\
+    \    assert(bounds.bounded_below());\n    assert(bounds.bounded_above());\n  \
+    \  assert(*bounds.lower_bound == 4);\n    assert(*bounds.upper_bound == 12);\n\
+    \n    auto all = game.tightest_upper_bounds(0);\n    assert(all.is_feasible());\n\
+    \    assert(all.bounded(0));\n    assert(all.bounded(3));\n    assert(all.upper_bound[0]\
+    \ == 0);\n    assert(all.upper_bound[3] == 12);\n}\n\nvoid test_infeasible() {\n\
+    \    CowGame game(2);\n    game.add_lower_bound(1, 0, 5);\n    assert(!game.can_use_dijkstra());\n\
+    \    assert(game.is_feasible());\n    assert(game.can_use_dijkstra());\n    assert(game.solve().is_feasible());\n\
+    \n    game.add_upper_bound(1, 0, 3);\n    assert(!game.can_use_dijkstra());\n\n\
+    \    assert(!game.is_feasible());\n    assert(!game.can_use_dijkstra());\n   \
     \ assert(!game.solve().is_feasible());\n    assert(!game.tightest_upper_bounds(0).is_feasible());\n\
-    \    assert(!game.difference_bounds(0, 1).is_feasible());\n}\n\nvoid test_unbounded()\
-    \ {\n    CowGame game(4);\n    game.add_upper_bound(0, 1, 7);\n    game.add_upper_bound(2,\
-    \ 3, 2);\n\n    auto one_way = game.difference_bounds(0, 1);\n    assert(one_way.is_feasible());\n\
+    \    assert(!game.difference_bounds(1, 0).is_feasible());\n}\n\nvoid test_unbounded()\
+    \ {\n    CowGame game(4);\n    game.add_upper_bound(1, 0, 7);\n    game.add_upper_bound(3,\
+    \ 2, 2);\n\n    auto one_way = game.difference_bounds(1, 0);\n    assert(one_way.is_feasible());\n\
     \    assert(!one_way.bounded_below());\n    assert(one_way.bounded_above());\n\
-    \    assert(*one_way.upper_bound == 7);\n\n    auto disconnected = game.difference_bounds(0,\
-    \ 3);\n    assert(disconnected.is_feasible());\n    assert(!disconnected.bounded_below());\n\
+    \    assert(*one_way.upper_bound == 7);\n\n    auto disconnected = game.difference_bounds(3,\
+    \ 0);\n    assert(disconnected.is_feasible());\n    assert(!disconnected.bounded_below());\n\
     \    assert(!disconnected.bounded_above());\n\n    auto all = game.tightest_upper_bounds(0);\n\
     \    assert(all.bounded(0));\n    assert(all.bounded(1));\n    assert(!all.bounded(2));\n\
-    \    assert(!all.bounded(3));\n}\n\nvoid test_alias_and_empty() {\n    m1une::graph::DifferenceConstraints<long\
-    \ long> constraints(0);\n    auto solution = constraints.solve();\n    assert(solution.is_feasible());\n\
-    \    assert(solution.value.empty());\n}\n\nvoid test_against_warshall_floyd()\
-    \ {\n    constexpr long long inf = std::numeric_limits<long long>::max() / 4;\n\
-    \    for (int n = 1; n <= 7; n++) {\n        for (int test = 0; test < 80; test++)\
-    \ {\n            CowGame game(n);\n            std::vector<std::vector<long long>>\
-    \ dist(\n                n, std::vector<long long>(n, inf));\n            for\
-    \ (int i = 0; i < n; i++) dist[i][i] = 0;\n\n            for (int from = 0; from\
-    \ < n; from++) {\n                for (int to = 0; to < n; to++) {\n         \
-    \           if ((test * 5 + from * 7 + to * 11) % 6 != 0) continue;\n        \
-    \            long long upper_bound = (test * 3 + from * 5 + to * 2) % 13 - 6;\n\
-    \                    game.add_constraint(from, to, upper_bound);\n           \
-    \         dist[from][to] = std::min(dist[from][to], upper_bound);\n          \
-    \      }\n            }\n\n            dist = m1une::graph::warshall_floyd(std::move(dist),\
-    \ inf);\n            bool feasible = !m1une::graph::has_negative_cycle(dist);\n\
-    \            assert(game.is_feasible() == feasible);\n\n            auto solution\
-    \ = game.solve();\n            assert(solution.is_feasible() == feasible);\n \
-    \           if (!feasible) continue;\n            for (const auto& constraint\
-    \ : game.constraints()) {\n                assert(solution.value[constraint.to]\
-    \ - solution.value[constraint.from] <=\n                       constraint.upper_bound);\n\
-    \            }\n\n            for (int source = 0; source < n; source++) {\n \
-    \               auto upper = game.tightest_upper_bounds(source);\n           \
-    \     assert(upper.is_feasible());\n                for (int target = 0; target\
-    \ < n; target++) {\n                    assert(upper.bounded(target) == (dist[source][target]\
-    \ != inf));\n                    if (upper.bounded(target)) {\n              \
-    \          assert(upper.upper_bound[target] == dist[source][target]);\n      \
-    \              }\n\n                    auto bounds = game.difference_bounds(source,\
-    \ target);\n                    assert(bounds.is_feasible());\n              \
-    \      assert(bounds.bounded_above() == (dist[source][target] != inf));\n    \
-    \                assert(bounds.bounded_below() == (dist[target][source] != inf));\n\
-    \                    if (bounds.bounded_above()) {\n                        assert(*bounds.upper_bound\
-    \ == dist[source][target]);\n                    }\n                    if (bounds.bounded_below())\
-    \ {\n                        assert(*bounds.lower_bound == -dist[target][source]);\n\
-    \                    }\n                }\n            }\n        }\n    }\n}\n\
-    \nint main() {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
+    \    assert(!all.bounded(3));\n}\n\nvoid test_dijkstra_and_reweighting() {\n \
+    \   CowGame game(5);\n    assert(game.can_use_dijkstra());\n    game.add_constraint(1,\
+    \ 0, 7);\n    game.add_constraint(2, 0, 2);\n    game.add_constraint(1, 2, 3);\n\
+    \    game.add_constraint(3, 1, 4);\n    assert(game.can_use_dijkstra());\n\n \
+    \   auto nonnegative_solution = game.solve();\n    assert(nonnegative_solution.is_feasible());\n\
+    \    assert(std::all_of(nonnegative_solution.value.begin(),\n                \
+    \       nonnegative_solution.value.end(),\n                       [](long long\
+    \ value) { return value == 0; }));\n\n    auto nonnegative = game.tightest_upper_bounds(0);\n\
+    \    assert(nonnegative.upper_bound[1] == 5);\n    assert(nonnegative.upper_bound[3]\
+    \ == 9);\n\n    game.add_constraint(4, 3, -2);\n    assert(!game.can_use_dijkstra());\n\
+    \    auto reweighted_solution = game.solve();\n    assert(reweighted_solution.is_feasible());\n\
+    \    assert(game.can_use_dijkstra());\n    auto reweighted = game.difference_bounds(4,\
+    \ 0);\n    assert(reweighted.bounded_above());\n    assert(!reweighted.bounded_below());\n\
+    \    assert(*reweighted.upper_bound == 7);\n}\n\nvoid test_alias_and_empty() {\n\
+    \    m1une::graph::DifferenceConstraints<long long> constraints(0);\n    auto\
+    \ solution = constraints.solve();\n    assert(solution.is_feasible());\n    assert(solution.value.empty());\n\
+    }\n\nvoid test_against_warshall_floyd() {\n    constexpr long long inf = std::numeric_limits<long\
+    \ long>::max() / 4;\n    for (int n = 1; n <= 7; n++) {\n        for (int test\
+    \ = 0; test < 80; test++) {\n            CowGame game(n);\n            std::vector<std::vector<long\
+    \ long>> dist(\n                n, std::vector<long long>(n, inf));\n        \
+    \    for (int i = 0; i < n; i++) dist[i][i] = 0;\n\n            for (int a = 0;\
+    \ a < n; a++) {\n                for (int b = 0; b < n; b++) {\n             \
+    \       if ((test * 5 + a * 7 + b * 11) % 6 != 0) continue;\n                \
+    \    long long upper_bound = (test * 3 + a * 5 + b * 2) % 13 - 6;\n          \
+    \          game.add_constraint(a, b, upper_bound);\n                    dist[b][a]\
+    \ = std::min(dist[b][a], upper_bound);\n                }\n            }\n\n \
+    \           dist = m1une::graph::warshall_floyd(std::move(dist), inf);\n     \
+    \       bool feasible = !m1une::graph::has_negative_cycle(dist);\n           \
+    \ assert(game.is_feasible() == feasible);\n\n            auto solution = game.solve();\n\
+    \            assert(solution.is_feasible() == feasible);\n            if (!feasible)\
+    \ continue;\n            for (const auto& constraint : game.constraints()) {\n\
+    \                assert(solution.value[constraint.a] - solution.value[constraint.b]\
+    \ <=\n                       constraint.upper_bound);\n            }\n\n     \
+    \       for (int source = 0; source < n; source++) {\n                auto upper\
+    \ = game.tightest_upper_bounds(source);\n                assert(upper.is_feasible());\n\
+    \                for (int target = 0; target < n; target++) {\n              \
+    \      assert(upper.bounded(target) == (dist[source][target] != inf));\n     \
+    \               if (upper.bounded(target)) {\n                        assert(upper.upper_bound[target]\
+    \ == dist[source][target]);\n                    }\n\n                    auto\
+    \ bounds = game.difference_bounds(target, source);\n                    assert(bounds.is_feasible());\n\
+    \                    assert(bounds.bounded_above() == (dist[source][target] !=\
+    \ inf));\n                    assert(bounds.bounded_below() == (dist[target][source]\
+    \ != inf));\n                    if (bounds.bounded_above()) {\n             \
+    \           assert(*bounds.upper_bound == dist[source][target]);\n           \
+    \         }\n                    if (bounds.bounded_below()) {\n             \
+    \           assert(*bounds.lower_bound == -dist[target][source]);\n          \
+    \          }\n                }\n            }\n        }\n    }\n}\n\nint main()\
+    \ {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
     \ fast_output;\n\n    test_basic_constraints();\n    test_infeasible();\n    test_unbounded();\n\
-    \    test_alias_and_empty();\n    test_against_warshall_floyd();\n\n    long long\
-    \ a, b;\n    fast_input >> a >> b;\n    fast_output << a + b << '\\n';\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <algorithm>\n\
-    #include <cassert>\n#include \"../../utilities/fast_io.hpp\"\n#include <limits>\n\
-    #include <vector>\n\n#include \"../../graph/all.hpp\"\n\nusing CowGame = m1une::graph::CowGame<long\
-    \ long>;\n\nvoid test_basic_constraints() {\n    CowGame game(4);\n    int first\
-    \ = game.add_upper_bound(0, 1, 5);\n    game.add_lower_bound(0, 1, 2);\n    game.add_bounds(1,\
-    \ 2, -1, 4);\n    game.add_equality(2, 3, 3);\n\n    assert(game.size() == 4);\n\
-    \    assert(game.constraint_count() == 6);\n    assert(game.get_constraint(first).from\
-    \ == 0);\n    assert(game.get_constraint(first).to == 1);\n    assert(game.get_constraint(first).upper_bound\
-    \ == 5);\n\n    auto solution = game.solve();\n    assert(solution.is_feasible());\n\
-    \    assert(solution.value.size() == 4);\n    for (const auto& constraint : game.constraints())\
-    \ {\n        assert(solution.value[constraint.to] - solution.value[constraint.from]\
-    \ <=\n               constraint.upper_bound);\n    }\n\n    auto bounds = game.difference_bounds(0,\
-    \ 3);\n    assert(bounds.is_feasible());\n    assert(bounds.bounded_below());\n\
-    \    assert(bounds.bounded_above());\n    assert(*bounds.lower_bound == 4);\n\
-    \    assert(*bounds.upper_bound == 12);\n\n    auto all = game.tightest_upper_bounds(0);\n\
-    \    assert(all.is_feasible());\n    assert(all.bounded(0));\n    assert(all.bounded(3));\n\
-    \    assert(all.upper_bound[0] == 0);\n    assert(all.upper_bound[3] == 12);\n\
-    }\n\nvoid test_infeasible() {\n    CowGame game(2);\n    game.add_lower_bound(0,\
-    \ 1, 5);\n    assert(game.is_feasible());\n    assert(game.solve().is_feasible());\n\
-    \n    game.add_upper_bound(0, 1, 3);\n\n    assert(!game.is_feasible());\n   \
+    \    test_dijkstra_and_reweighting();\n    test_alias_and_empty();\n    test_against_warshall_floyd();\n\
+    \n    int vertex_count, edge_count, source, target;\n    fast_input >> vertex_count\
+    \ >> edge_count >> source >> target;\n    CowGame game(vertex_count);\n    std::vector<int>\
+    \ from(edge_count), to(edge_count);\n    std::vector<long long> cost(edge_count);\n\
+    \    std::vector<std::vector<int>> outgoing(vertex_count);\n    for (int id =\
+    \ 0; id < edge_count; id++) {\n        fast_input >> from[id] >> to[id] >> cost[id];\n\
+    \        game.add_constraint(to[id], from[id], cost[id]);\n        outgoing[from[id]].push_back(id);\n\
+    \    }\n\n    auto bounds = game.tightest_upper_bounds(source);\n    if (!bounds.bounded(target))\
+    \ {\n        fast_output << -1 << '\\n';\n        return 0;\n    }\n\n    std::vector<int>\
+    \ parent_edge(vertex_count, -1);\n    std::queue<int> queue;\n    parent_edge[source]\
+    \ = edge_count;\n    queue.push(source);\n    while (!queue.empty()) {\n     \
+    \   int v = queue.front();\n        queue.pop();\n        for (int id : outgoing[v])\
+    \ {\n            if (parent_edge[to[id]] != -1) continue;\n            if (!bounds.bounded(to[id]))\
+    \ continue;\n            if (bounds.upper_bound[v] + cost[id] != bounds.upper_bound[to[id]])\
+    \ {\n                continue;\n            }\n            parent_edge[to[id]]\
+    \ = id;\n            queue.push(to[id]);\n        }\n    }\n\n    assert(parent_edge[target]\
+    \ != -1);\n    std::vector<std::pair<int, int>> path;\n    for (int v = target;\
+    \ v != source; v = from[parent_edge[v]]) {\n        int id = parent_edge[v];\n\
+    \        path.emplace_back(from[id], to[id]);\n    }\n    std::reverse(path.begin(),\
+    \ path.end());\n\n    fast_output << bounds.upper_bound[target] << ' ' << path.size()\
+    \ << '\\n';\n    for (auto [a, b] : path) fast_output << a << ' ' << b << '\\\
+    n';\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/shortest_path\"\n\n#include\
+    \ <algorithm>\n#include <cassert>\n#include <limits>\n#include <queue>\n#include\
+    \ <utility>\n#include <vector>\n\n#include \"../../graph/all.hpp\"\n#include \"\
+    ../../utilities/fast_io.hpp\"\n\nusing CowGame = m1une::graph::CowGame<long long>;\n\
+    \nvoid test_basic_constraints() {\n    CowGame game(4);\n    int first = game.add_upper_bound(1,\
+    \ 0, 5);\n    game.add_lower_bound(1, 0, 2);\n    game.add_bounds(2, 1, -1, 4);\n\
+    \    game.add_equality(3, 2, 3);\n\n    assert(game.size() == 4);\n    assert(game.constraint_count()\
+    \ == 6);\n    assert(game.get_constraint(first).a == 1);\n    assert(game.get_constraint(first).b\
+    \ == 0);\n    assert(game.get_constraint(first).upper_bound == 5);\n\n    auto\
+    \ solution = game.solve();\n    assert(solution.is_feasible());\n    assert(solution.value.size()\
+    \ == 4);\n    for (const auto& constraint : game.constraints()) {\n        assert(solution.value[constraint.a]\
+    \ - solution.value[constraint.b] <=\n               constraint.upper_bound);\n\
+    \    }\n\n    auto bounds = game.difference_bounds(3, 0);\n    assert(bounds.is_feasible());\n\
+    \    assert(bounds.bounded_below());\n    assert(bounds.bounded_above());\n  \
+    \  assert(*bounds.lower_bound == 4);\n    assert(*bounds.upper_bound == 12);\n\
+    \n    auto all = game.tightest_upper_bounds(0);\n    assert(all.is_feasible());\n\
+    \    assert(all.bounded(0));\n    assert(all.bounded(3));\n    assert(all.upper_bound[0]\
+    \ == 0);\n    assert(all.upper_bound[3] == 12);\n}\n\nvoid test_infeasible() {\n\
+    \    CowGame game(2);\n    game.add_lower_bound(1, 0, 5);\n    assert(!game.can_use_dijkstra());\n\
+    \    assert(game.is_feasible());\n    assert(game.can_use_dijkstra());\n    assert(game.solve().is_feasible());\n\
+    \n    game.add_upper_bound(1, 0, 3);\n    assert(!game.can_use_dijkstra());\n\n\
+    \    assert(!game.is_feasible());\n    assert(!game.can_use_dijkstra());\n   \
     \ assert(!game.solve().is_feasible());\n    assert(!game.tightest_upper_bounds(0).is_feasible());\n\
-    \    assert(!game.difference_bounds(0, 1).is_feasible());\n}\n\nvoid test_unbounded()\
-    \ {\n    CowGame game(4);\n    game.add_upper_bound(0, 1, 7);\n    game.add_upper_bound(2,\
-    \ 3, 2);\n\n    auto one_way = game.difference_bounds(0, 1);\n    assert(one_way.is_feasible());\n\
+    \    assert(!game.difference_bounds(1, 0).is_feasible());\n}\n\nvoid test_unbounded()\
+    \ {\n    CowGame game(4);\n    game.add_upper_bound(1, 0, 7);\n    game.add_upper_bound(3,\
+    \ 2, 2);\n\n    auto one_way = game.difference_bounds(1, 0);\n    assert(one_way.is_feasible());\n\
     \    assert(!one_way.bounded_below());\n    assert(one_way.bounded_above());\n\
-    \    assert(*one_way.upper_bound == 7);\n\n    auto disconnected = game.difference_bounds(0,\
-    \ 3);\n    assert(disconnected.is_feasible());\n    assert(!disconnected.bounded_below());\n\
+    \    assert(*one_way.upper_bound == 7);\n\n    auto disconnected = game.difference_bounds(3,\
+    \ 0);\n    assert(disconnected.is_feasible());\n    assert(!disconnected.bounded_below());\n\
     \    assert(!disconnected.bounded_above());\n\n    auto all = game.tightest_upper_bounds(0);\n\
     \    assert(all.bounded(0));\n    assert(all.bounded(1));\n    assert(!all.bounded(2));\n\
-    \    assert(!all.bounded(3));\n}\n\nvoid test_alias_and_empty() {\n    m1une::graph::DifferenceConstraints<long\
-    \ long> constraints(0);\n    auto solution = constraints.solve();\n    assert(solution.is_feasible());\n\
-    \    assert(solution.value.empty());\n}\n\nvoid test_against_warshall_floyd()\
-    \ {\n    constexpr long long inf = std::numeric_limits<long long>::max() / 4;\n\
-    \    for (int n = 1; n <= 7; n++) {\n        for (int test = 0; test < 80; test++)\
-    \ {\n            CowGame game(n);\n            std::vector<std::vector<long long>>\
-    \ dist(\n                n, std::vector<long long>(n, inf));\n            for\
-    \ (int i = 0; i < n; i++) dist[i][i] = 0;\n\n            for (int from = 0; from\
-    \ < n; from++) {\n                for (int to = 0; to < n; to++) {\n         \
-    \           if ((test * 5 + from * 7 + to * 11) % 6 != 0) continue;\n        \
-    \            long long upper_bound = (test * 3 + from * 5 + to * 2) % 13 - 6;\n\
-    \                    game.add_constraint(from, to, upper_bound);\n           \
-    \         dist[from][to] = std::min(dist[from][to], upper_bound);\n          \
-    \      }\n            }\n\n            dist = m1une::graph::warshall_floyd(std::move(dist),\
-    \ inf);\n            bool feasible = !m1une::graph::has_negative_cycle(dist);\n\
-    \            assert(game.is_feasible() == feasible);\n\n            auto solution\
-    \ = game.solve();\n            assert(solution.is_feasible() == feasible);\n \
-    \           if (!feasible) continue;\n            for (const auto& constraint\
-    \ : game.constraints()) {\n                assert(solution.value[constraint.to]\
-    \ - solution.value[constraint.from] <=\n                       constraint.upper_bound);\n\
-    \            }\n\n            for (int source = 0; source < n; source++) {\n \
-    \               auto upper = game.tightest_upper_bounds(source);\n           \
-    \     assert(upper.is_feasible());\n                for (int target = 0; target\
-    \ < n; target++) {\n                    assert(upper.bounded(target) == (dist[source][target]\
-    \ != inf));\n                    if (upper.bounded(target)) {\n              \
-    \          assert(upper.upper_bound[target] == dist[source][target]);\n      \
-    \              }\n\n                    auto bounds = game.difference_bounds(source,\
-    \ target);\n                    assert(bounds.is_feasible());\n              \
-    \      assert(bounds.bounded_above() == (dist[source][target] != inf));\n    \
-    \                assert(bounds.bounded_below() == (dist[target][source] != inf));\n\
-    \                    if (bounds.bounded_above()) {\n                        assert(*bounds.upper_bound\
-    \ == dist[source][target]);\n                    }\n                    if (bounds.bounded_below())\
-    \ {\n                        assert(*bounds.lower_bound == -dist[target][source]);\n\
-    \                    }\n                }\n            }\n        }\n    }\n}\n\
-    \nint main() {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
+    \    assert(!all.bounded(3));\n}\n\nvoid test_dijkstra_and_reweighting() {\n \
+    \   CowGame game(5);\n    assert(game.can_use_dijkstra());\n    game.add_constraint(1,\
+    \ 0, 7);\n    game.add_constraint(2, 0, 2);\n    game.add_constraint(1, 2, 3);\n\
+    \    game.add_constraint(3, 1, 4);\n    assert(game.can_use_dijkstra());\n\n \
+    \   auto nonnegative_solution = game.solve();\n    assert(nonnegative_solution.is_feasible());\n\
+    \    assert(std::all_of(nonnegative_solution.value.begin(),\n                \
+    \       nonnegative_solution.value.end(),\n                       [](long long\
+    \ value) { return value == 0; }));\n\n    auto nonnegative = game.tightest_upper_bounds(0);\n\
+    \    assert(nonnegative.upper_bound[1] == 5);\n    assert(nonnegative.upper_bound[3]\
+    \ == 9);\n\n    game.add_constraint(4, 3, -2);\n    assert(!game.can_use_dijkstra());\n\
+    \    auto reweighted_solution = game.solve();\n    assert(reweighted_solution.is_feasible());\n\
+    \    assert(game.can_use_dijkstra());\n    auto reweighted = game.difference_bounds(4,\
+    \ 0);\n    assert(reweighted.bounded_above());\n    assert(!reweighted.bounded_below());\n\
+    \    assert(*reweighted.upper_bound == 7);\n}\n\nvoid test_alias_and_empty() {\n\
+    \    m1une::graph::DifferenceConstraints<long long> constraints(0);\n    auto\
+    \ solution = constraints.solve();\n    assert(solution.is_feasible());\n    assert(solution.value.empty());\n\
+    }\n\nvoid test_against_warshall_floyd() {\n    constexpr long long inf = std::numeric_limits<long\
+    \ long>::max() / 4;\n    for (int n = 1; n <= 7; n++) {\n        for (int test\
+    \ = 0; test < 80; test++) {\n            CowGame game(n);\n            std::vector<std::vector<long\
+    \ long>> dist(\n                n, std::vector<long long>(n, inf));\n        \
+    \    for (int i = 0; i < n; i++) dist[i][i] = 0;\n\n            for (int a = 0;\
+    \ a < n; a++) {\n                for (int b = 0; b < n; b++) {\n             \
+    \       if ((test * 5 + a * 7 + b * 11) % 6 != 0) continue;\n                \
+    \    long long upper_bound = (test * 3 + a * 5 + b * 2) % 13 - 6;\n          \
+    \          game.add_constraint(a, b, upper_bound);\n                    dist[b][a]\
+    \ = std::min(dist[b][a], upper_bound);\n                }\n            }\n\n \
+    \           dist = m1une::graph::warshall_floyd(std::move(dist), inf);\n     \
+    \       bool feasible = !m1une::graph::has_negative_cycle(dist);\n           \
+    \ assert(game.is_feasible() == feasible);\n\n            auto solution = game.solve();\n\
+    \            assert(solution.is_feasible() == feasible);\n            if (!feasible)\
+    \ continue;\n            for (const auto& constraint : game.constraints()) {\n\
+    \                assert(solution.value[constraint.a] - solution.value[constraint.b]\
+    \ <=\n                       constraint.upper_bound);\n            }\n\n     \
+    \       for (int source = 0; source < n; source++) {\n                auto upper\
+    \ = game.tightest_upper_bounds(source);\n                assert(upper.is_feasible());\n\
+    \                for (int target = 0; target < n; target++) {\n              \
+    \      assert(upper.bounded(target) == (dist[source][target] != inf));\n     \
+    \               if (upper.bounded(target)) {\n                        assert(upper.upper_bound[target]\
+    \ == dist[source][target]);\n                    }\n\n                    auto\
+    \ bounds = game.difference_bounds(target, source);\n                    assert(bounds.is_feasible());\n\
+    \                    assert(bounds.bounded_above() == (dist[source][target] !=\
+    \ inf));\n                    assert(bounds.bounded_below() == (dist[target][source]\
+    \ != inf));\n                    if (bounds.bounded_above()) {\n             \
+    \           assert(*bounds.upper_bound == dist[source][target]);\n           \
+    \         }\n                    if (bounds.bounded_below()) {\n             \
+    \           assert(*bounds.lower_bound == -dist[target][source]);\n          \
+    \          }\n                }\n            }\n        }\n    }\n}\n\nint main()\
+    \ {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
     \ fast_output;\n\n    test_basic_constraints();\n    test_infeasible();\n    test_unbounded();\n\
-    \    test_alias_and_empty();\n    test_against_warshall_floyd();\n\n    long long\
-    \ a, b;\n    fast_input >> a >> b;\n    fast_output << a + b << '\\n';\n}\n"
+    \    test_dijkstra_and_reweighting();\n    test_alias_and_empty();\n    test_against_warshall_floyd();\n\
+    \n    int vertex_count, edge_count, source, target;\n    fast_input >> vertex_count\
+    \ >> edge_count >> source >> target;\n    CowGame game(vertex_count);\n    std::vector<int>\
+    \ from(edge_count), to(edge_count);\n    std::vector<long long> cost(edge_count);\n\
+    \    std::vector<std::vector<int>> outgoing(vertex_count);\n    for (int id =\
+    \ 0; id < edge_count; id++) {\n        fast_input >> from[id] >> to[id] >> cost[id];\n\
+    \        game.add_constraint(to[id], from[id], cost[id]);\n        outgoing[from[id]].push_back(id);\n\
+    \    }\n\n    auto bounds = game.tightest_upper_bounds(source);\n    if (!bounds.bounded(target))\
+    \ {\n        fast_output << -1 << '\\n';\n        return 0;\n    }\n\n    std::vector<int>\
+    \ parent_edge(vertex_count, -1);\n    std::queue<int> queue;\n    parent_edge[source]\
+    \ = edge_count;\n    queue.push(source);\n    while (!queue.empty()) {\n     \
+    \   int v = queue.front();\n        queue.pop();\n        for (int id : outgoing[v])\
+    \ {\n            if (parent_edge[to[id]] != -1) continue;\n            if (!bounds.bounded(to[id]))\
+    \ continue;\n            if (bounds.upper_bound[v] + cost[id] != bounds.upper_bound[to[id]])\
+    \ {\n                continue;\n            }\n            parent_edge[to[id]]\
+    \ = id;\n            queue.push(to[id]);\n        }\n    }\n\n    assert(parent_edge[target]\
+    \ != -1);\n    std::vector<std::pair<int, int>> path;\n    for (int v = target;\
+    \ v != source; v = from[parent_edge[v]]) {\n        int id = parent_edge[v];\n\
+    \        path.emplace_back(from[id], to[id]);\n    }\n    std::reverse(path.begin(),\
+    \ path.end());\n\n    fast_output << bounds.upper_bound[target] << ' ' << path.size()\
+    \ << '\\n';\n    for (auto [a, b] : path) fast_output << a << ' ' << b << '\\\
+    n';\n}\n"
   dependsOn:
-  - utilities/fast_io.hpp
   - graph/all.hpp
   - graph/counting.hpp
   - math/fps/convolution.hpp
@@ -7802,10 +7909,11 @@ data:
   - graph/st_numbering.hpp
   - graph/three_edge_connected_components.hpp
   - graph/two_edge_connected_components.hpp
+  - utilities/fast_io.hpp
   isVerificationFile: true
   path: verify/graph/cow_game.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 23:38:01+09:00'
+  timestamp: '2026-07-17 04:56:02+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/cow_game.test.cpp

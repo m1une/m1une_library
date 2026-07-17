@@ -5,6 +5,15 @@ data:
     path: geometry/lattice_point_count.hpp
     title: Lattice-Point Count
   - icon: ':heavy_check_mark:'
+    path: math/fps/convolution.hpp
+    title: Convolution
+  - icon: ':heavy_check_mark:'
+    path: math/fps/internal/ntt998_faster.hpp
+    title: math/fps/internal/ntt998_faster.hpp
+  - icon: ':heavy_check_mark:'
+    path: math/modint.hpp
+    title: ModInt
+  - icon: ':heavy_check_mark:'
     path: utilities/bigint.hpp
     title: BigInt
   - icon: ':heavy_check_mark:'
@@ -100,11 +109,14 @@ data:
   dependsOn:
   - geometry/lattice_point_count.hpp
   - utilities/bigint.hpp
+  - math/fps/convolution.hpp
+  - math/fps/internal/ntt998_faster.hpp
+  - math/modint.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
   path: verify/geometry/lattice_point_count.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-17 04:56:02+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/lattice_point_count.test.cpp

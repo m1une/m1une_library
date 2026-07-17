@@ -514,16 +514,18 @@ data:
     \ rhs) const noexcept {\n        return _v == rhs._v;\n    }\n    constexpr bool\
     \ operator!=(const ModInt& rhs) const noexcept {\n        return _v != rhs._v;\n\
     \    }\n\n    constexpr ModInt pow(long long n) const noexcept {\n        ModInt\
-    \ res = raw(1), x = *this;\n        while (n > 0) {\n            if (n & 1) res\
-    \ *= x;\n            x *= x;\n            n >>= 1;\n        }\n        return\
-    \ res;\n    }\n\n    constexpr ModInt inv() const noexcept {\n        int64_t\
-    \ a = _v, b = Modulus, u = 1, v = 0;\n        while (b) {\n            int64_t\
-    \ t = a / b;\n            a -= t * b;\n            std::swap(a, b);\n        \
-    \    u -= t * v;\n            std::swap(u, v);\n        }\n        if (u < 0)\
-    \ u += Modulus;\n        return raw(static_cast<uint32_t>(u));\n    }\n\n    friend\
-    \ std::ostream& operator<<(std::ostream& os, const ModInt& rhs) {\n        return\
-    \ os << rhs._v;\n    }\n\n    friend std::istream& operator>>(std::istream& is,\
-    \ ModInt& rhs) {\n        long long v;\n        is >> v;\n        rhs = ModInt(v);\n\
+    \ res = raw(1 % Modulus);\n        ModInt x = n < 0 ? inv() : *this;\n       \
+    \ uint64_t exponent = n < 0 ? uint64_t(-(n + 1)) + 1 : uint64_t(n);\n        while\
+    \ (exponent > 0) {\n            if (exponent & 1) res *= x;\n            x *=\
+    \ x;\n            exponent >>= 1;\n        }\n        return res;\n    }\n\n \
+    \   constexpr ModInt inv() const noexcept {\n        int64_t a = _v, b = Modulus,\
+    \ u = 1, v = 0;\n        while (b) {\n            int64_t t = a / b;\n       \
+    \     a -= t * b;\n            std::swap(a, b);\n            u -= t * v;\n   \
+    \         std::swap(u, v);\n        }\n        assert(a == 1);\n        u %= Modulus;\n\
+    \        if (u < 0) u += Modulus;\n        return raw(static_cast<uint32_t>(u));\n\
+    \    }\n\n    friend std::ostream& operator<<(std::ostream& os, const ModInt&\
+    \ rhs) {\n        return os << rhs._v;\n    }\n\n    friend std::istream& operator>>(std::istream&\
+    \ is, ModInt& rhs) {\n        long long v;\n        is >> v;\n        rhs = ModInt(v);\n\
     \        return is;\n    }\n};\n\nusing modint998244353 = ModInt<998244353>;\n\
     using modint1000000007 = ModInt<1000000007>;\n\ntemplate <int Id = 0>\nstruct\
     \ DynamicModInt {\n   private:\n    uint32_t _v;\n    inline static uint32_t _mod\
@@ -562,22 +564,23 @@ data:
     \ rhs;\n    }\n\n    bool operator==(const DynamicModInt& rhs) const noexcept\
     \ {\n        return _v == rhs._v;\n    }\n\n    bool operator!=(const DynamicModInt&\
     \ rhs) const noexcept {\n        return _v != rhs._v;\n    }\n\n    DynamicModInt\
-    \ pow(long long exponent) const noexcept {\n        assert(exponent >= 0);\n \
-    \       DynamicModInt result = raw(1 % _mod);\n        DynamicModInt base = *this;\n\
-    \        while (exponent > 0) {\n            if (exponent & 1) result *= base;\n\
-    \            base *= base;\n            exponent >>= 1;\n        }\n        return\
-    \ result;\n    }\n\n    DynamicModInt inv() const noexcept {\n        int64_t\
-    \ a = _v, b = _mod, u = 1, v = 0;\n        while (b) {\n            int64_t quotient\
-    \ = a / b;\n            a -= quotient * b;\n            std::swap(a, b);\n   \
-    \         u -= quotient * v;\n            std::swap(u, v);\n        }\n      \
-    \  assert(a == 1);\n        u %= _mod;\n        if (u < 0) u += _mod;\n      \
-    \  return raw(static_cast<uint32_t>(u));\n    }\n\n    friend std::ostream& operator<<(std::ostream&\
-    \ os, const DynamicModInt& rhs) {\n        return os << rhs._v;\n    }\n\n   \
-    \ friend std::istream& operator>>(std::istream& is, DynamicModInt& rhs) {\n  \
-    \      long long value;\n        is >> value;\n        rhs = DynamicModInt(value);\n\
-    \        return is;\n    }\n};\n\n}  // namespace math\n}  // namespace m1une\n\
-    \n\n#line 14 \"verify/ds/segtree/persistent_lazy_segtree.test.cpp\"\n\nnamespace\
-    \ {\n\nvoid test_range_add() {\n    using AM = m1une::acted_monoid::RangeAddRangeSum<long\
+    \ pow(long long exponent) const noexcept {\n        DynamicModInt result = raw(1\
+    \ % _mod);\n        DynamicModInt base = exponent < 0 ? inv() : *this;\n     \
+    \   uint64_t magnitude =\n            exponent < 0 ? uint64_t(-(exponent + 1))\
+    \ + 1 : uint64_t(exponent);\n        while (magnitude > 0) {\n            if (magnitude\
+    \ & 1) result *= base;\n            base *= base;\n            magnitude >>= 1;\n\
+    \        }\n        return result;\n    }\n\n    DynamicModInt inv() const noexcept\
+    \ {\n        int64_t a = _v, b = _mod, u = 1, v = 0;\n        while (b) {\n  \
+    \          int64_t quotient = a / b;\n            a -= quotient * b;\n       \
+    \     std::swap(a, b);\n            u -= quotient * v;\n            std::swap(u,\
+    \ v);\n        }\n        assert(a == 1);\n        u %= _mod;\n        if (u <\
+    \ 0) u += _mod;\n        return raw(static_cast<uint32_t>(u));\n    }\n\n    friend\
+    \ std::ostream& operator<<(std::ostream& os, const DynamicModInt& rhs) {\n   \
+    \     return os << rhs._v;\n    }\n\n    friend std::istream& operator>>(std::istream&\
+    \ is, DynamicModInt& rhs) {\n        long long value;\n        is >> value;\n\
+    \        rhs = DynamicModInt(value);\n        return is;\n    }\n};\n\n}  // namespace\
+    \ math\n}  // namespace m1une\n\n\n#line 14 \"verify/ds/segtree/persistent_lazy_segtree.test.cpp\"\
+    \n\nnamespace {\n\nvoid test_range_add() {\n    using AM = m1une::acted_monoid::RangeAddRangeSum<long\
     \ long>;\n    using Seg = m1une::ds::PersistentLazySegtree<AM>;\n\n    Seg seg(std::vector<long\
     \ long>{1, 2, 3, 4, 5});\n    Seg seg1 = seg.apply(1, 4, 10);\n    Seg seg2 =\
     \ seg1.set(2, AM::make(100));\n    Seg seg3 = seg2.apply(0, 5, -1);\n\n    auto\
@@ -684,7 +687,7 @@ data:
   isVerificationFile: true
   path: verify/ds/segtree/persistent_lazy_segtree.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-17 04:56:02+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/segtree/persistent_lazy_segtree.test.cpp

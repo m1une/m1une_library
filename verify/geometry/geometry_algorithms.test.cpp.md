@@ -56,6 +56,15 @@ data:
     path: geometry/rectangle_union_area.hpp
     title: Area of Union of Rectangles
   - icon: ':heavy_check_mark:'
+    path: math/fps/convolution.hpp
+    title: Convolution
+  - icon: ':heavy_check_mark:'
+    path: math/fps/internal/ntt998_faster.hpp
+    title: math/fps/internal/ntt998_faster.hpp
+  - icon: ':heavy_check_mark:'
+    path: math/modint.hpp
+    title: ModInt
+  - icon: ':heavy_check_mark:'
     path: utilities/bigint.hpp
     title: BigInt
   - icon: ':heavy_check_mark:'
@@ -175,6 +184,9 @@ data:
   - geometry/half_plane_intersection.hpp
   - geometry/lattice_point_count.hpp
   - utilities/bigint.hpp
+  - math/fps/convolution.hpp
+  - math/fps/internal/ntt998_faster.hpp
+  - math/modint.hpp
   - geometry/manhattan_mst.hpp
   - geometry/minimum_enclosing_circle.hpp
   - geometry/polygon.hpp
@@ -183,7 +195,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/geometry_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-17 04:56:02+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/geometry_algorithms.test.cpp

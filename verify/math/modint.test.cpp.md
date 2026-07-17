@@ -284,16 +284,18 @@ data:
     \ rhs) const noexcept {\n        return _v == rhs._v;\n    }\n    constexpr bool\
     \ operator!=(const ModInt& rhs) const noexcept {\n        return _v != rhs._v;\n\
     \    }\n\n    constexpr ModInt pow(long long n) const noexcept {\n        ModInt\
-    \ res = raw(1), x = *this;\n        while (n > 0) {\n            if (n & 1) res\
-    \ *= x;\n            x *= x;\n            n >>= 1;\n        }\n        return\
-    \ res;\n    }\n\n    constexpr ModInt inv() const noexcept {\n        int64_t\
-    \ a = _v, b = Modulus, u = 1, v = 0;\n        while (b) {\n            int64_t\
-    \ t = a / b;\n            a -= t * b;\n            std::swap(a, b);\n        \
-    \    u -= t * v;\n            std::swap(u, v);\n        }\n        if (u < 0)\
-    \ u += Modulus;\n        return raw(static_cast<uint32_t>(u));\n    }\n\n    friend\
-    \ std::ostream& operator<<(std::ostream& os, const ModInt& rhs) {\n        return\
-    \ os << rhs._v;\n    }\n\n    friend std::istream& operator>>(std::istream& is,\
-    \ ModInt& rhs) {\n        long long v;\n        is >> v;\n        rhs = ModInt(v);\n\
+    \ res = raw(1 % Modulus);\n        ModInt x = n < 0 ? inv() : *this;\n       \
+    \ uint64_t exponent = n < 0 ? uint64_t(-(n + 1)) + 1 : uint64_t(n);\n        while\
+    \ (exponent > 0) {\n            if (exponent & 1) res *= x;\n            x *=\
+    \ x;\n            exponent >>= 1;\n        }\n        return res;\n    }\n\n \
+    \   constexpr ModInt inv() const noexcept {\n        int64_t a = _v, b = Modulus,\
+    \ u = 1, v = 0;\n        while (b) {\n            int64_t t = a / b;\n       \
+    \     a -= t * b;\n            std::swap(a, b);\n            u -= t * v;\n   \
+    \         std::swap(u, v);\n        }\n        assert(a == 1);\n        u %= Modulus;\n\
+    \        if (u < 0) u += Modulus;\n        return raw(static_cast<uint32_t>(u));\n\
+    \    }\n\n    friend std::ostream& operator<<(std::ostream& os, const ModInt&\
+    \ rhs) {\n        return os << rhs._v;\n    }\n\n    friend std::istream& operator>>(std::istream&\
+    \ is, ModInt& rhs) {\n        long long v;\n        is >> v;\n        rhs = ModInt(v);\n\
     \        return is;\n    }\n};\n\nusing modint998244353 = ModInt<998244353>;\n\
     using modint1000000007 = ModInt<1000000007>;\n\ntemplate <int Id = 0>\nstruct\
     \ DynamicModInt {\n   private:\n    uint32_t _v;\n    inline static uint32_t _mod\
@@ -332,23 +334,25 @@ data:
     \ rhs;\n    }\n\n    bool operator==(const DynamicModInt& rhs) const noexcept\
     \ {\n        return _v == rhs._v;\n    }\n\n    bool operator!=(const DynamicModInt&\
     \ rhs) const noexcept {\n        return _v != rhs._v;\n    }\n\n    DynamicModInt\
-    \ pow(long long exponent) const noexcept {\n        assert(exponent >= 0);\n \
-    \       DynamicModInt result = raw(1 % _mod);\n        DynamicModInt base = *this;\n\
-    \        while (exponent > 0) {\n            if (exponent & 1) result *= base;\n\
-    \            base *= base;\n            exponent >>= 1;\n        }\n        return\
-    \ result;\n    }\n\n    DynamicModInt inv() const noexcept {\n        int64_t\
-    \ a = _v, b = _mod, u = 1, v = 0;\n        while (b) {\n            int64_t quotient\
-    \ = a / b;\n            a -= quotient * b;\n            std::swap(a, b);\n   \
-    \         u -= quotient * v;\n            std::swap(u, v);\n        }\n      \
-    \  assert(a == 1);\n        u %= _mod;\n        if (u < 0) u += _mod;\n      \
-    \  return raw(static_cast<uint32_t>(u));\n    }\n\n    friend std::ostream& operator<<(std::ostream&\
-    \ os, const DynamicModInt& rhs) {\n        return os << rhs._v;\n    }\n\n   \
-    \ friend std::istream& operator>>(std::istream& is, DynamicModInt& rhs) {\n  \
-    \      long long value;\n        is >> value;\n        rhs = DynamicModInt(value);\n\
-    \        return is;\n    }\n};\n\n}  // namespace math\n}  // namespace m1une\n\
-    \n\n#line 11 \"verify/math/modint.test.cpp\"\n\nusing mint = m1une::math::modint998244353;\n\
-    \nstatic_assert(std::is_constructible_v<mint, signed char>);\nstatic_assert(std::is_constructible_v<mint,\
-    \ unsigned char>);\nstatic_assert(std::is_constructible_v<mint, short>);\nstatic_assert(std::is_constructible_v<mint,\
+    \ pow(long long exponent) const noexcept {\n        DynamicModInt result = raw(1\
+    \ % _mod);\n        DynamicModInt base = exponent < 0 ? inv() : *this;\n     \
+    \   uint64_t magnitude =\n            exponent < 0 ? uint64_t(-(exponent + 1))\
+    \ + 1 : uint64_t(exponent);\n        while (magnitude > 0) {\n            if (magnitude\
+    \ & 1) result *= base;\n            base *= base;\n            magnitude >>= 1;\n\
+    \        }\n        return result;\n    }\n\n    DynamicModInt inv() const noexcept\
+    \ {\n        int64_t a = _v, b = _mod, u = 1, v = 0;\n        while (b) {\n  \
+    \          int64_t quotient = a / b;\n            a -= quotient * b;\n       \
+    \     std::swap(a, b);\n            u -= quotient * v;\n            std::swap(u,\
+    \ v);\n        }\n        assert(a == 1);\n        u %= _mod;\n        if (u <\
+    \ 0) u += _mod;\n        return raw(static_cast<uint32_t>(u));\n    }\n\n    friend\
+    \ std::ostream& operator<<(std::ostream& os, const DynamicModInt& rhs) {\n   \
+    \     return os << rhs._v;\n    }\n\n    friend std::istream& operator>>(std::istream&\
+    \ is, DynamicModInt& rhs) {\n        long long value;\n        is >> value;\n\
+    \        rhs = DynamicModInt(value);\n        return is;\n    }\n};\n\n}  // namespace\
+    \ math\n}  // namespace m1une\n\n\n#line 11 \"verify/math/modint.test.cpp\"\n\n\
+    using mint = m1une::math::modint998244353;\n\nstatic_assert(std::is_constructible_v<mint,\
+    \ signed char>);\nstatic_assert(std::is_constructible_v<mint, unsigned char>);\n\
+    static_assert(std::is_constructible_v<mint, short>);\nstatic_assert(std::is_constructible_v<mint,\
     \ unsigned short>);\nstatic_assert(std::is_constructible_v<mint, int>);\nstatic_assert(std::is_constructible_v<mint,\
     \ unsigned int>);\nstatic_assert(std::is_constructible_v<mint, long>);\nstatic_assert(std::is_constructible_v<mint,\
     \ unsigned long>);\nstatic_assert(std::is_constructible_v<mint, long long>);\n\
@@ -360,20 +364,30 @@ data:
     \ = unsigned_value;\n    std::int64_t signed_remainder = signed_value % std::int64_t(mod);\n\
     \    if (signed_remainder < 0) signed_remainder += mod;\n    return from_signed.val()\
     \ == std::uint64_t(signed_remainder) &&\n           from_unsigned.val() == unsigned_value\
-    \ % mod;\n}\n\nstatic_assert(test_constexpr_construction());\n\nvoid test_integral_construction()\
-    \ {\n    assert(mint(-1).val() == mint::mod() - 1);\n    assert(mint(std::numeric_limits<unsigned\
-    \ long long>::max()).val() ==\n           std::numeric_limits<unsigned long long>::max()\
-    \ % mint::mod());\n\n    std::mt19937 random(123456789);\n    mint from_random\
-    \ = random();\n    assert(from_random.val() < mint::mod());\n    from_random =\
-    \ random() % 100;\n    assert(from_random.val() < 100);\n}\n\nvoid test_dynamic_modint()\
-    \ {\n    using dynamic_mint = m1une::math::DynamicModInt<0>;\n    using other_dynamic_mint\
-    \ = m1une::math::DynamicModInt<1>;\n    dynamic_mint::set_mod(11);\n    other_dynamic_mint::set_mod(7);\n\
-    \n    assert(dynamic_mint(-1).val() == 10);\n    assert((dynamic_mint(8) + dynamic_mint(7)).val()\
-    \ == 4);\n    assert((dynamic_mint(8) - dynamic_mint(10)).val() == 9);\n    assert((dynamic_mint(8)\
-    \ * dynamic_mint(7)).val() == 1);\n    assert(dynamic_mint(3).pow(5).val() ==\
-    \ 1);\n    assert(dynamic_mint(3).inv().val() == 4);\n    assert(other_dynamic_mint(8).val()\
-    \ == 1);\n}\n\nint main() {\n    m1une::utilities::FastInput fast_input;\n   \
-    \ m1une::utilities::FastOutput fast_output;\n\n    test_integral_construction();\n\
+    \ % mod;\n}\n\nstatic_assert(test_constexpr_construction());\nstatic_assert(mint(2).pow(-1)\
+    \ * mint(2) == mint(1));\nstatic_assert(mint(2).pow(-3) == mint(8).inv());\n\n\
+    void test_integral_construction() {\n    assert(mint(-1).val() == mint::mod()\
+    \ - 1);\n    assert(mint(std::numeric_limits<unsigned long long>::max()).val()\
+    \ ==\n           std::numeric_limits<unsigned long long>::max() % mint::mod());\n\
+    \n    std::mt19937 random(123456789);\n    mint from_random = random();\n    assert(from_random.val()\
+    \ < mint::mod());\n    from_random = random() % 100;\n    assert(from_random.val()\
+    \ < 100);\n}\n\nvoid test_static_modint_pow() {\n    [[maybe_unused]] constexpr\
+    \ long long minimum =\n        std::numeric_limits<long long>::min();\n    assert(mint(3).pow(-1)\
+    \ * mint(3) == mint(1));\n    assert(mint(3).pow(-5) == mint(3).pow(5).inv());\n\
+    \    assert(mint(2).pow(minimum) * mint(2).pow(minimum + 1).inv() ==\n       \
+    \    mint(2).inv());\n}\n\nvoid test_dynamic_modint() {\n    using dynamic_mint\
+    \ = m1une::math::DynamicModInt<0>;\n    using other_dynamic_mint = m1une::math::DynamicModInt<1>;\n\
+    \    dynamic_mint::set_mod(11);\n    other_dynamic_mint::set_mod(7);\n\n    assert(dynamic_mint(-1).val()\
+    \ == 10);\n    assert((dynamic_mint(8) + dynamic_mint(7)).val() == 4);\n    assert((dynamic_mint(8)\
+    \ - dynamic_mint(10)).val() == 9);\n    assert((dynamic_mint(8) * dynamic_mint(7)).val()\
+    \ == 1);\n    assert(dynamic_mint(3).pow(5).val() == 1);\n    assert(dynamic_mint(3).pow(-1).val()\
+    \ == 4);\n    assert(dynamic_mint(3).pow(-2).val() == 5);\n    [[maybe_unused]]\
+    \ constexpr long long minimum =\n        std::numeric_limits<long long>::min();\n\
+    \    assert(dynamic_mint(2).pow(minimum) *\n               dynamic_mint(2).pow(minimum\
+    \ + 1).inv() ==\n           dynamic_mint(2).inv());\n    assert(dynamic_mint(3).inv().val()\
+    \ == 4);\n    assert(other_dynamic_mint(8).val() == 1);\n}\n\nint main() {\n \
+    \   m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
+    \ fast_output;\n\n    test_integral_construction();\n    test_static_modint_pow();\n\
     \    test_dynamic_modint();\n\n    long long a, b;\n    fast_input >> a >> b;\n\
     \    fast_output << a + b << '\\n';\n}\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <cassert>\n\
@@ -393,20 +407,30 @@ data:
     \ = unsigned_value;\n    std::int64_t signed_remainder = signed_value % std::int64_t(mod);\n\
     \    if (signed_remainder < 0) signed_remainder += mod;\n    return from_signed.val()\
     \ == std::uint64_t(signed_remainder) &&\n           from_unsigned.val() == unsigned_value\
-    \ % mod;\n}\n\nstatic_assert(test_constexpr_construction());\n\nvoid test_integral_construction()\
-    \ {\n    assert(mint(-1).val() == mint::mod() - 1);\n    assert(mint(std::numeric_limits<unsigned\
-    \ long long>::max()).val() ==\n           std::numeric_limits<unsigned long long>::max()\
-    \ % mint::mod());\n\n    std::mt19937 random(123456789);\n    mint from_random\
-    \ = random();\n    assert(from_random.val() < mint::mod());\n    from_random =\
-    \ random() % 100;\n    assert(from_random.val() < 100);\n}\n\nvoid test_dynamic_modint()\
-    \ {\n    using dynamic_mint = m1une::math::DynamicModInt<0>;\n    using other_dynamic_mint\
-    \ = m1une::math::DynamicModInt<1>;\n    dynamic_mint::set_mod(11);\n    other_dynamic_mint::set_mod(7);\n\
-    \n    assert(dynamic_mint(-1).val() == 10);\n    assert((dynamic_mint(8) + dynamic_mint(7)).val()\
-    \ == 4);\n    assert((dynamic_mint(8) - dynamic_mint(10)).val() == 9);\n    assert((dynamic_mint(8)\
-    \ * dynamic_mint(7)).val() == 1);\n    assert(dynamic_mint(3).pow(5).val() ==\
-    \ 1);\n    assert(dynamic_mint(3).inv().val() == 4);\n    assert(other_dynamic_mint(8).val()\
-    \ == 1);\n}\n\nint main() {\n    m1une::utilities::FastInput fast_input;\n   \
-    \ m1une::utilities::FastOutput fast_output;\n\n    test_integral_construction();\n\
+    \ % mod;\n}\n\nstatic_assert(test_constexpr_construction());\nstatic_assert(mint(2).pow(-1)\
+    \ * mint(2) == mint(1));\nstatic_assert(mint(2).pow(-3) == mint(8).inv());\n\n\
+    void test_integral_construction() {\n    assert(mint(-1).val() == mint::mod()\
+    \ - 1);\n    assert(mint(std::numeric_limits<unsigned long long>::max()).val()\
+    \ ==\n           std::numeric_limits<unsigned long long>::max() % mint::mod());\n\
+    \n    std::mt19937 random(123456789);\n    mint from_random = random();\n    assert(from_random.val()\
+    \ < mint::mod());\n    from_random = random() % 100;\n    assert(from_random.val()\
+    \ < 100);\n}\n\nvoid test_static_modint_pow() {\n    [[maybe_unused]] constexpr\
+    \ long long minimum =\n        std::numeric_limits<long long>::min();\n    assert(mint(3).pow(-1)\
+    \ * mint(3) == mint(1));\n    assert(mint(3).pow(-5) == mint(3).pow(5).inv());\n\
+    \    assert(mint(2).pow(minimum) * mint(2).pow(minimum + 1).inv() ==\n       \
+    \    mint(2).inv());\n}\n\nvoid test_dynamic_modint() {\n    using dynamic_mint\
+    \ = m1une::math::DynamicModInt<0>;\n    using other_dynamic_mint = m1une::math::DynamicModInt<1>;\n\
+    \    dynamic_mint::set_mod(11);\n    other_dynamic_mint::set_mod(7);\n\n    assert(dynamic_mint(-1).val()\
+    \ == 10);\n    assert((dynamic_mint(8) + dynamic_mint(7)).val() == 4);\n    assert((dynamic_mint(8)\
+    \ - dynamic_mint(10)).val() == 9);\n    assert((dynamic_mint(8) * dynamic_mint(7)).val()\
+    \ == 1);\n    assert(dynamic_mint(3).pow(5).val() == 1);\n    assert(dynamic_mint(3).pow(-1).val()\
+    \ == 4);\n    assert(dynamic_mint(3).pow(-2).val() == 5);\n    [[maybe_unused]]\
+    \ constexpr long long minimum =\n        std::numeric_limits<long long>::min();\n\
+    \    assert(dynamic_mint(2).pow(minimum) *\n               dynamic_mint(2).pow(minimum\
+    \ + 1).inv() ==\n           dynamic_mint(2).inv());\n    assert(dynamic_mint(3).inv().val()\
+    \ == 4);\n    assert(other_dynamic_mint(8).val() == 1);\n}\n\nint main() {\n \
+    \   m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
+    \ fast_output;\n\n    test_integral_construction();\n    test_static_modint_pow();\n\
     \    test_dynamic_modint();\n\n    long long a, b;\n    fast_input >> a >> b;\n\
     \    fast_output << a + b << '\\n';\n}\n"
   dependsOn:
@@ -415,7 +439,7 @@ data:
   isVerificationFile: true
   path: verify/math/modint.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-17 04:56:02+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/modint.test.cpp

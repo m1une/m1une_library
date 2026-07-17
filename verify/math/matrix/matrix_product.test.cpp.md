@@ -59,16 +59,18 @@ data:
     \ rhs) const noexcept {\n        return _v == rhs._v;\n    }\n    constexpr bool\
     \ operator!=(const ModInt& rhs) const noexcept {\n        return _v != rhs._v;\n\
     \    }\n\n    constexpr ModInt pow(long long n) const noexcept {\n        ModInt\
-    \ res = raw(1), x = *this;\n        while (n > 0) {\n            if (n & 1) res\
-    \ *= x;\n            x *= x;\n            n >>= 1;\n        }\n        return\
-    \ res;\n    }\n\n    constexpr ModInt inv() const noexcept {\n        int64_t\
-    \ a = _v, b = Modulus, u = 1, v = 0;\n        while (b) {\n            int64_t\
-    \ t = a / b;\n            a -= t * b;\n            std::swap(a, b);\n        \
-    \    u -= t * v;\n            std::swap(u, v);\n        }\n        if (u < 0)\
-    \ u += Modulus;\n        return raw(static_cast<uint32_t>(u));\n    }\n\n    friend\
-    \ std::ostream& operator<<(std::ostream& os, const ModInt& rhs) {\n        return\
-    \ os << rhs._v;\n    }\n\n    friend std::istream& operator>>(std::istream& is,\
-    \ ModInt& rhs) {\n        long long v;\n        is >> v;\n        rhs = ModInt(v);\n\
+    \ res = raw(1 % Modulus);\n        ModInt x = n < 0 ? inv() : *this;\n       \
+    \ uint64_t exponent = n < 0 ? uint64_t(-(n + 1)) + 1 : uint64_t(n);\n        while\
+    \ (exponent > 0) {\n            if (exponent & 1) res *= x;\n            x *=\
+    \ x;\n            exponent >>= 1;\n        }\n        return res;\n    }\n\n \
+    \   constexpr ModInt inv() const noexcept {\n        int64_t a = _v, b = Modulus,\
+    \ u = 1, v = 0;\n        while (b) {\n            int64_t t = a / b;\n       \
+    \     a -= t * b;\n            std::swap(a, b);\n            u -= t * v;\n   \
+    \         std::swap(u, v);\n        }\n        assert(a == 1);\n        u %= Modulus;\n\
+    \        if (u < 0) u += Modulus;\n        return raw(static_cast<uint32_t>(u));\n\
+    \    }\n\n    friend std::ostream& operator<<(std::ostream& os, const ModInt&\
+    \ rhs) {\n        return os << rhs._v;\n    }\n\n    friend std::istream& operator>>(std::istream&\
+    \ is, ModInt& rhs) {\n        long long v;\n        is >> v;\n        rhs = ModInt(v);\n\
     \        return is;\n    }\n};\n\nusing modint998244353 = ModInt<998244353>;\n\
     using modint1000000007 = ModInt<1000000007>;\n\ntemplate <int Id = 0>\nstruct\
     \ DynamicModInt {\n   private:\n    uint32_t _v;\n    inline static uint32_t _mod\
@@ -107,39 +109,41 @@ data:
     \ rhs;\n    }\n\n    bool operator==(const DynamicModInt& rhs) const noexcept\
     \ {\n        return _v == rhs._v;\n    }\n\n    bool operator!=(const DynamicModInt&\
     \ rhs) const noexcept {\n        return _v != rhs._v;\n    }\n\n    DynamicModInt\
-    \ pow(long long exponent) const noexcept {\n        assert(exponent >= 0);\n \
-    \       DynamicModInt result = raw(1 % _mod);\n        DynamicModInt base = *this;\n\
-    \        while (exponent > 0) {\n            if (exponent & 1) result *= base;\n\
-    \            base *= base;\n            exponent >>= 1;\n        }\n        return\
-    \ result;\n    }\n\n    DynamicModInt inv() const noexcept {\n        int64_t\
-    \ a = _v, b = _mod, u = 1, v = 0;\n        while (b) {\n            int64_t quotient\
-    \ = a / b;\n            a -= quotient * b;\n            std::swap(a, b);\n   \
-    \         u -= quotient * v;\n            std::swap(u, v);\n        }\n      \
-    \  assert(a == 1);\n        u %= _mod;\n        if (u < 0) u += _mod;\n      \
-    \  return raw(static_cast<uint32_t>(u));\n    }\n\n    friend std::ostream& operator<<(std::ostream&\
-    \ os, const DynamicModInt& rhs) {\n        return os << rhs._v;\n    }\n\n   \
-    \ friend std::istream& operator>>(std::istream& is, DynamicModInt& rhs) {\n  \
-    \      long long value;\n        is >> value;\n        rhs = DynamicModInt(value);\n\
-    \        return is;\n    }\n};\n\n}  // namespace math\n}  // namespace m1une\n\
-    \n\n#line 1 \"math/matrix/matrix.hpp\"\n\n\n\n#line 5 \"math/matrix/matrix.hpp\"\
-    \n#include <cstddef>\n#line 8 \"math/matrix/matrix.hpp\"\n#include <vector>\n\n\
-    namespace m1une {\nnamespace matrix {\n\ntemplate <class T>\nclass Matrix {\n\
-    \   private:\n    int _rows;\n    int _cols;\n    std::vector<T> _data;\n\n  \
-    \  static std::size_t storage_size(int rows, int cols) {\n        assert(rows\
-    \ >= 0);\n        assert(cols >= 0);\n        return std::size_t(rows) * std::size_t(cols);\n\
-    \    }\n\n   public:\n    using value_type = T;\n\n    Matrix() : _rows(0), _cols(0)\
-    \ {}\n\n    Matrix(int rows, int cols, const T& value = T())\n        : _rows(rows),\
-    \ _cols(cols), _data(storage_size(rows, cols), value) {}\n\n    Matrix(int rows,\
-    \ int cols, std::vector<T> values)\n        : _rows(rows), _cols(cols), _data(std::move(values))\
-    \ {\n        assert(rows >= 0);\n        assert(cols >= 0);\n        assert(_data.size()\
-    \ == std::size_t(rows) * std::size_t(cols));\n    }\n\n    explicit Matrix(const\
-    \ std::vector<std::vector<T>>& values)\n        : _rows(int(values.size())), _cols(values.empty()\
-    \ ? 0 : int(values[0].size())),\n          _data(storage_size(_rows, _cols)) {\n\
-    \        for (int row = 0; row < _rows; row++) {\n            assert(int(values[std::size_t(row)].size())\
-    \ == _cols);\n            for (int col = 0; col < _cols; col++) {\n          \
-    \      (*this)[row][col] = values[std::size_t(row)][std::size_t(col)];\n     \
-    \       }\n        }\n    }\n\n    int rows() const {\n        return _rows;\n\
-    \    }\n\n    int cols() const {\n        return _cols;\n    }\n\n    bool empty()\
+    \ pow(long long exponent) const noexcept {\n        DynamicModInt result = raw(1\
+    \ % _mod);\n        DynamicModInt base = exponent < 0 ? inv() : *this;\n     \
+    \   uint64_t magnitude =\n            exponent < 0 ? uint64_t(-(exponent + 1))\
+    \ + 1 : uint64_t(exponent);\n        while (magnitude > 0) {\n            if (magnitude\
+    \ & 1) result *= base;\n            base *= base;\n            magnitude >>= 1;\n\
+    \        }\n        return result;\n    }\n\n    DynamicModInt inv() const noexcept\
+    \ {\n        int64_t a = _v, b = _mod, u = 1, v = 0;\n        while (b) {\n  \
+    \          int64_t quotient = a / b;\n            a -= quotient * b;\n       \
+    \     std::swap(a, b);\n            u -= quotient * v;\n            std::swap(u,\
+    \ v);\n        }\n        assert(a == 1);\n        u %= _mod;\n        if (u <\
+    \ 0) u += _mod;\n        return raw(static_cast<uint32_t>(u));\n    }\n\n    friend\
+    \ std::ostream& operator<<(std::ostream& os, const DynamicModInt& rhs) {\n   \
+    \     return os << rhs._v;\n    }\n\n    friend std::istream& operator>>(std::istream&\
+    \ is, DynamicModInt& rhs) {\n        long long value;\n        is >> value;\n\
+    \        rhs = DynamicModInt(value);\n        return is;\n    }\n};\n\n}  // namespace\
+    \ math\n}  // namespace m1une\n\n\n#line 1 \"math/matrix/matrix.hpp\"\n\n\n\n\
+    #line 5 \"math/matrix/matrix.hpp\"\n#include <cstddef>\n#line 8 \"math/matrix/matrix.hpp\"\
+    \n#include <vector>\n\nnamespace m1une {\nnamespace matrix {\n\ntemplate <class\
+    \ T>\nclass Matrix {\n   private:\n    int _rows;\n    int _cols;\n    std::vector<T>\
+    \ _data;\n\n    static std::size_t storage_size(int rows, int cols) {\n      \
+    \  assert(rows >= 0);\n        assert(cols >= 0);\n        return std::size_t(rows)\
+    \ * std::size_t(cols);\n    }\n\n   public:\n    using value_type = T;\n\n   \
+    \ Matrix() : _rows(0), _cols(0) {}\n\n    Matrix(int rows, int cols, const T&\
+    \ value = T())\n        : _rows(rows), _cols(cols), _data(storage_size(rows, cols),\
+    \ value) {}\n\n    Matrix(int rows, int cols, std::vector<T> values)\n       \
+    \ : _rows(rows), _cols(cols), _data(std::move(values)) {\n        assert(rows\
+    \ >= 0);\n        assert(cols >= 0);\n        assert(_data.size() == std::size_t(rows)\
+    \ * std::size_t(cols));\n    }\n\n    explicit Matrix(const std::vector<std::vector<T>>&\
+    \ values)\n        : _rows(int(values.size())), _cols(values.empty() ? 0 : int(values[0].size())),\n\
+    \          _data(storage_size(_rows, _cols)) {\n        for (int row = 0; row\
+    \ < _rows; row++) {\n            assert(int(values[std::size_t(row)].size()) ==\
+    \ _cols);\n            for (int col = 0; col < _cols; col++) {\n             \
+    \   (*this)[row][col] = values[std::size_t(row)][std::size_t(col)];\n        \
+    \    }\n        }\n    }\n\n    int rows() const {\n        return _rows;\n  \
+    \  }\n\n    int cols() const {\n        return _cols;\n    }\n\n    bool empty()\
     \ const {\n        return _rows == 0 || _cols == 0;\n    }\n\n    std::vector<T>&\
     \ data() {\n        return _data;\n    }\n\n    const std::vector<T>& data() const\
     \ {\n        return _data;\n    }\n\n    T* operator[](int row) {\n        assert(0\
@@ -466,7 +470,7 @@ data:
   isVerificationFile: true
   path: verify/math/matrix/matrix_product.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 04:26:38+09:00'
+  timestamp: '2026-07-17 04:56:02+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/matrix/matrix_product.test.cpp

@@ -451,16 +451,18 @@ data:
     \ rhs) const noexcept {\n        return _v == rhs._v;\n    }\n    constexpr bool\
     \ operator!=(const ModInt& rhs) const noexcept {\n        return _v != rhs._v;\n\
     \    }\n\n    constexpr ModInt pow(long long n) const noexcept {\n        ModInt\
-    \ res = raw(1), x = *this;\n        while (n > 0) {\n            if (n & 1) res\
-    \ *= x;\n            x *= x;\n            n >>= 1;\n        }\n        return\
-    \ res;\n    }\n\n    constexpr ModInt inv() const noexcept {\n        int64_t\
-    \ a = _v, b = Modulus, u = 1, v = 0;\n        while (b) {\n            int64_t\
-    \ t = a / b;\n            a -= t * b;\n            std::swap(a, b);\n        \
-    \    u -= t * v;\n            std::swap(u, v);\n        }\n        if (u < 0)\
-    \ u += Modulus;\n        return raw(static_cast<uint32_t>(u));\n    }\n\n    friend\
-    \ std::ostream& operator<<(std::ostream& os, const ModInt& rhs) {\n        return\
-    \ os << rhs._v;\n    }\n\n    friend std::istream& operator>>(std::istream& is,\
-    \ ModInt& rhs) {\n        long long v;\n        is >> v;\n        rhs = ModInt(v);\n\
+    \ res = raw(1 % Modulus);\n        ModInt x = n < 0 ? inv() : *this;\n       \
+    \ uint64_t exponent = n < 0 ? uint64_t(-(n + 1)) + 1 : uint64_t(n);\n        while\
+    \ (exponent > 0) {\n            if (exponent & 1) res *= x;\n            x *=\
+    \ x;\n            exponent >>= 1;\n        }\n        return res;\n    }\n\n \
+    \   constexpr ModInt inv() const noexcept {\n        int64_t a = _v, b = Modulus,\
+    \ u = 1, v = 0;\n        while (b) {\n            int64_t t = a / b;\n       \
+    \     a -= t * b;\n            std::swap(a, b);\n            u -= t * v;\n   \
+    \         std::swap(u, v);\n        }\n        assert(a == 1);\n        u %= Modulus;\n\
+    \        if (u < 0) u += Modulus;\n        return raw(static_cast<uint32_t>(u));\n\
+    \    }\n\n    friend std::ostream& operator<<(std::ostream& os, const ModInt&\
+    \ rhs) {\n        return os << rhs._v;\n    }\n\n    friend std::istream& operator>>(std::istream&\
+    \ is, ModInt& rhs) {\n        long long v;\n        is >> v;\n        rhs = ModInt(v);\n\
     \        return is;\n    }\n};\n\nusing modint998244353 = ModInt<998244353>;\n\
     using modint1000000007 = ModInt<1000000007>;\n\ntemplate <int Id = 0>\nstruct\
     \ DynamicModInt {\n   private:\n    uint32_t _v;\n    inline static uint32_t _mod\
@@ -499,42 +501,44 @@ data:
     \ rhs;\n    }\n\n    bool operator==(const DynamicModInt& rhs) const noexcept\
     \ {\n        return _v == rhs._v;\n    }\n\n    bool operator!=(const DynamicModInt&\
     \ rhs) const noexcept {\n        return _v != rhs._v;\n    }\n\n    DynamicModInt\
-    \ pow(long long exponent) const noexcept {\n        assert(exponent >= 0);\n \
-    \       DynamicModInt result = raw(1 % _mod);\n        DynamicModInt base = *this;\n\
-    \        while (exponent > 0) {\n            if (exponent & 1) result *= base;\n\
-    \            base *= base;\n            exponent >>= 1;\n        }\n        return\
-    \ result;\n    }\n\n    DynamicModInt inv() const noexcept {\n        int64_t\
-    \ a = _v, b = _mod, u = 1, v = 0;\n        while (b) {\n            int64_t quotient\
-    \ = a / b;\n            a -= quotient * b;\n            std::swap(a, b);\n   \
-    \         u -= quotient * v;\n            std::swap(u, v);\n        }\n      \
-    \  assert(a == 1);\n        u %= _mod;\n        if (u < 0) u += _mod;\n      \
-    \  return raw(static_cast<uint32_t>(u));\n    }\n\n    friend std::ostream& operator<<(std::ostream&\
-    \ os, const DynamicModInt& rhs) {\n        return os << rhs._v;\n    }\n\n   \
-    \ friend std::istream& operator>>(std::istream& is, DynamicModInt& rhs) {\n  \
-    \      long long value;\n        is >> value;\n        rhs = DynamicModInt(value);\n\
-    \        return is;\n    }\n};\n\n}  // namespace math\n}  // namespace m1une\n\
-    \n\n#line 1 \"monoid/add.hpp\"\n\n\n\nnamespace m1une {\nnamespace monoid {\n\n\
-    // Monoid for addition (Range Sum).\ntemplate <typename T>\nstruct Add {\n   \
-    \ using value_type = T;\n\n    // Returns the identity element for addition, which\
-    \ is 0.\n    static constexpr T id() {\n        return T(0);\n    }\n\n    //\
-    \ Returns the sum of a and b.\n    static constexpr T op(const T& a, const T&\
-    \ b) {\n        return a + b;\n    }\n\n    static constexpr T inv(const T& x)\
-    \ {\n        return -x;\n    }\n};\n\n}  // namespace monoid\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"monoid/affine.hpp\"\n\n\n\n#line 5 \"monoid/affine.hpp\"\
-    \n\nnamespace m1une {\nnamespace monoid {\n\n// Monoid for affine transformations\
-    \ f(x) = ax + b.\n// Represented as a pair {a, b}.\ntemplate <typename T>\nstruct\
-    \ Affine {\n    using value_type = std::pair<T, T>;\n\n    // The identity transformation\
-    \ is f(x) = 1*x + 0.\n    static constexpr value_type id() {\n        return {T(1),\
-    \ T(0)};\n    }\n\n    // Composes two affine transformations.\n    // f(g(x))\
-    \ where f = a, g = b.\n    // a.first * (b.first * x + b.second) + a.second\n\
-    \    // = (a.first * b.first) * x + (a.first * b.second + a.second)\n    static\
-    \ constexpr value_type op(const value_type& a, const value_type& b) {\n      \
-    \  return {a.first * b.first, a.first * b.second + a.second};\n    }\n\n    //\
-    \ Helpers to create common affine transformations\n    static constexpr value_type\
-    \ make_add(const T& b) {\n        return {T(1), b};\n    }\n    static constexpr\
-    \ value_type make_mul(const T& a) {\n        return {a, T(0)};\n    }\n    static\
-    \ constexpr value_type make_assign(const T& b) {\n        return {T(0), b};\n\
-    \    }\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 15 \"verify/ds/segtree/dynamic_dual_segtree.test.cpp\"\
+    \ pow(long long exponent) const noexcept {\n        DynamicModInt result = raw(1\
+    \ % _mod);\n        DynamicModInt base = exponent < 0 ? inv() : *this;\n     \
+    \   uint64_t magnitude =\n            exponent < 0 ? uint64_t(-(exponent + 1))\
+    \ + 1 : uint64_t(exponent);\n        while (magnitude > 0) {\n            if (magnitude\
+    \ & 1) result *= base;\n            base *= base;\n            magnitude >>= 1;\n\
+    \        }\n        return result;\n    }\n\n    DynamicModInt inv() const noexcept\
+    \ {\n        int64_t a = _v, b = _mod, u = 1, v = 0;\n        while (b) {\n  \
+    \          int64_t quotient = a / b;\n            a -= quotient * b;\n       \
+    \     std::swap(a, b);\n            u -= quotient * v;\n            std::swap(u,\
+    \ v);\n        }\n        assert(a == 1);\n        u %= _mod;\n        if (u <\
+    \ 0) u += _mod;\n        return raw(static_cast<uint32_t>(u));\n    }\n\n    friend\
+    \ std::ostream& operator<<(std::ostream& os, const DynamicModInt& rhs) {\n   \
+    \     return os << rhs._v;\n    }\n\n    friend std::istream& operator>>(std::istream&\
+    \ is, DynamicModInt& rhs) {\n        long long value;\n        is >> value;\n\
+    \        rhs = DynamicModInt(value);\n        return is;\n    }\n};\n\n}  // namespace\
+    \ math\n}  // namespace m1une\n\n\n#line 1 \"monoid/add.hpp\"\n\n\n\nnamespace\
+    \ m1une {\nnamespace monoid {\n\n// Monoid for addition (Range Sum).\ntemplate\
+    \ <typename T>\nstruct Add {\n    using value_type = T;\n\n    // Returns the\
+    \ identity element for addition, which is 0.\n    static constexpr T id() {\n\
+    \        return T(0);\n    }\n\n    // Returns the sum of a and b.\n    static\
+    \ constexpr T op(const T& a, const T& b) {\n        return a + b;\n    }\n\n \
+    \   static constexpr T inv(const T& x) {\n        return -x;\n    }\n};\n\n} \
+    \ // namespace monoid\n}  // namespace m1une\n\n\n#line 1 \"monoid/affine.hpp\"\
+    \n\n\n\n#line 5 \"monoid/affine.hpp\"\n\nnamespace m1une {\nnamespace monoid {\n\
+    \n// Monoid for affine transformations f(x) = ax + b.\n// Represented as a pair\
+    \ {a, b}.\ntemplate <typename T>\nstruct Affine {\n    using value_type = std::pair<T,\
+    \ T>;\n\n    // The identity transformation is f(x) = 1*x + 0.\n    static constexpr\
+    \ value_type id() {\n        return {T(1), T(0)};\n    }\n\n    // Composes two\
+    \ affine transformations.\n    // f(g(x)) where f = a, g = b.\n    // a.first\
+    \ * (b.first * x + b.second) + a.second\n    // = (a.first * b.first) * x + (a.first\
+    \ * b.second + a.second)\n    static constexpr value_type op(const value_type&\
+    \ a, const value_type& b) {\n        return {a.first * b.first, a.first * b.second\
+    \ + a.second};\n    }\n\n    // Helpers to create common affine transformations\n\
+    \    static constexpr value_type make_add(const T& b) {\n        return {T(1),\
+    \ b};\n    }\n    static constexpr value_type make_mul(const T& a) {\n       \
+    \ return {a, T(0)};\n    }\n    static constexpr value_type make_assign(const\
+    \ T& b) {\n        return {T(0), b};\n    }\n};\n\n}  // namespace monoid\n} \
+    \ // namespace m1une\n\n\n#line 15 \"verify/ds/segtree/dynamic_dual_segtree.test.cpp\"\
     \n\nnamespace {\n\nvoid test_randomized() {\n    using Add = m1une::monoid::Add<long\
     \ long>;\n    constexpr int left = -43;\n    constexpr int right = 51;\n    m1une::ds::DynamicDualSegtree<Add,\
     \ int> seg(left, right, 7);\n    std::vector<long long> a(right - left, 7);\n\n\
@@ -619,7 +623,7 @@ data:
   isVerificationFile: true
   path: verify/ds/segtree/dynamic_dual_segtree.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 20:44:42+09:00'
+  timestamp: '2026-07-17 04:56:02+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/segtree/dynamic_dual_segtree.test.cpp

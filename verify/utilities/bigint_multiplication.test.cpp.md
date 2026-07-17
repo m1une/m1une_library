@@ -5,91 +5,33 @@ data:
     path: math/fps/convolution.hpp
     title: Convolution
   - icon: ':heavy_check_mark:'
-    path: math/fps/formal_power_series.hpp
-    title: Formal Power Series
-  - icon: ':heavy_check_mark:'
     path: math/fps/internal/ntt998_faster.hpp
     title: math/fps/internal/ntt998_faster.hpp
   - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
   - icon: ':heavy_check_mark:'
-    path: math/modular_square_root.hpp
-    title: Modular Square Root
-  _extendedRequiredBy:
+    path: utilities/bigint.hpp
+    title: BigInt
   - icon: ':heavy_check_mark:'
-    path: math/all.hpp
-    title: Math All
-  - icon: ':heavy_check_mark:'
-    path: math/fps/all.hpp
-    title: Formal Power Series All
-  _extendedVerifiedWith:
-  - icon: ':heavy_check_mark:'
-    path: verify/math/fps/exp_of_formal_power_series_sparse.test.cpp
-    title: verify/math/fps/exp_of_formal_power_series_sparse.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/math/fps/fps_algorithms.test.cpp
-    title: verify/math/fps/fps_algorithms.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/math/fps/inv_of_formal_power_series_sparse.test.cpp
-    title: verify/math/fps/inv_of_formal_power_series_sparse.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/math/fps/log_of_formal_power_series_sparse.test.cpp
-    title: verify/math/fps/log_of_formal_power_series_sparse.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/math/fps/pow_of_formal_power_series_sparse.test.cpp
-    title: verify/math/fps/pow_of_formal_power_series_sparse.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/math/fps/sqrt_of_formal_power_series_sparse.test.cpp
-    title: verify/math/fps/sqrt_of_formal_power_series_sparse.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/math/math_algorithms.test.cpp
-    title: verify/math/math_algorithms.test.cpp
+    path: utilities/fast_io.hpp
+    title: Fast IO
+  _extendedRequiredBy: []
+  _extendedVerifiedWith: []
   _isVerificationFailed: false
-  _pathExtension: hpp
+  _pathExtension: cpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
-    links: []
-  bundledCode: "#line 1 \"math/fps/sparse_formal_power_series.hpp\"\n\n\n\n#include\
-    \ <cassert>\n#include <cstdint>\n#include <optional>\n#include <utility>\n#include\
-    \ <vector>\n\n#line 1 \"math/fps/formal_power_series.hpp\"\n\n\n\n#include <algorithm>\n\
-    #line 10 \"math/fps/formal_power_series.hpp\"\n\n#line 1 \"math/modular_square_root.hpp\"\
-    \n\n\n\n#line 7 \"math/modular_square_root.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ math {\n\nnamespace internal {\n\ninline uint64_t modular_square_root_multiply(uint64_t\
-    \ lhs, uint64_t rhs, uint64_t mod) {\n    return static_cast<uint64_t>(static_cast<unsigned\
-    \ __int128>(lhs) * rhs % mod);\n}\n\ninline uint64_t modular_square_root_power(uint64_t\
-    \ base, uint64_t exponent, uint64_t mod) {\n    uint64_t result = 1 % mod;\n \
-    \   while (exponent > 0) {\n        if (exponent & 1) result = modular_square_root_multiply(result,\
-    \ base, mod);\n        base = modular_square_root_multiply(base, base, mod);\n\
-    \        exponent >>= 1;\n    }\n    return result;\n}\n\n}  // namespace internal\n\
-    \n// Returns x such that x * x = value (mod prime), or nullopt when no such x\
-    \ exists.\n// The modulus must be prime.\ninline std::optional<uint64_t> modular_square_root(uint64_t\
-    \ value, uint64_t prime) {\n    assert(prime >= 2);\n    value %= prime;\n   \
-    \ if (value == 0 || prime == 2) return value;\n\n    if (internal::modular_square_root_power(value,\
-    \ (prime - 1) / 2, prime) != 1) {\n        return std::nullopt;\n    }\n    if\
-    \ (prime % 4 == 3) {\n        return internal::modular_square_root_power(value,\
-    \ prime / 4 + 1, prime);\n    }\n\n    uint64_t odd_part = prime - 1;\n    int\
-    \ power_of_two = 0;\n    while ((odd_part & 1) == 0) {\n        odd_part >>= 1;\n\
-    \        power_of_two++;\n    }\n\n    uint64_t non_residue = 2;\n    while (internal::modular_square_root_power(non_residue,\
-    \ (prime - 1) / 2, prime) == 1) {\n        non_residue++;\n    }\n\n    uint64_t\
-    \ c = internal::modular_square_root_power(non_residue, odd_part, prime);\n   \
-    \ uint64_t root = internal::modular_square_root_power(value, odd_part / 2 + 1,\
-    \ prime);\n    uint64_t remainder = internal::modular_square_root_power(value,\
-    \ odd_part, prime);\n    int remaining_power = power_of_two;\n\n    while (remainder\
-    \ != 1) {\n        int exponent = 1;\n        uint64_t squared = internal::modular_square_root_multiply(remainder,\
-    \ remainder, prime);\n        while (squared != 1) {\n            squared = internal::modular_square_root_multiply(squared,\
-    \ squared, prime);\n            exponent++;\n        }\n\n        uint64_t correction\
-    \ = c;\n        for (int i = 0; i < remaining_power - exponent - 1; i++) {\n \
-    \           correction = internal::modular_square_root_multiply(correction, correction,\
-    \ prime);\n        }\n        root = internal::modular_square_root_multiply(root,\
-    \ correction, prime);\n        c = internal::modular_square_root_multiply(correction,\
-    \ correction, prime);\n        remainder = internal::modular_square_root_multiply(remainder,\
-    \ c, prime);\n        remaining_power = exponent;\n    }\n    return root;\n}\n\
-    \ntemplate <class Mint>\nstd::optional<Mint> modular_square_root(Mint value) {\n\
-    \    auto root = modular_square_root(static_cast<uint64_t>(value.val()),\n   \
-    \                                 static_cast<uint64_t>(Mint::mod()));\n    if\
-    \ (!root.has_value()) return std::nullopt;\n    return Mint(*root);\n}\n\n}  //\
-    \ namespace math\n}  // namespace m1une\n\n\n#line 1 \"math/fps/convolution.hpp\"\
+    '*NOT_SPECIAL_COMMENTS*': ''
+    PROBLEM: https://judge.yosupo.jp/problem/multiplication_of_big_integers
+    links:
+    - https://judge.yosupo.jp/problem/multiplication_of_big_integers
+  bundledCode: "#line 1 \"verify/utilities/bigint_multiplication.test.cpp\"\n#define\
+    \ PROBLEM \"https://judge.yosupo.jp/problem/multiplication_of_big_integers\"\n\
+    \n#include <cassert>\n#include <random>\n#include <string>\n#include <vector>\n\
+    \n#line 1 \"utilities/bigint.hpp\"\n\n\n\n#include <algorithm>\n#line 6 \"utilities/bigint.hpp\"\
+    \n#include <cstdint>\n#include <iostream>\n#include <stdexcept>\n#line 10 \"utilities/bigint.hpp\"\
+    \n#include <utility>\n#line 12 \"utilities/bigint.hpp\"\n\n#line 1 \"math/fps/convolution.hpp\"\
     \n\n\n\n#line 5 \"math/fps/convolution.hpp\"\n#include <array>\n#line 8 \"math/fps/convolution.hpp\"\
     \n#include <cstring>\n#include <new>\n#include <type_traits>\n#line 13 \"math/fps/convolution.hpp\"\
     \n\n#if defined(__GNUC__) && !defined(__clang__) && (defined(__x86_64__) || defined(__i386__))\n\
@@ -328,14 +270,13 @@ data:
     \    }\n}\n\n}  // namespace fast998_v2\n}  // namespace internal\n}  // namespace\
     \ fps\n}  // namespace m1une\n\n#endif  // M1UNE_FPS_HAS_X86_SIMD\n\n\n#line 22\
     \ \"math/fps/convolution.hpp\"\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n#pragma GCC pop_options\n\
-    #endif\n\n#line 1 \"math/modint.hpp\"\n\n\n\n#line 6 \"math/modint.hpp\"\n#include\
-    \ <iostream>\n#line 9 \"math/modint.hpp\"\n\nnamespace m1une {\nnamespace math\
-    \ {\n\ntemplate <uint32_t Modulus>\nstruct ModInt {\n    static_assert(0 < Modulus,\
-    \ \"Modulus must be positive\");\n\n   private:\n    uint32_t _v;\n\n   public:\n\
-    \    static constexpr uint32_t mod() {\n        return Modulus;\n    }\n\n   \
-    \ static constexpr ModInt raw(uint32_t v) noexcept {\n        ModInt x;\n    \
-    \    x._v = v;\n        return x;\n    }\n\n    constexpr ModInt() noexcept :\
-    \ _v(0) {}\n\n    template <class Integer, std::enable_if_t<std::is_integral_v<Integer>,\
+    #endif\n\n#line 1 \"math/modint.hpp\"\n\n\n\n#line 9 \"math/modint.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace math {\n\ntemplate <uint32_t Modulus>\nstruct ModInt {\n\
+    \    static_assert(0 < Modulus, \"Modulus must be positive\");\n\n   private:\n\
+    \    uint32_t _v;\n\n   public:\n    static constexpr uint32_t mod() {\n     \
+    \   return Modulus;\n    }\n\n    static constexpr ModInt raw(uint32_t v) noexcept\
+    \ {\n        ModInt x;\n        x._v = v;\n        return x;\n    }\n\n    constexpr\
+    \ ModInt() noexcept : _v(0) {}\n\n    template <class Integer, std::enable_if_t<std::is_integral_v<Integer>,\
     \ int> = 0>\n    constexpr ModInt(Integer v) noexcept {\n        if constexpr\
     \ (std::is_signed_v<Integer>) {\n            int64_t x = static_cast<int64_t>(v)\
     \ % static_cast<int64_t>(Modulus);\n            if (x < 0) x += Modulus;\n   \
@@ -723,450 +664,584 @@ data:
     \        value = (value + mod1_mod2_target * (second % target_mod)) % target_mod;\n\
     \        result[i] = Mint::raw(uint32_t(value));\n    }\n    return result;\n\
     }\n\n}  // namespace fps\n}  // namespace m1une\n\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n\
-    #undef M1UNE_FPS_HAS_X86_SIMD\n#endif\n\n\n#line 13 \"math/fps/formal_power_series.hpp\"\
-    \n\nnamespace m1une {\nnamespace fps {\n\ntemplate <class Mint>\nstruct FormalPowerSeries\
-    \ : std::vector<Mint> {\n    using std::vector<Mint>::vector;\n    using Fps =\
-    \ FormalPowerSeries;\n\n    FormalPowerSeries() = default;\n    FormalPowerSeries(const\
-    \ std::vector<Mint>& values) : std::vector<Mint>(values) {}\n    FormalPowerSeries(std::vector<Mint>&&\
-    \ values) : std::vector<Mint>(std::move(values)) {}\n\n    Fps& shrink() {\n \
-    \       while (!this->empty() && this->back() == Mint(0)) this->pop_back();\n\
-    \        return *this;\n    }\n\n    Fps pre(int degree) const {\n        assert(degree\
-    \ >= 0);\n        Fps result(this->begin(), this->begin() + std::min<int>(degree,\
-    \ this->size()));\n        result.resize(degree);\n        return result;\n  \
-    \  }\n\n    Fps reversed(int size = -1) const {\n        Fps result = *this;\n\
-    \        if (size >= 0) result.resize(size);\n        std::reverse(result.begin(),\
-    \ result.end());\n        return result;\n    }\n\n    Fps& operator+=(const Fps&\
-    \ rhs) {\n        if (this->size() < rhs.size()) this->resize(rhs.size());\n \
-    \       for (int i = 0; i < int(rhs.size()); i++) (*this)[i] += rhs[i];\n    \
-    \    return *this;\n    }\n\n    Fps& operator-=(const Fps& rhs) {\n        if\
-    \ (this->size() < rhs.size()) this->resize(rhs.size());\n        for (int i =\
-    \ 0; i < int(rhs.size()); i++) (*this)[i] -= rhs[i];\n        return *this;\n\
-    \    }\n\n    Fps& operator*=(const Fps& rhs) {\n        std::vector<Mint> lhs(this->begin(),\
-    \ this->end());\n        *this = convolution(lhs, rhs);\n        return *this;\n\
-    \    }\n\n    Fps& operator*=(Mint rhs) {\n        for (Mint& value : *this) value\
-    \ *= rhs;\n        return *this;\n    }\n\n    Fps& operator/=(Mint rhs) {\n \
-    \       return *this *= rhs.inv();\n    }\n\n    Fps& operator<<=(int shift) {\n\
-    \        assert(shift >= 0);\n        this->insert(this->begin(), shift, Mint(0));\n\
-    \        return *this;\n    }\n\n    Fps& operator>>=(int shift) {\n        assert(shift\
-    \ >= 0);\n        if (shift >= int(this->size())) {\n            this->clear();\n\
-    \        } else {\n            this->erase(this->begin(), this->begin() + shift);\n\
-    \        }\n        return *this;\n    }\n\n    Fps operator+() const {\n    \
-    \    return *this;\n    }\n\n    Fps operator-() const {\n        Fps result =\
-    \ *this;\n        for (Mint& value : result) value = Mint(0) - value;\n      \
-    \  return result;\n    }\n\n    friend Fps operator+(Fps lhs, const Fps& rhs)\
-    \ {\n        return lhs += rhs;\n    }\n\n    friend Fps operator-(Fps lhs, const\
-    \ Fps& rhs) {\n        return lhs -= rhs;\n    }\n\n    friend Fps operator*(Fps\
-    \ lhs, const Fps& rhs) {\n        return lhs *= rhs;\n    }\n\n    friend Fps\
-    \ operator*(Fps lhs, Mint rhs) {\n        return lhs *= rhs;\n    }\n\n    friend\
-    \ Fps operator*(Mint lhs, Fps rhs) {\n        return rhs *= lhs;\n    }\n\n  \
-    \  friend Fps operator/(Fps lhs, Mint rhs) {\n        return lhs /= rhs;\n   \
-    \ }\n\n    friend Fps operator<<(Fps lhs, int shift) {\n        return lhs <<=\
-    \ shift;\n    }\n\n    friend Fps operator>>(Fps lhs, int shift) {\n        return\
-    \ lhs >>= shift;\n    }\n\n    Fps derivative() const {\n        if (this->empty())\
-    \ return {};\n        Fps result(this->size() - 1);\n        for (int i = 1; i\
-    \ < int(this->size()); i++) result[i - 1] = (*this)[i] * Mint(i);\n        return\
-    \ result;\n    }\n\n    Fps integral() const {\n        Fps result(this->size()\
-    \ + 1);\n        if (this->empty()) return result;\n        assert(this->size()\
-    \ < Mint::mod());\n\n        std::vector<Mint> inverse(this->size() + 1);\n  \
-    \      inverse[1] = 1;\n        for (int i = 2; i <= int(this->size()); i++) {\n\
-    \            inverse[i] = Mint(0) - Mint(Mint::mod() / uint32_t(i)) * inverse[Mint::mod()\
-    \ % uint32_t(i)];\n        }\n        for (int i = 0; i < int(this->size()); i++)\
-    \ result[i + 1] = (*this)[i] * inverse[i + 1];\n        return result;\n    }\n\
-    \n    Mint evaluate(Mint x) const {\n        Mint result = 0;\n        for (auto\
-    \ it = this->rbegin(); it != this->rend(); ++it) result = result * x + *it;\n\
-    \        return result;\n    }\n\n    Fps inv(int degree = -1) const {\n     \
-    \   if (degree < 0) degree = int(this->size());\n        assert(degree >= 0);\n\
-    \        if (degree == 0) return {};\n        assert(!this->empty() && (*this)[0]\
-    \ != Mint(0));\n\n        Fps result(1, (*this)[0].inv());\n        for (int size\
-    \ = 1; size < degree; size <<= 1) {\n            const int next_size = std::min(size\
-    \ << 1, degree);\n            const int transform_size = size << 1;\n        \
-    \    if (size >= 32 && (Mint::mod() - 1) % uint32_t(transform_size) == 0) {\n\
-    \                // Newton's g <- g(2-fg), restricted to the newly determined\n\
-    \                // half.  Keeping g in the frequency domain avoids two general\n\
-    \                // convolutions and their 2x larger padding.\n              \
-    \  std::vector<Mint> transformed_f(transform_size);\n                std::copy_n(this->begin(),\
-    \ std::min<int>(this->size(), next_size),\n                            transformed_f.begin());\n\
-    \                std::vector<Mint> transformed_g(transform_size);\n          \
-    \      std::copy(result.begin(), result.end(), transformed_g.begin());\n     \
-    \           internal::ntt(transformed_f, false);\n                internal::ntt(transformed_g,\
-    \ false);\n\n                std::vector<Mint> error(transform_size);\n      \
-    \          for (int i = 0; i < transform_size; i++)\n                    error[i]\
-    \ = transformed_f[i] * transformed_g[i];\n                internal::ntt(error,\
-    \ true);\n                std::fill(error.begin(), error.begin() + size, Mint(0));\n\
-    \                internal::ntt(error, false);\n                for (int i = 0;\
-    \ i < transform_size; i++) error[i] *= transformed_g[i];\n                internal::ntt(error,\
-    \ true);\n\n                result.resize(next_size);\n                for (int\
-    \ i = size; i < next_size; i++) result[i] = Mint(0) - error[i];\n            \
-    \    continue;\n            }\n            Fps product = this->pre(next_size)\
-    \ * result;\n            product.resize(next_size);\n            for (Mint& value\
-    \ : product) value = Mint(0) - value;\n            product[0] += Mint(2);\n  \
-    \          result = (result * product).pre(next_size);\n        }\n        return\
-    \ result.pre(degree);\n    }\n\n    Fps log(int degree = -1) const {\n       \
-    \ if (degree < 0) degree = int(this->size());\n        assert(degree >= 0);\n\
-    \        if (degree == 0) return {};\n        assert(!this->empty() && (*this)[0]\
-    \ == Mint(1));\n        return (derivative() * inv(degree)).pre(degree - 1).integral();\n\
-    \    }\n\n    Fps exp(int degree = -1) const {\n        if (degree < 0) degree\
-    \ = int(this->size());\n        assert(degree >= 0);\n        if (degree == 0)\
-    \ return {};\n        assert(this->empty() || (*this)[0] == Mint(0));\n\n    \
-    \    Fps result(1, Mint(1));\n        for (int size = 1; size < degree; size <<=\
-    \ 1) {\n            const int next_size = std::min(size << 1, degree);\n     \
-    \       Fps correction = this->pre(next_size) - result.log(next_size);\n     \
-    \       correction[0] += Mint(1);\n            result = (result * correction).pre(next_size);\n\
-    \        }\n        return result.pre(degree);\n    }\n\n    Fps pow(long long\
-    \ exponent, int degree = -1) const {\n        if (degree < 0) degree = int(this->size());\n\
-    \        assert(exponent >= 0 && degree >= 0);\n        if (degree == 0) return\
-    \ {};\n        if (exponent == 0) {\n            Fps result(degree);\n       \
-    \     result[0] = 1;\n            return result;\n        }\n\n        int first\
-    \ = 0;\n        while (first < int(this->size()) && (*this)[first] == Mint(0))\
-    \ first++;\n        if (first == int(this->size()) || first > (degree - 1) / exponent)\
-    \ return Fps(degree);\n\n        const int shift = int(first * exponent);\n  \
-    \      const Mint leading = (*this)[first];\n        Fps normalized = (*this >>\
-    \ first) / leading;\n        Fps result = (normalized.log(degree - shift) * Mint(exponent)).exp(degree\
-    \ - shift);\n        result *= leading.pow(exponent);\n        result <<= shift;\n\
-    \        result.resize(degree);\n        return result;\n    }\n\n    std::optional<Fps>\
-    \ sqrt(int degree = -1) const {\n        if (degree < 0) degree = int(this->size());\n\
-    \        assert(degree >= 0);\n        if (degree == 0) return Fps();\n\n    \
-    \    int first = 0;\n        while (first < int(this->size()) && (*this)[first]\
-    \ == Mint(0)) first++;\n        if (first == int(this->size())) return Fps(degree);\n\
-    \        if (first >= degree) return Fps(degree);\n        if (first & 1) return\
-    \ std::nullopt;\n\n        const int shift = first / 2;\n        auto leading_root\
-    \ = m1une::math::modular_square_root((*this)[first]);\n        if (!leading_root.has_value())\
-    \ return std::nullopt;\n\n        const int result_degree = degree - shift;\n\
-    \        Fps normalized = (*this >> first) / (*this)[first];\n        Fps result\
-    \ = (normalized.log(result_degree) / Mint(2)).exp(result_degree);\n        result\
-    \ *= *leading_root;\n        result <<= shift;\n        result.resize(degree);\n\
-    \        return result;\n    }\n\n    std::pair<Fps, Fps> divmod(const Fps& divisor)\
-    \ const {\n        Fps dividend = *this;\n        Fps normalized_divisor = divisor;\n\
-    \        dividend.shrink();\n        normalized_divisor.shrink();\n        assert(!normalized_divisor.empty());\n\
-    \n        if (dividend.size() < normalized_divisor.size()) return std::make_pair(Fps(),\
-    \ dividend);\n        const int quotient_size = int(dividend.size() - normalized_divisor.size()\
-    \ + 1);\n        Fps quotient =\n            (dividend.reversed().pre(quotient_size)\
-    \ * normalized_divisor.reversed().inv(quotient_size))\n                .pre(quotient_size)\n\
-    \                .reversed();\n        quotient.shrink();\n        Fps remainder\
-    \ = dividend - normalized_divisor * quotient;\n        remainder.resize(normalized_divisor.size()\
-    \ - 1);\n        remainder.shrink();\n        return std::make_pair(std::move(quotient),\
-    \ std::move(remainder));\n    }\n\n    Fps& operator/=(const Fps& rhs) {\n   \
-    \     *this = divmod(rhs).first;\n        return *this;\n    }\n\n    Fps& operator%=(const\
-    \ Fps& rhs) {\n        *this = divmod(rhs).second;\n        return *this;\n  \
-    \  }\n\n    friend Fps operator/(Fps lhs, const Fps& rhs) {\n        return lhs\
-    \ /= rhs;\n    }\n\n    friend Fps operator%(Fps lhs, const Fps& rhs) {\n    \
-    \    return lhs %= rhs;\n    }\n\n    Fps taylor_shift(Mint shift) const {\n \
-    \       const int n = int(this->size());\n        if (n == 0) return {};\n   \
-    \     assert(uint32_t(n) < Mint::mod());\n\n        std::vector<Mint> factorial(n,\
-    \ Mint(1));\n        std::vector<Mint> inverse_factorial(n, Mint(1));\n      \
-    \  for (int i = 1; i < n; i++) factorial[i] = factorial[i - 1] * Mint(i);\n  \
-    \      inverse_factorial[n - 1] = factorial[n - 1].inv();\n        for (int i\
-    \ = n - 1; i > 0; i--) inverse_factorial[i - 1] = inverse_factorial[i] * Mint(i);\n\
-    \n        Fps left(n);\n        Fps right(n);\n        Mint power = 1;\n     \
-    \   for (int i = 0; i < n; i++) {\n            left[n - 1 - i] = (*this)[i] *\
-    \ factorial[i];\n            right[i] = power * inverse_factorial[i];\n      \
-    \      power *= shift;\n        }\n        Fps product = left * right;\n     \
-    \   Fps result(n);\n        for (int i = 0; i < n; i++) result[i] = product[n\
-    \ - 1 - i] * inverse_factorial[i];\n        return result;\n    }\n};\n\n}  //\
-    \ namespace fps\n}  // namespace m1une\n\n\n#line 11 \"math/fps/sparse_formal_power_series.hpp\"\
-    \n\nnamespace m1une {\nnamespace fps {\n\ntemplate <class Mint>\nusing SparseFormalPowerSeries\
-    \ = std::vector<std::pair<int, Mint>>;\n\nnamespace internal {\n\ntemplate <class\
-    \ Mint>\nvoid assert_valid_sparse_fps(const SparseFormalPowerSeries<Mint>& terms,\
-    \ int degree) {\n    int previous_degree = -1;\n    for (const auto& [term_degree,\
-    \ coefficient] : terms) {\n        assert(0 <= term_degree && previous_degree\
-    \ < term_degree && term_degree < degree);\n        assert(coefficient != Mint(0));\n\
-    \        previous_degree = term_degree;\n    }\n}\n\ntemplate <class Mint>\nstd::vector<Mint>\
-    \ sparse_integer_inverses(int degree) {\n    assert(degree >= 0 && uint32_t(degree)\
-    \ < Mint::mod());\n    std::vector<Mint> inverse(degree);\n    if (degree <= 1)\
-    \ return inverse;\n    inverse[1] = Mint(1);\n    for (int i = 2; i < degree;\
-    \ i++) {\n        const uint32_t quotient = Mint::mod() / uint32_t(i);\n     \
-    \   const uint32_t remainder = Mint::mod() % uint32_t(i);\n        inverse[i]\
-    \ = Mint(0) - Mint(quotient) * inverse[remainder];\n    }\n    return inverse;\n\
-    }\n\ntemplate <class Mint>\nFormalPowerSeries<Mint> sparse_unit_pow(const SparseFormalPowerSeries<Mint>&\
-    \ terms,\n                                        Mint exponent, int degree) {\n\
-    \    assert(degree > 0 && !terms.empty());\n    assert(terms[0].first == 0 &&\
-    \ terms[0].second == Mint(1));\n    std::vector<Mint> inverse = sparse_integer_inverses<Mint>(degree);\n\
-    \    FormalPowerSeries<Mint> result(degree);\n    result[0] = Mint(1);\n    for\
-    \ (int n = 1; n < degree; n++) {\n        Mint coefficient = 0;\n        for (int\
-    \ i = 1; i < int(terms.size()) && terms[i].first <= n; i++) {\n            const\
-    \ auto& [d, value] = terms[i];\n            coefficient += value * result[n -\
-    \ d] *\n                           (exponent * Mint(d) - Mint(n - d));\n     \
-    \   }\n        result[n] = coefficient * inverse[n];\n    }\n    return result;\n\
-    }\n\n}  // namespace internal\n\ntemplate <class Mint>\nFormalPowerSeries<Mint>\
-    \ sparse_fps_inv(const SparseFormalPowerSeries<Mint>& terms,\n               \
-    \                        int degree) {\n    assert(degree >= 0);\n    if (degree\
-    \ == 0) return {};\n    internal::assert_valid_sparse_fps(terms, degree);\n  \
-    \  assert(!terms.empty() && terms[0].first == 0);\n\n    const Mint inverse_constant\
-    \ = terms[0].second.inv();\n    FormalPowerSeries<Mint> result(degree);\n    result[0]\
-    \ = inverse_constant;\n    for (int n = 1; n < degree; n++) {\n        Mint coefficient\
-    \ = 0;\n        for (int i = 1; i < int(terms.size()) && terms[i].first <= n;\
-    \ i++) {\n            coefficient -= terms[i].second * result[n - terms[i].first];\n\
-    \        }\n        result[n] = coefficient * inverse_constant;\n    }\n    return\
-    \ result;\n}\n\ntemplate <class Mint>\nFormalPowerSeries<Mint> sparse_fps_log(const\
-    \ SparseFormalPowerSeries<Mint>& terms,\n                                    \
-    \   int degree) {\n    assert(degree >= 0);\n    if (degree == 0) return {};\n\
-    \    assert(uint32_t(degree) < Mint::mod());\n    internal::assert_valid_sparse_fps(terms,\
-    \ degree);\n    assert(!terms.empty() && terms[0].first == 0 && terms[0].second\
-    \ == Mint(1));\n\n    std::vector<Mint> inverse = internal::sparse_integer_inverses<Mint>(degree);\n\
-    \    FormalPowerSeries<Mint> result(degree);\n    for (int n = 0; n + 1 < degree;\
-    \ n++) {\n        Mint derivative_quotient = 0;\n        for (int i = 1; i < int(terms.size())\
-    \ && terms[i].first <= n + 1; i++) {\n            const auto& [d, value] = terms[i];\n\
-    \            if (d == n + 1) derivative_quotient += Mint(d) * value;\n       \
-    \     if (d <= n) {\n                derivative_quotient -=\n                \
-    \    value * Mint(n - d + 1) * result[n - d + 1];\n            }\n        }\n\
-    \        result[n + 1] = derivative_quotient * inverse[n + 1];\n    }\n    return\
-    \ result;\n}\n\ntemplate <class Mint>\nFormalPowerSeries<Mint> sparse_fps_exp(const\
-    \ SparseFormalPowerSeries<Mint>& terms,\n                                    \
-    \   int degree) {\n    assert(degree >= 0);\n    if (degree == 0) return {};\n\
-    \    assert(uint32_t(degree) < Mint::mod());\n    internal::assert_valid_sparse_fps(terms,\
-    \ degree);\n    assert(terms.empty() || terms[0].first > 0);\n\n    std::vector<Mint>\
-    \ inverse = internal::sparse_integer_inverses<Mint>(degree);\n    FormalPowerSeries<Mint>\
-    \ result(degree);\n    result[0] = Mint(1);\n    for (int n = 1; n < degree; n++)\
-    \ {\n        Mint coefficient = 0;\n        for (const auto& [d, value] : terms)\
-    \ {\n            if (d > n) break;\n            coefficient += Mint(d) * value\
-    \ * result[n - d];\n        }\n        result[n] = coefficient * inverse[n];\n\
-    \    }\n    return result;\n}\n\ntemplate <class Mint>\nFormalPowerSeries<Mint>\
-    \ sparse_fps_pow(const SparseFormalPowerSeries<Mint>& terms,\n               \
-    \                        long long exponent, int degree) {\n    assert(exponent\
-    \ >= 0 && degree >= 0);\n    if (degree == 0) return {};\n    assert(uint32_t(degree)\
-    \ < Mint::mod());\n    internal::assert_valid_sparse_fps(terms, degree);\n   \
-    \ if (exponent == 0) {\n        FormalPowerSeries<Mint> result(degree);\n    \
-    \    result[0] = Mint(1);\n        return result;\n    }\n    if (terms.empty())\
-    \ return FormalPowerSeries<Mint>(degree);\n\n    const int leading_degree = terms[0].first;\n\
-    \    if (leading_degree > 0 && exponent > (degree - 1) / leading_degree) {\n \
-    \       return FormalPowerSeries<Mint>(degree);\n    }\n    const int offset =\
-    \ int(leading_degree * exponent);\n    const int normalized_degree = degree -\
-    \ offset;\n    const Mint leading = terms[0].second;\n    const Mint inverse_leading\
-    \ = leading.inv();\n    SparseFormalPowerSeries<Mint> normalized;\n    normalized.reserve(terms.size());\n\
-    \    for (const auto& [d, value] : terms) {\n        if (d - leading_degree >=\
-    \ normalized_degree) break;\n        normalized.emplace_back(d - leading_degree,\
-    \ value * inverse_leading);\n    }\n\n    FormalPowerSeries<Mint> unit =\n   \
-    \     internal::sparse_unit_pow(normalized, Mint(exponent), normalized_degree);\n\
-    \    const Mint scale = leading.pow(exponent);\n    FormalPowerSeries<Mint> result(degree);\n\
-    \    for (int i = 0; i < normalized_degree; i++) result[offset + i] = unit[i]\
-    \ * scale;\n    return result;\n}\n\ntemplate <class Mint>\nstd::optional<FormalPowerSeries<Mint>>\
-    \ sparse_fps_sqrt(\n    const SparseFormalPowerSeries<Mint>& terms, int degree)\
-    \ {\n    assert(degree >= 0);\n    if (degree == 0) return FormalPowerSeries<Mint>();\n\
-    \    assert(uint32_t(degree) < Mint::mod());\n    internal::assert_valid_sparse_fps(terms,\
-    \ degree);\n    assert(Mint(2) != Mint(0));\n    if (terms.empty()) return FormalPowerSeries<Mint>(degree);\n\
-    \n    const int leading_degree = terms[0].first;\n    if (leading_degree & 1)\
-    \ return std::nullopt;\n    auto leading_root = m1une::math::modular_square_root(terms[0].second);\n\
-    \    if (!leading_root.has_value()) return std::nullopt;\n\n    const int normalized_degree\
-    \ = degree - leading_degree;\n    const Mint inverse_leading = terms[0].second.inv();\n\
-    \    SparseFormalPowerSeries<Mint> normalized;\n    normalized.reserve(terms.size());\n\
-    \    for (const auto& [d, value] : terms) {\n        normalized.emplace_back(d\
-    \ - leading_degree, value * inverse_leading);\n    }\n    FormalPowerSeries<Mint>\
-    \ unit = internal::sparse_unit_pow(\n        normalized, Mint(2).inv(), normalized_degree);\n\
-    \n    FormalPowerSeries<Mint> result(degree);\n    const int offset = leading_degree\
-    \ / 2;\n    for (int i = 0; i < normalized_degree; i++) {\n        result[offset\
-    \ + i] = unit[i] * *leading_root;\n    }\n    return result;\n}\n\n}  // namespace\
-    \ fps\n}  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_FPS_SPARSE_FORMAL_POWER_SERIES_HPP\n#define M1UNE_FPS_SPARSE_FORMAL_POWER_SERIES_HPP\
-    \ 1\n\n#include <cassert>\n#include <cstdint>\n#include <optional>\n#include <utility>\n\
-    #include <vector>\n\n#include \"formal_power_series.hpp\"\n\nnamespace m1une {\n\
-    namespace fps {\n\ntemplate <class Mint>\nusing SparseFormalPowerSeries = std::vector<std::pair<int,\
-    \ Mint>>;\n\nnamespace internal {\n\ntemplate <class Mint>\nvoid assert_valid_sparse_fps(const\
-    \ SparseFormalPowerSeries<Mint>& terms, int degree) {\n    int previous_degree\
-    \ = -1;\n    for (const auto& [term_degree, coefficient] : terms) {\n        assert(0\
-    \ <= term_degree && previous_degree < term_degree && term_degree < degree);\n\
-    \        assert(coefficient != Mint(0));\n        previous_degree = term_degree;\n\
-    \    }\n}\n\ntemplate <class Mint>\nstd::vector<Mint> sparse_integer_inverses(int\
-    \ degree) {\n    assert(degree >= 0 && uint32_t(degree) < Mint::mod());\n    std::vector<Mint>\
-    \ inverse(degree);\n    if (degree <= 1) return inverse;\n    inverse[1] = Mint(1);\n\
-    \    for (int i = 2; i < degree; i++) {\n        const uint32_t quotient = Mint::mod()\
-    \ / uint32_t(i);\n        const uint32_t remainder = Mint::mod() % uint32_t(i);\n\
-    \        inverse[i] = Mint(0) - Mint(quotient) * inverse[remainder];\n    }\n\
-    \    return inverse;\n}\n\ntemplate <class Mint>\nFormalPowerSeries<Mint> sparse_unit_pow(const\
-    \ SparseFormalPowerSeries<Mint>& terms,\n                                    \
-    \    Mint exponent, int degree) {\n    assert(degree > 0 && !terms.empty());\n\
-    \    assert(terms[0].first == 0 && terms[0].second == Mint(1));\n    std::vector<Mint>\
-    \ inverse = sparse_integer_inverses<Mint>(degree);\n    FormalPowerSeries<Mint>\
-    \ result(degree);\n    result[0] = Mint(1);\n    for (int n = 1; n < degree; n++)\
-    \ {\n        Mint coefficient = 0;\n        for (int i = 1; i < int(terms.size())\
-    \ && terms[i].first <= n; i++) {\n            const auto& [d, value] = terms[i];\n\
-    \            coefficient += value * result[n - d] *\n                        \
-    \   (exponent * Mint(d) - Mint(n - d));\n        }\n        result[n] = coefficient\
-    \ * inverse[n];\n    }\n    return result;\n}\n\n}  // namespace internal\n\n\
-    template <class Mint>\nFormalPowerSeries<Mint> sparse_fps_inv(const SparseFormalPowerSeries<Mint>&\
-    \ terms,\n                                       int degree) {\n    assert(degree\
-    \ >= 0);\n    if (degree == 0) return {};\n    internal::assert_valid_sparse_fps(terms,\
-    \ degree);\n    assert(!terms.empty() && terms[0].first == 0);\n\n    const Mint\
-    \ inverse_constant = terms[0].second.inv();\n    FormalPowerSeries<Mint> result(degree);\n\
-    \    result[0] = inverse_constant;\n    for (int n = 1; n < degree; n++) {\n \
-    \       Mint coefficient = 0;\n        for (int i = 1; i < int(terms.size()) &&\
-    \ terms[i].first <= n; i++) {\n            coefficient -= terms[i].second * result[n\
-    \ - terms[i].first];\n        }\n        result[n] = coefficient * inverse_constant;\n\
-    \    }\n    return result;\n}\n\ntemplate <class Mint>\nFormalPowerSeries<Mint>\
-    \ sparse_fps_log(const SparseFormalPowerSeries<Mint>& terms,\n               \
-    \                        int degree) {\n    assert(degree >= 0);\n    if (degree\
-    \ == 0) return {};\n    assert(uint32_t(degree) < Mint::mod());\n    internal::assert_valid_sparse_fps(terms,\
-    \ degree);\n    assert(!terms.empty() && terms[0].first == 0 && terms[0].second\
-    \ == Mint(1));\n\n    std::vector<Mint> inverse = internal::sparse_integer_inverses<Mint>(degree);\n\
-    \    FormalPowerSeries<Mint> result(degree);\n    for (int n = 0; n + 1 < degree;\
-    \ n++) {\n        Mint derivative_quotient = 0;\n        for (int i = 1; i < int(terms.size())\
-    \ && terms[i].first <= n + 1; i++) {\n            const auto& [d, value] = terms[i];\n\
-    \            if (d == n + 1) derivative_quotient += Mint(d) * value;\n       \
-    \     if (d <= n) {\n                derivative_quotient -=\n                \
-    \    value * Mint(n - d + 1) * result[n - d + 1];\n            }\n        }\n\
-    \        result[n + 1] = derivative_quotient * inverse[n + 1];\n    }\n    return\
-    \ result;\n}\n\ntemplate <class Mint>\nFormalPowerSeries<Mint> sparse_fps_exp(const\
-    \ SparseFormalPowerSeries<Mint>& terms,\n                                    \
-    \   int degree) {\n    assert(degree >= 0);\n    if (degree == 0) return {};\n\
-    \    assert(uint32_t(degree) < Mint::mod());\n    internal::assert_valid_sparse_fps(terms,\
-    \ degree);\n    assert(terms.empty() || terms[0].first > 0);\n\n    std::vector<Mint>\
-    \ inverse = internal::sparse_integer_inverses<Mint>(degree);\n    FormalPowerSeries<Mint>\
-    \ result(degree);\n    result[0] = Mint(1);\n    for (int n = 1; n < degree; n++)\
-    \ {\n        Mint coefficient = 0;\n        for (const auto& [d, value] : terms)\
-    \ {\n            if (d > n) break;\n            coefficient += Mint(d) * value\
-    \ * result[n - d];\n        }\n        result[n] = coefficient * inverse[n];\n\
-    \    }\n    return result;\n}\n\ntemplate <class Mint>\nFormalPowerSeries<Mint>\
-    \ sparse_fps_pow(const SparseFormalPowerSeries<Mint>& terms,\n               \
-    \                        long long exponent, int degree) {\n    assert(exponent\
-    \ >= 0 && degree >= 0);\n    if (degree == 0) return {};\n    assert(uint32_t(degree)\
-    \ < Mint::mod());\n    internal::assert_valid_sparse_fps(terms, degree);\n   \
-    \ if (exponent == 0) {\n        FormalPowerSeries<Mint> result(degree);\n    \
-    \    result[0] = Mint(1);\n        return result;\n    }\n    if (terms.empty())\
-    \ return FormalPowerSeries<Mint>(degree);\n\n    const int leading_degree = terms[0].first;\n\
-    \    if (leading_degree > 0 && exponent > (degree - 1) / leading_degree) {\n \
-    \       return FormalPowerSeries<Mint>(degree);\n    }\n    const int offset =\
-    \ int(leading_degree * exponent);\n    const int normalized_degree = degree -\
-    \ offset;\n    const Mint leading = terms[0].second;\n    const Mint inverse_leading\
-    \ = leading.inv();\n    SparseFormalPowerSeries<Mint> normalized;\n    normalized.reserve(terms.size());\n\
-    \    for (const auto& [d, value] : terms) {\n        if (d - leading_degree >=\
-    \ normalized_degree) break;\n        normalized.emplace_back(d - leading_degree,\
-    \ value * inverse_leading);\n    }\n\n    FormalPowerSeries<Mint> unit =\n   \
-    \     internal::sparse_unit_pow(normalized, Mint(exponent), normalized_degree);\n\
-    \    const Mint scale = leading.pow(exponent);\n    FormalPowerSeries<Mint> result(degree);\n\
-    \    for (int i = 0; i < normalized_degree; i++) result[offset + i] = unit[i]\
-    \ * scale;\n    return result;\n}\n\ntemplate <class Mint>\nstd::optional<FormalPowerSeries<Mint>>\
-    \ sparse_fps_sqrt(\n    const SparseFormalPowerSeries<Mint>& terms, int degree)\
-    \ {\n    assert(degree >= 0);\n    if (degree == 0) return FormalPowerSeries<Mint>();\n\
-    \    assert(uint32_t(degree) < Mint::mod());\n    internal::assert_valid_sparse_fps(terms,\
-    \ degree);\n    assert(Mint(2) != Mint(0));\n    if (terms.empty()) return FormalPowerSeries<Mint>(degree);\n\
-    \n    const int leading_degree = terms[0].first;\n    if (leading_degree & 1)\
-    \ return std::nullopt;\n    auto leading_root = m1une::math::modular_square_root(terms[0].second);\n\
-    \    if (!leading_root.has_value()) return std::nullopt;\n\n    const int normalized_degree\
-    \ = degree - leading_degree;\n    const Mint inverse_leading = terms[0].second.inv();\n\
-    \    SparseFormalPowerSeries<Mint> normalized;\n    normalized.reserve(terms.size());\n\
-    \    for (const auto& [d, value] : terms) {\n        normalized.emplace_back(d\
-    \ - leading_degree, value * inverse_leading);\n    }\n    FormalPowerSeries<Mint>\
-    \ unit = internal::sparse_unit_pow(\n        normalized, Mint(2).inv(), normalized_degree);\n\
-    \n    FormalPowerSeries<Mint> result(degree);\n    const int offset = leading_degree\
-    \ / 2;\n    for (int i = 0; i < normalized_degree; i++) {\n        result[offset\
-    \ + i] = unit[i] * *leading_root;\n    }\n    return result;\n}\n\n}  // namespace\
-    \ fps\n}  // namespace m1une\n\n#endif  // M1UNE_FPS_SPARSE_FORMAL_POWER_SERIES_HPP\n"
+    #undef M1UNE_FPS_HAS_X86_SIMD\n#endif\n\n\n#line 14 \"utilities/bigint.hpp\"\n\
+    \nnamespace m1une {\nnamespace utilities {\n\nstruct BigInt {\n    static constexpr\
+    \ int BASE = 1000000000;\n    static constexpr int BASE_DIGITS = 9;\n\n    std::vector<int>\
+    \ a;\n    int sign;\n\n    BigInt() : sign(1) {}\n\n    BigInt(long long v) {\n\
+    \        *this = v;\n    }\n\n    BigInt(const std::string& s) {\n        read(s);\n\
+    \    }\n\n    BigInt& operator=(long long v) {\n        sign = 1;\n        unsigned\
+    \ long long magnitude = static_cast<unsigned long long>(v);\n        if (v < 0)\
+    \ {\n            sign = -1;\n            magnitude = 0 - magnitude;\n        }\n\
+    \        a.clear();\n        for (; magnitude > 0; magnitude /= BASE) {\n    \
+    \        a.push_back(int(magnitude % BASE));\n        }\n        return *this;\n\
+    \    }\n\n    BigInt& operator=(const std::string& s) {\n        read(s);\n  \
+    \      return *this;\n    }\n\n    void trim() {\n        while (!a.empty() &&\
+    \ a.back() == 0) {\n            a.pop_back();\n        }\n        if (a.empty())\
+    \ sign = 1;\n    }\n\n    void read(const std::string& s) {\n        sign = 1;\n\
+    \        a.clear();\n        int pos = 0;\n        while (pos < (int)s.size()\
+    \ && (s[pos] == '-' || s[pos] == '+')) {\n            if (s[pos] == '-') sign\
+    \ = -1;\n            ++pos;\n        }\n        for (int i = int(s.size()) - 1;\
+    \ i >= pos; i -= BASE_DIGITS) {\n            int x = 0;\n            for (int\
+    \ j = std::max(pos, i - BASE_DIGITS + 1); j <= i; ++j) {\n                x =\
+    \ x * 10 + (s[j] - '0');\n            }\n            a.push_back(x);\n       \
+    \ }\n        trim();\n    }\n\n    std::string to_string() const {\n        if\
+    \ (a.empty()) return \"0\";\n        std::string res = \"\";\n        if (sign\
+    \ == -1) res += '-';\n        res += std::to_string(a.back());\n        for (int\
+    \ i = (int)a.size() - 2; i >= 0; --i) {\n            std::string block = std::to_string(a[i]);\n\
+    \            res += std::string(BASE_DIGITS - block.length(), '0') + block;\n\
+    \        }\n        return res;\n    }\n\n    bool is_zero() const {\n       \
+    \ return a.empty() || (a.size() == 1 && a[0] == 0);\n    }\n\n    BigInt operator-()\
+    \ const {\n        BigInt res = *this;\n        if (!is_zero()) res.sign = -sign;\n\
+    \        return res;\n    }\n\n    BigInt abs() const {\n        BigInt res =\
+    \ *this;\n        res.sign = 1;\n        return res;\n    }\n\n    friend bool\
+    \ operator<(const BigInt& x, const BigInt& y) {\n        if (x.sign != y.sign)\
+    \ return x.sign < y.sign;\n        if (x.a.size() != y.a.size()) {\n         \
+    \   return (x.sign == 1) ? (x.a.size() < y.a.size()) : (x.a.size() > y.a.size());\n\
+    \        }\n        for (int i = (int)x.a.size() - 1; i >= 0; --i) {\n       \
+    \     if (x.a[i] != y.a[i]) {\n                return (x.sign == 1) ? (x.a[i]\
+    \ < y.a[i]) : (x.a[i] > y.a[i]);\n            }\n        }\n        return false;\n\
+    \    }\n\n    friend bool operator>(const BigInt& x, const BigInt& y) {\n    \
+    \    return y < x;\n    }\n    friend bool operator<=(const BigInt& x, const BigInt&\
+    \ y) {\n        return !(y < x);\n    }\n    friend bool operator>=(const BigInt&\
+    \ x, const BigInt& y) {\n        return !(x < y);\n    }\n    friend bool operator==(const\
+    \ BigInt& x, const BigInt& y) {\n        return !(x < y) && !(y < x);\n    }\n\
+    \    friend bool operator!=(const BigInt& x, const BigInt& y) {\n        return\
+    \ x < y || y < x;\n    }\n\n    BigInt& operator+=(const BigInt& other) {\n  \
+    \      if (other.is_zero()) return *this;\n        if (is_zero()) return *this\
+    \ = other;\n        if (sign != other.sign) return *this -= (-other);\n      \
+    \  for (int i = 0, carry = 0; i < (int)std::max(a.size(), other.a.size()) || carry;\
+    \ ++i) {\n            if (i == (int)a.size()) a.push_back(0);\n            a[i]\
+    \ += carry + (i < (int)other.a.size() ? other.a[i] : 0);\n            carry =\
+    \ a[i] >= BASE;\n            if (carry) a[i] -= BASE;\n        }\n        return\
+    \ *this;\n    }\n\n    BigInt& operator-=(const BigInt& other) {\n        if (other.is_zero())\
+    \ return *this;\n        if (is_zero()) return *this = -other;\n        if (sign\
+    \ != other.sign) return *this += (-other);\n        if (abs() < other.abs()) {\n\
+    \            BigInt tmp = other;\n            tmp -= *this;\n            *this\
+    \ = tmp;\n            sign = -sign;\n            return *this;\n        }\n  \
+    \      for (int i = 0, carry = 0; i < (int)other.a.size() || carry; ++i) {\n \
+    \           a[i] -= carry + (i < (int)other.a.size() ? other.a[i] : 0);\n    \
+    \        carry = a[i] < 0;\n            if (carry) a[i] += BASE;\n        }\n\
+    \        trim();\n        return *this;\n    }\n\n    BigInt& operator*=(int v)\
+    \ {\n        long long multiplier = v;\n        if (multiplier < 0) {\n      \
+    \      sign = -sign;\n            multiplier = -multiplier;\n        }\n     \
+    \   long long carry = 0;\n        for (int i = 0; i < (int)a.size() || carry;\
+    \ ++i) {\n            if (i == (int)a.size()) a.push_back(0);\n            const\
+    \ long long cur = a[i] * multiplier + carry;\n            carry = cur / BASE;\n\
+    \            a[i] = (int)(cur % BASE);\n        }\n        trim();\n        return\
+    \ *this;\n    }\n\n   private:\n    static constexpr int MULTIPLICATION_THRESHOLD\
+    \ = 128;\n    static constexpr int DIVISION_THRESHOLD = 64;\n    static constexpr\
+    \ int CONVOLUTION_BASE = 1000;\n\n    static void trim_magnitude(std::vector<int>&\
+    \ value) {\n        while (!value.empty() && value.back() == 0) value.pop_back();\n\
+    \    }\n\n    static bool magnitude_less(const std::vector<int>& lhs, const std::vector<int>&\
+    \ rhs) {\n        if (lhs.size() != rhs.size()) return lhs.size() < rhs.size();\n\
+    \        for (int i = int(lhs.size()) - 1; i >= 0; --i) {\n            if (lhs[i]\
+    \ != rhs[i]) return lhs[i] < rhs[i];\n        }\n        return false;\n    }\n\
+    \n    static bool magnitude_less_equal(const std::vector<int>& lhs,\n        \
+    \                             const std::vector<int>& rhs) {\n        return !magnitude_less(rhs,\
+    \ lhs);\n    }\n\n    static std::vector<int> add_magnitude(const std::vector<int>&\
+    \ lhs,\n                                          const std::vector<int>& rhs)\
+    \ {\n        std::vector<int> result(std::max(lhs.size(), rhs.size()) + 1);\n\
+    \        for (int i = 0; i < int(result.size()) - 1; ++i) {\n            if (i\
+    \ < int(lhs.size())) result[i] += lhs[i];\n            if (i < int(rhs.size()))\
+    \ result[i] += rhs[i];\n            if (result[i] >= BASE) {\n               \
+    \ result[i] -= BASE;\n                result[i + 1]++;\n            }\n      \
+    \  }\n        trim_magnitude(result);\n        return result;\n    }\n\n    static\
+    \ std::vector<int> subtract_magnitude(const std::vector<int>& lhs,\n         \
+    \                                      const std::vector<int>& rhs) {\n      \
+    \  assert(!magnitude_less(lhs, rhs));\n        std::vector<int> result = lhs;\n\
+    \        int borrow = 0;\n        for (int i = 0; i < int(result.size()); ++i)\
+    \ {\n            const long long current =\n                (long long)result[i]\
+    \ - borrow - (i < int(rhs.size()) ? rhs[i] : 0);\n            if (current < 0)\
+    \ {\n                result[i] = int(current + BASE);\n                borrow\
+    \ = 1;\n            } else {\n                result[i] = int(current);\n    \
+    \            borrow = 0;\n            }\n        }\n        assert(borrow == 0);\n\
+    \        trim_magnitude(result);\n        return result;\n    }\n\n    static\
+    \ std::vector<int> multiply_naive(const std::vector<int>& lhs,\n             \
+    \                              const std::vector<int>& rhs) {\n        if (lhs.empty()\
+    \ || rhs.empty()) return std::vector<int>();\n        std::vector<long long> product(lhs.size()\
+    \ + rhs.size());\n        constexpr long long REDUCTION = 4LL * BASE * BASE;\n\
+    \        for (int i = 0; i < int(lhs.size()); ++i) {\n            for (int j =\
+    \ 0; j < int(rhs.size()); ++j) {\n                product[i + j] += (long long)lhs[i]\
+    \ * rhs[j];\n                if (product[i + j] >= REDUCTION) {\n            \
+    \        product[i + j] -= REDUCTION;\n                    product[i + j + 1]\
+    \ += 4LL * BASE;\n                }\n            }\n        }\n\n        std::vector<int>\
+    \ result;\n        result.reserve(product.size() + 1);\n        long long carry\
+    \ = 0;\n        for (int i = 0; i < int(product.size()) || carry > 0; ++i) {\n\
+    \            if (i < int(product.size())) carry += product[i];\n            result.push_back(int(carry\
+    \ % BASE));\n            carry /= BASE;\n        }\n        trim_magnitude(result);\n\
+    \        return result;\n    }\n\n    static std::vector<int> split_for_convolution(const\
+    \ std::vector<int>& value) {\n        std::vector<int> result(3 * value.size());\n\
+    \        for (int i = 0; i < int(value.size()); ++i) {\n            int limb =\
+    \ value[i];\n            result[3 * i] = limb % CONVOLUTION_BASE;\n          \
+    \  limb /= CONVOLUTION_BASE;\n            result[3 * i + 1] = limb % CONVOLUTION_BASE;\n\
+    \            result[3 * i + 2] = limb / CONVOLUTION_BASE;\n        }\n       \
+    \ trim_magnitude(result);\n        return result;\n    }\n\n    static std::vector<int>\
+    \ multiply_convolution(const std::vector<int>& lhs,\n                        \
+    \                         const std::vector<int>& rhs) {\n        using Mint1\
+    \ = math::ModInt<998244353>;\n        using Mint2 = math::ModInt<754974721>;\n\
+    \n        const std::vector<int> lhs_digits = split_for_convolution(lhs);\n  \
+    \      const std::vector<int> rhs_digits = split_for_convolution(rhs);\n     \
+    \   const int result_size = int(lhs_digits.size() + rhs_digits.size() - 1);\n\
+    \        assert(result_size <= (1 << 24));\n\n        std::vector<Mint1> residues1;\n\
+    \        {\n            std::vector<Mint1> x(lhs_digits.begin(), lhs_digits.end());\n\
+    \            std::vector<Mint1> y(rhs_digits.begin(), rhs_digits.end());\n   \
+    \         residues1 = fps::convolution(x, y);\n        }\n        std::vector<Mint2>\
+    \ residues2;\n        {\n            std::vector<Mint2> x(lhs_digits.begin(),\
+    \ lhs_digits.end());\n            std::vector<Mint2> y(rhs_digits.begin(), rhs_digits.end());\n\
+    \            residues2 = fps::convolution(x, y);\n        }\n\n        constexpr\
+    \ uint64_t MOD1 = Mint1::mod();\n        constexpr uint64_t MOD2 = Mint2::mod();\n\
+    \        const uint64_t inverse_mod1 = Mint2(MOD1).inv().val();\n        std::vector<int>\
+    \ digits;\n        digits.reserve(result_size + 8);\n        uint64_t carry =\
+    \ 0;\n        for (int i = 0; i < result_size || carry > 0; ++i) {\n         \
+    \   if (i < result_size) {\n                const uint64_t first = residues1[i].val();\n\
+    \                const uint64_t second = residues2[i].val();\n               \
+    \ const uint64_t difference = (second + MOD2 - first % MOD2) % MOD2;\n       \
+    \         const uint64_t quotient = difference * inverse_mod1 % MOD2;\n      \
+    \          carry += first + MOD1 * quotient;\n            }\n            digits.push_back(int(carry\
+    \ % CONVOLUTION_BASE));\n            carry /= CONVOLUTION_BASE;\n        }\n\n\
+    \        std::vector<int> result((digits.size() + 2) / 3);\n        constexpr\
+    \ int POWER[3] = {1, CONVOLUTION_BASE,\n                                  CONVOLUTION_BASE\
+    \ * CONVOLUTION_BASE};\n        for (int i = 0; i < int(digits.size()); ++i) {\n\
+    \            result[i / 3] += digits[i] * POWER[i % 3];\n        }\n        trim_magnitude(result);\n\
+    \        return result;\n    }\n\n    static std::vector<int> multiply_magnitude(const\
+    \ std::vector<int>& lhs,\n                                               const\
+    \ std::vector<int>& rhs) {\n        if (lhs.empty() || rhs.empty()) return std::vector<int>();\n\
+    \        if (std::min(lhs.size(), rhs.size()) <= MULTIPLICATION_THRESHOLD) {\n\
+    \            return multiply_naive(lhs, rhs);\n        }\n        return multiply_convolution(lhs,\
+    \ rhs);\n    }\n\n    static std::pair<std::vector<int>, std::vector<int>> divide_by_limb(\n\
+    \        const std::vector<int>& dividend, int divisor) {\n        assert(0 <\
+    \ divisor && divisor < BASE);\n        if (divisor == 1) {\n            return\
+    \ std::make_pair(dividend, std::vector<int>());\n        }\n        std::vector<int>\
+    \ quotient(dividend.size());\n        long long remainder = 0;\n        for (int\
+    \ i = int(dividend.size()) - 1; i >= 0; --i) {\n            const long long current\
+    \ = remainder * BASE + dividend[i];\n            quotient[i] = int(current / divisor);\n\
+    \            remainder = current % divisor;\n        }\n        trim_magnitude(quotient);\n\
+    \        std::vector<int> remainder_digits;\n        if (remainder != 0) remainder_digits.push_back(int(remainder));\n\
+    \        return std::make_pair(std::move(quotient), std::move(remainder_digits));\n\
+    \    }\n\n    static std::pair<std::vector<int>, std::vector<int>> divide_naive(\n\
+    \        const std::vector<int>& dividend, const std::vector<int>& divisor) {\n\
+    \        assert(!divisor.empty());\n        if (divisor.size() == 1) return divide_by_limb(dividend,\
+    \ divisor[0]);\n        if (magnitude_less(dividend, divisor)) {\n           \
+    \ return std::make_pair(std::vector<int>(), dividend);\n        }\n\n        const\
+    \ int normalization = BASE / (divisor.back() + 1);\n        const std::vector<int>\
+    \ normalized_dividend =\n            multiply_magnitude(dividend, std::vector<int>(1,\
+    \ normalization));\n        const std::vector<int> normalized_divisor =\n    \
+    \        multiply_magnitude(divisor, std::vector<int>(1, normalization));\n  \
+    \      const long long leading_divisor = normalized_divisor.back();\n        std::vector<int>\
+    \ quotient(normalized_dividend.size() - normalized_divisor.size() + 1);\n    \
+    \    std::vector<int> remainder(normalized_dividend.end() - normalized_divisor.size(),\n\
+    \                                   normalized_dividend.end());\n\n        for\
+    \ (int i = int(quotient.size()) - 1; i >= 0; --i) {\n            if (remainder.size()\
+    \ < normalized_divisor.size()) {\n                quotient[i] = 0;\n         \
+    \   } else if (remainder.size() == normalized_divisor.size()) {\n            \
+    \    if (magnitude_less_equal(normalized_divisor, remainder)) {\n            \
+    \        quotient[i] = 1;\n                    remainder = subtract_magnitude(remainder,\
+    \ normalized_divisor);\n                }\n            } else {\n            \
+    \    assert(remainder.size() == normalized_divisor.size() + 1);\n            \
+    \    const long long leading_remainder =\n                    (long long)remainder.back()\
+    \ * BASE + remainder[remainder.size() - 2];\n                int digit = int(leading_remainder\
+    \ / leading_divisor);\n                if (digit >= BASE) digit = BASE - 1;\n\
+    \                std::vector<int> product = multiply_magnitude(\n            \
+    \        normalized_divisor, std::vector<int>(1, digit));\n                while\
+    \ (magnitude_less(remainder, product)) {\n                    --digit;\n     \
+    \               product = subtract_magnitude(product, normalized_divisor);\n \
+    \               }\n                remainder = subtract_magnitude(remainder, product);\n\
+    \                while (magnitude_less_equal(normalized_divisor, remainder)) {\n\
+    \                    ++digit;\n                    remainder = subtract_magnitude(remainder,\
+    \ normalized_divisor);\n                }\n                quotient[i] = digit;\n\
+    \            }\n            if (i > 0) remainder.insert(remainder.begin(), normalized_dividend[i\
+    \ - 1]);\n        }\n\n        trim_magnitude(quotient);\n        trim_magnitude(remainder);\n\
+    \        std::pair<std::vector<int>, std::vector<int>> denormalized =\n      \
+    \      divide_by_limb(remainder, normalization);\n        assert(denormalized.second.empty());\n\
+    \        return std::make_pair(std::move(quotient), std::move(denormalized.first));\n\
+    \    }\n\n    static std::vector<int> reciprocal(const std::vector<int>& value,\
+    \ int degree) {\n        assert(!value.empty());\n        assert(BASE / 2 <= value.back()\
+    \ && value.back() < BASE);\n        assert(degree >= 0);\n\n        int precision\
+    \ = degree;\n        const int value_size = int(value.size());\n        while\
+    \ (precision > DIVISION_THRESHOLD) precision = (precision + 1) / 2;\n\n      \
+    \  std::vector<int> inverse(value_size + precision + 1);\n        inverse.back()\
+    \ = 1;\n        inverse = divide_naive(inverse, value).first;\n\n        while\
+    \ (precision < degree) {\n            std::vector<int> square = multiply_magnitude(inverse,\
+    \ inverse);\n            square.insert(square.begin(), 0);\n\n            std::vector<int>\
+    \ leading(2 * precision + 1);\n            const int copied = std::min(value_size,\
+    \ int(leading.size()));\n            std::copy(value.end() - copied, value.end(),\
+    \ leading.end() - copied);\n\n            std::vector<int> correction = multiply_magnitude(square,\
+    \ leading);\n            assert(int(correction.size()) >= 2 * precision + 1);\n\
+    \            correction.erase(correction.begin(), correction.begin() + 2 * precision\
+    \ + 1);\n\n            std::vector<int> shifted(precision + 1);\n            const\
+    \ std::vector<int> doubled = add_magnitude(inverse, inverse);\n            shifted.insert(shifted.end(),\
+    \ doubled.begin(), doubled.end());\n            inverse = subtract_magnitude(shifted,\
+    \ correction);\n            assert(!inverse.empty());\n            inverse.erase(inverse.begin());\n\
+    \            precision *= 2;\n        }\n\n        assert(precision >= degree);\n\
+    \        inverse.erase(inverse.begin(), inverse.begin() + precision - degree);\n\
+    \        trim_magnitude(inverse);\n        return inverse;\n    }\n\n    static\
+    \ std::pair<std::vector<int>, std::vector<int>> divide_magnitude(\n        const\
+    \ std::vector<int>& dividend, const std::vector<int>& divisor) {\n        assert(!divisor.empty());\n\
+    \        if (divisor.size() <= DIVISION_THRESHOLD ||\n            int(dividend.size())\
+    \ - int(divisor.size()) <= DIVISION_THRESHOLD) {\n            return divide_naive(dividend,\
+    \ divisor);\n        }\n\n        const int normalization = BASE / (divisor.back()\
+    \ + 1);\n        const std::vector<int> normalized_dividend =\n            multiply_magnitude(dividend,\
+    \ std::vector<int>(1, normalization));\n        const std::vector<int> normalized_divisor\
+    \ =\n            multiply_magnitude(divisor, std::vector<int>(1, normalization));\n\
+    \        const int dividend_size = int(normalized_dividend.size());\n        const\
+    \ int divisor_size = int(normalized_divisor.size());\n        const int degree\
+    \ = dividend_size - divisor_size + 2;\n        const std::vector<int> inverse\
+    \ = reciprocal(normalized_divisor, degree);\n\n        std::vector<int> quotient\
+    \ = multiply_magnitude(normalized_dividend, inverse);\n        const int discarded\
+    \ = divisor_size + degree;\n        assert(discarded <= int(quotient.size()));\n\
+    \        quotient.erase(quotient.begin(), quotient.begin() + discarded);\n\n \
+    \       std::vector<int> product = multiply_magnitude(normalized_divisor, quotient);\n\
+    \        while (magnitude_less(normalized_dividend, product)) {\n            quotient\
+    \ = subtract_magnitude(quotient, std::vector<int>(1, 1));\n            product\
+    \ = subtract_magnitude(product, normalized_divisor);\n        }\n        std::vector<int>\
+    \ remainder = subtract_magnitude(normalized_dividend, product);\n        while\
+    \ (magnitude_less_equal(normalized_divisor, remainder)) {\n            quotient\
+    \ = add_magnitude(quotient, std::vector<int>(1, 1));\n            remainder =\
+    \ subtract_magnitude(remainder, normalized_divisor);\n        }\n        trim_magnitude(quotient);\n\
+    \        trim_magnitude(remainder);\n\n        std::pair<std::vector<int>, std::vector<int>>\
+    \ denormalized =\n            divide_by_limb(remainder, normalization);\n    \
+    \    assert(denormalized.second.empty());\n        return std::make_pair(std::move(quotient),\
+    \ std::move(denormalized.first));\n    }\n\n   public:\n    BigInt& operator*=(const\
+    \ BigInt& other) {\n        if (is_zero() || other.is_zero()) return *this = 0;\n\
+    \        const int result_sign = sign * other.sign;\n        a = multiply_magnitude(a,\
+    \ other.a);\n        sign = result_sign;\n        trim();\n        return *this;\n\
+    \    }\n\n    friend std::pair<BigInt, BigInt> divmod(const BigInt& a1, const\
+    \ BigInt& b1) {\n        if (b1.is_zero()) {\n            throw std::domain_error(\"\
+    BigInt division by zero\");\n        }\n        std::pair<std::vector<int>, std::vector<int>>\
+    \ result =\n            divide_magnitude(a1.a, b1.a);\n        BigInt q, r;\n\
+    \        q.a = std::move(result.first);\n        r.a = std::move(result.second);\n\
+    \        q.sign = a1.sign * b1.sign;\n        r.sign = a1.sign;\n        q.trim();\n\
+    \        r.trim();\n        return {q, r};\n    }\n\n    BigInt& operator/=(const\
+    \ BigInt& other) {\n        return *this = divmod(*this, other).first;\n    }\n\
+    \    BigInt& operator%=(const BigInt& other) {\n        return *this = divmod(*this,\
+    \ other).second;\n    }\n\n    friend BigInt operator+(BigInt x, const BigInt&\
+    \ y) {\n        return x += y;\n    }\n    friend BigInt operator-(BigInt x, const\
+    \ BigInt& y) {\n        return x -= y;\n    }\n    friend BigInt operator*(BigInt\
+    \ x, const BigInt& y) {\n        return x *= y;\n    }\n    friend BigInt operator/(BigInt\
+    \ x, const BigInt& y) {\n        return x /= y;\n    }\n    friend BigInt operator%(BigInt\
+    \ x, const BigInt& y) {\n        return x %= y;\n    }\n\n    friend std::ostream&\
+    \ operator<<(std::ostream& os, const BigInt& b) {\n        return os << b.to_string();\n\
+    \    }\n\n    friend std::istream& operator>>(std::istream& is, BigInt& b) {\n\
+    \        std::string s;\n        if (is >> s) b.read(s);\n        return is;\n\
+    \    }\n};\n\n}  // namespace utilities\n}  // namespace m1une\n\n\n#line 1 \"\
+    utilities/fast_io.hpp\"\n\n\n\n#line 5 \"utilities/fast_io.hpp\"\n#include <charconv>\n\
+    #include <cstddef>\n#include <cstdio>\n#include <cstdlib>\n#line 11 \"utilities/fast_io.hpp\"\
+    \n#include <iterator>\n#line 15 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n\
+    \nnamespace m1une {\nnamespace utilities {\nnamespace internal {\n\n// Detect\
+    \ std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct is_range\
+    \ : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
+    \    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
+    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
+    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
+    \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
+    \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
+    \ std::void_t<typename std::remove_cv_t<std::remove_reference_t<T>>::value_type>>\
+    \ {\n    using type = typename std::remove_cv_t<std::remove_reference_t<T>>::value_type;\n\
+    };\n\ntemplate <class T>\nusing range_stored_value_t = typename range_stored_value<T>::type;\n\
+    \n// Treat strings and C strings as scalar output objects, not as ranges.\ntemplate\
+    \ <class T>\nstruct is_char_array : std::false_type {};\n\ntemplate <class T,\
+    \ std::size_t N>\nstruct is_char_array<T[N]>\n    : std::bool_constant<std::is_same_v<std::remove_cv_t<T>,\
+    \ char>> {};\n\ntemplate <class T>\nstruct is_string_like\n    : std::bool_constant<\n\
+    \          std::is_same_v<std::decay_t<T>, std::string>\n          || std::is_same_v<std::decay_t<T>,\
+    \ const char*>\n          || std::is_same_v<std::decay_t<T>, char*>\n        \
+    \  || is_char_array<std::remove_reference_t<T>>::value\n      > {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_string_like_v = is_string_like<T>::value;\n\
+    \n// ModInt-like type: x.val() is printable, and x can be assigned from long long.\n\
+    template <class T, class = void>\nstruct has_val_method : std::false_type {};\n\
+    \ntemplate <class T>\nstruct has_val_method<T, std::void_t<decltype(std::declval<const\
+    \ T&>().val())>>\n    : std::true_type {};\n\ntemplate <class T>\ninline constexpr\
+    \ bool has_val_method_v = has_val_method<T>::value;\n\ntemplate <class T, class\
+    \ = void>\nstruct has_static_mod_raw : std::false_type {};\n\ntemplate <class\
+    \ T>\nstruct has_static_mod_raw<\n    T, std::void_t<decltype(T::mod()), decltype(T::raw(std::declval<uint32_t>()))>>\n\
+    \    : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool has_static_mod_raw_v\
+    \ = has_static_mod_raw<T>::value;\n\n// libstdc++ before GCC 16 does not classify\
+    \ __int128 as an integral type in\n// strict ISO modes such as -std=c++23. Keep\
+    \ the fast-I/O interface independent\n// of that implementation detail.\ntemplate\
+    \ <class T>\ninline constexpr bool is_integral_v =\n    std::is_integral_v<T>\n\
+    \    || std::is_same_v<std::remove_cv_t<T>, __int128_t>\n    || std::is_same_v<std::remove_cv_t<T>,\
+    \ __uint128_t>;\n\ntemplate <class T>\ninline constexpr bool is_signed_v =\n \
+    \   std::is_signed_v<T>\n    || std::is_same_v<std::remove_cv_t<T>, __int128_t>;\n\
+    \ntemplate <class T>\nstruct make_unsigned {\n    using type = std::make_unsigned_t<T>;\n\
+    };\n\ntemplate <>\nstruct make_unsigned<__int128_t> {\n    using type = __uint128_t;\n\
+    };\n\ntemplate <>\nstruct make_unsigned<__uint128_t> {\n    using type = __uint128_t;\n\
+    };\n\ntemplate <class T>\nusing make_unsigned_t = typename make_unsigned<std::remove_cv_t<T>>::type;\n\
+    \n}  // namespace internal\n\nstruct FastInput {\n    static constexpr int buffer_size\
+    \ = 1 << 20;\n\n   private:\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
+    \    int _position;\n    int _length;\n    bool _terminal;\n\n    bool refill()\
+    \ {\n        _position = 0;\n        if (_terminal) {\n            if (std::fgets(_buffer,\
+    \ buffer_size, _stream) == nullptr) {\n                _length = 0;\n        \
+    \        return false;\n            }\n            _length = int(std::strlen(_buffer));\n\
+    \        } else {\n            _length = int(std::fread(_buffer, 1, buffer_size,\
+    \ _stream));\n        }\n        return _length != 0;\n    }\n\n    template <class\
+    \ T>\n    bool read_integer_from_terminal(T& value) {\n        if (!skip_spaces())\
+    \ return false;\n        int c = read_char_raw();\n\n        bool negative = false;\n\
+    \        if (c == '-') {\n            negative = true;\n            c = read_char_raw();\n\
+    \        }\n\n        if constexpr (internal::is_signed_v<T>) {\n            T\
+    \ result = 0;\n            while ('0' <= c && c <= '9') {\n                result\
+    \ = negative ? result * 10 - (c - '0')\n                                  : result\
+    \ * 10 + (c - '0');\n                c = read_char_raw();\n            }\n   \
+    \         value = result;\n        } else {\n            T result = 0;\n     \
+    \       while ('0' <= c && c <= '9') {\n                result = result * 10 +\
+    \ T(c - '0');\n                c = read_char_raw();\n            }\n         \
+    \   value = negative ? T(0) - result : result;\n        }\n        return true;\n\
+    \    }\n\n    bool prepare_number() {\n        if (_length - _position >= 64)\
+    \ return true;\n        const int remaining = _length - _position;\n        if\
+    \ (remaining > 0) std::memmove(_buffer, _buffer + _position, remaining);\n   \
+    \     const int added = int(std::fread(_buffer + remaining, 1, buffer_size - remaining,\
+    \ _stream));\n        _position = 0;\n        _length = remaining + added;\n \
+    \       if (_length < buffer_size) _buffer[_length] = '\\0';\n        return _length\
+    \ != 0;\n    }\n\n   public:\n    explicit FastInput(std::FILE* stream = stdin)\n\
+    \        : _stream(stream),\n          _position(0),\n          _length(0),\n\
+    \          _terminal(::isatty(::fileno(stream)) != 0) {}\n\n    FastInput(const\
+    \ FastInput&) = delete;\n    FastInput& operator=(const FastInput&) = delete;\n\
+    \n    int read_char_raw() {\n        if (_position == _length && !refill()) return\
+    \ EOF;\n        return _buffer[_position++];\n    }\n\n    bool skip_spaces()\
+    \ {\n        int c = read_char_raw();\n        while (c != EOF && c <= ' ') c\
+    \ = read_char_raw();\n        if (c == EOF) return false;\n        --_position;\n\
+    \        return true;\n    }\n\n    bool read(char& value) {\n        if (!skip_spaces())\
+    \ return false;\n        value = char(read_char_raw());\n        return true;\n\
+    \    }\n\n    bool read(std::string& value) {\n        if (!skip_spaces()) return\
+    \ false;\n        value.clear();\n        int c = read_char_raw();\n        while\
+    \ (c != EOF && c > ' ') {\n            value.push_back(char(c));\n           \
+    \ c = read_char_raw();\n        }\n        return true;\n    }\n\n    bool read(bool&\
+    \ value) {\n        int x;\n        if (!read(x)) return false;\n        value\
+    \ = x != 0;\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
+    \        internal::is_integral_v<T>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ bool>\n            && !std::is_same_v<std::remove_cv_t<T>, char>,\n        bool\n\
+    \    >\n    read(T& value) {\n        if (_terminal) return read_integer_from_terminal(value);\n\
+    \        if (!prepare_number()) return false;\n        int c = static_cast<unsigned\
+    \ char>(_buffer[_position++]);\n        while (c <= ' ') c = static_cast<unsigned\
+    \ char>(_buffer[_position++]);\n\n        bool negative = false;\n        if (c\
+    \ == '-') {\n            negative = true;\n            c = static_cast<unsigned\
+    \ char>(_buffer[_position++]);\n        }\n\n        if constexpr (internal::is_signed_v<T>)\
+    \ {\n            T result = 0;\n            while ('0' <= c && c <= '9') {\n \
+    \               const int first = c - '0';\n                const int second =\
+    \ static_cast<unsigned char>(_buffer[_position]) - '0';\n                if (0\
+    \ <= second && second <= 9) {\n                    result = negative ? result\
+    \ * 100 - (first * 10 + second)\n                                      : result\
+    \ * 100 + (first * 10 + second);\n                    ++_position;\n         \
+    \       } else {\n                    result = negative ? result * 10 - first\
+    \ : result * 10 + first;\n                }\n                c = static_cast<unsigned\
+    \ char>(_buffer[_position++]);\n            }\n            value = result;\n \
+    \       } else {\n            T result = 0;\n            while ('0' <= c && c\
+    \ <= '9') {\n                const unsigned first = unsigned(c - '0');\n     \
+    \           const int second = static_cast<unsigned char>(_buffer[_position])\
+    \ - '0';\n                if (0 <= second && second <= 9) {\n                \
+    \    result = result * 100 + T(first * 10 + unsigned(second));\n             \
+    \       ++_position;\n                } else {\n                    result = result\
+    \ * 10 + T(first);\n                }\n                c = static_cast<unsigned\
+    \ char>(_buffer[_position++]);\n            }\n            value = negative ?\
+    \ T(0) - result : result;\n        }\n        if (_position > _length) _position\
+    \ = _length;\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>,\
+    \ bool>\n    read(T& value) {\n        if (!skip_spaces()) return false;\n   \
+    \     int c = read_char_raw();\n        bool negative = false;\n        if (c\
+    \ == '-' || c == '+') {\n            negative = c == '-';\n            c = read_char_raw();\n\
+    \        }\n\n        long double result = 0;\n        while ('0' <= c && c <=\
+    \ '9') {\n            result = result * 10 + (c - '0');\n            c = read_char_raw();\n\
+    \        }\n        if (c == '.') {\n            long double place = 0.1L;\n \
+    \           c = read_char_raw();\n            while ('0' <= c && c <= '9') {\n\
+    \                result += (c - '0') * place;\n                place *= 0.1L;\n\
+    \                c = read_char_raw();\n            }\n        }\n        if (c\
+    \ == 'e' || c == 'E') {\n            c = read_char_raw();\n            bool exponent_negative\
+    \ = false;\n            if (c == '-' || c == '+') {\n                exponent_negative\
+    \ = c == '-';\n                c = read_char_raw();\n            }\n         \
+    \   int exponent = 0;\n            while ('0' <= c && c <= '9') {\n          \
+    \      exponent = exponent * 10 + (c - '0');\n                c = read_char_raw();\n\
+    \            }\n            long double scale = 1;\n            long double power\
+    \ = 10;\n            while (exponent > 0) {\n                if (exponent & 1)\
+    \ scale *= power;\n                power *= power;\n                exponent >>=\
+    \ 1;\n            }\n            result = exponent_negative ? result / scale :\
+    \ result * scale;\n        }\n        value = static_cast<T>(negative ? -result\
+    \ : result);\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
+    \        internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
+    \            && !internal::is_range_v<T>,\n        bool\n    >\n    read(T& value)\
+    \ {\n        long long x;\n        if (!read(x)) return false;\n        if constexpr\
+    \ (internal::has_static_mod_raw_v<T>) {\n            if (x >= 0 && uint64_t(x)\
+    \ < uint64_t(T::mod())) {\n                value = T::raw(uint32_t(x));\n    \
+    \        } else {\n                value = T(x);\n            }\n        } else\
+    \ {\n            value = T(x);\n        }\n        return true;\n    }\n\n   \
+    \ template <class First, class Second>\n    bool read(std::pair<First, Second>&\
+    \ value) {\n        if (!read(value.first)) return false;\n        return read(value.second);\n\
+    \    }\n\n    template <class Range>\n    std::enable_if_t<\n        internal::is_range_v<Range>\n\
+    \            && !internal::is_string_like_v<Range>,\n        bool\n    >\n   \
+    \ read(Range& range) {\n        using StoredValue = internal::range_stored_value_t<Range>;\n\
+    \        constexpr bool nested = internal::is_range_v<StoredValue>\n         \
+    \                       && !internal::is_string_like_v<StoredValue>;\n\n     \
+    \   for (auto&& value : range) {\n            if constexpr (std::is_same_v<StoredValue,\
+    \ bool> && !nested) {\n                bool x;\n                if (!read(x))\
+    \ return false;\n                value = x;\n            } else {\n          \
+    \      if (!read(value)) return false;\n            }\n        }\n        return\
+    \ true;\n    }\n\n    template <class First, class Second, class... Rest>\n  \
+    \  bool read(First& first, Second& second, Rest&... rest) {\n        if (!read(first))\
+    \ return false;\n        return read(second, rest...);\n    }\n\n    template\
+    \ <class T>\n    FastInput& operator>>(T& value) {\n        if (!read(value))\
+    \ std::abort();\n        return *this;\n    }\n};\n\nstruct FastOutput {\n   \
+    \ static constexpr int buffer_size = 1 << 20;\n\n   private:\n    inline static\
+    \ const auto digit_quads = [] {\n        std::array<char, 40000> result{};\n \
+    \       for (int i = 0; i < 10000; i++) {\n            int value = i;\n      \
+    \      for (int j = 3; j >= 0; j--) {\n                result[4 * i + j] = char('0'\
+    \ + value % 10);\n                value /= 10;\n            }\n        }\n   \
+    \     return result;\n    }();\n\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
+    \    int _position;\n    int _precision;\n    std::chars_format _float_format;\n\
+    \    char _range_separator;\n\n   public:\n    explicit FastOutput(std::FILE*\
+    \ stream = stdout)\n        : _stream(stream),\n          _position(0),\n    \
+    \      _precision(6),\n          _float_format(std::chars_format::general),\n\
+    \          _range_separator(' ') {}\n\n    FastOutput(const FastOutput&) = delete;\n\
+    \    FastOutput& operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n\
+    \        flush();\n    }\n\n    void flush() {\n        if (_position == 0) return;\n\
+    \        std::fwrite(_buffer, 1, _position, _stream);\n        _position = 0;\n\
+    \    }\n\n    void write_char(char c) {\n        if (_position == buffer_size)\
+    \ flush();\n        _buffer[_position++] = c;\n    }\n\n    void write(const char*\
+    \ s) {\n        while (*s != '\\0') write_char(*s++);\n    }\n\n    void write(const\
+    \ std::string& s) {\n        for (char c : s) write_char(c);\n    }\n\n    void\
+    \ write(char c) {\n        write_char(c);\n    }\n\n    void write(bool value)\
+    \ {\n        write_char(value ? '1' : '0');\n    }\n\n    template <class T>\n\
+    \    std::enable_if_t<std::is_floating_point_v<T>>\n    write(T value) {\n   \
+    \     char digits[128];\n        auto [end, error] = std::to_chars(\n        \
+    \    digits,\n            digits + sizeof(digits),\n            value,\n     \
+    \       _float_format,\n            _precision\n        );\n        if (error\
+    \ != std::errc()) std::abort();\n        for (const char* pointer = digits; pointer\
+    \ != end; pointer++) {\n            write_char(*pointer);\n        }\n    }\n\n\
+    \    template <class T>\n    std::enable_if_t<\n        internal::is_integral_v<T>\n\
+    \            && !std::is_same_v<std::remove_cv_t<T>, bool>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ char>\n    >\n    write(T value) {\n        using Raw = std::remove_cv_t<T>;\n\
+    \        using Unsigned = internal::make_unsigned_t<Raw>;\n\n        Unsigned\
+    \ magnitude;\n        if constexpr (internal::is_signed_v<Raw>) {\n          \
+    \  if (value < 0) {\n                write_char('-');\n                magnitude\
+    \ = Unsigned(0) - Unsigned(value);\n            } else {\n                magnitude\
+    \ = Unsigned(value);\n            }\n        } else {\n            magnitude =\
+    \ value;\n        }\n\n        if (magnitude == 0) {\n            write_char('0');\n\
+    \            return;\n        }\n\n        unsigned chunks[16];\n        int count\
+    \ = 0;\n        while (magnitude >= 10000) {\n            const Unsigned quotient\
+    \ = magnitude / 10000;\n            chunks[count++] = unsigned(magnitude - quotient\
+    \ * 10000);\n            magnitude = quotient;\n        }\n        if (_position\
+    \ > buffer_size - 64) flush();\n        const unsigned leading = unsigned(magnitude);\n\
+    \        const char* first = digit_quads.data() + 4 * leading;\n        int skip\
+    \ = leading < 10 ? 3 : leading < 100 ? 2 : leading < 1000 ? 1 : 0;\n        for\
+    \ (; skip < 4; skip++) _buffer[_position++] = first[skip];\n        while (count--)\
+    \ {\n            const char* digits = digit_quads.data() + 4 * chunks[count];\n\
+    \            std::memcpy(_buffer + _position, digits, 4);\n            _position\
+    \ += 4;\n        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n \
+    \       internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
+    \            && !internal::is_range_v<T>\n    >\n    write(const T& value) {\n\
+    \        write(value.val());\n    }\n\n    template <class First, class Second>\n\
+    \    void write(const std::pair<First, Second>& value) {\n        write(value.first);\n\
+    \        write_char(' ');\n        write(value.second);\n    }\n\n    template\
+    \ <class Range>\n    std::enable_if_t<\n        internal::is_range_v<Range>\n\
+    \            && !internal::is_string_like_v<Range>\n    >\n    write(const Range&\
+    \ range) {\n        using StoredValue = internal::range_stored_value_t<const Range>;\n\
+    \        constexpr bool nested = internal::is_range_v<StoredValue>\n         \
+    \                       && !internal::is_string_like_v<StoredValue>;\n\n     \
+    \   bool first = true;\n        for (const auto& value : range) {\n          \
+    \  if (!first) write_char(nested ? '\\n' : _range_separator);\n            first\
+    \ = false;\n            if constexpr (std::is_same_v<StoredValue, bool> && !nested)\
+    \ {\n                write(static_cast<bool>(value));\n            } else {\n\
+    \                write(value);\n            }\n        }\n    }\n\n    template\
+    \ <class First, class... Rest>\n    void print(const First& first, const Rest&...\
+    \ rest) {\n        write(first);\n        ((write_char(' '), write(rest)), ...);\n\
+    \    }\n\n    void println() {\n        write_char('\\n');\n    }\n\n    void\
+    \ set_precision(int precision) {\n        _precision = precision;\n    }\n\n \
+    \   void set_fixed(int precision = 6) {\n        _float_format = std::chars_format::fixed;\n\
+    \        _precision = precision;\n    }\n\n    void set_general(int precision\
+    \ = 6) {\n        _float_format = std::chars_format::general;\n        _precision\
+    \ = precision;\n    }\n\n    void set_range_separator(char separator) {\n    \
+    \    _range_separator = separator;\n    }\n\n    template <class... Args>\n  \
+    \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
+    n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
+    \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
+    \ utilities\n}  // namespace m1une\n\n\n#line 10 \"verify/utilities/bigint_multiplication.test.cpp\"\
+    \n\nnamespace {\n\nusing m1une::utilities::BigInt;\n\nstd::string absolute_decimal(const\
+    \ std::string& value) {\n    int begin = !value.empty() && (value[0] == '-' ||\
+    \ value[0] == '+');\n    while (begin + 1 < int(value.size()) && value[begin]\
+    \ == '0') ++begin;\n    return value.substr(begin);\n}\n\nstd::string multiply_naive(const\
+    \ std::string& lhs_text, const std::string& rhs_text) {\n    const std::string\
+    \ lhs = absolute_decimal(lhs_text);\n    const std::string rhs = absolute_decimal(rhs_text);\n\
+    \    if (lhs == \"0\" || rhs == \"0\") return \"0\";\n\n    std::vector<int> coefficients(lhs.size()\
+    \ + rhs.size());\n    for (int i = int(lhs.size()) - 1; i >= 0; --i) {\n     \
+    \   for (int j = int(rhs.size()) - 1; j >= 0; --j) {\n            coefficients[i\
+    \ + j + 1] += (lhs[i] - '0') * (rhs[j] - '0');\n        }\n    }\n    for (int\
+    \ i = int(coefficients.size()) - 1; i > 0; --i) {\n        coefficients[i - 1]\
+    \ += coefficients[i] / 10;\n        coefficients[i] %= 10;\n    }\n\n    int begin\
+    \ = 0;\n    while (begin + 1 < int(coefficients.size()) && coefficients[begin]\
+    \ == 0) ++begin;\n    std::string result;\n    if ((lhs_text[0] == '-') != (rhs_text[0]\
+    \ == '-')) result.push_back('-');\n    for (int i = begin; i < int(coefficients.size());\
+    \ ++i) {\n        result.push_back(char('0' + coefficients[i]));\n    }\n    return\
+    \ result;\n}\n\nstd::string random_integer(std::mt19937_64& random, int digits,\
+    \ bool allow_negative) {\n    std::string result;\n    if (allow_negative && (random()\
+    \ & 1)) result.push_back('-');\n    result.push_back(char('1' + random() % 9));\n\
+    \    for (int i = 1; i < digits; ++i) result.push_back(char('0' + random() % 10));\n\
+    \    return result;\n}\n\nvoid test_multiplication() {\n    assert((BigInt(0)\
+    \ * BigInt(\"999999999999999999\")).to_string() == \"0\");\n    assert((BigInt(-12)\
+    \ * BigInt(34)).to_string() == \"-408\");\n    assert((BigInt(-12) * BigInt(-34)).to_string()\
+    \ == \"408\");\n\n    std::mt19937_64 random(0x38b54fd917a3c2e1ULL);\n    for\
+    \ (int iteration = 0; iteration < 100; ++iteration) {\n        const std::string\
+    \ lhs = random_integer(random, 1 + random() % 250, true);\n        const std::string\
+    \ rhs = random_integer(random, 1 + random() % 250, true);\n        assert((BigInt(lhs)\
+    \ * BigInt(rhs)).to_string() == multiply_naive(lhs, rhs));\n    }\n\n    for (int\
+    \ iteration = 0; iteration < 2; ++iteration) {\n        const std::string lhs\
+    \ = random_integer(random, 1300, true);\n        const std::string rhs = random_integer(random,\
+    \ 1250, true);\n        assert((BigInt(lhs) * BigInt(rhs)).to_string() == multiply_naive(lhs,\
+    \ rhs));\n    }\n}\n\n}  // namespace\n\nint main() {\n    m1une::utilities::FastInput\
+    \ input;\n    m1une::utilities::FastOutput output;\n    test_multiplication();\n\
+    \n    int test_count;\n    input >> test_count;\n    while (test_count--) {\n\
+    \        std::string lhs, rhs;\n        input >> lhs >> rhs;\n        output <<\
+    \ (BigInt(lhs) * BigInt(rhs)).to_string() << '\\n';\n    }\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/multiplication_of_big_integers\"\
+    \n\n#include <cassert>\n#include <random>\n#include <string>\n#include <vector>\n\
+    \n#include \"../../utilities/bigint.hpp\"\n#include \"../../utilities/fast_io.hpp\"\
+    \n\nnamespace {\n\nusing m1une::utilities::BigInt;\n\nstd::string absolute_decimal(const\
+    \ std::string& value) {\n    int begin = !value.empty() && (value[0] == '-' ||\
+    \ value[0] == '+');\n    while (begin + 1 < int(value.size()) && value[begin]\
+    \ == '0') ++begin;\n    return value.substr(begin);\n}\n\nstd::string multiply_naive(const\
+    \ std::string& lhs_text, const std::string& rhs_text) {\n    const std::string\
+    \ lhs = absolute_decimal(lhs_text);\n    const std::string rhs = absolute_decimal(rhs_text);\n\
+    \    if (lhs == \"0\" || rhs == \"0\") return \"0\";\n\n    std::vector<int> coefficients(lhs.size()\
+    \ + rhs.size());\n    for (int i = int(lhs.size()) - 1; i >= 0; --i) {\n     \
+    \   for (int j = int(rhs.size()) - 1; j >= 0; --j) {\n            coefficients[i\
+    \ + j + 1] += (lhs[i] - '0') * (rhs[j] - '0');\n        }\n    }\n    for (int\
+    \ i = int(coefficients.size()) - 1; i > 0; --i) {\n        coefficients[i - 1]\
+    \ += coefficients[i] / 10;\n        coefficients[i] %= 10;\n    }\n\n    int begin\
+    \ = 0;\n    while (begin + 1 < int(coefficients.size()) && coefficients[begin]\
+    \ == 0) ++begin;\n    std::string result;\n    if ((lhs_text[0] == '-') != (rhs_text[0]\
+    \ == '-')) result.push_back('-');\n    for (int i = begin; i < int(coefficients.size());\
+    \ ++i) {\n        result.push_back(char('0' + coefficients[i]));\n    }\n    return\
+    \ result;\n}\n\nstd::string random_integer(std::mt19937_64& random, int digits,\
+    \ bool allow_negative) {\n    std::string result;\n    if (allow_negative && (random()\
+    \ & 1)) result.push_back('-');\n    result.push_back(char('1' + random() % 9));\n\
+    \    for (int i = 1; i < digits; ++i) result.push_back(char('0' + random() % 10));\n\
+    \    return result;\n}\n\nvoid test_multiplication() {\n    assert((BigInt(0)\
+    \ * BigInt(\"999999999999999999\")).to_string() == \"0\");\n    assert((BigInt(-12)\
+    \ * BigInt(34)).to_string() == \"-408\");\n    assert((BigInt(-12) * BigInt(-34)).to_string()\
+    \ == \"408\");\n\n    std::mt19937_64 random(0x38b54fd917a3c2e1ULL);\n    for\
+    \ (int iteration = 0; iteration < 100; ++iteration) {\n        const std::string\
+    \ lhs = random_integer(random, 1 + random() % 250, true);\n        const std::string\
+    \ rhs = random_integer(random, 1 + random() % 250, true);\n        assert((BigInt(lhs)\
+    \ * BigInt(rhs)).to_string() == multiply_naive(lhs, rhs));\n    }\n\n    for (int\
+    \ iteration = 0; iteration < 2; ++iteration) {\n        const std::string lhs\
+    \ = random_integer(random, 1300, true);\n        const std::string rhs = random_integer(random,\
+    \ 1250, true);\n        assert((BigInt(lhs) * BigInt(rhs)).to_string() == multiply_naive(lhs,\
+    \ rhs));\n    }\n}\n\n}  // namespace\n\nint main() {\n    m1une::utilities::FastInput\
+    \ input;\n    m1une::utilities::FastOutput output;\n    test_multiplication();\n\
+    \n    int test_count;\n    input >> test_count;\n    while (test_count--) {\n\
+    \        std::string lhs, rhs;\n        input >> lhs >> rhs;\n        output <<\
+    \ (BigInt(lhs) * BigInt(rhs)).to_string() << '\\n';\n    }\n}\n"
   dependsOn:
-  - math/fps/formal_power_series.hpp
-  - math/modular_square_root.hpp
+  - utilities/bigint.hpp
   - math/fps/convolution.hpp
   - math/fps/internal/ntt998_faster.hpp
   - math/modint.hpp
-  isVerificationFile: false
-  path: math/fps/sparse_formal_power_series.hpp
-  requiredBy:
-  - math/all.hpp
-  - math/fps/all.hpp
-  timestamp: '2026-07-17 04:56:02+09:00'
-  verificationStatus: LIBRARY_ALL_AC
-  verifiedWith:
-  - verify/math/math_algorithms.test.cpp
-  - verify/math/fps/pow_of_formal_power_series_sparse.test.cpp
-  - verify/math/fps/sqrt_of_formal_power_series_sparse.test.cpp
-  - verify/math/fps/fps_algorithms.test.cpp
-  - verify/math/fps/log_of_formal_power_series_sparse.test.cpp
-  - verify/math/fps/inv_of_formal_power_series_sparse.test.cpp
-  - verify/math/fps/exp_of_formal_power_series_sparse.test.cpp
-documentation_of: math/fps/sparse_formal_power_series.hpp
+  - utilities/fast_io.hpp
+  isVerificationFile: true
+  path: verify/utilities/bigint_multiplication.test.cpp
+  requiredBy: []
+  timestamp: '2026-07-17 05:04:04+09:00'
+  verificationStatus: TEST_ACCEPTED
+  verifiedWith: []
+documentation_of: verify/utilities/bigint_multiplication.test.cpp
 layout: document
-title: Sparse Formal Power Series
+redirect_from:
+- /verify/verify/utilities/bigint_multiplication.test.cpp
+- /verify/verify/utilities/bigint_multiplication.test.cpp.html
+title: verify/utilities/bigint_multiplication.test.cpp
 ---
-
-## Overview
-
-Sparse FPS operations compute a dense truncated result from only the nonzero
-terms of the input. They are useful when the requested degree `n` is large but
-the input contains only `k` terms.
-
-```cpp
-template <class Mint>
-using SparseFormalPowerSeries = std::vector<std::pair<int, Mint>>;
-```
-
-Each pair is `(degree, coefficient)`. Terms must have strictly increasing
-degrees in `[0, n)`, and coefficients must be nonzero.
-
-## Interface
-
-Let `Sparse` denote `SparseFormalPowerSeries<Mint>` and `Fps` denote
-`FormalPowerSeries<Mint>`.
-
-```cpp
-template <class Mint>
-FormalPowerSeries<Mint> sparse_fps_inv(
-    const SparseFormalPowerSeries<Mint>& terms, int degree);
-
-template <class Mint>
-FormalPowerSeries<Mint> sparse_fps_log(
-    const SparseFormalPowerSeries<Mint>& terms, int degree);
-
-template <class Mint>
-FormalPowerSeries<Mint> sparse_fps_exp(
-    const SparseFormalPowerSeries<Mint>& terms, int degree);
-
-template <class Mint>
-FormalPowerSeries<Mint> sparse_fps_pow(
-    const SparseFormalPowerSeries<Mint>& terms,
-    long long exponent, int degree);
-
-template <class Mint>
-std::optional<FormalPowerSeries<Mint>> sparse_fps_sqrt(
-    const SparseFormalPowerSeries<Mint>& terms, int degree);
-```
-
-| Function | Requirement | Result | Complexity |
-| --- | --- | --- | --- |
-| `Fps sparse_fps_inv(const Sparse& f, int n)` | `f[0].first == 0`, constant coefficient invertible | $1/f \bmod x^n$ | $O(nk)$ |
-| `Fps sparse_fps_log(const Sparse& f, int n)` | Constant term is exactly one | $\log f \bmod x^n$ | $O(nk)$ |
-| `Fps sparse_fps_exp(const Sparse& f, int n)` | Constant term is zero and therefore omitted | $\exp f \bmod x^n$ | $O(nk)$ |
-| `Fps sparse_fps_pow(const Sparse& f, long long m, int n)` | `m >= 0` | $f^m \bmod x^n$ | $O(nk)$ |
-| `std::optional<Fps> sparse_fps_sqrt(const Sparse& f, int n)` | Odd prime field | A square root modulo $x^n$, if one exists | $O(nk)$ |
-
-All functions return exactly `n` coefficients and use $O(n)$ memory. Logarithm,
-exponential, power, and square root require `n < Mint::mod()` because their
-recurrences divide by coefficient indices. The supplied `math/modint.hpp`
-types with a prime modulus satisfy the required field operations.
-
-`sparse_fps_pow(f, 0, n)` returns one, including when `f` is zero. Square root
-returns `std::nullopt` when the leading degree is odd or the leading
-coefficient is not a quadratic residue. The zero series has the zero series as
-its square root.
-
-No operation modifies the sparse input.
-
-## Example
-
-```cpp
-#include "math/fps/sparse_formal_power_series.hpp"
-#include "math/modint.hpp"
-#include <iostream>
-
-using mint = m1une::math::modint998244353;
-using Sparse = m1une::fps::SparseFormalPowerSeries<mint>;
-
-int main() {
-    Sparse f;
-    f.emplace_back(0, 1);
-    f.emplace_back(3, 2);
-
-    auto inverse = m1une::fps::sparse_fps_inv(f, 10);
-    for (mint coefficient : inverse) std::cout << coefficient << ' ';
-    std::cout << '\n';
-}
-```
-
-## Recurrences
-
-The implementation compares coefficients in standard differential identities:
-
-* $fg=1$ for inverse;
-* $(\log f)'=f'/f$;
-* $(\exp f)'=f'\exp f$;
-* $f(g^a)'=a f'g^a$ for a unit series $f$.
-
-Only the `k` stored terms contribute to each new coefficient, giving the
-$O(nk)$ bound.

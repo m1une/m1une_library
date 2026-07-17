@@ -2,6 +2,15 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
+    path: math/fps/convolution.hpp
+    title: Convolution
+  - icon: ':heavy_check_mark:'
+    path: math/fps/internal/ntt998_faster.hpp
+    title: math/fps/internal/ntt998_faster.hpp
+  - icon: ':heavy_check_mark:'
+    path: math/modint.hpp
+    title: ModInt
+  - icon: ':heavy_check_mark:'
     path: utilities/bigint.hpp
     title: BigInt
   _extendedRequiredBy:
@@ -220,11 +229,14 @@ data:
     \ m1une\n\n#endif  // M1UNE_GEOMETRY_LATTICE_POINT_COUNT_HPP\n"
   dependsOn:
   - utilities/bigint.hpp
+  - math/fps/convolution.hpp
+  - math/fps/internal/ntt998_faster.hpp
+  - math/modint.hpp
   isVerificationFile: false
   path: geometry/lattice_point_count.hpp
   requiredBy:
   - geometry/all.hpp
-  timestamp: '2026-07-07 22:43:27+09:00'
+  timestamp: '2026-07-17 04:56:02+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp

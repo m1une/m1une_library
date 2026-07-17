@@ -359,6 +359,7 @@ data:
     \ {\n    vc<T> B(I.size());\n    FOR(i, I.size()) B[i] = A[I[i]];\n    return\
     \ B;\n}\n\ntemplate <class... T>\nconstexpr auto min(T... a) {\n    return min(initializer_list<common_type_t<T...>>{a...});\n\
     }\ntemplate <class... T>\nconstexpr auto max(T... a) {\n    return max(initializer_list<common_type_t<T...>>{a...});\n\
+    }\n\ntemplate <class... Ts>\nbool scan(Ts&... values) {\n    return m1une::template_io::input().read(values...);\n\
     }\n\ntemplate <class... Ts>\nvoid print(const Ts&... values) {\n    m1une::template_io::output().println(values...);\n\
     }\nvoid YESNO(bool b) {\n    m1une::template_io::output().println(b ? \"YES\"\
     \ : \"NO\");\n}\nvoid YesNo(bool b) {\n    m1une::template_io::output().println(b\
@@ -410,7 +411,7 @@ data:
   isVerificationFile: true
   path: verify/utilities/template_fast_io.test.cpp
   requiredBy: []
-  timestamp: '2026-07-16 05:31:18+09:00'
+  timestamp: '2026-07-17 13:30:50+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/utilities/template_fast_io.test.cpp

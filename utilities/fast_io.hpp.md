@@ -898,6 +898,12 @@ data:
     path: verify/utilities/basic_utilities.test.cpp
     title: verify/utilities/basic_utilities.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/utilities/bigint_division.test.cpp
+    title: verify/utilities/bigint_division.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/utilities/bigint_multiplication.test.cpp
+    title: verify/utilities/bigint_multiplication.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/utilities/dice.test.cpp
     title: verify/utilities/dice.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1480,8 +1486,10 @@ data:
   - verify/math/factorize.test.cpp
   - verify/utilities/random_testing.test.cpp
   - verify/utilities/parser.test.cpp
+  - verify/utilities/bigint_multiplication.test.cpp
   - verify/utilities/extra_utilities.test.cpp
   - verify/utilities/dynamic_bitset.test.cpp
+  - verify/utilities/bigint_division.test.cpp
   - verify/utilities/basic_utilities.test.cpp
   - verify/utilities/random_generators.test.cpp
   - verify/utilities/fast_io.test.cpp

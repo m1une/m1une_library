@@ -3,6 +3,12 @@ data:
   _extendedDependsOn: []
   _extendedRequiredBy:
   - icon: ':heavy_check_mark:'
+    path: geometry/all.hpp
+    title: Geometry Bundle
+  - icon: ':heavy_check_mark:'
+    path: geometry/lattice_point_count.hpp
+    title: Lattice-Point Count
+  - icon: ':heavy_check_mark:'
     path: graph/all.hpp
     title: Graph All
   - icon: ':heavy_check_mark:'
@@ -71,7 +77,16 @@ data:
   - icon: ':heavy_check_mark:'
     path: string/wildcard_pattern_matching.hpp
     title: Wildcard Pattern Matching
+  - icon: ':heavy_check_mark:'
+    path: utilities/bigint.hpp
+    title: BigInt
   _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/geometry_algorithms.test.cpp
+    title: verify/geometry/geometry_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/lattice_point_count.test.cpp
+    title: verify/geometry/lattice_point_count.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/cow_game.test.cpp
     title: verify/graph/cow_game.test.cpp
@@ -186,6 +201,15 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/string/wildcard_pattern_matching.test.cpp
     title: verify/string/wildcard_pattern_matching.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/utilities/basic_utilities.test.cpp
+    title: verify/utilities/basic_utilities.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/utilities/bigint_division.test.cpp
+    title: verify/utilities/bigint_division.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/utilities/bigint_multiplication.test.cpp
+    title: verify/utilities/bigint_multiplication.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -678,12 +702,15 @@ data:
   - math/fps/linear_recurrence.hpp
   - math/bernoulli.hpp
   - math/multivariate_convolution.hpp
+  - utilities/bigint.hpp
   - graph/counting.hpp
   - graph/all.hpp
   - graph/tree/all.hpp
   - graph/tree/distance_frequency.hpp
   - string/wildcard_pattern_matching.hpp
   - string/all.hpp
+  - geometry/all.hpp
+  - geometry/lattice_point_count.hpp
   timestamp: '2026-07-13 23:28:27+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
@@ -717,6 +744,9 @@ data:
   - verify/math/bernoulli_utilities.test.cpp
   - verify/math/bell_number.test.cpp
   - verify/math/bernoulli_number.test.cpp
+  - verify/utilities/bigint_multiplication.test.cpp
+  - verify/utilities/bigint_division.test.cpp
+  - verify/utilities/basic_utilities.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/cow_game.test.cpp
   - verify/graph/range_edge_graph.test.cpp
@@ -725,6 +755,8 @@ data:
   - verify/graph/graph_counting.test.cpp
   - verify/string/string_algorithms.test.cpp
   - verify/string/wildcard_pattern_matching.test.cpp
+  - verify/geometry/geometry_algorithms.test.cpp
+  - verify/geometry/lattice_point_count.test.cpp
 documentation_of: math/fps/internal/ntt998_faster.hpp
 layout: document
 redirect_from:
