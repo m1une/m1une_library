@@ -358,6 +358,11 @@ constexpr auto max(T... a) {
 }
 
 template <class... Ts>
+bool scan(Ts&... values) {
+    return m1une::template_io::input().read(values...);
+}
+
+template <class... Ts>
 void print(const Ts&... values) {
     m1une::template_io::output().println(values...);
 }
