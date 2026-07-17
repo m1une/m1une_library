@@ -2,6 +2,7 @@
 #define M1UNE_FAST_IO_HPP 1
 
 #include <array>
+#include <cerrno>
 #include <charconv>
 #include <cstddef>
 #include <cstdio>
@@ -10,6 +11,7 @@
 #include <cstring>
 #include <iterator>
 #include <string>
+#include <sys/stat.h>
 #include <type_traits>
 #include <utility>
 #include <unistd.h>
@@ -134,16 +136,21 @@ struct FastInput {
     char _buffer[buffer_size];
     int _position;
     int _length;
-    bool _terminal;
+    int _file_descriptor;
+    bool _streaming;
 
     bool refill() {
         _position = 0;
-        if (_terminal) {
-            if (std::fgets(_buffer, buffer_size, _stream) == nullptr) {
+        if (_streaming) {
+            ssize_t length;
+            do {
+                length = ::read(_file_descriptor, _buffer, buffer_size);
+            } while (length < 0 && errno == EINTR);
+            if (length <= 0) {
                 _length = 0;
                 return false;
             }
-            _length = int(std::strlen(_buffer));
+            _length = int(length);
         } else {
             _length = int(std::fread(_buffer, 1, buffer_size, _stream));
         }
@@ -151,7 +158,7 @@ struct FastInput {
     }
 
     template <class T>
-    bool read_integer_from_terminal(T& value) {
+    bool read_integer_from_stream(T& value) {
         if (!skip_spaces()) return false;
         int c = read_char_raw();
 
@@ -196,7 +203,13 @@ struct FastInput {
         : _stream(stream),
           _position(0),
           _length(0),
-          _terminal(::isatty(::fileno(stream)) != 0) {}
+          _file_descriptor(::fileno(stream)),
+          _streaming([&] {
+              struct stat status;
+              return _file_descriptor >= 0
+                     && ::fstat(_file_descriptor, &status) == 0
+                     && !S_ISREG(status.st_mode);
+          }()) {}
 
     FastInput(const FastInput&) = delete;
     FastInput& operator=(const FastInput&) = delete;
@@ -246,7 +259,7 @@ struct FastInput {
         bool
     >
     read(T& value) {
-        if (_terminal) return read_integer_from_terminal(value);
+        if (_streaming) return read_integer_from_stream(value);
         if (!prepare_number()) return false;
         int c = static_cast<unsigned char>(_buffer[_position++]);
         while (c <= ' ') c = static_cast<unsigned char>(_buffer[_position++]);
@@ -444,9 +457,11 @@ struct FastOutput {
     }
 
     void flush() {
-        if (_position == 0) return;
-        std::fwrite(_buffer, 1, _position, _stream);
-        _position = 0;
+        if (_position != 0) {
+            std::fwrite(_buffer, 1, _position, _stream);
+            _position = 0;
+        }
+        std::fflush(_stream);
     }
 
     void write_char(char c) {

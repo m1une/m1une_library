@@ -4,7 +4,11 @@
 
 #include <cassert>
 #include <cstdio>
+#include <poll.h>
+#include <signal.h>
 #include <string>
+#include <sys/wait.h>
+#include <unistd.h>
 #include <utility>
 #include <vector>
 
@@ -46,6 +50,59 @@ void test_fast_input() {
     std::fclose(file);
 }
 
+void test_pipe_input_does_not_wait_for_eof() {
+    int request[2];
+    int response[2];
+    assert(::pipe(request) == 0);
+    assert(::pipe(response) == 0);
+
+    const pid_t child = ::fork();
+    assert(child >= 0);
+    if (child == 0) {
+        ::close(request[1]);
+        ::close(response[0]);
+        std::FILE* stream = ::fdopen(request[0], "r");
+        if (stream == nullptr) _exit(1);
+
+        m1une::utilities::FastInput input(stream);
+        int value;
+        const bool ok = input.read(value) && value == 123456789;
+        if (ok) {
+            const char byte = 'x';
+            if (::write(response[1], &byte, 1) != 1) _exit(1);
+        }
+        std::fclose(stream);
+        ::close(response[1]);
+        _exit(ok ? 0 : 1);
+    }
+
+    ::close(request[0]);
+    ::close(response[1]);
+    const char query[] = "123456789\n";
+    assert(
+        ::write(request[1], query, sizeof(query) - 1)
+        == ssize_t(sizeof(query) - 1)
+    );
+
+    pollfd event;
+    event.fd = response[0];
+    event.events = POLLIN;
+    event.revents = 0;
+    const int ready = ::poll(&event, 1, 1000);
+
+    ::close(request[1]);
+    if (ready <= 0) ::kill(child, SIGKILL);
+    int status;
+    assert(::waitpid(child, &status, 0) == child);
+    assert(ready == 1);
+    assert((event.revents & POLLIN) != 0);
+    char byte;
+    assert(::read(response[0], &byte, 1) == 1);
+    assert(byte == 'x');
+    assert(WIFEXITED(status) && WEXITSTATUS(status) == 0);
+    ::close(response[0]);
+}
+
 void test_fast_output() {
     std::FILE* file = std::tmpfile();
     assert(file != nullptr);
@@ -74,6 +131,37 @@ void test_fast_output() {
            "340282366920938463463374607431768211455\n"
     );
     std::fclose(file);
+}
+
+void test_output_flush_reaches_pipe() {
+    int descriptors[2];
+    assert(::pipe(descriptors) == 0);
+    std::FILE* stream = ::fdopen(descriptors[1], "w");
+    assert(stream != nullptr);
+
+    {
+        m1une::utilities::FastOutput output(stream);
+        output << "? 987654321\n";
+        output.flush();
+
+        pollfd event;
+        event.fd = descriptors[0];
+        event.events = POLLIN;
+        event.revents = 0;
+        assert(::poll(&event, 1, 1000) == 1);
+        assert((event.revents & POLLIN) != 0);
+
+        const char expected[] = "? 987654321\n";
+        char actual[sizeof(expected) - 1];
+        assert(
+            ::read(descriptors[0], actual, sizeof(actual))
+            == ssize_t(sizeof(actual))
+        );
+        assert(std::string(actual, actual + sizeof(actual)) == expected);
+    }
+
+    std::fclose(stream);
+    ::close(descriptors[0]);
 }
 
 void test_stream_operators_ranges_and_pairs() {
@@ -142,7 +230,9 @@ void test_stream_operators_ranges_and_pairs() {
 
 int main() {
     test_fast_input();
+    test_pipe_input_does_not_wait_for_eof();
     test_fast_output();
+    test_output_flush_reaches_pipe();
     test_stream_operators_ranges_and_pairs();
 
     m1une::utilities::FastInput input;

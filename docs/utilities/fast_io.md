@@ -8,9 +8,10 @@ documentation_of: ../../utilities/fast_io.hpp
 `FastInput` and `FastOutput` are buffered replacements for `std::cin` and
 `std::cout`. They provide familiar, chainable `operator>>` and `operator<<`
 syntax while using `std::FILE*` internally. By default they read from `stdin`
-and write to `stdout`. Terminal input is read one line at a time, so entered
-values become available as soon as Enter is pressed; redirected input keeps the
-larger high-throughput buffer.
+and write to `stdout`. Pipes, terminals, and other streaming inputs return
+available data without waiting for EOF or for the input buffer to fill, so
+`FastInput` can be used in interactive problems. Regular files keep the larger
+high-throughput reads.
 
 ```cpp
 FastInput input;
@@ -126,11 +127,13 @@ detected.
 | `void set_fixed(int precision = 6)` | Selects fixed-point output with `precision` fractional digits. | $O(1)$ |
 | `void set_general(int precision = 6)` | Selects general floating-point output with `precision` significant digits. | $O(1)$ |
 | `void set_range_separator(char separator)` | Changes the separator between non-range elements of ranges. | $O(1)$ |
-| `void flush()` | Writes all buffered bytes to the underlying stream. | Linear in buffered output |
+| `void flush()` | Makes all buffered bytes visible on the underlying stream. | Linear in buffered output |
 
 Pending output is flushed by the destructor. Standard iostream manipulators
 such as `std::endl` are not supported; use `output << '\n'` and call `flush()`
-explicitly only when the output must become visible immediately.
+after every query in an interactive problem. Otherwise, call `flush()` only
+when the output must become visible immediately. `flush()` drains both the
+`FastOutput` buffer and the underlying C stream buffer.
 
 ## Example
 
