@@ -8,12 +8,15 @@ documentation_of: ../../utilities/bigint.hpp
 An arbitrary-precision signed integer for competitive programming. Digits are
 stored in little-endian base-$10^9$ blocks.
 
-Large products convolve the base-$10^9$ blocks directly under three NTT primes,
-then reconstruct the exact coefficients with the Chinese remainder theorem.
+Large products split each base-$10^9$ block into 15-bit halves and use a packed
+complex FFT. The transform avoids explicit bit-reversal passes and has a
+specialized squaring path. Every FFT result is checked modulo $2^{61}-1$;
+values outside the conservative accuracy bound, or results that fail the check,
+fall back to an exact three-prime NTT with Chinese remainder reconstruction.
+
 Large quotients use a normalized Newton reciprocal and the same fast
 multiplication. Small products use schoolbook multiplication, while small
-quotients use normalized Knuth division to avoid transform overhead. Squaring
-uses specialized paths in both regimes. No floating-point rounding is involved.
+quotients use normalized Knuth division to avoid transform overhead.
 
 ## Methods
 
@@ -33,7 +36,7 @@ uses specialized paths in both regimes. No floating-point rounding is involved.
 | `operator+`, `operator+=` | Adds two values. | $O(N+M)$ |
 | `operator-`, `operator-=` | Subtracts two values. | $O(N+M)$ |
 | `BigInt& operator*=(int value)` | Multiplies by a machine integer. | $O(N)$ |
-| `operator*`, `operator*=(const BigInt&)` | Multiplies two values using exact convolution for large inputs. | $O((N+M)\log(N+M))$; $O(NM)$ for the small-input fallback |
+| `operator*`, `operator*=(const BigInt&)` | Multiplies two values using checked FFT convolution for large inputs, with an exact NTT fallback. | $O((N+M)\log(N+M))$; $O(NM)$ for the small-input fallback |
 | `operator/`, `operator/=` | Returns the quotient, truncated toward zero. | $O(N\log N)$ on the Newton path; $O(NM)$ for the bounded fallback |
 | `operator%`, `operator%=` | Returns the remainder associated with truncated division. | Same as division |
 | `divmod(const BigInt& a, const BigInt& b)` | Returns `std::pair<BigInt, BigInt>` containing `a / b` and `a % b`. | Same as division |

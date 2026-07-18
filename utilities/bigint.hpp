@@ -2,9 +2,13 @@
 #define M1UNE_UTILITIES_BIGINT_HPP 1
 
 #include <algorithm>
+#include <bit>
 #include <cassert>
+#include <charconv>
+#include <cmath>
 #include <cstdint>
 #include <iostream>
+#include <numbers>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -79,14 +83,27 @@ struct BigInt {
 
     std::string to_string() const {
         if (a.empty()) return "0";
-        std::string res;
-        res.reserve(a.size() * BASE_DIGITS + (sign == -1));
-        if (sign == -1) res += '-';
-        res += std::to_string(a.back());
+        char leading[BASE_DIGITS];
+        const std::to_chars_result converted =
+            std::to_chars(leading, leading + BASE_DIGITS, a.back());
+        assert(converted.ec == std::errc());
+        const int leading_size = int(converted.ptr - leading);
+        std::string res((sign == -1) + leading_size +
+                            (a.size() - 1) * BASE_DIGITS,
+                        '0');
+        int offset = 0;
+        if (sign == -1) res[offset++] = '-';
+        std::copy(leading, converted.ptr, res.begin() + offset);
+        offset += leading_size;
         for (int i = (int)a.size() - 2; i >= 0; --i) {
-            std::string block = std::to_string(a[i]);
-            res.append(BASE_DIGITS - block.length(), '0');
-            res += block;
+            char block[BASE_DIGITS];
+            const std::to_chars_result block_converted =
+                std::to_chars(block, block + BASE_DIGITS, a[i]);
+            assert(block_converted.ec == std::errc());
+            const int block_size = int(block_converted.ptr - block);
+            std::copy(block, block_converted.ptr,
+                      res.begin() + offset + BASE_DIGITS - block_size);
+            offset += BASE_DIGITS;
         }
         return res;
     }
@@ -200,8 +217,123 @@ struct BigInt {
     }
 
    private:
-    static constexpr int MULTIPLICATION_THRESHOLD = 224;
+    static constexpr int MULTIPLICATION_THRESHOLD = 128;
+    static constexpr int SQUARE_THRESHOLD = 224;
     static constexpr int DIVISION_THRESHOLD = 64;
+    static constexpr int FFT_SPLIT = 1 << 15;
+
+    struct FftComplex {
+        double real;
+        double imaginary;
+
+        FftComplex operator+(const FftComplex& other) const {
+            return {real + other.real, imaginary + other.imaginary};
+        }
+
+        FftComplex operator-(const FftComplex& other) const {
+            return {real - other.real, imaginary - other.imaginary};
+        }
+
+        FftComplex operator*(const FftComplex& other) const {
+            return {real * other.real - imaginary * other.imaginary,
+                    real * other.imaginary + imaginary * other.real};
+        }
+
+        FftComplex operator*(double scalar) const {
+            return {real * scalar, imaginary * scalar};
+        }
+
+        FftComplex conjugate() const {
+            return {real, -imaginary};
+        }
+    };
+
+    struct FftProducts {
+        FftComplex diagonal;
+        FftComplex cross;
+    };
+
+    static const std::vector<FftComplex>& fft_roots(int size) {
+        static std::vector<FftComplex> roots(2, FftComplex{1, 0});
+        if (int(roots.size()) < size) {
+            int length = int(roots.size());
+            roots.resize(size);
+            while (length < size) {
+                const long double angle = std::numbers::pi_v<long double> / length;
+                const long double step_real = std::cos(angle);
+                const long double step_imaginary = std::sin(angle);
+                for (int i = length; i < 2 * length; ++i) {
+                    roots[i] = roots[i / 2];
+                    if (i & 1) {
+                        const long double real = roots[i].real;
+                        const long double imaginary = roots[i].imaginary;
+                        roots[i] = {
+                            double(real * step_real - imaginary * step_imaginary),
+                            double(real * step_imaginary + imaginary * step_real)};
+                    }
+                }
+                length *= 2;
+            }
+        }
+        return roots;
+    }
+
+    static void fft(std::vector<FftComplex>& values) {
+        const int size = int(values.size());
+        assert(size > 0 && (size & (size - 1)) == 0);
+        const std::vector<FftComplex>& roots = fft_roots(size);
+
+        // Decimation in frequency leaves the spectrum bit-reversed. The inverse
+        // transform consumes that order directly, avoiding permutation passes.
+        for (int length = size / 2; length > 0; length /= 2) {
+            for (int offset = 0; offset < size; offset += 2 * length) {
+                for (int i = 0; i < length; ++i) {
+                    const FftComplex even = values[offset + i];
+                    const FftComplex odd = values[offset + i + length];
+                    values[offset + i] = even + odd;
+                    values[offset + i + length] =
+                        (even - odd) * roots[length + i];
+                }
+            }
+        }
+    }
+
+    static void inverse_fft(std::vector<FftComplex>& values) {
+        const int size = int(values.size());
+        assert(size > 0 && (size & (size - 1)) == 0);
+        const std::vector<FftComplex>& roots = fft_roots(size);
+
+        for (int length = 1; length < size; length *= 2) {
+            for (int offset = 0; offset < size; offset += 2 * length) {
+                for (int i = 0; i < length; ++i) {
+                    const FftComplex even = values[offset + i];
+                    const FftComplex value = values[offset + i + length];
+                    const FftComplex root = roots[length + i];
+                    const FftComplex odd = {
+                        value.real * root.real + value.imaginary * root.imaginary,
+                        value.imaginary * root.real - value.real * root.imaginary};
+                    values[offset + i] = even + odd;
+                    values[offset + i + length] = even - odd;
+                }
+            }
+        }
+        const double inverse_size = 1.0 / double(size);
+        for (FftComplex& value : values) {
+            value.real *= inverse_size;
+            value.imaginary *= inverse_size;
+        }
+    }
+
+    static FftComplex fft_low(const FftComplex& value,
+                              const FftComplex& reflected) {
+        return (value + reflected) * 0.5;
+    }
+
+    static FftComplex fft_high(const FftComplex& value,
+                               const FftComplex& reflected) {
+        const FftComplex difference = value - reflected;
+        return {difference.imaginary * 0.5, -difference.real * 0.5};
+    }
 
     static void trim_magnitude(std::vector<int>& value) {
         while (!value.empty() && value.back() == 0) value.pop_back();
@@ -371,8 +503,8 @@ struct BigInt {
         return result;
     }
 
-    static std::vector<int> multiply_convolution(const std::vector<int>& lhs,
-                                                 const std::vector<int>& rhs) {
+    static std::vector<int> multiply_ntt(const std::vector<int>& lhs,
+                                         const std::vector<int>& rhs) {
         using Mint1 = math::ModInt<998244353>;
         using Mint2 = math::ModInt<754974721>;
         using Mint3 = math::ModInt<469762049>;
@@ -430,16 +562,156 @@ struct BigInt {
         return result;
     }
 
+    static uint64_t mersenne_reduce(unsigned __int128 value) {
+        constexpr uint64_t MODULUS = (uint64_t(1) << 61) - 1;
+        value = (value & MODULUS) + (value >> 61);
+        uint64_t result = uint64_t(value & MODULUS) + uint64_t(value >> 61);
+        if (result >= MODULUS) result -= MODULUS;
+        return result;
+    }
+
+    static uint64_t magnitude_mod(const std::vector<int>& value) {
+        uint64_t result = 0;
+        for (int i = int(value.size()) - 1; i >= 0; --i) {
+            result = mersenne_reduce(static_cast<unsigned __int128>(result) * BASE +
+                                     value[i]);
+        }
+        return result;
+    }
+
+    static bool product_matches(const std::vector<int>& lhs, const std::vector<int>& rhs,
+                                const std::vector<int>& product) {
+        const uint64_t expected = mersenne_reduce(
+            static_cast<unsigned __int128>(magnitude_mod(lhs)) * magnitude_mod(rhs));
+        return magnitude_mod(product) == expected;
+    }
+
+    static std::vector<int> multiply_fft(const std::vector<int>& lhs,
+                                         const std::vector<int>& rhs) {
+        const int result_size = int(lhs.size() + rhs.size() - 1);
+        const int transform_size = int(std::bit_ceil(unsigned(result_size)));
+        const unsigned __int128 coefficient_bound =
+            static_cast<unsigned __int128>(std::min(lhs.size(), rhs.size())) *
+            2 * (FFT_SPLIT - 1) * ((BASE - 1) / FFT_SPLIT);
+        if (transform_size > (1 << 20) || coefficient_bound >= (uint64_t(1) << 48)) {
+            return multiply_ntt(lhs, rhs);
+        }
+
+        std::vector<FftComplex> transformed_lhs(transform_size, FftComplex{0, 0});
+        for (int i = 0; i < int(lhs.size()); ++i) {
+            transformed_lhs[i] = {double(lhs[i] % FFT_SPLIT),
+                                  double(lhs[i] / FFT_SPLIT)};
+        }
+        fft(transformed_lhs);
+
+        const bool squaring = &lhs == &rhs;
+        std::vector<FftComplex> transformed_rhs;
+        if (!squaring) {
+            transformed_rhs.assign(transform_size, FftComplex{0, 0});
+            for (int i = 0; i < int(rhs.size()); ++i) {
+                transformed_rhs[i] = {double(rhs[i] % FFT_SPLIT),
+                                      double(rhs[i] / FFT_SPLIT)};
+            }
+            fft(transformed_rhs);
+        }
+
+        std::vector<FftComplex> square_cross_product;
+        if (squaring) square_cross_product.resize(transform_size);
+        static std::vector<int> reflected_indices;
+        if (int(reflected_indices.size()) != transform_size) {
+            reflected_indices.resize(transform_size);
+            reflected_indices[0] = 0;
+            for (int i = 1; i < transform_size; ++i) {
+                // Negating a frequency complements the bits below the highest
+                // set bit of its bit-reversed index.
+                reflected_indices[i] =
+                    i ^ int(std::bit_floor(unsigned(i)) - 1);
+            }
+        }
+        auto calculate_products = [&](int index) {
+            const int opposite = reflected_indices[index];
+            const FftComplex lhs_reflected =
+                transformed_lhs[opposite].conjugate();
+            const FftComplex lhs_low =
+                fft_low(transformed_lhs[index], lhs_reflected);
+            const FftComplex lhs_high =
+                fft_high(transformed_lhs[index], lhs_reflected);
+
+            FftComplex rhs_low = lhs_low;
+            FftComplex rhs_high = lhs_high;
+            if (!squaring) {
+                const FftComplex rhs_reflected =
+                    transformed_rhs[opposite].conjugate();
+                rhs_low = fft_low(transformed_rhs[index], rhs_reflected);
+                rhs_high = fft_high(transformed_rhs[index], rhs_reflected);
+            }
+
+            const FftComplex low_product = lhs_low * rhs_low;
+            const FftComplex high_product = lhs_high * rhs_high;
+            const FftComplex diagonal =
+                low_product + FftComplex{-high_product.imaginary,
+                                         high_product.real};
+            const FftComplex cross =
+                lhs_low * rhs_high + lhs_high * rhs_low;
+            return FftProducts{diagonal, cross};
+        };
+
+        for (int i = 0; i < transform_size; ++i) {
+            const int opposite = reflected_indices[i];
+            if (i > opposite) continue;
+            const FftProducts products = calculate_products(i);
+            FftProducts opposite_products = products;
+            if (i != opposite) opposite_products = calculate_products(opposite);
+
+            transformed_lhs[i] = products.diagonal;
+            transformed_lhs[opposite] = opposite_products.diagonal;
+            if (squaring) {
+                square_cross_product[i] = products.cross;
+                square_cross_product[opposite] = opposite_products.cross;
+            } else {
+                transformed_rhs[i] = products.cross;
+                transformed_rhs[opposite] = opposite_products.cross;
+            }
+        }
+        std::vector<FftComplex>& cross_product =
+            squaring ? square_cross_product : transformed_rhs;
+        inverse_fft(transformed_lhs);
+        inverse_fft(cross_product);
+
+        std::vector<int> result;
+        result.reserve(result_size + 2);
+        unsigned __int128 carry = 0;
+        for (int i = 0; i < result_size || carry > 0; ++i) {
+            if (i < result_size) {
+                const long long low = std::llround(transformed_lhs[i].real);
+                const long long high = std::llround(transformed_lhs[i].imaginary);
+                const long long cross = std::llround(cross_product[i].real);
+                if (low < 0 || high < 0 || cross < 0) return multiply_ntt(lhs, rhs);
+                carry += low + static_cast<unsigned __int128>(cross) * FFT_SPLIT +
+                         static_cast<unsigned __int128>(high) * FFT_SPLIT * FFT_SPLIT;
+            }
+            result.push_back(int(carry % BASE));
+            carry /= BASE;
+        }
+        trim_magnitude(result);
+        if (result.empty() || !product_matches(lhs, rhs, result)) {
+            return multiply_ntt(lhs, rhs);
+        }
+        return result;
+    }
+
     static std::vector<int> multiply_magnitude(const std::vector<int>& lhs,
                                                const std::vector<int>& rhs) {
         if (lhs.empty() || rhs.empty()) return std::vector<int>();
         if (lhs.size() == 1) return multiply_by_limb(rhs, lhs[0]);
         if (rhs.size() == 1) return multiply_by_limb(lhs, rhs[0]);
+        if (&lhs == &rhs && lhs.size() <= SQUARE_THRESHOLD) {
+            return square_naive(lhs);
+        }
         if (std::min(lhs.size(), rhs.size()) <= MULTIPLICATION_THRESHOLD) {
-            if (&lhs == &rhs) return square_naive(lhs);
             return multiply_naive(lhs, rhs);
         }
-        return multiply_convolution(lhs, rhs);
+        return multiply_fft(lhs, rhs);
     }
 
     static std::pair<std::vector<int>, std::vector<int>> divide_by_limb(
