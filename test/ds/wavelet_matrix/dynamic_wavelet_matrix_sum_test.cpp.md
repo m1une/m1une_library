@@ -4,20 +4,14 @@ data:
   - icon: ':heavy_check_mark:'
     path: ds/wavelet_matrix/dynamic_wavelet_matrix.hpp
     title: Dynamic Wavelet Matrix
-  _extendedRequiredBy:
-  - icon: ':warning:'
-    path: benchmark/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_benchmark.cpp
-    title: benchmark/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_benchmark.cpp
-  - icon: ':warning:'
-    path: test/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_test.cpp
-    title: test/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_test.cpp
-  _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
-    path: verify/ds/wavelet_matrix/dynamic_wavelet_matrix_sum.test.cpp
-    title: verify/ds/wavelet_matrix/dynamic_wavelet_matrix_sum.test.cpp
+    path: ds/wavelet_matrix/dynamic_wavelet_matrix_sum.hpp
+    title: Dynamic Wavelet Matrix with Sums
+  _extendedRequiredBy: []
+  _extendedVerifiedWith: []
   _isVerificationFailed: false
-  _pathExtension: hpp
-  _verificationStatusIcon: ':heavy_check_mark:'
+  _pathExtension: cpp
+  _verificationStatusIcon: ':warning:'
   attributes:
     links: []
   bundledCode: "#line 1 \"ds/wavelet_matrix/dynamic_wavelet_matrix_sum.hpp\"\n\n\n\
@@ -1133,886 +1127,280 @@ data:
     \ count +\n               _final_weights.max_suffix(\n                   left,\n\
     \                   right,\n                   result,\n                   predicate\n\
     \               );\n    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\
-    \n"
-  code: "#ifndef M1UNE_DS_WAVELET_MATRIX_DYNAMIC_WAVELET_MATRIX_SUM_HPP\n#define M1UNE_DS_WAVELET_MATRIX_DYNAMIC_WAVELET_MATRIX_SUM_HPP\
-    \ 1\n\n#include <algorithm>\n#include <array>\n#include <bit>\n#include <cassert>\n\
-    #include <concepts>\n#include <cstdint>\n#include <limits>\n#include <optional>\n\
-    #include <type_traits>\n#include <utility>\n#include <vector>\n\n#include \"dynamic_wavelet_matrix.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\n\nnamespace dynamic_wavelet_matrix_sum_detail\
-    \ {\n\n#ifdef M1UNE_DYNAMIC_WAVELET_MATRIX_SUM_PROFILE\nstruct DynamicWaveletMatrixSumProfile\
-    \ {\n    std::uint64_t bitvector_tree_traversals = 0;\n    std::uint64_t weight_tree_traversals\
-    \ = 0;\n    std::uint64_t chunk_splits = 0;\n    std::uint64_t chunk_merges =\
-    \ 0;\n    std::uint64_t local_element_moves = 0;\n    std::uint64_t full_chunk_rebuilds\
-    \ = 0;\n};\n\ninline DynamicWaveletMatrixSumProfile profile;\n\ninline void reset_profile()\
-    \ {\n    profile = DynamicWaveletMatrixSumProfile();\n}\n\ninline DynamicWaveletMatrixSumProfile\
-    \ get_profile() {\n    return profile;\n}\n\n#define M1UNE_DWM_SUM_PROFILE_ADD(field,\
-    \ amount) \\\n    (::m1une::ds::dynamic_wavelet_matrix_sum_detail::profile.field\
-    \ += \\\n     (amount))\n#else\n#define M1UNE_DWM_SUM_PROFILE_ADD(field, amount)\
-    \ ((void)0)\n#endif\n\n#ifdef M1UNE_DYNAMIC_WAVELET_MATRIX_SUM_CHUNK_CAPACITY\n\
-    inline constexpr int configured_chunk_capacity =\n    M1UNE_DYNAMIC_WAVELET_MATRIX_SUM_CHUNK_CAPACITY;\n\
-    #else\ninline constexpr int configured_chunk_capacity = 64;\n#endif\n\n#ifdef\
-    \ M1UNE_DYNAMIC_WAVELET_MATRIX_SUM_GROUP_SIZE\ninline constexpr int configured_group_size\
-    \ =\n    M1UNE_DYNAMIC_WAVELET_MATRIX_SUM_GROUP_SIZE;\n#else\ninline constexpr\
-    \ int configured_group_size = 16;\n#endif\n\n// A chunked implicit treap storing\
-    \ routing bits and additive weights together.\ntemplate <\n    typename Sum,\n\
-    \    int ChunkCapacity = configured_chunk_capacity,\n    int GroupSize = configured_group_size\n\
-    >\nclass DynamicWeightedRankSequence {\n   public:\n    struct AccessRankResult\
-    \ {\n        bool bit;\n        Sum weight;\n        int ones_before;\n    };\n\
-    \n    struct EraseRankResult {\n        bool bit;\n        Sum weight;\n     \
-    \   int ones_before;\n    };\n\n    struct PrefixStats {\n        int ones = 0;\n\
-    \        Sum total_sum{};\n        Sum zero_sum{};\n    };\n\n    struct PrefixStatsPair\
-    \ {\n        PrefixStats left;\n        PrefixStats right;\n    };\n\n   private:\n\
-    \    static_assert(2 <= ChunkCapacity);\n    static_assert(\n        ChunkCapacity\
-    \ <= std::numeric_limits<std::uint16_t>::max()\n    );\n    static_assert(0 <\
-    \ GroupSize && GroupSize <= ChunkCapacity);\n    static_assert(ChunkCapacity %\
-    \ GroupSize == 0);\n    static constexpr int word_bits = 64;\n    static constexpr\
-    \ int word_count =\n        (ChunkCapacity + word_bits - 1) / word_bits;\n   \
-    \ static constexpr int group_count = ChunkCapacity / GroupSize;\n    static constexpr\
-    \ int minimum_chunk_size = ChunkCapacity / 2;\n\n    struct Node {\n        std::array<Sum,\
-    \ ChunkCapacity> weights{};\n        std::array<Sum, group_count> group_total_sums{};\n\
-    \        std::array<Sum, group_count> group_zero_sums{};\n        std::array<std::uint64_t,\
-    \ word_count> bits{};\n        Sum chunk_total_sum{};\n        Sum chunk_zero_sum{};\n\
-    \        Sum subtree_total_sum{};\n        Sum subtree_zero_sum{};\n        std::uint32_t\
-    \ priority = 0;\n        int left = 0;\n        int right = 0;\n        int subtree_size\
-    \ = 0;\n        int subtree_ones = 0;\n        std::uint16_t length = 0;\n   \
-    \     std::uint16_t chunk_ones = 0;\n    };\n\n    std::vector<Node> _nodes;\n\
-    \    std::vector<int> _free_nodes;\n    int _root = 0;\n    std::uint32_t _random_state\
-    \ = 1;\n\n    int size_of(int node) const {\n        return _nodes[node].subtree_size;\n\
-    \    }\n\n    int ones_of(int node) const {\n        return _nodes[node].subtree_ones;\n\
-    \    }\n\n    const Sum& total_sum_of(int node) const {\n        return _nodes[node].subtree_total_sum;\n\
-    \    }\n\n    const Sum& zero_sum_of(int node) const {\n        return _nodes[node].subtree_zero_sum;\n\
-    \    }\n\n    std::uint32_t next_priority() {\n        _random_state ^= _random_state\
-    \ << 13;\n        _random_state ^= _random_state >> 17;\n        _random_state\
-    \ ^= _random_state << 5;\n        if (_random_state == 0) _random_state = 1;\n\
-    \        return _random_state;\n    }\n\n    bool local_bit(int node, int position)\
-    \ const {\n        return (_nodes[node].bits[position / word_bits] >>\n      \
-    \          (position % word_bits)) &\n               1U;\n    }\n\n    void local_set_bit(int\
-    \ node, int position, bool bit) {\n        std::uint64_t mask =\n            std::uint64_t(1)\
-    \ << (position % word_bits);\n        std::uint64_t& word = _nodes[node].bits[position\
-    \ / word_bits];\n        if (bit) {\n            word |= mask;\n        } else\
-    \ {\n            word &= ~mask;\n        }\n    }\n\n    int local_rank1(int node,\
-    \ int right) const {\n        int full_words = right / word_bits;\n        int\
-    \ result = 0;\n        for (int word = 0; word < full_words; word++) {\n     \
-    \       result += std::popcount(_nodes[node].bits[word]);\n        }\n       \
-    \ int remainder = right % word_bits;\n        if (remainder != 0) {\n        \
-    \    result += std::popcount(\n                _nodes[node].bits[full_words] &\n\
-    \                ((std::uint64_t(1) << remainder) - 1)\n            );\n     \
-    \   }\n        return result;\n    }\n\n    void update(int node) {\n        if\
-    \ (node == 0) return;\n        Node& current = _nodes[node];\n        current.subtree_size\
-    \ =\n            size_of(current.left) + int(current.length) +\n            size_of(current.right);\n\
-    \        current.subtree_ones =\n            ones_of(current.left) + int(current.chunk_ones)\
-    \ +\n            ones_of(current.right);\n        current.subtree_total_sum =\n\
-    \            total_sum_of(current.left) + current.chunk_total_sum +\n        \
-    \    total_sum_of(current.right);\n        current.subtree_zero_sum =\n      \
-    \      zero_sum_of(current.left) + current.chunk_zero_sum +\n            zero_sum_of(current.right);\n\
-    \    }\n\n    void rebuild_chunk(int node) {\n        M1UNE_DWM_SUM_PROFILE_ADD(full_chunk_rebuilds,\
-    \ 1);\n        Node& current = _nodes[node];\n        current.group_total_sums.fill(Sum{});\n\
-    \        current.group_zero_sums.fill(Sum{});\n        current.chunk_total_sum\
-    \ = Sum{};\n        current.chunk_zero_sum = Sum{};\n        current.chunk_ones\
-    \ = 0;\n        for (int position = 0; position < current.length; position++)\
-    \ {\n            int group = position / GroupSize;\n            const Sum& weight\
-    \ = current.weights[position];\n            current.group_total_sums[group] =\n\
-    \                current.group_total_sums[group] + weight;\n            current.chunk_total_sum\
-    \ = current.chunk_total_sum + weight;\n            if (local_bit(node, position))\
-    \ {\n                current.chunk_ones++;\n            } else {\n           \
-    \     current.group_zero_sums[group] =\n                    current.group_zero_sums[group]\
-    \ + weight;\n                current.chunk_zero_sum = current.chunk_zero_sum +\
-    \ weight;\n            }\n        }\n        update(node);\n    }\n\n    PrefixStats\
-    \ local_prefix_stats(int node, int right) const {\n        PrefixStats result;\n\
-    \        result.ones = local_rank1(node, right);\n        int full_groups = right\
-    \ / GroupSize;\n        for (int group = 0; group < full_groups; group++) {\n\
-    \            result.total_sum =\n                result.total_sum + _nodes[node].group_total_sums[group];\n\
-    \            result.zero_sum =\n                result.zero_sum + _nodes[node].group_zero_sums[group];\n\
-    \        }\n        for (int position = full_groups * GroupSize; position < right;\n\
-    \             position++) {\n            const Sum& weight = _nodes[node].weights[position];\n\
-    \            result.total_sum = result.total_sum + weight;\n            if (!local_bit(node,\
-    \ position)) {\n                result.zero_sum = result.zero_sum + weight;\n\
-    \            }\n        }\n        return result;\n    }\n\n    static void add_stats(PrefixStats&\
-    \ destination, const PrefixStats& value) {\n        destination.ones += value.ones;\n\
-    \        destination.total_sum = destination.total_sum + value.total_sum;\n  \
-    \      destination.zero_sum = destination.zero_sum + value.zero_sum;\n    }\n\n\
-    \    PrefixStats subtree_stats(int node) const {\n        return PrefixStats{\n\
-    \            ones_of(node),\n            total_sum_of(node),\n            zero_sum_of(node)\n\
-    \        };\n    }\n\n    void local_insert(int node, int position, bool bit,\
-    \ const Sum& weight) {\n        Node& current = _nodes[node];\n        assert(0\
-    \ <= position && position <= current.length);\n        assert(current.length <\
-    \ ChunkCapacity);\n        M1UNE_DWM_SUM_PROFILE_ADD(\n            local_element_moves,\n\
-    \            int(current.length) - position\n        );\n        for (int i =\
-    \ current.length; position < i; i--) {\n            current.weights[i] = current.weights[i\
-    \ - 1];\n            local_set_bit(node, i, local_bit(node, i - 1));\n       \
-    \ }\n        current.weights[position] = weight;\n        local_set_bit(node,\
-    \ position, bit);\n        current.length++;\n        rebuild_chunk(node);\n \
-    \   }\n\n    EraseRankResult local_erase(int node, int position) {\n        Node&\
-    \ current = _nodes[node];\n        assert(0 <= position && position < current.length);\n\
-    \        M1UNE_DWM_SUM_PROFILE_ADD(\n            local_element_moves,\n      \
-    \      int(current.length) - position - 1\n        );\n        EraseRankResult\
-    \ result{\n            local_bit(node, position),\n            current.weights[position],\n\
-    \            0\n        };\n        for (int i = position; i + 1 < current.length;\
-    \ i++) {\n            current.weights[i] = current.weights[i + 1];\n         \
-    \   local_set_bit(node, i, local_bit(node, i + 1));\n        }\n        current.length--;\n\
-    \        current.weights[current.length] = Sum{};\n        local_set_bit(node,\
-    \ current.length, false);\n        rebuild_chunk(node);\n        return result;\n\
-    \    }\n\n    Sum local_set_weight(int node, int position, const Sum& weight)\
-    \ {\n        Node& current = _nodes[node];\n        Sum old_weight = current.weights[position];\n\
-    \        Sum delta = weight - old_weight;\n        current.weights[position] =\
-    \ weight;\n        int group = position / GroupSize;\n        current.group_total_sums[group]\
-    \ =\n            current.group_total_sums[group] + delta;\n        current.chunk_total_sum\
-    \ = current.chunk_total_sum + delta;\n        if (!local_bit(node, position))\
-    \ {\n            current.group_zero_sums[group] =\n                current.group_zero_sums[group]\
-    \ + delta;\n            current.chunk_zero_sum = current.chunk_zero_sum + delta;\n\
-    \        }\n        update(node);\n        return old_weight;\n    }\n\n    Sum\
-    \ local_add_weight(int node, int position, const Sum& delta) {\n        return\
-    \ local_set_weight(\n            node,\n            position,\n            _nodes[node].weights[position]\
-    \ + delta\n        );\n    }\n\n    int new_node() {\n        int node;\n    \
-    \    if (_free_nodes.empty()) {\n            node = int(_nodes.size());\n    \
-    \        _nodes.emplace_back();\n        } else {\n            node = _free_nodes.back();\n\
-    \            _free_nodes.pop_back();\n            _nodes[node] = Node();\n   \
-    \     }\n        _nodes[node].priority = next_priority();\n        return node;\n\
-    \    }\n\n    template <std::size_t Capacity>\n    void assign_from_values(\n\
-    \        int node,\n        const std::array<std::uint8_t, Capacity>& bits,\n\
-    \        const std::array<Sum, Capacity>& weights,\n        int first,\n     \
-    \   int last\n    ) {\n        Node& current = _nodes[node];\n        current.bits.fill(0);\n\
-    \        current.weights.fill(Sum{});\n        current.length = std::uint16_t(last\
-    \ - first);\n        for (int position = first; position < last; position++) {\n\
-    \            int destination = position - first;\n            current.weights[destination]\
-    \ = weights[position];\n            if (bits[position]) local_set_bit(node, destination,\
-    \ true);\n        }\n        rebuild_chunk(node);\n    }\n\n    void assign_from_values(\n\
-    \        int node,\n        const std::vector<std::uint8_t>& bits,\n        const\
-    \ std::vector<Sum>& weights,\n        int first,\n        int last\n    ) {\n\
-    \        Node& current = _nodes[node];\n        current.bits.fill(0);\n      \
-    \  current.weights.fill(Sum{});\n        current.length = std::uint16_t(last -\
-    \ first);\n        for (int position = first; position < last; position++) {\n\
-    \            int destination = position - first;\n            current.weights[destination]\
-    \ = weights[position];\n            if (bits[position]) local_set_bit(node, destination,\
-    \ true);\n        }\n        rebuild_chunk(node);\n    }\n\n    int new_node(\n\
-    \        const std::vector<std::uint8_t>& bits,\n        const std::vector<Sum>&\
-    \ weights,\n        int first,\n        int last\n    ) {\n        int node =\
-    \ new_node();\n        assign_from_values(node, bits, weights, first, last);\n\
-    \        return node;\n    }\n\n    void recycle_node(int node) {\n        assert(node\
-    \ != 0);\n        _nodes[node] = Node();\n        _free_nodes.push_back(node);\n\
-    \    }\n\n    int merge(int left, int right) {\n        if (left == 0 || right\
-    \ == 0) return left != 0 ? left : right;\n        if (_nodes[left].priority >\
-    \ _nodes[right].priority) {\n            _nodes[left].right = merge(_nodes[left].right,\
-    \ right);\n            update(left);\n            return left;\n        }\n  \
-    \      _nodes[right].left = merge(left, _nodes[right].left);\n        update(right);\n\
-    \        return right;\n    }\n\n    int rotate_right(int tree) {\n        int\
-    \ result = _nodes[tree].left;\n        _nodes[tree].left = _nodes[result].right;\n\
-    \        _nodes[result].right = tree;\n        update(tree);\n        update(result);\n\
-    \        return result;\n    }\n\n    int rotate_left(int tree) {\n        int\
-    \ result = _nodes[tree].right;\n        _nodes[tree].right = _nodes[result].left;\n\
-    \        _nodes[result].left = tree;\n        update(tree);\n        update(result);\n\
-    \        return result;\n    }\n\n    int extract_leftmost(int tree, int& extracted)\
-    \ {\n        if (_nodes[tree].left == 0) {\n            extracted = tree;\n  \
-    \          int result = _nodes[tree].right;\n            _nodes[tree].right =\
-    \ 0;\n            update(tree);\n            return result;\n        }\n     \
-    \   _nodes[tree].left = extract_leftmost(_nodes[tree].left, extracted);\n    \
-    \    update(tree);\n        return tree;\n    }\n\n    int extract_rightmost(int\
-    \ tree, int& extracted) {\n        if (_nodes[tree].right == 0) {\n          \
-    \  extracted = tree;\n            int result = _nodes[tree].left;\n          \
-    \  _nodes[tree].left = 0;\n            update(tree);\n            return result;\n\
-    \        }\n        _nodes[tree].right = extract_rightmost(_nodes[tree].right,\
-    \ extracted);\n        update(tree);\n        return tree;\n    }\n\n    int rebalance(int\
-    \ node) {\n        if (_nodes[node].length >= minimum_chunk_size) return node;\n\
-    \n        if (_nodes[node].right != 0) {\n            int neighbor = 0;\n    \
-    \        _nodes[node].right =\n                extract_leftmost(_nodes[node].right,\
-    \ neighbor);\n            int node_length = _nodes[node].length;\n           \
-    \ int neighbor_length = _nodes[neighbor].length;\n            int total = node_length\
-    \ + neighbor_length;\n            std::array<std::uint8_t, ChunkCapacity * 2>\
-    \ bits{};\n            std::array<Sum, ChunkCapacity * 2> weights{};\n       \
-    \     for (int i = 0; i < node_length; i++) {\n                bits[i] = local_bit(node,\
-    \ i);\n                weights[i] = _nodes[node].weights[i];\n            }\n\
-    \            for (int i = 0; i < neighbor_length; i++) {\n                bits[node_length\
-    \ + i] = local_bit(neighbor, i);\n                weights[node_length + i] = _nodes[neighbor].weights[i];\n\
-    \            }\n            if (total <= ChunkCapacity) {\n                M1UNE_DWM_SUM_PROFILE_ADD(chunk_merges,\
-    \ 1);\n                assign_from_values(node, bits, weights, 0, total);\n  \
-    \              recycle_node(neighbor);\n            } else {\n               \
-    \ int left_length = total / 2;\n                assign_from_values(node, bits,\
-    \ weights, 0, left_length);\n                assign_from_values(\n           \
-    \         neighbor,\n                    bits,\n                    weights,\n\
-    \                    left_length,\n                    total\n               \
-    \ );\n                _nodes[node].right = merge(neighbor, _nodes[node].right);\n\
-    \            }\n            update(node);\n            return node;\n        }\n\
-    \n        if (_nodes[node].left != 0) {\n            int neighbor = 0;\n     \
-    \       _nodes[node].left =\n                extract_rightmost(_nodes[node].left,\
-    \ neighbor);\n            int neighbor_length = _nodes[neighbor].length;\n   \
-    \         int node_length = _nodes[node].length;\n            int total = neighbor_length\
-    \ + node_length;\n            std::array<std::uint8_t, ChunkCapacity * 2> bits{};\n\
-    \            std::array<Sum, ChunkCapacity * 2> weights{};\n            for (int\
-    \ i = 0; i < neighbor_length; i++) {\n                bits[i] = local_bit(neighbor,\
-    \ i);\n                weights[i] = _nodes[neighbor].weights[i];\n           \
-    \ }\n            for (int i = 0; i < node_length; i++) {\n                bits[neighbor_length\
-    \ + i] = local_bit(node, i);\n                weights[neighbor_length + i] = _nodes[node].weights[i];\n\
-    \            }\n            if (total <= ChunkCapacity) {\n                M1UNE_DWM_SUM_PROFILE_ADD(chunk_merges,\
-    \ 1);\n                assign_from_values(node, bits, weights, 0, total);\n  \
-    \              recycle_node(neighbor);\n            } else {\n               \
-    \ int left_length = total / 2;\n                assign_from_values(\n        \
-    \            neighbor,\n                    bits,\n                    weights,\n\
-    \                    0,\n                    left_length\n                );\n\
-    \                assign_from_values(\n                    node,\n            \
-    \        bits,\n                    weights,\n                    left_length,\n\
-    \                    total\n                );\n                _nodes[node].left\
-    \ = merge(_nodes[node].left, neighbor);\n            }\n            update(node);\n\
-    \        }\n        return node;\n    }\n\n    int insert_impl(\n        int tree,\n\
-    \        int position,\n        bool bit,\n        const Sum& weight,\n      \
-    \  int& ones_before\n    ) {\n        if (tree == 0) {\n            int node =\
-    \ new_node();\n            local_insert(node, 0, bit, weight);\n            return\
-    \ node;\n        }\n\n        int left_size = size_of(_nodes[tree].left);\n  \
-    \      int length = _nodes[tree].length;\n        if (position < left_size) {\n\
-    \            _nodes[tree].left = insert_impl(\n                _nodes[tree].left,\n\
-    \                position,\n                bit,\n                weight,\n  \
-    \              ones_before\n            );\n            update(tree);\n      \
-    \      if (_nodes[_nodes[tree].left].priority >\n                _nodes[tree].priority)\
-    \ {\n                tree = rotate_right(tree);\n            }\n            return\
-    \ tree;\n        }\n        if (position > left_size + length) {\n           \
-    \ ones_before +=\n                ones_of(_nodes[tree].left) + _nodes[tree].chunk_ones;\n\
-    \            _nodes[tree].right = insert_impl(\n                _nodes[tree].right,\n\
-    \                position - left_size - length,\n                bit,\n      \
-    \          weight,\n                ones_before\n            );\n            update(tree);\n\
-    \            if (_nodes[_nodes[tree].right].priority >\n                _nodes[tree].priority)\
-    \ {\n                tree = rotate_left(tree);\n            }\n            return\
-    \ tree;\n        }\n\n        int local_position = position - left_size;\n   \
-    \     ones_before += ones_of(_nodes[tree].left) +\n                       local_rank1(tree,\
-    \ local_position);\n        if (length < ChunkCapacity) {\n            local_insert(tree,\
-    \ local_position, bit, weight);\n            return tree;\n        }\n\n     \
-    \   std::array<std::uint8_t, ChunkCapacity> bits{};\n        std::array<Sum, ChunkCapacity>\
-    \ weights{};\n        M1UNE_DWM_SUM_PROFILE_ADD(chunk_splits, 1);\n        for\
-    \ (int i = 0; i < ChunkCapacity; i++) {\n            bits[i] = local_bit(tree,\
-    \ i);\n            weights[i] = _nodes[tree].weights[i];\n        }\n        int\
-    \ right_chunk = new_node();\n        int middle = ChunkCapacity / 2;\n       \
-    \ assign_from_values(tree, bits, weights, 0, middle);\n        assign_from_values(\n\
-    \            right_chunk,\n            bits,\n            weights,\n         \
-    \   middle,\n            ChunkCapacity\n        );\n        if (local_position\
-    \ <= middle) {\n            local_insert(tree, local_position, bit, weight);\n\
-    \        } else {\n            local_insert(\n                right_chunk,\n \
-    \               local_position - middle,\n                bit,\n             \
-    \   weight\n            );\n        }\n\n        int old_right = _nodes[tree].right;\n\
-    \        _nodes[tree].right = 0;\n        update(tree);\n        return merge(merge(tree,\
-    \ right_chunk), old_right);\n    }\n\n    int erase_impl(\n        int tree,\n\
-    \        int position,\n        EraseRankResult& result\n    ) {\n        int\
-    \ left_size = size_of(_nodes[tree].left);\n        int length = _nodes[tree].length;\n\
-    \        if (position < left_size) {\n            _nodes[tree].left = erase_impl(\n\
-    \                _nodes[tree].left,\n                position,\n             \
-    \   result\n            );\n            update(tree);\n            return tree;\n\
-    \        }\n        if (position >= left_size + length) {\n            result.ones_before\
-    \ +=\n                ones_of(_nodes[tree].left) + _nodes[tree].chunk_ones;\n\
-    \            _nodes[tree].right = erase_impl(\n                _nodes[tree].right,\n\
-    \                position - left_size - length,\n                result\n    \
-    \        );\n            update(tree);\n            return tree;\n        }\n\n\
-    \        int local_position = position - left_size;\n        result.ones_before\
-    \ += ones_of(_nodes[tree].left) +\n                              local_rank1(tree,\
-    \ local_position);\n        EraseRankResult local = local_erase(tree, local_position);\n\
-    \        result.bit = local.bit;\n        result.weight = local.weight;\n    \
-    \    if (_nodes[tree].length == 0) {\n            int merged = merge(_nodes[tree].left,\
-    \ _nodes[tree].right);\n            recycle_node(tree);\n            return merged;\n\
-    \        }\n        return rebalance(tree);\n    }\n\n    template <bool Add>\n\
-    \    void change_weight_impl(\n        int tree,\n        int position,\n    \
-    \    const Sum& value,\n        AccessRankResult& result\n    ) {\n        int\
-    \ left_size = size_of(_nodes[tree].left);\n        if (position < left_size) {\n\
-    \            change_weight_impl<Add>(\n                _nodes[tree].left,\n  \
-    \              position,\n                value,\n                result\n   \
-    \         );\n        } else if (position < left_size + _nodes[tree].length) {\n\
-    \            int local_position = position - left_size;\n            result.ones_before\
-    \ += ones_of(_nodes[tree].left) +\n                                  local_rank1(tree,\
-    \ local_position);\n            result.bit = local_bit(tree, local_position);\n\
-    \            if constexpr (Add) {\n                result.weight = local_add_weight(tree,\
-    \ local_position, value);\n            } else {\n                result.weight\
-    \ = local_set_weight(tree, local_position, value);\n            }\n          \
-    \  return;\n        } else {\n            result.ones_before +=\n            \
-    \    ones_of(_nodes[tree].left) + _nodes[tree].chunk_ones;\n            change_weight_impl<Add>(\n\
-    \                _nodes[tree].right,\n                position - left_size - _nodes[tree].length,\n\
-    \                value,\n                result\n            );\n        }\n \
-    \       update(tree);\n    }\n\n    PrefixStats prefix_stats_impl(int tree, int\
-    \ right) const {\n        PrefixStats result;\n        while (tree != 0 && right\
-    \ != 0) {\n            int left_size = size_of(_nodes[tree].left);\n         \
-    \   if (right <= left_size) {\n                tree = _nodes[tree].left;\n   \
-    \             continue;\n            }\n            add_stats(result, subtree_stats(_nodes[tree].left));\n\
-    \            right -= left_size;\n            int take = std::min(right, int(_nodes[tree].length));\n\
-    \            add_stats(result, local_prefix_stats(tree, take));\n            right\
-    \ -= take;\n            if (right == 0) break;\n            tree = _nodes[tree].right;\n\
-    \        }\n        return result;\n    }\n\n    PrefixStatsPair prefix_stats_pair_impl(\n\
-    \        int tree,\n        int left,\n        int right\n    ) const {\n    \
-    \    if (left == right) {\n            PrefixStats value = prefix_stats_impl(tree,\
-    \ left);\n            return PrefixStatsPair{value, value};\n        }\n     \
-    \   if (tree == 0 || right == 0) return PrefixStatsPair{};\n\n        int left_size\
-    \ = size_of(_nodes[tree].left);\n        int chunk_end = left_size + _nodes[tree].length;\n\
-    \        if (right <= left_size) {\n            return prefix_stats_pair_impl(\n\
-    \                _nodes[tree].left,\n                left,\n                right\n\
-    \            );\n        }\n        if (chunk_end <= left) {\n            PrefixStats\
-    \ base = subtree_stats(_nodes[tree].left);\n            add_stats(base, local_prefix_stats(tree,\
-    \ _nodes[tree].length));\n            PrefixStatsPair result = prefix_stats_pair_impl(\n\
-    \                _nodes[tree].right,\n                left - chunk_end,\n    \
-    \            right - chunk_end\n            );\n            add_stats(result.left,\
-    \ base);\n            add_stats(result.right, base);\n            return result;\n\
-    \        }\n\n        PrefixStats left_stats;\n        if (left <= left_size)\
-    \ {\n            left_stats = prefix_stats_impl(_nodes[tree].left, left);\n  \
-    \      } else {\n            left_stats = subtree_stats(_nodes[tree].left);\n\
-    \            add_stats(\n                left_stats,\n                local_prefix_stats(tree,\
-    \ left - left_size)\n            );\n        }\n\n        PrefixStats right_stats\
-    \ = subtree_stats(_nodes[tree].left);\n        if (right <= chunk_end) {\n   \
-    \         add_stats(\n                right_stats,\n                local_prefix_stats(tree,\
-    \ right - left_size)\n            );\n        } else {\n            add_stats(\n\
-    \                right_stats,\n                local_prefix_stats(tree, _nodes[tree].length)\n\
-    \            );\n            add_stats(\n                right_stats,\n      \
-    \          prefix_stats_impl(_nodes[tree].right, right - chunk_end)\n        \
-    \    );\n        }\n        return PrefixStatsPair{left_stats, right_stats};\n\
-    \    }\n\n    template <class Predicate>\n    int consume_chunk_prefix(\n    \
-    \    int node,\n        int left,\n        int right,\n        Sum& sum,\n   \
-    \     Predicate& predicate\n    ) const {\n        int position = left;\n    \
-    \    while (position < right) {\n            if (position % GroupSize == 0 &&\n\
-    \                position + GroupSize <= right) {\n                int group =\
-    \ position / GroupSize;\n                Sum candidate =\n                   \
-    \ sum + _nodes[node].group_total_sums[group];\n                if (predicate(candidate))\
-    \ {\n                    sum = candidate;\n                    position += GroupSize;\n\
-    \                    continue;\n                }\n            }\n           \
-    \ Sum candidate = sum + _nodes[node].weights[position];\n            if (!predicate(candidate))\
-    \ break;\n            sum = candidate;\n            position++;\n        }\n \
-    \       return position - left;\n    }\n\n    template <class Predicate>\n   \
-    \ int consume_chunk_suffix(\n        int node,\n        int left,\n        int\
-    \ right,\n        Sum& sum,\n        Predicate& predicate\n    ) const {\n   \
-    \     int position = right;\n        while (left < position) {\n            if\
-    \ (position % GroupSize == 0 &&\n                left <= position - GroupSize)\
-    \ {\n                int group = position / GroupSize - 1;\n                Sum\
-    \ candidate =\n                    sum + _nodes[node].group_total_sums[group];\n\
-    \                if (predicate(candidate)) {\n                    sum = candidate;\n\
-    \                    position -= GroupSize;\n                    continue;\n \
-    \               }\n            }\n            Sum candidate = sum + _nodes[node].weights[position\
-    \ - 1];\n            if (!predicate(candidate)) break;\n            sum = candidate;\n\
-    \            position--;\n        }\n        return right - position;\n    }\n\
-    \n    template <class Predicate>\n    int max_prefix_impl(\n        int tree,\n\
-    \        int left,\n        int right,\n        Sum& sum,\n        Predicate&\
-    \ predicate\n    ) const {\n        assert(tree != 0);\n        assert(0 <= left\
-    \ && left < right && right <= size_of(tree));\n        if (left == 0 && right\
-    \ == size_of(tree)) {\n            Sum candidate = sum + total_sum_of(tree);\n\
-    \            if (predicate(candidate)) {\n                sum = candidate;\n \
-    \               return size_of(tree);\n            }\n        }\n\n        int\
-    \ left_size = size_of(_nodes[tree].left);\n        int chunk_end = left_size +\
-    \ _nodes[tree].length;\n        int count = 0;\n        if (left < left_size)\
-    \ {\n            int subtree_right = std::min(right, left_size);\n           \
-    \ int consumed = max_prefix_impl(\n                _nodes[tree].left,\n      \
-    \          left,\n                subtree_right,\n                sum,\n     \
-    \           predicate\n            );\n            count += consumed;\n      \
-    \      if (consumed < subtree_right - left) return count;\n        }\n\n     \
-    \   int chunk_left = std::max(left, left_size);\n        int chunk_right = std::min(right,\
-    \ chunk_end);\n        if (chunk_left < chunk_right) {\n            int consumed\
-    \ = consume_chunk_prefix(\n                tree,\n                chunk_left -\
-    \ left_size,\n                chunk_right - left_size,\n                sum,\n\
-    \                predicate\n            );\n            count += consumed;\n \
-    \           if (consumed < chunk_right - chunk_left) return count;\n        }\n\
-    \n        if (chunk_end < right) {\n            int subtree_left = std::max(left,\
-    \ chunk_end) - chunk_end;\n            int subtree_right = right - chunk_end;\n\
-    \            count += max_prefix_impl(\n                _nodes[tree].right,\n\
-    \                subtree_left,\n                subtree_right,\n             \
-    \   sum,\n                predicate\n            );\n        }\n        return\
-    \ count;\n    }\n\n    template <class Predicate>\n    int max_suffix_impl(\n\
-    \        int tree,\n        int left,\n        int right,\n        Sum& sum,\n\
-    \        Predicate& predicate\n    ) const {\n        assert(tree != 0);\n   \
-    \     assert(0 <= left && left < right && right <= size_of(tree));\n        if\
-    \ (left == 0 && right == size_of(tree)) {\n            Sum candidate = sum + total_sum_of(tree);\n\
-    \            if (predicate(candidate)) {\n                sum = candidate;\n \
-    \               return size_of(tree);\n            }\n        }\n\n        int\
-    \ left_size = size_of(_nodes[tree].left);\n        int chunk_end = left_size +\
-    \ _nodes[tree].length;\n        int count = 0;\n        if (chunk_end < right)\
-    \ {\n            int subtree_left = std::max(left, chunk_end) - chunk_end;\n \
-    \           int subtree_right = right - chunk_end;\n            int consumed =\
-    \ max_suffix_impl(\n                _nodes[tree].right,\n                subtree_left,\n\
-    \                subtree_right,\n                sum,\n                predicate\n\
-    \            );\n            count += consumed;\n            if (consumed < subtree_right\
-    \ - subtree_left) return count;\n        }\n\n        int chunk_left = std::max(left,\
-    \ left_size);\n        int chunk_right = std::min(right, chunk_end);\n       \
-    \ if (chunk_left < chunk_right) {\n            int consumed = consume_chunk_suffix(\n\
-    \                tree,\n                chunk_left - left_size,\n            \
-    \    chunk_right - left_size,\n                sum,\n                predicate\n\
-    \            );\n            count += consumed;\n            if (consumed < chunk_right\
-    \ - chunk_left) return count;\n        }\n\n        if (left < left_size) {\n\
-    \            int subtree_right = std::min(right, left_size);\n            count\
-    \ += max_suffix_impl(\n                _nodes[tree].left,\n                left,\n\
-    \                subtree_right,\n                sum,\n                predicate\n\
-    \            );\n        }\n        return count;\n    }\n\n    void update_subtree(int\
-    \ tree) {\n        if (tree == 0) return;\n        update_subtree(_nodes[tree].left);\n\
-    \        update_subtree(_nodes[tree].right);\n        update(tree);\n    }\n\n\
-    \    void build(\n        const std::vector<std::uint8_t>& bits,\n        const\
-    \ std::vector<Sum>& weights\n    ) {\n        assert(bits.size() == weights.size());\n\
-    \        _nodes.clear();\n        _nodes.emplace_back();\n        _free_nodes.clear();\n\
-    \        _root = 0;\n        _nodes.reserve(weights.size() / minimum_chunk_size\
-    \ + 2);\n\n        std::vector<int> stack;\n        for (int first = 0; first\
-    \ < int(weights.size());\n             first += ChunkCapacity) {\n           \
-    \ int last =\n                std::min(first + ChunkCapacity, int(weights.size()));\n\
-    \            int node = new_node(bits, weights, first, last);\n            int\
-    \ left = 0;\n            while (!stack.empty() &&\n                   _nodes[stack.back()].priority\
-    \ < _nodes[node].priority) {\n                left = stack.back();\n         \
-    \       stack.pop_back();\n            }\n            _nodes[node].left = left;\n\
-    \            if (!stack.empty()) _nodes[stack.back()].right = node;\n        \
-    \    stack.push_back(node);\n        }\n        if (!stack.empty()) _root = stack.front();\n\
-    \        update_subtree(_root);\n    }\n\n   public:\n    DynamicWeightedRankSequence()\
-    \ : _nodes(1) {}\n\n    DynamicWeightedRankSequence(\n        const std::vector<std::uint8_t>&\
-    \ bits,\n        const std::vector<Sum>& weights,\n        std::uint32_t seed\
-    \ = 1\n    ) : _random_state(seed == 0 ? 1 : seed) {\n        build(bits, weights);\n\
-    \    }\n\n    explicit DynamicWeightedRankSequence(\n        const std::vector<Sum>&\
-    \ weights,\n        std::uint32_t seed = 1\n    ) : _random_state(seed == 0 ?\
-    \ 1 : seed) {\n        build(std::vector<std::uint8_t>(weights.size()), weights);\n\
-    \    }\n\n    int size() const {\n        return size_of(_root);\n    }\n\n  \
-    \  AccessRankResult access_with_rank(int position) const {\n        assert(0 <=\
-    \ position && position < size());\n        M1UNE_DWM_SUM_PROFILE_ADD(weight_tree_traversals,\
-    \ 1);\n        int tree = _root;\n        int ones_before = 0;\n        while\
-    \ (tree != 0) {\n            int left_size = size_of(_nodes[tree].left);\n   \
-    \         if (position < left_size) {\n                tree = _nodes[tree].left;\n\
-    \            } else if (position < left_size + _nodes[tree].length) {\n      \
-    \          int local_position = position - left_size;\n                ones_before\
-    \ += ones_of(_nodes[tree].left) +\n                               local_rank1(tree,\
-    \ local_position);\n                return AccessRankResult{\n               \
-    \     local_bit(tree, local_position),\n                    _nodes[tree].weights[local_position],\n\
-    \                    ones_before\n                };\n            } else {\n \
-    \               ones_before +=\n                    ones_of(_nodes[tree].left)\
-    \ + _nodes[tree].chunk_ones;\n                position -= left_size + _nodes[tree].length;\n\
-    \                tree = _nodes[tree].right;\n            }\n        }\n      \
-    \  assert(false);\n        return AccessRankResult{false, Sum{}, 0};\n    }\n\n\
-    \    PrefixStats prefix_stats(int right) const {\n        assert(0 <= right &&\
-    \ right <= size());\n        M1UNE_DWM_SUM_PROFILE_ADD(weight_tree_traversals,\
-    \ 1);\n        return prefix_stats_impl(_root, right);\n    }\n\n    PrefixStatsPair\
-    \ prefix_stats_pair(int left, int right) const {\n        assert(0 <= left &&\
-    \ left <= right && right <= size());\n        M1UNE_DWM_SUM_PROFILE_ADD(weight_tree_traversals,\
-    \ 1);\n        return prefix_stats_pair_impl(_root, left, right);\n    }\n\n \
-    \   Sum range_sum(int left, int right) const {\n        PrefixStatsPair stats\
-    \ = prefix_stats_pair(left, right);\n        return stats.right.total_sum - stats.left.total_sum;\n\
-    \    }\n\n    int insert_with_rank(\n        int position,\n        bool bit,\n\
-    \        const Sum& weight\n    ) {\n        assert(0 <= position && position\
-    \ <= size());\n        M1UNE_DWM_SUM_PROFILE_ADD(weight_tree_traversals, 1);\n\
-    \        int ones_before = 0;\n        _root = insert_impl(\n            _root,\n\
-    \            position,\n            bit,\n            weight,\n            ones_before\n\
-    \        );\n        return ones_before;\n    }\n\n    EraseRankResult erase_with_rank(int\
-    \ position) {\n        assert(0 <= position && position < size());\n        M1UNE_DWM_SUM_PROFILE_ADD(weight_tree_traversals,\
-    \ 1);\n        EraseRankResult result{false, Sum{}, 0};\n        _root = erase_impl(_root,\
-    \ position, result);\n        return result;\n    }\n\n    AccessRankResult set_weight_with_rank(\n\
-    \        int position,\n        const Sum& weight\n    ) {\n        assert(0 <=\
-    \ position && position < size());\n        M1UNE_DWM_SUM_PROFILE_ADD(weight_tree_traversals,\
-    \ 1);\n        AccessRankResult result{false, Sum{}, 0};\n        change_weight_impl<false>(_root,\
-    \ position, weight, result);\n        return result;\n    }\n\n    AccessRankResult\
-    \ add_weight_with_rank(\n        int position,\n        const Sum& delta\n   \
-    \ ) {\n        assert(0 <= position && position < size());\n        M1UNE_DWM_SUM_PROFILE_ADD(weight_tree_traversals,\
-    \ 1);\n        AccessRankResult result{false, Sum{}, 0};\n        change_weight_impl<true>(_root,\
-    \ position, delta, result);\n        return result;\n    }\n\n    template <class\
-    \ Predicate>\n    int max_prefix(\n        int left,\n        int right,\n   \
-    \     Sum& sum,\n        Predicate& predicate\n    ) const {\n        assert(0\
-    \ <= left && left <= right && right <= size());\n        if (left == right) return\
-    \ 0;\n        M1UNE_DWM_SUM_PROFILE_ADD(weight_tree_traversals, 1);\n        return\
-    \ max_prefix_impl(_root, left, right, sum, predicate);\n    }\n\n    template\
-    \ <class Predicate>\n    int max_suffix(\n        int left,\n        int right,\n\
-    \        Sum& sum,\n        Predicate& predicate\n    ) const {\n        assert(0\
-    \ <= left && left <= right && right <= size());\n        if (left == right) return\
-    \ 0;\n        M1UNE_DWM_SUM_PROFILE_ADD(weight_tree_traversals, 1);\n        return\
-    \ max_suffix_impl(_root, left, right, sum, predicate);\n    }\n};\n\n}  // namespace\
-    \ dynamic_wavelet_matrix_sum_detail\n\n#undef M1UNE_DWM_SUM_PROFILE_ADD\n\n//\
-    \ A dynamic wavelet matrix with additive weights.\n// By default, each value is\
-    \ also used as its weight.\ntemplate <\n    std::integral T,\n    typename Sum\
-    \ = T,\n    int BitWidth = std::numeric_limits<std::make_unsigned_t<T>>::digits\n\
-    >\nrequires(!std::same_as<std::remove_cv_t<T>, bool>)\nclass DynamicWaveletMatrixSum\
-    \ {\n   public:\n    using value_type = T;\n    using sum_type = Sum;\n    using\
-    \ unsigned_type = std::make_unsigned_t<T>;\n\n   private:\n    static constexpr\
-    \ int full_bit_width =\n        std::numeric_limits<unsigned_type>::digits;\n\
-    \    static_assert(1 <= BitWidth && BitWidth <= full_bit_width);\n    static_assert(\n\
-    \        BitWidth == full_bit_width || std::unsigned_integral<T>,\n        \"\
-    reduced-width keys must use an unsigned type\"\n    );\n\n    static constexpr\
-    \ unsigned_type sign_mask = [] {\n        if constexpr (std::signed_integral<T>)\
-    \ {\n            return unsigned_type(1) << (BitWidth - 1);\n        } else {\n\
-    \            return unsigned_type(0);\n        }\n    }();\n\n    static constexpr\
-    \ unsigned_type reduced_limit = [] {\n        if constexpr (BitWidth < full_bit_width)\
-    \ {\n            return unsigned_type(1) << BitWidth;\n        } else {\n    \
-    \        return unsigned_type(0);\n        }\n    }();\n\n    using Level = dynamic_wavelet_matrix_sum_detail::\n\
-    \        DynamicWeightedRankSequence<Sum>;\n\n    struct ErasedElement {\n   \
-    \     unsigned_type key;\n        Sum weight;\n    };\n\n    int _size = 0;\n\
-    \    std::vector<Level> _levels;\n    Level _final_weights;\n    std::array<int,\
-    \ BitWidth> _zero_count{};\n\n    static bool key_fits(T value) {\n        if\
-    \ constexpr (BitWidth < full_bit_width) {\n            return static_cast<unsigned_type>(value)\
-    \ < reduced_limit;\n        } else {\n            return true;\n        }\n  \
-    \  }\n\n    static unsigned_type encode_unchecked(T value) {\n        unsigned_type\
-    \ bits;\n        if constexpr (std::signed_integral<T>) {\n            bits =\
-    \ std::bit_cast<unsigned_type>(value);\n        } else {\n            bits = value;\n\
-    \        }\n        return bits ^ sign_mask;\n    }\n\n    static unsigned_type\
-    \ encode_key(T value) {\n        assert(key_fits(value));\n        return encode_unchecked(value);\n\
-    \    }\n\n    static T decode(unsigned_type key) {\n        unsigned_type bits\
-    \ = key ^ sign_mask;\n        if constexpr (std::signed_integral<T>) {\n     \
-    \       return std::bit_cast<T>(bits);\n        } else {\n            return bits;\n\
-    \        }\n    }\n\n    static bool bit(unsigned_type key, int level) {\n   \
-    \     return (key >> (BitWidth - 1 - level)) & unsigned_type(1);\n    }\n\n  \
-    \  static Sum range_total(const typename Level::PrefixStatsPair& stats) {\n  \
-    \      return stats.right.total_sum - stats.left.total_sum;\n    }\n\n    static\
-    \ Sum range_zero(const typename Level::PrefixStatsPair& stats) {\n        return\
-    \ stats.right.zero_sum - stats.left.zero_sum;\n    }\n\n    void build(const std::vector<T>&\
-    \ values, const std::vector<Sum>& weights) {\n        assert(values.size() ==\
-    \ weights.size());\n        _size = int(values.size());\n\n        std::vector<unsigned_type>\
-    \ current_keys(_size);\n        std::vector<unsigned_type> next_keys(_size);\n\
-    \        std::vector<Sum> current_weights(weights);\n        std::vector<Sum>\
-    \ next_weights(_size);\n        for (int i = 0; i < _size; i++) {\n          \
-    \  current_keys[i] = encode_key(values[i]);\n        }\n\n        _levels.clear();\n\
-    \        _levels.reserve(BitWidth);\n        for (int level = 0; level < BitWidth;\
-    \ level++) {\n            std::vector<std::uint8_t> bits(_size);\n           \
-    \ int zeros = 0;\n            for (int i = 0; i < _size; i++) {\n            \
-    \    bits[i] = bit(current_keys[i], level);\n                zeros += !bits[i];\n\
-    \            }\n            _zero_count[level] = zeros;\n            _levels.emplace_back(\n\
-    \                bits,\n                current_weights,\n                std::uint32_t(0x9e3779b9U\
-    \ + level * 0x85ebca6bU)\n            );\n\n            int zero_position = 0;\n\
-    \            int one_position = zeros;\n            for (int i = 0; i < _size;\
-    \ i++) {\n                int next_position = bits[i] ? one_position++ : zero_position++;\n\
-    \                next_keys[next_position] = current_keys[i];\n               \
-    \ next_weights[next_position] = current_weights[i];\n            }\n         \
-    \   current_keys.swap(next_keys);\n            current_weights.swap(next_weights);\n\
-    \        }\n        _final_weights = Level(current_weights, 0xb7e15162U);\n  \
-    \  }\n\n    void insert_encoded(int position, unsigned_type key, const Sum& weight)\
-    \ {\n        for (int level = 0; level < BitWidth; level++) {\n            bool\
-    \ one = bit(key, level);\n            int ones_before =\n                _levels[level].insert_with_rank(position,\
-    \ one, weight);\n            int next_position;\n            if (one) {\n    \
-    \            next_position = _zero_count[level] + ones_before;\n            }\
-    \ else {\n                next_position = position - ones_before;\n          \
-    \      _zero_count[level]++;\n            }\n            position = next_position;\n\
-    \        }\n        _final_weights.insert_with_rank(position, false, weight);\n\
-    \        _size++;\n    }\n\n    ErasedElement erase_encoded(int position) {\n\
-    \        unsigned_type key = 0;\n        Sum weight{};\n        for (int level\
-    \ = 0; level < BitWidth; level++) {\n            auto erased = _levels[level].erase_with_rank(position);\n\
-    \            if (level == 0) weight = erased.weight;\n            int next_position;\n\
-    \            if (erased.bit) {\n                key |= unsigned_type(1) << (BitWidth\
-    \ - 1 - level);\n                next_position = _zero_count[level] + erased.ones_before;\n\
-    \            } else {\n                next_position = position - erased.ones_before;\n\
-    \                _zero_count[level]--;\n            }\n            position =\
-    \ next_position;\n        }\n        _final_weights.erase_with_rank(position);\n\
-    \        _size--;\n        return ErasedElement{key, weight};\n    }\n\n    int\
-    \ count_less_encoded(int left, int right, unsigned_type upper) const {\n     \
-    \   int result = 0;\n        for (int level = 0; level < BitWidth; level++) {\n\
-    \            auto stats = _levels[level].prefix_stats_pair(left, right);\n   \
-    \         int left_ones = stats.left.ones;\n            int right_ones = stats.right.ones;\n\
-    \            if (bit(upper, level)) {\n                result += (right - left)\
-    \ - (right_ones - left_ones);\n                left = _zero_count[level] + left_ones;\n\
-    \                right = _zero_count[level] + right_ones;\n            } else\
-    \ {\n                left -= left_ones;\n                right -= right_ones;\n\
-    \            }\n        }\n        return result;\n    }\n\n    int count_less(int\
-    \ left, int right, T upper) const {\n        if constexpr (BitWidth < full_bit_width)\
-    \ {\n            if (!key_fits(upper)) return right - left;\n        }\n     \
-    \   return count_less_encoded(left, right, encode_unchecked(upper));\n    }\n\n\
-    \    Sum sum_less_encoded(int left, int right, unsigned_type upper) const {\n\
-    \        Sum result{};\n        for (int level = 0; level < BitWidth; level++)\
-    \ {\n            auto stats = _levels[level].prefix_stats_pair(left, right);\n\
-    \            int left_ones = stats.left.ones;\n            int right_ones = stats.right.ones;\n\
-    \            if (bit(upper, level)) {\n                result = result + range_zero(stats);\n\
-    \                left = _zero_count[level] + left_ones;\n                right\
-    \ = _zero_count[level] + right_ones;\n            } else {\n                left\
-    \ -= left_ones;\n                right -= right_ones;\n            }\n       \
-    \ }\n        return result;\n    }\n\n    Sum sum_less(int left, int right, T\
-    \ upper) const {\n        if constexpr (BitWidth < full_bit_width) {\n       \
-    \     if (!key_fits(upper)) return range_sum(left, right);\n        }\n      \
-    \  return sum_less_encoded(left, right, encode_unchecked(upper));\n    }\n\n \
-    \  public:\n    DynamicWaveletMatrixSum() : _levels(BitWidth) {}\n\n    explicit\
-    \ DynamicWaveletMatrixSum(const std::vector<T>& values)\n        requires std::convertible_to<T,\
-    \ Sum>\n    {\n        std::vector<Sum> weights;\n        weights.reserve(values.size());\n\
-    \        for (T value : values) weights.push_back(static_cast<Sum>(value));\n\
-    \        build(values, weights);\n    }\n\n    DynamicWaveletMatrixSum(\n    \
-    \    const std::vector<T>& values,\n        const std::vector<Sum>& weights\n\
-    \    ) {\n        build(values, weights);\n    }\n\n    int size() const {\n \
-    \       return _size;\n    }\n\n    bool empty() const {\n        return _size\
-    \ == 0;\n    }\n\n    void clear() {\n        *this = DynamicWaveletMatrixSum();\n\
-    \    }\n\n    T access(int position) const {\n        assert(0 <= position &&\
-    \ position < _size);\n        unsigned_type key = 0;\n        for (int level =\
-    \ 0; level < BitWidth; level++) {\n            auto accessed = _levels[level].access_with_rank(position);\n\
-    \            if (accessed.bit) {\n                key |= unsigned_type(1) << (BitWidth\
-    \ - 1 - level);\n                position = _zero_count[level] + accessed.ones_before;\n\
-    \            } else {\n                position -= accessed.ones_before;\n   \
-    \         }\n        }\n        return decode(key);\n    }\n\n    T operator[](int\
-    \ position) const {\n        return access(position);\n    }\n\n    Sum weight(int\
-    \ position) const {\n        assert(0 <= position && position < _size);\n    \
-    \    return _levels[0].access_with_rank(position).weight;\n    }\n\n    std::pair<T,\
-    \ Sum> get(int position) const {\n        assert(0 <= position && position < _size);\n\
-    \        unsigned_type key = 0;\n        Sum result_weight{};\n        for (int\
-    \ level = 0; level < BitWidth; level++) {\n            auto accessed = _levels[level].access_with_rank(position);\n\
-    \            if (level == 0) result_weight = accessed.weight;\n            if\
-    \ (accessed.bit) {\n                key |= unsigned_type(1) << (BitWidth - 1 -\
-    \ level);\n                position = _zero_count[level] + accessed.ones_before;\n\
-    \            } else {\n                position -= accessed.ones_before;\n   \
-    \         }\n        }\n        return std::pair<T, Sum>(decode(key), result_weight);\n\
-    \    }\n\n    void insert(int position, T value)\n        requires std::convertible_to<T,\
-    \ Sum>\n    {\n        insert(position, value, static_cast<Sum>(value));\n   \
-    \ }\n\n    void insert(int position, T value, const Sum& weight) {\n        assert(0\
-    \ <= position && position <= _size);\n        insert_encoded(position, encode_key(value),\
-    \ weight);\n    }\n\n    void push_back(T value)\n        requires std::convertible_to<T,\
-    \ Sum>\n    {\n        insert(_size, value);\n    }\n\n    void push_back(T value,\
-    \ const Sum& weight) {\n        insert(_size, value, weight);\n    }\n\n    std::pair<T,\
-    \ Sum> erase(int position) {\n        assert(0 <= position && position < _size);\n\
-    \        ErasedElement erased = erase_encoded(position);\n        return std::pair<T,\
-    \ Sum>(decode(erased.key), erased.weight);\n    }\n\n    void set(int position,\
-    \ T value)\n        requires std::convertible_to<T, Sum>\n    {\n        set(position,\
-    \ value, static_cast<Sum>(value));\n    }\n\n    void set(int position, T value,\
-    \ const Sum& weight) {\n        assert(0 <= position && position < _size);\n \
-    \       unsigned_type key = encode_key(value);\n        erase_encoded(position);\n\
-    \        insert_encoded(position, key, weight);\n    }\n\n    void set_value(int\
-    \ position, T value) {\n        assert(0 <= position && position < _size);\n \
-    \       unsigned_type key = encode_key(value);\n        ErasedElement erased =\
-    \ erase_encoded(position);\n        insert_encoded(position, key, erased.weight);\n\
-    \    }\n\n    void set_weight(int position, const Sum& new_weight) {\n       \
-    \ assert(0 <= position && position < _size);\n        for (int level = 0; level\
-    \ < BitWidth; level++) {\n            auto accessed =\n                _levels[level].set_weight_with_rank(position,\
-    \ new_weight);\n            if (accessed.bit) {\n                position = _zero_count[level]\
-    \ + accessed.ones_before;\n            } else {\n                position -= accessed.ones_before;\n\
-    \            }\n        }\n        _final_weights.set_weight_with_rank(position,\
-    \ new_weight);\n    }\n\n    void add_weight(int position, const Sum& delta) {\n\
-    \        assert(0 <= position && position < _size);\n        for (int level =\
-    \ 0; level < BitWidth; level++) {\n            auto accessed =\n             \
-    \   _levels[level].add_weight_with_rank(position, delta);\n            if (accessed.bit)\
-    \ {\n                position = _zero_count[level] + accessed.ones_before;\n \
-    \           } else {\n                position -= accessed.ones_before;\n    \
-    \        }\n        }\n        _final_weights.add_weight_with_rank(position, delta);\n\
-    \    }\n\n    int rank(T value, int right) const {\n        assert(0 <= right\
-    \ && right <= _size);\n        return rank(value, 0, right);\n    }\n\n    int\
-    \ rank(T value, int left, int right) const {\n        assert(0 <= left && left\
-    \ <= right && right <= _size);\n        if constexpr (BitWidth < full_bit_width)\
-    \ {\n            if (!key_fits(value)) return 0;\n        }\n        unsigned_type\
-    \ key = encode_unchecked(value);\n        for (int level = 0; level < BitWidth;\
-    \ level++) {\n            auto stats = _levels[level].prefix_stats_pair(left,\
-    \ right);\n            int left_ones = stats.left.ones;\n            int right_ones\
-    \ = stats.right.ones;\n            if (bit(key, level)) {\n                left\
-    \ = _zero_count[level] + left_ones;\n                right = _zero_count[level]\
-    \ + right_ones;\n            } else {\n                left -= left_ones;\n  \
-    \              right -= right_ones;\n            }\n        }\n        return\
-    \ right - left;\n    }\n\n    T kth_smallest(int left, int right, int k) const\
-    \ {\n        assert(0 <= left && left <= right && right <= _size);\n        assert(0\
-    \ <= k && k < right - left);\n        unsigned_type key = 0;\n        for (int\
-    \ level = 0; level < BitWidth; level++) {\n            auto stats = _levels[level].prefix_stats_pair(left,\
-    \ right);\n            int left_ones = stats.left.ones;\n            int right_ones\
-    \ = stats.right.ones;\n            int left_zeros = left - left_ones;\n      \
-    \      int right_zeros = right - right_ones;\n            int zeros = right_zeros\
-    \ - left_zeros;\n            if (k < zeros) {\n                left = left_zeros;\n\
-    \                right = right_zeros;\n            } else {\n                k\
-    \ -= zeros;\n                key |= unsigned_type(1) << (BitWidth - 1 - level);\n\
-    \                left = _zero_count[level] + left_ones;\n                right\
-    \ = _zero_count[level] + right_ones;\n            }\n        }\n        return\
-    \ decode(key);\n    }\n\n    T kth_largest(int left, int right, int k) const {\n\
-    \        assert(0 <= left && left <= right && right <= _size);\n        assert(0\
-    \ <= k && k < right - left);\n        return kth_smallest(left, right, right -\
-    \ left - 1 - k);\n    }\n\n    int range_freq(int left, int right, T upper) const\
-    \ {\n        assert(0 <= left && left <= right && right <= _size);\n        return\
-    \ count_less(left, right, upper);\n    }\n\n    int range_freq(int left, int right,\
-    \ T lower, T upper) const {\n        assert(0 <= left && left <= right && right\
-    \ <= _size);\n        if (upper <= lower) return 0;\n        return count_less(left,\
-    \ right, upper) -\n               count_less(left, right, lower);\n    }\n\n \
-    \   std::optional<T> prev_value(int left, int right, T upper) const {\n      \
-    \  assert(0 <= left && left <= right && right <= _size);\n        int count =\
-    \ range_freq(left, right, upper);\n        if (count == 0) return std::nullopt;\n\
-    \        return kth_smallest(left, right, count - 1);\n    }\n\n    std::optional<T>\
-    \ next_value(int left, int right, T lower) const {\n        assert(0 <= left &&\
-    \ left <= right && right <= _size);\n        int count = range_freq(left, right,\
-    \ lower);\n        if (count == right - left) return std::nullopt;\n        return\
-    \ kth_smallest(left, right, count);\n    }\n\n    Sum range_sum(int left, int\
-    \ right) const {\n        assert(0 <= left && left <= right && right <= _size);\n\
-    \        return _levels[0].range_sum(left, right);\n    }\n\n    Sum range_sum(int\
-    \ left, int right, T upper) const {\n        assert(0 <= left && left <= right\
-    \ && right <= _size);\n        return sum_less(left, right, upper);\n    }\n\n\
-    \    Sum range_sum(int left, int right, T lower, T upper) const {\n        assert(0\
-    \ <= left && left <= right && right <= _size);\n        if (upper <= lower) return\
-    \ Sum{};\n        return sum_less(left, right, upper) -\n               sum_less(left,\
-    \ right, lower);\n    }\n\n    Sum sum_k_smallest(int left, int right, int k)\
-    \ const {\n        assert(0 <= left && left <= right && right <= _size);\n   \
-    \     assert(0 <= k && k <= right - left);\n        Sum result{};\n        for\
-    \ (int level = 0; level < BitWidth; level++) {\n            auto stats = _levels[level].prefix_stats_pair(left,\
-    \ right);\n            int left_ones = stats.left.ones;\n            int right_ones\
-    \ = stats.right.ones;\n            int left_zeros = left - left_ones;\n      \
-    \      int right_zeros = right - right_ones;\n            int zeros = right_zeros\
-    \ - left_zeros;\n            if (k < zeros) {\n                left = left_zeros;\n\
-    \                right = right_zeros;\n            } else {\n                result\
-    \ = result + range_zero(stats);\n                k -= zeros;\n               \
-    \ left = _zero_count[level] + left_ones;\n                right = _zero_count[level]\
-    \ + right_ones;\n            }\n        }\n        return result + _final_weights.range_sum(left,\
-    \ left + k);\n    }\n\n    Sum sum_k_largest(int left, int right, int k) const\
-    \ {\n        assert(0 <= left && left <= right && right <= _size);\n        assert(0\
-    \ <= k && k <= right - left);\n        return range_sum(left, right) -\n     \
-    \          sum_k_smallest(left, right, right - left - k);\n    }\n\n    template\
-    \ <class Predicate>\n    int max_count_smallest(\n        int left,\n        int\
-    \ right,\n        Predicate predicate\n    ) const {\n        assert(0 <= left\
-    \ && left <= right && right <= _size);\n        assert(predicate(Sum{}));\n  \
-    \      Sum result{};\n        int count = 0;\n        for (int level = 0; level\
-    \ < BitWidth; level++) {\n            auto stats = _levels[level].prefix_stats_pair(left,\
-    \ right);\n            int left_ones = stats.left.ones;\n            int right_ones\
-    \ = stats.right.ones;\n            int left_zeros = left - left_ones;\n      \
-    \      int right_zeros = right - right_ones;\n            int zeros = right_zeros\
-    \ - left_zeros;\n            Sum candidate = result + range_zero(stats);\n   \
-    \         if (predicate(candidate)) {\n                result = candidate;\n \
-    \               count += zeros;\n                left = _zero_count[level] + left_ones;\n\
-    \                right = _zero_count[level] + right_ones;\n            } else\
-    \ {\n                left = left_zeros;\n                right = right_zeros;\n\
-    \            }\n        }\n        return count +\n               _final_weights.max_prefix(\n\
-    \                   left,\n                   right,\n                   result,\n\
-    \                   predicate\n               );\n    }\n\n    template <class\
-    \ Predicate>\n    int max_count_largest(\n        int left,\n        int right,\n\
-    \        Predicate predicate\n    ) const {\n        assert(0 <= left && left\
-    \ <= right && right <= _size);\n        assert(predicate(Sum{}));\n        Sum\
-    \ result{};\n        int count = 0;\n        for (int level = 0; level < BitWidth;\
-    \ level++) {\n            auto stats = _levels[level].prefix_stats_pair(left,\
-    \ right);\n            int left_ones = stats.left.ones;\n            int right_ones\
-    \ = stats.right.ones;\n            int left_zeros = left - left_ones;\n      \
-    \      int right_zeros = right - right_ones;\n            int ones = right_ones\
-    \ - left_ones;\n            Sum zero_result = range_zero(stats);\n           \
-    \ Sum one_result = range_total(stats) - zero_result;\n            Sum candidate\
-    \ = result + one_result;\n            if (predicate(candidate)) {\n          \
-    \      result = candidate;\n                count += ones;\n                left\
-    \ = left_zeros;\n                right = right_zeros;\n            } else {\n\
-    \                left = _zero_count[level] + left_ones;\n                right\
-    \ = _zero_count[level] + right_ones;\n            }\n        }\n        return\
-    \ count +\n               _final_weights.max_suffix(\n                   left,\n\
-    \                   right,\n                   result,\n                   predicate\n\
-    \               );\n    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\
-    #endif  // M1UNE_DS_WAVELET_MATRIX_DYNAMIC_WAVELET_MATRIX_SUM_HPP\n"
+    \n#line 2 \"test/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_test.cpp\"\n\n#line\
+    \ 10 \"test/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_test.cpp\"\n\nnamespace\
+    \ {\n\nusing Key = std::uint32_t;\nusing Matrix = m1une::ds::DynamicWaveletMatrixSum<Key,\
+    \ long long, 6>;\n\nstd::uint64_t random_state = 0x243f6a8885a308d3ULL;\n\nstd::uint64_t\
+    \ random_value() {\n    random_state ^= random_state << 7;\n    random_state ^=\
+    \ random_state >> 9;\n    return random_state;\n}\n\nint random_int(int lower,\
+    \ int upper) {\n    return lower + int(random_value() % std::uint64_t(upper -\
+    \ lower + 1));\n}\n\nstd::vector<int> sorted_indices(\n    const std::vector<Key>&\
+    \ keys,\n    int left,\n    int right\n) {\n    std::vector<int> order;\n    for\
+    \ (int position = left; position < right; position++) {\n        order.push_back(position);\n\
+    \    }\n    std::stable_sort(\n        order.begin(),\n        order.end(),\n\
+    \        [&](int first, int second) { return keys[first] < keys[second]; }\n \
+    \   );\n    return order;\n}\n\nvoid check_state(\n    const Matrix& matrix,\n\
+    \    const std::vector<Key>& keys,\n    const std::vector<long long>& weights\n\
+    ) {\n    assert(matrix.size() == int(keys.size()));\n    assert(matrix.empty()\
+    \ == keys.empty());\n    for (int position = 0; position < int(keys.size()); position++)\
+    \ {\n        assert(matrix.access(position) == keys[position]);\n        assert(matrix[position]\
+    \ == keys[position]);\n        assert(matrix.weight(position) == weights[position]);\n\
+    \        std::pair<Key, long long> expected(\n            keys[position],\n  \
+    \          weights[position]\n        );\n        assert(matrix.get(position)\
+    \ == expected);\n    }\n\n    int left = random_int(0, int(keys.size()));\n  \
+    \  int right = random_int(0, int(keys.size()));\n    if (right < left) std::swap(left,\
+    \ right);\n    Key lower = Key(random_int(0, 64));\n    Key upper = Key(random_int(0,\
+    \ 64));\n    if (upper < lower) std::swap(lower, upper);\n\n    long long total\
+    \ = 0;\n    long long below = 0;\n    long long between = 0;\n    int frequency\
+    \ = 0;\n    for (int position = left; position < right; position++) {\n      \
+    \  total += weights[position];\n        if (keys[position] < upper) below += weights[position];\n\
+    \        if (lower <= keys[position] && keys[position] < upper) {\n          \
+    \  between += weights[position];\n            frequency++;\n        }\n    }\n\
+    \    assert(matrix.range_sum(left, right) == total);\n    assert(matrix.range_sum(left,\
+    \ right, upper) == below);\n    assert(matrix.range_sum(left, right, lower, upper)\
+    \ == between);\n    assert(matrix.range_freq(left, right, upper) ==\n        \
+    \   int(std::count_if(\n               keys.begin() + left,\n               keys.begin()\
+    \ + right,\n               [&](Key key) { return key < upper; }\n           )));\n\
+    \    assert(matrix.range_freq(left, right, lower, upper) == frequency);\n\n  \
+    \  Key value = Key(random_int(0, 64));\n    assert(matrix.rank(value, left, right)\
+    \ ==\n           int(std::count(\n               keys.begin() + left,\n      \
+    \         keys.begin() + right,\n               value\n           )));\n    assert(matrix.rank(value,\
+    \ right) ==\n           int(std::count(keys.begin(), keys.begin() + right, value)));\n\
+    \n    std::optional<Key> previous;\n    std::optional<Key> next;\n    for (int\
+    \ position = left; position < right; position++) {\n        if (keys[position]\
+    \ < upper &&\n            (!previous.has_value() || previous.value() < keys[position]))\
+    \ {\n            previous = keys[position];\n        }\n        if (lower <= keys[position]\
+    \ &&\n            (!next.has_value() || keys[position] < next.value())) {\n  \
+    \          next = keys[position];\n        }\n    }\n    assert(matrix.prev_value(left,\
+    \ right, upper) == previous);\n    assert(matrix.next_value(left, right, lower)\
+    \ == next);\n\n    std::vector<int> order = sorted_indices(keys, left, right);\n\
+    \    long long smallest_sum = 0;\n    long long largest_sum = 0;\n    for (int\
+    \ k = 0; k <= int(order.size()); k++) {\n        assert(matrix.sum_k_smallest(left,\
+    \ right, k) == smallest_sum);\n        assert(matrix.sum_k_largest(left, right,\
+    \ k) == largest_sum);\n        if (k < int(order.size())) {\n            smallest_sum\
+    \ += weights[order[k]];\n            largest_sum += weights[order[order.size()\
+    \ - 1 - k]];\n        }\n    }\n    if (!order.empty()) {\n        int k = random_int(0,\
+    \ int(order.size()) - 1);\n        assert(matrix.kth_smallest(left, right, k)\
+    \ == keys[order[k]]);\n        assert(\n            matrix.kth_largest(left, right,\
+    \ k) ==\n            keys[order[order.size() - 1 - k]]\n        );\n    }\n}\n\
+    \nvoid check_boundaries(\n    const Matrix& matrix,\n    const std::vector<Key>&\
+    \ keys,\n    const std::vector<long long>& weights,\n    int left,\n    int right,\n\
+    \    long long limit\n) {\n    std::vector<int> order = sorted_indices(keys, left,\
+    \ right);\n    auto predicate = [limit](long long sum) { return sum <= limit;\
+    \ };\n\n    long long sum = 0;\n    int smallest = 0;\n    while (smallest < int(order.size())\
+    \ &&\n           sum + weights[order[smallest]] <= limit) {\n        sum += weights[order[smallest]];\n\
+    \        smallest++;\n    }\n    assert(\n        matrix.max_count_smallest(left,\
+    \ right, predicate) == smallest\n    );\n\n    sum = 0;\n    int largest = 0;\n\
+    \    while (largest < int(order.size()) &&\n           sum + weights[order[order.size()\
+    \ - 1 - largest]] <= limit) {\n        sum += weights[order[order.size() - 1 -\
+    \ largest]];\n        largest++;\n    }\n    assert(matrix.max_count_largest(left,\
+    \ right, predicate) == largest);\n}\n\nvoid test_deterministic() {\n    Matrix\
+    \ empty;\n    assert(empty.empty());\n    assert(empty.range_sum(0, 0) == 0);\n\
+    \    assert(empty.max_count_smallest(0, 0, [](long long) { return true; }) ==\
+    \ 0);\n    assert(empty.max_count_largest(0, 0, [](long long) { return true; })\
+    \ == 0);\n\n    std::vector<Key> keys = {63, 7, 7, 0, 7};\n    std::vector<long\
+    \ long> weights = {0, 2, 0, 4, 8};\n    Matrix matrix(keys, weights);\n    check_state(matrix,\
+    \ keys, weights);\n    check_boundaries(matrix, keys, weights, 0, 5, 0);\n   \
+    \ check_boundaries(matrix, keys, weights, 0, 5, 6);\n    check_boundaries(matrix,\
+    \ keys, weights, 0, 5, 100);\n    assert(matrix.range_freq(0, 5, Key(64)) == 5);\n\
+    \    assert(matrix.range_sum(0, 5, Key(64)) == 14);\n\n    matrix.insert(2, 7,\
+    \ 16);\n    keys.insert(keys.begin() + 2, 7);\n    weights.insert(weights.begin()\
+    \ + 2, 16);\n    matrix.push_back(63, 1);\n    keys.push_back(63);\n    weights.push_back(1);\n\
+    \    matrix.set(0, 1, 3);\n    keys[0] = 1;\n    weights[0] = 3;\n    matrix.set_value(1,\
+    \ 63);\n    keys[1] = 63;\n    matrix.set_weight(2, 5);\n    weights[2] = 5;\n\
+    \    matrix.add_weight(3, 6);\n    weights[3] += 6;\n    std::pair<Key, long long>\
+    \ erased(keys[4], weights[4]);\n    assert(matrix.erase(4) == erased);\n    keys.erase(keys.begin()\
+    \ + 4);\n    weights.erase(weights.begin() + 4);\n    check_state(matrix, keys,\
+    \ weights);\n\n    std::vector<Key> negative_keys = {0, 1, 2};\n    std::vector<long\
+    \ long> negative_weights = {-3, 5, 20};\n    Matrix negative(negative_keys, negative_weights);\n\
+    \    check_boundaries(negative, negative_keys, negative_weights, 0, 3, 10);\n\n\
+    \    using SignedMatrix =\n        m1une::ds::DynamicWaveletMatrixSum<int, long\
+    \ long>;\n    std::vector<int> signed_keys;\n    signed_keys.push_back(std::numeric_limits<int>::min());\n\
+    \    signed_keys.push_back(-1);\n    signed_keys.push_back(0);\n    signed_keys.push_back(std::numeric_limits<int>::max());\n\
+    \    SignedMatrix signed_matrix(signed_keys);\n    for (int k = 0; k < 4; k++)\
+    \ {\n        assert(signed_matrix.kth_smallest(0, 4, k) == signed_keys[k]);\n\
+    \    }\n}\n\nvoid test_randomized() {\n    std::vector<Key> keys;\n    std::vector<long\
+    \ long> weights;\n    Matrix matrix;\n    for (int operation = 0; operation <\
+    \ 5000; operation++) {\n        int type = random_int(0, 7);\n        if (keys.empty())\
+    \ type = 0;\n        if (type == 0) {\n            int position = random_int(0,\
+    \ int(keys.size()));\n            Key key = Key(random_int(0, 63));\n        \
+    \    long long weight = random_int(0, 20);\n            keys.insert(keys.begin()\
+    \ + position, key);\n            weights.insert(weights.begin() + position, weight);\n\
+    \            matrix.insert(position, key, weight);\n        } else if (type ==\
+    \ 1 && keys.size() < 160) {\n            Key key = Key(random_int(0, 63));\n \
+    \           long long weight = random_int(0, 20);\n            keys.push_back(key);\n\
+    \            weights.push_back(weight);\n            matrix.push_back(key, weight);\n\
+    \        } else if (type == 2 && keys.size() > 20) {\n            int position\
+    \ = random_int(0, int(keys.size()) - 1);\n            std::pair<Key, long long>\
+    \ erased(\n                keys[position],\n                weights[position]\n\
+    \            );\n            assert(matrix.erase(position) == erased);\n     \
+    \       keys.erase(keys.begin() + position);\n            weights.erase(weights.begin()\
+    \ + position);\n        } else if (type == 3) {\n            int position = random_int(0,\
+    \ int(keys.size()) - 1);\n            keys[position] = Key(random_int(0, 63));\n\
+    \            weights[position] = random_int(0, 20);\n            matrix.set(position,\
+    \ keys[position], weights[position]);\n        } else if (type == 4) {\n     \
+    \       int position = random_int(0, int(keys.size()) - 1);\n            keys[position]\
+    \ = Key(random_int(0, 63));\n            matrix.set_value(position, keys[position]);\n\
+    \        } else if (type == 5) {\n            int position = random_int(0, int(keys.size())\
+    \ - 1);\n            weights[position] = random_int(0, 20);\n            matrix.set_weight(position,\
+    \ weights[position]);\n        } else if (type == 6) {\n            int position\
+    \ = random_int(0, int(keys.size()) - 1);\n            long long delta = random_int(0,\
+    \ 5);\n            weights[position] += delta;\n            matrix.add_weight(position,\
+    \ delta);\n        } else {\n            int position = random_int(0, int(keys.size())\
+    \ - 1);\n            Key key = Key(random_int(0, 63));\n            keys[position]\
+    \ = key;\n            weights[position] = key;\n            matrix.set(position,\
+    \ key);\n        }\n\n        if (operation % 7 == 0) check_state(matrix, keys,\
+    \ weights);\n        int left = random_int(0, int(keys.size()));\n        int\
+    \ right = random_int(0, int(keys.size()));\n        if (right < left) std::swap(left,\
+    \ right);\n        long long total = 0;\n        for (int position = left; position\
+    \ < right; position++) {\n            total += weights[position];\n        }\n\
+    \        long long limit = random_int(0, int(total + 20));\n        check_boundaries(matrix,\
+    \ keys, weights, left, right, limit);\n    }\n}\n\n}  // namespace\n\nint main()\
+    \ {\n    test_deterministic();\n    test_randomized();\n}\n"
+  code: "#include \"../../../ds/wavelet_matrix/dynamic_wavelet_matrix_sum.hpp\"\n\n\
+    #include <algorithm>\n#include <cassert>\n#include <cstdint>\n#include <limits>\n\
+    #include <optional>\n#include <utility>\n#include <vector>\n\nnamespace {\n\n\
+    using Key = std::uint32_t;\nusing Matrix = m1une::ds::DynamicWaveletMatrixSum<Key,\
+    \ long long, 6>;\n\nstd::uint64_t random_state = 0x243f6a8885a308d3ULL;\n\nstd::uint64_t\
+    \ random_value() {\n    random_state ^= random_state << 7;\n    random_state ^=\
+    \ random_state >> 9;\n    return random_state;\n}\n\nint random_int(int lower,\
+    \ int upper) {\n    return lower + int(random_value() % std::uint64_t(upper -\
+    \ lower + 1));\n}\n\nstd::vector<int> sorted_indices(\n    const std::vector<Key>&\
+    \ keys,\n    int left,\n    int right\n) {\n    std::vector<int> order;\n    for\
+    \ (int position = left; position < right; position++) {\n        order.push_back(position);\n\
+    \    }\n    std::stable_sort(\n        order.begin(),\n        order.end(),\n\
+    \        [&](int first, int second) { return keys[first] < keys[second]; }\n \
+    \   );\n    return order;\n}\n\nvoid check_state(\n    const Matrix& matrix,\n\
+    \    const std::vector<Key>& keys,\n    const std::vector<long long>& weights\n\
+    ) {\n    assert(matrix.size() == int(keys.size()));\n    assert(matrix.empty()\
+    \ == keys.empty());\n    for (int position = 0; position < int(keys.size()); position++)\
+    \ {\n        assert(matrix.access(position) == keys[position]);\n        assert(matrix[position]\
+    \ == keys[position]);\n        assert(matrix.weight(position) == weights[position]);\n\
+    \        std::pair<Key, long long> expected(\n            keys[position],\n  \
+    \          weights[position]\n        );\n        assert(matrix.get(position)\
+    \ == expected);\n    }\n\n    int left = random_int(0, int(keys.size()));\n  \
+    \  int right = random_int(0, int(keys.size()));\n    if (right < left) std::swap(left,\
+    \ right);\n    Key lower = Key(random_int(0, 64));\n    Key upper = Key(random_int(0,\
+    \ 64));\n    if (upper < lower) std::swap(lower, upper);\n\n    long long total\
+    \ = 0;\n    long long below = 0;\n    long long between = 0;\n    int frequency\
+    \ = 0;\n    for (int position = left; position < right; position++) {\n      \
+    \  total += weights[position];\n        if (keys[position] < upper) below += weights[position];\n\
+    \        if (lower <= keys[position] && keys[position] < upper) {\n          \
+    \  between += weights[position];\n            frequency++;\n        }\n    }\n\
+    \    assert(matrix.range_sum(left, right) == total);\n    assert(matrix.range_sum(left,\
+    \ right, upper) == below);\n    assert(matrix.range_sum(left, right, lower, upper)\
+    \ == between);\n    assert(matrix.range_freq(left, right, upper) ==\n        \
+    \   int(std::count_if(\n               keys.begin() + left,\n               keys.begin()\
+    \ + right,\n               [&](Key key) { return key < upper; }\n           )));\n\
+    \    assert(matrix.range_freq(left, right, lower, upper) == frequency);\n\n  \
+    \  Key value = Key(random_int(0, 64));\n    assert(matrix.rank(value, left, right)\
+    \ ==\n           int(std::count(\n               keys.begin() + left,\n      \
+    \         keys.begin() + right,\n               value\n           )));\n    assert(matrix.rank(value,\
+    \ right) ==\n           int(std::count(keys.begin(), keys.begin() + right, value)));\n\
+    \n    std::optional<Key> previous;\n    std::optional<Key> next;\n    for (int\
+    \ position = left; position < right; position++) {\n        if (keys[position]\
+    \ < upper &&\n            (!previous.has_value() || previous.value() < keys[position]))\
+    \ {\n            previous = keys[position];\n        }\n        if (lower <= keys[position]\
+    \ &&\n            (!next.has_value() || keys[position] < next.value())) {\n  \
+    \          next = keys[position];\n        }\n    }\n    assert(matrix.prev_value(left,\
+    \ right, upper) == previous);\n    assert(matrix.next_value(left, right, lower)\
+    \ == next);\n\n    std::vector<int> order = sorted_indices(keys, left, right);\n\
+    \    long long smallest_sum = 0;\n    long long largest_sum = 0;\n    for (int\
+    \ k = 0; k <= int(order.size()); k++) {\n        assert(matrix.sum_k_smallest(left,\
+    \ right, k) == smallest_sum);\n        assert(matrix.sum_k_largest(left, right,\
+    \ k) == largest_sum);\n        if (k < int(order.size())) {\n            smallest_sum\
+    \ += weights[order[k]];\n            largest_sum += weights[order[order.size()\
+    \ - 1 - k]];\n        }\n    }\n    if (!order.empty()) {\n        int k = random_int(0,\
+    \ int(order.size()) - 1);\n        assert(matrix.kth_smallest(left, right, k)\
+    \ == keys[order[k]]);\n        assert(\n            matrix.kth_largest(left, right,\
+    \ k) ==\n            keys[order[order.size() - 1 - k]]\n        );\n    }\n}\n\
+    \nvoid check_boundaries(\n    const Matrix& matrix,\n    const std::vector<Key>&\
+    \ keys,\n    const std::vector<long long>& weights,\n    int left,\n    int right,\n\
+    \    long long limit\n) {\n    std::vector<int> order = sorted_indices(keys, left,\
+    \ right);\n    auto predicate = [limit](long long sum) { return sum <= limit;\
+    \ };\n\n    long long sum = 0;\n    int smallest = 0;\n    while (smallest < int(order.size())\
+    \ &&\n           sum + weights[order[smallest]] <= limit) {\n        sum += weights[order[smallest]];\n\
+    \        smallest++;\n    }\n    assert(\n        matrix.max_count_smallest(left,\
+    \ right, predicate) == smallest\n    );\n\n    sum = 0;\n    int largest = 0;\n\
+    \    while (largest < int(order.size()) &&\n           sum + weights[order[order.size()\
+    \ - 1 - largest]] <= limit) {\n        sum += weights[order[order.size() - 1 -\
+    \ largest]];\n        largest++;\n    }\n    assert(matrix.max_count_largest(left,\
+    \ right, predicate) == largest);\n}\n\nvoid test_deterministic() {\n    Matrix\
+    \ empty;\n    assert(empty.empty());\n    assert(empty.range_sum(0, 0) == 0);\n\
+    \    assert(empty.max_count_smallest(0, 0, [](long long) { return true; }) ==\
+    \ 0);\n    assert(empty.max_count_largest(0, 0, [](long long) { return true; })\
+    \ == 0);\n\n    std::vector<Key> keys = {63, 7, 7, 0, 7};\n    std::vector<long\
+    \ long> weights = {0, 2, 0, 4, 8};\n    Matrix matrix(keys, weights);\n    check_state(matrix,\
+    \ keys, weights);\n    check_boundaries(matrix, keys, weights, 0, 5, 0);\n   \
+    \ check_boundaries(matrix, keys, weights, 0, 5, 6);\n    check_boundaries(matrix,\
+    \ keys, weights, 0, 5, 100);\n    assert(matrix.range_freq(0, 5, Key(64)) == 5);\n\
+    \    assert(matrix.range_sum(0, 5, Key(64)) == 14);\n\n    matrix.insert(2, 7,\
+    \ 16);\n    keys.insert(keys.begin() + 2, 7);\n    weights.insert(weights.begin()\
+    \ + 2, 16);\n    matrix.push_back(63, 1);\n    keys.push_back(63);\n    weights.push_back(1);\n\
+    \    matrix.set(0, 1, 3);\n    keys[0] = 1;\n    weights[0] = 3;\n    matrix.set_value(1,\
+    \ 63);\n    keys[1] = 63;\n    matrix.set_weight(2, 5);\n    weights[2] = 5;\n\
+    \    matrix.add_weight(3, 6);\n    weights[3] += 6;\n    std::pair<Key, long long>\
+    \ erased(keys[4], weights[4]);\n    assert(matrix.erase(4) == erased);\n    keys.erase(keys.begin()\
+    \ + 4);\n    weights.erase(weights.begin() + 4);\n    check_state(matrix, keys,\
+    \ weights);\n\n    std::vector<Key> negative_keys = {0, 1, 2};\n    std::vector<long\
+    \ long> negative_weights = {-3, 5, 20};\n    Matrix negative(negative_keys, negative_weights);\n\
+    \    check_boundaries(negative, negative_keys, negative_weights, 0, 3, 10);\n\n\
+    \    using SignedMatrix =\n        m1une::ds::DynamicWaveletMatrixSum<int, long\
+    \ long>;\n    std::vector<int> signed_keys;\n    signed_keys.push_back(std::numeric_limits<int>::min());\n\
+    \    signed_keys.push_back(-1);\n    signed_keys.push_back(0);\n    signed_keys.push_back(std::numeric_limits<int>::max());\n\
+    \    SignedMatrix signed_matrix(signed_keys);\n    for (int k = 0; k < 4; k++)\
+    \ {\n        assert(signed_matrix.kth_smallest(0, 4, k) == signed_keys[k]);\n\
+    \    }\n}\n\nvoid test_randomized() {\n    std::vector<Key> keys;\n    std::vector<long\
+    \ long> weights;\n    Matrix matrix;\n    for (int operation = 0; operation <\
+    \ 5000; operation++) {\n        int type = random_int(0, 7);\n        if (keys.empty())\
+    \ type = 0;\n        if (type == 0) {\n            int position = random_int(0,\
+    \ int(keys.size()));\n            Key key = Key(random_int(0, 63));\n        \
+    \    long long weight = random_int(0, 20);\n            keys.insert(keys.begin()\
+    \ + position, key);\n            weights.insert(weights.begin() + position, weight);\n\
+    \            matrix.insert(position, key, weight);\n        } else if (type ==\
+    \ 1 && keys.size() < 160) {\n            Key key = Key(random_int(0, 63));\n \
+    \           long long weight = random_int(0, 20);\n            keys.push_back(key);\n\
+    \            weights.push_back(weight);\n            matrix.push_back(key, weight);\n\
+    \        } else if (type == 2 && keys.size() > 20) {\n            int position\
+    \ = random_int(0, int(keys.size()) - 1);\n            std::pair<Key, long long>\
+    \ erased(\n                keys[position],\n                weights[position]\n\
+    \            );\n            assert(matrix.erase(position) == erased);\n     \
+    \       keys.erase(keys.begin() + position);\n            weights.erase(weights.begin()\
+    \ + position);\n        } else if (type == 3) {\n            int position = random_int(0,\
+    \ int(keys.size()) - 1);\n            keys[position] = Key(random_int(0, 63));\n\
+    \            weights[position] = random_int(0, 20);\n            matrix.set(position,\
+    \ keys[position], weights[position]);\n        } else if (type == 4) {\n     \
+    \       int position = random_int(0, int(keys.size()) - 1);\n            keys[position]\
+    \ = Key(random_int(0, 63));\n            matrix.set_value(position, keys[position]);\n\
+    \        } else if (type == 5) {\n            int position = random_int(0, int(keys.size())\
+    \ - 1);\n            weights[position] = random_int(0, 20);\n            matrix.set_weight(position,\
+    \ weights[position]);\n        } else if (type == 6) {\n            int position\
+    \ = random_int(0, int(keys.size()) - 1);\n            long long delta = random_int(0,\
+    \ 5);\n            weights[position] += delta;\n            matrix.add_weight(position,\
+    \ delta);\n        } else {\n            int position = random_int(0, int(keys.size())\
+    \ - 1);\n            Key key = Key(random_int(0, 63));\n            keys[position]\
+    \ = key;\n            weights[position] = key;\n            matrix.set(position,\
+    \ key);\n        }\n\n        if (operation % 7 == 0) check_state(matrix, keys,\
+    \ weights);\n        int left = random_int(0, int(keys.size()));\n        int\
+    \ right = random_int(0, int(keys.size()));\n        if (right < left) std::swap(left,\
+    \ right);\n        long long total = 0;\n        for (int position = left; position\
+    \ < right; position++) {\n            total += weights[position];\n        }\n\
+    \        long long limit = random_int(0, int(total + 20));\n        check_boundaries(matrix,\
+    \ keys, weights, left, right, limit);\n    }\n}\n\n}  // namespace\n\nint main()\
+    \ {\n    test_deterministic();\n    test_randomized();\n}\n"
   dependsOn:
+  - ds/wavelet_matrix/dynamic_wavelet_matrix_sum.hpp
   - ds/wavelet_matrix/dynamic_wavelet_matrix.hpp
   isVerificationFile: false
-  path: ds/wavelet_matrix/dynamic_wavelet_matrix_sum.hpp
-  requiredBy:
-  - benchmark/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_benchmark.cpp
-  - test/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_test.cpp
+  path: test/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_test.cpp
+  requiredBy: []
   timestamp: '2026-07-19 03:02:48+09:00'
-  verificationStatus: LIBRARY_ALL_AC
-  verifiedWith:
-  - verify/ds/wavelet_matrix/dynamic_wavelet_matrix_sum.test.cpp
-documentation_of: ds/wavelet_matrix/dynamic_wavelet_matrix_sum.hpp
+  verificationStatus: LIBRARY_NO_TESTS
+  verifiedWith: []
+documentation_of: test/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_test.cpp
 layout: document
-title: Dynamic Wavelet Matrix with Sums
+redirect_from:
+- /library/test/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_test.cpp
+- /library/test/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_test.cpp.html
+title: test/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_test.cpp
 ---
-
-## Overview
-
-`m1une::ds::DynamicWaveletMatrixSum<T, Sum, BitWidth>` maintains an integral
-key and an additive weight at every position of a dynamic sequence. It supports
-indexed insertion, erasure, key and weight updates, range order statistics, and
-sums selected by an index interval and a key interval. `BitWidth` defaults to
-the full width of `T`, so existing one- and two-argument uses are unchanged.
-
-Passing only a key uses that key as its weight, which gives ordinary sums of
-the stored values. The overloads taking a separate `Sum` can instead maintain
-costs, frequencies, or other additive data.
-
-Each wavelet level uses one implicit treap of 64-element chunks. A chunk stores
-packed routing bits, contiguous weights, and 16-element group aggregates
-together. Fused updates and prefix-statistics queries therefore traverse one
-tree per level instead of separate bit and weight trees. Signed full-width keys
-are ordered by an internal sign-bit transform; coordinate compression is not
-required.
-
-## Requirements
-
-`T` must be an integral type other than `bool`. `Sum{}` must be the additive
-identity, and `Sum` must support copying, addition, and subtraction. The
-key-only constructor and update overloads additionally require `T` to be
-convertible to `Sum`. Arithmetic overflow is not checked.
-
-`BitWidth` must be between one and the number of value bits in the unsigned
-version of `T`. A reduced `BitWidth` is supported only for unsigned `T`; every
-stored key must be less than `2^BitWidth`, which is asserted in debug builds.
-Query bounds may equal or exceed `2^BitWidth` and then naturally include the
-entire reduced-width key universe. Full-width signed keys preserve ordinary
-signed ordering, including the minimum and maximum values.
-
-Let `B = BitWidth` and let `N` be the current sequence length. Treap complexity
-is expected, and insertion and erasure are amortized because fixed-size chunks
-occasionally split or merge.
-
-## Construction
-
-| Constructor | Description | Complexity |
-| --- | --- | --- |
-| `DynamicWaveletMatrixSum()` | Constructs an empty sequence. | $O(B)$ |
-| `explicit DynamicWaveletMatrixSum(const vector<T>& values)` | Builds keys from `values` and uses each key as its weight. | $O(BN)$ |
-| `DynamicWaveletMatrixSum(const vector<T>& values, const vector<Sum>& weights)` | Builds separate keys and weights; the vector lengths must match. | $O(BN)$ |
-
-## Sequence Methods
-
-| Method | Description | Complexity |
-| --- | --- | --- |
-| `int size() const` | Returns the sequence length. | $O(1)$ |
-| `bool empty() const` | Tests whether the sequence is empty. | $O(1)$ |
-| `void clear()` | Removes every element. | $O(B)$ |
-| `T access(int position) const` | Returns the key at `position`. | Expected $O(B\log N)$ |
-| `T operator[](int position) const` | Equivalent to `access(position)`. | Expected $O(B\log N)$ |
-| `Sum weight(int position) const` | Returns the weight at `position`. | Expected $O(\log N)$ |
-| `pair<T, Sum> get(int position) const` | Returns the key and weight at `position`. | Expected $O(B\log N)$ |
-| `void insert(int position, T value)` | Inserts `value` as both key and weight before `position`. | Expected amortized $O(B\log N)$ |
-| `void insert(int position, T value, const Sum& weight)` | Inserts a separate key and weight before `position`. | Expected amortized $O(B\log N)$ |
-| `void push_back(T value)` | Appends `value` as both key and weight. | Expected amortized $O(B\log N)$ |
-| `void push_back(T value, const Sum& weight)` | Appends a separate key and weight. | Expected amortized $O(B\log N)$ |
-| `pair<T, Sum> erase(int position)` | Erases and returns the key and weight at `position`. | Expected amortized $O(B\log N)$ |
-| `void set(int position, T value)` | Replaces both the key and weight with `value`. | Expected amortized $O(B\log N)$ |
-| `void set(int position, T value, const Sum& weight)` | Replaces both the key and weight. | Expected amortized $O(B\log N)$ |
-| `void set_value(int position, T value)` | Replaces the key and preserves the weight. | Expected amortized $O(B\log N)$ |
-| `void set_weight(int position, const Sum& weight)` | Replaces the weight and preserves the key. | Expected $O(B\log N)$ |
-| `void add_weight(int position, const Sum& delta)` | Adds `delta` to the weight and preserves the key. | Expected $O(B\log N)$ |
-
-`position == size()` is allowed for insertion. All other positions must refer
-to an existing element.
-
-## Query Methods
-
-All index and key intervals are half-open.
-
-| Method | Description | Complexity |
-| --- | --- | --- |
-| `int rank(T value, int right) const` | Counts `value` in `[0, right)`. | Expected $O(B\log N)$ |
-| `int rank(T value, int left, int right) const` | Counts `value` in `[left, right)`. | Expected $O(B\log N)$ |
-| `T kth_smallest(int left, int right, int k) const` | Returns the zero-based `k`-th smallest key. | Expected $O(B\log N)$ |
-| `T kth_largest(int left, int right, int k) const` | Returns the zero-based `k`-th largest key. | Expected $O(B\log N)$ |
-| `int range_freq(int left, int right, T upper) const` | Counts keys less than `upper`. | Expected $O(B\log N)$ |
-| `int range_freq(int left, int right, T lower, T upper) const` | Counts keys in `[lower, upper)`. | Expected $O(B\log N)$ |
-| `optional<T> prev_value(int left, int right, T upper) const` | Returns the greatest key below `upper`, or `nullopt`. | Expected $O(B\log N)$ |
-| `optional<T> next_value(int left, int right, T lower) const` | Returns the smallest key at least `lower`, or `nullopt`. | Expected $O(B\log N)$ |
-| `Sum range_sum(int left, int right) const` | Sums every weight in the index interval. | Expected $O(\log N)$ |
-| `Sum range_sum(int left, int right, T upper) const` | Sums weights whose keys are less than `upper`. | Expected $O(B\log N)$ |
-| `Sum range_sum(int left, int right, T lower, T upper) const` | Sums weights whose keys are in `[lower, upper)`. | Expected $O(B\log N)$ |
-| `Sum sum_k_smallest(int left, int right, int k) const` | Sums the weights of the smallest `k` keys. | Expected $O(B\log N)$ |
-| `Sum sum_k_largest(int left, int right, int k) const` | Sums the weights of the largest `k` keys. | Expected $O(B\log N)$ |
-| `template <class Predicate> int max_count_smallest(int left, int right, Predicate predicate) const` | Returns the largest `k` for which `predicate(sum_k_smallest(left, right, k))` is true. | Expected $O(B\log N)$ |
-| `template <class Predicate> int max_count_largest(int left, int right, Predicate predicate) const` | Returns the largest `k` for which `predicate(sum_k_largest(left, right, k))` is true. | Expected $O(B\log N)$ |
-
-The order-statistic methods require `0 <= k < right - left`. The sum methods
-allow `0 <= k <= right - left`. Equal keys are selected in current sequence
-order by `sum_k_smallest` and in reverse current sequence order by
-`sum_k_largest`.
-
-For `max_count_smallest` and `max_count_largest`, `predicate(Sum{})` must be
-true. Over `k = 0, 1, ..., right - left`, the predicate results for the
-corresponding sums must consist of zero or more `true` values followed by zero
-or more `false` values. The predicate must not have side effects. Tie ordering
-is the same as for the corresponding `sum_k` method.
-
-The structure uses $O(BN)$ memory. Queries do not allocate. Point-weight
-replacement updates only the affected element, group sum, chunk sum, and
-ancestor sums. Insertion and erasure may shift and rebuild one 64-element local
-chunk. Index, range, and `k` bounds are asserted.
-
-## Example
-
-```cpp
-#include "ds/wavelet_matrix/dynamic_wavelet_matrix_sum.hpp"
-
-#include <cassert>
-#include <vector>
-
-int main() {
-    using Matrix = m1une::ds::DynamicWaveletMatrixSum<
-        unsigned int,
-        long long,
-        18
-    >;
-    std::vector<unsigned int> keys = {4, 1, 4, 2};
-    std::vector<long long> weights = {10, 20, 30, 40};
-    Matrix matrix(
-        keys,
-        weights
-    );
-
-    assert(matrix.range_sum(0, 4, 2, 5) == 80);
-    matrix.add_weight(0, 5);
-    matrix.insert(2, 3, 7);
-    assert(matrix.sum_k_smallest(0, 5, 3) == 67);
-
-    matrix.set_value(1, 5);  // The weight at index 1 remains 20.
-    assert(matrix.range_sum(0, 5, 4, 6) == 65);
-}
-```
-
-Here the keys can be coordinate-compressed ranks while the weights remain the
-original numeric values. The key controls ordering; selected sums use the
-weight. See the standalone local benchmark and its measured results under
-`benchmark/ds/wavelet_matrix/`. They are performance measurements, not formal
-verification.

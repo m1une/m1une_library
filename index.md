@@ -168,6 +168,11 @@ data:
     - icon: ':heavy_check_mark:'
       path: algo/sequence/subset_sum.hpp
       title: Meet-in-the-Middle Subset Sum
+  - name: benchmark/ds/wavelet_matrix
+    pages:
+    - icon: ':warning:'
+      path: benchmark/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_benchmark.cpp
+      title: benchmark/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_benchmark.cpp
   - name: .
     pages:
     - icon: ':warning:'
@@ -1173,6 +1178,11 @@ data:
     - icon: ':heavy_check_mark:'
       path: string/z_algorithm.hpp
       title: Z Algorithm
+  - name: test/ds/wavelet_matrix
+    pages:
+    - icon: ':warning:'
+      path: test/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_test.cpp
+      title: test/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_test.cpp
   - name: utilities
     pages:
     - icon: ':heavy_check_mark:'

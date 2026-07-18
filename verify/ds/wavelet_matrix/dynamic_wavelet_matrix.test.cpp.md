@@ -25,25 +25,29 @@ data:
     #include <utility>\n#include <vector>\n\nnamespace m1une {\nnamespace ds {\n\n\
     namespace dynamic_wavelet_matrix_detail {\n\n// A dynamic bit vector stored as\
     \ an implicit treap of small packed chunks.\nclass DynamicRankBitVector {\n  \
-    \ private:\n    static constexpr int word_bits = 64;\n    static constexpr int\
-    \ chunk_words = 4;\n    static constexpr int chunk_capacity = word_bits * chunk_words;\n\
-    \    static constexpr int minimum_chunk_size = chunk_capacity / 2;\n\n    struct\
-    \ Node {\n        std::array<std::uint64_t, chunk_words> bits{};\n        std::uint32_t\
-    \ priority = 0;\n        int left = 0;\n        int right = 0;\n        int subtree_size\
-    \ = 0;\n        int subtree_ones = 0;\n        std::uint16_t length = 0;\n   \
-    \     std::uint16_t chunk_ones = 0;\n    };\n\n    std::vector<Node> _nodes;\n\
-    \    std::vector<int> _free_nodes;\n    int _root = 0;\n    std::uint32_t _random_state\
-    \ = 1;\n\n    int size_of(int node) const {\n        return _nodes[node].subtree_size;\n\
-    \    }\n\n    int ones_of(int node) const {\n        return _nodes[node].subtree_ones;\n\
-    \    }\n\n    std::uint32_t next_priority() {\n        _random_state ^= _random_state\
-    \ << 13;\n        _random_state ^= _random_state >> 17;\n        _random_state\
-    \ ^= _random_state << 5;\n        if (_random_state == 0) _random_state = 1;\n\
-    \        return _random_state;\n    }\n\n    void update(int node) {\n       \
-    \ if (node == 0) return;\n        _nodes[node].subtree_size =\n            size_of(_nodes[node].left)\
-    \ + int(_nodes[node].length) +\n            size_of(_nodes[node].right);\n   \
-    \     _nodes[node].subtree_ones =\n            ones_of(_nodes[node].left) + int(_nodes[node].chunk_ones)\
-    \ +\n            ones_of(_nodes[node].right);\n    }\n\n    bool local_get(int\
-    \ node, int position) const {\n        return (_nodes[node].bits[position / word_bits]\
+    \ public:\n    struct AccessRankResult {\n        bool value;\n        int ones_before;\n\
+    \    };\n\n    struct EraseRankResult {\n        bool value;\n        int ones_before;\n\
+    \    };\n\n    struct RankPair {\n        int left_ones;\n        int right_ones;\n\
+    \    };\n\n   private:\n    static constexpr int word_bits = 64;\n    static constexpr\
+    \ int chunk_words = 4;\n    static constexpr int chunk_capacity = word_bits *\
+    \ chunk_words;\n    static constexpr int minimum_chunk_size = chunk_capacity /\
+    \ 2;\n\n    struct Node {\n        std::array<std::uint64_t, chunk_words> bits{};\n\
+    \        std::uint32_t priority = 0;\n        int left = 0;\n        int right\
+    \ = 0;\n        int subtree_size = 0;\n        int subtree_ones = 0;\n       \
+    \ std::uint16_t length = 0;\n        std::uint16_t chunk_ones = 0;\n    };\n\n\
+    \    std::vector<Node> _nodes;\n    std::vector<int> _free_nodes;\n    int _root\
+    \ = 0;\n    std::uint32_t _random_state = 1;\n\n    int size_of(int node) const\
+    \ {\n        return _nodes[node].subtree_size;\n    }\n\n    int ones_of(int node)\
+    \ const {\n        return _nodes[node].subtree_ones;\n    }\n\n    std::uint32_t\
+    \ next_priority() {\n        _random_state ^= _random_state << 13;\n        _random_state\
+    \ ^= _random_state >> 17;\n        _random_state ^= _random_state << 5;\n    \
+    \    if (_random_state == 0) _random_state = 1;\n        return _random_state;\n\
+    \    }\n\n    void update(int node) {\n        if (node == 0) return;\n      \
+    \  _nodes[node].subtree_size =\n            size_of(_nodes[node].left) + int(_nodes[node].length)\
+    \ +\n            size_of(_nodes[node].right);\n        _nodes[node].subtree_ones\
+    \ =\n            ones_of(_nodes[node].left) + int(_nodes[node].chunk_ones) +\n\
+    \            ones_of(_nodes[node].right);\n    }\n\n    bool local_get(int node,\
+    \ int position) const {\n        return (_nodes[node].bits[position / word_bits]\
     \ >>\n                (position % word_bits)) &\n               1U;\n    }\n\n\
     \    void local_set(int node, int position, bool value) {\n        std::uint64_t\
     \ mask =\n            std::uint64_t(1) << (position % word_bits);\n        std::uint64_t&\
@@ -175,41 +179,81 @@ data:
     \        _nodes[node].length = std::uint16_t(last - first);\n        _nodes[node].chunk_ones\
     \ = 0;\n        for (int i = first; i < last; i++) {\n            if (values[i])\
     \ {\n                local_set(node, i - first, true);\n                _nodes[node].chunk_ones++;\n\
-    \            }\n        }\n        update(node);\n    }\n\n    int insert_impl(int\
-    \ tree, int position, bool value) {\n        if (tree == 0) {\n            int\
-    \ node = new_node();\n            local_insert(node, 0, value);\n            return\
-    \ node;\n        }\n\n        int left_size = size_of(_nodes[tree].left);\n  \
-    \      int length = _nodes[tree].length;\n        if (position < left_size) {\n\
-    \            _nodes[tree].left =\n                insert_impl(_nodes[tree].left,\
-    \ position, value);\n            update(tree);\n            if (_nodes[_nodes[tree].left].priority\
-    \ >\n                _nodes[tree].priority) {\n                tree = rotate_right(tree);\n\
-    \            }\n            return tree;\n        }\n        if (position > left_size\
-    \ + length) {\n            _nodes[tree].right = insert_impl(\n               \
-    \ _nodes[tree].right,\n                position - left_size - length,\n      \
-    \          value\n            );\n            update(tree);\n            if (_nodes[_nodes[tree].right].priority\
-    \ >\n                _nodes[tree].priority) {\n                tree = rotate_left(tree);\n\
-    \            }\n            return tree;\n        }\n\n        int local_position\
-    \ = position - left_size;\n        if (length < chunk_capacity) {\n          \
-    \  local_insert(tree, local_position, value);\n            return tree;\n    \
-    \    }\n\n        std::vector<std::uint8_t> values(chunk_capacity);\n        for\
-    \ (int i = 0; i < chunk_capacity; i++) {\n            values[i] = local_get(tree,\
-    \ i);\n        }\n        int right_chunk = new_node();\n        int middle =\
-    \ chunk_capacity / 2;\n        assign_from_values(tree, values, 0, middle);\n\
-    \        assign_from_values(right_chunk, values, middle, chunk_capacity);\n  \
-    \      if (local_position <= middle) {\n            local_insert(tree, local_position,\
-    \ value);\n        } else {\n            local_insert(right_chunk, local_position\
-    \ - middle, value);\n        }\n\n        int old_right = _nodes[tree].right;\n\
+    \            }\n        }\n        update(node);\n    }\n\n    int prefix_rank1_impl(int\
+    \ tree, int right) const {\n        int result = 0;\n        while (tree != 0\
+    \ && right != 0) {\n            int left_size = size_of(_nodes[tree].left);\n\
+    \            if (right <= left_size) {\n                tree = _nodes[tree].left;\n\
+    \                continue;\n            }\n            result += ones_of(_nodes[tree].left);\n\
+    \            right -= left_size;\n            int take = std::min(right, int(_nodes[tree].length));\n\
+    \            result += local_rank1(tree, take);\n            right -= take;\n\
+    \            if (right == 0) break;\n            tree = _nodes[tree].right;\n\
+    \        }\n        return result;\n    }\n\n    RankPair rank1_pair_impl(int\
+    \ tree, int left, int right) const {\n        if (left == right) {\n         \
+    \   int ones = prefix_rank1_impl(tree, left);\n            return RankPair{ones,\
+    \ ones};\n        }\n        if (tree == 0 || right == 0) return RankPair{0, 0};\n\
+    \n        int left_size = size_of(_nodes[tree].left);\n        int chunk_end =\
+    \ left_size + _nodes[tree].length;\n        if (right <= left_size) {\n      \
+    \      return rank1_pair_impl(_nodes[tree].left, left, right);\n        }\n  \
+    \      if (chunk_end <= left) {\n            int base =\n                ones_of(_nodes[tree].left)\
+    \ + _nodes[tree].chunk_ones;\n            RankPair result = rank1_pair_impl(\n\
+    \                _nodes[tree].right,\n                left - chunk_end,\n    \
+    \            right - chunk_end\n            );\n            result.left_ones +=\
+    \ base;\n            result.right_ones += base;\n            return result;\n\
+    \        }\n\n        int left_ones;\n        if (left <= left_size) {\n     \
+    \       left_ones = prefix_rank1_impl(_nodes[tree].left, left);\n        } else\
+    \ {\n            left_ones = ones_of(_nodes[tree].left) +\n                  \
+    \      local_rank1(tree, left - left_size);\n        }\n\n        int right_ones;\n\
+    \        if (right <= chunk_end) {\n            right_ones = ones_of(_nodes[tree].left)\
+    \ +\n                         local_rank1(tree, right - left_size);\n        }\
+    \ else {\n            right_ones = ones_of(_nodes[tree].left) +\n            \
+    \             _nodes[tree].chunk_ones +\n                         prefix_rank1_impl(\n\
+    \                             _nodes[tree].right,\n                          \
+    \   right - chunk_end\n                         );\n        }\n        return\
+    \ RankPair{left_ones, right_ones};\n    }\n\n    int insert_impl(\n        int\
+    \ tree,\n        int position,\n        bool value,\n        int& ones_before\n\
+    \    ) {\n        if (tree == 0) {\n            int node = new_node();\n     \
+    \       local_insert(node, 0, value);\n            return node;\n        }\n\n\
+    \        int left_size = size_of(_nodes[tree].left);\n        int length = _nodes[tree].length;\n\
+    \        if (position < left_size) {\n            _nodes[tree].left = insert_impl(\n\
+    \                _nodes[tree].left,\n                position,\n             \
+    \   value,\n                ones_before\n            );\n            update(tree);\n\
+    \            if (_nodes[_nodes[tree].left].priority >\n                _nodes[tree].priority)\
+    \ {\n                tree = rotate_right(tree);\n            }\n            return\
+    \ tree;\n        }\n        if (position > left_size + length) {\n           \
+    \ ones_before +=\n                ones_of(_nodes[tree].left) + _nodes[tree].chunk_ones;\n\
+    \            _nodes[tree].right = insert_impl(\n                _nodes[tree].right,\n\
+    \                position - left_size - length,\n                value,\n    \
+    \            ones_before\n            );\n            update(tree);\n        \
+    \    if (_nodes[_nodes[tree].right].priority >\n                _nodes[tree].priority)\
+    \ {\n                tree = rotate_left(tree);\n            }\n            return\
+    \ tree;\n        }\n\n        int local_position = position - left_size;\n   \
+    \     ones_before += ones_of(_nodes[tree].left) +\n                       local_rank1(tree,\
+    \ local_position);\n        if (length < chunk_capacity) {\n            local_insert(tree,\
+    \ local_position, value);\n            return tree;\n        }\n\n        std::vector<std::uint8_t>\
+    \ values(chunk_capacity);\n        for (int i = 0; i < chunk_capacity; i++) {\n\
+    \            values[i] = local_get(tree, i);\n        }\n        int right_chunk\
+    \ = new_node();\n        int middle = chunk_capacity / 2;\n        assign_from_values(tree,\
+    \ values, 0, middle);\n        assign_from_values(right_chunk, values, middle,\
+    \ chunk_capacity);\n        if (local_position <= middle) {\n            local_insert(tree,\
+    \ local_position, value);\n        } else {\n            local_insert(right_chunk,\
+    \ local_position - middle, value);\n        }\n\n        int old_right = _nodes[tree].right;\n\
     \        _nodes[tree].right = 0;\n        update(tree);\n        return merge(merge(tree,\
-    \ right_chunk), old_right);\n    }\n\n    int erase_impl(int tree, int position)\
-    \ {\n        int left_size = size_of(_nodes[tree].left);\n        int length =\
-    \ _nodes[tree].length;\n        if (position < left_size) {\n            _nodes[tree].left\
-    \ = erase_impl(_nodes[tree].left, position);\n            update(tree);\n    \
-    \        return tree;\n        }\n        if (position >= left_size + length)\
-    \ {\n            _nodes[tree].right = erase_impl(\n                _nodes[tree].right,\n\
-    \                position - left_size - length\n            );\n            update(tree);\n\
-    \            return tree;\n        }\n\n        local_erase(tree, position - left_size);\n\
-    \        if (_nodes[tree].length == 0) {\n            int result = merge(_nodes[tree].left,\
-    \ _nodes[tree].right);\n            recycle_node(tree);\n            return result;\n\
+    \ right_chunk), old_right);\n    }\n\n    int erase_impl(\n        int tree,\n\
+    \        int position,\n        EraseRankResult& result\n    ) {\n        int\
+    \ left_size = size_of(_nodes[tree].left);\n        int length = _nodes[tree].length;\n\
+    \        if (position < left_size) {\n            _nodes[tree].left = erase_impl(\n\
+    \                _nodes[tree].left,\n                position,\n             \
+    \   result\n            );\n            update(tree);\n            return tree;\n\
+    \        }\n        if (position >= left_size + length) {\n            result.ones_before\
+    \ +=\n                ones_of(_nodes[tree].left) + _nodes[tree].chunk_ones;\n\
+    \            _nodes[tree].right = erase_impl(\n                _nodes[tree].right,\n\
+    \                position - left_size - length,\n                result\n    \
+    \        );\n            update(tree);\n            return tree;\n        }\n\n\
+    \        int local_position = position - left_size;\n        result.ones_before\
+    \ += ones_of(_nodes[tree].left) +\n                              local_rank1(tree,\
+    \ local_position);\n        result.value = local_erase(tree, local_position);\n\
+    \        if (_nodes[tree].length == 0) {\n            int merged = merge(_nodes[tree].left,\
+    \ _nodes[tree].right);\n            recycle_node(tree);\n            return merged;\n\
     \        }\n        return rebalance(tree);\n    }\n\n    void update_subtree(int\
     \ tree) {\n        if (tree == 0) return;\n        update_subtree(_nodes[tree].left);\n\
     \        update_subtree(_nodes[tree].right);\n        update(tree);\n    }\n\n\
@@ -229,32 +273,37 @@ data:
     \        const std::vector<std::uint8_t>& bits,\n        std::uint32_t seed =\
     \ 1\n    ) : _random_state(seed == 0 ? 1 : seed) {\n        build(bits);\n   \
     \ }\n\n    int size() const {\n        return size_of(_root);\n    }\n\n    bool\
-    \ get(int position) const {\n        assert(0 <= position && position < size());\n\
+    \ get(int position) const {\n        return access_with_rank(position).value;\n\
+    \    }\n\n    AccessRankResult access_with_rank(int position) const {\n      \
+    \  assert(0 <= position && position < size());\n        int ones_before = 0;\n\
     \        int tree = _root;\n        while (tree != 0) {\n            int left_size\
     \ = size_of(_nodes[tree].left);\n            if (position < left_size) {\n   \
     \             tree = _nodes[tree].left;\n            } else if (position < left_size\
-    \ + _nodes[tree].length) {\n                return local_get(tree, position -\
-    \ left_size);\n            } else {\n                position -= left_size + _nodes[tree].length;\n\
-    \                tree = _nodes[tree].right;\n            }\n        }\n      \
-    \  assert(false);\n        return false;\n    }\n\n    int rank1(int right) const\
-    \ {\n        assert(0 <= right && right <= size());\n        int result = 0;\n\
-    \        int tree = _root;\n        while (tree != 0 && right != 0) {\n      \
-    \      int left_size = size_of(_nodes[tree].left);\n            if (right <= left_size)\
-    \ {\n                tree = _nodes[tree].left;\n                continue;\n  \
-    \          }\n            result += ones_of(_nodes[tree].left);\n            right\
-    \ -= left_size;\n            int take = std::min(right, int(_nodes[tree].length));\n\
-    \            result += local_rank1(tree, take);\n            right -= take;\n\
-    \            if (right == 0) break;\n            tree = _nodes[tree].right;\n\
-    \        }\n        return result;\n    }\n\n    void insert(int position, bool\
-    \ value) {\n        assert(0 <= position && position <= size());\n        _root\
-    \ = insert_impl(_root, position, value);\n    }\n\n    bool erase(int position)\
-    \ {\n        assert(0 <= position && position < size());\n        bool value =\
-    \ get(position);\n        _root = erase_impl(_root, position);\n        return\
-    \ value;\n    }\n};\n\n}  // namespace dynamic_wavelet_matrix_detail\n\n// A dynamic\
-    \ wavelet matrix for integral sequences.\ntemplate <std::integral T>\nrequires(!std::same_as<std::remove_cv_t<T>,\
-    \ bool>)\nclass DynamicWaveletMatrix {\n   public:\n    using value_type = T;\n\
-    \    using unsigned_type = std::make_unsigned_t<T>;\n\n   private:\n    static\
-    \ constexpr int bit_width =\n        std::numeric_limits<unsigned_type>::digits;\n\
+    \ + _nodes[tree].length) {\n                int local_position = position - left_size;\n\
+    \                ones_before += ones_of(_nodes[tree].left) +\n               \
+    \                local_rank1(tree, local_position);\n                return AccessRankResult{\n\
+    \                    local_get(tree, local_position),\n                    ones_before\n\
+    \                };\n            } else {\n                ones_before +=\n  \
+    \                  ones_of(_nodes[tree].left) + _nodes[tree].chunk_ones;\n   \
+    \             position -= left_size + _nodes[tree].length;\n                tree\
+    \ = _nodes[tree].right;\n            }\n        }\n        assert(false);\n  \
+    \      return AccessRankResult{false, 0};\n    }\n\n    int rank1(int right) const\
+    \ {\n        assert(0 <= right && right <= size());\n        return prefix_rank1_impl(_root,\
+    \ right);\n    }\n\n    RankPair rank1_pair(int left, int right) const {\n   \
+    \     assert(0 <= left && left <= right && right <= size());\n        return rank1_pair_impl(_root,\
+    \ left, right);\n    }\n\n    void insert(int position, bool value) {\n      \
+    \  insert_with_rank(position, value);\n    }\n\n    int insert_with_rank(int position,\
+    \ bool value) {\n        assert(0 <= position && position <= size());\n      \
+    \  int ones_before = 0;\n        _root = insert_impl(_root, position, value, ones_before);\n\
+    \        return ones_before;\n    }\n\n    bool erase(int position) {\n      \
+    \  return erase_with_rank(position).value;\n    }\n\n    EraseRankResult erase_with_rank(int\
+    \ position) {\n        assert(0 <= position && position < size());\n        EraseRankResult\
+    \ result{false, 0};\n        _root = erase_impl(_root, position, result);\n  \
+    \      return result;\n    }\n};\n\n}  // namespace dynamic_wavelet_matrix_detail\n\
+    \n// A dynamic wavelet matrix for integral sequences.\ntemplate <std::integral\
+    \ T>\nrequires(!std::same_as<std::remove_cv_t<T>, bool>)\nclass DynamicWaveletMatrix\
+    \ {\n   public:\n    using value_type = T;\n    using unsigned_type = std::make_unsigned_t<T>;\n\
+    \n   private:\n    static constexpr int bit_width =\n        std::numeric_limits<unsigned_type>::digits;\n\
     \    static constexpr unsigned_type sign_mask = [] {\n        if constexpr (std::signed_integral<T>)\
     \ {\n            return unsigned_type(1) << (bit_width - 1);\n        } else {\n\
     \            return unsigned_type(0);\n        }\n    }();\n\n    int _size =\
@@ -269,30 +318,30 @@ data:
     \  }\n    }\n\n    static bool bit(unsigned_type key, int level) {\n        return\
     \ (key >> (bit_width - 1 - level)) & unsigned_type(1);\n    }\n\n    void insert_encoded(int\
     \ position, unsigned_type key) {\n        for (int level = 0; level < bit_width;\
-    \ level++) {\n            int ones_before = _matrix[level].rank1(position);\n\
-    \            if (bit(key, level)) {\n                int next_position = _zero_count[level]\
-    \ + ones_before;\n                _matrix[level].insert(position, true);\n   \
-    \             position = next_position;\n            } else {\n              \
-    \  int next_position = position - ones_before;\n                _matrix[level].insert(position,\
-    \ false);\n                _zero_count[level]++;\n                position = next_position;\n\
+    \ level++) {\n            if (bit(key, level)) {\n                int ones_before\
+    \ =\n                    _matrix[level].insert_with_rank(position, true);\n  \
+    \              int next_position = _zero_count[level] + ones_before;\n       \
+    \         position = next_position;\n            } else {\n                int\
+    \ ones_before =\n                    _matrix[level].insert_with_rank(position,\
+    \ false);\n                int next_position = position - ones_before;\n     \
+    \           _zero_count[level]++;\n                position = next_position;\n\
     \            }\n        }\n        _size++;\n    }\n\n    void erase_encoded(int\
     \ position) {\n        for (int level = 0; level < bit_width; level++) {\n   \
-    \         int ones_before = _matrix[level].rank1(position);\n            bool\
-    \ one = _matrix[level].get(position);\n            int next_position;\n      \
-    \      if (one) {\n                next_position = _zero_count[level] + ones_before;\n\
-    \            } else {\n                next_position = position - ones_before;\n\
-    \                _zero_count[level]--;\n            }\n            _matrix[level].erase(position);\n\
-    \            position = next_position;\n        }\n        _size--;\n    }\n\n\
-    \    int count_less_encoded(int left, int right, unsigned_type upper) const {\n\
-    \        int result = 0;\n        for (int level = 0; level < bit_width; level++)\
-    \ {\n            int left_ones = _matrix[level].rank1(left);\n            int\
-    \ right_ones = _matrix[level].rank1(right);\n            if (bit(upper, level))\
-    \ {\n                result += (right - left) - (right_ones - left_ones);\n  \
-    \              left = _zero_count[level] + left_ones;\n                right =\
-    \ _zero_count[level] + right_ones;\n            } else {\n                left\
-    \ -= left_ones;\n                right -= right_ones;\n            }\n       \
-    \ }\n        return result;\n    }\n\n   public:\n    DynamicWaveletMatrix() :\
-    \ _matrix(bit_width) {}\n\n    explicit DynamicWaveletMatrix(const std::vector<T>&\
+    \         auto erased = _matrix[level].erase_with_rank(position);\n          \
+    \  int next_position;\n            if (erased.value) {\n                next_position\
+    \ = _zero_count[level] + erased.ones_before;\n            } else {\n         \
+    \       next_position = position - erased.ones_before;\n                _zero_count[level]--;\n\
+    \            }\n            position = next_position;\n        }\n        _size--;\n\
+    \    }\n\n    int count_less_encoded(int left, int right, unsigned_type upper)\
+    \ const {\n        int result = 0;\n        for (int level = 0; level < bit_width;\
+    \ level++) {\n            auto ranks = _matrix[level].rank1_pair(left, right);\n\
+    \            int left_ones = ranks.left_ones;\n            int right_ones = ranks.right_ones;\n\
+    \            if (bit(upper, level)) {\n                result += (right - left)\
+    \ - (right_ones - left_ones);\n                left = _zero_count[level] + left_ones;\n\
+    \                right = _zero_count[level] + right_ones;\n            } else\
+    \ {\n                left -= left_ones;\n                right -= right_ones;\n\
+    \            }\n        }\n        return result;\n    }\n\n   public:\n    DynamicWaveletMatrix()\
+    \ : _matrix(bit_width) {}\n\n    explicit DynamicWaveletMatrix(const std::vector<T>&\
     \ values)\n        : _size(int(values.size())) {\n        std::vector<unsigned_type>\
     \ current(_size);\n        std::vector<unsigned_type> next(_size);\n        for\
     \ (int i = 0; i < _size; i++) current[i] = encode(values[i]);\n\n        _matrix.reserve(bit_width);\n\
@@ -311,11 +360,11 @@ data:
     \ == 0;\n    }\n\n    void clear() {\n        *this = DynamicWaveletMatrix();\n\
     \    }\n\n    T access(int position) const {\n        assert(0 <= position &&\
     \ position < _size);\n        unsigned_type key = 0;\n        for (int level =\
-    \ 0; level < bit_width; level++) {\n            int ones_before = _matrix[level].rank1(position);\n\
-    \            if (_matrix[level].get(position)) {\n                key |= unsigned_type(1)\
-    \ << (bit_width - 1 - level);\n                position = _zero_count[level] +\
-    \ ones_before;\n            } else {\n                position -= ones_before;\n\
-    \            }\n        }\n        return decode(key);\n    }\n\n    T operator[](int\
+    \ 0; level < bit_width; level++) {\n            auto accessed = _matrix[level].access_with_rank(position);\n\
+    \            if (accessed.value) {\n                key |= unsigned_type(1) <<\
+    \ (bit_width - 1 - level);\n                position = _zero_count[level] + accessed.ones_before;\n\
+    \            } else {\n                position -= accessed.ones_before;\n   \
+    \         }\n        }\n        return decode(key);\n    }\n\n    T operator[](int\
     \ position) const {\n        return access(position);\n    }\n\n    void insert(int\
     \ position, T value) {\n        assert(0 <= position && position <= _size);\n\
     \        insert_encoded(position, encode(value));\n    }\n\n    void push_back(T\
@@ -329,18 +378,19 @@ data:
     \ rank(value, 0, right);\n    }\n\n    int rank(T value, int left, int right)\
     \ const {\n        assert(0 <= left && left <= right && right <= _size);\n   \
     \     unsigned_type key = encode(value);\n        for (int level = 0; level <\
-    \ bit_width; level++) {\n            int left_ones = _matrix[level].rank1(left);\n\
-    \            int right_ones = _matrix[level].rank1(right);\n            if (bit(key,\
-    \ level)) {\n                left = _zero_count[level] + left_ones;\n        \
-    \        right = _zero_count[level] + right_ones;\n            } else {\n    \
-    \            left -= left_ones;\n                right -= right_ones;\n      \
-    \      }\n        }\n        return right - left;\n    }\n\n    T kth_smallest(int\
-    \ left, int right, int k) const {\n        assert(0 <= left && left <= right &&\
-    \ right <= _size);\n        assert(0 <= k && k < right - left);\n        unsigned_type\
-    \ key = 0;\n        for (int level = 0; level < bit_width; level++) {\n      \
-    \      int left_ones = _matrix[level].rank1(left);\n            int right_ones\
-    \ = _matrix[level].rank1(right);\n            int left_zeros = left - left_ones;\n\
-    \            int right_zeros = right - right_ones;\n            int zeros = right_zeros\
+    \ bit_width; level++) {\n            auto ranks = _matrix[level].rank1_pair(left,\
+    \ right);\n            int left_ones = ranks.left_ones;\n            int right_ones\
+    \ = ranks.right_ones;\n            if (bit(key, level)) {\n                left\
+    \ = _zero_count[level] + left_ones;\n                right = _zero_count[level]\
+    \ + right_ones;\n            } else {\n                left -= left_ones;\n  \
+    \              right -= right_ones;\n            }\n        }\n        return\
+    \ right - left;\n    }\n\n    T kth_smallest(int left, int right, int k) const\
+    \ {\n        assert(0 <= left && left <= right && right <= _size);\n        assert(0\
+    \ <= k && k < right - left);\n        unsigned_type key = 0;\n        for (int\
+    \ level = 0; level < bit_width; level++) {\n            auto ranks = _matrix[level].rank1_pair(left,\
+    \ right);\n            int left_ones = ranks.left_ones;\n            int right_ones\
+    \ = ranks.right_ones;\n            int left_zeros = left - left_ones;\n      \
+    \      int right_zeros = right - right_ones;\n            int zeros = right_zeros\
     \ - left_zeros;\n            if (k < zeros) {\n                left = left_zeros;\n\
     \                right = right_zeros;\n            } else {\n                k\
     \ -= zeros;\n                key |= unsigned_type(1) << (bit_width - 1 - level);\n\
@@ -773,7 +823,7 @@ data:
   isVerificationFile: true
   path: verify/ds/wavelet_matrix/dynamic_wavelet_matrix.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-07-19 03:02:48+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/wavelet_matrix/dynamic_wavelet_matrix.test.cpp
