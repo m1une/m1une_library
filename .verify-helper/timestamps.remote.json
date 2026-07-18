@@ -11,6 +11,7 @@
 "verify/algo/search/golden_section_search.test.cpp": "2026-07-17 22:34:46 +0900",
 "verify/algo/search/ternary_search.test.cpp": "2026-07-17 22:34:46 +0900",
 "verify/algo/sequence/longest_increasing_subsequence.test.cpp": "2026-07-17 22:34:46 +0900",
+"verify/algo/sequence/non_adjacent_selection.test.cpp": "2026-07-18 18:19:15 +0900",
 "verify/algo/sequence/number_of_subsequences.test.cpp": "2026-07-17 22:34:46 +0900",
 "verify/algo/sequence/sequence_algorithms.test.cpp": "2026-07-17 22:34:46 +0900",
 "verify/algo/sequence/subset_sum.test.cpp": "2026-07-17 22:34:46 +0900",
