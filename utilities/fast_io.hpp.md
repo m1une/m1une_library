@@ -331,6 +331,9 @@ data:
     path: verify/ds/wavelet_matrix/dynamic_wavelet_matrix.test.cpp
     title: verify/ds/wavelet_matrix/dynamic_wavelet_matrix.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/wavelet_matrix/dynamic_wavelet_matrix_sum.test.cpp
+    title: verify/ds/wavelet_matrix/dynamic_wavelet_matrix_sum.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/wavelet_matrix/wavelet_matrix.test.cpp
     title: verify/ds/wavelet_matrix/wavelet_matrix.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1613,6 +1616,7 @@ data:
   - verify/ds/wavelet_matrix/wavelet_matrix_2d.test.cpp
   - verify/ds/wavelet_matrix/dynamic_wavelet_matrix.test.cpp
   - verify/ds/wavelet_matrix/wavelet_matrix.test.cpp
+  - verify/ds/wavelet_matrix/dynamic_wavelet_matrix_sum.test.cpp
   - verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp
   - verify/ds/hash_table/hash_map.test.cpp
   - verify/ds/hash_table/hash_map_associative_array.test.cpp

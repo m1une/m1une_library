@@ -216,18 +216,54 @@ data:
     \ result + (_final_prefix[l + k] - _final_prefix[l]);\n    }\n\n    Sum sum_k_largest(int\
     \ l, int r, int k) const {\n        assert(0 <= l && l <= r && r <= _n);\n   \
     \     assert(0 <= k && k <= r - l);\n        return range_sum(l, r) - sum_k_smallest(l,\
-    \ r, r - l - k);\n    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n\
-    #line 4 \"verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp\"\n\n#line 1 \"\
-    utilities/fast_io.hpp\"\n\n\n\n#line 5 \"utilities/fast_io.hpp\"\n#include <array>\n\
-    #include <cerrno>\n#include <charconv>\n#include <cstddef>\n#include <cstdio>\n\
-    #include <cstdlib>\n#line 12 \"utilities/fast_io.hpp\"\n#include <cstring>\n#include\
-    \ <iterator>\n#include <string>\n#include <sys/stat.h>\n#line 18 \"utilities/fast_io.hpp\"\
-    \n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal\
-    \ {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\n\
-    struct is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T,\
-    \ std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
-    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
-    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    \ r, r - l - k);\n    }\n\n    template <class Predicate>\n    int max_count_smallest(int\
+    \ l, int r, Predicate predicate) const {\n        assert(0 <= l && l <= r && r\
+    \ <= _n);\n        assert(predicate(Sum{}));\n        Sum result{};\n        int\
+    \ count = 0;\n        for (int level = 0; level < _log; level++) {\n         \
+    \   int l1 = _matrix[level].rank1(l);\n            int r1 = _matrix[level].rank1(r);\n\
+    \            int l0 = l - l1;\n            int r0 = r - r1;\n            int zeros\
+    \ = r0 - l0;\n            Sum zero_result = result + zero_sum(level, l, r);\n\
+    \            if (predicate(zero_result)) {\n                result = zero_result;\n\
+    \                count += zeros;\n                l = _zero_count[level] + l1;\n\
+    \                r = _zero_count[level] + r1;\n            } else {\n        \
+    \        l = l0;\n                r = r0;\n            }\n        }\n\n      \
+    \  int low = 0;\n        int high = r - l;\n        while (low < high) {\n   \
+    \         int middle = low + (high - low + 1) / 2;\n            Sum candidate\
+    \ =\n                result + (_final_prefix[l + middle] - _final_prefix[l]);\n\
+    \            if (predicate(candidate)) {\n                low = middle;\n    \
+    \        } else {\n                high = middle - 1;\n            }\n       \
+    \ }\n        return count + low;\n    }\n\n    template <class Predicate>\n  \
+    \  int max_count_largest(int l, int r, Predicate predicate) const {\n        assert(0\
+    \ <= l && l <= r && r <= _n);\n        assert(predicate(Sum{}));\n        Sum\
+    \ result{};\n        Sum current_sum = range_sum(l, r);\n        int count = 0;\n\
+    \        for (int level = 0; level < _log; level++) {\n            int l1 = _matrix[level].rank1(l);\n\
+    \            int r1 = _matrix[level].rank1(r);\n            int l0 = l - l1;\n\
+    \            int r0 = r - r1;\n            int ones = r1 - l1;\n            Sum\
+    \ zero_result = zero_sum(level, l, r);\n            Sum one_result = current_sum\
+    \ - zero_result;\n            Sum candidate = result + one_result;\n         \
+    \   if (predicate(candidate)) {\n                result = candidate;\n       \
+    \         count += ones;\n                current_sum = zero_result;\n       \
+    \         l = l0;\n                r = r0;\n            } else {\n           \
+    \     current_sum = one_result;\n                l = _zero_count[level] + l1;\n\
+    \                r = _zero_count[level] + r1;\n            }\n        }\n\n  \
+    \      int low = 0;\n        int high = r - l;\n        while (low < high) {\n\
+    \            int middle = low + (high - low + 1) / 2;\n            Sum candidate\
+    \ =\n                result + (_final_prefix[r] - _final_prefix[r - middle]);\n\
+    \            if (predicate(candidate)) {\n                low = middle;\n    \
+    \        } else {\n                high = middle - 1;\n            }\n       \
+    \ }\n        return count + low;\n    }\n};\n\n}  // namespace ds\n}  // namespace\
+    \ m1une\n\n\n#line 4 \"verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp\"\n\
+    \n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 5 \"utilities/fast_io.hpp\"\n\
+    #include <array>\n#include <cerrno>\n#include <charconv>\n#include <cstddef>\n\
+    #include <cstdio>\n#include <cstdlib>\n#line 12 \"utilities/fast_io.hpp\"\n#include\
+    \ <cstring>\n#include <iterator>\n#include <string>\n#include <sys/stat.h>\n#line\
+    \ 18 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n\nnamespace m1une {\nnamespace\
+    \ utilities {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\n\
+    template <class T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate\
+    \ <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
+    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
+    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
     \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
     \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
@@ -481,45 +517,55 @@ data:
     \ long long> matrix(values, weights);\n    assert(matrix.range_sum(0, 4) == 100);\n\
     \    assert(matrix.range_sum(0, 4, 2) == 20);\n    assert(matrix.range_sum(0,\
     \ 4, 2, 5) == 80);\n    assert(matrix.sum_k_smallest(0, 4, 3) == 70);\n    assert(matrix.sum_k_largest(0,\
-    \ 4, 1) == 30);\n    assert(matrix.sum_k_largest(0, 4, 2) == 40);\n\n    std::vector<int>\
-    \ equal_values(4, 1000000000);\n    m1une::ds::WaveletMatrixSum<int, long long>\
-    \ equal_matrix(\n        equal_values,\n        weights\n    );\n    assert(equal_matrix.access(2)\
-    \ == 1000000000);\n    assert(equal_matrix.rank(1000000000, 1, 4) == 3);\n   \
-    \ assert(equal_matrix.rank(999999999, 0, 4) == 0);\n    assert(equal_matrix.range_sum(1,\
-    \ 4, 1000000001) == 90);\n    assert(equal_matrix.sum_k_smallest(0, 4, 2) == 30);\n\
-    \    assert(equal_matrix.sum_k_largest(0, 4, 2) == 70);\n}\n\nvoid test_randomized()\
-    \ {\n    std::uint64_t state = 23;\n    auto random = [&state]() {\n        state\
-    \ ^= state << 7;\n        state ^= state >> 9;\n        return state;\n    };\n\
-    \n    for (int trial = 0; trial < 70; trial++) {\n        int n = int(random()\
-    \ % 70);\n        int offset = trial % 3 == 0\n                         ? 1000000000\n\
-    \                         : (trial % 3 == 1 ? -1000000000 : 0);\n        std::vector<int>\
-    \ values(n);\n        std::vector<long long> weights(n);\n        for (int i =\
-    \ 0; i < n; i++) {\n            values[i] = offset + int(random() % 61) - 30;\n\
-    \            weights[i] = static_cast<long long>(random() % 101) - 50;\n     \
-    \   }\n        m1une::ds::WaveletMatrixSum<int, long long> matrix(values, weights);\n\
-    \n        for (int query = 0; query < 500; query++) {\n            int l = int(random()\
-    \ % std::uint64_t(n + 1));\n            int r = int(random() % std::uint64_t(n\
-    \ + 1));\n            if (r < l) std::swap(l, r);\n            int lower = offset\
-    \ + int(random() % 81) - 40;\n            int upper = offset + int(random() %\
-    \ 81) - 40;\n            if (upper < lower) std::swap(lower, upper);\n\n     \
-    \       [[maybe_unused]] long long total = 0;\n            [[maybe_unused]] long\
-    \ long below = 0;\n            [[maybe_unused]] long long between = 0;\n     \
-    \       std::vector<std::pair<int, int>> order;\n            for (int i = l; i\
-    \ < r; i++) {\n                total += weights[i];\n                if (values[i]\
-    \ < upper) below += weights[i];\n                if (lower <= values[i] && values[i]\
-    \ < upper) {\n                    between += weights[i];\n                }\n\
-    \                order.emplace_back(values[i], i);\n            }\n          \
-    \  std::stable_sort(order.begin(), order.end(), [](const auto& a, const auto&\
-    \ b) {\n                return a.first < b.first;\n            });\n\n       \
-    \     assert(matrix.range_sum(l, r) == total);\n            assert(matrix.range_freq(l,\
-    \ r, upper) ==\n                   int(std::count_if(\n                      \
-    \ values.begin() + l,\n                       values.begin() + r,\n          \
-    \             [upper](int value) { return value < upper; }\n                 \
-    \  )));\n            assert(matrix.range_sum(l, r, upper) == below);\n       \
-    \     assert(matrix.range_sum(l, r, lower, upper) == between);\n\n           \
-    \ [[maybe_unused]] long long smallest_sum = 0;\n            [[maybe_unused]] long\
-    \ long largest_sum = 0;\n            for (int k = 0; k <= int(order.size()); k++)\
-    \ {\n                assert(matrix.sum_k_smallest(l, r, k) == smallest_sum);\n\
+    \ 4, 1) == 30);\n    assert(matrix.sum_k_largest(0, 4, 2) == 40);\n    auto at_most_65\
+    \ = [](long long sum) { return sum <= 65; };\n    assert(matrix.max_count_smallest(0,\
+    \ 4, at_most_65) == 2);\n    assert(matrix.max_count_largest(0, 4, at_most_65)\
+    \ == 2);\n    assert(\n        matrix.max_count_smallest(\n            0,\n  \
+    \          4,\n            [](long long sum) { return sum <= 75; }\n        )\
+    \ == 3\n    );\n    assert(\n        matrix.max_count_largest(\n            0,\n\
+    \            4,\n            [](long long sum) { return sum <= 35; }\n       \
+    \ ) == 1\n    );\n    assert(\n        matrix.max_count_smallest(\n          \
+    \  0,\n            4,\n            [](long long sum) { return sum <= 100; }\n\
+    \        ) == 4\n    );\n    assert(\n        matrix.max_count_largest(\n    \
+    \        0,\n            4,\n            [](long long sum) { return sum == 0;\
+    \ }\n        ) == 0\n    );\n\n    std::vector<int> equal_values(4, 1000000000);\n\
+    \    m1une::ds::WaveletMatrixSum<int, long long> equal_matrix(\n        equal_values,\n\
+    \        weights\n    );\n    assert(equal_matrix.access(2) == 1000000000);\n\
+    \    assert(equal_matrix.rank(1000000000, 1, 4) == 3);\n    assert(equal_matrix.rank(999999999,\
+    \ 0, 4) == 0);\n    assert(equal_matrix.range_sum(1, 4, 1000000001) == 90);\n\
+    \    assert(equal_matrix.sum_k_smallest(0, 4, 2) == 30);\n    assert(equal_matrix.sum_k_largest(0,\
+    \ 4, 2) == 70);\n}\n\nvoid test_randomized() {\n    std::uint64_t state = 23;\n\
+    \    auto random = [&state]() {\n        state ^= state << 7;\n        state ^=\
+    \ state >> 9;\n        return state;\n    };\n\n    for (int trial = 0; trial\
+    \ < 70; trial++) {\n        int n = int(random() % 70);\n        int offset =\
+    \ trial % 3 == 0\n                         ? 1000000000\n                    \
+    \     : (trial % 3 == 1 ? -1000000000 : 0);\n        std::vector<int> values(n);\n\
+    \        std::vector<long long> weights(n);\n        for (int i = 0; i < n; i++)\
+    \ {\n            values[i] = offset + int(random() % 61) - 30;\n            weights[i]\
+    \ = static_cast<long long>(random() % 101) - 50;\n        }\n        m1une::ds::WaveletMatrixSum<int,\
+    \ long long> matrix(values, weights);\n\n        for (int query = 0; query < 500;\
+    \ query++) {\n            int l = int(random() % std::uint64_t(n + 1));\n    \
+    \        int r = int(random() % std::uint64_t(n + 1));\n            if (r < l)\
+    \ std::swap(l, r);\n            int lower = offset + int(random() % 81) - 40;\n\
+    \            int upper = offset + int(random() % 81) - 40;\n            if (upper\
+    \ < lower) std::swap(lower, upper);\n\n            [[maybe_unused]] long long\
+    \ total = 0;\n            [[maybe_unused]] long long below = 0;\n            [[maybe_unused]]\
+    \ long long between = 0;\n            std::vector<std::pair<int, int>> order;\n\
+    \            for (int i = l; i < r; i++) {\n                total += weights[i];\n\
+    \                if (values[i] < upper) below += weights[i];\n               \
+    \ if (lower <= values[i] && values[i] < upper) {\n                    between\
+    \ += weights[i];\n                }\n                order.emplace_back(values[i],\
+    \ i);\n            }\n            std::stable_sort(order.begin(), order.end(),\
+    \ [](const auto& a, const auto& b) {\n                return a.first < b.first;\n\
+    \            });\n\n            assert(matrix.range_sum(l, r) == total);\n   \
+    \         assert(matrix.range_freq(l, r, upper) ==\n                   int(std::count_if(\n\
+    \                       values.begin() + l,\n                       values.begin()\
+    \ + r,\n                       [upper](int value) { return value < upper; }\n\
+    \                   )));\n            assert(matrix.range_sum(l, r, upper) ==\
+    \ below);\n            assert(matrix.range_sum(l, r, lower, upper) == between);\n\
+    \n            [[maybe_unused]] long long smallest_sum = 0;\n            [[maybe_unused]]\
+    \ long long largest_sum = 0;\n            for (int k = 0; k <= int(order.size());\
+    \ k++) {\n                assert(matrix.sum_k_smallest(l, r, k) == smallest_sum);\n\
     \                assert(matrix.sum_k_largest(l, r, k) == largest_sum);\n     \
     \           if (k < int(order.size())) {\n                    smallest_sum +=\
     \ weights[order[k].second];\n                    largest_sum += weights[order[order.size()\
@@ -556,45 +602,55 @@ data:
     \ long long> matrix(values, weights);\n    assert(matrix.range_sum(0, 4) == 100);\n\
     \    assert(matrix.range_sum(0, 4, 2) == 20);\n    assert(matrix.range_sum(0,\
     \ 4, 2, 5) == 80);\n    assert(matrix.sum_k_smallest(0, 4, 3) == 70);\n    assert(matrix.sum_k_largest(0,\
-    \ 4, 1) == 30);\n    assert(matrix.sum_k_largest(0, 4, 2) == 40);\n\n    std::vector<int>\
-    \ equal_values(4, 1000000000);\n    m1une::ds::WaveletMatrixSum<int, long long>\
-    \ equal_matrix(\n        equal_values,\n        weights\n    );\n    assert(equal_matrix.access(2)\
-    \ == 1000000000);\n    assert(equal_matrix.rank(1000000000, 1, 4) == 3);\n   \
-    \ assert(equal_matrix.rank(999999999, 0, 4) == 0);\n    assert(equal_matrix.range_sum(1,\
-    \ 4, 1000000001) == 90);\n    assert(equal_matrix.sum_k_smallest(0, 4, 2) == 30);\n\
-    \    assert(equal_matrix.sum_k_largest(0, 4, 2) == 70);\n}\n\nvoid test_randomized()\
-    \ {\n    std::uint64_t state = 23;\n    auto random = [&state]() {\n        state\
-    \ ^= state << 7;\n        state ^= state >> 9;\n        return state;\n    };\n\
-    \n    for (int trial = 0; trial < 70; trial++) {\n        int n = int(random()\
-    \ % 70);\n        int offset = trial % 3 == 0\n                         ? 1000000000\n\
-    \                         : (trial % 3 == 1 ? -1000000000 : 0);\n        std::vector<int>\
-    \ values(n);\n        std::vector<long long> weights(n);\n        for (int i =\
-    \ 0; i < n; i++) {\n            values[i] = offset + int(random() % 61) - 30;\n\
-    \            weights[i] = static_cast<long long>(random() % 101) - 50;\n     \
-    \   }\n        m1une::ds::WaveletMatrixSum<int, long long> matrix(values, weights);\n\
-    \n        for (int query = 0; query < 500; query++) {\n            int l = int(random()\
-    \ % std::uint64_t(n + 1));\n            int r = int(random() % std::uint64_t(n\
-    \ + 1));\n            if (r < l) std::swap(l, r);\n            int lower = offset\
-    \ + int(random() % 81) - 40;\n            int upper = offset + int(random() %\
-    \ 81) - 40;\n            if (upper < lower) std::swap(lower, upper);\n\n     \
-    \       [[maybe_unused]] long long total = 0;\n            [[maybe_unused]] long\
-    \ long below = 0;\n            [[maybe_unused]] long long between = 0;\n     \
-    \       std::vector<std::pair<int, int>> order;\n            for (int i = l; i\
-    \ < r; i++) {\n                total += weights[i];\n                if (values[i]\
-    \ < upper) below += weights[i];\n                if (lower <= values[i] && values[i]\
-    \ < upper) {\n                    between += weights[i];\n                }\n\
-    \                order.emplace_back(values[i], i);\n            }\n          \
-    \  std::stable_sort(order.begin(), order.end(), [](const auto& a, const auto&\
-    \ b) {\n                return a.first < b.first;\n            });\n\n       \
-    \     assert(matrix.range_sum(l, r) == total);\n            assert(matrix.range_freq(l,\
-    \ r, upper) ==\n                   int(std::count_if(\n                      \
-    \ values.begin() + l,\n                       values.begin() + r,\n          \
-    \             [upper](int value) { return value < upper; }\n                 \
-    \  )));\n            assert(matrix.range_sum(l, r, upper) == below);\n       \
-    \     assert(matrix.range_sum(l, r, lower, upper) == between);\n\n           \
-    \ [[maybe_unused]] long long smallest_sum = 0;\n            [[maybe_unused]] long\
-    \ long largest_sum = 0;\n            for (int k = 0; k <= int(order.size()); k++)\
-    \ {\n                assert(matrix.sum_k_smallest(l, r, k) == smallest_sum);\n\
+    \ 4, 1) == 30);\n    assert(matrix.sum_k_largest(0, 4, 2) == 40);\n    auto at_most_65\
+    \ = [](long long sum) { return sum <= 65; };\n    assert(matrix.max_count_smallest(0,\
+    \ 4, at_most_65) == 2);\n    assert(matrix.max_count_largest(0, 4, at_most_65)\
+    \ == 2);\n    assert(\n        matrix.max_count_smallest(\n            0,\n  \
+    \          4,\n            [](long long sum) { return sum <= 75; }\n        )\
+    \ == 3\n    );\n    assert(\n        matrix.max_count_largest(\n            0,\n\
+    \            4,\n            [](long long sum) { return sum <= 35; }\n       \
+    \ ) == 1\n    );\n    assert(\n        matrix.max_count_smallest(\n          \
+    \  0,\n            4,\n            [](long long sum) { return sum <= 100; }\n\
+    \        ) == 4\n    );\n    assert(\n        matrix.max_count_largest(\n    \
+    \        0,\n            4,\n            [](long long sum) { return sum == 0;\
+    \ }\n        ) == 0\n    );\n\n    std::vector<int> equal_values(4, 1000000000);\n\
+    \    m1une::ds::WaveletMatrixSum<int, long long> equal_matrix(\n        equal_values,\n\
+    \        weights\n    );\n    assert(equal_matrix.access(2) == 1000000000);\n\
+    \    assert(equal_matrix.rank(1000000000, 1, 4) == 3);\n    assert(equal_matrix.rank(999999999,\
+    \ 0, 4) == 0);\n    assert(equal_matrix.range_sum(1, 4, 1000000001) == 90);\n\
+    \    assert(equal_matrix.sum_k_smallest(0, 4, 2) == 30);\n    assert(equal_matrix.sum_k_largest(0,\
+    \ 4, 2) == 70);\n}\n\nvoid test_randomized() {\n    std::uint64_t state = 23;\n\
+    \    auto random = [&state]() {\n        state ^= state << 7;\n        state ^=\
+    \ state >> 9;\n        return state;\n    };\n\n    for (int trial = 0; trial\
+    \ < 70; trial++) {\n        int n = int(random() % 70);\n        int offset =\
+    \ trial % 3 == 0\n                         ? 1000000000\n                    \
+    \     : (trial % 3 == 1 ? -1000000000 : 0);\n        std::vector<int> values(n);\n\
+    \        std::vector<long long> weights(n);\n        for (int i = 0; i < n; i++)\
+    \ {\n            values[i] = offset + int(random() % 61) - 30;\n            weights[i]\
+    \ = static_cast<long long>(random() % 101) - 50;\n        }\n        m1une::ds::WaveletMatrixSum<int,\
+    \ long long> matrix(values, weights);\n\n        for (int query = 0; query < 500;\
+    \ query++) {\n            int l = int(random() % std::uint64_t(n + 1));\n    \
+    \        int r = int(random() % std::uint64_t(n + 1));\n            if (r < l)\
+    \ std::swap(l, r);\n            int lower = offset + int(random() % 81) - 40;\n\
+    \            int upper = offset + int(random() % 81) - 40;\n            if (upper\
+    \ < lower) std::swap(lower, upper);\n\n            [[maybe_unused]] long long\
+    \ total = 0;\n            [[maybe_unused]] long long below = 0;\n            [[maybe_unused]]\
+    \ long long between = 0;\n            std::vector<std::pair<int, int>> order;\n\
+    \            for (int i = l; i < r; i++) {\n                total += weights[i];\n\
+    \                if (values[i] < upper) below += weights[i];\n               \
+    \ if (lower <= values[i] && values[i] < upper) {\n                    between\
+    \ += weights[i];\n                }\n                order.emplace_back(values[i],\
+    \ i);\n            }\n            std::stable_sort(order.begin(), order.end(),\
+    \ [](const auto& a, const auto& b) {\n                return a.first < b.first;\n\
+    \            });\n\n            assert(matrix.range_sum(l, r) == total);\n   \
+    \         assert(matrix.range_freq(l, r, upper) ==\n                   int(std::count_if(\n\
+    \                       values.begin() + l,\n                       values.begin()\
+    \ + r,\n                       [upper](int value) { return value < upper; }\n\
+    \                   )));\n            assert(matrix.range_sum(l, r, upper) ==\
+    \ below);\n            assert(matrix.range_sum(l, r, lower, upper) == between);\n\
+    \n            [[maybe_unused]] long long smallest_sum = 0;\n            [[maybe_unused]]\
+    \ long long largest_sum = 0;\n            for (int k = 0; k <= int(order.size());\
+    \ k++) {\n                assert(matrix.sum_k_smallest(l, r, k) == smallest_sum);\n\
     \                assert(matrix.sum_k_largest(l, r, k) == largest_sum);\n     \
     \           if (k < int(order.size())) {\n                    smallest_sum +=\
     \ weights[order[k].second];\n                    largest_sum += weights[order[order.size()\
@@ -613,7 +669,7 @@ data:
   isVerificationFile: true
   path: verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-07-19 01:44:04+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp

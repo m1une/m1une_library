@@ -1,11 +1,17 @@
 ---
 data:
   _extendedDependsOn: []
-  _extendedRequiredBy: []
+  _extendedRequiredBy:
+  - icon: ':heavy_check_mark:'
+    path: ds/wavelet_matrix/dynamic_wavelet_matrix_sum.hpp
+    title: Dynamic Wavelet Matrix with Sums
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/ds/wavelet_matrix/dynamic_wavelet_matrix.test.cpp
     title: verify/ds/wavelet_matrix/dynamic_wavelet_matrix.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/wavelet_matrix/dynamic_wavelet_matrix_sum.test.cpp
+    title: verify/ds/wavelet_matrix/dynamic_wavelet_matrix_sum.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -706,11 +712,13 @@ data:
   dependsOn: []
   isVerificationFile: false
   path: ds/wavelet_matrix/dynamic_wavelet_matrix.hpp
-  requiredBy: []
+  requiredBy:
+  - ds/wavelet_matrix/dynamic_wavelet_matrix_sum.hpp
   timestamp: '2026-07-16 19:05:45+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/wavelet_matrix/dynamic_wavelet_matrix.test.cpp
+  - verify/ds/wavelet_matrix/dynamic_wavelet_matrix_sum.test.cpp
 documentation_of: ds/wavelet_matrix/dynamic_wavelet_matrix.hpp
 layout: document
 title: Dynamic Wavelet Matrix

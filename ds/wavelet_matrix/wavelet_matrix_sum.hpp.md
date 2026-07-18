@@ -214,7 +214,43 @@ data:
     \ result + (_final_prefix[l + k] - _final_prefix[l]);\n    }\n\n    Sum sum_k_largest(int\
     \ l, int r, int k) const {\n        assert(0 <= l && l <= r && r <= _n);\n   \
     \     assert(0 <= k && k <= r - l);\n        return range_sum(l, r) - sum_k_smallest(l,\
-    \ r, r - l - k);\n    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n"
+    \ r, r - l - k);\n    }\n\n    template <class Predicate>\n    int max_count_smallest(int\
+    \ l, int r, Predicate predicate) const {\n        assert(0 <= l && l <= r && r\
+    \ <= _n);\n        assert(predicate(Sum{}));\n        Sum result{};\n        int\
+    \ count = 0;\n        for (int level = 0; level < _log; level++) {\n         \
+    \   int l1 = _matrix[level].rank1(l);\n            int r1 = _matrix[level].rank1(r);\n\
+    \            int l0 = l - l1;\n            int r0 = r - r1;\n            int zeros\
+    \ = r0 - l0;\n            Sum zero_result = result + zero_sum(level, l, r);\n\
+    \            if (predicate(zero_result)) {\n                result = zero_result;\n\
+    \                count += zeros;\n                l = _zero_count[level] + l1;\n\
+    \                r = _zero_count[level] + r1;\n            } else {\n        \
+    \        l = l0;\n                r = r0;\n            }\n        }\n\n      \
+    \  int low = 0;\n        int high = r - l;\n        while (low < high) {\n   \
+    \         int middle = low + (high - low + 1) / 2;\n            Sum candidate\
+    \ =\n                result + (_final_prefix[l + middle] - _final_prefix[l]);\n\
+    \            if (predicate(candidate)) {\n                low = middle;\n    \
+    \        } else {\n                high = middle - 1;\n            }\n       \
+    \ }\n        return count + low;\n    }\n\n    template <class Predicate>\n  \
+    \  int max_count_largest(int l, int r, Predicate predicate) const {\n        assert(0\
+    \ <= l && l <= r && r <= _n);\n        assert(predicate(Sum{}));\n        Sum\
+    \ result{};\n        Sum current_sum = range_sum(l, r);\n        int count = 0;\n\
+    \        for (int level = 0; level < _log; level++) {\n            int l1 = _matrix[level].rank1(l);\n\
+    \            int r1 = _matrix[level].rank1(r);\n            int l0 = l - l1;\n\
+    \            int r0 = r - r1;\n            int ones = r1 - l1;\n            Sum\
+    \ zero_result = zero_sum(level, l, r);\n            Sum one_result = current_sum\
+    \ - zero_result;\n            Sum candidate = result + one_result;\n         \
+    \   if (predicate(candidate)) {\n                result = candidate;\n       \
+    \         count += ones;\n                current_sum = zero_result;\n       \
+    \         l = l0;\n                r = r0;\n            } else {\n           \
+    \     current_sum = one_result;\n                l = _zero_count[level] + l1;\n\
+    \                r = _zero_count[level] + r1;\n            }\n        }\n\n  \
+    \      int low = 0;\n        int high = r - l;\n        while (low < high) {\n\
+    \            int middle = low + (high - low + 1) / 2;\n            Sum candidate\
+    \ =\n                result + (_final_prefix[r] - _final_prefix[r - middle]);\n\
+    \            if (predicate(candidate)) {\n                low = middle;\n    \
+    \        } else {\n                high = middle - 1;\n            }\n       \
+    \ }\n        return count + low;\n    }\n};\n\n}  // namespace ds\n}  // namespace\
+    \ m1une\n\n\n"
   code: "#ifndef M1UNE_DS_WAVELET_MATRIX_WAVELET_MATRIX_SUM_HPP\n#define M1UNE_DS_WAVELET_MATRIX_WAVELET_MATRIX_SUM_HPP\
     \ 1\n\n#include <algorithm>\n#include <bit>\n#include <cassert>\n#include <concepts>\n\
     #include <cstdint>\n#include <limits>\n#include <optional>\n#include <type_traits>\n\
@@ -412,14 +448,49 @@ data:
     \ result + (_final_prefix[l + k] - _final_prefix[l]);\n    }\n\n    Sum sum_k_largest(int\
     \ l, int r, int k) const {\n        assert(0 <= l && l <= r && r <= _n);\n   \
     \     assert(0 <= k && k <= r - l);\n        return range_sum(l, r) - sum_k_smallest(l,\
-    \ r, r - l - k);\n    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n#endif\
-    \  // M1UNE_DS_WAVELET_MATRIX_WAVELET_MATRIX_SUM_HPP\n"
+    \ r, r - l - k);\n    }\n\n    template <class Predicate>\n    int max_count_smallest(int\
+    \ l, int r, Predicate predicate) const {\n        assert(0 <= l && l <= r && r\
+    \ <= _n);\n        assert(predicate(Sum{}));\n        Sum result{};\n        int\
+    \ count = 0;\n        for (int level = 0; level < _log; level++) {\n         \
+    \   int l1 = _matrix[level].rank1(l);\n            int r1 = _matrix[level].rank1(r);\n\
+    \            int l0 = l - l1;\n            int r0 = r - r1;\n            int zeros\
+    \ = r0 - l0;\n            Sum zero_result = result + zero_sum(level, l, r);\n\
+    \            if (predicate(zero_result)) {\n                result = zero_result;\n\
+    \                count += zeros;\n                l = _zero_count[level] + l1;\n\
+    \                r = _zero_count[level] + r1;\n            } else {\n        \
+    \        l = l0;\n                r = r0;\n            }\n        }\n\n      \
+    \  int low = 0;\n        int high = r - l;\n        while (low < high) {\n   \
+    \         int middle = low + (high - low + 1) / 2;\n            Sum candidate\
+    \ =\n                result + (_final_prefix[l + middle] - _final_prefix[l]);\n\
+    \            if (predicate(candidate)) {\n                low = middle;\n    \
+    \        } else {\n                high = middle - 1;\n            }\n       \
+    \ }\n        return count + low;\n    }\n\n    template <class Predicate>\n  \
+    \  int max_count_largest(int l, int r, Predicate predicate) const {\n        assert(0\
+    \ <= l && l <= r && r <= _n);\n        assert(predicate(Sum{}));\n        Sum\
+    \ result{};\n        Sum current_sum = range_sum(l, r);\n        int count = 0;\n\
+    \        for (int level = 0; level < _log; level++) {\n            int l1 = _matrix[level].rank1(l);\n\
+    \            int r1 = _matrix[level].rank1(r);\n            int l0 = l - l1;\n\
+    \            int r0 = r - r1;\n            int ones = r1 - l1;\n            Sum\
+    \ zero_result = zero_sum(level, l, r);\n            Sum one_result = current_sum\
+    \ - zero_result;\n            Sum candidate = result + one_result;\n         \
+    \   if (predicate(candidate)) {\n                result = candidate;\n       \
+    \         count += ones;\n                current_sum = zero_result;\n       \
+    \         l = l0;\n                r = r0;\n            } else {\n           \
+    \     current_sum = one_result;\n                l = _zero_count[level] + l1;\n\
+    \                r = _zero_count[level] + r1;\n            }\n        }\n\n  \
+    \      int low = 0;\n        int high = r - l;\n        while (low < high) {\n\
+    \            int middle = low + (high - low + 1) / 2;\n            Sum candidate\
+    \ =\n                result + (_final_prefix[r] - _final_prefix[r - middle]);\n\
+    \            if (predicate(candidate)) {\n                low = middle;\n    \
+    \        } else {\n                high = middle - 1;\n            }\n       \
+    \ }\n        return count + low;\n    }\n};\n\n}  // namespace ds\n}  // namespace\
+    \ m1une\n\n#endif  // M1UNE_DS_WAVELET_MATRIX_WAVELET_MATRIX_SUM_HPP\n"
   dependsOn: []
   isVerificationFile: false
   path: ds/wavelet_matrix/wavelet_matrix_sum.hpp
   requiredBy:
   - ds/range_query/static_rectangle_sum.hpp
-  timestamp: '2026-07-16 18:47:36+09:00'
+  timestamp: '2026-07-19 01:44:04+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/range_query/static_rectangle_sum.test.cpp
@@ -437,7 +508,8 @@ with:
 
 * total weight in an index range,
 * total weight for values below a bound or inside a value interval, and
-* total weight of the smallest or largest `k` values.
+* total weight of the smallest or largest `k` values, plus predicate-based
+  searches for the maximum valid `k`.
 
 By default, each value is also its weight, producing ordinary sums of selected
 values. A separate weight vector can instead represent costs, counts, or other
@@ -498,10 +570,18 @@ All index and value intervals are half-open.
 | `Sum range_sum(int l, int r, T lower, T upper)` | Sums weights whose values are in `[lower, upper)`. | $O(L)$ |
 | `Sum sum_k_smallest(int l, int r, int k)` | Sums the weights of the smallest `k` values. | $O(L)$ |
 | `Sum sum_k_largest(int l, int r, int k)` | Sums the weights of the largest `k` values. | $O(L)$ |
+| `template <class Predicate> int max_count_smallest(int left, int right, Predicate predicate) const` | Returns the largest `k` for which `predicate(sum_k_smallest(left, right, k))` is true. | $O(L + \log N)$ |
+| `template <class Predicate> int max_count_largest(int left, int right, Predicate predicate) const` | Returns the largest `k` for which `predicate(sum_k_largest(left, right, k))` is true. | $O(L + \log N)$ |
 
 The `k` used by sum methods may range from `0` through `r - l`, inclusive. If
 equal values have different weights, `sum_k_smallest` selects ties in original
 index order, while `sum_k_largest` selects them in reverse original index order.
+
+For `max_count_smallest` and `max_count_largest`, `predicate(Sum{})` must be
+true. Over `k = 0, 1, ..., r - l`, the predicate results for the corresponding
+sums must consist of zero or more `true` values followed by zero or more
+`false` values. The predicate must not have side effects. Tie ordering is the
+same as for the corresponding `sum_k` method.
 
 ## Example
 

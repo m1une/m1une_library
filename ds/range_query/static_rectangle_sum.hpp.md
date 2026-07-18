@@ -214,26 +214,62 @@ data:
     \ result + (_final_prefix[l + k] - _final_prefix[l]);\n    }\n\n    Sum sum_k_largest(int\
     \ l, int r, int k) const {\n        assert(0 <= l && l <= r && r <= _n);\n   \
     \     assert(0 <= k && k <= r - l);\n        return range_sum(l, r) - sum_k_smallest(l,\
-    \ r, r - l - k);\n    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n\
-    #line 11 \"ds/range_query/static_rectangle_sum.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ ds {\n\ntemplate <class X, class Y = X, class Sum = long long>\nclass StaticRectangleSum\
-    \ {\n   public:\n    using x_type = X;\n    using y_type = Y;\n    using sum_type\
-    \ = Sum;\n    using weighted_point_type = std::tuple<X, Y, Sum>;\n\n   private:\n\
-    \    std::vector<X> _x_coordinates;\n    std::vector<Y> _y_coordinates;\n    WaveletMatrixSum<int,\
-    \ Sum> _matrix;\n\n   public:\n    StaticRectangleSum() = default;\n\n    explicit\
-    \ StaticRectangleSum(\n        const std::vector<weighted_point_type>& points\n\
-    \    ) {\n        build(points);\n    }\n\n    StaticRectangleSum(\n        const\
-    \ std::vector<X>& x_coordinates,\n        const std::vector<Y>& y_coordinates,\n\
-    \        const std::vector<Sum>& weights\n    ) {\n        build(x_coordinates,\
-    \ y_coordinates, weights);\n    }\n\n    void build(std::vector<weighted_point_type>\
-    \ points) {\n        std::sort(\n            points.begin(),\n            points.end(),\n\
-    \            [](const weighted_point_type& first,\n               const weighted_point_type&\
-    \ second) {\n                if (std::get<0>(first) < std::get<0>(second)) return\
-    \ true;\n                if (std::get<0>(second) < std::get<0>(first)) return\
-    \ false;\n                return std::get<1>(first) < std::get<1>(second);\n \
-    \           }\n        );\n\n        const int n = int(points.size());\n     \
-    \   _x_coordinates.resize(n);\n        _y_coordinates.clear();\n        _y_coordinates.reserve(n);\n\
-    \        for (const auto& point : points) {\n            _y_coordinates.push_back(std::get<1>(point));\n\
+    \ r, r - l - k);\n    }\n\n    template <class Predicate>\n    int max_count_smallest(int\
+    \ l, int r, Predicate predicate) const {\n        assert(0 <= l && l <= r && r\
+    \ <= _n);\n        assert(predicate(Sum{}));\n        Sum result{};\n        int\
+    \ count = 0;\n        for (int level = 0; level < _log; level++) {\n         \
+    \   int l1 = _matrix[level].rank1(l);\n            int r1 = _matrix[level].rank1(r);\n\
+    \            int l0 = l - l1;\n            int r0 = r - r1;\n            int zeros\
+    \ = r0 - l0;\n            Sum zero_result = result + zero_sum(level, l, r);\n\
+    \            if (predicate(zero_result)) {\n                result = zero_result;\n\
+    \                count += zeros;\n                l = _zero_count[level] + l1;\n\
+    \                r = _zero_count[level] + r1;\n            } else {\n        \
+    \        l = l0;\n                r = r0;\n            }\n        }\n\n      \
+    \  int low = 0;\n        int high = r - l;\n        while (low < high) {\n   \
+    \         int middle = low + (high - low + 1) / 2;\n            Sum candidate\
+    \ =\n                result + (_final_prefix[l + middle] - _final_prefix[l]);\n\
+    \            if (predicate(candidate)) {\n                low = middle;\n    \
+    \        } else {\n                high = middle - 1;\n            }\n       \
+    \ }\n        return count + low;\n    }\n\n    template <class Predicate>\n  \
+    \  int max_count_largest(int l, int r, Predicate predicate) const {\n        assert(0\
+    \ <= l && l <= r && r <= _n);\n        assert(predicate(Sum{}));\n        Sum\
+    \ result{};\n        Sum current_sum = range_sum(l, r);\n        int count = 0;\n\
+    \        for (int level = 0; level < _log; level++) {\n            int l1 = _matrix[level].rank1(l);\n\
+    \            int r1 = _matrix[level].rank1(r);\n            int l0 = l - l1;\n\
+    \            int r0 = r - r1;\n            int ones = r1 - l1;\n            Sum\
+    \ zero_result = zero_sum(level, l, r);\n            Sum one_result = current_sum\
+    \ - zero_result;\n            Sum candidate = result + one_result;\n         \
+    \   if (predicate(candidate)) {\n                result = candidate;\n       \
+    \         count += ones;\n                current_sum = zero_result;\n       \
+    \         l = l0;\n                r = r0;\n            } else {\n           \
+    \     current_sum = one_result;\n                l = _zero_count[level] + l1;\n\
+    \                r = _zero_count[level] + r1;\n            }\n        }\n\n  \
+    \      int low = 0;\n        int high = r - l;\n        while (low < high) {\n\
+    \            int middle = low + (high - low + 1) / 2;\n            Sum candidate\
+    \ =\n                result + (_final_prefix[r] - _final_prefix[r - middle]);\n\
+    \            if (predicate(candidate)) {\n                low = middle;\n    \
+    \        } else {\n                high = middle - 1;\n            }\n       \
+    \ }\n        return count + low;\n    }\n};\n\n}  // namespace ds\n}  // namespace\
+    \ m1une\n\n\n#line 11 \"ds/range_query/static_rectangle_sum.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace ds {\n\ntemplate <class X, class Y = X, class Sum = long\
+    \ long>\nclass StaticRectangleSum {\n   public:\n    using x_type = X;\n    using\
+    \ y_type = Y;\n    using sum_type = Sum;\n    using weighted_point_type = std::tuple<X,\
+    \ Y, Sum>;\n\n   private:\n    std::vector<X> _x_coordinates;\n    std::vector<Y>\
+    \ _y_coordinates;\n    WaveletMatrixSum<int, Sum> _matrix;\n\n   public:\n   \
+    \ StaticRectangleSum() = default;\n\n    explicit StaticRectangleSum(\n      \
+    \  const std::vector<weighted_point_type>& points\n    ) {\n        build(points);\n\
+    \    }\n\n    StaticRectangleSum(\n        const std::vector<X>& x_coordinates,\n\
+    \        const std::vector<Y>& y_coordinates,\n        const std::vector<Sum>&\
+    \ weights\n    ) {\n        build(x_coordinates, y_coordinates, weights);\n  \
+    \  }\n\n    void build(std::vector<weighted_point_type> points) {\n        std::sort(\n\
+    \            points.begin(),\n            points.end(),\n            [](const\
+    \ weighted_point_type& first,\n               const weighted_point_type& second)\
+    \ {\n                if (std::get<0>(first) < std::get<0>(second)) return true;\n\
+    \                if (std::get<0>(second) < std::get<0>(first)) return false;\n\
+    \                return std::get<1>(first) < std::get<1>(second);\n          \
+    \  }\n        );\n\n        const int n = int(points.size());\n        _x_coordinates.resize(n);\n\
+    \        _y_coordinates.clear();\n        _y_coordinates.reserve(n);\n       \
+    \ for (const auto& point : points) {\n            _y_coordinates.push_back(std::get<1>(point));\n\
     \        }\n        std::sort(_y_coordinates.begin(), _y_coordinates.end());\n\
     \        _y_coordinates.erase(\n            std::unique(\n                _y_coordinates.begin(),\n\
     \                _y_coordinates.end(),\n                [](const Y& first, const\
@@ -335,7 +371,7 @@ data:
   isVerificationFile: false
   path: ds/range_query/static_rectangle_sum.hpp
   requiredBy: []
-  timestamp: '2026-07-16 18:47:36+09:00'
+  timestamp: '2026-07-19 01:44:04+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/range_query/static_rectangle_sum.test.cpp
