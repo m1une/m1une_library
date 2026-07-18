@@ -116,7 +116,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/lattice_point_count.test.cpp
   requiredBy: []
-  timestamp: '2026-07-17 22:34:46+09:00'
+  timestamp: '2026-07-18 19:37:21+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/lattice_point_count.test.cpp

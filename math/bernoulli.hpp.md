@@ -540,47 +540,53 @@ data:
     \ Mint>\n__attribute__((target(\"avx2,bmi\"), hot))\nstd::vector<Mint> convolution_998244353_simd(const\
     \ std::vector<Mint>& a,\n                                             const std::vector<Mint>&\
     \ b) {\n    const int result_size = int(a.size() + b.size() - 1);\n    int n =\
-    \ 1;\n    while (n < result_size) n <<= 1;\n    auto* transformed_a = static_cast<uint32_t*>(\n\
-    \        ::operator new[](sizeof(uint32_t) * n, std::align_val_t(32)));\n    auto*\
-    \ transformed_b = static_cast<uint32_t*>(\n        ::operator new[](sizeof(uint32_t)\
-    \ * n, std::align_val_t(32)));\n    if constexpr (std::is_same_v<Mint, math::ModInt<998244353>>)\
-    \ {\n        static_assert(sizeof(Mint) == sizeof(uint32_t) && std::is_trivially_copyable_v<Mint>);\n\
-    \        std::memcpy(transformed_a, a.data(), sizeof(uint32_t) * a.size());\n\
-    \        std::memcpy(transformed_b, b.data(), sizeof(uint32_t) * b.size());\n\
-    \    } else {\n        for (int i = 0; i < int(a.size()); i++) transformed_a[i]\
-    \ = a[i].val();\n        for (int i = 0; i < int(b.size()); i++) transformed_b[i]\
+    \ 1;\n    while (n < result_size) n <<= 1;\n    const bool squaring = &a == &b;\n\
+    \    auto* transformed_a = static_cast<uint32_t*>(\n        ::operator new[](sizeof(uint32_t)\
+    \ * n, std::align_val_t(32)));\n    auto* transformed_b = squaring\n         \
+    \                     ? transformed_a\n                              : static_cast<uint32_t*>(::operator\
+    \ new[](\n                                    sizeof(uint32_t) * n, std::align_val_t(32)));\n\
+    \    if constexpr (std::is_same_v<Mint, math::ModInt<998244353>>) {\n        static_assert(sizeof(Mint)\
+    \ == sizeof(uint32_t) && std::is_trivially_copyable_v<Mint>);\n        std::memcpy(transformed_a,\
+    \ a.data(), sizeof(uint32_t) * a.size());\n        if (!squaring)\n          \
+    \  std::memcpy(transformed_b, b.data(), sizeof(uint32_t) * b.size());\n    } else\
+    \ {\n        for (int i = 0; i < int(a.size()); i++) transformed_a[i] = a[i].val();\n\
+    \        if (!squaring)\n            for (int i = 0; i < int(b.size()); i++) transformed_b[i]\
     \ = b[i].val();\n    }\n    std::memset(transformed_a + a.size(), 0, sizeof(uint32_t)\
-    \ * (n - a.size()));\n    std::memset(transformed_b + b.size(), 0, sizeof(uint32_t)\
-    \ * (n - b.size()));\n\n    static constexpr fast998_v2::FNTT32_info transform(998244353);\n\
-    \    const std::size_t vector_size = std::size_t(n) >> 3;\n    fast998_v2::vector_dif(reinterpret_cast<__m256i*>(transformed_a),\
-    \ vector_size, &transform);\n    fast998_v2::vector_dif(reinterpret_cast<__m256i*>(transformed_b),\
-    \ vector_size, &transform);\n    fast998_v2::vector_convolution_direct(\n    \
-    \    reinterpret_cast<__m256i*>(transformed_a),\n        reinterpret_cast<const\
+    \ * (n - a.size()));\n    if (!squaring)\n        std::memset(transformed_b +\
+    \ b.size(), 0, sizeof(uint32_t) * (n - b.size()));\n\n    static constexpr fast998_v2::FNTT32_info\
+    \ transform(998244353);\n    const std::size_t vector_size = std::size_t(n) >>\
+    \ 3;\n    fast998_v2::vector_dif(reinterpret_cast<__m256i*>(transformed_a), vector_size,\
+    \ &transform);\n    if (!squaring)\n        fast998_v2::vector_dif(reinterpret_cast<__m256i*>(transformed_b),\
+    \ vector_size,\n                              &transform);\n    fast998_v2::vector_convolution_direct(\n\
+    \        reinterpret_cast<__m256i*>(transformed_a),\n        reinterpret_cast<const\
     \ __m256i*>(transformed_b), vector_size, &transform);\n    fast998_v2::vector_dit<true>(reinterpret_cast<__m256i*>(transformed_a),\
     \ vector_size,\n                                 &transform);\n\n    std::vector<Mint>\
     \ result(result_size);\n    for (int j = 0; j < result_size; j++) result[j] =\
     \ Mint::raw(transformed_a[j]);\n    ::operator delete[](transformed_a, std::align_val_t(32));\n\
-    \    ::operator delete[](transformed_b, std::align_val_t(32));\n    return result;\n\
-    }\n\n#pragma GCC pop_options\n\n#endif\n\n}  // namespace internal\n\ntemplate\
-    \ <class Mint>\nstd::vector<Mint> convolution_naive(const std::vector<Mint>& a,\
-    \ const std::vector<Mint>& b) {\n    if (a.empty() || b.empty()) return {};\n\
-    \    std::vector<Mint> result(a.size() + b.size() - 1);\n    if (a.size() < b.size())\
-    \ {\n        for (int i = 0; i < int(a.size()); i++) {\n            for (int j\
-    \ = 0; j < int(b.size()); j++) result[i + j] += a[i] * b[j];\n        }\n    }\
-    \ else {\n        for (int j = 0; j < int(b.size()); j++) {\n            for (int\
-    \ i = 0; i < int(a.size()); i++) result[i + j] += a[i] * b[j];\n        }\n  \
-    \  }\n    return result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint> convolution_ntt(const\
-    \ std::vector<Mint>& a, const std::vector<Mint>& b) {\n    const int result_size\
-    \ = int(a.size() + b.size() - 1);\n    int n = 1;\n    while (n < result_size)\
-    \ n <<= 1;\n    assert((Mint::mod() - 1) % uint32_t(n) == 0);\n\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n\
-    \    if constexpr (Mint::mod() == 998244353) {\n        if (n >= 64 && __builtin_cpu_supports(\"\
-    avx2\"))\n            return internal::convolution_998244353_simd(a, b);\n   \
-    \ }\n#endif\n\n    // Allocate the padded buffers directly.  Constructing from\
-    \ the inputs and\n    // then resizing used to allocate and copy both large operands\
-    \ twice.\n    std::vector<Mint> fa(n);\n    std::vector<Mint> fb(n);\n    std::copy(a.begin(),\
-    \ a.end(), fa.begin());\n    std::copy(b.begin(), b.end(), fb.begin());\n    internal::ntt(fa,\
-    \ false);\n    internal::ntt(fb, false);\n    const Mint inverse_n = Mint(n).inv();\n\
-    \    for (int i = 0; i < n; i++) fa[i] *= fb[i] * inverse_n;\n    internal::ntt(fa,\
+    \    if (!squaring) ::operator delete[](transformed_b, std::align_val_t(32));\n\
+    \    return result;\n}\n\n#pragma GCC pop_options\n\n#endif\n\n}  // namespace\
+    \ internal\n\ntemplate <class Mint>\nstd::vector<Mint> convolution_naive(const\
+    \ std::vector<Mint>& a, const std::vector<Mint>& b) {\n    if (a.empty() || b.empty())\
+    \ return {};\n    std::vector<Mint> result(a.size() + b.size() - 1);\n    if (a.size()\
+    \ < b.size()) {\n        for (int i = 0; i < int(a.size()); i++) {\n         \
+    \   for (int j = 0; j < int(b.size()); j++) result[i + j] += a[i] * b[j];\n  \
+    \      }\n    } else {\n        for (int j = 0; j < int(b.size()); j++) {\n  \
+    \          for (int i = 0; i < int(a.size()); i++) result[i + j] += a[i] * b[j];\n\
+    \        }\n    }\n    return result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint>\
+    \ convolution_ntt(const std::vector<Mint>& a, const std::vector<Mint>& b) {\n\
+    \    const int result_size = int(a.size() + b.size() - 1);\n    int n = 1;\n \
+    \   while (n < result_size) n <<= 1;\n    assert((Mint::mod() - 1) % uint32_t(n)\
+    \ == 0);\n\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n    if constexpr (Mint::mod() == 998244353)\
+    \ {\n        if (n >= 64 && __builtin_cpu_supports(\"avx2\"))\n            return\
+    \ internal::convolution_998244353_simd(a, b);\n    }\n#endif\n\n    // Allocate\
+    \ the padded buffers directly.  Constructing from the inputs and\n    // then\
+    \ resizing used to allocate and copy both large operands twice.\n    const bool\
+    \ squaring = &a == &b;\n    std::vector<Mint> fa(n);\n    std::copy(a.begin(),\
+    \ a.end(), fa.begin());\n    internal::ntt(fa, false);\n    const Mint inverse_n\
+    \ = Mint(n).inv();\n    if (squaring) {\n        for (int i = 0; i < n; i++) fa[i]\
+    \ *= fa[i] * inverse_n;\n    } else {\n        std::vector<Mint> fb(n);\n    \
+    \    std::copy(b.begin(), b.end(), fb.begin());\n        internal::ntt(fb, false);\n\
+    \        for (int i = 0; i < n; i++) fa[i] *= fb[i] * inverse_n;\n    }\n    internal::ntt(fa,\
     \ true, false);\n    fa.resize(result_size);\n    return fa;\n}\n\nnamespace internal\
     \ {\n\ntemplate <class Mint>\nstd::vector<Mint> convolution_998244353_blocked_scalar(const\
     \ std::vector<Mint>& a,\n                                                    \
@@ -1077,7 +1083,7 @@ data:
   requiredBy:
   - math/all.hpp
   - math/combinatorial_sequences.hpp
-  timestamp: '2026-07-17 04:56:02+09:00'
+  timestamp: '2026-07-18 19:37:21+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp

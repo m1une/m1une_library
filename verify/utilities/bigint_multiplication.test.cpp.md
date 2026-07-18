@@ -28,10 +28,11 @@ data:
     - https://judge.yosupo.jp/problem/multiplication_of_big_integers
   bundledCode: "#line 1 \"verify/utilities/bigint_multiplication.test.cpp\"\n#define\
     \ PROBLEM \"https://judge.yosupo.jp/problem/multiplication_of_big_integers\"\n\
-    \n#include <cassert>\n#include <random>\n#include <string>\n#include <vector>\n\
-    \n#line 1 \"utilities/bigint.hpp\"\n\n\n\n#include <algorithm>\n#line 6 \"utilities/bigint.hpp\"\
-    \n#include <cstdint>\n#include <iostream>\n#include <stdexcept>\n#line 10 \"utilities/bigint.hpp\"\
-    \n#include <utility>\n#line 12 \"utilities/bigint.hpp\"\n\n#line 1 \"math/fps/convolution.hpp\"\
+    \n#pragma GCC optimize(\"O3\")\n\n#include <cassert>\n#include <random>\n#include\
+    \ <string>\n#include <vector>\n\n#line 1 \"utilities/bigint.hpp\"\n\n\n\n#include\
+    \ <algorithm>\n#line 6 \"utilities/bigint.hpp\"\n#include <cstdint>\n#include\
+    \ <iostream>\n#include <stdexcept>\n#line 10 \"utilities/bigint.hpp\"\n#include\
+    \ <utility>\n#line 12 \"utilities/bigint.hpp\"\n\n#line 1 \"math/fps/convolution.hpp\"\
     \n\n\n\n#line 5 \"math/fps/convolution.hpp\"\n#include <array>\n#line 8 \"math/fps/convolution.hpp\"\
     \n#include <cstring>\n#include <new>\n#include <type_traits>\n#line 13 \"math/fps/convolution.hpp\"\
     \n\n#if defined(__GNUC__) && !defined(__clang__) && (defined(__x86_64__) || defined(__i386__))\n\
@@ -483,47 +484,53 @@ data:
     \ Mint>\n__attribute__((target(\"avx2,bmi\"), hot))\nstd::vector<Mint> convolution_998244353_simd(const\
     \ std::vector<Mint>& a,\n                                             const std::vector<Mint>&\
     \ b) {\n    const int result_size = int(a.size() + b.size() - 1);\n    int n =\
-    \ 1;\n    while (n < result_size) n <<= 1;\n    auto* transformed_a = static_cast<uint32_t*>(\n\
-    \        ::operator new[](sizeof(uint32_t) * n, std::align_val_t(32)));\n    auto*\
-    \ transformed_b = static_cast<uint32_t*>(\n        ::operator new[](sizeof(uint32_t)\
-    \ * n, std::align_val_t(32)));\n    if constexpr (std::is_same_v<Mint, math::ModInt<998244353>>)\
-    \ {\n        static_assert(sizeof(Mint) == sizeof(uint32_t) && std::is_trivially_copyable_v<Mint>);\n\
-    \        std::memcpy(transformed_a, a.data(), sizeof(uint32_t) * a.size());\n\
-    \        std::memcpy(transformed_b, b.data(), sizeof(uint32_t) * b.size());\n\
-    \    } else {\n        for (int i = 0; i < int(a.size()); i++) transformed_a[i]\
-    \ = a[i].val();\n        for (int i = 0; i < int(b.size()); i++) transformed_b[i]\
+    \ 1;\n    while (n < result_size) n <<= 1;\n    const bool squaring = &a == &b;\n\
+    \    auto* transformed_a = static_cast<uint32_t*>(\n        ::operator new[](sizeof(uint32_t)\
+    \ * n, std::align_val_t(32)));\n    auto* transformed_b = squaring\n         \
+    \                     ? transformed_a\n                              : static_cast<uint32_t*>(::operator\
+    \ new[](\n                                    sizeof(uint32_t) * n, std::align_val_t(32)));\n\
+    \    if constexpr (std::is_same_v<Mint, math::ModInt<998244353>>) {\n        static_assert(sizeof(Mint)\
+    \ == sizeof(uint32_t) && std::is_trivially_copyable_v<Mint>);\n        std::memcpy(transformed_a,\
+    \ a.data(), sizeof(uint32_t) * a.size());\n        if (!squaring)\n          \
+    \  std::memcpy(transformed_b, b.data(), sizeof(uint32_t) * b.size());\n    } else\
+    \ {\n        for (int i = 0; i < int(a.size()); i++) transformed_a[i] = a[i].val();\n\
+    \        if (!squaring)\n            for (int i = 0; i < int(b.size()); i++) transformed_b[i]\
     \ = b[i].val();\n    }\n    std::memset(transformed_a + a.size(), 0, sizeof(uint32_t)\
-    \ * (n - a.size()));\n    std::memset(transformed_b + b.size(), 0, sizeof(uint32_t)\
-    \ * (n - b.size()));\n\n    static constexpr fast998_v2::FNTT32_info transform(998244353);\n\
-    \    const std::size_t vector_size = std::size_t(n) >> 3;\n    fast998_v2::vector_dif(reinterpret_cast<__m256i*>(transformed_a),\
-    \ vector_size, &transform);\n    fast998_v2::vector_dif(reinterpret_cast<__m256i*>(transformed_b),\
-    \ vector_size, &transform);\n    fast998_v2::vector_convolution_direct(\n    \
-    \    reinterpret_cast<__m256i*>(transformed_a),\n        reinterpret_cast<const\
+    \ * (n - a.size()));\n    if (!squaring)\n        std::memset(transformed_b +\
+    \ b.size(), 0, sizeof(uint32_t) * (n - b.size()));\n\n    static constexpr fast998_v2::FNTT32_info\
+    \ transform(998244353);\n    const std::size_t vector_size = std::size_t(n) >>\
+    \ 3;\n    fast998_v2::vector_dif(reinterpret_cast<__m256i*>(transformed_a), vector_size,\
+    \ &transform);\n    if (!squaring)\n        fast998_v2::vector_dif(reinterpret_cast<__m256i*>(transformed_b),\
+    \ vector_size,\n                              &transform);\n    fast998_v2::vector_convolution_direct(\n\
+    \        reinterpret_cast<__m256i*>(transformed_a),\n        reinterpret_cast<const\
     \ __m256i*>(transformed_b), vector_size, &transform);\n    fast998_v2::vector_dit<true>(reinterpret_cast<__m256i*>(transformed_a),\
     \ vector_size,\n                                 &transform);\n\n    std::vector<Mint>\
     \ result(result_size);\n    for (int j = 0; j < result_size; j++) result[j] =\
     \ Mint::raw(transformed_a[j]);\n    ::operator delete[](transformed_a, std::align_val_t(32));\n\
-    \    ::operator delete[](transformed_b, std::align_val_t(32));\n    return result;\n\
-    }\n\n#pragma GCC pop_options\n\n#endif\n\n}  // namespace internal\n\ntemplate\
-    \ <class Mint>\nstd::vector<Mint> convolution_naive(const std::vector<Mint>& a,\
-    \ const std::vector<Mint>& b) {\n    if (a.empty() || b.empty()) return {};\n\
-    \    std::vector<Mint> result(a.size() + b.size() - 1);\n    if (a.size() < b.size())\
-    \ {\n        for (int i = 0; i < int(a.size()); i++) {\n            for (int j\
-    \ = 0; j < int(b.size()); j++) result[i + j] += a[i] * b[j];\n        }\n    }\
-    \ else {\n        for (int j = 0; j < int(b.size()); j++) {\n            for (int\
-    \ i = 0; i < int(a.size()); i++) result[i + j] += a[i] * b[j];\n        }\n  \
-    \  }\n    return result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint> convolution_ntt(const\
-    \ std::vector<Mint>& a, const std::vector<Mint>& b) {\n    const int result_size\
-    \ = int(a.size() + b.size() - 1);\n    int n = 1;\n    while (n < result_size)\
-    \ n <<= 1;\n    assert((Mint::mod() - 1) % uint32_t(n) == 0);\n\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n\
-    \    if constexpr (Mint::mod() == 998244353) {\n        if (n >= 64 && __builtin_cpu_supports(\"\
-    avx2\"))\n            return internal::convolution_998244353_simd(a, b);\n   \
-    \ }\n#endif\n\n    // Allocate the padded buffers directly.  Constructing from\
-    \ the inputs and\n    // then resizing used to allocate and copy both large operands\
-    \ twice.\n    std::vector<Mint> fa(n);\n    std::vector<Mint> fb(n);\n    std::copy(a.begin(),\
-    \ a.end(), fa.begin());\n    std::copy(b.begin(), b.end(), fb.begin());\n    internal::ntt(fa,\
-    \ false);\n    internal::ntt(fb, false);\n    const Mint inverse_n = Mint(n).inv();\n\
-    \    for (int i = 0; i < n; i++) fa[i] *= fb[i] * inverse_n;\n    internal::ntt(fa,\
+    \    if (!squaring) ::operator delete[](transformed_b, std::align_val_t(32));\n\
+    \    return result;\n}\n\n#pragma GCC pop_options\n\n#endif\n\n}  // namespace\
+    \ internal\n\ntemplate <class Mint>\nstd::vector<Mint> convolution_naive(const\
+    \ std::vector<Mint>& a, const std::vector<Mint>& b) {\n    if (a.empty() || b.empty())\
+    \ return {};\n    std::vector<Mint> result(a.size() + b.size() - 1);\n    if (a.size()\
+    \ < b.size()) {\n        for (int i = 0; i < int(a.size()); i++) {\n         \
+    \   for (int j = 0; j < int(b.size()); j++) result[i + j] += a[i] * b[j];\n  \
+    \      }\n    } else {\n        for (int j = 0; j < int(b.size()); j++) {\n  \
+    \          for (int i = 0; i < int(a.size()); i++) result[i + j] += a[i] * b[j];\n\
+    \        }\n    }\n    return result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint>\
+    \ convolution_ntt(const std::vector<Mint>& a, const std::vector<Mint>& b) {\n\
+    \    const int result_size = int(a.size() + b.size() - 1);\n    int n = 1;\n \
+    \   while (n < result_size) n <<= 1;\n    assert((Mint::mod() - 1) % uint32_t(n)\
+    \ == 0);\n\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n    if constexpr (Mint::mod() == 998244353)\
+    \ {\n        if (n >= 64 && __builtin_cpu_supports(\"avx2\"))\n            return\
+    \ internal::convolution_998244353_simd(a, b);\n    }\n#endif\n\n    // Allocate\
+    \ the padded buffers directly.  Constructing from the inputs and\n    // then\
+    \ resizing used to allocate and copy both large operands twice.\n    const bool\
+    \ squaring = &a == &b;\n    std::vector<Mint> fa(n);\n    std::copy(a.begin(),\
+    \ a.end(), fa.begin());\n    internal::ntt(fa, false);\n    const Mint inverse_n\
+    \ = Mint(n).inv();\n    if (squaring) {\n        for (int i = 0; i < n; i++) fa[i]\
+    \ *= fa[i] * inverse_n;\n    } else {\n        std::vector<Mint> fb(n);\n    \
+    \    std::copy(b.begin(), b.end(), fb.begin());\n        internal::ntt(fb, false);\n\
+    \        for (int i = 0; i < n; i++) fa[i] *= fb[i] * inverse_n;\n    }\n    internal::ntt(fa,\
     \ true, false);\n    fa.resize(result_size);\n    return fa;\n}\n\nnamespace internal\
     \ {\n\ntemplate <class Mint>\nstd::vector<Mint> convolution_998244353_blocked_scalar(const\
     \ std::vector<Mint>& a,\n                                                    \
@@ -680,15 +687,17 @@ data:
     \ sign = 1;\n    }\n\n    void read(const std::string& s) {\n        sign = 1;\n\
     \        a.clear();\n        int pos = 0;\n        while (pos < (int)s.size()\
     \ && (s[pos] == '-' || s[pos] == '+')) {\n            if (s[pos] == '-') sign\
-    \ = -1;\n            ++pos;\n        }\n        for (int i = int(s.size()) - 1;\
+    \ = -1;\n            ++pos;\n        }\n        a.reserve((int(s.size()) - pos\
+    \ + BASE_DIGITS - 1) / BASE_DIGITS);\n        for (int i = int(s.size()) - 1;\
     \ i >= pos; i -= BASE_DIGITS) {\n            int x = 0;\n            for (int\
     \ j = std::max(pos, i - BASE_DIGITS + 1); j <= i; ++j) {\n                x =\
     \ x * 10 + (s[j] - '0');\n            }\n            a.push_back(x);\n       \
     \ }\n        trim();\n    }\n\n    std::string to_string() const {\n        if\
-    \ (a.empty()) return \"0\";\n        std::string res = \"\";\n        if (sign\
-    \ == -1) res += '-';\n        res += std::to_string(a.back());\n        for (int\
-    \ i = (int)a.size() - 2; i >= 0; --i) {\n            std::string block = std::to_string(a[i]);\n\
-    \            res += std::string(BASE_DIGITS - block.length(), '0') + block;\n\
+    \ (a.empty()) return \"0\";\n        std::string res;\n        res.reserve(a.size()\
+    \ * BASE_DIGITS + (sign == -1));\n        if (sign == -1) res += '-';\n      \
+    \  res += std::to_string(a.back());\n        for (int i = (int)a.size() - 2; i\
+    \ >= 0; --i) {\n            std::string block = std::to_string(a[i]);\n      \
+    \      res.append(BASE_DIGITS - block.length(), '0');\n            res += block;\n\
     \        }\n        return res;\n    }\n\n    bool is_zero() const {\n       \
     \ return a.empty() || (a.size() == 1 && a[0] == 0);\n    }\n\n    BigInt operator-()\
     \ const {\n        BigInt res = *this;\n        if (!is_zero()) res.sign = -sign;\n\
@@ -704,43 +713,66 @@ data:
     \    return y < x;\n    }\n    friend bool operator<=(const BigInt& x, const BigInt&\
     \ y) {\n        return !(y < x);\n    }\n    friend bool operator>=(const BigInt&\
     \ x, const BigInt& y) {\n        return !(x < y);\n    }\n    friend bool operator==(const\
-    \ BigInt& x, const BigInt& y) {\n        return !(x < y) && !(y < x);\n    }\n\
-    \    friend bool operator!=(const BigInt& x, const BigInt& y) {\n        return\
-    \ x < y || y < x;\n    }\n\n    BigInt& operator+=(const BigInt& other) {\n  \
-    \      if (other.is_zero()) return *this;\n        if (is_zero()) return *this\
-    \ = other;\n        if (sign != other.sign) return *this -= (-other);\n      \
-    \  for (int i = 0, carry = 0; i < (int)std::max(a.size(), other.a.size()) || carry;\
-    \ ++i) {\n            if (i == (int)a.size()) a.push_back(0);\n            a[i]\
-    \ += carry + (i < (int)other.a.size() ? other.a[i] : 0);\n            carry =\
-    \ a[i] >= BASE;\n            if (carry) a[i] -= BASE;\n        }\n        return\
-    \ *this;\n    }\n\n    BigInt& operator-=(const BigInt& other) {\n        if (other.is_zero())\
+    \ BigInt& x, const BigInt& y) {\n        return x.sign == y.sign && x.a == y.a;\n\
+    \    }\n    friend bool operator!=(const BigInt& x, const BigInt& y) {\n     \
+    \   return !(x == y);\n    }\n\n    BigInt& operator+=(const BigInt& other) {\n\
+    \        if (other.is_zero()) return *this;\n        if (is_zero()) return *this\
+    \ = other;\n        if (sign != other.sign) {\n            const int comparison\
+    \ = magnitude_compare(a, other.a);\n            if (comparison == 0) {\n     \
+    \           a.clear();\n                sign = 1;\n            } else if (comparison\
+    \ > 0) {\n                subtract_magnitude_inplace(a, other.a);\n          \
+    \  } else {\n                std::vector<int> result = other.a;\n            \
+    \    subtract_magnitude_inplace(result, a);\n                a = std::move(result);\n\
+    \                sign = other.sign;\n            }\n            return *this;\n\
+    \        }\n        add_magnitude_inplace(a, other.a);\n        return *this;\n\
+    \    }\n\n    BigInt& operator-=(const BigInt& other) {\n        if (other.is_zero())\
     \ return *this;\n        if (is_zero()) return *this = -other;\n        if (sign\
-    \ != other.sign) return *this += (-other);\n        if (abs() < other.abs()) {\n\
-    \            BigInt tmp = other;\n            tmp -= *this;\n            *this\
-    \ = tmp;\n            sign = -sign;\n            return *this;\n        }\n  \
-    \      for (int i = 0, carry = 0; i < (int)other.a.size() || carry; ++i) {\n \
-    \           a[i] -= carry + (i < (int)other.a.size() ? other.a[i] : 0);\n    \
-    \        carry = a[i] < 0;\n            if (carry) a[i] += BASE;\n        }\n\
-    \        trim();\n        return *this;\n    }\n\n    BigInt& operator*=(int v)\
-    \ {\n        long long multiplier = v;\n        if (multiplier < 0) {\n      \
-    \      sign = -sign;\n            multiplier = -multiplier;\n        }\n     \
-    \   long long carry = 0;\n        for (int i = 0; i < (int)a.size() || carry;\
-    \ ++i) {\n            if (i == (int)a.size()) a.push_back(0);\n            const\
-    \ long long cur = a[i] * multiplier + carry;\n            carry = cur / BASE;\n\
-    \            a[i] = (int)(cur % BASE);\n        }\n        trim();\n        return\
-    \ *this;\n    }\n\n   private:\n    static constexpr int MULTIPLICATION_THRESHOLD\
-    \ = 128;\n    static constexpr int DIVISION_THRESHOLD = 64;\n    static constexpr\
-    \ int CONVOLUTION_BASE = 1000;\n\n    static void trim_magnitude(std::vector<int>&\
-    \ value) {\n        while (!value.empty() && value.back() == 0) value.pop_back();\n\
-    \    }\n\n    static bool magnitude_less(const std::vector<int>& lhs, const std::vector<int>&\
-    \ rhs) {\n        if (lhs.size() != rhs.size()) return lhs.size() < rhs.size();\n\
+    \ != other.sign) {\n            add_magnitude_inplace(a, other.a);\n         \
+    \   return *this;\n        }\n        const int comparison = magnitude_compare(a,\
+    \ other.a);\n        if (comparison == 0) {\n            a.clear();\n        \
+    \    sign = 1;\n        } else if (comparison > 0) {\n            subtract_magnitude_inplace(a,\
+    \ other.a);\n        } else {\n            std::vector<int> result = other.a;\n\
+    \            subtract_magnitude_inplace(result, a);\n            a = std::move(result);\n\
+    \            sign = -sign;\n        }\n        return *this;\n    }\n\n    BigInt&\
+    \ operator*=(int v) {\n        if (v == 0 || is_zero()) return *this = 0;\n  \
+    \      long long multiplier = v;\n        if (multiplier < 0) {\n            sign\
+    \ = -sign;\n            multiplier = -multiplier;\n        }\n        a.reserve(a.size()\
+    \ + 2);\n        long long carry = 0;\n        for (int i = 0; i < (int)a.size()\
+    \ || carry; ++i) {\n            if (i == (int)a.size()) a.push_back(0);\n    \
+    \        const long long cur = a[i] * multiplier + carry;\n            carry =\
+    \ cur / BASE;\n            a[i] = (int)(cur % BASE);\n        }\n        trim();\n\
+    \        return *this;\n    }\n\n   private:\n    static constexpr int MULTIPLICATION_THRESHOLD\
+    \ = 224;\n    static constexpr int DIVISION_THRESHOLD = 64;\n\n    static void\
+    \ trim_magnitude(std::vector<int>& value) {\n        while (!value.empty() &&\
+    \ value.back() == 0) value.pop_back();\n    }\n\n    static bool magnitude_less(const\
+    \ std::vector<int>& lhs, const std::vector<int>& rhs) {\n        return magnitude_compare(lhs,\
+    \ rhs) < 0;\n    }\n\n    static int magnitude_compare(const std::vector<int>&\
+    \ lhs,\n                                 const std::vector<int>& rhs) {\n    \
+    \    if (lhs.size() != rhs.size()) return lhs.size() < rhs.size() ? -1 : 1;\n\
     \        for (int i = int(lhs.size()) - 1; i >= 0; --i) {\n            if (lhs[i]\
-    \ != rhs[i]) return lhs[i] < rhs[i];\n        }\n        return false;\n    }\n\
-    \n    static bool magnitude_less_equal(const std::vector<int>& lhs,\n        \
-    \                             const std::vector<int>& rhs) {\n        return !magnitude_less(rhs,\
-    \ lhs);\n    }\n\n    static std::vector<int> add_magnitude(const std::vector<int>&\
-    \ lhs,\n                                          const std::vector<int>& rhs)\
-    \ {\n        std::vector<int> result(std::max(lhs.size(), rhs.size()) + 1);\n\
+    \ != rhs[i]) return lhs[i] < rhs[i] ? -1 : 1;\n        }\n        return 0;\n\
+    \    }\n\n    static void add_magnitude_inplace(std::vector<int>& lhs,\n     \
+    \                                 const std::vector<int>& rhs) {\n        const\
+    \ int lhs_size = int(lhs.size());\n        const int rhs_size = int(rhs.size());\n\
+    \        const int size = std::max(lhs_size, rhs_size);\n        if (lhs_size\
+    \ < rhs_size) lhs.resize(rhs_size);\n        int carry = 0;\n        int i = 0;\n\
+    \        for (; i < rhs_size; ++i) {\n            const long long current = (long\
+    \ long)lhs[i] + rhs[i] + carry;\n            lhs[i] = int(current >= BASE ? current\
+    \ - BASE : current);\n            carry = current >= BASE;\n        }\n      \
+    \  while (i < size && carry) {\n            ++lhs[i];\n            carry = lhs[i]\
+    \ == BASE;\n            if (carry) lhs[i] = 0;\n            ++i;\n        }\n\
+    \        if (carry) lhs.push_back(1);\n    }\n\n    static void subtract_magnitude_inplace(std::vector<int>&\
+    \ lhs,\n                                           const std::vector<int>& rhs)\
+    \ {\n        assert(!magnitude_less(lhs, rhs));\n        int borrow = 0;\n   \
+    \     for (int i = 0; i < int(rhs.size()) || borrow; ++i) {\n            int current\
+    \ = lhs[i] - borrow - (i < int(rhs.size()) ? rhs[i] : 0);\n            borrow\
+    \ = current < 0;\n            if (borrow) current += BASE;\n            lhs[i]\
+    \ = current;\n        }\n        assert(borrow == 0);\n        trim_magnitude(lhs);\n\
+    \    }\n\n    static bool magnitude_less_equal(const std::vector<int>& lhs,\n\
+    \                                     const std::vector<int>& rhs) {\n       \
+    \ return !magnitude_less(rhs, lhs);\n    }\n\n    static std::vector<int> add_magnitude(const\
+    \ std::vector<int>& lhs,\n                                          const std::vector<int>&\
+    \ rhs) {\n        std::vector<int> result(std::max(lhs.size(), rhs.size()) + 1);\n\
     \        for (int i = 0; i < int(result.size()) - 1; ++i) {\n            if (i\
     \ < int(lhs.size())) result[i] += lhs[i];\n            if (i < int(rhs.size()))\
     \ result[i] += rhs[i];\n            if (result[i] >= BASE) {\n               \
@@ -769,107 +801,155 @@ data:
     \ = 0;\n        for (int i = 0; i < int(product.size()) || carry > 0; ++i) {\n\
     \            if (i < int(product.size())) carry += product[i];\n            result.push_back(int(carry\
     \ % BASE));\n            carry /= BASE;\n        }\n        trim_magnitude(result);\n\
-    \        return result;\n    }\n\n    static std::vector<int> split_for_convolution(const\
-    \ std::vector<int>& value) {\n        std::vector<int> result(3 * value.size());\n\
-    \        for (int i = 0; i < int(value.size()); ++i) {\n            int limb =\
-    \ value[i];\n            result[3 * i] = limb % CONVOLUTION_BASE;\n          \
-    \  limb /= CONVOLUTION_BASE;\n            result[3 * i + 1] = limb % CONVOLUTION_BASE;\n\
-    \            result[3 * i + 2] = limb / CONVOLUTION_BASE;\n        }\n       \
-    \ trim_magnitude(result);\n        return result;\n    }\n\n    static std::vector<int>\
-    \ multiply_convolution(const std::vector<int>& lhs,\n                        \
-    \                         const std::vector<int>& rhs) {\n        using Mint1\
-    \ = math::ModInt<998244353>;\n        using Mint2 = math::ModInt<754974721>;\n\
-    \n        const std::vector<int> lhs_digits = split_for_convolution(lhs);\n  \
-    \      const std::vector<int> rhs_digits = split_for_convolution(rhs);\n     \
-    \   const int result_size = int(lhs_digits.size() + rhs_digits.size() - 1);\n\
-    \        assert(result_size <= (1 << 24));\n\n        std::vector<Mint1> residues1;\n\
-    \        {\n            std::vector<Mint1> x(lhs_digits.begin(), lhs_digits.end());\n\
-    \            std::vector<Mint1> y(rhs_digits.begin(), rhs_digits.end());\n   \
-    \         residues1 = fps::convolution(x, y);\n        }\n        std::vector<Mint2>\
-    \ residues2;\n        {\n            std::vector<Mint2> x(lhs_digits.begin(),\
-    \ lhs_digits.end());\n            std::vector<Mint2> y(rhs_digits.begin(), rhs_digits.end());\n\
-    \            residues2 = fps::convolution(x, y);\n        }\n\n        constexpr\
-    \ uint64_t MOD1 = Mint1::mod();\n        constexpr uint64_t MOD2 = Mint2::mod();\n\
-    \        const uint64_t inverse_mod1 = Mint2(MOD1).inv().val();\n        std::vector<int>\
-    \ digits;\n        digits.reserve(result_size + 8);\n        uint64_t carry =\
-    \ 0;\n        for (int i = 0; i < result_size || carry > 0; ++i) {\n         \
-    \   if (i < result_size) {\n                const uint64_t first = residues1[i].val();\n\
+    \        return result;\n    }\n\n    static std::vector<int> square_naive(const\
+    \ std::vector<int>& value) {\n        if (value.empty()) return std::vector<int>();\n\
+    \        std::vector<long long> product(2 * value.size());\n        constexpr\
+    \ long long REDUCTION = 4LL * BASE * BASE;\n        for (int i = 0; i < int(value.size());\
+    \ ++i) {\n            product[2 * i] += (long long)value[i] * value[i];\n    \
+    \        if (product[2 * i] >= REDUCTION) {\n                product[2 * i] -=\
+    \ REDUCTION;\n                product[2 * i + 1] += 4LL * BASE;\n            }\n\
+    \            for (int j = i + 1; j < int(value.size()); ++j) {\n             \
+    \   product[i + j] += 2LL * value[i] * value[j];\n                if (product[i\
+    \ + j] >= REDUCTION) {\n                    product[i + j] -= REDUCTION;\n   \
+    \                 product[i + j + 1] += 4LL * BASE;\n                }\n     \
+    \       }\n        }\n\n        std::vector<int> result;\n        result.reserve(product.size()\
+    \ + 1);\n        long long carry = 0;\n        for (int i = 0; i < int(product.size())\
+    \ || carry > 0; ++i) {\n            if (i < int(product.size())) carry += product[i];\n\
+    \            result.push_back(int(carry % BASE));\n            carry /= BASE;\n\
+    \        }\n        trim_magnitude(result);\n        return result;\n    }\n\n\
+    \    static std::vector<int> multiply_by_limb(const std::vector<int>& value,\n\
+    \                                             int multiplier) {\n        assert(0\
+    \ <= multiplier && multiplier < BASE);\n        if (value.empty() || multiplier\
+    \ == 0) return std::vector<int>();\n        std::vector<int> result;\n       \
+    \ result.reserve(value.size() + 1);\n        uint64_t carry = 0;\n        for\
+    \ (int limb : value) {\n            const uint64_t current = uint64_t(limb) *\
+    \ multiplier + carry;\n            result.push_back(int(current % BASE));\n  \
+    \          carry = current / BASE;\n        }\n        if (carry) result.push_back(int(carry));\n\
+    \        return result;\n    }\n\n    static std::vector<int> multiply_convolution(const\
+    \ std::vector<int>& lhs,\n                                                 const\
+    \ std::vector<int>& rhs) {\n        using Mint1 = math::ModInt<998244353>;\n \
+    \       using Mint2 = math::ModInt<754974721>;\n        using Mint3 = math::ModInt<469762049>;\n\
+    \n        const int result_size = int(lhs.size() + rhs.size() - 1);\n        assert(result_size\
+    \ <= (1 << 24));\n\n        auto convolve = [&]<class Mint>() {\n            std::vector<Mint>\
+    \ x(lhs.begin(), lhs.end());\n            if (&lhs == &rhs) return fps::convolution(x,\
+    \ x);\n            std::vector<Mint> y(rhs.begin(), rhs.end());\n            return\
+    \ fps::convolution(x, y);\n        };\n        const std::vector<Mint1> residues1\
+    \ = convolve.template operator()<Mint1>();\n        const std::vector<Mint2> residues2\
+    \ = convolve.template operator()<Mint2>();\n        const std::vector<Mint3> residues3\
+    \ = convolve.template operator()<Mint3>();\n\n        constexpr uint64_t MOD1\
+    \ = Mint1::mod();\n        constexpr uint64_t MOD2 = Mint2::mod();\n        constexpr\
+    \ uint64_t MOD3 = Mint3::mod();\n        constexpr uint64_t MOD12 = MOD1 * MOD2;\n\
+    \        const static uint64_t inverse_mod1_mod2 = Mint2(MOD1).inv().val();\n\
+    \        const static uint64_t inverse_mod12_mod3 = Mint3(MOD12 % MOD3).inv().val();\n\
+    \        [[maybe_unused]] const unsigned __int128 coefficient_bound =\n      \
+    \      static_cast<unsigned __int128>(std::min(lhs.size(), rhs.size())) *\n  \
+    \          (BASE - 1) * (BASE - 1);\n        [[maybe_unused]] constexpr unsigned\
+    \ __int128 CRT_MODULUS =\n            static_cast<unsigned __int128>(MOD12) *\
+    \ MOD3;\n        assert(coefficient_bound < CRT_MODULUS);\n\n        std::vector<int>\
+    \ result;\n        result.reserve(result_size + 2);\n        unsigned __int128\
+    \ carry = 0;\n        for (int i = 0; i < result_size || carry > 0; ++i) {\n \
+    \           if (i < result_size) {\n                const uint64_t first = residues1[i].val();\n\
     \                const uint64_t second = residues2[i].val();\n               \
-    \ const uint64_t difference = (second + MOD2 - first % MOD2) % MOD2;\n       \
-    \         const uint64_t quotient = difference * inverse_mod1 % MOD2;\n      \
-    \          carry += first + MOD1 * quotient;\n            }\n            digits.push_back(int(carry\
-    \ % CONVOLUTION_BASE));\n            carry /= CONVOLUTION_BASE;\n        }\n\n\
-    \        std::vector<int> result((digits.size() + 2) / 3);\n        constexpr\
-    \ int POWER[3] = {1, CONVOLUTION_BASE,\n                                  CONVOLUTION_BASE\
-    \ * CONVOLUTION_BASE};\n        for (int i = 0; i < int(digits.size()); ++i) {\n\
-    \            result[i / 3] += digits[i] * POWER[i % 3];\n        }\n        trim_magnitude(result);\n\
-    \        return result;\n    }\n\n    static std::vector<int> multiply_magnitude(const\
+    \ const uint64_t third = residues3[i].val();\n                const uint64_t difference12\
+    \ =\n                    (second + MOD2 - first % MOD2) % MOD2;\n            \
+    \    const uint64_t quotient12 =\n                    difference12 * inverse_mod1_mod2\
+    \ % MOD2;\n                const uint64_t combined12 = first + MOD1 * quotient12;\n\
+    \                const uint64_t difference3 =\n                    (third + MOD3\
+    \ - combined12 % MOD3) % MOD3;\n                const uint64_t quotient3 =\n \
+    \                   difference3 * inverse_mod12_mod3 % MOD3;\n               \
+    \ carry += combined12 +\n                         static_cast<unsigned __int128>(MOD12)\
+    \ * quotient3;\n            }\n            result.push_back(int(carry % BASE));\n\
+    \            carry /= BASE;\n        }\n        trim_magnitude(result);\n    \
+    \    return result;\n    }\n\n    static std::vector<int> multiply_magnitude(const\
     \ std::vector<int>& lhs,\n                                               const\
     \ std::vector<int>& rhs) {\n        if (lhs.empty() || rhs.empty()) return std::vector<int>();\n\
-    \        if (std::min(lhs.size(), rhs.size()) <= MULTIPLICATION_THRESHOLD) {\n\
-    \            return multiply_naive(lhs, rhs);\n        }\n        return multiply_convolution(lhs,\
-    \ rhs);\n    }\n\n    static std::pair<std::vector<int>, std::vector<int>> divide_by_limb(\n\
-    \        const std::vector<int>& dividend, int divisor) {\n        assert(0 <\
-    \ divisor && divisor < BASE);\n        if (divisor == 1) {\n            return\
-    \ std::make_pair(dividend, std::vector<int>());\n        }\n        std::vector<int>\
-    \ quotient(dividend.size());\n        long long remainder = 0;\n        for (int\
-    \ i = int(dividend.size()) - 1; i >= 0; --i) {\n            const long long current\
-    \ = remainder * BASE + dividend[i];\n            quotient[i] = int(current / divisor);\n\
-    \            remainder = current % divisor;\n        }\n        trim_magnitude(quotient);\n\
-    \        std::vector<int> remainder_digits;\n        if (remainder != 0) remainder_digits.push_back(int(remainder));\n\
+    \        if (lhs.size() == 1) return multiply_by_limb(rhs, lhs[0]);\n        if\
+    \ (rhs.size() == 1) return multiply_by_limb(lhs, rhs[0]);\n        if (std::min(lhs.size(),\
+    \ rhs.size()) <= MULTIPLICATION_THRESHOLD) {\n            if (&lhs == &rhs) return\
+    \ square_naive(lhs);\n            return multiply_naive(lhs, rhs);\n        }\n\
+    \        return multiply_convolution(lhs, rhs);\n    }\n\n    static std::pair<std::vector<int>,\
+    \ std::vector<int>> divide_by_limb(\n        const std::vector<int>& dividend,\
+    \ int divisor) {\n        assert(0 < divisor && divisor < BASE);\n        if (divisor\
+    \ == 1) {\n            return std::make_pair(dividend, std::vector<int>());\n\
+    \        }\n        std::vector<int> quotient(dividend.size());\n        long\
+    \ long remainder = 0;\n        for (int i = int(dividend.size()) - 1; i >= 0;\
+    \ --i) {\n            const long long current = remainder * BASE + dividend[i];\n\
+    \            quotient[i] = int(current / divisor);\n            remainder = current\
+    \ % divisor;\n        }\n        trim_magnitude(quotient);\n        std::vector<int>\
+    \ remainder_digits;\n        if (remainder != 0) remainder_digits.push_back(int(remainder));\n\
     \        return std::make_pair(std::move(quotient), std::move(remainder_digits));\n\
-    \    }\n\n    static std::pair<std::vector<int>, std::vector<int>> divide_naive(\n\
+    \    }\n\n    static std::pair<std::vector<int>, std::vector<int>> divide_classical(\n\
     \        const std::vector<int>& dividend, const std::vector<int>& divisor) {\n\
     \        assert(!divisor.empty());\n        if (divisor.size() == 1) return divide_by_limb(dividend,\
     \ divisor[0]);\n        if (magnitude_less(dividend, divisor)) {\n           \
     \ return std::make_pair(std::vector<int>(), dividend);\n        }\n\n        const\
-    \ int normalization = BASE / (divisor.back() + 1);\n        const std::vector<int>\
-    \ normalized_dividend =\n            multiply_magnitude(dividend, std::vector<int>(1,\
-    \ normalization));\n        const std::vector<int> normalized_divisor =\n    \
-    \        multiply_magnitude(divisor, std::vector<int>(1, normalization));\n  \
-    \      const long long leading_divisor = normalized_divisor.back();\n        std::vector<int>\
-    \ quotient(normalized_dividend.size() - normalized_divisor.size() + 1);\n    \
-    \    std::vector<int> remainder(normalized_dividend.end() - normalized_divisor.size(),\n\
-    \                                   normalized_dividend.end());\n\n        for\
-    \ (int i = int(quotient.size()) - 1; i >= 0; --i) {\n            if (remainder.size()\
-    \ < normalized_divisor.size()) {\n                quotient[i] = 0;\n         \
-    \   } else if (remainder.size() == normalized_divisor.size()) {\n            \
-    \    if (magnitude_less_equal(normalized_divisor, remainder)) {\n            \
-    \        quotient[i] = 1;\n                    remainder = subtract_magnitude(remainder,\
-    \ normalized_divisor);\n                }\n            } else {\n            \
-    \    assert(remainder.size() == normalized_divisor.size() + 1);\n            \
-    \    const long long leading_remainder =\n                    (long long)remainder.back()\
-    \ * BASE + remainder[remainder.size() - 2];\n                int digit = int(leading_remainder\
-    \ / leading_divisor);\n                if (digit >= BASE) digit = BASE - 1;\n\
-    \                std::vector<int> product = multiply_magnitude(\n            \
-    \        normalized_divisor, std::vector<int>(1, digit));\n                while\
-    \ (magnitude_less(remainder, product)) {\n                    --digit;\n     \
-    \               product = subtract_magnitude(product, normalized_divisor);\n \
-    \               }\n                remainder = subtract_magnitude(remainder, product);\n\
-    \                while (magnitude_less_equal(normalized_divisor, remainder)) {\n\
-    \                    ++digit;\n                    remainder = subtract_magnitude(remainder,\
-    \ normalized_divisor);\n                }\n                quotient[i] = digit;\n\
-    \            }\n            if (i > 0) remainder.insert(remainder.begin(), normalized_dividend[i\
-    \ - 1]);\n        }\n\n        trim_magnitude(quotient);\n        trim_magnitude(remainder);\n\
-    \        std::pair<std::vector<int>, std::vector<int>> denormalized =\n      \
-    \      divide_by_limb(remainder, normalization);\n        assert(denormalized.second.empty());\n\
-    \        return std::make_pair(std::move(quotient), std::move(denormalized.first));\n\
-    \    }\n\n    static std::vector<int> reciprocal(const std::vector<int>& value,\
-    \ int degree) {\n        assert(!value.empty());\n        assert(BASE / 2 <= value.back()\
-    \ && value.back() < BASE);\n        assert(degree >= 0);\n\n        int precision\
-    \ = degree;\n        const int value_size = int(value.size());\n        while\
-    \ (precision > DIVISION_THRESHOLD) precision = (precision + 1) / 2;\n\n      \
-    \  std::vector<int> inverse(value_size + precision + 1);\n        inverse.back()\
-    \ = 1;\n        inverse = divide_naive(inverse, value).first;\n\n        while\
-    \ (precision < degree) {\n            std::vector<int> square = multiply_magnitude(inverse,\
-    \ inverse);\n            square.insert(square.begin(), 0);\n\n            std::vector<int>\
-    \ leading(2 * precision + 1);\n            const int copied = std::min(value_size,\
-    \ int(leading.size()));\n            std::copy(value.end() - copied, value.end(),\
-    \ leading.end() - copied);\n\n            std::vector<int> correction = multiply_magnitude(square,\
-    \ leading);\n            assert(int(correction.size()) >= 2 * precision + 1);\n\
-    \            correction.erase(correction.begin(), correction.begin() + 2 * precision\
-    \ + 1);\n\n            std::vector<int> shifted(precision + 1);\n            const\
-    \ std::vector<int> doubled = add_magnitude(inverse, inverse);\n            shifted.insert(shifted.end(),\
+    \ int normalization = BASE / (divisor.back() + 1);\n        std::vector<int> normalized_divisor(divisor.size());\n\
+    \        uint64_t carry = 0;\n        for (int i = 0; i < int(divisor.size());\
+    \ ++i) {\n            const uint64_t current = uint64_t(divisor[i]) * normalization\
+    \ + carry;\n            normalized_divisor[i] = int(current % BASE);\n       \
+    \     carry = current / BASE;\n        }\n        assert(carry == 0);\n\n    \
+    \    std::vector<int> normalized_dividend(dividend.size() + 1);\n        carry\
+    \ = 0;\n        for (int i = 0; i < int(dividend.size()); ++i) {\n           \
+    \ const uint64_t current = uint64_t(dividend[i]) * normalization + carry;\n  \
+    \          normalized_dividend[i] = int(current % BASE);\n            carry =\
+    \ current / BASE;\n        }\n        normalized_dividend[dividend.size()] = int(carry);\n\
+    \n        const int divisor_size = int(normalized_divisor.size());\n        const\
+    \ int quotient_size = int(dividend.size()) - divisor_size + 1;\n        const\
+    \ uint64_t leading_divisor = normalized_divisor.back();\n        const uint64_t\
+    \ second_divisor = normalized_divisor[divisor_size - 2];\n        std::vector<int>\
+    \ quotient(quotient_size);\n\n        for (int position = quotient_size - 1; position\
+    \ >= 0; --position) {\n            const uint64_t leading_dividend =\n       \
+    \         uint64_t(normalized_dividend[position + divisor_size]) * BASE +\n  \
+    \              normalized_dividend[position + divisor_size - 1];\n           \
+    \ uint64_t digit = leading_dividend / leading_divisor;\n            uint64_t remainder\
+    \ = leading_dividend % leading_divisor;\n            if (digit >= BASE) {\n  \
+    \              digit = BASE - 1;\n                remainder = leading_dividend\
+    \ - digit * leading_divisor;\n            }\n            while (remainder < BASE\
+    \ &&\n                   digit * second_divisor >\n                       remainder\
+    \ * BASE +\n                           normalized_dividend[position + divisor_size\
+    \ - 2]) {\n                --digit;\n                remainder += leading_divisor;\n\
+    \            }\n\n            uint64_t borrow = 0;\n            for (int i = 0;\
+    \ i < divisor_size; ++i) {\n                const uint64_t product =\n       \
+    \             digit * uint64_t(normalized_divisor[i]) + borrow;\n            \
+    \    const uint64_t low = product % BASE;\n                borrow = product /\
+    \ BASE;\n                if (uint64_t(normalized_dividend[position + i]) < low)\
+    \ {\n                    normalized_dividend[position + i] =\n               \
+    \         int(uint64_t(normalized_dividend[position + i]) + BASE - low);\n   \
+    \                 ++borrow;\n                } else {\n                    normalized_dividend[position\
+    \ + i] -= int(low);\n                }\n            }\n\n            long long\
+    \ top =\n                (long long)normalized_dividend[position + divisor_size]\
+    \ -\n                static_cast<long long>(borrow);\n            if (top < 0)\
+    \ {\n                --digit;\n                uint64_t add_carry = 0;\n     \
+    \           for (int i = 0; i < divisor_size; ++i) {\n                    const\
+    \ uint64_t current =\n                        uint64_t(normalized_dividend[position\
+    \ + i]) +\n                        normalized_divisor[i] + add_carry;\n      \
+    \              normalized_dividend[position + i] = int(current % BASE);\n    \
+    \                add_carry = current / BASE;\n                }\n            \
+    \    top += add_carry;\n            }\n            assert(0 <= top && top < BASE);\n\
+    \            normalized_dividend[position + divisor_size] = int(top);\n      \
+    \      quotient[position] = int(digit);\n        }\n\n        trim_magnitude(quotient);\n\
+    \        std::vector<int> remainder(normalized_dividend.begin(),\n           \
+    \                        normalized_dividend.begin() + divisor_size);\n      \
+    \  trim_magnitude(remainder);\n        std::pair<std::vector<int>, std::vector<int>>\
+    \ denormalized =\n            divide_by_limb(remainder, normalization);\n    \
+    \    assert(denormalized.second.empty());\n        return std::make_pair(std::move(quotient),\
+    \ std::move(denormalized.first));\n    }\n\n    static std::vector<int> reciprocal(const\
+    \ std::vector<int>& value, int degree) {\n        assert(!value.empty());\n  \
+    \      assert(BASE / 2 <= value.back() && value.back() < BASE);\n        assert(degree\
+    \ >= 0);\n\n        int precision = degree;\n        const int value_size = int(value.size());\n\
+    \        while (precision > DIVISION_THRESHOLD) precision = (precision + 1) /\
+    \ 2;\n\n        std::vector<int> inverse(value_size + precision + 1);\n      \
+    \  inverse.back() = 1;\n        inverse = divide_classical(inverse, value).first;\n\
+    \n        while (precision < degree) {\n            std::vector<int> square =\
+    \ multiply_magnitude(inverse, inverse);\n            square.insert(square.begin(),\
+    \ 0);\n\n            std::vector<int> leading(2 * precision + 1);\n          \
+    \  const int copied = std::min(value_size, int(leading.size()));\n           \
+    \ std::copy(value.end() - copied, value.end(), leading.end() - copied);\n\n  \
+    \          std::vector<int> correction = multiply_magnitude(square, leading);\n\
+    \            assert(int(correction.size()) >= 2 * precision + 1);\n          \
+    \  correction.erase(correction.begin(), correction.begin() + 2 * precision + 1);\n\
+    \n            std::vector<int> shifted(precision + 1);\n            const std::vector<int>\
+    \ doubled = add_magnitude(inverse, inverse);\n            shifted.insert(shifted.end(),\
     \ doubled.begin(), doubled.end());\n            inverse = subtract_magnitude(shifted,\
     \ correction);\n            assert(!inverse.empty());\n            inverse.erase(inverse.begin());\n\
     \            precision *= 2;\n        }\n\n        assert(precision >= degree);\n\
@@ -878,7 +958,7 @@ data:
     \ std::pair<std::vector<int>, std::vector<int>> divide_magnitude(\n        const\
     \ std::vector<int>& dividend, const std::vector<int>& divisor) {\n        assert(!divisor.empty());\n\
     \        if (divisor.size() <= DIVISION_THRESHOLD ||\n            int(dividend.size())\
-    \ - int(divisor.size()) <= DIVISION_THRESHOLD) {\n            return divide_naive(dividend,\
+    \ - int(divisor.size()) <= DIVISION_THRESHOLD) {\n            return divide_classical(dividend,\
     \ divisor);\n        }\n\n        const int normalization = BASE / (divisor.back()\
     \ + 1);\n        const std::vector<int> normalized_dividend =\n            multiply_magnitude(dividend,\
     \ std::vector<int>(1, normalization));\n        const std::vector<int> normalized_divisor\
@@ -1156,7 +1236,7 @@ data:
     \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
     n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 10 \"verify/utilities/bigint_multiplication.test.cpp\"\
+    \ utilities\n}  // namespace m1une\n\n\n#line 12 \"verify/utilities/bigint_multiplication.test.cpp\"\
     \n\nnamespace {\n\nusing m1une::utilities::BigInt;\n\nstd::string absolute_decimal(const\
     \ std::string& value) {\n    int begin = !value.empty() && (value[0] == '-' ||\
     \ value[0] == '+');\n    while (begin + 1 < int(value.size()) && value[begin]\
@@ -1186,52 +1266,58 @@ data:
     \ rhs = random_integer(random, 1 + random() % 250, true);\n        assert((BigInt(lhs)\
     \ * BigInt(rhs)).to_string() == multiply_naive(lhs, rhs));\n    }\n\n    for (int\
     \ iteration = 0; iteration < 2; ++iteration) {\n        const std::string lhs\
-    \ = random_integer(random, 1300, true);\n        const std::string rhs = random_integer(random,\
-    \ 1250, true);\n        assert((BigInt(lhs) * BigInt(rhs)).to_string() == multiply_naive(lhs,\
-    \ rhs));\n    }\n}\n\n}  // namespace\n\nint main() {\n    m1une::utilities::FastInput\
-    \ input;\n    m1une::utilities::FastOutput output;\n    test_multiplication();\n\
-    \n    int test_count;\n    input >> test_count;\n    while (test_count--) {\n\
-    \        std::string lhs, rhs;\n        input >> lhs >> rhs;\n        output <<\
-    \ (BigInt(lhs) * BigInt(rhs)).to_string() << '\\n';\n    }\n}\n"
+    \ = random_integer(random, 3000, true);\n        const std::string rhs = random_integer(random,\
+    \ 2900, true);\n        assert((BigInt(lhs) * BigInt(rhs)).to_string() == multiply_naive(lhs,\
+    \ rhs));\n    }\n\n    const std::string square_value = random_integer(random,\
+    \ 3200, false);\n    BigInt square(square_value);\n    square *= square;\n   \
+    \ assert(square.to_string() == multiply_naive(square_value, square_value));\n\
+    }\n\n}  // namespace\n\nint main() {\n    m1une::utilities::FastInput input;\n\
+    \    m1une::utilities::FastOutput output;\n    test_multiplication();\n\n    int\
+    \ test_count;\n    input >> test_count;\n    while (test_count--) {\n        std::string\
+    \ lhs, rhs;\n        input >> lhs >> rhs;\n        output << (BigInt(lhs) * BigInt(rhs)).to_string()\
+    \ << '\\n';\n    }\n}\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/multiplication_of_big_integers\"\
-    \n\n#include <cassert>\n#include <random>\n#include <string>\n#include <vector>\n\
-    \n#include \"../../utilities/bigint.hpp\"\n#include \"../../utilities/fast_io.hpp\"\
-    \n\nnamespace {\n\nusing m1une::utilities::BigInt;\n\nstd::string absolute_decimal(const\
-    \ std::string& value) {\n    int begin = !value.empty() && (value[0] == '-' ||\
-    \ value[0] == '+');\n    while (begin + 1 < int(value.size()) && value[begin]\
-    \ == '0') ++begin;\n    return value.substr(begin);\n}\n\nstd::string multiply_naive(const\
-    \ std::string& lhs_text, const std::string& rhs_text) {\n    const std::string\
-    \ lhs = absolute_decimal(lhs_text);\n    const std::string rhs = absolute_decimal(rhs_text);\n\
-    \    if (lhs == \"0\" || rhs == \"0\") return \"0\";\n\n    std::vector<int> coefficients(lhs.size()\
-    \ + rhs.size());\n    for (int i = int(lhs.size()) - 1; i >= 0; --i) {\n     \
-    \   for (int j = int(rhs.size()) - 1; j >= 0; --j) {\n            coefficients[i\
-    \ + j + 1] += (lhs[i] - '0') * (rhs[j] - '0');\n        }\n    }\n    for (int\
-    \ i = int(coefficients.size()) - 1; i > 0; --i) {\n        coefficients[i - 1]\
-    \ += coefficients[i] / 10;\n        coefficients[i] %= 10;\n    }\n\n    int begin\
-    \ = 0;\n    while (begin + 1 < int(coefficients.size()) && coefficients[begin]\
-    \ == 0) ++begin;\n    std::string result;\n    if ((lhs_text[0] == '-') != (rhs_text[0]\
-    \ == '-')) result.push_back('-');\n    for (int i = begin; i < int(coefficients.size());\
-    \ ++i) {\n        result.push_back(char('0' + coefficients[i]));\n    }\n    return\
-    \ result;\n}\n\nstd::string random_integer(std::mt19937_64& random, int digits,\
-    \ bool allow_negative) {\n    std::string result;\n    if (allow_negative && (random()\
-    \ & 1)) result.push_back('-');\n    result.push_back(char('1' + random() % 9));\n\
-    \    for (int i = 1; i < digits; ++i) result.push_back(char('0' + random() % 10));\n\
-    \    return result;\n}\n\nvoid test_multiplication() {\n    assert((BigInt(0)\
-    \ * BigInt(\"999999999999999999\")).to_string() == \"0\");\n    assert((BigInt(-12)\
-    \ * BigInt(34)).to_string() == \"-408\");\n    assert((BigInt(-12) * BigInt(-34)).to_string()\
-    \ == \"408\");\n\n    std::mt19937_64 random(0x38b54fd917a3c2e1ULL);\n    for\
-    \ (int iteration = 0; iteration < 100; ++iteration) {\n        const std::string\
+    \n\n#pragma GCC optimize(\"O3\")\n\n#include <cassert>\n#include <random>\n#include\
+    \ <string>\n#include <vector>\n\n#include \"../../utilities/bigint.hpp\"\n#include\
+    \ \"../../utilities/fast_io.hpp\"\n\nnamespace {\n\nusing m1une::utilities::BigInt;\n\
+    \nstd::string absolute_decimal(const std::string& value) {\n    int begin = !value.empty()\
+    \ && (value[0] == '-' || value[0] == '+');\n    while (begin + 1 < int(value.size())\
+    \ && value[begin] == '0') ++begin;\n    return value.substr(begin);\n}\n\nstd::string\
+    \ multiply_naive(const std::string& lhs_text, const std::string& rhs_text) {\n\
+    \    const std::string lhs = absolute_decimal(lhs_text);\n    const std::string\
+    \ rhs = absolute_decimal(rhs_text);\n    if (lhs == \"0\" || rhs == \"0\") return\
+    \ \"0\";\n\n    std::vector<int> coefficients(lhs.size() + rhs.size());\n    for\
+    \ (int i = int(lhs.size()) - 1; i >= 0; --i) {\n        for (int j = int(rhs.size())\
+    \ - 1; j >= 0; --j) {\n            coefficients[i + j + 1] += (lhs[i] - '0') *\
+    \ (rhs[j] - '0');\n        }\n    }\n    for (int i = int(coefficients.size())\
+    \ - 1; i > 0; --i) {\n        coefficients[i - 1] += coefficients[i] / 10;\n \
+    \       coefficients[i] %= 10;\n    }\n\n    int begin = 0;\n    while (begin\
+    \ + 1 < int(coefficients.size()) && coefficients[begin] == 0) ++begin;\n    std::string\
+    \ result;\n    if ((lhs_text[0] == '-') != (rhs_text[0] == '-')) result.push_back('-');\n\
+    \    for (int i = begin; i < int(coefficients.size()); ++i) {\n        result.push_back(char('0'\
+    \ + coefficients[i]));\n    }\n    return result;\n}\n\nstd::string random_integer(std::mt19937_64&\
+    \ random, int digits, bool allow_negative) {\n    std::string result;\n    if\
+    \ (allow_negative && (random() & 1)) result.push_back('-');\n    result.push_back(char('1'\
+    \ + random() % 9));\n    for (int i = 1; i < digits; ++i) result.push_back(char('0'\
+    \ + random() % 10));\n    return result;\n}\n\nvoid test_multiplication() {\n\
+    \    assert((BigInt(0) * BigInt(\"999999999999999999\")).to_string() == \"0\"\
+    );\n    assert((BigInt(-12) * BigInt(34)).to_string() == \"-408\");\n    assert((BigInt(-12)\
+    \ * BigInt(-34)).to_string() == \"408\");\n\n    std::mt19937_64 random(0x38b54fd917a3c2e1ULL);\n\
+    \    for (int iteration = 0; iteration < 100; ++iteration) {\n        const std::string\
     \ lhs = random_integer(random, 1 + random() % 250, true);\n        const std::string\
     \ rhs = random_integer(random, 1 + random() % 250, true);\n        assert((BigInt(lhs)\
     \ * BigInt(rhs)).to_string() == multiply_naive(lhs, rhs));\n    }\n\n    for (int\
     \ iteration = 0; iteration < 2; ++iteration) {\n        const std::string lhs\
-    \ = random_integer(random, 1300, true);\n        const std::string rhs = random_integer(random,\
-    \ 1250, true);\n        assert((BigInt(lhs) * BigInt(rhs)).to_string() == multiply_naive(lhs,\
-    \ rhs));\n    }\n}\n\n}  // namespace\n\nint main() {\n    m1une::utilities::FastInput\
-    \ input;\n    m1une::utilities::FastOutput output;\n    test_multiplication();\n\
-    \n    int test_count;\n    input >> test_count;\n    while (test_count--) {\n\
-    \        std::string lhs, rhs;\n        input >> lhs >> rhs;\n        output <<\
-    \ (BigInt(lhs) * BigInt(rhs)).to_string() << '\\n';\n    }\n}\n"
+    \ = random_integer(random, 3000, true);\n        const std::string rhs = random_integer(random,\
+    \ 2900, true);\n        assert((BigInt(lhs) * BigInt(rhs)).to_string() == multiply_naive(lhs,\
+    \ rhs));\n    }\n\n    const std::string square_value = random_integer(random,\
+    \ 3200, false);\n    BigInt square(square_value);\n    square *= square;\n   \
+    \ assert(square.to_string() == multiply_naive(square_value, square_value));\n\
+    }\n\n}  // namespace\n\nint main() {\n    m1une::utilities::FastInput input;\n\
+    \    m1une::utilities::FastOutput output;\n    test_multiplication();\n\n    int\
+    \ test_count;\n    input >> test_count;\n    while (test_count--) {\n        std::string\
+    \ lhs, rhs;\n        input >> lhs >> rhs;\n        output << (BigInt(lhs) * BigInt(rhs)).to_string()\
+    \ << '\\n';\n    }\n}\n"
   dependsOn:
   - utilities/bigint.hpp
   - math/fps/convolution.hpp
@@ -1241,7 +1327,7 @@ data:
   isVerificationFile: true
   path: verify/utilities/bigint_multiplication.test.cpp
   requiredBy: []
-  timestamp: '2026-07-17 22:34:46+09:00'
+  timestamp: '2026-07-18 19:37:21+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/utilities/bigint_multiplication.test.cpp
