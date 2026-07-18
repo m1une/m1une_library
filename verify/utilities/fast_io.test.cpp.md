@@ -16,13 +16,13 @@ data:
     - https://judge.yosupo.jp/problem/aplusb
   bundledCode: "#line 1 \"verify/utilities/fast_io.test.cpp\"\n#define PROBLEM \"\
     https://judge.yosupo.jp/problem/aplusb\"\n\n#line 1 \"utilities/fast_io.hpp\"\n\
-    \n\n\n#include <array>\n#include <cerrno>\n#include <charconv>\n#include <cstddef>\n\
-    #include <cstdio>\n#include <cstdlib>\n#include <cstdint>\n#include <cstring>\n\
-    #include <iterator>\n#include <string>\n#include <sys/stat.h>\n#include <type_traits>\n\
-    #include <utility>\n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities\
-    \ {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class\
-    \ T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate <class T>\n\
-    struct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
+    \n\n\n#include <algorithm>\n#include <array>\n#include <cerrno>\n#include <charconv>\n\
+    #include <cstddef>\n#include <cstdio>\n#include <cstdlib>\n#include <cstdint>\n\
+    #include <cstring>\n#include <iterator>\n#include <string>\n#include <sys/stat.h>\n\
+    #include <type_traits>\n#include <utility>\n#include <unistd.h>\n\nnamespace m1une\
+    \ {\nnamespace utilities {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\n\
+    template <class T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate\
+    \ <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
     \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
     \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
     \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
@@ -100,43 +100,47 @@ data:
     \        return true;\n    }\n\n    bool read(char& value) {\n        if (!skip_spaces())\
     \ return false;\n        value = char(read_char_raw());\n        return true;\n\
     \    }\n\n    bool read(std::string& value) {\n        if (!skip_spaces()) return\
-    \ false;\n        value.clear();\n        int c = read_char_raw();\n        while\
-    \ (c != EOF && c > ' ') {\n            value.push_back(char(c));\n           \
-    \ c = read_char_raw();\n        }\n        return true;\n    }\n\n    bool read(bool&\
-    \ value) {\n        int x;\n        if (!read(x)) return false;\n        value\
-    \ = x != 0;\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
-    \        internal::is_integral_v<T>\n            && !std::is_same_v<std::remove_cv_t<T>,\
-    \ bool>\n            && !std::is_same_v<std::remove_cv_t<T>, char>,\n        bool\n\
-    \    >\n    read(T& value) {\n        if (_streaming) return read_integer_from_stream(value);\n\
-    \        if (!prepare_number()) return false;\n        int c = static_cast<unsigned\
-    \ char>(_buffer[_position++]);\n        while (c <= ' ') c = static_cast<unsigned\
-    \ char>(_buffer[_position++]);\n\n        bool negative = false;\n        if (c\
-    \ == '-') {\n            negative = true;\n            c = static_cast<unsigned\
-    \ char>(_buffer[_position++]);\n        }\n\n        if constexpr (internal::is_signed_v<T>)\
-    \ {\n            T result = 0;\n            while ('0' <= c && c <= '9') {\n \
-    \               const int first = c - '0';\n                const int second =\
-    \ static_cast<unsigned char>(_buffer[_position]) - '0';\n                if (0\
-    \ <= second && second <= 9) {\n                    result = negative ? result\
-    \ * 100 - (first * 10 + second)\n                                      : result\
-    \ * 100 + (first * 10 + second);\n                    ++_position;\n         \
-    \       } else {\n                    result = negative ? result * 10 - first\
-    \ : result * 10 + first;\n                }\n                c = static_cast<unsigned\
-    \ char>(_buffer[_position++]);\n            }\n            value = result;\n \
-    \       } else {\n            T result = 0;\n            while ('0' <= c && c\
-    \ <= '9') {\n                const unsigned first = unsigned(c - '0');\n     \
-    \           const int second = static_cast<unsigned char>(_buffer[_position])\
+    \ false;\n        value.clear();\n        while (true) {\n            const int\
+    \ begin = _position;\n            while (_position < _length &&\n            \
+    \       static_cast<unsigned char>(_buffer[_position]) > ' ') {\n            \
+    \    ++_position;\n            }\n            value.append(_buffer + begin, _position\
+    \ - begin);\n            if (_position < _length) {\n                ++_position;\n\
+    \                return true;\n            }\n            if (!refill()) return\
+    \ true;\n        }\n    }\n\n    bool read(bool& value) {\n        int x;\n  \
+    \      if (!read(x)) return false;\n        value = x != 0;\n        return true;\n\
+    \    }\n\n    template <class T>\n    std::enable_if_t<\n        internal::is_integral_v<T>\n\
+    \            && !std::is_same_v<std::remove_cv_t<T>, bool>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ char>,\n        bool\n    >\n    read(T& value) {\n        if (_streaming) return\
+    \ read_integer_from_stream(value);\n        if (!prepare_number()) return false;\n\
+    \        int c = static_cast<unsigned char>(_buffer[_position++]);\n        while\
+    \ (c <= ' ') c = static_cast<unsigned char>(_buffer[_position++]);\n\n       \
+    \ bool negative = false;\n        if (c == '-') {\n            negative = true;\n\
+    \            c = static_cast<unsigned char>(_buffer[_position++]);\n        }\n\
+    \n        if constexpr (internal::is_signed_v<T>) {\n            T result = 0;\n\
+    \            while ('0' <= c && c <= '9') {\n                const int first =\
+    \ c - '0';\n                const int second = static_cast<unsigned char>(_buffer[_position])\
     \ - '0';\n                if (0 <= second && second <= 9) {\n                \
-    \    result = result * 100 + T(first * 10 + unsigned(second));\n             \
-    \       ++_position;\n                } else {\n                    result = result\
-    \ * 10 + T(first);\n                }\n                c = static_cast<unsigned\
-    \ char>(_buffer[_position++]);\n            }\n            value = negative ?\
-    \ T(0) - result : result;\n        }\n        if (_position > _length) _position\
-    \ = _length;\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>,\
-    \ bool>\n    read(T& value) {\n        if (!skip_spaces()) return false;\n   \
-    \     int c = read_char_raw();\n        bool negative = false;\n        if (c\
-    \ == '-' || c == '+') {\n            negative = c == '-';\n            c = read_char_raw();\n\
-    \        }\n\n        long double result = 0;\n        while ('0' <= c && c <=\
-    \ '9') {\n            result = result * 10 + (c - '0');\n            c = read_char_raw();\n\
+    \    result = negative ? result * 100 - (first * 10 + second)\n              \
+    \                        : result * 100 + (first * 10 + second);\n           \
+    \         ++_position;\n                } else {\n                    result =\
+    \ negative ? result * 10 - first : result * 10 + first;\n                }\n \
+    \               c = static_cast<unsigned char>(_buffer[_position++]);\n      \
+    \      }\n            value = result;\n        } else {\n            T result\
+    \ = 0;\n            while ('0' <= c && c <= '9') {\n                const unsigned\
+    \ first = unsigned(c - '0');\n                const int second = static_cast<unsigned\
+    \ char>(_buffer[_position]) - '0';\n                if (0 <= second && second\
+    \ <= 9) {\n                    result = result * 100 + T(first * 10 + unsigned(second));\n\
+    \                    ++_position;\n                } else {\n                \
+    \    result = result * 10 + T(first);\n                }\n                c =\
+    \ static_cast<unsigned char>(_buffer[_position++]);\n            }\n         \
+    \   value = negative ? T(0) - result : result;\n        }\n        if (_position\
+    \ > _length) _position = _length;\n        return true;\n    }\n\n    template\
+    \ <class T>\n    std::enable_if_t<std::is_floating_point_v<T>, bool>\n    read(T&\
+    \ value) {\n        if (!skip_spaces()) return false;\n        int c = read_char_raw();\n\
+    \        bool negative = false;\n        if (c == '-' || c == '+') {\n       \
+    \     negative = c == '-';\n            c = read_char_raw();\n        }\n\n  \
+    \      long double result = 0;\n        while ('0' <= c && c <= '9') {\n     \
+    \       result = result * 10 + (c - '0');\n            c = read_char_raw();\n\
     \        }\n        if (c == '.') {\n            long double place = 0.1L;\n \
     \           c = read_char_raw();\n            while ('0' <= c && c <= '9') {\n\
     \                result += (c - '0') * place;\n                place *= 0.1L;\n\
@@ -193,9 +197,14 @@ data:
     \ c) {\n        if (_position == buffer_size) flush();\n        _buffer[_position++]\
     \ = c;\n    }\n\n    void write(const char* s) {\n        while (*s != '\\0')\
     \ write_char(*s++);\n    }\n\n    void write(const std::string& s) {\n       \
-    \ for (char c : s) write_char(c);\n    }\n\n    void write(char c) {\n       \
-    \ write_char(c);\n    }\n\n    void write(bool value) {\n        write_char(value\
-    \ ? '1' : '0');\n    }\n\n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>>\n\
+    \ std::size_t position = 0;\n        while (position < s.size()) {\n         \
+    \   if (_position == buffer_size) flush();\n            const std::size_t copied\
+    \ =\n                std::min<std::size_t>(buffer_size - _position, s.size() -\
+    \ position);\n            std::memcpy(_buffer + _position, s.data() + position,\
+    \ copied);\n            _position += int(copied);\n            position += copied;\n\
+    \        }\n    }\n\n    void write(char c) {\n        write_char(c);\n    }\n\
+    \n    void write(bool value) {\n        write_char(value ? '1' : '0');\n    }\n\
+    \n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>>\n\
     \    write(T value) {\n        char digits[128];\n        auto [end, error] =\
     \ std::to_chars(\n            digits,\n            digits + sizeof(digits),\n\
     \            value,\n            _float_format,\n            _precision\n    \
@@ -265,22 +274,34 @@ data:
     \   assert(flag);\n    assert(decimal == -12.5);\n    assert(exponent == 625.0L);\n\
     \    __int128_t signed_minimum = -(__int128_t(1) << 126);\n    signed_minimum\
     \ *= 2;\n    assert(signed_wide == signed_minimum);\n    assert(unsigned_wide\
-    \ == ~__uint128_t(0));\n    std::fclose(file);\n}\n\nvoid test_pipe_input_does_not_wait_for_eof()\
-    \ {\n    int request[2];\n    int response[2];\n    assert(::pipe(request) ==\
-    \ 0);\n    assert(::pipe(response) == 0);\n\n    const pid_t child = ::fork();\n\
-    \    assert(child >= 0);\n    if (child == 0) {\n        ::close(request[1]);\n\
-    \        ::close(response[0]);\n        std::FILE* stream = ::fdopen(request[0],\
-    \ \"r\");\n        if (stream == nullptr) _exit(1);\n\n        m1une::utilities::FastInput\
-    \ input(stream);\n        int value;\n        const bool ok = input.read(value)\
-    \ && value == 123456789;\n        if (ok) {\n            const char byte = 'x';\n\
-    \            if (::write(response[1], &byte, 1) != 1) _exit(1);\n        }\n \
-    \       std::fclose(stream);\n        ::close(response[1]);\n        _exit(ok\
-    \ ? 0 : 1);\n    }\n\n    ::close(request[0]);\n    ::close(response[1]);\n  \
-    \  const char query[] = \"123456789\\n\";\n    assert(\n        ::write(request[1],\
-    \ query, sizeof(query) - 1)\n        == ssize_t(sizeof(query) - 1)\n    );\n\n\
-    \    pollfd event;\n    event.fd = response[0];\n    event.events = POLLIN;\n\
-    \    event.revents = 0;\n    const int ready = ::poll(&event, 1, 1000);\n\n  \
-    \  ::close(request[1]);\n    if (ready <= 0) ::kill(child, SIGKILL);\n    int\
+    \ == ~__uint128_t(0));\n    std::fclose(file);\n}\n\nvoid test_large_string_io()\
+    \ {\n    const std::string large(m1une::utilities::FastInput::buffer_size + 123,\
+    \ 'x');\n    std::FILE* input_file = std::tmpfile();\n    assert(input_file !=\
+    \ nullptr);\n    assert(std::fwrite(large.data(), 1, large.size(), input_file)\
+    \ == large.size());\n    std::fputs(\" tail\", input_file);\n    std::rewind(input_file);\n\
+    \n    m1une::utilities::FastInput input(input_file);\n    std::string actual,\
+    \ tail;\n    input >> actual >> tail;\n    assert(actual == large);\n    assert(tail\
+    \ == \"tail\");\n    std::fclose(input_file);\n\n    std::FILE* output_file =\
+    \ std::tmpfile();\n    assert(output_file != nullptr);\n    {\n        m1une::utilities::FastOutput\
+    \ output(output_file);\n        output << large;\n    }\n    assert(std::ftell(output_file)\
+    \ == long(large.size()));\n    std::rewind(output_file);\n    std::string written(large.size(),\
+    \ '\\0');\n    assert(std::fread(written.data(), 1, written.size(), output_file)\
+    \ == written.size());\n    assert(written == large);\n    std::fclose(output_file);\n\
+    }\n\nvoid test_pipe_input_does_not_wait_for_eof() {\n    int request[2];\n   \
+    \ int response[2];\n    assert(::pipe(request) == 0);\n    assert(::pipe(response)\
+    \ == 0);\n\n    const pid_t child = ::fork();\n    assert(child >= 0);\n    if\
+    \ (child == 0) {\n        ::close(request[1]);\n        ::close(response[0]);\n\
+    \        std::FILE* stream = ::fdopen(request[0], \"r\");\n        if (stream\
+    \ == nullptr) _exit(1);\n\n        m1une::utilities::FastInput input(stream);\n\
+    \        int value;\n        const bool ok = input.read(value) && value == 123456789;\n\
+    \        if (ok) {\n            const char byte = 'x';\n            if (::write(response[1],\
+    \ &byte, 1) != 1) _exit(1);\n        }\n        std::fclose(stream);\n       \
+    \ ::close(response[1]);\n        _exit(ok ? 0 : 1);\n    }\n\n    ::close(request[0]);\n\
+    \    ::close(response[1]);\n    const char query[] = \"123456789\\n\";\n    assert(\n\
+    \        ::write(request[1], query, sizeof(query) - 1)\n        == ssize_t(sizeof(query)\
+    \ - 1)\n    );\n\n    pollfd event;\n    event.fd = response[0];\n    event.events\
+    \ = POLLIN;\n    event.revents = 0;\n    const int ready = ::poll(&event, 1, 1000);\n\
+    \n    ::close(request[1]);\n    if (ready <= 0) ::kill(child, SIGKILL);\n    int\
     \ status;\n    assert(::waitpid(child, &status, 0) == child);\n    assert(ready\
     \ == 1);\n    assert((event.revents & POLLIN) != 0);\n    char byte;\n    assert(::read(response[0],\
     \ &byte, 1) == 1);\n    assert(byte == 'x');\n    assert(WIFEXITED(status) &&\
@@ -332,10 +353,10 @@ data:
     \ buffer + length);\n    assert(\n        result\n        == \"matrix\\n1 2 3\\\
     n4 5 6\\nlabel 7\\n8 9 10 11\\n12 13 14\\n\"\n           \"8 9\\n10 11\\n12 13\\\
     n\"\n    );\n    std::fclose(output_file);\n}\n\nint main() {\n    test_fast_input();\n\
-    \    test_pipe_input_does_not_wait_for_eof();\n    test_fast_output();\n    test_output_flush_reaches_pipe();\n\
-    \    test_stream_operators_ranges_and_pairs();\n\n    m1une::utilities::FastInput\
-    \ input;\n    m1une::utilities::FastOutput output;\n\n    long long a, b;\n  \
-    \  input >> a >> b;\n    output << a + b << '\\n';\n}\n"
+    \    test_large_string_io();\n    test_pipe_input_does_not_wait_for_eof();\n \
+    \   test_fast_output();\n    test_output_flush_reaches_pipe();\n    test_stream_operators_ranges_and_pairs();\n\
+    \n    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput output;\n\
+    \n    long long a, b;\n    input >> a >> b;\n    output << a + b << '\\n';\n}\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
     ../../utilities/fast_io.hpp\"\n\n#include <cassert>\n#include <cstdio>\n#include\
     \ <poll.h>\n#include <signal.h>\n#include <string>\n#include <sys/wait.h>\n#include\
@@ -352,22 +373,34 @@ data:
     \   assert(flag);\n    assert(decimal == -12.5);\n    assert(exponent == 625.0L);\n\
     \    __int128_t signed_minimum = -(__int128_t(1) << 126);\n    signed_minimum\
     \ *= 2;\n    assert(signed_wide == signed_minimum);\n    assert(unsigned_wide\
-    \ == ~__uint128_t(0));\n    std::fclose(file);\n}\n\nvoid test_pipe_input_does_not_wait_for_eof()\
-    \ {\n    int request[2];\n    int response[2];\n    assert(::pipe(request) ==\
-    \ 0);\n    assert(::pipe(response) == 0);\n\n    const pid_t child = ::fork();\n\
-    \    assert(child >= 0);\n    if (child == 0) {\n        ::close(request[1]);\n\
-    \        ::close(response[0]);\n        std::FILE* stream = ::fdopen(request[0],\
-    \ \"r\");\n        if (stream == nullptr) _exit(1);\n\n        m1une::utilities::FastInput\
-    \ input(stream);\n        int value;\n        const bool ok = input.read(value)\
-    \ && value == 123456789;\n        if (ok) {\n            const char byte = 'x';\n\
-    \            if (::write(response[1], &byte, 1) != 1) _exit(1);\n        }\n \
-    \       std::fclose(stream);\n        ::close(response[1]);\n        _exit(ok\
-    \ ? 0 : 1);\n    }\n\n    ::close(request[0]);\n    ::close(response[1]);\n  \
-    \  const char query[] = \"123456789\\n\";\n    assert(\n        ::write(request[1],\
-    \ query, sizeof(query) - 1)\n        == ssize_t(sizeof(query) - 1)\n    );\n\n\
-    \    pollfd event;\n    event.fd = response[0];\n    event.events = POLLIN;\n\
-    \    event.revents = 0;\n    const int ready = ::poll(&event, 1, 1000);\n\n  \
-    \  ::close(request[1]);\n    if (ready <= 0) ::kill(child, SIGKILL);\n    int\
+    \ == ~__uint128_t(0));\n    std::fclose(file);\n}\n\nvoid test_large_string_io()\
+    \ {\n    const std::string large(m1une::utilities::FastInput::buffer_size + 123,\
+    \ 'x');\n    std::FILE* input_file = std::tmpfile();\n    assert(input_file !=\
+    \ nullptr);\n    assert(std::fwrite(large.data(), 1, large.size(), input_file)\
+    \ == large.size());\n    std::fputs(\" tail\", input_file);\n    std::rewind(input_file);\n\
+    \n    m1une::utilities::FastInput input(input_file);\n    std::string actual,\
+    \ tail;\n    input >> actual >> tail;\n    assert(actual == large);\n    assert(tail\
+    \ == \"tail\");\n    std::fclose(input_file);\n\n    std::FILE* output_file =\
+    \ std::tmpfile();\n    assert(output_file != nullptr);\n    {\n        m1une::utilities::FastOutput\
+    \ output(output_file);\n        output << large;\n    }\n    assert(std::ftell(output_file)\
+    \ == long(large.size()));\n    std::rewind(output_file);\n    std::string written(large.size(),\
+    \ '\\0');\n    assert(std::fread(written.data(), 1, written.size(), output_file)\
+    \ == written.size());\n    assert(written == large);\n    std::fclose(output_file);\n\
+    }\n\nvoid test_pipe_input_does_not_wait_for_eof() {\n    int request[2];\n   \
+    \ int response[2];\n    assert(::pipe(request) == 0);\n    assert(::pipe(response)\
+    \ == 0);\n\n    const pid_t child = ::fork();\n    assert(child >= 0);\n    if\
+    \ (child == 0) {\n        ::close(request[1]);\n        ::close(response[0]);\n\
+    \        std::FILE* stream = ::fdopen(request[0], \"r\");\n        if (stream\
+    \ == nullptr) _exit(1);\n\n        m1une::utilities::FastInput input(stream);\n\
+    \        int value;\n        const bool ok = input.read(value) && value == 123456789;\n\
+    \        if (ok) {\n            const char byte = 'x';\n            if (::write(response[1],\
+    \ &byte, 1) != 1) _exit(1);\n        }\n        std::fclose(stream);\n       \
+    \ ::close(response[1]);\n        _exit(ok ? 0 : 1);\n    }\n\n    ::close(request[0]);\n\
+    \    ::close(response[1]);\n    const char query[] = \"123456789\\n\";\n    assert(\n\
+    \        ::write(request[1], query, sizeof(query) - 1)\n        == ssize_t(sizeof(query)\
+    \ - 1)\n    );\n\n    pollfd event;\n    event.fd = response[0];\n    event.events\
+    \ = POLLIN;\n    event.revents = 0;\n    const int ready = ::poll(&event, 1, 1000);\n\
+    \n    ::close(request[1]);\n    if (ready <= 0) ::kill(child, SIGKILL);\n    int\
     \ status;\n    assert(::waitpid(child, &status, 0) == child);\n    assert(ready\
     \ == 1);\n    assert((event.revents & POLLIN) != 0);\n    char byte;\n    assert(::read(response[0],\
     \ &byte, 1) == 1);\n    assert(byte == 'x');\n    assert(WIFEXITED(status) &&\
@@ -419,16 +452,16 @@ data:
     \ buffer + length);\n    assert(\n        result\n        == \"matrix\\n1 2 3\\\
     n4 5 6\\nlabel 7\\n8 9 10 11\\n12 13 14\\n\"\n           \"8 9\\n10 11\\n12 13\\\
     n\"\n    );\n    std::fclose(output_file);\n}\n\nint main() {\n    test_fast_input();\n\
-    \    test_pipe_input_does_not_wait_for_eof();\n    test_fast_output();\n    test_output_flush_reaches_pipe();\n\
-    \    test_stream_operators_ranges_and_pairs();\n\n    m1une::utilities::FastInput\
-    \ input;\n    m1une::utilities::FastOutput output;\n\n    long long a, b;\n  \
-    \  input >> a >> b;\n    output << a + b << '\\n';\n}\n"
+    \    test_large_string_io();\n    test_pipe_input_does_not_wait_for_eof();\n \
+    \   test_fast_output();\n    test_output_flush_reaches_pipe();\n    test_stream_operators_ranges_and_pairs();\n\
+    \n    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput output;\n\
+    \n    long long a, b;\n    input >> a >> b;\n    output << a + b << '\\n';\n}\n"
   dependsOn:
   - utilities/fast_io.hpp
   isVerificationFile: true
   path: verify/utilities/fast_io.test.cpp
   requiredBy: []
-  timestamp: '2026-07-17 22:34:46+09:00'
+  timestamp: '2026-07-18 22:54:37+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/utilities/fast_io.test.cpp

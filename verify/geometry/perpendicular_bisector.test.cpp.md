@@ -2,17 +2,14 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: geometry/circle.hpp
-    title: Circles
-  - icon: ':heavy_check_mark:'
     path: geometry/line.hpp
     title: Lines and Segments
   - icon: ':heavy_check_mark:'
+    path: geometry/perpendicular_bisector.hpp
+    title: Perpendicular Bisector
+  - icon: ':heavy_check_mark:'
     path: geometry/point.hpp
     title: 2D Point and Predicates
-  - icon: ':heavy_check_mark:'
-    path: geometry/ray.hpp
-    title: Rays
   - icon: ':heavy_check_mark:'
     path: utilities/fast_io.hpp
     title: Fast IO
@@ -23,17 +20,17 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://judge.yosupo.jp/problem/aplusb
+    PROBLEM: https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_2_A
     links:
-    - https://judge.yosupo.jp/problem/aplusb
-  bundledCode: "#line 1 \"verify/geometry/circle_ray.test.cpp\"\n#define PROBLEM \"\
-    https://judge.yosupo.jp/problem/aplusb\"\n\n#line 1 \"geometry/circle.hpp\"\n\n\
-    \n\n#include <algorithm>\n#include <cassert>\n#include <cmath>\n#include <optional>\n\
-    #include <vector>\n\n#line 1 \"geometry/ray.hpp\"\n\n\n\n#line 7 \"geometry/ray.hpp\"\
-    \n\n#line 1 \"geometry/line.hpp\"\n\n\n\n#line 8 \"geometry/line.hpp\"\n\n#line\
-    \ 1 \"geometry/point.hpp\"\n\n\n\n#line 5 \"geometry/point.hpp\"\n#include <concepts>\n\
-    #line 7 \"geometry/point.hpp\"\n#include <type_traits>\n\nnamespace m1une {\n\
-    namespace geometry {\n\ntemplate <typename T>\nconcept Coordinate = std::is_arithmetic_v<T>\
+    - https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_2_A
+  bundledCode: "#line 1 \"verify/geometry/perpendicular_bisector.test.cpp\"\n#define\
+    \ PROBLEM \"https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_2_A\"\
+    \n\n#line 1 \"geometry/perpendicular_bisector.hpp\"\n\n\n\n#include <algorithm>\n\
+    #include <cassert>\n#include <concepts>\n#include <limits>\n#include <numeric>\n\
+    \n#line 1 \"geometry/line.hpp\"\n\n\n\n#line 6 \"geometry/line.hpp\"\n#include\
+    \ <cmath>\n#include <optional>\n\n#line 1 \"geometry/point.hpp\"\n\n\n\n#line\
+    \ 7 \"geometry/point.hpp\"\n#include <type_traits>\n\nnamespace m1une {\nnamespace\
+    \ geometry {\n\ntemplate <typename T>\nconcept Coordinate = std::is_arithmetic_v<T>\
     \ && !std::same_as<std::remove_cv_t<T>, bool>;\n\ntemplate <Coordinate T>\nusing\
     \ wide_type = std::conditional_t<std::integral<T>, __int128_t, long double>;\n\
     \ntemplate <Coordinate T>\nstruct Point {\n    T x;\n    T y;\n\n    constexpr\
@@ -214,257 +211,69 @@ data:
     template <Coordinate T>\nstd::optional<Point<long double>> line_segment_intersection(\n\
     \    const Segment<T>& segment,\n    const Line<T>& line,\n    long double eps\
     \ = 1e-12L\n) {\n    return line_segment_intersection(line, segment, eps);\n}\n\
-    \n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 9 \"geometry/ray.hpp\"\
-    \n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <Coordinate T>\nstruct\
-    \ Ray {\n    Point<T> origin;\n    Point<T> through;\n};\n\nnamespace ray_detail\
-    \ {\n\ntemplate <Coordinate T>\nstruct Parameters {\n    wide_type<T> denominator;\n\
-    \    wide_type<T> first_numerator;\n    wide_type<T> second_numerator;\n};\n\n\
-    template <Coordinate T>\nParameters<T> parameters(\n    const Point<T>& first_origin,\n\
-    \    const Point<T>& first_through,\n    const Point<T>& second_origin,\n    const\
-    \ Point<T>& second_through\n) {\n    using W = wide_type<T>;\n    W first_x =\
-    \ W(first_through.x) - W(first_origin.x);\n    W first_y = W(first_through.y)\
-    \ - W(first_origin.y);\n    W second_x = W(second_through.x) - W(second_origin.x);\n\
-    \    W second_y = W(second_through.y) - W(second_origin.y);\n    W offset_x =\
-    \ W(second_origin.x) - W(first_origin.x);\n    W offset_y = W(second_origin.y)\
-    \ - W(first_origin.y);\n    return Parameters<T>{\n        first_x * second_y\
-    \ - first_y * second_x,\n        offset_x * second_y - offset_y * second_x,\n\
-    \        offset_x * first_y - offset_y * first_x\n    };\n}\n\ntemplate <Coordinate\
-    \ T>\nbool ratio_nonnegative(\n    wide_type<T> numerator,\n    wide_type<T> denominator,\n\
-    \    long double eps\n) {\n    int numerator_sign = sign<T>(numerator, eps);\n\
-    \    int denominator_sign = sign<T>(denominator, eps);\n    return numerator_sign\
-    \ == 0 || numerator_sign == denominator_sign;\n}\n\ntemplate <Coordinate T>\n\
-    bool ratio_in_unit_interval(\n    wide_type<T> numerator,\n    wide_type<T> denominator,\n\
-    \    long double eps\n) {\n    if (sign<T>(denominator, eps) > 0) {\n        return\
-    \ sign<T>(numerator, eps) >= 0 &&\n               sign<T>(numerator - denominator,\
-    \ eps) <= 0;\n    }\n    return sign<T>(numerator, eps) <= 0 &&\n           sign<T>(numerator\
-    \ - denominator, eps) >= 0;\n}\n\ntemplate <Coordinate T>\nPoint<long double>\
-    \ point_at(\n    const Ray<T>& ray,\n    wide_type<T> numerator,\n    wide_type<T>\
-    \ denominator\n) {\n    long double ratio =\n        static_cast<long double>(numerator)\
-    \ /\n        static_cast<long double>(denominator);\n    Point<long double> origin(ray.origin);\n\
-    \    Point<long double> direction =\n        Point<long double>(ray.through) -\
-    \ origin;\n    return origin + direction * ratio;\n}\n\n}  // namespace ray_detail\n\
-    \ntemplate <Coordinate T>\nbool on_ray(\n    const Ray<T>& ray,\n    const Point<T>&\
-    \ point,\n    long double eps = 1e-12L\n) {\n    assert(ray.origin != ray.through);\n\
-    \    if (orientation(ray.origin, ray.through, point, eps) != 0) return false;\n\
-    \    using W = wide_type<T>;\n    W direction_x = W(ray.through.x) - W(ray.origin.x);\n\
-    \    W direction_y = W(ray.through.y) - W(ray.origin.y);\n    W offset_x = W(point.x)\
-    \ - W(ray.origin.x);\n    W offset_y = W(point.y) - W(ray.origin.y);\n    return\
-    \ sign<T>(direction_x * offset_x + direction_y * offset_y, eps) >= 0;\n}\n\ntemplate\
-    \ <Coordinate T>\nPoint<long double> projection(const Ray<T>& ray, const Point<T>&\
-    \ point) {\n    assert(ray.origin != ray.through);\n    Point<long double> origin(ray.origin);\n\
-    \    Point<long double> direction =\n        Point<long double>(ray.through) -\
-    \ origin;\n    Point<long double> offset = Point<long double>(point) - origin;\n\
-    \    long double ratio = dot(offset, direction) / dot(direction, direction);\n\
-    \    if (ratio < 0) ratio = 0;\n    return origin + direction * ratio;\n}\n\n\
-    template <Coordinate T>\nlong double distance(const Ray<T>& ray, const Point<T>&\
-    \ point) {\n    return geometry::distance(projection(ray, point), Point<long double>(point));\n\
-    }\n\ntemplate <Coordinate T>\nlong double distance(const Point<T>& point, const\
-    \ Ray<T>& ray) {\n    return distance(ray, point);\n}\n\ntemplate <Coordinate\
-    \ T>\nRay<long double> reflection(const Line<T>& line, const Ray<T>& ray) {\n\
-    \    assert(ray.origin != ray.through);\n    return Ray<long double>{\n      \
-    \  reflection(line, ray.origin),\n        reflection(line, ray.through)\n    };\n\
-    }\n\ntemplate <Coordinate T>\nRay<long double> reflected_ray(\n    const Ray<T>&\
-    \ incoming,\n    const Point<T>& hit,\n    const Line<T>& mirror,\n    long double\
-    \ eps = 1e-12L\n) {\n    assert(incoming.origin != incoming.through);\n    assert(on_line(mirror,\
-    \ hit, eps));\n    Point<T> translated = hit + (incoming.through - incoming.origin);\n\
-    \    return Ray<long double>{\n        Point<long double>(hit),\n        reflection(mirror,\
-    \ translated)\n    };\n}\n\ntemplate <Coordinate T>\nbool intersects(\n    const\
-    \ Ray<T>& ray,\n    const Line<T>& line,\n    long double eps = 1e-12L\n) {\n\
-    \    assert(ray.origin != ray.through);\n    assert(line.a != line.b);\n    ray_detail::Parameters<T>\
-    \ values = ray_detail::parameters(\n        ray.origin,\n        ray.through,\n\
-    \        line.a,\n        line.b\n    );\n    if (sign<T>(values.denominator,\
-    \ eps) == 0) {\n        return on_line(line, ray.origin, eps);\n    }\n    return\
-    \ ray_detail::ratio_nonnegative<T>(\n        values.first_numerator,\n       \
-    \ values.denominator,\n        eps\n    );\n}\n\ntemplate <Coordinate T>\nbool\
-    \ intersects(\n    const Line<T>& line,\n    const Ray<T>& ray,\n    long double\
-    \ eps = 1e-12L\n) {\n    return intersects(ray, line, eps);\n}\n\ntemplate <Coordinate\
-    \ T>\nlong double distance(const Ray<T>& ray, const Line<T>& line) {\n    return\
-    \ intersects(ray, line) ? 0 : distance(line, ray.origin);\n}\n\ntemplate <Coordinate\
-    \ T>\nlong double distance(const Line<T>& line, const Ray<T>& ray) {\n    return\
-    \ distance(ray, line);\n}\n\ntemplate <Coordinate T>\nbool intersects(\n    const\
-    \ Ray<T>& ray,\n    const Segment<T>& segment,\n    long double eps = 1e-12L\n\
-    ) {\n    assert(ray.origin != ray.through);\n    if (segment.a == segment.b) return\
-    \ on_ray(ray, segment.a, eps);\n\n    ray_detail::Parameters<T> values = ray_detail::parameters(\n\
-    \        ray.origin,\n        ray.through,\n        segment.a,\n        segment.b\n\
-    \    );\n    if (sign<T>(values.denominator, eps) == 0) {\n        if (orientation(ray.origin,\
-    \ ray.through, segment.a, eps) != 0) {\n            return false;\n        }\n\
-    \        return on_ray(ray, segment.a, eps) ||\n               on_ray(ray, segment.b,\
-    \ eps) ||\n               on_segment(segment, ray.origin, eps);\n    }\n    return\
-    \ ray_detail::ratio_nonnegative<T>(\n               values.first_numerator,\n\
-    \               values.denominator,\n               eps\n           ) &&\n   \
-    \        ray_detail::ratio_in_unit_interval<T>(\n               values.second_numerator,\n\
-    \               values.denominator,\n               eps\n           );\n}\n\n\
-    template <Coordinate T>\nbool intersects(\n    const Segment<T>& segment,\n  \
-    \  const Ray<T>& ray,\n    long double eps = 1e-12L\n) {\n    return intersects(ray,\
-    \ segment, eps);\n}\n\ntemplate <Coordinate T>\nlong double distance(const Ray<T>&\
-    \ ray, const Segment<T>& segment) {\n    if (intersects(ray, segment)) return\
-    \ 0;\n    return std::min({\n        distance(ray, segment.a),\n        distance(ray,\
-    \ segment.b),\n        distance(segment, ray.origin)\n    });\n}\n\ntemplate <Coordinate\
-    \ T>\nlong double distance(const Segment<T>& segment, const Ray<T>& ray) {\n \
-    \   return distance(ray, segment);\n}\n\ntemplate <Coordinate T>\nbool intersects(\n\
-    \    const Ray<T>& first,\n    const Ray<T>& second,\n    long double eps = 1e-12L\n\
-    ) {\n    assert(first.origin != first.through);\n    assert(second.origin != second.through);\n\
-    \    ray_detail::Parameters<T> values = ray_detail::parameters(\n        first.origin,\n\
-    \        first.through,\n        second.origin,\n        second.through\n    );\n\
-    \    if (sign<T>(values.denominator, eps) == 0) {\n        if (orientation(first.origin,\
-    \ first.through, second.origin, eps) != 0) {\n            return false;\n    \
-    \    }\n        return on_ray(first, second.origin, eps) ||\n               on_ray(second,\
-    \ first.origin, eps);\n    }\n    return ray_detail::ratio_nonnegative<T>(\n \
-    \              values.first_numerator,\n               values.denominator,\n \
-    \              eps\n           ) &&\n           ray_detail::ratio_nonnegative<T>(\n\
-    \               values.second_numerator,\n               values.denominator,\n\
-    \               eps\n           );\n}\n\ntemplate <Coordinate T>\nlong double\
-    \ distance(const Ray<T>& first, const Ray<T>& second) {\n    if (intersects(first,\
-    \ second)) return 0;\n    return std::min(\n        distance(first, second.origin),\n\
-    \        distance(second, first.origin)\n    );\n}\n\ntemplate <Coordinate T>\n\
-    std::optional<Point<long double>> ray_line_intersection(\n    const Ray<T>& ray,\n\
-    \    const Line<T>& line,\n    long double eps = 1e-12L\n) {\n    assert(ray.origin\
-    \ != ray.through);\n    assert(line.a != line.b);\n    ray_detail::Parameters<T>\
-    \ values = ray_detail::parameters(\n        ray.origin,\n        ray.through,\n\
-    \        line.a,\n        line.b\n    );\n    if (\n        sign<T>(values.denominator,\
-    \ eps) == 0 ||\n        !ray_detail::ratio_nonnegative<T>(\n            values.first_numerator,\n\
-    \            values.denominator,\n            eps\n        )\n    ) {\n      \
-    \  return std::nullopt;\n    }\n    return ray_detail::point_at(\n        ray,\n\
-    \        values.first_numerator,\n        values.denominator\n    );\n}\n\ntemplate\
-    \ <Coordinate T>\nstd::optional<Point<long double>> ray_line_intersection(\n \
-    \   const Line<T>& line,\n    const Ray<T>& ray,\n    long double eps = 1e-12L\n\
-    ) {\n    return ray_line_intersection(ray, line, eps);\n}\n\ntemplate <Coordinate\
-    \ T>\nstd::optional<Point<long double>> ray_segment_intersection(\n    const Ray<T>&\
-    \ ray,\n    const Segment<T>& segment,\n    long double eps = 1e-12L\n) {\n  \
-    \  assert(ray.origin != ray.through);\n    if (segment.a == segment.b) {\n   \
-    \     if (on_ray(ray, segment.a, eps)) {\n            return Point<long double>(segment.a);\n\
-    \        }\n        return std::nullopt;\n    }\n\n    ray_detail::Parameters<T>\
-    \ values = ray_detail::parameters(\n        ray.origin,\n        ray.through,\n\
-    \        segment.a,\n        segment.b\n    );\n    if (sign<T>(values.denominator,\
-    \ eps) == 0) {\n        if (orientation(ray.origin, ray.through, segment.a, eps)\
-    \ != 0) {\n            return std::nullopt;\n        }\n        if (\n       \
-    \     segment.a == ray.origin &&\n            !on_ray(ray, segment.b, eps)\n \
-    \       ) {\n            return Point<long double>(ray.origin);\n        }\n \
-    \       if (\n            segment.b == ray.origin &&\n            !on_ray(ray,\
-    \ segment.a, eps)\n        ) {\n            return Point<long double>(ray.origin);\n\
-    \        }\n        return std::nullopt;\n    }\n    if (\n        !ray_detail::ratio_nonnegative<T>(\n\
-    \            values.first_numerator,\n            values.denominator,\n      \
-    \      eps\n        ) ||\n        !ray_detail::ratio_in_unit_interval<T>(\n  \
-    \          values.second_numerator,\n            values.denominator,\n       \
-    \     eps\n        )\n    ) {\n        return std::nullopt;\n    }\n    return\
-    \ ray_detail::point_at(\n        ray,\n        values.first_numerator,\n     \
-    \   values.denominator\n    );\n}\n\ntemplate <Coordinate T>\nstd::optional<Point<long\
-    \ double>> ray_segment_intersection(\n    const Segment<T>& segment,\n    const\
-    \ Ray<T>& ray,\n    long double eps = 1e-12L\n) {\n    return ray_segment_intersection(ray,\
-    \ segment, eps);\n}\n\ntemplate <Coordinate T>\nstd::optional<Point<long double>>\
-    \ ray_intersection(\n    const Ray<T>& first,\n    const Ray<T>& second,\n   \
-    \ long double eps = 1e-12L\n) {\n    assert(first.origin != first.through);\n\
-    \    assert(second.origin != second.through);\n    ray_detail::Parameters<T> values\
-    \ = ray_detail::parameters(\n        first.origin,\n        first.through,\n \
-    \       second.origin,\n        second.through\n    );\n    if (sign<T>(values.denominator,\
-    \ eps) == 0) {\n        if (\n            first.origin != second.origin ||\n \
-    \           orientation(\n                first.origin,\n                first.through,\n\
-    \                second.through,\n                eps\n            ) != 0\n  \
-    \      ) {\n            return std::nullopt;\n        }\n        using W = wide_type<T>;\n\
-    \        W first_x = W(first.through.x) - W(first.origin.x);\n        W first_y\
-    \ = W(first.through.y) - W(first.origin.y);\n        W second_x = W(second.through.x)\
-    \ - W(second.origin.x);\n        W second_y = W(second.through.y) - W(second.origin.y);\n\
-    \        if (sign<T>(first_x * second_x + first_y * second_y, eps) < 0) {\n  \
-    \          return Point<long double>(first.origin);\n        }\n        return\
-    \ std::nullopt;\n    }\n    if (\n        !ray_detail::ratio_nonnegative<T>(\n\
-    \            values.first_numerator,\n            values.denominator,\n      \
-    \      eps\n        ) ||\n        !ray_detail::ratio_nonnegative<T>(\n       \
-    \     values.second_numerator,\n            values.denominator,\n            eps\n\
-    \        )\n    ) {\n        return std::nullopt;\n    }\n    return ray_detail::point_at(\n\
-    \        first,\n        values.first_numerator,\n        values.denominator\n\
-    \    );\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 11 \"\
-    geometry/circle.hpp\"\n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <Coordinate\
-    \ T>\nstruct Circle {\n    Point<T> center;\n    T radius;\n};\n\nenum class CircleRelation\
-    \ {\n    Separate,\n    ExternallyTangent,\n    Intersecting,\n    InternallyTangent,\n\
-    \    Contained,\n    Coincident,\n};\n\ntemplate <Coordinate T>\nCircleRelation\
-    \ circle_relation(\n    const Circle<T>& first,\n    const Circle<T>& second,\n\
-    \    long double eps = 1e-12L\n) {\n    assert(first.radius >= 0);\n    assert(second.radius\
-    \ >= 0);\n    long double d = geometry::distance(first.center, second.center);\n\
-    \    long double r1 = static_cast<long double>(first.radius);\n    long double\
-    \ r2 = static_cast<long double>(second.radius);\n    long double sum = r1 + r2;\n\
-    \    long double difference = std::fabs(r1 - r2);\n    if (d <= eps && difference\
-    \ <= eps) return CircleRelation::Coincident;\n    if (sum < d - eps) return CircleRelation::Separate;\n\
-    \    if (std::fabs(d - sum) <= eps) return CircleRelation::ExternallyTangent;\n\
-    \    if (d < difference - eps) return CircleRelation::Contained;\n    if (std::fabs(d\
-    \ - difference) <= eps) return CircleRelation::InternallyTangent;\n    return\
-    \ CircleRelation::Intersecting;\n}\n\ntemplate <Coordinate T>\nstd::vector<Point<long\
-    \ double>> circle_line_intersections(\n    const Circle<T>& circle,\n    const\
-    \ Line<T>& line,\n    long double eps = 1e-12L\n) {\n    assert(circle.radius\
-    \ >= 0);\n    assert(line.a != line.b);\n    Point<long double> foot = projection(line,\
-    \ circle.center);\n    long double radius = static_cast<long double>(circle.radius);\n\
-    \    long double distance_to_line = geometry::distance(line, circle.center);\n\
-    \    if (radius < distance_to_line - eps) return {};\n\n    Point<long double>\
-    \ direction =\n        Point<long double>(line.b) - Point<long double>(line.a);\n\
-    \    direction = normalized(direction);\n    long double offset_squared =\n  \
-    \      std::max(0.0L, radius * radius - distance_to_line * distance_to_line);\n\
-    \    long double offset = std::sqrt(offset_squared);\n    if (offset <= eps) return\
-    \ {foot};\n\n    Point<long double> first = foot - direction * offset;\n    Point<long\
-    \ double> second = foot + direction * offset;\n    if (second < first) std::swap(first,\
-    \ second);\n    return {first, second};\n}\n\ntemplate <Coordinate C, Coordinate\
-    \ R>\nstd::vector<Point<long double>> circle_ray_intersections(\n    const Circle<C>&\
-    \ circle,\n    const Ray<R>& ray,\n    long double eps = 1e-12L\n) {\n    assert(circle.radius\
-    \ >= 0);\n    assert(ray.origin != ray.through);\n\n    Point<long double> origin(ray.origin);\n\
-    \    Point<long double> direction =\n        Point<long double>(ray.through) -\
-    \ origin;\n    Point<long double> offset = origin - Point<long double>(circle.center);\n\
-    \    long double radius = static_cast<long double>(circle.radius);\n    long double\
-    \ quadratic = dot(direction, direction);\n    long double linear = 2.0L * dot(offset,\
-    \ direction);\n    long double constant = dot(offset, offset) - radius * radius;\n\
-    \    long double discriminant =\n        linear * linear - 4.0L * quadratic *\
-    \ constant;\n    if (discriminant < -eps) return {};\n\n    discriminant = std::max(0.0L,\
-    \ discriminant);\n    long double root = std::sqrt(discriminant);\n    long double\
-    \ first_ratio = (-linear - root) / (2.0L * quadratic);\n    long double second_ratio\
-    \ = (-linear + root) / (2.0L * quadratic);\n\n    std::vector<Point<long double>>\
-    \ result;\n    if (first_ratio >= -eps) {\n        if (first_ratio < 0) first_ratio\
-    \ = 0;\n        result.push_back(origin + direction * first_ratio);\n    }\n \
-    \   if (\n        second_ratio >= -eps &&\n        root > eps\n    ) {\n     \
-    \   if (second_ratio < 0) second_ratio = 0;\n        result.push_back(origin +\
-    \ direction * second_ratio);\n    }\n    return result;\n}\n\ntemplate <Coordinate\
-    \ C, Coordinate R>\nstd::vector<Point<long double>> circle_ray_intersections(\n\
-    \    const Ray<R>& ray,\n    const Circle<C>& circle,\n    long double eps = 1e-12L\n\
-    ) {\n    return circle_ray_intersections(circle, ray, eps);\n}\n\ntemplate <Coordinate\
-    \ C, Coordinate R>\nstd::optional<Point<long double>> first_circle_ray_intersection(\n\
-    \    const Circle<C>& circle,\n    const Ray<R>& ray,\n    long double eps = 1e-12L\n\
-    ) {\n    std::vector<Point<long double>> points =\n        circle_ray_intersections(circle,\
-    \ ray, eps);\n    if (points.empty()) return std::nullopt;\n    return points.front();\n\
-    }\n\ntemplate <Coordinate C, Coordinate R>\nbool intersects(\n    const Circle<C>&\
-    \ circle,\n    const Ray<R>& ray,\n    long double eps = 1e-12L\n) {\n    return\
-    \ !circle_ray_intersections(circle, ray, eps).empty();\n}\n\ntemplate <Coordinate\
-    \ C, Coordinate R>\nbool intersects(\n    const Ray<R>& ray,\n    const Circle<C>&\
-    \ circle,\n    long double eps = 1e-12L\n) {\n    return intersects(circle, ray,\
-    \ eps);\n}\n\ntemplate <Coordinate R, Coordinate H, Coordinate C>\nRay<long double>\
-    \ reflected_ray(\n    const Ray<R>& incoming,\n    const Point<H>& hit,\n    const\
-    \ Circle<C>& circle,\n    long double eps = 1e-12L\n) {\n    assert(incoming.origin\
-    \ != incoming.through);\n    assert(static_cast<long double>(circle.radius) >\
-    \ eps);\n    assert(\n        std::fabs(\n            geometry::distance(\n  \
-    \              Point<long double>(hit),\n                Point<long double>(circle.center)\n\
-    \            ) -\n            static_cast<long double>(circle.radius)\n      \
-    \  ) <= eps\n    );\n\n    Point<long double> hit_point(hit);\n    Point<long\
-    \ double> normal =\n        hit_point - Point<long double>(circle.center);\n \
-    \   Point<long double> tangent_direction(-normal.y, normal.x);\n    Line<long\
-    \ double> tangent{\n        hit_point,\n        hit_point + tangent_direction\n\
-    \    };\n    Point<long double> incoming_direction =\n        Point<long double>(incoming.through)\
-    \ -\n        Point<long double>(incoming.origin);\n    Point<long double> translated\
-    \ = hit_point + incoming_direction;\n    return Ray<long double>{\n        hit_point,\n\
-    \        reflection(tangent, translated)\n    };\n}\n\ntemplate <Coordinate T>\n\
-    std::vector<Point<long double>> circle_intersections(\n    const Circle<T>& first,\n\
-    \    const Circle<T>& second,\n    long double eps = 1e-12L\n) {\n    assert(first.radius\
-    \ >= 0);\n    assert(second.radius >= 0);\n    CircleRelation relation = circle_relation(first,\
-    \ second, eps);\n    if (\n        relation == CircleRelation::Separate ||\n \
-    \       relation == CircleRelation::Contained ||\n        relation == CircleRelation::Coincident\n\
-    \    ) {\n        return {};\n    }\n\n    Point<long double> c1(first.center);\n\
-    \    Point<long double> c2(second.center);\n    Point<long double> direction =\
-    \ c2 - c1;\n    long double d = norm(direction);\n    long double r1 = static_cast<long\
-    \ double>(first.radius);\n    long double r2 = static_cast<long double>(second.radius);\n\
-    \    long double along = (r1 * r1 - r2 * r2 + d * d) / (2 * d);\n    long double\
-    \ height_squared = std::max(0.0L, r1 * r1 - along * along);\n    Point<long double>\
-    \ unit = direction / d;\n    Point<long double> base = c1 + unit * along;\n  \
-    \  long double height = std::sqrt(height_squared);\n    if (height <= eps) return\
-    \ {base};\n\n    Point<long double> perpendicular(-unit.y, unit.x);\n    Point<long\
-    \ double> a = base - perpendicular * height;\n    Point<long double> b = base\
-    \ + perpendicular * height;\n    if (b < a) std::swap(a, b);\n    return {a, b};\n\
-    }\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 4 \"verify/geometry/circle_ray.test.cpp\"\
-    \n\n#line 8 \"verify/geometry/circle_ray.test.cpp\"\n#include <cstdint>\n#line\
-    \ 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 5 \"utilities/fast_io.hpp\"\n#include\
+    \n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 11 \"geometry/perpendicular_bisector.hpp\"\
+    \n\nnamespace m1une {\nnamespace geometry {\n\nnamespace perpendicular_bisector_detail\
+    \ {\n\ntemplate <class Integer>\nconstexpr Integer absolute(Integer value) {\n\
+    \    return value < 0 ? -value : value;\n}\n\ntemplate <class Integer>\nconstexpr\
+    \ Integer gcd(Integer first, Integer second) {\n    first = absolute(first);\n\
+    \    second = absolute(second);\n    while (second != 0) {\n        Integer remainder\
+    \ = first % second;\n        first = second;\n        second = remainder;\n  \
+    \  }\n    return first;\n}\n\ntemplate <class Integer>\nconstexpr Integer floor_div(Integer\
+    \ numerator, Integer denominator) {\n    assert(denominator > 0);\n    Integer\
+    \ quotient = numerator / denominator;\n    if (numerator % denominator < 0) --quotient;\n\
+    \    return quotient;\n}\n\ntemplate <class Integer>\nconstexpr Integer ceil_div(Integer\
+    \ numerator, Integer denominator) {\n    assert(denominator > 0);\n    Integer\
+    \ quotient = numerator / denominator;\n    if (numerator % denominator > 0) ++quotient;\n\
+    \    return quotient;\n}\n\ntemplate <class Integer>\nstruct ParameterBounds {\n\
+    \    Integer lower;\n    Integer upper;\n};\n\ntemplate <class Integer>\nconstexpr\
+    \ ParameterBounds<Integer> parameter_bounds(\n    Integer value,\n    Integer\
+    \ step,\n    Integer minimum,\n    Integer maximum\n) {\n    assert(step != 0);\n\
+    \    Integer valid_minimum = std::max(minimum, minimum - step);\n    Integer valid_maximum\
+    \ = std::min(maximum, maximum - step);\n    if (step > 0) {\n        return ParameterBounds<Integer>{\n\
+    \            ceil_div(valid_minimum - value, step),\n            floor_div(valid_maximum\
+    \ - value, step)\n        };\n    }\n    Integer positive_step = -step;\n    return\
+    \ ParameterBounds<Integer>{\n        ceil_div(value - valid_maximum, positive_step),\n\
+    \        floor_div(value - valid_minimum, positive_step)\n    };\n}\n\ntemplate\
+    \ <Coordinate T>\nrequires std::integral<T>\nconstexpr Line<T> integral_perpendicular_bisector(\n\
+    \    const Point<T>& first,\n    const Point<T>& second\n) {\n    using W = wide_type<T>;\n\
+    \    W first_x = W(first.x);\n    W first_y = W(first.y);\n    W second_x = W(second.x);\n\
+    \    W second_y = W(second.y);\n    W difference_x = second_x - first_x;\n   \
+    \ W difference_y = second_y - first_y;\n    W divisor = gcd(difference_x, difference_y);\n\
+    \    assert(divisor != 0);\n\n    W primitive_x = difference_x / divisor;\n  \
+    \  W primitive_y = difference_y / divisor;\n    W sum_x = first_x + second_x;\n\
+    \    W sum_y = first_y + second_y;\n\n    W base_x;\n    W base_y;\n    if (sum_x\
+    \ % 2 == 0 && sum_y % 2 == 0) {\n        base_x = sum_x / 2;\n        base_y =\
+    \ sum_y / 2;\n    } else {\n        assert((sum_x + primitive_y) % 2 == 0);\n\
+    \        assert((sum_y - primitive_x) % 2 == 0);\n        base_x = (sum_x + primitive_y)\
+    \ / 2;\n        base_y = (sum_y - primitive_x) / 2;\n    }\n\n    W step_x = -primitive_y;\n\
+    \    W step_y = primitive_x;\n    W minimum = W(std::numeric_limits<T>::lowest());\n\
+    \    W maximum = W(std::numeric_limits<T>::max());\n    W lower = std::numeric_limits<W>::lowest();\n\
+    \    W upper = std::numeric_limits<W>::max();\n\n    auto restrict_parameter =\
+    \ [&](W value, W step) {\n        if (step == 0) {\n            assert(minimum\
+    \ <= value && value <= maximum);\n            return;\n        }\n        ParameterBounds<W>\
+    \ bounds =\n            parameter_bounds(value, step, minimum, maximum);\n   \
+    \     lower = std::max(lower, bounds.lower);\n        upper = std::min(upper,\
+    \ bounds.upper);\n    };\n    restrict_parameter(base_x, step_x);\n    restrict_parameter(base_y,\
+    \ step_y);\n    assert(lower <= upper);\n\n    W parameter = std::clamp(W(0),\
+    \ lower, upper);\n    W result_x = base_x + step_x * parameter;\n    W result_y\
+    \ = base_y + step_y * parameter;\n    W next_x = result_x + step_x;\n    W next_y\
+    \ = result_y + step_y;\n    assert(minimum <= result_x && result_x <= maximum);\n\
+    \    assert(minimum <= result_y && result_y <= maximum);\n    assert(minimum <=\
+    \ next_x && next_x <= maximum);\n    assert(minimum <= next_y && next_y <= maximum);\n\
+    \n    Line<T> result;\n    result.a = Point<T>(T(result_x), T(result_y));\n  \
+    \  result.b = Point<T>(T(next_x), T(next_y));\n    return result;\n}\n\n}  //\
+    \ namespace perpendicular_bisector_detail\n\ntemplate <Coordinate T>\nconstexpr\
+    \ Line<T> perpendicular_bisector(\n    const Point<T>& first,\n    const Point<T>&\
+    \ second\n) {\n    assert(first != second);\n    if constexpr (std::integral<T>)\
+    \ {\n        return perpendicular_bisector_detail::integral_perpendicular_bisector(\n\
+    \            first,\n            second\n        );\n    } else {\n        Point<T>\
+    \ midpoint(\n            std::midpoint(first.x, second.x),\n            std::midpoint(first.y,\
+    \ second.y)\n        );\n        Point<T> direction(first.y - second.y, second.x\
+    \ - first.x);\n\n        Line<T> result;\n        result.a = midpoint;\n     \
+    \   result.b = midpoint + direction;\n        return result;\n    }\n}\n\n}  //\
+    \ namespace geometry\n}  // namespace m1une\n\n\n#line 4 \"verify/geometry/perpendicular_bisector.test.cpp\"\
+    \n\n#line 8 \"verify/geometry/perpendicular_bisector.test.cpp\"\n#include <cstdint>\n\
+    #line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 5 \"utilities/fast_io.hpp\"\n#include\
     \ <array>\n#include <cerrno>\n#include <charconv>\n#include <cstddef>\n#include\
     \ <cstdio>\n#include <cstdlib>\n#line 12 \"utilities/fast_io.hpp\"\n#include <cstring>\n\
     #include <iterator>\n#include <string>\n#include <sys/stat.h>\n#line 17 \"utilities/fast_io.hpp\"\
@@ -706,162 +515,172 @@ data:
     \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
     n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 11 \"verify/geometry/circle_ray.test.cpp\"\
-    \n\nnamespace {\n\nusing namespace m1une::geometry;\nusing P = Point<long long>;\n\
-    \nbool close(long double first, long double second) {\n    return std::fabs(first\
-    \ - second) <= 1e-10L;\n}\n\nvoid test_intersections() {\n    Circle<long long>\
-    \ circle;\n    circle.center = P(0, 0);\n    circle.radius = 5;\n\n    Ray<long\
-    \ long> secant;\n    secant.origin = P(-10, 0);\n    secant.through = P(-9, 0);\n\
-    \    auto points = circle_ray_intersections(circle, secant);\n    assert(points.size()\
-    \ == 2);\n    assert(close(points[0].x, -5));\n    assert(close(points[1].x, 5));\n\
-    \    assert(intersects(circle, secant));\n    assert(intersects(secant, circle));\n\
-    \n    Ray<long long> inside;\n    inside.origin = P(0, 0);\n    inside.through\
-    \ = P(1, 0);\n    points = circle_ray_intersections(circle, inside);\n    assert(points.size()\
-    \ == 1);\n    assert(close(points[0].x, 5));\n\n    Ray<long long> tangent;\n\
-    \    tangent.origin = P(-10, 5);\n    tangent.through = P(-9, 5);\n    points\
-    \ = circle_ray_intersections(circle, tangent);\n    assert(points.size() == 1);\n\
-    \    assert(close(points[0].x, 0));\n    assert(close(points[0].y, 5));\n\n  \
-    \  Ray<long long> away;\n    away.origin = P(10, 0);\n    away.through = P(11,\
-    \ 0);\n    assert(circle_ray_intersections(circle, away).empty());\n    assert(!intersects(circle,\
-    \ away));\n    assert(!first_circle_ray_intersection(circle, away).has_value());\n\
-    \n    Ray<long long> boundary;\n    boundary.origin = P(5, 0);\n    boundary.through\
-    \ = P(6, 0);\n    points = circle_ray_intersections(circle, boundary);\n    assert(points.size()\
-    \ == 1);\n    assert(close(points[0].x, 5));\n\n    Circle<long long> point_circle;\n\
-    \    point_circle.center = P(2, 0);\n    point_circle.radius = 0;\n    points\
-    \ = circle_ray_intersections(point_circle, inside);\n    assert(points.size()\
-    \ == 1);\n    assert(close(points[0].x, 2));\n}\n\nvoid test_reflection() {\n\
-    \    Circle<long long> circle;\n    circle.center = P(0, 0);\n    circle.radius\
-    \ = 5;\n\n    Ray<long long> vertical;\n    vertical.origin = P(0, 10);\n    vertical.through\
-    \ = P(0, 5);\n    Ray<long double> vertical_out =\n        reflected_ray(vertical,\
-    \ P(0, 5), circle);\n    assert(close(vertical_out.origin.x, 0));\n    assert(close(vertical_out.origin.y,\
-    \ 5));\n    assert(close(vertical_out.through.x, 0));\n    assert(close(vertical_out.through.y,\
-    \ 10));\n\n    Ray<long long> oblique;\n    oblique.origin = P(-2, 7);\n    oblique.through\
-    \ = P(0, 5);\n    Ray<long double> oblique_out =\n        reflected_ray(oblique,\
-    \ P(0, 5), circle);\n    assert(close(oblique_out.through.x, 2));\n    assert(close(oblique_out.through.y,\
-    \ 7));\n\n    Point<long double> incoming_direction =\n        Point<long double>(oblique.through)\
-    \ -\n        Point<long double>(oblique.origin);\n    Point<long double> outgoing_direction\
-    \ =\n        oblique_out.through - oblique_out.origin;\n    assert(close(norm(incoming_direction),\
-    \ norm(outgoing_direction)));\n}\n\nvoid test_randomized_against_lines() {\n \
-    \   std::uint64_t state = 0x987654321abcdefULL;\n    auto random = [&state]()\
-    \ {\n        state ^= state << 7;\n        state ^= state >> 9;\n        return\
-    \ state;\n    };\n\n    for (int trial = 0; trial < 10000; ++trial) {\n      \
-    \  Circle<long double> circle;\n        circle.center = Point<long double>(\n\
-    \            static_cast<long double>(\n                static_cast<long long>(random()\
-    \ % 21) - 10\n            ),\n            static_cast<long double>(\n        \
-    \        static_cast<long long>(random() % 21) - 10\n            )\n        );\n\
-    \        circle.radius = static_cast<long double>(random() % 8);\n\n        Ray<long\
-    \ double> ray;\n        ray.origin = Point<long double>(\n            static_cast<long\
-    \ double>(\n                static_cast<long long>(random() % 31) - 15\n     \
-    \       ),\n            static_cast<long double>(\n                static_cast<long\
-    \ long>(random() % 31) - 15\n            )\n        );\n        do {\n       \
-    \     ray.through = Point<long double>(\n                static_cast<long double>(\n\
-    \                    static_cast<long long>(random() % 31) - 15\n            \
-    \    ),\n                static_cast<long double>(\n                    static_cast<long\
-    \ long>(random() % 31) - 15\n                )\n            );\n        } while\
-    \ (ray.origin == ray.through);\n\n        Line<long double> line{ray.origin, ray.through};\n\
-    \        auto line_points = circle_line_intersections(circle, line);\n       \
-    \ Point<long double> direction = ray.through - ray.origin;\n        std::vector<Point<long\
-    \ double>> expected;\n        for (const Point<long double>& point : line_points)\
-    \ {\n            if (dot(point - ray.origin, direction) >= -1e-10L) {\n      \
-    \          expected.push_back(point);\n            }\n        }\n        std::sort(\n\
-    \            expected.begin(),\n            expected.end(),\n            [&](const\
-    \ auto& first, const auto& second) {\n                return dot(first - ray.origin,\
-    \ direction) <\n                       dot(second - ray.origin, direction);\n\
-    \            }\n        );\n\n        auto actual = circle_ray_intersections(circle,\
-    \ ray);\n        assert(actual.size() == expected.size());\n        for (std::size_t\
-    \ index = 0; index < actual.size(); ++index) {\n            assert(close(actual[index].x,\
-    \ expected[index].x));\n            assert(close(actual[index].y, expected[index].y));\n\
-    \        }\n    }\n}\n\n}  // namespace\n\nint main() {\n    m1une::utilities::FastInput\
-    \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n\n    test_intersections();\n\
-    \    test_reflection();\n    test_randomized_against_lines();\n\n    long long\
-    \ a, b;\n    fast_input >> a >> b;\n    fast_output << a + b << '\\n';\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
-    ../../geometry/circle.hpp\"\n\n#include <algorithm>\n#include <cassert>\n#include\
-    \ <cmath>\n#include <cstdint>\n#include \"../../utilities/fast_io.hpp\"\n#include\
-    \ <vector>\n\nnamespace {\n\nusing namespace m1une::geometry;\nusing P = Point<long\
-    \ long>;\n\nbool close(long double first, long double second) {\n    return std::fabs(first\
-    \ - second) <= 1e-10L;\n}\n\nvoid test_intersections() {\n    Circle<long long>\
-    \ circle;\n    circle.center = P(0, 0);\n    circle.radius = 5;\n\n    Ray<long\
-    \ long> secant;\n    secant.origin = P(-10, 0);\n    secant.through = P(-9, 0);\n\
-    \    auto points = circle_ray_intersections(circle, secant);\n    assert(points.size()\
-    \ == 2);\n    assert(close(points[0].x, -5));\n    assert(close(points[1].x, 5));\n\
-    \    assert(intersects(circle, secant));\n    assert(intersects(secant, circle));\n\
-    \n    Ray<long long> inside;\n    inside.origin = P(0, 0);\n    inside.through\
-    \ = P(1, 0);\n    points = circle_ray_intersections(circle, inside);\n    assert(points.size()\
-    \ == 1);\n    assert(close(points[0].x, 5));\n\n    Ray<long long> tangent;\n\
-    \    tangent.origin = P(-10, 5);\n    tangent.through = P(-9, 5);\n    points\
-    \ = circle_ray_intersections(circle, tangent);\n    assert(points.size() == 1);\n\
-    \    assert(close(points[0].x, 0));\n    assert(close(points[0].y, 5));\n\n  \
-    \  Ray<long long> away;\n    away.origin = P(10, 0);\n    away.through = P(11,\
-    \ 0);\n    assert(circle_ray_intersections(circle, away).empty());\n    assert(!intersects(circle,\
-    \ away));\n    assert(!first_circle_ray_intersection(circle, away).has_value());\n\
-    \n    Ray<long long> boundary;\n    boundary.origin = P(5, 0);\n    boundary.through\
-    \ = P(6, 0);\n    points = circle_ray_intersections(circle, boundary);\n    assert(points.size()\
-    \ == 1);\n    assert(close(points[0].x, 5));\n\n    Circle<long long> point_circle;\n\
-    \    point_circle.center = P(2, 0);\n    point_circle.radius = 0;\n    points\
-    \ = circle_ray_intersections(point_circle, inside);\n    assert(points.size()\
-    \ == 1);\n    assert(close(points[0].x, 2));\n}\n\nvoid test_reflection() {\n\
-    \    Circle<long long> circle;\n    circle.center = P(0, 0);\n    circle.radius\
-    \ = 5;\n\n    Ray<long long> vertical;\n    vertical.origin = P(0, 10);\n    vertical.through\
-    \ = P(0, 5);\n    Ray<long double> vertical_out =\n        reflected_ray(vertical,\
-    \ P(0, 5), circle);\n    assert(close(vertical_out.origin.x, 0));\n    assert(close(vertical_out.origin.y,\
-    \ 5));\n    assert(close(vertical_out.through.x, 0));\n    assert(close(vertical_out.through.y,\
-    \ 10));\n\n    Ray<long long> oblique;\n    oblique.origin = P(-2, 7);\n    oblique.through\
-    \ = P(0, 5);\n    Ray<long double> oblique_out =\n        reflected_ray(oblique,\
-    \ P(0, 5), circle);\n    assert(close(oblique_out.through.x, 2));\n    assert(close(oblique_out.through.y,\
-    \ 7));\n\n    Point<long double> incoming_direction =\n        Point<long double>(oblique.through)\
-    \ -\n        Point<long double>(oblique.origin);\n    Point<long double> outgoing_direction\
-    \ =\n        oblique_out.through - oblique_out.origin;\n    assert(close(norm(incoming_direction),\
-    \ norm(outgoing_direction)));\n}\n\nvoid test_randomized_against_lines() {\n \
-    \   std::uint64_t state = 0x987654321abcdefULL;\n    auto random = [&state]()\
-    \ {\n        state ^= state << 7;\n        state ^= state >> 9;\n        return\
-    \ state;\n    };\n\n    for (int trial = 0; trial < 10000; ++trial) {\n      \
-    \  Circle<long double> circle;\n        circle.center = Point<long double>(\n\
-    \            static_cast<long double>(\n                static_cast<long long>(random()\
-    \ % 21) - 10\n            ),\n            static_cast<long double>(\n        \
-    \        static_cast<long long>(random() % 21) - 10\n            )\n        );\n\
-    \        circle.radius = static_cast<long double>(random() % 8);\n\n        Ray<long\
-    \ double> ray;\n        ray.origin = Point<long double>(\n            static_cast<long\
-    \ double>(\n                static_cast<long long>(random() % 31) - 15\n     \
-    \       ),\n            static_cast<long double>(\n                static_cast<long\
-    \ long>(random() % 31) - 15\n            )\n        );\n        do {\n       \
-    \     ray.through = Point<long double>(\n                static_cast<long double>(\n\
-    \                    static_cast<long long>(random() % 31) - 15\n            \
-    \    ),\n                static_cast<long double>(\n                    static_cast<long\
-    \ long>(random() % 31) - 15\n                )\n            );\n        } while\
-    \ (ray.origin == ray.through);\n\n        Line<long double> line{ray.origin, ray.through};\n\
-    \        auto line_points = circle_line_intersections(circle, line);\n       \
-    \ Point<long double> direction = ray.through - ray.origin;\n        std::vector<Point<long\
-    \ double>> expected;\n        for (const Point<long double>& point : line_points)\
-    \ {\n            if (dot(point - ray.origin, direction) >= -1e-10L) {\n      \
-    \          expected.push_back(point);\n            }\n        }\n        std::sort(\n\
-    \            expected.begin(),\n            expected.end(),\n            [&](const\
-    \ auto& first, const auto& second) {\n                return dot(first - ray.origin,\
-    \ direction) <\n                       dot(second - ray.origin, direction);\n\
-    \            }\n        );\n\n        auto actual = circle_ray_intersections(circle,\
-    \ ray);\n        assert(actual.size() == expected.size());\n        for (std::size_t\
-    \ index = 0; index < actual.size(); ++index) {\n            assert(close(actual[index].x,\
-    \ expected[index].x));\n            assert(close(actual[index].y, expected[index].y));\n\
-    \        }\n    }\n}\n\n}  // namespace\n\nint main() {\n    m1une::utilities::FastInput\
-    \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n\n    test_intersections();\n\
-    \    test_reflection();\n    test_randomized_against_lines();\n\n    long long\
-    \ a, b;\n    fast_input >> a >> b;\n    fast_output << a + b << '\\n';\n}\n"
+    \ utilities\n}  // namespace m1une\n\n\n#line 12 \"verify/geometry/perpendicular_bisector.test.cpp\"\
+    \n\nnamespace {\n\nusing namespace m1une::geometry;\nusing IntegerPoint = Point<long\
+    \ long>;\n\nusing IntegerBisectorResult = decltype(\n    perpendicular_bisector(IntegerPoint(0,\
+    \ 0), IntegerPoint(1, 1))\n);\nstatic_assert(std::same_as<IntegerBisectorResult,\
+    \ Line<long long>>);\nconstexpr Line<int> constexpr_bisector =\n    perpendicular_bisector(Point<int>(0,\
+    \ 0), Point<int>(2, 0));\nstatic_assert(constexpr_bisector.a == Point<int>(1,\
+    \ 0));\nstatic_assert(constexpr_bisector.b == Point<int>(1, 1));\n\nbool close(long\
+    \ double first, long double second) {\n    return std::fabs(first - second) <=\
+    \ 1e-12L;\n}\n\nvoid check_floating_bisector(\n    const IntegerPoint& integer_first,\n\
+    \    const IntegerPoint& integer_second\n) {\n    Point<long double> first(integer_first);\n\
+    \    Point<long double> second(integer_second);\n    Line<long double> bisector\
+    \ = perpendicular_bisector(first, second);\n    Point<long double> expected_midpoint(\n\
+    \        std::midpoint(first.x, second.x),\n        std::midpoint(first.y, second.y)\n\
+    \    );\n\n    assert(close(bisector.a.x, expected_midpoint.x));\n    assert(close(bisector.a.y,\
+    \ expected_midpoint.y));\n    assert(close(dot(second - first, bisector.b - bisector.a),\
+    \ 0));\n    assert(close(\n        distance2(bisector.a, first),\n        distance2(bisector.a,\
+    \ second)\n    ));\n    assert(close(\n        distance2(bisector.b, first),\n\
+    \        distance2(bisector.b, second)\n    ));\n}\n\nvoid check_integral_bisector(\n\
+    \    const IntegerPoint& first,\n    const IntegerPoint& second\n) {\n    Line<long\
+    \ long> bisector = perpendicular_bisector(first, second);\n    assert(bisector.a\
+    \ != bisector.b);\n    assert(distance2(bisector.a, first) == distance2(bisector.a,\
+    \ second));\n    assert(distance2(bisector.b, first) == distance2(bisector.b,\
+    \ second));\n\n    Line<long long> original;\n    original.a = first;\n    original.b\
+    \ = second;\n    assert(orthogonal(original, bisector));\n}\n\nbool has_lattice_point(\n\
+    \    const IntegerPoint& first,\n    const IntegerPoint& second\n) {\n    long\
+    \ long difference_x = second.x - first.x;\n    long long difference_y = second.y\
+    \ - first.y;\n    long long divisor = 2 * std::gcd(\n        std::abs(difference_x),\n\
+    \        std::abs(difference_y)\n    );\n    long long right_side =\n        second.x\
+    \ * second.x + second.y * second.y -\n        first.x * first.x - first.y * first.y;\n\
+    \    return right_side % divisor == 0;\n}\n\nvoid test_fixed() {\n    check_floating_bisector(IntegerPoint(0,\
+    \ 0), IntegerPoint(4, 0));\n    check_floating_bisector(IntegerPoint(1, 1), IntegerPoint(4,\
+    \ 5));\n    check_floating_bisector(IntegerPoint(-7, 3), IntegerPoint(2, -8));\n\
+    \n    check_integral_bisector(IntegerPoint(0, 0), IntegerPoint(4, 0));\n    check_integral_bisector(IntegerPoint(0,\
+    \ 0), IntegerPoint(1, 1));\n    check_integral_bisector(IntegerPoint(-7, 3), IntegerPoint(2,\
+    \ -8));\n\n    Line<long long> diagonal =\n        perpendicular_bisector(IntegerPoint(0,\
+    \ 0), IntegerPoint(1, 1));\n    assert(diagonal.a == IntegerPoint(1, 0));\n  \
+    \  assert(diagonal.b == IntegerPoint(0, 1));\n\n    Line<long long> horizontal\
+    \ =\n        perpendicular_bisector(IntegerPoint(0, -3), IntegerPoint(0, 5));\n\
+    \    assert(horizontal.a == IntegerPoint(0, 1));\n    assert(horizontal.b.y ==\
+    \ 1);\n\n    int int_minimum = std::numeric_limits<int>::lowest();\n    int int_maximum\
+    \ = std::numeric_limits<int>::max();\n    Line<int> near_upper = perpendicular_bisector(\n\
+    \        Point<int>(0, int_maximum),\n        Point<int>(2, int_maximum)\n   \
+    \ );\n    assert(near_upper.a == Point<int>(1, int_maximum - 1));\n    assert(near_upper.b\
+    \ == Point<int>(1, int_maximum));\n\n    Line<int> near_left = perpendicular_bisector(\n\
+    \        Point<int>(int_minimum, 0),\n        Point<int>(int_minimum, 2)\n   \
+    \ );\n    assert(near_left.a == Point<int>(int_minimum + 1, 1));\n    assert(near_left.b\
+    \ == Point<int>(int_minimum, 1));\n\n    unsigned unsigned_maximum = std::numeric_limits<unsigned>::max();\n\
+    \    Line<unsigned> unsigned_upper = perpendicular_bisector(\n        Point<unsigned>(0,\
+    \ unsigned_maximum),\n        Point<unsigned>(2, unsigned_maximum)\n    );\n \
+    \   assert(unsigned_upper.a == Point<unsigned>(1, unsigned_maximum - 1));\n  \
+    \  assert(unsigned_upper.b == Point<unsigned>(1, unsigned_maximum));\n}\n\nvoid\
+    \ test_randomized() {\n    std::uint64_t state = 0x5b8d9f1be2220cbaULL;\n    auto\
+    \ random = [&state]() {\n        state ^= state << 7;\n        state ^= state\
+    \ >> 9;\n        return state;\n    };\n\n    int integral_cases = 0;\n    for\
+    \ (int trial = 0; trial < 10000; ++trial) {\n        IntegerPoint first(\n   \
+    \         static_cast<long long>(random() % 2001) - 1000,\n            static_cast<long\
+    \ long>(random() % 2001) - 1000\n        );\n        IntegerPoint second;\n  \
+    \      do {\n            second = IntegerPoint(\n                static_cast<long\
+    \ long>(random() % 2001) - 1000,\n                static_cast<long long>(random()\
+    \ % 2001) - 1000\n            );\n        } while (first == second);\n\n     \
+    \   check_floating_bisector(first, second);\n        if (has_lattice_point(first,\
+    \ second)) {\n            check_integral_bisector(first, second);\n          \
+    \  ++integral_cases;\n        }\n    }\n    assert(integral_cases > 1000);\n}\n\
+    \n}  // namespace\n\nint main() {\n    m1une::utilities::FastInput fast_input;\n\
+    \    m1une::utilities::FastOutput fast_output;\n\n    test_fixed();\n    test_randomized();\n\
+    \n    using namespace m1une::geometry;\n    int q;\n    fast_input >> q;\n   \
+    \ while (q--) {\n        Line<long double> first;\n        Line<long double> second;\n\
+    \        fast_input >> first.a.x >> first.a.y >> first.b.x >> first.b.y;\n   \
+    \     fast_input >> second.a.x >> second.a.y >> second.b.x >> second.b.y;\n\n\
+    \        Line<long double> bisector =\n            perpendicular_bisector(first.a,\
+    \ first.b);\n        if (orthogonal(bisector, second)) {\n            fast_output\
+    \ << 2 << '\\n';\n        } else if (parallel(bisector, second)) {\n         \
+    \   fast_output << 1 << '\\n';\n        } else {\n            fast_output << 0\
+    \ << '\\n';\n        }\n    }\n}\n"
+  code: "#define PROBLEM \"https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_2_A\"\
+    \n\n#include \"../../geometry/perpendicular_bisector.hpp\"\n\n#include <cassert>\n\
+    #include <cmath>\n#include <concepts>\n#include <cstdint>\n#include <limits>\n\
+    #include <numeric>\n#include \"../../utilities/fast_io.hpp\"\n\nnamespace {\n\n\
+    using namespace m1une::geometry;\nusing IntegerPoint = Point<long long>;\n\nusing\
+    \ IntegerBisectorResult = decltype(\n    perpendicular_bisector(IntegerPoint(0,\
+    \ 0), IntegerPoint(1, 1))\n);\nstatic_assert(std::same_as<IntegerBisectorResult,\
+    \ Line<long long>>);\nconstexpr Line<int> constexpr_bisector =\n    perpendicular_bisector(Point<int>(0,\
+    \ 0), Point<int>(2, 0));\nstatic_assert(constexpr_bisector.a == Point<int>(1,\
+    \ 0));\nstatic_assert(constexpr_bisector.b == Point<int>(1, 1));\n\nbool close(long\
+    \ double first, long double second) {\n    return std::fabs(first - second) <=\
+    \ 1e-12L;\n}\n\nvoid check_floating_bisector(\n    const IntegerPoint& integer_first,\n\
+    \    const IntegerPoint& integer_second\n) {\n    Point<long double> first(integer_first);\n\
+    \    Point<long double> second(integer_second);\n    Line<long double> bisector\
+    \ = perpendicular_bisector(first, second);\n    Point<long double> expected_midpoint(\n\
+    \        std::midpoint(first.x, second.x),\n        std::midpoint(first.y, second.y)\n\
+    \    );\n\n    assert(close(bisector.a.x, expected_midpoint.x));\n    assert(close(bisector.a.y,\
+    \ expected_midpoint.y));\n    assert(close(dot(second - first, bisector.b - bisector.a),\
+    \ 0));\n    assert(close(\n        distance2(bisector.a, first),\n        distance2(bisector.a,\
+    \ second)\n    ));\n    assert(close(\n        distance2(bisector.b, first),\n\
+    \        distance2(bisector.b, second)\n    ));\n}\n\nvoid check_integral_bisector(\n\
+    \    const IntegerPoint& first,\n    const IntegerPoint& second\n) {\n    Line<long\
+    \ long> bisector = perpendicular_bisector(first, second);\n    assert(bisector.a\
+    \ != bisector.b);\n    assert(distance2(bisector.a, first) == distance2(bisector.a,\
+    \ second));\n    assert(distance2(bisector.b, first) == distance2(bisector.b,\
+    \ second));\n\n    Line<long long> original;\n    original.a = first;\n    original.b\
+    \ = second;\n    assert(orthogonal(original, bisector));\n}\n\nbool has_lattice_point(\n\
+    \    const IntegerPoint& first,\n    const IntegerPoint& second\n) {\n    long\
+    \ long difference_x = second.x - first.x;\n    long long difference_y = second.y\
+    \ - first.y;\n    long long divisor = 2 * std::gcd(\n        std::abs(difference_x),\n\
+    \        std::abs(difference_y)\n    );\n    long long right_side =\n        second.x\
+    \ * second.x + second.y * second.y -\n        first.x * first.x - first.y * first.y;\n\
+    \    return right_side % divisor == 0;\n}\n\nvoid test_fixed() {\n    check_floating_bisector(IntegerPoint(0,\
+    \ 0), IntegerPoint(4, 0));\n    check_floating_bisector(IntegerPoint(1, 1), IntegerPoint(4,\
+    \ 5));\n    check_floating_bisector(IntegerPoint(-7, 3), IntegerPoint(2, -8));\n\
+    \n    check_integral_bisector(IntegerPoint(0, 0), IntegerPoint(4, 0));\n    check_integral_bisector(IntegerPoint(0,\
+    \ 0), IntegerPoint(1, 1));\n    check_integral_bisector(IntegerPoint(-7, 3), IntegerPoint(2,\
+    \ -8));\n\n    Line<long long> diagonal =\n        perpendicular_bisector(IntegerPoint(0,\
+    \ 0), IntegerPoint(1, 1));\n    assert(diagonal.a == IntegerPoint(1, 0));\n  \
+    \  assert(diagonal.b == IntegerPoint(0, 1));\n\n    Line<long long> horizontal\
+    \ =\n        perpendicular_bisector(IntegerPoint(0, -3), IntegerPoint(0, 5));\n\
+    \    assert(horizontal.a == IntegerPoint(0, 1));\n    assert(horizontal.b.y ==\
+    \ 1);\n\n    int int_minimum = std::numeric_limits<int>::lowest();\n    int int_maximum\
+    \ = std::numeric_limits<int>::max();\n    Line<int> near_upper = perpendicular_bisector(\n\
+    \        Point<int>(0, int_maximum),\n        Point<int>(2, int_maximum)\n   \
+    \ );\n    assert(near_upper.a == Point<int>(1, int_maximum - 1));\n    assert(near_upper.b\
+    \ == Point<int>(1, int_maximum));\n\n    Line<int> near_left = perpendicular_bisector(\n\
+    \        Point<int>(int_minimum, 0),\n        Point<int>(int_minimum, 2)\n   \
+    \ );\n    assert(near_left.a == Point<int>(int_minimum + 1, 1));\n    assert(near_left.b\
+    \ == Point<int>(int_minimum, 1));\n\n    unsigned unsigned_maximum = std::numeric_limits<unsigned>::max();\n\
+    \    Line<unsigned> unsigned_upper = perpendicular_bisector(\n        Point<unsigned>(0,\
+    \ unsigned_maximum),\n        Point<unsigned>(2, unsigned_maximum)\n    );\n \
+    \   assert(unsigned_upper.a == Point<unsigned>(1, unsigned_maximum - 1));\n  \
+    \  assert(unsigned_upper.b == Point<unsigned>(1, unsigned_maximum));\n}\n\nvoid\
+    \ test_randomized() {\n    std::uint64_t state = 0x5b8d9f1be2220cbaULL;\n    auto\
+    \ random = [&state]() {\n        state ^= state << 7;\n        state ^= state\
+    \ >> 9;\n        return state;\n    };\n\n    int integral_cases = 0;\n    for\
+    \ (int trial = 0; trial < 10000; ++trial) {\n        IntegerPoint first(\n   \
+    \         static_cast<long long>(random() % 2001) - 1000,\n            static_cast<long\
+    \ long>(random() % 2001) - 1000\n        );\n        IntegerPoint second;\n  \
+    \      do {\n            second = IntegerPoint(\n                static_cast<long\
+    \ long>(random() % 2001) - 1000,\n                static_cast<long long>(random()\
+    \ % 2001) - 1000\n            );\n        } while (first == second);\n\n     \
+    \   check_floating_bisector(first, second);\n        if (has_lattice_point(first,\
+    \ second)) {\n            check_integral_bisector(first, second);\n          \
+    \  ++integral_cases;\n        }\n    }\n    assert(integral_cases > 1000);\n}\n\
+    \n}  // namespace\n\nint main() {\n    m1une::utilities::FastInput fast_input;\n\
+    \    m1une::utilities::FastOutput fast_output;\n\n    test_fixed();\n    test_randomized();\n\
+    \n    using namespace m1une::geometry;\n    int q;\n    fast_input >> q;\n   \
+    \ while (q--) {\n        Line<long double> first;\n        Line<long double> second;\n\
+    \        fast_input >> first.a.x >> first.a.y >> first.b.x >> first.b.y;\n   \
+    \     fast_input >> second.a.x >> second.a.y >> second.b.x >> second.b.y;\n\n\
+    \        Line<long double> bisector =\n            perpendicular_bisector(first.a,\
+    \ first.b);\n        if (orthogonal(bisector, second)) {\n            fast_output\
+    \ << 2 << '\\n';\n        } else if (parallel(bisector, second)) {\n         \
+    \   fast_output << 1 << '\\n';\n        } else {\n            fast_output << 0\
+    \ << '\\n';\n        }\n    }\n}\n"
   dependsOn:
-  - geometry/circle.hpp
-  - geometry/ray.hpp
+  - geometry/perpendicular_bisector.hpp
   - geometry/line.hpp
   - geometry/point.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
-  path: verify/geometry/circle_ray.test.cpp
+  path: verify/geometry/perpendicular_bisector.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-07-19 00:22:56+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/geometry/circle_ray.test.cpp
+documentation_of: verify/geometry/perpendicular_bisector.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/geometry/circle_ray.test.cpp
-- /verify/verify/geometry/circle_ray.test.cpp.html
-title: verify/geometry/circle_ray.test.cpp
+- /verify/verify/geometry/perpendicular_bisector.test.cpp
+- /verify/verify/geometry/perpendicular_bisector.test.cpp.html
+title: verify/geometry/perpendicular_bisector.test.cpp
 ---

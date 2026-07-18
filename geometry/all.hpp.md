@@ -41,6 +41,9 @@ data:
     path: geometry/minimum_enclosing_circle.hpp
     title: Minimum Enclosing Circle
   - icon: ':heavy_check_mark:'
+    path: geometry/perpendicular_bisector.hpp
+    title: Perpendicular Bisector
+  - icon: ':heavy_check_mark:'
     path: geometry/point.hpp
     title: 2D Point and Predicates
   - icon: ':heavy_check_mark:'
@@ -115,6 +118,8 @@ data:
 
     #include "minimum_enclosing_circle.hpp"
 
+    #include "perpendicular_bisector.hpp"
+
     #include "point.hpp"
 
     #include "polygon.hpp"
@@ -147,12 +152,13 @@ data:
   - math/modint.hpp
   - geometry/manhattan_mst.hpp
   - geometry/minimum_enclosing_circle.hpp
+  - geometry/perpendicular_bisector.hpp
   - geometry/polygon.hpp
   - geometry/rectangle_union_area.hpp
   isVerificationFile: false
   path: geometry/all.hpp
   requiredBy: []
-  timestamp: '2026-07-18 20:24:45+09:00'
+  timestamp: '2026-07-19 00:22:56+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp
@@ -181,6 +187,7 @@ title: Geometry Bundle
 | `geometry/manhattan_mst.hpp` | Manhattan minimum spanning tree for integral points in $O(N\log N)$. |
 | `geometry/minimum_enclosing_circle.hpp` | Randomized linear-time minimum enclosing circle with support indices. |
 | `geometry/line.hpp` | Lines, segments, projection, intersection, and distances. |
+| `geometry/perpendicular_bisector.hpp` | Floating-point and lattice-point perpendicular bisectors of two distinct points. |
 | `geometry/ray.hpp` | Rays, containment, projection, intersections, and distances with other linear objects. |
 | `geometry/rectangle_union_area.hpp` | Exact union area of axis-aligned rectangles in $O(N\log N)$. |
 | `geometry/polygon.hpp` | Area, centroids, triangulation, containment, ray queries, intersection, clipping, and Minkowski sums. |

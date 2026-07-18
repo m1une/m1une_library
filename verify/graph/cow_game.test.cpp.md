@@ -7397,10 +7397,10 @@ data:
     \            TwoEdgeConnectedBridge{first_component, second_component, edge_id});\n\
     \    }\n    return result;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\
     \n\n#line 32 \"graph/undirected.hpp\"\n\n\n#line 15 \"graph/all.hpp\"\n\n\n#line\
-    \ 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 5 \"utilities/fast_io.hpp\"\n#include\
-    \ <cerrno>\n#include <charconv>\n#line 8 \"utilities/fast_io.hpp\"\n#include <cstdio>\n\
-    #include <cstdlib>\n#line 12 \"utilities/fast_io.hpp\"\n#include <iterator>\n\
-    #include <string>\n#include <sys/stat.h>\n#line 17 \"utilities/fast_io.hpp\"\n\
+    \ 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 6 \"utilities/fast_io.hpp\"\n#include\
+    \ <cerrno>\n#include <charconv>\n#line 9 \"utilities/fast_io.hpp\"\n#include <cstdio>\n\
+    #include <cstdlib>\n#line 13 \"utilities/fast_io.hpp\"\n#include <iterator>\n\
+    #include <string>\n#include <sys/stat.h>\n#line 18 \"utilities/fast_io.hpp\"\n\
     #include <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal\
     \ {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\n\
     struct is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T,\
@@ -7481,43 +7481,47 @@ data:
     \        return true;\n    }\n\n    bool read(char& value) {\n        if (!skip_spaces())\
     \ return false;\n        value = char(read_char_raw());\n        return true;\n\
     \    }\n\n    bool read(std::string& value) {\n        if (!skip_spaces()) return\
-    \ false;\n        value.clear();\n        int c = read_char_raw();\n        while\
-    \ (c != EOF && c > ' ') {\n            value.push_back(char(c));\n           \
-    \ c = read_char_raw();\n        }\n        return true;\n    }\n\n    bool read(bool&\
-    \ value) {\n        int x;\n        if (!read(x)) return false;\n        value\
-    \ = x != 0;\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
-    \        internal::is_integral_v<T>\n            && !std::is_same_v<std::remove_cv_t<T>,\
-    \ bool>\n            && !std::is_same_v<std::remove_cv_t<T>, char>,\n        bool\n\
-    \    >\n    read(T& value) {\n        if (_streaming) return read_integer_from_stream(value);\n\
-    \        if (!prepare_number()) return false;\n        int c = static_cast<unsigned\
-    \ char>(_buffer[_position++]);\n        while (c <= ' ') c = static_cast<unsigned\
-    \ char>(_buffer[_position++]);\n\n        bool negative = false;\n        if (c\
-    \ == '-') {\n            negative = true;\n            c = static_cast<unsigned\
-    \ char>(_buffer[_position++]);\n        }\n\n        if constexpr (internal::is_signed_v<T>)\
-    \ {\n            T result = 0;\n            while ('0' <= c && c <= '9') {\n \
-    \               const int first = c - '0';\n                const int second =\
-    \ static_cast<unsigned char>(_buffer[_position]) - '0';\n                if (0\
-    \ <= second && second <= 9) {\n                    result = negative ? result\
-    \ * 100 - (first * 10 + second)\n                                      : result\
-    \ * 100 + (first * 10 + second);\n                    ++_position;\n         \
-    \       } else {\n                    result = negative ? result * 10 - first\
-    \ : result * 10 + first;\n                }\n                c = static_cast<unsigned\
-    \ char>(_buffer[_position++]);\n            }\n            value = result;\n \
-    \       } else {\n            T result = 0;\n            while ('0' <= c && c\
-    \ <= '9') {\n                const unsigned first = unsigned(c - '0');\n     \
-    \           const int second = static_cast<unsigned char>(_buffer[_position])\
+    \ false;\n        value.clear();\n        while (true) {\n            const int\
+    \ begin = _position;\n            while (_position < _length &&\n            \
+    \       static_cast<unsigned char>(_buffer[_position]) > ' ') {\n            \
+    \    ++_position;\n            }\n            value.append(_buffer + begin, _position\
+    \ - begin);\n            if (_position < _length) {\n                ++_position;\n\
+    \                return true;\n            }\n            if (!refill()) return\
+    \ true;\n        }\n    }\n\n    bool read(bool& value) {\n        int x;\n  \
+    \      if (!read(x)) return false;\n        value = x != 0;\n        return true;\n\
+    \    }\n\n    template <class T>\n    std::enable_if_t<\n        internal::is_integral_v<T>\n\
+    \            && !std::is_same_v<std::remove_cv_t<T>, bool>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ char>,\n        bool\n    >\n    read(T& value) {\n        if (_streaming) return\
+    \ read_integer_from_stream(value);\n        if (!prepare_number()) return false;\n\
+    \        int c = static_cast<unsigned char>(_buffer[_position++]);\n        while\
+    \ (c <= ' ') c = static_cast<unsigned char>(_buffer[_position++]);\n\n       \
+    \ bool negative = false;\n        if (c == '-') {\n            negative = true;\n\
+    \            c = static_cast<unsigned char>(_buffer[_position++]);\n        }\n\
+    \n        if constexpr (internal::is_signed_v<T>) {\n            T result = 0;\n\
+    \            while ('0' <= c && c <= '9') {\n                const int first =\
+    \ c - '0';\n                const int second = static_cast<unsigned char>(_buffer[_position])\
     \ - '0';\n                if (0 <= second && second <= 9) {\n                \
-    \    result = result * 100 + T(first * 10 + unsigned(second));\n             \
-    \       ++_position;\n                } else {\n                    result = result\
-    \ * 10 + T(first);\n                }\n                c = static_cast<unsigned\
-    \ char>(_buffer[_position++]);\n            }\n            value = negative ?\
-    \ T(0) - result : result;\n        }\n        if (_position > _length) _position\
-    \ = _length;\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>,\
-    \ bool>\n    read(T& value) {\n        if (!skip_spaces()) return false;\n   \
-    \     int c = read_char_raw();\n        bool negative = false;\n        if (c\
-    \ == '-' || c == '+') {\n            negative = c == '-';\n            c = read_char_raw();\n\
-    \        }\n\n        long double result = 0;\n        while ('0' <= c && c <=\
-    \ '9') {\n            result = result * 10 + (c - '0');\n            c = read_char_raw();\n\
+    \    result = negative ? result * 100 - (first * 10 + second)\n              \
+    \                        : result * 100 + (first * 10 + second);\n           \
+    \         ++_position;\n                } else {\n                    result =\
+    \ negative ? result * 10 - first : result * 10 + first;\n                }\n \
+    \               c = static_cast<unsigned char>(_buffer[_position++]);\n      \
+    \      }\n            value = result;\n        } else {\n            T result\
+    \ = 0;\n            while ('0' <= c && c <= '9') {\n                const unsigned\
+    \ first = unsigned(c - '0');\n                const int second = static_cast<unsigned\
+    \ char>(_buffer[_position]) - '0';\n                if (0 <= second && second\
+    \ <= 9) {\n                    result = result * 100 + T(first * 10 + unsigned(second));\n\
+    \                    ++_position;\n                } else {\n                \
+    \    result = result * 10 + T(first);\n                }\n                c =\
+    \ static_cast<unsigned char>(_buffer[_position++]);\n            }\n         \
+    \   value = negative ? T(0) - result : result;\n        }\n        if (_position\
+    \ > _length) _position = _length;\n        return true;\n    }\n\n    template\
+    \ <class T>\n    std::enable_if_t<std::is_floating_point_v<T>, bool>\n    read(T&\
+    \ value) {\n        if (!skip_spaces()) return false;\n        int c = read_char_raw();\n\
+    \        bool negative = false;\n        if (c == '-' || c == '+') {\n       \
+    \     negative = c == '-';\n            c = read_char_raw();\n        }\n\n  \
+    \      long double result = 0;\n        while ('0' <= c && c <= '9') {\n     \
+    \       result = result * 10 + (c - '0');\n            c = read_char_raw();\n\
     \        }\n        if (c == '.') {\n            long double place = 0.1L;\n \
     \           c = read_char_raw();\n            while ('0' <= c && c <= '9') {\n\
     \                result += (c - '0') * place;\n                place *= 0.1L;\n\
@@ -7574,9 +7578,14 @@ data:
     \ c) {\n        if (_position == buffer_size) flush();\n        _buffer[_position++]\
     \ = c;\n    }\n\n    void write(const char* s) {\n        while (*s != '\\0')\
     \ write_char(*s++);\n    }\n\n    void write(const std::string& s) {\n       \
-    \ for (char c : s) write_char(c);\n    }\n\n    void write(char c) {\n       \
-    \ write_char(c);\n    }\n\n    void write(bool value) {\n        write_char(value\
-    \ ? '1' : '0');\n    }\n\n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>>\n\
+    \ std::size_t position = 0;\n        while (position < s.size()) {\n         \
+    \   if (_position == buffer_size) flush();\n            const std::size_t copied\
+    \ =\n                std::min<std::size_t>(buffer_size - _position, s.size() -\
+    \ position);\n            std::memcpy(_buffer + _position, s.data() + position,\
+    \ copied);\n            _position += int(copied);\n            position += copied;\n\
+    \        }\n    }\n\n    void write(char c) {\n        write_char(c);\n    }\n\
+    \n    void write(bool value) {\n        write_char(value ? '1' : '0');\n    }\n\
+    \n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>>\n\
     \    write(T value) {\n        char digits[128];\n        auto [end, error] =\
     \ std::to_chars(\n            digits,\n            digits + sizeof(digits),\n\
     \            value,\n            _float_format,\n            _precision\n    \
@@ -7924,7 +7933,7 @@ data:
   isVerificationFile: true
   path: verify/graph/cow_game.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 19:37:21+09:00'
+  timestamp: '2026-07-18 22:54:37+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/cow_game.test.cpp

@@ -534,6 +534,9 @@ data:
       path: geometry/minimum_enclosing_circle.hpp
       title: Minimum Enclosing Circle
     - icon: ':heavy_check_mark:'
+      path: geometry/perpendicular_bisector.hpp
+      title: Perpendicular Bisector
+    - icon: ':heavy_check_mark:'
       path: geometry/point.hpp
       title: 2D Point and Predicates
     - icon: ':heavy_check_mark:'
@@ -1627,6 +1630,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/geometry/minimum_enclosing_circle.test.cpp
       title: verify/geometry/minimum_enclosing_circle.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/geometry/perpendicular_bisector.test.cpp
+      title: verify/geometry/perpendicular_bisector.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/geometry/point_in_polygon.test.cpp
       title: verify/geometry/point_in_polygon.test.cpp

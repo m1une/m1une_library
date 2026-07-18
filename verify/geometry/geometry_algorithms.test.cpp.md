@@ -44,6 +44,9 @@ data:
     path: geometry/minimum_enclosing_circle.hpp
     title: Minimum Enclosing Circle
   - icon: ':heavy_check_mark:'
+    path: geometry/perpendicular_bisector.hpp
+    title: Perpendicular Bisector
+  - icon: ':heavy_check_mark:'
     path: geometry/point.hpp
     title: 2D Point and Predicates
   - icon: ':heavy_check_mark:'
@@ -189,13 +192,14 @@ data:
   - math/modint.hpp
   - geometry/manhattan_mst.hpp
   - geometry/minimum_enclosing_circle.hpp
+  - geometry/perpendicular_bisector.hpp
   - geometry/polygon.hpp
   - geometry/rectangle_union_area.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
   path: verify/geometry/geometry_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 20:24:45+09:00'
+  timestamp: '2026-07-19 00:22:56+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/geometry_algorithms.test.cpp

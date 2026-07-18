@@ -34,16 +34,16 @@ data:
     - https://judge.yosupo.jp/problem/aplusb
   bundledCode: "#line 1 \"verify/optimization/simplex.test.cpp\"\n#define PROBLEM\
     \ \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <cassert>\n#line 1 \"\
-    utilities/fast_io.hpp\"\n\n\n\n#include <array>\n#include <cerrno>\n#include <charconv>\n\
-    #include <cstddef>\n#include <cstdio>\n#include <cstdlib>\n#include <cstdint>\n\
-    #include <cstring>\n#include <iterator>\n#include <string>\n#include <sys/stat.h>\n\
-    #include <type_traits>\n#include <utility>\n#include <unistd.h>\n\nnamespace m1une\
-    \ {\nnamespace utilities {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\n\
-    template <class T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate\
-    \ <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
-    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
-    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
-    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    utilities/fast_io.hpp\"\n\n\n\n#include <algorithm>\n#include <array>\n#include\
+    \ <cerrno>\n#include <charconv>\n#include <cstddef>\n#include <cstdio>\n#include\
+    \ <cstdlib>\n#include <cstdint>\n#include <cstring>\n#include <iterator>\n#include\
+    \ <string>\n#include <sys/stat.h>\n#include <type_traits>\n#include <utility>\n\
+    #include <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal\
+    \ {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\n\
+    struct is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T,\
+    \ std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
+    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
+    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
     \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
     \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
@@ -118,43 +118,47 @@ data:
     \        return true;\n    }\n\n    bool read(char& value) {\n        if (!skip_spaces())\
     \ return false;\n        value = char(read_char_raw());\n        return true;\n\
     \    }\n\n    bool read(std::string& value) {\n        if (!skip_spaces()) return\
-    \ false;\n        value.clear();\n        int c = read_char_raw();\n        while\
-    \ (c != EOF && c > ' ') {\n            value.push_back(char(c));\n           \
-    \ c = read_char_raw();\n        }\n        return true;\n    }\n\n    bool read(bool&\
-    \ value) {\n        int x;\n        if (!read(x)) return false;\n        value\
-    \ = x != 0;\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
-    \        internal::is_integral_v<T>\n            && !std::is_same_v<std::remove_cv_t<T>,\
-    \ bool>\n            && !std::is_same_v<std::remove_cv_t<T>, char>,\n        bool\n\
-    \    >\n    read(T& value) {\n        if (_streaming) return read_integer_from_stream(value);\n\
-    \        if (!prepare_number()) return false;\n        int c = static_cast<unsigned\
-    \ char>(_buffer[_position++]);\n        while (c <= ' ') c = static_cast<unsigned\
-    \ char>(_buffer[_position++]);\n\n        bool negative = false;\n        if (c\
-    \ == '-') {\n            negative = true;\n            c = static_cast<unsigned\
-    \ char>(_buffer[_position++]);\n        }\n\n        if constexpr (internal::is_signed_v<T>)\
-    \ {\n            T result = 0;\n            while ('0' <= c && c <= '9') {\n \
-    \               const int first = c - '0';\n                const int second =\
-    \ static_cast<unsigned char>(_buffer[_position]) - '0';\n                if (0\
-    \ <= second && second <= 9) {\n                    result = negative ? result\
-    \ * 100 - (first * 10 + second)\n                                      : result\
-    \ * 100 + (first * 10 + second);\n                    ++_position;\n         \
-    \       } else {\n                    result = negative ? result * 10 - first\
-    \ : result * 10 + first;\n                }\n                c = static_cast<unsigned\
-    \ char>(_buffer[_position++]);\n            }\n            value = result;\n \
-    \       } else {\n            T result = 0;\n            while ('0' <= c && c\
-    \ <= '9') {\n                const unsigned first = unsigned(c - '0');\n     \
-    \           const int second = static_cast<unsigned char>(_buffer[_position])\
+    \ false;\n        value.clear();\n        while (true) {\n            const int\
+    \ begin = _position;\n            while (_position < _length &&\n            \
+    \       static_cast<unsigned char>(_buffer[_position]) > ' ') {\n            \
+    \    ++_position;\n            }\n            value.append(_buffer + begin, _position\
+    \ - begin);\n            if (_position < _length) {\n                ++_position;\n\
+    \                return true;\n            }\n            if (!refill()) return\
+    \ true;\n        }\n    }\n\n    bool read(bool& value) {\n        int x;\n  \
+    \      if (!read(x)) return false;\n        value = x != 0;\n        return true;\n\
+    \    }\n\n    template <class T>\n    std::enable_if_t<\n        internal::is_integral_v<T>\n\
+    \            && !std::is_same_v<std::remove_cv_t<T>, bool>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ char>,\n        bool\n    >\n    read(T& value) {\n        if (_streaming) return\
+    \ read_integer_from_stream(value);\n        if (!prepare_number()) return false;\n\
+    \        int c = static_cast<unsigned char>(_buffer[_position++]);\n        while\
+    \ (c <= ' ') c = static_cast<unsigned char>(_buffer[_position++]);\n\n       \
+    \ bool negative = false;\n        if (c == '-') {\n            negative = true;\n\
+    \            c = static_cast<unsigned char>(_buffer[_position++]);\n        }\n\
+    \n        if constexpr (internal::is_signed_v<T>) {\n            T result = 0;\n\
+    \            while ('0' <= c && c <= '9') {\n                const int first =\
+    \ c - '0';\n                const int second = static_cast<unsigned char>(_buffer[_position])\
     \ - '0';\n                if (0 <= second && second <= 9) {\n                \
-    \    result = result * 100 + T(first * 10 + unsigned(second));\n             \
-    \       ++_position;\n                } else {\n                    result = result\
-    \ * 10 + T(first);\n                }\n                c = static_cast<unsigned\
-    \ char>(_buffer[_position++]);\n            }\n            value = negative ?\
-    \ T(0) - result : result;\n        }\n        if (_position > _length) _position\
-    \ = _length;\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>,\
-    \ bool>\n    read(T& value) {\n        if (!skip_spaces()) return false;\n   \
-    \     int c = read_char_raw();\n        bool negative = false;\n        if (c\
-    \ == '-' || c == '+') {\n            negative = c == '-';\n            c = read_char_raw();\n\
-    \        }\n\n        long double result = 0;\n        while ('0' <= c && c <=\
-    \ '9') {\n            result = result * 10 + (c - '0');\n            c = read_char_raw();\n\
+    \    result = negative ? result * 100 - (first * 10 + second)\n              \
+    \                        : result * 100 + (first * 10 + second);\n           \
+    \         ++_position;\n                } else {\n                    result =\
+    \ negative ? result * 10 - first : result * 10 + first;\n                }\n \
+    \               c = static_cast<unsigned char>(_buffer[_position++]);\n      \
+    \      }\n            value = result;\n        } else {\n            T result\
+    \ = 0;\n            while ('0' <= c && c <= '9') {\n                const unsigned\
+    \ first = unsigned(c - '0');\n                const int second = static_cast<unsigned\
+    \ char>(_buffer[_position]) - '0';\n                if (0 <= second && second\
+    \ <= 9) {\n                    result = result * 100 + T(first * 10 + unsigned(second));\n\
+    \                    ++_position;\n                } else {\n                \
+    \    result = result * 10 + T(first);\n                }\n                c =\
+    \ static_cast<unsigned char>(_buffer[_position++]);\n            }\n         \
+    \   value = negative ? T(0) - result : result;\n        }\n        if (_position\
+    \ > _length) _position = _length;\n        return true;\n    }\n\n    template\
+    \ <class T>\n    std::enable_if_t<std::is_floating_point_v<T>, bool>\n    read(T&\
+    \ value) {\n        if (!skip_spaces()) return false;\n        int c = read_char_raw();\n\
+    \        bool negative = false;\n        if (c == '-' || c == '+') {\n       \
+    \     negative = c == '-';\n            c = read_char_raw();\n        }\n\n  \
+    \      long double result = 0;\n        while ('0' <= c && c <= '9') {\n     \
+    \       result = result * 10 + (c - '0');\n            c = read_char_raw();\n\
     \        }\n        if (c == '.') {\n            long double place = 0.1L;\n \
     \           c = read_char_raw();\n            while ('0' <= c && c <= '9') {\n\
     \                result += (c - '0') * place;\n                place *= 0.1L;\n\
@@ -211,9 +215,14 @@ data:
     \ c) {\n        if (_position == buffer_size) flush();\n        _buffer[_position++]\
     \ = c;\n    }\n\n    void write(const char* s) {\n        while (*s != '\\0')\
     \ write_char(*s++);\n    }\n\n    void write(const std::string& s) {\n       \
-    \ for (char c : s) write_char(c);\n    }\n\n    void write(char c) {\n       \
-    \ write_char(c);\n    }\n\n    void write(bool value) {\n        write_char(value\
-    \ ? '1' : '0');\n    }\n\n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>>\n\
+    \ std::size_t position = 0;\n        while (position < s.size()) {\n         \
+    \   if (_position == buffer_size) flush();\n            const std::size_t copied\
+    \ =\n                std::min<std::size_t>(buffer_size - _position, s.size() -\
+    \ position);\n            std::memcpy(_buffer + _position, s.data() + position,\
+    \ copied);\n            _position += int(copied);\n            position += copied;\n\
+    \        }\n    }\n\n    void write(char c) {\n        write_char(c);\n    }\n\
+    \n    void write(bool value) {\n        write_char(value ? '1' : '0');\n    }\n\
+    \n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>>\n\
     \    write(T value) {\n        char digits[128];\n        auto [end, error] =\
     \ std::to_chars(\n            digits,\n            digits + sizeof(digits),\n\
     \            value,\n            _float_format,\n            _precision\n    \
@@ -268,54 +277,54 @@ data:
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
     \ utilities\n}  // namespace m1une\n\n\n#line 5 \"verify/optimization/simplex.test.cpp\"\
     \n#include <limits>\n#include <vector>\n\n#line 1 \"optimization/all.hpp\"\n\n\
-    \n\n#line 1 \"optimization/hungarian.hpp\"\n\n\n\n#include <algorithm>\n#line\
-    \ 9 \"optimization/hungarian.hpp\"\n\nnamespace m1une {\nnamespace opt {\n\ntemplate\
-    \ <class T>\nstruct HungarianResult {\n    T cost;\n    std::vector<int> row_to_col;\n\
-    \    std::vector<int> col_to_row;\n\n    int matching_size() const {\n       \
-    \ int result = 0;\n        for (int col : row_to_col) {\n            if (col !=\
-    \ -1) result++;\n        }\n        return result;\n    }\n\n    std::vector<std::pair<int,\
-    \ int>> matching() const {\n        std::vector<std::pair<int, int>> result;\n\
-    \        for (int row = 0; row < int(row_to_col.size()); row++) {\n          \
-    \  if (row_to_col[row] != -1) result.push_back({row, row_to_col[row]});\n    \
-    \    }\n        return result;\n    }\n};\n\nnamespace detail {\n\ntemplate <class\
-    \ T>\nT assignment_cost(const std::vector<std::vector<T>>& cost, const std::vector<int>&\
-    \ row_to_col) {\n    T result = T();\n    for (int row = 0; row < int(row_to_col.size());\
-    \ row++) {\n        if (row_to_col[row] != -1) result += cost[row][row_to_col[row]];\n\
-    \    }\n    return result;\n}\n\n}  // namespace detail\n\ntemplate <class T>\n\
-    HungarianResult<T> hungarian_min(const std::vector<std::vector<T>>& cost) {\n\
-    \    int row_count = int(cost.size());\n    int col_count = row_count == 0 ? 0\
-    \ : int(cost[0].size());\n    for (const auto& row : cost) assert(int(row.size())\
-    \ == col_count);\n\n    HungarianResult<T> result;\n    result.cost = T();\n \
-    \   result.row_to_col.assign(row_count, -1);\n    result.col_to_row.assign(col_count,\
-    \ -1);\n    if (row_count == 0 || col_count == 0) return result;\n\n    bool transposed\
-    \ = row_count > col_count;\n    int n = transposed ? col_count : row_count;\n\
-    \    int m = transposed ? row_count : col_count;\n    T inf = std::numeric_limits<T>::max()\
-    \ / T(4);\n\n    std::vector<T> u(n + 1, T()), v(m + 1, T()), minv(m + 1);\n \
-    \   std::vector<int> p(m + 1, 0), way(m + 1, 0);\n\n    auto value = [&](int i,\
-    \ int j) -> T {\n        return transposed ? cost[j][i] : cost[i][j];\n    };\n\
-    \n    for (int i = 1; i <= n; i++) {\n        p[0] = i;\n        int j0 = 0;\n\
-    \        std::fill(minv.begin(), minv.end(), inf);\n        std::vector<char>\
-    \ used(m + 1, false);\n\n        do {\n            used[j0] = true;\n        \
-    \    int i0 = p[j0];\n            int j1 = 0;\n            T delta = inf;\n\n\
-    \            for (int j = 1; j <= m; j++) {\n                if (used[j]) continue;\n\
-    \                T cur = value(i0 - 1, j - 1) - u[i0] - v[j];\n              \
-    \  if (cur < minv[j]) {\n                    minv[j] = cur;\n                \
-    \    way[j] = j0;\n                }\n                if (minv[j] < delta) {\n\
-    \                    delta = minv[j];\n                    j1 = j;\n         \
-    \       }\n            }\n\n            for (int j = 0; j <= m; j++) {\n     \
-    \           if (used[j]) {\n                    u[p[j]] += delta;\n          \
-    \          v[j] -= delta;\n                } else {\n                    minv[j]\
-    \ -= delta;\n                }\n            }\n            j0 = j1;\n        }\
-    \ while (p[j0] != 0);\n\n        do {\n            int j1 = way[j0];\n       \
-    \     p[j0] = p[j1];\n            j0 = j1;\n        } while (j0 != 0);\n    }\n\
-    \n    for (int j = 1; j <= m; j++) {\n        if (p[j] == 0) continue;\n     \
-    \   int i = p[j] - 1;\n        int matched = j - 1;\n        if (transposed) {\n\
-    \            int row = matched;\n            int col = i;\n            result.row_to_col[row]\
-    \ = col;\n            result.col_to_row[col] = row;\n        } else {\n      \
-    \      int row = i;\n            int col = matched;\n            result.row_to_col[row]\
-    \ = col;\n            result.col_to_row[col] = row;\n        }\n    }\n    result.cost\
-    \ = detail::assignment_cost(cost, result.row_to_col);\n    return result;\n}\n\
-    \ntemplate <class T>\nHungarianResult<T> hungarian_max(const std::vector<std::vector<T>>&\
+    \n\n#line 1 \"optimization/hungarian.hpp\"\n\n\n\n#line 9 \"optimization/hungarian.hpp\"\
+    \n\nnamespace m1une {\nnamespace opt {\n\ntemplate <class T>\nstruct HungarianResult\
+    \ {\n    T cost;\n    std::vector<int> row_to_col;\n    std::vector<int> col_to_row;\n\
+    \n    int matching_size() const {\n        int result = 0;\n        for (int col\
+    \ : row_to_col) {\n            if (col != -1) result++;\n        }\n        return\
+    \ result;\n    }\n\n    std::vector<std::pair<int, int>> matching() const {\n\
+    \        std::vector<std::pair<int, int>> result;\n        for (int row = 0; row\
+    \ < int(row_to_col.size()); row++) {\n            if (row_to_col[row] != -1) result.push_back({row,\
+    \ row_to_col[row]});\n        }\n        return result;\n    }\n};\n\nnamespace\
+    \ detail {\n\ntemplate <class T>\nT assignment_cost(const std::vector<std::vector<T>>&\
+    \ cost, const std::vector<int>& row_to_col) {\n    T result = T();\n    for (int\
+    \ row = 0; row < int(row_to_col.size()); row++) {\n        if (row_to_col[row]\
+    \ != -1) result += cost[row][row_to_col[row]];\n    }\n    return result;\n}\n\
+    \n}  // namespace detail\n\ntemplate <class T>\nHungarianResult<T> hungarian_min(const\
+    \ std::vector<std::vector<T>>& cost) {\n    int row_count = int(cost.size());\n\
+    \    int col_count = row_count == 0 ? 0 : int(cost[0].size());\n    for (const\
+    \ auto& row : cost) assert(int(row.size()) == col_count);\n\n    HungarianResult<T>\
+    \ result;\n    result.cost = T();\n    result.row_to_col.assign(row_count, -1);\n\
+    \    result.col_to_row.assign(col_count, -1);\n    if (row_count == 0 || col_count\
+    \ == 0) return result;\n\n    bool transposed = row_count > col_count;\n    int\
+    \ n = transposed ? col_count : row_count;\n    int m = transposed ? row_count\
+    \ : col_count;\n    T inf = std::numeric_limits<T>::max() / T(4);\n\n    std::vector<T>\
+    \ u(n + 1, T()), v(m + 1, T()), minv(m + 1);\n    std::vector<int> p(m + 1, 0),\
+    \ way(m + 1, 0);\n\n    auto value = [&](int i, int j) -> T {\n        return\
+    \ transposed ? cost[j][i] : cost[i][j];\n    };\n\n    for (int i = 1; i <= n;\
+    \ i++) {\n        p[0] = i;\n        int j0 = 0;\n        std::fill(minv.begin(),\
+    \ minv.end(), inf);\n        std::vector<char> used(m + 1, false);\n\n       \
+    \ do {\n            used[j0] = true;\n            int i0 = p[j0];\n          \
+    \  int j1 = 0;\n            T delta = inf;\n\n            for (int j = 1; j <=\
+    \ m; j++) {\n                if (used[j]) continue;\n                T cur = value(i0\
+    \ - 1, j - 1) - u[i0] - v[j];\n                if (cur < minv[j]) {\n        \
+    \            minv[j] = cur;\n                    way[j] = j0;\n              \
+    \  }\n                if (minv[j] < delta) {\n                    delta = minv[j];\n\
+    \                    j1 = j;\n                }\n            }\n\n           \
+    \ for (int j = 0; j <= m; j++) {\n                if (used[j]) {\n           \
+    \         u[p[j]] += delta;\n                    v[j] -= delta;\n            \
+    \    } else {\n                    minv[j] -= delta;\n                }\n    \
+    \        }\n            j0 = j1;\n        } while (p[j0] != 0);\n\n        do\
+    \ {\n            int j1 = way[j0];\n            p[j0] = p[j1];\n            j0\
+    \ = j1;\n        } while (j0 != 0);\n    }\n\n    for (int j = 1; j <= m; j++)\
+    \ {\n        if (p[j] == 0) continue;\n        int i = p[j] - 1;\n        int\
+    \ matched = j - 1;\n        if (transposed) {\n            int row = matched;\n\
+    \            int col = i;\n            result.row_to_col[row] = col;\n       \
+    \     result.col_to_row[col] = row;\n        } else {\n            int row = i;\n\
+    \            int col = matched;\n            result.row_to_col[row] = col;\n \
+    \           result.col_to_row[col] = row;\n        }\n    }\n    result.cost =\
+    \ detail::assignment_cost(cost, result.row_to_col);\n    return result;\n}\n\n\
+    template <class T>\nHungarianResult<T> hungarian_max(const std::vector<std::vector<T>>&\
     \ cost) {\n    std::vector<std::vector<T>> negated = cost;\n    for (auto& row\
     \ : negated) {\n        for (auto& x : row) x = -x;\n    }\n    auto result =\
     \ hungarian_min(negated);\n    result.cost = detail::assignment_cost(cost, result.row_to_col);\n\
@@ -1058,7 +1067,7 @@ data:
   isVerificationFile: true
   path: verify/optimization/simplex.test.cpp
   requiredBy: []
-  timestamp: '2026-07-17 22:34:46+09:00'
+  timestamp: '2026-07-18 22:54:37+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/optimization/simplex.test.cpp
