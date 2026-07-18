@@ -2,17 +2,26 @@
 #define M1UNE_UTILITIES_BIGINT_HPP 1
 
 #include <algorithm>
+#include <array>
 #include <bit>
 #include <cassert>
 #include <charconv>
 #include <cmath>
 #include <cstdint>
+#include <cstring>
 #include <iostream>
+#include <memory>
 #include <numbers>
 #include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
+
+#if (defined(__GNUC__) || defined(__clang__)) && \
+    (defined(__x86_64__) || defined(__i386__))
+#include <immintrin.h>
+#define M1UNE_BIGINT_HAS_X86_SIMD 1
+#endif
 
 #include "../math/fps/convolution.hpp"
 
@@ -83,6 +92,17 @@ struct BigInt {
 
     std::string to_string() const {
         if (a.empty()) return "0";
+        static const auto digit_quads = [] {
+            std::array<char, 40000> digits{};
+            for (int value = 0; value < 10000; ++value) {
+                int current = value;
+                for (int index = 3; index >= 0; --index) {
+                    digits[4 * value + index] = char('0' + current % 10);
+                    current /= 10;
+                }
+            }
+            return digits;
+        }();
         char leading[BASE_DIGITS];
         const std::to_chars_result converted =
             std::to_chars(leading, leading + BASE_DIGITS, a.back());
@@ -96,13 +116,14 @@ struct BigInt {
         std::copy(leading, converted.ptr, res.begin() + offset);
         offset += leading_size;
         for (int i = (int)a.size() - 2; i >= 0; --i) {
-            char block[BASE_DIGITS];
-            const std::to_chars_result block_converted =
-                std::to_chars(block, block + BASE_DIGITS, a[i]);
-            assert(block_converted.ec == std::errc());
-            const int block_size = int(block_converted.ptr - block);
-            std::copy(block, block_converted.ptr,
-                      res.begin() + offset + BASE_DIGITS - block_size);
+            const unsigned value = unsigned(a[i]);
+            const unsigned leading_digit = value / 100000000;
+            const unsigned remaining = value - leading_digit * 100000000;
+            const unsigned middle = remaining / 10000;
+            const unsigned trailing = remaining - middle * 10000;
+            res[offset] = char('0' + leading_digit);
+            std::memcpy(res.data() + offset + 1, digit_quads.data() + 4 * middle, 4);
+            std::memcpy(res.data() + offset + 5, digit_quads.data() + 4 * trailing, 4);
             offset += BASE_DIGITS;
         }
         return res;
@@ -278,9 +299,101 @@ struct BigInt {
         return roots;
     }
 
-    static void fft(std::vector<FftComplex>& values) {
-        const int size = int(values.size());
+#ifdef M1UNE_BIGINT_HAS_X86_SIMD
+    __attribute__((target("avx2,fma"), always_inline)) static inline __m256d
+    multiply_complex(__m256d value, __m256d root) {
+        const __m256d real = _mm256_movedup_pd(value);
+        const __m256d imaginary = _mm256_permute_pd(value, 0xf);
+        const __m256d swapped_root = _mm256_permute_pd(root, 0x5);
+        return _mm256_fmaddsub_pd(real, root,
+                                  _mm256_mul_pd(imaginary, swapped_root));
+    }
+
+    __attribute__((target("avx2,fma"), hot)) static void fft_simd(
+        FftComplex* values, int size) {
+        const std::vector<FftComplex>& roots = fft_roots(size);
+        for (int length = size / 2; length > 0; length /= 2) {
+            for (int offset = 0; offset < size; offset += 2 * length) {
+                int i = 0;
+                for (; i + 1 < length; i += 2) {
+                    const __m256d even = _mm256_loadu_pd(reinterpret_cast<const double*>(
+                        values + offset + i));
+                    const __m256d odd = _mm256_loadu_pd(reinterpret_cast<const double*>(
+                        values + offset + i + length));
+                    const __m256d root = _mm256_loadu_pd(reinterpret_cast<const double*>(
+                        roots.data() + length + i));
+                    _mm256_storeu_pd(reinterpret_cast<double*>(values + offset + i),
+                                     _mm256_add_pd(even, odd));
+                    _mm256_storeu_pd(
+                        reinterpret_cast<double*>(values + offset + i + length),
+                        multiply_complex(_mm256_sub_pd(even, odd), root));
+                }
+                for (; i < length; ++i) {
+                    const FftComplex even = values[offset + i];
+                    const FftComplex odd = values[offset + i + length];
+                    values[offset + i] = even + odd;
+                    values[offset + i + length] =
+                        (even - odd) * roots[length + i];
+                }
+            }
+        }
+    }
+
+    __attribute__((target("avx2,fma"), hot)) static void inverse_fft_simd(
+        FftComplex* values, int size) {
+        const std::vector<FftComplex>& roots = fft_roots(size);
+        const __m256d conjugate_mask = _mm256_setr_pd(0.0, -0.0, 0.0, -0.0);
+        for (int length = 1; length < size; length *= 2) {
+            for (int offset = 0; offset < size; offset += 2 * length) {
+                int i = 0;
+                for (; i + 1 < length; i += 2) {
+                    const __m256d even = _mm256_loadu_pd(reinterpret_cast<const double*>(
+                        values + offset + i));
+                    const __m256d value = _mm256_loadu_pd(reinterpret_cast<const double*>(
+                        values + offset + i + length));
+                    __m256d root = _mm256_loadu_pd(reinterpret_cast<const double*>(
+                        roots.data() + length + i));
+                    root = _mm256_xor_pd(root, conjugate_mask);
+                    const __m256d odd = multiply_complex(value, root);
+                    _mm256_storeu_pd(reinterpret_cast<double*>(values + offset + i),
+                                     _mm256_add_pd(even, odd));
+                    _mm256_storeu_pd(
+                        reinterpret_cast<double*>(values + offset + i + length),
+                        _mm256_sub_pd(even, odd));
+                }
+                for (; i < length; ++i) {
+                    const FftComplex even = values[offset + i];
+                    const FftComplex value = values[offset + i + length];
+                    const FftComplex root = roots[length + i];
+                    const FftComplex odd = {
+                        value.real * root.real + value.imaginary * root.imaginary,
+                        value.imaginary * root.real - value.real * root.imaginary};
+                    values[offset + i] = even + odd;
+                    values[offset + i + length] = even - odd;
+                }
+            }
+        }
+        const __m256d inverse_size = _mm256_set1_pd(1.0 / double(size));
+        int i = 0;
+        for (; i + 1 < size; i += 2) {
+            const __m256d value = _mm256_loadu_pd(
+                reinterpret_cast<const double*>(values + i));
+            _mm256_storeu_pd(reinterpret_cast<double*>(values + i),
+                             _mm256_mul_pd(value, inverse_size));
+        }
+        for (; i < size; ++i) {
+            values[i].real /= size;
+            values[i].imaginary /= size;
+        }
+    }
+#endif
+
+    static void fft(FftComplex* values, int size) {
         assert(size > 0 && (size & (size - 1)) == 0);
+#ifdef M1UNE_BIGINT_HAS_X86_SIMD
+        fft_simd(values, size);
+        return;
+#endif
         const std::vector<FftComplex>& roots = fft_roots(size);
 
         // Decimation in frequency leaves the spectrum bit-reversed. The inverse
@@ -298,9 +411,12 @@ struct BigInt {
         }
     }
 
-    static void inverse_fft(std::vector<FftComplex>& values) {
-        const int size = int(values.size());
+    static void inverse_fft(FftComplex* values, int size) {
         assert(size > 0 && (size & (size - 1)) == 0);
+#ifdef M1UNE_BIGINT_HAS_X86_SIMD
+        inverse_fft_simd(values, size);
+        return;
+#endif
         const std::vector<FftComplex>& roots = fft_roots(size);
 
         for (int length = 1; length < size; length *= 2) {
@@ -318,9 +434,9 @@ struct BigInt {
             }
         }
         const double inverse_size = 1.0 / double(size);
-        for (FftComplex& value : values) {
-            value.real *= inverse_size;
-            value.imaginary *= inverse_size;
+        for (int i = 0; i < size; ++i) {
+            values[i].real *= inverse_size;
+            values[i].imaginary *= inverse_size;
         }
     }
 
@@ -333,6 +449,38 @@ struct BigInt {
                                const FftComplex& reflected) {
         const FftComplex difference = value - reflected;
         return {difference.imaginary * 0.5, -difference.real * 0.5};
+    }
+
+    static void inverse_real_fft(FftComplex* values, int size) {
+        assert(size >= 2 && (size & (size - 1)) == 0);
+        const int half_size = size / 2;
+        const std::vector<FftComplex>& roots = fft_roots(size);
+        static std::vector<FftComplex> bit_reversed_roots;
+        static int cached_size = 0;
+        if (cached_size != size) {
+            bit_reversed_roots.resize(half_size);
+            std::vector<int> reversed(half_size);
+            const int shift = std::countr_zero(unsigned(half_size));
+            for (int i = 1; i < half_size; ++i) {
+                reversed[i] =
+                    (reversed[i / 2] >> 1) | ((i & 1) << (shift - 1));
+            }
+            for (int i = 0; i < half_size; ++i) {
+                bit_reversed_roots[i] = roots[half_size + reversed[i]];
+            }
+            cached_size = size;
+        }
+
+        for (int i = 0; i < half_size; ++i) {
+            const FftComplex first = values[2 * i];
+            const FftComplex second = values[2 * i + 1];
+            const FftComplex even = (first + second) * 0.5;
+            const FftComplex odd =
+                ((first - second) * 0.5) * bit_reversed_roots[i].conjugate();
+            values[i] = {even.real - odd.imaginary,
+                         even.imaginary + odd.real};
+        }
+        inverse_fft(values, half_size);
     }
 
     static void trim_magnitude(std::vector<int>& value) {
@@ -562,28 +710,38 @@ struct BigInt {
         return result;
     }
 
-    static uint64_t mersenne_reduce(unsigned __int128 value) {
-        constexpr uint64_t MODULUS = (uint64_t(1) << 61) - 1;
-        value = (value & MODULUS) + (value >> 61);
-        uint64_t result = uint64_t(value & MODULUS) + uint64_t(value >> 61);
-        if (result >= MODULUS) result -= MODULUS;
-        return result;
+    struct ProductFingerprint {
+        uint32_t mod31;
+        uint32_t mod29;
+    };
+
+    template <int bits>
+    static uint32_t mersenne_reduce(uint64_t value) {
+        constexpr uint64_t MODULUS = (uint64_t(1) << bits) - 1;
+        value = (value & MODULUS) + (value >> bits);
+        value = (value & MODULUS) + (value >> bits);
+        if (value >= MODULUS) value -= MODULUS;
+        return uint32_t(value);
     }
 
-    static uint64_t magnitude_mod(const std::vector<int>& value) {
-        uint64_t result = 0;
+    static ProductFingerprint magnitude_fingerprint(const std::vector<int>& value) {
+        ProductFingerprint result{0, 0};
         for (int i = int(value.size()) - 1; i >= 0; --i) {
-            result = mersenne_reduce(static_cast<unsigned __int128>(result) * BASE +
-                                     value[i]);
+            result.mod31 = mersenne_reduce<31>(uint64_t(result.mod31) * BASE + value[i]);
+            result.mod29 = mersenne_reduce<29>(uint64_t(result.mod29) * BASE + value[i]);
         }
         return result;
     }
 
     static bool product_matches(const std::vector<int>& lhs, const std::vector<int>& rhs,
                                 const std::vector<int>& product) {
-        const uint64_t expected = mersenne_reduce(
-            static_cast<unsigned __int128>(magnitude_mod(lhs)) * magnitude_mod(rhs));
-        return magnitude_mod(product) == expected;
+        const ProductFingerprint lhs_value = magnitude_fingerprint(lhs);
+        const ProductFingerprint rhs_value = magnitude_fingerprint(rhs);
+        const ProductFingerprint actual = magnitude_fingerprint(product);
+        return actual.mod31 ==
+                   mersenne_reduce<31>(uint64_t(lhs_value.mod31) * rhs_value.mod31) &&
+               actual.mod29 ==
+                   mersenne_reduce<29>(uint64_t(lhs_value.mod29) * rhs_value.mod29);
     }
 
     static std::vector<int> multiply_fft(const std::vector<int>& lhs,
@@ -593,35 +751,38 @@ struct BigInt {
         const unsigned __int128 coefficient_bound =
             static_cast<unsigned __int128>(std::min(lhs.size(), rhs.size())) *
             2 * (FFT_SPLIT - 1) * ((BASE - 1) / FFT_SPLIT);
-        if (transform_size > (1 << 20) || coefficient_bound >= (uint64_t(1) << 48)) {
+        if (transform_size > (1 << 20) || coefficient_bound >= (uint64_t(1) << 50)) {
             return multiply_ntt(lhs, rhs);
         }
 
-        std::vector<FftComplex> transformed_lhs(transform_size, FftComplex{0, 0});
+        std::unique_ptr<FftComplex[]> transformed_lhs(
+            new FftComplex[transform_size]);
         for (int i = 0; i < int(lhs.size()); ++i) {
             transformed_lhs[i] = {double(lhs[i] % FFT_SPLIT),
                                   double(lhs[i] / FFT_SPLIT)};
         }
-        fft(transformed_lhs);
+        std::fill(transformed_lhs.get() + lhs.size(),
+                  transformed_lhs.get() + transform_size, FftComplex{0, 0});
+        fft(transformed_lhs.get(), transform_size);
 
         const bool squaring = &lhs == &rhs;
-        std::vector<FftComplex> transformed_rhs;
+        std::unique_ptr<FftComplex[]> transformed_rhs(
+            new FftComplex[transform_size]);
         if (!squaring) {
-            transformed_rhs.assign(transform_size, FftComplex{0, 0});
             for (int i = 0; i < int(rhs.size()); ++i) {
                 transformed_rhs[i] = {double(rhs[i] % FFT_SPLIT),
                                       double(rhs[i] / FFT_SPLIT)};
             }
-            fft(transformed_rhs);
+            std::fill(transformed_rhs.get() + rhs.size(),
+                      transformed_rhs.get() + transform_size, FftComplex{0, 0});
+            fft(transformed_rhs.get(), transform_size);
         }
 
-        std::vector<FftComplex> square_cross_product;
-        if (squaring) square_cross_product.resize(transform_size);
         static std::vector<int> reflected_indices;
-        if (int(reflected_indices.size()) != transform_size) {
+        if (int(reflected_indices.size()) < transform_size) {
+            const int previous_size = int(reflected_indices.size());
             reflected_indices.resize(transform_size);
-            reflected_indices[0] = 0;
-            for (int i = 1; i < transform_size; ++i) {
+            for (int i = std::max(1, previous_size); i < transform_size; ++i) {
                 // Negating a frequency complements the bits below the highest
                 // set bit of its bit-reversed index.
                 reflected_indices[i] =
@@ -665,18 +826,11 @@ struct BigInt {
 
             transformed_lhs[i] = products.diagonal;
             transformed_lhs[opposite] = opposite_products.diagonal;
-            if (squaring) {
-                square_cross_product[i] = products.cross;
-                square_cross_product[opposite] = opposite_products.cross;
-            } else {
-                transformed_rhs[i] = products.cross;
-                transformed_rhs[opposite] = opposite_products.cross;
-            }
+            transformed_rhs[i] = products.cross;
+            transformed_rhs[opposite] = opposite_products.cross;
         }
-        std::vector<FftComplex>& cross_product =
-            squaring ? square_cross_product : transformed_rhs;
-        inverse_fft(transformed_lhs);
-        inverse_fft(cross_product);
+        inverse_fft(transformed_lhs.get(), transform_size);
+        inverse_real_fft(transformed_rhs.get(), transform_size);
 
         std::vector<int> result;
         result.reserve(result_size + 2);
@@ -685,7 +839,9 @@ struct BigInt {
             if (i < result_size) {
                 const long long low = std::llround(transformed_lhs[i].real);
                 const long long high = std::llround(transformed_lhs[i].imaginary);
-                const long long cross = std::llround(cross_product[i].real);
+                const FftComplex packed_cross = transformed_rhs[i / 2];
+                const long long cross = std::llround(
+                    (i & 1) ? packed_cross.imaginary : packed_cross.real);
                 if (low < 0 || high < 0 || cross < 0) return multiply_ntt(lhs, rhs);
                 carry += low + static_cast<unsigned __int128>(cross) * FFT_SPLIT +
                          static_cast<unsigned __int128>(high) * FFT_SPLIT * FFT_SPLIT;
@@ -846,13 +1002,15 @@ struct BigInt {
             std::vector<int> square = multiply_magnitude(inverse, inverse);
             square.insert(square.begin(), 0);
 
-            std::vector<int> leading(2 * precision + 1);
-            const int copied = std::min(value_size, int(leading.size()));
-            std::copy(value.end() - copied, value.end(), leading.end() - copied);
+            const int copied = std::min(value_size, 2 * precision + 1);
+            const std::vector<int> leading(value.end() - copied, value.end());
 
+            // The original Newton formula right-aligns `leading` in 2p + 1
+            // limbs, then discards the same 2p + 1 low limbs of the product.
+            // Cancelling that shift avoids convolving a long zero prefix.
             std::vector<int> correction = multiply_magnitude(square, leading);
-            assert(int(correction.size()) >= 2 * precision + 1);
-            correction.erase(correction.begin(), correction.begin() + 2 * precision + 1);
+            assert(int(correction.size()) >= copied);
+            correction.erase(correction.begin(), correction.begin() + copied);
 
             std::vector<int> shifted(precision + 1);
             const std::vector<int> doubled = add_magnitude(inverse, inverse);
@@ -875,6 +1033,76 @@ struct BigInt {
         if (divisor.size() <= DIVISION_THRESHOLD ||
             int(dividend.size()) - int(divisor.size()) <= DIVISION_THRESHOLD) {
             return divide_classical(dividend, divisor);
+        }
+
+        if (dividend.size() > 2 * divisor.size()) {
+            const int size_ratio = int(dividend.size() / divisor.size());
+            const int block_multiplier = size_ratio >= 16 ? 3 : size_ratio >= 7 ? 2 : 1;
+            const int block_size = block_multiplier * int(divisor.size());
+            const int block_count =
+                (int(dividend.size()) + block_size - 1) / block_size;
+            const int normalization = BASE / (divisor.back() + 1);
+            const std::vector<int> normalized_divisor =
+                multiply_by_limb(divisor, normalization);
+            const int degree = block_size + 3;
+            const std::vector<int> inverse = reciprocal(normalized_divisor, degree);
+            const int discarded = int(divisor.size()) + degree;
+
+            auto divide_block = [&](const std::vector<int>& current) {
+                const std::vector<int> normalized_current =
+                    multiply_by_limb(current, normalization);
+                std::vector<int> quotient_product =
+                    multiply_magnitude(normalized_current, inverse);
+                std::vector<int> partial_quotient;
+                if (int(quotient_product.size()) > discarded) {
+                    partial_quotient.assign(quotient_product.begin() + discarded,
+                                            quotient_product.end());
+                }
+
+                std::vector<int> product =
+                    multiply_magnitude(normalized_divisor, partial_quotient);
+                while (magnitude_less(normalized_current, product)) {
+                    partial_quotient =
+                        subtract_magnitude(partial_quotient, std::vector<int>(1, 1));
+                    product = subtract_magnitude(product, normalized_divisor);
+                }
+                std::vector<int> partial_remainder =
+                    subtract_magnitude(normalized_current, product);
+                while (magnitude_less_equal(normalized_divisor, partial_remainder)) {
+                    partial_quotient =
+                        add_magnitude(partial_quotient, std::vector<int>(1, 1));
+                    partial_remainder =
+                        subtract_magnitude(partial_remainder, normalized_divisor);
+                }
+                trim_magnitude(partial_quotient);
+                trim_magnitude(partial_remainder);
+                std::pair<std::vector<int>, std::vector<int>> denormalized =
+                    divide_by_limb(partial_remainder, normalization);
+                assert(denormalized.second.empty());
+                return std::make_pair(std::move(partial_quotient),
+                                      std::move(denormalized.first));
+            };
+
+            std::vector<int> quotient(dividend.size());
+            std::vector<int> remainder;
+            for (int block = block_count - 1; block >= 0; --block) {
+                const int begin = block * block_size;
+                const int end = std::min(begin + block_size, int(dividend.size()));
+                std::vector<int> current(dividend.begin() + begin,
+                                         dividend.begin() + end);
+                current.insert(current.end(), remainder.begin(), remainder.end());
+                trim_magnitude(current);
+
+                std::pair<std::vector<int>, std::vector<int>> partial =
+                    divide_block(current);
+                assert(int(partial.first.size()) <= end - begin);
+                std::copy(partial.first.begin(), partial.first.end(),
+                          quotient.begin() + begin);
+                remainder = std::move(partial.second);
+            }
+            trim_magnitude(quotient);
+            trim_magnitude(remainder);
+            return std::make_pair(std::move(quotient), std::move(remainder));
         }
 
         const int normalization = BASE / (divisor.back() + 1);
@@ -973,5 +1201,9 @@ struct BigInt {
 
 }  // namespace utilities
 }  // namespace m1une
+
+#ifdef M1UNE_BIGINT_HAS_X86_SIMD
+#undef M1UNE_BIGINT_HAS_X86_SIMD
+#endif
 
 #endif  // M1UNE_UTILITIES_BIGINT_HPP

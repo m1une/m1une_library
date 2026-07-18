@@ -50,6 +50,35 @@ void test_fast_input() {
     std::fclose(file);
 }
 
+void test_large_string_io() {
+    const std::string large(m1une::utilities::FastInput::buffer_size + 123, 'x');
+    std::FILE* input_file = std::tmpfile();
+    assert(input_file != nullptr);
+    assert(std::fwrite(large.data(), 1, large.size(), input_file) == large.size());
+    std::fputs(" tail", input_file);
+    std::rewind(input_file);
+
+    m1une::utilities::FastInput input(input_file);
+    std::string actual, tail;
+    input >> actual >> tail;
+    assert(actual == large);
+    assert(tail == "tail");
+    std::fclose(input_file);
+
+    std::FILE* output_file = std::tmpfile();
+    assert(output_file != nullptr);
+    {
+        m1une::utilities::FastOutput output(output_file);
+        output << large;
+    }
+    assert(std::ftell(output_file) == long(large.size()));
+    std::rewind(output_file);
+    std::string written(large.size(), '\0');
+    assert(std::fread(written.data(), 1, written.size(), output_file) == written.size());
+    assert(written == large);
+    std::fclose(output_file);
+}
+
 void test_pipe_input_does_not_wait_for_eof() {
     int request[2];
     int response[2];
@@ -230,6 +259,7 @@ void test_stream_operators_ranges_and_pairs() {
 
 int main() {
     test_fast_input();
+    test_large_string_io();
     test_pipe_input_does_not_wait_for_eof();
     test_fast_output();
     test_output_flush_reaches_pipe();

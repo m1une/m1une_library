@@ -9,14 +9,18 @@ An arbitrary-precision signed integer for competitive programming. Digits are
 stored in little-endian base-$10^9$ blocks.
 
 Large products split each base-$10^9$ block into 15-bit halves and use a packed
-complex FFT. The transform avoids explicit bit-reversal passes and has a
-specialized squaring path. Every FFT result is checked modulo $2^{61}-1$;
-values outside the conservative accuracy bound, or results that fail the check,
-fall back to an exact three-prime NTT with Chinese remainder reconstruction.
+complex FFT. The transform avoids explicit bit-reversal passes, uses a
+half-sized inverse transform for real coefficients, and has a specialized
+squaring path. GCC and Clang builds on x86 use AVX2/FMA butterflies. Every FFT
+result is checked modulo the coprime moduli $2^{31}-1$ and $2^{29}-1$; values
+outside the conservative accuracy bound, or results that fail the check, fall
+back to an exact three-prime NTT with Chinese remainder reconstruction.
 
-Large quotients use a normalized Newton reciprocal and the same fast
-multiplication. Small products use schoolbook multiplication, while small
-quotients use normalized Knuth division to avoid transform overhead.
+Large balanced quotients use a normalized Newton reciprocal and the same fast
+multiplication. Highly unbalanced division reuses a divisor-sized reciprocal
+across quotient blocks instead of constructing a dividend-sized reciprocal.
+Small products use schoolbook multiplication, while small quotients use
+normalized Knuth division to avoid transform overhead.
 
 ## Methods
 
@@ -37,7 +41,7 @@ quotients use normalized Knuth division to avoid transform overhead.
 | `operator-`, `operator-=` | Subtracts two values. | $O(N+M)$ |
 | `BigInt& operator*=(int value)` | Multiplies by a machine integer. | $O(N)$ |
 | `operator*`, `operator*=(const BigInt&)` | Multiplies two values using checked FFT convolution for large inputs, with an exact NTT fallback. | $O((N+M)\log(N+M))$; $O(NM)$ for the small-input fallback |
-| `operator/`, `operator/=` | Returns the quotient, truncated toward zero. | $O(N\log N)$ on the Newton path; $O(NM)$ for the bounded fallback |
+| `operator/`, `operator/=` | Returns the quotient, truncated toward zero. | $O(N\log N)$ on the balanced Newton path; $O(N\log M)$ on the blocked path; $O(NM)$ for the bounded fallback |
 | `operator%`, `operator%=` | Returns the remainder associated with truncated division. | Same as division |
 | `divmod(const BigInt& a, const BigInt& b)` | Returns `std::pair<BigInt, BigInt>` containing `a / b` and `a % b`. | Same as division |
 | `<`, `>`, `<=`, `>=`, `==`, `!=` | Compares two values. | $O(N+M)$ |

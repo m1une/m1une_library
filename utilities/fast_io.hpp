@@ -1,6 +1,7 @@
 #ifndef M1UNE_FAST_IO_HPP
 #define M1UNE_FAST_IO_HPP 1
 
+#include <algorithm>
 #include <array>
 #include <cerrno>
 #include <charconv>
@@ -236,12 +237,19 @@ struct FastInput {
     bool read(std::string& value) {
         if (!skip_spaces()) return false;
         value.clear();
-        int c = read_char_raw();
-        while (c != EOF && c > ' ') {
-            value.push_back(char(c));
-            c = read_char_raw();
+        while (true) {
+            const int begin = _position;
+            while (_position < _length &&
+                   static_cast<unsigned char>(_buffer[_position]) > ' ') {
+                ++_position;
+            }
+            value.append(_buffer + begin, _position - begin);
+            if (_position < _length) {
+                ++_position;
+                return true;
+            }
+            if (!refill()) return true;
         }
-        return true;
     }
 
     bool read(bool& value) {
@@ -474,7 +482,15 @@ struct FastOutput {
     }
 
     void write(const std::string& s) {
-        for (char c : s) write_char(c);
+        std::size_t position = 0;
+        while (position < s.size()) {
+            if (_position == buffer_size) flush();
+            const std::size_t copied =
+                std::min<std::size_t>(buffer_size - _position, s.size() - position);
+            std::memcpy(_buffer + _position, s.data() + position, copied);
+            _position += int(copied);
+            position += copied;
+        }
     }
 
     void write(char c) {
