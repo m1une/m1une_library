@@ -929,6 +929,9 @@ data:
   - name: math/matrix
     pages:
     - icon: ':heavy_check_mark:'
+      path: math/matrix/adjugate.hpp
+      title: Adjugate Matrix
+    - icon: ':heavy_check_mark:'
       path: math/matrix/all.hpp
       title: Matrix Bundle
     - icon: ':heavy_check_mark:'
@@ -937,6 +940,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: math/matrix/characteristic_polynomial.hpp
       title: Characteristic Polynomial
+    - icon: ':heavy_check_mark:'
+      path: math/matrix/determinant_mod.hpp
+      title: Determinant Modulo a Composite Modulus
     - icon: ':heavy_check_mark:'
       path: math/matrix/hafnian.hpp
       title: Hafnian
@@ -2030,6 +2036,9 @@ data:
   - name: verify/math/matrix
     pages:
     - icon: ':heavy_check_mark:'
+      path: verify/math/matrix/adjugate.test.cpp
+      title: verify/math/matrix/adjugate.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/math/matrix/bit_matrix_inverse.test.cpp
       title: verify/math/matrix/bit_matrix_inverse.test.cpp
     - icon: ':heavy_check_mark:'
@@ -2056,6 +2065,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/matrix/matrix_det.test.cpp
       title: verify/math/matrix/matrix_det.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/matrix/matrix_det_arbitrary_mod.test.cpp
+      title: verify/math/matrix/matrix_det_arbitrary_mod.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/matrix/matrix_product.test.cpp
       title: verify/math/matrix/matrix_product.test.cpp

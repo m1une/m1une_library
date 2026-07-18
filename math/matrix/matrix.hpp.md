@@ -18,11 +18,17 @@ data:
     path: math/all.hpp
     title: Math All
   - icon: ':heavy_check_mark:'
+    path: math/matrix/adjugate.hpp
+    title: Adjugate Matrix
+  - icon: ':heavy_check_mark:'
     path: math/matrix/all.hpp
     title: Matrix Bundle
   - icon: ':heavy_check_mark:'
     path: math/matrix/characteristic_polynomial.hpp
     title: Characteristic Polynomial
+  - icon: ':heavy_check_mark:'
+    path: math/matrix/determinant_mod.hpp
+    title: Determinant Modulo a Composite Modulus
   - icon: ':heavy_check_mark:'
     path: math/matrix/hafnian.hpp
     title: Hafnian
@@ -52,6 +58,9 @@ data:
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/matrix/adjugate.test.cpp
+    title: verify/math/matrix/adjugate.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/matrix/characteristic_polynomial.test.cpp
     title: verify/math/matrix/characteristic_polynomial.test.cpp
   - icon: ':heavy_check_mark:'
@@ -66,6 +75,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/matrix/matrix_det.test.cpp
     title: verify/math/matrix/matrix_det.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/matrix/matrix_det_arbitrary_mod.test.cpp
+    title: verify/math/matrix/matrix_det_arbitrary_mod.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/matrix/matrix_product.test.cpp
     title: verify/math/matrix/matrix_product.test.cpp
@@ -266,6 +278,8 @@ data:
   - math/matrix/all.hpp
   - math/matrix/characteristic_polynomial.hpp
   - math/matrix/hafnian.hpp
+  - math/matrix/adjugate.hpp
+  - math/matrix/determinant_mod.hpp
   - math/matrix/pfaffian.hpp
   - math/all.hpp
   - graph/directed.hpp
@@ -279,6 +293,7 @@ data:
   - verify/math/matrix/inverse_matrix.test.cpp
   - verify/math/matrix/system_of_linear_equations.test.cpp
   - verify/math/matrix/matrix.test.cpp
+  - verify/math/matrix/adjugate.test.cpp
   - verify/math/matrix/matrix_det.test.cpp
   - verify/math/matrix/sparse_determinant.test.cpp
   - verify/math/matrix/matrix_product.test.cpp
@@ -286,6 +301,7 @@ data:
   - verify/math/matrix/matrix_rank.test.cpp
   - verify/math/matrix/hafnian.test.cpp
   - verify/math/matrix/characteristic_polynomial.test.cpp
+  - verify/math/matrix/matrix_det_arbitrary_mod.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/counting_spanning_tree_undirected.test.cpp
   - verify/graph/cow_game.test.cpp

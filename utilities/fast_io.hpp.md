@@ -697,6 +697,9 @@ data:
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/matrix/adjugate.test.cpp
+    title: verify/math/matrix/adjugate.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/matrix/bit_matrix_inverse.test.cpp
     title: verify/math/matrix/bit_matrix_inverse.test.cpp
   - icon: ':heavy_check_mark:'
@@ -723,6 +726,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/matrix/matrix_det.test.cpp
     title: verify/math/matrix/matrix_det.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/matrix/matrix_det_arbitrary_mod.test.cpp
+    title: verify/math/matrix/matrix_det_arbitrary_mod.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/matrix/matrix_product.test.cpp
     title: verify/math/matrix/matrix_product.test.cpp
@@ -1443,6 +1449,7 @@ data:
   - verify/math/matrix/bit_matrix_inverse.test.cpp
   - verify/math/matrix/bit_matrix_rank.test.cpp
   - verify/math/matrix/matrix.test.cpp
+  - verify/math/matrix/adjugate.test.cpp
   - verify/math/matrix/matrix_det.test.cpp
   - verify/math/matrix/sparse_determinant.test.cpp
   - verify/math/matrix/matrix_product.test.cpp
@@ -1451,6 +1458,7 @@ data:
   - verify/math/matrix/matrix_rank.test.cpp
   - verify/math/matrix/hafnian.test.cpp
   - verify/math/matrix/characteristic_polynomial.test.cpp
+  - verify/math/matrix/matrix_det_arbitrary_mod.test.cpp
   - verify/math/partition_function.test.cpp
   - verify/math/extended_gcd.test.cpp
   - verify/math/cyclotomic_polynomial.test.cpp
