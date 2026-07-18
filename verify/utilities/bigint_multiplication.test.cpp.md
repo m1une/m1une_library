@@ -30,10 +30,11 @@ data:
     \ PROBLEM \"https://judge.yosupo.jp/problem/multiplication_of_big_integers\"\n\
     \n#pragma GCC optimize(\"O3\")\n\n#include <cassert>\n#include <random>\n#include\
     \ <string>\n#include <vector>\n\n#line 1 \"utilities/bigint.hpp\"\n\n\n\n#include\
-    \ <algorithm>\n#line 6 \"utilities/bigint.hpp\"\n#include <cstdint>\n#include\
-    \ <iostream>\n#include <stdexcept>\n#line 10 \"utilities/bigint.hpp\"\n#include\
-    \ <utility>\n#line 12 \"utilities/bigint.hpp\"\n\n#line 1 \"math/fps/convolution.hpp\"\
-    \n\n\n\n#line 5 \"math/fps/convolution.hpp\"\n#include <array>\n#line 8 \"math/fps/convolution.hpp\"\
+    \ <algorithm>\n#include <bit>\n#line 7 \"utilities/bigint.hpp\"\n#include <charconv>\n\
+    #include <cmath>\n#include <cstdint>\n#include <iostream>\n#include <numbers>\n\
+    #include <stdexcept>\n#line 14 \"utilities/bigint.hpp\"\n#include <utility>\n\
+    #line 16 \"utilities/bigint.hpp\"\n\n#line 1 \"math/fps/convolution.hpp\"\n\n\n\
+    \n#line 5 \"math/fps/convolution.hpp\"\n#include <array>\n#line 8 \"math/fps/convolution.hpp\"\
     \n#include <cstring>\n#include <new>\n#include <type_traits>\n#line 13 \"math/fps/convolution.hpp\"\
     \n\n#if defined(__GNUC__) && !defined(__clang__) && (defined(__x86_64__) || defined(__i386__))\n\
     #include <immintrin.h>\n#define M1UNE_FPS_HAS_X86_SIMD 1\n#pragma GCC push_options\n\
@@ -671,7 +672,7 @@ data:
     \        value = (value + mod1_mod2_target * (second % target_mod)) % target_mod;\n\
     \        result[i] = Mint::raw(uint32_t(value));\n    }\n    return result;\n\
     }\n\n}  // namespace fps\n}  // namespace m1une\n\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n\
-    #undef M1UNE_FPS_HAS_X86_SIMD\n#endif\n\n\n#line 14 \"utilities/bigint.hpp\"\n\
+    #undef M1UNE_FPS_HAS_X86_SIMD\n#endif\n\n\n#line 18 \"utilities/bigint.hpp\"\n\
     \nnamespace m1une {\nnamespace utilities {\n\nstruct BigInt {\n    static constexpr\
     \ int BASE = 1000000000;\n    static constexpr int BASE_DIGITS = 9;\n\n    std::vector<int>\
     \ a;\n    int sign;\n\n    BigInt() : sign(1) {}\n\n    BigInt(long long v) {\n\
@@ -693,11 +694,20 @@ data:
     \ j = std::max(pos, i - BASE_DIGITS + 1); j <= i; ++j) {\n                x =\
     \ x * 10 + (s[j] - '0');\n            }\n            a.push_back(x);\n       \
     \ }\n        trim();\n    }\n\n    std::string to_string() const {\n        if\
-    \ (a.empty()) return \"0\";\n        std::string res;\n        res.reserve(a.size()\
-    \ * BASE_DIGITS + (sign == -1));\n        if (sign == -1) res += '-';\n      \
-    \  res += std::to_string(a.back());\n        for (int i = (int)a.size() - 2; i\
-    \ >= 0; --i) {\n            std::string block = std::to_string(a[i]);\n      \
-    \      res.append(BASE_DIGITS - block.length(), '0');\n            res += block;\n\
+    \ (a.empty()) return \"0\";\n        char leading[BASE_DIGITS];\n        const\
+    \ std::to_chars_result converted =\n            std::to_chars(leading, leading\
+    \ + BASE_DIGITS, a.back());\n        assert(converted.ec == std::errc());\n  \
+    \      const int leading_size = int(converted.ptr - leading);\n        std::string\
+    \ res((sign == -1) + leading_size +\n                            (a.size() - 1)\
+    \ * BASE_DIGITS,\n                        '0');\n        int offset = 0;\n   \
+    \     if (sign == -1) res[offset++] = '-';\n        std::copy(leading, converted.ptr,\
+    \ res.begin() + offset);\n        offset += leading_size;\n        for (int i\
+    \ = (int)a.size() - 2; i >= 0; --i) {\n            char block[BASE_DIGITS];\n\
+    \            const std::to_chars_result block_converted =\n                std::to_chars(block,\
+    \ block + BASE_DIGITS, a[i]);\n            assert(block_converted.ec == std::errc());\n\
+    \            const int block_size = int(block_converted.ptr - block);\n      \
+    \      std::copy(block, block_converted.ptr,\n                      res.begin()\
+    \ + offset + BASE_DIGITS - block_size);\n            offset += BASE_DIGITS;\n\
     \        }\n        return res;\n    }\n\n    bool is_zero() const {\n       \
     \ return a.empty() || (a.size() == 1 && a[0] == 0);\n    }\n\n    BigInt operator-()\
     \ const {\n        BigInt res = *this;\n        if (!is_zero()) res.sign = -sign;\n\
@@ -742,7 +752,66 @@ data:
     \        const long long cur = a[i] * multiplier + carry;\n            carry =\
     \ cur / BASE;\n            a[i] = (int)(cur % BASE);\n        }\n        trim();\n\
     \        return *this;\n    }\n\n   private:\n    static constexpr int MULTIPLICATION_THRESHOLD\
-    \ = 224;\n    static constexpr int DIVISION_THRESHOLD = 64;\n\n    static void\
+    \ = 128;\n    static constexpr int SQUARE_THRESHOLD = 224;\n    static constexpr\
+    \ int DIVISION_THRESHOLD = 64;\n    static constexpr int FFT_SPLIT = 1 << 15;\n\
+    \n    struct FftComplex {\n        double real;\n        double imaginary;\n\n\
+    \        FftComplex operator+(const FftComplex& other) const {\n            return\
+    \ {real + other.real, imaginary + other.imaginary};\n        }\n\n        FftComplex\
+    \ operator-(const FftComplex& other) const {\n            return {real - other.real,\
+    \ imaginary - other.imaginary};\n        }\n\n        FftComplex operator*(const\
+    \ FftComplex& other) const {\n            return {real * other.real - imaginary\
+    \ * other.imaginary,\n                    real * other.imaginary + imaginary *\
+    \ other.real};\n        }\n\n        FftComplex operator*(double scalar) const\
+    \ {\n            return {real * scalar, imaginary * scalar};\n        }\n\n  \
+    \      FftComplex conjugate() const {\n            return {real, -imaginary};\n\
+    \        }\n    };\n\n    struct FftProducts {\n        FftComplex diagonal;\n\
+    \        FftComplex cross;\n    };\n\n    static const std::vector<FftComplex>&\
+    \ fft_roots(int size) {\n        static std::vector<FftComplex> roots(2, FftComplex{1,\
+    \ 0});\n        if (int(roots.size()) < size) {\n            int length = int(roots.size());\n\
+    \            roots.resize(size);\n            while (length < size) {\n      \
+    \          const long double angle = std::numbers::pi_v<long double> / length;\n\
+    \                const long double step_real = std::cos(angle);\n            \
+    \    const long double step_imaginary = std::sin(angle);\n                for\
+    \ (int i = length; i < 2 * length; ++i) {\n                    roots[i] = roots[i\
+    \ / 2];\n                    if (i & 1) {\n                        const long\
+    \ double real = roots[i].real;\n                        const long double imaginary\
+    \ = roots[i].imaginary;\n                        roots[i] = {\n              \
+    \              double(real * step_real - imaginary * step_imaginary),\n      \
+    \                      double(real * step_imaginary + imaginary * step_real)};\n\
+    \                    }\n                }\n                length *= 2;\n    \
+    \        }\n        }\n        return roots;\n    }\n\n    static void fft(std::vector<FftComplex>&\
+    \ values) {\n        const int size = int(values.size());\n        assert(size\
+    \ > 0 && (size & (size - 1)) == 0);\n        const std::vector<FftComplex>& roots\
+    \ = fft_roots(size);\n\n        // Decimation in frequency leaves the spectrum\
+    \ bit-reversed. The inverse\n        // transform consumes that order directly,\
+    \ avoiding permutation passes.\n        for (int length = size / 2; length > 0;\
+    \ length /= 2) {\n            for (int offset = 0; offset < size; offset += 2\
+    \ * length) {\n                for (int i = 0; i < length; ++i) {\n          \
+    \          const FftComplex even = values[offset + i];\n                    const\
+    \ FftComplex odd = values[offset + i + length];\n                    values[offset\
+    \ + i] = even + odd;\n                    values[offset + i + length] =\n    \
+    \                    (even - odd) * roots[length + i];\n                }\n  \
+    \          }\n        }\n    }\n\n    static void inverse_fft(std::vector<FftComplex>&\
+    \ values) {\n        const int size = int(values.size());\n        assert(size\
+    \ > 0 && (size & (size - 1)) == 0);\n        const std::vector<FftComplex>& roots\
+    \ = fft_roots(size);\n\n        for (int length = 1; length < size; length *=\
+    \ 2) {\n            for (int offset = 0; offset < size; offset += 2 * length)\
+    \ {\n                for (int i = 0; i < length; ++i) {\n                    const\
+    \ FftComplex even = values[offset + i];\n                    const FftComplex\
+    \ value = values[offset + i + length];\n                    const FftComplex root\
+    \ = roots[length + i];\n                    const FftComplex odd = {\n       \
+    \                 value.real * root.real + value.imaginary * root.imaginary,\n\
+    \                        value.imaginary * root.real - value.real * root.imaginary};\n\
+    \                    values[offset + i] = even + odd;\n                    values[offset\
+    \ + i + length] = even - odd;\n                }\n            }\n        }\n \
+    \       const double inverse_size = 1.0 / double(size);\n        for (FftComplex&\
+    \ value : values) {\n            value.real *= inverse_size;\n            value.imaginary\
+    \ *= inverse_size;\n        }\n    }\n\n    static FftComplex fft_low(const FftComplex&\
+    \ value,\n                              const FftComplex& reflected) {\n     \
+    \   return (value + reflected) * 0.5;\n    }\n\n    static FftComplex fft_high(const\
+    \ FftComplex& value,\n                               const FftComplex& reflected)\
+    \ {\n        const FftComplex difference = value - reflected;\n        return\
+    \ {difference.imaginary * 0.5, -difference.real * 0.5};\n    }\n\n    static void\
     \ trim_magnitude(std::vector<int>& value) {\n        while (!value.empty() &&\
     \ value.back() == 0) value.pop_back();\n    }\n\n    static bool magnitude_less(const\
     \ std::vector<int>& lhs, const std::vector<int>& rhs) {\n        return magnitude_compare(lhs,\
@@ -825,10 +894,10 @@ data:
     \ (int limb : value) {\n            const uint64_t current = uint64_t(limb) *\
     \ multiplier + carry;\n            result.push_back(int(current % BASE));\n  \
     \          carry = current / BASE;\n        }\n        if (carry) result.push_back(int(carry));\n\
-    \        return result;\n    }\n\n    static std::vector<int> multiply_convolution(const\
-    \ std::vector<int>& lhs,\n                                                 const\
-    \ std::vector<int>& rhs) {\n        using Mint1 = math::ModInt<998244353>;\n \
-    \       using Mint2 = math::ModInt<754974721>;\n        using Mint3 = math::ModInt<469762049>;\n\
+    \        return result;\n    }\n\n    static std::vector<int> multiply_ntt(const\
+    \ std::vector<int>& lhs,\n                                         const std::vector<int>&\
+    \ rhs) {\n        using Mint1 = math::ModInt<998244353>;\n        using Mint2\
+    \ = math::ModInt<754974721>;\n        using Mint3 = math::ModInt<469762049>;\n\
     \n        const int result_size = int(lhs.size() + rhs.size() - 1);\n        assert(result_size\
     \ <= (1 << 24));\n\n        auto convolve = [&]<class Mint>() {\n            std::vector<Mint>\
     \ x(lhs.begin(), lhs.end());\n            if (&lhs == &rhs) return fps::convolution(x,\
@@ -860,23 +929,101 @@ data:
     \ carry += combined12 +\n                         static_cast<unsigned __int128>(MOD12)\
     \ * quotient3;\n            }\n            result.push_back(int(carry % BASE));\n\
     \            carry /= BASE;\n        }\n        trim_magnitude(result);\n    \
-    \    return result;\n    }\n\n    static std::vector<int> multiply_magnitude(const\
-    \ std::vector<int>& lhs,\n                                               const\
-    \ std::vector<int>& rhs) {\n        if (lhs.empty() || rhs.empty()) return std::vector<int>();\n\
-    \        if (lhs.size() == 1) return multiply_by_limb(rhs, lhs[0]);\n        if\
-    \ (rhs.size() == 1) return multiply_by_limb(lhs, rhs[0]);\n        if (std::min(lhs.size(),\
-    \ rhs.size()) <= MULTIPLICATION_THRESHOLD) {\n            if (&lhs == &rhs) return\
-    \ square_naive(lhs);\n            return multiply_naive(lhs, rhs);\n        }\n\
-    \        return multiply_convolution(lhs, rhs);\n    }\n\n    static std::pair<std::vector<int>,\
-    \ std::vector<int>> divide_by_limb(\n        const std::vector<int>& dividend,\
-    \ int divisor) {\n        assert(0 < divisor && divisor < BASE);\n        if (divisor\
-    \ == 1) {\n            return std::make_pair(dividend, std::vector<int>());\n\
-    \        }\n        std::vector<int> quotient(dividend.size());\n        long\
-    \ long remainder = 0;\n        for (int i = int(dividend.size()) - 1; i >= 0;\
-    \ --i) {\n            const long long current = remainder * BASE + dividend[i];\n\
-    \            quotient[i] = int(current / divisor);\n            remainder = current\
-    \ % divisor;\n        }\n        trim_magnitude(quotient);\n        std::vector<int>\
-    \ remainder_digits;\n        if (remainder != 0) remainder_digits.push_back(int(remainder));\n\
+    \    return result;\n    }\n\n    static uint64_t mersenne_reduce(unsigned __int128\
+    \ value) {\n        constexpr uint64_t MODULUS = (uint64_t(1) << 61) - 1;\n  \
+    \      value = (value & MODULUS) + (value >> 61);\n        uint64_t result = uint64_t(value\
+    \ & MODULUS) + uint64_t(value >> 61);\n        if (result >= MODULUS) result -=\
+    \ MODULUS;\n        return result;\n    }\n\n    static uint64_t magnitude_mod(const\
+    \ std::vector<int>& value) {\n        uint64_t result = 0;\n        for (int i\
+    \ = int(value.size()) - 1; i >= 0; --i) {\n            result = mersenne_reduce(static_cast<unsigned\
+    \ __int128>(result) * BASE +\n                                     value[i]);\n\
+    \        }\n        return result;\n    }\n\n    static bool product_matches(const\
+    \ std::vector<int>& lhs, const std::vector<int>& rhs,\n                      \
+    \          const std::vector<int>& product) {\n        const uint64_t expected\
+    \ = mersenne_reduce(\n            static_cast<unsigned __int128>(magnitude_mod(lhs))\
+    \ * magnitude_mod(rhs));\n        return magnitude_mod(product) == expected;\n\
+    \    }\n\n    static std::vector<int> multiply_fft(const std::vector<int>& lhs,\n\
+    \                                         const std::vector<int>& rhs) {\n   \
+    \     const int result_size = int(lhs.size() + rhs.size() - 1);\n        const\
+    \ int transform_size = int(std::bit_ceil(unsigned(result_size)));\n        const\
+    \ unsigned __int128 coefficient_bound =\n            static_cast<unsigned __int128>(std::min(lhs.size(),\
+    \ rhs.size())) *\n            2 * (FFT_SPLIT - 1) * ((BASE - 1) / FFT_SPLIT);\n\
+    \        if (transform_size > (1 << 20) || coefficient_bound >= (uint64_t(1) <<\
+    \ 48)) {\n            return multiply_ntt(lhs, rhs);\n        }\n\n        std::vector<FftComplex>\
+    \ transformed_lhs(transform_size, FftComplex{0, 0});\n        for (int i = 0;\
+    \ i < int(lhs.size()); ++i) {\n            transformed_lhs[i] = {double(lhs[i]\
+    \ % FFT_SPLIT),\n                                  double(lhs[i] / FFT_SPLIT)};\n\
+    \        }\n        fft(transformed_lhs);\n\n        const bool squaring = &lhs\
+    \ == &rhs;\n        std::vector<FftComplex> transformed_rhs;\n        if (!squaring)\
+    \ {\n            transformed_rhs.assign(transform_size, FftComplex{0, 0});\n \
+    \           for (int i = 0; i < int(rhs.size()); ++i) {\n                transformed_rhs[i]\
+    \ = {double(rhs[i] % FFT_SPLIT),\n                                      double(rhs[i]\
+    \ / FFT_SPLIT)};\n            }\n            fft(transformed_rhs);\n        }\n\
+    \n        std::vector<FftComplex> square_cross_product;\n        if (squaring)\
+    \ square_cross_product.resize(transform_size);\n        static std::vector<int>\
+    \ reflected_indices;\n        if (int(reflected_indices.size()) != transform_size)\
+    \ {\n            reflected_indices.resize(transform_size);\n            reflected_indices[0]\
+    \ = 0;\n            for (int i = 1; i < transform_size; ++i) {\n             \
+    \   // Negating a frequency complements the bits below the highest\n         \
+    \       // set bit of its bit-reversed index.\n                reflected_indices[i]\
+    \ =\n                    i ^ int(std::bit_floor(unsigned(i)) - 1);\n         \
+    \   }\n        }\n        auto calculate_products = [&](int index) {\n       \
+    \     const int opposite = reflected_indices[index];\n            const FftComplex\
+    \ lhs_reflected =\n                transformed_lhs[opposite].conjugate();\n  \
+    \          const FftComplex lhs_low =\n                fft_low(transformed_lhs[index],\
+    \ lhs_reflected);\n            const FftComplex lhs_high =\n                fft_high(transformed_lhs[index],\
+    \ lhs_reflected);\n\n            FftComplex rhs_low = lhs_low;\n            FftComplex\
+    \ rhs_high = lhs_high;\n            if (!squaring) {\n                const FftComplex\
+    \ rhs_reflected =\n                    transformed_rhs[opposite].conjugate();\n\
+    \                rhs_low = fft_low(transformed_rhs[index], rhs_reflected);\n \
+    \               rhs_high = fft_high(transformed_rhs[index], rhs_reflected);\n\
+    \            }\n\n            const FftComplex low_product = lhs_low * rhs_low;\n\
+    \            const FftComplex high_product = lhs_high * rhs_high;\n          \
+    \  const FftComplex diagonal =\n                low_product + FftComplex{-high_product.imaginary,\n\
+    \                                         high_product.real};\n            const\
+    \ FftComplex cross =\n                lhs_low * rhs_high + lhs_high * rhs_low;\n\
+    \            return FftProducts{diagonal, cross};\n        };\n\n        for (int\
+    \ i = 0; i < transform_size; ++i) {\n            const int opposite = reflected_indices[i];\n\
+    \            if (i > opposite) continue;\n            const FftProducts products\
+    \ = calculate_products(i);\n            FftProducts opposite_products = products;\n\
+    \            if (i != opposite) opposite_products = calculate_products(opposite);\n\
+    \n            transformed_lhs[i] = products.diagonal;\n            transformed_lhs[opposite]\
+    \ = opposite_products.diagonal;\n            if (squaring) {\n               \
+    \ square_cross_product[i] = products.cross;\n                square_cross_product[opposite]\
+    \ = opposite_products.cross;\n            } else {\n                transformed_rhs[i]\
+    \ = products.cross;\n                transformed_rhs[opposite] = opposite_products.cross;\n\
+    \            }\n        }\n        std::vector<FftComplex>& cross_product =\n\
+    \            squaring ? square_cross_product : transformed_rhs;\n        inverse_fft(transformed_lhs);\n\
+    \        inverse_fft(cross_product);\n\n        std::vector<int> result;\n   \
+    \     result.reserve(result_size + 2);\n        unsigned __int128 carry = 0;\n\
+    \        for (int i = 0; i < result_size || carry > 0; ++i) {\n            if\
+    \ (i < result_size) {\n                const long long low = std::llround(transformed_lhs[i].real);\n\
+    \                const long long high = std::llround(transformed_lhs[i].imaginary);\n\
+    \                const long long cross = std::llround(cross_product[i].real);\n\
+    \                if (low < 0 || high < 0 || cross < 0) return multiply_ntt(lhs,\
+    \ rhs);\n                carry += low + static_cast<unsigned __int128>(cross)\
+    \ * FFT_SPLIT +\n                         static_cast<unsigned __int128>(high)\
+    \ * FFT_SPLIT * FFT_SPLIT;\n            }\n            result.push_back(int(carry\
+    \ % BASE));\n            carry /= BASE;\n        }\n        trim_magnitude(result);\n\
+    \        if (result.empty() || !product_matches(lhs, rhs, result)) {\n       \
+    \     return multiply_ntt(lhs, rhs);\n        }\n        return result;\n    }\n\
+    \n    static std::vector<int> multiply_magnitude(const std::vector<int>& lhs,\n\
+    \                                               const std::vector<int>& rhs) {\n\
+    \        if (lhs.empty() || rhs.empty()) return std::vector<int>();\n        if\
+    \ (lhs.size() == 1) return multiply_by_limb(rhs, lhs[0]);\n        if (rhs.size()\
+    \ == 1) return multiply_by_limb(lhs, rhs[0]);\n        if (&lhs == &rhs && lhs.size()\
+    \ <= SQUARE_THRESHOLD) {\n            return square_naive(lhs);\n        }\n \
+    \       if (std::min(lhs.size(), rhs.size()) <= MULTIPLICATION_THRESHOLD) {\n\
+    \            return multiply_naive(lhs, rhs);\n        }\n        return multiply_fft(lhs,\
+    \ rhs);\n    }\n\n    static std::pair<std::vector<int>, std::vector<int>> divide_by_limb(\n\
+    \        const std::vector<int>& dividend, int divisor) {\n        assert(0 <\
+    \ divisor && divisor < BASE);\n        if (divisor == 1) {\n            return\
+    \ std::make_pair(dividend, std::vector<int>());\n        }\n        std::vector<int>\
+    \ quotient(dividend.size());\n        long long remainder = 0;\n        for (int\
+    \ i = int(dividend.size()) - 1; i >= 0; --i) {\n            const long long current\
+    \ = remainder * BASE + dividend[i];\n            quotient[i] = int(current / divisor);\n\
+    \            remainder = current % divisor;\n        }\n        trim_magnitude(quotient);\n\
+    \        std::vector<int> remainder_digits;\n        if (remainder != 0) remainder_digits.push_back(int(remainder));\n\
     \        return std::make_pair(std::move(quotient), std::move(remainder_digits));\n\
     \    }\n\n    static std::pair<std::vector<int>, std::vector<int>> divide_classical(\n\
     \        const std::vector<int>& dividend, const std::vector<int>& divisor) {\n\
@@ -1005,13 +1152,13 @@ data:
     \        std::string s;\n        if (is >> s) b.read(s);\n        return is;\n\
     \    }\n};\n\n}  // namespace utilities\n}  // namespace m1une\n\n\n#line 1 \"\
     utilities/fast_io.hpp\"\n\n\n\n#line 5 \"utilities/fast_io.hpp\"\n#include <cerrno>\n\
-    #include <charconv>\n#include <cstddef>\n#include <cstdio>\n#include <cstdlib>\n\
-    #line 12 \"utilities/fast_io.hpp\"\n#include <iterator>\n#line 14 \"utilities/fast_io.hpp\"\
-    \n#include <sys/stat.h>\n#line 17 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n\
-    \nnamespace m1une {\nnamespace utilities {\nnamespace internal {\n\n// Detect\
-    \ std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct is_range\
-    \ : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
-    \    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
+    #line 7 \"utilities/fast_io.hpp\"\n#include <cstddef>\n#include <cstdio>\n#include\
+    \ <cstdlib>\n#line 12 \"utilities/fast_io.hpp\"\n#include <iterator>\n#line 14\
+    \ \"utilities/fast_io.hpp\"\n#include <sys/stat.h>\n#line 17 \"utilities/fast_io.hpp\"\
+    \n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal\
+    \ {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\n\
+    struct is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T,\
+    \ std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
     >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
     \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
@@ -1327,7 +1474,7 @@ data:
   isVerificationFile: true
   path: verify/utilities/bigint_multiplication.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 19:37:21+09:00'
+  timestamp: '2026-07-18 20:24:45+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/utilities/bigint_multiplication.test.cpp
