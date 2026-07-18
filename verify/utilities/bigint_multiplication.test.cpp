@@ -1,5 +1,7 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/multiplication_of_big_integers"
 
+#pragma GCC optimize("O3")
+
 #include <cassert>
 #include <random>
 #include <string>
@@ -65,10 +67,15 @@ void test_multiplication() {
     }
 
     for (int iteration = 0; iteration < 2; ++iteration) {
-        const std::string lhs = random_integer(random, 1300, true);
-        const std::string rhs = random_integer(random, 1250, true);
+        const std::string lhs = random_integer(random, 3000, true);
+        const std::string rhs = random_integer(random, 2900, true);
         assert((BigInt(lhs) * BigInt(rhs)).to_string() == multiply_naive(lhs, rhs));
     }
+
+    const std::string square_value = random_integer(random, 3200, false);
+    BigInt square(square_value);
+    square *= square;
+    assert(square.to_string() == multiply_naive(square_value, square_value));
 }
 
 }  // namespace

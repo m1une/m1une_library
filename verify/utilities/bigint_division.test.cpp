@@ -1,5 +1,7 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/division_of_big_integers"
 
+#pragma GCC optimize("O3")
+
 #include <cassert>
 #include <random>
 #include <string>
@@ -129,6 +131,12 @@ void test_division() {
     for (int iteration = 0; iteration < 2; ++iteration) {
         const std::string dividend = random_integer(random, 1400, true);
         const std::string divisor = random_integer(random, 650, true);
+        check_division(dividend, divisor);
+    }
+
+    for (int iteration = 0; iteration < 4; ++iteration) {
+        const std::string dividend = random_integer(random, 1000, true);
+        const std::string divisor = random_integer(random, 500, true);
         check_division(dividend, divisor);
     }
 }

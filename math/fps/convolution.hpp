@@ -250,25 +250,33 @@ std::vector<Mint> convolution_998244353_simd(const std::vector<Mint>& a,
     const int result_size = int(a.size() + b.size() - 1);
     int n = 1;
     while (n < result_size) n <<= 1;
+    const bool squaring = &a == &b;
     auto* transformed_a = static_cast<uint32_t*>(
         ::operator new[](sizeof(uint32_t) * n, std::align_val_t(32)));
-    auto* transformed_b = static_cast<uint32_t*>(
-        ::operator new[](sizeof(uint32_t) * n, std::align_val_t(32)));
+    auto* transformed_b = squaring
+                              ? transformed_a
+                              : static_cast<uint32_t*>(::operator new[](
+                                    sizeof(uint32_t) * n, std::align_val_t(32)));
     if constexpr (std::is_same_v<Mint, math::ModInt<998244353>>) {
         static_assert(sizeof(Mint) == sizeof(uint32_t) && std::is_trivially_copyable_v<Mint>);
         std::memcpy(transformed_a, a.data(), sizeof(uint32_t) * a.size());
-        std::memcpy(transformed_b, b.data(), sizeof(uint32_t) * b.size());
+        if (!squaring)
+            std::memcpy(transformed_b, b.data(), sizeof(uint32_t) * b.size());
     } else {
         for (int i = 0; i < int(a.size()); i++) transformed_a[i] = a[i].val();
-        for (int i = 0; i < int(b.size()); i++) transformed_b[i] = b[i].val();
+        if (!squaring)
+            for (int i = 0; i < int(b.size()); i++) transformed_b[i] = b[i].val();
     }
     std::memset(transformed_a + a.size(), 0, sizeof(uint32_t) * (n - a.size()));
-    std::memset(transformed_b + b.size(), 0, sizeof(uint32_t) * (n - b.size()));
+    if (!squaring)
+        std::memset(transformed_b + b.size(), 0, sizeof(uint32_t) * (n - b.size()));
 
     static constexpr fast998_v2::FNTT32_info transform(998244353);
     const std::size_t vector_size = std::size_t(n) >> 3;
     fast998_v2::vector_dif(reinterpret_cast<__m256i*>(transformed_a), vector_size, &transform);
-    fast998_v2::vector_dif(reinterpret_cast<__m256i*>(transformed_b), vector_size, &transform);
+    if (!squaring)
+        fast998_v2::vector_dif(reinterpret_cast<__m256i*>(transformed_b), vector_size,
+                              &transform);
     fast998_v2::vector_convolution_direct(
         reinterpret_cast<__m256i*>(transformed_a),
         reinterpret_cast<const __m256i*>(transformed_b), vector_size, &transform);
@@ -278,7 +286,7 @@ std::vector<Mint> convolution_998244353_simd(const std::vector<Mint>& a,
     std::vector<Mint> result(result_size);
     for (int j = 0; j < result_size; j++) result[j] = Mint::raw(transformed_a[j]);
     ::operator delete[](transformed_a, std::align_val_t(32));
-    ::operator delete[](transformed_b, std::align_val_t(32));
+    if (!squaring) ::operator delete[](transformed_b, std::align_val_t(32));
     return result;
 }
 
@@ -320,14 +328,19 @@ std::vector<Mint> convolution_ntt(const std::vector<Mint>& a, const std::vector<
 
     // Allocate the padded buffers directly.  Constructing from the inputs and
     // then resizing used to allocate and copy both large operands twice.
+    const bool squaring = &a == &b;
     std::vector<Mint> fa(n);
-    std::vector<Mint> fb(n);
     std::copy(a.begin(), a.end(), fa.begin());
-    std::copy(b.begin(), b.end(), fb.begin());
     internal::ntt(fa, false);
-    internal::ntt(fb, false);
     const Mint inverse_n = Mint(n).inv();
-    for (int i = 0; i < n; i++) fa[i] *= fb[i] * inverse_n;
+    if (squaring) {
+        for (int i = 0; i < n; i++) fa[i] *= fa[i] * inverse_n;
+    } else {
+        std::vector<Mint> fb(n);
+        std::copy(b.begin(), b.end(), fb.begin());
+        internal::ntt(fb, false);
+        for (int i = 0; i < n; i++) fa[i] *= fb[i] * inverse_n;
+    }
     internal::ntt(fa, true, false);
     fa.resize(result_size);
     return fa;

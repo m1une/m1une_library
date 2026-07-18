@@ -66,6 +66,7 @@ struct BigInt {
             if (s[pos] == '-') sign = -1;
             ++pos;
         }
+        a.reserve((int(s.size()) - pos + BASE_DIGITS - 1) / BASE_DIGITS);
         for (int i = int(s.size()) - 1; i >= pos; i -= BASE_DIGITS) {
             int x = 0;
             for (int j = std::max(pos, i - BASE_DIGITS + 1); j <= i; ++j) {
@@ -78,12 +79,14 @@ struct BigInt {
 
     std::string to_string() const {
         if (a.empty()) return "0";
-        std::string res = "";
+        std::string res;
+        res.reserve(a.size() * BASE_DIGITS + (sign == -1));
         if (sign == -1) res += '-';
         res += std::to_string(a.back());
         for (int i = (int)a.size() - 2; i >= 0; --i) {
             std::string block = std::to_string(a[i]);
-            res += std::string(BASE_DIGITS - block.length(), '0') + block;
+            res.append(BASE_DIGITS - block.length(), '0');
+            res += block;
         }
         return res;
     }
@@ -127,51 +130,64 @@ struct BigInt {
         return !(x < y);
     }
     friend bool operator==(const BigInt& x, const BigInt& y) {
-        return !(x < y) && !(y < x);
+        return x.sign == y.sign && x.a == y.a;
     }
     friend bool operator!=(const BigInt& x, const BigInt& y) {
-        return x < y || y < x;
+        return !(x == y);
     }
 
     BigInt& operator+=(const BigInt& other) {
         if (other.is_zero()) return *this;
         if (is_zero()) return *this = other;
-        if (sign != other.sign) return *this -= (-other);
-        for (int i = 0, carry = 0; i < (int)std::max(a.size(), other.a.size()) || carry; ++i) {
-            if (i == (int)a.size()) a.push_back(0);
-            a[i] += carry + (i < (int)other.a.size() ? other.a[i] : 0);
-            carry = a[i] >= BASE;
-            if (carry) a[i] -= BASE;
+        if (sign != other.sign) {
+            const int comparison = magnitude_compare(a, other.a);
+            if (comparison == 0) {
+                a.clear();
+                sign = 1;
+            } else if (comparison > 0) {
+                subtract_magnitude_inplace(a, other.a);
+            } else {
+                std::vector<int> result = other.a;
+                subtract_magnitude_inplace(result, a);
+                a = std::move(result);
+                sign = other.sign;
+            }
+            return *this;
         }
+        add_magnitude_inplace(a, other.a);
         return *this;
     }
 
     BigInt& operator-=(const BigInt& other) {
         if (other.is_zero()) return *this;
         if (is_zero()) return *this = -other;
-        if (sign != other.sign) return *this += (-other);
-        if (abs() < other.abs()) {
-            BigInt tmp = other;
-            tmp -= *this;
-            *this = tmp;
-            sign = -sign;
+        if (sign != other.sign) {
+            add_magnitude_inplace(a, other.a);
             return *this;
         }
-        for (int i = 0, carry = 0; i < (int)other.a.size() || carry; ++i) {
-            a[i] -= carry + (i < (int)other.a.size() ? other.a[i] : 0);
-            carry = a[i] < 0;
-            if (carry) a[i] += BASE;
+        const int comparison = magnitude_compare(a, other.a);
+        if (comparison == 0) {
+            a.clear();
+            sign = 1;
+        } else if (comparison > 0) {
+            subtract_magnitude_inplace(a, other.a);
+        } else {
+            std::vector<int> result = other.a;
+            subtract_magnitude_inplace(result, a);
+            a = std::move(result);
+            sign = -sign;
         }
-        trim();
         return *this;
     }
 
     BigInt& operator*=(int v) {
+        if (v == 0 || is_zero()) return *this = 0;
         long long multiplier = v;
         if (multiplier < 0) {
             sign = -sign;
             multiplier = -multiplier;
         }
+        a.reserve(a.size() + 2);
         long long carry = 0;
         for (int i = 0; i < (int)a.size() || carry; ++i) {
             if (i == (int)a.size()) a.push_back(0);
@@ -184,20 +200,60 @@ struct BigInt {
     }
 
    private:
-    static constexpr int MULTIPLICATION_THRESHOLD = 128;
+    static constexpr int MULTIPLICATION_THRESHOLD = 224;
     static constexpr int DIVISION_THRESHOLD = 64;
-    static constexpr int CONVOLUTION_BASE = 1000;
 
     static void trim_magnitude(std::vector<int>& value) {
         while (!value.empty() && value.back() == 0) value.pop_back();
     }
 
     static bool magnitude_less(const std::vector<int>& lhs, const std::vector<int>& rhs) {
-        if (lhs.size() != rhs.size()) return lhs.size() < rhs.size();
+        return magnitude_compare(lhs, rhs) < 0;
+    }
+
+    static int magnitude_compare(const std::vector<int>& lhs,
+                                 const std::vector<int>& rhs) {
+        if (lhs.size() != rhs.size()) return lhs.size() < rhs.size() ? -1 : 1;
         for (int i = int(lhs.size()) - 1; i >= 0; --i) {
-            if (lhs[i] != rhs[i]) return lhs[i] < rhs[i];
+            if (lhs[i] != rhs[i]) return lhs[i] < rhs[i] ? -1 : 1;
         }
-        return false;
+        return 0;
+    }
+
+    static void add_magnitude_inplace(std::vector<int>& lhs,
+                                      const std::vector<int>& rhs) {
+        const int lhs_size = int(lhs.size());
+        const int rhs_size = int(rhs.size());
+        const int size = std::max(lhs_size, rhs_size);
+        if (lhs_size < rhs_size) lhs.resize(rhs_size);
+        int carry = 0;
+        int i = 0;
+        for (; i < rhs_size; ++i) {
+            const long long current = (long long)lhs[i] + rhs[i] + carry;
+            lhs[i] = int(current >= BASE ? current - BASE : current);
+            carry = current >= BASE;
+        }
+        while (i < size && carry) {
+            ++lhs[i];
+            carry = lhs[i] == BASE;
+            if (carry) lhs[i] = 0;
+            ++i;
+        }
+        if (carry) lhs.push_back(1);
+    }
+
+    static void subtract_magnitude_inplace(std::vector<int>& lhs,
+                                           const std::vector<int>& rhs) {
+        assert(!magnitude_less(lhs, rhs));
+        int borrow = 0;
+        for (int i = 0; i < int(rhs.size()) || borrow; ++i) {
+            int current = lhs[i] - borrow - (i < int(rhs.size()) ? rhs[i] : 0);
+            borrow = current < 0;
+            if (borrow) current += BASE;
+            lhs[i] = current;
+        }
+        assert(borrow == 0);
+        trim_magnitude(lhs);
     }
 
     static bool magnitude_less_equal(const std::vector<int>& lhs,
@@ -268,16 +324,50 @@ struct BigInt {
         return result;
     }
 
-    static std::vector<int> split_for_convolution(const std::vector<int>& value) {
-        std::vector<int> result(3 * value.size());
+    static std::vector<int> square_naive(const std::vector<int>& value) {
+        if (value.empty()) return std::vector<int>();
+        std::vector<long long> product(2 * value.size());
+        constexpr long long REDUCTION = 4LL * BASE * BASE;
         for (int i = 0; i < int(value.size()); ++i) {
-            int limb = value[i];
-            result[3 * i] = limb % CONVOLUTION_BASE;
-            limb /= CONVOLUTION_BASE;
-            result[3 * i + 1] = limb % CONVOLUTION_BASE;
-            result[3 * i + 2] = limb / CONVOLUTION_BASE;
+            product[2 * i] += (long long)value[i] * value[i];
+            if (product[2 * i] >= REDUCTION) {
+                product[2 * i] -= REDUCTION;
+                product[2 * i + 1] += 4LL * BASE;
+            }
+            for (int j = i + 1; j < int(value.size()); ++j) {
+                product[i + j] += 2LL * value[i] * value[j];
+                if (product[i + j] >= REDUCTION) {
+                    product[i + j] -= REDUCTION;
+                    product[i + j + 1] += 4LL * BASE;
+                }
+            }
+        }
+
+        std::vector<int> result;
+        result.reserve(product.size() + 1);
+        long long carry = 0;
+        for (int i = 0; i < int(product.size()) || carry > 0; ++i) {
+            if (i < int(product.size())) carry += product[i];
+            result.push_back(int(carry % BASE));
+            carry /= BASE;
         }
         trim_magnitude(result);
+        return result;
+    }
+
+    static std::vector<int> multiply_by_limb(const std::vector<int>& value,
+                                             int multiplier) {
+        assert(0 <= multiplier && multiplier < BASE);
+        if (value.empty() || multiplier == 0) return std::vector<int>();
+        std::vector<int> result;
+        result.reserve(value.size() + 1);
+        uint64_t carry = 0;
+        for (int limb : value) {
+            const uint64_t current = uint64_t(limb) * multiplier + carry;
+            result.push_back(int(current % BASE));
+            carry = current / BASE;
+        }
+        if (carry) result.push_back(int(carry));
         return result;
     }
 
@@ -285,48 +375,56 @@ struct BigInt {
                                                  const std::vector<int>& rhs) {
         using Mint1 = math::ModInt<998244353>;
         using Mint2 = math::ModInt<754974721>;
+        using Mint3 = math::ModInt<469762049>;
 
-        const std::vector<int> lhs_digits = split_for_convolution(lhs);
-        const std::vector<int> rhs_digits = split_for_convolution(rhs);
-        const int result_size = int(lhs_digits.size() + rhs_digits.size() - 1);
+        const int result_size = int(lhs.size() + rhs.size() - 1);
         assert(result_size <= (1 << 24));
 
-        std::vector<Mint1> residues1;
-        {
-            std::vector<Mint1> x(lhs_digits.begin(), lhs_digits.end());
-            std::vector<Mint1> y(rhs_digits.begin(), rhs_digits.end());
-            residues1 = fps::convolution(x, y);
-        }
-        std::vector<Mint2> residues2;
-        {
-            std::vector<Mint2> x(lhs_digits.begin(), lhs_digits.end());
-            std::vector<Mint2> y(rhs_digits.begin(), rhs_digits.end());
-            residues2 = fps::convolution(x, y);
-        }
+        auto convolve = [&]<class Mint>() {
+            std::vector<Mint> x(lhs.begin(), lhs.end());
+            if (&lhs == &rhs) return fps::convolution(x, x);
+            std::vector<Mint> y(rhs.begin(), rhs.end());
+            return fps::convolution(x, y);
+        };
+        const std::vector<Mint1> residues1 = convolve.template operator()<Mint1>();
+        const std::vector<Mint2> residues2 = convolve.template operator()<Mint2>();
+        const std::vector<Mint3> residues3 = convolve.template operator()<Mint3>();
 
         constexpr uint64_t MOD1 = Mint1::mod();
         constexpr uint64_t MOD2 = Mint2::mod();
-        const uint64_t inverse_mod1 = Mint2(MOD1).inv().val();
-        std::vector<int> digits;
-        digits.reserve(result_size + 8);
-        uint64_t carry = 0;
+        constexpr uint64_t MOD3 = Mint3::mod();
+        constexpr uint64_t MOD12 = MOD1 * MOD2;
+        const static uint64_t inverse_mod1_mod2 = Mint2(MOD1).inv().val();
+        const static uint64_t inverse_mod12_mod3 = Mint3(MOD12 % MOD3).inv().val();
+        [[maybe_unused]] const unsigned __int128 coefficient_bound =
+            static_cast<unsigned __int128>(std::min(lhs.size(), rhs.size())) *
+            (BASE - 1) * (BASE - 1);
+        [[maybe_unused]] constexpr unsigned __int128 CRT_MODULUS =
+            static_cast<unsigned __int128>(MOD12) * MOD3;
+        assert(coefficient_bound < CRT_MODULUS);
+
+        std::vector<int> result;
+        result.reserve(result_size + 2);
+        unsigned __int128 carry = 0;
         for (int i = 0; i < result_size || carry > 0; ++i) {
             if (i < result_size) {
                 const uint64_t first = residues1[i].val();
                 const uint64_t second = residues2[i].val();
-                const uint64_t difference = (second + MOD2 - first % MOD2) % MOD2;
-                const uint64_t quotient = difference * inverse_mod1 % MOD2;
-                carry += first + MOD1 * quotient;
+                const uint64_t third = residues3[i].val();
+                const uint64_t difference12 =
+                    (second + MOD2 - first % MOD2) % MOD2;
+                const uint64_t quotient12 =
+                    difference12 * inverse_mod1_mod2 % MOD2;
+                const uint64_t combined12 = first + MOD1 * quotient12;
+                const uint64_t difference3 =
+                    (third + MOD3 - combined12 % MOD3) % MOD3;
+                const uint64_t quotient3 =
+                    difference3 * inverse_mod12_mod3 % MOD3;
+                carry += combined12 +
+                         static_cast<unsigned __int128>(MOD12) * quotient3;
             }
-            digits.push_back(int(carry % CONVOLUTION_BASE));
-            carry /= CONVOLUTION_BASE;
-        }
-
-        std::vector<int> result((digits.size() + 2) / 3);
-        constexpr int POWER[3] = {1, CONVOLUTION_BASE,
-                                  CONVOLUTION_BASE * CONVOLUTION_BASE};
-        for (int i = 0; i < int(digits.size()); ++i) {
-            result[i / 3] += digits[i] * POWER[i % 3];
+            result.push_back(int(carry % BASE));
+            carry /= BASE;
         }
         trim_magnitude(result);
         return result;
@@ -335,7 +433,10 @@ struct BigInt {
     static std::vector<int> multiply_magnitude(const std::vector<int>& lhs,
                                                const std::vector<int>& rhs) {
         if (lhs.empty() || rhs.empty()) return std::vector<int>();
+        if (lhs.size() == 1) return multiply_by_limb(rhs, lhs[0]);
+        if (rhs.size() == 1) return multiply_by_limb(lhs, rhs[0]);
         if (std::min(lhs.size(), rhs.size()) <= MULTIPLICATION_THRESHOLD) {
+            if (&lhs == &rhs) return square_naive(lhs);
             return multiply_naive(lhs, rhs);
         }
         return multiply_convolution(lhs, rhs);
@@ -360,7 +461,7 @@ struct BigInt {
         return std::make_pair(std::move(quotient), std::move(remainder_digits));
     }
 
-    static std::pair<std::vector<int>, std::vector<int>> divide_naive(
+    static std::pair<std::vector<int>, std::vector<int>> divide_classical(
         const std::vector<int>& dividend, const std::vector<int>& divisor) {
         assert(!divisor.empty());
         if (divisor.size() == 1) return divide_by_limb(dividend, divisor[0]);
@@ -369,46 +470,86 @@ struct BigInt {
         }
 
         const int normalization = BASE / (divisor.back() + 1);
-        const std::vector<int> normalized_dividend =
-            multiply_magnitude(dividend, std::vector<int>(1, normalization));
-        const std::vector<int> normalized_divisor =
-            multiply_magnitude(divisor, std::vector<int>(1, normalization));
-        const long long leading_divisor = normalized_divisor.back();
-        std::vector<int> quotient(normalized_dividend.size() - normalized_divisor.size() + 1);
-        std::vector<int> remainder(normalized_dividend.end() - normalized_divisor.size(),
-                                   normalized_dividend.end());
+        std::vector<int> normalized_divisor(divisor.size());
+        uint64_t carry = 0;
+        for (int i = 0; i < int(divisor.size()); ++i) {
+            const uint64_t current = uint64_t(divisor[i]) * normalization + carry;
+            normalized_divisor[i] = int(current % BASE);
+            carry = current / BASE;
+        }
+        assert(carry == 0);
 
-        for (int i = int(quotient.size()) - 1; i >= 0; --i) {
-            if (remainder.size() < normalized_divisor.size()) {
-                quotient[i] = 0;
-            } else if (remainder.size() == normalized_divisor.size()) {
-                if (magnitude_less_equal(normalized_divisor, remainder)) {
-                    quotient[i] = 1;
-                    remainder = subtract_magnitude(remainder, normalized_divisor);
-                }
-            } else {
-                assert(remainder.size() == normalized_divisor.size() + 1);
-                const long long leading_remainder =
-                    (long long)remainder.back() * BASE + remainder[remainder.size() - 2];
-                int digit = int(leading_remainder / leading_divisor);
-                if (digit >= BASE) digit = BASE - 1;
-                std::vector<int> product = multiply_magnitude(
-                    normalized_divisor, std::vector<int>(1, digit));
-                while (magnitude_less(remainder, product)) {
-                    --digit;
-                    product = subtract_magnitude(product, normalized_divisor);
-                }
-                remainder = subtract_magnitude(remainder, product);
-                while (magnitude_less_equal(normalized_divisor, remainder)) {
-                    ++digit;
-                    remainder = subtract_magnitude(remainder, normalized_divisor);
-                }
-                quotient[i] = digit;
+        std::vector<int> normalized_dividend(dividend.size() + 1);
+        carry = 0;
+        for (int i = 0; i < int(dividend.size()); ++i) {
+            const uint64_t current = uint64_t(dividend[i]) * normalization + carry;
+            normalized_dividend[i] = int(current % BASE);
+            carry = current / BASE;
+        }
+        normalized_dividend[dividend.size()] = int(carry);
+
+        const int divisor_size = int(normalized_divisor.size());
+        const int quotient_size = int(dividend.size()) - divisor_size + 1;
+        const uint64_t leading_divisor = normalized_divisor.back();
+        const uint64_t second_divisor = normalized_divisor[divisor_size - 2];
+        std::vector<int> quotient(quotient_size);
+
+        for (int position = quotient_size - 1; position >= 0; --position) {
+            const uint64_t leading_dividend =
+                uint64_t(normalized_dividend[position + divisor_size]) * BASE +
+                normalized_dividend[position + divisor_size - 1];
+            uint64_t digit = leading_dividend / leading_divisor;
+            uint64_t remainder = leading_dividend % leading_divisor;
+            if (digit >= BASE) {
+                digit = BASE - 1;
+                remainder = leading_dividend - digit * leading_divisor;
             }
-            if (i > 0) remainder.insert(remainder.begin(), normalized_dividend[i - 1]);
+            while (remainder < BASE &&
+                   digit * second_divisor >
+                       remainder * BASE +
+                           normalized_dividend[position + divisor_size - 2]) {
+                --digit;
+                remainder += leading_divisor;
+            }
+
+            uint64_t borrow = 0;
+            for (int i = 0; i < divisor_size; ++i) {
+                const uint64_t product =
+                    digit * uint64_t(normalized_divisor[i]) + borrow;
+                const uint64_t low = product % BASE;
+                borrow = product / BASE;
+                if (uint64_t(normalized_dividend[position + i]) < low) {
+                    normalized_dividend[position + i] =
+                        int(uint64_t(normalized_dividend[position + i]) + BASE - low);
+                    ++borrow;
+                } else {
+                    normalized_dividend[position + i] -= int(low);
+                }
+            }
+
+            long long top =
+                (long long)normalized_dividend[position + divisor_size] -
+                static_cast<long long>(borrow);
+            if (top < 0) {
+                --digit;
+                uint64_t add_carry = 0;
+                for (int i = 0; i < divisor_size; ++i) {
+                    const uint64_t current =
+                        uint64_t(normalized_dividend[position + i]) +
+                        normalized_divisor[i] + add_carry;
+                    normalized_dividend[position + i] = int(current % BASE);
+                    add_carry = current / BASE;
+                }
+                top += add_carry;
+            }
+            assert(0 <= top && top < BASE);
+            normalized_dividend[position + divisor_size] = int(top);
+            quotient[position] = int(digit);
         }
 
         trim_magnitude(quotient);
+        std::vector<int> remainder(normalized_dividend.begin(),
+                                   normalized_dividend.begin() + divisor_size);
         trim_magnitude(remainder);
         std::pair<std::vector<int>, std::vector<int>> denormalized =
             divide_by_limb(remainder, normalization);
@@ -427,7 +568,7 @@ struct BigInt {
 
         std::vector<int> inverse(value_size + precision + 1);
         inverse.back() = 1;
-        inverse = divide_naive(inverse, value).first;
+        inverse = divide_classical(inverse, value).first;
 
         while (precision < degree) {
             std::vector<int> square = multiply_magnitude(inverse, inverse);
@@ -461,7 +602,7 @@ struct BigInt {
         assert(!divisor.empty());
         if (divisor.size() <= DIVISION_THRESHOLD ||
             int(dividend.size()) - int(divisor.size()) <= DIVISION_THRESHOLD) {
-            return divide_naive(dividend, divisor);
+            return divide_classical(dividend, divisor);
         }
 
         const int normalization = BASE / (divisor.back() + 1);

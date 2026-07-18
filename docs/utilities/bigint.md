@@ -8,10 +8,12 @@ documentation_of: ../../utilities/bigint.hpp
 An arbitrary-precision signed integer for competitive programming. Digits are
 stored in little-endian base-$10^9$ blocks.
 
-Large products use exact number-theoretic convolution after splitting each
-block into base-$1000$ digits. Large quotients use a normalized Newton
-reciprocal and the same fast multiplication. Small inputs use schoolbook
-fallbacks to avoid transform overhead. No floating-point rounding is involved.
+Large products convolve the base-$10^9$ blocks directly under three NTT primes,
+then reconstruct the exact coefficients with the Chinese remainder theorem.
+Large quotients use a normalized Newton reciprocal and the same fast
+multiplication. Small products use schoolbook multiplication, while small
+quotients use normalized Knuth division to avoid transform overhead. Squaring
+uses specialized paths in both regimes. No floating-point rounding is involved.
 
 ## Methods
 
