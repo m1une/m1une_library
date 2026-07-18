@@ -18,7 +18,7 @@ If a header builds an object and then answers repeated queries, it belongs in
 
 | Header | Contents |
 | --- | --- |
-| `algo/sequence/all.hpp` | Sequence and array algorithms such as LIS, inversion count, run-length encoding, and subset sum. |
+| `algo/sequence/all.hpp` | Sequence and array algorithms such as LIS, inversion count, non-adjacent selection, run-length encoding, and subset sum. |
 | `algo/search/all.hpp` | Search-over-answer and unimodal optimization helpers. |
 | `algo/offline/all.hpp` | Offline query processing such as Mo's algorithm. |
 | `algo/enumeration/all.hpp` | Combinatorial traversal helpers such as Gray-code enumeration. |
