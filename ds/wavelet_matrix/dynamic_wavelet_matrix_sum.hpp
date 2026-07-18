@@ -20,25 +20,107 @@ namespace ds {
 
 namespace dynamic_wavelet_matrix_sum_detail {
 
-// An implicit treap of small chunks with additive range products.
-template <typename Sum>
-class DynamicSumSequence {
+#ifdef M1UNE_DYNAMIC_WAVELET_MATRIX_SUM_PROFILE
+struct DynamicWaveletMatrixSumProfile {
+    std::uint64_t bitvector_tree_traversals = 0;
+    std::uint64_t weight_tree_traversals = 0;
+    std::uint64_t chunk_splits = 0;
+    std::uint64_t chunk_merges = 0;
+    std::uint64_t local_element_moves = 0;
+    std::uint64_t full_chunk_rebuilds = 0;
+};
+
+inline DynamicWaveletMatrixSumProfile profile;
+
+inline void reset_profile() {
+    profile = DynamicWaveletMatrixSumProfile();
+}
+
+inline DynamicWaveletMatrixSumProfile get_profile() {
+    return profile;
+}
+
+#define M1UNE_DWM_SUM_PROFILE_ADD(field, amount) \
+    (::m1une::ds::dynamic_wavelet_matrix_sum_detail::profile.field += \
+     (amount))
+#else
+#define M1UNE_DWM_SUM_PROFILE_ADD(field, amount) ((void)0)
+#endif
+
+#ifdef M1UNE_DYNAMIC_WAVELET_MATRIX_SUM_CHUNK_CAPACITY
+inline constexpr int configured_chunk_capacity =
+    M1UNE_DYNAMIC_WAVELET_MATRIX_SUM_CHUNK_CAPACITY;
+#else
+inline constexpr int configured_chunk_capacity = 64;
+#endif
+
+#ifdef M1UNE_DYNAMIC_WAVELET_MATRIX_SUM_GROUP_SIZE
+inline constexpr int configured_group_size =
+    M1UNE_DYNAMIC_WAVELET_MATRIX_SUM_GROUP_SIZE;
+#else
+inline constexpr int configured_group_size = 16;
+#endif
+
+// A chunked implicit treap storing routing bits and additive weights together.
+template <
+    typename Sum,
+    int ChunkCapacity = configured_chunk_capacity,
+    int GroupSize = configured_group_size
+>
+class DynamicWeightedRankSequence {
+   public:
+    struct AccessRankResult {
+        bool bit;
+        Sum weight;
+        int ones_before;
+    };
+
+    struct EraseRankResult {
+        bool bit;
+        Sum weight;
+        int ones_before;
+    };
+
+    struct PrefixStats {
+        int ones = 0;
+        Sum total_sum{};
+        Sum zero_sum{};
+    };
+
+    struct PrefixStatsPair {
+        PrefixStats left;
+        PrefixStats right;
+    };
+
    private:
-    static constexpr int chunk_capacity = 256;
-    static constexpr int minimum_chunk_size = chunk_capacity / 2;
-    static constexpr int group_size = 32;
-    static constexpr int group_count = chunk_capacity / group_size;
+    static_assert(2 <= ChunkCapacity);
+    static_assert(
+        ChunkCapacity <= std::numeric_limits<std::uint16_t>::max()
+    );
+    static_assert(0 < GroupSize && GroupSize <= ChunkCapacity);
+    static_assert(ChunkCapacity % GroupSize == 0);
+    static constexpr int word_bits = 64;
+    static constexpr int word_count =
+        (ChunkCapacity + word_bits - 1) / word_bits;
+    static constexpr int group_count = ChunkCapacity / GroupSize;
+    static constexpr int minimum_chunk_size = ChunkCapacity / 2;
 
     struct Node {
-        std::array<Sum, chunk_capacity> values{};
-        std::array<Sum, group_count> group_sums{};
-        Sum chunk_sum{};
-        Sum subtree_sum{};
+        std::array<Sum, ChunkCapacity> weights{};
+        std::array<Sum, group_count> group_total_sums{};
+        std::array<Sum, group_count> group_zero_sums{};
+        std::array<std::uint64_t, word_count> bits{};
+        Sum chunk_total_sum{};
+        Sum chunk_zero_sum{};
+        Sum subtree_total_sum{};
+        Sum subtree_zero_sum{};
         std::uint32_t priority = 0;
         int left = 0;
         int right = 0;
         int subtree_size = 0;
+        int subtree_ones = 0;
         std::uint16_t length = 0;
+        std::uint16_t chunk_ones = 0;
     };
 
     std::vector<Node> _nodes;
@@ -50,8 +132,16 @@ class DynamicSumSequence {
         return _nodes[node].subtree_size;
     }
 
-    const Sum& sum_of(int node) const {
-        return _nodes[node].subtree_sum;
+    int ones_of(int node) const {
+        return _nodes[node].subtree_ones;
+    }
+
+    const Sum& total_sum_of(int node) const {
+        return _nodes[node].subtree_total_sum;
+    }
+
+    const Sum& zero_sum_of(int node) const {
+        return _nodes[node].subtree_zero_sum;
     }
 
     std::uint32_t next_priority() {
@@ -62,121 +152,181 @@ class DynamicSumSequence {
         return _random_state;
     }
 
+    bool local_bit(int node, int position) const {
+        return (_nodes[node].bits[position / word_bits] >>
+                (position % word_bits)) &
+               1U;
+    }
+
+    void local_set_bit(int node, int position, bool bit) {
+        std::uint64_t mask =
+            std::uint64_t(1) << (position % word_bits);
+        std::uint64_t& word = _nodes[node].bits[position / word_bits];
+        if (bit) {
+            word |= mask;
+        } else {
+            word &= ~mask;
+        }
+    }
+
+    int local_rank1(int node, int right) const {
+        int full_words = right / word_bits;
+        int result = 0;
+        for (int word = 0; word < full_words; word++) {
+            result += std::popcount(_nodes[node].bits[word]);
+        }
+        int remainder = right % word_bits;
+        if (remainder != 0) {
+            result += std::popcount(
+                _nodes[node].bits[full_words] &
+                ((std::uint64_t(1) << remainder) - 1)
+            );
+        }
+        return result;
+    }
+
     void update(int node) {
         if (node == 0) return;
-        _nodes[node].subtree_size =
-            size_of(_nodes[node].left) + int(_nodes[node].length) +
-            size_of(_nodes[node].right);
-        _nodes[node].subtree_sum =
-            sum_of(_nodes[node].left) + _nodes[node].chunk_sum +
-            sum_of(_nodes[node].right);
+        Node& current = _nodes[node];
+        current.subtree_size =
+            size_of(current.left) + int(current.length) +
+            size_of(current.right);
+        current.subtree_ones =
+            ones_of(current.left) + int(current.chunk_ones) +
+            ones_of(current.right);
+        current.subtree_total_sum =
+            total_sum_of(current.left) + current.chunk_total_sum +
+            total_sum_of(current.right);
+        current.subtree_zero_sum =
+            zero_sum_of(current.left) + current.chunk_zero_sum +
+            zero_sum_of(current.right);
     }
 
     void rebuild_chunk(int node) {
+        M1UNE_DWM_SUM_PROFILE_ADD(full_chunk_rebuilds, 1);
         Node& current = _nodes[node];
-        current.group_sums.fill(Sum{});
-        current.chunk_sum = Sum{};
+        current.group_total_sums.fill(Sum{});
+        current.group_zero_sums.fill(Sum{});
+        current.chunk_total_sum = Sum{};
+        current.chunk_zero_sum = Sum{};
+        current.chunk_ones = 0;
         for (int position = 0; position < current.length; position++) {
-            int group = position / group_size;
-            current.group_sums[group] =
-                current.group_sums[group] + current.values[position];
-            current.chunk_sum = current.chunk_sum + current.values[position];
+            int group = position / GroupSize;
+            const Sum& weight = current.weights[position];
+            current.group_total_sums[group] =
+                current.group_total_sums[group] + weight;
+            current.chunk_total_sum = current.chunk_total_sum + weight;
+            if (local_bit(node, position)) {
+                current.chunk_ones++;
+            } else {
+                current.group_zero_sums[group] =
+                    current.group_zero_sums[group] + weight;
+                current.chunk_zero_sum = current.chunk_zero_sum + weight;
+            }
         }
         update(node);
     }
 
-    Sum local_sum(int node, int right) const {
-        Sum result{};
-        int full_groups = right / group_size;
+    PrefixStats local_prefix_stats(int node, int right) const {
+        PrefixStats result;
+        result.ones = local_rank1(node, right);
+        int full_groups = right / GroupSize;
         for (int group = 0; group < full_groups; group++) {
-            result = result + _nodes[node].group_sums[group];
+            result.total_sum =
+                result.total_sum + _nodes[node].group_total_sums[group];
+            result.zero_sum =
+                result.zero_sum + _nodes[node].group_zero_sums[group];
         }
-        for (int position = full_groups * group_size; position < right;
+        for (int position = full_groups * GroupSize; position < right;
              position++) {
-            result = result + _nodes[node].values[position];
+            const Sum& weight = _nodes[node].weights[position];
+            result.total_sum = result.total_sum + weight;
+            if (!local_bit(node, position)) {
+                result.zero_sum = result.zero_sum + weight;
+            }
         }
         return result;
     }
 
-    template <class Predicate>
-    int consume_chunk_prefix(
-        int node,
-        int left,
-        int right,
-        Sum& result,
-        Predicate& predicate
-    ) const {
-        int position = left;
-        while (position < right) {
-            if (position % group_size == 0 &&
-                position + group_size <= right) {
-                int group = position / group_size;
-                Sum candidate = result + _nodes[node].group_sums[group];
-                if (predicate(candidate)) {
-                    result = candidate;
-                    position += group_size;
-                    continue;
-                }
-            }
-            Sum candidate = result + _nodes[node].values[position];
-            if (!predicate(candidate)) break;
-            result = candidate;
-            position++;
-        }
-        return position - left;
+    static void add_stats(PrefixStats& destination, const PrefixStats& value) {
+        destination.ones += value.ones;
+        destination.total_sum = destination.total_sum + value.total_sum;
+        destination.zero_sum = destination.zero_sum + value.zero_sum;
     }
 
-    template <class Predicate>
-    int consume_chunk_suffix(
-        int node,
-        int left,
-        int right,
-        Sum& result,
-        Predicate& predicate
-    ) const {
-        int position = right;
-        while (left < position) {
-            if (position % group_size == 0 &&
-                left <= position - group_size) {
-                int group = position / group_size - 1;
-                Sum candidate = result + _nodes[node].group_sums[group];
-                if (predicate(candidate)) {
-                    result = candidate;
-                    position -= group_size;
-                    continue;
-                }
-            }
-            Sum candidate = result + _nodes[node].values[position - 1];
-            if (!predicate(candidate)) break;
-            result = candidate;
-            position--;
-        }
-        return right - position;
+    PrefixStats subtree_stats(int node) const {
+        return PrefixStats{
+            ones_of(node),
+            total_sum_of(node),
+            zero_sum_of(node)
+        };
     }
 
-    void local_insert(int node, int position, const Sum& value) {
+    void local_insert(int node, int position, bool bit, const Sum& weight) {
         Node& current = _nodes[node];
         assert(0 <= position && position <= current.length);
-        assert(current.length < chunk_capacity);
-        for (int i = current.length; i > position; i--) {
-            current.values[i] = current.values[i - 1];
+        assert(current.length < ChunkCapacity);
+        M1UNE_DWM_SUM_PROFILE_ADD(
+            local_element_moves,
+            int(current.length) - position
+        );
+        for (int i = current.length; position < i; i--) {
+            current.weights[i] = current.weights[i - 1];
+            local_set_bit(node, i, local_bit(node, i - 1));
         }
-        current.values[position] = value;
+        current.weights[position] = weight;
+        local_set_bit(node, position, bit);
         current.length++;
         rebuild_chunk(node);
     }
 
-    Sum local_erase(int node, int position) {
+    EraseRankResult local_erase(int node, int position) {
         Node& current = _nodes[node];
         assert(0 <= position && position < current.length);
-        Sum result = current.values[position];
+        M1UNE_DWM_SUM_PROFILE_ADD(
+            local_element_moves,
+            int(current.length) - position - 1
+        );
+        EraseRankResult result{
+            local_bit(node, position),
+            current.weights[position],
+            0
+        };
         for (int i = position; i + 1 < current.length; i++) {
-            current.values[i] = current.values[i + 1];
+            current.weights[i] = current.weights[i + 1];
+            local_set_bit(node, i, local_bit(node, i + 1));
         }
         current.length--;
-        current.values[current.length] = Sum{};
+        current.weights[current.length] = Sum{};
+        local_set_bit(node, current.length, false);
         rebuild_chunk(node);
         return result;
+    }
+
+    Sum local_set_weight(int node, int position, const Sum& weight) {
+        Node& current = _nodes[node];
+        Sum old_weight = current.weights[position];
+        Sum delta = weight - old_weight;
+        current.weights[position] = weight;
+        int group = position / GroupSize;
+        current.group_total_sums[group] =
+            current.group_total_sums[group] + delta;
+        current.chunk_total_sum = current.chunk_total_sum + delta;
+        if (!local_bit(node, position)) {
+            current.group_zero_sums[group] =
+                current.group_zero_sums[group] + delta;
+            current.chunk_zero_sum = current.chunk_zero_sum + delta;
+        }
+        update(node);
+        return old_weight;
+    }
+
+    Sum local_add_weight(int node, int position, const Sum& delta) {
+        return local_set_weight(
+            node,
+            position,
+            _nodes[node].weights[position] + delta
+        );
     }
 
     int new_node() {
@@ -196,37 +346,50 @@ class DynamicSumSequence {
     template <std::size_t Capacity>
     void assign_from_values(
         int node,
-        const std::array<Sum, Capacity>& values,
+        const std::array<std::uint8_t, Capacity>& bits,
+        const std::array<Sum, Capacity>& weights,
         int first,
         int last
     ) {
         Node& current = _nodes[node];
-        current.values.fill(Sum{});
+        current.bits.fill(0);
+        current.weights.fill(Sum{});
         current.length = std::uint16_t(last - first);
-        for (int i = first; i < last; i++) {
-            current.values[i - first] = values[i];
+        for (int position = first; position < last; position++) {
+            int destination = position - first;
+            current.weights[destination] = weights[position];
+            if (bits[position]) local_set_bit(node, destination, true);
         }
         rebuild_chunk(node);
     }
 
     void assign_from_values(
         int node,
-        const std::vector<Sum>& values,
+        const std::vector<std::uint8_t>& bits,
+        const std::vector<Sum>& weights,
         int first,
         int last
     ) {
         Node& current = _nodes[node];
-        current.values.fill(Sum{});
+        current.bits.fill(0);
+        current.weights.fill(Sum{});
         current.length = std::uint16_t(last - first);
-        for (int i = first; i < last; i++) {
-            current.values[i - first] = values[i];
+        for (int position = first; position < last; position++) {
+            int destination = position - first;
+            current.weights[destination] = weights[position];
+            if (bits[position]) local_set_bit(node, destination, true);
         }
         rebuild_chunk(node);
     }
 
-    int new_node(const std::vector<Sum>& values, int first, int last) {
+    int new_node(
+        const std::vector<std::uint8_t>& bits,
+        const std::vector<Sum>& weights,
+        int first,
+        int last
+    ) {
         int node = new_node();
-        assign_from_values(node, values, first, last);
+        assign_from_values(node, bits, weights, first, last);
         return node;
     }
 
@@ -302,20 +465,30 @@ class DynamicSumSequence {
             int node_length = _nodes[node].length;
             int neighbor_length = _nodes[neighbor].length;
             int total = node_length + neighbor_length;
-            std::array<Sum, chunk_capacity * 2> values{};
+            std::array<std::uint8_t, ChunkCapacity * 2> bits{};
+            std::array<Sum, ChunkCapacity * 2> weights{};
             for (int i = 0; i < node_length; i++) {
-                values[i] = _nodes[node].values[i];
+                bits[i] = local_bit(node, i);
+                weights[i] = _nodes[node].weights[i];
             }
             for (int i = 0; i < neighbor_length; i++) {
-                values[node_length + i] = _nodes[neighbor].values[i];
+                bits[node_length + i] = local_bit(neighbor, i);
+                weights[node_length + i] = _nodes[neighbor].weights[i];
             }
-            if (total <= chunk_capacity) {
-                assign_from_values(node, values, 0, total);
+            if (total <= ChunkCapacity) {
+                M1UNE_DWM_SUM_PROFILE_ADD(chunk_merges, 1);
+                assign_from_values(node, bits, weights, 0, total);
                 recycle_node(neighbor);
             } else {
                 int left_length = total / 2;
-                assign_from_values(node, values, 0, left_length);
-                assign_from_values(neighbor, values, left_length, total);
+                assign_from_values(node, bits, weights, 0, left_length);
+                assign_from_values(
+                    neighbor,
+                    bits,
+                    weights,
+                    left_length,
+                    total
+                );
                 _nodes[node].right = merge(neighbor, _nodes[node].right);
             }
             update(node);
@@ -329,20 +502,36 @@ class DynamicSumSequence {
             int neighbor_length = _nodes[neighbor].length;
             int node_length = _nodes[node].length;
             int total = neighbor_length + node_length;
-            std::array<Sum, chunk_capacity * 2> values{};
+            std::array<std::uint8_t, ChunkCapacity * 2> bits{};
+            std::array<Sum, ChunkCapacity * 2> weights{};
             for (int i = 0; i < neighbor_length; i++) {
-                values[i] = _nodes[neighbor].values[i];
+                bits[i] = local_bit(neighbor, i);
+                weights[i] = _nodes[neighbor].weights[i];
             }
             for (int i = 0; i < node_length; i++) {
-                values[neighbor_length + i] = _nodes[node].values[i];
+                bits[neighbor_length + i] = local_bit(node, i);
+                weights[neighbor_length + i] = _nodes[node].weights[i];
             }
-            if (total <= chunk_capacity) {
-                assign_from_values(node, values, 0, total);
+            if (total <= ChunkCapacity) {
+                M1UNE_DWM_SUM_PROFILE_ADD(chunk_merges, 1);
+                assign_from_values(node, bits, weights, 0, total);
                 recycle_node(neighbor);
             } else {
                 int left_length = total / 2;
-                assign_from_values(neighbor, values, 0, left_length);
-                assign_from_values(node, values, left_length, total);
+                assign_from_values(
+                    neighbor,
+                    bits,
+                    weights,
+                    0,
+                    left_length
+                );
+                assign_from_values(
+                    node,
+                    bits,
+                    weights,
+                    left_length,
+                    total
+                );
                 _nodes[node].left = merge(_nodes[node].left, neighbor);
             }
             update(node);
@@ -350,18 +539,29 @@ class DynamicSumSequence {
         return node;
     }
 
-    int insert_impl(int tree, int position, const Sum& value) {
+    int insert_impl(
+        int tree,
+        int position,
+        bool bit,
+        const Sum& weight,
+        int& ones_before
+    ) {
         if (tree == 0) {
             int node = new_node();
-            local_insert(node, 0, value);
+            local_insert(node, 0, bit, weight);
             return node;
         }
 
         int left_size = size_of(_nodes[tree].left);
         int length = _nodes[tree].length;
         if (position < left_size) {
-            _nodes[tree].left =
-                insert_impl(_nodes[tree].left, position, value);
+            _nodes[tree].left = insert_impl(
+                _nodes[tree].left,
+                position,
+                bit,
+                weight,
+                ones_before
+            );
             update(tree);
             if (_nodes[_nodes[tree].left].priority >
                 _nodes[tree].priority) {
@@ -370,10 +570,14 @@ class DynamicSumSequence {
             return tree;
         }
         if (position > left_size + length) {
+            ones_before +=
+                ones_of(_nodes[tree].left) + _nodes[tree].chunk_ones;
             _nodes[tree].right = insert_impl(
                 _nodes[tree].right,
                 position - left_size - length,
-                value
+                bit,
+                weight,
+                ones_before
             );
             update(tree);
             if (_nodes[_nodes[tree].right].priority >
@@ -384,20 +588,39 @@ class DynamicSumSequence {
         }
 
         int local_position = position - left_size;
-        if (length < chunk_capacity) {
-            local_insert(tree, local_position, value);
+        ones_before += ones_of(_nodes[tree].left) +
+                       local_rank1(tree, local_position);
+        if (length < ChunkCapacity) {
+            local_insert(tree, local_position, bit, weight);
             return tree;
         }
 
-        std::array<Sum, chunk_capacity> values = _nodes[tree].values;
+        std::array<std::uint8_t, ChunkCapacity> bits{};
+        std::array<Sum, ChunkCapacity> weights{};
+        M1UNE_DWM_SUM_PROFILE_ADD(chunk_splits, 1);
+        for (int i = 0; i < ChunkCapacity; i++) {
+            bits[i] = local_bit(tree, i);
+            weights[i] = _nodes[tree].weights[i];
+        }
         int right_chunk = new_node();
-        int middle = chunk_capacity / 2;
-        assign_from_values(tree, values, 0, middle);
-        assign_from_values(right_chunk, values, middle, chunk_capacity);
+        int middle = ChunkCapacity / 2;
+        assign_from_values(tree, bits, weights, 0, middle);
+        assign_from_values(
+            right_chunk,
+            bits,
+            weights,
+            middle,
+            ChunkCapacity
+        );
         if (local_position <= middle) {
-            local_insert(tree, local_position, value);
+            local_insert(tree, local_position, bit, weight);
         } else {
-            local_insert(right_chunk, local_position - middle, value);
+            local_insert(
+                right_chunk,
+                local_position - middle,
+                bit,
+                weight
+            );
         }
 
         int old_right = _nodes[tree].right;
@@ -406,48 +629,225 @@ class DynamicSumSequence {
         return merge(merge(tree, right_chunk), old_right);
     }
 
-    int erase_impl(int tree, int position) {
+    int erase_impl(
+        int tree,
+        int position,
+        EraseRankResult& result
+    ) {
         int left_size = size_of(_nodes[tree].left);
         int length = _nodes[tree].length;
         if (position < left_size) {
-            _nodes[tree].left = erase_impl(_nodes[tree].left, position);
+            _nodes[tree].left = erase_impl(
+                _nodes[tree].left,
+                position,
+                result
+            );
             update(tree);
             return tree;
         }
         if (position >= left_size + length) {
+            result.ones_before +=
+                ones_of(_nodes[tree].left) + _nodes[tree].chunk_ones;
             _nodes[tree].right = erase_impl(
                 _nodes[tree].right,
-                position - left_size - length
+                position - left_size - length,
+                result
             );
             update(tree);
             return tree;
         }
 
-        local_erase(tree, position - left_size);
+        int local_position = position - left_size;
+        result.ones_before += ones_of(_nodes[tree].left) +
+                              local_rank1(tree, local_position);
+        EraseRankResult local = local_erase(tree, local_position);
+        result.bit = local.bit;
+        result.weight = local.weight;
         if (_nodes[tree].length == 0) {
-            int result = merge(_nodes[tree].left, _nodes[tree].right);
+            int merged = merge(_nodes[tree].left, _nodes[tree].right);
             recycle_node(tree);
-            return result;
+            return merged;
         }
         return rebalance(tree);
     }
 
-    void set_impl(int tree, int position, const Sum& value) {
+    template <bool Add>
+    void change_weight_impl(
+        int tree,
+        int position,
+        const Sum& value,
+        AccessRankResult& result
+    ) {
         int left_size = size_of(_nodes[tree].left);
         if (position < left_size) {
-            set_impl(_nodes[tree].left, position, value);
+            change_weight_impl<Add>(
+                _nodes[tree].left,
+                position,
+                value,
+                result
+            );
         } else if (position < left_size + _nodes[tree].length) {
-            _nodes[tree].values[position - left_size] = value;
-            rebuild_chunk(tree);
+            int local_position = position - left_size;
+            result.ones_before += ones_of(_nodes[tree].left) +
+                                  local_rank1(tree, local_position);
+            result.bit = local_bit(tree, local_position);
+            if constexpr (Add) {
+                result.weight = local_add_weight(tree, local_position, value);
+            } else {
+                result.weight = local_set_weight(tree, local_position, value);
+            }
             return;
         } else {
-            set_impl(
+            result.ones_before +=
+                ones_of(_nodes[tree].left) + _nodes[tree].chunk_ones;
+            change_weight_impl<Add>(
                 _nodes[tree].right,
                 position - left_size - _nodes[tree].length,
-                value
+                value,
+                result
             );
         }
         update(tree);
+    }
+
+    PrefixStats prefix_stats_impl(int tree, int right) const {
+        PrefixStats result;
+        while (tree != 0 && right != 0) {
+            int left_size = size_of(_nodes[tree].left);
+            if (right <= left_size) {
+                tree = _nodes[tree].left;
+                continue;
+            }
+            add_stats(result, subtree_stats(_nodes[tree].left));
+            right -= left_size;
+            int take = std::min(right, int(_nodes[tree].length));
+            add_stats(result, local_prefix_stats(tree, take));
+            right -= take;
+            if (right == 0) break;
+            tree = _nodes[tree].right;
+        }
+        return result;
+    }
+
+    PrefixStatsPair prefix_stats_pair_impl(
+        int tree,
+        int left,
+        int right
+    ) const {
+        if (left == right) {
+            PrefixStats value = prefix_stats_impl(tree, left);
+            return PrefixStatsPair{value, value};
+        }
+        if (tree == 0 || right == 0) return PrefixStatsPair{};
+
+        int left_size = size_of(_nodes[tree].left);
+        int chunk_end = left_size + _nodes[tree].length;
+        if (right <= left_size) {
+            return prefix_stats_pair_impl(
+                _nodes[tree].left,
+                left,
+                right
+            );
+        }
+        if (chunk_end <= left) {
+            PrefixStats base = subtree_stats(_nodes[tree].left);
+            add_stats(base, local_prefix_stats(tree, _nodes[tree].length));
+            PrefixStatsPair result = prefix_stats_pair_impl(
+                _nodes[tree].right,
+                left - chunk_end,
+                right - chunk_end
+            );
+            add_stats(result.left, base);
+            add_stats(result.right, base);
+            return result;
+        }
+
+        PrefixStats left_stats;
+        if (left <= left_size) {
+            left_stats = prefix_stats_impl(_nodes[tree].left, left);
+        } else {
+            left_stats = subtree_stats(_nodes[tree].left);
+            add_stats(
+                left_stats,
+                local_prefix_stats(tree, left - left_size)
+            );
+        }
+
+        PrefixStats right_stats = subtree_stats(_nodes[tree].left);
+        if (right <= chunk_end) {
+            add_stats(
+                right_stats,
+                local_prefix_stats(tree, right - left_size)
+            );
+        } else {
+            add_stats(
+                right_stats,
+                local_prefix_stats(tree, _nodes[tree].length)
+            );
+            add_stats(
+                right_stats,
+                prefix_stats_impl(_nodes[tree].right, right - chunk_end)
+            );
+        }
+        return PrefixStatsPair{left_stats, right_stats};
+    }
+
+    template <class Predicate>
+    int consume_chunk_prefix(
+        int node,
+        int left,
+        int right,
+        Sum& sum,
+        Predicate& predicate
+    ) const {
+        int position = left;
+        while (position < right) {
+            if (position % GroupSize == 0 &&
+                position + GroupSize <= right) {
+                int group = position / GroupSize;
+                Sum candidate =
+                    sum + _nodes[node].group_total_sums[group];
+                if (predicate(candidate)) {
+                    sum = candidate;
+                    position += GroupSize;
+                    continue;
+                }
+            }
+            Sum candidate = sum + _nodes[node].weights[position];
+            if (!predicate(candidate)) break;
+            sum = candidate;
+            position++;
+        }
+        return position - left;
+    }
+
+    template <class Predicate>
+    int consume_chunk_suffix(
+        int node,
+        int left,
+        int right,
+        Sum& sum,
+        Predicate& predicate
+    ) const {
+        int position = right;
+        while (left < position) {
+            if (position % GroupSize == 0 &&
+                left <= position - GroupSize) {
+                int group = position / GroupSize - 1;
+                Sum candidate =
+                    sum + _nodes[node].group_total_sums[group];
+                if (predicate(candidate)) {
+                    sum = candidate;
+                    position -= GroupSize;
+                    continue;
+                }
+            }
+            Sum candidate = sum + _nodes[node].weights[position - 1];
+            if (!predicate(candidate)) break;
+            sum = candidate;
+            position--;
+        }
+        return right - position;
     }
 
     template <class Predicate>
@@ -455,15 +855,15 @@ class DynamicSumSequence {
         int tree,
         int left,
         int right,
-        Sum& result,
+        Sum& sum,
         Predicate& predicate
     ) const {
         assert(tree != 0);
         assert(0 <= left && left < right && right <= size_of(tree));
         if (left == 0 && right == size_of(tree)) {
-            Sum candidate = result + sum_of(tree);
+            Sum candidate = sum + total_sum_of(tree);
             if (predicate(candidate)) {
-                result = candidate;
+                sum = candidate;
                 return size_of(tree);
             }
         }
@@ -477,7 +877,7 @@ class DynamicSumSequence {
                 _nodes[tree].left,
                 left,
                 subtree_right,
-                result,
+                sum,
                 predicate
             );
             count += consumed;
@@ -491,7 +891,7 @@ class DynamicSumSequence {
                 tree,
                 chunk_left - left_size,
                 chunk_right - left_size,
-                result,
+                sum,
                 predicate
             );
             count += consumed;
@@ -501,14 +901,13 @@ class DynamicSumSequence {
         if (chunk_end < right) {
             int subtree_left = std::max(left, chunk_end) - chunk_end;
             int subtree_right = right - chunk_end;
-            int consumed = max_prefix_impl(
+            count += max_prefix_impl(
                 _nodes[tree].right,
                 subtree_left,
                 subtree_right,
-                result,
+                sum,
                 predicate
             );
-            count += consumed;
         }
         return count;
     }
@@ -518,15 +917,15 @@ class DynamicSumSequence {
         int tree,
         int left,
         int right,
-        Sum& result,
+        Sum& sum,
         Predicate& predicate
     ) const {
         assert(tree != 0);
         assert(0 <= left && left < right && right <= size_of(tree));
         if (left == 0 && right == size_of(tree)) {
-            Sum candidate = result + sum_of(tree);
+            Sum candidate = sum + total_sum_of(tree);
             if (predicate(candidate)) {
-                result = candidate;
+                sum = candidate;
                 return size_of(tree);
             }
         }
@@ -541,7 +940,7 @@ class DynamicSumSequence {
                 _nodes[tree].right,
                 subtree_left,
                 subtree_right,
-                result,
+                sum,
                 predicate
             );
             count += consumed;
@@ -555,7 +954,7 @@ class DynamicSumSequence {
                 tree,
                 chunk_left - left_size,
                 chunk_right - left_size,
-                result,
+                sum,
                 predicate
             );
             count += consumed;
@@ -564,14 +963,13 @@ class DynamicSumSequence {
 
         if (left < left_size) {
             int subtree_right = std::min(right, left_size);
-            int consumed = max_suffix_impl(
+            count += max_suffix_impl(
                 _nodes[tree].left,
                 left,
                 subtree_right,
-                result,
+                sum,
                 predicate
             );
-            count += consumed;
         }
         return count;
     }
@@ -583,18 +981,23 @@ class DynamicSumSequence {
         update(tree);
     }
 
-    void build(const std::vector<Sum>& values) {
+    void build(
+        const std::vector<std::uint8_t>& bits,
+        const std::vector<Sum>& weights
+    ) {
+        assert(bits.size() == weights.size());
         _nodes.clear();
         _nodes.emplace_back();
         _free_nodes.clear();
         _root = 0;
-        _nodes.reserve(values.size() / chunk_capacity + 2);
+        _nodes.reserve(weights.size() / minimum_chunk_size + 2);
 
         std::vector<int> stack;
-        for (int first = 0; first < int(values.size());
-             first += chunk_capacity) {
-            int last = std::min(first + chunk_capacity, int(values.size()));
-            int node = new_node(values, first, last);
+        for (int first = 0; first < int(weights.size());
+             first += ChunkCapacity) {
+            int last =
+                std::min(first + ChunkCapacity, int(weights.size()));
+            int node = new_node(bits, weights, first, last);
             int left = 0;
             while (!stack.empty() &&
                    _nodes[stack.back()].priority < _nodes[node].priority) {
@@ -610,110 +1013,159 @@ class DynamicSumSequence {
     }
 
    public:
-    DynamicSumSequence() : _nodes(1) {}
+    DynamicWeightedRankSequence() : _nodes(1) {}
 
-    explicit DynamicSumSequence(
-        const std::vector<Sum>& values,
+    DynamicWeightedRankSequence(
+        const std::vector<std::uint8_t>& bits,
+        const std::vector<Sum>& weights,
         std::uint32_t seed = 1
     ) : _random_state(seed == 0 ? 1 : seed) {
-        build(values);
+        build(bits, weights);
+    }
+
+    explicit DynamicWeightedRankSequence(
+        const std::vector<Sum>& weights,
+        std::uint32_t seed = 1
+    ) : _random_state(seed == 0 ? 1 : seed) {
+        build(std::vector<std::uint8_t>(weights.size()), weights);
     }
 
     int size() const {
         return size_of(_root);
     }
 
-    Sum get(int position) const {
+    AccessRankResult access_with_rank(int position) const {
         assert(0 <= position && position < size());
+        M1UNE_DWM_SUM_PROFILE_ADD(weight_tree_traversals, 1);
         int tree = _root;
+        int ones_before = 0;
         while (tree != 0) {
             int left_size = size_of(_nodes[tree].left);
             if (position < left_size) {
                 tree = _nodes[tree].left;
             } else if (position < left_size + _nodes[tree].length) {
-                return _nodes[tree].values[position - left_size];
+                int local_position = position - left_size;
+                ones_before += ones_of(_nodes[tree].left) +
+                               local_rank1(tree, local_position);
+                return AccessRankResult{
+                    local_bit(tree, local_position),
+                    _nodes[tree].weights[local_position],
+                    ones_before
+                };
             } else {
+                ones_before +=
+                    ones_of(_nodes[tree].left) + _nodes[tree].chunk_ones;
                 position -= left_size + _nodes[tree].length;
                 tree = _nodes[tree].right;
             }
         }
         assert(false);
-        return Sum{};
+        return AccessRankResult{false, Sum{}, 0};
     }
 
-    Sum prefix_sum(int right) const {
+    PrefixStats prefix_stats(int right) const {
         assert(0 <= right && right <= size());
-        Sum result{};
-        int tree = _root;
-        while (tree != 0 && right != 0) {
-            int left_size = size_of(_nodes[tree].left);
-            if (right <= left_size) {
-                tree = _nodes[tree].left;
-                continue;
-            }
-            result = result + sum_of(_nodes[tree].left);
-            right -= left_size;
-            int take = std::min(right, int(_nodes[tree].length));
-            result = result + local_sum(tree, take);
-            right -= take;
-            if (right == 0) break;
-            tree = _nodes[tree].right;
-        }
-        return result;
+        M1UNE_DWM_SUM_PROFILE_ADD(weight_tree_traversals, 1);
+        return prefix_stats_impl(_root, right);
+    }
+
+    PrefixStatsPair prefix_stats_pair(int left, int right) const {
+        assert(0 <= left && left <= right && right <= size());
+        M1UNE_DWM_SUM_PROFILE_ADD(weight_tree_traversals, 1);
+        return prefix_stats_pair_impl(_root, left, right);
     }
 
     Sum range_sum(int left, int right) const {
-        assert(0 <= left && left <= right && right <= size());
-        return prefix_sum(right) - prefix_sum(left);
+        PrefixStatsPair stats = prefix_stats_pair(left, right);
+        return stats.right.total_sum - stats.left.total_sum;
+    }
+
+    int insert_with_rank(
+        int position,
+        bool bit,
+        const Sum& weight
+    ) {
+        assert(0 <= position && position <= size());
+        M1UNE_DWM_SUM_PROFILE_ADD(weight_tree_traversals, 1);
+        int ones_before = 0;
+        _root = insert_impl(
+            _root,
+            position,
+            bit,
+            weight,
+            ones_before
+        );
+        return ones_before;
+    }
+
+    EraseRankResult erase_with_rank(int position) {
+        assert(0 <= position && position < size());
+        M1UNE_DWM_SUM_PROFILE_ADD(weight_tree_traversals, 1);
+        EraseRankResult result{false, Sum{}, 0};
+        _root = erase_impl(_root, position, result);
+        return result;
+    }
+
+    AccessRankResult set_weight_with_rank(
+        int position,
+        const Sum& weight
+    ) {
+        assert(0 <= position && position < size());
+        M1UNE_DWM_SUM_PROFILE_ADD(weight_tree_traversals, 1);
+        AccessRankResult result{false, Sum{}, 0};
+        change_weight_impl<false>(_root, position, weight, result);
+        return result;
+    }
+
+    AccessRankResult add_weight_with_rank(
+        int position,
+        const Sum& delta
+    ) {
+        assert(0 <= position && position < size());
+        M1UNE_DWM_SUM_PROFILE_ADD(weight_tree_traversals, 1);
+        AccessRankResult result{false, Sum{}, 0};
+        change_weight_impl<true>(_root, position, delta, result);
+        return result;
     }
 
     template <class Predicate>
     int max_prefix(
         int left,
         int right,
-        Sum& result,
+        Sum& sum,
         Predicate& predicate
     ) const {
         assert(0 <= left && left <= right && right <= size());
         if (left == right) return 0;
-        return max_prefix_impl(_root, left, right, result, predicate);
+        M1UNE_DWM_SUM_PROFILE_ADD(weight_tree_traversals, 1);
+        return max_prefix_impl(_root, left, right, sum, predicate);
     }
 
     template <class Predicate>
     int max_suffix(
         int left,
         int right,
-        Sum& result,
+        Sum& sum,
         Predicate& predicate
     ) const {
         assert(0 <= left && left <= right && right <= size());
         if (left == right) return 0;
-        return max_suffix_impl(_root, left, right, result, predicate);
-    }
-
-    void insert(int position, const Sum& value) {
-        assert(0 <= position && position <= size());
-        _root = insert_impl(_root, position, value);
-    }
-
-    Sum erase(int position) {
-        assert(0 <= position && position < size());
-        Sum result = get(position);
-        _root = erase_impl(_root, position);
-        return result;
-    }
-
-    void set(int position, const Sum& value) {
-        assert(0 <= position && position < size());
-        set_impl(_root, position, value);
+        M1UNE_DWM_SUM_PROFILE_ADD(weight_tree_traversals, 1);
+        return max_suffix_impl(_root, left, right, sum, predicate);
     }
 };
 
 }  // namespace dynamic_wavelet_matrix_sum_detail
 
+#undef M1UNE_DWM_SUM_PROFILE_ADD
+
 // A dynamic wavelet matrix with additive weights.
 // By default, each value is also used as its weight.
-template <std::integral T, typename Sum = T>
+template <
+    std::integral T,
+    typename Sum = T,
+    int BitWidth = std::numeric_limits<std::make_unsigned_t<T>>::digits
+>
 requires(!std::same_as<std::remove_cv_t<T>, bool>)
 class DynamicWaveletMatrixSum {
    public:
@@ -722,29 +1174,52 @@ class DynamicWaveletMatrixSum {
     using unsigned_type = std::make_unsigned_t<T>;
 
    private:
-    static constexpr int bit_width =
+    static constexpr int full_bit_width =
         std::numeric_limits<unsigned_type>::digits;
+    static_assert(1 <= BitWidth && BitWidth <= full_bit_width);
+    static_assert(
+        BitWidth == full_bit_width || std::unsigned_integral<T>,
+        "reduced-width keys must use an unsigned type"
+    );
+
     static constexpr unsigned_type sign_mask = [] {
         if constexpr (std::signed_integral<T>) {
-            return unsigned_type(1) << (bit_width - 1);
+            return unsigned_type(1) << (BitWidth - 1);
         } else {
             return unsigned_type(0);
         }
     }();
 
-    using BitVector =
-        dynamic_wavelet_matrix_detail::DynamicRankBitVector;
-    using SumSequence =
-        dynamic_wavelet_matrix_sum_detail::DynamicSumSequence<Sum>;
+    static constexpr unsigned_type reduced_limit = [] {
+        if constexpr (BitWidth < full_bit_width) {
+            return unsigned_type(1) << BitWidth;
+        } else {
+            return unsigned_type(0);
+        }
+    }();
+
+    using Level = dynamic_wavelet_matrix_sum_detail::
+        DynamicWeightedRankSequence<Sum>;
+
+    struct ErasedElement {
+        unsigned_type key;
+        Sum weight;
+    };
 
     int _size = 0;
-    std::vector<BitVector> _matrix;
-    std::vector<SumSequence> _zero_weights;
-    SumSequence _original_weights;
-    SumSequence _final_weights;
-    std::array<int, bit_width> _zero_count{};
+    std::vector<Level> _levels;
+    Level _final_weights;
+    std::array<int, BitWidth> _zero_count{};
 
-    static unsigned_type encode(T value) {
+    static bool key_fits(T value) {
+        if constexpr (BitWidth < full_bit_width) {
+            return static_cast<unsigned_type>(value) < reduced_limit;
+        } else {
+            return true;
+        }
+    }
+
+    static unsigned_type encode_unchecked(T value) {
         unsigned_type bits;
         if constexpr (std::signed_integral<T>) {
             bits = std::bit_cast<unsigned_type>(value);
@@ -752,6 +1227,11 @@ class DynamicWaveletMatrixSum {
             bits = value;
         }
         return bits ^ sign_mask;
+    }
+
+    static unsigned_type encode_key(T value) {
+        assert(key_fits(value));
+        return encode_unchecked(value);
     }
 
     static T decode(unsigned_type key) {
@@ -764,7 +1244,15 @@ class DynamicWaveletMatrixSum {
     }
 
     static bool bit(unsigned_type key, int level) {
-        return (key >> (bit_width - 1 - level)) & unsigned_type(1);
+        return (key >> (BitWidth - 1 - level)) & unsigned_type(1);
+    }
+
+    static Sum range_total(const typename Level::PrefixStatsPair& stats) {
+        return stats.right.total_sum - stats.left.total_sum;
+    }
+
+    static Sum range_zero(const typename Level::PrefixStatsPair& stats) {
+        return stats.right.zero_sum - stats.left.zero_sum;
     }
 
     void build(const std::vector<T>& values, const std::vector<Sum>& weights) {
@@ -776,31 +1264,23 @@ class DynamicWaveletMatrixSum {
         std::vector<Sum> current_weights(weights);
         std::vector<Sum> next_weights(_size);
         for (int i = 0; i < _size; i++) {
-            current_keys[i] = encode(values[i]);
+            current_keys[i] = encode_key(values[i]);
         }
 
-        _original_weights = SumSequence(weights, 0x243f6a88U);
-        _matrix.clear();
-        _matrix.reserve(bit_width);
-        _zero_weights.clear();
-        _zero_weights.reserve(bit_width);
-        for (int level = 0; level < bit_width; level++) {
+        _levels.clear();
+        _levels.reserve(BitWidth);
+        for (int level = 0; level < BitWidth; level++) {
             std::vector<std::uint8_t> bits(_size);
-            std::vector<Sum> zero_weights(_size, Sum{});
             int zeros = 0;
             for (int i = 0; i < _size; i++) {
                 bits[i] = bit(current_keys[i], level);
                 zeros += !bits[i];
-                if (!bits[i]) zero_weights[i] = current_weights[i];
             }
             _zero_count[level] = zeros;
-            _matrix.emplace_back(
+            _levels.emplace_back(
                 bits,
+                current_weights,
                 std::uint32_t(0x9e3779b9U + level * 0x85ebca6bU)
-            );
-            _zero_weights.emplace_back(
-                zero_weights,
-                std::uint32_t(0xc2b2ae35U + level * 0x27d4eb2fU)
             );
 
             int zero_position = 0;
@@ -813,14 +1293,14 @@ class DynamicWaveletMatrixSum {
             current_keys.swap(next_keys);
             current_weights.swap(next_weights);
         }
-        _final_weights = SumSequence(current_weights, 0xb7e15162U);
+        _final_weights = Level(current_weights, 0xb7e15162U);
     }
 
     void insert_encoded(int position, unsigned_type key, const Sum& weight) {
-        _original_weights.insert(position, weight);
-        for (int level = 0; level < bit_width; level++) {
-            int ones_before = _matrix[level].rank1(position);
+        for (int level = 0; level < BitWidth; level++) {
             bool one = bit(key, level);
+            int ones_before =
+                _levels[level].insert_with_rank(position, one, weight);
             int next_position;
             if (one) {
                 next_position = _zero_count[level] + ones_before;
@@ -828,42 +1308,39 @@ class DynamicWaveletMatrixSum {
                 next_position = position - ones_before;
                 _zero_count[level]++;
             }
-            _matrix[level].insert(position, one);
-            _zero_weights[level].insert(
-                position,
-                one ? Sum{} : weight
-            );
             position = next_position;
         }
-        _final_weights.insert(position, weight);
+        _final_weights.insert_with_rank(position, false, weight);
         _size++;
     }
 
-    void erase_encoded(int position) {
-        _original_weights.erase(position);
-        for (int level = 0; level < bit_width; level++) {
-            int ones_before = _matrix[level].rank1(position);
-            bool one = _matrix[level].get(position);
+    ErasedElement erase_encoded(int position) {
+        unsigned_type key = 0;
+        Sum weight{};
+        for (int level = 0; level < BitWidth; level++) {
+            auto erased = _levels[level].erase_with_rank(position);
+            if (level == 0) weight = erased.weight;
             int next_position;
-            if (one) {
-                next_position = _zero_count[level] + ones_before;
+            if (erased.bit) {
+                key |= unsigned_type(1) << (BitWidth - 1 - level);
+                next_position = _zero_count[level] + erased.ones_before;
             } else {
-                next_position = position - ones_before;
+                next_position = position - erased.ones_before;
                 _zero_count[level]--;
             }
-            _matrix[level].erase(position);
-            _zero_weights[level].erase(position);
             position = next_position;
         }
-        _final_weights.erase(position);
+        _final_weights.erase_with_rank(position);
         _size--;
+        return ErasedElement{key, weight};
     }
 
     int count_less_encoded(int left, int right, unsigned_type upper) const {
         int result = 0;
-        for (int level = 0; level < bit_width; level++) {
-            int left_ones = _matrix[level].rank1(left);
-            int right_ones = _matrix[level].rank1(right);
+        for (int level = 0; level < BitWidth; level++) {
+            auto stats = _levels[level].prefix_stats_pair(left, right);
+            int left_ones = stats.left.ones;
+            int right_ones = stats.right.ones;
             if (bit(upper, level)) {
                 result += (right - left) - (right_ones - left_ones);
                 left = _zero_count[level] + left_ones;
@@ -876,14 +1353,21 @@ class DynamicWaveletMatrixSum {
         return result;
     }
 
+    int count_less(int left, int right, T upper) const {
+        if constexpr (BitWidth < full_bit_width) {
+            if (!key_fits(upper)) return right - left;
+        }
+        return count_less_encoded(left, right, encode_unchecked(upper));
+    }
+
     Sum sum_less_encoded(int left, int right, unsigned_type upper) const {
         Sum result{};
-        for (int level = 0; level < bit_width; level++) {
-            int left_ones = _matrix[level].rank1(left);
-            int right_ones = _matrix[level].rank1(right);
+        for (int level = 0; level < BitWidth; level++) {
+            auto stats = _levels[level].prefix_stats_pair(left, right);
+            int left_ones = stats.left.ones;
+            int right_ones = stats.right.ones;
             if (bit(upper, level)) {
-                result = result +
-                         _zero_weights[level].range_sum(left, right);
+                result = result + range_zero(stats);
                 left = _zero_count[level] + left_ones;
                 right = _zero_count[level] + right_ones;
             } else {
@@ -894,9 +1378,15 @@ class DynamicWaveletMatrixSum {
         return result;
     }
 
+    Sum sum_less(int left, int right, T upper) const {
+        if constexpr (BitWidth < full_bit_width) {
+            if (!key_fits(upper)) return range_sum(left, right);
+        }
+        return sum_less_encoded(left, right, encode_unchecked(upper));
+    }
+
    public:
-    DynamicWaveletMatrixSum()
-        : _matrix(bit_width), _zero_weights(bit_width) {}
+    DynamicWaveletMatrixSum() : _levels(BitWidth) {}
 
     explicit DynamicWaveletMatrixSum(const std::vector<T>& values)
         requires std::convertible_to<T, Sum>
@@ -929,13 +1419,13 @@ class DynamicWaveletMatrixSum {
     T access(int position) const {
         assert(0 <= position && position < _size);
         unsigned_type key = 0;
-        for (int level = 0; level < bit_width; level++) {
-            int ones_before = _matrix[level].rank1(position);
-            if (_matrix[level].get(position)) {
-                key |= unsigned_type(1) << (bit_width - 1 - level);
-                position = _zero_count[level] + ones_before;
+        for (int level = 0; level < BitWidth; level++) {
+            auto accessed = _levels[level].access_with_rank(position);
+            if (accessed.bit) {
+                key |= unsigned_type(1) << (BitWidth - 1 - level);
+                position = _zero_count[level] + accessed.ones_before;
             } else {
-                position -= ones_before;
+                position -= accessed.ones_before;
             }
         }
         return decode(key);
@@ -947,11 +1437,24 @@ class DynamicWaveletMatrixSum {
 
     Sum weight(int position) const {
         assert(0 <= position && position < _size);
-        return _original_weights.get(position);
+        return _levels[0].access_with_rank(position).weight;
     }
 
     std::pair<T, Sum> get(int position) const {
-        return std::pair<T, Sum>(access(position), weight(position));
+        assert(0 <= position && position < _size);
+        unsigned_type key = 0;
+        Sum result_weight{};
+        for (int level = 0; level < BitWidth; level++) {
+            auto accessed = _levels[level].access_with_rank(position);
+            if (level == 0) result_weight = accessed.weight;
+            if (accessed.bit) {
+                key |= unsigned_type(1) << (BitWidth - 1 - level);
+                position = _zero_count[level] + accessed.ones_before;
+            } else {
+                position -= accessed.ones_before;
+            }
+        }
+        return std::pair<T, Sum>(decode(key), result_weight);
     }
 
     void insert(int position, T value)
@@ -962,7 +1465,7 @@ class DynamicWaveletMatrixSum {
 
     void insert(int position, T value, const Sum& weight) {
         assert(0 <= position && position <= _size);
-        insert_encoded(position, encode(value), weight);
+        insert_encoded(position, encode_key(value), weight);
     }
 
     void push_back(T value)
@@ -977,9 +1480,8 @@ class DynamicWaveletMatrixSum {
 
     std::pair<T, Sum> erase(int position) {
         assert(0 <= position && position < _size);
-        std::pair<T, Sum> result = get(position);
-        erase_encoded(position);
-        return result;
+        ErasedElement erased = erase_encoded(position);
+        return std::pair<T, Sum>(decode(erased.key), erased.weight);
     }
 
     void set(int position, T value)
@@ -990,41 +1492,44 @@ class DynamicWaveletMatrixSum {
 
     void set(int position, T value, const Sum& weight) {
         assert(0 <= position && position < _size);
-        if (access(position) == value) {
-            set_weight(position, weight);
-            return;
-        }
+        unsigned_type key = encode_key(value);
         erase_encoded(position);
-        insert_encoded(position, encode(value), weight);
+        insert_encoded(position, key, weight);
     }
 
     void set_value(int position, T value) {
         assert(0 <= position && position < _size);
-        if (access(position) == value) return;
-        Sum current_weight = weight(position);
-        erase_encoded(position);
-        insert_encoded(position, encode(value), current_weight);
+        unsigned_type key = encode_key(value);
+        ErasedElement erased = erase_encoded(position);
+        insert_encoded(position, key, erased.weight);
     }
 
-    void set_weight(int position, const Sum& weight) {
+    void set_weight(int position, const Sum& new_weight) {
         assert(0 <= position && position < _size);
-        _original_weights.set(position, weight);
-        for (int level = 0; level < bit_width; level++) {
-            int ones_before = _matrix[level].rank1(position);
-            bool one = _matrix[level].get(position);
-            _zero_weights[level].set(position, one ? Sum{} : weight);
-            if (one) {
-                position = _zero_count[level] + ones_before;
+        for (int level = 0; level < BitWidth; level++) {
+            auto accessed =
+                _levels[level].set_weight_with_rank(position, new_weight);
+            if (accessed.bit) {
+                position = _zero_count[level] + accessed.ones_before;
             } else {
-                position -= ones_before;
+                position -= accessed.ones_before;
             }
         }
-        _final_weights.set(position, weight);
+        _final_weights.set_weight_with_rank(position, new_weight);
     }
 
     void add_weight(int position, const Sum& delta) {
         assert(0 <= position && position < _size);
-        set_weight(position, weight(position) + delta);
+        for (int level = 0; level < BitWidth; level++) {
+            auto accessed =
+                _levels[level].add_weight_with_rank(position, delta);
+            if (accessed.bit) {
+                position = _zero_count[level] + accessed.ones_before;
+            } else {
+                position -= accessed.ones_before;
+            }
+        }
+        _final_weights.add_weight_with_rank(position, delta);
     }
 
     int rank(T value, int right) const {
@@ -1034,10 +1539,14 @@ class DynamicWaveletMatrixSum {
 
     int rank(T value, int left, int right) const {
         assert(0 <= left && left <= right && right <= _size);
-        unsigned_type key = encode(value);
-        for (int level = 0; level < bit_width; level++) {
-            int left_ones = _matrix[level].rank1(left);
-            int right_ones = _matrix[level].rank1(right);
+        if constexpr (BitWidth < full_bit_width) {
+            if (!key_fits(value)) return 0;
+        }
+        unsigned_type key = encode_unchecked(value);
+        for (int level = 0; level < BitWidth; level++) {
+            auto stats = _levels[level].prefix_stats_pair(left, right);
+            int left_ones = stats.left.ones;
+            int right_ones = stats.right.ones;
             if (bit(key, level)) {
                 left = _zero_count[level] + left_ones;
                 right = _zero_count[level] + right_ones;
@@ -1053,9 +1562,10 @@ class DynamicWaveletMatrixSum {
         assert(0 <= left && left <= right && right <= _size);
         assert(0 <= k && k < right - left);
         unsigned_type key = 0;
-        for (int level = 0; level < bit_width; level++) {
-            int left_ones = _matrix[level].rank1(left);
-            int right_ones = _matrix[level].rank1(right);
+        for (int level = 0; level < BitWidth; level++) {
+            auto stats = _levels[level].prefix_stats_pair(left, right);
+            int left_ones = stats.left.ones;
+            int right_ones = stats.right.ones;
             int left_zeros = left - left_ones;
             int right_zeros = right - right_ones;
             int zeros = right_zeros - left_zeros;
@@ -1064,7 +1574,7 @@ class DynamicWaveletMatrixSum {
                 right = right_zeros;
             } else {
                 k -= zeros;
-                key |= unsigned_type(1) << (bit_width - 1 - level);
+                key |= unsigned_type(1) << (BitWidth - 1 - level);
                 left = _zero_count[level] + left_ones;
                 right = _zero_count[level] + right_ones;
             }
@@ -1080,14 +1590,14 @@ class DynamicWaveletMatrixSum {
 
     int range_freq(int left, int right, T upper) const {
         assert(0 <= left && left <= right && right <= _size);
-        return count_less_encoded(left, right, encode(upper));
+        return count_less(left, right, upper);
     }
 
     int range_freq(int left, int right, T lower, T upper) const {
         assert(0 <= left && left <= right && right <= _size);
         if (upper <= lower) return 0;
-        return range_freq(left, right, upper) -
-               range_freq(left, right, lower);
+        return count_less(left, right, upper) -
+               count_less(left, right, lower);
     }
 
     std::optional<T> prev_value(int left, int right, T upper) const {
@@ -1106,28 +1616,29 @@ class DynamicWaveletMatrixSum {
 
     Sum range_sum(int left, int right) const {
         assert(0 <= left && left <= right && right <= _size);
-        return _original_weights.range_sum(left, right);
+        return _levels[0].range_sum(left, right);
     }
 
     Sum range_sum(int left, int right, T upper) const {
         assert(0 <= left && left <= right && right <= _size);
-        return sum_less_encoded(left, right, encode(upper));
+        return sum_less(left, right, upper);
     }
 
     Sum range_sum(int left, int right, T lower, T upper) const {
         assert(0 <= left && left <= right && right <= _size);
         if (upper <= lower) return Sum{};
-        return range_sum(left, right, upper) -
-               range_sum(left, right, lower);
+        return sum_less(left, right, upper) -
+               sum_less(left, right, lower);
     }
 
     Sum sum_k_smallest(int left, int right, int k) const {
         assert(0 <= left && left <= right && right <= _size);
         assert(0 <= k && k <= right - left);
         Sum result{};
-        for (int level = 0; level < bit_width; level++) {
-            int left_ones = _matrix[level].rank1(left);
-            int right_ones = _matrix[level].rank1(right);
+        for (int level = 0; level < BitWidth; level++) {
+            auto stats = _levels[level].prefix_stats_pair(left, right);
+            int left_ones = stats.left.ones;
+            int right_ones = stats.right.ones;
             int left_zeros = left - left_ones;
             int right_zeros = right - right_ones;
             int zeros = right_zeros - left_zeros;
@@ -1135,8 +1646,7 @@ class DynamicWaveletMatrixSum {
                 left = left_zeros;
                 right = right_zeros;
             } else {
-                result = result +
-                         _zero_weights[level].range_sum(left, right);
+                result = result + range_zero(stats);
                 k -= zeros;
                 left = _zero_count[level] + left_ones;
                 right = _zero_count[level] + right_ones;
@@ -1162,14 +1672,14 @@ class DynamicWaveletMatrixSum {
         assert(predicate(Sum{}));
         Sum result{};
         int count = 0;
-        for (int level = 0; level < bit_width; level++) {
-            int left_ones = _matrix[level].rank1(left);
-            int right_ones = _matrix[level].rank1(right);
+        for (int level = 0; level < BitWidth; level++) {
+            auto stats = _levels[level].prefix_stats_pair(left, right);
+            int left_ones = stats.left.ones;
+            int right_ones = stats.right.ones;
             int left_zeros = left - left_ones;
             int right_zeros = right - right_ones;
             int zeros = right_zeros - left_zeros;
-            Sum candidate =
-                result + _zero_weights[level].range_sum(left, right);
+            Sum candidate = result + range_zero(stats);
             if (predicate(candidate)) {
                 result = candidate;
                 count += zeros;
@@ -1198,26 +1708,23 @@ class DynamicWaveletMatrixSum {
         assert(0 <= left && left <= right && right <= _size);
         assert(predicate(Sum{}));
         Sum result{};
-        Sum current_sum = range_sum(left, right);
         int count = 0;
-        for (int level = 0; level < bit_width; level++) {
-            int left_ones = _matrix[level].rank1(left);
-            int right_ones = _matrix[level].rank1(right);
+        for (int level = 0; level < BitWidth; level++) {
+            auto stats = _levels[level].prefix_stats_pair(left, right);
+            int left_ones = stats.left.ones;
+            int right_ones = stats.right.ones;
             int left_zeros = left - left_ones;
             int right_zeros = right - right_ones;
             int ones = right_ones - left_ones;
-            Sum zero_result =
-                _zero_weights[level].range_sum(left, right);
-            Sum one_result = current_sum - zero_result;
+            Sum zero_result = range_zero(stats);
+            Sum one_result = range_total(stats) - zero_result;
             Sum candidate = result + one_result;
             if (predicate(candidate)) {
                 result = candidate;
                 count += ones;
-                current_sum = zero_result;
                 left = left_zeros;
                 right = right_zeros;
             } else {
-                current_sum = one_result;
                 left = _zero_count[level] + left_ones;
                 right = _zero_count[level] + right_ones;
             }

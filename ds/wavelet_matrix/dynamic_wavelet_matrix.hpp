@@ -20,6 +20,22 @@ namespace dynamic_wavelet_matrix_detail {
 
 // A dynamic bit vector stored as an implicit treap of small packed chunks.
 class DynamicRankBitVector {
+   public:
+    struct AccessRankResult {
+        bool value;
+        int ones_before;
+    };
+
+    struct EraseRankResult {
+        bool value;
+        int ones_before;
+    };
+
+    struct RankPair {
+        int left_ones;
+        int right_ones;
+    };
+
    private:
     static constexpr int word_bits = 64;
     static constexpr int chunk_words = 4;
@@ -372,7 +388,79 @@ class DynamicRankBitVector {
         update(node);
     }
 
-    int insert_impl(int tree, int position, bool value) {
+    int prefix_rank1_impl(int tree, int right) const {
+        int result = 0;
+        while (tree != 0 && right != 0) {
+            int left_size = size_of(_nodes[tree].left);
+            if (right <= left_size) {
+                tree = _nodes[tree].left;
+                continue;
+            }
+            result += ones_of(_nodes[tree].left);
+            right -= left_size;
+            int take = std::min(right, int(_nodes[tree].length));
+            result += local_rank1(tree, take);
+            right -= take;
+            if (right == 0) break;
+            tree = _nodes[tree].right;
+        }
+        return result;
+    }
+
+    RankPair rank1_pair_impl(int tree, int left, int right) const {
+        if (left == right) {
+            int ones = prefix_rank1_impl(tree, left);
+            return RankPair{ones, ones};
+        }
+        if (tree == 0 || right == 0) return RankPair{0, 0};
+
+        int left_size = size_of(_nodes[tree].left);
+        int chunk_end = left_size + _nodes[tree].length;
+        if (right <= left_size) {
+            return rank1_pair_impl(_nodes[tree].left, left, right);
+        }
+        if (chunk_end <= left) {
+            int base =
+                ones_of(_nodes[tree].left) + _nodes[tree].chunk_ones;
+            RankPair result = rank1_pair_impl(
+                _nodes[tree].right,
+                left - chunk_end,
+                right - chunk_end
+            );
+            result.left_ones += base;
+            result.right_ones += base;
+            return result;
+        }
+
+        int left_ones;
+        if (left <= left_size) {
+            left_ones = prefix_rank1_impl(_nodes[tree].left, left);
+        } else {
+            left_ones = ones_of(_nodes[tree].left) +
+                        local_rank1(tree, left - left_size);
+        }
+
+        int right_ones;
+        if (right <= chunk_end) {
+            right_ones = ones_of(_nodes[tree].left) +
+                         local_rank1(tree, right - left_size);
+        } else {
+            right_ones = ones_of(_nodes[tree].left) +
+                         _nodes[tree].chunk_ones +
+                         prefix_rank1_impl(
+                             _nodes[tree].right,
+                             right - chunk_end
+                         );
+        }
+        return RankPair{left_ones, right_ones};
+    }
+
+    int insert_impl(
+        int tree,
+        int position,
+        bool value,
+        int& ones_before
+    ) {
         if (tree == 0) {
             int node = new_node();
             local_insert(node, 0, value);
@@ -382,8 +470,12 @@ class DynamicRankBitVector {
         int left_size = size_of(_nodes[tree].left);
         int length = _nodes[tree].length;
         if (position < left_size) {
-            _nodes[tree].left =
-                insert_impl(_nodes[tree].left, position, value);
+            _nodes[tree].left = insert_impl(
+                _nodes[tree].left,
+                position,
+                value,
+                ones_before
+            );
             update(tree);
             if (_nodes[_nodes[tree].left].priority >
                 _nodes[tree].priority) {
@@ -392,10 +484,13 @@ class DynamicRankBitVector {
             return tree;
         }
         if (position > left_size + length) {
+            ones_before +=
+                ones_of(_nodes[tree].left) + _nodes[tree].chunk_ones;
             _nodes[tree].right = insert_impl(
                 _nodes[tree].right,
                 position - left_size - length,
-                value
+                value,
+                ones_before
             );
             update(tree);
             if (_nodes[_nodes[tree].right].priority >
@@ -406,6 +501,8 @@ class DynamicRankBitVector {
         }
 
         int local_position = position - left_size;
+        ones_before += ones_of(_nodes[tree].left) +
+                       local_rank1(tree, local_position);
         if (length < chunk_capacity) {
             local_insert(tree, local_position, value);
             return tree;
@@ -431,28 +528,42 @@ class DynamicRankBitVector {
         return merge(merge(tree, right_chunk), old_right);
     }
 
-    int erase_impl(int tree, int position) {
+    int erase_impl(
+        int tree,
+        int position,
+        EraseRankResult& result
+    ) {
         int left_size = size_of(_nodes[tree].left);
         int length = _nodes[tree].length;
         if (position < left_size) {
-            _nodes[tree].left = erase_impl(_nodes[tree].left, position);
+            _nodes[tree].left = erase_impl(
+                _nodes[tree].left,
+                position,
+                result
+            );
             update(tree);
             return tree;
         }
         if (position >= left_size + length) {
+            result.ones_before +=
+                ones_of(_nodes[tree].left) + _nodes[tree].chunk_ones;
             _nodes[tree].right = erase_impl(
                 _nodes[tree].right,
-                position - left_size - length
+                position - left_size - length,
+                result
             );
             update(tree);
             return tree;
         }
 
-        local_erase(tree, position - left_size);
+        int local_position = position - left_size;
+        result.ones_before += ones_of(_nodes[tree].left) +
+                              local_rank1(tree, local_position);
+        result.value = local_erase(tree, local_position);
         if (_nodes[tree].length == 0) {
-            int result = merge(_nodes[tree].left, _nodes[tree].right);
+            int merged = merge(_nodes[tree].left, _nodes[tree].right);
             recycle_node(tree);
-            return result;
+            return merged;
         }
         return rebalance(tree);
     }
@@ -504,54 +615,66 @@ class DynamicRankBitVector {
     }
 
     bool get(int position) const {
+        return access_with_rank(position).value;
+    }
+
+    AccessRankResult access_with_rank(int position) const {
         assert(0 <= position && position < size());
+        int ones_before = 0;
         int tree = _root;
         while (tree != 0) {
             int left_size = size_of(_nodes[tree].left);
             if (position < left_size) {
                 tree = _nodes[tree].left;
             } else if (position < left_size + _nodes[tree].length) {
-                return local_get(tree, position - left_size);
+                int local_position = position - left_size;
+                ones_before += ones_of(_nodes[tree].left) +
+                               local_rank1(tree, local_position);
+                return AccessRankResult{
+                    local_get(tree, local_position),
+                    ones_before
+                };
             } else {
+                ones_before +=
+                    ones_of(_nodes[tree].left) + _nodes[tree].chunk_ones;
                 position -= left_size + _nodes[tree].length;
                 tree = _nodes[tree].right;
             }
         }
         assert(false);
-        return false;
+        return AccessRankResult{false, 0};
     }
 
     int rank1(int right) const {
         assert(0 <= right && right <= size());
-        int result = 0;
-        int tree = _root;
-        while (tree != 0 && right != 0) {
-            int left_size = size_of(_nodes[tree].left);
-            if (right <= left_size) {
-                tree = _nodes[tree].left;
-                continue;
-            }
-            result += ones_of(_nodes[tree].left);
-            right -= left_size;
-            int take = std::min(right, int(_nodes[tree].length));
-            result += local_rank1(tree, take);
-            right -= take;
-            if (right == 0) break;
-            tree = _nodes[tree].right;
-        }
-        return result;
+        return prefix_rank1_impl(_root, right);
+    }
+
+    RankPair rank1_pair(int left, int right) const {
+        assert(0 <= left && left <= right && right <= size());
+        return rank1_pair_impl(_root, left, right);
     }
 
     void insert(int position, bool value) {
+        insert_with_rank(position, value);
+    }
+
+    int insert_with_rank(int position, bool value) {
         assert(0 <= position && position <= size());
-        _root = insert_impl(_root, position, value);
+        int ones_before = 0;
+        _root = insert_impl(_root, position, value, ones_before);
+        return ones_before;
     }
 
     bool erase(int position) {
+        return erase_with_rank(position).value;
+    }
+
+    EraseRankResult erase_with_rank(int position) {
         assert(0 <= position && position < size());
-        bool value = get(position);
-        _root = erase_impl(_root, position);
-        return value;
+        EraseRankResult result{false, 0};
+        _root = erase_impl(_root, position, result);
+        return result;
     }
 };
 
@@ -605,14 +728,15 @@ class DynamicWaveletMatrix {
 
     void insert_encoded(int position, unsigned_type key) {
         for (int level = 0; level < bit_width; level++) {
-            int ones_before = _matrix[level].rank1(position);
             if (bit(key, level)) {
+                int ones_before =
+                    _matrix[level].insert_with_rank(position, true);
                 int next_position = _zero_count[level] + ones_before;
-                _matrix[level].insert(position, true);
                 position = next_position;
             } else {
+                int ones_before =
+                    _matrix[level].insert_with_rank(position, false);
                 int next_position = position - ones_before;
-                _matrix[level].insert(position, false);
                 _zero_count[level]++;
                 position = next_position;
             }
@@ -622,16 +746,14 @@ class DynamicWaveletMatrix {
 
     void erase_encoded(int position) {
         for (int level = 0; level < bit_width; level++) {
-            int ones_before = _matrix[level].rank1(position);
-            bool one = _matrix[level].get(position);
+            auto erased = _matrix[level].erase_with_rank(position);
             int next_position;
-            if (one) {
-                next_position = _zero_count[level] + ones_before;
+            if (erased.value) {
+                next_position = _zero_count[level] + erased.ones_before;
             } else {
-                next_position = position - ones_before;
+                next_position = position - erased.ones_before;
                 _zero_count[level]--;
             }
-            _matrix[level].erase(position);
             position = next_position;
         }
         _size--;
@@ -640,8 +762,9 @@ class DynamicWaveletMatrix {
     int count_less_encoded(int left, int right, unsigned_type upper) const {
         int result = 0;
         for (int level = 0; level < bit_width; level++) {
-            int left_ones = _matrix[level].rank1(left);
-            int right_ones = _matrix[level].rank1(right);
+            auto ranks = _matrix[level].rank1_pair(left, right);
+            int left_ones = ranks.left_ones;
+            int right_ones = ranks.right_ones;
             if (bit(upper, level)) {
                 result += (right - left) - (right_ones - left_ones);
                 left = _zero_count[level] + left_ones;
@@ -705,12 +828,12 @@ class DynamicWaveletMatrix {
         assert(0 <= position && position < _size);
         unsigned_type key = 0;
         for (int level = 0; level < bit_width; level++) {
-            int ones_before = _matrix[level].rank1(position);
-            if (_matrix[level].get(position)) {
+            auto accessed = _matrix[level].access_with_rank(position);
+            if (accessed.value) {
                 key |= unsigned_type(1) << (bit_width - 1 - level);
-                position = _zero_count[level] + ones_before;
+                position = _zero_count[level] + accessed.ones_before;
             } else {
-                position -= ones_before;
+                position -= accessed.ones_before;
             }
         }
         return decode(key);
@@ -752,8 +875,9 @@ class DynamicWaveletMatrix {
         assert(0 <= left && left <= right && right <= _size);
         unsigned_type key = encode(value);
         for (int level = 0; level < bit_width; level++) {
-            int left_ones = _matrix[level].rank1(left);
-            int right_ones = _matrix[level].rank1(right);
+            auto ranks = _matrix[level].rank1_pair(left, right);
+            int left_ones = ranks.left_ones;
+            int right_ones = ranks.right_ones;
             if (bit(key, level)) {
                 left = _zero_count[level] + left_ones;
                 right = _zero_count[level] + right_ones;
@@ -770,8 +894,9 @@ class DynamicWaveletMatrix {
         assert(0 <= k && k < right - left);
         unsigned_type key = 0;
         for (int level = 0; level < bit_width; level++) {
-            int left_ones = _matrix[level].rank1(left);
-            int right_ones = _matrix[level].rank1(right);
+            auto ranks = _matrix[level].rank1_pair(left, right);
+            int left_ones = ranks.left_ones;
+            int right_ones = ranks.right_ones;
             int left_zeros = left - left_ones;
             int right_zeros = right - right_ones;
             int zeros = right_zeros - left_zeros;

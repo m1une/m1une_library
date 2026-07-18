@@ -5,20 +5,22 @@ documentation_of: ../../../ds/wavelet_matrix/dynamic_wavelet_matrix_sum.hpp
 
 ## Overview
 
-`m1une::ds::DynamicWaveletMatrixSum<T, Sum>` maintains an integral key and an
-additive weight at every position of a dynamic sequence. It supports indexed
-insertion, erasure, key and weight updates, range order statistics, and sums
-selected by an index interval and a key interval.
+`m1une::ds::DynamicWaveletMatrixSum<T, Sum, BitWidth>` maintains an integral
+key and an additive weight at every position of a dynamic sequence. It supports
+indexed insertion, erasure, key and weight updates, range order statistics, and
+sums selected by an index interval and a key interval. `BitWidth` defaults to
+the full width of `T`, so existing one- and two-argument uses are unchanged.
 
 Passing only a key uses that key as its weight, which gives ordinary sums of
 the stored values. The overloads taking a separate `Sum` can instead maintain
 costs, frequencies, or other additive data.
 
-Routing bits use packed dynamic bitvectors. Parallel implicit treaps store
-weights in 256-element chunks, so the structure avoids allocating one tree node
-for every element at every wavelet level. Signed keys are ordered across their
-full type range by an internal sign-bit transform; coordinate compression is
-not required.
+Each wavelet level uses one implicit treap of 64-element chunks. A chunk stores
+packed routing bits, contiguous weights, and 16-element group aggregates
+together. Fused updates and prefix-statistics queries therefore traverse one
+tree per level instead of separate bit and weight trees. Signed full-width keys
+are ordered by an internal sign-bit transform; coordinate compression is not
+required.
 
 ## Requirements
 
@@ -27,9 +29,16 @@ identity, and `Sum` must support copying, addition, and subtraction. The
 key-only constructor and update overloads additionally require `T` to be
 convertible to `Sum`. Arithmetic overflow is not checked.
 
-Let `B = numeric_limits<make_unsigned_t<T>>::digits` and let `N` be the current
-sequence length. Treap complexity is expected, and insertion and erasure are
-amortized because fixed-size chunks occasionally split or merge.
+`BitWidth` must be between one and the number of value bits in the unsigned
+version of `T`. A reduced `BitWidth` is supported only for unsigned `T`; every
+stored key must be less than `2^BitWidth`, which is asserted in debug builds.
+Query bounds may equal or exceed `2^BitWidth` and then naturally include the
+entire reduced-width key universe. Full-width signed keys preserve ordinary
+signed ordering, including the minimum and maximum values.
+
+Let `B = BitWidth` and let `N` be the current sequence length. Treap complexity
+is expected, and insertion and erasure are amortized because fixed-size chunks
+occasionally split or merge.
 
 ## Construction
 
@@ -97,7 +106,10 @@ corresponding sums must consist of zero or more `true` values followed by zero
 or more `false` values. The predicate must not have side effects. Tie ordering
 is the same as for the corresponding `sum_k` method.
 
-The structure uses $O(BN)$ memory. Index, range, and `k` bounds are asserted.
+The structure uses $O(BN)$ memory. Queries do not allocate. Point-weight
+replacement updates only the affected element, group sum, chunk sum, and
+ancestor sums. Insertion and erasure may shift and rebuild one 64-element local
+chunk. Index, range, and `k` bounds are asserted.
 
 ## Example
 
@@ -108,9 +120,14 @@ The structure uses $O(BN)$ memory. Index, range, and `k` bounds are asserted.
 #include <vector>
 
 int main() {
-    std::vector<int> keys = {4, 1, 4, 2};
+    using Matrix = m1une::ds::DynamicWaveletMatrixSum<
+        unsigned int,
+        long long,
+        18
+    >;
+    std::vector<unsigned int> keys = {4, 1, 4, 2};
     std::vector<long long> weights = {10, 20, 30, 40};
-    m1une::ds::DynamicWaveletMatrixSum<int, long long> matrix(
+    Matrix matrix(
         keys,
         weights
     );
@@ -124,3 +141,9 @@ int main() {
     assert(matrix.range_sum(0, 5, 4, 6) == 65);
 }
 ```
+
+Here the keys can be coordinate-compressed ranks while the weights remain the
+original numeric values. The key controls ordering; selected sums use the
+weight. See the standalone local benchmark and its measured results under
+`benchmark/ds/wavelet_matrix/`. They are performance measurements, not formal
+verification.
