@@ -7,11 +7,13 @@
 #include "convolution_ll.hpp"
 #include "floating_point_convolution.hpp"
 #include "formal_power_series.hpp"
+#include "geometric_sequence_evaluation.hpp"
 #include "half_gcd.hpp"
 #include "lagrange_inversion.hpp"
 #include "linear_recurrence.hpp"
 #include "multipoint_evaluation.hpp"
 #include "polynomial_factorization.hpp"
+#include "polynomial_roots.hpp"
 #include "sparse_formal_power_series.hpp"
 
 #endif  // M1UNE_FPS_ALL_HPP
