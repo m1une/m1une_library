@@ -59,6 +59,37 @@ void test_weighted_ties() {
     assert(matrix.sum_k_smallest(0, 4, 3) == 70);
     assert(matrix.sum_k_largest(0, 4, 1) == 30);
     assert(matrix.sum_k_largest(0, 4, 2) == 40);
+    auto at_most_65 = [](long long sum) { return sum <= 65; };
+    assert(matrix.max_count_smallest(0, 4, at_most_65) == 2);
+    assert(matrix.max_count_largest(0, 4, at_most_65) == 2);
+    assert(
+        matrix.max_count_smallest(
+            0,
+            4,
+            [](long long sum) { return sum <= 75; }
+        ) == 3
+    );
+    assert(
+        matrix.max_count_largest(
+            0,
+            4,
+            [](long long sum) { return sum <= 35; }
+        ) == 1
+    );
+    assert(
+        matrix.max_count_smallest(
+            0,
+            4,
+            [](long long sum) { return sum <= 100; }
+        ) == 4
+    );
+    assert(
+        matrix.max_count_largest(
+            0,
+            4,
+            [](long long sum) { return sum == 0; }
+        ) == 0
+    );
 
     std::vector<int> equal_values(4, 1000000000);
     m1une::ds::WaveletMatrixSum<int, long long> equal_matrix(

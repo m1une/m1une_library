@@ -83,11 +83,19 @@ All index and key intervals are half-open.
 | `Sum range_sum(int left, int right, T lower, T upper) const` | Sums weights whose keys are in `[lower, upper)`. | Expected $O(B\log N)$ |
 | `Sum sum_k_smallest(int left, int right, int k) const` | Sums the weights of the smallest `k` keys. | Expected $O(B\log N)$ |
 | `Sum sum_k_largest(int left, int right, int k) const` | Sums the weights of the largest `k` keys. | Expected $O(B\log N)$ |
+| `template <class Predicate> int max_count_smallest(int left, int right, Predicate predicate) const` | Returns the largest `k` for which `predicate(sum_k_smallest(left, right, k))` is true. | Expected $O(B\log N)$ |
+| `template <class Predicate> int max_count_largest(int left, int right, Predicate predicate) const` | Returns the largest `k` for which `predicate(sum_k_largest(left, right, k))` is true. | Expected $O(B\log N)$ |
 
 The order-statistic methods require `0 <= k < right - left`. The sum methods
 allow `0 <= k <= right - left`. Equal keys are selected in current sequence
 order by `sum_k_smallest` and in reverse current sequence order by
 `sum_k_largest`.
+
+For `max_count_smallest` and `max_count_largest`, `predicate(Sum{})` must be
+true. Over `k = 0, 1, ..., right - left`, the predicate results for the
+corresponding sums must consist of zero or more `true` values followed by zero
+or more `false` values. The predicate must not have side effects. Tie ordering
+is the same as for the corresponding `sum_k` method.
 
 The structure uses $O(BN)$ memory. Index, range, and `k` bounds are asserted.
 

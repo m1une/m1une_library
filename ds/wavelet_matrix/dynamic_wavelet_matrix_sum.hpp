@@ -98,6 +98,62 @@ class DynamicSumSequence {
         return result;
     }
 
+    template <class Predicate>
+    int consume_chunk_prefix(
+        int node,
+        int left,
+        int right,
+        Sum& result,
+        Predicate& predicate
+    ) const {
+        int position = left;
+        while (position < right) {
+            if (position % group_size == 0 &&
+                position + group_size <= right) {
+                int group = position / group_size;
+                Sum candidate = result + _nodes[node].group_sums[group];
+                if (predicate(candidate)) {
+                    result = candidate;
+                    position += group_size;
+                    continue;
+                }
+            }
+            Sum candidate = result + _nodes[node].values[position];
+            if (!predicate(candidate)) break;
+            result = candidate;
+            position++;
+        }
+        return position - left;
+    }
+
+    template <class Predicate>
+    int consume_chunk_suffix(
+        int node,
+        int left,
+        int right,
+        Sum& result,
+        Predicate& predicate
+    ) const {
+        int position = right;
+        while (left < position) {
+            if (position % group_size == 0 &&
+                left <= position - group_size) {
+                int group = position / group_size - 1;
+                Sum candidate = result + _nodes[node].group_sums[group];
+                if (predicate(candidate)) {
+                    result = candidate;
+                    position -= group_size;
+                    continue;
+                }
+            }
+            Sum candidate = result + _nodes[node].values[position - 1];
+            if (!predicate(candidate)) break;
+            result = candidate;
+            position--;
+        }
+        return right - position;
+    }
+
     void local_insert(int node, int position, const Sum& value) {
         Node& current = _nodes[node];
         assert(0 <= position && position <= current.length);
@@ -394,6 +450,132 @@ class DynamicSumSequence {
         update(tree);
     }
 
+    template <class Predicate>
+    int max_prefix_impl(
+        int tree,
+        int left,
+        int right,
+        Sum& result,
+        Predicate& predicate
+    ) const {
+        assert(tree != 0);
+        assert(0 <= left && left < right && right <= size_of(tree));
+        if (left == 0 && right == size_of(tree)) {
+            Sum candidate = result + sum_of(tree);
+            if (predicate(candidate)) {
+                result = candidate;
+                return size_of(tree);
+            }
+        }
+
+        int left_size = size_of(_nodes[tree].left);
+        int chunk_end = left_size + _nodes[tree].length;
+        int count = 0;
+        if (left < left_size) {
+            int subtree_right = std::min(right, left_size);
+            int consumed = max_prefix_impl(
+                _nodes[tree].left,
+                left,
+                subtree_right,
+                result,
+                predicate
+            );
+            count += consumed;
+            if (consumed < subtree_right - left) return count;
+        }
+
+        int chunk_left = std::max(left, left_size);
+        int chunk_right = std::min(right, chunk_end);
+        if (chunk_left < chunk_right) {
+            int consumed = consume_chunk_prefix(
+                tree,
+                chunk_left - left_size,
+                chunk_right - left_size,
+                result,
+                predicate
+            );
+            count += consumed;
+            if (consumed < chunk_right - chunk_left) return count;
+        }
+
+        if (chunk_end < right) {
+            int subtree_left = std::max(left, chunk_end) - chunk_end;
+            int subtree_right = right - chunk_end;
+            int consumed = max_prefix_impl(
+                _nodes[tree].right,
+                subtree_left,
+                subtree_right,
+                result,
+                predicate
+            );
+            count += consumed;
+        }
+        return count;
+    }
+
+    template <class Predicate>
+    int max_suffix_impl(
+        int tree,
+        int left,
+        int right,
+        Sum& result,
+        Predicate& predicate
+    ) const {
+        assert(tree != 0);
+        assert(0 <= left && left < right && right <= size_of(tree));
+        if (left == 0 && right == size_of(tree)) {
+            Sum candidate = result + sum_of(tree);
+            if (predicate(candidate)) {
+                result = candidate;
+                return size_of(tree);
+            }
+        }
+
+        int left_size = size_of(_nodes[tree].left);
+        int chunk_end = left_size + _nodes[tree].length;
+        int count = 0;
+        if (chunk_end < right) {
+            int subtree_left = std::max(left, chunk_end) - chunk_end;
+            int subtree_right = right - chunk_end;
+            int consumed = max_suffix_impl(
+                _nodes[tree].right,
+                subtree_left,
+                subtree_right,
+                result,
+                predicate
+            );
+            count += consumed;
+            if (consumed < subtree_right - subtree_left) return count;
+        }
+
+        int chunk_left = std::max(left, left_size);
+        int chunk_right = std::min(right, chunk_end);
+        if (chunk_left < chunk_right) {
+            int consumed = consume_chunk_suffix(
+                tree,
+                chunk_left - left_size,
+                chunk_right - left_size,
+                result,
+                predicate
+            );
+            count += consumed;
+            if (consumed < chunk_right - chunk_left) return count;
+        }
+
+        if (left < left_size) {
+            int subtree_right = std::min(right, left_size);
+            int consumed = max_suffix_impl(
+                _nodes[tree].left,
+                left,
+                subtree_right,
+                result,
+                predicate
+            );
+            count += consumed;
+        }
+        return count;
+    }
+
     void update_subtree(int tree) {
         if (tree == 0) return;
         update_subtree(_nodes[tree].left);
@@ -483,6 +665,30 @@ class DynamicSumSequence {
     Sum range_sum(int left, int right) const {
         assert(0 <= left && left <= right && right <= size());
         return prefix_sum(right) - prefix_sum(left);
+    }
+
+    template <class Predicate>
+    int max_prefix(
+        int left,
+        int right,
+        Sum& result,
+        Predicate& predicate
+    ) const {
+        assert(0 <= left && left <= right && right <= size());
+        if (left == right) return 0;
+        return max_prefix_impl(_root, left, right, result, predicate);
+    }
+
+    template <class Predicate>
+    int max_suffix(
+        int left,
+        int right,
+        Sum& result,
+        Predicate& predicate
+    ) const {
+        assert(0 <= left && left <= right && right <= size());
+        if (left == right) return 0;
+        return max_suffix_impl(_root, left, right, result, predicate);
     }
 
     void insert(int position, const Sum& value) {
@@ -944,6 +1150,85 @@ class DynamicWaveletMatrixSum {
         assert(0 <= k && k <= right - left);
         return range_sum(left, right) -
                sum_k_smallest(left, right, right - left - k);
+    }
+
+    template <class Predicate>
+    int max_count_smallest(
+        int left,
+        int right,
+        Predicate predicate
+    ) const {
+        assert(0 <= left && left <= right && right <= _size);
+        assert(predicate(Sum{}));
+        Sum result{};
+        int count = 0;
+        for (int level = 0; level < bit_width; level++) {
+            int left_ones = _matrix[level].rank1(left);
+            int right_ones = _matrix[level].rank1(right);
+            int left_zeros = left - left_ones;
+            int right_zeros = right - right_ones;
+            int zeros = right_zeros - left_zeros;
+            Sum candidate =
+                result + _zero_weights[level].range_sum(left, right);
+            if (predicate(candidate)) {
+                result = candidate;
+                count += zeros;
+                left = _zero_count[level] + left_ones;
+                right = _zero_count[level] + right_ones;
+            } else {
+                left = left_zeros;
+                right = right_zeros;
+            }
+        }
+        return count +
+               _final_weights.max_prefix(
+                   left,
+                   right,
+                   result,
+                   predicate
+               );
+    }
+
+    template <class Predicate>
+    int max_count_largest(
+        int left,
+        int right,
+        Predicate predicate
+    ) const {
+        assert(0 <= left && left <= right && right <= _size);
+        assert(predicate(Sum{}));
+        Sum result{};
+        Sum current_sum = range_sum(left, right);
+        int count = 0;
+        for (int level = 0; level < bit_width; level++) {
+            int left_ones = _matrix[level].rank1(left);
+            int right_ones = _matrix[level].rank1(right);
+            int left_zeros = left - left_ones;
+            int right_zeros = right - right_ones;
+            int ones = right_ones - left_ones;
+            Sum zero_result =
+                _zero_weights[level].range_sum(left, right);
+            Sum one_result = current_sum - zero_result;
+            Sum candidate = result + one_result;
+            if (predicate(candidate)) {
+                result = candidate;
+                count += ones;
+                current_sum = zero_result;
+                left = left_zeros;
+                right = right_zeros;
+            } else {
+                current_sum = one_result;
+                left = _zero_count[level] + left_ones;
+                right = _zero_count[level] + right_ones;
+            }
+        }
+        return count +
+               _final_weights.max_suffix(
+                   left,
+                   right,
+                   result,
+                   predicate
+               );
     }
 };
 

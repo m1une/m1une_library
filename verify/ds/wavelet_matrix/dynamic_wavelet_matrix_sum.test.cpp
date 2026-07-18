@@ -245,6 +245,154 @@ void test_randomized() {
     }
 }
 
+void test_boundary_search() {
+    {
+        std::vector<int> equal_values(700, 7);
+        std::vector<long long> equal_weights(700);
+        for (int i = 0; i < int(equal_weights.size()); i++) {
+            equal_weights[i] = i % 17 + 1;
+        }
+        Matrix equal_matrix(equal_values, equal_weights);
+        for (int operation = 0; operation < 300; operation++) {
+            int type = int(random_value() % 3);
+            if (type == 0) {
+                int position =
+                    int(random_value() % (equal_values.size() + 1));
+                long long weight = random_int(1, 20);
+                equal_values.insert(equal_values.begin() + position, 7);
+                equal_weights.insert(
+                    equal_weights.begin() + position,
+                    weight
+                );
+                equal_matrix.insert(position, 7, weight);
+            } else if (type == 1 && equal_values.size() > 300) {
+                int position = int(random_value() % equal_values.size());
+                equal_values.erase(equal_values.begin() + position);
+                equal_weights.erase(equal_weights.begin() + position);
+                equal_matrix.erase(position);
+            } else {
+                int position = int(random_value() % equal_values.size());
+                equal_weights[position] = random_int(1, 20);
+                equal_matrix.set_weight(position, equal_weights[position]);
+            }
+
+            int left = int(random_value() % (equal_values.size() + 1));
+            int right = int(random_value() % (equal_values.size() + 1));
+            if (right < left) std::swap(left, right);
+            long long total = 0;
+            for (int i = left; i < right; i++) total += equal_weights[i];
+            long long limit = static_cast<long long>(
+                random_value() % std::uint64_t(total + 21)
+            );
+            auto predicate = [limit](long long sum) {
+                return sum <= limit;
+            };
+
+            long long sum = 0;
+            int smallest = 0;
+            while (left + smallest < right &&
+                   sum + equal_weights[left + smallest] <= limit) {
+                sum += equal_weights[left + smallest];
+                smallest++;
+            }
+            assert(
+                equal_matrix.max_count_smallest(
+                    left,
+                    right,
+                    predicate
+                ) == smallest
+            );
+
+            sum = 0;
+            int largest = 0;
+            while (left + largest < right &&
+                   sum + equal_weights[right - 1 - largest] <= limit) {
+                sum += equal_weights[right - 1 - largest];
+                largest++;
+            }
+            assert(
+                equal_matrix.max_count_largest(left, right, predicate) ==
+                largest
+            );
+        }
+    }
+
+    std::vector<int> values(700);
+    std::vector<long long> weights(700);
+    for (int i = 0; i < int(values.size()); i++) {
+        values[i] = random_int(-30, 30);
+        weights[i] = random_int(1, 20);
+    }
+    Matrix matrix(values, weights);
+
+    for (int operation = 0; operation < 700; operation++) {
+        int type = int(random_value() % 4);
+        if (type == 0) {
+            int position = int(random_value() % (values.size() + 1));
+            int value = random_int(-30, 30);
+            long long weight = random_int(1, 20);
+            values.insert(values.begin() + position, value);
+            weights.insert(weights.begin() + position, weight);
+            matrix.insert(position, value, weight);
+        } else if (type == 1 && values.size() > 300) {
+            int position = int(random_value() % values.size());
+            values.erase(values.begin() + position);
+            weights.erase(weights.begin() + position);
+            matrix.erase(position);
+        } else if (type == 2) {
+            int position = int(random_value() % values.size());
+            values[position] = random_int(-30, 30);
+            matrix.set_value(position, values[position]);
+        } else {
+            int position = int(random_value() % values.size());
+            weights[position] = random_int(1, 20);
+            matrix.set_weight(position, weights[position]);
+        }
+
+        int left = int(random_value() % (values.size() + 1));
+        int right = int(random_value() % (values.size() + 1));
+        if (right < left) std::swap(left, right);
+        std::vector<std::pair<int, int>> order;
+        long long total = 0;
+        for (int i = left; i < right; i++) {
+            order.emplace_back(values[i], i);
+            total += weights[i];
+        }
+        std::stable_sort(
+            order.begin(),
+            order.end(),
+            [](const auto& first, const auto& second) {
+                return first.first < second.first;
+            }
+        );
+        long long limit = static_cast<long long>(
+            random_value() % std::uint64_t(total + 21)
+        );
+        auto predicate = [limit](long long sum) { return sum <= limit; };
+
+        long long sum = 0;
+        int smallest = 0;
+        while (smallest < int(order.size()) &&
+               sum + weights[order[smallest].second] <= limit) {
+            sum += weights[order[smallest].second];
+            smallest++;
+        }
+        assert(
+            matrix.max_count_smallest(left, right, predicate) == smallest
+        );
+
+        sum = 0;
+        int largest = 0;
+        while (largest < int(order.size()) &&
+               sum + weights[order[order.size() - 1 - largest].second] <=
+                   limit) {
+            sum += weights[order[order.size() - 1 - largest].second];
+            largest++;
+        }
+        assert(matrix.max_count_largest(left, right, predicate) == largest);
+    }
+}
+
 struct Point {
     int x = 0;
     int y = 0;
@@ -269,6 +417,7 @@ int main() {
     m1une::utilities::FastOutput fast_output;
 
     test_randomized();
+    test_boundary_search();
 
     int point_count = 0;
     int query_count = 0;

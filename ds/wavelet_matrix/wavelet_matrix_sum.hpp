@@ -476,6 +476,89 @@ struct WaveletMatrixSum {
         assert(0 <= k && k <= r - l);
         return range_sum(l, r) - sum_k_smallest(l, r, r - l - k);
     }
+
+    template <class Predicate>
+    int max_count_smallest(int l, int r, Predicate predicate) const {
+        assert(0 <= l && l <= r && r <= _n);
+        assert(predicate(Sum{}));
+        Sum result{};
+        int count = 0;
+        for (int level = 0; level < _log; level++) {
+            int l1 = _matrix[level].rank1(l);
+            int r1 = _matrix[level].rank1(r);
+            int l0 = l - l1;
+            int r0 = r - r1;
+            int zeros = r0 - l0;
+            Sum zero_result = result + zero_sum(level, l, r);
+            if (predicate(zero_result)) {
+                result = zero_result;
+                count += zeros;
+                l = _zero_count[level] + l1;
+                r = _zero_count[level] + r1;
+            } else {
+                l = l0;
+                r = r0;
+            }
+        }
+
+        int low = 0;
+        int high = r - l;
+        while (low < high) {
+            int middle = low + (high - low + 1) / 2;
+            Sum candidate =
+                result + (_final_prefix[l + middle] - _final_prefix[l]);
+            if (predicate(candidate)) {
+                low = middle;
+            } else {
+                high = middle - 1;
+            }
+        }
+        return count + low;
+    }
+
+    template <class Predicate>
+    int max_count_largest(int l, int r, Predicate predicate) const {
+        assert(0 <= l && l <= r && r <= _n);
+        assert(predicate(Sum{}));
+        Sum result{};
+        Sum current_sum = range_sum(l, r);
+        int count = 0;
+        for (int level = 0; level < _log; level++) {
+            int l1 = _matrix[level].rank1(l);
+            int r1 = _matrix[level].rank1(r);
+            int l0 = l - l1;
+            int r0 = r - r1;
+            int ones = r1 - l1;
+            Sum zero_result = zero_sum(level, l, r);
+            Sum one_result = current_sum - zero_result;
+            Sum candidate = result + one_result;
+            if (predicate(candidate)) {
+                result = candidate;
+                count += ones;
+                current_sum = zero_result;
+                l = l0;
+                r = r0;
+            } else {
+                current_sum = one_result;
+                l = _zero_count[level] + l1;
+                r = _zero_count[level] + r1;
+            }
+        }
+
+        int low = 0;
+        int high = r - l;
+        while (low < high) {
+            int middle = low + (high - low + 1) / 2;
+            Sum candidate =
+                result + (_final_prefix[r] - _final_prefix[r - middle]);
+            if (predicate(candidate)) {
+                low = middle;
+            } else {
+                high = middle - 1;
+            }
+        }
+        return count + low;
+    }
 };
 
 }  // namespace ds

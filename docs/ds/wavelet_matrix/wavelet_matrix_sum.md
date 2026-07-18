@@ -11,7 +11,8 @@ with:
 
 * total weight in an index range,
 * total weight for values below a bound or inside a value interval, and
-* total weight of the smallest or largest `k` values.
+* total weight of the smallest or largest `k` values, plus predicate-based
+  searches for the maximum valid `k`.
 
 By default, each value is also its weight, producing ordinary sums of selected
 values. A separate weight vector can instead represent costs, counts, or other
@@ -72,10 +73,18 @@ All index and value intervals are half-open.
 | `Sum range_sum(int l, int r, T lower, T upper)` | Sums weights whose values are in `[lower, upper)`. | $O(L)$ |
 | `Sum sum_k_smallest(int l, int r, int k)` | Sums the weights of the smallest `k` values. | $O(L)$ |
 | `Sum sum_k_largest(int l, int r, int k)` | Sums the weights of the largest `k` values. | $O(L)$ |
+| `template <class Predicate> int max_count_smallest(int left, int right, Predicate predicate) const` | Returns the largest `k` for which `predicate(sum_k_smallest(left, right, k))` is true. | $O(L + \log N)$ |
+| `template <class Predicate> int max_count_largest(int left, int right, Predicate predicate) const` | Returns the largest `k` for which `predicate(sum_k_largest(left, right, k))` is true. | $O(L + \log N)$ |
 
 The `k` used by sum methods may range from `0` through `r - l`, inclusive. If
 equal values have different weights, `sum_k_smallest` selects ties in original
 index order, while `sum_k_largest` selects them in reverse original index order.
+
+For `max_count_smallest` and `max_count_largest`, `predicate(Sum{})` must be
+true. Over `k = 0, 1, ..., r - l`, the predicate results for the corresponding
+sums must consist of zero or more `true` values followed by zero or more
+`false` values. The predicate must not have side effects. Tie ordering is the
+same as for the corresponding `sum_k` method.
 
 ## Example
 
