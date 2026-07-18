@@ -8,7 +8,7 @@ objects live under `ds/`.
 
 | Category | Headers |
 | --- | --- |
-| [`sequence/`](sequence/) | `lis.hpp`, `inversion_count.hpp`, `number_of_subsequences.hpp`, `run_length_encoding.hpp`, `subset_sum.hpp`, and `all.hpp` |
+| [`sequence/`](sequence/) | `lis.hpp`, `inversion_count.hpp`, `non_adjacent_selection.hpp`, `number_of_subsequences.hpp`, `run_length_encoding.hpp`, `subset_sum.hpp`, and `all.hpp` |
 | [`search/`](search/) | `bisect.hpp`, `golden_section_search.hpp`, `ternary_search.hpp`, and `all.hpp` |
 | [`offline/`](offline/) | `mo.hpp`, `parallel_binary_search.hpp`, `cdq_divide_and_conquer.hpp`, and `all.hpp` |
 | [`enumeration/`](enumeration/) | `gray_code.hpp`, `submask.hpp`, `combination.hpp`, `segtree_range.hpp`, and `all.hpp` |

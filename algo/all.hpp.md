@@ -56,6 +56,9 @@ data:
     path: algo/sequence/lis.hpp
     title: Longest Increasing Subsequence (LIS)
   - icon: ':heavy_check_mark:'
+    path: algo/sequence/non_adjacent_selection.hpp
+    title: Non-Adjacent Selection Sums
+  - icon: ':heavy_check_mark:'
     path: algo/sequence/number_of_subsequences.hpp
     title: Number of Subsequences
   - icon: ':heavy_check_mark:'
@@ -471,10 +474,51 @@ data:
     \    while (current != -1) {\n        result.push_back(current);\n        current\
     \ = predecessor[current];\n    }\n    std::reverse(result.begin(), result.end());\n\
     \    return result;\n}\n\n}  // namespace algo\n}  // namespace m1une\n\n\n#line\
-    \ 1 \"algo/sequence/number_of_subsequences.hpp\"\n\n\n\n#line 6 \"algo/sequence/number_of_subsequences.hpp\"\
-    \n\nnamespace m1une {\nnamespace algo {\n\n// Returns the number of distinct nonempty\
-    \ subsequences.\ntemplate <class Mint, class T>\nMint number_of_distinct_subsequences(const\
-    \ std::vector<T>& values) {\n    std::vector<T> compressed = values;\n    std::sort(compressed.begin(),\
+    \ 1 \"algo/sequence/non_adjacent_selection.hpp\"\n\n\n\n#include <functional>\n\
+    #include <queue>\n#line 7 \"algo/sequence/non_adjacent_selection.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace algo {\n\nnamespace detail {\n\ntemplate <typename T>\nstruct\
+    \ NonAdjacentSelectionEntry {\n    T value;\n    int index;\n};\n\ntemplate <typename\
+    \ T, typename Better>\nstruct NonAdjacentSelectionCompare {\n    Better better;\n\
+    \n    bool operator()(\n        const NonAdjacentSelectionEntry<T>& lhs,\n   \
+    \     const NonAdjacentSelectionEntry<T>& rhs\n    ) const {\n        if (better(lhs.value,\
+    \ rhs.value)) return false;\n        if (better(rhs.value, lhs.value)) return\
+    \ true;\n        return lhs.index > rhs.index;\n    }\n};\n\ntemplate <typename\
+    \ T, typename Better>\nstd::vector<T> non_adjacent_selection_sums(const std::vector<T>&\
+    \ values, Better better) {\n    const int n = int(values.size());\n    std::vector<T>\
+    \ weight = values;\n    std::vector<int> left(n), right(n);\n    std::vector<char>\
+    \ alive(n, true);\n    for (int i = 0; i < n; ++i) {\n        left[i] = i - 1;\n\
+    \        right[i] = (i + 1 == n ? -1 : i + 1);\n    }\n\n    using Entry = NonAdjacentSelectionEntry<T>;\n\
+    \    using Compare = NonAdjacentSelectionCompare<T, Better>;\n    std::priority_queue<Entry,\
+    \ std::vector<Entry>, Compare> heap(Compare{better});\n    for (int i = 0; i <\
+    \ n; ++i) heap.push(Entry{weight[i], i});\n\n    std::vector<T> result;\n    result.reserve((n\
+    \ + 1) / 2);\n    T sum{};\n    while (int(result.size()) < (n + 1) / 2) {\n \
+    \       while (!alive[heap.top().index]) heap.pop();\n        const int current\
+    \ = heap.top().index;\n        heap.pop();\n\n        sum += weight[current];\n\
+    \        result.push_back(sum);\n\n        const int l = left[current];\n    \
+    \    const int r = right[current];\n        if (l != -1 && r != -1) {\n      \
+    \      weight[current] = weight[l] + weight[r] - weight[current];\n\n        \
+    \    const int ll = left[l];\n            const int rr = right[r];\n         \
+    \   alive[l] = false;\n            alive[r] = false;\n            left[current]\
+    \ = ll;\n            right[current] = rr;\n            if (ll != -1) right[ll]\
+    \ = current;\n            if (rr != -1) left[rr] = current;\n            heap.push(Entry{weight[current],\
+    \ current});\n        } else {\n            const int ll = (l == -1 ? -1 : left[l]);\n\
+    \            const int rr = (r == -1 ? -1 : right[r]);\n            alive[current]\
+    \ = false;\n            if (l != -1) alive[l] = false;\n            if (r != -1)\
+    \ alive[r] = false;\n            if (ll != -1) right[ll] = rr;\n            if\
+    \ (rr != -1) left[rr] = ll;\n        }\n    }\n    return result;\n}\n\n}  //\
+    \ namespace detail\n\n// Entry k - 1 is the maximum sum obtained by selecting\
+    \ exactly k values, with\n// no two selected indices adjacent.\ntemplate <typename\
+    \ T>\nstd::vector<T> maximum_non_adjacent_selection_sums(const std::vector<T>&\
+    \ values) {\n    return detail::non_adjacent_selection_sums(values, std::greater<T>{});\n\
+    }\n\n// Entry k - 1 is the minimum sum obtained by selecting exactly k values,\
+    \ with\n// no two selected indices adjacent.\ntemplate <typename T>\nstd::vector<T>\
+    \ minimum_non_adjacent_selection_sums(const std::vector<T>& values) {\n    return\
+    \ detail::non_adjacent_selection_sums(values, std::less<T>{});\n}\n\n}  // namespace\
+    \ algo\n}  // namespace m1une\n\n\n#line 1 \"algo/sequence/number_of_subsequences.hpp\"\
+    \n\n\n\n#line 6 \"algo/sequence/number_of_subsequences.hpp\"\n\nnamespace m1une\
+    \ {\nnamespace algo {\n\n// Returns the number of distinct nonempty subsequences.\n\
+    template <class Mint, class T>\nMint number_of_distinct_subsequences(const std::vector<T>&\
+    \ values) {\n    std::vector<T> compressed = values;\n    std::sort(compressed.begin(),\
     \ compressed.end());\n    compressed.erase(\n        std::unique(compressed.begin(),\
     \ compressed.end()),\n        compressed.end()\n    );\n\n    std::vector<Mint>\
     \ previous_total(compressed.size(), Mint(0));\n    Mint total = 1;\n    for (const\
@@ -525,7 +569,7 @@ data:
     \   --right_count;\n        }\n        if (right_count == 0) break;\n\n      \
     \  const T candidate = left + right_sums[right_count - 1];\n        if (answer\
     \ < candidate) answer = candidate;\n    }\n    return answer;\n}\n\n}  // namespace\
-    \ algo\n}  // namespace m1une\n\n\n#line 9 \"algo/sequence/all.hpp\"\n\n\n#line\
+    \ algo\n}  // namespace m1une\n\n\n#line 10 \"algo/sequence/all.hpp\"\n\n\n#line\
     \ 9 \"algo/all.hpp\"\n\n\n"
   code: '#ifndef M1UNE_ALGO_ALL_HPP
 
@@ -565,13 +609,14 @@ data:
   - algo/sequence/all.hpp
   - algo/sequence/inversion_count.hpp
   - algo/sequence/lis.hpp
+  - algo/sequence/non_adjacent_selection.hpp
   - algo/sequence/number_of_subsequences.hpp
   - algo/sequence/run_length_encoding.hpp
   - algo/sequence/subset_sum.hpp
   isVerificationFile: false
   path: algo/all.hpp
   requiredBy: []
-  timestamp: '2026-07-14 01:43:56+09:00'
+  timestamp: '2026-07-18 18:19:15+09:00'
   verificationStatus: LIBRARY_NO_TESTS
   verifiedWith: []
 documentation_of: algo/all.hpp
@@ -594,7 +639,7 @@ If a header builds an object and then answers repeated queries, it belongs in
 
 | Header | Contents |
 | --- | --- |
-| `algo/sequence/all.hpp` | Sequence and array algorithms such as LIS, inversion count, run-length encoding, and subset sum. |
+| `algo/sequence/all.hpp` | Sequence and array algorithms such as LIS, inversion count, non-adjacent selection, run-length encoding, and subset sum. |
 | `algo/search/all.hpp` | Search-over-answer and unimodal optimization helpers. |
 | `algo/offline/all.hpp` | Offline query processing such as Mo's algorithm. |
 | `algo/enumeration/all.hpp` | Combinatorial traversal helpers such as Gray-code enumeration. |

@@ -157,6 +157,9 @@ data:
       path: algo/sequence/lis.hpp
       title: Longest Increasing Subsequence (LIS)
     - icon: ':heavy_check_mark:'
+      path: algo/sequence/non_adjacent_selection.hpp
+      title: Non-Adjacent Selection Sums
+    - icon: ':heavy_check_mark:'
       path: algo/sequence/number_of_subsequences.hpp
       title: Number of Subsequences
     - icon: ':heavy_check_mark:'
@@ -1243,6 +1246,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/algo/sequence/longest_increasing_subsequence.test.cpp
       title: verify/algo/sequence/longest_increasing_subsequence.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/algo/sequence/non_adjacent_selection.test.cpp
+      title: verify/algo/sequence/non_adjacent_selection.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/algo/sequence/number_of_subsequences.test.cpp
       title: verify/algo/sequence/number_of_subsequences.test.cpp

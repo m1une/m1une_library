@@ -49,6 +49,9 @@ data:
     path: verify/algo/sequence/longest_increasing_subsequence.test.cpp
     title: verify/algo/sequence/longest_increasing_subsequence.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/algo/sequence/non_adjacent_selection.test.cpp
+    title: verify/algo/sequence/non_adjacent_selection.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/algo/sequence/number_of_subsequences.test.cpp
     title: verify/algo/sequence/number_of_subsequences.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1688,6 +1691,7 @@ data:
   - verify/algo/search/ternary_search.test.cpp
   - verify/algo/search/bisect.test.cpp
   - verify/algo/search/golden_section_search.test.cpp
+  - verify/algo/sequence/non_adjacent_selection.test.cpp
   - verify/algo/sequence/subset_sum.test.cpp
   - verify/algo/sequence/number_of_subsequences.test.cpp
   - verify/algo/sequence/longest_increasing_subsequence.test.cpp
