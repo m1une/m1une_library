@@ -20,6 +20,9 @@ data:
     path: math/fps/formal_power_series.hpp
     title: Formal Power Series
   - icon: ':heavy_check_mark:'
+    path: math/fps/geometric_sequence_evaluation.hpp
+    title: Geometric-Sequence Polynomial Evaluation and Interpolation
+  - icon: ':heavy_check_mark:'
     path: math/fps/half_gcd.hpp
     title: Polynomial Half-GCD
   - icon: ':heavy_check_mark:'
@@ -37,6 +40,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/fps/polynomial_factorization.hpp
     title: Polynomial Factorization
+  - icon: ':heavy_check_mark:'
+    path: math/fps/polynomial_roots.hpp
+    title: Polynomial Roots over a Finite Field
   - icon: ':heavy_check_mark:'
     path: math/fps/sparse_formal_power_series.hpp
     title: Sparse Formal Power Series
@@ -1072,22 +1078,96 @@ data:
     \    std::vector<Integer> result(real_result.size());\n    for (std::size_t index\
     \ = 0; index < result.size(); ++index) {\n        result[index] = static_cast<Integer>(std::round(real_result[index]));\n\
     \    }\n    return result;\n}\n\n}  // namespace fps\n}  // namespace m1une\n\n\
-    \n#line 1 \"math/fps/half_gcd.hpp\"\n\n\n\n#line 7 \"math/fps/half_gcd.hpp\"\n\
-    \n#line 9 \"math/fps/half_gcd.hpp\"\n\nnamespace m1une {\nnamespace fps {\n\n\
-    template <class Mint>\nstruct PolynomialMatrix2x2 {\n    using Fps = FormalPowerSeries<Mint>;\n\
-    \n    Fps a00;\n    Fps a01;\n    Fps a10;\n    Fps a11;\n\n    static PolynomialMatrix2x2\
-    \ identity() {\n        return PolynomialMatrix2x2{Fps(1, Mint(1)), Fps(), Fps(),\
-    \ Fps(1, Mint(1))};\n    }\n\n    std::pair<Fps, Fps> apply(const Fps& first,\
-    \ const Fps& second) const {\n        Fps result_first = a00 * first + a01 * second;\n\
-    \        Fps result_second = a10 * first + a11 * second;\n        result_first.shrink();\n\
-    \        result_second.shrink();\n        return std::make_pair(std::move(result_first),\
-    \ std::move(result_second));\n    }\n\n    friend PolynomialMatrix2x2 operator*(const\
-    \ PolynomialMatrix2x2& lhs,\n                                          const PolynomialMatrix2x2&\
-    \ rhs) {\n        PolynomialMatrix2x2 result;\n        result.a00 = lhs.a00 *\
-    \ rhs.a00 + lhs.a01 * rhs.a10;\n        result.a01 = lhs.a00 * rhs.a01 + lhs.a01\
-    \ * rhs.a11;\n        result.a10 = lhs.a10 * rhs.a00 + lhs.a11 * rhs.a10;\n  \
-    \      result.a11 = lhs.a10 * rhs.a01 + lhs.a11 * rhs.a11;\n        result.a00.shrink();\n\
-    \        result.a01.shrink();\n        result.a10.shrink();\n        result.a11.shrink();\n\
+    \n#line 1 \"math/fps/geometric_sequence_evaluation.hpp\"\n\n\n\n#line 8 \"math/fps/geometric_sequence_evaluation.hpp\"\
+    \n\n#line 10 \"math/fps/geometric_sequence_evaluation.hpp\"\n\nnamespace m1une\
+    \ {\nnamespace fps {\n\nnamespace internal {\n\ntemplate <class Mint>\nstd::vector<Mint>\
+    \ geometric_triangular_powers(Mint ratio, int count) {\n    assert(count >= 0);\n\
+    \    std::vector<Mint> result(count);\n    if (count == 0) return result;\n  \
+    \  result[0] = Mint(1);\n    Mint power = Mint(1);\n    for (int i = 0; i + 1\
+    \ < count; ++i) {\n        result[i + 1] = result[i] * power;\n        power *=\
+    \ ratio;\n    }\n    return result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint>\
+    \ geometric_batch_inverse(const std::vector<Mint>& values) {\n    const int count\
+    \ = int(values.size());\n    std::vector<Mint> prefix(count + 1, Mint(1));\n \
+    \   for (int i = 0; i < count; ++i) {\n        assert(values[i] != Mint(0));\n\
+    \        prefix[i + 1] = prefix[i] * values[i];\n    }\n\n    std::vector<Mint>\
+    \ result(count);\n    Mint inverse_suffix = prefix[count].inv();\n    for (int\
+    \ i = count - 1; i >= 0; --i) {\n        result[i] = prefix[i] * inverse_suffix;\n\
+    \        inverse_suffix *= values[i];\n    }\n    return result;\n}\n\ntemplate\
+    \ <class Mint>\nstd::vector<Mint> geometric_middle_product(const std::vector<Mint>&\
+    \ first,\n                                           std::vector<Mint> second)\
+    \ {\n    assert(first.size() >= second.size());\n    if (second.empty()) return\
+    \ std::vector<Mint>(first.size() + 1);\n    std::reverse(second.begin(), second.end());\n\
+    \    const std::vector<Mint> product = convolution(first, second);\n    const\
+    \ int result_size = int(first.size() - second.size() + 1);\n    return std::vector<Mint>(product.begin()\
+    \ + second.size() - 1,\n                             product.begin() + second.size()\
+    \ - 1 + result_size);\n}\n\n}  // namespace internal\n\ntemplate <class Mint>\n\
+    std::vector<Mint> multipoint_evaluate_geometric(\n    const FormalPowerSeries<Mint>&\
+    \ polynomial, Mint initial, Mint ratio, int count) {\n    assert(count >= 0);\n\
+    \    if (count == 0) return {};\n    if (polynomial.empty()) return std::vector<Mint>(count);\n\
+    \    if (initial == Mint(0)) return std::vector<Mint>(count, polynomial[0]);\n\
+    \    if (ratio == Mint(0)) {\n        std::vector<Mint> result(count, polynomial[0]);\n\
+    \        result[0] = polynomial.evaluate(initial);\n        return result;\n \
+    \   }\n\n    const int coefficient_count = int(polynomial.size());\n    std::vector<Mint>\
+    \ scaled(polynomial.begin(), polynomial.end());\n    Mint initial_power = Mint(1);\n\
+    \    for (Mint& coefficient : scaled) {\n        coefficient *= initial_power;\n\
+    \        initial_power *= initial;\n    }\n\n    const std::vector<Mint> chirp\
+    \ = internal::geometric_triangular_powers(\n        ratio, coefficient_count +\
+    \ count - 1);\n    const std::vector<Mint> inverse_chirp = internal::geometric_triangular_powers(\n\
+    \        ratio.inv(), std::max(coefficient_count, count));\n    for (int i = 0;\
+    \ i < coefficient_count; ++i) scaled[i] *= inverse_chirp[i];\n    std::reverse(scaled.begin(),\
+    \ scaled.end());\n\n    const std::vector<Mint> product = convolution(scaled,\
+    \ chirp);\n    std::vector<Mint> result(count);\n    for (int i = 0; i < count;\
+    \ ++i) {\n        result[i] = product[coefficient_count - 1 + i] * inverse_chirp[i];\n\
+    \    }\n    return result;\n}\n\ntemplate <class Mint>\nFormalPowerSeries<Mint>\
+    \ polynomial_interpolate_geometric(\n    const std::vector<Mint>& values, Mint\
+    \ initial, Mint ratio) {\n    using Fps = FormalPowerSeries<Mint>;\n    const\
+    \ int count = int(values.size());\n    if (count == 0) return {};\n    if (count\
+    \ == 1) return Fps(1, values[0]);\n    assert(initial != Mint(0));\n    assert(ratio\
+    \ != Mint(0));\n\n    std::vector<Mint> ratio_power(2 * count - 1, Mint(1));\n\
+    \    std::vector<Mint> chirp(2 * count - 1, Mint(1));\n    for (int i = 0; i +\
+    \ 1 < int(ratio_power.size()); ++i) {\n        ratio_power[i + 1] = ratio_power[i]\
+    \ * ratio;\n        chirp[i + 1] = chirp[i] * ratio_power[i];\n    }\n    const\
+    \ std::vector<Mint> inverse_chirp =\n        internal::geometric_triangular_powers(ratio.inv(),\
+    \ count);\n\n    std::vector<Mint> difference_product(count, Mint(1));\n    for\
+    \ (int i = 1; i < count; ++i) {\n        assert(ratio_power[i] != Mint(1));\n\
+    \        difference_product[i] =\n            difference_product[i - 1] * (Mint(1)\
+    \ - ratio_power[i]);\n    }\n    const std::vector<Mint> inverse_difference =\n\
+    \        internal::geometric_batch_inverse(difference_product);\n    const Mint\
+    \ complete_product =\n        difference_product[count - 1] * (Mint(1) - ratio_power[count]);\n\
+    \n    std::vector<Mint> weighted = values;\n    for (int i = 0; i < count; ++i)\
+    \ {\n        weighted[i] *= chirp[count - 1 - i] * inverse_chirp[count - 1] *\n\
+    \                       inverse_difference[i] * inverse_difference[count - 1 -\
+    \ i];\n        if (i & 1) weighted[i] = Mint(0) - weighted[i];\n        weighted[i]\
+    \ *= inverse_chirp[i];\n    }\n\n    std::vector<Mint> coefficients =\n      \
+    \  internal::geometric_middle_product(chirp, weighted);\n    for (int i = 0; i\
+    \ < count; ++i) coefficients[i] *= inverse_chirp[i];\n\n    std::vector<Mint>\
+    \ product_polynomial(count);\n    product_polynomial[0] = Mint(1);\n    for (int\
+    \ i = 1; i < count; ++i) {\n        product_polynomial[i] = chirp[i] * complete_product\
+    \ * inverse_difference[i] *\n                                inverse_difference[count\
+    \ - i];\n        if (i & 1) product_polynomial[i] = Mint(0) - product_polynomial[i];\n\
+    \    }\n    coefficients = convolution(coefficients, product_polynomial);\n  \
+    \  coefficients.resize(count);\n\n    std::reverse(coefficients.begin(), coefficients.end());\n\
+    \    const Mint inverse_initial = initial.inv();\n    Mint inverse_initial_power\
+    \ = Mint(1);\n    for (Mint& coefficient : coefficients) {\n        coefficient\
+    \ *= inverse_initial_power;\n        inverse_initial_power *= inverse_initial;\n\
+    \    }\n    return Fps(std::move(coefficients));\n}\n\n}  // namespace fps\n}\
+    \  // namespace m1une\n\n\n#line 1 \"math/fps/half_gcd.hpp\"\n\n\n\n#line 7 \"\
+    math/fps/half_gcd.hpp\"\n\n#line 9 \"math/fps/half_gcd.hpp\"\n\nnamespace m1une\
+    \ {\nnamespace fps {\n\ntemplate <class Mint>\nstruct PolynomialMatrix2x2 {\n\
+    \    using Fps = FormalPowerSeries<Mint>;\n\n    Fps a00;\n    Fps a01;\n    Fps\
+    \ a10;\n    Fps a11;\n\n    static PolynomialMatrix2x2 identity() {\n        return\
+    \ PolynomialMatrix2x2{Fps(1, Mint(1)), Fps(), Fps(), Fps(1, Mint(1))};\n    }\n\
+    \n    std::pair<Fps, Fps> apply(const Fps& first, const Fps& second) const {\n\
+    \        Fps result_first = a00 * first + a01 * second;\n        Fps result_second\
+    \ = a10 * first + a11 * second;\n        result_first.shrink();\n        result_second.shrink();\n\
+    \        return std::make_pair(std::move(result_first), std::move(result_second));\n\
+    \    }\n\n    friend PolynomialMatrix2x2 operator*(const PolynomialMatrix2x2&\
+    \ lhs,\n                                          const PolynomialMatrix2x2& rhs)\
+    \ {\n        PolynomialMatrix2x2 result;\n        result.a00 = lhs.a00 * rhs.a00\
+    \ + lhs.a01 * rhs.a10;\n        result.a01 = lhs.a00 * rhs.a01 + lhs.a01 * rhs.a11;\n\
+    \        result.a10 = lhs.a10 * rhs.a00 + lhs.a11 * rhs.a10;\n        result.a11\
+    \ = lhs.a10 * rhs.a01 + lhs.a11 * rhs.a11;\n        result.a00.shrink();\n   \
+    \     result.a01.shrink();\n        result.a10.shrink();\n        result.a11.shrink();\n\
     \        return result;\n    }\n};\n\nnamespace internal {\n\ntemplate <class\
     \ Mint>\nvoid polynomial_euclidean_step(PolynomialMatrix2x2<Mint>& matrix,\n \
     \                              std::pair<FormalPowerSeries<Mint>,\n          \
@@ -1373,7 +1453,45 @@ data:
     \ && merged.back().polynomial == factor.polynomial) {\n            merged.back().multiplicity\
     \ += factor.multiplicity;\n        } else {\n            merged.push_back(std::move(factor));\n\
     \        }\n    }\n    return {leading_coefficient, std::move(merged)};\n}\n\n\
-    }  // namespace fps\n}  // namespace m1une\n\n\n#line 1 \"math/fps/sparse_formal_power_series.hpp\"\
+    }  // namespace fps\n}  // namespace m1une\n\n\n#line 1 \"math/fps/polynomial_roots.hpp\"\
+    \n\n\n\n#line 9 \"math/fps/polynomial_roots.hpp\"\n\n#line 11 \"math/fps/polynomial_roots.hpp\"\
+    \n\nnamespace m1une {\nnamespace fps {\n\nnamespace internal {\n\nstruct PolynomialRootsRandom\
+    \ {\n    uint64_t state;\n\n    uint64_t operator()() {\n        state ^= state\
+    \ << 7;\n        state ^= state >> 9;\n        return state;\n    }\n};\n\ntemplate\
+    \ <class Mint>\nFormalPowerSeries<Mint> polynomial_roots_power_mod(\n    FormalPowerSeries<Mint>\
+    \ base, uint64_t exponent,\n    const FormalPowerSeries<Mint>& modulus) {\n  \
+    \  using Fps = FormalPowerSeries<Mint>;\n    Fps result(1, Mint(1));\n    result\
+    \ %= modulus;\n    base %= modulus;\n    while (exponent > 0) {\n        if (exponent\
+    \ & 1) result = (result * base) % modulus;\n        exponent >>= 1;\n        if\
+    \ (exponent > 0) base = (base * base) % modulus;\n    }\n    return result;\n\
+    }\n\n}  // namespace internal\n\ntemplate <class Mint>\nstd::vector<Mint> polynomial_roots(\n\
+    \    FormalPowerSeries<Mint> polynomial,\n    uint64_t seed = 88172645463325252ULL)\
+    \ {\n    using Fps = FormalPowerSeries<Mint>;\n    polynomial.shrink();\n    assert(!polynomial.empty());\n\
+    \    if (polynomial.size() == 1) return {};\n\n    const uint64_t modulus = Mint::mod();\n\
+    \    if (modulus == 2) {\n        std::vector<Mint> result;\n        if (polynomial.evaluate(Mint(0))\
+    \ == Mint(0)) result.push_back(Mint(0));\n        if (polynomial.evaluate(Mint(1))\
+    \ == Mint(0)) result.push_back(Mint(1));\n        return result;\n    }\n    assert(modulus\
+    \ & 1);\n\n    Fps x(2);\n    x[1] = Mint(1);\n    Fps frobenius = internal::polynomial_roots_power_mod(x,\
+    \ modulus, polynomial);\n    frobenius -= x;\n    frobenius.shrink();\n    Fps\
+    \ linear_part = polynomial_gcd(polynomial, frobenius);\n    if (linear_part.size()\
+    \ <= 1) return {};\n\n    if (seed == 0) seed = 88172645463325252ULL;\n    internal::PolynomialRootsRandom\
+    \ random{seed};\n    std::vector<Mint> result;\n    auto split = [&](auto&& self,\
+    \ Fps current) -> void {\n        current.shrink();\n        if (current.size()\
+    \ <= 1) return;\n        if (current.size() == 2) {\n            result.push_back((Mint(0)\
+    \ - current[0]) / current[1]);\n            return;\n        }\n\n        Fps\
+    \ divisor;\n        do {\n            Fps shifted_x(2);\n            shifted_x[0]\
+    \ = Mint(random() % modulus);\n            shifted_x[1] = Mint(1);\n         \
+    \   Fps separator = internal::polynomial_roots_power_mod(\n                std::move(shifted_x),\
+    \ (modulus - 1) / 2, current);\n            if (separator.empty()) separator.resize(1);\n\
+    \            separator[0] -= Mint(1);\n            separator.shrink();\n     \
+    \       divisor = polynomial_gcd(current, separator);\n        } while (divisor.size()\
+    \ <= 1 || divisor.size() == current.size());\n\n        auto division = current.divmod(divisor);\n\
+    \        assert(division.second.empty());\n        self(self, std::move(divisor));\n\
+    \        self(self, std::move(division.first));\n    };\n    split(split, std::move(linear_part));\n\
+    \n    std::sort(result.begin(), result.end(), [](Mint lhs, Mint rhs) {\n     \
+    \   return lhs.val() < rhs.val();\n    });\n    result.erase(std::unique(result.begin(),\
+    \ result.end()), result.end());\n    return result;\n}\n\n}  // namespace fps\n\
+    }  // namespace m1une\n\n\n#line 1 \"math/fps/sparse_formal_power_series.hpp\"\
     \n\n\n\n#line 9 \"math/fps/sparse_formal_power_series.hpp\"\n\n#line 11 \"math/fps/sparse_formal_power_series.hpp\"\
     \n\nnamespace m1une {\nnamespace fps {\n\ntemplate <class Mint>\nusing SparseFormalPowerSeries\
     \ = std::vector<std::pair<int, Mint>>;\n\nnamespace internal {\n\ntemplate <class\
@@ -1466,7 +1584,7 @@ data:
     \n    FormalPowerSeries<Mint> result(degree);\n    const int offset = leading_degree\
     \ / 2;\n    for (int i = 0; i < normalized_degree; i++) {\n        result[offset\
     \ + i] = unit[i] * *leading_root;\n    }\n    return result;\n}\n\n}  // namespace\
-    \ fps\n}  // namespace m1une\n\n\n#line 16 \"math/fps/all.hpp\"\n\n\n"
+    \ fps\n}  // namespace m1une\n\n\n#line 18 \"math/fps/all.hpp\"\n\n\n"
   code: '#ifndef M1UNE_FPS_ALL_HPP
 
     #define M1UNE_FPS_ALL_HPP 1
@@ -1484,6 +1602,8 @@ data:
 
     #include "formal_power_series.hpp"
 
+    #include "geometric_sequence_evaluation.hpp"
+
     #include "half_gcd.hpp"
 
     #include "lagrange_inversion.hpp"
@@ -1493,6 +1613,8 @@ data:
     #include "multipoint_evaluation.hpp"
 
     #include "polynomial_factorization.hpp"
+
+    #include "polynomial_roots.hpp"
 
     #include "sparse_formal_power_series.hpp"
 
@@ -1510,17 +1632,19 @@ data:
   - math/fps/compositional_inverse.hpp
   - math/fps/convolution_ll.hpp
   - math/fps/floating_point_convolution.hpp
+  - math/fps/geometric_sequence_evaluation.hpp
   - math/fps/half_gcd.hpp
   - math/fps/lagrange_inversion.hpp
   - math/fps/linear_recurrence.hpp
   - math/fps/multipoint_evaluation.hpp
   - math/fps/polynomial_factorization.hpp
+  - math/fps/polynomial_roots.hpp
   - math/fps/sparse_formal_power_series.hpp
   isVerificationFile: false
   path: math/fps/all.hpp
   requiredBy:
   - math/all.hpp
-  timestamp: '2026-07-17 04:56:02+09:00'
+  timestamp: '2026-07-18 18:52:01+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
@@ -1544,9 +1668,11 @@ title: Formal Power Series All
 | `math/fps/convolution_ll.hpp` | Exact signed 64-bit convolution using three NTT primes. |
 | `math/fps/floating_point_convolution.hpp` | FFT convolution for real, complex, and rounded integral coefficients. |
 | `math/fps/formal_power_series.hpp` | Formal power series operations and polynomial utilities. |
+| `math/fps/geometric_sequence_evaluation.hpp` | Fast evaluation and interpolation on geometric progressions. |
 | `math/fps/half_gcd.hpp` | Fast half-GCD, polynomial GCD, extended GCD, and modular inverse. |
 | `math/fps/lagrange_inversion.hpp` | Coefficients from the Lagrange inversion and Lagrange-Bürmann formulas. |
 | `math/fps/linear_recurrence.hpp` | Berlekamp-Massey and linear-recurrence term evaluation. |
 | `math/fps/multipoint_evaluation.hpp` | Multipoint evaluation and polynomial interpolation. |
 | `math/fps/polynomial_factorization.hpp` | Factorization into monic irreducible polynomials over a prime field. |
+| `math/fps/polynomial_roots.hpp` | Distinct roots of a polynomial over a finite prime field. |
 | `math/fps/sparse_formal_power_series.hpp` | Sparse inverse, logarithm, exponential, power, and square root. |

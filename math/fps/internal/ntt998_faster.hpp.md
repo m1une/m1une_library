@@ -48,6 +48,9 @@ data:
     path: math/fps/formal_power_series.hpp
     title: Formal Power Series
   - icon: ':heavy_check_mark:'
+    path: math/fps/geometric_sequence_evaluation.hpp
+    title: Geometric-Sequence Polynomial Evaluation and Interpolation
+  - icon: ':heavy_check_mark:'
     path: math/fps/half_gcd.hpp
     title: Polynomial Half-GCD
   - icon: ':heavy_check_mark:'
@@ -62,6 +65,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/fps/polynomial_factorization.hpp
     title: Polynomial Factorization
+  - icon: ':heavy_check_mark:'
+    path: math/fps/polynomial_roots.hpp
+    title: Polynomial Roots over a Finite Field
   - icon: ':heavy_check_mark:'
     path: math/fps/sparse_formal_power_series.hpp
     title: Sparse Formal Power Series
@@ -163,11 +169,20 @@ data:
     path: verify/math/fps/multipoint_evaluation.test.cpp
     title: verify/math/fps/multipoint_evaluation.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/fps/multipoint_evaluation_geometric.test.cpp
+    title: verify/math/fps/multipoint_evaluation_geometric.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/polynomial_factorization.test.cpp
     title: verify/math/fps/polynomial_factorization.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/fps/polynomial_interpolation.test.cpp
     title: verify/math/fps/polynomial_interpolation.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/fps/polynomial_interpolation_geometric.test.cpp
+    title: verify/math/fps/polynomial_interpolation_geometric.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/fps/polynomial_roots.test.cpp
+    title: verify/math/fps/polynomial_roots.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/fps/polynomial_taylor_shift.test.cpp
     title: verify/math/fps/polynomial_taylor_shift.test.cpp
@@ -691,9 +706,11 @@ data:
   - math/fps/sparse_formal_power_series.hpp
   - math/fps/half_gcd.hpp
   - math/fps/composition.hpp
+  - math/fps/polynomial_roots.hpp
   - math/fps/convolution_ll.hpp
   - math/fps/lagrange_inversion.hpp
   - math/fps/all.hpp
+  - math/fps/geometric_sequence_evaluation.hpp
   - math/fps/compositional_inverse.hpp
   - math/fps/formal_power_series.hpp
   - math/fps/multipoint_evaluation.hpp
@@ -717,12 +734,15 @@ data:
   - verify/math/math_algorithms.test.cpp
   - verify/math/partition_function.test.cpp
   - verify/math/fps/pow_of_formal_power_series_sparse.test.cpp
+  - verify/math/fps/polynomial_roots.test.cpp
   - verify/math/fps/sqrt_of_formal_power_series_sparse.test.cpp
   - verify/math/fps/convolution_mod_large.test.cpp
+  - verify/math/fps/polynomial_interpolation_geometric.test.cpp
   - verify/math/fps/exp_of_formal_power_series.test.cpp
   - verify/math/fps/find_linear_recurrence.test.cpp
   - verify/math/fps/fps_algorithms.test.cpp
   - verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
+  - verify/math/fps/multipoint_evaluation_geometric.test.cpp
   - verify/math/fps/polynomial_factorization.test.cpp
   - verify/math/fps/polynomial_taylor_shift.test.cpp
   - verify/math/fps/multipoint_evaluation.test.cpp

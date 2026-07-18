@@ -658,11 +658,20 @@ data:
     path: verify/math/fps/multipoint_evaluation.test.cpp
     title: verify/math/fps/multipoint_evaluation.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/fps/multipoint_evaluation_geometric.test.cpp
+    title: verify/math/fps/multipoint_evaluation_geometric.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/polynomial_factorization.test.cpp
     title: verify/math/fps/polynomial_factorization.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/fps/polynomial_interpolation.test.cpp
     title: verify/math/fps/polynomial_interpolation.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/fps/polynomial_interpolation_geometric.test.cpp
+    title: verify/math/fps/polynomial_interpolation_geometric.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/fps/polynomial_roots.test.cpp
+    title: verify/math/fps/polynomial_roots.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/fps/polynomial_taylor_shift.test.cpp
     title: verify/math/fps/polynomial_taylor_shift.test.cpp
@@ -1450,12 +1459,15 @@ data:
   - verify/math/modint.test.cpp
   - verify/math/subset_convolution.test.cpp
   - verify/math/fps/pow_of_formal_power_series_sparse.test.cpp
+  - verify/math/fps/polynomial_roots.test.cpp
   - verify/math/fps/sqrt_of_formal_power_series_sparse.test.cpp
   - verify/math/fps/convolution_mod_large.test.cpp
+  - verify/math/fps/polynomial_interpolation_geometric.test.cpp
   - verify/math/fps/exp_of_formal_power_series.test.cpp
   - verify/math/fps/find_linear_recurrence.test.cpp
   - verify/math/fps/fps_algorithms.test.cpp
   - verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
+  - verify/math/fps/multipoint_evaluation_geometric.test.cpp
   - verify/math/fps/polynomial_factorization.test.cpp
   - verify/math/fps/floating_point_convolution.test.cpp
   - verify/math/fps/polynomial_taylor_shift.test.cpp
