@@ -168,6 +168,11 @@ data:
     - icon: ':heavy_check_mark:'
       path: algo/sequence/subset_sum.hpp
       title: Meet-in-the-Middle Subset Sum
+  - name: benchmark/ds/range_query
+    pages:
+    - icon: ':warning:'
+      path: benchmark/ds/range_query/offline_point_update_range_order_statistics_sum_benchmark.cpp
+      title: benchmark/ds/range_query/offline_point_update_range_order_statistics_sum_benchmark.cpp
   - name: benchmark/ds/wavelet_matrix
     pages:
     - icon: ':warning:'
@@ -383,6 +388,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: ds/range_query/merge_sort_tree.hpp
       title: Merge Sort Tree
+    - icon: ':warning:'
+      path: ds/range_query/offline_point_update_range_order_statistics_sum.hpp
+      title: Offline-Registered Point-Update Range Order Statistics with Sums
     - icon: ':heavy_check_mark:'
       path: ds/range_query/offline_rectangle_add_rectangle_sum.hpp
       title: Offline Rectangle Add Rectangle Sum
