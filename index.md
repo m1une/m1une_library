@@ -1178,11 +1178,6 @@ data:
     - icon: ':heavy_check_mark:'
       path: string/z_algorithm.hpp
       title: Z Algorithm
-  - name: test/ds/wavelet_matrix
-    pages:
-    - icon: ':warning:'
-      path: test/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_test.cpp
-      title: test/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_test.cpp
   - name: utilities
     pages:
     - icon: ':heavy_check_mark:'

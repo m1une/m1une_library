@@ -8,9 +8,6 @@ data:
   - icon: ':warning:'
     path: benchmark/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_benchmark.cpp
     title: benchmark/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_benchmark.cpp
-  - icon: ':warning:'
-    path: test/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_test.cpp
-    title: test/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_test.cpp
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/ds/wavelet_matrix/dynamic_wavelet_matrix_sum.test.cpp
@@ -1862,7 +1859,6 @@ data:
   path: ds/wavelet_matrix/dynamic_wavelet_matrix_sum.hpp
   requiredBy:
   - benchmark/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_benchmark.cpp
-  - test/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_test.cpp
   timestamp: '2026-07-19 03:02:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
