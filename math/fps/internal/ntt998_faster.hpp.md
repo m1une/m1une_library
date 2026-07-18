@@ -220,6 +220,9 @@ data:
     path: verify/utilities/basic_utilities.test.cpp
     title: verify/utilities/basic_utilities.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/utilities/bigint_addition.test.cpp
+    title: verify/utilities/bigint_addition.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/utilities/bigint_division.test.cpp
     title: verify/utilities/bigint_division.test.cpp
   - icon: ':heavy_check_mark:'
@@ -764,6 +767,7 @@ data:
   - verify/math/bernoulli_utilities.test.cpp
   - verify/math/bell_number.test.cpp
   - verify/math/bernoulli_number.test.cpp
+  - verify/utilities/bigint_addition.test.cpp
   - verify/utilities/bigint_multiplication.test.cpp
   - verify/utilities/bigint_division.test.cpp
   - verify/utilities/basic_utilities.test.cpp

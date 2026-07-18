@@ -10,40 +10,27 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/modint.hpp
     title: ModInt
-  _extendedRequiredBy:
   - icon: ':heavy_check_mark:'
-    path: geometry/all.hpp
-    title: Geometry Bundle
+    path: utilities/bigint.hpp
+    title: BigInt
   - icon: ':heavy_check_mark:'
-    path: geometry/lattice_point_count.hpp
-    title: Lattice-Point Count
-  _extendedVerifiedWith:
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/geometry_algorithms.test.cpp
-    title: verify/geometry/geometry_algorithms.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/lattice_point_count.test.cpp
-    title: verify/geometry/lattice_point_count.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/utilities/basic_utilities.test.cpp
-    title: verify/utilities/basic_utilities.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/utilities/bigint_addition.test.cpp
-    title: verify/utilities/bigint_addition.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/utilities/bigint_division.test.cpp
-    title: verify/utilities/bigint_division.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/utilities/bigint_multiplication.test.cpp
-    title: verify/utilities/bigint_multiplication.test.cpp
+    path: utilities/fast_io.hpp
+    title: Fast IO
+  _extendedRequiredBy: []
+  _extendedVerifiedWith: []
   _isVerificationFailed: false
-  _pathExtension: hpp
+  _pathExtension: cpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
-    links: []
-  bundledCode: "#line 1 \"utilities/bigint.hpp\"\n\n\n\n#include <algorithm>\n#include\
-    \ <cassert>\n#include <cstdint>\n#include <iostream>\n#include <stdexcept>\n#include\
-    \ <string>\n#include <utility>\n#include <vector>\n\n#line 1 \"math/fps/convolution.hpp\"\
+    '*NOT_SPECIAL_COMMENTS*': ''
+    PROBLEM: https://judge.yosupo.jp/problem/addition_of_big_integers
+    links:
+    - https://judge.yosupo.jp/problem/addition_of_big_integers
+  bundledCode: "#line 1 \"verify/utilities/bigint_addition.test.cpp\"\n#define PROBLEM\
+    \ \"https://judge.yosupo.jp/problem/addition_of_big_integers\"\n\n#pragma GCC\
+    \ optimize(\"O3\")\n\n#line 1 \"utilities/bigint.hpp\"\n\n\n\n#include <algorithm>\n\
+    #include <cassert>\n#include <cstdint>\n#include <iostream>\n#include <stdexcept>\n\
+    #include <string>\n#include <utility>\n#include <vector>\n\n#line 1 \"math/fps/convolution.hpp\"\
     \n\n\n\n#line 5 \"math/fps/convolution.hpp\"\n#include <array>\n#line 8 \"math/fps/convolution.hpp\"\
     \n#include <cstring>\n#include <new>\n#include <type_traits>\n#line 13 \"math/fps/convolution.hpp\"\
     \n\n#if defined(__GNUC__) && !defined(__clang__) && (defined(__x86_64__) || defined(__i386__))\n\
@@ -935,369 +922,268 @@ data:
     \ operator<<(std::ostream& os, const BigInt& b) {\n        return os << b.to_string();\n\
     \    }\n\n    friend std::istream& operator>>(std::istream& is, BigInt& b) {\n\
     \        std::string s;\n        if (is >> s) b.read(s);\n        return is;\n\
-    \    }\n};\n\n}  // namespace utilities\n}  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_UTILITIES_BIGINT_HPP\n#define M1UNE_UTILITIES_BIGINT_HPP 1\n\
-    \n#include <algorithm>\n#include <cassert>\n#include <cstdint>\n#include <iostream>\n\
-    #include <stdexcept>\n#include <string>\n#include <utility>\n#include <vector>\n\
-    \n#include \"../math/fps/convolution.hpp\"\n\nnamespace m1une {\nnamespace utilities\
-    \ {\n\nstruct BigInt {\n    static constexpr int BASE = 1000000000;\n    static\
-    \ constexpr int BASE_DIGITS = 9;\n\n    std::vector<int> a;\n    int sign;\n\n\
-    \    BigInt() : sign(1) {}\n\n    BigInt(long long v) {\n        *this = v;\n\
-    \    }\n\n    BigInt(const std::string& s) {\n        read(s);\n    }\n\n    BigInt&\
-    \ operator=(long long v) {\n        sign = 1;\n        unsigned long long magnitude\
-    \ = static_cast<unsigned long long>(v);\n        if (v < 0) {\n            sign\
-    \ = -1;\n            magnitude = 0 - magnitude;\n        }\n        a.clear();\n\
-    \        for (; magnitude > 0; magnitude /= BASE) {\n            a.push_back(int(magnitude\
-    \ % BASE));\n        }\n        return *this;\n    }\n\n    BigInt& operator=(const\
-    \ std::string& s) {\n        read(s);\n        return *this;\n    }\n\n    void\
-    \ trim() {\n        while (!a.empty() && a.back() == 0) {\n            a.pop_back();\n\
-    \        }\n        if (a.empty()) sign = 1;\n    }\n\n    void read(const std::string&\
-    \ s) {\n        sign = 1;\n        a.clear();\n        int pos = 0;\n        while\
-    \ (pos < (int)s.size() && (s[pos] == '-' || s[pos] == '+')) {\n            if\
-    \ (s[pos] == '-') sign = -1;\n            ++pos;\n        }\n        for (int\
-    \ i = int(s.size()) - 1; i >= pos; i -= BASE_DIGITS) {\n            int x = 0;\n\
-    \            for (int j = std::max(pos, i - BASE_DIGITS + 1); j <= i; ++j) {\n\
-    \                x = x * 10 + (s[j] - '0');\n            }\n            a.push_back(x);\n\
-    \        }\n        trim();\n    }\n\n    std::string to_string() const {\n  \
-    \      if (a.empty()) return \"0\";\n        std::string res = \"\";\n       \
-    \ if (sign == -1) res += '-';\n        res += std::to_string(a.back());\n    \
-    \    for (int i = (int)a.size() - 2; i >= 0; --i) {\n            std::string block\
-    \ = std::to_string(a[i]);\n            res += std::string(BASE_DIGITS - block.length(),\
-    \ '0') + block;\n        }\n        return res;\n    }\n\n    bool is_zero() const\
-    \ {\n        return a.empty() || (a.size() == 1 && a[0] == 0);\n    }\n\n    BigInt\
-    \ operator-() const {\n        BigInt res = *this;\n        if (!is_zero()) res.sign\
-    \ = -sign;\n        return res;\n    }\n\n    BigInt abs() const {\n        BigInt\
-    \ res = *this;\n        res.sign = 1;\n        return res;\n    }\n\n    friend\
-    \ bool operator<(const BigInt& x, const BigInt& y) {\n        if (x.sign != y.sign)\
-    \ return x.sign < y.sign;\n        if (x.a.size() != y.a.size()) {\n         \
-    \   return (x.sign == 1) ? (x.a.size() < y.a.size()) : (x.a.size() > y.a.size());\n\
-    \        }\n        for (int i = (int)x.a.size() - 1; i >= 0; --i) {\n       \
-    \     if (x.a[i] != y.a[i]) {\n                return (x.sign == 1) ? (x.a[i]\
-    \ < y.a[i]) : (x.a[i] > y.a[i]);\n            }\n        }\n        return false;\n\
-    \    }\n\n    friend bool operator>(const BigInt& x, const BigInt& y) {\n    \
-    \    return y < x;\n    }\n    friend bool operator<=(const BigInt& x, const BigInt&\
-    \ y) {\n        return !(y < x);\n    }\n    friend bool operator>=(const BigInt&\
-    \ x, const BigInt& y) {\n        return !(x < y);\n    }\n    friend bool operator==(const\
-    \ BigInt& x, const BigInt& y) {\n        return !(x < y) && !(y < x);\n    }\n\
-    \    friend bool operator!=(const BigInt& x, const BigInt& y) {\n        return\
-    \ x < y || y < x;\n    }\n\n    BigInt& operator+=(const BigInt& other) {\n  \
-    \      if (other.is_zero()) return *this;\n        if (is_zero()) return *this\
-    \ = other;\n        if (sign != other.sign) return *this -= (-other);\n      \
-    \  for (int i = 0, carry = 0; i < (int)std::max(a.size(), other.a.size()) || carry;\
-    \ ++i) {\n            if (i == (int)a.size()) a.push_back(0);\n            a[i]\
-    \ += carry + (i < (int)other.a.size() ? other.a[i] : 0);\n            carry =\
-    \ a[i] >= BASE;\n            if (carry) a[i] -= BASE;\n        }\n        return\
-    \ *this;\n    }\n\n    BigInt& operator-=(const BigInt& other) {\n        if (other.is_zero())\
-    \ return *this;\n        if (is_zero()) return *this = -other;\n        if (sign\
-    \ != other.sign) return *this += (-other);\n        if (abs() < other.abs()) {\n\
-    \            BigInt tmp = other;\n            tmp -= *this;\n            *this\
-    \ = tmp;\n            sign = -sign;\n            return *this;\n        }\n  \
-    \      for (int i = 0, carry = 0; i < (int)other.a.size() || carry; ++i) {\n \
-    \           a[i] -= carry + (i < (int)other.a.size() ? other.a[i] : 0);\n    \
-    \        carry = a[i] < 0;\n            if (carry) a[i] += BASE;\n        }\n\
-    \        trim();\n        return *this;\n    }\n\n    BigInt& operator*=(int v)\
-    \ {\n        long long multiplier = v;\n        if (multiplier < 0) {\n      \
-    \      sign = -sign;\n            multiplier = -multiplier;\n        }\n     \
-    \   long long carry = 0;\n        for (int i = 0; i < (int)a.size() || carry;\
-    \ ++i) {\n            if (i == (int)a.size()) a.push_back(0);\n            const\
-    \ long long cur = a[i] * multiplier + carry;\n            carry = cur / BASE;\n\
-    \            a[i] = (int)(cur % BASE);\n        }\n        trim();\n        return\
-    \ *this;\n    }\n\n   private:\n    static constexpr int MULTIPLICATION_THRESHOLD\
-    \ = 128;\n    static constexpr int DIVISION_THRESHOLD = 64;\n    static constexpr\
-    \ int CONVOLUTION_BASE = 1000;\n\n    static void trim_magnitude(std::vector<int>&\
-    \ value) {\n        while (!value.empty() && value.back() == 0) value.pop_back();\n\
-    \    }\n\n    static bool magnitude_less(const std::vector<int>& lhs, const std::vector<int>&\
-    \ rhs) {\n        if (lhs.size() != rhs.size()) return lhs.size() < rhs.size();\n\
-    \        for (int i = int(lhs.size()) - 1; i >= 0; --i) {\n            if (lhs[i]\
-    \ != rhs[i]) return lhs[i] < rhs[i];\n        }\n        return false;\n    }\n\
-    \n    static bool magnitude_less_equal(const std::vector<int>& lhs,\n        \
-    \                             const std::vector<int>& rhs) {\n        return !magnitude_less(rhs,\
-    \ lhs);\n    }\n\n    static std::vector<int> add_magnitude(const std::vector<int>&\
-    \ lhs,\n                                          const std::vector<int>& rhs)\
-    \ {\n        std::vector<int> result(std::max(lhs.size(), rhs.size()) + 1);\n\
-    \        for (int i = 0; i < int(result.size()) - 1; ++i) {\n            if (i\
-    \ < int(lhs.size())) result[i] += lhs[i];\n            if (i < int(rhs.size()))\
-    \ result[i] += rhs[i];\n            if (result[i] >= BASE) {\n               \
-    \ result[i] -= BASE;\n                result[i + 1]++;\n            }\n      \
-    \  }\n        trim_magnitude(result);\n        return result;\n    }\n\n    static\
-    \ std::vector<int> subtract_magnitude(const std::vector<int>& lhs,\n         \
-    \                                      const std::vector<int>& rhs) {\n      \
-    \  assert(!magnitude_less(lhs, rhs));\n        std::vector<int> result = lhs;\n\
-    \        int borrow = 0;\n        for (int i = 0; i < int(result.size()); ++i)\
-    \ {\n            const long long current =\n                (long long)result[i]\
-    \ - borrow - (i < int(rhs.size()) ? rhs[i] : 0);\n            if (current < 0)\
-    \ {\n                result[i] = int(current + BASE);\n                borrow\
-    \ = 1;\n            } else {\n                result[i] = int(current);\n    \
-    \            borrow = 0;\n            }\n        }\n        assert(borrow == 0);\n\
-    \        trim_magnitude(result);\n        return result;\n    }\n\n    static\
-    \ std::vector<int> multiply_naive(const std::vector<int>& lhs,\n             \
-    \                              const std::vector<int>& rhs) {\n        if (lhs.empty()\
-    \ || rhs.empty()) return std::vector<int>();\n        std::vector<long long> product(lhs.size()\
-    \ + rhs.size());\n        constexpr long long REDUCTION = 4LL * BASE * BASE;\n\
-    \        for (int i = 0; i < int(lhs.size()); ++i) {\n            for (int j =\
-    \ 0; j < int(rhs.size()); ++j) {\n                product[i + j] += (long long)lhs[i]\
-    \ * rhs[j];\n                if (product[i + j] >= REDUCTION) {\n            \
-    \        product[i + j] -= REDUCTION;\n                    product[i + j + 1]\
-    \ += 4LL * BASE;\n                }\n            }\n        }\n\n        std::vector<int>\
-    \ result;\n        result.reserve(product.size() + 1);\n        long long carry\
-    \ = 0;\n        for (int i = 0; i < int(product.size()) || carry > 0; ++i) {\n\
-    \            if (i < int(product.size())) carry += product[i];\n            result.push_back(int(carry\
-    \ % BASE));\n            carry /= BASE;\n        }\n        trim_magnitude(result);\n\
-    \        return result;\n    }\n\n    static std::vector<int> split_for_convolution(const\
-    \ std::vector<int>& value) {\n        std::vector<int> result(3 * value.size());\n\
-    \        for (int i = 0; i < int(value.size()); ++i) {\n            int limb =\
-    \ value[i];\n            result[3 * i] = limb % CONVOLUTION_BASE;\n          \
-    \  limb /= CONVOLUTION_BASE;\n            result[3 * i + 1] = limb % CONVOLUTION_BASE;\n\
-    \            result[3 * i + 2] = limb / CONVOLUTION_BASE;\n        }\n       \
-    \ trim_magnitude(result);\n        return result;\n    }\n\n    static std::vector<int>\
-    \ multiply_convolution(const std::vector<int>& lhs,\n                        \
-    \                         const std::vector<int>& rhs) {\n        using Mint1\
-    \ = math::ModInt<998244353>;\n        using Mint2 = math::ModInt<754974721>;\n\
-    \n        const std::vector<int> lhs_digits = split_for_convolution(lhs);\n  \
-    \      const std::vector<int> rhs_digits = split_for_convolution(rhs);\n     \
-    \   const int result_size = int(lhs_digits.size() + rhs_digits.size() - 1);\n\
-    \        assert(result_size <= (1 << 24));\n\n        std::vector<Mint1> residues1;\n\
-    \        {\n            std::vector<Mint1> x(lhs_digits.begin(), lhs_digits.end());\n\
-    \            std::vector<Mint1> y(rhs_digits.begin(), rhs_digits.end());\n   \
-    \         residues1 = fps::convolution(x, y);\n        }\n        std::vector<Mint2>\
-    \ residues2;\n        {\n            std::vector<Mint2> x(lhs_digits.begin(),\
-    \ lhs_digits.end());\n            std::vector<Mint2> y(rhs_digits.begin(), rhs_digits.end());\n\
-    \            residues2 = fps::convolution(x, y);\n        }\n\n        constexpr\
-    \ uint64_t MOD1 = Mint1::mod();\n        constexpr uint64_t MOD2 = Mint2::mod();\n\
-    \        const uint64_t inverse_mod1 = Mint2(MOD1).inv().val();\n        std::vector<int>\
-    \ digits;\n        digits.reserve(result_size + 8);\n        uint64_t carry =\
-    \ 0;\n        for (int i = 0; i < result_size || carry > 0; ++i) {\n         \
-    \   if (i < result_size) {\n                const uint64_t first = residues1[i].val();\n\
-    \                const uint64_t second = residues2[i].val();\n               \
-    \ const uint64_t difference = (second + MOD2 - first % MOD2) % MOD2;\n       \
-    \         const uint64_t quotient = difference * inverse_mod1 % MOD2;\n      \
-    \          carry += first + MOD1 * quotient;\n            }\n            digits.push_back(int(carry\
-    \ % CONVOLUTION_BASE));\n            carry /= CONVOLUTION_BASE;\n        }\n\n\
-    \        std::vector<int> result((digits.size() + 2) / 3);\n        constexpr\
-    \ int POWER[3] = {1, CONVOLUTION_BASE,\n                                  CONVOLUTION_BASE\
-    \ * CONVOLUTION_BASE};\n        for (int i = 0; i < int(digits.size()); ++i) {\n\
-    \            result[i / 3] += digits[i] * POWER[i % 3];\n        }\n        trim_magnitude(result);\n\
-    \        return result;\n    }\n\n    static std::vector<int> multiply_magnitude(const\
-    \ std::vector<int>& lhs,\n                                               const\
-    \ std::vector<int>& rhs) {\n        if (lhs.empty() || rhs.empty()) return std::vector<int>();\n\
-    \        if (std::min(lhs.size(), rhs.size()) <= MULTIPLICATION_THRESHOLD) {\n\
-    \            return multiply_naive(lhs, rhs);\n        }\n        return multiply_convolution(lhs,\
-    \ rhs);\n    }\n\n    static std::pair<std::vector<int>, std::vector<int>> divide_by_limb(\n\
-    \        const std::vector<int>& dividend, int divisor) {\n        assert(0 <\
-    \ divisor && divisor < BASE);\n        if (divisor == 1) {\n            return\
-    \ std::make_pair(dividend, std::vector<int>());\n        }\n        std::vector<int>\
-    \ quotient(dividend.size());\n        long long remainder = 0;\n        for (int\
-    \ i = int(dividend.size()) - 1; i >= 0; --i) {\n            const long long current\
-    \ = remainder * BASE + dividend[i];\n            quotient[i] = int(current / divisor);\n\
-    \            remainder = current % divisor;\n        }\n        trim_magnitude(quotient);\n\
-    \        std::vector<int> remainder_digits;\n        if (remainder != 0) remainder_digits.push_back(int(remainder));\n\
-    \        return std::make_pair(std::move(quotient), std::move(remainder_digits));\n\
-    \    }\n\n    static std::pair<std::vector<int>, std::vector<int>> divide_naive(\n\
-    \        const std::vector<int>& dividend, const std::vector<int>& divisor) {\n\
-    \        assert(!divisor.empty());\n        if (divisor.size() == 1) return divide_by_limb(dividend,\
-    \ divisor[0]);\n        if (magnitude_less(dividend, divisor)) {\n           \
-    \ return std::make_pair(std::vector<int>(), dividend);\n        }\n\n        const\
-    \ int normalization = BASE / (divisor.back() + 1);\n        const std::vector<int>\
-    \ normalized_dividend =\n            multiply_magnitude(dividend, std::vector<int>(1,\
-    \ normalization));\n        const std::vector<int> normalized_divisor =\n    \
-    \        multiply_magnitude(divisor, std::vector<int>(1, normalization));\n  \
-    \      const long long leading_divisor = normalized_divisor.back();\n        std::vector<int>\
-    \ quotient(normalized_dividend.size() - normalized_divisor.size() + 1);\n    \
-    \    std::vector<int> remainder(normalized_dividend.end() - normalized_divisor.size(),\n\
-    \                                   normalized_dividend.end());\n\n        for\
-    \ (int i = int(quotient.size()) - 1; i >= 0; --i) {\n            if (remainder.size()\
-    \ < normalized_divisor.size()) {\n                quotient[i] = 0;\n         \
-    \   } else if (remainder.size() == normalized_divisor.size()) {\n            \
-    \    if (magnitude_less_equal(normalized_divisor, remainder)) {\n            \
-    \        quotient[i] = 1;\n                    remainder = subtract_magnitude(remainder,\
-    \ normalized_divisor);\n                }\n            } else {\n            \
-    \    assert(remainder.size() == normalized_divisor.size() + 1);\n            \
-    \    const long long leading_remainder =\n                    (long long)remainder.back()\
-    \ * BASE + remainder[remainder.size() - 2];\n                int digit = int(leading_remainder\
-    \ / leading_divisor);\n                if (digit >= BASE) digit = BASE - 1;\n\
-    \                std::vector<int> product = multiply_magnitude(\n            \
-    \        normalized_divisor, std::vector<int>(1, digit));\n                while\
-    \ (magnitude_less(remainder, product)) {\n                    --digit;\n     \
-    \               product = subtract_magnitude(product, normalized_divisor);\n \
-    \               }\n                remainder = subtract_magnitude(remainder, product);\n\
-    \                while (magnitude_less_equal(normalized_divisor, remainder)) {\n\
-    \                    ++digit;\n                    remainder = subtract_magnitude(remainder,\
-    \ normalized_divisor);\n                }\n                quotient[i] = digit;\n\
-    \            }\n            if (i > 0) remainder.insert(remainder.begin(), normalized_dividend[i\
-    \ - 1]);\n        }\n\n        trim_magnitude(quotient);\n        trim_magnitude(remainder);\n\
-    \        std::pair<std::vector<int>, std::vector<int>> denormalized =\n      \
-    \      divide_by_limb(remainder, normalization);\n        assert(denormalized.second.empty());\n\
-    \        return std::make_pair(std::move(quotient), std::move(denormalized.first));\n\
-    \    }\n\n    static std::vector<int> reciprocal(const std::vector<int>& value,\
-    \ int degree) {\n        assert(!value.empty());\n        assert(BASE / 2 <= value.back()\
-    \ && value.back() < BASE);\n        assert(degree >= 0);\n\n        int precision\
-    \ = degree;\n        const int value_size = int(value.size());\n        while\
-    \ (precision > DIVISION_THRESHOLD) precision = (precision + 1) / 2;\n\n      \
-    \  std::vector<int> inverse(value_size + precision + 1);\n        inverse.back()\
-    \ = 1;\n        inverse = divide_naive(inverse, value).first;\n\n        while\
-    \ (precision < degree) {\n            std::vector<int> square = multiply_magnitude(inverse,\
-    \ inverse);\n            square.insert(square.begin(), 0);\n\n            std::vector<int>\
-    \ leading(2 * precision + 1);\n            const int copied = std::min(value_size,\
-    \ int(leading.size()));\n            std::copy(value.end() - copied, value.end(),\
-    \ leading.end() - copied);\n\n            std::vector<int> correction = multiply_magnitude(square,\
-    \ leading);\n            assert(int(correction.size()) >= 2 * precision + 1);\n\
-    \            correction.erase(correction.begin(), correction.begin() + 2 * precision\
-    \ + 1);\n\n            std::vector<int> shifted(precision + 1);\n            const\
-    \ std::vector<int> doubled = add_magnitude(inverse, inverse);\n            shifted.insert(shifted.end(),\
-    \ doubled.begin(), doubled.end());\n            inverse = subtract_magnitude(shifted,\
-    \ correction);\n            assert(!inverse.empty());\n            inverse.erase(inverse.begin());\n\
-    \            precision *= 2;\n        }\n\n        assert(precision >= degree);\n\
-    \        inverse.erase(inverse.begin(), inverse.begin() + precision - degree);\n\
-    \        trim_magnitude(inverse);\n        return inverse;\n    }\n\n    static\
-    \ std::pair<std::vector<int>, std::vector<int>> divide_magnitude(\n        const\
-    \ std::vector<int>& dividend, const std::vector<int>& divisor) {\n        assert(!divisor.empty());\n\
-    \        if (divisor.size() <= DIVISION_THRESHOLD ||\n            int(dividend.size())\
-    \ - int(divisor.size()) <= DIVISION_THRESHOLD) {\n            return divide_naive(dividend,\
-    \ divisor);\n        }\n\n        const int normalization = BASE / (divisor.back()\
-    \ + 1);\n        const std::vector<int> normalized_dividend =\n            multiply_magnitude(dividend,\
-    \ std::vector<int>(1, normalization));\n        const std::vector<int> normalized_divisor\
-    \ =\n            multiply_magnitude(divisor, std::vector<int>(1, normalization));\n\
-    \        const int dividend_size = int(normalized_dividend.size());\n        const\
-    \ int divisor_size = int(normalized_divisor.size());\n        const int degree\
-    \ = dividend_size - divisor_size + 2;\n        const std::vector<int> inverse\
-    \ = reciprocal(normalized_divisor, degree);\n\n        std::vector<int> quotient\
-    \ = multiply_magnitude(normalized_dividend, inverse);\n        const int discarded\
-    \ = divisor_size + degree;\n        assert(discarded <= int(quotient.size()));\n\
-    \        quotient.erase(quotient.begin(), quotient.begin() + discarded);\n\n \
-    \       std::vector<int> product = multiply_magnitude(normalized_divisor, quotient);\n\
-    \        while (magnitude_less(normalized_dividend, product)) {\n            quotient\
-    \ = subtract_magnitude(quotient, std::vector<int>(1, 1));\n            product\
-    \ = subtract_magnitude(product, normalized_divisor);\n        }\n        std::vector<int>\
-    \ remainder = subtract_magnitude(normalized_dividend, product);\n        while\
-    \ (magnitude_less_equal(normalized_divisor, remainder)) {\n            quotient\
-    \ = add_magnitude(quotient, std::vector<int>(1, 1));\n            remainder =\
-    \ subtract_magnitude(remainder, normalized_divisor);\n        }\n        trim_magnitude(quotient);\n\
-    \        trim_magnitude(remainder);\n\n        std::pair<std::vector<int>, std::vector<int>>\
-    \ denormalized =\n            divide_by_limb(remainder, normalization);\n    \
-    \    assert(denormalized.second.empty());\n        return std::make_pair(std::move(quotient),\
-    \ std::move(denormalized.first));\n    }\n\n   public:\n    BigInt& operator*=(const\
-    \ BigInt& other) {\n        if (is_zero() || other.is_zero()) return *this = 0;\n\
-    \        const int result_sign = sign * other.sign;\n        a = multiply_magnitude(a,\
-    \ other.a);\n        sign = result_sign;\n        trim();\n        return *this;\n\
-    \    }\n\n    friend std::pair<BigInt, BigInt> divmod(const BigInt& a1, const\
-    \ BigInt& b1) {\n        if (b1.is_zero()) {\n            throw std::domain_error(\"\
-    BigInt division by zero\");\n        }\n        std::pair<std::vector<int>, std::vector<int>>\
-    \ result =\n            divide_magnitude(a1.a, b1.a);\n        BigInt q, r;\n\
-    \        q.a = std::move(result.first);\n        r.a = std::move(result.second);\n\
-    \        q.sign = a1.sign * b1.sign;\n        r.sign = a1.sign;\n        q.trim();\n\
-    \        r.trim();\n        return {q, r};\n    }\n\n    BigInt& operator/=(const\
-    \ BigInt& other) {\n        return *this = divmod(*this, other).first;\n    }\n\
-    \    BigInt& operator%=(const BigInt& other) {\n        return *this = divmod(*this,\
-    \ other).second;\n    }\n\n    friend BigInt operator+(BigInt x, const BigInt&\
-    \ y) {\n        return x += y;\n    }\n    friend BigInt operator-(BigInt x, const\
-    \ BigInt& y) {\n        return x -= y;\n    }\n    friend BigInt operator*(BigInt\
-    \ x, const BigInt& y) {\n        return x *= y;\n    }\n    friend BigInt operator/(BigInt\
-    \ x, const BigInt& y) {\n        return x /= y;\n    }\n    friend BigInt operator%(BigInt\
-    \ x, const BigInt& y) {\n        return x %= y;\n    }\n\n    friend std::ostream&\
-    \ operator<<(std::ostream& os, const BigInt& b) {\n        return os << b.to_string();\n\
-    \    }\n\n    friend std::istream& operator>>(std::istream& is, BigInt& b) {\n\
-    \        std::string s;\n        if (is >> s) b.read(s);\n        return is;\n\
-    \    }\n};\n\n}  // namespace utilities\n}  // namespace m1une\n\n#endif  // M1UNE_UTILITIES_BIGINT_HPP\n"
+    \    }\n};\n\n}  // namespace utilities\n}  // namespace m1une\n\n\n#line 6 \"\
+    verify/utilities/bigint_addition.test.cpp\"\nusing m1une::utilities::BigInt;\n\
+    \n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 5 \"utilities/fast_io.hpp\"\n\
+    #include <cerrno>\n#include <charconv>\n#include <cstddef>\n#include <cstdio>\n\
+    #include <cstdlib>\n#line 12 \"utilities/fast_io.hpp\"\n#include <iterator>\n\
+    #line 14 \"utilities/fast_io.hpp\"\n#include <sys/stat.h>\n#line 17 \"utilities/fast_io.hpp\"\
+    \n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal\
+    \ {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\n\
+    struct is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T,\
+    \ std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
+    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
+    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
+    \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
+    \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
+    \ std::void_t<typename std::remove_cv_t<std::remove_reference_t<T>>::value_type>>\
+    \ {\n    using type = typename std::remove_cv_t<std::remove_reference_t<T>>::value_type;\n\
+    };\n\ntemplate <class T>\nusing range_stored_value_t = typename range_stored_value<T>::type;\n\
+    \n// Treat strings and C strings as scalar output objects, not as ranges.\ntemplate\
+    \ <class T>\nstruct is_char_array : std::false_type {};\n\ntemplate <class T,\
+    \ std::size_t N>\nstruct is_char_array<T[N]>\n    : std::bool_constant<std::is_same_v<std::remove_cv_t<T>,\
+    \ char>> {};\n\ntemplate <class T>\nstruct is_string_like\n    : std::bool_constant<\n\
+    \          std::is_same_v<std::decay_t<T>, std::string>\n          || std::is_same_v<std::decay_t<T>,\
+    \ const char*>\n          || std::is_same_v<std::decay_t<T>, char*>\n        \
+    \  || is_char_array<std::remove_reference_t<T>>::value\n      > {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_string_like_v = is_string_like<T>::value;\n\
+    \n// ModInt-like type: x.val() is printable, and x can be assigned from long long.\n\
+    template <class T, class = void>\nstruct has_val_method : std::false_type {};\n\
+    \ntemplate <class T>\nstruct has_val_method<T, std::void_t<decltype(std::declval<const\
+    \ T&>().val())>>\n    : std::true_type {};\n\ntemplate <class T>\ninline constexpr\
+    \ bool has_val_method_v = has_val_method<T>::value;\n\ntemplate <class T, class\
+    \ = void>\nstruct has_static_mod_raw : std::false_type {};\n\ntemplate <class\
+    \ T>\nstruct has_static_mod_raw<\n    T, std::void_t<decltype(T::mod()), decltype(T::raw(std::declval<uint32_t>()))>>\n\
+    \    : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool has_static_mod_raw_v\
+    \ = has_static_mod_raw<T>::value;\n\n// libstdc++ before GCC 16 does not classify\
+    \ __int128 as an integral type in\n// strict ISO modes such as -std=c++23. Keep\
+    \ the fast-I/O interface independent\n// of that implementation detail.\ntemplate\
+    \ <class T>\ninline constexpr bool is_integral_v =\n    std::is_integral_v<T>\n\
+    \    || std::is_same_v<std::remove_cv_t<T>, __int128_t>\n    || std::is_same_v<std::remove_cv_t<T>,\
+    \ __uint128_t>;\n\ntemplate <class T>\ninline constexpr bool is_signed_v =\n \
+    \   std::is_signed_v<T>\n    || std::is_same_v<std::remove_cv_t<T>, __int128_t>;\n\
+    \ntemplate <class T>\nstruct make_unsigned {\n    using type = std::make_unsigned_t<T>;\n\
+    };\n\ntemplate <>\nstruct make_unsigned<__int128_t> {\n    using type = __uint128_t;\n\
+    };\n\ntemplate <>\nstruct make_unsigned<__uint128_t> {\n    using type = __uint128_t;\n\
+    };\n\ntemplate <class T>\nusing make_unsigned_t = typename make_unsigned<std::remove_cv_t<T>>::type;\n\
+    \n}  // namespace internal\n\nstruct FastInput {\n    static constexpr int buffer_size\
+    \ = 1 << 20;\n\n   private:\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
+    \    int _position;\n    int _length;\n    int _file_descriptor;\n    bool _streaming;\n\
+    \n    bool refill() {\n        _position = 0;\n        if (_streaming) {\n   \
+    \         ssize_t length;\n            do {\n                length = ::read(_file_descriptor,\
+    \ _buffer, buffer_size);\n            } while (length < 0 && errno == EINTR);\n\
+    \            if (length <= 0) {\n                _length = 0;\n              \
+    \  return false;\n            }\n            _length = int(length);\n        }\
+    \ else {\n            _length = int(std::fread(_buffer, 1, buffer_size, _stream));\n\
+    \        }\n        return _length != 0;\n    }\n\n    template <class T>\n  \
+    \  bool read_integer_from_stream(T& value) {\n        if (!skip_spaces()) return\
+    \ false;\n        int c = read_char_raw();\n\n        bool negative = false;\n\
+    \        if (c == '-') {\n            negative = true;\n            c = read_char_raw();\n\
+    \        }\n\n        if constexpr (internal::is_signed_v<T>) {\n            T\
+    \ result = 0;\n            while ('0' <= c && c <= '9') {\n                result\
+    \ = negative ? result * 10 - (c - '0')\n                                  : result\
+    \ * 10 + (c - '0');\n                c = read_char_raw();\n            }\n   \
+    \         value = result;\n        } else {\n            T result = 0;\n     \
+    \       while ('0' <= c && c <= '9') {\n                result = result * 10 +\
+    \ T(c - '0');\n                c = read_char_raw();\n            }\n         \
+    \   value = negative ? T(0) - result : result;\n        }\n        return true;\n\
+    \    }\n\n    bool prepare_number() {\n        if (_length - _position >= 64)\
+    \ return true;\n        const int remaining = _length - _position;\n        if\
+    \ (remaining > 0) std::memmove(_buffer, _buffer + _position, remaining);\n   \
+    \     const int added = int(std::fread(_buffer + remaining, 1, buffer_size - remaining,\
+    \ _stream));\n        _position = 0;\n        _length = remaining + added;\n \
+    \       if (_length < buffer_size) _buffer[_length] = '\\0';\n        return _length\
+    \ != 0;\n    }\n\n   public:\n    explicit FastInput(std::FILE* stream = stdin)\n\
+    \        : _stream(stream),\n          _position(0),\n          _length(0),\n\
+    \          _file_descriptor(::fileno(stream)),\n          _streaming([&] {\n \
+    \             struct stat status;\n              return _file_descriptor >= 0\n\
+    \                     && ::fstat(_file_descriptor, &status) == 0\n           \
+    \          && !S_ISREG(status.st_mode);\n          }()) {}\n\n    FastInput(const\
+    \ FastInput&) = delete;\n    FastInput& operator=(const FastInput&) = delete;\n\
+    \n    int read_char_raw() {\n        if (_position == _length && !refill()) return\
+    \ EOF;\n        return _buffer[_position++];\n    }\n\n    bool skip_spaces()\
+    \ {\n        int c = read_char_raw();\n        while (c != EOF && c <= ' ') c\
+    \ = read_char_raw();\n        if (c == EOF) return false;\n        --_position;\n\
+    \        return true;\n    }\n\n    bool read(char& value) {\n        if (!skip_spaces())\
+    \ return false;\n        value = char(read_char_raw());\n        return true;\n\
+    \    }\n\n    bool read(std::string& value) {\n        if (!skip_spaces()) return\
+    \ false;\n        value.clear();\n        int c = read_char_raw();\n        while\
+    \ (c != EOF && c > ' ') {\n            value.push_back(char(c));\n           \
+    \ c = read_char_raw();\n        }\n        return true;\n    }\n\n    bool read(bool&\
+    \ value) {\n        int x;\n        if (!read(x)) return false;\n        value\
+    \ = x != 0;\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
+    \        internal::is_integral_v<T>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ bool>\n            && !std::is_same_v<std::remove_cv_t<T>, char>,\n        bool\n\
+    \    >\n    read(T& value) {\n        if (_streaming) return read_integer_from_stream(value);\n\
+    \        if (!prepare_number()) return false;\n        int c = static_cast<unsigned\
+    \ char>(_buffer[_position++]);\n        while (c <= ' ') c = static_cast<unsigned\
+    \ char>(_buffer[_position++]);\n\n        bool negative = false;\n        if (c\
+    \ == '-') {\n            negative = true;\n            c = static_cast<unsigned\
+    \ char>(_buffer[_position++]);\n        }\n\n        if constexpr (internal::is_signed_v<T>)\
+    \ {\n            T result = 0;\n            while ('0' <= c && c <= '9') {\n \
+    \               const int first = c - '0';\n                const int second =\
+    \ static_cast<unsigned char>(_buffer[_position]) - '0';\n                if (0\
+    \ <= second && second <= 9) {\n                    result = negative ? result\
+    \ * 100 - (first * 10 + second)\n                                      : result\
+    \ * 100 + (first * 10 + second);\n                    ++_position;\n         \
+    \       } else {\n                    result = negative ? result * 10 - first\
+    \ : result * 10 + first;\n                }\n                c = static_cast<unsigned\
+    \ char>(_buffer[_position++]);\n            }\n            value = result;\n \
+    \       } else {\n            T result = 0;\n            while ('0' <= c && c\
+    \ <= '9') {\n                const unsigned first = unsigned(c - '0');\n     \
+    \           const int second = static_cast<unsigned char>(_buffer[_position])\
+    \ - '0';\n                if (0 <= second && second <= 9) {\n                \
+    \    result = result * 100 + T(first * 10 + unsigned(second));\n             \
+    \       ++_position;\n                } else {\n                    result = result\
+    \ * 10 + T(first);\n                }\n                c = static_cast<unsigned\
+    \ char>(_buffer[_position++]);\n            }\n            value = negative ?\
+    \ T(0) - result : result;\n        }\n        if (_position > _length) _position\
+    \ = _length;\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>,\
+    \ bool>\n    read(T& value) {\n        if (!skip_spaces()) return false;\n   \
+    \     int c = read_char_raw();\n        bool negative = false;\n        if (c\
+    \ == '-' || c == '+') {\n            negative = c == '-';\n            c = read_char_raw();\n\
+    \        }\n\n        long double result = 0;\n        while ('0' <= c && c <=\
+    \ '9') {\n            result = result * 10 + (c - '0');\n            c = read_char_raw();\n\
+    \        }\n        if (c == '.') {\n            long double place = 0.1L;\n \
+    \           c = read_char_raw();\n            while ('0' <= c && c <= '9') {\n\
+    \                result += (c - '0') * place;\n                place *= 0.1L;\n\
+    \                c = read_char_raw();\n            }\n        }\n        if (c\
+    \ == 'e' || c == 'E') {\n            c = read_char_raw();\n            bool exponent_negative\
+    \ = false;\n            if (c == '-' || c == '+') {\n                exponent_negative\
+    \ = c == '-';\n                c = read_char_raw();\n            }\n         \
+    \   int exponent = 0;\n            while ('0' <= c && c <= '9') {\n          \
+    \      exponent = exponent * 10 + (c - '0');\n                c = read_char_raw();\n\
+    \            }\n            long double scale = 1;\n            long double power\
+    \ = 10;\n            while (exponent > 0) {\n                if (exponent & 1)\
+    \ scale *= power;\n                power *= power;\n                exponent >>=\
+    \ 1;\n            }\n            result = exponent_negative ? result / scale :\
+    \ result * scale;\n        }\n        value = static_cast<T>(negative ? -result\
+    \ : result);\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
+    \        internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
+    \            && !internal::is_range_v<T>,\n        bool\n    >\n    read(T& value)\
+    \ {\n        long long x;\n        if (!read(x)) return false;\n        if constexpr\
+    \ (internal::has_static_mod_raw_v<T>) {\n            if (x >= 0 && uint64_t(x)\
+    \ < uint64_t(T::mod())) {\n                value = T::raw(uint32_t(x));\n    \
+    \        } else {\n                value = T(x);\n            }\n        } else\
+    \ {\n            value = T(x);\n        }\n        return true;\n    }\n\n   \
+    \ template <class First, class Second>\n    bool read(std::pair<First, Second>&\
+    \ value) {\n        if (!read(value.first)) return false;\n        return read(value.second);\n\
+    \    }\n\n    template <class Range>\n    std::enable_if_t<\n        internal::is_range_v<Range>\n\
+    \            && !internal::is_string_like_v<Range>,\n        bool\n    >\n   \
+    \ read(Range& range) {\n        using StoredValue = internal::range_stored_value_t<Range>;\n\
+    \        constexpr bool nested = internal::is_range_v<StoredValue>\n         \
+    \                       && !internal::is_string_like_v<StoredValue>;\n\n     \
+    \   for (auto&& value : range) {\n            if constexpr (std::is_same_v<StoredValue,\
+    \ bool> && !nested) {\n                bool x;\n                if (!read(x))\
+    \ return false;\n                value = x;\n            } else {\n          \
+    \      if (!read(value)) return false;\n            }\n        }\n        return\
+    \ true;\n    }\n\n    template <class First, class Second, class... Rest>\n  \
+    \  bool read(First& first, Second& second, Rest&... rest) {\n        if (!read(first))\
+    \ return false;\n        return read(second, rest...);\n    }\n\n    template\
+    \ <class T>\n    FastInput& operator>>(T& value) {\n        if (!read(value))\
+    \ std::abort();\n        return *this;\n    }\n};\n\nstruct FastOutput {\n   \
+    \ static constexpr int buffer_size = 1 << 20;\n\n   private:\n    inline static\
+    \ const auto digit_quads = [] {\n        std::array<char, 40000> result{};\n \
+    \       for (int i = 0; i < 10000; i++) {\n            int value = i;\n      \
+    \      for (int j = 3; j >= 0; j--) {\n                result[4 * i + j] = char('0'\
+    \ + value % 10);\n                value /= 10;\n            }\n        }\n   \
+    \     return result;\n    }();\n\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
+    \    int _position;\n    int _precision;\n    std::chars_format _float_format;\n\
+    \    char _range_separator;\n\n   public:\n    explicit FastOutput(std::FILE*\
+    \ stream = stdout)\n        : _stream(stream),\n          _position(0),\n    \
+    \      _precision(6),\n          _float_format(std::chars_format::general),\n\
+    \          _range_separator(' ') {}\n\n    FastOutput(const FastOutput&) = delete;\n\
+    \    FastOutput& operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n\
+    \        flush();\n    }\n\n    void flush() {\n        if (_position != 0) {\n\
+    \            std::fwrite(_buffer, 1, _position, _stream);\n            _position\
+    \ = 0;\n        }\n        std::fflush(_stream);\n    }\n\n    void write_char(char\
+    \ c) {\n        if (_position == buffer_size) flush();\n        _buffer[_position++]\
+    \ = c;\n    }\n\n    void write(const char* s) {\n        while (*s != '\\0')\
+    \ write_char(*s++);\n    }\n\n    void write(const std::string& s) {\n       \
+    \ for (char c : s) write_char(c);\n    }\n\n    void write(char c) {\n       \
+    \ write_char(c);\n    }\n\n    void write(bool value) {\n        write_char(value\
+    \ ? '1' : '0');\n    }\n\n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>>\n\
+    \    write(T value) {\n        char digits[128];\n        auto [end, error] =\
+    \ std::to_chars(\n            digits,\n            digits + sizeof(digits),\n\
+    \            value,\n            _float_format,\n            _precision\n    \
+    \    );\n        if (error != std::errc()) std::abort();\n        for (const char*\
+    \ pointer = digits; pointer != end; pointer++) {\n            write_char(*pointer);\n\
+    \        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n        internal::is_integral_v<T>\n\
+    \            && !std::is_same_v<std::remove_cv_t<T>, bool>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ char>\n    >\n    write(T value) {\n        using Raw = std::remove_cv_t<T>;\n\
+    \        using Unsigned = internal::make_unsigned_t<Raw>;\n\n        Unsigned\
+    \ magnitude;\n        if constexpr (internal::is_signed_v<Raw>) {\n          \
+    \  if (value < 0) {\n                write_char('-');\n                magnitude\
+    \ = Unsigned(0) - Unsigned(value);\n            } else {\n                magnitude\
+    \ = Unsigned(value);\n            }\n        } else {\n            magnitude =\
+    \ value;\n        }\n\n        if (magnitude == 0) {\n            write_char('0');\n\
+    \            return;\n        }\n\n        unsigned chunks[16];\n        int count\
+    \ = 0;\n        while (magnitude >= 10000) {\n            const Unsigned quotient\
+    \ = magnitude / 10000;\n            chunks[count++] = unsigned(magnitude - quotient\
+    \ * 10000);\n            magnitude = quotient;\n        }\n        if (_position\
+    \ > buffer_size - 64) flush();\n        const unsigned leading = unsigned(magnitude);\n\
+    \        const char* first = digit_quads.data() + 4 * leading;\n        int skip\
+    \ = leading < 10 ? 3 : leading < 100 ? 2 : leading < 1000 ? 1 : 0;\n        for\
+    \ (; skip < 4; skip++) _buffer[_position++] = first[skip];\n        while (count--)\
+    \ {\n            const char* digits = digit_quads.data() + 4 * chunks[count];\n\
+    \            std::memcpy(_buffer + _position, digits, 4);\n            _position\
+    \ += 4;\n        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n \
+    \       internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
+    \            && !internal::is_range_v<T>\n    >\n    write(const T& value) {\n\
+    \        write(value.val());\n    }\n\n    template <class First, class Second>\n\
+    \    void write(const std::pair<First, Second>& value) {\n        write(value.first);\n\
+    \        write_char(' ');\n        write(value.second);\n    }\n\n    template\
+    \ <class Range>\n    std::enable_if_t<\n        internal::is_range_v<Range>\n\
+    \            && !internal::is_string_like_v<Range>\n    >\n    write(const Range&\
+    \ range) {\n        using StoredValue = internal::range_stored_value_t<const Range>;\n\
+    \        constexpr bool nested = internal::is_range_v<StoredValue>\n         \
+    \                       && !internal::is_string_like_v<StoredValue>;\n\n     \
+    \   bool first = true;\n        for (const auto& value : range) {\n          \
+    \  if (!first) write_char(nested ? '\\n' : _range_separator);\n            first\
+    \ = false;\n            if constexpr (std::is_same_v<StoredValue, bool> && !nested)\
+    \ {\n                write(static_cast<bool>(value));\n            } else {\n\
+    \                write(value);\n            }\n        }\n    }\n\n    template\
+    \ <class First, class... Rest>\n    void print(const First& first, const Rest&...\
+    \ rest) {\n        write(first);\n        ((write_char(' '), write(rest)), ...);\n\
+    \    }\n\n    void println() {\n        write_char('\\n');\n    }\n\n    void\
+    \ set_precision(int precision) {\n        _precision = precision;\n    }\n\n \
+    \   void set_fixed(int precision = 6) {\n        _float_format = std::chars_format::fixed;\n\
+    \        _precision = precision;\n    }\n\n    void set_general(int precision\
+    \ = 6) {\n        _float_format = std::chars_format::general;\n        _precision\
+    \ = precision;\n    }\n\n    void set_range_separator(char separator) {\n    \
+    \    _range_separator = separator;\n    }\n\n    template <class... Args>\n  \
+    \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
+    n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
+    \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
+    \ utilities\n}  // namespace m1une\n\n\n#line 9 \"verify/utilities/bigint_addition.test.cpp\"\
+    \n\nint main() {\n    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput\
+    \ output;\n\n    int test_count;\n    input >> test_count;\n    while (test_count--)\
+    \ {\n        std::string lhs, rhs;\n        input >> lhs >> rhs;\n        output\
+    \ << (BigInt(lhs) + BigInt(rhs)).to_string() << '\\n';\n    }\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/addition_of_big_integers\"\
+    \n\n#pragma GCC optimize(\"O3\")\n\n#include \"../../utilities/bigint.hpp\"\n\
+    using m1une::utilities::BigInt;\n\n#include \"../../utilities/fast_io.hpp\"\n\n\
+    int main() {\n    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput\
+    \ output;\n\n    int test_count;\n    input >> test_count;\n    while (test_count--)\
+    \ {\n        std::string lhs, rhs;\n        input >> lhs >> rhs;\n        output\
+    \ << (BigInt(lhs) + BigInt(rhs)).to_string() << '\\n';\n    }\n}\n"
   dependsOn:
+  - utilities/bigint.hpp
   - math/fps/convolution.hpp
   - math/fps/internal/ntt998_faster.hpp
   - math/modint.hpp
-  isVerificationFile: false
-  path: utilities/bigint.hpp
-  requiredBy:
-  - geometry/all.hpp
-  - geometry/lattice_point_count.hpp
-  timestamp: '2026-07-17 04:56:02+09:00'
-  verificationStatus: LIBRARY_ALL_AC
-  verifiedWith:
-  - verify/utilities/bigint_addition.test.cpp
-  - verify/utilities/bigint_multiplication.test.cpp
-  - verify/utilities/bigint_division.test.cpp
-  - verify/utilities/basic_utilities.test.cpp
-  - verify/geometry/geometry_algorithms.test.cpp
-  - verify/geometry/lattice_point_count.test.cpp
-documentation_of: utilities/bigint.hpp
+  - utilities/fast_io.hpp
+  isVerificationFile: true
+  path: verify/utilities/bigint_addition.test.cpp
+  requiredBy: []
+  timestamp: '2026-07-18 19:00:17+09:00'
+  verificationStatus: TEST_ACCEPTED
+  verifiedWith: []
+documentation_of: verify/utilities/bigint_addition.test.cpp
 layout: document
-title: BigInt
+redirect_from:
+- /verify/verify/utilities/bigint_addition.test.cpp
+- /verify/verify/utilities/bigint_addition.test.cpp.html
+title: verify/utilities/bigint_addition.test.cpp
 ---
-
-## Overview
-
-An arbitrary-precision signed integer for competitive programming. Digits are
-stored in little-endian base-$10^9$ blocks.
-
-Large products use exact number-theoretic convolution after splitting each
-block into base-$1000$ digits. Large quotients use a normalized Newton
-reciprocal and the same fast multiplication. Small inputs use schoolbook
-fallbacks to avoid transform overhead. No floating-point rounding is involved.
-
-## Methods
-
-| Method / Operator | Description | Complexity |
-| --- | --- | --- |
-| `BigInt()` | Initializes the value to `0`. | $O(1)$ |
-| `BigInt(long long value)` | Initializes from a signed 64-bit integer. | $O(1)$ |
-| `BigInt(const std::string& text)` | Parses decimal text with optional `+` or `-`. | $O(N)$ |
-| `BigInt& operator=(long long value)` | Assigns a signed 64-bit integer. | $O(1)$ |
-| `BigInt& operator=(const std::string& text)` | Assigns parsed decimal text. | $O(N)$ |
-| `void read(const std::string& text)` | Replaces the value with parsed decimal text. | $O(N)$ |
-| `void trim()` | Removes leading zero blocks and canonicalizes zero. | $O(N)$ |
-| `std::string to_string() const` | Returns the decimal representation. | $O(N)$ |
-| `bool is_zero() const` | Tests whether the value is zero. | $O(1)$ |
-| `BigInt operator-() const` | Returns the negated value. | $O(N)$ |
-| `BigInt abs() const` | Returns the absolute value. | $O(N)$ |
-| `operator+`, `operator+=` | Adds two values. | $O(N+M)$ |
-| `operator-`, `operator-=` | Subtracts two values. | $O(N+M)$ |
-| `BigInt& operator*=(int value)` | Multiplies by a machine integer. | $O(N)$ |
-| `operator*`, `operator*=(const BigInt&)` | Multiplies two values using exact convolution for large inputs. | $O((N+M)\log(N+M))$; $O(NM)$ for the small-input fallback |
-| `operator/`, `operator/=` | Returns the quotient, truncated toward zero. | $O(N\log N)$ on the Newton path; $O(NM)$ for the bounded fallback |
-| `operator%`, `operator%=` | Returns the remainder associated with truncated division. | Same as division |
-| `divmod(const BigInt& a, const BigInt& b)` | Returns `std::pair<BigInt, BigInt>` containing `a / b` and `a % b`. | Same as division |
-| `<`, `>`, `<=`, `>=`, `==`, `!=` | Compares two values. | $O(N+M)$ |
-| `operator<<`, `operator>>` | Writes or reads decimal text through standard streams. | $O(N)$ |
-
-Here, $N$ is the number of base-$10^9$ blocks in the larger or dividend
-operand, and $M$ is the number in the other operand. Fast multiplication and
-division use $O(N+M)$ auxiliary memory.
-
-For compatibility, `a` (the limb vector) and `sign` remain public. Directly
-modified values must keep every limb in `[0, BASE)`, remove high zero limbs,
-and use a sign of `1` or `-1`; normal construction and arithmetic maintain
-these invariants automatically.
-
-Division is C++-style signed integer division: the quotient is truncated toward
-zero, `a == (a / b) * b + a % b`, the nonzero remainder has the sign of `a`,
-and its absolute value is smaller than `abs(b)`. Division by zero throws
-`std::domain_error`.
-
-## Example
-
-```cpp
-#include "utilities/bigint.hpp"
-#include <iostream>
-
-using m1une::utilities::BigInt;
-
-int main() {
-    BigInt a("12345678901234567890");
-    BigInt b = 987654321;
-
-    BigInt sum = a + b;
-    BigInt diff = a - b;
-    BigInt product = a * b;
-
-    // std::pair<BigInt, BigInt>
-    auto [quotient, remainder] = divmod(a, b);
-
-    std::cout << "Sum: " << sum << "\n";
-    std::cout << "Difference: " << diff << "\n";
-    std::cout << "Product: " << product << "\n";
-    std::cout << "Quotient: " << quotient << " R: " << remainder << "\n";
-
-    if (a > b) {
-        std::cout << "A is larger!\n";
-    }
-
-    return 0;
-}
-```

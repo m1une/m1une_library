@@ -2170,6 +2170,9 @@ data:
       path: verify/utilities/basic_utilities.test.cpp
       title: verify/utilities/basic_utilities.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/utilities/bigint_addition.test.cpp
+      title: verify/utilities/bigint_addition.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/utilities/bigint_division.test.cpp
       title: verify/utilities/bigint_division.test.cpp
     - icon: ':heavy_check_mark:'
