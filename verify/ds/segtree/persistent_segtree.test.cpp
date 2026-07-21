@@ -1,4 +1,4 @@
-#define PROBLEM "https://judge.yosupo.jp/problem/aplusb"
+#define PROBLEM "https://judge.yosupo.jp/problem/point_add_range_sum"
 
 #include "../../../ds/segtree/persistent_segtree.hpp"
 
@@ -52,7 +52,18 @@ int main() {
     assert(seg1.max_right(0, [](long long x) { return x <= 13; }) == 3);
     assert(seg1.min_left(5, [](long long x) { return x <= 9; }) == 3);
 
-    long long a, b;
-    fast_input >> a >> b;
-    fast_output << a + b << '\n';
+    int size, query_count;
+    fast_input >> size >> query_count;
+    std::vector<long long> values(size);
+    for (long long& value : values) fast_input >> value;
+    Seg current(values);
+    while (query_count--) {
+        int type, first, second;
+        fast_input >> type >> first >> second;
+        if (type == 0) {
+            current = current.set(first, current.get(first) + second);
+        } else {
+            fast_output << current.prod(first, second) << '\n';
+        }
+    }
 }

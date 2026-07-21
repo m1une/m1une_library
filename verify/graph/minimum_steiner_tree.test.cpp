@@ -1,4 +1,4 @@
-#define PROBLEM "https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=1040"
+#define PROBLEM "https://judge.yosupo.jp/problem/minimum_steiner_tree"
 
 #include "../../graph/minimum_steiner_tree.hpp"
 
@@ -393,24 +393,26 @@ int main() {
     test_examples_and_failures();
     test_randomized();
 
-    int height, width;
-    while (fast_input >> height >> width, height != 0) {
-        m1une::graph::Graph<int> graph(height * width);
-        std::vector<int> terminals;
-        for (int row = 0; row < height; row++) {
-            for (int column = 0; column < width; column++) {
-                int required;
-                fast_input >> required;
-                const int vertex = row * width + column;
-                if (row > 0) graph.add_edge(vertex, vertex - width);
-                if (column > 0) graph.add_edge(vertex, vertex - 1);
-                if (required == 1) terminals.push_back(vertex);
-            }
-        }
-
-        auto weighted = m1une::graph::minimum_steiner_tree(graph, terminals);
-        auto unweighted = m1une::graph::minimum_steiner_tree_unweighted(graph, terminals);
-        assert(weighted && unweighted && *weighted == *unweighted);
-        fast_output << height * width - *unweighted - 1 << '\n';
+    int vertex_count, edge_count;
+    fast_input >> vertex_count >> edge_count;
+    m1une::graph::Graph<long long> graph(vertex_count);
+    for (int edge = 0; edge < edge_count; edge++) {
+        int first, second;
+        long long weight;
+        fast_input >> first >> second >> weight;
+        graph.add_edge(first, second, weight);
     }
+    int terminal_count;
+    fast_input >> terminal_count;
+    std::vector<int> terminals(terminal_count);
+    for (int& terminal : terminals) fast_input >> terminal;
+
+    auto result = m1une::graph::build_minimum_steiner_tree(graph, terminals);
+    assert(result.has_value());
+    fast_output << result->cost << ' ' << result->edge_ids.size() << '\n';
+    for (int index = 0; index < int(result->edge_ids.size()); index++) {
+        if (index != 0) fast_output << ' ';
+        fast_output << result->edge_ids[index];
+    }
+    fast_output << '\n';
 }

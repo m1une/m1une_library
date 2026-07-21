@@ -1,8 +1,7 @@
-#define PROBLEM "https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_4_A"
+#define PROBLEM "https://judge.yosupo.jp/problem/static_convex_hull"
 
 #include "../../geometry/convex_hull.hpp"
 
-#include <algorithm>
 #include "../../utilities/fast_io.hpp"
 #include <vector>
 
@@ -11,24 +10,18 @@ int main() {
     m1une::utilities::FastOutput fast_output;
 
     using namespace m1une::geometry;
-    int n;
-    fast_input >> n;
-    std::vector<Point<long long>> points(n);
-    for (auto& point : points) fast_input >> point.x >> point.y;
+    int test_count;
+    fast_input >> test_count;
+    while (test_count--) {
+        int size;
+        fast_input >> size;
+        std::vector<Point<long long>> points(size);
+        for (auto& point : points) fast_input >> point.x >> point.y;
 
-    std::vector<Point<long long>> hull = convex_hull(points, true);
-    int start = int(std::min_element(
-        hull.begin(),
-        hull.end(),
-        [](const auto& a, const auto& b) {
-            if (a.y != b.y) return a.y < b.y;
-            return a.x < b.x;
+        std::vector<Point<long long>> hull = convex_hull(std::move(points));
+        fast_output << hull.size() << '\n';
+        for (const auto& point : hull) {
+            fast_output << point.x << ' ' << point.y << '\n';
         }
-    ) - hull.begin());
-
-    fast_output << hull.size() << '\n';
-    for (int offset = 0; offset < int(hull.size()); offset++) {
-        const auto& point = hull[(start + offset) % hull.size()];
-        fast_output << point.x << " " << point.y << '\n';
     }
 }

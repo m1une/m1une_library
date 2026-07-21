@@ -1,4 +1,4 @@
-#define PROBLEM "https://judge.yosupo.jp/problem/aplusb"
+#define PROBLEM "https://judge.yosupo.jp/problem/dynamic_tree_vertex_add_path_sum"
 
 #include <cassert>
 #include "../../../utilities/fast_io.hpp"
@@ -247,7 +247,37 @@ int main() {
     test_rooted_tree_utility_apis();
     test_random_vertex_sum();
 
-    long long a, b;
-    fast_input >> a >> b;
-    fast_output << a + b << '\n';
+    int vertex_count, query_count;
+    fast_input >> vertex_count >> query_count;
+    std::vector<long long> values(vertex_count);
+    for (long long& value : values) fast_input >> value;
+
+    m1une::ds::LinkCutTree<m1une::monoid::Add<long long>> tree(values);
+    for (int edge = 1; edge < vertex_count; edge++) {
+        int first, second;
+        fast_input >> first >> second;
+        [[maybe_unused]] bool linked = tree.link(first, second);
+        assert(linked);
+    }
+
+    while (query_count--) {
+        int type;
+        fast_input >> type;
+        if (type == 0) {
+            int first, second, new_first, new_second;
+            fast_input >> first >> second >> new_first >> new_second;
+            [[maybe_unused]] bool cut = tree.cut(first, second);
+            [[maybe_unused]] bool linked = tree.link(new_first, new_second);
+            assert(cut && linked);
+        } else if (type == 1) {
+            int vertex;
+            long long addition;
+            fast_input >> vertex >> addition;
+            tree.set(vertex, tree.get(vertex) + addition);
+        } else {
+            int first, second;
+            fast_input >> first >> second;
+            fast_output << tree.path_prod(first, second) << '\n';
+        }
+    }
 }

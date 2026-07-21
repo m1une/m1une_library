@@ -1,4 +1,4 @@
-#define PROBLEM "https://judge.yosupo.jp/problem/aplusb"
+#define PROBLEM "https://judge.yosupo.jp/problem/pow_of_matrix"
 
 #include "../../../math/modint.hpp"
 #include "../../../math/matrix/all.hpp"
@@ -245,7 +245,22 @@ int main() {
     test_floating_point();
     test_randomized_exact();
 
-    long long a, b;
-    fast_input >> a >> b;
-    fast_output << a + b << '\n';
+    int size;
+    std::uint64_t exponent;
+    fast_input >> size >> exponent;
+    Matrix<mint> matrix(size, size);
+    for (int row = 0; row < size; row++) {
+        for (int column = 0; column < size; column++) {
+            fast_input >> matrix[row][column];
+        }
+    }
+
+    Matrix<mint> result = matrix.pow(exponent);
+    for (int row = 0; row < size; row++) {
+        for (int column = 0; column < size; column++) {
+            if (column != 0) fast_output << ' ';
+            fast_output << result[row][column];
+        }
+        fast_output << '\n';
+    }
 }

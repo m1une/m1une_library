@@ -1,4 +1,4 @@
-#define PROBLEM "https://judge.yosupo.jp/problem/aplusb"
+#define PROBLEM "https://judge.yosupo.jp/problem/dynamic_tree_vertex_set_path_composite"
 
 #include <cassert>
 #include "../../../utilities/fast_io.hpp"
@@ -17,6 +17,26 @@ struct StringConcat {
 
     static std::string op(const std::string& a, const std::string& b) {
         return a + b;
+    }
+};
+
+constexpr long long modulus = 998244353;
+
+struct AffineComposition {
+    struct value_type {
+        long long multiplier;
+        long long addition;
+    };
+
+    static value_type id() {
+        return value_type{1, 0};
+    }
+
+    static value_type op(const value_type& first, const value_type& second) {
+        return value_type{
+            second.multiplier * first.multiplier % modulus,
+            (second.multiplier * first.addition + second.addition) % modulus,
+        };
     }
 };
 
@@ -106,7 +126,41 @@ int main() {
     test_path_order();
     test_edge_nodes();
 
-    long long a, b;
-    fast_input >> a >> b;
-    fast_output << a + b << '\n';
+    int vertex_count, query_count;
+    fast_input >> vertex_count >> query_count;
+    std::vector<AffineComposition::value_type> functions(vertex_count);
+    for (auto& function : functions) {
+        fast_input >> function.multiplier >> function.addition;
+    }
+
+    m1une::ds::PathLinkCutTree<AffineComposition> tree(functions);
+    for (int edge = 1; edge < vertex_count; edge++) {
+        int first, second;
+        fast_input >> first >> second;
+        [[maybe_unused]] bool linked = tree.link(first, second);
+        assert(linked);
+    }
+
+    while (query_count--) {
+        int type;
+        fast_input >> type;
+        if (type == 0) {
+            int first, second, new_first, new_second;
+            fast_input >> first >> second >> new_first >> new_second;
+            [[maybe_unused]] bool cut = tree.cut(first, second);
+            [[maybe_unused]] bool linked = tree.link(new_first, new_second);
+            assert(cut && linked);
+        } else if (type == 1) {
+            int vertex;
+            AffineComposition::value_type function;
+            fast_input >> vertex >> function.multiplier >> function.addition;
+            tree.set(vertex, function);
+        } else {
+            int first, second;
+            long long value;
+            fast_input >> first >> second >> value;
+            auto function = tree.path_prod(first, second);
+            fast_output << (function.multiplier * value + function.addition) % modulus << '\n';
+        }
+    }
 }

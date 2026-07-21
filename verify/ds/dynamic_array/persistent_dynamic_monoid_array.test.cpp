@@ -1,4 +1,4 @@
-#define PROBLEM "https://judge.yosupo.jp/problem/aplusb"
+#define PROBLEM "https://judge.yosupo.jp/problem/range_reverse_range_sum"
 
 #include "../../../ds/dynamic_array/persistent_dynamic_monoid_array.hpp"
 
@@ -10,6 +10,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#include "../../../monoid/add.hpp"
 
 struct StringMonoid {
     using value_type = std::string;
@@ -138,7 +140,21 @@ int main() {
         if (next_expected.size() <= 100) versions.push_back({next, next_expected});
     }
 
-    long long x, y;
-    fast_input >> x >> y;
-    fast_output << x + y << '\n';
+    int size, query_count;
+    fast_input >> size >> query_count;
+    std::vector<long long> values(size);
+    for (long long& value : values) fast_input >> value;
+
+    using SumArray =
+        m1une::ds::PersistentDynamicMonoidArray<m1une::monoid::Add<long long>>;
+    SumArray current(values);
+    while (query_count--) {
+        int type, left_index, right_index;
+        fast_input >> type >> left_index >> right_index;
+        if (type == 0) {
+            current = current.reverse(left_index, right_index);
+        } else {
+            fast_output << current.prod(left_index, right_index) << '\n';
+        }
+    }
 }

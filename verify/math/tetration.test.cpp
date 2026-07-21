@@ -1,4 +1,4 @@
-#define PROBLEM "https://judge.yosupo.jp/problem/aplusb"
+#define PROBLEM "https://judge.yosupo.jp/problem/tetration_mod"
 
 #include "../../math/tetration.hpp"
 
@@ -143,7 +143,11 @@ int main() {
     test_tetration_against_bruteforce();
     test_power_tower_against_bruteforce();
 
-    long long a, b;
-    fast_input >> a >> b;
-    fast_output << a + b << '\n';
+    int test_count;
+    fast_input >> test_count;
+    while (test_count--) {
+        uint64_t base, height, modulus;
+        fast_input >> base >> height >> modulus;
+        fast_output << m1une::math::tetration_mod(base, height, modulus) << '\n';
+    }
 }
