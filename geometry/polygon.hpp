@@ -21,6 +21,24 @@ enum class PointInPolygon {
     Inside = 2,
 };
 
+template <Coordinate T>
+constexpr Point<long double> centroid(
+    const std::array<Point<T>, 3>& triangle
+) {
+    return Point<long double>(
+        (
+            static_cast<long double>(triangle[0].x) +
+            static_cast<long double>(triangle[1].x) +
+            static_cast<long double>(triangle[2].x)
+        ) / 3,
+        (
+            static_cast<long double>(triangle[0].y) +
+            static_cast<long double>(triangle[1].y) +
+            static_cast<long double>(triangle[2].y)
+        ) / 3
+    );
+}
+
 namespace polygon_detail {
 
 inline bool close(
@@ -155,6 +173,14 @@ std::optional<Point<long double>> polygon_centroid(
         x_numerator / denominator,
         y_numerator / denominator
     );
+}
+
+template <Coordinate T>
+std::optional<Point<long double>> centroid(
+    const std::vector<Point<T>>& polygon,
+    long double eps = 1e-12L
+) {
+    return polygon_centroid(polygon, eps);
 }
 
 template <Coordinate T>

@@ -18,6 +18,12 @@ struct Circle {
     T radius;
 };
 
+template <Coordinate T>
+constexpr Point<long double> centroid(const Circle<T>& circle) {
+    assert(circle.radius >= 0);
+    return Point<long double>(circle.center);
+}
+
 enum class CircleRelation {
     Separate,
     ExternallyTangent,

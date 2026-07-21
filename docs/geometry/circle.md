@@ -6,8 +6,8 @@ documentation_of: ../../geometry/circle.hpp
 ## Overview
 
 This header provides circle relationships, intersection points with lines,
-rays, and other circles, and physical ray reflection. Constructed points use
-`long double`.
+rays, and other circles, the circle centroid, and physical ray reflection.
+Constructed points use `long double`.
 
 ## Types
 
@@ -34,6 +34,7 @@ Radii must be nonnegative.
 
 | Function | Description | Complexity |
 | --- | --- | --- |
+| `centroid(circle)` | Returns the center as `Point<long double>`. It is the centroid of both the filled disk and the circumference. | $O(1)$ |
 | `circle_relation(first, second, eps)` | Classifies two circles. | $O(1)$ |
 | `circle_line_intersections(circle, line, eps)` | Returns zero, one, or two intersection points in lexicographic order. | $O(1)$ |
 | `circle_ray_intersections(circle, ray, eps)` | Returns zero, one, or two intersections ordered from the ray origin. Both argument orders are supported. | $O(1)$ |

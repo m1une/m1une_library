@@ -84,9 +84,15 @@ public:
     std::pair<Wide, int> max_dot(const Point<T>& direction) const;
     std::pair<int, int> tangent_vertices(const Point<T>& point) const;
 };
+
+template <Coordinate T>
+std::optional<Point<long double>> centroid(
+    const ConvexPolygon<T>& polygon,
+    long double eps = 1e-12L
+);
 ```
 
-| Member | Description | Complexity |
+| Operation | Description | Complexity |
 | --- | --- | --- |
 | `ConvexPolygon(polygon, eps)` | Normalizes an ordered convex boundary and builds doubled prefix areas. | $O(N)$ time and memory |
 | `size()`, `empty()`, `vertices()`, `operator[]` | Access the normalized boundary. | $O(1)$ |
@@ -95,11 +101,18 @@ public:
 | `contains(point)` | Classifies a point as `Outside`, `Boundary`, or `Inside`. | $O(\log N)$ |
 | `min_dot(direction)`, `max_dot(direction)` | Returns the extreme dot product and one vertex attaining it. | $O(\log N)$ |
 | `tangent_vertices(point)` | Returns the two tangent-vertex indices for an external point. | $O(\log N)$ |
+| `centroid(polygon, eps)` | Returns the uniformly filled polygon's centroid, or `nullopt` for an empty or zero-area query object. | $O(N)$ |
 
 `min_dot` and `max_dot` require a nonempty polygon. `tangent_vertices`
 requires at least three vertices and a point strictly outside the polygon.
 Ties may return either endpoint of an extreme edge. No ordering is promised
 between the two tangent indices.
+
+`centroid` is a free geometry-wide overload rather than a convex-only member.
+The same name also supports points, segments, triangles, circles, and general
+simple polygon vectors. The convex overload delegates to the general polygon
+area-centroid calculation; preprocessing the query object does not make this
+particular operation constant-time.
 
 ## Construction and Combination
 

@@ -26,6 +26,8 @@ The polygon may be clockwise or counterclockwise and may be non-convex.
 
 | Function | Description | Complexity |
 | --- | --- | --- |
+| `centroid(triangle)` | Returns the filled triangle's centroid. The triangle is a `std::array<Point<T>, 3>`. | $O(1)$ |
+| `centroid(polygon, eps)` | Returns the uniformly filled polygon's centroid, or `nullopt` for zero area. | $O(N)$ |
 | `polygon_area2(polygon)` | Returns signed twice-area. Positive means counterclockwise. | $O(N)$ |
 | `polygon_area(polygon)` | Returns absolute area as `long double`. | $O(N)$ |
 | `polygon_centroid(polygon, eps)` | Returns the centroid of a uniformly filled polygon, or `nullopt` for zero area. | $O(N)$ |
@@ -44,13 +46,19 @@ Polygon queries require at least three vertices unless stated otherwise.
 
 ## Centroid and center of gravity
 
-`polygon_centroid` computes the center of gravity of a lamina with uniform
-density over the polygon's filled area. It accepts clockwise or
-counterclockwise simple polygons and returns `Point<long double>`.
+`centroid(polygon)` and `polygon_centroid` compute the center of gravity of a
+lamina with uniform density over the polygon's filled area.
+`centroid(polygon)` is the geometry-wide overload and `polygon_centroid` is its
+explicitly named equivalent. Both accept clockwise or counterclockwise simple
+polygons and return `std::optional<Point<long double>>`.
 
 A polygon with zero signed area has no area centroid, so the function returns
 `std::nullopt`. This is different from the arithmetic mean of the vertices,
 which generally is not the polygon's center of gravity.
+
+For a triangle represented by `std::array<Point<T>, 3>`, `centroid(triangle)`
+returns the arithmetic mean of its three vertices. This formula is also the
+usual filled-area centroid for every nondegenerate triangle.
 
 ## Triangulation
 

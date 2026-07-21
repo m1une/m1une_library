@@ -6,7 +6,8 @@ documentation_of: ../../geometry/line.hpp
 ## Overview
 
 This header provides `Line<T>` and `Segment<T>` together with projection,
-reflection, distances, intersection tests, and line intersection coordinates.
+reflection, distances, intersection tests, segment centroids, and line
+intersection coordinates.
 
 Segment predicates are exact for integral coordinates through 128-bit cross
 products. Constructed coordinates are returned as `Point<long double>`.
@@ -33,6 +34,7 @@ A line requires distinct endpoints. A segment may be degenerate.
 
 | Function | Description | Complexity |
 | --- | --- | --- |
+| `centroid(segment)` | Returns the midpoint, which is the centroid under uniform length. | $O(1)$ |
 | `on_line(line, point, eps)` | Tests whether a point lies on an infinite line. | $O(1)$ |
 | `parallel(first, second, eps)` | Tests whether two lines are parallel. | $O(1)$ |
 | `orthogonal(first, second, eps)` | Tests whether two lines are perpendicular. | $O(1)$ |
@@ -51,7 +53,8 @@ A line requires distinct endpoints. A segment may be degenerate.
 | `line_segment_intersection(line, segment, eps)` | Returns the unique intersection, or `nullopt` for no intersection or collinear overlap. Both argument orders are supported. | $O(1)$ |
 
 For a degenerate segment, `line_segment_intersection` returns its endpoint when
-that point lies on the line.
+that point lies on the line. Its centroid is also that endpoint. Infinite lines
+have no centroid overload.
 
 ## Example
 

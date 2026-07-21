@@ -63,6 +63,11 @@ struct Point {
     }
 };
 
+template <Coordinate T>
+constexpr Point<long double> centroid(const Point<T>& point) {
+    return Point<long double>(point);
+}
+
 template <Coordinate T, typename Scalar>
 requires std::is_arithmetic_v<Scalar>
 constexpr auto operator*(const Point<T>& point, Scalar scalar) {

@@ -7,7 +7,7 @@ documentation_of: ../../geometry/point.hpp
 
 `Point<T>` is the base type for the 2D geometry library. It provides vector
 arithmetic, lexicographic comparison, dot and cross products, distances,
-orientation, rotation, and normalization.
+orientation, rotation, normalization, and its trivial centroid.
 
 For integral coordinates, dot products, cross products, squared norms, and
 orientation calculations use signed 128-bit arithmetic. For floating-point
@@ -33,6 +33,7 @@ subtraction, scalar multiplication, and scalar division.
 
 | Function | Description | Complexity |
 | --- | --- | --- |
+| `centroid(point)` | Returns the point itself as `Point<long double>`. | $O(1)$ |
 | `dot(a, b)` | Dot product. | $O(1)$ |
 | `cross(a, b)` | Cross product of two vectors. | $O(1)$ |
 | `cross(origin, a, b)` | Cross product of vectors `a - origin` and `b - origin`. | $O(1)$ |

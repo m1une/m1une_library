@@ -389,6 +389,14 @@ class ConvexPolygon {
     }
 };
 
+template <Coordinate T>
+std::optional<Point<long double>> centroid(
+    const ConvexPolygon<T>& polygon,
+    long double eps = 1e-12L
+) {
+    return polygon_centroid(polygon.vertices(), eps);
+}
+
 namespace convex_polygon_detail {
 
 template <Coordinate T>

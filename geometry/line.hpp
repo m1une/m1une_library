@@ -24,6 +24,20 @@ struct Segment {
 };
 
 template <Coordinate T>
+constexpr Point<long double> centroid(const Segment<T>& segment) {
+    return Point<long double>(
+        (
+            static_cast<long double>(segment.a.x) +
+            static_cast<long double>(segment.b.x)
+        ) / 2,
+        (
+            static_cast<long double>(segment.a.y) +
+            static_cast<long double>(segment.b.y)
+        ) / 2
+    );
+}
+
+template <Coordinate T>
 bool on_line(
     const Line<T>& line,
     const Point<T>& point,
