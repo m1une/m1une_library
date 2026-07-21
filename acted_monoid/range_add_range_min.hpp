@@ -11,6 +11,8 @@ template <typename T, T Id = std::numeric_limits<T>::max()>
 struct RangeAddRangeMin {
     using value_type = T;
     using operator_type = T;
+    static constexpr bool commutative = true;
+    static constexpr bool operator_commutative = true;
 
     // Value Monoid (Min)
     static constexpr value_type id() {

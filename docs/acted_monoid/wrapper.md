@@ -22,6 +22,10 @@ callable in a constant expression.
 - `auto OpComp`: A function or lambda for operator composition (`E op_comp(E, E)`).
 - `auto OpId`: A function or lambda returning the operator identity (`E op_id()`).
 - `auto Mapping`: A function or lambda for mapping the operator onto the value (`T mapping(E, T)`).
+- `bool Commutative`: Whether the value operation `Op` is commutative. Defaults
+  to `false`.
+- `bool OperatorCommutative`: Whether the operator operation `OpComp` is
+  commutative. Defaults to `false`.
 
 ## Example
 
@@ -37,14 +41,17 @@ using RangeAddRangeMin = m1une::acted_monoid::Wrapper<
     []() { return INF; },
     [](long long f, long long g) { return f + g; },
     []() { return 0LL; },
-    [](long long f, long long x) { return x == INF ? INF : x + f; }
+    [](long long f, long long x) { return x == INF ? INF : x + f; },
+    true,
+    true
 >;
 ```
 
 ## Interface and Complexity
 
-`Wrapper` exposes `value_type`, `operator_type`, `id()`, `op(a, b)`, `op_id()`,
-`op_comp(f, g)`, and `mapping(f, x)` for lazy data structures.
+`Wrapper` exposes `value_type`, `operator_type`, `commutative`,
+`operator_commutative`, `id()`, `op(a, b)`, `op_id()`, `op_comp(f, g)`, and
+`mapping(f, x)` for lazy data structures.
 
 Each static operation forwards to the function or lambda supplied as the
 corresponding template parameter, so its complexity is the cost of that callable.

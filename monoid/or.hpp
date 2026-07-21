@@ -8,6 +8,7 @@ namespace monoid {
 template <typename T>
 struct Or {
     using value_type = T;
+    static constexpr bool commutative = true;
 
     // The identity element for bitwise OR is 0 (all bits 0).
     static constexpr T id() {

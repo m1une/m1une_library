@@ -11,6 +11,7 @@ namespace monoid {
 template <typename T>
 struct Update {
     using value_type = std::optional<T>;
+    static constexpr bool commutative = false;
 
     // The identity element represents "no operation".
     static constexpr value_type id() {

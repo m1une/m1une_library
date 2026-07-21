@@ -13,6 +13,7 @@ namespace monoid {
 template <typename T, int N, T Inf = std::numeric_limits<T>::max() / 2>
 struct MinPlusMatrix {
     using value_type = std::array<std::array<T, N>, N>;
+    static constexpr bool commutative = false;
 
     // The identity matrix for min-plus algebra.
     // Diagonal elements are 0 (identity for addition).

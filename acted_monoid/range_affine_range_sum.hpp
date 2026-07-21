@@ -9,7 +9,7 @@ namespace acted_monoid {
 template <typename T>
 struct RangeAffineRangeSumNode {
     T sum;
-    long long size;
+    int size;
 };
 
 // Designed to accept Modint or similar types as T
@@ -17,6 +17,8 @@ template <typename T>
 struct RangeAffineRangeSum {
     using value_type = RangeAffineRangeSumNode<T>;
     using operator_type = std::pair<T, T>;  // {a, b} for ax + b
+    static constexpr bool commutative = true;
+    static constexpr bool operator_commutative = false;
 
     // Value Monoid
     static constexpr value_type id() {
@@ -24,6 +26,9 @@ struct RangeAffineRangeSum {
     }
     static constexpr value_type op(const value_type& a, const value_type& b) {
         return {a.sum + b.sum, a.size + b.size};
+    }
+    static constexpr int size(const value_type& value) {
+        return value.size;
     }
 
     // Operator Monoid (Affine Composition)

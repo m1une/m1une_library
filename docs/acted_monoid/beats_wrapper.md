@@ -36,7 +36,9 @@ template <
     auto MakeAt = nullptr,
     auto MappingAt = nullptr,
     auto CanApplyAt = nullptr,
-    auto OpShift = nullptr
+    auto OpShift = nullptr,
+    bool Commutative = false,
+    bool OperatorCommutative = false
 >
 struct BeatsWrapper;
 ```
@@ -54,6 +56,12 @@ struct BeatsWrapper;
 | `Mapping` | `T(const F&, const T&)`; updates an aggregate when application is allowed. |
 | `CanApply` | `bool(const F&, const T&)`; reports whether `Mapping` can update the aggregate directly. |
 
+`Commutative` optionally declares whether the value operation `Op` is
+commutative and defaults to `false`.
+
+`OperatorCommutative` optionally declares whether the operator operation
+`OpComp` is commutative and defaults to `false`.
+
 The functions must satisfy the monoid and action laws required by
 `IsActedMonoid`. In addition, `CanApply` has the following contract:
 
@@ -70,8 +78,8 @@ many constant-time aggregate updates as the stored information permits.
 
 ## Optional callables
 
-The last five template arguments expose hooks used by `SegtreeBeats` when they
-are present.
+The five optional callable template arguments expose hooks used by
+`SegtreeBeats` when they are present.
 
 | Parameter | Exposed method | Purpose |
 | --- | --- | --- |

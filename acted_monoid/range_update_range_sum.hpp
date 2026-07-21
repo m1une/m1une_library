@@ -16,6 +16,8 @@ template <typename T>
 struct RangeUpdateRangeSum {
     using value_type = RangeUpdateRangeSumNode<T>;
     using operator_type = std::optional<T>;
+    static constexpr bool commutative = true;
+    static constexpr bool operator_commutative = false;
 
     static constexpr value_type id() {
         return {T(0), 0};

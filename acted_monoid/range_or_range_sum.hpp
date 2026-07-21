@@ -18,6 +18,8 @@ template <typename T, int BITS = 30>
 struct RangeOrRangeSum {
     using value_type = RangeOrRangeSumNode<T, BITS>;
     using operator_type = T;
+    static constexpr bool commutative = true;
+    static constexpr bool operator_commutative = true;
 
     static constexpr value_type id() {
         value_type res;

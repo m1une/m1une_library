@@ -7,7 +7,7 @@ documentation_of: ../../../ds/dynamic_array/dynamic_lazy_monoid_array.hpp
 
 `DynamicLazyMonoidArray` is an implicit treap for dynamic sequences with range products and lazy range actions. It supports indexed insertion, deletion, reversal, rotation, splitting, concatenation, range updates, and range product queries.
 
-Each node stores both forward and reversed products, so `reverse(l, r)` works correctly for non-commutative value monoids when the acted monoid action is compatible with the value operation.
+By default, each node stores both forward and reversed products, so `reverse(l, r)` works correctly for non-commutative value monoids when the acted monoid action is compatible with the value operation. If `ActedMonoid::commutative` is a static constant equal to `true`, the redundant reversed product is omitted.
 
 ## Complexity Notation
 
@@ -19,7 +19,7 @@ In this document:
 
 ## Template Parameters
 
-* `ActedMonoid`: An acted monoid satisfying `m1une::acted_monoid::IsActedMonoid`.
+* `ActedMonoid`: An acted monoid satisfying `m1une::acted_monoid::IsActedMonoid`. The optional static constant `commutative = true` lets the array omit the reversed product. The optional `static int size(const T&)` lets it use size metadata already stored in `T` instead of storing a duplicate node count.
 
 ## Constructors
 

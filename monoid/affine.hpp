@@ -11,6 +11,7 @@ namespace monoid {
 template <typename T>
 struct Affine {
     using value_type = std::pair<T, T>;
+    static constexpr bool commutative = false;
 
     // The identity transformation is f(x) = 1*x + 0.
     static constexpr value_type id() {

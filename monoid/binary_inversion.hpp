@@ -15,6 +15,7 @@ struct BinaryInversionNode {
 template <typename T = long long>
 struct BinaryInversion {
     using value_type = BinaryInversionNode<T>;
+    static constexpr bool commutative = false;
 
     // The identity element has 0 zeros, 0 ones, and 0 inversions.
     static constexpr value_type id() {

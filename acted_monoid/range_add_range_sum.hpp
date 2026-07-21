@@ -14,6 +14,8 @@ template <typename T>
 struct RangeAddRangeSum {
     using value_type = RangeAddRangeSumNode<T>;
     using operator_type = T;
+    static constexpr bool commutative = true;
+    static constexpr bool operator_commutative = true;
 
     // Value Monoid (Sum)
     static constexpr value_type id() {

@@ -28,6 +28,12 @@ To satisfy `m1une::monoid::IsMonoid`, a type `M` must implement:
 * `static T op(const T& a, const T& b);`
   Combines two values.
 
+Built-in monoids also expose `static constexpr bool commutative`. Generic data
+structures may use it to select a faster representation. This member is
+deliberately optional and is not part of `IsMonoid`, so a contest-local monoid
+may omit it. An omitted flag is treated conservatively by data structures that
+inspect it.
+
 ## Group
 
 `m1une::monoid::IsGroup` extends `IsMonoid` with an inverse:

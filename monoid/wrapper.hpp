@@ -6,9 +6,10 @@ namespace monoid {
 
 // Wrapper struct to generate a Monoid using Non-Type Template Parameters (NTTP).
 // Useful for quickly defining monoids using custom functions or constexpr lambdas during contests.
-template <typename T, auto Op, auto Id>
+template <typename T, auto Op, auto Id, bool Commutative = false>
 struct Wrapper {
     using value_type = T;
+    static constexpr bool commutative = Commutative;
 
     // Returns the identity element by invoking the provided `Id` function.
     static constexpr T id() {

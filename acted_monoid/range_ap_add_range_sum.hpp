@@ -17,6 +17,8 @@ template <typename T>
 struct RangeApAddRangeSum {
     using value_type = RangeApAddRangeSumNode<T>;
     using operator_type = std::pair<T, T>;  // {a, b} for adding a * i + b
+    static constexpr bool commutative = false;
+    static constexpr bool operator_commutative = true;
 
     // Value Monoid (Sum)
     static constexpr value_type id() {

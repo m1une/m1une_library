@@ -18,6 +18,8 @@ template <typename T>
 struct RangeAddRangeArgMax {
     using value_type = RangeAddRangeArgMaxNode<T>;
     using operator_type = T;
+    static constexpr bool commutative = false;
+    static constexpr bool operator_commutative = true;
 
     static constexpr value_type id() {
         return {std::numeric_limits<T>::lowest(), 0, -1};

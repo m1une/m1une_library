@@ -8,6 +8,7 @@ namespace monoid {
 template <typename T>
 struct Add {
     using value_type = T;
+    static constexpr bool commutative = true;
 
     // Returns the identity element for addition, which is 0.
     static constexpr T id() {

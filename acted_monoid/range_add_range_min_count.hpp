@@ -14,6 +14,8 @@ struct RangeAddRangeMinCount {
     using BaseMonoid = m1une::monoid::MinCount<T, Id, Compare>;
     using value_type = typename BaseMonoid::value_type;  // std::pair<T, int>
     using operator_type = T;
+    static constexpr bool commutative = true;
+    static constexpr bool operator_commutative = true;
 
     // Value Monoid (Min Count)
     static constexpr value_type id() {

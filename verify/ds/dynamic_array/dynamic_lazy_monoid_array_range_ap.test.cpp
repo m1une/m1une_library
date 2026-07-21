@@ -64,6 +64,21 @@ int main() {
         a.apply(1, 4, {2, 1});
         assert_all_ranges(a, {3, 10, 5, 6, 0});
     }
+    {
+        Array a(std::vector<long long>{1, 2, 3});
+        a.erase(1);
+        Array copied = a;
+        a.insert(1, AM::make(9));
+        copied.insert(1, AM::make(8));
+        assert_all_ranges(a, {1, 9, 3});
+        assert_all_ranges(copied, {1, 8, 3});
+
+        copied.erase(1);
+        Array moved = std::move(copied);
+        moved.insert(1, AM::make(7));
+        assert(copied.empty());
+        assert_all_ranges(moved, {1, 7, 3});
+    }
 
     std::mt19937 rng(3);
     Array a;

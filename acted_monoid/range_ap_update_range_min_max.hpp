@@ -20,6 +20,8 @@ template <typename T, T MinId = std::numeric_limits<T>::max(), T MaxId = std::nu
 struct RangeApUpdateRangeMinMax {
     using value_type = RangeApUpdateRangeMinMaxNode<T>;
     using operator_type = std::optional<std::pair<T, T>>;  // {a, b} for setting to a * i + b
+    static constexpr bool commutative = true;
+    static constexpr bool operator_commutative = false;
 
     // Value Monoid (Min & Max)
     static constexpr value_type id() {

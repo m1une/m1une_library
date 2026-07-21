@@ -14,6 +14,7 @@ namespace monoid {
 template <typename T, int K, typename Compare = std::greater<T>>
 struct TopKCount {
     using value_type = std::vector<std::pair<T, int>>;
+    static constexpr bool commutative = true;
 
     static constexpr value_type id() {
         return value_type();

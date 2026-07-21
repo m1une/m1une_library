@@ -21,6 +21,7 @@ struct LongestSameNode {
 template <typename T>
 struct LongestSame {
     using value_type = LongestSameNode<T>;
+    static constexpr bool commutative = false;
 
     // The identity element represents an empty array.
     static constexpr value_type id() {

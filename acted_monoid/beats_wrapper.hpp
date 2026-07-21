@@ -20,11 +20,15 @@ template <
     auto MakeAt = nullptr,
     auto MappingAt = nullptr,
     auto CanApplyAt = nullptr,
-    auto OpShift = nullptr
+    auto OpShift = nullptr,
+    bool Commutative = false,
+    bool OperatorCommutative = false
 >
 struct BeatsWrapper {
     using value_type = T;
     using operator_type = E;
+    static constexpr bool commutative = Commutative;
+    static constexpr bool operator_commutative = OperatorCommutative;
 
     static constexpr T id() {
         return Id();

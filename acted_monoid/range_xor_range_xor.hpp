@@ -14,6 +14,8 @@ template <typename T>
 struct RangeXorRangeXor {
     using value_type = RangeXorRangeXorNode<T>;
     using operator_type = T;
+    static constexpr bool commutative = true;
+    static constexpr bool operator_commutative = true;
 
     static constexpr value_type id() {
         return {T(0), 0};

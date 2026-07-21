@@ -12,6 +12,8 @@ struct RangeUpdateRangeLongestTrue {
     using BaseMonoid = m1une::monoid::LongestTrue;
     using value_type = typename BaseMonoid::value_type;
     using operator_type = std::optional<bool>;
+    static constexpr bool commutative = false;
+    static constexpr bool operator_commutative = false;
 
     // Value Monoid
     static constexpr value_type id() {

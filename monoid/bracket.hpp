@@ -15,6 +15,7 @@ struct BracketNode {
 // Monoid for matching parentheses (Bracket Sequences).
 struct Bracket {
     using value_type = BracketNode;
+    static constexpr bool commutative = false;
 
     // The identity element is an empty sequence.
     static constexpr value_type id() {

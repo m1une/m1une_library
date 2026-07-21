@@ -19,6 +19,7 @@ struct ArgMinNode {
 template <typename T, T Id = std::numeric_limits<T>::max(), typename Compare = std::less<T>>
 struct ArgMin {
     using value_type = ArgMinNode<T>;
+    static constexpr bool commutative = false;
 
     static constexpr value_type id() {
         return {Id, 0, -1};

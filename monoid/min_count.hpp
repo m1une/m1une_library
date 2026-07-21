@@ -13,6 +13,7 @@ namespace monoid {
 template <typename T, T Id = std::numeric_limits<T>::max(), typename Compare = std::less<T>>
 struct MinCount {
     using value_type = std::pair<T, int>;
+    static constexpr bool commutative = true;
 
     // The identity element has the specified Id value and a count of 0.
     static constexpr value_type id() {

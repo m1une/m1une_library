@@ -18,6 +18,8 @@ template <typename T, T MinId = std::numeric_limits<T>::max(), T MaxId = std::nu
 struct RangeAffineRangeMinMax {
     using value_type = RangeAffineRangeMinMaxNode<T>;
     using operator_type = std::pair<T, T>;
+    static constexpr bool commutative = true;
+    static constexpr bool operator_commutative = false;
 
     static constexpr value_type id() {
         return {MinId, MaxId};

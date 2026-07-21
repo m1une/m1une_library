@@ -14,6 +14,8 @@ struct RangeAddRangeArgMin {
     using BaseMonoid = m1une::monoid::ArgMin<T, Id, Compare>;
     using value_type = typename BaseMonoid::value_type;
     using operator_type = T;
+    static constexpr bool commutative = false;
+    static constexpr bool operator_commutative = true;
 
     // Value Monoid (ArgMin)
     static constexpr value_type id() {

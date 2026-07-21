@@ -17,6 +17,7 @@ struct StrictOpt2Node {
 template <typename T, T Id = std::numeric_limits<T>::max(), typename Compare = std::less<T>>
 struct StrictMin2 {
     using value_type = StrictOpt2Node<T>;
+    static constexpr bool commutative = true;
 
     // The identity element has both values set to Id.
     static constexpr value_type id() {

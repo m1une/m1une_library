@@ -14,6 +14,7 @@ namespace monoid {
 template <typename T, int K, typename Compare = std::greater<T>>
 struct TopK {
     using value_type = std::vector<T>;
+    static constexpr bool commutative = true;
 
     // The identity element is an empty vector.
     static constexpr value_type id() {

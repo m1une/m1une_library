@@ -17,6 +17,7 @@ struct LongestTrueNode {
 // where all elements satisfy a certain condition (i.e., are "true").
 struct LongestTrue {
     using value_type = LongestTrueNode;
+    static constexpr bool commutative = false;
 
     // The identity element represents an empty array.
     static constexpr value_type id() {

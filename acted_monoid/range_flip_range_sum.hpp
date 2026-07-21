@@ -16,6 +16,8 @@ template <typename T = long long>
 struct RangeFlipRangeSum {
     using value_type = RangeFlipRangeSumNode<T>;
     using operator_type = bool;  // 'true' means flip the bits in the range
+    static constexpr bool commutative = true;
+    static constexpr bool operator_commutative = true;
 
     static constexpr value_type id() {
         return {T(0), 0};

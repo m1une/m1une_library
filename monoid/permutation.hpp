@@ -12,6 +12,7 @@ namespace monoid {
 template <int N>
 struct Permutation {
     using value_type = std::array<int, N>;
+    static constexpr bool commutative = false;
 
     // The identity element is the identity permutation (0, 1, 2, ..., N-1).
     static constexpr value_type id() {

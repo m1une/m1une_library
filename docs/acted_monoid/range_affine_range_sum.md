@@ -11,7 +11,7 @@ An Acted Monoid representing Range Affine Transformations ($f(x) = ax + b$) and 
 
 When applying an affine transformation $f(x) = ax + b$ to a range of elements, the new sum becomes $a \times \text{sum} + b \times \text{size}$. Therefore, the `value_type` must keep track of the **size** of the range it currently represents.
 
-The `value_type` is defined as `RangeAffineRangeSumNode<T>`, which holds both the `sum` and the `size`.
+The `value_type` is defined as `RangeAffineRangeSumNode<T>`, which holds `T sum` and `int size`.
 
 When initializing a Lazy Segment Tree, you must initialize the leaf nodes with `size = 1`. Always use the helper function `make(val)` for this purpose.
 
@@ -52,6 +52,12 @@ This is a stateless acted-monoid tag. Lazy data structures use its public
 `value_type`, `operator_type`, `id()`, `op(a, b)`, `op_id()`, `op_comp(f, g)`,
 and `mapping(f, x)` members. Helpers such as `make(...)`, shifted mappings, or
 reversal-aware mappings are described above when the header provides them.
+
+| Member | Description | Complexity |
+| --- | --- | --- |
+| `static constexpr bool commutative` | `true`; allows compatible dynamic sequences to omit a reversed aggregate. | $O(1)$ |
+| `static constexpr int size(const value_type& value)` | Returns `value.size`. | $O(1)$ |
+| `static constexpr value_type make(const T& val)` | Constructs a leaf with sum `val` and size `1`. | $O(1)$ |
 
 The static operations are $O(1)$ for the scalar metadata stored by these range
 acted monoids, aside from the cost of the underlying arithmetic type.

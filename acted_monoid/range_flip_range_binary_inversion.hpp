@@ -10,6 +10,8 @@ template <typename T = long long>
 struct RangeFlipRangeBinaryInversion {
     using value_type = m1une::monoid::BinaryInversionNode<T>;
     using operator_type = bool;
+    static constexpr bool commutative = false;
+    static constexpr bool operator_commutative = true;
 
     static constexpr value_type id() {
         return {0, 0, 0};

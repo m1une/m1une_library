@@ -12,6 +12,8 @@ template <typename T, T Id = std::numeric_limits<T>::lowest()>
 struct RangeUpdateRangeMax {
     using value_type = T;
     using operator_type = std::optional<T>;
+    static constexpr bool commutative = true;
+    static constexpr bool operator_commutative = false;
 
     // Value Monoid (Max)
     static constexpr value_type id() {

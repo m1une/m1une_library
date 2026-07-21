@@ -12,6 +12,7 @@ namespace monoid {
 template <typename T, T MinId = std::numeric_limits<T>::max(), T MaxId = std::numeric_limits<T>::lowest()>
 struct MinMax {
     using value_type = std::pair<T, T>;
+    static constexpr bool commutative = true;
 
     // The identity element contains the bounds for min and max.
     static constexpr value_type id() {

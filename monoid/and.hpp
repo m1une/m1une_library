@@ -9,6 +9,7 @@ namespace monoid {
 template <typename T>
 struct And {
     using value_type = T;
+    static constexpr bool commutative = true;
 
     // The identity element for bitwise AND is all bits set to 1.
     static constexpr T id() { return ~T(0); }

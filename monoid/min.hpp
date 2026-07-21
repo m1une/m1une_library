@@ -12,6 +12,7 @@ namespace monoid {
 template <typename T, T Id = std::numeric_limits<T>::max()>
 struct Min {
     using value_type = T;
+    static constexpr bool commutative = true;
 
     // Returns the identity element for minimum.
     static constexpr T id() {

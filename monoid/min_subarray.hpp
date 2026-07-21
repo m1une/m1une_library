@@ -22,6 +22,7 @@ struct SubarrayNode {
 template <typename T, T Id = std::numeric_limits<T>::max() / 2, typename Compare = std::less<T>>
 struct MinSubarray {
     using value_type = SubarrayNode<T>;
+    static constexpr bool commutative = false;
 
     // The identity element contains values that do not affect the result.
     static constexpr value_type id() {

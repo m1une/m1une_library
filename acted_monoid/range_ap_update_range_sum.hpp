@@ -18,6 +18,8 @@ template <typename T>
 struct RangeApUpdateRangeSum {
     using value_type = RangeApUpdateRangeSumNode<T>;
     using operator_type = std::optional<std::pair<T, T>>;  // {a, b} for setting to a * i + b
+    static constexpr bool commutative = false;
+    static constexpr bool operator_commutative = false;
 
     // Value Monoid (Sum)
     static constexpr value_type id() {

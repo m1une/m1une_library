@@ -24,6 +24,14 @@ struct RangeUpdateRangeProduct {
     using base_type = typename Monoid::value_type;
     using value_type = RangeUpdateRangeProductNode<Monoid>;
     using operator_type = std::optional<base_type>;
+    static constexpr bool commutative = [] {
+        if constexpr (requires { Monoid::commutative; }) {
+            return bool(Monoid::commutative);
+        } else {
+            return false;
+        }
+    }();
+    static constexpr bool operator_commutative = false;
 
     static constexpr value_type id() {
         return {Monoid::id(), 0};

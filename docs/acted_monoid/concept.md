@@ -50,6 +50,17 @@ types. It does not require any operation to be `constexpr`. Associativity,
 identity laws, and the interaction between `mapping` and `op` must be satisfied
 by the implementation.
 
+Built-in acted monoids also expose two metadata flags:
+
+* `static constexpr bool commutative` describes the value operation `op`.
+* `static constexpr bool operator_commutative` describes the operator operation
+  `op_comp`.
+
+Generic data structures may use these flags to select faster representations or
+algorithms. Both members are deliberately optional and are not part of
+`IsActedMonoid`, so a contest-local acted monoid may omit them. An omitted flag
+is treated conservatively by data structures that inspect it.
+
 ## Commutative Acted Group
 
 `m1une::acted_monoid::IsCommutativeActedGroup` extends `IsActedMonoid` with an

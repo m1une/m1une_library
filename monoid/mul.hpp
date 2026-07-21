@@ -8,6 +8,7 @@ namespace monoid {
 template <typename T>
 struct Mul {
     using value_type = T;
+    static constexpr bool commutative = true;
 
     // Returns the identity element for multiplication, which is 1.
     static constexpr T id() {

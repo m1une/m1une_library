@@ -18,6 +18,8 @@ template <typename T>
 struct RangeAffineRangeSumOfSquares {
     using value_type = RangeAffineRangeSumOfSquaresNode<T>;
     using operator_type = std::pair<T, T>;  // {a, b} for f(x) = a*x + b
+    static constexpr bool commutative = true;
+    static constexpr bool operator_commutative = false;
 
     // Value Monoid (Sum of Squares, Sum, Size)
     static constexpr value_type id() {

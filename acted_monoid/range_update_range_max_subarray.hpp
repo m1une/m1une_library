@@ -19,6 +19,8 @@ template <typename T>
 struct RangeUpdateRangeMaxSubarray {
     using value_type = RangeUpdateRangeMaxSubarrayNode<T>;
     using operator_type = std::optional<T>;
+    static constexpr bool commutative = false;
+    static constexpr bool operator_commutative = false;
 
     static constexpr value_type id() {
         return {T(0), T(0), T(0), T(0), 0};

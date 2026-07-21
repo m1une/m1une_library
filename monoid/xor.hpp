@@ -8,6 +8,7 @@ namespace monoid {
 template <typename T>
 struct Xor {
     using value_type = T;
+    static constexpr bool commutative = true;
 
     // Returns the identity element for bitwise XOR, which is 0.
     static constexpr T id() {

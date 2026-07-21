@@ -10,6 +10,7 @@ namespace monoid {
 template <typename T, int N>
 struct Matrix {
     using value_type = std::array<std::array<T, N>, N>;
+    static constexpr bool commutative = false;
 
     // The identity element is the identity matrix.
     static constexpr value_type id() {

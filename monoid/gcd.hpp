@@ -10,6 +10,7 @@ namespace monoid {
 template <typename T>
 struct Gcd {
     using value_type = T;
+    static constexpr bool commutative = true;
 
     // The identity element for GCD is 0.
     static constexpr T id() {
