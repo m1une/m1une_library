@@ -241,6 +241,9 @@ data:
     path: verify/ds/range_query/range_lis_query.test.cpp
     title: verify/ds/range_query/range_lis_query.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/range_query/range_majority.test.cpp
+    title: verify/ds/range_query/range_majority.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/range_query/range_sort_range_composite.test.cpp
     title: verify/ds/range_query/range_sort_range_composite.test.cpp
   - icon: ':heavy_check_mark:'
@@ -264,9 +267,6 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/range_query/static_range_count_distinct.test.cpp
     title: verify/ds/range_query/static_range_count_distinct.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/ds/range_query/static_range_majority.test.cpp
-    title: verify/ds/range_query/static_range_majority.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/ds/range_query/static_range_mode_query.test.cpp
     title: verify/ds/range_query/static_range_mode_query.test.cpp
@@ -1608,12 +1608,12 @@ data:
   - verify/ds/range_query/merge_sort_tree.test.cpp
   - verify/ds/range_query/range_sort_range_composite.test.cpp
   - verify/ds/range_query/static_rectangle_sum.test.cpp
+  - verify/ds/range_query/range_majority.test.cpp
   - verify/ds/range_query/static_range_count_distinct.test.cpp
   - verify/ds/range_query/fenwick_tree_2d.test.cpp
   - verify/ds/range_query/offline_rectangle_add_rectangle_sum.test.cpp
   - verify/ds/range_query/sliding_window_aggregation_deque.test.cpp
   - verify/ds/range_query/disjoint_sparse_table.test.cpp
-  - verify/ds/range_query/static_range_majority.test.cpp
   - verify/ds/range_query/sliding_window_aggregation.test.cpp
   - verify/ds/range_query/sqrt_blocks.test.cpp
   - verify/ds/range_query/cumulative_sum.test.cpp

@@ -1,11 +1,17 @@
 ---
 data:
   _extendedDependsOn: []
-  _extendedRequiredBy: []
+  _extendedRequiredBy:
+  - icon: ':heavy_check_mark:'
+    path: ds/range_query/range_majority.hpp
+    title: Range Majority
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/ds/bst/ordered_set.test.cpp
     title: verify/ds/bst/ordered_set.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/range_query/range_majority.test.cpp
+    title: verify/ds/range_query/range_majority.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -312,10 +318,12 @@ data:
   dependsOn: []
   isVerificationFile: false
   path: ds/bst/ordered_set.hpp
-  requiredBy: []
+  requiredBy:
+  - ds/range_query/range_majority.hpp
   timestamp: '2026-07-13 03:01:19+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/ds/range_query/range_majority.test.cpp
   - verify/ds/bst/ordered_set.test.cpp
 documentation_of: ds/bst/ordered_set.hpp
 layout: document
