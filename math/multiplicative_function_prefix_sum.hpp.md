@@ -7,6 +7,12 @@ data:
     title: Math All
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/math/counting_primes.test.cpp
+    title: verify/math/counting_primes.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/enumerate_quotients.test.cpp
+    title: verify/math/enumerate_quotients.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
@@ -226,7 +232,9 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
+  - verify/math/enumerate_quotients.test.cpp
   - verify/math/sum_of_multiplicative_function.test.cpp
+  - verify/math/counting_primes.test.cpp
 documentation_of: math/multiplicative_function_prefix_sum.hpp
 layout: document
 title: Multiplicative Function Prefix Sum

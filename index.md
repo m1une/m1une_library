@@ -1562,6 +1562,9 @@ data:
       path: verify/ds/segtree/persistent_segtree.test.cpp
       title: verify/ds/segtree/persistent_segtree.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/ds/segtree/range_add_range_min.test.cpp
+      title: verify/ds/segtree/range_add_range_min.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/ds/segtree/range_update_range_product.test.cpp
       title: verify/ds/segtree/range_update_range_product.test.cpp
     - icon: ':heavy_check_mark:'
@@ -1817,6 +1820,9 @@ data:
       path: verify/graph/tree/dsu_on_tree.test.cpp
       title: verify/graph/tree/dsu_on_tree.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/graph/tree/jump_on_tree.test.cpp
+      title: verify/graph/tree/jump_on_tree.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
       title: verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
     - icon: ':heavy_check_mark:'
@@ -1855,8 +1861,14 @@ data:
       path: verify/math/binomial_coefficient_mod.test.cpp
       title: verify/math/binomial_coefficient_mod.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/math/bitwise_and_convolution.test.cpp
+      title: verify/math/bitwise_and_convolution.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/math/bitwise_convolution.test.cpp
       title: verify/math/bitwise_convolution.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/counting_primes.test.cpp
+      title: verify/math/counting_primes.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/cyclotomic_polynomial.test.cpp
       title: verify/math/cyclotomic_polynomial.test.cpp
@@ -1866,6 +1878,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/enumerate_primes.test.cpp
       title: verify/math/enumerate_primes.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/enumerate_quotients.test.cpp
+      title: verify/math/enumerate_quotients.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/extended_gcd.test.cpp
       title: verify/math/extended_gcd.test.cpp
@@ -1914,6 +1929,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/primality_test.test.cpp
       title: verify/math/primality_test.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/primitive_root.test.cpp
+      title: verify/math/primitive_root.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/rational.test.cpp
       title: verify/math/rational.test.cpp
@@ -2016,6 +2034,9 @@ data:
       path: verify/math/fps/lagrange_inversion.test.cpp
       title: verify/math/fps/lagrange_inversion.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/math/fps/log_of_formal_power_series.test.cpp
+      title: verify/math/fps/log_of_formal_power_series.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/math/fps/log_of_formal_power_series_sparse.test.cpp
       title: verify/math/fps/log_of_formal_power_series_sparse.test.cpp
     - icon: ':heavy_check_mark:'
@@ -2045,6 +2066,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/fps/pow_of_formal_power_series_sparse.test.cpp
       title: verify/math/fps/pow_of_formal_power_series_sparse.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/fps/sqrt_of_formal_power_series.test.cpp
+      title: verify/math/fps/sqrt_of_formal_power_series.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/fps/sqrt_of_formal_power_series_sparse.test.cpp
       title: verify/math/fps/sqrt_of_formal_power_series_sparse.test.cpp

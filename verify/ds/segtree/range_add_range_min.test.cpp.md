@@ -2,11 +2,17 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: geometry/convex_hull.hpp
-    title: Convex Hull
+    path: acted_monoid/concept.hpp
+    title: Acted Monoid Concept
   - icon: ':heavy_check_mark:'
-    path: geometry/point.hpp
-    title: 2D Point and Predicates
+    path: acted_monoid/range_add_range_min.hpp
+    title: Range Add Range Min
+  - icon: ':heavy_check_mark:'
+    path: ds/segtree/lazy_segtree.hpp
+    title: Lazy Segment Tree
+  - icon: ':heavy_check_mark:'
+    path: math/bit_ceil.hpp
+    title: Bit Ceil
   - icon: ':heavy_check_mark:'
     path: utilities/fast_io.hpp
     title: Fast IO
@@ -17,124 +23,182 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://judge.yosupo.jp/problem/static_convex_hull
+    PROBLEM: https://judge.yosupo.jp/problem/range_add_range_min
     links:
-    - https://judge.yosupo.jp/problem/static_convex_hull
-  bundledCode: "#line 1 \"verify/geometry/convex_hull.test.cpp\"\n#define PROBLEM\
-    \ \"https://judge.yosupo.jp/problem/static_convex_hull\"\n\n#line 1 \"geometry/convex_hull.hpp\"\
-    \n\n\n\n#include <algorithm>\n#include <cstddef>\n#include <utility>\n#include\
-    \ <vector>\n\n#line 1 \"geometry/point.hpp\"\n\n\n\n#include <cmath>\n#include\
-    \ <concepts>\n#include <cassert>\n#include <type_traits>\n\nnamespace m1une {\n\
-    namespace geometry {\n\ntemplate <typename T>\nconcept Coordinate = std::is_arithmetic_v<T>\
-    \ && !std::same_as<std::remove_cv_t<T>, bool>;\n\ntemplate <Coordinate T>\nusing\
-    \ wide_type = std::conditional_t<std::integral<T>, __int128_t, long double>;\n\
-    \ntemplate <Coordinate T>\nstruct Point {\n    T x;\n    T y;\n\n    constexpr\
-    \ Point() : x(0), y(0) {}\n    constexpr Point(T x_value, T y_value) : x(x_value),\
-    \ y(y_value) {}\n\n    template <Coordinate U>\n    explicit constexpr Point(const\
-    \ Point<U>& other)\n        : x(static_cast<T>(other.x)), y(static_cast<T>(other.y))\
-    \ {}\n\n    constexpr Point& operator+=(const Point& other) {\n        x += other.x;\n\
-    \        y += other.y;\n        return *this;\n    }\n\n    constexpr Point& operator-=(const\
-    \ Point& other) {\n        x -= other.x;\n        y -= other.y;\n        return\
-    \ *this;\n    }\n\n    constexpr Point operator+() const {\n        return *this;\n\
-    \    }\n\n    constexpr Point operator-() const {\n        return Point(-x, -y);\n\
-    \    }\n\n    friend constexpr Point operator+(Point left, const Point& right)\
-    \ {\n        return left += right;\n    }\n\n    friend constexpr Point operator-(Point\
-    \ left, const Point& right) {\n        return left -= right;\n    }\n\n    friend\
-    \ constexpr bool operator==(const Point&, const Point&) = default;\n\n    friend\
-    \ constexpr bool operator<(const Point& left, const Point& right) {\n        if\
-    \ (left.x != right.x) return left.x < right.x;\n        return left.y < right.y;\n\
-    \    }\n};\n\ntemplate <Coordinate T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\n\
-    constexpr auto operator*(const Point<T>& point, Scalar scalar) {\n    using Result\
-    \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
-    \ * Result(scalar),\n        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate\
-    \ <typename Scalar, Coordinate T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr\
-    \ auto operator*(Scalar scalar, const Point<T>& point) {\n    return point * scalar;\n\
-    }\n\ntemplate <Coordinate T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\n\
-    constexpr auto operator/(const Point<T>& point, Scalar scalar) {\n    using Result\
-    \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
-    \ / Result(scalar),\n        Result(point.y) / Result(scalar)\n    );\n}\n\ntemplate\
-    \ <Coordinate T>\nconstexpr wide_type<T> dot(const Point<T>& a, const Point<T>&\
-    \ b) {\n    using W = wide_type<T>;\n    return W(a.x) * W(b.x) + W(a.y) * W(b.y);\n\
-    }\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> cross(const Point<T>& a,\
-    \ const Point<T>& b) {\n    using W = wide_type<T>;\n    return W(a.x) * W(b.y)\
-    \ - W(a.y) * W(b.x);\n}\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> cross(\n\
-    \    const Point<T>& origin,\n    const Point<T>& a,\n    const Point<T>& b\n\
-    ) {\n    using W = wide_type<T>;\n    W ax = W(a.x) - W(origin.x);\n    W ay =\
-    \ W(a.y) - W(origin.y);\n    W bx = W(b.x) - W(origin.x);\n    W by = W(b.y) -\
-    \ W(origin.y);\n    return ax * by - ay * bx;\n}\n\ntemplate <Coordinate T>\n\
-    constexpr wide_type<T> norm2(const Point<T>& point) {\n    return dot(point, point);\n\
-    }\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> distance2(const Point<T>&\
-    \ a, const Point<T>& b) {\n    using W = wide_type<T>;\n    W dx = W(a.x) - W(b.x);\n\
-    \    W dy = W(a.y) - W(b.y);\n    return dx * dx + dy * dy;\n}\n\ntemplate <Coordinate\
-    \ T>\nlong double norm(const Point<T>& point) {\n    return std::hypot(\n    \
-    \    static_cast<long double>(point.x),\n        static_cast<long double>(point.y)\n\
-    \    );\n}\n\ntemplate <Coordinate T>\nlong double distance(const Point<T>& a,\
-    \ const Point<T>& b) {\n    return std::hypot(\n        static_cast<long double>(a.x)\
-    \ - static_cast<long double>(b.x),\n        static_cast<long double>(a.y) - static_cast<long\
-    \ double>(b.y)\n    );\n}\n\ntemplate <Coordinate T, typename M, typename N>\n\
-    requires std::is_arithmetic_v<M> && std::is_arithmetic_v<N>\nconstexpr Point<long\
-    \ double> internal_division_point(\n    const Point<T>& a,\n    const Point<T>&\
-    \ b,\n    M m,\n    N n\n) {\n    long double first_ratio = static_cast<long double>(m);\n\
-    \    long double second_ratio = static_cast<long double>(n);\n    long double\
-    \ denominator = first_ratio + second_ratio;\n    assert(denominator != 0);\n \
-    \   Point<long double> first(a);\n    Point<long double> direction = Point<long\
-    \ double>(b) - first;\n    return first + direction * (first_ratio / denominator);\n\
-    }\n\ntemplate <Coordinate T, typename M, typename N>\nrequires std::is_arithmetic_v<M>\
-    \ && std::is_arithmetic_v<N>\nconstexpr Point<long double> external_division_point(\n\
-    \    const Point<T>& a,\n    const Point<T>& b,\n    M m,\n    N n\n) {\n    long\
-    \ double first_ratio = static_cast<long double>(m);\n    long double second_ratio\
-    \ = static_cast<long double>(n);\n    long double denominator = first_ratio -\
-    \ second_ratio;\n    assert(denominator != 0);\n    Point<long double> first(a);\n\
-    \    Point<long double> direction = Point<long double>(b) - first;\n    return\
-    \ first + direction * (first_ratio / denominator);\n}\n\ntemplate <Coordinate\
-    \ T>\nconstexpr int sign(wide_type<T> value, long double eps = 1e-12L) {\n   \
-    \ if constexpr (std::integral<T>) {\n        return (value > 0) - (value < 0);\n\
-    \    } else {\n        return (value > eps) - (value < -eps);\n    }\n}\n\ntemplate\
-    \ <Coordinate T>\nconstexpr int orientation(\n    const Point<T>& a,\n    const\
-    \ Point<T>& b,\n    const Point<T>& c,\n    long double eps = 1e-12L\n) {\n  \
-    \  return sign<T>(cross(a, b, c), eps);\n}\n\ntemplate <Coordinate T>\nconstexpr\
-    \ bool collinear(\n    const Point<T>& a,\n    const Point<T>& b,\n    const Point<T>&\
-    \ c,\n    long double eps = 1e-12L\n) {\n    return orientation(a, b, c, eps)\
-    \ == 0;\n}\n\ntemplate <Coordinate T>\nPoint<long double> rotate(const Point<T>&\
-    \ point, long double angle) {\n    long double cosine = std::cos(angle);\n   \
-    \ long double sine = std::sin(angle);\n    return Point<long double>(\n      \
-    \  static_cast<long double>(point.x) * cosine -\n            static_cast<long\
-    \ double>(point.y) * sine,\n        static_cast<long double>(point.x) * sine +\n\
-    \            static_cast<long double>(point.y) * cosine\n    );\n}\n\ntemplate\
-    \ <Coordinate T>\nPoint<long double> normalized(const Point<T>& point) {\n   \
-    \ long double length = norm(point);\n    assert(length != 0);\n    return Point<long\
-    \ double>(\n        static_cast<long double>(point.x) / length,\n        static_cast<long\
-    \ double>(point.y) / length\n    );\n}\n\n}  // namespace geometry\n}  // namespace\
-    \ m1une\n\n\n#line 10 \"geometry/convex_hull.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ geometry {\n\n// Returns the convex hull counterclockwise from its lexicographically\
-    \ smallest\n// point. The first point is not repeated at the end.\ntemplate <Coordinate\
-    \ T>\nstd::vector<Point<T>> convex_hull(\n    std::vector<Point<T>> points,\n\
-    \    bool include_collinear = false\n) {\n    std::sort(points.begin(), points.end());\n\
-    \    points.erase(std::unique(points.begin(), points.end()), points.end());\n\
-    \    std::size_t size = points.size();\n    if (size <= 1) return points;\n\n\
-    \    std::vector<Point<T>> hull;\n    hull.reserve(2 * size);\n    auto should_pop\
-    \ = [include_collinear](\n        const Point<T>& first,\n        const Point<T>&\
-    \ second,\n        const Point<T>& third\n    ) {\n        int turn = orientation(first,\
-    \ second, third);\n        return include_collinear ? turn < 0 : turn <= 0;\n\
-    \    };\n\n    for (const Point<T>& point : points) {\n        while (\n     \
-    \       hull.size() >= 2 &&\n            should_pop(hull[hull.size() - 2], hull.back(),\
-    \ point)\n        ) {\n            hull.pop_back();\n        }\n        hull.push_back(point);\n\
-    \    }\n\n    std::size_t lower_size = hull.size();\n    for (std::size_t index\
-    \ = size - 1; index-- > 0;) {\n        const Point<T>& point = points[index];\n\
-    \        while (\n            hull.size() > lower_size &&\n            should_pop(hull[hull.size()\
-    \ - 2], hull.back(), point)\n        ) {\n            hull.pop_back();\n     \
-    \   }\n        hull.push_back(point);\n    }\n    hull.pop_back();\n\n    if (include_collinear\
-    \ && hull.size() == 2 * points.size() - 2) {\n        hull = std::move(points);\n\
-    \    }\n    return hull;\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\
-    \n\n#line 4 \"verify/geometry/convex_hull.test.cpp\"\n\n#line 1 \"utilities/fast_io.hpp\"\
-    \n\n\n\n#line 5 \"utilities/fast_io.hpp\"\n#include <array>\n#include <cerrno>\n\
-    #include <charconv>\n#line 9 \"utilities/fast_io.hpp\"\n#include <cstdio>\n#include\
-    \ <cstdlib>\n#include <cstdint>\n#include <cstring>\n#include <iterator>\n#include\
-    \ <string>\n#include <sys/stat.h>\n#line 18 \"utilities/fast_io.hpp\"\n#include\
-    \ <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal {\n\
-    \n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct\
-    \ is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
-    \    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
+    - https://judge.yosupo.jp/problem/range_add_range_min
+  bundledCode: "#line 1 \"verify/ds/segtree/range_add_range_min.test.cpp\"\n#define\
+    \ PROBLEM \"https://judge.yosupo.jp/problem/range_add_range_min\"\n\n#line 1 \"\
+    acted_monoid/range_add_range_min.hpp\"\n\n\n\n#include <algorithm>\n#include <limits>\n\
+    \nnamespace m1une {\nnamespace acted_monoid {\n\ntemplate <typename T, T Id =\
+    \ std::numeric_limits<T>::max()>\nstruct RangeAddRangeMin {\n    using value_type\
+    \ = T;\n    using operator_type = T;\n    static constexpr bool commutative =\
+    \ true;\n    static constexpr bool operator_commutative = true;\n\n    // Value\
+    \ Monoid (Min)\n    static constexpr value_type id() {\n        return Id;\n \
+    \   }\n    static constexpr value_type op(const value_type& a, const value_type&\
+    \ b) {\n        return std::min(a, b);\n    }\n\n    // Operator Monoid (Add)\n\
+    \    static constexpr operator_type op_id() {\n        return 0;\n    }\n    static\
+    \ constexpr operator_type op_comp(const operator_type& f, const operator_type&\
+    \ g) {\n        return f + g;\n    }\n\n    // Mapping\n    static constexpr value_type\
+    \ mapping(const operator_type& f, const value_type& x) {\n        if (x == id())\
+    \ return x;  // Do not apply the operator to the identity element\n        return\
+    \ x + f;\n    }\n};\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\n\
+    \n#line 1 \"ds/segtree/lazy_segtree.hpp\"\n\n\n\n#include <bit>\n#include <cassert>\n\
+    #include <concepts>\n#include <utility>\n#include <vector>\n\n#line 1 \"acted_monoid/concept.hpp\"\
+    \n\n\n\n#line 5 \"acted_monoid/concept.hpp\"\n\nnamespace m1une {\nnamespace acted_monoid\
+    \ {\n\n// Concept defining the requirements for an Acted Monoid.\ntemplate <typename\
+    \ AM>\nconcept IsActedMonoid = requires(typename AM::value_type a, typename AM::value_type\
+    \ b, typename AM::operator_type f,\n                                 typename\
+    \ AM::operator_type g) {\n    // 1. Value Monoid\n    typename AM::value_type;\n\
+    \    { AM::id() } -> std::same_as<typename AM::value_type>;\n    { AM::op(a, b)\
+    \ } -> std::same_as<typename AM::value_type>;\n\n    // 2. Operator Monoid\n \
+    \   typename AM::operator_type;\n    { AM::op_id() } -> std::same_as<typename\
+    \ AM::operator_type>;\n    { AM::op_comp(f, g) } -> std::same_as<typename AM::operator_type>;\
+    \  // Composition order: f(g(x))\n\n    // 3. Mapping: Operator x Value -> Value\n\
+    \    { AM::mapping(f, a) } -> std::same_as<typename AM::value_type>;\n};\n\n//\
+    \ Concept for acted monoids whose value monoid is a commutative group.\n// The\
+    \ value operation must obey commutativity and inverse laws.\ntemplate <typename\
+    \ AM>\nconcept IsCommutativeActedGroup = IsActedMonoid<AM> && requires(typename\
+    \ AM::value_type a) {\n    { AM::inv(a) } -> std::same_as<typename AM::value_type>;\n\
+    };\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\n\n#line 1 \"math/bit_ceil.hpp\"\
+    \n\n\n\nnamespace m1une {\nnamespace math {\n\ntemplate <typename T>\nconstexpr\
+    \ T bit_ceil(T n) {\n    if (n <= 1) return 1;\n    T x = 1;\n    while (x < n)\
+    \ x <<= 1;\n    return x;\n}\n\n}  // namespace math\n}  // namespace m1une\n\n\
+    \n#line 12 \"ds/segtree/lazy_segtree.hpp\"\n\nnamespace m1une {\nnamespace ds\
+    \ {\n\n// A highly generic Lazy Segment Tree utilizing C++20 Concepts for type\
+    \ safety.\n// It operates on any Acted Monoid structure satisfying the `m1une::acted_monoid::IsActedMonoid`\
+    \ concept.\ntemplate <m1une::acted_monoid::IsActedMonoid ActedMonoid>\nstruct\
+    \ LazySegtree {\n    using T = typename ActedMonoid::value_type;\n    using F\
+    \ = typename ActedMonoid::operator_type;\n\n   private:\n    int _n, _size, _log;\n\
+    \    std::vector<T> _d;\n    std::vector<F> _lz;\n\n    // Recalculates the value\
+    \ of the node k from its children.\n    void update(int k) {\n        _d[k] =\
+    \ ActedMonoid::op(_d[2 * k], _d[2 * k + 1]);\n    }\n\n    static T mapping_at(const\
+    \ F& f, const T& value, long long ord) {\n        if constexpr (requires(F g,\
+    \ T x, long long i) { ActedMonoid::mapping(g, x, i); }) {\n            return\
+    \ ActedMonoid::mapping(f, value, ord);\n        } else {\n            return ActedMonoid::mapping(f,\
+    \ value);\n        }\n    }\n\n    static F shift_operator(const F& f, long long\
+    \ ord) {\n        if constexpr (requires(F g, long long i) { ActedMonoid::op_shift(g,\
+    \ i); }) {\n            return ActedMonoid::op_shift(f, ord);\n        } else\
+    \ {\n            return f;\n        }\n    }\n\n    int node_length(int k) const\
+    \ {\n        int level = std::bit_width((unsigned int)k) - 1;\n        return\
+    \ _size >> level;\n    }\n\n    int node_left(int k) const {\n        int level\
+    \ = std::bit_width((unsigned int)k) - 1;\n        int len = _size >> level;\n\
+    \        return (k - (1 << level)) * len;\n    }\n\n    // Applies the operator\
+    \ f to the node k and updates its lazy tag if it's an internal node.\n    void\
+    \ all_apply(int k, F f) {\n        _d[k] = mapping_at(f, _d[k], 0);\n        if\
+    \ (k < _size) {\n            _lz[k] = ActedMonoid::op_comp(f, _lz[k]);\n     \
+    \   }\n    }\n\n    // Propagates the lazy tag of the node k down to its children.\n\
+    \    void push(int k) {\n        all_apply(2 * k, _lz[k]);\n        all_apply(2\
+    \ * k + 1, shift_operator(_lz[k], node_length(k) / 2));\n        _lz[k] = ActedMonoid::op_id();\n\
+    \    }\n\n   public:\n    // Constructs an empty lazy segment tree.\n    LazySegtree()\
+    \ : LazySegtree(0) {}\n\n    // Constructs a lazy segment tree of size `n`, initialized\
+    \ with the identity element.\n    explicit LazySegtree(int n) : LazySegtree(std::vector<T>(n,\
+    \ ActedMonoid::id())) {}\n\n    // Constructs a lazy segment tree from an existing\
+    \ vector.\n    explicit LazySegtree(const std::vector<T>& v) : _n(int(v.size()))\
+    \ {\n        _size = m1une::math::bit_ceil((unsigned int)(_n));\n        _log\
+    \ = 0;\n        while ((1U << _log) < (unsigned int)(_size)) _log++;\n       \
+    \ _d.assign(2 * _size, ActedMonoid::id());\n        _lz.assign(_size, ActedMonoid::op_id());\n\
+    \        for (int i = 0; i < _n; i++) _d[_size + i] = v[i];\n        for (int\
+    \ i = _size - 1; i >= 1; i--) update(i);\n    }\n    explicit LazySegtree(std::vector<T>&&\
+    \ v) : _n(int(v.size())) {\n        _size = m1une::math::bit_ceil((unsigned int)(_n));\n\
+    \        _log = 0;\n        while ((1U << _log) < (unsigned int)(_size)) _log++;\n\
+    \        _d.assign(2 * _size, ActedMonoid::id());\n        _lz.assign(_size, ActedMonoid::op_id());\n\
+    \        for (int i = 0; i < _n; i++) _d[_size + i] = std::move(v[i]);\n     \
+    \   for (int i = _size - 1; i >= 1; i--) update(i);\n    }\n\n    // Constructs\
+    \ a lazy segment tree from a vector of a different type U.\n    // It automatically\
+    \ adapts to the Monoid's initialization requirements:\n    // 1. ActedMonoid::make(val)\
+    \ if it exists.\n    // 2. ActedMonoid::make(val, index) if the monoid requires\
+    \ global indices.\n    // 3. static_cast<T>(val) as a fallback for simple monoids.\n\
+    \    template <typename U>\n    requires (!std::same_as<U, T>) && (\n        requires(U\
+    \ x) { ActedMonoid::make(x); } ||\n        requires(U x, int i) { ActedMonoid::make(x,\
+    \ i); } ||\n        std::convertible_to<U, T>\n    )\n    explicit LazySegtree(const\
+    \ std::vector<U>& v) : _n(int(v.size())) {\n        _size = m1une::math::bit_ceil((unsigned\
+    \ int)(_n));\n        _log = 0;\n        while ((1U << _log) < (unsigned int)(_size))\
+    \ _log++;\n        _d.assign(2 * _size, ActedMonoid::id());\n        _lz.assign(_size,\
+    \ ActedMonoid::op_id());\n        for (int i = 0; i < _n; i++) {\n           \
+    \ if constexpr (requires(U x) { ActedMonoid::make(x); }) {\n                _d[_size\
+    \ + i] = ActedMonoid::make(v[i]);\n            } else if constexpr (requires(U\
+    \ x, int idx) { ActedMonoid::make(x, idx); }) {\n                _d[_size + i]\
+    \ = ActedMonoid::make(v[i], i);\n            } else {\n                _d[_size\
+    \ + i] = static_cast<T>(v[i]);\n            }\n        }\n        for (int i =\
+    \ _size - 1; i >= 1; i--) update(i);\n    }\n\n    // Returns the number of elements.\n\
+    \    int size() const {\n        return _n;\n    }\n\n    // Returns whether the\
+    \ tree is empty.\n    bool empty() const {\n        return _n == 0;\n    }\n\n\
+    \    // Assigns x to the p-th element.\n    void set(int p, T x) {\n        assert(0\
+    \ <= p && p < _n);\n        p += _size;\n        for (int i = _log; i >= 1; i--)\
+    \ push(p >> i);\n        _d[p] = x;\n        for (int i = 1; i <= _log; i++) update(p\
+    \ >> i);\n    }\n\n    // Returns the value of the p-th element.\n    T get(int\
+    \ p) {\n        assert(0 <= p && p < _n);\n        p += _size;\n        for (int\
+    \ i = _log; i >= 1; i--) push(p >> i);\n        return _d[p];\n    }\n\n    //\
+    \ Returns the value of the p-th element.\n    T operator[](int p) {\n        return\
+    \ get(p);\n    }\n\n    // Returns the product (result of the monoid operation)\
+    \ in the range [l, r).\n    T prod(int l, int r) {\n        assert(0 <= l && l\
+    \ <= r && r <= _n);\n        if (l == r) return ActedMonoid::id();\n\n       \
+    \ l += _size;\n        r += _size;\n\n        for (int i = _log; i >= 1; i--)\
+    \ {\n            if (((l >> i) << i) != l) push(l >> i);\n            if (((r\
+    \ >> i) << i) != r) push((r - 1) >> i);\n        }\n\n        T sml = ActedMonoid::id(),\
+    \ smr = ActedMonoid::id();\n        while (l < r) {\n            if (l & 1) sml\
+    \ = ActedMonoid::op(sml, _d[l++]);\n            if (r & 1) smr = ActedMonoid::op(_d[--r],\
+    \ smr);\n            l >>= 1;\n            r >>= 1;\n        }\n\n        return\
+    \ ActedMonoid::op(sml, smr);\n    }\n\n    // Returns the product of the entire\
+    \ array.\n    T all_prod() const {\n        return _d[1];\n    }\n\n    // Returns\
+    \ all elements as a vector.\n    std::vector<T> to_vector() {\n        for (int\
+    \ k = 1; k < _size; k++) push(k);\n        std::vector<T> res;\n        res.reserve(_n);\n\
+    \        for (int i = 0; i < _n; i++) res.push_back(_d[_size + i]);\n        return\
+    \ res;\n    }\n\n    // Returns the elements in the range [l, r) as a vector.\n\
+    \    std::vector<T> to_vector(int l, int r) {\n        assert(0 <= l && l <= r\
+    \ && r <= _n);\n        std::vector<T> res;\n        res.reserve(r - l);\n   \
+    \     for (int i = l; i < r; i++) res.push_back(get(i));\n        return res;\n\
+    \    }\n\n    // Applies the operator f to the p-th element.\n    void apply(int\
+    \ p, F f) {\n        assert(0 <= p && p < _n);\n        p += _size;\n        for\
+    \ (int i = _log; i >= 1; i--) push(p >> i);\n        _d[p] = mapping_at(f, _d[p],\
+    \ 0);\n        for (int i = 1; i <= _log; i++) update(p >> i);\n    }\n\n    //\
+    \ Applies the operator f to all elements in the range [l, r).\n    void apply(int\
+    \ l, int r, F f) {\n        assert(0 <= l && l <= r && r <= _n);\n        if (l\
+    \ == r) return;\n\n        int base_l = l;\n        l += _size;\n        r +=\
+    \ _size;\n\n        for (int i = _log; i >= 1; i--) {\n            if (((l >>\
+    \ i) << i) != l) push(l >> i);\n            if (((r >> i) << i) != r) push((r\
+    \ - 1) >> i);\n        }\n\n        {\n            int l2 = l, r2 = r;\n     \
+    \       while (l < r) {\n                if (l & 1) {\n                    all_apply(l,\
+    \ shift_operator(f, node_left(l) - base_l));\n                    l++;\n     \
+    \           }\n                if (r & 1) {\n                    --r;\n      \
+    \              all_apply(r, shift_operator(f, node_left(r) - base_l));\n     \
+    \           }\n                l >>= 1;\n                r >>= 1;\n          \
+    \  }\n            l = l2;\n            r = r2;\n        }\n\n        for (int\
+    \ i = 1; i <= _log; i++) {\n            if (((l >> i) << i) != l) update(l >>\
+    \ i);\n            if (((r >> i) << i) != r) update((r - 1) >> i);\n        }\n\
+    \    }\n\n    // Finds the largest r such that g(prod(l, r)) is true.\n    template\
+    \ <class F_pred>\n    int max_right(int l, F_pred g) {\n        assert(0 <= l\
+    \ && l <= _n);\n        assert(g(ActedMonoid::id()));\n        if (l == _n) return\
+    \ _n;\n        l += _size;\n        for (int i = _log; i >= 1; i--) push(l >>\
+    \ i);\n        T sm = ActedMonoid::id();\n        do {\n            while (l %\
+    \ 2 == 0) l >>= 1;\n            if (!g(ActedMonoid::op(sm, _d[l]))) {\n      \
+    \          while (l < _size) {\n                    push(l);\n               \
+    \     l = (2 * l);\n                    if (g(ActedMonoid::op(sm, _d[l]))) {\n\
+    \                        sm = ActedMonoid::op(sm, _d[l]);\n                  \
+    \      l++;\n                    }\n                }\n                return\
+    \ l - _size;\n            }\n            sm = ActedMonoid::op(sm, _d[l]);\n  \
+    \          l++;\n        } while ((l & -l) != l);\n        return _n;\n    }\n\
+    \n    // Finds the smallest l such that g(prod(l, r)) is true.\n    template <class\
+    \ F_pred>\n    int min_left(int r, F_pred g) {\n        assert(0 <= r && r <=\
+    \ _n);\n        assert(g(ActedMonoid::id()));\n        if (r == 0) return 0;\n\
+    \        r += _size;\n        for (int i = _log; i >= 1; i--) push((r - 1) >>\
+    \ i);\n        T sm = ActedMonoid::id();\n        do {\n            r--;\n   \
+    \         while (r > 1 && (r % 2)) r >>= 1;\n            if (!g(ActedMonoid::op(_d[r],\
+    \ sm))) {\n                while (r < _size) {\n                    push(r);\n\
+    \                    r = (2 * r + 1);\n                    if (g(ActedMonoid::op(_d[r],\
+    \ sm))) {\n                        sm = ActedMonoid::op(_d[r], sm);\n        \
+    \                r--;\n                    }\n                }\n            \
+    \    return r + 1 - _size;\n            }\n            sm = ActedMonoid::op(_d[r],\
+    \ sm);\n        } while ((r & -r) != r);\n        return 0;\n    }\n};\n\n}  //\
+    \ namespace ds\n}  // namespace m1une\n\n\n#line 1 \"utilities/fast_io.hpp\"\n\
+    \n\n\n#line 5 \"utilities/fast_io.hpp\"\n#include <array>\n#include <cerrno>\n\
+    #include <charconv>\n#include <cstddef>\n#include <cstdio>\n#include <cstdlib>\n\
+    #include <cstdint>\n#include <cstring>\n#include <iterator>\n#include <string>\n\
+    #include <sys/stat.h>\n#include <type_traits>\n#line 18 \"utilities/fast_io.hpp\"\
+    \n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal\
+    \ {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\n\
+    struct is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T,\
+    \ std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
     >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
     \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
@@ -368,41 +432,47 @@ data:
     \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
     n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 7 \"verify/geometry/convex_hull.test.cpp\"\
-    \n\nint main() {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
-    \ fast_output;\n\n    using namespace m1une::geometry;\n    int test_count;\n\
-    \    fast_input >> test_count;\n    while (test_count--) {\n        int size;\n\
-    \        fast_input >> size;\n        std::vector<Point<long long>> points(size);\n\
-    \        for (auto& point : points) fast_input >> point.x >> point.y;\n\n    \
-    \    std::vector<Point<long long>> hull = convex_hull(std::move(points));\n  \
-    \      fast_output << hull.size() << '\\n';\n        for (const auto& point :\
-    \ hull) {\n            fast_output << point.x << ' ' << point.y << '\\n';\n  \
-    \      }\n    }\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/static_convex_hull\"\n\n\
-    #include \"../../geometry/convex_hull.hpp\"\n\n#include \"../../utilities/fast_io.hpp\"\
-    \n#include <vector>\n\nint main() {\n    m1une::utilities::FastInput fast_input;\n\
-    \    m1une::utilities::FastOutput fast_output;\n\n    using namespace m1une::geometry;\n\
-    \    int test_count;\n    fast_input >> test_count;\n    while (test_count--)\
-    \ {\n        int size;\n        fast_input >> size;\n        std::vector<Point<long\
-    \ long>> points(size);\n        for (auto& point : points) fast_input >> point.x\
-    \ >> point.y;\n\n        std::vector<Point<long long>> hull = convex_hull(std::move(points));\n\
-    \        fast_output << hull.size() << '\\n';\n        for (const auto& point\
-    \ : hull) {\n            fast_output << point.x << ' ' << point.y << '\\n';\n\
-    \        }\n    }\n}\n"
+    \ utilities\n}  // namespace m1une\n\n\n#line 6 \"verify/ds/segtree/range_add_range_min.test.cpp\"\
+    \n\n#line 8 \"verify/ds/segtree/range_add_range_min.test.cpp\"\n\nint main() {\n\
+    \    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
+    \ fast_output;\n\n    int size, query_count;\n    fast_input >> size >> query_count;\n\
+    \    std::vector<long long> values(size);\n    for (long long& value : values)\
+    \ fast_input >> value;\n\n    using ActedMonoid = m1une::acted_monoid::RangeAddRangeMin<long\
+    \ long>;\n    m1une::ds::LazySegtree<ActedMonoid> tree(values);\n    while (query_count--)\
+    \ {\n        int type, left, right;\n        fast_input >> type >> left >> right;\n\
+    \        if (type == 0) {\n            long long addition;\n            fast_input\
+    \ >> addition;\n            tree.apply(left, right, addition);\n        } else\
+    \ {\n            fast_output << tree.prod(left, right) << '\\n';\n        }\n\
+    \    }\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/range_add_range_min\"\n\
+    \n#include \"../../../acted_monoid/range_add_range_min.hpp\"\n#include \"../../../ds/segtree/lazy_segtree.hpp\"\
+    \n#include \"../../../utilities/fast_io.hpp\"\n\n#include <vector>\n\nint main()\
+    \ {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
+    \ fast_output;\n\n    int size, query_count;\n    fast_input >> size >> query_count;\n\
+    \    std::vector<long long> values(size);\n    for (long long& value : values)\
+    \ fast_input >> value;\n\n    using ActedMonoid = m1une::acted_monoid::RangeAddRangeMin<long\
+    \ long>;\n    m1une::ds::LazySegtree<ActedMonoid> tree(values);\n    while (query_count--)\
+    \ {\n        int type, left, right;\n        fast_input >> type >> left >> right;\n\
+    \        if (type == 0) {\n            long long addition;\n            fast_input\
+    \ >> addition;\n            tree.apply(left, right, addition);\n        } else\
+    \ {\n            fast_output << tree.prod(left, right) << '\\n';\n        }\n\
+    \    }\n}\n"
   dependsOn:
-  - geometry/convex_hull.hpp
-  - geometry/point.hpp
+  - acted_monoid/range_add_range_min.hpp
+  - ds/segtree/lazy_segtree.hpp
+  - acted_monoid/concept.hpp
+  - math/bit_ceil.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
-  path: verify/geometry/convex_hull.test.cpp
+  path: verify/ds/segtree/range_add_range_min.test.cpp
   requiredBy: []
   timestamp: '2026-07-21 21:50:16+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/geometry/convex_hull.test.cpp
+documentation_of: verify/ds/segtree/range_add_range_min.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/geometry/convex_hull.test.cpp
-- /verify/verify/geometry/convex_hull.test.cpp.html
-title: verify/geometry/convex_hull.test.cpp
+- /verify/verify/ds/segtree/range_add_range_min.test.cpp
+- /verify/verify/ds/segtree/range_add_range_min.test.cpp.html
+title: verify/ds/segtree/range_add_range_min.test.cpp
 ---

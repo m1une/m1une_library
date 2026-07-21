@@ -4,6 +4,9 @@ data:
   _extendedRequiredBy: []
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/ds/segtree/range_add_range_min.test.cpp
+    title: verify/ds/segtree/range_add_range_min.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/monoid/commutative_flags.test.cpp
     title: verify/monoid/commutative_flags.test.cpp
   _isVerificationFailed: false
@@ -49,6 +52,7 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/monoid/commutative_flags.test.cpp
+  - verify/ds/segtree/range_add_range_min.test.cpp
 documentation_of: acted_monoid/range_add_range_min.hpp
 layout: document
 title: Range Add Range Min

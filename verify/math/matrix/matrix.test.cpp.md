@@ -44,23 +44,23 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://judge.yosupo.jp/problem/aplusb
+    PROBLEM: https://judge.yosupo.jp/problem/pow_of_matrix
     links:
-    - https://judge.yosupo.jp/problem/aplusb
+    - https://judge.yosupo.jp/problem/pow_of_matrix
   bundledCode: "#line 1 \"verify/math/matrix/matrix.test.cpp\"\n#define PROBLEM \"\
-    https://judge.yosupo.jp/problem/aplusb\"\n\n#line 1 \"math/modint.hpp\"\n\n\n\n\
-    #include <cassert>\n#include <cstdint>\n#include <iostream>\n#include <type_traits>\n\
-    #include <utility>\n\nnamespace m1une {\nnamespace math {\n\ntemplate <uint32_t\
-    \ Modulus>\nstruct ModInt {\n    static_assert(0 < Modulus, \"Modulus must be\
-    \ positive\");\n\n   private:\n    uint32_t _v;\n\n   public:\n    static constexpr\
-    \ uint32_t mod() {\n        return Modulus;\n    }\n\n    static constexpr ModInt\
-    \ raw(uint32_t v) noexcept {\n        ModInt x;\n        x._v = v;\n        return\
-    \ x;\n    }\n\n    constexpr ModInt() noexcept : _v(0) {}\n\n    template <class\
-    \ Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>\n    constexpr\
-    \ ModInt(Integer v) noexcept {\n        if constexpr (std::is_signed_v<Integer>)\
-    \ {\n            int64_t x = static_cast<int64_t>(v) % static_cast<int64_t>(Modulus);\n\
-    \            if (x < 0) x += Modulus;\n            _v = static_cast<uint32_t>(x);\n\
-    \        } else {\n            _v = static_cast<uint32_t>(static_cast<uint64_t>(v)\
+    https://judge.yosupo.jp/problem/pow_of_matrix\"\n\n#line 1 \"math/modint.hpp\"\
+    \n\n\n\n#include <cassert>\n#include <cstdint>\n#include <iostream>\n#include\
+    \ <type_traits>\n#include <utility>\n\nnamespace m1une {\nnamespace math {\n\n\
+    template <uint32_t Modulus>\nstruct ModInt {\n    static_assert(0 < Modulus, \"\
+    Modulus must be positive\");\n\n   private:\n    uint32_t _v;\n\n   public:\n\
+    \    static constexpr uint32_t mod() {\n        return Modulus;\n    }\n\n   \
+    \ static constexpr ModInt raw(uint32_t v) noexcept {\n        ModInt x;\n    \
+    \    x._v = v;\n        return x;\n    }\n\n    constexpr ModInt() noexcept :\
+    \ _v(0) {}\n\n    template <class Integer, std::enable_if_t<std::is_integral_v<Integer>,\
+    \ int> = 0>\n    constexpr ModInt(Integer v) noexcept {\n        if constexpr\
+    \ (std::is_signed_v<Integer>) {\n            int64_t x = static_cast<int64_t>(v)\
+    \ % static_cast<int64_t>(Modulus);\n            if (x < 0) x += Modulus;\n   \
+    \         _v = static_cast<uint32_t>(x);\n        } else {\n            _v = static_cast<uint32_t>(static_cast<uint64_t>(v)\
     \ % Modulus);\n        }\n    }\n\n    constexpr uint32_t val() const noexcept\
     \ {\n        return _v;\n    }\n\n    constexpr ModInt& operator++() noexcept\
     \ {\n        _v++;\n        if (_v == Modulus) _v = 0;\n        return *this;\n\
@@ -1129,11 +1129,17 @@ data:
     \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n\n    test_construction_and_arithmetic();\n\
     \    test_power();\n    test_row_reduction();\n    test_determinant_and_inverse();\n\
     \    test_linear_systems();\n    test_floating_point();\n    test_randomized_exact();\n\
-    \n    long long a, b;\n    fast_input >> a >> b;\n    fast_output << a + b <<\
-    \ '\\n';\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
-    ../../../math/modint.hpp\"\n#include \"../../../math/matrix/all.hpp\"\n\n#include\
-    \ <cassert>\n#include <cmath>\n#include <cstdint>\n#include \"../../../utilities/fast_io.hpp\"\
+    \n    int size;\n    std::uint64_t exponent;\n    fast_input >> size >> exponent;\n\
+    \    Matrix<mint> matrix(size, size);\n    for (int row = 0; row < size; row++)\
+    \ {\n        for (int column = 0; column < size; column++) {\n            fast_input\
+    \ >> matrix[row][column];\n        }\n    }\n\n    Matrix<mint> result = matrix.pow(exponent);\n\
+    \    for (int row = 0; row < size; row++) {\n        for (int column = 0; column\
+    \ < size; column++) {\n            if (column != 0) fast_output << ' ';\n    \
+    \        fast_output << result[row][column];\n        }\n        fast_output <<\
+    \ '\\n';\n    }\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/pow_of_matrix\"\n\n#include\
+    \ \"../../../math/modint.hpp\"\n#include \"../../../math/matrix/all.hpp\"\n\n\
+    #include <cassert>\n#include <cmath>\n#include <cstdint>\n#include \"../../../utilities/fast_io.hpp\"\
     \n#include <vector>\n\nnamespace {\n\nusing mint = m1une::math::modint998244353;\n\
     using m1une::matrix::Matrix;\n\ntemplate <class T>\nvoid assert_product_is_identity(const\
     \ Matrix<T>& first, const Matrix<T>& second) {\n    assert(first.rows() == first.cols());\n\
@@ -1231,8 +1237,14 @@ data:
     \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n\n    test_construction_and_arithmetic();\n\
     \    test_power();\n    test_row_reduction();\n    test_determinant_and_inverse();\n\
     \    test_linear_systems();\n    test_floating_point();\n    test_randomized_exact();\n\
-    \n    long long a, b;\n    fast_input >> a >> b;\n    fast_output << a + b <<\
-    \ '\\n';\n}\n"
+    \n    int size;\n    std::uint64_t exponent;\n    fast_input >> size >> exponent;\n\
+    \    Matrix<mint> matrix(size, size);\n    for (int row = 0; row < size; row++)\
+    \ {\n        for (int column = 0; column < size; column++) {\n            fast_input\
+    \ >> matrix[row][column];\n        }\n    }\n\n    Matrix<mint> result = matrix.pow(exponent);\n\
+    \    for (int row = 0; row < size; row++) {\n        for (int column = 0; column\
+    \ < size; column++) {\n            if (column != 0) fast_output << ' ';\n    \
+    \        fast_output << result[row][column];\n        }\n        fast_output <<\
+    \ '\\n';\n    }\n}\n"
   dependsOn:
   - math/modint.hpp
   - math/matrix/all.hpp
@@ -1249,7 +1261,7 @@ data:
   isVerificationFile: true
   path: verify/math/matrix/matrix.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-07-21 21:50:16+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/matrix/matrix.test.cpp

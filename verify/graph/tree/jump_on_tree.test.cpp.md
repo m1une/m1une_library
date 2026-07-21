@@ -2,11 +2,14 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: geometry/convex_hull.hpp
-    title: Convex Hull
+    path: graph/graph.hpp
+    title: Graph
   - icon: ':heavy_check_mark:'
-    path: geometry/point.hpp
-    title: 2D Point and Predicates
+    path: graph/graph.hpp
+    title: Graph
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/heavy_light_decomposition.hpp
+    title: Heavy Light Decomposition
   - icon: ':heavy_check_mark:'
     path: utilities/fast_io.hpp
     title: Fast IO
@@ -17,123 +20,155 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://judge.yosupo.jp/problem/static_convex_hull
+    PROBLEM: https://judge.yosupo.jp/problem/jump_on_tree
     links:
-    - https://judge.yosupo.jp/problem/static_convex_hull
-  bundledCode: "#line 1 \"verify/geometry/convex_hull.test.cpp\"\n#define PROBLEM\
-    \ \"https://judge.yosupo.jp/problem/static_convex_hull\"\n\n#line 1 \"geometry/convex_hull.hpp\"\
-    \n\n\n\n#include <algorithm>\n#include <cstddef>\n#include <utility>\n#include\
-    \ <vector>\n\n#line 1 \"geometry/point.hpp\"\n\n\n\n#include <cmath>\n#include\
-    \ <concepts>\n#include <cassert>\n#include <type_traits>\n\nnamespace m1une {\n\
-    namespace geometry {\n\ntemplate <typename T>\nconcept Coordinate = std::is_arithmetic_v<T>\
-    \ && !std::same_as<std::remove_cv_t<T>, bool>;\n\ntemplate <Coordinate T>\nusing\
-    \ wide_type = std::conditional_t<std::integral<T>, __int128_t, long double>;\n\
-    \ntemplate <Coordinate T>\nstruct Point {\n    T x;\n    T y;\n\n    constexpr\
-    \ Point() : x(0), y(0) {}\n    constexpr Point(T x_value, T y_value) : x(x_value),\
-    \ y(y_value) {}\n\n    template <Coordinate U>\n    explicit constexpr Point(const\
-    \ Point<U>& other)\n        : x(static_cast<T>(other.x)), y(static_cast<T>(other.y))\
-    \ {}\n\n    constexpr Point& operator+=(const Point& other) {\n        x += other.x;\n\
-    \        y += other.y;\n        return *this;\n    }\n\n    constexpr Point& operator-=(const\
-    \ Point& other) {\n        x -= other.x;\n        y -= other.y;\n        return\
-    \ *this;\n    }\n\n    constexpr Point operator+() const {\n        return *this;\n\
-    \    }\n\n    constexpr Point operator-() const {\n        return Point(-x, -y);\n\
-    \    }\n\n    friend constexpr Point operator+(Point left, const Point& right)\
-    \ {\n        return left += right;\n    }\n\n    friend constexpr Point operator-(Point\
-    \ left, const Point& right) {\n        return left -= right;\n    }\n\n    friend\
-    \ constexpr bool operator==(const Point&, const Point&) = default;\n\n    friend\
-    \ constexpr bool operator<(const Point& left, const Point& right) {\n        if\
-    \ (left.x != right.x) return left.x < right.x;\n        return left.y < right.y;\n\
-    \    }\n};\n\ntemplate <Coordinate T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\n\
-    constexpr auto operator*(const Point<T>& point, Scalar scalar) {\n    using Result\
-    \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
-    \ * Result(scalar),\n        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate\
-    \ <typename Scalar, Coordinate T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr\
-    \ auto operator*(Scalar scalar, const Point<T>& point) {\n    return point * scalar;\n\
-    }\n\ntemplate <Coordinate T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\n\
-    constexpr auto operator/(const Point<T>& point, Scalar scalar) {\n    using Result\
-    \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
-    \ / Result(scalar),\n        Result(point.y) / Result(scalar)\n    );\n}\n\ntemplate\
-    \ <Coordinate T>\nconstexpr wide_type<T> dot(const Point<T>& a, const Point<T>&\
-    \ b) {\n    using W = wide_type<T>;\n    return W(a.x) * W(b.x) + W(a.y) * W(b.y);\n\
-    }\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> cross(const Point<T>& a,\
-    \ const Point<T>& b) {\n    using W = wide_type<T>;\n    return W(a.x) * W(b.y)\
-    \ - W(a.y) * W(b.x);\n}\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> cross(\n\
-    \    const Point<T>& origin,\n    const Point<T>& a,\n    const Point<T>& b\n\
-    ) {\n    using W = wide_type<T>;\n    W ax = W(a.x) - W(origin.x);\n    W ay =\
-    \ W(a.y) - W(origin.y);\n    W bx = W(b.x) - W(origin.x);\n    W by = W(b.y) -\
-    \ W(origin.y);\n    return ax * by - ay * bx;\n}\n\ntemplate <Coordinate T>\n\
-    constexpr wide_type<T> norm2(const Point<T>& point) {\n    return dot(point, point);\n\
-    }\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> distance2(const Point<T>&\
-    \ a, const Point<T>& b) {\n    using W = wide_type<T>;\n    W dx = W(a.x) - W(b.x);\n\
-    \    W dy = W(a.y) - W(b.y);\n    return dx * dx + dy * dy;\n}\n\ntemplate <Coordinate\
-    \ T>\nlong double norm(const Point<T>& point) {\n    return std::hypot(\n    \
-    \    static_cast<long double>(point.x),\n        static_cast<long double>(point.y)\n\
-    \    );\n}\n\ntemplate <Coordinate T>\nlong double distance(const Point<T>& a,\
-    \ const Point<T>& b) {\n    return std::hypot(\n        static_cast<long double>(a.x)\
-    \ - static_cast<long double>(b.x),\n        static_cast<long double>(a.y) - static_cast<long\
-    \ double>(b.y)\n    );\n}\n\ntemplate <Coordinate T, typename M, typename N>\n\
-    requires std::is_arithmetic_v<M> && std::is_arithmetic_v<N>\nconstexpr Point<long\
-    \ double> internal_division_point(\n    const Point<T>& a,\n    const Point<T>&\
-    \ b,\n    M m,\n    N n\n) {\n    long double first_ratio = static_cast<long double>(m);\n\
-    \    long double second_ratio = static_cast<long double>(n);\n    long double\
-    \ denominator = first_ratio + second_ratio;\n    assert(denominator != 0);\n \
-    \   Point<long double> first(a);\n    Point<long double> direction = Point<long\
-    \ double>(b) - first;\n    return first + direction * (first_ratio / denominator);\n\
-    }\n\ntemplate <Coordinate T, typename M, typename N>\nrequires std::is_arithmetic_v<M>\
-    \ && std::is_arithmetic_v<N>\nconstexpr Point<long double> external_division_point(\n\
-    \    const Point<T>& a,\n    const Point<T>& b,\n    M m,\n    N n\n) {\n    long\
-    \ double first_ratio = static_cast<long double>(m);\n    long double second_ratio\
-    \ = static_cast<long double>(n);\n    long double denominator = first_ratio -\
-    \ second_ratio;\n    assert(denominator != 0);\n    Point<long double> first(a);\n\
-    \    Point<long double> direction = Point<long double>(b) - first;\n    return\
-    \ first + direction * (first_ratio / denominator);\n}\n\ntemplate <Coordinate\
-    \ T>\nconstexpr int sign(wide_type<T> value, long double eps = 1e-12L) {\n   \
-    \ if constexpr (std::integral<T>) {\n        return (value > 0) - (value < 0);\n\
-    \    } else {\n        return (value > eps) - (value < -eps);\n    }\n}\n\ntemplate\
-    \ <Coordinate T>\nconstexpr int orientation(\n    const Point<T>& a,\n    const\
-    \ Point<T>& b,\n    const Point<T>& c,\n    long double eps = 1e-12L\n) {\n  \
-    \  return sign<T>(cross(a, b, c), eps);\n}\n\ntemplate <Coordinate T>\nconstexpr\
-    \ bool collinear(\n    const Point<T>& a,\n    const Point<T>& b,\n    const Point<T>&\
-    \ c,\n    long double eps = 1e-12L\n) {\n    return orientation(a, b, c, eps)\
-    \ == 0;\n}\n\ntemplate <Coordinate T>\nPoint<long double> rotate(const Point<T>&\
-    \ point, long double angle) {\n    long double cosine = std::cos(angle);\n   \
-    \ long double sine = std::sin(angle);\n    return Point<long double>(\n      \
-    \  static_cast<long double>(point.x) * cosine -\n            static_cast<long\
-    \ double>(point.y) * sine,\n        static_cast<long double>(point.x) * sine +\n\
-    \            static_cast<long double>(point.y) * cosine\n    );\n}\n\ntemplate\
-    \ <Coordinate T>\nPoint<long double> normalized(const Point<T>& point) {\n   \
-    \ long double length = norm(point);\n    assert(length != 0);\n    return Point<long\
-    \ double>(\n        static_cast<long double>(point.x) / length,\n        static_cast<long\
-    \ double>(point.y) / length\n    );\n}\n\n}  // namespace geometry\n}  // namespace\
-    \ m1une\n\n\n#line 10 \"geometry/convex_hull.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ geometry {\n\n// Returns the convex hull counterclockwise from its lexicographically\
-    \ smallest\n// point. The first point is not repeated at the end.\ntemplate <Coordinate\
-    \ T>\nstd::vector<Point<T>> convex_hull(\n    std::vector<Point<T>> points,\n\
-    \    bool include_collinear = false\n) {\n    std::sort(points.begin(), points.end());\n\
-    \    points.erase(std::unique(points.begin(), points.end()), points.end());\n\
-    \    std::size_t size = points.size();\n    if (size <= 1) return points;\n\n\
-    \    std::vector<Point<T>> hull;\n    hull.reserve(2 * size);\n    auto should_pop\
-    \ = [include_collinear](\n        const Point<T>& first,\n        const Point<T>&\
-    \ second,\n        const Point<T>& third\n    ) {\n        int turn = orientation(first,\
-    \ second, third);\n        return include_collinear ? turn < 0 : turn <= 0;\n\
-    \    };\n\n    for (const Point<T>& point : points) {\n        while (\n     \
-    \       hull.size() >= 2 &&\n            should_pop(hull[hull.size() - 2], hull.back(),\
-    \ point)\n        ) {\n            hull.pop_back();\n        }\n        hull.push_back(point);\n\
-    \    }\n\n    std::size_t lower_size = hull.size();\n    for (std::size_t index\
-    \ = size - 1; index-- > 0;) {\n        const Point<T>& point = points[index];\n\
-    \        while (\n            hull.size() > lower_size &&\n            should_pop(hull[hull.size()\
-    \ - 2], hull.back(), point)\n        ) {\n            hull.pop_back();\n     \
-    \   }\n        hull.push_back(point);\n    }\n    hull.pop_back();\n\n    if (include_collinear\
-    \ && hull.size() == 2 * points.size() - 2) {\n        hull = std::move(points);\n\
-    \    }\n    return hull;\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\
-    \n\n#line 4 \"verify/geometry/convex_hull.test.cpp\"\n\n#line 1 \"utilities/fast_io.hpp\"\
-    \n\n\n\n#line 5 \"utilities/fast_io.hpp\"\n#include <array>\n#include <cerrno>\n\
-    #include <charconv>\n#line 9 \"utilities/fast_io.hpp\"\n#include <cstdio>\n#include\
-    \ <cstdlib>\n#include <cstdint>\n#include <cstring>\n#include <iterator>\n#include\
-    \ <string>\n#include <sys/stat.h>\n#line 18 \"utilities/fast_io.hpp\"\n#include\
-    \ <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal {\n\
-    \n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct\
-    \ is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
+    - https://judge.yosupo.jp/problem/jump_on_tree
+  bundledCode: "#line 1 \"verify/graph/tree/jump_on_tree.test.cpp\"\n#define PROBLEM\
+    \ \"https://judge.yosupo.jp/problem/jump_on_tree\"\n\n#line 1 \"graph/graph.hpp\"\
+    \n\n\n\n#include <cassert>\n#include <utility>\n#include <vector>\n\nnamespace\
+    \ m1une {\nnamespace graph {\n\ntemplate <class T = int>\nstruct Edge {\n    using\
+    \ cost_type = T;\n\n    int from;\n    int to;\n    T cost;\n    int id;\n   \
+    \ bool alive;\n\n    Edge() : from(-1), to(-1), cost(T()), id(-1), alive(true)\
+    \ {}\n    Edge(int from_, int to_, T cost_ = T(1), int id_ = -1, bool alive_ =\
+    \ true)\n        : from(from_), to(to_), cost(cost_), id(id_), alive(alive_) {}\n\
+    \n    int other(int v) const {\n        assert(v == from || v == to);\n      \
+    \  return from ^ to ^ v;\n    }\n};\n\ntemplate <class T = int>\nstruct Graph\
+    \ {\n    using edge_type = Edge<T>;\n    using cost_type = T;\n\n   private:\n\
+    \    int _n;\n    int _edge_count;\n    std::vector<std::vector<edge_type>> _g;\n\
+    \    std::vector<std::vector<std::pair<int, int>>> _edge_positions;\n\n   public:\n\
+    \    Graph() : _n(0), _edge_count(0) {}\n    explicit Graph(int n) : _n(n), _edge_count(0),\
+    \ _g(n) {\n        assert(0 <= n);\n    }\n\n    int size() const {\n        return\
+    \ _n;\n    }\n\n    bool empty() const {\n        return _n == 0;\n    }\n\n \
+    \   int edge_count() const {\n        return _edge_count;\n    }\n\n    int add_vertex()\
+    \ {\n        _g.emplace_back();\n        return _n++;\n    }\n\n    int add_directed_edge(int\
+    \ from, int to, T cost = T(1)) {\n        assert(0 <= from && from < _n);\n  \
+    \      assert(0 <= to && to < _n);\n        int id = _edge_count++;\n        int\
+    \ idx = int(_g[from].size());\n        _g[from].push_back(edge_type(from, to,\
+    \ cost, id));\n        _edge_positions.emplace_back();\n        _edge_positions.back().push_back({from,\
+    \ idx});\n        return id;\n    }\n\n    int add_edge(int u, int v, T cost =\
+    \ T(1)) {\n        assert(0 <= u && u < _n);\n        assert(0 <= v && v < _n);\n\
+    \        int id = _edge_count++;\n        int u_idx = int(_g[u].size());\n   \
+    \     _g[u].push_back(edge_type(u, v, cost, id));\n        int v_idx = int(_g[v].size());\n\
+    \        _g[v].push_back(edge_type(v, u, cost, id));\n        _edge_positions.emplace_back();\n\
+    \        _edge_positions.back().push_back({u, u_idx});\n        _edge_positions.back().push_back({v,\
+    \ v_idx});\n        return id;\n    }\n\n    void set_edge_alive(int id, bool\
+    \ alive) {\n        assert(0 <= id && id < _edge_count);\n        for (auto [v,\
+    \ idx] : _edge_positions[id]) {\n            _g[v][idx].alive = alive;\n     \
+    \   }\n    }\n\n    void erase_edge(int id) {\n        set_edge_alive(id, false);\n\
+    \    }\n\n    void revive_edge(int id) {\n        set_edge_alive(id, true);\n\
+    \    }\n\n    bool is_edge_alive(int id) const {\n        assert(0 <= id && id\
+    \ < _edge_count);\n        assert(!_edge_positions[id].empty());\n        auto\
+    \ [v, idx] = _edge_positions[id][0];\n        return _g[v][idx].alive;\n    }\n\
+    \n    const std::vector<edge_type>& operator[](int v) const {\n        assert(0\
+    \ <= v && v < _n);\n        return _g[v];\n    }\n\n    std::vector<edge_type>&\
+    \ operator[](int v) {\n        assert(0 <= v && v < _n);\n        return _g[v];\n\
+    \    }\n\n    const std::vector<std::vector<edge_type>>& adjacency() const {\n\
+    \        return _g;\n    }\n\n    std::vector<std::vector<edge_type>>& adjacency()\
+    \ {\n        return _g;\n    }\n\n    std::vector<edge_type> edges(bool include_inactive\
+    \ = false) const {\n        std::vector<edge_type> result;\n        result.reserve(_edge_count);\n\
+    \        std::vector<char> used(_edge_count, false);\n        for (int v = 0;\
+    \ v < _n; v++) {\n            for (const auto& e : _g[v]) {\n                if\
+    \ (!include_inactive && !e.alive) continue;\n                if (0 <= e.id &&\
+    \ e.id < _edge_count) {\n                    if (used[e.id]) continue;\n     \
+    \               used[e.id] = true;\n                }\n                result.push_back(e);\n\
+    \            }\n        }\n        return result;\n    }\n\n    Graph reversed()\
+    \ const {\n        Graph result(_n);\n        result._edge_count = _edge_count;\n\
+    \        result._edge_positions.assign(_edge_count, {});\n        for (int v =\
+    \ 0; v < _n; v++) {\n            for (const auto& e : _g[v]) {\n             \
+    \   int idx = int(result._g[e.to].size());\n                result._g[e.to].push_back(edge_type(e.to,\
+    \ e.from, e.cost, e.id, e.alive));\n                if (0 <= e.id && e.id < _edge_count)\
+    \ result._edge_positions[e.id].push_back({e.to, idx});\n            }\n      \
+    \  }\n        return result;\n    }\n};\n\n}  // namespace graph\n}  // namespace\
+    \ m1une\n\n\n#line 1 \"graph/tree/heavy_light_decomposition.hpp\"\n\n\n\n#include\
+    \ <algorithm>\n#line 8 \"graph/tree/heavy_light_decomposition.hpp\"\n\n#line 10\
+    \ \"graph/tree/heavy_light_decomposition.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ tree {\n\nstruct HldPathSegment {\n    int l;\n    int r;\n    bool reversed;\n\
+    };\n\ntemplate <class T = int>\nstruct HeavyLightDecomposition {\n    using cost_type\
+    \ = T;\n    using edge_type = m1une::graph::Edge<T>;\n\n    int root;\n    std::vector<int>\
+    \ parent;\n    std::vector<int> parent_edge;\n    std::vector<int> depth;\n  \
+    \  std::vector<T> dist;\n    std::vector<int> subtree_size;\n    std::vector<int>\
+    \ heavy;\n    std::vector<int> head;\n    std::vector<int> tin;\n    std::vector<int>\
+    \ tout;\n    std::vector<int> order;\n\n   private:\n    int _n;\n\n    void check_vertex(int\
+    \ v) const {\n        assert(0 <= v && v < _n);\n        assert(tin[v] != -1);\n\
+    \    }\n\n    static void add_segment(std::vector<HldPathSegment>& result, int\
+    \ l, int r, bool reversed) {\n        if (l < r) result.push_back({l, r, reversed});\n\
+    \    }\n\n   public:\n    HeavyLightDecomposition() : root(-1), _n(0) {}\n   \
+    \ explicit HeavyLightDecomposition(const m1une::graph::Graph<T>& g, int root_\
+    \ = 0) {\n        build(g, root_);\n    }\n\n    void build(const m1une::graph::Graph<T>&\
+    \ g, int root_ = 0) {\n        _n = g.size();\n        root = _n == 0 ? -1 : root_;\n\
+    \        parent.assign(_n, -2);\n        parent_edge.assign(_n, -1);\n       \
+    \ depth.assign(_n, 0);\n        dist.assign(_n, T(0));\n        subtree_size.assign(_n,\
+    \ 1);\n        heavy.assign(_n, -1);\n        head.assign(_n, -1);\n        tin.assign(_n,\
+    \ -1);\n        tout.assign(_n, -1);\n        order.clear();\n        order.reserve(_n);\n\
+    \        if (_n == 0) return;\n        assert(0 <= root && root < _n);\n\n   \
+    \     std::vector<int> dfs_order;\n        dfs_order.reserve(_n);\n        std::vector<int>\
+    \ stack = {root};\n        parent[root] = -1;\n        while (!stack.empty())\
+    \ {\n            int v = stack.back();\n            stack.pop_back();\n      \
+    \      dfs_order.push_back(v);\n            for (const auto& e : g[v]) {\n   \
+    \             if (!e.alive) continue;\n                if (parent[e.to] != -2)\
+    \ continue;\n                parent[e.to] = v;\n                parent_edge[e.to]\
+    \ = e.id;\n                depth[e.to] = depth[v] + 1;\n                dist[e.to]\
+    \ = dist[v] + e.cost;\n                stack.push_back(e.to);\n            }\n\
+    \        }\n\n        for (int i = int(dfs_order.size()) - 1; i >= 0; i--) {\n\
+    \            int v = dfs_order[i];\n            if (parent[v] == -1) continue;\n\
+    \            int p = parent[v];\n            subtree_size[p] += subtree_size[v];\n\
+    \            if (heavy[p] == -1 || subtree_size[heavy[p]] < subtree_size[v]) heavy[p]\
+    \ = v;\n        }\n\n        order.assign(dfs_order.size(), -1);\n        int\
+    \ timer = 0;\n        std::vector<std::pair<int, int>> starts = {std::pair<int,\
+    \ int>{root, root}};\n        while (!starts.empty()) {\n            auto [start,\
+    \ h] = starts.back();\n            starts.pop_back();\n            for (int v\
+    \ = start; v != -1; v = heavy[v]) {\n                head[v] = h;\n          \
+    \      tin[v] = timer;\n                order[timer++] = v;\n                for\
+    \ (auto it = g[v].rbegin(); it != g[v].rend(); ++it) {\n                    if\
+    \ (!it->alive) continue;\n                    int to = it->to;\n             \
+    \       if (parent[to] != v || to == heavy[v]) continue;\n                   \
+    \ starts.push_back({to, to});\n                }\n            }\n        }\n \
+    \       for (int i = int(dfs_order.size()) - 1; i >= 0; i--) {\n            int\
+    \ v = dfs_order[i];\n            tout[v] = tin[v] + subtree_size[v];\n       \
+    \ }\n    }\n\n    int size() const {\n        return _n;\n    }\n\n    bool empty()\
+    \ const {\n        return _n == 0;\n    }\n\n    bool is_ancestor(int u, int v)\
+    \ const {\n        check_vertex(u);\n        check_vertex(v);\n        return\
+    \ tin[u] <= tin[v] && tout[v] <= tout[u];\n    }\n\n    int lca(int u, int v)\
+    \ const {\n        check_vertex(u);\n        check_vertex(v);\n        while (head[u]\
+    \ != head[v]) {\n            if (depth[head[u]] < depth[head[v]]) std::swap(u,\
+    \ v);\n            u = parent[head[u]];\n        }\n        return depth[u] <\
+    \ depth[v] ? u : v;\n    }\n\n    int dist_edges(int u, int v) const {\n     \
+    \   int w = lca(u, v);\n        return depth[u] + depth[v] - 2 * depth[w];\n \
+    \   }\n\n    T dist_cost(int u, int v) const {\n        int w = lca(u, v);\n \
+    \       return dist[u] + dist[v] - dist[w] - dist[w];\n    }\n\n    int kth_ancestor(int\
+    \ v, int k) const {\n        check_vertex(v);\n        assert(0 <= k);\n     \
+    \   while (v != -1) {\n            int h = head[v];\n            int len = depth[v]\
+    \ - depth[h];\n            if (k <= len) return order[tin[v] - k];\n         \
+    \   k -= len + 1;\n            v = parent[h];\n        }\n        return -1;\n\
+    \    }\n\n    int jump(int from, int to, int k) const {\n        check_vertex(from);\n\
+    \        check_vertex(to);\n        assert(0 <= k);\n        int w = lca(from,\
+    \ to);\n        int up_len = depth[from] - depth[w];\n        int down_len = depth[to]\
+    \ - depth[w];\n        if (up_len + down_len < k) return -1;\n        if (k <=\
+    \ up_len) return kth_ancestor(from, k);\n        return kth_ancestor(to, down_len\
+    \ - (k - up_len));\n    }\n\n    std::pair<int, int> subtree_range(int v, bool\
+    \ edge = false) const {\n        check_vertex(v);\n        return {tin[v] + (edge\
+    \ ? 1 : 0), tout[v]};\n    }\n\n    std::vector<HldPathSegment> path_segments(int\
+    \ u, int v, bool edge = false) const {\n        check_vertex(u);\n        check_vertex(v);\n\
+    \        std::vector<HldPathSegment> result, down;\n        while (head[u] !=\
+    \ head[v]) {\n            if (depth[head[u]] >= depth[head[v]]) {\n          \
+    \      add_segment(result, tin[head[u]], tin[u] + 1, true);\n                u\
+    \ = parent[head[u]];\n            } else {\n                add_segment(down,\
+    \ tin[head[v]], tin[v] + 1, false);\n                v = parent[head[v]];\n  \
+    \          }\n        }\n\n        if (depth[u] >= depth[v]) {\n            add_segment(result,\
+    \ tin[v] + (edge ? 1 : 0), tin[u] + 1, true);\n        } else {\n            add_segment(down,\
+    \ tin[u] + (edge ? 1 : 0), tin[v] + 1, false);\n        }\n        std::reverse(down.begin(),\
+    \ down.end());\n        result.insert(result.end(), down.begin(), down.end());\n\
+    \        return result;\n    }\n\n    template <class F>\n    void for_each_path(int\
+    \ u, int v, F f, bool edge = false) const {\n        for (auto seg : path_segments(u,\
+    \ v, edge)) f(seg.l, seg.r, seg.reversed);\n    }\n};\n\n}  // namespace tree\n\
+    }  // namespace m1une\n\n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 5 \"\
+    utilities/fast_io.hpp\"\n#include <array>\n#include <cerrno>\n#include <charconv>\n\
+    #include <cstddef>\n#include <cstdio>\n#include <cstdlib>\n#include <cstdint>\n\
+    #include <cstring>\n#include <iterator>\n#include <string>\n#include <sys/stat.h>\n\
+    #include <type_traits>\n#line 18 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n\
+    \nnamespace m1une {\nnamespace utilities {\nnamespace internal {\n\n// Detect\
+    \ std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct is_range\
+    \ : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
     \    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
     >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
     \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
@@ -368,41 +403,42 @@ data:
     \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
     n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 7 \"verify/geometry/convex_hull.test.cpp\"\
+    \ utilities\n}  // namespace m1une\n\n\n#line 6 \"verify/graph/tree/jump_on_tree.test.cpp\"\
     \n\nint main() {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
-    \ fast_output;\n\n    using namespace m1une::geometry;\n    int test_count;\n\
-    \    fast_input >> test_count;\n    while (test_count--) {\n        int size;\n\
-    \        fast_input >> size;\n        std::vector<Point<long long>> points(size);\n\
-    \        for (auto& point : points) fast_input >> point.x >> point.y;\n\n    \
-    \    std::vector<Point<long long>> hull = convex_hull(std::move(points));\n  \
-    \      fast_output << hull.size() << '\\n';\n        for (const auto& point :\
-    \ hull) {\n            fast_output << point.x << ' ' << point.y << '\\n';\n  \
-    \      }\n    }\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/static_convex_hull\"\n\n\
-    #include \"../../geometry/convex_hull.hpp\"\n\n#include \"../../utilities/fast_io.hpp\"\
-    \n#include <vector>\n\nint main() {\n    m1une::utilities::FastInput fast_input;\n\
-    \    m1une::utilities::FastOutput fast_output;\n\n    using namespace m1une::geometry;\n\
-    \    int test_count;\n    fast_input >> test_count;\n    while (test_count--)\
-    \ {\n        int size;\n        fast_input >> size;\n        std::vector<Point<long\
-    \ long>> points(size);\n        for (auto& point : points) fast_input >> point.x\
-    \ >> point.y;\n\n        std::vector<Point<long long>> hull = convex_hull(std::move(points));\n\
-    \        fast_output << hull.size() << '\\n';\n        for (const auto& point\
-    \ : hull) {\n            fast_output << point.x << ' ' << point.y << '\\n';\n\
-    \        }\n    }\n}\n"
+    \ fast_output;\n\n    int vertex_count, query_count;\n    fast_input >> vertex_count\
+    \ >> query_count;\n    m1une::graph::Graph<int> tree(vertex_count);\n    for (int\
+    \ edge = 1; edge < vertex_count; edge++) {\n        int first, second;\n     \
+    \   fast_input >> first >> second;\n        tree.add_edge(first, second);\n  \
+    \  }\n\n    m1une::tree::HeavyLightDecomposition<int> decomposition(tree);\n \
+    \   while (query_count--) {\n        int from, to, distance;\n        fast_input\
+    \ >> from >> to >> distance;\n        fast_output << decomposition.jump(from,\
+    \ to, distance) << '\\n';\n    }\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/jump_on_tree\"\n\n#include\
+    \ \"../../../graph/graph.hpp\"\n#include \"../../../graph/tree/heavy_light_decomposition.hpp\"\
+    \n#include \"../../../utilities/fast_io.hpp\"\n\nint main() {\n    m1une::utilities::FastInput\
+    \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n\n    int vertex_count,\
+    \ query_count;\n    fast_input >> vertex_count >> query_count;\n    m1une::graph::Graph<int>\
+    \ tree(vertex_count);\n    for (int edge = 1; edge < vertex_count; edge++) {\n\
+    \        int first, second;\n        fast_input >> first >> second;\n        tree.add_edge(first,\
+    \ second);\n    }\n\n    m1une::tree::HeavyLightDecomposition<int> decomposition(tree);\n\
+    \    while (query_count--) {\n        int from, to, distance;\n        fast_input\
+    \ >> from >> to >> distance;\n        fast_output << decomposition.jump(from,\
+    \ to, distance) << '\\n';\n    }\n}\n"
   dependsOn:
-  - geometry/convex_hull.hpp
-  - geometry/point.hpp
+  - graph/graph.hpp
+  - graph/tree/heavy_light_decomposition.hpp
+  - graph/graph.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
-  path: verify/geometry/convex_hull.test.cpp
+  path: verify/graph/tree/jump_on_tree.test.cpp
   requiredBy: []
   timestamp: '2026-07-21 21:50:16+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/geometry/convex_hull.test.cpp
+documentation_of: verify/graph/tree/jump_on_tree.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/geometry/convex_hull.test.cpp
-- /verify/verify/geometry/convex_hull.test.cpp.html
-title: verify/geometry/convex_hull.test.cpp
+- /verify/verify/graph/tree/jump_on_tree.test.cpp
+- /verify/verify/graph/tree/jump_on_tree.test.cpp.html
+title: verify/graph/tree/jump_on_tree.test.cpp
 ---

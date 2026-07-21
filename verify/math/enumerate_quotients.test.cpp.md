@@ -2,11 +2,8 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: geometry/convex_hull.hpp
-    title: Convex Hull
-  - icon: ':heavy_check_mark:'
-    path: geometry/point.hpp
-    title: 2D Point and Predicates
+    path: math/multiplicative_function_prefix_sum.hpp
+    title: Multiplicative Function Prefix Sum
   - icon: ':heavy_check_mark:'
     path: utilities/fast_io.hpp
     title: Fast IO
@@ -17,126 +14,121 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://judge.yosupo.jp/problem/static_convex_hull
+    PROBLEM: https://judge.yosupo.jp/problem/enumerate_quotients
     links:
-    - https://judge.yosupo.jp/problem/static_convex_hull
-  bundledCode: "#line 1 \"verify/geometry/convex_hull.test.cpp\"\n#define PROBLEM\
-    \ \"https://judge.yosupo.jp/problem/static_convex_hull\"\n\n#line 1 \"geometry/convex_hull.hpp\"\
-    \n\n\n\n#include <algorithm>\n#include <cstddef>\n#include <utility>\n#include\
-    \ <vector>\n\n#line 1 \"geometry/point.hpp\"\n\n\n\n#include <cmath>\n#include\
-    \ <concepts>\n#include <cassert>\n#include <type_traits>\n\nnamespace m1une {\n\
-    namespace geometry {\n\ntemplate <typename T>\nconcept Coordinate = std::is_arithmetic_v<T>\
-    \ && !std::same_as<std::remove_cv_t<T>, bool>;\n\ntemplate <Coordinate T>\nusing\
-    \ wide_type = std::conditional_t<std::integral<T>, __int128_t, long double>;\n\
-    \ntemplate <Coordinate T>\nstruct Point {\n    T x;\n    T y;\n\n    constexpr\
-    \ Point() : x(0), y(0) {}\n    constexpr Point(T x_value, T y_value) : x(x_value),\
-    \ y(y_value) {}\n\n    template <Coordinate U>\n    explicit constexpr Point(const\
-    \ Point<U>& other)\n        : x(static_cast<T>(other.x)), y(static_cast<T>(other.y))\
-    \ {}\n\n    constexpr Point& operator+=(const Point& other) {\n        x += other.x;\n\
-    \        y += other.y;\n        return *this;\n    }\n\n    constexpr Point& operator-=(const\
-    \ Point& other) {\n        x -= other.x;\n        y -= other.y;\n        return\
-    \ *this;\n    }\n\n    constexpr Point operator+() const {\n        return *this;\n\
-    \    }\n\n    constexpr Point operator-() const {\n        return Point(-x, -y);\n\
-    \    }\n\n    friend constexpr Point operator+(Point left, const Point& right)\
-    \ {\n        return left += right;\n    }\n\n    friend constexpr Point operator-(Point\
-    \ left, const Point& right) {\n        return left -= right;\n    }\n\n    friend\
-    \ constexpr bool operator==(const Point&, const Point&) = default;\n\n    friend\
-    \ constexpr bool operator<(const Point& left, const Point& right) {\n        if\
-    \ (left.x != right.x) return left.x < right.x;\n        return left.y < right.y;\n\
-    \    }\n};\n\ntemplate <Coordinate T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\n\
-    constexpr auto operator*(const Point<T>& point, Scalar scalar) {\n    using Result\
-    \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
-    \ * Result(scalar),\n        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate\
-    \ <typename Scalar, Coordinate T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr\
-    \ auto operator*(Scalar scalar, const Point<T>& point) {\n    return point * scalar;\n\
-    }\n\ntemplate <Coordinate T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\n\
-    constexpr auto operator/(const Point<T>& point, Scalar scalar) {\n    using Result\
-    \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
-    \ / Result(scalar),\n        Result(point.y) / Result(scalar)\n    );\n}\n\ntemplate\
-    \ <Coordinate T>\nconstexpr wide_type<T> dot(const Point<T>& a, const Point<T>&\
-    \ b) {\n    using W = wide_type<T>;\n    return W(a.x) * W(b.x) + W(a.y) * W(b.y);\n\
-    }\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> cross(const Point<T>& a,\
-    \ const Point<T>& b) {\n    using W = wide_type<T>;\n    return W(a.x) * W(b.y)\
-    \ - W(a.y) * W(b.x);\n}\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> cross(\n\
-    \    const Point<T>& origin,\n    const Point<T>& a,\n    const Point<T>& b\n\
-    ) {\n    using W = wide_type<T>;\n    W ax = W(a.x) - W(origin.x);\n    W ay =\
-    \ W(a.y) - W(origin.y);\n    W bx = W(b.x) - W(origin.x);\n    W by = W(b.y) -\
-    \ W(origin.y);\n    return ax * by - ay * bx;\n}\n\ntemplate <Coordinate T>\n\
-    constexpr wide_type<T> norm2(const Point<T>& point) {\n    return dot(point, point);\n\
-    }\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> distance2(const Point<T>&\
-    \ a, const Point<T>& b) {\n    using W = wide_type<T>;\n    W dx = W(a.x) - W(b.x);\n\
-    \    W dy = W(a.y) - W(b.y);\n    return dx * dx + dy * dy;\n}\n\ntemplate <Coordinate\
-    \ T>\nlong double norm(const Point<T>& point) {\n    return std::hypot(\n    \
-    \    static_cast<long double>(point.x),\n        static_cast<long double>(point.y)\n\
-    \    );\n}\n\ntemplate <Coordinate T>\nlong double distance(const Point<T>& a,\
-    \ const Point<T>& b) {\n    return std::hypot(\n        static_cast<long double>(a.x)\
-    \ - static_cast<long double>(b.x),\n        static_cast<long double>(a.y) - static_cast<long\
-    \ double>(b.y)\n    );\n}\n\ntemplate <Coordinate T, typename M, typename N>\n\
-    requires std::is_arithmetic_v<M> && std::is_arithmetic_v<N>\nconstexpr Point<long\
-    \ double> internal_division_point(\n    const Point<T>& a,\n    const Point<T>&\
-    \ b,\n    M m,\n    N n\n) {\n    long double first_ratio = static_cast<long double>(m);\n\
-    \    long double second_ratio = static_cast<long double>(n);\n    long double\
-    \ denominator = first_ratio + second_ratio;\n    assert(denominator != 0);\n \
-    \   Point<long double> first(a);\n    Point<long double> direction = Point<long\
-    \ double>(b) - first;\n    return first + direction * (first_ratio / denominator);\n\
-    }\n\ntemplate <Coordinate T, typename M, typename N>\nrequires std::is_arithmetic_v<M>\
-    \ && std::is_arithmetic_v<N>\nconstexpr Point<long double> external_division_point(\n\
-    \    const Point<T>& a,\n    const Point<T>& b,\n    M m,\n    N n\n) {\n    long\
-    \ double first_ratio = static_cast<long double>(m);\n    long double second_ratio\
-    \ = static_cast<long double>(n);\n    long double denominator = first_ratio -\
-    \ second_ratio;\n    assert(denominator != 0);\n    Point<long double> first(a);\n\
-    \    Point<long double> direction = Point<long double>(b) - first;\n    return\
-    \ first + direction * (first_ratio / denominator);\n}\n\ntemplate <Coordinate\
-    \ T>\nconstexpr int sign(wide_type<T> value, long double eps = 1e-12L) {\n   \
-    \ if constexpr (std::integral<T>) {\n        return (value > 0) - (value < 0);\n\
-    \    } else {\n        return (value > eps) - (value < -eps);\n    }\n}\n\ntemplate\
-    \ <Coordinate T>\nconstexpr int orientation(\n    const Point<T>& a,\n    const\
-    \ Point<T>& b,\n    const Point<T>& c,\n    long double eps = 1e-12L\n) {\n  \
-    \  return sign<T>(cross(a, b, c), eps);\n}\n\ntemplate <Coordinate T>\nconstexpr\
-    \ bool collinear(\n    const Point<T>& a,\n    const Point<T>& b,\n    const Point<T>&\
-    \ c,\n    long double eps = 1e-12L\n) {\n    return orientation(a, b, c, eps)\
-    \ == 0;\n}\n\ntemplate <Coordinate T>\nPoint<long double> rotate(const Point<T>&\
-    \ point, long double angle) {\n    long double cosine = std::cos(angle);\n   \
-    \ long double sine = std::sin(angle);\n    return Point<long double>(\n      \
-    \  static_cast<long double>(point.x) * cosine -\n            static_cast<long\
-    \ double>(point.y) * sine,\n        static_cast<long double>(point.x) * sine +\n\
-    \            static_cast<long double>(point.y) * cosine\n    );\n}\n\ntemplate\
-    \ <Coordinate T>\nPoint<long double> normalized(const Point<T>& point) {\n   \
-    \ long double length = norm(point);\n    assert(length != 0);\n    return Point<long\
-    \ double>(\n        static_cast<long double>(point.x) / length,\n        static_cast<long\
-    \ double>(point.y) / length\n    );\n}\n\n}  // namespace geometry\n}  // namespace\
-    \ m1une\n\n\n#line 10 \"geometry/convex_hull.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ geometry {\n\n// Returns the convex hull counterclockwise from its lexicographically\
-    \ smallest\n// point. The first point is not repeated at the end.\ntemplate <Coordinate\
-    \ T>\nstd::vector<Point<T>> convex_hull(\n    std::vector<Point<T>> points,\n\
-    \    bool include_collinear = false\n) {\n    std::sort(points.begin(), points.end());\n\
-    \    points.erase(std::unique(points.begin(), points.end()), points.end());\n\
-    \    std::size_t size = points.size();\n    if (size <= 1) return points;\n\n\
-    \    std::vector<Point<T>> hull;\n    hull.reserve(2 * size);\n    auto should_pop\
-    \ = [include_collinear](\n        const Point<T>& first,\n        const Point<T>&\
-    \ second,\n        const Point<T>& third\n    ) {\n        int turn = orientation(first,\
-    \ second, third);\n        return include_collinear ? turn < 0 : turn <= 0;\n\
-    \    };\n\n    for (const Point<T>& point : points) {\n        while (\n     \
-    \       hull.size() >= 2 &&\n            should_pop(hull[hull.size() - 2], hull.back(),\
-    \ point)\n        ) {\n            hull.pop_back();\n        }\n        hull.push_back(point);\n\
-    \    }\n\n    std::size_t lower_size = hull.size();\n    for (std::size_t index\
-    \ = size - 1; index-- > 0;) {\n        const Point<T>& point = points[index];\n\
-    \        while (\n            hull.size() > lower_size &&\n            should_pop(hull[hull.size()\
-    \ - 2], hull.back(), point)\n        ) {\n            hull.pop_back();\n     \
-    \   }\n        hull.push_back(point);\n    }\n    hull.pop_back();\n\n    if (include_collinear\
-    \ && hull.size() == 2 * points.size() - 2) {\n        hull = std::move(points);\n\
-    \    }\n    return hull;\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\
-    \n\n#line 4 \"verify/geometry/convex_hull.test.cpp\"\n\n#line 1 \"utilities/fast_io.hpp\"\
+    - https://judge.yosupo.jp/problem/enumerate_quotients
+  bundledCode: "#line 1 \"verify/math/enumerate_quotients.test.cpp\"\n#define PROBLEM\
+    \ \"https://judge.yosupo.jp/problem/enumerate_quotients\"\n\n#line 1 \"math/multiplicative_function_prefix_sum.hpp\"\
+    \n\n\n\n#include <algorithm>\n#include <cassert>\n#include <cmath>\n#include <cstdint>\n\
+    #include <limits>\n#include <utility>\n#include <vector>\n\nnamespace m1une {\n\
+    namespace math {\n\n// Computes summatory multiplicative functions with a Min_25\
+    \ sieve.\n// prime_power(p, e) must return f(p^e), and prime_prefix must contain\n\
+    // sum_{p <= x} f(p) at every x represented by quotient_values().\ntemplate <class\
+    \ T, class PrimePower>\nstruct MultiplicativeFunctionPrefixSum {\n   private:\n\
+    \    uint64_t _n;\n    uint64_t _sqrt_n;\n    uint64_t _large_size;\n    std::vector<int>\
+    \ _primes;\n    PrimePower _prime_power;\n\n    static uint64_t integer_sqrt(uint64_t\
+    \ n) {\n        uint64_t result = static_cast<uint64_t>(std::sqrt(static_cast<long\
+    \ double>(n)));\n        while (result != 0 && result > n / result) result--;\n\
+    \        while (result + 1 <= n / (result + 1)) result++;\n        return result;\n\
+    \    }\n\n    static uint64_t validated_sqrt(uint64_t n) {\n        const uint64_t\
+    \ result = integer_sqrt(n);\n        assert(result <= static_cast<uint64_t>(std::numeric_limits<int>::max()\
+    \ / 2));\n        return result;\n    }\n\n    static std::vector<int> enumerate_primes(uint64_t\
+    \ limit) {\n        assert(limit <= static_cast<uint64_t>(std::numeric_limits<int>::max()));\n\
+    \        const int n = static_cast<int>(limit);\n        std::vector<bool> is_composite(n\
+    \ + 1);\n        std::vector<int> primes;\n        for (int value = 2; value <=\
+    \ n; value++) {\n            if (!is_composite[value]) primes.push_back(value);\n\
+    \            for (int prime : primes) {\n                if (value > n / prime)\
+    \ break;\n                is_composite[value * prime] = true;\n              \
+    \  if (value % prime == 0) break;\n            }\n        }\n        return primes;\n\
+    \    }\n\n    T triangular(uint64_t n) const {\n        if ((n & 1) == 0) return\
+    \ T(n / 2) * T(n + 1);\n        return T(n) * T((n + 1) / 2);\n    }\n\n   public:\n\
+    \    explicit MultiplicativeFunctionPrefixSum(uint64_t n, PrimePower prime_power)\n\
+    \        : _n(n),\n          _sqrt_n(validated_sqrt(n)),\n          _large_size(n\
+    \ == 0 ? 0 : n / _sqrt_n),\n          _primes(enumerate_primes(_sqrt_n)),\n  \
+    \        _prime_power(std::move(prime_power)) {\n        if (n == 0) return;\n\
+    \        while (_large_size > 1 && n / (_large_size - 1) == _sqrt_n) _large_size--;\n\
+    \    }\n\n    uint64_t n() const {\n        return _n;\n    }\n\n    uint64_t\
+    \ sqrt_n() const {\n        return _sqrt_n;\n    }\n\n    const std::vector<int>&\
+    \ primes() const {\n        return _primes;\n    }\n\n    int table_size() const\
+    \ {\n        if (_n == 0) return 0;\n        return static_cast<int>(_large_size\
+    \ + _sqrt_n);\n    }\n\n    // Returns the table index representing x. The argument\
+    \ must be one of the\n    // values returned by quotient_values().\n    int index(uint64_t\
+    \ x) const {\n        assert(_n > 0 && 1 <= x && x <= _n);\n        if (x <= _sqrt_n)\
+    \ return table_size() - static_cast<int>(x);\n        const uint64_t result =\
+    \ _n / x;\n        assert(result < _large_size);\n        return static_cast<int>(result);\n\
+    \    }\n\n    // table[i] represents the value at quotient_values()[i]. Index\
+    \ zero is a\n    // dummy entry; the represented values occupy indices [1, table_size()).\n\
+    \    std::vector<uint64_t> quotient_values() const {\n        if (_n == 0) return\
+    \ {};\n        std::vector<uint64_t> result(table_size());\n        for (uint64_t\
+    \ i = 1; i < _large_size; i++) result[i] = _n / i;\n        for (uint64_t value\
+    \ = 1; value <= _sqrt_n; value++) {\n            result[index(value)] = value;\n\
+    \        }\n        return result;\n    }\n\n    // Returns pi(x) at every represented\
+    \ x.\n    std::vector<T> prime_count_table() const {\n        if (_n == 0) return\
+    \ {};\n        std::vector<uint64_t> large(_large_size);\n        for (uint64_t\
+    \ i = 1; i < _large_size; i++) large[i] = _n / i - 1;\n\n        std::vector<uint64_t>\
+    \ small(_sqrt_n + 1);\n        for (uint64_t value = 1; value <= _sqrt_n; value++)\
+    \ small[value] = value - 1;\n\n        uint64_t prime_count = 0;\n        for\
+    \ (int prime_int : _primes) {\n            const uint64_t prime = static_cast<uint64_t>(prime_int);\n\
+    \            const uint64_t square = prime * prime;\n            const uint64_t\
+    \ end = std::min(_large_size, _n / square + 1);\n            uint64_t product\
+    \ = prime;\n            for (uint64_t i = 1; i < end; i++, product += prime) {\n\
+    \                const uint64_t previous = product < _large_size ? large[product]\
+    \ : small[_n / product];\n                large[i] -= previous - prime_count;\n\
+    \            }\n            for (uint64_t value = _sqrt_n; value >= square; value--)\
+    \ {\n                small[value] -= small[value / prime] - prime_count;\n   \
+    \         }\n            prime_count++;\n        }\n\n        std::vector<T> result(table_size());\n\
+    \        for (uint64_t i = 0; i < _large_size; i++) result[i] = T(large[i]);\n\
+    \        for (uint64_t value = 1; value <= _sqrt_n; value++) result[index(value)]\
+    \ = T(small[value]);\n        return result;\n    }\n\n    // Returns sum_{p <=\
+    \ x} p at every represented x.\n    std::vector<T> prime_sum_table() const {\n\
+    \        if (_n == 0) return {};\n        std::vector<T> result(table_size());\n\
+    \        for (uint64_t i = 1; i < _large_size; i++) result[i] = triangular(_n\
+    \ / i) - T(1);\n        for (uint64_t value = 1; value <= _sqrt_n; value++) {\n\
+    \            result[index(value)] = triangular(value) - T(1);\n        }\n\n \
+    \       for (int prime_int : _primes) {\n            const uint64_t prime = static_cast<uint64_t>(prime_int);\n\
+    \            const uint64_t square = prime * prime;\n            const T before\
+    \ = result[index(prime - 1)];\n            const uint64_t end = std::min(_large_size,\
+    \ _n / square + 1);\n            uint64_t product = prime;\n            for (uint64_t\
+    \ i = 1; i < end; i++, product += prime) {\n                result[i] -= (result[index(_n\
+    \ / product)] - before) * T(prime);\n            }\n            for (uint64_t\
+    \ value = _sqrt_n; value >= square; value--) {\n                result[index(value)]\
+    \ -= (result[index(value / prime)] - before) * T(prime);\n            }\n    \
+    \    }\n        return result;\n    }\n\n    // Returns sum_{k=1}^x f(k) at every\
+    \ represented x.\n    std::vector<T> prefix_sum_table(const std::vector<T>& prime_prefix)\
+    \ const {\n        if (_n == 0) {\n            assert(prime_prefix.empty());\n\
+    \            return {};\n        }\n        assert(static_cast<int>(prime_prefix.size())\
+    \ == table_size());\n\n        const std::vector<uint64_t> values = quotient_values();\n\
+    \        std::vector<T> result = prime_prefix;\n        std::vector<T> next =\
+    \ prime_prefix;\n        for (int prime_index = static_cast<int>(_primes.size())\
+    \ - 1; prime_index >= 0; prime_index--) {\n            const uint64_t prime =\
+    \ static_cast<uint64_t>(_primes[prime_index]);\n            uint64_t power = prime;\n\
+    \            int exponent = 1;\n            while (power <= _n / prime) {\n  \
+    \              const T current_value = _prime_power(prime, exponent);\n      \
+    \          const T next_value = _prime_power(prime, exponent + 1);\n         \
+    \       const T primes_before = prime_prefix[index(prime)];\n                for\
+    \ (int i = 1; i < table_size(); i++) {\n                    const uint64_t value\
+    \ = values[i];\n                    if (value < power * prime) break;\n      \
+    \              next[i] += current_value * (result[index(value / power)] - primes_before)\
+    \ + next_value;\n                }\n                exponent++;\n            \
+    \    power *= prime;\n            }\n            const uint64_t bound = prime\
+    \ * prime;\n            const int copy_size = std::min(table_size(), index(bound)\
+    \ + 1);\n            std::copy(next.begin(), next.begin() + copy_size, result.begin());\n\
+    \        }\n        for (int i = 1; i < table_size(); i++) result[i] += T(1);\n\
+    \        return result;\n    }\n\n    T prefix_sum(const std::vector<T>& prime_prefix)\
+    \ const {\n        if (_n == 0) {\n            assert(prime_prefix.empty());\n\
+    \            return T{};\n        }\n        return prefix_sum_table(prime_prefix)[index(_n)];\n\
+    \    }\n};\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line 1 \"utilities/fast_io.hpp\"\
     \n\n\n\n#line 5 \"utilities/fast_io.hpp\"\n#include <array>\n#include <cerrno>\n\
-    #include <charconv>\n#line 9 \"utilities/fast_io.hpp\"\n#include <cstdio>\n#include\
-    \ <cstdlib>\n#include <cstdint>\n#include <cstring>\n#include <iterator>\n#include\
-    \ <string>\n#include <sys/stat.h>\n#line 18 \"utilities/fast_io.hpp\"\n#include\
-    \ <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal {\n\
-    \n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct\
-    \ is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
-    \    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
-    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
-    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    #include <charconv>\n#include <cstddef>\n#include <cstdio>\n#include <cstdlib>\n\
+    #line 12 \"utilities/fast_io.hpp\"\n#include <cstring>\n#include <iterator>\n\
+    #include <string>\n#include <sys/stat.h>\n#include <type_traits>\n#line 18 \"\
+    utilities/fast_io.hpp\"\n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities\
+    \ {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class\
+    \ T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate <class T>\n\
+    struct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
+    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
+    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
     \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
     \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
@@ -368,41 +360,42 @@ data:
     \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
     n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 7 \"verify/geometry/convex_hull.test.cpp\"\
-    \n\nint main() {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
-    \ fast_output;\n\n    using namespace m1une::geometry;\n    int test_count;\n\
-    \    fast_input >> test_count;\n    while (test_count--) {\n        int size;\n\
-    \        fast_input >> size;\n        std::vector<Point<long long>> points(size);\n\
-    \        for (auto& point : points) fast_input >> point.x >> point.y;\n\n    \
-    \    std::vector<Point<long long>> hull = convex_hull(std::move(points));\n  \
-    \      fast_output << hull.size() << '\\n';\n        for (const auto& point :\
-    \ hull) {\n            fast_output << point.x << ' ' << point.y << '\\n';\n  \
-    \      }\n    }\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/static_convex_hull\"\n\n\
-    #include \"../../geometry/convex_hull.hpp\"\n\n#include \"../../utilities/fast_io.hpp\"\
-    \n#include <vector>\n\nint main() {\n    m1une::utilities::FastInput fast_input;\n\
-    \    m1une::utilities::FastOutput fast_output;\n\n    using namespace m1une::geometry;\n\
-    \    int test_count;\n    fast_input >> test_count;\n    while (test_count--)\
-    \ {\n        int size;\n        fast_input >> size;\n        std::vector<Point<long\
-    \ long>> points(size);\n        for (auto& point : points) fast_input >> point.x\
-    \ >> point.y;\n\n        std::vector<Point<long long>> hull = convex_hull(std::move(points));\n\
-    \        fast_output << hull.size() << '\\n';\n        for (const auto& point\
-    \ : hull) {\n            fast_output << point.x << ' ' << point.y << '\\n';\n\
-    \        }\n    }\n}\n"
+    \ utilities\n}  // namespace m1une\n\n\n#line 5 \"verify/math/enumerate_quotients.test.cpp\"\
+    \n\n#line 7 \"verify/math/enumerate_quotients.test.cpp\"\n\nint main() {\n   \
+    \ m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput fast_output;\n\
+    \n    std::uint64_t n;\n    fast_input >> n;\n    auto prime_power = [](std::uint64_t,\
+    \ int) -> std::uint64_t {\n        return 1;\n    };\n    using Solver = m1une::math::MultiplicativeFunctionPrefixSum<\n\
+    \        std::uint64_t,\n        decltype(prime_power)\n    >;\n    Solver solver(n,\
+    \ prime_power);\n    const auto values = solver.quotient_values();\n\n    fast_output\
+    \ << values.size() - 1 << '\\n';\n    for (int index = int(values.size()) - 1;\
+    \ index >= 1; index--) {\n        if (index != int(values.size()) - 1) fast_output\
+    \ << ' ';\n        fast_output << values[index];\n    }\n    fast_output << '\\\
+    n';\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/enumerate_quotients\"\n\
+    \n#include \"../../math/multiplicative_function_prefix_sum.hpp\"\n#include \"\
+    ../../utilities/fast_io.hpp\"\n\n#include <cstdint>\n\nint main() {\n    m1une::utilities::FastInput\
+    \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n\n    std::uint64_t\
+    \ n;\n    fast_input >> n;\n    auto prime_power = [](std::uint64_t, int) -> std::uint64_t\
+    \ {\n        return 1;\n    };\n    using Solver = m1une::math::MultiplicativeFunctionPrefixSum<\n\
+    \        std::uint64_t,\n        decltype(prime_power)\n    >;\n    Solver solver(n,\
+    \ prime_power);\n    const auto values = solver.quotient_values();\n\n    fast_output\
+    \ << values.size() - 1 << '\\n';\n    for (int index = int(values.size()) - 1;\
+    \ index >= 1; index--) {\n        if (index != int(values.size()) - 1) fast_output\
+    \ << ' ';\n        fast_output << values[index];\n    }\n    fast_output << '\\\
+    n';\n}\n"
   dependsOn:
-  - geometry/convex_hull.hpp
-  - geometry/point.hpp
+  - math/multiplicative_function_prefix_sum.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
-  path: verify/geometry/convex_hull.test.cpp
+  path: verify/math/enumerate_quotients.test.cpp
   requiredBy: []
   timestamp: '2026-07-21 21:50:16+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/geometry/convex_hull.test.cpp
+documentation_of: verify/math/enumerate_quotients.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/geometry/convex_hull.test.cpp
-- /verify/verify/geometry/convex_hull.test.cpp.html
-title: verify/geometry/convex_hull.test.cpp
+- /verify/verify/math/enumerate_quotients.test.cpp
+- /verify/verify/math/enumerate_quotients.test.cpp.html
+title: verify/math/enumerate_quotients.test.cpp
 ---

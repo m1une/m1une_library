@@ -34,6 +34,9 @@ data:
     path: verify/ds/dynamic_array/dynamic_monoid_array.test.cpp
     title: verify/ds/dynamic_array/dynamic_monoid_array.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/dynamic_array/persistent_dynamic_monoid_array.test.cpp
+    title: verify/ds/dynamic_array/persistent_dynamic_monoid_array.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/dynamic_connectivity/dynamic_connectivity.test.cpp
     title: verify/ds/dynamic_connectivity/dynamic_connectivity.test.cpp
   - icon: ':heavy_check_mark:'
@@ -146,6 +149,7 @@ data:
   - verify/ds/dsu/potentialized_dsu.test.cpp
   - verify/ds/dsu/persistent_potentialized_dsu.test.cpp
   - verify/ds/dynamic_connectivity/dynamic_connectivity.test.cpp
+  - verify/ds/dynamic_array/persistent_dynamic_monoid_array.test.cpp
   - verify/ds/dynamic_array/dynamic_monoid_array.test.cpp
   - verify/ds/dynamic_tree/path_link_cut_tree.test.cpp
   - verify/ds/dynamic_tree/link_cut_tree.test.cpp

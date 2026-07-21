@@ -20,21 +20,22 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://judge.yosupo.jp/problem/aplusb
+    PROBLEM: https://judge.yosupo.jp/problem/dynamic_tree_vertex_add_path_sum
     links:
-    - https://judge.yosupo.jp/problem/aplusb
+    - https://judge.yosupo.jp/problem/dynamic_tree_vertex_add_path_sum
   bundledCode: "#line 1 \"verify/ds/dynamic_tree/link_cut_tree.test.cpp\"\n#define\
-    \ PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <cassert>\n#line\
-    \ 1 \"utilities/fast_io.hpp\"\n\n\n\n#include <algorithm>\n#include <array>\n\
-    #include <cerrno>\n#include <charconv>\n#include <cstddef>\n#include <cstdio>\n\
-    #include <cstdlib>\n#include <cstdint>\n#include <cstring>\n#include <iterator>\n\
-    #include <string>\n#include <sys/stat.h>\n#include <type_traits>\n#include <utility>\n\
-    #include <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal\
-    \ {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\n\
-    struct is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T,\
-    \ std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
-    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
-    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    \ PROBLEM \"https://judge.yosupo.jp/problem/dynamic_tree_vertex_add_path_sum\"\
+    \n\n#include <cassert>\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#include <algorithm>\n\
+    #include <array>\n#include <cerrno>\n#include <charconv>\n#include <cstddef>\n\
+    #include <cstdio>\n#include <cstdlib>\n#include <cstdint>\n#include <cstring>\n\
+    #include <iterator>\n#include <string>\n#include <sys/stat.h>\n#include <type_traits>\n\
+    #include <utility>\n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities\
+    \ {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class\
+    \ T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate <class T>\n\
+    struct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
+    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
+    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
     \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
     \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
@@ -632,13 +633,27 @@ data:
     \ v, u));\n            }\n        }\n    }\n}\n\nint main() {\n    m1une::utilities::FastInput\
     \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n\n    test_vertex_subtree_sum();\n\
     \    test_edge_nodes_subtree();\n    test_rooted_tree_utility_apis();\n    test_random_vertex_sum();\n\
-    \n    long long a, b;\n    fast_input >> a >> b;\n    fast_output << a + b <<\
-    \ '\\n';\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <cassert>\n\
-    #include \"../../../utilities/fast_io.hpp\"\n#include <random>\n#include <utility>\n\
-    #include <vector>\n\n#include \"../../../ds/dynamic_tree/link_cut_tree.hpp\"\n\
-    #include \"../../../monoid/add.hpp\"\n\nvoid test_vertex_subtree_sum() {\n   \
-    \ m1une::ds::LinkCutTree<m1une::monoid::Add<long long>> lct(std::vector<int>{1,\
+    \n    int vertex_count, query_count;\n    fast_input >> vertex_count >> query_count;\n\
+    \    std::vector<long long> values(vertex_count);\n    for (long long& value :\
+    \ values) fast_input >> value;\n\n    m1une::ds::LinkCutTree<m1une::monoid::Add<long\
+    \ long>> tree(values);\n    for (int edge = 1; edge < vertex_count; edge++) {\n\
+    \        int first, second;\n        fast_input >> first >> second;\n        [[maybe_unused]]\
+    \ bool linked = tree.link(first, second);\n        assert(linked);\n    }\n\n\
+    \    while (query_count--) {\n        int type;\n        fast_input >> type;\n\
+    \        if (type == 0) {\n            int first, second, new_first, new_second;\n\
+    \            fast_input >> first >> second >> new_first >> new_second;\n     \
+    \       [[maybe_unused]] bool cut = tree.cut(first, second);\n            [[maybe_unused]]\
+    \ bool linked = tree.link(new_first, new_second);\n            assert(cut && linked);\n\
+    \        } else if (type == 1) {\n            int vertex;\n            long long\
+    \ addition;\n            fast_input >> vertex >> addition;\n            tree.set(vertex,\
+    \ tree.get(vertex) + addition);\n        } else {\n            int first, second;\n\
+    \            fast_input >> first >> second;\n            fast_output << tree.path_prod(first,\
+    \ second) << '\\n';\n        }\n    }\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/dynamic_tree_vertex_add_path_sum\"\
+    \n\n#include <cassert>\n#include \"../../../utilities/fast_io.hpp\"\n#include\
+    \ <random>\n#include <utility>\n#include <vector>\n\n#include \"../../../ds/dynamic_tree/link_cut_tree.hpp\"\
+    \n#include \"../../../monoid/add.hpp\"\n\nvoid test_vertex_subtree_sum() {\n \
+    \   m1une::ds::LinkCutTree<m1une::monoid::Add<long long>> lct(std::vector<int>{1,\
     \ 2, 3, 4, 5});\n\n    assert(lct.link(0, 1));\n    assert(lct.link(1, 2));\n\
     \    assert(lct.link(1, 3));\n    assert(lct.link(3, 4));\n\n    assert(lct.path_prod(2,\
     \ 4) == 14);\n    assert(lct.subtree_prod(0, 1) == 14);\n    assert(lct.subtree_size(0,\
@@ -730,8 +745,22 @@ data:
     \ v, u));\n            }\n        }\n    }\n}\n\nint main() {\n    m1une::utilities::FastInput\
     \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n\n    test_vertex_subtree_sum();\n\
     \    test_edge_nodes_subtree();\n    test_rooted_tree_utility_apis();\n    test_random_vertex_sum();\n\
-    \n    long long a, b;\n    fast_input >> a >> b;\n    fast_output << a + b <<\
-    \ '\\n';\n}\n"
+    \n    int vertex_count, query_count;\n    fast_input >> vertex_count >> query_count;\n\
+    \    std::vector<long long> values(vertex_count);\n    for (long long& value :\
+    \ values) fast_input >> value;\n\n    m1une::ds::LinkCutTree<m1une::monoid::Add<long\
+    \ long>> tree(values);\n    for (int edge = 1; edge < vertex_count; edge++) {\n\
+    \        int first, second;\n        fast_input >> first >> second;\n        [[maybe_unused]]\
+    \ bool linked = tree.link(first, second);\n        assert(linked);\n    }\n\n\
+    \    while (query_count--) {\n        int type;\n        fast_input >> type;\n\
+    \        if (type == 0) {\n            int first, second, new_first, new_second;\n\
+    \            fast_input >> first >> second >> new_first >> new_second;\n     \
+    \       [[maybe_unused]] bool cut = tree.cut(first, second);\n            [[maybe_unused]]\
+    \ bool linked = tree.link(new_first, new_second);\n            assert(cut && linked);\n\
+    \        } else if (type == 1) {\n            int vertex;\n            long long\
+    \ addition;\n            fast_input >> vertex >> addition;\n            tree.set(vertex,\
+    \ tree.get(vertex) + addition);\n        } else {\n            int first, second;\n\
+    \            fast_input >> first >> second;\n            fast_output << tree.path_prod(first,\
+    \ second) << '\\n';\n        }\n    }\n}\n"
   dependsOn:
   - utilities/fast_io.hpp
   - ds/dynamic_tree/link_cut_tree.hpp
@@ -740,7 +769,7 @@ data:
   isVerificationFile: true
   path: verify/ds/dynamic_tree/link_cut_tree.test.cpp
   requiredBy: []
-  timestamp: '2026-07-21 20:17:47+09:00'
+  timestamp: '2026-07-21 21:50:16+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/dynamic_tree/link_cut_tree.test.cpp

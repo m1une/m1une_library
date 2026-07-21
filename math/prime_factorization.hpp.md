@@ -40,6 +40,9 @@ data:
     path: verify/math/primality_test.test.cpp
     title: verify/math/primality_test.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/primitive_root.test.cpp
+    title: verify/math/primitive_root.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/tetration.test.cpp
     title: verify/math/tetration.test.cpp
   - icon: ':heavy_check_mark:'
@@ -218,6 +221,7 @@ data:
   timestamp: '2026-06-20 09:18:49+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/math/primitive_root.test.cpp
   - verify/math/math_algorithms.test.cpp
   - verify/math/cyclotomic_polynomial.test.cpp
   - verify/math/yosupo_factorize.test.cpp

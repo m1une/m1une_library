@@ -10,6 +10,9 @@ data:
     title: Bitwise Convolution
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/math/bitwise_and_convolution.test.cpp
+    title: verify/math/bitwise_and_convolution.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/bitwise_convolution.test.cpp
     title: verify/math/bitwise_convolution.test.cpp
   - icon: ':heavy_check_mark:'
@@ -156,6 +159,7 @@ data:
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
   - verify/math/zeta_mobius_transform.test.cpp
+  - verify/math/bitwise_and_convolution.test.cpp
   - verify/math/bitwise_convolution.test.cpp
 documentation_of: math/zeta_mobius_transform.hpp
 layout: document

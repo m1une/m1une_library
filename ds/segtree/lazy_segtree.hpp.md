@@ -13,6 +13,9 @@ data:
     path: verify/ds/segtree/lazy_segtree.test.cpp
     title: verify/ds/segtree/lazy_segtree.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/segtree/range_add_range_min.test.cpp
+    title: verify/ds/segtree/range_add_range_min.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/range_update_range_product.test.cpp
     title: verify/ds/segtree/range_update_range_product.test.cpp
   _isVerificationFailed: false
@@ -312,6 +315,7 @@ data:
   verifiedWith:
   - verify/ds/segtree/lazy_segtree.test.cpp
   - verify/ds/segtree/range_update_range_product.test.cpp
+  - verify/ds/segtree/range_add_range_min.test.cpp
 documentation_of: ds/segtree/lazy_segtree.hpp
 layout: document
 title: Lazy Segment Tree

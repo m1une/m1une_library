@@ -20,21 +20,22 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://judge.yosupo.jp/problem/aplusb
+    PROBLEM: https://judge.yosupo.jp/problem/dynamic_tree_vertex_set_path_composite
     links:
-    - https://judge.yosupo.jp/problem/aplusb
+    - https://judge.yosupo.jp/problem/dynamic_tree_vertex_set_path_composite
   bundledCode: "#line 1 \"verify/ds/dynamic_tree/path_link_cut_tree.test.cpp\"\n#define\
-    \ PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <cassert>\n#line\
-    \ 1 \"utilities/fast_io.hpp\"\n\n\n\n#include <algorithm>\n#include <array>\n\
-    #include <cerrno>\n#include <charconv>\n#include <cstddef>\n#include <cstdio>\n\
-    #include <cstdlib>\n#include <cstdint>\n#include <cstring>\n#include <iterator>\n\
-    #include <string>\n#include <sys/stat.h>\n#include <type_traits>\n#include <utility>\n\
-    #include <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal\
-    \ {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\n\
-    struct is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T,\
-    \ std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
-    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
-    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    \ PROBLEM \"https://judge.yosupo.jp/problem/dynamic_tree_vertex_set_path_composite\"\
+    \n\n#include <cassert>\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#include <algorithm>\n\
+    #include <array>\n#include <cerrno>\n#include <charconv>\n#include <cstddef>\n\
+    #include <cstdio>\n#include <cstdlib>\n#include <cstdint>\n#include <cstring>\n\
+    #include <iterator>\n#include <string>\n#include <sys/stat.h>\n#include <type_traits>\n\
+    #include <utility>\n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities\
+    \ {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class\
+    \ T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate <class T>\n\
+    struct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
+    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
+    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
     \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
     \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
@@ -458,25 +459,32 @@ data:
     \ m1une\n\n\n#line 10 \"verify/ds/dynamic_tree/path_link_cut_tree.test.cpp\"\n\
     \nstruct StringConcat {\n    using value_type = std::string;\n\n    static std::string\
     \ id() {\n        return \"\";\n    }\n\n    static std::string op(const std::string&\
-    \ a, const std::string& b) {\n        return a + b;\n    }\n};\n\nvoid test_vertex_sum()\
-    \ {\n    m1une::ds::PathLinkCutTree<m1une::monoid::Add<long long>> lct(std::vector<int>{1,\
-    \ 2, 3, 4, 5});\n\n    assert(lct.size() == 5);\n    assert(!lct.empty());\n \
-    \   assert(lct[2] == 3);\n    assert(lct.link(0, 1));\n    assert(lct.link(1,\
-    \ 2));\n    assert(lct.link(1, 3));\n    assert(lct.link(3, 4));\n    assert(!lct.link(0,\
-    \ 4));\n\n    assert(lct.connected(0, 4));\n    assert(lct.same(2, 4));\n    assert(lct.prod(0,\
-    \ 2) == 6);\n    assert(lct.path_prod(2, 4) == 14);\n    assert(lct.path_size(2,\
-    \ 4) == 4);\n    assert(lct.kth_vertex(2, 4, 0) == 2);\n    assert(lct.kth_vertex(2,\
-    \ 4, 1) == 1);\n    assert(lct.kth_vertex(2, 4, 2) == 3);\n    assert(lct.kth_vertex(2,\
-    \ 4, 3) == 4);\n\n    lct.set(1, 10);\n    assert(lct.get(1) == 10);\n    assert(lct.prod(2,\
-    \ 4) == 22);\n\n    assert(!lct.cut(0, 2));\n    assert(lct.cut(1, 3));\n    assert(!lct.connected(2,\
-    \ 4));\n    assert(lct.link(2, 4));\n    assert(lct.prod(0, 3) == 23);\n\n   \
-    \ lct.evert(0);\n    assert(lct.component_root(3) == 0);\n    assert(lct.lca(2,\
-    \ 3) == 2);\n}\n\nvoid test_path_order() {\n    m1une::ds::PathLinkCutTree<StringConcat>\
-    \ lct(std::vector<std::string>{\"a\", \"b\", \"c\", \"d\"});\n    assert(lct.link(0,\
-    \ 1));\n    assert(lct.link(1, 2));\n    assert(lct.link(1, 3));\n\n    assert(lct.prod(0,\
-    \ 2) == \"abc\");\n    assert(lct.prod(2, 0) == \"cba\");\n    assert(lct.prod(3,\
-    \ 2) == \"dbc\");\n    lct.set(1, \"B\");\n    assert(lct.prod(0, 3) == \"aBd\"\
-    );\n}\n\nvoid test_edge_nodes() {\n    m1une::ds::PathLinkCutTree<m1une::monoid::Add<long\
+    \ a, const std::string& b) {\n        return a + b;\n    }\n};\n\nconstexpr long\
+    \ long modulus = 998244353;\n\nstruct AffineComposition {\n    struct value_type\
+    \ {\n        long long multiplier;\n        long long addition;\n    };\n\n  \
+    \  static value_type id() {\n        return value_type{1, 0};\n    }\n\n    static\
+    \ value_type op(const value_type& first, const value_type& second) {\n       \
+    \ return value_type{\n            second.multiplier * first.multiplier % modulus,\n\
+    \            (second.multiplier * first.addition + second.addition) % modulus,\n\
+    \        };\n    }\n};\n\nvoid test_vertex_sum() {\n    m1une::ds::PathLinkCutTree<m1une::monoid::Add<long\
+    \ long>> lct(std::vector<int>{1, 2, 3, 4, 5});\n\n    assert(lct.size() == 5);\n\
+    \    assert(!lct.empty());\n    assert(lct[2] == 3);\n    assert(lct.link(0, 1));\n\
+    \    assert(lct.link(1, 2));\n    assert(lct.link(1, 3));\n    assert(lct.link(3,\
+    \ 4));\n    assert(!lct.link(0, 4));\n\n    assert(lct.connected(0, 4));\n   \
+    \ assert(lct.same(2, 4));\n    assert(lct.prod(0, 2) == 6);\n    assert(lct.path_prod(2,\
+    \ 4) == 14);\n    assert(lct.path_size(2, 4) == 4);\n    assert(lct.kth_vertex(2,\
+    \ 4, 0) == 2);\n    assert(lct.kth_vertex(2, 4, 1) == 1);\n    assert(lct.kth_vertex(2,\
+    \ 4, 2) == 3);\n    assert(lct.kth_vertex(2, 4, 3) == 4);\n\n    lct.set(1, 10);\n\
+    \    assert(lct.get(1) == 10);\n    assert(lct.prod(2, 4) == 22);\n\n    assert(!lct.cut(0,\
+    \ 2));\n    assert(lct.cut(1, 3));\n    assert(!lct.connected(2, 4));\n    assert(lct.link(2,\
+    \ 4));\n    assert(lct.prod(0, 3) == 23);\n\n    lct.evert(0);\n    assert(lct.component_root(3)\
+    \ == 0);\n    assert(lct.lca(2, 3) == 2);\n}\n\nvoid test_path_order() {\n   \
+    \ m1une::ds::PathLinkCutTree<StringConcat> lct(std::vector<std::string>{\"a\"\
+    , \"b\", \"c\", \"d\"});\n    assert(lct.link(0, 1));\n    assert(lct.link(1,\
+    \ 2));\n    assert(lct.link(1, 3));\n\n    assert(lct.prod(0, 2) == \"abc\");\n\
+    \    assert(lct.prod(2, 0) == \"cba\");\n    assert(lct.prod(3, 2) == \"dbc\"\
+    );\n    lct.set(1, \"B\");\n    assert(lct.prod(0, 3) == \"aBd\");\n}\n\nvoid\
+    \ test_edge_nodes() {\n    m1une::ds::PathLinkCutTree<m1une::monoid::Add<long\
     \ long>> lct(3);\n\n    int e01 = lct.link_edge(0, 1, 5);\n    int e12 = lct.link_edge(1,\
     \ 2, 7);\n    assert(e01 == 0);\n    assert(e12 == 1);\n    assert(lct.edge_count()\
     \ == 2);\n    assert(lct.edge_alive(e01));\n    assert((lct.edge_endpoints(e01)\
@@ -488,32 +496,57 @@ data:
     \ 2));\n    int e02 = lct.link_edge(0, 2, 1);\n    assert(e02 == 2);\n    assert(lct.prod(0,\
     \ 1) == 21);\n}\n\nint main() {\n    m1une::utilities::FastInput fast_input;\n\
     \    m1une::utilities::FastOutput fast_output;\n\n    test_vertex_sum();\n   \
-    \ test_path_order();\n    test_edge_nodes();\n\n    long long a, b;\n    fast_input\
-    \ >> a >> b;\n    fast_output << a + b << '\\n';\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <cassert>\n\
-    #include \"../../../utilities/fast_io.hpp\"\n#include <string>\n#include <vector>\n\
-    \n#include \"../../../ds/dynamic_tree/path_link_cut_tree.hpp\"\n#include \"../../../monoid/add.hpp\"\
-    \n\nstruct StringConcat {\n    using value_type = std::string;\n\n    static std::string\
-    \ id() {\n        return \"\";\n    }\n\n    static std::string op(const std::string&\
-    \ a, const std::string& b) {\n        return a + b;\n    }\n};\n\nvoid test_vertex_sum()\
-    \ {\n    m1une::ds::PathLinkCutTree<m1une::monoid::Add<long long>> lct(std::vector<int>{1,\
-    \ 2, 3, 4, 5});\n\n    assert(lct.size() == 5);\n    assert(!lct.empty());\n \
-    \   assert(lct[2] == 3);\n    assert(lct.link(0, 1));\n    assert(lct.link(1,\
-    \ 2));\n    assert(lct.link(1, 3));\n    assert(lct.link(3, 4));\n    assert(!lct.link(0,\
-    \ 4));\n\n    assert(lct.connected(0, 4));\n    assert(lct.same(2, 4));\n    assert(lct.prod(0,\
-    \ 2) == 6);\n    assert(lct.path_prod(2, 4) == 14);\n    assert(lct.path_size(2,\
-    \ 4) == 4);\n    assert(lct.kth_vertex(2, 4, 0) == 2);\n    assert(lct.kth_vertex(2,\
-    \ 4, 1) == 1);\n    assert(lct.kth_vertex(2, 4, 2) == 3);\n    assert(lct.kth_vertex(2,\
-    \ 4, 3) == 4);\n\n    lct.set(1, 10);\n    assert(lct.get(1) == 10);\n    assert(lct.prod(2,\
-    \ 4) == 22);\n\n    assert(!lct.cut(0, 2));\n    assert(lct.cut(1, 3));\n    assert(!lct.connected(2,\
-    \ 4));\n    assert(lct.link(2, 4));\n    assert(lct.prod(0, 3) == 23);\n\n   \
-    \ lct.evert(0);\n    assert(lct.component_root(3) == 0);\n    assert(lct.lca(2,\
-    \ 3) == 2);\n}\n\nvoid test_path_order() {\n    m1une::ds::PathLinkCutTree<StringConcat>\
-    \ lct(std::vector<std::string>{\"a\", \"b\", \"c\", \"d\"});\n    assert(lct.link(0,\
-    \ 1));\n    assert(lct.link(1, 2));\n    assert(lct.link(1, 3));\n\n    assert(lct.prod(0,\
-    \ 2) == \"abc\");\n    assert(lct.prod(2, 0) == \"cba\");\n    assert(lct.prod(3,\
-    \ 2) == \"dbc\");\n    lct.set(1, \"B\");\n    assert(lct.prod(0, 3) == \"aBd\"\
-    );\n}\n\nvoid test_edge_nodes() {\n    m1une::ds::PathLinkCutTree<m1une::monoid::Add<long\
+    \ test_path_order();\n    test_edge_nodes();\n\n    int vertex_count, query_count;\n\
+    \    fast_input >> vertex_count >> query_count;\n    std::vector<AffineComposition::value_type>\
+    \ functions(vertex_count);\n    for (auto& function : functions) {\n        fast_input\
+    \ >> function.multiplier >> function.addition;\n    }\n\n    m1une::ds::PathLinkCutTree<AffineComposition>\
+    \ tree(functions);\n    for (int edge = 1; edge < vertex_count; edge++) {\n  \
+    \      int first, second;\n        fast_input >> first >> second;\n        [[maybe_unused]]\
+    \ bool linked = tree.link(first, second);\n        assert(linked);\n    }\n\n\
+    \    while (query_count--) {\n        int type;\n        fast_input >> type;\n\
+    \        if (type == 0) {\n            int first, second, new_first, new_second;\n\
+    \            fast_input >> first >> second >> new_first >> new_second;\n     \
+    \       [[maybe_unused]] bool cut = tree.cut(first, second);\n            [[maybe_unused]]\
+    \ bool linked = tree.link(new_first, new_second);\n            assert(cut && linked);\n\
+    \        } else if (type == 1) {\n            int vertex;\n            AffineComposition::value_type\
+    \ function;\n            fast_input >> vertex >> function.multiplier >> function.addition;\n\
+    \            tree.set(vertex, function);\n        } else {\n            int first,\
+    \ second;\n            long long value;\n            fast_input >> first >> second\
+    \ >> value;\n            auto function = tree.path_prod(first, second);\n    \
+    \        fast_output << (function.multiplier * value + function.addition) % modulus\
+    \ << '\\n';\n        }\n    }\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/dynamic_tree_vertex_set_path_composite\"\
+    \n\n#include <cassert>\n#include \"../../../utilities/fast_io.hpp\"\n#include\
+    \ <string>\n#include <vector>\n\n#include \"../../../ds/dynamic_tree/path_link_cut_tree.hpp\"\
+    \n#include \"../../../monoid/add.hpp\"\n\nstruct StringConcat {\n    using value_type\
+    \ = std::string;\n\n    static std::string id() {\n        return \"\";\n    }\n\
+    \n    static std::string op(const std::string& a, const std::string& b) {\n  \
+    \      return a + b;\n    }\n};\n\nconstexpr long long modulus = 998244353;\n\n\
+    struct AffineComposition {\n    struct value_type {\n        long long multiplier;\n\
+    \        long long addition;\n    };\n\n    static value_type id() {\n       \
+    \ return value_type{1, 0};\n    }\n\n    static value_type op(const value_type&\
+    \ first, const value_type& second) {\n        return value_type{\n           \
+    \ second.multiplier * first.multiplier % modulus,\n            (second.multiplier\
+    \ * first.addition + second.addition) % modulus,\n        };\n    }\n};\n\nvoid\
+    \ test_vertex_sum() {\n    m1une::ds::PathLinkCutTree<m1une::monoid::Add<long\
+    \ long>> lct(std::vector<int>{1, 2, 3, 4, 5});\n\n    assert(lct.size() == 5);\n\
+    \    assert(!lct.empty());\n    assert(lct[2] == 3);\n    assert(lct.link(0, 1));\n\
+    \    assert(lct.link(1, 2));\n    assert(lct.link(1, 3));\n    assert(lct.link(3,\
+    \ 4));\n    assert(!lct.link(0, 4));\n\n    assert(lct.connected(0, 4));\n   \
+    \ assert(lct.same(2, 4));\n    assert(lct.prod(0, 2) == 6);\n    assert(lct.path_prod(2,\
+    \ 4) == 14);\n    assert(lct.path_size(2, 4) == 4);\n    assert(lct.kth_vertex(2,\
+    \ 4, 0) == 2);\n    assert(lct.kth_vertex(2, 4, 1) == 1);\n    assert(lct.kth_vertex(2,\
+    \ 4, 2) == 3);\n    assert(lct.kth_vertex(2, 4, 3) == 4);\n\n    lct.set(1, 10);\n\
+    \    assert(lct.get(1) == 10);\n    assert(lct.prod(2, 4) == 22);\n\n    assert(!lct.cut(0,\
+    \ 2));\n    assert(lct.cut(1, 3));\n    assert(!lct.connected(2, 4));\n    assert(lct.link(2,\
+    \ 4));\n    assert(lct.prod(0, 3) == 23);\n\n    lct.evert(0);\n    assert(lct.component_root(3)\
+    \ == 0);\n    assert(lct.lca(2, 3) == 2);\n}\n\nvoid test_path_order() {\n   \
+    \ m1une::ds::PathLinkCutTree<StringConcat> lct(std::vector<std::string>{\"a\"\
+    , \"b\", \"c\", \"d\"});\n    assert(lct.link(0, 1));\n    assert(lct.link(1,\
+    \ 2));\n    assert(lct.link(1, 3));\n\n    assert(lct.prod(0, 2) == \"abc\");\n\
+    \    assert(lct.prod(2, 0) == \"cba\");\n    assert(lct.prod(3, 2) == \"dbc\"\
+    );\n    lct.set(1, \"B\");\n    assert(lct.prod(0, 3) == \"aBd\");\n}\n\nvoid\
+    \ test_edge_nodes() {\n    m1une::ds::PathLinkCutTree<m1une::monoid::Add<long\
     \ long>> lct(3);\n\n    int e01 = lct.link_edge(0, 1, 5);\n    int e12 = lct.link_edge(1,\
     \ 2, 7);\n    assert(e01 == 0);\n    assert(e12 == 1);\n    assert(lct.edge_count()\
     \ == 2);\n    assert(lct.edge_alive(e01));\n    assert((lct.edge_endpoints(e01)\
@@ -525,8 +558,25 @@ data:
     \ 2));\n    int e02 = lct.link_edge(0, 2, 1);\n    assert(e02 == 2);\n    assert(lct.prod(0,\
     \ 1) == 21);\n}\n\nint main() {\n    m1une::utilities::FastInput fast_input;\n\
     \    m1une::utilities::FastOutput fast_output;\n\n    test_vertex_sum();\n   \
-    \ test_path_order();\n    test_edge_nodes();\n\n    long long a, b;\n    fast_input\
-    \ >> a >> b;\n    fast_output << a + b << '\\n';\n}\n"
+    \ test_path_order();\n    test_edge_nodes();\n\n    int vertex_count, query_count;\n\
+    \    fast_input >> vertex_count >> query_count;\n    std::vector<AffineComposition::value_type>\
+    \ functions(vertex_count);\n    for (auto& function : functions) {\n        fast_input\
+    \ >> function.multiplier >> function.addition;\n    }\n\n    m1une::ds::PathLinkCutTree<AffineComposition>\
+    \ tree(functions);\n    for (int edge = 1; edge < vertex_count; edge++) {\n  \
+    \      int first, second;\n        fast_input >> first >> second;\n        [[maybe_unused]]\
+    \ bool linked = tree.link(first, second);\n        assert(linked);\n    }\n\n\
+    \    while (query_count--) {\n        int type;\n        fast_input >> type;\n\
+    \        if (type == 0) {\n            int first, second, new_first, new_second;\n\
+    \            fast_input >> first >> second >> new_first >> new_second;\n     \
+    \       [[maybe_unused]] bool cut = tree.cut(first, second);\n            [[maybe_unused]]\
+    \ bool linked = tree.link(new_first, new_second);\n            assert(cut && linked);\n\
+    \        } else if (type == 1) {\n            int vertex;\n            AffineComposition::value_type\
+    \ function;\n            fast_input >> vertex >> function.multiplier >> function.addition;\n\
+    \            tree.set(vertex, function);\n        } else {\n            int first,\
+    \ second;\n            long long value;\n            fast_input >> first >> second\
+    \ >> value;\n            auto function = tree.path_prod(first, second);\n    \
+    \        fast_output << (function.multiplier * value + function.addition) % modulus\
+    \ << '\\n';\n        }\n    }\n}\n"
   dependsOn:
   - utilities/fast_io.hpp
   - ds/dynamic_tree/path_link_cut_tree.hpp
@@ -535,7 +585,7 @@ data:
   isVerificationFile: true
   path: verify/ds/dynamic_tree/path_link_cut_tree.test.cpp
   requiredBy: []
-  timestamp: '2026-07-21 20:17:47+09:00'
+  timestamp: '2026-07-21 21:50:16+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/dynamic_tree/path_link_cut_tree.test.cpp

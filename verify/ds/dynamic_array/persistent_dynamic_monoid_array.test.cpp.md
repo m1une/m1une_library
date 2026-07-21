@@ -5,6 +5,9 @@ data:
     path: ds/dynamic_array/persistent_dynamic_monoid_array.hpp
     title: Persistent Dynamic Monoid Array
   - icon: ':heavy_check_mark:'
+    path: monoid/add.hpp
+    title: Add Monoid
+  - icon: ':heavy_check_mark:'
     path: monoid/concept.hpp
     title: Monoid Concept
   - icon: ':heavy_check_mark:'
@@ -17,13 +20,14 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://judge.yosupo.jp/problem/aplusb
+    PROBLEM: https://judge.yosupo.jp/problem/range_reverse_range_sum
     links:
-    - https://judge.yosupo.jp/problem/aplusb
+    - https://judge.yosupo.jp/problem/range_reverse_range_sum
   bundledCode: "#line 1 \"verify/ds/dynamic_array/persistent_dynamic_monoid_array.test.cpp\"\
-    \n#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#line 1 \"ds/dynamic_array/persistent_dynamic_monoid_array.hpp\"\
-    \n\n\n\n#include <cassert>\n#include <chrono>\n#include <concepts>\n#include <cstdint>\n\
-    #include <initializer_list>\n#include <memory>\n#include <utility>\n#include <vector>\n\
+    \n#define PROBLEM \"https://judge.yosupo.jp/problem/range_reverse_range_sum\"\n\
+    \n#line 1 \"ds/dynamic_array/persistent_dynamic_monoid_array.hpp\"\n\n\n\n#include\
+    \ <cassert>\n#include <chrono>\n#include <concepts>\n#include <cstdint>\n#include\
+    \ <initializer_list>\n#include <memory>\n#include <utility>\n#include <vector>\n\
     \n#line 1 \"monoid/concept.hpp\"\n\n\n\n#line 5 \"monoid/concept.hpp\"\n\nnamespace\
     \ m1une {\nnamespace monoid {\n\n// Concept to check if a type satisfies the requirements\
     \ of a Monoid.\n// A Monoid must have a `value_type`, an identity element `id()`,\
@@ -496,6 +500,14 @@ data:
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
     \ utilities\n}  // namespace m1une\n\n\n#line 8 \"verify/ds/dynamic_array/persistent_dynamic_monoid_array.test.cpp\"\
     \n#include <numeric>\n#include <random>\n#line 13 \"verify/ds/dynamic_array/persistent_dynamic_monoid_array.test.cpp\"\
+    \n\n#line 1 \"monoid/add.hpp\"\n\n\n\nnamespace m1une {\nnamespace monoid {\n\n\
+    // Monoid for addition (Range Sum).\ntemplate <typename T>\nstruct Add {\n   \
+    \ using value_type = T;\n    static constexpr bool commutative = true;\n\n   \
+    \ // Returns the identity element for addition, which is 0.\n    static constexpr\
+    \ T id() {\n        return T(0);\n    }\n\n    // Returns the sum of a and b.\n\
+    \    static constexpr T op(const T& a, const T& b) {\n        return a + b;\n\
+    \    }\n\n    static constexpr T inv(const T& x) {\n        return -x;\n    }\n\
+    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 15 \"verify/ds/dynamic_array/persistent_dynamic_monoid_array.test.cpp\"\
     \n\nstruct StringMonoid {\n    using value_type = std::string;\n\n    static std::string\
     \ id() {\n        return \"\";\n    }\n\n    static std::string op(const std::string&\
     \ a, const std::string& b) {\n        return a + b;\n    }\n};\n\nstd::string\
@@ -565,18 +577,26 @@ data:
     \ == std::vector<std::string>(next_expected.begin(), next_expected.begin() + split_pos));\n\
     \        assert(suffix.to_vector() == std::vector<std::string>(next_expected.begin()\
     \ + split_pos, next_expected.end()));\n\n        if (next_expected.size() <= 100)\
-    \ versions.push_back({next, next_expected});\n    }\n\n    long long x, y;\n \
-    \   fast_input >> x >> y;\n    fast_output << x + y << '\\n';\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
-    ../../../ds/dynamic_array/persistent_dynamic_monoid_array.hpp\"\n\n#include <algorithm>\n\
-    #include <cassert>\n#include \"../../../utilities/fast_io.hpp\"\n#include <numeric>\n\
-    #include <random>\n#include <string>\n#include <utility>\n#include <vector>\n\n\
-    struct StringMonoid {\n    using value_type = std::string;\n\n    static std::string\
-    \ id() {\n        return \"\";\n    }\n\n    static std::string op(const std::string&\
-    \ a, const std::string& b) {\n        return a + b;\n    }\n};\n\nstd::string\
-    \ join(const std::vector<std::string>& a, int l, int r) {\n    std::string res;\n\
-    \    for (int i = l; i < r; i++) res += a[i];\n    return res;\n}\n\nint main()\
-    \ {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
+    \ versions.push_back({next, next_expected});\n    }\n\n    int size, query_count;\n\
+    \    fast_input >> size >> query_count;\n    std::vector<long long> values(size);\n\
+    \    for (long long& value : values) fast_input >> value;\n\n    using SumArray\
+    \ =\n        m1une::ds::PersistentDynamicMonoidArray<m1une::monoid::Add<long long>>;\n\
+    \    SumArray current(values);\n    while (query_count--) {\n        int type,\
+    \ left_index, right_index;\n        fast_input >> type >> left_index >> right_index;\n\
+    \        if (type == 0) {\n            current = current.reverse(left_index, right_index);\n\
+    \        } else {\n            fast_output << current.prod(left_index, right_index)\
+    \ << '\\n';\n        }\n    }\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/range_reverse_range_sum\"\
+    \n\n#include \"../../../ds/dynamic_array/persistent_dynamic_monoid_array.hpp\"\
+    \n\n#include <algorithm>\n#include <cassert>\n#include \"../../../utilities/fast_io.hpp\"\
+    \n#include <numeric>\n#include <random>\n#include <string>\n#include <utility>\n\
+    #include <vector>\n\n#include \"../../../monoid/add.hpp\"\n\nstruct StringMonoid\
+    \ {\n    using value_type = std::string;\n\n    static std::string id() {\n  \
+    \      return \"\";\n    }\n\n    static std::string op(const std::string& a,\
+    \ const std::string& b) {\n        return a + b;\n    }\n};\n\nstd::string join(const\
+    \ std::vector<std::string>& a, int l, int r) {\n    std::string res;\n    for\
+    \ (int i = l; i < r; i++) res += a[i];\n    return res;\n}\n\nint main() {\n \
+    \   m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
     \ fast_output;\n\n    using Array = m1une::ds::PersistentDynamicMonoidArray<StringMonoid>;\n\
     \n    Array a = {\"a\", \"b\", \"c\", \"d\", \"e\"};\n    Array b = a.insert(2,\
     \ \"X\");\n    Array c = b.reverse(1, 5);\n    Array d = c.rotate(1, 3, 6);\n\
@@ -640,16 +660,24 @@ data:
     \ == std::vector<std::string>(next_expected.begin(), next_expected.begin() + split_pos));\n\
     \        assert(suffix.to_vector() == std::vector<std::string>(next_expected.begin()\
     \ + split_pos, next_expected.end()));\n\n        if (next_expected.size() <= 100)\
-    \ versions.push_back({next, next_expected});\n    }\n\n    long long x, y;\n \
-    \   fast_input >> x >> y;\n    fast_output << x + y << '\\n';\n}\n"
+    \ versions.push_back({next, next_expected});\n    }\n\n    int size, query_count;\n\
+    \    fast_input >> size >> query_count;\n    std::vector<long long> values(size);\n\
+    \    for (long long& value : values) fast_input >> value;\n\n    using SumArray\
+    \ =\n        m1une::ds::PersistentDynamicMonoidArray<m1une::monoid::Add<long long>>;\n\
+    \    SumArray current(values);\n    while (query_count--) {\n        int type,\
+    \ left_index, right_index;\n        fast_input >> type >> left_index >> right_index;\n\
+    \        if (type == 0) {\n            current = current.reverse(left_index, right_index);\n\
+    \        } else {\n            fast_output << current.prod(left_index, right_index)\
+    \ << '\\n';\n        }\n    }\n}\n"
   dependsOn:
   - ds/dynamic_array/persistent_dynamic_monoid_array.hpp
   - monoid/concept.hpp
   - utilities/fast_io.hpp
+  - monoid/add.hpp
   isVerificationFile: true
   path: verify/ds/dynamic_array/persistent_dynamic_monoid_array.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-07-21 21:50:16+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/dynamic_array/persistent_dynamic_monoid_array.test.cpp

@@ -17,50 +17,49 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=1040
+    PROBLEM: https://judge.yosupo.jp/problem/minimum_steiner_tree
     links:
-    - https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=1040
+    - https://judge.yosupo.jp/problem/minimum_steiner_tree
   bundledCode: "#line 1 \"verify/graph/minimum_steiner_tree.test.cpp\"\n#define PROBLEM\
-    \ \"https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=1040\"\n\n#line\
-    \ 1 \"graph/minimum_steiner_tree.hpp\"\n\n\n\n#include <algorithm>\n#include <bit>\n\
-    #include <cassert>\n#include <cstddef>\n#include <functional>\n#include <limits>\n\
-    #include <optional>\n#include <queue>\n#include <type_traits>\n#include <utility>\n\
-    #include <vector>\n\n#line 1 \"graph/graph.hpp\"\n\n\n\n#line 7 \"graph/graph.hpp\"\
-    \n\nnamespace m1une {\nnamespace graph {\n\ntemplate <class T = int>\nstruct Edge\
-    \ {\n    using cost_type = T;\n\n    int from;\n    int to;\n    T cost;\n   \
-    \ int id;\n    bool alive;\n\n    Edge() : from(-1), to(-1), cost(T()), id(-1),\
-    \ alive(true) {}\n    Edge(int from_, int to_, T cost_ = T(1), int id_ = -1, bool\
-    \ alive_ = true)\n        : from(from_), to(to_), cost(cost_), id(id_), alive(alive_)\
-    \ {}\n\n    int other(int v) const {\n        assert(v == from || v == to);\n\
-    \        return from ^ to ^ v;\n    }\n};\n\ntemplate <class T = int>\nstruct\
-    \ Graph {\n    using edge_type = Edge<T>;\n    using cost_type = T;\n\n   private:\n\
-    \    int _n;\n    int _edge_count;\n    std::vector<std::vector<edge_type>> _g;\n\
-    \    std::vector<std::vector<std::pair<int, int>>> _edge_positions;\n\n   public:\n\
-    \    Graph() : _n(0), _edge_count(0) {}\n    explicit Graph(int n) : _n(n), _edge_count(0),\
-    \ _g(n) {\n        assert(0 <= n);\n    }\n\n    int size() const {\n        return\
-    \ _n;\n    }\n\n    bool empty() const {\n        return _n == 0;\n    }\n\n \
-    \   int edge_count() const {\n        return _edge_count;\n    }\n\n    int add_vertex()\
-    \ {\n        _g.emplace_back();\n        return _n++;\n    }\n\n    int add_directed_edge(int\
-    \ from, int to, T cost = T(1)) {\n        assert(0 <= from && from < _n);\n  \
-    \      assert(0 <= to && to < _n);\n        int id = _edge_count++;\n        int\
-    \ idx = int(_g[from].size());\n        _g[from].push_back(edge_type(from, to,\
-    \ cost, id));\n        _edge_positions.emplace_back();\n        _edge_positions.back().push_back({from,\
-    \ idx});\n        return id;\n    }\n\n    int add_edge(int u, int v, T cost =\
-    \ T(1)) {\n        assert(0 <= u && u < _n);\n        assert(0 <= v && v < _n);\n\
-    \        int id = _edge_count++;\n        int u_idx = int(_g[u].size());\n   \
-    \     _g[u].push_back(edge_type(u, v, cost, id));\n        int v_idx = int(_g[v].size());\n\
-    \        _g[v].push_back(edge_type(v, u, cost, id));\n        _edge_positions.emplace_back();\n\
-    \        _edge_positions.back().push_back({u, u_idx});\n        _edge_positions.back().push_back({v,\
-    \ v_idx});\n        return id;\n    }\n\n    void set_edge_alive(int id, bool\
-    \ alive) {\n        assert(0 <= id && id < _edge_count);\n        for (auto [v,\
-    \ idx] : _edge_positions[id]) {\n            _g[v][idx].alive = alive;\n     \
-    \   }\n    }\n\n    void erase_edge(int id) {\n        set_edge_alive(id, false);\n\
-    \    }\n\n    void revive_edge(int id) {\n        set_edge_alive(id, true);\n\
-    \    }\n\n    bool is_edge_alive(int id) const {\n        assert(0 <= id && id\
-    \ < _edge_count);\n        assert(!_edge_positions[id].empty());\n        auto\
-    \ [v, idx] = _edge_positions[id][0];\n        return _g[v][idx].alive;\n    }\n\
-    \n    const std::vector<edge_type>& operator[](int v) const {\n        assert(0\
-    \ <= v && v < _n);\n        return _g[v];\n    }\n\n    std::vector<edge_type>&\
+    \ \"https://judge.yosupo.jp/problem/minimum_steiner_tree\"\n\n#line 1 \"graph/minimum_steiner_tree.hpp\"\
+    \n\n\n\n#include <algorithm>\n#include <bit>\n#include <cassert>\n#include <cstddef>\n\
+    #include <functional>\n#include <limits>\n#include <optional>\n#include <queue>\n\
+    #include <type_traits>\n#include <utility>\n#include <vector>\n\n#line 1 \"graph/graph.hpp\"\
+    \n\n\n\n#line 7 \"graph/graph.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\n\
+    template <class T = int>\nstruct Edge {\n    using cost_type = T;\n\n    int from;\n\
+    \    int to;\n    T cost;\n    int id;\n    bool alive;\n\n    Edge() : from(-1),\
+    \ to(-1), cost(T()), id(-1), alive(true) {}\n    Edge(int from_, int to_, T cost_\
+    \ = T(1), int id_ = -1, bool alive_ = true)\n        : from(from_), to(to_), cost(cost_),\
+    \ id(id_), alive(alive_) {}\n\n    int other(int v) const {\n        assert(v\
+    \ == from || v == to);\n        return from ^ to ^ v;\n    }\n};\n\ntemplate <class\
+    \ T = int>\nstruct Graph {\n    using edge_type = Edge<T>;\n    using cost_type\
+    \ = T;\n\n   private:\n    int _n;\n    int _edge_count;\n    std::vector<std::vector<edge_type>>\
+    \ _g;\n    std::vector<std::vector<std::pair<int, int>>> _edge_positions;\n\n\
+    \   public:\n    Graph() : _n(0), _edge_count(0) {}\n    explicit Graph(int n)\
+    \ : _n(n), _edge_count(0), _g(n) {\n        assert(0 <= n);\n    }\n\n    int\
+    \ size() const {\n        return _n;\n    }\n\n    bool empty() const {\n    \
+    \    return _n == 0;\n    }\n\n    int edge_count() const {\n        return _edge_count;\n\
+    \    }\n\n    int add_vertex() {\n        _g.emplace_back();\n        return _n++;\n\
+    \    }\n\n    int add_directed_edge(int from, int to, T cost = T(1)) {\n     \
+    \   assert(0 <= from && from < _n);\n        assert(0 <= to && to < _n);\n   \
+    \     int id = _edge_count++;\n        int idx = int(_g[from].size());\n     \
+    \   _g[from].push_back(edge_type(from, to, cost, id));\n        _edge_positions.emplace_back();\n\
+    \        _edge_positions.back().push_back({from, idx});\n        return id;\n\
+    \    }\n\n    int add_edge(int u, int v, T cost = T(1)) {\n        assert(0 <=\
+    \ u && u < _n);\n        assert(0 <= v && v < _n);\n        int id = _edge_count++;\n\
+    \        int u_idx = int(_g[u].size());\n        _g[u].push_back(edge_type(u,\
+    \ v, cost, id));\n        int v_idx = int(_g[v].size());\n        _g[v].push_back(edge_type(v,\
+    \ u, cost, id));\n        _edge_positions.emplace_back();\n        _edge_positions.back().push_back({u,\
+    \ u_idx});\n        _edge_positions.back().push_back({v, v_idx});\n        return\
+    \ id;\n    }\n\n    void set_edge_alive(int id, bool alive) {\n        assert(0\
+    \ <= id && id < _edge_count);\n        for (auto [v, idx] : _edge_positions[id])\
+    \ {\n            _g[v][idx].alive = alive;\n        }\n    }\n\n    void erase_edge(int\
+    \ id) {\n        set_edge_alive(id, false);\n    }\n\n    void revive_edge(int\
+    \ id) {\n        set_edge_alive(id, true);\n    }\n\n    bool is_edge_alive(int\
+    \ id) const {\n        assert(0 <= id && id < _edge_count);\n        assert(!_edge_positions[id].empty());\n\
+    \        auto [v, idx] = _edge_positions[id][0];\n        return _g[v][idx].alive;\n\
+    \    }\n\n    const std::vector<edge_type>& operator[](int v) const {\n      \
+    \  assert(0 <= v && v < _n);\n        return _g[v];\n    }\n\n    std::vector<edge_type>&\
     \ operator[](int v) {\n        assert(0 <= v && v < _n);\n        return _g[v];\n\
     \    }\n\n    const std::vector<std::vector<edge_type>>& adjacency() const {\n\
     \        return _g;\n    }\n\n    std::vector<std::vector<edge_type>>& adjacency()\
@@ -724,20 +723,20 @@ data:
     \ auto&) { return 1LL; }\n            );\n        }\n    }\n}\n\n}  // namespace\n\
     \nint main() {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
     \ fast_output;\n\n    test_examples_and_failures();\n    test_randomized();\n\n\
-    \    int height, width;\n    while (fast_input >> height >> width, height != 0)\
-    \ {\n        m1une::graph::Graph<int> graph(height * width);\n        std::vector<int>\
-    \ terminals;\n        for (int row = 0; row < height; row++) {\n            for\
-    \ (int column = 0; column < width; column++) {\n                int required;\n\
-    \                fast_input >> required;\n                const int vertex = row\
-    \ * width + column;\n                if (row > 0) graph.add_edge(vertex, vertex\
-    \ - width);\n                if (column > 0) graph.add_edge(vertex, vertex - 1);\n\
-    \                if (required == 1) terminals.push_back(vertex);\n           \
-    \ }\n        }\n\n        auto weighted = m1une::graph::minimum_steiner_tree(graph,\
-    \ terminals);\n        auto unweighted = m1une::graph::minimum_steiner_tree_unweighted(graph,\
-    \ terminals);\n        assert(weighted && unweighted && *weighted == *unweighted);\n\
-    \        fast_output << height * width - *unweighted - 1 << '\\n';\n    }\n}\n"
-  code: "#define PROBLEM \"https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=1040\"\
-    \n\n#include \"../../graph/minimum_steiner_tree.hpp\"\n\n#include <algorithm>\n\
+    \    int vertex_count, edge_count;\n    fast_input >> vertex_count >> edge_count;\n\
+    \    m1une::graph::Graph<long long> graph(vertex_count);\n    for (int edge =\
+    \ 0; edge < edge_count; edge++) {\n        int first, second;\n        long long\
+    \ weight;\n        fast_input >> first >> second >> weight;\n        graph.add_edge(first,\
+    \ second, weight);\n    }\n    int terminal_count;\n    fast_input >> terminal_count;\n\
+    \    std::vector<int> terminals(terminal_count);\n    for (int& terminal : terminals)\
+    \ fast_input >> terminal;\n\n    auto result = m1une::graph::build_minimum_steiner_tree(graph,\
+    \ terminals);\n    assert(result.has_value());\n    fast_output << result->cost\
+    \ << ' ' << result->edge_ids.size() << '\\n';\n    for (int index = 0; index <\
+    \ int(result->edge_ids.size()); index++) {\n        if (index != 0) fast_output\
+    \ << ' ';\n        fast_output << result->edge_ids[index];\n    }\n    fast_output\
+    \ << '\\n';\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/minimum_steiner_tree\"\n\
+    \n#include \"../../graph/minimum_steiner_tree.hpp\"\n\n#include <algorithm>\n\
     #include <cassert>\n#include <cstdint>\n#include \"../../utilities/fast_io.hpp\"\
     \n#include <limits>\n#include <numeric>\n#include <optional>\n#include <utility>\n\
     #include <vector>\n\nnamespace {\n\nstruct NaiveDsu {\n    std::vector<int> parent;\n\
@@ -908,18 +907,18 @@ data:
     \ auto&) { return 1LL; }\n            );\n        }\n    }\n}\n\n}  // namespace\n\
     \nint main() {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
     \ fast_output;\n\n    test_examples_and_failures();\n    test_randomized();\n\n\
-    \    int height, width;\n    while (fast_input >> height >> width, height != 0)\
-    \ {\n        m1une::graph::Graph<int> graph(height * width);\n        std::vector<int>\
-    \ terminals;\n        for (int row = 0; row < height; row++) {\n            for\
-    \ (int column = 0; column < width; column++) {\n                int required;\n\
-    \                fast_input >> required;\n                const int vertex = row\
-    \ * width + column;\n                if (row > 0) graph.add_edge(vertex, vertex\
-    \ - width);\n                if (column > 0) graph.add_edge(vertex, vertex - 1);\n\
-    \                if (required == 1) terminals.push_back(vertex);\n           \
-    \ }\n        }\n\n        auto weighted = m1une::graph::minimum_steiner_tree(graph,\
-    \ terminals);\n        auto unweighted = m1une::graph::minimum_steiner_tree_unweighted(graph,\
-    \ terminals);\n        assert(weighted && unweighted && *weighted == *unweighted);\n\
-    \        fast_output << height * width - *unweighted - 1 << '\\n';\n    }\n}\n"
+    \    int vertex_count, edge_count;\n    fast_input >> vertex_count >> edge_count;\n\
+    \    m1une::graph::Graph<long long> graph(vertex_count);\n    for (int edge =\
+    \ 0; edge < edge_count; edge++) {\n        int first, second;\n        long long\
+    \ weight;\n        fast_input >> first >> second >> weight;\n        graph.add_edge(first,\
+    \ second, weight);\n    }\n    int terminal_count;\n    fast_input >> terminal_count;\n\
+    \    std::vector<int> terminals(terminal_count);\n    for (int& terminal : terminals)\
+    \ fast_input >> terminal;\n\n    auto result = m1une::graph::build_minimum_steiner_tree(graph,\
+    \ terminals);\n    assert(result.has_value());\n    fast_output << result->cost\
+    \ << ' ' << result->edge_ids.size() << '\\n';\n    for (int index = 0; index <\
+    \ int(result->edge_ids.size()); index++) {\n        if (index != 0) fast_output\
+    \ << ' ';\n        fast_output << result->edge_ids[index];\n    }\n    fast_output\
+    \ << '\\n';\n}\n"
   dependsOn:
   - graph/minimum_steiner_tree.hpp
   - graph/graph.hpp
@@ -927,7 +926,7 @@ data:
   isVerificationFile: true
   path: verify/graph/minimum_steiner_tree.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-07-21 21:50:16+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/minimum_steiner_tree.test.cpp

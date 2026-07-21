@@ -17,10 +17,10 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://judge.yosupo.jp/problem/aplusb
+    PROBLEM: https://judge.yosupo.jp/problem/tetration_mod
     links:
-    - https://judge.yosupo.jp/problem/aplusb
-  bundledCode: "#line 1 \"verify/math/tetration.test.cpp\"\n#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\
+    - https://judge.yosupo.jp/problem/tetration_mod
+  bundledCode: "#line 1 \"verify/math/tetration.test.cpp\"\n#define PROBLEM \"https://judge.yosupo.jp/problem/tetration_mod\"\
     \n\n#line 1 \"math/tetration.hpp\"\n\n\n\n#include <cassert>\n#include <concepts>\n\
     #include <cstdint>\n#include <type_traits>\n#include <vector>\n\n#line 1 \"math/prime_factorization.hpp\"\
     \n\n\n\n#include <algorithm>\n#line 7 \"math/prime_factorization.hpp\"\n#include\
@@ -469,10 +469,12 @@ data:
     \ // namespace\n\nint main() {\n    m1une::utilities::FastInput fast_input;\n\
     \    m1une::utilities::FastOutput fast_output;\n\n    test_fixed_cases();\n  \
     \  test_tetration_against_bruteforce();\n    test_power_tower_against_bruteforce();\n\
-    \n    long long a, b;\n    fast_input >> a >> b;\n    fast_output << a + b <<\
-    \ '\\n';\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
-    ../../math/tetration.hpp\"\n\n#include <cassert>\n#include <cstdint>\n#include\
+    \n    int test_count;\n    fast_input >> test_count;\n    while (test_count--)\
+    \ {\n        uint64_t base, height, modulus;\n        fast_input >> base >> height\
+    \ >> modulus;\n        fast_output << m1une::math::tetration_mod(base, height,\
+    \ modulus) << '\\n';\n    }\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/tetration_mod\"\n\n#include\
+    \ \"../../math/tetration.hpp\"\n\n#include <cassert>\n#include <cstdint>\n#include\
     \ \"../../utilities/fast_io.hpp\"\n#include <vector>\n\nnamespace {\n\nuint64_t\
     \ minimum(uint64_t first, uint64_t second) {\n    return first < second ? first\
     \ : second;\n}\n\nuint64_t brute_pow_bounded(uint64_t base, uint64_t exponent,\
@@ -529,8 +531,10 @@ data:
     \ // namespace\n\nint main() {\n    m1une::utilities::FastInput fast_input;\n\
     \    m1une::utilities::FastOutput fast_output;\n\n    test_fixed_cases();\n  \
     \  test_tetration_against_bruteforce();\n    test_power_tower_against_bruteforce();\n\
-    \n    long long a, b;\n    fast_input >> a >> b;\n    fast_output << a + b <<\
-    \ '\\n';\n}\n"
+    \n    int test_count;\n    fast_input >> test_count;\n    while (test_count--)\
+    \ {\n        uint64_t base, height, modulus;\n        fast_input >> base >> height\
+    \ >> modulus;\n        fast_output << m1une::math::tetration_mod(base, height,\
+    \ modulus) << '\\n';\n    }\n}\n"
   dependsOn:
   - math/tetration.hpp
   - math/prime_factorization.hpp
@@ -538,7 +542,7 @@ data:
   isVerificationFile: true
   path: verify/math/tetration.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-07-21 21:50:16+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/tetration.test.cpp

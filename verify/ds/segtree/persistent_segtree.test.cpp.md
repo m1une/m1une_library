@@ -20,31 +20,31 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://judge.yosupo.jp/problem/aplusb
+    PROBLEM: https://judge.yosupo.jp/problem/point_add_range_sum
     links:
-    - https://judge.yosupo.jp/problem/aplusb
+    - https://judge.yosupo.jp/problem/point_add_range_sum
   bundledCode: "#line 1 \"verify/ds/segtree/persistent_segtree.test.cpp\"\n#define\
-    \ PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#line 1 \"ds/segtree/persistent_segtree.hpp\"\
-    \n\n\n\n#include <cassert>\n#include <concepts>\n#include <memory>\n#include <utility>\n\
-    #include <vector>\n\n#line 1 \"monoid/concept.hpp\"\n\n\n\n#line 5 \"monoid/concept.hpp\"\
-    \n\nnamespace m1une {\nnamespace monoid {\n\n// Concept to check if a type satisfies\
-    \ the requirements of a Monoid.\n// A Monoid must have a `value_type`, an identity\
-    \ element `id()`, and an associative binary operation `op()`.\ntemplate <typename\
-    \ M>\nconcept IsMonoid = requires(typename M::value_type a, typename M::value_type\
-    \ b) {\n    // 1. Must define `value_type`\n    typename M::value_type;\n\n  \
-    \  // 2. Must have a static method `id()` returning `value_type`\n    { M::id()\
-    \ } -> std::same_as<typename M::value_type>;\n\n    // 3. Must have a static method\
-    \ `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for groups. A type satisfying this concept\
-    \ must also obey the group\n// laws; concepts can check the interface but not\
-    \ the algebraic properties.\ntemplate <typename M>\nconcept IsGroup = IsMonoid<M>\
-    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for commutative groups. Commutativity is a\
-    \ semantic requirement and\n// cannot be checked by a C++ concept.\ntemplate <typename\
-    \ M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\n}  // namespace monoid\n}  //\
-    \ namespace m1une\n\n\n#line 11 \"ds/segtree/persistent_segtree.hpp\"\n\nnamespace\
-    \ m1une {\nnamespace ds {\n\ntemplate <m1une::monoid::IsMonoid Monoid>\nstruct\
-    \ PersistentSegtree {\n    using T = typename Monoid::value_type;\n\n   private:\n\
+    \ PROBLEM \"https://judge.yosupo.jp/problem/point_add_range_sum\"\n\n#line 1 \"\
+    ds/segtree/persistent_segtree.hpp\"\n\n\n\n#include <cassert>\n#include <concepts>\n\
+    #include <memory>\n#include <utility>\n#include <vector>\n\n#line 1 \"monoid/concept.hpp\"\
+    \n\n\n\n#line 5 \"monoid/concept.hpp\"\n\nnamespace m1une {\nnamespace monoid\
+    \ {\n\n// Concept to check if a type satisfies the requirements of a Monoid.\n\
+    // A Monoid must have a `value_type`, an identity element `id()`, and an associative\
+    \ binary operation `op()`.\ntemplate <typename M>\nconcept IsMonoid = requires(typename\
+    \ M::value_type a, typename M::value_type b) {\n    // 1. Must define `value_type`\n\
+    \    typename M::value_type;\n\n    // 2. Must have a static method `id()` returning\
+    \ `value_type`\n    { M::id() } -> std::same_as<typename M::value_type>;\n\n \
+    \   // 3. Must have a static method `op(a, b)` returning `value_type`\n    { M::op(a,\
+    \ b) } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for groups.\
+    \ A type satisfying this concept must also obey the group\n// laws; concepts can\
+    \ check the interface but not the algebraic properties.\ntemplate <typename M>\n\
+    concept IsGroup = IsMonoid<M> && requires(typename M::value_type a) {\n    { M::inv(a)\
+    \ } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for commutative\
+    \ groups. Commutativity is a semantic requirement and\n// cannot be checked by\
+    \ a C++ concept.\ntemplate <typename M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\
+    \n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 11 \"ds/segtree/persistent_segtree.hpp\"\
+    \n\nnamespace m1une {\nnamespace ds {\n\ntemplate <m1une::monoid::IsMonoid Monoid>\n\
+    struct PersistentSegtree {\n    using T = typename Monoid::value_type;\n\n   private:\n\
     \    struct Node {\n        T val;\n        int l, r;\n\n        Node() : val(Monoid::id()),\
     \ l(0), r(0) {}\n        explicit Node(T value) : val(std::move(value)), l(0),\
     \ r(0) {}\n        Node(T value, int left, int right) : val(std::move(value)),\
@@ -413,13 +413,18 @@ data:
     \    assert(seg.get(2) == 3);\n    assert(seg1.get(2) == 10);\n    assert(seg2.get(0)\
     \ == -1);\n    assert(seg1.max_right(0, [](long long x) { return x <= 13; }) ==\
     \ 3);\n    assert(seg1.min_left(5, [](long long x) { return x <= 9; }) == 3);\n\
-    \n    long long a, b;\n    fast_input >> a >> b;\n    fast_output << a + b <<\
-    \ '\\n';\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
-    ../../../ds/segtree/persistent_segtree.hpp\"\n\n#include <cassert>\n#include \"\
-    ../../../utilities/fast_io.hpp\"\n#include <vector>\n\n#include \"../../../monoid/add.hpp\"\
-    \n\nint main() {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
-    \ fast_output;\n\n    using Seg = m1une::ds::PersistentSegtree<m1une::monoid::Add<long\
+    \n    int size, query_count;\n    fast_input >> size >> query_count;\n    std::vector<long\
+    \ long> values(size);\n    for (long long& value : values) fast_input >> value;\n\
+    \    Seg current(values);\n    while (query_count--) {\n        int type, first,\
+    \ second;\n        fast_input >> type >> first >> second;\n        if (type ==\
+    \ 0) {\n            current = current.set(first, current.get(first) + second);\n\
+    \        } else {\n            fast_output << current.prod(first, second) << '\\\
+    n';\n        }\n    }\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/point_add_range_sum\"\n\
+    \n#include \"../../../ds/segtree/persistent_segtree.hpp\"\n\n#include <cassert>\n\
+    #include \"../../../utilities/fast_io.hpp\"\n#include <vector>\n\n#include \"\
+    ../../../monoid/add.hpp\"\n\nint main() {\n    m1une::utilities::FastInput fast_input;\n\
+    \    m1une::utilities::FastOutput fast_output;\n\n    using Seg = m1une::ds::PersistentSegtree<m1une::monoid::Add<long\
     \ long>>;\n\n    Seg seg(std::vector<long long>{1, 2, 3, 4, 5});\n    Seg seg1\
     \ = seg.set(2, 10);\n    Seg seg2 = seg1.set(0, -1);\n\n    auto check = [](const\
     \ Seg& tree, const std::vector<long long>& a) {\n        assert(tree.size() ==\
@@ -438,8 +443,13 @@ data:
     \    assert(seg.get(2) == 3);\n    assert(seg1.get(2) == 10);\n    assert(seg2.get(0)\
     \ == -1);\n    assert(seg1.max_right(0, [](long long x) { return x <= 13; }) ==\
     \ 3);\n    assert(seg1.min_left(5, [](long long x) { return x <= 9; }) == 3);\n\
-    \n    long long a, b;\n    fast_input >> a >> b;\n    fast_output << a + b <<\
-    \ '\\n';\n}\n"
+    \n    int size, query_count;\n    fast_input >> size >> query_count;\n    std::vector<long\
+    \ long> values(size);\n    for (long long& value : values) fast_input >> value;\n\
+    \    Seg current(values);\n    while (query_count--) {\n        int type, first,\
+    \ second;\n        fast_input >> type >> first >> second;\n        if (type ==\
+    \ 0) {\n            current = current.set(first, current.get(first) + second);\n\
+    \        } else {\n            fast_output << current.prod(first, second) << '\\\
+    n';\n        }\n    }\n}\n"
   dependsOn:
   - ds/segtree/persistent_segtree.hpp
   - monoid/concept.hpp
@@ -448,7 +458,7 @@ data:
   isVerificationFile: true
   path: verify/ds/segtree/persistent_segtree.test.cpp
   requiredBy: []
-  timestamp: '2026-07-21 20:17:47+09:00'
+  timestamp: '2026-07-21 21:50:16+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/segtree/persistent_segtree.test.cpp

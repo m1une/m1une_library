@@ -376,6 +376,12 @@ data:
     path: verify/graph/tree/dsu_on_tree.test.cpp
     title: verify/graph/tree/dsu_on_tree.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/jump_on_tree.test.cpp
+    title: verify/graph/tree/jump_on_tree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/jump_on_tree.test.cpp
+    title: verify/graph/tree/jump_on_tree.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
     title: verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
   - icon: ':heavy_check_mark:'
@@ -660,6 +666,8 @@ data:
   - verify/graph/tree/distance_frequency.test.cpp
   - verify/graph/tree/distance_frequency.test.cpp
   - verify/graph/tree/vertex_get_range_contour_add_on_tree.test.cpp
+  - verify/graph/tree/jump_on_tree.test.cpp
+  - verify/graph/tree/jump_on_tree.test.cpp
   - verify/graph/tree/zero_one_on_tree.test.cpp
   - verify/graph/tree/zero_one_on_tree.test.cpp
   - verify/graph/library_checker_lowest_common_ancestor.test.cpp

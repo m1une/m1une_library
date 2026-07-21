@@ -64,6 +64,9 @@ data:
     path: verify/ds/segtree/persistent_lazy_segtree.test.cpp
     title: verify/ds/segtree/persistent_lazy_segtree.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/segtree/range_add_range_min.test.cpp
+    title: verify/ds/segtree/range_add_range_min.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/range_update_range_product.test.cpp
     title: verify/ds/segtree/range_update_range_product.test.cpp
   - icon: ':heavy_check_mark:'
@@ -136,6 +139,7 @@ data:
   - verify/ds/segtree/lazy_segtree.test.cpp
   - verify/ds/segtree/range_update_range_product.test.cpp
   - verify/ds/segtree/range_update_range_product.test.cpp
+  - verify/ds/segtree/range_add_range_min.test.cpp
   - verify/ds/segtree/segtree_beats.test.cpp
   - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
   - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp

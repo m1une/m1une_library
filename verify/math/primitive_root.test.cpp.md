@@ -2,11 +2,11 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: geometry/convex_hull.hpp
-    title: Convex Hull
+    path: math/prime_factorization.hpp
+    title: 64-bit Prime Factorization
   - icon: ':heavy_check_mark:'
-    path: geometry/point.hpp
-    title: 2D Point and Predicates
+    path: math/primitive_root.hpp
+    title: Primitive Root
   - icon: ':heavy_check_mark:'
     path: utilities/fast_io.hpp
     title: Fast IO
@@ -17,126 +17,113 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://judge.yosupo.jp/problem/static_convex_hull
+    PROBLEM: https://judge.yosupo.jp/problem/primitive_root
     links:
-    - https://judge.yosupo.jp/problem/static_convex_hull
-  bundledCode: "#line 1 \"verify/geometry/convex_hull.test.cpp\"\n#define PROBLEM\
-    \ \"https://judge.yosupo.jp/problem/static_convex_hull\"\n\n#line 1 \"geometry/convex_hull.hpp\"\
-    \n\n\n\n#include <algorithm>\n#include <cstddef>\n#include <utility>\n#include\
-    \ <vector>\n\n#line 1 \"geometry/point.hpp\"\n\n\n\n#include <cmath>\n#include\
-    \ <concepts>\n#include <cassert>\n#include <type_traits>\n\nnamespace m1une {\n\
-    namespace geometry {\n\ntemplate <typename T>\nconcept Coordinate = std::is_arithmetic_v<T>\
-    \ && !std::same_as<std::remove_cv_t<T>, bool>;\n\ntemplate <Coordinate T>\nusing\
-    \ wide_type = std::conditional_t<std::integral<T>, __int128_t, long double>;\n\
-    \ntemplate <Coordinate T>\nstruct Point {\n    T x;\n    T y;\n\n    constexpr\
-    \ Point() : x(0), y(0) {}\n    constexpr Point(T x_value, T y_value) : x(x_value),\
-    \ y(y_value) {}\n\n    template <Coordinate U>\n    explicit constexpr Point(const\
-    \ Point<U>& other)\n        : x(static_cast<T>(other.x)), y(static_cast<T>(other.y))\
-    \ {}\n\n    constexpr Point& operator+=(const Point& other) {\n        x += other.x;\n\
-    \        y += other.y;\n        return *this;\n    }\n\n    constexpr Point& operator-=(const\
-    \ Point& other) {\n        x -= other.x;\n        y -= other.y;\n        return\
-    \ *this;\n    }\n\n    constexpr Point operator+() const {\n        return *this;\n\
-    \    }\n\n    constexpr Point operator-() const {\n        return Point(-x, -y);\n\
-    \    }\n\n    friend constexpr Point operator+(Point left, const Point& right)\
-    \ {\n        return left += right;\n    }\n\n    friend constexpr Point operator-(Point\
-    \ left, const Point& right) {\n        return left -= right;\n    }\n\n    friend\
-    \ constexpr bool operator==(const Point&, const Point&) = default;\n\n    friend\
-    \ constexpr bool operator<(const Point& left, const Point& right) {\n        if\
-    \ (left.x != right.x) return left.x < right.x;\n        return left.y < right.y;\n\
-    \    }\n};\n\ntemplate <Coordinate T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\n\
-    constexpr auto operator*(const Point<T>& point, Scalar scalar) {\n    using Result\
-    \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
-    \ * Result(scalar),\n        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate\
-    \ <typename Scalar, Coordinate T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr\
-    \ auto operator*(Scalar scalar, const Point<T>& point) {\n    return point * scalar;\n\
-    }\n\ntemplate <Coordinate T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\n\
-    constexpr auto operator/(const Point<T>& point, Scalar scalar) {\n    using Result\
-    \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
-    \ / Result(scalar),\n        Result(point.y) / Result(scalar)\n    );\n}\n\ntemplate\
-    \ <Coordinate T>\nconstexpr wide_type<T> dot(const Point<T>& a, const Point<T>&\
-    \ b) {\n    using W = wide_type<T>;\n    return W(a.x) * W(b.x) + W(a.y) * W(b.y);\n\
-    }\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> cross(const Point<T>& a,\
-    \ const Point<T>& b) {\n    using W = wide_type<T>;\n    return W(a.x) * W(b.y)\
-    \ - W(a.y) * W(b.x);\n}\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> cross(\n\
-    \    const Point<T>& origin,\n    const Point<T>& a,\n    const Point<T>& b\n\
-    ) {\n    using W = wide_type<T>;\n    W ax = W(a.x) - W(origin.x);\n    W ay =\
-    \ W(a.y) - W(origin.y);\n    W bx = W(b.x) - W(origin.x);\n    W by = W(b.y) -\
-    \ W(origin.y);\n    return ax * by - ay * bx;\n}\n\ntemplate <Coordinate T>\n\
-    constexpr wide_type<T> norm2(const Point<T>& point) {\n    return dot(point, point);\n\
-    }\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> distance2(const Point<T>&\
-    \ a, const Point<T>& b) {\n    using W = wide_type<T>;\n    W dx = W(a.x) - W(b.x);\n\
-    \    W dy = W(a.y) - W(b.y);\n    return dx * dx + dy * dy;\n}\n\ntemplate <Coordinate\
-    \ T>\nlong double norm(const Point<T>& point) {\n    return std::hypot(\n    \
-    \    static_cast<long double>(point.x),\n        static_cast<long double>(point.y)\n\
-    \    );\n}\n\ntemplate <Coordinate T>\nlong double distance(const Point<T>& a,\
-    \ const Point<T>& b) {\n    return std::hypot(\n        static_cast<long double>(a.x)\
-    \ - static_cast<long double>(b.x),\n        static_cast<long double>(a.y) - static_cast<long\
-    \ double>(b.y)\n    );\n}\n\ntemplate <Coordinate T, typename M, typename N>\n\
-    requires std::is_arithmetic_v<M> && std::is_arithmetic_v<N>\nconstexpr Point<long\
-    \ double> internal_division_point(\n    const Point<T>& a,\n    const Point<T>&\
-    \ b,\n    M m,\n    N n\n) {\n    long double first_ratio = static_cast<long double>(m);\n\
-    \    long double second_ratio = static_cast<long double>(n);\n    long double\
-    \ denominator = first_ratio + second_ratio;\n    assert(denominator != 0);\n \
-    \   Point<long double> first(a);\n    Point<long double> direction = Point<long\
-    \ double>(b) - first;\n    return first + direction * (first_ratio / denominator);\n\
-    }\n\ntemplate <Coordinate T, typename M, typename N>\nrequires std::is_arithmetic_v<M>\
-    \ && std::is_arithmetic_v<N>\nconstexpr Point<long double> external_division_point(\n\
-    \    const Point<T>& a,\n    const Point<T>& b,\n    M m,\n    N n\n) {\n    long\
-    \ double first_ratio = static_cast<long double>(m);\n    long double second_ratio\
-    \ = static_cast<long double>(n);\n    long double denominator = first_ratio -\
-    \ second_ratio;\n    assert(denominator != 0);\n    Point<long double> first(a);\n\
-    \    Point<long double> direction = Point<long double>(b) - first;\n    return\
-    \ first + direction * (first_ratio / denominator);\n}\n\ntemplate <Coordinate\
-    \ T>\nconstexpr int sign(wide_type<T> value, long double eps = 1e-12L) {\n   \
-    \ if constexpr (std::integral<T>) {\n        return (value > 0) - (value < 0);\n\
-    \    } else {\n        return (value > eps) - (value < -eps);\n    }\n}\n\ntemplate\
-    \ <Coordinate T>\nconstexpr int orientation(\n    const Point<T>& a,\n    const\
-    \ Point<T>& b,\n    const Point<T>& c,\n    long double eps = 1e-12L\n) {\n  \
-    \  return sign<T>(cross(a, b, c), eps);\n}\n\ntemplate <Coordinate T>\nconstexpr\
-    \ bool collinear(\n    const Point<T>& a,\n    const Point<T>& b,\n    const Point<T>&\
-    \ c,\n    long double eps = 1e-12L\n) {\n    return orientation(a, b, c, eps)\
-    \ == 0;\n}\n\ntemplate <Coordinate T>\nPoint<long double> rotate(const Point<T>&\
-    \ point, long double angle) {\n    long double cosine = std::cos(angle);\n   \
-    \ long double sine = std::sin(angle);\n    return Point<long double>(\n      \
-    \  static_cast<long double>(point.x) * cosine -\n            static_cast<long\
-    \ double>(point.y) * sine,\n        static_cast<long double>(point.x) * sine +\n\
-    \            static_cast<long double>(point.y) * cosine\n    );\n}\n\ntemplate\
-    \ <Coordinate T>\nPoint<long double> normalized(const Point<T>& point) {\n   \
-    \ long double length = norm(point);\n    assert(length != 0);\n    return Point<long\
-    \ double>(\n        static_cast<long double>(point.x) / length,\n        static_cast<long\
-    \ double>(point.y) / length\n    );\n}\n\n}  // namespace geometry\n}  // namespace\
-    \ m1une\n\n\n#line 10 \"geometry/convex_hull.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ geometry {\n\n// Returns the convex hull counterclockwise from its lexicographically\
-    \ smallest\n// point. The first point is not repeated at the end.\ntemplate <Coordinate\
-    \ T>\nstd::vector<Point<T>> convex_hull(\n    std::vector<Point<T>> points,\n\
-    \    bool include_collinear = false\n) {\n    std::sort(points.begin(), points.end());\n\
-    \    points.erase(std::unique(points.begin(), points.end()), points.end());\n\
-    \    std::size_t size = points.size();\n    if (size <= 1) return points;\n\n\
-    \    std::vector<Point<T>> hull;\n    hull.reserve(2 * size);\n    auto should_pop\
-    \ = [include_collinear](\n        const Point<T>& first,\n        const Point<T>&\
-    \ second,\n        const Point<T>& third\n    ) {\n        int turn = orientation(first,\
-    \ second, third);\n        return include_collinear ? turn < 0 : turn <= 0;\n\
-    \    };\n\n    for (const Point<T>& point : points) {\n        while (\n     \
-    \       hull.size() >= 2 &&\n            should_pop(hull[hull.size() - 2], hull.back(),\
-    \ point)\n        ) {\n            hull.pop_back();\n        }\n        hull.push_back(point);\n\
-    \    }\n\n    std::size_t lower_size = hull.size();\n    for (std::size_t index\
-    \ = size - 1; index-- > 0;) {\n        const Point<T>& point = points[index];\n\
-    \        while (\n            hull.size() > lower_size &&\n            should_pop(hull[hull.size()\
-    \ - 2], hull.back(), point)\n        ) {\n            hull.pop_back();\n     \
-    \   }\n        hull.push_back(point);\n    }\n    hull.pop_back();\n\n    if (include_collinear\
-    \ && hull.size() == 2 * points.size() - 2) {\n        hull = std::move(points);\n\
-    \    }\n    return hull;\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\
-    \n\n#line 4 \"verify/geometry/convex_hull.test.cpp\"\n\n#line 1 \"utilities/fast_io.hpp\"\
+    - https://judge.yosupo.jp/problem/primitive_root
+  bundledCode: "#line 1 \"verify/math/primitive_root.test.cpp\"\n#define PROBLEM \"\
+    https://judge.yosupo.jp/problem/primitive_root\"\n\n#line 1 \"math/primitive_root.hpp\"\
+    \n\n\n\n#include <cassert>\n#include <cstdint>\n#include <numeric>\n#include <utility>\n\
+    #include <vector>\n\n#line 1 \"math/prime_factorization.hpp\"\n\n\n\n#include\
+    \ <algorithm>\n#line 10 \"math/prime_factorization.hpp\"\n\nnamespace m1une {\n\
+    namespace math {\n\nnamespace internal {\n\ninline uint64_t multiply_mod(uint64_t\
+    \ a, uint64_t b, uint64_t mod) {\n    return static_cast<uint64_t>(static_cast<unsigned\
+    \ __int128>(a) * b % mod);\n}\n\ninline uint64_t power_mod(uint64_t base, uint64_t\
+    \ exponent, uint64_t mod) {\n    uint64_t result = 1;\n    while (exponent > 0)\
+    \ {\n        if (exponent & 1) result = multiply_mod(result, base, mod);\n   \
+    \     base = multiply_mod(base, base, mod);\n        exponent >>= 1;\n    }\n\
+    \    return result;\n}\n\ninline uint64_t pollard_random() {\n    static uint64_t\
+    \ state = 0x123456789abcdef0ULL;\n    state += 0x9e3779b97f4a7c15ULL;\n    uint64_t\
+    \ value = state;\n    value = (value ^ (value >> 30)) * 0xbf58476d1ce4e5b9ULL;\n\
+    \    value = (value ^ (value >> 27)) * 0x94d049bb133111ebULL;\n    return value\
+    \ ^ (value >> 31);\n}\n\n}  // namespace internal\n\ninline bool is_prime(uint64_t\
+    \ value) {\n    if (value < 2) return false;\n    for (uint64_t prime : {2ULL,\
+    \ 3ULL, 5ULL, 7ULL, 11ULL, 13ULL, 17ULL, 19ULL, 23ULL, 29ULL, 31ULL, 37ULL}) {\n\
+    \        if (value % prime == 0) return value == prime;\n    }\n\n    uint64_t\
+    \ odd_part = value - 1;\n    int power_of_two = 0;\n    while ((odd_part & 1)\
+    \ == 0) {\n        odd_part >>= 1;\n        power_of_two++;\n    }\n\n    for\
+    \ (uint64_t base : {2ULL, 325ULL, 9375ULL, 28178ULL, 450775ULL, 9780504ULL, 1795265022ULL})\
+    \ {\n        if (base % value == 0) continue;\n        uint64_t x = internal::power_mod(base\
+    \ % value, odd_part, value);\n        if (x == 1 || x == value - 1) continue;\n\
+    \n        bool composite = true;\n        for (int i = 1; i < power_of_two; i++)\
+    \ {\n            x = internal::multiply_mod(x, x, value);\n            if (x ==\
+    \ value - 1) {\n                composite = false;\n                break;\n \
+    \           }\n        }\n        if (composite) return false;\n    }\n    return\
+    \ true;\n}\n\nnamespace internal {\n\ninline uint64_t pollard_rho(uint64_t value)\
+    \ {\n    for (uint64_t prime : {2ULL, 3ULL, 5ULL, 7ULL, 11ULL, 13ULL, 17ULL, 19ULL,\
+    \ 23ULL, 29ULL, 31ULL, 37ULL}) {\n        if (value % prime == 0) return prime;\n\
+    \    }\n\n    while (true) {\n        const uint64_t constant = pollard_random()\
+    \ % (value - 1) + 1;\n        uint64_t y = pollard_random() % (value - 1) + 1;\n\
+    \        uint64_t x = 0;\n        uint64_t saved_y = 0;\n        uint64_t gcd\
+    \ = 1;\n        uint64_t segment_length = 1;\n\n        auto advance = [&](uint64_t\
+    \ current) {\n            return static_cast<uint64_t>(\n                (static_cast<unsigned\
+    \ __int128>(multiply_mod(current, current, value)) + constant) % value);\n   \
+    \     };\n\n        while (gcd == 1) {\n            x = y;\n            for (uint64_t\
+    \ i = 0; i < segment_length; i++) y = advance(y);\n\n            for (uint64_t\
+    \ offset = 0; offset < segment_length && gcd == 1; offset += 128) {\n        \
+    \        saved_y = y;\n                uint64_t product = 1;\n               \
+    \ const uint64_t block = std::min<uint64_t>(128, segment_length - offset);\n \
+    \               for (uint64_t i = 0; i < block; i++) {\n                    y\
+    \ = advance(y);\n                    const uint64_t difference = x > y ? x - y\
+    \ : y - x;\n                    product = multiply_mod(product, difference, value);\n\
+    \                }\n                gcd = std::gcd(product, value);\n        \
+    \    }\n            segment_length <<= 1;\n        }\n\n        if (gcd == value)\
+    \ {\n            do {\n                saved_y = advance(saved_y);\n         \
+    \       const uint64_t difference = x > saved_y ? x - saved_y : saved_y - x;\n\
+    \                gcd = std::gcd(difference, value);\n            } while (gcd\
+    \ == 1);\n        }\n        if (gcd != value) return gcd;\n    }\n}\n\ninline\
+    \ void factor_recursively(uint64_t value, std::vector<uint64_t>& factors) {\n\
+    \    if (value == 1) return;\n    if (is_prime(value)) {\n        factors.push_back(value);\n\
+    \        return;\n    }\n    const uint64_t divisor = pollard_rho(value);\n  \
+    \  factor_recursively(divisor, factors);\n    factor_recursively(value / divisor,\
+    \ factors);\n}\n\n}  // namespace internal\n\ninline std::vector<uint64_t> prime_factors(uint64_t\
+    \ value) {\n    assert(value >= 1);\n    std::vector<uint64_t> result;\n    internal::factor_recursively(value,\
+    \ result);\n    std::sort(result.begin(), result.end());\n    return result;\n\
+    }\n\ninline std::vector<std::pair<uint64_t, int>> prime_factorize(uint64_t value)\
+    \ {\n    std::vector<uint64_t> factors = prime_factors(value);\n    std::vector<std::pair<uint64_t,\
+    \ int>> result;\n    for (uint64_t prime : factors) {\n        if (result.empty()\
+    \ || result.back().first != prime) {\n            result.emplace_back(prime, 1);\n\
+    \        } else {\n            result.back().second++;\n        }\n    }\n   \
+    \ return result;\n}\n\ninline std::vector<uint64_t> divisors(uint64_t value) {\n\
+    \    std::vector<uint64_t> result = {1};\n    for (const auto& factor : prime_factorize(value))\
+    \ {\n        const int current_size = int(result.size());\n        uint64_t power\
+    \ = 1;\n        for (int exponent = 1; exponent <= factor.second; exponent++)\
+    \ {\n            power *= factor.first;\n            for (int i = 0; i < current_size;\
+    \ i++) {\n                result.push_back(result[i] * power);\n            }\n\
+    \        }\n    }\n    std::sort(result.begin(), result.end());\n    return result;\n\
+    }\n\ninline uint64_t euler_phi(uint64_t value) {\n    assert(value >= 1);\n  \
+    \  uint64_t result = value;\n    for (const auto& factor : prime_factorize(value))\
+    \ {\n        result = result / factor.first * (factor.first - 1);\n    }\n   \
+    \ return result;\n}\n\ninline int mobius(uint64_t value) {\n    assert(value >=\
+    \ 1);\n    int result = 1;\n    for (const auto& factor : prime_factorize(value))\
+    \ {\n        if (factor.second >= 2) return 0;\n        result = -result;\n  \
+    \  }\n    return result;\n}\n\n}  // namespace math\n}  // namespace m1une\n\n\
+    \n#line 11 \"math/primitive_root.hpp\"\n\nnamespace m1une {\nnamespace math {\n\
+    \ninline bool has_primitive_root(uint64_t mod) {\n    if (mod == 2 || mod == 4)\
+    \ return true;\n    if (mod < 2) return false;\n\n    uint64_t odd_part = mod;\n\
+    \    if ((odd_part & 1) == 0) {\n        odd_part >>= 1;\n        if ((odd_part\
+    \ & 1) == 0) return false;\n    }\n\n    return prime_factorize(odd_part).size()\
+    \ == 1;\n}\n\n// Returns the smallest positive primitive root modulo mod.\n//\
+    \ Returns 0 when no primitive root exists.\ninline uint64_t primitive_root(uint64_t\
+    \ mod) {\n    assert(mod >= 2);\n    if (mod == 2) return 1;\n    if (!has_primitive_root(mod))\
+    \ return 0;\n\n    const uint64_t phi = euler_phi(mod);\n    const std::vector<std::pair<uint64_t,\
+    \ int>> factors = prime_factorize(phi);\n    for (uint64_t candidate = 2; candidate\
+    \ < mod; candidate++) {\n        if (std::gcd(candidate, mod) != 1) continue;\n\
+    \n        bool generator = true;\n        for (const auto& factor : factors) {\n\
+    \            if (internal::power_mod(candidate, phi / factor.first, mod) == 1)\
+    \ {\n                generator = false;\n                break;\n            }\n\
+    \        }\n        if (generator) return candidate;\n    }\n    return 0;\n}\n\
+    \n}  // namespace math\n}  // namespace m1une\n\n\n#line 1 \"utilities/fast_io.hpp\"\
     \n\n\n\n#line 5 \"utilities/fast_io.hpp\"\n#include <array>\n#include <cerrno>\n\
-    #include <charconv>\n#line 9 \"utilities/fast_io.hpp\"\n#include <cstdio>\n#include\
-    \ <cstdlib>\n#include <cstdint>\n#include <cstring>\n#include <iterator>\n#include\
-    \ <string>\n#include <sys/stat.h>\n#line 18 \"utilities/fast_io.hpp\"\n#include\
-    \ <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal {\n\
-    \n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct\
-    \ is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
-    \    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
-    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
-    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    #include <charconv>\n#include <cstddef>\n#include <cstdio>\n#include <cstdlib>\n\
+    #line 12 \"utilities/fast_io.hpp\"\n#include <cstring>\n#include <iterator>\n\
+    #include <string>\n#include <sys/stat.h>\n#include <type_traits>\n#line 18 \"\
+    utilities/fast_io.hpp\"\n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities\
+    \ {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class\
+    \ T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate <class T>\n\
+    struct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
+    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
+    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
     \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
     \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
@@ -368,41 +355,33 @@ data:
     \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
     n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 7 \"verify/geometry/convex_hull.test.cpp\"\
-    \n\nint main() {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
-    \ fast_output;\n\n    using namespace m1une::geometry;\n    int test_count;\n\
-    \    fast_input >> test_count;\n    while (test_count--) {\n        int size;\n\
-    \        fast_input >> size;\n        std::vector<Point<long long>> points(size);\n\
-    \        for (auto& point : points) fast_input >> point.x >> point.y;\n\n    \
-    \    std::vector<Point<long long>> hull = convex_hull(std::move(points));\n  \
-    \      fast_output << hull.size() << '\\n';\n        for (const auto& point :\
-    \ hull) {\n            fast_output << point.x << ' ' << point.y << '\\n';\n  \
-    \      }\n    }\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/static_convex_hull\"\n\n\
-    #include \"../../geometry/convex_hull.hpp\"\n\n#include \"../../utilities/fast_io.hpp\"\
-    \n#include <vector>\n\nint main() {\n    m1une::utilities::FastInput fast_input;\n\
-    \    m1une::utilities::FastOutput fast_output;\n\n    using namespace m1une::geometry;\n\
-    \    int test_count;\n    fast_input >> test_count;\n    while (test_count--)\
-    \ {\n        int size;\n        fast_input >> size;\n        std::vector<Point<long\
-    \ long>> points(size);\n        for (auto& point : points) fast_input >> point.x\
-    \ >> point.y;\n\n        std::vector<Point<long long>> hull = convex_hull(std::move(points));\n\
-    \        fast_output << hull.size() << '\\n';\n        for (const auto& point\
-    \ : hull) {\n            fast_output << point.x << ' ' << point.y << '\\n';\n\
-    \        }\n    }\n}\n"
+    \ utilities\n}  // namespace m1une\n\n\n#line 5 \"verify/math/primitive_root.test.cpp\"\
+    \n\n#line 7 \"verify/math/primitive_root.test.cpp\"\n\nint main() {\n    m1une::utilities::FastInput\
+    \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n\n    int query_count;\n\
+    \    fast_input >> query_count;\n    while (query_count--) {\n        std::uint64_t\
+    \ prime;\n        fast_input >> prime;\n        fast_output << m1une::math::primitive_root(prime)\
+    \ << '\\n';\n    }\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/primitive_root\"\n\n#include\
+    \ \"../../math/primitive_root.hpp\"\n#include \"../../utilities/fast_io.hpp\"\n\
+    \n#include <cstdint>\n\nint main() {\n    m1une::utilities::FastInput fast_input;\n\
+    \    m1une::utilities::FastOutput fast_output;\n\n    int query_count;\n    fast_input\
+    \ >> query_count;\n    while (query_count--) {\n        std::uint64_t prime;\n\
+    \        fast_input >> prime;\n        fast_output << m1une::math::primitive_root(prime)\
+    \ << '\\n';\n    }\n}\n"
   dependsOn:
-  - geometry/convex_hull.hpp
-  - geometry/point.hpp
+  - math/primitive_root.hpp
+  - math/prime_factorization.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
-  path: verify/geometry/convex_hull.test.cpp
+  path: verify/math/primitive_root.test.cpp
   requiredBy: []
   timestamp: '2026-07-21 21:50:16+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/geometry/convex_hull.test.cpp
+documentation_of: verify/math/primitive_root.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/geometry/convex_hull.test.cpp
-- /verify/verify/geometry/convex_hull.test.cpp.html
-title: verify/geometry/convex_hull.test.cpp
+- /verify/verify/math/primitive_root.test.cpp
+- /verify/verify/math/primitive_root.test.cpp.html
+title: verify/math/primitive_root.test.cpp
 ---

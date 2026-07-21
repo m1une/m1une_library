@@ -22,6 +22,9 @@ data:
     path: verify/graph/range_edge_graph.test.cpp
     title: verify/graph/range_edge_graph.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/jump_on_tree.test.cpp
+    title: verify/graph/tree/jump_on_tree.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/tree/tree_algorithms.test.cpp
     title: verify/graph/tree/tree_algorithms.test.cpp
   _isVerificationFailed: false
@@ -262,6 +265,7 @@ data:
   - verify/graph/cow_game.test.cpp
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/tree/tree_algorithms.test.cpp
+  - verify/graph/tree/jump_on_tree.test.cpp
 documentation_of: graph/tree/heavy_light_decomposition.hpp
 layout: document
 title: Heavy Light Decomposition

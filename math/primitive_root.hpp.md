@@ -21,6 +21,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/multivariate_convolution_truncated.test.cpp
     title: verify/math/multivariate_convolution_truncated.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/primitive_root.test.cpp
+    title: verify/math/primitive_root.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -146,6 +149,7 @@ data:
   timestamp: '2026-06-24 15:25:00+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/math/primitive_root.test.cpp
   - verify/math/math_algorithms.test.cpp
   - verify/math/multivariate_convolution_cyclic.test.cpp
   - verify/math/multivariate_convolution_truncated.test.cpp
