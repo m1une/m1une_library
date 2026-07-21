@@ -12,7 +12,9 @@ and chain-area queries efficiently.
 
 The free functions cover convexity testing, normalization, triangulation,
 diameter, half-plane cuts, intersection construction, Minkowski sums, and
-linear-time intersection and distance between two convex polygons.
+intersection and distance between two convex polygons. Pair queries have both
+linear-time vector overloads and sublinear overloads for already-normalized
+`ConvexPolygon<T>` objects.
 
 Polygons are represented by `std::vector<Point<T>>`. Their first point is not
 repeated at the end unless a function explicitly accepts and removes a closing
@@ -147,7 +149,23 @@ long double convex_polygons_distance(
     const std::vector<Point<T>>& second,
     long double eps = 1e-12L
 );
+
+template <Coordinate T>
+bool convex_polygons_intersect(
+    const ConvexPolygon<T>& first,
+    const ConvexPolygon<T>& second,
+    long double eps = 1e-12L
+);
+
+template <Coordinate T>
+long double convex_polygons_distance(
+    const ConvexPolygon<T>& first,
+    const ConvexPolygon<T>& second,
+    long double eps = 1e-12L
+);
 ```
+
+### Vector overloads
 
 | Function | Description | Complexity |
 | --- | --- | --- |
@@ -159,15 +177,47 @@ long double convex_polygons_distance(
 | `convex_polygons_intersect(first, second, eps)` | Tests whether two closed convex polygons intersect. | $O(N+M)$ |
 | `convex_polygons_distance(first, second, eps)` | Returns the minimum Euclidean distance between two closed convex polygons. | $O(N+M)$ |
 
+The $O(N+M)$ bounds in this table apply when `first` and `second` are
+`std::vector<Point<T>>`. Those overloads normalize the boundaries and
+materialize their Minkowski difference, so they also use $O(N+M)$ temporary
+memory.
+
+### Preprocessed pair-query overloads
+
+| Function | Description | Complexity |
+| --- | --- | --- |
+| `convex_polygons_intersect(first, second, eps)` | Tests whether two closed `ConvexPolygon<T>` objects intersect. | $O(\log(N+M)\log(\min(N,M)+1))$ time, $O(1)$ extra memory |
+| `convex_polygons_distance(first, second, eps)` | Returns the minimum Euclidean distance between two closed `ConvexPolygon<T>` objects. | $O(\log(N+M)\log(\min(N,M)+1))$ time, $O(1)$ extra memory |
+
+These bounds apply only when both arguments are `ConvexPolygon<T>` objects.
+Constructing those objects still costs $O(N+M)$ total time and memory. The
+overloads are therefore useful when the same polygons participate in multiple
+queries, or when the query objects already exist for other operations.
+
+The product of logarithms is intentional: the implementation performs
+$O(\log(N+M))$ searches on a virtual Minkowski-difference boundary, and one
+random access into that merged boundary costs
+$O(\log(\min(N,M)+1))$. It does not build or cache an $N+M$-vertex pairwise
+boundary. In particular, this complexity must not be read as
+$O(\log N+\log M)$.
+
+Here $N$ and $M$ are the numbers of vertices after each query object's
+normalization. Empty query objects are invalid; points and segments are
+supported. Both pair-query overloads treat the polygons as closed, so sharing
+a vertex or edge counts as intersection and makes the distance zero. `eps`
+controls geometric classification during the pair query; each object's
+constructor tolerance has already been applied during its normalization.
+
 `convex_cut` and `convex_polygon_intersection` return `Point<long double>`
 because new vertices may be non-integral. A cut boundary is directed and must
 contain two distinct points. Intersection construction requires two
 nondegenerate convex inputs; the resulting intersection itself may degenerate
 to a point or segment.
 
-Minkowski addition is also used for the linear-time intersection and distance
-queries. These three functions require nonempty inputs. Coordinate negation,
-addition, and edge differences must fit `T`.
+Minkowski addition is also used for the vector intersection and distance
+queries. `minkowski_sum`, those two vector queries, and both preprocessed
+pair-query overloads require nonempty inputs. Coordinate negation, addition,
+and edge differences must fit `T`.
 Cross products, dot products, squared distances, and areas must fit
 `wide_type<T>`.
 

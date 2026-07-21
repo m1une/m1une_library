@@ -133,6 +133,57 @@ void test_fixed() {
     collinear.emplace_back(2, 0);
     assert(is_convex_polygon(collinear));
     assert(!is_convex_polygon(collinear, true));
+
+    ConvexPolygon<long long> overlapping(square);
+    ConvexPolygon<long long> touching(std::vector<PointType>{
+        PointType(4, 1),
+        PointType(7, 1),
+        PointType(7, 3),
+        PointType(4, 3),
+    });
+    ConvexPolygon<long long> separate(std::vector<PointType>{
+        PointType(7, 1),
+        PointType(9, 1),
+        PointType(9, 3),
+        PointType(7, 3),
+    });
+    assert(convex_polygons_intersect(overlapping, touching));
+    assert(!convex_polygons_intersect(overlapping, separate));
+    assert(close(convex_polygons_distance(overlapping, touching), 0));
+    assert(close(convex_polygons_distance(overlapping, separate), 3));
+
+    ConvexPolygon<long long> point(std::vector<PointType>{PointType(2, 2)});
+    ConvexPolygon<long long> outside_point(
+        std::vector<PointType>{PointType(8, 2)}
+    );
+    ConvexPolygon<long long> segment(std::vector<PointType>{
+        PointType(4, 1),
+        PointType(7, 1),
+    });
+    assert(convex_polygons_intersect(overlapping, point));
+    assert(!convex_polygons_intersect(overlapping, outside_point));
+    assert(convex_polygons_intersect(overlapping, segment));
+    assert(close(convex_polygons_distance(overlapping, outside_point), 4));
+    assert(close(convex_polygons_distance(overlapping, segment), 0));
+
+    ConvexPolygon<long long> first_segment(std::vector<PointType>{
+        PointType(0, 0),
+        PointType(4, 0),
+    });
+    ConvexPolygon<long long> crossing_segment(std::vector<PointType>{
+        PointType(2, -2),
+        PointType(2, 2),
+    });
+    ConvexPolygon<long long> parallel_segment(std::vector<PointType>{
+        PointType(1, 3),
+        PointType(5, 3),
+    });
+    assert(convex_polygons_intersect(first_segment, crossing_segment));
+    assert(!convex_polygons_intersect(first_segment, parallel_segment));
+    assert(close(
+        convex_polygons_distance(first_segment, parallel_segment),
+        3
+    ));
 }
 
 void test_randomized() {
@@ -143,7 +194,7 @@ void test_randomized() {
         return state;
     };
 
-    for (int trial = 0; trial < 3000; ++trial) {
+    for (int trial = 0; trial < 5000; ++trial) {
         std::vector<PointType> first_points;
         std::vector<PointType> second_points;
         const int first_count = 3 + int(random() % 18);
@@ -163,10 +214,18 @@ void test_randomized() {
         std::vector<PointType> first = convex_hull(first_points);
         std::vector<PointType> second = convex_hull(second_points);
         if (first.size() < 3 || second.size() < 3) continue;
+        const PointType translation(
+            static_cast<long long>(random() % 101) - 50,
+            static_cast<long long>(random() % 101) - 50
+        );
+        for (PointType& point : second) point += translation;
 
         std::vector<PointType> input = first;
         if (random() % 2 != 0) std::reverse(input.begin(), input.end());
         ConvexPolygon<long long> polygon(input);
+        input = second;
+        if (random() % 2 != 0) std::reverse(input.begin(), input.end());
+        ConvexPolygon<long long> other(input);
         assert(
             polygon.vertices() ==
             normalize_convex_polygon(first)
@@ -240,6 +299,63 @@ void test_randomized() {
             convex_polygons_distance(first, second),
             distance(first, second)
         ));
+        assert(
+            convex_polygons_intersect(polygon, other) ==
+            intersects(first, second)
+        );
+        assert(
+            convex_polygons_intersect(other, polygon) ==
+            intersects(first, second)
+        );
+        assert(close(
+            convex_polygons_distance(polygon, other),
+            distance(first, second)
+        ));
+        assert(close(
+            convex_polygons_distance(other, polygon),
+            distance(first, second)
+        ));
+    }
+}
+
+void test_randomized_floating_pairs() {
+    using FloatingPoint = Point<long double>;
+    std::uint64_t state = 0xbb67ae8584caa73bULL;
+    auto random = [&state]() {
+        state ^= state << 7;
+        state ^= state >> 9;
+        return state;
+    };
+    constexpr long double pi = 3.141592653589793238462643383279L;
+
+    for (int trial = 0; trial < 1500; ++trial) {
+        const int size = 3 + int(random() % 40);
+        const long double phase =
+            2 * pi * static_cast<long double>(random() % 1000000) / 1000000;
+        const FloatingPoint translation(
+            static_cast<long double>(random() % 8001) / 100 - 40,
+            static_cast<long double>(random() % 8001) / 100 - 40
+        );
+        std::vector<FloatingPoint> first;
+        std::vector<FloatingPoint> second;
+        for (int index = 0; index < size; ++index) {
+            const long double angle = phase + 2 * pi * index / size;
+            first.emplace_back(13 * std::cos(angle), 7 * std::sin(angle));
+            second.emplace_back(
+                13 * std::cos(angle) + translation.x,
+                7 * std::sin(angle) + translation.y
+            );
+        }
+        ConvexPolygon<long double> first_query(first);
+        ConvexPolygon<long double> second_query(second);
+        assert(
+            convex_polygons_intersect(first_query, second_query) ==
+            convex_polygons_intersect(first, second)
+        );
+        assert(close(
+            convex_polygons_distance(first_query, second_query),
+            convex_polygons_distance(first, second)
+        ));
     }
 }
 
@@ -251,6 +367,7 @@ int main() {
 
     test_fixed();
     test_randomized();
+    test_randomized_floating_pairs();
 
     int size;
     fast_input >> size;

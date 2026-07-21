@@ -4,9 +4,12 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <cmath>
+#include <concepts>
 #include <cstddef>
 #include <deque>
 #include <limits>
+#include <numbers>
 #include <optional>
 #include <utility>
 #include <vector>
@@ -386,6 +389,360 @@ class ConvexPolygon {
     }
 };
 
+namespace convex_polygon_detail {
+
+template <Coordinate T>
+class MinkowskiDifferenceView {
+   private:
+    struct Cycle {
+        const ConvexPolygon<T>* polygon;
+        int start;
+        bool negate;
+
+        int edge_count() const {
+            return polygon->size() >= 2 ? polygon->size() : 0;
+        }
+
+        Point<T> point(int index) const {
+            const int size = polygon->size();
+            const Point<T>& result = (*polygon)[(start + index) % size];
+            return negate ? -result : result;
+        }
+
+        Point<T> edge(int index) const {
+            return point((index + 1) % polygon->size()) - point(index);
+        }
+    };
+
+    Cycle first;
+    Cycle second;
+
+    static int direction_half(const Point<T>& direction) {
+        return
+            direction.y > 0 ||
+            (direction.y == 0 && direction.x >= 0)
+            ? 0
+            : 1;
+    }
+
+    static bool entry_less(
+        const Point<T>& left,
+        int left_cycle,
+        const Point<T>& right,
+        int right_cycle
+    ) {
+        if constexpr (std::floating_point<T>) {
+            long double left_angle = std::atan2(
+                static_cast<long double>(left.y),
+                static_cast<long double>(left.x)
+            );
+            long double right_angle = std::atan2(
+                static_cast<long double>(right.y),
+                static_cast<long double>(right.x)
+            );
+            if (left_angle < 0) {
+                left_angle += 2 * std::numbers::pi_v<long double>;
+            }
+            if (right_angle < 0) {
+                right_angle += 2 * std::numbers::pi_v<long double>;
+            }
+            if (left_angle != right_angle) return left_angle < right_angle;
+            return left_cycle < right_cycle;
+        }
+        const int left_half = direction_half(left);
+        const int right_half = direction_half(right);
+        if (left_half != right_half) return left_half < right_half;
+        const auto turn = cross(left, right);
+        if (turn != 0) return turn > 0;
+        return left_cycle < right_cycle;
+    }
+
+    static int negated_start(const ConvexPolygon<T>& polygon) {
+        if (polygon.size() <= 1) return 0;
+        int result = polygon.max_dot(Point<T>(0, 1)).second;
+        const int previous = result == 0 ? polygon.size() - 1 : result - 1;
+        const int next = result + 1 == polygon.size() ? 0 : result + 1;
+        for (const int candidate : {previous, next}) {
+            if (
+                polygon[candidate].y == polygon[result].y &&
+                polygon[candidate].x > polygon[result].x
+            ) {
+                result = candidate;
+            }
+        }
+        return result;
+    }
+
+   public:
+    MinkowskiDifferenceView(
+        const ConvexPolygon<T>& minuend,
+        const ConvexPolygon<T>& subtrahend
+    )
+        : first{&minuend, 0, false},
+          second{&subtrahend, negated_start(subtrahend), true} {
+        assert(!minuend.empty());
+        assert(!subtrahend.empty());
+    }
+
+    int size() const {
+        const int edge_count =
+            first.edge_count() + second.edge_count();
+        return edge_count == 0 ? 1 : edge_count;
+    }
+
+    Point<T> operator[](int rank) const {
+        assert(0 <= rank && rank < size());
+        const int first_size = first.edge_count();
+        const int second_size = second.edge_count();
+        if (first_size + second_size == 0) {
+            return first.point(0) + second.point(0);
+        }
+
+        int low = std::max(0, rank - second_size);
+        int high = std::min(rank, first_size);
+        while (low <= high) {
+            const int first_prefix = (low + high) / 2;
+            const int second_prefix = rank - first_prefix;
+            if (
+                first_prefix > 0 &&
+                second_prefix < second_size &&
+                entry_less(
+                    second.edge(second_prefix),
+                    1,
+                    first.edge(first_prefix - 1),
+                    0
+                )
+            ) {
+                high = first_prefix - 1;
+                continue;
+            }
+            if (
+                second_prefix > 0 &&
+                first_prefix < first_size &&
+                entry_less(
+                    first.edge(first_prefix),
+                    0,
+                    second.edge(second_prefix - 1),
+                    1
+                )
+            ) {
+                low = first_prefix + 1;
+                continue;
+            }
+            return
+                first.point(first_prefix % first.polygon->size()) +
+                second.point(second_prefix % second.polygon->size());
+        }
+        assert(false);
+        return Point<T>();
+    }
+};
+
+struct OriginLocation {
+    PointInPolygon location;
+    int outside_edge;
+};
+
+template <Coordinate T, class Polygon>
+OriginLocation locate_origin(
+    const Polygon& polygon,
+    long double eps
+) {
+    const int size = polygon.size();
+    assert(size >= 3);
+    const Point<T> origin;
+    const Point<T> base = polygon[0];
+    int first = 1;
+    if (
+        size >= 4 &&
+        orientation(base, polygon[1], polygon[2], eps) == 0 &&
+        dot(polygon[1] - base, polygon[2] - polygon[1]) > 0
+    ) {
+        first = 2;
+    }
+    const int last = size - 1;
+
+    const int first_side = orientation(base, polygon[first], origin, eps);
+    const int last_side = orientation(base, polygon[last], origin, eps);
+    if (first_side < 0) {
+        return OriginLocation{PointInPolygon::Outside, 0};
+    }
+    if (last_side > 0) {
+        return OriginLocation{PointInPolygon::Outside, last};
+    }
+    if (first_side == 0) {
+        if (on_segment(Segment<T>{base, polygon[first]}, origin, eps)) {
+            return OriginLocation{PointInPolygon::Boundary, -1};
+        }
+        return OriginLocation{PointInPolygon::Outside, first};
+    }
+    if (last_side == 0) {
+        if (on_segment(Segment<T>{base, polygon[last]}, origin, eps)) {
+            return OriginLocation{PointInPolygon::Boundary, -1};
+        }
+        return OriginLocation{PointInPolygon::Outside, last - 1};
+    }
+
+    int left = first;
+    int right = last;
+    while (right - left >= 2) {
+        const int middle = (left + right) / 2;
+        if (orientation(base, polygon[middle], origin, eps) >= 0) {
+            left = middle;
+        } else {
+            right = middle;
+        }
+    }
+    const int side = orientation(polygon[left], polygon[right], origin, eps);
+    if (side < 0) {
+        return OriginLocation{PointInPolygon::Outside, left};
+    }
+    if (side == 0) {
+        return OriginLocation{
+            on_segment(
+                Segment<T>{polygon[left], polygon[right]},
+                origin,
+                eps
+            )
+                ? PointInPolygon::Boundary
+                : PointInPolygon::Outside,
+            left,
+        };
+    }
+    return OriginLocation{PointInPolygon::Inside, -1};
+}
+
+template <class Compare>
+int periodic_best(int size, Compare better) {
+    int left = 0;
+    int middle = size;
+    int right = 2 * size;
+    while (right - left > 2) {
+        const int left_middle = (left + middle) / 2;
+        const int right_middle = (middle + right + 1) / 2;
+        if (better(left_middle % size, middle % size)) {
+            right = middle;
+            middle = left_middle;
+        } else if (better(right_middle % size, middle % size)) {
+            left = middle;
+            middle = right_middle;
+        } else {
+            left = left_middle;
+            right = right_middle;
+        }
+    }
+    return middle % size;
+}
+
+template <Coordinate T, class Polygon>
+std::pair<int, int> tangent_vertices_from_origin(
+    const Polygon& polygon,
+    long double eps
+) {
+    const int size = polygon.size();
+    const Point<T> origin;
+    int first = periodic_best(size, [&](int left, int right) {
+        return orientation(origin, polygon[left], polygon[right], eps) < 0;
+    });
+    int second = periodic_best(size, [&](int left, int right) {
+        return orientation(origin, polygon[left], polygon[right], eps) > 0;
+    });
+    const int previous = first == 0 ? size - 1 : first - 1;
+    if (orientation(origin, polygon[first], polygon[previous], eps) == 0) {
+        first = previous;
+    }
+    const int next = second + 1 == size ? 0 : second + 1;
+    if (orientation(origin, polygon[second], polygon[next], eps) == 0) {
+        second = next;
+    }
+    return std::pair<int, int>(first, second);
+}
+
+template <Coordinate T, class Polygon>
+long double distance_from_origin(
+    const Polygon& polygon,
+    long double eps
+) {
+    const int size = polygon.size();
+    assert(size >= 3);
+    const Point<T> origin;
+    const OriginLocation location = locate_origin<T>(polygon, eps);
+    if (location.location != PointInPolygon::Outside) return 0;
+
+    const auto tangents = tangent_vertices_from_origin<T>(polygon, eps);
+    auto visible = [&](int index) {
+        return orientation(
+            polygon[index],
+            polygon[(index + 1) % size],
+            origin,
+            eps
+        ) < 0;
+    };
+    auto forward_edges = [&](int start, int finish) {
+        return finish >= start ? finish - start : finish + size - start;
+    };
+
+    int witness = location.outside_edge;
+    if (!visible(witness)) {
+        const int previous = witness == 0 ? size - 1 : witness - 1;
+        const int next = witness + 1 == size ? 0 : witness + 1;
+        if (visible(previous)) {
+            witness = previous;
+        } else if (visible(next)) {
+            witness = next;
+        }
+    }
+
+    int start = tangents.first;
+    int finish = tangents.second;
+    if (forward_edges(start, witness) >= forward_edges(start, finish)) {
+        std::swap(start, finish);
+    }
+    int edge_count = forward_edges(start, finish);
+    if (edge_count == 0) {
+        start = location.outside_edge;
+        finish = (start + 1) % size;
+        edge_count = 1;
+    }
+
+    auto vertex = [&](int offset) {
+        return polygon[(start + offset) % size];
+    };
+    int left = 0;
+    int right = edge_count;
+    while (left < right) {
+        const int middle = (left + right) / 2;
+        if (norm2(vertex(middle)) <= norm2(vertex(middle + 1))) {
+            right = middle;
+        } else {
+            left = middle + 1;
+        }
+    }
+
+    long double result = norm(vertex(left));
+    if (left > 0) {
+        result = std::min(
+            result,
+            distance(
+                Segment<T>{vertex(left - 1), vertex(left)},
+                origin
+            )
+        );
+    }
+    if (left < edge_count) {
+        result = std::min(
+            result,
+            distance(
+                Segment<T>{vertex(left), vertex(left + 1)},
+                origin
+            )
+        );
+    }
+    return result;
+}
+
+}  // namespace convex_polygon_detail
+
 template <Coordinate T>
 std::vector<std::array<Point<T>, 3>> triangulate_convex_polygon(
     std::vector<Point<T>> polygon,
@@ -554,6 +911,48 @@ std::vector<Point<T>> minkowski_sum(
 
 template <Coordinate T>
 bool convex_polygons_intersect(
+    const ConvexPolygon<T>& first,
+    const ConvexPolygon<T>& second,
+    long double eps = 1e-12L
+) {
+    assert(!first.empty());
+    assert(!second.empty());
+    if (first.size() <= 2 && second.size() <= 2) {
+        if (first.size() == 1 && second.size() == 1) {
+            return distance(first[0], second[0]) <= eps;
+        }
+        if (first.size() == 1) {
+            return on_segment(
+                Segment<T>{second[0], second[1]},
+                first[0],
+                eps
+            );
+        }
+        if (second.size() == 1) {
+            return on_segment(
+                Segment<T>{first[0], first[1]},
+                second[0],
+                eps
+            );
+        }
+        return intersects(
+            Segment<T>{first[0], first[1]},
+            Segment<T>{second[0], second[1]},
+            eps
+        );
+    }
+
+    const convex_polygon_detail::MinkowskiDifferenceView<T> difference(
+        first,
+        second
+    );
+    return
+        convex_polygon_detail::locate_origin<T>(difference, eps).location !=
+        PointInPolygon::Outside;
+}
+
+template <Coordinate T>
+bool convex_polygons_intersect(
     const std::vector<Point<T>>& first,
     const std::vector<Point<T>>& second,
     long double eps = 1e-12L
@@ -568,6 +967,44 @@ bool convex_polygons_intersect(
     return
         point_in_convex_polygon(difference, Point<T>(), eps) !=
         PointInPolygon::Outside;
+}
+
+template <Coordinate T>
+long double convex_polygons_distance(
+    const ConvexPolygon<T>& first,
+    const ConvexPolygon<T>& second,
+    long double eps = 1e-12L
+) {
+    assert(!first.empty());
+    assert(!second.empty());
+    if (first.size() <= 2 && second.size() <= 2) {
+        if (convex_polygons_intersect(first, second, eps)) return 0;
+        if (first.size() == 1 && second.size() == 1) {
+            return distance(first[0], second[0]);
+        }
+        if (first.size() == 1) {
+            return distance(
+                Segment<T>{second[0], second[1]},
+                first[0]
+            );
+        }
+        if (second.size() == 1) {
+            return distance(
+                Segment<T>{first[0], first[1]},
+                second[0]
+            );
+        }
+        return distance(
+            Segment<T>{first[0], first[1]},
+            Segment<T>{second[0], second[1]}
+        );
+    }
+
+    const convex_polygon_detail::MinkowskiDifferenceView<T> difference(
+        first,
+        second
+    );
+    return convex_polygon_detail::distance_from_origin<T>(difference, eps);
 }
 
 template <Coordinate T>
