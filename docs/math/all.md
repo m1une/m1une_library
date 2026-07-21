@@ -24,6 +24,8 @@ You usually do not need to include this entire bundle:
   digit sequences.
 * Use `bitwise_convolution.hpp` for OR, AND, or XOR convolution over mask
   indices.
+* Use `divisor_convolution.hpp` for GCD or LCM convolution over positive
+  integer indices.
 * Use `subset_convolution.hpp` to combine values indexed by disjoint submasks.
 * Use `set_power_series.hpp` for inverse, division, exponential, logarithm,
   integer powers, and normalized square roots under subset convolution.
@@ -103,6 +105,7 @@ few unused headers do not matter.
 | `math/combinatorial_sequences.hpp` | Fast standard counting sequences and special numbers. |
 | `math/cyclotomic_polynomial.hpp` | Integer coefficients of cyclotomic polynomials. |
 | `math/discrete_logarithm.hpp` | Extended baby-step--giant-step for discrete logarithms modulo any positive integer. |
+| `math/divisor_convolution.hpp` | GCD and LCM convolutions over positive integer indices. |
 | `math/generalized_floor_sum.hpp` | Polynomial moments of a linear floor sequence using monoid floor sum. |
 | `math/number_theory.hpp` | Extended GCD, modular power and inverse, CRT, and floor sum. |
 | `math/partition_function.hpp` | Integer partition numbers via Euler's pentagonal theorem and FPS inversion. |
