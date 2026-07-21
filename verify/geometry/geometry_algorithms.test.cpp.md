@@ -23,6 +23,9 @@ data:
     path: geometry/convex_layers.hpp
     title: Convex Layers
   - icon: ':heavy_check_mark:'
+    path: geometry/count_points_in_triangle.hpp
+    title: Count Points in Triangle
+  - icon: ':heavy_check_mark:'
     path: geometry/euclidean_mst.hpp
     title: Euclidean Minimum Spanning Tree
   - icon: ':heavy_check_mark:'
@@ -181,6 +184,7 @@ data:
   - geometry/closest_pair.hpp
   - geometry/convex_hull.hpp
   - geometry/convex_layers.hpp
+  - geometry/count_points_in_triangle.hpp
   - geometry/euclidean_mst.hpp
   - ds/dsu/dsu.hpp
   - geometry/farthest_pair.hpp
@@ -199,7 +203,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/geometry_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-19 00:22:56+09:00'
+  timestamp: '2026-07-22 00:39:59+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/geometry_algorithms.test.cpp

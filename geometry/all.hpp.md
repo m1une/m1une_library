@@ -20,6 +20,9 @@ data:
     path: geometry/convex_layers.hpp
     title: Convex Layers
   - icon: ':heavy_check_mark:'
+    path: geometry/count_points_in_triangle.hpp
+    title: Count Points in Triangle
+  - icon: ':heavy_check_mark:'
     path: geometry/euclidean_mst.hpp
     title: Euclidean Minimum Spanning Tree
   - icon: ':heavy_check_mark:'
@@ -104,6 +107,8 @@ data:
 
     #include "convex_layers.hpp"
 
+    #include "count_points_in_triangle.hpp"
+
     #include "euclidean_mst.hpp"
 
     #include "farthest_pair.hpp"
@@ -141,6 +146,7 @@ data:
   - geometry/closest_pair.hpp
   - geometry/convex_hull.hpp
   - geometry/convex_layers.hpp
+  - geometry/count_points_in_triangle.hpp
   - geometry/euclidean_mst.hpp
   - ds/dsu/dsu.hpp
   - geometry/farthest_pair.hpp
@@ -158,7 +164,7 @@ data:
   isVerificationFile: false
   path: geometry/all.hpp
   requiredBy: []
-  timestamp: '2026-07-19 00:22:56+09:00'
+  timestamp: '2026-07-22 00:39:59+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp
@@ -180,6 +186,7 @@ title: Geometry Bundle
 | `geometry/closest_pair.hpp` | Euclidean closest pair with original indices in $O(N\log N)$. |
 | `geometry/convex_hull.hpp` | Monotone-chain convex hull with optional boundary-collinear points. |
 | `geometry/convex_layers.hpp` | Onion decomposition into successive convex-hull boundaries in $O(N\log^2 N)$. |
+| `geometry/count_points_in_triangle.hpp` | Preprocessed strict point counts for indexed triangle queries in $O(1)$ per query. |
 | `geometry/euclidean_mst.hpp` | Euclidean minimum spanning tree for integral points in $O(N\log N)$. |
 | `geometry/farthest_pair.hpp` | Euclidean farthest pair with original indices in $O(N\log N)$. |
 | `geometry/half_plane_intersection.hpp` | Bounded intersection polygon of directed closed half-planes in $O(N\log N)$. |

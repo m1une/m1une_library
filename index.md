@@ -519,6 +519,9 @@ data:
       path: geometry/convex_layers.hpp
       title: Convex Layers
     - icon: ':heavy_check_mark:'
+      path: geometry/count_points_in_triangle.hpp
+      title: Count Points in Triangle
+    - icon: ':heavy_check_mark:'
       path: geometry/euclidean_mst.hpp
       title: Euclidean Minimum Spanning Tree
     - icon: ':heavy_check_mark:'
@@ -1621,6 +1624,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/geometry/convex_layers.test.cpp
       title: verify/geometry/convex_layers.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/geometry/count_points_in_triangle.test.cpp
+      title: verify/geometry/count_points_in_triangle.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/geometry/euclidean_mst.test.cpp
       title: verify/geometry/euclidean_mst.test.cpp

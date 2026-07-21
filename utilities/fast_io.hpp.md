@@ -364,6 +364,9 @@ data:
     path: verify/geometry/convex_layers.test.cpp
     title: verify/geometry/convex_layers.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/count_points_in_triangle.test.cpp
+    title: verify/geometry/count_points_in_triangle.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/euclidean_mst.test.cpp
     title: verify/geometry/euclidean_mst.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1802,6 +1805,7 @@ data:
   - verify/geometry/point_in_polygon.test.cpp
   - verify/geometry/rectangle_union_area.test.cpp
   - verify/geometry/euclidean_mst.test.cpp
+  - verify/geometry/count_points_in_triangle.test.cpp
   - verify/geometry/convex_layers.test.cpp
   - verify/geometry/farthest_pair.test.cpp
   - verify/geometry/lattice_point_count.test.cpp
