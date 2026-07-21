@@ -1,17 +1,20 @@
-#ifndef M1UNE_DS_RANGE_QUERY_STATIC_RANGE_MAJORITY_HPP
-#define M1UNE_DS_RANGE_QUERY_STATIC_RANGE_MAJORITY_HPP 1
+#ifndef M1UNE_DS_RANGE_QUERY_RANGE_MAJORITY_HPP
+#define M1UNE_DS_RANGE_QUERY_RANGE_MAJORITY_HPP 1
 
-#include <algorithm>
+#include "../bst/ordered_set.hpp"
+
 #include <cassert>
+#include <map>
 #include <optional>
+#include <utility>
 #include <vector>
 
 namespace m1une {
 namespace ds {
 
-// Static strict-majority queries in O(log N) time.
+// Strict-majority queries and point assignments in O(log N) time.
 template <class T>
-struct StaticRangeMajority {
+struct RangeMajority {
     using result_type = std::optional<T>;
 
    private:
@@ -23,8 +26,20 @@ struct StaticRangeMajority {
     int _n;
     int _tree_size;
     std::vector<T> _values;
-    std::vector<std::vector<int>> _positions;
+    std::map<T, int> _ranks;
+    std::vector<int> _current;
+    std::vector<OrderedSet<int>> _positions;
     std::vector<Vote> _tree;
+
+    int register_value(T value) {
+        int rank = int(_values.size());
+        auto [iterator, inserted] = _ranks.emplace(std::move(value), rank);
+        if (inserted) {
+            _values.push_back(iterator->first);
+            _positions.emplace_back();
+        }
+        return iterator->second;
+    }
 
     static Vote combine(Vote first, Vote second) {
         if (first.balance == 0) return second;
@@ -56,26 +71,20 @@ struct StaticRangeMajority {
     }
 
    public:
-    StaticRangeMajority() : _n(0), _tree_size(1), _tree(2) {}
+    RangeMajority() : _n(0), _tree_size(1), _tree(2) {}
 
-    explicit StaticRangeMajority(const std::vector<T>& values)
-        : _n(int(values.size())), _tree_size(1), _values(values) {
-        std::sort(_values.begin(), _values.end());
-        _values.erase(
-            std::unique(_values.begin(), _values.end()),
-            _values.end()
-        );
-        _positions.resize(_values.size());
-
+    explicit RangeMajority(const std::vector<T>& values)
+        : _n(int(values.size())),
+          _tree_size(1),
+          _current(values.size()) {
+        _values.reserve(values.size());
+        _positions.reserve(values.size());
         while (_tree_size < _n) _tree_size <<= 1;
         _tree.assign(2 * _tree_size, Vote());
         for (int index = 0; index < _n; index++) {
-            int rank = int(
-                std::lower_bound(
-                    _values.begin(), _values.end(), values[index]
-                ) - _values.begin()
-            );
-            _positions[rank].push_back(index);
+            int rank = register_value(values[index]);
+            _current[index] = rank;
+            _positions[rank].insert(index);
             _tree[_tree_size + index] = Vote{rank, 1};
         }
         for (int node = _tree_size - 1; node > 0; node--) {
@@ -91,6 +100,26 @@ struct StaticRangeMajority {
         return _n == 0;
     }
 
+    // Assigns value to one position. Previously unseen values are supported.
+    void set(int index, T value) {
+        assert(0 <= index && index < _n);
+        int rank = register_value(std::move(value));
+        int previous_rank = _current[index];
+        if (rank == previous_rank) return;
+
+        [[maybe_unused]] bool erased =
+            _positions[previous_rank].erase(index);
+        [[maybe_unused]] bool inserted = _positions[rank].insert(index);
+        assert(erased && inserted);
+        _current[index] = rank;
+
+        int node = _tree_size + index;
+        _tree[node] = Vote{rank, 1};
+        while ((node >>= 1) != 0) {
+            _tree[node] = combine(_tree[node << 1], _tree[(node << 1) | 1]);
+        }
+    }
+
     // Returns the unique value occurring more than half the time in
     // [left, right), or nullopt when no such value exists.
     result_type query(int left, int right) const {
@@ -98,11 +127,9 @@ struct StaticRangeMajority {
         Vote vote = range_vote(left, right);
         if (vote.balance == 0) return std::nullopt;
 
-        const std::vector<int>& positions = _positions[vote.candidate];
-        int frequency = int(
-            std::lower_bound(positions.begin(), positions.end(), right)
-            - std::lower_bound(positions.begin(), positions.end(), left)
-        );
+        const OrderedSet<int>& positions = _positions[vote.candidate];
+        int frequency =
+            positions.order_of_key(right) - positions.order_of_key(left);
         if (2LL * frequency <= right - left) return std::nullopt;
         return _values[vote.candidate];
     }
@@ -115,4 +142,4 @@ struct StaticRangeMajority {
 }  // namespace ds
 }  // namespace m1une
 
-#endif  // M1UNE_DS_RANGE_QUERY_STATIC_RANGE_MAJORITY_HPP
+#endif  // M1UNE_DS_RANGE_QUERY_RANGE_MAJORITY_HPP

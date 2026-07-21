@@ -9,7 +9,7 @@ one-shot sequence computations such as LIS are in `algo/sequence/`.
 | --- | --- |
 | [`dsu/`](dsu/) | Ordinary, rollback, aggregate, potentialized, persistent, partially persistent, and range-parallel union-find variants |
 | [`segtree/`](segtree/) | Dense, dynamic, lazy, dual, generic Beats, specialized chmin/chmax/add, and persistent variants, including `segtree_2d.hpp` and `dual_segtree_2d.hpp` |
-| [`range_query/`](range_query/) | Repeated range-query objects: cumulative sums, Fenwick trees, SWAG, static and offline rectangle sums, offline-registered point-update order statistics, static inversions/LIS/modes/majorities, sqrt and merge-sort trees, and range-sort range-product queries |
+| [`range_query/`](range_query/) | Repeated range-query objects: cumulative sums, Fenwick trees, SWAG, static and offline rectangle sums, offline-registered point-update order statistics, static inversions/LIS/modes, point-updatable majorities in `range_majority.hpp`, sqrt and merge-sort trees, and range-sort range-product queries |
 | [`wavelet_matrix/`](wavelet_matrix/) | `wavelet_matrix.hpp`, `dynamic_wavelet_matrix.hpp`, weighted `wavelet_matrix_sum.hpp` and update-optimized `dynamic_wavelet_matrix_sum.hpp` with configurable key width, plus `wavelet_matrix_2d.hpp` for multidimensional orthogonal queries |
 | [`dynamic_array/`](dynamic_array/) | Dynamic and persistent implicit-treap arrays, with optional monoid or lazy aggregation |
 | [`bst/`](bst/) | Weight-balanced ordered sets and multisets, a fixed-universe predecessor set, and persistent red-black-tree variants with split and merge |
