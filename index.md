@@ -806,6 +806,9 @@ data:
       path: math/discrete_logarithm.hpp
       title: Discrete Logarithm
     - icon: ':heavy_check_mark:'
+      path: math/divisor_convolution.hpp
+      title: Divisor Convolution
+    - icon: ':heavy_check_mark:'
       path: math/generalized_floor_sum.hpp
       title: Generalized Floor Sum
     - icon: ':heavy_check_mark:'
@@ -1876,6 +1879,9 @@ data:
       path: verify/math/discrete_logarithm.test.cpp
       title: verify/math/discrete_logarithm.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/math/divisor_convolution.test.cpp
+      title: verify/math/divisor_convolution.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/math/enumerate_primes.test.cpp
       title: verify/math/enumerate_primes.test.cpp
     - icon: ':heavy_check_mark:'
@@ -1896,6 +1902,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/integer_arithmetic.test.cpp
       title: verify/math/integer_arithmetic.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/lcm_convolution.test.cpp
+      title: verify/math/lcm_convolution.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/lucas.test.cpp
       title: verify/math/lucas.test.cpp

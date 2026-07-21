@@ -29,6 +29,9 @@ data:
     path: math/discrete_logarithm.hpp
     title: Discrete Logarithm
   - icon: ':heavy_check_mark:'
+    path: math/divisor_convolution.hpp
+    title: Divisor Convolution
+  - icon: ':heavy_check_mark:'
     path: math/fps/all.hpp
     title: Formal Power Series All
   - icon: ':heavy_check_mark:'
@@ -1626,17 +1629,34 @@ data:
     \    }\n\n    auto remaining = internal::discrete_logarithm_coprime(\n       \
     \ coefficient, base % mod, target, mod);\n    if (!remaining.has_value()) return\
     \ std::nullopt;\n    return offset + *remaining;\n}\n\n}  // namespace math\n\
-    }  // namespace m1une\n\n\n#line 1 \"math/generalized_floor_sum.hpp\"\n\n\n\n\
-    #line 9 \"math/generalized_floor_sum.hpp\"\n\nnamespace m1une {\nnamespace math\
-    \ {\n\ntemplate <class T, int MaxPower, int MaxFloorPower>\nusing GeneralizedFloorSumTable\
-    \ =\n    std::array<std::array<T, MaxFloorPower + 1>, MaxPower + 1>;\n\nnamespace\
-    \ generalized_floor_sum_detail {\n\nusing SignedWide = __int128_t;\nusing UnsignedWide\
-    \ = __uint128_t;\n\ntemplate <class T>\nT from_wide(SignedWide value) {\n    bool\
-    \ negative = value < 0;\n    UnsignedWide magnitude;\n    if (negative) {\n  \
-    \      magnitude = static_cast<UnsignedWide>(-(value + 1));\n        ++magnitude;\n\
-    \    } else {\n        magnitude = static_cast<UnsignedWide>(value);\n    }\n\n\
-    \    T result = T();\n    T binary_place = T(1);\n    while (magnitude > 0) {\n\
-    \        if ((magnitude & 1) != 0) result += binary_place;\n        magnitude\
+    }  // namespace m1une\n\n\n#line 1 \"math/divisor_convolution.hpp\"\n\n\n\n#line\
+    \ 6 \"math/divisor_convolution.hpp\"\n\n#line 8 \"math/divisor_convolution.hpp\"\
+    \n\nnamespace m1une {\nnamespace math {\n\ntemplate <typename T>\nstd::vector<T>\
+    \ gcd_convolution(\n    std::vector<T> first,\n    std::vector<T> second\n) {\n\
+    \    if (first.empty() || second.empty()) return {};\n    const std::size_t size\
+    \ = first.size() > second.size()\n        ? first.size()\n        : second.size();\n\
+    \    first.resize(size);\n    second.resize(size);\n    first[0] = T{};\n    second[0]\
+    \ = T{};\n\n    multiple_zeta_transform(first);\n    multiple_zeta_transform(second);\n\
+    \    for (std::size_t index = 1; index < size; ++index) {\n        first[index]\
+    \ *= second[index];\n    }\n    multiple_mobius_transform(first);\n    return\
+    \ first;\n}\n\ntemplate <typename T>\nstd::vector<T> lcm_convolution(\n    std::vector<T>\
+    \ first,\n    std::vector<T> second\n) {\n    if (first.empty() || second.empty())\
+    \ return {};\n    const std::size_t size = first.size() > second.size()\n    \
+    \    ? first.size()\n        : second.size();\n    first.resize(size);\n    second.resize(size);\n\
+    \    first[0] = T{};\n    second[0] = T{};\n\n    divisor_zeta_transform(first);\n\
+    \    divisor_zeta_transform(second);\n    for (std::size_t index = 1; index <\
+    \ size; ++index) {\n        first[index] *= second[index];\n    }\n    divisor_mobius_transform(first);\n\
+    \    return first;\n}\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line\
+    \ 1 \"math/generalized_floor_sum.hpp\"\n\n\n\n#line 9 \"math/generalized_floor_sum.hpp\"\
+    \n\nnamespace m1une {\nnamespace math {\n\ntemplate <class T, int MaxPower, int\
+    \ MaxFloorPower>\nusing GeneralizedFloorSumTable =\n    std::array<std::array<T,\
+    \ MaxFloorPower + 1>, MaxPower + 1>;\n\nnamespace generalized_floor_sum_detail\
+    \ {\n\nusing SignedWide = __int128_t;\nusing UnsignedWide = __uint128_t;\n\ntemplate\
+    \ <class T>\nT from_wide(SignedWide value) {\n    bool negative = value < 0;\n\
+    \    UnsignedWide magnitude;\n    if (negative) {\n        magnitude = static_cast<UnsignedWide>(-(value\
+    \ + 1));\n        ++magnitude;\n    } else {\n        magnitude = static_cast<UnsignedWide>(value);\n\
+    \    }\n\n    T result = T();\n    T binary_place = T(1);\n    while (magnitude\
+    \ > 0) {\n        if ((magnitude & 1) != 0) result += binary_place;\n        magnitude\
     \ >>= 1;\n        if (magnitude > 0) binary_place += binary_place;\n    }\n  \
     \  return negative ? T() - result : result;\n}\n\ninline SignedWide floor_div(SignedWide\
     \ numerator, SignedWide denominator) {\n    assert(denominator > 0);\n    SignedWide\
@@ -4308,7 +4328,7 @@ data:
     \        for (UInt value : basis_) {\n            if (value != 0) result.push_back(value);\n\
     \        }\n        return result;\n    }\n\nprivate:\n    std::array<UInt, bit_width>\
     \ basis_{};\n    int rank_ = 0;\n};\n\n}  // namespace math\n}  // namespace m1une\n\
-    \n\n#line 41 \"math/all.hpp\"\n\n\n"
+    \n\n#line 42 \"math/all.hpp\"\n\n\n"
   code: '#ifndef M1UNE_MATH_ALL_HPP
 
     #define M1UNE_MATH_ALL_HPP 1
@@ -4331,6 +4351,8 @@ data:
     #include "cyclotomic_polynomial.hpp"
 
     #include "discrete_logarithm.hpp"
+
+    #include "divisor_convolution.hpp"
 
     #include "generalized_floor_sum.hpp"
 
@@ -4411,6 +4433,7 @@ data:
   - math/cyclotomic_polynomial.hpp
   - math/prime_factorization.hpp
   - math/discrete_logarithm.hpp
+  - math/divisor_convolution.hpp
   - math/generalized_floor_sum.hpp
   - math/integer_arithmetic.hpp
   - math/lucas.hpp
@@ -4461,7 +4484,7 @@ data:
   isVerificationFile: false
   path: math/all.hpp
   requiredBy: []
-  timestamp: '2026-07-18 19:37:21+09:00'
+  timestamp: '2026-07-21 23:59:08+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
@@ -4491,6 +4514,8 @@ You usually do not need to include this entire bundle:
   digit sequences.
 * Use `bitwise_convolution.hpp` for OR, AND, or XOR convolution over mask
   indices.
+* Use `divisor_convolution.hpp` for GCD or LCM convolution over positive
+  integer indices.
 * Use `subset_convolution.hpp` to combine values indexed by disjoint submasks.
 * Use `set_power_series.hpp` for inverse, division, exponential, logarithm,
   integer powers, and normalized square roots under subset convolution.
@@ -4570,6 +4595,7 @@ few unused headers do not matter.
 | `math/combinatorial_sequences.hpp` | Fast standard counting sequences and special numbers. |
 | `math/cyclotomic_polynomial.hpp` | Integer coefficients of cyclotomic polynomials. |
 | `math/discrete_logarithm.hpp` | Extended baby-step--giant-step for discrete logarithms modulo any positive integer. |
+| `math/divisor_convolution.hpp` | GCD and LCM convolutions over positive integer indices. |
 | `math/generalized_floor_sum.hpp` | Polynomial moments of a linear floor sequence using monoid floor sum. |
 | `math/number_theory.hpp` | Extended GCD, modular power and inverse, CRT, and floor sum. |
 | `math/partition_function.hpp` | Integer partition numbers via Euler's pentagonal theorem and FPS inversion. |

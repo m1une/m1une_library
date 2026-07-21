@@ -8,6 +8,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/bitwise_convolution.hpp
     title: Bitwise Convolution
+  - icon: ':heavy_check_mark:'
+    path: math/divisor_convolution.hpp
+    title: Divisor Convolution
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/math/bitwise_and_convolution.test.cpp
@@ -15,6 +18,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/bitwise_convolution.test.cpp
     title: verify/math/bitwise_convolution.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/divisor_convolution.test.cpp
+    title: verify/math/divisor_convolution.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/lcm_convolution.test.cpp
+    title: verify/math/lcm_convolution.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
@@ -154,12 +163,15 @@ data:
   requiredBy:
   - math/bitwise_convolution.hpp
   - math/all.hpp
+  - math/divisor_convolution.hpp
   timestamp: '2026-06-22 22:56:44+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
   - verify/math/zeta_mobius_transform.test.cpp
   - verify/math/bitwise_and_convolution.test.cpp
+  - verify/math/lcm_convolution.test.cpp
+  - verify/math/divisor_convolution.test.cpp
   - verify/math/bitwise_convolution.test.cpp
 documentation_of: math/zeta_mobius_transform.hpp
 layout: document

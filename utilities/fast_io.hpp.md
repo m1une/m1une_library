@@ -613,6 +613,9 @@ data:
     path: verify/math/discrete_logarithm.test.cpp
     title: verify/math/discrete_logarithm.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/divisor_convolution.test.cpp
+    title: verify/math/divisor_convolution.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/enumerate_primes.test.cpp
     title: verify/math/enumerate_primes.test.cpp
   - icon: ':heavy_check_mark:'
@@ -717,6 +720,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/integer_arithmetic.test.cpp
     title: verify/math/integer_arithmetic.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/lcm_convolution.test.cpp
+    title: verify/math/lcm_convolution.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/lucas.test.cpp
     title: verify/math/lucas.test.cpp
@@ -1519,6 +1525,7 @@ data:
   - verify/math/discrete_logarithm.test.cpp
   - verify/math/yosupo_stern_brocot_tree.test.cpp
   - verify/math/modular_square_root.test.cpp
+  - verify/math/lcm_convolution.test.cpp
   - verify/math/set_power_series_log.test.cpp
   - verify/math/modint.test.cpp
   - verify/math/subset_convolution.test.cpp
@@ -1567,6 +1574,7 @@ data:
   - verify/math/counting_primes.test.cpp
   - verify/math/binomial_coefficient_mod.test.cpp
   - verify/math/bell_number.test.cpp
+  - verify/math/divisor_convolution.test.cpp
   - verify/math/set_power_series_exp.test.cpp
   - verify/math/prefix_sum_of_binom_randomized.test.cpp
   - verify/math/bernoulli_number.test.cpp

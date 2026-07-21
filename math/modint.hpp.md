@@ -226,6 +226,9 @@ data:
     path: verify/math/cyclotomic_polynomial.test.cpp
     title: verify/math/cyclotomic_polynomial.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/divisor_convolution.test.cpp
+    title: verify/math/divisor_convolution.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/fps/composition.test.cpp
     title: verify/math/fps/composition.test.cpp
   - icon: ':heavy_check_mark:'
@@ -387,6 +390,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/generalized_floor_sum.test.cpp
     title: verify/math/generalized_floor_sum.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/lcm_convolution.test.cpp
+    title: verify/math/lcm_convolution.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/lucas.test.cpp
     title: verify/math/lucas.test.cpp
@@ -774,6 +780,7 @@ data:
   - verify/math/bitwise_and_convolution.test.cpp
   - verify/math/cyclotomic_polynomial.test.cpp
   - verify/math/modular_square_root.test.cpp
+  - verify/math/lcm_convolution.test.cpp
   - verify/math/set_power_series_log.test.cpp
   - verify/math/modint.test.cpp
   - verify/math/subset_convolution.test.cpp
@@ -845,6 +852,7 @@ data:
   - verify/math/bernoulli_utilities.test.cpp
   - verify/math/bell_number.test.cpp
   - verify/math/bell_number.test.cpp
+  - verify/math/divisor_convolution.test.cpp
   - verify/math/set_power_series_exp.test.cpp
   - verify/math/prefix_sum_of_binom_randomized.test.cpp
   - verify/math/bernoulli_number.test.cpp
