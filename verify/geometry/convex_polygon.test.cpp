@@ -19,6 +19,31 @@ bool close(long double first, long double second) {
     return std::fabs(first - second) <= 1e-9L;
 }
 
+template <Coordinate T>
+bool contains_closed(
+    const std::vector<Point<T>>& polygon,
+    const Point<long double>& point
+) {
+    std::vector<Point<long double>> converted;
+    converted.reserve(polygon.size());
+    for (const Point<T>& vertex : polygon) converted.emplace_back(vertex);
+    return
+        point_in_convex_polygon(converted, point, 1e-8L) !=
+        PointInPolygon::Outside;
+}
+
+template <Coordinate T>
+void assert_closest_points(
+    const std::vector<Point<T>>& first,
+    const std::vector<Point<T>>& second,
+    const std::pair<Point<long double>, Point<long double>>& points,
+    long double expected_distance
+) {
+    assert(contains_closed(first, points.first));
+    assert(contains_closed(second, points.second));
+    assert(close(distance(points.first, points.second), expected_distance));
+}
+
 Wide naive_chain_area2(
     const std::vector<PointType>& polygon,
     int first,
@@ -165,6 +190,26 @@ void test_fixed() {
     assert(convex_polygons_intersect(overlapping, segment));
     assert(close(convex_polygons_distance(overlapping, outside_point), 4));
     assert(close(convex_polygons_distance(overlapping, segment), 0));
+    const auto outside_closest =
+        convex_polygons_closest_points(overlapping, outside_point);
+    assert(close(outside_closest.first.x, 4));
+    assert(close(outside_closest.first.y, 2));
+    assert(close(outside_closest.second.x, 8));
+    assert(close(outside_closest.second.y, 2));
+    assert_closest_points(
+        overlapping.vertices(),
+        outside_point.vertices(),
+        outside_closest,
+        4
+    );
+    const auto overlap_closest =
+        convex_polygons_closest_points(overlapping, touching);
+    assert_closest_points(
+        overlapping.vertices(),
+        touching.vertices(),
+        overlap_closest,
+        0
+    );
 
     ConvexPolygon<long long> first_segment(std::vector<PointType>{
         PointType(0, 0),
@@ -184,6 +229,17 @@ void test_fixed() {
         convex_polygons_distance(first_segment, parallel_segment),
         3
     ));
+    const auto crossing_closest =
+        convex_polygons_closest_points(first_segment, crossing_segment);
+    assert(close(crossing_closest.first.x, 2));
+    assert(close(crossing_closest.first.y, 0));
+    assert(crossing_closest.first == crossing_closest.second);
+    assert_closest_points(
+        first_segment.vertices(),
+        parallel_segment.vertices(),
+        convex_polygons_closest_points(first_segment, parallel_segment),
+        3
+    );
 }
 
 void test_randomized() {
@@ -315,6 +371,23 @@ void test_randomized() {
             convex_polygons_distance(other, polygon),
             distance(first, second)
         ));
+        const auto object_closest =
+            convex_polygons_closest_points(polygon, other);
+        const auto vector_closest =
+            convex_polygons_closest_points(first, second);
+        const long double expected_distance = distance(first, second);
+        assert_closest_points(
+            first,
+            second,
+            object_closest,
+            expected_distance
+        );
+        assert_closest_points(
+            first,
+            second,
+            vector_closest,
+            expected_distance
+        );
     }
 }
 
@@ -356,6 +429,14 @@ void test_randomized_floating_pairs() {
             convex_polygons_distance(first_query, second_query),
             convex_polygons_distance(first, second)
         ));
+        const long double expected_distance =
+            convex_polygons_distance(first, second);
+        assert_closest_points(
+            first,
+            second,
+            convex_polygons_closest_points(first_query, second_query),
+            expected_distance
+        );
     }
 }
 

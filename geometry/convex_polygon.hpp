@@ -417,6 +417,50 @@ class MinkowskiDifferenceView {
     Cycle first;
     Cycle second;
 
+    std::pair<int, int> prefixes(int rank) const {
+        const int first_size = first.edge_count();
+        const int second_size = second.edge_count();
+        if (first_size + second_size == 0) {
+            return std::pair<int, int>(0, 0);
+        }
+
+        int low = std::max(0, rank - second_size);
+        int high = std::min(rank, first_size);
+        while (low <= high) {
+            const int first_prefix = (low + high) / 2;
+            const int second_prefix = rank - first_prefix;
+            if (
+                first_prefix > 0 &&
+                second_prefix < second_size &&
+                entry_less(
+                    second.edge(second_prefix),
+                    1,
+                    first.edge(first_prefix - 1),
+                    0
+                )
+            ) {
+                high = first_prefix - 1;
+                continue;
+            }
+            if (
+                second_prefix > 0 &&
+                first_prefix < first_size &&
+                entry_less(
+                    first.edge(first_prefix),
+                    0,
+                    second.edge(second_prefix - 1),
+                    1
+                )
+            ) {
+                low = first_prefix + 1;
+                continue;
+            }
+            return std::pair<int, int>(first_prefix, second_prefix);
+        }
+        assert(false);
+        return std::pair<int, int>(0, 0);
+    }
+
     static int direction_half(const Point<T>& direction) {
         return
             direction.y > 0 ||
@@ -492,55 +536,27 @@ class MinkowskiDifferenceView {
 
     Point<T> operator[](int rank) const {
         assert(0 <= rank && rank < size());
-        const int first_size = first.edge_count();
-        const int second_size = second.edge_count();
-        if (first_size + second_size == 0) {
-            return first.point(0) + second.point(0);
-        }
+        const auto [first_prefix, second_prefix] = prefixes(rank);
+        return
+            first.point(first_prefix % first.polygon->size()) +
+            second.point(second_prefix % second.polygon->size());
+    }
 
-        int low = std::max(0, rank - second_size);
-        int high = std::min(rank, first_size);
-        while (low <= high) {
-            const int first_prefix = (low + high) / 2;
-            const int second_prefix = rank - first_prefix;
-            if (
-                first_prefix > 0 &&
-                second_prefix < second_size &&
-                entry_less(
-                    second.edge(second_prefix),
-                    1,
-                    first.edge(first_prefix - 1),
-                    0
-                )
-            ) {
-                high = first_prefix - 1;
-                continue;
-            }
-            if (
-                second_prefix > 0 &&
-                first_prefix < first_size &&
-                entry_less(
-                    first.edge(first_prefix),
-                    0,
-                    second.edge(second_prefix - 1),
-                    1
-                )
-            ) {
-                low = first_prefix + 1;
-                continue;
-            }
-            return
-                first.point(first_prefix % first.polygon->size()) +
-                second.point(second_prefix % second.polygon->size());
-        }
-        assert(false);
-        return Point<T>();
+    std::pair<Point<T>, Point<T>> components(int rank) const {
+        assert(0 <= rank && rank < size());
+        const auto [first_prefix, second_prefix] = prefixes(rank);
+        return std::pair<Point<T>, Point<T>>(
+            first.point(first_prefix % first.polygon->size()),
+            -second.point(second_prefix % second.polygon->size())
+        );
     }
 };
 
 struct OriginLocation {
     PointInPolygon location;
     int outside_edge;
+    std::array<int, 3> simplex;
+    int simplex_size;
 };
 
 template <Coordinate T, class Polygon>
@@ -565,22 +581,52 @@ OriginLocation locate_origin(
     const int first_side = orientation(base, polygon[first], origin, eps);
     const int last_side = orientation(base, polygon[last], origin, eps);
     if (first_side < 0) {
-        return OriginLocation{PointInPolygon::Outside, 0};
+        return OriginLocation{
+            PointInPolygon::Outside,
+            0,
+            std::array<int, 3>{0, 0, 0},
+            0,
+        };
     }
     if (last_side > 0) {
-        return OriginLocation{PointInPolygon::Outside, last};
+        return OriginLocation{
+            PointInPolygon::Outside,
+            last,
+            std::array<int, 3>{0, 0, 0},
+            0,
+        };
     }
     if (first_side == 0) {
         if (on_segment(Segment<T>{base, polygon[first]}, origin, eps)) {
-            return OriginLocation{PointInPolygon::Boundary, -1};
+            return OriginLocation{
+                PointInPolygon::Boundary,
+                -1,
+                std::array<int, 3>{0, first, 0},
+                2,
+            };
         }
-        return OriginLocation{PointInPolygon::Outside, first};
+        return OriginLocation{
+            PointInPolygon::Outside,
+            first,
+            std::array<int, 3>{0, 0, 0},
+            0,
+        };
     }
     if (last_side == 0) {
         if (on_segment(Segment<T>{base, polygon[last]}, origin, eps)) {
-            return OriginLocation{PointInPolygon::Boundary, -1};
+            return OriginLocation{
+                PointInPolygon::Boundary,
+                -1,
+                std::array<int, 3>{0, last, 0},
+                2,
+            };
         }
-        return OriginLocation{PointInPolygon::Outside, last - 1};
+        return OriginLocation{
+            PointInPolygon::Outside,
+            last - 1,
+            std::array<int, 3>{0, 0, 0},
+            0,
+        };
     }
 
     int left = first;
@@ -595,21 +641,32 @@ OriginLocation locate_origin(
     }
     const int side = orientation(polygon[left], polygon[right], origin, eps);
     if (side < 0) {
-        return OriginLocation{PointInPolygon::Outside, left};
-    }
-    if (side == 0) {
         return OriginLocation{
-            on_segment(
-                Segment<T>{polygon[left], polygon[right]},
-                origin,
-                eps
-            )
-                ? PointInPolygon::Boundary
-                : PointInPolygon::Outside,
+            PointInPolygon::Outside,
             left,
+            std::array<int, 3>{0, 0, 0},
+            0,
         };
     }
-    return OriginLocation{PointInPolygon::Inside, -1};
+    if (side == 0) {
+        const bool boundary = on_segment(
+            Segment<T>{polygon[left], polygon[right]},
+            origin,
+            eps
+        );
+        return OriginLocation{
+            boundary ? PointInPolygon::Boundary : PointInPolygon::Outside,
+            boundary ? -1 : left,
+            std::array<int, 3>{left, right, 0},
+            boundary ? 2 : 0,
+        };
+    }
+    return OriginLocation{
+        PointInPolygon::Inside,
+        -1,
+        std::array<int, 3>{0, left, right},
+        3,
+    };
 }
 
 template <class Compare>
@@ -658,16 +715,23 @@ std::pair<int, int> tangent_vertices_from_origin(
     return std::pair<int, int>(first, second);
 }
 
+struct ClosestBoundaryFeature {
+    int first;
+    int second;
+    long double ratio;
+    long double distance;
+};
+
 template <Coordinate T, class Polygon>
-long double distance_from_origin(
+ClosestBoundaryFeature closest_boundary_feature(
     const Polygon& polygon,
+    const OriginLocation& location,
     long double eps
 ) {
     const int size = polygon.size();
     assert(size >= 3);
+    assert(location.location == PointInPolygon::Outside);
     const Point<T> origin;
-    const OriginLocation location = locate_origin<T>(polygon, eps);
-    if (location.location != PointInPolygon::Outside) return 0;
 
     const auto tangents = tangent_vertices_from_origin<T>(polygon, eps);
     auto visible = [&](int index) {
@@ -719,25 +783,206 @@ long double distance_from_origin(
         }
     }
 
-    long double result = norm(vertex(left));
+    ClosestBoundaryFeature result{
+        (start + left) % size,
+        (start + left) % size,
+        0,
+        norm(vertex(left)),
+    };
+    auto consider_edge = [&](int first_offset, int second_offset) {
+        const Point<long double> first_point(vertex(first_offset));
+        const Point<long double> second_point(vertex(second_offset));
+        const Point<long double> direction = second_point - first_point;
+        long double ratio =
+            -dot(first_point, direction) / dot(direction, direction);
+        ratio = std::clamp(ratio, 0.0L, 1.0L);
+        const long double candidate_distance =
+            norm(first_point + direction * ratio);
+        if (candidate_distance < result.distance) {
+            result = ClosestBoundaryFeature{
+                (start + first_offset) % size,
+                (start + second_offset) % size,
+                ratio,
+                candidate_distance,
+            };
+        }
+    };
     if (left > 0) {
-        result = std::min(
-            result,
-            distance(
-                Segment<T>{vertex(left - 1), vertex(left)},
-                origin
-            )
-        );
+        consider_edge(left - 1, left);
     }
     if (left < edge_count) {
-        result = std::min(
-            result,
-            distance(
-                Segment<T>{vertex(left), vertex(left + 1)},
-                origin
+        consider_edge(left, left + 1);
+    }
+    return result;
+}
+
+template <Coordinate T, class Polygon>
+long double distance_from_origin(
+    const Polygon& polygon,
+    long double eps
+) {
+    const OriginLocation location = locate_origin<T>(polygon, eps);
+    if (location.location != PointInPolygon::Outside) return 0;
+    return closest_boundary_feature<T>(polygon, location, eps).distance;
+}
+
+inline Point<long double> interpolate(
+    const Point<long double>& first,
+    const Point<long double>& second,
+    long double ratio
+) {
+    return first + (second - first) * ratio;
+}
+
+template <Coordinate T>
+std::pair<Point<long double>, Point<long double>>
+closest_points_from_difference(
+    const MinkowskiDifferenceView<T>& difference,
+    long double eps
+) {
+    const OriginLocation location = locate_origin<T>(difference, eps);
+    if (location.location == PointInPolygon::Outside) {
+        const ClosestBoundaryFeature feature =
+            closest_boundary_feature<T>(difference, location, eps);
+        const auto first_components = difference.components(feature.first);
+        const auto second_components = difference.components(feature.second);
+        return std::pair<Point<long double>, Point<long double>>(
+            interpolate(
+                Point<long double>(first_components.first),
+                Point<long double>(second_components.first),
+                feature.ratio
+            ),
+            interpolate(
+                Point<long double>(first_components.second),
+                Point<long double>(second_components.second),
+                feature.ratio
             )
         );
     }
+
+    assert(location.simplex_size == 2 || location.simplex_size == 3);
+    std::array<long double, 3> weight{0, 0, 0};
+    if (location.simplex_size == 2) {
+        const Point<long double> first(difference[location.simplex[0]]);
+        const Point<long double> second(difference[location.simplex[1]]);
+        const Point<long double> direction = second - first;
+        weight[1] = -dot(first, direction) / dot(direction, direction);
+        weight[1] = std::clamp(weight[1], 0.0L, 1.0L);
+        weight[0] = 1 - weight[1];
+    } else {
+        const Point<long double> first(difference[location.simplex[0]]);
+        const Point<long double> second(difference[location.simplex[1]]);
+        const Point<long double> third(difference[location.simplex[2]]);
+        const long double denominator = cross(
+            second - first,
+            third - first
+        );
+        weight[0] = cross(second, third) / denominator;
+        weight[1] = cross(third, first) / denominator;
+        weight[2] = cross(first, second) / denominator;
+    }
+
+    Point<long double> first_result;
+    Point<long double> second_result;
+    for (int index = 0; index < location.simplex_size; ++index) {
+        const auto components = difference.components(
+            location.simplex[index]
+        );
+        first_result += Point<long double>(components.first) * weight[index];
+        second_result +=
+            Point<long double>(components.second) * weight[index];
+    }
+    return std::pair<Point<long double>, Point<long double>>(
+        first_result,
+        second_result
+    );
+}
+
+template <Coordinate T>
+Point<long double> closest_point_on_segment(
+    const Segment<T>& segment,
+    const Point<T>& point
+) {
+    const Point<long double> first(segment.a);
+    const Point<long double> direction =
+        Point<long double>(segment.b) - first;
+    const long double length2 = dot(direction, direction);
+    if (length2 == 0) return first;
+    const long double ratio = std::clamp(
+        dot(Point<long double>(point) - first, direction) / length2,
+        0.0L,
+        1.0L
+    );
+    return first + direction * ratio;
+}
+
+template <Coordinate T>
+std::pair<Point<long double>, Point<long double>>
+closest_points_between_segments(
+    const Segment<T>& first,
+    const Segment<T>& second,
+    long double eps
+) {
+    if (intersects(first, second, eps)) {
+        for (const Point<T>& point : {first.a, first.b}) {
+            if (on_segment(second, point, eps)) {
+                const Point<long double> common(point);
+                return std::pair<Point<long double>, Point<long double>>(
+                    common,
+                    common
+                );
+            }
+        }
+        for (const Point<T>& point : {second.a, second.b}) {
+            if (on_segment(first, point, eps)) {
+                const Point<long double> common(point);
+                return std::pair<Point<long double>, Point<long double>>(
+                    common,
+                    common
+                );
+            }
+        }
+        const auto common = line_intersection(
+            Line<T>{first.a, first.b},
+            Line<T>{second.a, second.b},
+            eps
+        );
+        assert(common.has_value());
+        return std::pair<Point<long double>, Point<long double>>(
+            *common,
+            *common
+        );
+    }
+
+    std::pair<Point<long double>, Point<long double>> result(
+        Point<long double>(first.a),
+        closest_point_on_segment(second, first.a)
+    );
+    long double result_distance = distance(result.first, result.second);
+    auto consider = [&](const Point<long double>& first_point,
+                        const Point<long double>& second_point) {
+        const long double candidate_distance =
+            distance(first_point, second_point);
+        if (candidate_distance < result_distance) {
+            result = std::pair<Point<long double>, Point<long double>>(
+                first_point,
+                second_point
+            );
+            result_distance = candidate_distance;
+        }
+    };
+    consider(
+        Point<long double>(first.b),
+        closest_point_on_segment(second, first.b)
+    );
+    consider(
+        closest_point_on_segment(first, second.a),
+        Point<long double>(second.a)
+    );
+    consider(
+        closest_point_on_segment(first, second.b),
+        Point<long double>(second.b)
+    );
     return result;
 }
 
@@ -967,6 +1212,46 @@ bool convex_polygons_intersect(
     return
         point_in_convex_polygon(difference, Point<T>(), eps) !=
         PointInPolygon::Outside;
+}
+
+template <Coordinate T>
+std::pair<Point<long double>, Point<long double>>
+convex_polygons_closest_points(
+    const ConvexPolygon<T>& first,
+    const ConvexPolygon<T>& second,
+    long double eps = 1e-12L
+) {
+    assert(!first.empty());
+    assert(!second.empty());
+    if (first.size() <= 2 && second.size() <= 2) {
+        return convex_polygon_detail::closest_points_between_segments(
+            Segment<T>{first[0], first[first.size() - 1]},
+            Segment<T>{second[0], second[second.size() - 1]},
+            eps
+        );
+    }
+    const convex_polygon_detail::MinkowskiDifferenceView<T> difference(
+        first,
+        second
+    );
+    return convex_polygon_detail::closest_points_from_difference(
+        difference,
+        eps
+    );
+}
+
+template <Coordinate T>
+std::pair<Point<long double>, Point<long double>>
+convex_polygons_closest_points(
+    const std::vector<Point<T>>& first,
+    const std::vector<Point<T>>& second,
+    long double eps = 1e-12L
+) {
+    assert(!first.empty());
+    assert(!second.empty());
+    const ConvexPolygon<T> first_query(first, eps);
+    const ConvexPolygon<T> second_query(second, eps);
+    return convex_polygons_closest_points(first_query, second_query, eps);
 }
 
 template <Coordinate T>
