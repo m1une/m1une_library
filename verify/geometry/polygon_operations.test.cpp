@@ -1,5 +1,6 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/aplusb"
 
+#include "../../geometry/convex_polygon.hpp"
 #include "../../geometry/polygon.hpp"
 
 #include <algorithm>
@@ -31,6 +32,63 @@ std::vector<P> square(
     result.emplace_back(right, top);
     result.emplace_back(left, top);
     return result;
+}
+
+template <typename T>
+std::vector<Point<long double>> clipping_intersection(
+    std::vector<Point<T>> first,
+    std::vector<Point<T>> second
+) {
+    first = normalize_convex_polygon(std::move(first));
+    second = normalize_convex_polygon(std::move(second));
+    std::vector<Point<long double>> result;
+    result.reserve(first.size());
+    for (const Point<T>& point : first) result.emplace_back(point);
+    for (std::size_t index = 0; index < second.size(); ++index) {
+        const Line<T> boundary{
+            second[index],
+            second[(index + 1) % second.size()]
+        };
+        result = convex_cut(result, Line<long double>{
+            Point<long double>(boundary.a),
+            Point<long double>(boundary.b)
+        });
+        if (result.empty()) break;
+    }
+    return result;
+}
+
+template <typename T>
+PointInPolygon contains_closed(
+    const std::vector<Point<T>>& polygon,
+    const Point<T>& point
+) {
+    if (polygon.empty()) return PointInPolygon::Outside;
+    if (polygon.size() == 1) {
+        return distance(polygon[0], point) <= 1e-8L
+            ? PointInPolygon::Boundary
+            : PointInPolygon::Outside;
+    }
+    if (polygon.size() == 2) {
+        return on_segment(Segment<T>{polygon[0], polygon[1]}, point, 1e-8L)
+            ? PointInPolygon::Boundary
+            : PointInPolygon::Outside;
+    }
+    return point_in_polygon(polygon, point, 1e-8L);
+}
+
+void assert_same_closed_polygon(
+    const std::vector<Point<long double>>& first,
+    const std::vector<Point<long double>>& second
+) {
+    assert(first.empty() == second.empty());
+    assert(close(polygon_area(first), polygon_area(second)));
+    for (const auto& point : first) {
+        assert(contains_closed(second, point) != PointInPolygon::Outside);
+    }
+    for (const auto& point : second) {
+        assert(contains_closed(first, point) != PointInPolygon::Outside);
+    }
 }
 
 template <typename T>
@@ -233,6 +291,12 @@ void test_polygon_polygon() {
 
     auto empty_clip = convex_polygon_intersection(first, separate);
     assert(empty_clip.empty());
+
+    std::vector<P> corner_touching = square(4, 4, 7, 7);
+    auto corner_clip = convex_polygon_intersection(first, corner_touching);
+    assert(corner_clip.size() == 1);
+    assert(close(corner_clip[0].x, 4));
+    assert(close(corner_clip[0].y, 4));
 }
 
 void test_minkowski_examples() {
@@ -266,6 +330,16 @@ void test_minkowski_examples() {
     expected.emplace_back(2, 4);
     expected.emplace_back(5, 4);
     assert(translated == expected);
+
+    std::vector<P> diagonal_segment;
+    diagonal_segment.emplace_back(2, -1);
+    diagonal_segment.emplace_back(-1, 2);
+    std::vector<P> segment_sum = minkowski_sum(diagonal_segment, first);
+    brute.clear();
+    for (const P& a : diagonal_segment) {
+        for (const P& b : first) brute.push_back(a + b);
+    }
+    assert(convex_hull(segment_sum) == convex_hull(brute));
 }
 
 void test_randomized_minkowski_and_clipping() {
@@ -296,6 +370,11 @@ void test_randomized_minkowski_and_clipping() {
         std::vector<P> first = convex_hull(first_points);
         std::vector<P> second = convex_hull(second_points);
         if (first.size() < 3 || second.size() < 3) continue;
+        const P translation(
+            static_cast<long long>(random() % 41) - 20,
+            static_cast<long long>(random() % 41) - 20
+        );
+        for (P& point : second) point += translation;
 
         auto ear_triangles = triangulate_polygon(first);
         assert(ear_triangles.has_value());
@@ -325,6 +404,10 @@ void test_randomized_minkowski_and_clipping() {
         auto forward = convex_polygon_intersection(first, second);
         auto backward = convex_polygon_intersection(second, first);
         assert(close(polygon_area(forward), polygon_area(backward)));
+        assert_same_closed_polygon(
+            forward,
+            clipping_intersection(first, second)
+        );
         for (const Point<long double>& point : forward) {
             assert(
                 point_in_polygon(
@@ -345,6 +428,83 @@ void test_randomized_minkowski_and_clipping() {
                 ) != PointInPolygon::Outside
             );
         }
+
+        const auto rightmost = std::max_element(
+            first.begin(),
+            first.end(),
+            [](const P& left, const P& right) {
+                return left.x < right.x;
+            }
+        );
+        const auto leftmost = std::min_element(
+            second.begin(),
+            second.end(),
+            [](const P& left, const P& right) {
+                return left.x < right.x;
+            }
+        );
+        std::vector<P> touching = second;
+        const P touching_translation = *rightmost - *leftmost;
+        for (P& point : touching) point += touching_translation;
+        const auto degenerate =
+            convex_polygon_intersection(first, touching);
+        assert(!degenerate.empty());
+        assert(close(polygon_area(degenerate), 0));
+        assert_same_closed_polygon(
+            degenerate,
+            clipping_intersection(first, touching)
+        );
+    }
+}
+
+void test_randomized_floating_intersection() {
+    std::uint64_t state = 0xbb67ae8584caa73bULL;
+    auto random = [&state]() {
+        state ^= state << 7;
+        state ^= state >> 9;
+        return state;
+    };
+    constexpr long double pi = 3.141592653589793238462643383279L;
+
+    for (int trial = 0; trial < 2000; ++trial) {
+        const int first_size = 3 + int(random() % 20);
+        const int second_size = 3 + int(random() % 20);
+        const long double first_phase =
+            2 * pi * static_cast<long double>(random() % 1000000) / 1000000;
+        const long double second_phase =
+            2 * pi * static_cast<long double>(random() % 1000000) / 1000000;
+        const Point<long double> first_center(
+            static_cast<long double>(random() % 2001) / 100 - 10,
+            static_cast<long double>(random() % 2001) / 100 - 10
+        );
+        const Point<long double> second_center(
+            static_cast<long double>(random() % 4001) / 100 - 20,
+            static_cast<long double>(random() % 4001) / 100 - 20
+        );
+
+        std::vector<Point<long double>> first;
+        std::vector<Point<long double>> second;
+        for (int index = 0; index < first_size; ++index) {
+            const long double angle =
+                first_phase + 2 * pi * index / first_size;
+            first.emplace_back(
+                first_center.x + 12 * std::cos(angle),
+                first_center.y + 7 * std::sin(angle)
+            );
+        }
+        for (int index = 0; index < second_size; ++index) {
+            const long double angle =
+                second_phase + 2 * pi * index / second_size;
+            second.emplace_back(
+                second_center.x + 9 * std::cos(angle),
+                second_center.y + 14 * std::sin(angle)
+            );
+        }
+
+        assert_same_closed_polygon(
+            convex_polygon_intersection(first, second),
+            clipping_intersection(first, second)
+        );
     }
 }
 
@@ -360,6 +520,7 @@ int main() {
     test_polygon_polygon();
     test_minkowski_examples();
     test_randomized_minkowski_and_clipping();
+    test_randomized_floating_intersection();
 
     long long a, b;
     fast_input >> a >> b;

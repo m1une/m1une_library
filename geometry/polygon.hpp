@@ -10,7 +10,6 @@
 #include <optional>
 #include <vector>
 
-#include "convex_hull.hpp"
 #include "ray.hpp"
 
 namespace m1une {
@@ -41,96 +40,6 @@ inline void push_unique(
         if (close(existing, point, eps)) return;
     }
     points.push_back(point);
-}
-
-inline std::vector<Point<long double>> clean_convex_polygon(
-    std::vector<Point<long double>> polygon,
-    long double eps
-) {
-    if (polygon.empty()) return polygon;
-
-    std::vector<Point<long double>> deduplicated;
-    for (const Point<long double>& point : polygon) {
-        if (
-            deduplicated.empty() ||
-            !close(deduplicated.back(), point, eps)
-        ) {
-            deduplicated.push_back(point);
-        }
-    }
-    if (
-        deduplicated.size() >= 2 &&
-        close(deduplicated.front(), deduplicated.back(), eps)
-    ) {
-        deduplicated.pop_back();
-    }
-    if (deduplicated.size() <= 2) return deduplicated;
-
-    bool changed = true;
-    while (changed && deduplicated.size() >= 3) {
-        changed = false;
-        std::vector<Point<long double>> cleaned;
-        std::size_t size = deduplicated.size();
-        for (std::size_t index = 0; index < size; ++index) {
-            const Point<long double>& previous =
-                deduplicated[(index + size - 1) % size];
-            const Point<long double>& current = deduplicated[index];
-            const Point<long double>& next =
-                deduplicated[(index + 1) % size];
-            if (
-                orientation(previous, current, next, eps) == 0 &&
-                dot(current - previous, next - current) >= -eps
-            ) {
-                changed = true;
-            } else {
-                cleaned.push_back(current);
-            }
-        }
-        deduplicated = std::move(cleaned);
-    }
-    return deduplicated;
-}
-
-template <Coordinate T>
-std::vector<Point<T>> normalize_convex_polygon(
-    std::vector<Point<T>> polygon
-) {
-    if (
-        polygon.size() >= 2 &&
-        polygon.front() == polygon.back()
-    ) {
-        polygon.pop_back();
-    }
-    if (polygon.size() <= 1) return polygon;
-    if (polygon.size() >= 3 && polygon_area2(polygon) < 0) {
-        std::reverse(polygon.begin(), polygon.end());
-    }
-
-    auto start = std::min_element(
-        polygon.begin(),
-        polygon.end(),
-        [](const Point<T>& first, const Point<T>& second) {
-            if (first.y != second.y) return first.y < second.y;
-            return first.x < second.x;
-        }
-    );
-    std::rotate(polygon.begin(), start, polygon.end());
-
-    if (polygon.size() <= 2) return polygon;
-    std::vector<Point<T>> cleaned;
-    std::size_t size = polygon.size();
-    for (std::size_t index = 0; index < size; ++index) {
-        const Point<T>& previous = polygon[(index + size - 1) % size];
-        const Point<T>& current = polygon[index];
-        const Point<T>& next = polygon[(index + 1) % size];
-        if (
-            orientation(previous, current, next) != 0 ||
-            dot(current - previous, next - current) < 0
-        ) {
-            cleaned.push_back(current);
-        }
-    }
-    return cleaned;
 }
 
 template <Coordinate T>
@@ -388,30 +297,6 @@ std::optional<std::vector<std::array<Point<T>, 3>>> triangulate_polygon(
 }
 
 template <Coordinate T>
-std::vector<std::array<Point<T>, 3>> triangulate_convex_polygon(
-    std::vector<Point<T>> polygon,
-    long double eps = 1e-12L
-) {
-    polygon =
-        polygon_detail::clean_polygon_vertices(std::move(polygon), eps);
-    if (polygon.size() < 3) return {};
-    if (sign<T>(polygon_area2(polygon), eps) < 0) {
-        std::reverse(polygon.begin(), polygon.end());
-    }
-
-    std::vector<std::array<Point<T>, 3>> result;
-    result.reserve(polygon.size() - 2);
-    for (std::size_t index = 1; index + 1 < polygon.size(); ++index) {
-        std::array<Point<T>, 3> triangle;
-        triangle[0] = polygon[0];
-        triangle[1] = polygon[index];
-        triangle[2] = polygon[index + 1];
-        result.push_back(std::move(triangle));
-    }
-    return result;
-}
-
-template <Coordinate T>
 PointInPolygon point_in_polygon(
     const std::vector<Point<T>>& polygon,
     const Point<T>& point,
@@ -435,29 +320,6 @@ PointInPolygon point_in_polygon(
         }
     }
     return inside ? PointInPolygon::Inside : PointInPolygon::Outside;
-}
-
-template <Coordinate T>
-wide_type<T> convex_diameter2(const std::vector<Point<T>>& polygon) {
-    std::size_t n = polygon.size();
-    if (n <= 1) return 0;
-    if (n == 2) return distance2(polygon[1], polygon[0]);
-
-    wide_type<T> result = 0;
-    std::size_t opposite = 1;
-    for (std::size_t i = 0; i < n; i++) {
-        std::size_t next = (i + 1) % n;
-        while (true) {
-            std::size_t candidate = (opposite + 1) % n;
-            auto current_area = cross(polygon[i], polygon[next], polygon[opposite]);
-            auto candidate_area = cross(polygon[i], polygon[next], polygon[candidate]);
-            if (candidate_area <= current_area) break;
-            opposite = candidate;
-        }
-        result = std::max(result, distance2(polygon[i], polygon[opposite]));
-        result = std::max(result, distance2(polygon[next], polygon[opposite]));
-    }
-    return result;
 }
 
 template <Coordinate T>
@@ -661,142 +523,6 @@ long double distance(
         }
     }
     return result;
-}
-
-template <Coordinate T>
-std::vector<Point<long double>> convex_polygon_intersection(
-    const std::vector<Point<T>>& first,
-    const std::vector<Point<T>>& second,
-    long double eps = 1e-12L
-) {
-    assert(first.size() >= 3);
-    assert(second.size() >= 3);
-    std::vector<Point<long double>> subject;
-    subject.reserve(first.size());
-    for (const Point<T>& point : first) {
-        subject.emplace_back(point);
-    }
-    if (polygon_area2(subject) < 0) {
-        std::reverse(subject.begin(), subject.end());
-    }
-
-    std::vector<Point<long double>> clip;
-    clip.reserve(second.size());
-    for (const Point<T>& point : second) {
-        clip.emplace_back(point);
-    }
-    if (polygon_area2(clip) < 0) {
-        std::reverse(clip.begin(), clip.end());
-    }
-
-    std::size_t clip_size = clip.size();
-    for (std::size_t clip_index = 0; clip_index < clip_size; ++clip_index) {
-        Point<long double> clip_start = clip[clip_index];
-        Point<long double> clip_end =
-            clip[(clip_index + 1) % clip_size];
-        std::vector<Point<long double>> input = std::move(subject);
-        subject.clear();
-        if (input.empty()) break;
-
-        Point<long double> previous = input.back();
-        int previous_side =
-            orientation(clip_start, clip_end, previous, eps);
-        for (const Point<long double>& current : input) {
-            int current_side =
-                orientation(clip_start, clip_end, current, eps);
-            bool previous_inside = previous_side >= 0;
-            bool current_inside = current_side >= 0;
-            if (previous_inside != current_inside) {
-                Line<long double> boundary{clip_start, clip_end};
-                Line<long double> crossing{previous, current};
-                std::optional<Point<long double>> point =
-                    line_intersection(boundary, crossing, eps);
-                if (point.has_value()) subject.push_back(*point);
-            }
-            if (current_inside) subject.push_back(current);
-            previous = current;
-            previous_side = current_side;
-        }
-    }
-    return polygon_detail::clean_convex_polygon(
-        std::move(subject),
-        eps
-    );
-}
-
-template <Coordinate T>
-std::vector<Point<T>> minkowski_sum(
-    std::vector<Point<T>> first,
-    std::vector<Point<T>> second
-) {
-    assert(!first.empty());
-    assert(!second.empty());
-    first = polygon_detail::normalize_convex_polygon(std::move(first));
-    second = polygon_detail::normalize_convex_polygon(std::move(second));
-
-    if (first.size() <= 2 || second.size() <= 2) {
-        std::vector<Point<T>> sums;
-        sums.reserve(first.size() * second.size());
-        for (const Point<T>& first_point : first) {
-            for (const Point<T>& second_point : second) {
-                sums.push_back(first_point + second_point);
-            }
-        }
-        return convex_hull(std::move(sums));
-    }
-
-    std::vector<Point<T>> first_edges;
-    std::vector<Point<T>> second_edges;
-    for (std::size_t index = 0; index < first.size(); ++index) {
-        first_edges.push_back(
-            first[(index + 1) % first.size()] - first[index]
-        );
-    }
-    for (std::size_t index = 0; index < second.size(); ++index) {
-        second_edges.push_back(
-            second[(index + 1) % second.size()] - second[index]
-        );
-    }
-
-    Point<T> current = first.front() + second.front();
-    std::vector<Point<T>> result;
-    result.reserve(first.size() + second.size());
-    result.push_back(current);
-    std::size_t first_index = 0;
-    std::size_t second_index = 0;
-    while (
-        first_index < first_edges.size() ||
-        second_index < second_edges.size()
-    ) {
-        Point<T> step;
-        if (first_index == first_edges.size()) {
-            step = second_edges[second_index++];
-        } else if (second_index == second_edges.size()) {
-            step = first_edges[first_index++];
-        } else {
-            auto turn = cross(
-                first_edges[first_index],
-                second_edges[second_index]
-            );
-            if (turn > 0) {
-                step = first_edges[first_index++];
-            } else if (turn < 0) {
-                step = second_edges[second_index++];
-            } else {
-                step =
-                    first_edges[first_index++] +
-                    second_edges[second_index++];
-            }
-        }
-        current += step;
-        if (
-            first_index < first_edges.size() ||
-            second_index < second_edges.size()
-        ) {
-            result.push_back(current);
-        }
-    }
-    return polygon_detail::normalize_convex_polygon(std::move(result));
 }
 
 }  // namespace geometry

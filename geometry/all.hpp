@@ -6,6 +6,7 @@
 #include "closest_pair.hpp"
 #include "convex_hull.hpp"
 #include "convex_layers.hpp"
+#include "convex_polygon.hpp"
 #include "count_points_in_triangle.hpp"
 #include "euclidean_mst.hpp"
 #include "farthest_pair.hpp"

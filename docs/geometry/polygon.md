@@ -5,9 +5,9 @@ documentation_of: ../../geometry/polygon.hpp
 
 ## Overview
 
-This header provides polygon area, point containment, rotating-calipers convex
-diameter, ray queries, polygon intersection and distance, triangulation,
-centroids, convex clipping, and Minkowski sums.
+This header provides polygon area, point containment, ray queries, polygon
+intersection and distance, triangulation, and centroids for general simple
+polygons.
 
 Polygons are represented by `std::vector<Point<T>>`. The first point must not be
 repeated at the end.
@@ -32,17 +32,13 @@ The polygon may be clockwise or counterclockwise and may be non-convex.
 | `polygon_center_of_gravity(polygon, eps)` | Alias of `polygon_centroid`. | $O(N)$ |
 | `is_simple_polygon(polygon, eps)` | Tests whether polygon edges only meet at adjacent endpoints. | $O(N^2)$ |
 | `triangulate_polygon(polygon, eps)` | Ear-clips a simple polygon, or returns `nullopt` when triangulation fails. | $O(N^2)$ |
-| `triangulate_convex_polygon(polygon, eps)` | Fan-triangulates a convex polygon. | $O(N)$ |
 | `point_in_polygon(polygon, point, eps)` | Classifies a point against any simple polygon. | $O(N)$ |
-| `convex_diameter2(polygon)` | Returns the maximum squared distance between vertices of a convex counterclockwise polygon. | $O(N)$ |
 | `ray_polygon_intersections(ray, polygon, eps)` | Returns distinct boundary events ordered from the ray origin. | $O(N \log N)$ |
 | `first_ray_polygon_intersection(ray, polygon, eps)` | Returns the first boundary event, or `nullopt`. | $O(N \log N)$ |
 | `intersects(ray, polygon, eps)` | Tests intersection with the closed filled polygon. Both argument orders are supported. | $O(N \log N)$ |
 | `distance(ray, polygon)` | Minimum distance to the closed filled polygon. Both argument orders are supported. | $O(N \log N)$ |
 | `intersects(first, second, eps)` | Tests whether two closed filled simple polygons intersect. | $O(NM)$ |
 | `distance(first, second)` | Minimum distance between two closed filled simple polygons. | $O(NM)$ |
-| `convex_polygon_intersection(first, second, eps)` | Returns the intersection of two convex polygons. | $O(NM)$ |
-| `minkowski_sum(first, second)` | Returns the Minkowski sum of two convex polygons. | $O(N+M)$ |
 
 Polygon queries require at least three vertices unless stated otherwise.
 
@@ -68,10 +64,6 @@ vertices produces $K-2$ triangles.
 The return value is `std::nullopt` for fewer than three effective vertices,
 zero area, self-intersection, or another failure to find a valid ear.
 
-`triangulate_convex_polygon` is the faster fan construction. It has the same
-vertex cleanup and orientation normalization, but assumes the input is convex;
-violating that precondition can produce triangles outside the polygon.
-
 ## Ray intersections
 
 `ray_polygon_intersections` reports polygon-boundary events, not the whole
@@ -82,25 +74,14 @@ polygon vertices are deduplicated.
 `intersects(ray, polygon)` instead treats the polygon as a closed filled region,
 so a ray whose origin is inside the polygon intersects immediately.
 
-## Polygon intersection
+## Polygon intersection and distance
 
 `intersects(first, second)` and `distance(first, second)` accept any simple
 polygons, in clockwise or counterclockwise order.
 
-`convex_polygon_intersection` constructs the overlap region and therefore
-requires both inputs to be convex. The result uses `Point<long double>`, is
-counterclockwise when it has area, and does not repeat its first point. A
-touching intersection may contain one point or two segment endpoints.
-
-## Minkowski sum
-
-`minkowski_sum` requires nonempty convex polygons. Inputs may be clockwise or
-counterclockwise and may contain redundant collinear vertices. The result is a
-counterclockwise convex polygon without a repeated first point. Coordinates
-retain type `T`; ensure additions fit that type.
-
-For convex-hull construction, include
-[`geometry/convex_hull.hpp`](convex_hull.md).
+For optimized containment, cuts, diameter, intersection construction,
+Minkowski sums, and other convex-only operations, include
+[`geometry/convex_polygon.hpp`](convex_polygon.md).
 
 ## Example
 
