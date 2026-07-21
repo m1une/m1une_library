@@ -14,6 +14,7 @@ documentation_of: ../../geometry/all.hpp
 | `geometry/angle_sort.hpp` | Atan-free counterclockwise angle sorting around an arbitrary origin. |
 | `geometry/point.hpp` | Points, vectors, dot/cross products, exact orientation, distance, centroid, and rotation. |
 | `geometry/closest_pair.hpp` | Euclidean closest pair with original indices in $O(N\log N)$. |
+| `geometry/convex_decomposition.hpp` | Hertel--Mehlhorn approximate and Keil--Snoeyink minimum convex decompositions of a simple polygon. |
 | `geometry/convex_hull.hpp` | Monotone-chain convex hull with optional boundary-collinear points. |
 | `geometry/convex_layers.hpp` | Onion decomposition into successive convex-hull boundaries in $O(N\log^2 N)$. |
 | `geometry/convex_polygon.hpp` | Normalized convex-polygon queries, centroid, cuts, diameter, intersections, distance, triangulation, and Minkowski sums. |

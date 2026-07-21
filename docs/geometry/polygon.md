@@ -91,6 +91,10 @@ For optimized containment, cuts, diameter, intersection construction,
 Minkowski sums, and other convex-only operations, include
 [`geometry/convex_polygon.hpp`](convex_polygon.md).
 
+To partition a simple polygon into convex pieces, include
+[`geometry/convex_decomposition.hpp`](convex_decomposition.md). It provides a
+fast four-approximation and an exact minimum-piece dynamic program.
+
 ## Example
 
 ```cpp

@@ -1,0 +1,112 @@
+---
+title: Convex Decomposition
+documentation_of: ../../geometry/convex_decomposition.hpp
+---
+
+## Overview
+
+This header partitions a simple polygon without holes into convex polygons. It
+provides two choices:
+
+* `approximate_convex_decomposition` triangulates the polygon and applies the
+  Hertel--Mehlhorn diagonal-removal algorithm. It is the routine to use under
+  ordinary contest constraints.
+* `minimum_convex_decomposition` uses Keil--Snoeyink dynamic programming over
+  visible diagonals and narrowest-pair stacks. It returns the smallest possible
+  number of pieces. Its running time is sensitive to the number of reflex
+  vertices rather than being quartic in the total vertex count.
+
+Both algorithms use the **no-Steiner-point model**: every output vertex is an
+input vertex, apart from removing redundant boundary vertices. This restriction
+is important when interpreting both the approximation guarantee and the word
+"minimum."
+
+## Functions
+
+```cpp
+template <Coordinate T>
+std::optional<std::vector<std::vector<Point<T>>>>
+approximate_convex_decomposition(
+    std::vector<Point<T>> polygon,
+    long double eps = 1e-12L
+);
+
+template <Coordinate T>
+std::optional<std::vector<std::vector<Point<T>>>>
+minimum_convex_decomposition(
+    std::vector<Point<T>> polygon,
+    long double eps = 1e-12L
+);
+```
+
+| Function | Result | Time | Memory |
+| --- | --- | --- | --- |
+| `approximate_convex_decomposition(polygon, eps)` | A Hertel--Mehlhorn decomposition containing at most four times the minimum number of pieces. | $O(N^2)$ | $O(N)$ |
+| `minimum_convex_decomposition(polygon, eps)` | A decomposition with the minimum possible number of pieces. | $O(N + \min\{NR^2, R^4\})$ | $O(N + \min\{NR^2, R^4\})$ |
+
+Here $N$ is the number of vertices after cleanup and $R$ is the number of
+reflex vertices (vertices whose interior angle is greater than $\pi$).
+
+The bound for the exact routine is easy to misread. The implementation chooses
+between these two Keil--Snoeyink paths:
+
+* The direct narrowest-pair DP stores only subproblems with at least one reflex
+  endpoint and takes $O(NR^2)$ time and memory.
+* When $R^2 < N$, biased-decomposition reduction retains the $O(R^2)$ vertices
+  that can be endpoints of reflex extensions and diagonal extensions, and runs
+  the same DP on that reduced polygon. Including reduction and reconstruction,
+  this path takes $O(N + R^4)$ time and memory.
+
+The minimum of those paths is therefore
+$O(N + \min\{NR^2, R^4\})$. The reduction is internal: output pieces still
+contain the original polygon boundary, including vertices omitted from the DP
+instance. $R$ is not the number of vertices in the reduced polygon.
+
+## Input and output rules
+
+The input may be clockwise or counterclockwise. A repeated closing point,
+consecutive duplicates, and redundant collinear boundary vertices are removed.
+The polygon must be simple and have no holes. The exact routine treats
+simplicity as a precondition so that it does not add an $O(N^2)$ validation step
+to its reflex-sensitive bound. The approximate routine validates simplicity.
+The return value is `nullopt` when fewer than three effective vertices remain,
+the area is zero, validation fails where performed, or construction fails.
+
+Every returned polygon is counterclockwise, does not repeat its first point at
+the end, and is convex in the non-strict sense. The pieces have disjoint
+interiors and their union is the original closed polygon.
+
+"Minimum" means the minimum **number of non-strictly convex pieces**, not that
+each piece is strictly convex. Collinear vertices can therefore occur on an
+output boundary. The approximation factor compares against the same
+no-Steiner-point optimum.
+
+For integral coordinates, turn predicates on input vertices use the geometry
+module's widened integer type. Visibility and ray-shooting construction use
+extended floating-point arithmetic. For floating-point coordinates, `eps`
+also controls predicate tolerance.
+
+## Example
+
+```cpp
+#include "geometry/convex_decomposition.hpp"
+
+#include <iostream>
+#include <vector>
+
+int main() {
+    using Point = m1une::geometry::Point<long long>;
+    std::vector<Point> polygon;
+    polygon.emplace_back(0, 0);
+    polygon.emplace_back(5, 0);
+    polygon.emplace_back(5, 2);
+    polygon.emplace_back(2, 2);
+    polygon.emplace_back(2, 5);
+    polygon.emplace_back(0, 5);
+
+    auto parts =
+        m1une::geometry::minimum_convex_decomposition(polygon);
+    if (!parts.has_value()) return 0;
+    std::cout << parts->size() << "\n";  // 2
+}
+```

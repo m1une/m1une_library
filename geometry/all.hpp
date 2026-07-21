@@ -4,6 +4,7 @@
 #include "angle_sort.hpp"
 #include "circle.hpp"
 #include "closest_pair.hpp"
+#include "convex_decomposition.hpp"
 #include "convex_hull.hpp"
 #include "convex_layers.hpp"
 #include "convex_polygon.hpp"
