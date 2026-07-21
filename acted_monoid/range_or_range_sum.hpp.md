@@ -2,10 +2,13 @@
 data:
   _extendedDependsOn: []
   _extendedRequiredBy: []
-  _extendedVerifiedWith: []
+  _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/monoid/commutative_flags.test.cpp
+    title: verify/monoid/commutative_flags.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':warning:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"acted_monoid/range_or_range_sum.hpp\"\n\n\n\n#include <array>\n\
@@ -14,59 +17,62 @@ data:
     \    long long size;\n};\n\n// Acted Monoid for Range OR updates and Range Sum\
     \ queries.\ntemplate <typename T, int BITS = 30>\nstruct RangeOrRangeSum {\n \
     \   using value_type = RangeOrRangeSumNode<T, BITS>;\n    using operator_type\
-    \ = T;\n\n    static constexpr value_type id() {\n        value_type res;\n  \
-    \      res.sum = T(0);\n        res.bit_count.fill(0);\n        res.size = 0;\n\
-    \        return res;\n    }\n\n    static constexpr value_type op(const value_type&\
-    \ a, const value_type& b) {\n        value_type res;\n        res.sum = a.sum\
-    \ + b.sum;\n        res.size = a.size + b.size;\n        for (int i = 0; i < BITS;\
-    \ ++i) {\n            res.bit_count[i] = a.bit_count[i] + b.bit_count[i];\n  \
-    \      }\n        return res;\n    }\n\n    static constexpr operator_type op_id()\
-    \ {\n        return T(0);\n    }\n\n    static constexpr operator_type op_comp(const\
-    \ operator_type& f, const operator_type& g) {\n        return f | g;\n    }\n\n\
-    \    static constexpr value_type mapping(const operator_type& f, const value_type&\
-    \ x) {\n        if (f == T(0) || x.size == 0) return x;\n        value_type res\
-    \ = x;\n        res.sum = T(0);\n        for (int i = 0; i < BITS; ++i) {\n  \
-    \          if ((f >> i) & 1) {\n                res.bit_count[i] = x.size;  //\
-    \ OR forces the bit to be 1 for all elements\n            }\n            res.sum\
-    \ += static_cast<T>(res.bit_count[i]) * (T(1) << i);\n        }\n        return\
-    \ res;\n    }\n\n    static constexpr value_type make(const T& val) {\n      \
-    \  value_type res;\n        res.sum = val;\n        res.size = 1;\n        for\
-    \ (int i = 0; i < BITS; ++i) {\n            res.bit_count[i] = ((val >> i) & 1)\
-    \ ? 1 : 0;\n        }\n        return res;\n    }\n};\n\n}  // namespace acted_monoid\n\
-    }  // namespace m1une\n\n\n"
+    \ = T;\n    static constexpr bool commutative = true;\n    static constexpr bool\
+    \ operator_commutative = true;\n\n    static constexpr value_type id() {\n   \
+    \     value_type res;\n        res.sum = T(0);\n        res.bit_count.fill(0);\n\
+    \        res.size = 0;\n        return res;\n    }\n\n    static constexpr value_type\
+    \ op(const value_type& a, const value_type& b) {\n        value_type res;\n  \
+    \      res.sum = a.sum + b.sum;\n        res.size = a.size + b.size;\n       \
+    \ for (int i = 0; i < BITS; ++i) {\n            res.bit_count[i] = a.bit_count[i]\
+    \ + b.bit_count[i];\n        }\n        return res;\n    }\n\n    static constexpr\
+    \ operator_type op_id() {\n        return T(0);\n    }\n\n    static constexpr\
+    \ operator_type op_comp(const operator_type& f, const operator_type& g) {\n  \
+    \      return f | g;\n    }\n\n    static constexpr value_type mapping(const operator_type&\
+    \ f, const value_type& x) {\n        if (f == T(0) || x.size == 0) return x;\n\
+    \        value_type res = x;\n        res.sum = T(0);\n        for (int i = 0;\
+    \ i < BITS; ++i) {\n            if ((f >> i) & 1) {\n                res.bit_count[i]\
+    \ = x.size;  // OR forces the bit to be 1 for all elements\n            }\n  \
+    \          res.sum += static_cast<T>(res.bit_count[i]) * (T(1) << i);\n      \
+    \  }\n        return res;\n    }\n\n    static constexpr value_type make(const\
+    \ T& val) {\n        value_type res;\n        res.sum = val;\n        res.size\
+    \ = 1;\n        for (int i = 0; i < BITS; ++i) {\n            res.bit_count[i]\
+    \ = ((val >> i) & 1) ? 1 : 0;\n        }\n        return res;\n    }\n};\n\n}\
+    \  // namespace acted_monoid\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_ACTED_MONOID_RANGE_OR_RANGE_SUM_HPP\n#define M1UNE_ACTED_MONOID_RANGE_OR_RANGE_SUM_HPP\
     \ 1\n\n#include <array>\n\nnamespace m1une {\nnamespace acted_monoid {\n\ntemplate\
     \ <typename T, int BITS = 30>\nstruct RangeOrRangeSumNode {\n    T sum;\n    std::array<int,\
     \ BITS> bit_count;\n    long long size;\n};\n\n// Acted Monoid for Range OR updates\
     \ and Range Sum queries.\ntemplate <typename T, int BITS = 30>\nstruct RangeOrRangeSum\
     \ {\n    using value_type = RangeOrRangeSumNode<T, BITS>;\n    using operator_type\
-    \ = T;\n\n    static constexpr value_type id() {\n        value_type res;\n  \
-    \      res.sum = T(0);\n        res.bit_count.fill(0);\n        res.size = 0;\n\
-    \        return res;\n    }\n\n    static constexpr value_type op(const value_type&\
-    \ a, const value_type& b) {\n        value_type res;\n        res.sum = a.sum\
-    \ + b.sum;\n        res.size = a.size + b.size;\n        for (int i = 0; i < BITS;\
-    \ ++i) {\n            res.bit_count[i] = a.bit_count[i] + b.bit_count[i];\n  \
-    \      }\n        return res;\n    }\n\n    static constexpr operator_type op_id()\
-    \ {\n        return T(0);\n    }\n\n    static constexpr operator_type op_comp(const\
-    \ operator_type& f, const operator_type& g) {\n        return f | g;\n    }\n\n\
-    \    static constexpr value_type mapping(const operator_type& f, const value_type&\
-    \ x) {\n        if (f == T(0) || x.size == 0) return x;\n        value_type res\
-    \ = x;\n        res.sum = T(0);\n        for (int i = 0; i < BITS; ++i) {\n  \
-    \          if ((f >> i) & 1) {\n                res.bit_count[i] = x.size;  //\
-    \ OR forces the bit to be 1 for all elements\n            }\n            res.sum\
-    \ += static_cast<T>(res.bit_count[i]) * (T(1) << i);\n        }\n        return\
-    \ res;\n    }\n\n    static constexpr value_type make(const T& val) {\n      \
-    \  value_type res;\n        res.sum = val;\n        res.size = 1;\n        for\
-    \ (int i = 0; i < BITS; ++i) {\n            res.bit_count[i] = ((val >> i) & 1)\
-    \ ? 1 : 0;\n        }\n        return res;\n    }\n};\n\n}  // namespace acted_monoid\n\
-    }  // namespace m1une\n\n#endif  // M1UNE_ACTED_MONOID_RANGE_OR_RANGE_SUM_HPP\n"
+    \ = T;\n    static constexpr bool commutative = true;\n    static constexpr bool\
+    \ operator_commutative = true;\n\n    static constexpr value_type id() {\n   \
+    \     value_type res;\n        res.sum = T(0);\n        res.bit_count.fill(0);\n\
+    \        res.size = 0;\n        return res;\n    }\n\n    static constexpr value_type\
+    \ op(const value_type& a, const value_type& b) {\n        value_type res;\n  \
+    \      res.sum = a.sum + b.sum;\n        res.size = a.size + b.size;\n       \
+    \ for (int i = 0; i < BITS; ++i) {\n            res.bit_count[i] = a.bit_count[i]\
+    \ + b.bit_count[i];\n        }\n        return res;\n    }\n\n    static constexpr\
+    \ operator_type op_id() {\n        return T(0);\n    }\n\n    static constexpr\
+    \ operator_type op_comp(const operator_type& f, const operator_type& g) {\n  \
+    \      return f | g;\n    }\n\n    static constexpr value_type mapping(const operator_type&\
+    \ f, const value_type& x) {\n        if (f == T(0) || x.size == 0) return x;\n\
+    \        value_type res = x;\n        res.sum = T(0);\n        for (int i = 0;\
+    \ i < BITS; ++i) {\n            if ((f >> i) & 1) {\n                res.bit_count[i]\
+    \ = x.size;  // OR forces the bit to be 1 for all elements\n            }\n  \
+    \          res.sum += static_cast<T>(res.bit_count[i]) * (T(1) << i);\n      \
+    \  }\n        return res;\n    }\n\n    static constexpr value_type make(const\
+    \ T& val) {\n        value_type res;\n        res.sum = val;\n        res.size\
+    \ = 1;\n        for (int i = 0; i < BITS; ++i) {\n            res.bit_count[i]\
+    \ = ((val >> i) & 1) ? 1 : 0;\n        }\n        return res;\n    }\n};\n\n}\
+    \  // namespace acted_monoid\n}  // namespace m1une\n\n#endif  // M1UNE_ACTED_MONOID_RANGE_OR_RANGE_SUM_HPP\n"
   dependsOn: []
   isVerificationFile: false
   path: acted_monoid/range_or_range_sum.hpp
   requiredBy: []
-  timestamp: '2026-06-13 20:51:48+09:00'
-  verificationStatus: LIBRARY_NO_TESTS
-  verifiedWith: []
+  timestamp: '2026-07-21 20:17:47+09:00'
+  verificationStatus: LIBRARY_ALL_AC
+  verifiedWith:
+  - verify/monoid/commutative_flags.test.cpp
 documentation_of: acted_monoid/range_or_range_sum.hpp
 layout: document
 title: Range OR Range Sum

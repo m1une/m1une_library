@@ -2,16 +2,25 @@
 data:
   _extendedDependsOn: []
   _extendedRequiredBy:
-  - icon: ':warning:'
+  - icon: ':heavy_check_mark:'
     path: acted_monoid/range_add_range_min_count.hpp
     title: Range Add Range Min Count
-  - icon: ':warning:'
+  - icon: ':heavy_check_mark:'
     path: monoid/max_count.hpp
     title: MaxCount Monoid
-  _extendedVerifiedWith: []
+  _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/monoid/commutative_flags.test.cpp
+    title: verify/monoid/commutative_flags.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/monoid/commutative_flags.test.cpp
+    title: verify/monoid/commutative_flags.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/monoid/commutative_flags.test.cpp
+    title: verify/monoid/commutative_flags.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':warning:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"monoid/min_count.hpp\"\n\n\n\n#include <functional>\n#include\
@@ -20,41 +29,45 @@ data:
     \ a comparison functor (Compare) to determine the optimal value (default is less,\
     \ i.e., minimum).\ntemplate <typename T, T Id = std::numeric_limits<T>::max(),\
     \ typename Compare = std::less<T>>\nstruct MinCount {\n    using value_type =\
-    \ std::pair<T, int>;\n\n    // The identity element has the specified Id value\
-    \ and a count of 0.\n    static constexpr value_type id() {\n        return {Id,\
-    \ 0};\n    }\n\n    // Combines two elements, updating the optimal value and summing\
-    \ the counts if they are equal.\n    static constexpr value_type op(const value_type&\
-    \ a, const value_type& b) {\n        if (Compare()(a.first, b.first)) return a;\n\
-    \        if (Compare()(b.first, a.first)) return b;\n        return {a.first,\
-    \ a.second + b.second};\n    }\n\n    // Helper to securely create a leaf node\
-    \ from a single value.\n    static constexpr value_type make(const T& val, int\
-    \ count = 1) {\n        return {val, count};\n    }\n};\n\n}  // namespace monoid\n\
-    }  // namespace m1une\n\n\n"
+    \ std::pair<T, int>;\n    static constexpr bool commutative = true;\n\n    //\
+    \ The identity element has the specified Id value and a count of 0.\n    static\
+    \ constexpr value_type id() {\n        return {Id, 0};\n    }\n\n    // Combines\
+    \ two elements, updating the optimal value and summing the counts if they are\
+    \ equal.\n    static constexpr value_type op(const value_type& a, const value_type&\
+    \ b) {\n        if (Compare()(a.first, b.first)) return a;\n        if (Compare()(b.first,\
+    \ a.first)) return b;\n        return {a.first, a.second + b.second};\n    }\n\
+    \n    // Helper to securely create a leaf node from a single value.\n    static\
+    \ constexpr value_type make(const T& val, int count = 1) {\n        return {val,\
+    \ count};\n    }\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_MONOID_MIN_COUNT_HPP\n#define M1UNE_MONOID_MIN_COUNT_HPP 1\n\
     \n#include <functional>\n#include <limits>\n#include <utility>\n\nnamespace m1une\
     \ {\nnamespace monoid {\n\n// Monoid for finding the optimal value and its frequency\
     \ in a range.\n// Uses a comparison functor (Compare) to determine the optimal\
     \ value (default is less, i.e., minimum).\ntemplate <typename T, T Id = std::numeric_limits<T>::max(),\
     \ typename Compare = std::less<T>>\nstruct MinCount {\n    using value_type =\
-    \ std::pair<T, int>;\n\n    // The identity element has the specified Id value\
-    \ and a count of 0.\n    static constexpr value_type id() {\n        return {Id,\
-    \ 0};\n    }\n\n    // Combines two elements, updating the optimal value and summing\
-    \ the counts if they are equal.\n    static constexpr value_type op(const value_type&\
-    \ a, const value_type& b) {\n        if (Compare()(a.first, b.first)) return a;\n\
-    \        if (Compare()(b.first, a.first)) return b;\n        return {a.first,\
-    \ a.second + b.second};\n    }\n\n    // Helper to securely create a leaf node\
-    \ from a single value.\n    static constexpr value_type make(const T& val, int\
-    \ count = 1) {\n        return {val, count};\n    }\n};\n\n}  // namespace monoid\n\
-    }  // namespace m1une\n\n#endif  // M1UNE_MONOID_MIN_COUNT_HPP\n"
+    \ std::pair<T, int>;\n    static constexpr bool commutative = true;\n\n    //\
+    \ The identity element has the specified Id value and a count of 0.\n    static\
+    \ constexpr value_type id() {\n        return {Id, 0};\n    }\n\n    // Combines\
+    \ two elements, updating the optimal value and summing the counts if they are\
+    \ equal.\n    static constexpr value_type op(const value_type& a, const value_type&\
+    \ b) {\n        if (Compare()(a.first, b.first)) return a;\n        if (Compare()(b.first,\
+    \ a.first)) return b;\n        return {a.first, a.second + b.second};\n    }\n\
+    \n    // Helper to securely create a leaf node from a single value.\n    static\
+    \ constexpr value_type make(const T& val, int count = 1) {\n        return {val,\
+    \ count};\n    }\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n#endif\
+    \  // M1UNE_MONOID_MIN_COUNT_HPP\n"
   dependsOn: []
   isVerificationFile: false
   path: monoid/min_count.hpp
   requiredBy:
   - monoid/max_count.hpp
   - acted_monoid/range_add_range_min_count.hpp
-  timestamp: '2026-06-13 20:51:48+09:00'
-  verificationStatus: LIBRARY_NO_TESTS
-  verifiedWith: []
+  timestamp: '2026-07-21 20:17:47+09:00'
+  verificationStatus: LIBRARY_ALL_AC
+  verifiedWith:
+  - verify/monoid/commutative_flags.test.cpp
+  - verify/monoid/commutative_flags.test.cpp
+  - verify/monoid/commutative_flags.test.cpp
 documentation_of: monoid/min_count.hpp
 layout: document
 title: MinCount Monoid

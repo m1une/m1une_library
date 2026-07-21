@@ -50,20 +50,21 @@ data:
   bundledCode: "#line 1 \"graph/tree/range_contour_query.hpp\"\n\n\n\n#include <algorithm>\n\
     #include <cassert>\n#include <vector>\n\n#line 1 \"monoid/add.hpp\"\n\n\n\nnamespace\
     \ m1une {\nnamespace monoid {\n\n// Monoid for addition (Range Sum).\ntemplate\
-    \ <typename T>\nstruct Add {\n    using value_type = T;\n\n    // Returns the\
-    \ identity element for addition, which is 0.\n    static constexpr T id() {\n\
-    \        return T(0);\n    }\n\n    // Returns the sum of a and b.\n    static\
-    \ constexpr T op(const T& a, const T& b) {\n        return a + b;\n    }\n\n \
-    \   static constexpr T inv(const T& x) {\n        return -x;\n    }\n};\n\n} \
-    \ // namespace monoid\n}  // namespace m1une\n\n\n#line 1 \"monoid/concept.hpp\"\
-    \n\n\n\n#include <concepts>\n\nnamespace m1une {\nnamespace monoid {\n\n// Concept\
-    \ to check if a type satisfies the requirements of a Monoid.\n// A Monoid must\
-    \ have a `value_type`, an identity element `id()`, and an associative binary operation\
-    \ `op()`.\ntemplate <typename M>\nconcept IsMonoid = requires(typename M::value_type\
-    \ a, typename M::value_type b) {\n    // 1. Must define `value_type`\n    typename\
-    \ M::value_type;\n\n    // 2. Must have a static method `id()` returning `value_type`\n\
-    \    { M::id() } -> std::same_as<typename M::value_type>;\n\n    // 3. Must have\
-    \ a static method `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
+    \ <typename T>\nstruct Add {\n    using value_type = T;\n    static constexpr\
+    \ bool commutative = true;\n\n    // Returns the identity element for addition,\
+    \ which is 0.\n    static constexpr T id() {\n        return T(0);\n    }\n\n\
+    \    // Returns the sum of a and b.\n    static constexpr T op(const T& a, const\
+    \ T& b) {\n        return a + b;\n    }\n\n    static constexpr T inv(const T&\
+    \ x) {\n        return -x;\n    }\n};\n\n}  // namespace monoid\n}  // namespace\
+    \ m1une\n\n\n#line 1 \"monoid/concept.hpp\"\n\n\n\n#include <concepts>\n\nnamespace\
+    \ m1une {\nnamespace monoid {\n\n// Concept to check if a type satisfies the requirements\
+    \ of a Monoid.\n// A Monoid must have a `value_type`, an identity element `id()`,\
+    \ and an associative binary operation `op()`.\ntemplate <typename M>\nconcept\
+    \ IsMonoid = requires(typename M::value_type a, typename M::value_type b) {\n\
+    \    // 1. Must define `value_type`\n    typename M::value_type;\n\n    // 2.\
+    \ Must have a static method `id()` returning `value_type`\n    { M::id() } ->\
+    \ std::same_as<typename M::value_type>;\n\n    // 3. Must have a static method\
+    \ `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
     \ M::value_type>;\n};\n\n// Concept for groups. A type satisfying this concept\
     \ must also obey the group\n// laws; concepts can check the interface but not\
     \ the algebraic properties.\ntemplate <typename M>\nconcept IsGroup = IsMonoid<M>\
@@ -534,7 +535,7 @@ data:
   requiredBy:
   - graph/all.hpp
   - graph/tree/all.hpp
-  timestamp: '2026-07-16 20:44:42+09:00'
+  timestamp: '2026-07-21 20:17:47+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/graph_algorithms.test.cpp

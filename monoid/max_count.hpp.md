@@ -1,14 +1,17 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':warning:'
+  - icon: ':heavy_check_mark:'
     path: monoid/min_count.hpp
     title: MinCount Monoid
   _extendedRequiredBy: []
-  _extendedVerifiedWith: []
+  _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/monoid/commutative_flags.test.cpp
+    title: verify/monoid/commutative_flags.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':warning:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"monoid/max_count.hpp\"\n\n\n\n#include <functional>\n#include\
@@ -18,20 +21,21 @@ data:
     \ functor (Compare) to determine the optimal value (default is less, i.e., minimum).\n\
     template <typename T, T Id = std::numeric_limits<T>::max(), typename Compare =\
     \ std::less<T>>\nstruct MinCount {\n    using value_type = std::pair<T, int>;\n\
-    \n    // The identity element has the specified Id value and a count of 0.\n \
-    \   static constexpr value_type id() {\n        return {Id, 0};\n    }\n\n   \
-    \ // Combines two elements, updating the optimal value and summing the counts\
-    \ if they are equal.\n    static constexpr value_type op(const value_type& a,\
-    \ const value_type& b) {\n        if (Compare()(a.first, b.first)) return a;\n\
-    \        if (Compare()(b.first, a.first)) return b;\n        return {a.first,\
-    \ a.second + b.second};\n    }\n\n    // Helper to securely create a leaf node\
-    \ from a single value.\n    static constexpr value_type make(const T& val, int\
-    \ count = 1) {\n        return {val, count};\n    }\n};\n\n}  // namespace monoid\n\
-    }  // namespace m1une\n\n\n#line 8 \"monoid/max_count.hpp\"\n\nnamespace m1une\
-    \ {\nnamespace monoid {\n\n// Monoid for finding the maximum value and its frequency\
-    \ in a range.\n// Defined as a type alias of MinCount using std::greater.\ntemplate\
-    \ <typename T, T Id = std::numeric_limits<T>::lowest()>\nusing MaxCount = MinCount<T,\
-    \ Id, std::greater<T>>;\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n"
+    \    static constexpr bool commutative = true;\n\n    // The identity element\
+    \ has the specified Id value and a count of 0.\n    static constexpr value_type\
+    \ id() {\n        return {Id, 0};\n    }\n\n    // Combines two elements, updating\
+    \ the optimal value and summing the counts if they are equal.\n    static constexpr\
+    \ value_type op(const value_type& a, const value_type& b) {\n        if (Compare()(a.first,\
+    \ b.first)) return a;\n        if (Compare()(b.first, a.first)) return b;\n  \
+    \      return {a.first, a.second + b.second};\n    }\n\n    // Helper to securely\
+    \ create a leaf node from a single value.\n    static constexpr value_type make(const\
+    \ T& val, int count = 1) {\n        return {val, count};\n    }\n};\n\n}  // namespace\
+    \ monoid\n}  // namespace m1une\n\n\n#line 8 \"monoid/max_count.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace monoid {\n\n// Monoid for finding the maximum value and its\
+    \ frequency in a range.\n// Defined as a type alias of MinCount using std::greater.\n\
+    template <typename T, T Id = std::numeric_limits<T>::lowest()>\nusing MaxCount\
+    \ = MinCount<T, Id, std::greater<T>>;\n\n}  // namespace monoid\n}  // namespace\
+    \ m1une\n\n\n"
   code: '#ifndef M1UNE_MONOID_MAX_COUNT_HPP
 
     #define M1UNE_MONOID_MAX_COUNT_HPP 1
@@ -72,9 +76,10 @@ data:
   isVerificationFile: false
   path: monoid/max_count.hpp
   requiredBy: []
-  timestamp: '2026-06-21 04:34:53+09:00'
-  verificationStatus: LIBRARY_NO_TESTS
-  verifiedWith: []
+  timestamp: '2026-07-21 20:17:47+09:00'
+  verificationStatus: LIBRARY_ALL_AC
+  verifiedWith:
+  - verify/monoid/commutative_flags.test.cpp
 documentation_of: monoid/max_count.hpp
 layout: document
 title: MaxCount Monoid

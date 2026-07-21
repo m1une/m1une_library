@@ -6,85 +6,85 @@ data:
     - icon: ':heavy_check_mark:'
       path: acted_monoid/beats_concept.hpp
       title: Beats Acted Monoid Concept
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: acted_monoid/beats_wrapper.hpp
       title: Beats Acted Monoid Wrapper
     - icon: ':heavy_check_mark:'
       path: acted_monoid/concept.hpp
       title: Acted Monoid Concept
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: acted_monoid/range_add_range_arg_max.hpp
       title: Range Add Range ArgMax
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: acted_monoid/range_add_range_arg_min.hpp
       title: Range Add Range ArgMin
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: acted_monoid/range_add_range_max.hpp
       title: Range Add Range Max
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: acted_monoid/range_add_range_min.hpp
       title: Range Add Range Min
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: acted_monoid/range_add_range_min_count.hpp
       title: Range Add Range Min Count
     - icon: ':heavy_check_mark:'
       path: acted_monoid/range_add_range_sum.hpp
       title: Range Add Range Sum
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: acted_monoid/range_affine_range_min_max.hpp
       title: Range Affine Range Min Max
     - icon: ':heavy_check_mark:'
       path: acted_monoid/range_affine_range_sum.hpp
       title: Range Affine Range Sum
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: acted_monoid/range_affine_range_sum_of_squares.hpp
       title: Range Affine Range Sum of Squares
     - icon: ':heavy_check_mark:'
       path: acted_monoid/range_ap_add_range_sum.hpp
       title: Range AP Add Range Sum
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: acted_monoid/range_ap_update_range_min_max.hpp
       title: Range AP Update Range Min Max
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: acted_monoid/range_ap_update_range_sum.hpp
       title: Range AP Update Range Sum
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: acted_monoid/range_flip_range_binary_inversion.hpp
       title: Range Flip Range Binary Inversion
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: acted_monoid/range_flip_range_sum.hpp
       title: Range Flip Range Sum
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: acted_monoid/range_mul_range_sum.hpp
       title: Range Multiply Range Sum
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: acted_monoid/range_or_range_sum.hpp
       title: Range OR Range Sum
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: acted_monoid/range_update_range_longest_true.hpp
       title: Range Update Range Longest True
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: acted_monoid/range_update_range_max.hpp
       title: Range Update Range Max
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: acted_monoid/range_update_range_max_subarray.hpp
       title: Range Update Range Max Subarray
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: acted_monoid/range_update_range_min.hpp
       title: Range Update Range Min
     - icon: ':heavy_check_mark:'
       path: acted_monoid/range_update_range_product.hpp
       title: Range Update Range Product
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: acted_monoid/range_update_range_sum.hpp
       title: Range Update Range Sum
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: acted_monoid/range_xor_range_sum.hpp
       title: Range XOR Range Sum
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: acted_monoid/range_xor_range_xor.hpp
       title: Range Xor Range Xor
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: acted_monoid/wrapper.hpp
       title: Acted Monoid Wrapper
   - name: algo
@@ -168,16 +168,6 @@ data:
     - icon: ':heavy_check_mark:'
       path: algo/sequence/subset_sum.hpp
       title: Meet-in-the-Middle Subset Sum
-  - name: benchmark/ds/range_query
-    pages:
-    - icon: ':warning:'
-      path: benchmark/ds/range_query/offline_point_update_range_order_statistics_sum_benchmark.cpp
-      title: benchmark/ds/range_query/offline_point_update_range_order_statistics_sum_benchmark.cpp
-  - name: benchmark/ds/wavelet_matrix
-    pages:
-    - icon: ':warning:'
-      path: benchmark/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_benchmark.cpp
-      title: benchmark/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_benchmark.cpp
   - name: .
     pages:
     - icon: ':warning:'
@@ -1008,97 +998,97 @@ data:
     - icon: ':heavy_check_mark:'
       path: monoid/affine.hpp
       title: Affine Monoid
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/and.hpp
       title: Bitwise AND Monoid
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/arg_max.hpp
       title: ArgMax Monoid
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/arg_min.hpp
       title: ArgMin Monoid
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/binary_inversion.hpp
       title: Binary Inversion Monoid
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/bottom_k.hpp
       title: Bottom K Monoid
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/bracket.hpp
       title: Bracket Monoid
     - icon: ':heavy_check_mark:'
       path: monoid/concept.hpp
       title: Monoid Concept
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/gcd.hpp
       title: GCD Monoid
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/longest_same.hpp
       title: Longest Same Monoid
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/longest_true.hpp
       title: Longest True Monoid
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/matrix.hpp
       title: Matrix Monoid
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/max.hpp
       title: Max Monoid
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/max_count.hpp
       title: MaxCount Monoid
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/max_plus_matrix.hpp
       title: Max-Plus Matrix Monoid
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/max_subarray.hpp
       title: Max Subarray Monoid
     - icon: ':heavy_check_mark:'
       path: monoid/min.hpp
       title: Min Monoid
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/min_count.hpp
       title: MinCount Monoid
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/min_max.hpp
       title: MinMax Monoid
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/min_plus_matrix.hpp
       title: Min-Plus Matrix Monoid
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/min_subarray.hpp
       title: Min Subarray Monoid
     - icon: ':heavy_check_mark:'
       path: monoid/mul.hpp
       title: Multiply Monoid
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/or.hpp
       title: Bitwise OR Monoid
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/permutation.hpp
       title: Permutation Monoid
     - icon: ':heavy_check_mark:'
       path: monoid/power.hpp
       title: Monoid Power
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/rolling_hash.hpp
       title: Rolling Hash Monoid
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/strict_max2.hpp
       title: Strict Max 2 Monoid
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/strict_min2.hpp
       title: Strict Min 2 Monoid
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/top_k.hpp
       title: Top K Monoid
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/top_k_count.hpp
       title: Top K Count Monoid
     - icon: ':heavy_check_mark:'
       path: monoid/update.hpp
       title: Update Monoid
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: monoid/wrapper.hpp
       title: Monoid Wrapper
     - icon: ':heavy_check_mark:'
@@ -2119,6 +2109,11 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/matroid/weighted_matroid_intersection.test.cpp
       title: verify/matroid/weighted_matroid_intersection.test.cpp
+  - name: verify/monoid
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/monoid/commutative_flags.test.cpp
+      title: verify/monoid/commutative_flags.test.cpp
   - name: verify/optimization
     pages:
     - icon: ':heavy_check_mark:'

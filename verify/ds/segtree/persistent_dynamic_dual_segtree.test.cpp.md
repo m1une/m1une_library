@@ -448,21 +448,22 @@ data:
     \n#include <optional>\n#line 11 \"verify/ds/segtree/persistent_dynamic_dual_segtree.test.cpp\"\
     \n\n#line 1 \"monoid/add.hpp\"\n\n\n\nnamespace m1une {\nnamespace monoid {\n\n\
     // Monoid for addition (Range Sum).\ntemplate <typename T>\nstruct Add {\n   \
-    \ using value_type = T;\n\n    // Returns the identity element for addition, which\
-    \ is 0.\n    static constexpr T id() {\n        return T(0);\n    }\n\n    //\
-    \ Returns the sum of a and b.\n    static constexpr T op(const T& a, const T&\
-    \ b) {\n        return a + b;\n    }\n\n    static constexpr T inv(const T& x)\
-    \ {\n        return -x;\n    }\n};\n\n}  // namespace monoid\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"monoid/update.hpp\"\n\n\n\n#line 5 \"monoid/update.hpp\"\
-    \n\nnamespace m1une {\nnamespace monoid {\n\n// Monoid for range updates/assignments.\n\
-    // Uses std::optional to represent the presence of an assignment.\ntemplate <typename\
-    \ T>\nstruct Update {\n    using value_type = std::optional<T>;\n\n    // The\
-    \ identity element represents \"no operation\".\n    static constexpr value_type\
-    \ id() {\n        return std::nullopt;\n    }\n\n    // Composes two updates.\
-    \ The newer operation 'a' overwrites the older 'b'.\n    // If 'a' does not exist,\
-    \ it falls back to 'b'.\n    static constexpr value_type op(const value_type&\
-    \ a, const value_type& b) {\n        return a.has_value() ? a : b;\n    }\n};\n\
-    \n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 14 \"verify/ds/segtree/persistent_dynamic_dual_segtree.test.cpp\"\
+    \ using value_type = T;\n    static constexpr bool commutative = true;\n\n   \
+    \ // Returns the identity element for addition, which is 0.\n    static constexpr\
+    \ T id() {\n        return T(0);\n    }\n\n    // Returns the sum of a and b.\n\
+    \    static constexpr T op(const T& a, const T& b) {\n        return a + b;\n\
+    \    }\n\n    static constexpr T inv(const T& x) {\n        return -x;\n    }\n\
+    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 1 \"monoid/update.hpp\"\
+    \n\n\n\n#line 5 \"monoid/update.hpp\"\n\nnamespace m1une {\nnamespace monoid {\n\
+    \n// Monoid for range updates/assignments.\n// Uses std::optional to represent\
+    \ the presence of an assignment.\ntemplate <typename T>\nstruct Update {\n   \
+    \ using value_type = std::optional<T>;\n    static constexpr bool commutative\
+    \ = false;\n\n    // The identity element represents \"no operation\".\n    static\
+    \ constexpr value_type id() {\n        return std::nullopt;\n    }\n\n    // Composes\
+    \ two updates. The newer operation 'a' overwrites the older 'b'.\n    // If 'a'\
+    \ does not exist, it falls back to 'b'.\n    static constexpr value_type op(const\
+    \ value_type& a, const value_type& b) {\n        return a.has_value() ? a : b;\n\
+    \    }\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 14 \"verify/ds/segtree/persistent_dynamic_dual_segtree.test.cpp\"\
     \n\nnamespace {\n\nvoid test_versions() {\n    using Add = m1une::monoid::Add<long\
     \ long>;\n    using Seg = m1une::ds::PersistentDynamicDualSegtree<Add, int>;\n\
     \n    Seg base(-50, 60, 5);\n    base.reserve(20000);\n    Seg first = base.apply(-10,\
@@ -553,7 +554,7 @@ data:
   isVerificationFile: true
   path: verify/ds/segtree/persistent_dynamic_dual_segtree.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-07-21 20:17:47+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/segtree/persistent_dynamic_dual_segtree.test.cpp

@@ -2,13 +2,19 @@
 data:
   _extendedDependsOn: []
   _extendedRequiredBy:
-  - icon: ':warning:'
+  - icon: ':heavy_check_mark:'
     path: monoid/strict_max2.hpp
     title: Strict Max 2 Monoid
-  _extendedVerifiedWith: []
+  _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/monoid/commutative_flags.test.cpp
+    title: verify/monoid/commutative_flags.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/monoid/commutative_flags.test.cpp
+    title: verify/monoid/commutative_flags.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':warning:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"monoid/strict_min2.hpp\"\n\n\n\n#include <functional>\n\
@@ -17,33 +23,13 @@ data:
     \ opt2;  // The strictly second-best value\n};\n\n// Monoid for finding the strictly\
     \ 1st and 2nd optimal (minimum by default) values in a range.\ntemplate <typename\
     \ T, T Id = std::numeric_limits<T>::max(), typename Compare = std::less<T>>\n\
-    struct StrictMin2 {\n    using value_type = StrictOpt2Node<T>;\n\n    // The identity\
-    \ element has both values set to Id.\n    static constexpr value_type id() {\n\
-    \        return {Id, Id};\n    }\n\n    // Merges two elements, preserving the\
-    \ top 2 strictly unique values.\n    static constexpr value_type op(const value_type&\
-    \ a, const value_type& b) {\n        auto update = [](T& m1, T& m2, T val) {\n\
-    \            if (val == Id || val == m1 || val == m2) return;\n            if\
-    \ (m1 == Id || Compare()(val, m1)) {\n                m2 = m1;\n             \
-    \   m1 = val;\n            } else if (m2 == Id || Compare()(val, m2)) {\n    \
-    \            m2 = val;\n            }\n        };\n\n        T m1 = Id, m2 = Id;\n\
-    \        update(m1, m2, a.opt1);\n        update(m1, m2, a.opt2);\n        update(m1,\
-    \ m2, b.opt1);\n        update(m1, m2, b.opt2);\n\n        return {m1, m2};\n\
-    \    }\n\n    // Helper to securely create a leaf node.\n    static constexpr\
-    \ value_type make(const T& val) {\n        return {val, Id};\n    }\n};\n\n} \
-    \ // namespace monoid\n}  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_MONOID_STRICT_MIN2_HPP\n#define M1UNE_MONOID_STRICT_MIN2_HPP\
-    \ 1\n\n#include <functional>\n#include <limits>\n\nnamespace m1une {\nnamespace\
-    \ monoid {\n\ntemplate <typename T>\nstruct StrictOpt2Node {\n    T opt1;  //\
-    \ The strictly best value\n    T opt2;  // The strictly second-best value\n};\n\
-    \n// Monoid for finding the strictly 1st and 2nd optimal (minimum by default)\
-    \ values in a range.\ntemplate <typename T, T Id = std::numeric_limits<T>::max(),\
-    \ typename Compare = std::less<T>>\nstruct StrictMin2 {\n    using value_type\
-    \ = StrictOpt2Node<T>;\n\n    // The identity element has both values set to Id.\n\
-    \    static constexpr value_type id() {\n        return {Id, Id};\n    }\n\n \
-    \   // Merges two elements, preserving the top 2 strictly unique values.\n   \
-    \ static constexpr value_type op(const value_type& a, const value_type& b) {\n\
-    \        auto update = [](T& m1, T& m2, T val) {\n            if (val == Id ||\
-    \ val == m1 || val == m2) return;\n            if (m1 == Id || Compare()(val,\
+    struct StrictMin2 {\n    using value_type = StrictOpt2Node<T>;\n    static constexpr\
+    \ bool commutative = true;\n\n    // The identity element has both values set\
+    \ to Id.\n    static constexpr value_type id() {\n        return {Id, Id};\n \
+    \   }\n\n    // Merges two elements, preserving the top 2 strictly unique values.\n\
+    \    static constexpr value_type op(const value_type& a, const value_type& b)\
+    \ {\n        auto update = [](T& m1, T& m2, T val) {\n            if (val == Id\
+    \ || val == m1 || val == m2) return;\n            if (m1 == Id || Compare()(val,\
     \ m1)) {\n                m2 = m1;\n                m1 = val;\n            } else\
     \ if (m2 == Id || Compare()(val, m2)) {\n                m2 = val;\n         \
     \   }\n        };\n\n        T m1 = Id, m2 = Id;\n        update(m1, m2, a.opt1);\n\
@@ -51,15 +37,38 @@ data:
     \ m2, b.opt2);\n\n        return {m1, m2};\n    }\n\n    // Helper to securely\
     \ create a leaf node.\n    static constexpr value_type make(const T& val) {\n\
     \        return {val, Id};\n    }\n};\n\n}  // namespace monoid\n}  // namespace\
-    \ m1une\n\n#endif  // M1UNE_MONOID_STRICT_MIN2_HPP\n"
+    \ m1une\n\n\n"
+  code: "#ifndef M1UNE_MONOID_STRICT_MIN2_HPP\n#define M1UNE_MONOID_STRICT_MIN2_HPP\
+    \ 1\n\n#include <functional>\n#include <limits>\n\nnamespace m1une {\nnamespace\
+    \ monoid {\n\ntemplate <typename T>\nstruct StrictOpt2Node {\n    T opt1;  //\
+    \ The strictly best value\n    T opt2;  // The strictly second-best value\n};\n\
+    \n// Monoid for finding the strictly 1st and 2nd optimal (minimum by default)\
+    \ values in a range.\ntemplate <typename T, T Id = std::numeric_limits<T>::max(),\
+    \ typename Compare = std::less<T>>\nstruct StrictMin2 {\n    using value_type\
+    \ = StrictOpt2Node<T>;\n    static constexpr bool commutative = true;\n\n    //\
+    \ The identity element has both values set to Id.\n    static constexpr value_type\
+    \ id() {\n        return {Id, Id};\n    }\n\n    // Merges two elements, preserving\
+    \ the top 2 strictly unique values.\n    static constexpr value_type op(const\
+    \ value_type& a, const value_type& b) {\n        auto update = [](T& m1, T& m2,\
+    \ T val) {\n            if (val == Id || val == m1 || val == m2) return;\n   \
+    \         if (m1 == Id || Compare()(val, m1)) {\n                m2 = m1;\n  \
+    \              m1 = val;\n            } else if (m2 == Id || Compare()(val, m2))\
+    \ {\n                m2 = val;\n            }\n        };\n\n        T m1 = Id,\
+    \ m2 = Id;\n        update(m1, m2, a.opt1);\n        update(m1, m2, a.opt2);\n\
+    \        update(m1, m2, b.opt1);\n        update(m1, m2, b.opt2);\n\n        return\
+    \ {m1, m2};\n    }\n\n    // Helper to securely create a leaf node.\n    static\
+    \ constexpr value_type make(const T& val) {\n        return {val, Id};\n    }\n\
+    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n#endif  // M1UNE_MONOID_STRICT_MIN2_HPP\n"
   dependsOn: []
   isVerificationFile: false
   path: monoid/strict_min2.hpp
   requiredBy:
   - monoid/strict_max2.hpp
-  timestamp: '2026-06-13 20:51:48+09:00'
-  verificationStatus: LIBRARY_NO_TESTS
-  verifiedWith: []
+  timestamp: '2026-07-21 20:17:47+09:00'
+  verificationStatus: LIBRARY_ALL_AC
+  verifiedWith:
+  - verify/monoid/commutative_flags.test.cpp
+  - verify/monoid/commutative_flags.test.cpp
 documentation_of: monoid/strict_min2.hpp
 layout: document
 title: Strict Min 2 Monoid

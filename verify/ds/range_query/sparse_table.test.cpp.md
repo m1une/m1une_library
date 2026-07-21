@@ -95,22 +95,22 @@ data:
     #include <limits>\n\nnamespace m1une {\nnamespace monoid {\n\n// Monoid for minimum\
     \ (Range Minimum).\n// The identity element defaults to the maximum possible value\
     \ of type T, but can be overridden.\ntemplate <typename T, T Id = std::numeric_limits<T>::max()>\n\
-    struct Min {\n    using value_type = T;\n\n    // Returns the identity element\
-    \ for minimum.\n    static constexpr T id() {\n        return Id;\n    }\n\n \
-    \   // Returns the minimum of a and b.\n    static constexpr T op(const T& a,\
-    \ const T& b) {\n        return std::min(a, b);\n    }\n};\n\n}  // namespace\
-    \ monoid\n}  // namespace m1une\n\n\n#line 5 \"verify/ds/range_query/sparse_table.test.cpp\"\
-    \n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 5 \"utilities/fast_io.hpp\"\
-    \n#include <array>\n#include <cerrno>\n#include <charconv>\n#include <cstddef>\n\
-    #include <cstdio>\n#include <cstdlib>\n#include <cstdint>\n#include <cstring>\n\
-    #include <iterator>\n#include <string>\n#include <sys/stat.h>\n#include <type_traits>\n\
-    #line 18 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n\nnamespace m1une {\n\
-    namespace utilities {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\n\
-    template <class T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate\
-    \ <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
-    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
-    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
-    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    struct Min {\n    using value_type = T;\n    static constexpr bool commutative\
+    \ = true;\n\n    // Returns the identity element for minimum.\n    static constexpr\
+    \ T id() {\n        return Id;\n    }\n\n    // Returns the minimum of a and b.\n\
+    \    static constexpr T op(const T& a, const T& b) {\n        return std::min(a,\
+    \ b);\n    }\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 5\
+    \ \"verify/ds/range_query/sparse_table.test.cpp\"\n\n#line 1 \"utilities/fast_io.hpp\"\
+    \n\n\n\n#line 5 \"utilities/fast_io.hpp\"\n#include <array>\n#include <cerrno>\n\
+    #include <charconv>\n#include <cstddef>\n#include <cstdio>\n#include <cstdlib>\n\
+    #include <cstdint>\n#include <cstring>\n#include <iterator>\n#include <string>\n\
+    #include <sys/stat.h>\n#include <type_traits>\n#line 18 \"utilities/fast_io.hpp\"\
+    \n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal\
+    \ {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\n\
+    struct is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T,\
+    \ std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
+    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
+    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
     \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
     \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
@@ -368,7 +368,7 @@ data:
   isVerificationFile: true
   path: verify/ds/range_query/sparse_table.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-07-21 20:17:47+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/range_query/sparse_table.test.cpp

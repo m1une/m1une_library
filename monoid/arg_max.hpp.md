@@ -1,14 +1,17 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':warning:'
+  - icon: ':heavy_check_mark:'
     path: monoid/arg_min.hpp
     title: ArgMin Monoid
   _extendedRequiredBy: []
-  _extendedVerifiedWith: []
+  _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/monoid/commutative_flags.test.cpp
+    title: verify/monoid/commutative_flags.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':warning:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"monoid/arg_max.hpp\"\n\n\n\n#include <functional>\n#include\
@@ -18,19 +21,20 @@ data:
     \ finding the optimal value (minimum by default) and its relative order.\n// Ties\
     \ are broken by choosing the earlier element.\ntemplate <typename T, T Id = std::numeric_limits<T>::max(),\
     \ typename Compare = std::less<T>>\nstruct ArgMin {\n    using value_type = ArgMinNode<T>;\n\
-    \n    static constexpr value_type id() {\n        return {Id, 0, -1};\n    }\n\
-    \n    static constexpr value_type op(const value_type& a, const value_type& b)\
-    \ {\n        if (a.size == 0) return b;\n        if (b.size == 0) return a;\n\
-    \        long long size = a.size + b.size;\n        if (Compare()(a.value, b.value))\
-    \ return {a.value, size, a.ord};\n        if (Compare()(b.value, a.value)) return\
-    \ {b.value, size, b.ord + a.size};\n        return {a.value, size, a.ord};\n \
-    \   }\n\n    static constexpr value_type make(const T& val) {\n        return\
-    \ {val, 1, 0};\n    }\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n\
-    \n#line 8 \"monoid/arg_max.hpp\"\n\nnamespace m1une {\nnamespace monoid {\n\n\
-    // Monoid for finding the maximum value and its corresponding index.\n// Defined\
-    \ as a type alias of ArgMin using std::greater.\ntemplate <typename T, T Id =\
-    \ std::numeric_limits<T>::lowest()>\nusing ArgMax = ArgMin<T, Id, std::greater<T>>;\n\
-    \n}  // namespace monoid\n}  // namespace m1une\n\n\n"
+    \    static constexpr bool commutative = false;\n\n    static constexpr value_type\
+    \ id() {\n        return {Id, 0, -1};\n    }\n\n    static constexpr value_type\
+    \ op(const value_type& a, const value_type& b) {\n        if (a.size == 0) return\
+    \ b;\n        if (b.size == 0) return a;\n        long long size = a.size + b.size;\n\
+    \        if (Compare()(a.value, b.value)) return {a.value, size, a.ord};\n   \
+    \     if (Compare()(b.value, a.value)) return {b.value, size, b.ord + a.size};\n\
+    \        return {a.value, size, a.ord};\n    }\n\n    static constexpr value_type\
+    \ make(const T& val) {\n        return {val, 1, 0};\n    }\n};\n\n}  // namespace\
+    \ monoid\n}  // namespace m1une\n\n\n#line 8 \"monoid/arg_max.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace monoid {\n\n// Monoid for finding the maximum value and its\
+    \ corresponding index.\n// Defined as a type alias of ArgMin using std::greater.\n\
+    template <typename T, T Id = std::numeric_limits<T>::lowest()>\nusing ArgMax =\
+    \ ArgMin<T, Id, std::greater<T>>;\n\n}  // namespace monoid\n}  // namespace m1une\n\
+    \n\n"
   code: '#ifndef M1UNE_MONOID_ARG_MAX_HPP
 
     #define M1UNE_MONOID_ARG_MAX_HPP 1
@@ -71,9 +75,10 @@ data:
   isVerificationFile: false
   path: monoid/arg_max.hpp
   requiredBy: []
-  timestamp: '2026-06-21 04:34:53+09:00'
-  verificationStatus: LIBRARY_NO_TESTS
-  verifiedWith: []
+  timestamp: '2026-07-21 20:17:47+09:00'
+  verificationStatus: LIBRARY_ALL_AC
+  verifiedWith:
+  - verify/monoid/commutative_flags.test.cpp
 documentation_of: monoid/arg_max.hpp
 layout: document
 title: ArgMax Monoid

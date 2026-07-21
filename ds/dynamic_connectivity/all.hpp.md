@@ -145,35 +145,35 @@ data:
     #include <cstdint>\n#line 9 \"ds/dynamic_connectivity/online_dynamic_connectivity.hpp\"\
     \n\n#line 1 \"monoid/add.hpp\"\n\n\n\nnamespace m1une {\nnamespace monoid {\n\n\
     // Monoid for addition (Range Sum).\ntemplate <typename T>\nstruct Add {\n   \
-    \ using value_type = T;\n\n    // Returns the identity element for addition, which\
-    \ is 0.\n    static constexpr T id() {\n        return T(0);\n    }\n\n    //\
-    \ Returns the sum of a and b.\n    static constexpr T op(const T& a, const T&\
-    \ b) {\n        return a + b;\n    }\n\n    static constexpr T inv(const T& x)\
-    \ {\n        return -x;\n    }\n};\n\n}  // namespace monoid\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"ds/dynamic_tree/link_cut_tree.hpp\"\n\n\n\n#line 5 \"ds/dynamic_tree/link_cut_tree.hpp\"\
-    \n#include <concepts>\n#include <type_traits>\n#line 9 \"ds/dynamic_tree/link_cut_tree.hpp\"\
-    \n\n#line 1 \"monoid/concept.hpp\"\n\n\n\n#line 5 \"monoid/concept.hpp\"\n\nnamespace\
-    \ m1une {\nnamespace monoid {\n\n// Concept to check if a type satisfies the requirements\
-    \ of a Monoid.\n// A Monoid must have a `value_type`, an identity element `id()`,\
-    \ and an associative binary operation `op()`.\ntemplate <typename M>\nconcept\
-    \ IsMonoid = requires(typename M::value_type a, typename M::value_type b) {\n\
-    \    // 1. Must define `value_type`\n    typename M::value_type;\n\n    // 2.\
-    \ Must have a static method `id()` returning `value_type`\n    { M::id() } ->\
-    \ std::same_as<typename M::value_type>;\n\n    // 3. Must have a static method\
-    \ `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for groups. A type satisfying this concept\
-    \ must also obey the group\n// laws; concepts can check the interface but not\
-    \ the algebraic properties.\ntemplate <typename M>\nconcept IsGroup = IsMonoid<M>\
-    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for commutative groups. Commutativity is a\
-    \ semantic requirement and\n// cannot be checked by a C++ concept.\ntemplate <typename\
-    \ M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\n}  // namespace monoid\n}  //\
-    \ namespace m1une\n\n\n#line 11 \"ds/dynamic_tree/link_cut_tree.hpp\"\n\nnamespace\
-    \ m1une {\nnamespace ds {\n\ntemplate <m1une::monoid::IsCommutativeGroup Group>\n\
-    struct LinkCutTree {\n    using T = typename Group::value_type;\n\n   private:\n\
-    \    struct Node {\n        int left = -1;\n        int right = -1;\n        int\
-    \ parent = -1;\n        bool rev = false;\n        int size = 1;\n        int\
-    \ virtual_size = 0;\n        int all_size = 1;\n        T value = Group::id();\n\
+    \ using value_type = T;\n    static constexpr bool commutative = true;\n\n   \
+    \ // Returns the identity element for addition, which is 0.\n    static constexpr\
+    \ T id() {\n        return T(0);\n    }\n\n    // Returns the sum of a and b.\n\
+    \    static constexpr T op(const T& a, const T& b) {\n        return a + b;\n\
+    \    }\n\n    static constexpr T inv(const T& x) {\n        return -x;\n    }\n\
+    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 1 \"ds/dynamic_tree/link_cut_tree.hpp\"\
+    \n\n\n\n#line 5 \"ds/dynamic_tree/link_cut_tree.hpp\"\n#include <concepts>\n#include\
+    \ <type_traits>\n#line 9 \"ds/dynamic_tree/link_cut_tree.hpp\"\n\n#line 1 \"monoid/concept.hpp\"\
+    \n\n\n\n#line 5 \"monoid/concept.hpp\"\n\nnamespace m1une {\nnamespace monoid\
+    \ {\n\n// Concept to check if a type satisfies the requirements of a Monoid.\n\
+    // A Monoid must have a `value_type`, an identity element `id()`, and an associative\
+    \ binary operation `op()`.\ntemplate <typename M>\nconcept IsMonoid = requires(typename\
+    \ M::value_type a, typename M::value_type b) {\n    // 1. Must define `value_type`\n\
+    \    typename M::value_type;\n\n    // 2. Must have a static method `id()` returning\
+    \ `value_type`\n    { M::id() } -> std::same_as<typename M::value_type>;\n\n \
+    \   // 3. Must have a static method `op(a, b)` returning `value_type`\n    { M::op(a,\
+    \ b) } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for groups.\
+    \ A type satisfying this concept must also obey the group\n// laws; concepts can\
+    \ check the interface but not the algebraic properties.\ntemplate <typename M>\n\
+    concept IsGroup = IsMonoid<M> && requires(typename M::value_type a) {\n    { M::inv(a)\
+    \ } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for commutative\
+    \ groups. Commutativity is a semantic requirement and\n// cannot be checked by\
+    \ a C++ concept.\ntemplate <typename M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\
+    \n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 11 \"ds/dynamic_tree/link_cut_tree.hpp\"\
+    \n\nnamespace m1une {\nnamespace ds {\n\ntemplate <m1une::monoid::IsCommutativeGroup\
+    \ Group>\nstruct LinkCutTree {\n    using T = typename Group::value_type;\n\n\
+    \   private:\n    struct Node {\n        int left = -1;\n        int right = -1;\n\
+    \        int parent = -1;\n        bool rev = false;\n        int size = 1;\n\
+    \        int virtual_size = 0;\n        int all_size = 1;\n        T value = Group::id();\n\
     \        T prod = Group::id();\n        T rev_prod = Group::id();\n        T virtual_prod\
     \ = Group::id();\n        T all_prod = Group::id();\n    };\n\n    struct EdgeInfo\
     \ {\n        int u = -1;\n        int v = -1;\n        int node = -1;\n      \
@@ -534,7 +534,7 @@ data:
   isVerificationFile: false
   path: ds/dynamic_connectivity/all.hpp
   requiredBy: []
-  timestamp: '2026-07-16 20:44:42+09:00'
+  timestamp: '2026-07-21 20:17:47+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/dynamic_connectivity/dynamic_connectivity.test.cpp

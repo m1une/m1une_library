@@ -559,34 +559,36 @@ data:
     namespace acted_monoid {\n\ntemplate <typename T>\nstruct RangeAddRangeSumNode\
     \ {\n    T sum;\n    long long size;\n};\n\ntemplate <typename T>\nstruct RangeAddRangeSum\
     \ {\n    using value_type = RangeAddRangeSumNode<T>;\n    using operator_type\
-    \ = T;\n\n    // Value Monoid (Sum)\n    static constexpr value_type id() {\n\
-    \        return {T(0), 0};\n    }\n    static constexpr value_type op(const value_type&\
-    \ a, const value_type& b) {\n        return {a.sum + b.sum, a.size + b.size};\n\
-    \    }\n    static constexpr value_type inv(const value_type& x) {\n        return\
-    \ {-x.sum, -x.size};\n    }\n\n    // Operator Monoid (Add)\n    static constexpr\
-    \ operator_type op_id() {\n        return 0;\n    }\n    static constexpr operator_type\
-    \ op_comp(const operator_type& f, const operator_type& g) {\n        return f\
-    \ + g;\n    }\n\n    // Mapping (sum + f * size)\n    static constexpr value_type\
-    \ mapping(const operator_type& f, const value_type& x) {\n        return {x.sum\
-    \ + f * x.size, x.size};\n    }\n\n    // Helper for initializing a leaf node\n\
-    \    static constexpr value_type make(const T& val) {\n        return {val, 1};\n\
-    \    }\n};\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\n\n#line 15\
-    \ \"verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array.test.cpp\"\n\n\
-    using AM = m1une::acted_monoid::RangeAddRangeSum<long long>;\nusing Node = AM::value_type;\n\
-    using Array = m1une::ds::PersistentDynamicLazyMonoidArray<AM>;\n\nstruct StringNoopActedMonoid\
-    \ {\n    using value_type = std::string;\n    using operator_type = int;\n\n \
-    \   static std::string id() {\n        return \"\";\n    }\n\n    static std::string\
-    \ op(const std::string& a, const std::string& b) {\n        return a + b;\n  \
-    \  }\n\n    static int op_id() {\n        return 0;\n    }\n\n    static int op_comp(int\
-    \ f, int g) {\n        return f + g;\n    }\n\n    static std::string mapping(int,\
-    \ const std::string& x) {\n        return x;\n    }\n};\n\nstd::vector<Node> make_nodes(const\
-    \ std::vector<long long>& a) {\n    std::vector<Node> res;\n    res.reserve(a.size());\n\
-    \    for (long long x : a) res.push_back(AM::make(x));\n    return res;\n}\n\n\
-    std::vector<long long> sums(const std::vector<Node>& a) {\n    std::vector<long\
-    \ long> res;\n    res.reserve(a.size());\n    for (Node x : a) res.push_back(x.sum);\n\
-    \    return res;\n}\n\nlong long sum_range(const std::vector<long long>& a, int\
-    \ l, int r) {\n    return std::accumulate(a.begin() + l, a.begin() + r, 0LL);\n\
-    }\n\nint main() {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
+    \ = T;\n    static constexpr bool commutative = true;\n    static constexpr bool\
+    \ operator_commutative = true;\n\n    // Value Monoid (Sum)\n    static constexpr\
+    \ value_type id() {\n        return {T(0), 0};\n    }\n    static constexpr value_type\
+    \ op(const value_type& a, const value_type& b) {\n        return {a.sum + b.sum,\
+    \ a.size + b.size};\n    }\n    static constexpr value_type inv(const value_type&\
+    \ x) {\n        return {-x.sum, -x.size};\n    }\n\n    // Operator Monoid (Add)\n\
+    \    static constexpr operator_type op_id() {\n        return 0;\n    }\n    static\
+    \ constexpr operator_type op_comp(const operator_type& f, const operator_type&\
+    \ g) {\n        return f + g;\n    }\n\n    // Mapping (sum + f * size)\n    static\
+    \ constexpr value_type mapping(const operator_type& f, const value_type& x) {\n\
+    \        return {x.sum + f * x.size, x.size};\n    }\n\n    // Helper for initializing\
+    \ a leaf node\n    static constexpr value_type make(const T& val) {\n        return\
+    \ {val, 1};\n    }\n};\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\
+    \n\n#line 15 \"verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array.test.cpp\"\
+    \n\nusing AM = m1une::acted_monoid::RangeAddRangeSum<long long>;\nusing Node =\
+    \ AM::value_type;\nusing Array = m1une::ds::PersistentDynamicLazyMonoidArray<AM>;\n\
+    \nstruct StringNoopActedMonoid {\n    using value_type = std::string;\n    using\
+    \ operator_type = int;\n\n    static std::string id() {\n        return \"\";\n\
+    \    }\n\n    static std::string op(const std::string& a, const std::string& b)\
+    \ {\n        return a + b;\n    }\n\n    static int op_id() {\n        return\
+    \ 0;\n    }\n\n    static int op_comp(int f, int g) {\n        return f + g;\n\
+    \    }\n\n    static std::string mapping(int, const std::string& x) {\n      \
+    \  return x;\n    }\n};\n\nstd::vector<Node> make_nodes(const std::vector<long\
+    \ long>& a) {\n    std::vector<Node> res;\n    res.reserve(a.size());\n    for\
+    \ (long long x : a) res.push_back(AM::make(x));\n    return res;\n}\n\nstd::vector<long\
+    \ long> sums(const std::vector<Node>& a) {\n    std::vector<long long> res;\n\
+    \    res.reserve(a.size());\n    for (Node x : a) res.push_back(x.sum);\n    return\
+    \ res;\n}\n\nlong long sum_range(const std::vector<long long>& a, int l, int r)\
+    \ {\n    return std::accumulate(a.begin() + l, a.begin() + r, 0LL);\n}\n\nint\
+    \ main() {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
     \ fast_output;\n\n    using StringArray = m1une::ds::PersistentDynamicLazyMonoidArray<StringNoopActedMonoid>;\n\
     \    StringArray s = {\"a\", \"b\", \"c\", \"d\"};\n    StringArray sr = s.reverse(1,\
     \ 4);\n    assert(s.prod(0, 4) == \"abcd\");\n    assert(sr.to_vector() == (std::vector<std::string>{\"\
@@ -760,7 +762,7 @@ data:
   isVerificationFile: true
   path: verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-07-21 20:17:47+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array.test.cpp

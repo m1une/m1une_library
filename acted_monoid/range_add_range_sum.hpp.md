@@ -21,6 +21,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/persistent_lazy_segtree.test.cpp
     title: verify/ds/segtree/persistent_lazy_segtree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/monoid/commutative_flags.test.cpp
+    title: verify/monoid/commutative_flags.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -30,23 +33,8 @@ data:
     \ m1une {\nnamespace acted_monoid {\n\ntemplate <typename T>\nstruct RangeAddRangeSumNode\
     \ {\n    T sum;\n    long long size;\n};\n\ntemplate <typename T>\nstruct RangeAddRangeSum\
     \ {\n    using value_type = RangeAddRangeSumNode<T>;\n    using operator_type\
-    \ = T;\n\n    // Value Monoid (Sum)\n    static constexpr value_type id() {\n\
-    \        return {T(0), 0};\n    }\n    static constexpr value_type op(const value_type&\
-    \ a, const value_type& b) {\n        return {a.sum + b.sum, a.size + b.size};\n\
-    \    }\n    static constexpr value_type inv(const value_type& x) {\n        return\
-    \ {-x.sum, -x.size};\n    }\n\n    // Operator Monoid (Add)\n    static constexpr\
-    \ operator_type op_id() {\n        return 0;\n    }\n    static constexpr operator_type\
-    \ op_comp(const operator_type& f, const operator_type& g) {\n        return f\
-    \ + g;\n    }\n\n    // Mapping (sum + f * size)\n    static constexpr value_type\
-    \ mapping(const operator_type& f, const value_type& x) {\n        return {x.sum\
-    \ + f * x.size, x.size};\n    }\n\n    // Helper for initializing a leaf node\n\
-    \    static constexpr value_type make(const T& val) {\n        return {val, 1};\n\
-    \    }\n};\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_ACTED_MONOID_RANGE_ADD_RANGE_SUM_HPP\n#define M1UNE_ACTED_MONOID_RANGE_ADD_RANGE_SUM_HPP\
-    \ 1\n\nnamespace m1une {\nnamespace acted_monoid {\n\ntemplate <typename T>\n\
-    struct RangeAddRangeSumNode {\n    T sum;\n    long long size;\n};\n\ntemplate\
-    \ <typename T>\nstruct RangeAddRangeSum {\n    using value_type = RangeAddRangeSumNode<T>;\n\
-    \    using operator_type = T;\n\n    // Value Monoid (Sum)\n    static constexpr\
+    \ = T;\n    static constexpr bool commutative = true;\n    static constexpr bool\
+    \ operator_commutative = true;\n\n    // Value Monoid (Sum)\n    static constexpr\
     \ value_type id() {\n        return {T(0), 0};\n    }\n    static constexpr value_type\
     \ op(const value_type& a, const value_type& b) {\n        return {a.sum + b.sum,\
     \ a.size + b.size};\n    }\n    static constexpr value_type inv(const value_type&\
@@ -58,14 +46,33 @@ data:
     \        return {x.sum + f * x.size, x.size};\n    }\n\n    // Helper for initializing\
     \ a leaf node\n    static constexpr value_type make(const T& val) {\n        return\
     \ {val, 1};\n    }\n};\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\
-    \n#endif  // M1UNE_ACTED_MONOID_RANGE_ADD_RANGE_SUM_HPP\n"
+    \n\n"
+  code: "#ifndef M1UNE_ACTED_MONOID_RANGE_ADD_RANGE_SUM_HPP\n#define M1UNE_ACTED_MONOID_RANGE_ADD_RANGE_SUM_HPP\
+    \ 1\n\nnamespace m1une {\nnamespace acted_monoid {\n\ntemplate <typename T>\n\
+    struct RangeAddRangeSumNode {\n    T sum;\n    long long size;\n};\n\ntemplate\
+    \ <typename T>\nstruct RangeAddRangeSum {\n    using value_type = RangeAddRangeSumNode<T>;\n\
+    \    using operator_type = T;\n    static constexpr bool commutative = true;\n\
+    \    static constexpr bool operator_commutative = true;\n\n    // Value Monoid\
+    \ (Sum)\n    static constexpr value_type id() {\n        return {T(0), 0};\n \
+    \   }\n    static constexpr value_type op(const value_type& a, const value_type&\
+    \ b) {\n        return {a.sum + b.sum, a.size + b.size};\n    }\n    static constexpr\
+    \ value_type inv(const value_type& x) {\n        return {-x.sum, -x.size};\n \
+    \   }\n\n    // Operator Monoid (Add)\n    static constexpr operator_type op_id()\
+    \ {\n        return 0;\n    }\n    static constexpr operator_type op_comp(const\
+    \ operator_type& f, const operator_type& g) {\n        return f + g;\n    }\n\n\
+    \    // Mapping (sum + f * size)\n    static constexpr value_type mapping(const\
+    \ operator_type& f, const value_type& x) {\n        return {x.sum + f * x.size,\
+    \ x.size};\n    }\n\n    // Helper for initializing a leaf node\n    static constexpr\
+    \ value_type make(const T& val) {\n        return {val, 1};\n    }\n};\n\n}  //\
+    \ namespace acted_monoid\n}  // namespace m1une\n\n#endif  // M1UNE_ACTED_MONOID_RANGE_ADD_RANGE_SUM_HPP\n"
   dependsOn: []
   isVerificationFile: false
   path: acted_monoid/range_add_range_sum.hpp
   requiredBy: []
-  timestamp: '2026-06-17 21:06:48+09:00'
+  timestamp: '2026-07-21 20:17:47+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/monoid/commutative_flags.test.cpp
   - verify/ds/segtree/persistent_lazy_segtree.test.cpp
   - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
   - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp

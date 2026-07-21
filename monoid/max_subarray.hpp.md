@@ -1,14 +1,17 @@
 ---
 data:
   _extendedDependsOn:
-  - icon: ':warning:'
+  - icon: ':heavy_check_mark:'
     path: monoid/min_subarray.hpp
     title: Min Subarray Monoid
   _extendedRequiredBy: []
-  _extendedVerifiedWith: []
+  _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/monoid/commutative_flags.test.cpp
+    title: verify/monoid/commutative_flags.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':warning:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"monoid/max_subarray.hpp\"\n\n\n\n#include <functional>\n\
@@ -20,25 +23,26 @@ data:
     \ functor (Compare) to determine the optimal value.\n// Can be reused for maximum\
     \ subarray sum by changing the Compare functor.\ntemplate <typename T, T Id =\
     \ std::numeric_limits<T>::max() / 2, typename Compare = std::less<T>>\nstruct\
-    \ MinSubarray {\n    using value_type = SubarrayNode<T>;\n\n    // The identity\
-    \ element contains values that do not affect the result.\n    static constexpr\
-    \ value_type id() {\n        return {T(0), Id, Id, Id};\n    }\n\n    // Merges\
-    \ two subarray nodes.\n    static constexpr value_type op(const value_type& a,\
-    \ const value_type& b) {\n        if (a.opt == Id) return b;\n        if (b.opt\
-    \ == Id) return a;\n\n        // Lambda to select the optimal value according\
-    \ to the comparison functor.\n        auto get_opt = [](const T& x, const T& y)\
-    \ { return Compare()(x, y) ? x : y; };\n\n        return {a.sum + b.sum, get_opt(a.pre,\
-    \ a.sum + b.pre), get_opt(b.suf, a.suf + b.sum),\n                get_opt(get_opt(a.opt,\
-    \ b.opt), a.suf + b.pre)};\n    }\n\n    // Helper to securely create a leaf node\
-    \ from a single value.\n    // Set `allow_empty = true` if empty subarrays (sum\
-    \ = 0) are valid answers.\n    static constexpr value_type make(const T& val,\
-    \ bool allow_empty = false) {\n        if (allow_empty) {\n            T opt_val\
-    \ = Compare()(val, T(0)) ? val : T(0);\n            return {val, opt_val, opt_val,\
-    \ opt_val};\n        }\n        return {val, val, val, val};\n    }\n};\n\n} \
-    \ // namespace monoid\n}  // namespace m1une\n\n\n#line 8 \"monoid/max_subarray.hpp\"\
-    \n\nnamespace m1une {\nnamespace monoid {\n\n// Monoid for finding the maximum\
-    \ subarray sum in a range.\n// Defined as a type alias of MinSubarray using std::greater.\n\
-    template <typename T, T Id = std::numeric_limits<T>::lowest() / 2>\nusing MaxSubarray\
+    \ MinSubarray {\n    using value_type = SubarrayNode<T>;\n    static constexpr\
+    \ bool commutative = false;\n\n    // The identity element contains values that\
+    \ do not affect the result.\n    static constexpr value_type id() {\n        return\
+    \ {T(0), Id, Id, Id};\n    }\n\n    // Merges two subarray nodes.\n    static\
+    \ constexpr value_type op(const value_type& a, const value_type& b) {\n      \
+    \  if (a.opt == Id) return b;\n        if (b.opt == Id) return a;\n\n        //\
+    \ Lambda to select the optimal value according to the comparison functor.\n  \
+    \      auto get_opt = [](const T& x, const T& y) { return Compare()(x, y) ? x\
+    \ : y; };\n\n        return {a.sum + b.sum, get_opt(a.pre, a.sum + b.pre), get_opt(b.suf,\
+    \ a.suf + b.sum),\n                get_opt(get_opt(a.opt, b.opt), a.suf + b.pre)};\n\
+    \    }\n\n    // Helper to securely create a leaf node from a single value.\n\
+    \    // Set `allow_empty = true` if empty subarrays (sum = 0) are valid answers.\n\
+    \    static constexpr value_type make(const T& val, bool allow_empty = false)\
+    \ {\n        if (allow_empty) {\n            T opt_val = Compare()(val, T(0))\
+    \ ? val : T(0);\n            return {val, opt_val, opt_val, opt_val};\n      \
+    \  }\n        return {val, val, val, val};\n    }\n};\n\n}  // namespace monoid\n\
+    }  // namespace m1une\n\n\n#line 8 \"monoid/max_subarray.hpp\"\n\nnamespace m1une\
+    \ {\nnamespace monoid {\n\n// Monoid for finding the maximum subarray sum in a\
+    \ range.\n// Defined as a type alias of MinSubarray using std::greater.\ntemplate\
+    \ <typename T, T Id = std::numeric_limits<T>::lowest() / 2>\nusing MaxSubarray\
     \ = MinSubarray<T, Id, std::greater<T>>;\n\n}  // namespace monoid\n}  // namespace\
     \ m1une\n\n\n"
   code: '#ifndef M1UNE_MONOID_MAX_SUBARRAY_HPP
@@ -81,9 +85,10 @@ data:
   isVerificationFile: false
   path: monoid/max_subarray.hpp
   requiredBy: []
-  timestamp: '2026-06-21 04:34:53+09:00'
-  verificationStatus: LIBRARY_NO_TESTS
-  verifiedWith: []
+  timestamp: '2026-07-21 20:17:47+09:00'
+  verificationStatus: LIBRARY_ALL_AC
+  verifiedWith:
+  - verify/monoid/commutative_flags.test.cpp
 documentation_of: monoid/max_subarray.hpp
 layout: document
 title: Max Subarray Monoid

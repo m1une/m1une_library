@@ -2,12 +2,6 @@
 data:
   _extendedDependsOn: []
   _extendedRequiredBy:
-  - icon: ':warning:'
-    path: benchmark/ds/range_query/offline_point_update_range_order_statistics_sum_benchmark.cpp
-    title: benchmark/ds/range_query/offline_point_update_range_order_statistics_sum_benchmark.cpp
-  - icon: ':warning:'
-    path: benchmark/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_benchmark.cpp
-    title: benchmark/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_benchmark.cpp
   - icon: ':heavy_check_mark:'
     path: ds/wavelet_matrix/dynamic_wavelet_matrix_sum.hpp
     title: Dynamic Wavelet Matrix with Sums
@@ -817,8 +811,6 @@ data:
   isVerificationFile: false
   path: ds/wavelet_matrix/dynamic_wavelet_matrix.hpp
   requiredBy:
-  - benchmark/ds/range_query/offline_point_update_range_order_statistics_sum_benchmark.cpp
-  - benchmark/ds/wavelet_matrix/dynamic_wavelet_matrix_sum_benchmark.cpp
   - ds/wavelet_matrix/dynamic_wavelet_matrix_sum.hpp
   timestamp: '2026-07-19 03:02:48+09:00'
   verificationStatus: LIBRARY_ALL_AC

@@ -5,10 +5,13 @@ data:
     path: string/rolling_hash.hpp
     title: Static Rolling Hash
   _extendedRequiredBy: []
-  _extendedVerifiedWith: []
+  _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/monoid/commutative_flags.test.cpp
+    title: verify/monoid/commutative_flags.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':warning:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"monoid/rolling_hash.hpp\"\n\n\n\n#include <utility>\n\n\
@@ -76,16 +79,17 @@ data:
     \ init_data(N);\n//   for (int i = 0; i < N; ++i) {\n//       init_data[i] = RH::make(S[i]);\n\
     //   }\n//   Segtree<RH> seg(init_data);\ntemplate <long long Base = 10007, long\
     \ long Mod = (1LL << 61) - 1>\nstruct RollingHash {\n    using StringRH = m1une::string::RollingHash<Base,\
-    \ Mod>;\n    using value_type = std::pair<long long, long long>;\n\n    // The\
-    \ identity element represents an empty string.\n    static constexpr value_type\
-    \ id() {\n        return {0LL, 1LL};\n    }\n\n    // Combines two hashes by delegating\
-    \ to string::RollingHash.\n    static constexpr value_type op(const value_type&\
-    \ a, const value_type& b) {\n        return {StringRH::combine(a.first, b.first,\
-    \ b.second), (static_cast<__int128_t>(a.second) * b.second) % Mod};\n    }\n\n\
-    \    // Helper to securely create a monoid element from a single character (or\
-    \ integer).\n    // Delegates to string::RollingHash to hide the base/mod mechanics.\n\
-    \    static constexpr value_type make(long long c) {\n        return StringRH::make_single(c);\n\
-    \    }\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n"
+    \ Mod>;\n    using value_type = std::pair<long long, long long>;\n    static constexpr\
+    \ bool commutative = false;\n\n    // The identity element represents an empty\
+    \ string.\n    static constexpr value_type id() {\n        return {0LL, 1LL};\n\
+    \    }\n\n    // Combines two hashes by delegating to string::RollingHash.\n \
+    \   static constexpr value_type op(const value_type& a, const value_type& b) {\n\
+    \        return {StringRH::combine(a.first, b.first, b.second), (static_cast<__int128_t>(a.second)\
+    \ * b.second) % Mod};\n    }\n\n    // Helper to securely create a monoid element\
+    \ from a single character (or integer).\n    // Delegates to string::RollingHash\
+    \ to hide the base/mod mechanics.\n    static constexpr value_type make(long long\
+    \ c) {\n        return StringRH::make_single(c);\n    }\n};\n\n}  // namespace\
+    \ monoid\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_MONOID_ROLLING_HASH_HPP\n#define M1UNE_MONOID_ROLLING_HASH_HPP\
     \ 1\n\n#include <utility>\n\n#include \"../string/rolling_hash.hpp\"\n\nnamespace\
     \ m1une {\nnamespace monoid {\n\n// Monoid for Dynamic Rolling Hash (String Concatenation).\n\
@@ -95,24 +99,26 @@ data:
     \ init_data(N);\n//   for (int i = 0; i < N; ++i) {\n//       init_data[i] = RH::make(S[i]);\n\
     //   }\n//   Segtree<RH> seg(init_data);\ntemplate <long long Base = 10007, long\
     \ long Mod = (1LL << 61) - 1>\nstruct RollingHash {\n    using StringRH = m1une::string::RollingHash<Base,\
-    \ Mod>;\n    using value_type = std::pair<long long, long long>;\n\n    // The\
-    \ identity element represents an empty string.\n    static constexpr value_type\
-    \ id() {\n        return {0LL, 1LL};\n    }\n\n    // Combines two hashes by delegating\
-    \ to string::RollingHash.\n    static constexpr value_type op(const value_type&\
-    \ a, const value_type& b) {\n        return {StringRH::combine(a.first, b.first,\
-    \ b.second), (static_cast<__int128_t>(a.second) * b.second) % Mod};\n    }\n\n\
-    \    // Helper to securely create a monoid element from a single character (or\
-    \ integer).\n    // Delegates to string::RollingHash to hide the base/mod mechanics.\n\
-    \    static constexpr value_type make(long long c) {\n        return StringRH::make_single(c);\n\
-    \    }\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n#endif  // M1UNE_MONOID_ROLLING_HASH_HPP\n"
+    \ Mod>;\n    using value_type = std::pair<long long, long long>;\n    static constexpr\
+    \ bool commutative = false;\n\n    // The identity element represents an empty\
+    \ string.\n    static constexpr value_type id() {\n        return {0LL, 1LL};\n\
+    \    }\n\n    // Combines two hashes by delegating to string::RollingHash.\n \
+    \   static constexpr value_type op(const value_type& a, const value_type& b) {\n\
+    \        return {StringRH::combine(a.first, b.first, b.second), (static_cast<__int128_t>(a.second)\
+    \ * b.second) % Mod};\n    }\n\n    // Helper to securely create a monoid element\
+    \ from a single character (or integer).\n    // Delegates to string::RollingHash\
+    \ to hide the base/mod mechanics.\n    static constexpr value_type make(long long\
+    \ c) {\n        return StringRH::make_single(c);\n    }\n};\n\n}  // namespace\
+    \ monoid\n}  // namespace m1une\n\n#endif  // M1UNE_MONOID_ROLLING_HASH_HPP\n"
   dependsOn:
   - string/rolling_hash.hpp
   isVerificationFile: false
   path: monoid/rolling_hash.hpp
   requiredBy: []
-  timestamp: '2026-06-13 20:51:48+09:00'
-  verificationStatus: LIBRARY_NO_TESTS
-  verifiedWith: []
+  timestamp: '2026-07-21 20:17:47+09:00'
+  verificationStatus: LIBRARY_ALL_AC
+  verifiedWith:
+  - verify/monoid/commutative_flags.test.cpp
 documentation_of: monoid/rolling_hash.hpp
 layout: document
 title: Rolling Hash Monoid

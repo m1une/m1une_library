@@ -2,17 +2,37 @@
 data:
   _extendedDependsOn: []
   _extendedRequiredBy: []
-  _extendedVerifiedWith: []
+  _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/monoid/commutative_flags.test.cpp
+    title: verify/monoid/commutative_flags.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':warning:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"monoid/bracket.hpp\"\n\n\n\n#include <algorithm>\n\nnamespace\
     \ m1une {\nnamespace monoid {\n\nstruct BracketNode {\n    int matched;\n    int\
     \ unmatched_right;  // Count of unmatched ')'\n    int unmatched_left;   // Count\
     \ of unmatched '('\n};\n\n// Monoid for matching parentheses (Bracket Sequences).\n\
-    struct Bracket {\n    using value_type = BracketNode;\n\n    // The identity element\
+    struct Bracket {\n    using value_type = BracketNode;\n    static constexpr bool\
+    \ commutative = false;\n\n    // The identity element is an empty sequence.\n\
+    \    static constexpr value_type id() {\n        return {0, 0, 0};\n    }\n\n\
+    \    // Merges two bracket sequences.\n    // The unmatched '(' from the left\
+    \ perfectly matches the unmatched ')' from the right.\n    static constexpr value_type\
+    \ op(const value_type& a, const value_type& b) {\n        int match = std::min(a.unmatched_left,\
+    \ b.unmatched_right);\n        return {a.matched + b.matched + match, a.unmatched_right\
+    \ + b.unmatched_right - match,\n                a.unmatched_left + b.unmatched_left\
+    \ - match};\n    }\n\n    // Helper to securely create a leaf node from a single\
+    \ character.\n    static constexpr value_type make(char c) {\n        if (c ==\
+    \ '(') return {0, 0, 1};\n        if (c == ')') return {0, 1, 0};\n        return\
+    \ {0, 0, 0};\n    }\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n"
+  code: "#ifndef M1UNE_MONOID_BRACKET_HPP\n#define M1UNE_MONOID_BRACKET_HPP 1\n\n\
+    #include <algorithm>\n\nnamespace m1une {\nnamespace monoid {\n\nstruct BracketNode\
+    \ {\n    int matched;\n    int unmatched_right;  // Count of unmatched ')'\n \
+    \   int unmatched_left;   // Count of unmatched '('\n};\n\n// Monoid for matching\
+    \ parentheses (Bracket Sequences).\nstruct Bracket {\n    using value_type = BracketNode;\n\
+    \    static constexpr bool commutative = false;\n\n    // The identity element\
     \ is an empty sequence.\n    static constexpr value_type id() {\n        return\
     \ {0, 0, 0};\n    }\n\n    // Merges two bracket sequences.\n    // The unmatched\
     \ '(' from the left perfectly matches the unmatched ')' from the right.\n    static\
@@ -23,30 +43,15 @@ data:
     \ Helper to securely create a leaf node from a single character.\n    static constexpr\
     \ value_type make(char c) {\n        if (c == '(') return {0, 0, 1};\n       \
     \ if (c == ')') return {0, 1, 0};\n        return {0, 0, 0};\n    }\n};\n\n} \
-    \ // namespace monoid\n}  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_MONOID_BRACKET_HPP\n#define M1UNE_MONOID_BRACKET_HPP 1\n\n\
-    #include <algorithm>\n\nnamespace m1une {\nnamespace monoid {\n\nstruct BracketNode\
-    \ {\n    int matched;\n    int unmatched_right;  // Count of unmatched ')'\n \
-    \   int unmatched_left;   // Count of unmatched '('\n};\n\n// Monoid for matching\
-    \ parentheses (Bracket Sequences).\nstruct Bracket {\n    using value_type = BracketNode;\n\
-    \n    // The identity element is an empty sequence.\n    static constexpr value_type\
-    \ id() {\n        return {0, 0, 0};\n    }\n\n    // Merges two bracket sequences.\n\
-    \    // The unmatched '(' from the left perfectly matches the unmatched ')' from\
-    \ the right.\n    static constexpr value_type op(const value_type& a, const value_type&\
-    \ b) {\n        int match = std::min(a.unmatched_left, b.unmatched_right);\n \
-    \       return {a.matched + b.matched + match, a.unmatched_right + b.unmatched_right\
-    \ - match,\n                a.unmatched_left + b.unmatched_left - match};\n  \
-    \  }\n\n    // Helper to securely create a leaf node from a single character.\n\
-    \    static constexpr value_type make(char c) {\n        if (c == '(') return\
-    \ {0, 0, 1};\n        if (c == ')') return {0, 1, 0};\n        return {0, 0, 0};\n\
-    \    }\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n#endif  // M1UNE_MONOID_BRACKET_HPP\n"
+    \ // namespace monoid\n}  // namespace m1une\n\n#endif  // M1UNE_MONOID_BRACKET_HPP\n"
   dependsOn: []
   isVerificationFile: false
   path: monoid/bracket.hpp
   requiredBy: []
-  timestamp: '2026-06-13 20:51:48+09:00'
-  verificationStatus: LIBRARY_NO_TESTS
-  verifiedWith: []
+  timestamp: '2026-07-21 20:17:47+09:00'
+  verificationStatus: LIBRARY_ALL_AC
+  verifiedWith:
+  - verify/monoid/commutative_flags.test.cpp
 documentation_of: monoid/bracket.hpp
 layout: document
 title: Bracket Monoid

@@ -560,25 +560,26 @@ data:
     \ RangeApAddRangeSumNode {\n    T sum;\n    long long size;\n    T ord_sum;\n\
     };\n\ntemplate <typename T>\nstruct RangeApAddRangeSum {\n    using value_type\
     \ = RangeApAddRangeSumNode<T>;\n    using operator_type = std::pair<T, T>;  //\
-    \ {a, b} for adding a * i + b\n\n    // Value Monoid (Sum)\n    static constexpr\
-    \ value_type id() {\n        return {T(0), 0, T(0)};\n    }\n    static constexpr\
-    \ value_type op(const value_type& a, const value_type& b) {\n        return {a.sum\
-    \ + b.sum, a.size + b.size, a.ord_sum + b.ord_sum + T(a.size) * T(b.size)};\n\
-    \    }\n\n    // Operator Monoid (Add)\n    static constexpr operator_type op_id()\
-    \ {\n        return {T(0), T(0)};\n    }\n    static constexpr operator_type op_comp(const\
-    \ operator_type& f, const operator_type& g) {\n        return {f.first + g.first,\
-    \ f.second + g.second};\n    }\n\n    static constexpr value_type mapping(const\
-    \ operator_type& f, const value_type& x) {\n        return mapping(f, x, 0);\n\
-    \    }\n\n    static constexpr value_type mapping(const operator_type& f, const\
-    \ value_type& x, long long ord) {\n        return {x.sum + f.first * (x.ord_sum\
-    \ + T(ord) * T(x.size)) + f.second * T(x.size), x.size, x.ord_sum};\n    }\n\n\
-    \    static constexpr operator_type op_shift(const operator_type& f, long long\
-    \ ord) {\n        return {f.first, f.second + f.first * T(ord)};\n    }\n\n  \
-    \  static constexpr operator_type op_reverse(const operator_type& f, long long\
-    \ size) {\n        return {-f.first, f.second + f.first * T(size - 1)};\n    }\n\
-    \n    static constexpr value_type make(const T& val) {\n        return {val, 1,\
-    \ T(0)};\n    }\n};\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\n\
-    \n#line 14 \"verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array_range_ap.test.cpp\"\
+    \ {a, b} for adding a * i + b\n    static constexpr bool commutative = false;\n\
+    \    static constexpr bool operator_commutative = true;\n\n    // Value Monoid\
+    \ (Sum)\n    static constexpr value_type id() {\n        return {T(0), 0, T(0)};\n\
+    \    }\n    static constexpr value_type op(const value_type& a, const value_type&\
+    \ b) {\n        return {a.sum + b.sum, a.size + b.size, a.ord_sum + b.ord_sum\
+    \ + T(a.size) * T(b.size)};\n    }\n\n    // Operator Monoid (Add)\n    static\
+    \ constexpr operator_type op_id() {\n        return {T(0), T(0)};\n    }\n   \
+    \ static constexpr operator_type op_comp(const operator_type& f, const operator_type&\
+    \ g) {\n        return {f.first + g.first, f.second + g.second};\n    }\n\n  \
+    \  static constexpr value_type mapping(const operator_type& f, const value_type&\
+    \ x) {\n        return mapping(f, x, 0);\n    }\n\n    static constexpr value_type\
+    \ mapping(const operator_type& f, const value_type& x, long long ord) {\n    \
+    \    return {x.sum + f.first * (x.ord_sum + T(ord) * T(x.size)) + f.second * T(x.size),\
+    \ x.size, x.ord_sum};\n    }\n\n    static constexpr operator_type op_shift(const\
+    \ operator_type& f, long long ord) {\n        return {f.first, f.second + f.first\
+    \ * T(ord)};\n    }\n\n    static constexpr operator_type op_reverse(const operator_type&\
+    \ f, long long size) {\n        return {-f.first, f.second + f.first * T(size\
+    \ - 1)};\n    }\n\n    static constexpr value_type make(const T& val) {\n    \
+    \    return {val, 1, T(0)};\n    }\n};\n\n}  // namespace acted_monoid\n}  //\
+    \ namespace m1une\n\n\n#line 14 \"verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array_range_ap.test.cpp\"\
     \n\nusing AM = m1une::acted_monoid::RangeApAddRangeSum<long long>;\nusing Node\
     \ = AM::value_type;\nusing Array = m1une::ds::PersistentDynamicLazyMonoidArray<AM>;\n\
     \nstd::vector<long long> sums(const std::vector<Node>& a) {\n    std::vector<long\
@@ -712,7 +713,7 @@ data:
   isVerificationFile: true
   path: verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array_range_ap.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-07-21 20:17:47+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array_range_ap.test.cpp

@@ -12,6 +12,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/range_update_range_product.test.cpp
     title: verify/ds/segtree/range_update_range_product.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/monoid/commutative_flags.test.cpp
+    title: verify/monoid/commutative_flags.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -61,6 +64,7 @@ data:
   timestamp: '2026-07-16 20:44:42+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/monoid/commutative_flags.test.cpp
   - verify/ds/segtree/range_update_range_product.test.cpp
 documentation_of: monoid/power.hpp
 layout: document

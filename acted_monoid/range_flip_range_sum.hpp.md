@@ -2,10 +2,13 @@
 data:
   _extendedDependsOn: []
   _extendedRequiredBy: []
-  _extendedVerifiedWith: []
+  _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/monoid/commutative_flags.test.cpp
+    title: verify/monoid/commutative_flags.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':warning:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"acted_monoid/range_flip_range_sum.hpp\"\n\n\n\nnamespace\
@@ -14,25 +17,8 @@ data:
     \ (0s and 1s).\n// Supports range bit inversion (flip) and range sum queries.\n\
     template <typename T = long long>\nstruct RangeFlipRangeSum {\n    using value_type\
     \ = RangeFlipRangeSumNode<T>;\n    using operator_type = bool;  // 'true' means\
-    \ flip the bits in the range\n\n    static constexpr value_type id() {\n     \
-    \   return {T(0), 0};\n    }\n\n    static constexpr value_type op(const value_type&\
-    \ a, const value_type& b) {\n        return {a.sum + b.sum, a.size + b.size};\n\
-    \    }\n\n    static constexpr operator_type op_id() {\n        return false;\n\
-    \    }\n\n    static constexpr operator_type op_comp(const operator_type& f, const\
-    \ operator_type& g) {\n        return f ^ g;\n    }\n\n    static constexpr value_type\
-    \ mapping(const operator_type& f, const value_type& x) {\n        if (!f || x.size\
-    \ == 0) return x;\n        // If flipped, the new number of 1s is exactly (Total\
-    \ Elements - Old number of 1s)\n        return {static_cast<T>(x.size) - x.sum,\
-    \ x.size};\n    }\n\n    // Initialize with a 0 or 1\n    static constexpr value_type\
-    \ make(const T& val) {\n        return {val, 1};\n    }\n};\n\n}  // namespace\
-    \ acted_monoid\n}  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_ACTED_MONOID_RANGE_FLIP_RANGE_SUM_HPP\n#define M1UNE_ACTED_MONOID_RANGE_FLIP_RANGE_SUM_HPP\
-    \ 1\n\nnamespace m1une {\nnamespace acted_monoid {\n\ntemplate <typename T>\n\
-    struct RangeFlipRangeSumNode {\n    T sum;\n    long long size;\n};\n\n// Acted\
-    \ Monoid for binary arrays (0s and 1s).\n// Supports range bit inversion (flip)\
-    \ and range sum queries.\ntemplate <typename T = long long>\nstruct RangeFlipRangeSum\
-    \ {\n    using value_type = RangeFlipRangeSumNode<T>;\n    using operator_type\
-    \ = bool;  // 'true' means flip the bits in the range\n\n    static constexpr\
+    \ flip the bits in the range\n    static constexpr bool commutative = true;\n\
+    \    static constexpr bool operator_commutative = true;\n\n    static constexpr\
     \ value_type id() {\n        return {T(0), 0};\n    }\n\n    static constexpr\
     \ value_type op(const value_type& a, const value_type& b) {\n        return {a.sum\
     \ + b.sum, a.size + b.size};\n    }\n\n    static constexpr operator_type op_id()\
@@ -44,14 +30,35 @@ data:
     \ {static_cast<T>(x.size) - x.sum, x.size};\n    }\n\n    // Initialize with a\
     \ 0 or 1\n    static constexpr value_type make(const T& val) {\n        return\
     \ {val, 1};\n    }\n};\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\
-    \n#endif  // M1UNE_ACTED_MONOID_RANGE_FLIP_RANGE_SUM_HPP\n"
+    \n\n"
+  code: "#ifndef M1UNE_ACTED_MONOID_RANGE_FLIP_RANGE_SUM_HPP\n#define M1UNE_ACTED_MONOID_RANGE_FLIP_RANGE_SUM_HPP\
+    \ 1\n\nnamespace m1une {\nnamespace acted_monoid {\n\ntemplate <typename T>\n\
+    struct RangeFlipRangeSumNode {\n    T sum;\n    long long size;\n};\n\n// Acted\
+    \ Monoid for binary arrays (0s and 1s).\n// Supports range bit inversion (flip)\
+    \ and range sum queries.\ntemplate <typename T = long long>\nstruct RangeFlipRangeSum\
+    \ {\n    using value_type = RangeFlipRangeSumNode<T>;\n    using operator_type\
+    \ = bool;  // 'true' means flip the bits in the range\n    static constexpr bool\
+    \ commutative = true;\n    static constexpr bool operator_commutative = true;\n\
+    \n    static constexpr value_type id() {\n        return {T(0), 0};\n    }\n\n\
+    \    static constexpr value_type op(const value_type& a, const value_type& b)\
+    \ {\n        return {a.sum + b.sum, a.size + b.size};\n    }\n\n    static constexpr\
+    \ operator_type op_id() {\n        return false;\n    }\n\n    static constexpr\
+    \ operator_type op_comp(const operator_type& f, const operator_type& g) {\n  \
+    \      return f ^ g;\n    }\n\n    static constexpr value_type mapping(const operator_type&\
+    \ f, const value_type& x) {\n        if (!f || x.size == 0) return x;\n      \
+    \  // If flipped, the new number of 1s is exactly (Total Elements - Old number\
+    \ of 1s)\n        return {static_cast<T>(x.size) - x.sum, x.size};\n    }\n\n\
+    \    // Initialize with a 0 or 1\n    static constexpr value_type make(const T&\
+    \ val) {\n        return {val, 1};\n    }\n};\n\n}  // namespace acted_monoid\n\
+    }  // namespace m1une\n\n#endif  // M1UNE_ACTED_MONOID_RANGE_FLIP_RANGE_SUM_HPP\n"
   dependsOn: []
   isVerificationFile: false
   path: acted_monoid/range_flip_range_sum.hpp
   requiredBy: []
-  timestamp: '2026-06-13 20:51:48+09:00'
-  verificationStatus: LIBRARY_NO_TESTS
-  verifiedWith: []
+  timestamp: '2026-07-21 20:17:47+09:00'
+  verificationStatus: LIBRARY_ALL_AC
+  verifiedWith:
+  - verify/monoid/commutative_flags.test.cpp
 documentation_of: acted_monoid/range_flip_range_sum.hpp
 layout: document
 title: Range Flip Range Sum

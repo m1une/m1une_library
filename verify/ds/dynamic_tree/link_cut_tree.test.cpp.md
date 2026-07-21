@@ -532,12 +532,13 @@ data:
     \ child) == v);\n        return subtree_size(root, v) - subtree_size(root, child);\n\
     \    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n#line 1 \"monoid/add.hpp\"\
     \n\n\n\nnamespace m1une {\nnamespace monoid {\n\n// Monoid for addition (Range\
-    \ Sum).\ntemplate <typename T>\nstruct Add {\n    using value_type = T;\n\n  \
-    \  // Returns the identity element for addition, which is 0.\n    static constexpr\
-    \ T id() {\n        return T(0);\n    }\n\n    // Returns the sum of a and b.\n\
-    \    static constexpr T op(const T& a, const T& b) {\n        return a + b;\n\
-    \    }\n\n    static constexpr T inv(const T& x) {\n        return -x;\n    }\n\
-    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 11 \"verify/ds/dynamic_tree/link_cut_tree.test.cpp\"\
+    \ Sum).\ntemplate <typename T>\nstruct Add {\n    using value_type = T;\n    static\
+    \ constexpr bool commutative = true;\n\n    // Returns the identity element for\
+    \ addition, which is 0.\n    static constexpr T id() {\n        return T(0);\n\
+    \    }\n\n    // Returns the sum of a and b.\n    static constexpr T op(const\
+    \ T& a, const T& b) {\n        return a + b;\n    }\n\n    static constexpr T\
+    \ inv(const T& x) {\n        return -x;\n    }\n};\n\n}  // namespace monoid\n\
+    }  // namespace m1une\n\n\n#line 11 \"verify/ds/dynamic_tree/link_cut_tree.test.cpp\"\
     \n\nvoid test_vertex_subtree_sum() {\n    m1une::ds::LinkCutTree<m1une::monoid::Add<long\
     \ long>> lct(std::vector<int>{1, 2, 3, 4, 5});\n\n    assert(lct.link(0, 1));\n\
     \    assert(lct.link(1, 2));\n    assert(lct.link(1, 3));\n    assert(lct.link(3,\
@@ -739,7 +740,7 @@ data:
   isVerificationFile: true
   path: verify/ds/dynamic_tree/link_cut_tree.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-07-21 20:17:47+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/dynamic_tree/link_cut_tree.test.cpp

@@ -464,18 +464,18 @@ data:
     \ 5 \"monoid/affine.hpp\"\n\nnamespace m1une {\nnamespace monoid {\n\n// Monoid\
     \ for affine transformations f(x) = ax + b.\n// Represented as a pair {a, b}.\n\
     template <typename T>\nstruct Affine {\n    using value_type = std::pair<T, T>;\n\
-    \n    // The identity transformation is f(x) = 1*x + 0.\n    static constexpr\
-    \ value_type id() {\n        return {T(1), T(0)};\n    }\n\n    // Composes two\
-    \ affine transformations.\n    // f(g(x)) where f = a, g = b.\n    // a.first\
-    \ * (b.first * x + b.second) + a.second\n    // = (a.first * b.first) * x + (a.first\
-    \ * b.second + a.second)\n    static constexpr value_type op(const value_type&\
-    \ a, const value_type& b) {\n        return {a.first * b.first, a.first * b.second\
-    \ + a.second};\n    }\n\n    // Helpers to create common affine transformations\n\
-    \    static constexpr value_type make_add(const T& b) {\n        return {T(1),\
-    \ b};\n    }\n    static constexpr value_type make_mul(const T& a) {\n       \
-    \ return {a, T(0)};\n    }\n    static constexpr value_type make_assign(const\
-    \ T& b) {\n        return {T(0), b};\n    }\n};\n\n}  // namespace monoid\n} \
-    \ // namespace m1une\n\n\n#line 11 \"verify/ds/segtree/dual_segtree.test.cpp\"\
+    \    static constexpr bool commutative = false;\n\n    // The identity transformation\
+    \ is f(x) = 1*x + 0.\n    static constexpr value_type id() {\n        return {T(1),\
+    \ T(0)};\n    }\n\n    // Composes two affine transformations.\n    // f(g(x))\
+    \ where f = a, g = b.\n    // a.first * (b.first * x + b.second) + a.second\n\
+    \    // = (a.first * b.first) * x + (a.first * b.second + a.second)\n    static\
+    \ constexpr value_type op(const value_type& a, const value_type& b) {\n      \
+    \  return {a.first * b.first, a.first * b.second + a.second};\n    }\n\n    //\
+    \ Helpers to create common affine transformations\n    static constexpr value_type\
+    \ make_add(const T& b) {\n        return {T(1), b};\n    }\n    static constexpr\
+    \ value_type make_mul(const T& a) {\n        return {a, T(0)};\n    }\n    static\
+    \ constexpr value_type make_assign(const T& b) {\n        return {T(0), b};\n\
+    \    }\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 11 \"verify/ds/segtree/dual_segtree.test.cpp\"\
     \n\nusing mint = m1une::math::modint998244353;\nusing Affine = m1une::monoid::Affine<mint>;\n\
     \nusing namespace std;\nusing ll = long long;\n\nvoid solve(\n    m1une::utilities::FastInput&\
     \ fast_input,\n    m1une::utilities::FastOutput& fast_output\n) {\n    ll N, Q;\n\
@@ -522,7 +522,7 @@ data:
   isVerificationFile: true
   path: verify/ds/segtree/dual_segtree.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-07-21 20:17:47+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/segtree/dual_segtree.test.cpp

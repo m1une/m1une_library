@@ -2,10 +2,13 @@
 data:
   _extendedDependsOn: []
   _extendedRequiredBy: []
-  _extendedVerifiedWith: []
+  _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/monoid/commutative_flags.test.cpp
+    title: verify/monoid/commutative_flags.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':warning:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"acted_monoid/range_update_range_max_subarray.hpp\"\n\n\n\
@@ -15,22 +18,23 @@ data:
     \ Assignment (Update) and Max Contiguous Subarray Sum.\n// Note: This implementation\
     \ assumes empty subarrays are allowed (max sum is at least 0).\ntemplate <typename\
     \ T>\nstruct RangeUpdateRangeMaxSubarray {\n    using value_type = RangeUpdateRangeMaxSubarrayNode<T>;\n\
-    \    using operator_type = std::optional<T>;\n\n    static constexpr value_type\
-    \ id() {\n        return {T(0), T(0), T(0), T(0), 0};\n    }\n\n    static constexpr\
-    \ value_type op(const value_type& a, const value_type& b) {\n        if (a.size\
-    \ == 0) return b;\n        if (b.size == 0) return a;\n        value_type res;\n\
-    \        res.sum = a.sum + b.sum;\n        res.pref = std::max(a.pref, a.sum +\
-    \ b.pref);\n        res.suff = std::max(b.suff, b.sum + a.suff);\n        res.max_sub\
-    \ = std::max({a.max_sub, b.max_sub, a.suff + b.pref});\n        res.size = a.size\
-    \ + b.size;\n        return res;\n    }\n\n    static constexpr operator_type\
-    \ op_id() {\n        return std::nullopt;\n    }\n\n    static constexpr operator_type\
-    \ op_comp(const operator_type& f, const operator_type& g) {\n        return f\
-    \ ? f : g;  // left-biased because new updates override old ones\n    }\n\n  \
-    \  static constexpr value_type mapping(const operator_type& f, const value_type&\
-    \ x) {\n        if (!f || x.size == 0) return x;\n        value_type res;\n  \
-    \      res.sum = (*f) * x.size;\n        T max_val = std::max(T(0), res.sum);\n\
-    \        // If empty subarrays are NOT allowed, change to: T max_val = (*f) >\
-    \ 0 ? res.sum : (*f);\n        res.pref = res.suff = res.max_sub = max_val;\n\
+    \    using operator_type = std::optional<T>;\n    static constexpr bool commutative\
+    \ = false;\n    static constexpr bool operator_commutative = false;\n\n    static\
+    \ constexpr value_type id() {\n        return {T(0), T(0), T(0), T(0), 0};\n \
+    \   }\n\n    static constexpr value_type op(const value_type& a, const value_type&\
+    \ b) {\n        if (a.size == 0) return b;\n        if (b.size == 0) return a;\n\
+    \        value_type res;\n        res.sum = a.sum + b.sum;\n        res.pref =\
+    \ std::max(a.pref, a.sum + b.pref);\n        res.suff = std::max(b.suff, b.sum\
+    \ + a.suff);\n        res.max_sub = std::max({a.max_sub, b.max_sub, a.suff + b.pref});\n\
+    \        res.size = a.size + b.size;\n        return res;\n    }\n\n    static\
+    \ constexpr operator_type op_id() {\n        return std::nullopt;\n    }\n\n \
+    \   static constexpr operator_type op_comp(const operator_type& f, const operator_type&\
+    \ g) {\n        return f ? f : g;  // left-biased because new updates override\
+    \ old ones\n    }\n\n    static constexpr value_type mapping(const operator_type&\
+    \ f, const value_type& x) {\n        if (!f || x.size == 0) return x;\n      \
+    \  value_type res;\n        res.sum = (*f) * x.size;\n        T max_val = std::max(T(0),\
+    \ res.sum);\n        // If empty subarrays are NOT allowed, change to: T max_val\
+    \ = (*f) > 0 ? res.sum : (*f);\n        res.pref = res.suff = res.max_sub = max_val;\n\
     \        res.size = x.size;\n        return res;\n    }\n\n    static constexpr\
     \ value_type make(const T& val) {\n        T max_val = std::max(T(0), val);\n\
     \        return {val, max_val, max_val, max_val, 1};\n    }\n};\n\n}  // namespace\
@@ -43,11 +47,12 @@ data:
     \ implementation assumes empty subarrays are allowed (max sum is at least 0).\n\
     template <typename T>\nstruct RangeUpdateRangeMaxSubarray {\n    using value_type\
     \ = RangeUpdateRangeMaxSubarrayNode<T>;\n    using operator_type = std::optional<T>;\n\
-    \n    static constexpr value_type id() {\n        return {T(0), T(0), T(0), T(0),\
-    \ 0};\n    }\n\n    static constexpr value_type op(const value_type& a, const\
-    \ value_type& b) {\n        if (a.size == 0) return b;\n        if (b.size ==\
-    \ 0) return a;\n        value_type res;\n        res.sum = a.sum + b.sum;\n  \
-    \      res.pref = std::max(a.pref, a.sum + b.pref);\n        res.suff = std::max(b.suff,\
+    \    static constexpr bool commutative = false;\n    static constexpr bool operator_commutative\
+    \ = false;\n\n    static constexpr value_type id() {\n        return {T(0), T(0),\
+    \ T(0), T(0), 0};\n    }\n\n    static constexpr value_type op(const value_type&\
+    \ a, const value_type& b) {\n        if (a.size == 0) return b;\n        if (b.size\
+    \ == 0) return a;\n        value_type res;\n        res.sum = a.sum + b.sum;\n\
+    \        res.pref = std::max(a.pref, a.sum + b.pref);\n        res.suff = std::max(b.suff,\
     \ b.sum + a.suff);\n        res.max_sub = std::max({a.max_sub, b.max_sub, a.suff\
     \ + b.pref});\n        res.size = a.size + b.size;\n        return res;\n    }\n\
     \n    static constexpr operator_type op_id() {\n        return std::nullopt;\n\
@@ -66,9 +71,10 @@ data:
   isVerificationFile: false
   path: acted_monoid/range_update_range_max_subarray.hpp
   requiredBy: []
-  timestamp: '2026-06-13 20:51:48+09:00'
-  verificationStatus: LIBRARY_NO_TESTS
-  verifiedWith: []
+  timestamp: '2026-07-21 20:17:47+09:00'
+  verificationStatus: LIBRARY_ALL_AC
+  verifiedWith:
+  - verify/monoid/commutative_flags.test.cpp
 documentation_of: acted_monoid/range_update_range_max_subarray.hpp
 layout: document
 title: Range Update Range Max Subarray

@@ -15,6 +15,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/range_update_range_product.test.cpp
     title: verify/ds/segtree/range_update_range_product.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/monoid/commutative_flags.test.cpp
+    title: verify/monoid/commutative_flags.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -53,17 +56,21 @@ data:
     \ monoid.\ntemplate <m1une::monoid::IsMonoid Monoid>\nstruct RangeUpdateRangeProduct\
     \ {\n    using base_type = typename Monoid::value_type;\n    using value_type\
     \ = RangeUpdateRangeProductNode<Monoid>;\n    using operator_type = std::optional<base_type>;\n\
-    \n    static constexpr value_type id() {\n        return {Monoid::id(), 0};\n\
-    \    }\n\n    static constexpr value_type op(const value_type& a, const value_type&\
-    \ b) {\n        return {Monoid::op(a.product, b.product), a.size + b.size};\n\
-    \    }\n\n    static constexpr operator_type op_id() {\n        return std::nullopt;\n\
-    \    }\n\n    static constexpr operator_type op_comp(const operator_type& f, const\
-    \ operator_type& g) {\n        return f.has_value() ? f : g;\n    }\n\n    static\
-    \ constexpr value_type mapping(const operator_type& f, const value_type& x) {\n\
-    \        if (!f.has_value() || x.size == 0) return x;\n        return {m1une::monoid::power<Monoid>(f.value(),\
-    \ x.size), x.size};\n    }\n\n    static constexpr value_type make(const base_type&\
-    \ value) {\n        return {value, 1};\n    }\n};\n\n}  // namespace acted_monoid\n\
-    }  // namespace m1une\n\n\n"
+    \    static constexpr bool commutative = [] {\n        if constexpr (requires\
+    \ { Monoid::commutative; }) {\n            return bool(Monoid::commutative);\n\
+    \        } else {\n            return false;\n        }\n    }();\n    static\
+    \ constexpr bool operator_commutative = false;\n\n    static constexpr value_type\
+    \ id() {\n        return {Monoid::id(), 0};\n    }\n\n    static constexpr value_type\
+    \ op(const value_type& a, const value_type& b) {\n        return {Monoid::op(a.product,\
+    \ b.product), a.size + b.size};\n    }\n\n    static constexpr operator_type op_id()\
+    \ {\n        return std::nullopt;\n    }\n\n    static constexpr operator_type\
+    \ op_comp(const operator_type& f, const operator_type& g) {\n        return f.has_value()\
+    \ ? f : g;\n    }\n\n    static constexpr value_type mapping(const operator_type&\
+    \ f, const value_type& x) {\n        if (!f.has_value() || x.size == 0) return\
+    \ x;\n        return {m1une::monoid::power<Monoid>(f.value(), x.size), x.size};\n\
+    \    }\n\n    static constexpr value_type make(const base_type& value) {\n   \
+    \     return {value, 1};\n    }\n};\n\n}  // namespace acted_monoid\n}  // namespace\
+    \ m1une\n\n\n"
   code: "#ifndef M1UNE_ACTED_MONOID_RANGE_UPDATE_RANGE_PRODUCT_HPP\n#define M1UNE_ACTED_MONOID_RANGE_UPDATE_RANGE_PRODUCT_HPP\
     \ 1\n\n#include <optional>\n\n#include \"../monoid/concept.hpp\"\n#include \"\
     ../monoid/power.hpp\"\n\nnamespace m1une {\nnamespace acted_monoid {\n\ntemplate\
@@ -73,18 +80,21 @@ data:
     \ possibly\n// noncommutative, monoid.\ntemplate <m1une::monoid::IsMonoid Monoid>\n\
     struct RangeUpdateRangeProduct {\n    using base_type = typename Monoid::value_type;\n\
     \    using value_type = RangeUpdateRangeProductNode<Monoid>;\n    using operator_type\
-    \ = std::optional<base_type>;\n\n    static constexpr value_type id() {\n    \
-    \    return {Monoid::id(), 0};\n    }\n\n    static constexpr value_type op(const\
-    \ value_type& a, const value_type& b) {\n        return {Monoid::op(a.product,\
-    \ b.product), a.size + b.size};\n    }\n\n    static constexpr operator_type op_id()\
-    \ {\n        return std::nullopt;\n    }\n\n    static constexpr operator_type\
-    \ op_comp(const operator_type& f, const operator_type& g) {\n        return f.has_value()\
-    \ ? f : g;\n    }\n\n    static constexpr value_type mapping(const operator_type&\
-    \ f, const value_type& x) {\n        if (!f.has_value() || x.size == 0) return\
-    \ x;\n        return {m1une::monoid::power<Monoid>(f.value(), x.size), x.size};\n\
-    \    }\n\n    static constexpr value_type make(const base_type& value) {\n   \
-    \     return {value, 1};\n    }\n};\n\n}  // namespace acted_monoid\n}  // namespace\
-    \ m1une\n\n#endif  // M1UNE_ACTED_MONOID_RANGE_UPDATE_RANGE_PRODUCT_HPP\n"
+    \ = std::optional<base_type>;\n    static constexpr bool commutative = [] {\n\
+    \        if constexpr (requires { Monoid::commutative; }) {\n            return\
+    \ bool(Monoid::commutative);\n        } else {\n            return false;\n  \
+    \      }\n    }();\n    static constexpr bool operator_commutative = false;\n\n\
+    \    static constexpr value_type id() {\n        return {Monoid::id(), 0};\n \
+    \   }\n\n    static constexpr value_type op(const value_type& a, const value_type&\
+    \ b) {\n        return {Monoid::op(a.product, b.product), a.size + b.size};\n\
+    \    }\n\n    static constexpr operator_type op_id() {\n        return std::nullopt;\n\
+    \    }\n\n    static constexpr operator_type op_comp(const operator_type& f, const\
+    \ operator_type& g) {\n        return f.has_value() ? f : g;\n    }\n\n    static\
+    \ constexpr value_type mapping(const operator_type& f, const value_type& x) {\n\
+    \        if (!f.has_value() || x.size == 0) return x;\n        return {m1une::monoid::power<Monoid>(f.value(),\
+    \ x.size), x.size};\n    }\n\n    static constexpr value_type make(const base_type&\
+    \ value) {\n        return {value, 1};\n    }\n};\n\n}  // namespace acted_monoid\n\
+    }  // namespace m1une\n\n#endif  // M1UNE_ACTED_MONOID_RANGE_UPDATE_RANGE_PRODUCT_HPP\n"
   dependsOn:
   - monoid/concept.hpp
   - monoid/power.hpp
@@ -92,9 +102,10 @@ data:
   isVerificationFile: false
   path: acted_monoid/range_update_range_product.hpp
   requiredBy: []
-  timestamp: '2026-07-16 20:57:25+09:00'
+  timestamp: '2026-07-21 20:17:47+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/monoid/commutative_flags.test.cpp
   - verify/ds/segtree/range_update_range_product.test.cpp
 documentation_of: acted_monoid/range_update_range_product.hpp
 layout: document

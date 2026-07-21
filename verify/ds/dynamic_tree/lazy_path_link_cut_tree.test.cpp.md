@@ -271,39 +271,40 @@ data:
     namespace m1une {\nnamespace acted_monoid {\n\ntemplate <typename T>\nstruct RangeAddRangeSumNode\
     \ {\n    T sum;\n    long long size;\n};\n\ntemplate <typename T>\nstruct RangeAddRangeSum\
     \ {\n    using value_type = RangeAddRangeSumNode<T>;\n    using operator_type\
-    \ = T;\n\n    // Value Monoid (Sum)\n    static constexpr value_type id() {\n\
-    \        return {T(0), 0};\n    }\n    static constexpr value_type op(const value_type&\
-    \ a, const value_type& b) {\n        return {a.sum + b.sum, a.size + b.size};\n\
-    \    }\n    static constexpr value_type inv(const value_type& x) {\n        return\
-    \ {-x.sum, -x.size};\n    }\n\n    // Operator Monoid (Add)\n    static constexpr\
-    \ operator_type op_id() {\n        return 0;\n    }\n    static constexpr operator_type\
-    \ op_comp(const operator_type& f, const operator_type& g) {\n        return f\
-    \ + g;\n    }\n\n    // Mapping (sum + f * size)\n    static constexpr value_type\
-    \ mapping(const operator_type& f, const value_type& x) {\n        return {x.sum\
-    \ + f * x.size, x.size};\n    }\n\n    // Helper for initializing a leaf node\n\
-    \    static constexpr value_type make(const T& val) {\n        return {val, 1};\n\
-    \    }\n};\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\n\n#line 1\
-    \ \"ds/dynamic_tree/lazy_path_link_cut_tree.hpp\"\n\n\n\n#line 5 \"ds/dynamic_tree/lazy_path_link_cut_tree.hpp\"\
-    \n#include <concepts>\n#line 9 \"ds/dynamic_tree/lazy_path_link_cut_tree.hpp\"\
-    \n\n#line 1 \"acted_monoid/concept.hpp\"\n\n\n\n#line 5 \"acted_monoid/concept.hpp\"\
-    \n\nnamespace m1une {\nnamespace acted_monoid {\n\n// Concept defining the requirements\
-    \ for an Acted Monoid.\ntemplate <typename AM>\nconcept IsActedMonoid = requires(typename\
-    \ AM::value_type a, typename AM::value_type b, typename AM::operator_type f,\n\
-    \                                 typename AM::operator_type g) {\n    // 1. Value\
-    \ Monoid\n    typename AM::value_type;\n    { AM::id() } -> std::same_as<typename\
-    \ AM::value_type>;\n    { AM::op(a, b) } -> std::same_as<typename AM::value_type>;\n\
-    \n    // 2. Operator Monoid\n    typename AM::operator_type;\n    { AM::op_id()\
-    \ } -> std::same_as<typename AM::operator_type>;\n    { AM::op_comp(f, g) } ->\
-    \ std::same_as<typename AM::operator_type>;  // Composition order: f(g(x))\n\n\
-    \    // 3. Mapping: Operator x Value -> Value\n    { AM::mapping(f, a) } -> std::same_as<typename\
-    \ AM::value_type>;\n};\n\n// Concept for acted monoids whose value monoid is a\
-    \ commutative group.\n// The value operation must obey commutativity and inverse\
-    \ laws.\ntemplate <typename AM>\nconcept IsCommutativeActedGroup = IsActedMonoid<AM>\
-    \ && requires(typename AM::value_type a) {\n    { AM::inv(a) } -> std::same_as<typename\
-    \ AM::value_type>;\n};\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\
-    \n\n#line 11 \"ds/dynamic_tree/lazy_path_link_cut_tree.hpp\"\n\nnamespace m1une\
-    \ {\nnamespace ds {\n\ntemplate <m1une::acted_monoid::IsActedMonoid ActedMonoid>\n\
-    struct LazyPathLinkCutTree {\n    using T = typename ActedMonoid::value_type;\n\
+    \ = T;\n    static constexpr bool commutative = true;\n    static constexpr bool\
+    \ operator_commutative = true;\n\n    // Value Monoid (Sum)\n    static constexpr\
+    \ value_type id() {\n        return {T(0), 0};\n    }\n    static constexpr value_type\
+    \ op(const value_type& a, const value_type& b) {\n        return {a.sum + b.sum,\
+    \ a.size + b.size};\n    }\n    static constexpr value_type inv(const value_type&\
+    \ x) {\n        return {-x.sum, -x.size};\n    }\n\n    // Operator Monoid (Add)\n\
+    \    static constexpr operator_type op_id() {\n        return 0;\n    }\n    static\
+    \ constexpr operator_type op_comp(const operator_type& f, const operator_type&\
+    \ g) {\n        return f + g;\n    }\n\n    // Mapping (sum + f * size)\n    static\
+    \ constexpr value_type mapping(const operator_type& f, const value_type& x) {\n\
+    \        return {x.sum + f * x.size, x.size};\n    }\n\n    // Helper for initializing\
+    \ a leaf node\n    static constexpr value_type make(const T& val) {\n        return\
+    \ {val, 1};\n    }\n};\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\
+    \n\n#line 1 \"ds/dynamic_tree/lazy_path_link_cut_tree.hpp\"\n\n\n\n#line 5 \"\
+    ds/dynamic_tree/lazy_path_link_cut_tree.hpp\"\n#include <concepts>\n#line 9 \"\
+    ds/dynamic_tree/lazy_path_link_cut_tree.hpp\"\n\n#line 1 \"acted_monoid/concept.hpp\"\
+    \n\n\n\n#line 5 \"acted_monoid/concept.hpp\"\n\nnamespace m1une {\nnamespace acted_monoid\
+    \ {\n\n// Concept defining the requirements for an Acted Monoid.\ntemplate <typename\
+    \ AM>\nconcept IsActedMonoid = requires(typename AM::value_type a, typename AM::value_type\
+    \ b, typename AM::operator_type f,\n                                 typename\
+    \ AM::operator_type g) {\n    // 1. Value Monoid\n    typename AM::value_type;\n\
+    \    { AM::id() } -> std::same_as<typename AM::value_type>;\n    { AM::op(a, b)\
+    \ } -> std::same_as<typename AM::value_type>;\n\n    // 2. Operator Monoid\n \
+    \   typename AM::operator_type;\n    { AM::op_id() } -> std::same_as<typename\
+    \ AM::operator_type>;\n    { AM::op_comp(f, g) } -> std::same_as<typename AM::operator_type>;\
+    \  // Composition order: f(g(x))\n\n    // 3. Mapping: Operator x Value -> Value\n\
+    \    { AM::mapping(f, a) } -> std::same_as<typename AM::value_type>;\n};\n\n//\
+    \ Concept for acted monoids whose value monoid is a commutative group.\n// The\
+    \ value operation must obey commutativity and inverse laws.\ntemplate <typename\
+    \ AM>\nconcept IsCommutativeActedGroup = IsActedMonoid<AM> && requires(typename\
+    \ AM::value_type a) {\n    { AM::inv(a) } -> std::same_as<typename AM::value_type>;\n\
+    };\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\n\n#line 11 \"ds/dynamic_tree/lazy_path_link_cut_tree.hpp\"\
+    \n\nnamespace m1une {\nnamespace ds {\n\ntemplate <m1une::acted_monoid::IsActedMonoid\
+    \ ActedMonoid>\nstruct LazyPathLinkCutTree {\n    using T = typename ActedMonoid::value_type;\n\
     \    using F = typename ActedMonoid::operator_type;\n\n   private:\n    struct\
     \ Node {\n        int left = -1;\n        int right = -1;\n        int parent\
     \ = -1;\n        bool rev = false;\n        int size = 1;\n        T value = ActedMonoid::id();\n\
@@ -548,7 +549,7 @@ data:
   isVerificationFile: true
   path: verify/ds/dynamic_tree/lazy_path_link_cut_tree.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-07-21 20:17:47+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/dynamic_tree/lazy_path_link_cut_tree.test.cpp

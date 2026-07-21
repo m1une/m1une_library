@@ -72,6 +72,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/segtree_beats.test.cpp
     title: verify/ds/segtree/segtree_beats.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/monoid/commutative_flags.test.cpp
+    title: verify/monoid/commutative_flags.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -128,6 +131,7 @@ data:
   timestamp: '2026-06-17 21:06:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/monoid/commutative_flags.test.cpp
   - verify/ds/segtree/persistent_lazy_segtree.test.cpp
   - verify/ds/segtree/lazy_segtree.test.cpp
   - verify/ds/segtree/range_update_range_product.test.cpp
@@ -192,6 +196,17 @@ The concept checks that these expressions are valid and return the exact stated
 types. It does not require any operation to be `constexpr`. Associativity,
 identity laws, and the interaction between `mapping` and `op` must be satisfied
 by the implementation.
+
+Built-in acted monoids also expose two metadata flags:
+
+* `static constexpr bool commutative` describes the value operation `op`.
+* `static constexpr bool operator_commutative` describes the operator operation
+  `op_comp`.
+
+Generic data structures may use these flags to select faster representations or
+algorithms. Both members are deliberately optional and are not part of
+`IsActedMonoid`, so a contest-local acted monoid may omit them. An omitted flag
+is treated conservatively by data structures that inspect it.
 
 ## Commutative Acted Group
 

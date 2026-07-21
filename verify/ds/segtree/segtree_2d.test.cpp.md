@@ -136,13 +136,14 @@ data:
     \ _ys[k][j], _d[k][m + j]);\n            }\n        }\n\n        return res;\n\
     \    }\n};\n\n} // namespace ds\n} // namespace m1une\n\n\n#line 1 \"monoid/add.hpp\"\
     \n\n\n\nnamespace m1une {\nnamespace monoid {\n\n// Monoid for addition (Range\
-    \ Sum).\ntemplate <typename T>\nstruct Add {\n    using value_type = T;\n\n  \
-    \  // Returns the identity element for addition, which is 0.\n    static constexpr\
-    \ T id() {\n        return T(0);\n    }\n\n    // Returns the sum of a and b.\n\
-    \    static constexpr T op(const T& a, const T& b) {\n        return a + b;\n\
-    \    }\n\n    static constexpr T inv(const T& x) {\n        return -x;\n    }\n\
-    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 5 \"verify/ds/segtree/segtree_2d.test.cpp\"\
-    \n\n#line 8 \"verify/ds/segtree/segtree_2d.test.cpp\"\n#include <cstdint>\n#line\
+    \ Sum).\ntemplate <typename T>\nstruct Add {\n    using value_type = T;\n    static\
+    \ constexpr bool commutative = true;\n\n    // Returns the identity element for\
+    \ addition, which is 0.\n    static constexpr T id() {\n        return T(0);\n\
+    \    }\n\n    // Returns the sum of a and b.\n    static constexpr T op(const\
+    \ T& a, const T& b) {\n        return a + b;\n    }\n\n    static constexpr T\
+    \ inv(const T& x) {\n        return -x;\n    }\n};\n\n}  // namespace monoid\n\
+    }  // namespace m1une\n\n\n#line 5 \"verify/ds/segtree/segtree_2d.test.cpp\"\n\
+    \n#line 8 \"verify/ds/segtree/segtree_2d.test.cpp\"\n#include <cstdint>\n#line\
     \ 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 5 \"utilities/fast_io.hpp\"\n#include\
     \ <array>\n#include <cerrno>\n#include <charconv>\n#include <cstddef>\n#include\
     \ <cstdio>\n#include <cstdlib>\n#line 12 \"utilities/fast_io.hpp\"\n#include <cstring>\n\
@@ -497,7 +498,7 @@ data:
   isVerificationFile: true
   path: verify/ds/segtree/segtree_2d.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-07-21 20:17:47+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/segtree/segtree_2d.test.cpp

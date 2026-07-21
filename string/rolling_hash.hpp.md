@@ -2,13 +2,16 @@
 data:
   _extendedDependsOn: []
   _extendedRequiredBy:
-  - icon: ':warning:'
+  - icon: ':heavy_check_mark:'
     path: monoid/rolling_hash.hpp
     title: Rolling Hash Monoid
   - icon: ':heavy_check_mark:'
     path: string/all.hpp
     title: String Algorithms Bundle
   _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/monoid/commutative_flags.test.cpp
+    title: verify/monoid/commutative_flags.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/string/aoj_alds1_14_b.test.cpp
     title: verify/string/aoj_alds1_14_b.test.cpp
@@ -144,6 +147,7 @@ data:
   timestamp: '2026-06-13 20:51:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/monoid/commutative_flags.test.cpp
   - verify/string/string_algorithms.test.cpp
   - verify/string/aoj_alds1_14_b.test.cpp
 documentation_of: string/rolling_hash.hpp

@@ -2,49 +2,55 @@
 data:
   _extendedDependsOn: []
   _extendedRequiredBy: []
-  _extendedVerifiedWith: []
+  _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/monoid/commutative_flags.test.cpp
+    title: verify/monoid/commutative_flags.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':warning:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"acted_monoid/range_update_range_max.hpp\"\n\n\n\n#include\
     \ <algorithm>\n#include <limits>\n#include <optional>\n\nnamespace m1une {\nnamespace\
     \ acted_monoid {\n\ntemplate <typename T, T Id = std::numeric_limits<T>::lowest()>\n\
     struct RangeUpdateRangeMax {\n    using value_type = T;\n    using operator_type\
-    \ = std::optional<T>;\n\n    // Value Monoid (Max)\n    static constexpr value_type\
-    \ id() {\n        return Id;\n    }\n    static constexpr value_type op(const\
-    \ value_type& a, const value_type& b) {\n        return std::max(a, b);\n    }\n\
-    \n    // Operator Monoid (Update)\n    static constexpr operator_type op_id()\
-    \ {\n        return std::nullopt;\n    }\n    static constexpr operator_type op_comp(const\
-    \ operator_type& f, const operator_type& g) {\n        // Prioritize the newer\
-    \ operation (f) over the older one (g)\n        return f.has_value() ? f : g;\n\
-    \    }\n\n    // Mapping\n    static constexpr value_type mapping(const operator_type&\
-    \ f, const value_type& x) {\n        if (!f.has_value() || x == id()) return x;\n\
-    \        return f.value();\n    }\n};\n\n}  // namespace acted_monoid\n}  // namespace\
-    \ m1une\n\n\n"
+    \ = std::optional<T>;\n    static constexpr bool commutative = true;\n    static\
+    \ constexpr bool operator_commutative = false;\n\n    // Value Monoid (Max)\n\
+    \    static constexpr value_type id() {\n        return Id;\n    }\n    static\
+    \ constexpr value_type op(const value_type& a, const value_type& b) {\n      \
+    \  return std::max(a, b);\n    }\n\n    // Operator Monoid (Update)\n    static\
+    \ constexpr operator_type op_id() {\n        return std::nullopt;\n    }\n   \
+    \ static constexpr operator_type op_comp(const operator_type& f, const operator_type&\
+    \ g) {\n        // Prioritize the newer operation (f) over the older one (g)\n\
+    \        return f.has_value() ? f : g;\n    }\n\n    // Mapping\n    static constexpr\
+    \ value_type mapping(const operator_type& f, const value_type& x) {\n        if\
+    \ (!f.has_value() || x == id()) return x;\n        return f.value();\n    }\n\
+    };\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_ACTED_MONOID_RANGE_UPDATE_RANGE_MAX_HPP\n#define M1UNE_ACTED_MONOID_RANGE_UPDATE_RANGE_MAX_HPP\
     \ 1\n\n#include <algorithm>\n#include <limits>\n#include <optional>\n\nnamespace\
     \ m1une {\nnamespace acted_monoid {\n\ntemplate <typename T, T Id = std::numeric_limits<T>::lowest()>\n\
     struct RangeUpdateRangeMax {\n    using value_type = T;\n    using operator_type\
-    \ = std::optional<T>;\n\n    // Value Monoid (Max)\n    static constexpr value_type\
-    \ id() {\n        return Id;\n    }\n    static constexpr value_type op(const\
-    \ value_type& a, const value_type& b) {\n        return std::max(a, b);\n    }\n\
-    \n    // Operator Monoid (Update)\n    static constexpr operator_type op_id()\
-    \ {\n        return std::nullopt;\n    }\n    static constexpr operator_type op_comp(const\
-    \ operator_type& f, const operator_type& g) {\n        // Prioritize the newer\
-    \ operation (f) over the older one (g)\n        return f.has_value() ? f : g;\n\
-    \    }\n\n    // Mapping\n    static constexpr value_type mapping(const operator_type&\
-    \ f, const value_type& x) {\n        if (!f.has_value() || x == id()) return x;\n\
-    \        return f.value();\n    }\n};\n\n}  // namespace acted_monoid\n}  // namespace\
-    \ m1une\n\n#endif  // M1UNE_ACTED_MONOID_RANGE_UPDATE_RANGE_MAX_HPP\n"
+    \ = std::optional<T>;\n    static constexpr bool commutative = true;\n    static\
+    \ constexpr bool operator_commutative = false;\n\n    // Value Monoid (Max)\n\
+    \    static constexpr value_type id() {\n        return Id;\n    }\n    static\
+    \ constexpr value_type op(const value_type& a, const value_type& b) {\n      \
+    \  return std::max(a, b);\n    }\n\n    // Operator Monoid (Update)\n    static\
+    \ constexpr operator_type op_id() {\n        return std::nullopt;\n    }\n   \
+    \ static constexpr operator_type op_comp(const operator_type& f, const operator_type&\
+    \ g) {\n        // Prioritize the newer operation (f) over the older one (g)\n\
+    \        return f.has_value() ? f : g;\n    }\n\n    // Mapping\n    static constexpr\
+    \ value_type mapping(const operator_type& f, const value_type& x) {\n        if\
+    \ (!f.has_value() || x == id()) return x;\n        return f.value();\n    }\n\
+    };\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\n#endif  // M1UNE_ACTED_MONOID_RANGE_UPDATE_RANGE_MAX_HPP\n"
   dependsOn: []
   isVerificationFile: false
   path: acted_monoid/range_update_range_max.hpp
   requiredBy: []
-  timestamp: '2026-06-13 20:51:48+09:00'
-  verificationStatus: LIBRARY_NO_TESTS
-  verifiedWith: []
+  timestamp: '2026-07-21 20:17:47+09:00'
+  verificationStatus: LIBRARY_ALL_AC
+  verifiedWith:
+  - verify/monoid/commutative_flags.test.cpp
 documentation_of: acted_monoid/range_update_range_max.hpp
 layout: document
 title: Range Update Range Max

@@ -2,51 +2,60 @@
 data:
   _extendedDependsOn: []
   _extendedRequiredBy: []
-  _extendedVerifiedWith: []
+  _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/monoid/commutative_flags.test.cpp
+    title: verify/monoid/commutative_flags.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':warning:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"acted_monoid/wrapper.hpp\"\n\n\n\nnamespace m1une {\nnamespace\
     \ acted_monoid {\n\n// Wrapper struct to generate an Acted Monoid using Non-Type\
     \ Template Parameters (NTTP).\n// Useful for quickly defining acted monoids using\
     \ callables supplied as NTTPs during contests.\ntemplate <typename T, typename\
-    \ E, auto Op, auto Id, auto OpComp, auto OpId, auto Mapping>\nstruct Wrapper {\n\
-    \    using value_type = T;\n    using operator_type = E;\n\n    // Returns the\
-    \ identity element of the value monoid.\n    static constexpr T id() {\n     \
-    \   return Id();\n    }\n\n    // Returns the result of the value monoid binary\
-    \ operation.\n    static constexpr T op(const T& a, const T& b) {\n        return\
-    \ Op(a, b);\n    }\n\n    // Returns the identity element of the operator monoid.\n\
-    \    static constexpr E op_id() {\n        return OpId();\n    }\n\n    // Composes\
-    \ two operations f and g (corresponds to f(g(x))).\n    static constexpr E op_comp(const\
-    \ E& f, const E& g) {\n        return OpComp(f, g);\n    }\n\n    // Applies the\
-    \ operator f onto the value x.\n    static constexpr T mapping(const E& f, const\
-    \ T& x) {\n        return Mapping(f, x);\n    }\n};\n\n}  // namespace acted_monoid\n\
-    }  // namespace m1une\n\n\n"
+    \ E, auto Op, auto Id, auto OpComp, auto OpId, auto Mapping,\n          bool Commutative\
+    \ = false, bool OperatorCommutative = false>\nstruct Wrapper {\n    using value_type\
+    \ = T;\n    using operator_type = E;\n    static constexpr bool commutative =\
+    \ Commutative;\n    static constexpr bool operator_commutative = OperatorCommutative;\n\
+    \n    // Returns the identity element of the value monoid.\n    static constexpr\
+    \ T id() {\n        return Id();\n    }\n\n    // Returns the result of the value\
+    \ monoid binary operation.\n    static constexpr T op(const T& a, const T& b)\
+    \ {\n        return Op(a, b);\n    }\n\n    // Returns the identity element of\
+    \ the operator monoid.\n    static constexpr E op_id() {\n        return OpId();\n\
+    \    }\n\n    // Composes two operations f and g (corresponds to f(g(x))).\n \
+    \   static constexpr E op_comp(const E& f, const E& g) {\n        return OpComp(f,\
+    \ g);\n    }\n\n    // Applies the operator f onto the value x.\n    static constexpr\
+    \ T mapping(const E& f, const T& x) {\n        return Mapping(f, x);\n    }\n\
+    };\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_ACTED_MONOID_WRAPPER_HPP\n#define M1UNE_ACTED_MONOID_WRAPPER_HPP\
     \ 1\n\nnamespace m1une {\nnamespace acted_monoid {\n\n// Wrapper struct to generate\
     \ an Acted Monoid using Non-Type Template Parameters (NTTP).\n// Useful for quickly\
     \ defining acted monoids using callables supplied as NTTPs during contests.\n\
     template <typename T, typename E, auto Op, auto Id, auto OpComp, auto OpId, auto\
-    \ Mapping>\nstruct Wrapper {\n    using value_type = T;\n    using operator_type\
-    \ = E;\n\n    // Returns the identity element of the value monoid.\n    static\
-    \ constexpr T id() {\n        return Id();\n    }\n\n    // Returns the result\
-    \ of the value monoid binary operation.\n    static constexpr T op(const T& a,\
-    \ const T& b) {\n        return Op(a, b);\n    }\n\n    // Returns the identity\
-    \ element of the operator monoid.\n    static constexpr E op_id() {\n        return\
-    \ OpId();\n    }\n\n    // Composes two operations f and g (corresponds to f(g(x))).\n\
-    \    static constexpr E op_comp(const E& f, const E& g) {\n        return OpComp(f,\
-    \ g);\n    }\n\n    // Applies the operator f onto the value x.\n    static constexpr\
-    \ T mapping(const E& f, const T& x) {\n        return Mapping(f, x);\n    }\n\
-    };\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\n#endif  // M1UNE_ACTED_MONOID_WRAPPER_HPP\n"
+    \ Mapping,\n          bool Commutative = false, bool OperatorCommutative = false>\n\
+    struct Wrapper {\n    using value_type = T;\n    using operator_type = E;\n  \
+    \  static constexpr bool commutative = Commutative;\n    static constexpr bool\
+    \ operator_commutative = OperatorCommutative;\n\n    // Returns the identity element\
+    \ of the value monoid.\n    static constexpr T id() {\n        return Id();\n\
+    \    }\n\n    // Returns the result of the value monoid binary operation.\n  \
+    \  static constexpr T op(const T& a, const T& b) {\n        return Op(a, b);\n\
+    \    }\n\n    // Returns the identity element of the operator monoid.\n    static\
+    \ constexpr E op_id() {\n        return OpId();\n    }\n\n    // Composes two\
+    \ operations f and g (corresponds to f(g(x))).\n    static constexpr E op_comp(const\
+    \ E& f, const E& g) {\n        return OpComp(f, g);\n    }\n\n    // Applies the\
+    \ operator f onto the value x.\n    static constexpr T mapping(const E& f, const\
+    \ T& x) {\n        return Mapping(f, x);\n    }\n};\n\n}  // namespace acted_monoid\n\
+    }  // namespace m1une\n\n#endif  // M1UNE_ACTED_MONOID_WRAPPER_HPP\n"
   dependsOn: []
   isVerificationFile: false
   path: acted_monoid/wrapper.hpp
   requiredBy: []
-  timestamp: '2026-07-02 23:51:56+09:00'
-  verificationStatus: LIBRARY_NO_TESTS
-  verifiedWith: []
+  timestamp: '2026-07-21 20:17:47+09:00'
+  verificationStatus: LIBRARY_ALL_AC
+  verifiedWith:
+  - verify/monoid/commutative_flags.test.cpp
 documentation_of: acted_monoid/wrapper.hpp
 layout: document
 title: Acted Monoid Wrapper
@@ -71,6 +80,10 @@ callable in a constant expression.
 - `auto OpComp`: A function or lambda for operator composition (`E op_comp(E, E)`).
 - `auto OpId`: A function or lambda returning the operator identity (`E op_id()`).
 - `auto Mapping`: A function or lambda for mapping the operator onto the value (`T mapping(E, T)`).
+- `bool Commutative`: Whether the value operation `Op` is commutative. Defaults
+  to `false`.
+- `bool OperatorCommutative`: Whether the operator operation `OpComp` is
+  commutative. Defaults to `false`.
 
 ## Example
 
@@ -86,14 +99,17 @@ using RangeAddRangeMin = m1une::acted_monoid::Wrapper<
     []() { return INF; },
     [](long long f, long long g) { return f + g; },
     []() { return 0LL; },
-    [](long long f, long long x) { return x == INF ? INF : x + f; }
+    [](long long f, long long x) { return x == INF ? INF : x + f; },
+    true,
+    true
 >;
 ```
 
 ## Interface and Complexity
 
-`Wrapper` exposes `value_type`, `operator_type`, `id()`, `op(a, b)`, `op_id()`,
-`op_comp(f, g)`, and `mapping(f, x)` for lazy data structures.
+`Wrapper` exposes `value_type`, `operator_type`, `commutative`,
+`operator_commutative`, `id()`, `op(a, b)`, `op_id()`, `op_comp(f, g)`, and
+`mapping(f, x)` for lazy data structures.
 
 Each static operation forwards to the function or lambda supplied as the
 corresponding template parameter, so its complexity is the cost of that callable.

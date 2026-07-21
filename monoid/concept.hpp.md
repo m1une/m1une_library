@@ -243,6 +243,15 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/tree/vertex_get_range_contour_add_on_tree.test.cpp
     title: verify/graph/tree/vertex_get_range_contour_add_on_tree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/monoid/commutative_flags.test.cpp
+    title: verify/monoid/commutative_flags.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/monoid/commutative_flags.test.cpp
+    title: verify/monoid/commutative_flags.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/monoid/commutative_flags.test.cpp
+    title: verify/monoid/commutative_flags.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -328,6 +337,9 @@ data:
   timestamp: '2026-07-16 20:44:42+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/monoid/commutative_flags.test.cpp
+  - verify/monoid/commutative_flags.test.cpp
+  - verify/monoid/commutative_flags.test.cpp
   - verify/ds/range_query/range_sort_range_composite.test.cpp
   - verify/ds/range_query/range_sort_range_composite.test.cpp
   - verify/ds/range_query/sliding_window_aggregation_deque.test.cpp
@@ -398,6 +410,12 @@ To satisfy `m1une::monoid::IsMonoid`, a type `M` must implement:
 
 * `static T op(const T& a, const T& b);`
   Combines two values.
+
+Built-in monoids also expose `static constexpr bool commutative`. Generic data
+structures may use it to select a faster representation. This member is
+deliberately optional and is not part of `IsMonoid`, so a contest-local monoid
+may omit it. An omitted flag is treated conservatively by data structures that
+inspect it.
 
 ## Group
 

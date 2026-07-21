@@ -15,6 +15,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/tree/vertex_get_range_contour_add_on_tree.test.cpp
     title: verify/graph/tree/vertex_get_range_contour_add_on_tree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/monoid/commutative_flags.test.cpp
+    title: verify/monoid/commutative_flags.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -22,27 +25,29 @@ data:
     links: []
   bundledCode: "#line 1 \"monoid/xor.hpp\"\n\n\n\nnamespace m1une {\nnamespace monoid\
     \ {\n\n// Monoid for bitwise XOR (Range XOR).\ntemplate <typename T>\nstruct Xor\
-    \ {\n    using value_type = T;\n\n    // Returns the identity element for bitwise\
+    \ {\n    using value_type = T;\n    static constexpr bool commutative = true;\n\
+    \n    // Returns the identity element for bitwise XOR, which is 0.\n    static\
+    \ constexpr T id() {\n        return T(0);\n    }\n\n    // Returns the bitwise\
+    \ XOR of a and b.\n    static constexpr T op(const T& a, const T& b) {\n     \
+    \   return a ^ b;\n    }\n\n    static constexpr T inv(const T& x) {\n       \
+    \ return x;\n    }\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n"
+  code: "#ifndef M1UNE_MONOID_XOR_HPP\n#define M1UNE_MONOID_XOR_HPP 1\n\nnamespace\
+    \ m1une {\nnamespace monoid {\n\n// Monoid for bitwise XOR (Range XOR).\ntemplate\
+    \ <typename T>\nstruct Xor {\n    using value_type = T;\n    static constexpr\
+    \ bool commutative = true;\n\n    // Returns the identity element for bitwise\
     \ XOR, which is 0.\n    static constexpr T id() {\n        return T(0);\n    }\n\
     \n    // Returns the bitwise XOR of a and b.\n    static constexpr T op(const\
     \ T& a, const T& b) {\n        return a ^ b;\n    }\n\n    static constexpr T\
     \ inv(const T& x) {\n        return x;\n    }\n};\n\n}  // namespace monoid\n\
-    }  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_MONOID_XOR_HPP\n#define M1UNE_MONOID_XOR_HPP 1\n\nnamespace\
-    \ m1une {\nnamespace monoid {\n\n// Monoid for bitwise XOR (Range XOR).\ntemplate\
-    \ <typename T>\nstruct Xor {\n    using value_type = T;\n\n    // Returns the\
-    \ identity element for bitwise XOR, which is 0.\n    static constexpr T id() {\n\
-    \        return T(0);\n    }\n\n    // Returns the bitwise XOR of a and b.\n \
-    \   static constexpr T op(const T& a, const T& b) {\n        return a ^ b;\n \
-    \   }\n\n    static constexpr T inv(const T& x) {\n        return x;\n    }\n\
-    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n#endif  // M1UNE_MONOID_XOR_HPP\n"
+    }  // namespace m1une\n\n#endif  // M1UNE_MONOID_XOR_HPP\n"
   dependsOn: []
   isVerificationFile: false
   path: monoid/xor.hpp
   requiredBy: []
-  timestamp: '2026-06-17 21:06:48+09:00'
+  timestamp: '2026-07-21 20:17:47+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/monoid/commutative_flags.test.cpp
   - verify/ds/dsu/potentialized_dsu.test.cpp
   - verify/ds/dsu/persistent_potentialized_dsu.test.cpp
   - verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp

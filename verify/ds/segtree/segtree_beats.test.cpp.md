@@ -470,35 +470,37 @@ data:
     \ utilities\n}  // namespace m1une\n\n\n#line 9 \"verify/ds/segtree/segtree_beats.test.cpp\"\
     \n\n#line 1 \"acted_monoid/range_affine_range_sum.hpp\"\n\n\n\n#line 5 \"acted_monoid/range_affine_range_sum.hpp\"\
     \n\nnamespace m1une {\nnamespace acted_monoid {\n\ntemplate <typename T>\nstruct\
-    \ RangeAffineRangeSumNode {\n    T sum;\n    long long size;\n};\n\n// Designed\
-    \ to accept Modint or similar types as T\ntemplate <typename T>\nstruct RangeAffineRangeSum\
+    \ RangeAffineRangeSumNode {\n    T sum;\n    int size;\n};\n\n// Designed to accept\
+    \ Modint or similar types as T\ntemplate <typename T>\nstruct RangeAffineRangeSum\
     \ {\n    using value_type = RangeAffineRangeSumNode<T>;\n    using operator_type\
-    \ = std::pair<T, T>;  // {a, b} for ax + b\n\n    // Value Monoid\n    static\
-    \ constexpr value_type id() {\n        return {T(0), 0};\n    }\n    static constexpr\
-    \ value_type op(const value_type& a, const value_type& b) {\n        return {a.sum\
-    \ + b.sum, a.size + b.size};\n    }\n\n    // Operator Monoid (Affine Composition)\n\
-    \    // f(x) = a1*x + b1, g(x) = a2*x + b2\n    // f(g(x)) = a1*(a2*x + b2) +\
-    \ b1 = (a1*a2)*x + (a1*b2 + b1)\n    static constexpr operator_type op_id() {\n\
-    \        return {T(1), T(0)};\n    }\n    static constexpr operator_type op_comp(const\
-    \ operator_type& f, const operator_type& g) {\n        return {f.first * g.first,\
-    \ f.first * g.second + f.second};\n    }\n\n    // Mapping\n    // \\sum (a*x_i\
-    \ + b) = a * \\sum x_i + b * size\n    static constexpr value_type mapping(const\
-    \ operator_type& f, const value_type& x) {\n        return {f.first * x.sum +\
-    \ f.second * T(x.size), x.size};\n    }\n\n    // Helper for initializing a leaf\
-    \ node\n    static constexpr value_type make(const T& val) {\n        return {val,\
-    \ 1};\n    }\n};\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\n\n\
-    #line 1 \"math/modint.hpp\"\n\n\n\n#line 6 \"math/modint.hpp\"\n#include <iostream>\n\
-    #line 9 \"math/modint.hpp\"\n\nnamespace m1une {\nnamespace math {\n\ntemplate\
-    \ <uint32_t Modulus>\nstruct ModInt {\n    static_assert(0 < Modulus, \"Modulus\
-    \ must be positive\");\n\n   private:\n    uint32_t _v;\n\n   public:\n    static\
-    \ constexpr uint32_t mod() {\n        return Modulus;\n    }\n\n    static constexpr\
-    \ ModInt raw(uint32_t v) noexcept {\n        ModInt x;\n        x._v = v;\n  \
-    \      return x;\n    }\n\n    constexpr ModInt() noexcept : _v(0) {}\n\n    template\
-    \ <class Integer, std::enable_if_t<std::is_integral_v<Integer>, int> = 0>\n  \
-    \  constexpr ModInt(Integer v) noexcept {\n        if constexpr (std::is_signed_v<Integer>)\
-    \ {\n            int64_t x = static_cast<int64_t>(v) % static_cast<int64_t>(Modulus);\n\
-    \            if (x < 0) x += Modulus;\n            _v = static_cast<uint32_t>(x);\n\
-    \        } else {\n            _v = static_cast<uint32_t>(static_cast<uint64_t>(v)\
+    \ = std::pair<T, T>;  // {a, b} for ax + b\n    static constexpr bool commutative\
+    \ = true;\n    static constexpr bool operator_commutative = false;\n\n    // Value\
+    \ Monoid\n    static constexpr value_type id() {\n        return {T(0), 0};\n\
+    \    }\n    static constexpr value_type op(const value_type& a, const value_type&\
+    \ b) {\n        return {a.sum + b.sum, a.size + b.size};\n    }\n    static constexpr\
+    \ int size(const value_type& value) {\n        return value.size;\n    }\n\n \
+    \   // Operator Monoid (Affine Composition)\n    // f(x) = a1*x + b1, g(x) = a2*x\
+    \ + b2\n    // f(g(x)) = a1*(a2*x + b2) + b1 = (a1*a2)*x + (a1*b2 + b1)\n    static\
+    \ constexpr operator_type op_id() {\n        return {T(1), T(0)};\n    }\n   \
+    \ static constexpr operator_type op_comp(const operator_type& f, const operator_type&\
+    \ g) {\n        return {f.first * g.first, f.first * g.second + f.second};\n \
+    \   }\n\n    // Mapping\n    // \\sum (a*x_i + b) = a * \\sum x_i + b * size\n\
+    \    static constexpr value_type mapping(const operator_type& f, const value_type&\
+    \ x) {\n        return {f.first * x.sum + f.second * T(x.size), x.size};\n   \
+    \ }\n\n    // Helper for initializing a leaf node\n    static constexpr value_type\
+    \ make(const T& val) {\n        return {val, 1};\n    }\n};\n\n}  // namespace\
+    \ acted_monoid\n}  // namespace m1une\n\n\n#line 1 \"math/modint.hpp\"\n\n\n\n\
+    #line 6 \"math/modint.hpp\"\n#include <iostream>\n#line 9 \"math/modint.hpp\"\n\
+    \nnamespace m1une {\nnamespace math {\n\ntemplate <uint32_t Modulus>\nstruct ModInt\
+    \ {\n    static_assert(0 < Modulus, \"Modulus must be positive\");\n\n   private:\n\
+    \    uint32_t _v;\n\n   public:\n    static constexpr uint32_t mod() {\n     \
+    \   return Modulus;\n    }\n\n    static constexpr ModInt raw(uint32_t v) noexcept\
+    \ {\n        ModInt x;\n        x._v = v;\n        return x;\n    }\n\n    constexpr\
+    \ ModInt() noexcept : _v(0) {}\n\n    template <class Integer, std::enable_if_t<std::is_integral_v<Integer>,\
+    \ int> = 0>\n    constexpr ModInt(Integer v) noexcept {\n        if constexpr\
+    \ (std::is_signed_v<Integer>) {\n            int64_t x = static_cast<int64_t>(v)\
+    \ % static_cast<int64_t>(Modulus);\n            if (x < 0) x += Modulus;\n   \
+    \         _v = static_cast<uint32_t>(x);\n        } else {\n            _v = static_cast<uint32_t>(static_cast<uint64_t>(v)\
     \ % Modulus);\n        }\n    }\n\n    constexpr uint32_t val() const noexcept\
     \ {\n        return _v;\n    }\n\n    constexpr ModInt& operator++() noexcept\
     \ {\n        _v++;\n        if (_v == Modulus) _v = 0;\n        return *this;\n\
@@ -631,7 +633,7 @@ data:
   isVerificationFile: true
   path: verify/ds/segtree/segtree_beats.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-07-21 20:17:47+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/segtree/segtree_beats.test.cpp

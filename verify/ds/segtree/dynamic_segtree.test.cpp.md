@@ -463,23 +463,24 @@ data:
     \ utilities\n}  // namespace m1une\n\n\n#line 12 \"verify/ds/segtree/dynamic_segtree.test.cpp\"\
     \n\n#line 1 \"monoid/add.hpp\"\n\n\n\nnamespace m1une {\nnamespace monoid {\n\n\
     // Monoid for addition (Range Sum).\ntemplate <typename T>\nstruct Add {\n   \
-    \ using value_type = T;\n\n    // Returns the identity element for addition, which\
-    \ is 0.\n    static constexpr T id() {\n        return T(0);\n    }\n\n    //\
-    \ Returns the sum of a and b.\n    static constexpr T op(const T& a, const T&\
-    \ b) {\n        return a + b;\n    }\n\n    static constexpr T inv(const T& x)\
-    \ {\n        return -x;\n    }\n};\n\n}  // namespace monoid\n}  // namespace\
-    \ m1une\n\n\n#line 14 \"verify/ds/segtree/dynamic_segtree.test.cpp\"\n\nnamespace\
-    \ {\n\nstruct Concat {\n    using value_type = std::string;\n\n    static value_type\
-    \ id() {\n        return \"\";\n    }\n\n    static value_type op(const value_type&\
-    \ a, const value_type& b) {\n        return a + b;\n    }\n};\n\nvoid test_library_features()\
-    \ {\n    using Sum = m1une::monoid::Add<long long>;\n    using Seg = m1une::ds::DynamicSegtree<Sum>;\n\
-    \n    Seg empty;\n    assert(empty.empty());\n    assert(empty.size() == 0);\n\
-    \    assert(empty.all_prod() == 0);\n\n    Seg seg(-1'000'000'000'000'000'000LL,\
-    \ 1'000'000'000'000'000'000LL);\n    assert(!seg.empty());\n    assert(seg.left_bound()\
-    \ == -1'000'000'000'000'000'000LL);\n    assert(seg.right_bound() == 1'000'000'000'000'000'000LL);\n\
-    \    assert(seg.size() == 2'000'000'000'000'000'000ULL);\n\n    seg.reserve(256);\n\
-    \    seg.set(-3, 2);\n    seg.set(2, 4);\n    seg.set(7, 1);\n\n    assert(seg.get(-3)\
-    \ == 2);\n    assert(seg[-2] == 0);\n    assert(seg.prod(-4, 3) == 6);\n    assert(seg.prod(3,\
+    \ using value_type = T;\n    static constexpr bool commutative = true;\n\n   \
+    \ // Returns the identity element for addition, which is 0.\n    static constexpr\
+    \ T id() {\n        return T(0);\n    }\n\n    // Returns the sum of a and b.\n\
+    \    static constexpr T op(const T& a, const T& b) {\n        return a + b;\n\
+    \    }\n\n    static constexpr T inv(const T& x) {\n        return -x;\n    }\n\
+    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 14 \"verify/ds/segtree/dynamic_segtree.test.cpp\"\
+    \n\nnamespace {\n\nstruct Concat {\n    using value_type = std::string;\n\n  \
+    \  static value_type id() {\n        return \"\";\n    }\n\n    static value_type\
+    \ op(const value_type& a, const value_type& b) {\n        return a + b;\n    }\n\
+    };\n\nvoid test_library_features() {\n    using Sum = m1une::monoid::Add<long\
+    \ long>;\n    using Seg = m1une::ds::DynamicSegtree<Sum>;\n\n    Seg empty;\n\
+    \    assert(empty.empty());\n    assert(empty.size() == 0);\n    assert(empty.all_prod()\
+    \ == 0);\n\n    Seg seg(-1'000'000'000'000'000'000LL, 1'000'000'000'000'000'000LL);\n\
+    \    assert(!seg.empty());\n    assert(seg.left_bound() == -1'000'000'000'000'000'000LL);\n\
+    \    assert(seg.right_bound() == 1'000'000'000'000'000'000LL);\n    assert(seg.size()\
+    \ == 2'000'000'000'000'000'000ULL);\n\n    seg.reserve(256);\n    seg.set(-3,\
+    \ 2);\n    seg.set(2, 4);\n    seg.set(7, 1);\n\n    assert(seg.get(-3) == 2);\n\
+    \    assert(seg[-2] == 0);\n    assert(seg.prod(-4, 3) == 6);\n    assert(seg.prod(3,\
     \ 7) == 0);\n    assert(seg.all_prod() == 7);\n    assert(seg.max_right(-8, [](long\
     \ long x) { return x <= 5; }) == 2);\n    assert(seg.min_left(8, [](long long\
     \ x) { return x <= 4; }) == 3);\n\n    [[maybe_unused]] std::size_t nodes = seg.node_count();\n\
@@ -613,7 +614,7 @@ data:
   isVerificationFile: true
   path: verify/ds/segtree/dynamic_segtree.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-07-21 20:17:47+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/segtree/dynamic_segtree.test.cpp

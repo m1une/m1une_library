@@ -466,12 +466,12 @@ data:
     \ utilities\n}  // namespace m1une\n\n\n#line 12 \"verify/ds/segtree/persistent_dynamic_segtree.test.cpp\"\
     \n\n#line 1 \"monoid/add.hpp\"\n\n\n\nnamespace m1une {\nnamespace monoid {\n\n\
     // Monoid for addition (Range Sum).\ntemplate <typename T>\nstruct Add {\n   \
-    \ using value_type = T;\n\n    // Returns the identity element for addition, which\
-    \ is 0.\n    static constexpr T id() {\n        return T(0);\n    }\n\n    //\
-    \ Returns the sum of a and b.\n    static constexpr T op(const T& a, const T&\
-    \ b) {\n        return a + b;\n    }\n\n    static constexpr T inv(const T& x)\
-    \ {\n        return -x;\n    }\n};\n\n}  // namespace monoid\n}  // namespace\
-    \ m1une\n\n\n#line 14 \"verify/ds/segtree/persistent_dynamic_segtree.test.cpp\"\
+    \ using value_type = T;\n    static constexpr bool commutative = true;\n\n   \
+    \ // Returns the identity element for addition, which is 0.\n    static constexpr\
+    \ T id() {\n        return T(0);\n    }\n\n    // Returns the sum of a and b.\n\
+    \    static constexpr T op(const T& a, const T& b) {\n        return a + b;\n\
+    \    }\n\n    static constexpr T inv(const T& x) {\n        return -x;\n    }\n\
+    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 14 \"verify/ds/segtree/persistent_dynamic_segtree.test.cpp\"\
     \n\nnamespace {\n\nstruct Concat {\n    using value_type = std::string;\n\n  \
     \  static value_type id() {\n        return \"\";\n    }\n\n    static value_type\
     \ op(const value_type& a, const value_type& b) {\n        return a + b;\n    }\n\
@@ -611,7 +611,7 @@ data:
   isVerificationFile: true
   path: verify/ds/segtree/persistent_dynamic_segtree.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-07-21 20:17:47+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/segtree/persistent_dynamic_segtree.test.cpp
