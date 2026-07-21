@@ -81,10 +81,15 @@ each piece is strictly convex. Collinear vertices can therefore occur on an
 output boundary. The approximation factor compares against the same
 no-Steiner-point optimum.
 
-For integral coordinates, turn predicates on input vertices use the geometry
-module's widened integer type. Visibility and ray-shooting construction use
-extended floating-point arithmetic. For floating-point coordinates, `eps`
-also controls predicate tolerance.
+For integral coordinates, the exact routine performs no floating-point
+conversion. Input turns use the geometry module's widened integer type;
+projective visibility predicates and rational ray-intersection comparisons use
+the dependency-free [`Int512`](../utilities/int512.md) type. Results are
+therefore exact as long as the module's ordinary widened input predicates do
+not overflow. `eps` has no effect on integral predicates.
+
+For floating-point coordinates, visibility and ray shooting use `long double`,
+and `eps` controls predicate tolerance.
 
 ## Example
 

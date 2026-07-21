@@ -207,6 +207,17 @@ void test_fixed() {
     floating.emplace_back(0.0, 5.0);
     const auto floating_exact = minimum_convex_decomposition(floating);
     assert(floating_exact.has_value() && floating_exact->size() == 2);
+
+    constexpr long long shift = 8'000'000'000'000'000'000LL;
+    std::vector<P> translated = reconstruction_regression;
+    for (P& point : translated) {
+        point.x += shift;
+        point.y += shift;
+    }
+    const auto translated_exact = minimum_convex_decomposition(translated);
+    assert(translated_exact.has_value());
+    assert(translated_exact->size() == reconstructed->size());
+    assert_valid_decomposition(translated, *translated_exact);
 }
 
 void test_exhaustive_small_polygons() {

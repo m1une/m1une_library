@@ -10,9 +10,11 @@
 #include <map>
 #include <memory>
 #include <optional>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
+#include "../utilities/int512.hpp"
 #include "polygon.hpp"
 
 namespace m1une {
@@ -22,6 +24,29 @@ namespace convex_decomposition_detail {
 
 using Index = std::size_t;
 using IndexPolygon = std::vector<Index>;
+using ExactPredicateInteger = m1une::utilities::Int512;
+
+template <Coordinate T>
+using PredicateNumber = std::conditional_t<
+    std::integral<T>, ExactPredicateInteger, long double>;
+
+template <Coordinate T>
+PredicateNumber<T> predicate_number(T value) {
+    if constexpr (std::integral<T>) {
+        return ExactPredicateInteger(value);
+    } else {
+        return static_cast<long double>(value);
+    }
+}
+
+template <Coordinate T>
+int predicate_sign(const PredicateNumber<T>& value, long double eps) {
+    if constexpr (std::integral<T>) {
+        return (value > 0) - (value < 0);
+    } else {
+        return (value > eps) - (value < -eps);
+    }
+}
 
 template <Coordinate T>
 std::optional<std::vector<Point<T>>> prepare_polygon(
@@ -329,6 +354,18 @@ std::optional<std::vector<Point<T>>> prepare_minimum_polygon(
 template <Coordinate T>
 class BiasedPolygonReduction {
    private:
+    using Number = PredicateNumber<T>;
+
+    struct Vector {
+        Number x;
+        Number y;
+    };
+
+    struct Fraction {
+        Number numerator;
+        Number denominator;
+    };
+
     struct Chain {
         int first_edge;
         int edge_count;
@@ -371,8 +408,9 @@ class BiasedPolygonReduction {
 
         std::vector<std::vector<int>> extension_endpoints(size_);
         for (const int reflex : reflex_vertices_) {
-            const Point<T> direction =
-                polygon_[reflex] - polygon_[(reflex + 1) % size_];
+            const Vector direction = vector_between(
+                reflex, (reflex + 1) % size_
+            );
             for (const int edge : ray_shoot(reflex, direction)) {
                 marked_edge_[edge] = true;
                 extension_endpoints[reflex].push_back(edge);
@@ -388,11 +426,11 @@ class BiasedPolygonReduction {
                 const int second_vertex = reflex_vertices_[second];
                 mark_ray(
                     first_vertex,
-                    polygon_[first_vertex] - polygon_[second_vertex]
+                    vector_between(first_vertex, second_vertex)
                 );
                 mark_ray(
                     second_vertex,
-                    polygon_[second_vertex] - polygon_[first_vertex]
+                    vector_between(second_vertex, first_vertex)
                 );
             }
         }
@@ -406,7 +444,7 @@ class BiasedPolygonReduction {
             for (const int endpoint : endpoints) {
                 if (endpoint == reflex) continue;
                 mark_ray(
-                    reflex, polygon_[reflex] - polygon_[endpoint]
+                    reflex, vector_between(reflex, endpoint)
                 );
             }
         }
@@ -432,66 +470,88 @@ class BiasedPolygonReduction {
     std::vector<Chain> chains_;
     std::vector<bool> marked_edge_;
 
+    Vector vector_between(int first, int second) const {
+        return {
+            predicate_number<T>(polygon_[first].x) -
+                predicate_number<T>(polygon_[second].x),
+            predicate_number<T>(polygon_[first].y) -
+                predicate_number<T>(polygon_[second].y)
+        };
+    }
+
+    Number vector_cross(const Vector& first, const Vector& second) const {
+        return first.x * second.y - first.y * second.x;
+    }
+
+    Number vector_dot(const Vector& first, const Vector& second) const {
+        return first.x * second.x + first.y * second.y;
+    }
+
+    int vector_sign(const Number& value) const {
+        return predicate_sign<T>(value, eps_);
+    }
+
+    int quadrant(const Vector& direction) const {
+        const int x_sign = vector_sign(direction.x);
+        const int y_sign = vector_sign(direction.y);
+        if (y_sign >= 0) return x_sign >= 0 ? 0 : 1;
+        return x_sign < 0 ? 2 : 3;
+    }
+
     void build_chains() {
-        constexpr long double pi =
-            3.141592653589793238462643383279502884L;
-        const long double maximum_turn = pi / 3;
+        // Within one quadrant, monotonically turning edge directions span at
+        // most pi/2. This gives the bitonic sidedness needed by ray shooting
+        // without evaluating an angle.
         int first_edge = 0;
-        long double accumulated_turn = 0;
+        Vector previous_direction = vector_between(1, 0);
+        int current_quadrant = quadrant(previous_direction);
         for (int edge = 1; edge < size_; ++edge) {
-            const Point<T> previous_direction =
-                polygon_[edge] - polygon_[edge - 1];
-            const Point<T> direction =
-                polygon_[(edge + 1) % size_] - polygon_[edge];
-            const long double turn = std::atan2(
-                static_cast<long double>(
-                    cross(previous_direction, direction)
-                ),
-                static_cast<long double>(
-                    dot(previous_direction, direction)
-                )
+            const Vector direction = vector_between(
+                (edge + 1) % size_, edge
             );
+            const int direction_quadrant = quadrant(direction);
             if (
-                turn < -eps_ ||
-                accumulated_turn + std::max(0.0L, turn) > maximum_turn
+                vector_sign(vector_cross(previous_direction, direction)) <
+                    0 ||
+                direction_quadrant != current_quadrant
             ) {
                 chains_.push_back(Chain{
                     first_edge, edge - first_edge
                 });
                 first_edge = edge;
-                accumulated_turn = 0;
-            } else {
-                accumulated_turn += std::max(0.0L, turn);
+                current_quadrant = direction_quadrant;
             }
+            previous_direction = direction;
         }
         chains_.push_back(Chain{first_edge, size_ - first_edge});
     }
 
     int side(
         int origin,
-        const Point<T>& direction,
+        const Vector& direction,
         int vertex
     ) const {
-        return sign<T>(
-            cross(direction, polygon_[vertex % size_] - polygon_[origin]),
-            eps_
+        return vector_sign(
+            vector_cross(
+                direction,
+                vector_between(vertex % size_, origin)
+            )
         );
     }
 
-    int edge_side(const Point<T>& direction, int edge) const {
-        return sign<T>(
-            cross(
+    int edge_side(const Vector& direction, int edge) const {
+        return vector_sign(
+            vector_cross(
                 direction,
-                polygon_[(edge + 1) % size_] - polygon_[edge]
-            ),
-            eps_
+                vector_between((edge + 1) % size_, edge)
+            )
         );
     }
 
     void crossing_on_monotone_part(
         const Chain& chain,
         int origin,
-        const Point<T>& direction,
+        const Vector& direction,
         int first_position,
         int last_position,
         std::vector<int>& candidates
@@ -541,7 +601,7 @@ class BiasedPolygonReduction {
     void chain_candidates(
         const Chain& chain,
         int origin,
-        const Point<T>& direction,
+        const Vector& direction,
         std::vector<int>& candidates
     ) const {
         int split = 0;
@@ -599,7 +659,7 @@ class BiasedPolygonReduction {
 
     std::vector<int> ray_shoot(
         int origin,
-        const Point<T>& direction
+        const Vector& direction
     ) const {
         std::vector<int> candidates;
         for (const Chain& chain : chains_) {
@@ -611,37 +671,124 @@ class BiasedPolygonReduction {
             candidates.end()
         );
 
-        long double best = std::numeric_limits<long double>::infinity();
+        if constexpr (std::integral<T>) {
+            return exact_ray_shoot(origin, direction, candidates);
+        } else {
+            return floating_ray_shoot(origin, direction, candidates);
+        }
+    }
+
+    std::vector<int> exact_ray_shoot(
+        int origin,
+        const Vector& direction,
+        const std::vector<int>& candidates
+    ) const {
+        // Intersections are rational parameters along the ray. Keep their
+        // numerators and denominators and compare them by cross products.
+        std::optional<Fraction> best;
         std::vector<int> result;
-        const long double dx = static_cast<long double>(direction.x);
-        const long double dy = static_cast<long double>(direction.y);
-        const long double direction_norm2 = dx * dx + dy * dy;
+        const Number direction_norm2 = vector_dot(direction, direction);
         for (int edge : candidates) {
             edge %= size_;
-            const Point<T>& first = polygon_[edge];
-            const Point<T>& second = polygon_[(edge + 1) % size_];
-            const long double ax =
-                static_cast<long double>(first.x) -
-                static_cast<long double>(polygon_[origin].x);
-            const long double ay =
-                static_cast<long double>(first.y) -
-                static_cast<long double>(polygon_[origin].y);
-            const long double ex =
-                static_cast<long double>(second.x) -
-                static_cast<long double>(first.x);
-            const long double ey =
-                static_cast<long double>(second.y) -
-                static_cast<long double>(first.y);
-            const long double denominator = dx * ey - dy * ex;
+            const Vector first = vector_between(edge, origin);
+            const Vector second = vector_between(
+                (edge + 1) % size_, origin
+            );
+            const Vector edge_direction = vector_between(
+                (edge + 1) % size_, edge
+            );
+            Number denominator = vector_cross(direction, edge_direction);
+            Fraction parameter{0, 1};
+            bool valid = false;
+            if (denominator == 0) {
+                if (vector_cross(direction, first) != 0) continue;
+                const Number first_parameter =
+                    vector_dot(first, direction);
+                const Number second_parameter =
+                    vector_dot(second, direction);
+                if (first_parameter > 0) {
+                    parameter = Fraction{
+                        first_parameter, direction_norm2
+                    };
+                    valid = true;
+                }
+                if (
+                    second_parameter > 0 &&
+                    (!valid || second_parameter < parameter.numerator)
+                ) {
+                    parameter = Fraction{
+                        second_parameter, direction_norm2
+                    };
+                    valid = true;
+                }
+            } else {
+                Number numerator = vector_cross(first, edge_direction);
+                Number segment_numerator = vector_cross(first, direction);
+                if (denominator < 0) {
+                    denominator = -denominator;
+                    numerator = -numerator;
+                    segment_numerator = -segment_numerator;
+                }
+                if (
+                    numerator <= 0 || segment_numerator < 0 ||
+                    segment_numerator > denominator
+                ) {
+                    continue;
+                }
+                parameter = Fraction{numerator, denominator};
+                valid = true;
+            }
+            if (!valid) continue;
+            if (!best.has_value()) {
+                best = parameter;
+                result.assign(1, edge);
+                continue;
+            }
+            const Number left =
+                parameter.numerator * best->denominator;
+            const Number right =
+                best->numerator * parameter.denominator;
+            if (left < right) {
+                best = parameter;
+                result.assign(1, edge);
+            } else if (left == right) {
+                result.push_back(edge);
+            }
+        }
+        return result;
+    }
+
+    std::vector<int> floating_ray_shoot(
+        int origin,
+        const Vector& direction,
+        const std::vector<int>& candidates
+    ) const {
+        long double best = std::numeric_limits<long double>::infinity();
+        std::vector<int> result;
+        const long double direction_norm2 = vector_dot(
+            direction, direction
+        );
+        for (int edge : candidates) {
+            edge %= size_;
+            const Vector first = vector_between(edge, origin);
+            const Vector second = vector_between(
+                (edge + 1) % size_, origin
+            );
+            const Vector edge_direction = vector_between(
+                (edge + 1) % size_, edge
+            );
+            const long double denominator = vector_cross(
+                direction, edge_direction
+            );
             long double parameter = -1;
             if (std::fabs(denominator) <= eps_) {
-                if (std::fabs(dx * ay - dy * ax) > eps_) continue;
+                if (std::fabs(vector_cross(direction, first)) > eps_) {
+                    continue;
+                }
                 const long double first_parameter =
-                    (ax * dx + ay * dy) / direction_norm2;
-                const long double bx = ax + ex;
-                const long double by = ay + ey;
+                    vector_dot(first, direction) / direction_norm2;
                 const long double second_parameter =
-                    (bx * dx + by * dy) / direction_norm2;
+                    vector_dot(second, direction) / direction_norm2;
                 if (first_parameter > eps_) parameter = first_parameter;
                 if (
                     second_parameter > eps_ &&
@@ -650,9 +797,10 @@ class BiasedPolygonReduction {
                     parameter = second_parameter;
                 }
             } else {
-                parameter = (ax * ey - ay * ex) / denominator;
+                parameter =
+                    vector_cross(first, edge_direction) / denominator;
                 const long double segment_parameter =
-                    (ax * dy - ay * dx) / denominator;
+                    vector_cross(first, direction) / denominator;
                 if (
                     parameter <= eps_ || segment_parameter < -eps_ ||
                     segment_parameter > 1 + eps_
@@ -671,7 +819,7 @@ class BiasedPolygonReduction {
         return result;
     }
 
-    void mark_ray(int origin, const Point<T>& direction) {
+    void mark_ray(int origin, const Vector& direction) {
         for (const int edge : ray_shoot(origin, direction)) {
             marked_edge_[edge] = true;
         }
@@ -759,26 +907,28 @@ class KeilSnoeyinkDecomposition {
         PairDeque pairs;
     };
 
+    using ProjectiveNumber = PredicateNumber<T>;
+
     struct Homogeneous {
-        long double w;
-        long double x;
-        long double y;
+        ProjectiveNumber w;
+        ProjectiveNumber x;
+        ProjectiveNumber y;
 
         Homogeneous negated() const { return {-w, -x, -y}; }
 
-        long double side(const Point<T>& point) const {
-            return w + x * static_cast<long double>(point.x) +
-                   y * static_cast<long double>(point.y);
+        ProjectiveNumber side(const Point<T>& point) const {
+            return w + x * predicate_number<T>(point.x) +
+                   y * predicate_number<T>(point.y);
         }
 
         static Homogeneous line(
             const Point<T>& first,
             const Point<T>& second
         ) {
-            const long double ax = static_cast<long double>(first.x);
-            const long double ay = static_cast<long double>(first.y);
-            const long double bx = static_cast<long double>(second.x);
-            const long double by = static_cast<long double>(second.y);
+            const ProjectiveNumber ax = predicate_number<T>(first.x);
+            const ProjectiveNumber ay = predicate_number<T>(first.y);
+            const ProjectiveNumber bx = predicate_number<T>(second.x);
+            const ProjectiveNumber by = predicate_number<T>(second.y);
             return {ax * by - ay * bx, ay - by, bx - ax};
         }
 
@@ -793,7 +943,7 @@ class KeilSnoeyinkDecomposition {
             };
         }
 
-        static long double determinant(
+        static ProjectiveNumber determinant(
             const Homogeneous& first,
             const Homogeneous& second,
             const Homogeneous& third
@@ -935,21 +1085,24 @@ class KeilSnoeyinkDecomposition {
             const Homogeneous& line_value,
             const Point<T>& point_value
         ) const {
-            return line_value.side(point_value) > eps_;
+            return
+                predicate_sign<T>(line_value.side(point_value), eps_) > 0;
         }
         bool right(
             const Homogeneous& line_value,
             const Point<T>& point_value
         ) const {
-            return line_value.side(point_value) < -eps_;
+            return
+                predicate_sign<T>(line_value.side(point_value), eps_) < 0;
         }
         bool clockwise(
             const Homogeneous& first,
             const Homogeneous& second,
             const Homogeneous& third
         ) const {
-            return
-                Homogeneous::determinant(first, second, third) < -eps_;
+            return predicate_sign<T>(
+                Homogeneous::determinant(first, second, third), eps_
+            ) < 0;
         }
         void push(int index, VertexType type) {
             vertices_.push_back(index);
