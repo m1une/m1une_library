@@ -563,6 +563,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: geometry/rectangle_union_area.hpp
       title: Area of Union of Rectangles
+    - icon: ':heavy_check_mark:'
+      path: geometry/steiner_convex_decomposition.hpp
+      title: Steiner Convex Decomposition
   - name: graph
     pages:
     - icon: ':heavy_check_mark:'
@@ -1710,6 +1713,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/geometry/segment_intersection.test.cpp
       title: verify/geometry/segment_intersection.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/geometry/steiner_convex_decomposition.test.cpp
+      title: verify/geometry/steiner_convex_decomposition.test.cpp
   - name: verify/graph
     pages:
     - icon: ':heavy_check_mark:'

@@ -45,6 +45,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/polygon_operations.test.cpp
     title: verify/geometry/polygon_operations.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/steiner_convex_decomposition.test.cpp
+    title: verify/geometry/steiner_convex_decomposition.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -195,6 +198,7 @@ data:
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/convex_layers.test.cpp
   - verify/geometry/farthest_pair.test.cpp
+  - verify/geometry/steiner_convex_decomposition.test.cpp
   - verify/geometry/polygon_operations.test.cpp
   - verify/geometry/convex_decomposition.test.cpp
   - verify/geometry/convex_hull.test.cpp

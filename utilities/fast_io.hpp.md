@@ -430,6 +430,9 @@ data:
     path: verify/geometry/segment_intersection.test.cpp
     title: verify/geometry/segment_intersection.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/steiner_convex_decomposition.test.cpp
+    title: verify/geometry/steiner_convex_decomposition.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/bfs.test.cpp
     title: verify/graph/bfs.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1840,6 +1843,7 @@ data:
   - verify/geometry/polygon_area.test.cpp
   - verify/geometry/segment_intersection.test.cpp
   - verify/geometry/circle_ray.test.cpp
+  - verify/geometry/steiner_convex_decomposition.test.cpp
   - verify/geometry/polygon_operations.test.cpp
   - verify/geometry/convex_decomposition.test.cpp
   - verify/geometry/convex_hull.test.cpp

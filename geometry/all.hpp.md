@@ -65,6 +65,9 @@ data:
     path: geometry/rectangle_union_area.hpp
     title: Area of Union of Rectangles
   - icon: ':heavy_check_mark:'
+    path: geometry/steiner_convex_decomposition.hpp
+    title: Steiner Convex Decomposition
+  - icon: ':heavy_check_mark:'
     path: math/fps/convolution.hpp
     title: Convolution
   - icon: ':heavy_check_mark:'
@@ -155,6 +158,8 @@ data:
 
     #include "rectangle_union_area.hpp"
 
+    #include "steiner_convex_decomposition.hpp"
+
 
     #endif  // M1UNE_GEOMETRY_ALL_HPP
 
@@ -188,10 +193,11 @@ data:
   - geometry/minimum_enclosing_circle.hpp
   - geometry/perpendicular_bisector.hpp
   - geometry/rectangle_union_area.hpp
+  - geometry/steiner_convex_decomposition.hpp
   isVerificationFile: false
   path: geometry/all.hpp
   requiredBy: []
-  timestamp: '2026-07-22 10:48:11+09:00'
+  timestamp: '2026-07-22 13:48:02+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp
@@ -227,6 +233,7 @@ title: Geometry Bundle
 | `geometry/perpendicular_bisector.hpp` | Floating-point and lattice-point perpendicular bisectors of two distinct points. |
 | `geometry/ray.hpp` | Rays, containment, projection, intersections, and distances with other linear objects. |
 | `geometry/rectangle_union_area.hpp` | Exact union area of axis-aligned rectangles in $O(N\log N)$. |
+| `geometry/steiner_convex_decomposition.hpp` | Floating-point Steiner convex decomposition with an exact union and a strict 2-approximation piece count. |
 | `geometry/polygon.hpp` | General polygon area, centroids, triangulation, containment, ray queries, intersection, and distance. |
 | `geometry/circle.hpp` | Circle centroid, relations, line/ray intersections, and ray reflection. |
 

@@ -68,6 +68,9 @@ data:
     path: geometry/rectangle_union_area.hpp
     title: Area of Union of Rectangles
   - icon: ':heavy_check_mark:'
+    path: geometry/steiner_convex_decomposition.hpp
+    title: Steiner Convex Decomposition
+  - icon: ':heavy_check_mark:'
     path: math/fps/convolution.hpp
     title: Convolution
   - icon: ':heavy_check_mark:'
@@ -212,11 +215,12 @@ data:
   - geometry/minimum_enclosing_circle.hpp
   - geometry/perpendicular_bisector.hpp
   - geometry/rectangle_union_area.hpp
+  - geometry/steiner_convex_decomposition.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
   path: verify/geometry/centroid.test.cpp
   requiredBy: []
-  timestamp: '2026-07-22 10:48:11+09:00'
+  timestamp: '2026-07-22 13:48:02+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/centroid.test.cpp

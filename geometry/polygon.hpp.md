@@ -20,6 +20,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: geometry/convex_polygon.hpp
     title: Convex Polygons
+  - icon: ':heavy_check_mark:'
+    path: geometry/steiner_convex_decomposition.hpp
+    title: Steiner Convex Decomposition
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/centroid.test.cpp
@@ -51,6 +54,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/polygon_operations.test.cpp
     title: verify/geometry/polygon_operations.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/steiner_convex_decomposition.test.cpp
+    title: verify/geometry/steiner_convex_decomposition.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -827,6 +833,7 @@ data:
   isVerificationFile: false
   path: geometry/polygon.hpp
   requiredBy:
+  - geometry/steiner_convex_decomposition.hpp
   - geometry/all.hpp
   - geometry/convex_decomposition.hpp
   - geometry/convex_polygon.hpp
@@ -837,6 +844,7 @@ data:
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/point_in_polygon.test.cpp
   - verify/geometry/polygon_area.test.cpp
+  - verify/geometry/steiner_convex_decomposition.test.cpp
   - verify/geometry/polygon_operations.test.cpp
   - verify/geometry/polygon_operations.test.cpp
   - verify/geometry/convex_decomposition.test.cpp

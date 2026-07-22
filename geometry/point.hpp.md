@@ -59,6 +59,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: geometry/rectangle_union_area.hpp
     title: Area of Union of Rectangles
+  - icon: ':heavy_check_mark:'
+    path: geometry/steiner_convex_decomposition.hpp
+    title: Steiner Convex Decomposition
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/angle_sort.test.cpp
@@ -144,6 +147,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/segment_intersection.test.cpp
     title: verify/geometry/segment_intersection.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/steiner_convex_decomposition.test.cpp
+    title: verify/geometry/steiner_convex_decomposition.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -323,6 +329,7 @@ data:
   requiredBy:
   - geometry/farthest_pair.hpp
   - geometry/euclidean_mst.hpp
+  - geometry/steiner_convex_decomposition.hpp
   - geometry/all.hpp
   - geometry/closest_pair.hpp
   - geometry/convex_decomposition.hpp
@@ -358,6 +365,7 @@ data:
   - verify/geometry/polygon_area.test.cpp
   - verify/geometry/segment_intersection.test.cpp
   - verify/geometry/circle_ray.test.cpp
+  - verify/geometry/steiner_convex_decomposition.test.cpp
   - verify/geometry/polygon_operations.test.cpp
   - verify/geometry/convex_decomposition.test.cpp
   - verify/geometry/convex_hull.test.cpp
