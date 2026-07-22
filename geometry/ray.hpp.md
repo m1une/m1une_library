@@ -34,11 +34,35 @@ data:
     path: verify/geometry/centroid.test.cpp
     title: verify/geometry/centroid.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/circle_circle_intersection.test.cpp
+    title: verify/geometry/circle_circle_intersection.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/circle_circle_intersection_area.test.cpp
+    title: verify/geometry/circle_circle_intersection_area.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/circle_common_tangents.test.cpp
+    title: verify/geometry/circle_common_tangents.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/circle_line_intersection.test.cpp
     title: verify/geometry/circle_line_intersection.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/circle_operations.test.cpp
+    title: verify/geometry/circle_operations.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/circle_polygon_intersection_area.test.cpp
+    title: verify/geometry/circle_polygon_intersection_area.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/circle_ray.test.cpp
     title: verify/geometry/circle_ray.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/circle_relation.test.cpp
+    title: verify/geometry/circle_relation.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/circle_tangent_points.test.cpp
+    title: verify/geometry/circle_tangent_points.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/circumcircle.test.cpp
+    title: verify/geometry/circumcircle.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/convex_decomposition.test.cpp
     title: verify/geometry/convex_decomposition.test.cpp
@@ -51,6 +75,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/geometry_algorithms.test.cpp
     title: verify/geometry/geometry_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/incircle.test.cpp
+    title: verify/geometry/incircle.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/is_convex_polygon.test.cpp
     title: verify/geometry/is_convex_polygon.test.cpp
@@ -605,18 +632,27 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/convex_polygon.test.cpp
+  - verify/geometry/circle_relation.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/ray.test.cpp
   - verify/geometry/point_in_polygon.test.cpp
+  - verify/geometry/incircle.test.cpp
+  - verify/geometry/circle_circle_intersection_area.test.cpp
+  - verify/geometry/circumcircle.test.cpp
   - verify/geometry/polygon_area.test.cpp
   - verify/geometry/circle_ray.test.cpp
   - verify/geometry/steiner_convex_decomposition.test.cpp
+  - verify/geometry/circle_common_tangents.test.cpp
+  - verify/geometry/circle_polygon_intersection_area.test.cpp
   - verify/geometry/polygon_operations.test.cpp
   - verify/geometry/convex_decomposition.test.cpp
   - verify/geometry/is_convex_polygon.test.cpp
   - verify/geometry/centroid.test.cpp
+  - verify/geometry/circle_operations.test.cpp
+  - verify/geometry/circle_tangent_points.test.cpp
   - verify/geometry/circle_line_intersection.test.cpp
   - verify/geometry/minimum_enclosing_circle.test.cpp
+  - verify/geometry/circle_circle_intersection.test.cpp
   - verify/geometry/convex_diameter.test.cpp
 documentation_of: geometry/ray.hpp
 layout: document

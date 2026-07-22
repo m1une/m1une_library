@@ -1651,11 +1651,35 @@ data:
       path: verify/geometry/centroid.test.cpp
       title: verify/geometry/centroid.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/geometry/circle_circle_intersection.test.cpp
+      title: verify/geometry/circle_circle_intersection.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/geometry/circle_circle_intersection_area.test.cpp
+      title: verify/geometry/circle_circle_intersection_area.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/geometry/circle_common_tangents.test.cpp
+      title: verify/geometry/circle_common_tangents.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/geometry/circle_line_intersection.test.cpp
       title: verify/geometry/circle_line_intersection.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/geometry/circle_operations.test.cpp
+      title: verify/geometry/circle_operations.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/geometry/circle_polygon_intersection_area.test.cpp
+      title: verify/geometry/circle_polygon_intersection_area.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/geometry/circle_ray.test.cpp
       title: verify/geometry/circle_ray.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/geometry/circle_relation.test.cpp
+      title: verify/geometry/circle_relation.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/geometry/circle_tangent_points.test.cpp
+      title: verify/geometry/circle_tangent_points.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/geometry/circumcircle.test.cpp
+      title: verify/geometry/circumcircle.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/geometry/closest_pair.test.cpp
       title: verify/geometry/closest_pair.test.cpp
@@ -1695,6 +1719,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/geometry/half_plane_intersection_random.test.cpp
       title: verify/geometry/half_plane_intersection_random.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/geometry/incircle.test.cpp
+      title: verify/geometry/incircle.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/geometry/is_convex_polygon.test.cpp
       title: verify/geometry/is_convex_polygon.test.cpp

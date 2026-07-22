@@ -219,7 +219,7 @@ data:
   isVerificationFile: false
   path: geometry/all.hpp
   requiredBy: []
-  timestamp: '2026-07-22 15:13:07+09:00'
+  timestamp: '2026-07-22 20:44:51+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp
@@ -260,7 +260,7 @@ title: Geometry Bundle
 | `geometry/steiner_convex_decomposition.hpp` | Floating-point Steiner convex decomposition with an exact union and a strict 2-approximation piece count. |
 | `geometry/voronoi_diagram.hpp` | Exact-topology Euclidean Voronoi diagrams with segments, rays, lines, and per-site boundary edges in $O(N\log N)$. |
 | `geometry/polygon.hpp` | General polygon area, centroids, triangulation, containment, ray queries, intersection, and distance. |
-| `geometry/circle.hpp` | Circle centroid, relations, line/ray intersections, and ray reflection. |
+| `geometry/circle.hpp` | Circle classification, triangle constructions, intersections, tangents, reflection, and overlap area. |
 
 Integral predicates promote to signed 128-bit arithmetic. Constructions that
 may be non-integral return `Point<long double>`.
