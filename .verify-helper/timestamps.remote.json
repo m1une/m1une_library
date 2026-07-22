@@ -70,6 +70,7 @@
 "verify/ds/range_query/disjoint_sparse_table.test.cpp": "2026-07-21 20:17:47 +0900",
 "verify/ds/range_query/fenwick_tree.test.cpp": "2026-07-18 22:54:37 +0900",
 "verify/ds/range_query/fenwick_tree_2d.test.cpp": "2026-07-18 22:54:37 +0900",
+"verify/ds/range_query/kd_tree.test.cpp": "2026-07-22 14:00:35 +0900",
 "verify/ds/range_query/merge_sort_tree.test.cpp": "2026-07-18 22:54:37 +0900",
 "verify/ds/range_query/merge_sort_tree_sum.test.cpp": "2026-07-18 22:54:37 +0900",
 "verify/ds/range_query/offline_rectangle_add_rectangle_sum.test.cpp": "2026-07-18 22:54:37 +0900",
