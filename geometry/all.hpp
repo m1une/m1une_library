@@ -16,6 +16,7 @@
 #include "lattice_point_count.hpp"
 #include "line.hpp"
 #include "manhattan_mst.hpp"
+#include "manhattan_segment_intersections.hpp"
 #include "minimum_enclosing_circle.hpp"
 #include "perpendicular_bisector.hpp"
 #include "point.hpp"

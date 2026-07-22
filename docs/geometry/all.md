@@ -25,6 +25,7 @@ documentation_of: ../../geometry/all.hpp
 | `geometry/half_plane_intersection.hpp` | Bounded intersection polygon of directed closed half-planes in $O(N\log N)$. |
 | `geometry/lattice_point_count.hpp` | Exact lattice-point counting in a bounded intersection of integer linear inequalities. |
 | `geometry/manhattan_mst.hpp` | Manhattan minimum spanning tree for integral points in $O(N\log N)$. |
+| `geometry/manhattan_segment_intersections.hpp` | Counts or enumerates intersections of axis-aligned integral segments. |
 | `geometry/minimum_enclosing_circle.hpp` | Randomized linear-time minimum enclosing circle with support indices. |
 | `geometry/line.hpp` | Lines, segments, segment centroid, projection, intersection, and distances. |
 | `geometry/perpendicular_bisector.hpp` | Floating-point and lattice-point perpendicular bisectors of two distinct points. |
