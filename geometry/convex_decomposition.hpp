@@ -1746,7 +1746,7 @@ std::optional<std::vector<IndexPolygon>> faces_from_diagonals(
 
 template <Coordinate T>
 std::optional<std::vector<std::vector<Point<T>>>>
-approximate_convex_decomposition(
+convex_decomposition(
     std::vector<Point<T>> polygon,
     long double eps = 1e-12L
 ) {

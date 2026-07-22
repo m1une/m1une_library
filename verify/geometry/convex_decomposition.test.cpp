@@ -164,7 +164,7 @@ void test_fixed() {
     convex.emplace_back(6, 3);
     convex.emplace_back(2, 5);
     convex.emplace_back(-1, 2);
-    const auto convex_fast = approximate_convex_decomposition(convex);
+    const auto convex_fast = convex_decomposition(convex);
     const auto convex_exact = minimum_convex_decomposition(convex);
     assert(convex_fast.has_value() && convex_fast->size() == 1);
     assert(convex_exact.has_value() && convex_exact->size() == 1);
@@ -176,7 +176,7 @@ void test_fixed() {
     l_shape.emplace_back(2, 2);
     l_shape.emplace_back(2, 5);
     l_shape.emplace_back(0, 5);
-    const auto l_fast = approximate_convex_decomposition(l_shape);
+    const auto l_fast = convex_decomposition(l_shape);
     const auto l_exact = minimum_convex_decomposition(l_shape);
     assert(l_fast.has_value());
     assert(l_exact.has_value() && l_exact->size() == 2);
@@ -223,7 +223,7 @@ void test_fixed() {
     bow_tie.emplace_back(4, 4);
     bow_tie.emplace_back(0, 4);
     bow_tie.emplace_back(4, 0);
-    assert(!approximate_convex_decomposition(bow_tie).has_value());
+    assert(!convex_decomposition(bow_tie).has_value());
     assert(!minimum_convex_decomposition(bow_tie).has_value());
 
     std::vector<Point<double>> floating;
@@ -295,7 +295,7 @@ void test_exhaustive_small_polygons() {
 
         const int expected = brute_minimum_decomposition(polygon);
         const auto exact = minimum_convex_decomposition(polygon);
-        const auto fast = approximate_convex_decomposition(polygon);
+        const auto fast = convex_decomposition(polygon);
         assert(exact.has_value());
         assert(fast.has_value());
         assert(static_cast<int>(exact->size()) == expected);
@@ -337,7 +337,7 @@ void test_random_radial_polygons() {
 
         const int expected = brute_minimum_decomposition(polygon);
         const auto exact = minimum_convex_decomposition(polygon);
-        const auto fast = approximate_convex_decomposition(polygon);
+        const auto fast = convex_decomposition(polygon);
         assert(exact.has_value());
         assert(fast.has_value());
         assert(static_cast<int>(exact->size()) == expected);
