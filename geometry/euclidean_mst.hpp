@@ -363,6 +363,17 @@ class EuclideanDelaunay {
         solve();
     }
 
+    bool has_duplicates() const {
+        for (
+            int vertex = 0;
+            vertex < int(duplicate_representative.size());
+            ++vertex
+        ) {
+            if (duplicate_representative[vertex] != vertex) return true;
+        }
+        return false;
+    }
+
     std::vector<std::pair<int, int>> get_edges() const {
         std::vector<std::pair<int, int>> result;
         result.reserve(edges.size() / 2 + duplicate_representative.size());

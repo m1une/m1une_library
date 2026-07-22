@@ -19,6 +19,7 @@ documentation_of: ../../geometry/all.hpp
 | `geometry/convex_layers.hpp` | Onion decomposition into successive convex-hull boundaries in $O(N\log^2 N)$. |
 | `geometry/convex_polygon.hpp` | Normalized convex-polygon queries, centroid, cuts, diameter, intersections, distance, triangulation, and Minkowski sums. |
 | `geometry/count_points_in_triangle.hpp` | Preprocessed strict point counts for indexed triangle queries in $O(1)$ per query. |
+| `geometry/delaunay_triangulation.hpp` | Exact Delaunay edges and counterclockwise triangular faces for integral points in $O(N\log N)$. |
 | `geometry/euclidean_mst.hpp` | Euclidean minimum spanning tree for integral points in $O(N\log N)$. |
 | `geometry/farthest_pair.hpp` | Euclidean farthest pair with original indices in $O(N\log N)$. |
 | `geometry/half_plane_intersection.hpp` | Bounded intersection polygon of directed closed half-planes in $O(N\log N)$. |

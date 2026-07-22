@@ -9,6 +9,7 @@
 #include "convex_layers.hpp"
 #include "convex_polygon.hpp"
 #include "count_points_in_triangle.hpp"
+#include "delaunay_triangulation.hpp"
 #include "euclidean_mst.hpp"
 #include "farthest_pair.hpp"
 #include "half_plane_intersection.hpp"
