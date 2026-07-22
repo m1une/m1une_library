@@ -1490,8 +1490,8 @@ data:
     \ result.push_back(std::move(face));\n            }\n        }\n    }\n    if\
     \ (result.size() != diagonals.size() + 1) return std::nullopt;\n    return result;\n\
     }\n\n}  // namespace convex_decomposition_detail\n\ntemplate <Coordinate T>\n\
-    std::optional<std::vector<std::vector<Point<T>>>>\napproximate_convex_decomposition(\n\
-    \    std::vector<Point<T>> polygon,\n    long double eps = 1e-12L\n) {\n    auto\
+    std::optional<std::vector<std::vector<Point<T>>>>\nconvex_decomposition(\n   \
+    \ std::vector<Point<T>> polygon,\n    long double eps = 1e-12L\n) {\n    auto\
     \ prepared = convex_decomposition_detail::prepare_polygon(\n        std::move(polygon),\
     \ eps\n    );\n    if (!prepared.has_value()) return std::nullopt;\n    polygon\
     \ = std::move(*prepared);\n    if (convex_decomposition_detail::is_weakly_convex(polygon,\
@@ -2638,18 +2638,17 @@ data:
     \ long>::min()) ==\n        PredicateWidth::Int512\n    );\n}\n\nvoid test_fixed()\
     \ {\n    std::vector<P> convex;\n    convex.emplace_back(0, 0);\n    convex.emplace_back(5,\
     \ 0);\n    convex.emplace_back(6, 3);\n    convex.emplace_back(2, 5);\n    convex.emplace_back(-1,\
-    \ 2);\n    const auto convex_fast = approximate_convex_decomposition(convex);\n\
-    \    const auto convex_exact = minimum_convex_decomposition(convex);\n    assert(convex_fast.has_value()\
+    \ 2);\n    const auto convex_fast = convex_decomposition(convex);\n    const auto\
+    \ convex_exact = minimum_convex_decomposition(convex);\n    assert(convex_fast.has_value()\
     \ && convex_fast->size() == 1);\n    assert(convex_exact.has_value() && convex_exact->size()\
     \ == 1);\n\n    std::vector<P> l_shape;\n    l_shape.emplace_back(0, 0);\n   \
     \ l_shape.emplace_back(5, 0);\n    l_shape.emplace_back(5, 2);\n    l_shape.emplace_back(2,\
     \ 2);\n    l_shape.emplace_back(2, 5);\n    l_shape.emplace_back(0, 5);\n    const\
-    \ auto l_fast = approximate_convex_decomposition(l_shape);\n    const auto l_exact\
-    \ = minimum_convex_decomposition(l_shape);\n    assert(l_fast.has_value());\n\
-    \    assert(l_exact.has_value() && l_exact->size() == 2);\n    assert_valid_decomposition(l_shape,\
-    \ *l_fast);\n    assert_valid_decomposition(l_shape, *l_exact);\n\n    std::vector<P>\
-    \ reconstruction_regression;\n    reconstruction_regression.emplace_back(50, 0);\n\
-    \    reconstruction_regression.emplace_back(12, 16);\n    reconstruction_regression.emplace_back(-2,\
+    \ auto l_fast = convex_decomposition(l_shape);\n    const auto l_exact = minimum_convex_decomposition(l_shape);\n\
+    \    assert(l_fast.has_value());\n    assert(l_exact.has_value() && l_exact->size()\
+    \ == 2);\n    assert_valid_decomposition(l_shape, *l_fast);\n    assert_valid_decomposition(l_shape,\
+    \ *l_exact);\n\n    std::vector<P> reconstruction_regression;\n    reconstruction_regression.emplace_back(50,\
+    \ 0);\n    reconstruction_regression.emplace_back(12, 16);\n    reconstruction_regression.emplace_back(-2,\
     \ 10);\n    reconstruction_regression.emplace_back(-45, 20);\n    reconstruction_regression.emplace_back(-9,\
     \ -5);\n    reconstruction_regression.emplace_back(-8, -40);\n    reconstruction_regression.emplace_back(14,\
     \ -14);\n    const auto reconstructed =\n        minimum_convex_decomposition(reconstruction_regression);\n\
@@ -2665,7 +2664,7 @@ data:
     \ 0);\n    const auto cleaned = minimum_convex_decomposition(redundant);\n   \
     \ assert(cleaned.has_value() && cleaned->size() == 1);\n\n    std::vector<P> bow_tie;\n\
     \    bow_tie.emplace_back(0, 0);\n    bow_tie.emplace_back(4, 4);\n    bow_tie.emplace_back(0,\
-    \ 4);\n    bow_tie.emplace_back(4, 0);\n    assert(!approximate_convex_decomposition(bow_tie).has_value());\n\
+    \ 4);\n    bow_tie.emplace_back(4, 0);\n    assert(!convex_decomposition(bow_tie).has_value());\n\
     \    assert(!minimum_convex_decomposition(bow_tie).has_value());\n\n    std::vector<Point<double>>\
     \ floating;\n    floating.emplace_back(0.0, 0.0);\n    floating.emplace_back(5.0,\
     \ 0.0);\n    floating.emplace_back(5.0, 2.0);\n    floating.emplace_back(2.0,\
@@ -2697,7 +2696,7 @@ data:
     \        }\n        if (polygon_area2(polygon) <= 0 || !is_simple_polygon(polygon))\
     \ {\n            continue;\n        }\n\n        const int expected = brute_minimum_decomposition(polygon);\n\
     \        const auto exact = minimum_convex_decomposition(polygon);\n        const\
-    \ auto fast = approximate_convex_decomposition(polygon);\n        assert(exact.has_value());\n\
+    \ auto fast = convex_decomposition(polygon);\n        assert(exact.has_value());\n\
     \        assert(fast.has_value());\n        assert(static_cast<int>(exact->size())\
     \ == expected);\n        assert(fast->size() <= 4 * exact->size());\n        assert_valid_decomposition(polygon,\
     \ *exact);\n        assert_valid_decomposition(polygon, *fast);\n        ++checked;\n\
@@ -2715,8 +2714,8 @@ data:
     \              direction.y * radius\n            );\n        }\n        assert(polygon_area2(polygon)\
     \ > 0);\n        assert(is_simple_polygon(polygon));\n\n        const int expected\
     \ = brute_minimum_decomposition(polygon);\n        const auto exact = minimum_convex_decomposition(polygon);\n\
-    \        const auto fast = approximate_convex_decomposition(polygon);\n      \
-    \  assert(exact.has_value());\n        assert(fast.has_value());\n        assert(static_cast<int>(exact->size())\
+    \        const auto fast = convex_decomposition(polygon);\n        assert(exact.has_value());\n\
+    \        assert(fast.has_value());\n        assert(static_cast<int>(exact->size())\
     \ == expected);\n        assert(fast->size() <= 4 * exact->size());\n        assert_valid_decomposition(polygon,\
     \ *exact);\n        assert_valid_decomposition(polygon, *fast);\n    }\n}\n\n\
     void test_reflex_sensitive_reduction() {\n    std::vector<P> polygon;\n    polygon.emplace_back(10,\
@@ -2826,18 +2825,17 @@ data:
     \ long>::min()) ==\n        PredicateWidth::Int512\n    );\n}\n\nvoid test_fixed()\
     \ {\n    std::vector<P> convex;\n    convex.emplace_back(0, 0);\n    convex.emplace_back(5,\
     \ 0);\n    convex.emplace_back(6, 3);\n    convex.emplace_back(2, 5);\n    convex.emplace_back(-1,\
-    \ 2);\n    const auto convex_fast = approximate_convex_decomposition(convex);\n\
-    \    const auto convex_exact = minimum_convex_decomposition(convex);\n    assert(convex_fast.has_value()\
+    \ 2);\n    const auto convex_fast = convex_decomposition(convex);\n    const auto\
+    \ convex_exact = minimum_convex_decomposition(convex);\n    assert(convex_fast.has_value()\
     \ && convex_fast->size() == 1);\n    assert(convex_exact.has_value() && convex_exact->size()\
     \ == 1);\n\n    std::vector<P> l_shape;\n    l_shape.emplace_back(0, 0);\n   \
     \ l_shape.emplace_back(5, 0);\n    l_shape.emplace_back(5, 2);\n    l_shape.emplace_back(2,\
     \ 2);\n    l_shape.emplace_back(2, 5);\n    l_shape.emplace_back(0, 5);\n    const\
-    \ auto l_fast = approximate_convex_decomposition(l_shape);\n    const auto l_exact\
-    \ = minimum_convex_decomposition(l_shape);\n    assert(l_fast.has_value());\n\
-    \    assert(l_exact.has_value() && l_exact->size() == 2);\n    assert_valid_decomposition(l_shape,\
-    \ *l_fast);\n    assert_valid_decomposition(l_shape, *l_exact);\n\n    std::vector<P>\
-    \ reconstruction_regression;\n    reconstruction_regression.emplace_back(50, 0);\n\
-    \    reconstruction_regression.emplace_back(12, 16);\n    reconstruction_regression.emplace_back(-2,\
+    \ auto l_fast = convex_decomposition(l_shape);\n    const auto l_exact = minimum_convex_decomposition(l_shape);\n\
+    \    assert(l_fast.has_value());\n    assert(l_exact.has_value() && l_exact->size()\
+    \ == 2);\n    assert_valid_decomposition(l_shape, *l_fast);\n    assert_valid_decomposition(l_shape,\
+    \ *l_exact);\n\n    std::vector<P> reconstruction_regression;\n    reconstruction_regression.emplace_back(50,\
+    \ 0);\n    reconstruction_regression.emplace_back(12, 16);\n    reconstruction_regression.emplace_back(-2,\
     \ 10);\n    reconstruction_regression.emplace_back(-45, 20);\n    reconstruction_regression.emplace_back(-9,\
     \ -5);\n    reconstruction_regression.emplace_back(-8, -40);\n    reconstruction_regression.emplace_back(14,\
     \ -14);\n    const auto reconstructed =\n        minimum_convex_decomposition(reconstruction_regression);\n\
@@ -2853,7 +2851,7 @@ data:
     \ 0);\n    const auto cleaned = minimum_convex_decomposition(redundant);\n   \
     \ assert(cleaned.has_value() && cleaned->size() == 1);\n\n    std::vector<P> bow_tie;\n\
     \    bow_tie.emplace_back(0, 0);\n    bow_tie.emplace_back(4, 4);\n    bow_tie.emplace_back(0,\
-    \ 4);\n    bow_tie.emplace_back(4, 0);\n    assert(!approximate_convex_decomposition(bow_tie).has_value());\n\
+    \ 4);\n    bow_tie.emplace_back(4, 0);\n    assert(!convex_decomposition(bow_tie).has_value());\n\
     \    assert(!minimum_convex_decomposition(bow_tie).has_value());\n\n    std::vector<Point<double>>\
     \ floating;\n    floating.emplace_back(0.0, 0.0);\n    floating.emplace_back(5.0,\
     \ 0.0);\n    floating.emplace_back(5.0, 2.0);\n    floating.emplace_back(2.0,\
@@ -2885,7 +2883,7 @@ data:
     \        }\n        if (polygon_area2(polygon) <= 0 || !is_simple_polygon(polygon))\
     \ {\n            continue;\n        }\n\n        const int expected = brute_minimum_decomposition(polygon);\n\
     \        const auto exact = minimum_convex_decomposition(polygon);\n        const\
-    \ auto fast = approximate_convex_decomposition(polygon);\n        assert(exact.has_value());\n\
+    \ auto fast = convex_decomposition(polygon);\n        assert(exact.has_value());\n\
     \        assert(fast.has_value());\n        assert(static_cast<int>(exact->size())\
     \ == expected);\n        assert(fast->size() <= 4 * exact->size());\n        assert_valid_decomposition(polygon,\
     \ *exact);\n        assert_valid_decomposition(polygon, *fast);\n        ++checked;\n\
@@ -2903,8 +2901,8 @@ data:
     \              direction.y * radius\n            );\n        }\n        assert(polygon_area2(polygon)\
     \ > 0);\n        assert(is_simple_polygon(polygon));\n\n        const int expected\
     \ = brute_minimum_decomposition(polygon);\n        const auto exact = minimum_convex_decomposition(polygon);\n\
-    \        const auto fast = approximate_convex_decomposition(polygon);\n      \
-    \  assert(exact.has_value());\n        assert(fast.has_value());\n        assert(static_cast<int>(exact->size())\
+    \        const auto fast = convex_decomposition(polygon);\n        assert(exact.has_value());\n\
+    \        assert(fast.has_value());\n        assert(static_cast<int>(exact->size())\
     \ == expected);\n        assert(fast->size() <= 4 * exact->size());\n        assert_valid_decomposition(polygon,\
     \ *exact);\n        assert_valid_decomposition(polygon, *fast);\n    }\n}\n\n\
     void test_reflex_sensitive_reduction() {\n    std::vector<P> polygon;\n    polygon.emplace_back(10,\
@@ -2963,7 +2961,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/convex_decomposition.test.cpp
   requiredBy: []
-  timestamp: '2026-07-22 09:31:46+09:00'
+  timestamp: '2026-07-22 10:48:11+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/convex_decomposition.test.cpp

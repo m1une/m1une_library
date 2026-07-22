@@ -1482,8 +1482,8 @@ data:
     \ result.push_back(std::move(face));\n            }\n        }\n    }\n    if\
     \ (result.size() != diagonals.size() + 1) return std::nullopt;\n    return result;\n\
     }\n\n}  // namespace convex_decomposition_detail\n\ntemplate <Coordinate T>\n\
-    std::optional<std::vector<std::vector<Point<T>>>>\napproximate_convex_decomposition(\n\
-    \    std::vector<Point<T>> polygon,\n    long double eps = 1e-12L\n) {\n    auto\
+    std::optional<std::vector<std::vector<Point<T>>>>\nconvex_decomposition(\n   \
+    \ std::vector<Point<T>> polygon,\n    long double eps = 1e-12L\n) {\n    auto\
     \ prepared = convex_decomposition_detail::prepare_polygon(\n        std::move(polygon),\
     \ eps\n    );\n    if (!prepared.has_value()) return std::nullopt;\n    polygon\
     \ = std::move(*prepared);\n    if (convex_decomposition_detail::is_weakly_convex(polygon,\
@@ -2298,8 +2298,8 @@ data:
     \ result.push_back(std::move(face));\n            }\n        }\n    }\n    if\
     \ (result.size() != diagonals.size() + 1) return std::nullopt;\n    return result;\n\
     }\n\n}  // namespace convex_decomposition_detail\n\ntemplate <Coordinate T>\n\
-    std::optional<std::vector<std::vector<Point<T>>>>\napproximate_convex_decomposition(\n\
-    \    std::vector<Point<T>> polygon,\n    long double eps = 1e-12L\n) {\n    auto\
+    std::optional<std::vector<std::vector<Point<T>>>>\nconvex_decomposition(\n   \
+    \ std::vector<Point<T>> polygon,\n    long double eps = 1e-12L\n) {\n    auto\
     \ prepared = convex_decomposition_detail::prepare_polygon(\n        std::move(polygon),\
     \ eps\n    );\n    if (!prepared.has_value()) return std::nullopt;\n    polygon\
     \ = std::move(*prepared);\n    if (convex_decomposition_detail::is_weakly_convex(polygon,\
@@ -2397,7 +2397,7 @@ data:
   path: geometry/convex_decomposition.hpp
   requiredBy:
   - geometry/all.hpp
-  timestamp: '2026-07-22 09:31:46+09:00'
+  timestamp: '2026-07-22 10:48:11+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp
@@ -2413,7 +2413,7 @@ title: Convex Decomposition
 This header partitions a simple polygon without holes into convex polygons. It
 provides two choices:
 
-* `approximate_convex_decomposition` triangulates the polygon and applies the
+* `convex_decomposition` triangulates the polygon and applies the
   Hertel--Mehlhorn diagonal-removal algorithm. It is the routine to use under
   ordinary contest constraints.
 * `minimum_convex_decomposition` uses Keil--Snoeyink dynamic programming over
@@ -2421,9 +2421,14 @@ provides two choices:
   number of pieces. Its running time is sensitive to the number of reflex
   vertices rather than being quartic in the total vertex count.
 
+Both algorithms return an exact geometric partition: the pieces have disjoint
+interiors and their union is exactly the input polygon. The approximation
+guarantee of `convex_decomposition` concerns only how many pieces it returns
+compared with the minimum possible number.
+
 Both algorithms use the **no-Steiner-point model**: every output vertex is an
 input vertex, apart from removing redundant boundary vertices. This restriction
-is important when interpreting both the approximation guarantee and the word
+is important when interpreting the piece-count guarantee and the word
 "minimum."
 
 ## Functions
@@ -2431,7 +2436,7 @@ is important when interpreting both the approximation guarantee and the word
 ```cpp
 template <Coordinate T>
 std::optional<std::vector<std::vector<Point<T>>>>
-approximate_convex_decomposition(
+convex_decomposition(
     std::vector<Point<T>> polygon,
     long double eps = 1e-12L
 );
@@ -2446,7 +2451,7 @@ minimum_convex_decomposition(
 
 | Function | Result | Time | Memory |
 | --- | --- | --- | --- |
-| `approximate_convex_decomposition(polygon, eps)` | A Hertel--Mehlhorn decomposition containing at most four times the minimum number of pieces. | $O(N^2)$ | $O(N)$ |
+| `convex_decomposition(polygon, eps)` | An exact partition containing at most four times the minimum number of convex pieces. | $O(N^2)$ | $O(N)$ |
 | `minimum_convex_decomposition(polygon, eps)` | A decomposition with the minimum possible number of pieces. | $O(N + \min\lbrace NR^2, R^4 \rbrace)$ | $O(N + \min\lbrace NR^2, R^4 \rbrace)$ |
 
 Here $N$ is the number of vertices after cleanup and $R$ is the number of
@@ -2473,7 +2478,7 @@ The input may be clockwise or counterclockwise. A repeated closing point,
 consecutive duplicates, and redundant collinear boundary vertices are removed.
 The polygon must be simple and have no holes. The exact routine treats
 simplicity as a precondition so that it does not add an $O(N^2)$ validation step
-to its reflex-sensitive bound. The approximate routine validates simplicity.
+to its reflex-sensitive bound. `convex_decomposition` validates simplicity.
 The return value is `nullopt` when fewer than three effective vertices remain,
 the area is zero, validation fails where performed, or construction fails.
 
@@ -2531,8 +2536,7 @@ int main() {
     polygon.emplace_back(2, 5);
     polygon.emplace_back(0, 5);
 
-    auto parts =
-        m1une::geometry::minimum_convex_decomposition(polygon);
+    auto parts = m1une::geometry::convex_decomposition(polygon);
     if (!parts.has_value()) return 0;
     std::cout << parts->size() << "\n";  // 2
 }

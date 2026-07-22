@@ -938,7 +938,8 @@ Minkowski sums, and other convex-only operations, include
 
 To partition a simple polygon into convex pieces, include
 [`geometry/convex_decomposition.hpp`](convex_decomposition.md). It provides a
-fast four-approximation and an exact minimum-piece dynamic program.
+fast exact partition with a four-approximation guarantee on the piece count,
+and an exact minimum-piece dynamic program.
 
 ## Example
 
