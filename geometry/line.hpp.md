@@ -21,6 +21,9 @@ data:
     path: geometry/half_plane_intersection.hpp
     title: Half-Plane Intersection
   - icon: ':heavy_check_mark:'
+    path: geometry/manhattan_segment_intersections.hpp
+    title: Manhattan Segment Intersections
+  - icon: ':heavy_check_mark:'
     path: geometry/minimum_enclosing_circle.hpp
     title: Minimum Enclosing Circle
   - icon: ':heavy_check_mark:'
@@ -66,6 +69,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/is_convex_polygon.test.cpp
     title: verify/geometry/is_convex_polygon.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/manhattan_segment_intersections.test.cpp
+    title: verify/geometry/manhattan_segment_intersections.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/minimum_enclosing_circle.test.cpp
     title: verify/geometry/minimum_enclosing_circle.test.cpp
@@ -409,6 +415,7 @@ data:
   - geometry/steiner_convex_decomposition.hpp
   - geometry/all.hpp
   - geometry/convex_decomposition.hpp
+  - geometry/manhattan_segment_intersections.hpp
   - geometry/convex_polygon.hpp
   - geometry/ray.hpp
   - geometry/polygon.hpp
@@ -433,6 +440,7 @@ data:
   - verify/geometry/is_convex_polygon.test.cpp
   - verify/geometry/voronoi_diagram.test.cpp
   - verify/geometry/centroid.test.cpp
+  - verify/geometry/manhattan_segment_intersections.test.cpp
   - verify/geometry/projection.test.cpp
   - verify/geometry/circle_line_intersection.test.cpp
   - verify/geometry/half_plane_intersection.test.cpp

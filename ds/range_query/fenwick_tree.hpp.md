@@ -5,6 +5,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: ds/range_query/offline_rectangle_add_rectangle_sum.hpp
     title: Offline Rectangle Add Rectangle Sum
+  - icon: ':heavy_check_mark:'
+    path: geometry/all.hpp
+    title: Geometry Bundle
+  - icon: ':heavy_check_mark:'
+    path: geometry/manhattan_segment_intersections.hpp
+    title: Manhattan Segment Intersections
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/algo/offline/mo.test.cpp
@@ -15,6 +21,15 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/range_query/offline_rectangle_add_rectangle_sum.test.cpp
     title: verify/ds/range_query/offline_rectangle_add_rectangle_sum.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/centroid.test.cpp
+    title: verify/geometry/centroid.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/geometry_algorithms.test.cpp
+    title: verify/geometry/geometry_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/manhattan_segment_intersections.test.cpp
+    title: verify/geometry/manhattan_segment_intersections.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/tree/vertex_add_subtree_sum.test.cpp
     title: verify/graph/tree/vertex_add_subtree_sum.test.cpp
@@ -92,6 +107,8 @@ data:
   path: ds/range_query/fenwick_tree.hpp
   requiredBy:
   - ds/range_query/offline_rectangle_add_rectangle_sum.hpp
+  - geometry/all.hpp
+  - geometry/manhattan_segment_intersections.hpp
   timestamp: '2026-06-27 04:10:54+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
@@ -99,6 +116,9 @@ data:
   - verify/ds/range_query/fenwick_tree.test.cpp
   - verify/graph/tree/vertex_add_subtree_sum.test.cpp
   - verify/algo/offline/mo.test.cpp
+  - verify/geometry/geometry_algorithms.test.cpp
+  - verify/geometry/centroid.test.cpp
+  - verify/geometry/manhattan_segment_intersections.test.cpp
 documentation_of: ds/range_query/fenwick_tree.hpp
 layout: document
 title: Fenwick Tree (Binary Indexed Tree)

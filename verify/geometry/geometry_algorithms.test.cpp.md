@@ -5,6 +5,9 @@ data:
     path: ds/dsu/dsu.hpp
     title: DSU (Disjoint Set Union)
   - icon: ':heavy_check_mark:'
+    path: ds/range_query/fenwick_tree.hpp
+    title: Fenwick Tree (Binary Indexed Tree)
+  - icon: ':heavy_check_mark:'
     path: geometry/all.hpp
     title: Geometry Bundle
   - icon: ':heavy_check_mark:'
@@ -52,6 +55,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: geometry/manhattan_mst.hpp
     title: Manhattan Minimum Spanning Tree
+  - icon: ':heavy_check_mark:'
+    path: geometry/manhattan_segment_intersections.hpp
+    title: Manhattan Segment Intersections
   - icon: ':heavy_check_mark:'
     path: geometry/minimum_enclosing_circle.hpp
     title: Minimum Enclosing Circle
@@ -226,6 +232,8 @@ data:
   - math/fps/internal/ntt998_faster.hpp
   - math/modint.hpp
   - geometry/manhattan_mst.hpp
+  - geometry/manhattan_segment_intersections.hpp
+  - ds/range_query/fenwick_tree.hpp
   - geometry/minimum_enclosing_circle.hpp
   - geometry/perpendicular_bisector.hpp
   - geometry/rectangle_union_area.hpp
@@ -235,7 +243,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/geometry_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-22 14:57:12+09:00'
+  timestamp: '2026-07-22 15:13:07+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/geometry_algorithms.test.cpp

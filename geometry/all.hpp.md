@@ -5,6 +5,9 @@ data:
     path: ds/dsu/dsu.hpp
     title: DSU (Disjoint Set Union)
   - icon: ':heavy_check_mark:'
+    path: ds/range_query/fenwick_tree.hpp
+    title: Fenwick Tree (Binary Indexed Tree)
+  - icon: ':heavy_check_mark:'
     path: geometry/angle_sort.hpp
     title: Angle Sort
   - icon: ':heavy_check_mark:'
@@ -49,6 +52,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: geometry/manhattan_mst.hpp
     title: Manhattan Minimum Spanning Tree
+  - icon: ':heavy_check_mark:'
+    path: geometry/manhattan_segment_intersections.hpp
+    title: Manhattan Segment Intersections
   - icon: ':heavy_check_mark:'
     path: geometry/minimum_enclosing_circle.hpp
     title: Minimum Enclosing Circle
@@ -154,6 +160,8 @@ data:
 
     #include "manhattan_mst.hpp"
 
+    #include "manhattan_segment_intersections.hpp"
+
     #include "minimum_enclosing_circle.hpp"
 
     #include "perpendicular_bisector.hpp"
@@ -201,6 +209,8 @@ data:
   - math/fps/internal/ntt998_faster.hpp
   - math/modint.hpp
   - geometry/manhattan_mst.hpp
+  - geometry/manhattan_segment_intersections.hpp
+  - ds/range_query/fenwick_tree.hpp
   - geometry/minimum_enclosing_circle.hpp
   - geometry/perpendicular_bisector.hpp
   - geometry/rectangle_union_area.hpp
@@ -209,7 +219,7 @@ data:
   isVerificationFile: false
   path: geometry/all.hpp
   requiredBy: []
-  timestamp: '2026-07-22 14:57:12+09:00'
+  timestamp: '2026-07-22 15:13:07+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp
@@ -241,6 +251,7 @@ title: Geometry Bundle
 | `geometry/half_plane_intersection.hpp` | Bounded intersection polygon of directed closed half-planes in $O(N\log N)$. |
 | `geometry/lattice_point_count.hpp` | Exact lattice-point counting in a bounded intersection of integer linear inequalities. |
 | `geometry/manhattan_mst.hpp` | Manhattan minimum spanning tree for integral points in $O(N\log N)$. |
+| `geometry/manhattan_segment_intersections.hpp` | Counts or enumerates intersections of axis-aligned integral segments. |
 | `geometry/minimum_enclosing_circle.hpp` | Randomized linear-time minimum enclosing circle with support indices. |
 | `geometry/line.hpp` | Lines, segments, segment centroid, projection, intersection, and distances. |
 | `geometry/perpendicular_bisector.hpp` | Floating-point and lattice-point perpendicular bisectors of two distinct points. |

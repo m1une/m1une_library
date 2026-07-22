@@ -26,7 +26,7 @@ without rewriting boilerplate during a contest.
 | `graph/` | General graph algorithms and builders, plus `graph/tree/` for Euler tours, rooted-tree tools, Cartesian tree construction, and `graph/flow/` for flow networks. |
 | `optimization/` | Combinatorial and numeric optimization solvers such as project selection, Hungarian assignment, simplex LP, and integer LP. |
 | `matroid/` | Uniform, partition, graphic, and linear matroids, plus weighted and unweighted matroid intersection. |
-| `geometry/` | 2D points, lines, rays, segments, perpendicular bisectors, polygons, convex decomposition, rectangle-union area, convex hulls, Delaunay triangulations, Voronoi diagrams, half-plane intersection, lattice-point counting, and circles. |
+| `geometry/` | 2D points, lines, rays, segments, Manhattan segment intersections, perpendicular bisectors, polygons, convex decomposition, rectangle-union area, convex hulls, Delaunay triangulations, Voronoi diagrams, half-plane intersection, lattice-point counting, and circles. |
 | `ds/` | Categorized data structures for range queries, online/offline dynamic connectivity, dynamic sequences and trees, ordered sets, heaps, intervals, and hash tables. |
 | `monoid/` | Reusable monoids for generic data structures such as `Segtree`. |
 | `acted_monoid/` | Acted monoids for lazy propagation structures such as `LazySegtree` and generic `SegtreeBeats`, including generic range assignment/range product. |

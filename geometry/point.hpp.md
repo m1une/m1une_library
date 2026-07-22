@@ -48,6 +48,9 @@ data:
     path: geometry/manhattan_mst.hpp
     title: Manhattan Minimum Spanning Tree
   - icon: ':heavy_check_mark:'
+    path: geometry/manhattan_segment_intersections.hpp
+    title: Manhattan Segment Intersections
+  - icon: ':heavy_check_mark:'
     path: geometry/minimum_enclosing_circle.hpp
     title: Minimum Enclosing Circle
   - icon: ':heavy_check_mark:'
@@ -129,6 +132,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/manhattan_mst.test.cpp
     title: verify/geometry/manhattan_mst.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/manhattan_segment_intersections.test.cpp
+    title: verify/geometry/manhattan_segment_intersections.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/minimum_enclosing_circle.test.cpp
     title: verify/geometry/minimum_enclosing_circle.test.cpp
@@ -348,6 +354,7 @@ data:
   - geometry/convex_decomposition.hpp
   - geometry/rectangle_union_area.hpp
   - geometry/convex_hull.hpp
+  - geometry/manhattan_segment_intersections.hpp
   - geometry/manhattan_mst.hpp
   - geometry/convex_polygon.hpp
   - geometry/voronoi_diagram.hpp
@@ -388,6 +395,7 @@ data:
   - verify/geometry/voronoi_diagram.test.cpp
   - verify/geometry/closest_pair.test.cpp
   - verify/geometry/centroid.test.cpp
+  - verify/geometry/manhattan_segment_intersections.test.cpp
   - verify/geometry/manhattan_mst.test.cpp
   - verify/geometry/projection.test.cpp
   - verify/geometry/circle_line_intersection.test.cpp

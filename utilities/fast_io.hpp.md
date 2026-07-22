@@ -409,6 +409,9 @@ data:
     path: verify/geometry/manhattan_mst.test.cpp
     title: verify/geometry/manhattan_mst.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/manhattan_segment_intersections.test.cpp
+    title: verify/geometry/manhattan_segment_intersections.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/minimum_enclosing_circle.test.cpp
     title: verify/geometry/minimum_enclosing_circle.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1858,6 +1861,7 @@ data:
   - verify/geometry/is_convex_polygon.test.cpp
   - verify/geometry/closest_pair.test.cpp
   - verify/geometry/centroid.test.cpp
+  - verify/geometry/manhattan_segment_intersections.test.cpp
   - verify/geometry/manhattan_mst.test.cpp
   - verify/geometry/projection.test.cpp
   - verify/geometry/circle_line_intersection.test.cpp
