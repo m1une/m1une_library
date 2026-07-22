@@ -226,6 +226,9 @@ data:
     path: verify/ds/range_query/fenwick_tree_2d.test.cpp
     title: verify/ds/range_query/fenwick_tree_2d.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/range_query/kd_tree.test.cpp
+    title: verify/ds/range_query/kd_tree.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/range_query/merge_sort_tree.test.cpp
     title: verify/ds/range_query/merge_sort_tree.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1665,6 +1668,7 @@ data:
   - verify/ds/range_query/sparse_table.test.cpp
   - verify/ds/range_query/static_range_mode_query.test.cpp
   - verify/ds/range_query/sqrt_decomposition.test.cpp
+  - verify/ds/range_query/kd_tree.test.cpp
   - verify/ds/range_query/range_inversion_count.test.cpp
   - verify/ds/segtree/persistent_lazy_segtree.test.cpp
   - verify/ds/segtree/persistent_dynamic_segtree.test.cpp
