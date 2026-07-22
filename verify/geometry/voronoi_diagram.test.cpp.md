@@ -311,7 +311,10 @@ data:
     \ std::size_t(std::numeric_limits<int>::max()));\n        points.reserve(input_points.size());\n\
     \        edges.reserve(std::size_t(6) * input_points.size());\n        for (const\
     \ auto& point : input_points) {\n            points.push_back(InternalPoint{W(point.x),\
-    \ W(point.y)});\n        }\n        solve();\n    }\n\n    std::vector<std::pair<int,\
+    \ W(point.y)});\n        }\n        solve();\n    }\n\n    bool has_duplicates()\
+    \ const {\n        for (\n            int vertex = 0;\n            vertex < int(duplicate_representative.size());\n\
+    \            ++vertex\n        ) {\n            if (duplicate_representative[vertex]\
+    \ != vertex) return true;\n        }\n        return false;\n    }\n\n    std::vector<std::pair<int,\
     \ int>> get_edges() const {\n        std::vector<std::pair<int, int>> result;\n\
     \        result.reserve(edges.size() / 2 + duplicate_representative.size());\n\
     \        for (int edge = 0; edge < int(edges.size()); edge++) {\n            if\
@@ -1095,7 +1098,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/voronoi_diagram.test.cpp
   requiredBy: []
-  timestamp: '2026-07-22 14:17:27+09:00'
+  timestamp: '2026-07-22 14:57:12+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/voronoi_diagram.test.cpp

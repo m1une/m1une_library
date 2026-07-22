@@ -29,6 +29,9 @@ data:
     path: geometry/count_points_in_triangle.hpp
     title: Count Points in Triangle
   - icon: ':heavy_check_mark:'
+    path: geometry/delaunay_triangulation.hpp
+    title: Delaunay Triangulation
+  - icon: ':heavy_check_mark:'
     path: geometry/euclidean_mst.hpp
     title: Euclidean Minimum Spanning Tree
   - icon: ':heavy_check_mark:'
@@ -137,6 +140,8 @@ data:
 
     #include "count_points_in_triangle.hpp"
 
+    #include "delaunay_triangulation.hpp"
+
     #include "euclidean_mst.hpp"
 
     #include "farthest_pair.hpp"
@@ -186,6 +191,7 @@ data:
   - geometry/convex_polygon.hpp
   - geometry/half_plane_intersection.hpp
   - geometry/count_points_in_triangle.hpp
+  - geometry/delaunay_triangulation.hpp
   - geometry/euclidean_mst.hpp
   - ds/dsu/dsu.hpp
   - geometry/farthest_pair.hpp
@@ -203,7 +209,7 @@ data:
   isVerificationFile: false
   path: geometry/all.hpp
   requiredBy: []
-  timestamp: '2026-07-22 14:17:27+09:00'
+  timestamp: '2026-07-22 14:57:12+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp
@@ -229,6 +235,7 @@ title: Geometry Bundle
 | `geometry/convex_layers.hpp` | Onion decomposition into successive convex-hull boundaries in $O(N\log^2 N)$. |
 | `geometry/convex_polygon.hpp` | Normalized convex-polygon queries, centroid, cuts, diameter, intersections, distance, triangulation, and Minkowski sums. |
 | `geometry/count_points_in_triangle.hpp` | Preprocessed strict point counts for indexed triangle queries in $O(1)$ per query. |
+| `geometry/delaunay_triangulation.hpp` | Exact Delaunay edges and counterclockwise triangular faces for integral points in $O(N\log N)$. |
 | `geometry/euclidean_mst.hpp` | Euclidean minimum spanning tree for integral points in $O(N\log N)$. |
 | `geometry/farthest_pair.hpp` | Euclidean farthest pair with original indices in $O(N\log N)$. |
 | `geometry/half_plane_intersection.hpp` | Bounded intersection polygon of directed closed half-planes in $O(N\log N)$. |

@@ -6,6 +6,9 @@ data:
     path: geometry/all.hpp
     title: Geometry Bundle
   - icon: ':heavy_check_mark:'
+    path: geometry/delaunay_triangulation.hpp
+    title: Delaunay Triangulation
+  - icon: ':heavy_check_mark:'
     path: geometry/euclidean_mst.hpp
     title: Euclidean Minimum Spanning Tree
   - icon: ':heavy_check_mark:'
@@ -39,6 +42,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/centroid.test.cpp
     title: verify/geometry/centroid.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/delaunay_triangulation.test.cpp
+    title: verify/geometry/delaunay_triangulation.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/delaunay_triangulation.test.cpp
+    title: verify/geometry/delaunay_triangulation.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/euclidean_mst.test.cpp
     title: verify/geometry/euclidean_mst.test.cpp
@@ -161,6 +170,7 @@ data:
   - graph/connected_components.hpp
   - graph/undirected.hpp
   - graph/complement_connected_components.hpp
+  - geometry/delaunay_triangulation.hpp
   - geometry/euclidean_mst.hpp
   - geometry/all.hpp
   - geometry/manhattan_mst.hpp
@@ -179,6 +189,8 @@ data:
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/euclidean_mst.test.cpp
   - verify/geometry/euclidean_mst.test.cpp
+  - verify/geometry/delaunay_triangulation.test.cpp
+  - verify/geometry/delaunay_triangulation.test.cpp
   - verify/geometry/voronoi_diagram.test.cpp
   - verify/geometry/centroid.test.cpp
   - verify/geometry/manhattan_mst.test.cpp

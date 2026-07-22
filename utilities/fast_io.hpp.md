@@ -382,6 +382,9 @@ data:
     path: verify/geometry/count_points_in_triangle.test.cpp
     title: verify/geometry/count_points_in_triangle.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/delaunay_triangulation.test.cpp
+    title: verify/geometry/delaunay_triangulation.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/euclidean_mst.test.cpp
     title: verify/geometry/euclidean_mst.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1849,6 +1852,7 @@ data:
   - verify/geometry/circle_ray.test.cpp
   - verify/geometry/steiner_convex_decomposition.test.cpp
   - verify/geometry/polygon_operations.test.cpp
+  - verify/geometry/delaunay_triangulation.test.cpp
   - verify/geometry/convex_decomposition.test.cpp
   - verify/geometry/convex_hull.test.cpp
   - verify/geometry/is_convex_polygon.test.cpp

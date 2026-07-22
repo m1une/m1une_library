@@ -5,18 +5,15 @@ data:
     path: ds/dsu/dsu.hpp
     title: DSU (Disjoint Set Union)
   - icon: ':heavy_check_mark:'
+    path: geometry/euclidean_mst.hpp
+    title: Euclidean Minimum Spanning Tree
+  - icon: ':heavy_check_mark:'
     path: geometry/point.hpp
     title: 2D Point and Predicates
   _extendedRequiredBy:
   - icon: ':heavy_check_mark:'
     path: geometry/all.hpp
     title: Geometry Bundle
-  - icon: ':heavy_check_mark:'
-    path: geometry/delaunay_triangulation.hpp
-    title: Delaunay Triangulation
-  - icon: ':heavy_check_mark:'
-    path: geometry/voronoi_diagram.hpp
-    title: Voronoi Diagram
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/centroid.test.cpp
@@ -25,23 +22,19 @@ data:
     path: verify/geometry/delaunay_triangulation.test.cpp
     title: verify/geometry/delaunay_triangulation.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/geometry/euclidean_mst.test.cpp
-    title: verify/geometry/euclidean_mst.test.cpp
-  - icon: ':heavy_check_mark:'
     path: verify/geometry/geometry_algorithms.test.cpp
     title: verify/geometry/geometry_algorithms.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/voronoi_diagram.test.cpp
-    title: verify/geometry/voronoi_diagram.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"geometry/euclidean_mst.hpp\"\n\n\n\n#include <algorithm>\n\
-    #include <cassert>\n#include <cmath>\n#include <concepts>\n#include <cstddef>\n\
-    #include <limits>\n#include <tuple>\n#include <utility>\n#include <vector>\n\n\
-    #line 1 \"ds/dsu/dsu.hpp\"\n\n\n\n#line 5 \"ds/dsu/dsu.hpp\"\n#include <numeric>\n\
+  bundledCode: "#line 1 \"geometry/delaunay_triangulation.hpp\"\n\n\n\n#include <algorithm>\n\
+    #include <array>\n#include <cassert>\n#include <concepts>\n#include <utility>\n\
+    #include <vector>\n\n#line 1 \"geometry/euclidean_mst.hpp\"\n\n\n\n#line 6 \"\
+    geometry/euclidean_mst.hpp\"\n#include <cmath>\n#line 8 \"geometry/euclidean_mst.hpp\"\
+    \n#include <cstddef>\n#include <limits>\n#include <tuple>\n#line 13 \"geometry/euclidean_mst.hpp\"\
+    \n\n#line 1 \"ds/dsu/dsu.hpp\"\n\n\n\n#line 5 \"ds/dsu/dsu.hpp\"\n#include <numeric>\n\
     #line 8 \"ds/dsu/dsu.hpp\"\n\nnamespace m1une {\nnamespace ds {\n\nstruct Dsu\
     \ {\n   private:\n    int _n;\n    // parent_or_size[i] is the parent of i if\
     \ it's >= 0.\n    // If it's < 0, then i is a root and -parent_or_size[i] is the\
@@ -350,274 +343,187 @@ data:
     \        result.edges.push_back(edge);\n        if (result.edges.size() + 1 ==\
     \ points.size()) break;\n    }\n    assert(points.empty() || result.edges.size()\
     \ + 1 == points.size());\n    return result;\n}\n\n}  // namespace geometry\n\
-    }  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_GEOMETRY_EUCLIDEAN_MST_HPP\n#define M1UNE_GEOMETRY_EUCLIDEAN_MST_HPP\
-    \ 1\n\n#include <algorithm>\n#include <cassert>\n#include <cmath>\n#include <concepts>\n\
-    #include <cstddef>\n#include <limits>\n#include <tuple>\n#include <utility>\n\
-    #include <vector>\n\n#include \"../ds/dsu/dsu.hpp\"\n#include \"point.hpp\"\n\n\
-    namespace m1une {\nnamespace geometry {\n\ntemplate <class T>\nstruct EuclideanMstEdge\
-    \ {\n    int from;\n    int to;\n    T squared_distance;\n};\n\ntemplate <class\
-    \ T>\nstruct EuclideanMst {\n    long double cost;\n    std::vector<EuclideanMstEdge<T>>\
-    \ edges;\n};\n\nnamespace detail {\n\ntemplate <std::integral T>\nclass EuclideanDelaunay\
-    \ {\n   private:\n    using W = wide_type<T>;\n\n    struct InternalPoint {\n\
-    \        W x;\n        W y;\n\n        friend bool operator==(const InternalPoint&,\
-    \ const InternalPoint&) = default;\n    };\n\n    struct Edge {\n        int to;\n\
-    \        int ccw;\n        int cw;\n        int reverse;\n        bool enabled\
-    \ = false;\n    };\n\n    std::vector<int> open_addresses;\n    std::vector<InternalPoint>\
-    \ points;\n    std::vector<Edge> edges;\n    std::vector<int> duplicate_representative;\n\
-    \n    static InternalPoint subtract(const InternalPoint& a, const InternalPoint&\
-    \ b) {\n        return InternalPoint{a.x - b.x, a.y - b.y};\n    }\n\n    static\
-    \ W cross_product(const InternalPoint& a, const InternalPoint& b) {\n        return\
-    \ a.x * b.y - a.y * b.x;\n    }\n\n    static W squared_norm(const InternalPoint&\
-    \ point) {\n        return point.x * point.x + point.y * point.y;\n    }\n\n \
-    \   static bool inside_circumcircle(\n        InternalPoint a,\n        InternalPoint\
-    \ b,\n        InternalPoint c,\n        const InternalPoint& d\n    ) {\n    \
-    \    a = subtract(a, d);\n        b = subtract(b, d);\n        c = subtract(c,\
-    \ d);\n        W determinant = cross_product(b, c) * squared_norm(a)\n       \
-    \               + cross_product(c, a) * squared_norm(b)\n                    \
-    \  + cross_product(a, b) * squared_norm(c);\n        return determinant > 0;\n\
-    \    }\n\n    int get_open_address() {\n        if (open_addresses.empty()) {\n\
-    \            edges.push_back(Edge());\n            return int(edges.size()) -\
-    \ 1;\n        }\n        int result = open_addresses.back();\n        open_addresses.pop_back();\n\
-    \        return result;\n    }\n\n    std::pair<int, int> add_edge(int from, int\
-    \ to) {\n        int forward = get_open_address();\n        int backward = get_open_address();\n\
-    \        edges[forward].to = to;\n        edges[forward].ccw = forward;\n    \
-    \    edges[forward].cw = forward;\n        edges[forward].reverse = backward;\n\
-    \        edges[forward].enabled = true;\n        edges[backward].to = from;\n\
-    \        edges[backward].ccw = backward;\n        edges[backward].cw = backward;\n\
-    \        edges[backward].reverse = forward;\n        edges[backward].enabled =\
-    \ true;\n        return {forward, backward};\n    }\n\n    void erase_directed_edge(int\
-    \ edge) {\n        int ccw = edges[edge].ccw;\n        int cw = edges[edge].cw;\n\
-    \        edges[ccw].cw = cw;\n        edges[cw].ccw = ccw;\n        edges[edge].enabled\
-    \ = false;\n    }\n\n    void erase_edge(int edge) {\n        int reverse = edges[edge].reverse;\n\
-    \        erase_directed_edge(edge);\n        erase_directed_edge(reverse);\n \
-    \       open_addresses.push_back(edge);\n        open_addresses.push_back(reverse);\n\
-    \    }\n\n    void insert_ccw_after(int edge, int position) {\n        int next\
-    \ = edges[position].ccw;\n        edges[edge].ccw = next;\n        edges[next].cw\
-    \ = edge;\n        edges[edge].cw = position;\n        edges[position].ccw = edge;\n\
-    \    }\n\n    void insert_cw_after(int edge, int position) {\n        int next\
-    \ = edges[position].cw;\n        edges[edge].cw = next;\n        edges[next].ccw\
-    \ = edge;\n        edges[edge].ccw = position;\n        edges[position].cw = edge;\n\
-    \    }\n\n    int orientation(int a, int b, int c) const {\n        InternalPoint\
-    \ ab = subtract(points[b], points[a]);\n        InternalPoint ac = subtract(points[c],\
-    \ points[a]);\n        W value = cross_product(ab, ac);\n        return (value\
-    \ > 0) - (value < 0);\n    }\n\n    std::pair<int, int> go_next(int edge) const\
-    \ {\n        int vertex = edges[edge].to;\n        int next_edge = edges[edges[edge].reverse].ccw;\n\
-    \        return {vertex, next_edge};\n    }\n\n    std::pair<int, int> go_previous(int\
-    \ edge) const {\n        int vertex = edges[edges[edge].cw].to;\n        int next_edge\
-    \ = edges[edges[edge].cw].reverse;\n        return {vertex, next_edge};\n    }\n\
-    \n    std::tuple<int, int, int, int> lower_tangent(\n        int left_vertex,\n\
-    \        int left_edge,\n        int right_vertex,\n        int right_edge\n \
-    \   ) const {\n        while (true) {\n            auto [next_left_vertex, next_left_edge]\
-    \ = go_previous(left_edge);\n            if (orientation(right_vertex, left_vertex,\
-    \ next_left_vertex) > 0) {\n                left_vertex = next_left_vertex;\n\
-    \                left_edge = next_left_edge;\n                continue;\n    \
-    \        }\n            auto [next_right_vertex, next_right_edge] = go_next(right_edge);\n\
-    \            if (orientation(left_vertex, right_vertex, next_right_vertex) < 0)\
-    \ {\n                right_vertex = next_right_vertex;\n                right_edge\
-    \ = next_right_edge;\n                continue;\n            }\n            break;\n\
-    \        }\n        return {left_vertex, left_edge, right_vertex, right_edge};\n\
-    \    }\n\n    std::pair<int, int> extreme_vertex(int vertex, int edge, bool minimum)\
-    \ const {\n        std::pair<int, int> result = {vertex, edge};\n        int current_vertex\
-    \ = vertex;\n        int current_edge = edge;\n        do {\n            std::tie(current_vertex,\
-    \ current_edge) = go_next(current_edge);\n            std::pair<int, int> candidate\
-    \ = {current_vertex, current_edge};\n            if ((minimum && candidate < result)\
-    \ || (!minimum && result < candidate)) {\n                result = candidate;\n\
-    \            }\n        } while (current_edge != edge);\n        return result;\n\
-    \    }\n\n    bool inside_circumcircle(int a, int b, int c, int d) const {\n \
-    \       return inside_circumcircle(points[a], points[b], points[c], points[d]);\n\
-    \    }\n\n    std::pair<int, int> merge_triangulations(\n        int left_vertex,\n\
-    \        int left_edge,\n        int right_vertex,\n        int right_edge\n \
-    \   ) {\n        std::tie(left_vertex, left_edge) = extreme_vertex(left_vertex,\
-    \ left_edge, false);\n        std::tie(right_vertex, right_edge) = extreme_vertex(right_vertex,\
-    \ right_edge, true);\n\n        auto [lower_left, lower_left_edge, lower_right,\
-    \ lower_right_edge]\n            = lower_tangent(left_vertex, left_edge, right_vertex,\
-    \ right_edge);\n        auto [upper_right, upper_right_edge, upper_left, upper_left_edge]\n\
-    \            = lower_tangent(right_vertex, right_edge, left_vertex, left_edge);\n\
-    \        lower_right_edge = edges[lower_right_edge].cw;\n        upper_right_edge\
-    \ = edges[upper_right_edge].cw;\n\n        auto [base, reverse_base] = add_edge(lower_left,\
-    \ lower_right);\n        insert_cw_after(base, lower_left_edge);\n        insert_ccw_after(reverse_base,\
-    \ lower_right_edge);\n        if (lower_left == upper_left) upper_left_edge =\
-    \ base;\n        if (lower_right == upper_right) upper_right_edge = reverse_base;\n\
-    \n        int left = lower_left;\n        int left_candidate = lower_left_edge;\n\
-    \        int right = lower_right;\n        int right_candidate = lower_right_edge;\n\
-    \        while (left != upper_left || right != upper_right) {\n            int\
-    \ next_left = edges[left_candidate].to;\n            int next_right = edges[right_candidate].to;\n\
-    \            int next_left_candidate = edges[left_candidate].ccw;\n          \
-    \  int next_right_candidate = edges[right_candidate].cw;\n\n            if (left_candidate\
-    \ != upper_left_edge && next_left_candidate != base) {\n                int second_left\
-    \ = edges[next_left_candidate].to;\n                if (inside_circumcircle(left,\
-    \ right, next_left, second_left)) {\n                    erase_edge(left_candidate);\n\
-    \                    left_candidate = next_left_candidate;\n                 \
-    \   continue;\n                }\n            }\n\n            if (right_candidate\
-    \ != upper_right_edge && next_right_candidate != reverse_base) {\n           \
-    \     int second_right = edges[next_right_candidate].to;\n                if (inside_circumcircle(next_right,\
-    \ left, right, second_right)) {\n                    erase_edge(right_candidate);\n\
-    \                    right_candidate = next_right_candidate;\n               \
-    \     continue;\n                }\n            }\n\n            bool choose_left\
-    \ = right_candidate == upper_right_edge;\n            if (left_candidate != upper_left_edge\
-    \ && right_candidate != upper_right_edge) {\n                if (orientation(left,\
-    \ right, next_right) < 0) {\n                    choose_left = true;\n       \
-    \         } else if (orientation(next_left, left, right) < 0) {\n            \
-    \        choose_left = false;\n                } else {\n                    choose_left\
-    \ = inside_circumcircle(left, right, next_right, next_left);\n               \
-    \ }\n            }\n\n            if (choose_left) {\n                next_left_candidate\
-    \ = edges[edges[left_candidate].reverse].ccw;\n                auto [new_base,\
-    \ new_reverse_base] = add_edge(next_left, right);\n                insert_cw_after(new_base,\
-    \ next_left_candidate);\n                insert_ccw_after(new_reverse_base, right_candidate);\n\
-    \                left_candidate = next_left_candidate;\n                left =\
-    \ next_left;\n            } else {\n                next_right_candidate = edges[edges[right_candidate].reverse].cw;\n\
-    \                auto [new_reverse_base, new_base] = add_edge(next_right, left);\n\
-    \                insert_ccw_after(new_reverse_base, next_right_candidate);\n \
-    \               insert_cw_after(new_base, left_candidate);\n                right_candidate\
-    \ = next_right_candidate;\n                right = next_right;\n            }\n\
-    \        }\n        return {lower_left, base};\n    }\n\n    std::pair<int, int>\
-    \ solve_range(int left, int right) {\n        if (right - left == 2) {\n     \
-    \       auto [forward, backward] = add_edge(left, left + 1);\n            (void)backward;\n\
-    \            return {left, forward};\n        }\n        if (right - left == 3)\
-    \ {\n            int middle = left + 1;\n            int last = left + 2;\n  \
-    \          auto [first_middle, middle_first] = add_edge(left, middle);\n     \
-    \       auto [middle_last, last_middle] = add_edge(middle, last);\n          \
-    \  int direction = orientation(left, middle, last);\n            if (direction\
-    \ == 0) {\n                insert_ccw_after(middle_first, middle_last);\n    \
-    \            return {left, first_middle};\n            }\n\n            auto [first_last,\
-    \ last_first] = add_edge(left, last);\n            if (direction > 0) {\n    \
-    \            insert_cw_after(first_middle, first_last);\n                insert_cw_after(middle_last,\
-    \ middle_first);\n                insert_cw_after(last_first, last_middle);\n\
-    \                return {left, first_middle};\n            }\n            insert_ccw_after(first_middle,\
-    \ first_last);\n            insert_ccw_after(middle_last, middle_first);\n   \
-    \         insert_ccw_after(last_first, last_middle);\n            return {middle,\
-    \ middle_first};\n        }\n\n        int middle = (left + right) / 2;\n    \
-    \    auto [left_vertex, left_edge] = solve_range(left, middle);\n        auto\
-    \ [right_vertex, right_edge] = solve_range(middle, right);\n        return merge_triangulations(left_vertex,\
-    \ left_edge, right_vertex, right_edge);\n    }\n\n    void solve() {\n       \
-    \ int size = int(points.size());\n        if (size <= 1) return;\n\n        std::vector<int>\
-    \ order(size);\n        for (int i = 0; i < size; i++) order[i] = i;\n       \
-    \ std::stable_sort(order.begin(), order.end(), [&](int left, int right) {\n  \
-    \          if (points[left].x != points[right].x) {\n                return points[left].x\
-    \ < points[right].x;\n            }\n            return points[left].y < points[right].y;\n\
-    \        });\n\n        std::vector<InternalPoint> original_points = points;\n\
-    \        duplicate_representative.assign(size, 0);\n        int unique_size =\
-    \ 0;\n        for (int i = 0; i < size; i++) {\n            int vertex = order[i];\n\
-    \            if (i == 0 || !(original_points[order[unique_size - 1]] == original_points[vertex]))\
-    \ {\n                order[unique_size] = vertex;\n                points[unique_size]\
-    \ = original_points[vertex];\n                unique_size++;\n               \
-    \ duplicate_representative[vertex] = vertex;\n            } else {\n         \
-    \       duplicate_representative[vertex] = order[unique_size - 1];\n         \
-    \   }\n        }\n\n        if (unique_size >= 2) solve_range(0, unique_size);\n\
-    \        points.swap(original_points);\n        for (auto& edge : edges) edge.to\
-    \ = order[edge.to];\n    }\n\n   public:\n    explicit EuclideanDelaunay(const\
-    \ std::vector<Point<T>>& input_points) {\n        assert(input_points.size() <=\
-    \ std::size_t(std::numeric_limits<int>::max()));\n        points.reserve(input_points.size());\n\
-    \        edges.reserve(std::size_t(6) * input_points.size());\n        for (const\
-    \ auto& point : input_points) {\n            points.push_back(InternalPoint{W(point.x),\
-    \ W(point.y)});\n        }\n        solve();\n    }\n\n    bool has_duplicates()\
-    \ const {\n        for (\n            int vertex = 0;\n            vertex < int(duplicate_representative.size());\n\
-    \            ++vertex\n        ) {\n            if (duplicate_representative[vertex]\
-    \ != vertex) return true;\n        }\n        return false;\n    }\n\n    std::vector<std::pair<int,\
-    \ int>> get_edges() const {\n        std::vector<std::pair<int, int>> result;\n\
-    \        result.reserve(edges.size() / 2 + duplicate_representative.size());\n\
-    \        for (int edge = 0; edge < int(edges.size()); edge++) {\n            if\
-    \ (!edges[edge].enabled) continue;\n            int reverse = edges[edge].reverse;\n\
-    \            if (edge < reverse) continue;\n            result.emplace_back(edges[edge].to,\
-    \ edges[reverse].to);\n        }\n        for (int vertex = 0; vertex < int(duplicate_representative.size());\
-    \ vertex++) {\n            if (duplicate_representative[vertex] != vertex) {\n\
-    \                result.emplace_back(vertex, duplicate_representative[vertex]);\n\
-    \            }\n        }\n        return result;\n    }\n};\n\n}  // namespace\
-    \ detail\n\n// Returns O(n) Delaunay edges containing a Euclidean minimum spanning\
-    \ tree.\ntemplate <std::integral T>\nstd::vector<EuclideanMstEdge<wide_type<T>>>\
-    \ euclidean_mst_edges(\n    const std::vector<Point<T>>& points\n) {\n    using\
-    \ W = wide_type<T>;\n    auto delaunay_edges = detail::EuclideanDelaunay<T>(points).get_edges();\n\
-    \    std::vector<EuclideanMstEdge<W>> result;\n    result.reserve(delaunay_edges.size());\n\
-    \    for (auto [from, to] : delaunay_edges) {\n        result.push_back(EuclideanMstEdge<W>{from,\
-    \ to, distance2(points[from], points[to])});\n    }\n    return result;\n}\n\n\
-    // Returns a Euclidean minimum spanning tree.\ntemplate <std::integral T>\nEuclideanMst<wide_type<T>>\
-    \ euclidean_mst(const std::vector<Point<T>>& points) {\n    using W = wide_type<T>;\n\
-    \    auto candidates = euclidean_mst_edges(points);\n    std::sort(candidates.begin(),\
-    \ candidates.end(), [](const auto& left, const auto& right) {\n        if (left.squared_distance\
-    \ != right.squared_distance) {\n            return left.squared_distance < right.squared_distance;\n\
-    \        }\n        if (left.from != right.from) return left.from < right.from;\n\
-    \        return left.to < right.to;\n    });\n\n    m1une::ds::Dsu dsu(int(points.size()));\n\
-    \    EuclideanMst<W> result;\n    result.cost = 0;\n    result.edges.reserve(points.empty()\
-    \ ? 0 : points.size() - 1);\n    for (const auto& edge : candidates) {\n     \
-    \   if (dsu.same(edge.from, edge.to)) continue;\n        dsu.merge(edge.from,\
-    \ edge.to);\n        result.cost += std::sqrt(static_cast<long double>(edge.squared_distance));\n\
-    \        result.edges.push_back(edge);\n        if (result.edges.size() + 1 ==\
-    \ points.size()) break;\n    }\n    assert(points.empty() || result.edges.size()\
-    \ + 1 == points.size());\n    return result;\n}\n\n}  // namespace geometry\n\
-    }  // namespace m1une\n\n#endif  // M1UNE_GEOMETRY_EUCLIDEAN_MST_HPP\n"
+    }  // namespace m1une\n\n\n#line 12 \"geometry/delaunay_triangulation.hpp\"\n\n\
+    namespace m1une {\nnamespace geometry {\n\nstruct DelaunayTriangulation {\n  \
+    \  std::vector<std::pair<int, int>> edges;\n    std::vector<std::array<int, 3>>\
+    \ triangles;\n};\n\nnamespace delaunay_triangulation_detail {\n\ntemplate <std::integral\
+    \ T>\nint direction_half(\n    const Point<T>& origin,\n    const Point<T>& destination\n\
+    ) {\n    using W = wide_type<T>;\n    W x = W(destination.x) - W(origin.x);\n\
+    \    W y = W(destination.y) - W(origin.y);\n    return y > 0 || (y == 0 && x >=\
+    \ 0) ? 0 : 1;\n}\n\ntemplate <std::integral T>\nbool direction_less(\n    const\
+    \ std::vector<Point<T>>& points,\n    int origin,\n    int first,\n    int second\n\
+    ) {\n    int first_half = direction_half(points[origin], points[first]);\n   \
+    \ int second_half = direction_half(points[origin], points[second]);\n    if (first_half\
+    \ != second_half) return first_half < second_half;\n\n    using W = wide_type<T>;\n\
+    \    W first_x = W(points[first].x) - W(points[origin].x);\n    W first_y = W(points[first].y)\
+    \ - W(points[origin].y);\n    W second_x = W(points[second].x) - W(points[origin].x);\n\
+    \    W second_y = W(points[second].y) - W(points[origin].y);\n    W product =\
+    \ first_x * second_y - first_y * second_x;\n    if (product != 0) return product\
+    \ > 0;\n\n    W first_norm = first_x * first_x + first_y * first_y;\n    W second_norm\
+    \ = second_x * second_x + second_y * second_y;\n    if (first_norm != second_norm)\
+    \ return first_norm < second_norm;\n    return first < second;\n}\n\ninline void\
+    \ rotate_minimum_first(std::array<int, 3>& triangle) {\n    int minimum = int(std::min_element(triangle.begin(),\
+    \ triangle.end()) -\n                      triangle.begin());\n    std::rotate(\n\
+    \        triangle.begin(),\n        triangle.begin() + minimum,\n        triangle.end()\n\
+    \    );\n}\n\n}  // namespace delaunay_triangulation_detail\n\n// Constructs one\
+    \ Delaunay triangulation of distinct integral points.\ntemplate <std::integral\
+    \ T>\nDelaunayTriangulation delaunay_triangulation(\n    const std::vector<Point<T>>&\
+    \ points\n) {\n    namespace detail = delaunay_triangulation_detail;\n\n    DelaunayTriangulation\
+    \ result;\n    geometry::detail::EuclideanDelaunay<T> builder(points);\n    assert(!builder.has_duplicates());\n\
+    \    result.edges = builder.get_edges();\n    for (auto& [first, second] : result.edges)\
+    \ {\n        if (first > second) std::swap(first, second);\n    }\n    std::sort(result.edges.begin(),\
+    \ result.edges.end());\n    result.edges.erase(\n        std::unique(result.edges.begin(),\
+    \ result.edges.end()),\n        result.edges.end()\n    );\n\n    std::vector<std::vector<int>>\
+    \ neighbors(points.size());\n    for (auto [first, second] : result.edges) {\n\
+    \        neighbors[first].push_back(second);\n        neighbors[second].push_back(first);\n\
+    \    }\n    for (int point = 0; point < int(points.size()); ++point) {\n     \
+    \   std::sort(\n            neighbors[point].begin(),\n            neighbors[point].end(),\n\
+    \            [&](int first, int second) {\n                return detail::direction_less(points,\
+    \ point, first, second);\n            }\n        );\n    }\n\n    auto has_edge\
+    \ = [&](int first, int second) {\n        if (first > second) std::swap(first,\
+    \ second);\n        return std::binary_search(\n            result.edges.begin(),\n\
+    \            result.edges.end(),\n            std::pair(first, second)\n     \
+    \   );\n    };\n    result.triangles.reserve(result.edges.size());\n    for (int\
+    \ point = 0; point < int(points.size()); ++point) {\n        int degree = int(neighbors[point].size());\n\
+    \        for (int index = 0; index < degree; ++index) {\n            int first\
+    \ = neighbors[point][index];\n            int second = neighbors[point][(index\
+    \ + 1) % degree];\n            if (orientation(points[point], points[first], points[second])\
+    \ <= 0) {\n                continue;\n            }\n            if (!has_edge(first,\
+    \ second)) continue;\n            std::array<int, 3> triangle{point, first, second};\n\
+    \            detail::rotate_minimum_first(triangle);\n            result.triangles.push_back(triangle);\n\
+    \        }\n    }\n    std::sort(result.triangles.begin(), result.triangles.end());\n\
+    \    result.triangles.erase(\n        std::unique(result.triangles.begin(), result.triangles.end()),\n\
+    \        result.triangles.end()\n    );\n    return result;\n}\n\n}  // namespace\
+    \ geometry\n}  // namespace m1une\n\n\n"
+  code: "#ifndef M1UNE_GEOMETRY_DELAUNAY_TRIANGULATION_HPP\n#define M1UNE_GEOMETRY_DELAUNAY_TRIANGULATION_HPP\
+    \ 1\n\n#include <algorithm>\n#include <array>\n#include <cassert>\n#include <concepts>\n\
+    #include <utility>\n#include <vector>\n\n#include \"euclidean_mst.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace geometry {\n\nstruct DelaunayTriangulation {\n    std::vector<std::pair<int,\
+    \ int>> edges;\n    std::vector<std::array<int, 3>> triangles;\n};\n\nnamespace\
+    \ delaunay_triangulation_detail {\n\ntemplate <std::integral T>\nint direction_half(\n\
+    \    const Point<T>& origin,\n    const Point<T>& destination\n) {\n    using\
+    \ W = wide_type<T>;\n    W x = W(destination.x) - W(origin.x);\n    W y = W(destination.y)\
+    \ - W(origin.y);\n    return y > 0 || (y == 0 && x >= 0) ? 0 : 1;\n}\n\ntemplate\
+    \ <std::integral T>\nbool direction_less(\n    const std::vector<Point<T>>& points,\n\
+    \    int origin,\n    int first,\n    int second\n) {\n    int first_half = direction_half(points[origin],\
+    \ points[first]);\n    int second_half = direction_half(points[origin], points[second]);\n\
+    \    if (first_half != second_half) return first_half < second_half;\n\n    using\
+    \ W = wide_type<T>;\n    W first_x = W(points[first].x) - W(points[origin].x);\n\
+    \    W first_y = W(points[first].y) - W(points[origin].y);\n    W second_x = W(points[second].x)\
+    \ - W(points[origin].x);\n    W second_y = W(points[second].y) - W(points[origin].y);\n\
+    \    W product = first_x * second_y - first_y * second_x;\n    if (product !=\
+    \ 0) return product > 0;\n\n    W first_norm = first_x * first_x + first_y * first_y;\n\
+    \    W second_norm = second_x * second_x + second_y * second_y;\n    if (first_norm\
+    \ != second_norm) return first_norm < second_norm;\n    return first < second;\n\
+    }\n\ninline void rotate_minimum_first(std::array<int, 3>& triangle) {\n    int\
+    \ minimum = int(std::min_element(triangle.begin(), triangle.end()) -\n       \
+    \               triangle.begin());\n    std::rotate(\n        triangle.begin(),\n\
+    \        triangle.begin() + minimum,\n        triangle.end()\n    );\n}\n\n} \
+    \ // namespace delaunay_triangulation_detail\n\n// Constructs one Delaunay triangulation\
+    \ of distinct integral points.\ntemplate <std::integral T>\nDelaunayTriangulation\
+    \ delaunay_triangulation(\n    const std::vector<Point<T>>& points\n) {\n    namespace\
+    \ detail = delaunay_triangulation_detail;\n\n    DelaunayTriangulation result;\n\
+    \    geometry::detail::EuclideanDelaunay<T> builder(points);\n    assert(!builder.has_duplicates());\n\
+    \    result.edges = builder.get_edges();\n    for (auto& [first, second] : result.edges)\
+    \ {\n        if (first > second) std::swap(first, second);\n    }\n    std::sort(result.edges.begin(),\
+    \ result.edges.end());\n    result.edges.erase(\n        std::unique(result.edges.begin(),\
+    \ result.edges.end()),\n        result.edges.end()\n    );\n\n    std::vector<std::vector<int>>\
+    \ neighbors(points.size());\n    for (auto [first, second] : result.edges) {\n\
+    \        neighbors[first].push_back(second);\n        neighbors[second].push_back(first);\n\
+    \    }\n    for (int point = 0; point < int(points.size()); ++point) {\n     \
+    \   std::sort(\n            neighbors[point].begin(),\n            neighbors[point].end(),\n\
+    \            [&](int first, int second) {\n                return detail::direction_less(points,\
+    \ point, first, second);\n            }\n        );\n    }\n\n    auto has_edge\
+    \ = [&](int first, int second) {\n        if (first > second) std::swap(first,\
+    \ second);\n        return std::binary_search(\n            result.edges.begin(),\n\
+    \            result.edges.end(),\n            std::pair(first, second)\n     \
+    \   );\n    };\n    result.triangles.reserve(result.edges.size());\n    for (int\
+    \ point = 0; point < int(points.size()); ++point) {\n        int degree = int(neighbors[point].size());\n\
+    \        for (int index = 0; index < degree; ++index) {\n            int first\
+    \ = neighbors[point][index];\n            int second = neighbors[point][(index\
+    \ + 1) % degree];\n            if (orientation(points[point], points[first], points[second])\
+    \ <= 0) {\n                continue;\n            }\n            if (!has_edge(first,\
+    \ second)) continue;\n            std::array<int, 3> triangle{point, first, second};\n\
+    \            detail::rotate_minimum_first(triangle);\n            result.triangles.push_back(triangle);\n\
+    \        }\n    }\n    std::sort(result.triangles.begin(), result.triangles.end());\n\
+    \    result.triangles.erase(\n        std::unique(result.triangles.begin(), result.triangles.end()),\n\
+    \        result.triangles.end()\n    );\n    return result;\n}\n\n}  // namespace\
+    \ geometry\n}  // namespace m1une\n\n#endif  // M1UNE_GEOMETRY_DELAUNAY_TRIANGULATION_HPP\n"
   dependsOn:
+  - geometry/euclidean_mst.hpp
   - ds/dsu/dsu.hpp
   - geometry/point.hpp
   isVerificationFile: false
-  path: geometry/euclidean_mst.hpp
+  path: geometry/delaunay_triangulation.hpp
   requiredBy:
-  - geometry/delaunay_triangulation.hpp
   - geometry/all.hpp
-  - geometry/voronoi_diagram.hpp
   timestamp: '2026-07-22 14:57:12+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp
-  - verify/geometry/euclidean_mst.test.cpp
   - verify/geometry/delaunay_triangulation.test.cpp
-  - verify/geometry/voronoi_diagram.test.cpp
   - verify/geometry/centroid.test.cpp
-documentation_of: geometry/euclidean_mst.hpp
+documentation_of: geometry/delaunay_triangulation.hpp
 layout: document
-title: Euclidean Minimum Spanning Tree
+title: Delaunay Triangulation
 ---
 
 ## Overview
 
-This header constructs a minimum spanning tree of two-dimensional integral
-points under Euclidean distance. It first builds a Delaunay triangulation by
-divide and conquer, then applies Kruskal's algorithm to its $O(N)$ edges.
+`delaunay_triangulation` constructs one Delaunay triangulation of distinct
+two-dimensional integral points. It returns both the undirected edges and the
+counterclockwise triangular faces, using the original zero-based point indices.
 
-Duplicate points are connected to one representative by zero-length edges.
-Collinear and cocircular point sets are supported.
+The implementation uses divide and conquer. All topological decisions are made
+with exact integral orientation and incircle predicates.
 
-## Types
+## Type
 
 ```cpp
-template <class T>
-struct EuclideanMstEdge {
-    int from;
-    int to;
-    T squared_distance;
-};
-
-template <class T>
-struct EuclideanMst {
-    long double cost;
-    std::vector<EuclideanMstEdge<T>> edges;
+struct DelaunayTriangulation {
+    std::vector<std::pair<int, int>> edges;
+    std::vector<std::array<int, 3>> triangles;
 };
 ```
 
-For integral input coordinates, `T` in the returned types is `wide_type<T>`,
-which is `__int128_t`. Edge selection compares `squared_distance` exactly.
-`EuclideanMst::cost` is the sum of the selected Euclidean lengths and is stored
-as `long double`.
+Every edge is stored as `(first, second)` with `first < second`, and `edges` is
+lexicographically sorted without duplicates.
 
-All orientation, squared-distance, and degree-four incircle expressions must
-fit in signed 128-bit arithmetic. This condition holds for the Library Checker
-constraints.
+Every triangle is counterclockwise. Its smallest vertex index is stored first,
+and `triangles` is lexicographically sorted without duplicates. Every side of a
+triangle appears in `edges`.
 
-## Functions
+## Function
+
+The exact signature is:
+
+```cpp
+template <std::integral T>
+DelaunayTriangulation delaunay_triangulation(
+    const std::vector<Point<T>>& points
+);
+```
 
 | Function | Description | Complexity |
 | --- | --- | --- |
-| `template <std::integral T> std::vector<EuclideanMstEdge<wide_type<T>>> euclidean_mst_edges(const std::vector<Point<T>>& points)` | Returns the $O(N)$ Delaunay and duplicate edges containing a Euclidean MST. | $O(N\log N)$ time and $O(N)$ memory |
-| `template <std::integral T> EuclideanMst<wide_type<T>> euclidean_mst(const std::vector<Point<T>>& points)` | Returns the MST length and its selected edges. | $O(N\log N)$ time and $O(N)$ memory |
+| `delaunay_triangulation(points)` | Returns one Delaunay triangulation of the indexed points. | $O(N\log N)$ time and $O(N)$ memory |
 
-Vertices are identified by their zero-based indices in `points`. For zero or
-one point, the result has cost zero and no edges. For $N$ points with $N>0$,
-`euclidean_mst(points).edges` contains exactly $N-1$ edges.
+The input points must be pairwise distinct. Empty and one-point inputs have no
+edges or triangles. Two points produce one edge. A larger collinear input has
+no triangles and connects consecutive points in lexicographic order.
+
+When four or more points are cocircular, the Delaunay triangulation is not
+unique. The function returns one valid choice of diagonals; callers should not
+depend on which valid choice is selected.
+
+The degree-four incircle expressions must fit in signed 128-bit arithmetic.
+This is satisfied by the coordinate constraints of Library Checker's Euclidean
+MST problem.
 
 ## Example
 
 ```cpp
-#include "geometry/euclidean_mst.hpp"
+#include "geometry/delaunay_triangulation.hpp"
 
 #include <iostream>
 #include <vector>
@@ -626,13 +532,16 @@ int main() {
     using Point = m1une::geometry::Point<long long>;
     std::vector<Point> points;
     points.emplace_back(0, 0);
-    points.emplace_back(3, 0);
-    points.emplace_back(0, 4);
+    points.emplace_back(4, 0);
+    points.emplace_back(0, 3);
+    points.emplace_back(1, 1);
 
-    auto mst = m1une::geometry::euclidean_mst(points);
-    std::cout << static_cast<double>(mst.cost) << "\n";
-    for (const auto& edge : mst.edges) {
-        std::cout << edge.from << ' ' << edge.to << "\n";
+    auto triangulation =
+        m1une::geometry::delaunay_triangulation(points);
+    for (const auto& triangle : triangulation.triangles) {
+        std::cout << triangle[0] << ' '
+                  << triangle[1] << ' '
+                  << triangle[2] << '\n';
     }
 }
 ```

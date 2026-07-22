@@ -8,6 +8,12 @@ data:
     path: ds/dsu/dsu.hpp
     title: DSU (Disjoint Set Union)
   - icon: ':heavy_check_mark:'
+    path: geometry/convex_hull.hpp
+    title: Convex Hull
+  - icon: ':heavy_check_mark:'
+    path: geometry/delaunay_triangulation.hpp
+    title: Delaunay Triangulation
+  - icon: ':heavy_check_mark:'
     path: geometry/euclidean_mst.hpp
     title: Euclidean Minimum Spanning Tree
   - icon: ':heavy_check_mark:'
@@ -26,75 +32,39 @@ data:
     PROBLEM: https://judge.yosupo.jp/problem/euclidean_mst
     links:
     - https://judge.yosupo.jp/problem/euclidean_mst
-  bundledCode: "#line 1 \"verify/geometry/euclidean_mst.test.cpp\"\n#define PROBLEM\
-    \ \"https://judge.yosupo.jp/problem/euclidean_mst\"\n\n#line 1 \"geometry/euclidean_mst.hpp\"\
-    \n\n\n\n#include <algorithm>\n#include <cassert>\n#include <cmath>\n#include <concepts>\n\
-    #include <cstddef>\n#include <limits>\n#include <tuple>\n#include <utility>\n\
-    #include <vector>\n\n#line 1 \"ds/dsu/dsu.hpp\"\n\n\n\n#line 5 \"ds/dsu/dsu.hpp\"\
-    \n#include <numeric>\n#line 8 \"ds/dsu/dsu.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ ds {\n\nstruct Dsu {\n   private:\n    int _n;\n    // parent_or_size[i] is\
-    \ the parent of i if it's >= 0.\n    // If it's < 0, then i is a root and -parent_or_size[i]\
-    \ is the size of the group.\n    std::vector<int> parent_or_size;\n\n    // Returns\
-    \ {new leader, absorbed leader}. The absorbed leader is -1 when\n    // both vertices\
-    \ already belong to the same component.\n    std::pair<int, int> merge_leaders(int\
-    \ a, int b) {\n        int x = leader(a), y = leader(b);\n        if (x == y)\
-    \ return {x, -1};\n        if (-parent_or_size[x] < -parent_or_size[y]) std::swap(x,\
-    \ y);\n        parent_or_size[x] += parent_or_size[y];\n        parent_or_size[y]\
-    \ = x;\n        return {x, y};\n    }\n\n   public:\n    Dsu() : _n(0) {}\n  \
-    \  explicit Dsu(int n) : _n(n), parent_or_size(n, -1) {}\n\n    // Merges the\
-    \ group containing 'a' with the group containing 'b'.\n    // Returns the leader\
-    \ of the merged group.\n    int merge(int a, int b) {\n        return merge_leaders(a,\
-    \ b).first;\n    }\n\n    // Invokes callback(new_leader, absorbed_leader) after\
-    \ an actual merge.\n    // Returns the leader of the merged group.\n    template\
-    \ <class Callback>\n    int merge(int a, int b, Callback&& callback) {\n     \
-    \   std::pair<int, int> merged = merge_leaders(a, b);\n        if (merged.second\
-    \ != -1) callback(merged.first, merged.second);\n        return merged.first;\n\
-    \    }\n\n    // Returns true if 'a' and 'b' belong to the same group.\n    bool\
-    \ same(int a, int b) {\n        return leader(a) == leader(b);\n    }\n\n    //\
-    \ Returns the leader (representative) of the group containing 'a'.\n    int leader(int\
-    \ a) {\n        if (parent_or_size[a] < 0) return a;\n        // Path compression\n\
-    \        return parent_or_size[a] = leader(parent_or_size[a]);\n    }\n\n    //\
-    \ Returns the size of the group containing 'a'.\n    int size(int a) {\n     \
-    \   return -parent_or_size[leader(a)];\n    }\n\n    // Returns a list of all\
-    \ groups, where each group is a vector of its elements.\n    std::vector<std::vector<int>>\
-    \ groups() {\n        std::vector<int> leader_buf(_n), group_size(_n);\n     \
-    \   for (int i = 0; i < _n; i++) {\n            leader_buf[i] = leader(i);\n \
-    \           group_size[leader_buf[i]]++;\n        }\n        std::vector<std::vector<int>>\
-    \ result(_n);\n        for (int i = 0; i < _n; i++) {\n            result[i].reserve(group_size[i]);\n\
-    \        }\n        for (int i = 0; i < _n; i++) {\n            result[leader_buf[i]].push_back(i);\n\
-    \        }\n        result.erase(std::remove_if(result.begin(), result.end(),\
-    \ [&](const std::vector<int>& v) { return v.empty(); }),\n                   \
-    \  result.end());\n        return result;\n    }\n};\n\n}  // namespace ds\n}\
-    \  // namespace m1une\n\n\n#line 1 \"geometry/point.hpp\"\n\n\n\n#line 7 \"geometry/point.hpp\"\
-    \n#include <type_traits>\n\nnamespace m1une {\nnamespace geometry {\n\ntemplate\
-    \ <typename T>\nconcept Coordinate = std::is_arithmetic_v<T> && !std::same_as<std::remove_cv_t<T>,\
-    \ bool>;\n\ntemplate <Coordinate T>\nusing wide_type = std::conditional_t<std::integral<T>,\
-    \ __int128_t, long double>;\n\ntemplate <Coordinate T>\nstruct Point {\n    T\
-    \ x;\n    T y;\n\n    constexpr Point() : x(0), y(0) {}\n    constexpr Point(T\
-    \ x_value, T y_value) : x(x_value), y(y_value) {}\n\n    template <Coordinate\
-    \ U>\n    explicit constexpr Point(const Point<U>& other)\n        : x(static_cast<T>(other.x)),\
-    \ y(static_cast<T>(other.y)) {}\n\n    constexpr Point& operator+=(const Point&\
-    \ other) {\n        x += other.x;\n        y += other.y;\n        return *this;\n\
-    \    }\n\n    constexpr Point& operator-=(const Point& other) {\n        x -=\
-    \ other.x;\n        y -= other.y;\n        return *this;\n    }\n\n    constexpr\
-    \ Point operator+() const {\n        return *this;\n    }\n\n    constexpr Point\
-    \ operator-() const {\n        return Point(-x, -y);\n    }\n\n    friend constexpr\
-    \ Point operator+(Point left, const Point& right) {\n        return left += right;\n\
-    \    }\n\n    friend constexpr Point operator-(Point left, const Point& right)\
-    \ {\n        return left -= right;\n    }\n\n    friend constexpr bool operator==(const\
-    \ Point&, const Point&) = default;\n\n    friend constexpr bool operator<(const\
-    \ Point& left, const Point& right) {\n        if (left.x != right.x) return left.x\
-    \ < right.x;\n        return left.y < right.y;\n    }\n};\n\ntemplate <Coordinate\
-    \ T>\nconstexpr Point<long double> centroid(const Point<T>& point) {\n    return\
-    \ Point<long double>(point);\n}\n\ntemplate <Coordinate T, typename Scalar>\n\
-    requires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(const Point<T>&\
-    \ point, Scalar scalar) {\n    using Result = std::common_type_t<T, Scalar>;\n\
-    \    return Point<Result>(\n        Result(point.x) * Result(scalar),\n      \
-    \  Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate <typename Scalar, Coordinate\
-    \ T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(Scalar scalar,\
-    \ const Point<T>& point) {\n    return point * scalar;\n}\n\ntemplate <Coordinate\
-    \ T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator/(const\
+  bundledCode: "#line 1 \"verify/geometry/delaunay_triangulation.test.cpp\"\n#define\
+    \ PROBLEM \"https://judge.yosupo.jp/problem/euclidean_mst\"\n\n#line 1 \"geometry/convex_hull.hpp\"\
+    \n\n\n\n#include <algorithm>\n#include <cstddef>\n#include <utility>\n#include\
+    \ <vector>\n\n#line 1 \"geometry/point.hpp\"\n\n\n\n#include <cmath>\n#include\
+    \ <concepts>\n#include <cassert>\n#include <type_traits>\n\nnamespace m1une {\n\
+    namespace geometry {\n\ntemplate <typename T>\nconcept Coordinate = std::is_arithmetic_v<T>\
+    \ && !std::same_as<std::remove_cv_t<T>, bool>;\n\ntemplate <Coordinate T>\nusing\
+    \ wide_type = std::conditional_t<std::integral<T>, __int128_t, long double>;\n\
+    \ntemplate <Coordinate T>\nstruct Point {\n    T x;\n    T y;\n\n    constexpr\
+    \ Point() : x(0), y(0) {}\n    constexpr Point(T x_value, T y_value) : x(x_value),\
+    \ y(y_value) {}\n\n    template <Coordinate U>\n    explicit constexpr Point(const\
+    \ Point<U>& other)\n        : x(static_cast<T>(other.x)), y(static_cast<T>(other.y))\
+    \ {}\n\n    constexpr Point& operator+=(const Point& other) {\n        x += other.x;\n\
+    \        y += other.y;\n        return *this;\n    }\n\n    constexpr Point& operator-=(const\
+    \ Point& other) {\n        x -= other.x;\n        y -= other.y;\n        return\
+    \ *this;\n    }\n\n    constexpr Point operator+() const {\n        return *this;\n\
+    \    }\n\n    constexpr Point operator-() const {\n        return Point(-x, -y);\n\
+    \    }\n\n    friend constexpr Point operator+(Point left, const Point& right)\
+    \ {\n        return left += right;\n    }\n\n    friend constexpr Point operator-(Point\
+    \ left, const Point& right) {\n        return left -= right;\n    }\n\n    friend\
+    \ constexpr bool operator==(const Point&, const Point&) = default;\n\n    friend\
+    \ constexpr bool operator<(const Point& left, const Point& right) {\n        if\
+    \ (left.x != right.x) return left.x < right.x;\n        return left.y < right.y;\n\
+    \    }\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const\
+    \ Point<T>& point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate\
+    \ T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(const\
     \ Point<T>& point, Scalar scalar) {\n    using Result = std::common_type_t<T,\
+    \ Scalar>;\n    return Point<Result>(\n        Result(point.x) * Result(scalar),\n\
+    \        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate <typename Scalar,\
+    \ Coordinate T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(Scalar\
+    \ scalar, const Point<T>& point) {\n    return point * scalar;\n}\n\ntemplate\
+    \ <Coordinate T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr\
+    \ auto operator/(const Point<T>& point, Scalar scalar) {\n    using Result = std::common_type_t<T,\
     \ Scalar>;\n    return Point<Result>(\n        Result(point.x) / Result(scalar),\n\
     \        Result(point.y) / Result(scalar)\n    );\n}\n\ntemplate <Coordinate T>\n\
     constexpr wide_type<T> dot(const Point<T>& a, const Point<T>& b) {\n    using\
@@ -148,8 +118,69 @@ data:
     \ point) {\n    long double length = norm(point);\n    assert(length != 0);\n\
     \    return Point<long double>(\n        static_cast<long double>(point.x) / length,\n\
     \        static_cast<long double>(point.y) / length\n    );\n}\n\n}  // namespace\
-    \ geometry\n}  // namespace m1une\n\n\n#line 16 \"geometry/euclidean_mst.hpp\"\
-    \n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <class T>\nstruct EuclideanMstEdge\
+    \ geometry\n}  // namespace m1une\n\n\n#line 10 \"geometry/convex_hull.hpp\"\n\
+    \nnamespace m1une {\nnamespace geometry {\n\n// Returns the convex hull counterclockwise\
+    \ from its lexicographically smallest\n// point. The first point is not repeated\
+    \ at the end.\ntemplate <Coordinate T>\nstd::vector<Point<T>> convex_hull(\n \
+    \   std::vector<Point<T>> points,\n    bool include_collinear = false\n) {\n \
+    \   std::sort(points.begin(), points.end());\n    points.erase(std::unique(points.begin(),\
+    \ points.end()), points.end());\n    std::size_t size = points.size();\n    if\
+    \ (size <= 1) return points;\n\n    std::vector<Point<T>> hull;\n    hull.reserve(2\
+    \ * size);\n    auto should_pop = [include_collinear](\n        const Point<T>&\
+    \ first,\n        const Point<T>& second,\n        const Point<T>& third\n   \
+    \ ) {\n        int turn = orientation(first, second, third);\n        return include_collinear\
+    \ ? turn < 0 : turn <= 0;\n    };\n\n    for (const Point<T>& point : points)\
+    \ {\n        while (\n            hull.size() >= 2 &&\n            should_pop(hull[hull.size()\
+    \ - 2], hull.back(), point)\n        ) {\n            hull.pop_back();\n     \
+    \   }\n        hull.push_back(point);\n    }\n\n    std::size_t lower_size = hull.size();\n\
+    \    for (std::size_t index = size - 1; index-- > 0;) {\n        const Point<T>&\
+    \ point = points[index];\n        while (\n            hull.size() > lower_size\
+    \ &&\n            should_pop(hull[hull.size() - 2], hull.back(), point)\n    \
+    \    ) {\n            hull.pop_back();\n        }\n        hull.push_back(point);\n\
+    \    }\n    hull.pop_back();\n\n    if (include_collinear && hull.size() == 2\
+    \ * points.size() - 2) {\n        hull = std::move(points);\n    }\n    return\
+    \ hull;\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 1 \"\
+    geometry/delaunay_triangulation.hpp\"\n\n\n\n#line 5 \"geometry/delaunay_triangulation.hpp\"\
+    \n#include <array>\n#line 10 \"geometry/delaunay_triangulation.hpp\"\n\n#line\
+    \ 1 \"geometry/euclidean_mst.hpp\"\n\n\n\n#line 9 \"geometry/euclidean_mst.hpp\"\
+    \n#include <limits>\n#include <tuple>\n#line 13 \"geometry/euclidean_mst.hpp\"\
+    \n\n#line 1 \"ds/dsu/dsu.hpp\"\n\n\n\n#line 5 \"ds/dsu/dsu.hpp\"\n#include <numeric>\n\
+    #line 8 \"ds/dsu/dsu.hpp\"\n\nnamespace m1une {\nnamespace ds {\n\nstruct Dsu\
+    \ {\n   private:\n    int _n;\n    // parent_or_size[i] is the parent of i if\
+    \ it's >= 0.\n    // If it's < 0, then i is a root and -parent_or_size[i] is the\
+    \ size of the group.\n    std::vector<int> parent_or_size;\n\n    // Returns {new\
+    \ leader, absorbed leader}. The absorbed leader is -1 when\n    // both vertices\
+    \ already belong to the same component.\n    std::pair<int, int> merge_leaders(int\
+    \ a, int b) {\n        int x = leader(a), y = leader(b);\n        if (x == y)\
+    \ return {x, -1};\n        if (-parent_or_size[x] < -parent_or_size[y]) std::swap(x,\
+    \ y);\n        parent_or_size[x] += parent_or_size[y];\n        parent_or_size[y]\
+    \ = x;\n        return {x, y};\n    }\n\n   public:\n    Dsu() : _n(0) {}\n  \
+    \  explicit Dsu(int n) : _n(n), parent_or_size(n, -1) {}\n\n    // Merges the\
+    \ group containing 'a' with the group containing 'b'.\n    // Returns the leader\
+    \ of the merged group.\n    int merge(int a, int b) {\n        return merge_leaders(a,\
+    \ b).first;\n    }\n\n    // Invokes callback(new_leader, absorbed_leader) after\
+    \ an actual merge.\n    // Returns the leader of the merged group.\n    template\
+    \ <class Callback>\n    int merge(int a, int b, Callback&& callback) {\n     \
+    \   std::pair<int, int> merged = merge_leaders(a, b);\n        if (merged.second\
+    \ != -1) callback(merged.first, merged.second);\n        return merged.first;\n\
+    \    }\n\n    // Returns true if 'a' and 'b' belong to the same group.\n    bool\
+    \ same(int a, int b) {\n        return leader(a) == leader(b);\n    }\n\n    //\
+    \ Returns the leader (representative) of the group containing 'a'.\n    int leader(int\
+    \ a) {\n        if (parent_or_size[a] < 0) return a;\n        // Path compression\n\
+    \        return parent_or_size[a] = leader(parent_or_size[a]);\n    }\n\n    //\
+    \ Returns the size of the group containing 'a'.\n    int size(int a) {\n     \
+    \   return -parent_or_size[leader(a)];\n    }\n\n    // Returns a list of all\
+    \ groups, where each group is a vector of its elements.\n    std::vector<std::vector<int>>\
+    \ groups() {\n        std::vector<int> leader_buf(_n), group_size(_n);\n     \
+    \   for (int i = 0; i < _n; i++) {\n            leader_buf[i] = leader(i);\n \
+    \           group_size[leader_buf[i]]++;\n        }\n        std::vector<std::vector<int>>\
+    \ result(_n);\n        for (int i = 0; i < _n; i++) {\n            result[i].reserve(group_size[i]);\n\
+    \        }\n        for (int i = 0; i < _n; i++) {\n            result[leader_buf[i]].push_back(i);\n\
+    \        }\n        result.erase(std::remove_if(result.begin(), result.end(),\
+    \ [&](const std::vector<int>& v) { return v.empty(); }),\n                   \
+    \  result.end());\n        return result;\n    }\n};\n\n}  // namespace ds\n}\
+    \  // namespace m1une\n\n\n#line 16 \"geometry/euclidean_mst.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace geometry {\n\ntemplate <class T>\nstruct EuclideanMstEdge\
     \ {\n    int from;\n    int to;\n    T squared_distance;\n};\n\ntemplate <class\
     \ T>\nstruct EuclideanMst {\n    long double cost;\n    std::vector<EuclideanMstEdge<T>>\
     \ edges;\n};\n\nnamespace detail {\n\ntemplate <std::integral T>\nclass EuclideanDelaunay\
@@ -339,19 +370,71 @@ data:
     \        result.edges.push_back(edge);\n        if (result.edges.size() + 1 ==\
     \ points.size()) break;\n    }\n    assert(points.empty() || result.edges.size()\
     \ + 1 == points.size());\n    return result;\n}\n\n}  // namespace geometry\n\
-    }  // namespace m1une\n\n\n#line 4 \"verify/geometry/euclidean_mst.test.cpp\"\n\
-    \n#line 8 \"verify/geometry/euclidean_mst.test.cpp\"\n#include <cstdint>\n#line\
-    \ 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 5 \"utilities/fast_io.hpp\"\n#include\
-    \ <array>\n#include <cerrno>\n#include <charconv>\n#line 9 \"utilities/fast_io.hpp\"\
-    \n#include <cstdio>\n#include <cstdlib>\n#line 12 \"utilities/fast_io.hpp\"\n\
-    #include <cstring>\n#include <iterator>\n#include <string>\n#include <sys/stat.h>\n\
-    #line 18 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n\nnamespace m1une {\n\
-    namespace utilities {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\n\
-    template <class T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate\
-    \ <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
-    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
-    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
-    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    }  // namespace m1une\n\n\n#line 12 \"geometry/delaunay_triangulation.hpp\"\n\n\
+    namespace m1une {\nnamespace geometry {\n\nstruct DelaunayTriangulation {\n  \
+    \  std::vector<std::pair<int, int>> edges;\n    std::vector<std::array<int, 3>>\
+    \ triangles;\n};\n\nnamespace delaunay_triangulation_detail {\n\ntemplate <std::integral\
+    \ T>\nint direction_half(\n    const Point<T>& origin,\n    const Point<T>& destination\n\
+    ) {\n    using W = wide_type<T>;\n    W x = W(destination.x) - W(origin.x);\n\
+    \    W y = W(destination.y) - W(origin.y);\n    return y > 0 || (y == 0 && x >=\
+    \ 0) ? 0 : 1;\n}\n\ntemplate <std::integral T>\nbool direction_less(\n    const\
+    \ std::vector<Point<T>>& points,\n    int origin,\n    int first,\n    int second\n\
+    ) {\n    int first_half = direction_half(points[origin], points[first]);\n   \
+    \ int second_half = direction_half(points[origin], points[second]);\n    if (first_half\
+    \ != second_half) return first_half < second_half;\n\n    using W = wide_type<T>;\n\
+    \    W first_x = W(points[first].x) - W(points[origin].x);\n    W first_y = W(points[first].y)\
+    \ - W(points[origin].y);\n    W second_x = W(points[second].x) - W(points[origin].x);\n\
+    \    W second_y = W(points[second].y) - W(points[origin].y);\n    W product =\
+    \ first_x * second_y - first_y * second_x;\n    if (product != 0) return product\
+    \ > 0;\n\n    W first_norm = first_x * first_x + first_y * first_y;\n    W second_norm\
+    \ = second_x * second_x + second_y * second_y;\n    if (first_norm != second_norm)\
+    \ return first_norm < second_norm;\n    return first < second;\n}\n\ninline void\
+    \ rotate_minimum_first(std::array<int, 3>& triangle) {\n    int minimum = int(std::min_element(triangle.begin(),\
+    \ triangle.end()) -\n                      triangle.begin());\n    std::rotate(\n\
+    \        triangle.begin(),\n        triangle.begin() + minimum,\n        triangle.end()\n\
+    \    );\n}\n\n}  // namespace delaunay_triangulation_detail\n\n// Constructs one\
+    \ Delaunay triangulation of distinct integral points.\ntemplate <std::integral\
+    \ T>\nDelaunayTriangulation delaunay_triangulation(\n    const std::vector<Point<T>>&\
+    \ points\n) {\n    namespace detail = delaunay_triangulation_detail;\n\n    DelaunayTriangulation\
+    \ result;\n    geometry::detail::EuclideanDelaunay<T> builder(points);\n    assert(!builder.has_duplicates());\n\
+    \    result.edges = builder.get_edges();\n    for (auto& [first, second] : result.edges)\
+    \ {\n        if (first > second) std::swap(first, second);\n    }\n    std::sort(result.edges.begin(),\
+    \ result.edges.end());\n    result.edges.erase(\n        std::unique(result.edges.begin(),\
+    \ result.edges.end()),\n        result.edges.end()\n    );\n\n    std::vector<std::vector<int>>\
+    \ neighbors(points.size());\n    for (auto [first, second] : result.edges) {\n\
+    \        neighbors[first].push_back(second);\n        neighbors[second].push_back(first);\n\
+    \    }\n    for (int point = 0; point < int(points.size()); ++point) {\n     \
+    \   std::sort(\n            neighbors[point].begin(),\n            neighbors[point].end(),\n\
+    \            [&](int first, int second) {\n                return detail::direction_less(points,\
+    \ point, first, second);\n            }\n        );\n    }\n\n    auto has_edge\
+    \ = [&](int first, int second) {\n        if (first > second) std::swap(first,\
+    \ second);\n        return std::binary_search(\n            result.edges.begin(),\n\
+    \            result.edges.end(),\n            std::pair(first, second)\n     \
+    \   );\n    };\n    result.triangles.reserve(result.edges.size());\n    for (int\
+    \ point = 0; point < int(points.size()); ++point) {\n        int degree = int(neighbors[point].size());\n\
+    \        for (int index = 0; index < degree; ++index) {\n            int first\
+    \ = neighbors[point][index];\n            int second = neighbors[point][(index\
+    \ + 1) % degree];\n            if (orientation(points[point], points[first], points[second])\
+    \ <= 0) {\n                continue;\n            }\n            if (!has_edge(first,\
+    \ second)) continue;\n            std::array<int, 3> triangle{point, first, second};\n\
+    \            detail::rotate_minimum_first(triangle);\n            result.triangles.push_back(triangle);\n\
+    \        }\n    }\n    std::sort(result.triangles.begin(), result.triangles.end());\n\
+    \    result.triangles.erase(\n        std::unique(result.triangles.begin(), result.triangles.end()),\n\
+    \        result.triangles.end()\n    );\n    return result;\n}\n\n}  // namespace\
+    \ geometry\n}  // namespace m1une\n\n\n#line 5 \"verify/geometry/delaunay_triangulation.test.cpp\"\
+    \n\n#line 9 \"verify/geometry/delaunay_triangulation.test.cpp\"\n#include <cstdint>\n\
+    #line 11 \"verify/geometry/delaunay_triangulation.test.cpp\"\n#include <random>\n\
+    #include <set>\n#line 15 \"verify/geometry/delaunay_triangulation.test.cpp\"\n\
+    \n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 6 \"utilities/fast_io.hpp\"\n\
+    #include <cerrno>\n#include <charconv>\n#line 9 \"utilities/fast_io.hpp\"\n#include\
+    \ <cstdio>\n#include <cstdlib>\n#line 12 \"utilities/fast_io.hpp\"\n#include <cstring>\n\
+    #include <iterator>\n#include <string>\n#include <sys/stat.h>\n#line 18 \"utilities/fast_io.hpp\"\
+    \n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal\
+    \ {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\n\
+    struct is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T,\
+    \ std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
+    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
+    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
     \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
     \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
@@ -583,122 +666,242 @@ data:
     \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
     n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 11 \"verify/geometry/euclidean_mst.test.cpp\"\
-    \n\n#line 13 \"verify/geometry/euclidean_mst.test.cpp\"\n\nnamespace {\n\nusing\
-    \ Point = m1une::geometry::Point<long long>;\nusing Wide = __int128_t;\n\nWide\
-    \ squared_distance(const Point& a, const Point& b) {\n    return m1une::geometry::distance2(a,\
-    \ b);\n}\n\nstd::vector<Wide> brute_force_weights(const std::vector<Point>& points)\
-    \ {\n    struct Edge {\n        int from;\n        int to;\n        Wide squared_distance;\n\
-    \    };\n\n    std::vector<Edge> edges;\n    for (int i = 0; i < int(points.size());\
-    \ i++) {\n        for (int j = 0; j < i; j++) {\n            edges.push_back(Edge{i,\
-    \ j, squared_distance(points[i], points[j])});\n        }\n    }\n    std::sort(edges.begin(),\
-    \ edges.end(), [](const Edge& left, const Edge& right) {\n        return left.squared_distance\
-    \ < right.squared_distance;\n    });\n\n    m1une::ds::Dsu dsu(int(points.size()));\n\
-    \    std::vector<Wide> result;\n    for (const auto& edge : edges) {\n       \
-    \ if (dsu.same(edge.from, edge.to)) continue;\n        dsu.merge(edge.from, edge.to);\n\
-    \        result.push_back(edge.squared_distance);\n    }\n    std::sort(result.begin(),\
-    \ result.end());\n    return result;\n}\n\nvoid check(const std::vector<Point>&\
-    \ points) {\n    auto candidates = m1une::geometry::euclidean_mst_edges(points);\n\
-    \    assert(candidates.size() <= 4 * points.size());\n    for (const auto& edge\
-    \ : candidates) {\n        assert(0 <= edge.from && edge.from < int(points.size()));\n\
-    \        assert(0 <= edge.to && edge.to < int(points.size()));\n        assert(edge.from\
-    \ != edge.to);\n        assert(edge.squared_distance == squared_distance(points[edge.from],\
-    \ points[edge.to]));\n    }\n\n    auto mst = m1une::geometry::euclidean_mst(points);\n\
-    \    assert(mst.edges.size() == (points.empty() ? 0 : points.size() - 1));\n \
-    \   m1une::ds::Dsu dsu(int(points.size()));\n    std::vector<Wide> weights;\n\
-    \    long double cost = 0;\n    for (const auto& edge : mst.edges) {\n       \
-    \ assert(!dsu.same(edge.from, edge.to));\n        dsu.merge(edge.from, edge.to);\n\
-    \        weights.push_back(edge.squared_distance);\n        cost += std::sqrt(static_cast<long\
-    \ double>(edge.squared_distance));\n    }\n    std::sort(weights.begin(), weights.end());\n\
-    \    assert(weights == brute_force_weights(points));\n    assert(std::abs(mst.cost\
-    \ - cost) <= 1e-12L * (1 + cost));\n}\n\nvoid test_fixed() {\n    check({});\n\
-    \    check({Point(2, -3)});\n    check({Point(0, 0), Point(0, 0), Point(0, 0)});\n\
-    \    check({Point(-5, 0), Point(-2, 0), Point(1, 0), Point(7, 0)});\n    check({Point(0,\
-    \ 0), Point(1, 0), Point(1, 1), Point(0, 1)});\n    check({\n        Point(0,\
-    \ 0),\n        Point(2, 0),\n        Point(2, 2),\n        Point(0, 2),\n    \
-    \    Point(1, 1),\n        Point(1, 1),\n    });\n}\n\nvoid test_randomized()\
-    \ {\n    std::uint64_t state = 20260714;\n    auto random = [&state]() {\n   \
-    \     state ^= state << 7;\n        state ^= state >> 9;\n        return state;\n\
-    \    };\n\n    for (int trial = 0; trial < 3000; trial++) {\n        int size\
-    \ = int(random() % 15);\n        std::vector<Point> points;\n        points.reserve(size);\n\
-    \        for (int i = 0; i < size; i++) {\n            points.emplace_back(\n\
-    \                static_cast<long long>(random() % 21) - 10,\n               \
-    \ static_cast<long long>(random() % 21) - 10\n            );\n        }\n    \
-    \    check(points);\n    }\n}\n\n}  // namespace\n\nint main() {\n    m1une::utilities::FastInput\
+    \ utilities\n}  // namespace m1une\n\n\n#line 18 \"verify/geometry/delaunay_triangulation.test.cpp\"\
+    \n\nnamespace {\n\nusing Point = m1une::geometry::Point<long long>;\nusing Wide\
+    \ = __int128_t;\n\nbool inside_circumcircle(\n    const Point& first,\n    const\
+    \ Point& second,\n    const Point& third,\n    const Point& point\n) {\n    Wide\
+    \ ax = Wide(first.x) - Wide(point.x);\n    Wide ay = Wide(first.y) - Wide(point.y);\n\
+    \    Wide bx = Wide(second.x) - Wide(point.x);\n    Wide by = Wide(second.y) -\
+    \ Wide(point.y);\n    Wide cx = Wide(third.x) - Wide(point.x);\n    Wide cy =\
+    \ Wide(third.y) - Wide(point.y);\n    Wide first_norm = ax * ax + ay * ay;\n \
+    \   Wide second_norm = bx * bx + by * by;\n    Wide third_norm = cx * cx + cy\
+    \ * cy;\n    Wide determinant =\n        (bx * cy - by * cx) * first_norm +\n\
+    \        (cx * ay - cy * ax) * second_norm +\n        (ax * by - ay * bx) * third_norm;\n\
+    \    return determinant > 0;\n}\n\nvoid check(const std::vector<Point>& points)\
+    \ {\n    auto triangulation = m1une::geometry::delaunay_triangulation(points);\n\
+    \    assert(std::is_sorted(\n        triangulation.edges.begin(),\n        triangulation.edges.end()\n\
+    \    ));\n    assert(std::adjacent_find(\n        triangulation.edges.begin(),\n\
+    \        triangulation.edges.end()\n    ) == triangulation.edges.end());\n   \
+    \ assert(std::is_sorted(\n        triangulation.triangles.begin(),\n        triangulation.triangles.end()\n\
+    \    ));\n    assert(std::adjacent_find(\n        triangulation.triangles.begin(),\n\
+    \        triangulation.triangles.end()\n    ) == triangulation.triangles.end());\n\
+    \n    std::set<std::pair<int, int>> edge_set;\n    for (auto [first, second] :\
+    \ triangulation.edges) {\n        assert(0 <= first && first < int(points.size()));\n\
+    \        assert(0 <= second && second < int(points.size()));\n        assert(first\
+    \ < second);\n        edge_set.emplace(first, second);\n    }\n\n    std::vector<int>\
+    \ incidence(triangulation.edges.size(), 0);\n    Wide triangle_area_twice = 0;\n\
+    \    for (const auto& triangle : triangulation.triangles) {\n        int first\
+    \ = triangle[0];\n        int second = triangle[1];\n        int third = triangle[2];\n\
+    \        assert(first < second && first < third);\n        Wide area = m1une::geometry::cross(\n\
+    \            points[first],\n            points[second],\n            points[third]\n\
+    \        );\n        assert(area > 0);\n        triangle_area_twice += area;\n\
+    \n        for (int side = 0; side < 3; ++side) {\n            int from = triangle[side];\n\
+    \            int to = triangle[(side + 1) % 3];\n            if (from > to) std::swap(from,\
+    \ to);\n            auto iterator = edge_set.find(std::pair(from, to));\n    \
+    \        assert(iterator != edge_set.end());\n            auto sorted_iterator\
+    \ = std::lower_bound(\n                triangulation.edges.begin(),\n        \
+    \        triangulation.edges.end(),\n                *iterator\n            );\n\
+    \            ++incidence[sorted_iterator - triangulation.edges.begin()];\n   \
+    \     }\n        for (const Point& point : points) {\n            assert(!inside_circumcircle(\n\
+    \                points[first],\n                points[second],\n           \
+    \     points[third],\n                point\n            ));\n        }\n    }\n\
+    \n    std::vector<Point> hull = m1une::geometry::convex_hull(points, true);\n\
+    \    bool non_collinear = false;\n    for (int index = 2; index < int(points.size());\
+    \ ++index) {\n        if (m1une::geometry::orientation(\n                points[0],\n\
+    \                points[1],\n                points[index]\n            ) != 0)\
+    \ {\n            non_collinear = true;\n        }\n    }\n    if (!non_collinear)\
+    \ {\n        assert(triangulation.triangles.empty());\n        assert(triangulation.edges.size()\
+    \ ==\n               (points.empty() ? 0 : points.size() - 1));\n        return;\n\
+    \    }\n\n    int size = int(points.size());\n    int hull_size = int(hull.size());\n\
+    \    assert(int(triangulation.edges.size()) == 3 * size - 3 - hull_size);\n  \
+    \  assert(int(triangulation.triangles.size()) == 2 * size - 2 - hull_size);\n\
+    \    for (int count : incidence) assert(count == 1 || count == 2);\n\n    Wide\
+    \ hull_area_twice = 0;\n    for (int index = 0; index < hull_size; ++index) {\n\
+    \        hull_area_twice += m1une::geometry::cross(\n            hull[index],\n\
+    \            hull[(index + 1) % hull_size]\n        );\n    }\n    assert(triangle_area_twice\
+    \ == hull_area_twice);\n}\n\nvoid test_fixed() {\n    check({});\n    check({Point(3,\
+    \ -2)});\n    check({Point(0, 0), Point(7, 1)});\n    check({\n        Point(-5,\
+    \ 0),\n        Point(-2, 0),\n        Point(1, 0),\n        Point(7, 0),\n   \
+    \ });\n    check({Point(0, 0), Point(4, 0), Point(1, 3)});\n    check({\n    \
+    \    Point(0, 0),\n        Point(2, 0),\n        Point(2, 2),\n        Point(0,\
+    \ 2),\n    });\n    check({\n        Point(5, 0),\n        Point(3, 4),\n    \
+    \    Point(0, 5),\n        Point(-3, 4),\n        Point(-5, 0),\n        Point(-3,\
+    \ -4),\n        Point(0, -5),\n        Point(3, -4),\n    });\n    check({\n \
+    \       Point(0, 0),\n        Point(2, 0),\n        Point(4, 0),\n        Point(4,\
+    \ 3),\n        Point(0, 3),\n        Point(2, 1),\n    });\n    check({\n    \
+    \    Point(0, 0),\n        Point(4, 0),\n        Point(5, 3),\n        Point(2,\
+    \ 6),\n        Point(-1, 3),\n        Point(2, 3),\n    });\n}\n\nvoid test_randomized()\
+    \ {\n    std::uint64_t state = 0xd31a'2026'0722ULL;\n    auto random = [&state]()\
+    \ {\n        state ^= state << 7;\n        state ^= state >> 9;\n        return\
+    \ state;\n    };\n\n    for (int trial = 0; trial < 3000; ++trial) {\n       \
+    \ int size = int(random() % 15);\n        std::set<std::pair<long long, long long>>\
+    \ coordinates;\n        while (int(coordinates.size()) < size) {\n           \
+    \ coordinates.emplace(\n                static_cast<long long>(random() % 21)\
+    \ - 10,\n                static_cast<long long>(random() % 21) - 10\n        \
+    \    );\n        }\n        std::vector<Point> points;\n        for (auto [x,\
+    \ y] : coordinates) points.emplace_back(x, y);\n        std::shuffle(\n      \
+    \      points.begin(),\n            points.end(),\n            std::mt19937_64(random())\n\
+    \        );\n        check(points);\n    }\n}\n\nstd::vector<std::pair<int, int>>\
+    \ delaunay_mst(\n    const std::vector<Point>& points\n) {\n    struct Edge {\n\
+    \        int from;\n        int to;\n        Wide squared_distance;\n    };\n\n\
+    \    std::vector<int> order(points.size());\n    std::iota(order.begin(), order.end(),\
+    \ 0);\n    std::sort(order.begin(), order.end(), [&](int first, int second) {\n\
+    \        return points[first] < points[second];\n    });\n\n    std::vector<Point>\
+    \ unique_points;\n    std::vector<int> representatives;\n    std::vector<Edge>\
+    \ candidates;\n    unique_points.reserve(points.size());\n    representatives.reserve(points.size());\n\
+    \    candidates.reserve(3 * points.size());\n    for (int index : order) {\n \
+    \       if (unique_points.empty() || unique_points.back() != points[index]) {\n\
+    \            unique_points.push_back(points[index]);\n            representatives.push_back(index);\n\
+    \        } else {\n            candidates.push_back(Edge{index, representatives.back(),\
+    \ 0});\n        }\n    }\n\n    auto triangulation =\n        m1une::geometry::delaunay_triangulation(unique_points);\n\
+    \    for (auto [first, second] : triangulation.edges) {\n        int from = representatives[first];\n\
+    \        int to = representatives[second];\n        candidates.push_back(Edge{\n\
+    \            from,\n            to,\n            m1une::geometry::distance2(points[from],\
+    \ points[to]),\n        });\n    }\n    std::sort(\n        candidates.begin(),\n\
+    \        candidates.end(),\n        [](const Edge& left, const Edge& right) {\n\
+    \            if (left.squared_distance != right.squared_distance) {\n        \
+    \        return left.squared_distance < right.squared_distance;\n            }\n\
+    \            if (left.from != right.from) return left.from < right.from;\n   \
+    \         return left.to < right.to;\n        }\n    );\n\n    m1une::ds::Dsu\
+    \ dsu(int(points.size()));\n    std::vector<std::pair<int, int>> result;\n   \
+    \ for (const Edge& edge : candidates) {\n        if (dsu.same(edge.from, edge.to))\
+    \ continue;\n        dsu.merge(edge.from, edge.to);\n        result.emplace_back(edge.from,\
+    \ edge.to);\n    }\n    assert(points.empty() || result.size() + 1 == points.size());\n\
+    \    return result;\n}\n\n}  // namespace\n\nint main() {\n    m1une::utilities::FastInput\
     \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n\n    test_fixed();\n\
-    \    test_randomized();\n\n    int n;\n    fast_input >> n;\n    std::vector<Point>\
-    \ points;\n    points.reserve(n);\n    for (int i = 0; i < n; i++) {\n       \
-    \ long long x, y;\n        fast_input >> x >> y;\n        points.emplace_back(x,\
-    \ y);\n    }\n\n    auto mst = m1une::geometry::euclidean_mst(points);\n    for\
-    \ (const auto& edge : mst.edges) {\n        fast_output << edge.from << ' ' <<\
-    \ edge.to << '\\n';\n    }\n}\n"
+    \    test_randomized();\n\n    int size;\n    fast_input >> size;\n    std::vector<Point>\
+    \ points(size);\n    for (Point& point : points) fast_input >> point.x >> point.y;\n\
+    \    for (auto [from, to] : delaunay_mst(points)) {\n        fast_output << from\
+    \ << ' ' << to << '\\n';\n    }\n}\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/euclidean_mst\"\n\n#include\
-    \ \"../../geometry/euclidean_mst.hpp\"\n\n#include <algorithm>\n#include <cassert>\n\
-    #include <cmath>\n#include <cstdint>\n#include \"../../utilities/fast_io.hpp\"\
-    \n#include <vector>\n\n#include \"../../ds/dsu/dsu.hpp\"\n\nnamespace {\n\nusing\
-    \ Point = m1une::geometry::Point<long long>;\nusing Wide = __int128_t;\n\nWide\
-    \ squared_distance(const Point& a, const Point& b) {\n    return m1une::geometry::distance2(a,\
-    \ b);\n}\n\nstd::vector<Wide> brute_force_weights(const std::vector<Point>& points)\
-    \ {\n    struct Edge {\n        int from;\n        int to;\n        Wide squared_distance;\n\
-    \    };\n\n    std::vector<Edge> edges;\n    for (int i = 0; i < int(points.size());\
-    \ i++) {\n        for (int j = 0; j < i; j++) {\n            edges.push_back(Edge{i,\
-    \ j, squared_distance(points[i], points[j])});\n        }\n    }\n    std::sort(edges.begin(),\
-    \ edges.end(), [](const Edge& left, const Edge& right) {\n        return left.squared_distance\
-    \ < right.squared_distance;\n    });\n\n    m1une::ds::Dsu dsu(int(points.size()));\n\
-    \    std::vector<Wide> result;\n    for (const auto& edge : edges) {\n       \
-    \ if (dsu.same(edge.from, edge.to)) continue;\n        dsu.merge(edge.from, edge.to);\n\
-    \        result.push_back(edge.squared_distance);\n    }\n    std::sort(result.begin(),\
-    \ result.end());\n    return result;\n}\n\nvoid check(const std::vector<Point>&\
-    \ points) {\n    auto candidates = m1une::geometry::euclidean_mst_edges(points);\n\
-    \    assert(candidates.size() <= 4 * points.size());\n    for (const auto& edge\
-    \ : candidates) {\n        assert(0 <= edge.from && edge.from < int(points.size()));\n\
-    \        assert(0 <= edge.to && edge.to < int(points.size()));\n        assert(edge.from\
-    \ != edge.to);\n        assert(edge.squared_distance == squared_distance(points[edge.from],\
-    \ points[edge.to]));\n    }\n\n    auto mst = m1une::geometry::euclidean_mst(points);\n\
-    \    assert(mst.edges.size() == (points.empty() ? 0 : points.size() - 1));\n \
-    \   m1une::ds::Dsu dsu(int(points.size()));\n    std::vector<Wide> weights;\n\
-    \    long double cost = 0;\n    for (const auto& edge : mst.edges) {\n       \
-    \ assert(!dsu.same(edge.from, edge.to));\n        dsu.merge(edge.from, edge.to);\n\
-    \        weights.push_back(edge.squared_distance);\n        cost += std::sqrt(static_cast<long\
-    \ double>(edge.squared_distance));\n    }\n    std::sort(weights.begin(), weights.end());\n\
-    \    assert(weights == brute_force_weights(points));\n    assert(std::abs(mst.cost\
-    \ - cost) <= 1e-12L * (1 + cost));\n}\n\nvoid test_fixed() {\n    check({});\n\
-    \    check({Point(2, -3)});\n    check({Point(0, 0), Point(0, 0), Point(0, 0)});\n\
-    \    check({Point(-5, 0), Point(-2, 0), Point(1, 0), Point(7, 0)});\n    check({Point(0,\
-    \ 0), Point(1, 0), Point(1, 1), Point(0, 1)});\n    check({\n        Point(0,\
-    \ 0),\n        Point(2, 0),\n        Point(2, 2),\n        Point(0, 2),\n    \
-    \    Point(1, 1),\n        Point(1, 1),\n    });\n}\n\nvoid test_randomized()\
-    \ {\n    std::uint64_t state = 20260714;\n    auto random = [&state]() {\n   \
-    \     state ^= state << 7;\n        state ^= state >> 9;\n        return state;\n\
-    \    };\n\n    for (int trial = 0; trial < 3000; trial++) {\n        int size\
-    \ = int(random() % 15);\n        std::vector<Point> points;\n        points.reserve(size);\n\
-    \        for (int i = 0; i < size; i++) {\n            points.emplace_back(\n\
-    \                static_cast<long long>(random() % 21) - 10,\n               \
-    \ static_cast<long long>(random() % 21) - 10\n            );\n        }\n    \
-    \    check(points);\n    }\n}\n\n}  // namespace\n\nint main() {\n    m1une::utilities::FastInput\
+    \ \"../../geometry/convex_hull.hpp\"\n#include \"../../geometry/delaunay_triangulation.hpp\"\
+    \n\n#include <algorithm>\n#include <array>\n#include <cassert>\n#include <cstdint>\n\
+    #include <numeric>\n#include <random>\n#include <set>\n#include <utility>\n#include\
+    \ <vector>\n\n#include \"../../ds/dsu/dsu.hpp\"\n#include \"../../utilities/fast_io.hpp\"\
+    \n\nnamespace {\n\nusing Point = m1une::geometry::Point<long long>;\nusing Wide\
+    \ = __int128_t;\n\nbool inside_circumcircle(\n    const Point& first,\n    const\
+    \ Point& second,\n    const Point& third,\n    const Point& point\n) {\n    Wide\
+    \ ax = Wide(first.x) - Wide(point.x);\n    Wide ay = Wide(first.y) - Wide(point.y);\n\
+    \    Wide bx = Wide(second.x) - Wide(point.x);\n    Wide by = Wide(second.y) -\
+    \ Wide(point.y);\n    Wide cx = Wide(third.x) - Wide(point.x);\n    Wide cy =\
+    \ Wide(third.y) - Wide(point.y);\n    Wide first_norm = ax * ax + ay * ay;\n \
+    \   Wide second_norm = bx * bx + by * by;\n    Wide third_norm = cx * cx + cy\
+    \ * cy;\n    Wide determinant =\n        (bx * cy - by * cx) * first_norm +\n\
+    \        (cx * ay - cy * ax) * second_norm +\n        (ax * by - ay * bx) * third_norm;\n\
+    \    return determinant > 0;\n}\n\nvoid check(const std::vector<Point>& points)\
+    \ {\n    auto triangulation = m1une::geometry::delaunay_triangulation(points);\n\
+    \    assert(std::is_sorted(\n        triangulation.edges.begin(),\n        triangulation.edges.end()\n\
+    \    ));\n    assert(std::adjacent_find(\n        triangulation.edges.begin(),\n\
+    \        triangulation.edges.end()\n    ) == triangulation.edges.end());\n   \
+    \ assert(std::is_sorted(\n        triangulation.triangles.begin(),\n        triangulation.triangles.end()\n\
+    \    ));\n    assert(std::adjacent_find(\n        triangulation.triangles.begin(),\n\
+    \        triangulation.triangles.end()\n    ) == triangulation.triangles.end());\n\
+    \n    std::set<std::pair<int, int>> edge_set;\n    for (auto [first, second] :\
+    \ triangulation.edges) {\n        assert(0 <= first && first < int(points.size()));\n\
+    \        assert(0 <= second && second < int(points.size()));\n        assert(first\
+    \ < second);\n        edge_set.emplace(first, second);\n    }\n\n    std::vector<int>\
+    \ incidence(triangulation.edges.size(), 0);\n    Wide triangle_area_twice = 0;\n\
+    \    for (const auto& triangle : triangulation.triangles) {\n        int first\
+    \ = triangle[0];\n        int second = triangle[1];\n        int third = triangle[2];\n\
+    \        assert(first < second && first < third);\n        Wide area = m1une::geometry::cross(\n\
+    \            points[first],\n            points[second],\n            points[third]\n\
+    \        );\n        assert(area > 0);\n        triangle_area_twice += area;\n\
+    \n        for (int side = 0; side < 3; ++side) {\n            int from = triangle[side];\n\
+    \            int to = triangle[(side + 1) % 3];\n            if (from > to) std::swap(from,\
+    \ to);\n            auto iterator = edge_set.find(std::pair(from, to));\n    \
+    \        assert(iterator != edge_set.end());\n            auto sorted_iterator\
+    \ = std::lower_bound(\n                triangulation.edges.begin(),\n        \
+    \        triangulation.edges.end(),\n                *iterator\n            );\n\
+    \            ++incidence[sorted_iterator - triangulation.edges.begin()];\n   \
+    \     }\n        for (const Point& point : points) {\n            assert(!inside_circumcircle(\n\
+    \                points[first],\n                points[second],\n           \
+    \     points[third],\n                point\n            ));\n        }\n    }\n\
+    \n    std::vector<Point> hull = m1une::geometry::convex_hull(points, true);\n\
+    \    bool non_collinear = false;\n    for (int index = 2; index < int(points.size());\
+    \ ++index) {\n        if (m1une::geometry::orientation(\n                points[0],\n\
+    \                points[1],\n                points[index]\n            ) != 0)\
+    \ {\n            non_collinear = true;\n        }\n    }\n    if (!non_collinear)\
+    \ {\n        assert(triangulation.triangles.empty());\n        assert(triangulation.edges.size()\
+    \ ==\n               (points.empty() ? 0 : points.size() - 1));\n        return;\n\
+    \    }\n\n    int size = int(points.size());\n    int hull_size = int(hull.size());\n\
+    \    assert(int(triangulation.edges.size()) == 3 * size - 3 - hull_size);\n  \
+    \  assert(int(triangulation.triangles.size()) == 2 * size - 2 - hull_size);\n\
+    \    for (int count : incidence) assert(count == 1 || count == 2);\n\n    Wide\
+    \ hull_area_twice = 0;\n    for (int index = 0; index < hull_size; ++index) {\n\
+    \        hull_area_twice += m1une::geometry::cross(\n            hull[index],\n\
+    \            hull[(index + 1) % hull_size]\n        );\n    }\n    assert(triangle_area_twice\
+    \ == hull_area_twice);\n}\n\nvoid test_fixed() {\n    check({});\n    check({Point(3,\
+    \ -2)});\n    check({Point(0, 0), Point(7, 1)});\n    check({\n        Point(-5,\
+    \ 0),\n        Point(-2, 0),\n        Point(1, 0),\n        Point(7, 0),\n   \
+    \ });\n    check({Point(0, 0), Point(4, 0), Point(1, 3)});\n    check({\n    \
+    \    Point(0, 0),\n        Point(2, 0),\n        Point(2, 2),\n        Point(0,\
+    \ 2),\n    });\n    check({\n        Point(5, 0),\n        Point(3, 4),\n    \
+    \    Point(0, 5),\n        Point(-3, 4),\n        Point(-5, 0),\n        Point(-3,\
+    \ -4),\n        Point(0, -5),\n        Point(3, -4),\n    });\n    check({\n \
+    \       Point(0, 0),\n        Point(2, 0),\n        Point(4, 0),\n        Point(4,\
+    \ 3),\n        Point(0, 3),\n        Point(2, 1),\n    });\n    check({\n    \
+    \    Point(0, 0),\n        Point(4, 0),\n        Point(5, 3),\n        Point(2,\
+    \ 6),\n        Point(-1, 3),\n        Point(2, 3),\n    });\n}\n\nvoid test_randomized()\
+    \ {\n    std::uint64_t state = 0xd31a'2026'0722ULL;\n    auto random = [&state]()\
+    \ {\n        state ^= state << 7;\n        state ^= state >> 9;\n        return\
+    \ state;\n    };\n\n    for (int trial = 0; trial < 3000; ++trial) {\n       \
+    \ int size = int(random() % 15);\n        std::set<std::pair<long long, long long>>\
+    \ coordinates;\n        while (int(coordinates.size()) < size) {\n           \
+    \ coordinates.emplace(\n                static_cast<long long>(random() % 21)\
+    \ - 10,\n                static_cast<long long>(random() % 21) - 10\n        \
+    \    );\n        }\n        std::vector<Point> points;\n        for (auto [x,\
+    \ y] : coordinates) points.emplace_back(x, y);\n        std::shuffle(\n      \
+    \      points.begin(),\n            points.end(),\n            std::mt19937_64(random())\n\
+    \        );\n        check(points);\n    }\n}\n\nstd::vector<std::pair<int, int>>\
+    \ delaunay_mst(\n    const std::vector<Point>& points\n) {\n    struct Edge {\n\
+    \        int from;\n        int to;\n        Wide squared_distance;\n    };\n\n\
+    \    std::vector<int> order(points.size());\n    std::iota(order.begin(), order.end(),\
+    \ 0);\n    std::sort(order.begin(), order.end(), [&](int first, int second) {\n\
+    \        return points[first] < points[second];\n    });\n\n    std::vector<Point>\
+    \ unique_points;\n    std::vector<int> representatives;\n    std::vector<Edge>\
+    \ candidates;\n    unique_points.reserve(points.size());\n    representatives.reserve(points.size());\n\
+    \    candidates.reserve(3 * points.size());\n    for (int index : order) {\n \
+    \       if (unique_points.empty() || unique_points.back() != points[index]) {\n\
+    \            unique_points.push_back(points[index]);\n            representatives.push_back(index);\n\
+    \        } else {\n            candidates.push_back(Edge{index, representatives.back(),\
+    \ 0});\n        }\n    }\n\n    auto triangulation =\n        m1une::geometry::delaunay_triangulation(unique_points);\n\
+    \    for (auto [first, second] : triangulation.edges) {\n        int from = representatives[first];\n\
+    \        int to = representatives[second];\n        candidates.push_back(Edge{\n\
+    \            from,\n            to,\n            m1une::geometry::distance2(points[from],\
+    \ points[to]),\n        });\n    }\n    std::sort(\n        candidates.begin(),\n\
+    \        candidates.end(),\n        [](const Edge& left, const Edge& right) {\n\
+    \            if (left.squared_distance != right.squared_distance) {\n        \
+    \        return left.squared_distance < right.squared_distance;\n            }\n\
+    \            if (left.from != right.from) return left.from < right.from;\n   \
+    \         return left.to < right.to;\n        }\n    );\n\n    m1une::ds::Dsu\
+    \ dsu(int(points.size()));\n    std::vector<std::pair<int, int>> result;\n   \
+    \ for (const Edge& edge : candidates) {\n        if (dsu.same(edge.from, edge.to))\
+    \ continue;\n        dsu.merge(edge.from, edge.to);\n        result.emplace_back(edge.from,\
+    \ edge.to);\n    }\n    assert(points.empty() || result.size() + 1 == points.size());\n\
+    \    return result;\n}\n\n}  // namespace\n\nint main() {\n    m1une::utilities::FastInput\
     \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n\n    test_fixed();\n\
-    \    test_randomized();\n\n    int n;\n    fast_input >> n;\n    std::vector<Point>\
-    \ points;\n    points.reserve(n);\n    for (int i = 0; i < n; i++) {\n       \
-    \ long long x, y;\n        fast_input >> x >> y;\n        points.emplace_back(x,\
-    \ y);\n    }\n\n    auto mst = m1une::geometry::euclidean_mst(points);\n    for\
-    \ (const auto& edge : mst.edges) {\n        fast_output << edge.from << ' ' <<\
-    \ edge.to << '\\n';\n    }\n}\n"
+    \    test_randomized();\n\n    int size;\n    fast_input >> size;\n    std::vector<Point>\
+    \ points(size);\n    for (Point& point : points) fast_input >> point.x >> point.y;\n\
+    \    for (auto [from, to] : delaunay_mst(points)) {\n        fast_output << from\
+    \ << ' ' << to << '\\n';\n    }\n}\n"
   dependsOn:
+  - geometry/convex_hull.hpp
+  - geometry/point.hpp
+  - geometry/delaunay_triangulation.hpp
   - geometry/euclidean_mst.hpp
   - ds/dsu/dsu.hpp
-  - geometry/point.hpp
-  - utilities/fast_io.hpp
   - ds/dsu/dsu.hpp
+  - utilities/fast_io.hpp
   isVerificationFile: true
-  path: verify/geometry/euclidean_mst.test.cpp
+  path: verify/geometry/delaunay_triangulation.test.cpp
   requiredBy: []
   timestamp: '2026-07-22 14:57:12+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/geometry/euclidean_mst.test.cpp
+documentation_of: verify/geometry/delaunay_triangulation.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/geometry/euclidean_mst.test.cpp
-- /verify/verify/geometry/euclidean_mst.test.cpp.html
-title: verify/geometry/euclidean_mst.test.cpp
+- /verify/verify/geometry/delaunay_triangulation.test.cpp
+- /verify/verify/geometry/delaunay_triangulation.test.cpp.html
+title: verify/geometry/delaunay_triangulation.test.cpp
 ---

@@ -32,6 +32,9 @@ data:
     path: geometry/count_points_in_triangle.hpp
     title: Count Points in Triangle
   - icon: ':heavy_check_mark:'
+    path: geometry/delaunay_triangulation.hpp
+    title: Delaunay Triangulation
+  - icon: ':heavy_check_mark:'
     path: geometry/euclidean_mst.hpp
     title: Euclidean Minimum Spanning Tree
   - icon: ':heavy_check_mark:'
@@ -213,6 +216,7 @@ data:
   - geometry/convex_polygon.hpp
   - geometry/half_plane_intersection.hpp
   - geometry/count_points_in_triangle.hpp
+  - geometry/delaunay_triangulation.hpp
   - geometry/euclidean_mst.hpp
   - ds/dsu/dsu.hpp
   - geometry/farthest_pair.hpp
@@ -231,7 +235,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/geometry_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-22 14:17:27+09:00'
+  timestamp: '2026-07-22 14:57:12+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/geometry_algorithms.test.cpp
