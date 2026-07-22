@@ -14,11 +14,17 @@ data:
     path: geometry/closest_pair.hpp
     title: Closest Pair of Points
   - icon: ':heavy_check_mark:'
+    path: geometry/convex_decomposition.hpp
+    title: Convex Decomposition
+  - icon: ':heavy_check_mark:'
     path: geometry/convex_hull.hpp
     title: Convex Hull
   - icon: ':heavy_check_mark:'
     path: geometry/convex_layers.hpp
     title: Convex Layers
+  - icon: ':heavy_check_mark:'
+    path: geometry/convex_polygon.hpp
+    title: Convex Polygons
   - icon: ':heavy_check_mark:'
     path: geometry/count_points_in_triangle.hpp
     title: Count Points in Triangle
@@ -70,8 +76,20 @@ data:
   - icon: ':heavy_check_mark:'
     path: utilities/bigint.hpp
     title: BigInt
+  - icon: ':heavy_check_mark:'
+    path: utilities/detail/fixed_int.hpp
+    title: utilities/detail/fixed_int.hpp
+  - icon: ':heavy_check_mark:'
+    path: utilities/int256.hpp
+    title: Int256
+  - icon: ':heavy_check_mark:'
+    path: utilities/int512.hpp
+    title: Int512
   _extendedRequiredBy: []
   _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/centroid.test.cpp
+    title: verify/geometry/centroid.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/geometry_algorithms.test.cpp
     title: verify/geometry/geometry_algorithms.test.cpp
@@ -103,9 +121,13 @@ data:
 
     #include "closest_pair.hpp"
 
+    #include "convex_decomposition.hpp"
+
     #include "convex_hull.hpp"
 
     #include "convex_layers.hpp"
+
+    #include "convex_polygon.hpp"
 
     #include "count_points_in_triangle.hpp"
 
@@ -144,13 +166,19 @@ data:
   - geometry/ray.hpp
   - geometry/line.hpp
   - geometry/closest_pair.hpp
+  - geometry/convex_decomposition.hpp
+  - utilities/int256.hpp
+  - utilities/detail/fixed_int.hpp
+  - utilities/int512.hpp
+  - geometry/polygon.hpp
   - geometry/convex_hull.hpp
   - geometry/convex_layers.hpp
+  - geometry/convex_polygon.hpp
+  - geometry/half_plane_intersection.hpp
   - geometry/count_points_in_triangle.hpp
   - geometry/euclidean_mst.hpp
   - ds/dsu/dsu.hpp
   - geometry/farthest_pair.hpp
-  - geometry/half_plane_intersection.hpp
   - geometry/lattice_point_count.hpp
   - utilities/bigint.hpp
   - math/fps/convolution.hpp
@@ -159,15 +187,15 @@ data:
   - geometry/manhattan_mst.hpp
   - geometry/minimum_enclosing_circle.hpp
   - geometry/perpendicular_bisector.hpp
-  - geometry/polygon.hpp
   - geometry/rectangle_union_area.hpp
   isVerificationFile: false
   path: geometry/all.hpp
   requiredBy: []
-  timestamp: '2026-07-22 00:39:59+09:00'
+  timestamp: '2026-07-22 09:31:46+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp
+  - verify/geometry/centroid.test.cpp
 documentation_of: geometry/all.hpp
 layout: document
 title: Geometry Bundle
@@ -182,10 +210,12 @@ title: Geometry Bundle
 | Header | Contents |
 | --- | --- |
 | `geometry/angle_sort.hpp` | Atan-free counterclockwise angle sorting around an arbitrary origin. |
-| `geometry/point.hpp` | Points, vectors, dot/cross products, exact orientation, distance, and rotation. |
+| `geometry/point.hpp` | Points, vectors, dot/cross products, exact orientation, distance, centroid, and rotation. |
 | `geometry/closest_pair.hpp` | Euclidean closest pair with original indices in $O(N\log N)$. |
+| `geometry/convex_decomposition.hpp` | Hertel--Mehlhorn approximate and Keil--Snoeyink minimum convex decompositions of a simple polygon. |
 | `geometry/convex_hull.hpp` | Monotone-chain convex hull with optional boundary-collinear points. |
 | `geometry/convex_layers.hpp` | Onion decomposition into successive convex-hull boundaries in $O(N\log^2 N)$. |
+| `geometry/convex_polygon.hpp` | Normalized convex-polygon queries, centroid, cuts, diameter, intersections, distance, triangulation, and Minkowski sums. |
 | `geometry/count_points_in_triangle.hpp` | Preprocessed strict point counts for indexed triangle queries in $O(1)$ per query. |
 | `geometry/euclidean_mst.hpp` | Euclidean minimum spanning tree for integral points in $O(N\log N)$. |
 | `geometry/farthest_pair.hpp` | Euclidean farthest pair with original indices in $O(N\log N)$. |
@@ -193,12 +223,53 @@ title: Geometry Bundle
 | `geometry/lattice_point_count.hpp` | Exact lattice-point counting in a bounded intersection of integer linear inequalities. |
 | `geometry/manhattan_mst.hpp` | Manhattan minimum spanning tree for integral points in $O(N\log N)$. |
 | `geometry/minimum_enclosing_circle.hpp` | Randomized linear-time minimum enclosing circle with support indices. |
-| `geometry/line.hpp` | Lines, segments, projection, intersection, and distances. |
+| `geometry/line.hpp` | Lines, segments, segment centroid, projection, intersection, and distances. |
 | `geometry/perpendicular_bisector.hpp` | Floating-point and lattice-point perpendicular bisectors of two distinct points. |
 | `geometry/ray.hpp` | Rays, containment, projection, intersections, and distances with other linear objects. |
 | `geometry/rectangle_union_area.hpp` | Exact union area of axis-aligned rectangles in $O(N\log N)$. |
-| `geometry/polygon.hpp` | Area, centroids, triangulation, containment, ray queries, intersection, clipping, and Minkowski sums. |
-| `geometry/circle.hpp` | Circle relations, line/ray intersections, and ray reflection. |
+| `geometry/polygon.hpp` | General polygon area, centroids, triangulation, containment, ray queries, intersection, and distance. |
+| `geometry/circle.hpp` | Circle centroid, relations, line/ray intersections, and ray reflection. |
 
 Integral predicates promote to signed 128-bit arithmetic. Constructions that
 may be non-integral return `Point<long double>`.
+
+## Centroid overloads
+
+The bounded geometry types share the free function name `centroid`:
+
+```cpp
+template <Coordinate T>
+Point<long double> centroid(const Point<T>& point);
+
+template <Coordinate T>
+Point<long double> centroid(const Segment<T>& segment);
+
+template <Coordinate T>
+Point<long double> centroid(
+    const std::array<Point<T>, 3>& triangle
+);
+
+template <Coordinate T>
+Point<long double> centroid(const Circle<T>& circle);
+
+template <Coordinate T>
+std::optional<Point<long double>> centroid(
+    const std::vector<Point<T>>& polygon,
+    long double eps = 1e-12L
+);
+
+template <Coordinate T>
+std::optional<Point<long double>> centroid(
+    const ConvexPolygon<T>& polygon,
+    long double eps = 1e-12L
+);
+```
+
+Point, segment, triangle, and circle centroids take $O(1)$ time. Polygon
+centroids take $O(N)$ and use uniform filled-area density. The vector overload
+accepts any simple polygon, including concave and clockwise boundaries. It
+returns `nullopt` for zero signed area; the convex query-object overload has
+the same behavior for empty, point, or segment objects.
+
+Infinite lines and rays are unbounded, so they intentionally have no centroid
+overload.

@@ -13,6 +13,9 @@ data:
     title: Geometry Bundle
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/centroid.test.cpp
+    title: verify/geometry/centroid.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/euclidean_mst.test.cpp
     title: verify/geometry/euclidean_mst.test.cpp
   - icon: ':heavy_check_mark:'
@@ -81,14 +84,16 @@ data:
     \ Point&, const Point&) = default;\n\n    friend constexpr bool operator<(const\
     \ Point& left, const Point& right) {\n        if (left.x != right.x) return left.x\
     \ < right.x;\n        return left.y < right.y;\n    }\n};\n\ntemplate <Coordinate\
-    \ T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(const\
+    \ T>\nconstexpr Point<long double> centroid(const Point<T>& point) {\n    return\
+    \ Point<long double>(point);\n}\n\ntemplate <Coordinate T, typename Scalar>\n\
+    requires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(const Point<T>&\
+    \ point, Scalar scalar) {\n    using Result = std::common_type_t<T, Scalar>;\n\
+    \    return Point<Result>(\n        Result(point.x) * Result(scalar),\n      \
+    \  Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate <typename Scalar, Coordinate\
+    \ T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(Scalar scalar,\
+    \ const Point<T>& point) {\n    return point * scalar;\n}\n\ntemplate <Coordinate\
+    \ T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator/(const\
     \ Point<T>& point, Scalar scalar) {\n    using Result = std::common_type_t<T,\
-    \ Scalar>;\n    return Point<Result>(\n        Result(point.x) * Result(scalar),\n\
-    \        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate <typename Scalar,\
-    \ Coordinate T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(Scalar\
-    \ scalar, const Point<T>& point) {\n    return point * scalar;\n}\n\ntemplate\
-    \ <Coordinate T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr\
-    \ auto operator/(const Point<T>& point, Scalar scalar) {\n    using Result = std::common_type_t<T,\
     \ Scalar>;\n    return Point<Result>(\n        Result(point.x) / Result(scalar),\n\
     \        Result(point.y) / Result(scalar)\n    );\n}\n\ntemplate <Coordinate T>\n\
     constexpr wide_type<T> dot(const Point<T>& a, const Point<T>& b) {\n    using\
@@ -530,11 +535,12 @@ data:
   path: geometry/euclidean_mst.hpp
   requiredBy:
   - geometry/all.hpp
-  timestamp: '2026-07-14 00:51:53+09:00'
+  timestamp: '2026-07-22 02:25:12+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/euclidean_mst.test.cpp
+  - verify/geometry/centroid.test.cpp
 documentation_of: geometry/euclidean_mst.hpp
 layout: document
 title: Euclidean Minimum Spanning Tree

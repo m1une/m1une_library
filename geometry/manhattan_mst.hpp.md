@@ -13,6 +13,9 @@ data:
     title: Geometry Bundle
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/centroid.test.cpp
+    title: verify/geometry/centroid.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/geometry_algorithms.test.cpp
     title: verify/geometry/geometry_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
@@ -80,84 +83,86 @@ data:
     \ constexpr bool operator==(const Point&, const Point&) = default;\n\n    friend\
     \ constexpr bool operator<(const Point& left, const Point& right) {\n        if\
     \ (left.x != right.x) return left.x < right.x;\n        return left.y < right.y;\n\
-    \    }\n};\n\ntemplate <Coordinate T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\n\
-    constexpr auto operator*(const Point<T>& point, Scalar scalar) {\n    using Result\
-    \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
-    \ * Result(scalar),\n        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate\
-    \ <typename Scalar, Coordinate T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr\
-    \ auto operator*(Scalar scalar, const Point<T>& point) {\n    return point * scalar;\n\
-    }\n\ntemplate <Coordinate T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\n\
-    constexpr auto operator/(const Point<T>& point, Scalar scalar) {\n    using Result\
-    \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
-    \ / Result(scalar),\n        Result(point.y) / Result(scalar)\n    );\n}\n\ntemplate\
-    \ <Coordinate T>\nconstexpr wide_type<T> dot(const Point<T>& a, const Point<T>&\
-    \ b) {\n    using W = wide_type<T>;\n    return W(a.x) * W(b.x) + W(a.y) * W(b.y);\n\
-    }\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> cross(const Point<T>& a,\
-    \ const Point<T>& b) {\n    using W = wide_type<T>;\n    return W(a.x) * W(b.y)\
-    \ - W(a.y) * W(b.x);\n}\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> cross(\n\
-    \    const Point<T>& origin,\n    const Point<T>& a,\n    const Point<T>& b\n\
-    ) {\n    using W = wide_type<T>;\n    W ax = W(a.x) - W(origin.x);\n    W ay =\
-    \ W(a.y) - W(origin.y);\n    W bx = W(b.x) - W(origin.x);\n    W by = W(b.y) -\
-    \ W(origin.y);\n    return ax * by - ay * bx;\n}\n\ntemplate <Coordinate T>\n\
-    constexpr wide_type<T> norm2(const Point<T>& point) {\n    return dot(point, point);\n\
-    }\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> distance2(const Point<T>&\
-    \ a, const Point<T>& b) {\n    using W = wide_type<T>;\n    W dx = W(a.x) - W(b.x);\n\
-    \    W dy = W(a.y) - W(b.y);\n    return dx * dx + dy * dy;\n}\n\ntemplate <Coordinate\
-    \ T>\nlong double norm(const Point<T>& point) {\n    return std::hypot(\n    \
-    \    static_cast<long double>(point.x),\n        static_cast<long double>(point.y)\n\
-    \    );\n}\n\ntemplate <Coordinate T>\nlong double distance(const Point<T>& a,\
-    \ const Point<T>& b) {\n    return std::hypot(\n        static_cast<long double>(a.x)\
-    \ - static_cast<long double>(b.x),\n        static_cast<long double>(a.y) - static_cast<long\
-    \ double>(b.y)\n    );\n}\n\ntemplate <Coordinate T, typename M, typename N>\n\
-    requires std::is_arithmetic_v<M> && std::is_arithmetic_v<N>\nconstexpr Point<long\
-    \ double> internal_division_point(\n    const Point<T>& a,\n    const Point<T>&\
-    \ b,\n    M m,\n    N n\n) {\n    long double first_ratio = static_cast<long double>(m);\n\
-    \    long double second_ratio = static_cast<long double>(n);\n    long double\
-    \ denominator = first_ratio + second_ratio;\n    assert(denominator != 0);\n \
-    \   Point<long double> first(a);\n    Point<long double> direction = Point<long\
-    \ double>(b) - first;\n    return first + direction * (first_ratio / denominator);\n\
-    }\n\ntemplate <Coordinate T, typename M, typename N>\nrequires std::is_arithmetic_v<M>\
-    \ && std::is_arithmetic_v<N>\nconstexpr Point<long double> external_division_point(\n\
+    \    }\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const\
+    \ Point<T>& point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate\
+    \ T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(const\
+    \ Point<T>& point, Scalar scalar) {\n    using Result = std::common_type_t<T,\
+    \ Scalar>;\n    return Point<Result>(\n        Result(point.x) * Result(scalar),\n\
+    \        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate <typename Scalar,\
+    \ Coordinate T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(Scalar\
+    \ scalar, const Point<T>& point) {\n    return point * scalar;\n}\n\ntemplate\
+    \ <Coordinate T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr\
+    \ auto operator/(const Point<T>& point, Scalar scalar) {\n    using Result = std::common_type_t<T,\
+    \ Scalar>;\n    return Point<Result>(\n        Result(point.x) / Result(scalar),\n\
+    \        Result(point.y) / Result(scalar)\n    );\n}\n\ntemplate <Coordinate T>\n\
+    constexpr wide_type<T> dot(const Point<T>& a, const Point<T>& b) {\n    using\
+    \ W = wide_type<T>;\n    return W(a.x) * W(b.x) + W(a.y) * W(b.y);\n}\n\ntemplate\
+    \ <Coordinate T>\nconstexpr wide_type<T> cross(const Point<T>& a, const Point<T>&\
+    \ b) {\n    using W = wide_type<T>;\n    return W(a.x) * W(b.y) - W(a.y) * W(b.x);\n\
+    }\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> cross(\n    const Point<T>&\
+    \ origin,\n    const Point<T>& a,\n    const Point<T>& b\n) {\n    using W = wide_type<T>;\n\
+    \    W ax = W(a.x) - W(origin.x);\n    W ay = W(a.y) - W(origin.y);\n    W bx\
+    \ = W(b.x) - W(origin.x);\n    W by = W(b.y) - W(origin.y);\n    return ax * by\
+    \ - ay * bx;\n}\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> norm2(const\
+    \ Point<T>& point) {\n    return dot(point, point);\n}\n\ntemplate <Coordinate\
+    \ T>\nconstexpr wide_type<T> distance2(const Point<T>& a, const Point<T>& b) {\n\
+    \    using W = wide_type<T>;\n    W dx = W(a.x) - W(b.x);\n    W dy = W(a.y) -\
+    \ W(b.y);\n    return dx * dx + dy * dy;\n}\n\ntemplate <Coordinate T>\nlong double\
+    \ norm(const Point<T>& point) {\n    return std::hypot(\n        static_cast<long\
+    \ double>(point.x),\n        static_cast<long double>(point.y)\n    );\n}\n\n\
+    template <Coordinate T>\nlong double distance(const Point<T>& a, const Point<T>&\
+    \ b) {\n    return std::hypot(\n        static_cast<long double>(a.x) - static_cast<long\
+    \ double>(b.x),\n        static_cast<long double>(a.y) - static_cast<long double>(b.y)\n\
+    \    );\n}\n\ntemplate <Coordinate T, typename M, typename N>\nrequires std::is_arithmetic_v<M>\
+    \ && std::is_arithmetic_v<N>\nconstexpr Point<long double> internal_division_point(\n\
     \    const Point<T>& a,\n    const Point<T>& b,\n    M m,\n    N n\n) {\n    long\
     \ double first_ratio = static_cast<long double>(m);\n    long double second_ratio\
-    \ = static_cast<long double>(n);\n    long double denominator = first_ratio -\
+    \ = static_cast<long double>(n);\n    long double denominator = first_ratio +\
     \ second_ratio;\n    assert(denominator != 0);\n    Point<long double> first(a);\n\
     \    Point<long double> direction = Point<long double>(b) - first;\n    return\
     \ first + direction * (first_ratio / denominator);\n}\n\ntemplate <Coordinate\
-    \ T>\nconstexpr int sign(wide_type<T> value, long double eps = 1e-12L) {\n   \
-    \ if constexpr (std::integral<T>) {\n        return (value > 0) - (value < 0);\n\
-    \    } else {\n        return (value > eps) - (value < -eps);\n    }\n}\n\ntemplate\
-    \ <Coordinate T>\nconstexpr int orientation(\n    const Point<T>& a,\n    const\
-    \ Point<T>& b,\n    const Point<T>& c,\n    long double eps = 1e-12L\n) {\n  \
-    \  return sign<T>(cross(a, b, c), eps);\n}\n\ntemplate <Coordinate T>\nconstexpr\
-    \ bool collinear(\n    const Point<T>& a,\n    const Point<T>& b,\n    const Point<T>&\
-    \ c,\n    long double eps = 1e-12L\n) {\n    return orientation(a, b, c, eps)\
-    \ == 0;\n}\n\ntemplate <Coordinate T>\nPoint<long double> rotate(const Point<T>&\
-    \ point, long double angle) {\n    long double cosine = std::cos(angle);\n   \
-    \ long double sine = std::sin(angle);\n    return Point<long double>(\n      \
-    \  static_cast<long double>(point.x) * cosine -\n            static_cast<long\
-    \ double>(point.y) * sine,\n        static_cast<long double>(point.x) * sine +\n\
-    \            static_cast<long double>(point.y) * cosine\n    );\n}\n\ntemplate\
-    \ <Coordinate T>\nPoint<long double> normalized(const Point<T>& point) {\n   \
-    \ long double length = norm(point);\n    assert(length != 0);\n    return Point<long\
-    \ double>(\n        static_cast<long double>(point.x) / length,\n        static_cast<long\
-    \ double>(point.y) / length\n    );\n}\n\n}  // namespace geometry\n}  // namespace\
-    \ m1une\n\n\n#line 15 \"geometry/manhattan_mst.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ geometry {\n\ntemplate <class T>\nstruct ManhattanMstEdge {\n    int from;\n\
-    \    int to;\n    T cost;\n};\n\ntemplate <class T>\nstruct ManhattanMst {\n \
-    \   T cost;\n    std::vector<ManhattanMstEdge<T>> edges;\n};\n\n// Returns O(n)\
-    \ edges containing a Manhattan minimum spanning tree.\ntemplate <std::integral\
-    \ T>\nstd::vector<ManhattanMstEdge<wide_type<T>>> manhattan_mst_edges(const std::vector<Point<T>>&\
-    \ points) {\n    using W = wide_type<T>;\n    assert(points.size() <= std::size_t(std::numeric_limits<int>::max()));\n\
-    \    int n = int(points.size());\n    std::vector<Point<W>> transformed;\n   \
-    \ transformed.reserve(points.size());\n    for (const auto& point : points) {\n\
-    \        transformed.emplace_back(W(point.x), W(point.y));\n    }\n\n    std::vector<int>\
-    \ order(n);\n    std::iota(order.begin(), order.end(), 0);\n    std::vector<ManhattanMstEdge<W>>\
-    \ edges;\n    edges.reserve(std::size_t(4) * points.size());\n\n    for (int direction\
-    \ = 0; direction < 4; direction++) {\n        std::sort(order.begin(), order.end(),\
-    \ [&transformed](int i, int j) {\n            W first = transformed[i].x + transformed[i].y;\n\
-    \            W second = transformed[j].x + transformed[j].y;\n            if (first\
-    \ != second) return first < second;\n            if (transformed[i].x != transformed[j].x)\
+    \ T, typename M, typename N>\nrequires std::is_arithmetic_v<M> && std::is_arithmetic_v<N>\n\
+    constexpr Point<long double> external_division_point(\n    const Point<T>& a,\n\
+    \    const Point<T>& b,\n    M m,\n    N n\n) {\n    long double first_ratio =\
+    \ static_cast<long double>(m);\n    long double second_ratio = static_cast<long\
+    \ double>(n);\n    long double denominator = first_ratio - second_ratio;\n   \
+    \ assert(denominator != 0);\n    Point<long double> first(a);\n    Point<long\
+    \ double> direction = Point<long double>(b) - first;\n    return first + direction\
+    \ * (first_ratio / denominator);\n}\n\ntemplate <Coordinate T>\nconstexpr int\
+    \ sign(wide_type<T> value, long double eps = 1e-12L) {\n    if constexpr (std::integral<T>)\
+    \ {\n        return (value > 0) - (value < 0);\n    } else {\n        return (value\
+    \ > eps) - (value < -eps);\n    }\n}\n\ntemplate <Coordinate T>\nconstexpr int\
+    \ orientation(\n    const Point<T>& a,\n    const Point<T>& b,\n    const Point<T>&\
+    \ c,\n    long double eps = 1e-12L\n) {\n    return sign<T>(cross(a, b, c), eps);\n\
+    }\n\ntemplate <Coordinate T>\nconstexpr bool collinear(\n    const Point<T>& a,\n\
+    \    const Point<T>& b,\n    const Point<T>& c,\n    long double eps = 1e-12L\n\
+    ) {\n    return orientation(a, b, c, eps) == 0;\n}\n\ntemplate <Coordinate T>\n\
+    Point<long double> rotate(const Point<T>& point, long double angle) {\n    long\
+    \ double cosine = std::cos(angle);\n    long double sine = std::sin(angle);\n\
+    \    return Point<long double>(\n        static_cast<long double>(point.x) * cosine\
+    \ -\n            static_cast<long double>(point.y) * sine,\n        static_cast<long\
+    \ double>(point.x) * sine +\n            static_cast<long double>(point.y) * cosine\n\
+    \    );\n}\n\ntemplate <Coordinate T>\nPoint<long double> normalized(const Point<T>&\
+    \ point) {\n    long double length = norm(point);\n    assert(length != 0);\n\
+    \    return Point<long double>(\n        static_cast<long double>(point.x) / length,\n\
+    \        static_cast<long double>(point.y) / length\n    );\n}\n\n}  // namespace\
+    \ geometry\n}  // namespace m1une\n\n\n#line 15 \"geometry/manhattan_mst.hpp\"\
+    \n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <class T>\nstruct ManhattanMstEdge\
+    \ {\n    int from;\n    int to;\n    T cost;\n};\n\ntemplate <class T>\nstruct\
+    \ ManhattanMst {\n    T cost;\n    std::vector<ManhattanMstEdge<T>> edges;\n};\n\
+    \n// Returns O(n) edges containing a Manhattan minimum spanning tree.\ntemplate\
+    \ <std::integral T>\nstd::vector<ManhattanMstEdge<wide_type<T>>> manhattan_mst_edges(const\
+    \ std::vector<Point<T>>& points) {\n    using W = wide_type<T>;\n    assert(points.size()\
+    \ <= std::size_t(std::numeric_limits<int>::max()));\n    int n = int(points.size());\n\
+    \    std::vector<Point<W>> transformed;\n    transformed.reserve(points.size());\n\
+    \    for (const auto& point : points) {\n        transformed.emplace_back(W(point.x),\
+    \ W(point.y));\n    }\n\n    std::vector<int> order(n);\n    std::iota(order.begin(),\
+    \ order.end(), 0);\n    std::vector<ManhattanMstEdge<W>> edges;\n    edges.reserve(std::size_t(4)\
+    \ * points.size());\n\n    for (int direction = 0; direction < 4; direction++)\
+    \ {\n        std::sort(order.begin(), order.end(), [&transformed](int i, int j)\
+    \ {\n            W first = transformed[i].x + transformed[i].y;\n            W\
+    \ second = transformed[j].x + transformed[j].y;\n            if (first != second)\
+    \ return first < second;\n            if (transformed[i].x != transformed[j].x)\
     \ {\n                return transformed[i].x < transformed[j].x;\n           \
     \ }\n            return i < j;\n        });\n\n        std::map<W, int> sweep;\n\
     \        for (int i : order) {\n            auto it = sweep.lower_bound(-transformed[i].y);\n\
@@ -236,10 +241,11 @@ data:
   path: geometry/manhattan_mst.hpp
   requiredBy:
   - geometry/all.hpp
-  timestamp: '2026-07-13 06:09:24+09:00'
+  timestamp: '2026-07-22 02:25:12+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp
+  - verify/geometry/centroid.test.cpp
   - verify/geometry/manhattan_mst.test.cpp
 documentation_of: geometry/manhattan_mst.hpp
 layout: document

@@ -45,14 +45,16 @@ data:
     \ Point&, const Point&) = default;\n\n    friend constexpr bool operator<(const\
     \ Point& left, const Point& right) {\n        if (left.x != right.x) return left.x\
     \ < right.x;\n        return left.y < right.y;\n    }\n};\n\ntemplate <Coordinate\
-    \ T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(const\
+    \ T>\nconstexpr Point<long double> centroid(const Point<T>& point) {\n    return\
+    \ Point<long double>(point);\n}\n\ntemplate <Coordinate T, typename Scalar>\n\
+    requires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(const Point<T>&\
+    \ point, Scalar scalar) {\n    using Result = std::common_type_t<T, Scalar>;\n\
+    \    return Point<Result>(\n        Result(point.x) * Result(scalar),\n      \
+    \  Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate <typename Scalar, Coordinate\
+    \ T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(Scalar scalar,\
+    \ const Point<T>& point) {\n    return point * scalar;\n}\n\ntemplate <Coordinate\
+    \ T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator/(const\
     \ Point<T>& point, Scalar scalar) {\n    using Result = std::common_type_t<T,\
-    \ Scalar>;\n    return Point<Result>(\n        Result(point.x) * Result(scalar),\n\
-    \        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate <typename Scalar,\
-    \ Coordinate T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(Scalar\
-    \ scalar, const Point<T>& point) {\n    return point * scalar;\n}\n\ntemplate\
-    \ <Coordinate T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr\
-    \ auto operator/(const Point<T>& point, Scalar scalar) {\n    using Result = std::common_type_t<T,\
     \ Scalar>;\n    return Point<Result>(\n        Result(point.x) / Result(scalar),\n\
     \        Result(point.y) / Result(scalar)\n    );\n}\n\ntemplate <Coordinate T>\n\
     constexpr wide_type<T> dot(const Point<T>& a, const Point<T>& b) {\n    using\
@@ -109,37 +111,42 @@ data:
     \ geometry\n}  // namespace m1une\n\n\n#line 10 \"geometry/line.hpp\"\n\nnamespace\
     \ m1une {\nnamespace geometry {\n\ntemplate <Coordinate T>\nstruct Line {\n  \
     \  Point<T> a;\n    Point<T> b;\n};\n\ntemplate <Coordinate T>\nstruct Segment\
-    \ {\n    Point<T> a;\n    Point<T> b;\n};\n\ntemplate <Coordinate T>\nbool on_line(\n\
-    \    const Line<T>& line,\n    const Point<T>& point,\n    long double eps = 1e-12L\n\
-    ) {\n    assert(line.a != line.b);\n    return orientation(line.a, line.b, point,\
-    \ eps) == 0;\n}\n\ntemplate <Coordinate T>\nbool parallel(const Line<T>& first,\
-    \ const Line<T>& second, long double eps = 1e-12L) {\n    using W = wide_type<T>;\n\
-    \    W first_x = W(first.b.x) - W(first.a.x);\n    W first_y = W(first.b.y) -\
-    \ W(first.a.y);\n    W second_x = W(second.b.x) - W(second.a.x);\n    W second_y\
-    \ = W(second.b.y) - W(second.a.y);\n    return sign<T>(first_x * second_y - first_y\
-    \ * second_x, eps) == 0;\n}\n\ntemplate <Coordinate T>\nbool orthogonal(const\
+    \ {\n    Point<T> a;\n    Point<T> b;\n};\n\ntemplate <Coordinate T>\nconstexpr\
+    \ Point<long double> centroid(const Segment<T>& segment) {\n    return Point<long\
+    \ double>(\n        (\n            static_cast<long double>(segment.a.x) +\n \
+    \           static_cast<long double>(segment.b.x)\n        ) / 2,\n        (\n\
+    \            static_cast<long double>(segment.a.y) +\n            static_cast<long\
+    \ double>(segment.b.y)\n        ) / 2\n    );\n}\n\ntemplate <Coordinate T>\n\
+    bool on_line(\n    const Line<T>& line,\n    const Point<T>& point,\n    long\
+    \ double eps = 1e-12L\n) {\n    assert(line.a != line.b);\n    return orientation(line.a,\
+    \ line.b, point, eps) == 0;\n}\n\ntemplate <Coordinate T>\nbool parallel(const\
     \ Line<T>& first, const Line<T>& second, long double eps = 1e-12L) {\n    using\
     \ W = wide_type<T>;\n    W first_x = W(first.b.x) - W(first.a.x);\n    W first_y\
     \ = W(first.b.y) - W(first.a.y);\n    W second_x = W(second.b.x) - W(second.a.x);\n\
     \    W second_y = W(second.b.y) - W(second.a.y);\n    return sign<T>(first_x *\
-    \ second_x + first_y * second_y, eps) == 0;\n}\n\ntemplate <Coordinate T>\nPoint<long\
-    \ double> projection(const Line<T>& line, const Point<T>& point) {\n    assert(line.a\
-    \ != line.b);\n    Point<long double> a(line.a);\n    Point<long double> direction(\n\
-    \        static_cast<long double>(line.b.x) - static_cast<long double>(line.a.x),\n\
-    \        static_cast<long double>(line.b.y) - static_cast<long double>(line.a.y)\n\
-    \    );\n    Point<long double> offset(\n        static_cast<long double>(point.x)\
-    \ - a.x,\n        static_cast<long double>(point.y) - a.y\n    );\n    long double\
-    \ ratio = dot(offset, direction) / dot(direction, direction);\n    return a +\
-    \ direction * ratio;\n}\n\ntemplate <Coordinate T>\nPoint<long double> reflection(const\
-    \ Line<T>& line, const Point<T>& point) {\n    Point<long double> projected =\
-    \ projection(line, point);\n    return projected * 2.0L - Point<long double>(point);\n\
-    }\n\ntemplate <Coordinate T>\nlong double distance(const Line<T>& line, const\
-    \ Point<T>& point) {\n    assert(line.a != line.b);\n    Point<long double> direction(\n\
-    \        static_cast<long double>(line.b.x) - static_cast<long double>(line.a.x),\n\
-    \        static_cast<long double>(line.b.y) - static_cast<long double>(line.a.y)\n\
-    \    );\n    Point<long double> offset(\n        static_cast<long double>(point.x)\
-    \ - static_cast<long double>(line.a.x),\n        static_cast<long double>(point.y)\
-    \ - static_cast<long double>(line.a.y)\n    );\n    return std::fabs(cross(direction,\
+    \ second_y - first_y * second_x, eps) == 0;\n}\n\ntemplate <Coordinate T>\nbool\
+    \ orthogonal(const Line<T>& first, const Line<T>& second, long double eps = 1e-12L)\
+    \ {\n    using W = wide_type<T>;\n    W first_x = W(first.b.x) - W(first.a.x);\n\
+    \    W first_y = W(first.b.y) - W(first.a.y);\n    W second_x = W(second.b.x)\
+    \ - W(second.a.x);\n    W second_y = W(second.b.y) - W(second.a.y);\n    return\
+    \ sign<T>(first_x * second_x + first_y * second_y, eps) == 0;\n}\n\ntemplate <Coordinate\
+    \ T>\nPoint<long double> projection(const Line<T>& line, const Point<T>& point)\
+    \ {\n    assert(line.a != line.b);\n    Point<long double> a(line.a);\n    Point<long\
+    \ double> direction(\n        static_cast<long double>(line.b.x) - static_cast<long\
+    \ double>(line.a.x),\n        static_cast<long double>(line.b.y) - static_cast<long\
+    \ double>(line.a.y)\n    );\n    Point<long double> offset(\n        static_cast<long\
+    \ double>(point.x) - a.x,\n        static_cast<long double>(point.y) - a.y\n \
+    \   );\n    long double ratio = dot(offset, direction) / dot(direction, direction);\n\
+    \    return a + direction * ratio;\n}\n\ntemplate <Coordinate T>\nPoint<long double>\
+    \ reflection(const Line<T>& line, const Point<T>& point) {\n    Point<long double>\
+    \ projected = projection(line, point);\n    return projected * 2.0L - Point<long\
+    \ double>(point);\n}\n\ntemplate <Coordinate T>\nlong double distance(const Line<T>&\
+    \ line, const Point<T>& point) {\n    assert(line.a != line.b);\n    Point<long\
+    \ double> direction(\n        static_cast<long double>(line.b.x) - static_cast<long\
+    \ double>(line.a.x),\n        static_cast<long double>(line.b.y) - static_cast<long\
+    \ double>(line.a.y)\n    );\n    Point<long double> offset(\n        static_cast<long\
+    \ double>(point.x) - static_cast<long double>(line.a.x),\n        static_cast<long\
+    \ double>(point.y) - static_cast<long double>(line.a.y)\n    );\n    return std::fabs(cross(direction,\
     \ offset)) / norm(direction);\n}\n\ntemplate <Coordinate T>\nlong double distance(const\
     \ Point<T>& point, const Line<T>& line) {\n    return distance(line, point);\n\
     }\n\ntemplate <Coordinate T>\nbool intersects(\n    const Line<T>& first,\n  \
@@ -474,7 +481,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/projection.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-07-22 02:25:12+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/projection.test.cpp

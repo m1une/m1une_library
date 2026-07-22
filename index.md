@@ -513,11 +513,17 @@ data:
       path: geometry/closest_pair.hpp
       title: Closest Pair of Points
     - icon: ':heavy_check_mark:'
+      path: geometry/convex_decomposition.hpp
+      title: Convex Decomposition
+    - icon: ':heavy_check_mark:'
       path: geometry/convex_hull.hpp
       title: Convex Hull
     - icon: ':heavy_check_mark:'
       path: geometry/convex_layers.hpp
       title: Convex Layers
+    - icon: ':heavy_check_mark:'
+      path: geometry/convex_polygon.hpp
+      title: Convex Polygons
     - icon: ':heavy_check_mark:'
       path: geometry/count_points_in_triangle.hpp
       title: Count Points in Triangle
@@ -1206,8 +1212,17 @@ data:
       path: utilities/grid_transform.hpp
       title: Grid Transform
     - icon: ':heavy_check_mark:'
+      path: utilities/int1024.hpp
+      title: Int1024
+    - icon: ':heavy_check_mark:'
       path: utilities/int128.hpp
       title: Int128
+    - icon: ':heavy_check_mark:'
+      path: utilities/int256.hpp
+      title: Int256
+    - icon: ':heavy_check_mark:'
+      path: utilities/int512.hpp
+      title: Int512
     - icon: ':heavy_check_mark:'
       path: utilities/parser.hpp
       title: Parser
@@ -1226,6 +1241,11 @@ data:
     - icon: ':heavy_check_mark:'
       path: utilities/y_combinator.hpp
       title: Y Combinator
+  - name: utilities/detail
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: utilities/detail/fixed_int.hpp
+      title: utilities/detail/fixed_int.hpp
   verificationCategories:
   - name: verify/algo/dp
     pages:
@@ -1610,6 +1630,9 @@ data:
       path: verify/geometry/angle_sort.test.cpp
       title: verify/geometry/angle_sort.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/geometry/centroid.test.cpp
+      title: verify/geometry/centroid.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/geometry/circle_line_intersection.test.cpp
       title: verify/geometry/circle_line_intersection.test.cpp
     - icon: ':heavy_check_mark:'
@@ -1619,11 +1642,20 @@ data:
       path: verify/geometry/closest_pair.test.cpp
       title: verify/geometry/closest_pair.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/geometry/convex_decomposition.test.cpp
+      title: verify/geometry/convex_decomposition.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/geometry/convex_diameter.test.cpp
+      title: verify/geometry/convex_diameter.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/geometry/convex_hull.test.cpp
       title: verify/geometry/convex_hull.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/geometry/convex_layers.test.cpp
       title: verify/geometry/convex_layers.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/geometry/convex_polygon.test.cpp
+      title: verify/geometry/convex_polygon.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/geometry/count_points_in_triangle.test.cpp
       title: verify/geometry/count_points_in_triangle.test.cpp
@@ -1642,6 +1674,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/geometry/half_plane_intersection_random.test.cpp
       title: verify/geometry/half_plane_intersection_random.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/geometry/is_convex_polygon.test.cpp
+      title: verify/geometry/is_convex_polygon.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/geometry/lattice_point_count.test.cpp
       title: verify/geometry/lattice_point_count.test.cpp
@@ -2264,6 +2299,15 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/utilities/grid_transform.test.cpp
       title: verify/utilities/grid_transform.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/utilities/int1024.test.cpp
+      title: verify/utilities/int1024.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/utilities/int256.test.cpp
+      title: verify/utilities/int256.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/utilities/int512.test.cpp
+      title: verify/utilities/int512.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/utilities/parser.test.cpp
       title: verify/utilities/parser.test.cpp

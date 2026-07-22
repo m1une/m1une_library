@@ -19,6 +19,9 @@ data:
     title: Lattice-Point Count
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/centroid.test.cpp
+    title: verify/geometry/centroid.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/geometry_algorithms.test.cpp
     title: verify/geometry/geometry_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1943,6 +1946,7 @@ data:
   - verify/utilities/basic_utilities.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/lattice_point_count.test.cpp
+  - verify/geometry/centroid.test.cpp
 documentation_of: utilities/bigint.hpp
 layout: document
 title: BigInt

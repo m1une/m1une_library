@@ -10,6 +10,9 @@ data:
     title: Geometry Bundle
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/centroid.test.cpp
+    title: verify/geometry/centroid.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/convex_layers.test.cpp
     title: verify/geometry/convex_layers.test.cpp
   - icon: ':heavy_check_mark:'
@@ -42,90 +45,91 @@ data:
     \ constexpr bool operator==(const Point&, const Point&) = default;\n\n    friend\
     \ constexpr bool operator<(const Point& left, const Point& right) {\n        if\
     \ (left.x != right.x) return left.x < right.x;\n        return left.y < right.y;\n\
-    \    }\n};\n\ntemplate <Coordinate T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\n\
-    constexpr auto operator*(const Point<T>& point, Scalar scalar) {\n    using Result\
-    \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
-    \ * Result(scalar),\n        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate\
-    \ <typename Scalar, Coordinate T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr\
-    \ auto operator*(Scalar scalar, const Point<T>& point) {\n    return point * scalar;\n\
-    }\n\ntemplate <Coordinate T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\n\
-    constexpr auto operator/(const Point<T>& point, Scalar scalar) {\n    using Result\
-    \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
-    \ / Result(scalar),\n        Result(point.y) / Result(scalar)\n    );\n}\n\ntemplate\
-    \ <Coordinate T>\nconstexpr wide_type<T> dot(const Point<T>& a, const Point<T>&\
-    \ b) {\n    using W = wide_type<T>;\n    return W(a.x) * W(b.x) + W(a.y) * W(b.y);\n\
-    }\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> cross(const Point<T>& a,\
-    \ const Point<T>& b) {\n    using W = wide_type<T>;\n    return W(a.x) * W(b.y)\
-    \ - W(a.y) * W(b.x);\n}\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> cross(\n\
-    \    const Point<T>& origin,\n    const Point<T>& a,\n    const Point<T>& b\n\
-    ) {\n    using W = wide_type<T>;\n    W ax = W(a.x) - W(origin.x);\n    W ay =\
-    \ W(a.y) - W(origin.y);\n    W bx = W(b.x) - W(origin.x);\n    W by = W(b.y) -\
-    \ W(origin.y);\n    return ax * by - ay * bx;\n}\n\ntemplate <Coordinate T>\n\
-    constexpr wide_type<T> norm2(const Point<T>& point) {\n    return dot(point, point);\n\
-    }\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> distance2(const Point<T>&\
-    \ a, const Point<T>& b) {\n    using W = wide_type<T>;\n    W dx = W(a.x) - W(b.x);\n\
-    \    W dy = W(a.y) - W(b.y);\n    return dx * dx + dy * dy;\n}\n\ntemplate <Coordinate\
-    \ T>\nlong double norm(const Point<T>& point) {\n    return std::hypot(\n    \
-    \    static_cast<long double>(point.x),\n        static_cast<long double>(point.y)\n\
-    \    );\n}\n\ntemplate <Coordinate T>\nlong double distance(const Point<T>& a,\
-    \ const Point<T>& b) {\n    return std::hypot(\n        static_cast<long double>(a.x)\
-    \ - static_cast<long double>(b.x),\n        static_cast<long double>(a.y) - static_cast<long\
-    \ double>(b.y)\n    );\n}\n\ntemplate <Coordinate T, typename M, typename N>\n\
-    requires std::is_arithmetic_v<M> && std::is_arithmetic_v<N>\nconstexpr Point<long\
-    \ double> internal_division_point(\n    const Point<T>& a,\n    const Point<T>&\
-    \ b,\n    M m,\n    N n\n) {\n    long double first_ratio = static_cast<long double>(m);\n\
-    \    long double second_ratio = static_cast<long double>(n);\n    long double\
-    \ denominator = first_ratio + second_ratio;\n    assert(denominator != 0);\n \
-    \   Point<long double> first(a);\n    Point<long double> direction = Point<long\
-    \ double>(b) - first;\n    return first + direction * (first_ratio / denominator);\n\
-    }\n\ntemplate <Coordinate T, typename M, typename N>\nrequires std::is_arithmetic_v<M>\
-    \ && std::is_arithmetic_v<N>\nconstexpr Point<long double> external_division_point(\n\
+    \    }\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const\
+    \ Point<T>& point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate\
+    \ T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(const\
+    \ Point<T>& point, Scalar scalar) {\n    using Result = std::common_type_t<T,\
+    \ Scalar>;\n    return Point<Result>(\n        Result(point.x) * Result(scalar),\n\
+    \        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate <typename Scalar,\
+    \ Coordinate T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(Scalar\
+    \ scalar, const Point<T>& point) {\n    return point * scalar;\n}\n\ntemplate\
+    \ <Coordinate T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr\
+    \ auto operator/(const Point<T>& point, Scalar scalar) {\n    using Result = std::common_type_t<T,\
+    \ Scalar>;\n    return Point<Result>(\n        Result(point.x) / Result(scalar),\n\
+    \        Result(point.y) / Result(scalar)\n    );\n}\n\ntemplate <Coordinate T>\n\
+    constexpr wide_type<T> dot(const Point<T>& a, const Point<T>& b) {\n    using\
+    \ W = wide_type<T>;\n    return W(a.x) * W(b.x) + W(a.y) * W(b.y);\n}\n\ntemplate\
+    \ <Coordinate T>\nconstexpr wide_type<T> cross(const Point<T>& a, const Point<T>&\
+    \ b) {\n    using W = wide_type<T>;\n    return W(a.x) * W(b.y) - W(a.y) * W(b.x);\n\
+    }\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> cross(\n    const Point<T>&\
+    \ origin,\n    const Point<T>& a,\n    const Point<T>& b\n) {\n    using W = wide_type<T>;\n\
+    \    W ax = W(a.x) - W(origin.x);\n    W ay = W(a.y) - W(origin.y);\n    W bx\
+    \ = W(b.x) - W(origin.x);\n    W by = W(b.y) - W(origin.y);\n    return ax * by\
+    \ - ay * bx;\n}\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> norm2(const\
+    \ Point<T>& point) {\n    return dot(point, point);\n}\n\ntemplate <Coordinate\
+    \ T>\nconstexpr wide_type<T> distance2(const Point<T>& a, const Point<T>& b) {\n\
+    \    using W = wide_type<T>;\n    W dx = W(a.x) - W(b.x);\n    W dy = W(a.y) -\
+    \ W(b.y);\n    return dx * dx + dy * dy;\n}\n\ntemplate <Coordinate T>\nlong double\
+    \ norm(const Point<T>& point) {\n    return std::hypot(\n        static_cast<long\
+    \ double>(point.x),\n        static_cast<long double>(point.y)\n    );\n}\n\n\
+    template <Coordinate T>\nlong double distance(const Point<T>& a, const Point<T>&\
+    \ b) {\n    return std::hypot(\n        static_cast<long double>(a.x) - static_cast<long\
+    \ double>(b.x),\n        static_cast<long double>(a.y) - static_cast<long double>(b.y)\n\
+    \    );\n}\n\ntemplate <Coordinate T, typename M, typename N>\nrequires std::is_arithmetic_v<M>\
+    \ && std::is_arithmetic_v<N>\nconstexpr Point<long double> internal_division_point(\n\
     \    const Point<T>& a,\n    const Point<T>& b,\n    M m,\n    N n\n) {\n    long\
     \ double first_ratio = static_cast<long double>(m);\n    long double second_ratio\
-    \ = static_cast<long double>(n);\n    long double denominator = first_ratio -\
+    \ = static_cast<long double>(n);\n    long double denominator = first_ratio +\
     \ second_ratio;\n    assert(denominator != 0);\n    Point<long double> first(a);\n\
     \    Point<long double> direction = Point<long double>(b) - first;\n    return\
     \ first + direction * (first_ratio / denominator);\n}\n\ntemplate <Coordinate\
-    \ T>\nconstexpr int sign(wide_type<T> value, long double eps = 1e-12L) {\n   \
-    \ if constexpr (std::integral<T>) {\n        return (value > 0) - (value < 0);\n\
-    \    } else {\n        return (value > eps) - (value < -eps);\n    }\n}\n\ntemplate\
-    \ <Coordinate T>\nconstexpr int orientation(\n    const Point<T>& a,\n    const\
-    \ Point<T>& b,\n    const Point<T>& c,\n    long double eps = 1e-12L\n) {\n  \
-    \  return sign<T>(cross(a, b, c), eps);\n}\n\ntemplate <Coordinate T>\nconstexpr\
-    \ bool collinear(\n    const Point<T>& a,\n    const Point<T>& b,\n    const Point<T>&\
-    \ c,\n    long double eps = 1e-12L\n) {\n    return orientation(a, b, c, eps)\
-    \ == 0;\n}\n\ntemplate <Coordinate T>\nPoint<long double> rotate(const Point<T>&\
-    \ point, long double angle) {\n    long double cosine = std::cos(angle);\n   \
-    \ long double sine = std::sin(angle);\n    return Point<long double>(\n      \
-    \  static_cast<long double>(point.x) * cosine -\n            static_cast<long\
-    \ double>(point.y) * sine,\n        static_cast<long double>(point.x) * sine +\n\
-    \            static_cast<long double>(point.y) * cosine\n    );\n}\n\ntemplate\
-    \ <Coordinate T>\nPoint<long double> normalized(const Point<T>& point) {\n   \
-    \ long double length = norm(point);\n    assert(length != 0);\n    return Point<long\
-    \ double>(\n        static_cast<long double>(point.x) / length,\n        static_cast<long\
-    \ double>(point.y) / length\n    );\n}\n\n}  // namespace geometry\n}  // namespace\
-    \ m1une\n\n\n#line 11 \"geometry/convex_layers.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ geometry {\n\nnamespace convex_layers_detail {\n\ntemplate <Coordinate T>\n\
-    struct LayerPoint {\n    wide_type<T> x;\n    wide_type<T> y;\n};\n\ntemplate\
-    \ <Coordinate T>\nwide_type<T> layer_cross(\n    const LayerPoint<T>& first,\n\
-    \    const LayerPoint<T>& second,\n    const LayerPoint<T>& third\n) {\n    return\n\
-    \        (second.x - first.x) * (third.y - first.y) -\n        (second.y - first.y)\
-    \ * (third.x - first.x);\n}\n\ntemplate <Coordinate T>\nclass DecrementalHull\
-    \ {\n   private:\n    struct Node {\n        int left_bound;\n        int right_bound;\n\
-    \        int bridge_left;\n        int bridge_right;\n        int left_child;\n\
-    \        int right_child;\n    };\n\n    std::vector<LayerPoint<T>> points;\n\
-    \    std::vector<Node> nodes;\n    int root;\n\n    bool is_leaf(int node) const\
-    \ {\n        return nodes[node].left_child == -1 && nodes[node].right_child ==\
-    \ -1;\n    }\n\n    void pull(int node) {\n        int left = nodes[node].left_child;\n\
-    \        int right = nodes[node].right_child;\n        assert(left != -1 && right\
-    \ != -1);\n        using Wide = wide_type<T>;\n        const Wide split_y = points[nodes[right].left_bound].y;\n\
-    \n        while (!is_leaf(left) || !is_leaf(right)) {\n            const int a\
-    \ = nodes[left].bridge_left;\n            const int b = nodes[left].bridge_right;\n\
-    \            const int c = nodes[right].bridge_left;\n            const int d\
-    \ = nodes[right].bridge_right;\n\n            if (\n                a != b &&\n\
-    \                sign<T>(layer_cross<T>(points[a], points[b], points[c])) > 0\n\
-    \            ) {\n                left = nodes[left].left_child;\n           \
-    \ } else if (\n                c != d &&\n                sign<T>(layer_cross<T>(points[b],\
+    \ T, typename M, typename N>\nrequires std::is_arithmetic_v<M> && std::is_arithmetic_v<N>\n\
+    constexpr Point<long double> external_division_point(\n    const Point<T>& a,\n\
+    \    const Point<T>& b,\n    M m,\n    N n\n) {\n    long double first_ratio =\
+    \ static_cast<long double>(m);\n    long double second_ratio = static_cast<long\
+    \ double>(n);\n    long double denominator = first_ratio - second_ratio;\n   \
+    \ assert(denominator != 0);\n    Point<long double> first(a);\n    Point<long\
+    \ double> direction = Point<long double>(b) - first;\n    return first + direction\
+    \ * (first_ratio / denominator);\n}\n\ntemplate <Coordinate T>\nconstexpr int\
+    \ sign(wide_type<T> value, long double eps = 1e-12L) {\n    if constexpr (std::integral<T>)\
+    \ {\n        return (value > 0) - (value < 0);\n    } else {\n        return (value\
+    \ > eps) - (value < -eps);\n    }\n}\n\ntemplate <Coordinate T>\nconstexpr int\
+    \ orientation(\n    const Point<T>& a,\n    const Point<T>& b,\n    const Point<T>&\
+    \ c,\n    long double eps = 1e-12L\n) {\n    return sign<T>(cross(a, b, c), eps);\n\
+    }\n\ntemplate <Coordinate T>\nconstexpr bool collinear(\n    const Point<T>& a,\n\
+    \    const Point<T>& b,\n    const Point<T>& c,\n    long double eps = 1e-12L\n\
+    ) {\n    return orientation(a, b, c, eps) == 0;\n}\n\ntemplate <Coordinate T>\n\
+    Point<long double> rotate(const Point<T>& point, long double angle) {\n    long\
+    \ double cosine = std::cos(angle);\n    long double sine = std::sin(angle);\n\
+    \    return Point<long double>(\n        static_cast<long double>(point.x) * cosine\
+    \ -\n            static_cast<long double>(point.y) * sine,\n        static_cast<long\
+    \ double>(point.x) * sine +\n            static_cast<long double>(point.y) * cosine\n\
+    \    );\n}\n\ntemplate <Coordinate T>\nPoint<long double> normalized(const Point<T>&\
+    \ point) {\n    long double length = norm(point);\n    assert(length != 0);\n\
+    \    return Point<long double>(\n        static_cast<long double>(point.x) / length,\n\
+    \        static_cast<long double>(point.y) / length\n    );\n}\n\n}  // namespace\
+    \ geometry\n}  // namespace m1une\n\n\n#line 11 \"geometry/convex_layers.hpp\"\
+    \n\nnamespace m1une {\nnamespace geometry {\n\nnamespace convex_layers_detail\
+    \ {\n\ntemplate <Coordinate T>\nstruct LayerPoint {\n    wide_type<T> x;\n   \
+    \ wide_type<T> y;\n};\n\ntemplate <Coordinate T>\nwide_type<T> layer_cross(\n\
+    \    const LayerPoint<T>& first,\n    const LayerPoint<T>& second,\n    const\
+    \ LayerPoint<T>& third\n) {\n    return\n        (second.x - first.x) * (third.y\
+    \ - first.y) -\n        (second.y - first.y) * (third.x - first.x);\n}\n\ntemplate\
+    \ <Coordinate T>\nclass DecrementalHull {\n   private:\n    struct Node {\n  \
+    \      int left_bound;\n        int right_bound;\n        int bridge_left;\n \
+    \       int bridge_right;\n        int left_child;\n        int right_child;\n\
+    \    };\n\n    std::vector<LayerPoint<T>> points;\n    std::vector<Node> nodes;\n\
+    \    int root;\n\n    bool is_leaf(int node) const {\n        return nodes[node].left_child\
+    \ == -1 && nodes[node].right_child == -1;\n    }\n\n    void pull(int node) {\n\
+    \        int left = nodes[node].left_child;\n        int right = nodes[node].right_child;\n\
+    \        assert(left != -1 && right != -1);\n        using Wide = wide_type<T>;\n\
+    \        const Wide split_y = points[nodes[right].left_bound].y;\n\n        while\
+    \ (!is_leaf(left) || !is_leaf(right)) {\n            const int a = nodes[left].bridge_left;\n\
+    \            const int b = nodes[left].bridge_right;\n            const int c\
+    \ = nodes[right].bridge_left;\n            const int d = nodes[right].bridge_right;\n\
+    \n            if (\n                a != b &&\n                sign<T>(layer_cross<T>(points[a],\
+    \ points[b], points[c])) > 0\n            ) {\n                left = nodes[left].left_child;\n\
+    \            } else if (\n                c != d &&\n                sign<T>(layer_cross<T>(points[b],\
     \ points[c], points[d])) > 0\n            ) {\n                right = nodes[right].right_child;\n\
     \            } else if (a == b) {\n                right = nodes[right].left_child;\n\
     \            } else if (c == d) {\n                left = nodes[left].right_child;\n\
@@ -335,11 +339,12 @@ data:
   path: geometry/convex_layers.hpp
   requiredBy:
   - geometry/all.hpp
-  timestamp: '2026-07-13 20:32:52+09:00'
+  timestamp: '2026-07-22 02:25:12+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/convex_layers.test.cpp
+  - verify/geometry/centroid.test.cpp
 documentation_of: geometry/convex_layers.hpp
 layout: document
 title: Convex Layers

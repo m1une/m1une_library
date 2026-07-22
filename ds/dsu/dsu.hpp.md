@@ -34,6 +34,9 @@ data:
     path: verify/ds/dsu/range_parallel_dsu.test.cpp
     title: verify/ds/dsu/range_parallel_dsu.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/centroid.test.cpp
+    title: verify/geometry/centroid.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/euclidean_mst.test.cpp
     title: verify/geometry/euclidean_mst.test.cpp
   - icon: ':heavy_check_mark:'
@@ -169,6 +172,7 @@ data:
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/euclidean_mst.test.cpp
   - verify/geometry/euclidean_mst.test.cpp
+  - verify/geometry/centroid.test.cpp
   - verify/geometry/manhattan_mst.test.cpp
   - verify/geometry/manhattan_mst.test.cpp
 documentation_of: ds/dsu/dsu.hpp

@@ -20,9 +20,6 @@ data:
     path: geometry/polygon.hpp
     title: Polygons
   - icon: ':heavy_check_mark:'
-    path: geometry/polygon.hpp
-    title: Polygons
-  - icon: ':heavy_check_mark:'
     path: geometry/ray.hpp
     title: Rays
   - icon: ':heavy_check_mark:'
@@ -35,45 +32,46 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://judge.yosupo.jp/problem/aplusb
+    ERROR: 1e-7
+    PROBLEM: https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_4_C
     links:
-    - https://judge.yosupo.jp/problem/aplusb
-  bundledCode: "#line 1 \"verify/geometry/polygon_operations.test.cpp\"\n#define PROBLEM\
-    \ \"https://judge.yosupo.jp/problem/aplusb\"\n\n#line 1 \"geometry/convex_polygon.hpp\"\
-    \n\n\n\n#include <algorithm>\n#include <array>\n#include <cassert>\n#include <cmath>\n\
-    #include <concepts>\n#include <cstddef>\n#include <deque>\n#include <limits>\n\
-    #include <numbers>\n#include <optional>\n#include <utility>\n#include <vector>\n\
-    \n#line 1 \"geometry/convex_hull.hpp\"\n\n\n\n#line 8 \"geometry/convex_hull.hpp\"\
-    \n\n#line 1 \"geometry/point.hpp\"\n\n\n\n#line 7 \"geometry/point.hpp\"\n#include\
-    \ <type_traits>\n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <typename\
-    \ T>\nconcept Coordinate = std::is_arithmetic_v<T> && !std::same_as<std::remove_cv_t<T>,\
-    \ bool>;\n\ntemplate <Coordinate T>\nusing wide_type = std::conditional_t<std::integral<T>,\
-    \ __int128_t, long double>;\n\ntemplate <Coordinate T>\nstruct Point {\n    T\
-    \ x;\n    T y;\n\n    constexpr Point() : x(0), y(0) {}\n    constexpr Point(T\
-    \ x_value, T y_value) : x(x_value), y(y_value) {}\n\n    template <Coordinate\
-    \ U>\n    explicit constexpr Point(const Point<U>& other)\n        : x(static_cast<T>(other.x)),\
-    \ y(static_cast<T>(other.y)) {}\n\n    constexpr Point& operator+=(const Point&\
-    \ other) {\n        x += other.x;\n        y += other.y;\n        return *this;\n\
-    \    }\n\n    constexpr Point& operator-=(const Point& other) {\n        x -=\
-    \ other.x;\n        y -= other.y;\n        return *this;\n    }\n\n    constexpr\
-    \ Point operator+() const {\n        return *this;\n    }\n\n    constexpr Point\
-    \ operator-() const {\n        return Point(-x, -y);\n    }\n\n    friend constexpr\
-    \ Point operator+(Point left, const Point& right) {\n        return left += right;\n\
-    \    }\n\n    friend constexpr Point operator-(Point left, const Point& right)\
-    \ {\n        return left -= right;\n    }\n\n    friend constexpr bool operator==(const\
-    \ Point&, const Point&) = default;\n\n    friend constexpr bool operator<(const\
-    \ Point& left, const Point& right) {\n        if (left.x != right.x) return left.x\
-    \ < right.x;\n        return left.y < right.y;\n    }\n};\n\ntemplate <Coordinate\
-    \ T>\nconstexpr Point<long double> centroid(const Point<T>& point) {\n    return\
-    \ Point<long double>(point);\n}\n\ntemplate <Coordinate T, typename Scalar>\n\
-    requires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(const Point<T>&\
-    \ point, Scalar scalar) {\n    using Result = std::common_type_t<T, Scalar>;\n\
-    \    return Point<Result>(\n        Result(point.x) * Result(scalar),\n      \
-    \  Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate <typename Scalar, Coordinate\
-    \ T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(Scalar scalar,\
-    \ const Point<T>& point) {\n    return point * scalar;\n}\n\ntemplate <Coordinate\
-    \ T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator/(const\
+    - https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_4_C
+  bundledCode: "#line 1 \"verify/geometry/convex_polygon.test.cpp\"\n#define PROBLEM\
+    \ \"https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_4_C\"\n#define\
+    \ ERROR \"1e-7\"\n\n#line 1 \"geometry/convex_polygon.hpp\"\n\n\n\n#include <algorithm>\n\
+    #include <array>\n#include <cassert>\n#include <cmath>\n#include <concepts>\n\
+    #include <cstddef>\n#include <deque>\n#include <limits>\n#include <numbers>\n\
+    #include <optional>\n#include <utility>\n#include <vector>\n\n#line 1 \"geometry/convex_hull.hpp\"\
+    \n\n\n\n#line 8 \"geometry/convex_hull.hpp\"\n\n#line 1 \"geometry/point.hpp\"\
+    \n\n\n\n#line 7 \"geometry/point.hpp\"\n#include <type_traits>\n\nnamespace m1une\
+    \ {\nnamespace geometry {\n\ntemplate <typename T>\nconcept Coordinate = std::is_arithmetic_v<T>\
+    \ && !std::same_as<std::remove_cv_t<T>, bool>;\n\ntemplate <Coordinate T>\nusing\
+    \ wide_type = std::conditional_t<std::integral<T>, __int128_t, long double>;\n\
+    \ntemplate <Coordinate T>\nstruct Point {\n    T x;\n    T y;\n\n    constexpr\
+    \ Point() : x(0), y(0) {}\n    constexpr Point(T x_value, T y_value) : x(x_value),\
+    \ y(y_value) {}\n\n    template <Coordinate U>\n    explicit constexpr Point(const\
+    \ Point<U>& other)\n        : x(static_cast<T>(other.x)), y(static_cast<T>(other.y))\
+    \ {}\n\n    constexpr Point& operator+=(const Point& other) {\n        x += other.x;\n\
+    \        y += other.y;\n        return *this;\n    }\n\n    constexpr Point& operator-=(const\
+    \ Point& other) {\n        x -= other.x;\n        y -= other.y;\n        return\
+    \ *this;\n    }\n\n    constexpr Point operator+() const {\n        return *this;\n\
+    \    }\n\n    constexpr Point operator-() const {\n        return Point(-x, -y);\n\
+    \    }\n\n    friend constexpr Point operator+(Point left, const Point& right)\
+    \ {\n        return left += right;\n    }\n\n    friend constexpr Point operator-(Point\
+    \ left, const Point& right) {\n        return left -= right;\n    }\n\n    friend\
+    \ constexpr bool operator==(const Point&, const Point&) = default;\n\n    friend\
+    \ constexpr bool operator<(const Point& left, const Point& right) {\n        if\
+    \ (left.x != right.x) return left.x < right.x;\n        return left.y < right.y;\n\
+    \    }\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const\
+    \ Point<T>& point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate\
+    \ T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(const\
     \ Point<T>& point, Scalar scalar) {\n    using Result = std::common_type_t<T,\
+    \ Scalar>;\n    return Point<Result>(\n        Result(point.x) * Result(scalar),\n\
+    \        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate <typename Scalar,\
+    \ Coordinate T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(Scalar\
+    \ scalar, const Point<T>& point) {\n    return point * scalar;\n}\n\ntemplate\
+    \ <Coordinate T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr\
+    \ auto operator/(const Point<T>& point, Scalar scalar) {\n    using Result = std::common_type_t<T,\
     \ Scalar>;\n    return Point<Result>(\n        Result(point.x) / Result(scalar),\n\
     \        Result(point.y) / Result(scalar)\n    );\n}\n\ntemplate <Coordinate T>\n\
     constexpr wide_type<T> dot(const Point<T>& a, const Point<T>& b) {\n    using\
@@ -1348,7 +1346,7 @@ data:
     \                    difference[(index + 1) % difference.size()]\n           \
     \     },\n                origin\n            )\n        );\n    }\n    return\
     \ result;\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 5 \"\
-    verify/geometry/polygon_operations.test.cpp\"\n\n#line 10 \"verify/geometry/polygon_operations.test.cpp\"\
+    verify/geometry/convex_polygon.test.cpp\"\n\n#line 9 \"verify/geometry/convex_polygon.test.cpp\"\
     \n#include <cstdint>\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 6 \"utilities/fast_io.hpp\"\
     \n#include <cerrno>\n#include <charconv>\n#line 9 \"utilities/fast_io.hpp\"\n\
     #include <cstdio>\n#include <cstdlib>\n#line 12 \"utilities/fast_io.hpp\"\n#include\
@@ -1591,439 +1589,400 @@ data:
     \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
     n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 13 \"verify/geometry/polygon_operations.test.cpp\"\
-    \n\nnamespace {\n\nusing namespace m1une::geometry;\nusing P = Point<long long>;\n\
-    \nbool close(long double first, long double second) {\n    return std::fabs(first\
-    \ - second) <= 1e-9L;\n}\n\nstd::vector<P> square(\n    long long left,\n    long\
-    \ long bottom,\n    long long right,\n    long long top\n) {\n    std::vector<P>\
-    \ result;\n    result.emplace_back(left, bottom);\n    result.emplace_back(right,\
-    \ bottom);\n    result.emplace_back(right, top);\n    result.emplace_back(left,\
-    \ top);\n    return result;\n}\n\ntemplate <typename T>\nstd::vector<Point<long\
-    \ double>> clipping_intersection(\n    std::vector<Point<T>> first,\n    std::vector<Point<T>>\
-    \ second\n) {\n    first = normalize_convex_polygon(std::move(first));\n    second\
-    \ = normalize_convex_polygon(std::move(second));\n    std::vector<Point<long double>>\
-    \ result;\n    result.reserve(first.size());\n    for (const Point<T>& point :\
-    \ first) result.emplace_back(point);\n    for (std::size_t index = 0; index <\
-    \ second.size(); ++index) {\n        const Line<T> boundary{\n            second[index],\n\
-    \            second[(index + 1) % second.size()]\n        };\n        result =\
-    \ convex_cut(result, Line<long double>{\n            Point<long double>(boundary.a),\n\
-    \            Point<long double>(boundary.b)\n        });\n        if (result.empty())\
-    \ break;\n    }\n    return result;\n}\n\ntemplate <typename T>\nPointInPolygon\
-    \ contains_closed(\n    const std::vector<Point<T>>& polygon,\n    const Point<T>&\
-    \ point\n) {\n    if (polygon.empty()) return PointInPolygon::Outside;\n    if\
-    \ (polygon.size() == 1) {\n        return distance(polygon[0], point) <= 1e-8L\n\
-    \            ? PointInPolygon::Boundary\n            : PointInPolygon::Outside;\n\
-    \    }\n    if (polygon.size() == 2) {\n        return on_segment(Segment<T>{polygon[0],\
-    \ polygon[1]}, point, 1e-8L)\n            ? PointInPolygon::Boundary\n       \
-    \     : PointInPolygon::Outside;\n    }\n    return point_in_polygon(polygon,\
-    \ point, 1e-8L);\n}\n\nvoid assert_same_closed_polygon(\n    const std::vector<Point<long\
-    \ double>>& first,\n    const std::vector<Point<long double>>& second\n) {\n \
-    \   assert(first.empty() == second.empty());\n    assert(close(polygon_area(first),\
-    \ polygon_area(second)));\n    for (const auto& point : first) {\n        assert(contains_closed(second,\
-    \ point) != PointInPolygon::Outside);\n    }\n    for (const auto& point : second)\
-    \ {\n        assert(contains_closed(first, point) != PointInPolygon::Outside);\n\
-    \    }\n}\n\ntemplate <typename T>\nlong double triangle_area(\n    const std::array<Point<T>,\
-    \ 3>& triangle\n) {\n    return std::fabs(\n        static_cast<long double>(\n\
-    \            cross(triangle[0], triangle[1], triangle[2])\n        )\n    ) /\
-    \ 2;\n}\n\nvoid test_centroid_and_triangulation() {\n    std::vector<P> rectangle\
-    \ = square(0, 0, 4, 2);\n    auto rectangle_centroid = polygon_centroid(rectangle);\n\
-    \    assert(rectangle_centroid.has_value());\n    assert(close(rectangle_centroid->x,\
-    \ 2));\n    assert(close(rectangle_centroid->y, 1));\n    auto same_centroid =\
-    \ polygon_center_of_gravity(rectangle);\n    assert(same_centroid.has_value());\n\
-    \    assert(close(same_centroid->x, 2));\n    assert(close(same_centroid->y, 1));\n\
-    \n    std::vector<P> concave;\n    concave.emplace_back(0, 0);\n    concave.emplace_back(5,\
-    \ 0);\n    concave.emplace_back(5, 1);\n    concave.emplace_back(1, 1);\n    concave.emplace_back(1,\
-    \ 5);\n    concave.emplace_back(0, 5);\n    assert(is_simple_polygon(concave));\n\
-    \n    auto centroid = polygon_centroid(concave);\n    assert(centroid.has_value());\n\
-    \    assert(close(centroid->x, 14.5L / 9));\n    assert(close(centroid->y, 14.5L\
-    \ / 9));\n\n    auto triangulation = triangulate_polygon(concave);\n    assert(triangulation.has_value());\n\
-    \    assert(triangulation->size() == 4);\n    long double area_sum = 0;\n    for\
-    \ (const auto& triangle : *triangulation) {\n        assert(orientation(triangle[0],\
-    \ triangle[1], triangle[2]) > 0);\n        area_sum += triangle_area(triangle);\n\
-    \    }\n    assert(close(area_sum, polygon_area(concave)));\n\n    std::reverse(concave.begin(),\
-    \ concave.end());\n    auto clockwise = triangulate_polygon(concave);\n    assert(clockwise.has_value());\n\
-    \    assert(clockwise->size() == 4);\n\n    std::vector<P> redundant;\n    redundant.emplace_back(0,\
-    \ 0);\n    redundant.emplace_back(2, 0);\n    redundant.emplace_back(4, 0);\n\
-    \    redundant.emplace_back(4, 3);\n    redundant.emplace_back(0, 3);\n    redundant.emplace_back(0,\
-    \ 0);\n    auto cleaned = triangulate_polygon(redundant);\n    assert(cleaned.has_value());\n\
-    \    assert(cleaned->size() == 2);\n\n    auto convex = triangulate_convex_polygon(rectangle);\n\
-    \    assert(convex.size() == 2);\n\n    std::vector<P> bow_tie;\n    bow_tie.emplace_back(0,\
-    \ 0);\n    bow_tie.emplace_back(3, 3);\n    bow_tie.emplace_back(0, 3);\n    bow_tie.emplace_back(3,\
-    \ 0);\n    assert(!is_simple_polygon(bow_tie));\n    assert(!triangulate_polygon(bow_tie).has_value());\n\
-    \n    std::vector<P> backtracking;\n    backtracking.emplace_back(0, 0);\n   \
-    \ backtracking.emplace_back(4, 0);\n    backtracking.emplace_back(2, 0);\n   \
-    \ backtracking.emplace_back(2, 3);\n    backtracking.emplace_back(0, 3);\n   \
-    \ assert(!is_simple_polygon(backtracking));\n    assert(!triangulate_polygon(backtracking).has_value());\n\
-    \n    std::vector<P> zero_area;\n    zero_area.emplace_back(0, 0);\n    zero_area.emplace_back(1,\
-    \ 0);\n    zero_area.emplace_back(2, 0);\n    assert(!polygon_centroid(zero_area).has_value());\n\
-    \    assert(!triangulate_polygon(zero_area).has_value());\n}\n\nvoid test_reflection()\
-    \ {\n    Line<long long> mirror;\n    mirror.a = P(-10, 0);\n    mirror.b = P(10,\
-    \ 0);\n\n    Ray<long long> incoming;\n    incoming.origin = P(-2, 3);\n    incoming.through\
-    \ = P(0, 0);\n    Ray<long double> outgoing =\n        reflected_ray(incoming,\
-    \ P(0, 0), mirror);\n    assert(close(outgoing.origin.x, 0));\n    assert(close(outgoing.origin.y,\
-    \ 0));\n    assert(close(outgoing.through.x, 2));\n    assert(close(outgoing.through.y,\
-    \ 3));\n\n    Ray<long double> mirrored = reflection(mirror, incoming);\n    assert(close(mirrored.origin.x,\
-    \ -2));\n    assert(close(mirrored.origin.y, -3));\n    assert(close(mirrored.through.x,\
-    \ 0));\n    assert(close(mirrored.through.y, 0));\n}\n\nvoid test_ray_polygon()\
-    \ {\n    std::vector<P> polygon = square(0, 0, 4, 4);\n    Ray<long long> crossing;\n\
-    \    crossing.origin = P(-2, 2);\n    crossing.through = P(-1, 2);\n    auto hits\
-    \ = ray_polygon_intersections(crossing, polygon);\n    assert(hits.size() == 2);\n\
-    \    assert(close(hits[0].x, 0));\n    assert(close(hits[1].x, 4));\n    assert(intersects(crossing,\
-    \ polygon));\n    assert(close(distance(crossing, polygon), 0));\n\n    Ray<long\
-    \ long> inside;\n    inside.origin = P(2, 2);\n    inside.through = P(3, 2);\n\
-    \    auto first = first_ray_polygon_intersection(inside, polygon);\n    assert(first.has_value());\n\
-    \    assert(close(first->x, 4));\n    assert(intersects(inside, polygon));\n\n\
-    \    Ray<long long> collinear;\n    collinear.origin = P(-2, 0);\n    collinear.through\
-    \ = P(-1, 0);\n    auto boundary = ray_polygon_intersections(collinear, polygon);\n\
-    \    assert(boundary.size() == 2);\n    assert(close(boundary[0].x, 0));\n   \
-    \ assert(close(boundary[1].x, 4));\n\n    Ray<long long> through_vertices;\n \
-    \   through_vertices.origin = P(-1, -1);\n    through_vertices.through = P(0,\
-    \ 0);\n    auto vertex_hits =\n        ray_polygon_intersections(through_vertices,\
-    \ polygon);\n    assert(vertex_hits.size() == 2);\n    assert(close(vertex_hits[0].x,\
-    \ 0));\n    assert(close(vertex_hits[1].x, 4));\n\n    Ray<long long> missing;\n\
-    \    missing.origin = P(-2, 7);\n    missing.through = P(-1, 7);\n    assert(!intersects(missing,\
-    \ polygon));\n    assert(close(distance(missing, polygon), 3));\n}\n\nvoid test_polygon_polygon()\
-    \ {\n    std::vector<P> first = square(0, 0, 4, 4);\n    std::vector<P> overlap\
-    \ = square(2, 1, 6, 3);\n    std::vector<P> contained = square(1, 1, 2, 2);\n\
-    \    std::vector<P> touching = square(4, 1, 7, 2);\n    std::vector<P> separate\
-    \ = square(7, 0, 9, 2);\n\n    assert(intersects(first, overlap));\n    assert(intersects(first,\
-    \ contained));\n    assert(intersects(first, touching));\n    assert(!intersects(first,\
-    \ separate));\n    assert(close(distance(first, separate), 3));\n\n    std::vector<P>\
-    \ concave;\n    concave.emplace_back(0, 0);\n    concave.emplace_back(5, 0);\n\
-    \    concave.emplace_back(5, 1);\n    concave.emplace_back(1, 1);\n    concave.emplace_back(1,\
-    \ 5);\n    concave.emplace_back(0, 5);\n    std::vector<P> in_arm = square(0,\
-    \ 3, 1, 4);\n    std::vector<P> in_notch = square(2, 2, 3, 3);\n    assert(intersects(concave,\
-    \ in_arm));\n    assert(!intersects(concave, in_notch));\n    assert(close(distance(concave,\
-    \ in_notch), 1));\n\n    auto clipped = convex_polygon_intersection(first, overlap);\n\
-    \    assert(clipped.size() == 4);\n    assert(close(polygon_area(clipped), 4));\n\
-    \    std::reverse(first.begin(), first.end());\n    auto clockwise_clip = convex_polygon_intersection(first,\
-    \ overlap);\n    assert(close(polygon_area(clockwise_clip), 4));\n    assert(polygon_area2(clockwise_clip)\
-    \ > 0);\n    std::reverse(first.begin(), first.end());\n\n    auto contained_clip\
-    \ = convex_polygon_intersection(first, contained);\n    assert(close(polygon_area(contained_clip),\
-    \ 1));\n\n    auto touching_clip = convex_polygon_intersection(first, touching);\n\
-    \    assert(touching_clip.size() == 2);\n    assert(close(polygon_area(touching_clip),\
-    \ 0));\n\n    auto empty_clip = convex_polygon_intersection(first, separate);\n\
-    \    assert(empty_clip.empty());\n\n    std::vector<P> corner_touching = square(4,\
-    \ 4, 7, 7);\n    auto corner_clip = convex_polygon_intersection(first, corner_touching);\n\
-    \    assert(corner_clip.size() == 1);\n    assert(close(corner_clip[0].x, 4));\n\
-    \    assert(close(corner_clip[0].y, 4));\n}\n\nvoid test_minkowski_examples()\
-    \ {\n    std::vector<P> first = square(0, 0, 2, 2);\n    std::vector<P> second;\n\
-    \    second.emplace_back(0, 0);\n    second.emplace_back(2, 0);\n    second.emplace_back(0,\
-    \ 1);\n\n    std::vector<P> sum = minkowski_sum(first, second);\n    std::vector<P>\
-    \ brute;\n    for (const P& a : first) {\n        for (const P& b : second) brute.push_back(a\
-    \ + b);\n    }\n    assert(convex_hull(sum) == convex_hull(brute));\n\n    std::reverse(first.begin(),\
-    \ first.end());\n    std::reverse(second.begin(), second.end());\n    assert(\n\
-    \        convex_hull(minkowski_sum(first, second)) ==\n        convex_hull(brute)\n\
-    \    );\n\n    std::vector<P> segment;\n    segment.emplace_back(0, 0);\n    segment.emplace_back(3,\
-    \ 0);\n    std::vector<P> point;\n    point.emplace_back(2, 4);\n    std::vector<P>\
-    \ translated = minkowski_sum(segment, point);\n    std::vector<P> expected;\n\
-    \    expected.emplace_back(2, 4);\n    expected.emplace_back(5, 4);\n    assert(translated\
-    \ == expected);\n\n    std::vector<P> diagonal_segment;\n    diagonal_segment.emplace_back(2,\
-    \ -1);\n    diagonal_segment.emplace_back(-1, 2);\n    std::vector<P> segment_sum\
-    \ = minkowski_sum(diagonal_segment, first);\n    brute.clear();\n    for (const\
-    \ P& a : diagonal_segment) {\n        for (const P& b : first) brute.push_back(a\
-    \ + b);\n    }\n    assert(convex_hull(segment_sum) == convex_hull(brute));\n\
-    }\n\nvoid test_randomized_minkowski_and_clipping() {\n    std::uint64_t state\
-    \ = 0x314159265358979ULL;\n    auto random = [&state]() {\n        state ^= state\
-    \ << 7;\n        state ^= state >> 9;\n        return state;\n    };\n\n    for\
-    \ (int trial = 0; trial < 5000; ++trial) {\n        std::vector<P> first_points;\n\
-    \        std::vector<P> second_points;\n        int first_count = 3 + static_cast<int>(random()\
-    \ % 8);\n        int second_count = 3 + static_cast<int>(random() % 8);\n    \
-    \    for (int index = 0; index < first_count; ++index) {\n            first_points.emplace_back(\n\
-    \                static_cast<long long>(random() % 21) - 10,\n               \
-    \ static_cast<long long>(random() % 21) - 10\n            );\n        }\n    \
+    \ utilities\n}  // namespace m1une\n\n\n#line 12 \"verify/geometry/convex_polygon.test.cpp\"\
+    \n\nnamespace {\n\nusing namespace m1une::geometry;\nusing PointType = Point<long\
+    \ long>;\nusing Wide = wide_type<long long>;\n\nbool close(long double first,\
+    \ long double second) {\n    return std::fabs(first - second) <= 1e-9L;\n}\n\n\
+    template <Coordinate T>\nbool contains_closed(\n    const std::vector<Point<T>>&\
+    \ polygon,\n    const Point<long double>& point\n) {\n    std::vector<Point<long\
+    \ double>> converted;\n    converted.reserve(polygon.size());\n    for (const\
+    \ Point<T>& vertex : polygon) converted.emplace_back(vertex);\n    return\n  \
+    \      point_in_convex_polygon(converted, point, 1e-8L) !=\n        PointInPolygon::Outside;\n\
+    }\n\ntemplate <Coordinate T>\nvoid assert_closest_points(\n    const std::vector<Point<T>>&\
+    \ first,\n    const std::vector<Point<T>>& second,\n    const std::pair<Point<long\
+    \ double>, Point<long double>>& points,\n    long double expected_distance\n)\
+    \ {\n    assert(contains_closed(first, points.first));\n    assert(contains_closed(second,\
+    \ points.second));\n    assert(close(distance(points.first, points.second), expected_distance));\n\
+    }\n\nWide naive_chain_area2(\n    const std::vector<PointType>& polygon,\n   \
+    \ int first,\n    int last\n) {\n    Wide result = 0;\n    int index = first;\n\
+    \    while (index != last) {\n        const int next = (index + 1) % int(polygon.size());\n\
+    \        result += cross(polygon[index], polygon[next]);\n        index = next;\n\
+    \    }\n    result += cross(polygon[last], polygon[first]);\n    return result;\n\
+    }\n\nbool is_tangent(\n    const std::vector<PointType>& polygon,\n    const PointType&\
+    \ point,\n    int index\n) {\n    int side = 0;\n    for (const PointType& vertex\
+    \ : polygon) {\n        const int current = orientation(point, polygon[index],\
+    \ vertex);\n        if (current == 0) continue;\n        if (side != 0 && side\
+    \ != current) return false;\n        side = current;\n    }\n    return side !=\
+    \ 0;\n}\n\nvoid test_fixed() {\n    std::vector<PointType> square;\n    square.emplace_back(0,\
+    \ 0);\n    square.emplace_back(4, 0);\n    square.emplace_back(4, 4);\n    square.emplace_back(0,\
+    \ 4);\n    assert(is_convex_polygon(square));\n    assert(is_convex_polygon(square,\
+    \ true));\n\n    std::vector<PointType> weak;\n    weak.emplace_back(0, 0);\n\
+    \    weak.emplace_back(2, 0);\n    weak.emplace_back(4, 0);\n    weak.emplace_back(4,\
+    \ 4);\n    weak.emplace_back(0, 4);\n    assert(is_convex_polygon(weak));\n  \
+    \  assert(!is_convex_polygon(weak, true));\n    std::reverse(weak.begin(), weak.end());\n\
+    \n    ConvexPolygon<long long> polygon(weak);\n    assert(polygon.size() == 4);\n\
+    \    assert(polygon.area2() == 32);\n    assert(polygon.contains(PointType(2,\
+    \ 2)) == PointInPolygon::Inside);\n    assert(polygon.contains(PointType(0, 2))\
+    \ == PointInPolygon::Boundary);\n    assert(polygon.contains(PointType(5, 2))\
+    \ == PointInPolygon::Outside);\n    assert(polygon.max_dot(PointType(1, 0)).first\
+    \ == 4);\n    assert(polygon.min_dot(PointType(1, 0)).first == 0);\n\n    std::vector<PointType>\
+    \ diagonal_segment;\n    diagonal_segment.emplace_back(0, 3);\n    diagonal_segment.emplace_back(2,\
+    \ 1);\n    const auto normalized_segment =\n        normalize_convex_polygon(diagonal_segment);\n\
+    \    assert(normalized_segment[0] == PointType(2, 1));\n\n    const auto tangents\
+    \ = polygon.tangent_vertices(PointType(7, 2));\n    assert(is_tangent(polygon.vertices(),\
+    \ PointType(7, 2), tangents.first));\n    assert(is_tangent(polygon.vertices(),\
+    \ PointType(7, 2), tangents.second));\n    assert(tangents.first != tangents.second);\n\
+    \n    const PointType edge_extension(7, 0);\n    const auto collinear_tangents\
+    \ =\n        polygon.tangent_vertices(edge_extension);\n    assert(is_tangent(\n\
+    \        polygon.vertices(),\n        edge_extension,\n        collinear_tangents.first\n\
+    \    ));\n    assert(is_tangent(\n        polygon.vertices(),\n        edge_extension,\n\
+    \        collinear_tangents.second\n    ));\n\n    Line<long long> vertical{PointType(2,\
+    \ -1), PointType(2, 5)};\n    const auto left = convex_cut(square, vertical);\n\
+    \    assert(close(polygon_area(left), 8));\n\n    std::vector<PointType> redundant_square;\n\
+    \    redundant_square.emplace_back(0, 0);\n    redundant_square.emplace_back(2,\
+    \ 0);\n    redundant_square.emplace_back(4, 0);\n    redundant_square.emplace_back(4,\
+    \ 4);\n    redundant_square.emplace_back(0, 4);\n    redundant_square.emplace_back(0,\
+    \ 0);\n    const auto self_intersection =\n        convex_polygon_intersection(redundant_square,\
+    \ square);\n    assert(close(polygon_area(self_intersection), 16));\n\n    std::vector<PointType>\
+    \ concave;\n    concave.emplace_back(0, 0);\n    concave.emplace_back(4, 0);\n\
+    \    concave.emplace_back(2, 1);\n    concave.emplace_back(4, 4);\n    concave.emplace_back(0,\
+    \ 4);\n    assert(!is_convex_polygon(concave));\n\n    std::vector<PointType>\
+    \ collinear;\n    collinear.emplace_back(0, 0);\n    collinear.emplace_back(4,\
+    \ 0);\n    collinear.emplace_back(2, 0);\n    assert(is_convex_polygon(collinear));\n\
+    \    assert(!is_convex_polygon(collinear, true));\n\n    ConvexPolygon<long long>\
+    \ overlapping(square);\n    ConvexPolygon<long long> touching(std::vector<PointType>{\n\
+    \        PointType(4, 1),\n        PointType(7, 1),\n        PointType(7, 3),\n\
+    \        PointType(4, 3),\n    });\n    ConvexPolygon<long long> separate(std::vector<PointType>{\n\
+    \        PointType(7, 1),\n        PointType(9, 1),\n        PointType(9, 3),\n\
+    \        PointType(7, 3),\n    });\n    assert(convex_polygons_intersect(overlapping,\
+    \ touching));\n    assert(!convex_polygons_intersect(overlapping, separate));\n\
+    \    assert(close(convex_polygons_distance(overlapping, touching), 0));\n    assert(close(convex_polygons_distance(overlapping,\
+    \ separate), 3));\n\n    ConvexPolygon<long long> point(std::vector<PointType>{PointType(2,\
+    \ 2)});\n    ConvexPolygon<long long> outside_point(\n        std::vector<PointType>{PointType(8,\
+    \ 2)}\n    );\n    ConvexPolygon<long long> segment(std::vector<PointType>{\n\
+    \        PointType(4, 1),\n        PointType(7, 1),\n    });\n    assert(convex_polygons_intersect(overlapping,\
+    \ point));\n    assert(!convex_polygons_intersect(overlapping, outside_point));\n\
+    \    assert(convex_polygons_intersect(overlapping, segment));\n    assert(close(convex_polygons_distance(overlapping,\
+    \ outside_point), 4));\n    assert(close(convex_polygons_distance(overlapping,\
+    \ segment), 0));\n    const auto outside_closest =\n        convex_polygons_closest_points(overlapping,\
+    \ outside_point);\n    assert(close(outside_closest.first.x, 4));\n    assert(close(outside_closest.first.y,\
+    \ 2));\n    assert(close(outside_closest.second.x, 8));\n    assert(close(outside_closest.second.y,\
+    \ 2));\n    assert_closest_points(\n        overlapping.vertices(),\n        outside_point.vertices(),\n\
+    \        outside_closest,\n        4\n    );\n    const auto overlap_closest =\n\
+    \        convex_polygons_closest_points(overlapping, touching);\n    assert_closest_points(\n\
+    \        overlapping.vertices(),\n        touching.vertices(),\n        overlap_closest,\n\
+    \        0\n    );\n\n    ConvexPolygon<long long> first_segment(std::vector<PointType>{\n\
+    \        PointType(0, 0),\n        PointType(4, 0),\n    });\n    ConvexPolygon<long\
+    \ long> crossing_segment(std::vector<PointType>{\n        PointType(2, -2),\n\
+    \        PointType(2, 2),\n    });\n    ConvexPolygon<long long> parallel_segment(std::vector<PointType>{\n\
+    \        PointType(1, 3),\n        PointType(5, 3),\n    });\n    assert(convex_polygons_intersect(first_segment,\
+    \ crossing_segment));\n    assert(!convex_polygons_intersect(first_segment, parallel_segment));\n\
+    \    assert(close(\n        convex_polygons_distance(first_segment, parallel_segment),\n\
+    \        3\n    ));\n    const auto crossing_closest =\n        convex_polygons_closest_points(first_segment,\
+    \ crossing_segment);\n    assert(close(crossing_closest.first.x, 2));\n    assert(close(crossing_closest.first.y,\
+    \ 0));\n    assert(crossing_closest.first == crossing_closest.second);\n    assert_closest_points(\n\
+    \        first_segment.vertices(),\n        parallel_segment.vertices(),\n   \
+    \     convex_polygons_closest_points(first_segment, parallel_segment),\n     \
+    \   3\n    );\n}\n\nvoid test_randomized() {\n    std::uint64_t state = 0x6a09e667f3bcc909ULL;\n\
+    \    auto random = [&state]() {\n        state ^= state << 7;\n        state ^=\
+    \ state >> 9;\n        return state;\n    };\n\n    for (int trial = 0; trial\
+    \ < 5000; ++trial) {\n        std::vector<PointType> first_points;\n        std::vector<PointType>\
+    \ second_points;\n        const int first_count = 3 + int(random() % 18);\n  \
+    \      const int second_count = 3 + int(random() % 18);\n        for (int index\
+    \ = 0; index < first_count; ++index) {\n            first_points.emplace_back(\n\
+    \                static_cast<long long>(random() % 31) - 15,\n               \
+    \ static_cast<long long>(random() % 31) - 15\n            );\n        }\n    \
     \    for (int index = 0; index < second_count; ++index) {\n            second_points.emplace_back(\n\
-    \                static_cast<long long>(random() % 21) - 10,\n               \
-    \ static_cast<long long>(random() % 21) - 10\n            );\n        }\n    \
-    \    std::vector<P> first = convex_hull(first_points);\n        std::vector<P>\
+    \                static_cast<long long>(random() % 31) - 15,\n               \
+    \ static_cast<long long>(random() % 31) - 15\n            );\n        }\n    \
+    \    std::vector<PointType> first = convex_hull(first_points);\n        std::vector<PointType>\
     \ second = convex_hull(second_points);\n        if (first.size() < 3 || second.size()\
-    \ < 3) continue;\n        const P translation(\n            static_cast<long long>(random()\
-    \ % 41) - 20,\n            static_cast<long long>(random() % 41) - 20\n      \
-    \  );\n        for (P& point : second) point += translation;\n\n        auto ear_triangles\
-    \ = triangulate_polygon(first);\n        assert(ear_triangles.has_value());\n\
-    \        auto fan_triangles = triangulate_convex_polygon(first);\n        assert(ear_triangles->size()\
-    \ == first.size() - 2);\n        assert(fan_triangles.size() == first.size() -\
-    \ 2);\n        long double ear_area = 0;\n        long double fan_area = 0;\n\
-    \        for (const auto& triangle : *ear_triangles) {\n            ear_area +=\
-    \ triangle_area(triangle);\n        }\n        for (const auto& triangle : fan_triangles)\
-    \ {\n            fan_area += triangle_area(triangle);\n        }\n        assert(close(ear_area,\
-    \ polygon_area(first)));\n        assert(close(fan_area, polygon_area(first)));\n\
-    \n        std::vector<P> brute_sums;\n        for (const P& a : first) {\n   \
-    \         for (const P& b : second) brute_sums.push_back(a + b);\n        }\n\
-    \        assert(\n            convex_hull(minkowski_sum(first, second)) ==\n \
-    \           convex_hull(brute_sums)\n        );\n\n        auto forward = convex_polygon_intersection(first,\
-    \ second);\n        auto backward = convex_polygon_intersection(second, first);\n\
-    \        assert(close(polygon_area(forward), polygon_area(backward)));\n     \
-    \   assert_same_closed_polygon(\n            forward,\n            clipping_intersection(first,\
-    \ second)\n        );\n        for (const Point<long double>& point : forward)\
-    \ {\n            assert(\n                point_in_polygon(\n                \
-    \    std::vector<Point<long double>>(\n                        first.begin(),\n\
-    \                        first.end()\n                    ),\n               \
-    \     point\n                ) != PointInPolygon::Outside\n            );\n  \
-    \          assert(\n                point_in_polygon(\n                    std::vector<Point<long\
-    \ double>>(\n                        second.begin(),\n                       \
-    \ second.end()\n                    ),\n                    point\n          \
-    \      ) != PointInPolygon::Outside\n            );\n        }\n\n        const\
-    \ auto rightmost = std::max_element(\n            first.begin(),\n           \
-    \ first.end(),\n            [](const P& left, const P& right) {\n            \
-    \    return left.x < right.x;\n            }\n        );\n        const auto leftmost\
-    \ = std::min_element(\n            second.begin(),\n            second.end(),\n\
-    \            [](const P& left, const P& right) {\n                return left.x\
-    \ < right.x;\n            }\n        );\n        std::vector<P> touching = second;\n\
-    \        const P touching_translation = *rightmost - *leftmost;\n        for (P&\
-    \ point : touching) point += touching_translation;\n        const auto degenerate\
-    \ =\n            convex_polygon_intersection(first, touching);\n        assert(!degenerate.empty());\n\
-    \        assert(close(polygon_area(degenerate), 0));\n        assert_same_closed_polygon(\n\
-    \            degenerate,\n            clipping_intersection(first, touching)\n\
-    \        );\n    }\n}\n\nvoid test_randomized_floating_intersection() {\n    std::uint64_t\
-    \ state = 0xbb67ae8584caa73bULL;\n    auto random = [&state]() {\n        state\
-    \ ^= state << 7;\n        state ^= state >> 9;\n        return state;\n    };\n\
-    \    constexpr long double pi = 3.141592653589793238462643383279L;\n\n    for\
-    \ (int trial = 0; trial < 2000; ++trial) {\n        const int first_size = 3 +\
-    \ int(random() % 20);\n        const int second_size = 3 + int(random() % 20);\n\
-    \        const long double first_phase =\n            2 * pi * static_cast<long\
-    \ double>(random() % 1000000) / 1000000;\n        const long double second_phase\
-    \ =\n            2 * pi * static_cast<long double>(random() % 1000000) / 1000000;\n\
-    \        const Point<long double> first_center(\n            static_cast<long\
-    \ double>(random() % 2001) / 100 - 10,\n            static_cast<long double>(random()\
-    \ % 2001) / 100 - 10\n        );\n        const Point<long double> second_center(\n\
-    \            static_cast<long double>(random() % 4001) / 100 - 20,\n         \
-    \   static_cast<long double>(random() % 4001) / 100 - 20\n        );\n\n     \
-    \   std::vector<Point<long double>> first;\n        std::vector<Point<long double>>\
-    \ second;\n        for (int index = 0; index < first_size; ++index) {\n      \
-    \      const long double angle =\n                first_phase + 2 * pi * index\
-    \ / first_size;\n            first.emplace_back(\n                first_center.x\
-    \ + 12 * std::cos(angle),\n                first_center.y + 7 * std::sin(angle)\n\
-    \            );\n        }\n        for (int index = 0; index < second_size; ++index)\
-    \ {\n            const long double angle =\n                second_phase + 2 *\
-    \ pi * index / second_size;\n            second.emplace_back(\n              \
-    \  second_center.x + 9 * std::cos(angle),\n                second_center.y + 14\
-    \ * std::sin(angle)\n            );\n        }\n\n        assert_same_closed_polygon(\n\
-    \            convex_polygon_intersection(first, second),\n            clipping_intersection(first,\
-    \ second)\n        );\n    }\n}\n\n}  // namespace\n\nint main() {\n    m1une::utilities::FastInput\
-    \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n\n    test_centroid_and_triangulation();\n\
-    \    test_reflection();\n    test_ray_polygon();\n    test_polygon_polygon();\n\
-    \    test_minkowski_examples();\n    test_randomized_minkowski_and_clipping();\n\
-    \    test_randomized_floating_intersection();\n\n    long long a, b;\n    fast_input\
-    \ >> a >> b;\n    fast_output << a + b << '\\n';\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
-    ../../geometry/convex_polygon.hpp\"\n#include \"../../geometry/polygon.hpp\"\n\
-    \n#include <algorithm>\n#include <array>\n#include <cassert>\n#include <cmath>\n\
-    #include <cstdint>\n#include \"../../utilities/fast_io.hpp\"\n#include <vector>\n\
-    \nnamespace {\n\nusing namespace m1une::geometry;\nusing P = Point<long long>;\n\
-    \nbool close(long double first, long double second) {\n    return std::fabs(first\
-    \ - second) <= 1e-9L;\n}\n\nstd::vector<P> square(\n    long long left,\n    long\
-    \ long bottom,\n    long long right,\n    long long top\n) {\n    std::vector<P>\
-    \ result;\n    result.emplace_back(left, bottom);\n    result.emplace_back(right,\
-    \ bottom);\n    result.emplace_back(right, top);\n    result.emplace_back(left,\
-    \ top);\n    return result;\n}\n\ntemplate <typename T>\nstd::vector<Point<long\
-    \ double>> clipping_intersection(\n    std::vector<Point<T>> first,\n    std::vector<Point<T>>\
-    \ second\n) {\n    first = normalize_convex_polygon(std::move(first));\n    second\
-    \ = normalize_convex_polygon(std::move(second));\n    std::vector<Point<long double>>\
-    \ result;\n    result.reserve(first.size());\n    for (const Point<T>& point :\
-    \ first) result.emplace_back(point);\n    for (std::size_t index = 0; index <\
-    \ second.size(); ++index) {\n        const Line<T> boundary{\n            second[index],\n\
-    \            second[(index + 1) % second.size()]\n        };\n        result =\
-    \ convex_cut(result, Line<long double>{\n            Point<long double>(boundary.a),\n\
-    \            Point<long double>(boundary.b)\n        });\n        if (result.empty())\
-    \ break;\n    }\n    return result;\n}\n\ntemplate <typename T>\nPointInPolygon\
-    \ contains_closed(\n    const std::vector<Point<T>>& polygon,\n    const Point<T>&\
-    \ point\n) {\n    if (polygon.empty()) return PointInPolygon::Outside;\n    if\
-    \ (polygon.size() == 1) {\n        return distance(polygon[0], point) <= 1e-8L\n\
-    \            ? PointInPolygon::Boundary\n            : PointInPolygon::Outside;\n\
-    \    }\n    if (polygon.size() == 2) {\n        return on_segment(Segment<T>{polygon[0],\
-    \ polygon[1]}, point, 1e-8L)\n            ? PointInPolygon::Boundary\n       \
-    \     : PointInPolygon::Outside;\n    }\n    return point_in_polygon(polygon,\
-    \ point, 1e-8L);\n}\n\nvoid assert_same_closed_polygon(\n    const std::vector<Point<long\
-    \ double>>& first,\n    const std::vector<Point<long double>>& second\n) {\n \
-    \   assert(first.empty() == second.empty());\n    assert(close(polygon_area(first),\
-    \ polygon_area(second)));\n    for (const auto& point : first) {\n        assert(contains_closed(second,\
-    \ point) != PointInPolygon::Outside);\n    }\n    for (const auto& point : second)\
-    \ {\n        assert(contains_closed(first, point) != PointInPolygon::Outside);\n\
-    \    }\n}\n\ntemplate <typename T>\nlong double triangle_area(\n    const std::array<Point<T>,\
-    \ 3>& triangle\n) {\n    return std::fabs(\n        static_cast<long double>(\n\
-    \            cross(triangle[0], triangle[1], triangle[2])\n        )\n    ) /\
-    \ 2;\n}\n\nvoid test_centroid_and_triangulation() {\n    std::vector<P> rectangle\
-    \ = square(0, 0, 4, 2);\n    auto rectangle_centroid = polygon_centroid(rectangle);\n\
-    \    assert(rectangle_centroid.has_value());\n    assert(close(rectangle_centroid->x,\
-    \ 2));\n    assert(close(rectangle_centroid->y, 1));\n    auto same_centroid =\
-    \ polygon_center_of_gravity(rectangle);\n    assert(same_centroid.has_value());\n\
-    \    assert(close(same_centroid->x, 2));\n    assert(close(same_centroid->y, 1));\n\
-    \n    std::vector<P> concave;\n    concave.emplace_back(0, 0);\n    concave.emplace_back(5,\
-    \ 0);\n    concave.emplace_back(5, 1);\n    concave.emplace_back(1, 1);\n    concave.emplace_back(1,\
-    \ 5);\n    concave.emplace_back(0, 5);\n    assert(is_simple_polygon(concave));\n\
-    \n    auto centroid = polygon_centroid(concave);\n    assert(centroid.has_value());\n\
-    \    assert(close(centroid->x, 14.5L / 9));\n    assert(close(centroid->y, 14.5L\
-    \ / 9));\n\n    auto triangulation = triangulate_polygon(concave);\n    assert(triangulation.has_value());\n\
-    \    assert(triangulation->size() == 4);\n    long double area_sum = 0;\n    for\
-    \ (const auto& triangle : *triangulation) {\n        assert(orientation(triangle[0],\
-    \ triangle[1], triangle[2]) > 0);\n        area_sum += triangle_area(triangle);\n\
-    \    }\n    assert(close(area_sum, polygon_area(concave)));\n\n    std::reverse(concave.begin(),\
-    \ concave.end());\n    auto clockwise = triangulate_polygon(concave);\n    assert(clockwise.has_value());\n\
-    \    assert(clockwise->size() == 4);\n\n    std::vector<P> redundant;\n    redundant.emplace_back(0,\
-    \ 0);\n    redundant.emplace_back(2, 0);\n    redundant.emplace_back(4, 0);\n\
-    \    redundant.emplace_back(4, 3);\n    redundant.emplace_back(0, 3);\n    redundant.emplace_back(0,\
-    \ 0);\n    auto cleaned = triangulate_polygon(redundant);\n    assert(cleaned.has_value());\n\
-    \    assert(cleaned->size() == 2);\n\n    auto convex = triangulate_convex_polygon(rectangle);\n\
-    \    assert(convex.size() == 2);\n\n    std::vector<P> bow_tie;\n    bow_tie.emplace_back(0,\
-    \ 0);\n    bow_tie.emplace_back(3, 3);\n    bow_tie.emplace_back(0, 3);\n    bow_tie.emplace_back(3,\
-    \ 0);\n    assert(!is_simple_polygon(bow_tie));\n    assert(!triangulate_polygon(bow_tie).has_value());\n\
-    \n    std::vector<P> backtracking;\n    backtracking.emplace_back(0, 0);\n   \
-    \ backtracking.emplace_back(4, 0);\n    backtracking.emplace_back(2, 0);\n   \
-    \ backtracking.emplace_back(2, 3);\n    backtracking.emplace_back(0, 3);\n   \
-    \ assert(!is_simple_polygon(backtracking));\n    assert(!triangulate_polygon(backtracking).has_value());\n\
-    \n    std::vector<P> zero_area;\n    zero_area.emplace_back(0, 0);\n    zero_area.emplace_back(1,\
-    \ 0);\n    zero_area.emplace_back(2, 0);\n    assert(!polygon_centroid(zero_area).has_value());\n\
-    \    assert(!triangulate_polygon(zero_area).has_value());\n}\n\nvoid test_reflection()\
-    \ {\n    Line<long long> mirror;\n    mirror.a = P(-10, 0);\n    mirror.b = P(10,\
-    \ 0);\n\n    Ray<long long> incoming;\n    incoming.origin = P(-2, 3);\n    incoming.through\
-    \ = P(0, 0);\n    Ray<long double> outgoing =\n        reflected_ray(incoming,\
-    \ P(0, 0), mirror);\n    assert(close(outgoing.origin.x, 0));\n    assert(close(outgoing.origin.y,\
-    \ 0));\n    assert(close(outgoing.through.x, 2));\n    assert(close(outgoing.through.y,\
-    \ 3));\n\n    Ray<long double> mirrored = reflection(mirror, incoming);\n    assert(close(mirrored.origin.x,\
-    \ -2));\n    assert(close(mirrored.origin.y, -3));\n    assert(close(mirrored.through.x,\
-    \ 0));\n    assert(close(mirrored.through.y, 0));\n}\n\nvoid test_ray_polygon()\
-    \ {\n    std::vector<P> polygon = square(0, 0, 4, 4);\n    Ray<long long> crossing;\n\
-    \    crossing.origin = P(-2, 2);\n    crossing.through = P(-1, 2);\n    auto hits\
-    \ = ray_polygon_intersections(crossing, polygon);\n    assert(hits.size() == 2);\n\
-    \    assert(close(hits[0].x, 0));\n    assert(close(hits[1].x, 4));\n    assert(intersects(crossing,\
-    \ polygon));\n    assert(close(distance(crossing, polygon), 0));\n\n    Ray<long\
-    \ long> inside;\n    inside.origin = P(2, 2);\n    inside.through = P(3, 2);\n\
-    \    auto first = first_ray_polygon_intersection(inside, polygon);\n    assert(first.has_value());\n\
-    \    assert(close(first->x, 4));\n    assert(intersects(inside, polygon));\n\n\
-    \    Ray<long long> collinear;\n    collinear.origin = P(-2, 0);\n    collinear.through\
-    \ = P(-1, 0);\n    auto boundary = ray_polygon_intersections(collinear, polygon);\n\
-    \    assert(boundary.size() == 2);\n    assert(close(boundary[0].x, 0));\n   \
-    \ assert(close(boundary[1].x, 4));\n\n    Ray<long long> through_vertices;\n \
-    \   through_vertices.origin = P(-1, -1);\n    through_vertices.through = P(0,\
-    \ 0);\n    auto vertex_hits =\n        ray_polygon_intersections(through_vertices,\
-    \ polygon);\n    assert(vertex_hits.size() == 2);\n    assert(close(vertex_hits[0].x,\
-    \ 0));\n    assert(close(vertex_hits[1].x, 4));\n\n    Ray<long long> missing;\n\
-    \    missing.origin = P(-2, 7);\n    missing.through = P(-1, 7);\n    assert(!intersects(missing,\
-    \ polygon));\n    assert(close(distance(missing, polygon), 3));\n}\n\nvoid test_polygon_polygon()\
-    \ {\n    std::vector<P> first = square(0, 0, 4, 4);\n    std::vector<P> overlap\
-    \ = square(2, 1, 6, 3);\n    std::vector<P> contained = square(1, 1, 2, 2);\n\
-    \    std::vector<P> touching = square(4, 1, 7, 2);\n    std::vector<P> separate\
-    \ = square(7, 0, 9, 2);\n\n    assert(intersects(first, overlap));\n    assert(intersects(first,\
-    \ contained));\n    assert(intersects(first, touching));\n    assert(!intersects(first,\
-    \ separate));\n    assert(close(distance(first, separate), 3));\n\n    std::vector<P>\
-    \ concave;\n    concave.emplace_back(0, 0);\n    concave.emplace_back(5, 0);\n\
-    \    concave.emplace_back(5, 1);\n    concave.emplace_back(1, 1);\n    concave.emplace_back(1,\
-    \ 5);\n    concave.emplace_back(0, 5);\n    std::vector<P> in_arm = square(0,\
-    \ 3, 1, 4);\n    std::vector<P> in_notch = square(2, 2, 3, 3);\n    assert(intersects(concave,\
-    \ in_arm));\n    assert(!intersects(concave, in_notch));\n    assert(close(distance(concave,\
-    \ in_notch), 1));\n\n    auto clipped = convex_polygon_intersection(first, overlap);\n\
-    \    assert(clipped.size() == 4);\n    assert(close(polygon_area(clipped), 4));\n\
-    \    std::reverse(first.begin(), first.end());\n    auto clockwise_clip = convex_polygon_intersection(first,\
-    \ overlap);\n    assert(close(polygon_area(clockwise_clip), 4));\n    assert(polygon_area2(clockwise_clip)\
-    \ > 0);\n    std::reverse(first.begin(), first.end());\n\n    auto contained_clip\
-    \ = convex_polygon_intersection(first, contained);\n    assert(close(polygon_area(contained_clip),\
-    \ 1));\n\n    auto touching_clip = convex_polygon_intersection(first, touching);\n\
-    \    assert(touching_clip.size() == 2);\n    assert(close(polygon_area(touching_clip),\
-    \ 0));\n\n    auto empty_clip = convex_polygon_intersection(first, separate);\n\
-    \    assert(empty_clip.empty());\n\n    std::vector<P> corner_touching = square(4,\
-    \ 4, 7, 7);\n    auto corner_clip = convex_polygon_intersection(first, corner_touching);\n\
-    \    assert(corner_clip.size() == 1);\n    assert(close(corner_clip[0].x, 4));\n\
-    \    assert(close(corner_clip[0].y, 4));\n}\n\nvoid test_minkowski_examples()\
-    \ {\n    std::vector<P> first = square(0, 0, 2, 2);\n    std::vector<P> second;\n\
-    \    second.emplace_back(0, 0);\n    second.emplace_back(2, 0);\n    second.emplace_back(0,\
-    \ 1);\n\n    std::vector<P> sum = minkowski_sum(first, second);\n    std::vector<P>\
-    \ brute;\n    for (const P& a : first) {\n        for (const P& b : second) brute.push_back(a\
-    \ + b);\n    }\n    assert(convex_hull(sum) == convex_hull(brute));\n\n    std::reverse(first.begin(),\
-    \ first.end());\n    std::reverse(second.begin(), second.end());\n    assert(\n\
-    \        convex_hull(minkowski_sum(first, second)) ==\n        convex_hull(brute)\n\
-    \    );\n\n    std::vector<P> segment;\n    segment.emplace_back(0, 0);\n    segment.emplace_back(3,\
-    \ 0);\n    std::vector<P> point;\n    point.emplace_back(2, 4);\n    std::vector<P>\
-    \ translated = minkowski_sum(segment, point);\n    std::vector<P> expected;\n\
-    \    expected.emplace_back(2, 4);\n    expected.emplace_back(5, 4);\n    assert(translated\
-    \ == expected);\n\n    std::vector<P> diagonal_segment;\n    diagonal_segment.emplace_back(2,\
-    \ -1);\n    diagonal_segment.emplace_back(-1, 2);\n    std::vector<P> segment_sum\
-    \ = minkowski_sum(diagonal_segment, first);\n    brute.clear();\n    for (const\
-    \ P& a : diagonal_segment) {\n        for (const P& b : first) brute.push_back(a\
-    \ + b);\n    }\n    assert(convex_hull(segment_sum) == convex_hull(brute));\n\
-    }\n\nvoid test_randomized_minkowski_and_clipping() {\n    std::uint64_t state\
-    \ = 0x314159265358979ULL;\n    auto random = [&state]() {\n        state ^= state\
-    \ << 7;\n        state ^= state >> 9;\n        return state;\n    };\n\n    for\
-    \ (int trial = 0; trial < 5000; ++trial) {\n        std::vector<P> first_points;\n\
-    \        std::vector<P> second_points;\n        int first_count = 3 + static_cast<int>(random()\
-    \ % 8);\n        int second_count = 3 + static_cast<int>(random() % 8);\n    \
-    \    for (int index = 0; index < first_count; ++index) {\n            first_points.emplace_back(\n\
-    \                static_cast<long long>(random() % 21) - 10,\n               \
-    \ static_cast<long long>(random() % 21) - 10\n            );\n        }\n    \
+    \ < 3) continue;\n        const PointType translation(\n            static_cast<long\
+    \ long>(random() % 101) - 50,\n            static_cast<long long>(random() % 101)\
+    \ - 50\n        );\n        for (PointType& point : second) point += translation;\n\
+    \n        std::vector<PointType> input = first;\n        if (random() % 2 != 0)\
+    \ std::reverse(input.begin(), input.end());\n        ConvexPolygon<long long>\
+    \ polygon(input);\n        input = second;\n        if (random() % 2 != 0) std::reverse(input.begin(),\
+    \ input.end());\n        ConvexPolygon<long long> other(input);\n        assert(\n\
+    \            polygon.vertices() ==\n            normalize_convex_polygon(first)\n\
+    \        );\n        assert(polygon.area2() == polygon_area2(first));\n      \
+    \  assert(is_convex_polygon(polygon.vertices(), true));\n\n        for (int query\
+    \ = 0; query < 40; ++query) {\n            const PointType point(\n          \
+    \      static_cast<long long>(random() % 61) - 30,\n                static_cast<long\
+    \ long>(random() % 61) - 30\n            );\n            assert(\n           \
+    \     polygon.contains(point) ==\n                point_in_polygon(first, point)\n\
+    \            );\n\n            const PointType direction(\n                static_cast<long\
+    \ long>(random() % 21) - 10,\n                static_cast<long long>(random()\
+    \ % 21) - 10\n            );\n            Wide minimum = dot(first[0], direction);\n\
+    \            Wide maximum = minimum;\n            for (const PointType& vertex\
+    \ : first) {\n                minimum = std::min(minimum, dot(vertex, direction));\n\
+    \                maximum = std::max(maximum, dot(vertex, direction));\n      \
+    \      }\n            assert(polygon.min_dot(direction).first == minimum);\n \
+    \           assert(polygon.max_dot(direction).first == maximum);\n        }\n\n\
+    \        for (int first_index = 0; first_index < polygon.size(); ++first_index)\
+    \ {\n            for (int last_index = 0; last_index < polygon.size(); ++last_index)\
+    \ {\n                assert(\n                    polygon.chain_area2(first_index,\
+    \ last_index) ==\n                    naive_chain_area2(\n                   \
+    \     polygon.vertices(),\n                        first_index,\n            \
+    \            last_index\n                    )\n                );\n         \
+    \   }\n        }\n\n        for (int query = 0; query < 4; ++query) {\n      \
+    \      const long long outside_x =\n                query % 2 == 0 ? -100 - int(random()\
+    \ % 20)\n                               : 100 + int(random() % 20);\n        \
+    \    const long long outside_y =\n                query / 2 == 0 ? -100 - int(random()\
+    \ % 20)\n                               : 100 + int(random() % 20);\n        \
+    \    const PointType outside(outside_x, outside_y);\n            const auto tangents\
+    \ = polygon.tangent_vertices(outside);\n            assert(is_tangent(\n     \
+    \           polygon.vertices(),\n                outside,\n                tangents.first\n\
+    \            ));\n            assert(is_tangent(\n                polygon.vertices(),\n\
+    \                outside,\n                tangents.second\n            ));\n\
+    \        }\n\n        assert(\n            convex_polygons_intersect(first, second)\
+    \ ==\n            intersects(first, second)\n        );\n        assert(close(\n\
+    \            convex_polygons_distance(first, second),\n            distance(first,\
+    \ second)\n        ));\n        assert(\n            convex_polygons_intersect(polygon,\
+    \ other) ==\n            intersects(first, second)\n        );\n        assert(\n\
+    \            convex_polygons_intersect(other, polygon) ==\n            intersects(first,\
+    \ second)\n        );\n        assert(close(\n            convex_polygons_distance(polygon,\
+    \ other),\n            distance(first, second)\n        ));\n        assert(close(\n\
+    \            convex_polygons_distance(other, polygon),\n            distance(first,\
+    \ second)\n        ));\n        const auto object_closest =\n            convex_polygons_closest_points(polygon,\
+    \ other);\n        const auto vector_closest =\n            convex_polygons_closest_points(first,\
+    \ second);\n        const long double expected_distance = distance(first, second);\n\
+    \        assert_closest_points(\n            first,\n            second,\n   \
+    \         object_closest,\n            expected_distance\n        );\n       \
+    \ assert_closest_points(\n            first,\n            second,\n          \
+    \  vector_closest,\n            expected_distance\n        );\n    }\n}\n\nvoid\
+    \ test_randomized_floating_pairs() {\n    using FloatingPoint = Point<long double>;\n\
+    \    std::uint64_t state = 0xbb67ae8584caa73bULL;\n    auto random = [&state]()\
+    \ {\n        state ^= state << 7;\n        state ^= state >> 9;\n        return\
+    \ state;\n    };\n    constexpr long double pi = 3.141592653589793238462643383279L;\n\
+    \n    for (int trial = 0; trial < 1500; ++trial) {\n        const int size = 3\
+    \ + int(random() % 40);\n        const long double phase =\n            2 * pi\
+    \ * static_cast<long double>(random() % 1000000) / 1000000;\n        const FloatingPoint\
+    \ translation(\n            static_cast<long double>(random() % 8001) / 100 -\
+    \ 40,\n            static_cast<long double>(random() % 8001) / 100 - 40\n    \
+    \    );\n        std::vector<FloatingPoint> first;\n        std::vector<FloatingPoint>\
+    \ second;\n        for (int index = 0; index < size; ++index) {\n            const\
+    \ long double angle = phase + 2 * pi * index / size;\n            first.emplace_back(13\
+    \ * std::cos(angle), 7 * std::sin(angle));\n            second.emplace_back(\n\
+    \                13 * std::cos(angle) + translation.x,\n                7 * std::sin(angle)\
+    \ + translation.y\n            );\n        }\n        ConvexPolygon<long double>\
+    \ first_query(first);\n        ConvexPolygon<long double> second_query(second);\n\
+    \        assert(\n            convex_polygons_intersect(first_query, second_query)\
+    \ ==\n            convex_polygons_intersect(first, second)\n        );\n     \
+    \   assert(close(\n            convex_polygons_distance(first_query, second_query),\n\
+    \            convex_polygons_distance(first, second)\n        ));\n        const\
+    \ long double expected_distance =\n            convex_polygons_distance(first,\
+    \ second);\n        assert_closest_points(\n            first,\n            second,\n\
+    \            convex_polygons_closest_points(first_query, second_query),\n    \
+    \        expected_distance\n        );\n    }\n}\n\n}  // namespace\n\nint main()\
+    \ {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
+    \ fast_output;\n\n    test_fixed();\n    test_randomized();\n    test_randomized_floating_pairs();\n\
+    \n    int size;\n    fast_input >> size;\n    using FloatingPoint = Point<long\
+    \ double>;\n    std::vector<FloatingPoint> polygon(size);\n    for (FloatingPoint&\
+    \ point : polygon) fast_input >> point.x >> point.y;\n\n    int query_count;\n\
+    \    fast_input >> query_count;\n    fast_output.set_fixed(8);\n    while (query_count--)\
+    \ {\n        Line<long double> boundary;\n        fast_input >> boundary.a.x >>\
+    \ boundary.a.y;\n        fast_input >> boundary.b.x >> boundary.b.y;\n       \
+    \ fast_output << polygon_area(convex_cut(polygon, boundary)) << '\\n';\n    }\n\
+    }\n"
+  code: "#define PROBLEM \"https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_4_C\"\
+    \n#define ERROR \"1e-7\"\n\n#include \"../../geometry/convex_polygon.hpp\"\n\n\
+    #include <algorithm>\n#include <cassert>\n#include <cmath>\n#include <cstdint>\n\
+    #include \"../../utilities/fast_io.hpp\"\n#include <vector>\n\nnamespace {\n\n\
+    using namespace m1une::geometry;\nusing PointType = Point<long long>;\nusing Wide\
+    \ = wide_type<long long>;\n\nbool close(long double first, long double second)\
+    \ {\n    return std::fabs(first - second) <= 1e-9L;\n}\n\ntemplate <Coordinate\
+    \ T>\nbool contains_closed(\n    const std::vector<Point<T>>& polygon,\n    const\
+    \ Point<long double>& point\n) {\n    std::vector<Point<long double>> converted;\n\
+    \    converted.reserve(polygon.size());\n    for (const Point<T>& vertex : polygon)\
+    \ converted.emplace_back(vertex);\n    return\n        point_in_convex_polygon(converted,\
+    \ point, 1e-8L) !=\n        PointInPolygon::Outside;\n}\n\ntemplate <Coordinate\
+    \ T>\nvoid assert_closest_points(\n    const std::vector<Point<T>>& first,\n \
+    \   const std::vector<Point<T>>& second,\n    const std::pair<Point<long double>,\
+    \ Point<long double>>& points,\n    long double expected_distance\n) {\n    assert(contains_closed(first,\
+    \ points.first));\n    assert(contains_closed(second, points.second));\n    assert(close(distance(points.first,\
+    \ points.second), expected_distance));\n}\n\nWide naive_chain_area2(\n    const\
+    \ std::vector<PointType>& polygon,\n    int first,\n    int last\n) {\n    Wide\
+    \ result = 0;\n    int index = first;\n    while (index != last) {\n        const\
+    \ int next = (index + 1) % int(polygon.size());\n        result += cross(polygon[index],\
+    \ polygon[next]);\n        index = next;\n    }\n    result += cross(polygon[last],\
+    \ polygon[first]);\n    return result;\n}\n\nbool is_tangent(\n    const std::vector<PointType>&\
+    \ polygon,\n    const PointType& point,\n    int index\n) {\n    int side = 0;\n\
+    \    for (const PointType& vertex : polygon) {\n        const int current = orientation(point,\
+    \ polygon[index], vertex);\n        if (current == 0) continue;\n        if (side\
+    \ != 0 && side != current) return false;\n        side = current;\n    }\n   \
+    \ return side != 0;\n}\n\nvoid test_fixed() {\n    std::vector<PointType> square;\n\
+    \    square.emplace_back(0, 0);\n    square.emplace_back(4, 0);\n    square.emplace_back(4,\
+    \ 4);\n    square.emplace_back(0, 4);\n    assert(is_convex_polygon(square));\n\
+    \    assert(is_convex_polygon(square, true));\n\n    std::vector<PointType> weak;\n\
+    \    weak.emplace_back(0, 0);\n    weak.emplace_back(2, 0);\n    weak.emplace_back(4,\
+    \ 0);\n    weak.emplace_back(4, 4);\n    weak.emplace_back(0, 4);\n    assert(is_convex_polygon(weak));\n\
+    \    assert(!is_convex_polygon(weak, true));\n    std::reverse(weak.begin(), weak.end());\n\
+    \n    ConvexPolygon<long long> polygon(weak);\n    assert(polygon.size() == 4);\n\
+    \    assert(polygon.area2() == 32);\n    assert(polygon.contains(PointType(2,\
+    \ 2)) == PointInPolygon::Inside);\n    assert(polygon.contains(PointType(0, 2))\
+    \ == PointInPolygon::Boundary);\n    assert(polygon.contains(PointType(5, 2))\
+    \ == PointInPolygon::Outside);\n    assert(polygon.max_dot(PointType(1, 0)).first\
+    \ == 4);\n    assert(polygon.min_dot(PointType(1, 0)).first == 0);\n\n    std::vector<PointType>\
+    \ diagonal_segment;\n    diagonal_segment.emplace_back(0, 3);\n    diagonal_segment.emplace_back(2,\
+    \ 1);\n    const auto normalized_segment =\n        normalize_convex_polygon(diagonal_segment);\n\
+    \    assert(normalized_segment[0] == PointType(2, 1));\n\n    const auto tangents\
+    \ = polygon.tangent_vertices(PointType(7, 2));\n    assert(is_tangent(polygon.vertices(),\
+    \ PointType(7, 2), tangents.first));\n    assert(is_tangent(polygon.vertices(),\
+    \ PointType(7, 2), tangents.second));\n    assert(tangents.first != tangents.second);\n\
+    \n    const PointType edge_extension(7, 0);\n    const auto collinear_tangents\
+    \ =\n        polygon.tangent_vertices(edge_extension);\n    assert(is_tangent(\n\
+    \        polygon.vertices(),\n        edge_extension,\n        collinear_tangents.first\n\
+    \    ));\n    assert(is_tangent(\n        polygon.vertices(),\n        edge_extension,\n\
+    \        collinear_tangents.second\n    ));\n\n    Line<long long> vertical{PointType(2,\
+    \ -1), PointType(2, 5)};\n    const auto left = convex_cut(square, vertical);\n\
+    \    assert(close(polygon_area(left), 8));\n\n    std::vector<PointType> redundant_square;\n\
+    \    redundant_square.emplace_back(0, 0);\n    redundant_square.emplace_back(2,\
+    \ 0);\n    redundant_square.emplace_back(4, 0);\n    redundant_square.emplace_back(4,\
+    \ 4);\n    redundant_square.emplace_back(0, 4);\n    redundant_square.emplace_back(0,\
+    \ 0);\n    const auto self_intersection =\n        convex_polygon_intersection(redundant_square,\
+    \ square);\n    assert(close(polygon_area(self_intersection), 16));\n\n    std::vector<PointType>\
+    \ concave;\n    concave.emplace_back(0, 0);\n    concave.emplace_back(4, 0);\n\
+    \    concave.emplace_back(2, 1);\n    concave.emplace_back(4, 4);\n    concave.emplace_back(0,\
+    \ 4);\n    assert(!is_convex_polygon(concave));\n\n    std::vector<PointType>\
+    \ collinear;\n    collinear.emplace_back(0, 0);\n    collinear.emplace_back(4,\
+    \ 0);\n    collinear.emplace_back(2, 0);\n    assert(is_convex_polygon(collinear));\n\
+    \    assert(!is_convex_polygon(collinear, true));\n\n    ConvexPolygon<long long>\
+    \ overlapping(square);\n    ConvexPolygon<long long> touching(std::vector<PointType>{\n\
+    \        PointType(4, 1),\n        PointType(7, 1),\n        PointType(7, 3),\n\
+    \        PointType(4, 3),\n    });\n    ConvexPolygon<long long> separate(std::vector<PointType>{\n\
+    \        PointType(7, 1),\n        PointType(9, 1),\n        PointType(9, 3),\n\
+    \        PointType(7, 3),\n    });\n    assert(convex_polygons_intersect(overlapping,\
+    \ touching));\n    assert(!convex_polygons_intersect(overlapping, separate));\n\
+    \    assert(close(convex_polygons_distance(overlapping, touching), 0));\n    assert(close(convex_polygons_distance(overlapping,\
+    \ separate), 3));\n\n    ConvexPolygon<long long> point(std::vector<PointType>{PointType(2,\
+    \ 2)});\n    ConvexPolygon<long long> outside_point(\n        std::vector<PointType>{PointType(8,\
+    \ 2)}\n    );\n    ConvexPolygon<long long> segment(std::vector<PointType>{\n\
+    \        PointType(4, 1),\n        PointType(7, 1),\n    });\n    assert(convex_polygons_intersect(overlapping,\
+    \ point));\n    assert(!convex_polygons_intersect(overlapping, outside_point));\n\
+    \    assert(convex_polygons_intersect(overlapping, segment));\n    assert(close(convex_polygons_distance(overlapping,\
+    \ outside_point), 4));\n    assert(close(convex_polygons_distance(overlapping,\
+    \ segment), 0));\n    const auto outside_closest =\n        convex_polygons_closest_points(overlapping,\
+    \ outside_point);\n    assert(close(outside_closest.first.x, 4));\n    assert(close(outside_closest.first.y,\
+    \ 2));\n    assert(close(outside_closest.second.x, 8));\n    assert(close(outside_closest.second.y,\
+    \ 2));\n    assert_closest_points(\n        overlapping.vertices(),\n        outside_point.vertices(),\n\
+    \        outside_closest,\n        4\n    );\n    const auto overlap_closest =\n\
+    \        convex_polygons_closest_points(overlapping, touching);\n    assert_closest_points(\n\
+    \        overlapping.vertices(),\n        touching.vertices(),\n        overlap_closest,\n\
+    \        0\n    );\n\n    ConvexPolygon<long long> first_segment(std::vector<PointType>{\n\
+    \        PointType(0, 0),\n        PointType(4, 0),\n    });\n    ConvexPolygon<long\
+    \ long> crossing_segment(std::vector<PointType>{\n        PointType(2, -2),\n\
+    \        PointType(2, 2),\n    });\n    ConvexPolygon<long long> parallel_segment(std::vector<PointType>{\n\
+    \        PointType(1, 3),\n        PointType(5, 3),\n    });\n    assert(convex_polygons_intersect(first_segment,\
+    \ crossing_segment));\n    assert(!convex_polygons_intersect(first_segment, parallel_segment));\n\
+    \    assert(close(\n        convex_polygons_distance(first_segment, parallel_segment),\n\
+    \        3\n    ));\n    const auto crossing_closest =\n        convex_polygons_closest_points(first_segment,\
+    \ crossing_segment);\n    assert(close(crossing_closest.first.x, 2));\n    assert(close(crossing_closest.first.y,\
+    \ 0));\n    assert(crossing_closest.first == crossing_closest.second);\n    assert_closest_points(\n\
+    \        first_segment.vertices(),\n        parallel_segment.vertices(),\n   \
+    \     convex_polygons_closest_points(first_segment, parallel_segment),\n     \
+    \   3\n    );\n}\n\nvoid test_randomized() {\n    std::uint64_t state = 0x6a09e667f3bcc909ULL;\n\
+    \    auto random = [&state]() {\n        state ^= state << 7;\n        state ^=\
+    \ state >> 9;\n        return state;\n    };\n\n    for (int trial = 0; trial\
+    \ < 5000; ++trial) {\n        std::vector<PointType> first_points;\n        std::vector<PointType>\
+    \ second_points;\n        const int first_count = 3 + int(random() % 18);\n  \
+    \      const int second_count = 3 + int(random() % 18);\n        for (int index\
+    \ = 0; index < first_count; ++index) {\n            first_points.emplace_back(\n\
+    \                static_cast<long long>(random() % 31) - 15,\n               \
+    \ static_cast<long long>(random() % 31) - 15\n            );\n        }\n    \
     \    for (int index = 0; index < second_count; ++index) {\n            second_points.emplace_back(\n\
-    \                static_cast<long long>(random() % 21) - 10,\n               \
-    \ static_cast<long long>(random() % 21) - 10\n            );\n        }\n    \
-    \    std::vector<P> first = convex_hull(first_points);\n        std::vector<P>\
+    \                static_cast<long long>(random() % 31) - 15,\n               \
+    \ static_cast<long long>(random() % 31) - 15\n            );\n        }\n    \
+    \    std::vector<PointType> first = convex_hull(first_points);\n        std::vector<PointType>\
     \ second = convex_hull(second_points);\n        if (first.size() < 3 || second.size()\
-    \ < 3) continue;\n        const P translation(\n            static_cast<long long>(random()\
-    \ % 41) - 20,\n            static_cast<long long>(random() % 41) - 20\n      \
-    \  );\n        for (P& point : second) point += translation;\n\n        auto ear_triangles\
-    \ = triangulate_polygon(first);\n        assert(ear_triangles.has_value());\n\
-    \        auto fan_triangles = triangulate_convex_polygon(first);\n        assert(ear_triangles->size()\
-    \ == first.size() - 2);\n        assert(fan_triangles.size() == first.size() -\
-    \ 2);\n        long double ear_area = 0;\n        long double fan_area = 0;\n\
-    \        for (const auto& triangle : *ear_triangles) {\n            ear_area +=\
-    \ triangle_area(triangle);\n        }\n        for (const auto& triangle : fan_triangles)\
-    \ {\n            fan_area += triangle_area(triangle);\n        }\n        assert(close(ear_area,\
-    \ polygon_area(first)));\n        assert(close(fan_area, polygon_area(first)));\n\
-    \n        std::vector<P> brute_sums;\n        for (const P& a : first) {\n   \
-    \         for (const P& b : second) brute_sums.push_back(a + b);\n        }\n\
-    \        assert(\n            convex_hull(minkowski_sum(first, second)) ==\n \
-    \           convex_hull(brute_sums)\n        );\n\n        auto forward = convex_polygon_intersection(first,\
-    \ second);\n        auto backward = convex_polygon_intersection(second, first);\n\
-    \        assert(close(polygon_area(forward), polygon_area(backward)));\n     \
-    \   assert_same_closed_polygon(\n            forward,\n            clipping_intersection(first,\
-    \ second)\n        );\n        for (const Point<long double>& point : forward)\
-    \ {\n            assert(\n                point_in_polygon(\n                \
-    \    std::vector<Point<long double>>(\n                        first.begin(),\n\
-    \                        first.end()\n                    ),\n               \
-    \     point\n                ) != PointInPolygon::Outside\n            );\n  \
-    \          assert(\n                point_in_polygon(\n                    std::vector<Point<long\
-    \ double>>(\n                        second.begin(),\n                       \
-    \ second.end()\n                    ),\n                    point\n          \
-    \      ) != PointInPolygon::Outside\n            );\n        }\n\n        const\
-    \ auto rightmost = std::max_element(\n            first.begin(),\n           \
-    \ first.end(),\n            [](const P& left, const P& right) {\n            \
-    \    return left.x < right.x;\n            }\n        );\n        const auto leftmost\
-    \ = std::min_element(\n            second.begin(),\n            second.end(),\n\
-    \            [](const P& left, const P& right) {\n                return left.x\
-    \ < right.x;\n            }\n        );\n        std::vector<P> touching = second;\n\
-    \        const P touching_translation = *rightmost - *leftmost;\n        for (P&\
-    \ point : touching) point += touching_translation;\n        const auto degenerate\
-    \ =\n            convex_polygon_intersection(first, touching);\n        assert(!degenerate.empty());\n\
-    \        assert(close(polygon_area(degenerate), 0));\n        assert_same_closed_polygon(\n\
-    \            degenerate,\n            clipping_intersection(first, touching)\n\
-    \        );\n    }\n}\n\nvoid test_randomized_floating_intersection() {\n    std::uint64_t\
-    \ state = 0xbb67ae8584caa73bULL;\n    auto random = [&state]() {\n        state\
-    \ ^= state << 7;\n        state ^= state >> 9;\n        return state;\n    };\n\
-    \    constexpr long double pi = 3.141592653589793238462643383279L;\n\n    for\
-    \ (int trial = 0; trial < 2000; ++trial) {\n        const int first_size = 3 +\
-    \ int(random() % 20);\n        const int second_size = 3 + int(random() % 20);\n\
-    \        const long double first_phase =\n            2 * pi * static_cast<long\
-    \ double>(random() % 1000000) / 1000000;\n        const long double second_phase\
-    \ =\n            2 * pi * static_cast<long double>(random() % 1000000) / 1000000;\n\
-    \        const Point<long double> first_center(\n            static_cast<long\
-    \ double>(random() % 2001) / 100 - 10,\n            static_cast<long double>(random()\
-    \ % 2001) / 100 - 10\n        );\n        const Point<long double> second_center(\n\
-    \            static_cast<long double>(random() % 4001) / 100 - 20,\n         \
-    \   static_cast<long double>(random() % 4001) / 100 - 20\n        );\n\n     \
-    \   std::vector<Point<long double>> first;\n        std::vector<Point<long double>>\
-    \ second;\n        for (int index = 0; index < first_size; ++index) {\n      \
-    \      const long double angle =\n                first_phase + 2 * pi * index\
-    \ / first_size;\n            first.emplace_back(\n                first_center.x\
-    \ + 12 * std::cos(angle),\n                first_center.y + 7 * std::sin(angle)\n\
-    \            );\n        }\n        for (int index = 0; index < second_size; ++index)\
-    \ {\n            const long double angle =\n                second_phase + 2 *\
-    \ pi * index / second_size;\n            second.emplace_back(\n              \
-    \  second_center.x + 9 * std::cos(angle),\n                second_center.y + 14\
-    \ * std::sin(angle)\n            );\n        }\n\n        assert_same_closed_polygon(\n\
-    \            convex_polygon_intersection(first, second),\n            clipping_intersection(first,\
-    \ second)\n        );\n    }\n}\n\n}  // namespace\n\nint main() {\n    m1une::utilities::FastInput\
-    \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n\n    test_centroid_and_triangulation();\n\
-    \    test_reflection();\n    test_ray_polygon();\n    test_polygon_polygon();\n\
-    \    test_minkowski_examples();\n    test_randomized_minkowski_and_clipping();\n\
-    \    test_randomized_floating_intersection();\n\n    long long a, b;\n    fast_input\
-    \ >> a >> b;\n    fast_output << a + b << '\\n';\n}\n"
+    \ < 3) continue;\n        const PointType translation(\n            static_cast<long\
+    \ long>(random() % 101) - 50,\n            static_cast<long long>(random() % 101)\
+    \ - 50\n        );\n        for (PointType& point : second) point += translation;\n\
+    \n        std::vector<PointType> input = first;\n        if (random() % 2 != 0)\
+    \ std::reverse(input.begin(), input.end());\n        ConvexPolygon<long long>\
+    \ polygon(input);\n        input = second;\n        if (random() % 2 != 0) std::reverse(input.begin(),\
+    \ input.end());\n        ConvexPolygon<long long> other(input);\n        assert(\n\
+    \            polygon.vertices() ==\n            normalize_convex_polygon(first)\n\
+    \        );\n        assert(polygon.area2() == polygon_area2(first));\n      \
+    \  assert(is_convex_polygon(polygon.vertices(), true));\n\n        for (int query\
+    \ = 0; query < 40; ++query) {\n            const PointType point(\n          \
+    \      static_cast<long long>(random() % 61) - 30,\n                static_cast<long\
+    \ long>(random() % 61) - 30\n            );\n            assert(\n           \
+    \     polygon.contains(point) ==\n                point_in_polygon(first, point)\n\
+    \            );\n\n            const PointType direction(\n                static_cast<long\
+    \ long>(random() % 21) - 10,\n                static_cast<long long>(random()\
+    \ % 21) - 10\n            );\n            Wide minimum = dot(first[0], direction);\n\
+    \            Wide maximum = minimum;\n            for (const PointType& vertex\
+    \ : first) {\n                minimum = std::min(minimum, dot(vertex, direction));\n\
+    \                maximum = std::max(maximum, dot(vertex, direction));\n      \
+    \      }\n            assert(polygon.min_dot(direction).first == minimum);\n \
+    \           assert(polygon.max_dot(direction).first == maximum);\n        }\n\n\
+    \        for (int first_index = 0; first_index < polygon.size(); ++first_index)\
+    \ {\n            for (int last_index = 0; last_index < polygon.size(); ++last_index)\
+    \ {\n                assert(\n                    polygon.chain_area2(first_index,\
+    \ last_index) ==\n                    naive_chain_area2(\n                   \
+    \     polygon.vertices(),\n                        first_index,\n            \
+    \            last_index\n                    )\n                );\n         \
+    \   }\n        }\n\n        for (int query = 0; query < 4; ++query) {\n      \
+    \      const long long outside_x =\n                query % 2 == 0 ? -100 - int(random()\
+    \ % 20)\n                               : 100 + int(random() % 20);\n        \
+    \    const long long outside_y =\n                query / 2 == 0 ? -100 - int(random()\
+    \ % 20)\n                               : 100 + int(random() % 20);\n        \
+    \    const PointType outside(outside_x, outside_y);\n            const auto tangents\
+    \ = polygon.tangent_vertices(outside);\n            assert(is_tangent(\n     \
+    \           polygon.vertices(),\n                outside,\n                tangents.first\n\
+    \            ));\n            assert(is_tangent(\n                polygon.vertices(),\n\
+    \                outside,\n                tangents.second\n            ));\n\
+    \        }\n\n        assert(\n            convex_polygons_intersect(first, second)\
+    \ ==\n            intersects(first, second)\n        );\n        assert(close(\n\
+    \            convex_polygons_distance(first, second),\n            distance(first,\
+    \ second)\n        ));\n        assert(\n            convex_polygons_intersect(polygon,\
+    \ other) ==\n            intersects(first, second)\n        );\n        assert(\n\
+    \            convex_polygons_intersect(other, polygon) ==\n            intersects(first,\
+    \ second)\n        );\n        assert(close(\n            convex_polygons_distance(polygon,\
+    \ other),\n            distance(first, second)\n        ));\n        assert(close(\n\
+    \            convex_polygons_distance(other, polygon),\n            distance(first,\
+    \ second)\n        ));\n        const auto object_closest =\n            convex_polygons_closest_points(polygon,\
+    \ other);\n        const auto vector_closest =\n            convex_polygons_closest_points(first,\
+    \ second);\n        const long double expected_distance = distance(first, second);\n\
+    \        assert_closest_points(\n            first,\n            second,\n   \
+    \         object_closest,\n            expected_distance\n        );\n       \
+    \ assert_closest_points(\n            first,\n            second,\n          \
+    \  vector_closest,\n            expected_distance\n        );\n    }\n}\n\nvoid\
+    \ test_randomized_floating_pairs() {\n    using FloatingPoint = Point<long double>;\n\
+    \    std::uint64_t state = 0xbb67ae8584caa73bULL;\n    auto random = [&state]()\
+    \ {\n        state ^= state << 7;\n        state ^= state >> 9;\n        return\
+    \ state;\n    };\n    constexpr long double pi = 3.141592653589793238462643383279L;\n\
+    \n    for (int trial = 0; trial < 1500; ++trial) {\n        const int size = 3\
+    \ + int(random() % 40);\n        const long double phase =\n            2 * pi\
+    \ * static_cast<long double>(random() % 1000000) / 1000000;\n        const FloatingPoint\
+    \ translation(\n            static_cast<long double>(random() % 8001) / 100 -\
+    \ 40,\n            static_cast<long double>(random() % 8001) / 100 - 40\n    \
+    \    );\n        std::vector<FloatingPoint> first;\n        std::vector<FloatingPoint>\
+    \ second;\n        for (int index = 0; index < size; ++index) {\n            const\
+    \ long double angle = phase + 2 * pi * index / size;\n            first.emplace_back(13\
+    \ * std::cos(angle), 7 * std::sin(angle));\n            second.emplace_back(\n\
+    \                13 * std::cos(angle) + translation.x,\n                7 * std::sin(angle)\
+    \ + translation.y\n            );\n        }\n        ConvexPolygon<long double>\
+    \ first_query(first);\n        ConvexPolygon<long double> second_query(second);\n\
+    \        assert(\n            convex_polygons_intersect(first_query, second_query)\
+    \ ==\n            convex_polygons_intersect(first, second)\n        );\n     \
+    \   assert(close(\n            convex_polygons_distance(first_query, second_query),\n\
+    \            convex_polygons_distance(first, second)\n        ));\n        const\
+    \ long double expected_distance =\n            convex_polygons_distance(first,\
+    \ second);\n        assert_closest_points(\n            first,\n            second,\n\
+    \            convex_polygons_closest_points(first_query, second_query),\n    \
+    \        expected_distance\n        );\n    }\n}\n\n}  // namespace\n\nint main()\
+    \ {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
+    \ fast_output;\n\n    test_fixed();\n    test_randomized();\n    test_randomized_floating_pairs();\n\
+    \n    int size;\n    fast_input >> size;\n    using FloatingPoint = Point<long\
+    \ double>;\n    std::vector<FloatingPoint> polygon(size);\n    for (FloatingPoint&\
+    \ point : polygon) fast_input >> point.x >> point.y;\n\n    int query_count;\n\
+    \    fast_input >> query_count;\n    fast_output.set_fixed(8);\n    while (query_count--)\
+    \ {\n        Line<long double> boundary;\n        fast_input >> boundary.a.x >>\
+    \ boundary.a.y;\n        fast_input >> boundary.b.x >> boundary.b.y;\n       \
+    \ fast_output << polygon_area(convex_cut(polygon, boundary)) << '\\n';\n    }\n\
+    }\n"
   dependsOn:
   - geometry/convex_polygon.hpp
   - geometry/convex_hull.hpp
@@ -2032,18 +1991,17 @@ data:
   - geometry/line.hpp
   - geometry/polygon.hpp
   - geometry/ray.hpp
-  - geometry/polygon.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
-  path: verify/geometry/polygon_operations.test.cpp
+  path: verify/geometry/convex_polygon.test.cpp
   requiredBy: []
-  timestamp: '2026-07-22 02:25:12+09:00'
+  timestamp: '2026-07-22 10:16:29+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/geometry/polygon_operations.test.cpp
+documentation_of: verify/geometry/convex_polygon.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/geometry/polygon_operations.test.cpp
-- /verify/verify/geometry/polygon_operations.test.cpp.html
-title: verify/geometry/polygon_operations.test.cpp
+- /verify/verify/geometry/convex_polygon.test.cpp
+- /verify/verify/geometry/convex_polygon.test.cpp.html
+title: verify/geometry/convex_polygon.test.cpp
 ---

@@ -19,6 +19,9 @@ data:
     title: Geometry Bundle
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/centroid.test.cpp
+    title: verify/geometry/centroid.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/geometry_algorithms.test.cpp
     title: verify/geometry/geometry_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
@@ -241,6 +244,7 @@ data:
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/lattice_point_count.test.cpp
+  - verify/geometry/centroid.test.cpp
 documentation_of: geometry/lattice_point_count.hpp
 layout: document
 title: Lattice-Point Count

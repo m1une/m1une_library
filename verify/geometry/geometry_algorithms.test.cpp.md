@@ -17,11 +17,17 @@ data:
     path: geometry/closest_pair.hpp
     title: Closest Pair of Points
   - icon: ':heavy_check_mark:'
+    path: geometry/convex_decomposition.hpp
+    title: Convex Decomposition
+  - icon: ':heavy_check_mark:'
     path: geometry/convex_hull.hpp
     title: Convex Hull
   - icon: ':heavy_check_mark:'
     path: geometry/convex_layers.hpp
     title: Convex Layers
+  - icon: ':heavy_check_mark:'
+    path: geometry/convex_polygon.hpp
+    title: Convex Polygons
   - icon: ':heavy_check_mark:'
     path: geometry/count_points_in_triangle.hpp
     title: Count Points in Triangle
@@ -74,8 +80,17 @@ data:
     path: utilities/bigint.hpp
     title: BigInt
   - icon: ':heavy_check_mark:'
+    path: utilities/detail/fixed_int.hpp
+    title: utilities/detail/fixed_int.hpp
+  - icon: ':heavy_check_mark:'
     path: utilities/fast_io.hpp
     title: Fast IO
+  - icon: ':heavy_check_mark:'
+    path: utilities/int256.hpp
+    title: Int256
+  - icon: ':heavy_check_mark:'
+    path: utilities/int512.hpp
+    title: Int512
   _extendedRequiredBy: []
   _extendedVerifiedWith: []
   _isVerificationFailed: false
@@ -182,13 +197,19 @@ data:
   - geometry/ray.hpp
   - geometry/line.hpp
   - geometry/closest_pair.hpp
+  - geometry/convex_decomposition.hpp
+  - utilities/int256.hpp
+  - utilities/detail/fixed_int.hpp
+  - utilities/int512.hpp
+  - geometry/polygon.hpp
   - geometry/convex_hull.hpp
   - geometry/convex_layers.hpp
+  - geometry/convex_polygon.hpp
+  - geometry/half_plane_intersection.hpp
   - geometry/count_points_in_triangle.hpp
   - geometry/euclidean_mst.hpp
   - ds/dsu/dsu.hpp
   - geometry/farthest_pair.hpp
-  - geometry/half_plane_intersection.hpp
   - geometry/lattice_point_count.hpp
   - utilities/bigint.hpp
   - math/fps/convolution.hpp
@@ -197,13 +218,12 @@ data:
   - geometry/manhattan_mst.hpp
   - geometry/minimum_enclosing_circle.hpp
   - geometry/perpendicular_bisector.hpp
-  - geometry/polygon.hpp
   - geometry/rectangle_union_area.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
   path: verify/geometry/geometry_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-22 00:39:59+09:00'
+  timestamp: '2026-07-22 09:31:46+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/geometry_algorithms.test.cpp

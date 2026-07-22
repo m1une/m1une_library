@@ -12,6 +12,12 @@ data:
     path: geometry/circle.hpp
     title: Circles
   - icon: ':heavy_check_mark:'
+    path: geometry/convex_decomposition.hpp
+    title: Convex Decomposition
+  - icon: ':heavy_check_mark:'
+    path: geometry/convex_polygon.hpp
+    title: Convex Polygons
+  - icon: ':heavy_check_mark:'
     path: geometry/half_plane_intersection.hpp
     title: Half-Plane Intersection
   - icon: ':heavy_check_mark:'
@@ -28,11 +34,23 @@ data:
     title: Rays
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/centroid.test.cpp
+    title: verify/geometry/centroid.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/circle_line_intersection.test.cpp
     title: verify/geometry/circle_line_intersection.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/circle_ray.test.cpp
     title: verify/geometry/circle_ray.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/convex_decomposition.test.cpp
+    title: verify/geometry/convex_decomposition.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/convex_diameter.test.cpp
+    title: verify/geometry/convex_diameter.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/convex_polygon.test.cpp
+    title: verify/geometry/convex_polygon.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/geometry_algorithms.test.cpp
     title: verify/geometry/geometry_algorithms.test.cpp
@@ -42,6 +60,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/half_plane_intersection_random.test.cpp
     title: verify/geometry/half_plane_intersection_random.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/is_convex_polygon.test.cpp
+    title: verify/geometry/is_convex_polygon.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/minimum_enclosing_circle.test.cpp
     title: verify/geometry/minimum_enclosing_circle.test.cpp
@@ -93,14 +114,16 @@ data:
     \ Point&, const Point&) = default;\n\n    friend constexpr bool operator<(const\
     \ Point& left, const Point& right) {\n        if (left.x != right.x) return left.x\
     \ < right.x;\n        return left.y < right.y;\n    }\n};\n\ntemplate <Coordinate\
-    \ T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(const\
+    \ T>\nconstexpr Point<long double> centroid(const Point<T>& point) {\n    return\
+    \ Point<long double>(point);\n}\n\ntemplate <Coordinate T, typename Scalar>\n\
+    requires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(const Point<T>&\
+    \ point, Scalar scalar) {\n    using Result = std::common_type_t<T, Scalar>;\n\
+    \    return Point<Result>(\n        Result(point.x) * Result(scalar),\n      \
+    \  Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate <typename Scalar, Coordinate\
+    \ T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(Scalar scalar,\
+    \ const Point<T>& point) {\n    return point * scalar;\n}\n\ntemplate <Coordinate\
+    \ T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator/(const\
     \ Point<T>& point, Scalar scalar) {\n    using Result = std::common_type_t<T,\
-    \ Scalar>;\n    return Point<Result>(\n        Result(point.x) * Result(scalar),\n\
-    \        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate <typename Scalar,\
-    \ Coordinate T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(Scalar\
-    \ scalar, const Point<T>& point) {\n    return point * scalar;\n}\n\ntemplate\
-    \ <Coordinate T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr\
-    \ auto operator/(const Point<T>& point, Scalar scalar) {\n    using Result = std::common_type_t<T,\
     \ Scalar>;\n    return Point<Result>(\n        Result(point.x) / Result(scalar),\n\
     \        Result(point.y) / Result(scalar)\n    );\n}\n\ntemplate <Coordinate T>\n\
     constexpr wide_type<T> dot(const Point<T>& a, const Point<T>& b) {\n    using\
@@ -157,37 +180,42 @@ data:
     \ geometry\n}  // namespace m1une\n\n\n#line 10 \"geometry/line.hpp\"\n\nnamespace\
     \ m1une {\nnamespace geometry {\n\ntemplate <Coordinate T>\nstruct Line {\n  \
     \  Point<T> a;\n    Point<T> b;\n};\n\ntemplate <Coordinate T>\nstruct Segment\
-    \ {\n    Point<T> a;\n    Point<T> b;\n};\n\ntemplate <Coordinate T>\nbool on_line(\n\
-    \    const Line<T>& line,\n    const Point<T>& point,\n    long double eps = 1e-12L\n\
-    ) {\n    assert(line.a != line.b);\n    return orientation(line.a, line.b, point,\
-    \ eps) == 0;\n}\n\ntemplate <Coordinate T>\nbool parallel(const Line<T>& first,\
-    \ const Line<T>& second, long double eps = 1e-12L) {\n    using W = wide_type<T>;\n\
-    \    W first_x = W(first.b.x) - W(first.a.x);\n    W first_y = W(first.b.y) -\
-    \ W(first.a.y);\n    W second_x = W(second.b.x) - W(second.a.x);\n    W second_y\
-    \ = W(second.b.y) - W(second.a.y);\n    return sign<T>(first_x * second_y - first_y\
-    \ * second_x, eps) == 0;\n}\n\ntemplate <Coordinate T>\nbool orthogonal(const\
+    \ {\n    Point<T> a;\n    Point<T> b;\n};\n\ntemplate <Coordinate T>\nconstexpr\
+    \ Point<long double> centroid(const Segment<T>& segment) {\n    return Point<long\
+    \ double>(\n        (\n            static_cast<long double>(segment.a.x) +\n \
+    \           static_cast<long double>(segment.b.x)\n        ) / 2,\n        (\n\
+    \            static_cast<long double>(segment.a.y) +\n            static_cast<long\
+    \ double>(segment.b.y)\n        ) / 2\n    );\n}\n\ntemplate <Coordinate T>\n\
+    bool on_line(\n    const Line<T>& line,\n    const Point<T>& point,\n    long\
+    \ double eps = 1e-12L\n) {\n    assert(line.a != line.b);\n    return orientation(line.a,\
+    \ line.b, point, eps) == 0;\n}\n\ntemplate <Coordinate T>\nbool parallel(const\
     \ Line<T>& first, const Line<T>& second, long double eps = 1e-12L) {\n    using\
     \ W = wide_type<T>;\n    W first_x = W(first.b.x) - W(first.a.x);\n    W first_y\
     \ = W(first.b.y) - W(first.a.y);\n    W second_x = W(second.b.x) - W(second.a.x);\n\
     \    W second_y = W(second.b.y) - W(second.a.y);\n    return sign<T>(first_x *\
-    \ second_x + first_y * second_y, eps) == 0;\n}\n\ntemplate <Coordinate T>\nPoint<long\
-    \ double> projection(const Line<T>& line, const Point<T>& point) {\n    assert(line.a\
-    \ != line.b);\n    Point<long double> a(line.a);\n    Point<long double> direction(\n\
-    \        static_cast<long double>(line.b.x) - static_cast<long double>(line.a.x),\n\
-    \        static_cast<long double>(line.b.y) - static_cast<long double>(line.a.y)\n\
-    \    );\n    Point<long double> offset(\n        static_cast<long double>(point.x)\
-    \ - a.x,\n        static_cast<long double>(point.y) - a.y\n    );\n    long double\
-    \ ratio = dot(offset, direction) / dot(direction, direction);\n    return a +\
-    \ direction * ratio;\n}\n\ntemplate <Coordinate T>\nPoint<long double> reflection(const\
-    \ Line<T>& line, const Point<T>& point) {\n    Point<long double> projected =\
-    \ projection(line, point);\n    return projected * 2.0L - Point<long double>(point);\n\
-    }\n\ntemplate <Coordinate T>\nlong double distance(const Line<T>& line, const\
-    \ Point<T>& point) {\n    assert(line.a != line.b);\n    Point<long double> direction(\n\
-    \        static_cast<long double>(line.b.x) - static_cast<long double>(line.a.x),\n\
-    \        static_cast<long double>(line.b.y) - static_cast<long double>(line.a.y)\n\
-    \    );\n    Point<long double> offset(\n        static_cast<long double>(point.x)\
-    \ - static_cast<long double>(line.a.x),\n        static_cast<long double>(point.y)\
-    \ - static_cast<long double>(line.a.y)\n    );\n    return std::fabs(cross(direction,\
+    \ second_y - first_y * second_x, eps) == 0;\n}\n\ntemplate <Coordinate T>\nbool\
+    \ orthogonal(const Line<T>& first, const Line<T>& second, long double eps = 1e-12L)\
+    \ {\n    using W = wide_type<T>;\n    W first_x = W(first.b.x) - W(first.a.x);\n\
+    \    W first_y = W(first.b.y) - W(first.a.y);\n    W second_x = W(second.b.x)\
+    \ - W(second.a.x);\n    W second_y = W(second.b.y) - W(second.a.y);\n    return\
+    \ sign<T>(first_x * second_x + first_y * second_y, eps) == 0;\n}\n\ntemplate <Coordinate\
+    \ T>\nPoint<long double> projection(const Line<T>& line, const Point<T>& point)\
+    \ {\n    assert(line.a != line.b);\n    Point<long double> a(line.a);\n    Point<long\
+    \ double> direction(\n        static_cast<long double>(line.b.x) - static_cast<long\
+    \ double>(line.a.x),\n        static_cast<long double>(line.b.y) - static_cast<long\
+    \ double>(line.a.y)\n    );\n    Point<long double> offset(\n        static_cast<long\
+    \ double>(point.x) - a.x,\n        static_cast<long double>(point.y) - a.y\n \
+    \   );\n    long double ratio = dot(offset, direction) / dot(direction, direction);\n\
+    \    return a + direction * ratio;\n}\n\ntemplate <Coordinate T>\nPoint<long double>\
+    \ reflection(const Line<T>& line, const Point<T>& point) {\n    Point<long double>\
+    \ projected = projection(line, point);\n    return projected * 2.0L - Point<long\
+    \ double>(point);\n}\n\ntemplate <Coordinate T>\nlong double distance(const Line<T>&\
+    \ line, const Point<T>& point) {\n    assert(line.a != line.b);\n    Point<long\
+    \ double> direction(\n        static_cast<long double>(line.b.x) - static_cast<long\
+    \ double>(line.a.x),\n        static_cast<long double>(line.b.y) - static_cast<long\
+    \ double>(line.a.y)\n    );\n    Point<long double> offset(\n        static_cast<long\
+    \ double>(point.x) - static_cast<long double>(line.a.x),\n        static_cast<long\
+    \ double>(point.y) - static_cast<long double>(line.a.y)\n    );\n    return std::fabs(cross(direction,\
     \ offset)) / norm(direction);\n}\n\ntemplate <Coordinate T>\nlong double distance(const\
     \ Point<T>& point, const Line<T>& line) {\n    return distance(line, point);\n\
     }\n\ntemplate <Coordinate T>\nbool intersects(\n    const Line<T>& first,\n  \
@@ -261,8 +289,13 @@ data:
     \ \"point.hpp\"\n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <Coordinate\
     \ T>\nstruct Line {\n    Point<T> a;\n    Point<T> b;\n};\n\ntemplate <Coordinate\
     \ T>\nstruct Segment {\n    Point<T> a;\n    Point<T> b;\n};\n\ntemplate <Coordinate\
-    \ T>\nbool on_line(\n    const Line<T>& line,\n    const Point<T>& point,\n  \
-    \  long double eps = 1e-12L\n) {\n    assert(line.a != line.b);\n    return orientation(line.a,\
+    \ T>\nconstexpr Point<long double> centroid(const Segment<T>& segment) {\n   \
+    \ return Point<long double>(\n        (\n            static_cast<long double>(segment.a.x)\
+    \ +\n            static_cast<long double>(segment.b.x)\n        ) / 2,\n     \
+    \   (\n            static_cast<long double>(segment.a.y) +\n            static_cast<long\
+    \ double>(segment.b.y)\n        ) / 2\n    );\n}\n\ntemplate <Coordinate T>\n\
+    bool on_line(\n    const Line<T>& line,\n    const Point<T>& point,\n    long\
+    \ double eps = 1e-12L\n) {\n    assert(line.a != line.b);\n    return orientation(line.a,\
     \ line.b, point, eps) == 0;\n}\n\ntemplate <Coordinate T>\nbool parallel(const\
     \ Line<T>& first, const Line<T>& second, long double eps = 1e-12L) {\n    using\
     \ W = wide_type<T>;\n    W first_x = W(first.b.x) - W(first.a.x);\n    W first_y\
@@ -365,15 +398,18 @@ data:
   path: geometry/line.hpp
   requiredBy:
   - geometry/all.hpp
+  - geometry/convex_decomposition.hpp
+  - geometry/convex_polygon.hpp
   - geometry/ray.hpp
   - geometry/polygon.hpp
   - geometry/half_plane_intersection.hpp
   - geometry/circle.hpp
   - geometry/perpendicular_bisector.hpp
   - geometry/minimum_enclosing_circle.hpp
-  timestamp: '2026-06-21 12:04:47+09:00'
+  timestamp: '2026-07-22 02:25:12+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/geometry/convex_polygon.test.cpp
   - verify/geometry/perpendicular_bisector.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/ray.test.cpp
@@ -382,10 +418,14 @@ data:
   - verify/geometry/segment_intersection.test.cpp
   - verify/geometry/circle_ray.test.cpp
   - verify/geometry/polygon_operations.test.cpp
+  - verify/geometry/convex_decomposition.test.cpp
+  - verify/geometry/is_convex_polygon.test.cpp
+  - verify/geometry/centroid.test.cpp
   - verify/geometry/projection.test.cpp
   - verify/geometry/circle_line_intersection.test.cpp
   - verify/geometry/half_plane_intersection.test.cpp
   - verify/geometry/minimum_enclosing_circle.test.cpp
+  - verify/geometry/convex_diameter.test.cpp
   - verify/geometry/half_plane_intersection_random.test.cpp
 documentation_of: geometry/line.hpp
 layout: document
@@ -395,7 +435,8 @@ title: Lines and Segments
 ## Overview
 
 This header provides `Line<T>` and `Segment<T>` together with projection,
-reflection, distances, intersection tests, and line intersection coordinates.
+reflection, distances, intersection tests, segment centroids, and line
+intersection coordinates.
 
 Segment predicates are exact for integral coordinates through 128-bit cross
 products. Constructed coordinates are returned as `Point<long double>`.
@@ -422,6 +463,7 @@ A line requires distinct endpoints. A segment may be degenerate.
 
 | Function | Description | Complexity |
 | --- | --- | --- |
+| `centroid(segment)` | Returns the midpoint, which is the centroid under uniform length. | $O(1)$ |
 | `on_line(line, point, eps)` | Tests whether a point lies on an infinite line. | $O(1)$ |
 | `parallel(first, second, eps)` | Tests whether two lines are parallel. | $O(1)$ |
 | `orthogonal(first, second, eps)` | Tests whether two lines are perpendicular. | $O(1)$ |
@@ -440,7 +482,8 @@ A line requires distinct endpoints. A segment may be degenerate.
 | `line_segment_intersection(line, segment, eps)` | Returns the unique intersection, or `nullopt` for no intersection or collinear overlap. Both argument orders are supported. | $O(1)$ |
 
 For a degenerate segment, `line_segment_intersection` returns its endpoint when
-that point lies on the line.
+that point lies on the line. Its centroid is also that endpoint. Infinite lines
+have no centroid overload.
 
 ## Example
 

@@ -10,6 +10,9 @@ data:
     title: Geometry Bundle
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/centroid.test.cpp
+    title: verify/geometry/centroid.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/closest_pair.test.cpp
     title: verify/geometry/closest_pair.test.cpp
   - icon: ':heavy_check_mark:'
@@ -41,85 +44,86 @@ data:
     \ constexpr bool operator==(const Point&, const Point&) = default;\n\n    friend\
     \ constexpr bool operator<(const Point& left, const Point& right) {\n        if\
     \ (left.x != right.x) return left.x < right.x;\n        return left.y < right.y;\n\
-    \    }\n};\n\ntemplate <Coordinate T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\n\
-    constexpr auto operator*(const Point<T>& point, Scalar scalar) {\n    using Result\
-    \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
-    \ * Result(scalar),\n        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate\
-    \ <typename Scalar, Coordinate T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr\
-    \ auto operator*(Scalar scalar, const Point<T>& point) {\n    return point * scalar;\n\
-    }\n\ntemplate <Coordinate T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\n\
-    constexpr auto operator/(const Point<T>& point, Scalar scalar) {\n    using Result\
-    \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
-    \ / Result(scalar),\n        Result(point.y) / Result(scalar)\n    );\n}\n\ntemplate\
-    \ <Coordinate T>\nconstexpr wide_type<T> dot(const Point<T>& a, const Point<T>&\
-    \ b) {\n    using W = wide_type<T>;\n    return W(a.x) * W(b.x) + W(a.y) * W(b.y);\n\
-    }\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> cross(const Point<T>& a,\
-    \ const Point<T>& b) {\n    using W = wide_type<T>;\n    return W(a.x) * W(b.y)\
-    \ - W(a.y) * W(b.x);\n}\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> cross(\n\
-    \    const Point<T>& origin,\n    const Point<T>& a,\n    const Point<T>& b\n\
-    ) {\n    using W = wide_type<T>;\n    W ax = W(a.x) - W(origin.x);\n    W ay =\
-    \ W(a.y) - W(origin.y);\n    W bx = W(b.x) - W(origin.x);\n    W by = W(b.y) -\
-    \ W(origin.y);\n    return ax * by - ay * bx;\n}\n\ntemplate <Coordinate T>\n\
-    constexpr wide_type<T> norm2(const Point<T>& point) {\n    return dot(point, point);\n\
-    }\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> distance2(const Point<T>&\
-    \ a, const Point<T>& b) {\n    using W = wide_type<T>;\n    W dx = W(a.x) - W(b.x);\n\
-    \    W dy = W(a.y) - W(b.y);\n    return dx * dx + dy * dy;\n}\n\ntemplate <Coordinate\
-    \ T>\nlong double norm(const Point<T>& point) {\n    return std::hypot(\n    \
-    \    static_cast<long double>(point.x),\n        static_cast<long double>(point.y)\n\
-    \    );\n}\n\ntemplate <Coordinate T>\nlong double distance(const Point<T>& a,\
-    \ const Point<T>& b) {\n    return std::hypot(\n        static_cast<long double>(a.x)\
-    \ - static_cast<long double>(b.x),\n        static_cast<long double>(a.y) - static_cast<long\
-    \ double>(b.y)\n    );\n}\n\ntemplate <Coordinate T, typename M, typename N>\n\
-    requires std::is_arithmetic_v<M> && std::is_arithmetic_v<N>\nconstexpr Point<long\
-    \ double> internal_division_point(\n    const Point<T>& a,\n    const Point<T>&\
-    \ b,\n    M m,\n    N n\n) {\n    long double first_ratio = static_cast<long double>(m);\n\
-    \    long double second_ratio = static_cast<long double>(n);\n    long double\
-    \ denominator = first_ratio + second_ratio;\n    assert(denominator != 0);\n \
-    \   Point<long double> first(a);\n    Point<long double> direction = Point<long\
-    \ double>(b) - first;\n    return first + direction * (first_ratio / denominator);\n\
-    }\n\ntemplate <Coordinate T, typename M, typename N>\nrequires std::is_arithmetic_v<M>\
-    \ && std::is_arithmetic_v<N>\nconstexpr Point<long double> external_division_point(\n\
+    \    }\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const\
+    \ Point<T>& point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate\
+    \ T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(const\
+    \ Point<T>& point, Scalar scalar) {\n    using Result = std::common_type_t<T,\
+    \ Scalar>;\n    return Point<Result>(\n        Result(point.x) * Result(scalar),\n\
+    \        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate <typename Scalar,\
+    \ Coordinate T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(Scalar\
+    \ scalar, const Point<T>& point) {\n    return point * scalar;\n}\n\ntemplate\
+    \ <Coordinate T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr\
+    \ auto operator/(const Point<T>& point, Scalar scalar) {\n    using Result = std::common_type_t<T,\
+    \ Scalar>;\n    return Point<Result>(\n        Result(point.x) / Result(scalar),\n\
+    \        Result(point.y) / Result(scalar)\n    );\n}\n\ntemplate <Coordinate T>\n\
+    constexpr wide_type<T> dot(const Point<T>& a, const Point<T>& b) {\n    using\
+    \ W = wide_type<T>;\n    return W(a.x) * W(b.x) + W(a.y) * W(b.y);\n}\n\ntemplate\
+    \ <Coordinate T>\nconstexpr wide_type<T> cross(const Point<T>& a, const Point<T>&\
+    \ b) {\n    using W = wide_type<T>;\n    return W(a.x) * W(b.y) - W(a.y) * W(b.x);\n\
+    }\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> cross(\n    const Point<T>&\
+    \ origin,\n    const Point<T>& a,\n    const Point<T>& b\n) {\n    using W = wide_type<T>;\n\
+    \    W ax = W(a.x) - W(origin.x);\n    W ay = W(a.y) - W(origin.y);\n    W bx\
+    \ = W(b.x) - W(origin.x);\n    W by = W(b.y) - W(origin.y);\n    return ax * by\
+    \ - ay * bx;\n}\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> norm2(const\
+    \ Point<T>& point) {\n    return dot(point, point);\n}\n\ntemplate <Coordinate\
+    \ T>\nconstexpr wide_type<T> distance2(const Point<T>& a, const Point<T>& b) {\n\
+    \    using W = wide_type<T>;\n    W dx = W(a.x) - W(b.x);\n    W dy = W(a.y) -\
+    \ W(b.y);\n    return dx * dx + dy * dy;\n}\n\ntemplate <Coordinate T>\nlong double\
+    \ norm(const Point<T>& point) {\n    return std::hypot(\n        static_cast<long\
+    \ double>(point.x),\n        static_cast<long double>(point.y)\n    );\n}\n\n\
+    template <Coordinate T>\nlong double distance(const Point<T>& a, const Point<T>&\
+    \ b) {\n    return std::hypot(\n        static_cast<long double>(a.x) - static_cast<long\
+    \ double>(b.x),\n        static_cast<long double>(a.y) - static_cast<long double>(b.y)\n\
+    \    );\n}\n\ntemplate <Coordinate T, typename M, typename N>\nrequires std::is_arithmetic_v<M>\
+    \ && std::is_arithmetic_v<N>\nconstexpr Point<long double> internal_division_point(\n\
     \    const Point<T>& a,\n    const Point<T>& b,\n    M m,\n    N n\n) {\n    long\
     \ double first_ratio = static_cast<long double>(m);\n    long double second_ratio\
-    \ = static_cast<long double>(n);\n    long double denominator = first_ratio -\
+    \ = static_cast<long double>(n);\n    long double denominator = first_ratio +\
     \ second_ratio;\n    assert(denominator != 0);\n    Point<long double> first(a);\n\
     \    Point<long double> direction = Point<long double>(b) - first;\n    return\
     \ first + direction * (first_ratio / denominator);\n}\n\ntemplate <Coordinate\
-    \ T>\nconstexpr int sign(wide_type<T> value, long double eps = 1e-12L) {\n   \
-    \ if constexpr (std::integral<T>) {\n        return (value > 0) - (value < 0);\n\
-    \    } else {\n        return (value > eps) - (value < -eps);\n    }\n}\n\ntemplate\
-    \ <Coordinate T>\nconstexpr int orientation(\n    const Point<T>& a,\n    const\
-    \ Point<T>& b,\n    const Point<T>& c,\n    long double eps = 1e-12L\n) {\n  \
-    \  return sign<T>(cross(a, b, c), eps);\n}\n\ntemplate <Coordinate T>\nconstexpr\
-    \ bool collinear(\n    const Point<T>& a,\n    const Point<T>& b,\n    const Point<T>&\
-    \ c,\n    long double eps = 1e-12L\n) {\n    return orientation(a, b, c, eps)\
-    \ == 0;\n}\n\ntemplate <Coordinate T>\nPoint<long double> rotate(const Point<T>&\
-    \ point, long double angle) {\n    long double cosine = std::cos(angle);\n   \
-    \ long double sine = std::sin(angle);\n    return Point<long double>(\n      \
-    \  static_cast<long double>(point.x) * cosine -\n            static_cast<long\
-    \ double>(point.y) * sine,\n        static_cast<long double>(point.x) * sine +\n\
-    \            static_cast<long double>(point.y) * cosine\n    );\n}\n\ntemplate\
-    \ <Coordinate T>\nPoint<long double> normalized(const Point<T>& point) {\n   \
-    \ long double length = norm(point);\n    assert(length != 0);\n    return Point<long\
-    \ double>(\n        static_cast<long double>(point.x) / length,\n        static_cast<long\
-    \ double>(point.y) / length\n    );\n}\n\n}  // namespace geometry\n}  // namespace\
-    \ m1une\n\n\n#line 10 \"geometry/closest_pair.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ geometry {\n\ntemplate <Coordinate T>\nstruct ClosestPair {\n    int first;\n\
-    \    int second;\n    wide_type<T> distance_squared;\n};\n\n// Returns two distinct\
-    \ original indices with minimum Euclidean distance.\ntemplate <Coordinate T>\n\
-    std::optional<ClosestPair<T>> closest_pair(\n    const std::vector<Point<T>>&\
-    \ points\n) {\n    const int n = int(points.size());\n    if (n < 2) return std::nullopt;\n\
-    \n    struct IndexedPoint {\n        Point<T> point;\n        int index;\n   \
-    \ };\n\n    std::vector<IndexedPoint> ordered;\n    ordered.reserve(n);\n    for\
-    \ (int index = 0; index < n; index++) {\n        ordered.push_back(IndexedPoint{points[index],\
-    \ index});\n    }\n    std::sort(\n        ordered.begin(),\n        ordered.end(),\n\
-    \        [](const IndexedPoint& first, const IndexedPoint& second) {\n       \
-    \     if (first.point < second.point) return true;\n            if (second.point\
-    \ < first.point) return false;\n            return first.index < second.index;\n\
-    \        }\n    );\n\n    std::optional<ClosestPair<T>> duplicate_result;\n  \
-    \  for (int first = 0; first < n;) {\n        int last = first + 1;\n        while\
-    \ (last < n && ordered[last].point == ordered[first].point) last++;\n        if\
-    \ (last - first >= 2) {\n            int first_index = ordered[first].index;\n\
+    \ T, typename M, typename N>\nrequires std::is_arithmetic_v<M> && std::is_arithmetic_v<N>\n\
+    constexpr Point<long double> external_division_point(\n    const Point<T>& a,\n\
+    \    const Point<T>& b,\n    M m,\n    N n\n) {\n    long double first_ratio =\
+    \ static_cast<long double>(m);\n    long double second_ratio = static_cast<long\
+    \ double>(n);\n    long double denominator = first_ratio - second_ratio;\n   \
+    \ assert(denominator != 0);\n    Point<long double> first(a);\n    Point<long\
+    \ double> direction = Point<long double>(b) - first;\n    return first + direction\
+    \ * (first_ratio / denominator);\n}\n\ntemplate <Coordinate T>\nconstexpr int\
+    \ sign(wide_type<T> value, long double eps = 1e-12L) {\n    if constexpr (std::integral<T>)\
+    \ {\n        return (value > 0) - (value < 0);\n    } else {\n        return (value\
+    \ > eps) - (value < -eps);\n    }\n}\n\ntemplate <Coordinate T>\nconstexpr int\
+    \ orientation(\n    const Point<T>& a,\n    const Point<T>& b,\n    const Point<T>&\
+    \ c,\n    long double eps = 1e-12L\n) {\n    return sign<T>(cross(a, b, c), eps);\n\
+    }\n\ntemplate <Coordinate T>\nconstexpr bool collinear(\n    const Point<T>& a,\n\
+    \    const Point<T>& b,\n    const Point<T>& c,\n    long double eps = 1e-12L\n\
+    ) {\n    return orientation(a, b, c, eps) == 0;\n}\n\ntemplate <Coordinate T>\n\
+    Point<long double> rotate(const Point<T>& point, long double angle) {\n    long\
+    \ double cosine = std::cos(angle);\n    long double sine = std::sin(angle);\n\
+    \    return Point<long double>(\n        static_cast<long double>(point.x) * cosine\
+    \ -\n            static_cast<long double>(point.y) * sine,\n        static_cast<long\
+    \ double>(point.x) * sine +\n            static_cast<long double>(point.y) * cosine\n\
+    \    );\n}\n\ntemplate <Coordinate T>\nPoint<long double> normalized(const Point<T>&\
+    \ point) {\n    long double length = norm(point);\n    assert(length != 0);\n\
+    \    return Point<long double>(\n        static_cast<long double>(point.x) / length,\n\
+    \        static_cast<long double>(point.y) / length\n    );\n}\n\n}  // namespace\
+    \ geometry\n}  // namespace m1une\n\n\n#line 10 \"geometry/closest_pair.hpp\"\n\
+    \nnamespace m1une {\nnamespace geometry {\n\ntemplate <Coordinate T>\nstruct ClosestPair\
+    \ {\n    int first;\n    int second;\n    wide_type<T> distance_squared;\n};\n\
+    \n// Returns two distinct original indices with minimum Euclidean distance.\n\
+    template <Coordinate T>\nstd::optional<ClosestPair<T>> closest_pair(\n    const\
+    \ std::vector<Point<T>>& points\n) {\n    const int n = int(points.size());\n\
+    \    if (n < 2) return std::nullopt;\n\n    struct IndexedPoint {\n        Point<T>\
+    \ point;\n        int index;\n    };\n\n    std::vector<IndexedPoint> ordered;\n\
+    \    ordered.reserve(n);\n    for (int index = 0; index < n; index++) {\n    \
+    \    ordered.push_back(IndexedPoint{points[index], index});\n    }\n    std::sort(\n\
+    \        ordered.begin(),\n        ordered.end(),\n        [](const IndexedPoint&\
+    \ first, const IndexedPoint& second) {\n            if (first.point < second.point)\
+    \ return true;\n            if (second.point < first.point) return false;\n  \
+    \          return first.index < second.index;\n        }\n    );\n\n    std::optional<ClosestPair<T>>\
+    \ duplicate_result;\n    for (int first = 0; first < n;) {\n        int last =\
+    \ first + 1;\n        while (last < n && ordered[last].point == ordered[first].point)\
+    \ last++;\n        if (last - first >= 2) {\n            int first_index = ordered[first].index;\n\
     \            int second_index = ordered[first + 1].index;\n            std::pair<int,\
     \ int> candidate(first_index, second_index);\n            if (\n             \
     \   !duplicate_result ||\n                candidate < std::pair(\n           \
@@ -230,11 +234,12 @@ data:
   path: geometry/closest_pair.hpp
   requiredBy:
   - geometry/all.hpp
-  timestamp: '2026-07-11 20:28:42+09:00'
+  timestamp: '2026-07-22 02:25:12+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/closest_pair.test.cpp
+  - verify/geometry/centroid.test.cpp
 documentation_of: geometry/closest_pair.hpp
 layout: document
 title: Closest Pair of Points

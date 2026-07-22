@@ -349,6 +349,9 @@ data:
     path: verify/geometry/angle_sort.test.cpp
     title: verify/geometry/angle_sort.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/centroid.test.cpp
+    title: verify/geometry/centroid.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/circle_line_intersection.test.cpp
     title: verify/geometry/circle_line_intersection.test.cpp
   - icon: ':heavy_check_mark:'
@@ -358,11 +361,20 @@ data:
     path: verify/geometry/closest_pair.test.cpp
     title: verify/geometry/closest_pair.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/convex_decomposition.test.cpp
+    title: verify/geometry/convex_decomposition.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/convex_diameter.test.cpp
+    title: verify/geometry/convex_diameter.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/convex_hull.test.cpp
     title: verify/geometry/convex_hull.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/convex_layers.test.cpp
     title: verify/geometry/convex_layers.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/convex_polygon.test.cpp
+    title: verify/geometry/convex_polygon.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/count_points_in_triangle.test.cpp
     title: verify/geometry/count_points_in_triangle.test.cpp
@@ -381,6 +393,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/half_plane_intersection_random.test.cpp
     title: verify/geometry/half_plane_intersection_random.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/is_convex_polygon.test.cpp
+    title: verify/geometry/is_convex_polygon.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/lattice_point_count.test.cpp
     title: verify/geometry/lattice_point_count.test.cpp
@@ -978,6 +993,15 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/utilities/grid_transform.test.cpp
     title: verify/utilities/grid_transform.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/utilities/int1024.test.cpp
+    title: verify/utilities/int1024.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/utilities/int256.test.cpp
+    title: verify/utilities/int256.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/utilities/int512.test.cpp
+    title: verify/utilities/int512.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/utilities/parser.test.cpp
     title: verify/utilities/parser.test.cpp
@@ -1598,9 +1622,12 @@ data:
   - verify/utilities/random_generators.test.cpp
   - verify/utilities/fast_io.test.cpp
   - verify/utilities/arrow_dice.test.cpp
+  - verify/utilities/int512.test.cpp
   - verify/utilities/dice.test.cpp
+  - verify/utilities/int1024.test.cpp
   - verify/utilities/shifted_array.test.cpp
   - verify/utilities/grid_transform.test.cpp
+  - verify/utilities/int256.test.cpp
   - verify/utilities/template_fast_io.test.cpp
   - verify/matroid/weighted_matroid_intersection.test.cpp
   - verify/matroid/matroids.test.cpp
@@ -1798,6 +1825,7 @@ data:
   - verify/optimization/hungarian.test.cpp
   - verify/optimization/project_selection.test.cpp
   - verify/optimization/integer_lp.test.cpp
+  - verify/geometry/convex_polygon.test.cpp
   - verify/geometry/perpendicular_bisector.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/ray.test.cpp
@@ -1813,13 +1841,17 @@ data:
   - verify/geometry/segment_intersection.test.cpp
   - verify/geometry/circle_ray.test.cpp
   - verify/geometry/polygon_operations.test.cpp
+  - verify/geometry/convex_decomposition.test.cpp
   - verify/geometry/convex_hull.test.cpp
+  - verify/geometry/is_convex_polygon.test.cpp
   - verify/geometry/closest_pair.test.cpp
+  - verify/geometry/centroid.test.cpp
   - verify/geometry/manhattan_mst.test.cpp
   - verify/geometry/projection.test.cpp
   - verify/geometry/circle_line_intersection.test.cpp
   - verify/geometry/half_plane_intersection.test.cpp
   - verify/geometry/minimum_enclosing_circle.test.cpp
+  - verify/geometry/convex_diameter.test.cpp
   - verify/geometry/half_plane_intersection_random.test.cpp
 documentation_of: utilities/fast_io.hpp
 layout: document

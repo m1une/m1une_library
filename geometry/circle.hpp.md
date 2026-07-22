@@ -19,6 +19,9 @@ data:
     title: Minimum Enclosing Circle
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/centroid.test.cpp
+    title: verify/geometry/centroid.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/circle_line_intersection.test.cpp
     title: verify/geometry/circle_line_intersection.test.cpp
   - icon: ':heavy_check_mark:'
@@ -59,14 +62,16 @@ data:
     \ Point&, const Point&) = default;\n\n    friend constexpr bool operator<(const\
     \ Point& left, const Point& right) {\n        if (left.x != right.x) return left.x\
     \ < right.x;\n        return left.y < right.y;\n    }\n};\n\ntemplate <Coordinate\
-    \ T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(const\
+    \ T>\nconstexpr Point<long double> centroid(const Point<T>& point) {\n    return\
+    \ Point<long double>(point);\n}\n\ntemplate <Coordinate T, typename Scalar>\n\
+    requires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(const Point<T>&\
+    \ point, Scalar scalar) {\n    using Result = std::common_type_t<T, Scalar>;\n\
+    \    return Point<Result>(\n        Result(point.x) * Result(scalar),\n      \
+    \  Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate <typename Scalar, Coordinate\
+    \ T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(Scalar scalar,\
+    \ const Point<T>& point) {\n    return point * scalar;\n}\n\ntemplate <Coordinate\
+    \ T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator/(const\
     \ Point<T>& point, Scalar scalar) {\n    using Result = std::common_type_t<T,\
-    \ Scalar>;\n    return Point<Result>(\n        Result(point.x) * Result(scalar),\n\
-    \        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate <typename Scalar,\
-    \ Coordinate T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(Scalar\
-    \ scalar, const Point<T>& point) {\n    return point * scalar;\n}\n\ntemplate\
-    \ <Coordinate T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr\
-    \ auto operator/(const Point<T>& point, Scalar scalar) {\n    using Result = std::common_type_t<T,\
     \ Scalar>;\n    return Point<Result>(\n        Result(point.x) / Result(scalar),\n\
     \        Result(point.y) / Result(scalar)\n    );\n}\n\ntemplate <Coordinate T>\n\
     constexpr wide_type<T> dot(const Point<T>& a, const Point<T>& b) {\n    using\
@@ -123,37 +128,42 @@ data:
     \ geometry\n}  // namespace m1une\n\n\n#line 10 \"geometry/line.hpp\"\n\nnamespace\
     \ m1une {\nnamespace geometry {\n\ntemplate <Coordinate T>\nstruct Line {\n  \
     \  Point<T> a;\n    Point<T> b;\n};\n\ntemplate <Coordinate T>\nstruct Segment\
-    \ {\n    Point<T> a;\n    Point<T> b;\n};\n\ntemplate <Coordinate T>\nbool on_line(\n\
-    \    const Line<T>& line,\n    const Point<T>& point,\n    long double eps = 1e-12L\n\
-    ) {\n    assert(line.a != line.b);\n    return orientation(line.a, line.b, point,\
-    \ eps) == 0;\n}\n\ntemplate <Coordinate T>\nbool parallel(const Line<T>& first,\
-    \ const Line<T>& second, long double eps = 1e-12L) {\n    using W = wide_type<T>;\n\
-    \    W first_x = W(first.b.x) - W(first.a.x);\n    W first_y = W(first.b.y) -\
-    \ W(first.a.y);\n    W second_x = W(second.b.x) - W(second.a.x);\n    W second_y\
-    \ = W(second.b.y) - W(second.a.y);\n    return sign<T>(first_x * second_y - first_y\
-    \ * second_x, eps) == 0;\n}\n\ntemplate <Coordinate T>\nbool orthogonal(const\
+    \ {\n    Point<T> a;\n    Point<T> b;\n};\n\ntemplate <Coordinate T>\nconstexpr\
+    \ Point<long double> centroid(const Segment<T>& segment) {\n    return Point<long\
+    \ double>(\n        (\n            static_cast<long double>(segment.a.x) +\n \
+    \           static_cast<long double>(segment.b.x)\n        ) / 2,\n        (\n\
+    \            static_cast<long double>(segment.a.y) +\n            static_cast<long\
+    \ double>(segment.b.y)\n        ) / 2\n    );\n}\n\ntemplate <Coordinate T>\n\
+    bool on_line(\n    const Line<T>& line,\n    const Point<T>& point,\n    long\
+    \ double eps = 1e-12L\n) {\n    assert(line.a != line.b);\n    return orientation(line.a,\
+    \ line.b, point, eps) == 0;\n}\n\ntemplate <Coordinate T>\nbool parallel(const\
     \ Line<T>& first, const Line<T>& second, long double eps = 1e-12L) {\n    using\
     \ W = wide_type<T>;\n    W first_x = W(first.b.x) - W(first.a.x);\n    W first_y\
     \ = W(first.b.y) - W(first.a.y);\n    W second_x = W(second.b.x) - W(second.a.x);\n\
     \    W second_y = W(second.b.y) - W(second.a.y);\n    return sign<T>(first_x *\
-    \ second_x + first_y * second_y, eps) == 0;\n}\n\ntemplate <Coordinate T>\nPoint<long\
-    \ double> projection(const Line<T>& line, const Point<T>& point) {\n    assert(line.a\
-    \ != line.b);\n    Point<long double> a(line.a);\n    Point<long double> direction(\n\
-    \        static_cast<long double>(line.b.x) - static_cast<long double>(line.a.x),\n\
-    \        static_cast<long double>(line.b.y) - static_cast<long double>(line.a.y)\n\
-    \    );\n    Point<long double> offset(\n        static_cast<long double>(point.x)\
-    \ - a.x,\n        static_cast<long double>(point.y) - a.y\n    );\n    long double\
-    \ ratio = dot(offset, direction) / dot(direction, direction);\n    return a +\
-    \ direction * ratio;\n}\n\ntemplate <Coordinate T>\nPoint<long double> reflection(const\
-    \ Line<T>& line, const Point<T>& point) {\n    Point<long double> projected =\
-    \ projection(line, point);\n    return projected * 2.0L - Point<long double>(point);\n\
-    }\n\ntemplate <Coordinate T>\nlong double distance(const Line<T>& line, const\
-    \ Point<T>& point) {\n    assert(line.a != line.b);\n    Point<long double> direction(\n\
-    \        static_cast<long double>(line.b.x) - static_cast<long double>(line.a.x),\n\
-    \        static_cast<long double>(line.b.y) - static_cast<long double>(line.a.y)\n\
-    \    );\n    Point<long double> offset(\n        static_cast<long double>(point.x)\
-    \ - static_cast<long double>(line.a.x),\n        static_cast<long double>(point.y)\
-    \ - static_cast<long double>(line.a.y)\n    );\n    return std::fabs(cross(direction,\
+    \ second_y - first_y * second_x, eps) == 0;\n}\n\ntemplate <Coordinate T>\nbool\
+    \ orthogonal(const Line<T>& first, const Line<T>& second, long double eps = 1e-12L)\
+    \ {\n    using W = wide_type<T>;\n    W first_x = W(first.b.x) - W(first.a.x);\n\
+    \    W first_y = W(first.b.y) - W(first.a.y);\n    W second_x = W(second.b.x)\
+    \ - W(second.a.x);\n    W second_y = W(second.b.y) - W(second.a.y);\n    return\
+    \ sign<T>(first_x * second_x + first_y * second_y, eps) == 0;\n}\n\ntemplate <Coordinate\
+    \ T>\nPoint<long double> projection(const Line<T>& line, const Point<T>& point)\
+    \ {\n    assert(line.a != line.b);\n    Point<long double> a(line.a);\n    Point<long\
+    \ double> direction(\n        static_cast<long double>(line.b.x) - static_cast<long\
+    \ double>(line.a.x),\n        static_cast<long double>(line.b.y) - static_cast<long\
+    \ double>(line.a.y)\n    );\n    Point<long double> offset(\n        static_cast<long\
+    \ double>(point.x) - a.x,\n        static_cast<long double>(point.y) - a.y\n \
+    \   );\n    long double ratio = dot(offset, direction) / dot(direction, direction);\n\
+    \    return a + direction * ratio;\n}\n\ntemplate <Coordinate T>\nPoint<long double>\
+    \ reflection(const Line<T>& line, const Point<T>& point) {\n    Point<long double>\
+    \ projected = projection(line, point);\n    return projected * 2.0L - Point<long\
+    \ double>(point);\n}\n\ntemplate <Coordinate T>\nlong double distance(const Line<T>&\
+    \ line, const Point<T>& point) {\n    assert(line.a != line.b);\n    Point<long\
+    \ double> direction(\n        static_cast<long double>(line.b.x) - static_cast<long\
+    \ double>(line.a.x),\n        static_cast<long double>(line.b.y) - static_cast<long\
+    \ double>(line.a.y)\n    );\n    Point<long double> offset(\n        static_cast<long\
+    \ double>(point.x) - static_cast<long double>(line.a.x),\n        static_cast<long\
+    \ double>(point.y) - static_cast<long double>(line.a.y)\n    );\n    return std::fabs(cross(direction,\
     \ offset)) / norm(direction);\n}\n\ntemplate <Coordinate T>\nlong double distance(const\
     \ Point<T>& point, const Line<T>& line) {\n    return distance(line, point);\n\
     }\n\ntemplate <Coordinate T>\nbool intersects(\n    const Line<T>& first,\n  \
@@ -381,7 +391,9 @@ data:
     \        first,\n        values.first_numerator,\n        values.denominator\n\
     \    );\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 11 \"\
     geometry/circle.hpp\"\n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <Coordinate\
-    \ T>\nstruct Circle {\n    Point<T> center;\n    T radius;\n};\n\nenum class CircleRelation\
+    \ T>\nstruct Circle {\n    Point<T> center;\n    T radius;\n};\n\ntemplate <Coordinate\
+    \ T>\nconstexpr Point<long double> centroid(const Circle<T>& circle) {\n    assert(circle.radius\
+    \ >= 0);\n    return Point<long double>(circle.center);\n}\n\nenum class CircleRelation\
     \ {\n    Separate,\n    ExternallyTangent,\n    Intersecting,\n    InternallyTangent,\n\
     \    Contained,\n    Coincident,\n};\n\ntemplate <Coordinate T>\nCircleRelation\
     \ circle_relation(\n    const Circle<T>& first,\n    const Circle<T>& second,\n\
@@ -474,19 +486,21 @@ data:
     #include <algorithm>\n#include <cassert>\n#include <cmath>\n#include <optional>\n\
     #include <vector>\n\n#include \"ray.hpp\"\n\nnamespace m1une {\nnamespace geometry\
     \ {\n\ntemplate <Coordinate T>\nstruct Circle {\n    Point<T> center;\n    T radius;\n\
-    };\n\nenum class CircleRelation {\n    Separate,\n    ExternallyTangent,\n   \
-    \ Intersecting,\n    InternallyTangent,\n    Contained,\n    Coincident,\n};\n\
-    \ntemplate <Coordinate T>\nCircleRelation circle_relation(\n    const Circle<T>&\
-    \ first,\n    const Circle<T>& second,\n    long double eps = 1e-12L\n) {\n  \
-    \  assert(first.radius >= 0);\n    assert(second.radius >= 0);\n    long double\
-    \ d = geometry::distance(first.center, second.center);\n    long double r1 = static_cast<long\
-    \ double>(first.radius);\n    long double r2 = static_cast<long double>(second.radius);\n\
-    \    long double sum = r1 + r2;\n    long double difference = std::fabs(r1 - r2);\n\
-    \    if (d <= eps && difference <= eps) return CircleRelation::Coincident;\n \
-    \   if (sum < d - eps) return CircleRelation::Separate;\n    if (std::fabs(d -\
-    \ sum) <= eps) return CircleRelation::ExternallyTangent;\n    if (d < difference\
-    \ - eps) return CircleRelation::Contained;\n    if (std::fabs(d - difference)\
-    \ <= eps) return CircleRelation::InternallyTangent;\n    return CircleRelation::Intersecting;\n\
+    };\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const Circle<T>&\
+    \ circle) {\n    assert(circle.radius >= 0);\n    return Point<long double>(circle.center);\n\
+    }\n\nenum class CircleRelation {\n    Separate,\n    ExternallyTangent,\n    Intersecting,\n\
+    \    InternallyTangent,\n    Contained,\n    Coincident,\n};\n\ntemplate <Coordinate\
+    \ T>\nCircleRelation circle_relation(\n    const Circle<T>& first,\n    const\
+    \ Circle<T>& second,\n    long double eps = 1e-12L\n) {\n    assert(first.radius\
+    \ >= 0);\n    assert(second.radius >= 0);\n    long double d = geometry::distance(first.center,\
+    \ second.center);\n    long double r1 = static_cast<long double>(first.radius);\n\
+    \    long double r2 = static_cast<long double>(second.radius);\n    long double\
+    \ sum = r1 + r2;\n    long double difference = std::fabs(r1 - r2);\n    if (d\
+    \ <= eps && difference <= eps) return CircleRelation::Coincident;\n    if (sum\
+    \ < d - eps) return CircleRelation::Separate;\n    if (std::fabs(d - sum) <= eps)\
+    \ return CircleRelation::ExternallyTangent;\n    if (d < difference - eps) return\
+    \ CircleRelation::Contained;\n    if (std::fabs(d - difference) <= eps) return\
+    \ CircleRelation::InternallyTangent;\n    return CircleRelation::Intersecting;\n\
     }\n\ntemplate <Coordinate T>\nstd::vector<Point<long double>> circle_line_intersections(\n\
     \    const Circle<T>& circle,\n    const Line<T>& line,\n    long double eps =\
     \ 1e-12L\n) {\n    assert(circle.radius >= 0);\n    assert(line.a != line.b);\n\
@@ -572,11 +586,12 @@ data:
   requiredBy:
   - geometry/all.hpp
   - geometry/minimum_enclosing_circle.hpp
-  timestamp: '2026-06-21 12:04:47+09:00'
+  timestamp: '2026-07-22 02:25:12+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/circle_ray.test.cpp
+  - verify/geometry/centroid.test.cpp
   - verify/geometry/circle_line_intersection.test.cpp
   - verify/geometry/minimum_enclosing_circle.test.cpp
 documentation_of: geometry/circle.hpp
@@ -587,8 +602,8 @@ title: Circles
 ## Overview
 
 This header provides circle relationships, intersection points with lines,
-rays, and other circles, and physical ray reflection. Constructed points use
-`long double`.
+rays, and other circles, the circle centroid, and physical ray reflection.
+Constructed points use `long double`.
 
 ## Types
 
@@ -615,6 +630,7 @@ Radii must be nonnegative.
 
 | Function | Description | Complexity |
 | --- | --- | --- |
+| `centroid(circle)` | Returns the center as `Point<long double>`. It is the centroid of both the filled disk and the circumference. | $O(1)$ |
 | `circle_relation(first, second, eps)` | Classifies two circles. | $O(1)$ |
 | `circle_line_intersections(circle, line, eps)` | Returns zero, one, or two intersection points in lexicographic order. | $O(1)$ |
 | `circle_ray_intersections(circle, ray, eps)` | Returns zero, one, or two intersections ordered from the ray origin. Both argument orders are supported. | $O(1)$ |
