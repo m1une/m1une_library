@@ -24,7 +24,9 @@ compared with the minimum possible number.
 Both algorithms use the **no-Steiner-point model**: every output vertex is an
 input vertex, apart from removing redundant boundary vertices. This restriction
 is important when interpreting the piece-count guarantee and the word
-"minimum."
+"minimum." For a floating-point decomposition that may introduce Steiner
+vertices and guarantees fewer than twice the unrestricted optimum, see
+[`steiner_convex_decomposition`](steiner_convex_decomposition.md).
 
 ## Functions
 

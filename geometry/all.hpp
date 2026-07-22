@@ -21,5 +21,6 @@
 #include "polygon.hpp"
 #include "ray.hpp"
 #include "rectangle_union_area.hpp"
+#include "steiner_convex_decomposition.hpp"
 
 #endif  // M1UNE_GEOMETRY_ALL_HPP
