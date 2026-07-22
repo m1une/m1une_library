@@ -81,12 +81,29 @@ each piece is strictly convex. Collinear vertices can therefore occur on an
 output boundary. The approximation factor compares against the same
 no-Steiner-point optimum.
 
-For integral coordinates, the exact routine performs no floating-point
-conversion. Input turns use the geometry module's widened integer type;
-projective visibility predicates and rational ray-intersection comparisons use
-the dependency-free [`Int512`](../utilities/int512.md) type. Results are
-therefore exact as long as the module's ordinary widened input predicates do
-not overflow. `eps` has no effect on integral predicates.
+For standard integral coordinate types up to 64 bits, the exact routine
+performs no floating-point conversion. It scans the cleaned polygon once and
+selects the smallest integer type that is provably wide enough for its
+projective visibility predicates and rational ray-intersection comparisons:
+
+| Largest coordinate magnitude | Predicate type |
+| --- | --- |
+| Fewer than $2^{30}$ | built-in `__int128_t` |
+| Fewer than $2^{62}$ | [`Int256`](../utilities/int256.md) |
+| Otherwise | [`Int512`](../utilities/int512.md) |
+
+The largest intermediate has magnitude below $2^{4k+6}$ when coordinate
+magnitudes use at most $k$ bits. Thus full-range 32-bit coordinates are not
+dispatched to `__int128_t`, while the common bound
+$|x|,|y|\le 10^9$ is.
+Selection uses absolute coordinates rather than edge lengths because
+homogeneous line coefficients are formed before translation-dependent terms
+cancel; translating a polygon far from the origin can therefore select a wider
+type. The scan costs $O(N)$ and does not change the overall bound.
+
+Input turns still use the geometry module's ordinary widened integer type, so
+results are exact as long as those ordinary predicates do not overflow. `eps`
+has no effect on integral predicates.
 
 For floating-point coordinates, visibility and ray shooting use `long double`,
 and `eps` controls predicate tolerance.

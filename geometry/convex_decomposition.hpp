@@ -5,6 +5,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstddef>
+#include <cstdint>
 #include <deque>
 #include <limits>
 #include <map>
@@ -14,6 +15,7 @@
 #include <utility>
 #include <vector>
 
+#include "../utilities/int256.hpp"
 #include "../utilities/int512.hpp"
 #include "polygon.hpp"
 
@@ -24,23 +26,57 @@ namespace convex_decomposition_detail {
 
 using Index = std::size_t;
 using IndexPolygon = std::vector<Index>;
-using ExactPredicateInteger = m1une::utilities::Int512;
 
-template <Coordinate T>
-using PredicateNumber = std::conditional_t<
-    std::integral<T>, ExactPredicateInteger, long double>;
+enum class ExactPredicateWidth { Int128, Int256, Int512 };
 
-template <Coordinate T>
-PredicateNumber<T> predicate_number(T value) {
-    if constexpr (std::integral<T>) {
-        return ExactPredicateInteger(value);
-    } else {
-        return static_cast<long double>(value);
+template <std::integral T>
+std::size_t coordinate_magnitude_bits(
+    const std::vector<Point<T>>& polygon
+) {
+    using Unsigned = std::make_unsigned_t<T>;
+    std::size_t result = 0;
+    auto update = [&](T coordinate) {
+        Unsigned magnitude = static_cast<Unsigned>(coordinate);
+        if constexpr (std::signed_integral<T>) {
+            if (coordinate < 0) magnitude = Unsigned(0) - magnitude;
+        }
+        std::size_t bits = 0;
+        while (magnitude != 0) {
+            ++bits;
+            magnitude >>= 1;
+        }
+        result = std::max(result, bits);
+    };
+    for (const Point<T>& point : polygon) {
+        update(point.x);
+        update(point.y);
     }
+    return result;
 }
 
-template <Coordinate T>
-int predicate_sign(const PredicateNumber<T>& value, long double eps) {
+template <std::integral T>
+ExactPredicateWidth select_exact_predicate_width(
+    const std::vector<Point<T>>& polygon
+) {
+    static_assert(sizeof(T) <= sizeof(std::uint64_t));
+    const std::size_t coordinate_bits =
+        coordinate_magnitude_bits(polygon);
+    // Cross-multiplied ray parameters and projective visibility
+    // determinants have magnitude below 2^(4 * coordinate_bits + 6).
+    const std::size_t required_bits = 4 * coordinate_bits + 7;
+    if (required_bits <= 128) return ExactPredicateWidth::Int128;
+    if (required_bits <= 256) return ExactPredicateWidth::Int256;
+    assert(required_bits <= 512);
+    return ExactPredicateWidth::Int512;
+}
+
+template <typename Number, Coordinate T>
+Number predicate_number(T value) {
+    return static_cast<Number>(value);
+}
+
+template <Coordinate T, typename Number>
+int predicate_sign(const Number& value, long double eps) {
     if constexpr (std::integral<T>) {
         return (value > 0) - (value < 0);
     } else {
@@ -351,11 +387,9 @@ std::optional<std::vector<Point<T>>> prepare_minimum_polygon(
     return cleaned;
 }
 
-template <Coordinate T>
+template <Coordinate T, typename Number>
 class BiasedPolygonReduction {
    private:
-    using Number = PredicateNumber<T>;
-
     struct Vector {
         Number x;
         Number y;
@@ -472,10 +506,10 @@ class BiasedPolygonReduction {
 
     Vector vector_between(int first, int second) const {
         return {
-            predicate_number<T>(polygon_[first].x) -
-                predicate_number<T>(polygon_[second].x),
-            predicate_number<T>(polygon_[first].y) -
-                predicate_number<T>(polygon_[second].y)
+            predicate_number<Number>(polygon_[first].x) -
+                predicate_number<Number>(polygon_[second].x),
+            predicate_number<Number>(polygon_[first].y) -
+                predicate_number<Number>(polygon_[second].y)
         };
     }
 
@@ -826,7 +860,7 @@ class BiasedPolygonReduction {
     }
 };
 
-template <Coordinate T>
+template <Coordinate T, typename Number>
 class KeilSnoeyinkDecomposition {
    private:
     static constexpr int infinity = 100000000;
@@ -907,7 +941,7 @@ class KeilSnoeyinkDecomposition {
         PairDeque pairs;
     };
 
-    using ProjectiveNumber = PredicateNumber<T>;
+    using ProjectiveNumber = Number;
 
     struct Homogeneous {
         ProjectiveNumber w;
@@ -917,30 +951,23 @@ class KeilSnoeyinkDecomposition {
         Homogeneous negated() const { return {-w, -x, -y}; }
 
         ProjectiveNumber side(const Point<T>& point) const {
-            return w + x * predicate_number<T>(point.x) +
-                   y * predicate_number<T>(point.y);
+            return w + x * predicate_number<ProjectiveNumber>(point.x) +
+                   y * predicate_number<ProjectiveNumber>(point.y);
         }
 
         static Homogeneous line(
             const Point<T>& first,
             const Point<T>& second
         ) {
-            const ProjectiveNumber ax = predicate_number<T>(first.x);
-            const ProjectiveNumber ay = predicate_number<T>(first.y);
-            const ProjectiveNumber bx = predicate_number<T>(second.x);
-            const ProjectiveNumber by = predicate_number<T>(second.y);
+            const ProjectiveNumber ax =
+                predicate_number<ProjectiveNumber>(first.x);
+            const ProjectiveNumber ay =
+                predicate_number<ProjectiveNumber>(first.y);
+            const ProjectiveNumber bx =
+                predicate_number<ProjectiveNumber>(second.x);
+            const ProjectiveNumber by =
+                predicate_number<ProjectiveNumber>(second.y);
             return {ax * by - ay * bx, ay - by, bx - ax};
-        }
-
-        static Homogeneous meet(
-            const Homogeneous& first,
-            const Homogeneous& second
-        ) {
-            return {
-                first.x * second.y - first.y * second.x,
-                second.w * first.y - first.w * second.y,
-                first.w * second.x - second.w * first.x
-            };
         }
 
         static ProjectiveNumber determinant(
@@ -1851,48 +1878,73 @@ minimum_convex_decomposition(
         }
     }
 
-    std::vector<Point<T>> dynamic_polygon = polygon;
-    std::vector<convex_decomposition_detail::Index> original_index(
-        polygon.size()
-    );
-    for (std::size_t index = 0; index < polygon.size(); ++index) {
-        original_index[index] = index;
-    }
-    if (
-        reflex_count > 0 &&
-        polygon.size() / reflex_count > reflex_count
-    ) {
-        convex_decomposition_detail::BiasedPolygonReduction<T> reduction(
-            polygon, eps
+    auto solve = [&]<typename Number>()
+        -> std::optional<std::vector<std::vector<Point<T>>>> {
+        std::vector<Point<T>> dynamic_polygon = polygon;
+        std::vector<convex_decomposition_detail::Index> original_index(
+            polygon.size()
         );
-        auto reduced = reduction.run();
-        dynamic_polygon = std::move(reduced.polygon);
-        original_index = std::move(reduced.original_index);
-    }
+        for (std::size_t index = 0; index < polygon.size(); ++index) {
+            original_index[index] = index;
+        }
+        if (
+            reflex_count > 0 &&
+            polygon.size() / reflex_count > reflex_count
+        ) {
+            convex_decomposition_detail::BiasedPolygonReduction<T, Number>
+                reduction(polygon, eps);
+            auto reduced = reduction.run();
+            dynamic_polygon = std::move(reduced.polygon);
+            original_index = std::move(reduced.original_index);
+        }
 
-    convex_decomposition_detail::KeilSnoeyinkDecomposition<T> solver(
-        dynamic_polygon, eps
-    );
-    auto diagonals = solver.run();
-    if (!diagonals.has_value()) return std::nullopt;
-    for (auto& diagonal : *diagonals) {
-        diagonal.first = original_index[diagonal.first];
-        diagonal.second = original_index[diagonal.second];
-    }
-    auto index_decomposition =
-        convex_decomposition_detail::faces_from_diagonals(
-            polygon, *diagonals, eps
-        );
-    if (!index_decomposition.has_value()) return std::nullopt;
+        convex_decomposition_detail::KeilSnoeyinkDecomposition<T, Number>
+            solver(dynamic_polygon, eps);
+        auto diagonals = solver.run();
+        if (!diagonals.has_value()) return std::nullopt;
+        for (auto& diagonal : *diagonals) {
+            diagonal.first = original_index[diagonal.first];
+            diagonal.second = original_index[diagonal.second];
+        }
+        auto index_decomposition =
+            convex_decomposition_detail::faces_from_diagonals(
+                polygon, *diagonals, eps
+            );
+        if (!index_decomposition.has_value()) return std::nullopt;
 
-    std::vector<std::vector<Point<T>>> result;
-    result.reserve(index_decomposition->size());
-    for (const auto& indices : *index_decomposition) {
-        result.push_back(convex_decomposition_detail::materialize(
-            indices, polygon, eps
-        ));
+        std::vector<std::vector<Point<T>>> result;
+        result.reserve(index_decomposition->size());
+        for (const auto& indices : *index_decomposition) {
+            result.push_back(convex_decomposition_detail::materialize(
+                indices, polygon, eps
+            ));
+        }
+        return result;
+    };
+
+    if constexpr (std::integral<T>) {
+        using convex_decomposition_detail::ExactPredicateWidth;
+        switch (
+            convex_decomposition_detail::select_exact_predicate_width(
+                polygon
+            )
+        ) {
+            case ExactPredicateWidth::Int128:
+                return solve.template operator()<__int128_t>();
+            case ExactPredicateWidth::Int256:
+                return solve.template operator()<
+                    m1une::utilities::Int256
+                >();
+            case ExactPredicateWidth::Int512:
+                return solve.template operator()<
+                    m1une::utilities::Int512
+                >();
+        }
+        assert(false);
+        return std::nullopt;
+    } else {
+        return solve.template operator()<long double>();
     }
-    return result;
 }
 
 }  // namespace geometry

@@ -136,6 +136,27 @@ void assert_valid_decomposition(
     assert(std::fabs(area_sum - polygon_area(polygon)) <= 1e-9L);
 }
 
+void test_predicate_width_selection() {
+    using PredicateWidth =
+        convex_decomposition_detail::ExactPredicateWidth;
+    auto selected_for = [](long long coordinate) {
+        std::vector<P> points;
+        points.emplace_back(coordinate, 0);
+        return convex_decomposition_detail::select_exact_predicate_width(
+            points
+        );
+    };
+
+    assert(selected_for(1LL << 29) == PredicateWidth::Int128);
+    assert(selected_for(1LL << 30) == PredicateWidth::Int256);
+    assert(selected_for(1LL << 61) == PredicateWidth::Int256);
+    assert(selected_for(1LL << 62) == PredicateWidth::Int512);
+    assert(
+        selected_for(std::numeric_limits<long long>::min()) ==
+        PredicateWidth::Int512
+    );
+}
+
 void test_fixed() {
     std::vector<P> convex;
     convex.emplace_back(0, 0);
@@ -174,6 +195,13 @@ void test_fixed() {
         minimum_convex_decomposition(reconstruction_regression);
     assert(reconstructed.has_value() && reconstructed->size() == 3);
     assert_valid_decomposition(reconstruction_regression, *reconstructed);
+    using PredicateWidth =
+        convex_decomposition_detail::ExactPredicateWidth;
+    assert(
+        convex_decomposition_detail::select_exact_predicate_width(
+            reconstruction_regression
+        ) == PredicateWidth::Int128
+    );
 
     std::reverse(l_shape.begin(), l_shape.end());
     l_shape.push_back(l_shape.front());
@@ -208,6 +236,23 @@ void test_fixed() {
     const auto floating_exact = minimum_convex_decomposition(floating);
     assert(floating_exact.has_value() && floating_exact->size() == 2);
 
+    constexpr long long medium_shift = 1'000'000'000'000'000'000LL;
+    std::vector<P> medium_translated = reconstruction_regression;
+    for (P& point : medium_translated) {
+        point.x += medium_shift;
+        point.y += medium_shift;
+    }
+    assert(
+        convex_decomposition_detail::select_exact_predicate_width(
+            medium_translated
+        ) == PredicateWidth::Int256
+    );
+    const auto medium_exact =
+        minimum_convex_decomposition(medium_translated);
+    assert(medium_exact.has_value());
+    assert(medium_exact->size() == reconstructed->size());
+    assert_valid_decomposition(medium_translated, *medium_exact);
+
     constexpr long long shift = 8'000'000'000'000'000'000LL;
     std::vector<P> translated = reconstruction_regression;
     for (P& point : translated) {
@@ -215,6 +260,11 @@ void test_fixed() {
         point.y += shift;
     }
     const auto translated_exact = minimum_convex_decomposition(translated);
+    assert(
+        convex_decomposition_detail::select_exact_predicate_width(
+            translated
+        ) == PredicateWidth::Int512
+    );
     assert(translated_exact.has_value());
     assert(translated_exact->size() == reconstructed->size());
     assert_valid_decomposition(translated, *translated_exact);
@@ -370,8 +420,9 @@ void test_reflex_sensitive_reduction() {
         )
     );
 
-    convex_decomposition_detail::KeilSnoeyinkDecomposition<long long>
-        direct_solver(two_reflex, 1e-12L);
+    convex_decomposition_detail::KeilSnoeyinkDecomposition<
+        long long, __int128_t
+    > direct_solver(two_reflex, 1e-12L);
     const auto direct_diagonals = direct_solver.run();
     const auto reduced_solution =
         minimum_convex_decomposition(two_reflex);
@@ -384,6 +435,7 @@ void test_reflex_sensitive_reduction() {
 }  // namespace
 
 int main() {
+    test_predicate_width_selection();
     test_fixed();
     test_exhaustive_small_polygons();
     test_random_radial_polygons();
