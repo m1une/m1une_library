@@ -30,6 +30,7 @@ documentation_of: ../../geometry/all.hpp
 | `geometry/ray.hpp` | Rays, containment, projection, intersections, and distances with other linear objects. |
 | `geometry/rectangle_union_area.hpp` | Exact union area of axis-aligned rectangles in $O(N\log N)$. |
 | `geometry/steiner_convex_decomposition.hpp` | Floating-point Steiner convex decomposition with an exact union and a strict 2-approximation piece count. |
+| `geometry/voronoi_diagram.hpp` | Exact-topology Euclidean Voronoi diagrams with segments, rays, lines, and per-site boundary edges in $O(N\log N)$. |
 | `geometry/polygon.hpp` | General polygon area, centroids, triangulation, containment, ray queries, intersection, and distance. |
 | `geometry/circle.hpp` | Circle centroid, relations, line/ray intersections, and ray reflection. |
 
