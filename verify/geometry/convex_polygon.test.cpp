@@ -1,4 +1,5 @@
 #define PROBLEM "https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_4_C"
+#define ERROR "1e-7"
 
 #include "../../geometry/convex_polygon.hpp"
 
