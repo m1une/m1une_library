@@ -11,6 +11,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: geometry/all.hpp
     title: Geometry Bundle
+  - icon: ':heavy_check_mark:'
+    path: geometry/voronoi_diagram.hpp
+    title: Voronoi Diagram
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/centroid.test.cpp
@@ -21,6 +24,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/geometry_algorithms.test.cpp
     title: verify/geometry/geometry_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/voronoi_diagram.test.cpp
+    title: verify/geometry/voronoi_diagram.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -535,11 +541,13 @@ data:
   path: geometry/euclidean_mst.hpp
   requiredBy:
   - geometry/all.hpp
+  - geometry/voronoi_diagram.hpp
   timestamp: '2026-07-22 02:25:12+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/euclidean_mst.test.cpp
+  - verify/geometry/voronoi_diagram.test.cpp
   - verify/geometry/centroid.test.cpp
 documentation_of: geometry/euclidean_mst.hpp
 layout: document

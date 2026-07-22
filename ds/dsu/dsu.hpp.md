@@ -12,6 +12,9 @@ data:
     path: geometry/manhattan_mst.hpp
     title: Manhattan Minimum Spanning Tree
   - icon: ':heavy_check_mark:'
+    path: geometry/voronoi_diagram.hpp
+    title: Voronoi Diagram
+  - icon: ':heavy_check_mark:'
     path: graph/all.hpp
     title: Graph All
   - icon: ':heavy_check_mark:'
@@ -51,6 +54,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/manhattan_mst.test.cpp
     title: verify/geometry/manhattan_mst.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/voronoi_diagram.test.cpp
+    title: verify/geometry/voronoi_diagram.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/complement_connected_components.test.cpp
     title: verify/graph/complement_connected_components.test.cpp
@@ -158,6 +164,7 @@ data:
   - geometry/euclidean_mst.hpp
   - geometry/all.hpp
   - geometry/manhattan_mst.hpp
+  - geometry/voronoi_diagram.hpp
   timestamp: '2026-07-13 06:09:24+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
@@ -172,6 +179,7 @@ data:
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/euclidean_mst.test.cpp
   - verify/geometry/euclidean_mst.test.cpp
+  - verify/geometry/voronoi_diagram.test.cpp
   - verify/geometry/centroid.test.cpp
   - verify/geometry/manhattan_mst.test.cpp
   - verify/geometry/manhattan_mst.test.cpp

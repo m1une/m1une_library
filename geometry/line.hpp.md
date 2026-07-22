@@ -93,6 +93,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/steiner_convex_decomposition.test.cpp
     title: verify/geometry/steiner_convex_decomposition.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/voronoi_diagram.test.cpp
+    title: verify/geometry/voronoi_diagram.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -428,6 +431,7 @@ data:
   - verify/geometry/polygon_operations.test.cpp
   - verify/geometry/convex_decomposition.test.cpp
   - verify/geometry/is_convex_polygon.test.cpp
+  - verify/geometry/voronoi_diagram.test.cpp
   - verify/geometry/centroid.test.cpp
   - verify/geometry/projection.test.cpp
   - verify/geometry/circle_line_intersection.test.cpp

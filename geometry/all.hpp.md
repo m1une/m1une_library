@@ -68,6 +68,9 @@ data:
     path: geometry/steiner_convex_decomposition.hpp
     title: Steiner Convex Decomposition
   - icon: ':heavy_check_mark:'
+    path: geometry/voronoi_diagram.hpp
+    title: Voronoi Diagram
+  - icon: ':heavy_check_mark:'
     path: math/fps/convolution.hpp
     title: Convolution
   - icon: ':heavy_check_mark:'
@@ -160,6 +163,8 @@ data:
 
     #include "steiner_convex_decomposition.hpp"
 
+    #include "voronoi_diagram.hpp"
+
 
     #endif  // M1UNE_GEOMETRY_ALL_HPP
 
@@ -194,10 +199,11 @@ data:
   - geometry/perpendicular_bisector.hpp
   - geometry/rectangle_union_area.hpp
   - geometry/steiner_convex_decomposition.hpp
+  - geometry/voronoi_diagram.hpp
   isVerificationFile: false
   path: geometry/all.hpp
   requiredBy: []
-  timestamp: '2026-07-22 13:48:02+09:00'
+  timestamp: '2026-07-22 14:17:27+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/geometry_algorithms.test.cpp
@@ -234,6 +240,7 @@ title: Geometry Bundle
 | `geometry/ray.hpp` | Rays, containment, projection, intersections, and distances with other linear objects. |
 | `geometry/rectangle_union_area.hpp` | Exact union area of axis-aligned rectangles in $O(N\log N)$. |
 | `geometry/steiner_convex_decomposition.hpp` | Floating-point Steiner convex decomposition with an exact union and a strict 2-approximation piece count. |
+| `geometry/voronoi_diagram.hpp` | Exact-topology Euclidean Voronoi diagrams with segments, rays, lines, and per-site boundary edges in $O(N\log N)$. |
 | `geometry/polygon.hpp` | General polygon area, centroids, triangulation, containment, ray queries, intersection, and distance. |
 | `geometry/circle.hpp` | Circle centroid, relations, line/ray intersections, and ray reflection. |
 

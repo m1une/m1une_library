@@ -62,6 +62,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: geometry/steiner_convex_decomposition.hpp
     title: Steiner Convex Decomposition
+  - icon: ':heavy_check_mark:'
+    path: geometry/voronoi_diagram.hpp
+    title: Voronoi Diagram
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/angle_sort.test.cpp
@@ -150,6 +153,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/steiner_convex_decomposition.test.cpp
     title: verify/geometry/steiner_convex_decomposition.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/voronoi_diagram.test.cpp
+    title: verify/geometry/voronoi_diagram.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -337,6 +343,7 @@ data:
   - geometry/convex_hull.hpp
   - geometry/manhattan_mst.hpp
   - geometry/convex_polygon.hpp
+  - geometry/voronoi_diagram.hpp
   - geometry/ray.hpp
   - geometry/polygon.hpp
   - geometry/convex_layers.hpp
@@ -370,6 +377,7 @@ data:
   - verify/geometry/convex_decomposition.test.cpp
   - verify/geometry/convex_hull.test.cpp
   - verify/geometry/is_convex_polygon.test.cpp
+  - verify/geometry/voronoi_diagram.test.cpp
   - verify/geometry/closest_pair.test.cpp
   - verify/geometry/centroid.test.cpp
   - verify/geometry/manhattan_mst.test.cpp

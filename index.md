@@ -569,6 +569,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: geometry/steiner_convex_decomposition.hpp
       title: Steiner Convex Decomposition
+    - icon: ':heavy_check_mark:'
+      path: geometry/voronoi_diagram.hpp
+      title: Voronoi Diagram
   - name: graph
     pages:
     - icon: ':heavy_check_mark:'
@@ -1722,6 +1725,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/geometry/steiner_convex_decomposition.test.cpp
       title: verify/geometry/steiner_convex_decomposition.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/geometry/voronoi_diagram.test.cpp
+      title: verify/geometry/voronoi_diagram.test.cpp
   - name: verify/graph
     pages:
     - icon: ':heavy_check_mark:'
