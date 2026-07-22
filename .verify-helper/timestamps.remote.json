@@ -119,6 +119,7 @@
 "verify/geometry/convex_diameter.test.cpp": "2026-07-22 02:25:12 +0900",
 "verify/geometry/convex_hull.test.cpp": "2026-07-22 02:25:12 +0900",
 "verify/geometry/convex_layers.test.cpp": "2026-07-22 02:25:12 +0900",
+"verify/geometry/convex_polygon.test.cpp": "2026-07-22 10:16:29 +0900",
 "verify/geometry/count_points_in_triangle.test.cpp": "2026-07-22 02:25:12 +0900",
 "verify/geometry/euclidean_mst.test.cpp": "2026-07-22 02:25:12 +0900",
 "verify/geometry/farthest_pair.test.cpp": "2026-07-22 02:25:12 +0900",
