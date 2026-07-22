@@ -2447,7 +2447,7 @@ minimum_convex_decomposition(
 | Function | Result | Time | Memory |
 | --- | --- | --- | --- |
 | `approximate_convex_decomposition(polygon, eps)` | A Hertel--Mehlhorn decomposition containing at most four times the minimum number of pieces. | $O(N^2)$ | $O(N)$ |
-| `minimum_convex_decomposition(polygon, eps)` | A decomposition with the minimum possible number of pieces. | $O(N + \min\{NR^2, R^4\})$ | $O(N + \min\{NR^2, R^4\})$ |
+| `minimum_convex_decomposition(polygon, eps)` | A decomposition with the minimum possible number of pieces. | $O(N + \min\lbrace NR^2, R^4 \rbrace)$ | $O(N + \min\lbrace NR^2, R^4 \rbrace)$ |
 
 Here $N$ is the number of vertices after cleanup and $R$ is the number of
 reflex vertices (vertices whose interior angle is greater than $\pi$).
@@ -2463,7 +2463,7 @@ between these two Keil--Snoeyink paths:
   this path takes $O(N + R^4)$ time and memory.
 
 The minimum of those paths is therefore
-$O(N + \min\{NR^2, R^4\})$. The reduction is internal: output pieces still
+$O(N + \min\lbrace NR^2, R^4 \rbrace)$. The reduction is internal: output pieces still
 contain the original polygon boundary, including vertices omitted from the DP
 instance. $R$ is not the number of vertices in the reduced polygon.
 
