@@ -12,6 +12,7 @@
 #include "lyndon_factorization.hpp"
 #include "manacher.hpp"
 #include "minimum_rotation.hpp"
+#include "palindrome_lexicographical_order.hpp"
 #include "prefix_substring_lcs.hpp"
 #include "rolling_hash.hpp"
 #include "runs.hpp"
