@@ -1158,20 +1158,20 @@ data:
   timestamp: '2026-07-22 20:44:51+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/geometry/circle_relation.test.cpp
-  - verify/geometry/geometry_algorithms.test.cpp
-  - verify/geometry/incircle.test.cpp
   - verify/geometry/circle_circle_intersection_area.test.cpp
   - verify/geometry/circumcircle.test.cpp
   - verify/geometry/circle_ray.test.cpp
-  - verify/geometry/circle_common_tangents.test.cpp
-  - verify/geometry/circle_polygon_intersection_area.test.cpp
-  - verify/geometry/centroid.test.cpp
-  - verify/geometry/circle_operations.test.cpp
-  - verify/geometry/circle_tangent_points.test.cpp
-  - verify/geometry/circle_line_intersection.test.cpp
+  - verify/geometry/circle_relation.test.cpp
+  - verify/geometry/incircle.test.cpp
   - verify/geometry/minimum_enclosing_circle.test.cpp
+  - verify/geometry/centroid.test.cpp
+  - verify/geometry/circle_line_intersection.test.cpp
+  - verify/geometry/circle_operations.test.cpp
   - verify/geometry/circle_circle_intersection.test.cpp
+  - verify/geometry/circle_polygon_intersection_area.test.cpp
+  - verify/geometry/geometry_algorithms.test.cpp
+  - verify/geometry/circle_tangent_points.test.cpp
+  - verify/geometry/circle_common_tangents.test.cpp
 documentation_of: geometry/circle.hpp
 layout: document
 title: Circles

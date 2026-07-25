@@ -169,16 +169,16 @@ data:
   path: graph/tree/diameter.hpp
   requiredBy:
   - graph/all.hpp
-  - graph/tree/tree.hpp
   - graph/tree/all.hpp
+  - graph/tree/tree.hpp
   timestamp: '2026-07-11 19:47:32+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/graph_algorithms.test.cpp
-  - verify/graph/cow_game.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
-  - verify/graph/tree/tree_diameter.test.cpp
   - verify/graph/tree/tree_algorithms.test.cpp
+  - verify/graph/tree/tree_diameter.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/cow_game.test.cpp
 documentation_of: graph/tree/diameter.hpp
 layout: document
 title: Tree Diameter

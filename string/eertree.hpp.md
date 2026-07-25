@@ -5,10 +5,16 @@ data:
   - icon: ':heavy_check_mark:'
     path: string/all.hpp
     title: String Algorithms Bundle
+  - icon: ':heavy_check_mark:'
+    path: string/palindrome_lexicographical_order.hpp
+    title: Palindrome Lexicographical Order
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/string/eertree.test.cpp
     title: verify/string/eertree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/string/palindrome_lexicographical_order.test.cpp
+    title: verify/string/palindrome_lexicographical_order.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/string/string_algorithms.test.cpp
     title: verify/string/string_algorithms.test.cpp
@@ -179,9 +185,11 @@ data:
   path: string/eertree.hpp
   requiredBy:
   - string/all.hpp
+  - string/palindrome_lexicographical_order.hpp
   timestamp: '2026-06-23 11:42:02+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/string/palindrome_lexicographical_order.test.cpp
   - verify/string/string_algorithms.test.cpp
   - verify/string/eertree.test.cpp
 documentation_of: string/eertree.hpp

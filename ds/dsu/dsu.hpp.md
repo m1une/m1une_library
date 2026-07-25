@@ -165,36 +165,36 @@ data:
   isVerificationFile: false
   path: ds/dsu/dsu.hpp
   requiredBy:
+  - graph/undirected.hpp
+  - graph/complement_connected_components.hpp
   - graph/all.hpp
   - graph/kruskal.hpp
   - graph/connected_components.hpp
-  - graph/undirected.hpp
-  - graph/complement_connected_components.hpp
-  - geometry/delaunay_triangulation.hpp
-  - geometry/euclidean_mst.hpp
-  - geometry/all.hpp
-  - geometry/manhattan_mst.hpp
   - geometry/voronoi_diagram.hpp
+  - geometry/all.hpp
+  - geometry/euclidean_mst.hpp
+  - geometry/delaunay_triangulation.hpp
+  - geometry/manhattan_mst.hpp
   timestamp: '2026-07-13 06:09:24+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/graph/complement_connected_components.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/minimum_spanning_tree.test.cpp
+  - verify/graph/incremental_scc.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/cow_game.test.cpp
   - verify/ds/dsu/dsu.test.cpp
   - verify/ds/dsu/range_parallel_dsu.test.cpp
-  - verify/graph/graph_algorithms.test.cpp
-  - verify/graph/cow_game.test.cpp
-  - verify/graph/minimum_spanning_tree.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
-  - verify/graph/complement_connected_components.test.cpp
-  - verify/graph/incremental_scc.test.cpp
+  - verify/geometry/manhattan_mst.test.cpp
+  - verify/geometry/manhattan_mst.test.cpp
+  - verify/geometry/voronoi_diagram.test.cpp
+  - verify/geometry/centroid.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/euclidean_mst.test.cpp
   - verify/geometry/euclidean_mst.test.cpp
   - verify/geometry/delaunay_triangulation.test.cpp
   - verify/geometry/delaunay_triangulation.test.cpp
-  - verify/geometry/voronoi_diagram.test.cpp
-  - verify/geometry/centroid.test.cpp
-  - verify/geometry/manhattan_mst.test.cpp
-  - verify/geometry/manhattan_mst.test.cpp
 documentation_of: ds/dsu/dsu.hpp
 layout: document
 title: DSU (Disjoint Set Union)

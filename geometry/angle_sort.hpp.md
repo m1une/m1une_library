@@ -177,9 +177,9 @@ data:
   timestamp: '2026-07-22 02:25:12+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/geometry/centroid.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/angle_sort.test.cpp
-  - verify/geometry/centroid.test.cpp
 documentation_of: geometry/angle_sort.hpp
 layout: document
 title: Angle Sort

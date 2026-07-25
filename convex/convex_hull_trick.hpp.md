@@ -121,14 +121,14 @@ data:
   isVerificationFile: false
   path: convex/convex_hull_trick.hpp
   requiredBy:
-  - convex/all.hpp
   - convex/li_chao_tree.hpp
+  - convex/all.hpp
   timestamp: '2026-07-07 18:38:36+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/convex/convex_hull_trick.test.cpp
-  - verify/convex/li_chao_tree_segment.test.cpp
   - verify/convex/li_chao_tree.test.cpp
+  - verify/convex/li_chao_tree_segment.test.cpp
+  - verify/convex/convex_hull_trick.test.cpp
 documentation_of: convex/convex_hull_trick.hpp
 layout: document
 title: Convex Hull Trick

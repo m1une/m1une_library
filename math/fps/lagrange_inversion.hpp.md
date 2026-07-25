@@ -908,14 +908,14 @@ data:
   isVerificationFile: false
   path: math/fps/lagrange_inversion.hpp
   requiredBy:
-  - math/all.hpp
   - math/fps/all.hpp
+  - math/all.hpp
   timestamp: '2026-07-18 19:37:21+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
-  - verify/math/fps/fps_algorithms.test.cpp
   - verify/math/fps/lagrange_inversion.test.cpp
+  - verify/math/fps/fps_algorithms.test.cpp
 documentation_of: math/fps/lagrange_inversion.hpp
 layout: document
 title: Lagrange Inversion Formula

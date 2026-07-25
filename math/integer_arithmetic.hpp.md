@@ -194,16 +194,16 @@ data:
   isVerificationFile: false
   path: math/integer_arithmetic.hpp
   requiredBy:
-  - math/all.hpp
   - math/squarefree_count.hpp
-  - math/modular_kth_root.hpp
   - math/two_square_sum.hpp
+  - math/all.hpp
+  - math/modular_kth_root.hpp
   timestamp: '2026-07-15 01:09:58+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
-  - verify/math/integer_arithmetic.test.cpp
   - verify/math/modular_kth_root.test.cpp
+  - verify/math/integer_arithmetic.test.cpp
   - verify/math/squarefree_count.test.cpp
   - verify/math/two_square_sum.test.cpp
   - verify/math/two_square_sum.test.cpp

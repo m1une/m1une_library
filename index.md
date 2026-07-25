@@ -1177,6 +1177,9 @@ data:
       path: string/minimum_rotation.hpp
       title: Minimum Rotation
     - icon: ':heavy_check_mark:'
+      path: string/palindrome_lexicographical_order.hpp
+      title: Palindrome Lexicographical Order
+    - icon: ':heavy_check_mark:'
       path: string/prefix_substring_lcs.hpp
       title: Prefix-Substring LCS
     - icon: ':heavy_check_mark:'
@@ -2297,6 +2300,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/string/minimum_rotation.test.cpp
       title: verify/string/minimum_rotation.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/string/palindrome_lexicographical_order.test.cpp
+      title: verify/string/palindrome_lexicographical_order.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/string/prefix_substring_lcs.test.cpp
       title: verify/string/prefix_substring_lcs.test.cpp

@@ -206,8 +206,8 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
-  - verify/math/matrix/matrix.test.cpp
   - verify/math/matrix/adjugate.test.cpp
+  - verify/math/matrix/matrix.test.cpp
 documentation_of: math/matrix/adjugate.hpp
 layout: document
 title: Adjugate Matrix

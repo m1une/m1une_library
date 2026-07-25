@@ -144,8 +144,8 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
-  - verify/math/matrix/matrix.test.cpp
   - verify/math/matrix/sparse_determinant.test.cpp
+  - verify/math/matrix/matrix.test.cpp
 documentation_of: math/matrix/sparse_determinant.hpp
 layout: document
 title: Sparse Determinant

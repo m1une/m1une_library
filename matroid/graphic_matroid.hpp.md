@@ -76,9 +76,9 @@ data:
   timestamp: '2026-07-01 14:07:14+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/matroid/weighted_matroid_intersection.test.cpp
   - verify/matroid/matroids.test.cpp
   - verify/matroid/matroid_intersection.test.cpp
+  - verify/matroid/weighted_matroid_intersection.test.cpp
 documentation_of: matroid/graphic_matroid.hpp
 layout: document
 title: Graphic Matroid

@@ -150,8 +150,8 @@ data:
   timestamp: '2026-07-16 21:38:59+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/string/string_algorithms.test.cpp
   - verify/string/prefix_substring_lcs.test.cpp
+  - verify/string/string_algorithms.test.cpp
 documentation_of: string/prefix_substring_lcs.hpp
 layout: document
 title: Prefix-Substring LCS

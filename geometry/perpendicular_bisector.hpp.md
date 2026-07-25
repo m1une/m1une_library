@@ -353,8 +353,8 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/perpendicular_bisector.test.cpp
-  - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/centroid.test.cpp
+  - verify/geometry/geometry_algorithms.test.cpp
 documentation_of: geometry/perpendicular_bisector.hpp
 layout: document
 title: Perpendicular Bisector

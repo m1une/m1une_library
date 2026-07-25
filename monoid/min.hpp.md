@@ -40,8 +40,8 @@ data:
   timestamp: '2026-07-21 20:17:47+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/monoid/commutative_flags.test.cpp
   - verify/ds/range_query/sparse_table.test.cpp
+  - verify/monoid/commutative_flags.test.cpp
 documentation_of: monoid/min.hpp
 layout: document
 title: Min Monoid

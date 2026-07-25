@@ -635,8 +635,8 @@ data:
   timestamp: '2026-07-21 20:17:47+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/dynamic_array/dynamic_lazy_monoid_array.test.cpp
   - verify/ds/dynamic_array/dynamic_lazy_monoid_array_range_ap.test.cpp
+  - verify/ds/dynamic_array/dynamic_lazy_monoid_array.test.cpp
 documentation_of: ds/dynamic_array/dynamic_lazy_monoid_array.hpp
 layout: document
 title: Dynamic Lazy Monoid Array

@@ -118,9 +118,9 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
+  - verify/math/set_power_series_exp.test.cpp
   - verify/math/set_power_series_log.test.cpp
   - verify/math/subset_convolution.test.cpp
-  - verify/math/set_power_series_exp.test.cpp
 documentation_of: math/subset_convolution.hpp
 layout: document
 title: Subset Convolution

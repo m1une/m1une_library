@@ -44,6 +44,9 @@ data:
     path: string/minimum_rotation.hpp
     title: Minimum Rotation
   - icon: ':heavy_check_mark:'
+    path: string/palindrome_lexicographical_order.hpp
+    title: Palindrome Lexicographical Order
+  - icon: ':heavy_check_mark:'
     path: string/prefix_substring_lcs.hpp
     title: Prefix-Substring LCS
   - icon: ':heavy_check_mark:'
@@ -729,6 +732,86 @@ data:
     \      radius++;\n        }\n        result.even[i] = radius;\n        if (right\
     \ < i + radius - 1) {\n            left = i - radius;\n            right = i +\
     \ radius - 1;\n        }\n    }\n    return result;\n}\n\n}  // namespace string\n\
+    }  // namespace m1une\n\n\n#line 1 \"string/palindrome_lexicographical_order.hpp\"\
+    \n\n\n\n#line 9 \"string/palindrome_lexicographical_order.hpp\"\n\n#line 12 \"\
+    string/palindrome_lexicographical_order.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ string {\n\n// Indexes the distinct nonempty palindromic substrings of one sequence.\n\
+    template <\n    class Sequence = std::string,\n    int AlphabetSize = 26,\n  \
+    \  int FirstCharacter = 'a'\n>\nstruct PalindromeLexicographicalOrder {\n    static_assert(0\
+    \ < AlphabetSize);\n\n    using eertree_type = Eertree<AlphabetSize, FirstCharacter>;\n\
+    \    using node_id = typename eertree_type::node_id;\n\n   private:\n    Sequence\
+    \ _sequence;\n    eertree_type _eertree;\n    std::vector<node_id> _nodes_in_order;\n\
+    \    std::vector<int> _order_of_node;\n\n    template <class Symbol>\n    static\
+    \ int symbol_index(const Symbol& symbol) {\n        int index = int(symbol) -\
+    \ FirstCharacter;\n        assert(0 <= index && index < AlphabetSize);\n     \
+    \   return index;\n    }\n\n    void build_order() {\n        const int node_count\
+    \ = _eertree.node_count();\n        std::vector<std::vector<node_id>> suffix_children(node_count);\n\
+    \        for (node_id id = 0; id < node_count; id++) {\n            if (id ==\
+    \ eertree_type::odd_root) continue;\n            suffix_children[_eertree.node(id).suffix_link].push_back(id);\n\
+    \        }\n\n        std::vector<int> enter(node_count);\n        std::vector<int>\
+    \ leave(node_count);\n        std::vector<std::pair<node_id, bool>> stack;\n \
+    \       stack.reserve(2 * node_count);\n        stack.emplace_back(eertree_type::odd_root,\
+    \ false);\n        int timer = 0;\n        while (!stack.empty()) {\n        \
+    \    auto [id, exiting] = stack.back();\n            stack.pop_back();\n     \
+    \       if (exiting) {\n                leave[id] = timer;\n                continue;\n\
+    \            }\n\n            enter[id] = timer++;\n            stack.emplace_back(id,\
+    \ true);\n            const auto& children = suffix_children[id];\n          \
+    \  for (int i = int(children.size()) - 1; i >= 0; i--) {\n                stack.emplace_back(children[i],\
+    \ false);\n            }\n        }\n\n        std::vector<int> suffixes = suffix_array(_sequence);\n\
+    \        std::vector<int> suffix_rank(_sequence.size());\n        for (int rank\
+    \ = 0; rank < int(suffixes.size()); rank++) {\n            suffix_rank[suffixes[rank]]\
+    \ = rank;\n        }\n\n        _nodes_in_order.resize(_eertree.size());\n   \
+    \     for (int i = 0; i < _eertree.size(); i++) {\n            _nodes_in_order[i]\
+    \ = i + 2;\n        }\n\n        auto is_ancestor = [&](node_id ancestor, node_id\
+    \ descendant) {\n            return\n                enter[ancestor] <= enter[descendant]\
+    \ &&\n                leave[descendant] <= leave[ancestor];\n        };\n    \
+    \    std::sort(\n            _nodes_in_order.begin(),\n            _nodes_in_order.end(),\n\
+    \            [&](node_id first, node_id second) {\n                if (first ==\
+    \ second) return false;\n\n                // A palindromic prefix is also a palindromic\
+    \ suffix, so prefix\n                // cases are exactly the ancestor cases in\
+    \ the suffix-link tree.\n                if (is_ancestor(first, second)) return\
+    \ true;\n                if (is_ancestor(second, first)) return false;\n\n   \
+    \             // Otherwise the first mismatch occurs inside both substrings,\n\
+    \                // and the ranks of representative suffixes give their order.\n\
+    \                int first_start = _eertree.first_occurrence(first).first;\n \
+    \               int second_start = _eertree.first_occurrence(second).first;\n\
+    \                return suffix_rank[first_start] < suffix_rank[second_start];\n\
+    \            }\n        );\n\n        _order_of_node.assign(node_count, -1);\n\
+    \        for (int order = 0; order < size(); order++) {\n            _order_of_node[_nodes_in_order[order]]\
+    \ = order;\n        }\n    }\n\n   public:\n    PalindromeLexicographicalOrder()\
+    \ : _order_of_node(2, -1) {}\n\n    explicit PalindromeLexicographicalOrder(const\
+    \ Sequence& sequence)\n        : _sequence(sequence), _eertree(_sequence) {\n\
+    \        build_order();\n    }\n\n    explicit PalindromeLexicographicalOrder(Sequence&&\
+    \ sequence)\n        : _sequence(std::move(sequence)), _eertree(_sequence) {\n\
+    \        build_order();\n    }\n\n    int size() const {\n        return int(_nodes_in_order.size());\n\
+    \    }\n\n    bool empty() const {\n        return _nodes_in_order.empty();\n\
+    \    }\n\n    int text_length() const {\n        return int(_sequence.size());\n\
+    \    }\n\n    const Sequence& sequence() const {\n        return _sequence;\n\
+    \    }\n\n    const eertree_type& eertree() const {\n        return _eertree;\n\
+    \    }\n\n    const std::vector<node_id>& nodes_in_order() const {\n        return\
+    \ _nodes_in_order;\n    }\n\n    int order_of_node(node_id id) const {\n     \
+    \   assert(2 <= id && id < _eertree.node_count());\n        return _order_of_node[id];\n\
+    \    }\n\n    node_id node_by_order(int order) const {\n        assert(0 <= order\
+    \ && order < size());\n        return _nodes_in_order[order];\n    }\n\n    template\
+    \ <class Palindrome>\n    node_id find(const Palindrome& palindrome) const {\n\
+    \        const int length = int(palindrome.size());\n        if (length == 0)\
+    \ return eertree_type::null_node;\n        for (int i = 0; i < length / 2; i++)\
+    \ {\n            if (palindrome[i] != palindrome[length - 1 - i]) {\n        \
+    \        return eertree_type::null_node;\n            }\n        }\n\n       \
+    \ node_id id =\n            length & 1 ? eertree_type::odd_root : eertree_type::even_root;\n\
+    \        for (int i = (length - 1) / 2; i >= 0; i--) {\n            int symbol\
+    \ = symbol_index(palindrome[i]);\n            id = _eertree.node(id).next[symbol];\n\
+    \            if (id == eertree_type::null_node) return id;\n        }\n      \
+    \  return id;\n    }\n\n    template <class Palindrome>\n    bool contains(const\
+    \ Palindrome& palindrome) const {\n        return find(palindrome) != eertree_type::null_node;\n\
+    \    }\n\n    template <class Palindrome>\n    int order_of_palindrome(const Palindrome&\
+    \ palindrome) const {\n        node_id id = find(palindrome);\n        return\
+    \ id == eertree_type::null_node ? -1 : order_of_node(id);\n    }\n\n    std::pair<int,\
+    \ int> representative_occurrence(int order) const {\n        return _eertree.first_occurrence(node_by_order(order));\n\
+    \    }\n\n    Sequence palindrome(int order) const {\n        auto [left, right]\
+    \ = representative_occurrence(order);\n        return Sequence(_sequence.begin()\
+    \ + left, _sequence.begin() + right);\n    }\n\n    Sequence kth(int order) const\
+    \ {\n        return palindrome(order);\n    }\n};\n\n}  // namespace string\n\
     }  // namespace m1une\n\n\n#line 1 \"string/prefix_substring_lcs.hpp\"\n\n\n\n\
     #line 9 \"string/prefix_substring_lcs.hpp\"\n\nnamespace m1une {\nnamespace string\
     \ {\n\n// Answers LCS-length queries between a prefix of the first sequence and\
@@ -1813,7 +1896,7 @@ data:
     \ left]);\n        while (i + z[i] < n && sequence[z[i]] == sequence[i + z[i]])\
     \ {\n            z[i]++;\n        }\n        if (right < i + z[i]) {\n       \
     \     left = i;\n            right = i + z[i];\n        }\n    }\n    return z;\n\
-    }\n\n}  // namespace string\n}  // namespace m1une\n\n\n#line 24 \"string/all.hpp\"\
+    }\n\n}  // namespace string\n}  // namespace m1une\n\n\n#line 25 \"string/all.hpp\"\
     \n\n\n"
   code: '#ifndef M1UNE_STRING_ALL_HPP
 
@@ -1841,6 +1924,8 @@ data:
     #include "manacher.hpp"
 
     #include "minimum_rotation.hpp"
+
+    #include "palindrome_lexicographical_order.hpp"
 
     #include "prefix_substring_lcs.hpp"
 
@@ -1877,6 +1962,7 @@ data:
   - string/lyndon_factorization.hpp
   - string/minimum_rotation.hpp
   - string/manacher.hpp
+  - string/palindrome_lexicographical_order.hpp
   - string/prefix_substring_lcs.hpp
   - string/rolling_hash.hpp
   - string/runs.hpp
@@ -1891,7 +1977,7 @@ data:
   isVerificationFile: false
   path: string/all.hpp
   requiredBy: []
-  timestamp: '2026-07-18 19:37:21+09:00'
+  timestamp: '2026-07-25 23:09:52+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/string/string_algorithms.test.cpp
@@ -1922,6 +2008,7 @@ contest when convenience matters more.
 | `string/z_algorithm.hpp` | Linear-time Z array. |
 | `string/manacher.hpp` | Odd/even palindrome radii and substring checks. |
 | `string/minimum_rotation.hpp` | Earliest lexicographically minimum cyclic shift in linear time. |
+| `string/palindrome_lexicographical_order.hpp` | Rank and select distinct palindromic substrings in lexicographic order. |
 | `string/prefix_substring_lcs.hpp` | Offline LCS-length queries between prefixes and substrings. |
 | `string/suffix_automaton.hpp` | Online suffix automaton for substring queries and occurrence classes. |
 | `string/suffix_array.hpp` | Suffix array and LCP array. |

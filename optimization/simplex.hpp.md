@@ -227,14 +227,14 @@ data:
   isVerificationFile: false
   path: optimization/simplex.hpp
   requiredBy:
-  - optimization/integer_lp.hpp
   - optimization/all.hpp
+  - optimization/integer_lp.hpp
   timestamp: '2026-07-07 14:26:59+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/optimization/simplex.test.cpp
-  - verify/optimization/project_selection.test.cpp
   - verify/optimization/integer_lp.test.cpp
+  - verify/optimization/project_selection.test.cpp
 documentation_of: optimization/simplex.hpp
 layout: document
 title: Simplex Algorithm

@@ -716,9 +716,9 @@ data:
   timestamp: '2026-07-22 14:57:12+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/voronoi_diagram.test.cpp
   - verify/geometry/centroid.test.cpp
+  - verify/geometry/geometry_algorithms.test.cpp
 documentation_of: geometry/voronoi_diagram.hpp
 layout: document
 title: Voronoi Diagram

@@ -552,17 +552,17 @@ data:
   isVerificationFile: false
   path: geometry/euclidean_mst.hpp
   requiredBy:
-  - geometry/delaunay_triangulation.hpp
-  - geometry/all.hpp
   - geometry/voronoi_diagram.hpp
+  - geometry/all.hpp
+  - geometry/delaunay_triangulation.hpp
   timestamp: '2026-07-22 14:57:12+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/geometry/voronoi_diagram.test.cpp
+  - verify/geometry/centroid.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/euclidean_mst.test.cpp
   - verify/geometry/delaunay_triangulation.test.cpp
-  - verify/geometry/voronoi_diagram.test.cpp
-  - verify/geometry/centroid.test.cpp
 documentation_of: geometry/euclidean_mst.hpp
 layout: document
 title: Euclidean Minimum Spanning Tree

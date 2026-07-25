@@ -180,8 +180,8 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
-  - verify/math/bitwise_and_convolution.test.cpp
   - verify/math/bitwise_convolution.test.cpp
+  - verify/math/bitwise_and_convolution.test.cpp
 documentation_of: math/bitwise_convolution.hpp
 layout: document
 title: Bitwise Convolution

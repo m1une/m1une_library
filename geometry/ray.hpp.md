@@ -621,39 +621,39 @@ data:
   isVerificationFile: false
   path: geometry/ray.hpp
   requiredBy:
-  - geometry/steiner_convex_decomposition.hpp
   - geometry/all.hpp
   - geometry/convex_decomposition.hpp
-  - geometry/convex_polygon.hpp
   - geometry/polygon.hpp
-  - geometry/circle.hpp
+  - geometry/convex_polygon.hpp
   - geometry/minimum_enclosing_circle.hpp
+  - geometry/steiner_convex_decomposition.hpp
+  - geometry/circle.hpp
   timestamp: '2026-07-22 02:25:12+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/geometry/convex_polygon.test.cpp
-  - verify/geometry/circle_relation.test.cpp
-  - verify/geometry/geometry_algorithms.test.cpp
-  - verify/geometry/ray.test.cpp
-  - verify/geometry/point_in_polygon.test.cpp
-  - verify/geometry/incircle.test.cpp
   - verify/geometry/circle_circle_intersection_area.test.cpp
+  - verify/geometry/is_convex_polygon.test.cpp
   - verify/geometry/circumcircle.test.cpp
-  - verify/geometry/polygon_area.test.cpp
   - verify/geometry/circle_ray.test.cpp
   - verify/geometry/steiner_convex_decomposition.test.cpp
-  - verify/geometry/circle_common_tangents.test.cpp
-  - verify/geometry/circle_polygon_intersection_area.test.cpp
-  - verify/geometry/polygon_operations.test.cpp
-  - verify/geometry/convex_decomposition.test.cpp
-  - verify/geometry/is_convex_polygon.test.cpp
-  - verify/geometry/centroid.test.cpp
-  - verify/geometry/circle_operations.test.cpp
-  - verify/geometry/circle_tangent_points.test.cpp
-  - verify/geometry/circle_line_intersection.test.cpp
+  - verify/geometry/circle_relation.test.cpp
+  - verify/geometry/incircle.test.cpp
   - verify/geometry/minimum_enclosing_circle.test.cpp
-  - verify/geometry/circle_circle_intersection.test.cpp
+  - verify/geometry/polygon_area.test.cpp
   - verify/geometry/convex_diameter.test.cpp
+  - verify/geometry/centroid.test.cpp
+  - verify/geometry/circle_line_intersection.test.cpp
+  - verify/geometry/polygon_operations.test.cpp
+  - verify/geometry/circle_operations.test.cpp
+  - verify/geometry/circle_circle_intersection.test.cpp
+  - verify/geometry/circle_polygon_intersection_area.test.cpp
+  - verify/geometry/geometry_algorithms.test.cpp
+  - verify/geometry/circle_tangent_points.test.cpp
+  - verify/geometry/convex_decomposition.test.cpp
+  - verify/geometry/ray.test.cpp
+  - verify/geometry/point_in_polygon.test.cpp
+  - verify/geometry/circle_common_tangents.test.cpp
+  - verify/geometry/convex_polygon.test.cpp
 documentation_of: geometry/ray.hpp
 layout: document
 title: Rays

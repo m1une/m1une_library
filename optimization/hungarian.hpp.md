@@ -142,9 +142,9 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/optimization/simplex.test.cpp
+  - verify/optimization/integer_lp.test.cpp
   - verify/optimization/hungarian.test.cpp
   - verify/optimization/project_selection.test.cpp
-  - verify/optimization/integer_lp.test.cpp
 documentation_of: optimization/hungarian.hpp
 layout: document
 title: Hungarian Algorithm

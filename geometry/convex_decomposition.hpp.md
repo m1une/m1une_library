@@ -2400,9 +2400,9 @@ data:
   timestamp: '2026-07-22 10:48:11+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/geometry/centroid.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/convex_decomposition.test.cpp
-  - verify/geometry/centroid.test.cpp
 documentation_of: geometry/convex_decomposition.hpp
 layout: document
 title: Convex Decomposition

@@ -921,10 +921,10 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/graph_algorithms.test.cpp
-  - verify/graph/cow_game.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
-  - verify/graph/tree/tree_algorithms.test.cpp
   - verify/graph/tree/distance_frequency.test.cpp
+  - verify/graph/tree/tree_algorithms.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/cow_game.test.cpp
 documentation_of: graph/tree/distance_frequency.hpp
 layout: document
 title: Tree Distance Frequency

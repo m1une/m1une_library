@@ -51,8 +51,8 @@ data:
   timestamp: '2026-07-21 20:17:47+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/monoid/commutative_flags.test.cpp
   - verify/ds/segtree/range_add_range_min.test.cpp
+  - verify/monoid/commutative_flags.test.cpp
 documentation_of: acted_monoid/range_add_range_min.hpp
 layout: document
 title: Range Add Range Min

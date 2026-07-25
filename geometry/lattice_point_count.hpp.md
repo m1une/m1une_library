@@ -242,9 +242,9 @@ data:
   timestamp: '2026-07-18 22:54:37+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/geometry/geometry_algorithms.test.cpp
-  - verify/geometry/lattice_point_count.test.cpp
   - verify/geometry/centroid.test.cpp
+  - verify/geometry/lattice_point_count.test.cpp
+  - verify/geometry/geometry_algorithms.test.cpp
 documentation_of: geometry/lattice_point_count.hpp
 layout: document
 title: Lattice-Point Count

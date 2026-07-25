@@ -72,13 +72,13 @@ data:
   timestamp: '2026-07-21 20:17:47+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/monoid/commutative_flags.test.cpp
-  - verify/ds/segtree/persistent_lazy_segtree.test.cpp
-  - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
-  - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
   - verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array.test.cpp
   - verify/ds/dynamic_tree/lazy_link_cut_tree.test.cpp
   - verify/ds/dynamic_tree/lazy_path_link_cut_tree.test.cpp
+  - verify/ds/segtree/persistent_lazy_segtree.test.cpp
+  - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
+  - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
+  - verify/monoid/commutative_flags.test.cpp
 documentation_of: acted_monoid/range_add_range_sum.hpp
 layout: document
 title: Range Add Range Sum

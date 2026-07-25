@@ -749,8 +749,8 @@ data:
   timestamp: '2026-07-18 19:37:21+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/string/string_algorithms.test.cpp
   - verify/string/wildcard_pattern_matching.test.cpp
+  - verify/string/string_algorithms.test.cpp
 documentation_of: string/wildcard_pattern_matching.hpp
 layout: document
 title: Wildcard Pattern Matching

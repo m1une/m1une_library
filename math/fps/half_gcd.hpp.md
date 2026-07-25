@@ -1021,15 +1021,15 @@ data:
   isVerificationFile: false
   path: math/fps/half_gcd.hpp
   requiredBy:
-  - math/all.hpp
   - math/fps/polynomial_roots.hpp
   - math/fps/all.hpp
+  - math/all.hpp
   timestamp: '2026-07-18 19:37:21+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
-  - verify/math/fps/polynomial_roots.test.cpp
   - verify/math/fps/fps_algorithms.test.cpp
+  - verify/math/fps/polynomial_roots.test.cpp
   - verify/math/fps/half_gcd.test.cpp
 documentation_of: math/fps/half_gcd.hpp
 layout: document

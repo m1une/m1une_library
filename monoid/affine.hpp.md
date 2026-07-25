@@ -56,9 +56,9 @@ data:
   timestamp: '2026-07-21 20:17:47+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/monoid/commutative_flags.test.cpp
-  - verify/ds/segtree/dual_segtree.test.cpp
   - verify/ds/segtree/dynamic_dual_segtree.test.cpp
+  - verify/ds/segtree/dual_segtree.test.cpp
+  - verify/monoid/commutative_flags.test.cpp
 documentation_of: monoid/affine.hpp
 layout: document
 title: Affine Monoid

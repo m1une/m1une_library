@@ -145,8 +145,8 @@ data:
   isVerificationFile: false
   path: math/fps/floating_point_convolution.hpp
   requiredBy:
-  - math/all.hpp
   - math/fps/all.hpp
+  - math/all.hpp
   timestamp: '2026-07-07 14:26:59+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:

@@ -121,34 +121,34 @@ data:
   isVerificationFile: false
   path: acted_monoid/concept.hpp
   requiredBy:
-  - ds/segtree/lazy_segtree.hpp
-  - ds/segtree/persistent_lazy_segtree.hpp
-  - ds/segtree/segtree_beats.hpp
-  - ds/segtree/persistent_dynamic_lazy_segtree.hpp
-  - ds/segtree/dynamic_lazy_segtree.hpp
-  - ds/dynamic_array/dynamic_lazy_monoid_array.hpp
   - ds/dynamic_array/persistent_dynamic_lazy_monoid_array.hpp
-  - ds/dynamic_tree/lazy_path_link_cut_tree.hpp
+  - ds/dynamic_array/dynamic_lazy_monoid_array.hpp
   - ds/dynamic_tree/lazy_link_cut_tree.hpp
+  - ds/dynamic_tree/lazy_path_link_cut_tree.hpp
+  - ds/segtree/segtree_beats.hpp
+  - ds/segtree/persistent_lazy_segtree.hpp
+  - ds/segtree/dynamic_lazy_segtree.hpp
+  - ds/segtree/persistent_dynamic_lazy_segtree.hpp
+  - ds/segtree/lazy_segtree.hpp
   - acted_monoid/beats_concept.hpp
   timestamp: '2026-06-17 21:06:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/monoid/commutative_flags.test.cpp
-  - verify/ds/segtree/persistent_lazy_segtree.test.cpp
-  - verify/ds/segtree/lazy_segtree.test.cpp
-  - verify/ds/segtree/range_update_range_product.test.cpp
-  - verify/ds/segtree/range_update_range_product.test.cpp
-  - verify/ds/segtree/range_add_range_min.test.cpp
-  - verify/ds/segtree/segtree_beats.test.cpp
-  - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
-  - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
-  - verify/ds/dynamic_array/dynamic_lazy_monoid_array.test.cpp
   - verify/ds/dynamic_array/dynamic_lazy_monoid_array_range_ap.test.cpp
   - verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array_range_ap.test.cpp
   - verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array.test.cpp
+  - verify/ds/dynamic_array/dynamic_lazy_monoid_array.test.cpp
   - verify/ds/dynamic_tree/lazy_link_cut_tree.test.cpp
   - verify/ds/dynamic_tree/lazy_path_link_cut_tree.test.cpp
+  - verify/ds/segtree/lazy_segtree.test.cpp
+  - verify/ds/segtree/persistent_lazy_segtree.test.cpp
+  - verify/ds/segtree/segtree_beats.test.cpp
+  - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
+  - verify/ds/segtree/range_update_range_product.test.cpp
+  - verify/ds/segtree/range_update_range_product.test.cpp
+  - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
+  - verify/ds/segtree/range_add_range_min.test.cpp
+  - verify/monoid/commutative_flags.test.cpp
 documentation_of: acted_monoid/concept.hpp
 layout: document
 title: Acted Monoid Concept
