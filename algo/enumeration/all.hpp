@@ -3,6 +3,7 @@
 
 #include "combination.hpp"
 #include "gray_code.hpp"
+#include "permutation_lexicographical_order.hpp"
 #include "segtree_range.hpp"
 #include "submask.hpp"
 

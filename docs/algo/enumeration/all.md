@@ -16,3 +16,4 @@ spaces. The public namespace is `m1une::algo`.
 | `algo/enumeration/segtree_range.hpp` | Decomposition into maximal aligned segment-tree ranges. |
 | `algo/enumeration/submask.hpp` | Submask and supermask enumeration helpers. |
 | `algo/enumeration/combination.hpp` | Fixed-size subset mask generation helpers. |
+| `algo/enumeration/permutation_lexicographical_order.hpp` | Rank and select permutations in lexicographical order. |
