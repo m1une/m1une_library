@@ -2,6 +2,7 @@
 "verify/algo/dp/knapsack.test.cpp": "2026-07-18 22:54:37 +0900",
 "verify/algo/enumeration/combination.test.cpp": "2026-07-18 22:54:37 +0900",
 "verify/algo/enumeration/gray_code.test.cpp": "2026-07-18 22:54:37 +0900",
+"verify/algo/enumeration/permutation_lexicographical_order.test.cpp": "2026-07-25 23:25:14 +0900",
 "verify/algo/enumeration/segtree_range.test.cpp": "2026-07-18 22:54:37 +0900",
 "verify/algo/enumeration/submask.test.cpp": "2026-07-18 22:54:37 +0900",
 "verify/algo/offline/cdq_divide_and_conquer.test.cpp": "2026-07-18 22:54:37 +0900",
