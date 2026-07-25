@@ -112,6 +112,9 @@ data:
       path: algo/enumeration/gray_code.hpp
       title: Gray Code
     - icon: ':heavy_check_mark:'
+      path: algo/enumeration/permutation_lexicographical_order.hpp
+      title: Permutation Lexicographical Order
+    - icon: ':heavy_check_mark:'
       path: algo/enumeration/segtree_range.hpp
       title: Segment Tree Range Split
     - icon: ':heavy_check_mark:'
@@ -1278,6 +1281,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/algo/enumeration/gray_code.test.cpp
       title: verify/algo/enumeration/gray_code.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/algo/enumeration/permutation_lexicographical_order.test.cpp
+      title: verify/algo/enumeration/permutation_lexicographical_order.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/algo/enumeration/segtree_range.test.cpp
       title: verify/algo/enumeration/segtree_range.test.cpp

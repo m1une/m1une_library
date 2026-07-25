@@ -22,6 +22,9 @@ data:
     path: verify/algo/enumeration/gray_code.test.cpp
     title: verify/algo/enumeration/gray_code.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/algo/enumeration/permutation_lexicographical_order.test.cpp
+    title: verify/algo/enumeration/permutation_lexicographical_order.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/algo/enumeration/segtree_range.test.cpp
     title: verify/algo/enumeration/segtree_range.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1859,6 +1862,7 @@ data:
   - verify/algo/sequence/sequence_algorithms.test.cpp
   - verify/algo/dp/knapsack.test.cpp
   - verify/algo/enumeration/gray_code.test.cpp
+  - verify/algo/enumeration/permutation_lexicographical_order.test.cpp
   - verify/algo/enumeration/submask.test.cpp
   - verify/algo/enumeration/combination.test.cpp
   - verify/algo/enumeration/segtree_range.test.cpp
