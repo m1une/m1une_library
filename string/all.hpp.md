@@ -1146,29 +1146,32 @@ data:
     \    static constexpr int terminal_symbol = AlphabetSize;\n\n    struct Node {\n\
     \        std::array<node_id, AlphabetSize + 1> next;\n        node_id suffix_link;\n\
     \        node_id parent;\n        int left;\n        int right;\n        int suffix_start;\n\
-    \        int representative_suffix;\n        int leaf_count;\n\n        Node(int\
-    \ left_value = 0, int right_value = 0, node_id parent_value = null_node)\n   \
-    \         : suffix_link(null_node),\n              parent(parent_value),\n   \
-    \           left(left_value),\n              right(right_value),\n           \
-    \   suffix_start(-1),\n              representative_suffix(-1),\n            \
-    \  leaf_count(0) {\n            next.fill(null_node);\n        }\n    };\n\n \
-    \   struct Locus {\n        node_id node;\n        int offset;\n\n        explicit\
-    \ operator bool() const {\n            return node != null_node;\n        }\n\n\
-    \        friend bool operator==(const Locus&, const Locus&) = default;\n    };\n\
-    \n   private:\n    struct ActivePoint {\n        node_id node;\n        int offset;\n\
-    \    };\n\n    std::vector<Node> _nodes;\n    std::vector<int> _text;\n    ActivePoint\
-    \ _active;\n    int _text_length;\n\n    template <class Symbol>\n    static int\
-    \ symbol_index(const Symbol& symbol) {\n        int index = int(symbol) - FirstCharacter;\n\
-    \        assert(0 <= index && index < AlphabetSize);\n        return index;\n\
-    \    }\n\n    int edge_length_unchecked(node_id id) const {\n        return _nodes[id].right\
-    \ - _nodes[id].left;\n    }\n\n    node_id new_node(int left, int right, node_id\
-    \ parent) {\n        assert(_nodes.size() < std::size_t(std::numeric_limits<int>::max()));\n\
-    \        _nodes.emplace_back(left, right, parent);\n        return int(_nodes.size())\
-    \ - 1;\n    }\n\n    ActivePoint go(ActivePoint point, int left, int right) const\
-    \ {\n        while (left < right) {\n            if (point.offset == edge_length_unchecked(point.node))\
-    \ {\n                point = {_nodes[point.node].next[_text[left]], 0};\n    \
-    \            if (point.node == null_node) return point;\n            } else {\n\
-    \                if (_text[_nodes[point.node].left + point.offset] != _text[left])\
+    \        int representative_suffix;\n        int leaf_count;\n        int incoming_symbol;\n\
+    \        node_id first_child;\n        node_id next_sibling;\n        int child_count;\n\
+    \n        Node(int left_value = 0, int right_value = 0, node_id parent_value =\
+    \ null_node)\n            : suffix_link(null_node),\n              parent(parent_value),\n\
+    \              left(left_value),\n              right(right_value),\n        \
+    \      suffix_start(-1),\n              representative_suffix(-1),\n         \
+    \     leaf_count(0),\n              incoming_symbol(-1),\n              first_child(null_node),\n\
+    \              next_sibling(null_node),\n              child_count(0) {\n    \
+    \        next.fill(null_node);\n        }\n    };\n\n    struct Locus {\n    \
+    \    node_id node;\n        int offset;\n\n        explicit operator bool() const\
+    \ {\n            return node != null_node;\n        }\n\n        friend bool operator==(const\
+    \ Locus&, const Locus&) = default;\n    };\n\n   private:\n    struct ActivePoint\
+    \ {\n        node_id node;\n        int offset;\n    };\n\n    std::vector<Node>\
+    \ _nodes;\n    std::vector<int> _text;\n    ActivePoint _active;\n    int _text_length;\n\
+    \n    template <class Symbol>\n    static int symbol_index(const Symbol& symbol)\
+    \ {\n        int index = int(symbol) - FirstCharacter;\n        assert(0 <= index\
+    \ && index < AlphabetSize);\n        return index;\n    }\n\n    int edge_length_unchecked(node_id\
+    \ id) const {\n        return _nodes[id].right - _nodes[id].left;\n    }\n\n \
+    \   node_id new_node(int left, int right, node_id parent) {\n        assert(_nodes.size()\
+    \ < std::size_t(std::numeric_limits<int>::max()));\n        _nodes.emplace_back(left,\
+    \ right, parent);\n        return int(_nodes.size()) - 1;\n    }\n\n    ActivePoint\
+    \ go(ActivePoint point, int left, int right) const {\n        while (left < right)\
+    \ {\n            if (point.offset == edge_length_unchecked(point.node)) {\n  \
+    \              point = {_nodes[point.node].next[_text[left]], 0};\n          \
+    \      if (point.node == null_node) return point;\n            } else {\n    \
+    \            if (_text[_nodes[point.node].left + point.offset] != _text[left])\
     \ {\n                    return {null_node, 0};\n                }\n         \
     \       int remaining = edge_length_unchecked(point.node) - point.offset;\n  \
     \              if (right - left < remaining) {\n                    point.offset\
@@ -1201,11 +1204,17 @@ data:
     \ order;\n        order.reserve(_nodes.size());\n        order.push_back(root_node);\n\
     \        std::vector<int> depth(_nodes.size(), 0);\n\n        for (std::size_t\
     \ i = 0; i < order.size(); i++) {\n            node_id id = order[i];\n      \
-    \      for (node_id child : _nodes[id].next) {\n                if (child == null_node)\
-    \ continue;\n                depth[child] = depth[id] + edge_length_unchecked(child);\n\
-    \                order.push_back(child);\n            }\n        }\n\n       \
-    \ for (int i = int(order.size()) - 1; i >= 0; i--) {\n            node_id id =\
-    \ order[i];\n            bool leaf = true;\n            for (node_id child : _nodes[id].next)\
+    \      node_id previous_child = null_node;\n            for (int symbol = 0; symbol\
+    \ <= terminal_symbol; symbol++) {\n                node_id child = _nodes[id].next[symbol];\n\
+    \                if (child == null_node) continue;\n                _nodes[child].incoming_symbol\
+    \ = symbol;\n                if (previous_child == null_node) {\n            \
+    \        _nodes[id].first_child = child;\n                } else {\n         \
+    \           _nodes[previous_child].next_sibling = child;\n                }\n\
+    \                previous_child = child;\n                _nodes[id].child_count++;\n\
+    \                depth[child] = depth[id] + edge_length_unchecked(child);\n  \
+    \              order.push_back(child);\n            }\n        }\n\n        for\
+    \ (int i = int(order.size()) - 1; i >= 0; i--) {\n            node_id id = order[i];\n\
+    \            bool leaf = true;\n            for (node_id child : _nodes[id].next)\
     \ {\n                if (child == null_node) continue;\n                leaf =\
     \ false;\n                _nodes[id].leaf_count += _nodes[child].leaf_count;\n\
     \                if (_nodes[id].representative_suffix == -1) {\n             \
@@ -1236,22 +1245,22 @@ data:
     \ assert(0 <= id && id < node_count());\n        assert(0 <= symbol && symbol\
     \ <= terminal_symbol);\n        return _nodes[id].next[symbol];\n    }\n\n   \
     \ template <class Callback>\n    void for_each_child(node_id id, Callback callback)\
-    \ const {\n        assert(0 <= id && id < node_count());\n        for (int symbol\
-    \ = 0; symbol <= terminal_symbol; symbol++) {\n            node_id child_id =\
-    \ _nodes[id].next[symbol];\n            if (child_id != null_node) callback(symbol,\
-    \ child_id);\n        }\n    }\n\n    void clear() {\n        _text.clear();\n\
-    \        _text.push_back(terminal_symbol);\n        _text_length = 0;\n      \
-    \  initialize();\n    }\n\n    template <class Sequence>\n    void build(const\
-    \ Sequence& sequence) {\n        _text.clear();\n        for (const auto& symbol\
-    \ : sequence) _text.push_back(symbol_index(symbol));\n        assert(_text.size()\
-    \ < std::size_t(std::numeric_limits<int>::max()));\n        _text_length = int(_text.size());\n\
-    \        _text.push_back(terminal_symbol);\n        initialize();\n    }\n\n \
-    \   template <class Sequence>\n    Locus find(const Sequence& sequence) const\
-    \ {\n        ActivePoint point = {root_node, 0};\n        for (const auto& value\
-    \ : sequence) {\n            int symbol = symbol_index(value);\n            if\
-    \ (point.offset == edge_length_unchecked(point.node)) {\n                point\
-    \ = {_nodes[point.node].next[symbol], 0};\n                if (point.node == null_node)\
-    \ return {null_node, 0};\n            }\n            if (_text[_nodes[point.node].left\
+    \ const {\n        assert(0 <= id && id < node_count());\n        for (\n    \
+    \        node_id child_id = _nodes[id].first_child;\n            child_id != null_node;\n\
+    \            child_id = _nodes[child_id].next_sibling\n        ) {\n         \
+    \   callback(_nodes[child_id].incoming_symbol, child_id);\n        }\n    }\n\n\
+    \    void clear() {\n        _text.clear();\n        _text.push_back(terminal_symbol);\n\
+    \        _text_length = 0;\n        initialize();\n    }\n\n    template <class\
+    \ Sequence>\n    void build(const Sequence& sequence) {\n        _text.clear();\n\
+    \        for (const auto& symbol : sequence) _text.push_back(symbol_index(symbol));\n\
+    \        assert(_text.size() < std::size_t(std::numeric_limits<int>::max()));\n\
+    \        _text_length = int(_text.size());\n        _text.push_back(terminal_symbol);\n\
+    \        initialize();\n    }\n\n    template <class Sequence>\n    Locus find(const\
+    \ Sequence& sequence) const {\n        ActivePoint point = {root_node, 0};\n \
+    \       for (const auto& value : sequence) {\n            int symbol = symbol_index(value);\n\
+    \            if (point.offset == edge_length_unchecked(point.node)) {\n      \
+    \          point = {_nodes[point.node].next[symbol], 0};\n                if (point.node\
+    \ == null_node) return {null_node, 0};\n            }\n            if (_text[_nodes[point.node].left\
     \ + point.offset] != symbol) {\n                return {null_node, 0};\n     \
     \       }\n            point.offset++;\n        }\n        return {point.node,\
     \ point.offset};\n    }\n\n    template <class Sequence>\n    bool contains(const\
@@ -2116,7 +2125,7 @@ data:
   isVerificationFile: false
   path: string/all.hpp
   requiredBy: []
-  timestamp: '2026-07-27 02:08:28+09:00'
+  timestamp: '2026-07-27 02:17:17+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/string/string_algorithms.test.cpp
