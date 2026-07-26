@@ -121,6 +121,26 @@ void test_randomized() {
                 assert(node.suffix_start == -1);
                 assert(node.leaf_count >= (id == tree.root() ? 1 : 2));
             }
+
+            std::vector<std::pair<int, int>> children;
+            tree.for_each_child(id, [&](int symbol, int child) {
+                children.emplace_back(symbol, child);
+            });
+            assert(int(children.size()) == node.child_count);
+
+            int position = 0;
+            for (int child = node.first_child; child != tree.null_node; child = tree.node(child).next_sibling) {
+                assert(position < int(children.size()));
+                assert(tree.node(child).parent == id);
+                assert(tree.node(child).incoming_symbol == children[position].first);
+                assert(child == children[position].second);
+                assert(tree.child_by_index(id, children[position].first) == child);
+                position++;
+            }
+            assert(position == int(children.size()));
+            for (int i = 1; i < int(children.size()); i++) {
+                assert(children[i - 1].first < children[i].first);
+            }
         }
         assert(leaves == n + 1);
         assert(int(suffix_starts.size()) == n + 1);

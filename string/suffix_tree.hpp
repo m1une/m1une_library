@@ -30,6 +30,10 @@ struct SuffixTree {
         int suffix_start;
         int representative_suffix;
         int leaf_count;
+        int incoming_symbol;
+        node_id first_child;
+        node_id next_sibling;
+        int child_count;
 
         Node(int left_value = 0, int right_value = 0, node_id parent_value = null_node)
             : suffix_link(null_node),
@@ -38,7 +42,11 @@ struct SuffixTree {
               right(right_value),
               suffix_start(-1),
               representative_suffix(-1),
-              leaf_count(0) {
+              leaf_count(0),
+              incoming_symbol(-1),
+              first_child(null_node),
+              next_sibling(null_node),
+              child_count(0) {
             next.fill(null_node);
         }
     };
@@ -160,8 +168,18 @@ struct SuffixTree {
 
         for (std::size_t i = 0; i < order.size(); i++) {
             node_id id = order[i];
-            for (node_id child : _nodes[id].next) {
+            node_id previous_child = null_node;
+            for (int symbol = 0; symbol <= terminal_symbol; symbol++) {
+                node_id child = _nodes[id].next[symbol];
                 if (child == null_node) continue;
+                _nodes[child].incoming_symbol = symbol;
+                if (previous_child == null_node) {
+                    _nodes[id].first_child = child;
+                } else {
+                    _nodes[previous_child].next_sibling = child;
+                }
+                previous_child = child;
+                _nodes[id].child_count++;
                 depth[child] = depth[id] + edge_length_unchecked(child);
                 order.push_back(child);
             }
@@ -260,9 +278,12 @@ struct SuffixTree {
     template <class Callback>
     void for_each_child(node_id id, Callback callback) const {
         assert(0 <= id && id < node_count());
-        for (int symbol = 0; symbol <= terminal_symbol; symbol++) {
-            node_id child_id = _nodes[id].next[symbol];
-            if (child_id != null_node) callback(symbol, child_id);
+        for (
+            node_id child_id = _nodes[id].first_child;
+            child_id != null_node;
+            child_id = _nodes[child_id].next_sibling
+        ) {
+            callback(_nodes[child_id].incoming_symbol, child_id);
         }
     }
 
