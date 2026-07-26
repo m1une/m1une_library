@@ -1000,6 +1000,9 @@ data:
     path: verify/string/suffix_automaton.test.cpp
     title: verify/string/suffix_automaton.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/string/suffix_tree.test.cpp
+    title: verify/string/suffix_tree.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/string/trie.test.cpp
     title: verify/string/trie.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1729,6 +1732,7 @@ data:
   - verify/string/palindrome_lexicographical_order.test.cpp
   - verify/string/levenshtein_distance.test.cpp
   - verify/string/prefix_substring_lcs.test.cpp
+  - verify/string/suffix_tree.test.cpp
   - verify/string/runs.test.cpp
   - verify/string/wildcard_pattern_matching.test.cpp
   - verify/string/suffix_array.test.cpp

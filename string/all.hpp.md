@@ -65,6 +65,9 @@ data:
     path: string/suffix_automaton.hpp
     title: Suffix Automaton
   - icon: ':heavy_check_mark:'
+    path: string/suffix_tree.hpp
+    title: Suffix Tree
+  - icon: ':heavy_check_mark:'
     path: string/trie.hpp
     title: Trie
   - icon: ':heavy_check_mark:'
@@ -1135,6 +1138,139 @@ data:
     \            if (best_length < current_length) {\n                best_length\
     \ = current_length;\n                best_end = end;\n            }\n        }\n\
     \        return {best_end - best_length, best_end};\n    }\n};\n\n}  // namespace\
+    \ string\n}  // namespace m1une\n\n\n#line 1 \"string/suffix_tree.hpp\"\n\n\n\n\
+    #line 11 \"string/suffix_tree.hpp\"\n\nnamespace m1une {\nnamespace string {\n\
+    \ntemplate <int AlphabetSize = 26, int FirstCharacter = 'a'>\nstruct SuffixTree\
+    \ {\n    static_assert(0 < AlphabetSize);\n\n    using node_id = int;\n    static\
+    \ constexpr node_id root_node = 0;\n    static constexpr node_id null_node = -1;\n\
+    \    static constexpr int terminal_symbol = AlphabetSize;\n\n    struct Node {\n\
+    \        std::array<node_id, AlphabetSize + 1> next;\n        node_id suffix_link;\n\
+    \        node_id parent;\n        int left;\n        int right;\n        int suffix_start;\n\
+    \        int representative_suffix;\n        int leaf_count;\n\n        Node(int\
+    \ left_value = 0, int right_value = 0, node_id parent_value = null_node)\n   \
+    \         : suffix_link(null_node),\n              parent(parent_value),\n   \
+    \           left(left_value),\n              right(right_value),\n           \
+    \   suffix_start(-1),\n              representative_suffix(-1),\n            \
+    \  leaf_count(0) {\n            next.fill(null_node);\n        }\n    };\n\n \
+    \   struct Locus {\n        node_id node;\n        int offset;\n\n        explicit\
+    \ operator bool() const {\n            return node != null_node;\n        }\n\n\
+    \        friend bool operator==(const Locus&, const Locus&) = default;\n    };\n\
+    \n   private:\n    struct ActivePoint {\n        node_id node;\n        int offset;\n\
+    \    };\n\n    std::vector<Node> _nodes;\n    std::vector<int> _text;\n    ActivePoint\
+    \ _active;\n    int _text_length;\n\n    template <class Symbol>\n    static int\
+    \ symbol_index(const Symbol& symbol) {\n        int index = int(symbol) - FirstCharacter;\n\
+    \        assert(0 <= index && index < AlphabetSize);\n        return index;\n\
+    \    }\n\n    int edge_length_unchecked(node_id id) const {\n        return _nodes[id].right\
+    \ - _nodes[id].left;\n    }\n\n    node_id new_node(int left, int right, node_id\
+    \ parent) {\n        assert(_nodes.size() < std::size_t(std::numeric_limits<int>::max()));\n\
+    \        _nodes.emplace_back(left, right, parent);\n        return int(_nodes.size())\
+    \ - 1;\n    }\n\n    ActivePoint go(ActivePoint point, int left, int right) const\
+    \ {\n        while (left < right) {\n            if (point.offset == edge_length_unchecked(point.node))\
+    \ {\n                point = {_nodes[point.node].next[_text[left]], 0};\n    \
+    \            if (point.node == null_node) return point;\n            } else {\n\
+    \                if (_text[_nodes[point.node].left + point.offset] != _text[left])\
+    \ {\n                    return {null_node, 0};\n                }\n         \
+    \       int remaining = edge_length_unchecked(point.node) - point.offset;\n  \
+    \              if (right - left < remaining) {\n                    point.offset\
+    \ += right - left;\n                    return point;\n                }\n   \
+    \             left += remaining;\n                point.offset = edge_length_unchecked(point.node);\n\
+    \            }\n        }\n        return point;\n    }\n\n    node_id split(ActivePoint\
+    \ point) {\n        if (point.offset == edge_length_unchecked(point.node)) return\
+    \ point.node;\n        if (point.offset == 0) return _nodes[point.node].parent;\n\
+    \n        node_id child = point.node;\n        node_id parent = _nodes[child].parent;\n\
+    \        int left = _nodes[child].left;\n        node_id middle = new_node(left,\
+    \ left + point.offset, parent);\n        _nodes[parent].next[_text[left]] = middle;\n\
+    \        _nodes[middle].next[_text[left + point.offset]] = child;\n        _nodes[child].parent\
+    \ = middle;\n        _nodes[child].left += point.offset;\n        return middle;\n\
+    \    }\n\n    node_id get_suffix_link(node_id id) {\n        if (_nodes[id].suffix_link\
+    \ != null_node) return _nodes[id].suffix_link;\n        node_id parent = _nodes[id].parent;\n\
+    \        if (parent == null_node) return root_node;\n\n        node_id parent_link\
+    \ = get_suffix_link(parent);\n        ActivePoint point = {\n            parent_link,\n\
+    \            edge_length_unchecked(parent_link)\n        };\n        int left\
+    \ = _nodes[id].left + (parent == root_node);\n        point = go(point, left,\
+    \ _nodes[id].right);\n        assert(point.node != null_node);\n        return\
+    \ _nodes[id].suffix_link = split(point);\n    }\n\n    void extend(int position)\
+    \ {\n        while (true) {\n            ActivePoint next = go(_active, position,\
+    \ position + 1);\n            if (next.node != null_node) {\n                _active\
+    \ = next;\n                return;\n            }\n\n            node_id middle\
+    \ = split(_active);\n            node_id leaf = new_node(position, int(_text.size()),\
+    \ middle);\n            _nodes[middle].next[_text[position]] = leaf;\n\n     \
+    \       _active.node = get_suffix_link(middle);\n            _active.offset =\
+    \ edge_length_unchecked(_active.node);\n            if (middle == root_node) return;\n\
+    \        }\n    }\n\n    void finish_metadata() {\n        std::vector<node_id>\
+    \ order;\n        order.reserve(_nodes.size());\n        order.push_back(root_node);\n\
+    \        std::vector<int> depth(_nodes.size(), 0);\n\n        for (std::size_t\
+    \ i = 0; i < order.size(); i++) {\n            node_id id = order[i];\n      \
+    \      for (node_id child : _nodes[id].next) {\n                if (child == null_node)\
+    \ continue;\n                depth[child] = depth[id] + edge_length_unchecked(child);\n\
+    \                order.push_back(child);\n            }\n        }\n\n       \
+    \ for (int i = int(order.size()) - 1; i >= 0; i--) {\n            node_id id =\
+    \ order[i];\n            bool leaf = true;\n            for (node_id child : _nodes[id].next)\
+    \ {\n                if (child == null_node) continue;\n                leaf =\
+    \ false;\n                _nodes[id].leaf_count += _nodes[child].leaf_count;\n\
+    \                if (_nodes[id].representative_suffix == -1) {\n             \
+    \       _nodes[id].representative_suffix = _nodes[child].representative_suffix;\n\
+    \                }\n            }\n            if (leaf) {\n                _nodes[id].suffix_start\
+    \ = int(_text.size()) - depth[id];\n                _nodes[id].representative_suffix\
+    \ = _nodes[id].suffix_start;\n                _nodes[id].leaf_count = 1;\n   \
+    \         }\n        }\n    }\n\n    void initialize() {\n        _nodes.clear();\n\
+    \        _nodes.reserve(2 * _text.size() + 1);\n        _nodes.emplace_back();\n\
+    \        _nodes[root_node].suffix_link = root_node;\n        _active = {root_node,\
+    \ 0};\n        for (int position = 0; position < int(_text.size()); position++)\
+    \ extend(position);\n        finish_metadata();\n    }\n\n   public:\n    SuffixTree()\
+    \ {\n        clear();\n    }\n\n    template <class Sequence>\n    explicit SuffixTree(const\
+    \ Sequence& sequence) {\n        build(sequence);\n    }\n\n    int size() const\
+    \ {\n        return node_count();\n    }\n\n    bool empty() const {\n       \
+    \ return _text_length == 0;\n    }\n\n    int node_count() const {\n        return\
+    \ int(_nodes.size());\n    }\n\n    int text_length() const {\n        return\
+    \ _text_length;\n    }\n\n    node_id root() const {\n        return root_node;\n\
+    \    }\n\n    const Node& node(node_id id) const {\n        assert(0 <= id &&\
+    \ id < node_count());\n        return _nodes[id];\n    }\n\n    const std::vector<Node>&\
+    \ nodes() const {\n        return _nodes;\n    }\n\n    int edge_length(node_id\
+    \ id) const {\n        assert(0 <= id && id < node_count());\n        return edge_length_unchecked(id);\n\
+    \    }\n\n    bool is_leaf(node_id id) const {\n        assert(0 <= id && id <\
+    \ node_count());\n        return _nodes[id].suffix_start != -1;\n    }\n\n   \
+    \ template <class Symbol>\n    node_id child(node_id id, const Symbol& symbol)\
+    \ const {\n        assert(0 <= id && id < node_count());\n        return _nodes[id].next[symbol_index(symbol)];\n\
+    \    }\n\n    node_id child_by_index(node_id id, int symbol) const {\n       \
+    \ assert(0 <= id && id < node_count());\n        assert(0 <= symbol && symbol\
+    \ <= terminal_symbol);\n        return _nodes[id].next[symbol];\n    }\n\n   \
+    \ template <class Callback>\n    void for_each_child(node_id id, Callback callback)\
+    \ const {\n        assert(0 <= id && id < node_count());\n        for (int symbol\
+    \ = 0; symbol <= terminal_symbol; symbol++) {\n            node_id child_id =\
+    \ _nodes[id].next[symbol];\n            if (child_id != null_node) callback(symbol,\
+    \ child_id);\n        }\n    }\n\n    void clear() {\n        _text.clear();\n\
+    \        _text.push_back(terminal_symbol);\n        _text_length = 0;\n      \
+    \  initialize();\n    }\n\n    template <class Sequence>\n    void build(const\
+    \ Sequence& sequence) {\n        _text.clear();\n        for (const auto& symbol\
+    \ : sequence) _text.push_back(symbol_index(symbol));\n        assert(_text.size()\
+    \ < std::size_t(std::numeric_limits<int>::max()));\n        _text_length = int(_text.size());\n\
+    \        _text.push_back(terminal_symbol);\n        initialize();\n    }\n\n \
+    \   template <class Sequence>\n    Locus find(const Sequence& sequence) const\
+    \ {\n        ActivePoint point = {root_node, 0};\n        for (const auto& value\
+    \ : sequence) {\n            int symbol = symbol_index(value);\n            if\
+    \ (point.offset == edge_length_unchecked(point.node)) {\n                point\
+    \ = {_nodes[point.node].next[symbol], 0};\n                if (point.node == null_node)\
+    \ return {null_node, 0};\n            }\n            if (_text[_nodes[point.node].left\
+    \ + point.offset] != symbol) {\n                return {null_node, 0};\n     \
+    \       }\n            point.offset++;\n        }\n        return {point.node,\
+    \ point.offset};\n    }\n\n    template <class Sequence>\n    bool contains(const\
+    \ Sequence& sequence) const {\n        return bool(find(sequence));\n    }\n\n\
+    \    template <class Sequence>\n    int count_occurrences(const Sequence& sequence)\
+    \ const {\n        Locus locus = find(sequence);\n        return locus ? _nodes[locus.node].leaf_count\
+    \ : 0;\n    }\n\n    template <class Sequence>\n    std::pair<int, int> representative_occurrence(const\
+    \ Sequence& sequence) const {\n        Locus locus = {root_node, 0};\n       \
+    \ int length = 0;\n        for (const auto& value : sequence) {\n            int\
+    \ symbol = symbol_index(value);\n            if (locus.offset == edge_length_unchecked(locus.node))\
+    \ {\n                locus = {_nodes[locus.node].next[symbol], 0};\n         \
+    \       if (locus.node == null_node) return {-1, -1};\n            }\n       \
+    \     if (_text[_nodes[locus.node].left + locus.offset] != symbol) return {-1,\
+    \ -1};\n            locus.offset++;\n            length++;\n        }\n      \
+    \  int left = _nodes[locus.node].representative_suffix;\n        return {left,\
+    \ left + length};\n    }\n\n    long long distinct_substring_count() const {\n\
+    \        long long result = 0;\n        for (node_id id = 1; id < node_count();\
+    \ id++) {\n            result += std::max(0, std::min(_nodes[id].right, _text_length)\
+    \ - _nodes[id].left);\n        }\n        return result;\n    }\n};\n\n}  // namespace\
     \ string\n}  // namespace m1une\n\n\n#line 1 \"string/trie.hpp\"\n\n\n\n#line\
     \ 9 \"string/trie.hpp\"\n\nnamespace m1une {\nnamespace string {\n\n// A multiset\
     \ trie for a contiguous character alphabet.\ntemplate <int AlphabetSize = 26,\
@@ -1896,7 +2032,7 @@ data:
     \ left]);\n        while (i + z[i] < n && sequence[z[i]] == sequence[i + z[i]])\
     \ {\n            z[i]++;\n        }\n        if (right < i + z[i]) {\n       \
     \     left = i;\n            right = i + z[i];\n        }\n    }\n    return z;\n\
-    }\n\n}  // namespace string\n}  // namespace m1une\n\n\n#line 25 \"string/all.hpp\"\
+    }\n\n}  // namespace string\n}  // namespace m1une\n\n\n#line 26 \"string/all.hpp\"\
     \n\n\n"
   code: '#ifndef M1UNE_STRING_ALL_HPP
 
@@ -1939,6 +2075,8 @@ data:
 
     #include "suffix_array.hpp"
 
+    #include "suffix_tree.hpp"
+
     #include "trie.hpp"
 
     #include "wildcard_pattern_matching.hpp"
@@ -1968,6 +2106,7 @@ data:
   - string/runs.hpp
   - string/string_hash.hpp
   - string/suffix_automaton.hpp
+  - string/suffix_tree.hpp
   - string/trie.hpp
   - string/wildcard_pattern_matching.hpp
   - math/fps/convolution.hpp
@@ -1977,7 +2116,7 @@ data:
   isVerificationFile: false
   path: string/all.hpp
   requiredBy: []
-  timestamp: '2026-07-25 23:09:52+09:00'
+  timestamp: '2026-07-27 02:08:28+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/string/string_algorithms.test.cpp
@@ -2012,6 +2151,7 @@ contest when convenience matters more.
 | `string/prefix_substring_lcs.hpp` | Offline LCS-length queries between prefixes and substrings. |
 | `string/suffix_automaton.hpp` | Online suffix automaton for substring queries and occurrence classes. |
 | `string/suffix_array.hpp` | Suffix array and LCP array. |
+| `string/suffix_tree.hpp` | Ukkonen suffix tree with substring lookup and occurrence counts. |
 | `string/trie.hpp` | Contiguous-alphabet multiset trie with prefix queries. |
 | `string/wildcard_pattern_matching.hpp` | Exact wildcard matching at every text alignment. |
 | `string/rolling_hash.hpp` | Static substring hashing, LCP, and comparison. |

@@ -1201,6 +1201,9 @@ data:
       path: string/suffix_automaton.hpp
       title: Suffix Automaton
     - icon: ':heavy_check_mark:'
+      path: string/suffix_tree.hpp
+      title: Suffix Tree
+    - icon: ':heavy_check_mark:'
       path: string/trie.hpp
       title: Trie
     - icon: ':heavy_check_mark:'
@@ -2327,6 +2330,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/string/suffix_automaton.test.cpp
       title: verify/string/suffix_automaton.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/string/suffix_tree.test.cpp
+      title: verify/string/suffix_tree.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/string/trie.test.cpp
       title: verify/string/trie.test.cpp
