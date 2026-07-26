@@ -29,6 +29,7 @@ contest when convenience matters more.
 | `string/prefix_substring_lcs.hpp` | Offline LCS-length queries between prefixes and substrings. |
 | `string/suffix_automaton.hpp` | Online suffix automaton for substring queries and occurrence classes. |
 | `string/suffix_array.hpp` | Suffix array and LCP array. |
+| `string/suffix_tree.hpp` | Ukkonen suffix tree with substring lookup and occurrence counts. |
 | `string/trie.hpp` | Contiguous-alphabet multiset trie with prefix queries. |
 | `string/wildcard_pattern_matching.hpp` | Exact wildcard matching at every text alignment. |
 | `string/rolling_hash.hpp` | Static substring hashing, LCP, and comparison. |

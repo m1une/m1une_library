@@ -19,6 +19,7 @@
 #include "string_hash.hpp"
 #include "suffix_automaton.hpp"
 #include "suffix_array.hpp"
+#include "suffix_tree.hpp"
 #include "trie.hpp"
 #include "wildcard_pattern_matching.hpp"
 #include "z_algorithm.hpp"
