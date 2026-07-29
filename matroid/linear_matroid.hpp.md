@@ -7,6 +7,9 @@ data:
     title: Matroid All
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/matroid/linear_matroid_intersection.test.cpp
+    title: verify/matroid/linear_matroid_intersection.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/matroid/matroid_intersection.test.cpp
     title: verify/matroid/matroid_intersection.test.cpp
   - icon: ':heavy_check_mark:'
@@ -117,6 +120,7 @@ data:
   verifiedWith:
   - verify/matroid/matroids.test.cpp
   - verify/matroid/matroid_intersection.test.cpp
+  - verify/matroid/linear_matroid_intersection.test.cpp
 documentation_of: matroid/linear_matroid.hpp
 layout: document
 title: Linear Matroid

@@ -8,6 +8,9 @@ data:
     path: matroid/linear_matroid.hpp
     title: Linear Matroid
   - icon: ':heavy_check_mark:'
+    path: matroid/linear_matroid_intersection.hpp
+    title: Linear Matroid Intersection
+  - icon: ':heavy_check_mark:'
     path: matroid/matroid_intersection.hpp
     title: Matroid Intersection
   - icon: ':heavy_check_mark:'
@@ -97,7 +100,63 @@ data:
     \        if (value == 0) return false;\n        }\n        return true;\n    }\n\
     \n    bool operator()(const std::vector<int>& subset) const {\n        return\
     \ independent(subset);\n    }\n};\n\n}  // namespace matroid\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"matroid/matroid_intersection.hpp\"\n\n\n\n#include <algorithm>\n\
+    \ m1une\n\n\n#line 1 \"matroid/linear_matroid_intersection.hpp\"\n\n\n\n#line\
+    \ 5 \"matroid/linear_matroid_intersection.hpp\"\n#include <chrono>\n#line 9 \"\
+    matroid/linear_matroid_intersection.hpp\"\n\nnamespace m1une {\nnamespace matroid\
+    \ {\n\nnamespace internal {\n\ninline std::uint64_t linear_matroid_intersection_random()\
+    \ {\n    static std::uint64_t state = std::uint64_t(\n        std::chrono::steady_clock::now().time_since_epoch().count());\n\
+    \    state += 0x9e3779b97f4a7c15ULL;\n    std::uint64_t value = state;\n    value\
+    \ = (value ^ (value >> 30)) * 0xbf58476d1ce4e5b9ULL;\n    value = (value ^ (value\
+    \ >> 27)) * 0x94d049bb133111ebULL;\n    return value ^ (value >> 31);\n}\n\ntemplate\
+    \ <class Field>\nint linear_matroid_intersection_matrix_rank(\n    std::vector<std::vector<Field>>\
+    \ matrix) {\n    const int row_count = int(matrix.size());\n    const int column_count\
+    \ = row_count == 0 ? 0 : int(matrix[0].size());\n    int rank = 0;\n    for (int\
+    \ column = 0; column < column_count && rank < row_count; column++) {\n       \
+    \ int pivot = rank;\n        while (pivot < row_count && matrix[pivot][column]\
+    \ == Field(0)) pivot++;\n        if (pivot == row_count) continue;\n        std::swap(matrix[rank],\
+    \ matrix[pivot]);\n\n        Field inverse = Field(1) / matrix[rank][column];\n\
+    \        for (int j = column; j < column_count; j++) matrix[rank][j] *= inverse;\n\
+    \        for (int row = rank + 1; row < row_count; row++) {\n            if (matrix[row][column]\
+    \ == Field(0)) continue;\n            Field factor = matrix[row][column];\n  \
+    \          for (int j = column; j < column_count; j++) {\n                matrix[row][j]\
+    \ -= factor * matrix[rank][j];\n            }\n        }\n        rank++;\n  \
+    \  }\n    return rank;\n}\n\n}  // namespace internal\n\ntemplate <class Field>\n\
+    int linear_matroid_intersection_size_with_weights(\n    const std::vector<std::vector<Field>>&\
+    \ first_vectors,\n    const std::vector<std::vector<Field>>& second_vectors,\n\
+    \    const std::vector<Field>& weights) {\n    const int ground_size = int(first_vectors.size());\n\
+    \    assert(int(second_vectors.size()) == ground_size);\n    assert(int(weights.size())\
+    \ == ground_size);\n    if (ground_size == 0) return 0;\n\n    const int first_dimension\
+    \ = int(first_vectors[0].size());\n    const int second_dimension = int(second_vectors[0].size());\n\
+    #ifndef NDEBUG\n    for (const auto& vector : first_vectors) {\n        assert(int(vector.size())\
+    \ == first_dimension);\n    }\n    for (const auto& vector : second_vectors) {\n\
+    \        assert(int(vector.size()) == second_dimension);\n    }\n#endif\n\n  \
+    \  const bool transpose = second_dimension < first_dimension;\n    const int row_count\
+    \ = transpose ? second_dimension : first_dimension;\n    const int column_count\
+    \ = transpose ? first_dimension : second_dimension;\n    std::vector<std::vector<Field>>\
+    \ matrix(\n        row_count, std::vector<Field>(column_count, Field(0)));\n\n\
+    \    for (int element = 0; element < ground_size; element++) {\n        const\
+    \ auto& row_vector =\n            transpose ? second_vectors[element] : first_vectors[element];\n\
+    \        const auto& column_vector =\n            transpose ? first_vectors[element]\
+    \ : second_vectors[element];\n        for (int row = 0; row < row_count; row++)\
+    \ {\n            Field coefficient = weights[element] * row_vector[row];\n   \
+    \         if (coefficient == Field(0)) continue;\n            for (int column\
+    \ = 0; column < column_count; column++) {\n                matrix[row][column]\
+    \ += coefficient * column_vector[column];\n            }\n        }\n    }\n \
+    \   return internal::linear_matroid_intersection_matrix_rank(std::move(matrix));\n\
+    }\n\ntemplate <class Field, class RandomNumberGenerator>\nint linear_matroid_intersection_size(\n\
+    \    const std::vector<std::vector<Field>>& first_vectors,\n    const std::vector<std::vector<Field>>&\
+    \ second_vectors,\n    RandomNumberGenerator& random) {\n    assert(first_vectors.size()\
+    \ == second_vectors.size());\n    std::vector<Field> weights(first_vectors.size());\n\
+    \    for (Field& weight : weights) weight = Field(random());\n    return linear_matroid_intersection_size_with_weights(\n\
+    \        first_vectors, second_vectors, weights);\n}\n\ntemplate <class Field>\n\
+    int linear_matroid_intersection_size(\n    const std::vector<std::vector<Field>>&\
+    \ first_vectors,\n    const std::vector<std::vector<Field>>& second_vectors) {\n\
+    \    assert(first_vectors.size() == second_vectors.size());\n    std::vector<Field>\
+    \ weights(first_vectors.size());\n    for (Field& weight : weights) {\n      \
+    \  weight = Field(internal::linear_matroid_intersection_random());\n    }\n  \
+    \  return linear_matroid_intersection_size_with_weights(\n        first_vectors,\
+    \ second_vectors, weights);\n}\n\n}  // namespace matroid\n}  // namespace m1une\n\
+    \n\n#line 1 \"matroid/matroid_intersection.hpp\"\n\n\n\n#include <algorithm>\n\
     #line 7 \"matroid/matroid_intersection.hpp\"\n\nnamespace m1une {\nnamespace matroid\
     \ {\n\ntemplate <class IndependenceOracle1, class IndependenceOracle2>\nstd::vector<int>\
     \ matroid_intersection(int ground_size, IndependenceOracle1 oracle1,\n       \
@@ -313,7 +372,7 @@ data:
     \    int ground_size, const std::vector<Weight>& weight, IndependenceOracle1 oracle1,\n\
     \    IndependenceOracle2 oracle2) {\n    return weighted_matroid_intersection_max(ground_size,\
     \ weight, oracle1, oracle2);\n}\n\n}  // namespace matroid\n}  // namespace m1une\n\
-    \n\n#line 10 \"matroid/all.hpp\"\n\n\n"
+    \n\n#line 11 \"matroid/all.hpp\"\n\n\n"
   code: '#ifndef M1UNE_MATROID_ALL_HPP
 
     #define M1UNE_MATROID_ALL_HPP 1
@@ -322,6 +381,8 @@ data:
     #include "graphic_matroid.hpp"
 
     #include "linear_matroid.hpp"
+
+    #include "linear_matroid_intersection.hpp"
 
     #include "matroid_intersection.hpp"
 
@@ -338,6 +399,7 @@ data:
   dependsOn:
   - matroid/graphic_matroid.hpp
   - matroid/linear_matroid.hpp
+  - matroid/linear_matroid_intersection.hpp
   - matroid/matroid_intersection.hpp
   - matroid/partition_matroid.hpp
   - matroid/uniform_matroid.hpp
@@ -345,7 +407,7 @@ data:
   isVerificationFile: false
   path: matroid/all.hpp
   requiredBy: []
-  timestamp: '2026-07-01 14:47:47+09:00'
+  timestamp: '2026-07-29 16:26:14+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/matroid/matroids.test.cpp
@@ -356,8 +418,9 @@ title: Matroid All
 
 ## Overview
 
-`matroid/all.hpp` includes the standard matroid independence oracles and the
-unweighted matroid-intersection algorithm.
+`matroid/all.hpp` includes the standard matroid independence oracles, general
+weighted and unweighted matroid intersection, and the concise randomized
+cardinality algorithm for two linear matroids.
 
 Every oracle accepts a `const std::vector<int>&` subset and can be passed
 directly to `m1une::matroid::matroid_intersection`.
@@ -373,6 +436,7 @@ algorithm always satisfies this precondition.
 | `matroid/partition_matroid.hpp` | Per-group capacity constraints. |
 | `matroid/graphic_matroid.hpp` | Forest independence on graph edges. |
 | `matroid/linear_matroid.hpp` | General field and 64-bit binary linear matroids. |
+| `matroid/linear_matroid_intersection.hpp` | Randomized maximum cardinality for the intersection of two linear matroids. |
 | `matroid/matroid_intersection.hpp` | Maximum-cardinality common independent set. |
 | `matroid/weighted_matroid_intersection.hpp` | Minimum- or maximum-weight common independent set among those of maximum cardinality. |
 

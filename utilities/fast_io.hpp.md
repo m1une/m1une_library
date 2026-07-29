@@ -922,6 +922,9 @@ data:
     path: verify/math/zeta_mobius_transform.test.cpp
     title: verify/math/zeta_mobius_transform.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/matroid/linear_matroid_intersection.test.cpp
+    title: verify/matroid/linear_matroid_intersection.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/matroid/matroid_intersection.test.cpp
     title: verify/matroid/matroid_intersection.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1855,6 +1858,7 @@ data:
   - verify/math/primality_test.test.cpp
   - verify/matroid/matroids.test.cpp
   - verify/matroid/matroid_intersection.test.cpp
+  - verify/matroid/linear_matroid_intersection.test.cpp
   - verify/matroid/weighted_matroid_intersection.test.cpp
   - verify/algo/search/ternary_search.test.cpp
   - verify/algo/search/bisect.test.cpp

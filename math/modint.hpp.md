@@ -493,6 +493,9 @@ data:
     path: verify/math/sum_of_multiplicative_function.test.cpp
     title: verify/math/sum_of_multiplicative_function.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/matroid/linear_matroid_intersection.test.cpp
+    title: verify/matroid/linear_matroid_intersection.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/matroid/matroids.test.cpp
     title: verify/matroid/matroids.test.cpp
   - icon: ':heavy_check_mark:'
@@ -898,6 +901,7 @@ data:
   - verify/math/partition_function.test.cpp
   - verify/math/partition_function.test.cpp
   - verify/matroid/matroids.test.cpp
+  - verify/matroid/linear_matroid_intersection.test.cpp
   - verify/algo/sequence/number_of_subsequences.test.cpp
   - verify/geometry/centroid.test.cpp
   - verify/geometry/lattice_point_count.test.cpp

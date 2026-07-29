@@ -1009,6 +1009,9 @@ data:
       path: matroid/linear_matroid.hpp
       title: Linear Matroid
     - icon: ':heavy_check_mark:'
+      path: matroid/linear_matroid_intersection.hpp
+      title: Linear Matroid Intersection
+    - icon: ':heavy_check_mark:'
       path: matroid/matroid_intersection.hpp
       title: Matroid Intersection
     - icon: ':heavy_check_mark:'
@@ -2243,6 +2246,9 @@ data:
       title: verify/math/matrix/system_of_linear_equations.test.cpp
   - name: verify/matroid
     pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/matroid/linear_matroid_intersection.test.cpp
+      title: verify/matroid/linear_matroid_intersection.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/matroid/matroid_intersection.test.cpp
       title: verify/matroid/matroid_intersection.test.cpp
