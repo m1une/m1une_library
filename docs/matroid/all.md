@@ -5,8 +5,9 @@ documentation_of: ../../matroid/all.hpp
 
 ## Overview
 
-`matroid/all.hpp` includes the standard matroid independence oracles and the
-unweighted matroid-intersection algorithm.
+`matroid/all.hpp` includes the standard matroid independence oracles, general
+weighted and unweighted matroid intersection, and the concise randomized
+cardinality algorithm for two linear matroids.
 
 Every oracle accepts a `const std::vector<int>&` subset and can be passed
 directly to `m1une::matroid::matroid_intersection`.
@@ -22,6 +23,7 @@ algorithm always satisfies this precondition.
 | `matroid/partition_matroid.hpp` | Per-group capacity constraints. |
 | `matroid/graphic_matroid.hpp` | Forest independence on graph edges. |
 | `matroid/linear_matroid.hpp` | General field and 64-bit binary linear matroids. |
+| `matroid/linear_matroid_intersection.hpp` | Randomized maximum cardinality for the intersection of two linear matroids. |
 | `matroid/matroid_intersection.hpp` | Maximum-cardinality common independent set. |
 | `matroid/weighted_matroid_intersection.hpp` | Minimum- or maximum-weight common independent set among those of maximum cardinality. |
 

@@ -3,6 +3,7 @@
 
 #include "graphic_matroid.hpp"
 #include "linear_matroid.hpp"
+#include "linear_matroid_intersection.hpp"
 #include "matroid_intersection.hpp"
 #include "partition_matroid.hpp"
 #include "uniform_matroid.hpp"
