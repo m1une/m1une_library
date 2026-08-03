@@ -17,8 +17,8 @@ data:
     PROBLEM: https://onlinejudge.u-aizu.ac.jp/problems/GRL_6_A
     links:
     - https://onlinejudge.u-aizu.ac.jp/problems/GRL_6_A
-  bundledCode: "#line 1 \"verify/graph/flow/max_flow.test.cpp\"\n#define PROBLEM \"\
-    https://onlinejudge.u-aizu.ac.jp/problems/GRL_6_A\"\n\n#line 1 \"graph/flow/max_flow.hpp\"\
+  bundledCode: "#line 1 \"verify/graph/flow/max_flow_dinic.test.cpp\"\n#define PROBLEM\
+    \ \"https://onlinejudge.u-aizu.ac.jp/problems/GRL_6_A\"\n\n#line 1 \"graph/flow/max_flow.hpp\"\
     \n\n\n\n#include <algorithm>\n#include <cassert>\n#include <cstddef>\n#include\
     \ <limits>\n#include <vector>\n\nnamespace m1une {\nnamespace flow {\n\ntemplate\
     \ <class Cap>\nstruct MaxFlow {\n    struct Edge {\n        int from;\n      \
@@ -442,13 +442,13 @@ data:
     \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
     n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 5 \"verify/graph/flow/max_flow.test.cpp\"\
+    \ utilities\n}  // namespace m1une\n\n\n#line 5 \"verify/graph/flow/max_flow_dinic.test.cpp\"\
     \n\nint main() {\n    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput\
     \ output;\n\n    int vertex_count, edge_count;\n    input >> vertex_count >> edge_count;\n\
     \    m1une::flow::MaxFlow<long long> flow(vertex_count);\n    flow.reserve_edges(edge_count);\n\
     \    for (int edge = 0; edge < edge_count; edge++) {\n        int from, to;\n\
     \        long long capacity;\n        input >> from >> to >> capacity;\n     \
-    \   flow.add_edge(from, to, capacity);\n    }\n    output << flow.max_flow(0,\
+    \   flow.add_edge(from, to, capacity);\n    }\n    output << flow.max_flow_dinic(0,\
     \ vertex_count - 1) << '\\n';\n}\n"
   code: "#define PROBLEM \"https://onlinejudge.u-aizu.ac.jp/problems/GRL_6_A\"\n\n\
     #include \"../../../graph/flow/max_flow.hpp\"\n#include \"../../../utilities/fast_io.hpp\"\
@@ -457,21 +457,21 @@ data:
     \    m1une::flow::MaxFlow<long long> flow(vertex_count);\n    flow.reserve_edges(edge_count);\n\
     \    for (int edge = 0; edge < edge_count; edge++) {\n        int from, to;\n\
     \        long long capacity;\n        input >> from >> to >> capacity;\n     \
-    \   flow.add_edge(from, to, capacity);\n    }\n    output << flow.max_flow(0,\
+    \   flow.add_edge(from, to, capacity);\n    }\n    output << flow.max_flow_dinic(0,\
     \ vertex_count - 1) << '\\n';\n}\n"
   dependsOn:
   - graph/flow/max_flow.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
-  path: verify/graph/flow/max_flow.test.cpp
+  path: verify/graph/flow/max_flow_dinic.test.cpp
   requiredBy: []
   timestamp: '2026-08-04 02:22:50+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/graph/flow/max_flow.test.cpp
+documentation_of: verify/graph/flow/max_flow_dinic.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/graph/flow/max_flow.test.cpp
-- /verify/verify/graph/flow/max_flow.test.cpp.html
-title: verify/graph/flow/max_flow.test.cpp
+- /verify/verify/graph/flow/max_flow_dinic.test.cpp
+- /verify/verify/graph/flow/max_flow_dinic.test.cpp.html
+title: verify/graph/flow/max_flow_dinic.test.cpp
 ---

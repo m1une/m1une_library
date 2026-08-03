@@ -44,9 +44,9 @@ data:
     \    struct InternalEdge {\n        int to;\n        int rev;\n        Cap cap;\n\
     \    };\n\n    struct Position {\n        int from;\n        int edge;\n    };\n\
     \n    int _n;\n    std::vector<Position> _pos;\n    std::vector<std::vector<InternalEdge>>\
-    \ _g;\n\n    Cap push_relabel(int s, int t) {\n        const std::size_t edge_count\
-    \ = _pos.size();\n        const std::size_t source_degree = _g[s].size();\n  \
-    \      const std::size_t sink_degree = _g[t].size();\n        const std::size_t\
+    \ _g;\n\n    Cap highest_label_preflow_push(int s, int t) {\n        const std::size_t\
+    \ edge_count = _pos.size();\n        const std::size_t source_degree = _g[s].size();\n\
+    \        const std::size_t sink_degree = _g[t].size();\n        const std::size_t\
     \ terminal_degree =\n            std::min(source_degree, sink_degree);\n     \
     \   const bool dense = edge_count >= 5 * std::size_t(_n);\n        const std::size_t\
     \ wide_threshold =\n            4 * (edge_count / std::size_t(_n) + 1);\n    \
@@ -129,43 +129,13 @@ data:
     \ {\n                discharge.template operator()<true>(v);\n            } else\
     \ {\n                discharge.template operator()<false>(v);\n            }\n\
     \            if (work >= work_limit) global_relabel();\n        }\n        return\
-    \ excess[t];\n    }\n\n    Cap dinic_phases(\n        int s,\n        int t,\n\
-    \        Cap flow_limit,\n        int phase_limit,\n        bool& exhausted\n\
-    \    ) {\n        std::vector<int> work(3 * std::size_t(_n));\n        int* level\
-    \ = work.data();\n        int* iter = level + _n;\n        int* queue = iter +\
-    \ _n;\n        auto bfs = [&]() -> bool {\n            std::fill(level, level\
-    \ + _n, -1);\n            int head = 0;\n            int tail = 0;\n         \
-    \   level[s] = 0;\n            queue[tail++] = s;\n            while (head !=\
-    \ tail) {\n                int v = queue[head++];\n                const auto&\
-    \ edges = _g[v];\n                for (const auto& e : edges) {\n            \
-    \        if (level[e.to] != -1 || e.cap == Cap(0)) continue;\n               \
-    \     level[e.to] = level[v] + 1;\n                    if (e.to == t) return true;\n\
-    \                    queue[tail++] = e.to;\n                }\n            }\n\
-    \            return false;\n        };\n\n        auto dfs = [&](auto&& self,\
-    \ int v, Cap up) -> Cap {\n            if (v == s) return up;\n            Cap\
-    \ result = Cap(0);\n            const int current_level = level[v];\n        \
-    \    auto& edges = _g[v];\n            const int edge_count = int(edges.size());\n\
-    \            for (int& i = iter[v]; i < edge_count; i++) {\n                auto&\
-    \ e = edges[i];\n                if (level[e.to] + 1 != current_level) continue;\n\
-    \                auto& reverse = _g[e.to][e.rev];\n                if (reverse.cap\
-    \ == Cap(0)) continue;\n                Cap d = self(\n                    self,\n\
-    \                    e.to,\n                    std::min(up - result, reverse.cap)\n\
-    \                );\n                if (d == Cap(0)) continue;\n            \
-    \    e.cap += d;\n                reverse.cap -= d;\n                result +=\
-    \ d;\n                if (result == up) return result;\n            }\n      \
-    \      level[v] = _n;\n            return result;\n        };\n\n        Cap flow\
-    \ = Cap(0);\n        int phases = 0;\n        exhausted = false;\n        while\
-    \ (flow < flow_limit && phases < phase_limit) {\n            if (!bfs()) {\n \
-    \               exhausted = true;\n                break;\n            }\n   \
-    \         std::fill(iter, iter + _n, 0);\n            flow += dfs(dfs, t, flow_limit\
-    \ - flow);\n            phases++;\n        }\n        if (flow == flow_limit)\
-    \ exhausted = true;\n        return flow;\n    }\n\n   public:\n    MaxFlow()\
-    \ : MaxFlow(0) {}\n\n    explicit MaxFlow(int n) : _n(n), _g(n) {\n        assert(0\
-    \ <= n);\n    }\n\n    int size() const {\n        return _n;\n    }\n\n    int\
-    \ edge_count() const {\n        return int(_pos.size());\n    }\n\n    void reserve_edges(int\
-    \ edge_count) {\n        assert(0 <= edge_count);\n        _pos.reserve(edge_count);\n\
-    \        if (_n == 0 || edge_count == 0 ||\n            2 * std::size_t(edge_count)\
-    \ < std::size_t(_n)) {\n            return;\n        }\n        const std::size_t\
+    \ excess[t];\n    }\n\n   public:\n    MaxFlow() : MaxFlow(0) {}\n\n    explicit\
+    \ MaxFlow(int n) : _n(n), _g(n) {\n        assert(0 <= n);\n    }\n\n    int size()\
+    \ const {\n        return _n;\n    }\n\n    int edge_count() const {\n       \
+    \ return int(_pos.size());\n    }\n\n    void reserve_edges(int edge_count) {\n\
+    \        assert(0 <= edge_count);\n        _pos.reserve(edge_count);\n       \
+    \ if (_n == 0 || edge_count == 0 ||\n            2 * std::size_t(edge_count) <\
+    \ std::size_t(_n)) {\n            return;\n        }\n        const std::size_t\
     \ average_degree =\n            (3 * std::size_t(edge_count) + std::size_t(_n)\
     \ - 1)\n            / std::size_t(_n);\n        for (auto& edges : _g) edges.reserve(average_degree);\n\
     \    }\n\n    void reserve_edges(int edge_count, const std::vector<int>& degrees)\
@@ -209,32 +179,14 @@ data:
     \ <= new_flow && new_flow <= new_cap);\n            e.cap = new_cap - new_flow;\n\
     \            re.cap = new_flow;\n        }\n    }\n\n    Cap max_flow(int s, int\
     \ t) {\n        assert(0 <= s && s < _n);\n        assert(0 <= t && t < _n);\n\
-    \        assert(s != t);\n        bool exhausted;\n        const std::size_t edge_count\
-    \ = _pos.size();\n        const std::size_t terminal_degree =\n            std::min(_g[s].size(),\
-    \ _g[t].size());\n        const bool dense = edge_count >= 5 * std::size_t(_n);\n\
-    \        const bool sparse_narrow_terminals =\n            edge_count >= std::size_t(_n)\
-    \ &&\n            2 <= _g[s].size() && _g[s].size() <= 4 &&\n            2 <=\
-    \ _g[t].size() && _g[t].size() <= 4;\n        // Only pay for a possible push-relabel\
-    \ handoff on graph shapes where\n        // many Dinic phases are a realistic\
-    \ risk.\n        const bool use_hybrid =\n            (dense || sparse_narrow_terminals)\
-    \ &&\n            terminal_degree <= 4 * (edge_count / std::size_t(_n) + 1);\n\
-    \        if (!use_hybrid) {\n            return max_flow(s, t, std::numeric_limits<Cap>::max());\n\
-    \        }\n        int phase_limit = dense ? 4 : 8;\n        bool small_terminal_capacities\
-    \ = true;\n        const int terminals[2] = {s, t};\n        for (int v : terminals)\
-    \ {\n            for (const auto& e : _g[v]) {\n                if (Cap(2) < e.cap\
-    \ ||\n                    Cap(2) < _g[e.to][e.rev].cap) {\n                  \
-    \  small_terminal_capacities = false;\n                    break;\n          \
-    \      }\n            }\n            if (!small_terminal_capacities) break;\n\
-    \        }\n        if (small_terminal_capacities) {\n            return max_flow(s,\
-    \ t, std::numeric_limits<Cap>::max());\n        }\n        Cap flow = dinic_phases(\n\
-    \            s,\n            t,\n            std::numeric_limits<Cap>::max(),\n\
-    \            phase_limit,\n            exhausted\n        );\n        if (!exhausted)\
-    \ flow += push_relabel(s, t);\n        return flow;\n    }\n\n    Cap max_flow_push_relabel(int\
-    \ s, int t) {\n        assert(0 <= s && s < _n);\n        assert(0 <= t && t <\
-    \ _n);\n        assert(s != t);\n        return push_relabel(s, t);\n    }\n\n\
-    \    Cap max_flow(int s, int t, Cap flow_limit) {\n        assert(0 <= s && s\
-    \ < _n);\n        assert(0 <= t && t < _n);\n        assert(s != t);\n\n     \
-    \   std::vector<int> work(3 * std::size_t(_n));\n        int* level = work.data();\n\
+    \        assert(s != t);\n        return highest_label_preflow_push(s, t);\n \
+    \   }\n\n    Cap max_flow_push_relabel(int s, int t) {\n        assert(0 <= s\
+    \ && s < _n);\n        assert(0 <= t && t < _n);\n        assert(s != t);\n  \
+    \      return highest_label_preflow_push(s, t);\n    }\n\n    Cap max_flow_dinic(int\
+    \ s, int t) {\n        return max_flow(s, t, std::numeric_limits<Cap>::max());\n\
+    \    }\n\n    Cap max_flow(int s, int t, Cap flow_limit) {\n        assert(0 <=\
+    \ s && s < _n);\n        assert(0 <= t && t < _n);\n        assert(s != t);\n\n\
+    \        std::vector<int> work(3 * std::size_t(_n));\n        int* level = work.data();\n\
     \        int* iter = level + _n;\n        int* queue = iter + _n;\n        auto\
     \ bfs = [&]() -> bool {\n            std::fill(level, level + _n, -1);\n     \
     \       int head = 0;\n            int tail = 0;\n            level[s] = 0;\n\
@@ -1326,100 +1278,105 @@ data:
     \ == 7);\n\n    m1une::flow::MaxFlow<long long> limited(2);\n    int limited_id\
     \ = limited.add_edge(0, 1, 10);\n    assert(limited.max_flow(0, 1, 4) == 4);\n\
     \    assert(limited.get_edge(limited_id).flow == 4);\n    assert(limited.max_flow(0,\
-    \ 1) == 6);\n    assert(limited.get_edge(limited_id).flow == 10);\n\n    // Five\
-    \ different path lengths force the unlimited overload past its\n    // initial\
-    \ Dinic phases and exercise the push-relabel handoff.\n    m1une::flow::MaxFlow<long\
-    \ long> hybrid(17);\n    int next_vertex = 1;\n    for (int length = 2; length\
+    \ 1) == 6);\n    assert(limited.get_edge(limited_id).flow == 10);\n\n    // Different\
+    \ path lengths exercise repeated highest-label changes.\n    m1une::flow::MaxFlow<long\
+    \ long> layered(17);\n    int next_vertex = 1;\n    for (int length = 2; length\
     \ <= 6; length++) {\n        int from = 0;\n        for (int edge = 0; edge <\
     \ length; edge++) {\n            int to = edge + 1 == length ? 16 : next_vertex++;\n\
-    \            hybrid.add_edge(from, to, 3);\n            from = to;\n        }\n\
-    \    }\n    assert(next_vertex == 16);\n    while (hybrid.edge_count() < 85) {\n\
-    \        int v = 1 + hybrid.edge_count() % 15;\n        hybrid.add_edge(v, v,\
-    \ 0);\n    }\n    assert(hybrid.max_flow(0, 16) == 15);\n    assert(hybrid.max_flow(0,\
+    \            layered.add_edge(from, to, 3);\n            from = to;\n        }\n\
+    \    }\n    assert(next_vertex == 16);\n    while (layered.edge_count() < 85)\
+    \ {\n        int v = 1 + layered.edge_count() % 15;\n        layered.add_edge(v,\
+    \ v, 0);\n    }\n    assert(layered.max_flow(0, 16) == 15);\n    assert(layered.max_flow(0,\
     \ 16) == 0);\n\n    struct InputEdge {\n        int from;\n        int to;\n \
     \       long long cap;\n        bool undirected;\n    };\n    std::mt19937 random(19260817);\n\
     \    for (int iteration = 0; iteration < 500; iteration++) {\n        int n =\
     \ 2 + int(random() % 6);\n        int m = int(random() % 13);\n        std::vector<InputEdge>\
     \ input_edges;\n        m1une::flow::MaxFlow<long long> flow(n);\n        m1une::flow::MaxFlow<long\
-    \ long> push_relabel_flow(n);\n        flow.reserve_edges(m);\n        push_relabel_flow.reserve_edges(m);\n\
-    \        for (int edge = 0; edge < m; edge++) {\n            InputEdge input{\n\
-    \                int(random() % n),\n                int(random() % n),\n    \
-    \            1 + static_cast<long long>(random() % 10),\n                bool(random()\
-    \ & 1)\n            };\n            input_edges.push_back(input);\n          \
-    \  if (input.undirected) {\n                flow.add_undirected_edge(input.from,\
+    \ long> push_relabel_flow(n);\n        m1une::flow::MaxFlow<long long> dinic_flow(n);\n\
+    \        flow.reserve_edges(m);\n        push_relabel_flow.reserve_edges(m);\n\
+    \        dinic_flow.reserve_edges(m);\n        for (int edge = 0; edge < m; edge++)\
+    \ {\n            InputEdge input{\n                int(random() % n),\n      \
+    \          int(random() % n),\n                1 + static_cast<long long>(random()\
+    \ % 10),\n                bool(random() & 1)\n            };\n            input_edges.push_back(input);\n\
+    \            if (input.undirected) {\n                flow.add_undirected_edge(input.from,\
     \ input.to, input.cap);\n                push_relabel_flow.add_undirected_edge(input.from,\
+    \ input.to, input.cap);\n                dinic_flow.add_undirected_edge(input.from,\
     \ input.to, input.cap);\n            } else {\n                flow.add_edge(input.from,\
     \ input.to, input.cap);\n                push_relabel_flow.add_edge(input.from,\
-    \ input.to, input.cap);\n            }\n        }\n\n        long long expected\
-    \ = std::numeric_limits<long long>::max();\n        for (int mask = 0; mask <\
-    \ (1 << n); mask++) {\n            if ((mask & 1) == 0 || (mask >> (n - 1) & 1)\
-    \ != 0) continue;\n            long long capacity = 0;\n            for (const\
-    \ auto& edge : input_edges) {\n                bool from_side = mask >> edge.from\
-    \ & 1;\n                bool to_side = mask >> edge.to & 1;\n                if\
-    \ (from_side && !to_side) capacity += edge.cap;\n                if (edge.undirected\
-    \ && !from_side && to_side) {\n                    capacity += edge.cap;\n   \
-    \             }\n            }\n            expected = std::min(expected, capacity);\n\
-    \        }\n\n        long long result = flow.max_flow(0, n - 1);\n        assert(result\
-    \ == expected);\n        long long push_relabel_result =\n            push_relabel_flow.max_flow_push_relabel(0,\
-    \ n - 1);\n        assert(push_relabel_result == expected);\n\n        auto validate\
-    \ = [&](const auto& solved_flow, long long solved_value) {\n            std::vector<long\
-    \ long> net_flow(n, 0);\n            for (int edge = 0; edge < m; edge++) {\n\
-    \                auto result_edge = solved_flow.get_edge(edge);\n            \
-    \    assert(result_edge.cap == input_edges[edge].cap);\n                if (input_edges[edge].undirected)\
-    \ {\n                    assert(-result_edge.cap <= result_edge.flow);\n     \
-    \           } else {\n                    assert(0 <= result_edge.flow);\n   \
-    \             }\n                assert(result_edge.flow <= result_edge.cap);\n\
-    \                net_flow[result_edge.from] += result_edge.flow;\n           \
-    \     net_flow[result_edge.to] -= result_edge.flow;\n            }\n         \
-    \   assert(net_flow[0] == solved_value);\n            assert(net_flow[n - 1] ==\
-    \ -solved_value);\n            for (int vertex = 1; vertex + 1 < n; vertex++)\
+    \ input.to, input.cap);\n                dinic_flow.add_edge(input.from, input.to,\
+    \ input.cap);\n            }\n        }\n\n        long long expected = std::numeric_limits<long\
+    \ long>::max();\n        for (int mask = 0; mask < (1 << n); mask++) {\n     \
+    \       if ((mask & 1) == 0 || (mask >> (n - 1) & 1) != 0) continue;\n       \
+    \     long long capacity = 0;\n            for (const auto& edge : input_edges)\
+    \ {\n                bool from_side = mask >> edge.from & 1;\n               \
+    \ bool to_side = mask >> edge.to & 1;\n                if (from_side && !to_side)\
+    \ capacity += edge.cap;\n                if (edge.undirected && !from_side &&\
+    \ to_side) {\n                    capacity += edge.cap;\n                }\n \
+    \           }\n            expected = std::min(expected, capacity);\n        }\n\
+    \n        long long result = flow.max_flow(0, n - 1);\n        assert(result ==\
+    \ expected);\n        long long push_relabel_result =\n            push_relabel_flow.max_flow_push_relabel(0,\
+    \ n - 1);\n        assert(push_relabel_result == expected);\n        long long\
+    \ dinic_result = dinic_flow.max_flow_dinic(0, n - 1);\n        assert(dinic_result\
+    \ == expected);\n\n        auto validate = [&](const auto& solved_flow, long long\
+    \ solved_value) {\n            std::vector<long long> net_flow(n, 0);\n      \
+    \      for (int edge = 0; edge < m; edge++) {\n                auto result_edge\
+    \ = solved_flow.get_edge(edge);\n                assert(result_edge.cap == input_edges[edge].cap);\n\
+    \                if (input_edges[edge].undirected) {\n                    assert(-result_edge.cap\
+    \ <= result_edge.flow);\n                } else {\n                    assert(0\
+    \ <= result_edge.flow);\n                }\n                assert(result_edge.flow\
+    \ <= result_edge.cap);\n                net_flow[result_edge.from] += result_edge.flow;\n\
+    \                net_flow[result_edge.to] -= result_edge.flow;\n            }\n\
+    \            assert(net_flow[0] == solved_value);\n            assert(net_flow[n\
+    \ - 1] == -solved_value);\n            for (int vertex = 1; vertex + 1 < n; vertex++)\
     \ {\n                assert(net_flow[vertex] == 0);\n            }\n        };\n\
     \        validate(flow, result);\n        validate(push_relabel_flow, push_relabel_result);\n\
-    \        assert(flow.max_flow_push_relabel(0, n - 1) == 0);\n        assert(push_relabel_flow.max_flow_push_relabel(0,\
-    \ n - 1) == 0);\n        assert(push_relabel_flow.max_flow(0, n - 1) == 0);\n\
-    \    }\n}\n\nvoid test_gomory_hu() {\n    m1une::flow::GomoryHu<long long> gh(4);\n\
-    \    gh.add_edge(0, 1, 3);\n    gh.add_edge(1, 2, 2);\n    gh.add_edge(0, 2, 1);\n\
-    \    gh.add_edge(2, 3, 4);\n    gh.build();\n    assert(gh.size() == 4);\n   \
-    \ assert(gh.edge_count() == 4);\n    assert(gh.tree_edges().size() == 3);\n  \
-    \  assert(gh.min_cut(0, 1) == 4);\n    assert(gh.min_cut(0, 2) == 3);\n    assert(gh.min_cut(0,\
-    \ 3) == 3);\n    assert(gh.min_cut(2, 3) == 4);\n\n    m1une::flow::GomoryHu<long\
-    \ long> disconnected(3);\n    disconnected.add_edge(0, 1, 5);\n    disconnected.build();\n\
-    \    assert(disconnected.min_cut(0, 1) == 5);\n    assert(disconnected.min_cut(0,\
-    \ 2) == 0);\n\n    m1une::flow::GomoryHu<long long> rebuilt(2);\n    rebuilt.build();\n\
-    \    assert(rebuilt.min_cut(0, 1) == 0);\n    rebuilt.add_edge(0, 1, 7);\n   \
-    \ rebuilt.add_edge(0, 0, 100);\n    rebuilt.build();\n    assert(rebuilt.min_cut(0,\
-    \ 1) == 7);\n\n    m1une::flow::GomoryHu<long long> singleton(1);\n    singleton.build();\n\
-    \    assert(singleton.tree_edges().empty());\n\n    std::mt19937 random(123456789);\n\
-    \    for (int iteration = 0; iteration < 200; iteration++) {\n        int n =\
-    \ 2 + int(random() % 8);\n        struct InputEdge {\n            int u;\n   \
-    \         int v;\n            long long cap;\n        };\n        std::vector<InputEdge>\
-    \ edges;\n        m1une::flow::GomoryHu<long long> tree(n);\n        int m = random()\
-    \ % (2 * n * n + 1);\n        for (int i = 0; i < m; i++) {\n            int u\
-    \ = random() % n;\n            int v = random() % n;\n            long long cap\
-    \ = random() % 1000001;\n            edges.push_back(InputEdge{u, v, cap});\n\
-    \            tree.add_edge(u, v, cap);\n        }\n        tree.build();\n   \
-    \     for (int s = 0; s < n; s++) {\n            for (int t = s + 1; t < n; t++)\
-    \ {\n                m1une::flow::MaxFlow<long long> mf(n);\n                for\
-    \ (const auto& edge : edges) {\n                    mf.add_edge(edge.u, edge.v,\
-    \ edge.cap);\n                    mf.add_edge(edge.v, edge.u, edge.cap);\n   \
-    \             }\n                assert(tree.min_cut(s, t) == mf.max_flow(s, t));\n\
-    \            }\n        }\n    }\n}\n\nvoid test_bounded_flow() {\n    m1une::flow::BoundedFlow<long\
-    \ long> st(4);\n    int a = st.add_edge(0, 1, 1, 3);\n    int b = st.add_edge(0,\
-    \ 2, 0, 2);\n    int c = st.add_edge(1, 3, 1, 2);\n    int d = st.add_edge(2,\
-    \ 3, 0, 2);\n    int e = st.add_edge(1, 2, 0, 1);\n    (void)a;\n    (void)b;\n\
-    \    (void)c;\n    (void)d;\n    (void)e;\n\n    auto exact = st.feasible_st_flow(0,\
-    \ 3, 3);\n    assert(exact.has_value());\n    std::vector<long long> balance(4,\
-    \ 0);\n    for (const auto& edge : exact->edges) {\n        assert(edge.lower\
-    \ <= edge.flow && edge.flow <= edge.upper);\n        balance[edge.from] += edge.flow;\n\
-    \        balance[edge.to] -= edge.flow;\n    }\n    assert((balance == std::vector<long\
-    \ long>{3, 0, 0, -3}));\n\n    auto too_much = st.feasible_st_flow(0, 3, 6);\n\
-    \    assert(!too_much.has_value());\n\n    m1une::flow::BoundedFlow<long long>\
-    \ bf(3);\n    int f01 = bf.add_edge(0, 1, 1, 3);\n    int f02 = bf.add_edge(0,\
-    \ 2, 0, 4);\n    bf.add_edge(1, 2, 0, 2);\n    bf.add_supply(0, 4);\n    bf.add_demand(1,\
-    \ 1);\n    bf.add_demand(2, 3);\n    assert(bf.balance(0) == 4);\n    auto bflow\
-    \ = bf.feasible_flow();\n    assert(bflow.has_value());\n    assert(bflow->get_edge(f01).flow\
-    \ >= 1);\n    assert(bflow->get_edge(f02).flow >= 0);\n    std::vector<long long>\
-    \ b_balance(3, 0);\n    for (const auto& edge : bflow->edges) {\n        assert(edge.lower\
+    \        validate(dinic_flow, dinic_result);\n        assert(flow.max_flow_push_relabel(0,\
+    \ n - 1) == 0);\n        assert(push_relabel_flow.max_flow_push_relabel(0, n -\
+    \ 1) == 0);\n        assert(push_relabel_flow.max_flow(0, n - 1) == 0);\n    \
+    \    assert(dinic_flow.max_flow_dinic(0, n - 1) == 0);\n    }\n}\n\nvoid test_gomory_hu()\
+    \ {\n    m1une::flow::GomoryHu<long long> gh(4);\n    gh.add_edge(0, 1, 3);\n\
+    \    gh.add_edge(1, 2, 2);\n    gh.add_edge(0, 2, 1);\n    gh.add_edge(2, 3, 4);\n\
+    \    gh.build();\n    assert(gh.size() == 4);\n    assert(gh.edge_count() == 4);\n\
+    \    assert(gh.tree_edges().size() == 3);\n    assert(gh.min_cut(0, 1) == 4);\n\
+    \    assert(gh.min_cut(0, 2) == 3);\n    assert(gh.min_cut(0, 3) == 3);\n    assert(gh.min_cut(2,\
+    \ 3) == 4);\n\n    m1une::flow::GomoryHu<long long> disconnected(3);\n    disconnected.add_edge(0,\
+    \ 1, 5);\n    disconnected.build();\n    assert(disconnected.min_cut(0, 1) ==\
+    \ 5);\n    assert(disconnected.min_cut(0, 2) == 0);\n\n    m1une::flow::GomoryHu<long\
+    \ long> rebuilt(2);\n    rebuilt.build();\n    assert(rebuilt.min_cut(0, 1) ==\
+    \ 0);\n    rebuilt.add_edge(0, 1, 7);\n    rebuilt.add_edge(0, 0, 100);\n    rebuilt.build();\n\
+    \    assert(rebuilt.min_cut(0, 1) == 7);\n\n    m1une::flow::GomoryHu<long long>\
+    \ singleton(1);\n    singleton.build();\n    assert(singleton.tree_edges().empty());\n\
+    \n    std::mt19937 random(123456789);\n    for (int iteration = 0; iteration <\
+    \ 200; iteration++) {\n        int n = 2 + int(random() % 8);\n        struct\
+    \ InputEdge {\n            int u;\n            int v;\n            long long cap;\n\
+    \        };\n        std::vector<InputEdge> edges;\n        m1une::flow::GomoryHu<long\
+    \ long> tree(n);\n        int m = random() % (2 * n * n + 1);\n        for (int\
+    \ i = 0; i < m; i++) {\n            int u = random() % n;\n            int v =\
+    \ random() % n;\n            long long cap = random() % 1000001;\n           \
+    \ edges.push_back(InputEdge{u, v, cap});\n            tree.add_edge(u, v, cap);\n\
+    \        }\n        tree.build();\n        for (int s = 0; s < n; s++) {\n   \
+    \         for (int t = s + 1; t < n; t++) {\n                m1une::flow::MaxFlow<long\
+    \ long> mf(n);\n                for (const auto& edge : edges) {\n           \
+    \         mf.add_edge(edge.u, edge.v, edge.cap);\n                    mf.add_edge(edge.v,\
+    \ edge.u, edge.cap);\n                }\n                assert(tree.min_cut(s,\
+    \ t) == mf.max_flow(s, t));\n            }\n        }\n    }\n}\n\nvoid test_bounded_flow()\
+    \ {\n    m1une::flow::BoundedFlow<long long> st(4);\n    int a = st.add_edge(0,\
+    \ 1, 1, 3);\n    int b = st.add_edge(0, 2, 0, 2);\n    int c = st.add_edge(1,\
+    \ 3, 1, 2);\n    int d = st.add_edge(2, 3, 0, 2);\n    int e = st.add_edge(1,\
+    \ 2, 0, 1);\n    (void)a;\n    (void)b;\n    (void)c;\n    (void)d;\n    (void)e;\n\
+    \n    auto exact = st.feasible_st_flow(0, 3, 3);\n    assert(exact.has_value());\n\
+    \    std::vector<long long> balance(4, 0);\n    for (const auto& edge : exact->edges)\
+    \ {\n        assert(edge.lower <= edge.flow && edge.flow <= edge.upper);\n   \
+    \     balance[edge.from] += edge.flow;\n        balance[edge.to] -= edge.flow;\n\
+    \    }\n    assert((balance == std::vector<long long>{3, 0, 0, -3}));\n\n    auto\
+    \ too_much = st.feasible_st_flow(0, 3, 6);\n    assert(!too_much.has_value());\n\
+    \n    m1une::flow::BoundedFlow<long long> bf(3);\n    int f01 = bf.add_edge(0,\
+    \ 1, 1, 3);\n    int f02 = bf.add_edge(0, 2, 0, 4);\n    bf.add_edge(1, 2, 0,\
+    \ 2);\n    bf.add_supply(0, 4);\n    bf.add_demand(1, 1);\n    bf.add_demand(2,\
+    \ 3);\n    assert(bf.balance(0) == 4);\n    auto bflow = bf.feasible_flow();\n\
+    \    assert(bflow.has_value());\n    assert(bflow->get_edge(f01).flow >= 1);\n\
+    \    assert(bflow->get_edge(f02).flow >= 0);\n    std::vector<long long> b_balance(3,\
+    \ 0);\n    for (const auto& edge : bflow->edges) {\n        assert(edge.lower\
     \ <= edge.flow && edge.flow <= edge.upper);\n        b_balance[edge.from] += edge.flow;\n\
     \        b_balance[edge.to] -= edge.flow;\n    }\n    assert((b_balance == std::vector<long\
     \ long>{4, -1, -3}));\n\n    m1une::flow::BoundedFlow<long long> negative(2);\n\
@@ -1628,100 +1585,105 @@ data:
     \ == 7);\n\n    m1une::flow::MaxFlow<long long> limited(2);\n    int limited_id\
     \ = limited.add_edge(0, 1, 10);\n    assert(limited.max_flow(0, 1, 4) == 4);\n\
     \    assert(limited.get_edge(limited_id).flow == 4);\n    assert(limited.max_flow(0,\
-    \ 1) == 6);\n    assert(limited.get_edge(limited_id).flow == 10);\n\n    // Five\
-    \ different path lengths force the unlimited overload past its\n    // initial\
-    \ Dinic phases and exercise the push-relabel handoff.\n    m1une::flow::MaxFlow<long\
-    \ long> hybrid(17);\n    int next_vertex = 1;\n    for (int length = 2; length\
+    \ 1) == 6);\n    assert(limited.get_edge(limited_id).flow == 10);\n\n    // Different\
+    \ path lengths exercise repeated highest-label changes.\n    m1une::flow::MaxFlow<long\
+    \ long> layered(17);\n    int next_vertex = 1;\n    for (int length = 2; length\
     \ <= 6; length++) {\n        int from = 0;\n        for (int edge = 0; edge <\
     \ length; edge++) {\n            int to = edge + 1 == length ? 16 : next_vertex++;\n\
-    \            hybrid.add_edge(from, to, 3);\n            from = to;\n        }\n\
-    \    }\n    assert(next_vertex == 16);\n    while (hybrid.edge_count() < 85) {\n\
-    \        int v = 1 + hybrid.edge_count() % 15;\n        hybrid.add_edge(v, v,\
-    \ 0);\n    }\n    assert(hybrid.max_flow(0, 16) == 15);\n    assert(hybrid.max_flow(0,\
+    \            layered.add_edge(from, to, 3);\n            from = to;\n        }\n\
+    \    }\n    assert(next_vertex == 16);\n    while (layered.edge_count() < 85)\
+    \ {\n        int v = 1 + layered.edge_count() % 15;\n        layered.add_edge(v,\
+    \ v, 0);\n    }\n    assert(layered.max_flow(0, 16) == 15);\n    assert(layered.max_flow(0,\
     \ 16) == 0);\n\n    struct InputEdge {\n        int from;\n        int to;\n \
     \       long long cap;\n        bool undirected;\n    };\n    std::mt19937 random(19260817);\n\
     \    for (int iteration = 0; iteration < 500; iteration++) {\n        int n =\
     \ 2 + int(random() % 6);\n        int m = int(random() % 13);\n        std::vector<InputEdge>\
     \ input_edges;\n        m1une::flow::MaxFlow<long long> flow(n);\n        m1une::flow::MaxFlow<long\
-    \ long> push_relabel_flow(n);\n        flow.reserve_edges(m);\n        push_relabel_flow.reserve_edges(m);\n\
-    \        for (int edge = 0; edge < m; edge++) {\n            InputEdge input{\n\
-    \                int(random() % n),\n                int(random() % n),\n    \
-    \            1 + static_cast<long long>(random() % 10),\n                bool(random()\
-    \ & 1)\n            };\n            input_edges.push_back(input);\n          \
-    \  if (input.undirected) {\n                flow.add_undirected_edge(input.from,\
+    \ long> push_relabel_flow(n);\n        m1une::flow::MaxFlow<long long> dinic_flow(n);\n\
+    \        flow.reserve_edges(m);\n        push_relabel_flow.reserve_edges(m);\n\
+    \        dinic_flow.reserve_edges(m);\n        for (int edge = 0; edge < m; edge++)\
+    \ {\n            InputEdge input{\n                int(random() % n),\n      \
+    \          int(random() % n),\n                1 + static_cast<long long>(random()\
+    \ % 10),\n                bool(random() & 1)\n            };\n            input_edges.push_back(input);\n\
+    \            if (input.undirected) {\n                flow.add_undirected_edge(input.from,\
     \ input.to, input.cap);\n                push_relabel_flow.add_undirected_edge(input.from,\
+    \ input.to, input.cap);\n                dinic_flow.add_undirected_edge(input.from,\
     \ input.to, input.cap);\n            } else {\n                flow.add_edge(input.from,\
     \ input.to, input.cap);\n                push_relabel_flow.add_edge(input.from,\
-    \ input.to, input.cap);\n            }\n        }\n\n        long long expected\
-    \ = std::numeric_limits<long long>::max();\n        for (int mask = 0; mask <\
-    \ (1 << n); mask++) {\n            if ((mask & 1) == 0 || (mask >> (n - 1) & 1)\
-    \ != 0) continue;\n            long long capacity = 0;\n            for (const\
-    \ auto& edge : input_edges) {\n                bool from_side = mask >> edge.from\
-    \ & 1;\n                bool to_side = mask >> edge.to & 1;\n                if\
-    \ (from_side && !to_side) capacity += edge.cap;\n                if (edge.undirected\
-    \ && !from_side && to_side) {\n                    capacity += edge.cap;\n   \
-    \             }\n            }\n            expected = std::min(expected, capacity);\n\
-    \        }\n\n        long long result = flow.max_flow(0, n - 1);\n        assert(result\
-    \ == expected);\n        long long push_relabel_result =\n            push_relabel_flow.max_flow_push_relabel(0,\
-    \ n - 1);\n        assert(push_relabel_result == expected);\n\n        auto validate\
-    \ = [&](const auto& solved_flow, long long solved_value) {\n            std::vector<long\
-    \ long> net_flow(n, 0);\n            for (int edge = 0; edge < m; edge++) {\n\
-    \                auto result_edge = solved_flow.get_edge(edge);\n            \
-    \    assert(result_edge.cap == input_edges[edge].cap);\n                if (input_edges[edge].undirected)\
-    \ {\n                    assert(-result_edge.cap <= result_edge.flow);\n     \
-    \           } else {\n                    assert(0 <= result_edge.flow);\n   \
-    \             }\n                assert(result_edge.flow <= result_edge.cap);\n\
-    \                net_flow[result_edge.from] += result_edge.flow;\n           \
-    \     net_flow[result_edge.to] -= result_edge.flow;\n            }\n         \
-    \   assert(net_flow[0] == solved_value);\n            assert(net_flow[n - 1] ==\
-    \ -solved_value);\n            for (int vertex = 1; vertex + 1 < n; vertex++)\
+    \ input.to, input.cap);\n                dinic_flow.add_edge(input.from, input.to,\
+    \ input.cap);\n            }\n        }\n\n        long long expected = std::numeric_limits<long\
+    \ long>::max();\n        for (int mask = 0; mask < (1 << n); mask++) {\n     \
+    \       if ((mask & 1) == 0 || (mask >> (n - 1) & 1) != 0) continue;\n       \
+    \     long long capacity = 0;\n            for (const auto& edge : input_edges)\
+    \ {\n                bool from_side = mask >> edge.from & 1;\n               \
+    \ bool to_side = mask >> edge.to & 1;\n                if (from_side && !to_side)\
+    \ capacity += edge.cap;\n                if (edge.undirected && !from_side &&\
+    \ to_side) {\n                    capacity += edge.cap;\n                }\n \
+    \           }\n            expected = std::min(expected, capacity);\n        }\n\
+    \n        long long result = flow.max_flow(0, n - 1);\n        assert(result ==\
+    \ expected);\n        long long push_relabel_result =\n            push_relabel_flow.max_flow_push_relabel(0,\
+    \ n - 1);\n        assert(push_relabel_result == expected);\n        long long\
+    \ dinic_result = dinic_flow.max_flow_dinic(0, n - 1);\n        assert(dinic_result\
+    \ == expected);\n\n        auto validate = [&](const auto& solved_flow, long long\
+    \ solved_value) {\n            std::vector<long long> net_flow(n, 0);\n      \
+    \      for (int edge = 0; edge < m; edge++) {\n                auto result_edge\
+    \ = solved_flow.get_edge(edge);\n                assert(result_edge.cap == input_edges[edge].cap);\n\
+    \                if (input_edges[edge].undirected) {\n                    assert(-result_edge.cap\
+    \ <= result_edge.flow);\n                } else {\n                    assert(0\
+    \ <= result_edge.flow);\n                }\n                assert(result_edge.flow\
+    \ <= result_edge.cap);\n                net_flow[result_edge.from] += result_edge.flow;\n\
+    \                net_flow[result_edge.to] -= result_edge.flow;\n            }\n\
+    \            assert(net_flow[0] == solved_value);\n            assert(net_flow[n\
+    \ - 1] == -solved_value);\n            for (int vertex = 1; vertex + 1 < n; vertex++)\
     \ {\n                assert(net_flow[vertex] == 0);\n            }\n        };\n\
     \        validate(flow, result);\n        validate(push_relabel_flow, push_relabel_result);\n\
-    \        assert(flow.max_flow_push_relabel(0, n - 1) == 0);\n        assert(push_relabel_flow.max_flow_push_relabel(0,\
-    \ n - 1) == 0);\n        assert(push_relabel_flow.max_flow(0, n - 1) == 0);\n\
-    \    }\n}\n\nvoid test_gomory_hu() {\n    m1une::flow::GomoryHu<long long> gh(4);\n\
-    \    gh.add_edge(0, 1, 3);\n    gh.add_edge(1, 2, 2);\n    gh.add_edge(0, 2, 1);\n\
-    \    gh.add_edge(2, 3, 4);\n    gh.build();\n    assert(gh.size() == 4);\n   \
-    \ assert(gh.edge_count() == 4);\n    assert(gh.tree_edges().size() == 3);\n  \
-    \  assert(gh.min_cut(0, 1) == 4);\n    assert(gh.min_cut(0, 2) == 3);\n    assert(gh.min_cut(0,\
-    \ 3) == 3);\n    assert(gh.min_cut(2, 3) == 4);\n\n    m1une::flow::GomoryHu<long\
-    \ long> disconnected(3);\n    disconnected.add_edge(0, 1, 5);\n    disconnected.build();\n\
-    \    assert(disconnected.min_cut(0, 1) == 5);\n    assert(disconnected.min_cut(0,\
-    \ 2) == 0);\n\n    m1une::flow::GomoryHu<long long> rebuilt(2);\n    rebuilt.build();\n\
-    \    assert(rebuilt.min_cut(0, 1) == 0);\n    rebuilt.add_edge(0, 1, 7);\n   \
-    \ rebuilt.add_edge(0, 0, 100);\n    rebuilt.build();\n    assert(rebuilt.min_cut(0,\
-    \ 1) == 7);\n\n    m1une::flow::GomoryHu<long long> singleton(1);\n    singleton.build();\n\
-    \    assert(singleton.tree_edges().empty());\n\n    std::mt19937 random(123456789);\n\
-    \    for (int iteration = 0; iteration < 200; iteration++) {\n        int n =\
-    \ 2 + int(random() % 8);\n        struct InputEdge {\n            int u;\n   \
-    \         int v;\n            long long cap;\n        };\n        std::vector<InputEdge>\
-    \ edges;\n        m1une::flow::GomoryHu<long long> tree(n);\n        int m = random()\
-    \ % (2 * n * n + 1);\n        for (int i = 0; i < m; i++) {\n            int u\
-    \ = random() % n;\n            int v = random() % n;\n            long long cap\
-    \ = random() % 1000001;\n            edges.push_back(InputEdge{u, v, cap});\n\
-    \            tree.add_edge(u, v, cap);\n        }\n        tree.build();\n   \
-    \     for (int s = 0; s < n; s++) {\n            for (int t = s + 1; t < n; t++)\
-    \ {\n                m1une::flow::MaxFlow<long long> mf(n);\n                for\
-    \ (const auto& edge : edges) {\n                    mf.add_edge(edge.u, edge.v,\
-    \ edge.cap);\n                    mf.add_edge(edge.v, edge.u, edge.cap);\n   \
-    \             }\n                assert(tree.min_cut(s, t) == mf.max_flow(s, t));\n\
-    \            }\n        }\n    }\n}\n\nvoid test_bounded_flow() {\n    m1une::flow::BoundedFlow<long\
-    \ long> st(4);\n    int a = st.add_edge(0, 1, 1, 3);\n    int b = st.add_edge(0,\
-    \ 2, 0, 2);\n    int c = st.add_edge(1, 3, 1, 2);\n    int d = st.add_edge(2,\
-    \ 3, 0, 2);\n    int e = st.add_edge(1, 2, 0, 1);\n    (void)a;\n    (void)b;\n\
-    \    (void)c;\n    (void)d;\n    (void)e;\n\n    auto exact = st.feasible_st_flow(0,\
-    \ 3, 3);\n    assert(exact.has_value());\n    std::vector<long long> balance(4,\
-    \ 0);\n    for (const auto& edge : exact->edges) {\n        assert(edge.lower\
-    \ <= edge.flow && edge.flow <= edge.upper);\n        balance[edge.from] += edge.flow;\n\
-    \        balance[edge.to] -= edge.flow;\n    }\n    assert((balance == std::vector<long\
-    \ long>{3, 0, 0, -3}));\n\n    auto too_much = st.feasible_st_flow(0, 3, 6);\n\
-    \    assert(!too_much.has_value());\n\n    m1une::flow::BoundedFlow<long long>\
-    \ bf(3);\n    int f01 = bf.add_edge(0, 1, 1, 3);\n    int f02 = bf.add_edge(0,\
-    \ 2, 0, 4);\n    bf.add_edge(1, 2, 0, 2);\n    bf.add_supply(0, 4);\n    bf.add_demand(1,\
-    \ 1);\n    bf.add_demand(2, 3);\n    assert(bf.balance(0) == 4);\n    auto bflow\
-    \ = bf.feasible_flow();\n    assert(bflow.has_value());\n    assert(bflow->get_edge(f01).flow\
-    \ >= 1);\n    assert(bflow->get_edge(f02).flow >= 0);\n    std::vector<long long>\
-    \ b_balance(3, 0);\n    for (const auto& edge : bflow->edges) {\n        assert(edge.lower\
+    \        validate(dinic_flow, dinic_result);\n        assert(flow.max_flow_push_relabel(0,\
+    \ n - 1) == 0);\n        assert(push_relabel_flow.max_flow_push_relabel(0, n -\
+    \ 1) == 0);\n        assert(push_relabel_flow.max_flow(0, n - 1) == 0);\n    \
+    \    assert(dinic_flow.max_flow_dinic(0, n - 1) == 0);\n    }\n}\n\nvoid test_gomory_hu()\
+    \ {\n    m1une::flow::GomoryHu<long long> gh(4);\n    gh.add_edge(0, 1, 3);\n\
+    \    gh.add_edge(1, 2, 2);\n    gh.add_edge(0, 2, 1);\n    gh.add_edge(2, 3, 4);\n\
+    \    gh.build();\n    assert(gh.size() == 4);\n    assert(gh.edge_count() == 4);\n\
+    \    assert(gh.tree_edges().size() == 3);\n    assert(gh.min_cut(0, 1) == 4);\n\
+    \    assert(gh.min_cut(0, 2) == 3);\n    assert(gh.min_cut(0, 3) == 3);\n    assert(gh.min_cut(2,\
+    \ 3) == 4);\n\n    m1une::flow::GomoryHu<long long> disconnected(3);\n    disconnected.add_edge(0,\
+    \ 1, 5);\n    disconnected.build();\n    assert(disconnected.min_cut(0, 1) ==\
+    \ 5);\n    assert(disconnected.min_cut(0, 2) == 0);\n\n    m1une::flow::GomoryHu<long\
+    \ long> rebuilt(2);\n    rebuilt.build();\n    assert(rebuilt.min_cut(0, 1) ==\
+    \ 0);\n    rebuilt.add_edge(0, 1, 7);\n    rebuilt.add_edge(0, 0, 100);\n    rebuilt.build();\n\
+    \    assert(rebuilt.min_cut(0, 1) == 7);\n\n    m1une::flow::GomoryHu<long long>\
+    \ singleton(1);\n    singleton.build();\n    assert(singleton.tree_edges().empty());\n\
+    \n    std::mt19937 random(123456789);\n    for (int iteration = 0; iteration <\
+    \ 200; iteration++) {\n        int n = 2 + int(random() % 8);\n        struct\
+    \ InputEdge {\n            int u;\n            int v;\n            long long cap;\n\
+    \        };\n        std::vector<InputEdge> edges;\n        m1une::flow::GomoryHu<long\
+    \ long> tree(n);\n        int m = random() % (2 * n * n + 1);\n        for (int\
+    \ i = 0; i < m; i++) {\n            int u = random() % n;\n            int v =\
+    \ random() % n;\n            long long cap = random() % 1000001;\n           \
+    \ edges.push_back(InputEdge{u, v, cap});\n            tree.add_edge(u, v, cap);\n\
+    \        }\n        tree.build();\n        for (int s = 0; s < n; s++) {\n   \
+    \         for (int t = s + 1; t < n; t++) {\n                m1une::flow::MaxFlow<long\
+    \ long> mf(n);\n                for (const auto& edge : edges) {\n           \
+    \         mf.add_edge(edge.u, edge.v, edge.cap);\n                    mf.add_edge(edge.v,\
+    \ edge.u, edge.cap);\n                }\n                assert(tree.min_cut(s,\
+    \ t) == mf.max_flow(s, t));\n            }\n        }\n    }\n}\n\nvoid test_bounded_flow()\
+    \ {\n    m1une::flow::BoundedFlow<long long> st(4);\n    int a = st.add_edge(0,\
+    \ 1, 1, 3);\n    int b = st.add_edge(0, 2, 0, 2);\n    int c = st.add_edge(1,\
+    \ 3, 1, 2);\n    int d = st.add_edge(2, 3, 0, 2);\n    int e = st.add_edge(1,\
+    \ 2, 0, 1);\n    (void)a;\n    (void)b;\n    (void)c;\n    (void)d;\n    (void)e;\n\
+    \n    auto exact = st.feasible_st_flow(0, 3, 3);\n    assert(exact.has_value());\n\
+    \    std::vector<long long> balance(4, 0);\n    for (const auto& edge : exact->edges)\
+    \ {\n        assert(edge.lower <= edge.flow && edge.flow <= edge.upper);\n   \
+    \     balance[edge.from] += edge.flow;\n        balance[edge.to] -= edge.flow;\n\
+    \    }\n    assert((balance == std::vector<long long>{3, 0, 0, -3}));\n\n    auto\
+    \ too_much = st.feasible_st_flow(0, 3, 6);\n    assert(!too_much.has_value());\n\
+    \n    m1une::flow::BoundedFlow<long long> bf(3);\n    int f01 = bf.add_edge(0,\
+    \ 1, 1, 3);\n    int f02 = bf.add_edge(0, 2, 0, 4);\n    bf.add_edge(1, 2, 0,\
+    \ 2);\n    bf.add_supply(0, 4);\n    bf.add_demand(1, 1);\n    bf.add_demand(2,\
+    \ 3);\n    assert(bf.balance(0) == 4);\n    auto bflow = bf.feasible_flow();\n\
+    \    assert(bflow.has_value());\n    assert(bflow->get_edge(f01).flow >= 1);\n\
+    \    assert(bflow->get_edge(f02).flow >= 0);\n    std::vector<long long> b_balance(3,\
+    \ 0);\n    for (const auto& edge : bflow->edges) {\n        assert(edge.lower\
     \ <= edge.flow && edge.flow <= edge.upper);\n        b_balance[edge.from] += edge.flow;\n\
     \        b_balance[edge.to] -= edge.flow;\n    }\n    assert((b_balance == std::vector<long\
     \ long>{4, -1, -3}));\n\n    m1une::flow::BoundedFlow<long long> negative(2);\n\
@@ -1919,7 +1881,7 @@ data:
   isVerificationFile: true
   path: verify/graph/flow/flow_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-08-04 02:22:50+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/flow/flow_algorithms.test.cpp

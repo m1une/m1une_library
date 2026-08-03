@@ -31,6 +31,9 @@ data:
     path: verify/graph/flow/max_flow.test.cpp
     title: verify/graph/flow/max_flow.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/flow/max_flow_dinic.test.cpp
+    title: verify/graph/flow/max_flow_dinic.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/flow/max_flow_push_relabel.test.cpp
     title: verify/graph/flow/max_flow_push_relabel.test.cpp
   - icon: ':heavy_check_mark:'
@@ -63,7 +66,7 @@ data:
     \        Cap flow;\n    };\n\n   private:\n    struct InternalEdge {\n       \
     \ int to;\n        int rev;\n        Cap cap;\n    };\n\n    struct Position {\n\
     \        int from;\n        int edge;\n    };\n\n    int _n;\n    std::vector<Position>\
-    \ _pos;\n    std::vector<std::vector<InternalEdge>> _g;\n\n    Cap push_relabel(int\
+    \ _pos;\n    std::vector<std::vector<InternalEdge>> _g;\n\n    Cap highest_label_preflow_push(int\
     \ s, int t) {\n        const std::size_t edge_count = _pos.size();\n        const\
     \ std::size_t source_degree = _g[s].size();\n        const std::size_t sink_degree\
     \ = _g[t].size();\n        const std::size_t terminal_degree =\n            std::min(source_degree,\
@@ -148,43 +151,13 @@ data:
     \ {\n                discharge.template operator()<true>(v);\n            } else\
     \ {\n                discharge.template operator()<false>(v);\n            }\n\
     \            if (work >= work_limit) global_relabel();\n        }\n        return\
-    \ excess[t];\n    }\n\n    Cap dinic_phases(\n        int s,\n        int t,\n\
-    \        Cap flow_limit,\n        int phase_limit,\n        bool& exhausted\n\
-    \    ) {\n        std::vector<int> work(3 * std::size_t(_n));\n        int* level\
-    \ = work.data();\n        int* iter = level + _n;\n        int* queue = iter +\
-    \ _n;\n        auto bfs = [&]() -> bool {\n            std::fill(level, level\
-    \ + _n, -1);\n            int head = 0;\n            int tail = 0;\n         \
-    \   level[s] = 0;\n            queue[tail++] = s;\n            while (head !=\
-    \ tail) {\n                int v = queue[head++];\n                const auto&\
-    \ edges = _g[v];\n                for (const auto& e : edges) {\n            \
-    \        if (level[e.to] != -1 || e.cap == Cap(0)) continue;\n               \
-    \     level[e.to] = level[v] + 1;\n                    if (e.to == t) return true;\n\
-    \                    queue[tail++] = e.to;\n                }\n            }\n\
-    \            return false;\n        };\n\n        auto dfs = [&](auto&& self,\
-    \ int v, Cap up) -> Cap {\n            if (v == s) return up;\n            Cap\
-    \ result = Cap(0);\n            const int current_level = level[v];\n        \
-    \    auto& edges = _g[v];\n            const int edge_count = int(edges.size());\n\
-    \            for (int& i = iter[v]; i < edge_count; i++) {\n                auto&\
-    \ e = edges[i];\n                if (level[e.to] + 1 != current_level) continue;\n\
-    \                auto& reverse = _g[e.to][e.rev];\n                if (reverse.cap\
-    \ == Cap(0)) continue;\n                Cap d = self(\n                    self,\n\
-    \                    e.to,\n                    std::min(up - result, reverse.cap)\n\
-    \                );\n                if (d == Cap(0)) continue;\n            \
-    \    e.cap += d;\n                reverse.cap -= d;\n                result +=\
-    \ d;\n                if (result == up) return result;\n            }\n      \
-    \      level[v] = _n;\n            return result;\n        };\n\n        Cap flow\
-    \ = Cap(0);\n        int phases = 0;\n        exhausted = false;\n        while\
-    \ (flow < flow_limit && phases < phase_limit) {\n            if (!bfs()) {\n \
-    \               exhausted = true;\n                break;\n            }\n   \
-    \         std::fill(iter, iter + _n, 0);\n            flow += dfs(dfs, t, flow_limit\
-    \ - flow);\n            phases++;\n        }\n        if (flow == flow_limit)\
-    \ exhausted = true;\n        return flow;\n    }\n\n   public:\n    MaxFlow()\
-    \ : MaxFlow(0) {}\n\n    explicit MaxFlow(int n) : _n(n), _g(n) {\n        assert(0\
-    \ <= n);\n    }\n\n    int size() const {\n        return _n;\n    }\n\n    int\
-    \ edge_count() const {\n        return int(_pos.size());\n    }\n\n    void reserve_edges(int\
-    \ edge_count) {\n        assert(0 <= edge_count);\n        _pos.reserve(edge_count);\n\
-    \        if (_n == 0 || edge_count == 0 ||\n            2 * std::size_t(edge_count)\
-    \ < std::size_t(_n)) {\n            return;\n        }\n        const std::size_t\
+    \ excess[t];\n    }\n\n   public:\n    MaxFlow() : MaxFlow(0) {}\n\n    explicit\
+    \ MaxFlow(int n) : _n(n), _g(n) {\n        assert(0 <= n);\n    }\n\n    int size()\
+    \ const {\n        return _n;\n    }\n\n    int edge_count() const {\n       \
+    \ return int(_pos.size());\n    }\n\n    void reserve_edges(int edge_count) {\n\
+    \        assert(0 <= edge_count);\n        _pos.reserve(edge_count);\n       \
+    \ if (_n == 0 || edge_count == 0 ||\n            2 * std::size_t(edge_count) <\
+    \ std::size_t(_n)) {\n            return;\n        }\n        const std::size_t\
     \ average_degree =\n            (3 * std::size_t(edge_count) + std::size_t(_n)\
     \ - 1)\n            / std::size_t(_n);\n        for (auto& edges : _g) edges.reserve(average_degree);\n\
     \    }\n\n    void reserve_edges(int edge_count, const std::vector<int>& degrees)\
@@ -228,32 +201,14 @@ data:
     \ <= new_flow && new_flow <= new_cap);\n            e.cap = new_cap - new_flow;\n\
     \            re.cap = new_flow;\n        }\n    }\n\n    Cap max_flow(int s, int\
     \ t) {\n        assert(0 <= s && s < _n);\n        assert(0 <= t && t < _n);\n\
-    \        assert(s != t);\n        bool exhausted;\n        const std::size_t edge_count\
-    \ = _pos.size();\n        const std::size_t terminal_degree =\n            std::min(_g[s].size(),\
-    \ _g[t].size());\n        const bool dense = edge_count >= 5 * std::size_t(_n);\n\
-    \        const bool sparse_narrow_terminals =\n            edge_count >= std::size_t(_n)\
-    \ &&\n            2 <= _g[s].size() && _g[s].size() <= 4 &&\n            2 <=\
-    \ _g[t].size() && _g[t].size() <= 4;\n        // Only pay for a possible push-relabel\
-    \ handoff on graph shapes where\n        // many Dinic phases are a realistic\
-    \ risk.\n        const bool use_hybrid =\n            (dense || sparse_narrow_terminals)\
-    \ &&\n            terminal_degree <= 4 * (edge_count / std::size_t(_n) + 1);\n\
-    \        if (!use_hybrid) {\n            return max_flow(s, t, std::numeric_limits<Cap>::max());\n\
-    \        }\n        int phase_limit = dense ? 4 : 8;\n        bool small_terminal_capacities\
-    \ = true;\n        const int terminals[2] = {s, t};\n        for (int v : terminals)\
-    \ {\n            for (const auto& e : _g[v]) {\n                if (Cap(2) < e.cap\
-    \ ||\n                    Cap(2) < _g[e.to][e.rev].cap) {\n                  \
-    \  small_terminal_capacities = false;\n                    break;\n          \
-    \      }\n            }\n            if (!small_terminal_capacities) break;\n\
-    \        }\n        if (small_terminal_capacities) {\n            return max_flow(s,\
-    \ t, std::numeric_limits<Cap>::max());\n        }\n        Cap flow = dinic_phases(\n\
-    \            s,\n            t,\n            std::numeric_limits<Cap>::max(),\n\
-    \            phase_limit,\n            exhausted\n        );\n        if (!exhausted)\
-    \ flow += push_relabel(s, t);\n        return flow;\n    }\n\n    Cap max_flow_push_relabel(int\
-    \ s, int t) {\n        assert(0 <= s && s < _n);\n        assert(0 <= t && t <\
-    \ _n);\n        assert(s != t);\n        return push_relabel(s, t);\n    }\n\n\
-    \    Cap max_flow(int s, int t, Cap flow_limit) {\n        assert(0 <= s && s\
-    \ < _n);\n        assert(0 <= t && t < _n);\n        assert(s != t);\n\n     \
-    \   std::vector<int> work(3 * std::size_t(_n));\n        int* level = work.data();\n\
+    \        assert(s != t);\n        return highest_label_preflow_push(s, t);\n \
+    \   }\n\n    Cap max_flow_push_relabel(int s, int t) {\n        assert(0 <= s\
+    \ && s < _n);\n        assert(0 <= t && t < _n);\n        assert(s != t);\n  \
+    \      return highest_label_preflow_push(s, t);\n    }\n\n    Cap max_flow_dinic(int\
+    \ s, int t) {\n        return max_flow(s, t, std::numeric_limits<Cap>::max());\n\
+    \    }\n\n    Cap max_flow(int s, int t, Cap flow_limit) {\n        assert(0 <=\
+    \ s && s < _n);\n        assert(0 <= t && t < _n);\n        assert(s != t);\n\n\
+    \        std::vector<int> work(3 * std::size_t(_n));\n        int* level = work.data();\n\
     \        int* iter = level + _n;\n        int* queue = iter + _n;\n        auto\
     \ bfs = [&]() -> bool {\n            std::fill(level, level + _n, -1);\n     \
     \       int head = 0;\n            int tail = 0;\n            level[s] = 0;\n\
@@ -293,7 +248,7 @@ data:
     \ cap;\n        Cap flow;\n    };\n\n   private:\n    struct InternalEdge {\n\
     \        int to;\n        int rev;\n        Cap cap;\n    };\n\n    struct Position\
     \ {\n        int from;\n        int edge;\n    };\n\n    int _n;\n    std::vector<Position>\
-    \ _pos;\n    std::vector<std::vector<InternalEdge>> _g;\n\n    Cap push_relabel(int\
+    \ _pos;\n    std::vector<std::vector<InternalEdge>> _g;\n\n    Cap highest_label_preflow_push(int\
     \ s, int t) {\n        const std::size_t edge_count = _pos.size();\n        const\
     \ std::size_t source_degree = _g[s].size();\n        const std::size_t sink_degree\
     \ = _g[t].size();\n        const std::size_t terminal_degree =\n            std::min(source_degree,\
@@ -378,43 +333,13 @@ data:
     \ {\n                discharge.template operator()<true>(v);\n            } else\
     \ {\n                discharge.template operator()<false>(v);\n            }\n\
     \            if (work >= work_limit) global_relabel();\n        }\n        return\
-    \ excess[t];\n    }\n\n    Cap dinic_phases(\n        int s,\n        int t,\n\
-    \        Cap flow_limit,\n        int phase_limit,\n        bool& exhausted\n\
-    \    ) {\n        std::vector<int> work(3 * std::size_t(_n));\n        int* level\
-    \ = work.data();\n        int* iter = level + _n;\n        int* queue = iter +\
-    \ _n;\n        auto bfs = [&]() -> bool {\n            std::fill(level, level\
-    \ + _n, -1);\n            int head = 0;\n            int tail = 0;\n         \
-    \   level[s] = 0;\n            queue[tail++] = s;\n            while (head !=\
-    \ tail) {\n                int v = queue[head++];\n                const auto&\
-    \ edges = _g[v];\n                for (const auto& e : edges) {\n            \
-    \        if (level[e.to] != -1 || e.cap == Cap(0)) continue;\n               \
-    \     level[e.to] = level[v] + 1;\n                    if (e.to == t) return true;\n\
-    \                    queue[tail++] = e.to;\n                }\n            }\n\
-    \            return false;\n        };\n\n        auto dfs = [&](auto&& self,\
-    \ int v, Cap up) -> Cap {\n            if (v == s) return up;\n            Cap\
-    \ result = Cap(0);\n            const int current_level = level[v];\n        \
-    \    auto& edges = _g[v];\n            const int edge_count = int(edges.size());\n\
-    \            for (int& i = iter[v]; i < edge_count; i++) {\n                auto&\
-    \ e = edges[i];\n                if (level[e.to] + 1 != current_level) continue;\n\
-    \                auto& reverse = _g[e.to][e.rev];\n                if (reverse.cap\
-    \ == Cap(0)) continue;\n                Cap d = self(\n                    self,\n\
-    \                    e.to,\n                    std::min(up - result, reverse.cap)\n\
-    \                );\n                if (d == Cap(0)) continue;\n            \
-    \    e.cap += d;\n                reverse.cap -= d;\n                result +=\
-    \ d;\n                if (result == up) return result;\n            }\n      \
-    \      level[v] = _n;\n            return result;\n        };\n\n        Cap flow\
-    \ = Cap(0);\n        int phases = 0;\n        exhausted = false;\n        while\
-    \ (flow < flow_limit && phases < phase_limit) {\n            if (!bfs()) {\n \
-    \               exhausted = true;\n                break;\n            }\n   \
-    \         std::fill(iter, iter + _n, 0);\n            flow += dfs(dfs, t, flow_limit\
-    \ - flow);\n            phases++;\n        }\n        if (flow == flow_limit)\
-    \ exhausted = true;\n        return flow;\n    }\n\n   public:\n    MaxFlow()\
-    \ : MaxFlow(0) {}\n\n    explicit MaxFlow(int n) : _n(n), _g(n) {\n        assert(0\
-    \ <= n);\n    }\n\n    int size() const {\n        return _n;\n    }\n\n    int\
-    \ edge_count() const {\n        return int(_pos.size());\n    }\n\n    void reserve_edges(int\
-    \ edge_count) {\n        assert(0 <= edge_count);\n        _pos.reserve(edge_count);\n\
-    \        if (_n == 0 || edge_count == 0 ||\n            2 * std::size_t(edge_count)\
-    \ < std::size_t(_n)) {\n            return;\n        }\n        const std::size_t\
+    \ excess[t];\n    }\n\n   public:\n    MaxFlow() : MaxFlow(0) {}\n\n    explicit\
+    \ MaxFlow(int n) : _n(n), _g(n) {\n        assert(0 <= n);\n    }\n\n    int size()\
+    \ const {\n        return _n;\n    }\n\n    int edge_count() const {\n       \
+    \ return int(_pos.size());\n    }\n\n    void reserve_edges(int edge_count) {\n\
+    \        assert(0 <= edge_count);\n        _pos.reserve(edge_count);\n       \
+    \ if (_n == 0 || edge_count == 0 ||\n            2 * std::size_t(edge_count) <\
+    \ std::size_t(_n)) {\n            return;\n        }\n        const std::size_t\
     \ average_degree =\n            (3 * std::size_t(edge_count) + std::size_t(_n)\
     \ - 1)\n            / std::size_t(_n);\n        for (auto& edges : _g) edges.reserve(average_degree);\n\
     \    }\n\n    void reserve_edges(int edge_count, const std::vector<int>& degrees)\
@@ -458,32 +383,14 @@ data:
     \ <= new_flow && new_flow <= new_cap);\n            e.cap = new_cap - new_flow;\n\
     \            re.cap = new_flow;\n        }\n    }\n\n    Cap max_flow(int s, int\
     \ t) {\n        assert(0 <= s && s < _n);\n        assert(0 <= t && t < _n);\n\
-    \        assert(s != t);\n        bool exhausted;\n        const std::size_t edge_count\
-    \ = _pos.size();\n        const std::size_t terminal_degree =\n            std::min(_g[s].size(),\
-    \ _g[t].size());\n        const bool dense = edge_count >= 5 * std::size_t(_n);\n\
-    \        const bool sparse_narrow_terminals =\n            edge_count >= std::size_t(_n)\
-    \ &&\n            2 <= _g[s].size() && _g[s].size() <= 4 &&\n            2 <=\
-    \ _g[t].size() && _g[t].size() <= 4;\n        // Only pay for a possible push-relabel\
-    \ handoff on graph shapes where\n        // many Dinic phases are a realistic\
-    \ risk.\n        const bool use_hybrid =\n            (dense || sparse_narrow_terminals)\
-    \ &&\n            terminal_degree <= 4 * (edge_count / std::size_t(_n) + 1);\n\
-    \        if (!use_hybrid) {\n            return max_flow(s, t, std::numeric_limits<Cap>::max());\n\
-    \        }\n        int phase_limit = dense ? 4 : 8;\n        bool small_terminal_capacities\
-    \ = true;\n        const int terminals[2] = {s, t};\n        for (int v : terminals)\
-    \ {\n            for (const auto& e : _g[v]) {\n                if (Cap(2) < e.cap\
-    \ ||\n                    Cap(2) < _g[e.to][e.rev].cap) {\n                  \
-    \  small_terminal_capacities = false;\n                    break;\n          \
-    \      }\n            }\n            if (!small_terminal_capacities) break;\n\
-    \        }\n        if (small_terminal_capacities) {\n            return max_flow(s,\
-    \ t, std::numeric_limits<Cap>::max());\n        }\n        Cap flow = dinic_phases(\n\
-    \            s,\n            t,\n            std::numeric_limits<Cap>::max(),\n\
-    \            phase_limit,\n            exhausted\n        );\n        if (!exhausted)\
-    \ flow += push_relabel(s, t);\n        return flow;\n    }\n\n    Cap max_flow_push_relabel(int\
-    \ s, int t) {\n        assert(0 <= s && s < _n);\n        assert(0 <= t && t <\
-    \ _n);\n        assert(s != t);\n        return push_relabel(s, t);\n    }\n\n\
-    \    Cap max_flow(int s, int t, Cap flow_limit) {\n        assert(0 <= s && s\
-    \ < _n);\n        assert(0 <= t && t < _n);\n        assert(s != t);\n\n     \
-    \   std::vector<int> work(3 * std::size_t(_n));\n        int* level = work.data();\n\
+    \        assert(s != t);\n        return highest_label_preflow_push(s, t);\n \
+    \   }\n\n    Cap max_flow_push_relabel(int s, int t) {\n        assert(0 <= s\
+    \ && s < _n);\n        assert(0 <= t && t < _n);\n        assert(s != t);\n  \
+    \      return highest_label_preflow_push(s, t);\n    }\n\n    Cap max_flow_dinic(int\
+    \ s, int t) {\n        return max_flow(s, t, std::numeric_limits<Cap>::max());\n\
+    \    }\n\n    Cap max_flow(int s, int t, Cap flow_limit) {\n        assert(0 <=\
+    \ s && s < _n);\n        assert(0 <= t && t < _n);\n        assert(s != t);\n\n\
+    \        std::vector<int> work(3 * std::size_t(_n));\n        int* level = work.data();\n\
     \        int* iter = level + _n;\n        int* queue = iter + _n;\n        auto\
     \ bfs = [&]() -> bool {\n            std::fill(level, level + _n, -1);\n     \
     \       int head = 0;\n            int tail = 0;\n            level[s] = 0;\n\
@@ -526,11 +433,12 @@ data:
   - graph/all.hpp
   - optimization/project_selection.hpp
   - optimization/all.hpp
-  timestamp: '2026-07-15 23:21:59+09:00'
+  timestamp: '2026-08-04 02:22:50+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/flow/min_cost_flow.test.cpp
   - verify/graph/flow/flow_algorithms.test.cpp
+  - verify/graph/flow/max_flow_dinic.test.cpp
   - verify/graph/flow/max_flow_push_relabel.test.cpp
   - verify/graph/flow/max_flow.test.cpp
   - verify/graph/graph_algorithms.test.cpp
@@ -549,20 +457,16 @@ title: Max Flow
 `MaxFlow<Cap>` computes the maximum amount of flow that can be sent from a
 source vertex `s` to a sink vertex `t` in a directed capacitated graph.
 
-The unlimited `max_flow` overload uses an adaptive Dinic/push-relabel solver.
-It keeps the constant-factor optimized Dinic path on graphs where it is
-usually strongest. On narrow-terminal graphs that survive a small number of
-Dinic phases, it continues from the same residual graph with highest-label
-push-relabel. This avoids Dinic's bad many-phase behavior without paying the
-push-relabel setup cost on most path-like, low-flow, unit-capacity, or
-wide-terminal networks.
+The unlimited `max_flow` overload uses highest-label preflow-push. Active
+vertices are kept in flat buckets by height, so selecting a vertex of maximum
+height takes amortized constant time. The implementation also uses current-edge
+pointers, global relabeling, and the gap heuristic.
 
-Dinic builds level graphs with an array queue and sends blocking flow by
-traversing each level graph backward from the sink. Push-relabel uses flat
-highest-label buckets, order-adaptive adjacency scans, global relabeling, and
-the gap heuristic. The limited-flow overload remains pure Dinic, and
-`max_flow_push_relabel` exposes the push-relabel implementation directly when
-a representative workload favors it.
+The limited-flow overload uses Dinic because preflow-push initially saturates
+the source edges and therefore does not naturally stop at an arbitrary flow
+limit. `max_flow_push_relabel` is an explicit alias for the unlimited
+highest-label implementation, while `max_flow_dinic` explicitly selects
+unlimited Dinic.
 
 ## Graph Orientation
 
@@ -625,9 +529,10 @@ needed.
 | `get_edge` | `Edge get_edge(int i) const` | Returns the current state of original edge `i`. | $O(1)$ |
 | `edges` | `std::vector<Edge> edges() const` | Returns all original edges with current flow. | $O(M)$ |
 | `change_edge` | `void change_edge(int i, Cap new_cap, Cap new_flow)` | Replaces edge `i`'s capacity and current flow; undirected flow may be negative. | $O(1)$ |
-| `max_flow` | `Cap max_flow(int s, int t)` | Sends maximum flow from `s` to `t`. | $O(N^2 M)$ in general; see below |
+| `max_flow` | `Cap max_flow(int s, int t)` | Sends maximum flow from `s` to `t` with highest-label preflow-push. | $O(N^2 \sqrt M)$ |
 | `max_flow` | `Cap max_flow(int s, int t, Cap flow_limit)` | Sends at most `flow_limit` additional flow. | $O(N^2 M)$ in general; see below |
-| `max_flow_push_relabel` | `Cap max_flow_push_relabel(int s, int t)` | Sends maximum additional flow with highest-label push-relabel. | $O(N^2 M)$ conservatively |
+| `max_flow_push_relabel` | `Cap max_flow_push_relabel(int s, int t)` | Sends maximum additional flow with highest-label preflow-push. | $O(N^2 \sqrt M)$ |
+| `max_flow_dinic` | `Cap max_flow_dinic(int s, int t)` | Sends maximum additional flow with Dinic. | $O(N^2 M)$ in general; see below |
 | `min_cut` | `std::vector<bool> min_cut(int s) const` | Returns vertices reachable from `s` in the residual graph. | $O(N + M)$ |
 
 ## Time Complexity of `max_flow`
@@ -636,37 +541,28 @@ Here, $N$ is the number of vertices and $M$ is the number of original edges.
 The residual graph stores two directed residual edges for each original edge,
 including an edge added by `add_undirected_edge`.
 
-The unlimited overload runs either pure Dinic or a constant number of Dinic
-phases followed by highest-label push-relabel. Both alternatives have the
-general worst-case bound
+The unlimited overload and `max_flow_push_relabel` use highest-label
+preflow-push. The general worst-case bound is
 
 $$
-O(N^2 M).
+O(N^2 \sqrt M).
 $$
 
 This bound counts each `Cap` arithmetic or comparison operation as $O(1)$ and
 does not depend on the numerical size of the capacities.
 
-The dispatch uses only $N$, $M$, the two terminal adjacency lists, their
-residual capacities, and whether the first few Dinic phases finish the flow.
-It does not inspect all edges or copy the graph. Dense graphs with narrow
-terminals may switch after four phases. A conservative sparse narrow-terminal
-case may switch after eight. Small-capacity terminal networks and
-wide-terminal graphs stay on Dinic. These thresholds are performance
-heuristics; they do not affect correctness or the $O(N^2M)$ bound.
-
-The `flow_limit` overload is pure Dinic. Each phase first uses BFS to construct
-a level graph in $O(N + M)$ time, then uses DFS with current-edge pointers to
-find a blocking flow. A blocking-flow computation takes $O(NM)$ time in the
-general case. After a blocking flow is found, the shortest residual distance
-from `s` to `t` strictly increases, so there are fewer than $N$ phases. This
-also gives the general bound $O(N^2M)$.
+`max_flow_dinic` and the `flow_limit` overload use pure Dinic. Each phase first
+uses BFS to construct a level graph in $O(N + M)$ time, then uses DFS with
+current-edge pointers to find a blocking flow. A blocking-flow computation
+takes $O(NM)$ time in the general case. After a blocking flow is found, the
+shortest residual distance from `s` to `t` strictly increases, so there are
+fewer than $N$ phases. This also gives the general bound $O(N^2M)$.
 
 ### Bounds for Integer Capacities
 
-When every capacity is an integer, several additional bounds hold for the
-pure-Dinic `flow_limit` overload and whenever the unlimited overload stays on
-Dinic. Let $u_e$ be the capacity of edge $e$, and define
+When every capacity is an integer, several additional bounds hold for
+`max_flow_dinic` and the Dinic `flow_limit` overload. Let $u_e$ be the capacity
+of edge $e$, and define
 
 $$
 \bar{u} = \frac{1}{M}\sum_e u_e,
@@ -707,9 +603,8 @@ $\bar{c}$ by $g$ in these bounds. When using `flow_limit`, it must be scaled as
 well. Scaling all these values by $g$ does not change which paths and edges
 Dinic's algorithm processes.
 
-For unit-capacity graphs, $\bar{u}=U=1$. The unlimited overload keeps these
-graphs on Dinic. Combining the two edge-capacity bounds gives the standard
-result
+For unit-capacity graphs, $\bar{u}=U=1$. Combining the two edge-capacity bounds
+for the Dinic APIs gives the standard result
 
 $$
 O\left(M \min\left(N^{2/3}, \sqrt{M}\right)\right).
@@ -736,17 +631,11 @@ rather than recomputing it from scratch.
 
 `max_flow_push_relabel(s, t)` uses highest-label active-vertex selection, flat
 buckets, order-adaptive current-edge scans, global relabeling, and the gap
-heuristic. The conservative general bound is $O(N^2M)$, including calls on a
-residual graph that already contains flow.
+heuristic. Its general bound is $O(N^2 \sqrt M)$, including calls on a residual
+graph that already contains flow.
 
-Push-relabel often performs well on high-capacity networks where Dinic needs
-several level-graph phases. Dinic is commonly faster on path-like, unit, and
-layered networks. The difference can be large in either direction, so the
-unlimited `max_flow` overload performs a guarded automatic handoff. Use the
-explicit method when a representative benchmark shows that starting directly
-with push-relabel is faster. Both methods return only the additional flow sent
-and leave a valid residual graph, so `get_edge`, `edges`, and `min_cut` behave
-the same afterward.
+All maximum-flow methods return only the additional flow sent and leave a valid
+residual graph, so `get_edge`, `edges`, and `min_cut` behave the same afterward.
 
 ## Minimum Cut
 
