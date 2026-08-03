@@ -8,20 +8,16 @@ documentation_of: ../../../graph/flow/max_flow.hpp
 `MaxFlow<Cap>` computes the maximum amount of flow that can be sent from a
 source vertex `s` to a sink vertex `t` in a directed capacitated graph.
 
-The unlimited `max_flow` overload uses an adaptive Dinic/push-relabel solver.
-It keeps the constant-factor optimized Dinic path on graphs where it is
-usually strongest. On narrow-terminal graphs that survive a small number of
-Dinic phases, it continues from the same residual graph with highest-label
-push-relabel. This avoids Dinic's bad many-phase behavior without paying the
-push-relabel setup cost on most path-like, low-flow, unit-capacity, or
-wide-terminal networks.
+The unlimited `max_flow` overload uses highest-label preflow-push. Active
+vertices are kept in flat buckets by height, so selecting a vertex of maximum
+height takes amortized constant time. The implementation also uses current-edge
+pointers, global relabeling, and the gap heuristic.
 
-Dinic builds level graphs with an array queue and sends blocking flow by
-traversing each level graph backward from the sink. Push-relabel uses flat
-highest-label buckets, order-adaptive adjacency scans, global relabeling, and
-the gap heuristic. The limited-flow overload remains pure Dinic, and
-`max_flow_push_relabel` exposes the push-relabel implementation directly when
-a representative workload favors it.
+The limited-flow overload uses Dinic because preflow-push initially saturates
+the source edges and therefore does not naturally stop at an arbitrary flow
+limit. `max_flow_push_relabel` is an explicit alias for the unlimited
+highest-label implementation, while `max_flow_dinic` explicitly selects
+unlimited Dinic.
 
 ## Graph Orientation
 
@@ -84,9 +80,10 @@ needed.
 | `get_edge` | `Edge get_edge(int i) const` | Returns the current state of original edge `i`. | $O(1)$ |
 | `edges` | `std::vector<Edge> edges() const` | Returns all original edges with current flow. | $O(M)$ |
 | `change_edge` | `void change_edge(int i, Cap new_cap, Cap new_flow)` | Replaces edge `i`'s capacity and current flow; undirected flow may be negative. | $O(1)$ |
-| `max_flow` | `Cap max_flow(int s, int t)` | Sends maximum flow from `s` to `t`. | $O(N^2 M)$ in general; see below |
+| `max_flow` | `Cap max_flow(int s, int t)` | Sends maximum flow from `s` to `t` with highest-label preflow-push. | $O(N^2 \sqrt M)$ |
 | `max_flow` | `Cap max_flow(int s, int t, Cap flow_limit)` | Sends at most `flow_limit` additional flow. | $O(N^2 M)$ in general; see below |
-| `max_flow_push_relabel` | `Cap max_flow_push_relabel(int s, int t)` | Sends maximum additional flow with highest-label push-relabel. | $O(N^2 M)$ conservatively |
+| `max_flow_push_relabel` | `Cap max_flow_push_relabel(int s, int t)` | Sends maximum additional flow with highest-label preflow-push. | $O(N^2 \sqrt M)$ |
+| `max_flow_dinic` | `Cap max_flow_dinic(int s, int t)` | Sends maximum additional flow with Dinic. | $O(N^2 M)$ in general; see below |
 | `min_cut` | `std::vector<bool> min_cut(int s) const` | Returns vertices reachable from `s` in the residual graph. | $O(N + M)$ |
 
 ## Time Complexity of `max_flow`
@@ -95,37 +92,28 @@ Here, $N$ is the number of vertices and $M$ is the number of original edges.
 The residual graph stores two directed residual edges for each original edge,
 including an edge added by `add_undirected_edge`.
 
-The unlimited overload runs either pure Dinic or a constant number of Dinic
-phases followed by highest-label push-relabel. Both alternatives have the
-general worst-case bound
+The unlimited overload and `max_flow_push_relabel` use highest-label
+preflow-push. The general worst-case bound is
 
 $$
-O(N^2 M).
+O(N^2 \sqrt M).
 $$
 
 This bound counts each `Cap` arithmetic or comparison operation as $O(1)$ and
 does not depend on the numerical size of the capacities.
 
-The dispatch uses only $N$, $M$, the two terminal adjacency lists, their
-residual capacities, and whether the first few Dinic phases finish the flow.
-It does not inspect all edges or copy the graph. Dense graphs with narrow
-terminals may switch after four phases. A conservative sparse narrow-terminal
-case may switch after eight. Small-capacity terminal networks and
-wide-terminal graphs stay on Dinic. These thresholds are performance
-heuristics; they do not affect correctness or the $O(N^2M)$ bound.
-
-The `flow_limit` overload is pure Dinic. Each phase first uses BFS to construct
-a level graph in $O(N + M)$ time, then uses DFS with current-edge pointers to
-find a blocking flow. A blocking-flow computation takes $O(NM)$ time in the
-general case. After a blocking flow is found, the shortest residual distance
-from `s` to `t` strictly increases, so there are fewer than $N$ phases. This
-also gives the general bound $O(N^2M)$.
+`max_flow_dinic` and the `flow_limit` overload use pure Dinic. Each phase first
+uses BFS to construct a level graph in $O(N + M)$ time, then uses DFS with
+current-edge pointers to find a blocking flow. A blocking-flow computation
+takes $O(NM)$ time in the general case. After a blocking flow is found, the
+shortest residual distance from `s` to `t` strictly increases, so there are
+fewer than $N$ phases. This also gives the general bound $O(N^2M)$.
 
 ### Bounds for Integer Capacities
 
-When every capacity is an integer, several additional bounds hold for the
-pure-Dinic `flow_limit` overload and whenever the unlimited overload stays on
-Dinic. Let $u_e$ be the capacity of edge $e$, and define
+When every capacity is an integer, several additional bounds hold for
+`max_flow_dinic` and the Dinic `flow_limit` overload. Let $u_e$ be the capacity
+of edge $e$, and define
 
 $$
 \bar{u} = \frac{1}{M}\sum_e u_e,
@@ -166,9 +154,8 @@ $\bar{c}$ by $g$ in these bounds. When using `flow_limit`, it must be scaled as
 well. Scaling all these values by $g$ does not change which paths and edges
 Dinic's algorithm processes.
 
-For unit-capacity graphs, $\bar{u}=U=1$. The unlimited overload keeps these
-graphs on Dinic. Combining the two edge-capacity bounds gives the standard
-result
+For unit-capacity graphs, $\bar{u}=U=1$. Combining the two edge-capacity bounds
+for the Dinic APIs gives the standard result
 
 $$
 O\left(M \min\left(N^{2/3}, \sqrt{M}\right)\right).
@@ -195,17 +182,11 @@ rather than recomputing it from scratch.
 
 `max_flow_push_relabel(s, t)` uses highest-label active-vertex selection, flat
 buckets, order-adaptive current-edge scans, global relabeling, and the gap
-heuristic. The conservative general bound is $O(N^2M)$, including calls on a
-residual graph that already contains flow.
+heuristic. Its general bound is $O(N^2 \sqrt M)$, including calls on a residual
+graph that already contains flow.
 
-Push-relabel often performs well on high-capacity networks where Dinic needs
-several level-graph phases. Dinic is commonly faster on path-like, unit, and
-layered networks. The difference can be large in either direction, so the
-unlimited `max_flow` overload performs a guarded automatic handoff. Use the
-explicit method when a representative benchmark shows that starting directly
-with push-relabel is faster. Both methods return only the additional flow sent
-and leave a valid residual graph, so `get_edge`, `edges`, and `min_cut` behave
-the same afterward.
+All maximum-flow methods return only the additional flow sent and leave a valid
+residual graph, so `get_edge`, `edges`, and `min_cut` behave the same afterward.
 
 ## Minimum Cut
 

@@ -59,25 +59,24 @@ void test_max_flow() {
     assert(limited.max_flow(0, 1) == 6);
     assert(limited.get_edge(limited_id).flow == 10);
 
-    // Five different path lengths force the unlimited overload past its
-    // initial Dinic phases and exercise the push-relabel handoff.
-    m1une::flow::MaxFlow<long long> hybrid(17);
+    // Different path lengths exercise repeated highest-label changes.
+    m1une::flow::MaxFlow<long long> layered(17);
     int next_vertex = 1;
     for (int length = 2; length <= 6; length++) {
         int from = 0;
         for (int edge = 0; edge < length; edge++) {
             int to = edge + 1 == length ? 16 : next_vertex++;
-            hybrid.add_edge(from, to, 3);
+            layered.add_edge(from, to, 3);
             from = to;
         }
     }
     assert(next_vertex == 16);
-    while (hybrid.edge_count() < 85) {
-        int v = 1 + hybrid.edge_count() % 15;
-        hybrid.add_edge(v, v, 0);
+    while (layered.edge_count() < 85) {
+        int v = 1 + layered.edge_count() % 15;
+        layered.add_edge(v, v, 0);
     }
-    assert(hybrid.max_flow(0, 16) == 15);
-    assert(hybrid.max_flow(0, 16) == 0);
+    assert(layered.max_flow(0, 16) == 15);
+    assert(layered.max_flow(0, 16) == 0);
 
     struct InputEdge {
         int from;
@@ -92,8 +91,10 @@ void test_max_flow() {
         std::vector<InputEdge> input_edges;
         m1une::flow::MaxFlow<long long> flow(n);
         m1une::flow::MaxFlow<long long> push_relabel_flow(n);
+        m1une::flow::MaxFlow<long long> dinic_flow(n);
         flow.reserve_edges(m);
         push_relabel_flow.reserve_edges(m);
+        dinic_flow.reserve_edges(m);
         for (int edge = 0; edge < m; edge++) {
             InputEdge input{
                 int(random() % n),
@@ -105,9 +106,11 @@ void test_max_flow() {
             if (input.undirected) {
                 flow.add_undirected_edge(input.from, input.to, input.cap);
                 push_relabel_flow.add_undirected_edge(input.from, input.to, input.cap);
+                dinic_flow.add_undirected_edge(input.from, input.to, input.cap);
             } else {
                 flow.add_edge(input.from, input.to, input.cap);
                 push_relabel_flow.add_edge(input.from, input.to, input.cap);
+                dinic_flow.add_edge(input.from, input.to, input.cap);
             }
         }
 
@@ -131,6 +134,8 @@ void test_max_flow() {
         long long push_relabel_result =
             push_relabel_flow.max_flow_push_relabel(0, n - 1);
         assert(push_relabel_result == expected);
+        long long dinic_result = dinic_flow.max_flow_dinic(0, n - 1);
+        assert(dinic_result == expected);
 
         auto validate = [&](const auto& solved_flow, long long solved_value) {
             std::vector<long long> net_flow(n, 0);
@@ -154,9 +159,11 @@ void test_max_flow() {
         };
         validate(flow, result);
         validate(push_relabel_flow, push_relabel_result);
+        validate(dinic_flow, dinic_result);
         assert(flow.max_flow_push_relabel(0, n - 1) == 0);
         assert(push_relabel_flow.max_flow_push_relabel(0, n - 1) == 0);
         assert(push_relabel_flow.max_flow(0, n - 1) == 0);
+        assert(dinic_flow.max_flow_dinic(0, n - 1) == 0);
     }
 }
 
