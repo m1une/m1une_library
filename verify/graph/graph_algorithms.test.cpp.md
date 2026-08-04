@@ -2805,43 +2805,30 @@ data:
     \    struct InternalEdge {\n        int to;\n        int rev;\n        Cap cap;\n\
     \    };\n\n    struct Position {\n        int from;\n        int edge;\n    };\n\
     \n    int _n;\n    std::vector<Position> _pos;\n    std::vector<std::vector<InternalEdge>>\
-    \ _g;\n\n    Cap highest_label_preflow_push(int s, int t) {\n        const std::size_t\
-    \ edge_count = _pos.size();\n        const std::size_t source_degree = _g[s].size();\n\
-    \        const std::size_t sink_degree = _g[t].size();\n        const std::size_t\
-    \ terminal_degree =\n            std::min(source_degree, sink_degree);\n     \
-    \   const bool dense = edge_count >= 5 * std::size_t(_n);\n        const std::size_t\
-    \ wide_threshold =\n            4 * (edge_count / std::size_t(_n) + 1);\n    \
-    \    // Reverse input order defeats several ordering-sensitive hard cases,\n \
-    \       // while forward order is substantially better on ordinary random\n  \
-    \      // graphs with medium-width terminals.\n        const bool reverse_scan\
-    \ =\n            terminal_degree > wide_threshold ||\n            (terminal_degree\
-    \ <= 4 &&\n             (dense ||\n              (source_degree == 2 && sink_degree\
-    \ == 2) ||\n              (terminal_degree == 1 &&\n               edge_count\
-    \ >= 2 * std::size_t(_n))));\n        const int dead = 2 * _n;\n        const\
-    \ int unreachable = _n + 1;\n        std::vector<Cap> excess(_n, Cap(0));\n  \
-    \      std::vector<int> state(8 * std::size_t(_n) + 2);\n        int* height =\
-    \ state.data();\n        int* height_count = height + _n;\n        int* current\
-    \ = height_count + dead + 1;\n        int* queue = current + _n;\n        int*\
-    \ next = queue + _n;\n        int* bucket_head = next + _n;\n        std::vector<char>\
-    \ active(_n, false);\n        int highest = -1;\n        long long work = 0;\n\
-    \        const long long arc_count =\n            2LL * static_cast<long long>(_pos.size());\n\
-    \        const long long work_limit = std::max(\n            1LL,\n          \
-    \  (reverse_scan ? 3 : 4) * arc_count + _n\n        );\n\n        auto activate\
-    \ = [&](int v) {\n            if (v == s || v == t || active[v] || excess[v] ==\
-    \ Cap(0) ||\n                height[v] >= dead) {\n                return;\n \
-    \           }\n            active[v] = true;\n            next[v] = bucket_head[height[v]];\n\
+    \ _g;\n\n    Cap highest_label_preflow_push(int s, int t) {\n        const int\
+    \ dead = 2 * _n;\n        const int unreachable = _n + 1;\n        std::vector<Cap>\
+    \ excess(_n, Cap(0));\n        std::vector<int> state(8 * std::size_t(_n) + 2);\n\
+    \        int* height = state.data();\n        int* height_count = height + _n;\n\
+    \        int* current = height_count + dead + 1;\n        int* queue = current\
+    \ + _n;\n        int* next = queue + _n;\n        int* bucket_head = next + _n;\n\
+    \        std::vector<char> active(_n, false);\n        int highest = -1;\n   \
+    \     long long work = 0;\n        const long long arc_count =\n            2LL\
+    \ * static_cast<long long>(_pos.size());\n        const long long work_limit =\
+    \ std::max(1LL, 4 * arc_count + _n);\n\n        auto activate = [&](int v) {\n\
+    \            if (v == s || v == t || active[v] || excess[v] == Cap(0) ||\n   \
+    \             height[v] >= dead) {\n                return;\n            }\n \
+    \           active[v] = true;\n            next[v] = bucket_head[height[v]];\n\
     \            bucket_head[height[v]] = v;\n            highest = std::max(highest,\
     \ height[v]);\n        };\n\n        auto rebuild_buckets = [&]() {\n        \
     \    std::fill(bucket_head, bucket_head + dead + 1, -1);\n            std::fill(active.begin(),\
     \ active.end(), false);\n            highest = -1;\n            for (int v = 0;\
     \ v < _n; v++) activate(v);\n        };\n\n        auto global_relabel = [&]()\
     \ {\n            std::fill(height, height + _n, unreachable);\n            std::fill(height_count,\
-    \ height_count + dead + 1, 0);\n            for (int v = 0; v < _n; v++) {\n \
-    \               current[v] = reverse_scan ? int(_g[v].size()) - 1 : 0;\n     \
-    \       }\n            int head = 0;\n            int tail = 0;\n            height[t]\
-    \ = 0;\n            height[s] = _n;\n            queue[tail++] = t;\n        \
-    \    while (head != tail) {\n                int v = queue[head++];\n        \
-    \        for (const auto& e : _g[v]) {\n                    if (e.to == s || height[e.to]\
+    \ height_count + dead + 1, 0);\n            std::fill(current, current + _n, 0);\n\
+    \            int head = 0;\n            int tail = 0;\n            height[t] =\
+    \ 0;\n            height[s] = _n;\n            queue[tail++] = t;\n          \
+    \  while (head != tail) {\n                int v = queue[head++];\n          \
+    \      for (const auto& e : _g[v]) {\n                    if (e.to == s || height[e.to]\
     \ != unreachable) continue;\n                    const auto& reverse = _g[e.to][e.rev];\n\
     \                    if (reverse.cap == Cap(0)) continue;\n                  \
     \  height[e.to] = height[v] + 1;\n                    queue[tail++] = e.to;\n\
@@ -2852,33 +2839,27 @@ data:
     \                  height[v] >= _n) {\n                    continue;\n       \
     \         }\n                height_count[height[v]]--;\n                height[v]\
     \ = unreachable;\n                height_count[height[v]]++;\n               \
-    \ current[v] = reverse_scan ? int(_g[v].size()) - 1 : 0;\n            }\n    \
-    \        rebuild_buckets();\n        };\n\n        auto relabel = [&](int v) ->\
-    \ bool {\n            int old_height = height[v];\n            int new_height\
-    \ = dead;\n            work += int(_g[v].size());\n            for (const auto&\
-    \ e : _g[v]) {\n                if (e.cap != Cap(0)) {\n                    new_height\
-    \ = std::min(new_height, height[e.to] + 1);\n                }\n            }\n\
-    \            height_count[old_height]--;\n            height[v] = std::min(new_height,\
-    \ dead);\n            height_count[height[v]]++;\n            current[v] = reverse_scan\
-    \ ? int(_g[v].size()) - 1 : 0;\n            if (old_height < _n && height_count[old_height]\
+    \ current[v] = 0;\n            }\n            rebuild_buckets();\n        };\n\
+    \n        auto relabel = [&](int v) -> bool {\n            int old_height = height[v];\n\
+    \            int new_height = dead;\n            work += int(_g[v].size());\n\
+    \            for (const auto& e : _g[v]) {\n                if (e.cap != Cap(0))\
+    \ {\n                    new_height = std::min(new_height, height[e.to] + 1);\n\
+    \                }\n            }\n            height_count[old_height]--;\n \
+    \           height[v] = std::min(new_height, dead);\n            height_count[height[v]]++;\n\
+    \            current[v] = 0;\n            if (old_height < _n && height_count[old_height]\
     \ == 0) {\n                gap(old_height);\n                return true;\n  \
     \          }\n            return false;\n        };\n\n        auto push = [&](int\
     \ v, InternalEdge& e) {\n            Cap sent = std::min(excess[v], e.cap);\n\
     \            bool was_zero = excess[e.to] == Cap(0);\n            e.cap -= sent;\n\
     \            _g[e.to][e.rev].cap += sent;\n            excess[v] -= sent;\n  \
     \          excess[e.to] += sent;\n            if (was_zero) activate(e.to);\n\
-    \        };\n\n        auto discharge = [&]<bool Reverse>(int v) {\n         \
-    \   while (excess[v] != Cap(0) && height[v] < dead) {\n                bool exhausted_edges;\n\
-    \                if constexpr (Reverse) {\n                    exhausted_edges\
-    \ = current[v] < 0;\n                } else {\n                    exhausted_edges\
-    \ = current[v] == int(_g[v].size());\n                }\n                if (exhausted_edges)\
+    \        };\n\n        auto discharge = [&](int v) {\n            while (excess[v]\
+    \ != Cap(0) && height[v] < dead) {\n                if (current[v] == int(_g[v].size()))\
     \ {\n                    if (relabel(v)) return;\n                    continue;\n\
     \                }\n                auto& e = _g[v][current[v]];\n           \
     \     work++;\n                if (e.cap != Cap(0) && height[v] == height[e.to]\
     \ + 1) {\n                    push(v, e);\n                } else {\n        \
-    \            if constexpr (Reverse) {\n                        current[v]--;\n\
-    \                    } else {\n                        current[v]++;\n       \
-    \             }\n                }\n            }\n            activate(v);\n\
+    \            current[v]++;\n                }\n            }\n            activate(v);\n\
     \        };\n\n        for (auto& e : _g[s]) {\n            if (e.to == s || e.cap\
     \ == Cap(0)) continue;\n            Cap sent = e.cap;\n            e.cap = Cap(0);\n\
     \            _g[e.to][e.rev].cap += sent;\n            excess[e.to] += sent;\n\
@@ -2886,9 +2867,7 @@ data:
     \        if (bucket_head[highest] == -1) {\n                highest--;\n     \
     \           continue;\n            }\n            int v = bucket_head[highest];\n\
     \            bucket_head[highest] = next[v];\n            if (!active[v] || height[v]\
-    \ != highest) continue;\n            active[v] = false;\n            if (reverse_scan)\
-    \ {\n                discharge.template operator()<true>(v);\n            } else\
-    \ {\n                discharge.template operator()<false>(v);\n            }\n\
+    \ != highest) continue;\n            active[v] = false;\n            discharge(v);\n\
     \            if (work >= work_limit) global_relabel();\n        }\n        return\
     \ excess[t];\n    }\n\n   public:\n    MaxFlow() : MaxFlow(0) {}\n\n    explicit\
     \ MaxFlow(int n) : _n(n), _g(n) {\n        assert(0 <= n);\n    }\n\n    int size()\
@@ -8171,7 +8150,7 @@ data:
   isVerificationFile: true
   path: verify/graph/graph_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-08-04 02:22:50+09:00'
+  timestamp: '2026-08-04 16:49:58+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/graph_algorithms.test.cpp
