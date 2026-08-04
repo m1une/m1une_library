@@ -181,9 +181,9 @@ rather than recomputing it from scratch.
 ## Push-Relabel Alternative
 
 `max_flow_push_relabel(s, t)` uses highest-label active-vertex selection, flat
-buckets, order-adaptive current-edge scans, global relabeling, and the gap
-heuristic. Its general bound is $O(N^2 \sqrt M)$, including calls on a residual
-graph that already contains flow.
+buckets, current-edge pointers, global relabeling, and the gap heuristic. Its
+general bound is $O(N^2 \sqrt M)$, including calls on a residual graph that
+already contains flow.
 
 All maximum-flow methods return only the additional flow sent and leave a valid
 residual graph, so `get_edge`, `edges`, and `min_cut` behave the same afterward.

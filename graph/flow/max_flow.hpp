@@ -36,24 +36,6 @@ struct MaxFlow {
     std::vector<std::vector<InternalEdge>> _g;
 
     Cap highest_label_preflow_push(int s, int t) {
-        const std::size_t edge_count = _pos.size();
-        const std::size_t source_degree = _g[s].size();
-        const std::size_t sink_degree = _g[t].size();
-        const std::size_t terminal_degree =
-            std::min(source_degree, sink_degree);
-        const bool dense = edge_count >= 5 * std::size_t(_n);
-        const std::size_t wide_threshold =
-            4 * (edge_count / std::size_t(_n) + 1);
-        // Reverse input order defeats several ordering-sensitive hard cases,
-        // while forward order is substantially better on ordinary random
-        // graphs with medium-width terminals.
-        const bool reverse_scan =
-            terminal_degree > wide_threshold ||
-            (terminal_degree <= 4 &&
-             (dense ||
-              (source_degree == 2 && sink_degree == 2) ||
-              (terminal_degree == 1 &&
-               edge_count >= 2 * std::size_t(_n))));
         const int dead = 2 * _n;
         const int unreachable = _n + 1;
         std::vector<Cap> excess(_n, Cap(0));
@@ -69,10 +51,7 @@ struct MaxFlow {
         long long work = 0;
         const long long arc_count =
             2LL * static_cast<long long>(_pos.size());
-        const long long work_limit = std::max(
-            1LL,
-            (reverse_scan ? 3 : 4) * arc_count + _n
-        );
+        const long long work_limit = std::max(1LL, 4 * arc_count + _n);
 
         auto activate = [&](int v) {
             if (v == s || v == t || active[v] || excess[v] == Cap(0) ||
@@ -95,9 +74,7 @@ struct MaxFlow {
         auto global_relabel = [&]() {
             std::fill(height, height + _n, unreachable);
             std::fill(height_count, height_count + dead + 1, 0);
-            for (int v = 0; v < _n; v++) {
-                current[v] = reverse_scan ? int(_g[v].size()) - 1 : 0;
-            }
+            std::fill(current, current + _n, 0);
             int head = 0;
             int tail = 0;
             height[t] = 0;
@@ -127,7 +104,7 @@ struct MaxFlow {
                 height_count[height[v]]--;
                 height[v] = unreachable;
                 height_count[height[v]]++;
-                current[v] = reverse_scan ? int(_g[v].size()) - 1 : 0;
+                current[v] = 0;
             }
             rebuild_buckets();
         };
@@ -144,7 +121,7 @@ struct MaxFlow {
             height_count[old_height]--;
             height[v] = std::min(new_height, dead);
             height_count[height[v]]++;
-            current[v] = reverse_scan ? int(_g[v].size()) - 1 : 0;
+            current[v] = 0;
             if (old_height < _n && height_count[old_height] == 0) {
                 gap(old_height);
                 return true;
@@ -162,15 +139,9 @@ struct MaxFlow {
             if (was_zero) activate(e.to);
         };
 
-        auto discharge = [&]<bool Reverse>(int v) {
+        auto discharge = [&](int v) {
             while (excess[v] != Cap(0) && height[v] < dead) {
-                bool exhausted_edges;
-                if constexpr (Reverse) {
-                    exhausted_edges = current[v] < 0;
-                } else {
-                    exhausted_edges = current[v] == int(_g[v].size());
-                }
-                if (exhausted_edges) {
+                if (current[v] == int(_g[v].size())) {
                     if (relabel(v)) return;
                     continue;
                 }
@@ -179,11 +150,7 @@ struct MaxFlow {
                 if (e.cap != Cap(0) && height[v] == height[e.to] + 1) {
                     push(v, e);
                 } else {
-                    if constexpr (Reverse) {
-                        current[v]--;
-                    } else {
-                        current[v]++;
-                    }
+                    current[v]++;
                 }
             }
             activate(v);
@@ -207,11 +174,7 @@ struct MaxFlow {
             bucket_head[highest] = next[v];
             if (!active[v] || height[v] != highest) continue;
             active[v] = false;
-            if (reverse_scan) {
-                discharge.template operator()<true>(v);
-            } else {
-                discharge.template operator()<false>(v);
-            }
+            discharge(v);
             if (work >= work_limit) global_relabel();
         }
         return excess[t];

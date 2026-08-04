@@ -71,10 +71,6 @@ void test_max_flow() {
         }
     }
     assert(next_vertex == 16);
-    while (layered.edge_count() < 85) {
-        int v = 1 + layered.edge_count() % 15;
-        layered.add_edge(v, v, 0);
-    }
     assert(layered.max_flow(0, 16) == 15);
     assert(layered.max_flow(0, 16) == 0);
 
