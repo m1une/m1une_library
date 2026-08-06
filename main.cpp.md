@@ -33,7 +33,7 @@ data:
     \ fastout = m1une::template_io::output();\n\nvoid solve() {\n\n}\n\nint main()\
     \ {\n    CPP_DUMP_SET_OPTION(max_line_width, 80);\n    CPP_DUMP_SET_OPTION(log_label_func,\
     \ cpp_dump::log_label::filename());\n    CPP_DUMP_SET_OPTION(enable_asterisk,\
-    \ true);\n    int T = 1;\n    // cin >> T;\n    while (T--) solve();\n    return\
+    \ true);\n    int T = 1;\n    // scan(T);\n    while (T--) solve();\n    return\
     \ 0;\n}\n"
   dependsOn:
   - pch.hpp
@@ -42,7 +42,7 @@ data:
   isVerificationFile: false
   path: main.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-08-07 02:03:02+09:00'
   verificationStatus: LIBRARY_NO_TESTS
   verifiedWith: []
 documentation_of: main.cpp
