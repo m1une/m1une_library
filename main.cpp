@@ -12,7 +12,7 @@ int main() {
     CPP_DUMP_SET_OPTION(log_label_func, cpp_dump::log_label::filename());
     CPP_DUMP_SET_OPTION(enable_asterisk, true);
     int T = 1;
-    // cin >> T;
+    // scan(T);
     while (T--) solve();
     return 0;
 }
