@@ -16,6 +16,7 @@
 
 #include "convex_hull.hpp"
 #include "half_plane_intersection.hpp"
+#include "minkowski_sum.hpp"
 #include "polygon.hpp"
 
 namespace m1une {
@@ -68,17 +69,6 @@ inline std::vector<Point<long double>> clean_polygon(
     return cleaned;
 }
 
-template <Coordinate T>
-std::vector<Point<T>> without_closing_point(std::vector<Point<T>> polygon) {
-    if (
-        polygon.size() >= 2 &&
-        polygon.front() == polygon.back()
-    ) {
-        polygon.pop_back();
-    }
-    return polygon;
-}
-
 }  // namespace convex_polygon_detail
 
 template <Coordinate T>
@@ -113,55 +103,10 @@ std::vector<Point<T>> normalize_convex_polygon(
     std::vector<Point<T>> polygon,
     long double eps = 1e-12L
 ) {
-    polygon = convex_polygon_detail::without_closing_point(
-        std::move(polygon)
+    return convex_polygon_detail::normalize_convex_boundary(
+        std::move(polygon),
+        eps
     );
-    polygon.erase(
-        std::unique(polygon.begin(), polygon.end()),
-        polygon.end()
-    );
-    if (
-        polygon.size() >= 2 &&
-        polygon.front() == polygon.back()
-    ) {
-        polygon.pop_back();
-    }
-    if (polygon.size() <= 1) return polygon;
-    if (
-        polygon.size() >= 3 &&
-        sign<T>(polygon_area2(polygon), eps) < 0
-    ) {
-        std::reverse(polygon.begin(), polygon.end());
-    }
-
-    auto start = std::min_element(
-        polygon.begin(),
-        polygon.end(),
-        [](const Point<T>& first, const Point<T>& second) {
-            if (first.y != second.y) return first.y < second.y;
-            return first.x < second.x;
-        }
-    );
-    std::rotate(polygon.begin(), start, polygon.end());
-
-    if (polygon.size() >= 3) {
-        std::vector<Point<T>> cleaned;
-        const std::size_t size = polygon.size();
-        cleaned.reserve(size);
-        for (std::size_t index = 0; index < size; ++index) {
-            const Point<T>& previous = polygon[(index + size - 1) % size];
-            const Point<T>& current = polygon[index];
-            const Point<T>& next = polygon[(index + 1) % size];
-            if (
-                orientation(previous, current, next, eps) != 0 ||
-                sign<T>(dot(current - previous, next - current), eps) < 0
-            ) {
-                cleaned.push_back(current);
-            }
-        }
-        polygon = std::move(cleaned);
-    }
-    return polygon;
 }
 
 template <Coordinate T>
@@ -1085,81 +1030,6 @@ std::vector<Point<long double>> convex_cut(
         previous_side = current_side;
     }
     return convex_polygon_detail::clean_polygon(std::move(result), eps);
-}
-
-template <Coordinate T>
-std::vector<Point<T>> minkowski_sum(
-    std::vector<Point<T>> first,
-    std::vector<Point<T>> second,
-    long double eps = 1e-12L
-) {
-    assert(!first.empty());
-    assert(!second.empty());
-    first = normalize_convex_polygon(std::move(first), eps);
-    second = normalize_convex_polygon(std::move(second), eps);
-
-    if (first.size() == 1 || second.size() == 1) {
-        if (second.size() == 1) std::swap(first, second);
-        for (Point<T>& point : second) {
-            point += first[0];
-        }
-        return normalize_convex_polygon(std::move(second), eps);
-    }
-
-    std::vector<Point<T>> first_edges;
-    std::vector<Point<T>> second_edges;
-    first_edges.reserve(first.size());
-    second_edges.reserve(second.size());
-    for (std::size_t index = 0; index < first.size(); ++index) {
-        first_edges.push_back(
-            first[(index + 1) % first.size()] - first[index]
-        );
-    }
-    for (std::size_t index = 0; index < second.size(); ++index) {
-        second_edges.push_back(
-            second[(index + 1) % second.size()] - second[index]
-        );
-    }
-
-    Point<T> current = first.front() + second.front();
-    std::vector<Point<T>> result;
-    result.reserve(first.size() + second.size());
-    result.push_back(current);
-    std::size_t first_index = 0;
-    std::size_t second_index = 0;
-    while (
-        first_index < first_edges.size() ||
-        second_index < second_edges.size()
-    ) {
-        Point<T> step;
-        if (first_index == first_edges.size()) {
-            step = second_edges[second_index++];
-        } else if (second_index == second_edges.size()) {
-            step = first_edges[first_index++];
-        } else {
-            const auto turn = cross(
-                first_edges[first_index],
-                second_edges[second_index]
-            );
-            if (turn > 0) {
-                step = first_edges[first_index++];
-            } else if (turn < 0) {
-                step = second_edges[second_index++];
-            } else {
-                step =
-                    first_edges[first_index++] +
-                    second_edges[second_index++];
-            }
-        }
-        current += step;
-        if (
-            first_index < first_edges.size() ||
-            second_index < second_edges.size()
-        ) {
-            result.push_back(current);
-        }
-    }
-    return normalize_convex_polygon(std::move(result), eps);
 }
 
 template <Coordinate T>

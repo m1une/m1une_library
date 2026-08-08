@@ -17,7 +17,7 @@ documentation_of: ../../geometry/all.hpp
 | `geometry/convex_decomposition.hpp` | Hertel--Mehlhorn approximate and Keil--Snoeyink minimum convex decompositions of a simple polygon. |
 | `geometry/convex_hull.hpp` | Monotone-chain convex hull with optional boundary-collinear points. |
 | `geometry/convex_layers.hpp` | Onion decomposition into successive convex-hull boundaries in $O(N\log^2 N)$. |
-| `geometry/convex_polygon.hpp` | Normalized convex-polygon queries, centroid, cuts, diameter, intersections, distance, triangulation, and Minkowski sums. |
+| `geometry/convex_polygon.hpp` | Normalized convex-polygon queries, centroid, cuts, diameter, intersections, distance, and triangulation. |
 | `geometry/count_points_in_triangle.hpp` | Preprocessed strict point counts for indexed triangle queries in $O(1)$ per query. |
 | `geometry/delaunay_triangulation.hpp` | Exact Delaunay edges and counterclockwise triangular faces for integral points in $O(N\log N)$. |
 | `geometry/euclidean_mst.hpp` | Euclidean minimum spanning tree for integral points in $O(N\log N)$. |
@@ -27,6 +27,7 @@ documentation_of: ../../geometry/all.hpp
 | `geometry/manhattan_mst.hpp` | Manhattan minimum spanning tree for integral points in $O(N\log N)$. |
 | `geometry/manhattan_segment_intersections.hpp` | Counts or enumerates intersections of axis-aligned integral segments. |
 | `geometry/minimum_enclosing_circle.hpp` | Randomized linear-time minimum enclosing circle with support indices. |
+| `geometry/minkowski_sum.hpp` | Linear-time Minkowski sum of two ordered convex polygons. |
 | `geometry/line.hpp` | Lines, segments, segment centroid, projection, intersection, and distances. |
 | `geometry/perpendicular_bisector.hpp` | Floating-point and lattice-point perpendicular bisectors of two distinct points. |
 | `geometry/ray.hpp` | Rays, containment, projection, intersections, and distances with other linear objects. |

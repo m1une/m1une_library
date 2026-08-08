@@ -11,8 +11,8 @@ boundary once, then supports point containment, directional extrema, tangents,
 and chain-area queries efficiently.
 
 The free functions cover convexity testing, normalization, triangulation,
-diameter, half-plane cuts, intersection construction, Minkowski sums, and
-intersection and distance between two convex polygons. Pair queries have both
+diameter, half-plane cuts, intersection construction, and intersection and
+distance between two convex polygons. Pair queries have both
 linear-time vector overloads and sublinear overloads for already-normalized
 `ConvexPolygon<T>` objects. They can also return a pair of closest points,
 including points in edge interiors.
@@ -144,13 +144,6 @@ std::vector<Point<long double>> convex_polygon_intersection(
 );
 
 template <Coordinate T>
-std::vector<Point<T>> minkowski_sum(
-    std::vector<Point<T>> first,
-    std::vector<Point<T>> second,
-    long double eps = 1e-12L
-);
-
-template <Coordinate T>
 bool convex_polygons_intersect(
     const std::vector<Point<T>>& first,
     const std::vector<Point<T>>& second,
@@ -203,7 +196,6 @@ convex_polygons_closest_points(
 | `convex_diameter2(polygon, eps)` | Returns the maximum squared distance between two vertices using rotating calipers. | $O(N)$ |
 | `convex_cut(polygon, boundary, eps)` | Intersects the polygon with the closed half-plane to the left of the directed boundary line. | $O(N)$ |
 | `convex_polygon_intersection(first, second, eps)` | Constructs the closed intersection, including point or segment degeneracies, by merging the polygons' angle-sorted half-planes. | $O(N+M)$ |
-| `minkowski_sum(first, second, eps)` | Constructs the Minkowski sum and returns a normalized boundary. | $O(N+M)$ |
 | `convex_polygons_intersect(first, second, eps)` | Tests whether two closed convex polygons intersect. | $O(N+M)$ |
 | `convex_polygons_distance(first, second, eps)` | Returns the minimum Euclidean distance between two closed convex polygons. | $O(N+M)$ |
 | `convex_polygons_closest_points(first, second, eps)` | Returns one pair of points attaining the minimum distance. | $O(N+M)$ |
@@ -252,8 +244,8 @@ contain two distinct points. Intersection construction requires two
 nondegenerate convex inputs; the resulting intersection itself may degenerate
 to a point or segment.
 
-Minkowski addition is also used for the vector pair queries. `minkowski_sum`,
-the three vector pair queries, and the three preprocessed pair-query overloads
+Minkowski addition is also used internally for the vector pair queries. The
+three vector pair queries and the three preprocessed pair-query overloads
 require nonempty inputs. Coordinate negation, addition, and edge differences
 must fit `T`.
 Cross products, dot products, squared distances, and areas must fit

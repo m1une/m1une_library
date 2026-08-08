@@ -18,6 +18,7 @@
 #include "manhattan_mst.hpp"
 #include "manhattan_segment_intersections.hpp"
 #include "minimum_enclosing_circle.hpp"
+#include "minkowski_sum.hpp"
 #include "perpendicular_bisector.hpp"
 #include "point.hpp"
 #include "polygon.hpp"
