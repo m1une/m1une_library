@@ -46,6 +46,9 @@ data:
     path: verify/geometry/is_convex_polygon.test.cpp
     title: verify/geometry/is_convex_polygon.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/minkowski_sum.test.cpp
+    title: verify/geometry/minkowski_sum.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/polygon_operations.test.cpp
     title: verify/geometry/polygon_operations.test.cpp
   - icon: ':heavy_check_mark:'
@@ -202,6 +205,7 @@ data:
   - verify/geometry/steiner_convex_decomposition.test.cpp
   - verify/geometry/convex_diameter.test.cpp
   - verify/geometry/centroid.test.cpp
+  - verify/geometry/minkowski_sum.test.cpp
   - verify/geometry/polygon_operations.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/convex_decomposition.test.cpp

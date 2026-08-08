@@ -6,6 +6,9 @@ data:
     path: geometry/all.hpp
     title: Geometry Bundle
   - icon: ':heavy_check_mark:'
+    path: geometry/all.hpp
+    title: Geometry Bundle
+  - icon: ':heavy_check_mark:'
     path: geometry/angle_sort.hpp
     title: Angle Sort
   - icon: ':heavy_check_mark:'
@@ -27,11 +30,17 @@ data:
     path: geometry/convex_polygon.hpp
     title: Convex Polygons
   - icon: ':heavy_check_mark:'
+    path: geometry/convex_polygon.hpp
+    title: Convex Polygons
+  - icon: ':heavy_check_mark:'
     path: geometry/count_points_in_triangle.hpp
     title: Count Points in Triangle
   - icon: ':heavy_check_mark:'
     path: geometry/delaunay_triangulation.hpp
     title: Delaunay Triangulation
+  - icon: ':heavy_check_mark:'
+    path: geometry/detail/convex_polygon_normalize.hpp
+    title: geometry/detail/convex_polygon_normalize.hpp
   - icon: ':heavy_check_mark:'
     path: geometry/euclidean_mst.hpp
     title: Euclidean Minimum Spanning Tree
@@ -54,6 +63,9 @@ data:
     path: geometry/minimum_enclosing_circle.hpp
     title: Minimum Enclosing Circle
   - icon: ':heavy_check_mark:'
+    path: geometry/minkowski_sum.hpp
+    title: Minkowski Sum
+  - icon: ':heavy_check_mark:'
     path: geometry/perpendicular_bisector.hpp
     title: Perpendicular Bisector
   - icon: ':heavy_check_mark:'
@@ -75,6 +87,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/angle_sort.test.cpp
     title: verify/geometry/angle_sort.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/centroid.test.cpp
+    title: verify/geometry/centroid.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/centroid.test.cpp
     title: verify/geometry/centroid.test.cpp
@@ -115,6 +130,12 @@ data:
     path: verify/geometry/convex_decomposition.test.cpp
     title: verify/geometry/convex_decomposition.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/convex_decomposition.test.cpp
+    title: verify/geometry/convex_decomposition.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/convex_diameter.test.cpp
+    title: verify/geometry/convex_diameter.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/convex_diameter.test.cpp
     title: verify/geometry/convex_diameter.test.cpp
   - icon: ':heavy_check_mark:'
@@ -126,6 +147,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/convex_layers.test.cpp
     title: verify/geometry/convex_layers.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/convex_polygon.test.cpp
+    title: verify/geometry/convex_polygon.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/convex_polygon.test.cpp
     title: verify/geometry/convex_polygon.test.cpp
@@ -145,6 +169,9 @@ data:
     path: verify/geometry/geometry_algorithms.test.cpp
     title: verify/geometry/geometry_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/geometry_algorithms.test.cpp
+    title: verify/geometry/geometry_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/half_plane_intersection.test.cpp
     title: verify/geometry/half_plane_intersection.test.cpp
   - icon: ':heavy_check_mark:'
@@ -153,6 +180,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/incircle.test.cpp
     title: verify/geometry/incircle.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/is_convex_polygon.test.cpp
+    title: verify/geometry/is_convex_polygon.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/is_convex_polygon.test.cpp
     title: verify/geometry/is_convex_polygon.test.cpp
@@ -166,6 +196,12 @@ data:
     path: verify/geometry/minimum_enclosing_circle.test.cpp
     title: verify/geometry/minimum_enclosing_circle.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/minkowski_sum.test.cpp
+    title: verify/geometry/minkowski_sum.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/minkowski_sum.test.cpp
+    title: verify/geometry/minkowski_sum.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/perpendicular_bisector.test.cpp
     title: verify/geometry/perpendicular_bisector.test.cpp
   - icon: ':heavy_check_mark:'
@@ -174,6 +210,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/polygon_area.test.cpp
     title: verify/geometry/polygon_area.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/polygon_operations.test.cpp
+    title: verify/geometry/polygon_operations.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/polygon_operations.test.cpp
     title: verify/geometry/polygon_operations.test.cpp
@@ -189,6 +228,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/segment_intersection.test.cpp
     title: verify/geometry/segment_intersection.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/steiner_convex_decomposition.test.cpp
+    title: verify/geometry/steiner_convex_decomposition.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/steiner_convex_decomposition.test.cpp
     title: verify/geometry/steiner_convex_decomposition.test.cpp
@@ -374,22 +416,26 @@ data:
   requiredBy:
   - geometry/rectangle_union_area.hpp
   - geometry/convex_layers.hpp
+  - geometry/detail/convex_polygon_normalize.hpp
   - geometry/closest_pair.hpp
   - geometry/voronoi_diagram.hpp
   - geometry/half_plane_intersection.hpp
   - geometry/angle_sort.hpp
   - geometry/count_points_in_triangle.hpp
   - geometry/all.hpp
+  - geometry/all.hpp
   - geometry/euclidean_mst.hpp
   - geometry/delaunay_triangulation.hpp
   - geometry/farthest_pair.hpp
   - geometry/ray.hpp
   - geometry/convex_hull.hpp
+  - geometry/minkowski_sum.hpp
   - geometry/manhattan_segment_intersections.hpp
   - geometry/manhattan_mst.hpp
   - geometry/convex_decomposition.hpp
   - geometry/polygon.hpp
   - geometry/perpendicular_bisector.hpp
+  - geometry/convex_polygon.hpp
   - geometry/convex_polygon.hpp
   - geometry/minimum_enclosing_circle.hpp
   - geometry/steiner_convex_decomposition.hpp
@@ -402,6 +448,7 @@ data:
   - verify/geometry/perpendicular_bisector.test.cpp
   - verify/geometry/circle_circle_intersection_area.test.cpp
   - verify/geometry/is_convex_polygon.test.cpp
+  - verify/geometry/is_convex_polygon.test.cpp
   - verify/geometry/manhattan_mst.test.cpp
   - verify/geometry/half_plane_intersection.test.cpp
   - verify/geometry/half_plane_intersection_random.test.cpp
@@ -410,6 +457,7 @@ data:
   - verify/geometry/voronoi_diagram.test.cpp
   - verify/geometry/circle_ray.test.cpp
   - verify/geometry/steiner_convex_decomposition.test.cpp
+  - verify/geometry/steiner_convex_decomposition.test.cpp
   - verify/geometry/circle_relation.test.cpp
   - verify/geometry/closest_pair.test.cpp
   - verify/geometry/incircle.test.cpp
@@ -417,8 +465,13 @@ data:
   - verify/geometry/count_points_in_triangle.test.cpp
   - verify/geometry/polygon_area.test.cpp
   - verify/geometry/convex_diameter.test.cpp
+  - verify/geometry/convex_diameter.test.cpp
+  - verify/geometry/centroid.test.cpp
   - verify/geometry/centroid.test.cpp
   - verify/geometry/circle_line_intersection.test.cpp
+  - verify/geometry/minkowski_sum.test.cpp
+  - verify/geometry/minkowski_sum.test.cpp
+  - verify/geometry/polygon_operations.test.cpp
   - verify/geometry/polygon_operations.test.cpp
   - verify/geometry/segment_intersection.test.cpp
   - verify/geometry/circle_operations.test.cpp
@@ -426,7 +479,9 @@ data:
   - verify/geometry/rectangle_union_area.test.cpp
   - verify/geometry/circle_polygon_intersection_area.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
+  - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/circle_tangent_points.test.cpp
+  - verify/geometry/convex_decomposition.test.cpp
   - verify/geometry/convex_decomposition.test.cpp
   - verify/geometry/ray.test.cpp
   - verify/geometry/convex_layers.test.cpp
@@ -438,6 +493,7 @@ data:
   - verify/geometry/angle_sort.test.cpp
   - verify/geometry/delaunay_triangulation.test.cpp
   - verify/geometry/circle_common_tangents.test.cpp
+  - verify/geometry/convex_polygon.test.cpp
   - verify/geometry/convex_polygon.test.cpp
 documentation_of: geometry/point.hpp
 layout: document

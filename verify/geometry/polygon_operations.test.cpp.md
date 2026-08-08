@@ -8,11 +8,20 @@ data:
     path: geometry/convex_polygon.hpp
     title: Convex Polygons
   - icon: ':heavy_check_mark:'
+    path: geometry/detail/convex_polygon_normalize.hpp
+    title: geometry/detail/convex_polygon_normalize.hpp
+  - icon: ':heavy_check_mark:'
     path: geometry/half_plane_intersection.hpp
     title: Half-Plane Intersection
   - icon: ':heavy_check_mark:'
     path: geometry/line.hpp
     title: Lines and Segments
+  - icon: ':heavy_check_mark:'
+    path: geometry/minkowski_sum.hpp
+    title: Minkowski Sum
+  - icon: ':heavy_check_mark:'
+    path: geometry/point.hpp
+    title: 2D Point and Predicates
   - icon: ':heavy_check_mark:'
     path: geometry/point.hpp
     title: 2D Point and Predicates
@@ -398,10 +407,74 @@ data:
     \ polygon.end());\n    std::rotate(polygon.begin(), first, polygon.end());\n \
     \   return HalfPlaneIntersectionResult{\n        HalfPlaneIntersectionStatus::Bounded,\n\
     \        std::move(polygon),\n    };\n}\n\n}  // namespace geometry\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"geometry/polygon.hpp\"\n\n\n\n#line 12 \"geometry/polygon.hpp\"\
-    \n\n#line 1 \"geometry/ray.hpp\"\n\n\n\n#line 7 \"geometry/ray.hpp\"\n\n#line\
-    \ 9 \"geometry/ray.hpp\"\n\nnamespace m1une {\nnamespace geometry {\n\ntemplate\
-    \ <Coordinate T>\nstruct Ray {\n    Point<T> origin;\n    Point<T> through;\n\
+    \ m1une\n\n\n#line 1 \"geometry/minkowski_sum.hpp\"\n\n\n\n#line 8 \"geometry/minkowski_sum.hpp\"\
+    \n\n#line 1 \"geometry/detail/convex_polygon_normalize.hpp\"\n\n\n\n#line 8 \"\
+    geometry/detail/convex_polygon_normalize.hpp\"\n\n#line 10 \"geometry/detail/convex_polygon_normalize.hpp\"\
+    \n\nnamespace m1une {\nnamespace geometry {\nnamespace convex_polygon_detail {\n\
+    \ntemplate <Coordinate T>\nwide_type<T> boundary_area2(const std::vector<Point<T>>&\
+    \ polygon) {\n    wide_type<T> result = 0;\n    for (std::size_t index = 0; index\
+    \ < polygon.size(); ++index) {\n        result += cross(\n            polygon[index],\n\
+    \            polygon[(index + 1) % polygon.size()]\n        );\n    }\n    return\
+    \ result;\n}\n\ntemplate <Coordinate T>\nstd::vector<Point<T>> normalize_convex_boundary(\n\
+    \    std::vector<Point<T>> polygon,\n    long double eps\n) {\n    if (polygon.size()\
+    \ >= 2 && polygon.front() == polygon.back()) {\n        polygon.pop_back();\n\
+    \    }\n    polygon.erase(\n        std::unique(polygon.begin(), polygon.end()),\n\
+    \        polygon.end()\n    );\n    if (polygon.size() >= 2 && polygon.front()\
+    \ == polygon.back()) {\n        polygon.pop_back();\n    }\n    if (polygon.size()\
+    \ <= 1) return polygon;\n    if (\n        polygon.size() >= 3 &&\n        sign<T>(boundary_area2(polygon),\
+    \ eps) < 0\n    ) {\n        std::reverse(polygon.begin(), polygon.end());\n \
+    \   }\n\n    const auto start = std::min_element(\n        polygon.begin(),\n\
+    \        polygon.end(),\n        [](const Point<T>& first, const Point<T>& second)\
+    \ {\n            if (first.y != second.y) return first.y < second.y;\n       \
+    \     return first.x < second.x;\n        }\n    );\n    std::rotate(polygon.begin(),\
+    \ start, polygon.end());\n\n    if (polygon.size() >= 3) {\n        std::vector<Point<T>>\
+    \ cleaned;\n        const std::size_t size = polygon.size();\n        cleaned.reserve(size);\n\
+    \        for (std::size_t index = 0; index < size; ++index) {\n            const\
+    \ Point<T>& previous = polygon[(index + size - 1) % size];\n            const\
+    \ Point<T>& current = polygon[index];\n            const Point<T>& next = polygon[(index\
+    \ + 1) % size];\n            if (\n                orientation(previous, current,\
+    \ next, eps) != 0 ||\n                sign<T>(dot(current - previous, next - current),\
+    \ eps) < 0\n            ) {\n                cleaned.push_back(current);\n   \
+    \         }\n        }\n        polygon = std::move(cleaned);\n    }\n    return\
+    \ polygon;\n}\n\n}  // namespace convex_polygon_detail\n}  // namespace geometry\n\
+    }  // namespace m1une\n\n\n#line 10 \"geometry/minkowski_sum.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace geometry {\n\n// Returns the normalized boundary of the Minkowski\
+    \ sum of two nonempty\n// ordered convex polygons.\ntemplate <Coordinate T>\n\
+    std::vector<Point<T>> minkowski_sum(\n    std::vector<Point<T>> first,\n    std::vector<Point<T>>\
+    \ second,\n    long double eps = 1e-12L\n) {\n    assert(!first.empty());\n  \
+    \  assert(!second.empty());\n    first = convex_polygon_detail::normalize_convex_boundary(\n\
+    \        std::move(first),\n        eps\n    );\n    second = convex_polygon_detail::normalize_convex_boundary(\n\
+    \        std::move(second),\n        eps\n    );\n\n    if (first.size() == 1\
+    \ || second.size() == 1) {\n        if (second.size() == 1) std::swap(first, second);\n\
+    \        for (Point<T>& point : second) point += first[0];\n        return convex_polygon_detail::normalize_convex_boundary(\n\
+    \            std::move(second),\n            eps\n        );\n    }\n\n    std::vector<Point<T>>\
+    \ first_edges;\n    std::vector<Point<T>> second_edges;\n    first_edges.reserve(first.size());\n\
+    \    second_edges.reserve(second.size());\n    for (std::size_t index = 0; index\
+    \ < first.size(); ++index) {\n        first_edges.push_back(\n            first[(index\
+    \ + 1) % first.size()] - first[index]\n        );\n    }\n    for (std::size_t\
+    \ index = 0; index < second.size(); ++index) {\n        second_edges.push_back(\n\
+    \            second[(index + 1) % second.size()] - second[index]\n        );\n\
+    \    }\n\n    Point<T> current = first.front() + second.front();\n    std::vector<Point<T>>\
+    \ result;\n    result.reserve(first.size() + second.size());\n    result.push_back(current);\n\
+    \    std::size_t first_index = 0;\n    std::size_t second_index = 0;\n    while\
+    \ (\n        first_index < first_edges.size() ||\n        second_index < second_edges.size()\n\
+    \    ) {\n        Point<T> step;\n        if (first_index == first_edges.size())\
+    \ {\n            step = second_edges[second_index++];\n        } else if (second_index\
+    \ == second_edges.size()) {\n            step = first_edges[first_index++];\n\
+    \        } else {\n            const auto turn = cross(\n                first_edges[first_index],\n\
+    \                second_edges[second_index]\n            );\n            if (turn\
+    \ > 0) {\n                step = first_edges[first_index++];\n            } else\
+    \ if (turn < 0) {\n                step = second_edges[second_index++];\n    \
+    \        } else {\n                step = first_edges[first_index++] +\n     \
+    \                  second_edges[second_index++];\n            }\n        }\n \
+    \       current += step;\n        if (\n            first_index < first_edges.size()\
+    \ ||\n            second_index < second_edges.size()\n        ) {\n          \
+    \  result.push_back(current);\n        }\n    }\n    return convex_polygon_detail::normalize_convex_boundary(\n\
+    \        std::move(result),\n        eps\n    );\n}\n\n}  // namespace geometry\n\
+    }  // namespace m1une\n\n\n#line 1 \"geometry/polygon.hpp\"\n\n\n\n#line 12 \"\
+    geometry/polygon.hpp\"\n\n#line 1 \"geometry/ray.hpp\"\n\n\n\n#line 7 \"geometry/ray.hpp\"\
+    \n\n#line 9 \"geometry/ray.hpp\"\n\nnamespace m1une {\nnamespace geometry {\n\n\
+    template <Coordinate T>\nstruct Ray {\n    Point<T> origin;\n    Point<T> through;\n\
     };\n\nnamespace ray_detail {\n\ntemplate <Coordinate T>\nstruct Parameters {\n\
     \    wide_type<T> denominator;\n    wide_type<T> first_numerator;\n    wide_type<T>\
     \ second_numerator;\n};\n\ntemplate <Coordinate T>\nParameters<T> parameters(\n\
@@ -761,7 +834,7 @@ data:
     \                second[second_index],\n                second[(second_index +\
     \ 1) % second_size]\n            };\n            result = std::min(result, distance(first_edge,\
     \ second_edge));\n        }\n    }\n    return result;\n}\n\n}  // namespace geometry\n\
-    }  // namespace m1une\n\n\n#line 20 \"geometry/convex_polygon.hpp\"\n\nnamespace\
+    }  // namespace m1une\n\n\n#line 21 \"geometry/convex_polygon.hpp\"\n\nnamespace\
     \ m1une {\nnamespace geometry {\n\nnamespace convex_polygon_detail {\n\ninline\
     \ std::vector<Point<long double>> clean_polygon(\n    std::vector<Point<long double>>\
     \ polygon,\n    long double eps\n) {\n    if (polygon.empty()) return polygon;\n\
@@ -781,9 +854,6 @@ data:
     \        if (\n            orientation(previous, current, next, eps) != 0 ||\n\
     \            dot(current - previous, next - current) < -eps\n        ) {\n   \
     \         cleaned.push_back(current);\n        }\n    }\n    return cleaned;\n\
-    }\n\ntemplate <Coordinate T>\nstd::vector<Point<T>> without_closing_point(std::vector<Point<T>>\
-    \ polygon) {\n    if (\n        polygon.size() >= 2 &&\n        polygon.front()\
-    \ == polygon.back()\n    ) {\n        polygon.pop_back();\n    }\n    return polygon;\n\
     }\n\n}  // namespace convex_polygon_detail\n\ntemplate <Coordinate T>\nbool is_convex_polygon(\n\
     \    const std::vector<Point<T>>& polygon,\n    bool strict = false,\n    long\
     \ double eps = 1e-12L\n) {\n    std::size_t size = polygon.size();\n    if (size\
@@ -797,32 +867,13 @@ data:
     \        }\n        if (direction != 0 && direction != turn) return false;\n \
     \       direction = turn;\n    }\n    return !strict || direction != 0;\n}\n\n\
     template <Coordinate T>\nstd::vector<Point<T>> normalize_convex_polygon(\n   \
-    \ std::vector<Point<T>> polygon,\n    long double eps = 1e-12L\n) {\n    polygon\
-    \ = convex_polygon_detail::without_closing_point(\n        std::move(polygon)\n\
-    \    );\n    polygon.erase(\n        std::unique(polygon.begin(), polygon.end()),\n\
-    \        polygon.end()\n    );\n    if (\n        polygon.size() >= 2 &&\n   \
-    \     polygon.front() == polygon.back()\n    ) {\n        polygon.pop_back();\n\
-    \    }\n    if (polygon.size() <= 1) return polygon;\n    if (\n        polygon.size()\
-    \ >= 3 &&\n        sign<T>(polygon_area2(polygon), eps) < 0\n    ) {\n       \
-    \ std::reverse(polygon.begin(), polygon.end());\n    }\n\n    auto start = std::min_element(\n\
-    \        polygon.begin(),\n        polygon.end(),\n        [](const Point<T>&\
-    \ first, const Point<T>& second) {\n            if (first.y != second.y) return\
-    \ first.y < second.y;\n            return first.x < second.x;\n        }\n   \
-    \ );\n    std::rotate(polygon.begin(), start, polygon.end());\n\n    if (polygon.size()\
-    \ >= 3) {\n        std::vector<Point<T>> cleaned;\n        const std::size_t size\
-    \ = polygon.size();\n        cleaned.reserve(size);\n        for (std::size_t\
-    \ index = 0; index < size; ++index) {\n            const Point<T>& previous =\
-    \ polygon[(index + size - 1) % size];\n            const Point<T>& current = polygon[index];\n\
-    \            const Point<T>& next = polygon[(index + 1) % size];\n           \
-    \ if (\n                orientation(previous, current, next, eps) != 0 ||\n  \
-    \              sign<T>(dot(current - previous, next - current), eps) < 0\n   \
-    \         ) {\n                cleaned.push_back(current);\n            }\n  \
-    \      }\n        polygon = std::move(cleaned);\n    }\n    return polygon;\n\
-    }\n\ntemplate <Coordinate T>\nPointInPolygon point_in_convex_polygon(\n    const\
-    \ std::vector<Point<T>>& polygon,\n    const Point<T>& point,\n    long double\
-    \ eps = 1e-12L\n) {\n    const std::size_t size = polygon.size();\n    if (size\
-    \ == 0) return PointInPolygon::Outside;\n    if (size == 1) {\n        return\
-    \ distance(polygon[0], point) <= eps\n            ? PointInPolygon::Boundary\n\
+    \ std::vector<Point<T>> polygon,\n    long double eps = 1e-12L\n) {\n    return\
+    \ convex_polygon_detail::normalize_convex_boundary(\n        std::move(polygon),\n\
+    \        eps\n    );\n}\n\ntemplate <Coordinate T>\nPointInPolygon point_in_convex_polygon(\n\
+    \    const std::vector<Point<T>>& polygon,\n    const Point<T>& point,\n    long\
+    \ double eps = 1e-12L\n) {\n    const std::size_t size = polygon.size();\n   \
+    \ if (size == 0) return PointInPolygon::Outside;\n    if (size == 1) {\n     \
+    \   return distance(polygon[0], point) <= eps\n            ? PointInPolygon::Boundary\n\
     \            : PointInPolygon::Outside;\n    }\n    if (size == 2) {\n       \
     \ return on_segment(Segment<T>{polygon[0], polygon[1]}, point, eps)\n        \
     \    ? PointInPolygon::Boundary\n            : PointInPolygon::Outside;\n    }\n\
@@ -1193,45 +1244,15 @@ data:
     \ result.push_back(*intersection);\n        }\n        if (current_inside) result.push_back(current);\n\
     \        previous = current;\n        previous_side = current_side;\n    }\n \
     \   return convex_polygon_detail::clean_polygon(std::move(result), eps);\n}\n\n\
-    template <Coordinate T>\nstd::vector<Point<T>> minkowski_sum(\n    std::vector<Point<T>>\
-    \ first,\n    std::vector<Point<T>> second,\n    long double eps = 1e-12L\n) {\n\
-    \    assert(!first.empty());\n    assert(!second.empty());\n    first = normalize_convex_polygon(std::move(first),\
-    \ eps);\n    second = normalize_convex_polygon(std::move(second), eps);\n\n  \
-    \  if (first.size() == 1 || second.size() == 1) {\n        if (second.size() ==\
-    \ 1) std::swap(first, second);\n        for (Point<T>& point : second) {\n   \
-    \         point += first[0];\n        }\n        return normalize_convex_polygon(std::move(second),\
-    \ eps);\n    }\n\n    std::vector<Point<T>> first_edges;\n    std::vector<Point<T>>\
-    \ second_edges;\n    first_edges.reserve(first.size());\n    second_edges.reserve(second.size());\n\
-    \    for (std::size_t index = 0; index < first.size(); ++index) {\n        first_edges.push_back(\n\
-    \            first[(index + 1) % first.size()] - first[index]\n        );\n  \
-    \  }\n    for (std::size_t index = 0; index < second.size(); ++index) {\n    \
-    \    second_edges.push_back(\n            second[(index + 1) % second.size()]\
-    \ - second[index]\n        );\n    }\n\n    Point<T> current = first.front() +\
-    \ second.front();\n    std::vector<Point<T>> result;\n    result.reserve(first.size()\
-    \ + second.size());\n    result.push_back(current);\n    std::size_t first_index\
-    \ = 0;\n    std::size_t second_index = 0;\n    while (\n        first_index <\
-    \ first_edges.size() ||\n        second_index < second_edges.size()\n    ) {\n\
-    \        Point<T> step;\n        if (first_index == first_edges.size()) {\n  \
-    \          step = second_edges[second_index++];\n        } else if (second_index\
-    \ == second_edges.size()) {\n            step = first_edges[first_index++];\n\
-    \        } else {\n            const auto turn = cross(\n                first_edges[first_index],\n\
-    \                second_edges[second_index]\n            );\n            if (turn\
-    \ > 0) {\n                step = first_edges[first_index++];\n            } else\
-    \ if (turn < 0) {\n                step = second_edges[second_index++];\n    \
-    \        } else {\n                step =\n                    first_edges[first_index++]\
-    \ +\n                    second_edges[second_index++];\n            }\n      \
-    \  }\n        current += step;\n        if (\n            first_index < first_edges.size()\
-    \ ||\n            second_index < second_edges.size()\n        ) {\n          \
-    \  result.push_back(current);\n        }\n    }\n    return normalize_convex_polygon(std::move(result),\
-    \ eps);\n}\n\ntemplate <Coordinate T>\nbool convex_polygons_intersect(\n    const\
-    \ ConvexPolygon<T>& first,\n    const ConvexPolygon<T>& second,\n    long double\
-    \ eps = 1e-12L\n) {\n    assert(!first.empty());\n    assert(!second.empty());\n\
-    \    if (first.size() <= 2 && second.size() <= 2) {\n        if (first.size()\
-    \ == 1 && second.size() == 1) {\n            return distance(first[0], second[0])\
-    \ <= eps;\n        }\n        if (first.size() == 1) {\n            return on_segment(\n\
-    \                Segment<T>{second[0], second[1]},\n                first[0],\n\
-    \                eps\n            );\n        }\n        if (second.size() ==\
-    \ 1) {\n            return on_segment(\n                Segment<T>{first[0], first[1]},\n\
+    template <Coordinate T>\nbool convex_polygons_intersect(\n    const ConvexPolygon<T>&\
+    \ first,\n    const ConvexPolygon<T>& second,\n    long double eps = 1e-12L\n\
+    ) {\n    assert(!first.empty());\n    assert(!second.empty());\n    if (first.size()\
+    \ <= 2 && second.size() <= 2) {\n        if (first.size() == 1 && second.size()\
+    \ == 1) {\n            return distance(first[0], second[0]) <= eps;\n        }\n\
+    \        if (first.size() == 1) {\n            return on_segment(\n          \
+    \      Segment<T>{second[0], second[1]},\n                first[0],\n        \
+    \        eps\n            );\n        }\n        if (second.size() == 1) {\n \
+    \           return on_segment(\n                Segment<T>{first[0], first[1]},\n\
     \                second[0],\n                eps\n            );\n        }\n\
     \        return intersects(\n            Segment<T>{first[0], first[1]},\n   \
     \         Segment<T>{second[0], second[1]},\n            eps\n        );\n   \
@@ -2030,6 +2051,9 @@ data:
   - geometry/point.hpp
   - geometry/half_plane_intersection.hpp
   - geometry/line.hpp
+  - geometry/minkowski_sum.hpp
+  - geometry/detail/convex_polygon_normalize.hpp
+  - geometry/point.hpp
   - geometry/polygon.hpp
   - geometry/ray.hpp
   - geometry/polygon.hpp
@@ -2037,7 +2061,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/polygon_operations.test.cpp
   requiredBy: []
-  timestamp: '2026-07-22 02:25:12+09:00'
+  timestamp: '2026-08-08 16:10:43+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/polygon_operations.test.cpp

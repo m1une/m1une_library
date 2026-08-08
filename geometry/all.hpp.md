@@ -35,6 +35,9 @@ data:
     path: geometry/delaunay_triangulation.hpp
     title: Delaunay Triangulation
   - icon: ':heavy_check_mark:'
+    path: geometry/detail/convex_polygon_normalize.hpp
+    title: geometry/detail/convex_polygon_normalize.hpp
+  - icon: ':heavy_check_mark:'
     path: geometry/euclidean_mst.hpp
     title: Euclidean Minimum Spanning Tree
   - icon: ':heavy_check_mark:'
@@ -59,8 +62,14 @@ data:
     path: geometry/minimum_enclosing_circle.hpp
     title: Minimum Enclosing Circle
   - icon: ':heavy_check_mark:'
+    path: geometry/minkowski_sum.hpp
+    title: Minkowski Sum
+  - icon: ':heavy_check_mark:'
     path: geometry/perpendicular_bisector.hpp
     title: Perpendicular Bisector
+  - icon: ':heavy_check_mark:'
+    path: geometry/point.hpp
+    title: 2D Point and Predicates
   - icon: ':heavy_check_mark:'
     path: geometry/point.hpp
     title: 2D Point and Predicates
@@ -164,6 +173,8 @@ data:
 
     #include "minimum_enclosing_circle.hpp"
 
+    #include "minkowski_sum.hpp"
+
     #include "perpendicular_bisector.hpp"
 
     #include "point.hpp"
@@ -198,6 +209,9 @@ data:
   - geometry/convex_layers.hpp
   - geometry/convex_polygon.hpp
   - geometry/half_plane_intersection.hpp
+  - geometry/minkowski_sum.hpp
+  - geometry/detail/convex_polygon_normalize.hpp
+  - geometry/point.hpp
   - geometry/count_points_in_triangle.hpp
   - geometry/delaunay_triangulation.hpp
   - geometry/euclidean_mst.hpp
@@ -219,7 +233,7 @@ data:
   isVerificationFile: false
   path: geometry/all.hpp
   requiredBy: []
-  timestamp: '2026-07-22 20:44:51+09:00'
+  timestamp: '2026-08-08 16:10:43+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/centroid.test.cpp
@@ -243,7 +257,7 @@ title: Geometry Bundle
 | `geometry/convex_decomposition.hpp` | Hertel--Mehlhorn approximate and Keil--Snoeyink minimum convex decompositions of a simple polygon. |
 | `geometry/convex_hull.hpp` | Monotone-chain convex hull with optional boundary-collinear points. |
 | `geometry/convex_layers.hpp` | Onion decomposition into successive convex-hull boundaries in $O(N\log^2 N)$. |
-| `geometry/convex_polygon.hpp` | Normalized convex-polygon queries, centroid, cuts, diameter, intersections, distance, triangulation, and Minkowski sums. |
+| `geometry/convex_polygon.hpp` | Normalized convex-polygon queries, centroid, cuts, diameter, intersections, distance, and triangulation. |
 | `geometry/count_points_in_triangle.hpp` | Preprocessed strict point counts for indexed triangle queries in $O(1)$ per query. |
 | `geometry/delaunay_triangulation.hpp` | Exact Delaunay edges and counterclockwise triangular faces for integral points in $O(N\log N)$. |
 | `geometry/euclidean_mst.hpp` | Euclidean minimum spanning tree for integral points in $O(N\log N)$. |
@@ -253,6 +267,7 @@ title: Geometry Bundle
 | `geometry/manhattan_mst.hpp` | Manhattan minimum spanning tree for integral points in $O(N\log N)$. |
 | `geometry/manhattan_segment_intersections.hpp` | Counts or enumerates intersections of axis-aligned integral segments. |
 | `geometry/minimum_enclosing_circle.hpp` | Randomized linear-time minimum enclosing circle with support indices. |
+| `geometry/minkowski_sum.hpp` | Linear-time Minkowski sum of two ordered convex polygons. |
 | `geometry/line.hpp` | Lines, segments, segment centroid, projection, intersection, and distances. |
 | `geometry/perpendicular_bisector.hpp` | Floating-point and lattice-point perpendicular bisectors of two distinct points. |
 | `geometry/ray.hpp` | Rays, containment, projection, intersections, and distances with other linear objects. |

@@ -561,6 +561,9 @@ data:
       path: geometry/minimum_enclosing_circle.hpp
       title: Minimum Enclosing Circle
     - icon: ':heavy_check_mark:'
+      path: geometry/minkowski_sum.hpp
+      title: Minkowski Sum
+    - icon: ':heavy_check_mark:'
       path: geometry/perpendicular_bisector.hpp
       title: Perpendicular Bisector
     - icon: ':heavy_check_mark:'
@@ -581,6 +584,11 @@ data:
     - icon: ':heavy_check_mark:'
       path: geometry/voronoi_diagram.hpp
       title: Voronoi Diagram
+  - name: geometry/detail
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: geometry/detail/convex_polygon_normalize.hpp
+      title: geometry/detail/convex_polygon_normalize.hpp
   - name: graph
     pages:
     - icon: ':heavy_check_mark:'
@@ -1752,6 +1760,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/geometry/minimum_enclosing_circle.test.cpp
       title: verify/geometry/minimum_enclosing_circle.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/geometry/minkowski_sum.test.cpp
+      title: verify/geometry/minkowski_sum.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/geometry/perpendicular_bisector.test.cpp
       title: verify/geometry/perpendicular_bisector.test.cpp

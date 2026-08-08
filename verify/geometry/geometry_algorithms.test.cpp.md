@@ -38,6 +38,9 @@ data:
     path: geometry/delaunay_triangulation.hpp
     title: Delaunay Triangulation
   - icon: ':heavy_check_mark:'
+    path: geometry/detail/convex_polygon_normalize.hpp
+    title: geometry/detail/convex_polygon_normalize.hpp
+  - icon: ':heavy_check_mark:'
     path: geometry/euclidean_mst.hpp
     title: Euclidean Minimum Spanning Tree
   - icon: ':heavy_check_mark:'
@@ -62,8 +65,14 @@ data:
     path: geometry/minimum_enclosing_circle.hpp
     title: Minimum Enclosing Circle
   - icon: ':heavy_check_mark:'
+    path: geometry/minkowski_sum.hpp
+    title: Minkowski Sum
+  - icon: ':heavy_check_mark:'
     path: geometry/perpendicular_bisector.hpp
     title: Perpendicular Bisector
+  - icon: ':heavy_check_mark:'
+    path: geometry/point.hpp
+    title: 2D Point and Predicates
   - icon: ':heavy_check_mark:'
     path: geometry/point.hpp
     title: 2D Point and Predicates
@@ -221,6 +230,9 @@ data:
   - geometry/convex_layers.hpp
   - geometry/convex_polygon.hpp
   - geometry/half_plane_intersection.hpp
+  - geometry/minkowski_sum.hpp
+  - geometry/detail/convex_polygon_normalize.hpp
+  - geometry/point.hpp
   - geometry/count_points_in_triangle.hpp
   - geometry/delaunay_triangulation.hpp
   - geometry/euclidean_mst.hpp
@@ -243,7 +255,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/geometry_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-07-22 20:44:51+09:00'
+  timestamp: '2026-08-08 16:10:43+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/geometry_algorithms.test.cpp
