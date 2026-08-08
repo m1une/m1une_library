@@ -2,10 +2,10 @@
 
 #include "../../../ds/segtree/persistent_dynamic_segtree.hpp"
 
+#include "../../../utilities/fast_io.hpp"
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include "../../../utilities/fast_io.hpp"
 #include <limits>
 #include <string>
 #include <vector>
@@ -17,13 +17,9 @@ namespace {
 struct Concat {
     using value_type = std::string;
 
-    static value_type id() {
-        return "";
-    }
+    static value_type id() { return ""; }
 
-    static value_type op(const value_type& a, const value_type& b) {
-        return a + b;
-    }
+    static value_type op(const value_type& a, const value_type& b) { return a + b; }
 };
 
 void test_versions() {
@@ -49,6 +45,15 @@ void test_versions() {
     assert(second.prod(-4, 3) == 6);
     assert(second.max_right(-8, [](long long x) { return x <= 3; }) == 2);
     assert(second.min_left(8, [](long long x) { return x <= 4; }) == -2);
+
+    std::size_t live = base.node_count();
+    second.release();
+    assert(base.node_count() < live);
+    assert(second.all_prod() == 0);
+    assert(first.get(-3) == 2);
+    first.release();
+    branch.release();
+    assert(base.node_count() == 0);
 }
 
 void test_uniform_and_non_commutative() {
@@ -95,10 +100,7 @@ void test_randomized() {
 
     std::vector<Seg> versions;
     versions.emplace_back(left, right, 1);
-    std::vector<std::vector<long long>> expected(
-        1,
-        std::vector<long long>(right - left, 1)
-    );
+    std::vector<std::vector<long long>> expected(1, std::vector<long long>(right - left, 1));
 
     std::uint64_t state = 13;
     auto random = [&state]() {
@@ -130,30 +132,20 @@ void test_randomized() {
         int start = left + int(random() % (expected[check].size() + 1));
         int max_right = start;
         sum = 0;
-        while (
-            max_right < right &&
-            sum + expected[check][std::size_t(max_right - left)] <= limit
-        ) {
+        while (max_right < right && sum + expected[check][std::size_t(max_right - left)] <= limit) {
             sum += expected[check][std::size_t(max_right - left)];
             max_right++;
         }
-        assert(versions[check].max_right(start, [limit](long long value) {
-            return value <= limit;
-        }) == max_right);
+        assert(versions[check].max_right(start, [limit](long long value) { return value <= limit; }) == max_right);
 
         int finish = left + int(random() % (expected[check].size() + 1));
         int min_left = finish;
         sum = 0;
-        while (
-            left < min_left &&
-            expected[check][std::size_t(min_left - 1 - left)] + sum <= limit
-        ) {
+        while (left < min_left && expected[check][std::size_t(min_left - 1 - left)] + sum <= limit) {
             min_left--;
             sum += expected[check][std::size_t(min_left - left)];
         }
-        assert(versions[check].min_left(finish, [limit](long long value) {
-            return value <= limit;
-        }) == min_left);
+        assert(versions[check].min_left(finish, [limit](long long value) { return value <= limit; }) == min_left);
     }
 }
 

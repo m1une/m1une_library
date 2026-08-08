@@ -14,7 +14,8 @@ returns a new version while preserving every earlier version.
 Untouched coordinates have one uniform `initial_value`.
 
 Versions derived from the same root share a contiguous node pool. Queries do
-not push tags, mutate versions, or allocate nodes.
+not push tags, mutate versions, or allocate nodes. Unreferenced nodes are
+recycled after version destruction, assignment, or `release()`.
 
 ## Template Parameters
 
@@ -35,7 +36,7 @@ Construction takes $O(1)$ time and storage.
 
 ## Methods
 
-Let $U$ be the domain length and $K$ the number of nodes allocated by the shared
+Let $U$ be the domain length and $K$ the number of live nodes in the shared
 version family.
 
 | Method | Description | Complexity |
@@ -46,7 +47,8 @@ version family.
 | `Index right_bound()` | Returns the right endpoint. | $O(1)$ |
 | `const T& initial_value()` | Returns the uniform initial point value. | $O(1)$ |
 | `void reserve(size_t n)` | Reserves shared-pool space for `n` nodes. | $O(K)$ |
-| `size_t node_count()` | Returns total nodes allocated across shared versions. | $O(1)$ |
+| `size_t node_count()` | Returns live nodes across shared versions. | $O(1)$ |
+| `void release()` | Releases this root and resets the handle to the uniform initial version. | $O(F)$ |
 | `PersistentDynamicDualSegtree set(Index p, T x)` | Returns a version assigning `x` at `p`. | $O(\log U)$ |
 | `T get(Index p)` | Returns the current value at `p`. | $O(\log U)$ |
 | `T operator[](Index p)` | Equivalent to `get(p)`. | $O(\log U)$ |
@@ -54,7 +56,8 @@ version family.
 | `PersistentDynamicDualSegtree apply(Index l, Index r, T x)` | Returns a version applying `x` over `[l, r)`. | $O(\log U)$ |
 
 Each new update allocates $O(\log U)$ nodes in the worst case. Copying a
-version is $O(1)$.
+version is $O(1)$. Here $F$ is the number of nodes freed by a release. Released
+slots are reused by later updates.
 
 ## Example
 

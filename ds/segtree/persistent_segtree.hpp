@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "../../monoid/concept.hpp"
+#include "persistent_node_pool.hpp"
 
 namespace m1une {
 namespace ds {
@@ -19,29 +20,29 @@ struct PersistentSegtree {
    private:
     struct Node {
         T val;
-        int l, r;
+        int left, right;
+        int references;
 
-        Node() : val(Monoid::id()), l(0), r(0) {}
-        explicit Node(T value) : val(std::move(value)), l(0), r(0) {}
-        Node(T value, int left, int right) : val(std::move(value)), l(left), r(right) {}
+        Node() : val(Monoid::id()), left(0), right(0), references(0) {}
+        explicit Node(T value) : val(std::move(value)), left(0), right(0), references(0) {}
+        Node(T value, int left_child, int right_child)
+            : val(std::move(value)), left(left_child), right(right_child), references(0) {}
     };
+
+    using Pool = detail::PersistentNodePool<Node>;
 
     int _n;
     int _root;
-    std::shared_ptr<std::vector<Node>> _pool;
+    std::shared_ptr<Pool> _pool;
 
-    explicit PersistentSegtree(int n, int root, std::shared_ptr<std::vector<Node>> pool)
-        : _n(n), _root(root), _pool(std::move(pool)) {}
-
-    int new_node(const Node& node) const {
-        _pool->push_back(node);
-        return int(_pool->size()) - 1;
+    explicit PersistentSegtree(int n, int root, std::shared_ptr<Pool> pool)
+        : _n(n), _root(root), _pool(std::move(pool)) {
+        _pool->retain(_root);
     }
 
-    int new_node(Node&& node) const {
-        _pool->push_back(std::move(node));
-        return int(_pool->size()) - 1;
-    }
+    int new_node(const Node& node) const { return _pool->emplace(node); }
+
+    int new_node(Node&& node) const { return _pool->emplace(std::move(node)); }
 
     template <typename U>
     static T make_value(const U& value, int index) {
@@ -60,7 +61,7 @@ struct PersistentSegtree {
         int m = (l + r) >> 1;
         int left = build(l, m, v);
         int right = build(m, r, v);
-        return new_node(Node(Monoid::op((*_pool)[left].val, (*_pool)[right].val), left, right));
+        return new_node(Node(Monoid::op(_pool->nodes[left].val, _pool->nodes[right].val), left, right));
     }
 
     int build(int l, int r, std::vector<T>& v) const {
@@ -69,7 +70,7 @@ struct PersistentSegtree {
         int m = (l + r) >> 1;
         int left = build(l, m, v);
         int right = build(m, r, v);
-        return new_node(Node(Monoid::op((*_pool)[left].val, (*_pool)[right].val), left, right));
+        return new_node(Node(Monoid::op(_pool->nodes[left].val, _pool->nodes[right].val), left, right));
     }
 
     template <typename U>
@@ -79,45 +80,46 @@ struct PersistentSegtree {
         int m = (l + r) >> 1;
         int left = build_from_values(l, m, v);
         int right = build_from_values(m, r, v);
-        return new_node(Node(Monoid::op((*_pool)[left].val, (*_pool)[right].val), left, right));
+        return new_node(Node(Monoid::op(_pool->nodes[left].val, _pool->nodes[right].val), left, right));
     }
 
     int set_node(int t, int l, int r, int p, T value) const {
         if (r - l == 1) return new_node(Node(std::move(value)));
         int m = (l + r) >> 1;
-        int left = (*_pool)[t].l;
-        int right = (*_pool)[t].r;
+        int left = _pool->nodes[t].left;
+        int right = _pool->nodes[t].right;
         if (p < m) {
             left = set_node(left, l, m, p, std::move(value));
         } else {
             right = set_node(right, m, r, p, std::move(value));
         }
-        return new_node(Node(Monoid::op((*_pool)[left].val, (*_pool)[right].val), left, right));
+        return new_node(Node(Monoid::op(_pool->nodes[left].val, _pool->nodes[right].val), left, right));
     }
 
     T prod_node(int t, int l, int r, int ql, int qr) const {
         if (!t || qr <= l || r <= ql) return Monoid::id();
-        if (ql <= l && r <= qr) return (*_pool)[t].val;
+        if (ql <= l && r <= qr) return _pool->nodes[t].val;
         int m = (l + r) >> 1;
-        return Monoid::op(prod_node((*_pool)[t].l, l, m, ql, qr), prod_node((*_pool)[t].r, m, r, ql, qr));
+        return Monoid::op(prod_node(_pool->nodes[t].left, l, m, ql, qr),
+                          prod_node(_pool->nodes[t].right, m, r, ql, qr));
     }
 
     void collect_node(int t, int l, int r, int ql, int qr, std::vector<T>& res) const {
         if (!t || qr <= l || r <= ql) return;
         if (r - l == 1) {
-            res.push_back((*_pool)[t].val);
+            res.push_back(_pool->nodes[t].val);
             return;
         }
         int m = (l + r) >> 1;
-        collect_node((*_pool)[t].l, l, m, ql, qr, res);
-        collect_node((*_pool)[t].r, m, r, ql, qr, res);
+        collect_node(_pool->nodes[t].left, l, m, ql, qr, res);
+        collect_node(_pool->nodes[t].right, m, r, ql, qr, res);
     }
 
     template <class F>
     int max_right_node(int t, int l, int r, int ql, T& sm, F& f) const {
         if (r <= ql) return r;
         if (ql <= l) {
-            T nxt = Monoid::op(sm, (*_pool)[t].val);
+            T nxt = Monoid::op(sm, _pool->nodes[t].val);
             if (f(nxt)) {
                 sm = std::move(nxt);
                 return r;
@@ -125,16 +127,16 @@ struct PersistentSegtree {
             if (r - l == 1) return l;
         }
         int m = (l + r) >> 1;
-        int res = max_right_node((*_pool)[t].l, l, m, ql, sm, f);
+        int res = max_right_node(_pool->nodes[t].left, l, m, ql, sm, f);
         if (res < m) return res;
-        return max_right_node((*_pool)[t].r, m, r, ql, sm, f);
+        return max_right_node(_pool->nodes[t].right, m, r, ql, sm, f);
     }
 
     template <class F>
     int min_left_node(int t, int l, int r, int qr, T& sm, F& f) const {
         if (qr <= l) return l;
         if (r <= qr) {
-            T nxt = Monoid::op((*_pool)[t].val, sm);
+            T nxt = Monoid::op(_pool->nodes[t].val, sm);
             if (f(nxt)) {
                 sm = std::move(nxt);
                 return l;
@@ -142,33 +144,30 @@ struct PersistentSegtree {
             if (r - l == 1) return r;
         }
         int m = (l + r) >> 1;
-        int res = min_left_node((*_pool)[t].r, m, r, qr, sm, f);
+        int res = min_left_node(_pool->nodes[t].right, m, r, qr, sm, f);
         if (m < res) return res;
-        return min_left_node((*_pool)[t].l, l, m, qr, sm, f);
+        return min_left_node(_pool->nodes[t].left, l, m, qr, sm, f);
     }
 
    public:
     PersistentSegtree() : PersistentSegtree(0) {}
 
-    explicit PersistentSegtree(int n)
-        : _n(n), _root(0), _pool(std::make_shared<std::vector<Node>>()) {
+    explicit PersistentSegtree(int n) : _n(n), _root(0), _pool(std::make_shared<Pool>()) {
         assert(0 <= n);
-        _pool->push_back(Node());
         if (_n > 0) _root = build(0, _n, std::vector<T>(_n, Monoid::id()));
+        _pool->retain(_root);
     }
 
-    explicit PersistentSegtree(const std::vector<T>& v)
-        : _n(int(v.size())), _root(0), _pool(std::make_shared<std::vector<Node>>()) {
-        _pool->reserve(v.size() * 2 + 1);
-        _pool->push_back(Node());
+    explicit PersistentSegtree(const std::vector<T>& v) : _n(int(v.size())), _root(0), _pool(std::make_shared<Pool>()) {
+        _pool->reserve(v.size() * 2);
         if (_n > 0) _root = build(0, _n, v);
+        _pool->retain(_root);
     }
 
-    explicit PersistentSegtree(std::vector<T>&& v)
-        : _n(int(v.size())), _root(0), _pool(std::make_shared<std::vector<Node>>()) {
-        _pool->reserve(v.size() * 2 + 1);
-        _pool->push_back(Node());
+    explicit PersistentSegtree(std::vector<T>&& v) : _n(int(v.size())), _root(0), _pool(std::make_shared<Pool>()) {
+        _pool->reserve(v.size() * 2);
         if (_n > 0) _root = build(0, _n, v);
+        _pool->retain(_root);
     }
 
     template <typename U>
@@ -176,19 +175,60 @@ struct PersistentSegtree {
                 (requires(U x) { Monoid::make(x); } || requires(U x, int i) { Monoid::make(x, i); } ||
                  std::convertible_to<U, T>)
     explicit PersistentSegtree(const std::vector<U>& v)
-        : _n(int(v.size())), _root(0), _pool(std::make_shared<std::vector<Node>>()) {
-        _pool->reserve(v.size() * 2 + 1);
-        _pool->push_back(Node());
+        : _n(int(v.size())), _root(0), _pool(std::make_shared<Pool>()) {
+        _pool->reserve(v.size() * 2);
         if (_n > 0) _root = build_from_values(0, _n, v);
+        _pool->retain(_root);
     }
 
-    int size() const {
-        return _n;
+    PersistentSegtree(const PersistentSegtree& other) : _n(other._n), _root(other._root), _pool(other._pool) {
+        if (_pool) _pool->retain(_root);
     }
 
-    bool empty() const {
-        return _n == 0;
+    PersistentSegtree(PersistentSegtree&& other) noexcept
+        : _n(other._n), _root(other._root), _pool(std::move(other._pool)) {
+        other._n = 0;
+        other._root = 0;
     }
+
+    PersistentSegtree& operator=(const PersistentSegtree& other) {
+        if (this == &other) return *this;
+        if (other._pool) other._pool->retain(other._root);
+        if (_pool) _pool->release(_root);
+        _n = other._n;
+        _root = other._root;
+        _pool = other._pool;
+        return *this;
+    }
+
+    PersistentSegtree& operator=(PersistentSegtree&& other) noexcept {
+        if (this == &other) return *this;
+        if (_pool) _pool->release(_root);
+        _n = other._n;
+        _root = other._root;
+        _pool = std::move(other._pool);
+        other._n = 0;
+        other._root = 0;
+        return *this;
+    }
+
+    ~PersistentSegtree() {
+        if (_pool) _pool->release(_root);
+    }
+
+    int size() const { return _n; }
+
+    bool empty() const { return _n == 0; }
+
+    // Drops this version immediately. Other versions and shared nodes stay valid.
+    void release() {
+        if (_pool) _pool->release(_root);
+        _pool = std::make_shared<Pool>();
+        _root = 0;
+        _n = 0;
+    }
+
+    std::size_t node_count() const { return _pool ? _pool->size() : 0; }
 
     PersistentSegtree set(int p, T x) const {
         assert(0 <= p && p < _n);
@@ -202,19 +242,17 @@ struct PersistentSegtree {
         while (r - l > 1) {
             int m = (l + r) >> 1;
             if (p < m) {
-                t = (*_pool)[t].l;
+                t = _pool->nodes[t].left;
                 r = m;
             } else {
-                t = (*_pool)[t].r;
+                t = _pool->nodes[t].right;
                 l = m;
             }
         }
-        return (*_pool)[t].val;
+        return _pool->nodes[t].val;
     }
 
-    T operator[](int p) const {
-        return get(p);
-    }
+    T operator[](int p) const { return get(p); }
 
     T prod(int l, int r) const {
         assert(0 <= l && l <= r && r <= _n);
@@ -222,13 +260,9 @@ struct PersistentSegtree {
         return prod_node(_root, 0, _n, l, r);
     }
 
-    T all_prod() const {
-        return _root ? (*_pool)[_root].val : Monoid::id();
-    }
+    T all_prod() const { return _root ? _pool->nodes[_root].val : Monoid::id(); }
 
-    std::vector<T> to_vector() const {
-        return to_vector(0, _n);
-    }
+    std::vector<T> to_vector() const { return to_vector(0, _n); }
 
     std::vector<T> to_vector(int l, int r) const {
         assert(0 <= l && l <= r && r <= _n);

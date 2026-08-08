@@ -2,10 +2,10 @@
 
 #include "../../../ds/segtree/persistent_dynamic_dual_segtree.hpp"
 
+#include "../../../utilities/fast_io.hpp"
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include "../../../utilities/fast_io.hpp"
 #include <optional>
 #include <vector>
 
@@ -31,6 +31,15 @@ void test_versions() {
     assert(first.get(-20) == 5);
     assert(branch.get(10) == 12);
     assert(base.node_count() == branch.node_count());
+
+    std::size_t live = base.node_count();
+    second.release();
+    assert(base.node_count() < live);
+    assert(second.get(0) == 5);
+    assert(first.get(0) == 8);
+    first.release();
+    branch.release();
+    assert(base.node_count() == 0);
 }
 
 void test_update_order() {
@@ -56,10 +65,7 @@ void test_randomized() {
 
     std::vector<Seg> versions;
     versions.emplace_back(left, right, 4);
-    std::vector<std::vector<long long>> expected(
-        1,
-        std::vector<long long>(right - left, 4)
-    );
+    std::vector<std::vector<long long>> expected(1, std::vector<long long>(right - left, 4));
 
     std::uint64_t state = 9;
     auto random = [&state]() {

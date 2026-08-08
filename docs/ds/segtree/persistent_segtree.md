@@ -7,6 +7,8 @@ documentation_of: ../../../ds/segtree/persistent_segtree.hpp
 
 A persistent segment tree for any monoid satisfying `m1une::monoid::IsMonoid`.
 Point updates return a new tree while keeping older versions available.
+Versions use reference-counted path nodes. Destroying, overwriting, or explicitly
+releasing a version recursively recycles every node that has no remaining parent.
 
 ## Methods
 
@@ -16,6 +18,8 @@ Point updates return a new tree while keeping older versions available.
 | `PersistentSegtree(const std::vector<T>& v)` | Builds the tree from `v`. | $O(N)$ |
 | `int size()` | Returns the number of elements. | $O(1)$ |
 | `bool empty()` | Returns whether the tree is empty. | $O(1)$ |
+| `void release()` | Releases this version and makes this handle empty. | $O(F)$ |
+| `size_t node_count()` | Returns the number of live nodes in the shared version family. | $O(1)$ |
 | `PersistentSegtree set(int p, T x)` | Returns a new version where index `p` is assigned `x`. | $O(\log N)$ |
 | `T get(int p)` | Returns the value at index `p`. | $O(\log N)$ |
 | `T operator[](int p)` | Returns the value at index `p`. | $O(\log N)$ |
@@ -25,6 +29,9 @@ Point updates return a new tree while keeping older versions available.
 | `std::vector<T> to_vector(int l, int r)` | Returns the elements in `[l, r)`. | $O(\log N + r - l)$ |
 | `int max_right<F>(int l, F f)` | Returns the largest `r` such that `f(prod(l, r))` is `true`. | $O(\log N)$ |
 | `int min_left<F>(int r, F f)` | Returns the smallest `l` such that `f(prod(l, r))` is `true`. | $O(\log N)$ |
+
+Here $F$ is the number of nodes that become unreachable. Copying a version is
+$O(1)$. Released node slots are reused by later updates in the same family.
 
 ## Example
 
@@ -42,5 +49,6 @@ int main() {
 
     std::cout << seg.prod(0, 3) << "\n";   // 6
     std::cout << next.prod(0, 3) << "\n";  // 14
+    next.release();                         // unique path nodes are recycled
 }
 ```

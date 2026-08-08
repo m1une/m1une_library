@@ -2,8 +2,8 @@
 
 #include "../../../ds/segtree/persistent_lazy_segtree.hpp"
 
-#include <cassert>
 #include "../../../utilities/fast_io.hpp"
+#include <cassert>
 #include <optional>
 #include <utility>
 #include <vector>
@@ -68,6 +68,13 @@ void test_range_add() {
     check(mixed, {1, 12, 100, 14, 5});
     assert(seg.prod(0, 5).sum == 15);
     assert(seg2.prod(0, 5).sum == 132);
+
+    std::size_t before_release = seg.node_count();
+    Seg disposable = seg.apply(0, 5, 7);
+    assert(seg.node_count() > before_release);
+    disposable.release();
+    assert(disposable.empty());
+    assert(seg.node_count() == before_release);
 }
 
 }  // namespace
@@ -96,20 +103,12 @@ int main() {
         if (type == 0) {
             mint multiplier, addition;
             fast_input >> left >> right >> multiplier >> addition;
-            versions[query + 1] = versions[version]->apply(
-                left,
-                right,
-                std::pair<mint, mint>(multiplier, addition)
-            );
+            versions[query + 1] = versions[version]->apply(left, right, std::pair<mint, mint>(multiplier, addition));
         } else if (type == 1) {
             int source;
             fast_input >> source >> left >> right;
             source++;
-            versions[query + 1] = versions[version]->copy_range_from(
-                *versions[source],
-                left,
-                right
-            );
+            versions[query + 1] = versions[version]->copy_range_from(*versions[source], left, right);
         } else {
             fast_input >> left >> right;
             fast_output << versions[version]->prod(left, right).sum << '\n';

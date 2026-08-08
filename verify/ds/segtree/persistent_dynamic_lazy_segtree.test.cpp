@@ -2,10 +2,10 @@
 
 #include "../../../ds/segtree/persistent_dynamic_lazy_segtree.hpp"
 
+#include "../../../utilities/fast_io.hpp"
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
-#include "../../../utilities/fast_io.hpp"
 #include <vector>
 
 #include "../../../acted_monoid/range_add_range_sum.hpp"
@@ -32,13 +32,18 @@ void test_versions() {
     assert(first.get(0).sum == 3);
     assert(second.get(0).sum == 100);
     assert(branch.get(0).sum == 0);
-    assert(second.max_right(-30, [](const AM::value_type& x) {
-        return x.sum <= 20;
-    }) == -4);
-    assert(second.min_left(40, [](const AM::value_type& x) {
-        return x.sum <= 20;
-    }) == 14);
+    assert(second.max_right(-30, [](const AM::value_type& x) { return x.sum <= 20; }) == -4);
+    assert(second.min_left(40, [](const AM::value_type& x) { return x.sum <= 20; }) == 14);
     assert(base.node_count() == branch.node_count());
+
+    std::size_t live = base.node_count();
+    second.release();
+    assert(base.node_count() < live);
+    assert(second.all_prod().sum == 0);
+    assert(first.get(0).sum == 3);
+    first.release();
+    branch.release();
+    assert(base.node_count() == 0);
 }
 
 void test_arithmetic_progression() {

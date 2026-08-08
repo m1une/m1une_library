@@ -2,8 +2,8 @@
 
 #include "../../../ds/segtree/persistent_segtree.hpp"
 
-#include <cassert>
 #include "../../../utilities/fast_io.hpp"
+#include <cassert>
 #include <vector>
 
 #include "../../../monoid/add.hpp"
@@ -51,6 +51,25 @@ int main() {
     assert(seg2.get(0) == -1);
     assert(seg1.max_right(0, [](long long x) { return x <= 13; }) == 3);
     assert(seg1.min_left(5, [](long long x) { return x <= 9; }) == 3);
+
+    {
+        Seg base(std::vector<long long>{1, 2, 3, 4});
+        std::size_t base_nodes = base.node_count();
+        Seg branch = base.set(1, 20);
+        std::size_t branch_nodes = base.node_count();
+        assert(branch_nodes > base_nodes);
+        Seg copy = branch;
+        branch.release();
+        assert(branch.empty());
+        assert(base.node_count() == branch_nodes);
+        copy.release();
+        assert(base.node_count() == base_nodes);
+        Seg reused = base.set(2, 30);
+        assert(base.node_count() == branch_nodes);
+        reused.release();
+        base.release();
+        assert(base.node_count() == 0);
+    }
 
     int size, query_count;
     fast_input >> size >> query_count;

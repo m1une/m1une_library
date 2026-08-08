@@ -8,6 +8,8 @@ documentation_of: ../../../ds/segtree/persistent_dual_segtree.hpp
 A persistent dual segment tree for any monoid satisfying
 `m1une::monoid::IsMonoid`. Range updates and point assignments return new
 versions while older versions remain available.
+Nodes are reference counted across versions and recycled after their final
+parent or version handle is released.
 
 Use it when you need versioned range updates and point queries. If you also need
 range products on each version, use `PersistentLazySegtree`.
@@ -24,6 +26,8 @@ range products on each version, use `PersistentLazySegtree`.
 | `PersistentDualSegtree(const std::vector<U>& v)` | Builds from another value type when `Monoid::make(value)`, `Monoid::make(value, index)`, or `static_cast<T>(value)` is available. | $O(N)$ |
 | `int size()` | Returns the number of elements. | $O(1)$ |
 | `bool empty()` | Returns whether the tree is empty. | $O(1)$ |
+| `void release()` | Releases this version and makes this handle empty. | $O(F)$ |
+| `size_t node_count()` | Returns live nodes in the shared version family. | $O(1)$ |
 | `PersistentDualSegtree set(int p, T x)` | Returns a new version where index `p` is assigned `x`. | $O(\log N)$ |
 | `T get(int p)` | Returns the value at index `p`. | $O(\log N)$ |
 | `T operator[](int p)` | Returns the value at index `p`. | $O(\log N)$ |
@@ -31,6 +35,10 @@ range products on each version, use `PersistentLazySegtree`.
 | `PersistentDualSegtree apply(int l, int r, T x)` | Returns a new version where `x` is applied to every element in `[l, r)`. | $O(\log N)$ |
 | `std::vector<T> to_vector()` | Returns all elements as a vector. | $O(N)$ |
 | `std::vector<T> to_vector(int l, int r)` | Returns the elements in `[l, r)`. | $O(\log N + r - l)$ |
+
+Here $F$ is the number of nodes that become unreachable. Destruction and
+assignment release versions automatically; `release()` is useful when a handle
+must stay in scope. Released slots are reused.
 
 ## Example
 

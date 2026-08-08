@@ -11,15 +11,16 @@
 #include <utility>
 #include <vector>
 
-#include "dynamic_segtree_common.hpp"
 #include "../../monoid/concept.hpp"
+#include "dynamic_segtree_common.hpp"
+#include "persistent_node_pool.hpp"
 
 namespace m1une {
 namespace ds {
 
 // A persistent sparse segment tree over an integral half-open interval.
 template <m1une::monoid::IsMonoid Monoid, std::integral Index = long long>
-requires(!std::same_as<std::remove_cv_t<Index>, bool>)
+    requires(!std::same_as<std::remove_cv_t<Index>, bool>)
 struct PersistentDynamicSegtree {
     using T = typename Monoid::value_type;
     using index_type = Index;
@@ -30,33 +31,29 @@ struct PersistentDynamicSegtree {
         T val;
         int left;
         int right;
+        int references;
 
-        explicit Node(T value)
-            : val(std::move(value)), left(0), right(0) {}
+        Node() : val(Monoid::id()), left(0), right(0), references(0) {}
+        explicit Node(T value) : val(std::move(value)), left(0), right(0), references(0) {}
     };
 
     struct Config {
         detail::UniformMonoidDomain<Monoid, Index> domain;
 
-        Config(Index left, Index right, T initial_value)
-            : domain(left, right, std::move(initial_value)) {}
+        Config(Index left, Index right, T initial_value) : domain(left, right, std::move(initial_value)) {}
     };
 
     std::shared_ptr<const Config> _config;
-    std::shared_ptr<std::vector<Node>> _pool;
+    using Pool = detail::PersistentNodePool<Node>;
+    std::shared_ptr<Pool> _pool;
     int _root;
 
-    PersistentDynamicSegtree(
-        std::shared_ptr<const Config> config,
-        std::shared_ptr<std::vector<Node>> pool,
-        int root
-    ) : _config(std::move(config)), _pool(std::move(pool)), _root(root) {}
-
-    int new_node(T value) const {
-        assert(_pool->size() < std::size_t(std::numeric_limits<int>::max()));
-        _pool->emplace_back(std::move(value));
-        return int(_pool->size()) - 1;
+    PersistentDynamicSegtree(std::shared_ptr<const Config> config, std::shared_ptr<Pool> pool, int root)
+        : _config(std::move(config)), _pool(std::move(pool)), _root(root) {
+        _pool->retain(_root);
     }
+
+    int new_node(T value) const { return _pool->emplace(std::move(value)); }
 
     const T& value(int t, Index left, Index right, int depth) const {
         if (t) return (*_pool)[t].val;
@@ -70,77 +67,30 @@ struct PersistentDynamicSegtree {
         int left_child = t ? (*_pool)[t].left : 0;
         int right_child = t ? (*_pool)[t].right : 0;
         if (p < middle) {
-            left_child = set_node(
-                left_child,
-                left,
-                middle,
-                depth + 1,
-                p,
-                std::move(x)
-            );
+            left_child = set_node(left_child, left, middle, depth + 1, p, std::move(x));
         } else {
-            right_child = set_node(
-                right_child,
-                middle,
-                right,
-                depth + 1,
-                p,
-                std::move(x)
-            );
+            right_child = set_node(right_child, middle, right, depth + 1, p, std::move(x));
         }
 
-        int result = new_node(Monoid::op(
-            value(left_child, left, middle, depth + 1),
-            value(right_child, middle, right, depth + 1)
-        ));
-        (*_pool)[result].left = left_child;
-        (*_pool)[result].right = right_child;
+        int result = new_node(
+            Monoid::op(value(left_child, left, middle, depth + 1), value(right_child, middle, right, depth + 1)));
+        _pool->replace((*_pool)[result].left, left_child);
+        _pool->replace((*_pool)[result].right, right_child);
         return result;
     }
 
-    T prod_node(
-        int t,
-        Index left,
-        Index right,
-        int depth,
-        Index query_left,
-        Index query_right
-    ) const {
+    T prod_node(int t, Index left, Index right, int depth, Index query_left, Index query_right) const {
         if (query_right <= left || right <= query_left) return Monoid::id();
         if (query_left <= left && right <= query_right) {
             return value(t, left, right, depth);
         }
         Index middle = std::midpoint(left, right);
-        return Monoid::op(
-            prod_node(
-                t ? (*_pool)[t].left : 0,
-                left,
-                middle,
-                depth + 1,
-                query_left,
-                query_right
-            ),
-            prod_node(
-                t ? (*_pool)[t].right : 0,
-                middle,
-                right,
-                depth + 1,
-                query_left,
-                query_right
-            )
-        );
+        return Monoid::op(prod_node(t ? (*_pool)[t].left : 0, left, middle, depth + 1, query_left, query_right),
+                          prod_node(t ? (*_pool)[t].right : 0, middle, right, depth + 1, query_left, query_right));
     }
 
     template <class F>
-    Index max_right_node(
-        int t,
-        Index left,
-        Index right,
-        int depth,
-        Index query_left,
-        T& product,
-        F& predicate
-    ) const {
+    Index max_right_node(int t, Index left, Index right, int depth, Index query_left, T& product, F& predicate) const {
         if (right <= query_left) return right;
         if (query_left <= left) {
             T next = Monoid::op(product, value(t, left, right, depth));
@@ -153,37 +103,14 @@ struct PersistentDynamicSegtree {
         }
 
         Index middle = std::midpoint(left, right);
-        Index result = max_right_node(
-            t ? (*_pool)[t].left : 0,
-            left,
-            middle,
-            depth + 1,
-            query_left,
-            product,
-            predicate
-        );
+        Index result =
+            max_right_node(t ? (*_pool)[t].left : 0, left, middle, depth + 1, query_left, product, predicate);
         if (result < middle) return result;
-        return max_right_node(
-            t ? (*_pool)[t].right : 0,
-            middle,
-            right,
-            depth + 1,
-            query_left,
-            product,
-            predicate
-        );
+        return max_right_node(t ? (*_pool)[t].right : 0, middle, right, depth + 1, query_left, product, predicate);
     }
 
     template <class F>
-    Index min_left_node(
-        int t,
-        Index left,
-        Index right,
-        int depth,
-        Index query_right,
-        T& product,
-        F& predicate
-    ) const {
+    Index min_left_node(int t, Index left, Index right, int depth, Index query_right, T& product, F& predicate) const {
         if (query_right <= left) return left;
         if (right <= query_right) {
             T next = Monoid::op(value(t, left, right, depth), product);
@@ -196,82 +123,83 @@ struct PersistentDynamicSegtree {
         }
 
         Index middle = std::midpoint(left, right);
-        Index result = min_left_node(
-            t ? (*_pool)[t].right : 0,
-            middle,
-            right,
-            depth + 1,
-            query_right,
-            product,
-            predicate
-        );
+        Index result =
+            min_left_node(t ? (*_pool)[t].right : 0, middle, right, depth + 1, query_right, product, predicate);
         if (middle < result) return result;
-        return min_left_node(
-            t ? (*_pool)[t].left : 0,
-            left,
-            middle,
-            depth + 1,
-            query_right,
-            product,
-            predicate
-        );
+        return min_left_node(t ? (*_pool)[t].left : 0, left, middle, depth + 1, query_right, product, predicate);
     }
 
    public:
-    PersistentDynamicSegtree()
-        : PersistentDynamicSegtree(Index(0), Index(0), Monoid::id()) {}
+    PersistentDynamicSegtree() : PersistentDynamicSegtree(Index(0), Index(0), Monoid::id()) {}
 
-    explicit PersistentDynamicSegtree(Index n)
-        : PersistentDynamicSegtree(Index(0), n, Monoid::id()) {
+    explicit PersistentDynamicSegtree(Index n) : PersistentDynamicSegtree(Index(0), n, Monoid::id()) {
         if constexpr (std::signed_integral<Index>) assert(Index(0) <= n);
     }
 
-    PersistentDynamicSegtree(Index left, Index right)
-        : PersistentDynamicSegtree(left, right, Monoid::id()) {}
+    PersistentDynamicSegtree(Index left, Index right) : PersistentDynamicSegtree(left, right, Monoid::id()) {}
 
     PersistentDynamicSegtree(Index left, Index right, T initial_value)
         : _config(std::make_shared<Config>(left, right, std::move(initial_value))),
-          _pool(std::make_shared<std::vector<Node>>()),
-          _root(0) {
-        _pool->emplace_back(Monoid::id());
+          _pool(std::make_shared<Pool>()),
+          _root(0) {}
+
+    PersistentDynamicSegtree(const PersistentDynamicSegtree& other)
+        : _config(other._config), _pool(other._pool), _root(other._root) {
+        if (_pool) _pool->retain(_root);
+    }
+    PersistentDynamicSegtree(PersistentDynamicSegtree&& other) noexcept
+        : _config(std::move(other._config)), _pool(std::move(other._pool)), _root(other._root) {
+        other._root = 0;
+    }
+    PersistentDynamicSegtree& operator=(const PersistentDynamicSegtree& other) {
+        if (this == &other) return *this;
+        if (other._pool) other._pool->retain(other._root);
+        if (_pool) _pool->release(_root);
+        _config = other._config;
+        _pool = other._pool;
+        _root = other._root;
+        return *this;
+    }
+    PersistentDynamicSegtree& operator=(PersistentDynamicSegtree&& other) noexcept {
+        if (this == &other) return *this;
+        if (_pool) _pool->release(_root);
+        _config = std::move(other._config);
+        _pool = std::move(other._pool);
+        _root = other._root;
+        other._root = 0;
+        return *this;
+    }
+    ~PersistentDynamicSegtree() {
+        if (_pool) _pool->release(_root);
     }
 
-    size_type size() const {
-        return _config->domain.size();
-    }
+    size_type size() const { return _config->domain.size(); }
 
-    bool empty() const {
-        return _config->domain.empty();
-    }
+    bool empty() const { return _config->domain.empty(); }
 
-    Index left_bound() const {
-        return _config->domain.left_bound();
-    }
+    Index left_bound() const { return _config->domain.left_bound(); }
 
-    Index right_bound() const {
-        return _config->domain.right_bound();
-    }
+    Index right_bound() const { return _config->domain.right_bound(); }
 
-    const T& initial_value() const {
-        return _config->domain.initial_value();
-    }
+    const T& initial_value() const { return _config->domain.initial_value(); }
 
     void reserve(std::size_t node_capacity) const {
         assert(node_capacity < std::numeric_limits<std::size_t>::max());
-        _pool->reserve(node_capacity + 1);
+        _pool->reserve(node_capacity);
     }
 
-    std::size_t node_count() const {
-        return _pool->size() - 1;
+    std::size_t node_count() const { return _pool->size(); }
+
+    void release() {
+        if (_pool) _pool->release(_root);
+        _pool = std::make_shared<Pool>();
+        _root = 0;
     }
 
     PersistentDynamicSegtree set(Index p, T x) const {
         assert(left_bound() <= p && p < right_bound());
-        return PersistentDynamicSegtree(
-            _config,
-            _pool,
-            set_node(_root, left_bound(), right_bound(), 0, p, std::move(x))
-        );
+        return PersistentDynamicSegtree(_config, _pool,
+                                        set_node(_root, left_bound(), right_bound(), 0, p, std::move(x)));
     }
 
     T get(Index p) const {
@@ -294,26 +222,15 @@ struct PersistentDynamicSegtree {
         return initial_value();
     }
 
-    T operator[](Index p) const {
-        return get(p);
-    }
+    T operator[](Index p) const { return get(p); }
 
     T prod(Index left, Index right) const {
         assert(left_bound() <= left && left <= right && right <= right_bound());
         if (left == right) return Monoid::id();
-        return prod_node(
-            _root,
-            left_bound(),
-            right_bound(),
-            0,
-            left,
-            right
-        );
+        return prod_node(_root, left_bound(), right_bound(), 0, left, right);
     }
 
-    T all_prod() const {
-        return value(_root, left_bound(), right_bound(), 0);
-    }
+    T all_prod() const { return value(_root, left_bound(), right_bound(), 0); }
 
     template <class F>
     Index max_right(Index left, F predicate) const {
@@ -321,15 +238,7 @@ struct PersistentDynamicSegtree {
         assert(predicate(Monoid::id()));
         if (left == right_bound()) return right_bound();
         T product = Monoid::id();
-        return max_right_node(
-            _root,
-            left_bound(),
-            right_bound(),
-            0,
-            left,
-            product,
-            predicate
-        );
+        return max_right_node(_root, left_bound(), right_bound(), 0, left, product, predicate);
     }
 
     template <class F>
@@ -338,15 +247,7 @@ struct PersistentDynamicSegtree {
         assert(predicate(Monoid::id()));
         if (right == left_bound()) return left_bound();
         T product = Monoid::id();
-        return min_left_node(
-            _root,
-            left_bound(),
-            right_bound(),
-            0,
-            right,
-            product,
-            predicate
-        );
+        return min_left_node(_root, left_bound(), right_bound(), 0, right, product, predicate);
     }
 };
 

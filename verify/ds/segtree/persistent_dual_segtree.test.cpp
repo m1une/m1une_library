@@ -2,8 +2,8 @@
 
 #include "../../../ds/segtree/persistent_dual_segtree.hpp"
 
-#include <cassert>
 #include "../../../utilities/fast_io.hpp"
+#include <cassert>
 #include <vector>
 
 #include "../../../monoid/add.hpp"
@@ -47,6 +47,13 @@ int main() {
     assert(seg2.get(2) == 100);
     assert(seg3.get(2) == 99);
     assert(seg4.get(3) == 20);
+
+    std::size_t before_release = seg.node_count();
+    Seg disposable = seg.apply(0, 5, 9);
+    assert(seg.node_count() > before_release);
+    disposable.release();
+    assert(disposable.empty());
+    assert(seg.node_count() == before_release);
 
     long long a, b;
     fast_input >> a >> b;

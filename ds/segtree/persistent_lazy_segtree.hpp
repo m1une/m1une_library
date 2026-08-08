@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "../../acted_monoid/concept.hpp"
+#include "persistent_node_pool.hpp"
 
 namespace m1une {
 namespace ds {
@@ -21,36 +22,39 @@ struct PersistentLazySegtree {
     struct Node {
         T val;
         F lazy;
-        int l, r;
+        int left, right;
+        int references;
         bool has_lazy;
 
-        Node() : val(ActedMonoid::id()), lazy(ActedMonoid::op_id()), l(0), r(0), has_lazy(false) {}
+        Node()
+            : val(ActedMonoid::id()), lazy(ActedMonoid::op_id()), left(0), right(0), references(0), has_lazy(false) {}
         explicit Node(T value)
-            : val(std::move(value)), lazy(ActedMonoid::op_id()), l(0), r(0), has_lazy(false) {}
-        Node(T value, int left, int right)
-            : val(std::move(value)), lazy(ActedMonoid::op_id()), l(left), r(right), has_lazy(false) {}
+            : val(std::move(value)), lazy(ActedMonoid::op_id()), left(0), right(0), references(0), has_lazy(false) {}
+        Node(T value, int left_child, int right_child)
+            : val(std::move(value)),
+              lazy(ActedMonoid::op_id()),
+              left(left_child),
+              right(right_child),
+              references(0),
+              has_lazy(false) {}
     };
+
+    using Pool = detail::PersistentNodePool<Node>;
 
     int _n;
     int _root;
-    std::shared_ptr<std::vector<Node>> _pool;
+    std::shared_ptr<Pool> _pool;
 
-    explicit PersistentLazySegtree(int n, int root, std::shared_ptr<std::vector<Node>> pool)
-        : _n(n), _root(root), _pool(std::move(pool)) {}
-
-    int new_node(const Node& node) const {
-        _pool->push_back(node);
-        return int(_pool->size()) - 1;
+    explicit PersistentLazySegtree(int n, int root, std::shared_ptr<Pool> pool)
+        : _n(n), _root(root), _pool(std::move(pool)) {
+        _pool->retain(_root);
     }
 
-    int new_node(Node&& node) const {
-        _pool->push_back(std::move(node));
-        return int(_pool->size()) - 1;
-    }
+    int new_node(const Node& node) const { return _pool->emplace(node); }
 
-    int clone_node(int t) const {
-        return new_node((*_pool)[t]);
-    }
+    int new_node(Node&& node) const { return _pool->emplace(std::move(node)); }
+
+    int clone_node(int t) const { return _pool->clone(t); }
 
     template <typename U>
     static T make_value(const U& value, int index) {
@@ -129,21 +133,21 @@ struct PersistentLazySegtree {
     void push(int t, int l, int r) const {
         if (!(*_pool)[t].has_lazy) return;
         F lazy = (*_pool)[t].lazy;
-        int left = (*_pool)[t].l;
-        int right = (*_pool)[t].r;
+        int left = (*_pool)[t].left;
+        int right = (*_pool)[t].right;
         int m = (l + r) >> 1;
         left = all_apply_clone(left, lazy);
         right = all_apply_clone(right, shift_operator(lazy, m - l));
         Node& node = (*_pool)[t];
-        node.l = left;
-        node.r = right;
+        _pool->replace(node.left, left);
+        _pool->replace(node.right, right);
         node.lazy = ActedMonoid::op_id();
         node.has_lazy = false;
     }
 
     void update(int t) const {
         Node& node = (*_pool)[t];
-        node.val = ActedMonoid::op((*_pool)[node.l].val, (*_pool)[node.r].val);
+        node.val = ActedMonoid::op((*_pool)[node.left].val, (*_pool)[node.right].val);
     }
 
     int set_node(int t, int l, int r, int p, T value) const {
@@ -158,9 +162,11 @@ struct PersistentLazySegtree {
         push(t, l, r);
         int m = (l + r) >> 1;
         if (p < m) {
-            (*_pool)[t].l = set_node((*_pool)[t].l, l, m, p, std::move(value));
+            int child = set_node((*_pool)[t].left, l, m, p, std::move(value));
+            _pool->replace((*_pool)[t].left, child);
         } else {
-            (*_pool)[t].r = set_node((*_pool)[t].r, m, r, p, std::move(value));
+            int child = set_node((*_pool)[t].right, m, r, p, std::move(value));
+            _pool->replace((*_pool)[t].right, child);
         }
         update(t);
         return t;
@@ -175,8 +181,10 @@ struct PersistentLazySegtree {
         }
         push(t, l, r);
         int m = (l + r) >> 1;
-        (*_pool)[t].l = apply_node((*_pool)[t].l, l, m, ql, qr, f);
-        (*_pool)[t].r = apply_node((*_pool)[t].r, m, r, ql, qr, f);
+        int left = apply_node((*_pool)[t].left, l, m, ql, qr, f);
+        int right = apply_node((*_pool)[t].right, m, r, ql, qr, f);
+        _pool->replace((*_pool)[t].left, left);
+        _pool->replace((*_pool)[t].right, right);
         update(t);
         return t;
     }
@@ -187,29 +195,17 @@ struct PersistentLazySegtree {
 
         target = clone_node(target);
         source = clone_node(source);
+        _pool->retain(source);
         push(target, l, r);
         push(source, l, r);
 
         int m = (l + r) >> 1;
-        int left = copy_range_node(
-            (*_pool)[target].l,
-            (*_pool)[source].l,
-            l,
-            m,
-            ql,
-            qr
-        );
-        int right = copy_range_node(
-            (*_pool)[target].r,
-            (*_pool)[source].r,
-            m,
-            r,
-            ql,
-            qr
-        );
-        (*_pool)[target].l = left;
-        (*_pool)[target].r = right;
+        int left = copy_range_node((*_pool)[target].left, (*_pool)[source].left, l, m, ql, qr);
+        int right = copy_range_node((*_pool)[target].right, (*_pool)[source].right, m, r, ql, qr);
+        _pool->replace((*_pool)[target].left, left);
+        _pool->replace((*_pool)[target].right, right);
         update(target);
+        _pool->release(source);
         return target;
     }
 
@@ -218,8 +214,8 @@ struct PersistentLazySegtree {
         const Node& node = (*_pool)[t];
         if (ql <= l && r <= qr) return mapping_at(inherited, node.val, 0);
         int m = (l + r) >> 1;
-        return ActedMonoid::op(prod_node(node.l, l, m, ql, qr, compose_for_child(inherited, node, 0)),
-                               prod_node(node.r, m, r, ql, qr, compose_for_child(inherited, node, m - l)));
+        return ActedMonoid::op(prod_node(node.left, l, m, ql, qr, compose_for_child(inherited, node, 0)),
+                               prod_node(node.right, m, r, ql, qr, compose_for_child(inherited, node, m - l)));
     }
 
     void collect_node(int t, int l, int r, int ql, int qr, const F& inherited, std::vector<T>& res) const {
@@ -230,8 +226,8 @@ struct PersistentLazySegtree {
             return;
         }
         int m = (l + r) >> 1;
-        collect_node(node.l, l, m, ql, qr, compose_for_child(inherited, node, 0), res);
-        collect_node(node.r, m, r, ql, qr, compose_for_child(inherited, node, m - l), res);
+        collect_node(node.left, l, m, ql, qr, compose_for_child(inherited, node, 0), res);
+        collect_node(node.right, m, r, ql, qr, compose_for_child(inherited, node, m - l), res);
     }
 
     template <class G>
@@ -247,9 +243,9 @@ struct PersistentLazySegtree {
             if (r - l == 1) return l;
         }
         int m = (l + r) >> 1;
-        int res = max_right_node(node.l, l, m, ql, sm, compose_for_child(inherited, node, 0), g);
+        int res = max_right_node(node.left, l, m, ql, sm, compose_for_child(inherited, node, 0), g);
         if (res < m) return res;
-        return max_right_node(node.r, m, r, ql, sm, compose_for_child(inherited, node, m - l), g);
+        return max_right_node(node.right, m, r, ql, sm, compose_for_child(inherited, node, m - l), g);
     }
 
     template <class G>
@@ -265,33 +261,31 @@ struct PersistentLazySegtree {
             if (r - l == 1) return r;
         }
         int m = (l + r) >> 1;
-        int res = min_left_node(node.r, m, r, qr, sm, compose_for_child(inherited, node, m - l), g);
+        int res = min_left_node(node.right, m, r, qr, sm, compose_for_child(inherited, node, m - l), g);
         if (m < res) return res;
-        return min_left_node(node.l, l, m, qr, sm, compose_for_child(inherited, node, 0), g);
+        return min_left_node(node.left, l, m, qr, sm, compose_for_child(inherited, node, 0), g);
     }
 
    public:
     PersistentLazySegtree() : PersistentLazySegtree(0) {}
 
-    explicit PersistentLazySegtree(int n)
-        : _n(n), _root(0), _pool(std::make_shared<std::vector<Node>>()) {
+    explicit PersistentLazySegtree(int n) : _n(n), _root(0), _pool(std::make_shared<Pool>()) {
         assert(0 <= n);
-        _pool->push_back(Node());
         if (_n > 0) _root = build(0, _n, std::vector<T>(_n, ActedMonoid::id()));
+        _pool->retain(_root);
     }
 
     explicit PersistentLazySegtree(const std::vector<T>& v)
-        : _n(int(v.size())), _root(0), _pool(std::make_shared<std::vector<Node>>()) {
-        _pool->reserve(v.size() * 2 + 1);
-        _pool->push_back(Node());
+        : _n(int(v.size())), _root(0), _pool(std::make_shared<Pool>()) {
+        _pool->reserve(v.size() * 2);
         if (_n > 0) _root = build(0, _n, v);
+        _pool->retain(_root);
     }
 
-    explicit PersistentLazySegtree(std::vector<T>&& v)
-        : _n(int(v.size())), _root(0), _pool(std::make_shared<std::vector<Node>>()) {
-        _pool->reserve(v.size() * 2 + 1);
-        _pool->push_back(Node());
+    explicit PersistentLazySegtree(std::vector<T>&& v) : _n(int(v.size())), _root(0), _pool(std::make_shared<Pool>()) {
+        _pool->reserve(v.size() * 2);
         if (_n > 0) _root = build(0, _n, v);
+        _pool->retain(_root);
     }
 
     template <typename U>
@@ -299,19 +293,59 @@ struct PersistentLazySegtree {
                 (requires(U x) { ActedMonoid::make(x); } || requires(U x, int i) { ActedMonoid::make(x, i); } ||
                  std::convertible_to<U, T>)
     explicit PersistentLazySegtree(const std::vector<U>& v)
-        : _n(int(v.size())), _root(0), _pool(std::make_shared<std::vector<Node>>()) {
-        _pool->reserve(v.size() * 2 + 1);
-        _pool->push_back(Node());
+        : _n(int(v.size())), _root(0), _pool(std::make_shared<Pool>()) {
+        _pool->reserve(v.size() * 2);
         if (_n > 0) _root = build_from_values(0, _n, v);
+        _pool->retain(_root);
     }
 
-    int size() const {
-        return _n;
+    PersistentLazySegtree(const PersistentLazySegtree& other) : _n(other._n), _root(other._root), _pool(other._pool) {
+        if (_pool) _pool->retain(_root);
     }
 
-    bool empty() const {
-        return _n == 0;
+    PersistentLazySegtree(PersistentLazySegtree&& other) noexcept
+        : _n(other._n), _root(other._root), _pool(std::move(other._pool)) {
+        other._n = 0;
+        other._root = 0;
     }
+
+    PersistentLazySegtree& operator=(const PersistentLazySegtree& other) {
+        if (this == &other) return *this;
+        if (other._pool) other._pool->retain(other._root);
+        if (_pool) _pool->release(_root);
+        _n = other._n;
+        _root = other._root;
+        _pool = other._pool;
+        return *this;
+    }
+
+    PersistentLazySegtree& operator=(PersistentLazySegtree&& other) noexcept {
+        if (this == &other) return *this;
+        if (_pool) _pool->release(_root);
+        _n = other._n;
+        _root = other._root;
+        _pool = std::move(other._pool);
+        other._n = 0;
+        other._root = 0;
+        return *this;
+    }
+
+    ~PersistentLazySegtree() {
+        if (_pool) _pool->release(_root);
+    }
+
+    int size() const { return _n; }
+
+    bool empty() const { return _n == 0; }
+
+    void release() {
+        if (_pool) _pool->release(_root);
+        _pool = std::make_shared<Pool>();
+        _root = 0;
+        _n = 0;
+    }
+
+    std::size_t node_count() const { return _pool ? _pool->size() : 0; }
 
     PersistentLazySegtree set(int p, T x) const {
         assert(0 <= p && p < _n);
@@ -323,9 +357,7 @@ struct PersistentLazySegtree {
         return prod(p, p + 1);
     }
 
-    T operator[](int p) const {
-        return get(p);
-    }
+    T operator[](int p) const { return get(p); }
 
     T prod(int l, int r) const {
         assert(0 <= l && l <= r && r <= _n);
@@ -333,13 +365,9 @@ struct PersistentLazySegtree {
         return prod_node(_root, 0, _n, l, r, ActedMonoid::op_id());
     }
 
-    T all_prod() const {
-        return _root ? (*_pool)[_root].val : ActedMonoid::id();
-    }
+    T all_prod() const { return _root ? (*_pool)[_root].val : ActedMonoid::id(); }
 
-    std::vector<T> to_vector() const {
-        return to_vector(0, _n);
-    }
+    std::vector<T> to_vector() const { return to_vector(0, _n); }
 
     std::vector<T> to_vector(int l, int r) const {
         assert(0 <= l && l <= r && r <= _n);
@@ -360,11 +388,7 @@ struct PersistentLazySegtree {
         return PersistentLazySegtree(_n, apply_node(_root, 0, _n, l, r, f), _pool);
     }
 
-    PersistentLazySegtree copy_range_from(
-        const PersistentLazySegtree& source,
-        int l,
-        int r
-    ) const {
+    PersistentLazySegtree copy_range_from(const PersistentLazySegtree& source, int l, int r) const {
         assert(_n == source._n);
         assert(_pool == source._pool);
         assert(0 <= l && l <= r && r <= _n);

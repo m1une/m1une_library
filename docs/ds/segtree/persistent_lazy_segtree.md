@@ -8,6 +8,8 @@ documentation_of: ../../../ds/segtree/persistent_lazy_segtree.hpp
 A persistent lazy segment tree for any acted monoid satisfying
 `m1une::acted_monoid::IsActedMonoid`. Point assignments and range updates return
 new versions while older versions remain available.
+Unreferenced path nodes are recycled automatically when versions are destroyed
+or overwritten, and `release()` can drop a version early.
 
 ## Methods
 
@@ -17,6 +19,8 @@ new versions while older versions remain available.
 | `PersistentLazySegtree(const std::vector<T>& v)` | Builds the tree from `v`. | $O(N)$ |
 | `int size()` | Returns the number of elements. | $O(1)$ |
 | `bool empty()` | Returns whether the tree is empty. | $O(1)$ |
+| `void release()` | Releases this version and makes this handle empty. | $O(F)$ |
+| `size_t node_count()` | Returns live nodes in the shared version family. | $O(1)$ |
 | `PersistentLazySegtree set(int p, T x)` | Returns a new version where index `p` is assigned `x`. | $O(\log N)$ |
 | `T get(int p)` | Returns the value at index `p`. | $O(\log N)$ |
 | `T operator[](int p)` | Returns the value at index `p`. | $O(\log N)$ |
@@ -29,6 +33,9 @@ new versions while older versions remain available.
 | `PersistentLazySegtree copy_range_from(const PersistentLazySegtree& source, int l, int r)` | Returns a new version whose `[l, r)` is copied from `source`. | $O(\log N)$ |
 | `int max_right<G>(int l, G g)` | Returns the largest `r` such that `g(prod(l, r))` is `true`. | $O(\log N)$ |
 | `int min_left<G>(int r, G g)` | Returns the smallest `l` such that `g(prod(l, r))` is `true`. | $O(\log N)$ |
+
+Here $F$ is the number of nodes whose last reference is removed. Copying a
+version is $O(1)$, and released slots are reused by later updates.
 
 `copy_range_from` requires both versions to have the same size and to descend
 from the same initial tree, so that they share a node pool. Neither input
@@ -54,5 +61,6 @@ int main() {
     std::cout << seg.prod(0, 4).sum << "\n";   // 10
     std::cout << next.prod(0, 4).sum << "\n";  // 30
     std::cout << mixed.prod(0, 4).sum << "\n"; // 20
+    next.release();                            // mixed keeps shared nodes alive
 }
 ```

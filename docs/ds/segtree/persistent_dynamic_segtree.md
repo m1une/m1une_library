@@ -17,7 +17,8 @@ sparse-map behavior.
 
 All related versions share immutable domain metadata and one contiguous node
 pool. Read-only queries do not allocate nodes. Products preserve coordinate
-order, so non-commutative monoids are supported.
+order, so non-commutative monoids are supported. Nodes whose last parent or
+version reference disappears are recycled.
 
 ## Template Parameters
 
@@ -53,7 +54,8 @@ domain length. No tree node is allocated initially.
 | `Index right_bound()` | Returns the right endpoint. | $O(1)$ |
 | `const T& initial_value()` | Returns the uniform initial leaf value. | $O(1)$ |
 | `void reserve(size_t n)` | Reserves shared-pool space for `n` nodes. | $O(K)$ |
-| `size_t node_count()` | Returns total nodes allocated by the shared version family. | $O(1)$ |
+| `size_t node_count()` | Returns live nodes in the shared version family. | $O(1)$ |
+| `void release()` | Releases this root and resets the handle to the uniform initial version. | $O(F)$ |
 | `PersistentDynamicSegtree set(Index p, T x)` | Returns a version assigning `x` at `p`. | $O(\log U)$ |
 | `T get(Index p)` | Returns the value at `p`. | $O(\log U)$ |
 | `T operator[](Index p)` | Equivalent to `get(p)`. | $O(\log U)$ |
@@ -62,9 +64,10 @@ domain length. No tree node is allocated initially.
 | `Index max_right(Index l, F f)` | Finds the largest `r` for which `f(prod(l, r))` is true. | $O(\log U)$ |
 | `Index min_left(Index r, F f)` | Finds the smallest `l` for which `f(prod(l, r))` is true. | $O(\log U)$ |
 
-Here $K$ counts allocations made by every version sharing the pool. Each
-assignment allocates $O(\log U)$ nodes in the worst case. Copying a version is
-$O(1)$.
+Here $K$ is the number of live nodes and $F$ is the number freed by a release.
+Each assignment allocates $O(\log U)$ nodes in the worst case. Copying a version
+is $O(1)$. Destruction and assignment release roots automatically; freed slots
+are reused.
 
 For `max_right` and `min_left`, the identity must satisfy the predicate and the
 predicate must be monotone along searched products.
@@ -88,5 +91,6 @@ int main() {
     std::cout << base.all_prod() << "\n";    // 0
     std::cout << first.all_prod() << "\n";   // 7
     std::cout << second.all_prod() << "\n";  // 18
+    first.release();                         // second keeps shared nodes alive
 }
 ```

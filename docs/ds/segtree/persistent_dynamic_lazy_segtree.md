@@ -16,7 +16,8 @@ size-aware acted monoids, pass a real leaf value such as
 `RangeAddRangeSum<long long>::make(0)`, not the empty-product identity.
 
 All versions derived from one tree share a contiguous node pool and immutable
-domain metadata. Read-only queries allocate no nodes.
+domain metadata. Read-only queries allocate no nodes. Reference counting
+recycles nodes after their last parent or version handle is released.
 
 ## Template Parameters
 
@@ -51,7 +52,8 @@ allocated initially.
 | `Index right_bound()` | Returns the right endpoint. | $O(1)$ |
 | `const T& initial_value()` | Returns the uniform initial leaf. | $O(1)$ |
 | `void reserve(size_t n)` | Reserves shared-pool space for `n` nodes. | $O(K)$ |
-| `size_t node_count()` | Returns total nodes allocated across the shared version family. | $O(1)$ |
+| `size_t node_count()` | Returns live nodes in the shared version family. | $O(1)$ |
+| `void release()` | Releases this root and resets the handle to the uniform initial version. | $O(F)$ |
 | `PersistentDynamicLazySegtree set(Index p, T x)` | Returns a version assigning `x` at `p`. | $O(\log U)$ |
 | `T get(Index p)` | Returns the value at `p`. | $O(\log U)$ |
 | `T operator[](Index p)` | Equivalent to `get(p)`. | $O(\log U)$ |
@@ -62,9 +64,10 @@ allocated initially.
 | `Index max_right(Index l, G g)` | Finds the largest valid right boundary. | $O(\log U)$ |
 | `Index min_left(Index r, G g)` | Finds the smallest valid left boundary. | $O(\log U)$ |
 
-Here $K$ counts allocations made by every version sharing the pool. Each new
-update allocates $O(\log U)$ nodes in the worst case. Copying a version is
-$O(1)$.
+Here $K$ is the number of live nodes and $F$ is the number freed by a release.
+Each update allocates $O(\log U)$ nodes in the worst case. Copying a version is
+$O(1)$. Destruction and assignment release roots automatically, and freed slots
+are reused.
 
 ## Example
 
@@ -85,5 +88,6 @@ int main() {
     std::cout << base.all_prod().sum << "\n";    // 0
     std::cout << first.all_prod().sum << "\n";   // 150
     std::cout << second.all_prod().sum << "\n";  // 245
+    first.release();                             // drop an unneeded root early
 }
 ```

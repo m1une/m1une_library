@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "../../monoid/concept.hpp"
+#include "persistent_node_pool.hpp"
 
 namespace m1une {
 namespace ds {
@@ -19,34 +20,32 @@ struct PersistentDualSegtree {
    private:
     struct Node {
         T val;
-        int l, r;
+        int left, right;
+        int references;
         bool has_lazy;
 
-        Node() : val(Monoid::id()), l(0), r(0), has_lazy(false) {}
-        explicit Node(T value) : val(std::move(value)), l(0), r(0), has_lazy(false) {}
-        Node(int left, int right) : val(Monoid::id()), l(left), r(right), has_lazy(false) {}
+        Node() : val(Monoid::id()), left(0), right(0), references(0), has_lazy(false) {}
+        explicit Node(T value) : val(std::move(value)), left(0), right(0), references(0), has_lazy(false) {}
+        Node(int left_child, int right_child)
+            : val(Monoid::id()), left(left_child), right(right_child), references(0), has_lazy(false) {}
     };
+
+    using Pool = detail::PersistentNodePool<Node>;
 
     int _n;
     int _root;
-    std::shared_ptr<std::vector<Node>> _pool;
+    std::shared_ptr<Pool> _pool;
 
-    explicit PersistentDualSegtree(int n, int root, std::shared_ptr<std::vector<Node>> pool)
-        : _n(n), _root(root), _pool(std::move(pool)) {}
-
-    int new_node(const Node& node) const {
-        _pool->push_back(node);
-        return int(_pool->size()) - 1;
+    explicit PersistentDualSegtree(int n, int root, std::shared_ptr<Pool> pool)
+        : _n(n), _root(root), _pool(std::move(pool)) {
+        _pool->retain(_root);
     }
 
-    int new_node(Node&& node) const {
-        _pool->push_back(std::move(node));
-        return int(_pool->size()) - 1;
-    }
+    int new_node(const Node& node) const { return _pool->emplace(node); }
 
-    int clone_node(int t) const {
-        return new_node((*_pool)[t]);
-    }
+    int new_node(Node&& node) const { return _pool->emplace(std::move(node)); }
+
+    int clone_node(int t) const { return _pool->clone(t); }
 
     template <typename U>
     static T make_value(const U& value, int index) {
@@ -106,11 +105,11 @@ struct PersistentDualSegtree {
         Node node = (*_pool)[t];
         if (!node.has_lazy || r - l == 1) return;
         int m = (l + r) >> 1;
-        int left = all_apply_clone(node.l, node.val, l, m);
-        int right = all_apply_clone(node.r, node.val, m, r);
+        int left = all_apply_clone(node.left, node.val, l, m);
+        int right = all_apply_clone(node.right, node.val, m, r);
         Node& target = (*_pool)[t];
-        target.l = left;
-        target.r = right;
+        _pool->replace(target.left, left);
+        _pool->replace(target.right, right);
         target.val = Monoid::id();
         target.has_lazy = false;
     }
@@ -126,9 +125,11 @@ struct PersistentDualSegtree {
         push(t, l, r);
         int m = (l + r) >> 1;
         if (p < m) {
-            (*_pool)[t].l = set_node((*_pool)[t].l, l, m, p, std::move(value));
+            int child = set_node((*_pool)[t].left, l, m, p, std::move(value));
+            _pool->replace((*_pool)[t].left, child);
         } else {
-            (*_pool)[t].r = set_node((*_pool)[t].r, m, r, p, std::move(value));
+            int child = set_node((*_pool)[t].right, m, r, p, std::move(value));
+            _pool->replace((*_pool)[t].right, child);
         }
         return t;
     }
@@ -142,8 +143,10 @@ struct PersistentDualSegtree {
         }
         push(t, l, r);
         int m = (l + r) >> 1;
-        (*_pool)[t].l = apply_node((*_pool)[t].l, l, m, ql, qr, x);
-        (*_pool)[t].r = apply_node((*_pool)[t].r, m, r, ql, qr, x);
+        int left = apply_node((*_pool)[t].left, l, m, ql, qr, x);
+        int right = apply_node((*_pool)[t].right, m, r, ql, qr, x);
+        _pool->replace((*_pool)[t].left, left);
+        _pool->replace((*_pool)[t].right, right);
         return t;
     }
 
@@ -151,8 +154,8 @@ struct PersistentDualSegtree {
         const Node& node = (*_pool)[t];
         if (r - l == 1) return Monoid::op(inherited, node.val);
         int m = (l + r) >> 1;
-        if (p < m) return get_node(node.l, l, m, p, compose_for_child(inherited, node));
-        return get_node(node.r, m, r, p, compose_for_child(inherited, node));
+        if (p < m) return get_node(node.left, l, m, p, compose_for_child(inherited, node));
+        return get_node(node.right, m, r, p, compose_for_child(inherited, node));
     }
 
     void collect_node(int t, int l, int r, int ql, int qr, const T& inherited, std::vector<T>& res) const {
@@ -164,32 +167,30 @@ struct PersistentDualSegtree {
         }
         int m = (l + r) >> 1;
         T next = compose_for_child(inherited, node);
-        collect_node(node.l, l, m, ql, qr, next, res);
-        collect_node(node.r, m, r, ql, qr, next, res);
+        collect_node(node.left, l, m, ql, qr, next, res);
+        collect_node(node.right, m, r, ql, qr, next, res);
     }
 
    public:
     PersistentDualSegtree() : PersistentDualSegtree(0) {}
 
-    explicit PersistentDualSegtree(int n)
-        : _n(n), _root(0), _pool(std::make_shared<std::vector<Node>>()) {
+    explicit PersistentDualSegtree(int n) : _n(n), _root(0), _pool(std::make_shared<Pool>()) {
         assert(0 <= n);
-        _pool->push_back(Node());
         if (_n > 0) _root = build(0, _n, std::vector<T>(_n, Monoid::id()));
+        _pool->retain(_root);
     }
 
     explicit PersistentDualSegtree(const std::vector<T>& v)
-        : _n(int(v.size())), _root(0), _pool(std::make_shared<std::vector<Node>>()) {
-        _pool->reserve(v.size() * 2 + 1);
-        _pool->push_back(Node());
+        : _n(int(v.size())), _root(0), _pool(std::make_shared<Pool>()) {
+        _pool->reserve(v.size() * 2);
         if (_n > 0) _root = build(0, _n, v);
+        _pool->retain(_root);
     }
 
-    explicit PersistentDualSegtree(std::vector<T>&& v)
-        : _n(int(v.size())), _root(0), _pool(std::make_shared<std::vector<Node>>()) {
-        _pool->reserve(v.size() * 2 + 1);
-        _pool->push_back(Node());
+    explicit PersistentDualSegtree(std::vector<T>&& v) : _n(int(v.size())), _root(0), _pool(std::make_shared<Pool>()) {
+        _pool->reserve(v.size() * 2);
         if (_n > 0) _root = build(0, _n, v);
+        _pool->retain(_root);
     }
 
     template <typename U>
@@ -197,19 +198,55 @@ struct PersistentDualSegtree {
                 (requires(U x) { Monoid::make(x); } || requires(U x, int i) { Monoid::make(x, i); } ||
                  std::convertible_to<U, T>)
     explicit PersistentDualSegtree(const std::vector<U>& v)
-        : _n(int(v.size())), _root(0), _pool(std::make_shared<std::vector<Node>>()) {
-        _pool->reserve(v.size() * 2 + 1);
-        _pool->push_back(Node());
+        : _n(int(v.size())), _root(0), _pool(std::make_shared<Pool>()) {
+        _pool->reserve(v.size() * 2);
         if (_n > 0) _root = build_from_values(0, _n, v);
+        _pool->retain(_root);
     }
 
-    int size() const {
-        return _n;
+    PersistentDualSegtree(const PersistentDualSegtree& other) : _n(other._n), _root(other._root), _pool(other._pool) {
+        if (_pool) _pool->retain(_root);
+    }
+    PersistentDualSegtree(PersistentDualSegtree&& other) noexcept
+        : _n(other._n), _root(other._root), _pool(std::move(other._pool)) {
+        other._n = 0;
+        other._root = 0;
+    }
+    PersistentDualSegtree& operator=(const PersistentDualSegtree& other) {
+        if (this == &other) return *this;
+        if (other._pool) other._pool->retain(other._root);
+        if (_pool) _pool->release(_root);
+        _n = other._n;
+        _root = other._root;
+        _pool = other._pool;
+        return *this;
+    }
+    PersistentDualSegtree& operator=(PersistentDualSegtree&& other) noexcept {
+        if (this == &other) return *this;
+        if (_pool) _pool->release(_root);
+        _n = other._n;
+        _root = other._root;
+        _pool = std::move(other._pool);
+        other._n = 0;
+        other._root = 0;
+        return *this;
+    }
+    ~PersistentDualSegtree() {
+        if (_pool) _pool->release(_root);
     }
 
-    bool empty() const {
-        return _n == 0;
+    int size() const { return _n; }
+
+    bool empty() const { return _n == 0; }
+
+    void release() {
+        if (_pool) _pool->release(_root);
+        _pool = std::make_shared<Pool>();
+        _root = 0;
+        _n = 0;
     }
+
+    std::size_t node_count() const { return _pool ? _pool->size() : 0; }
 
     PersistentDualSegtree set(int p, T x) const {
         assert(0 <= p && p < _n);
@@ -221,9 +258,7 @@ struct PersistentDualSegtree {
         return get_node(_root, 0, _n, p, Monoid::id());
     }
 
-    T operator[](int p) const {
-        return get(p);
-    }
+    T operator[](int p) const { return get(p); }
 
     PersistentDualSegtree apply(int p, const T& x) const {
         assert(0 <= p && p < _n);
@@ -236,9 +271,7 @@ struct PersistentDualSegtree {
         return PersistentDualSegtree(_n, apply_node(_root, 0, _n, l, r, x), _pool);
     }
 
-    std::vector<T> to_vector() const {
-        return to_vector(0, _n);
-    }
+    std::vector<T> to_vector() const { return to_vector(0, _n); }
 
     std::vector<T> to_vector(int l, int r) const {
         assert(0 <= l && l <= r && r <= _n);
