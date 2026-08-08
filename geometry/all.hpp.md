@@ -14,6 +14,9 @@ data:
     path: geometry/circle.hpp
     title: Circles
   - icon: ':heavy_check_mark:'
+    path: geometry/circle_coverage_areas.hpp
+    title: Circle Coverage Areas
+  - icon: ':heavy_check_mark:'
     path: geometry/circle_union_area.hpp
     title: Area of Union of Circles
   - icon: ':heavy_check_mark:'
@@ -146,6 +149,8 @@ data:
 
     #include "circle.hpp"
 
+    #include "circle_coverage_areas.hpp"
+
     #include "circle_union_area.hpp"
 
     #include "closest_pair.hpp"
@@ -204,6 +209,7 @@ data:
   - geometry/circle.hpp
   - geometry/ray.hpp
   - geometry/line.hpp
+  - geometry/circle_coverage_areas.hpp
   - geometry/circle_union_area.hpp
   - geometry/closest_pair.hpp
   - geometry/convex_decomposition.hpp
@@ -239,7 +245,7 @@ data:
   isVerificationFile: false
   path: geometry/all.hpp
   requiredBy: []
-  timestamp: '2026-08-08 16:52:39+09:00'
+  timestamp: '2026-08-08 17:03:52+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/centroid.test.cpp
@@ -258,6 +264,7 @@ title: Geometry Bundle
 | Header | Contents |
 | --- | --- |
 | `geometry/angle_sort.hpp` | Atan-free counterclockwise angle sorting around an arbitrary origin. |
+| `geometry/circle_coverage_areas.hpp` | Areas covered by exactly $k$ circles for every $k$ in $O(N^2\log N)$. |
 | `geometry/circle_union_area.hpp` | Union area of circles in $O(N^2\log N)$. |
 | `geometry/point.hpp` | Points, vectors, dot/cross products, exact orientation, distance, centroid, and rotation. |
 | `geometry/closest_pair.hpp` | Euclidean closest pair with original indices in $O(N\log N)$. |

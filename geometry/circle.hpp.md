@@ -15,6 +15,9 @@ data:
     path: geometry/all.hpp
     title: Geometry Bundle
   - icon: ':heavy_check_mark:'
+    path: geometry/circle_coverage_areas.hpp
+    title: Circle Coverage Areas
+  - icon: ':heavy_check_mark:'
     path: geometry/circle_union_area.hpp
     title: Area of Union of Circles
   - icon: ':heavy_check_mark:'
@@ -33,6 +36,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/circle_common_tangents.test.cpp
     title: verify/geometry/circle_common_tangents.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/circle_coverage_areas.test.cpp
+    title: verify/geometry/circle_coverage_areas.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/circle_line_intersection.test.cpp
     title: verify/geometry/circle_line_intersection.test.cpp
@@ -1159,6 +1165,7 @@ data:
   isVerificationFile: false
   path: geometry/circle.hpp
   requiredBy:
+  - geometry/circle_coverage_areas.hpp
   - geometry/all.hpp
   - geometry/circle_union_area.hpp
   - geometry/minimum_enclosing_circle.hpp
@@ -1179,6 +1186,7 @@ data:
   - verify/geometry/circle_polygon_intersection_area.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/circle_tangent_points.test.cpp
+  - verify/geometry/circle_coverage_areas.test.cpp
   - verify/geometry/circle_common_tangents.test.cpp
 documentation_of: geometry/circle.hpp
 layout: document

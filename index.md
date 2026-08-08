@@ -519,6 +519,9 @@ data:
       path: geometry/circle.hpp
       title: Circles
     - icon: ':heavy_check_mark:'
+      path: geometry/circle_coverage_areas.hpp
+      title: Circle Coverage Areas
+    - icon: ':heavy_check_mark:'
       path: geometry/circle_union_area.hpp
       title: Area of Union of Circles
     - icon: ':heavy_check_mark:'
@@ -1688,6 +1691,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/geometry/circle_common_tangents.test.cpp
       title: verify/geometry/circle_common_tangents.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/geometry/circle_coverage_areas.test.cpp
+      title: verify/geometry/circle_coverage_areas.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/geometry/circle_line_intersection.test.cpp
       title: verify/geometry/circle_line_intersection.test.cpp

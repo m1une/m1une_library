@@ -17,6 +17,9 @@ data:
     path: geometry/circle.hpp
     title: Circles
   - icon: ':heavy_check_mark:'
+    path: geometry/circle_coverage_areas.hpp
+    title: Circle Coverage Areas
+  - icon: ':heavy_check_mark:'
     path: geometry/circle_union_area.hpp
     title: Area of Union of Circles
   - icon: ':heavy_check_mark:'
@@ -223,6 +226,7 @@ data:
   - geometry/circle.hpp
   - geometry/ray.hpp
   - geometry/line.hpp
+  - geometry/circle_coverage_areas.hpp
   - geometry/circle_union_area.hpp
   - geometry/closest_pair.hpp
   - geometry/convex_decomposition.hpp
@@ -259,7 +263,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/geometry_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-08-08 16:52:39+09:00'
+  timestamp: '2026-08-08 17:03:52+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/geometry_algorithms.test.cpp

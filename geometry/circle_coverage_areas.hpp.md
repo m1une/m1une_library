@@ -25,9 +25,6 @@ data:
     path: verify/geometry/circle_coverage_areas.test.cpp
     title: verify/geometry/circle_coverage_areas.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/geometry/circle_union_area.test.cpp
-    title: verify/geometry/circle_union_area.test.cpp
-  - icon: ':heavy_check_mark:'
     path: verify/geometry/geometry_algorithms.test.cpp
     title: verify/geometry/geometry_algorithms.test.cpp
   _isVerificationFailed: false
@@ -35,7 +32,7 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"geometry/circle_union_area.hpp\"\n\n\n\n#line 1 \"geometry/circle.hpp\"\
+  bundledCode: "#line 1 \"geometry/circle_coverage_areas.hpp\"\n\n\n\n#line 1 \"geometry/circle.hpp\"\
     \n\n\n\n#include <algorithm>\n#include <cassert>\n#include <cmath>\n#include <cstddef>\n\
     #include <numbers>\n#include <optional>\n#include <type_traits>\n#include <vector>\n\
     \n#line 1 \"geometry/ray.hpp\"\n\n\n\n#line 7 \"geometry/ray.hpp\"\n\n#line 1\
@@ -750,27 +747,29 @@ data:
     \ + 1) % polygon.size()]) - center;\n        result += circle_detail::segment_disk_signed_area(\n\
     \            first,\n            second,\n            radius,\n            eps\n\
     \        );\n    }\n    return std::fabs(result);\n}\n\n}  // namespace geometry\n\
-    }  // namespace m1une\n\n\n#line 5 \"geometry/circle_union_area.hpp\"\n\n#line\
-    \ 10 \"geometry/circle_union_area.hpp\"\n#include <utility>\n#line 12 \"geometry/circle_union_area.hpp\"\
-    \n\nnamespace m1une {\nnamespace geometry {\n\nnamespace circle_union_area_detail\
-    \ {\n\ninline long double arc_integral(\n    long double center_x,\n    long double\
-    \ center_y,\n    long double radius,\n    long double first_angle,\n    long double\
-    \ second_angle\n) {\n    return (\n        radius * center_x *\n            (std::sin(second_angle)\
-    \ - std::sin(first_angle)) -\n        radius * center_y *\n            (std::cos(second_angle)\
-    \ - std::cos(first_angle)) +\n        radius * radius * (second_angle - first_angle)\n\
-    \    ) / 2.0L;\n}\n\n}  // namespace circle_union_area_detail\n\ntemplate <Coordinate\
-    \ T>\nlong double circle_union_area(\n    const std::vector<Circle<T>>& circles,\n\
-    \    long double eps = 1e-12L\n) {\n    assert(eps >= 0.0L);\n    const long double\
-    \ pi = std::numbers::pi_v<long double>;\n    const long double full_angle = 2.0L\
-    \ * pi;\n    long double area = 0.0L;\n\n    for (int index = 0; index < int(circles.size());\
-    \ ++index) {\n        const Circle<T>& circle = circles[index];\n        assert(circle.radius\
-    \ >= 0);\n        long double radius = static_cast<long double>(circle.radius);\n\
-    \        if (radius == 0.0L) continue;\n\n        long double center_x = static_cast<long\
-    \ double>(circle.center.x);\n        long double center_y = static_cast<long double>(circle.center.y);\n\
-    \        bool covered = false;\n        std::vector<std::pair<long double, long\
-    \ double>> intervals;\n        intervals.reserve(2 * circles.size());\n\n    \
-    \    for (int other_index = 0;\n             other_index < int(circles.size());\n\
-    \             ++other_index) {\n            if (other_index == index) continue;\n\
+    }  // namespace m1une\n\n\n#line 5 \"geometry/circle_coverage_areas.hpp\"\n\n\
+    #line 10 \"geometry/circle_coverage_areas.hpp\"\n#include <utility>\n#line 12\
+    \ \"geometry/circle_coverage_areas.hpp\"\n\nnamespace m1une {\nnamespace geometry\
+    \ {\n\nnamespace circle_coverage_areas_detail {\n\ninline long double arc_integral(\n\
+    \    long double center_x,\n    long double center_y,\n    long double radius,\n\
+    \    long double first_angle,\n    long double second_angle\n) {\n    return (\n\
+    \        radius * center_x *\n            (std::sin(second_angle) - std::sin(first_angle))\
+    \ -\n        radius * center_y *\n            (std::cos(second_angle) - std::cos(first_angle))\
+    \ +\n        radius * radius * (second_angle - first_angle)\n    ) / 2.0L;\n}\n\
+    \n}  // namespace circle_coverage_areas_detail\n\ntemplate <Coordinate T>\nstd::vector<long\
+    \ double> circle_coverage_areas(\n    const std::vector<Circle<T>>& circles,\n\
+    \    long double eps = 1e-12L\n) {\n    assert(eps >= 0.0L);\n    const int count\
+    \ = int(circles.size());\n    const long double full_angle =\n        2.0L * std::numbers::pi_v<long\
+    \ double>;\n    std::vector<long double> at_least(count + 2, 0.0L);\n\n    for\
+    \ (int index = 0; index < count; ++index) {\n        const Circle<T>& circle =\
+    \ circles[index];\n        assert(circle.radius >= 0);\n        long double radius\
+    \ = static_cast<long double>(circle.radius);\n        if (radius == 0.0L) continue;\n\
+    \n        long double center_x = static_cast<long double>(circle.center.x);\n\
+    \        long double center_y = static_cast<long double>(circle.center.y);\n \
+    \       int coverage = 0;\n        int multiplicity = 1;\n        bool duplicate\
+    \ = false;\n        std::vector<std::pair<long double, int>> events;\n       \
+    \ events.reserve(2 * circles.size());\n\n        for (int other_index = 0; other_index\
+    \ < count; ++other_index) {\n            if (other_index == index) continue;\n\
     \            const Circle<T>& other = circles[other_index];\n            assert(other.radius\
     \ >= 0);\n            long double other_radius =\n                static_cast<long\
     \ double>(other.radius);\n            if (other_radius == 0.0L) continue;\n\n\
@@ -782,14 +781,14 @@ data:
     \ center_distance,\n                radius,\n                other_radius\n  \
     \          });\n\n            if (\n                center_distance <= tolerance\
     \ &&\n                std::fabs(radius - other_radius) <= tolerance\n        \
-    \    ) {\n                if (other_index < index) covered = true;\n         \
-    \       continue;\n            }\n            if (\n                radius <=\
-    \ other_radius &&\n                center_distance + radius <= other_radius +\
-    \ tolerance\n            ) {\n                covered = true;\n              \
-    \  break;\n            }\n            if (\n                center_distance >=\
-    \ radius + other_radius - tolerance ||\n                center_distance <=\n \
-    \                   std::fabs(radius - other_radius) + tolerance\n           \
-    \ ) {\n                continue;\n            }\n\n            long double direction\
+    \    ) {\n                if (other_index < index) duplicate = true;\n       \
+    \         multiplicity++;\n                continue;\n            }\n        \
+    \    if (\n                radius <= other_radius &&\n                center_distance\
+    \ + radius <= other_radius + tolerance\n            ) {\n                coverage++;\n\
+    \                continue;\n            }\n            if (\n                center_distance\
+    \ >= radius + other_radius - tolerance ||\n                center_distance <=\n\
+    \                    std::fabs(radius - other_radius) + tolerance\n          \
+    \  ) {\n                continue;\n            }\n\n            long double direction\
     \ =\n                std::atan2(difference_y, difference_x);\n            long\
     \ double cosine = std::clamp(\n                (\n                    center_distance\
     \ * center_distance + radius * radius -\n                    other_radius * other_radius\n\
@@ -797,44 +796,55 @@ data:
     \                1.0L\n            );\n            long double half_width = std::acos(cosine);\n\
     \            long double left = std::fmod(\n                direction - half_width,\n\
     \                full_angle\n            );\n            if (left < 0.0L) left\
-    \ += full_angle;\n            long double right = left + 2.0L * half_width;\n\
-    \            if (right <= full_angle) {\n                intervals.emplace_back(left,\
-    \ right);\n            } else {\n                intervals.emplace_back(left,\
-    \ full_angle);\n                intervals.emplace_back(0.0L, right - full_angle);\n\
-    \            }\n        }\n        if (covered) continue;\n\n        std::sort(intervals.begin(),\
-    \ intervals.end());\n        long double exposed_begin = 0.0L;\n        for (const\
-    \ auto& [left, right] : intervals) {\n            if (exposed_begin < left) {\n\
-    \                area += circle_union_area_detail::arc_integral(\n           \
-    \         center_x,\n                    center_y,\n                    radius,\n\
-    \                    exposed_begin,\n                    left\n              \
-    \  );\n            }\n            exposed_begin = std::max(exposed_begin, right);\n\
-    \        }\n        if (exposed_begin < full_angle) {\n            area += circle_union_area_detail::arc_integral(\n\
-    \                center_x,\n                center_y,\n                radius,\n\
-    \                exposed_begin,\n                full_angle\n            );\n\
-    \        }\n    }\n    return std::max(0.0L, area);\n}\n\n}  // namespace geometry\n\
-    }  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_GEOMETRY_CIRCLE_UNION_AREA_HPP\n#define M1UNE_GEOMETRY_CIRCLE_UNION_AREA_HPP\
+    \ += full_angle;\n            long double right = std::fmod(\n               \
+    \ direction + half_width,\n                full_angle\n            );\n      \
+    \      if (right < 0.0L) right += full_angle;\n            if (left <= right)\
+    \ {\n                events.emplace_back(left, 1);\n                events.emplace_back(right,\
+    \ -1);\n            } else {\n                coverage++;\n                events.emplace_back(right,\
+    \ -1);\n                events.emplace_back(left, 1);\n            }\n       \
+    \ }\n        if (duplicate) continue;\n\n        std::sort(events.begin(), events.end());\n\
+    \        long double previous_angle = 0.0L;\n        auto add_arc = [&](long double\
+    \ first_angle, long double second_angle) {\n            long double integral =\n\
+    \                circle_coverage_areas_detail::arc_integral(\n               \
+    \     center_x,\n                    center_y,\n                    radius,\n\
+    \                    first_angle,\n                    second_angle\n        \
+    \        );\n            for (int offset = 1; offset <= multiplicity; ++offset)\
+    \ {\n                at_least[coverage + offset] += integral;\n            }\n\
+    \        };\n        int event_index = 0;\n        while (event_index < int(events.size()))\
+    \ {\n            long double angle = events[event_index].first;\n            add_arc(previous_angle,\
+    \ angle);\n            int next = event_index;\n            while (\n        \
+    \        next < int(events.size()) &&\n                events[next].first == angle\n\
+    \            ) {\n                coverage += events[next].second;\n         \
+    \       next++;\n            }\n            previous_angle = angle;\n        \
+    \    event_index = next;\n        }\n        add_arc(previous_angle, full_angle);\n\
+    \    }\n\n    std::vector<long double> exact(count + 1, 0.0L);\n    for (int coverage\
+    \ = 1; coverage <= count; ++coverage) {\n        exact[coverage] = std::max(\n\
+    \            0.0L,\n            at_least[coverage] - at_least[coverage + 1]\n\
+    \        );\n    }\n    return exact;\n}\n\n}  // namespace geometry\n}  // namespace\
+    \ m1une\n\n\n"
+  code: "#ifndef M1UNE_GEOMETRY_CIRCLE_COVERAGE_AREAS_HPP\n#define M1UNE_GEOMETRY_CIRCLE_COVERAGE_AREAS_HPP\
     \ 1\n\n#include \"circle.hpp\"\n\n#include <algorithm>\n#include <cassert>\n#include\
     \ <cmath>\n#include <numbers>\n#include <utility>\n#include <vector>\n\nnamespace\
-    \ m1une {\nnamespace geometry {\n\nnamespace circle_union_area_detail {\n\ninline\
-    \ long double arc_integral(\n    long double center_x,\n    long double center_y,\n\
+    \ m1une {\nnamespace geometry {\n\nnamespace circle_coverage_areas_detail {\n\n\
+    inline long double arc_integral(\n    long double center_x,\n    long double center_y,\n\
     \    long double radius,\n    long double first_angle,\n    long double second_angle\n\
     ) {\n    return (\n        radius * center_x *\n            (std::sin(second_angle)\
     \ - std::sin(first_angle)) -\n        radius * center_y *\n            (std::cos(second_angle)\
     \ - std::cos(first_angle)) +\n        radius * radius * (second_angle - first_angle)\n\
-    \    ) / 2.0L;\n}\n\n}  // namespace circle_union_area_detail\n\ntemplate <Coordinate\
-    \ T>\nlong double circle_union_area(\n    const std::vector<Circle<T>>& circles,\n\
-    \    long double eps = 1e-12L\n) {\n    assert(eps >= 0.0L);\n    const long double\
-    \ pi = std::numbers::pi_v<long double>;\n    const long double full_angle = 2.0L\
-    \ * pi;\n    long double area = 0.0L;\n\n    for (int index = 0; index < int(circles.size());\
-    \ ++index) {\n        const Circle<T>& circle = circles[index];\n        assert(circle.radius\
-    \ >= 0);\n        long double radius = static_cast<long double>(circle.radius);\n\
-    \        if (radius == 0.0L) continue;\n\n        long double center_x = static_cast<long\
+    \    ) / 2.0L;\n}\n\n}  // namespace circle_coverage_areas_detail\n\ntemplate\
+    \ <Coordinate T>\nstd::vector<long double> circle_coverage_areas(\n    const std::vector<Circle<T>>&\
+    \ circles,\n    long double eps = 1e-12L\n) {\n    assert(eps >= 0.0L);\n    const\
+    \ int count = int(circles.size());\n    const long double full_angle =\n     \
+    \   2.0L * std::numbers::pi_v<long double>;\n    std::vector<long double> at_least(count\
+    \ + 2, 0.0L);\n\n    for (int index = 0; index < count; ++index) {\n        const\
+    \ Circle<T>& circle = circles[index];\n        assert(circle.radius >= 0);\n \
+    \       long double radius = static_cast<long double>(circle.radius);\n      \
+    \  if (radius == 0.0L) continue;\n\n        long double center_x = static_cast<long\
     \ double>(circle.center.x);\n        long double center_y = static_cast<long double>(circle.center.y);\n\
-    \        bool covered = false;\n        std::vector<std::pair<long double, long\
-    \ double>> intervals;\n        intervals.reserve(2 * circles.size());\n\n    \
-    \    for (int other_index = 0;\n             other_index < int(circles.size());\n\
-    \             ++other_index) {\n            if (other_index == index) continue;\n\
+    \        int coverage = 0;\n        int multiplicity = 1;\n        bool duplicate\
+    \ = false;\n        std::vector<std::pair<long double, int>> events;\n       \
+    \ events.reserve(2 * circles.size());\n\n        for (int other_index = 0; other_index\
+    \ < count; ++other_index) {\n            if (other_index == index) continue;\n\
     \            const Circle<T>& other = circles[other_index];\n            assert(other.radius\
     \ >= 0);\n            long double other_radius =\n                static_cast<long\
     \ double>(other.radius);\n            if (other_radius == 0.0L) continue;\n\n\
@@ -846,14 +856,14 @@ data:
     \ center_distance,\n                radius,\n                other_radius\n  \
     \          });\n\n            if (\n                center_distance <= tolerance\
     \ &&\n                std::fabs(radius - other_radius) <= tolerance\n        \
-    \    ) {\n                if (other_index < index) covered = true;\n         \
-    \       continue;\n            }\n            if (\n                radius <=\
-    \ other_radius &&\n                center_distance + radius <= other_radius +\
-    \ tolerance\n            ) {\n                covered = true;\n              \
-    \  break;\n            }\n            if (\n                center_distance >=\
-    \ radius + other_radius - tolerance ||\n                center_distance <=\n \
-    \                   std::fabs(radius - other_radius) + tolerance\n           \
-    \ ) {\n                continue;\n            }\n\n            long double direction\
+    \    ) {\n                if (other_index < index) duplicate = true;\n       \
+    \         multiplicity++;\n                continue;\n            }\n        \
+    \    if (\n                radius <= other_radius &&\n                center_distance\
+    \ + radius <= other_radius + tolerance\n            ) {\n                coverage++;\n\
+    \                continue;\n            }\n            if (\n                center_distance\
+    \ >= radius + other_radius - tolerance ||\n                center_distance <=\n\
+    \                    std::fabs(radius - other_radius) + tolerance\n          \
+    \  ) {\n                continue;\n            }\n\n            long double direction\
     \ =\n                std::atan2(difference_y, difference_x);\n            long\
     \ double cosine = std::clamp(\n                (\n                    center_distance\
     \ * center_distance + radius * radius -\n                    other_radius * other_radius\n\
@@ -861,58 +871,67 @@ data:
     \                1.0L\n            );\n            long double half_width = std::acos(cosine);\n\
     \            long double left = std::fmod(\n                direction - half_width,\n\
     \                full_angle\n            );\n            if (left < 0.0L) left\
-    \ += full_angle;\n            long double right = left + 2.0L * half_width;\n\
-    \            if (right <= full_angle) {\n                intervals.emplace_back(left,\
-    \ right);\n            } else {\n                intervals.emplace_back(left,\
-    \ full_angle);\n                intervals.emplace_back(0.0L, right - full_angle);\n\
-    \            }\n        }\n        if (covered) continue;\n\n        std::sort(intervals.begin(),\
-    \ intervals.end());\n        long double exposed_begin = 0.0L;\n        for (const\
-    \ auto& [left, right] : intervals) {\n            if (exposed_begin < left) {\n\
-    \                area += circle_union_area_detail::arc_integral(\n           \
-    \         center_x,\n                    center_y,\n                    radius,\n\
-    \                    exposed_begin,\n                    left\n              \
-    \  );\n            }\n            exposed_begin = std::max(exposed_begin, right);\n\
-    \        }\n        if (exposed_begin < full_angle) {\n            area += circle_union_area_detail::arc_integral(\n\
-    \                center_x,\n                center_y,\n                radius,\n\
-    \                exposed_begin,\n                full_angle\n            );\n\
-    \        }\n    }\n    return std::max(0.0L, area);\n}\n\n}  // namespace geometry\n\
-    }  // namespace m1une\n\n#endif  // M1UNE_GEOMETRY_CIRCLE_UNION_AREA_HPP\n"
+    \ += full_angle;\n            long double right = std::fmod(\n               \
+    \ direction + half_width,\n                full_angle\n            );\n      \
+    \      if (right < 0.0L) right += full_angle;\n            if (left <= right)\
+    \ {\n                events.emplace_back(left, 1);\n                events.emplace_back(right,\
+    \ -1);\n            } else {\n                coverage++;\n                events.emplace_back(right,\
+    \ -1);\n                events.emplace_back(left, 1);\n            }\n       \
+    \ }\n        if (duplicate) continue;\n\n        std::sort(events.begin(), events.end());\n\
+    \        long double previous_angle = 0.0L;\n        auto add_arc = [&](long double\
+    \ first_angle, long double second_angle) {\n            long double integral =\n\
+    \                circle_coverage_areas_detail::arc_integral(\n               \
+    \     center_x,\n                    center_y,\n                    radius,\n\
+    \                    first_angle,\n                    second_angle\n        \
+    \        );\n            for (int offset = 1; offset <= multiplicity; ++offset)\
+    \ {\n                at_least[coverage + offset] += integral;\n            }\n\
+    \        };\n        int event_index = 0;\n        while (event_index < int(events.size()))\
+    \ {\n            long double angle = events[event_index].first;\n            add_arc(previous_angle,\
+    \ angle);\n            int next = event_index;\n            while (\n        \
+    \        next < int(events.size()) &&\n                events[next].first == angle\n\
+    \            ) {\n                coverage += events[next].second;\n         \
+    \       next++;\n            }\n            previous_angle = angle;\n        \
+    \    event_index = next;\n        }\n        add_arc(previous_angle, full_angle);\n\
+    \    }\n\n    std::vector<long double> exact(count + 1, 0.0L);\n    for (int coverage\
+    \ = 1; coverage <= count; ++coverage) {\n        exact[coverage] = std::max(\n\
+    \            0.0L,\n            at_least[coverage] - at_least[coverage + 1]\n\
+    \        );\n    }\n    return exact;\n}\n\n}  // namespace geometry\n}  // namespace\
+    \ m1une\n\n#endif  // M1UNE_GEOMETRY_CIRCLE_COVERAGE_AREAS_HPP\n"
   dependsOn:
   - geometry/circle.hpp
   - geometry/ray.hpp
   - geometry/line.hpp
   - geometry/point.hpp
   isVerificationFile: false
-  path: geometry/circle_union_area.hpp
+  path: geometry/circle_coverage_areas.hpp
   requiredBy:
   - geometry/all.hpp
-  timestamp: '2026-08-08 16:52:39+09:00'
+  timestamp: '2026-08-08 17:03:52+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/centroid.test.cpp
-  - verify/geometry/circle_union_area.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/circle_coverage_areas.test.cpp
-documentation_of: geometry/circle_union_area.hpp
+documentation_of: geometry/circle_coverage_areas.hpp
 layout: document
-title: Area of Union of Circles
+title: Circle Coverage Areas
 ---
 
 ## Overview
 
-`circle_union_area` returns the area covered by at least one closed disk.
-Overlaps are counted once. Circles may be disjoint, tangent, nested, or
-coincident, and radius-zero circles contribute no area.
+`circle_coverage_areas` calculates the area covered by exactly $k$ closed disks
+for every $k$. Circles may be disjoint, tangent, nested, or coincident, and
+radius-zero circles do not affect any area.
 
-For each circle, the implementation finds and merges the angular intervals of
-its circumference covered by other disks. It integrates the remaining exposed
-arcs using Green's theorem.
+The implementation sweeps the intersection angles around every circumference.
+Each arc is assigned its coverage multiplicity, then integrated with Green's
+theorem.
 
 ## Interface
 
 ```cpp
 template <Coordinate T>
-long double circle_union_area(
+std::vector<long double> circle_coverage_areas(
     const std::vector<Circle<T>>& circles,
     long double eps = 1e-12L
 );
@@ -920,16 +939,17 @@ long double circle_union_area(
 
 | Function | Complexity | Description |
 | --- | --- | --- |
-| `circle_union_area(circles, eps)` | $O(N^2\log N)$ time and $O(N)$ auxiliary memory | Returns the union area without modifying the input. |
+| `circle_coverage_areas(circles, eps)` | $O(N^2\log N)$ time and $O(N)$ auxiliary memory besides the result | Returns a vector `area` of size `N + 1`, where `area[k]` is covered by exactly `k` circles. |
 
-Every radius and `eps` must be nonnegative. The result is a `long double`.
-The tolerance is scaled to the radii and pairwise center distance when deciding
-whether circles are tangent, contained, or coincident.
+`area[0]` is defined as zero because the uncovered plane has infinite area.
+Summing `area[1]` through `area[N]` gives the union area. Every radius and
+`eps` must be nonnegative. The tolerance is scaled to the radii and pairwise
+center distance for geometric classifications.
 
 ## Example
 
 ```cpp
-#include "geometry/circle_union_area.hpp"
+#include "geometry/circle_coverage_areas.hpp"
 
 #include <iostream>
 #include <vector>
@@ -938,8 +958,9 @@ int main() {
     using namespace m1une::geometry;
     std::vector<Circle<long double>> circles(2);
     circles[0] = Circle<long double>{Point<long double>(0, 0), 1};
-    circles[1] = Circle<long double>{Point<long double>(2, 0), 1};
+    circles[1] = Circle<long double>{Point<long double>(1, 0), 1};
 
-    std::cout << circle_union_area(circles) << "\n";
+    std::vector<long double> area = circle_coverage_areas(circles);
+    std::cout << area[1] << " " << area[2] << "\n";
 }
 ```

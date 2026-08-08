@@ -15,6 +15,9 @@ data:
     path: geometry/circle.hpp
     title: Circles
   - icon: ':heavy_check_mark:'
+    path: geometry/circle_coverage_areas.hpp
+    title: Circle Coverage Areas
+  - icon: ':heavy_check_mark:'
     path: geometry/circle_union_area.hpp
     title: Area of Union of Circles
   - icon: ':heavy_check_mark:'
@@ -105,6 +108,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/circle_common_tangents.test.cpp
     title: verify/geometry/circle_common_tangents.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/circle_coverage_areas.test.cpp
+    title: verify/geometry/circle_coverage_areas.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/circle_line_intersection.test.cpp
     title: verify/geometry/circle_line_intersection.test.cpp
@@ -424,6 +430,7 @@ data:
   - geometry/convex_layers.hpp
   - geometry/detail/convex_polygon_normalize.hpp
   - geometry/closest_pair.hpp
+  - geometry/circle_coverage_areas.hpp
   - geometry/voronoi_diagram.hpp
   - geometry/half_plane_intersection.hpp
   - geometry/angle_sort.hpp
@@ -499,6 +506,7 @@ data:
   - verify/geometry/point_in_polygon.test.cpp
   - verify/geometry/projection.test.cpp
   - verify/geometry/angle_sort.test.cpp
+  - verify/geometry/circle_coverage_areas.test.cpp
   - verify/geometry/delaunay_triangulation.test.cpp
   - verify/geometry/circle_common_tangents.test.cpp
   - verify/geometry/convex_polygon.test.cpp

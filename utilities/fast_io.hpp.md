@@ -367,6 +367,9 @@ data:
     path: verify/geometry/circle_common_tangents.test.cpp
     title: verify/geometry/circle_common_tangents.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/circle_coverage_areas.test.cpp
+    title: verify/geometry/circle_coverage_areas.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/circle_line_intersection.test.cpp
     title: verify/geometry/circle_line_intersection.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1922,6 +1925,7 @@ data:
   - verify/geometry/point_in_polygon.test.cpp
   - verify/geometry/projection.test.cpp
   - verify/geometry/angle_sort.test.cpp
+  - verify/geometry/circle_coverage_areas.test.cpp
   - verify/geometry/delaunay_triangulation.test.cpp
   - verify/geometry/circle_common_tangents.test.cpp
   - verify/geometry/convex_polygon.test.cpp
