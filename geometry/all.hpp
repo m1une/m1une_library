@@ -3,6 +3,7 @@
 
 #include "angle_sort.hpp"
 #include "circle.hpp"
+#include "circle_union_area.hpp"
 #include "closest_pair.hpp"
 #include "convex_decomposition.hpp"
 #include "convex_hull.hpp"

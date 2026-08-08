@@ -12,6 +12,7 @@ documentation_of: ../../geometry/all.hpp
 | Header | Contents |
 | --- | --- |
 | `geometry/angle_sort.hpp` | Atan-free counterclockwise angle sorting around an arbitrary origin. |
+| `geometry/circle_union_area.hpp` | Union area of circles in $O(N^2\log N)$. |
 | `geometry/point.hpp` | Points, vectors, dot/cross products, exact orientation, distance, centroid, and rotation. |
 | `geometry/closest_pair.hpp` | Euclidean closest pair with original indices in $O(N\log N)$. |
 | `geometry/convex_decomposition.hpp` | Hertel--Mehlhorn approximate and Keil--Snoeyink minimum convex decompositions of a simple polygon. |
