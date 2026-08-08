@@ -471,6 +471,9 @@ data:
       path: ds/segtree/persistent_lazy_segtree.hpp
       title: Persistent Lazy Segment Tree
     - icon: ':heavy_check_mark:'
+      path: ds/segtree/persistent_node_pool.hpp
+      title: ds/segtree/persistent_node_pool.hpp
+    - icon: ':heavy_check_mark:'
       path: ds/segtree/persistent_segtree.hpp
       title: Persistent Segment Tree
     - icon: ':heavy_check_mark:'
