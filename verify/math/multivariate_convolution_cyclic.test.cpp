@@ -49,15 +49,19 @@ void test_randomized() {
         state ^= state >> 9;
         return state;
     };
-    const int divisors[] = {1, 2, 3, 4, 6, 8};
+    const int dimensions_to_test[] = {1, 2, 3, 4, 5, 6, 7, 8};
 
     for (int trial = 0; trial < 300; trial++) {
         const int variable_count = int(random() % 4);
         std::vector<int> dimensions(variable_count);
         int size = 1;
         for (int& dimension : dimensions) {
-            dimension = divisors[random() % 6];
+            dimension = dimensions_to_test[random() % 8];
             size *= dimension;
+        }
+        if (size > 200) {
+            trial--;
+            continue;
         }
         std::vector<mint> first(size), second(size);
         for (mint& value : first) value = random() % mint::mod();
@@ -71,6 +75,17 @@ void test_randomized() {
 
     std::vector<int> dimensions = {96};
     std::vector<mint> first(96), second(96);
+    for (mint& value : first) value = random() % mint::mod();
+    for (mint& value : second) value = random() % mint::mod();
+    assert(
+        m1une::math::multivariate_convolution_cyclic(
+            dimensions, first, second
+        ) == naive(dimensions, first, second)
+    );
+
+    dimensions = {1, 5, 1, 7};
+    first.assign(35, mint(0));
+    second.assign(35, mint(0));
     for (mint& value : first) value = random() % mint::mod();
     for (mint& value : second) value = random() % mint::mod();
     assert(

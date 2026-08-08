@@ -25,12 +25,12 @@ Two products are available:
 | Function | Description | Complexity |
 | --- | --- | --- |
 | `template <class Mint> std::vector<Mint> multivariate_convolution_truncated(const std::vector<int>& dimensions, const std::vector<Mint>& first, const std::vector<Mint>& second)` | Returns the truncated product. | $O(kN\log N+k^2N)$ time and $O(kN)$ memory. |
-| `template <class Mint> std::vector<Mint> multivariate_convolution_cyclic(const std::vector<int>& dimensions, const std::vector<Mint>& first, const std::vector<Mint>& second)` | Returns the cyclic product. | $O(N\sum_i \log n_i + P(M))$ time and $O(N+\max_i n_i)$ memory. |
+| `template <class Mint> std::vector<Mint> multivariate_convolution_cyclic(const std::vector<int>& dimensions, const std::vector<Mint>& first, const std::vector<Mint>& second)` | Returns the cyclic product. | $O(N\sum_i \log n_i + P(M))$ time and $O(N+\max_i n_i)$ memory when every $n_i$ divides $M-1$; otherwise $O(k^2L\log L)$ time and $O(kL)$ memory. |
 
 Here, `k = dimensions.size()`, $n_i$ is the size of dimension `i`, and
-$N=\prod_i n_i$, $M$ is the modulus, and $P(M)$ is the cost of one
-`primitive_root(M)` call. Both input arrays and the returned array have length
-$N$.
+$N=\prod_i n_i$, $M$ is the modulus, $L=\prod_{i:n_i>1}(2n_i-1)$, and $P(M)$
+is the cost of one `primitive_root(M)` call. Both input arrays and the returned
+array have length $N$.
 
 ## Requirements and Behavior
 
@@ -43,10 +43,14 @@ is the smallest power of two with $S \geq 2N-1$, then `S` must divide
 sizes up to the usual $2^{22}$ coefficient limit for this routine.
 
 `multivariate_convolution_cyclic` accepts either `ModInt<mod>` or
-`DynamicModInt<id>`. Its modulus must admit a primitive root, and every $n_i$
-must divide `Mint::mod() - 1`. Library Checker's circular version supplies a
-prime modulus, which satisfies the first condition. For a dynamic modint, call
-`set_mod` before constructing or reading coefficients.
+`DynamicModInt<id>`. When every $n_i$ divides `Mint::mod() - 1`, it uses a
+multidimensional DFT and the modulus must admit a primitive root. Otherwise it
+works for arbitrary positive dimensions by zero-extending each nontrivial
+dimension from $n_i$ to $2n_i-1$, taking a truncated product, and folding the
+result modulo the original dimensions. The fallback uses ordinary convolution,
+so its supported transform length and coefficient bound are those of
+`fps::convolution`. For a dynamic modint, call `set_mod` before constructing or
+reading coefficients.
 
 Neither function modifies its arguments.
 

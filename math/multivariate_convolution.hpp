@@ -86,6 +86,52 @@ std::vector<Mint> geometric_evaluation(
     return result;
 }
 
+template <class Mint>
+std::vector<Mint> multivariate_convolution_truncated_arbitrary_mod(
+    const std::vector<int>& dimensions,
+    const std::vector<Mint>& first,
+    const std::vector<Mint>& second
+) {
+    const int variable_count = int(dimensions.size());
+    const int coefficient_count = multivariate_coefficient_count(dimensions);
+    assert(int(first.size()) == coefficient_count);
+    assert(int(second.size()) == coefficient_count);
+    if (variable_count == 0) return {first[0] * second[0]};
+
+    const std::vector<int> color = multivariate_colors(dimensions);
+    std::vector<std::vector<Mint>> colored_first(
+        variable_count, std::vector<Mint>(coefficient_count)
+    );
+    std::vector<std::vector<Mint>> colored_second(
+        variable_count, std::vector<Mint>(coefficient_count)
+    );
+    for (int i = 0; i < coefficient_count; i++) {
+        colored_first[color[i]][i] = first[i];
+        colored_second[color[i]][i] = second[i];
+    }
+
+    std::vector<std::vector<Mint>> colored_result(
+        variable_count, std::vector<Mint>(coefficient_count)
+    );
+    for (int left = 0; left < variable_count; left++) {
+        for (int right = 0; right < variable_count; right++) {
+            std::vector<Mint> product =
+                fps::convolution(colored_first[left], colored_second[right]);
+            std::vector<Mint>& destination =
+                colored_result[(left + right) % variable_count];
+            for (int i = 0; i < coefficient_count; i++) {
+                destination[i] += product[i];
+            }
+        }
+    }
+
+    std::vector<Mint> result(coefficient_count);
+    for (int i = 0; i < coefficient_count; i++) {
+        result[i] = colored_result[color[i]][i];
+    }
+    return result;
+}
+
 }  // namespace internal
 
 template <class Mint>
@@ -163,6 +209,61 @@ std::vector<Mint> multivariate_convolution_cyclic(
     if (dimensions.empty()) return {first[0] * second[0]};
 
     const uint32_t modulus = Mint::mod();
+    bool has_all_roots = true;
+    for (int dimension : dimensions) {
+        if ((modulus - 1) % uint32_t(dimension) != 0) has_all_roots = false;
+    }
+    if (!has_all_roots) {
+        std::vector<int> reduced_dimensions;
+        for (int dimension : dimensions) {
+            if (dimension != 1) reduced_dimensions.push_back(dimension);
+        }
+        if (reduced_dimensions.empty()) return {first[0] * second[0]};
+
+        std::vector<int> widened_dimensions(reduced_dimensions.size());
+        for (int i = 0; i < int(reduced_dimensions.size()); i++) {
+            const int64_t widened = 2LL * reduced_dimensions[i] - 1;
+            assert(widened <= std::numeric_limits<int>::max());
+            widened_dimensions[i] = int(widened);
+        }
+        const int widened_count =
+            internal::multivariate_coefficient_count(widened_dimensions);
+        std::vector<Mint> widened_first(widened_count);
+        std::vector<Mint> widened_second(widened_count);
+        for (int index = 0; index < coefficient_count; index++) {
+            int remaining = index;
+            int widened_index = 0;
+            int widened_stride = 1;
+            for (int variable = 0; variable < int(reduced_dimensions.size()); variable++) {
+                const int coordinate = remaining % reduced_dimensions[variable];
+                remaining /= reduced_dimensions[variable];
+                widened_index += coordinate * widened_stride;
+                widened_stride *= widened_dimensions[variable];
+            }
+            widened_first[widened_index] = first[index];
+            widened_second[widened_index] = second[index];
+        }
+
+        std::vector<Mint> widened_product =
+            internal::multivariate_convolution_truncated_arbitrary_mod(
+                widened_dimensions, widened_first, widened_second
+            );
+        std::vector<Mint> result(coefficient_count);
+        for (int widened_index = 0; widened_index < widened_count; widened_index++) {
+            int remaining = widened_index;
+            int index = 0;
+            int stride = 1;
+            for (int variable = 0; variable < int(reduced_dimensions.size()); variable++) {
+                const int coordinate = remaining % widened_dimensions[variable];
+                remaining /= widened_dimensions[variable];
+                index += (coordinate % reduced_dimensions[variable]) * stride;
+                stride *= reduced_dimensions[variable];
+            }
+            result[index] += widened_product[widened_index];
+        }
+        return result;
+    }
+
     const uint64_t generator = primitive_root(modulus);
     assert(generator != 0);
 
