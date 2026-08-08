@@ -800,10 +800,32 @@ data:
     \    for (int i = 0; i < size; i++) scaled[i] *= negative[i];\n    std::reverse(scaled.begin(),\
     \ scaled.end());\n    std::vector<Mint> product = fps::convolution(scaled, positive);\n\
     \n    std::vector<Mint> result(size);\n    for (int i = 0; i < size; i++) result[i]\
-    \ = product[size - 1 + i] * negative[i];\n    return result;\n}\n\n}  // namespace\
-    \ internal\n\ntemplate <class Mint>\nstd::vector<Mint> multivariate_convolution_truncated(\n\
+    \ = product[size - 1 + i] * negative[i];\n    return result;\n}\n\ntemplate <class\
+    \ Mint>\nstd::vector<Mint> multivariate_convolution_truncated_arbitrary_mod(\n\
     \    const std::vector<int>& dimensions,\n    const std::vector<Mint>& first,\n\
-    \    const std::vector<Mint>& second\n) {\n    static_assert(\n        fps::internal::has_static_modulus<Mint>::value,\n\
+    \    const std::vector<Mint>& second\n) {\n    const int variable_count = int(dimensions.size());\n\
+    \    const int coefficient_count = multivariate_coefficient_count(dimensions);\n\
+    \    assert(int(first.size()) == coefficient_count);\n    assert(int(second.size())\
+    \ == coefficient_count);\n    if (variable_count == 0) return {first[0] * second[0]};\n\
+    \n    const std::vector<int> color = multivariate_colors(dimensions);\n    std::vector<std::vector<Mint>>\
+    \ colored_first(\n        variable_count, std::vector<Mint>(coefficient_count)\n\
+    \    );\n    std::vector<std::vector<Mint>> colored_second(\n        variable_count,\
+    \ std::vector<Mint>(coefficient_count)\n    );\n    for (int i = 0; i < coefficient_count;\
+    \ i++) {\n        colored_first[color[i]][i] = first[i];\n        colored_second[color[i]][i]\
+    \ = second[i];\n    }\n\n    std::vector<std::vector<Mint>> colored_result(\n\
+    \        variable_count, std::vector<Mint>(coefficient_count)\n    );\n    for\
+    \ (int left = 0; left < variable_count; left++) {\n        for (int right = 0;\
+    \ right < variable_count; right++) {\n            std::vector<Mint> product =\n\
+    \                fps::convolution(colored_first[left], colored_second[right]);\n\
+    \            std::vector<Mint>& destination =\n                colored_result[(left\
+    \ + right) % variable_count];\n            for (int i = 0; i < coefficient_count;\
+    \ i++) {\n                destination[i] += product[i];\n            }\n     \
+    \   }\n    }\n\n    std::vector<Mint> result(coefficient_count);\n    for (int\
+    \ i = 0; i < coefficient_count; i++) {\n        result[i] = colored_result[color[i]][i];\n\
+    \    }\n    return result;\n}\n\n}  // namespace internal\n\ntemplate <class Mint>\n\
+    std::vector<Mint> multivariate_convolution_truncated(\n    const std::vector<int>&\
+    \ dimensions,\n    const std::vector<Mint>& first,\n    const std::vector<Mint>&\
+    \ second\n) {\n    static_assert(\n        fps::internal::has_static_modulus<Mint>::value,\n\
     \        \"truncated multivariate convolution requires a static-modulus type\"\
     \n    );\n    const int variable_count = int(dimensions.size());\n    const int\
     \ coefficient_count = internal::multivariate_coefficient_count(dimensions);\n\
@@ -837,31 +859,63 @@ data:
     \    const std::vector<Mint>& second\n) {\n    const int coefficient_count = internal::multivariate_coefficient_count(dimensions);\n\
     \    assert(int(first.size()) == coefficient_count);\n    assert(int(second.size())\
     \ == coefficient_count);\n    if (dimensions.empty()) return {first[0] * second[0]};\n\
-    \n    const uint32_t modulus = Mint::mod();\n    const uint64_t generator = primitive_root(modulus);\n\
-    \    assert(generator != 0);\n\n    std::vector<Mint> transformed_first(first);\n\
-    \    std::vector<Mint> transformed_second(second);\n    int stride = 1;\n    for\
-    \ (int dimension : dimensions) {\n        assert((modulus - 1) % uint32_t(dimension)\
-    \ == 0);\n        const Mint root = Mint(generator).pow((modulus - 1) / dimension);\n\
-    \        for (int block = 0; block < coefficient_count; block += stride * dimension)\
+    \n    const uint32_t modulus = Mint::mod();\n    bool has_all_roots = true;\n\
+    \    for (int dimension : dimensions) {\n        if ((modulus - 1) % uint32_t(dimension)\
+    \ != 0) has_all_roots = false;\n    }\n    if (!has_all_roots) {\n        std::vector<int>\
+    \ reduced_dimensions;\n        for (int dimension : dimensions) {\n          \
+    \  if (dimension != 1) reduced_dimensions.push_back(dimension);\n        }\n \
+    \       if (reduced_dimensions.empty()) return {first[0] * second[0]};\n\n   \
+    \     std::vector<int> widened_dimensions(reduced_dimensions.size());\n      \
+    \  for (int i = 0; i < int(reduced_dimensions.size()); i++) {\n            const\
+    \ int64_t widened = 2LL * reduced_dimensions[i] - 1;\n            assert(widened\
+    \ <= std::numeric_limits<int>::max());\n            widened_dimensions[i] = int(widened);\n\
+    \        }\n        const int widened_count =\n            internal::multivariate_coefficient_count(widened_dimensions);\n\
+    \        std::vector<Mint> widened_first(widened_count);\n        std::vector<Mint>\
+    \ widened_second(widened_count);\n        for (int index = 0; index < coefficient_count;\
+    \ index++) {\n            int remaining = index;\n            int widened_index\
+    \ = 0;\n            int widened_stride = 1;\n            for (int variable = 0;\
+    \ variable < int(reduced_dimensions.size()); variable++) {\n                const\
+    \ int coordinate = remaining % reduced_dimensions[variable];\n               \
+    \ remaining /= reduced_dimensions[variable];\n                widened_index +=\
+    \ coordinate * widened_stride;\n                widened_stride *= widened_dimensions[variable];\n\
+    \            }\n            widened_first[widened_index] = first[index];\n   \
+    \         widened_second[widened_index] = second[index];\n        }\n\n      \
+    \  std::vector<Mint> widened_product =\n            internal::multivariate_convolution_truncated_arbitrary_mod(\n\
+    \                widened_dimensions, widened_first, widened_second\n         \
+    \   );\n        std::vector<Mint> result(coefficient_count);\n        for (int\
+    \ widened_index = 0; widened_index < widened_count; widened_index++) {\n     \
+    \       int remaining = widened_index;\n            int index = 0;\n         \
+    \   int stride = 1;\n            for (int variable = 0; variable < int(reduced_dimensions.size());\
+    \ variable++) {\n                const int coordinate = remaining % widened_dimensions[variable];\n\
+    \                remaining /= widened_dimensions[variable];\n                index\
+    \ += (coordinate % reduced_dimensions[variable]) * stride;\n                stride\
+    \ *= reduced_dimensions[variable];\n            }\n            result[index] +=\
+    \ widened_product[widened_index];\n        }\n        return result;\n    }\n\n\
+    \    const uint64_t generator = primitive_root(modulus);\n    assert(generator\
+    \ != 0);\n\n    std::vector<Mint> transformed_first(first);\n    std::vector<Mint>\
+    \ transformed_second(second);\n    int stride = 1;\n    for (int dimension : dimensions)\
+    \ {\n        assert((modulus - 1) % uint32_t(dimension) == 0);\n        const\
+    \ Mint root = Mint(generator).pow((modulus - 1) / dimension);\n        for (int\
+    \ block = 0; block < coefficient_count; block += stride * dimension) {\n     \
+    \       for (int offset = 0; offset < stride; offset++) {\n                std::vector<Mint>\
+    \ first_line(dimension);\n                std::vector<Mint> second_line(dimension);\n\
+    \                for (int i = 0; i < dimension; i++) {\n                    first_line[i]\
+    \ = transformed_first[block + offset + stride * i];\n                    second_line[i]\
+    \ = transformed_second[block + offset + stride * i];\n                }\n    \
+    \            first_line = internal::geometric_evaluation(first_line, root);\n\
+    \                second_line = internal::geometric_evaluation(second_line, root);\n\
+    \                for (int i = 0; i < dimension; i++) {\n                    transformed_first[block\
+    \ + offset + stride * i] = first_line[i];\n                    transformed_second[block\
+    \ + offset + stride * i] = second_line[i];\n                }\n            }\n\
+    \        }\n        stride *= dimension;\n    }\n\n    for (int i = 0; i < coefficient_count;\
+    \ i++) {\n        transformed_first[i] *= transformed_second[i];\n    }\n\n  \
+    \  stride = 1;\n    for (int dimension : dimensions) {\n        const Mint inverse_root\
+    \ =\n            Mint(generator).pow((modulus - 1) / dimension).inv();\n     \
+    \   for (int block = 0; block < coefficient_count; block += stride * dimension)\
     \ {\n            for (int offset = 0; offset < stride; offset++) {\n         \
-    \       std::vector<Mint> first_line(dimension);\n                std::vector<Mint>\
-    \ second_line(dimension);\n                for (int i = 0; i < dimension; i++)\
-    \ {\n                    first_line[i] = transformed_first[block + offset + stride\
-    \ * i];\n                    second_line[i] = transformed_second[block + offset\
-    \ + stride * i];\n                }\n                first_line = internal::geometric_evaluation(first_line,\
-    \ root);\n                second_line = internal::geometric_evaluation(second_line,\
-    \ root);\n                for (int i = 0; i < dimension; i++) {\n            \
-    \        transformed_first[block + offset + stride * i] = first_line[i];\n   \
-    \                 transformed_second[block + offset + stride * i] = second_line[i];\n\
-    \                }\n            }\n        }\n        stride *= dimension;\n \
-    \   }\n\n    for (int i = 0; i < coefficient_count; i++) {\n        transformed_first[i]\
-    \ *= transformed_second[i];\n    }\n\n    stride = 1;\n    for (int dimension\
-    \ : dimensions) {\n        const Mint inverse_root =\n            Mint(generator).pow((modulus\
-    \ - 1) / dimension).inv();\n        for (int block = 0; block < coefficient_count;\
-    \ block += stride * dimension) {\n            for (int offset = 0; offset < stride;\
-    \ offset++) {\n                std::vector<Mint> line(dimension);\n          \
-    \      for (int i = 0; i < dimension; i++) {\n                    line[i] = transformed_first[block\
-    \ + offset + stride * i];\n                }\n                line = internal::geometric_evaluation(line,\
+    \       std::vector<Mint> line(dimension);\n                for (int i = 0; i\
+    \ < dimension; i++) {\n                    line[i] = transformed_first[block +\
+    \ offset + stride * i];\n                }\n                line = internal::geometric_evaluation(line,\
     \ inverse_root);\n                for (int i = 0; i < dimension; i++) {\n    \
     \                transformed_first[block + offset + stride * i] = line[i];\n \
     \               }\n            }\n        }\n        stride *= dimension;\n  \
@@ -1124,27 +1178,33 @@ data:
     \    return result;\n}\n\nvoid test_randomized() {\n    mint::set_mod(97);\n \
     \   uint64_t state = 0xfedcba987654321ULL;\n    auto random = [&state]() {\n \
     \       state ^= state << 7;\n        state ^= state >> 9;\n        return state;\n\
-    \    };\n    const int divisors[] = {1, 2, 3, 4, 6, 8};\n\n    for (int trial\
-    \ = 0; trial < 300; trial++) {\n        const int variable_count = int(random()\
-    \ % 4);\n        std::vector<int> dimensions(variable_count);\n        int size\
-    \ = 1;\n        for (int& dimension : dimensions) {\n            dimension = divisors[random()\
-    \ % 6];\n            size *= dimension;\n        }\n        std::vector<mint>\
-    \ first(size), second(size);\n        for (mint& value : first) value = random()\
-    \ % mint::mod();\n        for (mint& value : second) value = random() % mint::mod();\n\
-    \        assert(\n            m1une::math::multivariate_convolution_cyclic(\n\
+    \    };\n    const int dimensions_to_test[] = {1, 2, 3, 4, 5, 6, 7, 8};\n\n  \
+    \  for (int trial = 0; trial < 300; trial++) {\n        const int variable_count\
+    \ = int(random() % 4);\n        std::vector<int> dimensions(variable_count);\n\
+    \        int size = 1;\n        for (int& dimension : dimensions) {\n        \
+    \    dimension = dimensions_to_test[random() % 8];\n            size *= dimension;\n\
+    \        }\n        if (size > 200) {\n            trial--;\n            continue;\n\
+    \        }\n        std::vector<mint> first(size), second(size);\n        for\
+    \ (mint& value : first) value = random() % mint::mod();\n        for (mint& value\
+    \ : second) value = random() % mint::mod();\n        assert(\n            m1une::math::multivariate_convolution_cyclic(\n\
     \                dimensions, first, second\n            ) == naive(dimensions,\
     \ first, second)\n        );\n    }\n\n    std::vector<int> dimensions = {96};\n\
     \    std::vector<mint> first(96), second(96);\n    for (mint& value : first) value\
     \ = random() % mint::mod();\n    for (mint& value : second) value = random() %\
     \ mint::mod();\n    assert(\n        m1une::math::multivariate_convolution_cyclic(\n\
     \            dimensions, first, second\n        ) == naive(dimensions, first,\
-    \ second)\n    );\n}\n\n}  // namespace\n\nint main() {\n    test_randomized();\n\
-    \n    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput output;\n\
-    \    uint32_t modulus = 1;\n    int variable_count = 0;\n    input.read(modulus,\
-    \ variable_count);\n    mint::set_mod(modulus);\n    std::vector<int> dimensions(variable_count);\n\
-    \    input.read(dimensions);\n    int size = 1;\n    for (int dimension : dimensions)\
-    \ size *= dimension;\n    std::vector<mint> first(size), second(size);\n    input.read(first);\n\
-    \    input.read(second);\n    output.println(\n        m1une::math::multivariate_convolution_cyclic(\n\
+    \ second)\n    );\n\n    dimensions = {1, 5, 1, 7};\n    first.assign(35, mint(0));\n\
+    \    second.assign(35, mint(0));\n    for (mint& value : first) value = random()\
+    \ % mint::mod();\n    for (mint& value : second) value = random() % mint::mod();\n\
+    \    assert(\n        m1une::math::multivariate_convolution_cyclic(\n        \
+    \    dimensions, first, second\n        ) == naive(dimensions, first, second)\n\
+    \    );\n}\n\n}  // namespace\n\nint main() {\n    test_randomized();\n\n    m1une::utilities::FastInput\
+    \ input;\n    m1une::utilities::FastOutput output;\n    uint32_t modulus = 1;\n\
+    \    int variable_count = 0;\n    input.read(modulus, variable_count);\n    mint::set_mod(modulus);\n\
+    \    std::vector<int> dimensions(variable_count);\n    input.read(dimensions);\n\
+    \    int size = 1;\n    for (int dimension : dimensions) size *= dimension;\n\
+    \    std::vector<mint> first(size), second(size);\n    input.read(first);\n  \
+    \  input.read(second);\n    output.println(\n        m1une::math::multivariate_convolution_cyclic(\n\
     \            dimensions, first, second\n        )\n    );\n}\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/multivariate_convolution_cyclic\"\
     \n\n#pragma GCC optimize(\"O3\")\n\n#include <cassert>\n#include <cstdint>\n#include\
@@ -1164,27 +1224,34 @@ data:
     \ first[left] * second[right];\n        }\n    }\n    return result;\n}\n\nvoid\
     \ test_randomized() {\n    mint::set_mod(97);\n    uint64_t state = 0xfedcba987654321ULL;\n\
     \    auto random = [&state]() {\n        state ^= state << 7;\n        state ^=\
-    \ state >> 9;\n        return state;\n    };\n    const int divisors[] = {1, 2,\
-    \ 3, 4, 6, 8};\n\n    for (int trial = 0; trial < 300; trial++) {\n        const\
-    \ int variable_count = int(random() % 4);\n        std::vector<int> dimensions(variable_count);\n\
-    \        int size = 1;\n        for (int& dimension : dimensions) {\n        \
-    \    dimension = divisors[random() % 6];\n            size *= dimension;\n   \
-    \     }\n        std::vector<mint> first(size), second(size);\n        for (mint&\
-    \ value : first) value = random() % mint::mod();\n        for (mint& value : second)\
-    \ value = random() % mint::mod();\n        assert(\n            m1une::math::multivariate_convolution_cyclic(\n\
-    \                dimensions, first, second\n            ) == naive(dimensions,\
-    \ first, second)\n        );\n    }\n\n    std::vector<int> dimensions = {96};\n\
-    \    std::vector<mint> first(96), second(96);\n    for (mint& value : first) value\
-    \ = random() % mint::mod();\n    for (mint& value : second) value = random() %\
-    \ mint::mod();\n    assert(\n        m1une::math::multivariate_convolution_cyclic(\n\
-    \            dimensions, first, second\n        ) == naive(dimensions, first,\
-    \ second)\n    );\n}\n\n}  // namespace\n\nint main() {\n    test_randomized();\n\
-    \n    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput output;\n\
-    \    uint32_t modulus = 1;\n    int variable_count = 0;\n    input.read(modulus,\
-    \ variable_count);\n    mint::set_mod(modulus);\n    std::vector<int> dimensions(variable_count);\n\
-    \    input.read(dimensions);\n    int size = 1;\n    for (int dimension : dimensions)\
-    \ size *= dimension;\n    std::vector<mint> first(size), second(size);\n    input.read(first);\n\
-    \    input.read(second);\n    output.println(\n        m1une::math::multivariate_convolution_cyclic(\n\
+    \ state >> 9;\n        return state;\n    };\n    const int dimensions_to_test[]\
+    \ = {1, 2, 3, 4, 5, 6, 7, 8};\n\n    for (int trial = 0; trial < 300; trial++)\
+    \ {\n        const int variable_count = int(random() % 4);\n        std::vector<int>\
+    \ dimensions(variable_count);\n        int size = 1;\n        for (int& dimension\
+    \ : dimensions) {\n            dimension = dimensions_to_test[random() % 8];\n\
+    \            size *= dimension;\n        }\n        if (size > 200) {\n      \
+    \      trial--;\n            continue;\n        }\n        std::vector<mint> first(size),\
+    \ second(size);\n        for (mint& value : first) value = random() % mint::mod();\n\
+    \        for (mint& value : second) value = random() % mint::mod();\n        assert(\n\
+    \            m1une::math::multivariate_convolution_cyclic(\n                dimensions,\
+    \ first, second\n            ) == naive(dimensions, first, second)\n        );\n\
+    \    }\n\n    std::vector<int> dimensions = {96};\n    std::vector<mint> first(96),\
+    \ second(96);\n    for (mint& value : first) value = random() % mint::mod();\n\
+    \    for (mint& value : second) value = random() % mint::mod();\n    assert(\n\
+    \        m1une::math::multivariate_convolution_cyclic(\n            dimensions,\
+    \ first, second\n        ) == naive(dimensions, first, second)\n    );\n\n   \
+    \ dimensions = {1, 5, 1, 7};\n    first.assign(35, mint(0));\n    second.assign(35,\
+    \ mint(0));\n    for (mint& value : first) value = random() % mint::mod();\n \
+    \   for (mint& value : second) value = random() % mint::mod();\n    assert(\n\
+    \        m1une::math::multivariate_convolution_cyclic(\n            dimensions,\
+    \ first, second\n        ) == naive(dimensions, first, second)\n    );\n}\n\n\
+    }  // namespace\n\nint main() {\n    test_randomized();\n\n    m1une::utilities::FastInput\
+    \ input;\n    m1une::utilities::FastOutput output;\n    uint32_t modulus = 1;\n\
+    \    int variable_count = 0;\n    input.read(modulus, variable_count);\n    mint::set_mod(modulus);\n\
+    \    std::vector<int> dimensions(variable_count);\n    input.read(dimensions);\n\
+    \    int size = 1;\n    for (int dimension : dimensions) size *= dimension;\n\
+    \    std::vector<mint> first(size), second(size);\n    input.read(first);\n  \
+    \  input.read(second);\n    output.println(\n        m1une::math::multivariate_convolution_cyclic(\n\
     \            dimensions, first, second\n        )\n    );\n}\n"
   dependsOn:
   - math/modint.hpp
@@ -1198,7 +1265,7 @@ data:
   isVerificationFile: true
   path: verify/math/multivariate_convolution_cyclic.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-08-09 04:27:20+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/multivariate_convolution_cyclic.test.cpp
