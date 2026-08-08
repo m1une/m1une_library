@@ -519,6 +519,9 @@ data:
       path: geometry/circle.hpp
       title: Circles
     - icon: ':heavy_check_mark:'
+      path: geometry/circle_union_area.hpp
+      title: Area of Union of Circles
+    - icon: ':heavy_check_mark:'
       path: geometry/closest_pair.hpp
       title: Closest Pair of Points
     - icon: ':heavy_check_mark:'
@@ -1703,6 +1706,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/geometry/circle_tangent_points.test.cpp
       title: verify/geometry/circle_tangent_points.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/geometry/circle_union_area.test.cpp
+      title: verify/geometry/circle_union_area.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/geometry/circumcircle.test.cpp
       title: verify/geometry/circumcircle.test.cpp

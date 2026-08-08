@@ -15,6 +15,9 @@ data:
     path: geometry/circle.hpp
     title: Circles
   - icon: ':heavy_check_mark:'
+    path: geometry/circle_union_area.hpp
+    title: Area of Union of Circles
+  - icon: ':heavy_check_mark:'
     path: geometry/convex_decomposition.hpp
     title: Convex Decomposition
   - icon: ':heavy_check_mark:'
@@ -60,6 +63,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/circle_tangent_points.test.cpp
     title: verify/geometry/circle_tangent_points.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/circle_union_area.test.cpp
+    title: verify/geometry/circle_union_area.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/circumcircle.test.cpp
     title: verify/geometry/circumcircle.test.cpp
@@ -622,6 +628,7 @@ data:
   path: geometry/ray.hpp
   requiredBy:
   - geometry/all.hpp
+  - geometry/circle_union_area.hpp
   - geometry/convex_decomposition.hpp
   - geometry/polygon.hpp
   - geometry/convex_polygon.hpp
@@ -643,6 +650,7 @@ data:
   - verify/geometry/convex_diameter.test.cpp
   - verify/geometry/centroid.test.cpp
   - verify/geometry/circle_line_intersection.test.cpp
+  - verify/geometry/circle_union_area.test.cpp
   - verify/geometry/polygon_operations.test.cpp
   - verify/geometry/circle_operations.test.cpp
   - verify/geometry/circle_circle_intersection.test.cpp

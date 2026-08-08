@@ -14,6 +14,9 @@ data:
     path: geometry/circle.hpp
     title: Circles
   - icon: ':heavy_check_mark:'
+    path: geometry/circle_union_area.hpp
+    title: Area of Union of Circles
+  - icon: ':heavy_check_mark:'
     path: geometry/closest_pair.hpp
     title: Closest Pair of Points
   - icon: ':heavy_check_mark:'
@@ -143,6 +146,8 @@ data:
 
     #include "circle.hpp"
 
+    #include "circle_union_area.hpp"
+
     #include "closest_pair.hpp"
 
     #include "convex_decomposition.hpp"
@@ -199,6 +204,7 @@ data:
   - geometry/circle.hpp
   - geometry/ray.hpp
   - geometry/line.hpp
+  - geometry/circle_union_area.hpp
   - geometry/closest_pair.hpp
   - geometry/convex_decomposition.hpp
   - utilities/int256.hpp
@@ -233,7 +239,7 @@ data:
   isVerificationFile: false
   path: geometry/all.hpp
   requiredBy: []
-  timestamp: '2026-08-08 16:10:43+09:00'
+  timestamp: '2026-08-08 16:52:39+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/centroid.test.cpp
@@ -252,6 +258,7 @@ title: Geometry Bundle
 | Header | Contents |
 | --- | --- |
 | `geometry/angle_sort.hpp` | Atan-free counterclockwise angle sorting around an arbitrary origin. |
+| `geometry/circle_union_area.hpp` | Union area of circles in $O(N^2\log N)$. |
 | `geometry/point.hpp` | Points, vectors, dot/cross products, exact orientation, distance, centroid, and rotation. |
 | `geometry/closest_pair.hpp` | Euclidean closest pair with original indices in $O(N\log N)$. |
 | `geometry/convex_decomposition.hpp` | Hertel--Mehlhorn approximate and Keil--Snoeyink minimum convex decompositions of a simple polygon. |

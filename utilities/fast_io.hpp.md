@@ -385,6 +385,9 @@ data:
     path: verify/geometry/circle_tangent_points.test.cpp
     title: verify/geometry/circle_tangent_points.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/circle_union_area.test.cpp
+    title: verify/geometry/circle_union_area.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/circumcircle.test.cpp
     title: verify/geometry/circumcircle.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1902,6 +1905,7 @@ data:
   - verify/geometry/centroid.test.cpp
   - verify/geometry/circle_line_intersection.test.cpp
   - verify/geometry/lattice_point_count.test.cpp
+  - verify/geometry/circle_union_area.test.cpp
   - verify/geometry/polygon_operations.test.cpp
   - verify/geometry/segment_intersection.test.cpp
   - verify/geometry/circle_operations.test.cpp
