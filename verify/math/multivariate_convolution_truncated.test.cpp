@@ -73,10 +73,52 @@ void test_randomized() {
     }
 }
 
+void test_nested_vectors() {
+    std::vector<std::vector<mint>> first(3, std::vector<mint>(2));
+    std::vector<std::vector<mint>> second(3, std::vector<mint>(2));
+    int value = 1;
+    for (auto& row : first) {
+        for (mint& coefficient : row) coefficient = value++;
+    }
+    value = 7;
+    for (auto& row : second) {
+        for (mint& coefficient : row) coefficient = value++;
+    }
+
+    std::vector<mint> flattened_first, flattened_second;
+    for (const auto& row : first) {
+        flattened_first.insert(flattened_first.end(), row.begin(), row.end());
+    }
+    for (const auto& row : second) {
+        flattened_second.insert(flattened_second.end(), row.begin(), row.end());
+    }
+    std::vector<mint> expected = naive(
+        std::vector<int>{2, 3}, flattened_first, flattened_second
+    );
+    const auto result =
+        m1une::math::multivariate_convolution_truncated(first, second);
+    int index = 0;
+    for (const auto& row : result) {
+        for (mint coefficient : row) assert(coefficient == expected[index++]);
+    }
+
+    using Cube = std::vector<std::vector<std::vector<mint>>>;
+    Cube cube_first(2, std::vector<std::vector<mint>>(2, std::vector<mint>(2)));
+    Cube cube_second = cube_first;
+    cube_first[0][0][0] = 2;
+    cube_first[1][1][1] = 3;
+    cube_second[0][0][0] = 5;
+    const Cube cube_result =
+        m1une::math::multivariate_convolution_truncated(cube_first, cube_second);
+    assert(cube_result[0][0][0] == 10);
+    assert(cube_result[1][1][1] == 15);
+}
+
 }  // namespace
 
 int main() {
     test_randomized();
+    test_nested_vectors();
 
     m1une::utilities::FastInput input;
     m1une::utilities::FastOutput output;

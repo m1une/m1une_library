@@ -5,6 +5,8 @@
 #include <cassert>
 #include <cstdint>
 #include <limits>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
 #include "fps/convolution.hpp"
@@ -14,6 +16,100 @@ namespace m1une {
 namespace math {
 
 namespace internal {
+
+template <class T>
+struct nested_vector_traits {
+    using scalar_type = T;
+    static constexpr int depth = 0;
+};
+
+template <class T, class Allocator>
+struct nested_vector_traits<std::vector<T, Allocator>> {
+    using scalar_type = typename nested_vector_traits<T>::scalar_type;
+    static constexpr int depth = nested_vector_traits<T>::depth + 1;
+};
+
+template <class Nested>
+void nested_vector_shape(const Nested& values, std::vector<int>& shape) {
+    if constexpr (nested_vector_traits<Nested>::depth > 0) {
+        assert(!values.empty());
+        assert(values.size() <= std::size_t(std::numeric_limits<int>::max()));
+        shape.push_back(int(values.size()));
+        nested_vector_shape(values.front(), shape);
+    }
+}
+
+template <class Nested, class Mint>
+void flatten_nested_vector(
+    const Nested& values,
+    const std::vector<int>& shape,
+    int level,
+    std::vector<Mint>& flattened
+) {
+    if constexpr (nested_vector_traits<Nested>::depth == 0) {
+        flattened.push_back(values);
+    } else {
+        assert(level < int(shape.size()));
+        assert(int(values.size()) == shape[level]);
+        for (const auto& child : values) {
+            flatten_nested_vector(child, shape, level + 1, flattened);
+        }
+    }
+}
+
+template <class Nested, class Mint>
+void rebuild_nested_vector(
+    Nested& values,
+    const std::vector<int>& shape,
+    int level,
+    const std::vector<Mint>& flattened,
+    int& position
+) {
+    if constexpr (nested_vector_traits<Nested>::depth == 0) {
+        assert(position < int(flattened.size()));
+        values = flattened[position++];
+    } else {
+        assert(level < int(shape.size()));
+        values.resize(shape[level]);
+        for (auto& child : values) {
+            rebuild_nested_vector(child, shape, level + 1, flattened, position);
+        }
+    }
+}
+
+template <class Nested>
+std::vector<int> flatten_multivariate_inputs(
+    const Nested& first,
+    const Nested& second,
+    std::vector<typename nested_vector_traits<Nested>::scalar_type>& flattened_first,
+    std::vector<typename nested_vector_traits<Nested>::scalar_type>& flattened_second
+) {
+    std::vector<int> shape;
+    nested_vector_shape(first, shape);
+    assert(int(shape.size()) == nested_vector_traits<Nested>::depth);
+
+    std::vector<int> second_shape;
+    nested_vector_shape(second, second_shape);
+    assert(second_shape == shape);
+
+    flatten_nested_vector(first, shape, 0, flattened_first);
+    flatten_nested_vector(second, shape, 0, flattened_second);
+    std::reverse(shape.begin(), shape.end());
+    return shape;
+}
+
+template <class Nested>
+Nested rebuild_multivariate_result(
+    std::vector<int> dimensions,
+    const std::vector<typename nested_vector_traits<Nested>::scalar_type>& flattened
+) {
+    std::reverse(dimensions.begin(), dimensions.end());
+    Nested result;
+    int position = 0;
+    rebuild_nested_vector(result, dimensions, 0, flattened, position);
+    assert(position == int(flattened.size()));
+    return result;
+}
 
 inline int multivariate_coefficient_count(const std::vector<int>& dimensions) {
     int64_t count = 1;
@@ -197,6 +293,27 @@ std::vector<Mint> multivariate_convolution_truncated(
     return result;
 }
 
+template <
+    class Nested,
+    std::enable_if_t<(internal::nested_vector_traits<Nested>::depth > 0), int> = 0
+>
+Nested multivariate_convolution_truncated(
+    const Nested& first,
+    const Nested& second
+) {
+    using Mint = typename internal::nested_vector_traits<Nested>::scalar_type;
+    std::vector<Mint> flattened_first, flattened_second;
+    std::vector<int> dimensions = internal::flatten_multivariate_inputs(
+        first, second, flattened_first, flattened_second
+    );
+    std::vector<Mint> flattened_result = multivariate_convolution_truncated(
+        dimensions, flattened_first, flattened_second
+    );
+    return internal::rebuild_multivariate_result<Nested>(
+        std::move(dimensions), flattened_result
+    );
+}
+
 template <class Mint>
 std::vector<Mint> multivariate_convolution_cyclic(
     const std::vector<int>& dimensions,
@@ -318,6 +435,27 @@ std::vector<Mint> multivariate_convolution_cyclic(
     const Mint inverse_size = Mint(coefficient_count).inv();
     for (Mint& value : transformed_first) value *= inverse_size;
     return transformed_first;
+}
+
+template <
+    class Nested,
+    std::enable_if_t<(internal::nested_vector_traits<Nested>::depth > 0), int> = 0
+>
+Nested multivariate_convolution_cyclic(
+    const Nested& first,
+    const Nested& second
+) {
+    using Mint = typename internal::nested_vector_traits<Nested>::scalar_type;
+    std::vector<Mint> flattened_first, flattened_second;
+    std::vector<int> dimensions = internal::flatten_multivariate_inputs(
+        first, second, flattened_first, flattened_second
+    );
+    std::vector<Mint> flattened_result = multivariate_convolution_cyclic(
+        dimensions, flattened_first, flattened_second
+    );
+    return internal::rebuild_multivariate_result<Nested>(
+        std::move(dimensions), flattened_result
+    );
 }
 
 }  // namespace math

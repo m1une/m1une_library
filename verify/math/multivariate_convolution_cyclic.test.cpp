@@ -95,10 +95,41 @@ void test_randomized() {
     );
 }
 
+void test_nested_vectors() {
+    mint::set_mod(97);
+    std::vector<std::vector<mint>> first(3, std::vector<mint>(2));
+    std::vector<std::vector<mint>> second(3, std::vector<mint>(2));
+    int value = 1;
+    for (auto& row : first) {
+        for (mint& coefficient : row) coefficient = value++;
+    }
+    value = 7;
+    for (auto& row : second) {
+        for (mint& coefficient : row) coefficient = value++;
+    }
+
+    std::vector<mint> flattened_first, flattened_second;
+    for (const auto& row : first) {
+        flattened_first.insert(flattened_first.end(), row.begin(), row.end());
+    }
+    for (const auto& row : second) {
+        flattened_second.insert(flattened_second.end(), row.begin(), row.end());
+    }
+    std::vector<mint> expected = naive(
+        std::vector<int>{2, 3}, flattened_first, flattened_second
+    );
+    const auto result = m1une::math::multivariate_convolution_cyclic(first, second);
+    int index = 0;
+    for (const auto& row : result) {
+        for (mint coefficient : row) assert(coefficient == expected[index++]);
+    }
+}
+
 }  // namespace
 
 int main() {
     test_randomized();
+    test_nested_vectors();
 
     m1une::utilities::FastInput input;
     m1une::utilities::FastOutput output;

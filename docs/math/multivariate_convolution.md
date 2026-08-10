@@ -5,9 +5,10 @@ documentation_of: ../../math/multivariate_convolution.hpp
 
 ## Overview
 
-Fast convolution of flattened multidimensional arrays. The first dimension is
-contiguous: for dimensions `n`, coordinates `(i[0], ..., i[k - 1])` are stored
-at
+Fast convolution of multidimensional arrays. Inputs may use a flat vector plus
+explicit dimensions, or nested `std::vector`s whose dimensions are inferred.
+In the flat representation, the first dimension is contiguous: for dimensions
+`n`, coordinates `(i[0], ..., i[k - 1])` are stored at
 
 `i[0] + i[1] * n[0] + ... + i[k - 1] * n[0] * ... * n[k - 2]`.
 
@@ -25,7 +26,9 @@ Two products are available:
 | Function | Description | Complexity |
 | --- | --- | --- |
 | `template <class Mint> std::vector<Mint> multivariate_convolution_truncated(const std::vector<int>& dimensions, const std::vector<Mint>& first, const std::vector<Mint>& second)` | Returns the truncated product. | $O(kN\log N+k^2N)$ time and $O(kN)$ memory. |
+| `template <class Nested> Nested multivariate_convolution_truncated(const Nested& first, const Nested& second)` | Infers dimensions from equally shaped nested vectors and returns a nested truncated product. | $O(kN\log N+k^2N)$ time and $O(kN)$ memory. |
 | `template <class Mint> std::vector<Mint> multivariate_convolution_cyclic(const std::vector<int>& dimensions, const std::vector<Mint>& first, const std::vector<Mint>& second)` | Returns the cyclic product. | $O(N\sum_i \log n_i + P(M))$ time and $O(N+\max_i n_i)$ memory when every $n_i$ divides $M-1$; otherwise $O(k^2L\log L)$ time and $O(kL)$ memory. |
+| `template <class Nested> Nested multivariate_convolution_cyclic(const Nested& first, const Nested& second)` | Infers dimensions from equally shaped nested vectors and returns a nested cyclic product. | $O(N\sum_i \log n_i + P(M))$ time and $O(N+\max_i n_i)$ memory when every $n_i$ divides $M-1$; otherwise $O(k^2L\log L)$ time and $O(kL)$ memory. |
 
 Here, `k = dimensions.size()`, $n_i$ is the size of dimension `i`, and
 $N=\prod_i n_i$, $M$ is the modulus, $L=\prod_{i:n_i>1}(2n_i-1)$, and $P(M)$
@@ -54,6 +57,12 @@ reading coefficients.
 
 Neither function modifies its arguments.
 
+For a nested input, `Nested` must be one or more levels of `std::vector` with a
+modint scalar type. Both inputs must be nonempty, rectangular, and have the same
+shape. The innermost vector is the first, contiguous dimension: for example,
+`values[i2][i1][i0]` represents coordinate `(i0, i1, i2)`. Flattening and
+rebuilding the nested vectors take an additional $O(N)$ time and memory.
+
 ## Example
 
 ```cpp
@@ -80,5 +89,17 @@ int main() {
         );
     // truncated is 5, 16, 22, 60.
     // cyclic is 70, 68, 62, 60.
+
+    std::vector<std::vector<mint>> nested_first(
+        2, std::vector<mint>(2)
+    );
+    std::vector<std::vector<mint>> nested_second(
+        2, std::vector<mint>(2)
+    );
+    nested_first[0][0] = 1;
+    nested_second[0][0] = 2;
+    auto nested = m1une::math::multivariate_convolution_truncated(
+        nested_first, nested_second
+    );
 }
 ```
