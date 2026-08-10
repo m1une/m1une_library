@@ -81,10 +81,12 @@ sizes up to the usual $2^{22}$ coefficient limit for this routine.
 
 `multivariate_convolution_cyclic` accepts either `ModInt<mod>` or
 `DynamicModInt<id>`. When every $n_i$ divides `Mint::mod() - 1`, it uses a
-multidimensional DFT and the modulus must admit a primitive root. Otherwise it
-works for arbitrary positive dimensions by embedding each nontrivial dimension
-in mixed radix $2n_i-1$, taking one ordinary convolution, and folding the result
-modulo the original dimensions. The embedded input arrays end at index
+multidimensional DFT and the modulus must admit a primitive root. With a static
+modulus, power-of-two axes use the native NTT; other axis lengths use geometric
+evaluation. Otherwise it works for arbitrary positive dimensions by embedding
+each nontrivial dimension in mixed radix $2n_i-1$, taking one ordinary
+convolution, and folding the result modulo the original dimensions. The
+embedded input arrays end at index
 $(L-1)/2$, so the ordinary convolution has exactly $L$ output coefficients and
 uses the smallest power-of-two transform length that can hold them. The
 fallback's supported transform length and coefficient bound are those of

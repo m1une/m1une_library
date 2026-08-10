@@ -182,6 +182,22 @@ std::vector<Mint> geometric_evaluation(
     return result;
 }
 
+template <class Mint>
+std::vector<Mint> cyclic_fourier_transform(
+    std::vector<Mint> values, Mint ratio, bool inverse
+) {
+    if constexpr (fps::internal::has_static_modulus<Mint>::value) {
+        const int size = int(values.size());
+        if ((size & (size - 1)) == 0) {
+            // Keep normalization outside the per-axis transforms, matching
+            // the arbitrary-length DFT path below.
+            fps::internal::ntt(values, inverse, false);
+            return values;
+        }
+    }
+    return geometric_evaluation(values, ratio);
+}
+
 }  // namespace internal
 
 template <class Mint>
@@ -369,8 +385,12 @@ std::vector<Mint> multivariate_convolution_cyclic(
                     first_line[i] = transformed_first[block + offset + stride * i];
                     second_line[i] = transformed_second[block + offset + stride * i];
                 }
-                first_line = internal::geometric_evaluation(first_line, root);
-                second_line = internal::geometric_evaluation(second_line, root);
+                first_line = internal::cyclic_fourier_transform(
+                    std::move(first_line), root, false
+                );
+                second_line = internal::cyclic_fourier_transform(
+                    std::move(second_line), root, false
+                );
                 for (int i = 0; i < dimension; i++) {
                     transformed_first[block + offset + stride * i] = first_line[i];
                     transformed_second[block + offset + stride * i] = second_line[i];
@@ -394,7 +414,9 @@ std::vector<Mint> multivariate_convolution_cyclic(
                 for (int i = 0; i < dimension; i++) {
                     line[i] = transformed_first[block + offset + stride * i];
                 }
-                line = internal::geometric_evaluation(line, inverse_root);
+                line = internal::cyclic_fourier_transform(
+                    std::move(line), inverse_root, true
+                );
                 for (int i = 0; i < dimension; i++) {
                     transformed_first[block + offset + stride * i] = line[i];
                 }

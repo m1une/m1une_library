@@ -11,7 +11,9 @@
 #include <utility>
 #include <vector>
 
-#if defined(__GNUC__) && !defined(__clang__) && (defined(__x86_64__) || defined(__i386__))
+#if defined(__GNUC__) && !defined(__clang__) && \
+    (defined(__x86_64__) || defined(__i386__)) && \
+    !defined(M1UNE_FPS_DISABLE_X86_SIMD)
 #include <immintrin.h>
 #define M1UNE_FPS_HAS_X86_SIMD 1
 #pragma GCC push_options
