@@ -3557,7 +3557,7 @@ data:
     \        degree,\n        static_cast<uint64_t>(Mint::mod())\n    );\n    if (!root.has_value())\
     \ return std::nullopt;\n    return Mint(*root);\n}\n\n}  // namespace math\n}\
     \  // namespace m1une\n\n\n#line 1 \"math/multivariate_convolution.hpp\"\n\n\n\
-    \n#line 9 \"math/multivariate_convolution.hpp\"\n\n#line 1 \"math/primitive_root.hpp\"\
+    \n#line 11 \"math/multivariate_convolution.hpp\"\n\n#line 1 \"math/primitive_root.hpp\"\
     \n\n\n\n#line 9 \"math/primitive_root.hpp\"\n\n#line 11 \"math/primitive_root.hpp\"\
     \n\nnamespace m1une {\nnamespace math {\n\ninline bool has_primitive_root(uint64_t\
     \ mod) {\n    if (mod == 2 || mod == 4) return true;\n    if (mod < 2) return\
@@ -3574,10 +3574,46 @@ data:
     \            if (internal::power_mod(candidate, phi / factor.first, mod) == 1)\
     \ {\n                generator = false;\n                break;\n            }\n\
     \        }\n        if (generator) return candidate;\n    }\n    return 0;\n}\n\
-    \n}  // namespace math\n}  // namespace m1une\n\n\n#line 12 \"math/multivariate_convolution.hpp\"\
-    \n\nnamespace m1une {\nnamespace math {\n\nnamespace internal {\n\ninline int\
-    \ multivariate_coefficient_count(const std::vector<int>& dimensions) {\n    int64_t\
-    \ count = 1;\n    for (int dimension : dimensions) {\n        assert(dimension\
+    \n}  // namespace math\n}  // namespace m1une\n\n\n#line 14 \"math/multivariate_convolution.hpp\"\
+    \n\nnamespace m1une {\nnamespace math {\n\nnamespace internal {\n\ntemplate <class\
+    \ T>\nstruct nested_vector_traits {\n    using scalar_type = T;\n    static constexpr\
+    \ int depth = 0;\n};\n\ntemplate <class T, class Allocator>\nstruct nested_vector_traits<std::vector<T,\
+    \ Allocator>> {\n    using scalar_type = typename nested_vector_traits<T>::scalar_type;\n\
+    \    static constexpr int depth = nested_vector_traits<T>::depth + 1;\n};\n\n\
+    template <class Nested>\nvoid nested_vector_shape(const Nested& values, std::vector<int>&\
+    \ shape) {\n    if constexpr (nested_vector_traits<Nested>::depth > 0) {\n   \
+    \     assert(!values.empty());\n        assert(values.size() <= std::size_t(std::numeric_limits<int>::max()));\n\
+    \        shape.push_back(int(values.size()));\n        nested_vector_shape(values.front(),\
+    \ shape);\n    }\n}\n\ntemplate <class Nested, class Mint>\nvoid flatten_nested_vector(\n\
+    \    const Nested& values,\n    const std::vector<int>& shape,\n    int level,\n\
+    \    std::vector<Mint>& flattened\n) {\n    if constexpr (nested_vector_traits<Nested>::depth\
+    \ == 0) {\n        flattened.push_back(values);\n    } else {\n        assert(level\
+    \ < int(shape.size()));\n        assert(int(values.size()) == shape[level]);\n\
+    \        for (const auto& child : values) {\n            flatten_nested_vector(child,\
+    \ shape, level + 1, flattened);\n        }\n    }\n}\n\ntemplate <class Nested,\
+    \ class Mint>\nvoid rebuild_nested_vector(\n    Nested& values,\n    const std::vector<int>&\
+    \ shape,\n    int level,\n    const std::vector<Mint>& flattened,\n    int& position\n\
+    ) {\n    if constexpr (nested_vector_traits<Nested>::depth == 0) {\n        assert(position\
+    \ < int(flattened.size()));\n        values = flattened[position++];\n    } else\
+    \ {\n        assert(level < int(shape.size()));\n        values.resize(shape[level]);\n\
+    \        for (auto& child : values) {\n            rebuild_nested_vector(child,\
+    \ shape, level + 1, flattened, position);\n        }\n    }\n}\n\ntemplate <class\
+    \ Nested>\nstd::vector<int> flatten_multivariate_inputs(\n    const Nested& first,\n\
+    \    const Nested& second,\n    std::vector<typename nested_vector_traits<Nested>::scalar_type>&\
+    \ flattened_first,\n    std::vector<typename nested_vector_traits<Nested>::scalar_type>&\
+    \ flattened_second\n) {\n    std::vector<int> shape;\n    nested_vector_shape(first,\
+    \ shape);\n    assert(int(shape.size()) == nested_vector_traits<Nested>::depth);\n\
+    \n    std::vector<int> second_shape;\n    nested_vector_shape(second, second_shape);\n\
+    \    assert(second_shape == shape);\n\n    flatten_nested_vector(first, shape,\
+    \ 0, flattened_first);\n    flatten_nested_vector(second, shape, 0, flattened_second);\n\
+    \    std::reverse(shape.begin(), shape.end());\n    return shape;\n}\n\ntemplate\
+    \ <class Nested>\nNested rebuild_multivariate_result(\n    std::vector<int> dimensions,\n\
+    \    const std::vector<typename nested_vector_traits<Nested>::scalar_type>& flattened\n\
+    ) {\n    std::reverse(dimensions.begin(), dimensions.end());\n    Nested result;\n\
+    \    int position = 0;\n    rebuild_nested_vector(result, dimensions, 0, flattened,\
+    \ position);\n    assert(position == int(flattened.size()));\n    return result;\n\
+    }\n\ninline int multivariate_coefficient_count(const std::vector<int>& dimensions)\
+    \ {\n    int64_t count = 1;\n    for (int dimension : dimensions) {\n        assert(dimension\
     \ > 0);\n        count *= dimension;\n        assert(count <= std::numeric_limits<int>::max());\n\
     \    }\n    return int(count);\n}\n\ninline std::vector<int> multivariate_colors(const\
     \ std::vector<int>& dimensions) {\n    const int variable_count = int(dimensions.size());\n\
@@ -3658,9 +3694,18 @@ data:
     \ (int group = 0; group < variable_count; group++) {\n        fps::internal::ntt(transformed_result[group],\
     \ true);\n    }\n\n    std::vector<Mint> result(coefficient_count);\n    for (int\
     \ i = 0; i < coefficient_count; i++) {\n        result[i] = transformed_result[color[i]][i];\n\
-    \    }\n    return result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint> multivariate_convolution_cyclic(\n\
-    \    const std::vector<int>& dimensions,\n    const std::vector<Mint>& first,\n\
-    \    const std::vector<Mint>& second\n) {\n    const int coefficient_count = internal::multivariate_coefficient_count(dimensions);\n\
+    \    }\n    return result;\n}\n\ntemplate <\n    class Nested,\n    std::enable_if_t<(internal::nested_vector_traits<Nested>::depth\
+    \ > 0), int> = 0\n>\nNested multivariate_convolution_truncated(\n    const Nested&\
+    \ first,\n    const Nested& second\n) {\n    using Mint = typename internal::nested_vector_traits<Nested>::scalar_type;\n\
+    \    std::vector<Mint> flattened_first, flattened_second;\n    std::vector<int>\
+    \ dimensions = internal::flatten_multivariate_inputs(\n        first, second,\
+    \ flattened_first, flattened_second\n    );\n    std::vector<Mint> flattened_result\
+    \ = multivariate_convolution_truncated(\n        dimensions, flattened_first,\
+    \ flattened_second\n    );\n    return internal::rebuild_multivariate_result<Nested>(\n\
+    \        std::move(dimensions), flattened_result\n    );\n}\n\ntemplate <class\
+    \ Mint>\nstd::vector<Mint> multivariate_convolution_cyclic(\n    const std::vector<int>&\
+    \ dimensions,\n    const std::vector<Mint>& first,\n    const std::vector<Mint>&\
+    \ second\n) {\n    const int coefficient_count = internal::multivariate_coefficient_count(dimensions);\n\
     \    assert(int(first.size()) == coefficient_count);\n    assert(int(second.size())\
     \ == coefficient_count);\n    if (dimensions.empty()) return {first[0] * second[0]};\n\
     \n    const uint32_t modulus = Mint::mod();\n    bool has_all_roots = true;\n\
@@ -3725,15 +3770,24 @@ data:
     \               }\n            }\n        }\n        stride *= dimension;\n  \
     \  }\n\n    const Mint inverse_size = Mint(coefficient_count).inv();\n    for\
     \ (Mint& value : transformed_first) value *= inverse_size;\n    return transformed_first;\n\
-    }\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line 1 \"math/multiplicative_function_prefix_sum.hpp\"\
-    \n\n\n\n#line 11 \"math/multiplicative_function_prefix_sum.hpp\"\n\nnamespace\
-    \ m1une {\nnamespace math {\n\n// Computes summatory multiplicative functions\
-    \ with a Min_25 sieve.\n// prime_power(p, e) must return f(p^e), and prime_prefix\
-    \ must contain\n// sum_{p <= x} f(p) at every x represented by quotient_values().\n\
-    template <class T, class PrimePower>\nstruct MultiplicativeFunctionPrefixSum {\n\
-    \   private:\n    uint64_t _n;\n    uint64_t _sqrt_n;\n    uint64_t _large_size;\n\
-    \    std::vector<int> _primes;\n    PrimePower _prime_power;\n\n    static uint64_t\
-    \ integer_sqrt(uint64_t n) {\n        uint64_t result = static_cast<uint64_t>(std::sqrt(static_cast<long\
+    }\n\ntemplate <\n    class Nested,\n    std::enable_if_t<(internal::nested_vector_traits<Nested>::depth\
+    \ > 0), int> = 0\n>\nNested multivariate_convolution_cyclic(\n    const Nested&\
+    \ first,\n    const Nested& second\n) {\n    using Mint = typename internal::nested_vector_traits<Nested>::scalar_type;\n\
+    \    std::vector<Mint> flattened_first, flattened_second;\n    std::vector<int>\
+    \ dimensions = internal::flatten_multivariate_inputs(\n        first, second,\
+    \ flattened_first, flattened_second\n    );\n    std::vector<Mint> flattened_result\
+    \ = multivariate_convolution_cyclic(\n        dimensions, flattened_first, flattened_second\n\
+    \    );\n    return internal::rebuild_multivariate_result<Nested>(\n        std::move(dimensions),\
+    \ flattened_result\n    );\n}\n\n}  // namespace math\n}  // namespace m1une\n\
+    \n\n#line 1 \"math/multiplicative_function_prefix_sum.hpp\"\n\n\n\n#line 11 \"\
+    math/multiplicative_function_prefix_sum.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ math {\n\n// Computes summatory multiplicative functions with a Min_25 sieve.\n\
+    // prime_power(p, e) must return f(p^e), and prime_prefix must contain\n// sum_{p\
+    \ <= x} f(p) at every x represented by quotient_values().\ntemplate <class T,\
+    \ class PrimePower>\nstruct MultiplicativeFunctionPrefixSum {\n   private:\n \
+    \   uint64_t _n;\n    uint64_t _sqrt_n;\n    uint64_t _large_size;\n    std::vector<int>\
+    \ _primes;\n    PrimePower _prime_power;\n\n    static uint64_t integer_sqrt(uint64_t\
+    \ n) {\n        uint64_t result = static_cast<uint64_t>(std::sqrt(static_cast<long\
     \ double>(n)));\n        while (result != 0 && result > n / result) result--;\n\
     \        while (result + 1 <= n / (result + 1)) result++;\n        return result;\n\
     \    }\n\n    static uint64_t validated_sqrt(uint64_t n) {\n        const uint64_t\
@@ -5038,7 +5092,7 @@ data:
   isVerificationFile: true
   path: verify/math/math_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-08-09 04:27:20+09:00'
+  timestamp: '2026-08-10 15:56:40+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/math_algorithms.test.cpp

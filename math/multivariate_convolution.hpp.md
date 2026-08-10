@@ -36,11 +36,11 @@ data:
   attributes:
     links: []
   bundledCode: "#line 1 \"math/multivariate_convolution.hpp\"\n\n\n\n#include <algorithm>\n\
-    #include <cassert>\n#include <cstdint>\n#include <limits>\n#include <vector>\n\
-    \n#line 1 \"math/fps/convolution.hpp\"\n\n\n\n#line 5 \"math/fps/convolution.hpp\"\
-    \n#include <array>\n#line 8 \"math/fps/convolution.hpp\"\n#include <cstring>\n\
-    #include <new>\n#include <type_traits>\n#include <utility>\n#line 13 \"math/fps/convolution.hpp\"\
-    \n\n#if defined(__GNUC__) && !defined(__clang__) && (defined(__x86_64__) || defined(__i386__))\n\
+    #include <cassert>\n#include <cstdint>\n#include <limits>\n#include <type_traits>\n\
+    #include <utility>\n#include <vector>\n\n#line 1 \"math/fps/convolution.hpp\"\n\
+    \n\n\n#line 5 \"math/fps/convolution.hpp\"\n#include <array>\n#line 8 \"math/fps/convolution.hpp\"\
+    \n#include <cstring>\n#include <new>\n#line 13 \"math/fps/convolution.hpp\"\n\n\
+    #if defined(__GNUC__) && !defined(__clang__) && (defined(__x86_64__) || defined(__i386__))\n\
     #include <immintrin.h>\n#define M1UNE_FPS_HAS_X86_SIMD 1\n#pragma GCC push_options\n\
     #pragma GCC target(\"avx2,bmi\")\n#endif\n\n#line 1 \"math/fps/internal/ntt998_faster.hpp\"\
     \n\n\n\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n\n#line 9 \"math/fps/internal/ntt998_faster.hpp\"\
@@ -767,163 +767,45 @@ data:
     \            if (internal::power_mod(candidate, phi / factor.first, mod) == 1)\
     \ {\n                generator = false;\n                break;\n            }\n\
     \        }\n        if (generator) return candidate;\n    }\n    return 0;\n}\n\
-    \n}  // namespace math\n}  // namespace m1une\n\n\n#line 12 \"math/multivariate_convolution.hpp\"\
-    \n\nnamespace m1une {\nnamespace math {\n\nnamespace internal {\n\ninline int\
-    \ multivariate_coefficient_count(const std::vector<int>& dimensions) {\n    int64_t\
-    \ count = 1;\n    for (int dimension : dimensions) {\n        assert(dimension\
-    \ > 0);\n        count *= dimension;\n        assert(count <= std::numeric_limits<int>::max());\n\
-    \    }\n    return int(count);\n}\n\ninline std::vector<int> multivariate_colors(const\
-    \ std::vector<int>& dimensions) {\n    const int variable_count = int(dimensions.size());\n\
-    \    const int coefficient_count = multivariate_coefficient_count(dimensions);\n\
-    \    std::vector<int> color(coefficient_count);\n    if (variable_count == 0)\
-    \ return color;\n\n    for (int index = 0; index < coefficient_count; index++)\
-    \ {\n        int sum = 0;\n        int stride = 1;\n        for (int variable\
-    \ = 0; variable + 1 < variable_count; variable++) {\n            stride *= dimensions[variable];\n\
-    \            sum += index / stride;\n        }\n        color[index] = sum % variable_count;\n\
-    \    }\n    return color;\n}\n\ntemplate <class Mint>\nstd::vector<Mint> geometric_evaluation(\n\
-    \    const std::vector<Mint>& polynomial, Mint ratio\n) {\n    const int size\
-    \ = int(polynomial.size());\n    if (size <= 64) {\n        std::vector<Mint>\
-    \ result(size);\n        Mint point = 1;\n        for (int i = 0; i < size; i++)\
-    \ {\n            Mint power = 1;\n            for (const Mint& coefficient : polynomial)\
-    \ {\n                result[i] += coefficient * power;\n                power\
-    \ *= point;\n            }\n            point *= ratio;\n        }\n        return\
-    \ result;\n    }\n\n    auto triangular_powers = [](Mint base, int length) {\n\
-    \        std::vector<Mint> result(length);\n        if (length == 0) return result;\n\
-    \        result[0] = 1;\n        Mint power = 1;\n        for (int i = 0; i +\
-    \ 1 < length; i++) {\n            result[i + 1] = result[i] * power;\n       \
-    \     power *= base;\n        }\n        return result;\n    };\n\n    std::vector<Mint>\
-    \ positive = triangular_powers(ratio, 2 * size - 1);\n    std::vector<Mint> negative\
-    \ = triangular_powers(ratio.inv(), size);\n    std::vector<Mint> scaled(polynomial);\n\
-    \    for (int i = 0; i < size; i++) scaled[i] *= negative[i];\n    std::reverse(scaled.begin(),\
-    \ scaled.end());\n    std::vector<Mint> product = fps::convolution(scaled, positive);\n\
-    \n    std::vector<Mint> result(size);\n    for (int i = 0; i < size; i++) result[i]\
-    \ = product[size - 1 + i] * negative[i];\n    return result;\n}\n\ntemplate <class\
-    \ Mint>\nstd::vector<Mint> multivariate_convolution_truncated_arbitrary_mod(\n\
-    \    const std::vector<int>& dimensions,\n    const std::vector<Mint>& first,\n\
-    \    const std::vector<Mint>& second\n) {\n    const int variable_count = int(dimensions.size());\n\
-    \    const int coefficient_count = multivariate_coefficient_count(dimensions);\n\
-    \    assert(int(first.size()) == coefficient_count);\n    assert(int(second.size())\
-    \ == coefficient_count);\n    if (variable_count == 0) return {first[0] * second[0]};\n\
-    \n    const std::vector<int> color = multivariate_colors(dimensions);\n    std::vector<std::vector<Mint>>\
-    \ colored_first(\n        variable_count, std::vector<Mint>(coefficient_count)\n\
-    \    );\n    std::vector<std::vector<Mint>> colored_second(\n        variable_count,\
-    \ std::vector<Mint>(coefficient_count)\n    );\n    for (int i = 0; i < coefficient_count;\
-    \ i++) {\n        colored_first[color[i]][i] = first[i];\n        colored_second[color[i]][i]\
-    \ = second[i];\n    }\n\n    std::vector<std::vector<Mint>> colored_result(\n\
-    \        variable_count, std::vector<Mint>(coefficient_count)\n    );\n    for\
-    \ (int left = 0; left < variable_count; left++) {\n        for (int right = 0;\
-    \ right < variable_count; right++) {\n            std::vector<Mint> product =\n\
-    \                fps::convolution(colored_first[left], colored_second[right]);\n\
-    \            std::vector<Mint>& destination =\n                colored_result[(left\
-    \ + right) % variable_count];\n            for (int i = 0; i < coefficient_count;\
-    \ i++) {\n                destination[i] += product[i];\n            }\n     \
-    \   }\n    }\n\n    std::vector<Mint> result(coefficient_count);\n    for (int\
-    \ i = 0; i < coefficient_count; i++) {\n        result[i] = colored_result[color[i]][i];\n\
-    \    }\n    return result;\n}\n\n}  // namespace internal\n\ntemplate <class Mint>\n\
-    std::vector<Mint> multivariate_convolution_truncated(\n    const std::vector<int>&\
-    \ dimensions,\n    const std::vector<Mint>& first,\n    const std::vector<Mint>&\
-    \ second\n) {\n    static_assert(\n        fps::internal::has_static_modulus<Mint>::value,\n\
-    \        \"truncated multivariate convolution requires a static-modulus type\"\
-    \n    );\n    const int variable_count = int(dimensions.size());\n    const int\
-    \ coefficient_count = internal::multivariate_coefficient_count(dimensions);\n\
-    \    assert(int(first.size()) == coefficient_count);\n    assert(int(second.size())\
-    \ == coefficient_count);\n    if (variable_count == 0) return {first[0] * second[0]};\n\
-    \n    int64_t transform_size_64 = 1;\n    while (transform_size_64 < 2LL * coefficient_count\
-    \ - 1) transform_size_64 <<= 1;\n    assert(transform_size_64 <= std::numeric_limits<int>::max());\n\
-    \    const int transform_size = int(transform_size_64);\n    assert((Mint::mod()\
-    \ - 1) % uint32_t(transform_size) == 0);\n\n    const std::vector<int> color =\
-    \ internal::multivariate_colors(dimensions);\n    std::vector<std::vector<Mint>>\
-    \ transformed_first(\n        variable_count, std::vector<Mint>(transform_size)\n\
-    \    );\n    std::vector<std::vector<Mint>> transformed_second(\n        variable_count,\
-    \ std::vector<Mint>(transform_size)\n    );\n    for (int i = 0; i < coefficient_count;\
-    \ i++) {\n        transformed_first[color[i]][i] = first[i];\n        transformed_second[color[i]][i]\
-    \ = second[i];\n    }\n    for (int group = 0; group < variable_count; group++)\
-    \ {\n        fps::internal::ntt(transformed_first[group], false);\n        fps::internal::ntt(transformed_second[group],\
-    \ false);\n    }\n\n    std::vector<std::vector<Mint>> transformed_result(\n \
-    \       variable_count, std::vector<Mint>(transform_size)\n    );\n    for (int\
-    \ left = 0; left < variable_count; left++) {\n        for (int right = 0; right\
-    \ < variable_count; right++) {\n            std::vector<Mint>& destination =\n\
-    \                transformed_result[(left + right) % variable_count];\n      \
-    \      const std::vector<Mint>& left_values = transformed_first[left];\n     \
-    \       const std::vector<Mint>& right_values = transformed_second[right];\n \
-    \           for (int i = 0; i < transform_size; i++) {\n                destination[i]\
-    \ += left_values[i] * right_values[i];\n            }\n        }\n    }\n    for\
-    \ (int group = 0; group < variable_count; group++) {\n        fps::internal::ntt(transformed_result[group],\
-    \ true);\n    }\n\n    std::vector<Mint> result(coefficient_count);\n    for (int\
-    \ i = 0; i < coefficient_count; i++) {\n        result[i] = transformed_result[color[i]][i];\n\
-    \    }\n    return result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint> multivariate_convolution_cyclic(\n\
-    \    const std::vector<int>& dimensions,\n    const std::vector<Mint>& first,\n\
-    \    const std::vector<Mint>& second\n) {\n    const int coefficient_count = internal::multivariate_coefficient_count(dimensions);\n\
-    \    assert(int(first.size()) == coefficient_count);\n    assert(int(second.size())\
-    \ == coefficient_count);\n    if (dimensions.empty()) return {first[0] * second[0]};\n\
-    \n    const uint32_t modulus = Mint::mod();\n    bool has_all_roots = true;\n\
-    \    for (int dimension : dimensions) {\n        if ((modulus - 1) % uint32_t(dimension)\
-    \ != 0) has_all_roots = false;\n    }\n    if (!has_all_roots) {\n        std::vector<int>\
-    \ reduced_dimensions;\n        for (int dimension : dimensions) {\n          \
-    \  if (dimension != 1) reduced_dimensions.push_back(dimension);\n        }\n \
-    \       if (reduced_dimensions.empty()) return {first[0] * second[0]};\n\n   \
-    \     std::vector<int> widened_dimensions(reduced_dimensions.size());\n      \
-    \  for (int i = 0; i < int(reduced_dimensions.size()); i++) {\n            const\
-    \ int64_t widened = 2LL * reduced_dimensions[i] - 1;\n            assert(widened\
-    \ <= std::numeric_limits<int>::max());\n            widened_dimensions[i] = int(widened);\n\
-    \        }\n        const int widened_count =\n            internal::multivariate_coefficient_count(widened_dimensions);\n\
-    \        std::vector<Mint> widened_first(widened_count);\n        std::vector<Mint>\
-    \ widened_second(widened_count);\n        for (int index = 0; index < coefficient_count;\
-    \ index++) {\n            int remaining = index;\n            int widened_index\
-    \ = 0;\n            int widened_stride = 1;\n            for (int variable = 0;\
-    \ variable < int(reduced_dimensions.size()); variable++) {\n                const\
-    \ int coordinate = remaining % reduced_dimensions[variable];\n               \
-    \ remaining /= reduced_dimensions[variable];\n                widened_index +=\
-    \ coordinate * widened_stride;\n                widened_stride *= widened_dimensions[variable];\n\
-    \            }\n            widened_first[widened_index] = first[index];\n   \
-    \         widened_second[widened_index] = second[index];\n        }\n\n      \
-    \  std::vector<Mint> widened_product =\n            internal::multivariate_convolution_truncated_arbitrary_mod(\n\
-    \                widened_dimensions, widened_first, widened_second\n         \
-    \   );\n        std::vector<Mint> result(coefficient_count);\n        for (int\
-    \ widened_index = 0; widened_index < widened_count; widened_index++) {\n     \
-    \       int remaining = widened_index;\n            int index = 0;\n         \
-    \   int stride = 1;\n            for (int variable = 0; variable < int(reduced_dimensions.size());\
-    \ variable++) {\n                const int coordinate = remaining % widened_dimensions[variable];\n\
-    \                remaining /= widened_dimensions[variable];\n                index\
-    \ += (coordinate % reduced_dimensions[variable]) * stride;\n                stride\
-    \ *= reduced_dimensions[variable];\n            }\n            result[index] +=\
-    \ widened_product[widened_index];\n        }\n        return result;\n    }\n\n\
-    \    const uint64_t generator = primitive_root(modulus);\n    assert(generator\
-    \ != 0);\n\n    std::vector<Mint> transformed_first(first);\n    std::vector<Mint>\
-    \ transformed_second(second);\n    int stride = 1;\n    for (int dimension : dimensions)\
-    \ {\n        assert((modulus - 1) % uint32_t(dimension) == 0);\n        const\
-    \ Mint root = Mint(generator).pow((modulus - 1) / dimension);\n        for (int\
-    \ block = 0; block < coefficient_count; block += stride * dimension) {\n     \
-    \       for (int offset = 0; offset < stride; offset++) {\n                std::vector<Mint>\
-    \ first_line(dimension);\n                std::vector<Mint> second_line(dimension);\n\
-    \                for (int i = 0; i < dimension; i++) {\n                    first_line[i]\
-    \ = transformed_first[block + offset + stride * i];\n                    second_line[i]\
-    \ = transformed_second[block + offset + stride * i];\n                }\n    \
-    \            first_line = internal::geometric_evaluation(first_line, root);\n\
-    \                second_line = internal::geometric_evaluation(second_line, root);\n\
-    \                for (int i = 0; i < dimension; i++) {\n                    transformed_first[block\
-    \ + offset + stride * i] = first_line[i];\n                    transformed_second[block\
-    \ + offset + stride * i] = second_line[i];\n                }\n            }\n\
-    \        }\n        stride *= dimension;\n    }\n\n    for (int i = 0; i < coefficient_count;\
-    \ i++) {\n        transformed_first[i] *= transformed_second[i];\n    }\n\n  \
-    \  stride = 1;\n    for (int dimension : dimensions) {\n        const Mint inverse_root\
-    \ =\n            Mint(generator).pow((modulus - 1) / dimension).inv();\n     \
-    \   for (int block = 0; block < coefficient_count; block += stride * dimension)\
-    \ {\n            for (int offset = 0; offset < stride; offset++) {\n         \
-    \       std::vector<Mint> line(dimension);\n                for (int i = 0; i\
-    \ < dimension; i++) {\n                    line[i] = transformed_first[block +\
-    \ offset + stride * i];\n                }\n                line = internal::geometric_evaluation(line,\
-    \ inverse_root);\n                for (int i = 0; i < dimension; i++) {\n    \
-    \                transformed_first[block + offset + stride * i] = line[i];\n \
-    \               }\n            }\n        }\n        stride *= dimension;\n  \
-    \  }\n\n    const Mint inverse_size = Mint(coefficient_count).inv();\n    for\
-    \ (Mint& value : transformed_first) value *= inverse_size;\n    return transformed_first;\n\
-    }\n\n}  // namespace math\n}  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_MATH_MULTIVARIATE_CONVOLUTION_HPP\n#define M1UNE_MATH_MULTIVARIATE_CONVOLUTION_HPP\
-    \ 1\n\n#include <algorithm>\n#include <cassert>\n#include <cstdint>\n#include\
-    \ <limits>\n#include <vector>\n\n#include \"fps/convolution.hpp\"\n#include \"\
-    primitive_root.hpp\"\n\nnamespace m1une {\nnamespace math {\n\nnamespace internal\
-    \ {\n\ninline int multivariate_coefficient_count(const std::vector<int>& dimensions)\
+    \n}  // namespace math\n}  // namespace m1une\n\n\n#line 14 \"math/multivariate_convolution.hpp\"\
+    \n\nnamespace m1une {\nnamespace math {\n\nnamespace internal {\n\ntemplate <class\
+    \ T>\nstruct nested_vector_traits {\n    using scalar_type = T;\n    static constexpr\
+    \ int depth = 0;\n};\n\ntemplate <class T, class Allocator>\nstruct nested_vector_traits<std::vector<T,\
+    \ Allocator>> {\n    using scalar_type = typename nested_vector_traits<T>::scalar_type;\n\
+    \    static constexpr int depth = nested_vector_traits<T>::depth + 1;\n};\n\n\
+    template <class Nested>\nvoid nested_vector_shape(const Nested& values, std::vector<int>&\
+    \ shape) {\n    if constexpr (nested_vector_traits<Nested>::depth > 0) {\n   \
+    \     assert(!values.empty());\n        assert(values.size() <= std::size_t(std::numeric_limits<int>::max()));\n\
+    \        shape.push_back(int(values.size()));\n        nested_vector_shape(values.front(),\
+    \ shape);\n    }\n}\n\ntemplate <class Nested, class Mint>\nvoid flatten_nested_vector(\n\
+    \    const Nested& values,\n    const std::vector<int>& shape,\n    int level,\n\
+    \    std::vector<Mint>& flattened\n) {\n    if constexpr (nested_vector_traits<Nested>::depth\
+    \ == 0) {\n        flattened.push_back(values);\n    } else {\n        assert(level\
+    \ < int(shape.size()));\n        assert(int(values.size()) == shape[level]);\n\
+    \        for (const auto& child : values) {\n            flatten_nested_vector(child,\
+    \ shape, level + 1, flattened);\n        }\n    }\n}\n\ntemplate <class Nested,\
+    \ class Mint>\nvoid rebuild_nested_vector(\n    Nested& values,\n    const std::vector<int>&\
+    \ shape,\n    int level,\n    const std::vector<Mint>& flattened,\n    int& position\n\
+    ) {\n    if constexpr (nested_vector_traits<Nested>::depth == 0) {\n        assert(position\
+    \ < int(flattened.size()));\n        values = flattened[position++];\n    } else\
+    \ {\n        assert(level < int(shape.size()));\n        values.resize(shape[level]);\n\
+    \        for (auto& child : values) {\n            rebuild_nested_vector(child,\
+    \ shape, level + 1, flattened, position);\n        }\n    }\n}\n\ntemplate <class\
+    \ Nested>\nstd::vector<int> flatten_multivariate_inputs(\n    const Nested& first,\n\
+    \    const Nested& second,\n    std::vector<typename nested_vector_traits<Nested>::scalar_type>&\
+    \ flattened_first,\n    std::vector<typename nested_vector_traits<Nested>::scalar_type>&\
+    \ flattened_second\n) {\n    std::vector<int> shape;\n    nested_vector_shape(first,\
+    \ shape);\n    assert(int(shape.size()) == nested_vector_traits<Nested>::depth);\n\
+    \n    std::vector<int> second_shape;\n    nested_vector_shape(second, second_shape);\n\
+    \    assert(second_shape == shape);\n\n    flatten_nested_vector(first, shape,\
+    \ 0, flattened_first);\n    flatten_nested_vector(second, shape, 0, flattened_second);\n\
+    \    std::reverse(shape.begin(), shape.end());\n    return shape;\n}\n\ntemplate\
+    \ <class Nested>\nNested rebuild_multivariate_result(\n    std::vector<int> dimensions,\n\
+    \    const std::vector<typename nested_vector_traits<Nested>::scalar_type>& flattened\n\
+    ) {\n    std::reverse(dimensions.begin(), dimensions.end());\n    Nested result;\n\
+    \    int position = 0;\n    rebuild_nested_vector(result, dimensions, 0, flattened,\
+    \ position);\n    assert(position == int(flattened.size()));\n    return result;\n\
+    }\n\ninline int multivariate_coefficient_count(const std::vector<int>& dimensions)\
     \ {\n    int64_t count = 1;\n    for (int dimension : dimensions) {\n        assert(dimension\
     \ > 0);\n        count *= dimension;\n        assert(count <= std::numeric_limits<int>::max());\n\
     \    }\n    return int(count);\n}\n\ninline std::vector<int> multivariate_colors(const\
@@ -1005,9 +887,18 @@ data:
     \ (int group = 0; group < variable_count; group++) {\n        fps::internal::ntt(transformed_result[group],\
     \ true);\n    }\n\n    std::vector<Mint> result(coefficient_count);\n    for (int\
     \ i = 0; i < coefficient_count; i++) {\n        result[i] = transformed_result[color[i]][i];\n\
-    \    }\n    return result;\n}\n\ntemplate <class Mint>\nstd::vector<Mint> multivariate_convolution_cyclic(\n\
-    \    const std::vector<int>& dimensions,\n    const std::vector<Mint>& first,\n\
-    \    const std::vector<Mint>& second\n) {\n    const int coefficient_count = internal::multivariate_coefficient_count(dimensions);\n\
+    \    }\n    return result;\n}\n\ntemplate <\n    class Nested,\n    std::enable_if_t<(internal::nested_vector_traits<Nested>::depth\
+    \ > 0), int> = 0\n>\nNested multivariate_convolution_truncated(\n    const Nested&\
+    \ first,\n    const Nested& second\n) {\n    using Mint = typename internal::nested_vector_traits<Nested>::scalar_type;\n\
+    \    std::vector<Mint> flattened_first, flattened_second;\n    std::vector<int>\
+    \ dimensions = internal::flatten_multivariate_inputs(\n        first, second,\
+    \ flattened_first, flattened_second\n    );\n    std::vector<Mint> flattened_result\
+    \ = multivariate_convolution_truncated(\n        dimensions, flattened_first,\
+    \ flattened_second\n    );\n    return internal::rebuild_multivariate_result<Nested>(\n\
+    \        std::move(dimensions), flattened_result\n    );\n}\n\ntemplate <class\
+    \ Mint>\nstd::vector<Mint> multivariate_convolution_cyclic(\n    const std::vector<int>&\
+    \ dimensions,\n    const std::vector<Mint>& first,\n    const std::vector<Mint>&\
+    \ second\n) {\n    const int coefficient_count = internal::multivariate_coefficient_count(dimensions);\n\
     \    assert(int(first.size()) == coefficient_count);\n    assert(int(second.size())\
     \ == coefficient_count);\n    if (dimensions.empty()) return {first[0] * second[0]};\n\
     \n    const uint32_t modulus = Mint::mod();\n    bool has_all_roots = true;\n\
@@ -1072,7 +963,225 @@ data:
     \               }\n            }\n        }\n        stride *= dimension;\n  \
     \  }\n\n    const Mint inverse_size = Mint(coefficient_count).inv();\n    for\
     \ (Mint& value : transformed_first) value *= inverse_size;\n    return transformed_first;\n\
-    }\n\n}  // namespace math\n}  // namespace m1une\n\n#endif  // M1UNE_MATH_MULTIVARIATE_CONVOLUTION_HPP\n"
+    }\n\ntemplate <\n    class Nested,\n    std::enable_if_t<(internal::nested_vector_traits<Nested>::depth\
+    \ > 0), int> = 0\n>\nNested multivariate_convolution_cyclic(\n    const Nested&\
+    \ first,\n    const Nested& second\n) {\n    using Mint = typename internal::nested_vector_traits<Nested>::scalar_type;\n\
+    \    std::vector<Mint> flattened_first, flattened_second;\n    std::vector<int>\
+    \ dimensions = internal::flatten_multivariate_inputs(\n        first, second,\
+    \ flattened_first, flattened_second\n    );\n    std::vector<Mint> flattened_result\
+    \ = multivariate_convolution_cyclic(\n        dimensions, flattened_first, flattened_second\n\
+    \    );\n    return internal::rebuild_multivariate_result<Nested>(\n        std::move(dimensions),\
+    \ flattened_result\n    );\n}\n\n}  // namespace math\n}  // namespace m1une\n\
+    \n\n"
+  code: "#ifndef M1UNE_MATH_MULTIVARIATE_CONVOLUTION_HPP\n#define M1UNE_MATH_MULTIVARIATE_CONVOLUTION_HPP\
+    \ 1\n\n#include <algorithm>\n#include <cassert>\n#include <cstdint>\n#include\
+    \ <limits>\n#include <type_traits>\n#include <utility>\n#include <vector>\n\n\
+    #include \"fps/convolution.hpp\"\n#include \"primitive_root.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace math {\n\nnamespace internal {\n\ntemplate <class T>\nstruct\
+    \ nested_vector_traits {\n    using scalar_type = T;\n    static constexpr int\
+    \ depth = 0;\n};\n\ntemplate <class T, class Allocator>\nstruct nested_vector_traits<std::vector<T,\
+    \ Allocator>> {\n    using scalar_type = typename nested_vector_traits<T>::scalar_type;\n\
+    \    static constexpr int depth = nested_vector_traits<T>::depth + 1;\n};\n\n\
+    template <class Nested>\nvoid nested_vector_shape(const Nested& values, std::vector<int>&\
+    \ shape) {\n    if constexpr (nested_vector_traits<Nested>::depth > 0) {\n   \
+    \     assert(!values.empty());\n        assert(values.size() <= std::size_t(std::numeric_limits<int>::max()));\n\
+    \        shape.push_back(int(values.size()));\n        nested_vector_shape(values.front(),\
+    \ shape);\n    }\n}\n\ntemplate <class Nested, class Mint>\nvoid flatten_nested_vector(\n\
+    \    const Nested& values,\n    const std::vector<int>& shape,\n    int level,\n\
+    \    std::vector<Mint>& flattened\n) {\n    if constexpr (nested_vector_traits<Nested>::depth\
+    \ == 0) {\n        flattened.push_back(values);\n    } else {\n        assert(level\
+    \ < int(shape.size()));\n        assert(int(values.size()) == shape[level]);\n\
+    \        for (const auto& child : values) {\n            flatten_nested_vector(child,\
+    \ shape, level + 1, flattened);\n        }\n    }\n}\n\ntemplate <class Nested,\
+    \ class Mint>\nvoid rebuild_nested_vector(\n    Nested& values,\n    const std::vector<int>&\
+    \ shape,\n    int level,\n    const std::vector<Mint>& flattened,\n    int& position\n\
+    ) {\n    if constexpr (nested_vector_traits<Nested>::depth == 0) {\n        assert(position\
+    \ < int(flattened.size()));\n        values = flattened[position++];\n    } else\
+    \ {\n        assert(level < int(shape.size()));\n        values.resize(shape[level]);\n\
+    \        for (auto& child : values) {\n            rebuild_nested_vector(child,\
+    \ shape, level + 1, flattened, position);\n        }\n    }\n}\n\ntemplate <class\
+    \ Nested>\nstd::vector<int> flatten_multivariate_inputs(\n    const Nested& first,\n\
+    \    const Nested& second,\n    std::vector<typename nested_vector_traits<Nested>::scalar_type>&\
+    \ flattened_first,\n    std::vector<typename nested_vector_traits<Nested>::scalar_type>&\
+    \ flattened_second\n) {\n    std::vector<int> shape;\n    nested_vector_shape(first,\
+    \ shape);\n    assert(int(shape.size()) == nested_vector_traits<Nested>::depth);\n\
+    \n    std::vector<int> second_shape;\n    nested_vector_shape(second, second_shape);\n\
+    \    assert(second_shape == shape);\n\n    flatten_nested_vector(first, shape,\
+    \ 0, flattened_first);\n    flatten_nested_vector(second, shape, 0, flattened_second);\n\
+    \    std::reverse(shape.begin(), shape.end());\n    return shape;\n}\n\ntemplate\
+    \ <class Nested>\nNested rebuild_multivariate_result(\n    std::vector<int> dimensions,\n\
+    \    const std::vector<typename nested_vector_traits<Nested>::scalar_type>& flattened\n\
+    ) {\n    std::reverse(dimensions.begin(), dimensions.end());\n    Nested result;\n\
+    \    int position = 0;\n    rebuild_nested_vector(result, dimensions, 0, flattened,\
+    \ position);\n    assert(position == int(flattened.size()));\n    return result;\n\
+    }\n\ninline int multivariate_coefficient_count(const std::vector<int>& dimensions)\
+    \ {\n    int64_t count = 1;\n    for (int dimension : dimensions) {\n        assert(dimension\
+    \ > 0);\n        count *= dimension;\n        assert(count <= std::numeric_limits<int>::max());\n\
+    \    }\n    return int(count);\n}\n\ninline std::vector<int> multivariate_colors(const\
+    \ std::vector<int>& dimensions) {\n    const int variable_count = int(dimensions.size());\n\
+    \    const int coefficient_count = multivariate_coefficient_count(dimensions);\n\
+    \    std::vector<int> color(coefficient_count);\n    if (variable_count == 0)\
+    \ return color;\n\n    for (int index = 0; index < coefficient_count; index++)\
+    \ {\n        int sum = 0;\n        int stride = 1;\n        for (int variable\
+    \ = 0; variable + 1 < variable_count; variable++) {\n            stride *= dimensions[variable];\n\
+    \            sum += index / stride;\n        }\n        color[index] = sum % variable_count;\n\
+    \    }\n    return color;\n}\n\ntemplate <class Mint>\nstd::vector<Mint> geometric_evaluation(\n\
+    \    const std::vector<Mint>& polynomial, Mint ratio\n) {\n    const int size\
+    \ = int(polynomial.size());\n    if (size <= 64) {\n        std::vector<Mint>\
+    \ result(size);\n        Mint point = 1;\n        for (int i = 0; i < size; i++)\
+    \ {\n            Mint power = 1;\n            for (const Mint& coefficient : polynomial)\
+    \ {\n                result[i] += coefficient * power;\n                power\
+    \ *= point;\n            }\n            point *= ratio;\n        }\n        return\
+    \ result;\n    }\n\n    auto triangular_powers = [](Mint base, int length) {\n\
+    \        std::vector<Mint> result(length);\n        if (length == 0) return result;\n\
+    \        result[0] = 1;\n        Mint power = 1;\n        for (int i = 0; i +\
+    \ 1 < length; i++) {\n            result[i + 1] = result[i] * power;\n       \
+    \     power *= base;\n        }\n        return result;\n    };\n\n    std::vector<Mint>\
+    \ positive = triangular_powers(ratio, 2 * size - 1);\n    std::vector<Mint> negative\
+    \ = triangular_powers(ratio.inv(), size);\n    std::vector<Mint> scaled(polynomial);\n\
+    \    for (int i = 0; i < size; i++) scaled[i] *= negative[i];\n    std::reverse(scaled.begin(),\
+    \ scaled.end());\n    std::vector<Mint> product = fps::convolution(scaled, positive);\n\
+    \n    std::vector<Mint> result(size);\n    for (int i = 0; i < size; i++) result[i]\
+    \ = product[size - 1 + i] * negative[i];\n    return result;\n}\n\ntemplate <class\
+    \ Mint>\nstd::vector<Mint> multivariate_convolution_truncated_arbitrary_mod(\n\
+    \    const std::vector<int>& dimensions,\n    const std::vector<Mint>& first,\n\
+    \    const std::vector<Mint>& second\n) {\n    const int variable_count = int(dimensions.size());\n\
+    \    const int coefficient_count = multivariate_coefficient_count(dimensions);\n\
+    \    assert(int(first.size()) == coefficient_count);\n    assert(int(second.size())\
+    \ == coefficient_count);\n    if (variable_count == 0) return {first[0] * second[0]};\n\
+    \n    const std::vector<int> color = multivariate_colors(dimensions);\n    std::vector<std::vector<Mint>>\
+    \ colored_first(\n        variable_count, std::vector<Mint>(coefficient_count)\n\
+    \    );\n    std::vector<std::vector<Mint>> colored_second(\n        variable_count,\
+    \ std::vector<Mint>(coefficient_count)\n    );\n    for (int i = 0; i < coefficient_count;\
+    \ i++) {\n        colored_first[color[i]][i] = first[i];\n        colored_second[color[i]][i]\
+    \ = second[i];\n    }\n\n    std::vector<std::vector<Mint>> colored_result(\n\
+    \        variable_count, std::vector<Mint>(coefficient_count)\n    );\n    for\
+    \ (int left = 0; left < variable_count; left++) {\n        for (int right = 0;\
+    \ right < variable_count; right++) {\n            std::vector<Mint> product =\n\
+    \                fps::convolution(colored_first[left], colored_second[right]);\n\
+    \            std::vector<Mint>& destination =\n                colored_result[(left\
+    \ + right) % variable_count];\n            for (int i = 0; i < coefficient_count;\
+    \ i++) {\n                destination[i] += product[i];\n            }\n     \
+    \   }\n    }\n\n    std::vector<Mint> result(coefficient_count);\n    for (int\
+    \ i = 0; i < coefficient_count; i++) {\n        result[i] = colored_result[color[i]][i];\n\
+    \    }\n    return result;\n}\n\n}  // namespace internal\n\ntemplate <class Mint>\n\
+    std::vector<Mint> multivariate_convolution_truncated(\n    const std::vector<int>&\
+    \ dimensions,\n    const std::vector<Mint>& first,\n    const std::vector<Mint>&\
+    \ second\n) {\n    static_assert(\n        fps::internal::has_static_modulus<Mint>::value,\n\
+    \        \"truncated multivariate convolution requires a static-modulus type\"\
+    \n    );\n    const int variable_count = int(dimensions.size());\n    const int\
+    \ coefficient_count = internal::multivariate_coefficient_count(dimensions);\n\
+    \    assert(int(first.size()) == coefficient_count);\n    assert(int(second.size())\
+    \ == coefficient_count);\n    if (variable_count == 0) return {first[0] * second[0]};\n\
+    \n    int64_t transform_size_64 = 1;\n    while (transform_size_64 < 2LL * coefficient_count\
+    \ - 1) transform_size_64 <<= 1;\n    assert(transform_size_64 <= std::numeric_limits<int>::max());\n\
+    \    const int transform_size = int(transform_size_64);\n    assert((Mint::mod()\
+    \ - 1) % uint32_t(transform_size) == 0);\n\n    const std::vector<int> color =\
+    \ internal::multivariate_colors(dimensions);\n    std::vector<std::vector<Mint>>\
+    \ transformed_first(\n        variable_count, std::vector<Mint>(transform_size)\n\
+    \    );\n    std::vector<std::vector<Mint>> transformed_second(\n        variable_count,\
+    \ std::vector<Mint>(transform_size)\n    );\n    for (int i = 0; i < coefficient_count;\
+    \ i++) {\n        transformed_first[color[i]][i] = first[i];\n        transformed_second[color[i]][i]\
+    \ = second[i];\n    }\n    for (int group = 0; group < variable_count; group++)\
+    \ {\n        fps::internal::ntt(transformed_first[group], false);\n        fps::internal::ntt(transformed_second[group],\
+    \ false);\n    }\n\n    std::vector<std::vector<Mint>> transformed_result(\n \
+    \       variable_count, std::vector<Mint>(transform_size)\n    );\n    for (int\
+    \ left = 0; left < variable_count; left++) {\n        for (int right = 0; right\
+    \ < variable_count; right++) {\n            std::vector<Mint>& destination =\n\
+    \                transformed_result[(left + right) % variable_count];\n      \
+    \      const std::vector<Mint>& left_values = transformed_first[left];\n     \
+    \       const std::vector<Mint>& right_values = transformed_second[right];\n \
+    \           for (int i = 0; i < transform_size; i++) {\n                destination[i]\
+    \ += left_values[i] * right_values[i];\n            }\n        }\n    }\n    for\
+    \ (int group = 0; group < variable_count; group++) {\n        fps::internal::ntt(transformed_result[group],\
+    \ true);\n    }\n\n    std::vector<Mint> result(coefficient_count);\n    for (int\
+    \ i = 0; i < coefficient_count; i++) {\n        result[i] = transformed_result[color[i]][i];\n\
+    \    }\n    return result;\n}\n\ntemplate <\n    class Nested,\n    std::enable_if_t<(internal::nested_vector_traits<Nested>::depth\
+    \ > 0), int> = 0\n>\nNested multivariate_convolution_truncated(\n    const Nested&\
+    \ first,\n    const Nested& second\n) {\n    using Mint = typename internal::nested_vector_traits<Nested>::scalar_type;\n\
+    \    std::vector<Mint> flattened_first, flattened_second;\n    std::vector<int>\
+    \ dimensions = internal::flatten_multivariate_inputs(\n        first, second,\
+    \ flattened_first, flattened_second\n    );\n    std::vector<Mint> flattened_result\
+    \ = multivariate_convolution_truncated(\n        dimensions, flattened_first,\
+    \ flattened_second\n    );\n    return internal::rebuild_multivariate_result<Nested>(\n\
+    \        std::move(dimensions), flattened_result\n    );\n}\n\ntemplate <class\
+    \ Mint>\nstd::vector<Mint> multivariate_convolution_cyclic(\n    const std::vector<int>&\
+    \ dimensions,\n    const std::vector<Mint>& first,\n    const std::vector<Mint>&\
+    \ second\n) {\n    const int coefficient_count = internal::multivariate_coefficient_count(dimensions);\n\
+    \    assert(int(first.size()) == coefficient_count);\n    assert(int(second.size())\
+    \ == coefficient_count);\n    if (dimensions.empty()) return {first[0] * second[0]};\n\
+    \n    const uint32_t modulus = Mint::mod();\n    bool has_all_roots = true;\n\
+    \    for (int dimension : dimensions) {\n        if ((modulus - 1) % uint32_t(dimension)\
+    \ != 0) has_all_roots = false;\n    }\n    if (!has_all_roots) {\n        std::vector<int>\
+    \ reduced_dimensions;\n        for (int dimension : dimensions) {\n          \
+    \  if (dimension != 1) reduced_dimensions.push_back(dimension);\n        }\n \
+    \       if (reduced_dimensions.empty()) return {first[0] * second[0]};\n\n   \
+    \     std::vector<int> widened_dimensions(reduced_dimensions.size());\n      \
+    \  for (int i = 0; i < int(reduced_dimensions.size()); i++) {\n            const\
+    \ int64_t widened = 2LL * reduced_dimensions[i] - 1;\n            assert(widened\
+    \ <= std::numeric_limits<int>::max());\n            widened_dimensions[i] = int(widened);\n\
+    \        }\n        const int widened_count =\n            internal::multivariate_coefficient_count(widened_dimensions);\n\
+    \        std::vector<Mint> widened_first(widened_count);\n        std::vector<Mint>\
+    \ widened_second(widened_count);\n        for (int index = 0; index < coefficient_count;\
+    \ index++) {\n            int remaining = index;\n            int widened_index\
+    \ = 0;\n            int widened_stride = 1;\n            for (int variable = 0;\
+    \ variable < int(reduced_dimensions.size()); variable++) {\n                const\
+    \ int coordinate = remaining % reduced_dimensions[variable];\n               \
+    \ remaining /= reduced_dimensions[variable];\n                widened_index +=\
+    \ coordinate * widened_stride;\n                widened_stride *= widened_dimensions[variable];\n\
+    \            }\n            widened_first[widened_index] = first[index];\n   \
+    \         widened_second[widened_index] = second[index];\n        }\n\n      \
+    \  std::vector<Mint> widened_product =\n            internal::multivariate_convolution_truncated_arbitrary_mod(\n\
+    \                widened_dimensions, widened_first, widened_second\n         \
+    \   );\n        std::vector<Mint> result(coefficient_count);\n        for (int\
+    \ widened_index = 0; widened_index < widened_count; widened_index++) {\n     \
+    \       int remaining = widened_index;\n            int index = 0;\n         \
+    \   int stride = 1;\n            for (int variable = 0; variable < int(reduced_dimensions.size());\
+    \ variable++) {\n                const int coordinate = remaining % widened_dimensions[variable];\n\
+    \                remaining /= widened_dimensions[variable];\n                index\
+    \ += (coordinate % reduced_dimensions[variable]) * stride;\n                stride\
+    \ *= reduced_dimensions[variable];\n            }\n            result[index] +=\
+    \ widened_product[widened_index];\n        }\n        return result;\n    }\n\n\
+    \    const uint64_t generator = primitive_root(modulus);\n    assert(generator\
+    \ != 0);\n\n    std::vector<Mint> transformed_first(first);\n    std::vector<Mint>\
+    \ transformed_second(second);\n    int stride = 1;\n    for (int dimension : dimensions)\
+    \ {\n        assert((modulus - 1) % uint32_t(dimension) == 0);\n        const\
+    \ Mint root = Mint(generator).pow((modulus - 1) / dimension);\n        for (int\
+    \ block = 0; block < coefficient_count; block += stride * dimension) {\n     \
+    \       for (int offset = 0; offset < stride; offset++) {\n                std::vector<Mint>\
+    \ first_line(dimension);\n                std::vector<Mint> second_line(dimension);\n\
+    \                for (int i = 0; i < dimension; i++) {\n                    first_line[i]\
+    \ = transformed_first[block + offset + stride * i];\n                    second_line[i]\
+    \ = transformed_second[block + offset + stride * i];\n                }\n    \
+    \            first_line = internal::geometric_evaluation(first_line, root);\n\
+    \                second_line = internal::geometric_evaluation(second_line, root);\n\
+    \                for (int i = 0; i < dimension; i++) {\n                    transformed_first[block\
+    \ + offset + stride * i] = first_line[i];\n                    transformed_second[block\
+    \ + offset + stride * i] = second_line[i];\n                }\n            }\n\
+    \        }\n        stride *= dimension;\n    }\n\n    for (int i = 0; i < coefficient_count;\
+    \ i++) {\n        transformed_first[i] *= transformed_second[i];\n    }\n\n  \
+    \  stride = 1;\n    for (int dimension : dimensions) {\n        const Mint inverse_root\
+    \ =\n            Mint(generator).pow((modulus - 1) / dimension).inv();\n     \
+    \   for (int block = 0; block < coefficient_count; block += stride * dimension)\
+    \ {\n            for (int offset = 0; offset < stride; offset++) {\n         \
+    \       std::vector<Mint> line(dimension);\n                for (int i = 0; i\
+    \ < dimension; i++) {\n                    line[i] = transformed_first[block +\
+    \ offset + stride * i];\n                }\n                line = internal::geometric_evaluation(line,\
+    \ inverse_root);\n                for (int i = 0; i < dimension; i++) {\n    \
+    \                transformed_first[block + offset + stride * i] = line[i];\n \
+    \               }\n            }\n        }\n        stride *= dimension;\n  \
+    \  }\n\n    const Mint inverse_size = Mint(coefficient_count).inv();\n    for\
+    \ (Mint& value : transformed_first) value *= inverse_size;\n    return transformed_first;\n\
+    }\n\ntemplate <\n    class Nested,\n    std::enable_if_t<(internal::nested_vector_traits<Nested>::depth\
+    \ > 0), int> = 0\n>\nNested multivariate_convolution_cyclic(\n    const Nested&\
+    \ first,\n    const Nested& second\n) {\n    using Mint = typename internal::nested_vector_traits<Nested>::scalar_type;\n\
+    \    std::vector<Mint> flattened_first, flattened_second;\n    std::vector<int>\
+    \ dimensions = internal::flatten_multivariate_inputs(\n        first, second,\
+    \ flattened_first, flattened_second\n    );\n    std::vector<Mint> flattened_result\
+    \ = multivariate_convolution_cyclic(\n        dimensions, flattened_first, flattened_second\n\
+    \    );\n    return internal::rebuild_multivariate_result<Nested>(\n        std::move(dimensions),\
+    \ flattened_result\n    );\n}\n\n}  // namespace math\n}  // namespace m1une\n\
+    \n#endif  // M1UNE_MATH_MULTIVARIATE_CONVOLUTION_HPP\n"
   dependsOn:
   - math/fps/convolution.hpp
   - math/fps/internal/ntt998_faster.hpp
@@ -1083,7 +1192,7 @@ data:
   path: math/multivariate_convolution.hpp
   requiredBy:
   - math/all.hpp
-  timestamp: '2026-08-09 04:27:20+09:00'
+  timestamp: '2026-08-10 15:56:40+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
@@ -1096,9 +1205,10 @@ title: Multidimensional Convolution
 
 ## Overview
 
-Fast convolution of flattened multidimensional arrays. The first dimension is
-contiguous: for dimensions `n`, coordinates `(i[0], ..., i[k - 1])` are stored
-at
+Fast convolution of multidimensional arrays. Inputs may use a flat vector plus
+explicit dimensions, or nested `std::vector`s whose dimensions are inferred.
+In the flat representation, the first dimension is contiguous: for dimensions
+`n`, coordinates `(i[0], ..., i[k - 1])` are stored at
 
 `i[0] + i[1] * n[0] + ... + i[k - 1] * n[0] * ... * n[k - 2]`.
 
@@ -1116,7 +1226,9 @@ Two products are available:
 | Function | Description | Complexity |
 | --- | --- | --- |
 | `template <class Mint> std::vector<Mint> multivariate_convolution_truncated(const std::vector<int>& dimensions, const std::vector<Mint>& first, const std::vector<Mint>& second)` | Returns the truncated product. | $O(kN\log N+k^2N)$ time and $O(kN)$ memory. |
+| `template <class Nested> Nested multivariate_convolution_truncated(const Nested& first, const Nested& second)` | Infers dimensions from equally shaped nested vectors and returns a nested truncated product. | $O(kN\log N+k^2N)$ time and $O(kN)$ memory. |
 | `template <class Mint> std::vector<Mint> multivariate_convolution_cyclic(const std::vector<int>& dimensions, const std::vector<Mint>& first, const std::vector<Mint>& second)` | Returns the cyclic product. | $O(N\sum_i \log n_i + P(M))$ time and $O(N+\max_i n_i)$ memory when every $n_i$ divides $M-1$; otherwise $O(k^2L\log L)$ time and $O(kL)$ memory. |
+| `template <class Nested> Nested multivariate_convolution_cyclic(const Nested& first, const Nested& second)` | Infers dimensions from equally shaped nested vectors and returns a nested cyclic product. | $O(N\sum_i \log n_i + P(M))$ time and $O(N+\max_i n_i)$ memory when every $n_i$ divides $M-1$; otherwise $O(k^2L\log L)$ time and $O(kL)$ memory. |
 
 Here, `k = dimensions.size()`, $n_i$ is the size of dimension `i`, and
 $N=\prod_i n_i$, $M$ is the modulus, $L=\prod_{i:n_i>1}(2n_i-1)$, and $P(M)$
@@ -1145,6 +1257,12 @@ reading coefficients.
 
 Neither function modifies its arguments.
 
+For a nested input, `Nested` must be one or more levels of `std::vector` with a
+modint scalar type. Both inputs must be nonempty, rectangular, and have the same
+shape. The innermost vector is the first, contiguous dimension: for example,
+`values[i2][i1][i0]` represents coordinate `(i0, i1, i2)`. Flattening and
+rebuilding the nested vectors take an additional $O(N)$ time and memory.
+
 ## Example
 
 ```cpp
@@ -1171,5 +1289,17 @@ int main() {
         );
     // truncated is 5, 16, 22, 60.
     // cyclic is 70, 68, 62, 60.
+
+    std::vector<std::vector<mint>> nested_first(
+        2, std::vector<mint>(2)
+    );
+    std::vector<std::vector<mint>> nested_second(
+        2, std::vector<mint>(2)
+    );
+    nested_first[0][0] = 1;
+    nested_second[0][0] = 2;
+    auto nested = m1une::math::multivariate_convolution_truncated(
+        nested_first, nested_second
+    );
 }
 ```
