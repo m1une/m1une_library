@@ -1,11 +1,12 @@
+import argparse
 import os
 import re
-import sys
 
 LIBRARY_ROOT = os.path.abspath(os.path.dirname(__file__))
 LIBRARY_PARENT = os.path.dirname(LIBRARY_ROOT)
 INCLUDE_PATHS = ('.', LIBRARY_ROOT, LIBRARY_PARENT)
 visited = set()
+skipped_defined_macros = {'LOCAL'}
 
 
 def line_marker_name(display_name):
@@ -40,7 +41,8 @@ def resolve_include(header, current_file_dir):
 def expand_file(path, display_name=None):
     """
     Recursively expands a C++ file by inlining its local #include directives.
-    It removes include guards and skips #ifdef LOCAL blocks.
+    It removes include guards and skips blocks guarded by a macro configured as
+    unavailable for the generated submission.
     """
     abs_path = os.path.abspath(path)
     if abs_path in visited:
@@ -101,44 +103,49 @@ def expand_file(path, display_name=None):
     # --- Main Processing Loop ---
     first_line_emitted = False
     conditional_depth = 0
-    local_block_depth = None
-    skipping_local_branch = False
+    skipped_block_depth = None
+    skipping_guarded_branch = False
     current_file_dir = os.path.dirname(path)
 
     for i, line in enumerate(lines):
         stripped_line = line.strip()
 
         is_conditional_start = re.match(r'#\s*(?:if|ifdef|ifndef)\b', stripped_line)
-        is_local_start = re.match(
-            r'#\s*(?:ifdef\s+LOCAL\b|if\s+defined\s*(?:\(\s*LOCAL\s*\)|LOCAL\b))',
-            stripped_line,
+        is_skipped_start = any(
+            re.match(
+                r'#\s*(?:ifdef\s+' + re.escape(macro)
+                + r'\b|if\s+defined\s*(?:\(\s*' + re.escape(macro)
+                + r'\s*\)|' + re.escape(macro) + r'\b))',
+                stripped_line,
+            )
+            for macro in skipped_defined_macros
         )
         if is_conditional_start:
-            if local_block_depth is None and is_local_start:
-                local_block_depth = conditional_depth
-                skipping_local_branch = True
+            if skipped_block_depth is None and is_skipped_start:
+                skipped_block_depth = conditional_depth
+                skipping_guarded_branch = True
                 conditional_depth += 1
                 continue
             conditional_depth += 1
         elif (
             re.match(r'#\s*else\b', stripped_line)
-            and local_block_depth is not None
-            and conditional_depth == local_block_depth + 1
+            and skipped_block_depth is not None
+            and conditional_depth == skipped_block_depth + 1
         ):
-            skipping_local_branch = False
+            skipping_guarded_branch = False
             continue
         elif re.match(r'#\s*endif\b', stripped_line):
             if (
-                local_block_depth is not None
-                and conditional_depth == local_block_depth + 1
+                skipped_block_depth is not None
+                and conditional_depth == skipped_block_depth + 1
             ):
                 conditional_depth -= 1
-                local_block_depth = None
-                skipping_local_branch = False
+                skipped_block_depth = None
+                skipping_guarded_branch = False
                 continue
             conditional_depth = max(0, conditional_depth - 1)
 
-        if skipping_local_branch:
+        if skipping_guarded_branch:
             continue
 
         if i in lines_to_skip:
@@ -165,9 +172,23 @@ def expand_file(path, display_name=None):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print("Usage: python3 expander.py <main_file.cpp> > bundled_file.cpp", file=sys.stderr)
-        sys.exit(1)
+    parser = argparse.ArgumentParser(
+        description='Inline local C++ headers into a submission source.'
+    )
+    parser.add_argument(
+        '--no-x86-simd',
+        action='store_true',
+        help='omit code guarded by M1UNE_FPS_HAS_X86_SIMD',
+    )
+    parser.add_argument('main_file', help='the C++ source file to expand')
+    arguments = parser.parse_args()
+
+    if arguments.no_x86_simd:
+        skipped_defined_macros.add('M1UNE_FPS_HAS_X86_SIMD')
+        print('#define M1UNE_FPS_DISABLE_X86_SIMD 1')
 
     visited.clear()
-    expand_file(sys.argv[1])
+    expand_file(arguments.main_file)
+
+    if arguments.no_x86_simd:
+        print('#undef M1UNE_FPS_DISABLE_X86_SIMD')
