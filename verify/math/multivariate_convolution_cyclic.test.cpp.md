@@ -146,23 +146,24 @@ data:
     math/fps/convolution.hpp\"\n\n\n\n#line 5 \"math/fps/convolution.hpp\"\n#include\
     \ <array>\n#line 8 \"math/fps/convolution.hpp\"\n#include <cstring>\n#include\
     \ <new>\n#line 13 \"math/fps/convolution.hpp\"\n\n#if defined(__GNUC__) && !defined(__clang__)\
-    \ && (defined(__x86_64__) || defined(__i386__))\n#include <immintrin.h>\n#define\
-    \ M1UNE_FPS_HAS_X86_SIMD 1\n#pragma GCC push_options\n#pragma GCC target(\"avx2,bmi\"\
-    )\n#endif\n\n#line 1 \"math/fps/internal/ntt998_faster.hpp\"\n\n\n\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n\
-    \n#line 9 \"math/fps/internal/ntt998_faster.hpp\"\n\n#include <immintrin.h>\n\n\
-    namespace m1une {\nnamespace fps {\nnamespace internal {\nnamespace fast998_v2\
-    \ {\n\n// Fixed-modulus AVX2 transform with an in-register degree-8 residue product.\n\
-    \nusing u32=unsigned;\nusing u64=unsigned long long;\nusing idt=std::size_t;\n\
-    using I256=__m256i;\ninline void store256(void*p,I256 x){\n    _mm256_store_si256((I256*)p,x);\n\
-    }\ninline I256 load256(const void*p){\n    return _mm256_load_si256((const I256*)p);\n\
-    }\nconstexpr u32 shrk(u32 x,u32 M){\n    return std::min(x,x-M);\n}\nconstexpr\
-    \ u32 dilt(u32 x,u32 M){\n    return std::min(x,x+M);\n}\nconstexpr u32 reduce(u64\
-    \ x,u32 niv,u32 M){\n    return (x+u64(u32(x)*niv)*M)>>32;\n}\nconstexpr u32 mul(u32\
-    \ x,u32 y,u32 niv,u32 M){\n    return reduce(u64(x)*y,niv,M);\n}\nconstexpr u32\
-    \ mul_s(u32 x,u32 y,u32 niv,u32 M){\n    return shrk(reduce(u64(x)*y,niv,M),M);\n\
-    }\nconstexpr u32 qpw(u32 a,u32 b,u32 niv,u32 M,u32 r){\n    for(;b;b>>=1,a=mul(a,a,niv,M)){\n\
-    \        if(b&1){\n            r=mul(r,a,niv,M);\n        }\n    }\n    return\
-    \ r;\n}\nconstexpr u32 qpw_s(u32 a,u32 b,u32 niv,u32 M,u32 r){\n    return shrk(qpw(a,b,niv,M,r),M);\n\
+    \ && \\\n    (defined(__x86_64__) || defined(__i386__)) && \\\n    !defined(M1UNE_FPS_DISABLE_X86_SIMD)\n\
+    #include <immintrin.h>\n#define M1UNE_FPS_HAS_X86_SIMD 1\n#pragma GCC push_options\n\
+    #pragma GCC target(\"avx2,bmi\")\n#endif\n\n#line 1 \"math/fps/internal/ntt998_faster.hpp\"\
+    \n\n\n\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n\n#line 9 \"math/fps/internal/ntt998_faster.hpp\"\
+    \n\n#include <immintrin.h>\n\nnamespace m1une {\nnamespace fps {\nnamespace internal\
+    \ {\nnamespace fast998_v2 {\n\n// Fixed-modulus AVX2 transform with an in-register\
+    \ degree-8 residue product.\n\nusing u32=unsigned;\nusing u64=unsigned long long;\n\
+    using idt=std::size_t;\nusing I256=__m256i;\ninline void store256(void*p,I256\
+    \ x){\n    _mm256_store_si256((I256*)p,x);\n}\ninline I256 load256(const void*p){\n\
+    \    return _mm256_load_si256((const I256*)p);\n}\nconstexpr u32 shrk(u32 x,u32\
+    \ M){\n    return std::min(x,x-M);\n}\nconstexpr u32 dilt(u32 x,u32 M){\n    return\
+    \ std::min(x,x+M);\n}\nconstexpr u32 reduce(u64 x,u32 niv,u32 M){\n    return\
+    \ (x+u64(u32(x)*niv)*M)>>32;\n}\nconstexpr u32 mul(u32 x,u32 y,u32 niv,u32 M){\n\
+    \    return reduce(u64(x)*y,niv,M);\n}\nconstexpr u32 mul_s(u32 x,u32 y,u32 niv,u32\
+    \ M){\n    return shrk(reduce(u64(x)*y,niv,M),M);\n}\nconstexpr u32 qpw(u32 a,u32\
+    \ b,u32 niv,u32 M,u32 r){\n    for(;b;b>>=1,a=mul(a,a,niv,M)){\n        if(b&1){\n\
+    \            r=mul(r,a,niv,M);\n        }\n    }\n    return r;\n}\nconstexpr\
+    \ u32 qpw_s(u32 a,u32 b,u32 niv,u32 M,u32 r){\n    return shrk(qpw(a,b,niv,M,r),M);\n\
     }\ninline I256 shrk32(I256 x,I256 M){\n    return _mm256_min_epu32(x,_mm256_sub_epi32(x,M));\n\
     }\ninline I256 dilt32(I256 x,I256 M){\n    return _mm256_min_epu32(x,_mm256_add_epi32(x,M));\n\
     }\ninline I256 Ladd32(I256 x,I256 y,I256){\n    return _mm256_add_epi32(x,y);\n\
@@ -379,9 +380,9 @@ data:
     \    for(idt i=0;i<lm;++i){\n        const auto product=convolve8(f+i,g+i,_mm256_set1_epi32(RR),Fx,Niv,Mod,Mod2);\n\
     \        store256(result+i,add32(load256(result+i),product,Mod2));\n        RR=mul(RR,info->RT1[__builtin_ctzll(~i)],niv,mod);\n\
     \    }\n}\n\n}  // namespace fast998_v2\n}  // namespace internal\n}  // namespace\
-    \ fps\n}  // namespace m1une\n\n#endif  // M1UNE_FPS_HAS_X86_SIMD\n\n\n#line 22\
+    \ fps\n}  // namespace m1une\n\n#endif  // M1UNE_FPS_HAS_X86_SIMD\n\n\n#line 24\
     \ \"math/fps/convolution.hpp\"\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n#pragma GCC pop_options\n\
-    #endif\n\n#line 27 \"math/fps/convolution.hpp\"\n\nnamespace m1une {\nnamespace\
+    #endif\n\n#line 29 \"math/fps/convolution.hpp\"\n\nnamespace m1une {\nnamespace\
     \ fps {\n\nnamespace internal {\n\ntemplate <class Mint, class = void>\nstruct\
     \ has_static_modulus : std::false_type {};\n\ntemplate <class Mint>\nstruct has_static_modulus<\n\
     \    Mint, std::void_t<decltype(std::integral_constant<uint32_t, Mint::mod()>{})>>\n\
@@ -836,10 +837,17 @@ data:
     \    for (int i = 0; i < size; i++) scaled[i] *= negative[i];\n    std::reverse(scaled.begin(),\
     \ scaled.end());\n    std::vector<Mint> product = fps::convolution(scaled, positive);\n\
     \n    std::vector<Mint> result(size);\n    for (int i = 0; i < size; i++) result[i]\
-    \ = product[size - 1 + i] * negative[i];\n    return result;\n}\n\n}  // namespace\
-    \ internal\n\ntemplate <class Mint>\nstd::vector<Mint> multivariate_convolution_truncated(\n\
-    \    const std::vector<int>& dimensions,\n    const std::vector<Mint>& first,\n\
-    \    const std::vector<Mint>& second\n) {\n    static_assert(\n        fps::internal::has_static_modulus<Mint>::value,\n\
+    \ = product[size - 1 + i] * negative[i];\n    return result;\n}\n\ntemplate <class\
+    \ Mint>\nstd::vector<Mint> cyclic_fourier_transform(\n    std::vector<Mint> values,\
+    \ Mint ratio, bool inverse\n) {\n    if constexpr (fps::internal::has_static_modulus<Mint>::value)\
+    \ {\n        const int size = int(values.size());\n        if ((size & (size -\
+    \ 1)) == 0) {\n            // Keep normalization outside the per-axis transforms,\
+    \ matching\n            // the arbitrary-length DFT path below.\n            fps::internal::ntt(values,\
+    \ inverse, false);\n            return values;\n        }\n    }\n    return geometric_evaluation(values,\
+    \ ratio);\n}\n\n}  // namespace internal\n\ntemplate <class Mint>\nstd::vector<Mint>\
+    \ multivariate_convolution_truncated(\n    const std::vector<int>& dimensions,\n\
+    \    const std::vector<Mint>& first,\n    const std::vector<Mint>& second\n) {\n\
+    \    static_assert(\n        fps::internal::has_static_modulus<Mint>::value,\n\
     \        \"truncated multivariate convolution requires a static-modulus type\"\
     \n    );\n    const int variable_count = int(dimensions.size());\n    const int\
     \ coefficient_count = internal::multivariate_coefficient_count(dimensions);\n\
@@ -938,26 +946,28 @@ data:
     \                for (int i = 0; i < dimension; i++) {\n                    first_line[i]\
     \ = transformed_first[block + offset + stride * i];\n                    second_line[i]\
     \ = transformed_second[block + offset + stride * i];\n                }\n    \
-    \            first_line = internal::geometric_evaluation(first_line, root);\n\
-    \                second_line = internal::geometric_evaluation(second_line, root);\n\
-    \                for (int i = 0; i < dimension; i++) {\n                    transformed_first[block\
-    \ + offset + stride * i] = first_line[i];\n                    transformed_second[block\
-    \ + offset + stride * i] = second_line[i];\n                }\n            }\n\
-    \        }\n        stride *= dimension;\n    }\n\n    for (int i = 0; i < coefficient_count;\
-    \ i++) {\n        transformed_first[i] *= transformed_second[i];\n    }\n\n  \
-    \  stride = 1;\n    for (int dimension : dimensions) {\n        const Mint inverse_root\
+    \            first_line = internal::cyclic_fourier_transform(\n              \
+    \      std::move(first_line), root, false\n                );\n              \
+    \  second_line = internal::cyclic_fourier_transform(\n                    std::move(second_line),\
+    \ root, false\n                );\n                for (int i = 0; i < dimension;\
+    \ i++) {\n                    transformed_first[block + offset + stride * i] =\
+    \ first_line[i];\n                    transformed_second[block + offset + stride\
+    \ * i] = second_line[i];\n                }\n            }\n        }\n      \
+    \  stride *= dimension;\n    }\n\n    for (int i = 0; i < coefficient_count; i++)\
+    \ {\n        transformed_first[i] *= transformed_second[i];\n    }\n\n    stride\
+    \ = 1;\n    for (int dimension : dimensions) {\n        const Mint inverse_root\
     \ =\n            Mint(generator).pow((modulus - 1) / dimension).inv();\n     \
     \   for (int block = 0; block < coefficient_count; block += stride * dimension)\
     \ {\n            for (int offset = 0; offset < stride; offset++) {\n         \
     \       std::vector<Mint> line(dimension);\n                for (int i = 0; i\
     \ < dimension; i++) {\n                    line[i] = transformed_first[block +\
-    \ offset + stride * i];\n                }\n                line = internal::geometric_evaluation(line,\
-    \ inverse_root);\n                for (int i = 0; i < dimension; i++) {\n    \
-    \                transformed_first[block + offset + stride * i] = line[i];\n \
-    \               }\n            }\n        }\n        stride *= dimension;\n  \
-    \  }\n\n    const Mint inverse_size = Mint(coefficient_count).inv();\n    for\
-    \ (Mint& value : transformed_first) value *= inverse_size;\n    return transformed_first;\n\
-    }\n\ntemplate <\n    class Nested,\n    std::enable_if_t<(internal::nested_vector_traits<Nested>::depth\
+    \ offset + stride * i];\n                }\n                line = internal::cyclic_fourier_transform(\n\
+    \                    std::move(line), inverse_root, true\n                );\n\
+    \                for (int i = 0; i < dimension; i++) {\n                    transformed_first[block\
+    \ + offset + stride * i] = line[i];\n                }\n            }\n      \
+    \  }\n        stride *= dimension;\n    }\n\n    const Mint inverse_size = Mint(coefficient_count).inv();\n\
+    \    for (Mint& value : transformed_first) value *= inverse_size;\n    return\
+    \ transformed_first;\n}\n\ntemplate <\n    class Nested,\n    std::enable_if_t<(internal::nested_vector_traits<Nested>::depth\
     \ > 0), int> = 0\n>\nNested multivariate_convolution_cyclic(\n    const Nested&\
     \ first,\n    const Nested& second\n) {\n    using Mint = typename internal::nested_vector_traits<Nested>::scalar_type;\n\
     \    std::vector<Mint> flattened_first, flattened_second;\n    std::vector<int>\
@@ -1393,7 +1403,7 @@ data:
   isVerificationFile: true
   path: verify/math/multivariate_convolution_cyclic.test.cpp
   requiredBy: []
-  timestamp: '2026-08-10 17:18:00+09:00'
+  timestamp: '2026-08-10 17:30:05+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/multivariate_convolution_cyclic.test.cpp

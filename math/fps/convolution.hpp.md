@@ -284,8 +284,9 @@ data:
   bundledCode: "#line 1 \"math/fps/convolution.hpp\"\n\n\n\n#include <algorithm>\n\
     #include <array>\n#include <cassert>\n#include <cstdint>\n#include <cstring>\n\
     #include <new>\n#include <type_traits>\n#include <utility>\n#include <vector>\n\
-    \n#if defined(__GNUC__) && !defined(__clang__) && (defined(__x86_64__) || defined(__i386__))\n\
-    #include <immintrin.h>\n#define M1UNE_FPS_HAS_X86_SIMD 1\n#pragma GCC push_options\n\
+    \n#if defined(__GNUC__) && !defined(__clang__) && \\\n    (defined(__x86_64__)\
+    \ || defined(__i386__)) && \\\n    !defined(M1UNE_FPS_DISABLE_X86_SIMD)\n#include\
+    \ <immintrin.h>\n#define M1UNE_FPS_HAS_X86_SIMD 1\n#pragma GCC push_options\n\
     #pragma GCC target(\"avx2,bmi\")\n#endif\n\n#line 1 \"math/fps/internal/ntt998_faster.hpp\"\
     \n\n\n\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n\n#line 9 \"math/fps/internal/ntt998_faster.hpp\"\
     \n\n#include <immintrin.h>\n\nnamespace m1une {\nnamespace fps {\nnamespace internal\
@@ -518,7 +519,7 @@ data:
     \    for(idt i=0;i<lm;++i){\n        const auto product=convolve8(f+i,g+i,_mm256_set1_epi32(RR),Fx,Niv,Mod,Mod2);\n\
     \        store256(result+i,add32(load256(result+i),product,Mod2));\n        RR=mul(RR,info->RT1[__builtin_ctzll(~i)],niv,mod);\n\
     \    }\n}\n\n}  // namespace fast998_v2\n}  // namespace internal\n}  // namespace\
-    \ fps\n}  // namespace m1une\n\n#endif  // M1UNE_FPS_HAS_X86_SIMD\n\n\n#line 22\
+    \ fps\n}  // namespace m1une\n\n#endif  // M1UNE_FPS_HAS_X86_SIMD\n\n\n#line 24\
     \ \"math/fps/convolution.hpp\"\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n#pragma GCC pop_options\n\
     #endif\n\n#line 1 \"math/modint.hpp\"\n\n\n\n#line 6 \"math/modint.hpp\"\n#include\
     \ <iostream>\n#line 9 \"math/modint.hpp\"\n\nnamespace m1une {\nnamespace math\
@@ -622,7 +623,7 @@ data:
     \     return os << rhs._v;\n    }\n\n    friend std::istream& operator>>(std::istream&\
     \ is, DynamicModInt& rhs) {\n        long long value;\n        is >> value;\n\
     \        rhs = DynamicModInt(value);\n        return is;\n    }\n};\n\n}  // namespace\
-    \ math\n}  // namespace m1une\n\n\n#line 27 \"math/fps/convolution.hpp\"\n\nnamespace\
+    \ math\n}  // namespace m1une\n\n\n#line 29 \"math/fps/convolution.hpp\"\n\nnamespace\
     \ m1une {\nnamespace fps {\n\nnamespace internal {\n\ntemplate <class Mint, class\
     \ = void>\nstruct has_static_modulus : std::false_type {};\n\ntemplate <class\
     \ Mint>\nstruct has_static_modulus<\n    Mint, std::void_t<decltype(std::integral_constant<uint32_t,\
@@ -925,15 +926,15 @@ data:
   code: "#ifndef M1UNE_FPS_CONVOLUTION_HPP\n#define M1UNE_FPS_CONVOLUTION_HPP 1\n\n\
     #include <algorithm>\n#include <array>\n#include <cassert>\n#include <cstdint>\n\
     #include <cstring>\n#include <new>\n#include <type_traits>\n#include <utility>\n\
-    #include <vector>\n\n#if defined(__GNUC__) && !defined(__clang__) && (defined(__x86_64__)\
-    \ || defined(__i386__))\n#include <immintrin.h>\n#define M1UNE_FPS_HAS_X86_SIMD\
-    \ 1\n#pragma GCC push_options\n#pragma GCC target(\"avx2,bmi\")\n#endif\n\n#include\
-    \ \"internal/ntt998_faster.hpp\"\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n#pragma GCC pop_options\n\
-    #endif\n\n#include \"../modint.hpp\"\n\nnamespace m1une {\nnamespace fps {\n\n\
-    namespace internal {\n\ntemplate <class Mint, class = void>\nstruct has_static_modulus\
-    \ : std::false_type {};\n\ntemplate <class Mint>\nstruct has_static_modulus<\n\
-    \    Mint, std::void_t<decltype(std::integral_constant<uint32_t, Mint::mod()>{})>>\n\
-    \    : std::true_type {};\n\nconstexpr uint32_t primitive_root_constexpr(uint32_t\
+    #include <vector>\n\n#if defined(__GNUC__) && !defined(__clang__) && \\\n    (defined(__x86_64__)\
+    \ || defined(__i386__)) && \\\n    !defined(M1UNE_FPS_DISABLE_X86_SIMD)\n#include\
+    \ <immintrin.h>\n#define M1UNE_FPS_HAS_X86_SIMD 1\n#pragma GCC push_options\n\
+    #pragma GCC target(\"avx2,bmi\")\n#endif\n\n#include \"internal/ntt998_faster.hpp\"\
+    \n#ifdef M1UNE_FPS_HAS_X86_SIMD\n#pragma GCC pop_options\n#endif\n\n#include \"\
+    ../modint.hpp\"\n\nnamespace m1une {\nnamespace fps {\n\nnamespace internal {\n\
+    \ntemplate <class Mint, class = void>\nstruct has_static_modulus : std::false_type\
+    \ {};\n\ntemplate <class Mint>\nstruct has_static_modulus<\n    Mint, std::void_t<decltype(std::integral_constant<uint32_t,\
+    \ Mint::mod()>{})>>\n    : std::true_type {};\n\nconstexpr uint32_t primitive_root_constexpr(uint32_t\
     \ mod) {\n    if (mod == 2) return 1;\n    if (mod == 167772161) return 3;\n \
     \   if (mod == 469762049) return 3;\n    if (mod == 754974721) return 11;\n  \
     \  if (mod == 998244353) return 3;\n    if (mod == 1224736769) return 3;\n\n \
@@ -1266,7 +1267,7 @@ data:
   - math/bernoulli.hpp
   - geometry/all.hpp
   - geometry/lattice_point_count.hpp
-  timestamp: '2026-07-18 19:37:21+09:00'
+  timestamp: '2026-08-10 17:30:05+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/graph_algorithms.test.cpp

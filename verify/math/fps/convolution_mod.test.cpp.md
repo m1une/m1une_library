@@ -32,23 +32,24 @@ data:
     \ <algorithm>\n#include <array>\n#include <cassert>\n#include <cstdint>\n#include\
     \ <cstring>\n#include <new>\n#include <type_traits>\n#include <utility>\n#line\
     \ 13 \"math/fps/convolution.hpp\"\n\n#if defined(__GNUC__) && !defined(__clang__)\
-    \ && (defined(__x86_64__) || defined(__i386__))\n#include <immintrin.h>\n#define\
-    \ M1UNE_FPS_HAS_X86_SIMD 1\n#pragma GCC push_options\n#pragma GCC target(\"avx2,bmi\"\
-    )\n#endif\n\n#line 1 \"math/fps/internal/ntt998_faster.hpp\"\n\n\n\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n\
-    \n#line 9 \"math/fps/internal/ntt998_faster.hpp\"\n\n#include <immintrin.h>\n\n\
-    namespace m1une {\nnamespace fps {\nnamespace internal {\nnamespace fast998_v2\
-    \ {\n\n// Fixed-modulus AVX2 transform with an in-register degree-8 residue product.\n\
-    \nusing u32=unsigned;\nusing u64=unsigned long long;\nusing idt=std::size_t;\n\
-    using I256=__m256i;\ninline void store256(void*p,I256 x){\n    _mm256_store_si256((I256*)p,x);\n\
-    }\ninline I256 load256(const void*p){\n    return _mm256_load_si256((const I256*)p);\n\
-    }\nconstexpr u32 shrk(u32 x,u32 M){\n    return std::min(x,x-M);\n}\nconstexpr\
-    \ u32 dilt(u32 x,u32 M){\n    return std::min(x,x+M);\n}\nconstexpr u32 reduce(u64\
-    \ x,u32 niv,u32 M){\n    return (x+u64(u32(x)*niv)*M)>>32;\n}\nconstexpr u32 mul(u32\
-    \ x,u32 y,u32 niv,u32 M){\n    return reduce(u64(x)*y,niv,M);\n}\nconstexpr u32\
-    \ mul_s(u32 x,u32 y,u32 niv,u32 M){\n    return shrk(reduce(u64(x)*y,niv,M),M);\n\
-    }\nconstexpr u32 qpw(u32 a,u32 b,u32 niv,u32 M,u32 r){\n    for(;b;b>>=1,a=mul(a,a,niv,M)){\n\
-    \        if(b&1){\n            r=mul(r,a,niv,M);\n        }\n    }\n    return\
-    \ r;\n}\nconstexpr u32 qpw_s(u32 a,u32 b,u32 niv,u32 M,u32 r){\n    return shrk(qpw(a,b,niv,M,r),M);\n\
+    \ && \\\n    (defined(__x86_64__) || defined(__i386__)) && \\\n    !defined(M1UNE_FPS_DISABLE_X86_SIMD)\n\
+    #include <immintrin.h>\n#define M1UNE_FPS_HAS_X86_SIMD 1\n#pragma GCC push_options\n\
+    #pragma GCC target(\"avx2,bmi\")\n#endif\n\n#line 1 \"math/fps/internal/ntt998_faster.hpp\"\
+    \n\n\n\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n\n#line 9 \"math/fps/internal/ntt998_faster.hpp\"\
+    \n\n#include <immintrin.h>\n\nnamespace m1une {\nnamespace fps {\nnamespace internal\
+    \ {\nnamespace fast998_v2 {\n\n// Fixed-modulus AVX2 transform with an in-register\
+    \ degree-8 residue product.\n\nusing u32=unsigned;\nusing u64=unsigned long long;\n\
+    using idt=std::size_t;\nusing I256=__m256i;\ninline void store256(void*p,I256\
+    \ x){\n    _mm256_store_si256((I256*)p,x);\n}\ninline I256 load256(const void*p){\n\
+    \    return _mm256_load_si256((const I256*)p);\n}\nconstexpr u32 shrk(u32 x,u32\
+    \ M){\n    return std::min(x,x-M);\n}\nconstexpr u32 dilt(u32 x,u32 M){\n    return\
+    \ std::min(x,x+M);\n}\nconstexpr u32 reduce(u64 x,u32 niv,u32 M){\n    return\
+    \ (x+u64(u32(x)*niv)*M)>>32;\n}\nconstexpr u32 mul(u32 x,u32 y,u32 niv,u32 M){\n\
+    \    return reduce(u64(x)*y,niv,M);\n}\nconstexpr u32 mul_s(u32 x,u32 y,u32 niv,u32\
+    \ M){\n    return shrk(reduce(u64(x)*y,niv,M),M);\n}\nconstexpr u32 qpw(u32 a,u32\
+    \ b,u32 niv,u32 M,u32 r){\n    for(;b;b>>=1,a=mul(a,a,niv,M)){\n        if(b&1){\n\
+    \            r=mul(r,a,niv,M);\n        }\n    }\n    return r;\n}\nconstexpr\
+    \ u32 qpw_s(u32 a,u32 b,u32 niv,u32 M,u32 r){\n    return shrk(qpw(a,b,niv,M,r),M);\n\
     }\ninline I256 shrk32(I256 x,I256 M){\n    return _mm256_min_epu32(x,_mm256_sub_epi32(x,M));\n\
     }\ninline I256 dilt32(I256 x,I256 M){\n    return _mm256_min_epu32(x,_mm256_add_epi32(x,M));\n\
     }\ninline I256 Ladd32(I256 x,I256 y,I256){\n    return _mm256_add_epi32(x,y);\n\
@@ -265,7 +266,7 @@ data:
     \    for(idt i=0;i<lm;++i){\n        const auto product=convolve8(f+i,g+i,_mm256_set1_epi32(RR),Fx,Niv,Mod,Mod2);\n\
     \        store256(result+i,add32(load256(result+i),product,Mod2));\n        RR=mul(RR,info->RT1[__builtin_ctzll(~i)],niv,mod);\n\
     \    }\n}\n\n}  // namespace fast998_v2\n}  // namespace internal\n}  // namespace\
-    \ fps\n}  // namespace m1une\n\n#endif  // M1UNE_FPS_HAS_X86_SIMD\n\n\n#line 22\
+    \ fps\n}  // namespace m1une\n\n#endif  // M1UNE_FPS_HAS_X86_SIMD\n\n\n#line 24\
     \ \"math/fps/convolution.hpp\"\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n#pragma GCC pop_options\n\
     #endif\n\n#line 1 \"math/modint.hpp\"\n\n\n\n#line 6 \"math/modint.hpp\"\n#include\
     \ <iostream>\n#line 9 \"math/modint.hpp\"\n\nnamespace m1une {\nnamespace math\
@@ -369,7 +370,7 @@ data:
     \     return os << rhs._v;\n    }\n\n    friend std::istream& operator>>(std::istream&\
     \ is, DynamicModInt& rhs) {\n        long long value;\n        is >> value;\n\
     \        rhs = DynamicModInt(value);\n        return is;\n    }\n};\n\n}  // namespace\
-    \ math\n}  // namespace m1une\n\n\n#line 27 \"math/fps/convolution.hpp\"\n\nnamespace\
+    \ math\n}  // namespace m1une\n\n\n#line 29 \"math/fps/convolution.hpp\"\n\nnamespace\
     \ m1une {\nnamespace fps {\n\nnamespace internal {\n\ntemplate <class Mint, class\
     \ = void>\nstruct has_static_modulus : std::false_type {};\n\ntemplate <class\
     \ Mint>\nstruct has_static_modulus<\n    Mint, std::void_t<decltype(std::integral_constant<uint32_t,\
@@ -932,7 +933,7 @@ data:
   isVerificationFile: true
   path: verify/math/fps/convolution_mod.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-08-10 17:30:05+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/fps/convolution_mod.test.cpp

@@ -121,6 +121,22 @@ seg.set(1, 10);
 long long answer = seg.prod(0, 3);  // 1 + 10 + 3
 ```
 
+Create a single-file submission with the expander:
+
+```sh
+python3 expander.py main.cpp > bundled.cpp
+```
+
+The FPS convolution headers include an optional x86 AVX2 implementation. On a
+judge with a strict source-size limit, omit that implementation from the bundle:
+
+```sh
+python3 expander.py --no-x86-simd main.cpp > bundled.cpp
+```
+
+The resulting source uses the scalar NTT implementation and remains portable,
+but large convolutions can be slower.
+
 To shrink an expanded submission, run the dependency-free compressor. It removes
 comments and redundant whitespace, shortens file-owned variables, fields, types,
 namespaces, and unqualified functions, and introduces profitable short aliases

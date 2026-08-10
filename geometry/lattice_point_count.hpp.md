@@ -239,7 +239,7 @@ data:
   path: geometry/lattice_point_count.hpp
   requiredBy:
   - geometry/all.hpp
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-08-10 17:30:05+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/centroid.test.cpp

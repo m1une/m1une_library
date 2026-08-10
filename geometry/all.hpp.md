@@ -245,7 +245,7 @@ data:
   isVerificationFile: false
   path: geometry/all.hpp
   requiredBy: []
-  timestamp: '2026-08-08 17:03:52+09:00'
+  timestamp: '2026-08-10 17:30:05+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/centroid.test.cpp
