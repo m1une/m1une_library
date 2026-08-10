@@ -3392,32 +3392,10 @@ data:
     \    for (int i = 0; i < size; i++) scaled[i] *= negative[i];\n    std::reverse(scaled.begin(),\
     \ scaled.end());\n    std::vector<Mint> product = fps::convolution(scaled, positive);\n\
     \n    std::vector<Mint> result(size);\n    for (int i = 0; i < size; i++) result[i]\
-    \ = product[size - 1 + i] * negative[i];\n    return result;\n}\n\ntemplate <class\
-    \ Mint>\nstd::vector<Mint> multivariate_convolution_truncated_arbitrary_mod(\n\
+    \ = product[size - 1 + i] * negative[i];\n    return result;\n}\n\n}  // namespace\
+    \ internal\n\ntemplate <class Mint>\nstd::vector<Mint> multivariate_convolution_truncated(\n\
     \    const std::vector<int>& dimensions,\n    const std::vector<Mint>& first,\n\
-    \    const std::vector<Mint>& second\n) {\n    const int variable_count = int(dimensions.size());\n\
-    \    const int coefficient_count = multivariate_coefficient_count(dimensions);\n\
-    \    assert(int(first.size()) == coefficient_count);\n    assert(int(second.size())\
-    \ == coefficient_count);\n    if (variable_count == 0) return {first[0] * second[0]};\n\
-    \n    const std::vector<int> color = multivariate_colors(dimensions);\n    std::vector<std::vector<Mint>>\
-    \ colored_first(\n        variable_count, std::vector<Mint>(coefficient_count)\n\
-    \    );\n    std::vector<std::vector<Mint>> colored_second(\n        variable_count,\
-    \ std::vector<Mint>(coefficient_count)\n    );\n    for (int i = 0; i < coefficient_count;\
-    \ i++) {\n        colored_first[color[i]][i] = first[i];\n        colored_second[color[i]][i]\
-    \ = second[i];\n    }\n\n    std::vector<std::vector<Mint>> colored_result(\n\
-    \        variable_count, std::vector<Mint>(coefficient_count)\n    );\n    for\
-    \ (int left = 0; left < variable_count; left++) {\n        for (int right = 0;\
-    \ right < variable_count; right++) {\n            std::vector<Mint> product =\n\
-    \                fps::convolution(colored_first[left], colored_second[right]);\n\
-    \            std::vector<Mint>& destination =\n                colored_result[(left\
-    \ + right) % variable_count];\n            for (int i = 0; i < coefficient_count;\
-    \ i++) {\n                destination[i] += product[i];\n            }\n     \
-    \   }\n    }\n\n    std::vector<Mint> result(coefficient_count);\n    for (int\
-    \ i = 0; i < coefficient_count; i++) {\n        result[i] = colored_result[color[i]][i];\n\
-    \    }\n    return result;\n}\n\n}  // namespace internal\n\ntemplate <class Mint>\n\
-    std::vector<Mint> multivariate_convolution_truncated(\n    const std::vector<int>&\
-    \ dimensions,\n    const std::vector<Mint>& first,\n    const std::vector<Mint>&\
-    \ second\n) {\n    static_assert(\n        fps::internal::has_static_modulus<Mint>::value,\n\
+    \    const std::vector<Mint>& second\n) {\n    static_assert(\n        fps::internal::has_static_modulus<Mint>::value,\n\
     \        \"truncated multivariate convolution requires a static-modulus type\"\
     \n    );\n    const int variable_count = int(dimensions.size());\n    const int\
     \ coefficient_count = internal::multivariate_coefficient_count(dimensions);\n\
@@ -3471,22 +3449,35 @@ data:
     \ int64_t widened = 2LL * reduced_dimensions[i] - 1;\n            assert(widened\
     \ <= std::numeric_limits<int>::max());\n            widened_dimensions[i] = int(widened);\n\
     \        }\n        const int widened_count =\n            internal::multivariate_coefficient_count(widened_dimensions);\n\
-    \        std::vector<Mint> widened_first(widened_count);\n        std::vector<Mint>\
-    \ widened_second(widened_count);\n        for (int index = 0; index < coefficient_count;\
-    \ index++) {\n            int remaining = index;\n            int widened_index\
-    \ = 0;\n            int widened_stride = 1;\n            for (int variable = 0;\
-    \ variable < int(reduced_dimensions.size()); variable++) {\n                const\
-    \ int coordinate = remaining % reduced_dimensions[variable];\n               \
-    \ remaining /= reduced_dimensions[variable];\n                widened_index +=\
-    \ coordinate * widened_stride;\n                widened_stride *= widened_dimensions[variable];\n\
+    \n        // The largest embedded input index uses coordinate dimension - 1 on\n\
+    \        // every axis.  Its double is widened_count - 1, so convolving arrays\n\
+    \        // ending at this index produces exactly the widened mixed-radix box.\n\
+    \        // In particular, fps::convolution chooses the smallest transform that\n\
+    \        // contains widened_count coefficients, instead of one that contains\n\
+    \        // 2 * widened_count - 1 coefficients due to trailing zeroes.\n     \
+    \   int64_t maximum_embedded_index = 0;\n        int64_t widened_stride = 1;\n\
+    \        for (int variable = 0; variable < int(reduced_dimensions.size()); variable++)\
+    \ {\n            maximum_embedded_index +=\n                int64_t(reduced_dimensions[variable]\
+    \ - 1) * widened_stride;\n            widened_stride *= widened_dimensions[variable];\n\
+    \        }\n        assert(widened_stride == widened_count);\n        assert(2\
+    \ * maximum_embedded_index + 1 == widened_count);\n        assert(maximum_embedded_index\
+    \ < std::numeric_limits<int>::max());\n        const int embedded_input_count\
+    \ = int(maximum_embedded_index) + 1;\n        std::vector<Mint> widened_first(embedded_input_count);\n\
+    \        std::vector<Mint> widened_second(embedded_input_count);\n        for\
+    \ (int index = 0; index < coefficient_count; index++) {\n            int remaining\
+    \ = index;\n            int widened_index = 0;\n            int embedding_stride\
+    \ = 1;\n            for (int variable = 0; variable < int(reduced_dimensions.size());\
+    \ variable++) {\n                const int coordinate = remaining % reduced_dimensions[variable];\n\
+    \                remaining /= reduced_dimensions[variable];\n                widened_index\
+    \ += coordinate * embedding_stride;\n                embedding_stride *= widened_dimensions[variable];\n\
     \            }\n            widened_first[widened_index] = first[index];\n   \
     \         widened_second[widened_index] = second[index];\n        }\n\n      \
-    \  std::vector<Mint> widened_product =\n            internal::multivariate_convolution_truncated_arbitrary_mod(\n\
-    \                widened_dimensions, widened_first, widened_second\n         \
-    \   );\n        std::vector<Mint> result(coefficient_count);\n        for (int\
-    \ widened_index = 0; widened_index < widened_count; widened_index++) {\n     \
-    \       int remaining = widened_index;\n            int index = 0;\n         \
-    \   int stride = 1;\n            for (int variable = 0; variable < int(reduced_dimensions.size());\
+    \  std::vector<Mint> widened_product =\n            fps::convolution(widened_first,\
+    \ widened_second);\n        assert(int(widened_product.size()) == widened_count);\n\
+    \        std::vector<Mint> result(coefficient_count);\n        for (int widened_index\
+    \ = 0; widened_index < widened_count; widened_index++) {\n            int remaining\
+    \ = widened_index;\n            int index = 0;\n            int stride = 1;\n\
+    \            for (int variable = 0; variable < int(reduced_dimensions.size());\
     \ variable++) {\n                const int coordinate = remaining % widened_dimensions[variable];\n\
     \                remaining /= widened_dimensions[variable];\n                index\
     \ += (coordinate % reduced_dimensions[variable]) * stride;\n                stride\
@@ -4592,7 +4583,7 @@ data:
   isVerificationFile: false
   path: math/all.hpp
   requiredBy: []
-  timestamp: '2026-08-10 15:56:40+09:00'
+  timestamp: '2026-08-10 17:18:00+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
