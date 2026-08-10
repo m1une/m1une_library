@@ -27,8 +27,8 @@ Two products are available:
 | --- | --- | --- |
 | `template <class Mint> std::vector<Mint> multivariate_convolution_truncated(const std::vector<int>& dimensions, const std::vector<Mint>& first, const std::vector<Mint>& second)` | Returns the first $n_i$ coefficients in every dimension of the ordinary multidimensional convolution, in flat form. | $O(kN\log N+k^2N)$ time and $O(kN)$ memory. |
 | `template <class Nested> Nested multivariate_convolution_truncated(const Nested& first, const Nested& second)` | Returns the same truncated convolution as a nested vector with the same shape as the inputs. | $O(kN\log N+k^2N)$ time and $O(kN)$ memory. |
-| `template <class Mint> std::vector<Mint> multivariate_convolution_cyclic(const std::vector<int>& dimensions, const std::vector<Mint>& first, const std::vector<Mint>& second)` | Returns the multidimensional convolution with indices wrapping around each dimension, in flat form. | $O(N\sum_i \log n_i + P(M))$ time and $O(N+\max_i n_i)$ memory when every $n_i$ divides $M-1$; otherwise $O(k^2L\log L)$ time and $O(kL)$ memory. |
-| `template <class Nested> Nested multivariate_convolution_cyclic(const Nested& first, const Nested& second)` | Returns the same cyclic convolution as a nested vector with the same shape as the inputs. | $O(N\sum_i \log n_i + P(M))$ time and $O(N+\max_i n_i)$ memory when every $n_i$ divides $M-1$; otherwise $O(k^2L\log L)$ time and $O(kL)$ memory. |
+| `template <class Mint> std::vector<Mint> multivariate_convolution_cyclic(const std::vector<int>& dimensions, const std::vector<Mint>& first, const std::vector<Mint>& second)` | Returns the multidimensional convolution with indices wrapping around each dimension, in flat form. | $O(N\sum_i \log n_i + P(M))$ time and $O(N+\max_i n_i)$ memory when every $n_i$ divides $M-1$; otherwise $O(L\log L)$ time and $O(L)$ memory. |
+| `template <class Nested> Nested multivariate_convolution_cyclic(const Nested& first, const Nested& second)` | Returns the same cyclic convolution as a nested vector with the same shape as the inputs. | $O(N\sum_i \log n_i + P(M))$ time and $O(N+\max_i n_i)$ memory when every $n_i$ divides $M-1$; otherwise $O(L\log L)$ time and $O(L)$ memory. |
 
 Here, `k = dimensions.size()`, $n_i$ is the size of dimension `i`, and
 $N=\prod_i n_i$, $M$ is the modulus, $L=\prod_{i:n_i>1}(2n_i-1)$, and $P(M)$
@@ -82,10 +82,12 @@ sizes up to the usual $2^{22}$ coefficient limit for this routine.
 `multivariate_convolution_cyclic` accepts either `ModInt<mod>` or
 `DynamicModInt<id>`. When every $n_i$ divides `Mint::mod() - 1`, it uses a
 multidimensional DFT and the modulus must admit a primitive root. Otherwise it
-works for arbitrary positive dimensions by zero-extending each nontrivial
-dimension from $n_i$ to $2n_i-1$, taking a truncated product, and folding the
-result modulo the original dimensions. The fallback uses ordinary convolution,
-so its supported transform length and coefficient bound are those of
+works for arbitrary positive dimensions by embedding each nontrivial dimension
+in mixed radix $2n_i-1$, taking one ordinary convolution, and folding the result
+modulo the original dimensions. The embedded input arrays end at index
+$(L-1)/2$, so the ordinary convolution has exactly $L$ output coefficients and
+uses the smallest power-of-two transform length that can hold them. The
+fallback's supported transform length and coefficient bound are those of
 `fps::convolution`. For a dynamic modint, call `set_mod` before constructing or
 reading coefficients.
 
