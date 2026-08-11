@@ -6,14 +6,14 @@
 #include <utility>
 #include <vector>
 
-#include "../../acted_monoid/beats_concept.hpp"
+#include "../../beats_acted_monoid/concept.hpp"
 #include "../../math/bit_ceil.hpp"
 
 namespace m1une {
 namespace ds {
 
 // Generic Segment Tree Beats for actions that may require recursive descent.
-template <m1une::acted_monoid::IsBeatsActedMonoid ActedMonoid>
+template <m1une::beats_acted_monoid::IsBeatsActedMonoid ActedMonoid>
 struct SegtreeBeats {
     using value_type = typename ActedMonoid::value_type;
     using operator_type = typename ActedMonoid::operator_type;

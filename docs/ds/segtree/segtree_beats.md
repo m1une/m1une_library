@@ -20,7 +20,8 @@ directly. Its simpler contract gives the usual $O(\log N)$ update bound.
 
 ## Beats acted monoid
 
-`ActedMonoid` must satisfy `m1une::acted_monoid::IsBeatsActedMonoid` and provide:
+`ActedMonoid` must satisfy
+`m1une::beats_acted_monoid::IsBeatsActedMonoid` and provide:
 
 ```cpp
 using value_type = T;
@@ -77,10 +78,10 @@ Construction from `std::vector<U>` uses `ActedMonoid::make(value)` when
 available, then `ActedMonoid::make(value, index)`, then conversion to
 `value_type`.
 
-`acted_monoid/beats_wrapper.hpp` provides `BeatsWrapper` for assembling the
-required functions from `constexpr` lambdas or function objects. It can also
-forward optional `make`, index-aware mapping/applicability, and shifting
-functions.
+`beats_acted_monoid/wrapper.hpp` provides
+`m1une::beats_acted_monoid::Wrapper` for assembling the required functions
+from `constexpr` lambdas or function objects. It can also forward optional
+`make`, index-aware mapping/applicability, and shifting functions.
 
 ## Public interface
 

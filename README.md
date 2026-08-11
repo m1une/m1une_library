@@ -14,8 +14,8 @@ to `ds/`; for example, cumulative sums stay in `ds/range_query/`.
 Graph-specialized algorithms, including tree and flow routines, live under
 `graph/`; algebraic and numeric
 tools, including FPS and matrices, live under `math/`. Reusable algebraic
-definitions live in `monoid/` and `acted_monoid/` so they can be combined
-without rewriting boilerplate during a contest.
+definitions live in `monoid/`, `acted_monoid/`, and `beats_acted_monoid/` so
+they can be combined without rewriting boilerplate during a contest.
 
 ## Structure
 
@@ -29,7 +29,8 @@ without rewriting boilerplate during a contest.
 | `geometry/` | 2D points, lines, rays, segments, Manhattan segment intersections, perpendicular bisectors, polygons, convex decomposition, circle coverage multiplicities, circle- and rectangle-union area, convex hulls, Delaunay triangulations, Voronoi diagrams, half-plane intersection, lattice-point counting, and circles. |
 | `ds/` | Categorized data structures for range queries, online/offline dynamic connectivity, dynamic sequences and trees, ordered sets, heaps, intervals, and hash tables. |
 | `monoid/` | Reusable monoids for generic data structures such as `Segtree`. |
-| `acted_monoid/` | Acted monoids for lazy propagation structures such as `LazySegtree` and generic `SegtreeBeats`, including generic range assignment/range product and combined bitwise AND/OR/XOR updates with range sums. |
+| `acted_monoid/` | Ordinary acted monoids for lazy propagation structures such as `LazySegtree`, including generic range assignment/range product and combined bitwise AND/OR/XOR updates with range sums. |
+| `beats_acted_monoid/` | Fallible acted monoids intended for generic Beats structures such as `SegtreeBeats`, including chmin/chmax/add and bitwise AND/OR updates with range sums. |
 | `math/` | Number theory, modular arithmetic, combinatorics and partition functions, set power series and FPS/polynomials, XOR bases and bitwise transforms, matrices, exact rationals, and integer arithmetic. |
 | `string/` | Z/KMP, wildcard matching, edit distance, Manacher, palindrome lexicographic rank/select, minimum rotation, Lyndon factorization, run enumeration, longest common extension/subsequence/substring, eertrees, suffix trees/automata/arrays, tries, Aho-Corasick, and string hashes. |
 | `utilities/` | Fast I/O, Base64 packing for embedded numeric sequences, fixed-width 256-, 512-, and 1024-bit integers, convolution-backed arbitrary-precision integers, parsing, dice, 2D grid transforms, integer helpers, compression, random generation, and stream-ready property, constructive, and interactive stress testing. |
@@ -53,7 +54,7 @@ short namespace segment after `m1une::`; nested directories are for browsing.
 | `math/fps/` | `m1une::fps` |
 | `math/matrix/` | `m1une::matrix` |
 | `optimization/` | `m1une::opt` |
-| `geometry/`, `string/`, `matroid/`, `monoid/` | Matching short top-level namespaces. |
+| `geometry/`, `string/`, `matroid/`, `monoid/`, `acted_monoid/`, `beats_acted_monoid/` | Matching short top-level namespaces. |
 
 ### Algorithm categories
 
@@ -85,7 +86,7 @@ plumbing live in `utilities/`.
 | Directory | Use it for |
 | --- | --- |
 | `ds/dsu/` | Connectivity, component aggregation, potentials, range-parallel merging, and persistent union-find. |
-| `ds/segtree/` | Dense and dynamic segment trees, lazy propagation, dual segment trees, and persistent variants. |
+| `ds/segtree/` | Dense and dynamic segment trees, lazy propagation, dual segment trees, generic and persistent Beats, and other persistent variants. |
 | `ds/range_query/` | Objects built for repeated range queries, including cumulative sums, range LIS/modes/majorities and distinct counting, Fenwick and k-d trees, and static sparse-table queries. |
 | `ds/wavelet_matrix/` | Static and dynamic wavelet matrices for range order statistics, frequencies, dynamically updated weighted range sums, and multidimensional orthogonal queries. |
 | `ds/dynamic_array/` | Implicit-treap sequences with insertion, deletion, reversal, aggregation, or persistence. |
@@ -111,7 +112,9 @@ Include headers directly from the repository root and compile with C++20:
 #include "monoid/add.hpp"
 ```
 
-Most generic data structures are parameterized by a monoid or acted monoid, so prefer the ready-made definitions in `monoid/` and `acted_monoid/` when possible.
+Most generic data structures are parameterized by a monoid or acted monoid, so
+prefer the ready-made definitions in `monoid/`, `acted_monoid/`, and
+`beats_acted_monoid/` when possible.
 
 ```cpp
 using Sum = m1une::monoid::Add<long long>;

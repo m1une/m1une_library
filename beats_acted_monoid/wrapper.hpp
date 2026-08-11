@@ -1,10 +1,10 @@
-#ifndef M1UNE_ACTED_MONOID_BEATS_WRAPPER_HPP
-#define M1UNE_ACTED_MONOID_BEATS_WRAPPER_HPP 1
+#ifndef M1UNE_BEATS_ACTED_MONOID_WRAPPER_HPP
+#define M1UNE_BEATS_ACTED_MONOID_WRAPPER_HPP 1
 
 #include <concepts>
 
 namespace m1une {
-namespace acted_monoid {
+namespace beats_acted_monoid {
 
 // Wrapper for defining a Beats acted monoid with callables supplied as NTTPs.
 template <
@@ -24,7 +24,7 @@ template <
     bool Commutative = false,
     bool OperatorCommutative = false
 >
-struct BeatsWrapper {
+struct Wrapper {
     using value_type = T;
     using operator_type = E;
     static constexpr bool commutative = Commutative;
@@ -99,7 +99,7 @@ struct BeatsWrapper {
     }
 };
 
-}  // namespace acted_monoid
+}  // namespace beats_acted_monoid
 }  // namespace m1une
 
-#endif  // M1UNE_ACTED_MONOID_BEATS_WRAPPER_HPP
+#endif  // M1UNE_BEATS_ACTED_MONOID_WRAPPER_HPP

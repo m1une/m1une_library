@@ -2,7 +2,6 @@
 
 #include <iostream>
 
-#include "../../acted_monoid/beats_wrapper.hpp"
 #include "../../acted_monoid/concept.hpp"
 #include "../../acted_monoid/range_add_range_arg_max.hpp"
 #include "../../acted_monoid/range_add_range_arg_min.hpp"
@@ -30,6 +29,8 @@
 #include "../../acted_monoid/range_xor_range_sum.hpp"
 #include "../../acted_monoid/range_xor_range_xor.hpp"
 #include "../../acted_monoid/wrapper.hpp"
+#include "../../beats_acted_monoid/concept.hpp"
+#include "../../beats_acted_monoid/wrapper.hpp"
 #include "../../monoid/add.hpp"
 #include "../../monoid/affine.hpp"
 #include "../../monoid/and.hpp"
@@ -111,17 +112,20 @@ using CommutativeActedWrapper =
     m1une::acted_monoid::Wrapper<int, int, int_add, int_zero, int_add, int_zero, int_mapping, true>;
 using CommutativeOperatorActedWrapper =
     m1une::acted_monoid::Wrapper<int, int, int_add, int_zero, int_add, int_zero, int_mapping, false, true>;
-using DefaultBeatsWrapper = m1une::acted_monoid::BeatsWrapper<
+using DefaultBeatsWrapper = m1une::beats_acted_monoid::Wrapper<
     int, int, int_add, int_zero, int_add, int_zero, int_mapping, always_applicable>;
-using CommutativeBeatsWrapper = m1une::acted_monoid::BeatsWrapper<
+using CommutativeBeatsWrapper = m1une::beats_acted_monoid::Wrapper<
     int, int, int_add, int_zero, int_add, int_zero, int_mapping, always_applicable,
     nullptr, nullptr, nullptr, nullptr, nullptr, true>;
-using CommutativeOperatorBeatsWrapper = m1une::acted_monoid::BeatsWrapper<
+using CommutativeOperatorBeatsWrapper = m1une::beats_acted_monoid::Wrapper<
     int, int, int_add, int_zero, int_add, int_zero, int_mapping, always_applicable,
     nullptr, nullptr, nullptr, nullptr, nullptr, false, true>;
 
 static_assert(m1une::monoid::IsMonoid<ContestMonoid>);
 static_assert(m1une::acted_monoid::IsActedMonoid<ContestActedMonoid>);
+static_assert(
+    m1une::beats_acted_monoid::IsBeatsActedMonoid<DefaultBeatsWrapper>
+);
 
 static_assert(m1une::monoid::Add<int>::commutative);
 static_assert(m1une::monoid::And<int>::commutative);

@@ -1,12 +1,12 @@
 ---
 title: Beats Acted Monoid Concept
-documentation_of: ../../acted_monoid/beats_concept.hpp
+documentation_of: ../../beats_acted_monoid/concept.hpp
 ---
 
 ## Overview
 
-`m1une::acted_monoid::IsBeatsActedMonoid<AM>` extends
-`IsActedMonoid<AM>` with:
+`m1une::beats_acted_monoid::IsBeatsActedMonoid<AM>` extends
+`m1une::acted_monoid::IsActedMonoid<AM>` with:
 
 ```cpp
 static bool can_apply(

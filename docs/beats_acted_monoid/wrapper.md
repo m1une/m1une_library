@@ -1,11 +1,11 @@
 ---
 title: Beats Acted Monoid Wrapper
-documentation_of: ../../acted_monoid/beats_wrapper.hpp
+documentation_of: ../../beats_acted_monoid/wrapper.hpp
 ---
 
 ## Overview
 
-`m1une::acted_monoid::BeatsWrapper` defines a Beats acted monoid from callables
+`m1une::beats_acted_monoid::Wrapper` defines a Beats acted monoid from callables
 supplied as C++20 non-type template arguments (NTTPs). It is useful when the
 operations are short enough that declaring a named acted-monoid `struct` would
 add ceremony during a contest.
@@ -23,8 +23,8 @@ without inspecting its children. If it returns `false`, `SegtreeBeats`
 descends, applies the update to smaller nodes, and rebuilds the aggregate.
 
 Use `acted_monoid::Wrapper` with `LazySegtree` when every update is directly
-applicable. Use `BeatsWrapper` with `SegtreeBeats` when applicability depends on
-the aggregate.
+applicable. Use `beats_acted_monoid::Wrapper` with `SegtreeBeats` when
+applicability depends on the aggregate.
 
 ```cpp
 template <
@@ -40,7 +40,7 @@ template <
     bool Commutative = false,
     bool OperatorCommutative = false
 >
-struct BeatsWrapper;
+struct Wrapper;
 ```
 
 ## Required callables
@@ -139,7 +139,7 @@ descends.
 #include <limits>
 #include <vector>
 
-#include "acted_monoid/beats_wrapper.hpp"
+#include "beats_acted_monoid/wrapper.hpp"
 #include "ds/segtree/segtree_beats.hpp"
 
 struct Node {
@@ -197,7 +197,7 @@ constexpr auto make = [](long long value) {
     return Node{value, NEG_INF, value, 1, 1};
 };
 
-using RangeChminRangeSum = m1une::acted_monoid::BeatsWrapper<
+using RangeChminRangeSum = m1une::beats_acted_monoid::Wrapper<
     Node,
     long long,
     op,
