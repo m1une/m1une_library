@@ -83,10 +83,10 @@ data:
   timestamp: '2026-07-21 20:17:47+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/dynamic_array/dynamic_lazy_monoid_array_range_ap.test.cpp
   - verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array_range_ap.test.cpp
-  - verify/ds/segtree/persistent_segtree_beats.test.cpp
+  - verify/ds/dynamic_array/dynamic_lazy_monoid_array_range_ap.test.cpp
   - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
+  - verify/ds/segtree/persistent_segtree_beats.test.cpp
   - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
   - verify/monoid/commutative_flags.test.cpp
 documentation_of: acted_monoid/range_ap_add_range_sum.hpp

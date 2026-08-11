@@ -889,8 +889,8 @@ data:
   timestamp: '2026-08-08 16:52:39+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/geometry/centroid.test.cpp
   - verify/geometry/circle_union_area.test.cpp
+  - verify/geometry/centroid.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/circle_coverage_areas.test.cpp
 documentation_of: geometry/circle_union_area.hpp

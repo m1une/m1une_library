@@ -218,11 +218,11 @@ data:
   timestamp: '2026-07-01 22:14:13+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/extended_gcd.test.cpp
   - verify/math/binomial_coefficient_mod.test.cpp
-  - verify/math/math_algorithms.test.cpp
-  - verify/math/generalized_floor_sum.test.cpp
   - verify/math/floor_sum.test.cpp
+  - verify/math/generalized_floor_sum.test.cpp
+  - verify/math/extended_gcd.test.cpp
+  - verify/math/math_algorithms.test.cpp
 documentation_of: math/number_theory.hpp
 layout: document
 title: Number Theory

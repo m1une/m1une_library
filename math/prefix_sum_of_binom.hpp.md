@@ -218,9 +218,9 @@ data:
   timestamp: '2026-07-13 03:08:36+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/math_algorithms.test.cpp
   - verify/math/prefix_sum_of_binom.test.cpp
   - verify/math/prefix_sum_of_binom_randomized.test.cpp
+  - verify/math/math_algorithms.test.cpp
 documentation_of: math/prefix_sum_of_binom.hpp
 layout: document
 title: Prefix Sum of Binomial Coefficients

@@ -244,15 +244,15 @@ data:
   timestamp: '2026-08-08 16:10:43+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/geometry/polygon_operations.test.cpp
+  - verify/geometry/convex_polygon.test.cpp
   - verify/geometry/is_convex_polygon.test.cpp
+  - verify/geometry/centroid.test.cpp
   - verify/geometry/steiner_convex_decomposition.test.cpp
   - verify/geometry/convex_diameter.test.cpp
-  - verify/geometry/centroid.test.cpp
-  - verify/geometry/minkowski_sum.test.cpp
-  - verify/geometry/polygon_operations.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/convex_decomposition.test.cpp
-  - verify/geometry/convex_polygon.test.cpp
+  - verify/geometry/minkowski_sum.test.cpp
 documentation_of: geometry/minkowski_sum.hpp
 layout: document
 title: Minkowski Sum

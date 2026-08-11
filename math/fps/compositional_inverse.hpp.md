@@ -992,9 +992,9 @@ data:
   timestamp: '2026-08-10 17:30:05+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/math_algorithms.test.cpp
-  - verify/math/fps/fps_algorithms.test.cpp
   - verify/math/fps/compositional_inverse.test.cpp
+  - verify/math/fps/fps_algorithms.test.cpp
+  - verify/math/math_algorithms.test.cpp
 documentation_of: math/fps/compositional_inverse.hpp
 layout: document
 title: Compositional Inverse of Formal Power Series

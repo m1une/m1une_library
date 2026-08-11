@@ -340,8 +340,8 @@ data:
   timestamp: '2026-08-12 03:11:00+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/segtree/persistent_segtree.test.cpp
   - verify/ds/persistent_cow.test.cpp
+  - verify/ds/segtree/persistent_segtree.test.cpp
 documentation_of: ds/segtree/persistent_segtree.hpp
 layout: document
 title: Persistent Segment Tree

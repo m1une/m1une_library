@@ -324,10 +324,10 @@ data:
   timestamp: '2026-07-16 20:44:42+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/graph/graph_algorithms.test.cpp
-  - verify/graph/tree/tree_algorithms.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
   - verify/graph/cow_game.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/tree/tree_algorithms.test.cpp
 documentation_of: graph/tree/virtual_tree.hpp
 layout: document
 title: Virtual Tree

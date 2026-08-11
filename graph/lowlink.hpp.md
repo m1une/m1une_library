@@ -133,14 +133,14 @@ data:
   isVerificationFile: false
   path: graph/lowlink.hpp
   requiredBy:
-  - graph/undirected.hpp
   - graph/all.hpp
+  - graph/undirected.hpp
   timestamp: '2026-07-11 19:47:32+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/graph/cow_game.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/range_edge_graph.test.cpp
-  - verify/graph/cow_game.test.cpp
 documentation_of: graph/lowlink.hpp
 layout: document
 title: LowLink

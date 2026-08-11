@@ -207,8 +207,8 @@ data:
   timestamp: '2026-07-16 21:30:39+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/math_algorithms.test.cpp
   - verify/math/squarefree_count.test.cpp
+  - verify/math/math_algorithms.test.cpp
 documentation_of: math/squarefree_count.hpp
 layout: document
 title: Squarefree Count

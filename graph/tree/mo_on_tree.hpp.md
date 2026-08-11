@@ -394,11 +394,11 @@ data:
   timestamp: '2026-08-11 13:51:23+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/graph/graph_algorithms.test.cpp
-  - verify/graph/tree/tree_algorithms.test.cpp
-  - verify/graph/tree/mo_on_tree.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
   - verify/graph/cow_game.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/tree/mo_on_tree.test.cpp
+  - verify/graph/tree/tree_algorithms.test.cpp
 documentation_of: graph/tree/mo_on_tree.hpp
 layout: document
 title: Mo on Tree

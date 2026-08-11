@@ -1169,15 +1169,15 @@ data:
   isVerificationFile: false
   path: graph/general_weighted_matching.hpp
   requiredBy:
-  - graph/undirected.hpp
   - graph/all.hpp
+  - graph/undirected.hpp
   timestamp: '2026-07-14 02:19:12+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/general_weighted_matching.test.cpp
+  - verify/graph/cow_game.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/range_edge_graph.test.cpp
-  - verify/graph/cow_game.test.cpp
 documentation_of: graph/general_weighted_matching.hpp
 layout: document
 title: General Weighted Matching

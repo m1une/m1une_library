@@ -494,7 +494,7 @@ data:
       title: Persistent Segment Tree
     - icon: ':heavy_check_mark:'
       path: ds/segtree/persistent_segtree_beats.hpp
-      title: Persistent Segment Tree Beats
+      title: ds/segtree/persistent_segtree_beats.hpp
     - icon: ':heavy_check_mark:'
       path: ds/segtree/segtree.hpp
       title: Segment Tree

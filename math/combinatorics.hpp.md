@@ -140,17 +140,17 @@ data:
   timestamp: '2026-06-20 09:18:49+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/graph/graph_algorithms.test.cpp
-  - verify/graph/graph_counting.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
   - verify/graph/cow_game.test.cpp
-  - verify/math/bernoulli_utilities.test.cpp
-  - verify/math/math_algorithms.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/graph_counting.test.cpp
   - verify/math/stirling_number_of_the_second_kind.test.cpp
   - verify/math/prefix_sum_of_binom.test.cpp
   - verify/math/prefix_sum_of_binom_randomized.test.cpp
   - verify/math/prefix_sum_of_binom_randomized.test.cpp
+  - verify/math/bernoulli_utilities.test.cpp
   - verify/math/bernoulli_number.test.cpp
+  - verify/math/math_algorithms.test.cpp
   - verify/math/bell_number.test.cpp
 documentation_of: math/combinatorics.hpp
 layout: document

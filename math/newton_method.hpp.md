@@ -926,18 +926,18 @@ data:
   isVerificationFile: false
   path: math/newton_method.hpp
   requiredBy:
-  - math/fps/solve_fps_equation.hpp
   - math/fps/all.hpp
+  - math/fps/solve_fps_equation.hpp
   - math/all.hpp
   - math/all.hpp
   timestamp: '2026-08-11 14:11:53+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/math_algorithms.test.cpp
-  - verify/math/math_algorithms.test.cpp
   - verify/math/fps/fps_algorithms.test.cpp
   - verify/math/newton_method.test.cpp
   - verify/math/newton_method.test.cpp
+  - verify/math/math_algorithms.test.cpp
+  - verify/math/math_algorithms.test.cpp
 documentation_of: math/newton_method.hpp
 layout: document
 title: Newton Method

@@ -451,54 +451,54 @@ data:
   isVerificationFile: false
   path: geometry/line.hpp
   requiredBy:
-  - geometry/circle_coverage_areas.hpp
-  - geometry/half_plane_intersection.hpp
-  - geometry/all.hpp
-  - geometry/ray.hpp
   - geometry/manhattan_segment_intersections.hpp
   - geometry/circle_union_area.hpp
-  - geometry/convex_decomposition.hpp
   - geometry/polygon.hpp
   - geometry/perpendicular_bisector.hpp
-  - geometry/convex_polygon.hpp
+  - geometry/half_plane_intersection.hpp
   - geometry/minimum_enclosing_circle.hpp
+  - geometry/all.hpp
   - geometry/steiner_convex_decomposition.hpp
+  - geometry/circle_coverage_areas.hpp
+  - geometry/convex_polygon.hpp
   - geometry/circle.hpp
+  - geometry/ray.hpp
+  - geometry/convex_decomposition.hpp
   timestamp: '2026-07-22 02:25:12+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/geometry/manhattan_segment_intersections.test.cpp
-  - verify/geometry/perpendicular_bisector.test.cpp
-  - verify/geometry/circle_circle_intersection_area.test.cpp
-  - verify/geometry/is_convex_polygon.test.cpp
-  - verify/geometry/half_plane_intersection.test.cpp
-  - verify/geometry/half_plane_intersection_random.test.cpp
-  - verify/geometry/circumcircle.test.cpp
-  - verify/geometry/voronoi_diagram.test.cpp
-  - verify/geometry/circle_ray.test.cpp
-  - verify/geometry/steiner_convex_decomposition.test.cpp
-  - verify/geometry/circle_relation.test.cpp
-  - verify/geometry/incircle.test.cpp
-  - verify/geometry/minimum_enclosing_circle.test.cpp
-  - verify/geometry/polygon_area.test.cpp
-  - verify/geometry/convex_diameter.test.cpp
-  - verify/geometry/centroid.test.cpp
-  - verify/geometry/circle_line_intersection.test.cpp
-  - verify/geometry/circle_union_area.test.cpp
   - verify/geometry/polygon_operations.test.cpp
+  - verify/geometry/circle_tangent_points.test.cpp
+  - verify/geometry/point_in_polygon.test.cpp
+  - verify/geometry/perpendicular_bisector.test.cpp
+  - verify/geometry/circle_union_area.test.cpp
   - verify/geometry/segment_intersection.test.cpp
+  - verify/geometry/voronoi_diagram.test.cpp
+  - verify/geometry/incircle.test.cpp
+  - verify/geometry/convex_polygon.test.cpp
+  - verify/geometry/is_convex_polygon.test.cpp
+  - verify/geometry/circle_line_intersection.test.cpp
+  - verify/geometry/centroid.test.cpp
+  - verify/geometry/circle_circle_intersection_area.test.cpp
   - verify/geometry/circle_operations.test.cpp
-  - verify/geometry/circle_circle_intersection.test.cpp
+  - verify/geometry/circle_relation.test.cpp
+  - verify/geometry/manhattan_segment_intersections.test.cpp
+  - verify/geometry/minimum_enclosing_circle.test.cpp
+  - verify/geometry/steiner_convex_decomposition.test.cpp
+  - verify/geometry/circumcircle.test.cpp
+  - verify/geometry/projection.test.cpp
+  - verify/geometry/ray.test.cpp
+  - verify/geometry/circle_common_tangents.test.cpp
+  - verify/geometry/half_plane_intersection_random.test.cpp
+  - verify/geometry/circle_ray.test.cpp
+  - verify/geometry/convex_diameter.test.cpp
   - verify/geometry/circle_polygon_intersection_area.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
-  - verify/geometry/circle_tangent_points.test.cpp
+  - verify/geometry/polygon_area.test.cpp
   - verify/geometry/convex_decomposition.test.cpp
-  - verify/geometry/ray.test.cpp
-  - verify/geometry/point_in_polygon.test.cpp
-  - verify/geometry/projection.test.cpp
+  - verify/geometry/circle_circle_intersection.test.cpp
   - verify/geometry/circle_coverage_areas.test.cpp
-  - verify/geometry/circle_common_tangents.test.cpp
-  - verify/geometry/convex_polygon.test.cpp
+  - verify/geometry/half_plane_intersection.test.cpp
 documentation_of: geometry/line.hpp
 layout: document
 title: Lines and Segments

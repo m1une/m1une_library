@@ -528,8 +528,8 @@ data:
   timestamp: '2026-08-11 13:59:43+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/deque/persistent_deque.test.cpp
   - verify/ds/persistent_release.test.cpp
+  - verify/ds/deque/persistent_deque.test.cpp
 documentation_of: ds/deque/persistent_deque.hpp
 layout: document
 title: Persistent Deque
