@@ -20,6 +20,7 @@ same graph container.
 | `graph/tree/rooted_tree.hpp` | Rooted metadata, Euler intervals, LCA, jumps, paths, and distances. |
 | `graph/tree/sparse_table_lca.hpp` | Euler-tour sparse-table LCA with $O(1)$ queries. |
 | `graph/tree/heavy_light_decomposition.hpp` | HLD order, path segments, subtree ranges, LCA, and jumps. |
+| `graph/tree/mo_on_tree.hpp` | Offline Mo ordering for static vertex-path or edge-path queries. |
 | `graph/tree/range_contour_query.hpp` | Commutative-group contour products and applications by unweighted tree distance, with additive wrappers. |
 | `graph/tree/diameter.hpp` | Weighted tree/forest diameter path. |
 | `graph/tree/distance_frequency.hpp` | Counts unordered vertex pairs at every unweighted tree distance. |

@@ -8,6 +8,7 @@
 #include "dsu_on_tree.hpp"
 #include "euler_tour.hpp"
 #include "heavy_light_decomposition.hpp"
+#include "mo_on_tree.hpp"
 #include "range_contour_query.hpp"
 #include "rerooting_dp.hpp"
 #include "rerooting_static_top_tree.hpp"
