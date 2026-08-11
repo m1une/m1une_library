@@ -44,6 +44,9 @@ data:
     path: acted_monoid/range_ap_update_range_sum.hpp
     title: Range AP Update Range Sum
   - icon: ':heavy_check_mark:'
+    path: acted_monoid/range_bitwise_and_or_xor_range_sum.hpp
+    title: Range Bitwise AND/OR/XOR Range Sum
+  - icon: ':heavy_check_mark:'
     path: acted_monoid/range_flip_range_binary_inversion.hpp
     title: Range Flip Range Binary Inversion
   - icon: ':heavy_check_mark:'
@@ -564,25 +567,66 @@ data:
     \ if (!f.has_value()) return f;\n        return std::pair<T, T>{-f.value().first,\
     \ f.value().second + f.value().first * T(size - 1)};\n    }\n\n    static constexpr\
     \ value_type make(const T& val) {\n        return {val, 1, T(0)};\n    }\n};\n\
-    \n}  // namespace acted_monoid\n}  // namespace m1une\n\n\n#line 1 \"acted_monoid/range_flip_range_binary_inversion.hpp\"\
-    \n\n\n\n#line 1 \"monoid/binary_inversion.hpp\"\n\n\n\nnamespace m1une {\nnamespace\
-    \ monoid {\n\ntemplate <typename T = long long>\nstruct BinaryInversionNode {\n\
-    \    long long zeros;\n    long long ones;\n    T inversions;\n};\n\n// Monoid\
-    \ for counting zeros, ones, and inversions (1s before 0s) in a binary array.\n\
-    template <typename T = long long>\nstruct BinaryInversion {\n    using value_type\
-    \ = BinaryInversionNode<T>;\n    static constexpr bool commutative = false;\n\n\
-    \    // The identity element has 0 zeros, 0 ones, and 0 inversions.\n    static\
-    \ constexpr value_type id() {\n        return {0, 0, 0};\n    }\n\n    // Merges\
-    \ two segments and calculates the new inversions.\n    // New inversions = left\
-    \ inversions + right inversions + (ones in left * zeros in right)\n    static\
-    \ constexpr value_type op(const value_type& a, const value_type& b) {\n      \
-    \  return {a.zeros + b.zeros, a.ones + b.ones, a.inversions + b.inversions + a.ones\
-    \ * b.zeros};\n    }\n\n    // Helper to securely create a leaf node from a value\
-    \ (0 or 1).\n    static constexpr value_type make(int val) {\n        if (val\
-    \ == 0) return {1, 0, 0};\n        return {0, 1, 0};\n    }\n};\n\n}  // namespace\
-    \ monoid\n}  // namespace m1une\n\n\n#line 5 \"acted_monoid/range_flip_range_binary_inversion.hpp\"\
-    \n\nnamespace m1une {\nnamespace acted_monoid {\n\ntemplate <typename T = long\
-    \ long>\nstruct RangeFlipRangeBinaryInversion {\n    using value_type = m1une::monoid::BinaryInversionNode<T>;\n\
+    \n}  // namespace acted_monoid\n}  // namespace m1une\n\n\n#line 1 \"acted_monoid/range_bitwise_and_or_xor_range_sum.hpp\"\
+    \n\n\n\n#include <array>\n#line 6 \"acted_monoid/range_bitwise_and_or_xor_range_sum.hpp\"\
+    \n#include <type_traits>\n\nnamespace m1une {\nnamespace acted_monoid {\n\ntemplate\
+    \ <typename T, int BITS>\nstruct RangeBitwiseAndOrXorRangeSumNode {\n    T sum;\n\
+    \    std::array<long long, BITS> bit_count;\n    long long size;\n};\n\n// Acted\
+    \ monoid for range bitwise AND, OR, and XOR updates and range sum queries.\ntemplate\
+    \ <typename T, int BITS = 30>\nstruct RangeBitwiseAndOrXorRangeSum {\n    static_assert(std::is_integral_v<T>\
+    \ && !std::is_same_v<std::remove_cv_t<T>, bool>);\n    static_assert(0 < BITS\
+    \ && BITS <= std::numeric_limits<T>::digits);\n\n    using value_type = RangeBitwiseAndOrXorRangeSumNode<T,\
+    \ BITS>;\n\n    // Represents f(x) = (x & and_mask) ^ xor_mask on the lowest BITS\
+    \ bits.\n    struct operator_type {\n        T and_mask;\n        T xor_mask;\n\
+    \    };\n\n    static constexpr bool commutative = true;\n    static constexpr\
+    \ bool operator_commutative = false;\n\n    static constexpr T bit_mask() {\n\
+    \        if constexpr (std::is_unsigned_v<T> && BITS == std::numeric_limits<T>::digits)\
+    \ {\n            return ~T(0);\n        } else {\n            return (T(1) <<\
+    \ (BITS - 1)) | ((T(1) << (BITS - 1)) - 1);\n        }\n    }\n\n    static constexpr\
+    \ value_type id() {\n        value_type res;\n        res.sum = T(0);\n      \
+    \  res.bit_count.fill(0);\n        res.size = 0;\n        return res;\n    }\n\
+    \n    static constexpr value_type op(const value_type& a, const value_type& b)\
+    \ {\n        value_type res;\n        res.sum = a.sum + b.sum;\n        res.size\
+    \ = a.size + b.size;\n        for (int i = 0; i < BITS; ++i) {\n            res.bit_count[i]\
+    \ = a.bit_count[i] + b.bit_count[i];\n        }\n        return res;\n    }\n\n\
+    \    static constexpr operator_type op_id() {\n        return {bit_mask(), T(0)};\n\
+    \    }\n\n    // Returns f(g(x)).\n    static constexpr operator_type op_comp(const\
+    \ operator_type& f, const operator_type& g) {\n        return {f.and_mask & g.and_mask,\
+    \ (g.xor_mask & f.and_mask) ^ f.xor_mask};\n    }\n\n    static constexpr value_type\
+    \ mapping(const operator_type& f, const value_type& x) {\n        value_type res\
+    \ = x;\n        res.sum = T(0);\n        for (int i = 0; i < BITS; ++i) {\n  \
+    \          long long count = ((f.and_mask >> i) & T(1)) ? x.bit_count[i] : 0;\n\
+    \            if ((f.xor_mask >> i) & T(1)) count = x.size - count;\n         \
+    \   res.bit_count[i] = count;\n            res.sum += static_cast<T>(count) *\
+    \ (T(1) << i);\n        }\n        return res;\n    }\n\n    static constexpr\
+    \ value_type make(const T& value) {\n        value_type res;\n        res.sum\
+    \ = value;\n        res.size = 1;\n        for (int i = 0; i < BITS; ++i) {\n\
+    \            res.bit_count[i] = (value >> i) & T(1);\n        }\n        return\
+    \ res;\n    }\n\n    static constexpr operator_type make_and(const T& mask) {\n\
+    \        return {mask & bit_mask(), T(0)};\n    }\n\n    static constexpr operator_type\
+    \ make_or(const T& mask) {\n        T normalized = mask & bit_mask();\n      \
+    \  return {bit_mask() ^ normalized, normalized};\n    }\n\n    static constexpr\
+    \ operator_type make_xor(const T& mask) {\n        return {bit_mask(), mask &\
+    \ bit_mask()};\n    }\n};\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\
+    \n\n#line 1 \"acted_monoid/range_flip_range_binary_inversion.hpp\"\n\n\n\n#line\
+    \ 1 \"monoid/binary_inversion.hpp\"\n\n\n\nnamespace m1une {\nnamespace monoid\
+    \ {\n\ntemplate <typename T = long long>\nstruct BinaryInversionNode {\n    long\
+    \ long zeros;\n    long long ones;\n    T inversions;\n};\n\n// Monoid for counting\
+    \ zeros, ones, and inversions (1s before 0s) in a binary array.\ntemplate <typename\
+    \ T = long long>\nstruct BinaryInversion {\n    using value_type = BinaryInversionNode<T>;\n\
+    \    static constexpr bool commutative = false;\n\n    // The identity element\
+    \ has 0 zeros, 0 ones, and 0 inversions.\n    static constexpr value_type id()\
+    \ {\n        return {0, 0, 0};\n    }\n\n    // Merges two segments and calculates\
+    \ the new inversions.\n    // New inversions = left inversions + right inversions\
+    \ + (ones in left * zeros in right)\n    static constexpr value_type op(const\
+    \ value_type& a, const value_type& b) {\n        return {a.zeros + b.zeros, a.ones\
+    \ + b.ones, a.inversions + b.inversions + a.ones * b.zeros};\n    }\n\n    //\
+    \ Helper to securely create a leaf node from a value (0 or 1).\n    static constexpr\
+    \ value_type make(int val) {\n        if (val == 0) return {1, 0, 0};\n      \
+    \  return {0, 1, 0};\n    }\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\
+    \n\n#line 5 \"acted_monoid/range_flip_range_binary_inversion.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace acted_monoid {\n\ntemplate <typename T = long long>\nstruct\
+    \ RangeFlipRangeBinaryInversion {\n    using value_type = m1une::monoid::BinaryInversionNode<T>;\n\
     \    using operator_type = bool;\n    static constexpr bool commutative = false;\n\
     \    static constexpr bool operator_commutative = true;\n\n    static constexpr\
     \ value_type id() {\n        return {0, 0, 0};\n    }\n    static constexpr value_type\
@@ -630,31 +674,31 @@ data:
     \ f, const value_type& x) {\n        return f * x;\n    }\n\n    // Helper for\
     \ initializing a leaf node\n    static constexpr value_type make(const T& val)\
     \ {\n        return val;\n    }\n};\n\n}  // namespace acted_monoid\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"acted_monoid/range_or_range_sum.hpp\"\n\n\n\n#include <array>\n\
-    \nnamespace m1une {\nnamespace acted_monoid {\n\ntemplate <typename T, int BITS\
-    \ = 30>\nstruct RangeOrRangeSumNode {\n    T sum;\n    std::array<int, BITS> bit_count;\n\
-    \    long long size;\n};\n\n// Acted Monoid for Range OR updates and Range Sum\
-    \ queries.\ntemplate <typename T, int BITS = 30>\nstruct RangeOrRangeSum {\n \
-    \   using value_type = RangeOrRangeSumNode<T, BITS>;\n    using operator_type\
-    \ = T;\n    static constexpr bool commutative = true;\n    static constexpr bool\
-    \ operator_commutative = true;\n\n    static constexpr value_type id() {\n   \
-    \     value_type res;\n        res.sum = T(0);\n        res.bit_count.fill(0);\n\
-    \        res.size = 0;\n        return res;\n    }\n\n    static constexpr value_type\
-    \ op(const value_type& a, const value_type& b) {\n        value_type res;\n  \
-    \      res.sum = a.sum + b.sum;\n        res.size = a.size + b.size;\n       \
-    \ for (int i = 0; i < BITS; ++i) {\n            res.bit_count[i] = a.bit_count[i]\
-    \ + b.bit_count[i];\n        }\n        return res;\n    }\n\n    static constexpr\
-    \ operator_type op_id() {\n        return T(0);\n    }\n\n    static constexpr\
-    \ operator_type op_comp(const operator_type& f, const operator_type& g) {\n  \
-    \      return f | g;\n    }\n\n    static constexpr value_type mapping(const operator_type&\
-    \ f, const value_type& x) {\n        if (f == T(0) || x.size == 0) return x;\n\
-    \        value_type res = x;\n        res.sum = T(0);\n        for (int i = 0;\
-    \ i < BITS; ++i) {\n            if ((f >> i) & 1) {\n                res.bit_count[i]\
-    \ = x.size;  // OR forces the bit to be 1 for all elements\n            }\n  \
-    \          res.sum += static_cast<T>(res.bit_count[i]) * (T(1) << i);\n      \
-    \  }\n        return res;\n    }\n\n    static constexpr value_type make(const\
-    \ T& val) {\n        value_type res;\n        res.sum = val;\n        res.size\
-    \ = 1;\n        for (int i = 0; i < BITS; ++i) {\n            res.bit_count[i]\
+    \ m1une\n\n\n#line 1 \"acted_monoid/range_or_range_sum.hpp\"\n\n\n\n#line 5 \"\
+    acted_monoid/range_or_range_sum.hpp\"\n\nnamespace m1une {\nnamespace acted_monoid\
+    \ {\n\ntemplate <typename T, int BITS = 30>\nstruct RangeOrRangeSumNode {\n  \
+    \  T sum;\n    std::array<int, BITS> bit_count;\n    long long size;\n};\n\n//\
+    \ Acted Monoid for Range OR updates and Range Sum queries.\ntemplate <typename\
+    \ T, int BITS = 30>\nstruct RangeOrRangeSum {\n    using value_type = RangeOrRangeSumNode<T,\
+    \ BITS>;\n    using operator_type = T;\n    static constexpr bool commutative\
+    \ = true;\n    static constexpr bool operator_commutative = true;\n\n    static\
+    \ constexpr value_type id() {\n        value_type res;\n        res.sum = T(0);\n\
+    \        res.bit_count.fill(0);\n        res.size = 0;\n        return res;\n\
+    \    }\n\n    static constexpr value_type op(const value_type& a, const value_type&\
+    \ b) {\n        value_type res;\n        res.sum = a.sum + b.sum;\n        res.size\
+    \ = a.size + b.size;\n        for (int i = 0; i < BITS; ++i) {\n            res.bit_count[i]\
+    \ = a.bit_count[i] + b.bit_count[i];\n        }\n        return res;\n    }\n\n\
+    \    static constexpr operator_type op_id() {\n        return T(0);\n    }\n\n\
+    \    static constexpr operator_type op_comp(const operator_type& f, const operator_type&\
+    \ g) {\n        return f | g;\n    }\n\n    static constexpr value_type mapping(const\
+    \ operator_type& f, const value_type& x) {\n        if (f == T(0) || x.size ==\
+    \ 0) return x;\n        value_type res = x;\n        res.sum = T(0);\n       \
+    \ for (int i = 0; i < BITS; ++i) {\n            if ((f >> i) & 1) {\n        \
+    \        res.bit_count[i] = x.size;  // OR forces the bit to be 1 for all elements\n\
+    \            }\n            res.sum += static_cast<T>(res.bit_count[i]) * (T(1)\
+    \ << i);\n        }\n        return res;\n    }\n\n    static constexpr value_type\
+    \ make(const T& val) {\n        value_type res;\n        res.sum = val;\n    \
+    \    res.size = 1;\n        for (int i = 0; i < BITS; ++i) {\n            res.bit_count[i]\
     \ = ((val >> i) & 1) ? 1 : 0;\n        }\n        return res;\n    }\n};\n\n}\
     \  // namespace acted_monoid\n}  // namespace m1une\n\n\n#line 1 \"acted_monoid/range_update_range_longest_true.hpp\"\
     \n\n\n\n#line 5 \"acted_monoid/range_update_range_longest_true.hpp\"\n\n#line\
@@ -1283,7 +1327,7 @@ data:
     \    }\n\n    // Returns the bitwise XOR of a and b.\n    static constexpr T op(const\
     \ T& a, const T& b) {\n        return a ^ b;\n    }\n\n    static constexpr T\
     \ inv(const T& x) {\n        return x;\n    }\n};\n\n}  // namespace monoid\n\
-    }  // namespace m1une\n\n\n#line 65 \"verify/monoid/commutative_flags.test.cpp\"\
+    }  // namespace m1une\n\n\n#line 66 \"verify/monoid/commutative_flags.test.cpp\"\
     \n\nnamespace {\n\nstruct ContestMonoid {\n    using value_type = int;\n\n   \
     \ static constexpr int id() {\n        return 0;\n    }\n    static constexpr\
     \ int op(const int& a, const int& b) {\n        return a + b;\n    }\n};\n\nstruct\
@@ -1334,6 +1378,7 @@ data:
     static_assert(m1une::acted_monoid::RangeAddRangeSum<int>::commutative);\nstatic_assert(m1une::acted_monoid::RangeAffineRangeMinMax<int>::commutative);\n\
     static_assert(m1une::acted_monoid::RangeAffineRangeSum<int>::commutative);\nstatic_assert(m1une::acted_monoid::RangeAffineRangeSumOfSquares<int>::commutative);\n\
     static_assert(m1une::acted_monoid::RangeApUpdateRangeMinMax<int>::commutative);\n\
+    static_assert(m1une::acted_monoid::RangeBitwiseAndOrXorRangeSum<int>::commutative);\n\
     static_assert(m1une::acted_monoid::RangeFlipRangeSum<int>::commutative);\nstatic_assert(m1une::acted_monoid::RangeMulRangeSum<int>::commutative);\n\
     static_assert(m1une::acted_monoid::RangeOrRangeSum<int>::commutative);\nstatic_assert(m1une::acted_monoid::RangeUpdateRangeMax<int>::commutative);\n\
     static_assert(m1une::acted_monoid::RangeUpdateRangeMin<int>::commutative);\nstatic_assert(m1une::acted_monoid::RangeUpdateRangeProduct<m1une::monoid::Add<int>>::commutative);\n\
@@ -1367,6 +1412,7 @@ data:
     static_assert(!m1une::acted_monoid::RangeAffineRangeSumOfSquares<int>::operator_commutative);\n\
     static_assert(!m1une::acted_monoid::RangeApUpdateRangeMinMax<int>::operator_commutative);\n\
     static_assert(!m1une::acted_monoid::RangeApUpdateRangeSum<int>::operator_commutative);\n\
+    static_assert(!m1une::acted_monoid::RangeBitwiseAndOrXorRangeSum<int>::operator_commutative);\n\
     static_assert(!m1une::acted_monoid::RangeUpdateRangeLongestTrue::operator_commutative);\n\
     static_assert(!m1une::acted_monoid::RangeUpdateRangeMax<int>::operator_commutative);\n\
     static_assert(!m1une::acted_monoid::RangeUpdateRangeMaxSubarray<int>::operator_commutative);\n\
@@ -1386,8 +1432,9 @@ data:
     \n#include \"../../acted_monoid/range_affine_range_min_max.hpp\"\n#include \"\
     ../../acted_monoid/range_affine_range_sum.hpp\"\n#include \"../../acted_monoid/range_affine_range_sum_of_squares.hpp\"\
     \n#include \"../../acted_monoid/range_ap_add_range_sum.hpp\"\n#include \"../../acted_monoid/range_ap_update_range_min_max.hpp\"\
-    \n#include \"../../acted_monoid/range_ap_update_range_sum.hpp\"\n#include \"../../acted_monoid/range_flip_range_binary_inversion.hpp\"\
-    \n#include \"../../acted_monoid/range_flip_range_sum.hpp\"\n#include \"../../acted_monoid/range_mul_range_sum.hpp\"\
+    \n#include \"../../acted_monoid/range_ap_update_range_sum.hpp\"\n#include \"../../acted_monoid/range_bitwise_and_or_xor_range_sum.hpp\"\
+    \n#include \"../../acted_monoid/range_flip_range_binary_inversion.hpp\"\n#include\
+    \ \"../../acted_monoid/range_flip_range_sum.hpp\"\n#include \"../../acted_monoid/range_mul_range_sum.hpp\"\
     \n#include \"../../acted_monoid/range_or_range_sum.hpp\"\n#include \"../../acted_monoid/range_update_range_longest_true.hpp\"\
     \n#include \"../../acted_monoid/range_update_range_max.hpp\"\n#include \"../../acted_monoid/range_update_range_max_subarray.hpp\"\
     \n#include \"../../acted_monoid/range_update_range_min.hpp\"\n#include \"../../acted_monoid/range_update_range_product.hpp\"\
@@ -1459,6 +1506,7 @@ data:
     static_assert(m1une::acted_monoid::RangeAddRangeSum<int>::commutative);\nstatic_assert(m1une::acted_monoid::RangeAffineRangeMinMax<int>::commutative);\n\
     static_assert(m1une::acted_monoid::RangeAffineRangeSum<int>::commutative);\nstatic_assert(m1une::acted_monoid::RangeAffineRangeSumOfSquares<int>::commutative);\n\
     static_assert(m1une::acted_monoid::RangeApUpdateRangeMinMax<int>::commutative);\n\
+    static_assert(m1une::acted_monoid::RangeBitwiseAndOrXorRangeSum<int>::commutative);\n\
     static_assert(m1une::acted_monoid::RangeFlipRangeSum<int>::commutative);\nstatic_assert(m1une::acted_monoid::RangeMulRangeSum<int>::commutative);\n\
     static_assert(m1une::acted_monoid::RangeOrRangeSum<int>::commutative);\nstatic_assert(m1une::acted_monoid::RangeUpdateRangeMax<int>::commutative);\n\
     static_assert(m1une::acted_monoid::RangeUpdateRangeMin<int>::commutative);\nstatic_assert(m1une::acted_monoid::RangeUpdateRangeProduct<m1une::monoid::Add<int>>::commutative);\n\
@@ -1492,6 +1540,7 @@ data:
     static_assert(!m1une::acted_monoid::RangeAffineRangeSumOfSquares<int>::operator_commutative);\n\
     static_assert(!m1une::acted_monoid::RangeApUpdateRangeMinMax<int>::operator_commutative);\n\
     static_assert(!m1une::acted_monoid::RangeApUpdateRangeSum<int>::operator_commutative);\n\
+    static_assert(!m1une::acted_monoid::RangeBitwiseAndOrXorRangeSum<int>::operator_commutative);\n\
     static_assert(!m1une::acted_monoid::RangeUpdateRangeLongestTrue::operator_commutative);\n\
     static_assert(!m1une::acted_monoid::RangeUpdateRangeMax<int>::operator_commutative);\n\
     static_assert(!m1une::acted_monoid::RangeUpdateRangeMaxSubarray<int>::operator_commutative);\n\
@@ -1520,6 +1569,7 @@ data:
   - acted_monoid/range_ap_add_range_sum.hpp
   - acted_monoid/range_ap_update_range_min_max.hpp
   - acted_monoid/range_ap_update_range_sum.hpp
+  - acted_monoid/range_bitwise_and_or_xor_range_sum.hpp
   - acted_monoid/range_flip_range_binary_inversion.hpp
   - monoid/binary_inversion.hpp
   - acted_monoid/range_flip_range_sum.hpp
@@ -1580,7 +1630,7 @@ data:
   isVerificationFile: true
   path: verify/monoid/commutative_flags.test.cpp
   requiredBy: []
-  timestamp: '2026-07-21 20:17:47+09:00'
+  timestamp: '2026-08-12 00:05:48+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/monoid/commutative_flags.test.cpp

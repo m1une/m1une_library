@@ -34,6 +34,12 @@ data:
     title: Generic Segment Tree Beats!
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
+    title: verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
+    title: verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/dynamic_array/dynamic_lazy_monoid_array.test.cpp
     title: verify/ds/dynamic_array/dynamic_lazy_monoid_array.test.cpp
   - icon: ':heavy_check_mark:'
@@ -153,6 +159,8 @@ data:
   - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
   - verify/ds/segtree/range_add_range_min.test.cpp
   - verify/monoid/commutative_flags.test.cpp
+  - verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
+  - verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
 documentation_of: acted_monoid/concept.hpp
 layout: document
 title: Acted Monoid Concept

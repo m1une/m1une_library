@@ -10,6 +10,9 @@ data:
   _extendedRequiredBy: []
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
+    title: verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/lazy_segtree.test.cpp
     title: verify/ds/segtree/lazy_segtree.test.cpp
   - icon: ':heavy_check_mark:'
@@ -316,6 +319,7 @@ data:
   - verify/ds/segtree/lazy_segtree.test.cpp
   - verify/ds/segtree/range_update_range_product.test.cpp
   - verify/ds/segtree/range_add_range_min.test.cpp
+  - verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
 documentation_of: ds/segtree/lazy_segtree.hpp
 layout: document
 title: Lazy Segment Tree

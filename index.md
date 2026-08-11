@@ -49,6 +49,9 @@ data:
       path: acted_monoid/range_ap_update_range_sum.hpp
       title: Range AP Update Range Sum
     - icon: ':heavy_check_mark:'
+      path: acted_monoid/range_bitwise_and_or_xor_range_sum.hpp
+      title: Range Bitwise AND/OR/XOR Range Sum
+    - icon: ':heavy_check_mark:'
       path: acted_monoid/range_flip_range_binary_inversion.hpp
       title: Range Flip Range Binary Inversion
     - icon: ':heavy_check_mark:'
@@ -1311,6 +1314,11 @@ data:
       path: utilities/detail/fixed_int.hpp
       title: utilities/detail/fixed_int.hpp
   verificationCategories:
+  - name: verify/acted_monoid
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
+      title: verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
   - name: verify/algo/dp
     pages:
     - icon: ':heavy_check_mark:'
