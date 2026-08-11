@@ -22,6 +22,7 @@ contest when convenience matters more.
 | `string/longest_common_subsequence.hpp` | Finds one longest subsequence common to two sequences. |
 | `string/longest_common_substring.hpp` | Finds one longest substring common to two sequences. |
 | `string/lyndon_factorization.hpp` | Duval's linear-time Lyndon factorization. |
+| `string/map_trie.hpp` | Ordered-map multiset trie for large or generic alphabets. |
 | `string/z_algorithm.hpp` | Linear-time Z array. |
 | `string/manacher.hpp` | Odd/even palindrome radii and substring checks. |
 | `string/minimum_rotation.hpp` | Earliest lexicographically minimum cyclic shift in linear time. |
