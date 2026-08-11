@@ -168,6 +168,28 @@ struct PersistentOrderedMultiset {
         return make_node(node.l, child, is_black(t));
     }
 
+    int change_count_inplace(int t, const T& key, int delta) const {
+        t = pool.clone_if_shared(t);
+        if (is_leaf(t)) {
+            assert(equal(pool[t].key, key));
+            assert(pool[t].count + delta > 0);
+            pool[t].count += delta;
+            pool[t].size += delta;
+            return t;
+        }
+        if (!comp(pool[t].key, key)) {
+            int child = change_count_inplace(pool[t].l, key, delta);
+            pool.replace(pool[t].l, child);
+        } else {
+            int child = change_count_inplace(pool[t].r, key, delta);
+            pool.replace(pool[t].r, child);
+        }
+        Node& node = pool[t];
+        node.count = subtree_size(node.l);
+        node.size = node.count + subtree_size(node.r);
+        return t;
+    }
+
     int count_impl(int t, const T& key) const {
         if (t == -1) return 0;
         while (!is_leaf(t)) {
@@ -341,6 +363,17 @@ struct PersistentOrderedMultiset {
         return make_version(merge_nodes(merge_nodes(l, make_leaf(std::move(key), multiplicity)), r));
     }
 
+    void insert_inplace(T key, int multiplicity = 1) {
+        assert(multiplicity > 0);
+        if (!contains(key)) {
+            *this = insert(std::move(key), multiplicity);
+            return;
+        }
+        int next_root = change_count_inplace(root, key, multiplicity);
+        pool.replace(root, next_root);
+        pool.discard_unreferenced();
+    }
+
    private:
     PersistentOrderedMultiset insert_unique(T key) const {
         if (contains(key)) return *this;
@@ -362,6 +395,21 @@ struct PersistentOrderedMultiset {
 
     PersistentOrderedMultiset erase(const T& key) const { return erase_one(key); }
 
+    bool erase_one_inplace(const T& key) {
+        int old_count = count(key);
+        if (old_count == 0) return false;
+        if (old_count == 1) {
+            *this = erase_one(key);
+            return true;
+        }
+        int next_root = change_count_inplace(root, key, -1);
+        pool.replace(root, next_root);
+        pool.discard_unreferenced();
+        return true;
+    }
+
+    bool erase_inplace(const T& key) { return erase_one_inplace(key); }
+
     PersistentOrderedMultiset erase_all(const T& key) const {
         const int old_count = count(key);
         if (old_count == 0) return *this;
@@ -369,6 +417,12 @@ struct PersistentOrderedMultiset {
         auto [discarded, rest] = pop_min(r);
         assert(equal(pool[discarded].key, key));
         return make_version(merge_nodes(l, rest));
+    }
+
+    bool erase_all_inplace(const T& key) {
+        if (!contains(key)) return false;
+        *this = erase_all(key);
+        return true;
     }
 
     bool contains(const T& key) const { return count(key) > 0; }

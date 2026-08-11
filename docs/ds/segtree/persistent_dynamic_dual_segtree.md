@@ -17,6 +17,10 @@ Versions derived from the same root share a contiguous node pool. Queries do
 not push tags, mutate versions, or allocate nodes. Unreferenced nodes are
 recycled after version destruction, assignment, or `release()`.
 
+The `_inplace` updates mutate only the current handle with copy-on-write,
+cloning shared nodes before a write and reusing unique nodes. Ordinary `set` and
+`apply` continue to return new persistent versions.
+
 ## Template Parameters
 
 * `Monoid`: A type satisfying `m1une::monoid::IsMonoid`.
@@ -50,10 +54,13 @@ version family.
 | `size_t node_count()` | Returns live nodes across shared versions. | $O(1)$ |
 | `void release()` | Releases this root and resets the handle to the uniform initial version. | $O(F)$ |
 | `PersistentDynamicDualSegtree set(Index p, T x)` | Returns a version assigning `x` at `p`. | $O(\log U)$ |
+| `void set_inplace(Index p, T x)` | Assigns `x` in this version using copy-on-write. | $O(\log U)$ |
 | `T get(Index p)` | Returns the current value at `p`. | $O(\log U)$ |
 | `T operator[](Index p)` | Equivalent to `get(p)`. | $O(\log U)$ |
 | `PersistentDynamicDualSegtree apply(Index p, T x)` | Returns a version applying `x` at `p`. | $O(\log U)$ |
 | `PersistentDynamicDualSegtree apply(Index l, Index r, T x)` | Returns a version applying `x` over `[l, r)`. | $O(\log U)$ |
+| `void apply_inplace(Index p, const T& x)` | Applies `x` at `p` in this version using copy-on-write. | $O(\log U)$ |
+| `void apply_inplace(Index l, Index r, const T& x)` | Applies `x` over `[l, r)` in this version using copy-on-write. | $O(\log U)$ |
 
 Each new update allocates $O(\log U)$ nodes in the worst case. Copying a
 version is $O(1)$. Here $F$ is the number of nodes freed by a release. Released

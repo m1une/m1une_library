@@ -13,6 +13,12 @@ Nodes are stored in a specialization-wide stable-slot pool and refer to children
 by integer index. Intrusive reference counts reclaim a node after its final
 dependent version or parent is released, and later updates reuse its slot.
 
+The `_inplace` methods mutate this handle while preserving other versions.
+Changing the multiplicity of an existing leaf uses copy-on-write and reuses
+unique search-path nodes. Inserting a new distinct key or removing its final
+copy still runs the persistent red-black split/merge algorithm because that
+operation changes and rebalances the tree topology.
+
 Pointers returned by bound and predecessor/successor methods remain valid only
 while a live version depends on the pointed-to node.
 
@@ -48,9 +54,12 @@ Trees passed to `merge` must use equivalent comparator state.
 | `std::size_t node_count() const` | Returns live nodes for this `T, Compare` specialization. | $O(1)$ |
 | `PersistentOrderedMultiset clear() const` | Returns an empty multiset with the same comparator. | $O(1)$ |
 | `PersistentOrderedMultiset insert(T key, int multiplicity = 1) const` | Returns a new multiset with `multiplicity` copies of `key` inserted. | $O(\log N)$ |
+| `void insert_inplace(T key, int multiplicity = 1)` | Inserts into this version; multiplicity-only changes use copy-on-write. | $O(\log N)$ |
 | `PersistentOrderedMultiset erase_one(const T& key) const` | Returns a new multiset with one copy of `key` removed if it exists. | $O(\log N)$ |
 | `PersistentOrderedMultiset erase(const T& key) const` | Alias for `erase_one(key)`. | $O(\log N)$ |
+| `bool erase_one_inplace(const T& key)`, `bool erase_inplace(const T& key)` | Removes one copy in this version and returns whether it existed. Multiplicity-only changes use copy-on-write. | $O(\log N)$ |
 | `PersistentOrderedMultiset erase_all(const T& key) const` | Returns a new multiset with all copies of `key` removed if it exists. | $O(\log N)$ |
+| `bool erase_all_inplace(const T& key)` | Removes all copies in this version and returns whether the key existed. | $O(\log N)$ |
 | `bool contains(const T& key) const` | Returns whether `key` exists. | $O(\log N)$ |
 | `int count(const T& key) const` | Returns the multiplicity of `key`. | $O(\log N)$ |
 | `const T* find_by_order(int k) const` | Returns a pointer to the 0-indexed `k`-th smallest element. Requires `0 <= k < size()`. | $O(\log N)$ |

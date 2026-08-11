@@ -17,6 +17,11 @@ range products on each version, use `PersistentLazySegtree`.
 `apply(l, r, x)` updates each point value `v` in `[l, r)` to
 `Monoid::op(x, v)`.
 
+The `_inplace` updates use copy-on-write. They mutate only this handle, clone
+nodes that are still shared with another version, and reuse unique nodes.
+Ordinary `set` and `apply` keep their fully persistent, return-a-version
+semantics.
+
 ## Methods
 
 | Method | Description | Complexity |
@@ -29,10 +34,13 @@ range products on each version, use `PersistentLazySegtree`.
 | `void release()` | Releases this version and makes this handle empty. | $O(F)$ |
 | `size_t node_count()` | Returns live nodes in the shared version family. | $O(1)$ |
 | `PersistentDualSegtree set(int p, T x)` | Returns a new version where index `p` is assigned `x`. | $O(\log N)$ |
+| `void set_inplace(int p, T x)` | Assigns `x` in this version using copy-on-write. | $O(\log N)$ |
 | `T get(int p)` | Returns the value at index `p`. | $O(\log N)$ |
 | `T operator[](int p)` | Returns the value at index `p`. | $O(\log N)$ |
 | `PersistentDualSegtree apply(int p, T x)` | Returns a new version where `x` is applied to index `p`. | $O(\log N)$ |
 | `PersistentDualSegtree apply(int l, int r, T x)` | Returns a new version where `x` is applied to every element in `[l, r)`. | $O(\log N)$ |
+| `void apply_inplace(int p, const T& x)` | Applies `x` at `p` in this version using copy-on-write. | $O(\log N)$ |
+| `void apply_inplace(int l, int r, const T& x)` | Applies `x` over `[l, r)` in this version using copy-on-write. | $O(\log N)$ |
 | `std::vector<T> to_vector()` | Returns all elements as a vector. | $O(N)$ |
 | `std::vector<T> to_vector(int l, int r)` | Returns the elements in `[l, r)`. | $O(\log N + r - l)$ |
 

@@ -12,6 +12,11 @@ segments where the action can be evaluated directly. Every assignment, range
 action, and range copy returns a new version, leaving all input versions
 unchanged.
 
+`set_inplace` and `apply_inplace` are additional copy-on-write operations. They
+mutate this handle while preserving every other live version. Shared nodes are
+cloned before modification, including during lazy propagation and failed Beats
+actions; unique nodes are reused.
+
 Versions in the same family share a reference-counted node pool. Destroyed or
 explicitly released versions return unreferenced nodes to the pool, and later
 updates reuse those slots. Read-only methods never push into or otherwise
@@ -88,12 +93,15 @@ All indices are zero-based and ranges are half-open. `T` is `value_type` and
 | `void release()` | Releases this version early and makes the handle empty. | $O(R)$ |
 | `std::size_t node_count() const` | Returns live nodes in the shared version family. | $O(1)$ |
 | `PersistentSegtreeBeats set(int p, T x) const` | Returns a version with element `p` assigned to `x`. | $O(\log N+D)$ |
+| `void set_inplace(int p, T x)` | Assigns `x` in this version using copy-on-write. | $O(\log N+D)$ |
 | `T get(int p) const` | Returns element `p`. | $O(\log N+D)$ |
 | `T operator[](int p) const` | Returns element `p`. | $O(\log N+D)$ |
 | `T prod(int l, int r) const` | Returns the monoid product of `[l, r)`. | $O(\log N+D)$ |
 | `T all_prod() const` | Returns the whole-array product. | $O(1)$ |
 | `PersistentSegtreeBeats apply(int p, const F& f) const` | Returns a version with `f` applied at `p`. | $O(\log N+D)$ |
 | `PersistentSegtreeBeats apply(int l, int r, const F& f) const` | Returns a version with `f` applied to `[l, r)`. | $O(\log N+D)$ |
+| `void apply_inplace(int p, const F& f)` | Applies `f` at `p` in this version using copy-on-write. | $O(\log N+D)$ |
+| `void apply_inplace(int l, int r, const F& f)` | Applies `f` to `[l, r)` in this version using copy-on-write. | $O(\log N+D)$ |
 | `PersistentSegtreeBeats copy_range_from(const PersistentSegtreeBeats& source, int l, int r) const` | Returns a version using `source` on `[l, r)` and this version elsewhere. | $O(\log N+D)$ |
 | `std::vector<T> to_vector() const` | Materializes every element. | $O(N)$ |
 | `std::vector<T> to_vector(int l, int r) const` | Materializes `[l, r)`. | $O(\log N+r-l)$ |
@@ -101,7 +109,9 @@ All indices are zero-based and ranges are half-open. `T` is `value_type` and
 | `template<class Predicate> int min_left(int r, Predicate g) const` | Finds the smallest `l` for which `g(prod(l, r))` is true. | $O(\log N+D)$ |
 
 Here, $D$ is the number of extra nodes visited because a new or pending action
-cannot be evaluated directly. An update allocates $O(\log N+D)$ new nodes.
+cannot be evaluated directly. An update allocates $O(\log N+D)$ new nodes in
+the worst case. An in-place update allocates only where its modified traversal
+is still shared.
 There is no universal logarithmic Beats bound: the acted monoid needs its own
 potential or transition-count argument. Persistence also permits branching
 from the same old potential state, so bounds amortized across one linear update

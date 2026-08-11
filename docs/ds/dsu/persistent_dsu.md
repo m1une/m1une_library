@@ -9,6 +9,11 @@ documentation_of: ../../../ds/dsu/persistent_dsu.hpp
 
 It uses union by size without path compression, because path compression mutates the search path. Parent and size values are stored in a persistent array, so each merge shares most nodes with older versions. Reference counting recycles internal array nodes after their final dependent version and parent are released.
 
+`merge` returns a new version. `merge_inplace` mutates this handle with
+copy-on-write and returns whether two previously separate components were
+joined. Other live versions remain unchanged, and uniquely owned persistent
+array paths are reused.
+
 ## Complexity Notation
 
 * `N` is the number of elements.
@@ -24,6 +29,7 @@ It uses union by size without path compression, because path compression mutates
 | `void release()` | Releases this version immediately and makes this handle empty. | $O(F)$ |
 | `std::size_t node_count() const` | Returns live internal nodes in the shared version family. | $O(1)$ |
 | `PersistentDsu merge(int a, int b) const` | Returns a new version where the sets containing `a` and `b` are merged. | $O(\log^2 N)$ |
+| `bool merge_inplace(int a, int b)` | Merges in this version using copy-on-write and returns whether a merge occurred. | $O(\log^2 N)$ |
 | `bool same(int a, int b) const` | Returns whether `a` and `b` are in the same set. | $O(\log^2 N)$ |
 | `int leader(int a) const` | Returns the representative of the set containing `a`. | $O(\log^2 N)$ |
 | `int group_size(int a) const`, `int size(int a) const` | Returns the size of the set containing `a`. | $O(\log^2 N)$ |

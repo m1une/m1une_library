@@ -11,6 +11,12 @@ Nodes live in a shared stable-slot pool and store integer child indices. Intrusi
 
 It supports insertion, deletion, reversal, rotation, point assignment, range application, range products, splitting, and concatenation.
 
+`set_inplace` and `apply_inplace` mutate a working version with copy-on-write.
+They clone shared path nodes before writes, including propagation of pending
+reversal and action tags, while unique nodes are reused. Other live versions
+remain unchanged. Structural treap operations keep their persistent-returning
+interface.
+
 ## Template Parameters
 
 * `ActedMonoid`: An acted monoid satisfying `m1une::acted_monoid::IsActedMonoid`.
@@ -25,7 +31,10 @@ It supports insertion, deletion, reversal, rotation, point assignment, range app
 | `insert`, `push_back`, `push_front`, `append` | Return a version with values inserted. Another version sharing the pool reuses its nodes; an independently constructed array is copied into this pool. | Expected $O(\log N)$ for one value or a shared-pool version; $O(M + \log N)$ for a vector or independent array |
 | `erase`, `pop_back`, `pop_front` | Return a version with values removed. | Expected $O(\log N)$ |
 | `set` | Returns a version with one value replaced. | Expected $O(\log N)$ |
+| `set_inplace(int pos, T value)` | Replaces one value in this version using copy-on-write. | Expected $O(\log N)$ |
 | `apply` | Returns a version with an operator applied to one value or a half-open range. | Expected $O(\log N)$ |
+| `apply_inplace(int pos, const F& f)` | Applies an operator to one value in this version using copy-on-write. | Expected $O(\log N)$ |
+| `apply_inplace(int l, int r, const F& f)` | Applies an operator to `[l, r)` in this version using copy-on-write. | Expected $O(\log N)$ |
 | `reverse`, `rotate` | Return versions with sequence order changed. | Expected $O(\log N)$; whole-sequence `reverse()` is $O(1)$ |
 | `prod`, `all_prod` | Return acted-monoid products over a range or the whole sequence. | Expected $O(\log N)$ for `prod`; $O(1)$ for `all_prod` |
 | `split`, `split_off` | Return persistent split versions. | Expected $O(\log N)$ |

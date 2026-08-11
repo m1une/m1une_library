@@ -147,14 +147,21 @@ struct PersistentDynamicLazyMonoidArray {
                              node.priority, node.count, !node.rev, node.has_lazy, node.l, node.r);
     }
 
+    void all_apply_to_node(int t, const F& f) const {
+        Node& node = (*pool)[t];
+        int left_count = node.rev ? subtree_size(node.r) : subtree_size(node.l);
+        node.val = mapping_at(f, node.val, left_count);
+        node.prod = mapping_at(f, node.prod, 0);
+        node.rprod = mapping_at(reverse_operator(f, node.count), node.rprod, 0);
+        node.lazy = ActedMonoid::op_comp(f, node.lazy);
+        node.has_lazy = true;
+    }
+
     int all_apply(int t, const F& f) const {
         if (t == -1) return -1;
-        Node node = (*pool)[t];
-        int left_count = node.rev ? subtree_size(node.r) : subtree_size(node.l);
-        return make_raw_node(mapping_at(f, node.val, left_count), mapping_at(f, node.prod, 0),
-                             mapping_at(reverse_operator(f, node.count), node.rprod, 0),
-                             ActedMonoid::op_comp(f, node.lazy), node.priority, node.count, node.rev, true, node.l,
-                             node.r);
+        int result = pool->clone(t);
+        all_apply_to_node(result, f);
+        return result;
     }
 
     int push(int t) const {
@@ -212,6 +219,102 @@ struct PersistentDynamicLazyMonoidArray {
         }
         int r = set_node(node.r, pos - left_count - 1, std::move(val));
         return make_node(std::move(node.val), node.priority, false, node.l, r);
+    }
+
+    void reverse_node_inplace(int t) const {
+        Node& node = (*pool)[t];
+        std::swap(node.prod, node.rprod);
+        if (node.has_lazy) node.lazy = reverse_operator(node.lazy, node.count);
+        node.rev = !node.rev;
+    }
+
+    int reverse_node_cow(int t) const {
+        if (t == -1) return -1;
+        t = pool->clone_if_shared(t);
+        reverse_node_inplace(t);
+        return t;
+    }
+
+    int all_apply_cow(int t, const F& f) const {
+        if (t == -1) return -1;
+        t = pool->clone_if_shared(t);
+        all_apply_to_node(t, f);
+        return t;
+    }
+
+    void pull(int t) const {
+        Node& node = (*pool)[t];
+        node.prod = ActedMonoid::op(ActedMonoid::op(node_prod(node.l), node.val), node_prod(node.r));
+        node.rprod = ActedMonoid::op(ActedMonoid::op(node_rprod(node.r), node.val), node_rprod(node.l));
+    }
+
+    void push_inplace(int t) const {
+        if (!(*pool)[t].rev && !(*pool)[t].has_lazy) return;
+        const bool reversed = (*pool)[t].rev;
+        const bool has_lazy = (*pool)[t].has_lazy;
+        F lazy = (*pool)[t].lazy;
+        int left = (*pool)[t].l;
+        int right = (*pool)[t].r;
+        if (reversed) {
+            int new_left = reverse_node_cow(right);
+            int new_right = reverse_node_cow(left);
+            // Keep both children alive while the two owning edges are swapped.
+            pool->retain(new_left);
+            pool->retain(new_right);
+            pool->replace((*pool)[t].l, new_left);
+            pool->replace((*pool)[t].r, new_right);
+            pool->release(new_left);
+            pool->release(new_right);
+        }
+        if (has_lazy) {
+            left = all_apply_cow((*pool)[t].l, lazy);
+            pool->replace((*pool)[t].l, left);
+            right = all_apply_cow((*pool)[t].r, shift_operator(lazy, subtree_size(left) + 1));
+            pool->replace((*pool)[t].r, right);
+        }
+        Node& node = (*pool)[t];
+        node.lazy = ActedMonoid::op_id();
+        node.rev = false;
+        node.has_lazy = false;
+        pull(t);
+    }
+
+    int set_node_inplace(int t, int pos, T val) const {
+        t = pool->clone_if_shared(t);
+        push_inplace(t);
+        int left_count = subtree_size((*pool)[t].l);
+        if (pos < left_count) {
+            int child = set_node_inplace((*pool)[t].l, pos, std::move(val));
+            pool->replace((*pool)[t].l, child);
+        } else if (pos == left_count) {
+            (*pool)[t].val = std::move(val);
+        } else {
+            int child = set_node_inplace((*pool)[t].r, pos - left_count - 1, std::move(val));
+            pool->replace((*pool)[t].r, child);
+        }
+        pull(t);
+        return t;
+    }
+
+    int apply_node_inplace(int t, int offset, int query_left, int query_right, const F& f) const {
+        if (t == -1 || query_right <= offset || offset + subtree_size(t) <= query_left) return t;
+        t = pool->clone_if_shared(t);
+        if (query_left <= offset && offset + subtree_size(t) <= query_right) {
+            all_apply_to_node(t, shift_operator(f, offset - query_left));
+            return t;
+        }
+        push_inplace(t);
+        int left_count = subtree_size((*pool)[t].l);
+        int child = apply_node_inplace((*pool)[t].l, offset, query_left, query_right, f);
+        pool->replace((*pool)[t].l, child);
+        int position = offset + left_count;
+        if (query_left <= position && position < query_right) {
+            (*pool)[t].val = mapping_at(shift_operator(f, position - query_left), (*pool)[t].val, 0);
+        }
+        child = apply_node_inplace((*pool)[t].r, position + 1, query_left, query_right, f);
+        pool->replace((*pool)[t].r, child);
+        pull(t);
+        return t;
     }
 
     T get_value(int t, int pos, F inherited, bool reversed = false) const {
@@ -562,6 +665,13 @@ struct PersistentDynamicLazyMonoidArray {
         return make_version(set_node(root, pos, std::move(value)), rng_state);
     }
 
+    void set_inplace(int pos, T value) {
+        assert(0 <= pos && pos < size());
+        int next_root = set_node_inplace(root, pos, std::move(value));
+        pool->replace(root, next_root);
+        pool->discard_unreferenced();
+    }
+
     PersistentDynamicLazyMonoidArray reverse(int l, int r) const {
         assert(0 <= l && l <= r && r <= size());
         if (l == r) return *this;
@@ -594,6 +704,19 @@ struct PersistentDynamicLazyMonoidArray {
         auto [a, b] = split_node(root, l);
         auto [mid, c] = split_node(b, r - l);
         return make_version(merge(merge(a, all_apply(mid, f)), c), rng_state);
+    }
+
+    void apply_inplace(int pos, const F& f) {
+        assert(0 <= pos && pos < size());
+        apply_inplace(pos, pos + 1, f);
+    }
+
+    void apply_inplace(int l, int r, const F& f) {
+        assert(0 <= l && l <= r && r <= size());
+        if (l == r) return;
+        int next_root = apply_node_inplace(root, 0, l, r, f);
+        pool->replace(root, next_root);
+        pool->discard_unreferenced();
     }
 
     T prod(int l, int r) const {

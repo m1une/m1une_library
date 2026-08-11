@@ -95,18 +95,18 @@ struct PersistentDualSegtree {
         }
     }
 
-    int all_apply_clone(int t, const T& x, int l, int r) const {
-        int res = clone_node(t);
+    int all_apply_clone(int t, const T& x, int l, int r, bool copy_on_write = false) const {
+        int res = copy_on_write ? _pool->clone_if_shared(t) : clone_node(t);
         all_apply_to_node(res, x, l, r);
         return res;
     }
 
-    void push(int t, int l, int r) const {
+    void push(int t, int l, int r, bool copy_on_write = false) const {
         Node node = (*_pool)[t];
         if (!node.has_lazy || r - l == 1) return;
         int m = (l + r) >> 1;
-        int left = all_apply_clone(node.left, node.val, l, m);
-        int right = all_apply_clone(node.right, node.val, m, r);
+        int left = all_apply_clone(node.left, node.val, l, m, copy_on_write);
+        int right = all_apply_clone(node.right, node.val, m, r, copy_on_write);
         Node& target = (*_pool)[t];
         _pool->replace(target.left, left);
         _pool->replace(target.right, right);
@@ -114,37 +114,37 @@ struct PersistentDualSegtree {
         target.has_lazy = false;
     }
 
-    int set_node(int t, int l, int r, int p, T value) const {
-        t = clone_node(t);
+    int set_node(int t, int l, int r, int p, T value, bool copy_on_write = false) const {
+        t = copy_on_write ? _pool->clone_if_shared(t) : clone_node(t);
         if (r - l == 1) {
             Node& node = (*_pool)[t];
             node.val = std::move(value);
             node.has_lazy = false;
             return t;
         }
-        push(t, l, r);
+        push(t, l, r, copy_on_write);
         int m = (l + r) >> 1;
         if (p < m) {
-            int child = set_node((*_pool)[t].left, l, m, p, std::move(value));
+            int child = set_node((*_pool)[t].left, l, m, p, std::move(value), copy_on_write);
             _pool->replace((*_pool)[t].left, child);
         } else {
-            int child = set_node((*_pool)[t].right, m, r, p, std::move(value));
+            int child = set_node((*_pool)[t].right, m, r, p, std::move(value), copy_on_write);
             _pool->replace((*_pool)[t].right, child);
         }
         return t;
     }
 
-    int apply_node(int t, int l, int r, int ql, int qr, const T& x) const {
+    int apply_node(int t, int l, int r, int ql, int qr, const T& x, bool copy_on_write = false) const {
         if (qr <= l || r <= ql) return t;
-        t = clone_node(t);
+        t = copy_on_write ? _pool->clone_if_shared(t) : clone_node(t);
         if (ql <= l && r <= qr) {
             all_apply_to_node(t, x, l, r);
             return t;
         }
-        push(t, l, r);
+        push(t, l, r, copy_on_write);
         int m = (l + r) >> 1;
-        int left = apply_node((*_pool)[t].left, l, m, ql, qr, x);
-        int right = apply_node((*_pool)[t].right, m, r, ql, qr, x);
+        int left = apply_node((*_pool)[t].left, l, m, ql, qr, x, copy_on_write);
+        int right = apply_node((*_pool)[t].right, m, r, ql, qr, x, copy_on_write);
         _pool->replace((*_pool)[t].left, left);
         _pool->replace((*_pool)[t].right, right);
         return t;
@@ -253,6 +253,12 @@ struct PersistentDualSegtree {
         return PersistentDualSegtree(_n, set_node(_root, 0, _n, p, std::move(x)), _pool);
     }
 
+    void set_inplace(int p, T x) {
+        assert(0 <= p && p < _n);
+        int root = set_node(_root, 0, _n, p, std::move(x), true);
+        _pool->replace(_root, root);
+    }
+
     T get(int p) const {
         assert(0 <= p && p < _n);
         return get_node(_root, 0, _n, p, Monoid::id());
@@ -269,6 +275,18 @@ struct PersistentDualSegtree {
         assert(0 <= l && l <= r && r <= _n);
         if (l == r) return *this;
         return PersistentDualSegtree(_n, apply_node(_root, 0, _n, l, r, x), _pool);
+    }
+
+    void apply_inplace(int p, const T& x) {
+        assert(0 <= p && p < _n);
+        apply_inplace(p, p + 1, x);
+    }
+
+    void apply_inplace(int l, int r, const T& x) {
+        assert(0 <= l && l <= r && r <= _n);
+        if (l == r) return;
+        int root = apply_node(_root, 0, _n, l, r, x, true);
+        _pool->replace(_root, root);
     }
 
     std::vector<T> to_vector() const { return to_vector(0, _n); }

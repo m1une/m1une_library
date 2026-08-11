@@ -11,6 +11,11 @@ Nodes are stored in a shared stable-slot pool and refer to children by integer i
 
 The structure supports index-based insertion, deletion, point assignment, reversal, rotation, splitting, and concatenation. Untouched subtrees are shared between versions.
 
+`set` returns a new persistent version. `set_inplace` mutates this handle with
+copy-on-write: it clones shared nodes on the search path and reuses unique ones,
+while every other live version remains unchanged. Structural treap operations
+continue to use the persistent-returning interface.
+
 ## Complexity Notation
 
 * `N` is the current number of elements in the array.
@@ -62,6 +67,7 @@ The structure supports index-based insertion, deletion, point assignment, revers
 | `T get(int pos) const` | Returns a copy of the element at `pos`. | Expected $O(\log N)$ |
 | `const T& front() const`, `back() const` | Returns the first or last element. | Expected $O(\log N)$ |
 | `PersistentDynamicArray set(int pos, T val) const` | Returns a version where index `pos` is overwritten by `val`. | Expected $O(\log N)$ |
+| `void set_inplace(int pos, T val)` | Overwrites index `pos` in this version using copy-on-write. | Expected $O(\log N)$ |
 | `PersistentDynamicArray reverse(int l, int r) const` | Returns a version with `[l, r)` reversed. | Expected $O(\log N)$ |
 | `PersistentDynamicArray reverse() const` | Returns a version with the whole array reversed. | $O(1)$ |
 | `PersistentDynamicArray rotate(int l, int m, int r) const` | Returns a version where `[m, r)` is moved before `[l, m)`, like `std::rotate`. | Expected $O(\log N)$ |

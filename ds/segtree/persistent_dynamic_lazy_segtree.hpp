@@ -62,9 +62,9 @@ struct PersistentDynamicLazySegtree {
         return _pool->emplace(_config->domain.default_product(depth, left, right));
     }
 
-    int clone_or_new(int t, Index left, Index right, int depth) const {
+    int clone_or_new(int t, Index left, Index right, int depth, bool copy_on_write = false) const {
         if (!t) return new_node(left, right, depth);
-        return _pool->clone(t);
+        return copy_on_write ? _pool->clone_if_shared(t) : _pool->clone(t);
     }
 
     const T& value(int t, Index left, Index right, int depth) const {
@@ -81,22 +81,24 @@ struct PersistentDynamicLazySegtree {
         }
     }
 
-    int all_apply_clone(int t, Index left, Index right, int depth, const F& f) const {
-        int result = clone_or_new(t, left, right, depth);
+    int all_apply_clone(int t, Index left, Index right, int depth, const F& f,
+                        bool copy_on_write = false) const {
+        int result = clone_or_new(t, left, right, depth, copy_on_write);
         all_apply_to_node(result, left, right, f);
         return result;
     }
 
-    void push(int t, Index left, Index right, int depth) const {
+    void push(int t, Index left, Index right, int depth, bool copy_on_write = false) const {
         if (!(*_pool)[t].has_lazy) return;
         Index middle = std::midpoint(left, right);
         if (middle == left) return;
 
         F lazy = (*_pool)[t].lazy;
-        int left_child = all_apply_clone((*_pool)[t].left, left, middle, depth + 1, lazy);
+        int left_child = all_apply_clone((*_pool)[t].left, left, middle, depth + 1, lazy, copy_on_write);
         int right_child =
             all_apply_clone((*_pool)[t].right, middle, right, depth + 1,
-                            detail::dynamic_shift<ActedMonoid>(lazy, detail::dynamic_distance(left, middle)));
+                            detail::dynamic_shift<ActedMonoid>(lazy, detail::dynamic_distance(left, middle)),
+                            copy_on_write);
 
         Node& node = (*_pool)[t];
         _pool->replace(node.left, left_child);
@@ -112,8 +114,9 @@ struct PersistentDynamicLazySegtree {
             ActedMonoid::op(value(node.left, left, middle, depth + 1), value(node.right, middle, right, depth + 1));
     }
 
-    int set_node(int t, Index left, Index right, int depth, Index p, T x) const {
-        t = clone_or_new(t, left, right, depth);
+    int set_node(int t, Index left, Index right, int depth, Index p, T x,
+                 bool copy_on_write = false) const {
+        t = clone_or_new(t, left, right, depth, copy_on_write);
         Index middle = std::midpoint(left, right);
         if (middle == left) {
             Node& node = (*_pool)[t];
@@ -123,30 +126,34 @@ struct PersistentDynamicLazySegtree {
             return t;
         }
 
-        push(t, left, right, depth);
+        push(t, left, right, depth, copy_on_write);
         if (p < middle) {
-            int child = set_node((*_pool)[t].left, left, middle, depth + 1, p, std::move(x));
+            int child = set_node((*_pool)[t].left, left, middle, depth + 1, p, std::move(x), copy_on_write);
             _pool->replace((*_pool)[t].left, child);
         } else {
-            int child = set_node((*_pool)[t].right, middle, right, depth + 1, p, std::move(x));
+            int child = set_node((*_pool)[t].right, middle, right, depth + 1, p, std::move(x), copy_on_write);
             _pool->replace((*_pool)[t].right, child);
         }
         update(t, left, right, depth);
         return t;
     }
 
-    int apply_node(int t, Index left, Index right, int depth, Index query_left, Index query_right, const F& f) const {
+    int apply_node(int t, Index left, Index right, int depth, Index query_left, Index query_right, const F& f,
+                   bool copy_on_write = false) const {
         if (query_right <= left || right <= query_left) return t;
         if (query_left <= left && right <= query_right) {
             return all_apply_clone(t, left, right, depth,
-                                   detail::dynamic_shift<ActedMonoid>(f, detail::dynamic_distance(query_left, left)));
+                                   detail::dynamic_shift<ActedMonoid>(f, detail::dynamic_distance(query_left, left)),
+                                   copy_on_write);
         }
 
-        t = clone_or_new(t, left, right, depth);
-        push(t, left, right, depth);
+        t = clone_or_new(t, left, right, depth, copy_on_write);
+        push(t, left, right, depth, copy_on_write);
         Index middle = std::midpoint(left, right);
-        int left_child = apply_node((*_pool)[t].left, left, middle, depth + 1, query_left, query_right, f);
-        int right_child = apply_node((*_pool)[t].right, middle, right, depth + 1, query_left, query_right, f);
+        int left_child = apply_node((*_pool)[t].left, left, middle, depth + 1, query_left, query_right, f,
+                                    copy_on_write);
+        int right_child = apply_node((*_pool)[t].right, middle, right, depth + 1, query_left, query_right, f,
+                                     copy_on_write);
         _pool->replace((*_pool)[t].left, left_child);
         _pool->replace((*_pool)[t].right, right_child);
         update(t, left, right, depth);
@@ -291,6 +298,12 @@ struct PersistentDynamicLazySegtree {
                                             set_node(_root, left_bound(), right_bound(), 0, p, std::move(x)));
     }
 
+    void set_inplace(Index p, T x) {
+        assert(left_bound() <= p && p < right_bound());
+        int root = set_node(_root, left_bound(), right_bound(), 0, p, std::move(x), true);
+        _pool->replace(_root, root);
+    }
+
     T get(Index p) const {
         assert(left_bound() <= p && p < right_bound());
         return prod(p, p + 1);
@@ -316,6 +329,18 @@ struct PersistentDynamicLazySegtree {
         if (left == right) return *this;
         return PersistentDynamicLazySegtree(_config, _pool,
                                             apply_node(_root, left_bound(), right_bound(), 0, left, right, f));
+    }
+
+    void apply_inplace(Index p, const F& f) {
+        assert(left_bound() <= p && p < right_bound());
+        apply_inplace(p, p + 1, f);
+    }
+
+    void apply_inplace(Index left, Index right, const F& f) {
+        assert(left_bound() <= left && left <= right && right <= right_bound());
+        if (left == right) return;
+        int root = apply_node(_root, left_bound(), right_bound(), 0, left, right, f, true);
+        _pool->replace(_root, root);
     }
 
     template <class G>

@@ -20,6 +20,10 @@ pool. Read-only queries do not allocate nodes. Products preserve coordinate
 order, so non-commutative monoids are supported. Nodes whose last parent or
 version reference disappears are recycled.
 
+`set_inplace` mutates the current handle with copy-on-write. Shared nodes are
+cloned before modification and unique nodes are reused; all other live versions
+remain unchanged. `set` continues to return a distinct persistent version.
+
 ## Template Parameters
 
 * `Monoid`: A type satisfying `m1une::monoid::IsMonoid`.
@@ -57,6 +61,7 @@ domain length. No tree node is allocated initially.
 | `size_t node_count()` | Returns live nodes in the shared version family. | $O(1)$ |
 | `void release()` | Releases this root and resets the handle to the uniform initial version. | $O(F)$ |
 | `PersistentDynamicSegtree set(Index p, T x)` | Returns a version assigning `x` at `p`. | $O(\log U)$ |
+| `void set_inplace(Index p, T x)` | Assigns `x` in this version using copy-on-write. | $O(\log U)$ |
 | `T get(Index p)` | Returns the value at `p`. | $O(\log U)$ |
 | `T operator[](Index p)` | Equivalent to `get(p)`. | $O(\log U)$ |
 | `T prod(Index l, Index r)` | Returns the monoid product over `[l, r)`. | $O(\log U)$ |

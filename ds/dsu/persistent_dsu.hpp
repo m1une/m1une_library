@@ -52,15 +52,27 @@ struct PersistentDsu {
         return new_node(Node(0, left, right));
     }
 
-    int set_node(int t, int l, int r, int p, int value) const {
-        if (r - l == 1) return new_node(Node(value));
+    int set_node(int t, int l, int r, int p, int value, bool copy_on_write = false) const {
+        if (copy_on_write) t = _pool->clone_if_shared(t);
+        if (r - l == 1) {
+            if (copy_on_write) {
+                (*_pool)[t].val = value;
+                return t;
+            }
+            return new_node(Node(value));
+        }
         int m = (l + r) >> 1;
-            int left = (*_pool)[t].l;
-            int right = (*_pool)[t].r;
+        int left = (*_pool)[t].l;
+        int right = (*_pool)[t].r;
         if (p < m) {
-            left = set_node(left, l, m, p, value);
+            left = set_node(left, l, m, p, value, copy_on_write);
         } else {
-            right = set_node(right, m, r, p, value);
+            right = set_node(right, m, r, p, value, copy_on_write);
+        }
+        if (copy_on_write) {
+            _pool->replace((*_pool)[t].l, left);
+            _pool->replace((*_pool)[t].r, right);
+            return t;
         }
         return new_node(Node(0, left, right));
     }
@@ -192,6 +204,24 @@ struct PersistentDsu {
         int root = set_node(_root, 0, _n, x, -(sx + sy));
         root = set_node(root, 0, _n, y, x);
         return make_version(root);
+    }
+
+    bool merge_inplace(int a, int b) {
+        assert(0 <= a && a < _n);
+        assert(0 <= b && b < _n);
+        int x = leader(a), y = leader(b);
+        if (x == y) return false;
+        int sx = -get(x), sy = -get(y);
+        if (sx < sy) {
+            std::swap(x, y);
+            std::swap(sx, sy);
+        }
+        int root = set_node(_root, 0, _n, x, -(sx + sy), true);
+        _pool->replace(_root, root);
+        root = set_node(_root, 0, _n, y, x, true);
+        _pool->replace(_root, root);
+        _pool->discard_unreferenced();
+        return true;
     }
 
     std::vector<std::vector<int>> groups() const {

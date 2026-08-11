@@ -11,6 +11,11 @@ Nodes live in a shared stable-slot pool and store integer child indices. Intrusi
 
 Each node stores both forward and reversed products, so range reversal works for non-commutative monoids.
 
+`set_inplace` is a copy-on-write point assignment for a mutable working
+version. It preserves other versions, clones shared search-path nodes, and
+updates unique nodes directly. Other update methods retain their
+persistent-returning semantics.
+
 ## Template Parameters
 
 * `Monoid`: A monoid satisfying `m1une::monoid::IsMonoid`.
@@ -25,6 +30,7 @@ Each node stores both forward and reversed products, so range reversal works for
 | `insert`, `push_back`, `push_front`, `append` | Return a version with values inserted. Another version sharing the pool reuses its nodes; an independently constructed array is copied into this pool. | Expected $O(\log N)$ for one value or a shared-pool version; $O(M + \log N)$ for a vector or independent array |
 | `erase`, `pop_back`, `pop_front` | Return a version with values removed. | Expected $O(\log N)$ |
 | `set` | Returns a version with one value replaced. | Expected $O(\log N)$ |
+| `set_inplace(int pos, T value)` | Replaces one value in this version using copy-on-write. | Expected $O(\log N)$ |
 | `reverse`, `rotate` | Return versions with sequence order changed. | Expected $O(\log N)$; whole-sequence `reverse()` is $O(1)$ |
 | `prod`, `all_prod` | Return monoid products over a range or the whole sequence. | Expected $O(\log N)$ for `prod`; $O(1)$ for `all_prod` |
 | `split`, `split_off` | Return persistent split versions. | Expected $O(\log N)$ |

@@ -71,15 +71,27 @@ struct PersistentPotentializedDsu {
         return new_node(Node(Value(), left, right));
     }
 
-    int set_node(int t, int l, int r, int p, Value value) const {
-        if (r - l == 1) return new_node(Node(std::move(value)));
+    int set_node(int t, int l, int r, int p, Value value, bool copy_on_write = false) const {
+        if (copy_on_write) t = _pool->clone_if_shared(t);
+        if (r - l == 1) {
+            if (copy_on_write) {
+                (*_pool)[t].val = std::move(value);
+                return t;
+            }
+            return new_node(Node(std::move(value)));
+        }
         int m = (l + r) >> 1;
         int left = (*_pool)[t].l;
         int right = (*_pool)[t].r;
         if (p < m) {
-            left = set_node(left, l, m, p, std::move(value));
+            left = set_node(left, l, m, p, std::move(value), copy_on_write);
         } else {
-            right = set_node(right, m, r, p, std::move(value));
+            right = set_node(right, m, r, p, std::move(value), copy_on_write);
+        }
+        if (copy_on_write) {
+            _pool->replace((*_pool)[t].l, left);
+            _pool->replace((*_pool)[t].r, right);
+            return t;
         }
         return new_node(Node(Value(), left, right));
     }
@@ -235,6 +247,29 @@ struct PersistentPotentializedDsu {
         int root = set_node(_root, 0, _n, x, Value(-(sx + sy), Group::id()));
         root = set_node(root, 0, _n, y, Value(x, std::move(y_from_x)));
         return {make_version(root), true};
+    }
+
+    bool merge_inplace(int a, int b, const T& w) {
+        assert(0 <= a && a < _n);
+        assert(0 <= b && b < _n);
+        auto [x, pa] = leader_and_potential(a);
+        auto [y, pb] = leader_and_potential(b);
+        if (x == y) return Group::op(Group::inv(pa), pb) == w;
+
+        int sx = -get(x).parent_or_size;
+        int sy = -get(y).parent_or_size;
+        T y_from_x = Group::op(Group::op(pa, w), Group::inv(pb));
+        if (sx < sy) {
+            std::swap(x, y);
+            std::swap(sx, sy);
+            y_from_x = Group::inv(y_from_x);
+        }
+        int root = set_node(_root, 0, _n, x, Value(-(sx + sy), Group::id()), true);
+        _pool->replace(_root, root);
+        root = set_node(_root, 0, _n, y, Value(x, std::move(y_from_x)), true);
+        _pool->replace(_root, root);
+        _pool->discard_unreferenced();
+        return true;
     }
 
     std::vector<std::vector<int>> groups() const {

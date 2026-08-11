@@ -75,6 +75,18 @@ struct PersistentNodePool {
         return emplace(std::move(copy));
     }
 
+    bool unique(int node) const {
+        return !node || nodes[node].references == 1;
+    }
+
+    // Returns node itself when it has one owner, otherwise an unowned clone.
+    // The caller must attach a returned clone with replace() before it can be
+    // released or exposed as a root.
+    int clone_if_shared(int node) {
+        if (unique(node)) return node;
+        return clone(node);
+    }
+
     void replace(int& edge, int node) {
         if (edge == node) return;
         retain(node);

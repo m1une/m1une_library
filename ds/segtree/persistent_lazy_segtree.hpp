@@ -124,20 +124,20 @@ struct PersistentLazySegtree {
         node.has_lazy = true;
     }
 
-    int all_apply_clone(int t, const F& f) const {
-        int res = clone_node(t);
+    int all_apply_clone(int t, const F& f, bool copy_on_write = false) const {
+        int res = copy_on_write ? _pool->clone_if_shared(t) : clone_node(t);
         all_apply_to_node(res, f);
         return res;
     }
 
-    void push(int t, int l, int r) const {
+    void push(int t, int l, int r, bool copy_on_write = false) const {
         if (!(*_pool)[t].has_lazy) return;
         F lazy = (*_pool)[t].lazy;
         int left = (*_pool)[t].left;
         int right = (*_pool)[t].right;
         int m = (l + r) >> 1;
-        left = all_apply_clone(left, lazy);
-        right = all_apply_clone(right, shift_operator(lazy, m - l));
+        left = all_apply_clone(left, lazy, copy_on_write);
+        right = all_apply_clone(right, shift_operator(lazy, m - l), copy_on_write);
         Node& node = (*_pool)[t];
         _pool->replace(node.left, left);
         _pool->replace(node.right, right);
@@ -150,8 +150,8 @@ struct PersistentLazySegtree {
         node.val = ActedMonoid::op((*_pool)[node.left].val, (*_pool)[node.right].val);
     }
 
-    int set_node(int t, int l, int r, int p, T value) const {
-        t = clone_node(t);
+    int set_node(int t, int l, int r, int p, T value, bool copy_on_write = false) const {
+        t = copy_on_write ? _pool->clone_if_shared(t) : clone_node(t);
         if (r - l == 1) {
             Node& node = (*_pool)[t];
             node.val = std::move(value);
@@ -159,30 +159,30 @@ struct PersistentLazySegtree {
             node.has_lazy = false;
             return t;
         }
-        push(t, l, r);
+        push(t, l, r, copy_on_write);
         int m = (l + r) >> 1;
         if (p < m) {
-            int child = set_node((*_pool)[t].left, l, m, p, std::move(value));
+            int child = set_node((*_pool)[t].left, l, m, p, std::move(value), copy_on_write);
             _pool->replace((*_pool)[t].left, child);
         } else {
-            int child = set_node((*_pool)[t].right, m, r, p, std::move(value));
+            int child = set_node((*_pool)[t].right, m, r, p, std::move(value), copy_on_write);
             _pool->replace((*_pool)[t].right, child);
         }
         update(t);
         return t;
     }
 
-    int apply_node(int t, int l, int r, int ql, int qr, const F& f) const {
+    int apply_node(int t, int l, int r, int ql, int qr, const F& f, bool copy_on_write = false) const {
         if (qr <= l || r <= ql) return t;
-        t = clone_node(t);
+        t = copy_on_write ? _pool->clone_if_shared(t) : clone_node(t);
         if (ql <= l && r <= qr) {
             all_apply_to_node(t, shift_operator(f, l - ql));
             return t;
         }
-        push(t, l, r);
+        push(t, l, r, copy_on_write);
         int m = (l + r) >> 1;
-        int left = apply_node((*_pool)[t].left, l, m, ql, qr, f);
-        int right = apply_node((*_pool)[t].right, m, r, ql, qr, f);
+        int left = apply_node((*_pool)[t].left, l, m, ql, qr, f, copy_on_write);
+        int right = apply_node((*_pool)[t].right, m, r, ql, qr, f, copy_on_write);
         _pool->replace((*_pool)[t].left, left);
         _pool->replace((*_pool)[t].right, right);
         update(t);
@@ -352,6 +352,12 @@ struct PersistentLazySegtree {
         return PersistentLazySegtree(_n, set_node(_root, 0, _n, p, std::move(x)), _pool);
     }
 
+    void set_inplace(int p, T x) {
+        assert(0 <= p && p < _n);
+        int root = set_node(_root, 0, _n, p, std::move(x), true);
+        _pool->replace(_root, root);
+    }
+
     T get(int p) const {
         assert(0 <= p && p < _n);
         return prod(p, p + 1);
@@ -386,6 +392,18 @@ struct PersistentLazySegtree {
         assert(0 <= l && l <= r && r <= _n);
         if (l == r) return *this;
         return PersistentLazySegtree(_n, apply_node(_root, 0, _n, l, r, f), _pool);
+    }
+
+    void apply_inplace(int p, const F& f) {
+        assert(0 <= p && p < _n);
+        apply_inplace(p, p + 1, f);
+    }
+
+    void apply_inplace(int l, int r, const F& f) {
+        assert(0 <= l && l <= r && r <= _n);
+        if (l == r) return;
+        int root = apply_node(_root, 0, _n, l, r, f, true);
+        _pool->replace(_root, root);
     }
 
     PersistentLazySegtree copy_range_from(const PersistentLazySegtree& source, int l, int r) const {

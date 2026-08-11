@@ -60,9 +60,9 @@ struct PersistentDynamicDualSegtree {
 
     int new_node() const { return _pool->emplace(); }
 
-    int clone_or_new(int t) const {
+    int clone_or_new(int t, bool copy_on_write = false) const {
         if (!t) return new_node();
-        return _pool->clone(t);
+        return copy_on_write ? _pool->clone_if_shared(t) : _pool->clone(t);
     }
 
     void all_apply_to_node(int t, Index left, Index right, const T& x) const {
@@ -77,20 +77,20 @@ struct PersistentDynamicDualSegtree {
         }
     }
 
-    int all_apply_clone(int t, Index left, Index right, const T& x) const {
-        int result = clone_or_new(t);
+    int all_apply_clone(int t, Index left, Index right, const T& x, bool copy_on_write = false) const {
+        int result = clone_or_new(t, copy_on_write);
         all_apply_to_node(result, left, right, x);
         return result;
     }
 
-    void push(int t, Index left, Index right) const {
+    void push(int t, Index left, Index right, bool copy_on_write = false) const {
         if (!(*_pool)[t].has_lazy) return;
         Index middle = std::midpoint(left, right);
         if (middle == left) return;
 
         T lazy = (*_pool)[t].val;
-        int left_child = all_apply_clone((*_pool)[t].left, left, middle, lazy);
-        int right_child = all_apply_clone((*_pool)[t].right, middle, right, lazy);
+        int left_child = all_apply_clone((*_pool)[t].left, left, middle, lazy, copy_on_write);
+        int right_child = all_apply_clone((*_pool)[t].right, middle, right, lazy, copy_on_write);
 
         Node& node = (*_pool)[t];
         _pool->replace(node.left, left_child);
@@ -99,8 +99,8 @@ struct PersistentDynamicDualSegtree {
         node.has_lazy = false;
     }
 
-    int set_node(int t, Index left, Index right, Index p, T x) const {
-        t = clone_or_new(t);
+    int set_node(int t, Index left, Index right, Index p, T x, bool copy_on_write = false) const {
+        t = clone_or_new(t, copy_on_write);
         Index middle = std::midpoint(left, right);
         if (middle == left) {
             Node& node = (*_pool)[t];
@@ -109,28 +109,29 @@ struct PersistentDynamicDualSegtree {
             return t;
         }
 
-        push(t, left, right);
+        push(t, left, right, copy_on_write);
         if (p < middle) {
-            int child = set_node((*_pool)[t].left, left, middle, p, std::move(x));
+            int child = set_node((*_pool)[t].left, left, middle, p, std::move(x), copy_on_write);
             _pool->replace((*_pool)[t].left, child);
         } else {
-            int child = set_node((*_pool)[t].right, middle, right, p, std::move(x));
+            int child = set_node((*_pool)[t].right, middle, right, p, std::move(x), copy_on_write);
             _pool->replace((*_pool)[t].right, child);
         }
         return t;
     }
 
-    int apply_node(int t, Index left, Index right, Index query_left, Index query_right, const T& x) const {
+    int apply_node(int t, Index left, Index right, Index query_left, Index query_right, const T& x,
+                   bool copy_on_write = false) const {
         if (query_right <= left || right <= query_left) return t;
         if (query_left <= left && right <= query_right) {
-            return all_apply_clone(t, left, right, x);
+            return all_apply_clone(t, left, right, x, copy_on_write);
         }
 
-        t = clone_or_new(t);
-        push(t, left, right);
+        t = clone_or_new(t, copy_on_write);
+        push(t, left, right, copy_on_write);
         Index middle = std::midpoint(left, right);
-        int left_child = apply_node((*_pool)[t].left, left, middle, query_left, query_right, x);
-        int right_child = apply_node((*_pool)[t].right, middle, right, query_left, query_right, x);
+        int left_child = apply_node((*_pool)[t].left, left, middle, query_left, query_right, x, copy_on_write);
+        int right_child = apply_node((*_pool)[t].right, middle, right, query_left, query_right, x, copy_on_write);
         _pool->replace((*_pool)[t].left, left_child);
         _pool->replace((*_pool)[t].right, right_child);
         return t;
@@ -214,6 +215,12 @@ struct PersistentDynamicDualSegtree {
                                             set_node(_root, left_bound(), right_bound(), p, std::move(x)));
     }
 
+    void set_inplace(Index p, T x) {
+        assert(left_bound() <= p && p < right_bound());
+        int root = set_node(_root, left_bound(), right_bound(), p, std::move(x), true);
+        _pool->replace(_root, root);
+    }
+
     T get(Index p) const {
         assert(left_bound() <= p && p < right_bound());
         int t = _root;
@@ -251,6 +258,18 @@ struct PersistentDynamicDualSegtree {
         if (left == right) return *this;
         return PersistentDynamicDualSegtree(_config, _pool,
                                             apply_node(_root, left_bound(), right_bound(), left, right, x));
+    }
+
+    void apply_inplace(Index p, const T& x) {
+        assert(left_bound() <= p && p < right_bound());
+        apply_inplace(p, p + 1, x);
+    }
+
+    void apply_inplace(Index left, Index right, const T& x) {
+        assert(left_bound() <= left && left <= right && right <= right_bound());
+        if (left == right) return;
+        int root = apply_node(_root, left_bound(), right_bound(), left, right, x, true);
+        _pool->replace(_root, root);
     }
 };
 

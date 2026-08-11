@@ -19,6 +19,11 @@ All versions derived from one tree share a contiguous node pool and immutable
 domain metadata. Read-only queries allocate no nodes. Reference counting
 recycles nodes after their last parent or version handle is released.
 
+`set_inplace` and `apply_inplace` mutate only the current handle using
+copy-on-write. Shared nodes, including children receiving a pushed lazy tag, are
+cloned before modification; unique nodes are reused. The ordinary updates still
+return new persistent versions.
+
 ## Template Parameters
 
 * `ActedMonoid`: A type satisfying `m1une::acted_monoid::IsActedMonoid`.
@@ -55,12 +60,15 @@ allocated initially.
 | `size_t node_count()` | Returns live nodes in the shared version family. | $O(1)$ |
 | `void release()` | Releases this root and resets the handle to the uniform initial version. | $O(F)$ |
 | `PersistentDynamicLazySegtree set(Index p, T x)` | Returns a version assigning `x` at `p`. | $O(\log U)$ |
+| `void set_inplace(Index p, T x)` | Assigns `x` in this version using copy-on-write. | $O(\log U)$ |
 | `T get(Index p)` | Returns the value at `p`. | $O(\log U)$ |
 | `T operator[](Index p)` | Equivalent to `get(p)`. | $O(\log U)$ |
 | `T prod(Index l, Index r)` | Returns the product over `[l, r)`. | $O(\log U)$ |
 | `T all_prod()` | Returns the product over the entire domain. | $O(1)$ |
 | `PersistentDynamicLazySegtree apply(Index p, F f)` | Returns a version applying `f` at `p`. | $O(\log U)$ |
 | `PersistentDynamicLazySegtree apply(Index l, Index r, F f)` | Returns a version applying `f` over `[l, r)`. | $O(\log U)$ |
+| `void apply_inplace(Index p, const F& f)` | Applies `f` at `p` in this version using copy-on-write. | $O(\log U)$ |
+| `void apply_inplace(Index l, Index r, const F& f)` | Applies `f` over `[l, r)` in this version using copy-on-write. | $O(\log U)$ |
 | `Index max_right(Index l, G g)` | Finds the largest valid right boundary. | $O(\log U)$ |
 | `Index min_left(Index r, G g)` | Finds the smallest valid left boundary. | $O(\log U)$ |
 

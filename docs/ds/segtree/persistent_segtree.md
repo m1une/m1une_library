@@ -10,6 +10,12 @@ Point updates return a new tree while keeping older versions available.
 Versions use reference-counted path nodes. Destroying, overwriting, or explicitly
 releasing a version recursively recycles every node that has no remaining parent.
 
+`set` always returns a new persistent version. `set_inplace` instead mutates the
+current handle with copy-on-write: nodes shared with another live version are
+cloned before modification, while already unique path nodes are reused. Other
+versions remain unchanged. This is useful for a mutable working copy derived
+from a persistent base.
+
 ## Methods
 
 | Method | Description | Complexity |
@@ -21,6 +27,7 @@ releasing a version recursively recycles every node that has no remaining parent
 | `void release()` | Releases this version and makes this handle empty. | $O(F)$ |
 | `size_t node_count()` | Returns the number of live nodes in the shared version family. | $O(1)$ |
 | `PersistentSegtree set(int p, T x)` | Returns a new version where index `p` is assigned `x`. | $O(\log N)$ |
+| `void set_inplace(int p, T x)` | Assigns `x` in this version using copy-on-write. | $O(\log N)$ |
 | `T get(int p)` | Returns the value at index `p`. | $O(\log N)$ |
 | `T operator[](int p)` | Returns the value at index `p`. | $O(\log N)$ |
 | `T prod(int l, int r)` | Returns the monoid product over `[l, r)`. | $O(\log N)$ |

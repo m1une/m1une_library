@@ -198,9 +198,10 @@ struct PersistentSegtreeBeats {
         int node,
         int left,
         int right,
-        const F& f
+        const F& f,
+        bool copy_on_write = false
     ) const {
-        int result = clone_node(node);
+        int result = copy_on_write ? _pool->clone_if_shared(node) : clone_node(node);
         Node& current = (*_pool)[result];
         if (can_apply_at(f, current.val, 0)) {
             current.val = mapping_at(f, current.val, 0);
@@ -212,19 +213,21 @@ struct PersistentSegtreeBeats {
         }
 
         assert(right - left > 1);
-        push(result, left, right);
+        push(result, left, right, copy_on_write);
         int middle = left + (right - left) / 2;
         int left_child = all_apply_clone(
             (*_pool)[result].left,
             left,
             middle,
-            f
+            f,
+            copy_on_write
         );
         int right_child = all_apply_clone(
             (*_pool)[result].right,
             middle,
             right,
-            shift_operator(f, middle - left)
+            shift_operator(f, middle - left),
+            copy_on_write
         );
         _pool->replace((*_pool)[result].left, left_child);
         _pool->replace((*_pool)[result].right, right_child);
@@ -232,7 +235,12 @@ struct PersistentSegtreeBeats {
         return result;
     }
 
-    void push(int node, int left, int right) const {
+    void push(
+        int node,
+        int left,
+        int right,
+        bool copy_on_write = false
+    ) const {
         if (!(*_pool)[node].has_lazy) return;
         assert(right - left > 1);
 
@@ -242,13 +250,15 @@ struct PersistentSegtreeBeats {
             (*_pool)[node].left,
             left,
             middle,
-            lazy
+            lazy,
+            copy_on_write
         );
         int right_child = all_apply_clone(
             (*_pool)[node].right,
             middle,
             right,
-            shift_operator(lazy, middle - left)
+            shift_operator(lazy, middle - left),
+            copy_on_write
         );
         _pool->replace((*_pool)[node].left, left_child);
         _pool->replace((*_pool)[node].right, right_child);
@@ -262,9 +272,10 @@ struct PersistentSegtreeBeats {
         int left,
         int right,
         int index,
-        T value
+        T value,
+        bool copy_on_write = false
     ) const {
-        int result = clone_node(node);
+        int result = copy_on_write ? _pool->clone_if_shared(node) : clone_node(node);
         if (right - left == 1) {
             Node& current = (*_pool)[result];
             current.val = std::move(value);
@@ -273,7 +284,7 @@ struct PersistentSegtreeBeats {
             return result;
         }
 
-        push(result, left, right);
+        push(result, left, right, copy_on_write);
         int middle = left + (right - left) / 2;
         if (index < middle) {
             int child = set_node(
@@ -281,7 +292,8 @@ struct PersistentSegtreeBeats {
                 left,
                 middle,
                 index,
-                std::move(value)
+                std::move(value),
+                copy_on_write
             );
             _pool->replace((*_pool)[result].left, child);
         } else {
@@ -290,7 +302,8 @@ struct PersistentSegtreeBeats {
                 middle,
                 right,
                 index,
-                std::move(value)
+                std::move(value),
+                copy_on_write
             );
             _pool->replace((*_pool)[result].right, child);
         }
@@ -304,7 +317,8 @@ struct PersistentSegtreeBeats {
         int right,
         int query_left,
         int query_right,
-        const F& f
+        const F& f,
+        bool copy_on_write = false
     ) const {
         if (query_right <= left || right <= query_left) return node;
         if (query_left <= left && right <= query_right) {
@@ -312,12 +326,13 @@ struct PersistentSegtreeBeats {
                 node,
                 left,
                 right,
-                shift_operator(f, left - query_left)
+                shift_operator(f, left - query_left),
+                copy_on_write
             );
         }
 
-        int result = clone_node(node);
-        push(result, left, right);
+        int result = copy_on_write ? _pool->clone_if_shared(node) : clone_node(node);
+        push(result, left, right, copy_on_write);
         int middle = left + (right - left) / 2;
         int left_child = apply_node(
             (*_pool)[result].left,
@@ -325,7 +340,8 @@ struct PersistentSegtreeBeats {
             middle,
             query_left,
             query_right,
-            f
+            f,
+            copy_on_write
         );
         int right_child = apply_node(
             (*_pool)[result].right,
@@ -333,7 +349,8 @@ struct PersistentSegtreeBeats {
             right,
             query_left,
             query_right,
-            f
+            f,
+            copy_on_write
         );
         _pool->replace((*_pool)[result].left, left_child);
         _pool->replace((*_pool)[result].right, right_child);
@@ -706,6 +723,19 @@ struct PersistentSegtreeBeats {
         );
     }
 
+    void set_inplace(int index, T value) {
+        assert(0 <= index && index < _n);
+        int root = set_node(
+            _root,
+            0,
+            _n,
+            index,
+            std::move(value),
+            true
+        );
+        _pool->replace(_root, root);
+    }
+
     T get(int index) const {
         assert(0 <= index && index < _n);
         return prod(index, index + 1);
@@ -749,6 +779,26 @@ struct PersistentSegtreeBeats {
             apply_node(_root, 0, _n, left, right, f),
             _pool
         );
+    }
+
+    void apply_inplace(int index, const F& f) {
+        assert(0 <= index && index < _n);
+        apply_inplace(index, index + 1, f);
+    }
+
+    void apply_inplace(int left, int right, const F& f) {
+        assert(0 <= left && left <= right && right <= _n);
+        if (left == right) return;
+        int root = apply_node(
+            _root,
+            0,
+            _n,
+            left,
+            right,
+            f,
+            true
+        );
+        _pool->replace(_root, root);
     }
 
     PersistentSegtreeBeats copy_range_from(

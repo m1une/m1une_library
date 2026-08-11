@@ -60,8 +60,27 @@ struct PersistentDynamicSegtree {
         return _config->domain.default_product(depth, left, right);
     }
 
-    int set_node(int t, Index left, Index right, int depth, Index p, T x) const {
+    int set_node(int t, Index left, Index right, int depth, Index p, T x, bool copy_on_write = false) const {
         Index middle = std::midpoint(left, right);
+        if (copy_on_write) {
+            int result = t ? _pool->clone_if_shared(t) : new_node(value(0, left, right, depth));
+            if (middle == left) {
+                (*_pool)[result].val = std::move(x);
+                return result;
+            }
+            int child;
+            if (p < middle) {
+                child = set_node((*_pool)[result].left, left, middle, depth + 1, p, std::move(x), true);
+                _pool->replace((*_pool)[result].left, child);
+            } else {
+                child = set_node((*_pool)[result].right, middle, right, depth + 1, p, std::move(x), true);
+                _pool->replace((*_pool)[result].right, child);
+            }
+            Node& node = (*_pool)[result];
+            node.val = Monoid::op(value(node.left, left, middle, depth + 1),
+                                  value(node.right, middle, right, depth + 1));
+            return result;
+        }
         if (middle == left) return new_node(std::move(x));
 
         int left_child = t ? (*_pool)[t].left : 0;
@@ -200,6 +219,12 @@ struct PersistentDynamicSegtree {
         assert(left_bound() <= p && p < right_bound());
         return PersistentDynamicSegtree(_config, _pool,
                                         set_node(_root, left_bound(), right_bound(), 0, p, std::move(x)));
+    }
+
+    void set_inplace(Index p, T x) {
+        assert(left_bound() <= p && p < right_bound());
+        int root = set_node(_root, left_bound(), right_bound(), 0, p, std::move(x), true);
+        _pool->replace(_root, root);
     }
 
     T get(Index p) const {

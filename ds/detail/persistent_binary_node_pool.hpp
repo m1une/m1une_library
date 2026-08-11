@@ -92,6 +92,30 @@ struct PersistentBinaryNodePool {
         if (--_references[node] == 0) release_zero(node);
     }
 
+    bool unique(int node) const {
+        return node == null_node || _references[node] == 1;
+    }
+
+    int clone(int node) {
+        assert(node != null_node && _nodes[node].has_value());
+        return emplace(*_nodes[node]);
+    }
+
+    // Returns node itself when it has one owner, otherwise an unowned clone.
+    // A returned clone becomes owned when a root or parent edge retains it.
+    int clone_if_shared(int node) {
+        if (unique(node)) return node;
+        return clone(node);
+    }
+
+    void replace(int& edge, int node) {
+        if (edge == node) return;
+        retain(node);
+        int old = edge;
+        edge = node;
+        release(old);
+    }
+
     void discard_unreferenced() {
         while (!_unowned.empty()) {
             int node = _unowned.back();

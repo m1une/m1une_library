@@ -13,6 +13,11 @@ component.
 Reference counting recycles internal persistent-array nodes after their final
 dependent version and parent are released.
 
+`merge` returns a new version. `merge_inplace` applies the same constraint to
+this handle with copy-on-write, preserving other live versions and reusing
+unique persistent-array paths. Its return value reports consistency, like the
+`bool` in the result of `merge`.
+
 The template parameter is a type satisfying
 `m1une::monoid::IsGroup`. The stored constraint for
 `merge(a, b, w)` is `diff(a, b) == w`, where `diff(a, b)` is
@@ -52,6 +57,7 @@ checked for consistency.
 | `void release()` | Releases this version immediately and makes this handle empty. | $O(F)$ |
 | `std::size_t node_count() const` | Returns live internal nodes in the shared version family. | $O(1)$ |
 | `std::pair<PersistentPotentializedDsu, bool> merge(int a, int b, const T& w) const` | Returns a new version with the constraint `diff(a, b) == w`, and whether the constraint is consistent. If the constraint contradicts an existing component, the returned version is unchanged. | $O(\log^2 N)$ |
+| `bool merge_inplace(int a, int b, const T& w)` | Adds the constraint to this version using copy-on-write and returns whether it is consistent. A contradiction leaves this version unchanged. | $O(\log^2 N)$ |
 | `bool same(int a, int b) const` | Returns whether `a` and `b` are in the same set. | $O(\log^2 N)$ |
 | `int leader(int a) const` | Returns the representative of the set containing `a`. | $O(\log^2 N)$ |
 | `int group_size(int a) const`, `int size(int a) const` | Returns the size of the set containing `a`. | $O(\log^2 N)$ |

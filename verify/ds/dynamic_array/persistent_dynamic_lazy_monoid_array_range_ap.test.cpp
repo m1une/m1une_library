@@ -69,6 +69,44 @@ int main() {
         assert_all_ranges(c, {3, 9, 2, 1, 0});
         assert_all_ranges(d, {3, 10, 5, 6, 0});
     }
+    {
+        std::vector<long long> expected(16);
+        std::iota(expected.begin(), expected.end(), 0LL);
+        Array original(expected);
+        Array base = original.apply(0, 16, AM::operator_type(2, 3)).reverse();
+        for (int i = 0; i < int(expected.size()); ++i) expected[i] += 2 * i + 3;
+        std::reverse(expected.begin(), expected.end());
+        const std::vector<long long> base_expected = expected;
+        Array inplace = base;
+        Array persistent = base;
+        std::mt19937 cow_rng(17);
+        for (int step = 0; step < 500; ++step) {
+            int l = int(cow_rng() % (expected.size() + 1));
+            int r = int(cow_rng() % (expected.size() + 1));
+            if (l > r) std::swap(l, r);
+            if (step % 5 == 0) {
+                int pos = int(cow_rng() % expected.size());
+                long long value = int(cow_rng() % 101) - 50;
+                inplace.set_inplace(pos, AM::make(value));
+                expected[pos] = value;
+                persistent = persistent.set(pos, AM::make(value));
+            } else {
+                long long coef = int(cow_rng() % 11) - 5;
+                long long add = int(cow_rng() % 21) - 10;
+                AM::operator_type action(coef, add);
+                inplace.apply_inplace(l, r, action);
+                persistent = persistent.apply(l, r, action);
+                for (int i = l; i < r; ++i) expected[i] += coef * (i - l) + add;
+            }
+            assert_all_ranges(inplace, expected);
+            assert_all_ranges(persistent, expected);
+            assert_all_ranges(base, base_expected);
+            assert_all_ranges(original, std::vector<long long>{
+                0, 1, 2, 3, 4, 5, 6, 7,
+                8, 9, 10, 11, 12, 13, 14, 15
+            });
+        }
+    }
 
     std::mt19937 rng(4);
     std::vector<std::pair<Array, std::vector<long long>>> versions;

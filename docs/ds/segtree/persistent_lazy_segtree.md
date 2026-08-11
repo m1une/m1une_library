@@ -11,6 +11,12 @@ new versions while older versions remain available.
 Unreferenced path nodes are recycled automatically when versions are destroyed
 or overwritten, and `release()` can drop a version early.
 
+The ordinary `set` and `apply` methods always return new versions. Their
+`_inplace` counterparts mutate this handle with copy-on-write. A shared node is
+cloned immediately before a write, including writes caused by lazy propagation;
+an already unique node is updated directly. Every other live version stays
+unchanged. This is intended for repeatedly updating a working copy of a base.
+
 ## Methods
 
 | Method | Description | Complexity |
@@ -22,6 +28,7 @@ or overwritten, and `release()` can drop a version early.
 | `void release()` | Releases this version and makes this handle empty. | $O(F)$ |
 | `size_t node_count()` | Returns live nodes in the shared version family. | $O(1)$ |
 | `PersistentLazySegtree set(int p, T x)` | Returns a new version where index `p` is assigned `x`. | $O(\log N)$ |
+| `void set_inplace(int p, T x)` | Assigns `x` in this version using copy-on-write. | $O(\log N)$ |
 | `T get(int p)` | Returns the value at index `p`. | $O(\log N)$ |
 | `T operator[](int p)` | Returns the value at index `p`. | $O(\log N)$ |
 | `T prod(int l, int r)` | Returns the acted-monoid product over `[l, r)`. | $O(\log N)$ |
@@ -30,6 +37,8 @@ or overwritten, and `release()` can drop a version early.
 | `std::vector<T> to_vector(int l, int r)` | Returns the elements in `[l, r)`. | $O(\log N + r - l)$ |
 | `PersistentLazySegtree apply(int p, F f)` | Returns a new version where `f` is applied to index `p`. | $O(\log N)$ |
 | `PersistentLazySegtree apply(int l, int r, F f)` | Returns a new version where `f` is applied to every element in `[l, r)`. | $O(\log N)$ |
+| `void apply_inplace(int p, const F& f)` | Applies `f` at `p` in this version using copy-on-write. | $O(\log N)$ |
+| `void apply_inplace(int l, int r, const F& f)` | Applies `f` over `[l, r)` in this version using copy-on-write. | $O(\log N)$ |
 | `PersistentLazySegtree copy_range_from(const PersistentLazySegtree& source, int l, int r)` | Returns a new version whose `[l, r)` is copied from `source`. | $O(\log N)$ |
 | `int max_right<G>(int l, G g)` | Returns the largest `r` such that `g(prod(l, r))` is `true`. | $O(\log N)$ |
 | `int min_left<G>(int r, G g)` | Returns the smallest `l` such that `g(prod(l, r))` is `true`. | $O(\log N)$ |
@@ -57,10 +66,13 @@ int main() {
     Seg seg(std::vector<long long>{1, 2, 3, 4});
     Seg next = seg.apply(1, 3, 10);
     Seg mixed = seg.copy_range_from(next, 2, 4);
+    Seg working = seg;
+    working.apply_inplace(0, 4, 1);
 
     std::cout << seg.prod(0, 4).sum << "\n";   // 10
     std::cout << next.prod(0, 4).sum << "\n";  // 30
     std::cout << mixed.prod(0, 4).sum << "\n"; // 20
+    std::cout << working.prod(0, 4).sum << "\n"; // 14; seg is still 10
     next.release();                            // mixed keeps shared nodes alive
 }
 ```

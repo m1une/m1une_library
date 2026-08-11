@@ -148,6 +148,40 @@ struct PersistentDynamicMonoidArray {
         return make_node(std::move(node.val), node.priority, false, node.l, r);
     }
 
+    void pull(int t) const {
+        Node& node = (*pool)[t];
+        node.prod = Monoid::op(Monoid::op(node_prod(node.l), node.val), node_prod(node.r));
+        node.rprod = Monoid::op(Monoid::op(node_rprod(node.r), node.val), node_rprod(node.l));
+        if (node.rev) std::swap(node.prod, node.rprod);
+    }
+
+    int set_node_inplace(int t, int pos, T val, bool inherited_reversed = false) const {
+        t = pool->clone_if_shared(t);
+        const bool reversed = inherited_reversed ^ (*pool)[t].rev;
+        const int logical_left = reversed ? (*pool)[t].r : (*pool)[t].l;
+        const int left_count = subtree_size(logical_left);
+        if (pos < left_count) {
+            int child = set_node_inplace(logical_left, pos, std::move(val), reversed);
+            if (reversed) {
+                pool->replace((*pool)[t].r, child);
+            } else {
+                pool->replace((*pool)[t].l, child);
+            }
+        } else if (pos == left_count) {
+            (*pool)[t].val = std::move(val);
+        } else {
+            const int logical_right = reversed ? (*pool)[t].l : (*pool)[t].r;
+            int child = set_node_inplace(logical_right, pos - left_count - 1, std::move(val), reversed);
+            if (reversed) {
+                pool->replace((*pool)[t].l, child);
+            } else {
+                pool->replace((*pool)[t].r, child);
+            }
+        }
+        pull(t);
+        return t;
+    }
+
     int find_node(int t, int pos) const {
         bool reversed = false;
         while (t != -1) {
@@ -481,6 +515,13 @@ struct PersistentDynamicMonoidArray {
     PersistentDynamicMonoidArray set(int pos, T value) const {
         assert(0 <= pos && pos < size());
         return make_version(set_node(root, pos, std::move(value)), rng_state);
+    }
+
+    void set_inplace(int pos, T value) {
+        assert(0 <= pos && pos < size());
+        int next_root = set_node_inplace(root, pos, std::move(value));
+        pool->replace(root, next_root);
+        pool->discard_unreferenced();
     }
 
     PersistentDynamicMonoidArray reverse(int l, int r) const {
