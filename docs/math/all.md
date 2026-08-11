@@ -71,6 +71,8 @@ You usually do not need to include this entire bundle:
 * Use `rational.hpp` for normalized exact fractions.
 * Use `rational_approximation.hpp` for the closest fraction on each side under
   numerator and denominator bounds.
+* Use `newton_method.hpp` for fixed-count Newton iteration over numeric values or
+  formal power series.
 * Use `squarefree_count.hpp` to count square-free integers through a 64-bit
   limit.
 * Use `stern_brocot_tree.hpp` for positive rational tree paths, ancestors, and
@@ -99,6 +101,7 @@ few unused headers do not matter.
 | `math/modular_square_root.hpp` | Modular square roots for prime moduli using Tonelli-Shanks. |
 | `math/multivariate_convolution.hpp` | Truncated and cyclic multidimensional convolution. |
 | `math/multiplicative_function_prefix_sum.hpp` | Min_25 prefix sums of a multiplicative function. |
+| `math/newton_method.hpp` | Generic fixed-count Newton iteration with formal-power-series division support. |
 | `math/fps/all.hpp` | Convolution, formal power series, polynomial algorithms, and linear recurrences. |
 | `math/matrix/all.hpp` | Dense and packed GF(2) matrices, Pfaffian, hafnian, sparse determinant, Gaussian elimination, inverse, and linear systems. |
 | `math/combinatorics.hpp` | Factorials, binomial coefficients, permutations, and multiset counts. |

@@ -21,6 +21,7 @@
 #include "modular_square_root.hpp"
 #include "multivariate_convolution.hpp"
 #include "multiplicative_function_prefix_sum.hpp"
+#include "newton_method.hpp"
 #include "number_theory.hpp"
 #include "partition_function.hpp"
 #include "prefix_sum_of_binom.hpp"

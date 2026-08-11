@@ -14,6 +14,7 @@
 #include "multipoint_evaluation.hpp"
 #include "polynomial_factorization.hpp"
 #include "polynomial_roots.hpp"
+#include "solve_fps_equation.hpp"
 #include "sparse_formal_power_series.hpp"
 
 #endif  // M1UNE_FPS_ALL_HPP
