@@ -1,4 +1,4 @@
-#define PROBLEM "https://judge.yosupo.jp/problem/aplusb"
+#define PROBLEM "https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=ALDS1_5_A"
 
 #include <algorithm>
 #include <cassert>
@@ -17,6 +17,14 @@ std::vector<char> naive_subset_sum(const std::vector<int>& weights, int limit) {
         }
     }
     return reachable;
+}
+
+int naive_subset_sum_max_value(const std::vector<int>& weights, int limit) {
+    const std::vector<char> reachable = naive_subset_sum(weights, limit);
+    for (int sum = limit; 0 <= sum; --sum) {
+        if (reachable[sum]) return sum;
+    }
+    return 0;
 }
 
 std::vector<long long> naive_zero_one_max_value(
@@ -95,13 +103,21 @@ std::vector<long long> naive_min_weight_for_value(
 }
 
 void test_subset_sum() {
-    for (int n = 0; n <= 8; ++n) {
-        std::vector<int> weights(n);
-        for (int seed = 0; seed < 60; ++seed) {
-            for (int i = 0; i < n; ++i) {
-                weights[i] = (seed * 13 + i * 7) % 10;
+    const std::vector<int> limits = {0, 1, 30, 63, 64, 65, 127, 128, 129};
+    for (int limit : limits) {
+        for (int n = 0; n <= 8; ++n) {
+            std::vector<int> weights(n);
+            for (int seed = 0; seed < 60; ++seed) {
+                for (int i = 0; i < n; ++i) {
+                    weights[i] = (seed * 13 + i * 67) % 140;
+                }
+                const std::vector<char> expected = naive_subset_sum(weights, limit);
+                assert(m1une::algo::subset_sum_reachable(weights, limit) == expected);
+                assert(
+                    m1une::algo::subset_sum_max_value(weights, limit) ==
+                    naive_subset_sum_max_value(weights, limit)
+                );
             }
-            assert(m1une::algo::subset_sum_reachable(weights, 30) == naive_subset_sum(weights, 30));
         }
     }
 }
@@ -143,7 +159,18 @@ int main() {
     test_bounded_knapsack();
     test_min_weight_for_value();
 
-    long long a, b;
-    fast_input >> a >> b;
-    fast_output << a + b << '\n';
+    int n;
+    fast_input >> n;
+    std::vector<int> weights(n);
+    for (int& weight : weights) fast_input >> weight;
+
+    int query_count;
+    fast_input >> query_count;
+    while (query_count--) {
+        int target;
+        fast_input >> target;
+        const bool reachable =
+            m1une::algo::subset_sum_max_value(weights, target) == target;
+        fast_output << (reachable ? "yes" : "no") << '\n';
+    }
 }

@@ -2,6 +2,7 @@
 #define M1UNE_ALGO_DP_KNAPSACK_HPP 1
 
 #include <algorithm>
+#include <bit>
 #include <cassert>
 #include <cstddef>
 #include <deque>
@@ -11,9 +12,16 @@
 namespace m1une {
 namespace algo {
 
-inline std::vector<char> subset_sum_reachable(const std::vector<int>& weights, int limit) {
+namespace internal {
+
+using SubsetSumWord = unsigned long long;
+
+inline std::vector<SubsetSumWord> subset_sum_reachability_bits(
+    const std::vector<int>& weights,
+    int limit
+) {
     assert(0 <= limit);
-    using Word = unsigned long long;
+    using Word = SubsetSumWord;
     constexpr int word_bits = std::numeric_limits<Word>::digits;
 
     const std::size_t bit_count = std::size_t(limit) + 1;
@@ -44,12 +52,37 @@ inline std::vector<char> subset_sum_reachable(const std::vector<int>& weights, i
         }
         trim();
     }
+    return bits;
+}
+
+}  // namespace internal
+
+inline std::vector<char> subset_sum_reachable(const std::vector<int>& weights, int limit) {
+    using Word = internal::SubsetSumWord;
+    constexpr int word_bits = std::numeric_limits<Word>::digits;
+    const std::vector<Word> bits =
+        internal::subset_sum_reachability_bits(weights, limit);
 
     std::vector<char> reachable(std::size_t(limit) + 1, 0);
     for (int sum = 0; sum <= limit; ++sum) {
         reachable[sum] = char((bits[std::size_t(sum / word_bits)] >> (sum % word_bits)) & Word(1));
     }
     return reachable;
+}
+
+// Returns the maximum subset sum not exceeding limit.
+inline int subset_sum_max_value(const std::vector<int>& weights, int limit) {
+    using Word = internal::SubsetSumWord;
+    constexpr int word_bits = std::numeric_limits<Word>::digits;
+    const std::vector<Word> bits =
+        internal::subset_sum_reachability_bits(weights, limit);
+
+    for (std::size_t i = bits.size(); i-- > 0;) {
+        if (bits[i] != Word(0)) {
+            return int(i * word_bits + std::bit_width(bits[i]) - 1);
+        }
+    }
+    return 0;
 }
 
 template <typename Value = long long>
