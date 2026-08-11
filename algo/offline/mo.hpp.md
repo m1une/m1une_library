@@ -8,10 +8,34 @@ data:
   - icon: ':warning:'
     path: algo/offline/all.hpp
     title: Offline Algorithms All
+  - icon: ':heavy_check_mark:'
+    path: graph/all.hpp
+    title: Graph All
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/all.hpp
+    title: Tree All
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/mo_on_tree.hpp
+    title: Mo on Tree
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/algo/offline/mo.test.cpp
     title: verify/algo/offline/mo.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/cow_game.test.cpp
+    title: verify/graph/cow_game.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/graph_algorithms.test.cpp
+    title: verify/graph/graph_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/range_edge_graph.test.cpp
+    title: verify/graph/range_edge_graph.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/mo_on_tree.test.cpp
+    title: verify/graph/tree/mo_on_tree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/tree_algorithms.test.cpp
+    title: verify/graph/tree/tree_algorithms.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -107,11 +131,19 @@ data:
   isVerificationFile: false
   path: algo/offline/mo.hpp
   requiredBy:
+  - graph/all.hpp
+  - graph/tree/all.hpp
+  - graph/tree/mo_on_tree.hpp
   - algo/all.hpp
   - algo/offline/all.hpp
   timestamp: '2026-07-07 21:49:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/tree/tree_algorithms.test.cpp
+  - verify/graph/tree/mo_on_tree.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/cow_game.test.cpp
   - verify/algo/offline/mo.test.cpp
 documentation_of: algo/offline/mo.hpp
 layout: document

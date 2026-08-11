@@ -2,6 +2,9 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
+    path: algo/offline/mo.hpp
+    title: Mo's Algorithm
+  - icon: ':heavy_check_mark:'
     path: ds/dsu/dsu.hpp
     title: DSU (Disjoint Set Union)
   - icon: ':heavy_check_mark:'
@@ -175,6 +178,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/tree/heavy_light_decomposition.hpp
     title: Heavy Light Decomposition
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/mo_on_tree.hpp
+    title: Mo on Tree
   - icon: ':heavy_check_mark:'
     path: graph/tree/range_contour_query.hpp
     title: Range Contour Query on Tree
@@ -4151,36 +4157,158 @@ data:
     \        return result;\n    }\n\n    template <class F>\n    void for_each_path(int\
     \ u, int v, F f, bool edge = false) const {\n        for (auto seg : path_segments(u,\
     \ v, edge)) f(seg.l, seg.r, seg.reversed);\n    }\n};\n\n}  // namespace tree\n\
-    }  // namespace m1une\n\n\n#line 1 \"graph/tree/range_contour_query.hpp\"\n\n\n\
-    \n#line 7 \"graph/tree/range_contour_query.hpp\"\n\n#line 1 \"monoid/add.hpp\"\
-    \n\n\n\nnamespace m1une {\nnamespace monoid {\n\n// Monoid for addition (Range\
-    \ Sum).\ntemplate <typename T>\nstruct Add {\n    using value_type = T;\n    static\
-    \ constexpr bool commutative = true;\n\n    // Returns the identity element for\
-    \ addition, which is 0.\n    static constexpr T id() {\n        return T(0);\n\
-    \    }\n\n    // Returns the sum of a and b.\n    static constexpr T op(const\
-    \ T& a, const T& b) {\n        return a + b;\n    }\n\n    static constexpr T\
-    \ inv(const T& x) {\n        return -x;\n    }\n};\n\n}  // namespace monoid\n\
-    }  // namespace m1une\n\n\n#line 1 \"monoid/concept.hpp\"\n\n\n\n#line 5 \"monoid/concept.hpp\"\
-    \n\nnamespace m1une {\nnamespace monoid {\n\n// Concept to check if a type satisfies\
-    \ the requirements of a Monoid.\n// A Monoid must have a `value_type`, an identity\
-    \ element `id()`, and an associative binary operation `op()`.\ntemplate <typename\
-    \ M>\nconcept IsMonoid = requires(typename M::value_type a, typename M::value_type\
-    \ b) {\n    // 1. Must define `value_type`\n    typename M::value_type;\n\n  \
-    \  // 2. Must have a static method `id()` returning `value_type`\n    { M::id()\
-    \ } -> std::same_as<typename M::value_type>;\n\n    // 3. Must have a static method\
-    \ `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for groups. A type satisfying this concept\
-    \ must also obey the group\n// laws; concepts can check the interface but not\
-    \ the algebraic properties.\ntemplate <typename M>\nconcept IsGroup = IsMonoid<M>\
-    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for commutative groups. Commutativity is a\
-    \ semantic requirement and\n// cannot be checked by a C++ concept.\ntemplate <typename\
-    \ M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\n}  // namespace monoid\n}  //\
-    \ namespace m1une\n\n\n#line 1 \"graph/tree/rooted_tree.hpp\"\n\n\n\n#line 7 \"\
-    graph/tree/rooted_tree.hpp\"\n\n#line 9 \"graph/tree/rooted_tree.hpp\"\n\nnamespace\
-    \ m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct RootedTree {\n\
-    \    using cost_type = T;\n    using edge_type = m1une::graph::Edge<T>;\n\n  \
-    \  int root;\n    std::vector<int> parent;\n    std::vector<int> parent_edge;\n\
+    }  // namespace m1une\n\n\n#line 1 \"graph/tree/mo_on_tree.hpp\"\n\n\n\n#line\
+    \ 7 \"graph/tree/mo_on_tree.hpp\"\n\n#line 1 \"algo/offline/mo.hpp\"\n\n\n\n#line\
+    \ 7 \"algo/offline/mo.hpp\"\n#include <numeric>\n#line 9 \"algo/offline/mo.hpp\"\
+    \n\nnamespace m1une {\nnamespace algo {\n\n// Offline Mo's algorithm for half-open\
+    \ array ranges.\nstruct Mo {\n    struct Query {\n        int left;\n        int\
+    \ right;\n        int id;\n    };\n\n   private:\n    int _n;\n    std::vector<Query>\
+    \ _queries;\n\n   public:\n    Mo() : _n(0) {}\n\n    explicit Mo(int n) : _n(n)\
+    \ {\n        assert(0 <= n);\n    }\n\n    int size() const {\n        return\
+    \ _n;\n    }\n\n    int query_count() const {\n        return int(_queries.size());\n\
+    \    }\n\n    bool empty() const {\n        return _queries.empty();\n    }\n\n\
+    \    const std::vector<Query>& queries() const {\n        return _queries;\n \
+    \   }\n\n    void reserve(int query_capacity) {\n        assert(0 <= query_capacity);\n\
+    \        _queries.reserve(query_capacity);\n    }\n\n    void clear() {\n    \
+    \    _queries.clear();\n    }\n\n    // Adds [left, right) and returns its insertion-order\
+    \ ID.\n    int add_query(int left, int right) {\n        assert(0 <= left && left\
+    \ <= right && right <= _n);\n        int id = query_count();\n        _queries.push_back(Query{left,\
+    \ right, id});\n        return id;\n    }\n\n    // Returns query IDs in Mo order.\
+    \ A non-positive block size selects one\n    // automatically.\n    std::vector<int>\
+    \ order(int block_size = 0) const {\n        int query_size = query_count();\n\
+    \        std::vector<int> result(query_size);\n        std::iota(result.begin(),\
+    \ result.end(), 0);\n        if (query_size == 0) return result;\n\n        if\
+    \ (block_size <= 0) {\n            block_size = std::max(1, int(_n / std::sqrt(static_cast<double>(query_size))));\n\
+    \        }\n\n        std::sort(result.begin(), result.end(), [&](int first, int\
+    \ second) {\n            const Query& a = _queries[first];\n            const\
+    \ Query& b = _queries[second];\n            int first_block = a.left / block_size;\n\
+    \            int second_block = b.left / block_size;\n            if (first_block\
+    \ != second_block) {\n                return first_block < second_block;\n   \
+    \         }\n            if (first_block & 1) return a.right > b.right;\n    \
+    \        return a.right < b.right;\n        });\n        return result;\n    }\n\
+    \n    // Maintains [left, right). Each movement callback receives the array index\n\
+    \    // being inserted or erased. `answer(query_id)` stores or reports a result.\n\
+    \    template <class AddLeft, class AddRight, class RemoveLeft, class RemoveRight,\
+    \ class Answer>\n    void run(AddLeft add_left, AddRight add_right, RemoveLeft\
+    \ remove_left, RemoveRight remove_right, Answer answer,\n             int block_size\
+    \ = 0) const {\n        int left = 0;\n        int right = 0;\n        for (int\
+    \ query_index : order(block_size)) {\n            const Query& query = _queries[query_index];\n\
+    \            while (query.left < left) add_left(--left);\n            while (right\
+    \ < query.right) add_right(right++);\n            while (left < query.left) remove_left(left++);\n\
+    \            while (query.right < right) remove_right(--right);\n            answer(query.id);\n\
+    \        }\n    }\n\n    // Convenience overload for statistics whose update is\
+    \ independent of\n    // which side moves.\n    template <class Add, class Remove,\
+    \ class Answer>\n    void run(Add add, Remove remove, Answer answer, int block_size\
+    \ = 0) const {\n        run(add, add, remove, remove, answer, block_size);\n \
+    \   }\n};\n\n}  // namespace algo\n}  // namespace m1une\n\n\n#line 11 \"graph/tree/mo_on_tree.hpp\"\
+    \n\nnamespace m1une {\nnamespace tree {\n\n// Offline Mo's algorithm for static\
+    \ paths in a tree.\ntemplate <class T = int>\nstruct MoOnTree {\n    struct Query\
+    \ {\n        int from;\n        int to;\n        int left;\n        int right;\n\
+    \        int extra;\n        int id;\n        bool edge;\n    };\n\n    int root;\n\
+    \    std::vector<int> entry;\n    std::vector<int> exit;\n    std::vector<int>\
+    \ tour;\n\n   private:\n    int _n;\n    HeavyLightDecomposition<T> _hld;\n  \
+    \  m1une::algo::Mo _mo;\n    std::vector<Query> _queries;\n\n    void check_vertex(int\
+    \ vertex) const {\n        assert(0 <= vertex && vertex < _n);\n        assert(entry[vertex]\
+    \ != -1);\n    }\n\n    int add_path_query(int from, int to, bool edge) {\n  \
+    \      check_vertex(from);\n        check_vertex(to);\n        assert(_queries.empty()\
+    \ || _queries.front().edge == edge);\n        int original_from = from;\n    \
+    \    int original_to = to;\n        if (entry[from] > entry[to]) std::swap(from,\
+    \ to);\n\n        int ancestor = _hld.lca(from, to);\n        int left;\n    \
+    \    int right = entry[to] + 1;\n        int extra = -1;\n        if (ancestor\
+    \ == from) {\n            left = entry[from] + int(edge);\n        } else {\n\
+    \            left = exit[from];\n            if (!edge) extra = ancestor;\n  \
+    \      }\n\n        int id = _mo.add_query(left, right);\n        _queries.push_back(Query{\n\
+    \            original_from,\n            original_to,\n            left,\n   \
+    \         right,\n            extra,\n            id,\n            edge,\n   \
+    \     });\n        return id;\n    }\n\n   public:\n    MoOnTree() : root(-1),\
+    \ _n(0), _mo(0) {}\n\n    explicit MoOnTree(\n        const m1une::graph::Graph<T>&\
+    \ graph,\n        int root_vertex = 0\n    ) : root(-1), _n(0), _mo(0) {\n   \
+    \     build(graph, root_vertex);\n    }\n\n    void build(\n        const m1une::graph::Graph<T>&\
+    \ graph,\n        int root_vertex = 0\n    ) {\n        _n = graph.size();\n \
+    \       root = _n == 0 ? -1 : root_vertex;\n        entry.assign(_n, -1);\n  \
+    \      exit.assign(_n, -1);\n        tour.clear();\n        tour.reserve(2 * _n);\n\
+    \        _queries.clear();\n        _mo = m1une::algo::Mo(2 * _n);\n        _hld.build(graph,\
+    \ root_vertex);\n        if (_n == 0) return;\n\n        assert(0 <= root && root\
+    \ < _n);\n        for (int vertex = 0; vertex < _n; ++vertex) {\n            assert(_hld.parent[vertex]\
+    \ != -2);\n        }\n\n        std::vector<std::vector<int>> children(_n);\n\
+    \        for (int vertex = 0; vertex < _n; ++vertex) {\n            int parent\
+    \ = _hld.parent[vertex];\n            if (parent != -1) children[parent].push_back(vertex);\n\
+    \        }\n\n        struct Event {\n            int vertex;\n            bool\
+    \ leaving;\n        };\n        std::vector<Event> stack;\n        stack.reserve(2\
+    \ * _n);\n        stack.push_back(Event{root, false});\n        while (!stack.empty())\
+    \ {\n            Event event = stack.back();\n            stack.pop_back();\n\
+    \            int vertex = event.vertex;\n            if (event.leaving) {\n  \
+    \              exit[vertex] = int(tour.size());\n                tour.push_back(vertex);\n\
+    \                continue;\n            }\n\n            entry[vertex] = int(tour.size());\n\
+    \            tour.push_back(vertex);\n            stack.push_back(Event{vertex,\
+    \ true});\n            const auto& child_list = children[vertex];\n          \
+    \  for (int index = int(child_list.size()) - 1; index >= 0; --index) {\n     \
+    \           stack.push_back(Event{child_list[index], false});\n            }\n\
+    \        }\n        assert(int(tour.size()) == 2 * _n);\n    }\n\n    int size()\
+    \ const {\n        return _n;\n    }\n\n    bool empty() const {\n        return\
+    \ _n == 0;\n    }\n\n    int query_count() const {\n        return int(_queries.size());\n\
+    \    }\n\n    const std::vector<Query>& queries() const {\n        return _queries;\n\
+    \    }\n\n    int parent(int vertex) const {\n        check_vertex(vertex);\n\
+    \        return _hld.parent[vertex];\n    }\n\n    int parent_edge(int vertex)\
+    \ const {\n        check_vertex(vertex);\n        return _hld.parent_edge[vertex];\n\
+    \    }\n\n    int depth(int vertex) const {\n        check_vertex(vertex);\n \
+    \       return _hld.depth[vertex];\n    }\n\n    int lca(int first, int second)\
+    \ const {\n        check_vertex(first);\n        check_vertex(second);\n     \
+    \   return _hld.lca(first, second);\n    }\n\n    void reserve(int query_capacity)\
+    \ {\n        assert(0 <= query_capacity);\n        _queries.reserve(query_capacity);\n\
+    \        _mo.reserve(query_capacity);\n    }\n\n    void clear() {\n        _queries.clear();\n\
+    \        _mo.clear();\n    }\n\n    // Adds an inclusive vertex-path query and\
+    \ returns its insertion-order ID.\n    // Vertex and edge queries cannot be mixed\
+    \ in one collection.\n    int add_query(int from, int to) {\n        return add_path_query(from,\
+    \ to, false);\n    }\n\n    // Adds an edge-path query. Each edge is represented\
+    \ by its child vertex.\n    int add_edge_query(int from, int to) {\n        return\
+    \ add_path_query(from, to, true);\n    }\n\n    std::vector<int> order(int block_size\
+    \ = 0) const {\n        return _mo.order(block_size);\n    }\n\n    // `add(v)`\
+    \ and `remove(v)` maintain the current path. In edge mode, v\n    // always represents\
+    \ the real edge parent_edge(v).\n    template <class Add, class Remove, class\
+    \ Answer>\n    void run(\n        Add add,\n        Remove remove,\n        Answer\
+    \ answer,\n        int block_size = 0\n    ) const {\n        bool edge_mode =\
+    \ !_queries.empty() && _queries.front().edge;\n        std::vector<char> active(_n,\
+    \ false);\n        auto toggle = [&](int tour_index) {\n            int vertex\
+    \ = tour[tour_index];\n            if (!edge_mode || vertex != root) {\n     \
+    \           if (active[vertex]) {\n                    remove(vertex);\n     \
+    \           } else {\n                    add(vertex);\n                }\n  \
+    \          }\n            active[vertex] = !active[vertex];\n        };\n\n  \
+    \      _mo.run(\n            toggle,\n            toggle,\n            [&](int\
+    \ query_id) {\n                int extra = _queries[query_id].extra;\n       \
+    \         if (extra != -1) {\n                    assert(!active[extra]);\n  \
+    \                  add(extra);\n                }\n                answer(query_id);\n\
+    \                if (extra != -1) remove(extra);\n            },\n           \
+    \ block_size\n        );\n    }\n};\n\n}  // namespace tree\n}  // namespace m1une\n\
+    \n\n#line 1 \"graph/tree/range_contour_query.hpp\"\n\n\n\n#line 7 \"graph/tree/range_contour_query.hpp\"\
+    \n\n#line 1 \"monoid/add.hpp\"\n\n\n\nnamespace m1une {\nnamespace monoid {\n\n\
+    // Monoid for addition (Range Sum).\ntemplate <typename T>\nstruct Add {\n   \
+    \ using value_type = T;\n    static constexpr bool commutative = true;\n\n   \
+    \ // Returns the identity element for addition, which is 0.\n    static constexpr\
+    \ T id() {\n        return T(0);\n    }\n\n    // Returns the sum of a and b.\n\
+    \    static constexpr T op(const T& a, const T& b) {\n        return a + b;\n\
+    \    }\n\n    static constexpr T inv(const T& x) {\n        return -x;\n    }\n\
+    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 1 \"monoid/concept.hpp\"\
+    \n\n\n\n#line 5 \"monoid/concept.hpp\"\n\nnamespace m1une {\nnamespace monoid\
+    \ {\n\n// Concept to check if a type satisfies the requirements of a Monoid.\n\
+    // A Monoid must have a `value_type`, an identity element `id()`, and an associative\
+    \ binary operation `op()`.\ntemplate <typename M>\nconcept IsMonoid = requires(typename\
+    \ M::value_type a, typename M::value_type b) {\n    // 1. Must define `value_type`\n\
+    \    typename M::value_type;\n\n    // 2. Must have a static method `id()` returning\
+    \ `value_type`\n    { M::id() } -> std::same_as<typename M::value_type>;\n\n \
+    \   // 3. Must have a static method `op(a, b)` returning `value_type`\n    { M::op(a,\
+    \ b) } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for groups.\
+    \ A type satisfying this concept must also obey the group\n// laws; concepts can\
+    \ check the interface but not the algebraic properties.\ntemplate <typename M>\n\
+    concept IsGroup = IsMonoid<M> && requires(typename M::value_type a) {\n    { M::inv(a)\
+    \ } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for commutative\
+    \ groups. Commutativity is a semantic requirement and\n// cannot be checked by\
+    \ a C++ concept.\ntemplate <typename M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\
+    \n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 1 \"graph/tree/rooted_tree.hpp\"\
+    \n\n\n\n#line 7 \"graph/tree/rooted_tree.hpp\"\n\n#line 9 \"graph/tree/rooted_tree.hpp\"\
+    \n\nnamespace m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct RootedTree\
+    \ {\n    using cost_type = T;\n    using edge_type = m1une::graph::Edge<T>;\n\n\
+    \    int root;\n    std::vector<int> parent;\n    std::vector<int> parent_edge;\n\
     \    std::vector<int> depth;\n    std::vector<T> dist;\n    std::vector<int> subtree_size;\n\
     \    std::vector<int> tin;\n    std::vector<int> tout;\n    std::vector<int> order;\n\
     \    std::vector<std::vector<int>> up;\n\n   private:\n    int _n;\n    int _log;\n\
@@ -5037,7 +5165,7 @@ data:
     \ == n);\n    if (n == 0) return 0;\n    assert(0 <= root && root < n);\n    assert(int(graph.edges().size())\
     \ == n - 1);\n\n    RootedTree<T> rooted_tree(graph, root);\n    assert(int(rooted_tree.order.size())\
     \ == n);\n    return zero_one_on_tree(rooted_tree.parent, value);\n}\n\n}  //\
-    \ namespace tree\n}  // namespace m1une\n\n\n#line 21 \"graph/tree/all.hpp\"\n\
+    \ namespace tree\n}  // namespace m1une\n\n\n#line 22 \"graph/tree/all.hpp\"\n\
     \n\n#line 1 \"graph/undirected.hpp\"\n\n\n\n#line 1 \"graph/bipartite.hpp\"\n\n\
     \n\n#line 13 \"graph/bipartite.hpp\"\n\n#line 15 \"graph/bipartite.hpp\"\n\nnamespace\
     \ m1une {\nnamespace graph {\n\nstruct BipartiteResult {\n    bool is_bipartite;\n\
@@ -5557,32 +5685,32 @@ data:
     \ n;\n}\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/complement_connected_components.hpp\"\
     \n\n\n\n#line 6 \"graph/complement_connected_components.hpp\"\n\n#line 1 \"graph/connected_components.hpp\"\
     \n\n\n\n#line 6 \"graph/connected_components.hpp\"\n\n#line 1 \"ds/dsu/dsu.hpp\"\
-    \n\n\n\n#line 5 \"ds/dsu/dsu.hpp\"\n#include <numeric>\n#line 8 \"ds/dsu/dsu.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\n\nstruct Dsu {\n   private:\n    int _n;\n\
-    \    // parent_or_size[i] is the parent of i if it's >= 0.\n    // If it's < 0,\
-    \ then i is a root and -parent_or_size[i] is the size of the group.\n    std::vector<int>\
-    \ parent_or_size;\n\n    // Returns {new leader, absorbed leader}. The absorbed\
-    \ leader is -1 when\n    // both vertices already belong to the same component.\n\
-    \    std::pair<int, int> merge_leaders(int a, int b) {\n        int x = leader(a),\
-    \ y = leader(b);\n        if (x == y) return {x, -1};\n        if (-parent_or_size[x]\
-    \ < -parent_or_size[y]) std::swap(x, y);\n        parent_or_size[x] += parent_or_size[y];\n\
-    \        parent_or_size[y] = x;\n        return {x, y};\n    }\n\n   public:\n\
-    \    Dsu() : _n(0) {}\n    explicit Dsu(int n) : _n(n), parent_or_size(n, -1)\
-    \ {}\n\n    // Merges the group containing 'a' with the group containing 'b'.\n\
-    \    // Returns the leader of the merged group.\n    int merge(int a, int b) {\n\
-    \        return merge_leaders(a, b).first;\n    }\n\n    // Invokes callback(new_leader,\
-    \ absorbed_leader) after an actual merge.\n    // Returns the leader of the merged\
-    \ group.\n    template <class Callback>\n    int merge(int a, int b, Callback&&\
-    \ callback) {\n        std::pair<int, int> merged = merge_leaders(a, b);\n   \
-    \     if (merged.second != -1) callback(merged.first, merged.second);\n      \
-    \  return merged.first;\n    }\n\n    // Returns true if 'a' and 'b' belong to\
-    \ the same group.\n    bool same(int a, int b) {\n        return leader(a) ==\
-    \ leader(b);\n    }\n\n    // Returns the leader (representative) of the group\
-    \ containing 'a'.\n    int leader(int a) {\n        if (parent_or_size[a] < 0)\
-    \ return a;\n        // Path compression\n        return parent_or_size[a] = leader(parent_or_size[a]);\n\
-    \    }\n\n    // Returns the size of the group containing 'a'.\n    int size(int\
-    \ a) {\n        return -parent_or_size[leader(a)];\n    }\n\n    // Returns a\
-    \ list of all groups, where each group is a vector of its elements.\n    std::vector<std::vector<int>>\
+    \n\n\n\n#line 8 \"ds/dsu/dsu.hpp\"\n\nnamespace m1une {\nnamespace ds {\n\nstruct\
+    \ Dsu {\n   private:\n    int _n;\n    // parent_or_size[i] is the parent of i\
+    \ if it's >= 0.\n    // If it's < 0, then i is a root and -parent_or_size[i] is\
+    \ the size of the group.\n    std::vector<int> parent_or_size;\n\n    // Returns\
+    \ {new leader, absorbed leader}. The absorbed leader is -1 when\n    // both vertices\
+    \ already belong to the same component.\n    std::pair<int, int> merge_leaders(int\
+    \ a, int b) {\n        int x = leader(a), y = leader(b);\n        if (x == y)\
+    \ return {x, -1};\n        if (-parent_or_size[x] < -parent_or_size[y]) std::swap(x,\
+    \ y);\n        parent_or_size[x] += parent_or_size[y];\n        parent_or_size[y]\
+    \ = x;\n        return {x, y};\n    }\n\n   public:\n    Dsu() : _n(0) {}\n  \
+    \  explicit Dsu(int n) : _n(n), parent_or_size(n, -1) {}\n\n    // Merges the\
+    \ group containing 'a' with the group containing 'b'.\n    // Returns the leader\
+    \ of the merged group.\n    int merge(int a, int b) {\n        return merge_leaders(a,\
+    \ b).first;\n    }\n\n    // Invokes callback(new_leader, absorbed_leader) after\
+    \ an actual merge.\n    // Returns the leader of the merged group.\n    template\
+    \ <class Callback>\n    int merge(int a, int b, Callback&& callback) {\n     \
+    \   std::pair<int, int> merged = merge_leaders(a, b);\n        if (merged.second\
+    \ != -1) callback(merged.first, merged.second);\n        return merged.first;\n\
+    \    }\n\n    // Returns true if 'a' and 'b' belong to the same group.\n    bool\
+    \ same(int a, int b) {\n        return leader(a) == leader(b);\n    }\n\n    //\
+    \ Returns the leader (representative) of the group containing 'a'.\n    int leader(int\
+    \ a) {\n        if (parent_or_size[a] < 0) return a;\n        // Path compression\n\
+    \        return parent_or_size[a] = leader(parent_or_size[a]);\n    }\n\n    //\
+    \ Returns the size of the group containing 'a'.\n    int size(int a) {\n     \
+    \   return -parent_or_size[leader(a)];\n    }\n\n    // Returns a list of all\
+    \ groups, where each group is a vector of its elements.\n    std::vector<std::vector<int>>\
     \ groups() {\n        std::vector<int> leader_buf(_n), group_size(_n);\n     \
     \   for (int i = 0; i < _n; i++) {\n            leader_buf[i] = leader(i);\n \
     \           group_size[leader_buf[i]]++;\n        }\n        std::vector<std::vector<int>>\
@@ -7412,6 +7540,8 @@ data:
   - graph/tree/dsu_on_tree.hpp
   - graph/tree/euler_tour.hpp
   - graph/tree/heavy_light_decomposition.hpp
+  - graph/tree/mo_on_tree.hpp
+  - algo/offline/mo.hpp
   - graph/tree/range_contour_query.hpp
   - monoid/add.hpp
   - monoid/concept.hpp
@@ -7451,7 +7581,7 @@ data:
   isVerificationFile: false
   path: graph/all.hpp
   requiredBy: []
-  timestamp: '2026-08-10 17:30:05+09:00'
+  timestamp: '2026-08-11 13:51:23+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/graph_algorithms.test.cpp
@@ -7477,7 +7607,7 @@ Public namespaces stay flat and short: general graph helpers use
 | Header | Graph orientation | Contents |
 | --- | --- | --- |
 | `graph/graph.hpp` | Container | `Graph<T>` and `Edge<T>` adjacency-list container. |
-| `graph/tree/all.hpp` | Tree algorithms | Euler tours, rooted-tree metadata, LCA, HLD, distance frequencies, Cartesian trees, virtual trees, tree hashing, rerooting DP, static top trees, and centroid decomposition. |
+| `graph/tree/all.hpp` | Tree algorithms | Euler tours, rooted-tree metadata, LCA, HLD, Mo path queries, distance frequencies, Cartesian trees, virtual trees, tree hashing, rerooting DP, static top trees, and centroid decomposition. |
 | `graph/flow/flow.hpp` | Flow networks | Max flow, min-cost flow, bounded flow, bounded min-cost flow, and Gomory-Hu trees. |
 | `graph/counting.hpp` | Counting formulas | Counts common labeled graph classes, tournaments, DAGs, and unlabeled trees by vertex number. |
 | `graph/matrix_tree_theorem.hpp` | Undirected or directed | Counts weighted spanning trees and rooted arborescences by determinant. |

@@ -988,6 +988,9 @@ data:
     path: verify/string/manacher.test.cpp
     title: verify/string/manacher.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/string/map_trie.test.cpp
+    title: verify/string/map_trie.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/string/minimum_rotation.test.cpp
     title: verify/string/minimum_rotation.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1741,6 +1744,7 @@ data:
   - verify/ds/queue/persistent_queue.test.cpp
   - verify/string/manacher.test.cpp
   - verify/string/lyndon_factorization.test.cpp
+  - verify/string/map_trie.test.cpp
   - verify/string/trie.test.cpp
   - verify/string/palindrome_lexicographical_order.test.cpp
   - verify/string/levenshtein_distance.test.cpp

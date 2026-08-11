@@ -147,6 +147,9 @@ data:
     path: graph/tree/heavy_light_decomposition.hpp
     title: Heavy Light Decomposition
   - icon: ':heavy_check_mark:'
+    path: graph/tree/mo_on_tree.hpp
+    title: Mo on Tree
+  - icon: ':heavy_check_mark:'
     path: graph/tree/range_contour_query.hpp
     title: Range Contour Query on Tree
   - icon: ':heavy_check_mark:'
@@ -382,6 +385,9 @@ data:
     path: verify/graph/tree/jump_on_tree.test.cpp
     title: verify/graph/tree/jump_on_tree.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/mo_on_tree.test.cpp
+    title: verify/graph/tree/mo_on_tree.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
     title: verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
   - icon: ':heavy_check_mark:'
@@ -577,6 +583,7 @@ data:
   - graph/tree/centroid_decomposition.hpp
   - graph/tree/all.hpp
   - graph/tree/tree.hpp
+  - graph/tree/mo_on_tree.hpp
   - graph/tree/sparse_table_lca.hpp
   - graph/tree/tree_hash.hpp
   - graph/tree/rerooting_static_top_tree.hpp
@@ -653,6 +660,7 @@ data:
   - verify/graph/tree/tree_algorithms.test.cpp
   - verify/graph/tree/dsu_on_tree.test.cpp
   - verify/graph/tree/dsu_on_tree.test.cpp
+  - verify/graph/tree/mo_on_tree.test.cpp
   - verify/graph/tree/tree_diameter.test.cpp
   - verify/graph/tree/tree_diameter.test.cpp
   - verify/graph/tree/jump_on_tree.test.cpp

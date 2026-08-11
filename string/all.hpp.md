@@ -41,6 +41,9 @@ data:
     path: string/manacher.hpp
     title: Manacher Algorithm
   - icon: ':heavy_check_mark:'
+    path: string/map_trie.hpp
+    title: Map Trie
+  - icon: ':heavy_check_mark:'
     path: string/minimum_rotation.hpp
     title: Minimum Rotation
   - icon: ':heavy_check_mark:'
@@ -735,7 +738,84 @@ data:
     \      radius++;\n        }\n        result.even[i] = radius;\n        if (right\
     \ < i + radius - 1) {\n            left = i - radius;\n            right = i +\
     \ radius - 1;\n        }\n    }\n    return result;\n}\n\n}  // namespace string\n\
-    }  // namespace m1une\n\n\n#line 1 \"string/palindrome_lexicographical_order.hpp\"\
+    }  // namespace m1une\n\n\n#line 1 \"string/map_trie.hpp\"\n\n\n\n#line 6 \"string/map_trie.hpp\"\
+    \n#include <functional>\n#line 8 \"string/map_trie.hpp\"\n#include <map>\n#line\
+    \ 10 \"string/map_trie.hpp\"\n\nnamespace m1une {\nnamespace string {\n\n// A\
+    \ multiset trie whose outgoing edges are stored in ordered maps.\ntemplate <class\
+    \ Symbol, class Compare = std::less<Symbol>>\nstruct MapTrie {\n    using node_id\
+    \ = int;\n    static constexpr node_id null_node = -1;\n\n    struct Node {\n\
+    \        std::map<Symbol, node_id, Compare> child;\n        int subtree_count\
+    \ = 0;\n        int terminal_count = 0;\n    };\n\n   private:\n    std::vector<Node>\
+    \ _nodes;\n    int _distinct_size;\n\n    node_id new_node() {\n        assert(_nodes.size()\
+    \ < std::size_t(std::numeric_limits<int>::max()));\n        _nodes.emplace_back();\n\
+    \        return int(_nodes.size()) - 1;\n    }\n\n    template <class Sequence>\n\
+    \    node_id find_node(const Sequence& sequence) const {\n        node_id node\
+    \ = 0;\n        for (const auto& symbol : sequence) {\n            auto iterator\
+    \ = _nodes[node].child.find(symbol);\n            if (iterator == _nodes[node].child.end())\
+    \ return null_node;\n            node = iterator->second;\n            if (_nodes[node].subtree_count\
+    \ == 0) return null_node;\n        }\n        return node;\n    }\n\n   public:\n\
+    \    MapTrie() : _nodes(1), _distinct_size(0) {}\n\n    int size() const {\n \
+    \       return _nodes[0].subtree_count;\n    }\n\n    int distinct_size() const\
+    \ {\n        return _distinct_size;\n    }\n\n    bool empty() const {\n     \
+    \   return size() == 0;\n    }\n\n    node_id root() const {\n        return 0;\n\
+    \    }\n\n    const Node& node(node_id id) const {\n        assert(0 <= id &&\
+    \ std::size_t(id) < _nodes.size());\n        return _nodes[id];\n    }\n\n   \
+    \ template <class Sequence>\n    node_id find(const Sequence& sequence) const\
+    \ {\n        return find_node(sequence);\n    }\n\n    std::size_t node_count()\
+    \ const {\n        return _nodes.size();\n    }\n\n    void reserve(std::size_t\
+    \ node_capacity) {\n        _nodes.reserve(node_capacity);\n    }\n\n    void\
+    \ clear() {\n        _nodes.clear();\n        _nodes.emplace_back();\n       \
+    \ _distinct_size = 0;\n    }\n\n    template <class Sequence>\n    node_id insert(const\
+    \ Sequence& sequence, int multiplicity = 1) {\n        assert(0 < multiplicity);\n\
+    \        node_id node = 0;\n        _nodes[node].subtree_count += multiplicity;\n\
+    \        for (const auto& symbol : sequence) {\n            auto iterator = _nodes[node].child.find(symbol);\n\
+    \            node_id child;\n            if (iterator == _nodes[node].child.end())\
+    \ {\n                child = new_node();\n                _nodes[node].child.emplace(symbol,\
+    \ child);\n            } else {\n                child = iterator->second;\n \
+    \           }\n            node = child;\n            _nodes[node].subtree_count\
+    \ += multiplicity;\n        }\n        if (_nodes[node].terminal_count == 0) _distinct_size++;\n\
+    \        _nodes[node].terminal_count += multiplicity;\n        return node;\n\
+    \    }\n\n    template <class Sequence>\n    int count(const Sequence& sequence)\
+    \ const {\n        node_id node = find_node(sequence);\n        return node ==\
+    \ null_node ? 0 : _nodes[node].terminal_count;\n    }\n\n    template <class Sequence>\n\
+    \    bool contains(const Sequence& sequence) const {\n        return count(sequence)\
+    \ != 0;\n    }\n\n    // Returns the number of stored sequences beginning with\
+    \ prefix.\n    template <class Sequence>\n    int prefix_count(const Sequence&\
+    \ prefix) const {\n        node_id node = find_node(prefix);\n        return node\
+    \ == null_node ? 0 : _nodes[node].subtree_count;\n    }\n\n    template <class\
+    \ Sequence>\n    bool starts_with(const Sequence& prefix) const {\n        return\
+    \ prefix_count(prefix) != 0;\n    }\n\n    template <class Sequence>\n    bool\
+    \ erase_one(const Sequence& sequence) {\n        node_id terminal = find_node(sequence);\n\
+    \        if (terminal == null_node || _nodes[terminal].terminal_count == 0) {\n\
+    \            return false;\n        }\n\n        node_id node = 0;\n        _nodes[node].subtree_count--;\n\
+    \        for (const auto& symbol : sequence) {\n            node = _nodes[node].child.find(symbol)->second;\n\
+    \            _nodes[node].subtree_count--;\n        }\n        _nodes[node].terminal_count--;\n\
+    \        if (_nodes[node].terminal_count == 0) _distinct_size--;\n        return\
+    \ true;\n    }\n\n    template <class Sequence>\n    bool erase(const Sequence&\
+    \ sequence) {\n        return erase_one(sequence);\n    }\n\n    template <class\
+    \ Sequence>\n    int erase_all(const Sequence& sequence) {\n        int multiplicity\
+    \ = count(sequence);\n        if (multiplicity == 0) return 0;\n\n        node_id\
+    \ node = 0;\n        _nodes[node].subtree_count -= multiplicity;\n        for\
+    \ (const auto& symbol : sequence) {\n            node = _nodes[node].child.find(symbol)->second;\n\
+    \            _nodes[node].subtree_count -= multiplicity;\n        }\n        _nodes[node].terminal_count\
+    \ = 0;\n        _distinct_size--;\n        return multiplicity;\n    }\n\n   \
+    \ // Calls callback(length, multiplicity) for every stored prefix.\n    // The\
+    \ empty prefix is reported with length 0 when it is stored.\n    template <class\
+    \ Sequence, class Callback>\n    void for_each_prefix(const Sequence& sequence,\
+    \ Callback callback) const {\n        node_id node = 0;\n        if (_nodes[node].terminal_count\
+    \ != 0) {\n            callback(0, _nodes[node].terminal_count);\n        }\n\n\
+    \        int length = 0;\n        for (const auto& symbol : sequence) {\n    \
+    \        auto iterator = _nodes[node].child.find(symbol);\n            if (iterator\
+    \ == _nodes[node].child.end()) return;\n            node = iterator->second;\n\
+    \            if (_nodes[node].subtree_count == 0) return;\n            length++;\n\
+    \            if (_nodes[node].terminal_count != 0) {\n                callback(length,\
+    \ _nodes[node].terminal_count);\n            }\n        }\n    }\n\n    // Returns\
+    \ the length of the longest stored sequence that is a prefix.\n    // Returns\
+    \ -1 when no stored prefix exists.\n    template <class Sequence>\n    int longest_prefix(const\
+    \ Sequence& sequence) const {\n        int result = _nodes[0].terminal_count ==\
+    \ 0 ? -1 : 0;\n        for_each_prefix(sequence, [&result](int length, int) {\n\
+    \            result = length;\n        });\n        return result;\n    }\n};\n\
+    \n}  // namespace string\n}  // namespace m1une\n\n\n#line 1 \"string/palindrome_lexicographical_order.hpp\"\
     \n\n\n\n#line 9 \"string/palindrome_lexicographical_order.hpp\"\n\n#line 12 \"\
     string/palindrome_lexicographical_order.hpp\"\n\nnamespace m1une {\nnamespace\
     \ string {\n\n// Indexes the distinct nonempty palindromic substrings of one sequence.\n\
@@ -2042,7 +2122,7 @@ data:
     \ left]);\n        while (i + z[i] < n && sequence[z[i]] == sequence[i + z[i]])\
     \ {\n            z[i]++;\n        }\n        if (right < i + z[i]) {\n       \
     \     left = i;\n            right = i + z[i];\n        }\n    }\n    return z;\n\
-    }\n\n}  // namespace string\n}  // namespace m1une\n\n\n#line 26 \"string/all.hpp\"\
+    }\n\n}  // namespace string\n}  // namespace m1une\n\n\n#line 27 \"string/all.hpp\"\
     \n\n\n"
   code: '#ifndef M1UNE_STRING_ALL_HPP
 
@@ -2068,6 +2148,8 @@ data:
     #include "lyndon_factorization.hpp"
 
     #include "manacher.hpp"
+
+    #include "map_trie.hpp"
 
     #include "minimum_rotation.hpp"
 
@@ -2110,6 +2192,7 @@ data:
   - string/lyndon_factorization.hpp
   - string/minimum_rotation.hpp
   - string/manacher.hpp
+  - string/map_trie.hpp
   - string/palindrome_lexicographical_order.hpp
   - string/prefix_substring_lcs.hpp
   - string/rolling_hash.hpp
@@ -2126,7 +2209,7 @@ data:
   isVerificationFile: false
   path: string/all.hpp
   requiredBy: []
-  timestamp: '2026-08-10 17:30:05+09:00'
+  timestamp: '2026-08-11 13:50:43+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/string/string_algorithms.test.cpp
@@ -2154,6 +2237,7 @@ contest when convenience matters more.
 | `string/longest_common_subsequence.hpp` | Finds one longest subsequence common to two sequences. |
 | `string/longest_common_substring.hpp` | Finds one longest substring common to two sequences. |
 | `string/lyndon_factorization.hpp` | Duval's linear-time Lyndon factorization. |
+| `string/map_trie.hpp` | Ordered-map multiset trie for large or generic alphabets. |
 | `string/z_algorithm.hpp` | Linear-time Z array. |
 | `string/manacher.hpp` | Odd/even palindrome radii and substring checks. |
 | `string/minimum_rotation.hpp` | Earliest lexicographically minimum cyclic shift in linear time. |

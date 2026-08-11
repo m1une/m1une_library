@@ -788,6 +788,9 @@ data:
       path: graph/tree/heavy_light_decomposition.hpp
       title: Heavy Light Decomposition
     - icon: ':heavy_check_mark:'
+      path: graph/tree/mo_on_tree.hpp
+      title: Mo on Tree
+    - icon: ':heavy_check_mark:'
       path: graph/tree/range_contour_query.hpp
       title: Range Contour Query on Tree
     - icon: ':heavy_check_mark:'
@@ -1196,6 +1199,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: string/manacher.hpp
       title: Manacher Algorithm
+    - icon: ':heavy_check_mark:'
+      path: string/map_trie.hpp
+      title: Map Trie
     - icon: ':heavy_check_mark:'
       path: string/minimum_rotation.hpp
       title: Minimum Rotation
@@ -1968,6 +1974,9 @@ data:
       path: verify/graph/tree/jump_on_tree.test.cpp
       title: verify/graph/tree/jump_on_tree.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/graph/tree/mo_on_tree.test.cpp
+      title: verify/graph/tree/mo_on_tree.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
       title: verify/graph/tree/rooted_tree_isomorphism_classification.test.cpp
     - icon: ':heavy_check_mark:'
@@ -2341,6 +2350,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/string/manacher.test.cpp
       title: verify/string/manacher.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/string/map_trie.test.cpp
+      title: verify/string/map_trie.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/string/minimum_rotation.test.cpp
       title: verify/string/minimum_rotation.test.cpp

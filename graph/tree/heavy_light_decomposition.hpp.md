@@ -11,6 +11,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/tree/all.hpp
     title: Tree All
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/mo_on_tree.hpp
+    title: Mo on Tree
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/graph/cow_game.test.cpp
@@ -24,6 +27,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/tree/jump_on_tree.test.cpp
     title: verify/graph/tree/jump_on_tree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/mo_on_tree.test.cpp
+    title: verify/graph/tree/mo_on_tree.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/tree/tree_algorithms.test.cpp
     title: verify/graph/tree/tree_algorithms.test.cpp
@@ -258,11 +264,13 @@ data:
   requiredBy:
   - graph/all.hpp
   - graph/tree/all.hpp
+  - graph/tree/mo_on_tree.hpp
   timestamp: '2026-07-11 19:47:32+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/tree/tree_algorithms.test.cpp
+  - verify/graph/tree/mo_on_tree.test.cpp
   - verify/graph/tree/jump_on_tree.test.cpp
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/cow_game.test.cpp
