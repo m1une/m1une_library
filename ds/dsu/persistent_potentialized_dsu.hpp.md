@@ -2,6 +2,9 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
+    path: ds/detail/persistent_binary_node_pool.hpp
+    title: ds/detail/persistent_binary_node_pool.hpp
+  - icon: ':heavy_check_mark:'
     path: monoid/concept.hpp
     title: Monoid Concept
   _extendedRequiredBy: []
@@ -9,106 +12,75 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/dsu/persistent_potentialized_dsu.test.cpp
     title: verify/ds/dsu/persistent_potentialized_dsu.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/persistent_release.test.cpp
+    title: verify/ds/persistent_release.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"ds/dsu/persistent_potentialized_dsu.hpp\"\n\n\n\n#include\
-    \ <algorithm>\n#include <cassert>\n#include <concepts>\n#include <memory>\n#include\
-    \ <utility>\n#include <vector>\n\n#line 1 \"monoid/concept.hpp\"\n\n\n\n#line\
-    \ 5 \"monoid/concept.hpp\"\n\nnamespace m1une {\nnamespace monoid {\n\n// Concept\
-    \ to check if a type satisfies the requirements of a Monoid.\n// A Monoid must\
-    \ have a `value_type`, an identity element `id()`, and an associative binary operation\
-    \ `op()`.\ntemplate <typename M>\nconcept IsMonoid = requires(typename M::value_type\
-    \ a, typename M::value_type b) {\n    // 1. Must define `value_type`\n    typename\
-    \ M::value_type;\n\n    // 2. Must have a static method `id()` returning `value_type`\n\
-    \    { M::id() } -> std::same_as<typename M::value_type>;\n\n    // 3. Must have\
-    \ a static method `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for groups. A type satisfying this concept\
-    \ must also obey the group\n// laws; concepts can check the interface but not\
-    \ the algebraic properties.\ntemplate <typename M>\nconcept IsGroup = IsMonoid<M>\
-    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for commutative groups. Commutativity is a\
-    \ semantic requirement and\n// cannot be checked by a C++ concept.\ntemplate <typename\
-    \ M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\n}  // namespace monoid\n}  //\
-    \ namespace m1une\n\n\n#line 12 \"ds/dsu/persistent_potentialized_dsu.hpp\"\n\n\
-    namespace m1une {\nnamespace ds {\n\ntemplate <m1une::monoid::IsGroup Group>\n\
-    \    requires std::equality_comparable<typename Group::value_type>\nstruct PersistentPotentializedDsu\
-    \ {\n    using T = typename Group::value_type;\n\n    struct Value {\n       \
-    \ int parent_or_size;\n        T diff_to_parent;\n\n        Value() : parent_or_size(0),\
-    \ diff_to_parent(Group::id()) {}\n        Value(int parent_or_size_, const T&\
-    \ diff_to_parent_)\n            : parent_or_size(parent_or_size_), diff_to_parent(diff_to_parent_)\
-    \ {}\n        Value(int parent_or_size_, T&& diff_to_parent_)\n            : parent_or_size(parent_or_size_),\
-    \ diff_to_parent(std::move(diff_to_parent_)) {}\n    };\n\n   private:\n    struct\
-    \ Node {\n        Value val;\n        int l, r;\n\n        Node() : val(), l(0),\
-    \ r(0) {}\n        explicit Node(const Value& value) : val(value), l(0), r(0)\
-    \ {}\n        explicit Node(Value&& value) : val(std::move(value)), l(0), r(0)\
-    \ {}\n        Node(const Value& value, int left, int right) : val(value), l(left),\
-    \ r(right) {}\n        Node(Value&& value, int left, int right) : val(std::move(value)),\
-    \ l(left), r(right) {}\n    };\n\n    int _n;\n    int _root;\n    std::shared_ptr<std::vector<Node>>\
-    \ _pool;\n\n    explicit PersistentPotentializedDsu(int n, int root, std::shared_ptr<std::vector<Node>>\
-    \ pool)\n        : _n(n), _root(root), _pool(std::move(pool)) {}\n\n    int new_node(const\
-    \ Node& node) const {\n        _pool->push_back(node);\n        return int(_pool->size())\
-    \ - 1;\n    }\n\n    int new_node(Node&& node) const {\n        _pool->push_back(std::move(node));\n\
-    \        return int(_pool->size()) - 1;\n    }\n\n    int build(int l, int r)\
-    \ const {\n        if (l == r) return 0;\n        if (r - l == 1) return new_node(Node(Value(-1,\
-    \ Group::id())));\n        int m = (l + r) >> 1;\n        int left = build(l,\
-    \ m);\n        int right = build(m, r);\n        return new_node(Node(Value(),\
-    \ left, right));\n    }\n\n    int set_node(int t, int l, int r, int p, Value\
-    \ value) const {\n        if (r - l == 1) return new_node(Node(std::move(value)));\n\
-    \        int m = (l + r) >> 1;\n        int left = (*_pool)[t].l;\n        int\
-    \ right = (*_pool)[t].r;\n        if (p < m) {\n            left = set_node(left,\
-    \ l, m, p, std::move(value));\n        } else {\n            right = set_node(right,\
-    \ m, r, p, std::move(value));\n        }\n        return new_node(Node(Value(),\
-    \ left, right));\n    }\n\n    Value get_value(int t, int l, int r, int p) const\
-    \ {\n        while (r - l > 1) {\n            int m = (l + r) >> 1;\n        \
-    \    if (p < m) {\n                t = (*_pool)[t].l;\n                r = m;\n\
-    \            } else {\n                t = (*_pool)[t].r;\n                l =\
-    \ m;\n            }\n        }\n        return (*_pool)[t].val;\n    }\n\n   \
-    \ std::pair<int, T> leader_and_potential(int a) const {\n        T res = Group::id();\n\
-    \        while (true) {\n            Value cur = get(a);\n            if (cur.parent_or_size\
-    \ < 0) return {a, res};\n            res = Group::op(cur.diff_to_parent, res);\n\
-    \            a = cur.parent_or_size;\n        }\n    }\n\n   public:\n    PersistentPotentializedDsu()\
-    \ : PersistentPotentializedDsu(0) {}\n\n    explicit PersistentPotentializedDsu(int\
-    \ n) : _n(n), _root(0), _pool(std::make_shared<std::vector<Node>>()) {\n     \
-    \   assert(0 <= n);\n        _pool->reserve(n * 4 + 1);\n        _pool->push_back(Node());\n\
-    \        if (_n > 0) _root = build(0, _n);\n    }\n\n    int size() const {\n\
-    \        return _n;\n    }\n\n    bool empty() const {\n        return _n == 0;\n\
-    \    }\n\n    int leader(int a) const {\n        assert(0 <= a && a < _n);\n \
-    \       return leader_and_potential(a).first;\n    }\n\n    bool same(int a, int\
-    \ b) const {\n        assert(0 <= a && a < _n);\n        assert(0 <= b && b <\
-    \ _n);\n        return leader(a) == leader(b);\n    }\n\n    int group_size(int\
-    \ a) const {\n        assert(0 <= a && a < _n);\n        return -get(leader(a)).parent_or_size;\n\
-    \    }\n\n    int size(int a) const {\n        return group_size(a);\n    }\n\n\
-    \    T potential(int a) const {\n        assert(0 <= a && a < _n);\n        return\
-    \ leader_and_potential(a).second;\n    }\n\n    T diff(int a, int b) const {\n\
-    \        assert(same(a, b));\n        return Group::op(Group::inv(potential(a)),\
-    \ potential(b));\n    }\n\n    Value get(int p) const {\n        assert(0 <= p\
-    \ && p < _n);\n        return get_value(_root, 0, _n, p);\n    }\n\n    int parent_or_size(int\
-    \ p) const {\n        return get(p).parent_or_size;\n    }\n\n    std::pair<PersistentPotentializedDsu,\
-    \ bool> merge(int a, int b, const T& w) const {\n        assert(0 <= a && a <\
-    \ _n);\n        assert(0 <= b && b < _n);\n        auto [x, pa] = leader_and_potential(a);\n\
-    \        auto [y, pb] = leader_and_potential(b);\n        if (x == y) return {*this,\
-    \ Group::op(Group::inv(pa), pb) == w};\n\n        int sx = -get(x).parent_or_size;\n\
-    \        int sy = -get(y).parent_or_size;\n        T y_from_x = Group::op(Group::op(pa,\
-    \ w), Group::inv(pb));\n        if (sx < sy) {\n            std::swap(x, y);\n\
-    \            std::swap(sx, sy);\n            y_from_x = Group::inv(y_from_x);\n\
-    \        }\n        int root = set_node(_root, 0, _n, x, Value(-(sx + sy), Group::id()));\n\
-    \        root = set_node(root, 0, _n, y, Value(x, std::move(y_from_x)));\n   \
-    \     return {PersistentPotentializedDsu(_n, root, _pool), true};\n    }\n\n \
-    \   std::vector<std::vector<int>> groups() const {\n        std::vector<int> leader_buf(_n),\
-    \ group_size(_n);\n        for (int i = 0; i < _n; i++) {\n            leader_buf[i]\
-    \ = leader(i);\n            group_size[leader_buf[i]]++;\n        }\n        std::vector<std::vector<int>>\
-    \ result(_n);\n        for (int i = 0; i < _n; i++) {\n            result[i].reserve(group_size[i]);\n\
-    \        }\n        for (int i = 0; i < _n; i++) {\n            result[leader_buf[i]].push_back(i);\n\
-    \        }\n        result.erase(std::remove_if(result.begin(), result.end(),\
-    \ [&](const std::vector<int>& v) { return v.empty(); }),\n                   \
-    \  result.end());\n        return result;\n    }\n};\n\n}  // namespace ds\n}\
-    \  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_PERSISTENT_POTENTIALIZED_DSU_HPP\n#define M1UNE_PERSISTENT_POTENTIALIZED_DSU_HPP\
-    \ 1\n\n#include <algorithm>\n#include <cassert>\n#include <concepts>\n#include\
-    \ <memory>\n#include <utility>\n#include <vector>\n\n#include \"../../monoid/concept.hpp\"\
+    \ <algorithm>\n#include <cassert>\n#include <concepts>\n#include <cstddef>\n#include\
+    \ <memory>\n#include <utility>\n#include <vector>\n\n#line 1 \"monoid/concept.hpp\"\
+    \n\n\n\n#line 5 \"monoid/concept.hpp\"\n\nnamespace m1une {\nnamespace monoid\
+    \ {\n\n// Concept to check if a type satisfies the requirements of a Monoid.\n\
+    // A Monoid must have a `value_type`, an identity element `id()`, and an associative\
+    \ binary operation `op()`.\ntemplate <typename M>\nconcept IsMonoid = requires(typename\
+    \ M::value_type a, typename M::value_type b) {\n    // 1. Must define `value_type`\n\
+    \    typename M::value_type;\n\n    // 2. Must have a static method `id()` returning\
+    \ `value_type`\n    { M::id() } -> std::same_as<typename M::value_type>;\n\n \
+    \   // 3. Must have a static method `op(a, b)` returning `value_type`\n    { M::op(a,\
+    \ b) } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for groups.\
+    \ A type satisfying this concept must also obey the group\n// laws; concepts can\
+    \ check the interface but not the algebraic properties.\ntemplate <typename M>\n\
+    concept IsGroup = IsMonoid<M> && requires(typename M::value_type a) {\n    { M::inv(a)\
+    \ } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for commutative\
+    \ groups. Commutativity is a semantic requirement and\n// cannot be checked by\
+    \ a C++ concept.\ntemplate <typename M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\
+    \n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 1 \"ds/detail/persistent_binary_node_pool.hpp\"\
+    \n\n\n\n#line 6 \"ds/detail/persistent_binary_node_pool.hpp\"\n#include <deque>\n\
+    #include <limits>\n#include <optional>\n#line 11 \"ds/detail/persistent_binary_node_pool.hpp\"\
+    \n\nnamespace m1une {\nnamespace ds {\nnamespace detail {\n\n// Node must have\
+    \ integer `l` and `r` members. New nodes initially have no\n// owner; discard_unreferenced()\
+    \ removes temporary path-copy nodes after the\n// result roots have been retained.\n\
+    template <class Node, int null_node = -1>\nstruct PersistentBinaryNodePool {\n\
+    \   private:\n    std::deque<std::optional<Node>> _nodes;\n    std::vector<int>\
+    \ _references;\n    std::vector<int> _next_free;\n    std::vector<int> _unowned;\n\
+    \    int _first_free = -1;\n    std::size_t _live_nodes = 0;\n\n    void release_zero(int\
+    \ node) {\n        assert(node != null_node && _nodes[node].has_value());\n  \
+    \      int left = (*_nodes[node]).l;\n        int right = (*_nodes[node]).r;\n\
+    \        _nodes[node].reset();\n        _next_free[node] = _first_free;\n    \
+    \    _first_free = node;\n        --_live_nodes;\n        if (left != null_node\
+    \ && --_references[left] == 0) release_zero(left);\n        if (right != null_node\
+    \ && --_references[right] == 0) release_zero(right);\n    }\n\n   public:\n  \
+    \  PersistentBinaryNodePool() {\n        if constexpr (null_node == 0) {\n   \
+    \         _nodes.emplace_back();\n            _references.push_back(0);\n    \
+    \        _next_free.push_back(-1);\n        }\n    }\n\n    Node& operator[](int\
+    \ node) {\n        assert(node != null_node && _nodes[node].has_value());\n  \
+    \      return *_nodes[node];\n    }\n\n    const Node& operator[](int node) const\
+    \ {\n        assert(node != null_node && _nodes[node].has_value());\n        return\
+    \ *_nodes[node];\n    }\n\n    template <class... Args>\n    int emplace(Args&&...\
+    \ args) {\n        int result;\n        if (_first_free == -1) {\n           \
+    \ assert(_nodes.size() < std::size_t(std::numeric_limits<int>::max()));\n    \
+    \        result = int(_nodes.size());\n            _nodes.emplace_back(std::in_place,\
+    \ std::forward<Args>(args)...);\n            _references.push_back(0);\n     \
+    \       _next_free.push_back(-1);\n        } else {\n            result = _first_free;\n\
+    \            _first_free = _next_free[result];\n            _nodes[result].emplace(std::forward<Args>(args)...);\n\
+    \            _references[result] = 0;\n        }\n        retain((*_nodes[result]).l);\n\
+    \        retain((*_nodes[result]).r);\n        _unowned.push_back(result);\n \
+    \       ++_live_nodes;\n        return result;\n    }\n\n    void retain(int node)\
+    \ {\n        if (node != null_node) {\n            assert(_nodes[node].has_value());\n\
+    \            ++_references[node];\n        }\n    }\n\n    void release(int node)\
+    \ {\n        if (node == null_node) return;\n        assert(_nodes[node].has_value()\
+    \ && _references[node] > 0);\n        if (--_references[node] == 0) release_zero(node);\n\
+    \    }\n\n    void discard_unreferenced() {\n        while (!_unowned.empty())\
+    \ {\n            int node = _unowned.back();\n            _unowned.pop_back();\n\
+    \            if (_nodes[node].has_value() && _references[node] == 0) release_zero(node);\n\
+    \        }\n    }\n\n    void reserve(std::size_t) {}\n\n    int next_index()\
+    \ const { return _first_free == -1 ? int(_nodes.size()) : _first_free; }\n\n \
+    \   std::size_t size() const { return _live_nodes; }\n};\n\n}  // namespace detail\n\
+    }  // namespace ds\n}  // namespace m1une\n\n\n#line 14 \"ds/dsu/persistent_potentialized_dsu.hpp\"\
     \n\nnamespace m1une {\nnamespace ds {\n\ntemplate <m1une::monoid::IsGroup Group>\n\
     \    requires std::equality_comparable<typename Group::value_type>\nstruct PersistentPotentializedDsu\
     \ {\n    using T = typename Group::value_type;\n\n    struct Value {\n       \
@@ -122,75 +94,196 @@ data:
     \ {}\n        explicit Node(Value&& value) : val(std::move(value)), l(0), r(0)\
     \ {}\n        Node(const Value& value, int left, int right) : val(value), l(left),\
     \ r(right) {}\n        Node(Value&& value, int left, int right) : val(std::move(value)),\
-    \ l(left), r(right) {}\n    };\n\n    int _n;\n    int _root;\n    std::shared_ptr<std::vector<Node>>\
-    \ _pool;\n\n    explicit PersistentPotentializedDsu(int n, int root, std::shared_ptr<std::vector<Node>>\
-    \ pool)\n        : _n(n), _root(root), _pool(std::move(pool)) {}\n\n    int new_node(const\
-    \ Node& node) const {\n        _pool->push_back(node);\n        return int(_pool->size())\
-    \ - 1;\n    }\n\n    int new_node(Node&& node) const {\n        _pool->push_back(std::move(node));\n\
-    \        return int(_pool->size()) - 1;\n    }\n\n    int build(int l, int r)\
-    \ const {\n        if (l == r) return 0;\n        if (r - l == 1) return new_node(Node(Value(-1,\
-    \ Group::id())));\n        int m = (l + r) >> 1;\n        int left = build(l,\
-    \ m);\n        int right = build(m, r);\n        return new_node(Node(Value(),\
-    \ left, right));\n    }\n\n    int set_node(int t, int l, int r, int p, Value\
-    \ value) const {\n        if (r - l == 1) return new_node(Node(std::move(value)));\n\
-    \        int m = (l + r) >> 1;\n        int left = (*_pool)[t].l;\n        int\
-    \ right = (*_pool)[t].r;\n        if (p < m) {\n            left = set_node(left,\
-    \ l, m, p, std::move(value));\n        } else {\n            right = set_node(right,\
-    \ m, r, p, std::move(value));\n        }\n        return new_node(Node(Value(),\
-    \ left, right));\n    }\n\n    Value get_value(int t, int l, int r, int p) const\
-    \ {\n        while (r - l > 1) {\n            int m = (l + r) >> 1;\n        \
-    \    if (p < m) {\n                t = (*_pool)[t].l;\n                r = m;\n\
-    \            } else {\n                t = (*_pool)[t].r;\n                l =\
-    \ m;\n            }\n        }\n        return (*_pool)[t].val;\n    }\n\n   \
-    \ std::pair<int, T> leader_and_potential(int a) const {\n        T res = Group::id();\n\
-    \        while (true) {\n            Value cur = get(a);\n            if (cur.parent_or_size\
-    \ < 0) return {a, res};\n            res = Group::op(cur.diff_to_parent, res);\n\
-    \            a = cur.parent_or_size;\n        }\n    }\n\n   public:\n    PersistentPotentializedDsu()\
+    \ l(left), r(right) {}\n    };\n\n    int _n;\n    int _root;\n    using Pool\
+    \ = detail::PersistentBinaryNodePool<Node, 0>;\n\n    std::shared_ptr<Pool> _pool;\n\
+    \n    explicit PersistentPotentializedDsu(int n, int root, std::shared_ptr<Pool>\
+    \ pool)\n        : _n(n), _root(root), _pool(std::move(pool)) {\n        _pool->retain(_root);\n\
+    \    }\n\n    int new_node(const Node& node) const {\n        return _pool->emplace(node);\n\
+    \    }\n\n    int new_node(Node&& node) const {\n        return _pool->emplace(std::move(node));\n\
+    \    }\n\n    int build(int l, int r) const {\n        if (l == r) return 0;\n\
+    \        if (r - l == 1) return new_node(Node(Value(-1, Group::id())));\n    \
+    \    int m = (l + r) >> 1;\n        int left = build(l, m);\n        int right\
+    \ = build(m, r);\n        return new_node(Node(Value(), left, right));\n    }\n\
+    \n    int set_node(int t, int l, int r, int p, Value value) const {\n        if\
+    \ (r - l == 1) return new_node(Node(std::move(value)));\n        int m = (l +\
+    \ r) >> 1;\n        int left = (*_pool)[t].l;\n        int right = (*_pool)[t].r;\n\
+    \        if (p < m) {\n            left = set_node(left, l, m, p, std::move(value));\n\
+    \        } else {\n            right = set_node(right, m, r, p, std::move(value));\n\
+    \        }\n        return new_node(Node(Value(), left, right));\n    }\n\n  \
+    \  Value get_value(int t, int l, int r, int p) const {\n        while (r - l >\
+    \ 1) {\n            int m = (l + r) >> 1;\n            if (p < m) {\n        \
+    \        t = (*_pool)[t].l;\n                r = m;\n            } else {\n  \
+    \              t = (*_pool)[t].r;\n                l = m;\n            }\n   \
+    \     }\n        return (*_pool)[t].val;\n    }\n\n    std::pair<int, T> leader_and_potential(int\
+    \ a) const {\n        T res = Group::id();\n        while (true) {\n         \
+    \   Value cur = get(a);\n            if (cur.parent_or_size < 0) return {a, res};\n\
+    \            res = Group::op(cur.diff_to_parent, res);\n            a = cur.parent_or_size;\n\
+    \        }\n    }\n\n    PersistentPotentializedDsu make_version(int root) const\
+    \ {\n        PersistentPotentializedDsu result(_n, root, _pool);\n        _pool->discard_unreferenced();\n\
+    \        return result;\n    }\n\n   public:\n    PersistentPotentializedDsu()\
     \ : PersistentPotentializedDsu(0) {}\n\n    explicit PersistentPotentializedDsu(int\
-    \ n) : _n(n), _root(0), _pool(std::make_shared<std::vector<Node>>()) {\n     \
-    \   assert(0 <= n);\n        _pool->reserve(n * 4 + 1);\n        _pool->push_back(Node());\n\
-    \        if (_n > 0) _root = build(0, _n);\n    }\n\n    int size() const {\n\
-    \        return _n;\n    }\n\n    bool empty() const {\n        return _n == 0;\n\
-    \    }\n\n    int leader(int a) const {\n        assert(0 <= a && a < _n);\n \
-    \       return leader_and_potential(a).first;\n    }\n\n    bool same(int a, int\
-    \ b) const {\n        assert(0 <= a && a < _n);\n        assert(0 <= b && b <\
-    \ _n);\n        return leader(a) == leader(b);\n    }\n\n    int group_size(int\
-    \ a) const {\n        assert(0 <= a && a < _n);\n        return -get(leader(a)).parent_or_size;\n\
-    \    }\n\n    int size(int a) const {\n        return group_size(a);\n    }\n\n\
-    \    T potential(int a) const {\n        assert(0 <= a && a < _n);\n        return\
-    \ leader_and_potential(a).second;\n    }\n\n    T diff(int a, int b) const {\n\
-    \        assert(same(a, b));\n        return Group::op(Group::inv(potential(a)),\
-    \ potential(b));\n    }\n\n    Value get(int p) const {\n        assert(0 <= p\
-    \ && p < _n);\n        return get_value(_root, 0, _n, p);\n    }\n\n    int parent_or_size(int\
-    \ p) const {\n        return get(p).parent_or_size;\n    }\n\n    std::pair<PersistentPotentializedDsu,\
-    \ bool> merge(int a, int b, const T& w) const {\n        assert(0 <= a && a <\
-    \ _n);\n        assert(0 <= b && b < _n);\n        auto [x, pa] = leader_and_potential(a);\n\
-    \        auto [y, pb] = leader_and_potential(b);\n        if (x == y) return {*this,\
-    \ Group::op(Group::inv(pa), pb) == w};\n\n        int sx = -get(x).parent_or_size;\n\
-    \        int sy = -get(y).parent_or_size;\n        T y_from_x = Group::op(Group::op(pa,\
-    \ w), Group::inv(pb));\n        if (sx < sy) {\n            std::swap(x, y);\n\
-    \            std::swap(sx, sy);\n            y_from_x = Group::inv(y_from_x);\n\
-    \        }\n        int root = set_node(_root, 0, _n, x, Value(-(sx + sy), Group::id()));\n\
-    \        root = set_node(root, 0, _n, y, Value(x, std::move(y_from_x)));\n   \
-    \     return {PersistentPotentializedDsu(_n, root, _pool), true};\n    }\n\n \
-    \   std::vector<std::vector<int>> groups() const {\n        std::vector<int> leader_buf(_n),\
-    \ group_size(_n);\n        for (int i = 0; i < _n; i++) {\n            leader_buf[i]\
-    \ = leader(i);\n            group_size[leader_buf[i]]++;\n        }\n        std::vector<std::vector<int>>\
-    \ result(_n);\n        for (int i = 0; i < _n; i++) {\n            result[i].reserve(group_size[i]);\n\
-    \        }\n        for (int i = 0; i < _n; i++) {\n            result[leader_buf[i]].push_back(i);\n\
+    \ n) : _n(n), _root(0), _pool(std::make_shared<Pool>()) {\n        assert(0 <=\
+    \ n);\n        _pool->reserve(n * 4 + 1);\n        if (_n > 0) _root = build(0,\
+    \ _n);\n        _pool->retain(_root);\n        _pool->discard_unreferenced();\n\
+    \    }\n\n    PersistentPotentializedDsu(const PersistentPotentializedDsu& other)\n\
+    \        : _n(other._n), _root(other._root), _pool(other._pool) {\n        if\
+    \ (_pool) _pool->retain(_root);\n    }\n\n    PersistentPotentializedDsu(PersistentPotentializedDsu&&\
+    \ other) noexcept\n        : _n(other._n), _root(other._root), _pool(std::move(other._pool))\
+    \ {\n        other._n = 0;\n        other._root = 0;\n    }\n\n    PersistentPotentializedDsu&\
+    \ operator=(const PersistentPotentializedDsu& other) {\n        if (this == &other)\
+    \ return *this;\n        if (other._pool) other._pool->retain(other._root);\n\
+    \        if (_pool) _pool->release(_root);\n        _n = other._n;\n        _root\
+    \ = other._root;\n        _pool = other._pool;\n        return *this;\n    }\n\
+    \n    PersistentPotentializedDsu& operator=(PersistentPotentializedDsu&& other)\
+    \ noexcept {\n        if (this == &other) return *this;\n        if (_pool) _pool->release(_root);\n\
+    \        _n = other._n;\n        _root = other._root;\n        _pool = std::move(other._pool);\n\
+    \        other._n = 0;\n        other._root = 0;\n        return *this;\n    }\n\
+    \n    ~PersistentPotentializedDsu() {\n        if (_pool) _pool->release(_root);\n\
+    \    }\n\n    int size() const {\n        return _n;\n    }\n\n    bool empty()\
+    \ const {\n        return _n == 0;\n    }\n\n    void release() {\n        if\
+    \ (_pool) _pool->release(_root);\n        _n = 0;\n        _root = 0;\n      \
+    \  _pool = std::make_shared<Pool>();\n    }\n\n    std::size_t node_count() const\
+    \ { return _pool ? _pool->size() : 0; }\n\n    int leader(int a) const {\n   \
+    \     assert(0 <= a && a < _n);\n        return leader_and_potential(a).first;\n\
+    \    }\n\n    bool same(int a, int b) const {\n        assert(0 <= a && a < _n);\n\
+    \        assert(0 <= b && b < _n);\n        return leader(a) == leader(b);\n \
+    \   }\n\n    int group_size(int a) const {\n        assert(0 <= a && a < _n);\n\
+    \        return -get(leader(a)).parent_or_size;\n    }\n\n    int size(int a)\
+    \ const {\n        return group_size(a);\n    }\n\n    T potential(int a) const\
+    \ {\n        assert(0 <= a && a < _n);\n        return leader_and_potential(a).second;\n\
+    \    }\n\n    T diff(int a, int b) const {\n        assert(same(a, b));\n    \
+    \    return Group::op(Group::inv(potential(a)), potential(b));\n    }\n\n    Value\
+    \ get(int p) const {\n        assert(0 <= p && p < _n);\n        return get_value(_root,\
+    \ 0, _n, p);\n    }\n\n    int parent_or_size(int p) const {\n        return get(p).parent_or_size;\n\
+    \    }\n\n    std::pair<PersistentPotentializedDsu, bool> merge(int a, int b,\
+    \ const T& w) const {\n        assert(0 <= a && a < _n);\n        assert(0 <=\
+    \ b && b < _n);\n        auto [x, pa] = leader_and_potential(a);\n        auto\
+    \ [y, pb] = leader_and_potential(b);\n        if (x == y) return {*this, Group::op(Group::inv(pa),\
+    \ pb) == w};\n\n        int sx = -get(x).parent_or_size;\n        int sy = -get(y).parent_or_size;\n\
+    \        T y_from_x = Group::op(Group::op(pa, w), Group::inv(pb));\n        if\
+    \ (sx < sy) {\n            std::swap(x, y);\n            std::swap(sx, sy);\n\
+    \            y_from_x = Group::inv(y_from_x);\n        }\n        int root = set_node(_root,\
+    \ 0, _n, x, Value(-(sx + sy), Group::id()));\n        root = set_node(root, 0,\
+    \ _n, y, Value(x, std::move(y_from_x)));\n        return {make_version(root),\
+    \ true};\n    }\n\n    std::vector<std::vector<int>> groups() const {\n      \
+    \  std::vector<int> leader_buf(_n), group_size(_n);\n        for (int i = 0; i\
+    \ < _n; i++) {\n            leader_buf[i] = leader(i);\n            group_size[leader_buf[i]]++;\n\
+    \        }\n        std::vector<std::vector<int>> result(_n);\n        for (int\
+    \ i = 0; i < _n; i++) {\n            result[i].reserve(group_size[i]);\n     \
+    \   }\n        for (int i = 0; i < _n; i++) {\n            result[leader_buf[i]].push_back(i);\n\
+    \        }\n        result.erase(std::remove_if(result.begin(), result.end(),\
+    \ [&](const std::vector<int>& v) { return v.empty(); }),\n                   \
+    \  result.end());\n        return result;\n    }\n};\n\n}  // namespace ds\n}\
+    \  // namespace m1une\n\n\n"
+  code: "#ifndef M1UNE_PERSISTENT_POTENTIALIZED_DSU_HPP\n#define M1UNE_PERSISTENT_POTENTIALIZED_DSU_HPP\
+    \ 1\n\n#include <algorithm>\n#include <cassert>\n#include <concepts>\n#include\
+    \ <cstddef>\n#include <memory>\n#include <utility>\n#include <vector>\n\n#include\
+    \ \"../../monoid/concept.hpp\"\n#include \"../detail/persistent_binary_node_pool.hpp\"\
+    \n\nnamespace m1une {\nnamespace ds {\n\ntemplate <m1une::monoid::IsGroup Group>\n\
+    \    requires std::equality_comparable<typename Group::value_type>\nstruct PersistentPotentializedDsu\
+    \ {\n    using T = typename Group::value_type;\n\n    struct Value {\n       \
+    \ int parent_or_size;\n        T diff_to_parent;\n\n        Value() : parent_or_size(0),\
+    \ diff_to_parent(Group::id()) {}\n        Value(int parent_or_size_, const T&\
+    \ diff_to_parent_)\n            : parent_or_size(parent_or_size_), diff_to_parent(diff_to_parent_)\
+    \ {}\n        Value(int parent_or_size_, T&& diff_to_parent_)\n            : parent_or_size(parent_or_size_),\
+    \ diff_to_parent(std::move(diff_to_parent_)) {}\n    };\n\n   private:\n    struct\
+    \ Node {\n        Value val;\n        int l, r;\n\n        Node() : val(), l(0),\
+    \ r(0) {}\n        explicit Node(const Value& value) : val(value), l(0), r(0)\
+    \ {}\n        explicit Node(Value&& value) : val(std::move(value)), l(0), r(0)\
+    \ {}\n        Node(const Value& value, int left, int right) : val(value), l(left),\
+    \ r(right) {}\n        Node(Value&& value, int left, int right) : val(std::move(value)),\
+    \ l(left), r(right) {}\n    };\n\n    int _n;\n    int _root;\n    using Pool\
+    \ = detail::PersistentBinaryNodePool<Node, 0>;\n\n    std::shared_ptr<Pool> _pool;\n\
+    \n    explicit PersistentPotentializedDsu(int n, int root, std::shared_ptr<Pool>\
+    \ pool)\n        : _n(n), _root(root), _pool(std::move(pool)) {\n        _pool->retain(_root);\n\
+    \    }\n\n    int new_node(const Node& node) const {\n        return _pool->emplace(node);\n\
+    \    }\n\n    int new_node(Node&& node) const {\n        return _pool->emplace(std::move(node));\n\
+    \    }\n\n    int build(int l, int r) const {\n        if (l == r) return 0;\n\
+    \        if (r - l == 1) return new_node(Node(Value(-1, Group::id())));\n    \
+    \    int m = (l + r) >> 1;\n        int left = build(l, m);\n        int right\
+    \ = build(m, r);\n        return new_node(Node(Value(), left, right));\n    }\n\
+    \n    int set_node(int t, int l, int r, int p, Value value) const {\n        if\
+    \ (r - l == 1) return new_node(Node(std::move(value)));\n        int m = (l +\
+    \ r) >> 1;\n        int left = (*_pool)[t].l;\n        int right = (*_pool)[t].r;\n\
+    \        if (p < m) {\n            left = set_node(left, l, m, p, std::move(value));\n\
+    \        } else {\n            right = set_node(right, m, r, p, std::move(value));\n\
+    \        }\n        return new_node(Node(Value(), left, right));\n    }\n\n  \
+    \  Value get_value(int t, int l, int r, int p) const {\n        while (r - l >\
+    \ 1) {\n            int m = (l + r) >> 1;\n            if (p < m) {\n        \
+    \        t = (*_pool)[t].l;\n                r = m;\n            } else {\n  \
+    \              t = (*_pool)[t].r;\n                l = m;\n            }\n   \
+    \     }\n        return (*_pool)[t].val;\n    }\n\n    std::pair<int, T> leader_and_potential(int\
+    \ a) const {\n        T res = Group::id();\n        while (true) {\n         \
+    \   Value cur = get(a);\n            if (cur.parent_or_size < 0) return {a, res};\n\
+    \            res = Group::op(cur.diff_to_parent, res);\n            a = cur.parent_or_size;\n\
+    \        }\n    }\n\n    PersistentPotentializedDsu make_version(int root) const\
+    \ {\n        PersistentPotentializedDsu result(_n, root, _pool);\n        _pool->discard_unreferenced();\n\
+    \        return result;\n    }\n\n   public:\n    PersistentPotentializedDsu()\
+    \ : PersistentPotentializedDsu(0) {}\n\n    explicit PersistentPotentializedDsu(int\
+    \ n) : _n(n), _root(0), _pool(std::make_shared<Pool>()) {\n        assert(0 <=\
+    \ n);\n        _pool->reserve(n * 4 + 1);\n        if (_n > 0) _root = build(0,\
+    \ _n);\n        _pool->retain(_root);\n        _pool->discard_unreferenced();\n\
+    \    }\n\n    PersistentPotentializedDsu(const PersistentPotentializedDsu& other)\n\
+    \        : _n(other._n), _root(other._root), _pool(other._pool) {\n        if\
+    \ (_pool) _pool->retain(_root);\n    }\n\n    PersistentPotentializedDsu(PersistentPotentializedDsu&&\
+    \ other) noexcept\n        : _n(other._n), _root(other._root), _pool(std::move(other._pool))\
+    \ {\n        other._n = 0;\n        other._root = 0;\n    }\n\n    PersistentPotentializedDsu&\
+    \ operator=(const PersistentPotentializedDsu& other) {\n        if (this == &other)\
+    \ return *this;\n        if (other._pool) other._pool->retain(other._root);\n\
+    \        if (_pool) _pool->release(_root);\n        _n = other._n;\n        _root\
+    \ = other._root;\n        _pool = other._pool;\n        return *this;\n    }\n\
+    \n    PersistentPotentializedDsu& operator=(PersistentPotentializedDsu&& other)\
+    \ noexcept {\n        if (this == &other) return *this;\n        if (_pool) _pool->release(_root);\n\
+    \        _n = other._n;\n        _root = other._root;\n        _pool = std::move(other._pool);\n\
+    \        other._n = 0;\n        other._root = 0;\n        return *this;\n    }\n\
+    \n    ~PersistentPotentializedDsu() {\n        if (_pool) _pool->release(_root);\n\
+    \    }\n\n    int size() const {\n        return _n;\n    }\n\n    bool empty()\
+    \ const {\n        return _n == 0;\n    }\n\n    void release() {\n        if\
+    \ (_pool) _pool->release(_root);\n        _n = 0;\n        _root = 0;\n      \
+    \  _pool = std::make_shared<Pool>();\n    }\n\n    std::size_t node_count() const\
+    \ { return _pool ? _pool->size() : 0; }\n\n    int leader(int a) const {\n   \
+    \     assert(0 <= a && a < _n);\n        return leader_and_potential(a).first;\n\
+    \    }\n\n    bool same(int a, int b) const {\n        assert(0 <= a && a < _n);\n\
+    \        assert(0 <= b && b < _n);\n        return leader(a) == leader(b);\n \
+    \   }\n\n    int group_size(int a) const {\n        assert(0 <= a && a < _n);\n\
+    \        return -get(leader(a)).parent_or_size;\n    }\n\n    int size(int a)\
+    \ const {\n        return group_size(a);\n    }\n\n    T potential(int a) const\
+    \ {\n        assert(0 <= a && a < _n);\n        return leader_and_potential(a).second;\n\
+    \    }\n\n    T diff(int a, int b) const {\n        assert(same(a, b));\n    \
+    \    return Group::op(Group::inv(potential(a)), potential(b));\n    }\n\n    Value\
+    \ get(int p) const {\n        assert(0 <= p && p < _n);\n        return get_value(_root,\
+    \ 0, _n, p);\n    }\n\n    int parent_or_size(int p) const {\n        return get(p).parent_or_size;\n\
+    \    }\n\n    std::pair<PersistentPotentializedDsu, bool> merge(int a, int b,\
+    \ const T& w) const {\n        assert(0 <= a && a < _n);\n        assert(0 <=\
+    \ b && b < _n);\n        auto [x, pa] = leader_and_potential(a);\n        auto\
+    \ [y, pb] = leader_and_potential(b);\n        if (x == y) return {*this, Group::op(Group::inv(pa),\
+    \ pb) == w};\n\n        int sx = -get(x).parent_or_size;\n        int sy = -get(y).parent_or_size;\n\
+    \        T y_from_x = Group::op(Group::op(pa, w), Group::inv(pb));\n        if\
+    \ (sx < sy) {\n            std::swap(x, y);\n            std::swap(sx, sy);\n\
+    \            y_from_x = Group::inv(y_from_x);\n        }\n        int root = set_node(_root,\
+    \ 0, _n, x, Value(-(sx + sy), Group::id()));\n        root = set_node(root, 0,\
+    \ _n, y, Value(x, std::move(y_from_x)));\n        return {make_version(root),\
+    \ true};\n    }\n\n    std::vector<std::vector<int>> groups() const {\n      \
+    \  std::vector<int> leader_buf(_n), group_size(_n);\n        for (int i = 0; i\
+    \ < _n; i++) {\n            leader_buf[i] = leader(i);\n            group_size[leader_buf[i]]++;\n\
+    \        }\n        std::vector<std::vector<int>> result(_n);\n        for (int\
+    \ i = 0; i < _n; i++) {\n            result[i].reserve(group_size[i]);\n     \
+    \   }\n        for (int i = 0; i < _n; i++) {\n            result[leader_buf[i]].push_back(i);\n\
     \        }\n        result.erase(std::remove_if(result.begin(), result.end(),\
     \ [&](const std::vector<int>& v) { return v.empty(); }),\n                   \
     \  result.end());\n        return result;\n    }\n};\n\n}  // namespace ds\n}\
     \  // namespace m1une\n\n#endif  // M1UNE_PERSISTENT_POTENTIALIZED_DSU_HPP\n"
   dependsOn:
   - monoid/concept.hpp
+  - ds/detail/persistent_binary_node_pool.hpp
   isVerificationFile: false
   path: ds/dsu/persistent_potentialized_dsu.hpp
   requiredBy: []
-  timestamp: '2026-07-16 20:44:54+09:00'
+  timestamp: '2026-08-11 13:59:43+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/dsu/persistent_potentialized_dsu.test.cpp
+  - verify/ds/persistent_release.test.cpp
 documentation_of: ds/dsu/persistent_potentialized_dsu.hpp
 layout: document
 title: Persistent Potentialized DSU
@@ -202,6 +295,9 @@ title: Persistent Potentialized DSU
 possibly noncommutative group. Merge operations return a new version and leave
 the old version available, while preserving potential differences inside each
 component.
+
+Reference counting recycles internal persistent-array nodes after their final
+dependent version and parent are released.
 
 The template parameter is a type satisfying
 `m1une::monoid::IsGroup`. The stored constraint for
@@ -239,6 +335,8 @@ checked for consistency.
 | `explicit PersistentPotentializedDsu(int n)` | Creates `n` singleton sets with identity potentials. | $O(N)$ |
 | `int size() const` | Returns the number of elements. | $O(1)$ |
 | `bool empty() const` | Returns whether the DSU has no elements. | $O(1)$ |
+| `void release()` | Releases this version immediately and makes this handle empty. | $O(F)$ |
+| `std::size_t node_count() const` | Returns live internal nodes in the shared version family. | $O(1)$ |
 | `std::pair<PersistentPotentializedDsu, bool> merge(int a, int b, const T& w) const` | Returns a new version with the constraint `diff(a, b) == w`, and whether the constraint is consistent. If the constraint contradicts an existing component, the returned version is unchanged. | $O(\log^2 N)$ |
 | `bool same(int a, int b) const` | Returns whether `a` and `b` are in the same set. | $O(\log^2 N)$ |
 | `int leader(int a) const` | Returns the representative of the set containing `a`. | $O(\log^2 N)$ |
@@ -248,6 +346,9 @@ checked for consistency.
 | `Value get(int p) const` | Returns the internal value at index `p`. It has `parent_or_size` and `diff_to_parent` members. | $O(\log N)$ |
 | `int parent_or_size(int p) const` | Returns the internal parent-or-size value at index `p`. | $O(\log N)$ |
 | `std::vector<std::vector<int>> groups() const` | Returns all sets as vectors of element indices. | $O(N \log^2 N)$ |
+
+Here $F$ is the number of internal nodes that become unreachable. Destruction
+and assignment release roots automatically.
 
 ## Example
 

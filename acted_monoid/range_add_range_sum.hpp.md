@@ -13,6 +13,9 @@ data:
     path: verify/ds/dynamic_tree/lazy_path_link_cut_tree.test.cpp
     title: verify/ds/dynamic_tree/lazy_path_link_cut_tree.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/persistent_release.test.cpp
+    title: verify/ds/persistent_release.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/dynamic_lazy_segtree.test.cpp
     title: verify/ds/segtree/dynamic_lazy_segtree.test.cpp
   - icon: ':heavy_check_mark:'
@@ -73,6 +76,7 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array.test.cpp
+  - verify/ds/persistent_release.test.cpp
   - verify/ds/dynamic_tree/lazy_link_cut_tree.test.cpp
   - verify/ds/dynamic_tree/lazy_path_link_cut_tree.test.cpp
   - verify/ds/segtree/persistent_lazy_segtree.test.cpp

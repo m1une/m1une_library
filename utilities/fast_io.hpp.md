@@ -214,6 +214,9 @@ data:
     path: verify/ds/interval_set/interval_set.test.cpp
     title: verify/ds/interval_set/interval_set.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/persistent_release.test.cpp
+    title: verify/ds/persistent_release.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/queue/persistent_queue.test.cpp
     title: verify/ds/queue/persistent_queue.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1030,6 +1033,9 @@ data:
     path: verify/utilities/arrow_dice.test.cpp
     title: verify/utilities/arrow_dice.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/utilities/base64.test.cpp
+    title: verify/utilities/base64.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/utilities/basic_utilities.test.cpp
     title: verify/utilities/basic_utilities.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1650,6 +1656,7 @@ data:
   - verify/utilities/extra_utilities.test.cpp
   - verify/utilities/parser.test.cpp
   - verify/utilities/int1024.test.cpp
+  - verify/utilities/base64.test.cpp
   - verify/utilities/dynamic_bitset.test.cpp
   - verify/utilities/template_fast_io.test.cpp
   - verify/utilities/shifted_array.test.cpp
@@ -1689,6 +1696,7 @@ data:
   - verify/ds/binary_trie/binary_trie_monoid.test.cpp
   - verify/ds/binary_trie/binary_trie.test.cpp
   - verify/ds/interval_set/interval_set.test.cpp
+  - verify/ds/persistent_release.test.cpp
   - verify/ds/dynamic_tree/link_cut_tree.test.cpp
   - verify/ds/dynamic_tree/yosupo_point_set_tree_path_composite_sum.test.cpp
   - verify/ds/dynamic_tree/path_link_cut_tree.test.cpp

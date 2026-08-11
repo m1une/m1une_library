@@ -8,6 +8,9 @@ data:
     path: ds/bst/persistent_ordered_set.hpp
     title: Persistent Ordered Set
   - icon: ':heavy_check_mark:'
+    path: ds/detail/persistent_binary_node_pool.hpp
+    title: ds/detail/persistent_binary_node_pool.hpp
+  - icon: ':heavy_check_mark:'
     path: utilities/fast_io.hpp
     title: Fast IO
   _extendedRequiredBy: []
@@ -22,57 +25,90 @@ data:
     - https://judge.yosupo.jp/problem/ordered_set
   bundledCode: "#line 1 \"verify/ds/bst/persistent_ordered_set.test.cpp\"\n#define\
     \ PROBLEM \"https://judge.yosupo.jp/problem/ordered_set\"\n\n#line 1 \"ds/bst/persistent_ordered_set.hpp\"\
-    \n\n\n\n#include <functional>\n#include <initializer_list>\n#include <utility>\n\
-    #include <vector>\n\n#line 1 \"ds/bst/persistent_ordered_multiset.hpp\"\n\n\n\n\
-    #include <cassert>\n#line 9 \"ds/bst/persistent_ordered_multiset.hpp\"\n\nnamespace\
-    \ m1une {\nnamespace ds {\n\ntemplate <typename T, typename Compare>\nstruct PersistentOrderedSet;\n\
-    \ntemplate <typename T, typename Compare = std::less<T>>\nstruct PersistentOrderedMultiset\
-    \ {\n   private:\n    friend struct PersistentOrderedSet<T, Compare>;\n    struct\
-    \ Node {\n        T key;\n        int count;\n        int size;\n        int distinct_size;\n\
-    \        int rank_color;\n        int l;\n        int r;\n        int min_leaf;\n\
-    \        int max_leaf;\n\n        Node(T value, int multiplicity, int maximum)\n\
-    \            : key(std::move(value)),\n              count(multiplicity),\n  \
-    \            size(multiplicity),\n              distinct_size(1),\n          \
-    \    rank_color(1),\n              l(-1),\n              r(-1),\n            \
-    \  min_leaf(maximum),\n              max_leaf(maximum) {}\n\n        Node(T separator,\
-    \ int subtree_size, int left_size, int unique_count, int node_rank,\n        \
-    \     int left, int right, int minimum, int maximum, bool is_black)\n        \
-    \    : key(std::move(separator)),\n              count(left_size),\n         \
-    \     size(subtree_size),\n              distinct_size(unique_count),\n      \
-    \        rank_color(node_rank * 2 + int(is_black)),\n              l(left),\n\
+    \n\n\n\n#include <cstddef>\n#include <functional>\n#include <initializer_list>\n\
+    #include <utility>\n#include <vector>\n\n#line 1 \"ds/bst/persistent_ordered_multiset.hpp\"\
+    \n\n\n\n#include <cassert>\n#line 10 \"ds/bst/persistent_ordered_multiset.hpp\"\
+    \n\n#line 1 \"ds/detail/persistent_binary_node_pool.hpp\"\n\n\n\n#line 6 \"ds/detail/persistent_binary_node_pool.hpp\"\
+    \n#include <deque>\n#include <limits>\n#include <optional>\n#line 11 \"ds/detail/persistent_binary_node_pool.hpp\"\
+    \n\nnamespace m1une {\nnamespace ds {\nnamespace detail {\n\n// Node must have\
+    \ integer `l` and `r` members. New nodes initially have no\n// owner; discard_unreferenced()\
+    \ removes temporary path-copy nodes after the\n// result roots have been retained.\n\
+    template <class Node, int null_node = -1>\nstruct PersistentBinaryNodePool {\n\
+    \   private:\n    std::deque<std::optional<Node>> _nodes;\n    std::vector<int>\
+    \ _references;\n    std::vector<int> _next_free;\n    std::vector<int> _unowned;\n\
+    \    int _first_free = -1;\n    std::size_t _live_nodes = 0;\n\n    void release_zero(int\
+    \ node) {\n        assert(node != null_node && _nodes[node].has_value());\n  \
+    \      int left = (*_nodes[node]).l;\n        int right = (*_nodes[node]).r;\n\
+    \        _nodes[node].reset();\n        _next_free[node] = _first_free;\n    \
+    \    _first_free = node;\n        --_live_nodes;\n        if (left != null_node\
+    \ && --_references[left] == 0) release_zero(left);\n        if (right != null_node\
+    \ && --_references[right] == 0) release_zero(right);\n    }\n\n   public:\n  \
+    \  PersistentBinaryNodePool() {\n        if constexpr (null_node == 0) {\n   \
+    \         _nodes.emplace_back();\n            _references.push_back(0);\n    \
+    \        _next_free.push_back(-1);\n        }\n    }\n\n    Node& operator[](int\
+    \ node) {\n        assert(node != null_node && _nodes[node].has_value());\n  \
+    \      return *_nodes[node];\n    }\n\n    const Node& operator[](int node) const\
+    \ {\n        assert(node != null_node && _nodes[node].has_value());\n        return\
+    \ *_nodes[node];\n    }\n\n    template <class... Args>\n    int emplace(Args&&...\
+    \ args) {\n        int result;\n        if (_first_free == -1) {\n           \
+    \ assert(_nodes.size() < std::size_t(std::numeric_limits<int>::max()));\n    \
+    \        result = int(_nodes.size());\n            _nodes.emplace_back(std::in_place,\
+    \ std::forward<Args>(args)...);\n            _references.push_back(0);\n     \
+    \       _next_free.push_back(-1);\n        } else {\n            result = _first_free;\n\
+    \            _first_free = _next_free[result];\n            _nodes[result].emplace(std::forward<Args>(args)...);\n\
+    \            _references[result] = 0;\n        }\n        retain((*_nodes[result]).l);\n\
+    \        retain((*_nodes[result]).r);\n        _unowned.push_back(result);\n \
+    \       ++_live_nodes;\n        return result;\n    }\n\n    void retain(int node)\
+    \ {\n        if (node != null_node) {\n            assert(_nodes[node].has_value());\n\
+    \            ++_references[node];\n        }\n    }\n\n    void release(int node)\
+    \ {\n        if (node == null_node) return;\n        assert(_nodes[node].has_value()\
+    \ && _references[node] > 0);\n        if (--_references[node] == 0) release_zero(node);\n\
+    \    }\n\n    void discard_unreferenced() {\n        while (!_unowned.empty())\
+    \ {\n            int node = _unowned.back();\n            _unowned.pop_back();\n\
+    \            if (_nodes[node].has_value() && _references[node] == 0) release_zero(node);\n\
+    \        }\n    }\n\n    void reserve(std::size_t) {}\n\n    int next_index()\
+    \ const { return _first_free == -1 ? int(_nodes.size()) : _first_free; }\n\n \
+    \   std::size_t size() const { return _live_nodes; }\n};\n\n}  // namespace detail\n\
+    }  // namespace ds\n}  // namespace m1une\n\n\n#line 12 \"ds/bst/persistent_ordered_multiset.hpp\"\
+    \n\nnamespace m1une {\nnamespace ds {\n\ntemplate <typename T, typename Compare>\n\
+    struct PersistentOrderedSet;\n\ntemplate <typename T, typename Compare = std::less<T>>\n\
+    struct PersistentOrderedMultiset {\n   private:\n    friend struct PersistentOrderedSet<T,\
+    \ Compare>;\n    struct Node {\n        T key;\n        int count;\n        int\
+    \ size;\n        int distinct_size;\n        int rank_color;\n        int l;\n\
+    \        int r;\n        int min_leaf;\n        int max_leaf;\n\n        Node(T\
+    \ value, int multiplicity, int maximum)\n            : key(std::move(value)),\n\
+    \              count(multiplicity),\n              size(multiplicity),\n     \
+    \         distinct_size(1),\n              rank_color(1),\n              l(-1),\n\
+    \              r(-1),\n              min_leaf(maximum),\n              max_leaf(maximum)\
+    \ {}\n\n        Node(T separator, int subtree_size, int left_size, int unique_count,\
+    \ int node_rank,\n             int left, int right, int minimum, int maximum,\
+    \ bool is_black)\n            : key(std::move(separator)),\n              count(left_size),\n\
+    \              size(subtree_size),\n              distinct_size(unique_count),\n\
+    \              rank_color(node_rank * 2 + int(is_black)),\n              l(left),\n\
     \              r(right),\n              min_leaf(minimum),\n              max_leaf(maximum)\
-    \ {}\n    };\n\n    static constexpr int pool_block_bits = 16;\n    static constexpr\
-    \ int pool_block_size = 1 << pool_block_bits;\n    static constexpr int pool_block_mask\
-    \ = pool_block_size - 1;\n\n    struct Pool {\n        std::vector<std::vector<Node>>\
-    \ blocks;\n        int node_count = 0;\n\n        const Node& operator[](int index)\
-    \ const {\n            return blocks[index >> pool_block_bits][index & pool_block_mask];\n\
-    \        }\n\n        template <class... Args>\n        int emplace(Args&&...\
-    \ args) {\n            if ((node_count & pool_block_mask) == 0) {\n          \
-    \      blocks.emplace_back();\n                blocks.back().reserve(pool_block_size);\n\
-    \            }\n            blocks.back().emplace_back(std::forward<Args>(args)...);\n\
-    \            return node_count++;\n        }\n    };\n\n    inline static Pool\
-    \ pool;\n\n    int root;\n    Compare comp;\n\n    static int subtree_size(int\
-    \ t) { return t == -1 ? 0 : pool[t].size; }\n    static int subtree_distinct_size(int\
-    \ t) { return t == -1 ? 0 : pool[t].distinct_size; }\n    static int node_rank(int\
-    \ t) { return pool[t].rank_color >> 1; }\n    static bool is_black(int t) { return\
-    \ (pool[t].rank_color & 1) != 0; }\n    static bool is_leaf(int t) { return pool[t].l\
-    \ == -1; }\n\n    bool equal(const T& a, const T& b) const {\n        return !comp(a,\
-    \ b) && !comp(b, a);\n    }\n\n    static int make_leaf(T key, int count) {\n\
-    \        const int id = pool.node_count;\n        return pool.emplace(std::move(key),\
-    \ count, id);\n    }\n\n    static int make_node(int l, int r, bool black) {\n\
-    \        assert(l != -1 && r != -1);\n        const int rank = node_rank(l) +\
-    \ int(is_black(l));\n        assert(rank == node_rank(r) + int(is_black(r)));\n\
-    \        return pool.emplace(pool[pool[l].max_leaf].key,\n                   \
-    \         subtree_size(l) + subtree_size(r),\n                            subtree_size(l),\n\
-    \                            subtree_distinct_size(l) + subtree_distinct_size(r),\n\
-    \                            rank, l, r, pool[l].min_leaf, pool[r].max_leaf,\n\
-    \                            black);\n    }\n\n    static int as_root(int t) {\n\
-    \        if (t == -1 || is_black(t)) return t;\n        return make_node(pool[t].l,\
-    \ pool[t].r, true);\n    }\n\n    static int merge_sub(int a, int b) {\n     \
-    \   assert(a != -1 && b != -1);\n        if (node_rank(a) < node_rank(b)) {\n\
-    \            const Node& right = pool[b];\n            int c = merge_sub(a, right.l);\n\
-    \            if (is_black(b) && !is_black(c) && !is_black(pool[c].l)) {\n    \
-    \            const Node& middle = pool[c];\n                if (is_black(right.r))\
+    \ {}\n    };\n\n    using Pool = detail::PersistentBinaryNodePool<Node>;\n\n \
+    \   inline static Pool pool;\n\n    int root;\n    Compare comp;\n\n    static\
+    \ int subtree_size(int t) { return t == -1 ? 0 : pool[t].size; }\n    static int\
+    \ subtree_distinct_size(int t) { return t == -1 ? 0 : pool[t].distinct_size; }\n\
+    \    static int node_rank(int t) { return pool[t].rank_color >> 1; }\n    static\
+    \ bool is_black(int t) { return (pool[t].rank_color & 1) != 0; }\n    static bool\
+    \ is_leaf(int t) { return pool[t].l == -1; }\n\n    bool equal(const T& a, const\
+    \ T& b) const {\n        return !comp(a, b) && !comp(b, a);\n    }\n\n    static\
+    \ int make_leaf(T key, int count) {\n        const int id = pool.next_index();\n\
+    \        return pool.emplace(std::move(key), count, id);\n    }\n\n    static\
+    \ int make_node(int l, int r, bool black) {\n        assert(l != -1 && r != -1);\n\
+    \        const int rank = node_rank(l) + int(is_black(l));\n        assert(rank\
+    \ == node_rank(r) + int(is_black(r)));\n        return pool.emplace(pool[pool[l].max_leaf].key,\n\
+    \                            subtree_size(l) + subtree_size(r),\n            \
+    \                subtree_size(l),\n                            subtree_distinct_size(l)\
+    \ + subtree_distinct_size(r),\n                            rank, l, r, pool[l].min_leaf,\
+    \ pool[r].max_leaf,\n                            black);\n    }\n\n    static\
+    \ int as_root(int t) {\n        if (t == -1 || is_black(t)) return t;\n      \
+    \  return make_node(pool[t].l, pool[t].r, true);\n    }\n\n    static int merge_sub(int\
+    \ a, int b) {\n        assert(a != -1 && b != -1);\n        if (node_rank(a) <\
+    \ node_rank(b)) {\n            const Node& right = pool[b];\n            int c\
+    \ = merge_sub(a, right.l);\n            if (is_black(b) && !is_black(c) && !is_black(pool[c].l))\
+    \ {\n                const Node& middle = pool[c];\n                if (is_black(right.r))\
     \ {\n                    return make_node(middle.l,\n                        \
     \             make_node(middle.r, right.r, false),\n                         \
     \            true);\n                }\n                const Node& far = pool[right.r];\n\
@@ -151,48 +187,60 @@ data:
     \        const Node& node = pool[t];\n        if (is_leaf(t)) return {t, -1};\n\
     \        auto [minimum, rest] = pop_min(node.l);\n        return {minimum, merge_nodes(rest,\
     \ as_root(node.r))};\n    }\n\n    PersistentOrderedMultiset(int node, Compare\
-    \ compare) : root(node), comp(std::move(compare)) {}\n\n   public:\n    explicit\
-    \ PersistentOrderedMultiset(Compare compare) : root(-1), comp(std::move(compare))\
-    \ {}\n    PersistentOrderedMultiset() : PersistentOrderedMultiset(Compare()) {}\n\
-    \n    PersistentOrderedMultiset(std::initializer_list<T> init, Compare compare\
-    \ = Compare())\n        : PersistentOrderedMultiset(std::move(compare)) {\n  \
-    \      for (const T& x : init) *this = insert(x);\n    }\n\n    template <typename\
-    \ Iterator>\n    PersistentOrderedMultiset(Iterator first, Iterator last, Compare\
-    \ compare = Compare())\n        : PersistentOrderedMultiset(std::move(compare))\
-    \ {\n        while (first != last) *this = insert(*first++);\n    }\n\n    int\
-    \ size() const { return subtree_size(root); }\n    int unique_size() const { return\
-    \ subtree_distinct_size(root); }\n    bool empty() const { return root == -1;\
-    \ }\n    PersistentOrderedMultiset clear() const { return PersistentOrderedMultiset(-1,\
-    \ comp); }\n\n    PersistentOrderedMultiset insert(T key, int multiplicity = 1)\
-    \ const {\n        assert(multiplicity > 0);\n        int old_count = 0;\n   \
-    \     const int changed_root = change_count_impl(root, key, multiplicity, old_count);\n\
-    \        if (old_count != 0) {\n            return PersistentOrderedMultiset(changed_root,\
-    \ comp);\n        }\n        auto [l, r] = split_nodes(root, key);\n        return\
-    \ PersistentOrderedMultiset(merge_nodes(merge_nodes(l, make_leaf(std::move(key),\
-    \ multiplicity)), r), comp);\n    }\n\n   private:\n    PersistentOrderedMultiset\
-    \ insert_unique(T key) const {\n        if (contains(key)) return *this;\n   \
-    \     auto [l, r] = split_nodes(root, key);\n        return PersistentOrderedMultiset(\n\
-    \            merge_nodes(merge_nodes(l, make_leaf(std::move(key), 1)), r), comp);\n\
-    \    }\n\n   public:\n    PersistentOrderedMultiset erase_one(const T& key) const\
-    \ {\n        int old_count = 0;\n        const int changed_root = change_count_impl(root,\
-    \ key, -1, old_count);\n        if (old_count == 0) return *this;\n        if\
-    \ (old_count > 1) return PersistentOrderedMultiset(changed_root, comp);\n    \
-    \    auto [l, r] = split_nodes(root, key);\n        auto [discarded, rest] = pop_min(r);\n\
-    \        assert(equal(pool[discarded].key, key));\n        return PersistentOrderedMultiset(merge_nodes(l,\
-    \ rest), comp);\n    }\n\n    PersistentOrderedMultiset erase(const T& key) const\
-    \ { return erase_one(key); }\n\n    PersistentOrderedMultiset erase_all(const\
-    \ T& key) const {\n        const int old_count = count(key);\n        if (old_count\
-    \ == 0) return *this;\n        auto [l, r] = split_nodes(root, key);\n       \
-    \ auto [discarded, rest] = pop_min(r);\n        assert(equal(pool[discarded].key,\
-    \ key));\n        return PersistentOrderedMultiset(merge_nodes(l, rest), comp);\n\
-    \    }\n\n    bool contains(const T& key) const { return count(key) > 0; }\n \
-    \   int count(const T& key) const { return count_impl(root, key); }\n\n    const\
-    \ T* find_by_order(int k) const {\n        assert(0 <= k && k < size());\n   \
-    \     return kth_impl(root, k);\n    }\n\n    T kth(int k) const { return *find_by_order(k);\
-    \ }\n    int order_of_key(const T& key) const { return order_of_key_impl(root,\
-    \ key, false); }\n    int count_less(const T& key) const { return order_of_key(key);\
-    \ }\n    int count_less_equal(const T& key) const { return order_of_key_impl(root,\
-    \ key, true); }\n    int count_greater(const T& key) const { return size() - count_less_equal(key);\
+    \ compare) : root(node), comp(std::move(compare)) {\n        pool.retain(root);\n\
+    \    }\n\n    PersistentOrderedMultiset make_version(int node) const {\n     \
+    \   PersistentOrderedMultiset result(node, comp);\n        pool.discard_unreferenced();\n\
+    \        return result;\n    }\n\n   public:\n    explicit PersistentOrderedMultiset(Compare\
+    \ compare) : root(-1), comp(std::move(compare)) {}\n    PersistentOrderedMultiset()\
+    \ : PersistentOrderedMultiset(Compare()) {}\n\n    PersistentOrderedMultiset(std::initializer_list<T>\
+    \ init, Compare compare = Compare())\n        : PersistentOrderedMultiset(std::move(compare))\
+    \ {\n        for (const T& x : init) *this = insert(x);\n    }\n\n    template\
+    \ <typename Iterator>\n    PersistentOrderedMultiset(Iterator first, Iterator\
+    \ last, Compare compare = Compare())\n        : PersistentOrderedMultiset(std::move(compare))\
+    \ {\n        while (first != last) *this = insert(*first++);\n    }\n\n    PersistentOrderedMultiset(const\
+    \ PersistentOrderedMultiset& other)\n        : root(other.root), comp(other.comp)\
+    \ {\n        pool.retain(root);\n    }\n\n    PersistentOrderedMultiset(PersistentOrderedMultiset&&\
+    \ other)\n        : root(other.root), comp(std::move(other.comp)) {\n        other.root\
+    \ = -1;\n    }\n\n    PersistentOrderedMultiset& operator=(const PersistentOrderedMultiset&\
+    \ other) {\n        if (this == &other) return *this;\n        pool.retain(other.root);\n\
+    \        pool.release(root);\n        root = other.root;\n        comp = other.comp;\n\
+    \        return *this;\n    }\n\n    PersistentOrderedMultiset& operator=(PersistentOrderedMultiset&&\
+    \ other) {\n        if (this == &other) return *this;\n        pool.release(root);\n\
+    \        root = other.root;\n        comp = std::move(other.comp);\n        other.root\
+    \ = -1;\n        return *this;\n    }\n\n    ~PersistentOrderedMultiset() { pool.release(root);\
+    \ }\n\n    int size() const { return subtree_size(root); }\n    int unique_size()\
+    \ const { return subtree_distinct_size(root); }\n    bool empty() const { return\
+    \ root == -1; }\n    void release() { pool.release(std::exchange(root, -1)); }\n\
+    \    std::size_t node_count() const { return pool.size(); }\n    PersistentOrderedMultiset\
+    \ clear() const { return make_version(-1); }\n\n    PersistentOrderedMultiset\
+    \ insert(T key, int multiplicity = 1) const {\n        assert(multiplicity > 0);\n\
+    \        int old_count = 0;\n        const int changed_root = change_count_impl(root,\
+    \ key, multiplicity, old_count);\n        if (old_count != 0) {\n            return\
+    \ make_version(changed_root);\n        }\n        auto [l, r] = split_nodes(root,\
+    \ key);\n        return make_version(merge_nodes(merge_nodes(l, make_leaf(std::move(key),\
+    \ multiplicity)), r));\n    }\n\n   private:\n    PersistentOrderedMultiset insert_unique(T\
+    \ key) const {\n        if (contains(key)) return *this;\n        auto [l, r]\
+    \ = split_nodes(root, key);\n        return make_version(merge_nodes(merge_nodes(l,\
+    \ make_leaf(std::move(key), 1)), r));\n    }\n\n   public:\n    PersistentOrderedMultiset\
+    \ erase_one(const T& key) const {\n        int old_count = 0;\n        const int\
+    \ changed_root = change_count_impl(root, key, -1, old_count);\n        if (old_count\
+    \ == 0) return *this;\n        if (old_count > 1) return make_version(changed_root);\n\
+    \        auto [l, r] = split_nodes(root, key);\n        auto [discarded, rest]\
+    \ = pop_min(r);\n        assert(equal(pool[discarded].key, key));\n        return\
+    \ make_version(merge_nodes(l, rest));\n    }\n\n    PersistentOrderedMultiset\
+    \ erase(const T& key) const { return erase_one(key); }\n\n    PersistentOrderedMultiset\
+    \ erase_all(const T& key) const {\n        const int old_count = count(key);\n\
+    \        if (old_count == 0) return *this;\n        auto [l, r] = split_nodes(root,\
+    \ key);\n        auto [discarded, rest] = pop_min(r);\n        assert(equal(pool[discarded].key,\
+    \ key));\n        return make_version(merge_nodes(l, rest));\n    }\n\n    bool\
+    \ contains(const T& key) const { return count(key) > 0; }\n    int count(const\
+    \ T& key) const { return count_impl(root, key); }\n\n    const T* find_by_order(int\
+    \ k) const {\n        assert(0 <= k && k < size());\n        return kth_impl(root,\
+    \ k);\n    }\n\n    T kth(int k) const { return *find_by_order(k); }\n    int\
+    \ order_of_key(const T& key) const { return order_of_key_impl(root, key, false);\
+    \ }\n    int count_less(const T& key) const { return order_of_key(key); }\n  \
+    \  int count_less_equal(const T& key) const { return order_of_key_impl(root, key,\
+    \ true); }\n    int count_greater(const T& key) const { return size() - count_less_equal(key);\
     \ }\n    int count_greater_equal(const T& key) const { return size() - count_less(key);\
     \ }\n    const T* lower_bound(const T& key) const { return lower_bound_impl(root,\
     \ key, false); }\n    const T* upper_bound(const T& key) const { return lower_bound_impl(root,\
@@ -203,16 +251,16 @@ data:
     \ true); }\n    const T* min() const { return empty() ? nullptr : &pool[pool[root].min_leaf].key;\
     \ }\n    const T* max() const { return empty() ? nullptr : &pool[pool[root].max_leaf].key;\
     \ }\n\n    std::pair<PersistentOrderedMultiset, PersistentOrderedMultiset> split(const\
-    \ T& key) const {\n        auto [l, r] = split_nodes(root, key);\n        return\
-    \ {PersistentOrderedMultiset(l, comp), PersistentOrderedMultiset(r, comp)};\n\
-    \    }\n\n    PersistentOrderedMultiset merge(const PersistentOrderedMultiset&\
-    \ other) const {\n        assert(empty() || other.empty() || comp(*max(), *other.min()));\n\
-    \        return PersistentOrderedMultiset(merge_nodes(root, other.root), comp);\n\
-    \    }\n\n    std::vector<T> to_vector() const {\n        std::vector<T> result;\n\
-    \        result.reserve(size());\n        dump_impl(root, result);\n        return\
-    \ result;\n    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n#line 10\
-    \ \"ds/bst/persistent_ordered_set.hpp\"\n\nnamespace m1une {\nnamespace ds {\n\
-    \ntemplate <typename T, typename Compare = std::less<T>>\nstruct PersistentOrderedSet\
+    \ T& key) const {\n        auto [l, r] = split_nodes(root, key);\n        PersistentOrderedMultiset\
+    \ left(l, comp);\n        PersistentOrderedMultiset right(r, comp);\n        pool.discard_unreferenced();\n\
+    \        return {std::move(left), std::move(right)};\n    }\n\n    PersistentOrderedMultiset\
+    \ merge(const PersistentOrderedMultiset& other) const {\n        assert(empty()\
+    \ || other.empty() || comp(*max(), *other.min()));\n        return make_version(merge_nodes(root,\
+    \ other.root));\n    }\n\n    std::vector<T> to_vector() const {\n        std::vector<T>\
+    \ result;\n        result.reserve(size());\n        dump_impl(root, result);\n\
+    \        return result;\n    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\
+    \n\n#line 11 \"ds/bst/persistent_ordered_set.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ ds {\n\ntemplate <typename T, typename Compare = std::less<T>>\nstruct PersistentOrderedSet\
     \ {\n   private:\n    using Multiset = PersistentOrderedMultiset<T, Compare>;\n\
     \n    Multiset data;\n\n    explicit PersistentOrderedSet(Multiset multiset) :\
     \ data(std::move(multiset)) {}\n\n   public:\n    explicit PersistentOrderedSet(Compare\
@@ -225,9 +273,11 @@ data:
     \ while (first != last) {\n            *this = insert(*first);\n            ++first;\n\
     \        }\n    }\n\n    int size() const {\n        return data.size();\n   \
     \ }\n\n    int unique_size() const {\n        return data.size();\n    }\n\n \
-    \   bool empty() const {\n        return data.empty();\n    }\n\n    PersistentOrderedSet\
-    \ clear() const {\n        return PersistentOrderedSet(data.clear());\n    }\n\
-    \n    PersistentOrderedSet insert(T key) const {\n        return PersistentOrderedSet(data.insert_unique(std::move(key)));\n\
+    \   bool empty() const {\n        return data.empty();\n    }\n\n    void release()\
+    \ {\n        data.release();\n    }\n\n    std::size_t node_count() const {\n\
+    \        return data.node_count();\n    }\n\n    PersistentOrderedSet clear()\
+    \ const {\n        return PersistentOrderedSet(data.clear());\n    }\n\n    PersistentOrderedSet\
+    \ insert(T key) const {\n        return PersistentOrderedSet(data.insert_unique(std::move(key)));\n\
     \    }\n\n    PersistentOrderedSet erase(const T& key) const {\n        return\
     \ PersistentOrderedSet(data.erase(key));\n    }\n\n    bool contains(const T&\
     \ key) const {\n        return data.contains(key);\n    }\n\n    int count(const\
@@ -254,13 +304,13 @@ data:
     \   std::vector<T> to_vector() const {\n        return data.to_vector();\n   \
     \ }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n#line 4 \"verify/ds/bst/persistent_ordered_set.test.cpp\"\
     \n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#include <algorithm>\n#include <array>\n\
-    #include <cerrno>\n#include <charconv>\n#include <cstddef>\n#include <cstdio>\n\
-    #include <cstdlib>\n#include <cstdint>\n#include <cstring>\n#include <iterator>\n\
-    #include <string>\n#include <sys/stat.h>\n#include <type_traits>\n#line 18 \"\
-    utilities/fast_io.hpp\"\n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities\
-    \ {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class\
-    \ T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate <class T>\n\
-    struct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
+    #include <cerrno>\n#include <charconv>\n#line 9 \"utilities/fast_io.hpp\"\n#include\
+    \ <cstdio>\n#include <cstdlib>\n#include <cstdint>\n#include <cstring>\n#include\
+    \ <iterator>\n#include <string>\n#include <sys/stat.h>\n#include <type_traits>\n\
+    #line 18 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n\nnamespace m1une {\n\
+    namespace utilities {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\n\
+    template <class T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate\
+    \ <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
     \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
     \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
     \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
@@ -543,11 +593,12 @@ data:
   dependsOn:
   - ds/bst/persistent_ordered_set.hpp
   - ds/bst/persistent_ordered_multiset.hpp
+  - ds/detail/persistent_binary_node_pool.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
   path: verify/ds/bst/persistent_ordered_set.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-08-11 13:59:43+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/bst/persistent_ordered_set.test.cpp

@@ -2,11 +2,8 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: ds/detail/persistent_binary_node_pool.hpp
-    title: ds/detail/persistent_binary_node_pool.hpp
-  - icon: ':heavy_check_mark:'
-    path: ds/dsu/persistent_dsu.hpp
-    title: Persistent DSU
+    path: utilities/base64.hpp
+    title: Base64 Sequence Encoding
   - icon: ':heavy_check_mark:'
     path: utilities/fast_io.hpp
     title: Fast IO
@@ -17,21 +14,93 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://judge.yosupo.jp/problem/persistent_unionfind
+    PROBLEM: https://judge.yosupo.jp/problem/aplusb
     links:
-    - https://judge.yosupo.jp/problem/persistent_unionfind
-  bundledCode: "#line 1 \"verify/ds/dsu/persistent_dsu_library_checker.test.cpp\"\n\
-    #define PROBLEM \"https://judge.yosupo.jp/problem/persistent_unionfind\"\n\n#line\
-    \ 1 \"utilities/fast_io.hpp\"\n\n\n\n#include <algorithm>\n#include <array>\n\
-    #include <cerrno>\n#include <charconv>\n#include <cstddef>\n#include <cstdio>\n\
-    #include <cstdlib>\n#include <cstdint>\n#include <cstring>\n#include <iterator>\n\
-    #include <string>\n#include <sys/stat.h>\n#include <type_traits>\n#include <utility>\n\
-    #include <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal\
-    \ {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\n\
-    struct is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T,\
-    \ std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
-    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
-    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    - https://judge.yosupo.jp/problem/aplusb
+  bundledCode: "#line 1 \"verify/utilities/base64.test.cpp\"\n#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\
+    \n\n#line 1 \"utilities/base64.hpp\"\n\n\n\n#include <algorithm>\n#include <cassert>\n\
+    #include <concepts>\n#include <cstddef>\n#include <limits>\n#include <optional>\n\
+    #include <ranges>\n#include <string>\n#include <string_view>\n#include <type_traits>\n\
+    #include <vector>\n\nnamespace m1une {\nnamespace utilities {\n\ninline constexpr\
+    \ std::string_view base64_alphabet =\n    \"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/\"\
+    ;\n\nnamespace detail {\n\ninline int base64_digit(char character) noexcept {\n\
+    \    if ('A' <= character && character <= 'Z') return character - 'A';\n    if\
+    \ ('a' <= character && character <= 'z') return character - 'a' + 26;\n    if\
+    \ ('0' <= character && character <= '9') return character - '0' + 52;\n    if\
+    \ (character == '+') return 62;\n    if (character == '/') return 63;\n    return\
+    \ -1;\n}\n\ntemplate <class Integer>\nconcept Base64Integer =\n    std::integral<Integer>\
+    \ &&\n    (!std::same_as<std::remove_cv_t<Integer>, bool>);\n\n}  // namespace\
+    \ detail\n\n// Packs fixed-width nonnegative integers, most-significant bit first.\
+    \ The last\n// Base64 digit is zero-padded on the right; '=' padding is intentionally\
+    \ omitted.\ntemplate <class Sequence>\nrequires std::ranges::input_range<const\
+    \ Sequence&> &&\n         detail::Base64Integer<std::ranges::range_value_t<Sequence>>\n\
+    std::string to_base64(const Sequence& values, int bit_width) {\n    using Integer\
+    \ = std::ranges::range_value_t<Sequence>;\n    using Unsigned = std::make_unsigned_t<Integer>;\n\
+    \    constexpr int digits = std::numeric_limits<Integer>::digits;\n\n    assert(1\
+    \ <= bit_width && bit_width <= digits);\n    if (bit_width < 1 || bit_width >\
+    \ digits) return {};\n\n    std::string encoded;\n    if constexpr (std::ranges::sized_range<const\
+    \ Sequence&>) {\n        std::size_t count = static_cast<std::size_t>(std::ranges::size(values));\n\
+    \        constexpr std::size_t size_limit =\n            std::numeric_limits<std::size_t>::max();\n\
+    \        if (count <= (size_limit - 5) / static_cast<unsigned>(bit_width)) {\n\
+    \            encoded.reserve((count * static_cast<unsigned>(bit_width) + 5) /\
+    \ 6);\n        }\n    }\n    unsigned buffer = 0;\n    int buffered_bits = 0;\n\
+    \n    for (Integer value : values) {\n        if constexpr (std::signed_integral<Integer>)\
+    \ {\n            assert(value >= 0);\n            if (value < 0) return {};\n\
+    \        }\n        Unsigned unsigned_value = static_cast<Unsigned>(value);\n\
+    \        if (bit_width < digits) {\n            assert((unsigned_value >> bit_width)\
+    \ == 0);\n            if ((unsigned_value >> bit_width) != 0) return {};\n   \
+    \     }\n\n        int remaining_bits = bit_width;\n        while (remaining_bits\
+    \ > 0) {\n            int take = std::min(6 - buffered_bits, remaining_bits);\n\
+    \            int shift = remaining_bits - take;\n            unsigned mask = (1U\
+    \ << take) - 1;\n            unsigned part = static_cast<unsigned>((unsigned_value\
+    \ >> shift) & mask);\n            buffer = (buffer << take) | part;\n        \
+    \    buffered_bits += take;\n            remaining_bits -= take;\n\n         \
+    \   if (buffered_bits == 6) {\n                encoded.push_back(base64_alphabet[buffer]);\n\
+    \                buffer = 0;\n                buffered_bits = 0;\n           \
+    \ }\n        }\n    }\n\n    if (buffered_bits != 0) {\n        encoded.push_back(base64_alphabet[buffer\
+    \ << (6 - buffered_bits)]);\n    }\n    return encoded;\n}\n\n// Returns nullopt\
+    \ unless encoded is the canonical encoding of exactly count\n// values with the\
+    \ requested bit width.\ntemplate <detail::Base64Integer Integer>\nstd::optional<std::vector<Integer>>\
+    \ checked_from_base64(\n    std::string_view encoded, std::size_t count, int bit_width)\
+    \ {\n    constexpr int digits = std::numeric_limits<Integer>::digits;\n    if\
+    \ (bit_width < 1 || bit_width > digits) return std::nullopt;\n\n    constexpr\
+    \ std::size_t size_limit = std::numeric_limits<std::size_t>::max();\n    if (count\
+    \ > (size_limit - 5) / static_cast<unsigned>(bit_width)) {\n        return std::nullopt;\n\
+    \    }\n    std::size_t total_bits = count * static_cast<unsigned>(bit_width);\n\
+    \    if (encoded.size() != (total_bits + 5) / 6) return std::nullopt;\n\n    using\
+    \ Unsigned = std::make_unsigned_t<Integer>;\n    std::vector<Integer> values;\n\
+    \    values.reserve(count);\n    std::size_t position = 0;\n    unsigned buffer\
+    \ = 0;\n    int buffered_bits = 0;\n\n    for (std::size_t index = 0; index <\
+    \ count; ++index) {\n        Unsigned value = 0;\n        int remaining_bits =\
+    \ bit_width;\n        while (remaining_bits > 0) {\n            if (buffered_bits\
+    \ == 0) {\n                int digit = detail::base64_digit(encoded[position++]);\n\
+    \                if (digit < 0) return std::nullopt;\n                buffer =\
+    \ static_cast<unsigned>(digit);\n                buffered_bits = 6;\n        \
+    \    }\n\n            int take = std::min(buffered_bits, remaining_bits);\n  \
+    \          int shift = buffered_bits - take;\n            unsigned mask = (1U\
+    \ << take) - 1;\n            unsigned part = (buffer >> shift) & mask;\n     \
+    \       value = static_cast<Unsigned>((value << take) | part);\n            buffered_bits\
+    \ -= take;\n            remaining_bits -= take;\n        }\n        values.push_back(static_cast<Integer>(value));\n\
+    \    }\n\n    if (buffered_bits != 0) {\n        unsigned mask = (1U << buffered_bits)\
+    \ - 1;\n        if ((buffer & mask) != 0) return std::nullopt;\n    }\n    return\
+    \ values;\n}\n\ntemplate <detail::Base64Integer Integer>\nstd::vector<Integer>\
+    \ from_base64(std::string_view encoded, std::size_t count,\n                 \
+    \                int bit_width) {\n    std::optional<std::vector<Integer>> result\
+    \ =\n        checked_from_base64<Integer>(encoded, count, bit_width);\n    assert(result.has_value());\n\
+    \    return result.value_or(std::vector<Integer>());\n}\n\n}  // namespace utilities\n\
+    }  // namespace m1une\n\n\n#line 4 \"verify/utilities/base64.test.cpp\"\n\n#line\
+    \ 6 \"verify/utilities/base64.test.cpp\"\n#include <cstdint>\n#line 1 \"utilities/fast_io.hpp\"\
+    \n\n\n\n#line 5 \"utilities/fast_io.hpp\"\n#include <array>\n#include <cerrno>\n\
+    #include <charconv>\n#line 9 \"utilities/fast_io.hpp\"\n#include <cstdio>\n#include\
+    \ <cstdlib>\n#line 12 \"utilities/fast_io.hpp\"\n#include <cstring>\n#include\
+    \ <iterator>\n#line 15 \"utilities/fast_io.hpp\"\n#include <sys/stat.h>\n#line\
+    \ 17 \"utilities/fast_io.hpp\"\n#include <utility>\n#include <unistd.h>\n\nnamespace\
+    \ m1une {\nnamespace utilities {\nnamespace internal {\n\n// Detect std::begin(x),\
+    \ std::end(x).\ntemplate <class T, class = void>\nstruct is_range : std::false_type\
+    \ {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
+    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
+    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
     \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
     \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
@@ -263,155 +332,97 @@ data:
     \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
     n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 4 \"verify/ds/dsu/persistent_dsu_library_checker.test.cpp\"\
-    \n\n#include <bits/stdc++.h>\nusing namespace std;\n\n#line 1 \"ds/dsu/persistent_dsu.hpp\"\
-    \n\n\n\n#line 10 \"ds/dsu/persistent_dsu.hpp\"\n\n#line 1 \"ds/detail/persistent_binary_node_pool.hpp\"\
-    \n\n\n\n#line 8 \"ds/detail/persistent_binary_node_pool.hpp\"\n#include <optional>\n\
-    #line 11 \"ds/detail/persistent_binary_node_pool.hpp\"\n\nnamespace m1une {\n\
-    namespace ds {\nnamespace detail {\n\n// Node must have integer `l` and `r` members.\
-    \ New nodes initially have no\n// owner; discard_unreferenced() removes temporary\
-    \ path-copy nodes after the\n// result roots have been retained.\ntemplate <class\
-    \ Node, int null_node = -1>\nstruct PersistentBinaryNodePool {\n   private:\n\
-    \    std::deque<std::optional<Node>> _nodes;\n    std::vector<int> _references;\n\
-    \    std::vector<int> _next_free;\n    std::vector<int> _unowned;\n    int _first_free\
-    \ = -1;\n    std::size_t _live_nodes = 0;\n\n    void release_zero(int node) {\n\
-    \        assert(node != null_node && _nodes[node].has_value());\n        int left\
-    \ = (*_nodes[node]).l;\n        int right = (*_nodes[node]).r;\n        _nodes[node].reset();\n\
-    \        _next_free[node] = _first_free;\n        _first_free = node;\n      \
-    \  --_live_nodes;\n        if (left != null_node && --_references[left] == 0)\
-    \ release_zero(left);\n        if (right != null_node && --_references[right]\
-    \ == 0) release_zero(right);\n    }\n\n   public:\n    PersistentBinaryNodePool()\
-    \ {\n        if constexpr (null_node == 0) {\n            _nodes.emplace_back();\n\
-    \            _references.push_back(0);\n            _next_free.push_back(-1);\n\
-    \        }\n    }\n\n    Node& operator[](int node) {\n        assert(node !=\
-    \ null_node && _nodes[node].has_value());\n        return *_nodes[node];\n   \
-    \ }\n\n    const Node& operator[](int node) const {\n        assert(node != null_node\
-    \ && _nodes[node].has_value());\n        return *_nodes[node];\n    }\n\n    template\
-    \ <class... Args>\n    int emplace(Args&&... args) {\n        int result;\n  \
-    \      if (_first_free == -1) {\n            assert(_nodes.size() < std::size_t(std::numeric_limits<int>::max()));\n\
-    \            result = int(_nodes.size());\n            _nodes.emplace_back(std::in_place,\
-    \ std::forward<Args>(args)...);\n            _references.push_back(0);\n     \
-    \       _next_free.push_back(-1);\n        } else {\n            result = _first_free;\n\
-    \            _first_free = _next_free[result];\n            _nodes[result].emplace(std::forward<Args>(args)...);\n\
-    \            _references[result] = 0;\n        }\n        retain((*_nodes[result]).l);\n\
-    \        retain((*_nodes[result]).r);\n        _unowned.push_back(result);\n \
-    \       ++_live_nodes;\n        return result;\n    }\n\n    void retain(int node)\
-    \ {\n        if (node != null_node) {\n            assert(_nodes[node].has_value());\n\
-    \            ++_references[node];\n        }\n    }\n\n    void release(int node)\
-    \ {\n        if (node == null_node) return;\n        assert(_nodes[node].has_value()\
-    \ && _references[node] > 0);\n        if (--_references[node] == 0) release_zero(node);\n\
-    \    }\n\n    void discard_unreferenced() {\n        while (!_unowned.empty())\
-    \ {\n            int node = _unowned.back();\n            _unowned.pop_back();\n\
-    \            if (_nodes[node].has_value() && _references[node] == 0) release_zero(node);\n\
-    \        }\n    }\n\n    void reserve(std::size_t) {}\n\n    int next_index()\
-    \ const { return _first_free == -1 ? int(_nodes.size()) : _first_free; }\n\n \
-    \   std::size_t size() const { return _live_nodes; }\n};\n\n}  // namespace detail\n\
-    }  // namespace ds\n}  // namespace m1une\n\n\n#line 12 \"ds/dsu/persistent_dsu.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\n\nstruct PersistentDsu {\n   private:\n\
-    \    struct Node {\n        int val;\n        int l, r;\n\n        Node() : val(0),\
-    \ l(0), r(0) {}\n        explicit Node(int value) : val(value), l(0), r(0) {}\n\
-    \        Node(int value, int left, int right) : val(value), l(left), r(right)\
-    \ {}\n    };\n\n    int _n;\n    int _root;\n    using Pool = detail::PersistentBinaryNodePool<Node,\
-    \ 0>;\n\n    std::shared_ptr<Pool> _pool;\n\n    explicit PersistentDsu(int n,\
-    \ int root, std::shared_ptr<Pool> pool)\n        : _n(n), _root(root), _pool(std::move(pool))\
-    \ {\n        _pool->retain(_root);\n    }\n\n    int new_node(const Node& node)\
-    \ const {\n        return _pool->emplace(node);\n    }\n\n    int new_node(Node&&\
-    \ node) const {\n        return _pool->emplace(std::move(node));\n    }\n\n  \
-    \  int build(int l, int r) const {\n        if (l == r) return 0;\n        if\
-    \ (r - l == 1) return new_node(Node(-1));\n        int m = (l + r) >> 1;\n   \
-    \     int left = build(l, m);\n        int right = build(m, r);\n        return\
-    \ new_node(Node(0, left, right));\n    }\n\n    int set_node(int t, int l, int\
-    \ r, int p, int value) const {\n        if (r - l == 1) return new_node(Node(value));\n\
-    \        int m = (l + r) >> 1;\n            int left = (*_pool)[t].l;\n      \
-    \      int right = (*_pool)[t].r;\n        if (p < m) {\n            left = set_node(left,\
-    \ l, m, p, value);\n        } else {\n            right = set_node(right, m, r,\
-    \ p, value);\n        }\n        return new_node(Node(0, left, right));\n    }\n\
-    \n    PersistentDsu make_version(int root) const {\n        PersistentDsu result(_n,\
-    \ root, _pool);\n        _pool->discard_unreferenced();\n        return result;\n\
-    \    }\n\n    int get_node(int t, int l, int r, int p) const {\n        while\
-    \ (r - l > 1) {\n            int m = (l + r) >> 1;\n            if (p < m) {\n\
-    \                t = (*_pool)[t].l;\n                r = m;\n            } else\
-    \ {\n                t = (*_pool)[t].r;\n                l = m;\n            }\n\
-    \        }\n        return (*_pool)[t].val;\n    }\n\n   public:\n    PersistentDsu()\
-    \ : PersistentDsu(0) {}\n\n    explicit PersistentDsu(int n) : _n(n), _root(0),\
-    \ _pool(std::make_shared<Pool>()) {\n        assert(0 <= n);\n        _pool->reserve(n\
-    \ * 2 + 1);\n        if (_n > 0) _root = build(0, _n);\n        _pool->retain(_root);\n\
-    \        _pool->discard_unreferenced();\n    }\n\n    PersistentDsu(const PersistentDsu&\
-    \ other) : _n(other._n), _root(other._root), _pool(other._pool) {\n        if\
-    \ (_pool) _pool->retain(_root);\n    }\n\n    PersistentDsu(PersistentDsu&& other)\
-    \ noexcept\n        : _n(other._n), _root(other._root), _pool(std::move(other._pool))\
-    \ {\n        other._n = 0;\n        other._root = 0;\n    }\n\n    PersistentDsu&\
-    \ operator=(const PersistentDsu& other) {\n        if (this == &other) return\
-    \ *this;\n        if (other._pool) other._pool->retain(other._root);\n       \
-    \ if (_pool) _pool->release(_root);\n        _n = other._n;\n        _root = other._root;\n\
-    \        _pool = other._pool;\n        return *this;\n    }\n\n    PersistentDsu&\
-    \ operator=(PersistentDsu&& other) noexcept {\n        if (this == &other) return\
-    \ *this;\n        if (_pool) _pool->release(_root);\n        _n = other._n;\n\
-    \        _root = other._root;\n        _pool = std::move(other._pool);\n     \
-    \   other._n = 0;\n        other._root = 0;\n        return *this;\n    }\n\n\
-    \    ~PersistentDsu() {\n        if (_pool) _pool->release(_root);\n    }\n\n\
-    \    int size() const {\n        return _n;\n    }\n\n    bool empty() const {\n\
-    \        return _n == 0;\n    }\n\n    void release() {\n        if (_pool) _pool->release(_root);\n\
-    \        _n = 0;\n        _root = 0;\n        _pool = std::make_shared<Pool>();\n\
-    \    }\n\n    std::size_t node_count() const { return _pool ? _pool->size() :\
-    \ 0; }\n\n    int leader(int a) const {\n        assert(0 <= a && a < _n);\n \
-    \       int x = a;\n        int p = get(x);\n        while (p >= 0) {\n      \
-    \      x = p;\n            p = get(x);\n        }\n        return x;\n    }\n\n\
-    \    bool same(int a, int b) const {\n        assert(0 <= a && a < _n);\n    \
-    \    assert(0 <= b && b < _n);\n        return leader(a) == leader(b);\n    }\n\
-    \n    int group_size(int a) const {\n        assert(0 <= a && a < _n);\n     \
-    \   return -get(leader(a));\n    }\n\n    int size(int a) const {\n        return\
-    \ group_size(a);\n    }\n\n    int get(int p) const {\n        assert(0 <= p &&\
-    \ p < _n);\n        return get_node(_root, 0, _n, p);\n    }\n\n    PersistentDsu\
-    \ merge(int a, int b) const {\n        assert(0 <= a && a < _n);\n        assert(0\
-    \ <= b && b < _n);\n        int x = leader(a), y = leader(b);\n        if (x ==\
-    \ y) return *this;\n        int sx = -get(x), sy = -get(y);\n        if (sx <\
-    \ sy) {\n            std::swap(x, y);\n            std::swap(sx, sy);\n      \
-    \  }\n        int root = set_node(_root, 0, _n, x, -(sx + sy));\n        root\
-    \ = set_node(root, 0, _n, y, x);\n        return make_version(root);\n    }\n\n\
-    \    std::vector<std::vector<int>> groups() const {\n        std::vector<int>\
-    \ leader_buf(_n), group_size(_n);\n        for (int i = 0; i < _n; i++) {\n  \
-    \          leader_buf[i] = leader(i);\n            group_size[leader_buf[i]]++;\n\
-    \        }\n        std::vector<std::vector<int>> result(_n);\n        for (int\
-    \ i = 0; i < _n; i++) {\n            result[i].reserve(group_size[i]);\n     \
-    \   }\n        for (int i = 0; i < _n; i++) {\n            result[leader_buf[i]].push_back(i);\n\
-    \        }\n        result.erase(std::remove_if(result.begin(), result.end(),\
-    \ [&](const std::vector<int>& v) { return v.empty(); }),\n                   \
-    \  result.end());\n        return result;\n    }\n};\n\n}  // namespace ds\n}\
-    \  // namespace m1une\n\n\n#line 9 \"verify/ds/dsu/persistent_dsu_library_checker.test.cpp\"\
-    \nusing namespace m1une::ds;\n\nint main() {\n    m1une::utilities::FastInput\
-    \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n\n    int N, Q;\n\
-    \    fast_input >> N >> Q;\n    vector<PersistentDsu> dsus;\n    dsus.push_back(PersistentDsu(N));\n\
-    \    while (Q--) {\n        int t, k, u, v;\n        fast_input >> t >> k >> u\
-    \ >> v;\n        if (t == 0) {\n            dsus.push_back(dsus[k + 1].merge(u,\
-    \ v));\n        } else {\n            fast_output << int(dsus[k + 1].same(u, v))\
-    \ << '\\n';\n            dsus.push_back(PersistentDsu(0));\n        }\n    }\n\
-    }\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/persistent_unionfind\"\n\
-    \n#include \"../../../utilities/fast_io.hpp\"\n\n#include <bits/stdc++.h>\nusing\
-    \ namespace std;\n\n#include \"../../../ds/dsu/persistent_dsu.hpp\"\nusing namespace\
-    \ m1une::ds;\n\nint main() {\n    m1une::utilities::FastInput fast_input;\n  \
-    \  m1une::utilities::FastOutput fast_output;\n\n    int N, Q;\n    fast_input\
-    \ >> N >> Q;\n    vector<PersistentDsu> dsus;\n    dsus.push_back(PersistentDsu(N));\n\
-    \    while (Q--) {\n        int t, k, u, v;\n        fast_input >> t >> k >> u\
-    \ >> v;\n        if (t == 0) {\n            dsus.push_back(dsus[k + 1].merge(u,\
-    \ v));\n        } else {\n            fast_output << int(dsus[k + 1].same(u, v))\
-    \ << '\\n';\n            dsus.push_back(PersistentDsu(0));\n        }\n    }\n\
-    }\n"
+    \ utilities\n}  // namespace m1une\n\n\n#line 10 \"verify/utilities/base64.test.cpp\"\
+    \n#include <random>\n#line 13 \"verify/utilities/base64.test.cpp\"\n\nnamespace\
+    \ {\n\nusing m1une::utilities::checked_from_base64;\nusing m1une::utilities::from_base64;\n\
+    using m1une::utilities::to_base64;\n\nvoid fixed_tests() {\n    std::vector<int>\
+    \ digits(64);\n    for (int value = 0; value < 64; ++value) digits[value] = value;\n\
+    \    assert(to_base64(digits, 6) == m1une::utilities::base64_alphabet);\n    assert(from_base64<int>(m1une::utilities::base64_alphabet,\
+    \ 64, 6) == digits);\n\n    std::vector<unsigned char> man = {'M', 'a', 'n'};\n\
+    \    assert(to_base64(man, 8) == \"TWFu\");\n    assert(from_base64<unsigned char>(\"\
+    TWFu\", 3, 8) == man);\n\n    std::vector<unsigned char> one_byte = {'M'};\n \
+    \   assert(to_base64(one_byte, 8) == \"TQ\");\n    assert(from_base64<unsigned\
+    \ char>(\"TQ\", 1, 8) == one_byte);\n\n    std::vector<unsigned char> foobar =\
+    \ {'f', 'o', 'o', 'b', 'a', 'r'};\n    assert(to_base64(foobar, 8) == \"Zm9vYmFy\"\
+    );\n    assert(from_base64<unsigned char>(\"Zm9vYmFy\", 6, 8) == foobar);\n\n\
+    \    std::vector<int> two_bit_values = {1, 2, 3};\n    assert(to_base64(two_bit_values,\
+    \ 2) == \"b\");\n    assert(from_base64<int>(\"b\", 3, 2) == two_bit_values);\n\
+    \n    assert(to_base64(std::vector<int>(), 1).empty());\n    assert(from_base64<int>(\"\
+    \", 0, 1).empty());\n    assert(!checked_from_base64<int>(\"A\", 0, 1).has_value());\n\
+    \    assert(!checked_from_base64<int>(\"!\", 1, 6).has_value());\n    assert(!checked_from_base64<int>(\"\
+    AA\", 1, 6).has_value());\n    assert(!checked_from_base64<int>(\"B\", 1, 1).has_value());\n\
+    \    assert(!checked_from_base64<int>(\"A\", 1, 0).has_value());\n    assert(!checked_from_base64<int>(\"\
+    A\", 1, 32).has_value());\n}\n\ntemplate <class Integer>\nvoid randomized_type_tests(std::mt19937_64&\
+    \ random) {\n    constexpr int digits = std::numeric_limits<Integer>::digits;\n\
+    \    for (int bit_width = 1; bit_width <= digits; ++bit_width) {\n        for\
+    \ (int trial = 0; trial < 200; ++trial) {\n            std::size_t count = static_cast<std::size_t>(random()\
+    \ % 100);\n            std::vector<Integer> values(count);\n            for (Integer&\
+    \ value : values) {\n                std::uint64_t generated = random();\n   \
+    \             if (bit_width < 64) generated &= (std::uint64_t(1) << bit_width)\
+    \ - 1;\n                value = static_cast<Integer>(generated);\n           \
+    \ }\n\n            std::string encoded = to_base64(values, bit_width);\n     \
+    \       assert(encoded.size() == (count * bit_width + 5) / 6);\n            assert(from_base64<Integer>(encoded,\
+    \ count, bit_width) == values);\n        }\n    }\n}\n\nvoid randomized_tests()\
+    \ {\n    std::mt19937_64 random(0x81f42c957a6d3e10ULL);\n    randomized_type_tests<std::uint8_t>(random);\n\
+    \    randomized_type_tests<std::uint16_t>(random);\n    randomized_type_tests<std::uint32_t>(random);\n\
+    \    randomized_type_tests<std::uint64_t>(random);\n    randomized_type_tests<int>(random);\n\
+    \    randomized_type_tests<long long>(random);\n}\n\n}  // namespace\n\nint main()\
+    \ {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
+    \ fast_output;\n\n    fixed_tests();\n    randomized_tests();\n\n    long long\
+    \ a, b;\n    fast_input >> a >> b;\n    fast_output << a + b << '\\n';\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
+    ../../utilities/base64.hpp\"\n\n#include <cassert>\n#include <cstdint>\n#include\
+    \ \"../../utilities/fast_io.hpp\"\n#include <limits>\n#include <optional>\n#include\
+    \ <random>\n#include <string>\n#include <vector>\n\nnamespace {\n\nusing m1une::utilities::checked_from_base64;\n\
+    using m1une::utilities::from_base64;\nusing m1une::utilities::to_base64;\n\nvoid\
+    \ fixed_tests() {\n    std::vector<int> digits(64);\n    for (int value = 0; value\
+    \ < 64; ++value) digits[value] = value;\n    assert(to_base64(digits, 6) == m1une::utilities::base64_alphabet);\n\
+    \    assert(from_base64<int>(m1une::utilities::base64_alphabet, 64, 6) == digits);\n\
+    \n    std::vector<unsigned char> man = {'M', 'a', 'n'};\n    assert(to_base64(man,\
+    \ 8) == \"TWFu\");\n    assert(from_base64<unsigned char>(\"TWFu\", 3, 8) == man);\n\
+    \n    std::vector<unsigned char> one_byte = {'M'};\n    assert(to_base64(one_byte,\
+    \ 8) == \"TQ\");\n    assert(from_base64<unsigned char>(\"TQ\", 1, 8) == one_byte);\n\
+    \n    std::vector<unsigned char> foobar = {'f', 'o', 'o', 'b', 'a', 'r'};\n  \
+    \  assert(to_base64(foobar, 8) == \"Zm9vYmFy\");\n    assert(from_base64<unsigned\
+    \ char>(\"Zm9vYmFy\", 6, 8) == foobar);\n\n    std::vector<int> two_bit_values\
+    \ = {1, 2, 3};\n    assert(to_base64(two_bit_values, 2) == \"b\");\n    assert(from_base64<int>(\"\
+    b\", 3, 2) == two_bit_values);\n\n    assert(to_base64(std::vector<int>(), 1).empty());\n\
+    \    assert(from_base64<int>(\"\", 0, 1).empty());\n    assert(!checked_from_base64<int>(\"\
+    A\", 0, 1).has_value());\n    assert(!checked_from_base64<int>(\"!\", 1, 6).has_value());\n\
+    \    assert(!checked_from_base64<int>(\"AA\", 1, 6).has_value());\n    assert(!checked_from_base64<int>(\"\
+    B\", 1, 1).has_value());\n    assert(!checked_from_base64<int>(\"A\", 1, 0).has_value());\n\
+    \    assert(!checked_from_base64<int>(\"A\", 1, 32).has_value());\n}\n\ntemplate\
+    \ <class Integer>\nvoid randomized_type_tests(std::mt19937_64& random) {\n   \
+    \ constexpr int digits = std::numeric_limits<Integer>::digits;\n    for (int bit_width\
+    \ = 1; bit_width <= digits; ++bit_width) {\n        for (int trial = 0; trial\
+    \ < 200; ++trial) {\n            std::size_t count = static_cast<std::size_t>(random()\
+    \ % 100);\n            std::vector<Integer> values(count);\n            for (Integer&\
+    \ value : values) {\n                std::uint64_t generated = random();\n   \
+    \             if (bit_width < 64) generated &= (std::uint64_t(1) << bit_width)\
+    \ - 1;\n                value = static_cast<Integer>(generated);\n           \
+    \ }\n\n            std::string encoded = to_base64(values, bit_width);\n     \
+    \       assert(encoded.size() == (count * bit_width + 5) / 6);\n            assert(from_base64<Integer>(encoded,\
+    \ count, bit_width) == values);\n        }\n    }\n}\n\nvoid randomized_tests()\
+    \ {\n    std::mt19937_64 random(0x81f42c957a6d3e10ULL);\n    randomized_type_tests<std::uint8_t>(random);\n\
+    \    randomized_type_tests<std::uint16_t>(random);\n    randomized_type_tests<std::uint32_t>(random);\n\
+    \    randomized_type_tests<std::uint64_t>(random);\n    randomized_type_tests<int>(random);\n\
+    \    randomized_type_tests<long long>(random);\n}\n\n}  // namespace\n\nint main()\
+    \ {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
+    \ fast_output;\n\n    fixed_tests();\n    randomized_tests();\n\n    long long\
+    \ a, b;\n    fast_input >> a >> b;\n    fast_output << a + b << '\\n';\n}\n"
   dependsOn:
+  - utilities/base64.hpp
   - utilities/fast_io.hpp
-  - ds/dsu/persistent_dsu.hpp
-  - ds/detail/persistent_binary_node_pool.hpp
   isVerificationFile: true
-  path: verify/ds/dsu/persistent_dsu_library_checker.test.cpp
+  path: verify/utilities/base64.test.cpp
   requiredBy: []
-  timestamp: '2026-08-11 13:59:43+09:00'
+  timestamp: '2026-08-11 14:01:29+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/ds/dsu/persistent_dsu_library_checker.test.cpp
+documentation_of: verify/utilities/base64.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/ds/dsu/persistent_dsu_library_checker.test.cpp
-- /verify/verify/ds/dsu/persistent_dsu_library_checker.test.cpp.html
-title: verify/ds/dsu/persistent_dsu_library_checker.test.cpp
+- /verify/verify/utilities/base64.test.cpp
+- /verify/verify/utilities/base64.test.cpp.html
+title: verify/utilities/base64.test.cpp
 ---

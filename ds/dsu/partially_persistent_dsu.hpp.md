@@ -6,6 +6,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/dsu/partially_persistent_dsu.test.cpp
     title: verify/ds/dsu/partially_persistent_dsu.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/persistent_release.test.cpp
+    title: verify/ds/persistent_release.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -24,27 +27,31 @@ data:
     \ _time(0), parent(_n, -1), parent_time(_n, never), size_history(_n) {\n     \
     \   for (int i = 0; i < _n; i++) size_history[i].emplace_back(0, 1);\n    }\n\n\
     \    int size() const {\n        return _n;\n    }\n\n    bool empty() const {\n\
-    \        return _n == 0;\n    }\n\n    int time() const {\n        return _time;\n\
-    \    }\n\n    int leader(int t, int a) const {\n        check_time(t);\n     \
-    \   assert(0 <= a && a < _n);\n        while (parent_time[a] <= t) a = parent[a];\n\
-    \        return a;\n    }\n\n    int leader(int a) const {\n        return leader(_time,\
-    \ a);\n    }\n\n    bool same(int t, int a, int b) const {\n        check_time(t);\n\
+    \        return _n == 0;\n    }\n\n    // Releases the complete history and resets\
+    \ this object to an empty DSU.\n    void release() {\n        _n = 0;\n      \
+    \  _time = 0;\n        std::vector<int>().swap(parent);\n        std::vector<int>().swap(parent_time);\n\
+    \        std::vector<std::vector<std::pair<int, int>>>().swap(size_history);\n\
+    \    }\n\n    int time() const {\n        return _time;\n    }\n\n    int leader(int\
+    \ t, int a) const {\n        check_time(t);\n        assert(0 <= a && a < _n);\n\
+    \        while (parent_time[a] <= t) a = parent[a];\n        return a;\n    }\n\
+    \n    int leader(int a) const {\n        return leader(_time, a);\n    }\n\n \
+    \   bool same(int t, int a, int b) const {\n        check_time(t);\n        assert(0\
+    \ <= a && a < _n);\n        assert(0 <= b && b < _n);\n        return leader(t,\
+    \ a) == leader(t, b);\n    }\n\n    bool same(int a, int b) const {\n        return\
+    \ same(_time, a, b);\n    }\n\n    int group_size(int t, int a) const {\n    \
+    \    int r = leader(t, a);\n        const auto& h = size_history[r];\n       \
+    \ auto it = std::upper_bound(h.begin(), h.end(), std::pair<int, int>(t, never));\n\
+    \        --it;\n        return it->second;\n    }\n\n    int group_size(int a)\
+    \ const {\n        return -parent[leader(a)];\n    }\n\n    int size(int t, int\
+    \ a) const {\n        return group_size(t, a);\n    }\n\n    int size(int a) const\
+    \ {\n        return group_size(a);\n    }\n\n    bool merge(int a, int b) {\n\
     \        assert(0 <= a && a < _n);\n        assert(0 <= b && b < _n);\n      \
-    \  return leader(t, a) == leader(t, b);\n    }\n\n    bool same(int a, int b)\
-    \ const {\n        return same(_time, a, b);\n    }\n\n    int group_size(int\
-    \ t, int a) const {\n        int r = leader(t, a);\n        const auto& h = size_history[r];\n\
-    \        auto it = std::upper_bound(h.begin(), h.end(), std::pair<int, int>(t,\
-    \ never));\n        --it;\n        return it->second;\n    }\n\n    int group_size(int\
-    \ a) const {\n        return -parent[leader(a)];\n    }\n\n    int size(int t,\
-    \ int a) const {\n        return group_size(t, a);\n    }\n\n    int size(int\
-    \ a) const {\n        return group_size(a);\n    }\n\n    bool merge(int a, int\
-    \ b) {\n        assert(0 <= a && a < _n);\n        assert(0 <= b && b < _n);\n\
-    \        ++_time;\n        int x = leader(a), y = leader(b);\n        if (x ==\
-    \ y) return false;\n        if (-parent[x] < -parent[y]) {\n            std::swap(x,\
-    \ y);\n        }\n        parent[x] += parent[y];\n        parent[y] = x;\n  \
-    \      parent_time[y] = _time;\n        size_history[x].emplace_back(_time, -parent[x]);\n\
-    \        return true;\n    }\n\n    std::vector<std::vector<int>> groups(int t)\
-    \ const {\n        check_time(t);\n        std::vector<int> leader_buf(_n), group_size(_n);\n\
+    \  ++_time;\n        int x = leader(a), y = leader(b);\n        if (x == y) return\
+    \ false;\n        if (-parent[x] < -parent[y]) {\n            std::swap(x, y);\n\
+    \        }\n        parent[x] += parent[y];\n        parent[y] = x;\n        parent_time[y]\
+    \ = _time;\n        size_history[x].emplace_back(_time, -parent[x]);\n       \
+    \ return true;\n    }\n\n    std::vector<std::vector<int>> groups(int t) const\
+    \ {\n        check_time(t);\n        std::vector<int> leader_buf(_n), group_size(_n);\n\
     \        for (int i = 0; i < _n; i++) {\n            leader_buf[i] = leader(t,\
     \ i);\n            group_size[leader_buf[i]]++;\n        }\n        std::vector<std::vector<int>>\
     \ result(_n);\n        for (int i = 0; i < _n; i++) {\n            result[i].reserve(group_size[i]);\n\
@@ -67,27 +74,31 @@ data:
     \ _time(0), parent(_n, -1), parent_time(_n, never), size_history(_n) {\n     \
     \   for (int i = 0; i < _n; i++) size_history[i].emplace_back(0, 1);\n    }\n\n\
     \    int size() const {\n        return _n;\n    }\n\n    bool empty() const {\n\
-    \        return _n == 0;\n    }\n\n    int time() const {\n        return _time;\n\
-    \    }\n\n    int leader(int t, int a) const {\n        check_time(t);\n     \
-    \   assert(0 <= a && a < _n);\n        while (parent_time[a] <= t) a = parent[a];\n\
-    \        return a;\n    }\n\n    int leader(int a) const {\n        return leader(_time,\
-    \ a);\n    }\n\n    bool same(int t, int a, int b) const {\n        check_time(t);\n\
+    \        return _n == 0;\n    }\n\n    // Releases the complete history and resets\
+    \ this object to an empty DSU.\n    void release() {\n        _n = 0;\n      \
+    \  _time = 0;\n        std::vector<int>().swap(parent);\n        std::vector<int>().swap(parent_time);\n\
+    \        std::vector<std::vector<std::pair<int, int>>>().swap(size_history);\n\
+    \    }\n\n    int time() const {\n        return _time;\n    }\n\n    int leader(int\
+    \ t, int a) const {\n        check_time(t);\n        assert(0 <= a && a < _n);\n\
+    \        while (parent_time[a] <= t) a = parent[a];\n        return a;\n    }\n\
+    \n    int leader(int a) const {\n        return leader(_time, a);\n    }\n\n \
+    \   bool same(int t, int a, int b) const {\n        check_time(t);\n        assert(0\
+    \ <= a && a < _n);\n        assert(0 <= b && b < _n);\n        return leader(t,\
+    \ a) == leader(t, b);\n    }\n\n    bool same(int a, int b) const {\n        return\
+    \ same(_time, a, b);\n    }\n\n    int group_size(int t, int a) const {\n    \
+    \    int r = leader(t, a);\n        const auto& h = size_history[r];\n       \
+    \ auto it = std::upper_bound(h.begin(), h.end(), std::pair<int, int>(t, never));\n\
+    \        --it;\n        return it->second;\n    }\n\n    int group_size(int a)\
+    \ const {\n        return -parent[leader(a)];\n    }\n\n    int size(int t, int\
+    \ a) const {\n        return group_size(t, a);\n    }\n\n    int size(int a) const\
+    \ {\n        return group_size(a);\n    }\n\n    bool merge(int a, int b) {\n\
     \        assert(0 <= a && a < _n);\n        assert(0 <= b && b < _n);\n      \
-    \  return leader(t, a) == leader(t, b);\n    }\n\n    bool same(int a, int b)\
-    \ const {\n        return same(_time, a, b);\n    }\n\n    int group_size(int\
-    \ t, int a) const {\n        int r = leader(t, a);\n        const auto& h = size_history[r];\n\
-    \        auto it = std::upper_bound(h.begin(), h.end(), std::pair<int, int>(t,\
-    \ never));\n        --it;\n        return it->second;\n    }\n\n    int group_size(int\
-    \ a) const {\n        return -parent[leader(a)];\n    }\n\n    int size(int t,\
-    \ int a) const {\n        return group_size(t, a);\n    }\n\n    int size(int\
-    \ a) const {\n        return group_size(a);\n    }\n\n    bool merge(int a, int\
-    \ b) {\n        assert(0 <= a && a < _n);\n        assert(0 <= b && b < _n);\n\
-    \        ++_time;\n        int x = leader(a), y = leader(b);\n        if (x ==\
-    \ y) return false;\n        if (-parent[x] < -parent[y]) {\n            std::swap(x,\
-    \ y);\n        }\n        parent[x] += parent[y];\n        parent[y] = x;\n  \
-    \      parent_time[y] = _time;\n        size_history[x].emplace_back(_time, -parent[x]);\n\
-    \        return true;\n    }\n\n    std::vector<std::vector<int>> groups(int t)\
-    \ const {\n        check_time(t);\n        std::vector<int> leader_buf(_n), group_size(_n);\n\
+    \  ++_time;\n        int x = leader(a), y = leader(b);\n        if (x == y) return\
+    \ false;\n        if (-parent[x] < -parent[y]) {\n            std::swap(x, y);\n\
+    \        }\n        parent[x] += parent[y];\n        parent[y] = x;\n        parent_time[y]\
+    \ = _time;\n        size_history[x].emplace_back(_time, -parent[x]);\n       \
+    \ return true;\n    }\n\n    std::vector<std::vector<int>> groups(int t) const\
+    \ {\n        check_time(t);\n        std::vector<int> leader_buf(_n), group_size(_n);\n\
     \        for (int i = 0; i < _n; i++) {\n            leader_buf[i] = leader(t,\
     \ i);\n            group_size[leader_buf[i]]++;\n        }\n        std::vector<std::vector<int>>\
     \ result(_n);\n        for (int i = 0; i < _n; i++) {\n            result[i].reserve(group_size[i]);\n\
@@ -101,10 +112,11 @@ data:
   isVerificationFile: false
   path: ds/dsu/partially_persistent_dsu.hpp
   requiredBy: []
-  timestamp: '2026-06-27 02:52:37+09:00'
+  timestamp: '2026-08-11 13:59:43+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/dsu/partially_persistent_dsu.test.cpp
+  - verify/ds/persistent_release.test.cpp
 documentation_of: ds/dsu/partially_persistent_dsu.hpp
 layout: document
 title: Partially Persistent DSU
@@ -136,6 +148,7 @@ remain queryable.
 | `explicit PartiallyPersistentDsu(int n)` | Creates `n` singleton sets at time `0`. | $O(N)$ |
 | `int size() const` | Returns the number of elements. | $O(1)$ |
 | `bool empty() const` | Returns whether the DSU has no elements. | $O(1)$ |
+| `void release()` | Releases the complete history and resets the object to an empty DSU at time `0`. | $O(N + Q)$ |
 | `int time() const` | Returns the current time. | $O(1)$ |
 | `bool merge(int a, int b)` | Advances time by one and merges the current sets containing `a` and `b`. Returns whether two different sets were merged. | $O(\log N)$ |
 | `bool same(int t, int a, int b) const` | Returns whether `a` and `b` were in the same set at time `t`. | $O(\log N)$ |

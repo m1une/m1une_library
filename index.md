@@ -261,6 +261,11 @@ data:
     - icon: ':heavy_check_mark:'
       path: ds/deque/persistent_deque.hpp
       title: Persistent Deque
+  - name: ds/detail
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: ds/detail/persistent_binary_node_pool.hpp
+      title: ds/detail/persistent_binary_node_pool.hpp
   - name: ds/dsu
     pages:
     - icon: ':heavy_check_mark:'
@@ -1241,6 +1246,9 @@ data:
   - name: utilities
     pages:
     - icon: ':heavy_check_mark:'
+      path: utilities/base64.hpp
+      title: Base64 Sequence Encoding
+    - icon: ':heavy_check_mark:'
       path: utilities/bigint.hpp
       title: BigInt
     - icon: ':heavy_check_mark:'
@@ -1532,6 +1540,11 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/ds/interval_set/interval_set.test.cpp
       title: verify/ds/interval_set/interval_set.test.cpp
+  - name: verify/ds
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/persistent_release.test.cpp
+      title: verify/ds/persistent_release.test.cpp
   - name: verify/ds/queue
     pages:
     - icon: ':heavy_check_mark:'
@@ -2394,6 +2407,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/utilities/arrow_dice.test.cpp
       title: verify/utilities/arrow_dice.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/utilities/base64.test.cpp
+      title: verify/utilities/base64.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/utilities/basic_utilities.test.cpp
       title: verify/utilities/basic_utilities.test.cpp
