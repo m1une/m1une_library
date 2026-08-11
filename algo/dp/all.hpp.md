@@ -15,12 +15,13 @@ data:
   attributes:
     links: []
   bundledCode: "#line 1 \"algo/dp/all.hpp\"\n\n\n\n#line 1 \"algo/dp/knapsack.hpp\"\
-    \n\n\n\n#include <algorithm>\n#include <cassert>\n#include <cstddef>\n#include\
-    \ <deque>\n#include <limits>\n#include <vector>\n\nnamespace m1une {\nnamespace\
-    \ algo {\n\ninline std::vector<char> subset_sum_reachable(const std::vector<int>&\
-    \ weights, int limit) {\n    assert(0 <= limit);\n    using Word = unsigned long\
-    \ long;\n    constexpr int word_bits = std::numeric_limits<Word>::digits;\n\n\
-    \    const std::size_t bit_count = std::size_t(limit) + 1;\n    std::vector<Word>\
+    \n\n\n\n#include <algorithm>\n#include <bit>\n#include <cassert>\n#include <cstddef>\n\
+    #include <deque>\n#include <limits>\n#include <vector>\n\nnamespace m1une {\n\
+    namespace algo {\n\nnamespace internal {\n\nusing SubsetSumWord = unsigned long\
+    \ long;\n\ninline std::vector<SubsetSumWord> subset_sum_reachability_bits(\n \
+    \   const std::vector<int>& weights,\n    int limit\n) {\n    assert(0 <= limit);\n\
+    \    using Word = SubsetSumWord;\n    constexpr int word_bits = std::numeric_limits<Word>::digits;\n\
+    \n    const std::size_t bit_count = std::size_t(limit) + 1;\n    std::vector<Word>\
     \ bits((bit_count + word_bits - 1) / word_bits, Word(0));\n    bits[0] = Word(1);\n\
     \n    auto trim = [&]() {\n        const int extra = int(bit_count % word_bits);\n\
     \        if (extra != 0) {\n            bits.back() &= (Word(1) << extra) - Word(1);\n\
@@ -33,14 +34,24 @@ data:
     \            bits[target] |= source << bit_shift;\n            if (bit_shift !=\
     \ 0 && target + 1 < bits.size()) {\n                bits[target + 1] |= source\
     \ >> (word_bits - bit_shift);\n            }\n        }\n        trim();\n   \
-    \ }\n\n    std::vector<char> reachable(std::size_t(limit) + 1, 0);\n    for (int\
-    \ sum = 0; sum <= limit; ++sum) {\n        reachable[sum] = char((bits[std::size_t(sum\
+    \ }\n    return bits;\n}\n\n}  // namespace internal\n\ninline std::vector<char>\
+    \ subset_sum_reachable(const std::vector<int>& weights, int limit) {\n    using\
+    \ Word = internal::SubsetSumWord;\n    constexpr int word_bits = std::numeric_limits<Word>::digits;\n\
+    \    const std::vector<Word> bits =\n        internal::subset_sum_reachability_bits(weights,\
+    \ limit);\n\n    std::vector<char> reachable(std::size_t(limit) + 1, 0);\n   \
+    \ for (int sum = 0; sum <= limit; ++sum) {\n        reachable[sum] = char((bits[std::size_t(sum\
     \ / word_bits)] >> (sum % word_bits)) & Word(1));\n    }\n    return reachable;\n\
-    }\n\ntemplate <typename Value = long long>\nstd::vector<Value> zero_one_knapsack_max_value(\n\
-    \    const std::vector<int>& weights,\n    const std::vector<Value>& values,\n\
-    \    int capacity,\n    Value neg_inf = std::numeric_limits<Value>::lowest() /\
-    \ Value(4)\n) {\n    assert(weights.size() == values.size());\n    assert(0 <=\
-    \ capacity);\n\n    std::vector<Value> dp(std::size_t(capacity) + 1, neg_inf);\n\
+    }\n\n// Returns the maximum subset sum not exceeding limit.\ninline int subset_sum_max_value(const\
+    \ std::vector<int>& weights, int limit) {\n    using Word = internal::SubsetSumWord;\n\
+    \    constexpr int word_bits = std::numeric_limits<Word>::digits;\n    const std::vector<Word>\
+    \ bits =\n        internal::subset_sum_reachability_bits(weights, limit);\n\n\
+    \    for (std::size_t i = bits.size(); i-- > 0;) {\n        if (bits[i] != Word(0))\
+    \ {\n            return int(i * word_bits + std::bit_width(bits[i]) - 1);\n  \
+    \      }\n    }\n    return 0;\n}\n\ntemplate <typename Value = long long>\nstd::vector<Value>\
+    \ zero_one_knapsack_max_value(\n    const std::vector<int>& weights,\n    const\
+    \ std::vector<Value>& values,\n    int capacity,\n    Value neg_inf = std::numeric_limits<Value>::lowest()\
+    \ / Value(4)\n) {\n    assert(weights.size() == values.size());\n    assert(0\
+    \ <= capacity);\n\n    std::vector<Value> dp(std::size_t(capacity) + 1, neg_inf);\n\
     \    dp[0] = Value{};\n    for (std::size_t item = 0; item < weights.size(); ++item)\
     \ {\n        const int weight = weights[item];\n        assert(0 <= weight);\n\
     \        for (int current = capacity; weight <= current; --current) {\n      \
@@ -106,7 +117,7 @@ data:
   path: algo/dp/all.hpp
   requiredBy:
   - algo/all.hpp
-  timestamp: '2026-07-07 22:10:04+09:00'
+  timestamp: '2026-08-12 05:02:13+09:00'
   verificationStatus: LIBRARY_NO_TESTS
   verifiedWith: []
 documentation_of: algo/dp/all.hpp

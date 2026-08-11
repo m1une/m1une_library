@@ -14,10 +14,10 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://judge.yosupo.jp/problem/aplusb
+    PROBLEM: https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=ALDS1_5_A
     links:
-    - https://judge.yosupo.jp/problem/aplusb
-  bundledCode: "#line 1 \"verify/algo/dp/knapsack.test.cpp\"\n#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\
+    - https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=ALDS1_5_A
+  bundledCode: "#line 1 \"verify/algo/dp/knapsack.test.cpp\"\n#define PROBLEM \"https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=ALDS1_5_A\"\
     \n\n#include <algorithm>\n#include <cassert>\n#line 1 \"utilities/fast_io.hpp\"\
     \n\n\n\n#line 5 \"utilities/fast_io.hpp\"\n#include <array>\n#include <cerrno>\n\
     #include <charconv>\n#include <cstddef>\n#include <cstdio>\n#include <cstdlib>\n\
@@ -262,14 +262,16 @@ data:
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
     \ utilities\n}  // namespace m1une\n\n\n#line 6 \"verify/algo/dp/knapsack.test.cpp\"\
     \n#include <limits>\n#include <vector>\n\n#line 1 \"algo/dp/knapsack.hpp\"\n\n\
-    \n\n#line 7 \"algo/dp/knapsack.hpp\"\n#include <deque>\n#line 10 \"algo/dp/knapsack.hpp\"\
-    \n\nnamespace m1une {\nnamespace algo {\n\ninline std::vector<char> subset_sum_reachable(const\
-    \ std::vector<int>& weights, int limit) {\n    assert(0 <= limit);\n    using\
-    \ Word = unsigned long long;\n    constexpr int word_bits = std::numeric_limits<Word>::digits;\n\
-    \n    const std::size_t bit_count = std::size_t(limit) + 1;\n    std::vector<Word>\
-    \ bits((bit_count + word_bits - 1) / word_bits, Word(0));\n    bits[0] = Word(1);\n\
-    \n    auto trim = [&]() {\n        const int extra = int(bit_count % word_bits);\n\
-    \        if (extra != 0) {\n            bits.back() &= (Word(1) << extra) - Word(1);\n\
+    \n\n#line 5 \"algo/dp/knapsack.hpp\"\n#include <bit>\n#line 8 \"algo/dp/knapsack.hpp\"\
+    \n#include <deque>\n#line 11 \"algo/dp/knapsack.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ algo {\n\nnamespace internal {\n\nusing SubsetSumWord = unsigned long long;\n\
+    \ninline std::vector<SubsetSumWord> subset_sum_reachability_bits(\n    const std::vector<int>&\
+    \ weights,\n    int limit\n) {\n    assert(0 <= limit);\n    using Word = SubsetSumWord;\n\
+    \    constexpr int word_bits = std::numeric_limits<Word>::digits;\n\n    const\
+    \ std::size_t bit_count = std::size_t(limit) + 1;\n    std::vector<Word> bits((bit_count\
+    \ + word_bits - 1) / word_bits, Word(0));\n    bits[0] = Word(1);\n\n    auto\
+    \ trim = [&]() {\n        const int extra = int(bit_count % word_bits);\n    \
+    \    if (extra != 0) {\n            bits.back() &= (Word(1) << extra) - Word(1);\n\
     \        }\n    };\n\n    for (int weight : weights) {\n        assert(0 <= weight);\n\
     \        if (weight == 0 || limit < weight) continue;\n\n        const std::size_t\
     \ word_shift = std::size_t(weight / word_bits);\n        const int bit_shift =\
@@ -279,14 +281,24 @@ data:
     \            bits[target] |= source << bit_shift;\n            if (bit_shift !=\
     \ 0 && target + 1 < bits.size()) {\n                bits[target + 1] |= source\
     \ >> (word_bits - bit_shift);\n            }\n        }\n        trim();\n   \
-    \ }\n\n    std::vector<char> reachable(std::size_t(limit) + 1, 0);\n    for (int\
-    \ sum = 0; sum <= limit; ++sum) {\n        reachable[sum] = char((bits[std::size_t(sum\
+    \ }\n    return bits;\n}\n\n}  // namespace internal\n\ninline std::vector<char>\
+    \ subset_sum_reachable(const std::vector<int>& weights, int limit) {\n    using\
+    \ Word = internal::SubsetSumWord;\n    constexpr int word_bits = std::numeric_limits<Word>::digits;\n\
+    \    const std::vector<Word> bits =\n        internal::subset_sum_reachability_bits(weights,\
+    \ limit);\n\n    std::vector<char> reachable(std::size_t(limit) + 1, 0);\n   \
+    \ for (int sum = 0; sum <= limit; ++sum) {\n        reachable[sum] = char((bits[std::size_t(sum\
     \ / word_bits)] >> (sum % word_bits)) & Word(1));\n    }\n    return reachable;\n\
-    }\n\ntemplate <typename Value = long long>\nstd::vector<Value> zero_one_knapsack_max_value(\n\
-    \    const std::vector<int>& weights,\n    const std::vector<Value>& values,\n\
-    \    int capacity,\n    Value neg_inf = std::numeric_limits<Value>::lowest() /\
-    \ Value(4)\n) {\n    assert(weights.size() == values.size());\n    assert(0 <=\
-    \ capacity);\n\n    std::vector<Value> dp(std::size_t(capacity) + 1, neg_inf);\n\
+    }\n\n// Returns the maximum subset sum not exceeding limit.\ninline int subset_sum_max_value(const\
+    \ std::vector<int>& weights, int limit) {\n    using Word = internal::SubsetSumWord;\n\
+    \    constexpr int word_bits = std::numeric_limits<Word>::digits;\n    const std::vector<Word>\
+    \ bits =\n        internal::subset_sum_reachability_bits(weights, limit);\n\n\
+    \    for (std::size_t i = bits.size(); i-- > 0;) {\n        if (bits[i] != Word(0))\
+    \ {\n            return int(i * word_bits + std::bit_width(bits[i]) - 1);\n  \
+    \      }\n    }\n    return 0;\n}\n\ntemplate <typename Value = long long>\nstd::vector<Value>\
+    \ zero_one_knapsack_max_value(\n    const std::vector<int>& weights,\n    const\
+    \ std::vector<Value>& values,\n    int capacity,\n    Value neg_inf = std::numeric_limits<Value>::lowest()\
+    \ / Value(4)\n) {\n    assert(weights.size() == values.size());\n    assert(0\
+    \ <= capacity);\n\n    std::vector<Value> dp(std::size_t(capacity) + 1, neg_inf);\n\
     \    dp[0] = Value{};\n    for (std::size_t item = 0; item < weights.size(); ++item)\
     \ {\n        const int weight = weights[item];\n        assert(0 <= weight);\n\
     \        for (int current = capacity; weight <= current; --current) {\n      \
@@ -338,7 +350,10 @@ data:
     \ std::vector<int>& weights, int limit) {\n    std::vector<char> reachable(limit\
     \ + 1, 0);\n    reachable[0] = 1;\n    for (int weight : weights) {\n        for\
     \ (int sum = limit; weight <= sum; --sum) {\n            if (reachable[sum - weight])\
-    \ reachable[sum] = 1;\n        }\n    }\n    return reachable;\n}\n\nstd::vector<long\
+    \ reachable[sum] = 1;\n        }\n    }\n    return reachable;\n}\n\nint naive_subset_sum_max_value(const\
+    \ std::vector<int>& weights, int limit) {\n    const std::vector<char> reachable\
+    \ = naive_subset_sum(weights, limit);\n    for (int sum = limit; 0 <= sum; --sum)\
+    \ {\n        if (reachable[sum]) return sum;\n    }\n    return 0;\n}\n\nstd::vector<long\
     \ long> naive_zero_one_max_value(\n    const std::vector<int>& weights,\n    const\
     \ std::vector<long long>& values,\n    int capacity\n) {\n    std::vector<long\
     \ long> result(capacity + 1, 0);\n    const int n = int(weights.size());\n   \
@@ -369,11 +384,16 @@ data:
     \    weight += weights[i];\n                value += values[i];\n            }\n\
     \        }\n        if (value <= value_limit) {\n            result[value] = std::min(result[value],\
     \ weight);\n        }\n    }\n    return result;\n}\n\nvoid test_subset_sum()\
-    \ {\n    for (int n = 0; n <= 8; ++n) {\n        std::vector<int> weights(n);\n\
-    \        for (int seed = 0; seed < 60; ++seed) {\n            for (int i = 0;\
-    \ i < n; ++i) {\n                weights[i] = (seed * 13 + i * 7) % 10;\n    \
-    \        }\n            assert(m1une::algo::subset_sum_reachable(weights, 30)\
-    \ == naive_subset_sum(weights, 30));\n        }\n    }\n}\n\nvoid test_zero_one_knapsack()\
+    \ {\n    const std::vector<int> limits = {0, 1, 30, 63, 64, 65, 127, 128, 129};\n\
+    \    for (int limit : limits) {\n        for (int n = 0; n <= 8; ++n) {\n    \
+    \        std::vector<int> weights(n);\n            for (int seed = 0; seed < 60;\
+    \ ++seed) {\n                for (int i = 0; i < n; ++i) {\n                 \
+    \   weights[i] = (seed * 13 + i * 67) % 140;\n                }\n            \
+    \    const std::vector<char> expected = naive_subset_sum(weights, limit);\n  \
+    \              assert(m1une::algo::subset_sum_reachable(weights, limit) == expected);\n\
+    \                assert(\n                    m1une::algo::subset_sum_max_value(weights,\
+    \ limit) ==\n                    naive_subset_sum_max_value(weights, limit)\n\
+    \                );\n            }\n        }\n    }\n}\n\nvoid test_zero_one_knapsack()\
     \ {\n    std::vector<int> weights = {2, 3, 4, 5};\n    std::vector<long long>\
     \ values = {4, 5, 7, 8};\n    assert(\n        m1une::algo::zero_one_knapsack_max_value(weights,\
     \ values, 10)\n        == naive_zero_one_max_value(weights, values, 10)\n    );\n\
@@ -387,29 +407,37 @@ data:
     \ 20)\n        == naive_min_weight_for_value(weights, values, 20)\n    );\n}\n\
     \nint main() {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
     \ fast_output;\n\n    test_subset_sum();\n    test_zero_one_knapsack();\n    test_bounded_knapsack();\n\
-    \    test_min_weight_for_value();\n\n    long long a, b;\n    fast_input >> a\
-    \ >> b;\n    fast_output << a + b << '\\n';\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <algorithm>\n\
-    #include <cassert>\n#include \"../../../utilities/fast_io.hpp\"\n#include <limits>\n\
-    #include <vector>\n\n#include \"../../../algo/dp/knapsack.hpp\"\n\nstd::vector<char>\
-    \ naive_subset_sum(const std::vector<int>& weights, int limit) {\n    std::vector<char>\
-    \ reachable(limit + 1, 0);\n    reachable[0] = 1;\n    for (int weight : weights)\
-    \ {\n        for (int sum = limit; weight <= sum; --sum) {\n            if (reachable[sum\
-    \ - weight]) reachable[sum] = 1;\n        }\n    }\n    return reachable;\n}\n\
-    \nstd::vector<long long> naive_zero_one_max_value(\n    const std::vector<int>&\
-    \ weights,\n    const std::vector<long long>& values,\n    int capacity\n) {\n\
-    \    std::vector<long long> result(capacity + 1, 0);\n    const int n = int(weights.size());\n\
-    \    for (int mask = 0; mask < (1 << n); ++mask) {\n        int weight = 0;\n\
-    \        long long value = 0;\n        for (int i = 0; i < n; ++i) {\n       \
-    \     if ((mask >> i) & 1) {\n                weight += weights[i];\n        \
-    \        value += values[i];\n            }\n        }\n        if (weight <=\
-    \ capacity) {\n            for (int current = weight; current <= capacity; ++current)\
-    \ {\n                result[current] = std::max(result[current], value);\n   \
-    \         }\n        }\n    }\n    return result;\n}\n\nstd::vector<long long>\
-    \ naive_bounded_max_value(\n    const std::vector<int>& weights,\n    const std::vector<long\
-    \ long>& values,\n    const std::vector<int>& counts,\n    int capacity\n) {\n\
-    \    std::vector<long long> result(capacity + 1, 0);\n    const int n = int(weights.size());\n\
-    \n    auto dfs = [&](auto& self, int item, int weight, long long value) -> void\
+    \    test_min_weight_for_value();\n\n    int n;\n    fast_input >> n;\n    std::vector<int>\
+    \ weights(n);\n    for (int& weight : weights) fast_input >> weight;\n\n    int\
+    \ query_count;\n    fast_input >> query_count;\n    while (query_count--) {\n\
+    \        int target;\n        fast_input >> target;\n        const bool reachable\
+    \ =\n            m1une::algo::subset_sum_max_value(weights, target) == target;\n\
+    \        fast_output << (reachable ? \"yes\" : \"no\") << '\\n';\n    }\n}\n"
+  code: "#define PROBLEM \"https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=ALDS1_5_A\"\
+    \n\n#include <algorithm>\n#include <cassert>\n#include \"../../../utilities/fast_io.hpp\"\
+    \n#include <limits>\n#include <vector>\n\n#include \"../../../algo/dp/knapsack.hpp\"\
+    \n\nstd::vector<char> naive_subset_sum(const std::vector<int>& weights, int limit)\
+    \ {\n    std::vector<char> reachable(limit + 1, 0);\n    reachable[0] = 1;\n \
+    \   for (int weight : weights) {\n        for (int sum = limit; weight <= sum;\
+    \ --sum) {\n            if (reachable[sum - weight]) reachable[sum] = 1;\n   \
+    \     }\n    }\n    return reachable;\n}\n\nint naive_subset_sum_max_value(const\
+    \ std::vector<int>& weights, int limit) {\n    const std::vector<char> reachable\
+    \ = naive_subset_sum(weights, limit);\n    for (int sum = limit; 0 <= sum; --sum)\
+    \ {\n        if (reachable[sum]) return sum;\n    }\n    return 0;\n}\n\nstd::vector<long\
+    \ long> naive_zero_one_max_value(\n    const std::vector<int>& weights,\n    const\
+    \ std::vector<long long>& values,\n    int capacity\n) {\n    std::vector<long\
+    \ long> result(capacity + 1, 0);\n    const int n = int(weights.size());\n   \
+    \ for (int mask = 0; mask < (1 << n); ++mask) {\n        int weight = 0;\n   \
+    \     long long value = 0;\n        for (int i = 0; i < n; ++i) {\n          \
+    \  if ((mask >> i) & 1) {\n                weight += weights[i];\n           \
+    \     value += values[i];\n            }\n        }\n        if (weight <= capacity)\
+    \ {\n            for (int current = weight; current <= capacity; ++current) {\n\
+    \                result[current] = std::max(result[current], value);\n       \
+    \     }\n        }\n    }\n    return result;\n}\n\nstd::vector<long long> naive_bounded_max_value(\n\
+    \    const std::vector<int>& weights,\n    const std::vector<long long>& values,\n\
+    \    const std::vector<int>& counts,\n    int capacity\n) {\n    std::vector<long\
+    \ long> result(capacity + 1, 0);\n    const int n = int(weights.size());\n\n \
+    \   auto dfs = [&](auto& self, int item, int weight, long long value) -> void\
     \ {\n        if (item == n) {\n            if (weight <= capacity) {\n       \
     \         for (int current = weight; current <= capacity; ++current) {\n     \
     \               result[current] = std::max(result[current], value);\n        \
@@ -426,11 +454,16 @@ data:
     \    weight += weights[i];\n                value += values[i];\n            }\n\
     \        }\n        if (value <= value_limit) {\n            result[value] = std::min(result[value],\
     \ weight);\n        }\n    }\n    return result;\n}\n\nvoid test_subset_sum()\
-    \ {\n    for (int n = 0; n <= 8; ++n) {\n        std::vector<int> weights(n);\n\
-    \        for (int seed = 0; seed < 60; ++seed) {\n            for (int i = 0;\
-    \ i < n; ++i) {\n                weights[i] = (seed * 13 + i * 7) % 10;\n    \
-    \        }\n            assert(m1une::algo::subset_sum_reachable(weights, 30)\
-    \ == naive_subset_sum(weights, 30));\n        }\n    }\n}\n\nvoid test_zero_one_knapsack()\
+    \ {\n    const std::vector<int> limits = {0, 1, 30, 63, 64, 65, 127, 128, 129};\n\
+    \    for (int limit : limits) {\n        for (int n = 0; n <= 8; ++n) {\n    \
+    \        std::vector<int> weights(n);\n            for (int seed = 0; seed < 60;\
+    \ ++seed) {\n                for (int i = 0; i < n; ++i) {\n                 \
+    \   weights[i] = (seed * 13 + i * 67) % 140;\n                }\n            \
+    \    const std::vector<char> expected = naive_subset_sum(weights, limit);\n  \
+    \              assert(m1une::algo::subset_sum_reachable(weights, limit) == expected);\n\
+    \                assert(\n                    m1une::algo::subset_sum_max_value(weights,\
+    \ limit) ==\n                    naive_subset_sum_max_value(weights, limit)\n\
+    \                );\n            }\n        }\n    }\n}\n\nvoid test_zero_one_knapsack()\
     \ {\n    std::vector<int> weights = {2, 3, 4, 5};\n    std::vector<long long>\
     \ values = {4, 5, 7, 8};\n    assert(\n        m1une::algo::zero_one_knapsack_max_value(weights,\
     \ values, 10)\n        == naive_zero_one_max_value(weights, values, 10)\n    );\n\
@@ -444,15 +477,19 @@ data:
     \ 20)\n        == naive_min_weight_for_value(weights, values, 20)\n    );\n}\n\
     \nint main() {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
     \ fast_output;\n\n    test_subset_sum();\n    test_zero_one_knapsack();\n    test_bounded_knapsack();\n\
-    \    test_min_weight_for_value();\n\n    long long a, b;\n    fast_input >> a\
-    \ >> b;\n    fast_output << a + b << '\\n';\n}\n"
+    \    test_min_weight_for_value();\n\n    int n;\n    fast_input >> n;\n    std::vector<int>\
+    \ weights(n);\n    for (int& weight : weights) fast_input >> weight;\n\n    int\
+    \ query_count;\n    fast_input >> query_count;\n    while (query_count--) {\n\
+    \        int target;\n        fast_input >> target;\n        const bool reachable\
+    \ =\n            m1une::algo::subset_sum_max_value(weights, target) == target;\n\
+    \        fast_output << (reachable ? \"yes\" : \"no\") << '\\n';\n    }\n}\n"
   dependsOn:
   - utilities/fast_io.hpp
   - algo/dp/knapsack.hpp
   isVerificationFile: true
   path: verify/algo/dp/knapsack.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-08-12 05:02:13+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/algo/dp/knapsack.test.cpp
