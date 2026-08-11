@@ -1,6 +1,7 @@
 #ifndef M1UNE_PERSISTENT_ORDERED_SET_HPP
 #define M1UNE_PERSISTENT_ORDERED_SET_HPP 1
 
+#include <cstddef>
 #include <functional>
 #include <initializer_list>
 #include <utility>
@@ -49,6 +50,14 @@ struct PersistentOrderedSet {
 
     bool empty() const {
         return data.empty();
+    }
+
+    void release() {
+        data.release();
+    }
+
+    std::size_t node_count() const {
+        return data.node_count();
     }
 
     PersistentOrderedSet clear() const {

@@ -10,6 +10,9 @@ possibly noncommutative group. Merge operations return a new version and leave
 the old version available, while preserving potential differences inside each
 component.
 
+Reference counting recycles internal persistent-array nodes after their final
+dependent version and parent are released.
+
 The template parameter is a type satisfying
 `m1une::monoid::IsGroup`. The stored constraint for
 `merge(a, b, w)` is `diff(a, b) == w`, where `diff(a, b)` is
@@ -46,6 +49,8 @@ checked for consistency.
 | `explicit PersistentPotentializedDsu(int n)` | Creates `n` singleton sets with identity potentials. | $O(N)$ |
 | `int size() const` | Returns the number of elements. | $O(1)$ |
 | `bool empty() const` | Returns whether the DSU has no elements. | $O(1)$ |
+| `void release()` | Releases this version immediately and makes this handle empty. | $O(F)$ |
+| `std::size_t node_count() const` | Returns live internal nodes in the shared version family. | $O(1)$ |
 | `std::pair<PersistentPotentializedDsu, bool> merge(int a, int b, const T& w) const` | Returns a new version with the constraint `diff(a, b) == w`, and whether the constraint is consistent. If the constraint contradicts an existing component, the returned version is unchanged. | $O(\log^2 N)$ |
 | `bool same(int a, int b) const` | Returns whether `a` and `b` are in the same set. | $O(\log^2 N)$ |
 | `int leader(int a) const` | Returns the representative of the set containing `a`. | $O(\log^2 N)$ |
@@ -55,6 +60,9 @@ checked for consistency.
 | `Value get(int p) const` | Returns the internal value at index `p`. It has `parent_or_size` and `diff_to_parent` members. | $O(\log N)$ |
 | `int parent_or_size(int p) const` | Returns the internal parent-or-size value at index `p`. | $O(\log N)$ |
 | `std::vector<std::vector<int>> groups() const` | Returns all sets as vectors of element indices. | $O(N \log^2 N)$ |
+
+Here $F$ is the number of internal nodes that become unreachable. Destruction
+and assignment release roots automatically.
 
 ## Example
 

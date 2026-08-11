@@ -17,9 +17,10 @@ operation copies or traverses the whole deque.
 Indexed access is intentionally not part of this endpoint deque API; adding a
 general `operator[]` would not have the same worst-case constant bound.
 
-Values live in a shared append-only pool and stream cells contain value indices.
-A push therefore stores its `T` only once, and `T` may be move-only. The pool is
-released when the last related deque version is destroyed.
+Values live in a shared recyclable pool and stream cells contain value indices.
+A push therefore stores its `T` only once, and `T` may be move-only. Reference
+counting reclaims values and stream cells after their final dependent version or
+cell is released.
 
 ## Behavior
 
@@ -30,7 +31,7 @@ contents of the source version.
 Lazy stream cells are memoized internally when accessed. This physical
 memoization is shared by related versions and does not change any version's
 logical contents. References returned by `front()` and `back()` remain valid
-while any related version keeps the shared pool alive.
+while a live version depends on the pointed-to value.
 
 ## Interface
 
@@ -39,6 +40,8 @@ while any related version keeps the shared pool alive.
 | Constructor | `PersistentDeque()` | Constructs an empty deque. | Worst-case $O(1)$ |
 | `size` | `int size() const` | Returns the number of elements. | Worst-case $O(1)$ |
 | `empty` | `bool empty() const` | Returns whether the deque is empty. | Worst-case $O(1)$ |
+| `release` | `void release()` | Releases this version immediately and makes this handle empty. | $O(F)$ |
+| `node_count` | `std::size_t node_count() const` | Returns live values and stream cells in the shared version family. | $O(1)$ |
 | `front` | `const T& front() const` | Returns the first element. | Worst-case $O(1)$ |
 | `back` | `const T& back() const` | Returns the last element. | Worst-case $O(1)$ |
 | `push_front` | `PersistentDeque push_front(T value) const` | Returns a version with `value` prepended. | Worst-case $O(1)$ |
@@ -48,6 +51,9 @@ while any related version keeps the shared pool alive.
 | `pop_front` | `PersistentDeque pop_front() const` | Returns a version without its first element. | Worst-case $O(1)$ |
 | `pop_back` | `PersistentDeque pop_back() const` | Returns a version without its last element. | Worst-case $O(1)$ |
 | `clear` | `PersistentDeque clear() const` | Returns an empty related version. | Worst-case $O(1)$ |
+
+Here $F$ is the number of values and stream cells that become unreachable.
+Destruction and assignment release versions automatically.
 
 Each push stores one `T`. Every operation creates and evaluates only $O(1)$
 stream cells, so memory usage is $O(1)$ per update across all branches.

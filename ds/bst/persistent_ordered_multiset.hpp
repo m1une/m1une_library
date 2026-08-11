@@ -2,10 +2,13 @@
 #define M1UNE_PERSISTENT_ORDERED_MULTISET_HPP 1
 
 #include <cassert>
+#include <cstddef>
 #include <functional>
 #include <initializer_list>
 #include <utility>
 #include <vector>
+
+#include "../detail/persistent_binary_node_pool.hpp"
 
 namespace m1une {
 namespace ds {
@@ -52,28 +55,7 @@ struct PersistentOrderedMultiset {
               max_leaf(maximum) {}
     };
 
-    static constexpr int pool_block_bits = 16;
-    static constexpr int pool_block_size = 1 << pool_block_bits;
-    static constexpr int pool_block_mask = pool_block_size - 1;
-
-    struct Pool {
-        std::vector<std::vector<Node>> blocks;
-        int node_count = 0;
-
-        const Node& operator[](int index) const {
-            return blocks[index >> pool_block_bits][index & pool_block_mask];
-        }
-
-        template <class... Args>
-        int emplace(Args&&... args) {
-            if ((node_count & pool_block_mask) == 0) {
-                blocks.emplace_back();
-                blocks.back().reserve(pool_block_size);
-            }
-            blocks.back().emplace_back(std::forward<Args>(args)...);
-            return node_count++;
-        }
-    };
+    using Pool = detail::PersistentBinaryNodePool<Node>;
 
     inline static Pool pool;
 
@@ -91,7 +73,7 @@ struct PersistentOrderedMultiset {
     }
 
     static int make_leaf(T key, int count) {
-        const int id = pool.node_count;
+        const int id = pool.next_index();
         return pool.emplace(std::move(key), count, id);
     }
 
@@ -286,7 +268,15 @@ struct PersistentOrderedMultiset {
         return {minimum, merge_nodes(rest, as_root(node.r))};
     }
 
-    PersistentOrderedMultiset(int node, Compare compare) : root(node), comp(std::move(compare)) {}
+    PersistentOrderedMultiset(int node, Compare compare) : root(node), comp(std::move(compare)) {
+        pool.retain(root);
+    }
+
+    PersistentOrderedMultiset make_version(int node) const {
+        PersistentOrderedMultiset result(node, comp);
+        pool.discard_unreferenced();
+        return result;
+    }
 
    public:
     explicit PersistentOrderedMultiset(Compare compare) : root(-1), comp(std::move(compare)) {}
@@ -303,28 +293,59 @@ struct PersistentOrderedMultiset {
         while (first != last) *this = insert(*first++);
     }
 
+    PersistentOrderedMultiset(const PersistentOrderedMultiset& other)
+        : root(other.root), comp(other.comp) {
+        pool.retain(root);
+    }
+
+    PersistentOrderedMultiset(PersistentOrderedMultiset&& other)
+        : root(other.root), comp(std::move(other.comp)) {
+        other.root = -1;
+    }
+
+    PersistentOrderedMultiset& operator=(const PersistentOrderedMultiset& other) {
+        if (this == &other) return *this;
+        pool.retain(other.root);
+        pool.release(root);
+        root = other.root;
+        comp = other.comp;
+        return *this;
+    }
+
+    PersistentOrderedMultiset& operator=(PersistentOrderedMultiset&& other) {
+        if (this == &other) return *this;
+        pool.release(root);
+        root = other.root;
+        comp = std::move(other.comp);
+        other.root = -1;
+        return *this;
+    }
+
+    ~PersistentOrderedMultiset() { pool.release(root); }
+
     int size() const { return subtree_size(root); }
     int unique_size() const { return subtree_distinct_size(root); }
     bool empty() const { return root == -1; }
-    PersistentOrderedMultiset clear() const { return PersistentOrderedMultiset(-1, comp); }
+    void release() { pool.release(std::exchange(root, -1)); }
+    std::size_t node_count() const { return pool.size(); }
+    PersistentOrderedMultiset clear() const { return make_version(-1); }
 
     PersistentOrderedMultiset insert(T key, int multiplicity = 1) const {
         assert(multiplicity > 0);
         int old_count = 0;
         const int changed_root = change_count_impl(root, key, multiplicity, old_count);
         if (old_count != 0) {
-            return PersistentOrderedMultiset(changed_root, comp);
+            return make_version(changed_root);
         }
         auto [l, r] = split_nodes(root, key);
-        return PersistentOrderedMultiset(merge_nodes(merge_nodes(l, make_leaf(std::move(key), multiplicity)), r), comp);
+        return make_version(merge_nodes(merge_nodes(l, make_leaf(std::move(key), multiplicity)), r));
     }
 
    private:
     PersistentOrderedMultiset insert_unique(T key) const {
         if (contains(key)) return *this;
         auto [l, r] = split_nodes(root, key);
-        return PersistentOrderedMultiset(
-            merge_nodes(merge_nodes(l, make_leaf(std::move(key), 1)), r), comp);
+        return make_version(merge_nodes(merge_nodes(l, make_leaf(std::move(key), 1)), r));
     }
 
    public:
@@ -332,11 +353,11 @@ struct PersistentOrderedMultiset {
         int old_count = 0;
         const int changed_root = change_count_impl(root, key, -1, old_count);
         if (old_count == 0) return *this;
-        if (old_count > 1) return PersistentOrderedMultiset(changed_root, comp);
+        if (old_count > 1) return make_version(changed_root);
         auto [l, r] = split_nodes(root, key);
         auto [discarded, rest] = pop_min(r);
         assert(equal(pool[discarded].key, key));
-        return PersistentOrderedMultiset(merge_nodes(l, rest), comp);
+        return make_version(merge_nodes(l, rest));
     }
 
     PersistentOrderedMultiset erase(const T& key) const { return erase_one(key); }
@@ -347,7 +368,7 @@ struct PersistentOrderedMultiset {
         auto [l, r] = split_nodes(root, key);
         auto [discarded, rest] = pop_min(r);
         assert(equal(pool[discarded].key, key));
-        return PersistentOrderedMultiset(merge_nodes(l, rest), comp);
+        return make_version(merge_nodes(l, rest));
     }
 
     bool contains(const T& key) const { return count(key) > 0; }
@@ -375,12 +396,15 @@ struct PersistentOrderedMultiset {
 
     std::pair<PersistentOrderedMultiset, PersistentOrderedMultiset> split(const T& key) const {
         auto [l, r] = split_nodes(root, key);
-        return {PersistentOrderedMultiset(l, comp), PersistentOrderedMultiset(r, comp)};
+        PersistentOrderedMultiset left(l, comp);
+        PersistentOrderedMultiset right(r, comp);
+        pool.discard_unreferenced();
+        return {std::move(left), std::move(right)};
     }
 
     PersistentOrderedMultiset merge(const PersistentOrderedMultiset& other) const {
         assert(empty() || other.empty() || comp(*max(), *other.min()));
-        return PersistentOrderedMultiset(merge_nodes(root, other.root), comp);
+        return make_version(merge_nodes(root, other.root));
     }
 
     std::vector<T> to_vector() const {

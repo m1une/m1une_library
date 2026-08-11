@@ -7,8 +7,7 @@ documentation_of: ../../../ds/dynamic_array/persistent_dynamic_lazy_monoid_array
 
 `PersistentDynamicLazyMonoidArray` is a path-copying implicit treap for dynamic sequences with lazy range actions and range product queries. Updates return a new sequence and keep previous versions unchanged.
 
-Nodes live in a shared contiguous pool and store integer child indices. This improves locality and removes per-node allocation and reference-counted child pointers.
-The pool is append-only and is released when the last related version is destroyed.
+Nodes live in a shared stable-slot pool and store integer child indices. Intrusive reference counts reclaim nodes after their final dependent version or parent is released, and later updates reuse their slots.
 
 It supports insertion, deletion, reversal, rotation, point assignment, range application, range products, splitting, and concatenation.
 
@@ -20,6 +19,9 @@ It supports insertion, deletion, reversal, rotation, point assignment, range app
 
 | Method | Description | Complexity |
 | --- | --- | --- |
+| `int size() const`, `bool empty() const` | Returns the sequence size or whether it is empty. | $O(1)$ |
+| `void release()` | Releases this version immediately and makes this handle empty. | $O(F)$ |
+| `std::size_t node_count() const` | Returns live nodes in the shared version family. | $O(1)$ |
 | `insert`, `push_back`, `push_front`, `append` | Return a version with values inserted. Another version sharing the pool reuses its nodes; an independently constructed array is copied into this pool. | Expected $O(\log N)$ for one value or a shared-pool version; $O(M + \log N)$ for a vector or independent array |
 | `erase`, `pop_back`, `pop_front` | Return a version with values removed. | Expected $O(\log N)$ |
 | `set` | Returns a version with one value replaced. | Expected $O(\log N)$ |
@@ -28,6 +30,9 @@ It supports insertion, deletion, reversal, rotation, point assignment, range app
 | `prod`, `all_prod` | Return acted-monoid products over a range or the whole sequence. | Expected $O(\log N)$ for `prod`; $O(1)$ for `all_prod` |
 | `split`, `split_off` | Return persistent split versions. | Expected $O(\log N)$ |
 | `to_vector` | Dumps a range or the whole sequence without mutating the version. | $O(K + \log N)$ for a range; $O(N)$ for all values |
+
+Here $F$ is the number of nodes that become unreachable. Destruction and
+assignment release roots automatically.
 
 ## Notes
 

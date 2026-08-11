@@ -13,9 +13,9 @@ update performs at most a constant amount of pending list rotation, including
 when versions branch, so operations have deterministic worst-case bounds rather
 than only amortized bounds.
 
-Values are stored once in a shared append-only pool. Rotation links refer to
-values by index, so `T` may be move-only. The pool is released when the last
-related queue version is destroyed.
+Values are stored once in a shared recyclable pool. Rotation links refer to
+values by index, so `T` may be move-only. Reference counting reclaims both links
+and values after their final dependent version or link is released.
 
 ## Behavior
 
@@ -24,7 +24,7 @@ assert otherwise. Update methods are `const` and never change the logical
 contents of the source version.
 
 References returned by `front()` and `back()` remain valid while any related
-version keeps the shared pool alive.
+version depends on the pointed-to value.
 
 ## Interface
 
@@ -33,6 +33,8 @@ version keeps the shared pool alive.
 | Constructor | `PersistentQueue()` | Constructs an empty queue. | $O(1)$ |
 | `size` | `int size() const` | Returns the number of elements. | $O(1)$ |
 | `empty` | `bool empty() const` | Returns whether the queue is empty. | $O(1)$ |
+| `release` | `void release()` | Releases this version immediately and makes this handle empty. | $O(F)$ |
+| `node_count` | `std::size_t node_count() const` | Returns live values and internal links in the shared version family. | $O(1)$ |
 | `front` | `const T& front() const` | Returns the first element. Requires a nonempty queue. | $O(1)$ |
 | `back` | `const T& back() const` | Returns the last element. Requires a nonempty queue. | $O(1)$ |
 | `push` | `PersistentQueue push(T value) const` | Returns a version with `value` appended. | Worst-case $O(1)$ |
@@ -43,7 +45,9 @@ version keeps the shared pool alive.
 
 Each push stores one `T` and creates $O(1)$ small link nodes. Rotation work also
 creates $O(1)$ links per update, so total memory is linear in the number of
-updates across all related versions.
+updates across all related versions. Here $F$ is the number of values and links
+that become unreachable. Destruction and assignment release versions
+automatically.
 
 ## Example
 

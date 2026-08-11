@@ -3,12 +3,15 @@
 
 #include <cassert>
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <deque>
 #include <initializer_list>
 #include <memory>
 #include <utility>
 #include <vector>
+
+#include "../detail/persistent_binary_node_pool.hpp"
 
 namespace m1une {
 namespace ds {
@@ -42,7 +45,9 @@ struct PersistentDynamicArray {
 
     int root;
     std::uint32_t rng_state;
-    std::shared_ptr<std::deque<Node>> pool;
+    using Pool = detail::PersistentBinaryNodePool<Node>;
+
+    std::shared_ptr<Pool> pool;
 
     int subtree_size(int t) const {
         return t == -1 ? 0 : (*pool)[t].count;
@@ -62,8 +67,7 @@ struct PersistentDynamicArray {
 
     int make_node(T val, int priority, bool rev, int l, int r) const {
         int count = 1 + subtree_size(l) + subtree_size(r);
-        pool->emplace_back(std::move(val), priority, count, l, r, rev);
-        return int(pool->size()) - 1;
+        return pool->emplace(std::move(val), priority, count, l, r, rev);
     }
 
     int reversed_node(int t) const {
@@ -211,14 +215,22 @@ struct PersistentDynamicArray {
         return make_node(node.val, node.priority, node.rev, l, r);
     }
 
-    explicit PersistentDynamicArray(int node, std::uint32_t state, std::shared_ptr<std::deque<Node>> node_pool)
-        : root(node), rng_state(state), pool(std::move(node_pool)) {}
+    explicit PersistentDynamicArray(int node, std::uint32_t state, std::shared_ptr<Pool> node_pool)
+        : root(node), rng_state(state), pool(std::move(node_pool)) {
+        pool->retain(root);
+    }
+
+    PersistentDynamicArray make_version(int node, std::uint32_t state) const {
+        PersistentDynamicArray result(node, state, pool);
+        pool->discard_unreferenced();
+        return result;
+    }
 
    public:
     PersistentDynamicArray()
         : root(-1),
           rng_state(std::uint32_t(std::chrono::steady_clock::now().time_since_epoch().count())),
-          pool(std::make_shared<std::deque<Node>>()) {
+          pool(std::make_shared<Pool>()) {
         if (rng_state == 0) rng_state = 1;
     }
 
@@ -228,17 +240,57 @@ struct PersistentDynamicArray {
         assert(0 <= n);
         std::vector<T> v(n, value);
         root = build_from_vector(std::move(v), rng_state);
+        pool->retain(root);
+        pool->discard_unreferenced();
     }
 
     explicit PersistentDynamicArray(const std::vector<T>& v) : PersistentDynamicArray() {
         root = build_from_vector(v, rng_state);
+        pool->retain(root);
+        pool->discard_unreferenced();
     }
 
     explicit PersistentDynamicArray(std::vector<T>&& v) : PersistentDynamicArray() {
         root = build_from_vector(std::move(v), rng_state);
+        pool->retain(root);
+        pool->discard_unreferenced();
     }
 
     PersistentDynamicArray(std::initializer_list<T> init) : PersistentDynamicArray(std::vector<T>(init)) {}
+
+    PersistentDynamicArray(const PersistentDynamicArray& other)
+        : root(other.root), rng_state(other.rng_state), pool(other.pool) {
+        if (pool) pool->retain(root);
+    }
+
+    PersistentDynamicArray(PersistentDynamicArray&& other) noexcept
+        : root(other.root), rng_state(other.rng_state), pool(std::move(other.pool)) {
+        other.root = -1;
+    }
+
+    PersistentDynamicArray& operator=(const PersistentDynamicArray& other) {
+        if (this == &other) return *this;
+        if (other.pool) other.pool->retain(other.root);
+        if (pool) pool->release(root);
+        root = other.root;
+        rng_state = other.rng_state;
+        pool = other.pool;
+        return *this;
+    }
+
+    PersistentDynamicArray& operator=(PersistentDynamicArray&& other) noexcept {
+        if (this == &other) return *this;
+        if (pool) pool->release(root);
+        root = other.root;
+        rng_state = other.rng_state;
+        pool = std::move(other.pool);
+        other.root = -1;
+        return *this;
+    }
+
+    ~PersistentDynamicArray() {
+        if (pool) pool->release(root);
+    }
 
     int size() const {
         return subtree_size(root);
@@ -248,8 +300,16 @@ struct PersistentDynamicArray {
         return size() == 0;
     }
 
+    void release() {
+        if (pool) pool->release(root);
+        root = -1;
+        pool = std::make_shared<Pool>();
+    }
+
+    std::size_t node_count() const { return pool ? pool->size() : 0; }
+
     PersistentDynamicArray clear() const {
-        return PersistentDynamicArray(-1, rng_state, pool);
+        return make_version(-1, rng_state);
     }
 
     PersistentDynamicArray insert(int pos, T val) const {
@@ -257,7 +317,7 @@ struct PersistentDynamicArray {
         std::uint32_t next = next_state(rng_state);
         int node = make_node(std::move(val), int(next), false, -1, -1);
         auto [l, r] = split_node(root, pos);
-        return PersistentDynamicArray(merge(merge(l, node), r), next, pool);
+        return make_version(merge(merge(l, node), r), next);
     }
 
     PersistentDynamicArray insert(int pos, const std::vector<T>& v) const {
@@ -266,7 +326,7 @@ struct PersistentDynamicArray {
         std::uint32_t next = rng_state;
         int mid = build_from_vector(v, next);
         auto [l, r] = split_node(root, pos);
-        return PersistentDynamicArray(merge(merge(l, mid), r), next, pool);
+        return make_version(merge(merge(l, mid), r), next);
     }
 
     PersistentDynamicArray insert(int pos, std::vector<T>&& v) const {
@@ -275,7 +335,7 @@ struct PersistentDynamicArray {
         std::uint32_t next = rng_state;
         int mid = build_from_vector(std::move(v), next);
         auto [l, r] = split_node(root, pos);
-        return PersistentDynamicArray(merge(merge(l, mid), r), next, pool);
+        return make_version(merge(merge(l, mid), r), next);
     }
 
     PersistentDynamicArray insert(int pos, std::initializer_list<T> init) const {
@@ -287,7 +347,7 @@ struct PersistentDynamicArray {
         if (other.empty()) return *this;
         int mid = import_node(other, other.root);
         auto [l, r] = split_node(root, pos);
-        return PersistentDynamicArray(merge(merge(l, mid), r), rng_state, pool);
+        return make_version(merge(merge(l, mid), r), rng_state);
     }
 
     PersistentDynamicArray push_back(T val) const {
@@ -315,7 +375,7 @@ struct PersistentDynamicArray {
         auto [a, b] = split_node(root, pos);
         auto [mid, c] = split_node(b, 1);
         (void)mid;
-        return PersistentDynamicArray(merge(a, c), rng_state, pool);
+        return make_version(merge(a, c), rng_state);
     }
 
     PersistentDynamicArray erase(int l, int r) const {
@@ -324,7 +384,7 @@ struct PersistentDynamicArray {
         auto [a, b] = split_node(root, l);
         auto [mid, c] = split_node(b, r - l);
         (void)mid;
-        return PersistentDynamicArray(merge(a, c), rng_state, pool);
+        return make_version(merge(a, c), rng_state);
     }
 
     PersistentDynamicArray pop_back() const {
@@ -362,7 +422,7 @@ struct PersistentDynamicArray {
 
     PersistentDynamicArray set(int pos, T val) const {
         assert(0 <= pos && pos < size());
-        return PersistentDynamicArray(set_node(root, pos, std::move(val)), rng_state, pool);
+        return make_version(set_node(root, pos, std::move(val)), rng_state);
     }
 
     PersistentDynamicArray reverse(int l, int r) const {
@@ -370,11 +430,11 @@ struct PersistentDynamicArray {
         if (l == r) return *this;
         auto [a, b] = split_node(root, l);
         auto [mid, c] = split_node(b, r - l);
-        return PersistentDynamicArray(merge(merge(a, reversed_node(mid)), c), rng_state, pool);
+        return make_version(merge(merge(a, reversed_node(mid)), c), rng_state);
     }
 
     PersistentDynamicArray reverse() const {
-        return PersistentDynamicArray(reversed_node(root), rng_state, pool);
+        return make_version(reversed_node(root), rng_state);
     }
 
     PersistentDynamicArray rotate(int l, int m, int r) const {
@@ -383,18 +443,21 @@ struct PersistentDynamicArray {
         auto [a, b] = split_node(root, l);
         auto [c, d] = split_node(b, m - l);
         auto [e, f] = split_node(d, r - m);
-        return PersistentDynamicArray(merge(merge(a, e), merge(c, f)), rng_state, pool);
+        return make_version(merge(merge(a, e), merge(c, f)), rng_state);
     }
 
     std::pair<PersistentDynamicArray, PersistentDynamicArray> split(int pos) const {
         assert(0 <= pos && pos <= size());
         auto [l, r] = split_node(root, pos);
-        return {PersistentDynamicArray(l, rng_state, pool), PersistentDynamicArray(r, rng_state, pool)};
+        PersistentDynamicArray left(l, rng_state, pool);
+        PersistentDynamicArray right(r, rng_state, pool);
+        pool->discard_unreferenced();
+        return {std::move(left), std::move(right)};
     }
 
     PersistentDynamicArray split_off(int pos) const {
         assert(0 <= pos && pos <= size());
-        return PersistentDynamicArray(split_node(root, pos).second, rng_state, pool);
+        return make_version(split_node(root, pos).second, rng_state);
     }
 
     std::vector<T> to_vector() const {

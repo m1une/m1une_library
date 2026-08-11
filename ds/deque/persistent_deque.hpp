@@ -2,10 +2,13 @@
 #define M1UNE_DS_DEQUE_PERSISTENT_DEQUE_HPP 1
 
 #include <cassert>
+#include <cstddef>
 #include <cstdint>
 #include <deque>
 #include <memory>
+#include <optional>
 #include <utility>
+#include <vector>
 
 namespace m1une {
 namespace ds {
@@ -44,8 +47,168 @@ struct PersistentDeque {
     };
 
     struct Pool {
-        std::deque<T> values;
-        std::deque<StreamNode> streams;
+        std::deque<std::optional<T>> values;
+        std::deque<std::optional<StreamNode>> streams;
+        std::vector<int> value_references, stream_references;
+        std::vector<int> next_free_value, next_free_stream;
+        std::vector<int> unowned_values, unowned_streams;
+        int first_free_value = -1;
+        int first_free_stream = -1;
+        std::size_t live_values = 0;
+        std::size_t live_streams = 0;
+
+        void retain_value(int value) {
+            if (value != -1) ++value_references[value];
+        }
+
+        void release_value(int value) {
+            if (value == -1) return;
+            assert(values[value].has_value() && value_references[value] > 0);
+            if (--value_references[value] != 0) return;
+            values[value].reset();
+            next_free_value[value] = first_free_value;
+            first_free_value = value;
+            --live_values;
+        }
+
+        void retain_stream(int stream) {
+            if (stream != -1) ++stream_references[stream];
+        }
+
+        void retain_dependencies(const StreamNode& node) {
+            if (node.kind == StreamKind::cons) {
+                retain_value(node.first);
+                retain_stream(node.second);
+            } else if (node.kind == StreamKind::take) {
+                retain_stream(node.first);
+            } else if (node.kind == StreamKind::rotate_drop) {
+                retain_stream(node.first);
+                retain_stream(node.third);
+            } else {
+                retain_stream(node.first);
+                retain_stream(node.second);
+                retain_stream(node.third);
+            }
+        }
+
+        void release_zero_stream(int stream) {
+            std::vector<int> pending = {stream};
+            while (!pending.empty()) {
+                int current = pending.back();
+                pending.pop_back();
+                assert(streams[current].has_value() && stream_references[current] == 0);
+                StreamNode node = *streams[current];
+                streams[current].reset();
+                next_free_stream[current] = first_free_stream;
+                first_free_stream = current;
+                --live_streams;
+
+                auto release_child = [&](int child) {
+                    if (child != -1 && --stream_references[child] == 0) pending.push_back(child);
+                };
+                if (node.kind == StreamKind::cons) {
+                    release_value(node.first);
+                    release_child(node.second);
+                } else if (node.kind == StreamKind::take) {
+                    release_child(node.first);
+                } else if (node.kind == StreamKind::rotate_drop) {
+                    release_child(node.first);
+                    release_child(node.third);
+                } else {
+                    release_child(node.first);
+                    release_child(node.second);
+                    release_child(node.third);
+                }
+            }
+        }
+
+        void release_stream(int stream) {
+            if (stream == -1) return;
+            assert(streams[stream].has_value() && stream_references[stream] > 0);
+            if (--stream_references[stream] == 0) release_zero_stream(stream);
+        }
+
+        template <class... Args>
+        int store_value(Args&&... args) {
+            int result;
+            if (first_free_value == -1) {
+                result = int(values.size());
+                values.emplace_back(std::in_place, std::forward<Args>(args)...);
+                value_references.push_back(0);
+                next_free_value.push_back(-1);
+            } else {
+                result = first_free_value;
+                first_free_value = next_free_value[result];
+                values[result].emplace(std::forward<Args>(args)...);
+                value_references[result] = 0;
+            }
+            unowned_values.push_back(result);
+            ++live_values;
+            return result;
+        }
+
+        int make_stream(StreamKind kind, int first, int second, int third) {
+            int result;
+            if (first_free_stream == -1) {
+                result = int(streams.size());
+                streams.emplace_back(std::in_place, kind, first, second, third);
+                stream_references.push_back(0);
+                next_free_stream.push_back(-1);
+            } else {
+                result = first_free_stream;
+                first_free_stream = next_free_stream[result];
+                streams[result].emplace(kind, first, second, third);
+                stream_references[result] = 0;
+            }
+            retain_dependencies(*streams[result]);
+            unowned_streams.push_back(result);
+            ++live_streams;
+            return result;
+        }
+
+        void set_cons(int stream, int value, int tail) {
+            retain_value(value);
+            retain_stream(tail);
+            StreamNode old = *streams[stream];
+            if (old.kind == StreamKind::take) {
+                release_stream(old.first);
+            } else if (old.kind == StreamKind::rotate_drop) {
+                release_stream(old.first);
+                release_stream(old.third);
+            } else if (old.kind == StreamKind::rotate_reverse) {
+                release_stream(old.first);
+                release_stream(old.second);
+                release_stream(old.third);
+            } else {
+                release_value(old.first);
+                release_stream(old.second);
+            }
+            StreamNode& node = *streams[stream];
+            node.kind = StreamKind::cons;
+            node.first = value;
+            node.second = tail;
+            node.third = -1;
+        }
+
+        void discard_unreferenced() {
+            while (!unowned_streams.empty()) {
+                int stream = unowned_streams.back();
+                unowned_streams.pop_back();
+                if (streams[stream].has_value() && stream_references[stream] == 0) release_zero_stream(stream);
+            }
+            while (!unowned_values.empty()) {
+                int value = unowned_values.back();
+                unowned_values.pop_back();
+                if (values[value].has_value() && value_references[value] == 0) {
+                    values[value].reset();
+                    next_free_value[value] = first_free_value;
+                    first_free_value = value;
+                    --live_values;
+                }
+            }
+        }
+
+        std::size_t size() const { return live_values + live_streams; }
     };
 
     int _front_size;
@@ -71,12 +234,28 @@ struct PersistentDeque {
           _rear_size(rear_size),
           _rear(rear),
           _rear_schedule(rear_schedule),
-          _pool(std::move(pool)) {}
+          _pool(std::move(pool)) {
+        retain_state();
+        _pool->discard_unreferenced();
+    }
+
+    void retain_state() const {
+        _pool->retain_stream(_front);
+        _pool->retain_stream(_front_schedule);
+        _pool->retain_stream(_rear);
+        _pool->retain_stream(_rear_schedule);
+    }
+
+    void release_state() const {
+        _pool->release_stream(_front);
+        _pool->release_stream(_front_schedule);
+        _pool->release_stream(_rear);
+        _pool->release_stream(_rear_schedule);
+    }
 
     template <class... Args>
     int store_value(Args&&... args) const {
-        _pool->values.emplace_back(std::forward<Args>(args)...);
-        return int(_pool->values.size()) - 1;
+        return _pool->store_value(std::forward<Args>(args)...);
     }
 
     int make_stream(
@@ -85,8 +264,7 @@ struct PersistentDeque {
         int second,
         int third = -1
     ) const {
-        _pool->streams.emplace_back(kind, first, second, third);
-        return int(_pool->streams.size()) - 1;
+        return _pool->make_stream(kind, first, second, third);
     }
 
     int make_cons(int value_index, int tail) const {
@@ -113,23 +291,19 @@ struct PersistentDeque {
     }
 
     void set_cons(int stream, int value_index, int tail) const {
-        StreamNode& node = _pool->streams[stream];
-        node.kind = StreamKind::cons;
-        node.first = value_index;
-        node.second = tail;
-        node.third = -1;
+        _pool->set_cons(stream, value_index, tail);
     }
 
     int stream_head(int stream) const {
         assert(stream != -1);
         force(stream);
-        return _pool->streams[stream].first;
+        return (*_pool->streams[stream]).first;
     }
 
     int stream_tail(int stream) const {
         assert(stream != -1);
         force(stream);
-        return _pool->streams[stream].second;
+        return (*_pool->streams[stream]).second;
     }
 
     int drop(int stream, int count) const {
@@ -160,7 +334,7 @@ struct PersistentDeque {
 
     void force(int stream) const {
         assert(stream != -1);
-        StreamNode node = _pool->streams[stream];
+        StreamNode node = *_pool->streams[stream];
         if (node.kind == StreamKind::cons) return;
 
         if (node.kind == StreamKind::take) {
@@ -304,6 +478,62 @@ struct PersistentDeque {
           _rear_schedule(-1),
           _pool(std::make_shared<Pool>()) {}
 
+    PersistentDeque(const PersistentDeque& other)
+        : _front_size(other._front_size),
+          _front(other._front),
+          _front_schedule(other._front_schedule),
+          _rear_size(other._rear_size),
+          _rear(other._rear),
+          _rear_schedule(other._rear_schedule),
+          _pool(other._pool) {
+        if (_pool) retain_state();
+    }
+
+    PersistentDeque(PersistentDeque&& other) noexcept
+        : _front_size(other._front_size),
+          _front(other._front),
+          _front_schedule(other._front_schedule),
+          _rear_size(other._rear_size),
+          _rear(other._rear),
+          _rear_schedule(other._rear_schedule),
+          _pool(std::move(other._pool)) {
+        other._front_size = other._rear_size = 0;
+        other._front = other._front_schedule = other._rear = other._rear_schedule = -1;
+    }
+
+    PersistentDeque& operator=(const PersistentDeque& other) {
+        if (this == &other) return *this;
+        if (other._pool) other.retain_state();
+        if (_pool) release_state();
+        _front_size = other._front_size;
+        _front = other._front;
+        _front_schedule = other._front_schedule;
+        _rear_size = other._rear_size;
+        _rear = other._rear;
+        _rear_schedule = other._rear_schedule;
+        _pool = other._pool;
+        return *this;
+    }
+
+    PersistentDeque& operator=(PersistentDeque&& other) noexcept {
+        if (this == &other) return *this;
+        if (_pool) release_state();
+        _front_size = other._front_size;
+        _front = other._front;
+        _front_schedule = other._front_schedule;
+        _rear_size = other._rear_size;
+        _rear = other._rear;
+        _rear_schedule = other._rear_schedule;
+        _pool = std::move(other._pool);
+        other._front_size = other._rear_size = 0;
+        other._front = other._front_schedule = other._rear = other._rear_schedule = -1;
+        return *this;
+    }
+
+    ~PersistentDeque() {
+        if (_pool) release_state();
+    }
+
     int size() const {
         return _front_size + _rear_size;
     }
@@ -312,16 +542,29 @@ struct PersistentDeque {
         return size() == 0;
     }
 
+    void release() {
+        if (_pool) release_state();
+        _front_size = _rear_size = 0;
+        _front = _front_schedule = _rear = _rear_schedule = -1;
+        _pool = std::make_shared<Pool>();
+    }
+
+    std::size_t node_count() const { return _pool ? _pool->size() : 0; }
+
     const T& front() const {
         assert(!empty());
         int stream = _front == -1 ? _rear : _front;
-        return _pool->values[stream_head(stream)];
+        int value = stream_head(stream);
+        _pool->discard_unreferenced();
+        return *_pool->values[value];
     }
 
     const T& back() const {
         assert(!empty());
         int stream = _rear == -1 ? _front : _rear;
-        return _pool->values[stream_head(stream)];
+        int value = stream_head(stream);
+        _pool->discard_unreferenced();
+        return *_pool->values[value];
     }
 
     PersistentDeque push_front(T value) const {

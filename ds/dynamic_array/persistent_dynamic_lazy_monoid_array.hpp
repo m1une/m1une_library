@@ -4,6 +4,7 @@
 #include <cassert>
 #include <chrono>
 #include <concepts>
+#include <cstddef>
 #include <cstdint>
 #include <initializer_list>
 #include <memory>
@@ -11,6 +12,7 @@
 #include <vector>
 
 #include "../../acted_monoid/concept.hpp"
+#include "../detail/persistent_binary_node_pool.hpp"
 
 namespace m1une {
 namespace ds {
@@ -54,7 +56,9 @@ struct PersistentDynamicLazyMonoidArray {
 
     int root;
     std::uint32_t rng_state;
-    std::shared_ptr<std::vector<Node>> pool;
+    using Pool = detail::PersistentBinaryNodePool<Node>;
+
+    std::shared_ptr<Pool> pool;
 
     int subtree_size(int t) const {
         return t == -1 ? 0 : (*pool)[t].count;
@@ -122,9 +126,8 @@ struct PersistentDynamicLazyMonoidArray {
 
     int make_raw_node(T val, T prod, T rprod, F lazy, int priority, int count, bool rev, bool has_lazy, int l,
                       int r) const {
-        pool->emplace_back(std::move(val), std::move(prod), std::move(rprod), std::move(lazy), priority, count, l,
-                           r, rev, has_lazy);
-        return int(pool->size()) - 1;
+        return pool->emplace(std::move(val), std::move(prod), std::move(rprod), std::move(lazy), priority, count,
+                             l, r, rev, has_lazy);
     }
 
     int make_node(T val, int priority, bool rev, int l, int r) const {
@@ -336,14 +339,22 @@ struct PersistentDynamicLazyMonoidArray {
     }
 
     explicit PersistentDynamicLazyMonoidArray(int node, std::uint32_t state,
-                                              std::shared_ptr<std::vector<Node>> node_pool)
-        : root(node), rng_state(state), pool(std::move(node_pool)) {}
+                                              std::shared_ptr<Pool> node_pool)
+        : root(node), rng_state(state), pool(std::move(node_pool)) {
+        pool->retain(root);
+    }
+
+    PersistentDynamicLazyMonoidArray make_version(int node, std::uint32_t state) const {
+        PersistentDynamicLazyMonoidArray result(node, state, pool);
+        pool->discard_unreferenced();
+        return result;
+    }
 
    public:
     PersistentDynamicLazyMonoidArray()
         : root(-1),
           rng_state(std::uint32_t(std::chrono::steady_clock::now().time_since_epoch().count())),
-          pool(std::make_shared<std::vector<Node>>()) {
+          pool(std::make_shared<Pool>()) {
         if (rng_state == 0) rng_state = 1;
     }
 
@@ -355,17 +366,23 @@ struct PersistentDynamicLazyMonoidArray {
         pool->reserve(n);
         std::vector<T> v(n, value);
         root = build_from_vector(std::move(v), rng_state);
+        pool->retain(root);
+        pool->discard_unreferenced();
     }
 
     explicit PersistentDynamicLazyMonoidArray(const std::vector<T>& v)
         : PersistentDynamicLazyMonoidArray() {
         pool->reserve(v.size());
         root = build_from_vector(v, rng_state);
+        pool->retain(root);
+        pool->discard_unreferenced();
     }
 
     explicit PersistentDynamicLazyMonoidArray(std::vector<T>&& v) : PersistentDynamicLazyMonoidArray() {
         pool->reserve(v.size());
         root = build_from_vector(std::move(v), rng_state);
+        pool->retain(root);
+        pool->discard_unreferenced();
     }
 
     template <typename U>
@@ -375,10 +392,46 @@ struct PersistentDynamicLazyMonoidArray {
         : PersistentDynamicLazyMonoidArray() {
         pool->reserve(v.size());
         root = build_from_values(v, rng_state);
+        pool->retain(root);
+        pool->discard_unreferenced();
     }
 
     PersistentDynamicLazyMonoidArray(std::initializer_list<T> init)
         : PersistentDynamicLazyMonoidArray(std::vector<T>(init)) {}
+
+    PersistentDynamicLazyMonoidArray(const PersistentDynamicLazyMonoidArray& other)
+        : root(other.root), rng_state(other.rng_state), pool(other.pool) {
+        if (pool) pool->retain(root);
+    }
+
+    PersistentDynamicLazyMonoidArray(PersistentDynamicLazyMonoidArray&& other) noexcept
+        : root(other.root), rng_state(other.rng_state), pool(std::move(other.pool)) {
+        other.root = -1;
+    }
+
+    PersistentDynamicLazyMonoidArray& operator=(const PersistentDynamicLazyMonoidArray& other) {
+        if (this == &other) return *this;
+        if (other.pool) other.pool->retain(other.root);
+        if (pool) pool->release(root);
+        root = other.root;
+        rng_state = other.rng_state;
+        pool = other.pool;
+        return *this;
+    }
+
+    PersistentDynamicLazyMonoidArray& operator=(PersistentDynamicLazyMonoidArray&& other) noexcept {
+        if (this == &other) return *this;
+        if (pool) pool->release(root);
+        root = other.root;
+        rng_state = other.rng_state;
+        pool = std::move(other.pool);
+        other.root = -1;
+        return *this;
+    }
+
+    ~PersistentDynamicLazyMonoidArray() {
+        if (pool) pool->release(root);
+    }
 
     int size() const {
         return subtree_size(root);
@@ -388,8 +441,16 @@ struct PersistentDynamicLazyMonoidArray {
         return size() == 0;
     }
 
+    void release() {
+        if (pool) pool->release(root);
+        root = -1;
+        pool = std::make_shared<Pool>();
+    }
+
+    std::size_t node_count() const { return pool ? pool->size() : 0; }
+
     PersistentDynamicLazyMonoidArray clear() const {
-        return PersistentDynamicLazyMonoidArray(-1, rng_state, pool);
+        return make_version(-1, rng_state);
     }
 
     PersistentDynamicLazyMonoidArray insert(int pos, T value) const {
@@ -397,7 +458,7 @@ struct PersistentDynamicLazyMonoidArray {
         std::uint32_t next = next_state(rng_state);
         int node = make_node(std::move(value), int(next), false, -1, -1);
         auto [l, r] = split_node(root, pos);
-        return PersistentDynamicLazyMonoidArray(merge(merge(l, node), r), next, pool);
+        return make_version(merge(merge(l, node), r), next);
     }
 
     PersistentDynamicLazyMonoidArray insert(int pos, const std::vector<T>& v) const {
@@ -406,7 +467,7 @@ struct PersistentDynamicLazyMonoidArray {
         std::uint32_t next = rng_state;
         int mid = build_from_vector(v, next);
         auto [l, r] = split_node(root, pos);
-        return PersistentDynamicLazyMonoidArray(merge(merge(l, mid), r), next, pool);
+        return make_version(merge(merge(l, mid), r), next);
     }
 
     PersistentDynamicLazyMonoidArray insert(int pos, std::vector<T>&& v) const {
@@ -415,7 +476,7 @@ struct PersistentDynamicLazyMonoidArray {
         std::uint32_t next = rng_state;
         int mid = build_from_vector(std::move(v), next);
         auto [l, r] = split_node(root, pos);
-        return PersistentDynamicLazyMonoidArray(merge(merge(l, mid), r), next, pool);
+        return make_version(merge(merge(l, mid), r), next);
     }
 
     PersistentDynamicLazyMonoidArray insert(int pos, std::initializer_list<T> init) const {
@@ -427,7 +488,7 @@ struct PersistentDynamicLazyMonoidArray {
         if (other.empty()) return *this;
         int mid = import_node(other, other.root);
         auto [l, r] = split_node(root, pos);
-        return PersistentDynamicLazyMonoidArray(merge(merge(l, mid), r), rng_state, pool);
+        return make_version(merge(merge(l, mid), r), rng_state);
     }
 
     PersistentDynamicLazyMonoidArray push_back(T value) const {
@@ -455,7 +516,7 @@ struct PersistentDynamicLazyMonoidArray {
         auto [a, b] = split_node(root, pos);
         auto [mid, c] = split_node(b, 1);
         (void)mid;
-        return PersistentDynamicLazyMonoidArray(merge(a, c), rng_state, pool);
+        return make_version(merge(a, c), rng_state);
     }
 
     PersistentDynamicLazyMonoidArray erase(int l, int r) const {
@@ -464,7 +525,7 @@ struct PersistentDynamicLazyMonoidArray {
         auto [a, b] = split_node(root, l);
         auto [mid, c] = split_node(b, r - l);
         (void)mid;
-        return PersistentDynamicLazyMonoidArray(merge(a, c), rng_state, pool);
+        return make_version(merge(a, c), rng_state);
     }
 
     PersistentDynamicLazyMonoidArray pop_back() const {
@@ -498,7 +559,7 @@ struct PersistentDynamicLazyMonoidArray {
 
     PersistentDynamicLazyMonoidArray set(int pos, T value) const {
         assert(0 <= pos && pos < size());
-        return PersistentDynamicLazyMonoidArray(set_node(root, pos, std::move(value)), rng_state, pool);
+        return make_version(set_node(root, pos, std::move(value)), rng_state);
     }
 
     PersistentDynamicLazyMonoidArray reverse(int l, int r) const {
@@ -506,11 +567,11 @@ struct PersistentDynamicLazyMonoidArray {
         if (l == r) return *this;
         auto [a, b] = split_node(root, l);
         auto [mid, c] = split_node(b, r - l);
-        return PersistentDynamicLazyMonoidArray(merge(merge(a, reversed_node(mid)), c), rng_state, pool);
+        return make_version(merge(merge(a, reversed_node(mid)), c), rng_state);
     }
 
     PersistentDynamicLazyMonoidArray reverse() const {
-        return PersistentDynamicLazyMonoidArray(reversed_node(root), rng_state, pool);
+        return make_version(reversed_node(root), rng_state);
     }
 
     PersistentDynamicLazyMonoidArray rotate(int l, int m, int r) const {
@@ -519,7 +580,7 @@ struct PersistentDynamicLazyMonoidArray {
         auto [a, b] = split_node(root, l);
         auto [c, d] = split_node(b, m - l);
         auto [e, f] = split_node(d, r - m);
-        return PersistentDynamicLazyMonoidArray(merge(merge(a, e), merge(c, f)), rng_state, pool);
+        return make_version(merge(merge(a, e), merge(c, f)), rng_state);
     }
 
     PersistentDynamicLazyMonoidArray apply(int pos, const F& f) const {
@@ -532,7 +593,7 @@ struct PersistentDynamicLazyMonoidArray {
         if (l == r) return *this;
         auto [a, b] = split_node(root, l);
         auto [mid, c] = split_node(b, r - l);
-        return PersistentDynamicLazyMonoidArray(merge(merge(a, all_apply(mid, f)), c), rng_state, pool);
+        return make_version(merge(merge(a, all_apply(mid, f)), c), rng_state);
     }
 
     T prod(int l, int r) const {
@@ -548,13 +609,15 @@ struct PersistentDynamicLazyMonoidArray {
     std::pair<PersistentDynamicLazyMonoidArray, PersistentDynamicLazyMonoidArray> split(int pos) const {
         assert(0 <= pos && pos <= size());
         auto [l, r] = split_node(root, pos);
-        return {PersistentDynamicLazyMonoidArray(l, rng_state, pool),
-                PersistentDynamicLazyMonoidArray(r, rng_state, pool)};
+        PersistentDynamicLazyMonoidArray left(l, rng_state, pool);
+        PersistentDynamicLazyMonoidArray right(r, rng_state, pool);
+        pool->discard_unreferenced();
+        return {std::move(left), std::move(right)};
     }
 
     PersistentDynamicLazyMonoidArray split_off(int pos) const {
         assert(0 <= pos && pos <= size());
-        return PersistentDynamicLazyMonoidArray(split_node(root, pos).second, rng_state, pool);
+        return make_version(split_node(root, pos).second, rng_state);
     }
 
     std::vector<T> to_vector() const {

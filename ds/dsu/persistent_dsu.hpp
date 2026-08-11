@@ -3,9 +3,12 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstddef>
 #include <memory>
 #include <utility>
 #include <vector>
+
+#include "../detail/persistent_binary_node_pool.hpp"
 
 namespace m1une {
 namespace ds {
@@ -23,19 +26,21 @@ struct PersistentDsu {
 
     int _n;
     int _root;
-    std::shared_ptr<std::vector<Node>> _pool;
+    using Pool = detail::PersistentBinaryNodePool<Node, 0>;
 
-    explicit PersistentDsu(int n, int root, std::shared_ptr<std::vector<Node>> pool)
-        : _n(n), _root(root), _pool(std::move(pool)) {}
+    std::shared_ptr<Pool> _pool;
+
+    explicit PersistentDsu(int n, int root, std::shared_ptr<Pool> pool)
+        : _n(n), _root(root), _pool(std::move(pool)) {
+        _pool->retain(_root);
+    }
 
     int new_node(const Node& node) const {
-        _pool->push_back(node);
-        return int(_pool->size()) - 1;
+        return _pool->emplace(node);
     }
 
     int new_node(Node&& node) const {
-        _pool->push_back(std::move(node));
-        return int(_pool->size()) - 1;
+        return _pool->emplace(std::move(node));
     }
 
     int build(int l, int r) const {
@@ -50,14 +55,20 @@ struct PersistentDsu {
     int set_node(int t, int l, int r, int p, int value) const {
         if (r - l == 1) return new_node(Node(value));
         int m = (l + r) >> 1;
-        int left = (*_pool)[t].l;
-        int right = (*_pool)[t].r;
+            int left = (*_pool)[t].l;
+            int right = (*_pool)[t].r;
         if (p < m) {
             left = set_node(left, l, m, p, value);
         } else {
             right = set_node(right, m, r, p, value);
         }
         return new_node(Node(0, left, right));
+    }
+
+    PersistentDsu make_version(int root) const {
+        PersistentDsu result(_n, root, _pool);
+        _pool->discard_unreferenced();
+        return result;
     }
 
     int get_node(int t, int l, int r, int p) const {
@@ -77,11 +88,47 @@ struct PersistentDsu {
    public:
     PersistentDsu() : PersistentDsu(0) {}
 
-    explicit PersistentDsu(int n) : _n(n), _root(0), _pool(std::make_shared<std::vector<Node>>()) {
+    explicit PersistentDsu(int n) : _n(n), _root(0), _pool(std::make_shared<Pool>()) {
         assert(0 <= n);
         _pool->reserve(n * 2 + 1);
-        _pool->push_back(Node());
         if (_n > 0) _root = build(0, _n);
+        _pool->retain(_root);
+        _pool->discard_unreferenced();
+    }
+
+    PersistentDsu(const PersistentDsu& other) : _n(other._n), _root(other._root), _pool(other._pool) {
+        if (_pool) _pool->retain(_root);
+    }
+
+    PersistentDsu(PersistentDsu&& other) noexcept
+        : _n(other._n), _root(other._root), _pool(std::move(other._pool)) {
+        other._n = 0;
+        other._root = 0;
+    }
+
+    PersistentDsu& operator=(const PersistentDsu& other) {
+        if (this == &other) return *this;
+        if (other._pool) other._pool->retain(other._root);
+        if (_pool) _pool->release(_root);
+        _n = other._n;
+        _root = other._root;
+        _pool = other._pool;
+        return *this;
+    }
+
+    PersistentDsu& operator=(PersistentDsu&& other) noexcept {
+        if (this == &other) return *this;
+        if (_pool) _pool->release(_root);
+        _n = other._n;
+        _root = other._root;
+        _pool = std::move(other._pool);
+        other._n = 0;
+        other._root = 0;
+        return *this;
+    }
+
+    ~PersistentDsu() {
+        if (_pool) _pool->release(_root);
     }
 
     int size() const {
@@ -91,6 +138,15 @@ struct PersistentDsu {
     bool empty() const {
         return _n == 0;
     }
+
+    void release() {
+        if (_pool) _pool->release(_root);
+        _n = 0;
+        _root = 0;
+        _pool = std::make_shared<Pool>();
+    }
+
+    std::size_t node_count() const { return _pool ? _pool->size() : 0; }
 
     int leader(int a) const {
         assert(0 <= a && a < _n);
@@ -135,7 +191,7 @@ struct PersistentDsu {
         }
         int root = set_node(_root, 0, _n, x, -(sx + sy));
         root = set_node(root, 0, _n, y, x);
-        return PersistentDsu(_n, root, _pool);
+        return make_version(root);
     }
 
     std::vector<std::vector<int>> groups() const {

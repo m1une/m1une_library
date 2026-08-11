@@ -7,8 +7,7 @@ documentation_of: ../../../ds/dynamic_array/persistent_dynamic_array.hpp
 
 `PersistentDynamicArray` is a path-copying implicit treap. It acts like a persistent version of `DynamicArray`: update operations return a new array and leave the old version available.
 
-Nodes are stored in a shared block-contiguous pool and refer to children by integer index. This avoids per-node allocation and reference-counted child pointers while preserving stable references returned by `at`, `front`, and `back`.
-The pool is append-only and is released when the last related version is destroyed.
+Nodes are stored in a shared stable-slot pool and refer to children by integer index. Intrusive reference counts reclaim a node once no version or parent node depends on it, and reclaimed slots are reused by later updates. References returned by `at`, `front`, and `back` remain valid only while a live version depends on their node.
 
 The structure supports index-based insertion, deletion, point assignment, reversal, rotation, splitting, and concatenation. Untouched subtrees are shared between versions.
 
@@ -48,6 +47,8 @@ The structure supports index-based insertion, deletion, point assignment, revers
 | --- | --- | --- |
 | `int size() const` | Returns the number of elements. | $O(1)$ |
 | `bool empty() const` | Returns whether the array is empty. | $O(1)$ |
+| `void release()` | Releases this version immediately and makes this handle empty. | $O(F)$ |
+| `std::size_t node_count() const` | Returns live nodes in the shared version family. | $O(1)$ |
 | `PersistentDynamicArray clear() const` | Returns an empty version. | $O(1)$ |
 | `PersistentDynamicArray insert(int pos, T val) const` | Returns a version with `val` inserted before index `pos`. | Expected $O(\log N)$ |
 | `PersistentDynamicArray insert(int pos, const std::vector<T>& v) const` | Returns a version with all elements of `v` inserted before index `pos`. | Expected $O(M + \log N)$ |
@@ -68,6 +69,9 @@ The structure supports index-based insertion, deletion, point assignment, revers
 | `PersistentDynamicArray split_off(int pos) const` | Returns the suffix `[pos, N)` while leaving the current version unchanged. | Expected $O(\log N)$ |
 | `std::vector<T> to_vector() const` | Dumps the entire array. | $O(N)$ |
 | `std::vector<T> to_vector(int l, int r) const` | Dumps `[l, r)`, where `K = r - l`. | $O(K + \log N)$ |
+
+Here $F$ is the number of nodes that become unreachable. Destruction and
+assignment release roots automatically.
 
 ## Example
 

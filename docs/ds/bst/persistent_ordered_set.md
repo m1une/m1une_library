@@ -8,12 +8,12 @@ documentation_of: ../../../ds/bst/persistent_ordered_set.hpp
 `PersistentOrderedSet` is a path-copying red-black tree for sets. Updates,
 splits, and merges return new versions and leave every input version available.
 
-Its underlying tree uses a specialization-wide indexed, chunked node pool
-rather than per-node pointers. The append-only pool is released when the program
-exits.
+Its underlying tree uses a specialization-wide indexed stable-slot pool rather
+than per-node pointers. Intrusive reference counts reclaim a node after its
+final dependent version or parent is released, and later updates reuse its slot.
 
-Pointers returned by bound and predecessor/successor methods remain valid for
-the remainder of the program.
+Pointers returned by bound and predecessor/successor methods remain valid only
+while a live version depends on the pointed-to node.
 
 ## Template Parameters
 
@@ -43,6 +43,8 @@ Trees passed to `merge` must use equivalent comparator state.
 | `int size() const` | Returns the number of keys. | $O(1)$ |
 | `int unique_size() const` | Alias for `size()`. | $O(1)$ |
 | `bool empty() const` | Returns whether the set is empty. | $O(1)$ |
+| `void release()` | Releases this version immediately and makes this handle empty. | $O(F)$ |
+| `std::size_t node_count() const` | Returns live nodes for this `T, Compare` specialization. | $O(1)$ |
 | `PersistentOrderedSet clear() const` | Returns an empty set with the same comparator. | $O(1)$ |
 | `PersistentOrderedSet insert(T key) const` | Returns a new set with `key` inserted; if `key` exists, returns an equivalent set. | $O(\log N)$ |
 | `PersistentOrderedSet erase(const T& key) const` | Returns a new set with `key` removed if it exists. | $O(\log N)$ |
@@ -63,6 +65,9 @@ Trees passed to `merge` must use equivalent comparator state.
 | `std::pair<PersistentOrderedSet, PersistentOrderedSet> split(const T& key) const` | Returns `{less, greater_equal}` without changing this version. | $O(\log N)$ |
 | `PersistentOrderedSet merge(const PersistentOrderedSet& other) const` | Returns the union without changing either version. Requires every key in `*this` to be smaller than every key in `other`. | $O(\log(N + M))$ |
 | `std::vector<T> to_vector() const` | Returns all keys in sorted order. | $O(N)$ |
+
+Here $F$ is the number of nodes that become unreachable. Destruction and
+assignment release roots automatically.
 
 ## Example
 

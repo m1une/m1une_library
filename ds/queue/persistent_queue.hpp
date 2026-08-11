@@ -2,9 +2,12 @@
 #define M1UNE_DS_QUEUE_PERSISTENT_QUEUE_HPP 1
 
 #include <cassert>
+#include <cstddef>
 #include <deque>
 #include <memory>
+#include <optional>
 #include <utility>
+#include <vector>
 
 namespace m1une {
 namespace ds {
@@ -21,8 +24,112 @@ struct PersistentQueue {
     };
 
     struct Pool {
-        std::deque<T> values;
-        std::deque<Link> links;
+        std::deque<std::optional<T>> values;
+        std::deque<std::optional<Link>> links;
+        std::vector<int> value_references, link_references;
+        std::vector<int> next_free_value, next_free_link;
+        std::vector<int> unowned_values, unowned_links;
+        int first_free_value = -1;
+        int first_free_link = -1;
+        std::size_t live_values = 0;
+        std::size_t live_links = 0;
+
+        void retain_value(int value) {
+            if (value != -1) ++value_references[value];
+        }
+
+        void release_value(int value) {
+            if (value == -1) return;
+            assert(values[value].has_value() && value_references[value] > 0);
+            if (--value_references[value] != 0) return;
+            values[value].reset();
+            next_free_value[value] = first_free_value;
+            first_free_value = value;
+            --live_values;
+        }
+
+        void retain_link(int link) {
+            if (link != -1) ++link_references[link];
+        }
+
+        void release_zero_link(int link) {
+            while (link != -1) {
+                assert(links[link].has_value() && link_references[link] == 0);
+                int value = links[link]->value_index;
+                int next = links[link]->next;
+                links[link].reset();
+                next_free_link[link] = first_free_link;
+                first_free_link = link;
+                --live_links;
+                release_value(value);
+                if (next == -1 || --link_references[next] != 0) return;
+                link = next;
+            }
+        }
+
+        void release_link(int link) {
+            if (link == -1) return;
+            assert(links[link].has_value() && link_references[link] > 0);
+            if (--link_references[link] == 0) release_zero_link(link);
+        }
+
+        int store_value(T value) {
+            int result;
+            if (first_free_value == -1) {
+                result = int(values.size());
+                values.emplace_back(std::in_place, std::move(value));
+                value_references.push_back(0);
+                next_free_value.push_back(-1);
+            } else {
+                result = first_free_value;
+                first_free_value = next_free_value[result];
+                values[result].emplace(std::move(value));
+                value_references[result] = 0;
+            }
+            unowned_values.push_back(result);
+            ++live_values;
+            return result;
+        }
+
+        int make_link(int value, int next) {
+            int result;
+            if (first_free_link == -1) {
+                result = int(links.size());
+                links.emplace_back(std::in_place, value, next);
+                link_references.push_back(0);
+                next_free_link.push_back(-1);
+            } else {
+                result = first_free_link;
+                first_free_link = next_free_link[result];
+                links[result].emplace(value, next);
+                link_references[result] = 0;
+            }
+            retain_value(value);
+            retain_link(next);
+            unowned_links.push_back(result);
+            ++live_links;
+            return result;
+        }
+
+        void discard_unreferenced() {
+            while (!unowned_links.empty()) {
+                int link = unowned_links.back();
+                unowned_links.pop_back();
+                if (links[link].has_value() && link_references[link] == 0) release_zero_link(link);
+            }
+            while (!unowned_values.empty()) {
+                int value = unowned_values.back();
+                unowned_values.pop_back();
+                if (values[value].has_value() && value_references[value] == 0) {
+                    values[value].reset();
+                    next_free_value[value] = first_free_value;
+                    first_free_value = value;
+                    --live_values;
+                }
+            }
+        }
+
+        std::size_t size() const { return live_values + live_links; }
     };
 
     enum class RotationPhase {
@@ -64,26 +171,47 @@ struct PersistentQueue {
           _rear_size(rear_size),
           _rear(rear),
           _back_value(back_value),
-          _pool(std::move(pool)) {}
+          _pool(std::move(pool)) {
+        retain_state();
+        _pool->discard_unreferenced();
+    }
+
+    void retain_state() const {
+        _pool->retain_link(_front);
+        _pool->retain_link(_rotation.remaining_front);
+        _pool->retain_link(_rotation.reversed_front);
+        _pool->retain_link(_rotation.remaining_rear);
+        _pool->retain_link(_rotation.reversed_rear);
+        _pool->retain_link(_rear);
+        _pool->retain_value(_back_value);
+    }
+
+    void release_state() const {
+        _pool->release_link(_front);
+        _pool->release_link(_rotation.remaining_front);
+        _pool->release_link(_rotation.reversed_front);
+        _pool->release_link(_rotation.remaining_rear);
+        _pool->release_link(_rotation.reversed_rear);
+        _pool->release_link(_rear);
+        _pool->release_value(_back_value);
+    }
 
     int next_link(int link) const {
         assert(link != -1);
-        return _pool->links[link].next;
+        return (*_pool->links[link]).next;
     }
 
     int link_value(int link) const {
         assert(link != -1);
-        return _pool->links[link].value_index;
+        return (*_pool->links[link]).value_index;
     }
 
     int make_link(int value_index, int next) const {
-        _pool->links.emplace_back(value_index, next);
-        return int(_pool->links.size()) - 1;
+        return _pool->make_link(value_index, next);
     }
 
     int store_value(T value) const {
-        _pool->values.emplace_back(std::move(value));
-        return int(_pool->values.size()) - 1;
+        return _pool->store_value(std::move(value));
     }
 
     RotationState execute(RotationState state) const {
@@ -209,6 +337,64 @@ struct PersistentQueue {
           _back_value(-1),
           _pool(std::make_shared<Pool>()) {}
 
+    PersistentQueue(const PersistentQueue& other)
+        : _front_size(other._front_size),
+          _front(other._front),
+          _rotation(other._rotation),
+          _rear_size(other._rear_size),
+          _rear(other._rear),
+          _back_value(other._back_value),
+          _pool(other._pool) {
+        if (_pool) retain_state();
+    }
+
+    PersistentQueue(PersistentQueue&& other) noexcept
+        : _front_size(other._front_size),
+          _front(other._front),
+          _rotation(other._rotation),
+          _rear_size(other._rear_size),
+          _rear(other._rear),
+          _back_value(other._back_value),
+          _pool(std::move(other._pool)) {
+        other._front_size = other._rear_size = 0;
+        other._front = other._rear = other._back_value = -1;
+        other._rotation = RotationState();
+    }
+
+    PersistentQueue& operator=(const PersistentQueue& other) {
+        if (this == &other) return *this;
+        if (other._pool) other.retain_state();
+        if (_pool) release_state();
+        _front_size = other._front_size;
+        _front = other._front;
+        _rotation = other._rotation;
+        _rear_size = other._rear_size;
+        _rear = other._rear;
+        _back_value = other._back_value;
+        _pool = other._pool;
+        return *this;
+    }
+
+    PersistentQueue& operator=(PersistentQueue&& other) noexcept {
+        if (this == &other) return *this;
+        if (_pool) release_state();
+        _front_size = other._front_size;
+        _front = other._front;
+        _rotation = other._rotation;
+        _rear_size = other._rear_size;
+        _rear = other._rear;
+        _back_value = other._back_value;
+        _pool = std::move(other._pool);
+        other._front_size = other._rear_size = 0;
+        other._front = other._rear = other._back_value = -1;
+        other._rotation = RotationState();
+        return *this;
+    }
+
+    ~PersistentQueue() {
+        if (_pool) release_state();
+    }
+
     int size() const {
         return _front_size + _rear_size;
     }
@@ -217,14 +403,24 @@ struct PersistentQueue {
         return size() == 0;
     }
 
+    void release() {
+        if (_pool) release_state();
+        _front_size = _rear_size = 0;
+        _front = _rear = _back_value = -1;
+        _rotation = RotationState();
+        _pool = std::make_shared<Pool>();
+    }
+
+    std::size_t node_count() const { return _pool ? _pool->size() : 0; }
+
     const T& front() const {
         assert(!empty() && _front != -1);
-        return _pool->values[link_value(_front)];
+        return *_pool->values[link_value(_front)];
     }
 
     const T& back() const {
         assert(!empty() && _back_value != -1);
-        return _pool->values[_back_value];
+        return *_pool->values[_back_value];
     }
 
     PersistentQueue push(T value) const {

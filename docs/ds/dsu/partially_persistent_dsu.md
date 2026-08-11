@@ -29,6 +29,7 @@ remain queryable.
 | `explicit PartiallyPersistentDsu(int n)` | Creates `n` singleton sets at time `0`. | $O(N)$ |
 | `int size() const` | Returns the number of elements. | $O(1)$ |
 | `bool empty() const` | Returns whether the DSU has no elements. | $O(1)$ |
+| `void release()` | Releases the complete history and resets the object to an empty DSU at time `0`. | $O(N + Q)$ |
 | `int time() const` | Returns the current time. | $O(1)$ |
 | `bool merge(int a, int b)` | Advances time by one and merges the current sets containing `a` and `b`. Returns whether two different sets were merged. | $O(\log N)$ |
 | `bool same(int t, int a, int b) const` | Returns whether `a` and `b` were in the same set at time `t`. | $O(\log N)$ |

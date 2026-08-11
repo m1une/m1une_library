@@ -9,12 +9,12 @@ documentation_of: ../../../ds/bst/persistent_ordered_multiset.hpp
 Updates, splits, and merges return new versions and leave every input version
 available. Equal keys are stored as one leaf with a multiplicity.
 
-Nodes are stored in a specialization-wide append-only chunked pool and refer to
-children by integer index. This avoids per-node allocation and reference-counted
-child pointers. The pool is released when the program exits.
+Nodes are stored in a specialization-wide stable-slot pool and refer to children
+by integer index. Intrusive reference counts reclaim a node after its final
+dependent version or parent is released, and later updates reuse its slot.
 
-Pointers returned by bound and predecessor/successor methods remain valid for
-the remainder of the program.
+Pointers returned by bound and predecessor/successor methods remain valid only
+while a live version depends on the pointed-to node.
 
 ## Template Parameters
 
@@ -44,6 +44,8 @@ Trees passed to `merge` must use equivalent comparator state.
 | `int size() const` | Returns the total number of elements, including duplicates. | $O(1)$ |
 | `int unique_size() const` | Returns the number of distinct keys. | $O(1)$ |
 | `bool empty() const` | Returns whether the multiset is empty. | $O(1)$ |
+| `void release()` | Releases this version immediately and makes this handle empty. | $O(F)$ |
+| `std::size_t node_count() const` | Returns live nodes for this `T, Compare` specialization. | $O(1)$ |
 | `PersistentOrderedMultiset clear() const` | Returns an empty multiset with the same comparator. | $O(1)$ |
 | `PersistentOrderedMultiset insert(T key, int multiplicity = 1) const` | Returns a new multiset with `multiplicity` copies of `key` inserted. | $O(\log N)$ |
 | `PersistentOrderedMultiset erase_one(const T& key) const` | Returns a new multiset with one copy of `key` removed if it exists. | $O(\log N)$ |
@@ -66,6 +68,9 @@ Trees passed to `merge` must use equivalent comparator state.
 | `std::pair<PersistentOrderedMultiset, PersistentOrderedMultiset> split(const T& key) const` | Returns `{less, greater_equal}` without changing this version. | $O(\log N)$ |
 | `PersistentOrderedMultiset merge(const PersistentOrderedMultiset& other) const` | Returns the union without changing either version. Requires every key in `*this` to be smaller than every key in `other`. | $O(\log(N + M))$ |
 | `std::vector<T> to_vector() const` | Returns all elements in sorted order, including duplicates. | $O(N)$ |
+
+Here $F$ is the number of nodes that become unreachable. Destruction and
+assignment release roots automatically.
 
 ## Example
 

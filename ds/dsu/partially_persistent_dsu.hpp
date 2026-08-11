@@ -45,6 +45,15 @@ struct PartiallyPersistentDsu {
         return _n == 0;
     }
 
+    // Releases the complete history and resets this object to an empty DSU.
+    void release() {
+        _n = 0;
+        _time = 0;
+        std::vector<int>().swap(parent);
+        std::vector<int>().swap(parent_time);
+        std::vector<std::vector<std::pair<int, int>>>().swap(size_history);
+    }
+
     int time() const {
         return _time;
     }
