@@ -85,19 +85,19 @@ plumbing live in `utilities/`.
 
 | Directory | Use it for |
 | --- | --- |
-| `ds/dsu/` | Connectivity, component aggregation, potentials, range-parallel merging, and persistent union-find. |
-| `ds/segtree/` | Dense and dynamic segment trees, lazy propagation, dual segment trees, generic and persistent Beats, and other persistent variants. |
+| `ds/dsu/` | Connectivity, component aggregation, potentials, range-parallel merging, persistent union-find, and rollback variants. |
+| `ds/segtree/` | Dense and dynamic segment trees, lazy propagation, dual segment trees, generic Beats, and persistent or rollback variants. |
 | `ds/range_query/` | Objects built for repeated range queries, including cumulative sums, range LIS/modes/majorities and distinct counting, Fenwick and k-d trees, and static sparse-table queries. |
 | `ds/wavelet_matrix/` | Static and dynamic wavelet matrices for range order statistics, frequencies, dynamically updated weighted range sums, and multidimensional orthogonal queries. |
-| `ds/dynamic_array/` | Implicit-treap sequences with insertion, deletion, reversal, aggregation, or persistence. |
-| `ds/bst/` | Weight-balanced ordered sets and multisets, a fixed-universe predecessor set, and persistent red-black-tree variants with split/merge APIs. |
+| `ds/dynamic_array/` | Implicit-treap sequences with insertion, deletion, reversal, aggregation, persistence, or rollback. |
+| `ds/bst/` | Weight-balanced ordered sets and multisets, a fixed-universe predecessor set, and persistent or rollback red-black-tree variants. |
 | `ds/binary_trie/` | Binary tries for integer xor queries and optional monoid aggregates. |
 | `ds/dynamic_tree/` | Link-cut trees and rake-compress trees for changing forests. |
 | `ds/dynamic_connectivity/` | Online and offline connectivity under edge insertions and deletions. |
 | `ds/heap/` | Double-ended and meldable priority queues. |
-| `ds/deque/` | Purely persistent real-time double-ended queues. |
-| `ds/queue/` | Purely persistent real-time FIFO queues. |
-| `ds/stack/` | Purely persistent constant-time LIFO stacks. |
+| `ds/deque/` | Persistent and rollback real-time double-ended queues. |
+| `ds/queue/` | Persistent and rollback real-time FIFO queues. |
+| `ds/stack/` | Persistent and rollback constant-time LIFO stacks. |
 | `ds/interval_set/` | Disjoint interval maintenance. |
 | `ds/hash_table/` | Hash maps and hash sets. |
 

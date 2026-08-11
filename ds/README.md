@@ -7,19 +7,19 @@ one-shot sequence computations such as LIS are in `algo/sequence/`.
 
 | Category | Headers |
 | --- | --- |
-| [`dsu/`](dsu/) | Ordinary, rollback, aggregate, potentialized, persistent, partially persistent, and range-parallel union-find variants |
-| [`segtree/`](segtree/) | Dense, dynamic, lazy, dual, generic Beats, persistent Beats, specialized chmin/chmax/add, and other persistent variants, including `segtree_2d.hpp` and `dual_segtree_2d.hpp` |
+| [`dsu/`](dsu/) | Ordinary, rollback, aggregate, potentialized, persistent, partially persistent, rollback-potentialized, and range-parallel union-find variants |
+| [`segtree/`](segtree/) | Dense, dynamic, lazy, dual, generic Beats, persistent and rollback counterparts, specialized chmin/chmax/add, plus `segtree_2d.hpp` and `dual_segtree_2d.hpp` |
 | [`range_query/`](range_query/) | Repeated range-query objects: cumulative sums, Fenwick trees, SWAG, static and offline rectangle sums, static multidimensional k-d trees, offline-registered point-update order statistics, static inversions/LIS/modes, point-updatable majorities in `range_majority.hpp`, sqrt and merge-sort trees, and range-sort range-product queries |
 | [`wavelet_matrix/`](wavelet_matrix/) | `wavelet_matrix.hpp`, `dynamic_wavelet_matrix.hpp`, weighted `wavelet_matrix_sum.hpp` and update-optimized `dynamic_wavelet_matrix_sum.hpp` with configurable key width, plus `wavelet_matrix_2d.hpp` for multidimensional orthogonal queries |
-| [`dynamic_array/`](dynamic_array/) | Dynamic and persistent implicit-treap arrays, with optional monoid or lazy aggregation |
-| [`bst/`](bst/) | Weight-balanced ordered sets and multisets, a fixed-universe predecessor set, and persistent red-black-tree variants with split and merge |
+| [`dynamic_array/`](dynamic_array/) | Dynamic, persistent, and rollback implicit-treap arrays, with optional monoid or lazy aggregation |
+| [`bst/`](bst/) | Weight-balanced ordered sets and multisets, a fixed-universe predecessor set, and persistent or rollback red-black-tree variants |
 | [`binary_trie/`](binary_trie/) | Binary tries for integer xor queries and monoid aggregates |
 | [`dynamic_tree/`](dynamic_tree/) | Link-cut tree, path-oriented variants, and rake-compress link-cut tree |
 | [`dynamic_connectivity/`](dynamic_connectivity/) | Online and offline fully dynamic undirected connectivity |
 | [`heap/`](heap/) | Array-based double-ended priority queue and pairing-based meldable priority queue |
-| [`deque/`](deque/) | Purely persistent real-time double-ended queue |
-| [`queue/`](queue/) | Purely persistent real-time FIFO queue |
-| [`stack/`](stack/) | Purely persistent constant-time LIFO stack |
+| [`deque/`](deque/) | Persistent and rollback real-time double-ended queues |
+| [`queue/`](queue/) | Persistent and rollback real-time FIFO queues |
+| [`stack/`](stack/) | Persistent and rollback constant-time LIFO stacks |
 | [`interval_set/`](interval_set/) | Disjoint interval set with insertion, deletion, and covered-point queries |
 | [`hash_table/`](hash_table/) | `hash_map.hpp`, `hash_set.hpp`, and their shared implementation |
 
@@ -42,4 +42,5 @@ The lazy and Beats variants differ as follows:
 | `LazySegtree<ActedMonoid>` | Ordinary monoid action that always applies directly |
 | `SegtreeBeats<ActedMonoid>` | Generic fallible monoid action that descends on failure |
 | `PersistentSegtreeBeats<ActedMonoid>` | Persistent generic fallible action; updates return new versions |
+| `RollbackSegtreeBeats<ActedMonoid>` | Linear-history generic fallible action; updates mutate and can be undone |
 | `ChminChmaxAddSegtree<T>` | Ready-made numeric chmin/chmax/add implementation |
