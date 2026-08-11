@@ -69,11 +69,17 @@ data:
     path: math/fps/polynomial_roots.hpp
     title: Polynomial Roots over a Finite Field
   - icon: ':heavy_check_mark:'
+    path: math/fps/solve_fps_equation.hpp
+    title: Solve Formal Power Series Equation
+  - icon: ':heavy_check_mark:'
     path: math/fps/sparse_formal_power_series.hpp
     title: Sparse Formal Power Series
   - icon: ':heavy_check_mark:'
     path: math/multivariate_convolution.hpp
     title: Multidimensional Convolution
+  - icon: ':heavy_check_mark:'
+    path: math/newton_method.hpp
+    title: Newton Method
   - icon: ':heavy_check_mark:'
     path: math/partition_function.hpp
     title: Partition Function
@@ -213,6 +219,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/math/multivariate_convolution_truncated.test.cpp
     title: verify/math/multivariate_convolution_truncated.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/newton_method.test.cpp
+    title: verify/math/newton_method.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/math/partition_function.test.cpp
     title: verify/math/partition_function.test.cpp
@@ -719,6 +728,7 @@ data:
   - utilities/bigint.hpp
   - string/all.hpp
   - string/wildcard_pattern_matching.hpp
+  - math/fps/solve_fps_equation.hpp
   - math/fps/geometric_sequence_evaluation.hpp
   - math/fps/formal_power_series.hpp
   - math/fps/convolution_ll.hpp
@@ -734,6 +744,7 @@ data:
   - math/fps/polynomial_factorization.hpp
   - math/fps/lagrange_inversion.hpp
   - math/all.hpp
+  - math/newton_method.hpp
   - math/partition_function.hpp
   - math/combinatorial_sequences.hpp
   - math/multivariate_convolution.hpp
@@ -786,6 +797,7 @@ data:
   - verify/math/fps/convolution_mod_large.test.cpp
   - verify/math/fps/half_gcd.test.cpp
   - verify/math/multivariate_convolution_cyclic.test.cpp
+  - verify/math/newton_method.test.cpp
   - verify/math/multivariate_convolution_truncated.test.cpp
   - verify/math/bernoulli_number.test.cpp
   - verify/math/bell_number.test.cpp

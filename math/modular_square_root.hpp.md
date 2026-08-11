@@ -54,8 +54,14 @@ data:
     path: math/fps/polynomial_roots.hpp
     title: Polynomial Roots over a Finite Field
   - icon: ':heavy_check_mark:'
+    path: math/fps/solve_fps_equation.hpp
+    title: Solve Formal Power Series Equation
+  - icon: ':heavy_check_mark:'
     path: math/fps/sparse_formal_power_series.hpp
     title: Sparse Formal Power Series
+  - icon: ':heavy_check_mark:'
+    path: math/newton_method.hpp
+    title: Newton Method
   - icon: ':heavy_check_mark:'
     path: math/partition_function.hpp
     title: Partition Function
@@ -163,6 +169,9 @@ data:
     path: verify/math/modular_square_root.test.cpp
     title: verify/math/modular_square_root.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/newton_method.test.cpp
+    title: verify/math/newton_method.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/partition_function.test.cpp
     title: verify/math/partition_function.test.cpp
   - icon: ':heavy_check_mark:'
@@ -253,6 +262,7 @@ data:
   requiredBy:
   - graph/counting.hpp
   - graph/all.hpp
+  - math/fps/solve_fps_equation.hpp
   - math/fps/geometric_sequence_evaluation.hpp
   - math/fps/formal_power_series.hpp
   - math/fps/polynomial_roots.hpp
@@ -267,6 +277,7 @@ data:
   - math/fps/lagrange_inversion.hpp
   - math/all.hpp
   - math/all.hpp
+  - math/newton_method.hpp
   - math/partition_function.hpp
   - math/combinatorial_sequences.hpp
   - math/bernoulli.hpp
@@ -305,6 +316,7 @@ data:
   - verify/math/fps/polynomial_roots.test.cpp
   - verify/math/fps/sqrt_of_formal_power_series_sparse.test.cpp
   - verify/math/fps/half_gcd.test.cpp
+  - verify/math/newton_method.test.cpp
   - verify/math/modular_square_root.test.cpp
   - verify/math/bernoulli_number.test.cpp
   - verify/math/bell_number.test.cpp

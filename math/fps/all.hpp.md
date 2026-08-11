@@ -20,6 +20,9 @@ data:
     path: math/fps/formal_power_series.hpp
     title: Formal Power Series
   - icon: ':heavy_check_mark:'
+    path: math/fps/formal_power_series.hpp
+    title: Formal Power Series
+  - icon: ':heavy_check_mark:'
     path: math/fps/geometric_sequence_evaluation.hpp
     title: Geometric-Sequence Polynomial Evaluation and Interpolation
   - icon: ':heavy_check_mark:'
@@ -44,6 +47,9 @@ data:
     path: math/fps/polynomial_roots.hpp
     title: Polynomial Roots over a Finite Field
   - icon: ':heavy_check_mark:'
+    path: math/fps/solve_fps_equation.hpp
+    title: Solve Formal Power Series Equation
+  - icon: ':heavy_check_mark:'
     path: math/fps/sparse_formal_power_series.hpp
     title: Sparse Formal Power Series
   - icon: ':heavy_check_mark:'
@@ -52,6 +58,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/modular_square_root.hpp
     title: Modular Square Root
+  - icon: ':heavy_check_mark:'
+    path: math/newton_method.hpp
+    title: Newton Method
   _extendedRequiredBy:
   - icon: ':heavy_check_mark:'
     path: math/all.hpp
@@ -1498,8 +1507,54 @@ data:
     \n    std::sort(result.begin(), result.end(), [](Mint lhs, Mint rhs) {\n     \
     \   return lhs.val() < rhs.val();\n    });\n    result.erase(std::unique(result.begin(),\
     \ result.end()), result.end());\n    return result;\n}\n\n}  // namespace fps\n\
-    }  // namespace m1une\n\n\n#line 1 \"math/fps/sparse_formal_power_series.hpp\"\
-    \n\n\n\n#line 9 \"math/fps/sparse_formal_power_series.hpp\"\n\n#line 11 \"math/fps/sparse_formal_power_series.hpp\"\
+    }  // namespace m1une\n\n\n#line 1 \"math/fps/solve_fps_equation.hpp\"\n\n\n\n\
+    #line 6 \"math/fps/solve_fps_equation.hpp\"\n\n#line 1 \"math/newton_method.hpp\"\
+    \n\n\n\n#line 5 \"math/newton_method.hpp\"\n\n#line 7 \"math/newton_method.hpp\"\
+    \n\nnamespace m1une {\nnamespace math {\n\nnamespace newton_method_detail {\n\n\
+    template <class T>\nstruct DefaultQuotient {\n    template <class Numerator, class\
+    \ Denominator>\n    auto operator()(\n        const Numerator& numerator,\n  \
+    \      const Denominator& denominator\n    ) const {\n        return numerator\
+    \ / denominator;\n    }\n};\n\ntemplate <class Mint>\nstruct DefaultQuotient<fps::FormalPowerSeries<Mint>>\
+    \ {\n    using Fps = fps::FormalPowerSeries<Mint>;\n\n    int degree;\n\n    Fps\
+    \ operator()(const Fps& numerator, const Fps& denominator) const {\n        return\
+    \ (numerator.pre(degree) * denominator.inv(degree)).pre(degree);\n    }\n};\n\n\
+    template <class T>\nDefaultQuotient<T> make_default_quotient(const T&) {\n   \
+    \ return {};\n}\n\ntemplate <class Mint>\nDefaultQuotient<fps::FormalPowerSeries<Mint>>\
+    \ make_default_quotient(\n    const fps::FormalPowerSeries<Mint>& value\n) {\n\
+    \    return {int(value.size())};\n}\n\n}  // namespace newton_method_detail\n\n\
+    template <class T, class F, class Derivative, class Quotient>\nT newton_method(\n\
+    \    T initial,\n    F function,\n    Derivative derivative,\n    int iterations,\n\
+    \    Quotient quotient\n) {\n    assert(iterations >= 0);\n    for (int iteration\
+    \ = 0; iteration < iterations; iteration++) {\n        auto numerator = function(initial);\n\
+    \        auto denominator = derivative(initial);\n        initial -= quotient(numerator,\
+    \ denominator);\n    }\n    return initial;\n}\n\ntemplate <class T, class F,\
+    \ class Derivative>\nT newton_method(\n    T initial,\n    F function,\n    Derivative\
+    \ derivative,\n    int iterations\n) {\n    auto quotient = newton_method_detail::make_default_quotient(initial);\n\
+    \    return newton_method(initial, function, derivative, iterations, quotient);\n\
+    }\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line 8 \"math/fps/solve_fps_equation.hpp\"\
+    \n\nnamespace m1une {\nnamespace fps {\n\n// Extends a solution modulo x^initial.size()\
+    \ to a solution modulo x^degree.\n// Both callbacks receive the precision currently\
+    \ requested by Newton lifting.\ntemplate <class Mint, class Function, class Derivative>\n\
+    FormalPowerSeries<Mint> solve_fps_equation(\n    FormalPowerSeries<Mint> initial,\n\
+    \    int degree,\n    Function function,\n    Derivative derivative\n) {\n   \
+    \ using Fps = FormalPowerSeries<Mint>;\n    assert(degree >= 0);\n    if (degree\
+    \ == 0) return {};\n    assert(!initial.empty());\n    if (int(initial.size())\
+    \ >= degree) return initial.pre(degree);\n\n    while (int(initial.size()) < degree)\
+    \ {\n        const int next_degree = std::min(int(initial.size()) << 1, degree);\n\
+    \        initial.resize(next_degree);\n\n        auto truncated_function = [&](const\
+    \ Fps& value) {\n            return function(value, next_degree).pre(next_degree);\n\
+    \        };\n        auto truncated_derivative = [&](const Fps& value) {\n   \
+    \         return derivative(value, next_degree).pre(next_degree);\n        };\n\
+    \        initial = math::newton_method(\n            initial, truncated_function,\
+    \ truncated_derivative, 1\n        );\n    }\n    return initial;\n}\n\n// Starts\
+    \ Newton lifting from a solution modulo x.\ntemplate <class Mint, class Function,\
+    \ class Derivative>\nFormalPowerSeries<Mint> solve_fps_equation(\n    int degree,\n\
+    \    Mint constant_solution,\n    Function function,\n    Derivative derivative\n\
+    ) {\n    assert(degree >= 0);\n    if (degree == 0) return {};\n    return solve_fps_equation(\n\
+    \        FormalPowerSeries<Mint>(1, constant_solution),\n        degree,\n   \
+    \     function,\n        derivative\n    );\n}\n\n}  // namespace fps\n}  // namespace\
+    \ m1une\n\n\n#line 1 \"math/fps/sparse_formal_power_series.hpp\"\n\n\n\n#line\
+    \ 9 \"math/fps/sparse_formal_power_series.hpp\"\n\n#line 11 \"math/fps/sparse_formal_power_series.hpp\"\
     \n\nnamespace m1une {\nnamespace fps {\n\ntemplate <class Mint>\nusing SparseFormalPowerSeries\
     \ = std::vector<std::pair<int, Mint>>;\n\nnamespace internal {\n\ntemplate <class\
     \ Mint>\nvoid assert_valid_sparse_fps(const SparseFormalPowerSeries<Mint>& terms,\
@@ -1591,7 +1646,7 @@ data:
     \n    FormalPowerSeries<Mint> result(degree);\n    const int offset = leading_degree\
     \ / 2;\n    for (int i = 0; i < normalized_degree; i++) {\n        result[offset\
     \ + i] = unit[i] * *leading_root;\n    }\n    return result;\n}\n\n}  // namespace\
-    \ fps\n}  // namespace m1une\n\n\n#line 18 \"math/fps/all.hpp\"\n\n\n"
+    \ fps\n}  // namespace m1une\n\n\n#line 19 \"math/fps/all.hpp\"\n\n\n"
   code: '#ifndef M1UNE_FPS_ALL_HPP
 
     #define M1UNE_FPS_ALL_HPP 1
@@ -1623,6 +1678,8 @@ data:
 
     #include "polynomial_roots.hpp"
 
+    #include "solve_fps_equation.hpp"
+
     #include "sparse_formal_power_series.hpp"
 
 
@@ -1646,12 +1703,15 @@ data:
   - math/fps/multipoint_evaluation.hpp
   - math/fps/polynomial_factorization.hpp
   - math/fps/polynomial_roots.hpp
+  - math/fps/solve_fps_equation.hpp
+  - math/newton_method.hpp
+  - math/fps/formal_power_series.hpp
   - math/fps/sparse_formal_power_series.hpp
   isVerificationFile: false
   path: math/fps/all.hpp
   requiredBy:
   - math/all.hpp
-  timestamp: '2026-08-10 17:30:05+09:00'
+  timestamp: '2026-08-11 14:11:53+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
@@ -1682,4 +1742,5 @@ title: Formal Power Series All
 | `math/fps/multipoint_evaluation.hpp` | Multipoint evaluation and polynomial interpolation. |
 | `math/fps/polynomial_factorization.hpp` | Factorization into monic irreducible polynomials over a prime field. |
 | `math/fps/polynomial_roots.hpp` | Distinct roots of a polynomial over a finite prime field. |
+| `math/fps/solve_fps_equation.hpp` | Newton lifting for equations over formal power series. |
 | `math/fps/sparse_formal_power_series.hpp` | Sparse inverse, logarithm, exponential, power, and square root. |

@@ -81,11 +81,17 @@ data:
     path: math/fps/polynomial_roots.hpp
     title: Polynomial Roots over a Finite Field
   - icon: ':heavy_check_mark:'
+    path: math/fps/solve_fps_equation.hpp
+    title: Solve Formal Power Series Equation
+  - icon: ':heavy_check_mark:'
     path: math/fps/sparse_formal_power_series.hpp
     title: Sparse Formal Power Series
   - icon: ':heavy_check_mark:'
     path: math/multivariate_convolution.hpp
     title: Multidimensional Convolution
+  - icon: ':heavy_check_mark:'
+    path: math/newton_method.hpp
+    title: Newton Method
   - icon: ':heavy_check_mark:'
     path: math/partition_function.hpp
     title: Partition Function
@@ -460,6 +466,12 @@ data:
     path: verify/math/multivariate_convolution_truncated.test.cpp
     title: verify/math/multivariate_convolution_truncated.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/newton_method.test.cpp
+    title: verify/math/newton_method.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/math/newton_method.test.cpp
+    title: verify/math/newton_method.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/partition_function.test.cpp
     title: verify/math/partition_function.test.cpp
   - icon: ':heavy_check_mark:'
@@ -742,6 +754,7 @@ data:
   - utilities/bigint.hpp
   - string/all.hpp
   - string/wildcard_pattern_matching.hpp
+  - math/fps/solve_fps_equation.hpp
   - math/fps/geometric_sequence_evaluation.hpp
   - math/fps/formal_power_series.hpp
   - math/fps/convolution_ll.hpp
@@ -758,6 +771,7 @@ data:
   - math/fps/lagrange_inversion.hpp
   - math/all.hpp
   - math/all.hpp
+  - math/newton_method.hpp
   - math/partition_function.hpp
   - math/combinatorial_sequences.hpp
   - math/multivariate_convolution.hpp
@@ -885,6 +899,8 @@ data:
   - verify/math/prefix_sum_of_binom.test.cpp
   - verify/math/sum_of_multiplicative_function.test.cpp
   - verify/math/cyclotomic_polynomial.test.cpp
+  - verify/math/newton_method.test.cpp
+  - verify/math/newton_method.test.cpp
   - verify/math/modular_kth_root.test.cpp
   - verify/math/bitwise_convolution.test.cpp
   - verify/math/set_power_series_log.test.cpp

@@ -59,6 +59,9 @@ data:
     path: math/fps/formal_power_series.hpp
     title: Formal Power Series
   - icon: ':heavy_check_mark:'
+    path: math/fps/formal_power_series.hpp
+    title: Formal Power Series
+  - icon: ':heavy_check_mark:'
     path: math/fps/geometric_sequence_evaluation.hpp
     title: Geometric-Sequence Polynomial Evaluation and Interpolation
   - icon: ':heavy_check_mark:'
@@ -82,6 +85,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/fps/polynomial_roots.hpp
     title: Polynomial Roots over a Finite Field
+  - icon: ':heavy_check_mark:'
+    path: math/fps/solve_fps_equation.hpp
+    title: Solve Formal Power Series Equation
   - icon: ':heavy_check_mark:'
     path: math/fps/sparse_formal_power_series.hpp
     title: Sparse Formal Power Series
@@ -145,6 +151,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: math/multivariate_convolution.hpp
     title: Multidimensional Convolution
+  - icon: ':heavy_check_mark:'
+    path: math/newton_method.hpp
+    title: Newton Method
+  - icon: ':heavy_check_mark:'
+    path: math/newton_method.hpp
+    title: Newton Method
   - icon: ':heavy_check_mark:'
     path: math/number_theory.hpp
     title: Number Theory
@@ -2485,8 +2497,54 @@ data:
     \n    std::sort(result.begin(), result.end(), [](Mint lhs, Mint rhs) {\n     \
     \   return lhs.val() < rhs.val();\n    });\n    result.erase(std::unique(result.begin(),\
     \ result.end()), result.end());\n    return result;\n}\n\n}  // namespace fps\n\
-    }  // namespace m1une\n\n\n#line 1 \"math/fps/sparse_formal_power_series.hpp\"\
-    \n\n\n\n#line 9 \"math/fps/sparse_formal_power_series.hpp\"\n\n#line 11 \"math/fps/sparse_formal_power_series.hpp\"\
+    }  // namespace m1une\n\n\n#line 1 \"math/fps/solve_fps_equation.hpp\"\n\n\n\n\
+    #line 6 \"math/fps/solve_fps_equation.hpp\"\n\n#line 1 \"math/newton_method.hpp\"\
+    \n\n\n\n#line 5 \"math/newton_method.hpp\"\n\n#line 7 \"math/newton_method.hpp\"\
+    \n\nnamespace m1une {\nnamespace math {\n\nnamespace newton_method_detail {\n\n\
+    template <class T>\nstruct DefaultQuotient {\n    template <class Numerator, class\
+    \ Denominator>\n    auto operator()(\n        const Numerator& numerator,\n  \
+    \      const Denominator& denominator\n    ) const {\n        return numerator\
+    \ / denominator;\n    }\n};\n\ntemplate <class Mint>\nstruct DefaultQuotient<fps::FormalPowerSeries<Mint>>\
+    \ {\n    using Fps = fps::FormalPowerSeries<Mint>;\n\n    int degree;\n\n    Fps\
+    \ operator()(const Fps& numerator, const Fps& denominator) const {\n        return\
+    \ (numerator.pre(degree) * denominator.inv(degree)).pre(degree);\n    }\n};\n\n\
+    template <class T>\nDefaultQuotient<T> make_default_quotient(const T&) {\n   \
+    \ return {};\n}\n\ntemplate <class Mint>\nDefaultQuotient<fps::FormalPowerSeries<Mint>>\
+    \ make_default_quotient(\n    const fps::FormalPowerSeries<Mint>& value\n) {\n\
+    \    return {int(value.size())};\n}\n\n}  // namespace newton_method_detail\n\n\
+    template <class T, class F, class Derivative, class Quotient>\nT newton_method(\n\
+    \    T initial,\n    F function,\n    Derivative derivative,\n    int iterations,\n\
+    \    Quotient quotient\n) {\n    assert(iterations >= 0);\n    for (int iteration\
+    \ = 0; iteration < iterations; iteration++) {\n        auto numerator = function(initial);\n\
+    \        auto denominator = derivative(initial);\n        initial -= quotient(numerator,\
+    \ denominator);\n    }\n    return initial;\n}\n\ntemplate <class T, class F,\
+    \ class Derivative>\nT newton_method(\n    T initial,\n    F function,\n    Derivative\
+    \ derivative,\n    int iterations\n) {\n    auto quotient = newton_method_detail::make_default_quotient(initial);\n\
+    \    return newton_method(initial, function, derivative, iterations, quotient);\n\
+    }\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line 8 \"math/fps/solve_fps_equation.hpp\"\
+    \n\nnamespace m1une {\nnamespace fps {\n\n// Extends a solution modulo x^initial.size()\
+    \ to a solution modulo x^degree.\n// Both callbacks receive the precision currently\
+    \ requested by Newton lifting.\ntemplate <class Mint, class Function, class Derivative>\n\
+    FormalPowerSeries<Mint> solve_fps_equation(\n    FormalPowerSeries<Mint> initial,\n\
+    \    int degree,\n    Function function,\n    Derivative derivative\n) {\n   \
+    \ using Fps = FormalPowerSeries<Mint>;\n    assert(degree >= 0);\n    if (degree\
+    \ == 0) return {};\n    assert(!initial.empty());\n    if (int(initial.size())\
+    \ >= degree) return initial.pre(degree);\n\n    while (int(initial.size()) < degree)\
+    \ {\n        const int next_degree = std::min(int(initial.size()) << 1, degree);\n\
+    \        initial.resize(next_degree);\n\n        auto truncated_function = [&](const\
+    \ Fps& value) {\n            return function(value, next_degree).pre(next_degree);\n\
+    \        };\n        auto truncated_derivative = [&](const Fps& value) {\n   \
+    \         return derivative(value, next_degree).pre(next_degree);\n        };\n\
+    \        initial = math::newton_method(\n            initial, truncated_function,\
+    \ truncated_derivative, 1\n        );\n    }\n    return initial;\n}\n\n// Starts\
+    \ Newton lifting from a solution modulo x.\ntemplate <class Mint, class Function,\
+    \ class Derivative>\nFormalPowerSeries<Mint> solve_fps_equation(\n    int degree,\n\
+    \    Mint constant_solution,\n    Function function,\n    Derivative derivative\n\
+    ) {\n    assert(degree >= 0);\n    if (degree == 0) return {};\n    return solve_fps_equation(\n\
+    \        FormalPowerSeries<Mint>(1, constant_solution),\n        degree,\n   \
+    \     function,\n        derivative\n    );\n}\n\n}  // namespace fps\n}  // namespace\
+    \ m1une\n\n\n#line 1 \"math/fps/sparse_formal_power_series.hpp\"\n\n\n\n#line\
+    \ 9 \"math/fps/sparse_formal_power_series.hpp\"\n\n#line 11 \"math/fps/sparse_formal_power_series.hpp\"\
     \n\nnamespace m1une {\nnamespace fps {\n\ntemplate <class Mint>\nusing SparseFormalPowerSeries\
     \ = std::vector<std::pair<int, Mint>>;\n\nnamespace internal {\n\ntemplate <class\
     \ Mint>\nvoid assert_valid_sparse_fps(const SparseFormalPowerSeries<Mint>& terms,\
@@ -2578,7 +2636,7 @@ data:
     \n    FormalPowerSeries<Mint> result(degree);\n    const int offset = leading_degree\
     \ / 2;\n    for (int i = 0; i < normalized_degree; i++) {\n        result[offset\
     \ + i] = unit[i] * *leading_root;\n    }\n    return result;\n}\n\n}  // namespace\
-    \ fps\n}  // namespace m1une\n\n\n#line 18 \"math/fps/all.hpp\"\n\n\n#line 1 \"\
+    \ fps\n}  // namespace m1une\n\n\n#line 19 \"math/fps/all.hpp\"\n\n\n#line 1 \"\
     math/matrix/all.hpp\"\n\n\n\n#line 1 \"math/matrix/adjugate.hpp\"\n\n\n\n#line\
     \ 6 \"math/matrix/adjugate.hpp\"\n\n#line 1 \"math/matrix/matrix.hpp\"\n\n\n\n\
     #line 9 \"math/matrix/matrix.hpp\"\n\nnamespace m1une {\nnamespace matrix {\n\n\
@@ -4437,7 +4495,7 @@ data:
     \        for (UInt value : basis_) {\n            if (value != 0) result.push_back(value);\n\
     \        }\n        return result;\n    }\n\nprivate:\n    std::array<UInt, bit_width>\
     \ basis_{};\n    int rank_ = 0;\n};\n\n}  // namespace math\n}  // namespace m1une\n\
-    \n\n#line 42 \"math/all.hpp\"\n\n\n"
+    \n\n#line 43 \"math/all.hpp\"\n\n\n"
   code: '#ifndef M1UNE_MATH_ALL_HPP
 
     #define M1UNE_MATH_ALL_HPP 1
@@ -4482,6 +4540,8 @@ data:
     #include "multivariate_convolution.hpp"
 
     #include "multiplicative_function_prefix_sum.hpp"
+
+    #include "newton_method.hpp"
 
     #include "number_theory.hpp"
 
@@ -4559,6 +4619,9 @@ data:
   - math/fps/multipoint_evaluation.hpp
   - math/fps/polynomial_factorization.hpp
   - math/fps/polynomial_roots.hpp
+  - math/fps/solve_fps_equation.hpp
+  - math/newton_method.hpp
+  - math/fps/formal_power_series.hpp
   - math/fps/sparse_formal_power_series.hpp
   - math/matrix/all.hpp
   - math/matrix/adjugate.hpp
@@ -4577,6 +4640,7 @@ data:
   - math/fps/convolution.hpp
   - math/primitive_root.hpp
   - math/multiplicative_function_prefix_sum.hpp
+  - math/newton_method.hpp
   - math/prefix_sum_of_binom.hpp
   - math/prime_sieve.hpp
   - math/rational.hpp
@@ -4593,7 +4657,7 @@ data:
   isVerificationFile: false
   path: math/all.hpp
   requiredBy: []
-  timestamp: '2026-08-10 17:30:05+09:00'
+  timestamp: '2026-08-11 14:11:53+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp
@@ -4670,6 +4734,8 @@ You usually do not need to include this entire bundle:
 * Use `rational.hpp` for normalized exact fractions.
 * Use `rational_approximation.hpp` for the closest fraction on each side under
   numerator and denominator bounds.
+* Use `newton_method.hpp` for fixed-count Newton iteration over numeric values or
+  formal power series.
 * Use `squarefree_count.hpp` to count square-free integers through a 64-bit
   limit.
 * Use `stern_brocot_tree.hpp` for positive rational tree paths, ancestors, and
@@ -4698,6 +4764,7 @@ few unused headers do not matter.
 | `math/modular_square_root.hpp` | Modular square roots for prime moduli using Tonelli-Shanks. |
 | `math/multivariate_convolution.hpp` | Truncated and cyclic multidimensional convolution. |
 | `math/multiplicative_function_prefix_sum.hpp` | Min_25 prefix sums of a multiplicative function. |
+| `math/newton_method.hpp` | Generic fixed-count Newton iteration with formal-power-series division support. |
 | `math/fps/all.hpp` | Convolution, formal power series, polynomial algorithms, and linear recurrences. |
 | `math/matrix/all.hpp` | Dense and packed GF(2) matrices, Pfaffian, hafnian, sparse determinant, Gaussian elimination, inverse, and linear systems. |
 | `math/combinatorics.hpp` | Factorials, binomial coefficients, permutations, and multiset counts. |

@@ -885,6 +885,9 @@ data:
       path: math/multivariate_convolution.hpp
       title: Multidimensional Convolution
     - icon: ':heavy_check_mark:'
+      path: math/newton_method.hpp
+      title: Newton Method
+    - icon: ':heavy_check_mark:'
       path: math/number_theory.hpp
       title: Number Theory
     - icon: ':heavy_check_mark:'
@@ -982,6 +985,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: math/fps/polynomial_roots.hpp
       title: Polynomial Roots over a Finite Field
+    - icon: ':heavy_check_mark:'
+      path: math/fps/solve_fps_equation.hpp
+      title: Solve Formal Power Series Equation
     - icon: ':heavy_check_mark:'
       path: math/fps/sparse_formal_power_series.hpp
       title: Sparse Formal Power Series
@@ -2090,6 +2096,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/multivariate_convolution_truncated.test.cpp
       title: verify/math/multivariate_convolution_truncated.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/newton_method.test.cpp
+      title: verify/math/newton_method.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/partition_function.test.cpp
       title: verify/math/partition_function.test.cpp

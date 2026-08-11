@@ -865,6 +865,9 @@ data:
     path: verify/math/multivariate_convolution_truncated.test.cpp
     title: verify/math/multivariate_convolution_truncated.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/newton_method.test.cpp
+    title: verify/math/newton_method.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/partition_function.test.cpp
     title: verify/math/partition_function.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1854,6 +1857,7 @@ data:
   - verify/math/prefix_sum_of_binom.test.cpp
   - verify/math/sum_of_multiplicative_function.test.cpp
   - verify/math/cyclotomic_polynomial.test.cpp
+  - verify/math/newton_method.test.cpp
   - verify/math/modular_kth_root.test.cpp
   - verify/math/bitwise_convolution.test.cpp
   - verify/math/set_power_series_log.test.cpp
