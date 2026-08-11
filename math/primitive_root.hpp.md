@@ -144,15 +144,15 @@ data:
   isVerificationFile: false
   path: math/primitive_root.hpp
   requiredBy:
-  - math/multivariate_convolution.hpp
   - math/all.hpp
+  - math/multivariate_convolution.hpp
   timestamp: '2026-06-24 15:25:00+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/math/math_algorithms.test.cpp
+  - verify/math/primitive_root.test.cpp
   - verify/math/multivariate_convolution_cyclic.test.cpp
   - verify/math/multivariate_convolution_truncated.test.cpp
-  - verify/math/primitive_root.test.cpp
-  - verify/math/math_algorithms.test.cpp
 documentation_of: math/primitive_root.hpp
 layout: document
 title: Primitive Root

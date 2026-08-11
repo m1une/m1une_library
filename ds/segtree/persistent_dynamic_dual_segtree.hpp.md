@@ -10,11 +10,17 @@ data:
   - icon: ':heavy_check_mark:'
     path: monoid/concept.hpp
     title: Monoid Concept
-  _extendedRequiredBy: []
+  _extendedRequiredBy:
+  - icon: ':heavy_check_mark:'
+    path: ds/segtree/rollback_dynamic_dual_segtree.hpp
+    title: Rollback Dynamic Dual Segment Tree
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/ds/persistent_cow.test.cpp
     title: verify/ds/persistent_cow.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/rollback_counterparts.test.cpp
+    title: verify/ds/rollback_counterparts.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/persistent_dynamic_dual_segtree.test.cpp
     title: verify/ds/segtree/persistent_dynamic_dual_segtree.test.cpp
@@ -382,12 +388,14 @@ data:
   - ds/segtree/persistent_node_pool.hpp
   isVerificationFile: false
   path: ds/segtree/persistent_dynamic_dual_segtree.hpp
-  requiredBy: []
+  requiredBy:
+  - ds/segtree/rollback_dynamic_dual_segtree.hpp
   timestamp: '2026-08-12 03:11:00+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/persistent_cow.test.cpp
+  - verify/ds/rollback_counterparts.test.cpp
   - verify/ds/segtree/persistent_dynamic_dual_segtree.test.cpp
+  - verify/ds/persistent_cow.test.cpp
 documentation_of: ds/segtree/persistent_dynamic_dual_segtree.hpp
 layout: document
 title: Persistent Dynamic Dual Segment Tree

@@ -215,15 +215,15 @@ data:
   isVerificationFile: false
   path: graph/enumerate_cliques.hpp
   requiredBy:
-  - graph/all.hpp
   - graph/undirected.hpp
+  - graph/all.hpp
   timestamp: '2026-07-16 19:22:46+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/graph/cow_game.test.cpp
-  - verify/graph/enumerate_cliques.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/cow_game.test.cpp
+  - verify/graph/enumerate_cliques.test.cpp
 documentation_of: graph/enumerate_cliques.hpp
 layout: document
 title: Enumerate Cliques

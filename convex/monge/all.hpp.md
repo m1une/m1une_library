@@ -425,8 +425,8 @@ data:
   timestamp: '2026-07-07 18:38:36+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/convex/monge/monge_dp_optimization.test.cpp
   - verify/convex/monge/monge_algorithms.test.cpp
+  - verify/convex/monge/monge_dp_optimization.test.cpp
 documentation_of: convex/monge/all.hpp
 layout: document
 title: Monge All

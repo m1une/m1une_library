@@ -23,10 +23,34 @@ data:
   - icon: ':heavy_check_mark:'
     path: ds/segtree/persistent_segtree_beats.hpp
     title: ds/segtree/persistent_segtree_beats.hpp
+  - icon: ':heavy_check_mark:'
+    path: ds/segtree/rollback_dual_segtree.hpp
+    title: Rollback Dual Segment Tree
+  - icon: ':heavy_check_mark:'
+    path: ds/segtree/rollback_dynamic_dual_segtree.hpp
+    title: Rollback Dynamic Dual Segment Tree
+  - icon: ':heavy_check_mark:'
+    path: ds/segtree/rollback_dynamic_lazy_segtree.hpp
+    title: Rollback Dynamic Lazy Segment Tree
+  - icon: ':heavy_check_mark:'
+    path: ds/segtree/rollback_dynamic_segtree.hpp
+    title: Rollback Dynamic Segment Tree
+  - icon: ':heavy_check_mark:'
+    path: ds/segtree/rollback_lazy_segtree.hpp
+    title: Rollback Lazy Segment Tree
+  - icon: ':heavy_check_mark:'
+    path: ds/segtree/rollback_segtree.hpp
+    title: Rollback Segment Tree
+  - icon: ':heavy_check_mark:'
+    path: ds/segtree/rollback_segtree_beats.hpp
+    title: Rollback Segment Tree Beats
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/ds/persistent_cow.test.cpp
     title: verify/ds/persistent_cow.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/rollback_counterparts.test.cpp
+    title: verify/ds/rollback_counterparts.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/persistent_dual_segtree.test.cpp
     title: verify/ds/segtree/persistent_dual_segtree.test.cpp
@@ -127,24 +151,32 @@ data:
   isVerificationFile: false
   path: ds/segtree/persistent_node_pool.hpp
   requiredBy:
+  - ds/segtree/persistent_segtree.hpp
+  - ds/segtree/rollback_lazy_segtree.hpp
+  - ds/segtree/rollback_dual_segtree.hpp
   - ds/segtree/persistent_lazy_segtree.hpp
+  - ds/segtree/rollback_segtree_beats.hpp
   - ds/segtree/persistent_dynamic_dual_segtree.hpp
+  - ds/segtree/rollback_dynamic_lazy_segtree.hpp
+  - ds/segtree/rollback_dynamic_dual_segtree.hpp
+  - ds/segtree/rollback_dynamic_segtree.hpp
   - ds/segtree/persistent_dynamic_segtree.hpp
   - ds/segtree/persistent_segtree_beats.hpp
   - ds/segtree/persistent_dynamic_lazy_segtree.hpp
-  - ds/segtree/persistent_segtree.hpp
+  - ds/segtree/rollback_segtree.hpp
   - ds/segtree/persistent_dual_segtree.hpp
   timestamp: '2026-08-12 03:11:00+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/persistent_cow.test.cpp
+  - verify/ds/rollback_counterparts.test.cpp
+  - verify/ds/segtree/persistent_dynamic_dual_segtree.test.cpp
   - verify/ds/segtree/persistent_dual_segtree.test.cpp
-  - verify/ds/segtree/persistent_segtree.test.cpp
-  - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
+  - verify/ds/segtree/persistent_segtree_beats.test.cpp
   - verify/ds/segtree/persistent_dynamic_segtree.test.cpp
   - verify/ds/segtree/persistent_lazy_segtree.test.cpp
-  - verify/ds/segtree/persistent_segtree_beats.test.cpp
-  - verify/ds/segtree/persistent_dynamic_dual_segtree.test.cpp
+  - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
+  - verify/ds/segtree/persistent_segtree.test.cpp
+  - verify/ds/persistent_cow.test.cpp
 documentation_of: ds/segtree/persistent_node_pool.hpp
 layout: document
 redirect_from:

@@ -1245,8 +1245,6 @@ data:
   isVerificationFile: false
   path: math/fps/convolution.hpp
   requiredBy:
-  - geometry/lattice_point_count.hpp
-  - geometry/all.hpp
   - graph/counting.hpp
   - graph/counting.hpp
   - graph/all.hpp
@@ -1255,91 +1253,93 @@ data:
   - graph/tree/distance_frequency.hpp
   - graph/tree/all.hpp
   - utilities/bigint.hpp
-  - string/wildcard_pattern_matching.hpp
   - string/all.hpp
-  - math/fps/convolution_ll.hpp
-  - math/fps/polynomial_factorization.hpp
-  - math/fps/polynomial_roots.hpp
-  - math/fps/formal_power_series.hpp
-  - math/fps/sparse_formal_power_series.hpp
-  - math/fps/linear_recurrence.hpp
-  - math/fps/all.hpp
-  - math/fps/lagrange_inversion.hpp
-  - math/fps/multipoint_evaluation.hpp
-  - math/fps/compositional_inverse.hpp
-  - math/fps/half_gcd.hpp
-  - math/fps/composition.hpp
+  - string/wildcard_pattern_matching.hpp
   - math/fps/solve_fps_equation.hpp
   - math/fps/geometric_sequence_evaluation.hpp
-  - math/partition_function.hpp
+  - math/fps/formal_power_series.hpp
+  - math/fps/convolution_ll.hpp
+  - math/fps/polynomial_roots.hpp
+  - math/fps/compositional_inverse.hpp
+  - math/fps/all.hpp
+  - math/fps/multipoint_evaluation.hpp
+  - math/fps/composition.hpp
+  - math/fps/sparse_formal_power_series.hpp
+  - math/fps/linear_recurrence.hpp
+  - math/fps/half_gcd.hpp
+  - math/fps/polynomial_factorization.hpp
+  - math/fps/lagrange_inversion.hpp
+  - math/all.hpp
+  - math/all.hpp
   - math/newton_method.hpp
-  - math/multivariate_convolution.hpp
-  - math/all.hpp
-  - math/all.hpp
+  - math/partition_function.hpp
   - math/combinatorial_sequences.hpp
+  - math/multivariate_convolution.hpp
   - math/bernoulli.hpp
+  - geometry/all.hpp
+  - geometry/lattice_point_count.hpp
   timestamp: '2026-08-10 17:30:05+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/geometry/centroid.test.cpp
-  - verify/geometry/lattice_point_count.test.cpp
-  - verify/geometry/geometry_algorithms.test.cpp
-  - verify/graph/cow_game.test.cpp
-  - verify/graph/cow_game.test.cpp
-  - verify/graph/cow_game.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/graph_algorithms.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
   - verify/graph/tree/distance_frequency.test.cpp
   - verify/graph/tree/tree_algorithms.test.cpp
   - verify/graph/graph_counting.test.cpp
   - verify/graph/graph_counting.test.cpp
-  - verify/utilities/bigint_addition.test.cpp
-  - verify/utilities/bigint_division.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/cow_game.test.cpp
+  - verify/graph/cow_game.test.cpp
+  - verify/graph/cow_game.test.cpp
   - verify/utilities/basic_utilities.test.cpp
   - verify/utilities/bigint_multiplication.test.cpp
+  - verify/utilities/bigint_division.test.cpp
+  - verify/utilities/bigint_addition.test.cpp
   - verify/string/wildcard_pattern_matching.test.cpp
   - verify/string/string_algorithms.test.cpp
-  - verify/math/fps/pow_of_formal_power_series_sparse.test.cpp
-  - verify/math/fps/exp_of_formal_power_series.test.cpp
-  - verify/math/fps/convolution_mod_large.test.cpp
-  - verify/math/fps/polynomial_interpolation.test.cpp
-  - verify/math/fps/find_linear_recurrence.test.cpp
-  - verify/math/fps/convolution_ll.test.cpp
-  - verify/math/fps/polynomial_roots.test.cpp
-  - verify/math/fps/inv_of_formal_power_series_sparse.test.cpp
-  - verify/math/fps/compositional_inverse.test.cpp
+  - verify/math/bernoulli_utilities.test.cpp
+  - verify/math/math_algorithms.test.cpp
+  - verify/math/math_algorithms.test.cpp
+  - verify/math/stirling_number_of_the_second_kind.test.cpp
   - verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
-  - verify/math/fps/half_gcd.test.cpp
-  - verify/math/fps/inv_of_formal_power_series.test.cpp
-  - verify/math/fps/multipoint_evaluation_geometric.test.cpp
-  - verify/math/fps/sqrt_of_formal_power_series_sparse.test.cpp
-  - verify/math/fps/polynomial_interpolation_geometric.test.cpp
-  - verify/math/fps/composition.test.cpp
+  - verify/math/fps/convolution_mod.test.cpp
+  - verify/math/fps/convolution_ll.test.cpp
+  - verify/math/fps/inv_of_formal_power_series_sparse.test.cpp
+  - verify/math/fps/lagrange_inversion.test.cpp
+  - verify/math/fps/log_of_formal_power_series_sparse.test.cpp
   - verify/math/fps/sqrt_of_formal_power_series.test.cpp
   - verify/math/fps/fps_algorithms.test.cpp
-  - verify/math/fps/pow_of_formal_power_series.test.cpp
-  - verify/math/fps/polynomial_factorization.test.cpp
-  - verify/math/fps/multipoint_evaluation.test.cpp
-  - verify/math/fps/convolution_mod.test.cpp
-  - verify/math/fps/log_of_formal_power_series.test.cpp
-  - verify/math/fps/polynomial_taylor_shift.test.cpp
-  - verify/math/fps/lagrange_inversion.test.cpp
+  - verify/math/fps/find_linear_recurrence.test.cpp
   - verify/math/fps/exp_of_formal_power_series_sparse.test.cpp
-  - verify/math/fps/log_of_formal_power_series_sparse.test.cpp
+  - verify/math/fps/polynomial_interpolation.test.cpp
+  - verify/math/fps/composition.test.cpp
+  - verify/math/fps/exp_of_formal_power_series.test.cpp
+  - verify/math/fps/compositional_inverse.test.cpp
+  - verify/math/fps/multipoint_evaluation.test.cpp
+  - verify/math/fps/inv_of_formal_power_series.test.cpp
+  - verify/math/fps/polynomial_interpolation_geometric.test.cpp
+  - verify/math/fps/pow_of_formal_power_series_sparse.test.cpp
+  - verify/math/fps/polynomial_factorization.test.cpp
+  - verify/math/fps/pow_of_formal_power_series.test.cpp
+  - verify/math/fps/multipoint_evaluation_geometric.test.cpp
+  - verify/math/fps/polynomial_taylor_shift.test.cpp
+  - verify/math/fps/log_of_formal_power_series.test.cpp
+  - verify/math/fps/polynomial_roots.test.cpp
+  - verify/math/fps/sqrt_of_formal_power_series_sparse.test.cpp
+  - verify/math/fps/convolution_mod_large.test.cpp
+  - verify/math/fps/half_gcd.test.cpp
   - verify/math/multivariate_convolution_cyclic.test.cpp
-  - verify/math/stirling_number_of_the_second_kind.test.cpp
-  - verify/math/multivariate_convolution_truncated.test.cpp
   - verify/math/newton_method.test.cpp
-  - verify/math/bernoulli_utilities.test.cpp
+  - verify/math/multivariate_convolution_truncated.test.cpp
   - verify/math/bernoulli_number.test.cpp
-  - verify/math/partition_function.test.cpp
-  - verify/math/math_algorithms.test.cpp
-  - verify/math/math_algorithms.test.cpp
   - verify/math/bell_number.test.cpp
+  - verify/math/partition_function.test.cpp
+  - verify/geometry/centroid.test.cpp
+  - verify/geometry/lattice_point_count.test.cpp
+  - verify/geometry/geometry_algorithms.test.cpp
 documentation_of: math/fps/convolution.hpp
 layout: document
 title: Convolution

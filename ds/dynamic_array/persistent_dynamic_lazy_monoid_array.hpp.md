@@ -7,7 +7,10 @@ data:
   - icon: ':heavy_check_mark:'
     path: ds/detail/persistent_binary_node_pool.hpp
     title: ds/detail/persistent_binary_node_pool.hpp
-  _extendedRequiredBy: []
+  _extendedRequiredBy:
+  - icon: ':heavy_check_mark:'
+    path: ds/dynamic_array/rollback_dynamic_lazy_monoid_array.hpp
+    title: Rollback Dynamic Lazy Monoid Array
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array.test.cpp
@@ -21,6 +24,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/persistent_release.test.cpp
     title: verify/ds/persistent_release.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/rollback_counterparts.test.cpp
+    title: verify/ds/rollback_counterparts.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -797,14 +803,16 @@ data:
   - ds/detail/persistent_binary_node_pool.hpp
   isVerificationFile: false
   path: ds/dynamic_array/persistent_dynamic_lazy_monoid_array.hpp
-  requiredBy: []
+  requiredBy:
+  - ds/dynamic_array/rollback_dynamic_lazy_monoid_array.hpp
   timestamp: '2026-08-12 03:11:00+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/persistent_cow.test.cpp
-  - verify/ds/persistent_release.test.cpp
   - verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array_range_ap.test.cpp
   - verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array.test.cpp
+  - verify/ds/rollback_counterparts.test.cpp
+  - verify/ds/persistent_release.test.cpp
+  - verify/ds/persistent_cow.test.cpp
 documentation_of: ds/dynamic_array/persistent_dynamic_lazy_monoid_array.hpp
 layout: document
 title: Persistent Dynamic Lazy Monoid Array

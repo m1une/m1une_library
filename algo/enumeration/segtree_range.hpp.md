@@ -58,8 +58,8 @@ data:
   isVerificationFile: false
   path: algo/enumeration/segtree_range.hpp
   requiredBy:
-  - algo/enumeration/all.hpp
   - algo/all.hpp
+  - algo/enumeration/all.hpp
   timestamp: '2026-07-14 01:43:56+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:

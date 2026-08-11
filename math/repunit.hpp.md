@@ -132,8 +132,8 @@ data:
   timestamp: '2026-07-03 15:39:11+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/repunit.test.cpp
   - verify/math/math_algorithms.test.cpp
+  - verify/math/repunit.test.cpp
 documentation_of: math/repunit.hpp
 layout: document
 title: Repunit

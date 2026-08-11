@@ -160,8 +160,8 @@ data:
   timestamp: '2026-07-09 02:40:33+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/string/longest_common_substring.test.cpp
   - verify/string/string_algorithms.test.cpp
+  - verify/string/longest_common_substring.test.cpp
 documentation_of: string/longest_common_substring.hpp
 layout: document
 title: Longest Common Substring

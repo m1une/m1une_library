@@ -1,7 +1,10 @@
 ---
 data:
   _extendedDependsOn: []
-  _extendedRequiredBy: []
+  _extendedRequiredBy:
+  - icon: ':heavy_check_mark:'
+    path: ds/deque/rollback_deque.hpp
+    title: Rollback Deque
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/ds/deque/persistent_deque.test.cpp
@@ -9,6 +12,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/persistent_release.test.cpp
     title: verify/ds/persistent_release.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/rollback_counterparts.test.cpp
+    title: verify/ds/rollback_counterparts.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -524,12 +530,14 @@ data:
   dependsOn: []
   isVerificationFile: false
   path: ds/deque/persistent_deque.hpp
-  requiredBy: []
+  requiredBy:
+  - ds/deque/rollback_deque.hpp
   timestamp: '2026-08-11 13:59:43+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/persistent_release.test.cpp
   - verify/ds/deque/persistent_deque.test.cpp
+  - verify/ds/rollback_counterparts.test.cpp
+  - verify/ds/persistent_release.test.cpp
 documentation_of: ds/deque/persistent_deque.hpp
 layout: document
 title: Persistent Deque

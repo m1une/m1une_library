@@ -3640,9 +3640,9 @@ data:
   timestamp: '2026-07-17 02:44:01+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/graph/cow_game.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/cow_game.test.cpp
 documentation_of: graph/undirected.hpp
 layout: document
 title: Undirected Graph Algorithms

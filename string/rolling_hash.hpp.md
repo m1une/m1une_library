@@ -147,8 +147,8 @@ data:
   timestamp: '2026-06-13 20:51:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/string/aoj_alds1_14_b.test.cpp
   - verify/string/string_algorithms.test.cpp
+  - verify/string/aoj_alds1_14_b.test.cpp
   - verify/monoid/commutative_flags.test.cpp
 documentation_of: string/rolling_hash.hpp
 layout: document

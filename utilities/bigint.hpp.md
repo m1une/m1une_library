@@ -1936,18 +1936,18 @@ data:
   isVerificationFile: false
   path: utilities/bigint.hpp
   requiredBy:
-  - geometry/lattice_point_count.hpp
   - geometry/all.hpp
+  - geometry/lattice_point_count.hpp
   timestamp: '2026-08-10 17:30:05+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/utilities/basic_utilities.test.cpp
+  - verify/utilities/bigint_multiplication.test.cpp
+  - verify/utilities/bigint_division.test.cpp
+  - verify/utilities/bigint_addition.test.cpp
   - verify/geometry/centroid.test.cpp
   - verify/geometry/lattice_point_count.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
-  - verify/utilities/bigint_addition.test.cpp
-  - verify/utilities/bigint_division.test.cpp
-  - verify/utilities/basic_utilities.test.cpp
-  - verify/utilities/bigint_multiplication.test.cpp
 documentation_of: utilities/bigint.hpp
 layout: document
 title: BigInt

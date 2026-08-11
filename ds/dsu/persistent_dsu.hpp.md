@@ -256,10 +256,10 @@ data:
   timestamp: '2026-08-12 03:11:00+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/persistent_cow.test.cpp
-  - verify/ds/persistent_release.test.cpp
   - verify/ds/dsu/persistent_dsu.test.cpp
   - verify/ds/dsu/persistent_dsu_library_checker.test.cpp
+  - verify/ds/persistent_release.test.cpp
+  - verify/ds/persistent_cow.test.cpp
 documentation_of: ds/dsu/persistent_dsu.hpp
 layout: document
 title: Persistent DSU

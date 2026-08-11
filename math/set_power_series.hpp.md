@@ -247,9 +247,9 @@ data:
   timestamp: '2026-07-16 17:56:33+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/set_power_series_log.test.cpp
-  - verify/math/set_power_series_exp.test.cpp
   - verify/math/math_algorithms.test.cpp
+  - verify/math/set_power_series_exp.test.cpp
+  - verify/math/set_power_series_log.test.cpp
 documentation_of: math/set_power_series.hpp
 layout: document
 title: Set Power Series

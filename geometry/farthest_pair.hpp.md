@@ -226,8 +226,8 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/centroid.test.cpp
-  - verify/geometry/farthest_pair.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
+  - verify/geometry/farthest_pair.test.cpp
 documentation_of: geometry/farthest_pair.hpp
 layout: document
 title: Farthest Pair of Points

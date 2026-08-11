@@ -12,6 +12,9 @@ data:
     path: ds/dynamic_array/persistent_dynamic_lazy_monoid_array.hpp
     title: Persistent Dynamic Lazy Monoid Array
   - icon: ':heavy_check_mark:'
+    path: ds/dynamic_array/rollback_dynamic_lazy_monoid_array.hpp
+    title: Rollback Dynamic Lazy Monoid Array
+  - icon: ':heavy_check_mark:'
     path: ds/dynamic_tree/lazy_link_cut_tree.hpp
     title: Lazy Link-Cut Tree
   - icon: ':heavy_check_mark:'
@@ -32,6 +35,15 @@ data:
   - icon: ':heavy_check_mark:'
     path: ds/segtree/persistent_segtree_beats.hpp
     title: ds/segtree/persistent_segtree_beats.hpp
+  - icon: ':heavy_check_mark:'
+    path: ds/segtree/rollback_dynamic_lazy_segtree.hpp
+    title: Rollback Dynamic Lazy Segment Tree
+  - icon: ':heavy_check_mark:'
+    path: ds/segtree/rollback_lazy_segtree.hpp
+    title: Rollback Lazy Segment Tree
+  - icon: ':heavy_check_mark:'
+    path: ds/segtree/rollback_segtree_beats.hpp
+    title: Rollback Segment Tree Beats
   - icon: ':heavy_check_mark:'
     path: ds/segtree/segtree_beats.hpp
     title: Generic Segment Tree Beats!
@@ -78,6 +90,15 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/persistent_release.test.cpp
     title: verify/ds/persistent_release.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/rollback_counterparts.test.cpp
+    title: verify/ds/rollback_counterparts.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/rollback_counterparts.test.cpp
+    title: verify/ds/rollback_counterparts.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/rollback_counterparts.test.cpp
+    title: verify/ds/rollback_counterparts.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/dynamic_lazy_segtree.test.cpp
     title: verify/ds/segtree/dynamic_lazy_segtree.test.cpp
@@ -154,45 +175,52 @@ data:
   isVerificationFile: false
   path: acted_monoid/concept.hpp
   requiredBy:
-  - ds/dynamic_array/dynamic_lazy_monoid_array.hpp
   - ds/dynamic_array/persistent_dynamic_lazy_monoid_array.hpp
-  - ds/dynamic_tree/lazy_path_link_cut_tree.hpp
+  - ds/dynamic_array/dynamic_lazy_monoid_array.hpp
+  - ds/dynamic_array/rollback_dynamic_lazy_monoid_array.hpp
   - ds/dynamic_tree/lazy_link_cut_tree.hpp
+  - ds/dynamic_tree/lazy_path_link_cut_tree.hpp
+  - ds/segtree/rollback_lazy_segtree.hpp
+  - ds/segtree/segtree_beats.hpp
   - ds/segtree/persistent_lazy_segtree.hpp
+  - ds/segtree/rollback_segtree_beats.hpp
+  - ds/segtree/rollback_dynamic_lazy_segtree.hpp
+  - ds/segtree/dynamic_lazy_segtree.hpp
   - ds/segtree/persistent_segtree_beats.hpp
   - ds/segtree/persistent_dynamic_lazy_segtree.hpp
   - ds/segtree/lazy_segtree.hpp
-  - ds/segtree/dynamic_lazy_segtree.hpp
-  - ds/segtree/segtree_beats.hpp
   - beats_acted_monoid/concept.hpp
   timestamp: '2026-06-17 21:06:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/persistent_cow.test.cpp
-  - verify/ds/persistent_cow.test.cpp
-  - verify/ds/persistent_cow.test.cpp
-  - verify/ds/persistent_release.test.cpp
+  - verify/ds/dynamic_array/dynamic_lazy_monoid_array_range_ap.test.cpp
   - verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array_range_ap.test.cpp
   - verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array.test.cpp
-  - verify/ds/dynamic_array/dynamic_lazy_monoid_array_range_ap.test.cpp
   - verify/ds/dynamic_array/dynamic_lazy_monoid_array.test.cpp
-  - verify/ds/dynamic_tree/lazy_path_link_cut_tree.test.cpp
+  - verify/ds/rollback_counterparts.test.cpp
+  - verify/ds/rollback_counterparts.test.cpp
+  - verify/ds/rollback_counterparts.test.cpp
+  - verify/ds/persistent_release.test.cpp
   - verify/ds/dynamic_tree/lazy_link_cut_tree.test.cpp
-  - verify/ds/segtree/range_add_range_min.test.cpp
+  - verify/ds/dynamic_tree/lazy_path_link_cut_tree.test.cpp
+  - verify/ds/segtree/persistent_segtree_beats.test.cpp
   - verify/ds/segtree/lazy_segtree.test.cpp
-  - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
   - verify/ds/segtree/persistent_lazy_segtree.test.cpp
   - verify/ds/segtree/segtree_beats.test.cpp
+  - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
   - verify/ds/segtree/range_update_range_product.test.cpp
   - verify/ds/segtree/range_update_range_product.test.cpp
-  - verify/ds/segtree/persistent_segtree_beats.test.cpp
   - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
-  - verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
+  - verify/ds/segtree/range_add_range_min.test.cpp
+  - verify/ds/persistent_cow.test.cpp
+  - verify/ds/persistent_cow.test.cpp
+  - verify/ds/persistent_cow.test.cpp
   - verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
-  - verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
-  - verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
+  - verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
   - verify/monoid/commutative_flags.test.cpp
   - verify/monoid/commutative_flags.test.cpp
+  - verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
+  - verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
 documentation_of: acted_monoid/concept.hpp
 layout: document
 title: Acted Monoid Concept

@@ -6,6 +6,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
     title: verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/rollback_counterparts.test.cpp
+    title: verify/ds/rollback_counterparts.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -231,6 +234,7 @@ data:
   timestamp: '2026-08-12 01:20:42+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/ds/rollback_counterparts.test.cpp
   - verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
 documentation_of: beats_acted_monoid/range_chmin_chmax_add_range_sum.hpp
 layout: document

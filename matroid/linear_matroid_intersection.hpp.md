@@ -139,8 +139,8 @@ data:
   timestamp: '2026-07-29 16:26:14+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/matroid/linear_matroid_intersection.test.cpp
   - verify/matroid/matroids.test.cpp
+  - verify/matroid/linear_matroid_intersection.test.cpp
 documentation_of: matroid/linear_matroid_intersection.hpp
 layout: document
 title: Linear Matroid Intersection

@@ -21,11 +21,17 @@ data:
     path: ds/dsu/potentialized_dsu.hpp
     title: Potentialized DSU
   - icon: ':heavy_check_mark:'
+    path: ds/dsu/rollback_potentialized_dsu.hpp
+    title: Rollback Potentialized DSU
+  - icon: ':heavy_check_mark:'
     path: ds/dynamic_array/dynamic_monoid_array.hpp
     title: Dynamic Monoid Array
   - icon: ':heavy_check_mark:'
     path: ds/dynamic_array/persistent_dynamic_monoid_array.hpp
     title: Persistent Dynamic Monoid Array
+  - icon: ':heavy_check_mark:'
+    path: ds/dynamic_array/rollback_dynamic_monoid_array.hpp
+    title: Rollback Dynamic Monoid Array
   - icon: ':heavy_check_mark:'
     path: ds/dynamic_connectivity/all.hpp
     title: Dynamic Connectivity
@@ -87,6 +93,18 @@ data:
     path: ds/segtree/persistent_segtree.hpp
     title: Persistent Segment Tree
   - icon: ':heavy_check_mark:'
+    path: ds/segtree/rollback_dual_segtree.hpp
+    title: Rollback Dual Segment Tree
+  - icon: ':heavy_check_mark:'
+    path: ds/segtree/rollback_dynamic_dual_segtree.hpp
+    title: Rollback Dynamic Dual Segment Tree
+  - icon: ':heavy_check_mark:'
+    path: ds/segtree/rollback_dynamic_segtree.hpp
+    title: Rollback Dynamic Segment Tree
+  - icon: ':heavy_check_mark:'
+    path: ds/segtree/rollback_segtree.hpp
+    title: Rollback Segment Tree
+  - icon: ':heavy_check_mark:'
     path: ds/segtree/segtree.hpp
     title: Segment Tree
   - icon: ':heavy_check_mark:'
@@ -132,6 +150,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/dsu/potentialized_dsu.test.cpp
     title: verify/ds/dsu/potentialized_dsu.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/dsu/rollback_potentialized_dsu.test.cpp
+    title: verify/ds/dsu/rollback_potentialized_dsu.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp
     title: verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp
@@ -189,6 +210,15 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/range_query/sqrt_tree.test.cpp
     title: verify/ds/range_query/sqrt_tree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/rollback_counterparts.test.cpp
+    title: verify/ds/rollback_counterparts.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/rollback_counterparts.test.cpp
+    title: verify/ds/rollback_counterparts.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/rollback_counterparts.test.cpp
+    title: verify/ds/rollback_counterparts.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/dual_segtree.test.cpp
     title: verify/ds/segtree/dual_segtree.test.cpp
@@ -312,92 +342,102 @@ data:
   requiredBy:
   - graph/all.hpp
   - graph/all.hpp
-  - graph/tree/virtual_tree.hpp
-  - graph/tree/all.hpp
-  - graph/tree/all.hpp
-  - graph/tree/sparse_table_lca.hpp
-  - graph/tree/tree.hpp
   - graph/tree/range_contour_query.hpp
-  - ds/dynamic_array/dynamic_monoid_array.hpp
+  - graph/tree/all.hpp
+  - graph/tree/all.hpp
+  - graph/tree/tree.hpp
+  - graph/tree/sparse_table_lca.hpp
+  - graph/tree/virtual_tree.hpp
   - ds/dynamic_array/persistent_dynamic_monoid_array.hpp
-  - ds/dynamic_connectivity/online_dynamic_connectivity.hpp
-  - ds/dynamic_connectivity/all.hpp
-  - ds/binary_trie/binary_trie_monoid.hpp
+  - ds/dynamic_array/dynamic_monoid_array.hpp
+  - ds/dynamic_array/rollback_dynamic_monoid_array.hpp
   - ds/dsu/persistent_potentialized_dsu.hpp
   - ds/dsu/potentialized_dsu.hpp
+  - ds/dsu/rollback_potentialized_dsu.hpp
   - ds/dsu/dsu_monoid.hpp
-  - ds/range_query/sliding_window_aggregation_deque.hpp
-  - ds/range_query/sqrt_decomposition.hpp
-  - ds/range_query/sqrt_tree.hpp
-  - ds/range_query/disjoint_sparse_table.hpp
-  - ds/range_query/sliding_window_aggregation.hpp
-  - ds/range_query/sparse_table.hpp
-  - ds/range_query/range_sort_range_composite.hpp
-  - ds/range_query/range_sort_range_composite.hpp
-  - ds/dynamic_tree/link_cut_tree.hpp
+  - ds/binary_trie/binary_trie_monoid.hpp
   - ds/dynamic_tree/path_link_cut_tree.hpp
-  - ds/segtree/dynamic_segtree.hpp
-  - ds/segtree/segtree_2d.hpp
-  - ds/segtree/persistent_dynamic_dual_segtree.hpp
-  - ds/segtree/persistent_dynamic_segtree.hpp
-  - ds/segtree/dual_segtree_2d.hpp
+  - ds/dynamic_tree/link_cut_tree.hpp
   - ds/segtree/persistent_segtree.hpp
+  - ds/segtree/rollback_dual_segtree.hpp
+  - ds/segtree/persistent_dynamic_dual_segtree.hpp
+  - ds/segtree/dual_segtree_2d.hpp
+  - ds/segtree/segtree_2d.hpp
+  - ds/segtree/rollback_dynamic_dual_segtree.hpp
+  - ds/segtree/rollback_dynamic_segtree.hpp
+  - ds/segtree/persistent_dynamic_segtree.hpp
   - ds/segtree/segtree.hpp
+  - ds/segtree/rollback_segtree.hpp
+  - ds/segtree/dynamic_segtree.hpp
   - ds/segtree/dynamic_dual_segtree.hpp
   - ds/segtree/dual_segtree.hpp
   - ds/segtree/persistent_dual_segtree.hpp
-  - acted_monoid/range_update_range_product.hpp
-  - acted_monoid/range_update_range_product.hpp
+  - ds/range_query/sparse_table.hpp
+  - ds/range_query/disjoint_sparse_table.hpp
+  - ds/range_query/sqrt_decomposition.hpp
+  - ds/range_query/sliding_window_aggregation.hpp
+  - ds/range_query/sliding_window_aggregation_deque.hpp
+  - ds/range_query/range_sort_range_composite.hpp
+  - ds/range_query/range_sort_range_composite.hpp
+  - ds/range_query/sqrt_tree.hpp
+  - ds/dynamic_connectivity/online_dynamic_connectivity.hpp
+  - ds/dynamic_connectivity/all.hpp
   - monoid/power.hpp
+  - acted_monoid/range_update_range_product.hpp
+  - acted_monoid/range_update_range_product.hpp
   timestamp: '2026-07-16 20:44:42+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
   - verify/graph/library_checker_lowest_common_ancestor.test.cpp
-  - verify/graph/cow_game.test.cpp
-  - verify/graph/cow_game.test.cpp
-  - verify/graph/graph_algorithms.test.cpp
-  - verify/graph/graph_algorithms.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
-  - verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
   - verify/graph/tree/vertex_get_range_contour_add_on_tree.test.cpp
+  - verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
   - verify/graph/tree/tree_algorithms.test.cpp
   - verify/graph/tree/tree_algorithms.test.cpp
-  - verify/ds/persistent_cow.test.cpp
-  - verify/ds/persistent_cow.test.cpp
-  - verify/ds/persistent_cow.test.cpp
-  - verify/ds/persistent_release.test.cpp
-  - verify/ds/persistent_release.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/cow_game.test.cpp
+  - verify/graph/cow_game.test.cpp
   - verify/ds/dynamic_array/dynamic_monoid_array.test.cpp
   - verify/ds/dynamic_array/persistent_dynamic_monoid_array.test.cpp
-  - verify/ds/dynamic_connectivity/dynamic_connectivity.test.cpp
-  - verify/ds/binary_trie/binary_trie_monoid.test.cpp
-  - verify/ds/dsu/dsu_monoid.test.cpp
-  - verify/ds/dsu/persistent_potentialized_dsu.test.cpp
   - verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp
   - verify/ds/dsu/potentialized_dsu.test.cpp
-  - verify/ds/range_query/sparse_table.test.cpp
-  - verify/ds/range_query/disjoint_sparse_table.test.cpp
-  - verify/ds/range_query/sqrt_decomposition.test.cpp
-  - verify/ds/range_query/sqrt_tree.test.cpp
-  - verify/ds/range_query/sliding_window_aggregation.test.cpp
-  - verify/ds/range_query/sliding_window_aggregation_deque.test.cpp
-  - verify/ds/range_query/range_sort_range_composite.test.cpp
-  - verify/ds/range_query/range_sort_range_composite.test.cpp
-  - verify/ds/dynamic_tree/path_link_cut_tree.test.cpp
+  - verify/ds/dsu/persistent_potentialized_dsu.test.cpp
+  - verify/ds/dsu/rollback_potentialized_dsu.test.cpp
+  - verify/ds/dsu/dsu_monoid.test.cpp
+  - verify/ds/binary_trie/binary_trie_monoid.test.cpp
+  - verify/ds/rollback_counterparts.test.cpp
+  - verify/ds/rollback_counterparts.test.cpp
+  - verify/ds/rollback_counterparts.test.cpp
+  - verify/ds/persistent_release.test.cpp
+  - verify/ds/persistent_release.test.cpp
   - verify/ds/dynamic_tree/link_cut_tree.test.cpp
-  - verify/ds/segtree/dual_segtree.test.cpp
-  - verify/ds/segtree/persistent_dual_segtree.test.cpp
-  - verify/ds/segtree/persistent_segtree.test.cpp
-  - verify/ds/segtree/segtree_2d.test.cpp
-  - verify/ds/segtree/persistent_dynamic_segtree.test.cpp
-  - verify/ds/segtree/dual_segtree_2d.test.cpp
-  - verify/ds/segtree/dynamic_segtree.test.cpp
-  - verify/ds/segtree/range_update_range_product.test.cpp
-  - verify/ds/segtree/range_update_range_product.test.cpp
-  - verify/ds/segtree/dynamic_dual_segtree.test.cpp
-  - verify/ds/segtree/segtree.test.cpp
+  - verify/ds/dynamic_tree/path_link_cut_tree.test.cpp
   - verify/ds/segtree/persistent_dynamic_dual_segtree.test.cpp
+  - verify/ds/segtree/dynamic_dual_segtree.test.cpp
+  - verify/ds/segtree/persistent_dual_segtree.test.cpp
+  - verify/ds/segtree/segtree.test.cpp
+  - verify/ds/segtree/segtree_2d.test.cpp
+  - verify/ds/segtree/dual_segtree_2d.test.cpp
+  - verify/ds/segtree/persistent_dynamic_segtree.test.cpp
+  - verify/ds/segtree/dual_segtree.test.cpp
+  - verify/ds/segtree/range_update_range_product.test.cpp
+  - verify/ds/segtree/range_update_range_product.test.cpp
+  - verify/ds/segtree/persistent_segtree.test.cpp
+  - verify/ds/segtree/dynamic_segtree.test.cpp
+  - verify/ds/range_query/sqrt_decomposition.test.cpp
+  - verify/ds/range_query/sliding_window_aggregation_deque.test.cpp
+  - verify/ds/range_query/sparse_table.test.cpp
+  - verify/ds/range_query/sqrt_tree.test.cpp
+  - verify/ds/range_query/range_sort_range_composite.test.cpp
+  - verify/ds/range_query/range_sort_range_composite.test.cpp
+  - verify/ds/range_query/disjoint_sparse_table.test.cpp
+  - verify/ds/range_query/sliding_window_aggregation.test.cpp
+  - verify/ds/persistent_cow.test.cpp
+  - verify/ds/persistent_cow.test.cpp
+  - verify/ds/persistent_cow.test.cpp
+  - verify/ds/dynamic_connectivity/dynamic_connectivity.test.cpp
   - verify/monoid/commutative_flags.test.cpp
   - verify/monoid/commutative_flags.test.cpp
   - verify/monoid/commutative_flags.test.cpp

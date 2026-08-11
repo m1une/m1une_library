@@ -343,8 +343,8 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/centroid.test.cpp
-  - verify/geometry/convex_layers.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
+  - verify/geometry/convex_layers.test.cpp
 documentation_of: geometry/convex_layers.hpp
 layout: document
 title: Convex Layers

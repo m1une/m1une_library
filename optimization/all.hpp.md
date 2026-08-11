@@ -595,9 +595,9 @@ data:
   timestamp: '2026-08-04 16:49:58+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/optimization/project_selection.test.cpp
-  - verify/optimization/integer_lp.test.cpp
   - verify/optimization/simplex.test.cpp
+  - verify/optimization/integer_lp.test.cpp
+  - verify/optimization/project_selection.test.cpp
 documentation_of: optimization/all.hpp
 layout: document
 title: Optimization All

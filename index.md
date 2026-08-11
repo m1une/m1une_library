@@ -267,16 +267,28 @@ data:
     - icon: ':heavy_check_mark:'
       path: ds/bst/predecessor_set.hpp
       title: Predecessor Set
+    - icon: ':heavy_check_mark:'
+      path: ds/bst/rollback_ordered_multiset.hpp
+      title: Rollback Ordered Multiset
+    - icon: ':heavy_check_mark:'
+      path: ds/bst/rollback_ordered_set.hpp
+      title: Rollback Ordered Set
   - name: ds/deque
     pages:
     - icon: ':heavy_check_mark:'
       path: ds/deque/persistent_deque.hpp
       title: Persistent Deque
+    - icon: ':heavy_check_mark:'
+      path: ds/deque/rollback_deque.hpp
+      title: Rollback Deque
   - name: ds/detail
     pages:
     - icon: ':heavy_check_mark:'
       path: ds/detail/persistent_binary_node_pool.hpp
       title: ds/detail/persistent_binary_node_pool.hpp
+    - icon: ':heavy_check_mark:'
+      path: ds/detail/rollback_persistent_base.hpp
+      title: ds/detail/rollback_persistent_base.hpp
   - name: ds/dsu
     pages:
     - icon: ':heavy_check_mark:'
@@ -303,6 +315,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: ds/dsu/rollback_dsu.hpp
       title: Rollback DSU
+    - icon: ':heavy_check_mark:'
+      path: ds/dsu/rollback_potentialized_dsu.hpp
+      title: Rollback Potentialized DSU
   - name: ds/dynamic_array
     pages:
     - icon: ':heavy_check_mark:'
@@ -323,6 +338,15 @@ data:
     - icon: ':heavy_check_mark:'
       path: ds/dynamic_array/persistent_dynamic_monoid_array.hpp
       title: Persistent Dynamic Monoid Array
+    - icon: ':heavy_check_mark:'
+      path: ds/dynamic_array/rollback_dynamic_array.hpp
+      title: Rollback Dynamic Array
+    - icon: ':heavy_check_mark:'
+      path: ds/dynamic_array/rollback_dynamic_lazy_monoid_array.hpp
+      title: Rollback Dynamic Lazy Monoid Array
+    - icon: ':heavy_check_mark:'
+      path: ds/dynamic_array/rollback_dynamic_monoid_array.hpp
+      title: Rollback Dynamic Monoid Array
   - name: ds/dynamic_connectivity
     pages:
     - icon: ':heavy_check_mark:'
@@ -380,6 +404,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: ds/queue/persistent_queue.hpp
       title: Persistent Queue
+    - icon: ':heavy_check_mark:'
+      path: ds/queue/rollback_queue.hpp
+      title: Rollback Queue
   - name: ds/range_query
     pages:
     - icon: ':heavy_check_mark:'
@@ -496,6 +523,27 @@ data:
       path: ds/segtree/persistent_segtree_beats.hpp
       title: ds/segtree/persistent_segtree_beats.hpp
     - icon: ':heavy_check_mark:'
+      path: ds/segtree/rollback_dual_segtree.hpp
+      title: Rollback Dual Segment Tree
+    - icon: ':heavy_check_mark:'
+      path: ds/segtree/rollback_dynamic_dual_segtree.hpp
+      title: Rollback Dynamic Dual Segment Tree
+    - icon: ':heavy_check_mark:'
+      path: ds/segtree/rollback_dynamic_lazy_segtree.hpp
+      title: Rollback Dynamic Lazy Segment Tree
+    - icon: ':heavy_check_mark:'
+      path: ds/segtree/rollback_dynamic_segtree.hpp
+      title: Rollback Dynamic Segment Tree
+    - icon: ':heavy_check_mark:'
+      path: ds/segtree/rollback_lazy_segtree.hpp
+      title: Rollback Lazy Segment Tree
+    - icon: ':heavy_check_mark:'
+      path: ds/segtree/rollback_segtree.hpp
+      title: Rollback Segment Tree
+    - icon: ':heavy_check_mark:'
+      path: ds/segtree/rollback_segtree_beats.hpp
+      title: Rollback Segment Tree Beats
+    - icon: ':heavy_check_mark:'
       path: ds/segtree/segtree.hpp
       title: Segment Tree
     - icon: ':heavy_check_mark:'
@@ -509,6 +557,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: ds/stack/persistent_stack.hpp
       title: Persistent Stack
+    - icon: ':heavy_check_mark:'
+      path: ds/stack/rollback_stack.hpp
+      title: Rollback Stack
   - name: ds/wavelet_matrix
     pages:
     - icon: ':heavy_check_mark:'
@@ -1496,6 +1547,9 @@ data:
       path: verify/ds/dsu/rollback_dsu.test.cpp
       title: verify/ds/dsu/rollback_dsu.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/ds/dsu/rollback_potentialized_dsu.test.cpp
+      title: verify/ds/dsu/rollback_potentialized_dsu.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp
       title: verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp
   - name: verify/ds/dynamic_array
@@ -1581,6 +1635,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/ds/persistent_release.test.cpp
       title: verify/ds/persistent_release.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/rollback_counterparts.test.cpp
+      title: verify/ds/rollback_counterparts.test.cpp
   - name: verify/ds/queue
     pages:
     - icon: ':heavy_check_mark:'

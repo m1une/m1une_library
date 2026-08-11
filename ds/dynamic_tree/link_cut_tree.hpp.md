@@ -543,8 +543,8 @@ data:
   timestamp: '2026-07-16 20:44:42+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/dynamic_connectivity/dynamic_connectivity.test.cpp
   - verify/ds/dynamic_tree/link_cut_tree.test.cpp
+  - verify/ds/dynamic_connectivity/dynamic_connectivity.test.cpp
 documentation_of: ds/dynamic_tree/link_cut_tree.hpp
 layout: document
 title: Link-Cut Tree

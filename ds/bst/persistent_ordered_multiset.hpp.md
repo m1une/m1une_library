@@ -8,6 +8,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: ds/bst/persistent_ordered_set.hpp
     title: Persistent Ordered Set
+  - icon: ':heavy_check_mark:'
+    path: ds/bst/rollback_ordered_multiset.hpp
+    title: Rollback Ordered Multiset
+  - icon: ':heavy_check_mark:'
+    path: ds/bst/rollback_ordered_set.hpp
+    title: Rollback Ordered Set
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/ds/bst/persistent_ordered_multiset.test.cpp
@@ -24,6 +30,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/persistent_release.test.cpp
     title: verify/ds/persistent_release.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/rollback_counterparts.test.cpp
+    title: verify/ds/rollback_counterparts.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -518,14 +527,17 @@ data:
   path: ds/bst/persistent_ordered_multiset.hpp
   requiredBy:
   - ds/bst/persistent_ordered_set.hpp
+  - ds/bst/rollback_ordered_multiset.hpp
+  - ds/bst/rollback_ordered_set.hpp
   timestamp: '2026-08-12 03:11:00+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/bst/persistent_ordered_set.test.cpp
+  - verify/ds/rollback_counterparts.test.cpp
+  - verify/ds/persistent_release.test.cpp
+  - verify/ds/persistent_release.test.cpp
   - verify/ds/bst/persistent_ordered_multiset.test.cpp
+  - verify/ds/bst/persistent_ordered_set.test.cpp
   - verify/ds/persistent_cow.test.cpp
-  - verify/ds/persistent_release.test.cpp
-  - verify/ds/persistent_release.test.cpp
 documentation_of: ds/bst/persistent_ordered_multiset.hpp
 layout: document
 title: Persistent Ordered Multiset

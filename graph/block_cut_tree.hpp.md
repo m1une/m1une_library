@@ -233,15 +233,15 @@ data:
   isVerificationFile: false
   path: graph/block_cut_tree.hpp
   requiredBy:
-  - graph/all.hpp
   - graph/undirected.hpp
+  - graph/all.hpp
   timestamp: '2026-07-13 03:42:12+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/graph/cow_game.test.cpp
+  - verify/graph/block_cut_tree.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/range_edge_graph.test.cpp
-  - verify/graph/block_cut_tree.test.cpp
+  - verify/graph/cow_game.test.cpp
 documentation_of: graph/block_cut_tree.hpp
 layout: document
 title: Block-Cut Tree

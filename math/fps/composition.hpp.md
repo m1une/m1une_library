@@ -1034,16 +1034,16 @@ data:
   isVerificationFile: false
   path: math/fps/composition.hpp
   requiredBy:
-  - math/fps/all.hpp
   - math/fps/compositional_inverse.hpp
+  - math/fps/all.hpp
   - math/all.hpp
   timestamp: '2026-08-10 17:30:05+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/fps/compositional_inverse.test.cpp
-  - verify/math/fps/composition.test.cpp
-  - verify/math/fps/fps_algorithms.test.cpp
   - verify/math/math_algorithms.test.cpp
+  - verify/math/fps/fps_algorithms.test.cpp
+  - verify/math/fps/composition.test.cpp
+  - verify/math/fps/compositional_inverse.test.cpp
 documentation_of: math/fps/composition.hpp
 layout: document
 title: Formal Power Series Composition

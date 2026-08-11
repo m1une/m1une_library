@@ -128,8 +128,8 @@ data:
   timestamp: '2026-07-01 21:56:39+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/string/string_algorithms.test.cpp
   - verify/string/levenshtein_distance.test.cpp
+  - verify/string/string_algorithms.test.cpp
 documentation_of: string/levenshtein_distance.hpp
 layout: document
 title: Levenshtein Distance
