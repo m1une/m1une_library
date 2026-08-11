@@ -113,28 +113,37 @@ data:
     \            ++_references[node];\n        }\n    }\n\n    void release(int node)\
     \ {\n        if (node == null_node) return;\n        assert(_nodes[node].has_value()\
     \ && _references[node] > 0);\n        if (--_references[node] == 0) release_zero(node);\n\
-    \    }\n\n    void discard_unreferenced() {\n        while (!_unowned.empty())\
-    \ {\n            int node = _unowned.back();\n            _unowned.pop_back();\n\
-    \            if (_nodes[node].has_value() && _references[node] == 0) release_zero(node);\n\
-    \        }\n    }\n\n    void reserve(std::size_t) {}\n\n    int next_index()\
-    \ const { return _first_free == -1 ? int(_nodes.size()) : _first_free; }\n\n \
-    \   std::size_t size() const { return _live_nodes; }\n};\n\n}  // namespace detail\n\
-    }  // namespace ds\n}  // namespace m1une\n\n\n#line 12 \"ds/bst/persistent_ordered_multiset.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\n\ntemplate <typename T, typename Compare>\n\
-    struct PersistentOrderedSet;\n\ntemplate <typename T, typename Compare = std::less<T>>\n\
-    struct PersistentOrderedMultiset {\n   private:\n    friend struct PersistentOrderedSet<T,\
-    \ Compare>;\n    struct Node {\n        T key;\n        int count;\n        int\
-    \ size;\n        int distinct_size;\n        int rank_color;\n        int l;\n\
-    \        int r;\n        int min_leaf;\n        int max_leaf;\n\n        Node(T\
-    \ value, int multiplicity, int maximum)\n            : key(std::move(value)),\n\
-    \              count(multiplicity),\n              size(multiplicity),\n     \
-    \         distinct_size(1),\n              rank_color(1),\n              l(-1),\n\
-    \              r(-1),\n              min_leaf(maximum),\n              max_leaf(maximum)\
-    \ {}\n\n        Node(T separator, int subtree_size, int left_size, int unique_count,\
-    \ int node_rank,\n             int left, int right, int minimum, int maximum,\
-    \ bool is_black)\n            : key(std::move(separator)),\n              count(left_size),\n\
-    \              size(subtree_size),\n              distinct_size(unique_count),\n\
-    \              rank_color(node_rank * 2 + int(is_black)),\n              l(left),\n\
+    \    }\n\n    bool unique(int node) const {\n        return node == null_node\
+    \ || _references[node] == 1;\n    }\n\n    int clone(int node) {\n        assert(node\
+    \ != null_node && _nodes[node].has_value());\n        return emplace(*_nodes[node]);\n\
+    \    }\n\n    // Returns node itself when it has one owner, otherwise an unowned\
+    \ clone.\n    // A returned clone becomes owned when a root or parent edge retains\
+    \ it.\n    int clone_if_shared(int node) {\n        if (unique(node)) return node;\n\
+    \        return clone(node);\n    }\n\n    void replace(int& edge, int node) {\n\
+    \        if (edge == node) return;\n        retain(node);\n        int old = edge;\n\
+    \        edge = node;\n        release(old);\n    }\n\n    void discard_unreferenced()\
+    \ {\n        while (!_unowned.empty()) {\n            int node = _unowned.back();\n\
+    \            _unowned.pop_back();\n            if (_nodes[node].has_value() &&\
+    \ _references[node] == 0) release_zero(node);\n        }\n    }\n\n    void reserve(std::size_t)\
+    \ {}\n\n    int next_index() const { return _first_free == -1 ? int(_nodes.size())\
+    \ : _first_free; }\n\n    std::size_t size() const { return _live_nodes; }\n};\n\
+    \n}  // namespace detail\n}  // namespace ds\n}  // namespace m1une\n\n\n#line\
+    \ 12 \"ds/bst/persistent_ordered_multiset.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ ds {\n\ntemplate <typename T, typename Compare>\nstruct PersistentOrderedSet;\n\
+    \ntemplate <typename T, typename Compare = std::less<T>>\nstruct PersistentOrderedMultiset\
+    \ {\n   private:\n    friend struct PersistentOrderedSet<T, Compare>;\n    struct\
+    \ Node {\n        T key;\n        int count;\n        int size;\n        int distinct_size;\n\
+    \        int rank_color;\n        int l;\n        int r;\n        int min_leaf;\n\
+    \        int max_leaf;\n\n        Node(T value, int multiplicity, int maximum)\n\
+    \            : key(std::move(value)),\n              count(multiplicity),\n  \
+    \            size(multiplicity),\n              distinct_size(1),\n          \
+    \    rank_color(1),\n              l(-1),\n              r(-1),\n            \
+    \  min_leaf(maximum),\n              max_leaf(maximum) {}\n\n        Node(T separator,\
+    \ int subtree_size, int left_size, int unique_count, int node_rank,\n        \
+    \     int left, int right, int minimum, int maximum, bool is_black)\n        \
+    \    : key(std::move(separator)),\n              count(left_size),\n         \
+    \     size(subtree_size),\n              distinct_size(unique_count),\n      \
+    \        rank_color(node_rank * 2 + int(is_black)),\n              l(left),\n\
     \              r(right),\n              min_leaf(minimum),\n              max_leaf(maximum)\
     \ {}\n    };\n\n    using Pool = detail::PersistentBinaryNodePool<Node>;\n\n \
     \   inline static Pool pool;\n\n    int root;\n    Compare comp;\n\n    static\
@@ -194,13 +203,23 @@ data:
     \    return make_node(child, node.r, is_black(t));\n        }\n        child =\
     \ change_count_impl(node.r, key, delta, old_count);\n        if (old_count ==\
     \ 0 || old_count + delta == 0) return t;\n        return make_node(node.l, child,\
-    \ is_black(t));\n    }\n\n    int count_impl(int t, const T& key) const {\n  \
-    \      if (t == -1) return 0;\n        while (!is_leaf(t)) {\n            t =\
-    \ !comp(pool[t].key, key) ? pool[t].l : pool[t].r;\n        }\n        return\
-    \ equal(pool[t].key, key) ? pool[t].count : 0;\n    }\n\n    const T* kth_impl(int\
-    \ t, int k) const {\n        while (!is_leaf(t)) {\n            const int left_size\
-    \ = pool[t].count;\n            if (k < left_size) {\n                t = pool[t].l;\n\
-    \            } else {\n                k -= left_size;\n                t = pool[t].r;\n\
+    \ is_black(t));\n    }\n\n    int change_count_inplace(int t, const T& key, int\
+    \ delta) const {\n        t = pool.clone_if_shared(t);\n        if (is_leaf(t))\
+    \ {\n            assert(equal(pool[t].key, key));\n            assert(pool[t].count\
+    \ + delta > 0);\n            pool[t].count += delta;\n            pool[t].size\
+    \ += delta;\n            return t;\n        }\n        if (!comp(pool[t].key,\
+    \ key)) {\n            int child = change_count_inplace(pool[t].l, key, delta);\n\
+    \            pool.replace(pool[t].l, child);\n        } else {\n            int\
+    \ child = change_count_inplace(pool[t].r, key, delta);\n            pool.replace(pool[t].r,\
+    \ child);\n        }\n        Node& node = pool[t];\n        node.count = subtree_size(node.l);\n\
+    \        node.size = node.count + subtree_size(node.r);\n        return t;\n \
+    \   }\n\n    int count_impl(int t, const T& key) const {\n        if (t == -1)\
+    \ return 0;\n        while (!is_leaf(t)) {\n            t = !comp(pool[t].key,\
+    \ key) ? pool[t].l : pool[t].r;\n        }\n        return equal(pool[t].key,\
+    \ key) ? pool[t].count : 0;\n    }\n\n    const T* kth_impl(int t, int k) const\
+    \ {\n        while (!is_leaf(t)) {\n            const int left_size = pool[t].count;\n\
+    \            if (k < left_size) {\n                t = pool[t].l;\n          \
+    \  } else {\n                k -= left_size;\n                t = pool[t].r;\n\
     \            }\n        }\n        return &pool[t].key;\n    }\n\n    int order_of_key_impl(int\
     \ t, const T& key, bool upper) const {\n        int result = 0;\n        while\
     \ (t != -1 && !is_leaf(t)) {\n            const Node& node = pool[t];\n      \
@@ -268,39 +287,52 @@ data:
     \ key, multiplicity, old_count);\n        if (old_count != 0) {\n            return\
     \ make_version(changed_root);\n        }\n        auto [l, r] = split_nodes(root,\
     \ key);\n        return make_version(merge_nodes(merge_nodes(l, make_leaf(std::move(key),\
-    \ multiplicity)), r));\n    }\n\n   private:\n    PersistentOrderedMultiset insert_unique(T\
-    \ key) const {\n        if (contains(key)) return *this;\n        auto [l, r]\
-    \ = split_nodes(root, key);\n        return make_version(merge_nodes(merge_nodes(l,\
-    \ make_leaf(std::move(key), 1)), r));\n    }\n\n   public:\n    PersistentOrderedMultiset\
-    \ erase_one(const T& key) const {\n        int old_count = 0;\n        const int\
-    \ changed_root = change_count_impl(root, key, -1, old_count);\n        if (old_count\
-    \ == 0) return *this;\n        if (old_count > 1) return make_version(changed_root);\n\
+    \ multiplicity)), r));\n    }\n\n    void insert_inplace(T key, int multiplicity\
+    \ = 1) {\n        assert(multiplicity > 0);\n        if (!contains(key)) {\n \
+    \           *this = insert(std::move(key), multiplicity);\n            return;\n\
+    \        }\n        int next_root = change_count_inplace(root, key, multiplicity);\n\
+    \        pool.replace(root, next_root);\n        pool.discard_unreferenced();\n\
+    \    }\n\n   private:\n    PersistentOrderedMultiset insert_unique(T key) const\
+    \ {\n        if (contains(key)) return *this;\n        auto [l, r] = split_nodes(root,\
+    \ key);\n        return make_version(merge_nodes(merge_nodes(l, make_leaf(std::move(key),\
+    \ 1)), r));\n    }\n\n   public:\n    PersistentOrderedMultiset erase_one(const\
+    \ T& key) const {\n        int old_count = 0;\n        const int changed_root\
+    \ = change_count_impl(root, key, -1, old_count);\n        if (old_count == 0)\
+    \ return *this;\n        if (old_count > 1) return make_version(changed_root);\n\
     \        auto [l, r] = split_nodes(root, key);\n        auto [discarded, rest]\
     \ = pop_min(r);\n        assert(equal(pool[discarded].key, key));\n        return\
     \ make_version(merge_nodes(l, rest));\n    }\n\n    PersistentOrderedMultiset\
-    \ erase(const T& key) const { return erase_one(key); }\n\n    PersistentOrderedMultiset\
-    \ erase_all(const T& key) const {\n        const int old_count = count(key);\n\
-    \        if (old_count == 0) return *this;\n        auto [l, r] = split_nodes(root,\
-    \ key);\n        auto [discarded, rest] = pop_min(r);\n        assert(equal(pool[discarded].key,\
+    \ erase(const T& key) const { return erase_one(key); }\n\n    bool erase_one_inplace(const\
+    \ T& key) {\n        int old_count = count(key);\n        if (old_count == 0)\
+    \ return false;\n        if (old_count == 1) {\n            *this = erase_one(key);\n\
+    \            return true;\n        }\n        int next_root = change_count_inplace(root,\
+    \ key, -1);\n        pool.replace(root, next_root);\n        pool.discard_unreferenced();\n\
+    \        return true;\n    }\n\n    bool erase_inplace(const T& key) { return\
+    \ erase_one_inplace(key); }\n\n    PersistentOrderedMultiset erase_all(const T&\
+    \ key) const {\n        const int old_count = count(key);\n        if (old_count\
+    \ == 0) return *this;\n        auto [l, r] = split_nodes(root, key);\n       \
+    \ auto [discarded, rest] = pop_min(r);\n        assert(equal(pool[discarded].key,\
     \ key));\n        return make_version(merge_nodes(l, rest));\n    }\n\n    bool\
-    \ contains(const T& key) const { return count(key) > 0; }\n    int count(const\
-    \ T& key) const { return count_impl(root, key); }\n\n    const T* find_by_order(int\
-    \ k) const {\n        assert(0 <= k && k < size());\n        return kth_impl(root,\
-    \ k);\n    }\n\n    T kth(int k) const { return *find_by_order(k); }\n    int\
-    \ order_of_key(const T& key) const { return order_of_key_impl(root, key, false);\
-    \ }\n    int count_less(const T& key) const { return order_of_key(key); }\n  \
-    \  int count_less_equal(const T& key) const { return order_of_key_impl(root, key,\
-    \ true); }\n    int count_greater(const T& key) const { return size() - count_less_equal(key);\
-    \ }\n    int count_greater_equal(const T& key) const { return size() - count_less(key);\
-    \ }\n    const T* lower_bound(const T& key) const { return lower_bound_impl(root,\
-    \ key, false); }\n    const T* upper_bound(const T& key) const { return lower_bound_impl(root,\
-    \ key, true); }\n    const T* min_ge(const T& key) const { return lower_bound(key);\
-    \ }\n    const T* min_gt(const T& key) const { return upper_bound(key); }\n  \
-    \  const T* max_le(const T& key) const { return max_less_impl(root, key, false);\
-    \ }\n    const T* max_lt(const T& key) const { return max_less_impl(root, key,\
-    \ true); }\n    const T* min() const { return empty() ? nullptr : &pool[pool[root].min_leaf].key;\
-    \ }\n    const T* max() const { return empty() ? nullptr : &pool[pool[root].max_leaf].key;\
-    \ }\n\n    std::pair<PersistentOrderedMultiset, PersistentOrderedMultiset> split(const\
+    \ erase_all_inplace(const T& key) {\n        if (!contains(key)) return false;\n\
+    \        *this = erase_all(key);\n        return true;\n    }\n\n    bool contains(const\
+    \ T& key) const { return count(key) > 0; }\n    int count(const T& key) const\
+    \ { return count_impl(root, key); }\n\n    const T* find_by_order(int k) const\
+    \ {\n        assert(0 <= k && k < size());\n        return kth_impl(root, k);\n\
+    \    }\n\n    T kth(int k) const { return *find_by_order(k); }\n    int order_of_key(const\
+    \ T& key) const { return order_of_key_impl(root, key, false); }\n    int count_less(const\
+    \ T& key) const { return order_of_key(key); }\n    int count_less_equal(const\
+    \ T& key) const { return order_of_key_impl(root, key, true); }\n    int count_greater(const\
+    \ T& key) const { return size() - count_less_equal(key); }\n    int count_greater_equal(const\
+    \ T& key) const { return size() - count_less(key); }\n    const T* lower_bound(const\
+    \ T& key) const { return lower_bound_impl(root, key, false); }\n    const T* upper_bound(const\
+    \ T& key) const { return lower_bound_impl(root, key, true); }\n    const T* min_ge(const\
+    \ T& key) const { return lower_bound(key); }\n    const T* min_gt(const T& key)\
+    \ const { return upper_bound(key); }\n    const T* max_le(const T& key) const\
+    \ { return max_less_impl(root, key, false); }\n    const T* max_lt(const T& key)\
+    \ const { return max_less_impl(root, key, true); }\n    const T* min() const {\
+    \ return empty() ? nullptr : &pool[pool[root].min_leaf].key; }\n    const T* max()\
+    \ const { return empty() ? nullptr : &pool[pool[root].max_leaf].key; }\n\n   \
+    \ std::pair<PersistentOrderedMultiset, PersistentOrderedMultiset> split(const\
     \ T& key) const {\n        auto [l, r] = split_nodes(root, key);\n        PersistentOrderedMultiset\
     \ left(l, comp);\n        PersistentOrderedMultiset right(r, comp);\n        pool.discard_unreferenced();\n\
     \        return {std::move(left), std::move(right)};\n    }\n\n    PersistentOrderedMultiset\
@@ -667,12 +699,17 @@ data:
     \ (r - l == 1) return new_node(Node(-1));\n        int m = (l + r) >> 1;\n   \
     \     int left = build(l, m);\n        int right = build(m, r);\n        return\
     \ new_node(Node(0, left, right));\n    }\n\n    int set_node(int t, int l, int\
-    \ r, int p, int value) const {\n        if (r - l == 1) return new_node(Node(value));\n\
-    \        int m = (l + r) >> 1;\n            int left = (*_pool)[t].l;\n      \
-    \      int right = (*_pool)[t].r;\n        if (p < m) {\n            left = set_node(left,\
-    \ l, m, p, value);\n        } else {\n            right = set_node(right, m, r,\
-    \ p, value);\n        }\n        return new_node(Node(0, left, right));\n    }\n\
-    \n    PersistentDsu make_version(int root) const {\n        PersistentDsu result(_n,\
+    \ r, int p, int value, bool copy_on_write = false) const {\n        if (copy_on_write)\
+    \ t = _pool->clone_if_shared(t);\n        if (r - l == 1) {\n            if (copy_on_write)\
+    \ {\n                (*_pool)[t].val = value;\n                return t;\n   \
+    \         }\n            return new_node(Node(value));\n        }\n        int\
+    \ m = (l + r) >> 1;\n        int left = (*_pool)[t].l;\n        int right = (*_pool)[t].r;\n\
+    \        if (p < m) {\n            left = set_node(left, l, m, p, value, copy_on_write);\n\
+    \        } else {\n            right = set_node(right, m, r, p, value, copy_on_write);\n\
+    \        }\n        if (copy_on_write) {\n            _pool->replace((*_pool)[t].l,\
+    \ left);\n            _pool->replace((*_pool)[t].r, right);\n            return\
+    \ t;\n        }\n        return new_node(Node(0, left, right));\n    }\n\n   \
+    \ PersistentDsu make_version(int root) const {\n        PersistentDsu result(_n,\
     \ root, _pool);\n        _pool->discard_unreferenced();\n        return result;\n\
     \    }\n\n    int get_node(int t, int l, int r, int p) const {\n        while\
     \ (r - l > 1) {\n            int m = (l + r) >> 1;\n            if (p < m) {\n\
@@ -715,9 +752,16 @@ data:
     \ sy) {\n            std::swap(x, y);\n            std::swap(sx, sy);\n      \
     \  }\n        int root = set_node(_root, 0, _n, x, -(sx + sy));\n        root\
     \ = set_node(root, 0, _n, y, x);\n        return make_version(root);\n    }\n\n\
-    \    std::vector<std::vector<int>> groups() const {\n        std::vector<int>\
-    \ leader_buf(_n), group_size(_n);\n        for (int i = 0; i < _n; i++) {\n  \
-    \          leader_buf[i] = leader(i);\n            group_size[leader_buf[i]]++;\n\
+    \    bool merge_inplace(int a, int b) {\n        assert(0 <= a && a < _n);\n \
+    \       assert(0 <= b && b < _n);\n        int x = leader(a), y = leader(b);\n\
+    \        if (x == y) return false;\n        int sx = -get(x), sy = -get(y);\n\
+    \        if (sx < sy) {\n            std::swap(x, y);\n            std::swap(sx,\
+    \ sy);\n        }\n        int root = set_node(_root, 0, _n, x, -(sx + sy), true);\n\
+    \        _pool->replace(_root, root);\n        root = set_node(_root, 0, _n, y,\
+    \ x, true);\n        _pool->replace(_root, root);\n        _pool->discard_unreferenced();\n\
+    \        return true;\n    }\n\n    std::vector<std::vector<int>> groups() const\
+    \ {\n        std::vector<int> leader_buf(_n), group_size(_n);\n        for (int\
+    \ i = 0; i < _n; i++) {\n            leader_buf[i] = leader(i);\n            group_size[leader_buf[i]]++;\n\
     \        }\n        std::vector<std::vector<int>> result(_n);\n        for (int\
     \ i = 0; i < _n; i++) {\n            result[i].reserve(group_size[i]);\n     \
     \   }\n        for (int i = 0; i < _n; i++) {\n            result[leader_buf[i]].push_back(i);\n\
@@ -766,17 +810,23 @@ data:
     \        if (r - l == 1) return new_node(Node(Value(-1, Group::id())));\n    \
     \    int m = (l + r) >> 1;\n        int left = build(l, m);\n        int right\
     \ = build(m, r);\n        return new_node(Node(Value(), left, right));\n    }\n\
-    \n    int set_node(int t, int l, int r, int p, Value value) const {\n        if\
-    \ (r - l == 1) return new_node(Node(std::move(value)));\n        int m = (l +\
-    \ r) >> 1;\n        int left = (*_pool)[t].l;\n        int right = (*_pool)[t].r;\n\
-    \        if (p < m) {\n            left = set_node(left, l, m, p, std::move(value));\n\
-    \        } else {\n            right = set_node(right, m, r, p, std::move(value));\n\
-    \        }\n        return new_node(Node(Value(), left, right));\n    }\n\n  \
-    \  Value get_value(int t, int l, int r, int p) const {\n        while (r - l >\
-    \ 1) {\n            int m = (l + r) >> 1;\n            if (p < m) {\n        \
-    \        t = (*_pool)[t].l;\n                r = m;\n            } else {\n  \
-    \              t = (*_pool)[t].r;\n                l = m;\n            }\n   \
-    \     }\n        return (*_pool)[t].val;\n    }\n\n    std::pair<int, T> leader_and_potential(int\
+    \n    int set_node(int t, int l, int r, int p, Value value, bool copy_on_write\
+    \ = false) const {\n        if (copy_on_write) t = _pool->clone_if_shared(t);\n\
+    \        if (r - l == 1) {\n            if (copy_on_write) {\n               \
+    \ (*_pool)[t].val = std::move(value);\n                return t;\n           \
+    \ }\n            return new_node(Node(std::move(value)));\n        }\n       \
+    \ int m = (l + r) >> 1;\n        int left = (*_pool)[t].l;\n        int right\
+    \ = (*_pool)[t].r;\n        if (p < m) {\n            left = set_node(left, l,\
+    \ m, p, std::move(value), copy_on_write);\n        } else {\n            right\
+    \ = set_node(right, m, r, p, std::move(value), copy_on_write);\n        }\n  \
+    \      if (copy_on_write) {\n            _pool->replace((*_pool)[t].l, left);\n\
+    \            _pool->replace((*_pool)[t].r, right);\n            return t;\n  \
+    \      }\n        return new_node(Node(Value(), left, right));\n    }\n\n    Value\
+    \ get_value(int t, int l, int r, int p) const {\n        while (r - l > 1) {\n\
+    \            int m = (l + r) >> 1;\n            if (p < m) {\n               \
+    \ t = (*_pool)[t].l;\n                r = m;\n            } else {\n         \
+    \       t = (*_pool)[t].r;\n                l = m;\n            }\n        }\n\
+    \        return (*_pool)[t].val;\n    }\n\n    std::pair<int, T> leader_and_potential(int\
     \ a) const {\n        T res = Group::id();\n        while (true) {\n         \
     \   Value cur = get(a);\n            if (cur.parent_or_size < 0) return {a, res};\n\
     \            res = Group::op(cur.diff_to_parent, res);\n            a = cur.parent_or_size;\n\
@@ -827,9 +877,20 @@ data:
     \            y_from_x = Group::inv(y_from_x);\n        }\n        int root = set_node(_root,\
     \ 0, _n, x, Value(-(sx + sy), Group::id()));\n        root = set_node(root, 0,\
     \ _n, y, Value(x, std::move(y_from_x)));\n        return {make_version(root),\
-    \ true};\n    }\n\n    std::vector<std::vector<int>> groups() const {\n      \
-    \  std::vector<int> leader_buf(_n), group_size(_n);\n        for (int i = 0; i\
-    \ < _n; i++) {\n            leader_buf[i] = leader(i);\n            group_size[leader_buf[i]]++;\n\
+    \ true};\n    }\n\n    bool merge_inplace(int a, int b, const T& w) {\n      \
+    \  assert(0 <= a && a < _n);\n        assert(0 <= b && b < _n);\n        auto\
+    \ [x, pa] = leader_and_potential(a);\n        auto [y, pb] = leader_and_potential(b);\n\
+    \        if (x == y) return Group::op(Group::inv(pa), pb) == w;\n\n        int\
+    \ sx = -get(x).parent_or_size;\n        int sy = -get(y).parent_or_size;\n   \
+    \     T y_from_x = Group::op(Group::op(pa, w), Group::inv(pb));\n        if (sx\
+    \ < sy) {\n            std::swap(x, y);\n            std::swap(sx, sy);\n    \
+    \        y_from_x = Group::inv(y_from_x);\n        }\n        int root = set_node(_root,\
+    \ 0, _n, x, Value(-(sx + sy), Group::id()), true);\n        _pool->replace(_root,\
+    \ root);\n        root = set_node(_root, 0, _n, y, Value(x, std::move(y_from_x)),\
+    \ true);\n        _pool->replace(_root, root);\n        _pool->discard_unreferenced();\n\
+    \        return true;\n    }\n\n    std::vector<std::vector<int>> groups() const\
+    \ {\n        std::vector<int> leader_buf(_n), group_size(_n);\n        for (int\
+    \ i = 0; i < _n; i++) {\n            leader_buf[i] = leader(i);\n            group_size[leader_buf[i]]++;\n\
     \        }\n        std::vector<std::vector<int>> result(_n);\n        for (int\
     \ i = 0; i < _n; i++) {\n            result[i].reserve(group_size[i]);\n     \
     \   }\n        for (int i = 0; i < _n; i++) {\n            result[leader_buf[i]].push_back(i);\n\
@@ -883,36 +944,49 @@ data:
     \        }\n        if (pos == left_count) {\n            return make_node(std::move(val),\
     \ node.priority, false, node.l, node.r);\n        }\n        int r = set_node(node.r,\
     \ pos - left_count - 1, std::move(val));\n        return make_node(std::move(node.val),\
-    \ node.priority, false, node.l, r);\n    }\n\n    int find_node(int t, int pos)\
-    \ const {\n        bool reversed = false;\n        while (t != -1) {\n       \
-    \     const Node& node = (*pool)[t];\n            bool cur_reversed = reversed\
-    \ ^ node.rev;\n            int l = cur_reversed ? node.r : node.l;\n         \
-    \   int r = cur_reversed ? node.l : node.r;\n            int left_count = subtree_size(l);\n\
-    \            if (pos < left_count) {\n                t = l;\n               \
-    \ reversed = cur_reversed;\n            } else if (pos == left_count) {\n    \
-    \            return t;\n            } else {\n                pos -= left_count\
-    \ + 1;\n                t = r;\n                reversed = cur_reversed;\n   \
-    \         }\n        }\n        return -1;\n    }\n\n    void dump_dfs(int t,\
-    \ std::vector<T>& res, bool reversed = false) const {\n        if (t == -1) return;\n\
+    \ node.priority, false, node.l, r);\n    }\n\n    int set_node_inplace(int t,\
+    \ int pos, T val, bool inherited_reversed = false) const {\n        t = pool->clone_if_shared(t);\n\
+    \        const bool reversed = inherited_reversed ^ (*pool)[t].rev;\n        const\
+    \ int logical_left = reversed ? (*pool)[t].r : (*pool)[t].l;\n        const int\
+    \ left_count = subtree_size(logical_left);\n        if (pos < left_count) {\n\
+    \            int child = set_node_inplace(logical_left, pos, std::move(val), reversed);\n\
+    \            if (reversed) {\n                pool->replace((*pool)[t].r, child);\n\
+    \            } else {\n                pool->replace((*pool)[t].l, child);\n \
+    \           }\n        } else if (pos == left_count) {\n            (*pool)[t].val\
+    \ = std::move(val);\n        } else {\n            const int logical_right = reversed\
+    \ ? (*pool)[t].l : (*pool)[t].r;\n            int child = set_node_inplace(logical_right,\
+    \ pos - left_count - 1, std::move(val), reversed);\n            if (reversed)\
+    \ {\n                pool->replace((*pool)[t].l, child);\n            } else {\n\
+    \                pool->replace((*pool)[t].r, child);\n            }\n        }\n\
+    \        return t;\n    }\n\n    int find_node(int t, int pos) const {\n     \
+    \   bool reversed = false;\n        while (t != -1) {\n            const Node&\
+    \ node = (*pool)[t];\n            bool cur_reversed = reversed ^ node.rev;\n \
+    \           int l = cur_reversed ? node.r : node.l;\n            int r = cur_reversed\
+    \ ? node.l : node.r;\n            int left_count = subtree_size(l);\n        \
+    \    if (pos < left_count) {\n                t = l;\n                reversed\
+    \ = cur_reversed;\n            } else if (pos == left_count) {\n             \
+    \   return t;\n            } else {\n                pos -= left_count + 1;\n\
+    \                t = r;\n                reversed = cur_reversed;\n          \
+    \  }\n        }\n        return -1;\n    }\n\n    void dump_dfs(int t, std::vector<T>&\
+    \ res, bool reversed = false) const {\n        if (t == -1) return;\n        const\
+    \ Node& node = (*pool)[t];\n        bool cur_reversed = reversed ^ node.rev;\n\
+    \        int l = cur_reversed ? node.r : node.l;\n        int r = cur_reversed\
+    \ ? node.l : node.r;\n        dump_dfs(l, res, cur_reversed);\n        res.push_back(node.val);\n\
+    \        dump_dfs(r, res, cur_reversed);\n    }\n\n    void dump_range_dfs(int\
+    \ t, int ql, int qr, int offset, std::vector<T>& res, bool reversed = false) const\
+    \ {\n        if (t == -1 || qr <= offset || offset + (*pool)[t].count <= ql) return;\n\
     \        const Node& node = (*pool)[t];\n        bool cur_reversed = reversed\
     \ ^ node.rev;\n        int l = cur_reversed ? node.r : node.l;\n        int r\
-    \ = cur_reversed ? node.l : node.r;\n        dump_dfs(l, res, cur_reversed);\n\
-    \        res.push_back(node.val);\n        dump_dfs(r, res, cur_reversed);\n \
-    \   }\n\n    void dump_range_dfs(int t, int ql, int qr, int offset, std::vector<T>&\
-    \ res, bool reversed = false) const {\n        if (t == -1 || qr <= offset ||\
-    \ offset + (*pool)[t].count <= ql) return;\n        const Node& node = (*pool)[t];\n\
-    \        bool cur_reversed = reversed ^ node.rev;\n        int l = cur_reversed\
-    \ ? node.r : node.l;\n        int r = cur_reversed ? node.l : node.r;\n      \
-    \  int left_count = subtree_size(l);\n        int node_pos = offset + left_count;\n\
-    \        dump_range_dfs(l, ql, qr, offset, res, cur_reversed);\n        if (ql\
-    \ <= node_pos && node_pos < qr) res.push_back(node.val);\n        dump_range_dfs(r,\
-    \ ql, qr, node_pos + 1, res, cur_reversed);\n    }\n\n    int build_from_nodes(std::vector<BuildNode>&\
-    \ nodes, int t) const {\n        if (t == -1) return -1;\n        int l = build_from_nodes(nodes,\
-    \ nodes[t].l);\n        int r = build_from_nodes(nodes, nodes[t].r);\n       \
-    \ return make_node(std::move(nodes[t].val), nodes[t].priority, false, l, r);\n\
-    \    }\n\n    int build_cartesian(std::vector<BuildNode>& nodes) const {\n   \
-    \     if (nodes.empty()) return -1;\n        std::vector<int> stack;\n       \
-    \ stack.reserve(nodes.size());\n        for (int i = 0; i < int(nodes.size());\
+    \ = cur_reversed ? node.l : node.r;\n        int left_count = subtree_size(l);\n\
+    \        int node_pos = offset + left_count;\n        dump_range_dfs(l, ql, qr,\
+    \ offset, res, cur_reversed);\n        if (ql <= node_pos && node_pos < qr) res.push_back(node.val);\n\
+    \        dump_range_dfs(r, ql, qr, node_pos + 1, res, cur_reversed);\n    }\n\n\
+    \    int build_from_nodes(std::vector<BuildNode>& nodes, int t) const {\n    \
+    \    if (t == -1) return -1;\n        int l = build_from_nodes(nodes, nodes[t].l);\n\
+    \        int r = build_from_nodes(nodes, nodes[t].r);\n        return make_node(std::move(nodes[t].val),\
+    \ nodes[t].priority, false, l, r);\n    }\n\n    int build_cartesian(std::vector<BuildNode>&\
+    \ nodes) const {\n        if (nodes.empty()) return -1;\n        std::vector<int>\
+    \ stack;\n        stack.reserve(nodes.size());\n        for (int i = 0; i < int(nodes.size());\
     \ i++) {\n            int left_child = -1;\n            while (!stack.empty()\
     \ && nodes[stack.back()].priority < nodes[i].priority) {\n                left_child\
     \ = stack.back();\n                stack.pop_back();\n            }\n        \
@@ -1010,33 +1084,35 @@ data:
     \      return at(size() - 1);\n    }\n\n    T get(int pos) const {\n        return\
     \ at(pos);\n    }\n\n    PersistentDynamicArray set(int pos, T val) const {\n\
     \        assert(0 <= pos && pos < size());\n        return make_version(set_node(root,\
-    \ pos, std::move(val)), rng_state);\n    }\n\n    PersistentDynamicArray reverse(int\
-    \ l, int r) const {\n        assert(0 <= l && l <= r && r <= size());\n      \
-    \  if (l == r) return *this;\n        auto [a, b] = split_node(root, l);\n   \
-    \     auto [mid, c] = split_node(b, r - l);\n        return make_version(merge(merge(a,\
-    \ reversed_node(mid)), c), rng_state);\n    }\n\n    PersistentDynamicArray reverse()\
-    \ const {\n        return make_version(reversed_node(root), rng_state);\n    }\n\
-    \n    PersistentDynamicArray rotate(int l, int m, int r) const {\n        assert(0\
-    \ <= l && l <= m && m <= r && r <= size());\n        if (l == m || m == r) return\
-    \ *this;\n        auto [a, b] = split_node(root, l);\n        auto [c, d] = split_node(b,\
-    \ m - l);\n        auto [e, f] = split_node(d, r - m);\n        return make_version(merge(merge(a,\
-    \ e), merge(c, f)), rng_state);\n    }\n\n    std::pair<PersistentDynamicArray,\
-    \ PersistentDynamicArray> split(int pos) const {\n        assert(0 <= pos && pos\
-    \ <= size());\n        auto [l, r] = split_node(root, pos);\n        PersistentDynamicArray\
-    \ left(l, rng_state, pool);\n        PersistentDynamicArray right(r, rng_state,\
-    \ pool);\n        pool->discard_unreferenced();\n        return {std::move(left),\
-    \ std::move(right)};\n    }\n\n    PersistentDynamicArray split_off(int pos) const\
-    \ {\n        assert(0 <= pos && pos <= size());\n        return make_version(split_node(root,\
-    \ pos).second, rng_state);\n    }\n\n    std::vector<T> to_vector() const {\n\
-    \        std::vector<T> res;\n        res.reserve(size());\n        dump_dfs(root,\
-    \ res);\n        return res;\n    }\n\n    std::vector<T> to_vector(int l, int\
-    \ r) const {\n        assert(0 <= l && l <= r && r <= size());\n        std::vector<T>\
-    \ res;\n        res.reserve(r - l);\n        dump_range_dfs(root, l, r, 0, res);\n\
-    \        return res;\n    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\
-    \n\n#line 1 \"ds/dynamic_array/persistent_dynamic_lazy_monoid_array.hpp\"\n\n\n\
-    \n#line 13 \"ds/dynamic_array/persistent_dynamic_lazy_monoid_array.hpp\"\n\n#line\
-    \ 1 \"acted_monoid/concept.hpp\"\n\n\n\n#line 5 \"acted_monoid/concept.hpp\"\n\
-    \nnamespace m1une {\nnamespace acted_monoid {\n\n// Concept defining the requirements\
+    \ pos, std::move(val)), rng_state);\n    }\n\n    void set_inplace(int pos, T\
+    \ val) {\n        assert(0 <= pos && pos < size());\n        int next_root = set_node_inplace(root,\
+    \ pos, std::move(val));\n        pool->replace(root, next_root);\n        pool->discard_unreferenced();\n\
+    \    }\n\n    PersistentDynamicArray reverse(int l, int r) const {\n        assert(0\
+    \ <= l && l <= r && r <= size());\n        if (l == r) return *this;\n       \
+    \ auto [a, b] = split_node(root, l);\n        auto [mid, c] = split_node(b, r\
+    \ - l);\n        return make_version(merge(merge(a, reversed_node(mid)), c), rng_state);\n\
+    \    }\n\n    PersistentDynamicArray reverse() const {\n        return make_version(reversed_node(root),\
+    \ rng_state);\n    }\n\n    PersistentDynamicArray rotate(int l, int m, int r)\
+    \ const {\n        assert(0 <= l && l <= m && m <= r && r <= size());\n      \
+    \  if (l == m || m == r) return *this;\n        auto [a, b] = split_node(root,\
+    \ l);\n        auto [c, d] = split_node(b, m - l);\n        auto [e, f] = split_node(d,\
+    \ r - m);\n        return make_version(merge(merge(a, e), merge(c, f)), rng_state);\n\
+    \    }\n\n    std::pair<PersistentDynamicArray, PersistentDynamicArray> split(int\
+    \ pos) const {\n        assert(0 <= pos && pos <= size());\n        auto [l, r]\
+    \ = split_node(root, pos);\n        PersistentDynamicArray left(l, rng_state,\
+    \ pool);\n        PersistentDynamicArray right(r, rng_state, pool);\n        pool->discard_unreferenced();\n\
+    \        return {std::move(left), std::move(right)};\n    }\n\n    PersistentDynamicArray\
+    \ split_off(int pos) const {\n        assert(0 <= pos && pos <= size());\n   \
+    \     return make_version(split_node(root, pos).second, rng_state);\n    }\n\n\
+    \    std::vector<T> to_vector() const {\n        std::vector<T> res;\n       \
+    \ res.reserve(size());\n        dump_dfs(root, res);\n        return res;\n  \
+    \  }\n\n    std::vector<T> to_vector(int l, int r) const {\n        assert(0 <=\
+    \ l && l <= r && r <= size());\n        std::vector<T> res;\n        res.reserve(r\
+    \ - l);\n        dump_range_dfs(root, l, r, 0, res);\n        return res;\n  \
+    \  }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n#line 1 \"ds/dynamic_array/persistent_dynamic_lazy_monoid_array.hpp\"\
+    \n\n\n\n#line 13 \"ds/dynamic_array/persistent_dynamic_lazy_monoid_array.hpp\"\
+    \n\n#line 1 \"acted_monoid/concept.hpp\"\n\n\n\n#line 5 \"acted_monoid/concept.hpp\"\
+    \n\nnamespace m1une {\nnamespace acted_monoid {\n\n// Concept defining the requirements\
     \ for an Acted Monoid.\ntemplate <typename AM>\nconcept IsActedMonoid = requires(typename\
     \ AM::value_type a, typename AM::value_type b, typename AM::operator_type f,\n\
     \                                 typename AM::operator_type g) {\n    // 1. Value\
@@ -1108,14 +1184,15 @@ data:
     \ = node.has_lazy ? reverse_operator(node.lazy, node.count) : node.lazy;\n   \
     \     return make_raw_node(std::move(node.val), std::move(node.rprod), std::move(node.prod),\
     \ std::move(lazy),\n                             node.priority, node.count, !node.rev,\
-    \ node.has_lazy, node.l, node.r);\n    }\n\n    int all_apply(int t, const F&\
-    \ f) const {\n        if (t == -1) return -1;\n        Node node = (*pool)[t];\n\
-    \        int left_count = node.rev ? subtree_size(node.r) : subtree_size(node.l);\n\
-    \        return make_raw_node(mapping_at(f, node.val, left_count), mapping_at(f,\
-    \ node.prod, 0),\n                             mapping_at(reverse_operator(f,\
-    \ node.count), node.rprod, 0),\n                             ActedMonoid::op_comp(f,\
-    \ node.lazy), node.priority, node.count, node.rev, true, node.l,\n           \
-    \                  node.r);\n    }\n\n    int push(int t) const {\n        if\
+    \ node.has_lazy, node.l, node.r);\n    }\n\n    void all_apply_to_node(int t,\
+    \ const F& f) const {\n        Node& node = (*pool)[t];\n        int left_count\
+    \ = node.rev ? subtree_size(node.r) : subtree_size(node.l);\n        node.val\
+    \ = mapping_at(f, node.val, left_count);\n        node.prod = mapping_at(f, node.prod,\
+    \ 0);\n        node.rprod = mapping_at(reverse_operator(f, node.count), node.rprod,\
+    \ 0);\n        node.lazy = ActedMonoid::op_comp(f, node.lazy);\n        node.has_lazy\
+    \ = true;\n    }\n\n    int all_apply(int t, const F& f) const {\n        if (t\
+    \ == -1) return -1;\n        int result = pool->clone(t);\n        all_apply_to_node(result,\
+    \ f);\n        return result;\n    }\n\n    int push(int t) const {\n        if\
     \ (t == -1) return -1;\n        const Node& stored = (*pool)[t];\n        if (!stored.rev\
     \ && !stored.has_lazy) return t;\n        Node node = stored;\n        int l =\
     \ node.l;\n        int r = node.r;\n        if (node.rev) {\n            std::swap(l,\
@@ -1143,55 +1220,101 @@ data:
     \        if (pos == left_count) {\n            return make_node(std::move(val),\
     \ node.priority, false, node.l, node.r);\n        }\n        int r = set_node(node.r,\
     \ pos - left_count - 1, std::move(val));\n        return make_node(std::move(node.val),\
-    \ node.priority, false, node.l, r);\n    }\n\n    T get_value(int t, int pos,\
-    \ F inherited, bool reversed = false) const {\n        while (t != -1) {\n   \
-    \         const Node& node = (*pool)[t];\n            bool cur_reversed = reversed\
-    \ ^ node.rev;\n            int l = cur_reversed ? node.r : node.l;\n         \
-    \   int r = cur_reversed ? node.l : node.r;\n            int left_count = subtree_size(l);\n\
-    \            if (pos < left_count) {\n                inherited = compose_for_child(inherited,\
-    \ t, 0);\n                t = l;\n                reversed = cur_reversed;\n \
-    \           } else if (pos == left_count) {\n                return mapping_at(inherited,\
-    \ node.val, left_count);\n            } else {\n                pos -= left_count\
-    \ + 1;\n                inherited = compose_for_child(inherited, t, left_count\
-    \ + 1);\n                t = r;\n                reversed = cur_reversed;\n  \
-    \          }\n        }\n        return ActedMonoid::id();\n    }\n\n    T prod_dfs(int\
-    \ t, int ql, int qr, int offset, const F& inherited, bool reversed = false) const\
-    \ {\n        if (t == -1 || qr <= offset || offset + (*pool)[t].count <= ql) return\
-    \ ActedMonoid::id();\n        const Node& node = (*pool)[t];\n        bool cur_reversed\
-    \ = reversed ^ node.rev;\n        if (ql <= offset && offset + node.count <= qr)\
-    \ {\n            return mapping_at(inherited, reversed ? node.rprod : node.prod,\
-    \ 0);\n        }\n        int l = cur_reversed ? node.r : node.l;\n        int\
-    \ r = cur_reversed ? node.l : node.r;\n        int left_count = subtree_size(l);\n\
-    \        int node_pos = offset + left_count;\n        T res = prod_dfs(l, ql,\
-    \ qr, offset, compose_for_child(inherited, t, 0), cur_reversed);\n        if (ql\
-    \ <= node_pos && node_pos < qr) res = ActedMonoid::op(res, mapping_at(inherited,\
-    \ node.val, left_count));\n        return ActedMonoid::op(\n            res, prod_dfs(r,\
-    \ ql, qr, node_pos + 1, compose_for_child(inherited, t, left_count + 1),\n   \
-    \                       cur_reversed));\n    }\n\n    void dump_dfs(int t, std::vector<T>&\
-    \ res, const F& inherited, bool reversed = false) const {\n        if (t == -1)\
-    \ return;\n        const Node& node = (*pool)[t];\n        bool cur_reversed =\
-    \ reversed ^ node.rev;\n        int l = cur_reversed ? node.r : node.l;\n    \
-    \    int r = cur_reversed ? node.l : node.r;\n        int left_count = subtree_size(l);\n\
-    \        dump_dfs(l, res, compose_for_child(inherited, t, 0), cur_reversed);\n\
-    \        res.push_back(mapping_at(inherited, node.val, left_count));\n       \
-    \ dump_dfs(r, res, compose_for_child(inherited, t, left_count + 1), cur_reversed);\n\
-    \    }\n\n    void dump_range_dfs(int t, int ql, int qr, int offset, std::vector<T>&\
-    \ res, const F& inherited,\n                        bool reversed = false) const\
-    \ {\n        if (t == -1 || qr <= offset || offset + (*pool)[t].count <= ql) return;\n\
-    \        const Node& node = (*pool)[t];\n        bool cur_reversed = reversed\
-    \ ^ node.rev;\n        int l = cur_reversed ? node.r : node.l;\n        int r\
-    \ = cur_reversed ? node.l : node.r;\n        int left_count = subtree_size(l);\n\
-    \        int node_pos = offset + left_count;\n        dump_range_dfs(l, ql, qr,\
-    \ offset, res, compose_for_child(inherited, t, 0), cur_reversed);\n        if\
-    \ (ql <= node_pos && node_pos < qr) res.push_back(mapping_at(inherited, node.val,\
-    \ left_count));\n        dump_range_dfs(r, ql, qr, node_pos + 1, res, compose_for_child(inherited,\
-    \ t, left_count + 1),\n                       cur_reversed);\n    }\n\n    int\
-    \ build_from_nodes(std::vector<BuildNode>& nodes, int t) const {\n        if (t\
-    \ == -1) return -1;\n        int l = build_from_nodes(nodes, nodes[t].l);\n  \
-    \      int r = build_from_nodes(nodes, nodes[t].r);\n        return make_node(std::move(nodes[t].val),\
-    \ nodes[t].priority, false, l, r);\n    }\n\n    int build_cartesian(std::vector<BuildNode>&\
-    \ nodes) const {\n        if (nodes.empty()) return -1;\n        std::vector<int>\
-    \ stack;\n        stack.reserve(nodes.size());\n        for (int i = 0; i < int(nodes.size());\
+    \ node.priority, false, node.l, r);\n    }\n\n    void reverse_node_inplace(int\
+    \ t) const {\n        Node& node = (*pool)[t];\n        std::swap(node.prod, node.rprod);\n\
+    \        if (node.has_lazy) node.lazy = reverse_operator(node.lazy, node.count);\n\
+    \        node.rev = !node.rev;\n    }\n\n    int reverse_node_cow(int t) const\
+    \ {\n        if (t == -1) return -1;\n        t = pool->clone_if_shared(t);\n\
+    \        reverse_node_inplace(t);\n        return t;\n    }\n\n    int all_apply_cow(int\
+    \ t, const F& f) const {\n        if (t == -1) return -1;\n        t = pool->clone_if_shared(t);\n\
+    \        all_apply_to_node(t, f);\n        return t;\n    }\n\n    void pull(int\
+    \ t) const {\n        Node& node = (*pool)[t];\n        node.prod = ActedMonoid::op(ActedMonoid::op(node_prod(node.l),\
+    \ node.val), node_prod(node.r));\n        node.rprod = ActedMonoid::op(ActedMonoid::op(node_rprod(node.r),\
+    \ node.val), node_rprod(node.l));\n    }\n\n    void push_inplace(int t) const\
+    \ {\n        if (!(*pool)[t].rev && !(*pool)[t].has_lazy) return;\n        const\
+    \ bool reversed = (*pool)[t].rev;\n        const bool has_lazy = (*pool)[t].has_lazy;\n\
+    \        F lazy = (*pool)[t].lazy;\n        int left = (*pool)[t].l;\n       \
+    \ int right = (*pool)[t].r;\n        if (reversed) {\n            int new_left\
+    \ = reverse_node_cow(right);\n            int new_right = reverse_node_cow(left);\n\
+    \            // Keep both children alive while the two owning edges are swapped.\n\
+    \            pool->retain(new_left);\n            pool->retain(new_right);\n \
+    \           pool->replace((*pool)[t].l, new_left);\n            pool->replace((*pool)[t].r,\
+    \ new_right);\n            pool->release(new_left);\n            pool->release(new_right);\n\
+    \        }\n        if (has_lazy) {\n            left = all_apply_cow((*pool)[t].l,\
+    \ lazy);\n            pool->replace((*pool)[t].l, left);\n            right =\
+    \ all_apply_cow((*pool)[t].r, shift_operator(lazy, subtree_size(left) + 1));\n\
+    \            pool->replace((*pool)[t].r, right);\n        }\n        Node& node\
+    \ = (*pool)[t];\n        node.lazy = ActedMonoid::op_id();\n        node.rev =\
+    \ false;\n        node.has_lazy = false;\n        pull(t);\n    }\n\n    int set_node_inplace(int\
+    \ t, int pos, T val) const {\n        t = pool->clone_if_shared(t);\n        push_inplace(t);\n\
+    \        int left_count = subtree_size((*pool)[t].l);\n        if (pos < left_count)\
+    \ {\n            int child = set_node_inplace((*pool)[t].l, pos, std::move(val));\n\
+    \            pool->replace((*pool)[t].l, child);\n        } else if (pos == left_count)\
+    \ {\n            (*pool)[t].val = std::move(val);\n        } else {\n        \
+    \    int child = set_node_inplace((*pool)[t].r, pos - left_count - 1, std::move(val));\n\
+    \            pool->replace((*pool)[t].r, child);\n        }\n        pull(t);\n\
+    \        return t;\n    }\n\n    int apply_node_inplace(int t, int offset, int\
+    \ query_left, int query_right, const F& f) const {\n        if (t == -1 || query_right\
+    \ <= offset || offset + subtree_size(t) <= query_left) return t;\n        t =\
+    \ pool->clone_if_shared(t);\n        if (query_left <= offset && offset + subtree_size(t)\
+    \ <= query_right) {\n            all_apply_to_node(t, shift_operator(f, offset\
+    \ - query_left));\n            return t;\n        }\n        push_inplace(t);\n\
+    \        int left_count = subtree_size((*pool)[t].l);\n        int child = apply_node_inplace((*pool)[t].l,\
+    \ offset, query_left, query_right, f);\n        pool->replace((*pool)[t].l, child);\n\
+    \        int position = offset + left_count;\n        if (query_left <= position\
+    \ && position < query_right) {\n            (*pool)[t].val = mapping_at(shift_operator(f,\
+    \ position - query_left), (*pool)[t].val, 0);\n        }\n        child = apply_node_inplace((*pool)[t].r,\
+    \ position + 1, query_left, query_right, f);\n        pool->replace((*pool)[t].r,\
+    \ child);\n        pull(t);\n        return t;\n    }\n\n    T get_value(int t,\
+    \ int pos, F inherited, bool reversed = false) const {\n        while (t != -1)\
+    \ {\n            const Node& node = (*pool)[t];\n            bool cur_reversed\
+    \ = reversed ^ node.rev;\n            int l = cur_reversed ? node.r : node.l;\n\
+    \            int r = cur_reversed ? node.l : node.r;\n            int left_count\
+    \ = subtree_size(l);\n            if (pos < left_count) {\n                inherited\
+    \ = compose_for_child(inherited, t, 0);\n                t = l;\n            \
+    \    reversed = cur_reversed;\n            } else if (pos == left_count) {\n \
+    \               return mapping_at(inherited, node.val, left_count);\n        \
+    \    } else {\n                pos -= left_count + 1;\n                inherited\
+    \ = compose_for_child(inherited, t, left_count + 1);\n                t = r;\n\
+    \                reversed = cur_reversed;\n            }\n        }\n        return\
+    \ ActedMonoid::id();\n    }\n\n    T prod_dfs(int t, int ql, int qr, int offset,\
+    \ const F& inherited, bool reversed = false) const {\n        if (t == -1 || qr\
+    \ <= offset || offset + (*pool)[t].count <= ql) return ActedMonoid::id();\n  \
+    \      const Node& node = (*pool)[t];\n        bool cur_reversed = reversed ^\
+    \ node.rev;\n        if (ql <= offset && offset + node.count <= qr) {\n      \
+    \      return mapping_at(inherited, reversed ? node.rprod : node.prod, 0);\n \
+    \       }\n        int l = cur_reversed ? node.r : node.l;\n        int r = cur_reversed\
+    \ ? node.l : node.r;\n        int left_count = subtree_size(l);\n        int node_pos\
+    \ = offset + left_count;\n        T res = prod_dfs(l, ql, qr, offset, compose_for_child(inherited,\
+    \ t, 0), cur_reversed);\n        if (ql <= node_pos && node_pos < qr) res = ActedMonoid::op(res,\
+    \ mapping_at(inherited, node.val, left_count));\n        return ActedMonoid::op(\n\
+    \            res, prod_dfs(r, ql, qr, node_pos + 1, compose_for_child(inherited,\
+    \ t, left_count + 1),\n                          cur_reversed));\n    }\n\n  \
+    \  void dump_dfs(int t, std::vector<T>& res, const F& inherited, bool reversed\
+    \ = false) const {\n        if (t == -1) return;\n        const Node& node = (*pool)[t];\n\
+    \        bool cur_reversed = reversed ^ node.rev;\n        int l = cur_reversed\
+    \ ? node.r : node.l;\n        int r = cur_reversed ? node.l : node.r;\n      \
+    \  int left_count = subtree_size(l);\n        dump_dfs(l, res, compose_for_child(inherited,\
+    \ t, 0), cur_reversed);\n        res.push_back(mapping_at(inherited, node.val,\
+    \ left_count));\n        dump_dfs(r, res, compose_for_child(inherited, t, left_count\
+    \ + 1), cur_reversed);\n    }\n\n    void dump_range_dfs(int t, int ql, int qr,\
+    \ int offset, std::vector<T>& res, const F& inherited,\n                     \
+    \   bool reversed = false) const {\n        if (t == -1 || qr <= offset || offset\
+    \ + (*pool)[t].count <= ql) return;\n        const Node& node = (*pool)[t];\n\
+    \        bool cur_reversed = reversed ^ node.rev;\n        int l = cur_reversed\
+    \ ? node.r : node.l;\n        int r = cur_reversed ? node.l : node.r;\n      \
+    \  int left_count = subtree_size(l);\n        int node_pos = offset + left_count;\n\
+    \        dump_range_dfs(l, ql, qr, offset, res, compose_for_child(inherited, t,\
+    \ 0), cur_reversed);\n        if (ql <= node_pos && node_pos < qr) res.push_back(mapping_at(inherited,\
+    \ node.val, left_count));\n        dump_range_dfs(r, ql, qr, node_pos + 1, res,\
+    \ compose_for_child(inherited, t, left_count + 1),\n                       cur_reversed);\n\
+    \    }\n\n    int build_from_nodes(std::vector<BuildNode>& nodes, int t) const\
+    \ {\n        if (t == -1) return -1;\n        int l = build_from_nodes(nodes,\
+    \ nodes[t].l);\n        int r = build_from_nodes(nodes, nodes[t].r);\n       \
+    \ return make_node(std::move(nodes[t].val), nodes[t].priority, false, l, r);\n\
+    \    }\n\n    int build_cartesian(std::vector<BuildNode>& nodes) const {\n   \
+    \     if (nodes.empty()) return -1;\n        std::vector<int> stack;\n       \
+    \ stack.reserve(nodes.size());\n        for (int i = 0; i < int(nodes.size());\
     \ i++) {\n            int left_child = -1;\n            while (!stack.empty()\
     \ && nodes[stack.back()].priority < nodes[i].priority) {\n                left_child\
     \ = stack.back();\n                stack.pop_back();\n            }\n        \
@@ -1307,6 +1430,9 @@ data:
     \        assert(!empty());\n        return get(size() - 1);\n    }\n\n    PersistentDynamicLazyMonoidArray\
     \ set(int pos, T value) const {\n        assert(0 <= pos && pos < size());\n \
     \       return make_version(set_node(root, pos, std::move(value)), rng_state);\n\
+    \    }\n\n    void set_inplace(int pos, T value) {\n        assert(0 <= pos &&\
+    \ pos < size());\n        int next_root = set_node_inplace(root, pos, std::move(value));\n\
+    \        pool->replace(root, next_root);\n        pool->discard_unreferenced();\n\
     \    }\n\n    PersistentDynamicLazyMonoidArray reverse(int l, int r) const {\n\
     \        assert(0 <= l && l <= r && r <= size());\n        if (l == r) return\
     \ *this;\n        auto [a, b] = split_node(root, l);\n        auto [mid, c] =\
@@ -1324,11 +1450,16 @@ data:
     \ const F& f) const {\n        assert(0 <= l && l <= r && r <= size());\n    \
     \    if (l == r) return *this;\n        auto [a, b] = split_node(root, l);\n \
     \       auto [mid, c] = split_node(b, r - l);\n        return make_version(merge(merge(a,\
-    \ all_apply(mid, f)), c), rng_state);\n    }\n\n    T prod(int l, int r) const\
-    \ {\n        assert(0 <= l && l <= r && r <= size());\n        if (l == r) return\
-    \ ActedMonoid::id();\n        return prod_dfs(root, l, r, 0, ActedMonoid::op_id());\n\
-    \    }\n\n    T all_prod() const {\n        return root == -1 ? ActedMonoid::id()\
-    \ : (*pool)[root].prod;\n    }\n\n    std::pair<PersistentDynamicLazyMonoidArray,\
+    \ all_apply(mid, f)), c), rng_state);\n    }\n\n    void apply_inplace(int pos,\
+    \ const F& f) {\n        assert(0 <= pos && pos < size());\n        apply_inplace(pos,\
+    \ pos + 1, f);\n    }\n\n    void apply_inplace(int l, int r, const F& f) {\n\
+    \        assert(0 <= l && l <= r && r <= size());\n        if (l == r) return;\n\
+    \        int next_root = apply_node_inplace(root, 0, l, r, f);\n        pool->replace(root,\
+    \ next_root);\n        pool->discard_unreferenced();\n    }\n\n    T prod(int\
+    \ l, int r) const {\n        assert(0 <= l && l <= r && r <= size());\n      \
+    \  if (l == r) return ActedMonoid::id();\n        return prod_dfs(root, l, r,\
+    \ 0, ActedMonoid::op_id());\n    }\n\n    T all_prod() const {\n        return\
+    \ root == -1 ? ActedMonoid::id() : (*pool)[root].prod;\n    }\n\n    std::pair<PersistentDynamicLazyMonoidArray,\
     \ PersistentDynamicLazyMonoidArray> split(int pos) const {\n        assert(0 <=\
     \ pos && pos <= size());\n        auto [l, r] = split_node(root, pos);\n     \
     \   PersistentDynamicLazyMonoidArray left(l, rng_state, pool);\n        PersistentDynamicLazyMonoidArray\
@@ -1400,7 +1531,25 @@ data:
     \        }\n        if (pos == left_count) {\n            return make_node(std::move(val),\
     \ node.priority, false, node.l, node.r);\n        }\n        int r = set_node(node.r,\
     \ pos - left_count - 1, std::move(val));\n        return make_node(std::move(node.val),\
-    \ node.priority, false, node.l, r);\n    }\n\n    int find_node(int t, int pos)\
+    \ node.priority, false, node.l, r);\n    }\n\n    void pull(int t) const {\n \
+    \       Node& node = (*pool)[t];\n        node.prod = Monoid::op(Monoid::op(node_prod(node.l),\
+    \ node.val), node_prod(node.r));\n        node.rprod = Monoid::op(Monoid::op(node_rprod(node.r),\
+    \ node.val), node_rprod(node.l));\n        if (node.rev) std::swap(node.prod,\
+    \ node.rprod);\n    }\n\n    int set_node_inplace(int t, int pos, T val, bool\
+    \ inherited_reversed = false) const {\n        t = pool->clone_if_shared(t);\n\
+    \        const bool reversed = inherited_reversed ^ (*pool)[t].rev;\n        const\
+    \ int logical_left = reversed ? (*pool)[t].r : (*pool)[t].l;\n        const int\
+    \ left_count = subtree_size(logical_left);\n        if (pos < left_count) {\n\
+    \            int child = set_node_inplace(logical_left, pos, std::move(val), reversed);\n\
+    \            if (reversed) {\n                pool->replace((*pool)[t].r, child);\n\
+    \            } else {\n                pool->replace((*pool)[t].l, child);\n \
+    \           }\n        } else if (pos == left_count) {\n            (*pool)[t].val\
+    \ = std::move(val);\n        } else {\n            const int logical_right = reversed\
+    \ ? (*pool)[t].l : (*pool)[t].r;\n            int child = set_node_inplace(logical_right,\
+    \ pos - left_count - 1, std::move(val), reversed);\n            if (reversed)\
+    \ {\n                pool->replace((*pool)[t].l, child);\n            } else {\n\
+    \                pool->replace((*pool)[t].r, child);\n            }\n        }\n\
+    \        pull(t);\n        return t;\n    }\n\n    int find_node(int t, int pos)\
     \ const {\n        bool reversed = false;\n        while (t != -1) {\n       \
     \     const Node& node = (*pool)[t];\n            bool cur_reversed = reversed\
     \ ^ node.rev;\n            int l = cur_reversed ? node.r : node.l;\n         \
@@ -1549,7 +1698,10 @@ data:
     \    }\n\n    T back() const {\n        assert(!empty());\n        return get(size()\
     \ - 1);\n    }\n\n    PersistentDynamicMonoidArray set(int pos, T value) const\
     \ {\n        assert(0 <= pos && pos < size());\n        return make_version(set_node(root,\
-    \ pos, std::move(value)), rng_state);\n    }\n\n    PersistentDynamicMonoidArray\
+    \ pos, std::move(value)), rng_state);\n    }\n\n    void set_inplace(int pos,\
+    \ T value) {\n        assert(0 <= pos && pos < size());\n        int next_root\
+    \ = set_node_inplace(root, pos, std::move(value));\n        pool->replace(root,\
+    \ next_root);\n        pool->discard_unreferenced();\n    }\n\n    PersistentDynamicMonoidArray\
     \ reverse(int l, int r) const {\n        assert(0 <= l && l <= r && r <= size());\n\
     \        if (l == r) return *this;\n        auto [a, b] = split_node(root, l);\n\
     \        auto [mid, c] = split_node(b, r - l);\n        return make_version(merge(merge(a,\
@@ -2266,7 +2418,7 @@ data:
   isVerificationFile: true
   path: verify/ds/persistent_release.test.cpp
   requiredBy: []
-  timestamp: '2026-08-11 13:59:43+09:00'
+  timestamp: '2026-08-12 03:11:00+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/persistent_release.test.cpp

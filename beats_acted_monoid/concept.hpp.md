@@ -25,6 +25,9 @@ data:
     path: verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
     title: verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/persistent_cow.test.cpp
+    title: verify/ds/persistent_cow.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/persistent_segtree_beats.test.cpp
     title: verify/ds/segtree/persistent_segtree_beats.test.cpp
   - icon: ':heavy_check_mark:'
@@ -81,6 +84,7 @@ data:
   verifiedWith:
   - verify/ds/segtree/persistent_segtree_beats.test.cpp
   - verify/ds/segtree/segtree_beats.test.cpp
+  - verify/ds/persistent_cow.test.cpp
   - verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
   - verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
   - verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp

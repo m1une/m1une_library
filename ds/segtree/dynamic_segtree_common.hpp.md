@@ -22,6 +22,9 @@ data:
     title: Persistent Dynamic Segment Tree
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/ds/persistent_cow.test.cpp
+    title: verify/ds/persistent_cow.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/dynamic_dual_segtree.test.cpp
     title: verify/ds/segtree/dynamic_dual_segtree.test.cpp
   - icon: ':heavy_check_mark:'
@@ -171,6 +174,7 @@ data:
   - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
   - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
   - verify/ds/segtree/dynamic_segtree.test.cpp
+  - verify/ds/persistent_cow.test.cpp
 documentation_of: ds/segtree/dynamic_segtree_common.hpp
 layout: document
 redirect_from:

@@ -13,6 +13,9 @@ data:
     path: verify/ds/dynamic_tree/lazy_path_link_cut_tree.test.cpp
     title: verify/ds/dynamic_tree/lazy_path_link_cut_tree.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/persistent_cow.test.cpp
+    title: verify/ds/persistent_cow.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/persistent_release.test.cpp
     title: verify/ds/persistent_release.test.cpp
   - icon: ':heavy_check_mark:'
@@ -82,6 +85,7 @@ data:
   - verify/ds/segtree/persistent_lazy_segtree.test.cpp
   - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
   - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
+  - verify/ds/persistent_cow.test.cpp
   - verify/monoid/commutative_flags.test.cpp
 documentation_of: acted_monoid/range_add_range_sum.hpp
 layout: document

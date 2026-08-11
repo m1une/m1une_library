@@ -1576,6 +1576,9 @@ data:
   - name: verify/ds
     pages:
     - icon: ':heavy_check_mark:'
+      path: verify/ds/persistent_cow.test.cpp
+      title: verify/ds/persistent_cow.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/ds/persistent_release.test.cpp
       title: verify/ds/persistent_release.test.cpp
   - name: verify/ds/queue

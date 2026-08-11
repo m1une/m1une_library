@@ -25,6 +25,9 @@ data:
     title: Persistent Segment Tree Beats
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/ds/persistent_cow.test.cpp
+    title: verify/ds/persistent_cow.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/persistent_dual_segtree.test.cpp
     title: verify/ds/segtree/persistent_dual_segtree.test.cpp
   - icon: ':heavy_check_mark:'
@@ -75,6 +78,11 @@ data:
     \        retain(node.left);\n        retain(node.right);\n        ++live_nodes;\n\
     \        return result;\n    }\n\n    int clone(int node) {\n        assert(node);\n\
     \        Node copy = nodes[node];\n        return emplace(std::move(copy));\n\
+    \    }\n\n    bool unique(int node) const {\n        return !node || nodes[node].references\
+    \ == 1;\n    }\n\n    // Returns node itself when it has one owner, otherwise\
+    \ an unowned clone.\n    // The caller must attach a returned clone with replace()\
+    \ before it can be\n    // released or exposed as a root.\n    int clone_if_shared(int\
+    \ node) {\n        if (unique(node)) return node;\n        return clone(node);\n\
     \    }\n\n    void replace(int& edge, int node) {\n        if (edge == node) return;\n\
     \        retain(node);\n        int old = edge;\n        edge = node;\n      \
     \  release(old);\n    }\n\n    std::size_t size() const { return live_nodes; }\n\
@@ -105,6 +113,11 @@ data:
     \        retain(node.left);\n        retain(node.right);\n        ++live_nodes;\n\
     \        return result;\n    }\n\n    int clone(int node) {\n        assert(node);\n\
     \        Node copy = nodes[node];\n        return emplace(std::move(copy));\n\
+    \    }\n\n    bool unique(int node) const {\n        return !node || nodes[node].references\
+    \ == 1;\n    }\n\n    // Returns node itself when it has one owner, otherwise\
+    \ an unowned clone.\n    // The caller must attach a returned clone with replace()\
+    \ before it can be\n    // released or exposed as a root.\n    int clone_if_shared(int\
+    \ node) {\n        if (unique(node)) return node;\n        return clone(node);\n\
     \    }\n\n    void replace(int& edge, int node) {\n        if (edge == node) return;\n\
     \        retain(node);\n        int old = edge;\n        edge = node;\n      \
     \  release(old);\n    }\n\n    std::size_t size() const { return live_nodes; }\n\
@@ -121,7 +134,7 @@ data:
   - ds/segtree/persistent_segtree_beats.hpp
   - ds/segtree/persistent_dynamic_lazy_segtree.hpp
   - ds/segtree/persistent_dual_segtree.hpp
-  timestamp: '2026-08-08 16:34:26+09:00'
+  timestamp: '2026-08-12 03:11:00+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/segtree/persistent_dynamic_dual_segtree.test.cpp
@@ -131,6 +144,7 @@ data:
   - verify/ds/segtree/persistent_lazy_segtree.test.cpp
   - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
   - verify/ds/segtree/persistent_segtree.test.cpp
+  - verify/ds/persistent_cow.test.cpp
 documentation_of: ds/segtree/persistent_node_pool.hpp
 layout: document
 redirect_from:

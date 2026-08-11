@@ -16,6 +16,9 @@ data:
     path: verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array_range_ap.test.cpp
     title: verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array_range_ap.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/persistent_cow.test.cpp
+    title: verify/ds/persistent_cow.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/persistent_release.test.cpp
     title: verify/ds/persistent_release.test.cpp
   _isVerificationFailed: false
@@ -77,51 +80,60 @@ data:
     \            ++_references[node];\n        }\n    }\n\n    void release(int node)\
     \ {\n        if (node == null_node) return;\n        assert(_nodes[node].has_value()\
     \ && _references[node] > 0);\n        if (--_references[node] == 0) release_zero(node);\n\
-    \    }\n\n    void discard_unreferenced() {\n        while (!_unowned.empty())\
-    \ {\n            int node = _unowned.back();\n            _unowned.pop_back();\n\
-    \            if (_nodes[node].has_value() && _references[node] == 0) release_zero(node);\n\
-    \        }\n    }\n\n    void reserve(std::size_t) {}\n\n    int next_index()\
-    \ const { return _first_free == -1 ? int(_nodes.size()) : _first_free; }\n\n \
-    \   std::size_t size() const { return _live_nodes; }\n};\n\n}  // namespace detail\n\
-    }  // namespace ds\n}  // namespace m1une\n\n\n#line 16 \"ds/dynamic_array/persistent_dynamic_lazy_monoid_array.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\n\ntemplate <m1une::acted_monoid::IsActedMonoid\
-    \ ActedMonoid>\nstruct PersistentDynamicLazyMonoidArray {\n    using T = typename\
-    \ ActedMonoid::value_type;\n    using F = typename ActedMonoid::operator_type;\n\
-    \n   private:\n    struct Node {\n        T val, prod, rprod;\n        F lazy;\n\
-    \        int priority;\n        int count;\n        int l, r;\n        bool rev;\n\
-    \        bool has_lazy;\n\n        Node(T value, T product, T reverse_product,\
-    \ F lazy_value, int node_priority, int node_count, int left,\n             int\
-    \ right, bool reversed, bool lazy_flag)\n            : val(std::move(value)),\n\
-    \              prod(std::move(product)),\n              rprod(std::move(reverse_product)),\n\
-    \              lazy(std::move(lazy_value)),\n              priority(node_priority),\n\
-    \              count(node_count),\n              l(left),\n              r(right),\n\
-    \              rev(reversed),\n              has_lazy(lazy_flag) {}\n    };\n\n\
-    \    struct BuildNode {\n        T val;\n        int priority;\n        int l,\
-    \ r;\n\n        BuildNode(T value, int node_priority) : val(std::move(value)),\
-    \ priority(node_priority), l(-1), r(-1) {}\n    };\n\n    int root;\n    std::uint32_t\
-    \ rng_state;\n    using Pool = detail::PersistentBinaryNodePool<Node>;\n\n   \
-    \ std::shared_ptr<Pool> pool;\n\n    int subtree_size(int t) const {\n       \
-    \ return t == -1 ? 0 : (*pool)[t].count;\n    }\n\n    T node_prod(int t) const\
-    \ {\n        return t == -1 ? ActedMonoid::id() : (*pool)[t].prod;\n    }\n\n\
-    \    T node_rprod(int t) const {\n        return t == -1 ? ActedMonoid::id() :\
-    \ (*pool)[t].rprod;\n    }\n\n    static std::uint32_t next_state(std::uint32_t\
-    \ state) {\n        state ^= state << 13;\n        state ^= state >> 17;\n   \
-    \     state ^= state << 5;\n        return state == 0 ? 1 : state;\n    }\n\n\
-    \    static int next_priority(std::uint32_t& state) {\n        state = next_state(state);\n\
-    \        return int(state);\n    }\n\n    template <typename U>\n    static T\
-    \ make_value(const U& value) {\n        if constexpr (requires(U x) { ActedMonoid::make(x);\
-    \ }) {\n            return ActedMonoid::make(value);\n        } else {\n     \
-    \       return static_cast<T>(value);\n        }\n    }\n\n    static T mapping_at(const\
-    \ F& f, const T& value, long long ord) {\n        if constexpr (requires(F g,\
-    \ T x, long long i) { ActedMonoid::mapping(g, x, i); }) {\n            return\
-    \ ActedMonoid::mapping(f, value, ord);\n        } else {\n            return ActedMonoid::mapping(f,\
-    \ value);\n        }\n    }\n\n    static F shift_operator(const F& f, long long\
-    \ ord) {\n        if constexpr (requires(F g, long long i) { ActedMonoid::op_shift(g,\
-    \ i); }) {\n            return ActedMonoid::op_shift(f, ord);\n        } else\
-    \ {\n            return f;\n        }\n    }\n\n    static F reverse_operator(const\
-    \ F& f, long long size) {\n        if constexpr (requires(F g, long long n) {\
-    \ ActedMonoid::op_reverse(g, n); }) {\n            return ActedMonoid::op_reverse(f,\
-    \ size);\n        } else {\n            return f;\n        }\n    }\n\n    F compose_for_child(const\
+    \    }\n\n    bool unique(int node) const {\n        return node == null_node\
+    \ || _references[node] == 1;\n    }\n\n    int clone(int node) {\n        assert(node\
+    \ != null_node && _nodes[node].has_value());\n        return emplace(*_nodes[node]);\n\
+    \    }\n\n    // Returns node itself when it has one owner, otherwise an unowned\
+    \ clone.\n    // A returned clone becomes owned when a root or parent edge retains\
+    \ it.\n    int clone_if_shared(int node) {\n        if (unique(node)) return node;\n\
+    \        return clone(node);\n    }\n\n    void replace(int& edge, int node) {\n\
+    \        if (edge == node) return;\n        retain(node);\n        int old = edge;\n\
+    \        edge = node;\n        release(old);\n    }\n\n    void discard_unreferenced()\
+    \ {\n        while (!_unowned.empty()) {\n            int node = _unowned.back();\n\
+    \            _unowned.pop_back();\n            if (_nodes[node].has_value() &&\
+    \ _references[node] == 0) release_zero(node);\n        }\n    }\n\n    void reserve(std::size_t)\
+    \ {}\n\n    int next_index() const { return _first_free == -1 ? int(_nodes.size())\
+    \ : _first_free; }\n\n    std::size_t size() const { return _live_nodes; }\n};\n\
+    \n}  // namespace detail\n}  // namespace ds\n}  // namespace m1une\n\n\n#line\
+    \ 16 \"ds/dynamic_array/persistent_dynamic_lazy_monoid_array.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace ds {\n\ntemplate <m1une::acted_monoid::IsActedMonoid ActedMonoid>\n\
+    struct PersistentDynamicLazyMonoidArray {\n    using T = typename ActedMonoid::value_type;\n\
+    \    using F = typename ActedMonoid::operator_type;\n\n   private:\n    struct\
+    \ Node {\n        T val, prod, rprod;\n        F lazy;\n        int priority;\n\
+    \        int count;\n        int l, r;\n        bool rev;\n        bool has_lazy;\n\
+    \n        Node(T value, T product, T reverse_product, F lazy_value, int node_priority,\
+    \ int node_count, int left,\n             int right, bool reversed, bool lazy_flag)\n\
+    \            : val(std::move(value)),\n              prod(std::move(product)),\n\
+    \              rprod(std::move(reverse_product)),\n              lazy(std::move(lazy_value)),\n\
+    \              priority(node_priority),\n              count(node_count),\n  \
+    \            l(left),\n              r(right),\n              rev(reversed),\n\
+    \              has_lazy(lazy_flag) {}\n    };\n\n    struct BuildNode {\n    \
+    \    T val;\n        int priority;\n        int l, r;\n\n        BuildNode(T value,\
+    \ int node_priority) : val(std::move(value)), priority(node_priority), l(-1),\
+    \ r(-1) {}\n    };\n\n    int root;\n    std::uint32_t rng_state;\n    using Pool\
+    \ = detail::PersistentBinaryNodePool<Node>;\n\n    std::shared_ptr<Pool> pool;\n\
+    \n    int subtree_size(int t) const {\n        return t == -1 ? 0 : (*pool)[t].count;\n\
+    \    }\n\n    T node_prod(int t) const {\n        return t == -1 ? ActedMonoid::id()\
+    \ : (*pool)[t].prod;\n    }\n\n    T node_rprod(int t) const {\n        return\
+    \ t == -1 ? ActedMonoid::id() : (*pool)[t].rprod;\n    }\n\n    static std::uint32_t\
+    \ next_state(std::uint32_t state) {\n        state ^= state << 13;\n        state\
+    \ ^= state >> 17;\n        state ^= state << 5;\n        return state == 0 ? 1\
+    \ : state;\n    }\n\n    static int next_priority(std::uint32_t& state) {\n  \
+    \      state = next_state(state);\n        return int(state);\n    }\n\n    template\
+    \ <typename U>\n    static T make_value(const U& value) {\n        if constexpr\
+    \ (requires(U x) { ActedMonoid::make(x); }) {\n            return ActedMonoid::make(value);\n\
+    \        } else {\n            return static_cast<T>(value);\n        }\n    }\n\
+    \n    static T mapping_at(const F& f, const T& value, long long ord) {\n     \
+    \   if constexpr (requires(F g, T x, long long i) { ActedMonoid::mapping(g, x,\
+    \ i); }) {\n            return ActedMonoid::mapping(f, value, ord);\n        }\
+    \ else {\n            return ActedMonoid::mapping(f, value);\n        }\n    }\n\
+    \n    static F shift_operator(const F& f, long long ord) {\n        if constexpr\
+    \ (requires(F g, long long i) { ActedMonoid::op_shift(g, i); }) {\n          \
+    \  return ActedMonoid::op_shift(f, ord);\n        } else {\n            return\
+    \ f;\n        }\n    }\n\n    static F reverse_operator(const F& f, long long\
+    \ size) {\n        if constexpr (requires(F g, long long n) { ActedMonoid::op_reverse(g,\
+    \ n); }) {\n            return ActedMonoid::op_reverse(f, size);\n        } else\
+    \ {\n            return f;\n        }\n    }\n\n    F compose_for_child(const\
     \ F& inherited, int t, long long ord) const {\n        F shifted = shift_operator(inherited,\
     \ ord);\n        const Node& node = (*pool)[t];\n        if (!node.has_lazy) return\
     \ shifted;\n        return ActedMonoid::op_comp(shifted, shift_operator(node.lazy,\
@@ -140,14 +152,15 @@ data:
     \ = node.has_lazy ? reverse_operator(node.lazy, node.count) : node.lazy;\n   \
     \     return make_raw_node(std::move(node.val), std::move(node.rprod), std::move(node.prod),\
     \ std::move(lazy),\n                             node.priority, node.count, !node.rev,\
-    \ node.has_lazy, node.l, node.r);\n    }\n\n    int all_apply(int t, const F&\
-    \ f) const {\n        if (t == -1) return -1;\n        Node node = (*pool)[t];\n\
-    \        int left_count = node.rev ? subtree_size(node.r) : subtree_size(node.l);\n\
-    \        return make_raw_node(mapping_at(f, node.val, left_count), mapping_at(f,\
-    \ node.prod, 0),\n                             mapping_at(reverse_operator(f,\
-    \ node.count), node.rprod, 0),\n                             ActedMonoid::op_comp(f,\
-    \ node.lazy), node.priority, node.count, node.rev, true, node.l,\n           \
-    \                  node.r);\n    }\n\n    int push(int t) const {\n        if\
+    \ node.has_lazy, node.l, node.r);\n    }\n\n    void all_apply_to_node(int t,\
+    \ const F& f) const {\n        Node& node = (*pool)[t];\n        int left_count\
+    \ = node.rev ? subtree_size(node.r) : subtree_size(node.l);\n        node.val\
+    \ = mapping_at(f, node.val, left_count);\n        node.prod = mapping_at(f, node.prod,\
+    \ 0);\n        node.rprod = mapping_at(reverse_operator(f, node.count), node.rprod,\
+    \ 0);\n        node.lazy = ActedMonoid::op_comp(f, node.lazy);\n        node.has_lazy\
+    \ = true;\n    }\n\n    int all_apply(int t, const F& f) const {\n        if (t\
+    \ == -1) return -1;\n        int result = pool->clone(t);\n        all_apply_to_node(result,\
+    \ f);\n        return result;\n    }\n\n    int push(int t) const {\n        if\
     \ (t == -1) return -1;\n        const Node& stored = (*pool)[t];\n        if (!stored.rev\
     \ && !stored.has_lazy) return t;\n        Node node = stored;\n        int l =\
     \ node.l;\n        int r = node.r;\n        if (node.rev) {\n            std::swap(l,\
@@ -175,55 +188,101 @@ data:
     \        if (pos == left_count) {\n            return make_node(std::move(val),\
     \ node.priority, false, node.l, node.r);\n        }\n        int r = set_node(node.r,\
     \ pos - left_count - 1, std::move(val));\n        return make_node(std::move(node.val),\
-    \ node.priority, false, node.l, r);\n    }\n\n    T get_value(int t, int pos,\
-    \ F inherited, bool reversed = false) const {\n        while (t != -1) {\n   \
-    \         const Node& node = (*pool)[t];\n            bool cur_reversed = reversed\
-    \ ^ node.rev;\n            int l = cur_reversed ? node.r : node.l;\n         \
-    \   int r = cur_reversed ? node.l : node.r;\n            int left_count = subtree_size(l);\n\
-    \            if (pos < left_count) {\n                inherited = compose_for_child(inherited,\
-    \ t, 0);\n                t = l;\n                reversed = cur_reversed;\n \
-    \           } else if (pos == left_count) {\n                return mapping_at(inherited,\
-    \ node.val, left_count);\n            } else {\n                pos -= left_count\
-    \ + 1;\n                inherited = compose_for_child(inherited, t, left_count\
-    \ + 1);\n                t = r;\n                reversed = cur_reversed;\n  \
-    \          }\n        }\n        return ActedMonoid::id();\n    }\n\n    T prod_dfs(int\
-    \ t, int ql, int qr, int offset, const F& inherited, bool reversed = false) const\
-    \ {\n        if (t == -1 || qr <= offset || offset + (*pool)[t].count <= ql) return\
-    \ ActedMonoid::id();\n        const Node& node = (*pool)[t];\n        bool cur_reversed\
-    \ = reversed ^ node.rev;\n        if (ql <= offset && offset + node.count <= qr)\
-    \ {\n            return mapping_at(inherited, reversed ? node.rprod : node.prod,\
-    \ 0);\n        }\n        int l = cur_reversed ? node.r : node.l;\n        int\
-    \ r = cur_reversed ? node.l : node.r;\n        int left_count = subtree_size(l);\n\
-    \        int node_pos = offset + left_count;\n        T res = prod_dfs(l, ql,\
-    \ qr, offset, compose_for_child(inherited, t, 0), cur_reversed);\n        if (ql\
-    \ <= node_pos && node_pos < qr) res = ActedMonoid::op(res, mapping_at(inherited,\
-    \ node.val, left_count));\n        return ActedMonoid::op(\n            res, prod_dfs(r,\
-    \ ql, qr, node_pos + 1, compose_for_child(inherited, t, left_count + 1),\n   \
-    \                       cur_reversed));\n    }\n\n    void dump_dfs(int t, std::vector<T>&\
-    \ res, const F& inherited, bool reversed = false) const {\n        if (t == -1)\
-    \ return;\n        const Node& node = (*pool)[t];\n        bool cur_reversed =\
-    \ reversed ^ node.rev;\n        int l = cur_reversed ? node.r : node.l;\n    \
-    \    int r = cur_reversed ? node.l : node.r;\n        int left_count = subtree_size(l);\n\
-    \        dump_dfs(l, res, compose_for_child(inherited, t, 0), cur_reversed);\n\
-    \        res.push_back(mapping_at(inherited, node.val, left_count));\n       \
-    \ dump_dfs(r, res, compose_for_child(inherited, t, left_count + 1), cur_reversed);\n\
-    \    }\n\n    void dump_range_dfs(int t, int ql, int qr, int offset, std::vector<T>&\
-    \ res, const F& inherited,\n                        bool reversed = false) const\
-    \ {\n        if (t == -1 || qr <= offset || offset + (*pool)[t].count <= ql) return;\n\
-    \        const Node& node = (*pool)[t];\n        bool cur_reversed = reversed\
-    \ ^ node.rev;\n        int l = cur_reversed ? node.r : node.l;\n        int r\
-    \ = cur_reversed ? node.l : node.r;\n        int left_count = subtree_size(l);\n\
-    \        int node_pos = offset + left_count;\n        dump_range_dfs(l, ql, qr,\
-    \ offset, res, compose_for_child(inherited, t, 0), cur_reversed);\n        if\
-    \ (ql <= node_pos && node_pos < qr) res.push_back(mapping_at(inherited, node.val,\
-    \ left_count));\n        dump_range_dfs(r, ql, qr, node_pos + 1, res, compose_for_child(inherited,\
-    \ t, left_count + 1),\n                       cur_reversed);\n    }\n\n    int\
-    \ build_from_nodes(std::vector<BuildNode>& nodes, int t) const {\n        if (t\
-    \ == -1) return -1;\n        int l = build_from_nodes(nodes, nodes[t].l);\n  \
-    \      int r = build_from_nodes(nodes, nodes[t].r);\n        return make_node(std::move(nodes[t].val),\
-    \ nodes[t].priority, false, l, r);\n    }\n\n    int build_cartesian(std::vector<BuildNode>&\
-    \ nodes) const {\n        if (nodes.empty()) return -1;\n        std::vector<int>\
-    \ stack;\n        stack.reserve(nodes.size());\n        for (int i = 0; i < int(nodes.size());\
+    \ node.priority, false, node.l, r);\n    }\n\n    void reverse_node_inplace(int\
+    \ t) const {\n        Node& node = (*pool)[t];\n        std::swap(node.prod, node.rprod);\n\
+    \        if (node.has_lazy) node.lazy = reverse_operator(node.lazy, node.count);\n\
+    \        node.rev = !node.rev;\n    }\n\n    int reverse_node_cow(int t) const\
+    \ {\n        if (t == -1) return -1;\n        t = pool->clone_if_shared(t);\n\
+    \        reverse_node_inplace(t);\n        return t;\n    }\n\n    int all_apply_cow(int\
+    \ t, const F& f) const {\n        if (t == -1) return -1;\n        t = pool->clone_if_shared(t);\n\
+    \        all_apply_to_node(t, f);\n        return t;\n    }\n\n    void pull(int\
+    \ t) const {\n        Node& node = (*pool)[t];\n        node.prod = ActedMonoid::op(ActedMonoid::op(node_prod(node.l),\
+    \ node.val), node_prod(node.r));\n        node.rprod = ActedMonoid::op(ActedMonoid::op(node_rprod(node.r),\
+    \ node.val), node_rprod(node.l));\n    }\n\n    void push_inplace(int t) const\
+    \ {\n        if (!(*pool)[t].rev && !(*pool)[t].has_lazy) return;\n        const\
+    \ bool reversed = (*pool)[t].rev;\n        const bool has_lazy = (*pool)[t].has_lazy;\n\
+    \        F lazy = (*pool)[t].lazy;\n        int left = (*pool)[t].l;\n       \
+    \ int right = (*pool)[t].r;\n        if (reversed) {\n            int new_left\
+    \ = reverse_node_cow(right);\n            int new_right = reverse_node_cow(left);\n\
+    \            // Keep both children alive while the two owning edges are swapped.\n\
+    \            pool->retain(new_left);\n            pool->retain(new_right);\n \
+    \           pool->replace((*pool)[t].l, new_left);\n            pool->replace((*pool)[t].r,\
+    \ new_right);\n            pool->release(new_left);\n            pool->release(new_right);\n\
+    \        }\n        if (has_lazy) {\n            left = all_apply_cow((*pool)[t].l,\
+    \ lazy);\n            pool->replace((*pool)[t].l, left);\n            right =\
+    \ all_apply_cow((*pool)[t].r, shift_operator(lazy, subtree_size(left) + 1));\n\
+    \            pool->replace((*pool)[t].r, right);\n        }\n        Node& node\
+    \ = (*pool)[t];\n        node.lazy = ActedMonoid::op_id();\n        node.rev =\
+    \ false;\n        node.has_lazy = false;\n        pull(t);\n    }\n\n    int set_node_inplace(int\
+    \ t, int pos, T val) const {\n        t = pool->clone_if_shared(t);\n        push_inplace(t);\n\
+    \        int left_count = subtree_size((*pool)[t].l);\n        if (pos < left_count)\
+    \ {\n            int child = set_node_inplace((*pool)[t].l, pos, std::move(val));\n\
+    \            pool->replace((*pool)[t].l, child);\n        } else if (pos == left_count)\
+    \ {\n            (*pool)[t].val = std::move(val);\n        } else {\n        \
+    \    int child = set_node_inplace((*pool)[t].r, pos - left_count - 1, std::move(val));\n\
+    \            pool->replace((*pool)[t].r, child);\n        }\n        pull(t);\n\
+    \        return t;\n    }\n\n    int apply_node_inplace(int t, int offset, int\
+    \ query_left, int query_right, const F& f) const {\n        if (t == -1 || query_right\
+    \ <= offset || offset + subtree_size(t) <= query_left) return t;\n        t =\
+    \ pool->clone_if_shared(t);\n        if (query_left <= offset && offset + subtree_size(t)\
+    \ <= query_right) {\n            all_apply_to_node(t, shift_operator(f, offset\
+    \ - query_left));\n            return t;\n        }\n        push_inplace(t);\n\
+    \        int left_count = subtree_size((*pool)[t].l);\n        int child = apply_node_inplace((*pool)[t].l,\
+    \ offset, query_left, query_right, f);\n        pool->replace((*pool)[t].l, child);\n\
+    \        int position = offset + left_count;\n        if (query_left <= position\
+    \ && position < query_right) {\n            (*pool)[t].val = mapping_at(shift_operator(f,\
+    \ position - query_left), (*pool)[t].val, 0);\n        }\n        child = apply_node_inplace((*pool)[t].r,\
+    \ position + 1, query_left, query_right, f);\n        pool->replace((*pool)[t].r,\
+    \ child);\n        pull(t);\n        return t;\n    }\n\n    T get_value(int t,\
+    \ int pos, F inherited, bool reversed = false) const {\n        while (t != -1)\
+    \ {\n            const Node& node = (*pool)[t];\n            bool cur_reversed\
+    \ = reversed ^ node.rev;\n            int l = cur_reversed ? node.r : node.l;\n\
+    \            int r = cur_reversed ? node.l : node.r;\n            int left_count\
+    \ = subtree_size(l);\n            if (pos < left_count) {\n                inherited\
+    \ = compose_for_child(inherited, t, 0);\n                t = l;\n            \
+    \    reversed = cur_reversed;\n            } else if (pos == left_count) {\n \
+    \               return mapping_at(inherited, node.val, left_count);\n        \
+    \    } else {\n                pos -= left_count + 1;\n                inherited\
+    \ = compose_for_child(inherited, t, left_count + 1);\n                t = r;\n\
+    \                reversed = cur_reversed;\n            }\n        }\n        return\
+    \ ActedMonoid::id();\n    }\n\n    T prod_dfs(int t, int ql, int qr, int offset,\
+    \ const F& inherited, bool reversed = false) const {\n        if (t == -1 || qr\
+    \ <= offset || offset + (*pool)[t].count <= ql) return ActedMonoid::id();\n  \
+    \      const Node& node = (*pool)[t];\n        bool cur_reversed = reversed ^\
+    \ node.rev;\n        if (ql <= offset && offset + node.count <= qr) {\n      \
+    \      return mapping_at(inherited, reversed ? node.rprod : node.prod, 0);\n \
+    \       }\n        int l = cur_reversed ? node.r : node.l;\n        int r = cur_reversed\
+    \ ? node.l : node.r;\n        int left_count = subtree_size(l);\n        int node_pos\
+    \ = offset + left_count;\n        T res = prod_dfs(l, ql, qr, offset, compose_for_child(inherited,\
+    \ t, 0), cur_reversed);\n        if (ql <= node_pos && node_pos < qr) res = ActedMonoid::op(res,\
+    \ mapping_at(inherited, node.val, left_count));\n        return ActedMonoid::op(\n\
+    \            res, prod_dfs(r, ql, qr, node_pos + 1, compose_for_child(inherited,\
+    \ t, left_count + 1),\n                          cur_reversed));\n    }\n\n  \
+    \  void dump_dfs(int t, std::vector<T>& res, const F& inherited, bool reversed\
+    \ = false) const {\n        if (t == -1) return;\n        const Node& node = (*pool)[t];\n\
+    \        bool cur_reversed = reversed ^ node.rev;\n        int l = cur_reversed\
+    \ ? node.r : node.l;\n        int r = cur_reversed ? node.l : node.r;\n      \
+    \  int left_count = subtree_size(l);\n        dump_dfs(l, res, compose_for_child(inherited,\
+    \ t, 0), cur_reversed);\n        res.push_back(mapping_at(inherited, node.val,\
+    \ left_count));\n        dump_dfs(r, res, compose_for_child(inherited, t, left_count\
+    \ + 1), cur_reversed);\n    }\n\n    void dump_range_dfs(int t, int ql, int qr,\
+    \ int offset, std::vector<T>& res, const F& inherited,\n                     \
+    \   bool reversed = false) const {\n        if (t == -1 || qr <= offset || offset\
+    \ + (*pool)[t].count <= ql) return;\n        const Node& node = (*pool)[t];\n\
+    \        bool cur_reversed = reversed ^ node.rev;\n        int l = cur_reversed\
+    \ ? node.r : node.l;\n        int r = cur_reversed ? node.l : node.r;\n      \
+    \  int left_count = subtree_size(l);\n        int node_pos = offset + left_count;\n\
+    \        dump_range_dfs(l, ql, qr, offset, res, compose_for_child(inherited, t,\
+    \ 0), cur_reversed);\n        if (ql <= node_pos && node_pos < qr) res.push_back(mapping_at(inherited,\
+    \ node.val, left_count));\n        dump_range_dfs(r, ql, qr, node_pos + 1, res,\
+    \ compose_for_child(inherited, t, left_count + 1),\n                       cur_reversed);\n\
+    \    }\n\n    int build_from_nodes(std::vector<BuildNode>& nodes, int t) const\
+    \ {\n        if (t == -1) return -1;\n        int l = build_from_nodes(nodes,\
+    \ nodes[t].l);\n        int r = build_from_nodes(nodes, nodes[t].r);\n       \
+    \ return make_node(std::move(nodes[t].val), nodes[t].priority, false, l, r);\n\
+    \    }\n\n    int build_cartesian(std::vector<BuildNode>& nodes) const {\n   \
+    \     if (nodes.empty()) return -1;\n        std::vector<int> stack;\n       \
+    \ stack.reserve(nodes.size());\n        for (int i = 0; i < int(nodes.size());\
     \ i++) {\n            int left_child = -1;\n            while (!stack.empty()\
     \ && nodes[stack.back()].priority < nodes[i].priority) {\n                left_child\
     \ = stack.back();\n                stack.pop_back();\n            }\n        \
@@ -339,6 +398,9 @@ data:
     \        assert(!empty());\n        return get(size() - 1);\n    }\n\n    PersistentDynamicLazyMonoidArray\
     \ set(int pos, T value) const {\n        assert(0 <= pos && pos < size());\n \
     \       return make_version(set_node(root, pos, std::move(value)), rng_state);\n\
+    \    }\n\n    void set_inplace(int pos, T value) {\n        assert(0 <= pos &&\
+    \ pos < size());\n        int next_root = set_node_inplace(root, pos, std::move(value));\n\
+    \        pool->replace(root, next_root);\n        pool->discard_unreferenced();\n\
     \    }\n\n    PersistentDynamicLazyMonoidArray reverse(int l, int r) const {\n\
     \        assert(0 <= l && l <= r && r <= size());\n        if (l == r) return\
     \ *this;\n        auto [a, b] = split_node(root, l);\n        auto [mid, c] =\
@@ -356,11 +418,16 @@ data:
     \ const F& f) const {\n        assert(0 <= l && l <= r && r <= size());\n    \
     \    if (l == r) return *this;\n        auto [a, b] = split_node(root, l);\n \
     \       auto [mid, c] = split_node(b, r - l);\n        return make_version(merge(merge(a,\
-    \ all_apply(mid, f)), c), rng_state);\n    }\n\n    T prod(int l, int r) const\
-    \ {\n        assert(0 <= l && l <= r && r <= size());\n        if (l == r) return\
-    \ ActedMonoid::id();\n        return prod_dfs(root, l, r, 0, ActedMonoid::op_id());\n\
-    \    }\n\n    T all_prod() const {\n        return root == -1 ? ActedMonoid::id()\
-    \ : (*pool)[root].prod;\n    }\n\n    std::pair<PersistentDynamicLazyMonoidArray,\
+    \ all_apply(mid, f)), c), rng_state);\n    }\n\n    void apply_inplace(int pos,\
+    \ const F& f) {\n        assert(0 <= pos && pos < size());\n        apply_inplace(pos,\
+    \ pos + 1, f);\n    }\n\n    void apply_inplace(int l, int r, const F& f) {\n\
+    \        assert(0 <= l && l <= r && r <= size());\n        if (l == r) return;\n\
+    \        int next_root = apply_node_inplace(root, 0, l, r, f);\n        pool->replace(root,\
+    \ next_root);\n        pool->discard_unreferenced();\n    }\n\n    T prod(int\
+    \ l, int r) const {\n        assert(0 <= l && l <= r && r <= size());\n      \
+    \  if (l == r) return ActedMonoid::id();\n        return prod_dfs(root, l, r,\
+    \ 0, ActedMonoid::op_id());\n    }\n\n    T all_prod() const {\n        return\
+    \ root == -1 ? ActedMonoid::id() : (*pool)[root].prod;\n    }\n\n    std::pair<PersistentDynamicLazyMonoidArray,\
     \ PersistentDynamicLazyMonoidArray> split(int pos) const {\n        assert(0 <=\
     \ pos && pos <= size());\n        auto [l, r] = split_node(root, pos);\n     \
     \   PersistentDynamicLazyMonoidArray left(l, rng_state, pool);\n        PersistentDynamicLazyMonoidArray\
@@ -435,14 +502,15 @@ data:
     \ = node.has_lazy ? reverse_operator(node.lazy, node.count) : node.lazy;\n   \
     \     return make_raw_node(std::move(node.val), std::move(node.rprod), std::move(node.prod),\
     \ std::move(lazy),\n                             node.priority, node.count, !node.rev,\
-    \ node.has_lazy, node.l, node.r);\n    }\n\n    int all_apply(int t, const F&\
-    \ f) const {\n        if (t == -1) return -1;\n        Node node = (*pool)[t];\n\
-    \        int left_count = node.rev ? subtree_size(node.r) : subtree_size(node.l);\n\
-    \        return make_raw_node(mapping_at(f, node.val, left_count), mapping_at(f,\
-    \ node.prod, 0),\n                             mapping_at(reverse_operator(f,\
-    \ node.count), node.rprod, 0),\n                             ActedMonoid::op_comp(f,\
-    \ node.lazy), node.priority, node.count, node.rev, true, node.l,\n           \
-    \                  node.r);\n    }\n\n    int push(int t) const {\n        if\
+    \ node.has_lazy, node.l, node.r);\n    }\n\n    void all_apply_to_node(int t,\
+    \ const F& f) const {\n        Node& node = (*pool)[t];\n        int left_count\
+    \ = node.rev ? subtree_size(node.r) : subtree_size(node.l);\n        node.val\
+    \ = mapping_at(f, node.val, left_count);\n        node.prod = mapping_at(f, node.prod,\
+    \ 0);\n        node.rprod = mapping_at(reverse_operator(f, node.count), node.rprod,\
+    \ 0);\n        node.lazy = ActedMonoid::op_comp(f, node.lazy);\n        node.has_lazy\
+    \ = true;\n    }\n\n    int all_apply(int t, const F& f) const {\n        if (t\
+    \ == -1) return -1;\n        int result = pool->clone(t);\n        all_apply_to_node(result,\
+    \ f);\n        return result;\n    }\n\n    int push(int t) const {\n        if\
     \ (t == -1) return -1;\n        const Node& stored = (*pool)[t];\n        if (!stored.rev\
     \ && !stored.has_lazy) return t;\n        Node node = stored;\n        int l =\
     \ node.l;\n        int r = node.r;\n        if (node.rev) {\n            std::swap(l,\
@@ -470,55 +538,101 @@ data:
     \        if (pos == left_count) {\n            return make_node(std::move(val),\
     \ node.priority, false, node.l, node.r);\n        }\n        int r = set_node(node.r,\
     \ pos - left_count - 1, std::move(val));\n        return make_node(std::move(node.val),\
-    \ node.priority, false, node.l, r);\n    }\n\n    T get_value(int t, int pos,\
-    \ F inherited, bool reversed = false) const {\n        while (t != -1) {\n   \
-    \         const Node& node = (*pool)[t];\n            bool cur_reversed = reversed\
-    \ ^ node.rev;\n            int l = cur_reversed ? node.r : node.l;\n         \
-    \   int r = cur_reversed ? node.l : node.r;\n            int left_count = subtree_size(l);\n\
-    \            if (pos < left_count) {\n                inherited = compose_for_child(inherited,\
-    \ t, 0);\n                t = l;\n                reversed = cur_reversed;\n \
-    \           } else if (pos == left_count) {\n                return mapping_at(inherited,\
-    \ node.val, left_count);\n            } else {\n                pos -= left_count\
-    \ + 1;\n                inherited = compose_for_child(inherited, t, left_count\
-    \ + 1);\n                t = r;\n                reversed = cur_reversed;\n  \
-    \          }\n        }\n        return ActedMonoid::id();\n    }\n\n    T prod_dfs(int\
-    \ t, int ql, int qr, int offset, const F& inherited, bool reversed = false) const\
-    \ {\n        if (t == -1 || qr <= offset || offset + (*pool)[t].count <= ql) return\
-    \ ActedMonoid::id();\n        const Node& node = (*pool)[t];\n        bool cur_reversed\
-    \ = reversed ^ node.rev;\n        if (ql <= offset && offset + node.count <= qr)\
-    \ {\n            return mapping_at(inherited, reversed ? node.rprod : node.prod,\
-    \ 0);\n        }\n        int l = cur_reversed ? node.r : node.l;\n        int\
-    \ r = cur_reversed ? node.l : node.r;\n        int left_count = subtree_size(l);\n\
-    \        int node_pos = offset + left_count;\n        T res = prod_dfs(l, ql,\
-    \ qr, offset, compose_for_child(inherited, t, 0), cur_reversed);\n        if (ql\
-    \ <= node_pos && node_pos < qr) res = ActedMonoid::op(res, mapping_at(inherited,\
-    \ node.val, left_count));\n        return ActedMonoid::op(\n            res, prod_dfs(r,\
-    \ ql, qr, node_pos + 1, compose_for_child(inherited, t, left_count + 1),\n   \
-    \                       cur_reversed));\n    }\n\n    void dump_dfs(int t, std::vector<T>&\
-    \ res, const F& inherited, bool reversed = false) const {\n        if (t == -1)\
-    \ return;\n        const Node& node = (*pool)[t];\n        bool cur_reversed =\
-    \ reversed ^ node.rev;\n        int l = cur_reversed ? node.r : node.l;\n    \
-    \    int r = cur_reversed ? node.l : node.r;\n        int left_count = subtree_size(l);\n\
-    \        dump_dfs(l, res, compose_for_child(inherited, t, 0), cur_reversed);\n\
-    \        res.push_back(mapping_at(inherited, node.val, left_count));\n       \
-    \ dump_dfs(r, res, compose_for_child(inherited, t, left_count + 1), cur_reversed);\n\
-    \    }\n\n    void dump_range_dfs(int t, int ql, int qr, int offset, std::vector<T>&\
-    \ res, const F& inherited,\n                        bool reversed = false) const\
-    \ {\n        if (t == -1 || qr <= offset || offset + (*pool)[t].count <= ql) return;\n\
-    \        const Node& node = (*pool)[t];\n        bool cur_reversed = reversed\
-    \ ^ node.rev;\n        int l = cur_reversed ? node.r : node.l;\n        int r\
-    \ = cur_reversed ? node.l : node.r;\n        int left_count = subtree_size(l);\n\
-    \        int node_pos = offset + left_count;\n        dump_range_dfs(l, ql, qr,\
-    \ offset, res, compose_for_child(inherited, t, 0), cur_reversed);\n        if\
-    \ (ql <= node_pos && node_pos < qr) res.push_back(mapping_at(inherited, node.val,\
-    \ left_count));\n        dump_range_dfs(r, ql, qr, node_pos + 1, res, compose_for_child(inherited,\
-    \ t, left_count + 1),\n                       cur_reversed);\n    }\n\n    int\
-    \ build_from_nodes(std::vector<BuildNode>& nodes, int t) const {\n        if (t\
-    \ == -1) return -1;\n        int l = build_from_nodes(nodes, nodes[t].l);\n  \
-    \      int r = build_from_nodes(nodes, nodes[t].r);\n        return make_node(std::move(nodes[t].val),\
-    \ nodes[t].priority, false, l, r);\n    }\n\n    int build_cartesian(std::vector<BuildNode>&\
-    \ nodes) const {\n        if (nodes.empty()) return -1;\n        std::vector<int>\
-    \ stack;\n        stack.reserve(nodes.size());\n        for (int i = 0; i < int(nodes.size());\
+    \ node.priority, false, node.l, r);\n    }\n\n    void reverse_node_inplace(int\
+    \ t) const {\n        Node& node = (*pool)[t];\n        std::swap(node.prod, node.rprod);\n\
+    \        if (node.has_lazy) node.lazy = reverse_operator(node.lazy, node.count);\n\
+    \        node.rev = !node.rev;\n    }\n\n    int reverse_node_cow(int t) const\
+    \ {\n        if (t == -1) return -1;\n        t = pool->clone_if_shared(t);\n\
+    \        reverse_node_inplace(t);\n        return t;\n    }\n\n    int all_apply_cow(int\
+    \ t, const F& f) const {\n        if (t == -1) return -1;\n        t = pool->clone_if_shared(t);\n\
+    \        all_apply_to_node(t, f);\n        return t;\n    }\n\n    void pull(int\
+    \ t) const {\n        Node& node = (*pool)[t];\n        node.prod = ActedMonoid::op(ActedMonoid::op(node_prod(node.l),\
+    \ node.val), node_prod(node.r));\n        node.rprod = ActedMonoid::op(ActedMonoid::op(node_rprod(node.r),\
+    \ node.val), node_rprod(node.l));\n    }\n\n    void push_inplace(int t) const\
+    \ {\n        if (!(*pool)[t].rev && !(*pool)[t].has_lazy) return;\n        const\
+    \ bool reversed = (*pool)[t].rev;\n        const bool has_lazy = (*pool)[t].has_lazy;\n\
+    \        F lazy = (*pool)[t].lazy;\n        int left = (*pool)[t].l;\n       \
+    \ int right = (*pool)[t].r;\n        if (reversed) {\n            int new_left\
+    \ = reverse_node_cow(right);\n            int new_right = reverse_node_cow(left);\n\
+    \            // Keep both children alive while the two owning edges are swapped.\n\
+    \            pool->retain(new_left);\n            pool->retain(new_right);\n \
+    \           pool->replace((*pool)[t].l, new_left);\n            pool->replace((*pool)[t].r,\
+    \ new_right);\n            pool->release(new_left);\n            pool->release(new_right);\n\
+    \        }\n        if (has_lazy) {\n            left = all_apply_cow((*pool)[t].l,\
+    \ lazy);\n            pool->replace((*pool)[t].l, left);\n            right =\
+    \ all_apply_cow((*pool)[t].r, shift_operator(lazy, subtree_size(left) + 1));\n\
+    \            pool->replace((*pool)[t].r, right);\n        }\n        Node& node\
+    \ = (*pool)[t];\n        node.lazy = ActedMonoid::op_id();\n        node.rev =\
+    \ false;\n        node.has_lazy = false;\n        pull(t);\n    }\n\n    int set_node_inplace(int\
+    \ t, int pos, T val) const {\n        t = pool->clone_if_shared(t);\n        push_inplace(t);\n\
+    \        int left_count = subtree_size((*pool)[t].l);\n        if (pos < left_count)\
+    \ {\n            int child = set_node_inplace((*pool)[t].l, pos, std::move(val));\n\
+    \            pool->replace((*pool)[t].l, child);\n        } else if (pos == left_count)\
+    \ {\n            (*pool)[t].val = std::move(val);\n        } else {\n        \
+    \    int child = set_node_inplace((*pool)[t].r, pos - left_count - 1, std::move(val));\n\
+    \            pool->replace((*pool)[t].r, child);\n        }\n        pull(t);\n\
+    \        return t;\n    }\n\n    int apply_node_inplace(int t, int offset, int\
+    \ query_left, int query_right, const F& f) const {\n        if (t == -1 || query_right\
+    \ <= offset || offset + subtree_size(t) <= query_left) return t;\n        t =\
+    \ pool->clone_if_shared(t);\n        if (query_left <= offset && offset + subtree_size(t)\
+    \ <= query_right) {\n            all_apply_to_node(t, shift_operator(f, offset\
+    \ - query_left));\n            return t;\n        }\n        push_inplace(t);\n\
+    \        int left_count = subtree_size((*pool)[t].l);\n        int child = apply_node_inplace((*pool)[t].l,\
+    \ offset, query_left, query_right, f);\n        pool->replace((*pool)[t].l, child);\n\
+    \        int position = offset + left_count;\n        if (query_left <= position\
+    \ && position < query_right) {\n            (*pool)[t].val = mapping_at(shift_operator(f,\
+    \ position - query_left), (*pool)[t].val, 0);\n        }\n        child = apply_node_inplace((*pool)[t].r,\
+    \ position + 1, query_left, query_right, f);\n        pool->replace((*pool)[t].r,\
+    \ child);\n        pull(t);\n        return t;\n    }\n\n    T get_value(int t,\
+    \ int pos, F inherited, bool reversed = false) const {\n        while (t != -1)\
+    \ {\n            const Node& node = (*pool)[t];\n            bool cur_reversed\
+    \ = reversed ^ node.rev;\n            int l = cur_reversed ? node.r : node.l;\n\
+    \            int r = cur_reversed ? node.l : node.r;\n            int left_count\
+    \ = subtree_size(l);\n            if (pos < left_count) {\n                inherited\
+    \ = compose_for_child(inherited, t, 0);\n                t = l;\n            \
+    \    reversed = cur_reversed;\n            } else if (pos == left_count) {\n \
+    \               return mapping_at(inherited, node.val, left_count);\n        \
+    \    } else {\n                pos -= left_count + 1;\n                inherited\
+    \ = compose_for_child(inherited, t, left_count + 1);\n                t = r;\n\
+    \                reversed = cur_reversed;\n            }\n        }\n        return\
+    \ ActedMonoid::id();\n    }\n\n    T prod_dfs(int t, int ql, int qr, int offset,\
+    \ const F& inherited, bool reversed = false) const {\n        if (t == -1 || qr\
+    \ <= offset || offset + (*pool)[t].count <= ql) return ActedMonoid::id();\n  \
+    \      const Node& node = (*pool)[t];\n        bool cur_reversed = reversed ^\
+    \ node.rev;\n        if (ql <= offset && offset + node.count <= qr) {\n      \
+    \      return mapping_at(inherited, reversed ? node.rprod : node.prod, 0);\n \
+    \       }\n        int l = cur_reversed ? node.r : node.l;\n        int r = cur_reversed\
+    \ ? node.l : node.r;\n        int left_count = subtree_size(l);\n        int node_pos\
+    \ = offset + left_count;\n        T res = prod_dfs(l, ql, qr, offset, compose_for_child(inherited,\
+    \ t, 0), cur_reversed);\n        if (ql <= node_pos && node_pos < qr) res = ActedMonoid::op(res,\
+    \ mapping_at(inherited, node.val, left_count));\n        return ActedMonoid::op(\n\
+    \            res, prod_dfs(r, ql, qr, node_pos + 1, compose_for_child(inherited,\
+    \ t, left_count + 1),\n                          cur_reversed));\n    }\n\n  \
+    \  void dump_dfs(int t, std::vector<T>& res, const F& inherited, bool reversed\
+    \ = false) const {\n        if (t == -1) return;\n        const Node& node = (*pool)[t];\n\
+    \        bool cur_reversed = reversed ^ node.rev;\n        int l = cur_reversed\
+    \ ? node.r : node.l;\n        int r = cur_reversed ? node.l : node.r;\n      \
+    \  int left_count = subtree_size(l);\n        dump_dfs(l, res, compose_for_child(inherited,\
+    \ t, 0), cur_reversed);\n        res.push_back(mapping_at(inherited, node.val,\
+    \ left_count));\n        dump_dfs(r, res, compose_for_child(inherited, t, left_count\
+    \ + 1), cur_reversed);\n    }\n\n    void dump_range_dfs(int t, int ql, int qr,\
+    \ int offset, std::vector<T>& res, const F& inherited,\n                     \
+    \   bool reversed = false) const {\n        if (t == -1 || qr <= offset || offset\
+    \ + (*pool)[t].count <= ql) return;\n        const Node& node = (*pool)[t];\n\
+    \        bool cur_reversed = reversed ^ node.rev;\n        int l = cur_reversed\
+    \ ? node.r : node.l;\n        int r = cur_reversed ? node.l : node.r;\n      \
+    \  int left_count = subtree_size(l);\n        int node_pos = offset + left_count;\n\
+    \        dump_range_dfs(l, ql, qr, offset, res, compose_for_child(inherited, t,\
+    \ 0), cur_reversed);\n        if (ql <= node_pos && node_pos < qr) res.push_back(mapping_at(inherited,\
+    \ node.val, left_count));\n        dump_range_dfs(r, ql, qr, node_pos + 1, res,\
+    \ compose_for_child(inherited, t, left_count + 1),\n                       cur_reversed);\n\
+    \    }\n\n    int build_from_nodes(std::vector<BuildNode>& nodes, int t) const\
+    \ {\n        if (t == -1) return -1;\n        int l = build_from_nodes(nodes,\
+    \ nodes[t].l);\n        int r = build_from_nodes(nodes, nodes[t].r);\n       \
+    \ return make_node(std::move(nodes[t].val), nodes[t].priority, false, l, r);\n\
+    \    }\n\n    int build_cartesian(std::vector<BuildNode>& nodes) const {\n   \
+    \     if (nodes.empty()) return -1;\n        std::vector<int> stack;\n       \
+    \ stack.reserve(nodes.size());\n        for (int i = 0; i < int(nodes.size());\
     \ i++) {\n            int left_child = -1;\n            while (!stack.empty()\
     \ && nodes[stack.back()].priority < nodes[i].priority) {\n                left_child\
     \ = stack.back();\n                stack.pop_back();\n            }\n        \
@@ -634,6 +748,9 @@ data:
     \        assert(!empty());\n        return get(size() - 1);\n    }\n\n    PersistentDynamicLazyMonoidArray\
     \ set(int pos, T value) const {\n        assert(0 <= pos && pos < size());\n \
     \       return make_version(set_node(root, pos, std::move(value)), rng_state);\n\
+    \    }\n\n    void set_inplace(int pos, T value) {\n        assert(0 <= pos &&\
+    \ pos < size());\n        int next_root = set_node_inplace(root, pos, std::move(value));\n\
+    \        pool->replace(root, next_root);\n        pool->discard_unreferenced();\n\
     \    }\n\n    PersistentDynamicLazyMonoidArray reverse(int l, int r) const {\n\
     \        assert(0 <= l && l <= r && r <= size());\n        if (l == r) return\
     \ *this;\n        auto [a, b] = split_node(root, l);\n        auto [mid, c] =\
@@ -651,11 +768,16 @@ data:
     \ const F& f) const {\n        assert(0 <= l && l <= r && r <= size());\n    \
     \    if (l == r) return *this;\n        auto [a, b] = split_node(root, l);\n \
     \       auto [mid, c] = split_node(b, r - l);\n        return make_version(merge(merge(a,\
-    \ all_apply(mid, f)), c), rng_state);\n    }\n\n    T prod(int l, int r) const\
-    \ {\n        assert(0 <= l && l <= r && r <= size());\n        if (l == r) return\
-    \ ActedMonoid::id();\n        return prod_dfs(root, l, r, 0, ActedMonoid::op_id());\n\
-    \    }\n\n    T all_prod() const {\n        return root == -1 ? ActedMonoid::id()\
-    \ : (*pool)[root].prod;\n    }\n\n    std::pair<PersistentDynamicLazyMonoidArray,\
+    \ all_apply(mid, f)), c), rng_state);\n    }\n\n    void apply_inplace(int pos,\
+    \ const F& f) {\n        assert(0 <= pos && pos < size());\n        apply_inplace(pos,\
+    \ pos + 1, f);\n    }\n\n    void apply_inplace(int l, int r, const F& f) {\n\
+    \        assert(0 <= l && l <= r && r <= size());\n        if (l == r) return;\n\
+    \        int next_root = apply_node_inplace(root, 0, l, r, f);\n        pool->replace(root,\
+    \ next_root);\n        pool->discard_unreferenced();\n    }\n\n    T prod(int\
+    \ l, int r) const {\n        assert(0 <= l && l <= r && r <= size());\n      \
+    \  if (l == r) return ActedMonoid::id();\n        return prod_dfs(root, l, r,\
+    \ 0, ActedMonoid::op_id());\n    }\n\n    T all_prod() const {\n        return\
+    \ root == -1 ? ActedMonoid::id() : (*pool)[root].prod;\n    }\n\n    std::pair<PersistentDynamicLazyMonoidArray,\
     \ PersistentDynamicLazyMonoidArray> split(int pos) const {\n        assert(0 <=\
     \ pos && pos <= size());\n        auto [l, r] = split_node(root, pos);\n     \
     \   PersistentDynamicLazyMonoidArray left(l, rng_state, pool);\n        PersistentDynamicLazyMonoidArray\
@@ -676,12 +798,13 @@ data:
   isVerificationFile: false
   path: ds/dynamic_array/persistent_dynamic_lazy_monoid_array.hpp
   requiredBy: []
-  timestamp: '2026-08-11 13:59:43+09:00'
+  timestamp: '2026-08-12 03:11:00+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array_range_ap.test.cpp
   - verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array.test.cpp
   - verify/ds/persistent_release.test.cpp
+  - verify/ds/persistent_cow.test.cpp
 documentation_of: ds/dynamic_array/persistent_dynamic_lazy_monoid_array.hpp
 layout: document
 title: Persistent Dynamic Lazy Monoid Array
@@ -694,6 +817,12 @@ title: Persistent Dynamic Lazy Monoid Array
 Nodes live in a shared stable-slot pool and store integer child indices. Intrusive reference counts reclaim nodes after their final dependent version or parent is released, and later updates reuse their slots.
 
 It supports insertion, deletion, reversal, rotation, point assignment, range application, range products, splitting, and concatenation.
+
+`set_inplace` and `apply_inplace` mutate a working version with copy-on-write.
+They clone shared path nodes before writes, including propagation of pending
+reversal and action tags, while unique nodes are reused. Other live versions
+remain unchanged. Structural treap operations keep their persistent-returning
+interface.
 
 ## Template Parameters
 
@@ -709,7 +838,10 @@ It supports insertion, deletion, reversal, rotation, point assignment, range app
 | `insert`, `push_back`, `push_front`, `append` | Return a version with values inserted. Another version sharing the pool reuses its nodes; an independently constructed array is copied into this pool. | Expected $O(\log N)$ for one value or a shared-pool version; $O(M + \log N)$ for a vector or independent array |
 | `erase`, `pop_back`, `pop_front` | Return a version with values removed. | Expected $O(\log N)$ |
 | `set` | Returns a version with one value replaced. | Expected $O(\log N)$ |
+| `set_inplace(int pos, T value)` | Replaces one value in this version using copy-on-write. | Expected $O(\log N)$ |
 | `apply` | Returns a version with an operator applied to one value or a half-open range. | Expected $O(\log N)$ |
+| `apply_inplace(int pos, const F& f)` | Applies an operator to one value in this version using copy-on-write. | Expected $O(\log N)$ |
+| `apply_inplace(int l, int r, const F& f)` | Applies an operator to `[l, r)` in this version using copy-on-write. | Expected $O(\log N)$ |
 | `reverse`, `rotate` | Return versions with sequence order changed. | Expected $O(\log N)$; whole-sequence `reverse()` is $O(1)$ |
 | `prod`, `all_prod` | Return acted-monoid products over a range or the whole sequence. | Expected $O(\log N)$ for `prod`; $O(1)$ for `all_prod` |
 | `split`, `split_off` | Return persistent split versions. | Expected $O(\log N)$ |

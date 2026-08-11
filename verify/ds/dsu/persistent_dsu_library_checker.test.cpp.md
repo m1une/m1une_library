@@ -300,39 +300,53 @@ data:
     \            ++_references[node];\n        }\n    }\n\n    void release(int node)\
     \ {\n        if (node == null_node) return;\n        assert(_nodes[node].has_value()\
     \ && _references[node] > 0);\n        if (--_references[node] == 0) release_zero(node);\n\
-    \    }\n\n    void discard_unreferenced() {\n        while (!_unowned.empty())\
-    \ {\n            int node = _unowned.back();\n            _unowned.pop_back();\n\
-    \            if (_nodes[node].has_value() && _references[node] == 0) release_zero(node);\n\
-    \        }\n    }\n\n    void reserve(std::size_t) {}\n\n    int next_index()\
-    \ const { return _first_free == -1 ? int(_nodes.size()) : _first_free; }\n\n \
-    \   std::size_t size() const { return _live_nodes; }\n};\n\n}  // namespace detail\n\
-    }  // namespace ds\n}  // namespace m1une\n\n\n#line 12 \"ds/dsu/persistent_dsu.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\n\nstruct PersistentDsu {\n   private:\n\
-    \    struct Node {\n        int val;\n        int l, r;\n\n        Node() : val(0),\
-    \ l(0), r(0) {}\n        explicit Node(int value) : val(value), l(0), r(0) {}\n\
-    \        Node(int value, int left, int right) : val(value), l(left), r(right)\
-    \ {}\n    };\n\n    int _n;\n    int _root;\n    using Pool = detail::PersistentBinaryNodePool<Node,\
-    \ 0>;\n\n    std::shared_ptr<Pool> _pool;\n\n    explicit PersistentDsu(int n,\
-    \ int root, std::shared_ptr<Pool> pool)\n        : _n(n), _root(root), _pool(std::move(pool))\
-    \ {\n        _pool->retain(_root);\n    }\n\n    int new_node(const Node& node)\
-    \ const {\n        return _pool->emplace(node);\n    }\n\n    int new_node(Node&&\
-    \ node) const {\n        return _pool->emplace(std::move(node));\n    }\n\n  \
-    \  int build(int l, int r) const {\n        if (l == r) return 0;\n        if\
-    \ (r - l == 1) return new_node(Node(-1));\n        int m = (l + r) >> 1;\n   \
-    \     int left = build(l, m);\n        int right = build(m, r);\n        return\
-    \ new_node(Node(0, left, right));\n    }\n\n    int set_node(int t, int l, int\
-    \ r, int p, int value) const {\n        if (r - l == 1) return new_node(Node(value));\n\
-    \        int m = (l + r) >> 1;\n            int left = (*_pool)[t].l;\n      \
-    \      int right = (*_pool)[t].r;\n        if (p < m) {\n            left = set_node(left,\
-    \ l, m, p, value);\n        } else {\n            right = set_node(right, m, r,\
-    \ p, value);\n        }\n        return new_node(Node(0, left, right));\n    }\n\
-    \n    PersistentDsu make_version(int root) const {\n        PersistentDsu result(_n,\
-    \ root, _pool);\n        _pool->discard_unreferenced();\n        return result;\n\
-    \    }\n\n    int get_node(int t, int l, int r, int p) const {\n        while\
-    \ (r - l > 1) {\n            int m = (l + r) >> 1;\n            if (p < m) {\n\
-    \                t = (*_pool)[t].l;\n                r = m;\n            } else\
-    \ {\n                t = (*_pool)[t].r;\n                l = m;\n            }\n\
-    \        }\n        return (*_pool)[t].val;\n    }\n\n   public:\n    PersistentDsu()\
+    \    }\n\n    bool unique(int node) const {\n        return node == null_node\
+    \ || _references[node] == 1;\n    }\n\n    int clone(int node) {\n        assert(node\
+    \ != null_node && _nodes[node].has_value());\n        return emplace(*_nodes[node]);\n\
+    \    }\n\n    // Returns node itself when it has one owner, otherwise an unowned\
+    \ clone.\n    // A returned clone becomes owned when a root or parent edge retains\
+    \ it.\n    int clone_if_shared(int node) {\n        if (unique(node)) return node;\n\
+    \        return clone(node);\n    }\n\n    void replace(int& edge, int node) {\n\
+    \        if (edge == node) return;\n        retain(node);\n        int old = edge;\n\
+    \        edge = node;\n        release(old);\n    }\n\n    void discard_unreferenced()\
+    \ {\n        while (!_unowned.empty()) {\n            int node = _unowned.back();\n\
+    \            _unowned.pop_back();\n            if (_nodes[node].has_value() &&\
+    \ _references[node] == 0) release_zero(node);\n        }\n    }\n\n    void reserve(std::size_t)\
+    \ {}\n\n    int next_index() const { return _first_free == -1 ? int(_nodes.size())\
+    \ : _first_free; }\n\n    std::size_t size() const { return _live_nodes; }\n};\n\
+    \n}  // namespace detail\n}  // namespace ds\n}  // namespace m1une\n\n\n#line\
+    \ 12 \"ds/dsu/persistent_dsu.hpp\"\n\nnamespace m1une {\nnamespace ds {\n\nstruct\
+    \ PersistentDsu {\n   private:\n    struct Node {\n        int val;\n        int\
+    \ l, r;\n\n        Node() : val(0), l(0), r(0) {}\n        explicit Node(int value)\
+    \ : val(value), l(0), r(0) {}\n        Node(int value, int left, int right) :\
+    \ val(value), l(left), r(right) {}\n    };\n\n    int _n;\n    int _root;\n  \
+    \  using Pool = detail::PersistentBinaryNodePool<Node, 0>;\n\n    std::shared_ptr<Pool>\
+    \ _pool;\n\n    explicit PersistentDsu(int n, int root, std::shared_ptr<Pool>\
+    \ pool)\n        : _n(n), _root(root), _pool(std::move(pool)) {\n        _pool->retain(_root);\n\
+    \    }\n\n    int new_node(const Node& node) const {\n        return _pool->emplace(node);\n\
+    \    }\n\n    int new_node(Node&& node) const {\n        return _pool->emplace(std::move(node));\n\
+    \    }\n\n    int build(int l, int r) const {\n        if (l == r) return 0;\n\
+    \        if (r - l == 1) return new_node(Node(-1));\n        int m = (l + r) >>\
+    \ 1;\n        int left = build(l, m);\n        int right = build(m, r);\n    \
+    \    return new_node(Node(0, left, right));\n    }\n\n    int set_node(int t,\
+    \ int l, int r, int p, int value, bool copy_on_write = false) const {\n      \
+    \  if (copy_on_write) t = _pool->clone_if_shared(t);\n        if (r - l == 1)\
+    \ {\n            if (copy_on_write) {\n                (*_pool)[t].val = value;\n\
+    \                return t;\n            }\n            return new_node(Node(value));\n\
+    \        }\n        int m = (l + r) >> 1;\n        int left = (*_pool)[t].l;\n\
+    \        int right = (*_pool)[t].r;\n        if (p < m) {\n            left =\
+    \ set_node(left, l, m, p, value, copy_on_write);\n        } else {\n         \
+    \   right = set_node(right, m, r, p, value, copy_on_write);\n        }\n     \
+    \   if (copy_on_write) {\n            _pool->replace((*_pool)[t].l, left);\n \
+    \           _pool->replace((*_pool)[t].r, right);\n            return t;\n   \
+    \     }\n        return new_node(Node(0, left, right));\n    }\n\n    PersistentDsu\
+    \ make_version(int root) const {\n        PersistentDsu result(_n, root, _pool);\n\
+    \        _pool->discard_unreferenced();\n        return result;\n    }\n\n   \
+    \ int get_node(int t, int l, int r, int p) const {\n        while (r - l > 1)\
+    \ {\n            int m = (l + r) >> 1;\n            if (p < m) {\n           \
+    \     t = (*_pool)[t].l;\n                r = m;\n            } else {\n     \
+    \           t = (*_pool)[t].r;\n                l = m;\n            }\n      \
+    \  }\n        return (*_pool)[t].val;\n    }\n\n   public:\n    PersistentDsu()\
     \ : PersistentDsu(0) {}\n\n    explicit PersistentDsu(int n) : _n(n), _root(0),\
     \ _pool(std::make_shared<Pool>()) {\n        assert(0 <= n);\n        _pool->reserve(n\
     \ * 2 + 1);\n        if (_n > 0) _root = build(0, _n);\n        _pool->retain(_root);\n\
@@ -369,9 +383,16 @@ data:
     \ sy) {\n            std::swap(x, y);\n            std::swap(sx, sy);\n      \
     \  }\n        int root = set_node(_root, 0, _n, x, -(sx + sy));\n        root\
     \ = set_node(root, 0, _n, y, x);\n        return make_version(root);\n    }\n\n\
-    \    std::vector<std::vector<int>> groups() const {\n        std::vector<int>\
-    \ leader_buf(_n), group_size(_n);\n        for (int i = 0; i < _n; i++) {\n  \
-    \          leader_buf[i] = leader(i);\n            group_size[leader_buf[i]]++;\n\
+    \    bool merge_inplace(int a, int b) {\n        assert(0 <= a && a < _n);\n \
+    \       assert(0 <= b && b < _n);\n        int x = leader(a), y = leader(b);\n\
+    \        if (x == y) return false;\n        int sx = -get(x), sy = -get(y);\n\
+    \        if (sx < sy) {\n            std::swap(x, y);\n            std::swap(sx,\
+    \ sy);\n        }\n        int root = set_node(_root, 0, _n, x, -(sx + sy), true);\n\
+    \        _pool->replace(_root, root);\n        root = set_node(_root, 0, _n, y,\
+    \ x, true);\n        _pool->replace(_root, root);\n        _pool->discard_unreferenced();\n\
+    \        return true;\n    }\n\n    std::vector<std::vector<int>> groups() const\
+    \ {\n        std::vector<int> leader_buf(_n), group_size(_n);\n        for (int\
+    \ i = 0; i < _n; i++) {\n            leader_buf[i] = leader(i);\n            group_size[leader_buf[i]]++;\n\
     \        }\n        std::vector<std::vector<int>> result(_n);\n        for (int\
     \ i = 0; i < _n; i++) {\n            result[i].reserve(group_size[i]);\n     \
     \   }\n        for (int i = 0; i < _n; i++) {\n            result[leader_buf[i]].push_back(i);\n\
@@ -405,7 +426,7 @@ data:
   isVerificationFile: true
   path: verify/ds/dsu/persistent_dsu_library_checker.test.cpp
   requiredBy: []
-  timestamp: '2026-08-11 13:59:43+09:00'
+  timestamp: '2026-08-12 03:11:00+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/dsu/persistent_dsu_library_checker.test.cpp

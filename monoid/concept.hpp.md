@@ -151,6 +151,15 @@ data:
     path: verify/ds/dynamic_tree/path_link_cut_tree.test.cpp
     title: verify/ds/dynamic_tree/path_link_cut_tree.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/persistent_cow.test.cpp
+    title: verify/ds/persistent_cow.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/persistent_cow.test.cpp
+    title: verify/ds/persistent_cow.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/persistent_cow.test.cpp
+    title: verify/ds/persistent_cow.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/persistent_release.test.cpp
     title: verify/ds/persistent_release.test.cpp
   - icon: ':heavy_check_mark:'
@@ -385,6 +394,9 @@ data:
   - verify/ds/range_query/range_sort_range_composite.test.cpp
   - verify/ds/range_query/disjoint_sparse_table.test.cpp
   - verify/ds/range_query/sliding_window_aggregation.test.cpp
+  - verify/ds/persistent_cow.test.cpp
+  - verify/ds/persistent_cow.test.cpp
+  - verify/ds/persistent_cow.test.cpp
   - verify/ds/dynamic_connectivity/dynamic_connectivity.test.cpp
   - verify/monoid/commutative_flags.test.cpp
   - verify/monoid/commutative_flags.test.cpp

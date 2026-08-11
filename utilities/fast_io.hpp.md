@@ -217,6 +217,9 @@ data:
     path: verify/ds/interval_set/interval_set.test.cpp
     title: verify/ds/interval_set/interval_set.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/persistent_cow.test.cpp
+    title: verify/ds/persistent_cow.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/persistent_release.test.cpp
     title: verify/ds/persistent_release.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1757,6 +1760,7 @@ data:
   - verify/ds/bst/ordered_multiset.test.cpp
   - verify/ds/bst/predecessor_set.test.cpp
   - verify/ds/bst/persistent_ordered_set.test.cpp
+  - verify/ds/persistent_cow.test.cpp
   - verify/ds/dynamic_connectivity/dynamic_connectivity.test.cpp
   - verify/ds/stack/persistent_stack.test.cpp
   - verify/ds/queue/persistent_queue.test.cpp

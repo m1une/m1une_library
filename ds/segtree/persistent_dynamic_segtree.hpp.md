@@ -13,6 +13,9 @@ data:
   _extendedRequiredBy: []
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/ds/persistent_cow.test.cpp
+    title: verify/ds/persistent_cow.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/persistent_dynamic_segtree.test.cpp
     title: verify/ds/segtree/persistent_dynamic_segtree.test.cpp
   _isVerificationFailed: false
@@ -116,6 +119,11 @@ data:
     \        retain(node.left);\n        retain(node.right);\n        ++live_nodes;\n\
     \        return result;\n    }\n\n    int clone(int node) {\n        assert(node);\n\
     \        Node copy = nodes[node];\n        return emplace(std::move(copy));\n\
+    \    }\n\n    bool unique(int node) const {\n        return !node || nodes[node].references\
+    \ == 1;\n    }\n\n    // Returns node itself when it has one owner, otherwise\
+    \ an unowned clone.\n    // The caller must attach a returned clone with replace()\
+    \ before it can be\n    // released or exposed as a root.\n    int clone_if_shared(int\
+    \ node) {\n        if (unique(node)) return node;\n        return clone(node);\n\
     \    }\n\n    void replace(int& edge, int node) {\n        if (edge == node) return;\n\
     \        retain(node);\n        int old = edge;\n        edge = node;\n      \
     \  release(old);\n    }\n\n    std::size_t size() const { return live_nodes; }\n\
@@ -140,40 +148,52 @@ data:
     \n    const T& value(int t, Index left, Index right, int depth) const {\n    \
     \    if (t) return (*_pool)[t].val;\n        return _config->domain.default_product(depth,\
     \ left, right);\n    }\n\n    int set_node(int t, Index left, Index right, int\
-    \ depth, Index p, T x) const {\n        Index middle = std::midpoint(left, right);\n\
-    \        if (middle == left) return new_node(std::move(x));\n\n        int left_child\
-    \ = t ? (*_pool)[t].left : 0;\n        int right_child = t ? (*_pool)[t].right\
-    \ : 0;\n        if (p < middle) {\n            left_child = set_node(left_child,\
-    \ left, middle, depth + 1, p, std::move(x));\n        } else {\n            right_child\
-    \ = set_node(right_child, middle, right, depth + 1, p, std::move(x));\n      \
-    \  }\n\n        int result = new_node(\n            Monoid::op(value(left_child,\
-    \ left, middle, depth + 1), value(right_child, middle, right, depth + 1)));\n\
-    \        _pool->replace((*_pool)[result].left, left_child);\n        _pool->replace((*_pool)[result].right,\
-    \ right_child);\n        return result;\n    }\n\n    T prod_node(int t, Index\
-    \ left, Index right, int depth, Index query_left, Index query_right) const {\n\
-    \        if (query_right <= left || right <= query_left) return Monoid::id();\n\
-    \        if (query_left <= left && right <= query_right) {\n            return\
-    \ value(t, left, right, depth);\n        }\n        Index middle = std::midpoint(left,\
-    \ right);\n        return Monoid::op(prod_node(t ? (*_pool)[t].left : 0, left,\
-    \ middle, depth + 1, query_left, query_right),\n                          prod_node(t\
-    \ ? (*_pool)[t].right : 0, middle, right, depth + 1, query_left, query_right));\n\
-    \    }\n\n    template <class F>\n    Index max_right_node(int t, Index left,\
-    \ Index right, int depth, Index query_left, T& product, F& predicate) const {\n\
-    \        if (right <= query_left) return right;\n        if (query_left <= left)\
-    \ {\n            T next = Monoid::op(product, value(t, left, right, depth));\n\
-    \            if (predicate(next)) {\n                product = std::move(next);\n\
-    \                return right;\n            }\n            Index middle = std::midpoint(left,\
-    \ right);\n            if (middle == left) return left;\n        }\n\n       \
-    \ Index middle = std::midpoint(left, right);\n        Index result =\n       \
-    \     max_right_node(t ? (*_pool)[t].left : 0, left, middle, depth + 1, query_left,\
-    \ product, predicate);\n        if (result < middle) return result;\n        return\
-    \ max_right_node(t ? (*_pool)[t].right : 0, middle, right, depth + 1, query_left,\
-    \ product, predicate);\n    }\n\n    template <class F>\n    Index min_left_node(int\
-    \ t, Index left, Index right, int depth, Index query_right, T& product, F& predicate)\
-    \ const {\n        if (query_right <= left) return left;\n        if (right <=\
-    \ query_right) {\n            T next = Monoid::op(value(t, left, right, depth),\
-    \ product);\n            if (predicate(next)) {\n                product = std::move(next);\n\
-    \                return left;\n            }\n            Index middle = std::midpoint(left,\
+    \ depth, Index p, T x, bool copy_on_write = false) const {\n        Index middle\
+    \ = std::midpoint(left, right);\n        if (copy_on_write) {\n            int\
+    \ result = t ? _pool->clone_if_shared(t) : new_node(value(0, left, right, depth));\n\
+    \            if (middle == left) {\n                (*_pool)[result].val = std::move(x);\n\
+    \                return result;\n            }\n            int child;\n     \
+    \       if (p < middle) {\n                child = set_node((*_pool)[result].left,\
+    \ left, middle, depth + 1, p, std::move(x), true);\n                _pool->replace((*_pool)[result].left,\
+    \ child);\n            } else {\n                child = set_node((*_pool)[result].right,\
+    \ middle, right, depth + 1, p, std::move(x), true);\n                _pool->replace((*_pool)[result].right,\
+    \ child);\n            }\n            Node& node = (*_pool)[result];\n       \
+    \     node.val = Monoid::op(value(node.left, left, middle, depth + 1),\n     \
+    \                             value(node.right, middle, right, depth + 1));\n\
+    \            return result;\n        }\n        if (middle == left) return new_node(std::move(x));\n\
+    \n        int left_child = t ? (*_pool)[t].left : 0;\n        int right_child\
+    \ = t ? (*_pool)[t].right : 0;\n        if (p < middle) {\n            left_child\
+    \ = set_node(left_child, left, middle, depth + 1, p, std::move(x));\n        }\
+    \ else {\n            right_child = set_node(right_child, middle, right, depth\
+    \ + 1, p, std::move(x));\n        }\n\n        int result = new_node(\n      \
+    \      Monoid::op(value(left_child, left, middle, depth + 1), value(right_child,\
+    \ middle, right, depth + 1)));\n        _pool->replace((*_pool)[result].left,\
+    \ left_child);\n        _pool->replace((*_pool)[result].right, right_child);\n\
+    \        return result;\n    }\n\n    T prod_node(int t, Index left, Index right,\
+    \ int depth, Index query_left, Index query_right) const {\n        if (query_right\
+    \ <= left || right <= query_left) return Monoid::id();\n        if (query_left\
+    \ <= left && right <= query_right) {\n            return value(t, left, right,\
+    \ depth);\n        }\n        Index middle = std::midpoint(left, right);\n   \
+    \     return Monoid::op(prod_node(t ? (*_pool)[t].left : 0, left, middle, depth\
+    \ + 1, query_left, query_right),\n                          prod_node(t ? (*_pool)[t].right\
+    \ : 0, middle, right, depth + 1, query_left, query_right));\n    }\n\n    template\
+    \ <class F>\n    Index max_right_node(int t, Index left, Index right, int depth,\
+    \ Index query_left, T& product, F& predicate) const {\n        if (right <= query_left)\
+    \ return right;\n        if (query_left <= left) {\n            T next = Monoid::op(product,\
+    \ value(t, left, right, depth));\n            if (predicate(next)) {\n       \
+    \         product = std::move(next);\n                return right;\n        \
+    \    }\n            Index middle = std::midpoint(left, right);\n            if\
+    \ (middle == left) return left;\n        }\n\n        Index middle = std::midpoint(left,\
+    \ right);\n        Index result =\n            max_right_node(t ? (*_pool)[t].left\
+    \ : 0, left, middle, depth + 1, query_left, product, predicate);\n        if (result\
+    \ < middle) return result;\n        return max_right_node(t ? (*_pool)[t].right\
+    \ : 0, middle, right, depth + 1, query_left, product, predicate);\n    }\n\n \
+    \   template <class F>\n    Index min_left_node(int t, Index left, Index right,\
+    \ int depth, Index query_right, T& product, F& predicate) const {\n        if\
+    \ (query_right <= left) return left;\n        if (right <= query_right) {\n  \
+    \          T next = Monoid::op(value(t, left, right, depth), product);\n     \
+    \       if (predicate(next)) {\n                product = std::move(next);\n \
+    \               return left;\n            }\n            Index middle = std::midpoint(left,\
     \ right);\n            if (middle == left) return right;\n        }\n\n      \
     \  Index middle = std::midpoint(left, right);\n        Index result =\n      \
     \      min_left_node(t ? (*_pool)[t].right : 0, middle, right, depth + 1, query_right,\
@@ -212,8 +232,11 @@ data:
     \ = 0;\n    }\n\n    PersistentDynamicSegtree set(Index p, T x) const {\n    \
     \    assert(left_bound() <= p && p < right_bound());\n        return PersistentDynamicSegtree(_config,\
     \ _pool,\n                                        set_node(_root, left_bound(),\
-    \ right_bound(), 0, p, std::move(x)));\n    }\n\n    T get(Index p) const {\n\
-    \        assert(left_bound() <= p && p < right_bound());\n        int t = _root;\n\
+    \ right_bound(), 0, p, std::move(x)));\n    }\n\n    void set_inplace(Index p,\
+    \ T x) {\n        assert(left_bound() <= p && p < right_bound());\n        int\
+    \ root = set_node(_root, left_bound(), right_bound(), 0, p, std::move(x), true);\n\
+    \        _pool->replace(_root, root);\n    }\n\n    T get(Index p) const {\n \
+    \       assert(left_bound() <= p && p < right_bound());\n        int t = _root;\n\
     \        Index left = left_bound();\n        Index right = right_bound();\n\n\
     \        while (t) {\n            Index middle = std::midpoint(left, right);\n\
     \            if (middle == left) return (*_pool)[t].val;\n            if (p <\
@@ -259,40 +282,52 @@ data:
     \n    const T& value(int t, Index left, Index right, int depth) const {\n    \
     \    if (t) return (*_pool)[t].val;\n        return _config->domain.default_product(depth,\
     \ left, right);\n    }\n\n    int set_node(int t, Index left, Index right, int\
-    \ depth, Index p, T x) const {\n        Index middle = std::midpoint(left, right);\n\
-    \        if (middle == left) return new_node(std::move(x));\n\n        int left_child\
-    \ = t ? (*_pool)[t].left : 0;\n        int right_child = t ? (*_pool)[t].right\
-    \ : 0;\n        if (p < middle) {\n            left_child = set_node(left_child,\
-    \ left, middle, depth + 1, p, std::move(x));\n        } else {\n            right_child\
-    \ = set_node(right_child, middle, right, depth + 1, p, std::move(x));\n      \
-    \  }\n\n        int result = new_node(\n            Monoid::op(value(left_child,\
-    \ left, middle, depth + 1), value(right_child, middle, right, depth + 1)));\n\
-    \        _pool->replace((*_pool)[result].left, left_child);\n        _pool->replace((*_pool)[result].right,\
-    \ right_child);\n        return result;\n    }\n\n    T prod_node(int t, Index\
-    \ left, Index right, int depth, Index query_left, Index query_right) const {\n\
-    \        if (query_right <= left || right <= query_left) return Monoid::id();\n\
-    \        if (query_left <= left && right <= query_right) {\n            return\
-    \ value(t, left, right, depth);\n        }\n        Index middle = std::midpoint(left,\
-    \ right);\n        return Monoid::op(prod_node(t ? (*_pool)[t].left : 0, left,\
-    \ middle, depth + 1, query_left, query_right),\n                          prod_node(t\
-    \ ? (*_pool)[t].right : 0, middle, right, depth + 1, query_left, query_right));\n\
-    \    }\n\n    template <class F>\n    Index max_right_node(int t, Index left,\
-    \ Index right, int depth, Index query_left, T& product, F& predicate) const {\n\
-    \        if (right <= query_left) return right;\n        if (query_left <= left)\
-    \ {\n            T next = Monoid::op(product, value(t, left, right, depth));\n\
-    \            if (predicate(next)) {\n                product = std::move(next);\n\
-    \                return right;\n            }\n            Index middle = std::midpoint(left,\
-    \ right);\n            if (middle == left) return left;\n        }\n\n       \
-    \ Index middle = std::midpoint(left, right);\n        Index result =\n       \
-    \     max_right_node(t ? (*_pool)[t].left : 0, left, middle, depth + 1, query_left,\
-    \ product, predicate);\n        if (result < middle) return result;\n        return\
-    \ max_right_node(t ? (*_pool)[t].right : 0, middle, right, depth + 1, query_left,\
-    \ product, predicate);\n    }\n\n    template <class F>\n    Index min_left_node(int\
-    \ t, Index left, Index right, int depth, Index query_right, T& product, F& predicate)\
-    \ const {\n        if (query_right <= left) return left;\n        if (right <=\
-    \ query_right) {\n            T next = Monoid::op(value(t, left, right, depth),\
-    \ product);\n            if (predicate(next)) {\n                product = std::move(next);\n\
-    \                return left;\n            }\n            Index middle = std::midpoint(left,\
+    \ depth, Index p, T x, bool copy_on_write = false) const {\n        Index middle\
+    \ = std::midpoint(left, right);\n        if (copy_on_write) {\n            int\
+    \ result = t ? _pool->clone_if_shared(t) : new_node(value(0, left, right, depth));\n\
+    \            if (middle == left) {\n                (*_pool)[result].val = std::move(x);\n\
+    \                return result;\n            }\n            int child;\n     \
+    \       if (p < middle) {\n                child = set_node((*_pool)[result].left,\
+    \ left, middle, depth + 1, p, std::move(x), true);\n                _pool->replace((*_pool)[result].left,\
+    \ child);\n            } else {\n                child = set_node((*_pool)[result].right,\
+    \ middle, right, depth + 1, p, std::move(x), true);\n                _pool->replace((*_pool)[result].right,\
+    \ child);\n            }\n            Node& node = (*_pool)[result];\n       \
+    \     node.val = Monoid::op(value(node.left, left, middle, depth + 1),\n     \
+    \                             value(node.right, middle, right, depth + 1));\n\
+    \            return result;\n        }\n        if (middle == left) return new_node(std::move(x));\n\
+    \n        int left_child = t ? (*_pool)[t].left : 0;\n        int right_child\
+    \ = t ? (*_pool)[t].right : 0;\n        if (p < middle) {\n            left_child\
+    \ = set_node(left_child, left, middle, depth + 1, p, std::move(x));\n        }\
+    \ else {\n            right_child = set_node(right_child, middle, right, depth\
+    \ + 1, p, std::move(x));\n        }\n\n        int result = new_node(\n      \
+    \      Monoid::op(value(left_child, left, middle, depth + 1), value(right_child,\
+    \ middle, right, depth + 1)));\n        _pool->replace((*_pool)[result].left,\
+    \ left_child);\n        _pool->replace((*_pool)[result].right, right_child);\n\
+    \        return result;\n    }\n\n    T prod_node(int t, Index left, Index right,\
+    \ int depth, Index query_left, Index query_right) const {\n        if (query_right\
+    \ <= left || right <= query_left) return Monoid::id();\n        if (query_left\
+    \ <= left && right <= query_right) {\n            return value(t, left, right,\
+    \ depth);\n        }\n        Index middle = std::midpoint(left, right);\n   \
+    \     return Monoid::op(prod_node(t ? (*_pool)[t].left : 0, left, middle, depth\
+    \ + 1, query_left, query_right),\n                          prod_node(t ? (*_pool)[t].right\
+    \ : 0, middle, right, depth + 1, query_left, query_right));\n    }\n\n    template\
+    \ <class F>\n    Index max_right_node(int t, Index left, Index right, int depth,\
+    \ Index query_left, T& product, F& predicate) const {\n        if (right <= query_left)\
+    \ return right;\n        if (query_left <= left) {\n            T next = Monoid::op(product,\
+    \ value(t, left, right, depth));\n            if (predicate(next)) {\n       \
+    \         product = std::move(next);\n                return right;\n        \
+    \    }\n            Index middle = std::midpoint(left, right);\n            if\
+    \ (middle == left) return left;\n        }\n\n        Index middle = std::midpoint(left,\
+    \ right);\n        Index result =\n            max_right_node(t ? (*_pool)[t].left\
+    \ : 0, left, middle, depth + 1, query_left, product, predicate);\n        if (result\
+    \ < middle) return result;\n        return max_right_node(t ? (*_pool)[t].right\
+    \ : 0, middle, right, depth + 1, query_left, product, predicate);\n    }\n\n \
+    \   template <class F>\n    Index min_left_node(int t, Index left, Index right,\
+    \ int depth, Index query_right, T& product, F& predicate) const {\n        if\
+    \ (query_right <= left) return left;\n        if (right <= query_right) {\n  \
+    \          T next = Monoid::op(value(t, left, right, depth), product);\n     \
+    \       if (predicate(next)) {\n                product = std::move(next);\n \
+    \               return left;\n            }\n            Index middle = std::midpoint(left,\
     \ right);\n            if (middle == left) return right;\n        }\n\n      \
     \  Index middle = std::midpoint(left, right);\n        Index result =\n      \
     \      min_left_node(t ? (*_pool)[t].right : 0, middle, right, depth + 1, query_right,\
@@ -331,8 +366,11 @@ data:
     \ = 0;\n    }\n\n    PersistentDynamicSegtree set(Index p, T x) const {\n    \
     \    assert(left_bound() <= p && p < right_bound());\n        return PersistentDynamicSegtree(_config,\
     \ _pool,\n                                        set_node(_root, left_bound(),\
-    \ right_bound(), 0, p, std::move(x)));\n    }\n\n    T get(Index p) const {\n\
-    \        assert(left_bound() <= p && p < right_bound());\n        int t = _root;\n\
+    \ right_bound(), 0, p, std::move(x)));\n    }\n\n    void set_inplace(Index p,\
+    \ T x) {\n        assert(left_bound() <= p && p < right_bound());\n        int\
+    \ root = set_node(_root, left_bound(), right_bound(), 0, p, std::move(x), true);\n\
+    \        _pool->replace(_root, root);\n    }\n\n    T get(Index p) const {\n \
+    \       assert(left_bound() <= p && p < right_bound());\n        int t = _root;\n\
     \        Index left = left_bound();\n        Index right = right_bound();\n\n\
     \        while (t) {\n            Index middle = std::midpoint(left, right);\n\
     \            if (middle == left) return (*_pool)[t].val;\n            if (p <\
@@ -362,10 +400,11 @@ data:
   isVerificationFile: false
   path: ds/segtree/persistent_dynamic_segtree.hpp
   requiredBy: []
-  timestamp: '2026-08-08 16:34:26+09:00'
+  timestamp: '2026-08-12 03:11:00+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/segtree/persistent_dynamic_segtree.test.cpp
+  - verify/ds/persistent_cow.test.cpp
 documentation_of: ds/segtree/persistent_dynamic_segtree.hpp
 layout: document
 title: Persistent Dynamic Segment Tree
@@ -387,6 +426,10 @@ All related versions share immutable domain metadata and one contiguous node
 pool. Read-only queries do not allocate nodes. Products preserve coordinate
 order, so non-commutative monoids are supported. Nodes whose last parent or
 version reference disappears are recycled.
+
+`set_inplace` mutates the current handle with copy-on-write. Shared nodes are
+cloned before modification and unique nodes are reused; all other live versions
+remain unchanged. `set` continues to return a distinct persistent version.
 
 ## Template Parameters
 
@@ -425,6 +468,7 @@ domain length. No tree node is allocated initially.
 | `size_t node_count()` | Returns live nodes in the shared version family. | $O(1)$ |
 | `void release()` | Releases this root and resets the handle to the uniform initial version. | $O(F)$ |
 | `PersistentDynamicSegtree set(Index p, T x)` | Returns a version assigning `x` at `p`. | $O(\log U)$ |
+| `void set_inplace(Index p, T x)` | Assigns `x` in this version using copy-on-write. | $O(\log U)$ |
 | `T get(Index p)` | Returns the value at `p`. | $O(\log U)$ |
 | `T operator[](Index p)` | Equivalent to `get(p)`. | $O(\log U)$ |
 | `T prod(Index l, Index r)` | Returns the monoid product over `[l, r)`. | $O(\log U)$ |

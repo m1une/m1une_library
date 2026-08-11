@@ -129,6 +129,11 @@ data:
     \        retain(node.left);\n        retain(node.right);\n        ++live_nodes;\n\
     \        return result;\n    }\n\n    int clone(int node) {\n        assert(node);\n\
     \        Node copy = nodes[node];\n        return emplace(std::move(copy));\n\
+    \    }\n\n    bool unique(int node) const {\n        return !node || nodes[node].references\
+    \ == 1;\n    }\n\n    // Returns node itself when it has one owner, otherwise\
+    \ an unowned clone.\n    // The caller must attach a returned clone with replace()\
+    \ before it can be\n    // released or exposed as a root.\n    int clone_if_shared(int\
+    \ node) {\n        if (unique(node)) return node;\n        return clone(node);\n\
     \    }\n\n    void replace(int& edge, int node) {\n        if (edge == node) return;\n\
     \        retain(node);\n        int old = edge;\n        edge = node;\n      \
     \  release(old);\n    }\n\n    std::size_t size() const { return live_nodes; }\n\
@@ -151,43 +156,47 @@ data:
     \ Config> config, std::shared_ptr<Pool> pool, int root)\n        : _config(std::move(config)),\
     \ _pool(std::move(pool)), _root(root) {\n        _pool->retain(_root);\n    }\n\
     \n    int new_node() const { return _pool->emplace(); }\n\n    int clone_or_new(int\
-    \ t) const {\n        if (!t) return new_node();\n        return _pool->clone(t);\n\
+    \ t, bool copy_on_write = false) const {\n        if (!t) return new_node();\n\
+    \        return copy_on_write ? _pool->clone_if_shared(t) : _pool->clone(t);\n\
     \    }\n\n    void all_apply_to_node(int t, Index left, Index right, const T&\
     \ x) const {\n        Node& node = (*_pool)[t];\n        if (std::midpoint(left,\
     \ right) == left) {\n            T value = node.has_lazy ? node.val : _config->initial_value;\n\
     \            node.val = Monoid::op(x, value);\n            node.has_lazy = true;\n\
     \        } else {\n            node.val = node.has_lazy ? Monoid::op(x, node.val)\
     \ : x;\n            node.has_lazy = true;\n        }\n    }\n\n    int all_apply_clone(int\
-    \ t, Index left, Index right, const T& x) const {\n        int result = clone_or_new(t);\n\
-    \        all_apply_to_node(result, left, right, x);\n        return result;\n\
-    \    }\n\n    void push(int t, Index left, Index right) const {\n        if (!(*_pool)[t].has_lazy)\
+    \ t, Index left, Index right, const T& x, bool copy_on_write = false) const {\n\
+    \        int result = clone_or_new(t, copy_on_write);\n        all_apply_to_node(result,\
+    \ left, right, x);\n        return result;\n    }\n\n    void push(int t, Index\
+    \ left, Index right, bool copy_on_write = false) const {\n        if (!(*_pool)[t].has_lazy)\
     \ return;\n        Index middle = std::midpoint(left, right);\n        if (middle\
     \ == left) return;\n\n        T lazy = (*_pool)[t].val;\n        int left_child\
-    \ = all_apply_clone((*_pool)[t].left, left, middle, lazy);\n        int right_child\
-    \ = all_apply_clone((*_pool)[t].right, middle, right, lazy);\n\n        Node&\
-    \ node = (*_pool)[t];\n        _pool->replace(node.left, left_child);\n      \
-    \  _pool->replace(node.right, right_child);\n        node.val = Monoid::id();\n\
-    \        node.has_lazy = false;\n    }\n\n    int set_node(int t, Index left,\
-    \ Index right, Index p, T x) const {\n        t = clone_or_new(t);\n        Index\
-    \ middle = std::midpoint(left, right);\n        if (middle == left) {\n      \
-    \      Node& node = (*_pool)[t];\n            node.val = std::move(x);\n     \
-    \       node.has_lazy = true;\n            return t;\n        }\n\n        push(t,\
-    \ left, right);\n        if (p < middle) {\n            int child = set_node((*_pool)[t].left,\
-    \ left, middle, p, std::move(x));\n            _pool->replace((*_pool)[t].left,\
+    \ = all_apply_clone((*_pool)[t].left, left, middle, lazy, copy_on_write);\n  \
+    \      int right_child = all_apply_clone((*_pool)[t].right, middle, right, lazy,\
+    \ copy_on_write);\n\n        Node& node = (*_pool)[t];\n        _pool->replace(node.left,\
+    \ left_child);\n        _pool->replace(node.right, right_child);\n        node.val\
+    \ = Monoid::id();\n        node.has_lazy = false;\n    }\n\n    int set_node(int\
+    \ t, Index left, Index right, Index p, T x, bool copy_on_write = false) const\
+    \ {\n        t = clone_or_new(t, copy_on_write);\n        Index middle = std::midpoint(left,\
+    \ right);\n        if (middle == left) {\n            Node& node = (*_pool)[t];\n\
+    \            node.val = std::move(x);\n            node.has_lazy = true;\n   \
+    \         return t;\n        }\n\n        push(t, left, right, copy_on_write);\n\
+    \        if (p < middle) {\n            int child = set_node((*_pool)[t].left,\
+    \ left, middle, p, std::move(x), copy_on_write);\n            _pool->replace((*_pool)[t].left,\
     \ child);\n        } else {\n            int child = set_node((*_pool)[t].right,\
-    \ middle, right, p, std::move(x));\n            _pool->replace((*_pool)[t].right,\
+    \ middle, right, p, std::move(x), copy_on_write);\n            _pool->replace((*_pool)[t].right,\
     \ child);\n        }\n        return t;\n    }\n\n    int apply_node(int t, Index\
-    \ left, Index right, Index query_left, Index query_right, const T& x) const {\n\
-    \        if (query_right <= left || right <= query_left) return t;\n        if\
-    \ (query_left <= left && right <= query_right) {\n            return all_apply_clone(t,\
-    \ left, right, x);\n        }\n\n        t = clone_or_new(t);\n        push(t,\
-    \ left, right);\n        Index middle = std::midpoint(left, right);\n        int\
-    \ left_child = apply_node((*_pool)[t].left, left, middle, query_left, query_right,\
-    \ x);\n        int right_child = apply_node((*_pool)[t].right, middle, right,\
-    \ query_left, query_right, x);\n        _pool->replace((*_pool)[t].left, left_child);\n\
-    \        _pool->replace((*_pool)[t].right, right_child);\n        return t;\n\
-    \    }\n\n    T compose(const T& inherited, int t) const {\n        if (!t ||\
-    \ !(*_pool)[t].has_lazy) return inherited;\n        return Monoid::op(inherited,\
+    \ left, Index right, Index query_left, Index query_right, const T& x,\n      \
+    \             bool copy_on_write = false) const {\n        if (query_right <=\
+    \ left || right <= query_left) return t;\n        if (query_left <= left && right\
+    \ <= query_right) {\n            return all_apply_clone(t, left, right, x, copy_on_write);\n\
+    \        }\n\n        t = clone_or_new(t, copy_on_write);\n        push(t, left,\
+    \ right, copy_on_write);\n        Index middle = std::midpoint(left, right);\n\
+    \        int left_child = apply_node((*_pool)[t].left, left, middle, query_left,\
+    \ query_right, x, copy_on_write);\n        int right_child = apply_node((*_pool)[t].right,\
+    \ middle, right, query_left, query_right, x, copy_on_write);\n        _pool->replace((*_pool)[t].left,\
+    \ left_child);\n        _pool->replace((*_pool)[t].right, right_child);\n    \
+    \    return t;\n    }\n\n    T compose(const T& inherited, int t) const {\n  \
+    \      if (!t || !(*_pool)[t].has_lazy) return inherited;\n        return Monoid::op(inherited,\
     \ (*_pool)[t].val);\n    }\n\n   public:\n    PersistentDynamicDualSegtree() :\
     \ PersistentDynamicDualSegtree(Index(0), Index(0), Monoid::id()) {}\n\n    explicit\
     \ PersistentDynamicDualSegtree(Index n) : PersistentDynamicDualSegtree(Index(0),\
@@ -223,8 +232,11 @@ data:
     \ set(Index p, T x) const {\n        assert(left_bound() <= p && p < right_bound());\n\
     \        return PersistentDynamicDualSegtree(_config, _pool,\n               \
     \                             set_node(_root, left_bound(), right_bound(), p,\
-    \ std::move(x)));\n    }\n\n    T get(Index p) const {\n        assert(left_bound()\
-    \ <= p && p < right_bound());\n        int t = _root;\n        Index left = left_bound();\n\
+    \ std::move(x)));\n    }\n\n    void set_inplace(Index p, T x) {\n        assert(left_bound()\
+    \ <= p && p < right_bound());\n        int root = set_node(_root, left_bound(),\
+    \ right_bound(), p, std::move(x), true);\n        _pool->replace(_root, root);\n\
+    \    }\n\n    T get(Index p) const {\n        assert(left_bound() <= p && p <\
+    \ right_bound());\n        int t = _root;\n        Index left = left_bound();\n\
     \        Index right = right_bound();\n        T inherited = Monoid::id();\n\n\
     \        while (t) {\n            Index middle = std::midpoint(left, right);\n\
     \            if (middle == left) {\n                T value = (*_pool)[t].has_lazy\
@@ -241,13 +253,18 @@ data:
     \ && right <= right_bound());\n        if (left == right) return *this;\n    \
     \    return PersistentDynamicDualSegtree(_config, _pool,\n                   \
     \                         apply_node(_root, left_bound(), right_bound(), left,\
-    \ right, x));\n    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n#line\
-    \ 4 \"verify/ds/segtree/persistent_dynamic_dual_segtree.test.cpp\"\n\n#line 1\
-    \ \"utilities/fast_io.hpp\"\n\n\n\n#include <algorithm>\n#include <array>\n#include\
-    \ <cerrno>\n#include <charconv>\n#line 9 \"utilities/fast_io.hpp\"\n#include <cstdio>\n\
-    #include <cstdlib>\n#include <cstdint>\n#include <cstring>\n#include <iterator>\n\
-    #include <string>\n#include <sys/stat.h>\n#line 18 \"utilities/fast_io.hpp\"\n\
-    #include <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal\
+    \ right, x));\n    }\n\n    void apply_inplace(Index p, const T& x) {\n      \
+    \  assert(left_bound() <= p && p < right_bound());\n        apply_inplace(p, p\
+    \ + 1, x);\n    }\n\n    void apply_inplace(Index left, Index right, const T&\
+    \ x) {\n        assert(left_bound() <= left && left <= right && right <= right_bound());\n\
+    \        if (left == right) return;\n        int root = apply_node(_root, left_bound(),\
+    \ right_bound(), left, right, x, true);\n        _pool->replace(_root, root);\n\
+    \    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n#line 4 \"verify/ds/segtree/persistent_dynamic_dual_segtree.test.cpp\"\
+    \n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#include <algorithm>\n#include <array>\n\
+    #include <cerrno>\n#include <charconv>\n#line 9 \"utilities/fast_io.hpp\"\n#include\
+    \ <cstdio>\n#include <cstdlib>\n#include <cstdint>\n#include <cstring>\n#include\
+    \ <iterator>\n#include <string>\n#include <sys/stat.h>\n#line 18 \"utilities/fast_io.hpp\"\
+    \n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal\
     \ {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\n\
     struct is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T,\
     \ std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
@@ -601,7 +618,7 @@ data:
   isVerificationFile: true
   path: verify/ds/segtree/persistent_dynamic_dual_segtree.test.cpp
   requiredBy: []
-  timestamp: '2026-08-08 16:34:26+09:00'
+  timestamp: '2026-08-12 03:11:00+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/segtree/persistent_dynamic_dual_segtree.test.cpp

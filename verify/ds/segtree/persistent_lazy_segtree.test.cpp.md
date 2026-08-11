@@ -78,6 +78,11 @@ data:
     \        retain(node.left);\n        retain(node.right);\n        ++live_nodes;\n\
     \        return result;\n    }\n\n    int clone(int node) {\n        assert(node);\n\
     \        Node copy = nodes[node];\n        return emplace(std::move(copy));\n\
+    \    }\n\n    bool unique(int node) const {\n        return !node || nodes[node].references\
+    \ == 1;\n    }\n\n    // Returns node itself when it has one owner, otherwise\
+    \ an unowned clone.\n    // The caller must attach a returned clone with replace()\
+    \ before it can be\n    // released or exposed as a root.\n    int clone_if_shared(int\
+    \ node) {\n        if (unique(node)) return node;\n        return clone(node);\n\
     \    }\n\n    void replace(int& edge, int node) {\n        if (edge == node) return;\n\
     \        retain(node);\n        int old = edge;\n        edge = node;\n      \
     \  release(old);\n    }\n\n    std::size_t size() const { return live_nodes; }\n\
@@ -133,35 +138,39 @@ data:
     \ t, const F& f) const {\n        Node& node = (*_pool)[t];\n        node.val\
     \ = mapping_at(f, node.val, 0);\n        node.lazy = ActedMonoid::op_comp(f, node.lazy);\n\
     \        node.has_lazy = true;\n    }\n\n    int all_apply_clone(int t, const\
-    \ F& f) const {\n        int res = clone_node(t);\n        all_apply_to_node(res,\
-    \ f);\n        return res;\n    }\n\n    void push(int t, int l, int r) const\
-    \ {\n        if (!(*_pool)[t].has_lazy) return;\n        F lazy = (*_pool)[t].lazy;\n\
-    \        int left = (*_pool)[t].left;\n        int right = (*_pool)[t].right;\n\
-    \        int m = (l + r) >> 1;\n        left = all_apply_clone(left, lazy);\n\
-    \        right = all_apply_clone(right, shift_operator(lazy, m - l));\n      \
-    \  Node& node = (*_pool)[t];\n        _pool->replace(node.left, left);\n     \
-    \   _pool->replace(node.right, right);\n        node.lazy = ActedMonoid::op_id();\n\
+    \ F& f, bool copy_on_write = false) const {\n        int res = copy_on_write ?\
+    \ _pool->clone_if_shared(t) : clone_node(t);\n        all_apply_to_node(res, f);\n\
+    \        return res;\n    }\n\n    void push(int t, int l, int r, bool copy_on_write\
+    \ = false) const {\n        if (!(*_pool)[t].has_lazy) return;\n        F lazy\
+    \ = (*_pool)[t].lazy;\n        int left = (*_pool)[t].left;\n        int right\
+    \ = (*_pool)[t].right;\n        int m = (l + r) >> 1;\n        left = all_apply_clone(left,\
+    \ lazy, copy_on_write);\n        right = all_apply_clone(right, shift_operator(lazy,\
+    \ m - l), copy_on_write);\n        Node& node = (*_pool)[t];\n        _pool->replace(node.left,\
+    \ left);\n        _pool->replace(node.right, right);\n        node.lazy = ActedMonoid::op_id();\n\
     \        node.has_lazy = false;\n    }\n\n    void update(int t) const {\n   \
     \     Node& node = (*_pool)[t];\n        node.val = ActedMonoid::op((*_pool)[node.left].val,\
     \ (*_pool)[node.right].val);\n    }\n\n    int set_node(int t, int l, int r, int\
-    \ p, T value) const {\n        t = clone_node(t);\n        if (r - l == 1) {\n\
-    \            Node& node = (*_pool)[t];\n            node.val = std::move(value);\n\
+    \ p, T value, bool copy_on_write = false) const {\n        t = copy_on_write ?\
+    \ _pool->clone_if_shared(t) : clone_node(t);\n        if (r - l == 1) {\n    \
+    \        Node& node = (*_pool)[t];\n            node.val = std::move(value);\n\
     \            node.lazy = ActedMonoid::op_id();\n            node.has_lazy = false;\n\
-    \            return t;\n        }\n        push(t, l, r);\n        int m = (l\
-    \ + r) >> 1;\n        if (p < m) {\n            int child = set_node((*_pool)[t].left,\
-    \ l, m, p, std::move(value));\n            _pool->replace((*_pool)[t].left, child);\n\
-    \        } else {\n            int child = set_node((*_pool)[t].right, m, r, p,\
-    \ std::move(value));\n            _pool->replace((*_pool)[t].right, child);\n\
-    \        }\n        update(t);\n        return t;\n    }\n\n    int apply_node(int\
-    \ t, int l, int r, int ql, int qr, const F& f) const {\n        if (qr <= l ||\
-    \ r <= ql) return t;\n        t = clone_node(t);\n        if (ql <= l && r <=\
-    \ qr) {\n            all_apply_to_node(t, shift_operator(f, l - ql));\n      \
-    \      return t;\n        }\n        push(t, l, r);\n        int m = (l + r) >>\
-    \ 1;\n        int left = apply_node((*_pool)[t].left, l, m, ql, qr, f);\n    \
-    \    int right = apply_node((*_pool)[t].right, m, r, ql, qr, f);\n        _pool->replace((*_pool)[t].left,\
-    \ left);\n        _pool->replace((*_pool)[t].right, right);\n        update(t);\n\
-    \        return t;\n    }\n\n    int copy_range_node(int target, int source, int\
-    \ l, int r, int ql, int qr) const {\n        if (qr <= l || r <= ql) return target;\n\
+    \            return t;\n        }\n        push(t, l, r, copy_on_write);\n   \
+    \     int m = (l + r) >> 1;\n        if (p < m) {\n            int child = set_node((*_pool)[t].left,\
+    \ l, m, p, std::move(value), copy_on_write);\n            _pool->replace((*_pool)[t].left,\
+    \ child);\n        } else {\n            int child = set_node((*_pool)[t].right,\
+    \ m, r, p, std::move(value), copy_on_write);\n            _pool->replace((*_pool)[t].right,\
+    \ child);\n        }\n        update(t);\n        return t;\n    }\n\n    int\
+    \ apply_node(int t, int l, int r, int ql, int qr, const F& f, bool copy_on_write\
+    \ = false) const {\n        if (qr <= l || r <= ql) return t;\n        t = copy_on_write\
+    \ ? _pool->clone_if_shared(t) : clone_node(t);\n        if (ql <= l && r <= qr)\
+    \ {\n            all_apply_to_node(t, shift_operator(f, l - ql));\n          \
+    \  return t;\n        }\n        push(t, l, r, copy_on_write);\n        int m\
+    \ = (l + r) >> 1;\n        int left = apply_node((*_pool)[t].left, l, m, ql, qr,\
+    \ f, copy_on_write);\n        int right = apply_node((*_pool)[t].right, m, r,\
+    \ ql, qr, f, copy_on_write);\n        _pool->replace((*_pool)[t].left, left);\n\
+    \        _pool->replace((*_pool)[t].right, right);\n        update(t);\n     \
+    \   return t;\n    }\n\n    int copy_range_node(int target, int source, int l,\
+    \ int r, int ql, int qr) const {\n        if (qr <= l || r <= ql) return target;\n\
     \        if (ql <= l && r <= qr) return source;\n\n        target = clone_node(target);\n\
     \        source = clone_node(source);\n        _pool->retain(source);\n      \
     \  push(target, l, r);\n        push(source, l, r);\n\n        int m = (l + r)\
@@ -235,21 +244,28 @@ data:
     \    }\n\n    std::size_t node_count() const { return _pool ? _pool->size() :\
     \ 0; }\n\n    PersistentLazySegtree set(int p, T x) const {\n        assert(0\
     \ <= p && p < _n);\n        return PersistentLazySegtree(_n, set_node(_root, 0,\
-    \ _n, p, std::move(x)), _pool);\n    }\n\n    T get(int p) const {\n        assert(0\
-    \ <= p && p < _n);\n        return prod(p, p + 1);\n    }\n\n    T operator[](int\
-    \ p) const { return get(p); }\n\n    T prod(int l, int r) const {\n        assert(0\
-    \ <= l && l <= r && r <= _n);\n        if (l == r) return ActedMonoid::id();\n\
-    \        return prod_node(_root, 0, _n, l, r, ActedMonoid::op_id());\n    }\n\n\
-    \    T all_prod() const { return _root ? (*_pool)[_root].val : ActedMonoid::id();\
-    \ }\n\n    std::vector<T> to_vector() const { return to_vector(0, _n); }\n\n \
-    \   std::vector<T> to_vector(int l, int r) const {\n        assert(0 <= l && l\
-    \ <= r && r <= _n);\n        std::vector<T> res;\n        res.reserve(r - l);\n\
-    \        collect_node(_root, 0, _n, l, r, ActedMonoid::op_id(), res);\n      \
-    \  return res;\n    }\n\n    PersistentLazySegtree apply(int p, const F& f) const\
-    \ {\n        assert(0 <= p && p < _n);\n        return apply(p, p + 1, f);\n \
-    \   }\n\n    PersistentLazySegtree apply(int l, int r, const F& f) const {\n \
-    \       assert(0 <= l && l <= r && r <= _n);\n        if (l == r) return *this;\n\
-    \        return PersistentLazySegtree(_n, apply_node(_root, 0, _n, l, r, f), _pool);\n\
+    \ _n, p, std::move(x)), _pool);\n    }\n\n    void set_inplace(int p, T x) {\n\
+    \        assert(0 <= p && p < _n);\n        int root = set_node(_root, 0, _n,\
+    \ p, std::move(x), true);\n        _pool->replace(_root, root);\n    }\n\n   \
+    \ T get(int p) const {\n        assert(0 <= p && p < _n);\n        return prod(p,\
+    \ p + 1);\n    }\n\n    T operator[](int p) const { return get(p); }\n\n    T\
+    \ prod(int l, int r) const {\n        assert(0 <= l && l <= r && r <= _n);\n \
+    \       if (l == r) return ActedMonoid::id();\n        return prod_node(_root,\
+    \ 0, _n, l, r, ActedMonoid::op_id());\n    }\n\n    T all_prod() const { return\
+    \ _root ? (*_pool)[_root].val : ActedMonoid::id(); }\n\n    std::vector<T> to_vector()\
+    \ const { return to_vector(0, _n); }\n\n    std::vector<T> to_vector(int l, int\
+    \ r) const {\n        assert(0 <= l && l <= r && r <= _n);\n        std::vector<T>\
+    \ res;\n        res.reserve(r - l);\n        collect_node(_root, 0, _n, l, r,\
+    \ ActedMonoid::op_id(), res);\n        return res;\n    }\n\n    PersistentLazySegtree\
+    \ apply(int p, const F& f) const {\n        assert(0 <= p && p < _n);\n      \
+    \  return apply(p, p + 1, f);\n    }\n\n    PersistentLazySegtree apply(int l,\
+    \ int r, const F& f) const {\n        assert(0 <= l && l <= r && r <= _n);\n \
+    \       if (l == r) return *this;\n        return PersistentLazySegtree(_n, apply_node(_root,\
+    \ 0, _n, l, r, f), _pool);\n    }\n\n    void apply_inplace(int p, const F& f)\
+    \ {\n        assert(0 <= p && p < _n);\n        apply_inplace(p, p + 1, f);\n\
+    \    }\n\n    void apply_inplace(int l, int r, const F& f) {\n        assert(0\
+    \ <= l && l <= r && r <= _n);\n        if (l == r) return;\n        int root =\
+    \ apply_node(_root, 0, _n, l, r, f, true);\n        _pool->replace(_root, root);\n\
     \    }\n\n    PersistentLazySegtree copy_range_from(const PersistentLazySegtree&\
     \ source, int l, int r) const {\n        assert(_n == source._n);\n        assert(_pool\
     \ == source._pool);\n        assert(0 <= l && l <= r && r <= _n);\n        if\
@@ -758,7 +774,7 @@ data:
   isVerificationFile: true
   path: verify/ds/segtree/persistent_lazy_segtree.test.cpp
   requiredBy: []
-  timestamp: '2026-08-08 16:34:26+09:00'
+  timestamp: '2026-08-12 03:11:00+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/segtree/persistent_lazy_segtree.test.cpp

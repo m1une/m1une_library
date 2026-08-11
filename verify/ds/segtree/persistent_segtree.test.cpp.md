@@ -71,6 +71,11 @@ data:
     \        retain(node.left);\n        retain(node.right);\n        ++live_nodes;\n\
     \        return result;\n    }\n\n    int clone(int node) {\n        assert(node);\n\
     \        Node copy = nodes[node];\n        return emplace(std::move(copy));\n\
+    \    }\n\n    bool unique(int node) const {\n        return !node || nodes[node].references\
+    \ == 1;\n    }\n\n    // Returns node itself when it has one owner, otherwise\
+    \ an unowned clone.\n    // The caller must attach a returned clone with replace()\
+    \ before it can be\n    // released or exposed as a root.\n    int clone_if_shared(int\
+    \ node) {\n        if (unique(node)) return node;\n        return clone(node);\n\
     \    }\n\n    void replace(int& edge, int node) {\n        if (edge == node) return;\n\
     \        retain(node);\n        int old = edge;\n        edge = node;\n      \
     \  release(old);\n    }\n\n    std::size_t size() const { return live_nodes; }\n\
@@ -108,21 +113,27 @@ data:
     \ l)));\n        int m = (l + r) >> 1;\n        int left = build_from_values(l,\
     \ m, v);\n        int right = build_from_values(m, r, v);\n        return new_node(Node(Monoid::op(_pool->nodes[left].val,\
     \ _pool->nodes[right].val), left, right));\n    }\n\n    int set_node(int t, int\
-    \ l, int r, int p, T value) const {\n        if (r - l == 1) return new_node(Node(std::move(value)));\n\
-    \        int m = (l + r) >> 1;\n        int left = _pool->nodes[t].left;\n   \
-    \     int right = _pool->nodes[t].right;\n        if (p < m) {\n            left\
-    \ = set_node(left, l, m, p, std::move(value));\n        } else {\n           \
-    \ right = set_node(right, m, r, p, std::move(value));\n        }\n        return\
-    \ new_node(Node(Monoid::op(_pool->nodes[left].val, _pool->nodes[right].val), left,\
-    \ right));\n    }\n\n    T prod_node(int t, int l, int r, int ql, int qr) const\
-    \ {\n        if (!t || qr <= l || r <= ql) return Monoid::id();\n        if (ql\
-    \ <= l && r <= qr) return _pool->nodes[t].val;\n        int m = (l + r) >> 1;\n\
-    \        return Monoid::op(prod_node(_pool->nodes[t].left, l, m, ql, qr),\n  \
-    \                        prod_node(_pool->nodes[t].right, m, r, ql, qr));\n  \
-    \  }\n\n    void collect_node(int t, int l, int r, int ql, int qr, std::vector<T>&\
-    \ res) const {\n        if (!t || qr <= l || r <= ql) return;\n        if (r -\
-    \ l == 1) {\n            res.push_back(_pool->nodes[t].val);\n            return;\n\
-    \        }\n        int m = (l + r) >> 1;\n        collect_node(_pool->nodes[t].left,\
+    \ l, int r, int p, T value, bool copy_on_write = false) const {\n        if (copy_on_write)\
+    \ t = _pool->clone_if_shared(t);\n        if (r - l == 1) {\n            if (copy_on_write)\
+    \ {\n                _pool->nodes[t].val = std::move(value);\n               \
+    \ return t;\n            }\n            return new_node(Node(std::move(value)));\n\
+    \        }\n        int m = (l + r) >> 1;\n        int left = _pool->nodes[t].left;\n\
+    \        int right = _pool->nodes[t].right;\n        if (p < m) {\n          \
+    \  left = set_node(left, l, m, p, std::move(value), copy_on_write);\n        }\
+    \ else {\n            right = set_node(right, m, r, p, std::move(value), copy_on_write);\n\
+    \        }\n        T product = Monoid::op(_pool->nodes[left].val, _pool->nodes[right].val);\n\
+    \        if (copy_on_write) {\n            _pool->replace(_pool->nodes[t].left,\
+    \ left);\n            _pool->replace(_pool->nodes[t].right, right);\n        \
+    \    _pool->nodes[t].val = std::move(product);\n            return t;\n      \
+    \  }\n        return new_node(Node(std::move(product), left, right));\n    }\n\
+    \n    T prod_node(int t, int l, int r, int ql, int qr) const {\n        if (!t\
+    \ || qr <= l || r <= ql) return Monoid::id();\n        if (ql <= l && r <= qr)\
+    \ return _pool->nodes[t].val;\n        int m = (l + r) >> 1;\n        return Monoid::op(prod_node(_pool->nodes[t].left,\
+    \ l, m, ql, qr),\n                          prod_node(_pool->nodes[t].right, m,\
+    \ r, ql, qr));\n    }\n\n    void collect_node(int t, int l, int r, int ql, int\
+    \ qr, std::vector<T>& res) const {\n        if (!t || qr <= l || r <= ql) return;\n\
+    \        if (r - l == 1) {\n            res.push_back(_pool->nodes[t].val);\n\
+    \            return;\n        }\n        int m = (l + r) >> 1;\n        collect_node(_pool->nodes[t].left,\
     \ l, m, ql, qr, res);\n        collect_node(_pool->nodes[t].right, m, r, ql, qr,\
     \ res);\n    }\n\n    template <class F>\n    int max_right_node(int t, int l,\
     \ int r, int ql, T& sm, F& f) const {\n        if (r <= ql) return r;\n      \
@@ -173,10 +184,12 @@ data:
     \        _root = 0;\n        _n = 0;\n    }\n\n    std::size_t node_count() const\
     \ { return _pool ? _pool->size() : 0; }\n\n    PersistentSegtree set(int p, T\
     \ x) const {\n        assert(0 <= p && p < _n);\n        return PersistentSegtree(_n,\
-    \ set_node(_root, 0, _n, p, std::move(x)), _pool);\n    }\n\n    T get(int p)\
-    \ const {\n        assert(0 <= p && p < _n);\n        int t = _root;\n       \
-    \ int l = 0, r = _n;\n        while (r - l > 1) {\n            int m = (l + r)\
-    \ >> 1;\n            if (p < m) {\n                t = _pool->nodes[t].left;\n\
+    \ set_node(_root, 0, _n, p, std::move(x)), _pool);\n    }\n\n    void set_inplace(int\
+    \ p, T x) {\n        assert(0 <= p && p < _n);\n        int root = set_node(_root,\
+    \ 0, _n, p, std::move(x), true);\n        _pool->replace(_root, root);\n    }\n\
+    \n    T get(int p) const {\n        assert(0 <= p && p < _n);\n        int t =\
+    \ _root;\n        int l = 0, r = _n;\n        while (r - l > 1) {\n          \
+    \  int m = (l + r) >> 1;\n            if (p < m) {\n                t = _pool->nodes[t].left;\n\
     \                r = m;\n            } else {\n                t = _pool->nodes[t].right;\n\
     \                l = m;\n            }\n        }\n        return _pool->nodes[t].val;\n\
     \    }\n\n    T operator[](int p) const { return get(p); }\n\n    T prod(int l,\
@@ -527,7 +540,7 @@ data:
   isVerificationFile: true
   path: verify/ds/segtree/persistent_segtree.test.cpp
   requiredBy: []
-  timestamp: '2026-08-08 16:34:26+09:00'
+  timestamp: '2026-08-12 03:11:00+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/segtree/persistent_segtree.test.cpp

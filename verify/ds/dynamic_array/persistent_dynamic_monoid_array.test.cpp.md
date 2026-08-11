@@ -83,30 +83,38 @@ data:
     \            ++_references[node];\n        }\n    }\n\n    void release(int node)\
     \ {\n        if (node == null_node) return;\n        assert(_nodes[node].has_value()\
     \ && _references[node] > 0);\n        if (--_references[node] == 0) release_zero(node);\n\
-    \    }\n\n    void discard_unreferenced() {\n        while (!_unowned.empty())\
-    \ {\n            int node = _unowned.back();\n            _unowned.pop_back();\n\
-    \            if (_nodes[node].has_value() && _references[node] == 0) release_zero(node);\n\
-    \        }\n    }\n\n    void reserve(std::size_t) {}\n\n    int next_index()\
-    \ const { return _first_free == -1 ? int(_nodes.size()) : _first_free; }\n\n \
-    \   std::size_t size() const { return _live_nodes; }\n};\n\n}  // namespace detail\n\
-    }  // namespace ds\n}  // namespace m1une\n\n\n#line 16 \"ds/dynamic_array/persistent_dynamic_monoid_array.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\n\ntemplate <m1une::monoid::IsMonoid Monoid>\n\
-    struct PersistentDynamicMonoidArray {\n    using T = typename Monoid::value_type;\n\
-    \n   private:\n    struct Node {\n        T val, prod, rprod;\n        int priority;\n\
-    \        int count;\n        int l, r;\n        bool rev;\n\n        Node(T value,\
-    \ T product, T reverse_product, int node_priority, int node_count, int left, int\
-    \ right,\n             bool reversed)\n            : val(std::move(value)),\n\
-    \              prod(std::move(product)),\n              rprod(std::move(reverse_product)),\n\
-    \              priority(node_priority),\n              count(node_count),\n  \
-    \            l(left),\n              r(right),\n              rev(reversed) {}\n\
-    \    };\n\n    struct BuildNode {\n        T val;\n        int priority;\n   \
-    \     int l, r;\n\n        BuildNode(T value, int node_priority) : val(std::move(value)),\
-    \ priority(node_priority), l(-1), r(-1) {}\n    };\n\n    int root;\n    std::uint32_t\
-    \ rng_state;\n    using Pool = detail::PersistentBinaryNodePool<Node>;\n\n   \
-    \ std::shared_ptr<Pool> pool;\n\n    int subtree_size(int t) const {\n       \
-    \ return t == -1 ? 0 : (*pool)[t].count;\n    }\n\n    T node_prod(int t) const\
-    \ {\n        return t == -1 ? Monoid::id() : (*pool)[t].prod;\n    }\n\n    T\
-    \ node_rprod(int t) const {\n        return t == -1 ? Monoid::id() : (*pool)[t].rprod;\n\
+    \    }\n\n    bool unique(int node) const {\n        return node == null_node\
+    \ || _references[node] == 1;\n    }\n\n    int clone(int node) {\n        assert(node\
+    \ != null_node && _nodes[node].has_value());\n        return emplace(*_nodes[node]);\n\
+    \    }\n\n    // Returns node itself when it has one owner, otherwise an unowned\
+    \ clone.\n    // A returned clone becomes owned when a root or parent edge retains\
+    \ it.\n    int clone_if_shared(int node) {\n        if (unique(node)) return node;\n\
+    \        return clone(node);\n    }\n\n    void replace(int& edge, int node) {\n\
+    \        if (edge == node) return;\n        retain(node);\n        int old = edge;\n\
+    \        edge = node;\n        release(old);\n    }\n\n    void discard_unreferenced()\
+    \ {\n        while (!_unowned.empty()) {\n            int node = _unowned.back();\n\
+    \            _unowned.pop_back();\n            if (_nodes[node].has_value() &&\
+    \ _references[node] == 0) release_zero(node);\n        }\n    }\n\n    void reserve(std::size_t)\
+    \ {}\n\n    int next_index() const { return _first_free == -1 ? int(_nodes.size())\
+    \ : _first_free; }\n\n    std::size_t size() const { return _live_nodes; }\n};\n\
+    \n}  // namespace detail\n}  // namespace ds\n}  // namespace m1une\n\n\n#line\
+    \ 16 \"ds/dynamic_array/persistent_dynamic_monoid_array.hpp\"\n\nnamespace m1une\
+    \ {\nnamespace ds {\n\ntemplate <m1une::monoid::IsMonoid Monoid>\nstruct PersistentDynamicMonoidArray\
+    \ {\n    using T = typename Monoid::value_type;\n\n   private:\n    struct Node\
+    \ {\n        T val, prod, rprod;\n        int priority;\n        int count;\n\
+    \        int l, r;\n        bool rev;\n\n        Node(T value, T product, T reverse_product,\
+    \ int node_priority, int node_count, int left, int right,\n             bool reversed)\n\
+    \            : val(std::move(value)),\n              prod(std::move(product)),\n\
+    \              rprod(std::move(reverse_product)),\n              priority(node_priority),\n\
+    \              count(node_count),\n              l(left),\n              r(right),\n\
+    \              rev(reversed) {}\n    };\n\n    struct BuildNode {\n        T val;\n\
+    \        int priority;\n        int l, r;\n\n        BuildNode(T value, int node_priority)\
+    \ : val(std::move(value)), priority(node_priority), l(-1), r(-1) {}\n    };\n\n\
+    \    int root;\n    std::uint32_t rng_state;\n    using Pool = detail::PersistentBinaryNodePool<Node>;\n\
+    \n    std::shared_ptr<Pool> pool;\n\n    int subtree_size(int t) const {\n   \
+    \     return t == -1 ? 0 : (*pool)[t].count;\n    }\n\n    T node_prod(int t)\
+    \ const {\n        return t == -1 ? Monoid::id() : (*pool)[t].prod;\n    }\n\n\
+    \    T node_rprod(int t) const {\n        return t == -1 ? Monoid::id() : (*pool)[t].rprod;\n\
     \    }\n\n    static std::uint32_t next_state(std::uint32_t state) {\n       \
     \ state ^= state << 13;\n        state ^= state >> 17;\n        state ^= state\
     \ << 5;\n        return state == 0 ? 1 : state;\n    }\n\n    static int next_priority(std::uint32_t&\
@@ -145,7 +153,25 @@ data:
     \        }\n        if (pos == left_count) {\n            return make_node(std::move(val),\
     \ node.priority, false, node.l, node.r);\n        }\n        int r = set_node(node.r,\
     \ pos - left_count - 1, std::move(val));\n        return make_node(std::move(node.val),\
-    \ node.priority, false, node.l, r);\n    }\n\n    int find_node(int t, int pos)\
+    \ node.priority, false, node.l, r);\n    }\n\n    void pull(int t) const {\n \
+    \       Node& node = (*pool)[t];\n        node.prod = Monoid::op(Monoid::op(node_prod(node.l),\
+    \ node.val), node_prod(node.r));\n        node.rprod = Monoid::op(Monoid::op(node_rprod(node.r),\
+    \ node.val), node_rprod(node.l));\n        if (node.rev) std::swap(node.prod,\
+    \ node.rprod);\n    }\n\n    int set_node_inplace(int t, int pos, T val, bool\
+    \ inherited_reversed = false) const {\n        t = pool->clone_if_shared(t);\n\
+    \        const bool reversed = inherited_reversed ^ (*pool)[t].rev;\n        const\
+    \ int logical_left = reversed ? (*pool)[t].r : (*pool)[t].l;\n        const int\
+    \ left_count = subtree_size(logical_left);\n        if (pos < left_count) {\n\
+    \            int child = set_node_inplace(logical_left, pos, std::move(val), reversed);\n\
+    \            if (reversed) {\n                pool->replace((*pool)[t].r, child);\n\
+    \            } else {\n                pool->replace((*pool)[t].l, child);\n \
+    \           }\n        } else if (pos == left_count) {\n            (*pool)[t].val\
+    \ = std::move(val);\n        } else {\n            const int logical_right = reversed\
+    \ ? (*pool)[t].l : (*pool)[t].r;\n            int child = set_node_inplace(logical_right,\
+    \ pos - left_count - 1, std::move(val), reversed);\n            if (reversed)\
+    \ {\n                pool->replace((*pool)[t].l, child);\n            } else {\n\
+    \                pool->replace((*pool)[t].r, child);\n            }\n        }\n\
+    \        pull(t);\n        return t;\n    }\n\n    int find_node(int t, int pos)\
     \ const {\n        bool reversed = false;\n        while (t != -1) {\n       \
     \     const Node& node = (*pool)[t];\n            bool cur_reversed = reversed\
     \ ^ node.rev;\n            int l = cur_reversed ? node.r : node.l;\n         \
@@ -294,7 +320,10 @@ data:
     \    }\n\n    T back() const {\n        assert(!empty());\n        return get(size()\
     \ - 1);\n    }\n\n    PersistentDynamicMonoidArray set(int pos, T value) const\
     \ {\n        assert(0 <= pos && pos < size());\n        return make_version(set_node(root,\
-    \ pos, std::move(value)), rng_state);\n    }\n\n    PersistentDynamicMonoidArray\
+    \ pos, std::move(value)), rng_state);\n    }\n\n    void set_inplace(int pos,\
+    \ T value) {\n        assert(0 <= pos && pos < size());\n        int next_root\
+    \ = set_node_inplace(root, pos, std::move(value));\n        pool->replace(root,\
+    \ next_root);\n        pool->discard_unreferenced();\n    }\n\n    PersistentDynamicMonoidArray\
     \ reverse(int l, int r) const {\n        assert(0 <= l && l <= r && r <= size());\n\
     \        if (l == r) return *this;\n        auto [a, b] = split_node(root, l);\n\
     \        auto [mid, c] = split_node(b, r - l);\n        return make_version(merge(merge(a,\
@@ -744,7 +773,7 @@ data:
   isVerificationFile: true
   path: verify/ds/dynamic_array/persistent_dynamic_monoid_array.test.cpp
   requiredBy: []
-  timestamp: '2026-08-11 13:59:43+09:00'
+  timestamp: '2026-08-12 03:11:00+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/dynamic_array/persistent_dynamic_monoid_array.test.cpp

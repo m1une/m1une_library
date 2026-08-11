@@ -71,6 +71,11 @@ data:
     \        retain(node.left);\n        retain(node.right);\n        ++live_nodes;\n\
     \        return result;\n    }\n\n    int clone(int node) {\n        assert(node);\n\
     \        Node copy = nodes[node];\n        return emplace(std::move(copy));\n\
+    \    }\n\n    bool unique(int node) const {\n        return !node || nodes[node].references\
+    \ == 1;\n    }\n\n    // Returns node itself when it has one owner, otherwise\
+    \ an unowned clone.\n    // The caller must attach a returned clone with replace()\
+    \ before it can be\n    // released or exposed as a root.\n    int clone_if_shared(int\
+    \ node) {\n        if (unique(node)) return node;\n        return clone(node);\n\
     \    }\n\n    void replace(int& edge, int node) {\n        if (edge == node) return;\n\
     \        retain(node);\n        int old = edge;\n        edge = node;\n      \
     \  release(old);\n    }\n\n    std::size_t size() const { return live_nodes; }\n\
@@ -112,43 +117,47 @@ data:
     \   if (r - l == 1) {\n            node.val = Monoid::op(x, node.val);\n     \
     \   } else {\n            node.val = node.has_lazy ? Monoid::op(x, node.val) :\
     \ x;\n            node.has_lazy = true;\n        }\n    }\n\n    int all_apply_clone(int\
-    \ t, const T& x, int l, int r) const {\n        int res = clone_node(t);\n   \
-    \     all_apply_to_node(res, x, l, r);\n        return res;\n    }\n\n    void\
-    \ push(int t, int l, int r) const {\n        Node node = (*_pool)[t];\n      \
-    \  if (!node.has_lazy || r - l == 1) return;\n        int m = (l + r) >> 1;\n\
-    \        int left = all_apply_clone(node.left, node.val, l, m);\n        int right\
-    \ = all_apply_clone(node.right, node.val, m, r);\n        Node& target = (*_pool)[t];\n\
-    \        _pool->replace(target.left, left);\n        _pool->replace(target.right,\
-    \ right);\n        target.val = Monoid::id();\n        target.has_lazy = false;\n\
-    \    }\n\n    int set_node(int t, int l, int r, int p, T value) const {\n    \
-    \    t = clone_node(t);\n        if (r - l == 1) {\n            Node& node = (*_pool)[t];\n\
-    \            node.val = std::move(value);\n            node.has_lazy = false;\n\
-    \            return t;\n        }\n        push(t, l, r);\n        int m = (l\
-    \ + r) >> 1;\n        if (p < m) {\n            int child = set_node((*_pool)[t].left,\
-    \ l, m, p, std::move(value));\n            _pool->replace((*_pool)[t].left, child);\n\
-    \        } else {\n            int child = set_node((*_pool)[t].right, m, r, p,\
-    \ std::move(value));\n            _pool->replace((*_pool)[t].right, child);\n\
-    \        }\n        return t;\n    }\n\n    int apply_node(int t, int l, int r,\
-    \ int ql, int qr, const T& x) const {\n        if (qr <= l || r <= ql) return\
-    \ t;\n        t = clone_node(t);\n        if (ql <= l && r <= qr) {\n        \
-    \    all_apply_to_node(t, x, l, r);\n            return t;\n        }\n      \
-    \  push(t, l, r);\n        int m = (l + r) >> 1;\n        int left = apply_node((*_pool)[t].left,\
-    \ l, m, ql, qr, x);\n        int right = apply_node((*_pool)[t].right, m, r, ql,\
-    \ qr, x);\n        _pool->replace((*_pool)[t].left, left);\n        _pool->replace((*_pool)[t].right,\
-    \ right);\n        return t;\n    }\n\n    T get_node(int t, int l, int r, int\
-    \ p, const T& inherited) const {\n        const Node& node = (*_pool)[t];\n  \
-    \      if (r - l == 1) return Monoid::op(inherited, node.val);\n        int m\
-    \ = (l + r) >> 1;\n        if (p < m) return get_node(node.left, l, m, p, compose_for_child(inherited,\
-    \ node));\n        return get_node(node.right, m, r, p, compose_for_child(inherited,\
-    \ node));\n    }\n\n    void collect_node(int t, int l, int r, int ql, int qr,\
-    \ const T& inherited, std::vector<T>& res) const {\n        if (!t || qr <= l\
-    \ || r <= ql) return;\n        const Node& node = (*_pool)[t];\n        if (r\
-    \ - l == 1) {\n            res.push_back(Monoid::op(inherited, node.val));\n \
-    \           return;\n        }\n        int m = (l + r) >> 1;\n        T next\
-    \ = compose_for_child(inherited, node);\n        collect_node(node.left, l, m,\
-    \ ql, qr, next, res);\n        collect_node(node.right, m, r, ql, qr, next, res);\n\
-    \    }\n\n   public:\n    PersistentDualSegtree() : PersistentDualSegtree(0) {}\n\
-    \n    explicit PersistentDualSegtree(int n) : _n(n), _root(0), _pool(std::make_shared<Pool>())\
+    \ t, const T& x, int l, int r, bool copy_on_write = false) const {\n        int\
+    \ res = copy_on_write ? _pool->clone_if_shared(t) : clone_node(t);\n        all_apply_to_node(res,\
+    \ x, l, r);\n        return res;\n    }\n\n    void push(int t, int l, int r,\
+    \ bool copy_on_write = false) const {\n        Node node = (*_pool)[t];\n    \
+    \    if (!node.has_lazy || r - l == 1) return;\n        int m = (l + r) >> 1;\n\
+    \        int left = all_apply_clone(node.left, node.val, l, m, copy_on_write);\n\
+    \        int right = all_apply_clone(node.right, node.val, m, r, copy_on_write);\n\
+    \        Node& target = (*_pool)[t];\n        _pool->replace(target.left, left);\n\
+    \        _pool->replace(target.right, right);\n        target.val = Monoid::id();\n\
+    \        target.has_lazy = false;\n    }\n\n    int set_node(int t, int l, int\
+    \ r, int p, T value, bool copy_on_write = false) const {\n        t = copy_on_write\
+    \ ? _pool->clone_if_shared(t) : clone_node(t);\n        if (r - l == 1) {\n  \
+    \          Node& node = (*_pool)[t];\n            node.val = std::move(value);\n\
+    \            node.has_lazy = false;\n            return t;\n        }\n      \
+    \  push(t, l, r, copy_on_write);\n        int m = (l + r) >> 1;\n        if (p\
+    \ < m) {\n            int child = set_node((*_pool)[t].left, l, m, p, std::move(value),\
+    \ copy_on_write);\n            _pool->replace((*_pool)[t].left, child);\n    \
+    \    } else {\n            int child = set_node((*_pool)[t].right, m, r, p, std::move(value),\
+    \ copy_on_write);\n            _pool->replace((*_pool)[t].right, child);\n   \
+    \     }\n        return t;\n    }\n\n    int apply_node(int t, int l, int r, int\
+    \ ql, int qr, const T& x, bool copy_on_write = false) const {\n        if (qr\
+    \ <= l || r <= ql) return t;\n        t = copy_on_write ? _pool->clone_if_shared(t)\
+    \ : clone_node(t);\n        if (ql <= l && r <= qr) {\n            all_apply_to_node(t,\
+    \ x, l, r);\n            return t;\n        }\n        push(t, l, r, copy_on_write);\n\
+    \        int m = (l + r) >> 1;\n        int left = apply_node((*_pool)[t].left,\
+    \ l, m, ql, qr, x, copy_on_write);\n        int right = apply_node((*_pool)[t].right,\
+    \ m, r, ql, qr, x, copy_on_write);\n        _pool->replace((*_pool)[t].left, left);\n\
+    \        _pool->replace((*_pool)[t].right, right);\n        return t;\n    }\n\
+    \n    T get_node(int t, int l, int r, int p, const T& inherited) const {\n   \
+    \     const Node& node = (*_pool)[t];\n        if (r - l == 1) return Monoid::op(inherited,\
+    \ node.val);\n        int m = (l + r) >> 1;\n        if (p < m) return get_node(node.left,\
+    \ l, m, p, compose_for_child(inherited, node));\n        return get_node(node.right,\
+    \ m, r, p, compose_for_child(inherited, node));\n    }\n\n    void collect_node(int\
+    \ t, int l, int r, int ql, int qr, const T& inherited, std::vector<T>& res) const\
+    \ {\n        if (!t || qr <= l || r <= ql) return;\n        const Node& node =\
+    \ (*_pool)[t];\n        if (r - l == 1) {\n            res.push_back(Monoid::op(inherited,\
+    \ node.val));\n            return;\n        }\n        int m = (l + r) >> 1;\n\
+    \        T next = compose_for_child(inherited, node);\n        collect_node(node.left,\
+    \ l, m, ql, qr, next, res);\n        collect_node(node.right, m, r, ql, qr, next,\
+    \ res);\n    }\n\n   public:\n    PersistentDualSegtree() : PersistentDualSegtree(0)\
+    \ {}\n\n    explicit PersistentDualSegtree(int n) : _n(n), _root(0), _pool(std::make_shared<Pool>())\
     \ {\n        assert(0 <= n);\n        if (_n > 0) _root = build(0, _n, std::vector<T>(_n,\
     \ Monoid::id()));\n        _pool->retain(_root);\n    }\n\n    explicit PersistentDualSegtree(const\
     \ std::vector<T>& v)\n        : _n(int(v.size())), _root(0), _pool(std::make_shared<Pool>())\
@@ -182,30 +191,36 @@ data:
     \    }\n\n    std::size_t node_count() const { return _pool ? _pool->size() :\
     \ 0; }\n\n    PersistentDualSegtree set(int p, T x) const {\n        assert(0\
     \ <= p && p < _n);\n        return PersistentDualSegtree(_n, set_node(_root, 0,\
-    \ _n, p, std::move(x)), _pool);\n    }\n\n    T get(int p) const {\n        assert(0\
-    \ <= p && p < _n);\n        return get_node(_root, 0, _n, p, Monoid::id());\n\
-    \    }\n\n    T operator[](int p) const { return get(p); }\n\n    PersistentDualSegtree\
-    \ apply(int p, const T& x) const {\n        assert(0 <= p && p < _n);\n      \
-    \  return apply(p, p + 1, x);\n    }\n\n    PersistentDualSegtree apply(int l,\
-    \ int r, const T& x) const {\n        assert(0 <= l && l <= r && r <= _n);\n \
-    \       if (l == r) return *this;\n        return PersistentDualSegtree(_n, apply_node(_root,\
-    \ 0, _n, l, r, x), _pool);\n    }\n\n    std::vector<T> to_vector() const { return\
-    \ to_vector(0, _n); }\n\n    std::vector<T> to_vector(int l, int r) const {\n\
-    \        assert(0 <= l && l <= r && r <= _n);\n        std::vector<T> res;\n \
-    \       res.reserve(r - l);\n        collect_node(_root, 0, _n, l, r, Monoid::id(),\
-    \ res);\n        return res;\n    }\n};\n\n}  // namespace ds\n}  // namespace\
-    \ m1une\n\n\n#line 4 \"verify/ds/segtree/persistent_dual_segtree.test.cpp\"\n\n\
-    #line 1 \"utilities/fast_io.hpp\"\n\n\n\n#include <algorithm>\n#include <array>\n\
-    #include <cerrno>\n#include <charconv>\n#line 9 \"utilities/fast_io.hpp\"\n#include\
-    \ <cstdio>\n#include <cstdlib>\n#include <cstdint>\n#include <cstring>\n#include\
-    \ <iterator>\n#include <string>\n#include <sys/stat.h>\n#include <type_traits>\n\
-    #line 18 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n\nnamespace m1une {\n\
-    namespace utilities {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\n\
-    template <class T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate\
-    \ <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
-    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
-    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
-    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    \ _n, p, std::move(x)), _pool);\n    }\n\n    void set_inplace(int p, T x) {\n\
+    \        assert(0 <= p && p < _n);\n        int root = set_node(_root, 0, _n,\
+    \ p, std::move(x), true);\n        _pool->replace(_root, root);\n    }\n\n   \
+    \ T get(int p) const {\n        assert(0 <= p && p < _n);\n        return get_node(_root,\
+    \ 0, _n, p, Monoid::id());\n    }\n\n    T operator[](int p) const { return get(p);\
+    \ }\n\n    PersistentDualSegtree apply(int p, const T& x) const {\n        assert(0\
+    \ <= p && p < _n);\n        return apply(p, p + 1, x);\n    }\n\n    PersistentDualSegtree\
+    \ apply(int l, int r, const T& x) const {\n        assert(0 <= l && l <= r &&\
+    \ r <= _n);\n        if (l == r) return *this;\n        return PersistentDualSegtree(_n,\
+    \ apply_node(_root, 0, _n, l, r, x), _pool);\n    }\n\n    void apply_inplace(int\
+    \ p, const T& x) {\n        assert(0 <= p && p < _n);\n        apply_inplace(p,\
+    \ p + 1, x);\n    }\n\n    void apply_inplace(int l, int r, const T& x) {\n  \
+    \      assert(0 <= l && l <= r && r <= _n);\n        if (l == r) return;\n   \
+    \     int root = apply_node(_root, 0, _n, l, r, x, true);\n        _pool->replace(_root,\
+    \ root);\n    }\n\n    std::vector<T> to_vector() const { return to_vector(0,\
+    \ _n); }\n\n    std::vector<T> to_vector(int l, int r) const {\n        assert(0\
+    \ <= l && l <= r && r <= _n);\n        std::vector<T> res;\n        res.reserve(r\
+    \ - l);\n        collect_node(_root, 0, _n, l, r, Monoid::id(), res);\n      \
+    \  return res;\n    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n#line\
+    \ 4 \"verify/ds/segtree/persistent_dual_segtree.test.cpp\"\n\n#line 1 \"utilities/fast_io.hpp\"\
+    \n\n\n\n#include <algorithm>\n#include <array>\n#include <cerrno>\n#include <charconv>\n\
+    #line 9 \"utilities/fast_io.hpp\"\n#include <cstdio>\n#include <cstdlib>\n#include\
+    \ <cstdint>\n#include <cstring>\n#include <iterator>\n#include <string>\n#include\
+    \ <sys/stat.h>\n#include <type_traits>\n#line 18 \"utilities/fast_io.hpp\"\n#include\
+    \ <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal {\n\
+    \n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct\
+    \ is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
+    \    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
+    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
+    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
     \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
     \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
@@ -502,7 +517,7 @@ data:
   isVerificationFile: true
   path: verify/ds/segtree/persistent_dual_segtree.test.cpp
   requiredBy: []
-  timestamp: '2026-08-08 16:34:26+09:00'
+  timestamp: '2026-08-12 03:11:00+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/segtree/persistent_dual_segtree.test.cpp

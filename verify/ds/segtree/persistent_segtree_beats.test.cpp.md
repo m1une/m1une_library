@@ -88,6 +88,11 @@ data:
     \        retain(node.left);\n        retain(node.right);\n        ++live_nodes;\n\
     \        return result;\n    }\n\n    int clone(int node) {\n        assert(node);\n\
     \        Node copy = nodes[node];\n        return emplace(std::move(copy));\n\
+    \    }\n\n    bool unique(int node) const {\n        return !node || nodes[node].references\
+    \ == 1;\n    }\n\n    // Returns node itself when it has one owner, otherwise\
+    \ an unowned clone.\n    // The caller must attach a returned clone with replace()\
+    \ before it can be\n    // released or exposed as a root.\n    int clone_if_shared(int\
+    \ node) {\n        if (unique(node)) return node;\n        return clone(node);\n\
     \    }\n\n    void replace(int& edge, int node) {\n        if (edge == node) return;\n\
     \        retain(node);\n        int old = edge;\n        edge = node;\n      \
     \  release(old);\n    }\n\n    std::size_t size() const { return live_nodes; }\n\
@@ -161,57 +166,64 @@ data:
     \ {\n        Node& current = (*_pool)[node];\n        current.val = ActedMonoid::op(\n\
     \            (*_pool)[current.left].val,\n            (*_pool)[current.right].val\n\
     \        );\n    }\n\n    int all_apply_clone(\n        int node,\n        int\
-    \ left,\n        int right,\n        const F& f\n    ) const {\n        int result\
-    \ = clone_node(node);\n        Node& current = (*_pool)[result];\n        if (can_apply_at(f,\
+    \ left,\n        int right,\n        const F& f,\n        bool copy_on_write =\
+    \ false\n    ) const {\n        int result = copy_on_write ? _pool->clone_if_shared(node)\
+    \ : clone_node(node);\n        Node& current = (*_pool)[result];\n        if (can_apply_at(f,\
     \ current.val, 0)) {\n            current.val = mapping_at(f, current.val, 0);\n\
     \            if (right - left > 1) {\n                current.lazy = ActedMonoid::op_comp(f,\
     \ current.lazy);\n                current.has_lazy = true;\n            }\n  \
     \          return result;\n        }\n\n        assert(right - left > 1);\n  \
-    \      push(result, left, right);\n        int middle = left + (right - left)\
-    \ / 2;\n        int left_child = all_apply_clone(\n            (*_pool)[result].left,\n\
-    \            left,\n            middle,\n            f\n        );\n        int\
-    \ right_child = all_apply_clone(\n            (*_pool)[result].right,\n      \
-    \      middle,\n            right,\n            shift_operator(f, middle - left)\n\
-    \        );\n        _pool->replace((*_pool)[result].left, left_child);\n    \
-    \    _pool->replace((*_pool)[result].right, right_child);\n        update(result);\n\
-    \        return result;\n    }\n\n    void push(int node, int left, int right)\
-    \ const {\n        if (!(*_pool)[node].has_lazy) return;\n        assert(right\
-    \ - left > 1);\n\n        F lazy = (*_pool)[node].lazy;\n        int middle =\
-    \ left + (right - left) / 2;\n        int left_child = all_apply_clone(\n    \
-    \        (*_pool)[node].left,\n            left,\n            middle,\n      \
-    \      lazy\n        );\n        int right_child = all_apply_clone(\n        \
-    \    (*_pool)[node].right,\n            middle,\n            right,\n        \
-    \    shift_operator(lazy, middle - left)\n        );\n        _pool->replace((*_pool)[node].left,\
+    \      push(result, left, right, copy_on_write);\n        int middle = left +\
+    \ (right - left) / 2;\n        int left_child = all_apply_clone(\n           \
+    \ (*_pool)[result].left,\n            left,\n            middle,\n           \
+    \ f,\n            copy_on_write\n        );\n        int right_child = all_apply_clone(\n\
+    \            (*_pool)[result].right,\n            middle,\n            right,\n\
+    \            shift_operator(f, middle - left),\n            copy_on_write\n  \
+    \      );\n        _pool->replace((*_pool)[result].left, left_child);\n      \
+    \  _pool->replace((*_pool)[result].right, right_child);\n        update(result);\n\
+    \        return result;\n    }\n\n    void push(\n        int node,\n        int\
+    \ left,\n        int right,\n        bool copy_on_write = false\n    ) const {\n\
+    \        if (!(*_pool)[node].has_lazy) return;\n        assert(right - left >\
+    \ 1);\n\n        F lazy = (*_pool)[node].lazy;\n        int middle = left + (right\
+    \ - left) / 2;\n        int left_child = all_apply_clone(\n            (*_pool)[node].left,\n\
+    \            left,\n            middle,\n            lazy,\n            copy_on_write\n\
+    \        );\n        int right_child = all_apply_clone(\n            (*_pool)[node].right,\n\
+    \            middle,\n            right,\n            shift_operator(lazy, middle\
+    \ - left),\n            copy_on_write\n        );\n        _pool->replace((*_pool)[node].left,\
     \ left_child);\n        _pool->replace((*_pool)[node].right, right_child);\n \
     \       Node& current = (*_pool)[node];\n        current.lazy = ActedMonoid::op_id();\n\
     \        current.has_lazy = false;\n    }\n\n    int set_node(\n        int node,\n\
-    \        int left,\n        int right,\n        int index,\n        T value\n\
-    \    ) const {\n        int result = clone_node(node);\n        if (right - left\
+    \        int left,\n        int right,\n        int index,\n        T value,\n\
+    \        bool copy_on_write = false\n    ) const {\n        int result = copy_on_write\
+    \ ? _pool->clone_if_shared(node) : clone_node(node);\n        if (right - left\
     \ == 1) {\n            Node& current = (*_pool)[result];\n            current.val\
     \ = std::move(value);\n            current.lazy = ActedMonoid::op_id();\n    \
     \        current.has_lazy = false;\n            return result;\n        }\n\n\
-    \        push(result, left, right);\n        int middle = left + (right - left)\
-    \ / 2;\n        if (index < middle) {\n            int child = set_node(\n   \
-    \             (*_pool)[result].left,\n                left,\n                middle,\n\
-    \                index,\n                std::move(value)\n            );\n  \
-    \          _pool->replace((*_pool)[result].left, child);\n        } else {\n \
-    \           int child = set_node(\n                (*_pool)[result].right,\n \
-    \               middle,\n                right,\n                index,\n    \
-    \            std::move(value)\n            );\n            _pool->replace((*_pool)[result].right,\
-    \ child);\n        }\n        update(result);\n        return result;\n    }\n\
-    \n    int apply_node(\n        int node,\n        int left,\n        int right,\n\
-    \        int query_left,\n        int query_right,\n        const F& f\n    )\
-    \ const {\n        if (query_right <= left || right <= query_left) return node;\n\
-    \        if (query_left <= left && right <= query_right) {\n            return\
-    \ all_apply_clone(\n                node,\n                left,\n           \
-    \     right,\n                shift_operator(f, left - query_left)\n         \
-    \   );\n        }\n\n        int result = clone_node(node);\n        push(result,\
-    \ left, right);\n        int middle = left + (right - left) / 2;\n        int\
-    \ left_child = apply_node(\n            (*_pool)[result].left,\n            left,\n\
-    \            middle,\n            query_left,\n            query_right,\n    \
-    \        f\n        );\n        int right_child = apply_node(\n            (*_pool)[result].right,\n\
-    \            middle,\n            right,\n            query_left,\n          \
-    \  query_right,\n            f\n        );\n        _pool->replace((*_pool)[result].left,\
+    \        push(result, left, right, copy_on_write);\n        int middle = left\
+    \ + (right - left) / 2;\n        if (index < middle) {\n            int child\
+    \ = set_node(\n                (*_pool)[result].left,\n                left,\n\
+    \                middle,\n                index,\n                std::move(value),\n\
+    \                copy_on_write\n            );\n            _pool->replace((*_pool)[result].left,\
+    \ child);\n        } else {\n            int child = set_node(\n             \
+    \   (*_pool)[result].right,\n                middle,\n                right,\n\
+    \                index,\n                std::move(value),\n                copy_on_write\n\
+    \            );\n            _pool->replace((*_pool)[result].right, child);\n\
+    \        }\n        update(result);\n        return result;\n    }\n\n    int\
+    \ apply_node(\n        int node,\n        int left,\n        int right,\n    \
+    \    int query_left,\n        int query_right,\n        const F& f,\n        bool\
+    \ copy_on_write = false\n    ) const {\n        if (query_right <= left || right\
+    \ <= query_left) return node;\n        if (query_left <= left && right <= query_right)\
+    \ {\n            return all_apply_clone(\n                node,\n            \
+    \    left,\n                right,\n                shift_operator(f, left - query_left),\n\
+    \                copy_on_write\n            );\n        }\n\n        int result\
+    \ = copy_on_write ? _pool->clone_if_shared(node) : clone_node(node);\n       \
+    \ push(result, left, right, copy_on_write);\n        int middle = left + (right\
+    \ - left) / 2;\n        int left_child = apply_node(\n            (*_pool)[result].left,\n\
+    \            left,\n            middle,\n            query_left,\n           \
+    \ query_right,\n            f,\n            copy_on_write\n        );\n      \
+    \  int right_child = apply_node(\n            (*_pool)[result].right,\n      \
+    \      middle,\n            right,\n            query_left,\n            query_right,\n\
+    \            f,\n            copy_on_write\n        );\n        _pool->replace((*_pool)[result].left,\
     \ left_child);\n        _pool->replace((*_pool)[result].right, right_child);\n\
     \        update(result);\n        return result;\n    }\n\n    int copy_range_node(\n\
     \        int target,\n        int source,\n        int left,\n        int right,\n\
@@ -343,52 +355,61 @@ data:
     \ set(int index, T value) const {\n        assert(0 <= index && index < _n);\n\
     \        return PersistentSegtreeBeats(\n            _n,\n            set_node(_root,\
     \ 0, _n, index, std::move(value)),\n            _pool\n        );\n    }\n\n \
-    \   T get(int index) const {\n        assert(0 <= index && index < _n);\n    \
-    \    return prod(index, index + 1);\n    }\n\n    T operator[](int index) const\
-    \ {\n        return get(index);\n    }\n\n    T prod(int left, int right) const\
-    \ {\n        assert(0 <= left && left <= right && right <= _n);\n        if (left\
-    \ == right) return ActedMonoid::id();\n        return prod_node(\n           \
-    \ _root,\n            0,\n            _n,\n            left,\n            right,\n\
-    \            ActedMonoid::op_id()\n        );\n    }\n\n    T all_prod() const\
-    \ {\n        return _root ? (*_pool)[_root].val : ActedMonoid::id();\n    }\n\n\
-    \    PersistentSegtreeBeats apply(int index, const F& f) const {\n        assert(0\
-    \ <= index && index < _n);\n        return apply(index, index + 1, f);\n    }\n\
-    \n    PersistentSegtreeBeats apply(\n        int left,\n        int right,\n \
-    \       const F& f\n    ) const {\n        assert(0 <= left && left <= right &&\
-    \ right <= _n);\n        if (left == right) return *this;\n        return PersistentSegtreeBeats(\n\
-    \            _n,\n            apply_node(_root, 0, _n, left, right, f),\n    \
-    \        _pool\n        );\n    }\n\n    PersistentSegtreeBeats copy_range_from(\n\
-    \        const PersistentSegtreeBeats& source,\n        int left,\n        int\
-    \ right\n    ) const {\n        assert(_n == source._n);\n        assert(_pool\
-    \ == source._pool);\n        assert(0 <= left && left <= right && right <= _n);\n\
-    \        if (left == right) return *this;\n        return PersistentSegtreeBeats(\n\
-    \            _n,\n            copy_range_node(\n                _root,\n     \
-    \           source._root,\n                0,\n                _n,\n         \
-    \       left,\n                right\n            ),\n            _pool\n    \
-    \    );\n    }\n\n    std::vector<T> to_vector() const {\n        return to_vector(0,\
-    \ _n);\n    }\n\n    std::vector<T> to_vector(int left, int right) const {\n \
-    \       assert(0 <= left && left <= right && right <= _n);\n        std::vector<T>\
-    \ result;\n        result.reserve(right - left);\n        if (left != right) {\n\
-    \            collect_node(\n                _root,\n                0,\n     \
-    \           _n,\n                left,\n                right,\n             \
-    \   ActedMonoid::op_id(),\n                result\n            );\n        }\n\
-    \        return result;\n    }\n\n    template <class Predicate>\n    int max_right(int\
-    \ left, Predicate predicate) const {\n        assert(0 <= left && left <= _n);\n\
-    \        assert(predicate(ActedMonoid::id()));\n        if (left == _n) return\
-    \ _n;\n        T product = ActedMonoid::id();\n        return max_right_node(\n\
-    \            _root,\n            0,\n            _n,\n            left,\n    \
-    \        product,\n            ActedMonoid::op_id(),\n            predicate\n\
-    \        );\n    }\n\n    template <class Predicate>\n    int min_left(int right,\
-    \ Predicate predicate) const {\n        assert(0 <= right && right <= _n);\n \
-    \       assert(predicate(ActedMonoid::id()));\n        if (right == 0) return\
-    \ 0;\n        T product = ActedMonoid::id();\n        return min_left_node(\n\
-    \            _root,\n            0,\n            _n,\n            right,\n   \
-    \         product,\n            ActedMonoid::op_id(),\n            predicate\n\
-    \        );\n    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n#line\
-    \ 4 \"verify/ds/segtree/persistent_segtree_beats.test.cpp\"\n\n#include <algorithm>\n\
-    #line 7 \"verify/ds/segtree/persistent_segtree_beats.test.cpp\"\n#include <cstdint>\n\
-    #line 9 \"verify/ds/segtree/persistent_segtree_beats.test.cpp\"\n#include <numeric>\n\
-    #include <optional>\n#line 13 \"verify/ds/segtree/persistent_segtree_beats.test.cpp\"\
+    \   void set_inplace(int index, T value) {\n        assert(0 <= index && index\
+    \ < _n);\n        int root = set_node(\n            _root,\n            0,\n \
+    \           _n,\n            index,\n            std::move(value),\n         \
+    \   true\n        );\n        _pool->replace(_root, root);\n    }\n\n    T get(int\
+    \ index) const {\n        assert(0 <= index && index < _n);\n        return prod(index,\
+    \ index + 1);\n    }\n\n    T operator[](int index) const {\n        return get(index);\n\
+    \    }\n\n    T prod(int left, int right) const {\n        assert(0 <= left &&\
+    \ left <= right && right <= _n);\n        if (left == right) return ActedMonoid::id();\n\
+    \        return prod_node(\n            _root,\n            0,\n            _n,\n\
+    \            left,\n            right,\n            ActedMonoid::op_id()\n   \
+    \     );\n    }\n\n    T all_prod() const {\n        return _root ? (*_pool)[_root].val\
+    \ : ActedMonoid::id();\n    }\n\n    PersistentSegtreeBeats apply(int index, const\
+    \ F& f) const {\n        assert(0 <= index && index < _n);\n        return apply(index,\
+    \ index + 1, f);\n    }\n\n    PersistentSegtreeBeats apply(\n        int left,\n\
+    \        int right,\n        const F& f\n    ) const {\n        assert(0 <= left\
+    \ && left <= right && right <= _n);\n        if (left == right) return *this;\n\
+    \        return PersistentSegtreeBeats(\n            _n,\n            apply_node(_root,\
+    \ 0, _n, left, right, f),\n            _pool\n        );\n    }\n\n    void apply_inplace(int\
+    \ index, const F& f) {\n        assert(0 <= index && index < _n);\n        apply_inplace(index,\
+    \ index + 1, f);\n    }\n\n    void apply_inplace(int left, int right, const F&\
+    \ f) {\n        assert(0 <= left && left <= right && right <= _n);\n        if\
+    \ (left == right) return;\n        int root = apply_node(\n            _root,\n\
+    \            0,\n            _n,\n            left,\n            right,\n    \
+    \        f,\n            true\n        );\n        _pool->replace(_root, root);\n\
+    \    }\n\n    PersistentSegtreeBeats copy_range_from(\n        const PersistentSegtreeBeats&\
+    \ source,\n        int left,\n        int right\n    ) const {\n        assert(_n\
+    \ == source._n);\n        assert(_pool == source._pool);\n        assert(0 <=\
+    \ left && left <= right && right <= _n);\n        if (left == right) return *this;\n\
+    \        return PersistentSegtreeBeats(\n            _n,\n            copy_range_node(\n\
+    \                _root,\n                source._root,\n                0,\n \
+    \               _n,\n                left,\n                right\n          \
+    \  ),\n            _pool\n        );\n    }\n\n    std::vector<T> to_vector()\
+    \ const {\n        return to_vector(0, _n);\n    }\n\n    std::vector<T> to_vector(int\
+    \ left, int right) const {\n        assert(0 <= left && left <= right && right\
+    \ <= _n);\n        std::vector<T> result;\n        result.reserve(right - left);\n\
+    \        if (left != right) {\n            collect_node(\n                _root,\n\
+    \                0,\n                _n,\n                left,\n            \
+    \    right,\n                ActedMonoid::op_id(),\n                result\n \
+    \           );\n        }\n        return result;\n    }\n\n    template <class\
+    \ Predicate>\n    int max_right(int left, Predicate predicate) const {\n     \
+    \   assert(0 <= left && left <= _n);\n        assert(predicate(ActedMonoid::id()));\n\
+    \        if (left == _n) return _n;\n        T product = ActedMonoid::id();\n\
+    \        return max_right_node(\n            _root,\n            0,\n        \
+    \    _n,\n            left,\n            product,\n            ActedMonoid::op_id(),\n\
+    \            predicate\n        );\n    }\n\n    template <class Predicate>\n\
+    \    int min_left(int right, Predicate predicate) const {\n        assert(0 <=\
+    \ right && right <= _n);\n        assert(predicate(ActedMonoid::id()));\n    \
+    \    if (right == 0) return 0;\n        T product = ActedMonoid::id();\n     \
+    \   return min_left_node(\n            _root,\n            0,\n            _n,\n\
+    \            right,\n            product,\n            ActedMonoid::op_id(),\n\
+    \            predicate\n        );\n    }\n};\n\n}  // namespace ds\n}  // namespace\
+    \ m1une\n\n\n#line 4 \"verify/ds/segtree/persistent_segtree_beats.test.cpp\"\n\
+    \n#include <algorithm>\n#line 7 \"verify/ds/segtree/persistent_segtree_beats.test.cpp\"\
+    \n#include <cstdint>\n#line 9 \"verify/ds/segtree/persistent_segtree_beats.test.cpp\"\
+    \n#include <numeric>\n#include <optional>\n#line 13 \"verify/ds/segtree/persistent_segtree_beats.test.cpp\"\
     \n\n#line 1 \"acted_monoid/range_affine_range_sum.hpp\"\n\n\n\n#line 5 \"acted_monoid/range_affine_range_sum.hpp\"\
     \n\nnamespace m1une {\nnamespace acted_monoid {\n\ntemplate <typename T>\nstruct\
     \ RangeAffineRangeSumNode {\n    T sum;\n    int size;\n};\n\n// Designed to accept\
@@ -1075,7 +1096,7 @@ data:
   isVerificationFile: true
   path: verify/ds/segtree/persistent_segtree_beats.test.cpp
   requiredBy: []
-  timestamp: '2026-08-12 01:20:42+09:00'
+  timestamp: '2026-08-12 03:11:00+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/segtree/persistent_segtree_beats.test.cpp
