@@ -3,205 +3,362 @@ title: Random Testing
 documentation_of: ../../utilities/random_testing.hpp
 ---
 
-## Overview
+## The Quick Way
 
-This header removes the repetitive loop around competitive-programming stress
-tests. It supports two workflows:
-
-* `random_test` repeatedly checks a Boolean property;
-* `compare_randomly` generates small cases and compares an optimized solver
-  against a brute-force oracle.
-
-Testing stops at the first failure. The returned seed and zero-based trial make
-the failure reproducible.
-
-## Quick Use During a Contest
+You do not need to rewrite a solution to return custom input and answer types.
+Keep ordinary contest code that reads `std::cin` and writes `std::cout`:
 
 ```cpp
-template <class Property>
-RandomTestResult stress_test(
-    Property property,
-    int trials = 1000,
-    std::uint64_t seed = default_random_test_seed);
-
-template <class Generator, class Solver, class Oracle>
-RandomTestResult stress_test(
-    Generator generator,
-    Solver solver,
-    Oracle oracle,
-    int trials = 1000,
-    std::uint64_t seed = default_random_test_seed);
+void solve() {
+    // The same code used in the submission.
+}
 ```
 
-The shortest interface needs only one lambda:
+Then choose one helper:
+
+| Problem | Helper |
+| --- | --- |
+| Non-interactive or constructive | `stream_stress_test(generate, solve, check)` |
+| Interactive | `interactive_stream_stress_test(limit, generate, solve, reply, check)` |
+
+The helper redirects `std::cin` and `std::cout` for every random case. You only
+write the random input generator and checker. On failure it prints the input,
+output or interaction transcript, seed, and zero-based trial.
 
 ```cpp
-stress_test([](Random& random) {
-    auto input = generate_small_case(random);
-    return solve(input) == brute(input);
-});
+#include "utilities/random_testing.hpp"
+
+using namespace m1une::utilities;
 ```
 
-Or keep generation and the two solutions separate:
+## Non-Interactive and Constructive Recipe
+
+Write these three pieces:
 
 ```cpp
-stress_test(generate_small_case, solve, brute);
-```
-
-The included `Random` helpers keep generators short:
-
-```cpp
-stress_test([](Random& rng) {
-    auto values = rng.sequence(20, -10, 10);
-    auto text = rng.string(20, "abc");
-    auto tree = rng.tree(20);
-    auto graph = rng.graph(20, 30);
-    auto weighted_graph = rng.weighted_graph(20, 30, -10, 10);
-    auto dag = rng.dag(20, 30);
-    return check(values, text, tree, graph, weighted_graph, dag);
-});
-```
-
-Both forms run 1000 trials with a fixed default seed. Optional trailing
-arguments select the trial count and seed:
-
-```cpp
-stress_test(generate_small_case, solve, brute, 10000, 123456789);
-```
-
-`stress_test` returns normally after every test passes. On failure, it prints
-the seed and trial and then calls `std::abort`. The three-function form also
-prints the input, expected result, and actual result when they are streamable
-or iterable. This means the call does not need an `assert` or result check.
-
-## Configuration and Result
-
-```cpp
-struct RandomTestConfig {
-    int trials = 1000;
-    std::uint64_t seed = default_random_test_seed;
+auto generate = [](Random& random, std::ostream& input) {
+    // Write one small random case to input.
 };
 
-struct RandomTestResult {
-    std::uint64_t seed;
-    int requested_trials;
-    int completed_trials;
-    int failed_trial;
+void solve() {
+    // Read std::cin and write std::cout as usual.
+}
 
-    bool passed() const;
-    explicit operator bool() const;
+auto check = [](std::istream& input, std::istream& output) {
+    // Read the original input and candidate output.
+    return true;  // Return whether the output is valid.
 };
+
+int main() {
+    stream_stress_test(generate, solve, check);
+}
 ```
 
-The fixed default seed makes ordinary runs deterministic. Supply a different
-seed when exploring more cases. On success, `completed_trials` equals
-`requested_trials` and `failed_trial` is `-1`. On failure,
-`completed_trials == failed_trial` is the number of earlier successful trials.
+This works for constructive problems because `check` validates the output; it
+does not compare against one fixed answer.
 
-## Property Tests
+### Complete example
 
-```cpp
-template <class Property>
-RandomTestResult random_test(
-    RandomTestConfig config,
-    Property property);
-```
-
-`random_test(property)` is shorthand using the default configuration.
-
-The property may have either signature and must return something convertible
-to `bool`:
-
-```cpp
-bool property(Random& random);
-bool property(Random& random, int trial);
-```
-
-Each call advances the same seeded `Random` generator.
-
-## Optimized Solver Against Brute Force
-
-```cpp
-template <class Generator, class Solver, class Oracle,
-          class OnFailure = IgnoreRandomTestFailure,
-          class Equal = std::equal_to<>>
-RandomTestResult compare_randomly(
-    RandomTestConfig config,
-    Generator generator,
-    Solver solver,
-    Oracle oracle,
-    OnFailure on_failure = {},
-    Equal equal = {});
-```
-
-`compare_randomly(generator, solver, oracle)` is shorthand using the default
-configuration. Unlike `stress_test`, the lower-level functions return a failed
-result instead of terminating the program.
-
-`generator` receives `Random&` and optionally the trial number. Its result must
-be copyable. The harness gives separate copies to `solver` and `oracle`, so
-either function may mutate its input. Results are compared with `equal`.
-
-On a mismatch, `on_failure` is called as follows before testing stops:
-
-```cpp
-on_failure(test_case, expected, actual, trial, seed);
-```
-
-The callback is optional. Use it to print the counterexample in the format most
-helpful for the current problem.
-
-If a failure reports seed `S` and trial `T`, rerun with the same seed and at
-least `T + 1` trials. Generation is deterministic as long as the generator
-makes the same sequence of random calls.
-
-## Example
+The following tester checks ordinary code that prints the values in sorted
+order:
 
 ```cpp
 #include "utilities/random_testing.hpp"
 
 #include <algorithm>
 #include <iostream>
+#include <string>
 #include <vector>
 
+using namespace m1une::utilities;
+
+void solve() {
+    int n;
+    std::cin >> n;
+    std::vector<int> values(n);
+    for (int& value : values) std::cin >> value;
+
+    std::sort(values.begin(), values.end());
+    for (int value : values) std::cout << value << ' ';
+    std::cout << '\n';
+}
+
 int main() {
-    using namespace m1une::utilities;
-    RandomTestConfig config;
-    config.trials = 10000;
-    config.seed = 123456789;
+    auto generate = [](Random& random, std::ostream& input) {
+        int n = int(random.uniform(0, 20));
+        input << n << '\n';
+        for (int value : random.sequence(n, -10, 10)) {
+            input << value << ' ';
+        }
+        input << '\n';
+    };
 
-    auto result = compare_randomly(
-        config,
-        [](Random& random) {
-            int n = int(random.uniform(0, 10));
-            std::vector<int> values(n);
-            for (int& value : values) value = int(random.uniform(-5, 5));
-            return values;
-        },
-        [](std::vector<int>& values) {
-            std::sort(values.begin(), values.end());
-            return values;
-        },
-        [](std::vector<int>& values) {
-            // Replace this with a deliberately simple oracle for the problem.
-            for (int i = 0; i < int(values.size()); i++) {
-                for (int j = i + 1; j < int(values.size()); j++) {
-                    if (values[j] < values[i]) std::swap(values[i], values[j]);
-                }
-            }
-            return values;
-        },
-        [](const auto& input, const auto& expected, const auto& actual,
-           int trial, std::uint64_t seed) {
-            std::cerr << "mismatch: seed=" << seed << " trial=" << trial
-                      << " size=" << input.size() << "\n";
-            (void)expected;
-            (void)actual;
-        });
+    auto check = [](std::istream& input, std::istream& output) {
+        int n;
+        input >> n;
+        std::vector<int> expected(n);
+        for (int& value : expected) input >> value;
+        std::sort(expected.begin(), expected.end());
 
-    return result ? 0 : 1;
+        std::vector<int> actual(n);
+        for (int& value : actual) {
+            if (!(output >> value)) return false;
+        }
+        std::string extra;
+        return actual == expected && !(output >> extra);
+    };
+
+    stream_stress_test(generate, solve, check);
 }
 ```
 
-The harness adds only $O(1)$ work around each trial, excluding case copies and
-the supplied generator, solvers, comparison, and failure callback.
+Usually the generator is just a few `random.uniform(...)` calls and `<<`
+operations. The checker can reuse input constraints and validation logic from
+the problem statement.
+
+The default is 1000 cases with a fixed seed. Add a trial count and seed at the
+end when needed:
+
+```cpp
+stream_stress_test(generate, solve, check, 10000, 123456789);
+```
+
+## Interactive Recipe
+
+The submitted solution can keep the ordinary protocol:
+
+```cpp
+std::cout << "? " << query << std::endl;
+std::cin >> reply;
+// ...
+std::cout << "! " << answer << std::endl;
+```
+
+The tester needs four pieces:
+
+1. `generate` writes the public input and returns hidden judge state;
+2. `solve` is the ordinary interactive solution;
+3. `reply` reads one query and writes the mock judge's response;
+4. `check` validates the final output.
+
+### Complete example
+
+```cpp
+#include "utilities/random_testing.hpp"
+
+#include <iostream>
+#include <string>
+
+using namespace m1une::utilities;
+
+void solve() {
+    int upper;
+    std::cin >> upper;
+
+    int low = 0;
+    int high = upper;
+    while (low < high) {
+        int middle = (low + high) / 2;
+        std::cout << "? " << middle << std::endl;
+
+        int comparison;
+        std::cin >> comparison;
+        if (comparison <= 0) high = middle;
+        else low = middle + 1;
+    }
+    std::cout << "! " << low << std::endl;
+}
+
+int main() {
+    auto generate = [](Random& random, std::ostream& input) {
+        int upper = 1000;
+        input << upper << '\n';
+        return int(random.uniform(0, upper));  // Hidden number.
+    };
+
+    auto reply = [](int& secret, std::istream& query,
+                    std::ostream& response) {
+        char type;
+        int guess;
+        std::string extra;
+        if (!(query >> type >> guess) || type != '?' || query >> extra) {
+            reject_query("expected: ? x");
+        }
+
+        if (secret < guess) response << -1;
+        else if (guess < secret) response << 1;
+        else response << 0;
+    };
+
+    auto check = [](std::istream& input, const int& secret,
+                    std::istream& output) {
+        int upper;
+        char type;
+        int answer;
+        std::string extra;
+        input >> upper;
+        return bool(output >> type >> answer) && type == '!' &&
+               0 <= answer && answer <= upper && answer == secret &&
+               !(output >> extra);
+    };
+
+    interactive_stream_stress_test(10, generate, solve, reply, check);
+}
+```
+
+When `solve` tries to read after printing, the helper sends that pending output
+to `reply` and feeds the generated response back through `std::cin`. Output
+remaining when `solve` returns is passed to `check` as the final answer.
+
+Call `reject_query("reason")` for malformed or forbidden queries. The first
+query beyond the limit also fails. Both failures include the full query/reply
+transcript.
+
+Select trials and a seed with trailing arguments:
+
+```cpp
+interactive_stream_stress_test(
+    query_limit, generate, solve, reply, check, 10000, 123456789);
+```
+
+## Practical Limitations
+
+The stream helpers redirect C++ `std::cin` and `std::cout`. They cannot capture
+`scanf`, `printf`, `fread`, `FastInput`, or other code that accesses the C file
+handles directly. Keep a `std::cin`/`std::cout` version while stress testing, or
+move only the algorithm into a shared function used by both I/O frontends.
+
+Call `std::ios::sync_with_stdio(false)` before starting the tester, not inside
+`solve`, because changing synchronization can replace standard stream buffers.
+
+The interactive helper runs in one process without real pipes. It checks the
+algorithm and protocol, but it does not detect missing flushes, deadlocks, or
+timing problems.
+
+## Typed Helpers (Optional)
+
+Use the typed interface only when the solution already accepts values and
+returns an answer.
+
+For ordinary optimized-vs-brute testing:
+
+```cpp
+stress_test(generate, solve, brute);
+```
+
+For constructive testing:
+
+```cpp
+constructive_stress_test(
+    generate,
+    solve,
+    [](const Input& input, const Answer& answer) {
+        return is_valid(input, answer);
+    });
+```
+
+For a typed interactive solution, generate public input and hidden state with
+`interactive_test_case(input, state)`. The solution receives the public input
+and an object providing `interaction.ask(query)`:
+
+```cpp
+interactive_stress_test(
+    query_limit, generate, solve, reply, check);
+```
+
+The stream and typed interfaces use the same deterministic seeds, failure
+categories, query limits, and transcript reporting.
+
+## Handle Failure Without Aborting
+
+The `*_stress_test` helpers print a failure and call `std::abort`. Use the
+lower-level version to inspect a result instead:
+
+```cpp
+RandomTestConfig config;
+config.trials = 10000;
+config.seed = 123456789;
+
+auto result = test_streams(config, generate, solve, check);
+if (!result) {
+    // result.seed
+    // result.failed_trial
+    // result.failure
+}
+```
+
+The interactive equivalent is:
+
+```cpp
+auto result = test_interactive_streams(
+    config, query_limit, generate, solve, reply, check);
+```
+
+| Result field | Meaning |
+| --- | --- |
+| `seed` | Seed used by the generator. |
+| `requested_trials` | Number of requested cases. |
+| `completed_trials` | Cases that passed before the failure. |
+| `failed_trial` | Zero-based failed case, or `-1` on success. |
+| `failure` | `property`, `mismatch`, `rejected_output`, `query_limit`, or `invalid_query`. |
+| `query_count` | Attempted queries on an interactive failure, otherwise `-1`. |
+
+`result.passed()` and `bool(result)` report success.
+
+## Interface Reference
+
+```cpp
+template <class Generator, class Solution, class Checker>
+RandomTestResult stream_stress_test(
+    Generator generator,
+    Solution solution,
+    Checker checker,
+    int trials = 1000,
+    std::uint64_t seed = default_random_test_seed);
+
+template <class Generator, class Solution, class QueryHandler, class Checker>
+RandomTestResult interactive_stream_stress_test(
+    int query_limit,
+    Generator generator,
+    Solution solution,
+    QueryHandler query_handler,
+    Checker checker,
+    int trials = 1000,
+    std::uint64_t seed = default_random_test_seed);
+```
+
+The lower-level forms add a configuration and optional failure callback:
+
+```cpp
+template <class Generator, class Solution, class Checker,
+          class OnFailure = IgnoreRandomTestFailure>
+RandomTestResult test_streams(
+    RandomTestConfig config,
+    Generator generator,
+    Solution solution,
+    Checker checker,
+    OnFailure on_failure = {});
+
+template <class Generator, class Solution, class QueryHandler, class Checker,
+          class OnFailure = IgnoreRandomTestFailure>
+RandomTestResult test_interactive_streams(
+    RandomTestConfig config,
+    int query_limit,
+    Generator generator,
+    Solution solution,
+    QueryHandler query_handler,
+    Checker checker,
+    OnFailure on_failure = {});
+```
+
+The non-interactive callback is called as
+`on_failure(input_text, output_text, trial, seed)`. The interactive callback is
+called as `on_failure(input_text, state, transcript, trial, seed, failure)`.
+
+Generators may also accept a final `int trial`. The non-interactive generator
+returns `void`; the interactive generator returns the hidden state. Query
+handlers return `void` and write their response to the supplied output stream.
+
+The harness adds $O(1)$ work per trial apart from the supplied functions and
+the size of generated/captured text. Interactive transcript time and memory are
+linear in the total query and response text.
