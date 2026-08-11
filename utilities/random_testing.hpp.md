@@ -15,31 +15,31 @@ data:
   attributes:
     links: []
   bundledCode: "#line 1 \"utilities/random_testing.hpp\"\n\n\n\n#include <cassert>\n\
-    #include <concepts>\n#include <cstdint>\n#include <cstdlib>\n#include <functional>\n\
-    #include <iostream>\n#include <iterator>\n#include <type_traits>\n#include <utility>\n\
-    \n#line 1 \"utilities/random.hpp\"\n\n\n\n#include <algorithm>\n#line 6 \"utilities/random.hpp\"\
-    \n#include <chrono>\n#line 10 \"utilities/random.hpp\"\n#include <numeric>\n#include\
-    \ <queue>\n#include <random>\n#include <string>\n#include <string_view>\n#include\
-    \ <tuple>\n#line 17 \"utilities/random.hpp\"\n#include <unordered_set>\n#line\
-    \ 19 \"utilities/random.hpp\"\n#include <vector>\n\nnamespace m1une {\nnamespace\
-    \ utilities {\n\nstruct RandomGraphOptions {\n    bool directed = false;\n   \
-    \ bool allow_self_loops = false;\n    bool allow_parallel_edges = false;\n};\n\
-    \nstruct Random {\n   private:\n    std::mt19937_64 _engine;\n\n    static unsigned\
-    \ long long chrono_seed() {\n        return static_cast<unsigned long long>(\n\
-    \            std::chrono::steady_clock::now().time_since_epoch().count());\n \
-    \   }\n\n    static std::uint64_t graph_edge_count(int vertex_count,\n       \
-    \                                   const RandomGraphOptions& options) {\n   \
-    \     std::uint64_t n = static_cast<unsigned int>(vertex_count);\n        if (options.directed)\
-    \ {\n            return options.allow_self_loops ? n * n : n * (n - 1);\n    \
-    \    }\n        return options.allow_self_loops ? n * (n + 1) / 2 : n * (n - 1)\
-    \ / 2;\n    }\n\n    static std::pair<int, int> decode_graph_edge(\n        std::uint64_t\
-    \ index, int vertex_count,\n        const RandomGraphOptions& options) {\n   \
-    \     std::uint64_t n = static_cast<unsigned int>(vertex_count);\n        if (options.directed)\
-    \ {\n            std::uint64_t width = options.allow_self_loops ? n : n - 1;\n\
-    \            int from = int(index / width);\n            int offset = int(index\
-    \ % width);\n            int to = options.allow_self_loops || offset < from ?\
-    \ offset : offset + 1;\n            return {from, to};\n        }\n\n        auto\
-    \ prefix = [&](std::uint64_t vertex) {\n            if (options.allow_self_loops)\
+    #include <concepts>\n#include <cstdint>\n#include <cstdlib>\n#include <exception>\n\
+    #include <functional>\n#include <iostream>\n#include <iterator>\n#include <sstream>\n\
+    #include <string>\n#include <tuple>\n#include <type_traits>\n#include <utility>\n\
+    #include <vector>\n\n#line 1 \"utilities/random.hpp\"\n\n\n\n#include <algorithm>\n\
+    #line 6 \"utilities/random.hpp\"\n#include <chrono>\n#line 10 \"utilities/random.hpp\"\
+    \n#include <numeric>\n#include <queue>\n#include <random>\n#line 14 \"utilities/random.hpp\"\
+    \n#include <string_view>\n#line 17 \"utilities/random.hpp\"\n#include <unordered_set>\n\
+    #line 20 \"utilities/random.hpp\"\n\nnamespace m1une {\nnamespace utilities {\n\
+    \nstruct RandomGraphOptions {\n    bool directed = false;\n    bool allow_self_loops\
+    \ = false;\n    bool allow_parallel_edges = false;\n};\n\nstruct Random {\n  \
+    \ private:\n    std::mt19937_64 _engine;\n\n    static unsigned long long chrono_seed()\
+    \ {\n        return static_cast<unsigned long long>(\n            std::chrono::steady_clock::now().time_since_epoch().count());\n\
+    \    }\n\n    static std::uint64_t graph_edge_count(int vertex_count,\n      \
+    \                                    const RandomGraphOptions& options) {\n  \
+    \      std::uint64_t n = static_cast<unsigned int>(vertex_count);\n        if\
+    \ (options.directed) {\n            return options.allow_self_loops ? n * n :\
+    \ n * (n - 1);\n        }\n        return options.allow_self_loops ? n * (n +\
+    \ 1) / 2 : n * (n - 1) / 2;\n    }\n\n    static std::pair<int, int> decode_graph_edge(\n\
+    \        std::uint64_t index, int vertex_count,\n        const RandomGraphOptions&\
+    \ options) {\n        std::uint64_t n = static_cast<unsigned int>(vertex_count);\n\
+    \        if (options.directed) {\n            std::uint64_t width = options.allow_self_loops\
+    \ ? n : n - 1;\n            int from = int(index / width);\n            int offset\
+    \ = int(index % width);\n            int to = options.allow_self_loops || offset\
+    \ < from ? offset : offset + 1;\n            return {from, to};\n        }\n\n\
+    \        auto prefix = [&](std::uint64_t vertex) {\n            if (options.allow_self_loops)\
     \ {\n                return vertex * (2 * n - vertex + 1) / 2;\n            }\n\
     \            return vertex * (2 * n - vertex - 1) / 2;\n        };\n        std::uint64_t\
     \ low = 0;\n        std::uint64_t high = n;\n        while (low + 1 < high) {\n\
@@ -177,23 +177,44 @@ data:
     \ last) {\n        std::shuffle(first, last, _engine);\n    }\n\n    template\
     \ <typename T>\n    const T& choice(const std::vector<T>& v) {\n        return\
     \ v[uniform(0, static_cast<long long>(v.size()) - 1)];\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 15 \"utilities/random_testing.hpp\"\
+    \ utilities\n}  // namespace m1une\n\n\n#line 20 \"utilities/random_testing.hpp\"\
     \n\nnamespace m1une {\nnamespace utilities {\n\ninline constexpr std::uint64_t\
     \ default_random_test_seed =\n    0x243f6a8885a308d3ULL;\n\nstruct RandomTestConfig\
     \ {\n    int trials = 1000;\n    std::uint64_t seed = default_random_test_seed;\n\
-    };\n\nstruct RandomTestResult {\n    std::uint64_t seed = 0;\n    int requested_trials\
-    \ = 0;\n    int completed_trials = 0;\n    int failed_trial = -1;\n\n    bool\
-    \ passed() const {\n        return failed_trial == -1;\n    }\n\n    explicit\
-    \ operator bool() const {\n        return passed();\n    }\n};\n\nstruct IgnoreRandomTestFailure\
+    };\n\nenum class RandomTestFailure {\n    none,\n    property,\n    mismatch,\n\
+    \    rejected_output,\n    query_limit,\n    invalid_query,\n};\n\ninline const\
+    \ char* random_test_failure_name(RandomTestFailure failure) {\n    switch (failure)\
+    \ {\n        case RandomTestFailure::none:\n            return \"none\";\n   \
+    \     case RandomTestFailure::property:\n            return \"property\";\n  \
+    \      case RandomTestFailure::mismatch:\n            return \"mismatch\";\n \
+    \       case RandomTestFailure::rejected_output:\n            return \"rejected\
+    \ output\";\n        case RandomTestFailure::query_limit:\n            return\
+    \ \"query limit exceeded\";\n        case RandomTestFailure::invalid_query:\n\
+    \            return \"invalid query\";\n    }\n    return \"unknown\";\n}\n\n\
+    struct RandomTestResult {\n    std::uint64_t seed = 0;\n    int requested_trials\
+    \ = 0;\n    int completed_trials = 0;\n    int failed_trial = -1;\n    RandomTestFailure\
+    \ failure = RandomTestFailure::none;\n    int query_count = -1;\n\n    bool passed()\
+    \ const {\n        return failed_trial == -1;\n    }\n\n    explicit operator\
+    \ bool() const {\n        return passed();\n    }\n};\n\nstruct IgnoreRandomTestFailure\
     \ {\n    template <class... Args>\n    void operator()(Args&&...) const {}\n};\n\
-    \nnamespace random_testing_detail {\n\ntemplate <class T>\nvoid print_value(std::ostream&\
-    \ output, const T& value) {\n    if constexpr (requires { output << value; })\
-    \ {\n        output << value;\n    } else if constexpr (requires { std::begin(value);\
-    \ std::end(value); }) {\n        output << '[';\n        bool first = true;\n\
-    \        for (const auto& element : value) {\n            if (!first) output <<\
-    \ \", \";\n            first = false;\n            print_value(output, element);\n\
-    \        }\n        output << ']';\n    } else {\n        output << \"<unprintable>\"\
-    ;\n    }\n}\n\ntemplate <class Function>\ndecltype(auto) invoke_with_trial(Function&\
+    \nstruct InteractionExchange {\n    std::string query;\n    std::string response;\n\
+    \    bool responded = false;\n};\n\nstruct InteractionTranscript {\n    std::vector<InteractionExchange>\
+    \ exchanges;\n    std::string answer;\n    bool answered = false;\n    std::string\
+    \ failure_message;\n};\n\nnamespace random_testing_detail {\n\ntemplate <class\
+    \ T>\nvoid print_value(std::ostream& output, const T& value) {\n    if constexpr\
+    \ (requires { output << value; }) {\n        output << value;\n    } else if constexpr\
+    \ (requires {\n                             typename std::tuple_size<\n      \
+    \                           std::remove_cvref_t<T>>::type;\n                 \
+    \        }) {\n        output << '(';\n        int index = 0;\n        std::apply(\n\
+    \            [&](const auto&... elements) {\n                ((output << (index++\
+    \ == 0 ? \"\" : \", \"),\n                  print_value(output, elements)),\n\
+    \                 ...);\n            },\n            value);\n        output <<\
+    \ ')';\n    } else if constexpr (requires { std::begin(value); std::end(value);\
+    \ }) {\n        output << '[';\n        bool first = true;\n        for (const\
+    \ auto& element : value) {\n            if (!first) output << \", \";\n      \
+    \      first = false;\n            print_value(output, element);\n        }\n\
+    \        output << ']';\n    } else {\n        output << \"<unprintable>\";\n\
+    \    }\n}\n\ntemplate <class Function>\ndecltype(auto) invoke_with_trial(Function&\
     \ function, Random& random, int trial) {\n    if constexpr (std::invocable<Function&,\
     \ Random&, int>) {\n        return std::invoke(function, random, trial);\n   \
     \ } else {\n        static_assert(std::invocable<Function&, Random&>);\n     \
@@ -202,35 +223,210 @@ data:
     \    result.seed = config.seed;\n    result.requested_trials = config.trials;\n\
     \    result.completed_trials = config.trials;\n    return result;\n}\n\ninline\
     \ RandomTestResult failure_result(const RandomTestConfig& config,\n          \
-    \                             int failed_trial) {\n    RandomTestResult result;\n\
-    \    result.seed = config.seed;\n    result.requested_trials = config.trials;\n\
-    \    result.completed_trials = failed_trial;\n    result.failed_trial = failed_trial;\n\
-    \    return result;\n}\n\n}  // namespace random_testing_detail\n\nstruct PrintRandomTestFailure\
-    \ {\n    template <class Case, class Expected, class Actual>\n    void operator()(const\
-    \ Case& test_case, const Expected& expected,\n                    const Actual&\
-    \ actual, int trial,\n                    std::uint64_t seed) const {\n      \
-    \  std::cerr << \"random test failed: seed=\" << seed\n                  << \"\
-    \ trial=\" << trial << '\\n';\n        std::cerr << \"input: \";\n        random_testing_detail::print_value(std::cerr,\
+    \                             int failed_trial,\n                            \
+    \           RandomTestFailure failure,\n                                     \
+    \  int query_count = -1) {\n    RandomTestResult result;\n    result.seed = config.seed;\n\
+    \    result.requested_trials = config.trials;\n    result.completed_trials = failed_trial;\n\
+    \    result.failed_trial = failed_trial;\n    result.failure = failure;\n    result.query_count\
+    \ = query_count;\n    return result;\n}\n\ntemplate <class T>\nstd::string value_to_string(const\
+    \ T& value) {\n    std::ostringstream output;\n    print_value(output, value);\n\
+    \    return output.str();\n}\n\nstruct InteractionAbort {\n    RandomTestFailure\
+    \ failure;\n    std::string message;\n};\n\nclass StandardStreamRedirect {\n \
+    \  private:\n    std::streambuf* _cin_buffer;\n    std::streambuf* _cout_buffer;\n\
+    \n   public:\n    StandardStreamRedirect(std::streambuf* input, std::streambuf*\
+    \ output)\n        : _cin_buffer(std::cin.rdbuf()), _cout_buffer(std::cout.rdbuf())\
+    \ {\n        std::cout.flush();\n        std::cin.rdbuf(input);\n        std::cout.rdbuf(output);\n\
+    \        std::cin.clear();\n        std::cout.clear();\n    }\n\n    StandardStreamRedirect(const\
+    \ StandardStreamRedirect&) = delete;\n    StandardStreamRedirect& operator=(const\
+    \ StandardStreamRedirect&) = delete;\n\n    ~StandardStreamRedirect() {\n    \
+    \    std::cout.flush();\n        std::cin.rdbuf(_cin_buffer);\n        std::cout.rdbuf(_cout_buffer);\n\
+    \        std::cin.clear();\n        std::cout.clear();\n    }\n};\n\ntemplate\
+    \ <class Generator>\nstd::string generate_stream_input(Generator& generator, Random&\
+    \ random,\n                                  int trial) {\n    std::ostringstream\
+    \ output;\n    if constexpr (std::invocable<Generator&, Random&, std::ostream&,\
+    \ int>) {\n        std::invoke(generator, random, output, trial);\n    } else\
+    \ {\n        static_assert(std::invocable<Generator&, Random&, std::ostream&>);\n\
+    \        std::invoke(generator, random, output);\n    }\n    return output.str();\n\
+    }\n\ntemplate <class Generator>\ndecltype(auto) generate_interactive_stream_input(Generator&\
+    \ generator,\n                                                 Random& random,\n\
+    \                                                 std::ostream& output,\n    \
+    \                                             int trial) {\n    if constexpr (std::invocable<Generator&,\
+    \ Random&, std::ostream&, int>) {\n        return std::invoke(generator, random,\
+    \ output, trial);\n    } else {\n        static_assert(std::invocable<Generator&,\
+    \ Random&, std::ostream&>);\n        return std::invoke(generator, random, output);\n\
+    \    }\n}\n\ntemplate <class Solution>\nstd::string run_with_standard_streams(const\
+    \ std::string& input,\n                                      Solution& solution)\
+    \ {\n    std::istringstream input_stream(input);\n    std::ostringstream output_stream;\n\
+    \    {\n        StandardStreamRedirect redirect(input_stream.rdbuf(),\n      \
+    \                                  output_stream.rdbuf());\n        std::invoke(solution);\n\
+    \    }\n    return output_stream.str();\n}\n\ninline std::string trim_line_breaks(std::string\
+    \ text) {\n    while (!text.empty() &&\n           (text.back() == '\\n' || text.back()\
+    \ == '\\r')) {\n        text.pop_back();\n    }\n    return text;\n}\n\ntemplate\
+    \ <class State, class QueryHandler>\nclass InteractiveStreamBuffer : public std::streambuf\
+    \ {\n   private:\n    State* _state;\n    QueryHandler* _query_handler;\n    std::stringbuf*\
+    \ _candidate_output;\n    std::size_t _output_cursor = 0;\n    int _query_limit;\n\
+    \    int _query_count = 0;\n    std::string _input_chunk;\n    InteractionTranscript\
+    \ _transcript;\n    RandomTestFailure _failure = RandomTestFailure::none;\n  \
+    \  std::exception_ptr _exception;\n\n    void set_input_chunk(std::string text)\
+    \ {\n        text.push_back('\\n');\n        _input_chunk = std::move(text);\n\
+    \        char* first = _input_chunk.data();\n        setg(first, first, first\
+    \ + _input_chunk.size());\n    }\n\n    void fail(RandomTestFailure failure, std::string\
+    \ message) {\n        _failure = failure;\n        _transcript.failure_message\
+    \ = std::move(message);\n        setg(nullptr, nullptr, nullptr);\n    }\n\n \
+    \  protected:\n    int_type underflow() override {\n        if (gptr() != nullptr\
+    \ && gptr() < egptr()) {\n            return traits_type::to_int_type(*gptr());\n\
+    \        }\n        if (_failure != RandomTestFailure::none || _exception) {\n\
+    \            return traits_type::eof();\n        }\n\n        std::string all_output\
+    \ = _candidate_output->str();\n        std::string query = all_output.substr(_output_cursor);\n\
+    \        _output_cursor = all_output.size();\n        if (query.empty()) {\n \
+    \           fail(RandomTestFailure::invalid_query,\n                 \"solution\
+    \ requested input without writing a query\");\n            return traits_type::eof();\n\
+    \        }\n\n        InteractionExchange exchange;\n        exchange.query =\
+    \ trim_line_breaks(query);\n        _transcript.exchanges.push_back(std::move(exchange));\n\
+    \        _query_count++;\n        if (_query_limit < _query_count) {\n       \
+    \     fail(RandomTestFailure::query_limit,\n                 \"attempted query\
+    \ \" + std::to_string(_query_count) +\n                     \" with limit \" +\
+    \ std::to_string(_query_limit));\n            return traits_type::eof();\n   \
+    \     }\n\n        std::istringstream query_stream(query);\n        std::ostringstream\
+    \ response_stream;\n        try {\n            std::invoke(*_query_handler, *_state,\
+    \ query_stream,\n                        response_stream);\n        } catch (const\
+    \ InteractionAbort& failure) {\n            fail(failure.failure, failure.message);\n\
+    \            return traits_type::eof();\n        } catch (...) {\n           \
+    \ _exception = std::current_exception();\n            return traits_type::eof();\n\
+    \        }\n\n        std::string response = response_stream.str();\n        InteractionExchange&\
+    \ recorded = _transcript.exchanges.back();\n        recorded.response = trim_line_breaks(response);\n\
+    \        recorded.responded = true;\n        set_input_chunk(std::move(response));\n\
+    \        return traits_type::to_int_type(*gptr());\n    }\n\n   public:\n    InteractiveStreamBuffer(State&\
+    \ state, QueryHandler& query_handler,\n                            std::stringbuf&\
+    \ candidate_output,\n                            std::string initial_input, int\
+    \ query_limit)\n        : _state(&state),\n          _query_handler(&query_handler),\n\
+    \          _candidate_output(&candidate_output),\n          _query_limit(query_limit)\
+    \ {\n        set_input_chunk(std::move(initial_input));\n    }\n\n    void finish()\
+    \ {\n        std::string all_output = _candidate_output->str();\n        _transcript.answer\
+    \ = all_output.substr(_output_cursor);\n        _transcript.answered = true;\n\
+    \    }\n\n    RandomTestFailure failure() const {\n        return _failure;\n\
+    \    }\n\n    int query_count() const {\n        return _query_count;\n    }\n\
+    \n    const InteractionTranscript& transcript() const {\n        return _transcript;\n\
+    \    }\n\n    const std::exception_ptr& exception() const {\n        return _exception;\n\
+    \    }\n};\n\ntemplate <class Solver, class Input, class Interaction>\ndecltype(auto)\
+    \ invoke_interactive_solver(Solver& solver, const Input& input,\n            \
+    \                             Interaction& interaction) {\n    if constexpr (std::invocable<Solver&,\
+    \ const Input&, Interaction&>) {\n        return std::invoke(solver, input, interaction);\n\
+    \    } else {\n        static_assert(std::invocable<Solver&, Interaction&>);\n\
+    \        return std::invoke(solver, interaction);\n    }\n}\n\n}  // namespace\
+    \ random_testing_detail\n\ntemplate <class Input, class State>\nstruct InteractiveTestCase\
+    \ {\n    Input input;\n    State state;\n};\n\ntemplate <class Input, class State>\n\
+    auto interactive_test_case(Input&& input, State&& state) {\n    return InteractiveTestCase<std::remove_cvref_t<Input>,\n\
+    \                               std::remove_cvref_t<State>>{\n        std::forward<Input>(input),\
+    \ std::forward<State>(state)};\n}\n\n// Call this from a query handler when the\
+    \ candidate violates the protocol.\n[[noreturn]] inline void reject_query(std::string\
+    \ message = {}) {\n    throw random_testing_detail::InteractionAbort{\n      \
+    \  RandomTestFailure::invalid_query, std::move(message)};\n}\n\ntemplate <class\
+    \ State, class QueryHandler>\nclass RandomInteraction {\n   private:\n    State*\
+    \ _state;\n    QueryHandler* _query_handler;\n    int _query_limit;\n    int _query_count\
+    \ = 0;\n    InteractionTranscript _transcript;\n\n   public:\n    RandomInteraction(State&\
+    \ state, QueryHandler& query_handler,\n                      int query_limit)\n\
+    \        : _state(&state),\n          _query_handler(&query_handler),\n      \
+    \    _query_limit(query_limit) {}\n\n    RandomInteraction(const RandomInteraction&)\
+    \ = delete;\n    RandomInteraction& operator=(const RandomInteraction&) = delete;\n\
+    \    RandomInteraction(RandomInteraction&&) = delete;\n    RandomInteraction&\
+    \ operator=(RandomInteraction&&) = delete;\n\n    template <class Query>\n   \
+    \ auto ask(Query&& query) {\n        using Reply = std::remove_cvref_t<std::invoke_result_t<\n\
+    \            QueryHandler&, State&, Query>>;\n        static_assert(!std::is_void_v<Reply>);\n\
+    \n        InteractionExchange exchange;\n        exchange.query = random_testing_detail::value_to_string(query);\n\
+    \        _transcript.exchanges.push_back(std::move(exchange));\n        _query_count++;\n\
+    \        if (_query_limit < _query_count) {\n            throw random_testing_detail::InteractionAbort{\n\
+    \                RandomTestFailure::query_limit,\n                \"attempted\
+    \ query \" + std::to_string(_query_count) +\n                    \" with limit\
+    \ \" + std::to_string(_query_limit)};\n        }\n\n        Reply reply = std::invoke(*_query_handler,\
+    \ *_state,\n                                  std::forward<Query>(query));\n \
+    \       InteractionExchange& recorded = _transcript.exchanges.back();\n      \
+    \  recorded.response = random_testing_detail::value_to_string(reply);\n      \
+    \  recorded.responded = true;\n        return reply;\n    }\n\n    int query_count()\
+    \ const {\n        return _query_count;\n    }\n\n    const InteractionTranscript&\
+    \ transcript() const {\n        return _transcript;\n    }\n\n    template <class\
+    \ Answer>\n    void record_answer(const Answer& answer) {\n        _transcript.answer\
+    \ =\n            random_testing_detail::value_to_string(answer);\n        _transcript.answered\
+    \ = true;\n    }\n\n    void record_failure(std::string message) {\n        _transcript.failure_message\
+    \ = std::move(message);\n    }\n};\n\nstruct PrintRandomTestFailure {\n    template\
+    \ <class Case, class Expected, class Actual>\n    void operator()(const Case&\
+    \ test_case, const Expected& expected,\n                    const Actual& actual,\
+    \ int trial,\n                    std::uint64_t seed) const {\n        std::cerr\
+    \ << \"random test failed: seed=\" << seed\n                  << \" trial=\" <<\
+    \ trial << '\\n';\n        std::cerr << \"input: \";\n        random_testing_detail::print_value(std::cerr,\
     \ test_case);\n        std::cerr << \"\\nexpected: \";\n        random_testing_detail::print_value(std::cerr,\
     \ expected);\n        std::cerr << \"\\nactual: \";\n        random_testing_detail::print_value(std::cerr,\
-    \ actual);\n        std::cerr << '\\n';\n    }\n};\n\n// Runs a property returning\
-    \ bool for every generated trial.\n// The property may accept (Random&) or (Random&,\
-    \ int trial).\ntemplate <class Property>\nRandomTestResult random_test(RandomTestConfig\
-    \ config, Property property) {\n    assert(0 <= config.trials);\n    if (config.trials\
-    \ < 0) config.trials = 0;\n    Random random(config.seed);\n    for (int trial\
-    \ = 0; trial < config.trials; trial++) {\n        static_assert(std::convertible_to<\n\
+    \ actual);\n        std::cerr << '\\n';\n    }\n};\n\nstruct PrintConstructiveTestFailure\
+    \ {\n    template <class Case, class Answer>\n    void operator()(const Case&\
+    \ test_case, const Answer& answer, int trial,\n                    std::uint64_t\
+    \ seed) const {\n        std::cerr << \"constructive random test failed: seed=\"\
+    \ << seed\n                  << \" trial=\" << trial << '\\n';\n        std::cerr\
+    \ << \"input: \";\n        random_testing_detail::print_value(std::cerr, test_case);\n\
+    \        std::cerr << \"\\noutput: \";\n        random_testing_detail::print_value(std::cerr,\
+    \ answer);\n        std::cerr << '\\n';\n    }\n};\n\nstruct PrintStreamTestFailure\
+    \ {\n    void operator()(const std::string& input, const std::string& output,\n\
+    \                    int trial, std::uint64_t seed) const {\n        std::cerr\
+    \ << \"stream random test failed: seed=\" << seed\n                  << \" trial=\"\
+    \ << trial << \"\\ninput:\\n\"\n                  << input;\n        if (input.empty()\
+    \ || input.back() != '\\n') std::cerr << '\\n';\n        std::cerr << \"output:\\\
+    n\" << output;\n        if (output.empty() || output.back() != '\\n') std::cerr\
+    \ << '\\n';\n    }\n};\n\nstruct PrintInteractiveTestFailure {\n    template <class\
+    \ Input, class State>\n    void operator()(const InteractiveTestCase<Input, State>&\
+    \ test_case,\n                    const InteractionTranscript& transcript, int\
+    \ trial,\n                    std::uint64_t seed,\n                    RandomTestFailure\
+    \ failure) const {\n        std::cerr << \"interactive random test failed: seed=\"\
+    \ << seed\n                  << \" trial=\" << trial\n                  << \"\
+    \ reason=\" << random_test_failure_name(failure) << '\\n';\n        std::cerr\
+    \ << \"input: \";\n        random_testing_detail::print_value(std::cerr, test_case.input);\n\
+    \        std::cerr << \"\\njudge state: \";\n        random_testing_detail::print_value(std::cerr,\
+    \ test_case.state);\n        std::cerr << '\\n';\n        for (int index = 0;\
+    \ index < int(transcript.exchanges.size()); index++) {\n            const InteractionExchange&\
+    \ exchange = transcript.exchanges[index];\n            std::cerr << \"query \"\
+    \ << index + 1 << \": \" << exchange.query;\n            if (exchange.responded)\
+    \ {\n                std::cerr << \" -> \" << exchange.response;\n           \
+    \ } else {\n                std::cerr << \" -> <no response>\";\n            }\n\
+    \            std::cerr << '\\n';\n        }\n        if (transcript.answered)\
+    \ {\n            std::cerr << \"answer: \" << transcript.answer << '\\n';\n  \
+    \      }\n        if (!transcript.failure_message.empty()) {\n            std::cerr\
+    \ << \"message: \" << transcript.failure_message << '\\n';\n        }\n    }\n\
+    };\n\nstruct PrintInteractiveStreamTestFailure {\n    template <class State>\n\
+    \    void operator()(const std::string& input, const State& state,\n         \
+    \           const InteractionTranscript& transcript, int trial,\n            \
+    \        std::uint64_t seed,\n                    RandomTestFailure failure) const\
+    \ {\n        std::cerr << \"interactive stream random test failed: seed=\" <<\
+    \ seed\n                  << \" trial=\" << trial\n                  << \" reason=\"\
+    \ << random_test_failure_name(failure)\n                  << \"\\ninput:\\n\"\n\
+    \                  << input;\n        if (input.empty() || input.back() != '\\\
+    n') std::cerr << '\\n';\n        std::cerr << \"judge state: \";\n        random_testing_detail::print_value(std::cerr,\
+    \ state);\n        std::cerr << '\\n';\n        for (int index = 0; index < int(transcript.exchanges.size());\
+    \ index++) {\n            const InteractionExchange& exchange = transcript.exchanges[index];\n\
+    \            std::cerr << \"query \" << index + 1 << \": \" << exchange.query;\n\
+    \            if (exchange.responded) {\n                std::cerr << \" -> \"\
+    \ << exchange.response;\n            } else {\n                std::cerr << \"\
+    \ -> <no response>\";\n            }\n            std::cerr << '\\n';\n      \
+    \  }\n        if (transcript.answered) {\n            std::cerr << \"answer: \"\
+    \ << transcript.answer;\n            if (transcript.answer.empty() || transcript.answer.back()\
+    \ != '\\n') {\n                std::cerr << '\\n';\n            }\n        }\n\
+    \        if (!transcript.failure_message.empty()) {\n            std::cerr <<\
+    \ \"message: \" << transcript.failure_message << '\\n';\n        }\n    }\n};\n\
+    \n// Runs a property returning bool for every generated trial.\n// The property\
+    \ may accept (Random&) or (Random&, int trial).\ntemplate <class Property>\nRandomTestResult\
+    \ random_test(RandomTestConfig config, Property property) {\n    assert(0 <= config.trials);\n\
+    \    if (config.trials < 0) config.trials = 0;\n    Random random(config.seed);\n\
+    \    for (int trial = 0; trial < config.trials; trial++) {\n        static_assert(std::convertible_to<\n\
     \                      decltype(random_testing_detail::invoke_with_trial(\n  \
     \                        property, random, trial)),\n                      bool>);\n\
     \        bool passed = bool(\n            random_testing_detail::invoke_with_trial(property,\
-    \ random, trial));\n        if (!passed) {\n            return random_testing_detail::failure_result(config,\
-    \ trial);\n        }\n    }\n    return random_testing_detail::success_result(config);\n\
-    }\n\ntemplate <class Property>\nRandomTestResult random_test(Property property)\
-    \ {\n    return random_test(RandomTestConfig(), std::move(property));\n}\n\n//\
-    \ Generates a case, runs an optimized solver and an oracle on separate copies,\n\
-    // and compares their results. Stops at the first mismatch.\n//\n// generator:\
-    \ (Random&) or (Random&, int trial) -> Case\n// solver/oracle: (Case&) -> result\n\
-    // on_failure: (case, expected, actual, trial, seed) -> void\ntemplate <class\
-    \ Generator, class Solver, class Oracle,\n          class OnFailure = IgnoreRandomTestFailure,\n\
+    \ random, trial));\n        if (!passed) {\n            return random_testing_detail::failure_result(\n\
+    \                config, trial, RandomTestFailure::property);\n        }\n   \
+    \ }\n    return random_testing_detail::success_result(config);\n}\n\ntemplate\
+    \ <class Property>\nRandomTestResult random_test(Property property) {\n    return\
+    \ random_test(RandomTestConfig(), std::move(property));\n}\n\n// Generates a case,\
+    \ runs an optimized solver and an oracle on separate copies,\n// and compares\
+    \ their results. Stops at the first mismatch.\n//\n// generator: (Random&) or\
+    \ (Random&, int trial) -> Case\n// solver/oracle: (Case&) -> result\n// on_failure:\
+    \ (case, expected, actual, trial, seed) -> void\ntemplate <class Generator, class\
+    \ Solver, class Oracle,\n          class OnFailure = IgnoreRandomTestFailure,\n\
     \          class Equal = std::equal_to<>>\nRandomTestResult compare_randomly(RandomTestConfig\
     \ config, Generator generator,\n                                  Solver solver,\
     \ Oracle oracle,\n                                  OnFailure on_failure = {},\
@@ -243,12 +439,136 @@ data:
     \        decltype(auto) actual = std::invoke(solver, actual_input);\n        decltype(auto)\
     \ expected = std::invoke(oracle, expected_input);\n        if (!bool(std::invoke(equal,\
     \ actual, expected))) {\n            std::invoke(on_failure, test_case, expected,\
-    \ actual, trial,\n                        config.seed);\n            return random_testing_detail::failure_result(config,\
-    \ trial);\n        }\n    }\n    return random_testing_detail::success_result(config);\n\
-    }\n\ntemplate <class Generator, class Solver, class Oracle>\nRandomTestResult\
-    \ compare_randomly(Generator generator, Solver solver,\n                     \
-    \             Oracle oracle) {\n    return compare_randomly(RandomTestConfig(),\
-    \ std::move(generator),\n                            std::move(solver), std::move(oracle));\n\
+    \ actual, trial,\n                        config.seed);\n            return random_testing_detail::failure_result(\n\
+    \                config, trial, RandomTestFailure::mismatch);\n        }\n   \
+    \ }\n    return random_testing_detail::success_result(config);\n}\n\ntemplate\
+    \ <class Generator, class Solver, class Oracle>\nRandomTestResult compare_randomly(Generator\
+    \ generator, Solver solver,\n                                  Oracle oracle)\
+    \ {\n    return compare_randomly(RandomTestConfig(), std::move(generator),\n \
+    \                           std::move(solver), std::move(oracle));\n}\n\n// Generates\
+    \ an input, runs a constructive solver, and validates its output.\n// validator:\
+    \ (const Case&, const Answer&) -> bool\ntemplate <class Generator, class Solver,\
+    \ class Validator,\n          class OnFailure = IgnoreRandomTestFailure>\nRandomTestResult\
+    \ test_constructively(RandomTestConfig config,\n                             \
+    \        Generator generator, Solver solver,\n                               \
+    \      Validator validator,\n                                     OnFailure on_failure\
+    \ = {}) {\n    assert(0 <= config.trials);\n    if (config.trials < 0) config.trials\
+    \ = 0;\n    Random random(config.seed);\n\n    for (int trial = 0; trial < config.trials;\
+    \ trial++) {\n        auto test_case =\n            random_testing_detail::invoke_with_trial(generator,\
+    \ random, trial);\n        using Case = std::remove_cvref_t<decltype(test_case)>;\n\
+    \        static_assert(std::copy_constructible<Case>);\n        Case solver_input\
+    \ = test_case;\n        auto answer = std::invoke(solver, solver_input);\n   \
+    \     if (!bool(std::invoke(validator, std::as_const(test_case),\n           \
+    \                   std::as_const(answer)))) {\n            std::invoke(on_failure,\
+    \ std::as_const(test_case),\n                        std::as_const(answer), trial,\
+    \ config.seed);\n            return random_testing_detail::failure_result(\n \
+    \               config, trial, RandomTestFailure::rejected_output);\n        }\n\
+    \    }\n    return random_testing_detail::success_result(config);\n}\n\ntemplate\
+    \ <class Generator, class Solver, class Validator>\nRandomTestResult test_constructively(Generator\
+    \ generator, Solver solver,\n                                     Validator validator)\
+    \ {\n    return test_constructively(RandomTestConfig(), std::move(generator),\n\
+    \                               std::move(solver), std::move(validator));\n}\n\
+    \n// Runs an ordinary solution that reads std::cin and writes std::cout.\n// generator:\
+    \ (Random&, ostream&) or (Random&, ostream&, trial) -> void\n// checker: (istream&\
+    \ generated_input, istream& candidate_output) -> bool\ntemplate <class Generator,\
+    \ class Solution, class Checker,\n          class OnFailure = IgnoreRandomTestFailure>\n\
+    RandomTestResult test_streams(RandomTestConfig config, Generator generator,\n\
+    \                              Solution solution, Checker checker,\n         \
+    \                     OnFailure on_failure = {}) {\n    assert(0 <= config.trials);\n\
+    \    if (config.trials < 0) config.trials = 0;\n    Random random(config.seed);\n\
+    \n    for (int trial = 0; trial < config.trials; trial++) {\n        std::string\
+    \ input = random_testing_detail::generate_stream_input(\n            generator,\
+    \ random, trial);\n        std::string output =\n            random_testing_detail::run_with_standard_streams(input,\
+    \ solution);\n        std::istringstream input_stream(input);\n        std::istringstream\
+    \ output_stream(output);\n        if (!bool(std::invoke(checker, input_stream,\
+    \ output_stream))) {\n            std::invoke(on_failure, std::as_const(input),\n\
+    \                        std::as_const(output), trial, config.seed);\n       \
+    \     return random_testing_detail::failure_result(\n                config, trial,\
+    \ RandomTestFailure::rejected_output);\n        }\n    }\n    return random_testing_detail::success_result(config);\n\
+    }\n\ntemplate <class Generator, class Solution, class Checker>\nRandomTestResult\
+    \ test_streams(Generator generator, Solution solution,\n                     \
+    \         Checker checker) {\n    return test_streams(RandomTestConfig(), std::move(generator),\n\
+    \                        std::move(solution), std::move(checker));\n}\n\n// generator:\
+    \ (Random&) or (Random&, trial) -> InteractiveTestCase<Input, State>\n// solver:\
+    \ (const Input&, interaction) or (interaction) -> Answer\n// query_handler: (State&,\
+    \ Query) -> Reply\n// validator: (const Input&, const State&, const Answer&) ->\
+    \ bool\ntemplate <class Generator, class Solver, class QueryHandler, class Validator,\n\
+    \          class OnFailure = IgnoreRandomTestFailure>\nRandomTestResult test_interactively(RandomTestConfig\
+    \ config, int query_limit,\n                                    Generator generator,\
+    \ Solver solver,\n                                    QueryHandler query_handler,\n\
+    \                                    Validator validator,\n                  \
+    \                  OnFailure on_failure = {}) {\n    assert(0 <= config.trials);\n\
+    \    assert(0 <= query_limit);\n    if (config.trials < 0) config.trials = 0;\n\
+    \    if (query_limit < 0) query_limit = 0;\n    Random random(config.seed);\n\n\
+    \    for (int trial = 0; trial < config.trials; trial++) {\n        auto test_case\
+    \ =\n            random_testing_detail::invoke_with_trial(generator, random, trial);\n\
+    \        using State = std::remove_cvref_t<decltype(test_case.state)>;\n     \
+    \   RandomInteraction<State, QueryHandler> interaction(\n            test_case.state,\
+    \ query_handler, query_limit);\n\n        try {\n            auto answer = random_testing_detail::invoke_interactive_solver(\n\
+    \                solver, std::as_const(test_case.input), interaction);\n     \
+    \       interaction.record_answer(answer);\n            if (!bool(std::invoke(validator,\
+    \ std::as_const(test_case.input),\n                                  std::as_const(test_case.state),\n\
+    \                                  std::as_const(answer)))) {\n              \
+    \  RandomTestResult result =\n                    random_testing_detail::failure_result(\n\
+    \                        config, trial, RandomTestFailure::rejected_output,\n\
+    \                        interaction.query_count());\n                std::invoke(on_failure,\
+    \ std::as_const(test_case),\n                            interaction.transcript(),\
+    \ trial, config.seed,\n                            result.failure);\n        \
+    \        return result;\n            }\n        } catch (const random_testing_detail::InteractionAbort&\
+    \ failure) {\n            interaction.record_failure(failure.message);\n     \
+    \       RandomTestResult result = random_testing_detail::failure_result(\n   \
+    \             config, trial, failure.failure, interaction.query_count());\n  \
+    \          std::invoke(on_failure, std::as_const(test_case),\n               \
+    \         interaction.transcript(), trial, config.seed,\n                    \
+    \    result.failure);\n            return result;\n        }\n    }\n    return\
+    \ random_testing_detail::success_result(config);\n}\n\ntemplate <class Generator,\
+    \ class Solver, class QueryHandler, class Validator>\nRandomTestResult test_interactively(int\
+    \ query_limit, Generator generator,\n                                    Solver\
+    \ solver, QueryHandler query_handler,\n                                    Validator\
+    \ validator) {\n    return test_interactively(RandomTestConfig(), query_limit,\n\
+    \                              std::move(generator), std::move(solver),\n    \
+    \                          std::move(query_handler), std::move(validator));\n\
+    }\n\n// Runs an ordinary interactive solution using std::cin and std::cout.\n\
+    // generator: (Random&, ostream&) or (Random&, ostream&, trial) -> JudgeState\n\
+    // query_handler: (JudgeState&, istream& query, ostream& response) -> void\n//\
+    \ checker: (istream& public_input, const JudgeState&,\n//           istream& final_output)\
+    \ -> bool\ntemplate <class Generator, class Solution, class QueryHandler, class\
+    \ Checker,\n          class OnFailure = IgnoreRandomTestFailure>\nRandomTestResult\
+    \ test_interactive_streams(\n    RandomTestConfig config, int query_limit, Generator\
+    \ generator,\n    Solution solution, QueryHandler query_handler, Checker checker,\n\
+    \    OnFailure on_failure = {}) {\n    assert(0 <= config.trials);\n    assert(0\
+    \ <= query_limit);\n    if (config.trials < 0) config.trials = 0;\n    if (query_limit\
+    \ < 0) query_limit = 0;\n    Random random(config.seed);\n\n    for (int trial\
+    \ = 0; trial < config.trials; trial++) {\n        std::ostringstream generated_input;\n\
+    \        auto state =\n            random_testing_detail::generate_interactive_stream_input(\n\
+    \                generator, random, generated_input, trial);\n        std::string\
+    \ input = generated_input.str();\n        std::stringbuf candidate_output(std::ios::out);\n\
+    \        using State = std::remove_cvref_t<decltype(state)>;\n        random_testing_detail::InteractiveStreamBuffer<State,\
+    \ QueryHandler>\n            input_buffer(state, query_handler, candidate_output,\
+    \ input,\n                         query_limit);\n        {\n            random_testing_detail::StandardStreamRedirect\
+    \ redirect(\n                &input_buffer, &candidate_output);\n            std::invoke(solution);\n\
+    \        }\n        input_buffer.finish();\n        if (input_buffer.exception())\
+    \ {\n            std::rethrow_exception(input_buffer.exception());\n        }\n\
+    \n        RandomTestFailure failure = input_buffer.failure();\n        if (failure\
+    \ != RandomTestFailure::none) {\n            RandomTestResult result = random_testing_detail::failure_result(\n\
+    \                config, trial, failure, input_buffer.query_count());\n      \
+    \      std::invoke(on_failure, std::as_const(input),\n                       \
+    \ std::as_const(state), input_buffer.transcript(), trial,\n                  \
+    \      config.seed, failure);\n            return result;\n        }\n\n     \
+    \   std::istringstream input_stream(input);\n        std::istringstream output_stream(input_buffer.transcript().answer);\n\
+    \        if (!bool(std::invoke(checker, input_stream, std::as_const(state),\n\
+    \                              output_stream))) {\n            RandomTestResult\
+    \ result = random_testing_detail::failure_result(\n                config, trial,\
+    \ RandomTestFailure::rejected_output,\n                input_buffer.query_count());\n\
+    \            std::invoke(on_failure, std::as_const(input),\n                 \
+    \       std::as_const(state), input_buffer.transcript(), trial,\n            \
+    \            config.seed, result.failure);\n            return result;\n     \
+    \   }\n    }\n    return random_testing_detail::success_result(config);\n}\n\n\
+    template <class Generator, class Solution, class QueryHandler, class Checker>\n\
+    RandomTestResult test_interactive_streams(\n    int query_limit, Generator generator,\
+    \ Solution solution,\n    QueryHandler query_handler, Checker checker) {\n   \
+    \ return test_interactive_streams(\n        RandomTestConfig(), query_limit, std::move(generator),\n\
+    \        std::move(solution), std::move(query_handler), std::move(checker));\n\
     }\n\n// Short contest interface. Prints failure metadata and terminates on failure.\n\
     template <class Property>\nRandomTestResult stress_test(Property property, int\
     \ trials = 1000,\n                             std::uint64_t seed = default_random_test_seed)\
@@ -265,63 +585,290 @@ data:
     \ = trials;\n    config.seed = seed;\n    RandomTestResult result = compare_randomly(\n\
     \        config, std::move(generator), std::move(solver), std::move(oracle),\n\
     \        PrintRandomTestFailure());\n    if (!result) std::abort();\n    return\
-    \ result;\n}\n\n}  // namespace utilities\n}  // namespace m1une\n\n\n"
+    \ result;\n}\n\ntemplate <class Generator, class Solver, class Validator>\nRandomTestResult\
+    \ constructive_stress_test(\n    Generator generator, Solver solver, Validator\
+    \ validator,\n    int trials = 1000, std::uint64_t seed = default_random_test_seed)\
+    \ {\n    RandomTestConfig config;\n    config.trials = trials;\n    config.seed\
+    \ = seed;\n    RandomTestResult result = test_constructively(\n        config,\
+    \ std::move(generator), std::move(solver),\n        std::move(validator), PrintConstructiveTestFailure());\n\
+    \    if (!result) std::abort();\n    return result;\n}\n\ntemplate <class Generator,\
+    \ class Solution, class Checker>\nRandomTestResult stream_stress_test(\n    Generator\
+    \ generator, Solution solution, Checker checker,\n    int trials = 1000, std::uint64_t\
+    \ seed = default_random_test_seed) {\n    RandomTestConfig config;\n    config.trials\
+    \ = trials;\n    config.seed = seed;\n    RandomTestResult result = test_streams(\n\
+    \        config, std::move(generator), std::move(solution),\n        std::move(checker),\
+    \ PrintStreamTestFailure());\n    if (!result) std::abort();\n    return result;\n\
+    }\n\ntemplate <class Generator, class Solver, class QueryHandler, class Validator>\n\
+    RandomTestResult interactive_stress_test(\n    int query_limit, Generator generator,\
+    \ Solver solver,\n    QueryHandler query_handler, Validator validator, int trials\
+    \ = 1000,\n    std::uint64_t seed = default_random_test_seed) {\n    RandomTestConfig\
+    \ config;\n    config.trials = trials;\n    config.seed = seed;\n    RandomTestResult\
+    \ result = test_interactively(\n        config, query_limit, std::move(generator),\
+    \ std::move(solver),\n        std::move(query_handler), std::move(validator),\n\
+    \        PrintInteractiveTestFailure());\n    if (!result) std::abort();\n   \
+    \ return result;\n}\n\ntemplate <class Generator, class Solution, class QueryHandler,\
+    \ class Checker>\nRandomTestResult interactive_stream_stress_test(\n    int query_limit,\
+    \ Generator generator, Solution solution,\n    QueryHandler query_handler, Checker\
+    \ checker, int trials = 1000,\n    std::uint64_t seed = default_random_test_seed)\
+    \ {\n    RandomTestConfig config;\n    config.trials = trials;\n    config.seed\
+    \ = seed;\n    RandomTestResult result = test_interactive_streams(\n        config,\
+    \ query_limit, std::move(generator), std::move(solution),\n        std::move(query_handler),\
+    \ std::move(checker),\n        PrintInteractiveStreamTestFailure());\n    if (!result)\
+    \ std::abort();\n    return result;\n}\n\n}  // namespace utilities\n}  // namespace\
+    \ m1une\n\n\n"
   code: "#ifndef M1UNE_RANDOM_TESTING_HPP\n#define M1UNE_RANDOM_TESTING_HPP 1\n\n\
     #include <cassert>\n#include <concepts>\n#include <cstdint>\n#include <cstdlib>\n\
-    #include <functional>\n#include <iostream>\n#include <iterator>\n#include <type_traits>\n\
-    #include <utility>\n\n#include \"random.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ utilities {\n\ninline constexpr std::uint64_t default_random_test_seed =\n \
-    \   0x243f6a8885a308d3ULL;\n\nstruct RandomTestConfig {\n    int trials = 1000;\n\
-    \    std::uint64_t seed = default_random_test_seed;\n};\n\nstruct RandomTestResult\
-    \ {\n    std::uint64_t seed = 0;\n    int requested_trials = 0;\n    int completed_trials\
-    \ = 0;\n    int failed_trial = -1;\n\n    bool passed() const {\n        return\
-    \ failed_trial == -1;\n    }\n\n    explicit operator bool() const {\n       \
-    \ return passed();\n    }\n};\n\nstruct IgnoreRandomTestFailure {\n    template\
-    \ <class... Args>\n    void operator()(Args&&...) const {}\n};\n\nnamespace random_testing_detail\
-    \ {\n\ntemplate <class T>\nvoid print_value(std::ostream& output, const T& value)\
-    \ {\n    if constexpr (requires { output << value; }) {\n        output << value;\n\
-    \    } else if constexpr (requires { std::begin(value); std::end(value); }) {\n\
-    \        output << '[';\n        bool first = true;\n        for (const auto&\
-    \ element : value) {\n            if (!first) output << \", \";\n            first\
-    \ = false;\n            print_value(output, element);\n        }\n        output\
-    \ << ']';\n    } else {\n        output << \"<unprintable>\";\n    }\n}\n\ntemplate\
-    \ <class Function>\ndecltype(auto) invoke_with_trial(Function& function, Random&\
-    \ random, int trial) {\n    if constexpr (std::invocable<Function&, Random&, int>)\
-    \ {\n        return std::invoke(function, random, trial);\n    } else {\n    \
-    \    static_assert(std::invocable<Function&, Random&>);\n        return std::invoke(function,\
-    \ random);\n    }\n}\n\ninline RandomTestResult success_result(const RandomTestConfig&\
-    \ config) {\n    RandomTestResult result;\n    result.seed = config.seed;\n  \
-    \  result.requested_trials = config.trials;\n    result.completed_trials = config.trials;\n\
-    \    return result;\n}\n\ninline RandomTestResult failure_result(const RandomTestConfig&\
-    \ config,\n                                       int failed_trial) {\n    RandomTestResult\
-    \ result;\n    result.seed = config.seed;\n    result.requested_trials = config.trials;\n\
-    \    result.completed_trials = failed_trial;\n    result.failed_trial = failed_trial;\n\
-    \    return result;\n}\n\n}  // namespace random_testing_detail\n\nstruct PrintRandomTestFailure\
-    \ {\n    template <class Case, class Expected, class Actual>\n    void operator()(const\
-    \ Case& test_case, const Expected& expected,\n                    const Actual&\
-    \ actual, int trial,\n                    std::uint64_t seed) const {\n      \
-    \  std::cerr << \"random test failed: seed=\" << seed\n                  << \"\
-    \ trial=\" << trial << '\\n';\n        std::cerr << \"input: \";\n        random_testing_detail::print_value(std::cerr,\
+    #include <exception>\n#include <functional>\n#include <iostream>\n#include <iterator>\n\
+    #include <sstream>\n#include <string>\n#include <tuple>\n#include <type_traits>\n\
+    #include <utility>\n#include <vector>\n\n#include \"random.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace utilities {\n\ninline constexpr std::uint64_t default_random_test_seed\
+    \ =\n    0x243f6a8885a308d3ULL;\n\nstruct RandomTestConfig {\n    int trials =\
+    \ 1000;\n    std::uint64_t seed = default_random_test_seed;\n};\n\nenum class\
+    \ RandomTestFailure {\n    none,\n    property,\n    mismatch,\n    rejected_output,\n\
+    \    query_limit,\n    invalid_query,\n};\n\ninline const char* random_test_failure_name(RandomTestFailure\
+    \ failure) {\n    switch (failure) {\n        case RandomTestFailure::none:\n\
+    \            return \"none\";\n        case RandomTestFailure::property:\n   \
+    \         return \"property\";\n        case RandomTestFailure::mismatch:\n  \
+    \          return \"mismatch\";\n        case RandomTestFailure::rejected_output:\n\
+    \            return \"rejected output\";\n        case RandomTestFailure::query_limit:\n\
+    \            return \"query limit exceeded\";\n        case RandomTestFailure::invalid_query:\n\
+    \            return \"invalid query\";\n    }\n    return \"unknown\";\n}\n\n\
+    struct RandomTestResult {\n    std::uint64_t seed = 0;\n    int requested_trials\
+    \ = 0;\n    int completed_trials = 0;\n    int failed_trial = -1;\n    RandomTestFailure\
+    \ failure = RandomTestFailure::none;\n    int query_count = -1;\n\n    bool passed()\
+    \ const {\n        return failed_trial == -1;\n    }\n\n    explicit operator\
+    \ bool() const {\n        return passed();\n    }\n};\n\nstruct IgnoreRandomTestFailure\
+    \ {\n    template <class... Args>\n    void operator()(Args&&...) const {}\n};\n\
+    \nstruct InteractionExchange {\n    std::string query;\n    std::string response;\n\
+    \    bool responded = false;\n};\n\nstruct InteractionTranscript {\n    std::vector<InteractionExchange>\
+    \ exchanges;\n    std::string answer;\n    bool answered = false;\n    std::string\
+    \ failure_message;\n};\n\nnamespace random_testing_detail {\n\ntemplate <class\
+    \ T>\nvoid print_value(std::ostream& output, const T& value) {\n    if constexpr\
+    \ (requires { output << value; }) {\n        output << value;\n    } else if constexpr\
+    \ (requires {\n                             typename std::tuple_size<\n      \
+    \                           std::remove_cvref_t<T>>::type;\n                 \
+    \        }) {\n        output << '(';\n        int index = 0;\n        std::apply(\n\
+    \            [&](const auto&... elements) {\n                ((output << (index++\
+    \ == 0 ? \"\" : \", \"),\n                  print_value(output, elements)),\n\
+    \                 ...);\n            },\n            value);\n        output <<\
+    \ ')';\n    } else if constexpr (requires { std::begin(value); std::end(value);\
+    \ }) {\n        output << '[';\n        bool first = true;\n        for (const\
+    \ auto& element : value) {\n            if (!first) output << \", \";\n      \
+    \      first = false;\n            print_value(output, element);\n        }\n\
+    \        output << ']';\n    } else {\n        output << \"<unprintable>\";\n\
+    \    }\n}\n\ntemplate <class Function>\ndecltype(auto) invoke_with_trial(Function&\
+    \ function, Random& random, int trial) {\n    if constexpr (std::invocable<Function&,\
+    \ Random&, int>) {\n        return std::invoke(function, random, trial);\n   \
+    \ } else {\n        static_assert(std::invocable<Function&, Random&>);\n     \
+    \   return std::invoke(function, random);\n    }\n}\n\ninline RandomTestResult\
+    \ success_result(const RandomTestConfig& config) {\n    RandomTestResult result;\n\
+    \    result.seed = config.seed;\n    result.requested_trials = config.trials;\n\
+    \    result.completed_trials = config.trials;\n    return result;\n}\n\ninline\
+    \ RandomTestResult failure_result(const RandomTestConfig& config,\n          \
+    \                             int failed_trial,\n                            \
+    \           RandomTestFailure failure,\n                                     \
+    \  int query_count = -1) {\n    RandomTestResult result;\n    result.seed = config.seed;\n\
+    \    result.requested_trials = config.trials;\n    result.completed_trials = failed_trial;\n\
+    \    result.failed_trial = failed_trial;\n    result.failure = failure;\n    result.query_count\
+    \ = query_count;\n    return result;\n}\n\ntemplate <class T>\nstd::string value_to_string(const\
+    \ T& value) {\n    std::ostringstream output;\n    print_value(output, value);\n\
+    \    return output.str();\n}\n\nstruct InteractionAbort {\n    RandomTestFailure\
+    \ failure;\n    std::string message;\n};\n\nclass StandardStreamRedirect {\n \
+    \  private:\n    std::streambuf* _cin_buffer;\n    std::streambuf* _cout_buffer;\n\
+    \n   public:\n    StandardStreamRedirect(std::streambuf* input, std::streambuf*\
+    \ output)\n        : _cin_buffer(std::cin.rdbuf()), _cout_buffer(std::cout.rdbuf())\
+    \ {\n        std::cout.flush();\n        std::cin.rdbuf(input);\n        std::cout.rdbuf(output);\n\
+    \        std::cin.clear();\n        std::cout.clear();\n    }\n\n    StandardStreamRedirect(const\
+    \ StandardStreamRedirect&) = delete;\n    StandardStreamRedirect& operator=(const\
+    \ StandardStreamRedirect&) = delete;\n\n    ~StandardStreamRedirect() {\n    \
+    \    std::cout.flush();\n        std::cin.rdbuf(_cin_buffer);\n        std::cout.rdbuf(_cout_buffer);\n\
+    \        std::cin.clear();\n        std::cout.clear();\n    }\n};\n\ntemplate\
+    \ <class Generator>\nstd::string generate_stream_input(Generator& generator, Random&\
+    \ random,\n                                  int trial) {\n    std::ostringstream\
+    \ output;\n    if constexpr (std::invocable<Generator&, Random&, std::ostream&,\
+    \ int>) {\n        std::invoke(generator, random, output, trial);\n    } else\
+    \ {\n        static_assert(std::invocable<Generator&, Random&, std::ostream&>);\n\
+    \        std::invoke(generator, random, output);\n    }\n    return output.str();\n\
+    }\n\ntemplate <class Generator>\ndecltype(auto) generate_interactive_stream_input(Generator&\
+    \ generator,\n                                                 Random& random,\n\
+    \                                                 std::ostream& output,\n    \
+    \                                             int trial) {\n    if constexpr (std::invocable<Generator&,\
+    \ Random&, std::ostream&, int>) {\n        return std::invoke(generator, random,\
+    \ output, trial);\n    } else {\n        static_assert(std::invocable<Generator&,\
+    \ Random&, std::ostream&>);\n        return std::invoke(generator, random, output);\n\
+    \    }\n}\n\ntemplate <class Solution>\nstd::string run_with_standard_streams(const\
+    \ std::string& input,\n                                      Solution& solution)\
+    \ {\n    std::istringstream input_stream(input);\n    std::ostringstream output_stream;\n\
+    \    {\n        StandardStreamRedirect redirect(input_stream.rdbuf(),\n      \
+    \                                  output_stream.rdbuf());\n        std::invoke(solution);\n\
+    \    }\n    return output_stream.str();\n}\n\ninline std::string trim_line_breaks(std::string\
+    \ text) {\n    while (!text.empty() &&\n           (text.back() == '\\n' || text.back()\
+    \ == '\\r')) {\n        text.pop_back();\n    }\n    return text;\n}\n\ntemplate\
+    \ <class State, class QueryHandler>\nclass InteractiveStreamBuffer : public std::streambuf\
+    \ {\n   private:\n    State* _state;\n    QueryHandler* _query_handler;\n    std::stringbuf*\
+    \ _candidate_output;\n    std::size_t _output_cursor = 0;\n    int _query_limit;\n\
+    \    int _query_count = 0;\n    std::string _input_chunk;\n    InteractionTranscript\
+    \ _transcript;\n    RandomTestFailure _failure = RandomTestFailure::none;\n  \
+    \  std::exception_ptr _exception;\n\n    void set_input_chunk(std::string text)\
+    \ {\n        text.push_back('\\n');\n        _input_chunk = std::move(text);\n\
+    \        char* first = _input_chunk.data();\n        setg(first, first, first\
+    \ + _input_chunk.size());\n    }\n\n    void fail(RandomTestFailure failure, std::string\
+    \ message) {\n        _failure = failure;\n        _transcript.failure_message\
+    \ = std::move(message);\n        setg(nullptr, nullptr, nullptr);\n    }\n\n \
+    \  protected:\n    int_type underflow() override {\n        if (gptr() != nullptr\
+    \ && gptr() < egptr()) {\n            return traits_type::to_int_type(*gptr());\n\
+    \        }\n        if (_failure != RandomTestFailure::none || _exception) {\n\
+    \            return traits_type::eof();\n        }\n\n        std::string all_output\
+    \ = _candidate_output->str();\n        std::string query = all_output.substr(_output_cursor);\n\
+    \        _output_cursor = all_output.size();\n        if (query.empty()) {\n \
+    \           fail(RandomTestFailure::invalid_query,\n                 \"solution\
+    \ requested input without writing a query\");\n            return traits_type::eof();\n\
+    \        }\n\n        InteractionExchange exchange;\n        exchange.query =\
+    \ trim_line_breaks(query);\n        _transcript.exchanges.push_back(std::move(exchange));\n\
+    \        _query_count++;\n        if (_query_limit < _query_count) {\n       \
+    \     fail(RandomTestFailure::query_limit,\n                 \"attempted query\
+    \ \" + std::to_string(_query_count) +\n                     \" with limit \" +\
+    \ std::to_string(_query_limit));\n            return traits_type::eof();\n   \
+    \     }\n\n        std::istringstream query_stream(query);\n        std::ostringstream\
+    \ response_stream;\n        try {\n            std::invoke(*_query_handler, *_state,\
+    \ query_stream,\n                        response_stream);\n        } catch (const\
+    \ InteractionAbort& failure) {\n            fail(failure.failure, failure.message);\n\
+    \            return traits_type::eof();\n        } catch (...) {\n           \
+    \ _exception = std::current_exception();\n            return traits_type::eof();\n\
+    \        }\n\n        std::string response = response_stream.str();\n        InteractionExchange&\
+    \ recorded = _transcript.exchanges.back();\n        recorded.response = trim_line_breaks(response);\n\
+    \        recorded.responded = true;\n        set_input_chunk(std::move(response));\n\
+    \        return traits_type::to_int_type(*gptr());\n    }\n\n   public:\n    InteractiveStreamBuffer(State&\
+    \ state, QueryHandler& query_handler,\n                            std::stringbuf&\
+    \ candidate_output,\n                            std::string initial_input, int\
+    \ query_limit)\n        : _state(&state),\n          _query_handler(&query_handler),\n\
+    \          _candidate_output(&candidate_output),\n          _query_limit(query_limit)\
+    \ {\n        set_input_chunk(std::move(initial_input));\n    }\n\n    void finish()\
+    \ {\n        std::string all_output = _candidate_output->str();\n        _transcript.answer\
+    \ = all_output.substr(_output_cursor);\n        _transcript.answered = true;\n\
+    \    }\n\n    RandomTestFailure failure() const {\n        return _failure;\n\
+    \    }\n\n    int query_count() const {\n        return _query_count;\n    }\n\
+    \n    const InteractionTranscript& transcript() const {\n        return _transcript;\n\
+    \    }\n\n    const std::exception_ptr& exception() const {\n        return _exception;\n\
+    \    }\n};\n\ntemplate <class Solver, class Input, class Interaction>\ndecltype(auto)\
+    \ invoke_interactive_solver(Solver& solver, const Input& input,\n            \
+    \                             Interaction& interaction) {\n    if constexpr (std::invocable<Solver&,\
+    \ const Input&, Interaction&>) {\n        return std::invoke(solver, input, interaction);\n\
+    \    } else {\n        static_assert(std::invocable<Solver&, Interaction&>);\n\
+    \        return std::invoke(solver, interaction);\n    }\n}\n\n}  // namespace\
+    \ random_testing_detail\n\ntemplate <class Input, class State>\nstruct InteractiveTestCase\
+    \ {\n    Input input;\n    State state;\n};\n\ntemplate <class Input, class State>\n\
+    auto interactive_test_case(Input&& input, State&& state) {\n    return InteractiveTestCase<std::remove_cvref_t<Input>,\n\
+    \                               std::remove_cvref_t<State>>{\n        std::forward<Input>(input),\
+    \ std::forward<State>(state)};\n}\n\n// Call this from a query handler when the\
+    \ candidate violates the protocol.\n[[noreturn]] inline void reject_query(std::string\
+    \ message = {}) {\n    throw random_testing_detail::InteractionAbort{\n      \
+    \  RandomTestFailure::invalid_query, std::move(message)};\n}\n\ntemplate <class\
+    \ State, class QueryHandler>\nclass RandomInteraction {\n   private:\n    State*\
+    \ _state;\n    QueryHandler* _query_handler;\n    int _query_limit;\n    int _query_count\
+    \ = 0;\n    InteractionTranscript _transcript;\n\n   public:\n    RandomInteraction(State&\
+    \ state, QueryHandler& query_handler,\n                      int query_limit)\n\
+    \        : _state(&state),\n          _query_handler(&query_handler),\n      \
+    \    _query_limit(query_limit) {}\n\n    RandomInteraction(const RandomInteraction&)\
+    \ = delete;\n    RandomInteraction& operator=(const RandomInteraction&) = delete;\n\
+    \    RandomInteraction(RandomInteraction&&) = delete;\n    RandomInteraction&\
+    \ operator=(RandomInteraction&&) = delete;\n\n    template <class Query>\n   \
+    \ auto ask(Query&& query) {\n        using Reply = std::remove_cvref_t<std::invoke_result_t<\n\
+    \            QueryHandler&, State&, Query>>;\n        static_assert(!std::is_void_v<Reply>);\n\
+    \n        InteractionExchange exchange;\n        exchange.query = random_testing_detail::value_to_string(query);\n\
+    \        _transcript.exchanges.push_back(std::move(exchange));\n        _query_count++;\n\
+    \        if (_query_limit < _query_count) {\n            throw random_testing_detail::InteractionAbort{\n\
+    \                RandomTestFailure::query_limit,\n                \"attempted\
+    \ query \" + std::to_string(_query_count) +\n                    \" with limit\
+    \ \" + std::to_string(_query_limit)};\n        }\n\n        Reply reply = std::invoke(*_query_handler,\
+    \ *_state,\n                                  std::forward<Query>(query));\n \
+    \       InteractionExchange& recorded = _transcript.exchanges.back();\n      \
+    \  recorded.response = random_testing_detail::value_to_string(reply);\n      \
+    \  recorded.responded = true;\n        return reply;\n    }\n\n    int query_count()\
+    \ const {\n        return _query_count;\n    }\n\n    const InteractionTranscript&\
+    \ transcript() const {\n        return _transcript;\n    }\n\n    template <class\
+    \ Answer>\n    void record_answer(const Answer& answer) {\n        _transcript.answer\
+    \ =\n            random_testing_detail::value_to_string(answer);\n        _transcript.answered\
+    \ = true;\n    }\n\n    void record_failure(std::string message) {\n        _transcript.failure_message\
+    \ = std::move(message);\n    }\n};\n\nstruct PrintRandomTestFailure {\n    template\
+    \ <class Case, class Expected, class Actual>\n    void operator()(const Case&\
+    \ test_case, const Expected& expected,\n                    const Actual& actual,\
+    \ int trial,\n                    std::uint64_t seed) const {\n        std::cerr\
+    \ << \"random test failed: seed=\" << seed\n                  << \" trial=\" <<\
+    \ trial << '\\n';\n        std::cerr << \"input: \";\n        random_testing_detail::print_value(std::cerr,\
     \ test_case);\n        std::cerr << \"\\nexpected: \";\n        random_testing_detail::print_value(std::cerr,\
     \ expected);\n        std::cerr << \"\\nactual: \";\n        random_testing_detail::print_value(std::cerr,\
-    \ actual);\n        std::cerr << '\\n';\n    }\n};\n\n// Runs a property returning\
-    \ bool for every generated trial.\n// The property may accept (Random&) or (Random&,\
-    \ int trial).\ntemplate <class Property>\nRandomTestResult random_test(RandomTestConfig\
-    \ config, Property property) {\n    assert(0 <= config.trials);\n    if (config.trials\
-    \ < 0) config.trials = 0;\n    Random random(config.seed);\n    for (int trial\
-    \ = 0; trial < config.trials; trial++) {\n        static_assert(std::convertible_to<\n\
+    \ actual);\n        std::cerr << '\\n';\n    }\n};\n\nstruct PrintConstructiveTestFailure\
+    \ {\n    template <class Case, class Answer>\n    void operator()(const Case&\
+    \ test_case, const Answer& answer, int trial,\n                    std::uint64_t\
+    \ seed) const {\n        std::cerr << \"constructive random test failed: seed=\"\
+    \ << seed\n                  << \" trial=\" << trial << '\\n';\n        std::cerr\
+    \ << \"input: \";\n        random_testing_detail::print_value(std::cerr, test_case);\n\
+    \        std::cerr << \"\\noutput: \";\n        random_testing_detail::print_value(std::cerr,\
+    \ answer);\n        std::cerr << '\\n';\n    }\n};\n\nstruct PrintStreamTestFailure\
+    \ {\n    void operator()(const std::string& input, const std::string& output,\n\
+    \                    int trial, std::uint64_t seed) const {\n        std::cerr\
+    \ << \"stream random test failed: seed=\" << seed\n                  << \" trial=\"\
+    \ << trial << \"\\ninput:\\n\"\n                  << input;\n        if (input.empty()\
+    \ || input.back() != '\\n') std::cerr << '\\n';\n        std::cerr << \"output:\\\
+    n\" << output;\n        if (output.empty() || output.back() != '\\n') std::cerr\
+    \ << '\\n';\n    }\n};\n\nstruct PrintInteractiveTestFailure {\n    template <class\
+    \ Input, class State>\n    void operator()(const InteractiveTestCase<Input, State>&\
+    \ test_case,\n                    const InteractionTranscript& transcript, int\
+    \ trial,\n                    std::uint64_t seed,\n                    RandomTestFailure\
+    \ failure) const {\n        std::cerr << \"interactive random test failed: seed=\"\
+    \ << seed\n                  << \" trial=\" << trial\n                  << \"\
+    \ reason=\" << random_test_failure_name(failure) << '\\n';\n        std::cerr\
+    \ << \"input: \";\n        random_testing_detail::print_value(std::cerr, test_case.input);\n\
+    \        std::cerr << \"\\njudge state: \";\n        random_testing_detail::print_value(std::cerr,\
+    \ test_case.state);\n        std::cerr << '\\n';\n        for (int index = 0;\
+    \ index < int(transcript.exchanges.size()); index++) {\n            const InteractionExchange&\
+    \ exchange = transcript.exchanges[index];\n            std::cerr << \"query \"\
+    \ << index + 1 << \": \" << exchange.query;\n            if (exchange.responded)\
+    \ {\n                std::cerr << \" -> \" << exchange.response;\n           \
+    \ } else {\n                std::cerr << \" -> <no response>\";\n            }\n\
+    \            std::cerr << '\\n';\n        }\n        if (transcript.answered)\
+    \ {\n            std::cerr << \"answer: \" << transcript.answer << '\\n';\n  \
+    \      }\n        if (!transcript.failure_message.empty()) {\n            std::cerr\
+    \ << \"message: \" << transcript.failure_message << '\\n';\n        }\n    }\n\
+    };\n\nstruct PrintInteractiveStreamTestFailure {\n    template <class State>\n\
+    \    void operator()(const std::string& input, const State& state,\n         \
+    \           const InteractionTranscript& transcript, int trial,\n            \
+    \        std::uint64_t seed,\n                    RandomTestFailure failure) const\
+    \ {\n        std::cerr << \"interactive stream random test failed: seed=\" <<\
+    \ seed\n                  << \" trial=\" << trial\n                  << \" reason=\"\
+    \ << random_test_failure_name(failure)\n                  << \"\\ninput:\\n\"\n\
+    \                  << input;\n        if (input.empty() || input.back() != '\\\
+    n') std::cerr << '\\n';\n        std::cerr << \"judge state: \";\n        random_testing_detail::print_value(std::cerr,\
+    \ state);\n        std::cerr << '\\n';\n        for (int index = 0; index < int(transcript.exchanges.size());\
+    \ index++) {\n            const InteractionExchange& exchange = transcript.exchanges[index];\n\
+    \            std::cerr << \"query \" << index + 1 << \": \" << exchange.query;\n\
+    \            if (exchange.responded) {\n                std::cerr << \" -> \"\
+    \ << exchange.response;\n            } else {\n                std::cerr << \"\
+    \ -> <no response>\";\n            }\n            std::cerr << '\\n';\n      \
+    \  }\n        if (transcript.answered) {\n            std::cerr << \"answer: \"\
+    \ << transcript.answer;\n            if (transcript.answer.empty() || transcript.answer.back()\
+    \ != '\\n') {\n                std::cerr << '\\n';\n            }\n        }\n\
+    \        if (!transcript.failure_message.empty()) {\n            std::cerr <<\
+    \ \"message: \" << transcript.failure_message << '\\n';\n        }\n    }\n};\n\
+    \n// Runs a property returning bool for every generated trial.\n// The property\
+    \ may accept (Random&) or (Random&, int trial).\ntemplate <class Property>\nRandomTestResult\
+    \ random_test(RandomTestConfig config, Property property) {\n    assert(0 <= config.trials);\n\
+    \    if (config.trials < 0) config.trials = 0;\n    Random random(config.seed);\n\
+    \    for (int trial = 0; trial < config.trials; trial++) {\n        static_assert(std::convertible_to<\n\
     \                      decltype(random_testing_detail::invoke_with_trial(\n  \
     \                        property, random, trial)),\n                      bool>);\n\
     \        bool passed = bool(\n            random_testing_detail::invoke_with_trial(property,\
-    \ random, trial));\n        if (!passed) {\n            return random_testing_detail::failure_result(config,\
-    \ trial);\n        }\n    }\n    return random_testing_detail::success_result(config);\n\
-    }\n\ntemplate <class Property>\nRandomTestResult random_test(Property property)\
-    \ {\n    return random_test(RandomTestConfig(), std::move(property));\n}\n\n//\
-    \ Generates a case, runs an optimized solver and an oracle on separate copies,\n\
-    // and compares their results. Stops at the first mismatch.\n//\n// generator:\
-    \ (Random&) or (Random&, int trial) -> Case\n// solver/oracle: (Case&) -> result\n\
-    // on_failure: (case, expected, actual, trial, seed) -> void\ntemplate <class\
-    \ Generator, class Solver, class Oracle,\n          class OnFailure = IgnoreRandomTestFailure,\n\
+    \ random, trial));\n        if (!passed) {\n            return random_testing_detail::failure_result(\n\
+    \                config, trial, RandomTestFailure::property);\n        }\n   \
+    \ }\n    return random_testing_detail::success_result(config);\n}\n\ntemplate\
+    \ <class Property>\nRandomTestResult random_test(Property property) {\n    return\
+    \ random_test(RandomTestConfig(), std::move(property));\n}\n\n// Generates a case,\
+    \ runs an optimized solver and an oracle on separate copies,\n// and compares\
+    \ their results. Stops at the first mismatch.\n//\n// generator: (Random&) or\
+    \ (Random&, int trial) -> Case\n// solver/oracle: (Case&) -> result\n// on_failure:\
+    \ (case, expected, actual, trial, seed) -> void\ntemplate <class Generator, class\
+    \ Solver, class Oracle,\n          class OnFailure = IgnoreRandomTestFailure,\n\
     \          class Equal = std::equal_to<>>\nRandomTestResult compare_randomly(RandomTestConfig\
     \ config, Generator generator,\n                                  Solver solver,\
     \ Oracle oracle,\n                                  OnFailure on_failure = {},\
@@ -334,12 +881,136 @@ data:
     \        decltype(auto) actual = std::invoke(solver, actual_input);\n        decltype(auto)\
     \ expected = std::invoke(oracle, expected_input);\n        if (!bool(std::invoke(equal,\
     \ actual, expected))) {\n            std::invoke(on_failure, test_case, expected,\
-    \ actual, trial,\n                        config.seed);\n            return random_testing_detail::failure_result(config,\
-    \ trial);\n        }\n    }\n    return random_testing_detail::success_result(config);\n\
-    }\n\ntemplate <class Generator, class Solver, class Oracle>\nRandomTestResult\
-    \ compare_randomly(Generator generator, Solver solver,\n                     \
-    \             Oracle oracle) {\n    return compare_randomly(RandomTestConfig(),\
-    \ std::move(generator),\n                            std::move(solver), std::move(oracle));\n\
+    \ actual, trial,\n                        config.seed);\n            return random_testing_detail::failure_result(\n\
+    \                config, trial, RandomTestFailure::mismatch);\n        }\n   \
+    \ }\n    return random_testing_detail::success_result(config);\n}\n\ntemplate\
+    \ <class Generator, class Solver, class Oracle>\nRandomTestResult compare_randomly(Generator\
+    \ generator, Solver solver,\n                                  Oracle oracle)\
+    \ {\n    return compare_randomly(RandomTestConfig(), std::move(generator),\n \
+    \                           std::move(solver), std::move(oracle));\n}\n\n// Generates\
+    \ an input, runs a constructive solver, and validates its output.\n// validator:\
+    \ (const Case&, const Answer&) -> bool\ntemplate <class Generator, class Solver,\
+    \ class Validator,\n          class OnFailure = IgnoreRandomTestFailure>\nRandomTestResult\
+    \ test_constructively(RandomTestConfig config,\n                             \
+    \        Generator generator, Solver solver,\n                               \
+    \      Validator validator,\n                                     OnFailure on_failure\
+    \ = {}) {\n    assert(0 <= config.trials);\n    if (config.trials < 0) config.trials\
+    \ = 0;\n    Random random(config.seed);\n\n    for (int trial = 0; trial < config.trials;\
+    \ trial++) {\n        auto test_case =\n            random_testing_detail::invoke_with_trial(generator,\
+    \ random, trial);\n        using Case = std::remove_cvref_t<decltype(test_case)>;\n\
+    \        static_assert(std::copy_constructible<Case>);\n        Case solver_input\
+    \ = test_case;\n        auto answer = std::invoke(solver, solver_input);\n   \
+    \     if (!bool(std::invoke(validator, std::as_const(test_case),\n           \
+    \                   std::as_const(answer)))) {\n            std::invoke(on_failure,\
+    \ std::as_const(test_case),\n                        std::as_const(answer), trial,\
+    \ config.seed);\n            return random_testing_detail::failure_result(\n \
+    \               config, trial, RandomTestFailure::rejected_output);\n        }\n\
+    \    }\n    return random_testing_detail::success_result(config);\n}\n\ntemplate\
+    \ <class Generator, class Solver, class Validator>\nRandomTestResult test_constructively(Generator\
+    \ generator, Solver solver,\n                                     Validator validator)\
+    \ {\n    return test_constructively(RandomTestConfig(), std::move(generator),\n\
+    \                               std::move(solver), std::move(validator));\n}\n\
+    \n// Runs an ordinary solution that reads std::cin and writes std::cout.\n// generator:\
+    \ (Random&, ostream&) or (Random&, ostream&, trial) -> void\n// checker: (istream&\
+    \ generated_input, istream& candidate_output) -> bool\ntemplate <class Generator,\
+    \ class Solution, class Checker,\n          class OnFailure = IgnoreRandomTestFailure>\n\
+    RandomTestResult test_streams(RandomTestConfig config, Generator generator,\n\
+    \                              Solution solution, Checker checker,\n         \
+    \                     OnFailure on_failure = {}) {\n    assert(0 <= config.trials);\n\
+    \    if (config.trials < 0) config.trials = 0;\n    Random random(config.seed);\n\
+    \n    for (int trial = 0; trial < config.trials; trial++) {\n        std::string\
+    \ input = random_testing_detail::generate_stream_input(\n            generator,\
+    \ random, trial);\n        std::string output =\n            random_testing_detail::run_with_standard_streams(input,\
+    \ solution);\n        std::istringstream input_stream(input);\n        std::istringstream\
+    \ output_stream(output);\n        if (!bool(std::invoke(checker, input_stream,\
+    \ output_stream))) {\n            std::invoke(on_failure, std::as_const(input),\n\
+    \                        std::as_const(output), trial, config.seed);\n       \
+    \     return random_testing_detail::failure_result(\n                config, trial,\
+    \ RandomTestFailure::rejected_output);\n        }\n    }\n    return random_testing_detail::success_result(config);\n\
+    }\n\ntemplate <class Generator, class Solution, class Checker>\nRandomTestResult\
+    \ test_streams(Generator generator, Solution solution,\n                     \
+    \         Checker checker) {\n    return test_streams(RandomTestConfig(), std::move(generator),\n\
+    \                        std::move(solution), std::move(checker));\n}\n\n// generator:\
+    \ (Random&) or (Random&, trial) -> InteractiveTestCase<Input, State>\n// solver:\
+    \ (const Input&, interaction) or (interaction) -> Answer\n// query_handler: (State&,\
+    \ Query) -> Reply\n// validator: (const Input&, const State&, const Answer&) ->\
+    \ bool\ntemplate <class Generator, class Solver, class QueryHandler, class Validator,\n\
+    \          class OnFailure = IgnoreRandomTestFailure>\nRandomTestResult test_interactively(RandomTestConfig\
+    \ config, int query_limit,\n                                    Generator generator,\
+    \ Solver solver,\n                                    QueryHandler query_handler,\n\
+    \                                    Validator validator,\n                  \
+    \                  OnFailure on_failure = {}) {\n    assert(0 <= config.trials);\n\
+    \    assert(0 <= query_limit);\n    if (config.trials < 0) config.trials = 0;\n\
+    \    if (query_limit < 0) query_limit = 0;\n    Random random(config.seed);\n\n\
+    \    for (int trial = 0; trial < config.trials; trial++) {\n        auto test_case\
+    \ =\n            random_testing_detail::invoke_with_trial(generator, random, trial);\n\
+    \        using State = std::remove_cvref_t<decltype(test_case.state)>;\n     \
+    \   RandomInteraction<State, QueryHandler> interaction(\n            test_case.state,\
+    \ query_handler, query_limit);\n\n        try {\n            auto answer = random_testing_detail::invoke_interactive_solver(\n\
+    \                solver, std::as_const(test_case.input), interaction);\n     \
+    \       interaction.record_answer(answer);\n            if (!bool(std::invoke(validator,\
+    \ std::as_const(test_case.input),\n                                  std::as_const(test_case.state),\n\
+    \                                  std::as_const(answer)))) {\n              \
+    \  RandomTestResult result =\n                    random_testing_detail::failure_result(\n\
+    \                        config, trial, RandomTestFailure::rejected_output,\n\
+    \                        interaction.query_count());\n                std::invoke(on_failure,\
+    \ std::as_const(test_case),\n                            interaction.transcript(),\
+    \ trial, config.seed,\n                            result.failure);\n        \
+    \        return result;\n            }\n        } catch (const random_testing_detail::InteractionAbort&\
+    \ failure) {\n            interaction.record_failure(failure.message);\n     \
+    \       RandomTestResult result = random_testing_detail::failure_result(\n   \
+    \             config, trial, failure.failure, interaction.query_count());\n  \
+    \          std::invoke(on_failure, std::as_const(test_case),\n               \
+    \         interaction.transcript(), trial, config.seed,\n                    \
+    \    result.failure);\n            return result;\n        }\n    }\n    return\
+    \ random_testing_detail::success_result(config);\n}\n\ntemplate <class Generator,\
+    \ class Solver, class QueryHandler, class Validator>\nRandomTestResult test_interactively(int\
+    \ query_limit, Generator generator,\n                                    Solver\
+    \ solver, QueryHandler query_handler,\n                                    Validator\
+    \ validator) {\n    return test_interactively(RandomTestConfig(), query_limit,\n\
+    \                              std::move(generator), std::move(solver),\n    \
+    \                          std::move(query_handler), std::move(validator));\n\
+    }\n\n// Runs an ordinary interactive solution using std::cin and std::cout.\n\
+    // generator: (Random&, ostream&) or (Random&, ostream&, trial) -> JudgeState\n\
+    // query_handler: (JudgeState&, istream& query, ostream& response) -> void\n//\
+    \ checker: (istream& public_input, const JudgeState&,\n//           istream& final_output)\
+    \ -> bool\ntemplate <class Generator, class Solution, class QueryHandler, class\
+    \ Checker,\n          class OnFailure = IgnoreRandomTestFailure>\nRandomTestResult\
+    \ test_interactive_streams(\n    RandomTestConfig config, int query_limit, Generator\
+    \ generator,\n    Solution solution, QueryHandler query_handler, Checker checker,\n\
+    \    OnFailure on_failure = {}) {\n    assert(0 <= config.trials);\n    assert(0\
+    \ <= query_limit);\n    if (config.trials < 0) config.trials = 0;\n    if (query_limit\
+    \ < 0) query_limit = 0;\n    Random random(config.seed);\n\n    for (int trial\
+    \ = 0; trial < config.trials; trial++) {\n        std::ostringstream generated_input;\n\
+    \        auto state =\n            random_testing_detail::generate_interactive_stream_input(\n\
+    \                generator, random, generated_input, trial);\n        std::string\
+    \ input = generated_input.str();\n        std::stringbuf candidate_output(std::ios::out);\n\
+    \        using State = std::remove_cvref_t<decltype(state)>;\n        random_testing_detail::InteractiveStreamBuffer<State,\
+    \ QueryHandler>\n            input_buffer(state, query_handler, candidate_output,\
+    \ input,\n                         query_limit);\n        {\n            random_testing_detail::StandardStreamRedirect\
+    \ redirect(\n                &input_buffer, &candidate_output);\n            std::invoke(solution);\n\
+    \        }\n        input_buffer.finish();\n        if (input_buffer.exception())\
+    \ {\n            std::rethrow_exception(input_buffer.exception());\n        }\n\
+    \n        RandomTestFailure failure = input_buffer.failure();\n        if (failure\
+    \ != RandomTestFailure::none) {\n            RandomTestResult result = random_testing_detail::failure_result(\n\
+    \                config, trial, failure, input_buffer.query_count());\n      \
+    \      std::invoke(on_failure, std::as_const(input),\n                       \
+    \ std::as_const(state), input_buffer.transcript(), trial,\n                  \
+    \      config.seed, failure);\n            return result;\n        }\n\n     \
+    \   std::istringstream input_stream(input);\n        std::istringstream output_stream(input_buffer.transcript().answer);\n\
+    \        if (!bool(std::invoke(checker, input_stream, std::as_const(state),\n\
+    \                              output_stream))) {\n            RandomTestResult\
+    \ result = random_testing_detail::failure_result(\n                config, trial,\
+    \ RandomTestFailure::rejected_output,\n                input_buffer.query_count());\n\
+    \            std::invoke(on_failure, std::as_const(input),\n                 \
+    \       std::as_const(state), input_buffer.transcript(), trial,\n            \
+    \            config.seed, result.failure);\n            return result;\n     \
+    \   }\n    }\n    return random_testing_detail::success_result(config);\n}\n\n\
+    template <class Generator, class Solution, class QueryHandler, class Checker>\n\
+    RandomTestResult test_interactive_streams(\n    int query_limit, Generator generator,\
+    \ Solution solution,\n    QueryHandler query_handler, Checker checker) {\n   \
+    \ return test_interactive_streams(\n        RandomTestConfig(), query_limit, std::move(generator),\n\
+    \        std::move(solution), std::move(query_handler), std::move(checker));\n\
     }\n\n// Short contest interface. Prints failure metadata and terminates on failure.\n\
     template <class Property>\nRandomTestResult stress_test(Property property, int\
     \ trials = 1000,\n                             std::uint64_t seed = default_random_test_seed)\
@@ -356,14 +1027,43 @@ data:
     \ = trials;\n    config.seed = seed;\n    RandomTestResult result = compare_randomly(\n\
     \        config, std::move(generator), std::move(solver), std::move(oracle),\n\
     \        PrintRandomTestFailure());\n    if (!result) std::abort();\n    return\
-    \ result;\n}\n\n}  // namespace utilities\n}  // namespace m1une\n\n#endif  //\
-    \ M1UNE_RANDOM_TESTING_HPP\n"
+    \ result;\n}\n\ntemplate <class Generator, class Solver, class Validator>\nRandomTestResult\
+    \ constructive_stress_test(\n    Generator generator, Solver solver, Validator\
+    \ validator,\n    int trials = 1000, std::uint64_t seed = default_random_test_seed)\
+    \ {\n    RandomTestConfig config;\n    config.trials = trials;\n    config.seed\
+    \ = seed;\n    RandomTestResult result = test_constructively(\n        config,\
+    \ std::move(generator), std::move(solver),\n        std::move(validator), PrintConstructiveTestFailure());\n\
+    \    if (!result) std::abort();\n    return result;\n}\n\ntemplate <class Generator,\
+    \ class Solution, class Checker>\nRandomTestResult stream_stress_test(\n    Generator\
+    \ generator, Solution solution, Checker checker,\n    int trials = 1000, std::uint64_t\
+    \ seed = default_random_test_seed) {\n    RandomTestConfig config;\n    config.trials\
+    \ = trials;\n    config.seed = seed;\n    RandomTestResult result = test_streams(\n\
+    \        config, std::move(generator), std::move(solution),\n        std::move(checker),\
+    \ PrintStreamTestFailure());\n    if (!result) std::abort();\n    return result;\n\
+    }\n\ntemplate <class Generator, class Solver, class QueryHandler, class Validator>\n\
+    RandomTestResult interactive_stress_test(\n    int query_limit, Generator generator,\
+    \ Solver solver,\n    QueryHandler query_handler, Validator validator, int trials\
+    \ = 1000,\n    std::uint64_t seed = default_random_test_seed) {\n    RandomTestConfig\
+    \ config;\n    config.trials = trials;\n    config.seed = seed;\n    RandomTestResult\
+    \ result = test_interactively(\n        config, query_limit, std::move(generator),\
+    \ std::move(solver),\n        std::move(query_handler), std::move(validator),\n\
+    \        PrintInteractiveTestFailure());\n    if (!result) std::abort();\n   \
+    \ return result;\n}\n\ntemplate <class Generator, class Solution, class QueryHandler,\
+    \ class Checker>\nRandomTestResult interactive_stream_stress_test(\n    int query_limit,\
+    \ Generator generator, Solution solution,\n    QueryHandler query_handler, Checker\
+    \ checker, int trials = 1000,\n    std::uint64_t seed = default_random_test_seed)\
+    \ {\n    RandomTestConfig config;\n    config.trials = trials;\n    config.seed\
+    \ = seed;\n    RandomTestResult result = test_interactive_streams(\n        config,\
+    \ query_limit, std::move(generator), std::move(solution),\n        std::move(query_handler),\
+    \ std::move(checker),\n        PrintInteractiveStreamTestFailure());\n    if (!result)\
+    \ std::abort();\n    return result;\n}\n\n}  // namespace utilities\n}  // namespace\
+    \ m1une\n\n#endif  // M1UNE_RANDOM_TESTING_HPP\n"
   dependsOn:
   - utilities/random.hpp
   isVerificationFile: false
   path: utilities/random_testing.hpp
   requiredBy: []
-  timestamp: '2026-07-01 22:42:42+09:00'
+  timestamp: '2026-08-11 14:24:35+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/utilities/random_testing.test.cpp
@@ -372,205 +1072,362 @@ layout: document
 title: Random Testing
 ---
 
-## Overview
+## The Quick Way
 
-This header removes the repetitive loop around competitive-programming stress
-tests. It supports two workflows:
-
-* `random_test` repeatedly checks a Boolean property;
-* `compare_randomly` generates small cases and compares an optimized solver
-  against a brute-force oracle.
-
-Testing stops at the first failure. The returned seed and zero-based trial make
-the failure reproducible.
-
-## Quick Use During a Contest
+You do not need to rewrite a solution to return custom input and answer types.
+Keep ordinary contest code that reads `std::cin` and writes `std::cout`:
 
 ```cpp
-template <class Property>
-RandomTestResult stress_test(
-    Property property,
-    int trials = 1000,
-    std::uint64_t seed = default_random_test_seed);
-
-template <class Generator, class Solver, class Oracle>
-RandomTestResult stress_test(
-    Generator generator,
-    Solver solver,
-    Oracle oracle,
-    int trials = 1000,
-    std::uint64_t seed = default_random_test_seed);
+void solve() {
+    // The same code used in the submission.
+}
 ```
 
-The shortest interface needs only one lambda:
+Then choose one helper:
+
+| Problem | Helper |
+| --- | --- |
+| Non-interactive or constructive | `stream_stress_test(generate, solve, check)` |
+| Interactive | `interactive_stream_stress_test(limit, generate, solve, reply, check)` |
+
+The helper redirects `std::cin` and `std::cout` for every random case. You only
+write the random input generator and checker. On failure it prints the input,
+output or interaction transcript, seed, and zero-based trial.
 
 ```cpp
-stress_test([](Random& random) {
-    auto input = generate_small_case(random);
-    return solve(input) == brute(input);
-});
+#include "utilities/random_testing.hpp"
+
+using namespace m1une::utilities;
 ```
 
-Or keep generation and the two solutions separate:
+## Non-Interactive and Constructive Recipe
+
+Write these three pieces:
 
 ```cpp
-stress_test(generate_small_case, solve, brute);
-```
-
-The included `Random` helpers keep generators short:
-
-```cpp
-stress_test([](Random& rng) {
-    auto values = rng.sequence(20, -10, 10);
-    auto text = rng.string(20, "abc");
-    auto tree = rng.tree(20);
-    auto graph = rng.graph(20, 30);
-    auto weighted_graph = rng.weighted_graph(20, 30, -10, 10);
-    auto dag = rng.dag(20, 30);
-    return check(values, text, tree, graph, weighted_graph, dag);
-});
-```
-
-Both forms run 1000 trials with a fixed default seed. Optional trailing
-arguments select the trial count and seed:
-
-```cpp
-stress_test(generate_small_case, solve, brute, 10000, 123456789);
-```
-
-`stress_test` returns normally after every test passes. On failure, it prints
-the seed and trial and then calls `std::abort`. The three-function form also
-prints the input, expected result, and actual result when they are streamable
-or iterable. This means the call does not need an `assert` or result check.
-
-## Configuration and Result
-
-```cpp
-struct RandomTestConfig {
-    int trials = 1000;
-    std::uint64_t seed = default_random_test_seed;
+auto generate = [](Random& random, std::ostream& input) {
+    // Write one small random case to input.
 };
 
-struct RandomTestResult {
-    std::uint64_t seed;
-    int requested_trials;
-    int completed_trials;
-    int failed_trial;
+void solve() {
+    // Read std::cin and write std::cout as usual.
+}
 
-    bool passed() const;
-    explicit operator bool() const;
+auto check = [](std::istream& input, std::istream& output) {
+    // Read the original input and candidate output.
+    return true;  // Return whether the output is valid.
 };
+
+int main() {
+    stream_stress_test(generate, solve, check);
+}
 ```
 
-The fixed default seed makes ordinary runs deterministic. Supply a different
-seed when exploring more cases. On success, `completed_trials` equals
-`requested_trials` and `failed_trial` is `-1`. On failure,
-`completed_trials == failed_trial` is the number of earlier successful trials.
+This works for constructive problems because `check` validates the output; it
+does not compare against one fixed answer.
 
-## Property Tests
+### Complete example
 
-```cpp
-template <class Property>
-RandomTestResult random_test(
-    RandomTestConfig config,
-    Property property);
-```
-
-`random_test(property)` is shorthand using the default configuration.
-
-The property may have either signature and must return something convertible
-to `bool`:
-
-```cpp
-bool property(Random& random);
-bool property(Random& random, int trial);
-```
-
-Each call advances the same seeded `Random` generator.
-
-## Optimized Solver Against Brute Force
-
-```cpp
-template <class Generator, class Solver, class Oracle,
-          class OnFailure = IgnoreRandomTestFailure,
-          class Equal = std::equal_to<>>
-RandomTestResult compare_randomly(
-    RandomTestConfig config,
-    Generator generator,
-    Solver solver,
-    Oracle oracle,
-    OnFailure on_failure = {},
-    Equal equal = {});
-```
-
-`compare_randomly(generator, solver, oracle)` is shorthand using the default
-configuration. Unlike `stress_test`, the lower-level functions return a failed
-result instead of terminating the program.
-
-`generator` receives `Random&` and optionally the trial number. Its result must
-be copyable. The harness gives separate copies to `solver` and `oracle`, so
-either function may mutate its input. Results are compared with `equal`.
-
-On a mismatch, `on_failure` is called as follows before testing stops:
-
-```cpp
-on_failure(test_case, expected, actual, trial, seed);
-```
-
-The callback is optional. Use it to print the counterexample in the format most
-helpful for the current problem.
-
-If a failure reports seed `S` and trial `T`, rerun with the same seed and at
-least `T + 1` trials. Generation is deterministic as long as the generator
-makes the same sequence of random calls.
-
-## Example
+The following tester checks ordinary code that prints the values in sorted
+order:
 
 ```cpp
 #include "utilities/random_testing.hpp"
 
 #include <algorithm>
 #include <iostream>
+#include <string>
 #include <vector>
 
+using namespace m1une::utilities;
+
+void solve() {
+    int n;
+    std::cin >> n;
+    std::vector<int> values(n);
+    for (int& value : values) std::cin >> value;
+
+    std::sort(values.begin(), values.end());
+    for (int value : values) std::cout << value << ' ';
+    std::cout << '\n';
+}
+
 int main() {
-    using namespace m1une::utilities;
-    RandomTestConfig config;
-    config.trials = 10000;
-    config.seed = 123456789;
+    auto generate = [](Random& random, std::ostream& input) {
+        int n = int(random.uniform(0, 20));
+        input << n << '\n';
+        for (int value : random.sequence(n, -10, 10)) {
+            input << value << ' ';
+        }
+        input << '\n';
+    };
 
-    auto result = compare_randomly(
-        config,
-        [](Random& random) {
-            int n = int(random.uniform(0, 10));
-            std::vector<int> values(n);
-            for (int& value : values) value = int(random.uniform(-5, 5));
-            return values;
-        },
-        [](std::vector<int>& values) {
-            std::sort(values.begin(), values.end());
-            return values;
-        },
-        [](std::vector<int>& values) {
-            // Replace this with a deliberately simple oracle for the problem.
-            for (int i = 0; i < int(values.size()); i++) {
-                for (int j = i + 1; j < int(values.size()); j++) {
-                    if (values[j] < values[i]) std::swap(values[i], values[j]);
-                }
-            }
-            return values;
-        },
-        [](const auto& input, const auto& expected, const auto& actual,
-           int trial, std::uint64_t seed) {
-            std::cerr << "mismatch: seed=" << seed << " trial=" << trial
-                      << " size=" << input.size() << "\n";
-            (void)expected;
-            (void)actual;
-        });
+    auto check = [](std::istream& input, std::istream& output) {
+        int n;
+        input >> n;
+        std::vector<int> expected(n);
+        for (int& value : expected) input >> value;
+        std::sort(expected.begin(), expected.end());
 
-    return result ? 0 : 1;
+        std::vector<int> actual(n);
+        for (int& value : actual) {
+            if (!(output >> value)) return false;
+        }
+        std::string extra;
+        return actual == expected && !(output >> extra);
+    };
+
+    stream_stress_test(generate, solve, check);
 }
 ```
 
-The harness adds only $O(1)$ work around each trial, excluding case copies and
-the supplied generator, solvers, comparison, and failure callback.
+Usually the generator is just a few `random.uniform(...)` calls and `<<`
+operations. The checker can reuse input constraints and validation logic from
+the problem statement.
+
+The default is 1000 cases with a fixed seed. Add a trial count and seed at the
+end when needed:
+
+```cpp
+stream_stress_test(generate, solve, check, 10000, 123456789);
+```
+
+## Interactive Recipe
+
+The submitted solution can keep the ordinary protocol:
+
+```cpp
+std::cout << "? " << query << std::endl;
+std::cin >> reply;
+// ...
+std::cout << "! " << answer << std::endl;
+```
+
+The tester needs four pieces:
+
+1. `generate` writes the public input and returns hidden judge state;
+2. `solve` is the ordinary interactive solution;
+3. `reply` reads one query and writes the mock judge's response;
+4. `check` validates the final output.
+
+### Complete example
+
+```cpp
+#include "utilities/random_testing.hpp"
+
+#include <iostream>
+#include <string>
+
+using namespace m1une::utilities;
+
+void solve() {
+    int upper;
+    std::cin >> upper;
+
+    int low = 0;
+    int high = upper;
+    while (low < high) {
+        int middle = (low + high) / 2;
+        std::cout << "? " << middle << std::endl;
+
+        int comparison;
+        std::cin >> comparison;
+        if (comparison <= 0) high = middle;
+        else low = middle + 1;
+    }
+    std::cout << "! " << low << std::endl;
+}
+
+int main() {
+    auto generate = [](Random& random, std::ostream& input) {
+        int upper = 1000;
+        input << upper << '\n';
+        return int(random.uniform(0, upper));  // Hidden number.
+    };
+
+    auto reply = [](int& secret, std::istream& query,
+                    std::ostream& response) {
+        char type;
+        int guess;
+        std::string extra;
+        if (!(query >> type >> guess) || type != '?' || query >> extra) {
+            reject_query("expected: ? x");
+        }
+
+        if (secret < guess) response << -1;
+        else if (guess < secret) response << 1;
+        else response << 0;
+    };
+
+    auto check = [](std::istream& input, const int& secret,
+                    std::istream& output) {
+        int upper;
+        char type;
+        int answer;
+        std::string extra;
+        input >> upper;
+        return bool(output >> type >> answer) && type == '!' &&
+               0 <= answer && answer <= upper && answer == secret &&
+               !(output >> extra);
+    };
+
+    interactive_stream_stress_test(10, generate, solve, reply, check);
+}
+```
+
+When `solve` tries to read after printing, the helper sends that pending output
+to `reply` and feeds the generated response back through `std::cin`. Output
+remaining when `solve` returns is passed to `check` as the final answer.
+
+Call `reject_query("reason")` for malformed or forbidden queries. The first
+query beyond the limit also fails. Both failures include the full query/reply
+transcript.
+
+Select trials and a seed with trailing arguments:
+
+```cpp
+interactive_stream_stress_test(
+    query_limit, generate, solve, reply, check, 10000, 123456789);
+```
+
+## Practical Limitations
+
+The stream helpers redirect C++ `std::cin` and `std::cout`. They cannot capture
+`scanf`, `printf`, `fread`, `FastInput`, or other code that accesses the C file
+handles directly. Keep a `std::cin`/`std::cout` version while stress testing, or
+move only the algorithm into a shared function used by both I/O frontends.
+
+Call `std::ios::sync_with_stdio(false)` before starting the tester, not inside
+`solve`, because changing synchronization can replace standard stream buffers.
+
+The interactive helper runs in one process without real pipes. It checks the
+algorithm and protocol, but it does not detect missing flushes, deadlocks, or
+timing problems.
+
+## Typed Helpers (Optional)
+
+Use the typed interface only when the solution already accepts values and
+returns an answer.
+
+For ordinary optimized-vs-brute testing:
+
+```cpp
+stress_test(generate, solve, brute);
+```
+
+For constructive testing:
+
+```cpp
+constructive_stress_test(
+    generate,
+    solve,
+    [](const Input& input, const Answer& answer) {
+        return is_valid(input, answer);
+    });
+```
+
+For a typed interactive solution, generate public input and hidden state with
+`interactive_test_case(input, state)`. The solution receives the public input
+and an object providing `interaction.ask(query)`:
+
+```cpp
+interactive_stress_test(
+    query_limit, generate, solve, reply, check);
+```
+
+The stream and typed interfaces use the same deterministic seeds, failure
+categories, query limits, and transcript reporting.
+
+## Handle Failure Without Aborting
+
+The `*_stress_test` helpers print a failure and call `std::abort`. Use the
+lower-level version to inspect a result instead:
+
+```cpp
+RandomTestConfig config;
+config.trials = 10000;
+config.seed = 123456789;
+
+auto result = test_streams(config, generate, solve, check);
+if (!result) {
+    // result.seed
+    // result.failed_trial
+    // result.failure
+}
+```
+
+The interactive equivalent is:
+
+```cpp
+auto result = test_interactive_streams(
+    config, query_limit, generate, solve, reply, check);
+```
+
+| Result field | Meaning |
+| --- | --- |
+| `seed` | Seed used by the generator. |
+| `requested_trials` | Number of requested cases. |
+| `completed_trials` | Cases that passed before the failure. |
+| `failed_trial` | Zero-based failed case, or `-1` on success. |
+| `failure` | `property`, `mismatch`, `rejected_output`, `query_limit`, or `invalid_query`. |
+| `query_count` | Attempted queries on an interactive failure, otherwise `-1`. |
+
+`result.passed()` and `bool(result)` report success.
+
+## Interface Reference
+
+```cpp
+template <class Generator, class Solution, class Checker>
+RandomTestResult stream_stress_test(
+    Generator generator,
+    Solution solution,
+    Checker checker,
+    int trials = 1000,
+    std::uint64_t seed = default_random_test_seed);
+
+template <class Generator, class Solution, class QueryHandler, class Checker>
+RandomTestResult interactive_stream_stress_test(
+    int query_limit,
+    Generator generator,
+    Solution solution,
+    QueryHandler query_handler,
+    Checker checker,
+    int trials = 1000,
+    std::uint64_t seed = default_random_test_seed);
+```
+
+The lower-level forms add a configuration and optional failure callback:
+
+```cpp
+template <class Generator, class Solution, class Checker,
+          class OnFailure = IgnoreRandomTestFailure>
+RandomTestResult test_streams(
+    RandomTestConfig config,
+    Generator generator,
+    Solution solution,
+    Checker checker,
+    OnFailure on_failure = {});
+
+template <class Generator, class Solution, class QueryHandler, class Checker,
+          class OnFailure = IgnoreRandomTestFailure>
+RandomTestResult test_interactive_streams(
+    RandomTestConfig config,
+    int query_limit,
+    Generator generator,
+    Solution solution,
+    QueryHandler query_handler,
+    Checker checker,
+    OnFailure on_failure = {});
+```
+
+The non-interactive callback is called as
+`on_failure(input_text, output_text, trial, seed)`. The interactive callback is
+called as `on_failure(input_text, state, transcript, trial, seed, failure)`.
+
+Generators may also accept a final `int trial`. The non-interactive generator
+returns `void`; the interactive generator returns the hidden state. Query
+handlers return `void` and write their response to the supplied output stream.
+
+The harness adds $O(1)$ work per trial apart from the supplied functions and
+the size of generated/captured text. Interactive transcript time and memory are
+linear in the total query and response text.

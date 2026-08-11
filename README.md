@@ -32,7 +32,7 @@ without rewriting boilerplate during a contest.
 | `acted_monoid/` | Acted monoids for lazy propagation structures such as `LazySegtree` and generic `SegtreeBeats`, including generic range assignment/range product. |
 | `math/` | Number theory, modular arithmetic, combinatorics and partition functions, set power series and FPS/polynomials, XOR bases and bitwise transforms, matrices, exact rationals, and integer arithmetic. |
 | `string/` | Z/KMP, wildcard matching, edit distance, Manacher, palindrome lexicographic rank/select, minimum rotation, Lyndon factorization, run enumeration, longest common extension/subsequence/substring, eertrees, suffix trees/automata/arrays, tries, Aho-Corasick, and string hashes. |
-| `utilities/` | Fast I/O, Base64 packing for embedded numeric sequences, fixed-width 256-, 512-, and 1024-bit integers, convolution-backed arbitrary-precision integers, parsing, dice, 2D grid transforms, integer helpers, compression, random generation, stress testing, and general contest utilities. |
+| `utilities/` | Fast I/O, Base64 packing for embedded numeric sequences, fixed-width 256-, 512-, and 1024-bit integers, convolution-backed arbitrary-precision integers, parsing, dice, 2D grid transforms, integer helpers, compression, random generation, and stream-ready property, constructive, and interactive stress testing. |
 | `verify/` | Online Judge Verify Helper tests. |
 | `docs/` | Markdown documentation for the public headers. |
 
