@@ -16,6 +16,7 @@
 #include "../../acted_monoid/range_ap_add_range_sum.hpp"
 #include "../../acted_monoid/range_ap_update_range_min_max.hpp"
 #include "../../acted_monoid/range_ap_update_range_sum.hpp"
+#include "../../acted_monoid/range_bitwise_and_or_xor_range_sum.hpp"
 #include "../../acted_monoid/range_flip_range_binary_inversion.hpp"
 #include "../../acted_monoid/range_flip_range_sum.hpp"
 #include "../../acted_monoid/range_mul_range_sum.hpp"
@@ -165,6 +166,7 @@ static_assert(m1une::acted_monoid::RangeAffineRangeMinMax<int>::commutative);
 static_assert(m1une::acted_monoid::RangeAffineRangeSum<int>::commutative);
 static_assert(m1une::acted_monoid::RangeAffineRangeSumOfSquares<int>::commutative);
 static_assert(m1une::acted_monoid::RangeApUpdateRangeMinMax<int>::commutative);
+static_assert(m1une::acted_monoid::RangeBitwiseAndOrXorRangeSum<int>::commutative);
 static_assert(m1une::acted_monoid::RangeFlipRangeSum<int>::commutative);
 static_assert(m1une::acted_monoid::RangeMulRangeSum<int>::commutative);
 static_assert(m1une::acted_monoid::RangeOrRangeSum<int>::commutative);
@@ -210,6 +212,7 @@ static_assert(!m1une::acted_monoid::RangeAffineRangeSum<int>::operator_commutati
 static_assert(!m1une::acted_monoid::RangeAffineRangeSumOfSquares<int>::operator_commutative);
 static_assert(!m1une::acted_monoid::RangeApUpdateRangeMinMax<int>::operator_commutative);
 static_assert(!m1une::acted_monoid::RangeApUpdateRangeSum<int>::operator_commutative);
+static_assert(!m1une::acted_monoid::RangeBitwiseAndOrXorRangeSum<int>::operator_commutative);
 static_assert(!m1une::acted_monoid::RangeUpdateRangeLongestTrue::operator_commutative);
 static_assert(!m1une::acted_monoid::RangeUpdateRangeMax<int>::operator_commutative);
 static_assert(!m1une::acted_monoid::RangeUpdateRangeMaxSubarray<int>::operator_commutative);
