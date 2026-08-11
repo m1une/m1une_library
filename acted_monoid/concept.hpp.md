@@ -3,7 +3,7 @@ data:
   _extendedDependsOn: []
   _extendedRequiredBy:
   - icon: ':heavy_check_mark:'
-    path: acted_monoid/beats_concept.hpp
+    path: beats_acted_monoid/concept.hpp
     title: Beats Acted Monoid Concept
   - icon: ':heavy_check_mark:'
     path: ds/dynamic_array/dynamic_lazy_monoid_array.hpp
@@ -30,6 +30,9 @@ data:
     path: ds/segtree/persistent_lazy_segtree.hpp
     title: Persistent Lazy Segment Tree
   - icon: ':heavy_check_mark:'
+    path: ds/segtree/persistent_segtree_beats.hpp
+    title: Persistent Segment Tree Beats
+  - icon: ':heavy_check_mark:'
     path: ds/segtree/segtree_beats.hpp
     title: Generic Segment Tree Beats!
   _extendedVerifiedWith:
@@ -39,6 +42,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
     title: verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
+    title: verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
+    title: verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/ds/dynamic_array/dynamic_lazy_monoid_array.test.cpp
     title: verify/ds/dynamic_array/dynamic_lazy_monoid_array.test.cpp
@@ -73,6 +82,9 @@ data:
     path: verify/ds/segtree/persistent_lazy_segtree.test.cpp
     title: verify/ds/segtree/persistent_lazy_segtree.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/segtree/persistent_segtree_beats.test.cpp
+    title: verify/ds/segtree/persistent_segtree_beats.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/range_add_range_min.test.cpp
     title: verify/ds/segtree/range_add_range_min.test.cpp
   - icon: ':heavy_check_mark:'
@@ -84,6 +96,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/segtree_beats.test.cpp
     title: verify/ds/segtree/segtree_beats.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/monoid/commutative_flags.test.cpp
+    title: verify/monoid/commutative_flags.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/monoid/commutative_flags.test.cpp
     title: verify/monoid/commutative_flags.test.cpp
@@ -137,9 +152,10 @@ data:
   - ds/segtree/segtree_beats.hpp
   - ds/segtree/persistent_lazy_segtree.hpp
   - ds/segtree/dynamic_lazy_segtree.hpp
+  - ds/segtree/persistent_segtree_beats.hpp
   - ds/segtree/persistent_dynamic_lazy_segtree.hpp
   - ds/segtree/lazy_segtree.hpp
-  - acted_monoid/beats_concept.hpp
+  - beats_acted_monoid/concept.hpp
   timestamp: '2026-06-17 21:06:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
@@ -150,6 +166,7 @@ data:
   - verify/ds/persistent_release.test.cpp
   - verify/ds/dynamic_tree/lazy_link_cut_tree.test.cpp
   - verify/ds/dynamic_tree/lazy_path_link_cut_tree.test.cpp
+  - verify/ds/segtree/persistent_segtree_beats.test.cpp
   - verify/ds/segtree/lazy_segtree.test.cpp
   - verify/ds/segtree/persistent_lazy_segtree.test.cpp
   - verify/ds/segtree/segtree_beats.test.cpp
@@ -158,6 +175,9 @@ data:
   - verify/ds/segtree/range_update_range_product.test.cpp
   - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
   - verify/ds/segtree/range_add_range_min.test.cpp
+  - verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
+  - verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
+  - verify/monoid/commutative_flags.test.cpp
   - verify/monoid/commutative_flags.test.cpp
   - verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
   - verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp

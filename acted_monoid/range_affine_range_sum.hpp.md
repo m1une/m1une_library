@@ -19,6 +19,9 @@ data:
     path: verify/ds/segtree/persistent_lazy_segtree.test.cpp
     title: verify/ds/segtree/persistent_lazy_segtree.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/segtree/persistent_segtree_beats.test.cpp
+    title: verify/ds/segtree/persistent_segtree_beats.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/segtree_beats.test.cpp
     title: verify/ds/segtree/segtree_beats.test.cpp
   - icon: ':heavy_check_mark:'
@@ -81,6 +84,7 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/dynamic_array/dynamic_lazy_monoid_array.test.cpp
+  - verify/ds/segtree/persistent_segtree_beats.test.cpp
   - verify/ds/segtree/lazy_segtree.test.cpp
   - verify/ds/segtree/persistent_lazy_segtree.test.cpp
   - verify/ds/segtree/segtree_beats.test.cpp

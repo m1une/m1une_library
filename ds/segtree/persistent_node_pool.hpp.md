@@ -20,6 +20,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: ds/segtree/persistent_segtree.hpp
     title: Persistent Segment Tree
+  - icon: ':heavy_check_mark:'
+    path: ds/segtree/persistent_segtree_beats.hpp
+    title: Persistent Segment Tree Beats
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/persistent_dual_segtree.test.cpp
@@ -39,6 +42,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/persistent_segtree.test.cpp
     title: verify/ds/segtree/persistent_segtree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/segtree/persistent_segtree_beats.test.cpp
+    title: verify/ds/segtree/persistent_segtree_beats.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -112,6 +118,7 @@ data:
   - ds/segtree/persistent_lazy_segtree.hpp
   - ds/segtree/persistent_dynamic_dual_segtree.hpp
   - ds/segtree/persistent_dynamic_segtree.hpp
+  - ds/segtree/persistent_segtree_beats.hpp
   - ds/segtree/persistent_dynamic_lazy_segtree.hpp
   - ds/segtree/persistent_dual_segtree.hpp
   timestamp: '2026-08-08 16:34:26+09:00'
@@ -119,6 +126,7 @@ data:
   verifiedWith:
   - verify/ds/segtree/persistent_dynamic_dual_segtree.test.cpp
   - verify/ds/segtree/persistent_dual_segtree.test.cpp
+  - verify/ds/segtree/persistent_segtree_beats.test.cpp
   - verify/ds/segtree/persistent_dynamic_segtree.test.cpp
   - verify/ds/segtree/persistent_lazy_segtree.test.cpp
   - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp

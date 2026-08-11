@@ -34,6 +34,12 @@ data:
     path: verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
     title: verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
+    title: verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
+    title: verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/range_query/merge_sort_tree.test.cpp
     title: verify/ds/range_query/merge_sort_tree.test.cpp
   - icon: ':heavy_check_mark:'
@@ -110,6 +116,8 @@ data:
   - verify/ds/range_query/range_sort_range_composite.test.cpp
   - verify/ds/range_query/merge_sort_tree_sum.test.cpp
   - verify/math/math_algorithms.test.cpp
+  - verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
+  - verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
   - verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
 documentation_of: math/bit_ceil.hpp
 layout: document

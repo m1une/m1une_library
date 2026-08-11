@@ -2,16 +2,22 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: acted_monoid/beats_concept.hpp
-    title: Beats Acted Monoid Concept
-  - icon: ':heavy_check_mark:'
     path: acted_monoid/concept.hpp
     title: Acted Monoid Concept
+  - icon: ':heavy_check_mark:'
+    path: beats_acted_monoid/concept.hpp
+    title: Beats Acted Monoid Concept
   - icon: ':heavy_check_mark:'
     path: math/bit_ceil.hpp
     title: Bit Ceil
   _extendedRequiredBy: []
   _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
+    title: verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
+    title: verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/segtree_beats.test.cpp
     title: verify/ds/segtree/segtree_beats.test.cpp
@@ -21,8 +27,8 @@ data:
   attributes:
     links: []
   bundledCode: "#line 1 \"ds/segtree/segtree_beats.hpp\"\n\n\n\n#include <cassert>\n\
-    #include <concepts>\n#include <utility>\n#include <vector>\n\n#line 1 \"acted_monoid/beats_concept.hpp\"\
-    \n\n\n\n#line 5 \"acted_monoid/beats_concept.hpp\"\n\n#line 1 \"acted_monoid/concept.hpp\"\
+    #include <concepts>\n#include <utility>\n#include <vector>\n\n#line 1 \"beats_acted_monoid/concept.hpp\"\
+    \n\n\n\n#line 5 \"beats_acted_monoid/concept.hpp\"\n\n#line 1 \"acted_monoid/concept.hpp\"\
     \n\n\n\n#line 5 \"acted_monoid/concept.hpp\"\n\nnamespace m1une {\nnamespace acted_monoid\
     \ {\n\n// Concept defining the requirements for an Acted Monoid.\ntemplate <typename\
     \ AM>\nconcept IsActedMonoid = requires(typename AM::value_type a, typename AM::value_type\
@@ -38,20 +44,20 @@ data:
     \ value operation must obey commutativity and inverse laws.\ntemplate <typename\
     \ AM>\nconcept IsCommutativeActedGroup = IsActedMonoid<AM> && requires(typename\
     \ AM::value_type a) {\n    { AM::inv(a) } -> std::same_as<typename AM::value_type>;\n\
-    };\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\n\n#line 7 \"acted_monoid/beats_concept.hpp\"\
-    \n\nnamespace m1une {\nnamespace acted_monoid {\n\n// An acted monoid whose action\
-    \ may require descent before it can be applied.\ntemplate <typename AM>\nconcept\
-    \ IsBeatsActedMonoid = IsActedMonoid<AM> &&\n    requires(typename AM::value_type\
-    \ x, typename AM::operator_type f) {\n        { AM::can_apply(f, x) } -> std::same_as<bool>;\n\
-    \    };\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\n\n#line 1 \"\
-    math/bit_ceil.hpp\"\n\n\n\nnamespace m1une {\nnamespace math {\n\ntemplate <typename\
-    \ T>\nconstexpr T bit_ceil(T n) {\n    if (n <= 1) return 1;\n    T x = 1;\n \
-    \   while (x < n) x <<= 1;\n    return x;\n}\n\n}  // namespace math\n}  // namespace\
-    \ m1une\n\n\n#line 11 \"ds/segtree/segtree_beats.hpp\"\n\nnamespace m1une {\n\
-    namespace ds {\n\n// Generic Segment Tree Beats for actions that may require recursive\
-    \ descent.\ntemplate <m1une::acted_monoid::IsBeatsActedMonoid ActedMonoid>\nstruct\
-    \ SegtreeBeats {\n    using value_type = typename ActedMonoid::value_type;\n \
-    \   using operator_type = typename ActedMonoid::operator_type;\n    using T =\
+    };\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\n\n#line 7 \"beats_acted_monoid/concept.hpp\"\
+    \n\nnamespace m1une {\nnamespace beats_acted_monoid {\n\n// An acted monoid whose\
+    \ action may require descent before it can be applied.\ntemplate <typename AM>\n\
+    concept IsBeatsActedMonoid = m1une::acted_monoid::IsActedMonoid<AM> &&\n    requires(typename\
+    \ AM::value_type x, typename AM::operator_type f) {\n        { AM::can_apply(f,\
+    \ x) } -> std::same_as<bool>;\n    };\n\n}  // namespace beats_acted_monoid\n\
+    }  // namespace m1une\n\n\n#line 1 \"math/bit_ceil.hpp\"\n\n\n\nnamespace m1une\
+    \ {\nnamespace math {\n\ntemplate <typename T>\nconstexpr T bit_ceil(T n) {\n\
+    \    if (n <= 1) return 1;\n    T x = 1;\n    while (x < n) x <<= 1;\n    return\
+    \ x;\n}\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line 11 \"ds/segtree/segtree_beats.hpp\"\
+    \n\nnamespace m1une {\nnamespace ds {\n\n// Generic Segment Tree Beats for actions\
+    \ that may require recursive descent.\ntemplate <m1une::beats_acted_monoid::IsBeatsActedMonoid\
+    \ ActedMonoid>\nstruct SegtreeBeats {\n    using value_type = typename ActedMonoid::value_type;\n\
+    \    using operator_type = typename ActedMonoid::operator_type;\n    using T =\
     \ value_type;\n    using F = operator_type;\n\n   private:\n    int _n = 0;\n\
     \    int _size = 1;\n    std::vector<T> _data;\n    std::vector<F> _lazy;\n\n\
     \    static T mapping_at(const F& f, const T& value, long long ordinal) {\n  \
@@ -214,9 +220,9 @@ data:
     \ ds\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_DS_SEGTREE_BEATS_HPP\n#define M1UNE_DS_SEGTREE_BEATS_HPP 1\n\
     \n#include <cassert>\n#include <concepts>\n#include <utility>\n#include <vector>\n\
-    \n#include \"../../acted_monoid/beats_concept.hpp\"\n#include \"../../math/bit_ceil.hpp\"\
+    \n#include \"../../beats_acted_monoid/concept.hpp\"\n#include \"../../math/bit_ceil.hpp\"\
     \n\nnamespace m1une {\nnamespace ds {\n\n// Generic Segment Tree Beats for actions\
-    \ that may require recursive descent.\ntemplate <m1une::acted_monoid::IsBeatsActedMonoid\
+    \ that may require recursive descent.\ntemplate <m1une::beats_acted_monoid::IsBeatsActedMonoid\
     \ ActedMonoid>\nstruct SegtreeBeats {\n    using value_type = typename ActedMonoid::value_type;\n\
     \    using operator_type = typename ActedMonoid::operator_type;\n    using T =\
     \ value_type;\n    using F = operator_type;\n\n   private:\n    int _n = 0;\n\
@@ -380,16 +386,18 @@ data:
     \            answer\n        );\n        return answer;\n    }\n};\n\n}  // namespace\
     \ ds\n}  // namespace m1une\n\n#endif  // M1UNE_DS_SEGTREE_BEATS_HPP\n"
   dependsOn:
-  - acted_monoid/beats_concept.hpp
+  - beats_acted_monoid/concept.hpp
   - acted_monoid/concept.hpp
   - math/bit_ceil.hpp
   isVerificationFile: false
   path: ds/segtree/segtree_beats.hpp
   requiredBy: []
-  timestamp: '2026-07-02 21:23:03+09:00'
+  timestamp: '2026-08-12 01:20:42+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/segtree/segtree_beats.test.cpp
+  - verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
+  - verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
 documentation_of: ds/segtree/segtree_beats.hpp
 layout: document
 title: Generic Segment Tree Beats!
@@ -412,7 +420,8 @@ directly. Its simpler contract gives the usual $O(\log N)$ update bound.
 
 ## Beats acted monoid
 
-`ActedMonoid` must satisfy `m1une::acted_monoid::IsBeatsActedMonoid` and provide:
+`ActedMonoid` must satisfy
+`m1une::beats_acted_monoid::IsBeatsActedMonoid` and provide:
 
 ```cpp
 using value_type = T;
@@ -469,10 +478,10 @@ Construction from `std::vector<U>` uses `ActedMonoid::make(value)` when
 available, then `ActedMonoid::make(value, index)`, then conversion to
 `value_type`.
 
-`acted_monoid/beats_wrapper.hpp` provides `BeatsWrapper` for assembling the
-required functions from `constexpr` lambdas or function objects. It can also
-forward optional `make`, index-aware mapping/applicability, and shifting
-functions.
+`beats_acted_monoid/wrapper.hpp` provides
+`m1une::beats_acted_monoid::Wrapper` for assembling the required functions
+from `constexpr` lambdas or function objects. It can also forward optional
+`make`, index-aware mapping/applicability, and shifting functions.
 
 ## Public interface
 

@@ -4,12 +4,6 @@ data:
   - name: acted_monoid
     pages:
     - icon: ':heavy_check_mark:'
-      path: acted_monoid/beats_concept.hpp
-      title: Beats Acted Monoid Concept
-    - icon: ':heavy_check_mark:'
-      path: acted_monoid/beats_wrapper.hpp
-      title: Beats Acted Monoid Wrapper
-    - icon: ':heavy_check_mark:'
       path: acted_monoid/concept.hpp
       title: Acted Monoid Concept
     - icon: ':heavy_check_mark:'
@@ -174,6 +168,20 @@ data:
     - icon: ':heavy_check_mark:'
       path: algo/sequence/subset_sum.hpp
       title: Meet-in-the-Middle Subset Sum
+  - name: beats_acted_monoid
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: beats_acted_monoid/concept.hpp
+      title: Beats Acted Monoid Concept
+    - icon: ':heavy_check_mark:'
+      path: beats_acted_monoid/range_bitwise_and_or_range_sum.hpp
+      title: Range Bitwise AND/OR Range Sum
+    - icon: ':heavy_check_mark:'
+      path: beats_acted_monoid/range_chmin_chmax_add_range_sum.hpp
+      title: Range Chmin/Chmax/Add Range Sum
+    - icon: ':heavy_check_mark:'
+      path: beats_acted_monoid/wrapper.hpp
+      title: Beats Acted Monoid Wrapper
   - name: .
     pages:
     - icon: ':warning:'
@@ -484,6 +492,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: ds/segtree/persistent_segtree.hpp
       title: Persistent Segment Tree
+    - icon: ':heavy_check_mark:'
+      path: ds/segtree/persistent_segtree_beats.hpp
+      title: Persistent Segment Tree Beats
     - icon: ':heavy_check_mark:'
       path: ds/segtree/segtree.hpp
       title: Segment Tree
@@ -1380,6 +1391,14 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/algo/sequence/subset_sum.test.cpp
       title: verify/algo/sequence/subset_sum.test.cpp
+  - name: verify/beats_acted_monoid
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
+      title: verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
+      title: verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
   - name: verify/convex
     pages:
     - icon: ':heavy_check_mark:'
@@ -1670,6 +1689,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/ds/segtree/persistent_segtree.test.cpp
       title: verify/ds/segtree/persistent_segtree.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/segtree/persistent_segtree_beats.test.cpp
+      title: verify/ds/segtree/persistent_segtree_beats.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/ds/segtree/range_add_range_min.test.cpp
       title: verify/ds/segtree/range_add_range_min.test.cpp

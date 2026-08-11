@@ -5,20 +5,20 @@ data:
     path: acted_monoid/concept.hpp
     title: Acted Monoid Concept
   - icon: ':heavy_check_mark:'
-    path: acted_monoid/range_affine_range_sum.hpp
-    title: Range Affine Range Sum
+    path: beats_acted_monoid/concept.hpp
+    title: Beats Acted Monoid Concept
   - icon: ':heavy_check_mark:'
     path: beats_acted_monoid/concept.hpp
     title: Beats Acted Monoid Concept
+  - icon: ':heavy_check_mark:'
+    path: beats_acted_monoid/range_chmin_chmax_add_range_sum.hpp
+    title: Range Chmin/Chmax/Add Range Sum
   - icon: ':heavy_check_mark:'
     path: ds/segtree/segtree_beats.hpp
     title: Generic Segment Tree Beats!
   - icon: ':heavy_check_mark:'
     path: math/bit_ceil.hpp
     title: Bit Ceil
-  - icon: ':heavy_check_mark:'
-    path: math/modint.hpp
-    title: ModInt
   - icon: ':heavy_check_mark:'
     path: utilities/fast_io.hpp
     title: Fast IO
@@ -29,14 +29,14 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://judge.yosupo.jp/problem/range_affine_range_sum
+    PROBLEM: https://judge.yosupo.jp/problem/range_chmin_chmax_add_range_sum
     links:
-    - https://judge.yosupo.jp/problem/range_affine_range_sum
-  bundledCode: "#line 1 \"verify/ds/segtree/segtree_beats.test.cpp\"\n#define PROBLEM\
-    \ \"https://judge.yosupo.jp/problem/range_affine_range_sum\"\n\n#line 1 \"ds/segtree/segtree_beats.hpp\"\
-    \n\n\n\n#include <cassert>\n#include <concepts>\n#include <utility>\n#include\
-    \ <vector>\n\n#line 1 \"beats_acted_monoid/concept.hpp\"\n\n\n\n#line 5 \"beats_acted_monoid/concept.hpp\"\
-    \n\n#line 1 \"acted_monoid/concept.hpp\"\n\n\n\n#line 5 \"acted_monoid/concept.hpp\"\
+    - https://judge.yosupo.jp/problem/range_chmin_chmax_add_range_sum
+  bundledCode: "#line 1 \"verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp\"\
+    \n#define PROBLEM \"https://judge.yosupo.jp/problem/range_chmin_chmax_add_range_sum\"\
+    \n\n#include <algorithm>\n#include <cassert>\n#include <cstdint>\n#include <numeric>\n\
+    #include <vector>\n\n#line 1 \"beats_acted_monoid/concept.hpp\"\n\n\n\n#include\
+    \ <concepts>\n\n#line 1 \"acted_monoid/concept.hpp\"\n\n\n\n#line 5 \"acted_monoid/concept.hpp\"\
     \n\nnamespace m1une {\nnamespace acted_monoid {\n\n// Concept defining the requirements\
     \ for an Acted Monoid.\ntemplate <typename AM>\nconcept IsActedMonoid = requires(typename\
     \ AM::value_type a, typename AM::value_type b, typename AM::operator_type f,\n\
@@ -58,61 +58,168 @@ data:
     \ = m1une::acted_monoid::IsActedMonoid<AM> &&\n    requires(typename AM::value_type\
     \ x, typename AM::operator_type f) {\n        { AM::can_apply(f, x) } -> std::same_as<bool>;\n\
     \    };\n\n}  // namespace beats_acted_monoid\n}  // namespace m1une\n\n\n#line\
-    \ 1 \"math/bit_ceil.hpp\"\n\n\n\nnamespace m1une {\nnamespace math {\n\ntemplate\
-    \ <typename T>\nconstexpr T bit_ceil(T n) {\n    if (n <= 1) return 1;\n    T\
-    \ x = 1;\n    while (x < n) x <<= 1;\n    return x;\n}\n\n}  // namespace math\n\
-    }  // namespace m1une\n\n\n#line 11 \"ds/segtree/segtree_beats.hpp\"\n\nnamespace\
-    \ m1une {\nnamespace ds {\n\n// Generic Segment Tree Beats for actions that may\
-    \ require recursive descent.\ntemplate <m1une::beats_acted_monoid::IsBeatsActedMonoid\
-    \ ActedMonoid>\nstruct SegtreeBeats {\n    using value_type = typename ActedMonoid::value_type;\n\
-    \    using operator_type = typename ActedMonoid::operator_type;\n    using T =\
-    \ value_type;\n    using F = operator_type;\n\n   private:\n    int _n = 0;\n\
-    \    int _size = 1;\n    std::vector<T> _data;\n    std::vector<F> _lazy;\n\n\
-    \    static T mapping_at(const F& f, const T& value, long long ordinal) {\n  \
-    \      if constexpr (requires(F g, T x, long long i) {\n            ActedMonoid::mapping(g,\
-    \ x, i);\n        }) {\n            return ActedMonoid::mapping(f, value, ordinal);\n\
-    \        } else {\n            return ActedMonoid::mapping(f, value);\n      \
-    \  }\n    }\n\n    static bool can_apply_at(const F& f, const T& value, long long\
-    \ ordinal) {\n        if constexpr (requires(F g, T x, long long i) {\n      \
-    \      ActedMonoid::can_apply(g, x, i);\n        }) {\n            return ActedMonoid::can_apply(f,\
-    \ value, ordinal);\n        } else {\n            return ActedMonoid::can_apply(f,\
-    \ value);\n        }\n    }\n\n    static F shift_operator(const F& f, long long\
-    \ ordinal) {\n        if constexpr (requires(F g, long long i) {\n           \
-    \ ActedMonoid::op_shift(g, i);\n        }) {\n            return ActedMonoid::op_shift(f,\
-    \ ordinal);\n        } else {\n            return f;\n        }\n    }\n\n   \
-    \ void initialize(std::vector<T>&& values) {\n        _n = int(values.size());\n\
-    \        _size = int(m1une::math::bit_ceil((unsigned int)_n));\n        _data.assign(2\
-    \ * _size, ActedMonoid::id());\n        _lazy.assign(_size, ActedMonoid::op_id());\n\
-    \        for (int i = 0; i < _n; ++i) {\n            _data[_size + i] = std::move(values[i]);\n\
-    \        }\n        for (int k = _size - 1; k >= 1; --k) update(k);\n    }\n\n\
-    \    void update(int node) {\n        _data[node] = ActedMonoid::op(\n       \
-    \     _data[node * 2],\n            _data[node * 2 + 1]\n        );\n    }\n\n\
-    \    void all_apply(int node, int left, int right, const F& f) {\n        if (_n\
-    \ <= left) return;\n        if (can_apply_at(f, _data[node], 0)) {\n         \
-    \   _data[node] = mapping_at(f, _data[node], 0);\n            if (node < _size)\
-    \ {\n                _lazy[node] = ActedMonoid::op_comp(f, _lazy[node]);\n   \
-    \         }\n            return;\n        }\n\n        assert(right - left > 1);\n\
+    \ 1 \"beats_acted_monoid/range_chmin_chmax_add_range_sum.hpp\"\n\n\n\n#line 7\
+    \ \"beats_acted_monoid/range_chmin_chmax_add_range_sum.hpp\"\n#include <limits>\n\
+    \nnamespace m1une {\nnamespace beats_acted_monoid {\n\ntemplate <std::signed_integral\
+    \ T>\nstruct RangeChminChmaxAddRangeSumNode {\n    T sum;\n    T maximum;\n  \
+    \  T second_maximum;\n    T minimum;\n    T second_minimum;\n    int maximum_count;\n\
+    \    int minimum_count;\n    int length;\n};\n\n// Beats acted monoid for range\
+    \ chmin/chmax/add updates and range sum queries.\ntemplate <std::signed_integral\
+    \ T = long long>\nstruct RangeChminChmaxAddRangeSum {\n    using value_type =\
+    \ RangeChminChmaxAddRangeSumNode<T>;\n\n    // Represents f(x) = clamp(x + add,\
+    \ lower, upper).\n    struct operator_type {\n        T add;\n        T lower;\n\
+    \        T upper;\n    };\n\n    static constexpr bool commutative = true;\n \
+    \   static constexpr bool operator_commutative = false;\n    static constexpr\
+    \ T negative_infinity = std::numeric_limits<T>::lowest();\n    static constexpr\
+    \ T positive_infinity = std::numeric_limits<T>::max();\n\n   private:\n    static\
+    \ constexpr T shift_lower_bound(T bound, T add) {\n        return bound == negative_infinity\
+    \ ? bound : bound + add;\n    }\n\n    static constexpr T shift_upper_bound(T\
+    \ bound, T add) {\n        return bound == positive_infinity ? bound : bound +\
+    \ add;\n    }\n\n    static constexpr void apply_add(value_type& value, T add)\
+    \ {\n        if (value.length == 0 || add == T(0)) return;\n        value.sum\
+    \ += add * T(value.length);\n        value.maximum += add;\n        value.minimum\
+    \ += add;\n        if (value.maximum_count != value.length) {\n            value.second_maximum\
+    \ += add;\n        }\n        if (value.minimum_count != value.length) {\n   \
+    \         value.second_minimum += add;\n        }\n    }\n\n    static constexpr\
+    \ bool can_apply_chmin(\n        const value_type& value,\n        T upper\n \
+    \   ) {\n        return value.maximum <= upper ||\n            value.maximum_count\
+    \ == value.length ||\n            value.second_maximum < upper;\n    }\n\n   \
+    \ static constexpr void apply_chmin(value_type& value, T upper) {\n        if\
+    \ (value.maximum <= upper) return;\n        assert(can_apply_chmin(value, upper));\n\
+    \        value.sum +=\n            (upper - value.maximum) * T(value.maximum_count);\n\
+    \        if (value.minimum == value.maximum) {\n            value.minimum = upper;\n\
+    \        } else if (value.second_minimum == value.maximum) {\n            value.second_minimum\
+    \ = upper;\n        }\n        value.maximum = upper;\n    }\n\n    static constexpr\
+    \ bool can_apply_chmax(\n        const value_type& value,\n        T lower\n \
+    \   ) {\n        return lower <= value.minimum ||\n            value.minimum_count\
+    \ == value.length ||\n            lower < value.second_minimum;\n    }\n\n   \
+    \ static constexpr void apply_chmax(value_type& value, T lower) {\n        if\
+    \ (lower <= value.minimum) return;\n        assert(can_apply_chmax(value, lower));\n\
+    \        value.sum +=\n            (lower - value.minimum) * T(value.minimum_count);\n\
+    \        if (value.maximum == value.minimum) {\n            value.maximum = lower;\n\
+    \        } else if (value.second_maximum == value.minimum) {\n            value.second_maximum\
+    \ = lower;\n        }\n        value.minimum = lower;\n    }\n\n    static constexpr\
+    \ value_type constant_value(T value, int length) {\n        return {\n       \
+    \     value * T(length),\n            value,\n            negative_infinity,\n\
+    \            value,\n            positive_infinity,\n            length,\n   \
+    \         length,\n            length\n        };\n    }\n\n   public:\n    static\
+    \ constexpr value_type id() {\n        return {\n            T(0),\n         \
+    \   negative_infinity,\n            negative_infinity,\n            positive_infinity,\n\
+    \            positive_infinity,\n            0,\n            0,\n            0\n\
+    \        };\n    }\n\n    static constexpr value_type op(\n        const value_type&\
+    \ left,\n        const value_type& right\n    ) {\n        if (left.length ==\
+    \ 0) return right;\n        if (right.length == 0) return left;\n\n        value_type\
+    \ result;\n        result.sum = left.sum + right.sum;\n        result.length =\
+    \ left.length + right.length;\n\n        result.maximum = std::max(left.maximum,\
+    \ right.maximum);\n        result.maximum_count = 0;\n        result.second_maximum\
+    \ = negative_infinity;\n        if (left.maximum == result.maximum) {\n      \
+    \      result.maximum_count += left.maximum_count;\n            result.second_maximum\
+    \ = std::max(\n                result.second_maximum,\n                left.second_maximum\n\
+    \            );\n        } else {\n            result.second_maximum = std::max(\n\
+    \                result.second_maximum,\n                left.maximum\n      \
+    \      );\n        }\n        if (right.maximum == result.maximum) {\n       \
+    \     result.maximum_count += right.maximum_count;\n            result.second_maximum\
+    \ = std::max(\n                result.second_maximum,\n                right.second_maximum\n\
+    \            );\n        } else {\n            result.second_maximum = std::max(\n\
+    \                result.second_maximum,\n                right.maximum\n     \
+    \       );\n        }\n\n        result.minimum = std::min(left.minimum, right.minimum);\n\
+    \        result.minimum_count = 0;\n        result.second_minimum = positive_infinity;\n\
+    \        if (left.minimum == result.minimum) {\n            result.minimum_count\
+    \ += left.minimum_count;\n            result.second_minimum = std::min(\n    \
+    \            result.second_minimum,\n                left.second_minimum\n   \
+    \         );\n        } else {\n            result.second_minimum = std::min(\n\
+    \                result.second_minimum,\n                left.minimum\n      \
+    \      );\n        }\n        if (right.minimum == result.minimum) {\n       \
+    \     result.minimum_count += right.minimum_count;\n            result.second_minimum\
+    \ = std::min(\n                result.second_minimum,\n                right.second_minimum\n\
+    \            );\n        } else {\n            result.second_minimum = std::min(\n\
+    \                result.second_minimum,\n                right.minimum\n     \
+    \       );\n        }\n        return result;\n    }\n\n    static constexpr operator_type\
+    \ op_id() {\n        return {T(0), negative_infinity, positive_infinity};\n  \
+    \  }\n\n    // Returns f(g(x)).\n    static constexpr operator_type op_comp(\n\
+    \        const operator_type& f,\n        const operator_type& g\n    ) {\n  \
+    \      T lower = shift_lower_bound(g.lower, f.add);\n        T upper = shift_upper_bound(g.upper,\
+    \ f.add);\n        return {\n            g.add + f.add,\n            std::clamp(lower,\
+    \ f.lower, f.upper),\n            std::clamp(upper, f.lower, f.upper)\n      \
+    \  };\n    }\n\n    static constexpr bool can_apply(\n        const operator_type&\
+    \ f,\n        const value_type& value\n    ) {\n        if (value.length == 0\
+    \ || f.lower == f.upper) return true;\n        value_type mapped = value;\n  \
+    \      apply_add(mapped, f.add);\n        if (\n            mapped.maximum <=\
+    \ f.lower ||\n            f.upper <= mapped.minimum\n        ) {\n           \
+    \ return true;\n        }\n        if (!can_apply_chmax(mapped, f.lower)) return\
+    \ false;\n        apply_chmax(mapped, f.lower);\n        return can_apply_chmin(mapped,\
+    \ f.upper);\n    }\n\n    static constexpr value_type mapping(\n        const\
+    \ operator_type& f,\n        const value_type& value\n    ) {\n        assert(can_apply(f,\
+    \ value));\n        if (value.length == 0) return value;\n        if (f.lower\
+    \ == f.upper) {\n            return constant_value(f.lower, value.length);\n \
+    \       }\n        value_type result = value;\n        apply_add(result, f.add);\n\
+    \        if (result.maximum <= f.lower) {\n            return constant_value(f.lower,\
+    \ result.length);\n        }\n        if (f.upper <= result.minimum) {\n     \
+    \       return constant_value(f.upper, result.length);\n        }\n        apply_chmax(result,\
+    \ f.lower);\n        apply_chmin(result, f.upper);\n        return result;\n \
+    \   }\n\n    static constexpr value_type make(const T& value) {\n        return\
+    \ constant_value(value, 1);\n    }\n\n    static constexpr operator_type make_chmin(const\
+    \ T& upper) {\n        return {T(0), negative_infinity, upper};\n    }\n\n   \
+    \ static constexpr operator_type make_chmax(const T& lower) {\n        return\
+    \ {T(0), lower, positive_infinity};\n    }\n\n    static constexpr operator_type\
+    \ make_add(const T& add) {\n        return {add, negative_infinity, positive_infinity};\n\
+    \    }\n};\n\n}  // namespace beats_acted_monoid\n}  // namespace m1une\n\n\n\
+    #line 1 \"ds/segtree/segtree_beats.hpp\"\n\n\n\n#line 6 \"ds/segtree/segtree_beats.hpp\"\
+    \n#include <utility>\n#line 8 \"ds/segtree/segtree_beats.hpp\"\n\n#line 1 \"math/bit_ceil.hpp\"\
+    \n\n\n\nnamespace m1une {\nnamespace math {\n\ntemplate <typename T>\nconstexpr\
+    \ T bit_ceil(T n) {\n    if (n <= 1) return 1;\n    T x = 1;\n    while (x < n)\
+    \ x <<= 1;\n    return x;\n}\n\n}  // namespace math\n}  // namespace m1une\n\n\
+    \n#line 11 \"ds/segtree/segtree_beats.hpp\"\n\nnamespace m1une {\nnamespace ds\
+    \ {\n\n// Generic Segment Tree Beats for actions that may require recursive descent.\n\
+    template <m1une::beats_acted_monoid::IsBeatsActedMonoid ActedMonoid>\nstruct SegtreeBeats\
+    \ {\n    using value_type = typename ActedMonoid::value_type;\n    using operator_type\
+    \ = typename ActedMonoid::operator_type;\n    using T = value_type;\n    using\
+    \ F = operator_type;\n\n   private:\n    int _n = 0;\n    int _size = 1;\n   \
+    \ std::vector<T> _data;\n    std::vector<F> _lazy;\n\n    static T mapping_at(const\
+    \ F& f, const T& value, long long ordinal) {\n        if constexpr (requires(F\
+    \ g, T x, long long i) {\n            ActedMonoid::mapping(g, x, i);\n       \
+    \ }) {\n            return ActedMonoid::mapping(f, value, ordinal);\n        }\
+    \ else {\n            return ActedMonoid::mapping(f, value);\n        }\n    }\n\
+    \n    static bool can_apply_at(const F& f, const T& value, long long ordinal)\
+    \ {\n        if constexpr (requires(F g, T x, long long i) {\n            ActedMonoid::can_apply(g,\
+    \ x, i);\n        }) {\n            return ActedMonoid::can_apply(f, value, ordinal);\n\
+    \        } else {\n            return ActedMonoid::can_apply(f, value);\n    \
+    \    }\n    }\n\n    static F shift_operator(const F& f, long long ordinal) {\n\
+    \        if constexpr (requires(F g, long long i) {\n            ActedMonoid::op_shift(g,\
+    \ i);\n        }) {\n            return ActedMonoid::op_shift(f, ordinal);\n \
+    \       } else {\n            return f;\n        }\n    }\n\n    void initialize(std::vector<T>&&\
+    \ values) {\n        _n = int(values.size());\n        _size = int(m1une::math::bit_ceil((unsigned\
+    \ int)_n));\n        _data.assign(2 * _size, ActedMonoid::id());\n        _lazy.assign(_size,\
+    \ ActedMonoid::op_id());\n        for (int i = 0; i < _n; ++i) {\n           \
+    \ _data[_size + i] = std::move(values[i]);\n        }\n        for (int k = _size\
+    \ - 1; k >= 1; --k) update(k);\n    }\n\n    void update(int node) {\n       \
+    \ _data[node] = ActedMonoid::op(\n            _data[node * 2],\n            _data[node\
+    \ * 2 + 1]\n        );\n    }\n\n    void all_apply(int node, int left, int right,\
+    \ const F& f) {\n        if (_n <= left) return;\n        if (can_apply_at(f,\
+    \ _data[node], 0)) {\n            _data[node] = mapping_at(f, _data[node], 0);\n\
+    \            if (node < _size) {\n                _lazy[node] = ActedMonoid::op_comp(f,\
+    \ _lazy[node]);\n            }\n            return;\n        }\n\n        assert(right\
+    \ - left > 1);\n        push(node, left, right);\n        int middle = left +\
+    \ (right - left) / 2;\n        all_apply(node * 2, left, middle, f);\n       \
+    \ all_apply(\n            node * 2 + 1,\n            middle,\n            right,\n\
+    \            shift_operator(f, middle - left)\n        );\n        update(node);\n\
+    \    }\n\n    void push(int node, int left, int right) {\n        assert(right\
+    \ - left > 1);\n        int middle = left + (right - left) / 2;\n        F f =\
+    \ _lazy[node];\n        _lazy[node] = ActedMonoid::op_id();\n        all_apply(node\
+    \ * 2, left, middle, f);\n        all_apply(\n            node * 2 + 1,\n    \
+    \        middle,\n            right,\n            shift_operator(f, middle - left)\n\
+    \        );\n    }\n\n    void set_impl(\n        int node,\n        int left,\n\
+    \        int right,\n        int index,\n        T value\n    ) {\n        if\
+    \ (right - left == 1) {\n            _data[node] = std::move(value);\n       \
+    \     return;\n        }\n        push(node, left, right);\n        int middle\
+    \ = left + (right - left) / 2;\n        if (index < middle) {\n            set_impl(node\
+    \ * 2, left, middle, index, std::move(value));\n        } else {\n           \
+    \ set_impl(\n                node * 2 + 1,\n                middle,\n        \
+    \        right,\n                index,\n                std::move(value)\n  \
+    \          );\n        }\n        update(node);\n    }\n\n    T get_impl(int node,\
+    \ int left, int right, int index) {\n        if (right - left == 1) return _data[node];\n\
     \        push(node, left, right);\n        int middle = left + (right - left)\
-    \ / 2;\n        all_apply(node * 2, left, middle, f);\n        all_apply(\n  \
-    \          node * 2 + 1,\n            middle,\n            right,\n          \
-    \  shift_operator(f, middle - left)\n        );\n        update(node);\n    }\n\
-    \n    void push(int node, int left, int right) {\n        assert(right - left\
-    \ > 1);\n        int middle = left + (right - left) / 2;\n        F f = _lazy[node];\n\
-    \        _lazy[node] = ActedMonoid::op_id();\n        all_apply(node * 2, left,\
-    \ middle, f);\n        all_apply(\n            node * 2 + 1,\n            middle,\n\
-    \            right,\n            shift_operator(f, middle - left)\n        );\n\
-    \    }\n\n    void set_impl(\n        int node,\n        int left,\n        int\
-    \ right,\n        int index,\n        T value\n    ) {\n        if (right - left\
-    \ == 1) {\n            _data[node] = std::move(value);\n            return;\n\
-    \        }\n        push(node, left, right);\n        int middle = left + (right\
-    \ - left) / 2;\n        if (index < middle) {\n            set_impl(node * 2,\
-    \ left, middle, index, std::move(value));\n        } else {\n            set_impl(\n\
-    \                node * 2 + 1,\n                middle,\n                right,\n\
-    \                index,\n                std::move(value)\n            );\n  \
-    \      }\n        update(node);\n    }\n\n    T get_impl(int node, int left, int\
-    \ right, int index) {\n        if (right - left == 1) return _data[node];\n  \
-    \      push(node, left, right);\n        int middle = left + (right - left) /\
-    \ 2;\n        if (index < middle) {\n            return get_impl(node * 2, left,\
+    \ / 2;\n        if (index < middle) {\n            return get_impl(node * 2, left,\
     \ middle, index);\n        }\n        return get_impl(node * 2 + 1, middle, right,\
     \ index);\n    }\n\n    T prod_impl(\n        int node,\n        int left,\n \
     \       int right,\n        int query_left,\n        int query_right\n    ) {\n\
@@ -225,18 +332,17 @@ data:
     \       int answer = 0;\n        min_left_impl(\n            1,\n            0,\n\
     \            _size,\n            right,\n            predicate,\n            product,\n\
     \            answer\n        );\n        return answer;\n    }\n};\n\n}  // namespace\
-    \ ds\n}  // namespace m1une\n\n\n#line 4 \"verify/ds/segtree/segtree_beats.test.cpp\"\
-    \n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#include <algorithm>\n#include <array>\n\
-    #include <cerrno>\n#include <charconv>\n#include <cstddef>\n#include <cstdio>\n\
-    #include <cstdlib>\n#include <cstdint>\n#include <cstring>\n#include <iterator>\n\
-    #include <string>\n#include <sys/stat.h>\n#include <type_traits>\n#line 18 \"\
-    utilities/fast_io.hpp\"\n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities\
-    \ {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class\
-    \ T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate <class T>\n\
-    struct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
-    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
-    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
-    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    \ ds\n}  // namespace m1une\n\n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line\
+    \ 5 \"utilities/fast_io.hpp\"\n#include <array>\n#include <cerrno>\n#include <charconv>\n\
+    #include <cstddef>\n#include <cstdio>\n#include <cstdlib>\n#line 12 \"utilities/fast_io.hpp\"\
+    \n#include <cstring>\n#include <iterator>\n#include <string>\n#include <sys/stat.h>\n\
+    #include <type_traits>\n#line 18 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n\
+    \nnamespace m1une {\nnamespace utilities {\nnamespace internal {\n\n// Detect\
+    \ std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct is_range\
+    \ : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
+    \    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
+    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
+    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
     \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
     \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
@@ -468,179 +574,136 @@ data:
     \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
     n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 9 \"verify/ds/segtree/segtree_beats.test.cpp\"\
-    \n\n#line 1 \"acted_monoid/range_affine_range_sum.hpp\"\n\n\n\n#line 5 \"acted_monoid/range_affine_range_sum.hpp\"\
-    \n\nnamespace m1une {\nnamespace acted_monoid {\n\ntemplate <typename T>\nstruct\
-    \ RangeAffineRangeSumNode {\n    T sum;\n    int size;\n};\n\n// Designed to accept\
-    \ Modint or similar types as T\ntemplate <typename T>\nstruct RangeAffineRangeSum\
-    \ {\n    using value_type = RangeAffineRangeSumNode<T>;\n    using operator_type\
-    \ = std::pair<T, T>;  // {a, b} for ax + b\n    static constexpr bool commutative\
-    \ = true;\n    static constexpr bool operator_commutative = false;\n\n    // Value\
-    \ Monoid\n    static constexpr value_type id() {\n        return {T(0), 0};\n\
-    \    }\n    static constexpr value_type op(const value_type& a, const value_type&\
-    \ b) {\n        return {a.sum + b.sum, a.size + b.size};\n    }\n    static constexpr\
-    \ int size(const value_type& value) {\n        return value.size;\n    }\n\n \
-    \   // Operator Monoid (Affine Composition)\n    // f(x) = a1*x + b1, g(x) = a2*x\
-    \ + b2\n    // f(g(x)) = a1*(a2*x + b2) + b1 = (a1*a2)*x + (a1*b2 + b1)\n    static\
-    \ constexpr operator_type op_id() {\n        return {T(1), T(0)};\n    }\n   \
-    \ static constexpr operator_type op_comp(const operator_type& f, const operator_type&\
-    \ g) {\n        return {f.first * g.first, f.first * g.second + f.second};\n \
-    \   }\n\n    // Mapping\n    // \\sum (a*x_i + b) = a * \\sum x_i + b * size\n\
-    \    static constexpr value_type mapping(const operator_type& f, const value_type&\
-    \ x) {\n        return {f.first * x.sum + f.second * T(x.size), x.size};\n   \
-    \ }\n\n    // Helper for initializing a leaf node\n    static constexpr value_type\
-    \ make(const T& val) {\n        return {val, 1};\n    }\n};\n\n}  // namespace\
-    \ acted_monoid\n}  // namespace m1une\n\n\n#line 1 \"math/modint.hpp\"\n\n\n\n\
-    #line 6 \"math/modint.hpp\"\n#include <iostream>\n#line 9 \"math/modint.hpp\"\n\
-    \nnamespace m1une {\nnamespace math {\n\ntemplate <uint32_t Modulus>\nstruct ModInt\
-    \ {\n    static_assert(0 < Modulus, \"Modulus must be positive\");\n\n   private:\n\
-    \    uint32_t _v;\n\n   public:\n    static constexpr uint32_t mod() {\n     \
-    \   return Modulus;\n    }\n\n    static constexpr ModInt raw(uint32_t v) noexcept\
-    \ {\n        ModInt x;\n        x._v = v;\n        return x;\n    }\n\n    constexpr\
-    \ ModInt() noexcept : _v(0) {}\n\n    template <class Integer, std::enable_if_t<std::is_integral_v<Integer>,\
-    \ int> = 0>\n    constexpr ModInt(Integer v) noexcept {\n        if constexpr\
-    \ (std::is_signed_v<Integer>) {\n            int64_t x = static_cast<int64_t>(v)\
-    \ % static_cast<int64_t>(Modulus);\n            if (x < 0) x += Modulus;\n   \
-    \         _v = static_cast<uint32_t>(x);\n        } else {\n            _v = static_cast<uint32_t>(static_cast<uint64_t>(v)\
-    \ % Modulus);\n        }\n    }\n\n    constexpr uint32_t val() const noexcept\
-    \ {\n        return _v;\n    }\n\n    constexpr ModInt& operator++() noexcept\
-    \ {\n        _v++;\n        if (_v == Modulus) _v = 0;\n        return *this;\n\
-    \    }\n\n    constexpr ModInt& operator--() noexcept {\n        if (_v == 0)\
-    \ _v = Modulus;\n        _v--;\n        return *this;\n    }\n\n    constexpr\
-    \ ModInt operator++(int) noexcept {\n        ModInt res = *this;\n        ++*this;\n\
-    \        return res;\n    }\n\n    constexpr ModInt operator--(int) noexcept {\n\
-    \        ModInt res = *this;\n        --*this;\n        return res;\n    }\n\n\
-    \    constexpr ModInt& operator+=(const ModInt& rhs) noexcept {\n        _v +=\
-    \ rhs._v;\n        if (_v >= Modulus) _v -= Modulus;\n        return *this;\n\
-    \    }\n\n    constexpr ModInt& operator-=(const ModInt& rhs) noexcept {\n   \
-    \     _v -= rhs._v;\n        if (_v >= Modulus) _v += Modulus;\n        return\
-    \ *this;\n    }\n\n    constexpr ModInt& operator*=(const ModInt& rhs) noexcept\
-    \ {\n        uint64_t z = _v;\n        z *= rhs._v;\n        _v = static_cast<uint32_t>(z\
-    \ % Modulus);\n        return *this;\n    }\n\n    constexpr ModInt& operator/=(const\
-    \ ModInt& rhs) noexcept {\n        return *this *= rhs.inv();\n    }\n\n    constexpr\
-    \ ModInt operator+(const ModInt& rhs) const noexcept {\n        return ModInt(*this)\
-    \ += rhs;\n    }\n    constexpr ModInt operator-(const ModInt& rhs) const noexcept\
-    \ {\n        return ModInt(*this) -= rhs;\n    }\n    constexpr ModInt operator*(const\
-    \ ModInt& rhs) const noexcept {\n        return ModInt(*this) *= rhs;\n    }\n\
-    \    constexpr ModInt operator/(const ModInt& rhs) const noexcept {\n        return\
-    \ ModInt(*this) /= rhs;\n    }\n\n    constexpr bool operator==(const ModInt&\
-    \ rhs) const noexcept {\n        return _v == rhs._v;\n    }\n    constexpr bool\
-    \ operator!=(const ModInt& rhs) const noexcept {\n        return _v != rhs._v;\n\
-    \    }\n\n    constexpr ModInt pow(long long n) const noexcept {\n        ModInt\
-    \ res = raw(1 % Modulus);\n        ModInt x = n < 0 ? inv() : *this;\n       \
-    \ uint64_t exponent = n < 0 ? uint64_t(-(n + 1)) + 1 : uint64_t(n);\n        while\
-    \ (exponent > 0) {\n            if (exponent & 1) res *= x;\n            x *=\
-    \ x;\n            exponent >>= 1;\n        }\n        return res;\n    }\n\n \
-    \   constexpr ModInt inv() const noexcept {\n        int64_t a = _v, b = Modulus,\
-    \ u = 1, v = 0;\n        while (b) {\n            int64_t t = a / b;\n       \
-    \     a -= t * b;\n            std::swap(a, b);\n            u -= t * v;\n   \
-    \         std::swap(u, v);\n        }\n        assert(a == 1);\n        u %= Modulus;\n\
-    \        if (u < 0) u += Modulus;\n        return raw(static_cast<uint32_t>(u));\n\
-    \    }\n\n    friend std::ostream& operator<<(std::ostream& os, const ModInt&\
-    \ rhs) {\n        return os << rhs._v;\n    }\n\n    friend std::istream& operator>>(std::istream&\
-    \ is, ModInt& rhs) {\n        long long v;\n        is >> v;\n        rhs = ModInt(v);\n\
-    \        return is;\n    }\n};\n\nusing modint998244353 = ModInt<998244353>;\n\
-    using modint1000000007 = ModInt<1000000007>;\n\ntemplate <int Id = 0>\nstruct\
-    \ DynamicModInt {\n   private:\n    uint32_t _v;\n    inline static uint32_t _mod\
-    \ = 1;\n\n   public:\n    static uint32_t mod() noexcept {\n        return _mod;\n\
-    \    }\n\n    static void set_mod(uint32_t modulus) noexcept {\n        assert(modulus\
-    \ > 0);\n        assert(modulus <= uint32_t(1) << 31);\n        _mod = modulus;\n\
-    \    }\n\n    static DynamicModInt raw(uint32_t v) noexcept {\n        assert(v\
-    \ < _mod);\n        DynamicModInt x;\n        x._v = v;\n        return x;\n \
-    \   }\n\n    DynamicModInt() noexcept : _v(0) {}\n\n    template <class Integer,\
-    \ std::enable_if_t<std::is_integral_v<Integer>, int> = 0>\n    DynamicModInt(Integer\
-    \ v) noexcept {\n        if constexpr (std::is_signed_v<Integer>) {\n        \
-    \    int64_t x = static_cast<int64_t>(v) % static_cast<int64_t>(_mod);\n     \
-    \       if (x < 0) x += _mod;\n            _v = static_cast<uint32_t>(x);\n  \
-    \      } else {\n            _v = static_cast<uint32_t>(static_cast<uint64_t>(v)\
-    \ % _mod);\n        }\n    }\n\n    uint32_t val() const noexcept {\n        return\
-    \ _v;\n    }\n\n    DynamicModInt& operator++() noexcept {\n        _v++;\n  \
-    \      if (_v == _mod) _v = 0;\n        return *this;\n    }\n\n    DynamicModInt&\
-    \ operator--() noexcept {\n        if (_v == 0) _v = _mod;\n        _v--;\n  \
-    \      return *this;\n    }\n\n    DynamicModInt operator++(int) noexcept {\n\
-    \        DynamicModInt result = *this;\n        ++*this;\n        return result;\n\
-    \    }\n\n    DynamicModInt operator--(int) noexcept {\n        DynamicModInt\
-    \ result = *this;\n        --*this;\n        return result;\n    }\n\n    DynamicModInt&\
-    \ operator+=(const DynamicModInt& rhs) noexcept {\n        _v += rhs._v;\n   \
-    \     if (_v >= _mod) _v -= _mod;\n        return *this;\n    }\n\n    DynamicModInt&\
-    \ operator-=(const DynamicModInt& rhs) noexcept {\n        _v -= rhs._v;\n   \
-    \     if (_v >= _mod) _v += _mod;\n        return *this;\n    }\n\n    DynamicModInt&\
-    \ operator*=(const DynamicModInt& rhs) noexcept {\n        _v = static_cast<uint32_t>(uint64_t(_v)\
-    \ * rhs._v % _mod);\n        return *this;\n    }\n\n    DynamicModInt& operator/=(const\
-    \ DynamicModInt& rhs) noexcept {\n        return *this *= rhs.inv();\n    }\n\n\
-    \    DynamicModInt operator+(const DynamicModInt& rhs) const noexcept {\n    \
-    \    return DynamicModInt(*this) += rhs;\n    }\n\n    DynamicModInt operator-(const\
-    \ DynamicModInt& rhs) const noexcept {\n        return DynamicModInt(*this) -=\
-    \ rhs;\n    }\n\n    DynamicModInt operator*(const DynamicModInt& rhs) const noexcept\
-    \ {\n        return DynamicModInt(*this) *= rhs;\n    }\n\n    DynamicModInt operator/(const\
-    \ DynamicModInt& rhs) const noexcept {\n        return DynamicModInt(*this) /=\
-    \ rhs;\n    }\n\n    bool operator==(const DynamicModInt& rhs) const noexcept\
-    \ {\n        return _v == rhs._v;\n    }\n\n    bool operator!=(const DynamicModInt&\
-    \ rhs) const noexcept {\n        return _v != rhs._v;\n    }\n\n    DynamicModInt\
-    \ pow(long long exponent) const noexcept {\n        DynamicModInt result = raw(1\
-    \ % _mod);\n        DynamicModInt base = exponent < 0 ? inv() : *this;\n     \
-    \   uint64_t magnitude =\n            exponent < 0 ? uint64_t(-(exponent + 1))\
-    \ + 1 : uint64_t(exponent);\n        while (magnitude > 0) {\n            if (magnitude\
-    \ & 1) result *= base;\n            base *= base;\n            magnitude >>= 1;\n\
-    \        }\n        return result;\n    }\n\n    DynamicModInt inv() const noexcept\
-    \ {\n        int64_t a = _v, b = _mod, u = 1, v = 0;\n        while (b) {\n  \
-    \          int64_t quotient = a / b;\n            a -= quotient * b;\n       \
-    \     std::swap(a, b);\n            u -= quotient * v;\n            std::swap(u,\
-    \ v);\n        }\n        assert(a == 1);\n        u %= _mod;\n        if (u <\
-    \ 0) u += _mod;\n        return raw(static_cast<uint32_t>(u));\n    }\n\n    friend\
-    \ std::ostream& operator<<(std::ostream& os, const DynamicModInt& rhs) {\n   \
-    \     return os << rhs._v;\n    }\n\n    friend std::istream& operator>>(std::istream&\
-    \ is, DynamicModInt& rhs) {\n        long long value;\n        is >> value;\n\
-    \        rhs = DynamicModInt(value);\n        return is;\n    }\n};\n\n}  // namespace\
-    \ math\n}  // namespace m1une\n\n\n#line 12 \"verify/ds/segtree/segtree_beats.test.cpp\"\
-    \n\nusing mint = m1une::math::modint998244353;\n\nstruct RangeAffineRangeSumBeats\n\
-    \    : m1une::acted_monoid::RangeAffineRangeSum<mint> {\n    static bool can_apply(\n\
-    \        const operator_type&,\n        const value_type&\n    ) {\n        return\
-    \ true;\n    }\n};\n\nint main() {\n    m1une::utilities::FastInput fast_input;\n\
-    \    m1une::utilities::FastOutput fast_output;\n\n    int n, q;\n    fast_input\
-    \ >> n >> q;\n    std::vector<long long> values(n);\n    for (long long& value\
-    \ : values) fast_input >> value;\n\n    m1une::ds::SegtreeBeats<RangeAffineRangeSumBeats>\
-    \ seg(values);\n    assert(seg.size() == n);\n    assert(seg.empty() == (n ==\
-    \ 0));\n\n    while (q--) {\n        int type, left, right;\n        fast_input\
-    \ >> type >> left >> right;\n        if (type == 0) {\n            long long b,\
-    \ c;\n            fast_input >> b >> c;\n            seg.apply(left, right, std::pair<mint,\
-    \ mint>(b, c));\n        } else {\n            fast_output << seg.prod(left, right).sum\
-    \ << '\\n';\n        }\n    }\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/range_affine_range_sum\"\
-    \n\n#include \"../../../ds/segtree/segtree_beats.hpp\"\n\n#include <cassert>\n\
-    #include \"../../../utilities/fast_io.hpp\"\n#include <utility>\n#include <vector>\n\
-    \n#include \"../../../acted_monoid/range_affine_range_sum.hpp\"\n#include \"../../../math/modint.hpp\"\
-    \n\nusing mint = m1une::math::modint998244353;\n\nstruct RangeAffineRangeSumBeats\n\
-    \    : m1une::acted_monoid::RangeAffineRangeSum<mint> {\n    static bool can_apply(\n\
-    \        const operator_type&,\n        const value_type&\n    ) {\n        return\
-    \ true;\n    }\n};\n\nint main() {\n    m1une::utilities::FastInput fast_input;\n\
-    \    m1une::utilities::FastOutput fast_output;\n\n    int n, q;\n    fast_input\
-    \ >> n >> q;\n    std::vector<long long> values(n);\n    for (long long& value\
-    \ : values) fast_input >> value;\n\n    m1une::ds::SegtreeBeats<RangeAffineRangeSumBeats>\
-    \ seg(values);\n    assert(seg.size() == n);\n    assert(seg.empty() == (n ==\
-    \ 0));\n\n    while (q--) {\n        int type, left, right;\n        fast_input\
-    \ >> type >> left >> right;\n        if (type == 0) {\n            long long b,\
-    \ c;\n            fast_input >> b >> c;\n            seg.apply(left, right, std::pair<mint,\
-    \ mint>(b, c));\n        } else {\n            fast_output << seg.prod(left, right).sum\
-    \ << '\\n';\n        }\n    }\n}\n"
+    \ utilities\n}  // namespace m1une\n\n\n#line 13 \"verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp\"\
+    \n\nnamespace {\n\nusing AM =\n    m1une::beats_acted_monoid::RangeChminChmaxAddRangeSum<long\
+    \ long>;\n\nlong long apply_scalar(const AM::operator_type& f, long long value)\
+    \ {\n    return std::clamp(value + f.add, f.lower, f.upper);\n}\n\nvoid test_composition()\
+    \ {\n    std::vector<AM::operator_type> operators;\n    for (long long value =\
+    \ -10; value <= 10; ++value) {\n        operators.emplace_back(AM::make_chmin(value));\n\
+    \        operators.emplace_back(AM::make_chmax(value));\n        operators.emplace_back(AM::make_add(value));\n\
+    \    }\n\n    for (const auto& f : operators) {\n        for (const auto& g :\
+    \ operators) {\n            auto composition = AM::op_comp(f, g);\n          \
+    \  for (long long value = -20; value <= 20; ++value) {\n                assert(\n\
+    \                    apply_scalar(composition, value) ==\n                   \
+    \ apply_scalar(f, apply_scalar(g, value))\n                );\n            }\n\
+    \        }\n    }\n}\n\nvoid test_randomized() {\n    std::uint64_t state = 0x123456789abcdef0ULL;\n\
+    \    auto random = [&state]() {\n        state ^= state << 7;\n        state ^=\
+    \ state >> 9;\n        return state;\n    };\n\n    for (int trial = 0; trial\
+    \ < 300; ++trial) {\n        int size = int(random() % 80);\n        std::vector<long\
+    \ long> values(size);\n        for (long long& value : values) {\n           \
+    \ value = static_cast<long long>(random() % 201) - 100;\n        }\n        m1une::ds::SegtreeBeats<AM>\
+    \ seg(values);\n\n        for (int operation = 0; operation < 500; ++operation)\
+    \ {\n            int left = int(random() % (size + 1));\n            int right\
+    \ = int(random() % (size + 1));\n            if (right < left) std::swap(left,\
+    \ right);\n            int type = int(random() % 5);\n            long long value\
+    \ =\n                static_cast<long long>(random() % 101) - 50;\n\n        \
+    \    if (type == 0) {\n                seg.apply(left, right, AM::make_chmin(value));\n\
+    \                for (int index = left; index < right; ++index) {\n          \
+    \          values[index] = std::min(values[index], value);\n                }\n\
+    \            } else if (type == 1) {\n                seg.apply(left, right, AM::make_chmax(value));\n\
+    \                for (int index = left; index < right; ++index) {\n          \
+    \          values[index] = std::max(values[index], value);\n                }\n\
+    \            } else if (type == 2) {\n                seg.apply(left, right, AM::make_add(value));\n\
+    \                for (int index = left; index < right; ++index) {\n          \
+    \          values[index] += value;\n                }\n            } else {\n\
+    \                long long expected = std::accumulate(\n                    values.begin()\
+    \ + left,\n                    values.begin() + right,\n                    0LL\n\
+    \                );\n                assert(seg.prod(left, right).sum == expected);\n\
+    \            }\n\n            if (operation % 31 == 0) {\n                auto\
+    \ actual = seg.to_vector();\n                for (int index = 0; index < size;\
+    \ ++index) {\n                    assert(actual[index].sum == values[index]);\n\
+    \                }\n            }\n        }\n    }\n}\n\nstatic_assert(m1une::beats_acted_monoid::IsBeatsActedMonoid<AM>);\n\
+    static_assert(AM::commutative);\nstatic_assert(!AM::operator_commutative);\n\n\
+    }  // namespace\n\nint main() {\n    test_composition();\n    test_randomized();\n\
+    \n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
+    \ fast_output;\n\n    int n, q;\n    fast_input >> n >> q;\n    std::vector<long\
+    \ long> values(n);\n    for (long long& value : values) fast_input >> value;\n\
+    \    m1une::ds::SegtreeBeats<AM> seg(values);\n\n    while (q--) {\n        int\
+    \ type, left, right;\n        fast_input >> type >> left >> right;\n        if\
+    \ (type == 0) {\n            long long value;\n            fast_input >> value;\n\
+    \            seg.apply(left, right, AM::make_chmin(value));\n        } else if\
+    \ (type == 1) {\n            long long value;\n            fast_input >> value;\n\
+    \            seg.apply(left, right, AM::make_chmax(value));\n        } else if\
+    \ (type == 2) {\n            long long value;\n            fast_input >> value;\n\
+    \            seg.apply(left, right, AM::make_add(value));\n        } else {\n\
+    \            fast_output << seg.prod(left, right).sum << '\\n';\n        }\n \
+    \   }\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/range_chmin_chmax_add_range_sum\"\
+    \n\n#include <algorithm>\n#include <cassert>\n#include <cstdint>\n#include <numeric>\n\
+    #include <vector>\n\n#include \"../../beats_acted_monoid/concept.hpp\"\n#include\
+    \ \"../../beats_acted_monoid/range_chmin_chmax_add_range_sum.hpp\"\n#include \"\
+    ../../ds/segtree/segtree_beats.hpp\"\n#include \"../../utilities/fast_io.hpp\"\
+    \n\nnamespace {\n\nusing AM =\n    m1une::beats_acted_monoid::RangeChminChmaxAddRangeSum<long\
+    \ long>;\n\nlong long apply_scalar(const AM::operator_type& f, long long value)\
+    \ {\n    return std::clamp(value + f.add, f.lower, f.upper);\n}\n\nvoid test_composition()\
+    \ {\n    std::vector<AM::operator_type> operators;\n    for (long long value =\
+    \ -10; value <= 10; ++value) {\n        operators.emplace_back(AM::make_chmin(value));\n\
+    \        operators.emplace_back(AM::make_chmax(value));\n        operators.emplace_back(AM::make_add(value));\n\
+    \    }\n\n    for (const auto& f : operators) {\n        for (const auto& g :\
+    \ operators) {\n            auto composition = AM::op_comp(f, g);\n          \
+    \  for (long long value = -20; value <= 20; ++value) {\n                assert(\n\
+    \                    apply_scalar(composition, value) ==\n                   \
+    \ apply_scalar(f, apply_scalar(g, value))\n                );\n            }\n\
+    \        }\n    }\n}\n\nvoid test_randomized() {\n    std::uint64_t state = 0x123456789abcdef0ULL;\n\
+    \    auto random = [&state]() {\n        state ^= state << 7;\n        state ^=\
+    \ state >> 9;\n        return state;\n    };\n\n    for (int trial = 0; trial\
+    \ < 300; ++trial) {\n        int size = int(random() % 80);\n        std::vector<long\
+    \ long> values(size);\n        for (long long& value : values) {\n           \
+    \ value = static_cast<long long>(random() % 201) - 100;\n        }\n        m1une::ds::SegtreeBeats<AM>\
+    \ seg(values);\n\n        for (int operation = 0; operation < 500; ++operation)\
+    \ {\n            int left = int(random() % (size + 1));\n            int right\
+    \ = int(random() % (size + 1));\n            if (right < left) std::swap(left,\
+    \ right);\n            int type = int(random() % 5);\n            long long value\
+    \ =\n                static_cast<long long>(random() % 101) - 50;\n\n        \
+    \    if (type == 0) {\n                seg.apply(left, right, AM::make_chmin(value));\n\
+    \                for (int index = left; index < right; ++index) {\n          \
+    \          values[index] = std::min(values[index], value);\n                }\n\
+    \            } else if (type == 1) {\n                seg.apply(left, right, AM::make_chmax(value));\n\
+    \                for (int index = left; index < right; ++index) {\n          \
+    \          values[index] = std::max(values[index], value);\n                }\n\
+    \            } else if (type == 2) {\n                seg.apply(left, right, AM::make_add(value));\n\
+    \                for (int index = left; index < right; ++index) {\n          \
+    \          values[index] += value;\n                }\n            } else {\n\
+    \                long long expected = std::accumulate(\n                    values.begin()\
+    \ + left,\n                    values.begin() + right,\n                    0LL\n\
+    \                );\n                assert(seg.prod(left, right).sum == expected);\n\
+    \            }\n\n            if (operation % 31 == 0) {\n                auto\
+    \ actual = seg.to_vector();\n                for (int index = 0; index < size;\
+    \ ++index) {\n                    assert(actual[index].sum == values[index]);\n\
+    \                }\n            }\n        }\n    }\n}\n\nstatic_assert(m1une::beats_acted_monoid::IsBeatsActedMonoid<AM>);\n\
+    static_assert(AM::commutative);\nstatic_assert(!AM::operator_commutative);\n\n\
+    }  // namespace\n\nint main() {\n    test_composition();\n    test_randomized();\n\
+    \n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
+    \ fast_output;\n\n    int n, q;\n    fast_input >> n >> q;\n    std::vector<long\
+    \ long> values(n);\n    for (long long& value : values) fast_input >> value;\n\
+    \    m1une::ds::SegtreeBeats<AM> seg(values);\n\n    while (q--) {\n        int\
+    \ type, left, right;\n        fast_input >> type >> left >> right;\n        if\
+    \ (type == 0) {\n            long long value;\n            fast_input >> value;\n\
+    \            seg.apply(left, right, AM::make_chmin(value));\n        } else if\
+    \ (type == 1) {\n            long long value;\n            fast_input >> value;\n\
+    \            seg.apply(left, right, AM::make_chmax(value));\n        } else if\
+    \ (type == 2) {\n            long long value;\n            fast_input >> value;\n\
+    \            seg.apply(left, right, AM::make_add(value));\n        } else {\n\
+    \            fast_output << seg.prod(left, right).sum << '\\n';\n        }\n \
+    \   }\n}\n"
   dependsOn:
-  - ds/segtree/segtree_beats.hpp
   - beats_acted_monoid/concept.hpp
   - acted_monoid/concept.hpp
+  - beats_acted_monoid/range_chmin_chmax_add_range_sum.hpp
+  - ds/segtree/segtree_beats.hpp
+  - beats_acted_monoid/concept.hpp
   - math/bit_ceil.hpp
   - utilities/fast_io.hpp
-  - acted_monoid/range_affine_range_sum.hpp
-  - math/modint.hpp
   isVerificationFile: true
-  path: verify/ds/segtree/segtree_beats.test.cpp
+  path: verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
   requiredBy: []
   timestamp: '2026-08-12 01:20:42+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/ds/segtree/segtree_beats.test.cpp
+documentation_of: verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/ds/segtree/segtree_beats.test.cpp
-- /verify/verify/ds/segtree/segtree_beats.test.cpp.html
-title: verify/ds/segtree/segtree_beats.test.cpp
+- /verify/verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
+- /verify/verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp.html
+title: verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
 ---

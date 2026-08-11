@@ -2,8 +2,8 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: acted_monoid/beats_wrapper.hpp
-    title: Beats Acted Monoid Wrapper
+    path: acted_monoid/concept.hpp
+    title: Acted Monoid Concept
   - icon: ':heavy_check_mark:'
     path: acted_monoid/concept.hpp
     title: Acted Monoid Concept
@@ -85,6 +85,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: acted_monoid/wrapper.hpp
     title: Acted Monoid Wrapper
+  - icon: ':heavy_check_mark:'
+    path: beats_acted_monoid/concept.hpp
+    title: Beats Acted Monoid Concept
+  - icon: ':heavy_check_mark:'
+    path: beats_acted_monoid/wrapper.hpp
+    title: Beats Acted Monoid Wrapper
   - icon: ':heavy_check_mark:'
     path: monoid/add.hpp
     title: Add Monoid
@@ -235,76 +241,43 @@ data:
     - https://judge.yosupo.jp/problem/aplusb
   bundledCode: "#line 1 \"verify/monoid/commutative_flags.test.cpp\"\n#define PROBLEM\
     \ \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <iostream>\n\n#line 1\
-    \ \"acted_monoid/beats_wrapper.hpp\"\n\n\n\n#include <concepts>\n\nnamespace m1une\
-    \ {\nnamespace acted_monoid {\n\n// Wrapper for defining a Beats acted monoid\
-    \ with callables supplied as NTTPs.\ntemplate <\n    typename T,\n    typename\
-    \ E,\n    auto Op,\n    auto Id,\n    auto OpComp,\n    auto OpId,\n    auto Mapping,\n\
-    \    auto CanApply,\n    auto Make = nullptr,\n    auto MakeAt = nullptr,\n  \
-    \  auto MappingAt = nullptr,\n    auto CanApplyAt = nullptr,\n    auto OpShift\
-    \ = nullptr,\n    bool Commutative = false,\n    bool OperatorCommutative = false\n\
-    >\nstruct BeatsWrapper {\n    using value_type = T;\n    using operator_type =\
-    \ E;\n    static constexpr bool commutative = Commutative;\n    static constexpr\
-    \ bool operator_commutative = OperatorCommutative;\n\n    static constexpr T id()\
-    \ {\n        return Id();\n    }\n\n    static constexpr T op(const T& lhs, const\
-    \ T& rhs) {\n        return Op(lhs, rhs);\n    }\n\n    static constexpr E op_id()\
-    \ {\n        return OpId();\n    }\n\n    static constexpr E op_comp(const E&\
-    \ f, const E& g) {\n        return OpComp(f, g);\n    }\n\n    static constexpr\
-    \ T mapping(const E& f, const T& x) {\n        return Mapping(f, x);\n    }\n\n\
-    \    static constexpr bool can_apply(const E& f, const T& x) {\n        return\
-    \ CanApply(f, x);\n    }\n\n    template <typename U>\n    requires requires(const\
-    \ U& value) {\n        { Make(value) } -> std::convertible_to<T>;\n    }\n   \
-    \ static constexpr T make(const U& value) {\n        return Make(value);\n   \
-    \ }\n\n    template <typename U>\n    requires requires(const U& value, int index)\
-    \ {\n        { MakeAt(value, index) } -> std::convertible_to<T>;\n    }\n    static\
-    \ constexpr T make(const U& value, int index) {\n        return MakeAt(value,\
-    \ index);\n    }\n\n    static constexpr T mapping(const E& f, const T& x, long\
-    \ long ordinal)\n    requires requires {\n        { MappingAt(f, x, ordinal) }\
-    \ -> std::convertible_to<T>;\n    }\n    {\n        return MappingAt(f, x, ordinal);\n\
-    \    }\n\n    static constexpr bool can_apply(\n        const E& f,\n        const\
-    \ T& x,\n        long long ordinal\n    )\n    requires requires {\n        {\
-    \ CanApplyAt(f, x, ordinal) } -> std::convertible_to<bool>;\n    }\n    {\n  \
-    \      return CanApplyAt(f, x, ordinal);\n    }\n\n    static constexpr E op_shift(const\
-    \ E& f, long long ordinal)\n    requires requires {\n        { OpShift(f, ordinal)\
-    \ } -> std::convertible_to<E>;\n    }\n    {\n        return OpShift(f, ordinal);\n\
-    \    }\n};\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\n\n#line 1\
-    \ \"acted_monoid/concept.hpp\"\n\n\n\n#line 5 \"acted_monoid/concept.hpp\"\n\n\
-    namespace m1une {\nnamespace acted_monoid {\n\n// Concept defining the requirements\
-    \ for an Acted Monoid.\ntemplate <typename AM>\nconcept IsActedMonoid = requires(typename\
-    \ AM::value_type a, typename AM::value_type b, typename AM::operator_type f,\n\
-    \                                 typename AM::operator_type g) {\n    // 1. Value\
-    \ Monoid\n    typename AM::value_type;\n    { AM::id() } -> std::same_as<typename\
-    \ AM::value_type>;\n    { AM::op(a, b) } -> std::same_as<typename AM::value_type>;\n\
-    \n    // 2. Operator Monoid\n    typename AM::operator_type;\n    { AM::op_id()\
-    \ } -> std::same_as<typename AM::operator_type>;\n    { AM::op_comp(f, g) } ->\
-    \ std::same_as<typename AM::operator_type>;  // Composition order: f(g(x))\n\n\
-    \    // 3. Mapping: Operator x Value -> Value\n    { AM::mapping(f, a) } -> std::same_as<typename\
-    \ AM::value_type>;\n};\n\n// Concept for acted monoids whose value monoid is a\
-    \ commutative group.\n// The value operation must obey commutativity and inverse\
-    \ laws.\ntemplate <typename AM>\nconcept IsCommutativeActedGroup = IsActedMonoid<AM>\
-    \ && requires(typename AM::value_type a) {\n    { AM::inv(a) } -> std::same_as<typename\
-    \ AM::value_type>;\n};\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\
-    \n\n#line 1 \"acted_monoid/range_add_range_arg_max.hpp\"\n\n\n\n#include <limits>\n\
-    \nnamespace m1une {\nnamespace acted_monoid {\n\ntemplate <typename T>\nstruct\
-    \ RangeAddRangeArgMaxNode {\n    T max_val;\n    long long size;\n    long long\
-    \ ord;\n};\n\n// Acted Monoid for Range Addition and Range Maximum Value & Index\
-    \ queries.\ntemplate <typename T>\nstruct RangeAddRangeArgMax {\n    using value_type\
-    \ = RangeAddRangeArgMaxNode<T>;\n    using operator_type = T;\n    static constexpr\
-    \ bool commutative = false;\n    static constexpr bool operator_commutative =\
-    \ true;\n\n    static constexpr value_type id() {\n        return {std::numeric_limits<T>::lowest(),\
-    \ 0, -1};\n    }\n\n    static constexpr value_type op(const value_type& a, const\
-    \ value_type& b) {\n        if (a.size == 0) return b;\n        if (b.size ==\
-    \ 0) return a;\n        long long size = a.size + b.size;\n        if (a.max_val\
-    \ >= b.max_val) return {a.max_val, size, a.ord};\n        return {b.max_val, size,\
-    \ b.ord + a.size};\n    }\n\n    static constexpr operator_type op_id() {\n  \
-    \      return T(0);\n    }\n\n    static constexpr operator_type op_comp(const\
-    \ operator_type& f, const operator_type& g) {\n        return f + g;\n    }\n\n\
-    \    static constexpr value_type mapping(const operator_type& f, const value_type&\
-    \ x) {\n        if (x.size == 0) return x;\n        return {x.max_val + f, x.size,\
-    \ x.ord};\n    }\n\n    static constexpr value_type make(const T& val) {\n   \
-    \     return {val, 1, 0};\n    }\n};\n\n}  // namespace acted_monoid\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"acted_monoid/range_add_range_arg_min.hpp\"\n\n\n\n#include\
-    \ <functional>\n#line 6 \"acted_monoid/range_add_range_arg_min.hpp\"\n\n#line\
-    \ 1 \"monoid/arg_min.hpp\"\n\n\n\n#line 6 \"monoid/arg_min.hpp\"\n\nnamespace\
+    \ \"acted_monoid/concept.hpp\"\n\n\n\n#include <concepts>\n\nnamespace m1une {\n\
+    namespace acted_monoid {\n\n// Concept defining the requirements for an Acted\
+    \ Monoid.\ntemplate <typename AM>\nconcept IsActedMonoid = requires(typename AM::value_type\
+    \ a, typename AM::value_type b, typename AM::operator_type f,\n              \
+    \                   typename AM::operator_type g) {\n    // 1. Value Monoid\n\
+    \    typename AM::value_type;\n    { AM::id() } -> std::same_as<typename AM::value_type>;\n\
+    \    { AM::op(a, b) } -> std::same_as<typename AM::value_type>;\n\n    // 2. Operator\
+    \ Monoid\n    typename AM::operator_type;\n    { AM::op_id() } -> std::same_as<typename\
+    \ AM::operator_type>;\n    { AM::op_comp(f, g) } -> std::same_as<typename AM::operator_type>;\
+    \  // Composition order: f(g(x))\n\n    // 3. Mapping: Operator x Value -> Value\n\
+    \    { AM::mapping(f, a) } -> std::same_as<typename AM::value_type>;\n};\n\n//\
+    \ Concept for acted monoids whose value monoid is a commutative group.\n// The\
+    \ value operation must obey commutativity and inverse laws.\ntemplate <typename\
+    \ AM>\nconcept IsCommutativeActedGroup = IsActedMonoid<AM> && requires(typename\
+    \ AM::value_type a) {\n    { AM::inv(a) } -> std::same_as<typename AM::value_type>;\n\
+    };\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\n\n#line 1 \"acted_monoid/range_add_range_arg_max.hpp\"\
+    \n\n\n\n#include <limits>\n\nnamespace m1une {\nnamespace acted_monoid {\n\ntemplate\
+    \ <typename T>\nstruct RangeAddRangeArgMaxNode {\n    T max_val;\n    long long\
+    \ size;\n    long long ord;\n};\n\n// Acted Monoid for Range Addition and Range\
+    \ Maximum Value & Index queries.\ntemplate <typename T>\nstruct RangeAddRangeArgMax\
+    \ {\n    using value_type = RangeAddRangeArgMaxNode<T>;\n    using operator_type\
+    \ = T;\n    static constexpr bool commutative = false;\n    static constexpr bool\
+    \ operator_commutative = true;\n\n    static constexpr value_type id() {\n   \
+    \     return {std::numeric_limits<T>::lowest(), 0, -1};\n    }\n\n    static constexpr\
+    \ value_type op(const value_type& a, const value_type& b) {\n        if (a.size\
+    \ == 0) return b;\n        if (b.size == 0) return a;\n        long long size\
+    \ = a.size + b.size;\n        if (a.max_val >= b.max_val) return {a.max_val, size,\
+    \ a.ord};\n        return {b.max_val, size, b.ord + a.size};\n    }\n\n    static\
+    \ constexpr operator_type op_id() {\n        return T(0);\n    }\n\n    static\
+    \ constexpr operator_type op_comp(const operator_type& f, const operator_type&\
+    \ g) {\n        return f + g;\n    }\n\n    static constexpr value_type mapping(const\
+    \ operator_type& f, const value_type& x) {\n        if (x.size == 0) return x;\n\
+    \        return {x.max_val + f, x.size, x.ord};\n    }\n\n    static constexpr\
+    \ value_type make(const T& val) {\n        return {val, 1, 0};\n    }\n};\n\n\
+    }  // namespace acted_monoid\n}  // namespace m1une\n\n\n#line 1 \"acted_monoid/range_add_range_arg_min.hpp\"\
+    \n\n\n\n#include <functional>\n#line 6 \"acted_monoid/range_add_range_arg_min.hpp\"\
+    \n\n#line 1 \"monoid/arg_min.hpp\"\n\n\n\n#line 6 \"monoid/arg_min.hpp\"\n\nnamespace\
     \ m1une {\nnamespace monoid {\n\ntemplate <typename T>\nstruct ArgMinNode {\n\
     \    T value;\n    long long size;\n    long long ord;\n};\n\n// Monoid for finding\
     \ the optimal value (minimum by default) and its relative order.\n// Ties are\
@@ -919,84 +892,123 @@ data:
     \    static constexpr E op_comp(const E& f, const E& g) {\n        return OpComp(f,\
     \ g);\n    }\n\n    // Applies the operator f onto the value x.\n    static constexpr\
     \ T mapping(const E& f, const T& x) {\n        return Mapping(f, x);\n    }\n\
-    };\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\n\n#line 1 \"monoid/add.hpp\"\
-    \n\n\n\nnamespace m1une {\nnamespace monoid {\n\n// Monoid for addition (Range\
-    \ Sum).\ntemplate <typename T>\nstruct Add {\n    using value_type = T;\n    static\
-    \ constexpr bool commutative = true;\n\n    // Returns the identity element for\
-    \ addition, which is 0.\n    static constexpr T id() {\n        return T(0);\n\
-    \    }\n\n    // Returns the sum of a and b.\n    static constexpr T op(const\
-    \ T& a, const T& b) {\n        return a + b;\n    }\n\n    static constexpr T\
-    \ inv(const T& x) {\n        return -x;\n    }\n};\n\n}  // namespace monoid\n\
-    }  // namespace m1une\n\n\n#line 1 \"monoid/affine.hpp\"\n\n\n\n#line 5 \"monoid/affine.hpp\"\
-    \n\nnamespace m1une {\nnamespace monoid {\n\n// Monoid for affine transformations\
-    \ f(x) = ax + b.\n// Represented as a pair {a, b}.\ntemplate <typename T>\nstruct\
-    \ Affine {\n    using value_type = std::pair<T, T>;\n    static constexpr bool\
-    \ commutative = false;\n\n    // The identity transformation is f(x) = 1*x + 0.\n\
-    \    static constexpr value_type id() {\n        return {T(1), T(0)};\n    }\n\
-    \n    // Composes two affine transformations.\n    // f(g(x)) where f = a, g =\
-    \ b.\n    // a.first * (b.first * x + b.second) + a.second\n    // = (a.first\
-    \ * b.first) * x + (a.first * b.second + a.second)\n    static constexpr value_type\
-    \ op(const value_type& a, const value_type& b) {\n        return {a.first * b.first,\
-    \ a.first * b.second + a.second};\n    }\n\n    // Helpers to create common affine\
-    \ transformations\n    static constexpr value_type make_add(const T& b) {\n  \
-    \      return {T(1), b};\n    }\n    static constexpr value_type make_mul(const\
-    \ T& a) {\n        return {a, T(0)};\n    }\n    static constexpr value_type make_assign(const\
-    \ T& b) {\n        return {T(0), b};\n    }\n};\n\n}  // namespace monoid\n} \
-    \ // namespace m1une\n\n\n#line 1 \"monoid/and.hpp\"\n\n\n\nnamespace m1une {\n\
-    namespace monoid {\n\n// Monoid for bitwise AND (Range AND).\n// ~T(0) sets all\
-    \ bits to 1, acting as the identity for bitwise AND.\ntemplate <typename T>\n\
-    struct And {\n    using value_type = T;\n    static constexpr bool commutative\
-    \ = true;\n\n    // The identity element for bitwise AND is all bits set to 1.\n\
-    \    static constexpr T id() { return ~T(0); }\n\n    // Returns the bitwise AND\
-    \ of a and b.\n    static constexpr T op(const T& a, const T& b) { return a &\
-    \ b; }\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 1 \"monoid/arg_max.hpp\"\
-    \n\n\n\n#line 6 \"monoid/arg_max.hpp\"\n\n#line 8 \"monoid/arg_max.hpp\"\n\nnamespace\
-    \ m1une {\nnamespace monoid {\n\n// Monoid for finding the maximum value and its\
-    \ corresponding index.\n// Defined as a type alias of ArgMin using std::greater.\n\
-    template <typename T, T Id = std::numeric_limits<T>::lowest()>\nusing ArgMax =\
-    \ ArgMin<T, Id, std::greater<T>>;\n\n}  // namespace monoid\n}  // namespace m1une\n\
-    \n\n#line 1 \"monoid/bottom_k.hpp\"\n\n\n\n#line 5 \"monoid/bottom_k.hpp\"\n\n\
-    #line 1 \"monoid/top_k.hpp\"\n\n\n\n#line 6 \"monoid/top_k.hpp\"\n#include <vector>\n\
-    \nnamespace m1une {\nnamespace monoid {\n\n// Monoid for finding the top/bottom\
-    \ K elements in a range.\n// The elements must be stored in the order defined\
-    \ by the Compare functor.\n// Default Compare is std::greater<T> (i.e., descending\
-    \ order for Top K).\ntemplate <typename T, int K, typename Compare = std::greater<T>>\n\
-    struct TopK {\n    using value_type = std::vector<T>;\n    static constexpr bool\
-    \ commutative = true;\n\n    // The identity element is an empty vector.\n   \
-    \ static constexpr value_type id() {\n        return std::vector<T>();\n    }\n\
-    \n    // Merges two sorted vectors and keeps only the first K elements.\n    static\
+    };\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\n\n#line 1 \"beats_acted_monoid/concept.hpp\"\
+    \n\n\n\n#line 5 \"beats_acted_monoid/concept.hpp\"\n\n#line 7 \"beats_acted_monoid/concept.hpp\"\
+    \n\nnamespace m1une {\nnamespace beats_acted_monoid {\n\n// An acted monoid whose\
+    \ action may require descent before it can be applied.\ntemplate <typename AM>\n\
+    concept IsBeatsActedMonoid = m1une::acted_monoid::IsActedMonoid<AM> &&\n    requires(typename\
+    \ AM::value_type x, typename AM::operator_type f) {\n        { AM::can_apply(f,\
+    \ x) } -> std::same_as<bool>;\n    };\n\n}  // namespace beats_acted_monoid\n\
+    }  // namespace m1une\n\n\n#line 1 \"beats_acted_monoid/wrapper.hpp\"\n\n\n\n\
+    #line 5 \"beats_acted_monoid/wrapper.hpp\"\n\nnamespace m1une {\nnamespace beats_acted_monoid\
+    \ {\n\n// Wrapper for defining a Beats acted monoid with callables supplied as\
+    \ NTTPs.\ntemplate <\n    typename T,\n    typename E,\n    auto Op,\n    auto\
+    \ Id,\n    auto OpComp,\n    auto OpId,\n    auto Mapping,\n    auto CanApply,\n\
+    \    auto Make = nullptr,\n    auto MakeAt = nullptr,\n    auto MappingAt = nullptr,\n\
+    \    auto CanApplyAt = nullptr,\n    auto OpShift = nullptr,\n    bool Commutative\
+    \ = false,\n    bool OperatorCommutative = false\n>\nstruct Wrapper {\n    using\
+    \ value_type = T;\n    using operator_type = E;\n    static constexpr bool commutative\
+    \ = Commutative;\n    static constexpr bool operator_commutative = OperatorCommutative;\n\
+    \n    static constexpr T id() {\n        return Id();\n    }\n\n    static constexpr\
+    \ T op(const T& lhs, const T& rhs) {\n        return Op(lhs, rhs);\n    }\n\n\
+    \    static constexpr E op_id() {\n        return OpId();\n    }\n\n    static\
+    \ constexpr E op_comp(const E& f, const E& g) {\n        return OpComp(f, g);\n\
+    \    }\n\n    static constexpr T mapping(const E& f, const T& x) {\n        return\
+    \ Mapping(f, x);\n    }\n\n    static constexpr bool can_apply(const E& f, const\
+    \ T& x) {\n        return CanApply(f, x);\n    }\n\n    template <typename U>\n\
+    \    requires requires(const U& value) {\n        { Make(value) } -> std::convertible_to<T>;\n\
+    \    }\n    static constexpr T make(const U& value) {\n        return Make(value);\n\
+    \    }\n\n    template <typename U>\n    requires requires(const U& value, int\
+    \ index) {\n        { MakeAt(value, index) } -> std::convertible_to<T>;\n    }\n\
+    \    static constexpr T make(const U& value, int index) {\n        return MakeAt(value,\
+    \ index);\n    }\n\n    static constexpr T mapping(const E& f, const T& x, long\
+    \ long ordinal)\n    requires requires {\n        { MappingAt(f, x, ordinal) }\
+    \ -> std::convertible_to<T>;\n    }\n    {\n        return MappingAt(f, x, ordinal);\n\
+    \    }\n\n    static constexpr bool can_apply(\n        const E& f,\n        const\
+    \ T& x,\n        long long ordinal\n    )\n    requires requires {\n        {\
+    \ CanApplyAt(f, x, ordinal) } -> std::convertible_to<bool>;\n    }\n    {\n  \
+    \      return CanApplyAt(f, x, ordinal);\n    }\n\n    static constexpr E op_shift(const\
+    \ E& f, long long ordinal)\n    requires requires {\n        { OpShift(f, ordinal)\
+    \ } -> std::convertible_to<E>;\n    }\n    {\n        return OpShift(f, ordinal);\n\
+    \    }\n};\n\n}  // namespace beats_acted_monoid\n}  // namespace m1une\n\n\n\
+    #line 1 \"monoid/add.hpp\"\n\n\n\nnamespace m1une {\nnamespace monoid {\n\n//\
+    \ Monoid for addition (Range Sum).\ntemplate <typename T>\nstruct Add {\n    using\
+    \ value_type = T;\n    static constexpr bool commutative = true;\n\n    // Returns\
+    \ the identity element for addition, which is 0.\n    static constexpr T id()\
+    \ {\n        return T(0);\n    }\n\n    // Returns the sum of a and b.\n    static\
+    \ constexpr T op(const T& a, const T& b) {\n        return a + b;\n    }\n\n \
+    \   static constexpr T inv(const T& x) {\n        return -x;\n    }\n};\n\n} \
+    \ // namespace monoid\n}  // namespace m1une\n\n\n#line 1 \"monoid/affine.hpp\"\
+    \n\n\n\n#line 5 \"monoid/affine.hpp\"\n\nnamespace m1une {\nnamespace monoid {\n\
+    \n// Monoid for affine transformations f(x) = ax + b.\n// Represented as a pair\
+    \ {a, b}.\ntemplate <typename T>\nstruct Affine {\n    using value_type = std::pair<T,\
+    \ T>;\n    static constexpr bool commutative = false;\n\n    // The identity transformation\
+    \ is f(x) = 1*x + 0.\n    static constexpr value_type id() {\n        return {T(1),\
+    \ T(0)};\n    }\n\n    // Composes two affine transformations.\n    // f(g(x))\
+    \ where f = a, g = b.\n    // a.first * (b.first * x + b.second) + a.second\n\
+    \    // = (a.first * b.first) * x + (a.first * b.second + a.second)\n    static\
     \ constexpr value_type op(const value_type& a, const value_type& b) {\n      \
-    \  value_type res;\n        res.reserve(std::min(K, (int)(a.size() + b.size())));\n\
-    \n        int i = 0, j = 0;\n        while (res.size() < (std::size_t)K && (i\
-    \ < (int)a.size() || j < (int)b.size())) {\n            if (i == (int)a.size())\
-    \ {\n                res.push_back(b[j++]);\n            } else if (j == (int)b.size())\
-    \ {\n                res.push_back(a[i++]);\n            } else if (Compare()(a[i],\
-    \ b[j])) {\n                res.push_back(a[i++]);\n            } else {\n   \
-    \             res.push_back(b[j++]);\n            }\n        }\n        return\
-    \ res;\n    }\n\n    // Helper to securely create a leaf node from a single value.\n\
-    \    static constexpr value_type make(const T& val) {\n        return {val};\n\
-    \    }\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 7 \"monoid/bottom_k.hpp\"\
-    \n\nnamespace m1une {\nnamespace monoid {\n\n// Monoid for finding the bottom\
-    \ K (smallest) elements in a range.\n// Defined as a type alias of TopK using\
-    \ std::less.\ntemplate <typename T, int K>\nusing BottomK = TopK<T, K, std::less<T>>;\n\
-    \n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 1 \"monoid/bracket.hpp\"\
-    \n\n\n\n#line 5 \"monoid/bracket.hpp\"\n\nnamespace m1une {\nnamespace monoid\
-    \ {\n\nstruct BracketNode {\n    int matched;\n    int unmatched_right;  // Count\
-    \ of unmatched ')'\n    int unmatched_left;   // Count of unmatched '('\n};\n\n\
-    // Monoid for matching parentheses (Bracket Sequences).\nstruct Bracket {\n  \
-    \  using value_type = BracketNode;\n    static constexpr bool commutative = false;\n\
-    \n    // The identity element is an empty sequence.\n    static constexpr value_type\
-    \ id() {\n        return {0, 0, 0};\n    }\n\n    // Merges two bracket sequences.\n\
-    \    // The unmatched '(' from the left perfectly matches the unmatched ')' from\
-    \ the right.\n    static constexpr value_type op(const value_type& a, const value_type&\
-    \ b) {\n        int match = std::min(a.unmatched_left, b.unmatched_right);\n \
-    \       return {a.matched + b.matched + match, a.unmatched_right + b.unmatched_right\
-    \ - match,\n                a.unmatched_left + b.unmatched_left - match};\n  \
-    \  }\n\n    // Helper to securely create a leaf node from a single character.\n\
-    \    static constexpr value_type make(char c) {\n        if (c == '(') return\
-    \ {0, 0, 1};\n        if (c == ')') return {0, 1, 0};\n        return {0, 0, 0};\n\
-    \    }\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 1 \"monoid/gcd.hpp\"\
-    \n\n\n\n#include <numeric>\n\nnamespace m1une {\nnamespace monoid {\n\n// Monoid\
+    \  return {a.first * b.first, a.first * b.second + a.second};\n    }\n\n    //\
+    \ Helpers to create common affine transformations\n    static constexpr value_type\
+    \ make_add(const T& b) {\n        return {T(1), b};\n    }\n    static constexpr\
+    \ value_type make_mul(const T& a) {\n        return {a, T(0)};\n    }\n    static\
+    \ constexpr value_type make_assign(const T& b) {\n        return {T(0), b};\n\
+    \    }\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 1 \"monoid/and.hpp\"\
+    \n\n\n\nnamespace m1une {\nnamespace monoid {\n\n// Monoid for bitwise AND (Range\
+    \ AND).\n// ~T(0) sets all bits to 1, acting as the identity for bitwise AND.\n\
+    template <typename T>\nstruct And {\n    using value_type = T;\n    static constexpr\
+    \ bool commutative = true;\n\n    // The identity element for bitwise AND is all\
+    \ bits set to 1.\n    static constexpr T id() { return ~T(0); }\n\n    // Returns\
+    \ the bitwise AND of a and b.\n    static constexpr T op(const T& a, const T&\
+    \ b) { return a & b; }\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\n\
+    \n#line 1 \"monoid/arg_max.hpp\"\n\n\n\n#line 6 \"monoid/arg_max.hpp\"\n\n#line\
+    \ 8 \"monoid/arg_max.hpp\"\n\nnamespace m1une {\nnamespace monoid {\n\n// Monoid\
+    \ for finding the maximum value and its corresponding index.\n// Defined as a\
+    \ type alias of ArgMin using std::greater.\ntemplate <typename T, T Id = std::numeric_limits<T>::lowest()>\n\
+    using ArgMax = ArgMin<T, Id, std::greater<T>>;\n\n}  // namespace monoid\n}  //\
+    \ namespace m1une\n\n\n#line 1 \"monoid/bottom_k.hpp\"\n\n\n\n#line 5 \"monoid/bottom_k.hpp\"\
+    \n\n#line 1 \"monoid/top_k.hpp\"\n\n\n\n#line 6 \"monoid/top_k.hpp\"\n#include\
+    \ <vector>\n\nnamespace m1une {\nnamespace monoid {\n\n// Monoid for finding the\
+    \ top/bottom K elements in a range.\n// The elements must be stored in the order\
+    \ defined by the Compare functor.\n// Default Compare is std::greater<T> (i.e.,\
+    \ descending order for Top K).\ntemplate <typename T, int K, typename Compare\
+    \ = std::greater<T>>\nstruct TopK {\n    using value_type = std::vector<T>;\n\
+    \    static constexpr bool commutative = true;\n\n    // The identity element\
+    \ is an empty vector.\n    static constexpr value_type id() {\n        return\
+    \ std::vector<T>();\n    }\n\n    // Merges two sorted vectors and keeps only\
+    \ the first K elements.\n    static constexpr value_type op(const value_type&\
+    \ a, const value_type& b) {\n        value_type res;\n        res.reserve(std::min(K,\
+    \ (int)(a.size() + b.size())));\n\n        int i = 0, j = 0;\n        while (res.size()\
+    \ < (std::size_t)K && (i < (int)a.size() || j < (int)b.size())) {\n          \
+    \  if (i == (int)a.size()) {\n                res.push_back(b[j++]);\n       \
+    \     } else if (j == (int)b.size()) {\n                res.push_back(a[i++]);\n\
+    \            } else if (Compare()(a[i], b[j])) {\n                res.push_back(a[i++]);\n\
+    \            } else {\n                res.push_back(b[j++]);\n            }\n\
+    \        }\n        return res;\n    }\n\n    // Helper to securely create a leaf\
+    \ node from a single value.\n    static constexpr value_type make(const T& val)\
+    \ {\n        return {val};\n    }\n};\n\n}  // namespace monoid\n}  // namespace\
+    \ m1une\n\n\n#line 7 \"monoid/bottom_k.hpp\"\n\nnamespace m1une {\nnamespace monoid\
+    \ {\n\n// Monoid for finding the bottom K (smallest) elements in a range.\n//\
+    \ Defined as a type alias of TopK using std::less.\ntemplate <typename T, int\
+    \ K>\nusing BottomK = TopK<T, K, std::less<T>>;\n\n}  // namespace monoid\n} \
+    \ // namespace m1une\n\n\n#line 1 \"monoid/bracket.hpp\"\n\n\n\n#line 5 \"monoid/bracket.hpp\"\
+    \n\nnamespace m1une {\nnamespace monoid {\n\nstruct BracketNode {\n    int matched;\n\
+    \    int unmatched_right;  // Count of unmatched ')'\n    int unmatched_left;\
+    \   // Count of unmatched '('\n};\n\n// Monoid for matching parentheses (Bracket\
+    \ Sequences).\nstruct Bracket {\n    using value_type = BracketNode;\n    static\
+    \ constexpr bool commutative = false;\n\n    // The identity element is an empty\
+    \ sequence.\n    static constexpr value_type id() {\n        return {0, 0, 0};\n\
+    \    }\n\n    // Merges two bracket sequences.\n    // The unmatched '(' from\
+    \ the left perfectly matches the unmatched ')' from the right.\n    static constexpr\
+    \ value_type op(const value_type& a, const value_type& b) {\n        int match\
+    \ = std::min(a.unmatched_left, b.unmatched_right);\n        return {a.matched\
+    \ + b.matched + match, a.unmatched_right + b.unmatched_right - match,\n      \
+    \          a.unmatched_left + b.unmatched_left - match};\n    }\n\n    // Helper\
+    \ to securely create a leaf node from a single character.\n    static constexpr\
+    \ value_type make(char c) {\n        if (c == '(') return {0, 0, 1};\n       \
+    \ if (c == ')') return {0, 1, 0};\n        return {0, 0, 0};\n    }\n};\n\n} \
+    \ // namespace monoid\n}  // namespace m1une\n\n\n#line 1 \"monoid/gcd.hpp\"\n\
+    \n\n\n#include <numeric>\n\nnamespace m1une {\nnamespace monoid {\n\n// Monoid\
     \ for Greatest Common Divisor (Range GCD).\ntemplate <typename T>\nstruct Gcd\
     \ {\n    using value_type = T;\n    static constexpr bool commutative = true;\n\
     \n    // The identity element for GCD is 0.\n    static constexpr T id() {\n \
@@ -1327,7 +1339,7 @@ data:
     \    }\n\n    // Returns the bitwise XOR of a and b.\n    static constexpr T op(const\
     \ T& a, const T& b) {\n        return a ^ b;\n    }\n\n    static constexpr T\
     \ inv(const T& x) {\n        return x;\n    }\n};\n\n}  // namespace monoid\n\
-    }  // namespace m1une\n\n\n#line 66 \"verify/monoid/commutative_flags.test.cpp\"\
+    }  // namespace m1une\n\n\n#line 67 \"verify/monoid/commutative_flags.test.cpp\"\
     \n\nnamespace {\n\nstruct ContestMonoid {\n    using value_type = int;\n\n   \
     \ static constexpr int id() {\n        return 0;\n    }\n    static constexpr\
     \ int op(const int& a, const int& b) {\n        return a + b;\n    }\n};\n\nstruct\
@@ -1347,23 +1359,25 @@ data:
     \ int_mapping>;\nusing CommutativeActedWrapper =\n    m1une::acted_monoid::Wrapper<int,\
     \ int, int_add, int_zero, int_add, int_zero, int_mapping, true>;\nusing CommutativeOperatorActedWrapper\
     \ =\n    m1une::acted_monoid::Wrapper<int, int, int_add, int_zero, int_add, int_zero,\
-    \ int_mapping, false, true>;\nusing DefaultBeatsWrapper = m1une::acted_monoid::BeatsWrapper<\n\
+    \ int_mapping, false, true>;\nusing DefaultBeatsWrapper = m1une::beats_acted_monoid::Wrapper<\n\
     \    int, int, int_add, int_zero, int_add, int_zero, int_mapping, always_applicable>;\n\
-    using CommutativeBeatsWrapper = m1une::acted_monoid::BeatsWrapper<\n    int, int,\
-    \ int_add, int_zero, int_add, int_zero, int_mapping, always_applicable,\n    nullptr,\
-    \ nullptr, nullptr, nullptr, nullptr, true>;\nusing CommutativeOperatorBeatsWrapper\
-    \ = m1une::acted_monoid::BeatsWrapper<\n    int, int, int_add, int_zero, int_add,\
+    using CommutativeBeatsWrapper = m1une::beats_acted_monoid::Wrapper<\n    int,\
+    \ int, int_add, int_zero, int_add, int_zero, int_mapping, always_applicable,\n\
+    \    nullptr, nullptr, nullptr, nullptr, nullptr, true>;\nusing CommutativeOperatorBeatsWrapper\
+    \ = m1une::beats_acted_monoid::Wrapper<\n    int, int, int_add, int_zero, int_add,\
     \ int_zero, int_mapping, always_applicable,\n    nullptr, nullptr, nullptr, nullptr,\
     \ nullptr, false, true>;\n\nstatic_assert(m1une::monoid::IsMonoid<ContestMonoid>);\n\
-    static_assert(m1une::acted_monoid::IsActedMonoid<ContestActedMonoid>);\n\nstatic_assert(m1une::monoid::Add<int>::commutative);\n\
-    static_assert(m1une::monoid::And<int>::commutative);\nstatic_assert(m1une::monoid::BottomK<int,\
-    \ 2>::commutative);\nstatic_assert(m1une::monoid::Gcd<int>::commutative);\nstatic_assert(m1une::monoid::Max<int>::commutative);\n\
-    static_assert(m1une::monoid::MaxCount<int>::commutative);\nstatic_assert(m1une::monoid::Min<int>::commutative);\n\
-    static_assert(m1une::monoid::MinCount<int>::commutative);\nstatic_assert(m1une::monoid::MinMax<int>::commutative);\n\
-    static_assert(m1une::monoid::Mul<int>::commutative);\nstatic_assert(m1une::monoid::Or<int>::commutative);\n\
-    static_assert(m1une::monoid::StrictMax2<int>::commutative);\nstatic_assert(m1une::monoid::StrictMin2<int>::commutative);\n\
-    static_assert(m1une::monoid::TopK<int, 2>::commutative);\nstatic_assert(m1une::monoid::TopKCount<int,\
-    \ 2>::commutative);\nstatic_assert(m1une::monoid::Xor<int>::commutative);\nstatic_assert(CommutativeMonoidWrapper::commutative);\n\
+    static_assert(m1une::acted_monoid::IsActedMonoid<ContestActedMonoid>);\nstatic_assert(\n\
+    \    m1une::beats_acted_monoid::IsBeatsActedMonoid<DefaultBeatsWrapper>\n);\n\n\
+    static_assert(m1une::monoid::Add<int>::commutative);\nstatic_assert(m1une::monoid::And<int>::commutative);\n\
+    static_assert(m1une::monoid::BottomK<int, 2>::commutative);\nstatic_assert(m1une::monoid::Gcd<int>::commutative);\n\
+    static_assert(m1une::monoid::Max<int>::commutative);\nstatic_assert(m1une::monoid::MaxCount<int>::commutative);\n\
+    static_assert(m1une::monoid::Min<int>::commutative);\nstatic_assert(m1une::monoid::MinCount<int>::commutative);\n\
+    static_assert(m1une::monoid::MinMax<int>::commutative);\nstatic_assert(m1une::monoid::Mul<int>::commutative);\n\
+    static_assert(m1une::monoid::Or<int>::commutative);\nstatic_assert(m1une::monoid::StrictMax2<int>::commutative);\n\
+    static_assert(m1une::monoid::StrictMin2<int>::commutative);\nstatic_assert(m1une::monoid::TopK<int,\
+    \ 2>::commutative);\nstatic_assert(m1une::monoid::TopKCount<int, 2>::commutative);\n\
+    static_assert(m1une::monoid::Xor<int>::commutative);\nstatic_assert(CommutativeMonoidWrapper::commutative);\n\
     \nstatic_assert(!m1une::monoid::Affine<int>::commutative);\nstatic_assert(!m1une::monoid::ArgMax<int>::commutative);\n\
     static_assert(!m1une::monoid::ArgMin<int>::commutative);\nstatic_assert(!m1une::monoid::BinaryInversion<int>::commutative);\n\
     static_assert(!m1une::monoid::Bracket::commutative);\nstatic_assert(!m1une::monoid::LongestSame<int>::commutative);\n\
@@ -1425,12 +1439,11 @@ data:
     \n}  // namespace\n\nint main() {\n    int a, b;\n    std::cin >> a >> b;\n  \
     \  std::cout << a + b << '\\n';\n}\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <iostream>\n\
-    \n#include \"../../acted_monoid/beats_wrapper.hpp\"\n#include \"../../acted_monoid/concept.hpp\"\
-    \n#include \"../../acted_monoid/range_add_range_arg_max.hpp\"\n#include \"../../acted_monoid/range_add_range_arg_min.hpp\"\
-    \n#include \"../../acted_monoid/range_add_range_max.hpp\"\n#include \"../../acted_monoid/range_add_range_min.hpp\"\
-    \n#include \"../../acted_monoid/range_add_range_min_count.hpp\"\n#include \"../../acted_monoid/range_add_range_sum.hpp\"\
-    \n#include \"../../acted_monoid/range_affine_range_min_max.hpp\"\n#include \"\
-    ../../acted_monoid/range_affine_range_sum.hpp\"\n#include \"../../acted_monoid/range_affine_range_sum_of_squares.hpp\"\
+    \n#include \"../../acted_monoid/concept.hpp\"\n#include \"../../acted_monoid/range_add_range_arg_max.hpp\"\
+    \n#include \"../../acted_monoid/range_add_range_arg_min.hpp\"\n#include \"../../acted_monoid/range_add_range_max.hpp\"\
+    \n#include \"../../acted_monoid/range_add_range_min.hpp\"\n#include \"../../acted_monoid/range_add_range_min_count.hpp\"\
+    \n#include \"../../acted_monoid/range_add_range_sum.hpp\"\n#include \"../../acted_monoid/range_affine_range_min_max.hpp\"\
+    \n#include \"../../acted_monoid/range_affine_range_sum.hpp\"\n#include \"../../acted_monoid/range_affine_range_sum_of_squares.hpp\"\
     \n#include \"../../acted_monoid/range_ap_add_range_sum.hpp\"\n#include \"../../acted_monoid/range_ap_update_range_min_max.hpp\"\
     \n#include \"../../acted_monoid/range_ap_update_range_sum.hpp\"\n#include \"../../acted_monoid/range_bitwise_and_or_xor_range_sum.hpp\"\
     \n#include \"../../acted_monoid/range_flip_range_binary_inversion.hpp\"\n#include\
@@ -1440,6 +1453,7 @@ data:
     \n#include \"../../acted_monoid/range_update_range_min.hpp\"\n#include \"../../acted_monoid/range_update_range_product.hpp\"\
     \n#include \"../../acted_monoid/range_update_range_sum.hpp\"\n#include \"../../acted_monoid/range_xor_range_sum.hpp\"\
     \n#include \"../../acted_monoid/range_xor_range_xor.hpp\"\n#include \"../../acted_monoid/wrapper.hpp\"\
+    \n#include \"../../beats_acted_monoid/concept.hpp\"\n#include \"../../beats_acted_monoid/wrapper.hpp\"\
     \n#include \"../../monoid/add.hpp\"\n#include \"../../monoid/affine.hpp\"\n#include\
     \ \"../../monoid/and.hpp\"\n#include \"../../monoid/arg_max.hpp\"\n#include \"\
     ../../monoid/arg_min.hpp\"\n#include \"../../monoid/binary_inversion.hpp\"\n#include\
@@ -1476,22 +1490,24 @@ data:
     \ =\n    m1une::acted_monoid::Wrapper<int, int, int_add, int_zero, int_add, int_zero,\
     \ int_mapping, true>;\nusing CommutativeOperatorActedWrapper =\n    m1une::acted_monoid::Wrapper<int,\
     \ int, int_add, int_zero, int_add, int_zero, int_mapping, false, true>;\nusing\
-    \ DefaultBeatsWrapper = m1une::acted_monoid::BeatsWrapper<\n    int, int, int_add,\
+    \ DefaultBeatsWrapper = m1une::beats_acted_monoid::Wrapper<\n    int, int, int_add,\
     \ int_zero, int_add, int_zero, int_mapping, always_applicable>;\nusing CommutativeBeatsWrapper\
-    \ = m1une::acted_monoid::BeatsWrapper<\n    int, int, int_add, int_zero, int_add,\
+    \ = m1une::beats_acted_monoid::Wrapper<\n    int, int, int_add, int_zero, int_add,\
     \ int_zero, int_mapping, always_applicable,\n    nullptr, nullptr, nullptr, nullptr,\
-    \ nullptr, true>;\nusing CommutativeOperatorBeatsWrapper = m1une::acted_monoid::BeatsWrapper<\n\
+    \ nullptr, true>;\nusing CommutativeOperatorBeatsWrapper = m1une::beats_acted_monoid::Wrapper<\n\
     \    int, int, int_add, int_zero, int_add, int_zero, int_mapping, always_applicable,\n\
     \    nullptr, nullptr, nullptr, nullptr, nullptr, false, true>;\n\nstatic_assert(m1une::monoid::IsMonoid<ContestMonoid>);\n\
-    static_assert(m1une::acted_monoid::IsActedMonoid<ContestActedMonoid>);\n\nstatic_assert(m1une::monoid::Add<int>::commutative);\n\
-    static_assert(m1une::monoid::And<int>::commutative);\nstatic_assert(m1une::monoid::BottomK<int,\
-    \ 2>::commutative);\nstatic_assert(m1une::monoid::Gcd<int>::commutative);\nstatic_assert(m1une::monoid::Max<int>::commutative);\n\
-    static_assert(m1une::monoid::MaxCount<int>::commutative);\nstatic_assert(m1une::monoid::Min<int>::commutative);\n\
-    static_assert(m1une::monoid::MinCount<int>::commutative);\nstatic_assert(m1une::monoid::MinMax<int>::commutative);\n\
-    static_assert(m1une::monoid::Mul<int>::commutative);\nstatic_assert(m1une::monoid::Or<int>::commutative);\n\
-    static_assert(m1une::monoid::StrictMax2<int>::commutative);\nstatic_assert(m1une::monoid::StrictMin2<int>::commutative);\n\
-    static_assert(m1une::monoid::TopK<int, 2>::commutative);\nstatic_assert(m1une::monoid::TopKCount<int,\
-    \ 2>::commutative);\nstatic_assert(m1une::monoid::Xor<int>::commutative);\nstatic_assert(CommutativeMonoidWrapper::commutative);\n\
+    static_assert(m1une::acted_monoid::IsActedMonoid<ContestActedMonoid>);\nstatic_assert(\n\
+    \    m1une::beats_acted_monoid::IsBeatsActedMonoid<DefaultBeatsWrapper>\n);\n\n\
+    static_assert(m1une::monoid::Add<int>::commutative);\nstatic_assert(m1une::monoid::And<int>::commutative);\n\
+    static_assert(m1une::monoid::BottomK<int, 2>::commutative);\nstatic_assert(m1une::monoid::Gcd<int>::commutative);\n\
+    static_assert(m1une::monoid::Max<int>::commutative);\nstatic_assert(m1une::monoid::MaxCount<int>::commutative);\n\
+    static_assert(m1une::monoid::Min<int>::commutative);\nstatic_assert(m1une::monoid::MinCount<int>::commutative);\n\
+    static_assert(m1une::monoid::MinMax<int>::commutative);\nstatic_assert(m1une::monoid::Mul<int>::commutative);\n\
+    static_assert(m1une::monoid::Or<int>::commutative);\nstatic_assert(m1une::monoid::StrictMax2<int>::commutative);\n\
+    static_assert(m1une::monoid::StrictMin2<int>::commutative);\nstatic_assert(m1une::monoid::TopK<int,\
+    \ 2>::commutative);\nstatic_assert(m1une::monoid::TopKCount<int, 2>::commutative);\n\
+    static_assert(m1une::monoid::Xor<int>::commutative);\nstatic_assert(CommutativeMonoidWrapper::commutative);\n\
     \nstatic_assert(!m1une::monoid::Affine<int>::commutative);\nstatic_assert(!m1une::monoid::ArgMax<int>::commutative);\n\
     static_assert(!m1une::monoid::ArgMin<int>::commutative);\nstatic_assert(!m1une::monoid::BinaryInversion<int>::commutative);\n\
     static_assert(!m1une::monoid::Bracket::commutative);\nstatic_assert(!m1une::monoid::LongestSame<int>::commutative);\n\
@@ -1553,7 +1569,6 @@ data:
     \n}  // namespace\n\nint main() {\n    int a, b;\n    std::cin >> a >> b;\n  \
     \  std::cout << a + b << '\\n';\n}\n"
   dependsOn:
-  - acted_monoid/beats_wrapper.hpp
   - acted_monoid/concept.hpp
   - acted_monoid/range_add_range_arg_max.hpp
   - acted_monoid/range_add_range_arg_min.hpp
@@ -1588,6 +1603,9 @@ data:
   - acted_monoid/range_xor_range_sum.hpp
   - acted_monoid/range_xor_range_xor.hpp
   - acted_monoid/wrapper.hpp
+  - beats_acted_monoid/concept.hpp
+  - acted_monoid/concept.hpp
+  - beats_acted_monoid/wrapper.hpp
   - monoid/add.hpp
   - monoid/affine.hpp
   - monoid/and.hpp
@@ -1630,7 +1648,7 @@ data:
   isVerificationFile: true
   path: verify/monoid/commutative_flags.test.cpp
   requiredBy: []
-  timestamp: '2026-08-12 00:05:48+09:00'
+  timestamp: '2026-08-12 01:20:42+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/monoid/commutative_flags.test.cpp

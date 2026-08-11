@@ -16,6 +16,9 @@ data:
     path: verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
     title: verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/segtree/persistent_segtree_beats.test.cpp
+    title: verify/ds/segtree/persistent_segtree_beats.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/monoid/commutative_flags.test.cpp
     title: verify/monoid/commutative_flags.test.cpp
   _isVerificationFailed: false
@@ -82,6 +85,7 @@ data:
   verifiedWith:
   - verify/ds/dynamic_array/dynamic_lazy_monoid_array_range_ap.test.cpp
   - verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array_range_ap.test.cpp
+  - verify/ds/segtree/persistent_segtree_beats.test.cpp
   - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
   - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
   - verify/monoid/commutative_flags.test.cpp

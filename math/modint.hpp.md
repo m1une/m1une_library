@@ -148,6 +148,9 @@ data:
     path: verify/ds/segtree/persistent_lazy_segtree.test.cpp
     title: verify/ds/segtree/persistent_lazy_segtree.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/segtree/persistent_segtree_beats.test.cpp
+    title: verify/ds/segtree/persistent_segtree_beats.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/range_update_range_product.test.cpp
     title: verify/ds/segtree/range_update_range_product.test.cpp
   - icon: ':heavy_check_mark:'
@@ -806,6 +809,7 @@ data:
   - verify/ds/dynamic_tree/yosupo_point_set_tree_path_composite_sum.test.cpp
   - verify/ds/dynamic_tree/rake_compress_link_cut_tree.test.cpp
   - verify/ds/segtree/dynamic_dual_segtree.test.cpp
+  - verify/ds/segtree/persistent_segtree_beats.test.cpp
   - verify/ds/segtree/dual_segtree.test.cpp
   - verify/ds/segtree/lazy_segtree.test.cpp
   - verify/ds/segtree/persistent_lazy_segtree.test.cpp

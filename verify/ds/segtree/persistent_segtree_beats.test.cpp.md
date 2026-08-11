@@ -1,0 +1,1087 @@
+---
+data:
+  _extendedDependsOn:
+  - icon: ':heavy_check_mark:'
+    path: acted_monoid/concept.hpp
+    title: Acted Monoid Concept
+  - icon: ':heavy_check_mark:'
+    path: acted_monoid/range_affine_range_sum.hpp
+    title: Range Affine Range Sum
+  - icon: ':heavy_check_mark:'
+    path: acted_monoid/range_ap_add_range_sum.hpp
+    title: Range AP Add Range Sum
+  - icon: ':heavy_check_mark:'
+    path: beats_acted_monoid/concept.hpp
+    title: Beats Acted Monoid Concept
+  - icon: ':heavy_check_mark:'
+    path: ds/segtree/persistent_node_pool.hpp
+    title: ds/segtree/persistent_node_pool.hpp
+  - icon: ':heavy_check_mark:'
+    path: ds/segtree/persistent_segtree_beats.hpp
+    title: Persistent Segment Tree Beats
+  - icon: ':heavy_check_mark:'
+    path: math/modint.hpp
+    title: ModInt
+  - icon: ':heavy_check_mark:'
+    path: utilities/fast_io.hpp
+    title: Fast IO
+  _extendedRequiredBy: []
+  _extendedVerifiedWith: []
+  _isVerificationFailed: false
+  _pathExtension: cpp
+  _verificationStatusIcon: ':heavy_check_mark:'
+  attributes:
+    '*NOT_SPECIAL_COMMENTS*': ''
+    PROBLEM: https://judge.yosupo.jp/problem/persistent_range_affine_range_sum
+    links:
+    - https://judge.yosupo.jp/problem/persistent_range_affine_range_sum
+  bundledCode: "#line 1 \"verify/ds/segtree/persistent_segtree_beats.test.cpp\"\n\
+    #define PROBLEM \"https://judge.yosupo.jp/problem/persistent_range_affine_range_sum\"\
+    \n\n#line 1 \"ds/segtree/persistent_segtree_beats.hpp\"\n\n\n\n#include <cassert>\n\
+    #include <concepts>\n#include <cstddef>\n#include <memory>\n#include <utility>\n\
+    #include <vector>\n\n#line 1 \"beats_acted_monoid/concept.hpp\"\n\n\n\n#line 5\
+    \ \"beats_acted_monoid/concept.hpp\"\n\n#line 1 \"acted_monoid/concept.hpp\"\n\
+    \n\n\n#line 5 \"acted_monoid/concept.hpp\"\n\nnamespace m1une {\nnamespace acted_monoid\
+    \ {\n\n// Concept defining the requirements for an Acted Monoid.\ntemplate <typename\
+    \ AM>\nconcept IsActedMonoid = requires(typename AM::value_type a, typename AM::value_type\
+    \ b, typename AM::operator_type f,\n                                 typename\
+    \ AM::operator_type g) {\n    // 1. Value Monoid\n    typename AM::value_type;\n\
+    \    { AM::id() } -> std::same_as<typename AM::value_type>;\n    { AM::op(a, b)\
+    \ } -> std::same_as<typename AM::value_type>;\n\n    // 2. Operator Monoid\n \
+    \   typename AM::operator_type;\n    { AM::op_id() } -> std::same_as<typename\
+    \ AM::operator_type>;\n    { AM::op_comp(f, g) } -> std::same_as<typename AM::operator_type>;\
+    \  // Composition order: f(g(x))\n\n    // 3. Mapping: Operator x Value -> Value\n\
+    \    { AM::mapping(f, a) } -> std::same_as<typename AM::value_type>;\n};\n\n//\
+    \ Concept for acted monoids whose value monoid is a commutative group.\n// The\
+    \ value operation must obey commutativity and inverse laws.\ntemplate <typename\
+    \ AM>\nconcept IsCommutativeActedGroup = IsActedMonoid<AM> && requires(typename\
+    \ AM::value_type a) {\n    { AM::inv(a) } -> std::same_as<typename AM::value_type>;\n\
+    };\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\n\n#line 7 \"beats_acted_monoid/concept.hpp\"\
+    \n\nnamespace m1une {\nnamespace beats_acted_monoid {\n\n// An acted monoid whose\
+    \ action may require descent before it can be applied.\ntemplate <typename AM>\n\
+    concept IsBeatsActedMonoid = m1une::acted_monoid::IsActedMonoid<AM> &&\n    requires(typename\
+    \ AM::value_type x, typename AM::operator_type f) {\n        { AM::can_apply(f,\
+    \ x) } -> std::same_as<bool>;\n    };\n\n}  // namespace beats_acted_monoid\n\
+    }  // namespace m1une\n\n\n#line 1 \"ds/segtree/persistent_node_pool.hpp\"\n\n\
+    \n\n#line 6 \"ds/segtree/persistent_node_pool.hpp\"\n#include <limits>\n#line\
+    \ 9 \"ds/segtree/persistent_node_pool.hpp\"\n\nnamespace m1une {\nnamespace ds\
+    \ {\nnamespace detail {\n\n// Node must have integer `left`, `right`, and `references`\
+    \ members.\ntemplate <class Node>\nstruct PersistentNodePool {\n    std::vector<Node>\
+    \ nodes;\n    int first_free = 0;\n    std::size_t live_nodes = 0;\n\n   private:\n\
+    \    void release_zero(int node) {\n        int left = nodes[node].left;\n   \
+    \     int right = nodes[node].right;\n        nodes[node] = Node();\n        nodes[node].left\
+    \ = first_free;\n        first_free = node;\n        --live_nodes;\n        if\
+    \ (left && --nodes[left].references == 0) release_zero(left);\n        if (right\
+    \ && --nodes[right].references == 0) release_zero(right);\n    }\n\n   public:\n\
+    \    PersistentNodePool() { nodes.emplace_back(); }\n\n    void reserve(std::size_t\
+    \ capacity) { nodes.reserve(capacity + 1); }\n\n    Node& operator[](int node)\
+    \ { return nodes[node]; }\n\n    const Node& operator[](int node) const { return\
+    \ nodes[node]; }\n\n    void retain(int node) {\n        if (node) ++nodes[node].references;\n\
+    \    }\n\n    void release(int node) {\n        if (!node) return;\n        assert(nodes[node].references\
+    \ > 0);\n        if (--nodes[node].references == 0) release_zero(node);\n    }\n\
+    \n    template <class... Args>\n    int emplace(Args&&... args) {\n        int\
+    \ result;\n        if (!first_free) {\n            assert(nodes.size() < std::size_t(std::numeric_limits<int>::max()));\n\
+    \            nodes.emplace_back(std::forward<Args>(args)...);\n            result\
+    \ = int(nodes.size()) - 1;\n        } else {\n            result = first_free;\n\
+    \            first_free = nodes[result].left;\n            nodes[result] = Node(std::forward<Args>(args)...);\n\
+    \        }\n        Node& node = nodes[result];\n        node.references = 0;\n\
+    \        retain(node.left);\n        retain(node.right);\n        ++live_nodes;\n\
+    \        return result;\n    }\n\n    int clone(int node) {\n        assert(node);\n\
+    \        Node copy = nodes[node];\n        return emplace(std::move(copy));\n\
+    \    }\n\n    void replace(int& edge, int node) {\n        if (edge == node) return;\n\
+    \        retain(node);\n        int old = edge;\n        edge = node;\n      \
+    \  release(old);\n    }\n\n    std::size_t size() const { return live_nodes; }\n\
+    };\n\n}  // namespace detail\n}  // namespace ds\n}  // namespace m1une\n\n\n\
+    #line 13 \"ds/segtree/persistent_segtree_beats.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ ds {\n\n// A persistent Segment Tree Beats for fallible monoid actions.\ntemplate\
+    \ <m1une::beats_acted_monoid::IsBeatsActedMonoid ActedMonoid>\nstruct PersistentSegtreeBeats\
+    \ {\n    using value_type = typename ActedMonoid::value_type;\n    using operator_type\
+    \ = typename ActedMonoid::operator_type;\n    using T = value_type;\n    using\
+    \ F = operator_type;\n\n   private:\n    struct Node {\n        T val;\n     \
+    \   F lazy;\n        int left;\n        int right;\n        int references;\n\
+    \        bool has_lazy;\n\n        Node()\n            : val(ActedMonoid::id()),\n\
+    \              lazy(ActedMonoid::op_id()),\n              left(0),\n         \
+    \     right(0),\n              references(0),\n              has_lazy(false) {}\n\
+    \n        explicit Node(T value)\n            : val(std::move(value)),\n     \
+    \         lazy(ActedMonoid::op_id()),\n              left(0),\n              right(0),\n\
+    \              references(0),\n              has_lazy(false) {}\n\n        Node(T\
+    \ value, int left_child, int right_child)\n            : val(std::move(value)),\n\
+    \              lazy(ActedMonoid::op_id()),\n              left(left_child),\n\
+    \              right(right_child),\n              references(0),\n           \
+    \   has_lazy(false) {}\n    };\n\n    using Pool = detail::PersistentNodePool<Node>;\n\
+    \n    int _n;\n    int _root;\n    std::shared_ptr<Pool> _pool;\n\n    explicit\
+    \ PersistentSegtreeBeats(\n        int n,\n        int root,\n        std::shared_ptr<Pool>\
+    \ pool\n    ) : _n(n), _root(root), _pool(std::move(pool)) {\n        _pool->retain(_root);\n\
+    \    }\n\n    int new_node(const Node& node) const {\n        return _pool->emplace(node);\n\
+    \    }\n\n    int new_node(Node&& node) const {\n        return _pool->emplace(std::move(node));\n\
+    \    }\n\n    int clone_node(int node) const {\n        return _pool->clone(node);\n\
+    \    }\n\n    template <typename U>\n    static T make_value(const U& value, int\
+    \ index) {\n        if constexpr (requires(U x) { ActedMonoid::make(x); }) {\n\
+    \            return ActedMonoid::make(value);\n        } else if constexpr (requires(U\
+    \ x, int i) {\n            ActedMonoid::make(x, i);\n        }) {\n          \
+    \  return ActedMonoid::make(value, index);\n        } else {\n            return\
+    \ static_cast<T>(value);\n        }\n    }\n\n    static T mapping_at(const F&\
+    \ f, const T& value, long long ordinal) {\n        if constexpr (requires(F g,\
+    \ T x, long long i) {\n            ActedMonoid::mapping(g, x, i);\n        })\
+    \ {\n            return ActedMonoid::mapping(f, value, ordinal);\n        } else\
+    \ {\n            return ActedMonoid::mapping(f, value);\n        }\n    }\n\n\
+    \    static bool can_apply_at(\n        const F& f,\n        const T& value,\n\
+    \        long long ordinal\n    ) {\n        if constexpr (requires(F g, T x,\
+    \ long long i) {\n            ActedMonoid::can_apply(g, x, i);\n        }) {\n\
+    \            return ActedMonoid::can_apply(f, value, ordinal);\n        } else\
+    \ {\n            return ActedMonoid::can_apply(f, value);\n        }\n    }\n\n\
+    \    static F shift_operator(const F& f, long long ordinal) {\n        if constexpr\
+    \ (requires(F g, long long i) {\n            ActedMonoid::op_shift(g, i);\n  \
+    \      }) {\n            return ActedMonoid::op_shift(f, ordinal);\n        }\
+    \ else {\n            return f;\n        }\n    }\n\n    int build(int left, int\
+    \ right, const std::vector<T>& values) const {\n        if (left == right) return\
+    \ 0;\n        if (right - left == 1) return new_node(Node(values[left]));\n  \
+    \      int middle = left + (right - left) / 2;\n        int left_child = build(left,\
+    \ middle, values);\n        int right_child = build(middle, right, values);\n\
+    \        return new_node(Node(\n            ActedMonoid::op(\n               \
+    \ (*_pool)[left_child].val,\n                (*_pool)[right_child].val\n     \
+    \       ),\n            left_child,\n            right_child\n        ));\n  \
+    \  }\n\n    int build(int left, int right, std::vector<T>& values) const {\n \
+    \       if (left == right) return 0;\n        if (right - left == 1) {\n     \
+    \       return new_node(Node(std::move(values[left])));\n        }\n        int\
+    \ middle = left + (right - left) / 2;\n        int left_child = build(left, middle,\
+    \ values);\n        int right_child = build(middle, right, values);\n        return\
+    \ new_node(Node(\n            ActedMonoid::op(\n                (*_pool)[left_child].val,\n\
+    \                (*_pool)[right_child].val\n            ),\n            left_child,\n\
+    \            right_child\n        ));\n    }\n\n    template <typename U>\n  \
+    \  int build_from_values(\n        int left,\n        int right,\n        const\
+    \ std::vector<U>& values\n    ) const {\n        if (left == right) return 0;\n\
+    \        if (right - left == 1) {\n            return new_node(Node(make_value(values[left],\
+    \ left)));\n        }\n        int middle = left + (right - left) / 2;\n     \
+    \   int left_child = build_from_values(left, middle, values);\n        int right_child\
+    \ = build_from_values(middle, right, values);\n        return new_node(Node(\n\
+    \            ActedMonoid::op(\n                (*_pool)[left_child].val,\n   \
+    \             (*_pool)[right_child].val\n            ),\n            left_child,\n\
+    \            right_child\n        ));\n    }\n\n    void update(int node) const\
+    \ {\n        Node& current = (*_pool)[node];\n        current.val = ActedMonoid::op(\n\
+    \            (*_pool)[current.left].val,\n            (*_pool)[current.right].val\n\
+    \        );\n    }\n\n    int all_apply_clone(\n        int node,\n        int\
+    \ left,\n        int right,\n        const F& f\n    ) const {\n        int result\
+    \ = clone_node(node);\n        Node& current = (*_pool)[result];\n        if (can_apply_at(f,\
+    \ current.val, 0)) {\n            current.val = mapping_at(f, current.val, 0);\n\
+    \            if (right - left > 1) {\n                current.lazy = ActedMonoid::op_comp(f,\
+    \ current.lazy);\n                current.has_lazy = true;\n            }\n  \
+    \          return result;\n        }\n\n        assert(right - left > 1);\n  \
+    \      push(result, left, right);\n        int middle = left + (right - left)\
+    \ / 2;\n        int left_child = all_apply_clone(\n            (*_pool)[result].left,\n\
+    \            left,\n            middle,\n            f\n        );\n        int\
+    \ right_child = all_apply_clone(\n            (*_pool)[result].right,\n      \
+    \      middle,\n            right,\n            shift_operator(f, middle - left)\n\
+    \        );\n        _pool->replace((*_pool)[result].left, left_child);\n    \
+    \    _pool->replace((*_pool)[result].right, right_child);\n        update(result);\n\
+    \        return result;\n    }\n\n    void push(int node, int left, int right)\
+    \ const {\n        if (!(*_pool)[node].has_lazy) return;\n        assert(right\
+    \ - left > 1);\n\n        F lazy = (*_pool)[node].lazy;\n        int middle =\
+    \ left + (right - left) / 2;\n        int left_child = all_apply_clone(\n    \
+    \        (*_pool)[node].left,\n            left,\n            middle,\n      \
+    \      lazy\n        );\n        int right_child = all_apply_clone(\n        \
+    \    (*_pool)[node].right,\n            middle,\n            right,\n        \
+    \    shift_operator(lazy, middle - left)\n        );\n        _pool->replace((*_pool)[node].left,\
+    \ left_child);\n        _pool->replace((*_pool)[node].right, right_child);\n \
+    \       Node& current = (*_pool)[node];\n        current.lazy = ActedMonoid::op_id();\n\
+    \        current.has_lazy = false;\n    }\n\n    int set_node(\n        int node,\n\
+    \        int left,\n        int right,\n        int index,\n        T value\n\
+    \    ) const {\n        int result = clone_node(node);\n        if (right - left\
+    \ == 1) {\n            Node& current = (*_pool)[result];\n            current.val\
+    \ = std::move(value);\n            current.lazy = ActedMonoid::op_id();\n    \
+    \        current.has_lazy = false;\n            return result;\n        }\n\n\
+    \        push(result, left, right);\n        int middle = left + (right - left)\
+    \ / 2;\n        if (index < middle) {\n            int child = set_node(\n   \
+    \             (*_pool)[result].left,\n                left,\n                middle,\n\
+    \                index,\n                std::move(value)\n            );\n  \
+    \          _pool->replace((*_pool)[result].left, child);\n        } else {\n \
+    \           int child = set_node(\n                (*_pool)[result].right,\n \
+    \               middle,\n                right,\n                index,\n    \
+    \            std::move(value)\n            );\n            _pool->replace((*_pool)[result].right,\
+    \ child);\n        }\n        update(result);\n        return result;\n    }\n\
+    \n    int apply_node(\n        int node,\n        int left,\n        int right,\n\
+    \        int query_left,\n        int query_right,\n        const F& f\n    )\
+    \ const {\n        if (query_right <= left || right <= query_left) return node;\n\
+    \        if (query_left <= left && right <= query_right) {\n            return\
+    \ all_apply_clone(\n                node,\n                left,\n           \
+    \     right,\n                shift_operator(f, left - query_left)\n         \
+    \   );\n        }\n\n        int result = clone_node(node);\n        push(result,\
+    \ left, right);\n        int middle = left + (right - left) / 2;\n        int\
+    \ left_child = apply_node(\n            (*_pool)[result].left,\n            left,\n\
+    \            middle,\n            query_left,\n            query_right,\n    \
+    \        f\n        );\n        int right_child = apply_node(\n            (*_pool)[result].right,\n\
+    \            middle,\n            right,\n            query_left,\n          \
+    \  query_right,\n            f\n        );\n        _pool->replace((*_pool)[result].left,\
+    \ left_child);\n        _pool->replace((*_pool)[result].right, right_child);\n\
+    \        update(result);\n        return result;\n    }\n\n    int copy_range_node(\n\
+    \        int target,\n        int source,\n        int left,\n        int right,\n\
+    \        int query_left,\n        int query_right\n    ) const {\n        if (query_right\
+    \ <= left || right <= query_left) return target;\n        if (query_left <= left\
+    \ && right <= query_right) return source;\n\n        int result = clone_node(target);\n\
+    \        int materialized_source = clone_node(source);\n        _pool->retain(materialized_source);\n\
+    \        push(result, left, right);\n        push(materialized_source, left, right);\n\
+    \n        int middle = left + (right - left) / 2;\n        int left_child = copy_range_node(\n\
+    \            (*_pool)[result].left,\n            (*_pool)[materialized_source].left,\n\
+    \            left,\n            middle,\n            query_left,\n           \
+    \ query_right\n        );\n        int right_child = copy_range_node(\n      \
+    \      (*_pool)[result].right,\n            (*_pool)[materialized_source].right,\n\
+    \            middle,\n            right,\n            query_left,\n          \
+    \  query_right\n        );\n        _pool->replace((*_pool)[result].left, left_child);\n\
+    \        _pool->replace((*_pool)[result].right, right_child);\n        update(result);\n\
+    \        _pool->release(materialized_source);\n        return result;\n    }\n\
+    \n    F compose_for_child(\n        const F& inherited,\n        const Node& node,\n\
+    \        long long ordinal\n    ) const {\n        F shifted = shift_operator(inherited,\
+    \ ordinal);\n        if (!node.has_lazy) return shifted;\n        return ActedMonoid::op_comp(\n\
+    \            shifted,\n            shift_operator(node.lazy, ordinal)\n      \
+    \  );\n    }\n\n    T evaluate_node(\n        int node,\n        int left,\n \
+    \       int right,\n        const F& inherited\n    ) const {\n        const Node&\
+    \ current = (*_pool)[node];\n        if (can_apply_at(inherited, current.val,\
+    \ 0)) {\n            return mapping_at(inherited, current.val, 0);\n        }\n\
+    \n        assert(right - left > 1);\n        int middle = left + (right - left)\
+    \ / 2;\n        return ActedMonoid::op(\n            evaluate_node(\n        \
+    \        current.left,\n                left,\n                middle,\n     \
+    \           compose_for_child(inherited, current, 0)\n            ),\n       \
+    \     evaluate_node(\n                current.right,\n                middle,\n\
+    \                right,\n                compose_for_child(inherited, current,\
+    \ middle - left)\n            )\n        );\n    }\n\n    T prod_node(\n     \
+    \   int node,\n        int left,\n        int right,\n        int query_left,\n\
+    \        int query_right,\n        const F& inherited\n    ) const {\n       \
+    \ if (query_right <= left || right <= query_left) {\n            return ActedMonoid::id();\n\
+    \        }\n        if (query_left <= left && right <= query_right) {\n      \
+    \      return evaluate_node(node, left, right, inherited);\n        }\n\n    \
+    \    const Node& current = (*_pool)[node];\n        int middle = left + (right\
+    \ - left) / 2;\n        return ActedMonoid::op(\n            prod_node(\n    \
+    \            current.left,\n                left,\n                middle,\n \
+    \               query_left,\n                query_right,\n                compose_for_child(inherited,\
+    \ current, 0)\n            ),\n            prod_node(\n                current.right,\n\
+    \                middle,\n                right,\n                query_left,\n\
+    \                query_right,\n                compose_for_child(inherited, current,\
+    \ middle - left)\n            )\n        );\n    }\n\n    void collect_node(\n\
+    \        int node,\n        int left,\n        int right,\n        int query_left,\n\
+    \        int query_right,\n        const F& inherited,\n        std::vector<T>&\
+    \ result\n    ) const {\n        if (query_right <= left || right <= query_left)\
+    \ return;\n        const Node& current = (*_pool)[node];\n        if (right -\
+    \ left == 1) {\n            result.push_back(mapping_at(inherited, current.val,\
+    \ 0));\n            return;\n        }\n\n        int middle = left + (right -\
+    \ left) / 2;\n        collect_node(\n            current.left,\n            left,\n\
+    \            middle,\n            query_left,\n            query_right,\n    \
+    \        compose_for_child(inherited, current, 0),\n            result\n     \
+    \   );\n        collect_node(\n            current.right,\n            middle,\n\
+    \            right,\n            query_left,\n            query_right,\n     \
+    \       compose_for_child(inherited, current, middle - left),\n            result\n\
+    \        );\n    }\n\n    template <class Predicate>\n    int max_right_node(\n\
+    \        int node,\n        int left,\n        int right,\n        int query_left,\n\
+    \        T& product,\n        const F& inherited,\n        Predicate& predicate\n\
+    \    ) const {\n        if (right <= query_left) return right;\n        if (query_left\
+    \ <= left) {\n            T next = ActedMonoid::op(\n                product,\n\
+    \                evaluate_node(node, left, right, inherited)\n            );\n\
+    \            if (predicate(next)) {\n                product = std::move(next);\n\
+    \                return right;\n            }\n            if (right - left ==\
+    \ 1) return left;\n        }\n\n        const Node& current = (*_pool)[node];\n\
+    \        int middle = left + (right - left) / 2;\n        int result = max_right_node(\n\
+    \            current.left,\n            left,\n            middle,\n         \
+    \   query_left,\n            product,\n            compose_for_child(inherited,\
+    \ current, 0),\n            predicate\n        );\n        if (result < middle)\
+    \ return result;\n        return max_right_node(\n            current.right,\n\
+    \            middle,\n            right,\n            query_left,\n          \
+    \  product,\n            compose_for_child(inherited, current, middle - left),\n\
+    \            predicate\n        );\n    }\n\n    template <class Predicate>\n\
+    \    int min_left_node(\n        int node,\n        int left,\n        int right,\n\
+    \        int query_right,\n        T& product,\n        const F& inherited,\n\
+    \        Predicate& predicate\n    ) const {\n        if (query_right <= left)\
+    \ return left;\n        if (right <= query_right) {\n            T next = ActedMonoid::op(\n\
+    \                evaluate_node(node, left, right, inherited),\n              \
+    \  product\n            );\n            if (predicate(next)) {\n             \
+    \   product = std::move(next);\n                return left;\n            }\n\
+    \            if (right - left == 1) return right;\n        }\n\n        const\
+    \ Node& current = (*_pool)[node];\n        int middle = left + (right - left)\
+    \ / 2;\n        int result = min_left_node(\n            current.right,\n    \
+    \        middle,\n            right,\n            query_right,\n            product,\n\
+    \            compose_for_child(inherited, current, middle - left),\n         \
+    \   predicate\n        );\n        if (middle < result) return result;\n     \
+    \   return min_left_node(\n            current.left,\n            left,\n    \
+    \        middle,\n            query_right,\n            product,\n           \
+    \ compose_for_child(inherited, current, 0),\n            predicate\n        );\n\
+    \    }\n\n   public:\n    PersistentSegtreeBeats() : PersistentSegtreeBeats(0)\
+    \ {}\n\n    explicit PersistentSegtreeBeats(int n)\n        : _n(n), _root(0),\
+    \ _pool(std::make_shared<Pool>()) {\n        assert(0 <= n);\n        if (_n >\
+    \ 0) {\n            std::vector<T> values(_n, ActedMonoid::id());\n          \
+    \  _root = build(0, _n, values);\n        }\n        _pool->retain(_root);\n \
+    \   }\n\n    explicit PersistentSegtreeBeats(const std::vector<T>& values)\n \
+    \       : _n(int(values.size())),\n          _root(0),\n          _pool(std::make_shared<Pool>())\
+    \ {\n        _pool->reserve(values.size() * 2);\n        if (_n > 0) _root = build(0,\
+    \ _n, values);\n        _pool->retain(_root);\n    }\n\n    explicit PersistentSegtreeBeats(std::vector<T>&&\
+    \ values)\n        : _n(int(values.size())),\n          _root(0),\n          _pool(std::make_shared<Pool>())\
+    \ {\n        _pool->reserve(values.size() * 2);\n        if (_n > 0) _root = build(0,\
+    \ _n, values);\n        _pool->retain(_root);\n    }\n\n    template <typename\
+    \ U>\n    requires (!std::same_as<U, T>) && (\n        requires(U x) { ActedMonoid::make(x);\
+    \ } ||\n        requires(U x, int i) { ActedMonoid::make(x, i); } ||\n       \
+    \ std::convertible_to<U, T>\n    )\n    explicit PersistentSegtreeBeats(const\
+    \ std::vector<U>& values)\n        : _n(int(values.size())),\n          _root(0),\n\
+    \          _pool(std::make_shared<Pool>()) {\n        _pool->reserve(values.size()\
+    \ * 2);\n        if (_n > 0) _root = build_from_values(0, _n, values);\n     \
+    \   _pool->retain(_root);\n    }\n\n    PersistentSegtreeBeats(const PersistentSegtreeBeats&\
+    \ other)\n        : _n(other._n), _root(other._root), _pool(other._pool) {\n \
+    \       if (_pool) _pool->retain(_root);\n    }\n\n    PersistentSegtreeBeats(PersistentSegtreeBeats&&\
+    \ other) noexcept\n        : _n(other._n),\n          _root(other._root),\n  \
+    \        _pool(std::move(other._pool)) {\n        other._n = 0;\n        other._root\
+    \ = 0;\n    }\n\n    PersistentSegtreeBeats& operator=(\n        const PersistentSegtreeBeats&\
+    \ other\n    ) {\n        if (this == &other) return *this;\n        if (other._pool)\
+    \ other._pool->retain(other._root);\n        if (_pool) _pool->release(_root);\n\
+    \        _n = other._n;\n        _root = other._root;\n        _pool = other._pool;\n\
+    \        return *this;\n    }\n\n    PersistentSegtreeBeats& operator=(\n    \
+    \    PersistentSegtreeBeats&& other\n    ) noexcept {\n        if (this == &other)\
+    \ return *this;\n        if (_pool) _pool->release(_root);\n        _n = other._n;\n\
+    \        _root = other._root;\n        _pool = std::move(other._pool);\n     \
+    \   other._n = 0;\n        other._root = 0;\n        return *this;\n    }\n\n\
+    \    ~PersistentSegtreeBeats() {\n        if (_pool) _pool->release(_root);\n\
+    \    }\n\n    int size() const {\n        return _n;\n    }\n\n    bool empty()\
+    \ const {\n        return _n == 0;\n    }\n\n    void release() {\n        if\
+    \ (_pool) _pool->release(_root);\n        _pool = std::make_shared<Pool>();\n\
+    \        _root = 0;\n        _n = 0;\n    }\n\n    std::size_t node_count() const\
+    \ {\n        return _pool ? _pool->size() : 0;\n    }\n\n    PersistentSegtreeBeats\
+    \ set(int index, T value) const {\n        assert(0 <= index && index < _n);\n\
+    \        return PersistentSegtreeBeats(\n            _n,\n            set_node(_root,\
+    \ 0, _n, index, std::move(value)),\n            _pool\n        );\n    }\n\n \
+    \   T get(int index) const {\n        assert(0 <= index && index < _n);\n    \
+    \    return prod(index, index + 1);\n    }\n\n    T operator[](int index) const\
+    \ {\n        return get(index);\n    }\n\n    T prod(int left, int right) const\
+    \ {\n        assert(0 <= left && left <= right && right <= _n);\n        if (left\
+    \ == right) return ActedMonoid::id();\n        return prod_node(\n           \
+    \ _root,\n            0,\n            _n,\n            left,\n            right,\n\
+    \            ActedMonoid::op_id()\n        );\n    }\n\n    T all_prod() const\
+    \ {\n        return _root ? (*_pool)[_root].val : ActedMonoid::id();\n    }\n\n\
+    \    PersistentSegtreeBeats apply(int index, const F& f) const {\n        assert(0\
+    \ <= index && index < _n);\n        return apply(index, index + 1, f);\n    }\n\
+    \n    PersistentSegtreeBeats apply(\n        int left,\n        int right,\n \
+    \       const F& f\n    ) const {\n        assert(0 <= left && left <= right &&\
+    \ right <= _n);\n        if (left == right) return *this;\n        return PersistentSegtreeBeats(\n\
+    \            _n,\n            apply_node(_root, 0, _n, left, right, f),\n    \
+    \        _pool\n        );\n    }\n\n    PersistentSegtreeBeats copy_range_from(\n\
+    \        const PersistentSegtreeBeats& source,\n        int left,\n        int\
+    \ right\n    ) const {\n        assert(_n == source._n);\n        assert(_pool\
+    \ == source._pool);\n        assert(0 <= left && left <= right && right <= _n);\n\
+    \        if (left == right) return *this;\n        return PersistentSegtreeBeats(\n\
+    \            _n,\n            copy_range_node(\n                _root,\n     \
+    \           source._root,\n                0,\n                _n,\n         \
+    \       left,\n                right\n            ),\n            _pool\n    \
+    \    );\n    }\n\n    std::vector<T> to_vector() const {\n        return to_vector(0,\
+    \ _n);\n    }\n\n    std::vector<T> to_vector(int left, int right) const {\n \
+    \       assert(0 <= left && left <= right && right <= _n);\n        std::vector<T>\
+    \ result;\n        result.reserve(right - left);\n        if (left != right) {\n\
+    \            collect_node(\n                _root,\n                0,\n     \
+    \           _n,\n                left,\n                right,\n             \
+    \   ActedMonoid::op_id(),\n                result\n            );\n        }\n\
+    \        return result;\n    }\n\n    template <class Predicate>\n    int max_right(int\
+    \ left, Predicate predicate) const {\n        assert(0 <= left && left <= _n);\n\
+    \        assert(predicate(ActedMonoid::id()));\n        if (left == _n) return\
+    \ _n;\n        T product = ActedMonoid::id();\n        return max_right_node(\n\
+    \            _root,\n            0,\n            _n,\n            left,\n    \
+    \        product,\n            ActedMonoid::op_id(),\n            predicate\n\
+    \        );\n    }\n\n    template <class Predicate>\n    int min_left(int right,\
+    \ Predicate predicate) const {\n        assert(0 <= right && right <= _n);\n \
+    \       assert(predicate(ActedMonoid::id()));\n        if (right == 0) return\
+    \ 0;\n        T product = ActedMonoid::id();\n        return min_left_node(\n\
+    \            _root,\n            0,\n            _n,\n            right,\n   \
+    \         product,\n            ActedMonoid::op_id(),\n            predicate\n\
+    \        );\n    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n#line\
+    \ 4 \"verify/ds/segtree/persistent_segtree_beats.test.cpp\"\n\n#include <algorithm>\n\
+    #line 7 \"verify/ds/segtree/persistent_segtree_beats.test.cpp\"\n#include <cstdint>\n\
+    #line 9 \"verify/ds/segtree/persistent_segtree_beats.test.cpp\"\n#include <numeric>\n\
+    #include <optional>\n#line 13 \"verify/ds/segtree/persistent_segtree_beats.test.cpp\"\
+    \n\n#line 1 \"acted_monoid/range_affine_range_sum.hpp\"\n\n\n\n#line 5 \"acted_monoid/range_affine_range_sum.hpp\"\
+    \n\nnamespace m1une {\nnamespace acted_monoid {\n\ntemplate <typename T>\nstruct\
+    \ RangeAffineRangeSumNode {\n    T sum;\n    int size;\n};\n\n// Designed to accept\
+    \ Modint or similar types as T\ntemplate <typename T>\nstruct RangeAffineRangeSum\
+    \ {\n    using value_type = RangeAffineRangeSumNode<T>;\n    using operator_type\
+    \ = std::pair<T, T>;  // {a, b} for ax + b\n    static constexpr bool commutative\
+    \ = true;\n    static constexpr bool operator_commutative = false;\n\n    // Value\
+    \ Monoid\n    static constexpr value_type id() {\n        return {T(0), 0};\n\
+    \    }\n    static constexpr value_type op(const value_type& a, const value_type&\
+    \ b) {\n        return {a.sum + b.sum, a.size + b.size};\n    }\n    static constexpr\
+    \ int size(const value_type& value) {\n        return value.size;\n    }\n\n \
+    \   // Operator Monoid (Affine Composition)\n    // f(x) = a1*x + b1, g(x) = a2*x\
+    \ + b2\n    // f(g(x)) = a1*(a2*x + b2) + b1 = (a1*a2)*x + (a1*b2 + b1)\n    static\
+    \ constexpr operator_type op_id() {\n        return {T(1), T(0)};\n    }\n   \
+    \ static constexpr operator_type op_comp(const operator_type& f, const operator_type&\
+    \ g) {\n        return {f.first * g.first, f.first * g.second + f.second};\n \
+    \   }\n\n    // Mapping\n    // \\sum (a*x_i + b) = a * \\sum x_i + b * size\n\
+    \    static constexpr value_type mapping(const operator_type& f, const value_type&\
+    \ x) {\n        return {f.first * x.sum + f.second * T(x.size), x.size};\n   \
+    \ }\n\n    // Helper for initializing a leaf node\n    static constexpr value_type\
+    \ make(const T& val) {\n        return {val, 1};\n    }\n};\n\n}  // namespace\
+    \ acted_monoid\n}  // namespace m1une\n\n\n#line 1 \"acted_monoid/range_ap_add_range_sum.hpp\"\
+    \n\n\n\n#line 5 \"acted_monoid/range_ap_add_range_sum.hpp\"\n\nnamespace m1une\
+    \ {\nnamespace acted_monoid {\n\ntemplate <typename T>\nstruct RangeApAddRangeSumNode\
+    \ {\n    T sum;\n    long long size;\n    T ord_sum;\n};\n\ntemplate <typename\
+    \ T>\nstruct RangeApAddRangeSum {\n    using value_type = RangeApAddRangeSumNode<T>;\n\
+    \    using operator_type = std::pair<T, T>;  // {a, b} for adding a * i + b\n\
+    \    static constexpr bool commutative = false;\n    static constexpr bool operator_commutative\
+    \ = true;\n\n    // Value Monoid (Sum)\n    static constexpr value_type id() {\n\
+    \        return {T(0), 0, T(0)};\n    }\n    static constexpr value_type op(const\
+    \ value_type& a, const value_type& b) {\n        return {a.sum + b.sum, a.size\
+    \ + b.size, a.ord_sum + b.ord_sum + T(a.size) * T(b.size)};\n    }\n\n    // Operator\
+    \ Monoid (Add)\n    static constexpr operator_type op_id() {\n        return {T(0),\
+    \ T(0)};\n    }\n    static constexpr operator_type op_comp(const operator_type&\
+    \ f, const operator_type& g) {\n        return {f.first + g.first, f.second +\
+    \ g.second};\n    }\n\n    static constexpr value_type mapping(const operator_type&\
+    \ f, const value_type& x) {\n        return mapping(f, x, 0);\n    }\n\n    static\
+    \ constexpr value_type mapping(const operator_type& f, const value_type& x, long\
+    \ long ord) {\n        return {x.sum + f.first * (x.ord_sum + T(ord) * T(x.size))\
+    \ + f.second * T(x.size), x.size, x.ord_sum};\n    }\n\n    static constexpr operator_type\
+    \ op_shift(const operator_type& f, long long ord) {\n        return {f.first,\
+    \ f.second + f.first * T(ord)};\n    }\n\n    static constexpr operator_type op_reverse(const\
+    \ operator_type& f, long long size) {\n        return {-f.first, f.second + f.first\
+    \ * T(size - 1)};\n    }\n\n    static constexpr value_type make(const T& val)\
+    \ {\n        return {val, 1, T(0)};\n    }\n};\n\n}  // namespace acted_monoid\n\
+    }  // namespace m1une\n\n\n#line 1 \"math/modint.hpp\"\n\n\n\n#line 6 \"math/modint.hpp\"\
+    \n#include <iostream>\n#include <type_traits>\n#line 9 \"math/modint.hpp\"\n\n\
+    namespace m1une {\nnamespace math {\n\ntemplate <uint32_t Modulus>\nstruct ModInt\
+    \ {\n    static_assert(0 < Modulus, \"Modulus must be positive\");\n\n   private:\n\
+    \    uint32_t _v;\n\n   public:\n    static constexpr uint32_t mod() {\n     \
+    \   return Modulus;\n    }\n\n    static constexpr ModInt raw(uint32_t v) noexcept\
+    \ {\n        ModInt x;\n        x._v = v;\n        return x;\n    }\n\n    constexpr\
+    \ ModInt() noexcept : _v(0) {}\n\n    template <class Integer, std::enable_if_t<std::is_integral_v<Integer>,\
+    \ int> = 0>\n    constexpr ModInt(Integer v) noexcept {\n        if constexpr\
+    \ (std::is_signed_v<Integer>) {\n            int64_t x = static_cast<int64_t>(v)\
+    \ % static_cast<int64_t>(Modulus);\n            if (x < 0) x += Modulus;\n   \
+    \         _v = static_cast<uint32_t>(x);\n        } else {\n            _v = static_cast<uint32_t>(static_cast<uint64_t>(v)\
+    \ % Modulus);\n        }\n    }\n\n    constexpr uint32_t val() const noexcept\
+    \ {\n        return _v;\n    }\n\n    constexpr ModInt& operator++() noexcept\
+    \ {\n        _v++;\n        if (_v == Modulus) _v = 0;\n        return *this;\n\
+    \    }\n\n    constexpr ModInt& operator--() noexcept {\n        if (_v == 0)\
+    \ _v = Modulus;\n        _v--;\n        return *this;\n    }\n\n    constexpr\
+    \ ModInt operator++(int) noexcept {\n        ModInt res = *this;\n        ++*this;\n\
+    \        return res;\n    }\n\n    constexpr ModInt operator--(int) noexcept {\n\
+    \        ModInt res = *this;\n        --*this;\n        return res;\n    }\n\n\
+    \    constexpr ModInt& operator+=(const ModInt& rhs) noexcept {\n        _v +=\
+    \ rhs._v;\n        if (_v >= Modulus) _v -= Modulus;\n        return *this;\n\
+    \    }\n\n    constexpr ModInt& operator-=(const ModInt& rhs) noexcept {\n   \
+    \     _v -= rhs._v;\n        if (_v >= Modulus) _v += Modulus;\n        return\
+    \ *this;\n    }\n\n    constexpr ModInt& operator*=(const ModInt& rhs) noexcept\
+    \ {\n        uint64_t z = _v;\n        z *= rhs._v;\n        _v = static_cast<uint32_t>(z\
+    \ % Modulus);\n        return *this;\n    }\n\n    constexpr ModInt& operator/=(const\
+    \ ModInt& rhs) noexcept {\n        return *this *= rhs.inv();\n    }\n\n    constexpr\
+    \ ModInt operator+(const ModInt& rhs) const noexcept {\n        return ModInt(*this)\
+    \ += rhs;\n    }\n    constexpr ModInt operator-(const ModInt& rhs) const noexcept\
+    \ {\n        return ModInt(*this) -= rhs;\n    }\n    constexpr ModInt operator*(const\
+    \ ModInt& rhs) const noexcept {\n        return ModInt(*this) *= rhs;\n    }\n\
+    \    constexpr ModInt operator/(const ModInt& rhs) const noexcept {\n        return\
+    \ ModInt(*this) /= rhs;\n    }\n\n    constexpr bool operator==(const ModInt&\
+    \ rhs) const noexcept {\n        return _v == rhs._v;\n    }\n    constexpr bool\
+    \ operator!=(const ModInt& rhs) const noexcept {\n        return _v != rhs._v;\n\
+    \    }\n\n    constexpr ModInt pow(long long n) const noexcept {\n        ModInt\
+    \ res = raw(1 % Modulus);\n        ModInt x = n < 0 ? inv() : *this;\n       \
+    \ uint64_t exponent = n < 0 ? uint64_t(-(n + 1)) + 1 : uint64_t(n);\n        while\
+    \ (exponent > 0) {\n            if (exponent & 1) res *= x;\n            x *=\
+    \ x;\n            exponent >>= 1;\n        }\n        return res;\n    }\n\n \
+    \   constexpr ModInt inv() const noexcept {\n        int64_t a = _v, b = Modulus,\
+    \ u = 1, v = 0;\n        while (b) {\n            int64_t t = a / b;\n       \
+    \     a -= t * b;\n            std::swap(a, b);\n            u -= t * v;\n   \
+    \         std::swap(u, v);\n        }\n        assert(a == 1);\n        u %= Modulus;\n\
+    \        if (u < 0) u += Modulus;\n        return raw(static_cast<uint32_t>(u));\n\
+    \    }\n\n    friend std::ostream& operator<<(std::ostream& os, const ModInt&\
+    \ rhs) {\n        return os << rhs._v;\n    }\n\n    friend std::istream& operator>>(std::istream&\
+    \ is, ModInt& rhs) {\n        long long v;\n        is >> v;\n        rhs = ModInt(v);\n\
+    \        return is;\n    }\n};\n\nusing modint998244353 = ModInt<998244353>;\n\
+    using modint1000000007 = ModInt<1000000007>;\n\ntemplate <int Id = 0>\nstruct\
+    \ DynamicModInt {\n   private:\n    uint32_t _v;\n    inline static uint32_t _mod\
+    \ = 1;\n\n   public:\n    static uint32_t mod() noexcept {\n        return _mod;\n\
+    \    }\n\n    static void set_mod(uint32_t modulus) noexcept {\n        assert(modulus\
+    \ > 0);\n        assert(modulus <= uint32_t(1) << 31);\n        _mod = modulus;\n\
+    \    }\n\n    static DynamicModInt raw(uint32_t v) noexcept {\n        assert(v\
+    \ < _mod);\n        DynamicModInt x;\n        x._v = v;\n        return x;\n \
+    \   }\n\n    DynamicModInt() noexcept : _v(0) {}\n\n    template <class Integer,\
+    \ std::enable_if_t<std::is_integral_v<Integer>, int> = 0>\n    DynamicModInt(Integer\
+    \ v) noexcept {\n        if constexpr (std::is_signed_v<Integer>) {\n        \
+    \    int64_t x = static_cast<int64_t>(v) % static_cast<int64_t>(_mod);\n     \
+    \       if (x < 0) x += _mod;\n            _v = static_cast<uint32_t>(x);\n  \
+    \      } else {\n            _v = static_cast<uint32_t>(static_cast<uint64_t>(v)\
+    \ % _mod);\n        }\n    }\n\n    uint32_t val() const noexcept {\n        return\
+    \ _v;\n    }\n\n    DynamicModInt& operator++() noexcept {\n        _v++;\n  \
+    \      if (_v == _mod) _v = 0;\n        return *this;\n    }\n\n    DynamicModInt&\
+    \ operator--() noexcept {\n        if (_v == 0) _v = _mod;\n        _v--;\n  \
+    \      return *this;\n    }\n\n    DynamicModInt operator++(int) noexcept {\n\
+    \        DynamicModInt result = *this;\n        ++*this;\n        return result;\n\
+    \    }\n\n    DynamicModInt operator--(int) noexcept {\n        DynamicModInt\
+    \ result = *this;\n        --*this;\n        return result;\n    }\n\n    DynamicModInt&\
+    \ operator+=(const DynamicModInt& rhs) noexcept {\n        _v += rhs._v;\n   \
+    \     if (_v >= _mod) _v -= _mod;\n        return *this;\n    }\n\n    DynamicModInt&\
+    \ operator-=(const DynamicModInt& rhs) noexcept {\n        _v -= rhs._v;\n   \
+    \     if (_v >= _mod) _v += _mod;\n        return *this;\n    }\n\n    DynamicModInt&\
+    \ operator*=(const DynamicModInt& rhs) noexcept {\n        _v = static_cast<uint32_t>(uint64_t(_v)\
+    \ * rhs._v % _mod);\n        return *this;\n    }\n\n    DynamicModInt& operator/=(const\
+    \ DynamicModInt& rhs) noexcept {\n        return *this *= rhs.inv();\n    }\n\n\
+    \    DynamicModInt operator+(const DynamicModInt& rhs) const noexcept {\n    \
+    \    return DynamicModInt(*this) += rhs;\n    }\n\n    DynamicModInt operator-(const\
+    \ DynamicModInt& rhs) const noexcept {\n        return DynamicModInt(*this) -=\
+    \ rhs;\n    }\n\n    DynamicModInt operator*(const DynamicModInt& rhs) const noexcept\
+    \ {\n        return DynamicModInt(*this) *= rhs;\n    }\n\n    DynamicModInt operator/(const\
+    \ DynamicModInt& rhs) const noexcept {\n        return DynamicModInt(*this) /=\
+    \ rhs;\n    }\n\n    bool operator==(const DynamicModInt& rhs) const noexcept\
+    \ {\n        return _v == rhs._v;\n    }\n\n    bool operator!=(const DynamicModInt&\
+    \ rhs) const noexcept {\n        return _v != rhs._v;\n    }\n\n    DynamicModInt\
+    \ pow(long long exponent) const noexcept {\n        DynamicModInt result = raw(1\
+    \ % _mod);\n        DynamicModInt base = exponent < 0 ? inv() : *this;\n     \
+    \   uint64_t magnitude =\n            exponent < 0 ? uint64_t(-(exponent + 1))\
+    \ + 1 : uint64_t(exponent);\n        while (magnitude > 0) {\n            if (magnitude\
+    \ & 1) result *= base;\n            base *= base;\n            magnitude >>= 1;\n\
+    \        }\n        return result;\n    }\n\n    DynamicModInt inv() const noexcept\
+    \ {\n        int64_t a = _v, b = _mod, u = 1, v = 0;\n        while (b) {\n  \
+    \          int64_t quotient = a / b;\n            a -= quotient * b;\n       \
+    \     std::swap(a, b);\n            u -= quotient * v;\n            std::swap(u,\
+    \ v);\n        }\n        assert(a == 1);\n        u %= _mod;\n        if (u <\
+    \ 0) u += _mod;\n        return raw(static_cast<uint32_t>(u));\n    }\n\n    friend\
+    \ std::ostream& operator<<(std::ostream& os, const DynamicModInt& rhs) {\n   \
+    \     return os << rhs._v;\n    }\n\n    friend std::istream& operator>>(std::istream&\
+    \ is, DynamicModInt& rhs) {\n        long long value;\n        is >> value;\n\
+    \        rhs = DynamicModInt(value);\n        return is;\n    }\n};\n\n}  // namespace\
+    \ math\n}  // namespace m1une\n\n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line\
+    \ 5 \"utilities/fast_io.hpp\"\n#include <array>\n#include <cerrno>\n#include <charconv>\n\
+    #line 9 \"utilities/fast_io.hpp\"\n#include <cstdio>\n#include <cstdlib>\n#line\
+    \ 12 \"utilities/fast_io.hpp\"\n#include <cstring>\n#include <iterator>\n#include\
+    \ <string>\n#include <sys/stat.h>\n#line 18 \"utilities/fast_io.hpp\"\n#include\
+    \ <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal {\n\
+    \n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct\
+    \ is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
+    \    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
+    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
+    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
+    \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
+    \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
+    \ std::void_t<typename std::remove_cv_t<std::remove_reference_t<T>>::value_type>>\
+    \ {\n    using type = typename std::remove_cv_t<std::remove_reference_t<T>>::value_type;\n\
+    };\n\ntemplate <class T>\nusing range_stored_value_t = typename range_stored_value<T>::type;\n\
+    \n// Treat strings and C strings as scalar output objects, not as ranges.\ntemplate\
+    \ <class T>\nstruct is_char_array : std::false_type {};\n\ntemplate <class T,\
+    \ std::size_t N>\nstruct is_char_array<T[N]>\n    : std::bool_constant<std::is_same_v<std::remove_cv_t<T>,\
+    \ char>> {};\n\ntemplate <class T>\nstruct is_string_like\n    : std::bool_constant<\n\
+    \          std::is_same_v<std::decay_t<T>, std::string>\n          || std::is_same_v<std::decay_t<T>,\
+    \ const char*>\n          || std::is_same_v<std::decay_t<T>, char*>\n        \
+    \  || is_char_array<std::remove_reference_t<T>>::value\n      > {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_string_like_v = is_string_like<T>::value;\n\
+    \n// ModInt-like type: x.val() is printable, and x can be assigned from long long.\n\
+    template <class T, class = void>\nstruct has_val_method : std::false_type {};\n\
+    \ntemplate <class T>\nstruct has_val_method<T, std::void_t<decltype(std::declval<const\
+    \ T&>().val())>>\n    : std::true_type {};\n\ntemplate <class T>\ninline constexpr\
+    \ bool has_val_method_v = has_val_method<T>::value;\n\ntemplate <class T, class\
+    \ = void>\nstruct has_static_mod_raw : std::false_type {};\n\ntemplate <class\
+    \ T>\nstruct has_static_mod_raw<\n    T, std::void_t<decltype(T::mod()), decltype(T::raw(std::declval<uint32_t>()))>>\n\
+    \    : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool has_static_mod_raw_v\
+    \ = has_static_mod_raw<T>::value;\n\n// libstdc++ before GCC 16 does not classify\
+    \ __int128 as an integral type in\n// strict ISO modes such as -std=c++23. Keep\
+    \ the fast-I/O interface independent\n// of that implementation detail.\ntemplate\
+    \ <class T>\ninline constexpr bool is_integral_v =\n    std::is_integral_v<T>\n\
+    \    || std::is_same_v<std::remove_cv_t<T>, __int128_t>\n    || std::is_same_v<std::remove_cv_t<T>,\
+    \ __uint128_t>;\n\ntemplate <class T>\ninline constexpr bool is_signed_v =\n \
+    \   std::is_signed_v<T>\n    || std::is_same_v<std::remove_cv_t<T>, __int128_t>;\n\
+    \ntemplate <class T>\nstruct make_unsigned {\n    using type = std::make_unsigned_t<T>;\n\
+    };\n\ntemplate <>\nstruct make_unsigned<__int128_t> {\n    using type = __uint128_t;\n\
+    };\n\ntemplate <>\nstruct make_unsigned<__uint128_t> {\n    using type = __uint128_t;\n\
+    };\n\ntemplate <class T>\nusing make_unsigned_t = typename make_unsigned<std::remove_cv_t<T>>::type;\n\
+    \n}  // namespace internal\n\nstruct FastInput {\n    static constexpr int buffer_size\
+    \ = 1 << 20;\n\n   private:\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
+    \    int _position;\n    int _length;\n    int _file_descriptor;\n    bool _streaming;\n\
+    \n    bool refill() {\n        _position = 0;\n        if (_streaming) {\n   \
+    \         ssize_t length;\n            do {\n                length = ::read(_file_descriptor,\
+    \ _buffer, buffer_size);\n            } while (length < 0 && errno == EINTR);\n\
+    \            if (length <= 0) {\n                _length = 0;\n              \
+    \  return false;\n            }\n            _length = int(length);\n        }\
+    \ else {\n            _length = int(std::fread(_buffer, 1, buffer_size, _stream));\n\
+    \        }\n        return _length != 0;\n    }\n\n    template <class T>\n  \
+    \  bool read_integer_from_stream(T& value) {\n        if (!skip_spaces()) return\
+    \ false;\n        int c = read_char_raw();\n\n        bool negative = false;\n\
+    \        if (c == '-') {\n            negative = true;\n            c = read_char_raw();\n\
+    \        }\n\n        if constexpr (internal::is_signed_v<T>) {\n            T\
+    \ result = 0;\n            while ('0' <= c && c <= '9') {\n                result\
+    \ = negative ? result * 10 - (c - '0')\n                                  : result\
+    \ * 10 + (c - '0');\n                c = read_char_raw();\n            }\n   \
+    \         value = result;\n        } else {\n            T result = 0;\n     \
+    \       while ('0' <= c && c <= '9') {\n                result = result * 10 +\
+    \ T(c - '0');\n                c = read_char_raw();\n            }\n         \
+    \   value = negative ? T(0) - result : result;\n        }\n        return true;\n\
+    \    }\n\n    bool prepare_number() {\n        if (_length - _position >= 64)\
+    \ return true;\n        const int remaining = _length - _position;\n        if\
+    \ (remaining > 0) std::memmove(_buffer, _buffer + _position, remaining);\n   \
+    \     const int added = int(std::fread(_buffer + remaining, 1, buffer_size - remaining,\
+    \ _stream));\n        _position = 0;\n        _length = remaining + added;\n \
+    \       if (_length < buffer_size) _buffer[_length] = '\\0';\n        return _length\
+    \ != 0;\n    }\n\n   public:\n    explicit FastInput(std::FILE* stream = stdin)\n\
+    \        : _stream(stream),\n          _position(0),\n          _length(0),\n\
+    \          _file_descriptor(::fileno(stream)),\n          _streaming([&] {\n \
+    \             struct stat status;\n              return _file_descriptor >= 0\n\
+    \                     && ::fstat(_file_descriptor, &status) == 0\n           \
+    \          && !S_ISREG(status.st_mode);\n          }()) {}\n\n    FastInput(const\
+    \ FastInput&) = delete;\n    FastInput& operator=(const FastInput&) = delete;\n\
+    \n    int read_char_raw() {\n        if (_position == _length && !refill()) return\
+    \ EOF;\n        return _buffer[_position++];\n    }\n\n    bool skip_spaces()\
+    \ {\n        int c = read_char_raw();\n        while (c != EOF && c <= ' ') c\
+    \ = read_char_raw();\n        if (c == EOF) return false;\n        --_position;\n\
+    \        return true;\n    }\n\n    bool read(char& value) {\n        if (!skip_spaces())\
+    \ return false;\n        value = char(read_char_raw());\n        return true;\n\
+    \    }\n\n    bool read(std::string& value) {\n        if (!skip_spaces()) return\
+    \ false;\n        value.clear();\n        while (true) {\n            const int\
+    \ begin = _position;\n            while (_position < _length &&\n            \
+    \       static_cast<unsigned char>(_buffer[_position]) > ' ') {\n            \
+    \    ++_position;\n            }\n            value.append(_buffer + begin, _position\
+    \ - begin);\n            if (_position < _length) {\n                ++_position;\n\
+    \                return true;\n            }\n            if (!refill()) return\
+    \ true;\n        }\n    }\n\n    bool read(bool& value) {\n        int x;\n  \
+    \      if (!read(x)) return false;\n        value = x != 0;\n        return true;\n\
+    \    }\n\n    template <class T>\n    std::enable_if_t<\n        internal::is_integral_v<T>\n\
+    \            && !std::is_same_v<std::remove_cv_t<T>, bool>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ char>,\n        bool\n    >\n    read(T& value) {\n        if (_streaming) return\
+    \ read_integer_from_stream(value);\n        if (!prepare_number()) return false;\n\
+    \        int c = static_cast<unsigned char>(_buffer[_position++]);\n        while\
+    \ (c <= ' ') c = static_cast<unsigned char>(_buffer[_position++]);\n\n       \
+    \ bool negative = false;\n        if (c == '-') {\n            negative = true;\n\
+    \            c = static_cast<unsigned char>(_buffer[_position++]);\n        }\n\
+    \n        if constexpr (internal::is_signed_v<T>) {\n            T result = 0;\n\
+    \            while ('0' <= c && c <= '9') {\n                const int first =\
+    \ c - '0';\n                const int second = static_cast<unsigned char>(_buffer[_position])\
+    \ - '0';\n                if (0 <= second && second <= 9) {\n                \
+    \    result = negative ? result * 100 - (first * 10 + second)\n              \
+    \                        : result * 100 + (first * 10 + second);\n           \
+    \         ++_position;\n                } else {\n                    result =\
+    \ negative ? result * 10 - first : result * 10 + first;\n                }\n \
+    \               c = static_cast<unsigned char>(_buffer[_position++]);\n      \
+    \      }\n            value = result;\n        } else {\n            T result\
+    \ = 0;\n            while ('0' <= c && c <= '9') {\n                const unsigned\
+    \ first = unsigned(c - '0');\n                const int second = static_cast<unsigned\
+    \ char>(_buffer[_position]) - '0';\n                if (0 <= second && second\
+    \ <= 9) {\n                    result = result * 100 + T(first * 10 + unsigned(second));\n\
+    \                    ++_position;\n                } else {\n                \
+    \    result = result * 10 + T(first);\n                }\n                c =\
+    \ static_cast<unsigned char>(_buffer[_position++]);\n            }\n         \
+    \   value = negative ? T(0) - result : result;\n        }\n        if (_position\
+    \ > _length) _position = _length;\n        return true;\n    }\n\n    template\
+    \ <class T>\n    std::enable_if_t<std::is_floating_point_v<T>, bool>\n    read(T&\
+    \ value) {\n        if (!skip_spaces()) return false;\n        int c = read_char_raw();\n\
+    \        bool negative = false;\n        if (c == '-' || c == '+') {\n       \
+    \     negative = c == '-';\n            c = read_char_raw();\n        }\n\n  \
+    \      long double result = 0;\n        while ('0' <= c && c <= '9') {\n     \
+    \       result = result * 10 + (c - '0');\n            c = read_char_raw();\n\
+    \        }\n        if (c == '.') {\n            long double place = 0.1L;\n \
+    \           c = read_char_raw();\n            while ('0' <= c && c <= '9') {\n\
+    \                result += (c - '0') * place;\n                place *= 0.1L;\n\
+    \                c = read_char_raw();\n            }\n        }\n        if (c\
+    \ == 'e' || c == 'E') {\n            c = read_char_raw();\n            bool exponent_negative\
+    \ = false;\n            if (c == '-' || c == '+') {\n                exponent_negative\
+    \ = c == '-';\n                c = read_char_raw();\n            }\n         \
+    \   int exponent = 0;\n            while ('0' <= c && c <= '9') {\n          \
+    \      exponent = exponent * 10 + (c - '0');\n                c = read_char_raw();\n\
+    \            }\n            long double scale = 1;\n            long double power\
+    \ = 10;\n            while (exponent > 0) {\n                if (exponent & 1)\
+    \ scale *= power;\n                power *= power;\n                exponent >>=\
+    \ 1;\n            }\n            result = exponent_negative ? result / scale :\
+    \ result * scale;\n        }\n        value = static_cast<T>(negative ? -result\
+    \ : result);\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
+    \        internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
+    \            && !internal::is_range_v<T>,\n        bool\n    >\n    read(T& value)\
+    \ {\n        long long x;\n        if (!read(x)) return false;\n        if constexpr\
+    \ (internal::has_static_mod_raw_v<T>) {\n            if (x >= 0 && uint64_t(x)\
+    \ < uint64_t(T::mod())) {\n                value = T::raw(uint32_t(x));\n    \
+    \        } else {\n                value = T(x);\n            }\n        } else\
+    \ {\n            value = T(x);\n        }\n        return true;\n    }\n\n   \
+    \ template <class First, class Second>\n    bool read(std::pair<First, Second>&\
+    \ value) {\n        if (!read(value.first)) return false;\n        return read(value.second);\n\
+    \    }\n\n    template <class Range>\n    std::enable_if_t<\n        internal::is_range_v<Range>\n\
+    \            && !internal::is_string_like_v<Range>,\n        bool\n    >\n   \
+    \ read(Range& range) {\n        using StoredValue = internal::range_stored_value_t<Range>;\n\
+    \        constexpr bool nested = internal::is_range_v<StoredValue>\n         \
+    \                       && !internal::is_string_like_v<StoredValue>;\n\n     \
+    \   for (auto&& value : range) {\n            if constexpr (std::is_same_v<StoredValue,\
+    \ bool> && !nested) {\n                bool x;\n                if (!read(x))\
+    \ return false;\n                value = x;\n            } else {\n          \
+    \      if (!read(value)) return false;\n            }\n        }\n        return\
+    \ true;\n    }\n\n    template <class First, class Second, class... Rest>\n  \
+    \  bool read(First& first, Second& second, Rest&... rest) {\n        if (!read(first))\
+    \ return false;\n        return read(second, rest...);\n    }\n\n    template\
+    \ <class T>\n    FastInput& operator>>(T& value) {\n        if (!read(value))\
+    \ std::abort();\n        return *this;\n    }\n};\n\nstruct FastOutput {\n   \
+    \ static constexpr int buffer_size = 1 << 20;\n\n   private:\n    inline static\
+    \ const auto digit_quads = [] {\n        std::array<char, 40000> result{};\n \
+    \       for (int i = 0; i < 10000; i++) {\n            int value = i;\n      \
+    \      for (int j = 3; j >= 0; j--) {\n                result[4 * i + j] = char('0'\
+    \ + value % 10);\n                value /= 10;\n            }\n        }\n   \
+    \     return result;\n    }();\n\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
+    \    int _position;\n    int _precision;\n    std::chars_format _float_format;\n\
+    \    char _range_separator;\n\n   public:\n    explicit FastOutput(std::FILE*\
+    \ stream = stdout)\n        : _stream(stream),\n          _position(0),\n    \
+    \      _precision(6),\n          _float_format(std::chars_format::general),\n\
+    \          _range_separator(' ') {}\n\n    FastOutput(const FastOutput&) = delete;\n\
+    \    FastOutput& operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n\
+    \        flush();\n    }\n\n    void flush() {\n        if (_position != 0) {\n\
+    \            std::fwrite(_buffer, 1, _position, _stream);\n            _position\
+    \ = 0;\n        }\n        std::fflush(_stream);\n    }\n\n    void write_char(char\
+    \ c) {\n        if (_position == buffer_size) flush();\n        _buffer[_position++]\
+    \ = c;\n    }\n\n    void write(const char* s) {\n        while (*s != '\\0')\
+    \ write_char(*s++);\n    }\n\n    void write(const std::string& s) {\n       \
+    \ std::size_t position = 0;\n        while (position < s.size()) {\n         \
+    \   if (_position == buffer_size) flush();\n            const std::size_t copied\
+    \ =\n                std::min<std::size_t>(buffer_size - _position, s.size() -\
+    \ position);\n            std::memcpy(_buffer + _position, s.data() + position,\
+    \ copied);\n            _position += int(copied);\n            position += copied;\n\
+    \        }\n    }\n\n    void write(char c) {\n        write_char(c);\n    }\n\
+    \n    void write(bool value) {\n        write_char(value ? '1' : '0');\n    }\n\
+    \n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>>\n\
+    \    write(T value) {\n        char digits[128];\n        auto [end, error] =\
+    \ std::to_chars(\n            digits,\n            digits + sizeof(digits),\n\
+    \            value,\n            _float_format,\n            _precision\n    \
+    \    );\n        if (error != std::errc()) std::abort();\n        for (const char*\
+    \ pointer = digits; pointer != end; pointer++) {\n            write_char(*pointer);\n\
+    \        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n        internal::is_integral_v<T>\n\
+    \            && !std::is_same_v<std::remove_cv_t<T>, bool>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ char>\n    >\n    write(T value) {\n        using Raw = std::remove_cv_t<T>;\n\
+    \        using Unsigned = internal::make_unsigned_t<Raw>;\n\n        Unsigned\
+    \ magnitude;\n        if constexpr (internal::is_signed_v<Raw>) {\n          \
+    \  if (value < 0) {\n                write_char('-');\n                magnitude\
+    \ = Unsigned(0) - Unsigned(value);\n            } else {\n                magnitude\
+    \ = Unsigned(value);\n            }\n        } else {\n            magnitude =\
+    \ value;\n        }\n\n        if (magnitude == 0) {\n            write_char('0');\n\
+    \            return;\n        }\n\n        unsigned chunks[16];\n        int count\
+    \ = 0;\n        while (magnitude >= 10000) {\n            const Unsigned quotient\
+    \ = magnitude / 10000;\n            chunks[count++] = unsigned(magnitude - quotient\
+    \ * 10000);\n            magnitude = quotient;\n        }\n        if (_position\
+    \ > buffer_size - 64) flush();\n        const unsigned leading = unsigned(magnitude);\n\
+    \        const char* first = digit_quads.data() + 4 * leading;\n        int skip\
+    \ = leading < 10 ? 3 : leading < 100 ? 2 : leading < 1000 ? 1 : 0;\n        for\
+    \ (; skip < 4; skip++) _buffer[_position++] = first[skip];\n        while (count--)\
+    \ {\n            const char* digits = digit_quads.data() + 4 * chunks[count];\n\
+    \            std::memcpy(_buffer + _position, digits, 4);\n            _position\
+    \ += 4;\n        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n \
+    \       internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
+    \            && !internal::is_range_v<T>\n    >\n    write(const T& value) {\n\
+    \        write(value.val());\n    }\n\n    template <class First, class Second>\n\
+    \    void write(const std::pair<First, Second>& value) {\n        write(value.first);\n\
+    \        write_char(' ');\n        write(value.second);\n    }\n\n    template\
+    \ <class Range>\n    std::enable_if_t<\n        internal::is_range_v<Range>\n\
+    \            && !internal::is_string_like_v<Range>\n    >\n    write(const Range&\
+    \ range) {\n        using StoredValue = internal::range_stored_value_t<const Range>;\n\
+    \        constexpr bool nested = internal::is_range_v<StoredValue>\n         \
+    \                       && !internal::is_string_like_v<StoredValue>;\n\n     \
+    \   bool first = true;\n        for (const auto& value : range) {\n          \
+    \  if (!first) write_char(nested ? '\\n' : _range_separator);\n            first\
+    \ = false;\n            if constexpr (std::is_same_v<StoredValue, bool> && !nested)\
+    \ {\n                write(static_cast<bool>(value));\n            } else {\n\
+    \                write(value);\n            }\n        }\n    }\n\n    template\
+    \ <class First, class... Rest>\n    void print(const First& first, const Rest&...\
+    \ rest) {\n        write(first);\n        ((write_char(' '), write(rest)), ...);\n\
+    \    }\n\n    void println() {\n        write_char('\\n');\n    }\n\n    void\
+    \ set_precision(int precision) {\n        _precision = precision;\n    }\n\n \
+    \   void set_fixed(int precision = 6) {\n        _float_format = std::chars_format::fixed;\n\
+    \        _precision = precision;\n    }\n\n    void set_general(int precision\
+    \ = 6) {\n        _float_format = std::chars_format::general;\n        _precision\
+    \ = precision;\n    }\n\n    void set_range_separator(char separator) {\n    \
+    \    _range_separator = separator;\n    }\n\n    template <class... Args>\n  \
+    \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
+    n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
+    \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
+    \ utilities\n}  // namespace m1une\n\n\n#line 18 \"verify/ds/segtree/persistent_segtree_beats.test.cpp\"\
+    \n\nnamespace {\n\nstruct ChminRangeSum {\n    struct value_type {\n        long\
+    \ long sum;\n        long long maximum;\n        long long second_maximum;\n \
+    \       int maximum_count;\n        int length;\n    };\n\n    using operator_type\
+    \ = long long;\n\n    static constexpr long long negative_infinity =\n       \
+    \ std::numeric_limits<long long>::lowest();\n    static constexpr long long positive_infinity\
+    \ =\n        std::numeric_limits<long long>::max();\n\n    static value_type id()\
+    \ {\n        return {0, negative_infinity, negative_infinity, 0, 0};\n    }\n\n\
+    \    static value_type op(const value_type& left, const value_type& right) {\n\
+    \        value_type result;\n        result.sum = left.sum + right.sum;\n    \
+    \    result.length = left.length + right.length;\n        if (left.maximum ==\
+    \ right.maximum) {\n            result.maximum = left.maximum;\n            result.second_maximum\
+    \ = std::max(\n                left.second_maximum,\n                right.second_maximum\n\
+    \            );\n            result.maximum_count =\n                left.maximum_count\
+    \ + right.maximum_count;\n        } else if (left.maximum < right.maximum) {\n\
+    \            result.maximum = right.maximum;\n            result.second_maximum\
+    \ = std::max(\n                left.maximum,\n                right.second_maximum\n\
+    \            );\n            result.maximum_count = right.maximum_count;\n   \
+    \     } else {\n            result.maximum = left.maximum;\n            result.second_maximum\
+    \ = std::max(\n                left.second_maximum,\n                right.maximum\n\
+    \            );\n            result.maximum_count = left.maximum_count;\n    \
+    \    }\n        return result;\n    }\n\n    static operator_type op_id() {\n\
+    \        return positive_infinity;\n    }\n\n    static operator_type op_comp(operator_type\
+    \ f, operator_type g) {\n        return std::min(f, g);\n    }\n\n    static bool\
+    \ can_apply(operator_type f, const value_type& value) {\n        return value.maximum\
+    \ <= f || value.second_maximum < f;\n    }\n\n    static value_type mapping(operator_type\
+    \ f, value_type value) {\n        if (value.maximum <= f) return value;\n    \
+    \    assert(value.second_maximum < f);\n        value.sum +=\n            (f -\
+    \ value.maximum) * static_cast<long long>(\n                value.maximum_count\n\
+    \            );\n        value.maximum = f;\n        return value;\n    }\n\n\
+    \    static value_type make(long long value) {\n        return {value, value,\
+    \ negative_infinity, 1, 1};\n    }\n};\n\nstruct RangeApAddRangeSumBeats\n   \
+    \ : m1une::acted_monoid::RangeApAddRangeSum<long long> {\n    static bool can_apply(\n\
+    \        const operator_type&,\n        const value_type&\n    ) {\n        return\
+    \ true;\n    }\n};\n\nvoid check_version(\n    const m1une::ds::PersistentSegtreeBeats<ChminRangeSum>&\
+    \ seg,\n    const std::vector<long long>& expected\n) {\n    assert(seg.size()\
+    \ == int(expected.size()));\n    assert(seg.empty() == expected.empty());\n  \
+    \  assert(\n        seg.all_prod().sum\n        == std::accumulate(expected.begin(),\
+    \ expected.end(), 0LL)\n    );\n\n    std::vector<ChminRangeSum::value_type> materialized\
+    \ =\n        seg.to_vector();\n    assert(materialized.size() == expected.size());\n\
+    \    for (int index = 0; index < int(expected.size()); ++index) {\n        assert(materialized[index].sum\
+    \ == expected[index]);\n        assert(seg.get(index).sum == expected[index]);\n\
+    \        assert(seg[index].sum == expected[index]);\n    }\n\n    int slice_left\
+    \ = int(expected.size()) / 4;\n    int slice_right = int(expected.size()) * 3\
+    \ / 4;\n    std::vector<ChminRangeSum::value_type> slice =\n        seg.to_vector(slice_left,\
+    \ slice_right);\n    assert(int(slice.size()) == slice_right - slice_left);\n\
+    \    for (int index = slice_left; index < slice_right; ++index) {\n        assert(slice[index\
+    \ - slice_left].sum == expected[index]);\n    }\n\n    for (int left = 0; left\
+    \ <= int(expected.size()); ++left) {\n        long long sum = 0;\n        for\
+    \ (int right = left; right <= int(expected.size()); ++right) {\n            assert(seg.prod(left,\
+    \ right).sum == sum);\n            if (right < int(expected.size())) sum += expected[right];\n\
+    \        }\n    }\n\n    if (!expected.empty()) {\n        int left = int(expected.size())\
+    \ / 3;\n        long long limit = 0;\n        int expected_right = left;\n   \
+    \     while (\n            expected_right < int(expected.size()) &&\n        \
+    \    limit + expected[expected_right] <= 60\n        ) {\n            limit +=\
+    \ expected[expected_right++];\n        }\n        assert(seg.max_right(\n    \
+    \        left,\n            [](const ChminRangeSum::value_type& value) {\n   \
+    \             return value.sum <= 60;\n            }\n        ) == expected_right);\n\
+    \n        int right = int(expected.size()) * 2 / 3 + 1;\n        right = std::min(right,\
+    \ int(expected.size()));\n        limit = 0;\n        int expected_left = right;\n\
+    \        while (\n            expected_left > 0 &&\n            limit + expected[expected_left\
+    \ - 1] <= 60\n        ) {\n            limit += expected[--expected_left];\n \
+    \       }\n        assert(seg.min_left(\n            right,\n            [](const\
+    \ ChminRangeSum::value_type& value) {\n                return value.sum <= 60;\n\
+    \            }\n        ) == expected_left);\n    }\n}\n\nvoid test_randomized_persistence()\
+    \ {\n    using Seg = m1une::ds::PersistentSegtreeBeats<ChminRangeSum>;\n\n   \
+    \ Seg empty;\n    assert(empty.empty());\n    assert(empty.size() == 0);\n   \
+    \ assert(empty.all_prod().sum == 0);\n    assert(empty.prod(0, 0).sum == 0);\n\
+    \    assert(empty.to_vector().empty());\n    assert(empty.max_right(0, [](const\
+    \ ChminRangeSum::value_type&) {\n        return true;\n    }) == 0);\n    assert(empty.min_left(0,\
+    \ [](const ChminRangeSum::value_type&) {\n        return true;\n    }) == 0);\n\
+    \n    std::uint64_t state = 0x6a09e667f3bcc909ULL;\n    auto random = [&state]()\
+    \ {\n        state ^= state << 7;\n        state ^= state >> 9;\n        return\
+    \ state;\n    };\n\n    for (int trial = 0; trial < 80; ++trial) {\n        int\
+    \ size = int(random() % 20) + 1;\n        std::vector<long long> initial(size);\n\
+    \        for (long long& value : initial) {\n            value = static_cast<long\
+    \ long>(random() % 51);\n        }\n\n        std::vector<std::optional<Seg>>\
+    \ versions;\n        std::vector<std::vector<long long>> naive_versions;\n   \
+    \     versions.emplace_back(std::in_place, initial);\n        naive_versions.push_back(initial);\n\
+    \n        for (int operation = 0; operation < 240; ++operation) {\n          \
+    \  int base = int(random() % versions.size());\n            int left = int(random()\
+    \ % (size + 1));\n            int right = int(random() % (size + 1));\n      \
+    \      if (right < left) std::swap(left, right);\n            int type = int(random()\
+    \ % 5);\n\n            std::vector<long long> next = naive_versions[base];\n \
+    \           if (type <= 1) {\n                long long upper = static_cast<long\
+    \ long>(random() % 51);\n                versions.push_back(\n               \
+    \     versions[base]->apply(left, right, upper)\n                );\n        \
+    \        for (int index = left; index < right; ++index) {\n                  \
+    \  next[index] = std::min(next[index], upper);\n                }\n          \
+    \      naive_versions.push_back(std::move(next));\n            } else if (type\
+    \ == 2) {\n                int index = int(random() % size);\n               \
+    \ long long value = static_cast<long long>(random() % 51);\n                versions.push_back(versions[base]->set(\n\
+    \                    index,\n                    ChminRangeSum::make(value)\n\
+    \                ));\n                next[index] = value;\n                naive_versions.push_back(std::move(next));\n\
+    \            } else if (type == 3) {\n                int source = int(random()\
+    \ % versions.size());\n                versions.push_back(versions[base]->copy_range_from(\n\
+    \                    *versions[source],\n                    left,\n         \
+    \           right\n                ));\n                std::copy(\n         \
+    \           naive_versions[source].begin() + left,\n                    naive_versions[source].begin()\
+    \ + right,\n                    next.begin() + left\n                );\n    \
+    \            naive_versions.push_back(std::move(next));\n            } else {\n\
+    \                long long expected = std::accumulate(\n                    next.begin()\
+    \ + left,\n                    next.begin() + right,\n                    0LL\n\
+    \                );\n                assert(versions[base]->prod(left, right).sum\
+    \ == expected);\n            }\n\n            int checked = int(random() % versions.size());\n\
+    \            check_version(*versions[checked], naive_versions[checked]);\n   \
+    \     }\n        check_version(*versions[0], initial);\n\n        Seg base(initial);\n\
+    \        std::size_t before = base.node_count();\n        {\n            Seg disposable\
+    \ = base.apply(0, size, 17);\n            assert(base.node_count() >= before);\n\
+    \            check_version(base, initial);\n        }\n        assert(base.node_count()\
+    \ == before);\n\n        Seg released = base;\n        released.release();\n \
+    \       assert(released.empty());\n        assert(base.node_count() == before);\n\
+    \        check_version(base, initial);\n    }\n}\n\nvoid test_index_aware_action()\
+    \ {\n    using Seg =\n        m1une::ds::PersistentSegtreeBeats<RangeApAddRangeSumBeats>;\n\
+    \    Seg original(std::vector<long long>{1, 2, 3, 4, 5});\n    Seg updated = original.apply(1,\
+    \ 5, std::pair<long long, long long>(2, 3));\n    std::vector<long long> expected{1,\
+    \ 5, 8, 11, 14};\n    assert(original.all_prod().sum == 15);\n    assert(updated.all_prod().sum\
+    \ == 39);\n    for (int index = 0; index < 5; ++index) {\n        assert(updated[index].sum\
+    \ == expected[index]);\n    }\n}\n\n}  // namespace\n\nusing mint = m1une::math::modint998244353;\n\
+    \nstruct RangeAffineRangeSumBeats\n    : m1une::acted_monoid::RangeAffineRangeSum<mint>\
+    \ {\n    static bool can_apply(\n        const operator_type&,\n        const\
+    \ value_type&\n    ) {\n        return true;\n    }\n};\n\nint main() {\n    test_randomized_persistence();\n\
+    \    test_index_aware_action();\n\n    m1une::utilities::FastInput fast_input;\n\
+    \    m1une::utilities::FastOutput fast_output;\n\n    int size, query_count;\n\
+    \    fast_input >> size >> query_count;\n    std::vector<mint> initial(size);\n\
+    \    for (mint& value : initial) fast_input >> value;\n\n    using Seg =\n   \
+    \     m1une::ds::PersistentSegtreeBeats<RangeAffineRangeSumBeats>;\n    std::vector<std::optional<Seg>>\
+    \ versions(query_count + 1);\n    versions[0].emplace(initial);\n    for (int\
+    \ query = 0; query < query_count; ++query) {\n        int type, version, left,\
+    \ right;\n        fast_input >> type >> version;\n        ++version;\n       \
+    \ if (type == 0) {\n            mint multiplier, addition;\n            fast_input\
+    \ >> left >> right >> multiplier >> addition;\n            versions[query + 1]\
+    \ = versions[version]->apply(\n                left,\n                right,\n\
+    \                std::pair<mint, mint>(multiplier, addition)\n            );\n\
+    \        } else if (type == 1) {\n            int source;\n            fast_input\
+    \ >> source >> left >> right;\n            ++source;\n            versions[query\
+    \ + 1] = versions[version]->copy_range_from(\n                *versions[source],\n\
+    \                left,\n                right\n            );\n        } else\
+    \ {\n            fast_input >> left >> right;\n            fast_output << versions[version]->prod(left,\
+    \ right).sum << '\\n';\n        }\n    }\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/persistent_range_affine_range_sum\"\
+    \n\n#include \"../../../ds/segtree/persistent_segtree_beats.hpp\"\n\n#include\
+    \ <algorithm>\n#include <cassert>\n#include <cstdint>\n#include <limits>\n#include\
+    \ <numeric>\n#include <optional>\n#include <utility>\n#include <vector>\n\n#include\
+    \ \"../../../acted_monoid/range_affine_range_sum.hpp\"\n#include \"../../../acted_monoid/range_ap_add_range_sum.hpp\"\
+    \n#include \"../../../math/modint.hpp\"\n#include \"../../../utilities/fast_io.hpp\"\
+    \n\nnamespace {\n\nstruct ChminRangeSum {\n    struct value_type {\n        long\
+    \ long sum;\n        long long maximum;\n        long long second_maximum;\n \
+    \       int maximum_count;\n        int length;\n    };\n\n    using operator_type\
+    \ = long long;\n\n    static constexpr long long negative_infinity =\n       \
+    \ std::numeric_limits<long long>::lowest();\n    static constexpr long long positive_infinity\
+    \ =\n        std::numeric_limits<long long>::max();\n\n    static value_type id()\
+    \ {\n        return {0, negative_infinity, negative_infinity, 0, 0};\n    }\n\n\
+    \    static value_type op(const value_type& left, const value_type& right) {\n\
+    \        value_type result;\n        result.sum = left.sum + right.sum;\n    \
+    \    result.length = left.length + right.length;\n        if (left.maximum ==\
+    \ right.maximum) {\n            result.maximum = left.maximum;\n            result.second_maximum\
+    \ = std::max(\n                left.second_maximum,\n                right.second_maximum\n\
+    \            );\n            result.maximum_count =\n                left.maximum_count\
+    \ + right.maximum_count;\n        } else if (left.maximum < right.maximum) {\n\
+    \            result.maximum = right.maximum;\n            result.second_maximum\
+    \ = std::max(\n                left.maximum,\n                right.second_maximum\n\
+    \            );\n            result.maximum_count = right.maximum_count;\n   \
+    \     } else {\n            result.maximum = left.maximum;\n            result.second_maximum\
+    \ = std::max(\n                left.second_maximum,\n                right.maximum\n\
+    \            );\n            result.maximum_count = left.maximum_count;\n    \
+    \    }\n        return result;\n    }\n\n    static operator_type op_id() {\n\
+    \        return positive_infinity;\n    }\n\n    static operator_type op_comp(operator_type\
+    \ f, operator_type g) {\n        return std::min(f, g);\n    }\n\n    static bool\
+    \ can_apply(operator_type f, const value_type& value) {\n        return value.maximum\
+    \ <= f || value.second_maximum < f;\n    }\n\n    static value_type mapping(operator_type\
+    \ f, value_type value) {\n        if (value.maximum <= f) return value;\n    \
+    \    assert(value.second_maximum < f);\n        value.sum +=\n            (f -\
+    \ value.maximum) * static_cast<long long>(\n                value.maximum_count\n\
+    \            );\n        value.maximum = f;\n        return value;\n    }\n\n\
+    \    static value_type make(long long value) {\n        return {value, value,\
+    \ negative_infinity, 1, 1};\n    }\n};\n\nstruct RangeApAddRangeSumBeats\n   \
+    \ : m1une::acted_monoid::RangeApAddRangeSum<long long> {\n    static bool can_apply(\n\
+    \        const operator_type&,\n        const value_type&\n    ) {\n        return\
+    \ true;\n    }\n};\n\nvoid check_version(\n    const m1une::ds::PersistentSegtreeBeats<ChminRangeSum>&\
+    \ seg,\n    const std::vector<long long>& expected\n) {\n    assert(seg.size()\
+    \ == int(expected.size()));\n    assert(seg.empty() == expected.empty());\n  \
+    \  assert(\n        seg.all_prod().sum\n        == std::accumulate(expected.begin(),\
+    \ expected.end(), 0LL)\n    );\n\n    std::vector<ChminRangeSum::value_type> materialized\
+    \ =\n        seg.to_vector();\n    assert(materialized.size() == expected.size());\n\
+    \    for (int index = 0; index < int(expected.size()); ++index) {\n        assert(materialized[index].sum\
+    \ == expected[index]);\n        assert(seg.get(index).sum == expected[index]);\n\
+    \        assert(seg[index].sum == expected[index]);\n    }\n\n    int slice_left\
+    \ = int(expected.size()) / 4;\n    int slice_right = int(expected.size()) * 3\
+    \ / 4;\n    std::vector<ChminRangeSum::value_type> slice =\n        seg.to_vector(slice_left,\
+    \ slice_right);\n    assert(int(slice.size()) == slice_right - slice_left);\n\
+    \    for (int index = slice_left; index < slice_right; ++index) {\n        assert(slice[index\
+    \ - slice_left].sum == expected[index]);\n    }\n\n    for (int left = 0; left\
+    \ <= int(expected.size()); ++left) {\n        long long sum = 0;\n        for\
+    \ (int right = left; right <= int(expected.size()); ++right) {\n            assert(seg.prod(left,\
+    \ right).sum == sum);\n            if (right < int(expected.size())) sum += expected[right];\n\
+    \        }\n    }\n\n    if (!expected.empty()) {\n        int left = int(expected.size())\
+    \ / 3;\n        long long limit = 0;\n        int expected_right = left;\n   \
+    \     while (\n            expected_right < int(expected.size()) &&\n        \
+    \    limit + expected[expected_right] <= 60\n        ) {\n            limit +=\
+    \ expected[expected_right++];\n        }\n        assert(seg.max_right(\n    \
+    \        left,\n            [](const ChminRangeSum::value_type& value) {\n   \
+    \             return value.sum <= 60;\n            }\n        ) == expected_right);\n\
+    \n        int right = int(expected.size()) * 2 / 3 + 1;\n        right = std::min(right,\
+    \ int(expected.size()));\n        limit = 0;\n        int expected_left = right;\n\
+    \        while (\n            expected_left > 0 &&\n            limit + expected[expected_left\
+    \ - 1] <= 60\n        ) {\n            limit += expected[--expected_left];\n \
+    \       }\n        assert(seg.min_left(\n            right,\n            [](const\
+    \ ChminRangeSum::value_type& value) {\n                return value.sum <= 60;\n\
+    \            }\n        ) == expected_left);\n    }\n}\n\nvoid test_randomized_persistence()\
+    \ {\n    using Seg = m1une::ds::PersistentSegtreeBeats<ChminRangeSum>;\n\n   \
+    \ Seg empty;\n    assert(empty.empty());\n    assert(empty.size() == 0);\n   \
+    \ assert(empty.all_prod().sum == 0);\n    assert(empty.prod(0, 0).sum == 0);\n\
+    \    assert(empty.to_vector().empty());\n    assert(empty.max_right(0, [](const\
+    \ ChminRangeSum::value_type&) {\n        return true;\n    }) == 0);\n    assert(empty.min_left(0,\
+    \ [](const ChminRangeSum::value_type&) {\n        return true;\n    }) == 0);\n\
+    \n    std::uint64_t state = 0x6a09e667f3bcc909ULL;\n    auto random = [&state]()\
+    \ {\n        state ^= state << 7;\n        state ^= state >> 9;\n        return\
+    \ state;\n    };\n\n    for (int trial = 0; trial < 80; ++trial) {\n        int\
+    \ size = int(random() % 20) + 1;\n        std::vector<long long> initial(size);\n\
+    \        for (long long& value : initial) {\n            value = static_cast<long\
+    \ long>(random() % 51);\n        }\n\n        std::vector<std::optional<Seg>>\
+    \ versions;\n        std::vector<std::vector<long long>> naive_versions;\n   \
+    \     versions.emplace_back(std::in_place, initial);\n        naive_versions.push_back(initial);\n\
+    \n        for (int operation = 0; operation < 240; ++operation) {\n          \
+    \  int base = int(random() % versions.size());\n            int left = int(random()\
+    \ % (size + 1));\n            int right = int(random() % (size + 1));\n      \
+    \      if (right < left) std::swap(left, right);\n            int type = int(random()\
+    \ % 5);\n\n            std::vector<long long> next = naive_versions[base];\n \
+    \           if (type <= 1) {\n                long long upper = static_cast<long\
+    \ long>(random() % 51);\n                versions.push_back(\n               \
+    \     versions[base]->apply(left, right, upper)\n                );\n        \
+    \        for (int index = left; index < right; ++index) {\n                  \
+    \  next[index] = std::min(next[index], upper);\n                }\n          \
+    \      naive_versions.push_back(std::move(next));\n            } else if (type\
+    \ == 2) {\n                int index = int(random() % size);\n               \
+    \ long long value = static_cast<long long>(random() % 51);\n                versions.push_back(versions[base]->set(\n\
+    \                    index,\n                    ChminRangeSum::make(value)\n\
+    \                ));\n                next[index] = value;\n                naive_versions.push_back(std::move(next));\n\
+    \            } else if (type == 3) {\n                int source = int(random()\
+    \ % versions.size());\n                versions.push_back(versions[base]->copy_range_from(\n\
+    \                    *versions[source],\n                    left,\n         \
+    \           right\n                ));\n                std::copy(\n         \
+    \           naive_versions[source].begin() + left,\n                    naive_versions[source].begin()\
+    \ + right,\n                    next.begin() + left\n                );\n    \
+    \            naive_versions.push_back(std::move(next));\n            } else {\n\
+    \                long long expected = std::accumulate(\n                    next.begin()\
+    \ + left,\n                    next.begin() + right,\n                    0LL\n\
+    \                );\n                assert(versions[base]->prod(left, right).sum\
+    \ == expected);\n            }\n\n            int checked = int(random() % versions.size());\n\
+    \            check_version(*versions[checked], naive_versions[checked]);\n   \
+    \     }\n        check_version(*versions[0], initial);\n\n        Seg base(initial);\n\
+    \        std::size_t before = base.node_count();\n        {\n            Seg disposable\
+    \ = base.apply(0, size, 17);\n            assert(base.node_count() >= before);\n\
+    \            check_version(base, initial);\n        }\n        assert(base.node_count()\
+    \ == before);\n\n        Seg released = base;\n        released.release();\n \
+    \       assert(released.empty());\n        assert(base.node_count() == before);\n\
+    \        check_version(base, initial);\n    }\n}\n\nvoid test_index_aware_action()\
+    \ {\n    using Seg =\n        m1une::ds::PersistentSegtreeBeats<RangeApAddRangeSumBeats>;\n\
+    \    Seg original(std::vector<long long>{1, 2, 3, 4, 5});\n    Seg updated = original.apply(1,\
+    \ 5, std::pair<long long, long long>(2, 3));\n    std::vector<long long> expected{1,\
+    \ 5, 8, 11, 14};\n    assert(original.all_prod().sum == 15);\n    assert(updated.all_prod().sum\
+    \ == 39);\n    for (int index = 0; index < 5; ++index) {\n        assert(updated[index].sum\
+    \ == expected[index]);\n    }\n}\n\n}  // namespace\n\nusing mint = m1une::math::modint998244353;\n\
+    \nstruct RangeAffineRangeSumBeats\n    : m1une::acted_monoid::RangeAffineRangeSum<mint>\
+    \ {\n    static bool can_apply(\n        const operator_type&,\n        const\
+    \ value_type&\n    ) {\n        return true;\n    }\n};\n\nint main() {\n    test_randomized_persistence();\n\
+    \    test_index_aware_action();\n\n    m1une::utilities::FastInput fast_input;\n\
+    \    m1une::utilities::FastOutput fast_output;\n\n    int size, query_count;\n\
+    \    fast_input >> size >> query_count;\n    std::vector<mint> initial(size);\n\
+    \    for (mint& value : initial) fast_input >> value;\n\n    using Seg =\n   \
+    \     m1une::ds::PersistentSegtreeBeats<RangeAffineRangeSumBeats>;\n    std::vector<std::optional<Seg>>\
+    \ versions(query_count + 1);\n    versions[0].emplace(initial);\n    for (int\
+    \ query = 0; query < query_count; ++query) {\n        int type, version, left,\
+    \ right;\n        fast_input >> type >> version;\n        ++version;\n       \
+    \ if (type == 0) {\n            mint multiplier, addition;\n            fast_input\
+    \ >> left >> right >> multiplier >> addition;\n            versions[query + 1]\
+    \ = versions[version]->apply(\n                left,\n                right,\n\
+    \                std::pair<mint, mint>(multiplier, addition)\n            );\n\
+    \        } else if (type == 1) {\n            int source;\n            fast_input\
+    \ >> source >> left >> right;\n            ++source;\n            versions[query\
+    \ + 1] = versions[version]->copy_range_from(\n                *versions[source],\n\
+    \                left,\n                right\n            );\n        } else\
+    \ {\n            fast_input >> left >> right;\n            fast_output << versions[version]->prod(left,\
+    \ right).sum << '\\n';\n        }\n    }\n}\n"
+  dependsOn:
+  - ds/segtree/persistent_segtree_beats.hpp
+  - beats_acted_monoid/concept.hpp
+  - acted_monoid/concept.hpp
+  - ds/segtree/persistent_node_pool.hpp
+  - acted_monoid/range_affine_range_sum.hpp
+  - acted_monoid/range_ap_add_range_sum.hpp
+  - math/modint.hpp
+  - utilities/fast_io.hpp
+  isVerificationFile: true
+  path: verify/ds/segtree/persistent_segtree_beats.test.cpp
+  requiredBy: []
+  timestamp: '2026-08-12 01:20:42+09:00'
+  verificationStatus: TEST_ACCEPTED
+  verifiedWith: []
+documentation_of: verify/ds/segtree/persistent_segtree_beats.test.cpp
+layout: document
+redirect_from:
+- /verify/verify/ds/segtree/persistent_segtree_beats.test.cpp
+- /verify/verify/ds/segtree/persistent_segtree_beats.test.cpp.html
+title: verify/ds/segtree/persistent_segtree_beats.test.cpp
+---

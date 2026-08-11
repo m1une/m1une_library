@@ -64,6 +64,9 @@ data:
     path: verify/algo/sequence/subset_sum.test.cpp
     title: verify/algo/sequence/subset_sum.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
+    title: verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/convex/alien_trick.test.cpp
     title: verify/convex/alien_trick.test.cpp
   - icon: ':heavy_check_mark:'
@@ -321,6 +324,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/persistent_segtree.test.cpp
     title: verify/ds/segtree/persistent_segtree.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/segtree/persistent_segtree_beats.test.cpp
+    title: verify/ds/segtree/persistent_segtree_beats.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/range_add_range_min.test.cpp
     title: verify/ds/segtree/range_add_range_min.test.cpp
@@ -1712,6 +1718,7 @@ data:
   - verify/ds/segtree/persistent_dual_segtree.test.cpp
   - verify/ds/segtree/segtree.test.cpp
   - verify/ds/segtree/segtree_2d.test.cpp
+  - verify/ds/segtree/persistent_segtree_beats.test.cpp
   - verify/ds/segtree/dual_segtree_2d.test.cpp
   - verify/ds/segtree/persistent_dynamic_segtree.test.cpp
   - verify/ds/segtree/dual_segtree.test.cpp
@@ -1882,6 +1889,7 @@ data:
   - verify/math/two_square_sum.test.cpp
   - verify/math/enumerate_primes.test.cpp
   - verify/math/primality_test.test.cpp
+  - verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
   - verify/matroid/matroids.test.cpp
   - verify/matroid/matroid_intersection.test.cpp
   - verify/matroid/linear_matroid_intersection.test.cpp
