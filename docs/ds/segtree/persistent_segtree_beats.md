@@ -1,7 +1,8 @@
 ---
+
 title: Persistent Segment Tree Beats
 documentation_of: ../../../ds/segtree/persistent_segtree_beats.hpp
----
+------------------------------------------------------------------
 
 ## Overview
 
@@ -12,10 +13,46 @@ segments where the action can be evaluated directly. Every assignment, range
 action, and range copy returns a new version, leaving all input versions
 unchanged.
 
+**Full persistence does not in general preserve the usual amortized complexity
+guarantees of Segment Tree Beats.**
+
+A Beats analysis typically relies on an expensive update decreasing some
+potential of the current state. With persistence, multiple updates may branch
+from the same old version and independently repeat the same expensive
+potential-decreasing transition. Therefore, an amortized bound proved for one
+linear update sequence does not automatically hold across a branching version
+tree.
+
+For example, along one lineage,
+
+```text
+v0 -> v1 -> v2 -> v3
+```
+
+the usual potential argument for the acted monoid may still apply. With full
+persistence, however,
+
+```text
+    /-> v1
+v0 ---> v2
+    \-> v3
+```
+
+each branch may repeat the same expensive operation from `v0`.
+
+The data structure remains correct under arbitrary persistent versioning, but
+its running time must be analyzed for the particular acted monoid and version
+access pattern.
+
 `set_inplace` and `apply_inplace` are additional copy-on-write operations. They
 mutate this handle while preserving every other live version. Shared nodes are
 cloned before modification, including during lazy propagation and failed Beats
 actions; unique nodes are reused.
+
+Copy-on-write reduces allocations when one working version is repeatedly
+updated, but it does not restore an amortized Beats bound that is invalidated by
+branching. If an operation needs to descend through $\Theta(N)$ nodes, the
+corresponding in-place operation may still take $\Theta(N)$ time.
 
 Versions in the same family share a reference-counted node pool. Destroyed or
 explicitly released versions return unreferenced nodes to the pool, and later
@@ -76,46 +113,80 @@ available operation.
 All indices are zero-based and ranges are half-open. `T` is `value_type` and
 `F` is `operator_type`.
 
-| Method | Description | Complexity |
-| --- | --- | --- |
-| `PersistentSegtreeBeats()` | Constructs an empty version family. | $O(1)$ |
-| `explicit PersistentSegtreeBeats(int n)` | Constructs `n` identity values. | $O(N)$ |
-| `explicit PersistentSegtreeBeats(const std::vector<T>& v)` | Copies and builds from acted-monoid values. | $O(N)$ |
-| `explicit PersistentSegtreeBeats(std::vector<T>&& v)` | Moves and builds from acted-monoid values. | $O(N)$ |
-| `template<class U> explicit PersistentSegtreeBeats(const std::vector<U>& v)` | Converts elements with `make` or conversion and builds. | $O(N)$ |
-| `PersistentSegtreeBeats(const PersistentSegtreeBeats& other)` | Copies a version handle. | $O(1)$ |
-| `PersistentSegtreeBeats(PersistentSegtreeBeats&& other) noexcept` | Moves a version handle. | $O(1)$ |
-| `PersistentSegtreeBeats& operator=(const PersistentSegtreeBeats& other)` | Replaces this handle with a shared copy of `other`. | $O(R)$ |
-| `PersistentSegtreeBeats& operator=(PersistentSegtreeBeats&& other) noexcept` | Replaces this handle by moving `other`. | $O(R)$ |
-| `~PersistentSegtreeBeats()` | Releases this handle's root. | $O(R)$ |
-| `int size() const` | Returns the number of elements. | $O(1)$ |
-| `bool empty() const` | Returns whether the handle has no elements. | $O(1)$ |
-| `void release()` | Releases this version early and makes the handle empty. | $O(R)$ |
-| `std::size_t node_count() const` | Returns live nodes in the shared version family. | $O(1)$ |
-| `PersistentSegtreeBeats set(int p, T x) const` | Returns a version with element `p` assigned to `x`. | $O(\log N+D)$ |
-| `void set_inplace(int p, T x)` | Assigns `x` in this version using copy-on-write. | $O(\log N+D)$ |
-| `T get(int p) const` | Returns element `p`. | $O(\log N+D)$ |
-| `T operator[](int p) const` | Returns element `p`. | $O(\log N+D)$ |
-| `T prod(int l, int r) const` | Returns the monoid product of `[l, r)`. | $O(\log N+D)$ |
-| `T all_prod() const` | Returns the whole-array product. | $O(1)$ |
-| `PersistentSegtreeBeats apply(int p, const F& f) const` | Returns a version with `f` applied at `p`. | $O(\log N+D)$ |
-| `PersistentSegtreeBeats apply(int l, int r, const F& f) const` | Returns a version with `f` applied to `[l, r)`. | $O(\log N+D)$ |
-| `void apply_inplace(int p, const F& f)` | Applies `f` at `p` in this version using copy-on-write. | $O(\log N+D)$ |
-| `void apply_inplace(int l, int r, const F& f)` | Applies `f` to `[l, r)` in this version using copy-on-write. | $O(\log N+D)$ |
-| `PersistentSegtreeBeats copy_range_from(const PersistentSegtreeBeats& source, int l, int r) const` | Returns a version using `source` on `[l, r)` and this version elsewhere. | $O(\log N+D)$ |
-| `std::vector<T> to_vector() const` | Materializes every element. | $O(N)$ |
-| `std::vector<T> to_vector(int l, int r) const` | Materializes `[l, r)`. | $O(\log N+r-l)$ |
-| `template<class Predicate> int max_right(int l, Predicate g) const` | Finds the largest `r` for which `g(prod(l, r))` is true. | $O(\log N+D)$ |
-| `template<class Predicate> int min_left(int r, Predicate g) const` | Finds the smallest `l` for which `g(prod(l, r))` is true. | $O(\log N+D)$ |
+| Method                                                                                             | Description                                                              | Complexity      |
+| -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | --------------- |
+| `PersistentSegtreeBeats()`                                                                         | Constructs an empty version family.                                      | $O(1)$          |
+| `explicit PersistentSegtreeBeats(int n)`                                                           | Constructs `n` identity values.                                          | $O(N)$          |
+| `explicit PersistentSegtreeBeats(const std::vector<T>& v)`                                         | Copies and builds from acted-monoid values.                              | $O(N)$          |
+| `explicit PersistentSegtreeBeats(std::vector<T>&& v)`                                              | Moves and builds from acted-monoid values.                               | $O(N)$          |
+| `template<class U> explicit PersistentSegtreeBeats(const std::vector<U>& v)`                       | Converts elements with `make` or conversion and builds.                  | $O(N)$          |
+| `PersistentSegtreeBeats(const PersistentSegtreeBeats& other)`                                      | Copies a version handle.                                                 | $O(1)$          |
+| `PersistentSegtreeBeats(PersistentSegtreeBeats&& other) noexcept`                                  | Moves a version handle.                                                  | $O(1)$          |
+| `PersistentSegtreeBeats& operator=(const PersistentSegtreeBeats& other)`                           | Replaces this handle with a shared copy of `other`.                      | $O(R)$          |
+| `PersistentSegtreeBeats& operator=(PersistentSegtreeBeats&& other) noexcept`                       | Replaces this handle by moving `other`.                                  | $O(R)$          |
+| `~PersistentSegtreeBeats()`                                                                        | Releases this handle's root.                                             | $O(R)$          |
+| `int size() const`                                                                                 | Returns the number of elements.                                          | $O(1)$          |
+| `bool empty() const`                                                                               | Returns whether the handle has no elements.                              | $O(1)$          |
+| `void release()`                                                                                   | Releases this version early and makes the handle empty.                  | $O(R)$          |
+| `std::size_t node_count() const`                                                                   | Returns live nodes in the shared version family.                         | $O(1)$          |
+| `PersistentSegtreeBeats set(int p, T x) const`                                                     | Returns a version with element `p` assigned to `x`.                      | $O(\log N+D)$   |
+| `void set_inplace(int p, T x)`                                                                     | Assigns `x` in this version using copy-on-write.                         | $O(\log N+D)$   |
+| `T get(int p) const`                                                                               | Returns element `p`.                                                     | $O(\log N+D)$   |
+| `T operator[](int p) const`                                                                        | Returns element `p`.                                                     | $O(\log N+D)$   |
+| `T prod(int l, int r) const`                                                                       | Returns the monoid product of `[l, r)`.                                  | $O(\log N+D)$   |
+| `T all_prod() const`                                                                               | Returns the whole-array product.                                         | $O(1)$          |
+| `PersistentSegtreeBeats apply(int p, const F& f) const`                                            | Returns a version with `f` applied at `p`.                               | $O(\log N+D)$   |
+| `PersistentSegtreeBeats apply(int l, int r, const F& f) const`                                     | Returns a version with `f` applied to `[l, r)`.                          | $O(\log N+D)$   |
+| `void apply_inplace(int p, const F& f)`                                                            | Applies `f` at `p` in this version using copy-on-write.                  | $O(\log N+D)$   |
+| `void apply_inplace(int l, int r, const F& f)`                                                     | Applies `f` to `[l, r)` in this version using copy-on-write.             | $O(\log N+D)$   |
+| `PersistentSegtreeBeats copy_range_from(const PersistentSegtreeBeats& source, int l, int r) const` | Returns a version using `source` on `[l, r)` and this version elsewhere. | $O(\log N+D)$   |
+| `std::vector<T> to_vector() const`                                                                 | Materializes every element.                                              | $O(N)$          |
+| `std::vector<T> to_vector(int l, int r) const`                                                     | Materializes `[l, r)`.                                                   | $O(\log N+r-l)$ |
+| `template<class Predicate> int max_right(int l, Predicate g) const`                                | Finds the largest `r` for which `g(prod(l, r))` is true.                 | $O(\log N+D)$   |
+| `template<class Predicate> int min_left(int r, Predicate g) const`                                 | Finds the smallest `l` for which `g(prod(l, r))` is true.                | $O(\log N+D)$   |
 
-Here, $D$ is the number of extra nodes visited because a new or pending action
-cannot be evaluated directly. An update allocates $O(\log N+D)$ new nodes in
-the worst case. An in-place update allocates only where its modified traversal
-is still shared.
-There is no universal logarithmic Beats bound: the acted monoid needs its own
-potential or transition-count argument. Persistence also permits branching
-from the same old potential state, so bounds amortized across one linear update
-sequence do not automatically amortize across every branch.
+### Complexity caveat
+
+Here, $D$ is the number of additional nodes visited because a new or pending
+action cannot be evaluated directly at the current aggregate.
+
+Thus, $O(\log N+D)$ is a description of the actual traversal of one operation,
+not a generic amortized Beats guarantee. In the worst case, $D$ can be
+$\Theta(N)$ for a single operation.
+
+An ordinary Segment Tree Beats implementation obtains stronger bounds only
+when the acted monoid admits an appropriate potential or transition-count
+argument. Such an argument normally applies to a linear sequence of mutations:
+
+```text
+v0 -> v1 -> v2 -> ...
+```
+
+With full persistence, the version history may instead branch:
+
+```text
+    /-> v1
+v0 ---> v2
+    \-> v3
+```
+
+and each branch may repeat an expensive transition from the same state `v0`.
+Consequently, a potential decrease that can be charged only once in a
+nonpersistent linear sequence may be charged multiple times across persistent
+branches.
+
+Therefore, `PersistentSegtreeBeats` guarantees correctness under arbitrary
+persistent branching, but there is no generic Segment Tree Beats amortized
+complexity guarantee across the entire version tree.
+
+If updates follow only one lineage, the usual amortized analysis of the acted
+monoid may still apply along that lineage. This depends on the assumptions of
+that specific Beats analysis.
+
+An ordinary persistent update allocates $O(\log N+D)$ new nodes in the worst
+case. An in-place update allocates only where its modified traversal is still
+shared. Copy-on-write can therefore reduce allocation overhead, but it does not
+change the number of nodes that a failed Beats action must visit.
 
 $R$ in the handle-management rows is the number of nodes whose last reference
 is removed. Empty products return `id()`. Boundary-search predicates must
