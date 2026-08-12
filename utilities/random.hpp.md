@@ -7,6 +7,15 @@ data:
     title: Random Testing
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/heuristic/beam_search.test.cpp
+    title: verify/heuristic/beam_search.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/heuristic/hill_climbing.test.cpp
+    title: verify/heuristic/hill_climbing.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/heuristic/simulated_annealing.test.cpp
+    title: verify/heuristic/simulated_annealing.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/utilities/basic_utilities.test.cpp
     title: verify/utilities/basic_utilities.test.cpp
   - icon: ':heavy_check_mark:'
@@ -357,6 +366,9 @@ data:
   - verify/utilities/random_generators.test.cpp
   - verify/utilities/grid_transform.test.cpp
   - verify/utilities/random_testing.test.cpp
+  - verify/heuristic/simulated_annealing.test.cpp
+  - verify/heuristic/hill_climbing.test.cpp
+  - verify/heuristic/beam_search.test.cpp
 documentation_of: utilities/random.hpp
 layout: document
 title: Random

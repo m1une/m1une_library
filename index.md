@@ -890,6 +890,23 @@ data:
     - icon: ':heavy_check_mark:'
       path: graph/tree/zero_one_on_tree.hpp
       title: 01 on Tree
+  - name: heuristic
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: heuristic/all.hpp
+      title: Heuristic Search
+    - icon: ':heavy_check_mark:'
+      path: heuristic/beam_search.hpp
+      title: Beam Search
+    - icon: ':heavy_check_mark:'
+      path: heuristic/hill_climbing.hpp
+      title: Hill Climbing
+    - icon: ':heavy_check_mark:'
+      path: heuristic/objective.hpp
+      title: Heuristic Objective
+    - icon: ':heavy_check_mark:'
+      path: heuristic/simulated_annealing.hpp
+      title: Simulated Annealing
   - name: math
     pages:
     - icon: ':heavy_check_mark:'
@@ -2106,6 +2123,17 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/graph/tree/zero_one_on_tree.test.cpp
       title: verify/graph/tree/zero_one_on_tree.test.cpp
+  - name: verify/heuristic
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/heuristic/beam_search.test.cpp
+      title: verify/heuristic/beam_search.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/heuristic/hill_climbing.test.cpp
+      title: verify/heuristic/hill_climbing.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/heuristic/simulated_annealing.test.cpp
+      title: verify/heuristic/simulated_annealing.test.cpp
   - name: verify/math
     pages:
     - icon: ':heavy_check_mark:'
@@ -2518,6 +2546,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/utilities/bigint_division.test.cpp
       title: verify/utilities/bigint_division.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/utilities/bigint_gcd.test.cpp
+      title: verify/utilities/bigint_gcd.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/utilities/bigint_multiplication.test.cpp
       title: verify/utilities/bigint_multiplication.test.cpp

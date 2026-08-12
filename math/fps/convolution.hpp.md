@@ -283,6 +283,9 @@ data:
     path: verify/utilities/bigint_division.test.cpp
     title: verify/utilities/bigint_division.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/utilities/bigint_gcd.test.cpp
+    title: verify/utilities/bigint_gcd.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/utilities/bigint_multiplication.test.cpp
     title: verify/utilities/bigint_multiplication.test.cpp
   _isVerificationFailed: false
@@ -1298,6 +1301,7 @@ data:
   - verify/utilities/bigint_multiplication.test.cpp
   - verify/utilities/bigint_division.test.cpp
   - verify/utilities/bigint_addition.test.cpp
+  - verify/utilities/bigint_gcd.test.cpp
   - verify/string/wildcard_pattern_matching.test.cpp
   - verify/string/string_algorithms.test.cpp
   - verify/math/bernoulli_utilities.test.cpp

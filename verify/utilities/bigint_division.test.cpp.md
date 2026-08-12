@@ -1277,12 +1277,15 @@ data:
     \ result =\n            divide_magnitude(a1.a, b1.a);\n        BigInt q, r;\n\
     \        q.a = std::move(result.first);\n        r.a = std::move(result.second);\n\
     \        q.sign = a1.sign * b1.sign;\n        r.sign = a1.sign;\n        q.trim();\n\
-    \        r.trim();\n        return {q, r};\n    }\n\n    BigInt& operator/=(const\
-    \ BigInt& other) {\n        return *this = divmod(*this, other).first;\n    }\n\
-    \    BigInt& operator%=(const BigInt& other) {\n        return *this = divmod(*this,\
-    \ other).second;\n    }\n\n    friend BigInt operator+(BigInt x, const BigInt&\
-    \ y) {\n        return x += y;\n    }\n    friend BigInt operator-(BigInt x, const\
-    \ BigInt& y) {\n        return x -= y;\n    }\n    friend BigInt operator*(BigInt\
+    \        r.trim();\n        return {q, r};\n    }\n\n    friend BigInt gcd(BigInt\
+    \ first, BigInt second) {\n        first.sign = 1;\n        second.sign = 1;\n\
+    \        while (!second.is_zero()) {\n            first %= second;\n         \
+    \   std::swap(first, second);\n        }\n        return first;\n    }\n\n   \
+    \ BigInt& operator/=(const BigInt& other) {\n        return *this = divmod(*this,\
+    \ other).first;\n    }\n    BigInt& operator%=(const BigInt& other) {\n      \
+    \  return *this = divmod(*this, other).second;\n    }\n\n    friend BigInt operator+(BigInt\
+    \ x, const BigInt& y) {\n        return x += y;\n    }\n    friend BigInt operator-(BigInt\
+    \ x, const BigInt& y) {\n        return x -= y;\n    }\n    friend BigInt operator*(BigInt\
     \ x, const BigInt& y) {\n        return x *= y;\n    }\n    friend BigInt operator/(BigInt\
     \ x, const BigInt& y) {\n        return x /= y;\n    }\n    friend BigInt operator%(BigInt\
     \ x, const BigInt& y) {\n        return x %= y;\n    }\n\n    friend std::ostream&\
@@ -1682,7 +1685,7 @@ data:
   isVerificationFile: true
   path: verify/utilities/bigint_division.test.cpp
   requiredBy: []
-  timestamp: '2026-08-10 17:30:05+09:00'
+  timestamp: '2026-08-12 20:17:35+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/utilities/bigint_division.test.cpp

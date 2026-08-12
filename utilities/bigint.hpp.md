@@ -37,6 +37,9 @@ data:
     path: verify/utilities/bigint_division.test.cpp
     title: verify/utilities/bigint_division.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/utilities/bigint_gcd.test.cpp
+    title: verify/utilities/bigint_gcd.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/utilities/bigint_multiplication.test.cpp
     title: verify/utilities/bigint_multiplication.test.cpp
   _isVerificationFailed: false
@@ -1292,12 +1295,15 @@ data:
     \ result =\n            divide_magnitude(a1.a, b1.a);\n        BigInt q, r;\n\
     \        q.a = std::move(result.first);\n        r.a = std::move(result.second);\n\
     \        q.sign = a1.sign * b1.sign;\n        r.sign = a1.sign;\n        q.trim();\n\
-    \        r.trim();\n        return {q, r};\n    }\n\n    BigInt& operator/=(const\
-    \ BigInt& other) {\n        return *this = divmod(*this, other).first;\n    }\n\
-    \    BigInt& operator%=(const BigInt& other) {\n        return *this = divmod(*this,\
-    \ other).second;\n    }\n\n    friend BigInt operator+(BigInt x, const BigInt&\
-    \ y) {\n        return x += y;\n    }\n    friend BigInt operator-(BigInt x, const\
-    \ BigInt& y) {\n        return x -= y;\n    }\n    friend BigInt operator*(BigInt\
+    \        r.trim();\n        return {q, r};\n    }\n\n    friend BigInt gcd(BigInt\
+    \ first, BigInt second) {\n        first.sign = 1;\n        second.sign = 1;\n\
+    \        while (!second.is_zero()) {\n            first %= second;\n         \
+    \   std::swap(first, second);\n        }\n        return first;\n    }\n\n   \
+    \ BigInt& operator/=(const BigInt& other) {\n        return *this = divmod(*this,\
+    \ other).first;\n    }\n    BigInt& operator%=(const BigInt& other) {\n      \
+    \  return *this = divmod(*this, other).second;\n    }\n\n    friend BigInt operator+(BigInt\
+    \ x, const BigInt& y) {\n        return x += y;\n    }\n    friend BigInt operator-(BigInt\
+    \ x, const BigInt& y) {\n        return x -= y;\n    }\n    friend BigInt operator*(BigInt\
     \ x, const BigInt& y) {\n        return x *= y;\n    }\n    friend BigInt operator/(BigInt\
     \ x, const BigInt& y) {\n        return x /= y;\n    }\n    friend BigInt operator%(BigInt\
     \ x, const BigInt& y) {\n        return x %= y;\n    }\n\n    friend std::ostream&\
@@ -1915,12 +1921,15 @@ data:
     \ result =\n            divide_magnitude(a1.a, b1.a);\n        BigInt q, r;\n\
     \        q.a = std::move(result.first);\n        r.a = std::move(result.second);\n\
     \        q.sign = a1.sign * b1.sign;\n        r.sign = a1.sign;\n        q.trim();\n\
-    \        r.trim();\n        return {q, r};\n    }\n\n    BigInt& operator/=(const\
-    \ BigInt& other) {\n        return *this = divmod(*this, other).first;\n    }\n\
-    \    BigInt& operator%=(const BigInt& other) {\n        return *this = divmod(*this,\
-    \ other).second;\n    }\n\n    friend BigInt operator+(BigInt x, const BigInt&\
-    \ y) {\n        return x += y;\n    }\n    friend BigInt operator-(BigInt x, const\
-    \ BigInt& y) {\n        return x -= y;\n    }\n    friend BigInt operator*(BigInt\
+    \        r.trim();\n        return {q, r};\n    }\n\n    friend BigInt gcd(BigInt\
+    \ first, BigInt second) {\n        first.sign = 1;\n        second.sign = 1;\n\
+    \        while (!second.is_zero()) {\n            first %= second;\n         \
+    \   std::swap(first, second);\n        }\n        return first;\n    }\n\n   \
+    \ BigInt& operator/=(const BigInt& other) {\n        return *this = divmod(*this,\
+    \ other).first;\n    }\n    BigInt& operator%=(const BigInt& other) {\n      \
+    \  return *this = divmod(*this, other).second;\n    }\n\n    friend BigInt operator+(BigInt\
+    \ x, const BigInt& y) {\n        return x += y;\n    }\n    friend BigInt operator-(BigInt\
+    \ x, const BigInt& y) {\n        return x -= y;\n    }\n    friend BigInt operator*(BigInt\
     \ x, const BigInt& y) {\n        return x *= y;\n    }\n    friend BigInt operator/(BigInt\
     \ x, const BigInt& y) {\n        return x /= y;\n    }\n    friend BigInt operator%(BigInt\
     \ x, const BigInt& y) {\n        return x %= y;\n    }\n\n    friend std::ostream&\
@@ -1938,13 +1947,14 @@ data:
   requiredBy:
   - geometry/all.hpp
   - geometry/lattice_point_count.hpp
-  timestamp: '2026-08-10 17:30:05+09:00'
+  timestamp: '2026-08-12 20:17:35+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/utilities/basic_utilities.test.cpp
   - verify/utilities/bigint_multiplication.test.cpp
   - verify/utilities/bigint_division.test.cpp
   - verify/utilities/bigint_addition.test.cpp
+  - verify/utilities/bigint_gcd.test.cpp
   - verify/geometry/centroid.test.cpp
   - verify/geometry/lattice_point_count.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
@@ -1994,6 +2004,7 @@ normalized Knuth division to avoid transform overhead.
 | `operator/`, `operator/=` | Returns the quotient, truncated toward zero. | $O(N\log N)$ on the balanced Newton path; $O(N\log M)$ on the blocked path; $O(NM)$ for the bounded fallback |
 | `operator%`, `operator%=` | Returns the remainder associated with truncated division. | Same as division |
 | `divmod(const BigInt& a, const BigInt& b)` | Returns `std::pair<BigInt, BigInt>` containing `a / b` and `a % b`. | Same as division |
+| `gcd(BigInt a, BigInt b)` | Returns the nonnegative greatest common divisor of `abs(a)` and `abs(b)`. | $O(N^2\log N)$ in the worst case |
 | `<`, `>`, `<=`, `>=`, `==`, `!=` | Compares two values. | $O(N+M)$ |
 | `operator<<`, `operator>>` | Writes or reads decimal text through standard streams. | $O(N)$ |
 
@@ -2011,6 +2022,9 @@ zero, `a == (a / b) * b + a % b`, the nonzero remainder has the sign of `a`,
 and its absolute value is smaller than `abs(b)`. Division by zero throws
 `std::domain_error`.
 
+`gcd(0, 0)` is defined as `0`. The arguments are passed by value, so computing a
+greatest common divisor does not mutate the caller's values.
+
 ## Example
 
 ```cpp
@@ -2026,6 +2040,7 @@ int main() {
     BigInt sum = a + b;
     BigInt diff = a - b;
     BigInt product = a * b;
+    BigInt common_divisor = gcd(a, b);
 
     // std::pair<BigInt, BigInt>
     auto [quotient, remainder] = divmod(a, b);
@@ -2033,6 +2048,7 @@ int main() {
     std::cout << "Sum: " << sum << "\n";
     std::cout << "Difference: " << diff << "\n";
     std::cout << "Product: " << product << "\n";
+    std::cout << "GCD: " << common_divisor << "\n";
     std::cout << "Quotient: " << quotient << " R: " << remainder << "\n";
 
     if (a > b) {

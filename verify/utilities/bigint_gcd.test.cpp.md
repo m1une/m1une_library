@@ -23,24 +23,23 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://judge.yosupo.jp/problem/multiplication_of_big_integers
+    PROBLEM: https://judge.yosupo.jp/problem/aplusb
     links:
-    - https://judge.yosupo.jp/problem/multiplication_of_big_integers
-  bundledCode: "#line 1 \"verify/utilities/bigint_multiplication.test.cpp\"\n#define\
-    \ PROBLEM \"https://judge.yosupo.jp/problem/multiplication_of_big_integers\"\n\
-    \n#pragma GCC optimize(\"O3\")\n\n#include <cassert>\n#include <random>\n#include\
-    \ <string>\n#include <vector>\n\n#line 1 \"utilities/bigint.hpp\"\n\n\n\n#include\
-    \ <algorithm>\n#include <array>\n#include <bit>\n#line 8 \"utilities/bigint.hpp\"\
-    \n#include <charconv>\n#include <cmath>\n#include <cstdint>\n#include <cstring>\n\
-    #include <iostream>\n#include <memory>\n#include <numbers>\n#include <stdexcept>\n\
-    #line 17 \"utilities/bigint.hpp\"\n#include <utility>\n#line 19 \"utilities/bigint.hpp\"\
-    \n\n#if (defined(__GNUC__) || defined(__clang__)) && \\\n    (defined(__x86_64__)\
-    \ || defined(__i386__))\n#include <immintrin.h>\n#define M1UNE_BIGINT_HAS_X86_SIMD\
-    \ 1\n#endif\n\n#line 1 \"math/fps/convolution.hpp\"\n\n\n\n#line 9 \"math/fps/convolution.hpp\"\
-    \n#include <new>\n#include <type_traits>\n#line 13 \"math/fps/convolution.hpp\"\
-    \n\n#if defined(__GNUC__) && !defined(__clang__) && \\\n    (defined(__x86_64__)\
-    \ || defined(__i386__)) && \\\n    !defined(M1UNE_FPS_DISABLE_X86_SIMD)\n#include\
-    \ <immintrin.h>\n#define M1UNE_FPS_HAS_X86_SIMD 1\n#pragma GCC push_options\n\
+    - https://judge.yosupo.jp/problem/aplusb
+  bundledCode: "#line 1 \"verify/utilities/bigint_gcd.test.cpp\"\n#define PROBLEM\
+    \ \"https://judge.yosupo.jp/problem/aplusb\"\n\n#pragma GCC optimize(\"O3\")\n\
+    \n#include <cassert>\n#include <numeric>\n#include <random>\n#include <string>\n\
+    #include <utility>\n\n#line 1 \"utilities/bigint.hpp\"\n\n\n\n#include <algorithm>\n\
+    #include <array>\n#include <bit>\n#line 8 \"utilities/bigint.hpp\"\n#include <charconv>\n\
+    #include <cmath>\n#include <cstdint>\n#include <cstring>\n#include <iostream>\n\
+    #include <memory>\n#include <numbers>\n#include <stdexcept>\n#line 18 \"utilities/bigint.hpp\"\
+    \n#include <vector>\n\n#if (defined(__GNUC__) || defined(__clang__)) && \\\n \
+    \   (defined(__x86_64__) || defined(__i386__))\n#include <immintrin.h>\n#define\
+    \ M1UNE_BIGINT_HAS_X86_SIMD 1\n#endif\n\n#line 1 \"math/fps/convolution.hpp\"\n\
+    \n\n\n#line 9 \"math/fps/convolution.hpp\"\n#include <new>\n#include <type_traits>\n\
+    #line 13 \"math/fps/convolution.hpp\"\n\n#if defined(__GNUC__) && !defined(__clang__)\
+    \ && \\\n    (defined(__x86_64__) || defined(__i386__)) && \\\n    !defined(M1UNE_FPS_DISABLE_X86_SIMD)\n\
+    #include <immintrin.h>\n#define M1UNE_FPS_HAS_X86_SIMD 1\n#pragma GCC push_options\n\
     #pragma GCC target(\"avx2,bmi\")\n#endif\n\n#line 1 \"math/fps/internal/ntt998_faster.hpp\"\
     \n\n\n\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n\n#line 9 \"math/fps/internal/ntt998_faster.hpp\"\
     \n\n#include <immintrin.h>\n\nnamespace m1une {\nnamespace fps {\nnamespace internal\
@@ -1536,88 +1535,59 @@ data:
     \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
     n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 12 \"verify/utilities/bigint_multiplication.test.cpp\"\
-    \n\nnamespace {\n\nusing m1une::utilities::BigInt;\n\nstd::string absolute_decimal(const\
-    \ std::string& value) {\n    int begin = !value.empty() && (value[0] == '-' ||\
-    \ value[0] == '+');\n    while (begin + 1 < int(value.size()) && value[begin]\
-    \ == '0') ++begin;\n    return value.substr(begin);\n}\n\nstd::string multiply_naive(const\
-    \ std::string& lhs_text, const std::string& rhs_text) {\n    const std::string\
-    \ lhs = absolute_decimal(lhs_text);\n    const std::string rhs = absolute_decimal(rhs_text);\n\
-    \    if (lhs == \"0\" || rhs == \"0\") return \"0\";\n\n    std::vector<int> coefficients(lhs.size()\
-    \ + rhs.size());\n    for (int i = int(lhs.size()) - 1; i >= 0; --i) {\n     \
-    \   for (int j = int(rhs.size()) - 1; j >= 0; --j) {\n            coefficients[i\
-    \ + j + 1] += (lhs[i] - '0') * (rhs[j] - '0');\n        }\n    }\n    for (int\
-    \ i = int(coefficients.size()) - 1; i > 0; --i) {\n        coefficients[i - 1]\
-    \ += coefficients[i] / 10;\n        coefficients[i] %= 10;\n    }\n\n    int begin\
-    \ = 0;\n    while (begin + 1 < int(coefficients.size()) && coefficients[begin]\
-    \ == 0) ++begin;\n    std::string result;\n    if ((lhs_text[0] == '-') != (rhs_text[0]\
-    \ == '-')) result.push_back('-');\n    for (int i = begin; i < int(coefficients.size());\
-    \ ++i) {\n        result.push_back(char('0' + coefficients[i]));\n    }\n    return\
-    \ result;\n}\n\nstd::string random_integer(std::mt19937_64& random, int digits,\
-    \ bool allow_negative) {\n    std::string result;\n    if (allow_negative && (random()\
-    \ & 1)) result.push_back('-');\n    result.push_back(char('1' + random() % 9));\n\
-    \    for (int i = 1; i < digits; ++i) result.push_back(char('0' + random() % 10));\n\
-    \    return result;\n}\n\nvoid test_multiplication() {\n    assert((BigInt(0)\
-    \ * BigInt(\"999999999999999999\")).to_string() == \"0\");\n    assert((BigInt(-12)\
-    \ * BigInt(34)).to_string() == \"-408\");\n    assert((BigInt(-12) * BigInt(-34)).to_string()\
-    \ == \"408\");\n\n    std::mt19937_64 random(0x38b54fd917a3c2e1ULL);\n    for\
-    \ (int iteration = 0; iteration < 100; ++iteration) {\n        const std::string\
-    \ lhs = random_integer(random, 1 + random() % 250, true);\n        const std::string\
-    \ rhs = random_integer(random, 1 + random() % 250, true);\n        assert((BigInt(lhs)\
-    \ * BigInt(rhs)).to_string() == multiply_naive(lhs, rhs));\n    }\n\n    for (int\
-    \ iteration = 0; iteration < 2; ++iteration) {\n        const std::string lhs\
-    \ = random_integer(random, 3000, true);\n        const std::string rhs = random_integer(random,\
-    \ 2900, true);\n        assert((BigInt(lhs) * BigInt(rhs)).to_string() == multiply_naive(lhs,\
-    \ rhs));\n    }\n\n    const std::string square_value = random_integer(random,\
-    \ 3200, false);\n    BigInt square(square_value);\n    square *= square;\n   \
-    \ assert(square.to_string() == multiply_naive(square_value, square_value));\n\
-    }\n\n}  // namespace\n\nint main() {\n    m1une::utilities::FastInput input;\n\
-    \    m1une::utilities::FastOutput output;\n    test_multiplication();\n\n    int\
-    \ test_count;\n    input >> test_count;\n    while (test_count--) {\n        std::string\
-    \ lhs, rhs;\n        input >> lhs >> rhs;\n        output << (BigInt(lhs) * BigInt(rhs)).to_string()\
-    \ << '\\n';\n    }\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/multiplication_of_big_integers\"\
-    \n\n#pragma GCC optimize(\"O3\")\n\n#include <cassert>\n#include <random>\n#include\
-    \ <string>\n#include <vector>\n\n#include \"../../utilities/bigint.hpp\"\n#include\
-    \ \"../../utilities/fast_io.hpp\"\n\nnamespace {\n\nusing m1une::utilities::BigInt;\n\
-    \nstd::string absolute_decimal(const std::string& value) {\n    int begin = !value.empty()\
-    \ && (value[0] == '-' || value[0] == '+');\n    while (begin + 1 < int(value.size())\
-    \ && value[begin] == '0') ++begin;\n    return value.substr(begin);\n}\n\nstd::string\
-    \ multiply_naive(const std::string& lhs_text, const std::string& rhs_text) {\n\
-    \    const std::string lhs = absolute_decimal(lhs_text);\n    const std::string\
-    \ rhs = absolute_decimal(rhs_text);\n    if (lhs == \"0\" || rhs == \"0\") return\
-    \ \"0\";\n\n    std::vector<int> coefficients(lhs.size() + rhs.size());\n    for\
-    \ (int i = int(lhs.size()) - 1; i >= 0; --i) {\n        for (int j = int(rhs.size())\
-    \ - 1; j >= 0; --j) {\n            coefficients[i + j + 1] += (lhs[i] - '0') *\
-    \ (rhs[j] - '0');\n        }\n    }\n    for (int i = int(coefficients.size())\
-    \ - 1; i > 0; --i) {\n        coefficients[i - 1] += coefficients[i] / 10;\n \
-    \       coefficients[i] %= 10;\n    }\n\n    int begin = 0;\n    while (begin\
-    \ + 1 < int(coefficients.size()) && coefficients[begin] == 0) ++begin;\n    std::string\
-    \ result;\n    if ((lhs_text[0] == '-') != (rhs_text[0] == '-')) result.push_back('-');\n\
-    \    for (int i = begin; i < int(coefficients.size()); ++i) {\n        result.push_back(char('0'\
-    \ + coefficients[i]));\n    }\n    return result;\n}\n\nstd::string random_integer(std::mt19937_64&\
-    \ random, int digits, bool allow_negative) {\n    std::string result;\n    if\
-    \ (allow_negative && (random() & 1)) result.push_back('-');\n    result.push_back(char('1'\
-    \ + random() % 9));\n    for (int i = 1; i < digits; ++i) result.push_back(char('0'\
-    \ + random() % 10));\n    return result;\n}\n\nvoid test_multiplication() {\n\
-    \    assert((BigInt(0) * BigInt(\"999999999999999999\")).to_string() == \"0\"\
-    );\n    assert((BigInt(-12) * BigInt(34)).to_string() == \"-408\");\n    assert((BigInt(-12)\
-    \ * BigInt(-34)).to_string() == \"408\");\n\n    std::mt19937_64 random(0x38b54fd917a3c2e1ULL);\n\
-    \    for (int iteration = 0; iteration < 100; ++iteration) {\n        const std::string\
-    \ lhs = random_integer(random, 1 + random() % 250, true);\n        const std::string\
-    \ rhs = random_integer(random, 1 + random() % 250, true);\n        assert((BigInt(lhs)\
-    \ * BigInt(rhs)).to_string() == multiply_naive(lhs, rhs));\n    }\n\n    for (int\
-    \ iteration = 0; iteration < 2; ++iteration) {\n        const std::string lhs\
-    \ = random_integer(random, 3000, true);\n        const std::string rhs = random_integer(random,\
-    \ 2900, true);\n        assert((BigInt(lhs) * BigInt(rhs)).to_string() == multiply_naive(lhs,\
-    \ rhs));\n    }\n\n    const std::string square_value = random_integer(random,\
-    \ 3200, false);\n    BigInt square(square_value);\n    square *= square;\n   \
-    \ assert(square.to_string() == multiply_naive(square_value, square_value));\n\
-    }\n\n}  // namespace\n\nint main() {\n    m1une::utilities::FastInput input;\n\
-    \    m1une::utilities::FastOutput output;\n    test_multiplication();\n\n    int\
-    \ test_count;\n    input >> test_count;\n    while (test_count--) {\n        std::string\
-    \ lhs, rhs;\n        input >> lhs >> rhs;\n        output << (BigInt(lhs) * BigInt(rhs)).to_string()\
-    \ << '\\n';\n    }\n}\n"
+    \ utilities\n}  // namespace m1une\n\n\n#line 13 \"verify/utilities/bigint_gcd.test.cpp\"\
+    \n\nnamespace {\n\nusing m1une::utilities::BigInt;\n\nstd::string random_positive_integer(std::mt19937_64&\
+    \ random, int digits) {\n    std::string result;\n    result.push_back(char('1'\
+    \ + random() % 9));\n    for (int i = 1; i < digits; ++i) {\n        result.push_back(char('0'\
+    \ + random() % 10));\n    }\n    return result;\n}\n\nvoid test_gcd() {\n    assert(gcd(BigInt(0),\
+    \ BigInt(0)) == 0);\n    assert(gcd(BigInt(0), BigInt(-42)) == 42);\n    assert(gcd(BigInt(-24),\
+    \ BigInt(18)) == 6);\n    assert(gcd(BigInt(-24), BigInt(-18)) == 6);\n\n    std::mt19937_64\
+    \ random(0x36c15d2f217a4017ULL);\n    for (int iteration = 0; iteration < 3000;\
+    \ ++iteration) {\n        const long long first = static_cast<long long>(random()\
+    \ % 2000000000001ULL) -\n                                1000000000000LL;\n  \
+    \      const long long second =\n            static_cast<long long>(random() %\
+    \ 2000000000001ULL) - 1000000000000LL;\n        assert(gcd(BigInt(first), BigInt(second))\
+    \ == std::gcd(first, second));\n    }\n\n    for (int iteration = 0; iteration\
+    \ < 20; ++iteration) {\n        const BigInt common(random_positive_integer(random,\
+    \ 100 + random() % 400));\n        const BigInt factor(random_positive_integer(random,\
+    \ 100 + random() % 300));\n        const BigInt first = common * factor;\n   \
+    \     const BigInt second = common * (factor + 1);\n        assert(gcd(first,\
+    \ second) == common);\n        assert(gcd(-first, second) == common);\n    }\n\
+    \n    BigInt previous = 0;\n    BigInt current = 1;\n    for (int iteration =\
+    \ 0; iteration < 2000; ++iteration) {\n        BigInt next = previous + current;\n\
+    \        previous = std::move(current);\n        current = std::move(next);\n\
+    \    }\n    assert(gcd(previous, current) == 1);\n}\n\n}  // namespace\n\nint\
+    \ main() {\n    test_gcd();\n\n    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput\
+    \ output;\n    long long first, second;\n    input >> first >> second;\n    output\
+    \ << first + second << '\\n';\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#pragma GCC\
+    \ optimize(\"O3\")\n\n#include <cassert>\n#include <numeric>\n#include <random>\n\
+    #include <string>\n#include <utility>\n\n#include \"../../utilities/bigint.hpp\"\
+    \n#include \"../../utilities/fast_io.hpp\"\n\nnamespace {\n\nusing m1une::utilities::BigInt;\n\
+    \nstd::string random_positive_integer(std::mt19937_64& random, int digits) {\n\
+    \    std::string result;\n    result.push_back(char('1' + random() % 9));\n  \
+    \  for (int i = 1; i < digits; ++i) {\n        result.push_back(char('0' + random()\
+    \ % 10));\n    }\n    return result;\n}\n\nvoid test_gcd() {\n    assert(gcd(BigInt(0),\
+    \ BigInt(0)) == 0);\n    assert(gcd(BigInt(0), BigInt(-42)) == 42);\n    assert(gcd(BigInt(-24),\
+    \ BigInt(18)) == 6);\n    assert(gcd(BigInt(-24), BigInt(-18)) == 6);\n\n    std::mt19937_64\
+    \ random(0x36c15d2f217a4017ULL);\n    for (int iteration = 0; iteration < 3000;\
+    \ ++iteration) {\n        const long long first = static_cast<long long>(random()\
+    \ % 2000000000001ULL) -\n                                1000000000000LL;\n  \
+    \      const long long second =\n            static_cast<long long>(random() %\
+    \ 2000000000001ULL) - 1000000000000LL;\n        assert(gcd(BigInt(first), BigInt(second))\
+    \ == std::gcd(first, second));\n    }\n\n    for (int iteration = 0; iteration\
+    \ < 20; ++iteration) {\n        const BigInt common(random_positive_integer(random,\
+    \ 100 + random() % 400));\n        const BigInt factor(random_positive_integer(random,\
+    \ 100 + random() % 300));\n        const BigInt first = common * factor;\n   \
+    \     const BigInt second = common * (factor + 1);\n        assert(gcd(first,\
+    \ second) == common);\n        assert(gcd(-first, second) == common);\n    }\n\
+    \n    BigInt previous = 0;\n    BigInt current = 1;\n    for (int iteration =\
+    \ 0; iteration < 2000; ++iteration) {\n        BigInt next = previous + current;\n\
+    \        previous = std::move(current);\n        current = std::move(next);\n\
+    \    }\n    assert(gcd(previous, current) == 1);\n}\n\n}  // namespace\n\nint\
+    \ main() {\n    test_gcd();\n\n    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput\
+    \ output;\n    long long first, second;\n    input >> first >> second;\n    output\
+    \ << first + second << '\\n';\n}\n"
   dependsOn:
   - utilities/bigint.hpp
   - math/fps/convolution.hpp
@@ -1625,15 +1595,15 @@ data:
   - math/modint.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
-  path: verify/utilities/bigint_multiplication.test.cpp
+  path: verify/utilities/bigint_gcd.test.cpp
   requiredBy: []
-  timestamp: '2026-08-12 20:17:35+09:00'
+  timestamp: '2026-08-12 20:17:40+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/utilities/bigint_multiplication.test.cpp
+documentation_of: verify/utilities/bigint_gcd.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/utilities/bigint_multiplication.test.cpp
-- /verify/verify/utilities/bigint_multiplication.test.cpp.html
-title: verify/utilities/bigint_multiplication.test.cpp
+- /verify/verify/utilities/bigint_gcd.test.cpp
+- /verify/verify/utilities/bigint_gcd.test.cpp.html
+title: verify/utilities/bigint_gcd.test.cpp
 ---

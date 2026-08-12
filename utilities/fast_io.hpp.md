@@ -1057,6 +1057,9 @@ data:
     path: verify/utilities/bigint_division.test.cpp
     title: verify/utilities/bigint_division.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/utilities/bigint_gcd.test.cpp
+    title: verify/utilities/bigint_gcd.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/utilities/bigint_multiplication.test.cpp
     title: verify/utilities/bigint_multiplication.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1665,6 +1668,7 @@ data:
   - verify/utilities/bigint_division.test.cpp
   - verify/utilities/bigint_addition.test.cpp
   - verify/utilities/random_generators.test.cpp
+  - verify/utilities/bigint_gcd.test.cpp
   - verify/utilities/extra_utilities.test.cpp
   - verify/utilities/parser.test.cpp
   - verify/utilities/int1024.test.cpp

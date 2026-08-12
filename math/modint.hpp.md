@@ -529,6 +529,9 @@ data:
     path: verify/utilities/bigint_division.test.cpp
     title: verify/utilities/bigint_division.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/utilities/bigint_gcd.test.cpp
+    title: verify/utilities/bigint_gcd.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/utilities/bigint_multiplication.test.cpp
     title: verify/utilities/bigint_multiplication.test.cpp
   _isVerificationFailed: false
@@ -803,6 +806,7 @@ data:
   - verify/utilities/bigint_multiplication.test.cpp
   - verify/utilities/bigint_division.test.cpp
   - verify/utilities/bigint_addition.test.cpp
+  - verify/utilities/bigint_gcd.test.cpp
   - verify/ds/dynamic_array/dynamic_lazy_monoid_array.test.cpp
   - verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp
   - verify/ds/dsu/range_parallel_dsu.test.cpp
