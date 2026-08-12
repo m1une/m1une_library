@@ -226,8 +226,25 @@ struct Rational {
             gcd(static_cast<Magnitude>(_denominator), static_cast<Magnitude>(other._denominator));
         Wide left_scale = Wide(other._denominator) / static_cast<Wide>(common);
         Wide right_scale = Wide(_denominator) / static_cast<Wide>(common);
-        assign_normalized(Wide(_numerator) * left_scale + Wide(other._numerator) * right_scale,
-                          Wide(_denominator) * left_scale);
+        Wide numerator =
+            Wide(_numerator) * left_scale + Wide(other._numerator) * right_scale;
+
+        // With both operands already reduced, every factor shared by the new
+        // numerator and denominator must divide `common`.  Restricting the
+        // second gcd to that value avoids a full-size gcd against the product
+        // of both denominators, which is especially important for BigInt.
+        Magnitude reduction = common == Magnitude(1)
+                                  ? Magnitude(1)
+                                  : gcd(magnitude(numerator), common);
+        if (reduction != Magnitude(1)) {
+            numerator /= static_cast<Wide>(reduction);
+        }
+        Wide remaining_denominator = Wide(other._denominator);
+        if (reduction != Magnitude(1)) {
+            remaining_denominator /= static_cast<Wide>(reduction);
+        }
+        _numerator = narrow(numerator);
+        _denominator = narrow(right_scale * remaining_denominator);
         return *this;
     }
 
