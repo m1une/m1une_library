@@ -28,6 +28,9 @@ data:
     path: verify/geometry/lattice_point_count.test.cpp
     title: verify/geometry/lattice_point_count.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/rational.test.cpp
+    title: verify/math/rational.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/utilities/basic_utilities.test.cpp
     title: verify/utilities/basic_utilities.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1955,6 +1958,7 @@ data:
   - verify/utilities/bigint_division.test.cpp
   - verify/utilities/bigint_addition.test.cpp
   - verify/utilities/bigint_gcd.test.cpp
+  - verify/math/rational.test.cpp
   - verify/geometry/centroid.test.cpp
   - verify/geometry/lattice_point_count.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp

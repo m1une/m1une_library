@@ -3814,62 +3814,105 @@ data:
     \ reduced = value / prime;\n            result[value] = reduced % prime == 0 ?\
     \ 0 : -result[reduced];\n        }\n        return result;\n    }\n};\n\n}  //\
     \ namespace math\n}  // namespace m1une\n\n\n#line 1 \"math/rational.hpp\"\n\n\
-    \n\n#line 5 \"math/rational.hpp\"\n#include <compare>\n#line 10 \"math/rational.hpp\"\
-    \n\nnamespace m1une {\nnamespace math {\n\ntemplate <std::signed_integral T =\
-    \ long long>\nstruct Rational {\n    static_assert(sizeof(T) <= sizeof(long long));\n\
-    \n   private:\n    using Wide = __int128_t;\n    using UnsignedWide = __uint128_t;\n\
-    \n    T _numerator;\n    T _denominator;\n\n    static constexpr UnsignedWide\
-    \ magnitude(Wide value) {\n        if (value < 0) {\n            return static_cast<UnsignedWide>(-(value\
-    \ + 1)) + 1;\n        }\n        return static_cast<UnsignedWide>(value);\n  \
-    \  }\n\n    static constexpr UnsignedWide gcd(UnsignedWide first, UnsignedWide\
-    \ second) {\n        while (second != 0) {\n            UnsignedWide remainder\
-    \ = first % second;\n            first = second;\n            second = remainder;\n\
-    \        }\n        return first;\n    }\n\n    static constexpr T narrow(Wide\
-    \ value) {\n        assert(Wide(std::numeric_limits<T>::min()) <= value);\n  \
-    \      assert(value <= Wide(std::numeric_limits<T>::max()));\n        return static_cast<T>(value);\n\
-    \    }\n\n    constexpr void assign_normalized(Wide numerator, Wide denominator)\
+    \n\n#line 7 \"math/rational.hpp\"\n#include <compare>\n#line 11 \"math/rational.hpp\"\
+    \n#include <sstream>\n#line 15 \"math/rational.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ math {\n\nnamespace rational_detail {\n\ntemplate <class T>\nconcept IntegerLike\
+    \ =\n    std::signed_integral<T> ||\n    (!std::integral<T> && std::copyable<T>\
+    \ && requires(T first, T second) {\n        T(0);\n        T(1);\n        { -first\
+    \ } -> std::same_as<T>;\n        { first + second } -> std::same_as<T>;\n    \
+    \    { first - second } -> std::same_as<T>;\n        { first * second } -> std::same_as<T>;\n\
+    \        { first / second } -> std::same_as<T>;\n        { first % second } ->\
+    \ std::same_as<T>;\n        { first += second } -> std::same_as<T&>;\n       \
+    \ { first -= second } -> std::same_as<T&>;\n        { first /= second } -> std::same_as<T&>;\n\
+    \        { first == second } -> std::convertible_to<bool>;\n        { first <\
+    \ second } -> std::convertible_to<bool>;\n    });\n\n}  // namespace rational_detail\n\
+    \ntemplate <rational_detail::IntegerLike T = long long>\nstruct Rational {\n \
+    \   static_assert(!std::signed_integral<T> || sizeof(T) <= sizeof(long long));\n\
+    \n   private:\n    static constexpr bool BUILTIN_INTEGER = std::signed_integral<T>;\n\
+    \    using Wide = std::conditional_t<BUILTIN_INTEGER, __int128_t, T>;\n    using\
+    \ Magnitude = std::conditional_t<BUILTIN_INTEGER, __uint128_t, T>;\n\n    T _numerator;\n\
+    \    T _denominator;\n\n    static constexpr Magnitude magnitude(Wide value) {\n\
+    \        if constexpr (BUILTIN_INTEGER) {\n            if (value < 0) {\n    \
+    \            return static_cast<Magnitude>(-(value + 1)) + 1;\n            }\n\
+    \            return static_cast<Magnitude>(value);\n        } else {\n       \
+    \     return value < 0 ? -value : value;\n        }\n    }\n\n    static constexpr\
+    \ Magnitude gcd(Magnitude first, Magnitude second) {\n        while (second !=\
+    \ 0) {\n            Magnitude remainder = first % second;\n            first =\
+    \ second;\n            second = remainder;\n        }\n        return first;\n\
+    \    }\n\n    static constexpr T narrow(Wide value) {\n        if constexpr (BUILTIN_INTEGER)\
+    \ {\n            assert(Wide(std::numeric_limits<T>::min()) <= value);\n     \
+    \       assert(value <= Wide(std::numeric_limits<T>::max()));\n            return\
+    \ static_cast<T>(value);\n        } else {\n            return value;\n      \
+    \  }\n    }\n\n    constexpr void assign_normalized(Wide numerator, Wide denominator)\
     \ {\n        assert(denominator != 0);\n        if (numerator == 0) {\n      \
     \      _numerator = 0;\n            _denominator = 1;\n            return;\n \
-    \       }\n\n        UnsignedWide divisor = gcd(magnitude(numerator), magnitude(denominator));\n\
+    \       }\n\n        Magnitude divisor = gcd(magnitude(numerator), magnitude(denominator));\n\
     \        numerator /= static_cast<Wide>(divisor);\n        denominator /= static_cast<Wide>(divisor);\n\
     \        if (denominator < 0) {\n            numerator = -numerator;\n       \
     \     denominator = -denominator;\n        }\n        _numerator = narrow(numerator);\n\
     \        _denominator = narrow(denominator);\n    }\n\n    static constexpr Rational\
     \ from_wide(Wide numerator, Wide denominator) {\n        Rational result;\n  \
     \      result.assign_normalized(numerator, denominator);\n        return result;\n\
-    \    }\n\n   public:\n    constexpr Rational() : _numerator(0), _denominator(1)\
-    \ {}\n\n    constexpr Rational(T integer) : _numerator(integer), _denominator(1)\
-    \ {}\n\n    constexpr Rational(T numerator, T denominator) {\n        assign_normalized(Wide(numerator),\
-    \ Wide(denominator));\n    }\n\n    constexpr T numerator() const {\n        return\
-    \ _numerator;\n    }\n\n    constexpr T denominator() const {\n        return\
-    \ _denominator;\n    }\n\n    constexpr bool is_integer() const {\n        return\
-    \ _denominator == 1;\n    }\n\n    constexpr int sign() const {\n        return\
-    \ (_numerator > 0) - (_numerator < 0);\n    }\n\n    constexpr Rational reciprocal()\
-    \ const {\n        assert(_numerator != 0);\n        return from_wide(Wide(_denominator),\
+    \    }\n\n    static std::pair<long double, long long> decimal_scientific(const\
+    \ T& value) {\n        std::ostringstream output;\n        output << value;\n\
+    \        const std::string text = output.str();\n        std::size_t begin = 0;\n\
+    \        int sign = 1;\n        if (!text.empty() && (text[0] == '-' || text[0]\
+    \ == '+')) {\n            if (text[0] == '-') sign = -1;\n            begin =\
+    \ 1;\n        }\n        while (begin < text.size() && text[begin] == '0') ++begin;\n\
+    \        if (begin == text.size()) return std::make_pair(0.0L, 0LL);\n\n     \
+    \   constexpr int DIGITS = std::numeric_limits<long double>::digits10 + 1;\n \
+    \       const std::size_t used = std::min<std::size_t>(DIGITS, text.size() - begin);\n\
+    \        long double significand = 0;\n        for (std::size_t i = 0; i < used;\
+    \ ++i) {\n            assert('0' <= text[begin + i] && text[begin + i] <= '9');\n\
+    \            significand = significand * 10 + (text[begin + i] - '0');\n     \
+    \   }\n        for (std::size_t i = 1; i < used; ++i) significand /= 10;\n   \
+    \     const long long exponent = static_cast<long long>(text.size() - begin -\
+    \ 1);\n        return std::make_pair(sign * significand, exponent);\n    }\n\n\
+    \   public:\n    constexpr Rational() : _numerator(0), _denominator(1) {}\n\n\
+    \    constexpr Rational(T integer) : _numerator(integer), _denominator(1) {}\n\
+    \n    template <std::integral U>\n        requires std::constructible_from<T,\
+    \ U> &&\n                 (!std::same_as<std::remove_cv_t<U>, T>)\n    constexpr\
+    \ Rational(U integer) : Rational(T(integer)) {}\n\n    constexpr Rational(T numerator,\
+    \ T denominator) {\n        assign_normalized(Wide(numerator), Wide(denominator));\n\
+    \    }\n\n    constexpr T numerator() const {\n        return _numerator;\n  \
+    \  }\n\n    constexpr T denominator() const {\n        return _denominator;\n\
+    \    }\n\n    constexpr bool is_integer() const {\n        return _denominator\
+    \ == 1;\n    }\n\n    constexpr int sign() const {\n        return (_numerator\
+    \ > 0) - (_numerator < 0);\n    }\n\n    constexpr Rational reciprocal() const\
+    \ {\n        assert(_numerator != 0);\n        return from_wide(Wide(_denominator),\
     \ Wide(_numerator));\n    }\n\n    constexpr Rational abs() const {\n        return\
     \ _numerator < 0 ? -*this : *this;\n    }\n\n    constexpr long double to_long_double()\
-    \ const {\n        return static_cast<long double>(_numerator) / static_cast<long\
-    \ double>(_denominator);\n    }\n\n    explicit constexpr operator long double()\
-    \ const {\n        return to_long_double();\n    }\n\n    constexpr T trunc()\
-    \ const {\n        return _numerator / _denominator;\n    }\n\n    constexpr T\
-    \ floor() const {\n        T quotient = _numerator / _denominator;\n        if\
-    \ (_numerator < 0 && _numerator % _denominator != 0) --quotient;\n        return\
-    \ quotient;\n    }\n\n    constexpr T ceil() const {\n        T quotient = _numerator\
-    \ / _denominator;\n        if (0 < _numerator && _numerator % _denominator !=\
-    \ 0) ++quotient;\n        return quotient;\n    }\n\n    constexpr Rational operator+()\
-    \ const {\n        return *this;\n    }\n\n    constexpr Rational operator-()\
-    \ const {\n        return from_wide(-Wide(_numerator), Wide(_denominator));\n\
+    \ const\n        requires requires(const T& value) { static_cast<long double>(value);\
+    \ }\n    {\n        return static_cast<long double>(_numerator) / static_cast<long\
+    \ double>(_denominator);\n    }\n\n    long double to_long_double() const\n  \
+    \      requires(!requires(const T& value) { static_cast<long double>(value); })\n\
+    \    {\n        const auto [numerator, numerator_exponent] = decimal_scientific(_numerator);\n\
+    \        const auto [denominator, denominator_exponent] = decimal_scientific(_denominator);\n\
+    \        return numerator / denominator *\n               std::pow(10.0L, numerator_exponent\
+    \ - denominator_exponent);\n    }\n\n    explicit constexpr operator long double()\
+    \ const\n        requires requires(const T& value) { static_cast<long double>(value);\
+    \ }\n    {\n        return to_long_double();\n    }\n\n    explicit operator long\
+    \ double() const\n        requires(!requires(const T& value) { static_cast<long\
+    \ double>(value); })\n    {\n        return to_long_double();\n    }\n\n    constexpr\
+    \ T trunc() const {\n        return _numerator / _denominator;\n    }\n\n    constexpr\
+    \ T floor() const {\n        T quotient = _numerator / _denominator;\n       \
+    \ if (_numerator < 0 && _numerator % _denominator != 0) quotient -= T(1);\n  \
+    \      return quotient;\n    }\n\n    constexpr T ceil() const {\n        T quotient\
+    \ = _numerator / _denominator;\n        if (0 < _numerator && _numerator % _denominator\
+    \ != 0) quotient += T(1);\n        return quotient;\n    }\n\n    constexpr Rational\
+    \ operator+() const {\n        return *this;\n    }\n\n    constexpr Rational\
+    \ operator-() const {\n        return from_wide(-Wide(_numerator), Wide(_denominator));\n\
     \    }\n\n    constexpr Rational& operator+=(const Rational& other) {\n      \
-    \  UnsignedWide common =\n            gcd(static_cast<UnsignedWide>(_denominator),\
-    \ static_cast<UnsignedWide>(other._denominator));\n        Wide left_scale = Wide(other._denominator)\
-    \ / static_cast<Wide>(common);\n        Wide right_scale = Wide(_denominator)\
-    \ / static_cast<Wide>(common);\n        assign_normalized(Wide(_numerator) * left_scale\
-    \ + Wide(other._numerator) * right_scale,\n                          Wide(_denominator)\
-    \ * left_scale);\n        return *this;\n    }\n\n    constexpr Rational& operator-=(const\
-    \ Rational& other) {\n        return *this += -other;\n    }\n\n    constexpr\
-    \ Rational& operator*=(const Rational& other) {\n        UnsignedWide first_gcd\
-    \ = gcd(magnitude(Wide(_numerator)), static_cast<UnsignedWide>(other._denominator));\n\
-    \        UnsignedWide second_gcd = gcd(magnitude(Wide(other._numerator)), static_cast<UnsignedWide>(_denominator));\n\
+    \  Magnitude common =\n            gcd(static_cast<Magnitude>(_denominator), static_cast<Magnitude>(other._denominator));\n\
+    \        Wide left_scale = Wide(other._denominator) / static_cast<Wide>(common);\n\
+    \        Wide right_scale = Wide(_denominator) / static_cast<Wide>(common);\n\
+    \        assign_normalized(Wide(_numerator) * left_scale + Wide(other._numerator)\
+    \ * right_scale,\n                          Wide(_denominator) * left_scale);\n\
+    \        return *this;\n    }\n\n    constexpr Rational& operator-=(const Rational&\
+    \ other) {\n        return *this += -other;\n    }\n\n    constexpr Rational&\
+    \ operator*=(const Rational& other) {\n        Magnitude first_gcd = gcd(magnitude(Wide(_numerator)),\
+    \ static_cast<Magnitude>(other._denominator));\n        Magnitude second_gcd =\
+    \ gcd(magnitude(Wide(other._numerator)), static_cast<Magnitude>(_denominator));\n\
     \        assign_normalized((Wide(_numerator) / static_cast<Wide>(first_gcd)) *\n\
     \                              (Wide(other._numerator) / static_cast<Wide>(second_gcd)),\n\
     \                          (Wide(_denominator) / static_cast<Wide>(second_gcd))\
@@ -3893,13 +3936,21 @@ data:
     \ value) {\n        output << value._numerator;\n        if (value._denominator\
     \ != 1) {\n            output << '/' << value._denominator;\n        }\n     \
     \   return output;\n    }\n\n    friend std::istream& operator>>(std::istream&\
-    \ input, Rational& value) {\n        T numerator;\n        if (!(input >> numerator))\
-    \ return input;\n        T denominator = 1;\n        if (input.peek() == '/')\
-    \ {\n            input.get();\n            if (!(input >> denominator)) return\
-    \ input;\n        }\n        value = Rational(numerator, denominator);\n     \
-    \   return input;\n    }\n};\n\ntemplate <std::signed_integral T>\nconstexpr Rational<T>\
-    \ abs(const Rational<T>& value) {\n    return value.abs();\n}\n\n}  // namespace\
-    \ math\n}  // namespace m1une\n\n\n#line 1 \"math/rational_approximation.hpp\"\
+    \ input, Rational& value) {\n        std::string token;\n        if (!(input >>\
+    \ token)) return input;\n\n        std::size_t slash = token.find('/');\n    \
+    \    if (slash != std::string::npos && token.find('/', slash + 1) != std::string::npos)\
+    \ {\n            input.setstate(std::ios::failbit);\n            return input;\n\
+    \        }\n\n        T numerator = 0;\n        T denominator = 1;\n        std::istringstream\
+    \ numerator_input(token.substr(0, slash));\n        if (!(numerator_input >> numerator)\
+    \ || numerator_input.peek() != std::char_traits<char>::eof()) {\n            input.setstate(std::ios::failbit);\n\
+    \            return input;\n        }\n        if (slash != std::string::npos)\
+    \ {\n            std::istringstream denominator_input(token.substr(slash + 1));\n\
+    \            if (!(denominator_input >> denominator) ||\n                denominator_input.peek()\
+    \ != std::char_traits<char>::eof()) {\n                input.setstate(std::ios::failbit);\n\
+    \                return input;\n            }\n        }\n        value = Rational(numerator,\
+    \ denominator);\n        return input;\n    }\n};\n\ntemplate <rational_detail::IntegerLike\
+    \ T>\nconstexpr Rational<T> abs(const Rational<T>& value) {\n    return value.abs();\n\
+    }\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line 1 \"math/rational_approximation.hpp\"\
     \n\n\n\n#line 10 \"math/rational_approximation.hpp\"\n\nnamespace m1une {\nnamespace\
     \ math {\n\ntemplate <std::integral T>\nrequires(!std::same_as<std::remove_cv_t<T>,\
     \ bool>)\nstruct RationalApproximationResult {\n    using fraction_type = std::pair<T,\
@@ -4657,7 +4708,7 @@ data:
   isVerificationFile: false
   path: math/all.hpp
   requiredBy: []
-  timestamp: '2026-08-11 14:11:53+09:00'
+  timestamp: '2026-08-13 00:26:09+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp

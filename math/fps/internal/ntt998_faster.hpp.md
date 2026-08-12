@@ -226,6 +226,9 @@ data:
     path: verify/math/partition_function.test.cpp
     title: verify/math/partition_function.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/rational.test.cpp
+    title: verify/math/rational.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/stirling_number_of_the_second_kind.test.cpp
     title: verify/math/stirling_number_of_the_second_kind.test.cpp
   - icon: ':heavy_check_mark:'
@@ -802,6 +805,7 @@ data:
   - verify/math/fps/half_gcd.test.cpp
   - verify/math/multivariate_convolution_cyclic.test.cpp
   - verify/math/newton_method.test.cpp
+  - verify/math/rational.test.cpp
   - verify/math/multivariate_convolution_truncated.test.cpp
   - verify/math/bernoulli_number.test.cpp
   - verify/math/bell_number.test.cpp

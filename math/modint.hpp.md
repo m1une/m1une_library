@@ -487,6 +487,9 @@ data:
     path: verify/math/prefix_sum_of_binom_randomized.test.cpp
     title: verify/math/prefix_sum_of_binom_randomized.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/rational.test.cpp
+    title: verify/math/rational.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/repunit.test.cpp
     title: verify/math/repunit.test.cpp
   - icon: ':heavy_check_mark:'
@@ -912,6 +915,7 @@ data:
   - verify/math/modular_kth_root.test.cpp
   - verify/math/bitwise_convolution.test.cpp
   - verify/math/set_power_series_log.test.cpp
+  - verify/math/rational.test.cpp
   - verify/math/multivariate_convolution_truncated.test.cpp
   - verify/math/multivariate_convolution_truncated.test.cpp
   - verify/math/bitwise_and_convolution.test.cpp
