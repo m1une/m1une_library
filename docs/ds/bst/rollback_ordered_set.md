@@ -6,30 +6,30 @@ documentation_of: ../../../ds/bst/rollback_ordered_set.hpp
 ## Overview
 
 `RollbackOrderedSet<T, Compare>` is an ordered set with order statistics and
-linear-history rollback. It reuses the persistent red-black-tree node pool.
+registered-snapshot rollback. It stores its mutable ordered tree independently of any versioned structure.
 `Compare` must define a strict weak ordering, as for `std::set`.
 
 ## Methods
 
-Constructors and all read-only search, order-statistic, conversion, and split
-methods match `PersistentOrderedSet<T, Compare>`.
+Constructors and read-only search, order-statistic, conversion, and split
+methods follow the corresponding mutable structure.
 
 | Method | Description | Complexity |
 | --- | --- | --- |
-| `void clear()` | Clears the set and advances history. | $O(1)$ |
-| `bool insert(T key)` | Inserts a key, reports whether it was new, and advances history. | $O(\log N)$ |
-| `bool erase(const T& key)` | Erases a key, reports whether it existed, and advances history. | $O(\log N)$ |
-| `void merge(const RollbackOrderedSet& other)` | Appends an ordered, disjoint set and advances history. | $O(\log N)$ |
-| `void merge(const PersistentOrderedSet<T, Compare>& other)` | Persistent-handle overload of `merge`. | $O(\log N)$ |
-| `int history_size() const`, `int snapshot() const` | Returns the history position. | $O(1)$ |
-| `void reserve_history(int count)` | Reserves history entries. | $O(H)$ |
-| `bool undo()` | Undoes one update. | $O(F)$ |
+| `void clear()` | Clears the set. | $O(N)$ |
+| `bool insert(T key)` | Inserts a key, reports whether it was new. | $O(\log N)$ |
+| `bool erase(const T& key)` | Erases a key, reports whether it existed. | $O(\log N)$ |
+| `void merge(const RollbackOrderedSet& other)` | Inserts an ordered, disjoint set of size $M$. | $O(M \log(N+M))$ |
+| `int snapshot()` | Registers the current state and returns its token. | $O(1)$ |
+| `int snapshot_count() const` | Returns the number of active snapshots. | $O(1)$ |
+| `void reserve_snapshots(int count)` | Reserves snapshot tokens. | $O(H)$ |
 | `void rollback(int state)` | Rolls back to a current-path snapshot. | $O(F)$ total |
 | `void clear_history()`, `void release()` | Releases saved states, or all states. | $O(F)$ |
-| `const PersistentOrderedSet<T, Compare>& current_version() const` | Returns the current persistent state. | $O(1)$ |
 
-Each attempted update advances history, even if it does not change membership.
-$F$ counts nodes whose final reference is released.
+
+## Snapshot semantics
+
+Updates made before the first `snapshot()` retain no rollback data. A snapshot token is positive and valid only on the current path. `rollback(state)` restores that registered state, keeps it active, and invalidates newer snapshots. `clear_history()` commits the current state and invalidates every token. No per-update reversal operation is provided.
 
 ## Example
 

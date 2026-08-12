@@ -11,20 +11,24 @@ retain the configured initial value.
 
 ## Methods
 
-Constructors and read-only domain, product, boundary-search, and node-count
-methods match `PersistentDynamicSegtree<Monoid, Index>`.
+Constructors and read-only methods follow `DynamicSegtree<Monoid, Index>`.
 
 | Method | Description | Complexity |
 | --- | --- | --- |
 | `void set(Index pos, T value)`, `void set_inplace(Index pos, T value)` | Assigns one point. | $O(\log U)$ |
-| `int history_size() const`, `int snapshot() const` | Returns the history position. | $O(1)$ |
-| `void reserve_history(int count)` | Reserves history entries. | $O(H)$ |
-| `bool undo()` | Undoes one assignment. | $O(F)$ |
+| `int snapshot()` | Registers the current state and returns its token. | $O(1)$ |
+| `int snapshot_count() const` | Returns the number of active snapshots. | $O(1)$ |
+| `void reserve_snapshots(int count)` | Reserves snapshot tokens. | $O(H)$ |
 | `void rollback(int state)` | Restores a current-path snapshot. | $O(F)$ total |
 | `void clear_history()`, `void release()` | Releases saved states, or all materialized nodes. | $O(F)$ |
-| `const PersistentDynamicSegtree<Monoid, Index>& current_version() const` | Returns the current persistent state. | $O(1)$ |
 
 $U$ is the domain width and $F = O(\log U)$ per assignment.
+
+## Snapshot semantics
+
+Updates made before the first `snapshot()` retain no rollback data. A snapshot token is positive and valid only on the current path. `rollback(state)` restores that registered state, keeps it active, and invalidates newer snapshots. `clear_history()` commits the current state and invalidates every token. No per-update reversal operation is provided.
+
+Within one snapshot interval, a materialized node is saved only before its first mutation; newly allocated nodes are truncated directly by rollback.
 
 ## Example
 

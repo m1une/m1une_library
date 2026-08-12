@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cassert>
 #include <concepts>
+#include <cstddef>
 #include <utility>
 #include <vector>
 
@@ -39,6 +40,7 @@ struct RollbackPotentializedDsu {
     std::vector<int> _parent_or_size;
     std::vector<T> _diff_to_parent;
     std::vector<HistoryEntry> _history;
+    std::vector<std::size_t> _checkpoints;
 
     static int check_size(int n) {
         assert(0 <= n);
@@ -67,11 +69,11 @@ struct RollbackPotentializedDsu {
     int size() const { return _n; }
     bool empty() const { return _n == 0; }
     int component_count() const { return _component_count; }
-    int history_size() const { return int(_history.size()); }
+    int snapshot_count() const { return int(_checkpoints.size()); }
 
-    void reserve_history(int count) {
+    void reserve_snapshots(int count) {
         assert(0 <= count);
-        _history.reserve(count);
+        _checkpoints.reserve(count);
     }
 
     int leader(int vertex) const {
@@ -106,7 +108,6 @@ struct RollbackPotentializedDsu {
         auto [first_root, first_potential] = leader_and_potential(first);
         auto [second_root, second_potential] = leader_and_potential(second);
         if (first_root == second_root) {
-            _history.emplace_back(-1, 0, -1, 0, Group::id());
             return Group::op(Group::inv(first_potential), second_potential) == difference;
         }
 
@@ -119,10 +120,12 @@ struct RollbackPotentializedDsu {
             second_from_first = Group::inv(second_from_first);
         }
 
-        _history.emplace_back(
-            first_root, _parent_or_size[first_root], second_root,
-            _parent_or_size[second_root], _diff_to_parent[second_root]
-        );
+        if (!_checkpoints.empty()) {
+            _history.emplace_back(
+                first_root, _parent_or_size[first_root], second_root,
+                _parent_or_size[second_root], _diff_to_parent[second_root]
+            );
+        }
         _parent_or_size[first_root] += _parent_or_size[second_root];
         _parent_or_size[second_root] = first_root;
         _diff_to_parent[second_root] = std::move(second_from_first);
@@ -130,24 +133,26 @@ struct RollbackPotentializedDsu {
         return true;
     }
 
-    bool undo() {
-        if (_history.empty()) return false;
+   private:
+    void restore_one() {
         HistoryEntry entry = std::move(_history.back());
         _history.pop_back();
-        if (entry.first == -1) return true;
         _parent_or_size[entry.first] = entry.first_value;
         _parent_or_size[entry.second] = entry.second_value;
         _diff_to_parent[entry.second] = std::move(entry.second_diff);
         ++_component_count;
-        return true;
     }
 
-    int snapshot() const { return history_size(); }
+   public:
+    int snapshot() { _checkpoints.push_back(_history.size()); return int(_checkpoints.size()); }
 
     void rollback(int state) {
-        assert(0 <= state && state <= history_size());
-        while (history_size() > state) undo();
+        assert(1 <= state && state <= snapshot_count());
+        while (_history.size() > _checkpoints[state - 1]) restore_one();
+        _checkpoints.resize(state);
     }
+
+    void clear_history() { _history.clear(); _checkpoints.clear(); }
 
     std::vector<std::vector<int>> groups() const {
         std::vector<int> leaders(_n);

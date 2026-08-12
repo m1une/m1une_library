@@ -5,30 +5,30 @@ documentation_of: ../../../ds/deque/rollback_deque.hpp
 
 ## Overview
 
-`RollbackDeque<T>` is a mutable real-time double-ended queue with undo and
-snapshot support. It retains shared states of `PersistentDeque<T>`. Each update
-advances history exactly once.
+`RollbackDeque<T>` is a mutable real-time double-ended queue with
+registered-snapshot rollback. Rollback values are retained only while snapshots are active.
 
 ## Methods
 
-Constructors and the read-only methods `size`, `empty`, `front`, `back`, and
-`node_count` match `PersistentDeque<T>`.
+Constructors and read-only methods follow ordinary double-ended queue semantics.
 
 | Method | Description | Complexity |
 | --- | --- | --- |
 | `void push_front(T value)`, `void push_back(T value)` | Pushes at one end. | $O(1)$ worst case |
 | `template<class... Args> void emplace_front(Args&&... args)`, `template<class... Args> void emplace_back(Args&&... args)` | Constructs a value at one end. | $O(1)$ worst case |
 | `void pop_front()`, `void pop_back()` | Pops one end. Requires a nonempty deque. | $O(1)$ worst case |
-| `void clear()` | Removes all values. | $O(1)$ |
-| `int history_size() const`, `int snapshot() const` | Returns the history position. | $O(1)$ |
-| `void reserve_history(int count)` | Reserves history entries. | $O(H)$ |
-| `bool undo()` | Undoes one update. | $O(F)$ |
+| `void clear()` | Removes all values. | $O(N)$ |
+| `int snapshot()` | Registers the current state and returns its token. | $O(1)$ |
+| `int snapshot_count() const` | Returns the number of active snapshots. | $O(1)$ |
+| `void reserve_snapshots(int count)` | Reserves snapshot tokens. | $O(H)$ |
 | `void rollback(int state)` | Rolls back to a current-path snapshot. | $O(F)$ total |
 | `void clear_history()` | Forgets saved states. | $O(F)$ |
 | `void release()` | Releases current and saved states. | $O(F)$ |
-| `const PersistentDeque<T>& current_version() const` | Returns the current persistent state. | $O(1)$ |
 
-$F$ counts nodes and delayed stream cells whose final reference is released.
+
+## Snapshot semantics
+
+Updates made before the first `snapshot()` retain no rollback data. A snapshot token is positive and valid only on the current path. `rollback(state)` restores that registered state, keeps it active, and invalidates newer snapshots. `clear_history()` commits the current state and invalidates every token. No per-update reversal operation is provided.
 
 ## Example
 

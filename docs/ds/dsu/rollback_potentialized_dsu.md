@@ -5,20 +5,13 @@ documentation_of: ../../../ds/dsu/rollback_potentialized_dsu.hpp
 
 ## Overview
 
-`RollbackPotentializedDsu<Group>` is a weighted Union-Find that can undo merge
-constraints. It supports possibly noncommutative groups and uses union by size
-without path compression, so every tree has logarithmic depth and undo is
-constant time.
+`RollbackPotentializedDsu<Group>` is a weighted Union-Find with registered snapshots. It supports possibly noncommutative groups and uses union by size without path compression, so every tree has logarithmic depth.
 
 For `merge(a, b, w)`, the stored constraint is
 `diff(a, b) == w`, where
 `diff(a, b) = Group::op(Group::inv(potential(a)), potential(b))`.
 The group value type must be equality comparable so a constraint inside an
 existing component can be checked.
-
-Every merge call adds one history entry, including a redundant or contradictory
-constraint. Thus one `undo()` always corresponds to one `merge()` call.
-Snapshots are valid only on the current history path.
 
 ## Methods
 
@@ -35,14 +28,18 @@ Snapshots are valid only on the current history path.
 | `T diff(int first, int second) const` | Returns the potential difference; requires connectivity. | $O(\log N)$ |
 | `int parent_or_size(int vertex) const` | Returns the internal parent-or-negative-size entry. | $O(1)$ |
 | `bool merge(int first, int second, const T& difference)` | Adds `diff(first, second) == difference`; returns whether the constraints are consistent. | $O(\log N)$ |
-| `int history_size() const`, `int snapshot() const` | Returns the current history position. | $O(1)$ |
-| `void reserve_history(int count)` | Reserves merge history. | $O(H)$ |
-| `bool undo()` | Undoes the latest merge call. | $O(1)$ |
-| `void rollback(int state)` | Restores a current-path snapshot. | $O(H - state)$ |
+| `int snapshot()` | Registers the current state and returns its token. | $O(1)$ |
+| `int snapshot_count() const` | Returns the number of active snapshots. | $O(1)$ |
+| `void reserve_snapshots(int count)` | Reserves snapshot tokens. | $O(H)$ |
+| `void rollback(int state)` | Restores a current-path snapshot. | $O(M)$ for $M$ reverted successful merges |
+| `void clear_history()` | Commits the current state and invalidates snapshots. | $O(H)$ |
 | `std::vector<std::vector<int>> groups() const` | Materializes all components. | $O(N \log N)$ |
 
-Indices must lie in `[0, size())`; rollback states must lie in
-`[0, history_size()]`.
+Indices must lie in `[0, size())`. A rollback token must be active.
+
+## Snapshot semantics
+
+Updates made before the first `snapshot()` retain no rollback data. A snapshot token is positive and valid only on the current path. `rollback(state)` restores that registered state, keeps it active, and invalidates newer snapshots. `clear_history()` commits the current state and invalidates every token. No per-update reversal operation is provided.
 
 ## Example
 

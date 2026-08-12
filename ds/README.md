@@ -42,5 +42,5 @@ The lazy and Beats variants differ as follows:
 | `LazySegtree<ActedMonoid>` | Ordinary monoid action that always applies directly |
 | `SegtreeBeats<ActedMonoid>` | Generic fallible monoid action that descends on failure |
 | `PersistentSegtreeBeats<ActedMonoid>` | Persistent generic fallible action; updates return new versions |
-| `RollbackSegtreeBeats<ActedMonoid>` | Linear-history generic fallible action; updates mutate and can be undone |
+| `RollbackSegtreeBeats<ActedMonoid>` | Mutable generic fallible action with registered snapshots and rollback |
 | `ChminChmaxAddSegtree<T>` | Ready-made numeric chmin/chmax/add implementation |

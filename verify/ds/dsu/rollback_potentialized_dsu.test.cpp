@@ -47,8 +47,6 @@ void noncommutative_test() {
     Permutation composed = PermutationGroup::op(rotate, swap_last);
     assert(dsu.diff(0, 2) == composed);
     assert(!dsu.merge(0, 2, PermutationGroup::op(swap_last, rotate)));
-    assert(dsu.undo());
-    assert(dsu.diff(0, 2) == composed);
     dsu.rollback(state);
     assert(!dsu.same(0, 2));
 }
@@ -89,25 +87,7 @@ void randomized_test() {
         return std::pair(std::move(seen), std::move(potential));
     };
 
-    for (int step = 0; step < 600; ++step) {
-        if (!history.empty() && random() % 4 == 0) {
-            assert(dsu.undo());
-            history.pop_back();
-            rebuild();
-        } else {
-            int first = int(random() % size);
-            int second = int(random() % size);
-            auto [seen, potential] = naive_potential(first);
-            long long difference = seen[second]
-                ? potential[second]
-                : static_cast<long long>(int(random() % 41) - 20);
-            bool consistent = dsu.merge(first, second, difference);
-            assert(consistent);
-            if (!seen[second]) history.emplace_back(first, second, difference);
-            else history.emplace_back(first, first, 0);
-            rebuild();
-        }
-
+    auto validate = [&] {
         for (int first = 0; first < size; ++first) {
             auto [seen, potential] = naive_potential(first);
             for (int second = 0; second < size; ++second) {
@@ -117,6 +97,30 @@ void randomized_test() {
                 }
             }
         }
+    };
+
+    for (int round = 0; round < 120; ++round) {
+        int state = dsu.snapshot();
+        std::size_t history_size = history.size();
+        int update_count = 1 + int(random() % 8);
+        for (int step = 0; step < update_count; ++step) {
+            int first = int(random() % size);
+            int second = int(random() % size);
+            auto [seen, potential] = naive_potential(first);
+            long long difference = seen[second]
+                ? potential[second]
+                : static_cast<long long>(int(random() % 41) - 20);
+            bool consistent = dsu.merge(first, second, difference);
+            assert(consistent);
+            if (!seen[second]) history.emplace_back(first, second, difference);
+            rebuild();
+            validate();
+        }
+
+        dsu.rollback(state);
+        history.resize(history_size);
+        rebuild();
+        validate();
     }
 }
 
