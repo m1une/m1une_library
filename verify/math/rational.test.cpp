@@ -1,6 +1,7 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/aplusb"
 
 #include "../../math/rational.hpp"
+#include "../../utilities/bigint.hpp"
 
 #include <cassert>
 #include <compare>
@@ -12,6 +13,8 @@
 namespace {
 
 using Fraction = m1une::math::Rational<long long>;
+using BigInt = m1une::utilities::BigInt;
+using BigFraction = m1une::math::Rational<BigInt>;
 
 void test_fixed() {
     constexpr Fraction zero;
@@ -91,6 +94,71 @@ void test_randomized() {
     }
 }
 
+void test_bigint() {
+    BigInt power = 1;
+    for (int i = 0; i < 100; ++i) power *= 10;
+
+    BigFraction reduced(power * 6, power * 8);
+    assert(reduced == BigFraction(3, 4));
+    assert(reduced.numerator() == 3);
+    assert(reduced.denominator() == 4);
+
+    BigFraction large(power, 3);
+    BigFraction inverse(3, power);
+    assert(large * inverse == 1);
+    assert(large > inverse);
+    assert(large + BigFraction(1, 3) == BigFraction(power + 1, 3));
+    assert(large / large == 1);
+
+    BigFraction negative(-(power + 1), power);
+    assert(negative.floor() == -2);
+    assert(negative.ceil() == -1);
+    assert(negative.trunc() == -1);
+    assert(negative.sign() == -1);
+    assert(abs(negative) == -negative);
+
+    BigFraction integer = 5;
+    assert(integer + 1 == 6);
+    assert(BigFraction(1, 2).to_long_double() == 0.5L);
+    long double near_two_thirds =
+        BigFraction(power * 2 + 1, power * 3 + 1).to_long_double();
+    assert(0.66L < near_two_thirds && near_two_thirds < 0.67L);
+
+    std::stringstream stream;
+    stream << large;
+    BigFraction parsed;
+    stream >> parsed;
+    assert(parsed == large);
+
+    std::uint64_t state = 2309;
+    auto random = [&state]() {
+        state ^= state << 7;
+        state ^= state >> 9;
+        return state;
+    };
+    auto assert_same = [](const BigFraction& big, const Fraction& small) {
+        assert(big.numerator().to_string() == std::to_string(small.numerator()));
+        assert(big.denominator().to_string() == std::to_string(small.denominator()));
+    };
+    for (int trial = 0; trial < 10000; ++trial) {
+        long long a = static_cast<long long>(random() % 2001) - 1000;
+        long long b = 1 + static_cast<long long>(random() % 1000);
+        long long c = static_cast<long long>(random() % 2001) - 1000;
+        long long d = 1 + static_cast<long long>(random() % 1000);
+        BigFraction big_first = BigFraction(BigInt(a), BigInt(b));
+        BigFraction big_second = BigFraction(BigInt(c), BigInt(d));
+        Fraction small_first(a, b);
+        Fraction small_second(c, d);
+        assert_same(big_first + big_second, small_first + small_second);
+        assert_same(big_first - big_second, small_first - small_second);
+        assert_same(big_first * big_second, small_first * small_second);
+        assert((big_first <=> big_second) == (small_first <=> small_second));
+        if (c != 0) {
+            assert_same(big_first / big_second, small_first / small_second);
+        }
+    }
+}
+
 }  // namespace
 
 int main() {
@@ -99,6 +167,7 @@ int main() {
 
     test_fixed();
     test_randomized();
+    test_bigint();
 
     long long a, b;
     fast_input >> a >> b;
