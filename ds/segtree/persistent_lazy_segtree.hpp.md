@@ -7,17 +7,11 @@ data:
   - icon: ':heavy_check_mark:'
     path: ds/segtree/persistent_node_pool.hpp
     title: ds/segtree/persistent_node_pool.hpp
-  _extendedRequiredBy:
-  - icon: ':heavy_check_mark:'
-    path: ds/segtree/rollback_lazy_segtree.hpp
-    title: Rollback Lazy Segment Tree
+  _extendedRequiredBy: []
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/ds/persistent_cow.test.cpp
     title: verify/ds/persistent_cow.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/ds/rollback_counterparts.test.cpp
-    title: verify/ds/rollback_counterparts.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/persistent_lazy_segtree.test.cpp
     title: verify/ds/segtree/persistent_lazy_segtree.test.cpp
@@ -470,12 +464,10 @@ data:
   - ds/segtree/persistent_node_pool.hpp
   isVerificationFile: false
   path: ds/segtree/persistent_lazy_segtree.hpp
-  requiredBy:
-  - ds/segtree/rollback_lazy_segtree.hpp
+  requiredBy: []
   timestamp: '2026-08-12 03:11:00+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/rollback_counterparts.test.cpp
   - verify/ds/segtree/persistent_lazy_segtree.test.cpp
   - verify/ds/persistent_cow.test.cpp
 documentation_of: ds/segtree/persistent_lazy_segtree.hpp

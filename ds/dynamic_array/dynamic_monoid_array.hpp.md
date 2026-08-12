@@ -4,11 +4,17 @@ data:
   - icon: ':heavy_check_mark:'
     path: monoid/concept.hpp
     title: Monoid Concept
-  _extendedRequiredBy: []
+  _extendedRequiredBy:
+  - icon: ':heavy_check_mark:'
+    path: ds/dynamic_array/rollback_dynamic_monoid_array.hpp
+    title: Rollback Dynamic Monoid Array
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/ds/dynamic_array/dynamic_monoid_array.test.cpp
     title: verify/ds/dynamic_array/dynamic_monoid_array.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/rollback_counterparts.test.cpp
+    title: verify/ds/rollback_counterparts.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -447,11 +453,13 @@ data:
   - monoid/concept.hpp
   isVerificationFile: false
   path: ds/dynamic_array/dynamic_monoid_array.hpp
-  requiredBy: []
+  requiredBy:
+  - ds/dynamic_array/rollback_dynamic_monoid_array.hpp
   timestamp: '2026-07-16 20:44:42+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/dynamic_array/dynamic_monoid_array.test.cpp
+  - verify/ds/rollback_counterparts.test.cpp
 documentation_of: ds/dynamic_array/dynamic_monoid_array.hpp
 layout: document
 title: Dynamic Monoid Array

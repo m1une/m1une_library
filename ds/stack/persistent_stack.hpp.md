@@ -1,17 +1,11 @@
 ---
 data:
   _extendedDependsOn: []
-  _extendedRequiredBy:
-  - icon: ':heavy_check_mark:'
-    path: ds/stack/rollback_stack.hpp
-    title: Rollback Stack
+  _extendedRequiredBy: []
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/ds/persistent_release.test.cpp
     title: verify/ds/persistent_release.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/ds/rollback_counterparts.test.cpp
-    title: verify/ds/rollback_counterparts.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/ds/stack/persistent_stack.test.cpp
     title: verify/ds/stack/persistent_stack.test.cpp
@@ -143,12 +137,10 @@ data:
   dependsOn: []
   isVerificationFile: false
   path: ds/stack/persistent_stack.hpp
-  requiredBy:
-  - ds/stack/rollback_stack.hpp
+  requiredBy: []
   timestamp: '2026-08-11 13:59:43+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/rollback_counterparts.test.cpp
   - verify/ds/persistent_release.test.cpp
   - verify/ds/stack/persistent_stack.test.cpp
 documentation_of: ds/stack/persistent_stack.hpp

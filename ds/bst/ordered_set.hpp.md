@@ -3,6 +3,9 @@ data:
   _extendedDependsOn: []
   _extendedRequiredBy:
   - icon: ':heavy_check_mark:'
+    path: ds/bst/rollback_ordered_set.hpp
+    title: Rollback Ordered Set
+  - icon: ':heavy_check_mark:'
     path: ds/range_query/range_majority.hpp
     title: Range Majority
   _extendedVerifiedWith:
@@ -12,6 +15,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/range_query/range_majority.test.cpp
     title: verify/ds/range_query/range_majority.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/rollback_counterparts.test.cpp
+    title: verify/ds/rollback_counterparts.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -320,9 +326,11 @@ data:
   path: ds/bst/ordered_set.hpp
   requiredBy:
   - ds/range_query/range_majority.hpp
+  - ds/bst/rollback_ordered_set.hpp
   timestamp: '2026-07-13 03:01:19+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/ds/rollback_counterparts.test.cpp
   - verify/ds/range_query/range_majority.test.cpp
   - verify/ds/bst/ordered_set.test.cpp
 documentation_of: ds/bst/ordered_set.hpp

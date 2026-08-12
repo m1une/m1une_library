@@ -18,6 +18,12 @@ data:
     path: ds/segtree/lazy_segtree.hpp
     title: Lazy Segment Tree
   - icon: ':heavy_check_mark:'
+    path: ds/segtree/rollback_lazy_segtree.hpp
+    title: Rollback Lazy Segment Tree
+  - icon: ':heavy_check_mark:'
+    path: ds/segtree/rollback_segtree_beats.hpp
+    title: Rollback Segment Tree Beats
+  - icon: ':heavy_check_mark:'
     path: ds/segtree/segtree.hpp
     title: Segment Tree
   - icon: ':heavy_check_mark:'
@@ -48,6 +54,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/range_query/range_sort_range_composite.test.cpp
     title: verify/ds/range_query/range_sort_range_composite.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/rollback_counterparts.test.cpp
+    title: verify/ds/rollback_counterparts.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/dual_segtree.test.cpp
     title: verify/ds/segtree/dual_segtree.test.cpp
@@ -92,7 +101,9 @@ data:
   isVerificationFile: false
   path: math/bit_ceil.hpp
   requiredBy:
+  - ds/segtree/rollback_lazy_segtree.hpp
   - ds/segtree/segtree_beats.hpp
+  - ds/segtree/rollback_segtree_beats.hpp
   - ds/segtree/dual_segtree_2d.hpp
   - ds/segtree/segtree_2d.hpp
   - ds/segtree/segtree.hpp
@@ -104,6 +115,7 @@ data:
   timestamp: '2026-06-15 01:47:39+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/ds/rollback_counterparts.test.cpp
   - verify/ds/segtree/segtree.test.cpp
   - verify/ds/segtree/segtree_2d.test.cpp
   - verify/ds/segtree/dual_segtree_2d.test.cpp

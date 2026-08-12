@@ -287,8 +287,8 @@ data:
       path: ds/detail/persistent_binary_node_pool.hpp
       title: ds/detail/persistent_binary_node_pool.hpp
     - icon: ':heavy_check_mark:'
-      path: ds/detail/rollback_persistent_base.hpp
-      title: ds/detail/rollback_persistent_base.hpp
+      path: ds/detail/rollback_journal.hpp
+      title: ds/detail/rollback_journal.hpp
   - name: ds/dsu
     pages:
     - icon: ':heavy_check_mark:'

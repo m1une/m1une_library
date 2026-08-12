@@ -2,17 +2,11 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: ds/detail/rollback_persistent_base.hpp
-    title: ds/detail/rollback_persistent_base.hpp
+    path: ds/detail/rollback_journal.hpp
+    title: ds/detail/rollback_journal.hpp
   - icon: ':heavy_check_mark:'
     path: ds/segtree/dynamic_segtree_common.hpp
     title: ds/segtree/dynamic_segtree_common.hpp
-  - icon: ':heavy_check_mark:'
-    path: ds/segtree/persistent_dynamic_dual_segtree.hpp
-    title: Persistent Dynamic Dual Segment Tree
-  - icon: ':heavy_check_mark:'
-    path: ds/segtree/persistent_node_pool.hpp
-    title: ds/segtree/persistent_node_pool.hpp
   - icon: ':heavy_check_mark:'
     path: monoid/concept.hpp
     title: Monoid Concept
@@ -27,53 +21,70 @@ data:
   attributes:
     links: []
   bundledCode: "#line 1 \"ds/segtree/rollback_dynamic_dual_segtree.hpp\"\n\n\n\n#include\
-    \ <concepts>\n#include <type_traits>\n#include <utility>\n\n#line 1 \"ds/detail/rollback_persistent_base.hpp\"\
-    \n\n\n\n#include <cassert>\n#include <cstddef>\n#include <limits>\n#line 8 \"\
-    ds/detail/rollback_persistent_base.hpp\"\n#include <vector>\n\nnamespace m1une\
-    \ {\nnamespace ds {\nnamespace detail {\n\ntemplate <class Persistent>\nstruct\
-    \ RollbackPersistentBase : Persistent {\n   private:\n    std::vector<Persistent>\
-    \ _history;\n\n   protected:\n    using Persistent::Persistent;\n\n    const Persistent&\
-    \ persistent() const {\n        return *this;\n    }\n\n    void commit(Persistent\
-    \ next) {\n        assert(_history.size() < std::size_t(std::numeric_limits<int>::max()));\n\
-    \        _history.emplace_back(persistent());\n        Persistent::operator=(std::move(next));\n\
-    \    }\n\n   public:\n    RollbackPersistentBase() = default;\n\n    explicit\
-    \ RollbackPersistentBase(Persistent initial)\n        : Persistent(std::move(initial))\
-    \ {}\n\n    int history_size() const {\n        return int(_history.size());\n\
-    \    }\n\n    void reserve_history(int count) {\n        assert(0 <= count);\n\
-    \        _history.reserve(count);\n    }\n\n    bool undo() {\n        if (_history.empty())\
-    \ return false;\n        Persistent::operator=(std::move(_history.back()));\n\
-    \        _history.pop_back();\n        return true;\n    }\n\n    int snapshot()\
-    \ const {\n        return history_size();\n    }\n\n    void rollback(int state)\
-    \ {\n        assert(0 <= state && state <= history_size());\n        while (history_size()\
-    \ > state) undo();\n    }\n\n    void clear_history() {\n        _history.clear();\n\
-    \    }\n\n    void release() {\n        _history.clear();\n        Persistent::release();\n\
-    \    }\n\n    const Persistent& current_version() const {\n        return persistent();\n\
-    \    }\n};\n\n}  // namespace detail\n}  // namespace ds\n}  // namespace m1une\n\
-    \n\n#line 1 \"ds/segtree/persistent_dynamic_dual_segtree.hpp\"\n\n\n\n#line 8\
-    \ \"ds/segtree/persistent_dynamic_dual_segtree.hpp\"\n#include <memory>\n#include\
-    \ <numeric>\n#line 13 \"ds/segtree/persistent_dynamic_dual_segtree.hpp\"\n\n#line\
-    \ 1 \"monoid/concept.hpp\"\n\n\n\n#line 5 \"monoid/concept.hpp\"\n\nnamespace\
-    \ m1une {\nnamespace monoid {\n\n// Concept to check if a type satisfies the requirements\
-    \ of a Monoid.\n// A Monoid must have a `value_type`, an identity element `id()`,\
-    \ and an associative binary operation `op()`.\ntemplate <typename M>\nconcept\
-    \ IsMonoid = requires(typename M::value_type a, typename M::value_type b) {\n\
-    \    // 1. Must define `value_type`\n    typename M::value_type;\n\n    // 2.\
-    \ Must have a static method `id()` returning `value_type`\n    { M::id() } ->\
-    \ std::same_as<typename M::value_type>;\n\n    // 3. Must have a static method\
-    \ `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for groups. A type satisfying this concept\
-    \ must also obey the group\n// laws; concepts can check the interface but not\
-    \ the algebraic properties.\ntemplate <typename M>\nconcept IsGroup = IsMonoid<M>\
-    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for commutative groups. Commutativity is a\
-    \ semantic requirement and\n// cannot be checked by a C++ concept.\ntemplate <typename\
-    \ M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\n}  // namespace monoid\n}  //\
-    \ namespace m1une\n\n\n#line 1 \"ds/segtree/dynamic_segtree_common.hpp\"\n\n\n\
-    \n#line 11 \"ds/segtree/dynamic_segtree_common.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ ds {\nnamespace detail {\n\ntemplate <std::integral Index>\nusing dynamic_size_type\
-    \ = std::make_unsigned_t<Index>;\n\ntemplate <std::integral Index>\nconstexpr\
-    \ dynamic_size_type<Index> dynamic_distance(Index left, Index right) {\n    return\
-    \ static_cast<dynamic_size_type<Index>>(right) - static_cast<dynamic_size_type<Index>>(left);\n\
+    \ <cassert>\n#include <concepts>\n#include <limits>\n#include <numeric>\n#include\
+    \ <type_traits>\n#include <utility>\n\n#line 1 \"monoid/concept.hpp\"\n\n\n\n\
+    #line 5 \"monoid/concept.hpp\"\n\nnamespace m1une {\nnamespace monoid {\n\n//\
+    \ Concept to check if a type satisfies the requirements of a Monoid.\n// A Monoid\
+    \ must have a `value_type`, an identity element `id()`, and an associative binary\
+    \ operation `op()`.\ntemplate <typename M>\nconcept IsMonoid = requires(typename\
+    \ M::value_type a, typename M::value_type b) {\n    // 1. Must define `value_type`\n\
+    \    typename M::value_type;\n\n    // 2. Must have a static method `id()` returning\
+    \ `value_type`\n    { M::id() } -> std::same_as<typename M::value_type>;\n\n \
+    \   // 3. Must have a static method `op(a, b)` returning `value_type`\n    { M::op(a,\
+    \ b) } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for groups.\
+    \ A type satisfying this concept must also obey the group\n// laws; concepts can\
+    \ check the interface but not the algebraic properties.\ntemplate <typename M>\n\
+    concept IsGroup = IsMonoid<M> && requires(typename M::value_type a) {\n    { M::inv(a)\
+    \ } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for commutative\
+    \ groups. Commutativity is a semantic requirement and\n// cannot be checked by\
+    \ a C++ concept.\ntemplate <typename M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\
+    \n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 1 \"ds/detail/rollback_journal.hpp\"\
+    \n\n\n\n#include <algorithm>\n#line 6 \"ds/detail/rollback_journal.hpp\"\n#include\
+    \ <cstddef>\n#include <cstdint>\n#line 10 \"ds/detail/rollback_journal.hpp\"\n\
+    #include <vector>\n\nnamespace m1une {\nnamespace ds {\nnamespace detail {\n\n\
+    template <class Node>\nstruct RollbackJournal {\n    struct Change {\n       \
+    \ int index;\n        Node value;\n    };\n\n    struct Checkpoint {\n       \
+    \ std::size_t change_size;\n        std::size_t node_size;\n        std::uint64_t\
+    \ epoch;\n    };\n\n    std::vector<Node> nodes;\n    std::vector<Change> changes;\n\
+    \    std::vector<Checkpoint> checkpoints;\n    std::vector<std::uint64_t> saved_epoch;\n\
+    \    std::uint64_t next_epoch = 1;\n\n    std::uint64_t new_epoch() {\n      \
+    \  if (next_epoch == 0) {\n            std::fill(saved_epoch.begin(), saved_epoch.end(),\
+    \ 0);\n            next_epoch = 1;\n        }\n        return next_epoch++;\n\
+    \    }\n\n    int size() const { return int(nodes.size()); }\n\n    Node& operator[](int\
+    \ index) { return nodes[index]; }\n    const Node& operator[](int index) const\
+    \ { return nodes[index]; }\n\n    template <class... Args>\n    int emplace(Args&&...\
+    \ args) {\n        assert(nodes.size() < std::size_t(std::numeric_limits<int>::max()));\n\
+    \        int index = int(nodes.size());\n        nodes.emplace_back(std::forward<Args>(args)...);\n\
+    \        saved_epoch.push_back(0);\n        return index;\n    }\n\n    int snapshot()\
+    \ {\n        assert(checkpoints.size() < std::size_t(std::numeric_limits<int>::max()));\n\
+    \        checkpoints.push_back(Checkpoint{changes.size(), nodes.size(), new_epoch()});\n\
+    \        return int(checkpoints.size());\n    }\n\n    void touch(int index) {\n\
+    \        assert(0 <= index && index < size());\n        if (checkpoints.empty())\
+    \ return;\n        const Checkpoint& checkpoint = checkpoints.back();\n      \
+    \  if (std::size_t(index) >= checkpoint.node_size) return;\n        if (saved_epoch[index]\
+    \ == checkpoint.epoch) return;\n        saved_epoch[index] = checkpoint.epoch;\n\
+    \        changes.push_back(Change{index, nodes[index]});\n    }\n\n    int snapshot_count()\
+    \ const { return int(checkpoints.size()); }\n\n    void reserve_snapshots(int\
+    \ count) {\n        assert(0 <= count);\n        checkpoints.reserve(count);\n\
+    \    }\n\n    void reserve_changes(std::size_t count) { changes.reserve(count);\
+    \ }\n\n    void rollback(int state) {\n        assert(1 <= state && state <= snapshot_count());\n\
+    \        Checkpoint checkpoint = checkpoints[state - 1];\n        while (changes.size()\
+    \ > checkpoint.change_size) {\n            Change change = std::move(changes.back());\n\
+    \            changes.pop_back();\n            nodes[change.index] = std::move(change.value);\n\
+    \        }\n        nodes.erase(nodes.begin() + checkpoint.node_size, nodes.end());\n\
+    \        saved_epoch.resize(checkpoint.node_size);\n        checkpoints.resize(state);\n\
+    \        checkpoints.back().change_size = changes.size();\n        checkpoints.back().node_size\
+    \ = nodes.size();\n        checkpoints.back().epoch = new_epoch();\n    }\n\n\
+    \    void clear_history() {\n        changes.clear();\n        checkpoints.clear();\n\
+    \        std::fill(saved_epoch.begin(), saved_epoch.end(), 0);\n    }\n\n    void\
+    \ clear() {\n        nodes.clear();\n        changes.clear();\n        checkpoints.clear();\n\
+    \        saved_epoch.clear();\n        next_epoch = 1;\n    }\n};\n\n}  // namespace\
+    \ detail\n}  // namespace ds\n}  // namespace m1une\n\n\n#line 1 \"ds/segtree/dynamic_segtree_common.hpp\"\
+    \n\n\n\n#line 11 \"ds/segtree/dynamic_segtree_common.hpp\"\n\nnamespace m1une\
+    \ {\nnamespace ds {\nnamespace detail {\n\ntemplate <std::integral Index>\nusing\
+    \ dynamic_size_type = std::make_unsigned_t<Index>;\n\ntemplate <std::integral\
+    \ Index>\nconstexpr dynamic_size_type<Index> dynamic_distance(Index left, Index\
+    \ right) {\n    return static_cast<dynamic_size_type<Index>>(right) - static_cast<dynamic_size_type<Index>>(left);\n\
     }\n\ntemplate <class Monoid, class Size>\ntypename Monoid::value_type monoid_repeat(typename\
     \ Monoid::value_type value, Size count) {\n    typename Monoid::value_type result\
     \ = Monoid::id();\n    while (count != 0) {\n        if (count & 1) result = Monoid::op(result,\
@@ -120,205 +131,193 @@ data:
     \ right);\n        if (length == level.small_length) return level.small_value;\n\
     \        assert(length == level.small_length + 1);\n        return level.large_value;\n\
     \    }\n};\n\n}  // namespace detail\n}  // namespace ds\n}  // namespace m1une\n\
-    \n\n#line 1 \"ds/segtree/persistent_node_pool.hpp\"\n\n\n\n#line 9 \"ds/segtree/persistent_node_pool.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\nnamespace detail {\n\n// Node must have\
-    \ integer `left`, `right`, and `references` members.\ntemplate <class Node>\n\
-    struct PersistentNodePool {\n    std::vector<Node> nodes;\n    int first_free\
-    \ = 0;\n    std::size_t live_nodes = 0;\n\n   private:\n    void release_zero(int\
-    \ node) {\n        int left = nodes[node].left;\n        int right = nodes[node].right;\n\
-    \        nodes[node] = Node();\n        nodes[node].left = first_free;\n     \
-    \   first_free = node;\n        --live_nodes;\n        if (left && --nodes[left].references\
-    \ == 0) release_zero(left);\n        if (right && --nodes[right].references ==\
-    \ 0) release_zero(right);\n    }\n\n   public:\n    PersistentNodePool() { nodes.emplace_back();\
-    \ }\n\n    void reserve(std::size_t capacity) { nodes.reserve(capacity + 1); }\n\
-    \n    Node& operator[](int node) { return nodes[node]; }\n\n    const Node& operator[](int\
-    \ node) const { return nodes[node]; }\n\n    void retain(int node) {\n       \
-    \ if (node) ++nodes[node].references;\n    }\n\n    void release(int node) {\n\
-    \        if (!node) return;\n        assert(nodes[node].references > 0);\n   \
-    \     if (--nodes[node].references == 0) release_zero(node);\n    }\n\n    template\
-    \ <class... Args>\n    int emplace(Args&&... args) {\n        int result;\n  \
-    \      if (!first_free) {\n            assert(nodes.size() < std::size_t(std::numeric_limits<int>::max()));\n\
-    \            nodes.emplace_back(std::forward<Args>(args)...);\n            result\
-    \ = int(nodes.size()) - 1;\n        } else {\n            result = first_free;\n\
-    \            first_free = nodes[result].left;\n            nodes[result] = Node(std::forward<Args>(args)...);\n\
-    \        }\n        Node& node = nodes[result];\n        node.references = 0;\n\
-    \        retain(node.left);\n        retain(node.right);\n        ++live_nodes;\n\
-    \        return result;\n    }\n\n    int clone(int node) {\n        assert(node);\n\
-    \        Node copy = nodes[node];\n        return emplace(std::move(copy));\n\
-    \    }\n\n    bool unique(int node) const {\n        return !node || nodes[node].references\
-    \ == 1;\n    }\n\n    // Returns node itself when it has one owner, otherwise\
-    \ an unowned clone.\n    // The caller must attach a returned clone with replace()\
-    \ before it can be\n    // released or exposed as a root.\n    int clone_if_shared(int\
-    \ node) {\n        if (unique(node)) return node;\n        return clone(node);\n\
-    \    }\n\n    void replace(int& edge, int node) {\n        if (edge == node) return;\n\
-    \        retain(node);\n        int old = edge;\n        edge = node;\n      \
-    \  release(old);\n    }\n\n    std::size_t size() const { return live_nodes; }\n\
-    };\n\n}  // namespace detail\n}  // namespace ds\n}  // namespace m1une\n\n\n\
-    #line 17 \"ds/segtree/persistent_dynamic_dual_segtree.hpp\"\n\nnamespace m1une\
-    \ {\nnamespace ds {\n\n// A persistent sparse dual segment tree over an integral\
-    \ half-open interval.\ntemplate <m1une::monoid::IsMonoid Monoid, std::integral\
+    \n\n#line 14 \"ds/segtree/rollback_dynamic_dual_segtree.hpp\"\n\nnamespace m1une\
+    \ {\nnamespace ds {\n\ntemplate <m1une::monoid::IsMonoid Monoid, std::integral\
     \ Index = long long>\n    requires(!std::same_as<std::remove_cv_t<Index>, bool>)\n\
-    struct PersistentDynamicDualSegtree {\n    using T = typename Monoid::value_type;\n\
+    struct RollbackDynamicDualSegtree {\n    using T = typename Monoid::value_type;\n\
     \    using index_type = Index;\n    using size_type = detail::dynamic_size_type<Index>;\n\
-    \n   private:\n    struct Node {\n        T val;\n        int left;\n        int\
-    \ right;\n        int references;\n        bool has_lazy;\n\n        Node() :\
-    \ val(Monoid::id()), left(0), right(0), references(0), has_lazy(false) {}\n  \
-    \  };\n\n    struct Config {\n        Index left;\n        Index right;\n    \
-    \    T initial_value;\n\n        Config(Index left_bound, Index right_bound, T\
-    \ value)\n            : left(left_bound), right(right_bound), initial_value(std::move(value))\
-    \ {\n            assert(left <= right);\n        }\n    };\n\n    std::shared_ptr<const\
-    \ Config> _config;\n    using Pool = detail::PersistentNodePool<Node>;\n    std::shared_ptr<Pool>\
-    \ _pool;\n    int _root;\n\n    PersistentDynamicDualSegtree(std::shared_ptr<const\
-    \ Config> config, std::shared_ptr<Pool> pool, int root)\n        : _config(std::move(config)),\
-    \ _pool(std::move(pool)), _root(root) {\n        _pool->retain(_root);\n    }\n\
-    \n    int new_node() const { return _pool->emplace(); }\n\n    int clone_or_new(int\
-    \ t, bool copy_on_write = false) const {\n        if (!t) return new_node();\n\
-    \        return copy_on_write ? _pool->clone_if_shared(t) : _pool->clone(t);\n\
-    \    }\n\n    void all_apply_to_node(int t, Index left, Index right, const T&\
-    \ x) const {\n        Node& node = (*_pool)[t];\n        if (std::midpoint(left,\
-    \ right) == left) {\n            T value = node.has_lazy ? node.val : _config->initial_value;\n\
-    \            node.val = Monoid::op(x, value);\n            node.has_lazy = true;\n\
-    \        } else {\n            node.val = node.has_lazy ? Monoid::op(x, node.val)\
-    \ : x;\n            node.has_lazy = true;\n        }\n    }\n\n    int all_apply_clone(int\
-    \ t, Index left, Index right, const T& x, bool copy_on_write = false) const {\n\
-    \        int result = clone_or_new(t, copy_on_write);\n        all_apply_to_node(result,\
-    \ left, right, x);\n        return result;\n    }\n\n    void push(int t, Index\
-    \ left, Index right, bool copy_on_write = false) const {\n        if (!(*_pool)[t].has_lazy)\
+    \n   private:\n    struct Node {\n        T value = Monoid::id();\n        int\
+    \ left = 0;\n        int right = 0;\n        bool has_value = false;\n    };\n\
+    \n    Index _left;\n    Index _right;\n    T _initial_value;\n    detail::RollbackJournal<Node>\
+    \ _journal;\n\n    int root() const { return _journal[0].left; }\n    int new_node()\
+    \ { return _journal.emplace(); }\n\n    int ensure(int node) { return node ? node\
+    \ : new_node(); }\n\n    void all_apply(int node, Index left, Index right, const\
+    \ T& value) {\n        _journal.touch(node);\n        Node& current = _journal[node];\n\
+    \        if (std::midpoint(left, right) == left) {\n            T old = current.has_value\
+    \ ? current.value : _initial_value;\n            current.value = Monoid::op(value,\
+    \ old);\n        } else {\n            current.value = current.has_value ? Monoid::op(value,\
+    \ current.value) : value;\n        }\n        current.has_value = true;\n    }\n\
+    \n    void push(int node, Index left, Index right) {\n        if (!_journal[node].has_value)\
     \ return;\n        Index middle = std::midpoint(left, right);\n        if (middle\
-    \ == left) return;\n\n        T lazy = (*_pool)[t].val;\n        int left_child\
-    \ = all_apply_clone((*_pool)[t].left, left, middle, lazy, copy_on_write);\n  \
-    \      int right_child = all_apply_clone((*_pool)[t].right, middle, right, lazy,\
-    \ copy_on_write);\n\n        Node& node = (*_pool)[t];\n        _pool->replace(node.left,\
-    \ left_child);\n        _pool->replace(node.right, right_child);\n        node.val\
-    \ = Monoid::id();\n        node.has_lazy = false;\n    }\n\n    int set_node(int\
-    \ t, Index left, Index right, Index p, T x, bool copy_on_write = false) const\
-    \ {\n        t = clone_or_new(t, copy_on_write);\n        Index middle = std::midpoint(left,\
-    \ right);\n        if (middle == left) {\n            Node& node = (*_pool)[t];\n\
-    \            node.val = std::move(x);\n            node.has_lazy = true;\n   \
-    \         return t;\n        }\n\n        push(t, left, right, copy_on_write);\n\
-    \        if (p < middle) {\n            int child = set_node((*_pool)[t].left,\
-    \ left, middle, p, std::move(x), copy_on_write);\n            _pool->replace((*_pool)[t].left,\
-    \ child);\n        } else {\n            int child = set_node((*_pool)[t].right,\
-    \ middle, right, p, std::move(x), copy_on_write);\n            _pool->replace((*_pool)[t].right,\
-    \ child);\n        }\n        return t;\n    }\n\n    int apply_node(int t, Index\
-    \ left, Index right, Index query_left, Index query_right, const T& x,\n      \
-    \             bool copy_on_write = false) const {\n        if (query_right <=\
-    \ left || right <= query_left) return t;\n        if (query_left <= left && right\
-    \ <= query_right) {\n            return all_apply_clone(t, left, right, x, copy_on_write);\n\
-    \        }\n\n        t = clone_or_new(t, copy_on_write);\n        push(t, left,\
-    \ right, copy_on_write);\n        Index middle = std::midpoint(left, right);\n\
-    \        int left_child = apply_node((*_pool)[t].left, left, middle, query_left,\
-    \ query_right, x, copy_on_write);\n        int right_child = apply_node((*_pool)[t].right,\
-    \ middle, right, query_left, query_right, x, copy_on_write);\n        _pool->replace((*_pool)[t].left,\
-    \ left_child);\n        _pool->replace((*_pool)[t].right, right_child);\n    \
-    \    return t;\n    }\n\n    T compose(const T& inherited, int t) const {\n  \
-    \      if (!t || !(*_pool)[t].has_lazy) return inherited;\n        return Monoid::op(inherited,\
-    \ (*_pool)[t].val);\n    }\n\n   public:\n    PersistentDynamicDualSegtree() :\
-    \ PersistentDynamicDualSegtree(Index(0), Index(0), Monoid::id()) {}\n\n    explicit\
-    \ PersistentDynamicDualSegtree(Index n) : PersistentDynamicDualSegtree(Index(0),\
-    \ n, Monoid::id()) {\n        if constexpr (std::signed_integral<Index>) assert(Index(0)\
-    \ <= n);\n    }\n\n    PersistentDynamicDualSegtree(Index left, Index right) :\
-    \ PersistentDynamicDualSegtree(left, right, Monoid::id()) {}\n\n    PersistentDynamicDualSegtree(Index\
-    \ left, Index right, T initial_value)\n        : _config(std::make_shared<Config>(left,\
-    \ right, std::move(initial_value))),\n          _pool(std::make_shared<Pool>()),\n\
-    \          _root(0) {}\n\n    PersistentDynamicDualSegtree(const PersistentDynamicDualSegtree&\
-    \ other)\n        : _config(other._config), _pool(other._pool), _root(other._root)\
-    \ {\n        if (_pool) _pool->retain(_root);\n    }\n    PersistentDynamicDualSegtree(PersistentDynamicDualSegtree&&\
-    \ other) noexcept\n        : _config(std::move(other._config)), _pool(std::move(other._pool)),\
-    \ _root(other._root) {\n        other._root = 0;\n    }\n    PersistentDynamicDualSegtree&\
-    \ operator=(const PersistentDynamicDualSegtree& other) {\n        if (this ==\
-    \ &other) return *this;\n        if (other._pool) other._pool->retain(other._root);\n\
-    \        if (_pool) _pool->release(_root);\n        _config = other._config;\n\
-    \        _pool = other._pool;\n        _root = other._root;\n        return *this;\n\
-    \    }\n    PersistentDynamicDualSegtree& operator=(PersistentDynamicDualSegtree&&\
-    \ other) noexcept {\n        if (this == &other) return *this;\n        if (_pool)\
-    \ _pool->release(_root);\n        _config = std::move(other._config);\n      \
-    \  _pool = std::move(other._pool);\n        _root = other._root;\n        other._root\
-    \ = 0;\n        return *this;\n    }\n    ~PersistentDynamicDualSegtree() {\n\
-    \        if (_pool) _pool->release(_root);\n    }\n\n    size_type size() const\
-    \ { return detail::dynamic_distance(_config->left, _config->right); }\n\n    bool\
-    \ empty() const { return _config->left == _config->right; }\n\n    Index left_bound()\
-    \ const { return _config->left; }\n\n    Index right_bound() const { return _config->right;\
-    \ }\n\n    const T& initial_value() const { return _config->initial_value; }\n\
-    \n    void reserve(std::size_t node_capacity) const {\n        assert(node_capacity\
-    \ < std::numeric_limits<std::size_t>::max());\n        _pool->reserve(node_capacity);\n\
-    \    }\n\n    std::size_t node_count() const { return _pool->size(); }\n\n   \
-    \ void release() {\n        if (_pool) _pool->release(_root);\n        _pool =\
-    \ std::make_shared<Pool>();\n        _root = 0;\n    }\n\n    PersistentDynamicDualSegtree\
-    \ set(Index p, T x) const {\n        assert(left_bound() <= p && p < right_bound());\n\
-    \        return PersistentDynamicDualSegtree(_config, _pool,\n               \
-    \                             set_node(_root, left_bound(), right_bound(), p,\
-    \ std::move(x)));\n    }\n\n    void set_inplace(Index p, T x) {\n        assert(left_bound()\
-    \ <= p && p < right_bound());\n        int root = set_node(_root, left_bound(),\
-    \ right_bound(), p, std::move(x), true);\n        _pool->replace(_root, root);\n\
-    \    }\n\n    T get(Index p) const {\n        assert(left_bound() <= p && p <\
-    \ right_bound());\n        int t = _root;\n        Index left = left_bound();\n\
-    \        Index right = right_bound();\n        T inherited = Monoid::id();\n\n\
-    \        while (t) {\n            Index middle = std::midpoint(left, right);\n\
-    \            if (middle == left) {\n                T value = (*_pool)[t].has_lazy\
-    \ ? (*_pool)[t].val : initial_value();\n                return Monoid::op(inherited,\
-    \ value);\n            }\n            inherited = compose(inherited, t);\n   \
-    \         if (p < middle) {\n                t = (*_pool)[t].left;\n         \
-    \       right = middle;\n            } else {\n                t = (*_pool)[t].right;\n\
-    \                left = middle;\n            }\n        }\n        return Monoid::op(inherited,\
-    \ initial_value());\n    }\n\n    T operator[](Index p) const { return get(p);\
-    \ }\n\n    PersistentDynamicDualSegtree apply(Index p, const T& x) const {\n \
-    \       assert(left_bound() <= p && p < right_bound());\n        return apply(p,\
-    \ p + 1, x);\n    }\n\n    PersistentDynamicDualSegtree apply(Index left, Index\
-    \ right, const T& x) const {\n        assert(left_bound() <= left && left <= right\
-    \ && right <= right_bound());\n        if (left == right) return *this;\n    \
-    \    return PersistentDynamicDualSegtree(_config, _pool,\n                   \
-    \                         apply_node(_root, left_bound(), right_bound(), left,\
-    \ right, x));\n    }\n\n    void apply_inplace(Index p, const T& x) {\n      \
-    \  assert(left_bound() <= p && p < right_bound());\n        apply_inplace(p, p\
-    \ + 1, x);\n    }\n\n    void apply_inplace(Index left, Index right, const T&\
-    \ x) {\n        assert(left_bound() <= left && left <= right && right <= right_bound());\n\
-    \        if (left == right) return;\n        int root = apply_node(_root, left_bound(),\
-    \ right_bound(), left, right, x, true);\n        _pool->replace(_root, root);\n\
-    \    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n#line 10 \"ds/segtree/rollback_dynamic_dual_segtree.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\n\ntemplate <m1une::monoid::IsMonoid Monoid,\
-    \ std::integral Index = long long>\n    requires(!std::same_as<std::remove_cv_t<Index>,\
-    \ bool>)\nstruct RollbackDynamicDualSegtree\n    : detail::RollbackPersistentBase<PersistentDynamicDualSegtree<Monoid,\
-    \ Index>> {\n    using T = typename Monoid::value_type;\n\n   private:\n    using\
-    \ Persistent = PersistentDynamicDualSegtree<Monoid, Index>;\n    using Base =\
-    \ detail::RollbackPersistentBase<Persistent>;\n\n   public:\n    using Base::Base;\n\
-    \n    void set(Index pos, T value) {\n        Base::commit(Base::persistent().set(pos,\
-    \ std::move(value)));\n    }\n    void set_inplace(Index pos, T value) { set(pos,\
-    \ std::move(value)); }\n\n    void apply(Index pos, const T& value) {\n      \
-    \  Base::commit(Base::persistent().apply(pos, value));\n    }\n    void apply(Index\
-    \ left, Index right, const T& value) {\n        Base::commit(Base::persistent().apply(left,\
-    \ right, value));\n    }\n    void apply_inplace(Index pos, const T& value) {\
-    \ apply(pos, value); }\n    void apply_inplace(Index left, Index right, const\
-    \ T& value) { apply(left, right, value); }\n};\n\n}  // namespace ds\n}  // namespace\
-    \ m1une\n\n\n"
+    \ == left) return;\n        T lazy = _journal[node].value;\n        int left_child\
+    \ = ensure(_journal[node].left);\n        int right_child = ensure(_journal[node].right);\n\
+    \        all_apply(left_child, left, middle, lazy);\n        all_apply(right_child,\
+    \ middle, right, lazy);\n        _journal.touch(node);\n        _journal[node].left\
+    \ = left_child;\n        _journal[node].right = right_child;\n        _journal[node].value\
+    \ = Monoid::id();\n        _journal[node].has_value = false;\n    }\n\n    int\
+    \ set_node(int node, Index left, Index right, Index pos, T value) {\n        node\
+    \ = ensure(node);\n        Index middle = std::midpoint(left, right);\n      \
+    \  if (middle == left) {\n            _journal.touch(node);\n            _journal[node].value\
+    \ = std::move(value);\n            _journal[node].has_value = true;\n        \
+    \    return node;\n        }\n        push(node, left, right);\n        if (pos\
+    \ < middle) {\n            int child = set_node(_journal[node].left, left, middle,\
+    \ pos, std::move(value));\n            _journal.touch(node);\n            _journal[node].left\
+    \ = child;\n        } else {\n            int child = set_node(_journal[node].right,\
+    \ middle, right, pos, std::move(value));\n            _journal.touch(node);\n\
+    \            _journal[node].right = child;\n        }\n        return node;\n\
+    \    }\n\n    int apply_node(int node, Index left, Index right, Index query_left,\
+    \ Index query_right, const T& value) {\n        if (query_right <= left || right\
+    \ <= query_left) return node;\n        node = ensure(node);\n        if (query_left\
+    \ <= left && right <= query_right) {\n            all_apply(node, left, right,\
+    \ value);\n            return node;\n        }\n        push(node, left, right);\n\
+    \        Index middle = std::midpoint(left, right);\n        int left_child =\
+    \ apply_node(_journal[node].left, left, middle, query_left, query_right, value);\n\
+    \        int right_child = apply_node(_journal[node].right, middle, right, query_left,\
+    \ query_right, value);\n        _journal.touch(node);\n        _journal[node].left\
+    \ = left_child;\n        _journal[node].right = right_child;\n        return node;\n\
+    \    }\n\n   public:\n    RollbackDynamicDualSegtree()\n        : RollbackDynamicDualSegtree(Index(0),\
+    \ Index(0), Monoid::id()) {}\n    explicit RollbackDynamicDualSegtree(Index n)\n\
+    \        : RollbackDynamicDualSegtree(Index(0), n, Monoid::id()) {\n        if\
+    \ constexpr (std::signed_integral<Index>) assert(Index(0) <= n);\n    }\n    RollbackDynamicDualSegtree(Index\
+    \ left, Index right)\n        : RollbackDynamicDualSegtree(left, right, Monoid::id())\
+    \ {}\n    RollbackDynamicDualSegtree(Index left, Index right, T initial_value)\n\
+    \        : _left(left), _right(right), _initial_value(std::move(initial_value))\
+    \ {\n        assert(left <= right);\n        _journal.emplace();\n    }\n\n  \
+    \  size_type size() const { return detail::dynamic_distance(_left, _right); }\n\
+    \    bool empty() const { return _left == _right; }\n    Index left_bound() const\
+    \ { return _left; }\n    Index right_bound() const { return _right; }\n    const\
+    \ T& initial_value() const { return _initial_value; }\n    std::size_t node_count()\
+    \ const { return _journal.nodes.size() - 1; }\n\n    void reserve(std::size_t\
+    \ node_capacity) {\n        _journal.nodes.reserve(node_capacity + 1);\n     \
+    \   _journal.saved_epoch.reserve(node_capacity + 1);\n    }\n\n    void set(Index\
+    \ pos, T value) {\n        assert(_left <= pos && pos < _right);\n        int\
+    \ next_root = set_node(root(), _left, _right, pos, std::move(value));\n      \
+    \  if (next_root != root()) {\n            _journal.touch(0);\n            _journal[0].left\
+    \ = next_root;\n        }\n    }\n    void set_inplace(Index pos, T value) { set(pos,\
+    \ std::move(value)); }\n\n    T get(Index pos) const {\n        assert(_left <=\
+    \ pos && pos < _right);\n        int node = root();\n        Index left = _left;\n\
+    \        Index right = _right;\n        T inherited = Monoid::id();\n        while\
+    \ (node) {\n            Index middle = std::midpoint(left, right);\n         \
+    \   if (middle == left) {\n                T value = _journal[node].has_value\
+    \ ? _journal[node].value : _initial_value;\n                return Monoid::op(inherited,\
+    \ value);\n            }\n            if (_journal[node].has_value) inherited\
+    \ = Monoid::op(inherited, _journal[node].value);\n            if (pos < middle)\
+    \ {\n                node = _journal[node].left;\n                right = middle;\n\
+    \            } else {\n                node = _journal[node].right;\n        \
+    \        left = middle;\n            }\n        }\n        return Monoid::op(inherited,\
+    \ _initial_value);\n    }\n    T operator[](Index pos) const { return get(pos);\
+    \ }\n\n    void apply(Index pos, const T& value) { apply(pos, pos + 1, value);\
+    \ }\n    void apply(Index left, Index right, const T& value) {\n        assert(_left\
+    \ <= left && left <= right && right <= _right);\n        if (left == right) return;\n\
+    \        int next_root = apply_node(root(), _left, _right, left, right, value);\n\
+    \        if (next_root != root()) {\n            _journal.touch(0);\n        \
+    \    _journal[0].left = next_root;\n        }\n    }\n    void apply_inplace(Index\
+    \ pos, const T& value) { apply(pos, value); }\n    void apply_inplace(Index left,\
+    \ Index right, const T& value) { apply(left, right, value); }\n\n    int snapshot()\
+    \ { return _journal.snapshot(); }\n    int snapshot_count() const { return _journal.snapshot_count();\
+    \ }\n    void reserve_snapshots(int count) { _journal.reserve_snapshots(count);\
+    \ }\n    void rollback(int state) { _journal.rollback(state); }\n    void clear_history()\
+    \ { _journal.clear_history(); }\n    void release() { _journal.clear(); _journal.emplace();\
+    \ }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_DS_SEGTREE_ROLLBACK_DYNAMIC_DUAL_SEGTREE_HPP\n#define M1UNE_DS_SEGTREE_ROLLBACK_DYNAMIC_DUAL_SEGTREE_HPP\
-    \ 1\n\n#include <concepts>\n#include <type_traits>\n#include <utility>\n\n#include\
-    \ \"../detail/rollback_persistent_base.hpp\"\n#include \"persistent_dynamic_dual_segtree.hpp\"\
+    \ 1\n\n#include <cassert>\n#include <concepts>\n#include <limits>\n#include <numeric>\n\
+    #include <type_traits>\n#include <utility>\n\n#include \"../../monoid/concept.hpp\"\
+    \n#include \"../detail/rollback_journal.hpp\"\n#include \"dynamic_segtree_common.hpp\"\
     \n\nnamespace m1une {\nnamespace ds {\n\ntemplate <m1une::monoid::IsMonoid Monoid,\
     \ std::integral Index = long long>\n    requires(!std::same_as<std::remove_cv_t<Index>,\
-    \ bool>)\nstruct RollbackDynamicDualSegtree\n    : detail::RollbackPersistentBase<PersistentDynamicDualSegtree<Monoid,\
-    \ Index>> {\n    using T = typename Monoid::value_type;\n\n   private:\n    using\
-    \ Persistent = PersistentDynamicDualSegtree<Monoid, Index>;\n    using Base =\
-    \ detail::RollbackPersistentBase<Persistent>;\n\n   public:\n    using Base::Base;\n\
-    \n    void set(Index pos, T value) {\n        Base::commit(Base::persistent().set(pos,\
-    \ std::move(value)));\n    }\n    void set_inplace(Index pos, T value) { set(pos,\
-    \ std::move(value)); }\n\n    void apply(Index pos, const T& value) {\n      \
-    \  Base::commit(Base::persistent().apply(pos, value));\n    }\n    void apply(Index\
-    \ left, Index right, const T& value) {\n        Base::commit(Base::persistent().apply(left,\
-    \ right, value));\n    }\n    void apply_inplace(Index pos, const T& value) {\
-    \ apply(pos, value); }\n    void apply_inplace(Index left, Index right, const\
-    \ T& value) { apply(left, right, value); }\n};\n\n}  // namespace ds\n}  // namespace\
-    \ m1une\n\n#endif  // M1UNE_DS_SEGTREE_ROLLBACK_DYNAMIC_DUAL_SEGTREE_HPP\n"
+    \ bool>)\nstruct RollbackDynamicDualSegtree {\n    using T = typename Monoid::value_type;\n\
+    \    using index_type = Index;\n    using size_type = detail::dynamic_size_type<Index>;\n\
+    \n   private:\n    struct Node {\n        T value = Monoid::id();\n        int\
+    \ left = 0;\n        int right = 0;\n        bool has_value = false;\n    };\n\
+    \n    Index _left;\n    Index _right;\n    T _initial_value;\n    detail::RollbackJournal<Node>\
+    \ _journal;\n\n    int root() const { return _journal[0].left; }\n    int new_node()\
+    \ { return _journal.emplace(); }\n\n    int ensure(int node) { return node ? node\
+    \ : new_node(); }\n\n    void all_apply(int node, Index left, Index right, const\
+    \ T& value) {\n        _journal.touch(node);\n        Node& current = _journal[node];\n\
+    \        if (std::midpoint(left, right) == left) {\n            T old = current.has_value\
+    \ ? current.value : _initial_value;\n            current.value = Monoid::op(value,\
+    \ old);\n        } else {\n            current.value = current.has_value ? Monoid::op(value,\
+    \ current.value) : value;\n        }\n        current.has_value = true;\n    }\n\
+    \n    void push(int node, Index left, Index right) {\n        if (!_journal[node].has_value)\
+    \ return;\n        Index middle = std::midpoint(left, right);\n        if (middle\
+    \ == left) return;\n        T lazy = _journal[node].value;\n        int left_child\
+    \ = ensure(_journal[node].left);\n        int right_child = ensure(_journal[node].right);\n\
+    \        all_apply(left_child, left, middle, lazy);\n        all_apply(right_child,\
+    \ middle, right, lazy);\n        _journal.touch(node);\n        _journal[node].left\
+    \ = left_child;\n        _journal[node].right = right_child;\n        _journal[node].value\
+    \ = Monoid::id();\n        _journal[node].has_value = false;\n    }\n\n    int\
+    \ set_node(int node, Index left, Index right, Index pos, T value) {\n        node\
+    \ = ensure(node);\n        Index middle = std::midpoint(left, right);\n      \
+    \  if (middle == left) {\n            _journal.touch(node);\n            _journal[node].value\
+    \ = std::move(value);\n            _journal[node].has_value = true;\n        \
+    \    return node;\n        }\n        push(node, left, right);\n        if (pos\
+    \ < middle) {\n            int child = set_node(_journal[node].left, left, middle,\
+    \ pos, std::move(value));\n            _journal.touch(node);\n            _journal[node].left\
+    \ = child;\n        } else {\n            int child = set_node(_journal[node].right,\
+    \ middle, right, pos, std::move(value));\n            _journal.touch(node);\n\
+    \            _journal[node].right = child;\n        }\n        return node;\n\
+    \    }\n\n    int apply_node(int node, Index left, Index right, Index query_left,\
+    \ Index query_right, const T& value) {\n        if (query_right <= left || right\
+    \ <= query_left) return node;\n        node = ensure(node);\n        if (query_left\
+    \ <= left && right <= query_right) {\n            all_apply(node, left, right,\
+    \ value);\n            return node;\n        }\n        push(node, left, right);\n\
+    \        Index middle = std::midpoint(left, right);\n        int left_child =\
+    \ apply_node(_journal[node].left, left, middle, query_left, query_right, value);\n\
+    \        int right_child = apply_node(_journal[node].right, middle, right, query_left,\
+    \ query_right, value);\n        _journal.touch(node);\n        _journal[node].left\
+    \ = left_child;\n        _journal[node].right = right_child;\n        return node;\n\
+    \    }\n\n   public:\n    RollbackDynamicDualSegtree()\n        : RollbackDynamicDualSegtree(Index(0),\
+    \ Index(0), Monoid::id()) {}\n    explicit RollbackDynamicDualSegtree(Index n)\n\
+    \        : RollbackDynamicDualSegtree(Index(0), n, Monoid::id()) {\n        if\
+    \ constexpr (std::signed_integral<Index>) assert(Index(0) <= n);\n    }\n    RollbackDynamicDualSegtree(Index\
+    \ left, Index right)\n        : RollbackDynamicDualSegtree(left, right, Monoid::id())\
+    \ {}\n    RollbackDynamicDualSegtree(Index left, Index right, T initial_value)\n\
+    \        : _left(left), _right(right), _initial_value(std::move(initial_value))\
+    \ {\n        assert(left <= right);\n        _journal.emplace();\n    }\n\n  \
+    \  size_type size() const { return detail::dynamic_distance(_left, _right); }\n\
+    \    bool empty() const { return _left == _right; }\n    Index left_bound() const\
+    \ { return _left; }\n    Index right_bound() const { return _right; }\n    const\
+    \ T& initial_value() const { return _initial_value; }\n    std::size_t node_count()\
+    \ const { return _journal.nodes.size() - 1; }\n\n    void reserve(std::size_t\
+    \ node_capacity) {\n        _journal.nodes.reserve(node_capacity + 1);\n     \
+    \   _journal.saved_epoch.reserve(node_capacity + 1);\n    }\n\n    void set(Index\
+    \ pos, T value) {\n        assert(_left <= pos && pos < _right);\n        int\
+    \ next_root = set_node(root(), _left, _right, pos, std::move(value));\n      \
+    \  if (next_root != root()) {\n            _journal.touch(0);\n            _journal[0].left\
+    \ = next_root;\n        }\n    }\n    void set_inplace(Index pos, T value) { set(pos,\
+    \ std::move(value)); }\n\n    T get(Index pos) const {\n        assert(_left <=\
+    \ pos && pos < _right);\n        int node = root();\n        Index left = _left;\n\
+    \        Index right = _right;\n        T inherited = Monoid::id();\n        while\
+    \ (node) {\n            Index middle = std::midpoint(left, right);\n         \
+    \   if (middle == left) {\n                T value = _journal[node].has_value\
+    \ ? _journal[node].value : _initial_value;\n                return Monoid::op(inherited,\
+    \ value);\n            }\n            if (_journal[node].has_value) inherited\
+    \ = Monoid::op(inherited, _journal[node].value);\n            if (pos < middle)\
+    \ {\n                node = _journal[node].left;\n                right = middle;\n\
+    \            } else {\n                node = _journal[node].right;\n        \
+    \        left = middle;\n            }\n        }\n        return Monoid::op(inherited,\
+    \ _initial_value);\n    }\n    T operator[](Index pos) const { return get(pos);\
+    \ }\n\n    void apply(Index pos, const T& value) { apply(pos, pos + 1, value);\
+    \ }\n    void apply(Index left, Index right, const T& value) {\n        assert(_left\
+    \ <= left && left <= right && right <= _right);\n        if (left == right) return;\n\
+    \        int next_root = apply_node(root(), _left, _right, left, right, value);\n\
+    \        if (next_root != root()) {\n            _journal.touch(0);\n        \
+    \    _journal[0].left = next_root;\n        }\n    }\n    void apply_inplace(Index\
+    \ pos, const T& value) { apply(pos, value); }\n    void apply_inplace(Index left,\
+    \ Index right, const T& value) { apply(left, right, value); }\n\n    int snapshot()\
+    \ { return _journal.snapshot(); }\n    int snapshot_count() const { return _journal.snapshot_count();\
+    \ }\n    void reserve_snapshots(int count) { _journal.reserve_snapshots(count);\
+    \ }\n    void rollback(int state) { _journal.rollback(state); }\n    void clear_history()\
+    \ { _journal.clear_history(); }\n    void release() { _journal.clear(); _journal.emplace();\
+    \ }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n#endif  // M1UNE_DS_SEGTREE_ROLLBACK_DYNAMIC_DUAL_SEGTREE_HPP\n"
   dependsOn:
-  - ds/detail/rollback_persistent_base.hpp
-  - ds/segtree/persistent_dynamic_dual_segtree.hpp
   - monoid/concept.hpp
+  - ds/detail/rollback_journal.hpp
   - ds/segtree/dynamic_segtree_common.hpp
-  - ds/segtree/persistent_node_pool.hpp
   isVerificationFile: false
   path: ds/segtree/rollback_dynamic_dual_segtree.hpp
   requiredBy: []
-  timestamp: '2026-08-12 04:04:21+09:00'
+  timestamp: '2026-08-12 17:21:09+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/rollback_counterparts.test.cpp
@@ -335,22 +334,25 @@ integral half-open domain.
 
 ## Methods
 
-Constructors and read-only methods match
-`PersistentDynamicDualSegtree<Monoid, Index>`.
+Constructors and read-only methods follow the corresponding mutable structure.
 
 | Method | Description | Complexity |
 | --- | --- | --- |
 | `void set(Index pos, T value)`, `void set_inplace(Index pos, T value)` | Assigns one point. | $O(\log U)$ |
 | `void apply(Index pos, const T& value)`, `void apply(Index left, Index right, const T& value)` | Composes an action on a point or range. | $O(\log U)$ |
-| `void apply_inplace(...)` | Rollback-recording aliases of `apply`. | $O(\log U)$ |
-| `int history_size() const`, `int snapshot() const` | Returns the history position. | $O(1)$ |
-| `void reserve_history(int count)` | Reserves history entries. | $O(H)$ |
-| `bool undo()` | Undoes one update. | $O(F)$ |
+| `void apply_inplace(...)` | Aliases of `apply`. | $O(\log U)$ |
+| `int snapshot()` | Registers the current state and returns its token. | $O(1)$ |
+| `int snapshot_count() const` | Returns the number of active snapshots. | $O(1)$ |
+| `void reserve_snapshots(int count)` | Reserves snapshot tokens. | $O(H)$ |
 | `void rollback(int state)` | Restores a current-path snapshot. | $O(F)$ total |
 | `void clear_history()`, `void release()` | Releases saved states, or all materialized nodes. | $O(F)$ |
-| `const PersistentDynamicDualSegtree<Monoid, Index>& current_version() const` | Returns the current persistent state. | $O(1)$ |
 
-$U$ is the domain width; $F$ counts released nodes.
+
+## Snapshot semantics
+
+Updates made before the first `snapshot()` retain no rollback data. A snapshot token is positive and valid only on the current path. `rollback(state)` restores that registered state, keeps it active, and invalidates newer snapshots. `clear_history()` commits the current state and invalidates every token. No per-update reversal operation is provided.
+
+Within one snapshot interval, a materialized node is saved only before its first mutation; newly allocated nodes are truncated directly by rollback.
 
 ## Example
 

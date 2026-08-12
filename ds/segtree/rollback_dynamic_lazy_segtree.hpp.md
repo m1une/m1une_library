@@ -5,17 +5,11 @@ data:
     path: acted_monoid/concept.hpp
     title: Acted Monoid Concept
   - icon: ':heavy_check_mark:'
-    path: ds/detail/rollback_persistent_base.hpp
-    title: ds/detail/rollback_persistent_base.hpp
+    path: ds/detail/rollback_journal.hpp
+    title: ds/detail/rollback_journal.hpp
   - icon: ':heavy_check_mark:'
     path: ds/segtree/dynamic_segtree_common.hpp
     title: ds/segtree/dynamic_segtree_common.hpp
-  - icon: ':heavy_check_mark:'
-    path: ds/segtree/persistent_dynamic_lazy_segtree.hpp
-    title: Persistent Dynamic Lazy Segment Tree
-  - icon: ':heavy_check_mark:'
-    path: ds/segtree/persistent_node_pool.hpp
-    title: ds/segtree/persistent_node_pool.hpp
   _extendedRequiredBy: []
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
@@ -27,33 +21,10 @@ data:
   attributes:
     links: []
   bundledCode: "#line 1 \"ds/segtree/rollback_dynamic_lazy_segtree.hpp\"\n\n\n\n#include\
-    \ <concepts>\n#include <type_traits>\n#include <utility>\n\n#line 1 \"ds/detail/rollback_persistent_base.hpp\"\
-    \n\n\n\n#include <cassert>\n#include <cstddef>\n#include <limits>\n#line 8 \"\
-    ds/detail/rollback_persistent_base.hpp\"\n#include <vector>\n\nnamespace m1une\
-    \ {\nnamespace ds {\nnamespace detail {\n\ntemplate <class Persistent>\nstruct\
-    \ RollbackPersistentBase : Persistent {\n   private:\n    std::vector<Persistent>\
-    \ _history;\n\n   protected:\n    using Persistent::Persistent;\n\n    const Persistent&\
-    \ persistent() const {\n        return *this;\n    }\n\n    void commit(Persistent\
-    \ next) {\n        assert(_history.size() < std::size_t(std::numeric_limits<int>::max()));\n\
-    \        _history.emplace_back(persistent());\n        Persistent::operator=(std::move(next));\n\
-    \    }\n\n   public:\n    RollbackPersistentBase() = default;\n\n    explicit\
-    \ RollbackPersistentBase(Persistent initial)\n        : Persistent(std::move(initial))\
-    \ {}\n\n    int history_size() const {\n        return int(_history.size());\n\
-    \    }\n\n    void reserve_history(int count) {\n        assert(0 <= count);\n\
-    \        _history.reserve(count);\n    }\n\n    bool undo() {\n        if (_history.empty())\
-    \ return false;\n        Persistent::operator=(std::move(_history.back()));\n\
-    \        _history.pop_back();\n        return true;\n    }\n\n    int snapshot()\
-    \ const {\n        return history_size();\n    }\n\n    void rollback(int state)\
-    \ {\n        assert(0 <= state && state <= history_size());\n        while (history_size()\
-    \ > state) undo();\n    }\n\n    void clear_history() {\n        _history.clear();\n\
-    \    }\n\n    void release() {\n        _history.clear();\n        Persistent::release();\n\
-    \    }\n\n    const Persistent& current_version() const {\n        return persistent();\n\
-    \    }\n};\n\n}  // namespace detail\n}  // namespace ds\n}  // namespace m1une\n\
-    \n\n#line 1 \"ds/segtree/persistent_dynamic_lazy_segtree.hpp\"\n\n\n\n#line 8\
-    \ \"ds/segtree/persistent_dynamic_lazy_segtree.hpp\"\n#include <memory>\n#include\
-    \ <numeric>\n#line 13 \"ds/segtree/persistent_dynamic_lazy_segtree.hpp\"\n\n#line\
-    \ 1 \"acted_monoid/concept.hpp\"\n\n\n\n#line 5 \"acted_monoid/concept.hpp\"\n\
-    \nnamespace m1une {\nnamespace acted_monoid {\n\n// Concept defining the requirements\
+    \ <cassert>\n#include <concepts>\n#include <cstddef>\n#include <limits>\n#include\
+    \ <numeric>\n#include <type_traits>\n#include <utility>\n#include <vector>\n\n\
+    #line 1 \"acted_monoid/concept.hpp\"\n\n\n\n#line 5 \"acted_monoid/concept.hpp\"\
+    \n\nnamespace m1une {\nnamespace acted_monoid {\n\n// Concept defining the requirements\
     \ for an Acted Monoid.\ntemplate <typename AM>\nconcept IsActedMonoid = requires(typename\
     \ AM::value_type a, typename AM::value_type b, typename AM::operator_type f,\n\
     \                                 typename AM::operator_type g) {\n    // 1. Value\
@@ -68,9 +39,50 @@ data:
     \ laws.\ntemplate <typename AM>\nconcept IsCommutativeActedGroup = IsActedMonoid<AM>\
     \ && requires(typename AM::value_type a) {\n    { AM::inv(a) } -> std::same_as<typename\
     \ AM::value_type>;\n};\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\
-    \n\n#line 1 \"ds/segtree/dynamic_segtree_common.hpp\"\n\n\n\n#line 11 \"ds/segtree/dynamic_segtree_common.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\nnamespace detail {\n\ntemplate <std::integral\
-    \ Index>\nusing dynamic_size_type = std::make_unsigned_t<Index>;\n\ntemplate <std::integral\
+    \n\n#line 1 \"ds/detail/rollback_journal.hpp\"\n\n\n\n#include <algorithm>\n#line\
+    \ 7 \"ds/detail/rollback_journal.hpp\"\n#include <cstdint>\n#line 11 \"ds/detail/rollback_journal.hpp\"\
+    \n\nnamespace m1une {\nnamespace ds {\nnamespace detail {\n\ntemplate <class Node>\n\
+    struct RollbackJournal {\n    struct Change {\n        int index;\n        Node\
+    \ value;\n    };\n\n    struct Checkpoint {\n        std::size_t change_size;\n\
+    \        std::size_t node_size;\n        std::uint64_t epoch;\n    };\n\n    std::vector<Node>\
+    \ nodes;\n    std::vector<Change> changes;\n    std::vector<Checkpoint> checkpoints;\n\
+    \    std::vector<std::uint64_t> saved_epoch;\n    std::uint64_t next_epoch = 1;\n\
+    \n    std::uint64_t new_epoch() {\n        if (next_epoch == 0) {\n          \
+    \  std::fill(saved_epoch.begin(), saved_epoch.end(), 0);\n            next_epoch\
+    \ = 1;\n        }\n        return next_epoch++;\n    }\n\n    int size() const\
+    \ { return int(nodes.size()); }\n\n    Node& operator[](int index) { return nodes[index];\
+    \ }\n    const Node& operator[](int index) const { return nodes[index]; }\n\n\
+    \    template <class... Args>\n    int emplace(Args&&... args) {\n        assert(nodes.size()\
+    \ < std::size_t(std::numeric_limits<int>::max()));\n        int index = int(nodes.size());\n\
+    \        nodes.emplace_back(std::forward<Args>(args)...);\n        saved_epoch.push_back(0);\n\
+    \        return index;\n    }\n\n    int snapshot() {\n        assert(checkpoints.size()\
+    \ < std::size_t(std::numeric_limits<int>::max()));\n        checkpoints.push_back(Checkpoint{changes.size(),\
+    \ nodes.size(), new_epoch()});\n        return int(checkpoints.size());\n    }\n\
+    \n    void touch(int index) {\n        assert(0 <= index && index < size());\n\
+    \        if (checkpoints.empty()) return;\n        const Checkpoint& checkpoint\
+    \ = checkpoints.back();\n        if (std::size_t(index) >= checkpoint.node_size)\
+    \ return;\n        if (saved_epoch[index] == checkpoint.epoch) return;\n     \
+    \   saved_epoch[index] = checkpoint.epoch;\n        changes.push_back(Change{index,\
+    \ nodes[index]});\n    }\n\n    int snapshot_count() const { return int(checkpoints.size());\
+    \ }\n\n    void reserve_snapshots(int count) {\n        assert(0 <= count);\n\
+    \        checkpoints.reserve(count);\n    }\n\n    void reserve_changes(std::size_t\
+    \ count) { changes.reserve(count); }\n\n    void rollback(int state) {\n     \
+    \   assert(1 <= state && state <= snapshot_count());\n        Checkpoint checkpoint\
+    \ = checkpoints[state - 1];\n        while (changes.size() > checkpoint.change_size)\
+    \ {\n            Change change = std::move(changes.back());\n            changes.pop_back();\n\
+    \            nodes[change.index] = std::move(change.value);\n        }\n     \
+    \   nodes.erase(nodes.begin() + checkpoint.node_size, nodes.end());\n        saved_epoch.resize(checkpoint.node_size);\n\
+    \        checkpoints.resize(state);\n        checkpoints.back().change_size =\
+    \ changes.size();\n        checkpoints.back().node_size = nodes.size();\n    \
+    \    checkpoints.back().epoch = new_epoch();\n    }\n\n    void clear_history()\
+    \ {\n        changes.clear();\n        checkpoints.clear();\n        std::fill(saved_epoch.begin(),\
+    \ saved_epoch.end(), 0);\n    }\n\n    void clear() {\n        nodes.clear();\n\
+    \        changes.clear();\n        checkpoints.clear();\n        saved_epoch.clear();\n\
+    \        next_epoch = 1;\n    }\n};\n\n}  // namespace detail\n}  // namespace\
+    \ ds\n}  // namespace m1une\n\n\n#line 1 \"ds/segtree/dynamic_segtree_common.hpp\"\
+    \n\n\n\n#line 11 \"ds/segtree/dynamic_segtree_common.hpp\"\n\nnamespace m1une\
+    \ {\nnamespace ds {\nnamespace detail {\n\ntemplate <std::integral Index>\nusing\
+    \ dynamic_size_type = std::make_unsigned_t<Index>;\n\ntemplate <std::integral\
     \ Index>\nconstexpr dynamic_size_type<Index> dynamic_distance(Index left, Index\
     \ right) {\n    return static_cast<dynamic_size_type<Index>>(right) - static_cast<dynamic_size_type<Index>>(left);\n\
     }\n\ntemplate <class Monoid, class Size>\ntypename Monoid::value_type monoid_repeat(typename\
@@ -119,271 +131,372 @@ data:
     \ right);\n        if (length == level.small_length) return level.small_value;\n\
     \        assert(length == level.small_length + 1);\n        return level.large_value;\n\
     \    }\n};\n\n}  // namespace detail\n}  // namespace ds\n}  // namespace m1une\n\
-    \n\n#line 1 \"ds/segtree/persistent_node_pool.hpp\"\n\n\n\n#line 9 \"ds/segtree/persistent_node_pool.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\nnamespace detail {\n\n// Node must have\
-    \ integer `left`, `right`, and `references` members.\ntemplate <class Node>\n\
-    struct PersistentNodePool {\n    std::vector<Node> nodes;\n    int first_free\
-    \ = 0;\n    std::size_t live_nodes = 0;\n\n   private:\n    void release_zero(int\
-    \ node) {\n        int left = nodes[node].left;\n        int right = nodes[node].right;\n\
-    \        nodes[node] = Node();\n        nodes[node].left = first_free;\n     \
-    \   first_free = node;\n        --live_nodes;\n        if (left && --nodes[left].references\
-    \ == 0) release_zero(left);\n        if (right && --nodes[right].references ==\
-    \ 0) release_zero(right);\n    }\n\n   public:\n    PersistentNodePool() { nodes.emplace_back();\
-    \ }\n\n    void reserve(std::size_t capacity) { nodes.reserve(capacity + 1); }\n\
-    \n    Node& operator[](int node) { return nodes[node]; }\n\n    const Node& operator[](int\
-    \ node) const { return nodes[node]; }\n\n    void retain(int node) {\n       \
-    \ if (node) ++nodes[node].references;\n    }\n\n    void release(int node) {\n\
-    \        if (!node) return;\n        assert(nodes[node].references > 0);\n   \
-    \     if (--nodes[node].references == 0) release_zero(node);\n    }\n\n    template\
-    \ <class... Args>\n    int emplace(Args&&... args) {\n        int result;\n  \
-    \      if (!first_free) {\n            assert(nodes.size() < std::size_t(std::numeric_limits<int>::max()));\n\
-    \            nodes.emplace_back(std::forward<Args>(args)...);\n            result\
-    \ = int(nodes.size()) - 1;\n        } else {\n            result = first_free;\n\
-    \            first_free = nodes[result].left;\n            nodes[result] = Node(std::forward<Args>(args)...);\n\
-    \        }\n        Node& node = nodes[result];\n        node.references = 0;\n\
-    \        retain(node.left);\n        retain(node.right);\n        ++live_nodes;\n\
-    \        return result;\n    }\n\n    int clone(int node) {\n        assert(node);\n\
-    \        Node copy = nodes[node];\n        return emplace(std::move(copy));\n\
-    \    }\n\n    bool unique(int node) const {\n        return !node || nodes[node].references\
-    \ == 1;\n    }\n\n    // Returns node itself when it has one owner, otherwise\
-    \ an unowned clone.\n    // The caller must attach a returned clone with replace()\
-    \ before it can be\n    // released or exposed as a root.\n    int clone_if_shared(int\
-    \ node) {\n        if (unique(node)) return node;\n        return clone(node);\n\
-    \    }\n\n    void replace(int& edge, int node) {\n        if (edge == node) return;\n\
-    \        retain(node);\n        int old = edge;\n        edge = node;\n      \
-    \  release(old);\n    }\n\n    std::size_t size() const { return live_nodes; }\n\
-    };\n\n}  // namespace detail\n}  // namespace ds\n}  // namespace m1une\n\n\n\
-    #line 17 \"ds/segtree/persistent_dynamic_lazy_segtree.hpp\"\n\nnamespace m1une\
-    \ {\nnamespace ds {\n\n// A persistent sparse lazy segment tree over an integral\
-    \ half-open interval.\ntemplate <m1une::acted_monoid::IsActedMonoid ActedMonoid,\
-    \ std::integral Index = long long>\n    requires(!std::same_as<std::remove_cv_t<Index>,\
-    \ bool>)\nstruct PersistentDynamicLazySegtree {\n    using T = typename ActedMonoid::value_type;\n\
+    \n\n#line 16 \"ds/segtree/rollback_dynamic_lazy_segtree.hpp\"\n\nnamespace m1une\
+    \ {\nnamespace ds {\n\n// A sparse lazy segment tree over an integral half-open\
+    \ interval.\ntemplate <m1une::acted_monoid::IsActedMonoid ActedMonoid, std::integral\
+    \ Index = long long>\nrequires(!std::same_as<std::remove_cv_t<Index>, bool>)\n\
+    struct RollbackDynamicLazySegtree {\n    using T = typename ActedMonoid::value_type;\n\
     \    using F = typename ActedMonoid::operator_type;\n    using index_type = Index;\n\
     \    using size_type = detail::dynamic_size_type<Index>;\n\n   private:\n    struct\
     \ Node {\n        T val;\n        F lazy;\n        int left;\n        int right;\n\
-    \        int references;\n        bool has_lazy;\n\n        Node()\n         \
-    \   : val(ActedMonoid::id()), lazy(ActedMonoid::op_id()), left(0), right(0), references(0),\
-    \ has_lazy(false) {}\n        explicit Node(T value)\n            : val(std::move(value)),\
-    \ lazy(ActedMonoid::op_id()), left(0), right(0), references(0), has_lazy(false)\
-    \ {}\n    };\n\n    struct Config {\n        detail::UniformMonoidDomain<ActedMonoid,\
-    \ Index> domain;\n\n        Config(Index left, Index right, T initial_value) :\
-    \ domain(left, right, std::move(initial_value)) {}\n    };\n\n    std::shared_ptr<const\
-    \ Config> _config;\n    using Pool = detail::PersistentNodePool<Node>;\n    std::shared_ptr<Pool>\
-    \ _pool;\n    int _root;\n\n    PersistentDynamicLazySegtree(std::shared_ptr<const\
-    \ Config> config, std::shared_ptr<Pool> pool, int root)\n        : _config(std::move(config)),\
-    \ _pool(std::move(pool)), _root(root) {\n        _pool->retain(_root);\n    }\n\
-    \n    int new_node(Index left, Index right, int depth) const {\n        return\
-    \ _pool->emplace(_config->domain.default_product(depth, left, right));\n    }\n\
-    \n    int clone_or_new(int t, Index left, Index right, int depth, bool copy_on_write\
-    \ = false) const {\n        if (!t) return new_node(left, right, depth);\n   \
-    \     return copy_on_write ? _pool->clone_if_shared(t) : _pool->clone(t);\n  \
-    \  }\n\n    const T& value(int t, Index left, Index right, int depth) const {\n\
-    \        if (t) return (*_pool)[t].val;\n        return _config->domain.default_product(depth,\
-    \ left, right);\n    }\n\n    void all_apply_to_node(int t, Index left, Index\
-    \ right, const F& f) const {\n        Node& node = (*_pool)[t];\n        node.val\
+    \        bool has_lazy;\n\n        explicit Node(T value)\n            : val(std::move(value)),\n\
+    \              lazy(ActedMonoid::op_id()),\n              left(0),\n         \
+    \     right(0),\n              has_lazy(false) {}\n    };\n\n    detail::UniformMonoidDomain<ActedMonoid,\
+    \ Index> _domain;\n    detail::RollbackJournal<Node> _journal;\n\n    int root()\
+    \ const { return _journal[0].left; }\n\n    int new_node(Index left, Index right,\
+    \ int depth) {\n        assert(_journal.nodes.size() < std::size_t(std::numeric_limits<int>::max()));\n\
+    \        return _journal.emplace(_domain.default_product(depth, left, right));\n\
+    \    }\n\n    const T& value(int t, Index left, Index right, int depth) const\
+    \ {\n        if (t) return _journal[t].val;\n        return _domain.default_product(depth,\
+    \ left, right);\n    }\n\n    void all_apply(int& t, Index left, Index right,\
+    \ int depth, const F& f) {\n        if (!t) t = new_node(left, right, depth);\n\
+    \        _journal.touch(t);\n        Node& node = _journal[t];\n        node.val\
     \ = detail::dynamic_mapping<ActedMonoid>(f, node.val);\n        if (std::midpoint(left,\
     \ right) != left) {\n            node.lazy = ActedMonoid::op_comp(f, node.lazy);\n\
-    \            node.has_lazy = true;\n        }\n    }\n\n    int all_apply_clone(int\
-    \ t, Index left, Index right, int depth, const F& f,\n                       \
-    \ bool copy_on_write = false) const {\n        int result = clone_or_new(t, left,\
-    \ right, depth, copy_on_write);\n        all_apply_to_node(result, left, right,\
-    \ f);\n        return result;\n    }\n\n    void push(int t, Index left, Index\
-    \ right, int depth, bool copy_on_write = false) const {\n        if (!(*_pool)[t].has_lazy)\
-    \ return;\n        Index middle = std::midpoint(left, right);\n        if (middle\
-    \ == left) return;\n\n        F lazy = (*_pool)[t].lazy;\n        int left_child\
-    \ = all_apply_clone((*_pool)[t].left, left, middle, depth + 1, lazy, copy_on_write);\n\
-    \        int right_child =\n            all_apply_clone((*_pool)[t].right, middle,\
-    \ right, depth + 1,\n                            detail::dynamic_shift<ActedMonoid>(lazy,\
-    \ detail::dynamic_distance(left, middle)),\n                            copy_on_write);\n\
-    \n        Node& node = (*_pool)[t];\n        _pool->replace(node.left, left_child);\n\
-    \        _pool->replace(node.right, right_child);\n        node.lazy = ActedMonoid::op_id();\n\
-    \        node.has_lazy = false;\n    }\n\n    void update(int t, Index left, Index\
-    \ right, int depth) const {\n        Index middle = std::midpoint(left, right);\n\
-    \        Node& node = (*_pool)[t];\n        node.val =\n            ActedMonoid::op(value(node.left,\
-    \ left, middle, depth + 1), value(node.right, middle, right, depth + 1));\n  \
-    \  }\n\n    int set_node(int t, Index left, Index right, int depth, Index p, T\
-    \ x,\n                 bool copy_on_write = false) const {\n        t = clone_or_new(t,\
-    \ left, right, depth, copy_on_write);\n        Index middle = std::midpoint(left,\
-    \ right);\n        if (middle == left) {\n            Node& node = (*_pool)[t];\n\
-    \            node.val = std::move(x);\n            node.lazy = ActedMonoid::op_id();\n\
+    \            node.has_lazy = true;\n        }\n    }\n\n    void push(int t, Index\
+    \ left, Index right, int depth) {\n        if (!_journal[t].has_lazy) return;\n\
+    \        Index middle = std::midpoint(left, right);\n        if (middle == left)\
+    \ return;\n\n        F lazy = _journal[t].lazy;\n        int left_child = _journal[t].left;\n\
+    \        int right_child = _journal[t].right;\n        all_apply(left_child, left,\
+    \ middle, depth + 1, lazy);\n        all_apply(\n            right_child,\n  \
+    \          middle,\n            right,\n            depth + 1,\n            detail::dynamic_shift<ActedMonoid>(lazy,\
+    \ detail::dynamic_distance(left, middle))\n        );\n\n        _journal.touch(t);\n\
+    \        Node& node = _journal[t];\n        node.left = left_child;\n        node.right\
+    \ = right_child;\n        node.lazy = ActedMonoid::op_id();\n        node.has_lazy\
+    \ = false;\n    }\n\n    void update(int t, Index left, Index right, int depth)\
+    \ {\n        _journal.touch(t);\n        Index middle = std::midpoint(left, right);\n\
+    \        _journal[t].val = ActedMonoid::op(\n            value(_journal[t].left,\
+    \ left, middle, depth + 1),\n            value(_journal[t].right, middle, right,\
+    \ depth + 1)\n        );\n    }\n\n    int set_node(int t, Index left, Index right,\
+    \ int depth, Index p, T x) {\n        if (!t) t = new_node(left, right, depth);\n\
+    \        Index middle = std::midpoint(left, right);\n        if (middle == left)\
+    \ {\n            _journal.touch(t);\n            Node& node = _journal[t];\n \
+    \           node.val = std::move(x);\n            node.lazy = ActedMonoid::op_id();\n\
     \            node.has_lazy = false;\n            return t;\n        }\n\n    \
-    \    push(t, left, right, depth, copy_on_write);\n        if (p < middle) {\n\
-    \            int child = set_node((*_pool)[t].left, left, middle, depth + 1, p,\
-    \ std::move(x), copy_on_write);\n            _pool->replace((*_pool)[t].left,\
-    \ child);\n        } else {\n            int child = set_node((*_pool)[t].right,\
-    \ middle, right, depth + 1, p, std::move(x), copy_on_write);\n            _pool->replace((*_pool)[t].right,\
-    \ child);\n        }\n        update(t, left, right, depth);\n        return t;\n\
-    \    }\n\n    int apply_node(int t, Index left, Index right, int depth, Index\
-    \ query_left, Index query_right, const F& f,\n                   bool copy_on_write\
-    \ = false) const {\n        if (query_right <= left || right <= query_left) return\
-    \ t;\n        if (query_left <= left && right <= query_right) {\n            return\
-    \ all_apply_clone(t, left, right, depth,\n                                   detail::dynamic_shift<ActedMonoid>(f,\
-    \ detail::dynamic_distance(query_left, left)),\n                             \
-    \      copy_on_write);\n        }\n\n        t = clone_or_new(t, left, right,\
-    \ depth, copy_on_write);\n        push(t, left, right, depth, copy_on_write);\n\
-    \        Index middle = std::midpoint(left, right);\n        int left_child =\
-    \ apply_node((*_pool)[t].left, left, middle, depth + 1, query_left, query_right,\
-    \ f,\n                                    copy_on_write);\n        int right_child\
-    \ = apply_node((*_pool)[t].right, middle, right, depth + 1, query_left, query_right,\
-    \ f,\n                                     copy_on_write);\n        _pool->replace((*_pool)[t].left,\
-    \ left_child);\n        _pool->replace((*_pool)[t].right, right_child);\n    \
-    \    update(t, left, right, depth);\n        return t;\n    }\n\n    F compose_for_child(const\
+    \    push(t, left, right, depth);\n        if (p < middle) {\n            int\
+    \ child = set_node(_journal[t].left, left, middle, depth + 1, p, std::move(x));\n\
+    \            _journal.touch(t);\n            _journal[t].left = child;\n     \
+    \   } else {\n            int child = set_node(_journal[t].right, middle, right,\
+    \ depth + 1, p, std::move(x));\n            _journal.touch(t);\n            _journal[t].right\
+    \ = child;\n        }\n        update(t, left, right, depth);\n        return\
+    \ t;\n    }\n\n    int apply_node(\n        int t,\n        Index left,\n    \
+    \    Index right,\n        int depth,\n        Index query_left,\n        Index\
+    \ query_right,\n        const F& f\n    ) {\n        if (query_right <= left ||\
+    \ right <= query_left) return t;\n        if (query_left <= left && right <= query_right)\
+    \ {\n            all_apply(\n                t,\n                left,\n     \
+    \           right,\n                depth,\n                detail::dynamic_shift<ActedMonoid>(f,\
+    \ detail::dynamic_distance(query_left, left))\n            );\n            return\
+    \ t;\n        }\n\n        if (!t) t = new_node(left, right, depth);\n       \
+    \ push(t, left, right, depth);\n        Index middle = std::midpoint(left, right);\n\
+    \        int left_child = apply_node(_journal[t].left, left, middle, depth + 1,\
+    \ query_left, query_right, f);\n        int right_child = apply_node(_journal[t].right,\
+    \ middle, right, depth + 1, query_left, query_right, f);\n        _journal.touch(t);\n\
+    \        _journal[t].left = left_child;\n        _journal[t].right = right_child;\n\
+    \        update(t, left, right, depth);\n        return t;\n    }\n\n    F compose_for_child(const\
     \ F& inherited, int t, size_type offset) const {\n        F shifted = detail::dynamic_shift<ActedMonoid>(inherited,\
-    \ offset);\n        if (!t || !(*_pool)[t].has_lazy) return shifted;\n       \
-    \ return ActedMonoid::op_comp(shifted, detail::dynamic_shift<ActedMonoid>((*_pool)[t].lazy,\
-    \ offset));\n    }\n\n    T prod_node(int t, Index left, Index right, int depth,\
-    \ Index query_left, Index query_right,\n                const F& inherited) const\
-    \ {\n        if (query_right <= left || right <= query_left) return ActedMonoid::id();\n\
+    \ offset);\n        if (!t || !_journal[t].has_lazy) return shifted;\n       \
+    \ return ActedMonoid::op_comp(\n            shifted,\n            detail::dynamic_shift<ActedMonoid>(_journal[t].lazy,\
+    \ offset)\n        );\n    }\n\n    T prod_node(\n        int t,\n        Index\
+    \ left,\n        Index right,\n        int depth,\n        Index query_left,\n\
+    \        Index query_right,\n        const F& inherited\n    ) const {\n     \
+    \   if (query_right <= left || right <= query_left) return ActedMonoid::id();\n\
     \        if (query_left <= left && right <= query_right) {\n            return\
-    \ detail::dynamic_mapping<ActedMonoid>(inherited, value(t, left, right, depth));\n\
-    \        }\n        Index middle = std::midpoint(left, right);\n        return\
-    \ ActedMonoid::op(prod_node(t ? (*_pool)[t].left : 0, left, middle, depth + 1,\
-    \ query_left, query_right,\n                                         compose_for_child(inherited,\
-    \ t, 0)),\n                               prod_node(t ? (*_pool)[t].right : 0,\
-    \ middle, right, depth + 1, query_left, query_right,\n                       \
-    \                  compose_for_child(inherited, t, detail::dynamic_distance(left,\
-    \ middle))));\n    }\n\n    template <class G>\n    Index max_right_node(int t,\
-    \ Index left, Index right, int depth, Index query_left, T& product, const F& inherited,\n\
-    \                         G& predicate) const {\n        if (right <= query_left)\
-    \ return right;\n        if (query_left <= left) {\n            T next =\n   \
-    \             ActedMonoid::op(product, detail::dynamic_mapping<ActedMonoid>(inherited,\
-    \ value(t, left, right, depth)));\n            if (predicate(next)) {\n      \
-    \          product = std::move(next);\n                return right;\n       \
-    \     }\n            Index middle = std::midpoint(left, right);\n            if\
-    \ (middle == left) return left;\n        }\n        Index middle = std::midpoint(left,\
-    \ right);\n        Index result = max_right_node(t ? (*_pool)[t].left : 0, left,\
-    \ middle, depth + 1, query_left, product,\n                                  \
-    \    compose_for_child(inherited, t, 0), predicate);\n        if (result < middle)\
-    \ return result;\n        return max_right_node(t ? (*_pool)[t].right : 0, middle,\
-    \ right, depth + 1, query_left, product,\n                              compose_for_child(inherited,\
-    \ t, detail::dynamic_distance(left, middle)), predicate);\n    }\n\n    template\
-    \ <class G>\n    Index min_left_node(int t, Index left, Index right, int depth,\
-    \ Index query_right, T& product, const F& inherited,\n                       \
-    \ G& predicate) const {\n        if (query_right <= left) return left;\n     \
-    \   if (right <= query_right) {\n            T next =\n                ActedMonoid::op(detail::dynamic_mapping<ActedMonoid>(inherited,\
-    \ value(t, left, right, depth)), product);\n            if (predicate(next)) {\n\
-    \                product = std::move(next);\n                return left;\n  \
-    \          }\n            Index middle = std::midpoint(left, right);\n       \
-    \     if (middle == left) return right;\n        }\n        Index middle = std::midpoint(left,\
-    \ right);\n        Index result =\n            min_left_node(t ? (*_pool)[t].right\
-    \ : 0, middle, right, depth + 1, query_right, product,\n                     \
-    \     compose_for_child(inherited, t, detail::dynamic_distance(left, middle)),\
-    \ predicate);\n        if (middle < result) return result;\n        return min_left_node(t\
-    \ ? (*_pool)[t].left : 0, left, middle, depth + 1, query_right, product,\n   \
-    \                          compose_for_child(inherited, t, 0), predicate);\n \
-    \   }\n\n   public:\n    PersistentDynamicLazySegtree() : PersistentDynamicLazySegtree(Index(0),\
-    \ Index(0), ActedMonoid::id()) {}\n\n    explicit PersistentDynamicLazySegtree(Index\
-    \ n) : PersistentDynamicLazySegtree(Index(0), n, ActedMonoid::id()) {\n      \
-    \  if constexpr (std::signed_integral<Index>) assert(Index(0) <= n);\n    }\n\n\
-    \    PersistentDynamicLazySegtree(Index left, Index right)\n        : PersistentDynamicLazySegtree(left,\
-    \ right, ActedMonoid::id()) {}\n\n    PersistentDynamicLazySegtree(Index left,\
-    \ Index right, T initial_value)\n        : _config(std::make_shared<Config>(left,\
-    \ right, std::move(initial_value))),\n          _pool(std::make_shared<Pool>()),\n\
-    \          _root(0) {}\n\n    PersistentDynamicLazySegtree(const PersistentDynamicLazySegtree&\
-    \ other)\n        : _config(other._config), _pool(other._pool), _root(other._root)\
-    \ {\n        if (_pool) _pool->retain(_root);\n    }\n    PersistentDynamicLazySegtree(PersistentDynamicLazySegtree&&\
-    \ other) noexcept\n        : _config(std::move(other._config)), _pool(std::move(other._pool)),\
-    \ _root(other._root) {\n        other._root = 0;\n    }\n    PersistentDynamicLazySegtree&\
-    \ operator=(const PersistentDynamicLazySegtree& other) {\n        if (this ==\
-    \ &other) return *this;\n        if (other._pool) other._pool->retain(other._root);\n\
-    \        if (_pool) _pool->release(_root);\n        _config = other._config;\n\
-    \        _pool = other._pool;\n        _root = other._root;\n        return *this;\n\
-    \    }\n    PersistentDynamicLazySegtree& operator=(PersistentDynamicLazySegtree&&\
-    \ other) noexcept {\n        if (this == &other) return *this;\n        if (_pool)\
-    \ _pool->release(_root);\n        _config = std::move(other._config);\n      \
-    \  _pool = std::move(other._pool);\n        _root = other._root;\n        other._root\
-    \ = 0;\n        return *this;\n    }\n    ~PersistentDynamicLazySegtree() {\n\
-    \        if (_pool) _pool->release(_root);\n    }\n\n    size_type size() const\
-    \ { return _config->domain.size(); }\n\n    bool empty() const { return _config->domain.empty();\
-    \ }\n\n    Index left_bound() const { return _config->domain.left_bound(); }\n\
-    \n    Index right_bound() const { return _config->domain.right_bound(); }\n\n\
-    \    const T& initial_value() const { return _config->domain.initial_value();\
-    \ }\n\n    void reserve(std::size_t node_capacity) const {\n        assert(node_capacity\
-    \ < std::numeric_limits<std::size_t>::max());\n        _pool->reserve(node_capacity);\n\
-    \    }\n\n    std::size_t node_count() const { return _pool->size(); }\n\n   \
-    \ void release() {\n        if (_pool) _pool->release(_root);\n        _pool =\
-    \ std::make_shared<Pool>();\n        _root = 0;\n    }\n\n    PersistentDynamicLazySegtree\
-    \ set(Index p, T x) const {\n        assert(left_bound() <= p && p < right_bound());\n\
-    \        return PersistentDynamicLazySegtree(_config, _pool,\n               \
-    \                             set_node(_root, left_bound(), right_bound(), 0,\
-    \ p, std::move(x)));\n    }\n\n    void set_inplace(Index p, T x) {\n        assert(left_bound()\
-    \ <= p && p < right_bound());\n        int root = set_node(_root, left_bound(),\
-    \ right_bound(), 0, p, std::move(x), true);\n        _pool->replace(_root, root);\n\
-    \    }\n\n    T get(Index p) const {\n        assert(left_bound() <= p && p <\
-    \ right_bound());\n        return prod(p, p + 1);\n    }\n\n    T operator[](Index\
-    \ p) const { return get(p); }\n\n    T prod(Index left, Index right) const {\n\
-    \        assert(left_bound() <= left && left <= right && right <= right_bound());\n\
-    \        if (left == right) return ActedMonoid::id();\n        return prod_node(_root,\
-    \ left_bound(), right_bound(), 0, left, right, ActedMonoid::op_id());\n    }\n\
-    \n    T all_prod() const { return value(_root, left_bound(), right_bound(), 0);\
-    \ }\n\n    PersistentDynamicLazySegtree apply(Index p, const F& f) const {\n \
-    \       assert(left_bound() <= p && p < right_bound());\n        return apply(p,\
-    \ p + 1, f);\n    }\n\n    PersistentDynamicLazySegtree apply(Index left, Index\
-    \ right, const F& f) const {\n        assert(left_bound() <= left && left <= right\
-    \ && right <= right_bound());\n        if (left == right) return *this;\n    \
-    \    return PersistentDynamicLazySegtree(_config, _pool,\n                   \
-    \                         apply_node(_root, left_bound(), right_bound(), 0, left,\
-    \ right, f));\n    }\n\n    void apply_inplace(Index p, const F& f) {\n      \
-    \  assert(left_bound() <= p && p < right_bound());\n        apply_inplace(p, p\
-    \ + 1, f);\n    }\n\n    void apply_inplace(Index left, Index right, const F&\
-    \ f) {\n        assert(left_bound() <= left && left <= right && right <= right_bound());\n\
-    \        if (left == right) return;\n        int root = apply_node(_root, left_bound(),\
-    \ right_bound(), 0, left, right, f, true);\n        _pool->replace(_root, root);\n\
-    \    }\n\n    template <class G>\n    Index max_right(Index left, G predicate)\
-    \ const {\n        assert(left_bound() <= left && left <= right_bound());\n  \
-    \      assert(predicate(ActedMonoid::id()));\n        if (left == right_bound())\
+    \ detail::dynamic_mapping<ActedMonoid>(\n                inherited,\n        \
+    \        value(t, left, right, depth)\n            );\n        }\n        Index\
+    \ middle = std::midpoint(left, right);\n        return ActedMonoid::op(\n    \
+    \        prod_node(\n                t ? _journal[t].left : 0,\n             \
+    \   left,\n                middle,\n                depth + 1,\n             \
+    \   query_left,\n                query_right,\n                compose_for_child(inherited,\
+    \ t, 0)\n            ),\n            prod_node(\n                t ? _journal[t].right\
+    \ : 0,\n                middle,\n                right,\n                depth\
+    \ + 1,\n                query_left,\n                query_right,\n          \
+    \      compose_for_child(inherited, t, detail::dynamic_distance(left, middle))\n\
+    \            )\n        );\n    }\n\n    template <class G>\n    Index max_right_node(\n\
+    \        int t,\n        Index left,\n        Index right,\n        int depth,\n\
+    \        Index query_left,\n        T& product,\n        const F& inherited,\n\
+    \        G& predicate\n    ) const {\n        if (right <= query_left) return\
+    \ right;\n        if (query_left <= left) {\n            T next = ActedMonoid::op(\n\
+    \                product,\n                detail::dynamic_mapping<ActedMonoid>(\n\
+    \                    inherited,\n                    value(t, left, right, depth)\n\
+    \                )\n            );\n            if (predicate(next)) {\n     \
+    \           product = std::move(next);\n                return right;\n      \
+    \      }\n            Index middle = std::midpoint(left, right);\n           \
+    \ if (middle == left) return left;\n        }\n        Index middle = std::midpoint(left,\
+    \ right);\n        Index result = max_right_node(\n            t ? _journal[t].left\
+    \ : 0,\n            left,\n            middle,\n            depth + 1,\n     \
+    \       query_left,\n            product,\n            compose_for_child(inherited,\
+    \ t, 0),\n            predicate\n        );\n        if (result < middle) return\
+    \ result;\n        return max_right_node(\n            t ? _journal[t].right :\
+    \ 0,\n            middle,\n            right,\n            depth + 1,\n      \
+    \      query_left,\n            product,\n            compose_for_child(inherited,\
+    \ t, detail::dynamic_distance(left, middle)),\n            predicate\n       \
+    \ );\n    }\n\n    template <class G>\n    Index min_left_node(\n        int t,\n\
+    \        Index left,\n        Index right,\n        int depth,\n        Index\
+    \ query_right,\n        T& product,\n        const F& inherited,\n        G& predicate\n\
+    \    ) const {\n        if (query_right <= left) return left;\n        if (right\
+    \ <= query_right) {\n            T next = ActedMonoid::op(\n                detail::dynamic_mapping<ActedMonoid>(\n\
+    \                    inherited,\n                    value(t, left, right, depth)\n\
+    \                ),\n                product\n            );\n            if (predicate(next))\
+    \ {\n                product = std::move(next);\n                return left;\n\
+    \            }\n            Index middle = std::midpoint(left, right);\n     \
+    \       if (middle == left) return right;\n        }\n        Index middle = std::midpoint(left,\
+    \ right);\n        Index result = min_left_node(\n            t ? _journal[t].right\
+    \ : 0,\n            middle,\n            right,\n            depth + 1,\n    \
+    \        query_right,\n            product,\n            compose_for_child(inherited,\
+    \ t, detail::dynamic_distance(left, middle)),\n            predicate\n       \
+    \ );\n        if (middle < result) return result;\n        return min_left_node(\n\
+    \            t ? _journal[t].left : 0,\n            left,\n            middle,\n\
+    \            depth + 1,\n            query_right,\n            product,\n    \
+    \        compose_for_child(inherited, t, 0),\n            predicate\n        );\n\
+    \    }\n\n   public:\n    RollbackDynamicLazySegtree()\n        : RollbackDynamicLazySegtree(Index(0),\
+    \ Index(0), ActedMonoid::id()) {}\n\n    explicit RollbackDynamicLazySegtree(Index\
+    \ n)\n        : RollbackDynamicLazySegtree(Index(0), n, ActedMonoid::id()) {\n\
+    \        if constexpr (std::signed_integral<Index>) assert(Index(0) <= n);\n \
+    \   }\n\n    RollbackDynamicLazySegtree(Index left, Index right)\n        : RollbackDynamicLazySegtree(left,\
+    \ right, ActedMonoid::id()) {}\n\n    RollbackDynamicLazySegtree(Index left, Index\
+    \ right, T initial_value)\n        : _domain(left, right, std::move(initial_value))\
+    \ {\n        _journal.emplace(ActedMonoid::id());\n    }\n\n    size_type size()\
+    \ const {\n        return _domain.size();\n    }\n\n    bool empty() const {\n\
+    \        return _domain.empty();\n    }\n\n    Index left_bound() const {\n  \
+    \      return _domain.left_bound();\n    }\n\n    Index right_bound() const {\n\
+    \        return _domain.right_bound();\n    }\n\n    const T& initial_value()\
+    \ const {\n        return _domain.initial_value();\n    }\n\n    void reserve(std::size_t\
+    \ node_capacity) {\n        assert(node_capacity < std::numeric_limits<std::size_t>::max());\n\
+    \        _journal.nodes.reserve(node_capacity + 1);\n        _journal.saved_epoch.reserve(node_capacity\
+    \ + 1);\n    }\n\n    std::size_t node_count() const {\n        return _journal.nodes.size()\
+    \ - 1;\n    }\n\n    void clear() {\n        if (_journal.snapshot_count() ==\
+    \ 0) {\n            _journal.clear();\n            _journal.emplace(ActedMonoid::id());\n\
+    \            return;\n        }\n        _journal.touch(0);\n        _journal[0].left\
+    \ = 0;\n    }\n\n    void set(Index p, T x) {\n        assert(left_bound() <=\
+    \ p && p < right_bound());\n        int next_root = set_node(root(), left_bound(),\
+    \ right_bound(), 0, p, std::move(x));\n        if (next_root != root()) {\n  \
+    \          _journal.touch(0);\n            _journal[0].left = next_root;\n   \
+    \     }\n    }\n\n    T get(Index p) const {\n        assert(left_bound() <= p\
+    \ && p < right_bound());\n        return prod(p, p + 1);\n    }\n\n    T operator[](Index\
+    \ p) const {\n        return get(p);\n    }\n\n    T prod(Index left, Index right)\
+    \ const {\n        assert(left_bound() <= left && left <= right && right <= right_bound());\n\
+    \        if (left == right) return ActedMonoid::id();\n        return prod_node(\n\
+    \            root(),\n            left_bound(),\n            right_bound(),\n\
+    \            0,\n            left,\n            right,\n            ActedMonoid::op_id()\n\
+    \        );\n    }\n\n    T all_prod() const {\n        return value(root(), left_bound(),\
+    \ right_bound(), 0);\n    }\n\n    void apply(Index p, const F& f) {\n       \
+    \ assert(left_bound() <= p && p < right_bound());\n        apply(p, p + 1, f);\n\
+    \    }\n\n    void apply(Index left, Index right, const F& f) {\n        assert(left_bound()\
+    \ <= left && left <= right && right <= right_bound());\n        if (left == right)\
+    \ return;\n        int next_root = apply_node(\n            root(), left_bound(),\
+    \ right_bound(), 0, left, right, f\n        );\n        if (next_root != root())\
+    \ {\n            _journal.touch(0);\n            _journal[0].left = next_root;\n\
+    \        }\n    }\n\n    template <class G>\n    Index max_right(Index left, G\
+    \ predicate) const {\n        assert(left_bound() <= left && left <= right_bound());\n\
+    \        assert(predicate(ActedMonoid::id()));\n        if (left == right_bound())\
     \ return right_bound();\n        T product = ActedMonoid::id();\n        return\
-    \ max_right_node(_root, left_bound(), right_bound(), 0, left, product, ActedMonoid::op_id(),\
-    \ predicate);\n    }\n\n    template <class G>\n    Index min_left(Index right,\
-    \ G predicate) const {\n        assert(left_bound() <= right && right <= right_bound());\n\
-    \        assert(predicate(ActedMonoid::id()));\n        if (right == left_bound())\
-    \ return left_bound();\n        T product = ActedMonoid::id();\n        return\
-    \ min_left_node(_root, left_bound(), right_bound(), 0, right, product, ActedMonoid::op_id(),\
-    \ predicate);\n    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n#line\
-    \ 10 \"ds/segtree/rollback_dynamic_lazy_segtree.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ ds {\n\ntemplate <m1une::acted_monoid::IsActedMonoid ActedMonoid, std::integral\
-    \ Index = long long>\n    requires(!std::same_as<std::remove_cv_t<Index>, bool>)\n\
-    struct RollbackDynamicLazySegtree\n    : detail::RollbackPersistentBase<PersistentDynamicLazySegtree<ActedMonoid,\
-    \ Index>> {\n    using T = typename ActedMonoid::value_type;\n    using F = typename\
-    \ ActedMonoid::operator_type;\n\n   private:\n    using Persistent = PersistentDynamicLazySegtree<ActedMonoid,\
-    \ Index>;\n    using Base = detail::RollbackPersistentBase<Persistent>;\n\n  \
-    \ public:\n    using Base::Base;\n\n    void set(Index pos, T value) {\n     \
-    \   Base::commit(Base::persistent().set(pos, std::move(value)));\n    }\n    void\
-    \ set_inplace(Index pos, T value) { set(pos, std::move(value)); }\n\n    void\
-    \ apply(Index pos, const F& f) {\n        Base::commit(Base::persistent().apply(pos,\
-    \ f));\n    }\n    void apply(Index left, Index right, const F& f) {\n       \
-    \ Base::commit(Base::persistent().apply(left, right, f));\n    }\n    void apply_inplace(Index\
-    \ pos, const F& f) { apply(pos, f); }\n    void apply_inplace(Index left, Index\
-    \ right, const F& f) { apply(left, right, f); }\n};\n\n}  // namespace ds\n} \
-    \ // namespace m1une\n\n\n"
+    \ max_right_node(\n            root(),\n            left_bound(),\n          \
+    \  right_bound(),\n            0,\n            left,\n            product,\n \
+    \           ActedMonoid::op_id(),\n            predicate\n        );\n    }\n\n\
+    \    template <class G>\n    Index min_left(Index right, G predicate) const {\n\
+    \        assert(left_bound() <= right && right <= right_bound());\n        assert(predicate(ActedMonoid::id()));\n\
+    \        if (right == left_bound()) return left_bound();\n        T product =\
+    \ ActedMonoid::id();\n        return min_left_node(\n            root(),\n   \
+    \         left_bound(),\n            right_bound(),\n            0,\n        \
+    \    right,\n            product,\n            ActedMonoid::op_id(),\n       \
+    \     predicate\n        );\n    }\n\n    void set_inplace(Index p, T x) { set(p,\
+    \ std::move(x)); }\n    void apply_inplace(Index p, const F& f) { apply(p, f);\
+    \ }\n    void apply_inplace(Index left, Index right, const F& f) { apply(left,\
+    \ right, f); }\n\n    int snapshot() { return _journal.snapshot(); }\n    int\
+    \ snapshot_count() const { return _journal.snapshot_count(); }\n    void reserve_snapshots(int\
+    \ count) { _journal.reserve_snapshots(count); }\n    void rollback(int state)\
+    \ { _journal.rollback(state); }\n    void clear_history() { _journal.clear_history();\
+    \ }\n    void release() { _journal.clear(); _journal.emplace(ActedMonoid::id());\
+    \ }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_DS_SEGTREE_ROLLBACK_DYNAMIC_LAZY_SEGTREE_HPP\n#define M1UNE_DS_SEGTREE_ROLLBACK_DYNAMIC_LAZY_SEGTREE_HPP\
-    \ 1\n\n#include <concepts>\n#include <type_traits>\n#include <utility>\n\n#include\
-    \ \"../detail/rollback_persistent_base.hpp\"\n#include \"persistent_dynamic_lazy_segtree.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\n\ntemplate <m1une::acted_monoid::IsActedMonoid\
-    \ ActedMonoid, std::integral Index = long long>\n    requires(!std::same_as<std::remove_cv_t<Index>,\
-    \ bool>)\nstruct RollbackDynamicLazySegtree\n    : detail::RollbackPersistentBase<PersistentDynamicLazySegtree<ActedMonoid,\
-    \ Index>> {\n    using T = typename ActedMonoid::value_type;\n    using F = typename\
-    \ ActedMonoid::operator_type;\n\n   private:\n    using Persistent = PersistentDynamicLazySegtree<ActedMonoid,\
-    \ Index>;\n    using Base = detail::RollbackPersistentBase<Persistent>;\n\n  \
-    \ public:\n    using Base::Base;\n\n    void set(Index pos, T value) {\n     \
-    \   Base::commit(Base::persistent().set(pos, std::move(value)));\n    }\n    void\
-    \ set_inplace(Index pos, T value) { set(pos, std::move(value)); }\n\n    void\
-    \ apply(Index pos, const F& f) {\n        Base::commit(Base::persistent().apply(pos,\
-    \ f));\n    }\n    void apply(Index left, Index right, const F& f) {\n       \
-    \ Base::commit(Base::persistent().apply(left, right, f));\n    }\n    void apply_inplace(Index\
-    \ pos, const F& f) { apply(pos, f); }\n    void apply_inplace(Index left, Index\
-    \ right, const F& f) { apply(left, right, f); }\n};\n\n}  // namespace ds\n} \
-    \ // namespace m1une\n\n#endif  // M1UNE_DS_SEGTREE_ROLLBACK_DYNAMIC_LAZY_SEGTREE_HPP\n"
+    \ 1\n\n#include <cassert>\n#include <concepts>\n#include <cstddef>\n#include <limits>\n\
+    #include <numeric>\n#include <type_traits>\n#include <utility>\n#include <vector>\n\
+    \n#include \"../../acted_monoid/concept.hpp\"\n#include \"../detail/rollback_journal.hpp\"\
+    \n#include \"dynamic_segtree_common.hpp\"\n\nnamespace m1une {\nnamespace ds {\n\
+    \n// A sparse lazy segment tree over an integral half-open interval.\ntemplate\
+    \ <m1une::acted_monoid::IsActedMonoid ActedMonoid, std::integral Index = long\
+    \ long>\nrequires(!std::same_as<std::remove_cv_t<Index>, bool>)\nstruct RollbackDynamicLazySegtree\
+    \ {\n    using T = typename ActedMonoid::value_type;\n    using F = typename ActedMonoid::operator_type;\n\
+    \    using index_type = Index;\n    using size_type = detail::dynamic_size_type<Index>;\n\
+    \n   private:\n    struct Node {\n        T val;\n        F lazy;\n        int\
+    \ left;\n        int right;\n        bool has_lazy;\n\n        explicit Node(T\
+    \ value)\n            : val(std::move(value)),\n              lazy(ActedMonoid::op_id()),\n\
+    \              left(0),\n              right(0),\n              has_lazy(false)\
+    \ {}\n    };\n\n    detail::UniformMonoidDomain<ActedMonoid, Index> _domain;\n\
+    \    detail::RollbackJournal<Node> _journal;\n\n    int root() const { return\
+    \ _journal[0].left; }\n\n    int new_node(Index left, Index right, int depth)\
+    \ {\n        assert(_journal.nodes.size() < std::size_t(std::numeric_limits<int>::max()));\n\
+    \        return _journal.emplace(_domain.default_product(depth, left, right));\n\
+    \    }\n\n    const T& value(int t, Index left, Index right, int depth) const\
+    \ {\n        if (t) return _journal[t].val;\n        return _domain.default_product(depth,\
+    \ left, right);\n    }\n\n    void all_apply(int& t, Index left, Index right,\
+    \ int depth, const F& f) {\n        if (!t) t = new_node(left, right, depth);\n\
+    \        _journal.touch(t);\n        Node& node = _journal[t];\n        node.val\
+    \ = detail::dynamic_mapping<ActedMonoid>(f, node.val);\n        if (std::midpoint(left,\
+    \ right) != left) {\n            node.lazy = ActedMonoid::op_comp(f, node.lazy);\n\
+    \            node.has_lazy = true;\n        }\n    }\n\n    void push(int t, Index\
+    \ left, Index right, int depth) {\n        if (!_journal[t].has_lazy) return;\n\
+    \        Index middle = std::midpoint(left, right);\n        if (middle == left)\
+    \ return;\n\n        F lazy = _journal[t].lazy;\n        int left_child = _journal[t].left;\n\
+    \        int right_child = _journal[t].right;\n        all_apply(left_child, left,\
+    \ middle, depth + 1, lazy);\n        all_apply(\n            right_child,\n  \
+    \          middle,\n            right,\n            depth + 1,\n            detail::dynamic_shift<ActedMonoid>(lazy,\
+    \ detail::dynamic_distance(left, middle))\n        );\n\n        _journal.touch(t);\n\
+    \        Node& node = _journal[t];\n        node.left = left_child;\n        node.right\
+    \ = right_child;\n        node.lazy = ActedMonoid::op_id();\n        node.has_lazy\
+    \ = false;\n    }\n\n    void update(int t, Index left, Index right, int depth)\
+    \ {\n        _journal.touch(t);\n        Index middle = std::midpoint(left, right);\n\
+    \        _journal[t].val = ActedMonoid::op(\n            value(_journal[t].left,\
+    \ left, middle, depth + 1),\n            value(_journal[t].right, middle, right,\
+    \ depth + 1)\n        );\n    }\n\n    int set_node(int t, Index left, Index right,\
+    \ int depth, Index p, T x) {\n        if (!t) t = new_node(left, right, depth);\n\
+    \        Index middle = std::midpoint(left, right);\n        if (middle == left)\
+    \ {\n            _journal.touch(t);\n            Node& node = _journal[t];\n \
+    \           node.val = std::move(x);\n            node.lazy = ActedMonoid::op_id();\n\
+    \            node.has_lazy = false;\n            return t;\n        }\n\n    \
+    \    push(t, left, right, depth);\n        if (p < middle) {\n            int\
+    \ child = set_node(_journal[t].left, left, middle, depth + 1, p, std::move(x));\n\
+    \            _journal.touch(t);\n            _journal[t].left = child;\n     \
+    \   } else {\n            int child = set_node(_journal[t].right, middle, right,\
+    \ depth + 1, p, std::move(x));\n            _journal.touch(t);\n            _journal[t].right\
+    \ = child;\n        }\n        update(t, left, right, depth);\n        return\
+    \ t;\n    }\n\n    int apply_node(\n        int t,\n        Index left,\n    \
+    \    Index right,\n        int depth,\n        Index query_left,\n        Index\
+    \ query_right,\n        const F& f\n    ) {\n        if (query_right <= left ||\
+    \ right <= query_left) return t;\n        if (query_left <= left && right <= query_right)\
+    \ {\n            all_apply(\n                t,\n                left,\n     \
+    \           right,\n                depth,\n                detail::dynamic_shift<ActedMonoid>(f,\
+    \ detail::dynamic_distance(query_left, left))\n            );\n            return\
+    \ t;\n        }\n\n        if (!t) t = new_node(left, right, depth);\n       \
+    \ push(t, left, right, depth);\n        Index middle = std::midpoint(left, right);\n\
+    \        int left_child = apply_node(_journal[t].left, left, middle, depth + 1,\
+    \ query_left, query_right, f);\n        int right_child = apply_node(_journal[t].right,\
+    \ middle, right, depth + 1, query_left, query_right, f);\n        _journal.touch(t);\n\
+    \        _journal[t].left = left_child;\n        _journal[t].right = right_child;\n\
+    \        update(t, left, right, depth);\n        return t;\n    }\n\n    F compose_for_child(const\
+    \ F& inherited, int t, size_type offset) const {\n        F shifted = detail::dynamic_shift<ActedMonoid>(inherited,\
+    \ offset);\n        if (!t || !_journal[t].has_lazy) return shifted;\n       \
+    \ return ActedMonoid::op_comp(\n            shifted,\n            detail::dynamic_shift<ActedMonoid>(_journal[t].lazy,\
+    \ offset)\n        );\n    }\n\n    T prod_node(\n        int t,\n        Index\
+    \ left,\n        Index right,\n        int depth,\n        Index query_left,\n\
+    \        Index query_right,\n        const F& inherited\n    ) const {\n     \
+    \   if (query_right <= left || right <= query_left) return ActedMonoid::id();\n\
+    \        if (query_left <= left && right <= query_right) {\n            return\
+    \ detail::dynamic_mapping<ActedMonoid>(\n                inherited,\n        \
+    \        value(t, left, right, depth)\n            );\n        }\n        Index\
+    \ middle = std::midpoint(left, right);\n        return ActedMonoid::op(\n    \
+    \        prod_node(\n                t ? _journal[t].left : 0,\n             \
+    \   left,\n                middle,\n                depth + 1,\n             \
+    \   query_left,\n                query_right,\n                compose_for_child(inherited,\
+    \ t, 0)\n            ),\n            prod_node(\n                t ? _journal[t].right\
+    \ : 0,\n                middle,\n                right,\n                depth\
+    \ + 1,\n                query_left,\n                query_right,\n          \
+    \      compose_for_child(inherited, t, detail::dynamic_distance(left, middle))\n\
+    \            )\n        );\n    }\n\n    template <class G>\n    Index max_right_node(\n\
+    \        int t,\n        Index left,\n        Index right,\n        int depth,\n\
+    \        Index query_left,\n        T& product,\n        const F& inherited,\n\
+    \        G& predicate\n    ) const {\n        if (right <= query_left) return\
+    \ right;\n        if (query_left <= left) {\n            T next = ActedMonoid::op(\n\
+    \                product,\n                detail::dynamic_mapping<ActedMonoid>(\n\
+    \                    inherited,\n                    value(t, left, right, depth)\n\
+    \                )\n            );\n            if (predicate(next)) {\n     \
+    \           product = std::move(next);\n                return right;\n      \
+    \      }\n            Index middle = std::midpoint(left, right);\n           \
+    \ if (middle == left) return left;\n        }\n        Index middle = std::midpoint(left,\
+    \ right);\n        Index result = max_right_node(\n            t ? _journal[t].left\
+    \ : 0,\n            left,\n            middle,\n            depth + 1,\n     \
+    \       query_left,\n            product,\n            compose_for_child(inherited,\
+    \ t, 0),\n            predicate\n        );\n        if (result < middle) return\
+    \ result;\n        return max_right_node(\n            t ? _journal[t].right :\
+    \ 0,\n            middle,\n            right,\n            depth + 1,\n      \
+    \      query_left,\n            product,\n            compose_for_child(inherited,\
+    \ t, detail::dynamic_distance(left, middle)),\n            predicate\n       \
+    \ );\n    }\n\n    template <class G>\n    Index min_left_node(\n        int t,\n\
+    \        Index left,\n        Index right,\n        int depth,\n        Index\
+    \ query_right,\n        T& product,\n        const F& inherited,\n        G& predicate\n\
+    \    ) const {\n        if (query_right <= left) return left;\n        if (right\
+    \ <= query_right) {\n            T next = ActedMonoid::op(\n                detail::dynamic_mapping<ActedMonoid>(\n\
+    \                    inherited,\n                    value(t, left, right, depth)\n\
+    \                ),\n                product\n            );\n            if (predicate(next))\
+    \ {\n                product = std::move(next);\n                return left;\n\
+    \            }\n            Index middle = std::midpoint(left, right);\n     \
+    \       if (middle == left) return right;\n        }\n        Index middle = std::midpoint(left,\
+    \ right);\n        Index result = min_left_node(\n            t ? _journal[t].right\
+    \ : 0,\n            middle,\n            right,\n            depth + 1,\n    \
+    \        query_right,\n            product,\n            compose_for_child(inherited,\
+    \ t, detail::dynamic_distance(left, middle)),\n            predicate\n       \
+    \ );\n        if (middle < result) return result;\n        return min_left_node(\n\
+    \            t ? _journal[t].left : 0,\n            left,\n            middle,\n\
+    \            depth + 1,\n            query_right,\n            product,\n    \
+    \        compose_for_child(inherited, t, 0),\n            predicate\n        );\n\
+    \    }\n\n   public:\n    RollbackDynamicLazySegtree()\n        : RollbackDynamicLazySegtree(Index(0),\
+    \ Index(0), ActedMonoid::id()) {}\n\n    explicit RollbackDynamicLazySegtree(Index\
+    \ n)\n        : RollbackDynamicLazySegtree(Index(0), n, ActedMonoid::id()) {\n\
+    \        if constexpr (std::signed_integral<Index>) assert(Index(0) <= n);\n \
+    \   }\n\n    RollbackDynamicLazySegtree(Index left, Index right)\n        : RollbackDynamicLazySegtree(left,\
+    \ right, ActedMonoid::id()) {}\n\n    RollbackDynamicLazySegtree(Index left, Index\
+    \ right, T initial_value)\n        : _domain(left, right, std::move(initial_value))\
+    \ {\n        _journal.emplace(ActedMonoid::id());\n    }\n\n    size_type size()\
+    \ const {\n        return _domain.size();\n    }\n\n    bool empty() const {\n\
+    \        return _domain.empty();\n    }\n\n    Index left_bound() const {\n  \
+    \      return _domain.left_bound();\n    }\n\n    Index right_bound() const {\n\
+    \        return _domain.right_bound();\n    }\n\n    const T& initial_value()\
+    \ const {\n        return _domain.initial_value();\n    }\n\n    void reserve(std::size_t\
+    \ node_capacity) {\n        assert(node_capacity < std::numeric_limits<std::size_t>::max());\n\
+    \        _journal.nodes.reserve(node_capacity + 1);\n        _journal.saved_epoch.reserve(node_capacity\
+    \ + 1);\n    }\n\n    std::size_t node_count() const {\n        return _journal.nodes.size()\
+    \ - 1;\n    }\n\n    void clear() {\n        if (_journal.snapshot_count() ==\
+    \ 0) {\n            _journal.clear();\n            _journal.emplace(ActedMonoid::id());\n\
+    \            return;\n        }\n        _journal.touch(0);\n        _journal[0].left\
+    \ = 0;\n    }\n\n    void set(Index p, T x) {\n        assert(left_bound() <=\
+    \ p && p < right_bound());\n        int next_root = set_node(root(), left_bound(),\
+    \ right_bound(), 0, p, std::move(x));\n        if (next_root != root()) {\n  \
+    \          _journal.touch(0);\n            _journal[0].left = next_root;\n   \
+    \     }\n    }\n\n    T get(Index p) const {\n        assert(left_bound() <= p\
+    \ && p < right_bound());\n        return prod(p, p + 1);\n    }\n\n    T operator[](Index\
+    \ p) const {\n        return get(p);\n    }\n\n    T prod(Index left, Index right)\
+    \ const {\n        assert(left_bound() <= left && left <= right && right <= right_bound());\n\
+    \        if (left == right) return ActedMonoid::id();\n        return prod_node(\n\
+    \            root(),\n            left_bound(),\n            right_bound(),\n\
+    \            0,\n            left,\n            right,\n            ActedMonoid::op_id()\n\
+    \        );\n    }\n\n    T all_prod() const {\n        return value(root(), left_bound(),\
+    \ right_bound(), 0);\n    }\n\n    void apply(Index p, const F& f) {\n       \
+    \ assert(left_bound() <= p && p < right_bound());\n        apply(p, p + 1, f);\n\
+    \    }\n\n    void apply(Index left, Index right, const F& f) {\n        assert(left_bound()\
+    \ <= left && left <= right && right <= right_bound());\n        if (left == right)\
+    \ return;\n        int next_root = apply_node(\n            root(), left_bound(),\
+    \ right_bound(), 0, left, right, f\n        );\n        if (next_root != root())\
+    \ {\n            _journal.touch(0);\n            _journal[0].left = next_root;\n\
+    \        }\n    }\n\n    template <class G>\n    Index max_right(Index left, G\
+    \ predicate) const {\n        assert(left_bound() <= left && left <= right_bound());\n\
+    \        assert(predicate(ActedMonoid::id()));\n        if (left == right_bound())\
+    \ return right_bound();\n        T product = ActedMonoid::id();\n        return\
+    \ max_right_node(\n            root(),\n            left_bound(),\n          \
+    \  right_bound(),\n            0,\n            left,\n            product,\n \
+    \           ActedMonoid::op_id(),\n            predicate\n        );\n    }\n\n\
+    \    template <class G>\n    Index min_left(Index right, G predicate) const {\n\
+    \        assert(left_bound() <= right && right <= right_bound());\n        assert(predicate(ActedMonoid::id()));\n\
+    \        if (right == left_bound()) return left_bound();\n        T product =\
+    \ ActedMonoid::id();\n        return min_left_node(\n            root(),\n   \
+    \         left_bound(),\n            right_bound(),\n            0,\n        \
+    \    right,\n            product,\n            ActedMonoid::op_id(),\n       \
+    \     predicate\n        );\n    }\n\n    void set_inplace(Index p, T x) { set(p,\
+    \ std::move(x)); }\n    void apply_inplace(Index p, const F& f) { apply(p, f);\
+    \ }\n    void apply_inplace(Index left, Index right, const F& f) { apply(left,\
+    \ right, f); }\n\n    int snapshot() { return _journal.snapshot(); }\n    int\
+    \ snapshot_count() const { return _journal.snapshot_count(); }\n    void reserve_snapshots(int\
+    \ count) { _journal.reserve_snapshots(count); }\n    void rollback(int state)\
+    \ { _journal.rollback(state); }\n    void clear_history() { _journal.clear_history();\
+    \ }\n    void release() { _journal.clear(); _journal.emplace(ActedMonoid::id());\
+    \ }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n#endif  // M1UNE_DS_SEGTREE_ROLLBACK_DYNAMIC_LAZY_SEGTREE_HPP\n"
   dependsOn:
-  - ds/detail/rollback_persistent_base.hpp
-  - ds/segtree/persistent_dynamic_lazy_segtree.hpp
   - acted_monoid/concept.hpp
+  - ds/detail/rollback_journal.hpp
   - ds/segtree/dynamic_segtree_common.hpp
-  - ds/segtree/persistent_node_pool.hpp
   isVerificationFile: false
   path: ds/segtree/rollback_dynamic_lazy_segtree.hpp
   requiredBy: []
-  timestamp: '2026-08-12 04:04:21+09:00'
+  timestamp: '2026-08-12 17:21:09+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/rollback_counterparts.test.cpp
@@ -400,22 +513,28 @@ integral half-open domain.
 
 ## Methods
 
-Constructors and read-only methods match
-`PersistentDynamicLazySegtree<ActedMonoid, Index>`.
+Constructors and read-only methods follow the corresponding mutable structure.
 
 | Method | Description | Complexity |
 | --- | --- | --- |
+| `void clear()` | Resets the logical tree to its initial value. | $O(P)$ without snapshots; $O(1)$ with an active snapshot |
 | `void set(Index pos, T value)`, `void set_inplace(Index pos, T value)` | Assigns one point. | $O(\log U)$ |
 | `void apply(Index pos, const F& f)`, `void apply(Index left, Index right, const F& f)` | Applies an action to a point or range. | $O(\log U)$ |
-| `void apply_inplace(...)` | Rollback-recording aliases of `apply`. | $O(\log U)$ |
-| `int history_size() const`, `int snapshot() const` | Returns the history position. | $O(1)$ |
-| `void reserve_history(int count)` | Reserves history entries. | $O(H)$ |
-| `bool undo()` | Undoes one update. | $O(F)$ |
+| `void apply_inplace(...)` | Aliases of `apply`. | $O(\log U)$ |
+| `int snapshot()` | Registers the current state and returns its token. | $O(1)$ |
+| `int snapshot_count() const` | Returns the number of active snapshots. | $O(1)$ |
+| `void reserve_snapshots(int count)` | Reserves snapshot tokens. | $O(H)$ |
 | `void rollback(int state)` | Restores a current-path snapshot. | $O(F)$ total |
 | `void clear_history()`, `void release()` | Releases saved states, or all materialized nodes. | $O(F)$ |
-| `const PersistentDynamicLazySegtree<ActedMonoid, Index>& current_version() const` | Returns the current persistent state. | $O(1)$ |
 
-$U$ is the domain width; $F$ counts released nodes.
+$U$ is the domain width, $P$ is the number of materialized nodes, and $F$ is
+the number of saved or newly allocated nodes discarded by the operation.
+
+## Snapshot semantics
+
+Updates made before the first `snapshot()` retain no rollback data. A snapshot token is positive and valid only on the current path. `rollback(state)` restores that registered state, keeps it active, and invalidates newer snapshots. `clear_history()` commits the current state and invalidates every token. No per-update reversal operation is provided.
+
+Within one snapshot interval, a materialized node is saved only before its first mutation; newly allocated nodes are truncated directly by rollback.
 
 ## Example
 

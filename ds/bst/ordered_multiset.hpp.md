@@ -1,11 +1,17 @@
 ---
 data:
   _extendedDependsOn: []
-  _extendedRequiredBy: []
+  _extendedRequiredBy:
+  - icon: ':heavy_check_mark:'
+    path: ds/bst/rollback_ordered_multiset.hpp
+    title: Rollback Ordered Multiset
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/ds/bst/ordered_multiset.test.cpp
     title: verify/ds/bst/ordered_multiset.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/rollback_counterparts.test.cpp
+    title: verify/ds/rollback_counterparts.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -356,10 +362,12 @@ data:
   dependsOn: []
   isVerificationFile: false
   path: ds/bst/ordered_multiset.hpp
-  requiredBy: []
+  requiredBy:
+  - ds/bst/rollback_ordered_multiset.hpp
   timestamp: '2026-07-13 03:01:19+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/ds/rollback_counterparts.test.cpp
   - verify/ds/bst/ordered_multiset.test.cpp
 documentation_of: ds/bst/ordered_multiset.hpp
 layout: document

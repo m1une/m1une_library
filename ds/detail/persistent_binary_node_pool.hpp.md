@@ -9,12 +9,6 @@ data:
     path: ds/bst/persistent_ordered_set.hpp
     title: Persistent Ordered Set
   - icon: ':heavy_check_mark:'
-    path: ds/bst/rollback_ordered_multiset.hpp
-    title: Rollback Ordered Multiset
-  - icon: ':heavy_check_mark:'
-    path: ds/bst/rollback_ordered_set.hpp
-    title: Rollback Ordered Set
-  - icon: ':heavy_check_mark:'
     path: ds/dsu/persistent_dsu.hpp
     title: Persistent DSU
   - icon: ':heavy_check_mark:'
@@ -29,15 +23,6 @@ data:
   - icon: ':heavy_check_mark:'
     path: ds/dynamic_array/persistent_dynamic_monoid_array.hpp
     title: Persistent Dynamic Monoid Array
-  - icon: ':heavy_check_mark:'
-    path: ds/dynamic_array/rollback_dynamic_array.hpp
-    title: Rollback Dynamic Array
-  - icon: ':heavy_check_mark:'
-    path: ds/dynamic_array/rollback_dynamic_lazy_monoid_array.hpp
-    title: Rollback Dynamic Lazy Monoid Array
-  - icon: ':heavy_check_mark:'
-    path: ds/dynamic_array/rollback_dynamic_monoid_array.hpp
-    title: Rollback Dynamic Monoid Array
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/ds/bst/persistent_ordered_multiset.test.cpp
@@ -84,12 +69,6 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/persistent_release.test.cpp
     title: verify/ds/persistent_release.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/ds/rollback_counterparts.test.cpp
-    title: verify/ds/rollback_counterparts.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/ds/rollback_counterparts.test.cpp
-    title: verify/ds/rollback_counterparts.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -201,17 +180,12 @@ data:
   path: ds/detail/persistent_binary_node_pool.hpp
   requiredBy:
   - ds/dynamic_array/persistent_dynamic_monoid_array.hpp
-  - ds/dynamic_array/rollback_dynamic_array.hpp
   - ds/dynamic_array/persistent_dynamic_array.hpp
   - ds/dynamic_array/persistent_dynamic_lazy_monoid_array.hpp
-  - ds/dynamic_array/rollback_dynamic_monoid_array.hpp
-  - ds/dynamic_array/rollback_dynamic_lazy_monoid_array.hpp
   - ds/dsu/persistent_dsu.hpp
   - ds/dsu/persistent_potentialized_dsu.hpp
   - ds/bst/persistent_ordered_set.hpp
-  - ds/bst/rollback_ordered_multiset.hpp
   - ds/bst/persistent_ordered_multiset.hpp
-  - ds/bst/rollback_ordered_set.hpp
   timestamp: '2026-08-12 03:11:00+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
@@ -222,8 +196,6 @@ data:
   - verify/ds/dsu/persistent_dsu.test.cpp
   - verify/ds/dsu/persistent_potentialized_dsu.test.cpp
   - verify/ds/dsu/persistent_dsu_library_checker.test.cpp
-  - verify/ds/rollback_counterparts.test.cpp
-  - verify/ds/rollback_counterparts.test.cpp
   - verify/ds/persistent_release.test.cpp
   - verify/ds/persistent_release.test.cpp
   - verify/ds/persistent_release.test.cpp

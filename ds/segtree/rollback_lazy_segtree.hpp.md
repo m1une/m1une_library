@@ -5,14 +5,11 @@ data:
     path: acted_monoid/concept.hpp
     title: Acted Monoid Concept
   - icon: ':heavy_check_mark:'
-    path: ds/detail/rollback_persistent_base.hpp
-    title: ds/detail/rollback_persistent_base.hpp
+    path: ds/detail/rollback_journal.hpp
+    title: ds/detail/rollback_journal.hpp
   - icon: ':heavy_check_mark:'
-    path: ds/segtree/persistent_lazy_segtree.hpp
-    title: Persistent Lazy Segment Tree
-  - icon: ':heavy_check_mark:'
-    path: ds/segtree/persistent_node_pool.hpp
-    title: ds/segtree/persistent_node_pool.hpp
+    path: math/bit_ceil.hpp
+    title: Bit Ceil
   _extendedRequiredBy: []
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
@@ -23,31 +20,9 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"ds/segtree/rollback_lazy_segtree.hpp\"\n\n\n\n#include <utility>\n\
-    \n#line 1 \"ds/detail/rollback_persistent_base.hpp\"\n\n\n\n#include <cassert>\n\
-    #include <cstddef>\n#include <limits>\n#line 8 \"ds/detail/rollback_persistent_base.hpp\"\
-    \n#include <vector>\n\nnamespace m1une {\nnamespace ds {\nnamespace detail {\n\
-    \ntemplate <class Persistent>\nstruct RollbackPersistentBase : Persistent {\n\
-    \   private:\n    std::vector<Persistent> _history;\n\n   protected:\n    using\
-    \ Persistent::Persistent;\n\n    const Persistent& persistent() const {\n    \
-    \    return *this;\n    }\n\n    void commit(Persistent next) {\n        assert(_history.size()\
-    \ < std::size_t(std::numeric_limits<int>::max()));\n        _history.emplace_back(persistent());\n\
-    \        Persistent::operator=(std::move(next));\n    }\n\n   public:\n    RollbackPersistentBase()\
-    \ = default;\n\n    explicit RollbackPersistentBase(Persistent initial)\n    \
-    \    : Persistent(std::move(initial)) {}\n\n    int history_size() const {\n \
-    \       return int(_history.size());\n    }\n\n    void reserve_history(int count)\
-    \ {\n        assert(0 <= count);\n        _history.reserve(count);\n    }\n\n\
-    \    bool undo() {\n        if (_history.empty()) return false;\n        Persistent::operator=(std::move(_history.back()));\n\
-    \        _history.pop_back();\n        return true;\n    }\n\n    int snapshot()\
-    \ const {\n        return history_size();\n    }\n\n    void rollback(int state)\
-    \ {\n        assert(0 <= state && state <= history_size());\n        while (history_size()\
-    \ > state) undo();\n    }\n\n    void clear_history() {\n        _history.clear();\n\
-    \    }\n\n    void release() {\n        _history.clear();\n        Persistent::release();\n\
-    \    }\n\n    const Persistent& current_version() const {\n        return persistent();\n\
-    \    }\n};\n\n}  // namespace detail\n}  // namespace ds\n}  // namespace m1une\n\
-    \n\n#line 1 \"ds/segtree/persistent_lazy_segtree.hpp\"\n\n\n\n#line 5 \"ds/segtree/persistent_lazy_segtree.hpp\"\
-    \n#include <concepts>\n#include <memory>\n#line 9 \"ds/segtree/persistent_lazy_segtree.hpp\"\
-    \n\n#line 1 \"acted_monoid/concept.hpp\"\n\n\n\n#line 5 \"acted_monoid/concept.hpp\"\
+  bundledCode: "#line 1 \"ds/segtree/rollback_lazy_segtree.hpp\"\n\n\n\n#include <bit>\n\
+    #include <cassert>\n#include <concepts>\n#include <utility>\n#include <vector>\n\
+    \n#line 1 \"acted_monoid/concept.hpp\"\n\n\n\n#line 5 \"acted_monoid/concept.hpp\"\
     \n\nnamespace m1une {\nnamespace acted_monoid {\n\n// Concept defining the requirements\
     \ for an Acted Monoid.\ntemplate <typename AM>\nconcept IsActedMonoid = requires(typename\
     \ AM::value_type a, typename AM::value_type b, typename AM::operator_type f,\n\
@@ -63,278 +38,329 @@ data:
     \ laws.\ntemplate <typename AM>\nconcept IsCommutativeActedGroup = IsActedMonoid<AM>\
     \ && requires(typename AM::value_type a) {\n    { AM::inv(a) } -> std::same_as<typename\
     \ AM::value_type>;\n};\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\
-    \n\n#line 1 \"ds/segtree/persistent_node_pool.hpp\"\n\n\n\n#line 9 \"ds/segtree/persistent_node_pool.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\nnamespace detail {\n\n// Node must have\
-    \ integer `left`, `right`, and `references` members.\ntemplate <class Node>\n\
-    struct PersistentNodePool {\n    std::vector<Node> nodes;\n    int first_free\
-    \ = 0;\n    std::size_t live_nodes = 0;\n\n   private:\n    void release_zero(int\
-    \ node) {\n        int left = nodes[node].left;\n        int right = nodes[node].right;\n\
-    \        nodes[node] = Node();\n        nodes[node].left = first_free;\n     \
-    \   first_free = node;\n        --live_nodes;\n        if (left && --nodes[left].references\
-    \ == 0) release_zero(left);\n        if (right && --nodes[right].references ==\
-    \ 0) release_zero(right);\n    }\n\n   public:\n    PersistentNodePool() { nodes.emplace_back();\
-    \ }\n\n    void reserve(std::size_t capacity) { nodes.reserve(capacity + 1); }\n\
-    \n    Node& operator[](int node) { return nodes[node]; }\n\n    const Node& operator[](int\
-    \ node) const { return nodes[node]; }\n\n    void retain(int node) {\n       \
-    \ if (node) ++nodes[node].references;\n    }\n\n    void release(int node) {\n\
-    \        if (!node) return;\n        assert(nodes[node].references > 0);\n   \
-    \     if (--nodes[node].references == 0) release_zero(node);\n    }\n\n    template\
-    \ <class... Args>\n    int emplace(Args&&... args) {\n        int result;\n  \
-    \      if (!first_free) {\n            assert(nodes.size() < std::size_t(std::numeric_limits<int>::max()));\n\
-    \            nodes.emplace_back(std::forward<Args>(args)...);\n            result\
-    \ = int(nodes.size()) - 1;\n        } else {\n            result = first_free;\n\
-    \            first_free = nodes[result].left;\n            nodes[result] = Node(std::forward<Args>(args)...);\n\
-    \        }\n        Node& node = nodes[result];\n        node.references = 0;\n\
-    \        retain(node.left);\n        retain(node.right);\n        ++live_nodes;\n\
-    \        return result;\n    }\n\n    int clone(int node) {\n        assert(node);\n\
-    \        Node copy = nodes[node];\n        return emplace(std::move(copy));\n\
-    \    }\n\n    bool unique(int node) const {\n        return !node || nodes[node].references\
-    \ == 1;\n    }\n\n    // Returns node itself when it has one owner, otherwise\
-    \ an unowned clone.\n    // The caller must attach a returned clone with replace()\
-    \ before it can be\n    // released or exposed as a root.\n    int clone_if_shared(int\
-    \ node) {\n        if (unique(node)) return node;\n        return clone(node);\n\
-    \    }\n\n    void replace(int& edge, int node) {\n        if (edge == node) return;\n\
-    \        retain(node);\n        int old = edge;\n        edge = node;\n      \
-    \  release(old);\n    }\n\n    std::size_t size() const { return live_nodes; }\n\
-    };\n\n}  // namespace detail\n}  // namespace ds\n}  // namespace m1une\n\n\n\
-    #line 12 \"ds/segtree/persistent_lazy_segtree.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ ds {\n\ntemplate <m1une::acted_monoid::IsActedMonoid ActedMonoid>\nstruct PersistentLazySegtree\
-    \ {\n    using T = typename ActedMonoid::value_type;\n    using F = typename ActedMonoid::operator_type;\n\
-    \n   private:\n    struct Node {\n        T val;\n        F lazy;\n        int\
-    \ left, right;\n        int references;\n        bool has_lazy;\n\n        Node()\n\
-    \            : val(ActedMonoid::id()), lazy(ActedMonoid::op_id()), left(0), right(0),\
-    \ references(0), has_lazy(false) {}\n        explicit Node(T value)\n        \
-    \    : val(std::move(value)), lazy(ActedMonoid::op_id()), left(0), right(0), references(0),\
-    \ has_lazy(false) {}\n        Node(T value, int left_child, int right_child)\n\
-    \            : val(std::move(value)),\n              lazy(ActedMonoid::op_id()),\n\
-    \              left(left_child),\n              right(right_child),\n        \
-    \      references(0),\n              has_lazy(false) {}\n    };\n\n    using Pool\
-    \ = detail::PersistentNodePool<Node>;\n\n    int _n;\n    int _root;\n    std::shared_ptr<Pool>\
-    \ _pool;\n\n    explicit PersistentLazySegtree(int n, int root, std::shared_ptr<Pool>\
-    \ pool)\n        : _n(n), _root(root), _pool(std::move(pool)) {\n        _pool->retain(_root);\n\
-    \    }\n\n    int new_node(const Node& node) const { return _pool->emplace(node);\
-    \ }\n\n    int new_node(Node&& node) const { return _pool->emplace(std::move(node));\
-    \ }\n\n    int clone_node(int t) const { return _pool->clone(t); }\n\n    template\
-    \ <typename U>\n    static T make_value(const U& value, int index) {\n       \
-    \ if constexpr (requires(U x) { ActedMonoid::make(x); }) {\n            return\
-    \ ActedMonoid::make(value);\n        } else if constexpr (requires(U x, int i)\
-    \ { ActedMonoid::make(x, i); }) {\n            return ActedMonoid::make(value,\
+    \n\n#line 1 \"math/bit_ceil.hpp\"\n\n\n\nnamespace m1une {\nnamespace math {\n\
+    \ntemplate <typename T>\nconstexpr T bit_ceil(T n) {\n    if (n <= 1) return 1;\n\
+    \    T x = 1;\n    while (x < n) x <<= 1;\n    return x;\n}\n\n}  // namespace\
+    \ math\n}  // namespace m1une\n\n\n#line 1 \"ds/detail/rollback_journal.hpp\"\n\
+    \n\n\n#include <algorithm>\n#line 6 \"ds/detail/rollback_journal.hpp\"\n#include\
+    \ <cstddef>\n#include <cstdint>\n#include <limits>\n#line 11 \"ds/detail/rollback_journal.hpp\"\
+    \n\nnamespace m1une {\nnamespace ds {\nnamespace detail {\n\ntemplate <class Node>\n\
+    struct RollbackJournal {\n    struct Change {\n        int index;\n        Node\
+    \ value;\n    };\n\n    struct Checkpoint {\n        std::size_t change_size;\n\
+    \        std::size_t node_size;\n        std::uint64_t epoch;\n    };\n\n    std::vector<Node>\
+    \ nodes;\n    std::vector<Change> changes;\n    std::vector<Checkpoint> checkpoints;\n\
+    \    std::vector<std::uint64_t> saved_epoch;\n    std::uint64_t next_epoch = 1;\n\
+    \n    std::uint64_t new_epoch() {\n        if (next_epoch == 0) {\n          \
+    \  std::fill(saved_epoch.begin(), saved_epoch.end(), 0);\n            next_epoch\
+    \ = 1;\n        }\n        return next_epoch++;\n    }\n\n    int size() const\
+    \ { return int(nodes.size()); }\n\n    Node& operator[](int index) { return nodes[index];\
+    \ }\n    const Node& operator[](int index) const { return nodes[index]; }\n\n\
+    \    template <class... Args>\n    int emplace(Args&&... args) {\n        assert(nodes.size()\
+    \ < std::size_t(std::numeric_limits<int>::max()));\n        int index = int(nodes.size());\n\
+    \        nodes.emplace_back(std::forward<Args>(args)...);\n        saved_epoch.push_back(0);\n\
+    \        return index;\n    }\n\n    int snapshot() {\n        assert(checkpoints.size()\
+    \ < std::size_t(std::numeric_limits<int>::max()));\n        checkpoints.push_back(Checkpoint{changes.size(),\
+    \ nodes.size(), new_epoch()});\n        return int(checkpoints.size());\n    }\n\
+    \n    void touch(int index) {\n        assert(0 <= index && index < size());\n\
+    \        if (checkpoints.empty()) return;\n        const Checkpoint& checkpoint\
+    \ = checkpoints.back();\n        if (std::size_t(index) >= checkpoint.node_size)\
+    \ return;\n        if (saved_epoch[index] == checkpoint.epoch) return;\n     \
+    \   saved_epoch[index] = checkpoint.epoch;\n        changes.push_back(Change{index,\
+    \ nodes[index]});\n    }\n\n    int snapshot_count() const { return int(checkpoints.size());\
+    \ }\n\n    void reserve_snapshots(int count) {\n        assert(0 <= count);\n\
+    \        checkpoints.reserve(count);\n    }\n\n    void reserve_changes(std::size_t\
+    \ count) { changes.reserve(count); }\n\n    void rollback(int state) {\n     \
+    \   assert(1 <= state && state <= snapshot_count());\n        Checkpoint checkpoint\
+    \ = checkpoints[state - 1];\n        while (changes.size() > checkpoint.change_size)\
+    \ {\n            Change change = std::move(changes.back());\n            changes.pop_back();\n\
+    \            nodes[change.index] = std::move(change.value);\n        }\n     \
+    \   nodes.erase(nodes.begin() + checkpoint.node_size, nodes.end());\n        saved_epoch.resize(checkpoint.node_size);\n\
+    \        checkpoints.resize(state);\n        checkpoints.back().change_size =\
+    \ changes.size();\n        checkpoints.back().node_size = nodes.size();\n    \
+    \    checkpoints.back().epoch = new_epoch();\n    }\n\n    void clear_history()\
+    \ {\n        changes.clear();\n        checkpoints.clear();\n        std::fill(saved_epoch.begin(),\
+    \ saved_epoch.end(), 0);\n    }\n\n    void clear() {\n        nodes.clear();\n\
+    \        changes.clear();\n        checkpoints.clear();\n        saved_epoch.clear();\n\
+    \        next_epoch = 1;\n    }\n};\n\n}  // namespace detail\n}  // namespace\
+    \ ds\n}  // namespace m1une\n\n\n#line 13 \"ds/segtree/rollback_lazy_segtree.hpp\"\
+    \n\nnamespace m1une {\nnamespace ds {\n\ntemplate <m1une::acted_monoid::IsActedMonoid\
+    \ ActedMonoid>\nstruct RollbackLazySegtree {\n    using T = typename ActedMonoid::value_type;\n\
+    \    using F = typename ActedMonoid::operator_type;\n\n   private:\n    struct\
+    \ Node {\n        T value = ActedMonoid::id();\n        F lazy = ActedMonoid::op_id();\n\
+    \        bool has_lazy = false;\n    };\n\n    int _n = 0;\n    int _size = 1;\n\
+    \    int _log = 0;\n    detail::RollbackJournal<Node> _journal;\n\n    static\
+    \ T mapping_at(const F& f, const T& value, long long ordinal) {\n        if constexpr\
+    \ (requires(F g, T x, long long i) { ActedMonoid::mapping(g, x, i); }) {\n   \
+    \         return ActedMonoid::mapping(f, value, ordinal);\n        } else {\n\
+    \            return ActedMonoid::mapping(f, value);\n        }\n    }\n\n    static\
+    \ F shift_operator(const F& f, long long ordinal) {\n        if constexpr (requires(F\
+    \ g, long long i) { ActedMonoid::op_shift(g, i); }) {\n            return ActedMonoid::op_shift(f,\
+    \ ordinal);\n        } else {\n            return f;\n        }\n    }\n\n   \
+    \ template <class U>\n    static T make_value(const U& value, int index) {\n \
+    \       if constexpr (requires(U x) { ActedMonoid::make(x); }) {\n           \
+    \ return ActedMonoid::make(value);\n        } else if constexpr (requires(U x,\
+    \ int i) { ActedMonoid::make(x, i); }) {\n            return ActedMonoid::make(value,\
     \ index);\n        } else {\n            return static_cast<T>(value);\n     \
-    \   }\n    }\n\n    static T mapping_at(const F& f, const T& value, long long\
-    \ ord) {\n        if constexpr (requires(F g, T x, long long i) { ActedMonoid::mapping(g,\
-    \ x, i); }) {\n            return ActedMonoid::mapping(f, value, ord);\n     \
-    \   } else {\n            return ActedMonoid::mapping(f, value);\n        }\n\
-    \    }\n\n    static F shift_operator(const F& f, long long ord) {\n        if\
-    \ constexpr (requires(F g, long long i) { ActedMonoid::op_shift(g, i); }) {\n\
-    \            return ActedMonoid::op_shift(f, ord);\n        } else {\n       \
-    \     return f;\n        }\n    }\n\n    F compose_for_child(const F& inherited,\
-    \ const Node& node, long long ord) const {\n        F shifted = shift_operator(inherited,\
-    \ ord);\n        if (!node.has_lazy) return shifted;\n        return ActedMonoid::op_comp(shifted,\
-    \ shift_operator(node.lazy, ord));\n    }\n\n    int build(int l, int r, const\
-    \ std::vector<T>& v) const {\n        if (l == r) return 0;\n        if (r - l\
-    \ == 1) return new_node(Node(v[l]));\n        int m = (l + r) >> 1;\n        int\
-    \ left = build(l, m, v);\n        int right = build(m, r, v);\n        return\
-    \ new_node(Node(ActedMonoid::op((*_pool)[left].val, (*_pool)[right].val), left,\
-    \ right));\n    }\n\n    int build(int l, int r, std::vector<T>& v) const {\n\
-    \        if (l == r) return 0;\n        if (r - l == 1) return new_node(Node(std::move(v[l])));\n\
-    \        int m = (l + r) >> 1;\n        int left = build(l, m, v);\n        int\
-    \ right = build(m, r, v);\n        return new_node(Node(ActedMonoid::op((*_pool)[left].val,\
-    \ (*_pool)[right].val), left, right));\n    }\n\n    template <typename U>\n \
-    \   int build_from_values(int l, int r, const std::vector<U>& v) const {\n   \
-    \     if (l == r) return 0;\n        if (r - l == 1) return new_node(Node(make_value(v[l],\
-    \ l)));\n        int m = (l + r) >> 1;\n        int left = build_from_values(l,\
-    \ m, v);\n        int right = build_from_values(m, r, v);\n        return new_node(Node(ActedMonoid::op((*_pool)[left].val,\
-    \ (*_pool)[right].val), left, right));\n    }\n\n    void all_apply_to_node(int\
-    \ t, const F& f) const {\n        Node& node = (*_pool)[t];\n        node.val\
-    \ = mapping_at(f, node.val, 0);\n        node.lazy = ActedMonoid::op_comp(f, node.lazy);\n\
-    \        node.has_lazy = true;\n    }\n\n    int all_apply_clone(int t, const\
-    \ F& f, bool copy_on_write = false) const {\n        int res = copy_on_write ?\
-    \ _pool->clone_if_shared(t) : clone_node(t);\n        all_apply_to_node(res, f);\n\
-    \        return res;\n    }\n\n    void push(int t, int l, int r, bool copy_on_write\
-    \ = false) const {\n        if (!(*_pool)[t].has_lazy) return;\n        F lazy\
-    \ = (*_pool)[t].lazy;\n        int left = (*_pool)[t].left;\n        int right\
-    \ = (*_pool)[t].right;\n        int m = (l + r) >> 1;\n        left = all_apply_clone(left,\
-    \ lazy, copy_on_write);\n        right = all_apply_clone(right, shift_operator(lazy,\
-    \ m - l), copy_on_write);\n        Node& node = (*_pool)[t];\n        _pool->replace(node.left,\
-    \ left);\n        _pool->replace(node.right, right);\n        node.lazy = ActedMonoid::op_id();\n\
-    \        node.has_lazy = false;\n    }\n\n    void update(int t) const {\n   \
-    \     Node& node = (*_pool)[t];\n        node.val = ActedMonoid::op((*_pool)[node.left].val,\
-    \ (*_pool)[node.right].val);\n    }\n\n    int set_node(int t, int l, int r, int\
-    \ p, T value, bool copy_on_write = false) const {\n        t = copy_on_write ?\
-    \ _pool->clone_if_shared(t) : clone_node(t);\n        if (r - l == 1) {\n    \
-    \        Node& node = (*_pool)[t];\n            node.val = std::move(value);\n\
-    \            node.lazy = ActedMonoid::op_id();\n            node.has_lazy = false;\n\
-    \            return t;\n        }\n        push(t, l, r, copy_on_write);\n   \
-    \     int m = (l + r) >> 1;\n        if (p < m) {\n            int child = set_node((*_pool)[t].left,\
-    \ l, m, p, std::move(value), copy_on_write);\n            _pool->replace((*_pool)[t].left,\
-    \ child);\n        } else {\n            int child = set_node((*_pool)[t].right,\
-    \ m, r, p, std::move(value), copy_on_write);\n            _pool->replace((*_pool)[t].right,\
-    \ child);\n        }\n        update(t);\n        return t;\n    }\n\n    int\
-    \ apply_node(int t, int l, int r, int ql, int qr, const F& f, bool copy_on_write\
-    \ = false) const {\n        if (qr <= l || r <= ql) return t;\n        t = copy_on_write\
-    \ ? _pool->clone_if_shared(t) : clone_node(t);\n        if (ql <= l && r <= qr)\
-    \ {\n            all_apply_to_node(t, shift_operator(f, l - ql));\n          \
-    \  return t;\n        }\n        push(t, l, r, copy_on_write);\n        int m\
-    \ = (l + r) >> 1;\n        int left = apply_node((*_pool)[t].left, l, m, ql, qr,\
-    \ f, copy_on_write);\n        int right = apply_node((*_pool)[t].right, m, r,\
-    \ ql, qr, f, copy_on_write);\n        _pool->replace((*_pool)[t].left, left);\n\
-    \        _pool->replace((*_pool)[t].right, right);\n        update(t);\n     \
-    \   return t;\n    }\n\n    int copy_range_node(int target, int source, int l,\
-    \ int r, int ql, int qr) const {\n        if (qr <= l || r <= ql) return target;\n\
-    \        if (ql <= l && r <= qr) return source;\n\n        target = clone_node(target);\n\
-    \        source = clone_node(source);\n        _pool->retain(source);\n      \
-    \  push(target, l, r);\n        push(source, l, r);\n\n        int m = (l + r)\
-    \ >> 1;\n        int left = copy_range_node((*_pool)[target].left, (*_pool)[source].left,\
-    \ l, m, ql, qr);\n        int right = copy_range_node((*_pool)[target].right,\
-    \ (*_pool)[source].right, m, r, ql, qr);\n        _pool->replace((*_pool)[target].left,\
-    \ left);\n        _pool->replace((*_pool)[target].right, right);\n        update(target);\n\
-    \        _pool->release(source);\n        return target;\n    }\n\n    T prod_node(int\
-    \ t, int l, int r, int ql, int qr, const F& inherited) const {\n        if (!t\
-    \ || qr <= l || r <= ql) return ActedMonoid::id();\n        const Node& node =\
-    \ (*_pool)[t];\n        if (ql <= l && r <= qr) return mapping_at(inherited, node.val,\
-    \ 0);\n        int m = (l + r) >> 1;\n        return ActedMonoid::op(prod_node(node.left,\
-    \ l, m, ql, qr, compose_for_child(inherited, node, 0)),\n                    \
-    \           prod_node(node.right, m, r, ql, qr, compose_for_child(inherited, node,\
-    \ m - l)));\n    }\n\n    void collect_node(int t, int l, int r, int ql, int qr,\
-    \ const F& inherited, std::vector<T>& res) const {\n        if (!t || qr <= l\
-    \ || r <= ql) return;\n        const Node& node = (*_pool)[t];\n        if (r\
-    \ - l == 1) {\n            res.push_back(mapping_at(inherited, node.val, 0));\n\
-    \            return;\n        }\n        int m = (l + r) >> 1;\n        collect_node(node.left,\
-    \ l, m, ql, qr, compose_for_child(inherited, node, 0), res);\n        collect_node(node.right,\
-    \ m, r, ql, qr, compose_for_child(inherited, node, m - l), res);\n    }\n\n  \
-    \  template <class G>\n    int max_right_node(int t, int l, int r, int ql, T&\
-    \ sm, const F& inherited, G& g) const {\n        if (r <= ql) return r;\n    \
-    \    const Node& node = (*_pool)[t];\n        if (ql <= l) {\n            T nxt\
-    \ = ActedMonoid::op(sm, mapping_at(inherited, node.val, 0));\n            if (g(nxt))\
-    \ {\n                sm = std::move(nxt);\n                return r;\n       \
-    \     }\n            if (r - l == 1) return l;\n        }\n        int m = (l\
-    \ + r) >> 1;\n        int res = max_right_node(node.left, l, m, ql, sm, compose_for_child(inherited,\
-    \ node, 0), g);\n        if (res < m) return res;\n        return max_right_node(node.right,\
-    \ m, r, ql, sm, compose_for_child(inherited, node, m - l), g);\n    }\n\n    template\
-    \ <class G>\n    int min_left_node(int t, int l, int r, int qr, T& sm, const F&\
-    \ inherited, G& g) const {\n        if (qr <= l) return l;\n        const Node&\
-    \ node = (*_pool)[t];\n        if (r <= qr) {\n            T nxt = ActedMonoid::op(mapping_at(inherited,\
-    \ node.val, 0), sm);\n            if (g(nxt)) {\n                sm = std::move(nxt);\n\
-    \                return l;\n            }\n            if (r - l == 1) return\
-    \ r;\n        }\n        int m = (l + r) >> 1;\n        int res = min_left_node(node.right,\
-    \ m, r, qr, sm, compose_for_child(inherited, node, m - l), g);\n        if (m\
-    \ < res) return res;\n        return min_left_node(node.left, l, m, qr, sm, compose_for_child(inherited,\
-    \ node, 0), g);\n    }\n\n   public:\n    PersistentLazySegtree() : PersistentLazySegtree(0)\
-    \ {}\n\n    explicit PersistentLazySegtree(int n) : _n(n), _root(0), _pool(std::make_shared<Pool>())\
-    \ {\n        assert(0 <= n);\n        if (_n > 0) _root = build(0, _n, std::vector<T>(_n,\
-    \ ActedMonoid::id()));\n        _pool->retain(_root);\n    }\n\n    explicit PersistentLazySegtree(const\
-    \ std::vector<T>& v)\n        : _n(int(v.size())), _root(0), _pool(std::make_shared<Pool>())\
-    \ {\n        _pool->reserve(v.size() * 2);\n        if (_n > 0) _root = build(0,\
-    \ _n, v);\n        _pool->retain(_root);\n    }\n\n    explicit PersistentLazySegtree(std::vector<T>&&\
-    \ v) : _n(int(v.size())), _root(0), _pool(std::make_shared<Pool>()) {\n      \
-    \  _pool->reserve(v.size() * 2);\n        if (_n > 0) _root = build(0, _n, v);\n\
-    \        _pool->retain(_root);\n    }\n\n    template <typename U>\n        requires(!std::same_as<U,\
-    \ T>) &&\n                (requires(U x) { ActedMonoid::make(x); } || requires(U\
-    \ x, int i) { ActedMonoid::make(x, i); } ||\n                 std::convertible_to<U,\
-    \ T>)\n    explicit PersistentLazySegtree(const std::vector<U>& v)\n        :\
-    \ _n(int(v.size())), _root(0), _pool(std::make_shared<Pool>()) {\n        _pool->reserve(v.size()\
-    \ * 2);\n        if (_n > 0) _root = build_from_values(0, _n, v);\n        _pool->retain(_root);\n\
-    \    }\n\n    PersistentLazySegtree(const PersistentLazySegtree& other) : _n(other._n),\
-    \ _root(other._root), _pool(other._pool) {\n        if (_pool) _pool->retain(_root);\n\
-    \    }\n\n    PersistentLazySegtree(PersistentLazySegtree&& other) noexcept\n\
-    \        : _n(other._n), _root(other._root), _pool(std::move(other._pool)) {\n\
-    \        other._n = 0;\n        other._root = 0;\n    }\n\n    PersistentLazySegtree&\
-    \ operator=(const PersistentLazySegtree& other) {\n        if (this == &other)\
-    \ return *this;\n        if (other._pool) other._pool->retain(other._root);\n\
-    \        if (_pool) _pool->release(_root);\n        _n = other._n;\n        _root\
-    \ = other._root;\n        _pool = other._pool;\n        return *this;\n    }\n\
-    \n    PersistentLazySegtree& operator=(PersistentLazySegtree&& other) noexcept\
-    \ {\n        if (this == &other) return *this;\n        if (_pool) _pool->release(_root);\n\
-    \        _n = other._n;\n        _root = other._root;\n        _pool = std::move(other._pool);\n\
-    \        other._n = 0;\n        other._root = 0;\n        return *this;\n    }\n\
-    \n    ~PersistentLazySegtree() {\n        if (_pool) _pool->release(_root);\n\
-    \    }\n\n    int size() const { return _n; }\n\n    bool empty() const { return\
-    \ _n == 0; }\n\n    void release() {\n        if (_pool) _pool->release(_root);\n\
-    \        _pool = std::make_shared<Pool>();\n        _root = 0;\n        _n = 0;\n\
-    \    }\n\n    std::size_t node_count() const { return _pool ? _pool->size() :\
-    \ 0; }\n\n    PersistentLazySegtree set(int p, T x) const {\n        assert(0\
-    \ <= p && p < _n);\n        return PersistentLazySegtree(_n, set_node(_root, 0,\
-    \ _n, p, std::move(x)), _pool);\n    }\n\n    void set_inplace(int p, T x) {\n\
-    \        assert(0 <= p && p < _n);\n        int root = set_node(_root, 0, _n,\
-    \ p, std::move(x), true);\n        _pool->replace(_root, root);\n    }\n\n   \
-    \ T get(int p) const {\n        assert(0 <= p && p < _n);\n        return prod(p,\
-    \ p + 1);\n    }\n\n    T operator[](int p) const { return get(p); }\n\n    T\
-    \ prod(int l, int r) const {\n        assert(0 <= l && l <= r && r <= _n);\n \
-    \       if (l == r) return ActedMonoid::id();\n        return prod_node(_root,\
-    \ 0, _n, l, r, ActedMonoid::op_id());\n    }\n\n    T all_prod() const { return\
-    \ _root ? (*_pool)[_root].val : ActedMonoid::id(); }\n\n    std::vector<T> to_vector()\
-    \ const { return to_vector(0, _n); }\n\n    std::vector<T> to_vector(int l, int\
-    \ r) const {\n        assert(0 <= l && l <= r && r <= _n);\n        std::vector<T>\
-    \ res;\n        res.reserve(r - l);\n        collect_node(_root, 0, _n, l, r,\
-    \ ActedMonoid::op_id(), res);\n        return res;\n    }\n\n    PersistentLazySegtree\
-    \ apply(int p, const F& f) const {\n        assert(0 <= p && p < _n);\n      \
-    \  return apply(p, p + 1, f);\n    }\n\n    PersistentLazySegtree apply(int l,\
-    \ int r, const F& f) const {\n        assert(0 <= l && l <= r && r <= _n);\n \
-    \       if (l == r) return *this;\n        return PersistentLazySegtree(_n, apply_node(_root,\
-    \ 0, _n, l, r, f), _pool);\n    }\n\n    void apply_inplace(int p, const F& f)\
-    \ {\n        assert(0 <= p && p < _n);\n        apply_inplace(p, p + 1, f);\n\
-    \    }\n\n    void apply_inplace(int l, int r, const F& f) {\n        assert(0\
-    \ <= l && l <= r && r <= _n);\n        if (l == r) return;\n        int root =\
-    \ apply_node(_root, 0, _n, l, r, f, true);\n        _pool->replace(_root, root);\n\
-    \    }\n\n    PersistentLazySegtree copy_range_from(const PersistentLazySegtree&\
-    \ source, int l, int r) const {\n        assert(_n == source._n);\n        assert(_pool\
-    \ == source._pool);\n        assert(0 <= l && l <= r && r <= _n);\n        if\
-    \ (l == r) return *this;\n        int root = copy_range_node(_root, source._root,\
-    \ 0, _n, l, r);\n        return PersistentLazySegtree(_n, root, _pool);\n    }\n\
-    \n    template <class G>\n    int max_right(int l, G g) const {\n        assert(0\
-    \ <= l && l <= _n);\n        assert(g(ActedMonoid::id()));\n        if (l == _n)\
-    \ return _n;\n        T sm = ActedMonoid::id();\n        return max_right_node(_root,\
-    \ 0, _n, l, sm, ActedMonoid::op_id(), g);\n    }\n\n    template <class G>\n \
-    \   int min_left(int r, G g) const {\n        assert(0 <= r && r <= _n);\n   \
-    \     assert(g(ActedMonoid::id()));\n        if (r == 0) return 0;\n        T\
-    \ sm = ActedMonoid::id();\n        return min_left_node(_root, 0, _n, r, sm, ActedMonoid::op_id(),\
-    \ g);\n    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n#line 8 \"\
-    ds/segtree/rollback_lazy_segtree.hpp\"\n\nnamespace m1une {\nnamespace ds {\n\n\
-    template <m1une::acted_monoid::IsActedMonoid ActedMonoid>\nstruct RollbackLazySegtree\n\
-    \    : detail::RollbackPersistentBase<PersistentLazySegtree<ActedMonoid>> {\n\
-    \    using T = typename ActedMonoid::value_type;\n    using F = typename ActedMonoid::operator_type;\n\
-    \n   private:\n    using Persistent = PersistentLazySegtree<ActedMonoid>;\n  \
-    \  using Base = detail::RollbackPersistentBase<Persistent>;\n\n   public:\n  \
-    \  using Base::Base;\n\n    void set(int pos, T value) {\n        Base::commit(Base::persistent().set(pos,\
-    \ std::move(value)));\n    }\n    void set_inplace(int pos, T value) { set(pos,\
-    \ std::move(value)); }\n\n    void apply(int pos, const F& f) {\n        Base::commit(Base::persistent().apply(pos,\
-    \ f));\n    }\n    void apply(int left, int right, const F& f) {\n        Base::commit(Base::persistent().apply(left,\
-    \ right, f));\n    }\n    void apply_inplace(int pos, const F& f) { apply(pos,\
+    \   }\n    }\n\n    int node_length(int node) const {\n        int level = std::bit_width(static_cast<unsigned\
+    \ int>(node)) - 1;\n        return _size >> level;\n    }\n\n    int node_left(int\
+    \ node) const {\n        int level = std::bit_width(static_cast<unsigned int>(node))\
+    \ - 1;\n        int length = _size >> level;\n        return (node - (1 << level))\
+    \ * length;\n    }\n\n    void update(int node) {\n        _journal.touch(node);\n\
+    \        _journal[node].value = ActedMonoid::op(\n            _journal[node <<\
+    \ 1].value,\n            _journal[node << 1 | 1].value\n        );\n    }\n\n\
+    \    void all_apply(int node, const F& f) {\n        _journal.touch(node);\n \
+    \       _journal[node].value = mapping_at(f, _journal[node].value, 0);\n     \
+    \   if (node < _size) {\n            _journal[node].lazy = ActedMonoid::op_comp(f,\
+    \ _journal[node].lazy);\n            _journal[node].has_lazy = true;\n       \
+    \ }\n    }\n\n    void push(int node) {\n        if (!_journal[node].has_lazy)\
+    \ return;\n        F lazy = _journal[node].lazy;\n        all_apply(node << 1,\
+    \ lazy);\n        all_apply(node << 1 | 1, shift_operator(lazy, node_length(node)\
+    \ / 2));\n        _journal.touch(node);\n        _journal[node].lazy = ActedMonoid::op_id();\n\
+    \        _journal[node].has_lazy = false;\n    }\n\n    template <class U>\n \
+    \   void build(const std::vector<U>& values) {\n        _n = int(values.size());\n\
+    \        _size = int(m1une::math::bit_ceil(static_cast<unsigned int>(_n)));\n\
+    \        _log = 0;\n        while ((1U << _log) < static_cast<unsigned int>(_size))\
+    \ ++_log;\n        _journal.nodes.assign(2 * _size, Node());\n        _journal.saved_epoch.assign(_journal.nodes.size(),\
+    \ 0);\n        for (int index = 0; index < _n; ++index) {\n            _journal[_size\
+    \ + index].value = make_value(values[index], index);\n        }\n        for (int\
+    \ node = _size - 1; node > 0; --node) {\n            _journal[node].value = ActedMonoid::op(\n\
+    \                _journal[node << 1].value,\n                _journal[node <<\
+    \ 1 | 1].value\n            );\n        }\n    }\n\n   public:\n    RollbackLazySegtree()\
+    \ { build(std::vector<T>()); }\n    explicit RollbackLazySegtree(int n) {\n  \
+    \      assert(0 <= n);\n        build(std::vector<T>(n, ActedMonoid::id()));\n\
+    \    }\n    explicit RollbackLazySegtree(const std::vector<T>& values) { build(values);\
+    \ }\n    explicit RollbackLazySegtree(std::vector<T>&& values) { build(values);\
+    \ }\n\n    template <class U>\n        requires(!std::same_as<U, T>)\n    explicit\
+    \ RollbackLazySegtree(const std::vector<U>& values) { build(values); }\n\n   \
+    \ int size() const { return _n; }\n    bool empty() const { return _n == 0; }\n\
+    \    std::size_t node_count() const { return _journal.nodes.size(); }\n\n    void\
+    \ set(int pos, T value) {\n        assert(0 <= pos && pos < _n);\n        int\
+    \ node = pos + _size;\n        for (int level = _log; level >= 1; --level) push(node\
+    \ >> level);\n        _journal.touch(node);\n        _journal[node].value = std::move(value);\n\
+    \        for (int level = 1; level <= _log; ++level) update(node >> level);\n\
+    \    }\n\n    void set_inplace(int pos, T value) { set(pos, std::move(value));\
+    \ }\n\n    T get(int pos) {\n        assert(0 <= pos && pos < _n);\n        int\
+    \ node = pos + _size;\n        for (int level = _log; level >= 1; --level) push(node\
+    \ >> level);\n        return _journal[node].value;\n    }\n\n    T operator[](int\
+    \ pos) { return get(pos); }\n\n    T prod(int left, int right) {\n        assert(0\
+    \ <= left && left <= right && right <= _n);\n        if (left == right) return\
+    \ ActedMonoid::id();\n        left += _size;\n        right += _size;\n      \
+    \  for (int level = _log; level >= 1; --level) {\n            if (((left >> level)\
+    \ << level) != left) push(left >> level);\n            if (((right >> level) <<\
+    \ level) != right) push((right - 1) >> level);\n        }\n        T left_product\
+    \ = ActedMonoid::id();\n        T right_product = ActedMonoid::id();\n       \
+    \ while (left < right) {\n            if (left & 1) left_product = ActedMonoid::op(left_product,\
+    \ _journal[left++].value);\n            if (right & 1) right_product = ActedMonoid::op(_journal[--right].value,\
+    \ right_product);\n            left >>= 1;\n            right >>= 1;\n       \
+    \ }\n        return ActedMonoid::op(left_product, right_product);\n    }\n\n \
+    \   T all_prod() const { return _journal[1].value; }\n\n    std::vector<T> to_vector()\
+    \ {\n        for (int node = 1; node < _size; ++node) push(node);\n        std::vector<T>\
+    \ result;\n        result.reserve(_n);\n        for (int index = 0; index < _n;\
+    \ ++index) result.push_back(_journal[_size + index].value);\n        return result;\n\
+    \    }\n\n    std::vector<T> to_vector(int left, int right) {\n        assert(0\
+    \ <= left && left <= right && right <= _n);\n        std::vector<T> result;\n\
+    \        result.reserve(right - left);\n        for (int index = left; index <\
+    \ right; ++index) result.push_back(get(index));\n        return result;\n    }\n\
+    \n    void apply(int pos, const F& f) {\n        assert(0 <= pos && pos < _n);\n\
+    \        int node = pos + _size;\n        for (int level = _log; level >= 1; --level)\
+    \ push(node >> level);\n        _journal.touch(node);\n        _journal[node].value\
+    \ = mapping_at(f, _journal[node].value, 0);\n        for (int level = 1; level\
+    \ <= _log; ++level) update(node >> level);\n    }\n\n    void apply(int left,\
+    \ int right, const F& f) {\n        assert(0 <= left && left <= right && right\
+    \ <= _n);\n        if (left == right) return;\n        int base_left = left;\n\
+    \        left += _size;\n        right += _size;\n        for (int level = _log;\
+    \ level >= 1; --level) {\n            if (((left >> level) << level) != left)\
+    \ push(left >> level);\n            if (((right >> level) << level) != right)\
+    \ push((right - 1) >> level);\n        }\n        int saved_left = left;\n   \
+    \     int saved_right = right;\n        while (left < right) {\n            if\
+    \ (left & 1) {\n                all_apply(left, shift_operator(f, node_left(left)\
+    \ - base_left));\n                ++left;\n            }\n            if (right\
+    \ & 1) {\n                --right;\n                all_apply(right, shift_operator(f,\
+    \ node_left(right) - base_left));\n            }\n            left >>= 1;\n  \
+    \          right >>= 1;\n        }\n        left = saved_left;\n        right\
+    \ = saved_right;\n        for (int level = 1; level <= _log; ++level) {\n    \
+    \        if (((left >> level) << level) != left) update(left >> level);\n    \
+    \        if (((right >> level) << level) != right) update((right - 1) >> level);\n\
+    \        }\n    }\n\n    void apply_inplace(int pos, const F& f) { apply(pos,\
     \ f); }\n    void apply_inplace(int left, int right, const F& f) { apply(left,\
-    \ right, f); }\n\n    void copy_range_from(const RollbackLazySegtree& source,\
-    \ int left, int right) {\n        Base::commit(Base::persistent().copy_range_from(source.current_version(),\
-    \ left, right));\n    }\n    void copy_range_from(const Persistent& source, int\
-    \ left, int right) {\n        Base::commit(Base::persistent().copy_range_from(source,\
-    \ left, right));\n    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n"
+    \ right, f); }\n\n    template <class Predicate>\n    int max_right(int left,\
+    \ Predicate predicate) {\n        assert(0 <= left && left <= _n);\n        assert(predicate(ActedMonoid::id()));\n\
+    \        if (left == _n) return _n;\n        int node = left + _size;\n      \
+    \  for (int level = _log; level >= 1; --level) push(node >> level);\n        T\
+    \ product = ActedMonoid::id();\n        do {\n            while ((node & 1) ==\
+    \ 0) node >>= 1;\n            T next = ActedMonoid::op(product, _journal[node].value);\n\
+    \            if (!predicate(next)) {\n                while (node < _size) {\n\
+    \                    push(node);\n                    node <<= 1;\n          \
+    \          next = ActedMonoid::op(product, _journal[node].value);\n          \
+    \          if (predicate(next)) {\n                        product = std::move(next);\n\
+    \                        ++node;\n                    }\n                }\n \
+    \               return node - _size;\n            }\n            product = std::move(next);\n\
+    \            ++node;\n        } while ((node & -node) != node);\n        return\
+    \ _n;\n    }\n\n    template <class Predicate>\n    int min_left(int right, Predicate\
+    \ predicate) {\n        assert(0 <= right && right <= _n);\n        assert(predicate(ActedMonoid::id()));\n\
+    \        if (right == 0) return 0;\n        int node = right + _size;\n      \
+    \  for (int level = _log; level >= 1; --level) push((node - 1) >> level);\n  \
+    \      T product = ActedMonoid::id();\n        do {\n            --node;\n   \
+    \         while (node > 1 && (node & 1)) node >>= 1;\n            T next = ActedMonoid::op(_journal[node].value,\
+    \ product);\n            if (!predicate(next)) {\n                while (node\
+    \ < _size) {\n                    push(node);\n                    node = node\
+    \ << 1 | 1;\n                    next = ActedMonoid::op(_journal[node].value,\
+    \ product);\n                    if (predicate(next)) {\n                    \
+    \    product = std::move(next);\n                        --node;\n           \
+    \         }\n                }\n                return node + 1 - _size;\n   \
+    \         }\n            product = std::move(next);\n        } while ((node &\
+    \ -node) != node);\n        return 0;\n    }\n\n    int snapshot() { return _journal.snapshot();\
+    \ }\n    int snapshot_count() const { return _journal.snapshot_count(); }\n  \
+    \  void reserve_snapshots(int count) { _journal.reserve_snapshots(count); }\n\
+    \    void rollback(int state) { _journal.rollback(state); }\n    void clear_history()\
+    \ { _journal.clear_history(); }\n    void release() { _n = 0; _size = 1; _log\
+    \ = 0; _journal.clear(); }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\
+    \n"
   code: "#ifndef M1UNE_DS_SEGTREE_ROLLBACK_LAZY_SEGTREE_HPP\n#define M1UNE_DS_SEGTREE_ROLLBACK_LAZY_SEGTREE_HPP\
-    \ 1\n\n#include <utility>\n\n#include \"../detail/rollback_persistent_base.hpp\"\
-    \n#include \"persistent_lazy_segtree.hpp\"\n\nnamespace m1une {\nnamespace ds\
-    \ {\n\ntemplate <m1une::acted_monoid::IsActedMonoid ActedMonoid>\nstruct RollbackLazySegtree\n\
-    \    : detail::RollbackPersistentBase<PersistentLazySegtree<ActedMonoid>> {\n\
-    \    using T = typename ActedMonoid::value_type;\n    using F = typename ActedMonoid::operator_type;\n\
-    \n   private:\n    using Persistent = PersistentLazySegtree<ActedMonoid>;\n  \
-    \  using Base = detail::RollbackPersistentBase<Persistent>;\n\n   public:\n  \
-    \  using Base::Base;\n\n    void set(int pos, T value) {\n        Base::commit(Base::persistent().set(pos,\
-    \ std::move(value)));\n    }\n    void set_inplace(int pos, T value) { set(pos,\
-    \ std::move(value)); }\n\n    void apply(int pos, const F& f) {\n        Base::commit(Base::persistent().apply(pos,\
-    \ f));\n    }\n    void apply(int left, int right, const F& f) {\n        Base::commit(Base::persistent().apply(left,\
-    \ right, f));\n    }\n    void apply_inplace(int pos, const F& f) { apply(pos,\
+    \ 1\n\n#include <bit>\n#include <cassert>\n#include <concepts>\n#include <utility>\n\
+    #include <vector>\n\n#include \"../../acted_monoid/concept.hpp\"\n#include \"\
+    ../../math/bit_ceil.hpp\"\n#include \"../detail/rollback_journal.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace ds {\n\ntemplate <m1une::acted_monoid::IsActedMonoid ActedMonoid>\n\
+    struct RollbackLazySegtree {\n    using T = typename ActedMonoid::value_type;\n\
+    \    using F = typename ActedMonoid::operator_type;\n\n   private:\n    struct\
+    \ Node {\n        T value = ActedMonoid::id();\n        F lazy = ActedMonoid::op_id();\n\
+    \        bool has_lazy = false;\n    };\n\n    int _n = 0;\n    int _size = 1;\n\
+    \    int _log = 0;\n    detail::RollbackJournal<Node> _journal;\n\n    static\
+    \ T mapping_at(const F& f, const T& value, long long ordinal) {\n        if constexpr\
+    \ (requires(F g, T x, long long i) { ActedMonoid::mapping(g, x, i); }) {\n   \
+    \         return ActedMonoid::mapping(f, value, ordinal);\n        } else {\n\
+    \            return ActedMonoid::mapping(f, value);\n        }\n    }\n\n    static\
+    \ F shift_operator(const F& f, long long ordinal) {\n        if constexpr (requires(F\
+    \ g, long long i) { ActedMonoid::op_shift(g, i); }) {\n            return ActedMonoid::op_shift(f,\
+    \ ordinal);\n        } else {\n            return f;\n        }\n    }\n\n   \
+    \ template <class U>\n    static T make_value(const U& value, int index) {\n \
+    \       if constexpr (requires(U x) { ActedMonoid::make(x); }) {\n           \
+    \ return ActedMonoid::make(value);\n        } else if constexpr (requires(U x,\
+    \ int i) { ActedMonoid::make(x, i); }) {\n            return ActedMonoid::make(value,\
+    \ index);\n        } else {\n            return static_cast<T>(value);\n     \
+    \   }\n    }\n\n    int node_length(int node) const {\n        int level = std::bit_width(static_cast<unsigned\
+    \ int>(node)) - 1;\n        return _size >> level;\n    }\n\n    int node_left(int\
+    \ node) const {\n        int level = std::bit_width(static_cast<unsigned int>(node))\
+    \ - 1;\n        int length = _size >> level;\n        return (node - (1 << level))\
+    \ * length;\n    }\n\n    void update(int node) {\n        _journal.touch(node);\n\
+    \        _journal[node].value = ActedMonoid::op(\n            _journal[node <<\
+    \ 1].value,\n            _journal[node << 1 | 1].value\n        );\n    }\n\n\
+    \    void all_apply(int node, const F& f) {\n        _journal.touch(node);\n \
+    \       _journal[node].value = mapping_at(f, _journal[node].value, 0);\n     \
+    \   if (node < _size) {\n            _journal[node].lazy = ActedMonoid::op_comp(f,\
+    \ _journal[node].lazy);\n            _journal[node].has_lazy = true;\n       \
+    \ }\n    }\n\n    void push(int node) {\n        if (!_journal[node].has_lazy)\
+    \ return;\n        F lazy = _journal[node].lazy;\n        all_apply(node << 1,\
+    \ lazy);\n        all_apply(node << 1 | 1, shift_operator(lazy, node_length(node)\
+    \ / 2));\n        _journal.touch(node);\n        _journal[node].lazy = ActedMonoid::op_id();\n\
+    \        _journal[node].has_lazy = false;\n    }\n\n    template <class U>\n \
+    \   void build(const std::vector<U>& values) {\n        _n = int(values.size());\n\
+    \        _size = int(m1une::math::bit_ceil(static_cast<unsigned int>(_n)));\n\
+    \        _log = 0;\n        while ((1U << _log) < static_cast<unsigned int>(_size))\
+    \ ++_log;\n        _journal.nodes.assign(2 * _size, Node());\n        _journal.saved_epoch.assign(_journal.nodes.size(),\
+    \ 0);\n        for (int index = 0; index < _n; ++index) {\n            _journal[_size\
+    \ + index].value = make_value(values[index], index);\n        }\n        for (int\
+    \ node = _size - 1; node > 0; --node) {\n            _journal[node].value = ActedMonoid::op(\n\
+    \                _journal[node << 1].value,\n                _journal[node <<\
+    \ 1 | 1].value\n            );\n        }\n    }\n\n   public:\n    RollbackLazySegtree()\
+    \ { build(std::vector<T>()); }\n    explicit RollbackLazySegtree(int n) {\n  \
+    \      assert(0 <= n);\n        build(std::vector<T>(n, ActedMonoid::id()));\n\
+    \    }\n    explicit RollbackLazySegtree(const std::vector<T>& values) { build(values);\
+    \ }\n    explicit RollbackLazySegtree(std::vector<T>&& values) { build(values);\
+    \ }\n\n    template <class U>\n        requires(!std::same_as<U, T>)\n    explicit\
+    \ RollbackLazySegtree(const std::vector<U>& values) { build(values); }\n\n   \
+    \ int size() const { return _n; }\n    bool empty() const { return _n == 0; }\n\
+    \    std::size_t node_count() const { return _journal.nodes.size(); }\n\n    void\
+    \ set(int pos, T value) {\n        assert(0 <= pos && pos < _n);\n        int\
+    \ node = pos + _size;\n        for (int level = _log; level >= 1; --level) push(node\
+    \ >> level);\n        _journal.touch(node);\n        _journal[node].value = std::move(value);\n\
+    \        for (int level = 1; level <= _log; ++level) update(node >> level);\n\
+    \    }\n\n    void set_inplace(int pos, T value) { set(pos, std::move(value));\
+    \ }\n\n    T get(int pos) {\n        assert(0 <= pos && pos < _n);\n        int\
+    \ node = pos + _size;\n        for (int level = _log; level >= 1; --level) push(node\
+    \ >> level);\n        return _journal[node].value;\n    }\n\n    T operator[](int\
+    \ pos) { return get(pos); }\n\n    T prod(int left, int right) {\n        assert(0\
+    \ <= left && left <= right && right <= _n);\n        if (left == right) return\
+    \ ActedMonoid::id();\n        left += _size;\n        right += _size;\n      \
+    \  for (int level = _log; level >= 1; --level) {\n            if (((left >> level)\
+    \ << level) != left) push(left >> level);\n            if (((right >> level) <<\
+    \ level) != right) push((right - 1) >> level);\n        }\n        T left_product\
+    \ = ActedMonoid::id();\n        T right_product = ActedMonoid::id();\n       \
+    \ while (left < right) {\n            if (left & 1) left_product = ActedMonoid::op(left_product,\
+    \ _journal[left++].value);\n            if (right & 1) right_product = ActedMonoid::op(_journal[--right].value,\
+    \ right_product);\n            left >>= 1;\n            right >>= 1;\n       \
+    \ }\n        return ActedMonoid::op(left_product, right_product);\n    }\n\n \
+    \   T all_prod() const { return _journal[1].value; }\n\n    std::vector<T> to_vector()\
+    \ {\n        for (int node = 1; node < _size; ++node) push(node);\n        std::vector<T>\
+    \ result;\n        result.reserve(_n);\n        for (int index = 0; index < _n;\
+    \ ++index) result.push_back(_journal[_size + index].value);\n        return result;\n\
+    \    }\n\n    std::vector<T> to_vector(int left, int right) {\n        assert(0\
+    \ <= left && left <= right && right <= _n);\n        std::vector<T> result;\n\
+    \        result.reserve(right - left);\n        for (int index = left; index <\
+    \ right; ++index) result.push_back(get(index));\n        return result;\n    }\n\
+    \n    void apply(int pos, const F& f) {\n        assert(0 <= pos && pos < _n);\n\
+    \        int node = pos + _size;\n        for (int level = _log; level >= 1; --level)\
+    \ push(node >> level);\n        _journal.touch(node);\n        _journal[node].value\
+    \ = mapping_at(f, _journal[node].value, 0);\n        for (int level = 1; level\
+    \ <= _log; ++level) update(node >> level);\n    }\n\n    void apply(int left,\
+    \ int right, const F& f) {\n        assert(0 <= left && left <= right && right\
+    \ <= _n);\n        if (left == right) return;\n        int base_left = left;\n\
+    \        left += _size;\n        right += _size;\n        for (int level = _log;\
+    \ level >= 1; --level) {\n            if (((left >> level) << level) != left)\
+    \ push(left >> level);\n            if (((right >> level) << level) != right)\
+    \ push((right - 1) >> level);\n        }\n        int saved_left = left;\n   \
+    \     int saved_right = right;\n        while (left < right) {\n            if\
+    \ (left & 1) {\n                all_apply(left, shift_operator(f, node_left(left)\
+    \ - base_left));\n                ++left;\n            }\n            if (right\
+    \ & 1) {\n                --right;\n                all_apply(right, shift_operator(f,\
+    \ node_left(right) - base_left));\n            }\n            left >>= 1;\n  \
+    \          right >>= 1;\n        }\n        left = saved_left;\n        right\
+    \ = saved_right;\n        for (int level = 1; level <= _log; ++level) {\n    \
+    \        if (((left >> level) << level) != left) update(left >> level);\n    \
+    \        if (((right >> level) << level) != right) update((right - 1) >> level);\n\
+    \        }\n    }\n\n    void apply_inplace(int pos, const F& f) { apply(pos,\
     \ f); }\n    void apply_inplace(int left, int right, const F& f) { apply(left,\
-    \ right, f); }\n\n    void copy_range_from(const RollbackLazySegtree& source,\
-    \ int left, int right) {\n        Base::commit(Base::persistent().copy_range_from(source.current_version(),\
-    \ left, right));\n    }\n    void copy_range_from(const Persistent& source, int\
-    \ left, int right) {\n        Base::commit(Base::persistent().copy_range_from(source,\
-    \ left, right));\n    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n#endif\
-    \  // M1UNE_DS_SEGTREE_ROLLBACK_LAZY_SEGTREE_HPP\n"
+    \ right, f); }\n\n    template <class Predicate>\n    int max_right(int left,\
+    \ Predicate predicate) {\n        assert(0 <= left && left <= _n);\n        assert(predicate(ActedMonoid::id()));\n\
+    \        if (left == _n) return _n;\n        int node = left + _size;\n      \
+    \  for (int level = _log; level >= 1; --level) push(node >> level);\n        T\
+    \ product = ActedMonoid::id();\n        do {\n            while ((node & 1) ==\
+    \ 0) node >>= 1;\n            T next = ActedMonoid::op(product, _journal[node].value);\n\
+    \            if (!predicate(next)) {\n                while (node < _size) {\n\
+    \                    push(node);\n                    node <<= 1;\n          \
+    \          next = ActedMonoid::op(product, _journal[node].value);\n          \
+    \          if (predicate(next)) {\n                        product = std::move(next);\n\
+    \                        ++node;\n                    }\n                }\n \
+    \               return node - _size;\n            }\n            product = std::move(next);\n\
+    \            ++node;\n        } while ((node & -node) != node);\n        return\
+    \ _n;\n    }\n\n    template <class Predicate>\n    int min_left(int right, Predicate\
+    \ predicate) {\n        assert(0 <= right && right <= _n);\n        assert(predicate(ActedMonoid::id()));\n\
+    \        if (right == 0) return 0;\n        int node = right + _size;\n      \
+    \  for (int level = _log; level >= 1; --level) push((node - 1) >> level);\n  \
+    \      T product = ActedMonoid::id();\n        do {\n            --node;\n   \
+    \         while (node > 1 && (node & 1)) node >>= 1;\n            T next = ActedMonoid::op(_journal[node].value,\
+    \ product);\n            if (!predicate(next)) {\n                while (node\
+    \ < _size) {\n                    push(node);\n                    node = node\
+    \ << 1 | 1;\n                    next = ActedMonoid::op(_journal[node].value,\
+    \ product);\n                    if (predicate(next)) {\n                    \
+    \    product = std::move(next);\n                        --node;\n           \
+    \         }\n                }\n                return node + 1 - _size;\n   \
+    \         }\n            product = std::move(next);\n        } while ((node &\
+    \ -node) != node);\n        return 0;\n    }\n\n    int snapshot() { return _journal.snapshot();\
+    \ }\n    int snapshot_count() const { return _journal.snapshot_count(); }\n  \
+    \  void reserve_snapshots(int count) { _journal.reserve_snapshots(count); }\n\
+    \    void rollback(int state) { _journal.rollback(state); }\n    void clear_history()\
+    \ { _journal.clear_history(); }\n    void release() { _n = 0; _size = 1; _log\
+    \ = 0; _journal.clear(); }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\
+    #endif  // M1UNE_DS_SEGTREE_ROLLBACK_LAZY_SEGTREE_HPP\n"
   dependsOn:
-  - ds/detail/rollback_persistent_base.hpp
-  - ds/segtree/persistent_lazy_segtree.hpp
   - acted_monoid/concept.hpp
-  - ds/segtree/persistent_node_pool.hpp
+  - math/bit_ceil.hpp
+  - ds/detail/rollback_journal.hpp
   isVerificationFile: false
   path: ds/segtree/rollback_lazy_segtree.hpp
   requiredBy: []
-  timestamp: '2026-08-12 04:04:21+09:00'
+  timestamp: '2026-08-12 17:21:09+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/rollback_counterparts.test.cpp
@@ -346,30 +372,30 @@ title: Rollback Lazy Segment Tree
 ## Overview
 
 `RollbackLazySegtree<ActedMonoid>` provides point assignment, range actions,
-range products, and linear-history rollback. `ActedMonoid` must satisfy
+range products, and registered-snapshot rollback. `ActedMonoid` must satisfy
 `m1une::acted_monoid::IsActedMonoid`.
 
 ## Methods
 
-Constructors and read-only methods match
-`PersistentLazySegtree<ActedMonoid>`.
+Constructors and read-only methods follow the corresponding mutable structure.
 
 | Method | Description | Complexity |
 | --- | --- | --- |
 | `void set(int pos, T value)`, `void set_inplace(int pos, T value)` | Assigns one point. | $O(\log N)$ |
 | `void apply(int pos, const F& f)`, `void apply(int left, int right, const F& f)` | Applies an action to a point or `[left, right)`. | $O(\log N)$ |
-| `void apply_inplace(...)` | Rollback-recording aliases of `apply`. | $O(\log N)$ |
-| `void copy_range_from(const RollbackLazySegtree& source, int left, int right)` | Copies a range from a version in the same pool. | $O(\log N)$ |
-| `void copy_range_from(const PersistentLazySegtree<ActedMonoid>& source, int left, int right)` | Persistent-handle overload. | $O(\log N)$ |
-| `int history_size() const`, `int snapshot() const` | Returns the history position. | $O(1)$ |
-| `void reserve_history(int count)` | Reserves history entries. | $O(H)$ |
-| `bool undo()` | Undoes one update. | $O(F)$ |
+| `void apply_inplace(...)` | Aliases of `apply`. | $O(\log N)$ |
+| `int snapshot()` | Registers the current state and returns its token. | $O(1)$ |
+| `int snapshot_count() const` | Returns the number of active snapshots. | $O(1)$ |
+| `void reserve_snapshots(int count)` | Reserves snapshot tokens. | $O(H)$ |
 | `void rollback(int state)` | Restores a current-path snapshot. | $O(F)$ total |
 | `void clear_history()`, `void release()` | Releases saved states, or all states. | $O(F)$ |
-| `const PersistentLazySegtree<ActedMonoid>& current_version() const` | Returns the current persistent state. | $O(1)$ |
 
-Each update call advances history, including an empty-range action. $F$ is at
-most the number of nodes created by the undone updates.
+
+## Snapshot semantics
+
+Updates made before the first `snapshot()` retain no rollback data. A snapshot token is positive and valid only on the current path. `rollback(state)` restores that registered state, keeps it active, and invalidates newer snapshots. `clear_history()` commits the current state and invalidates every token. No per-update reversal operation is provided.
+
+Within one snapshot interval, a tree node is saved only before its first mutation.
 
 ## Example
 
