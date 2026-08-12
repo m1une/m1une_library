@@ -59,6 +59,7 @@ DijkstraResult<T> replacement_paths_dijkstra(const Graph<T>& g, int s, T inf) {
     assert(0 <= s && s < n);
     DijkstraResult<T> result;
     result.dist.assign(n, inf);
+    result.reached.assign(n, false);
     result.parent.assign(n, -1);
     result.parent_edge.assign(n, -1);
     result.inf = inf;
@@ -66,6 +67,7 @@ DijkstraResult<T> replacement_paths_dijkstra(const Graph<T>& g, int s, T inf) {
     using P = std::pair<T, int>;
     std::priority_queue<P, std::vector<P>, std::greater<P>> que;
     result.dist[s] = T(0);
+    result.reached[s] = true;
     que.emplace(T(0), s);
     while (!que.empty()) {
         auto [d, v] = que.top();
@@ -75,6 +77,7 @@ DijkstraResult<T> replacement_paths_dijkstra(const Graph<T>& g, int s, T inf) {
             if (!e.alive) continue;
             T nd = replacement_paths_safe_add(d, e.cost, inf);
             if (result.dist[e.to] <= nd) continue;
+            result.reached[e.to] = true;
             result.dist[e.to] = nd;
             result.parent[e.to] = v;
             result.parent_edge[e.to] = e.id;
@@ -117,7 +120,7 @@ std::vector<Edge<T>> replacement_paths_validate_graph(const Graph<T>& g, T inf) 
 template <class T>
 void replacement_paths_validate_path(const Graph<T>& g, const GraphPath& path,
                                      const std::vector<Edge<T>>& edge_by_id,
-                                     const DijkstraResult<T>& from_s) {
+                                     const DijkstraResult<T>& from_s, T inf) {
     assert(!path.vertices.empty());
     assert(path.edges.size() + 1 == path.vertices.size());
     std::vector<char> used_vertex(g.size(), false);
@@ -137,7 +140,7 @@ void replacement_paths_validate_path(const Graph<T>& g, const GraphPath& path,
         int v = path.vertices[i + 1];
         assert((e.from == u && e.to == v) || (e.from == v && e.to == u));
         assert(T(0) < e.cost);
-        path_cost = replacement_paths_safe_add(path_cost, e.cost, from_s.inf);
+        path_cost = replacement_paths_safe_add(path_cost, e.cost, inf);
     }
     assert(from_s.reachable(path.vertices.back()));
     assert(path_cost == from_s.dist[path.vertices.back()]);
@@ -179,7 +182,7 @@ ReplacementPathsData<T> replacement_paths_prepare(const Graph<T>& g, const Graph
                                ? replacement_paths_dijkstra(g, s, inf)
                                : DijkstraResult<T>();
     const auto& from_s = known_from_s == nullptr ? computed_from_s : *known_from_s;
-    replacement_paths_validate_path(g, path, edge_by_id, from_s);
+    replacement_paths_validate_path(g, path, edge_by_id, from_s, inf);
     auto from_t = replacement_paths_dijkstra(g, t, inf);
 
     int n = g.size();
