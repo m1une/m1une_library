@@ -110,25 +110,28 @@ data:
   bundledCode: "#line 1 \"graph/tree/all.hpp\"\n\n\n\n#line 1 \"graph/tree/cartesian_tree.hpp\"\
     \n\n\n\n#include <cassert>\n#include <cstddef>\n#include <functional>\n#include\
     \ <limits>\n#include <utility>\n#include <vector>\n\n#line 1 \"graph/graph.hpp\"\
-    \n\n\n\n#line 7 \"graph/graph.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\n\
-    template <class T = int>\nstruct Edge {\n    using cost_type = T;\n\n    int from;\n\
-    \    int to;\n    T cost;\n    int id;\n    bool alive;\n\n    Edge() : from(-1),\
-    \ to(-1), cost(T()), id(-1), alive(true) {}\n    Edge(int from_, int to_, T cost_\
-    \ = T(1), int id_ = -1, bool alive_ = true)\n        : from(from_), to(to_), cost(cost_),\
-    \ id(id_), alive(alive_) {}\n\n    int other(int v) const {\n        assert(v\
-    \ == from || v == to);\n        return from ^ to ^ v;\n    }\n};\n\ntemplate <class\
-    \ T = int>\nstruct Graph {\n    using edge_type = Edge<T>;\n    using cost_type\
-    \ = T;\n\n   private:\n    int _n;\n    int _edge_count;\n    std::vector<std::vector<edge_type>>\
-    \ _g;\n    std::vector<std::vector<std::pair<int, int>>> _edge_positions;\n\n\
-    \   public:\n    Graph() : _n(0), _edge_count(0) {}\n    explicit Graph(int n)\
-    \ : _n(n), _edge_count(0), _g(n) {\n        assert(0 <= n);\n    }\n\n    int\
-    \ size() const {\n        return _n;\n    }\n\n    bool empty() const {\n    \
-    \    return _n == 0;\n    }\n\n    int edge_count() const {\n        return _edge_count;\n\
-    \    }\n\n    int add_vertex() {\n        _g.emplace_back();\n        return _n++;\n\
-    \    }\n\n    int add_directed_edge(int from, int to, T cost = T(1)) {\n     \
-    \   assert(0 <= from && from < _n);\n        assert(0 <= to && to < _n);\n   \
-    \     int id = _edge_count++;\n        int idx = int(_g[from].size());\n     \
-    \   _g[from].push_back(edge_type(from, to, cost, id));\n        _edge_positions.emplace_back();\n\
+    \n\n\n\n#include <array>\n#line 8 \"graph/graph.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ graph {\n\ntemplate <class T = int>\nstruct Edge {\n    using cost_type = T;\n\
+    \n    int from;\n    int to;\n    T cost;\n    int id;\n    bool alive;\n\n  \
+    \  Edge() : from(-1), to(-1), cost(T()), id(-1), alive(true) {}\n    Edge(int\
+    \ from_, int to_, T cost_ = T(1), int id_ = -1, bool alive_ = true)\n        :\
+    \ from(from_), to(to_), cost(cost_), id(id_), alive(alive_) {}\n\n    int other(int\
+    \ v) const {\n        assert(v == from || v == to);\n        return from ^ to\
+    \ ^ v;\n    }\n};\n\ntemplate <class T = int>\nstruct Graph {\n    using edge_type\
+    \ = Edge<T>;\n    using cost_type = T;\n\n   private:\n    struct EdgePositions\
+    \ {\n        std::array<std::pair<int, int>, 2> value{};\n        int size = 0;\n\
+    \n        void push_back(std::pair<int, int> position) {\n            assert(size\
+    \ < 2);\n            value[size++] = position;\n        }\n    };\n\n    int _n;\n\
+    \    int _edge_count;\n    std::vector<std::vector<edge_type>> _g;\n    std::vector<EdgePositions>\
+    \ _edge_positions;\n\n   public:\n    Graph() : _n(0), _edge_count(0) {}\n   \
+    \ explicit Graph(int n) : _n(n), _edge_count(0), _g(n) {\n        assert(0 <=\
+    \ n);\n    }\n\n    int size() const {\n        return _n;\n    }\n\n    bool\
+    \ empty() const {\n        return _n == 0;\n    }\n\n    int edge_count() const\
+    \ {\n        return _edge_count;\n    }\n\n    int add_vertex() {\n        _g.emplace_back();\n\
+    \        return _n++;\n    }\n\n    int add_directed_edge(int from, int to, T\
+    \ cost = T(1)) {\n        assert(0 <= from && from < _n);\n        assert(0 <=\
+    \ to && to < _n);\n        int id = _edge_count++;\n        int idx = int(_g[from].size());\n\
+    \        _g[from].push_back(edge_type(from, to, cost, id));\n        _edge_positions.emplace_back();\n\
     \        _edge_positions.back().push_back({from, idx});\n        return id;\n\
     \    }\n\n    int add_edge(int u, int v, T cost = T(1)) {\n        assert(0 <=\
     \ u && u < _n);\n        assert(0 <= v && v < _n);\n        int id = _edge_count++;\n\
@@ -137,44 +140,45 @@ data:
     \ u, cost, id));\n        _edge_positions.emplace_back();\n        _edge_positions.back().push_back({u,\
     \ u_idx});\n        _edge_positions.back().push_back({v, v_idx});\n        return\
     \ id;\n    }\n\n    void set_edge_alive(int id, bool alive) {\n        assert(0\
-    \ <= id && id < _edge_count);\n        for (auto [v, idx] : _edge_positions[id])\
-    \ {\n            _g[v][idx].alive = alive;\n        }\n    }\n\n    void erase_edge(int\
-    \ id) {\n        set_edge_alive(id, false);\n    }\n\n    void revive_edge(int\
-    \ id) {\n        set_edge_alive(id, true);\n    }\n\n    bool is_edge_alive(int\
-    \ id) const {\n        assert(0 <= id && id < _edge_count);\n        assert(!_edge_positions[id].empty());\n\
-    \        auto [v, idx] = _edge_positions[id][0];\n        return _g[v][idx].alive;\n\
-    \    }\n\n    const std::vector<edge_type>& operator[](int v) const {\n      \
-    \  assert(0 <= v && v < _n);\n        return _g[v];\n    }\n\n    std::vector<edge_type>&\
-    \ operator[](int v) {\n        assert(0 <= v && v < _n);\n        return _g[v];\n\
-    \    }\n\n    const std::vector<std::vector<edge_type>>& adjacency() const {\n\
-    \        return _g;\n    }\n\n    std::vector<std::vector<edge_type>>& adjacency()\
-    \ {\n        return _g;\n    }\n\n    std::vector<edge_type> edges(bool include_inactive\
-    \ = false) const {\n        std::vector<edge_type> result;\n        result.reserve(_edge_count);\n\
-    \        std::vector<char> used(_edge_count, false);\n        for (int v = 0;\
-    \ v < _n; v++) {\n            for (const auto& e : _g[v]) {\n                if\
-    \ (!include_inactive && !e.alive) continue;\n                if (0 <= e.id &&\
-    \ e.id < _edge_count) {\n                    if (used[e.id]) continue;\n     \
-    \               used[e.id] = true;\n                }\n                result.push_back(e);\n\
-    \            }\n        }\n        return result;\n    }\n\n    Graph reversed()\
-    \ const {\n        Graph result(_n);\n        result._edge_count = _edge_count;\n\
-    \        result._edge_positions.assign(_edge_count, {});\n        for (int v =\
-    \ 0; v < _n; v++) {\n            for (const auto& e : _g[v]) {\n             \
-    \   int idx = int(result._g[e.to].size());\n                result._g[e.to].push_back(edge_type(e.to,\
-    \ e.from, e.cost, e.id, e.alive));\n                if (0 <= e.id && e.id < _edge_count)\
-    \ result._edge_positions[e.id].push_back({e.to, idx});\n            }\n      \
-    \  }\n        return result;\n    }\n};\n\n}  // namespace graph\n}  // namespace\
-    \ m1une\n\n\n#line 12 \"graph/tree/cartesian_tree.hpp\"\n\nnamespace m1une {\n\
-    namespace tree {\n\nstruct CartesianTree {\n    int root;\n    std::vector<int>\
-    \ parent;\n    std::vector<int> left;\n    std::vector<int> right;\n\n   private:\n\
-    \    int _n;\n\n    void check_vertex(int v) const {\n        assert(0 <= v &&\
-    \ v < _n);\n    }\n\n   public:\n    CartesianTree() : root(-1), _n(0) {}\n\n\
-    \    template <class T, class Compare = std::less<T>>\n    explicit CartesianTree(const\
-    \ std::vector<T>& a, Compare comp = Compare()) : root(-1), _n(0) {\n        build(a,\
-    \ comp);\n    }\n\n    template <class T, class Compare = std::less<T>>\n    void\
-    \ build(const std::vector<T>& a, Compare comp = Compare()) {\n        assert(a.size()\
-    \ <= static_cast<std::size_t>(std::numeric_limits<int>::max()));\n        _n =\
-    \ int(a.size());\n        root = -1;\n        parent.assign(_n, -1);\n       \
-    \ left.assign(_n, -1);\n        right.assign(_n, -1);\n\n        std::vector<int>\
+    \ <= id && id < _edge_count);\n        for (int i = 0; i < _edge_positions[id].size;\
+    \ ++i) {\n            auto [v, idx] = _edge_positions[id].value[i];\n        \
+    \    _g[v][idx].alive = alive;\n        }\n    }\n\n    void erase_edge(int id)\
+    \ {\n        set_edge_alive(id, false);\n    }\n\n    void revive_edge(int id)\
+    \ {\n        set_edge_alive(id, true);\n    }\n\n    bool is_edge_alive(int id)\
+    \ const {\n        assert(0 <= id && id < _edge_count);\n        assert(_edge_positions[id].size\
+    \ != 0);\n        auto [v, idx] = _edge_positions[id].value[0];\n        return\
+    \ _g[v][idx].alive;\n    }\n\n    const std::vector<edge_type>& operator[](int\
+    \ v) const {\n        assert(0 <= v && v < _n);\n        return _g[v];\n    }\n\
+    \n    std::vector<edge_type>& operator[](int v) {\n        assert(0 <= v && v\
+    \ < _n);\n        return _g[v];\n    }\n\n    const std::vector<std::vector<edge_type>>&\
+    \ adjacency() const {\n        return _g;\n    }\n\n    std::vector<std::vector<edge_type>>&\
+    \ adjacency() {\n        return _g;\n    }\n\n    std::vector<edge_type> edges(bool\
+    \ include_inactive = false) const {\n        std::vector<edge_type> result;\n\
+    \        result.reserve(_edge_count);\n        std::vector<char> used(_edge_count,\
+    \ false);\n        for (int v = 0; v < _n; v++) {\n            for (const auto&\
+    \ e : _g[v]) {\n                if (!include_inactive && !e.alive) continue;\n\
+    \                if (0 <= e.id && e.id < _edge_count) {\n                    if\
+    \ (used[e.id]) continue;\n                    used[e.id] = true;\n           \
+    \     }\n                result.push_back(e);\n            }\n        }\n    \
+    \    return result;\n    }\n\n    Graph reversed() const {\n        Graph result(_n);\n\
+    \        result._edge_count = _edge_count;\n        result._edge_positions.assign(_edge_count,\
+    \ {});\n        for (int v = 0; v < _n; v++) {\n            for (const auto& e\
+    \ : _g[v]) {\n                int idx = int(result._g[e.to].size());\n       \
+    \         result._g[e.to].push_back(edge_type(e.to, e.from, e.cost, e.id, e.alive));\n\
+    \                if (0 <= e.id && e.id < _edge_count) result._edge_positions[e.id].push_back({e.to,\
+    \ idx});\n            }\n        }\n        return result;\n    }\n};\n\n}  //\
+    \ namespace graph\n}  // namespace m1une\n\n\n#line 12 \"graph/tree/cartesian_tree.hpp\"\
+    \n\nnamespace m1une {\nnamespace tree {\n\nstruct CartesianTree {\n    int root;\n\
+    \    std::vector<int> parent;\n    std::vector<int> left;\n    std::vector<int>\
+    \ right;\n\n   private:\n    int _n;\n\n    void check_vertex(int v) const {\n\
+    \        assert(0 <= v && v < _n);\n    }\n\n   public:\n    CartesianTree() :\
+    \ root(-1), _n(0) {}\n\n    template <class T, class Compare = std::less<T>>\n\
+    \    explicit CartesianTree(const std::vector<T>& a, Compare comp = Compare())\
+    \ : root(-1), _n(0) {\n        build(a, comp);\n    }\n\n    template <class T,\
+    \ class Compare = std::less<T>>\n    void build(const std::vector<T>& a, Compare\
+    \ comp = Compare()) {\n        assert(a.size() <= static_cast<std::size_t>(std::numeric_limits<int>::max()));\n\
+    \        _n = int(a.size());\n        root = -1;\n        parent.assign(_n, -1);\n\
+    \        left.assign(_n, -1);\n        right.assign(_n, -1);\n\n        std::vector<int>\
     \ stack;\n        stack.reserve(_n);\n        for (int i = 0; i < _n; i++) {\n\
     \            int last = -1;\n            while (!stack.empty() && comp(a[i], a[stack.back()]))\
     \ {\n                last = stack.back();\n                stack.pop_back();\n\
@@ -277,27 +281,26 @@ data:
     \ tree\n}  // namespace m1une\n\n\n#line 1 \"graph/tree/distance_frequency.hpp\"\
     \n\n\n\n#line 7 \"graph/tree/distance_frequency.hpp\"\n#include <cstdint>\n#line\
     \ 10 \"graph/tree/distance_frequency.hpp\"\n\n#line 1 \"math/fps/convolution.hpp\"\
-    \n\n\n\n#line 5 \"math/fps/convolution.hpp\"\n#include <array>\n#line 8 \"math/fps/convolution.hpp\"\
-    \n#include <cstring>\n#include <new>\n#include <type_traits>\n#line 13 \"math/fps/convolution.hpp\"\
-    \n\n#if defined(__GNUC__) && !defined(__clang__) && \\\n    (defined(__x86_64__)\
-    \ || defined(__i386__)) && \\\n    !defined(M1UNE_FPS_DISABLE_X86_SIMD)\n#include\
-    \ <immintrin.h>\n#define M1UNE_FPS_HAS_X86_SIMD 1\n#pragma GCC push_options\n\
-    #pragma GCC target(\"avx2,bmi\")\n#endif\n\n#line 1 \"math/fps/internal/ntt998_faster.hpp\"\
-    \n\n\n\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n\n#line 9 \"math/fps/internal/ntt998_faster.hpp\"\
-    \n\n#include <immintrin.h>\n\nnamespace m1une {\nnamespace fps {\nnamespace internal\
-    \ {\nnamespace fast998_v2 {\n\n// Fixed-modulus AVX2 transform with an in-register\
-    \ degree-8 residue product.\n\nusing u32=unsigned;\nusing u64=unsigned long long;\n\
-    using idt=std::size_t;\nusing I256=__m256i;\ninline void store256(void*p,I256\
-    \ x){\n    _mm256_store_si256((I256*)p,x);\n}\ninline I256 load256(const void*p){\n\
-    \    return _mm256_load_si256((const I256*)p);\n}\nconstexpr u32 shrk(u32 x,u32\
-    \ M){\n    return std::min(x,x-M);\n}\nconstexpr u32 dilt(u32 x,u32 M){\n    return\
-    \ std::min(x,x+M);\n}\nconstexpr u32 reduce(u64 x,u32 niv,u32 M){\n    return\
-    \ (x+u64(u32(x)*niv)*M)>>32;\n}\nconstexpr u32 mul(u32 x,u32 y,u32 niv,u32 M){\n\
-    \    return reduce(u64(x)*y,niv,M);\n}\nconstexpr u32 mul_s(u32 x,u32 y,u32 niv,u32\
-    \ M){\n    return shrk(reduce(u64(x)*y,niv,M),M);\n}\nconstexpr u32 qpw(u32 a,u32\
-    \ b,u32 niv,u32 M,u32 r){\n    for(;b;b>>=1,a=mul(a,a,niv,M)){\n        if(b&1){\n\
-    \            r=mul(r,a,niv,M);\n        }\n    }\n    return r;\n}\nconstexpr\
-    \ u32 qpw_s(u32 a,u32 b,u32 niv,u32 M,u32 r){\n    return shrk(qpw(a,b,niv,M,r),M);\n\
+    \n\n\n\n#line 8 \"math/fps/convolution.hpp\"\n#include <cstring>\n#include <new>\n\
+    #include <type_traits>\n#line 13 \"math/fps/convolution.hpp\"\n\n#if defined(__GNUC__)\
+    \ && !defined(__clang__) && \\\n    (defined(__x86_64__) || defined(__i386__))\
+    \ && \\\n    !defined(M1UNE_FPS_DISABLE_X86_SIMD)\n#include <immintrin.h>\n#define\
+    \ M1UNE_FPS_HAS_X86_SIMD 1\n#pragma GCC push_options\n#pragma GCC target(\"avx2,bmi\"\
+    )\n#endif\n\n#line 1 \"math/fps/internal/ntt998_faster.hpp\"\n\n\n\n#ifdef M1UNE_FPS_HAS_X86_SIMD\n\
+    \n#line 9 \"math/fps/internal/ntt998_faster.hpp\"\n\n#include <immintrin.h>\n\n\
+    namespace m1une {\nnamespace fps {\nnamespace internal {\nnamespace fast998_v2\
+    \ {\n\n// Fixed-modulus AVX2 transform with an in-register degree-8 residue product.\n\
+    \nusing u32=unsigned;\nusing u64=unsigned long long;\nusing idt=std::size_t;\n\
+    using I256=__m256i;\ninline void store256(void*p,I256 x){\n    _mm256_store_si256((I256*)p,x);\n\
+    }\ninline I256 load256(const void*p){\n    return _mm256_load_si256((const I256*)p);\n\
+    }\nconstexpr u32 shrk(u32 x,u32 M){\n    return std::min(x,x-M);\n}\nconstexpr\
+    \ u32 dilt(u32 x,u32 M){\n    return std::min(x,x+M);\n}\nconstexpr u32 reduce(u64\
+    \ x,u32 niv,u32 M){\n    return (x+u64(u32(x)*niv)*M)>>32;\n}\nconstexpr u32 mul(u32\
+    \ x,u32 y,u32 niv,u32 M){\n    return reduce(u64(x)*y,niv,M);\n}\nconstexpr u32\
+    \ mul_s(u32 x,u32 y,u32 niv,u32 M){\n    return shrk(reduce(u64(x)*y,niv,M),M);\n\
+    }\nconstexpr u32 qpw(u32 a,u32 b,u32 niv,u32 M,u32 r){\n    for(;b;b>>=1,a=mul(a,a,niv,M)){\n\
+    \        if(b&1){\n            r=mul(r,a,niv,M);\n        }\n    }\n    return\
+    \ r;\n}\nconstexpr u32 qpw_s(u32 a,u32 b,u32 niv,u32 M,u32 r){\n    return shrk(qpw(a,b,niv,M,r),M);\n\
     }\ninline I256 shrk32(I256 x,I256 M){\n    return _mm256_min_epu32(x,_mm256_sub_epi32(x,M));\n\
     }\ninline I256 dilt32(I256 x,I256 M){\n    return _mm256_min_epu32(x,_mm256_add_epi32(x,M));\n\
     }\ninline I256 Ladd32(I256 x,I256 y,I256){\n    return _mm256_add_epi32(x,y);\n\
@@ -2262,7 +2265,7 @@ data:
   path: graph/tree/all.hpp
   requiredBy:
   - graph/all.hpp
-  timestamp: '2026-08-11 13:51:23+09:00'
+  timestamp: '2026-08-13 01:41:40+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/graph_algorithms.test.cpp

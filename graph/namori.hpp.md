@@ -31,25 +31,28 @@ data:
     links: []
   bundledCode: "#line 1 \"graph/namori.hpp\"\n\n\n\n#include <cassert>\n#include <optional>\n\
     #include <queue>\n#include <utility>\n#include <vector>\n\n#line 1 \"graph/graph.hpp\"\
-    \n\n\n\n#line 7 \"graph/graph.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\n\
-    template <class T = int>\nstruct Edge {\n    using cost_type = T;\n\n    int from;\n\
-    \    int to;\n    T cost;\n    int id;\n    bool alive;\n\n    Edge() : from(-1),\
-    \ to(-1), cost(T()), id(-1), alive(true) {}\n    Edge(int from_, int to_, T cost_\
-    \ = T(1), int id_ = -1, bool alive_ = true)\n        : from(from_), to(to_), cost(cost_),\
-    \ id(id_), alive(alive_) {}\n\n    int other(int v) const {\n        assert(v\
-    \ == from || v == to);\n        return from ^ to ^ v;\n    }\n};\n\ntemplate <class\
-    \ T = int>\nstruct Graph {\n    using edge_type = Edge<T>;\n    using cost_type\
-    \ = T;\n\n   private:\n    int _n;\n    int _edge_count;\n    std::vector<std::vector<edge_type>>\
-    \ _g;\n    std::vector<std::vector<std::pair<int, int>>> _edge_positions;\n\n\
-    \   public:\n    Graph() : _n(0), _edge_count(0) {}\n    explicit Graph(int n)\
-    \ : _n(n), _edge_count(0), _g(n) {\n        assert(0 <= n);\n    }\n\n    int\
-    \ size() const {\n        return _n;\n    }\n\n    bool empty() const {\n    \
-    \    return _n == 0;\n    }\n\n    int edge_count() const {\n        return _edge_count;\n\
-    \    }\n\n    int add_vertex() {\n        _g.emplace_back();\n        return _n++;\n\
-    \    }\n\n    int add_directed_edge(int from, int to, T cost = T(1)) {\n     \
-    \   assert(0 <= from && from < _n);\n        assert(0 <= to && to < _n);\n   \
-    \     int id = _edge_count++;\n        int idx = int(_g[from].size());\n     \
-    \   _g[from].push_back(edge_type(from, to, cost, id));\n        _edge_positions.emplace_back();\n\
+    \n\n\n\n#include <array>\n#line 8 \"graph/graph.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ graph {\n\ntemplate <class T = int>\nstruct Edge {\n    using cost_type = T;\n\
+    \n    int from;\n    int to;\n    T cost;\n    int id;\n    bool alive;\n\n  \
+    \  Edge() : from(-1), to(-1), cost(T()), id(-1), alive(true) {}\n    Edge(int\
+    \ from_, int to_, T cost_ = T(1), int id_ = -1, bool alive_ = true)\n        :\
+    \ from(from_), to(to_), cost(cost_), id(id_), alive(alive_) {}\n\n    int other(int\
+    \ v) const {\n        assert(v == from || v == to);\n        return from ^ to\
+    \ ^ v;\n    }\n};\n\ntemplate <class T = int>\nstruct Graph {\n    using edge_type\
+    \ = Edge<T>;\n    using cost_type = T;\n\n   private:\n    struct EdgePositions\
+    \ {\n        std::array<std::pair<int, int>, 2> value{};\n        int size = 0;\n\
+    \n        void push_back(std::pair<int, int> position) {\n            assert(size\
+    \ < 2);\n            value[size++] = position;\n        }\n    };\n\n    int _n;\n\
+    \    int _edge_count;\n    std::vector<std::vector<edge_type>> _g;\n    std::vector<EdgePositions>\
+    \ _edge_positions;\n\n   public:\n    Graph() : _n(0), _edge_count(0) {}\n   \
+    \ explicit Graph(int n) : _n(n), _edge_count(0), _g(n) {\n        assert(0 <=\
+    \ n);\n    }\n\n    int size() const {\n        return _n;\n    }\n\n    bool\
+    \ empty() const {\n        return _n == 0;\n    }\n\n    int edge_count() const\
+    \ {\n        return _edge_count;\n    }\n\n    int add_vertex() {\n        _g.emplace_back();\n\
+    \        return _n++;\n    }\n\n    int add_directed_edge(int from, int to, T\
+    \ cost = T(1)) {\n        assert(0 <= from && from < _n);\n        assert(0 <=\
+    \ to && to < _n);\n        int id = _edge_count++;\n        int idx = int(_g[from].size());\n\
+    \        _g[from].push_back(edge_type(from, to, cost, id));\n        _edge_positions.emplace_back();\n\
     \        _edge_positions.back().push_back({from, idx});\n        return id;\n\
     \    }\n\n    int add_edge(int u, int v, T cost = T(1)) {\n        assert(0 <=\
     \ u && u < _n);\n        assert(0 <= v && v < _n);\n        int id = _edge_count++;\n\
@@ -58,72 +61,74 @@ data:
     \ u, cost, id));\n        _edge_positions.emplace_back();\n        _edge_positions.back().push_back({u,\
     \ u_idx});\n        _edge_positions.back().push_back({v, v_idx});\n        return\
     \ id;\n    }\n\n    void set_edge_alive(int id, bool alive) {\n        assert(0\
-    \ <= id && id < _edge_count);\n        for (auto [v, idx] : _edge_positions[id])\
-    \ {\n            _g[v][idx].alive = alive;\n        }\n    }\n\n    void erase_edge(int\
-    \ id) {\n        set_edge_alive(id, false);\n    }\n\n    void revive_edge(int\
-    \ id) {\n        set_edge_alive(id, true);\n    }\n\n    bool is_edge_alive(int\
-    \ id) const {\n        assert(0 <= id && id < _edge_count);\n        assert(!_edge_positions[id].empty());\n\
-    \        auto [v, idx] = _edge_positions[id][0];\n        return _g[v][idx].alive;\n\
-    \    }\n\n    const std::vector<edge_type>& operator[](int v) const {\n      \
-    \  assert(0 <= v && v < _n);\n        return _g[v];\n    }\n\n    std::vector<edge_type>&\
-    \ operator[](int v) {\n        assert(0 <= v && v < _n);\n        return _g[v];\n\
-    \    }\n\n    const std::vector<std::vector<edge_type>>& adjacency() const {\n\
-    \        return _g;\n    }\n\n    std::vector<std::vector<edge_type>>& adjacency()\
-    \ {\n        return _g;\n    }\n\n    std::vector<edge_type> edges(bool include_inactive\
-    \ = false) const {\n        std::vector<edge_type> result;\n        result.reserve(_edge_count);\n\
-    \        std::vector<char> used(_edge_count, false);\n        for (int v = 0;\
-    \ v < _n; v++) {\n            for (const auto& e : _g[v]) {\n                if\
-    \ (!include_inactive && !e.alive) continue;\n                if (0 <= e.id &&\
-    \ e.id < _edge_count) {\n                    if (used[e.id]) continue;\n     \
-    \               used[e.id] = true;\n                }\n                result.push_back(e);\n\
-    \            }\n        }\n        return result;\n    }\n\n    Graph reversed()\
-    \ const {\n        Graph result(_n);\n        result._edge_count = _edge_count;\n\
-    \        result._edge_positions.assign(_edge_count, {});\n        for (int v =\
-    \ 0; v < _n; v++) {\n            for (const auto& e : _g[v]) {\n             \
-    \   int idx = int(result._g[e.to].size());\n                result._g[e.to].push_back(edge_type(e.to,\
-    \ e.from, e.cost, e.id, e.alive));\n                if (0 <= e.id && e.id < _edge_count)\
-    \ result._edge_positions[e.id].push_back({e.to, idx});\n            }\n      \
-    \  }\n        return result;\n    }\n};\n\n}  // namespace graph\n}  // namespace\
-    \ m1une\n\n\n#line 11 \"graph/namori.hpp\"\n\nnamespace m1une {\nnamespace graph\
-    \ {\n\ntemplate <class T>\nstruct NamoriDecomposition {\n    int component_count;\n\
-    \    std::vector<std::vector<int>> cycles;\n    std::vector<std::vector<int>>\
-    \ cycle_edge_ids;\n    std::vector<std::vector<T>> cycle_edge_costs;\n\n    std::vector<bool>\
-    \ on_cycle;\n    std::vector<int> component;\n    std::vector<int> cycle_root;\n\
-    \    std::vector<int> cycle_position;\n    std::vector<int> parent;\n    std::vector<int>\
-    \ parent_edge;\n    std::vector<int> depth;\n    std::vector<T> dist_to_cycle;\n\
-    \    std::vector<std::vector<int>> children;\n\n    bool same_component(int u,\
-    \ int v) const {\n        assert(0 <= u && u < int(component.size()));\n     \
-    \   assert(0 <= v && v < int(component.size()));\n        return component[u]\
-    \ == component[v];\n    }\n\n    bool same_tree(int u, int v) const {\n      \
-    \  assert(0 <= u && u < int(cycle_root.size()));\n        assert(0 <= v && v <\
-    \ int(cycle_root.size()));\n        return cycle_root[u] == cycle_root[v];\n \
-    \   }\n};\n\ntemplate <class T>\nstd::optional<NamoriDecomposition<T>> namori_decomposition(const\
-    \ Graph<T>& graph) {\n    int n = graph.size();\n    NamoriDecomposition<T> result;\n\
-    \    result.component_count = 0;\n    result.on_cycle.assign(n, false);\n    result.component.assign(n,\
-    \ -1);\n    result.cycle_root.assign(n, -1);\n    result.cycle_position.assign(n,\
-    \ -1);\n    result.parent.assign(n, -1);\n    result.parent_edge.assign(n, -1);\n\
-    \    result.depth.assign(n, 0);\n    result.dist_to_cycle.assign(n, T(0));\n \
-    \   result.children.assign(n, {});\n    if (n == 0) return result;\n\n    std::vector<int>\
-    \ degree(n, 0);\n    for (int v = 0; v < n; v++) {\n        for (const auto& edge\
-    \ : graph[v]) {\n            if (edge.alive) degree[v]++;\n        }\n    }\n\n\
-    \    std::queue<int> queue;\n    std::vector<bool> removed(n, false);\n    for\
-    \ (int v = 0; v < n; v++) {\n        if (degree[v] <= 1) queue.push(v);\n    }\n\
-    \    while (!queue.empty()) {\n        int v = queue.front();\n        queue.pop();\n\
-    \        if (removed[v] || degree[v] > 1) continue;\n        removed[v] = true;\n\
-    \        for (const auto& edge : graph[v]) {\n            if (!edge.alive || removed[edge.to])\
-    \ continue;\n            degree[edge.to]--;\n            if (degree[edge.to] ==\
-    \ 1) queue.push(edge.to);\n        }\n    }\n\n    for (int v = 0; v < n; v++)\
-    \ {\n        result.on_cycle[v] = !removed[v];\n    }\n    for (int v = 0; v <\
-    \ n; v++) {\n        if (!result.on_cycle[v]) continue;\n        int cycle_degree\
-    \ = 0;\n        for (const auto& edge : graph[v]) {\n            if (edge.alive\
-    \ && result.on_cycle[edge.to]) cycle_degree++;\n        }\n        if (cycle_degree\
-    \ != 2) return std::nullopt;\n    }\n\n    std::vector<bool> cycle_visited(n,\
-    \ false);\n    for (int start = 0; start < n; start++) {\n        if (!result.on_cycle[start]\
-    \ || cycle_visited[start]) continue;\n        int component_id = int(result.cycles.size());\n\
-    \        std::vector<int> vertices;\n        std::vector<int> edge_ids;\n    \
-    \    std::vector<T> edge_costs;\n\n        int current = start;\n        int previous_edge\
-    \ = -1;\n        while (true) {\n            if (cycle_visited[current]) return\
-    \ std::nullopt;\n            cycle_visited[current] = true;\n            vertices.push_back(current);\n\
+    \ <= id && id < _edge_count);\n        for (int i = 0; i < _edge_positions[id].size;\
+    \ ++i) {\n            auto [v, idx] = _edge_positions[id].value[i];\n        \
+    \    _g[v][idx].alive = alive;\n        }\n    }\n\n    void erase_edge(int id)\
+    \ {\n        set_edge_alive(id, false);\n    }\n\n    void revive_edge(int id)\
+    \ {\n        set_edge_alive(id, true);\n    }\n\n    bool is_edge_alive(int id)\
+    \ const {\n        assert(0 <= id && id < _edge_count);\n        assert(_edge_positions[id].size\
+    \ != 0);\n        auto [v, idx] = _edge_positions[id].value[0];\n        return\
+    \ _g[v][idx].alive;\n    }\n\n    const std::vector<edge_type>& operator[](int\
+    \ v) const {\n        assert(0 <= v && v < _n);\n        return _g[v];\n    }\n\
+    \n    std::vector<edge_type>& operator[](int v) {\n        assert(0 <= v && v\
+    \ < _n);\n        return _g[v];\n    }\n\n    const std::vector<std::vector<edge_type>>&\
+    \ adjacency() const {\n        return _g;\n    }\n\n    std::vector<std::vector<edge_type>>&\
+    \ adjacency() {\n        return _g;\n    }\n\n    std::vector<edge_type> edges(bool\
+    \ include_inactive = false) const {\n        std::vector<edge_type> result;\n\
+    \        result.reserve(_edge_count);\n        std::vector<char> used(_edge_count,\
+    \ false);\n        for (int v = 0; v < _n; v++) {\n            for (const auto&\
+    \ e : _g[v]) {\n                if (!include_inactive && !e.alive) continue;\n\
+    \                if (0 <= e.id && e.id < _edge_count) {\n                    if\
+    \ (used[e.id]) continue;\n                    used[e.id] = true;\n           \
+    \     }\n                result.push_back(e);\n            }\n        }\n    \
+    \    return result;\n    }\n\n    Graph reversed() const {\n        Graph result(_n);\n\
+    \        result._edge_count = _edge_count;\n        result._edge_positions.assign(_edge_count,\
+    \ {});\n        for (int v = 0; v < _n; v++) {\n            for (const auto& e\
+    \ : _g[v]) {\n                int idx = int(result._g[e.to].size());\n       \
+    \         result._g[e.to].push_back(edge_type(e.to, e.from, e.cost, e.id, e.alive));\n\
+    \                if (0 <= e.id && e.id < _edge_count) result._edge_positions[e.id].push_back({e.to,\
+    \ idx});\n            }\n        }\n        return result;\n    }\n};\n\n}  //\
+    \ namespace graph\n}  // namespace m1une\n\n\n#line 11 \"graph/namori.hpp\"\n\n\
+    namespace m1une {\nnamespace graph {\n\ntemplate <class T>\nstruct NamoriDecomposition\
+    \ {\n    int component_count;\n    std::vector<std::vector<int>> cycles;\n   \
+    \ std::vector<std::vector<int>> cycle_edge_ids;\n    std::vector<std::vector<T>>\
+    \ cycle_edge_costs;\n\n    std::vector<bool> on_cycle;\n    std::vector<int> component;\n\
+    \    std::vector<int> cycle_root;\n    std::vector<int> cycle_position;\n    std::vector<int>\
+    \ parent;\n    std::vector<int> parent_edge;\n    std::vector<int> depth;\n  \
+    \  std::vector<T> dist_to_cycle;\n    std::vector<std::vector<int>> children;\n\
+    \n    bool same_component(int u, int v) const {\n        assert(0 <= u && u <\
+    \ int(component.size()));\n        assert(0 <= v && v < int(component.size()));\n\
+    \        return component[u] == component[v];\n    }\n\n    bool same_tree(int\
+    \ u, int v) const {\n        assert(0 <= u && u < int(cycle_root.size()));\n \
+    \       assert(0 <= v && v < int(cycle_root.size()));\n        return cycle_root[u]\
+    \ == cycle_root[v];\n    }\n};\n\ntemplate <class T>\nstd::optional<NamoriDecomposition<T>>\
+    \ namori_decomposition(const Graph<T>& graph) {\n    int n = graph.size();\n \
+    \   NamoriDecomposition<T> result;\n    result.component_count = 0;\n    result.on_cycle.assign(n,\
+    \ false);\n    result.component.assign(n, -1);\n    result.cycle_root.assign(n,\
+    \ -1);\n    result.cycle_position.assign(n, -1);\n    result.parent.assign(n,\
+    \ -1);\n    result.parent_edge.assign(n, -1);\n    result.depth.assign(n, 0);\n\
+    \    result.dist_to_cycle.assign(n, T(0));\n    result.children.assign(n, {});\n\
+    \    if (n == 0) return result;\n\n    std::vector<int> degree(n, 0);\n    for\
+    \ (int v = 0; v < n; v++) {\n        for (const auto& edge : graph[v]) {\n   \
+    \         if (edge.alive) degree[v]++;\n        }\n    }\n\n    std::queue<int>\
+    \ queue;\n    std::vector<bool> removed(n, false);\n    for (int v = 0; v < n;\
+    \ v++) {\n        if (degree[v] <= 1) queue.push(v);\n    }\n    while (!queue.empty())\
+    \ {\n        int v = queue.front();\n        queue.pop();\n        if (removed[v]\
+    \ || degree[v] > 1) continue;\n        removed[v] = true;\n        for (const\
+    \ auto& edge : graph[v]) {\n            if (!edge.alive || removed[edge.to]) continue;\n\
+    \            degree[edge.to]--;\n            if (degree[edge.to] == 1) queue.push(edge.to);\n\
+    \        }\n    }\n\n    for (int v = 0; v < n; v++) {\n        result.on_cycle[v]\
+    \ = !removed[v];\n    }\n    for (int v = 0; v < n; v++) {\n        if (!result.on_cycle[v])\
+    \ continue;\n        int cycle_degree = 0;\n        for (const auto& edge : graph[v])\
+    \ {\n            if (edge.alive && result.on_cycle[edge.to]) cycle_degree++;\n\
+    \        }\n        if (cycle_degree != 2) return std::nullopt;\n    }\n\n   \
+    \ std::vector<bool> cycle_visited(n, false);\n    for (int start = 0; start <\
+    \ n; start++) {\n        if (!result.on_cycle[start] || cycle_visited[start])\
+    \ continue;\n        int component_id = int(result.cycles.size());\n        std::vector<int>\
+    \ vertices;\n        std::vector<int> edge_ids;\n        std::vector<T> edge_costs;\n\
+    \n        int current = start;\n        int previous_edge = -1;\n        while\
+    \ (true) {\n            if (cycle_visited[current]) return std::nullopt;\n   \
+    \         cycle_visited[current] = true;\n            vertices.push_back(current);\n\
     \n            int next_vertex = -1;\n            int next_edge = -1;\n       \
     \     T next_cost = T(0);\n            for (const auto& edge : graph[current])\
     \ {\n                if (!edge.alive || !result.on_cycle[edge.to] || edge.id ==\
@@ -237,7 +242,7 @@ data:
   requiredBy:
   - graph/undirected.hpp
   - graph/all.hpp
-  timestamp: '2026-07-11 19:47:32+09:00'
+  timestamp: '2026-08-13 01:41:40+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/graph_algorithms.test.cpp

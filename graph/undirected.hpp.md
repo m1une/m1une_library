@@ -143,26 +143,29 @@ data:
   bundledCode: "#line 1 \"graph/undirected.hpp\"\n\n\n\n#line 1 \"graph/bipartite.hpp\"\
     \n\n\n\n#include <algorithm>\n#include <cassert>\n#include <cstddef>\n#include\
     \ <cstdint>\n#include <limits>\n#include <optional>\n#include <queue>\n#include\
-    \ <utility>\n#include <vector>\n\n#line 1 \"graph/graph.hpp\"\n\n\n\n#line 7 \"\
-    graph/graph.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\ntemplate <class T\
-    \ = int>\nstruct Edge {\n    using cost_type = T;\n\n    int from;\n    int to;\n\
-    \    T cost;\n    int id;\n    bool alive;\n\n    Edge() : from(-1), to(-1), cost(T()),\
-    \ id(-1), alive(true) {}\n    Edge(int from_, int to_, T cost_ = T(1), int id_\
-    \ = -1, bool alive_ = true)\n        : from(from_), to(to_), cost(cost_), id(id_),\
-    \ alive(alive_) {}\n\n    int other(int v) const {\n        assert(v == from ||\
-    \ v == to);\n        return from ^ to ^ v;\n    }\n};\n\ntemplate <class T = int>\n\
-    struct Graph {\n    using edge_type = Edge<T>;\n    using cost_type = T;\n\n \
-    \  private:\n    int _n;\n    int _edge_count;\n    std::vector<std::vector<edge_type>>\
-    \ _g;\n    std::vector<std::vector<std::pair<int, int>>> _edge_positions;\n\n\
-    \   public:\n    Graph() : _n(0), _edge_count(0) {}\n    explicit Graph(int n)\
-    \ : _n(n), _edge_count(0), _g(n) {\n        assert(0 <= n);\n    }\n\n    int\
-    \ size() const {\n        return _n;\n    }\n\n    bool empty() const {\n    \
-    \    return _n == 0;\n    }\n\n    int edge_count() const {\n        return _edge_count;\n\
-    \    }\n\n    int add_vertex() {\n        _g.emplace_back();\n        return _n++;\n\
-    \    }\n\n    int add_directed_edge(int from, int to, T cost = T(1)) {\n     \
-    \   assert(0 <= from && from < _n);\n        assert(0 <= to && to < _n);\n   \
-    \     int id = _edge_count++;\n        int idx = int(_g[from].size());\n     \
-    \   _g[from].push_back(edge_type(from, to, cost, id));\n        _edge_positions.emplace_back();\n\
+    \ <utility>\n#include <vector>\n\n#line 1 \"graph/graph.hpp\"\n\n\n\n#include\
+    \ <array>\n#line 8 \"graph/graph.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\
+    \ntemplate <class T = int>\nstruct Edge {\n    using cost_type = T;\n\n    int\
+    \ from;\n    int to;\n    T cost;\n    int id;\n    bool alive;\n\n    Edge()\
+    \ : from(-1), to(-1), cost(T()), id(-1), alive(true) {}\n    Edge(int from_, int\
+    \ to_, T cost_ = T(1), int id_ = -1, bool alive_ = true)\n        : from(from_),\
+    \ to(to_), cost(cost_), id(id_), alive(alive_) {}\n\n    int other(int v) const\
+    \ {\n        assert(v == from || v == to);\n        return from ^ to ^ v;\n  \
+    \  }\n};\n\ntemplate <class T = int>\nstruct Graph {\n    using edge_type = Edge<T>;\n\
+    \    using cost_type = T;\n\n   private:\n    struct EdgePositions {\n       \
+    \ std::array<std::pair<int, int>, 2> value{};\n        int size = 0;\n\n     \
+    \   void push_back(std::pair<int, int> position) {\n            assert(size <\
+    \ 2);\n            value[size++] = position;\n        }\n    };\n\n    int _n;\n\
+    \    int _edge_count;\n    std::vector<std::vector<edge_type>> _g;\n    std::vector<EdgePositions>\
+    \ _edge_positions;\n\n   public:\n    Graph() : _n(0), _edge_count(0) {}\n   \
+    \ explicit Graph(int n) : _n(n), _edge_count(0), _g(n) {\n        assert(0 <=\
+    \ n);\n    }\n\n    int size() const {\n        return _n;\n    }\n\n    bool\
+    \ empty() const {\n        return _n == 0;\n    }\n\n    int edge_count() const\
+    \ {\n        return _edge_count;\n    }\n\n    int add_vertex() {\n        _g.emplace_back();\n\
+    \        return _n++;\n    }\n\n    int add_directed_edge(int from, int to, T\
+    \ cost = T(1)) {\n        assert(0 <= from && from < _n);\n        assert(0 <=\
+    \ to && to < _n);\n        int id = _edge_count++;\n        int idx = int(_g[from].size());\n\
+    \        _g[from].push_back(edge_type(from, to, cost, id));\n        _edge_positions.emplace_back();\n\
     \        _edge_positions.back().push_back({from, idx});\n        return id;\n\
     \    }\n\n    int add_edge(int u, int v, T cost = T(1)) {\n        assert(0 <=\
     \ u && u < _n);\n        assert(0 <= v && v < _n);\n        int id = _edge_count++;\n\
@@ -171,61 +174,63 @@ data:
     \ u, cost, id));\n        _edge_positions.emplace_back();\n        _edge_positions.back().push_back({u,\
     \ u_idx});\n        _edge_positions.back().push_back({v, v_idx});\n        return\
     \ id;\n    }\n\n    void set_edge_alive(int id, bool alive) {\n        assert(0\
-    \ <= id && id < _edge_count);\n        for (auto [v, idx] : _edge_positions[id])\
-    \ {\n            _g[v][idx].alive = alive;\n        }\n    }\n\n    void erase_edge(int\
-    \ id) {\n        set_edge_alive(id, false);\n    }\n\n    void revive_edge(int\
-    \ id) {\n        set_edge_alive(id, true);\n    }\n\n    bool is_edge_alive(int\
-    \ id) const {\n        assert(0 <= id && id < _edge_count);\n        assert(!_edge_positions[id].empty());\n\
-    \        auto [v, idx] = _edge_positions[id][0];\n        return _g[v][idx].alive;\n\
-    \    }\n\n    const std::vector<edge_type>& operator[](int v) const {\n      \
-    \  assert(0 <= v && v < _n);\n        return _g[v];\n    }\n\n    std::vector<edge_type>&\
-    \ operator[](int v) {\n        assert(0 <= v && v < _n);\n        return _g[v];\n\
-    \    }\n\n    const std::vector<std::vector<edge_type>>& adjacency() const {\n\
-    \        return _g;\n    }\n\n    std::vector<std::vector<edge_type>>& adjacency()\
-    \ {\n        return _g;\n    }\n\n    std::vector<edge_type> edges(bool include_inactive\
-    \ = false) const {\n        std::vector<edge_type> result;\n        result.reserve(_edge_count);\n\
-    \        std::vector<char> used(_edge_count, false);\n        for (int v = 0;\
-    \ v < _n; v++) {\n            for (const auto& e : _g[v]) {\n                if\
-    \ (!include_inactive && !e.alive) continue;\n                if (0 <= e.id &&\
-    \ e.id < _edge_count) {\n                    if (used[e.id]) continue;\n     \
-    \               used[e.id] = true;\n                }\n                result.push_back(e);\n\
-    \            }\n        }\n        return result;\n    }\n\n    Graph reversed()\
-    \ const {\n        Graph result(_n);\n        result._edge_count = _edge_count;\n\
-    \        result._edge_positions.assign(_edge_count, {});\n        for (int v =\
-    \ 0; v < _n; v++) {\n            for (const auto& e : _g[v]) {\n             \
-    \   int idx = int(result._g[e.to].size());\n                result._g[e.to].push_back(edge_type(e.to,\
-    \ e.from, e.cost, e.id, e.alive));\n                if (0 <= e.id && e.id < _edge_count)\
-    \ result._edge_positions[e.id].push_back({e.to, idx});\n            }\n      \
-    \  }\n        return result;\n    }\n};\n\n}  // namespace graph\n}  // namespace\
-    \ m1une\n\n\n#line 15 \"graph/bipartite.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ graph {\n\nstruct BipartiteResult {\n    bool is_bipartite;\n    std::vector<int>\
-    \ color;\n    std::vector<int> left_vertices;\n    std::vector<int> right_vertices;\n\
-    \    std::vector<int> left_id;\n    std::vector<int> right_id;\n};\n\ntemplate\
-    \ <class T>\nBipartiteResult bipartite(const Graph<T>& g) {\n    int n = g.size();\n\
-    \    BipartiteResult result;\n    result.is_bipartite = true;\n    result.color.assign(n,\
-    \ -1);\n    result.left_id.assign(n, -1);\n    result.right_id.assign(n, -1);\n\
-    \n    std::vector<std::vector<int>> adjacency(n);\n    for (const auto& e : g.edges())\
-    \ {\n        adjacency[e.from].push_back(e.to);\n        adjacency[e.to].push_back(e.from);\n\
-    \    }\n\n    std::queue<int> que;\n    for (int s = 0; s < n; s++) {\n      \
-    \  if (result.color[s] != -1) continue;\n        result.color[s] = 0;\n      \
-    \  que.push(s);\n        while (!que.empty()) {\n            int v = que.front();\n\
-    \            que.pop();\n            for (int to : adjacency[v]) {\n         \
-    \       if (result.color[to] == -1) {\n                    result.color[to] =\
-    \ result.color[v] ^ 1;\n                    que.push(to);\n                } else\
-    \ if (result.color[to] == result.color[v]) {\n                    result.is_bipartite\
-    \ = false;\n                    return result;\n                }\n          \
-    \  }\n        }\n    }\n\n    for (int v = 0; v < n; v++) {\n        if (result.color[v]\
-    \ == 0) {\n            result.left_id[v] = int(result.left_vertices.size());\n\
-    \            result.left_vertices.push_back(v);\n        } else {\n          \
-    \  result.right_id[v] = int(result.right_vertices.size());\n            result.right_vertices.push_back(v);\n\
-    \        }\n    }\n\n    return result;\n}\n\ntemplate <class T>\nbool is_bipartite(const\
-    \ Graph<T>& g) {\n    return bipartite(g).is_bipartite;\n}\n\nstruct BipartiteVertexSet\
-    \ {\n    std::vector<int> left;\n    std::vector<int> right;\n\n    int size()\
-    \ const {\n        return int(left.size() + right.size());\n    }\n};\n\nstruct\
-    \ BipartiteMatching {\n    struct Edge {\n        int left;\n        int right;\n\
-    \        int id;\n        bool alive;\n    };\n\n    struct Pair {\n        int\
-    \ left;\n        int right;\n        int edge_id;\n    };\n\n   private:\n   \
-    \ int _left_size;\n    int _right_size;\n    std::vector<Edge> _edges;\n    std::vector<std::vector<int>>\
+    \ <= id && id < _edge_count);\n        for (int i = 0; i < _edge_positions[id].size;\
+    \ ++i) {\n            auto [v, idx] = _edge_positions[id].value[i];\n        \
+    \    _g[v][idx].alive = alive;\n        }\n    }\n\n    void erase_edge(int id)\
+    \ {\n        set_edge_alive(id, false);\n    }\n\n    void revive_edge(int id)\
+    \ {\n        set_edge_alive(id, true);\n    }\n\n    bool is_edge_alive(int id)\
+    \ const {\n        assert(0 <= id && id < _edge_count);\n        assert(_edge_positions[id].size\
+    \ != 0);\n        auto [v, idx] = _edge_positions[id].value[0];\n        return\
+    \ _g[v][idx].alive;\n    }\n\n    const std::vector<edge_type>& operator[](int\
+    \ v) const {\n        assert(0 <= v && v < _n);\n        return _g[v];\n    }\n\
+    \n    std::vector<edge_type>& operator[](int v) {\n        assert(0 <= v && v\
+    \ < _n);\n        return _g[v];\n    }\n\n    const std::vector<std::vector<edge_type>>&\
+    \ adjacency() const {\n        return _g;\n    }\n\n    std::vector<std::vector<edge_type>>&\
+    \ adjacency() {\n        return _g;\n    }\n\n    std::vector<edge_type> edges(bool\
+    \ include_inactive = false) const {\n        std::vector<edge_type> result;\n\
+    \        result.reserve(_edge_count);\n        std::vector<char> used(_edge_count,\
+    \ false);\n        for (int v = 0; v < _n; v++) {\n            for (const auto&\
+    \ e : _g[v]) {\n                if (!include_inactive && !e.alive) continue;\n\
+    \                if (0 <= e.id && e.id < _edge_count) {\n                    if\
+    \ (used[e.id]) continue;\n                    used[e.id] = true;\n           \
+    \     }\n                result.push_back(e);\n            }\n        }\n    \
+    \    return result;\n    }\n\n    Graph reversed() const {\n        Graph result(_n);\n\
+    \        result._edge_count = _edge_count;\n        result._edge_positions.assign(_edge_count,\
+    \ {});\n        for (int v = 0; v < _n; v++) {\n            for (const auto& e\
+    \ : _g[v]) {\n                int idx = int(result._g[e.to].size());\n       \
+    \         result._g[e.to].push_back(edge_type(e.to, e.from, e.cost, e.id, e.alive));\n\
+    \                if (0 <= e.id && e.id < _edge_count) result._edge_positions[e.id].push_back({e.to,\
+    \ idx});\n            }\n        }\n        return result;\n    }\n};\n\n}  //\
+    \ namespace graph\n}  // namespace m1une\n\n\n#line 15 \"graph/bipartite.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\nstruct BipartiteResult {\n    bool\
+    \ is_bipartite;\n    std::vector<int> color;\n    std::vector<int> left_vertices;\n\
+    \    std::vector<int> right_vertices;\n    std::vector<int> left_id;\n    std::vector<int>\
+    \ right_id;\n};\n\ntemplate <class T>\nBipartiteResult bipartite(const Graph<T>&\
+    \ g) {\n    int n = g.size();\n    BipartiteResult result;\n    result.is_bipartite\
+    \ = true;\n    result.color.assign(n, -1);\n    result.left_id.assign(n, -1);\n\
+    \    result.right_id.assign(n, -1);\n\n    std::vector<std::vector<int>> adjacency(n);\n\
+    \    for (const auto& e : g.edges()) {\n        adjacency[e.from].push_back(e.to);\n\
+    \        adjacency[e.to].push_back(e.from);\n    }\n\n    std::queue<int> que;\n\
+    \    for (int s = 0; s < n; s++) {\n        if (result.color[s] != -1) continue;\n\
+    \        result.color[s] = 0;\n        que.push(s);\n        while (!que.empty())\
+    \ {\n            int v = que.front();\n            que.pop();\n            for\
+    \ (int to : adjacency[v]) {\n                if (result.color[to] == -1) {\n \
+    \                   result.color[to] = result.color[v] ^ 1;\n                \
+    \    que.push(to);\n                } else if (result.color[to] == result.color[v])\
+    \ {\n                    result.is_bipartite = false;\n                    return\
+    \ result;\n                }\n            }\n        }\n    }\n\n    for (int\
+    \ v = 0; v < n; v++) {\n        if (result.color[v] == 0) {\n            result.left_id[v]\
+    \ = int(result.left_vertices.size());\n            result.left_vertices.push_back(v);\n\
+    \        } else {\n            result.right_id[v] = int(result.right_vertices.size());\n\
+    \            result.right_vertices.push_back(v);\n        }\n    }\n\n    return\
+    \ result;\n}\n\ntemplate <class T>\nbool is_bipartite(const Graph<T>& g) {\n \
+    \   return bipartite(g).is_bipartite;\n}\n\nstruct BipartiteVertexSet {\n    std::vector<int>\
+    \ left;\n    std::vector<int> right;\n\n    int size() const {\n        return\
+    \ int(left.size() + right.size());\n    }\n};\n\nstruct BipartiteMatching {\n\
+    \    struct Edge {\n        int left;\n        int right;\n        int id;\n \
+    \       bool alive;\n    };\n\n    struct Pair {\n        int left;\n        int\
+    \ right;\n        int edge_id;\n    };\n\n   private:\n    int _left_size;\n \
+    \   int _right_size;\n    std::vector<Edge> _edges;\n    std::vector<std::vector<int>>\
     \ _adj;\n    std::vector<std::vector<int>> _radj;\n    std::vector<int> _left_match;\n\
     \    std::vector<int> _right_match;\n    std::vector<int> _left_match_edge;\n\
     \    std::vector<int> _right_match_edge;\n    bool _calculated;\n\n    void invalidate()\
@@ -680,7 +685,7 @@ data:
     \ std::move(order), {}};\n}\n\ntemplate <class T>\nbool is_chordal(const Graph<T>&\
     \ graph) {\n    return chordal_graph_recognition(graph).is_chordal;\n}\n\n}  //\
     \ namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/chromatic_number.hpp\"\
-    \n\n\n\n#include <array>\n#include <bit>\n#line 9 \"graph/chromatic_number.hpp\"\
+    \n\n\n\n#line 5 \"graph/chromatic_number.hpp\"\n#include <bit>\n#line 9 \"graph/chromatic_number.hpp\"\
     \n\n#line 11 \"graph/chromatic_number.hpp\"\n\nnamespace m1une {\nnamespace graph\
     \ {\n\nnamespace detail {\n\nstruct ChromaticResidues {\n    static constexpr\
     \ std::array<std::uint32_t, 14> mod = {\n        1000000007, 1000000009, 998244353,\
@@ -2781,7 +2786,7 @@ data:
     \ Graph<T>& graph) {\n    return namori_decomposition(graph);\n}\n\n}  // namespace\
     \ graph\n}  // namespace m1une\n\n\n#line 1 \"graph/replacement_paths.hpp\"\n\n\
     \n\n#line 11 \"graph/replacement_paths.hpp\"\n\n#line 1 \"graph/dijkstra.hpp\"\
-    \n\n\n\n#line 9 \"graph/dijkstra.hpp\"\n\n#line 11 \"graph/dijkstra.hpp\"\n\n\
+    \n\n\n\n#line 8 \"graph/dijkstra.hpp\"\n\n#line 10 \"graph/dijkstra.hpp\"\n\n\
     namespace m1une {\nnamespace graph {\n\ntemplate <class T>\nstruct DijkstraResult\
     \ {\n    std::vector<T> dist;\n    std::vector<char> reached;\n    std::vector<int>\
     \ parent;\n    std::vector<int> parent_edge;\n    T inf = T();\n\n    bool reachable(int\
@@ -2790,38 +2795,54 @@ data:
     \        std::vector<int> result;\n        for (int v = t; v != -1; v = parent[v])\
     \ result.push_back(v);\n        std::reverse(result.begin(), result.end());\n\
     \        return result;\n    }\n};\n\nnamespace internal {\n\ntemplate <class\
-    \ T>\nstruct DijkstraQueueNode {\n    T dist;\n    int vertex;\n};\n\ntemplate\
-    \ <class T>\nstruct DijkstraQueueCompare {\n    bool operator()(const DijkstraQueueNode<T>&\
-    \ first,\n                    const DijkstraQueueNode<T>& second) const {\n  \
-    \      return second.dist < first.dist;\n    }\n};\n\n}  // namespace internal\n\
-    \ntemplate <class T>\nDijkstraResult<T> dijkstra(const Graph<T>& g,\n        \
-    \                   const std::vector<int>& sources) {\n    int n = g.size();\n\
-    \    DijkstraResult<T> result;\n    result.dist.resize(n);\n    result.reached.assign(n,\
-    \ false);\n    result.parent.assign(n, -1);\n    result.parent_edge.assign(n,\
-    \ -1);\n\n    using Node = internal::DijkstraQueueNode<T>;\n    using Compare\
-    \ = internal::DijkstraQueueCompare<T>;\n    std::priority_queue<Node, std::vector<Node>,\
-    \ Compare> que;\n    for (int s : sources) {\n        assert(0 <= s && s < n);\n\
-    \        if (result.reached[s]) continue;\n        result.reached[s] = true;\n\
-    \        result.dist[s] = T();\n        que.push(Node{T(), s});\n    }\n\n   \
-    \ while (!que.empty()) {\n        Node current = que.top();\n        que.pop();\n\
-    \        if (result.dist[current.vertex] < current.dist) continue;\n        for\
-    \ (const auto& e : g[current.vertex]) {\n            if (!e.alive) continue;\n\
-    \            T nd = current.dist + e.cost;\n            if (result.reached[e.to]\
+    \ T>\nclass DijkstraHeap {\n   private:\n    const std::vector<T>& dist_;\n  \
+    \  std::vector<int> heap_;\n    std::vector<int> position_;\n\n    bool less(int\
+    \ first, int second) const {\n        return dist_[heap_[first]] < dist_[heap_[second]];\n\
+    \    }\n\n    void swap_nodes(int first, int second) {\n        std::swap(heap_[first],\
+    \ heap_[second]);\n        position_[heap_[first]] = first;\n        position_[heap_[second]]\
+    \ = second;\n    }\n\n    void sift_up(int index) {\n        while (index != 0)\
+    \ {\n            const int parent = (index - 1) / 2;\n            if (!less(index,\
+    \ parent)) break;\n            swap_nodes(index, parent);\n            index =\
+    \ parent;\n        }\n    }\n\n    void sift_down(int index) {\n        while\
+    \ (2 * index + 1 < int(heap_.size())) {\n            int child = 2 * index + 1;\n\
+    \            if (child + 1 < int(heap_.size()) && less(child + 1, child)) {\n\
+    \                ++child;\n            }\n            if (!less(child, index))\
+    \ break;\n            swap_nodes(index, child);\n            index = child;\n\
+    \        }\n    }\n\n   public:\n    DijkstraHeap(const std::vector<T>& dist,\
+    \ int size)\n        : dist_(dist), position_(size, -1) {\n        heap_.reserve(size);\n\
+    \    }\n\n    bool empty() const {\n        return heap_.empty();\n    }\n\n \
+    \   void push_or_decrease(int vertex) {\n        int& position = position_[vertex];\n\
+    \        if (position == -1) {\n            position = int(heap_.size());\n  \
+    \          heap_.push_back(vertex);\n        }\n        sift_up(position);\n \
+    \   }\n\n    int pop_min() {\n        const int result = heap_.front();\n    \
+    \    position_[result] = -1;\n        if (heap_.size() == 1) {\n            heap_.pop_back();\n\
+    \            return result;\n        }\n        heap_.front() = heap_.back();\n\
+    \        position_[heap_.front()] = 0;\n        heap_.pop_back();\n        sift_down(0);\n\
+    \        return result;\n    }\n};\n\n}  // namespace internal\n\ntemplate <class\
+    \ T>\nDijkstraResult<T> dijkstra(const Graph<T>& g,\n                        \
+    \   const std::vector<int>& sources) {\n    int n = g.size();\n    DijkstraResult<T>\
+    \ result;\n    result.dist.resize(n);\n    result.reached.assign(n, false);\n\
+    \    result.parent.assign(n, -1);\n    result.parent_edge.assign(n, -1);\n\n \
+    \   internal::DijkstraHeap<T> que(result.dist, n);\n    for (int s : sources)\
+    \ {\n        assert(0 <= s && s < n);\n        if (result.reached[s]) continue;\n\
+    \        result.reached[s] = true;\n        result.dist[s] = T();\n        que.push_or_decrease(s);\n\
+    \    }\n\n    while (!que.empty()) {\n        const int current = que.pop_min();\n\
+    \        for (const auto& e : g[current]) {\n            if (!e.alive) continue;\n\
+    \            T nd = result.dist[current] + e.cost;\n            if (result.reached[e.to]\
     \ && !(nd < result.dist[e.to])) continue;\n            result.reached[e.to] =\
-    \ true;\n            result.dist[e.to] = nd;\n            result.parent[e.to]\
-    \ = current.vertex;\n            result.parent_edge[e.to] = e.id;\n          \
-    \  que.push(Node{std::move(nd), e.to});\n        }\n    }\n\n    return result;\n\
-    }\n\ntemplate <class T>\nDijkstraResult<T> dijkstra(const Graph<T>& g, int s)\
-    \ {\n    return dijkstra(g, std::vector<int>{s});\n}\n\n// Compatibility overload:\
-    \ unreachable distances are replaced by inf after the\n// search. Reachability\
-    \ itself never depends on this sentinel.\ntemplate <class T>\nDijkstraResult<T>\
-    \ dijkstra(const Graph<T>& g,\n                           const std::vector<int>&\
-    \ sources, const T& inf) {\n    DijkstraResult<T> result = dijkstra(g, sources);\n\
-    \    result.inf = inf;\n    for (int v = 0; v < int(result.dist.size()); v++)\
-    \ {\n        if (!result.reachable(v)) result.dist[v] = inf;\n    }\n    return\
-    \ result;\n}\n\ntemplate <class T>\nDijkstraResult<T> dijkstra(const Graph<T>&\
-    \ g, int s, const T& inf) {\n    return dijkstra(g, std::vector<int>{s}, inf);\n\
-    }\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 14 \"graph/replacement_paths.hpp\"\
+    \ true;\n            result.dist[e.to] = std::move(nd);\n            result.parent[e.to]\
+    \ = current;\n            result.parent_edge[e.to] = e.id;\n            que.push_or_decrease(e.to);\n\
+    \        }\n    }\n\n    return result;\n}\n\ntemplate <class T>\nDijkstraResult<T>\
+    \ dijkstra(const Graph<T>& g, int s) {\n    return dijkstra(g, std::vector<int>{s});\n\
+    }\n\n// Compatibility overload: unreachable distances are replaced by inf after\
+    \ the\n// search. Reachability itself never depends on this sentinel.\ntemplate\
+    \ <class T>\nDijkstraResult<T> dijkstra(const Graph<T>& g,\n                 \
+    \          const std::vector<int>& sources, const T& inf) {\n    DijkstraResult<T>\
+    \ result = dijkstra(g, sources);\n    result.inf = inf;\n    for (int v = 0; v\
+    \ < int(result.dist.size()); v++) {\n        if (!result.reachable(v)) result.dist[v]\
+    \ = inf;\n    }\n    return result;\n}\n\ntemplate <class T>\nDijkstraResult<T>\
+    \ dijkstra(const Graph<T>& g, int s, const T& inf) {\n    return dijkstra(g, std::vector<int>{s},\
+    \ inf);\n}\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 14 \"graph/replacement_paths.hpp\"\
     \n\nnamespace m1une {\nnamespace graph {\n\nstruct GraphPath {\n    std::vector<int>\
     \ vertices;\n    std::vector<int> edges;\n};\n\ntemplate <class T>\nstruct EdgeReplacementPathsResult\
     \ {\n    GraphPath path;\n    std::vector<T> replacement_dist;\n    T inf;\n\n\
@@ -3653,7 +3674,7 @@ data:
   path: graph/undirected.hpp
   requiredBy:
   - graph/all.hpp
-  timestamp: '2026-08-13 00:22:33+09:00'
+  timestamp: '2026-08-13 01:41:40+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/graph_algorithms.test.cpp

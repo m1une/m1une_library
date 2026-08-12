@@ -32,26 +32,29 @@ data:
   bundledCode: "#line 1 \"verify/graph/incremental_scc.test.cpp\"\n#define PROBLEM\
     \ \"https://judge.yosupo.jp/problem/incremental_scc\"\n\n#line 1 \"graph/incremental_scc.hpp\"\
     \n\n\n\n#include <algorithm>\n#include <cassert>\n#include <cstddef>\n#include\
-    \ <utility>\n#include <vector>\n\n#line 1 \"graph/graph.hpp\"\n\n\n\n#line 7 \"\
-    graph/graph.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\ntemplate <class T\
-    \ = int>\nstruct Edge {\n    using cost_type = T;\n\n    int from;\n    int to;\n\
-    \    T cost;\n    int id;\n    bool alive;\n\n    Edge() : from(-1), to(-1), cost(T()),\
-    \ id(-1), alive(true) {}\n    Edge(int from_, int to_, T cost_ = T(1), int id_\
-    \ = -1, bool alive_ = true)\n        : from(from_), to(to_), cost(cost_), id(id_),\
-    \ alive(alive_) {}\n\n    int other(int v) const {\n        assert(v == from ||\
-    \ v == to);\n        return from ^ to ^ v;\n    }\n};\n\ntemplate <class T = int>\n\
-    struct Graph {\n    using edge_type = Edge<T>;\n    using cost_type = T;\n\n \
-    \  private:\n    int _n;\n    int _edge_count;\n    std::vector<std::vector<edge_type>>\
-    \ _g;\n    std::vector<std::vector<std::pair<int, int>>> _edge_positions;\n\n\
-    \   public:\n    Graph() : _n(0), _edge_count(0) {}\n    explicit Graph(int n)\
-    \ : _n(n), _edge_count(0), _g(n) {\n        assert(0 <= n);\n    }\n\n    int\
-    \ size() const {\n        return _n;\n    }\n\n    bool empty() const {\n    \
-    \    return _n == 0;\n    }\n\n    int edge_count() const {\n        return _edge_count;\n\
-    \    }\n\n    int add_vertex() {\n        _g.emplace_back();\n        return _n++;\n\
-    \    }\n\n    int add_directed_edge(int from, int to, T cost = T(1)) {\n     \
-    \   assert(0 <= from && from < _n);\n        assert(0 <= to && to < _n);\n   \
-    \     int id = _edge_count++;\n        int idx = int(_g[from].size());\n     \
-    \   _g[from].push_back(edge_type(from, to, cost, id));\n        _edge_positions.emplace_back();\n\
+    \ <utility>\n#include <vector>\n\n#line 1 \"graph/graph.hpp\"\n\n\n\n#include\
+    \ <array>\n#line 8 \"graph/graph.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\
+    \ntemplate <class T = int>\nstruct Edge {\n    using cost_type = T;\n\n    int\
+    \ from;\n    int to;\n    T cost;\n    int id;\n    bool alive;\n\n    Edge()\
+    \ : from(-1), to(-1), cost(T()), id(-1), alive(true) {}\n    Edge(int from_, int\
+    \ to_, T cost_ = T(1), int id_ = -1, bool alive_ = true)\n        : from(from_),\
+    \ to(to_), cost(cost_), id(id_), alive(alive_) {}\n\n    int other(int v) const\
+    \ {\n        assert(v == from || v == to);\n        return from ^ to ^ v;\n  \
+    \  }\n};\n\ntemplate <class T = int>\nstruct Graph {\n    using edge_type = Edge<T>;\n\
+    \    using cost_type = T;\n\n   private:\n    struct EdgePositions {\n       \
+    \ std::array<std::pair<int, int>, 2> value{};\n        int size = 0;\n\n     \
+    \   void push_back(std::pair<int, int> position) {\n            assert(size <\
+    \ 2);\n            value[size++] = position;\n        }\n    };\n\n    int _n;\n\
+    \    int _edge_count;\n    std::vector<std::vector<edge_type>> _g;\n    std::vector<EdgePositions>\
+    \ _edge_positions;\n\n   public:\n    Graph() : _n(0), _edge_count(0) {}\n   \
+    \ explicit Graph(int n) : _n(n), _edge_count(0), _g(n) {\n        assert(0 <=\
+    \ n);\n    }\n\n    int size() const {\n        return _n;\n    }\n\n    bool\
+    \ empty() const {\n        return _n == 0;\n    }\n\n    int edge_count() const\
+    \ {\n        return _edge_count;\n    }\n\n    int add_vertex() {\n        _g.emplace_back();\n\
+    \        return _n++;\n    }\n\n    int add_directed_edge(int from, int to, T\
+    \ cost = T(1)) {\n        assert(0 <= from && from < _n);\n        assert(0 <=\
+    \ to && to < _n);\n        int id = _edge_count++;\n        int idx = int(_g[from].size());\n\
+    \        _g[from].push_back(edge_type(from, to, cost, id));\n        _edge_positions.emplace_back();\n\
     \        _edge_positions.back().push_back({from, idx});\n        return id;\n\
     \    }\n\n    int add_edge(int u, int v, T cost = T(1)) {\n        assert(0 <=\
     \ u && u < _n);\n        assert(0 <= v && v < _n);\n        int id = _edge_count++;\n\
@@ -60,42 +63,43 @@ data:
     \ u, cost, id));\n        _edge_positions.emplace_back();\n        _edge_positions.back().push_back({u,\
     \ u_idx});\n        _edge_positions.back().push_back({v, v_idx});\n        return\
     \ id;\n    }\n\n    void set_edge_alive(int id, bool alive) {\n        assert(0\
-    \ <= id && id < _edge_count);\n        for (auto [v, idx] : _edge_positions[id])\
-    \ {\n            _g[v][idx].alive = alive;\n        }\n    }\n\n    void erase_edge(int\
-    \ id) {\n        set_edge_alive(id, false);\n    }\n\n    void revive_edge(int\
-    \ id) {\n        set_edge_alive(id, true);\n    }\n\n    bool is_edge_alive(int\
-    \ id) const {\n        assert(0 <= id && id < _edge_count);\n        assert(!_edge_positions[id].empty());\n\
-    \        auto [v, idx] = _edge_positions[id][0];\n        return _g[v][idx].alive;\n\
-    \    }\n\n    const std::vector<edge_type>& operator[](int v) const {\n      \
-    \  assert(0 <= v && v < _n);\n        return _g[v];\n    }\n\n    std::vector<edge_type>&\
-    \ operator[](int v) {\n        assert(0 <= v && v < _n);\n        return _g[v];\n\
-    \    }\n\n    const std::vector<std::vector<edge_type>>& adjacency() const {\n\
-    \        return _g;\n    }\n\n    std::vector<std::vector<edge_type>>& adjacency()\
-    \ {\n        return _g;\n    }\n\n    std::vector<edge_type> edges(bool include_inactive\
-    \ = false) const {\n        std::vector<edge_type> result;\n        result.reserve(_edge_count);\n\
-    \        std::vector<char> used(_edge_count, false);\n        for (int v = 0;\
-    \ v < _n; v++) {\n            for (const auto& e : _g[v]) {\n                if\
-    \ (!include_inactive && !e.alive) continue;\n                if (0 <= e.id &&\
-    \ e.id < _edge_count) {\n                    if (used[e.id]) continue;\n     \
-    \               used[e.id] = true;\n                }\n                result.push_back(e);\n\
-    \            }\n        }\n        return result;\n    }\n\n    Graph reversed()\
-    \ const {\n        Graph result(_n);\n        result._edge_count = _edge_count;\n\
-    \        result._edge_positions.assign(_edge_count, {});\n        for (int v =\
-    \ 0; v < _n; v++) {\n            for (const auto& e : _g[v]) {\n             \
-    \   int idx = int(result._g[e.to].size());\n                result._g[e.to].push_back(edge_type(e.to,\
-    \ e.from, e.cost, e.id, e.alive));\n                if (0 <= e.id && e.id < _edge_count)\
-    \ result._edge_positions[e.id].push_back({e.to, idx});\n            }\n      \
-    \  }\n        return result;\n    }\n};\n\n}  // namespace graph\n}  // namespace\
-    \ m1une\n\n\n#line 11 \"graph/incremental_scc.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ graph {\n\nnamespace incremental_scc_detail {\n\nstruct EdgeEvent {\n    int\
-    \ id;\n    int from;\n    int to;\n};\n\ninline std::vector<int> component_ids(\n\
-    \    int vertex_count,\n    const std::vector<EdgeEvent>& edges,\n    int time\n\
-    ) {\n    std::vector<int> begin(vertex_count + 1, 0);\n    std::vector<int> reverse_begin(vertex_count\
-    \ + 1, 0);\n    int edge_count = 0;\n    for (const EdgeEvent& edge : edges) {\n\
-    \        if (edge.id >= time) continue;\n        begin[edge.from + 1]++;\n   \
-    \     reverse_begin[edge.to + 1]++;\n        edge_count++;\n    }\n    for (int\
-    \ vertex = 0; vertex < vertex_count; vertex++) {\n        begin[vertex + 1] +=\
-    \ begin[vertex];\n        reverse_begin[vertex + 1] += reverse_begin[vertex];\n\
+    \ <= id && id < _edge_count);\n        for (int i = 0; i < _edge_positions[id].size;\
+    \ ++i) {\n            auto [v, idx] = _edge_positions[id].value[i];\n        \
+    \    _g[v][idx].alive = alive;\n        }\n    }\n\n    void erase_edge(int id)\
+    \ {\n        set_edge_alive(id, false);\n    }\n\n    void revive_edge(int id)\
+    \ {\n        set_edge_alive(id, true);\n    }\n\n    bool is_edge_alive(int id)\
+    \ const {\n        assert(0 <= id && id < _edge_count);\n        assert(_edge_positions[id].size\
+    \ != 0);\n        auto [v, idx] = _edge_positions[id].value[0];\n        return\
+    \ _g[v][idx].alive;\n    }\n\n    const std::vector<edge_type>& operator[](int\
+    \ v) const {\n        assert(0 <= v && v < _n);\n        return _g[v];\n    }\n\
+    \n    std::vector<edge_type>& operator[](int v) {\n        assert(0 <= v && v\
+    \ < _n);\n        return _g[v];\n    }\n\n    const std::vector<std::vector<edge_type>>&\
+    \ adjacency() const {\n        return _g;\n    }\n\n    std::vector<std::vector<edge_type>>&\
+    \ adjacency() {\n        return _g;\n    }\n\n    std::vector<edge_type> edges(bool\
+    \ include_inactive = false) const {\n        std::vector<edge_type> result;\n\
+    \        result.reserve(_edge_count);\n        std::vector<char> used(_edge_count,\
+    \ false);\n        for (int v = 0; v < _n; v++) {\n            for (const auto&\
+    \ e : _g[v]) {\n                if (!include_inactive && !e.alive) continue;\n\
+    \                if (0 <= e.id && e.id < _edge_count) {\n                    if\
+    \ (used[e.id]) continue;\n                    used[e.id] = true;\n           \
+    \     }\n                result.push_back(e);\n            }\n        }\n    \
+    \    return result;\n    }\n\n    Graph reversed() const {\n        Graph result(_n);\n\
+    \        result._edge_count = _edge_count;\n        result._edge_positions.assign(_edge_count,\
+    \ {});\n        for (int v = 0; v < _n; v++) {\n            for (const auto& e\
+    \ : _g[v]) {\n                int idx = int(result._g[e.to].size());\n       \
+    \         result._g[e.to].push_back(edge_type(e.to, e.from, e.cost, e.id, e.alive));\n\
+    \                if (0 <= e.id && e.id < _edge_count) result._edge_positions[e.id].push_back({e.to,\
+    \ idx});\n            }\n        }\n        return result;\n    }\n};\n\n}  //\
+    \ namespace graph\n}  // namespace m1une\n\n\n#line 11 \"graph/incremental_scc.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\nnamespace incremental_scc_detail {\n\
+    \nstruct EdgeEvent {\n    int id;\n    int from;\n    int to;\n};\n\ninline std::vector<int>\
+    \ component_ids(\n    int vertex_count,\n    const std::vector<EdgeEvent>& edges,\n\
+    \    int time\n) {\n    std::vector<int> begin(vertex_count + 1, 0);\n    std::vector<int>\
+    \ reverse_begin(vertex_count + 1, 0);\n    int edge_count = 0;\n    for (const\
+    \ EdgeEvent& edge : edges) {\n        if (edge.id >= time) continue;\n       \
+    \ begin[edge.from + 1]++;\n        reverse_begin[edge.to + 1]++;\n        edge_count++;\n\
+    \    }\n    for (int vertex = 0; vertex < vertex_count; vertex++) {\n        begin[vertex\
+    \ + 1] += begin[vertex];\n        reverse_begin[vertex + 1] += reverse_begin[vertex];\n\
     \    }\n\n    std::vector<int> adjacency(edge_count);\n    std::vector<int> reverse_adjacency(edge_count);\n\
     \    std::vector<int> cursor = begin;\n    std::vector<int> reverse_cursor = reverse_begin;\n\
     \    for (const EdgeEvent& edge : edges) {\n        if (edge.id >= time) continue;\n\
@@ -350,13 +354,13 @@ data:
     \ is, DynamicModInt& rhs) {\n        long long value;\n        is >> value;\n\
     \        rhs = DynamicModInt(value);\n        return is;\n    }\n};\n\n}  // namespace\
     \ math\n}  // namespace m1une\n\n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line\
-    \ 5 \"utilities/fast_io.hpp\"\n#include <array>\n#include <cerrno>\n#include <charconv>\n\
-    #line 9 \"utilities/fast_io.hpp\"\n#include <cstdio>\n#include <cstdlib>\n#line\
-    \ 12 \"utilities/fast_io.hpp\"\n#include <cstring>\n#include <iterator>\n#include\
-    \ <string>\n#include <sys/stat.h>\n#line 18 \"utilities/fast_io.hpp\"\n#include\
-    \ <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal {\n\
-    \n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct\
-    \ is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
+    \ 6 \"utilities/fast_io.hpp\"\n#include <cerrno>\n#include <charconv>\n#line 9\
+    \ \"utilities/fast_io.hpp\"\n#include <cstdio>\n#include <cstdlib>\n#line 12 \"\
+    utilities/fast_io.hpp\"\n#include <cstring>\n#include <iterator>\n#include <string>\n\
+    #include <sys/stat.h>\n#line 18 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n\
+    \nnamespace m1une {\nnamespace utilities {\nnamespace internal {\n\n// Detect\
+    \ std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct is_range\
+    \ : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
     \    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
     >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
     \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
@@ -730,7 +734,7 @@ data:
   isVerificationFile: true
   path: verify/graph/incremental_scc.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-08-13 01:41:40+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/incremental_scc.test.cpp

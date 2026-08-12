@@ -219,80 +219,85 @@ data:
     \  direction[std::size_t(pivot_col)] = T() - augmented[row][free_col];\n     \
     \   }\n        result.nullspace_basis.push_back(std::move(direction));\n    }\n\
     \    return result;\n}\n\n}  // namespace matrix\n}  // namespace m1une\n\n\n\
-    #line 1 \"graph/graph.hpp\"\n\n\n\n#line 7 \"graph/graph.hpp\"\n\nnamespace m1une\
-    \ {\nnamespace graph {\n\ntemplate <class T = int>\nstruct Edge {\n    using cost_type\
-    \ = T;\n\n    int from;\n    int to;\n    T cost;\n    int id;\n    bool alive;\n\
-    \n    Edge() : from(-1), to(-1), cost(T()), id(-1), alive(true) {}\n    Edge(int\
-    \ from_, int to_, T cost_ = T(1), int id_ = -1, bool alive_ = true)\n        :\
-    \ from(from_), to(to_), cost(cost_), id(id_), alive(alive_) {}\n\n    int other(int\
-    \ v) const {\n        assert(v == from || v == to);\n        return from ^ to\
-    \ ^ v;\n    }\n};\n\ntemplate <class T = int>\nstruct Graph {\n    using edge_type\
-    \ = Edge<T>;\n    using cost_type = T;\n\n   private:\n    int _n;\n    int _edge_count;\n\
-    \    std::vector<std::vector<edge_type>> _g;\n    std::vector<std::vector<std::pair<int,\
-    \ int>>> _edge_positions;\n\n   public:\n    Graph() : _n(0), _edge_count(0) {}\n\
-    \    explicit Graph(int n) : _n(n), _edge_count(0), _g(n) {\n        assert(0\
-    \ <= n);\n    }\n\n    int size() const {\n        return _n;\n    }\n\n    bool\
-    \ empty() const {\n        return _n == 0;\n    }\n\n    int edge_count() const\
-    \ {\n        return _edge_count;\n    }\n\n    int add_vertex() {\n        _g.emplace_back();\n\
-    \        return _n++;\n    }\n\n    int add_directed_edge(int from, int to, T\
-    \ cost = T(1)) {\n        assert(0 <= from && from < _n);\n        assert(0 <=\
-    \ to && to < _n);\n        int id = _edge_count++;\n        int idx = int(_g[from].size());\n\
-    \        _g[from].push_back(edge_type(from, to, cost, id));\n        _edge_positions.emplace_back();\n\
-    \        _edge_positions.back().push_back({from, idx});\n        return id;\n\
-    \    }\n\n    int add_edge(int u, int v, T cost = T(1)) {\n        assert(0 <=\
-    \ u && u < _n);\n        assert(0 <= v && v < _n);\n        int id = _edge_count++;\n\
-    \        int u_idx = int(_g[u].size());\n        _g[u].push_back(edge_type(u,\
-    \ v, cost, id));\n        int v_idx = int(_g[v].size());\n        _g[v].push_back(edge_type(v,\
-    \ u, cost, id));\n        _edge_positions.emplace_back();\n        _edge_positions.back().push_back({u,\
-    \ u_idx});\n        _edge_positions.back().push_back({v, v_idx});\n        return\
-    \ id;\n    }\n\n    void set_edge_alive(int id, bool alive) {\n        assert(0\
-    \ <= id && id < _edge_count);\n        for (auto [v, idx] : _edge_positions[id])\
-    \ {\n            _g[v][idx].alive = alive;\n        }\n    }\n\n    void erase_edge(int\
+    #line 1 \"graph/graph.hpp\"\n\n\n\n#include <array>\n#line 8 \"graph/graph.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\ntemplate <class T = int>\nstruct Edge\
+    \ {\n    using cost_type = T;\n\n    int from;\n    int to;\n    T cost;\n   \
+    \ int id;\n    bool alive;\n\n    Edge() : from(-1), to(-1), cost(T()), id(-1),\
+    \ alive(true) {}\n    Edge(int from_, int to_, T cost_ = T(1), int id_ = -1, bool\
+    \ alive_ = true)\n        : from(from_), to(to_), cost(cost_), id(id_), alive(alive_)\
+    \ {}\n\n    int other(int v) const {\n        assert(v == from || v == to);\n\
+    \        return from ^ to ^ v;\n    }\n};\n\ntemplate <class T = int>\nstruct\
+    \ Graph {\n    using edge_type = Edge<T>;\n    using cost_type = T;\n\n   private:\n\
+    \    struct EdgePositions {\n        std::array<std::pair<int, int>, 2> value{};\n\
+    \        int size = 0;\n\n        void push_back(std::pair<int, int> position)\
+    \ {\n            assert(size < 2);\n            value[size++] = position;\n  \
+    \      }\n    };\n\n    int _n;\n    int _edge_count;\n    std::vector<std::vector<edge_type>>\
+    \ _g;\n    std::vector<EdgePositions> _edge_positions;\n\n   public:\n    Graph()\
+    \ : _n(0), _edge_count(0) {}\n    explicit Graph(int n) : _n(n), _edge_count(0),\
+    \ _g(n) {\n        assert(0 <= n);\n    }\n\n    int size() const {\n        return\
+    \ _n;\n    }\n\n    bool empty() const {\n        return _n == 0;\n    }\n\n \
+    \   int edge_count() const {\n        return _edge_count;\n    }\n\n    int add_vertex()\
+    \ {\n        _g.emplace_back();\n        return _n++;\n    }\n\n    int add_directed_edge(int\
+    \ from, int to, T cost = T(1)) {\n        assert(0 <= from && from < _n);\n  \
+    \      assert(0 <= to && to < _n);\n        int id = _edge_count++;\n        int\
+    \ idx = int(_g[from].size());\n        _g[from].push_back(edge_type(from, to,\
+    \ cost, id));\n        _edge_positions.emplace_back();\n        _edge_positions.back().push_back({from,\
+    \ idx});\n        return id;\n    }\n\n    int add_edge(int u, int v, T cost =\
+    \ T(1)) {\n        assert(0 <= u && u < _n);\n        assert(0 <= v && v < _n);\n\
+    \        int id = _edge_count++;\n        int u_idx = int(_g[u].size());\n   \
+    \     _g[u].push_back(edge_type(u, v, cost, id));\n        int v_idx = int(_g[v].size());\n\
+    \        _g[v].push_back(edge_type(v, u, cost, id));\n        _edge_positions.emplace_back();\n\
+    \        _edge_positions.back().push_back({u, u_idx});\n        _edge_positions.back().push_back({v,\
+    \ v_idx});\n        return id;\n    }\n\n    void set_edge_alive(int id, bool\
+    \ alive) {\n        assert(0 <= id && id < _edge_count);\n        for (int i =\
+    \ 0; i < _edge_positions[id].size; ++i) {\n            auto [v, idx] = _edge_positions[id].value[i];\n\
+    \            _g[v][idx].alive = alive;\n        }\n    }\n\n    void erase_edge(int\
     \ id) {\n        set_edge_alive(id, false);\n    }\n\n    void revive_edge(int\
     \ id) {\n        set_edge_alive(id, true);\n    }\n\n    bool is_edge_alive(int\
-    \ id) const {\n        assert(0 <= id && id < _edge_count);\n        assert(!_edge_positions[id].empty());\n\
-    \        auto [v, idx] = _edge_positions[id][0];\n        return _g[v][idx].alive;\n\
-    \    }\n\n    const std::vector<edge_type>& operator[](int v) const {\n      \
-    \  assert(0 <= v && v < _n);\n        return _g[v];\n    }\n\n    std::vector<edge_type>&\
-    \ operator[](int v) {\n        assert(0 <= v && v < _n);\n        return _g[v];\n\
-    \    }\n\n    const std::vector<std::vector<edge_type>>& adjacency() const {\n\
-    \        return _g;\n    }\n\n    std::vector<std::vector<edge_type>>& adjacency()\
-    \ {\n        return _g;\n    }\n\n    std::vector<edge_type> edges(bool include_inactive\
-    \ = false) const {\n        std::vector<edge_type> result;\n        result.reserve(_edge_count);\n\
-    \        std::vector<char> used(_edge_count, false);\n        for (int v = 0;\
-    \ v < _n; v++) {\n            for (const auto& e : _g[v]) {\n                if\
-    \ (!include_inactive && !e.alive) continue;\n                if (0 <= e.id &&\
-    \ e.id < _edge_count) {\n                    if (used[e.id]) continue;\n     \
-    \               used[e.id] = true;\n                }\n                result.push_back(e);\n\
-    \            }\n        }\n        return result;\n    }\n\n    Graph reversed()\
-    \ const {\n        Graph result(_n);\n        result._edge_count = _edge_count;\n\
-    \        result._edge_positions.assign(_edge_count, {});\n        for (int v =\
-    \ 0; v < _n; v++) {\n            for (const auto& e : _g[v]) {\n             \
-    \   int idx = int(result._g[e.to].size());\n                result._g[e.to].push_back(edge_type(e.to,\
-    \ e.from, e.cost, e.id, e.alive));\n                if (0 <= e.id && e.id < _edge_count)\
-    \ result._edge_positions[e.id].push_back({e.to, idx});\n            }\n      \
-    \  }\n        return result;\n    }\n};\n\n}  // namespace graph\n}  // namespace\
-    \ m1une\n\n\n#line 10 \"graph/matrix_tree_theorem.hpp\"\n\nnamespace m1une {\n\
-    namespace graph {\n\nnamespace matrix_tree_detail {\n\ninline int minor_index(int\
-    \ vertex, int removed) {\n    assert(vertex != removed);\n    return vertex <\
-    \ removed ? vertex : vertex - 1;\n}\n\ntemplate <class Weight>\nvoid assert_edge_incidence(const\
-    \ Graph<Weight>& graph, int expected) {\n#ifndef NDEBUG\n    std::vector<int>\
-    \ incidence(graph.edge_count(), 0);\n    for (int vertex = 0; vertex < graph.size();\
-    \ vertex++) {\n        for (const Edge<Weight>& edge : graph[vertex]) {\n    \
-    \        if (!edge.alive) continue;\n            assert(0 <= edge.id && edge.id\
-    \ < graph.edge_count());\n            incidence[edge.id]++;\n        }\n    }\n\
-    \    for (int count : incidence) {\n        if (count != 0) assert(count == expected);\n\
-    \    }\n#else\n    (void)graph;\n    (void)expected;\n#endif\n}\n\ntemplate <class\
-    \ Field, class Weight>\nField count_arborescences(\n    const Graph<Weight>& graph,\n\
-    \    int root,\n    bool outward\n) {\n    const int n = graph.size();\n    assert(0\
-    \ <= root && root < n);\n    assert_edge_incidence(graph, 1);\n\n    matrix::Matrix<Field>\
-    \ minor(n - 1, n - 1);\n    for (int vertex = 0; vertex < n; vertex++) {\n   \
-    \     for (const Edge<Weight>& edge : graph[vertex]) {\n            if (!edge.alive\
-    \ || edge.from == edge.to) continue;\n            const int row = outward ? edge.to\
-    \ : edge.from;\n            const int col = outward ? edge.from : edge.to;\n \
-    \           if (row == root) continue;\n\n            const Field weight(edge.cost);\n\
-    \            const int reduced_row = minor_index(row, root);\n            minor[reduced_row][reduced_row]\
-    \ += weight;\n            if (col != root) {\n                minor[reduced_row][minor_index(col,\
+    \ id) const {\n        assert(0 <= id && id < _edge_count);\n        assert(_edge_positions[id].size\
+    \ != 0);\n        auto [v, idx] = _edge_positions[id].value[0];\n        return\
+    \ _g[v][idx].alive;\n    }\n\n    const std::vector<edge_type>& operator[](int\
+    \ v) const {\n        assert(0 <= v && v < _n);\n        return _g[v];\n    }\n\
+    \n    std::vector<edge_type>& operator[](int v) {\n        assert(0 <= v && v\
+    \ < _n);\n        return _g[v];\n    }\n\n    const std::vector<std::vector<edge_type>>&\
+    \ adjacency() const {\n        return _g;\n    }\n\n    std::vector<std::vector<edge_type>>&\
+    \ adjacency() {\n        return _g;\n    }\n\n    std::vector<edge_type> edges(bool\
+    \ include_inactive = false) const {\n        std::vector<edge_type> result;\n\
+    \        result.reserve(_edge_count);\n        std::vector<char> used(_edge_count,\
+    \ false);\n        for (int v = 0; v < _n; v++) {\n            for (const auto&\
+    \ e : _g[v]) {\n                if (!include_inactive && !e.alive) continue;\n\
+    \                if (0 <= e.id && e.id < _edge_count) {\n                    if\
+    \ (used[e.id]) continue;\n                    used[e.id] = true;\n           \
+    \     }\n                result.push_back(e);\n            }\n        }\n    \
+    \    return result;\n    }\n\n    Graph reversed() const {\n        Graph result(_n);\n\
+    \        result._edge_count = _edge_count;\n        result._edge_positions.assign(_edge_count,\
+    \ {});\n        for (int v = 0; v < _n; v++) {\n            for (const auto& e\
+    \ : _g[v]) {\n                int idx = int(result._g[e.to].size());\n       \
+    \         result._g[e.to].push_back(edge_type(e.to, e.from, e.cost, e.id, e.alive));\n\
+    \                if (0 <= e.id && e.id < _edge_count) result._edge_positions[e.id].push_back({e.to,\
+    \ idx});\n            }\n        }\n        return result;\n    }\n};\n\n}  //\
+    \ namespace graph\n}  // namespace m1une\n\n\n#line 10 \"graph/matrix_tree_theorem.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\nnamespace matrix_tree_detail {\n\n\
+    inline int minor_index(int vertex, int removed) {\n    assert(vertex != removed);\n\
+    \    return vertex < removed ? vertex : vertex - 1;\n}\n\ntemplate <class Weight>\n\
+    void assert_edge_incidence(const Graph<Weight>& graph, int expected) {\n#ifndef\
+    \ NDEBUG\n    std::vector<int> incidence(graph.edge_count(), 0);\n    for (int\
+    \ vertex = 0; vertex < graph.size(); vertex++) {\n        for (const Edge<Weight>&\
+    \ edge : graph[vertex]) {\n            if (!edge.alive) continue;\n          \
+    \  assert(0 <= edge.id && edge.id < graph.edge_count());\n            incidence[edge.id]++;\n\
+    \        }\n    }\n    for (int count : incidence) {\n        if (count != 0)\
+    \ assert(count == expected);\n    }\n#else\n    (void)graph;\n    (void)expected;\n\
+    #endif\n}\n\ntemplate <class Field, class Weight>\nField count_arborescences(\n\
+    \    const Graph<Weight>& graph,\n    int root,\n    bool outward\n) {\n    const\
+    \ int n = graph.size();\n    assert(0 <= root && root < n);\n    assert_edge_incidence(graph,\
+    \ 1);\n\n    matrix::Matrix<Field> minor(n - 1, n - 1);\n    for (int vertex =\
+    \ 0; vertex < n; vertex++) {\n        for (const Edge<Weight>& edge : graph[vertex])\
+    \ {\n            if (!edge.alive || edge.from == edge.to) continue;\n        \
+    \    const int row = outward ? edge.to : edge.from;\n            const int col\
+    \ = outward ? edge.from : edge.to;\n            if (row == root) continue;\n\n\
+    \            const Field weight(edge.cost);\n            const int reduced_row\
+    \ = minor_index(row, root);\n            minor[reduced_row][reduced_row] += weight;\n\
+    \            if (col != root) {\n                minor[reduced_row][minor_index(col,\
     \ root)] -= weight;\n            }\n        }\n    }\n    return matrix::determinant(std::move(minor));\n\
     }\n\n}  // namespace matrix_tree_detail\n\n// Returns the total weight of all\
     \ undirected spanning trees. The weight of a\n// tree is the product of its edge\
@@ -426,16 +431,16 @@ data:
     \        rhs = DynamicModInt(value);\n        return is;\n    }\n};\n\n}  // namespace\
     \ math\n}  // namespace m1une\n\n\n#line 5 \"verify/graph/counting_spanning_tree_directed.test.cpp\"\
     \n\n#include <bit>\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#include <algorithm>\n\
-    #include <array>\n#include <cerrno>\n#include <charconv>\n#line 9 \"utilities/fast_io.hpp\"\
-    \n#include <cstdio>\n#include <cstdlib>\n#line 12 \"utilities/fast_io.hpp\"\n\
-    #include <cstring>\n#include <iterator>\n#include <string>\n#include <sys/stat.h>\n\
-    #line 18 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n\nnamespace m1une {\n\
-    namespace utilities {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\n\
-    template <class T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate\
-    \ <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
-    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
-    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
-    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    #line 6 \"utilities/fast_io.hpp\"\n#include <cerrno>\n#include <charconv>\n#line\
+    \ 9 \"utilities/fast_io.hpp\"\n#include <cstdio>\n#include <cstdlib>\n#line 12\
+    \ \"utilities/fast_io.hpp\"\n#include <cstring>\n#include <iterator>\n#include\
+    \ <string>\n#include <sys/stat.h>\n#line 18 \"utilities/fast_io.hpp\"\n#include\
+    \ <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal {\n\
+    \n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct\
+    \ is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
+    \    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
+    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
+    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
     \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
     \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
@@ -764,7 +769,7 @@ data:
   isVerificationFile: true
   path: verify/graph/counting_spanning_tree_directed.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-08-13 01:41:40+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/counting_spanning_tree_directed.test.cpp

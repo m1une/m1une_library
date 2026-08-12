@@ -32,18 +32,21 @@ data:
   bundledCode: "#line 1 \"graph/general_weighted_matching.hpp\"\n\n\n\n#include <algorithm>\n\
     #include <cassert>\n#include <cstddef>\n#include <functional>\n#include <limits>\n\
     #include <queue>\n#include <type_traits>\n#include <utility>\n#include <vector>\n\
-    \n#line 1 \"graph/graph.hpp\"\n\n\n\n#line 7 \"graph/graph.hpp\"\n\nnamespace\
-    \ m1une {\nnamespace graph {\n\ntemplate <class T = int>\nstruct Edge {\n    using\
-    \ cost_type = T;\n\n    int from;\n    int to;\n    T cost;\n    int id;\n   \
-    \ bool alive;\n\n    Edge() : from(-1), to(-1), cost(T()), id(-1), alive(true)\
-    \ {}\n    Edge(int from_, int to_, T cost_ = T(1), int id_ = -1, bool alive_ =\
-    \ true)\n        : from(from_), to(to_), cost(cost_), id(id_), alive(alive_) {}\n\
-    \n    int other(int v) const {\n        assert(v == from || v == to);\n      \
-    \  return from ^ to ^ v;\n    }\n};\n\ntemplate <class T = int>\nstruct Graph\
-    \ {\n    using edge_type = Edge<T>;\n    using cost_type = T;\n\n   private:\n\
-    \    int _n;\n    int _edge_count;\n    std::vector<std::vector<edge_type>> _g;\n\
-    \    std::vector<std::vector<std::pair<int, int>>> _edge_positions;\n\n   public:\n\
-    \    Graph() : _n(0), _edge_count(0) {}\n    explicit Graph(int n) : _n(n), _edge_count(0),\
+    \n#line 1 \"graph/graph.hpp\"\n\n\n\n#include <array>\n#line 8 \"graph/graph.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\ntemplate <class T = int>\nstruct Edge\
+    \ {\n    using cost_type = T;\n\n    int from;\n    int to;\n    T cost;\n   \
+    \ int id;\n    bool alive;\n\n    Edge() : from(-1), to(-1), cost(T()), id(-1),\
+    \ alive(true) {}\n    Edge(int from_, int to_, T cost_ = T(1), int id_ = -1, bool\
+    \ alive_ = true)\n        : from(from_), to(to_), cost(cost_), id(id_), alive(alive_)\
+    \ {}\n\n    int other(int v) const {\n        assert(v == from || v == to);\n\
+    \        return from ^ to ^ v;\n    }\n};\n\ntemplate <class T = int>\nstruct\
+    \ Graph {\n    using edge_type = Edge<T>;\n    using cost_type = T;\n\n   private:\n\
+    \    struct EdgePositions {\n        std::array<std::pair<int, int>, 2> value{};\n\
+    \        int size = 0;\n\n        void push_back(std::pair<int, int> position)\
+    \ {\n            assert(size < 2);\n            value[size++] = position;\n  \
+    \      }\n    };\n\n    int _n;\n    int _edge_count;\n    std::vector<std::vector<edge_type>>\
+    \ _g;\n    std::vector<EdgePositions> _edge_positions;\n\n   public:\n    Graph()\
+    \ : _n(0), _edge_count(0) {}\n    explicit Graph(int n) : _n(n), _edge_count(0),\
     \ _g(n) {\n        assert(0 <= n);\n    }\n\n    int size() const {\n        return\
     \ _n;\n    }\n\n    bool empty() const {\n        return _n == 0;\n    }\n\n \
     \   int edge_count() const {\n        return _edge_count;\n    }\n\n    int add_vertex()\
@@ -59,61 +62,61 @@ data:
     \        _g[v].push_back(edge_type(v, u, cost, id));\n        _edge_positions.emplace_back();\n\
     \        _edge_positions.back().push_back({u, u_idx});\n        _edge_positions.back().push_back({v,\
     \ v_idx});\n        return id;\n    }\n\n    void set_edge_alive(int id, bool\
-    \ alive) {\n        assert(0 <= id && id < _edge_count);\n        for (auto [v,\
-    \ idx] : _edge_positions[id]) {\n            _g[v][idx].alive = alive;\n     \
-    \   }\n    }\n\n    void erase_edge(int id) {\n        set_edge_alive(id, false);\n\
-    \    }\n\n    void revive_edge(int id) {\n        set_edge_alive(id, true);\n\
-    \    }\n\n    bool is_edge_alive(int id) const {\n        assert(0 <= id && id\
-    \ < _edge_count);\n        assert(!_edge_positions[id].empty());\n        auto\
-    \ [v, idx] = _edge_positions[id][0];\n        return _g[v][idx].alive;\n    }\n\
-    \n    const std::vector<edge_type>& operator[](int v) const {\n        assert(0\
-    \ <= v && v < _n);\n        return _g[v];\n    }\n\n    std::vector<edge_type>&\
-    \ operator[](int v) {\n        assert(0 <= v && v < _n);\n        return _g[v];\n\
-    \    }\n\n    const std::vector<std::vector<edge_type>>& adjacency() const {\n\
-    \        return _g;\n    }\n\n    std::vector<std::vector<edge_type>>& adjacency()\
-    \ {\n        return _g;\n    }\n\n    std::vector<edge_type> edges(bool include_inactive\
-    \ = false) const {\n        std::vector<edge_type> result;\n        result.reserve(_edge_count);\n\
-    \        std::vector<char> used(_edge_count, false);\n        for (int v = 0;\
-    \ v < _n; v++) {\n            for (const auto& e : _g[v]) {\n                if\
-    \ (!include_inactive && !e.alive) continue;\n                if (0 <= e.id &&\
-    \ e.id < _edge_count) {\n                    if (used[e.id]) continue;\n     \
-    \               used[e.id] = true;\n                }\n                result.push_back(e);\n\
-    \            }\n        }\n        return result;\n    }\n\n    Graph reversed()\
-    \ const {\n        Graph result(_n);\n        result._edge_count = _edge_count;\n\
-    \        result._edge_positions.assign(_edge_count, {});\n        for (int v =\
-    \ 0; v < _n; v++) {\n            for (const auto& e : _g[v]) {\n             \
-    \   int idx = int(result._g[e.to].size());\n                result._g[e.to].push_back(edge_type(e.to,\
-    \ e.from, e.cost, e.id, e.alive));\n                if (0 <= e.id && e.id < _edge_count)\
-    \ result._edge_positions[e.id].push_back({e.to, idx});\n            }\n      \
-    \  }\n        return result;\n    }\n};\n\n}  // namespace graph\n}  // namespace\
-    \ m1une\n\n\n#line 15 \"graph/general_weighted_matching.hpp\"\n\nnamespace m1une\
-    \ {\nnamespace graph {\nnamespace internal {\n\n// Primal-dual weighted blossom\
-    \ algorithm using Gabow's event queues.\n// Reference: H. N. Gabow, \"Data Structures\
-    \ for Weighted Matching and\n// Extensions to b-matching and f-factors\", 2016.\n\
-    // Vertices 1..n are atoms; larger indices represent contracted blossoms.\ntemplate\
-    \ <class Cost, class TotalCost>\nclass WeightedBlossomSolver {\n   public:\n \
-    \   using cost_type = Cost;\n    using total_type = TotalCost;\n\n   private:\n\
-    \    enum BlossomLabel : int {\n        separated_label = -2,\n        inner_label\
-    \ = -1,\n        free_label = 0,\n        outer_label = 1\n    };\n    static\
-    \ constexpr cost_type infinity = cost_type(1) << (sizeof(cost_type) * 8 - 2);\n\
-    \n    template <class T>\n    class MutableBinaryHeap {\n       public:\n    \
-    \    struct Node {\n            bool operator<(const Node& rhs) const {\n    \
-    \            if (value < rhs.value) {\n                    return true;\n    \
-    \            }\n                if (rhs.value < value) {\n                   \
-    \ return false;\n                }\n                return id < rhs.id;\n    \
-    \        }\n            T value;\n            int id;\n        };\n\n        MutableBinaryHeap()\
-    \ = default;\n        explicit MutableBinaryHeap(int capacity) : _size(0), _nodes(capacity\
-    \ + 1), _position(capacity, 0) {\n        }\n\n        bool empty() const {\n\
-    \            return _size == 0;\n        }\n        void clear() {\n         \
-    \   while (_size > 0) {\n                _position[_nodes[_size].id] = 0;\n  \
-    \              _size--;\n            }\n        }\n        T min() const {\n \
-    \           return _nodes[1].value;\n        }\n        int argmin() const {\n\
-    \            return _nodes[1].id;\n        }\n        void pop() {\n         \
-    \   if (_size > 0) pop(1);\n        }\n        void erase(int id) {\n        \
-    \    if (_position[id]) pop(_position[id]);\n        }\n        bool has(int id)\
-    \ const {\n            return _position[id] != 0;\n        }\n        void update(int\
-    \ id, T v) {\n            if (!has(id)) return push(id, v);\n            bool\
-    \ up = (v < _nodes[_position[id]].value);\n            _nodes[_position[id]].value\
+    \ alive) {\n        assert(0 <= id && id < _edge_count);\n        for (int i =\
+    \ 0; i < _edge_positions[id].size; ++i) {\n            auto [v, idx] = _edge_positions[id].value[i];\n\
+    \            _g[v][idx].alive = alive;\n        }\n    }\n\n    void erase_edge(int\
+    \ id) {\n        set_edge_alive(id, false);\n    }\n\n    void revive_edge(int\
+    \ id) {\n        set_edge_alive(id, true);\n    }\n\n    bool is_edge_alive(int\
+    \ id) const {\n        assert(0 <= id && id < _edge_count);\n        assert(_edge_positions[id].size\
+    \ != 0);\n        auto [v, idx] = _edge_positions[id].value[0];\n        return\
+    \ _g[v][idx].alive;\n    }\n\n    const std::vector<edge_type>& operator[](int\
+    \ v) const {\n        assert(0 <= v && v < _n);\n        return _g[v];\n    }\n\
+    \n    std::vector<edge_type>& operator[](int v) {\n        assert(0 <= v && v\
+    \ < _n);\n        return _g[v];\n    }\n\n    const std::vector<std::vector<edge_type>>&\
+    \ adjacency() const {\n        return _g;\n    }\n\n    std::vector<std::vector<edge_type>>&\
+    \ adjacency() {\n        return _g;\n    }\n\n    std::vector<edge_type> edges(bool\
+    \ include_inactive = false) const {\n        std::vector<edge_type> result;\n\
+    \        result.reserve(_edge_count);\n        std::vector<char> used(_edge_count,\
+    \ false);\n        for (int v = 0; v < _n; v++) {\n            for (const auto&\
+    \ e : _g[v]) {\n                if (!include_inactive && !e.alive) continue;\n\
+    \                if (0 <= e.id && e.id < _edge_count) {\n                    if\
+    \ (used[e.id]) continue;\n                    used[e.id] = true;\n           \
+    \     }\n                result.push_back(e);\n            }\n        }\n    \
+    \    return result;\n    }\n\n    Graph reversed() const {\n        Graph result(_n);\n\
+    \        result._edge_count = _edge_count;\n        result._edge_positions.assign(_edge_count,\
+    \ {});\n        for (int v = 0; v < _n; v++) {\n            for (const auto& e\
+    \ : _g[v]) {\n                int idx = int(result._g[e.to].size());\n       \
+    \         result._g[e.to].push_back(edge_type(e.to, e.from, e.cost, e.id, e.alive));\n\
+    \                if (0 <= e.id && e.id < _edge_count) result._edge_positions[e.id].push_back({e.to,\
+    \ idx});\n            }\n        }\n        return result;\n    }\n};\n\n}  //\
+    \ namespace graph\n}  // namespace m1une\n\n\n#line 15 \"graph/general_weighted_matching.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\nnamespace internal {\n\n// Primal-dual\
+    \ weighted blossom algorithm using Gabow's event queues.\n// Reference: H. N.\
+    \ Gabow, \"Data Structures for Weighted Matching and\n// Extensions to b-matching\
+    \ and f-factors\", 2016.\n// Vertices 1..n are atoms; larger indices represent\
+    \ contracted blossoms.\ntemplate <class Cost, class TotalCost>\nclass WeightedBlossomSolver\
+    \ {\n   public:\n    using cost_type = Cost;\n    using total_type = TotalCost;\n\
+    \n   private:\n    enum BlossomLabel : int {\n        separated_label = -2,\n\
+    \        inner_label = -1,\n        free_label = 0,\n        outer_label = 1\n\
+    \    };\n    static constexpr cost_type infinity = cost_type(1) << (sizeof(cost_type)\
+    \ * 8 - 2);\n\n    template <class T>\n    class MutableBinaryHeap {\n       public:\n\
+    \        struct Node {\n            bool operator<(const Node& rhs) const {\n\
+    \                if (value < rhs.value) {\n                    return true;\n\
+    \                }\n                if (rhs.value < value) {\n               \
+    \     return false;\n                }\n                return id < rhs.id;\n\
+    \            }\n            T value;\n            int id;\n        };\n\n    \
+    \    MutableBinaryHeap() = default;\n        explicit MutableBinaryHeap(int capacity)\
+    \ : _size(0), _nodes(capacity + 1), _position(capacity, 0) {\n        }\n\n  \
+    \      bool empty() const {\n            return _size == 0;\n        }\n     \
+    \   void clear() {\n            while (_size > 0) {\n                _position[_nodes[_size].id]\
+    \ = 0;\n                _size--;\n            }\n        }\n        T min() const\
+    \ {\n            return _nodes[1].value;\n        }\n        int argmin() const\
+    \ {\n            return _nodes[1].id;\n        }\n        void pop() {\n     \
+    \       if (_size > 0) pop(1);\n        }\n        void erase(int id) {\n    \
+    \        if (_position[id]) pop(_position[id]);\n        }\n        bool has(int\
+    \ id) const {\n            return _position[id] != 0;\n        }\n        void\
+    \ update(int id, T v) {\n            if (!has(id)) return push(id, v);\n     \
+    \       bool up = (v < _nodes[_position[id]].value);\n            _nodes[_position[id]].value\
     \ = v;\n            if (up) {\n                up_heap(_position[id]);\n     \
     \       } else {\n                down_heap(_position[id]);\n            }\n \
     \       }\n        void decrease_key(int id, T v) {\n            if (!has(id))\
@@ -1171,7 +1174,7 @@ data:
   requiredBy:
   - graph/undirected.hpp
   - graph/all.hpp
-  timestamp: '2026-07-14 02:19:12+09:00'
+  timestamp: '2026-08-13 01:41:40+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/general_weighted_matching.test.cpp
