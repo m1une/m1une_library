@@ -123,13 +123,23 @@ data:
     \  Magnitude common =\n            gcd(static_cast<Magnitude>(_denominator), static_cast<Magnitude>(other._denominator));\n\
     \        Wide left_scale = Wide(other._denominator) / static_cast<Wide>(common);\n\
     \        Wide right_scale = Wide(_denominator) / static_cast<Wide>(common);\n\
-    \        assign_normalized(Wide(_numerator) * left_scale + Wide(other._numerator)\
-    \ * right_scale,\n                          Wide(_denominator) * left_scale);\n\
-    \        return *this;\n    }\n\n    constexpr Rational& operator-=(const Rational&\
-    \ other) {\n        return *this += -other;\n    }\n\n    constexpr Rational&\
-    \ operator*=(const Rational& other) {\n        Magnitude first_gcd = gcd(magnitude(Wide(_numerator)),\
-    \ static_cast<Magnitude>(other._denominator));\n        Magnitude second_gcd =\
-    \ gcd(magnitude(Wide(other._numerator)), static_cast<Magnitude>(_denominator));\n\
+    \        Wide numerator =\n            Wide(_numerator) * left_scale + Wide(other._numerator)\
+    \ * right_scale;\n\n        // With both operands already reduced, every factor\
+    \ shared by the new\n        // numerator and denominator must divide `common`.\
+    \  Restricting the\n        // second gcd to that value avoids a full-size gcd\
+    \ against the product\n        // of both denominators, which is especially important\
+    \ for BigInt.\n        Magnitude reduction = common == Magnitude(1)\n        \
+    \                          ? Magnitude(1)\n                                  :\
+    \ gcd(magnitude(numerator), common);\n        if (reduction != Magnitude(1)) {\n\
+    \            numerator /= static_cast<Wide>(reduction);\n        }\n        Wide\
+    \ remaining_denominator = Wide(other._denominator);\n        if (reduction !=\
+    \ Magnitude(1)) {\n            remaining_denominator /= static_cast<Wide>(reduction);\n\
+    \        }\n        _numerator = narrow(numerator);\n        _denominator = narrow(right_scale\
+    \ * remaining_denominator);\n        return *this;\n    }\n\n    constexpr Rational&\
+    \ operator-=(const Rational& other) {\n        return *this += -other;\n    }\n\
+    \n    constexpr Rational& operator*=(const Rational& other) {\n        Magnitude\
+    \ first_gcd = gcd(magnitude(Wide(_numerator)), static_cast<Magnitude>(other._denominator));\n\
+    \        Magnitude second_gcd = gcd(magnitude(Wide(other._numerator)), static_cast<Magnitude>(_denominator));\n\
     \        assign_normalized((Wide(_numerator) / static_cast<Wide>(first_gcd)) *\n\
     \                              (Wide(other._numerator) / static_cast<Wide>(second_gcd)),\n\
     \                          (Wide(_denominator) / static_cast<Wide>(second_gcd))\
@@ -1832,7 +1842,7 @@ data:
   isVerificationFile: true
   path: verify/math/rational.test.cpp
   requiredBy: []
-  timestamp: '2026-08-13 00:26:09+09:00'
+  timestamp: '2026-08-13 01:13:27+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/rational.test.cpp

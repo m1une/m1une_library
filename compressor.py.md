@@ -21,52 +21,53 @@ data:
     \ when their\ndeclaration cost is profitable.  Macros, reserved names, external\
     \ qualified\nnames and member calls, contract functions, and labels remain protected.\n\
     \"\"\"\n\nfrom __future__ import annotations\n\nimport argparse\nimport re\nimport\
-    \ sys\nfrom dataclasses import dataclass\nfrom pathlib import Path\n\n\nCPP_KEYWORDS\
-    \ = {\n    \"alignas\", \"alignof\", \"and\", \"and_eq\", \"asm\", \"auto\", \"\
-    bitand\",\n    \"bitor\", \"bool\", \"break\", \"case\", \"catch\", \"char\",\
-    \ \"char8_t\",\n    \"char16_t\", \"char32_t\", \"class\", \"compl\", \"concept\"\
-    , \"const\",\n    \"consteval\", \"constexpr\", \"constinit\", \"const_cast\"\
-    , \"continue\",\n    \"co_await\", \"co_return\", \"co_yield\", \"decltype\",\
-    \ \"default\", \"delete\",\n    \"do\", \"double\", \"dynamic_cast\", \"else\"\
-    , \"enum\", \"explicit\", \"export\",\n    \"extern\", \"false\", \"float\", \"\
-    for\", \"friend\", \"goto\", \"if\", \"inline\",\n    \"int\", \"long\", \"mutable\"\
-    , \"namespace\", \"new\", \"noexcept\", \"not\",\n    \"not_eq\", \"nullptr\"\
-    , \"operator\", \"or\", \"or_eq\", \"private\", \"protected\",\n    \"public\"\
-    , \"register\", \"reinterpret_cast\", \"requires\", \"return\", \"short\",\n \
-    \   \"signed\", \"sizeof\", \"static\", \"static_assert\", \"static_cast\", \"\
-    struct\",\n    \"switch\", \"template\", \"this\", \"thread_local\", \"throw\"\
-    , \"true\", \"try\",\n    \"typedef\", \"typeid\", \"typename\", \"union\", \"\
-    unsigned\", \"using\", \"virtual\",\n    \"void\", \"volatile\", \"wchar_t\",\
-    \ \"while\", \"xor\", \"xor_eq\", \"import\",\n    \"module\",\n}\n\nBUILTIN_TYPES\
-    \ = {\n    \"auto\", \"bool\", \"char\", \"char8_t\", \"char16_t\", \"char32_t\"\
-    , \"double\",\n    \"float\", \"int\", \"long\", \"short\", \"signed\", \"unsigned\"\
-    , \"void\",\n    \"wchar_t\", \"size_t\", \"ptrdiff_t\", \"int8_t\", \"int16_t\"\
-    , \"int32_t\",\n    \"int64_t\", \"uint8_t\", \"uint16_t\", \"uint32_t\", \"uint64_t\"\
-    , \"__int128\",\n    \"__int128_t\", \"__uint128_t\",\n}\n\nCOMMON_TYPES = {\n\
-    \    \"array\", \"bitset\", \"deque\", \"function\", \"initializer_list\", \"\
-    list\",\n    \"map\", \"multimap\", \"multiset\", \"optional\", \"pair\", \"priority_queue\"\
-    ,\n    \"queue\", \"set\", \"span\", \"stack\", \"string\", \"string_view\", \"\
-    tuple\",\n    \"unordered_map\", \"unordered_multimap\", \"unordered_multiset\"\
-    ,\n    \"unordered_set\", \"variant\", \"vector\",\n}\n\nCV_AND_POINTER = {\"\
-    const\", \"volatile\", \"constexpr\", \"static\", \"mutable\", \"*\", \"&\", \"\
-    &&\"}\n\nCONVENTIONAL_EXTERNAL_DOT_MEMBERS = {\"first\", \"second\"}\nCONVENTIONAL_EXTERNAL_QUALIFIED_MEMBERS\
-    \ = {\"type\", \"value\"}\n\nTYPE_ALIAS_PATTERNS = (\n    (\"unsigned\", \"long\"\
-    , \"long\", \"int\"),\n    (\"signed\", \"long\", \"long\", \"int\"),\n    (\"\
-    unsigned\", \"long\", \"long\"),\n    (\"signed\", \"long\", \"long\"),\n    (\"\
-    long\", \"long\", \"int\"),\n    (\"long\", \"long\"),\n    (\"unsigned\", \"\
-    long\", \"int\"),\n    (\"signed\", \"long\", \"int\"),\n    (\"unsigned\", \"\
-    short\", \"int\"),\n    (\"signed\", \"short\", \"int\"),\n    (\"short\", \"\
-    int\"),\n    (\"long\", \"int\"),\n    (\"unsigned\", \"char\"),\n    (\"signed\"\
-    , \"char\"),\n    (\"unsigned\", \"long\"),\n    (\"signed\", \"long\"),\n   \
-    \ (\"unsigned\", \"short\"),\n    (\"signed\", \"short\"),\n    (\"unsigned\"\
-    , \"int\"),\n    (\"signed\", \"int\"),\n    (\"long\", \"double\"),\n    (\"\
-    void\",),\n    (\"bool\",),\n    (\"char\",),\n    (\"char8_t\",),\n    (\"char16_t\"\
-    ,),\n    (\"char32_t\",),\n    (\"wchar_t\",),\n    (\"short\",),\n    (\"int\"\
-    ,),\n    (\"long\",),\n    (\"signed\",),\n    (\"unsigned\",),\n    (\"float\"\
-    ,),\n    (\"double\",),\n    (\"__int128\",),\n    (\"__int128_t\",),\n    (\"\
-    __uint128_t\",),\n)\n\nTYPE_SPECIFIER_WORDS = {\n    word for pattern in TYPE_ALIAS_PATTERNS\
-    \ for word in pattern\n}\n\nSTD_PACK_ALIAS_TEMPLATES = {\n    \"allocator\": \"\
-    memory\",\n    \"basic_string\": \"string\",\n    \"basic_string_view\": \"string_view\"\
+    \ sys\nfrom collections import Counter\nfrom dataclasses import dataclass\nfrom\
+    \ pathlib import Path\n\n\nCPP_KEYWORDS = {\n    \"alignas\", \"alignof\", \"\
+    and\", \"and_eq\", \"asm\", \"auto\", \"bitand\",\n    \"bitor\", \"bool\", \"\
+    break\", \"case\", \"catch\", \"char\", \"char8_t\",\n    \"char16_t\", \"char32_t\"\
+    , \"class\", \"compl\", \"concept\", \"const\",\n    \"consteval\", \"constexpr\"\
+    , \"constinit\", \"const_cast\", \"continue\",\n    \"co_await\", \"co_return\"\
+    , \"co_yield\", \"decltype\", \"default\", \"delete\",\n    \"do\", \"double\"\
+    , \"dynamic_cast\", \"else\", \"enum\", \"explicit\", \"export\",\n    \"extern\"\
+    , \"false\", \"float\", \"for\", \"friend\", \"goto\", \"if\", \"inline\",\n \
+    \   \"int\", \"long\", \"mutable\", \"namespace\", \"new\", \"noexcept\", \"not\"\
+    ,\n    \"not_eq\", \"nullptr\", \"operator\", \"or\", \"or_eq\", \"private\",\
+    \ \"protected\",\n    \"public\", \"register\", \"reinterpret_cast\", \"requires\"\
+    , \"return\", \"short\",\n    \"signed\", \"sizeof\", \"static\", \"static_assert\"\
+    , \"static_cast\", \"struct\",\n    \"switch\", \"template\", \"this\", \"thread_local\"\
+    , \"throw\", \"true\", \"try\",\n    \"typedef\", \"typeid\", \"typename\", \"\
+    union\", \"unsigned\", \"using\", \"virtual\",\n    \"void\", \"volatile\", \"\
+    wchar_t\", \"while\", \"xor\", \"xor_eq\", \"import\",\n    \"module\",\n}\n\n\
+    BUILTIN_TYPES = {\n    \"auto\", \"bool\", \"char\", \"char8_t\", \"char16_t\"\
+    , \"char32_t\", \"double\",\n    \"float\", \"int\", \"long\", \"short\", \"signed\"\
+    , \"unsigned\", \"void\",\n    \"wchar_t\", \"size_t\", \"ptrdiff_t\", \"int8_t\"\
+    , \"int16_t\", \"int32_t\",\n    \"int64_t\", \"uint8_t\", \"uint16_t\", \"uint32_t\"\
+    , \"uint64_t\", \"__int128\",\n    \"__int128_t\", \"__uint128_t\",\n}\n\nCOMMON_TYPES\
+    \ = {\n    \"array\", \"bitset\", \"deque\", \"function\", \"initializer_list\"\
+    , \"list\",\n    \"map\", \"multimap\", \"multiset\", \"optional\", \"pair\",\
+    \ \"priority_queue\",\n    \"queue\", \"set\", \"span\", \"stack\", \"string\"\
+    , \"string_view\", \"tuple\",\n    \"unordered_map\", \"unordered_multimap\",\
+    \ \"unordered_multiset\",\n    \"unordered_set\", \"variant\", \"vector\",\n}\n\
+    \nCV_AND_POINTER = {\"const\", \"volatile\", \"constexpr\", \"static\", \"mutable\"\
+    , \"*\", \"&\", \"&&\"}\n\nCONVENTIONAL_EXTERNAL_DOT_MEMBERS = {\"first\", \"\
+    second\"}\nCONVENTIONAL_EXTERNAL_QUALIFIED_MEMBERS = {\"type\", \"value\"}\n\n\
+    TYPE_ALIAS_PATTERNS = (\n    (\"unsigned\", \"long\", \"long\", \"int\"),\n  \
+    \  (\"signed\", \"long\", \"long\", \"int\"),\n    (\"unsigned\", \"long\", \"\
+    long\"),\n    (\"signed\", \"long\", \"long\"),\n    (\"long\", \"long\", \"int\"\
+    ),\n    (\"long\", \"long\"),\n    (\"unsigned\", \"long\", \"int\"),\n    (\"\
+    signed\", \"long\", \"int\"),\n    (\"unsigned\", \"short\", \"int\"),\n    (\"\
+    signed\", \"short\", \"int\"),\n    (\"short\", \"int\"),\n    (\"long\", \"int\"\
+    ),\n    (\"unsigned\", \"char\"),\n    (\"signed\", \"char\"),\n    (\"unsigned\"\
+    , \"long\"),\n    (\"signed\", \"long\"),\n    (\"unsigned\", \"short\"),\n  \
+    \  (\"signed\", \"short\"),\n    (\"unsigned\", \"int\"),\n    (\"signed\", \"\
+    int\"),\n    (\"long\", \"double\"),\n    (\"void\",),\n    (\"bool\",),\n   \
+    \ (\"char\",),\n    (\"char8_t\",),\n    (\"char16_t\",),\n    (\"char32_t\",),\n\
+    \    (\"wchar_t\",),\n    (\"short\",),\n    (\"int\",),\n    (\"long\",),\n \
+    \   (\"signed\",),\n    (\"unsigned\",),\n    (\"float\",),\n    (\"double\",),\n\
+    \    (\"__int128\",),\n    (\"__int128_t\",),\n    (\"__uint128_t\",),\n)\n\n\
+    TYPE_SPECIFIER_WORDS = {\n    word for pattern in TYPE_ALIAS_PATTERNS for word\
+    \ in pattern\n}\n\nSTD_PACK_ALIAS_TEMPLATES = {\n    \"allocator\": \"memory\"\
+    ,\n    \"basic_string\": \"string\",\n    \"basic_string_view\": \"string_view\"\
     ,\n    \"complex\": \"complex\",\n    \"deque\": \"deque\",\n    \"forward_list\"\
     : \"forward_list\",\n    \"function\": \"functional\",\n    \"list\": \"list\"\
     ,\n    \"map\": \"map\",\n    \"multimap\": \"map\",\n    \"multiset\": \"set\"\
@@ -362,7 +363,58 @@ data:
     \ is not None:\n                if operand in seen_includes:\n               \
     \     continue\n                seen_includes.add(operand)\n\n        result.append(token)\n\
     \        if keyword in {\"if\", \"ifdef\", \"ifndef\"}:\n            conditional_depth\
-    \ += 1\n    return result\n\n\ndef _variable_rename_plan(\n    tokens: list[Token],\n\
+    \ += 1\n    return result\n\n\ndef _strip_assertions(tokens: list[Token]) -> list[Token]:\n\
+    \    \"\"\"Remove assert/static_assert calls for source-size-constrained builds.\n\
+    \n    Runtime assertions become ``(void)0`` so the surrounding expression keeps\n\
+    \    its type and grammar.  Static assertions, including their trailing\n    semicolon,\
+    \ can be dropped entirely after a successful normal build.\n    \"\"\"\n    result:\
+    \ list[Token] = []\n    i = 0\n    while i < len(tokens):\n        token = tokens[i]\n\
+    \        if (\n            token.kind != \"directive\"\n            and token.text\
+    \ in {\"assert\", \"static_assert\"}\n            and i + 1 < len(tokens)\n  \
+    \          and tokens[i + 1].text == \"(\"\n        ):\n            depth = 0\n\
+    \            end = i + 1\n            while end < len(tokens):\n             \
+    \   if tokens[end].text == \"(\":\n                    depth += 1\n          \
+    \      elif tokens[end].text == \")\":\n                    depth -= 1\n     \
+    \               if depth == 0:\n                        break\n              \
+    \  end += 1\n            if end == len(tokens):\n                result.append(token)\n\
+    \                i += 1\n                continue\n            if token.text ==\
+    \ \"assert\":\n                result.extend(tokenize(\"(void)0\"))\n        \
+    \    elif end + 1 < len(tokens) and tokens[end + 1].text == \";\":\n         \
+    \       end += 1\n            i = end + 1\n            continue\n        result.append(token)\n\
+    \        i += 1\n    return result\n\n\ndef _hoist_direct_includes(tokens: list[Token])\
+    \ -> tuple[list[Token], int]:\n    \"\"\"Move direct includes to the front and\
+    \ return their resulting count.\n\n    Extreme mode targets one known judge platform,\
+    \ so making a conditional\n    include unconditional is intentional: it lets generated\
+    \ keyword macros be\n    defined after every system header without polluting those\
+    \ headers.\n    \"\"\"\n    includes: list[Token] = []\n    body: list[Token]\
+    \ = []\n    seen: set[str] = set()\n    for token in tokens:\n        operand\
+    \ = (\n            _direct_include_operand(token.text)\n            if token.kind\
+    \ == \"directive\"\n            else None\n        )\n        if operand is None:\n\
+    \            body.append(token)\n        elif operand not in seen:\n         \
+    \   seen.add(operand)\n            includes.append(token)\n    return includes\
+    \ + body, len(includes)\n\n\ndef _keyword_macro_compression(\n    tokens: list[Token],\
+    \ insertion: int,\n) -> tuple[list[Token], dict[str, str]]:\n    \"\"\"Alias profitable\
+    \ C++ keywords after all includes with short macros.\"\"\"\n    used: set[str]\
+    \ = {\n        token.text for token in tokens if token.kind == \"identifier\"\n\
+    \    }\n    for token in tokens:\n        if token.kind == \"directive\":\n  \
+    \          used.update(re.findall(r\"[A-Za-z_][A-Za-z_0-9]*\", token.text))\n\n\
+    \    names = (\n        name for name in _short_names()\n        if name not in\
+    \ used and name not in CPP_KEYWORDS and not name.startswith(\"_\")\n    )\n  \
+    \  counts = Counter(\n        token.text for token in tokens[insertion:]\n   \
+    \     if token.kind != \"directive\" and token.text in CPP_KEYWORDS\n    )\n \
+    \   ordered = sorted(\n        counts.items(),\n        key=lambda item: (-item[1]\
+    \ * max(0, len(item[0]) - 2), item[0]),\n    )\n    aliases: dict[str, str] =\
+    \ {}\n    candidate = next(names)\n    for keyword, count in ordered:\n      \
+    \  declaration_size = len(f\"#define {candidate} {keyword}\\n\")\n        saving\
+    \ = count * (len(keyword) - len(candidate)) - declaration_size\n        if saving\
+    \ <= 0:\n            continue\n        aliases[keyword] = candidate\n        candidate\
+    \ = next(names)\n\n    definitions = [\n        Token(\"directive\", f\"#define\
+    \ {alias} {keyword}\")\n        for keyword, alias in aliases.items()\n    ]\n\
+    \    result = tokens[:insertion] + definitions + tokens[insertion:]\n    first_code\
+    \ = insertion + len(definitions)\n    for i in range(first_code, len(result)):\n\
+    \        token = result[i]\n        if token.kind != \"directive\" and token.text\
+    \ in aliases:\n            result[i] = Token(token.kind, aliases[token.text])\n\
+    \    return result, aliases\n\n\ndef _variable_rename_plan(\n    tokens: list[Token],\n\
     ) -> tuple[dict[str, str], frozenset[int]]:\n    \"\"\"Build replacements and\
     \ positions that refer to external names.\"\"\"\n    known_types = _known_types(tokens)\n\
     \    declared_types = _declared_type_names(tokens)\n    declared_namespaces =\
@@ -611,20 +663,25 @@ data:
     \ comments,\n    # and multi-character punctuators.  Each token participates in\
     \ at most two\n    # such checks, so the total amount of text examined remains\
     \ linear.\n    combined = tokenize(previous.text + current.text)\n    return combined\
-    \ != [previous, current]\n\n\ndef minify(source: str, rename: bool = True) ->\
-    \ tuple[str, dict[str, str]]:\n    tokens = _filter_directives(tokenize(source))\n\
-    \    rename_exclusions: frozenset[int] = frozenset()\n    if rename:\n       \
-    \ renames, rename_exclusions = _variable_rename_plan(tokens)\n    else:\n    \
-    \    renames = {}\n    aliases: list[Alias] = []\n    type_insert = namespace_insert\
+    \ != [previous, current]\n\n\ndef minify(\n    source: str, rename: bool = True,\
+    \ extreme: bool = False,\n) -> tuple[str, dict[str, str]]:\n    tokens = _filter_directives(tokenize(source))\n\
+    \    if extreme:\n        tokens = _strip_assertions(tokens)\n        tokens,\
+    \ include_count = _hoist_direct_includes(tokens)\n    else:\n        include_count\
+    \ = 0\n    rename_exclusions: frozenset[int] = frozenset()\n    if rename:\n \
+    \       renames, rename_exclusions = _variable_rename_plan(tokens)\n    else:\n\
+    \        renames = {}\n    aliases: list[Alias] = []\n    type_insert = namespace_insert\
     \ = 0\n    if rename:\n        aliases, type_insert, namespace_insert = _compression_aliases(tokens,\
     \ renames)\n        tokens = _transform_tokens(\n            tokens, renames,\
     \ aliases, type_insert, namespace_insert,\n            rename_exclusions,\n  \
     \      )\n        for alias in aliases:\n            renames[_alias_key(alias)]\
-    \ = alias.name\n    output: list[str] = []\n    previous: Token | None = None\n\
-    \n    for token in tokens:\n        if token.kind == \"directive\":\n        \
-    \    if output and not output[-1].endswith(\"\\n\"):\n                output.append(\"\
-    \\n\")\n            output.append(token.text + \"\\n\")\n            previous\
-    \ = None\n            continue\n        if previous is not None and _needs_space(previous,\
+    \ = alias.name\n    if extreme:\n        tokens, keyword_aliases = _keyword_macro_compression(\n\
+    \            tokens, include_count,\n        )\n        for keyword, alias in\
+    \ keyword_aliases.items():\n            renames[f\"keyword:{keyword}\"] = alias\n\
+    \    output: list[str] = []\n    previous: Token | None = None\n\n    for token\
+    \ in tokens:\n        if token.kind == \"directive\":\n            if output and\
+    \ not output[-1].endswith(\"\\n\"):\n                output.append(\"\\n\")\n\
+    \            output.append(token.text + \"\\n\")\n            previous = None\n\
+    \            continue\n        if previous is not None and _needs_space(previous,\
     \ token):\n            output.append(\" \")\n        output.append(token.text)\n\
     \        previous = token\n\n    result = \"\".join(output).rstrip()\n    return\
     \ (result + \"\\n\" if result else \"\"), renames\n\n\ndef main() -> int:\n  \
@@ -633,18 +690,22 @@ data:
     \ help=\"input file (default: stdin)\")\n    parser.add_argument(\"-o\", \"--output\"\
     , type=Path, help=\"output file (default: stdout)\")\n    parser.add_argument(\"\
     --no-rename\", action=\"store_true\", help=\"only remove comments and whitespace\"\
-    )\n    parser.add_argument(\"--stats\", action=\"store_true\", help=\"print size\
-    \ and name-compression statistics to stderr\")\n    args = parser.parse_args()\n\
-    \n    source = args.input.read_text(encoding=\"utf-8\") if args.input else sys.stdin.read()\n\
-    \    result, renames = minify(source, rename=not args.no_rename)\n    if args.output:\n\
-    \        args.output.write_text(result, encoding=\"utf-8\")\n    else:\n     \
-    \   sys.stdout.write(result)\n\n    if args.stats:\n        source_size = len(source.encode(\"\
-    utf-8\"))\n        result_size = len(result.encode(\"utf-8\"))\n        reduction\
-    \ = 0.0 if not source_size else 100.0 * (source_size - result_size) / source_size\n\
-    \        print(\n            f\"{source_size} -> {result_size} bytes ({reduction:.1f}%\
-    \ smaller), \"\n            f\"renamed/aliased {len(renames)} names\",\n     \
-    \       file=sys.stderr,\n        )\n    return 0\n\n\nif __name__ == \"__main__\"\
-    :\n    raise SystemExit(main())\n"
+    )\n    parser.add_argument(\n        \"--extreme\",\n        action=\"store_true\"\
+    ,\n        help=(\n            \"target-specific size mode: hoist direct includes,\
+    \ remove assertions, \"\n            \"and alias profitable C++ keywords with\
+    \ macros\"\n        ),\n    )\n    parser.add_argument(\"--stats\", action=\"\
+    store_true\", help=\"print size and name-compression statistics to stderr\")\n\
+    \    args = parser.parse_args()\n\n    source = args.input.read_text(encoding=\"\
+    utf-8\") if args.input else sys.stdin.read()\n    result, renames = minify(\n\
+    \        source, rename=not args.no_rename, extreme=args.extreme,\n    )\n   \
+    \ if args.output:\n        args.output.write_text(result, encoding=\"utf-8\")\n\
+    \    else:\n        sys.stdout.write(result)\n\n    if args.stats:\n        source_size\
+    \ = len(source.encode(\"utf-8\"))\n        result_size = len(result.encode(\"\
+    utf-8\"))\n        reduction = 0.0 if not source_size else 100.0 * (source_size\
+    \ - result_size) / source_size\n        print(\n            f\"{source_size} ->\
+    \ {result_size} bytes ({reduction:.1f}% smaller), \"\n            f\"renamed/aliased\
+    \ {len(renames)} names\",\n            file=sys.stderr,\n        )\n    return\
+    \ 0\n\n\nif __name__ == \"__main__\":\n    raise SystemExit(main())\n"
   dependsOn: []
   isVerificationFile: false
   path: compressor.py
