@@ -1165,6 +1165,16 @@ struct BigInt {
         return {q, r};
     }
 
+    friend BigInt gcd(BigInt first, BigInt second) {
+        first.sign = 1;
+        second.sign = 1;
+        while (!second.is_zero()) {
+            first %= second;
+            std::swap(first, second);
+        }
+        return first;
+    }
+
     BigInt& operator/=(const BigInt& other) {
         return *this = divmod(*this, other).first;
     }
