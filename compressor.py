@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import re
 import sys
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -766,6 +767,118 @@ def _filter_directives(tokens: list[Token]) -> list[Token]:
     return result
 
 
+def _strip_assertions(tokens: list[Token]) -> list[Token]:
+    """Remove assert/static_assert calls for source-size-constrained builds.
+
+    Runtime assertions become ``(void)0`` so the surrounding expression keeps
+    its type and grammar.  Static assertions, including their trailing
+    semicolon, can be dropped entirely after a successful normal build.
+    """
+    result: list[Token] = []
+    i = 0
+    while i < len(tokens):
+        token = tokens[i]
+        if (
+            token.kind != "directive"
+            and token.text in {"assert", "static_assert"}
+            and i + 1 < len(tokens)
+            and tokens[i + 1].text == "("
+        ):
+            depth = 0
+            end = i + 1
+            while end < len(tokens):
+                if tokens[end].text == "(":
+                    depth += 1
+                elif tokens[end].text == ")":
+                    depth -= 1
+                    if depth == 0:
+                        break
+                end += 1
+            if end == len(tokens):
+                result.append(token)
+                i += 1
+                continue
+            if token.text == "assert":
+                result.extend(tokenize("(void)0"))
+            elif end + 1 < len(tokens) and tokens[end + 1].text == ";":
+                end += 1
+            i = end + 1
+            continue
+        result.append(token)
+        i += 1
+    return result
+
+
+def _hoist_direct_includes(tokens: list[Token]) -> tuple[list[Token], int]:
+    """Move direct includes to the front and return their resulting count.
+
+    Extreme mode targets one known judge platform, so making a conditional
+    include unconditional is intentional: it lets generated keyword macros be
+    defined after every system header without polluting those headers.
+    """
+    includes: list[Token] = []
+    body: list[Token] = []
+    seen: set[str] = set()
+    for token in tokens:
+        operand = (
+            _direct_include_operand(token.text)
+            if token.kind == "directive"
+            else None
+        )
+        if operand is None:
+            body.append(token)
+        elif operand not in seen:
+            seen.add(operand)
+            includes.append(token)
+    return includes + body, len(includes)
+
+
+def _keyword_macro_compression(
+    tokens: list[Token], insertion: int,
+) -> tuple[list[Token], dict[str, str]]:
+    """Alias profitable C++ keywords after all includes with short macros."""
+    used: set[str] = {
+        token.text for token in tokens if token.kind == "identifier"
+    }
+    for token in tokens:
+        if token.kind == "directive":
+            used.update(re.findall(r"[A-Za-z_][A-Za-z_0-9]*", token.text))
+
+    names = (
+        name for name in _short_names()
+        if name not in used and name not in CPP_KEYWORDS and not name.startswith("_")
+    )
+    counts = Counter(
+        token.text for token in tokens[insertion:]
+        if token.kind != "directive" and token.text in CPP_KEYWORDS
+    )
+    ordered = sorted(
+        counts.items(),
+        key=lambda item: (-item[1] * max(0, len(item[0]) - 2), item[0]),
+    )
+    aliases: dict[str, str] = {}
+    candidate = next(names)
+    for keyword, count in ordered:
+        declaration_size = len(f"#define {candidate} {keyword}\n")
+        saving = count * (len(keyword) - len(candidate)) - declaration_size
+        if saving <= 0:
+            continue
+        aliases[keyword] = candidate
+        candidate = next(names)
+
+    definitions = [
+        Token("directive", f"#define {alias} {keyword}")
+        for keyword, alias in aliases.items()
+    ]
+    result = tokens[:insertion] + definitions + tokens[insertion:]
+    first_code = insertion + len(definitions)
+    for i in range(first_code, len(result)):
+        token = result[i]
+        if token.kind != "directive" and token.text in aliases:
+            result[i] = Token(token.kind, aliases[token.text])
+    return result, aliases
+
+
 def _variable_rename_plan(
     tokens: list[Token],
 ) -> tuple[dict[str, str], frozenset[int]]:
@@ -1286,8 +1399,15 @@ def _needs_space(previous: Token, current: Token) -> bool:
     return combined != [previous, current]
 
 
-def minify(source: str, rename: bool = True) -> tuple[str, dict[str, str]]:
+def minify(
+    source: str, rename: bool = True, extreme: bool = False,
+) -> tuple[str, dict[str, str]]:
     tokens = _filter_directives(tokenize(source))
+    if extreme:
+        tokens = _strip_assertions(tokens)
+        tokens, include_count = _hoist_direct_includes(tokens)
+    else:
+        include_count = 0
     rename_exclusions: frozenset[int] = frozenset()
     if rename:
         renames, rename_exclusions = _variable_rename_plan(tokens)
@@ -1303,6 +1423,12 @@ def minify(source: str, rename: bool = True) -> tuple[str, dict[str, str]]:
         )
         for alias in aliases:
             renames[_alias_key(alias)] = alias.name
+    if extreme:
+        tokens, keyword_aliases = _keyword_macro_compression(
+            tokens, include_count,
+        )
+        for keyword, alias in keyword_aliases.items():
+            renames[f"keyword:{keyword}"] = alias
     output: list[str] = []
     previous: Token | None = None
 
@@ -1327,11 +1453,21 @@ def main() -> int:
     parser.add_argument("input", nargs="?", type=Path, help="input file (default: stdin)")
     parser.add_argument("-o", "--output", type=Path, help="output file (default: stdout)")
     parser.add_argument("--no-rename", action="store_true", help="only remove comments and whitespace")
+    parser.add_argument(
+        "--extreme",
+        action="store_true",
+        help=(
+            "target-specific size mode: hoist direct includes, remove assertions, "
+            "and alias profitable C++ keywords with macros"
+        ),
+    )
     parser.add_argument("--stats", action="store_true", help="print size and name-compression statistics to stderr")
     args = parser.parse_args()
 
     source = args.input.read_text(encoding="utf-8") if args.input else sys.stdin.read()
-    result, renames = minify(source, rename=not args.no_rename)
+    result, renames = minify(
+        source, rename=not args.no_rename, extreme=args.extreme,
+    )
     if args.output:
         args.output.write_text(result, encoding="utf-8")
     else:

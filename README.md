@@ -161,6 +161,20 @@ comments and escaped newlines in translation-phase order, and preserves other
 preprocessor directives, user-defined literals, string and character literals,
 and raw strings.
 
+For a fixed judge target with an unusually strict source-size limit, enable the
+additional source-golfing pass:
+
+```sh
+python3 compressor.py bundled.cpp -o submission.cpp --extreme --stats
+```
+
+`--extreme` keeps algorithm implementations (including x86 SIMD code), but
+hoists direct includes, removes `assert` and `static_assert` calls, and replaces
+profitable C++ keywords with short macros. Hoisting makes conditional includes
+unconditional, so use this mode only after expanding the source and only when
+all of its included headers are valid on the target judge. Run and test the
+ordinary build before relying on the assertion-free output.
+
 ## Documentation Conventions
 
 * Ranges are half-open: `[l, r)` includes `l` and excludes `r`.
