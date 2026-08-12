@@ -7,7 +7,9 @@ documentation_of: ../../graph/dijkstra.hpp
 
 Dijkstra's algorithm computes shortest paths from one or more sources when all
 edge costs are non-negative. It repeatedly fixes the unreached vertex with the
-smallest tentative distance, using a priority queue.
+smallest tentative distance, using an indexed binary heap. The heap stores each
+vertex at most once and updates its position after a distance decrease, so it
+uses $O(N)$ memory and does not copy the cost into stale queue entries.
 
 Use it for typical weighted shortest path problems with costs like time,
 distance, or price. Do not use it if a reachable edge can have a negative cost;

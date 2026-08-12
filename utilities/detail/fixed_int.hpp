@@ -73,7 +73,7 @@ class FixedInt {
             if (digit < '0' || digit > '9') {
                 throw std::invalid_argument("invalid fixed-width integer");
             }
-            result.multiply_small(10);
+            result.multiply_unsigned_small(10);
             result += FixedInt(static_cast<unsigned>(digit - '0'));
         }
         *this = negative ? -result : result;
@@ -140,6 +140,11 @@ class FixedInt {
         return *this;
     }
 
+    constexpr FixedInt& multiply_small(std::uint64_t value) {
+        multiply_unsigned_small(value);
+        return *this;
+    }
+
     constexpr FixedInt& operator/=(const FixedInt& other) {
         return *this = divmod(*this, other).first;
     }
@@ -153,13 +158,29 @@ class FixedInt {
         const bool negative = is_negative();
         LimbArray magnitude = unsigned_magnitude();
 
-        std::string result;
+        constexpr std::size_t chunk_capacity =
+            (Bits * 30103 / 100000 + 9) / 9;
+        std::array<std::uint32_t, chunk_capacity> chunks{};
+        std::size_t chunk_count = 0;
         while (!magnitude_is_zero(magnitude)) {
-            const unsigned digit = divide_unsigned_by_ten(magnitude);
-            result.push_back(static_cast<char>('0' + digit));
+            chunks[chunk_count++] = static_cast<std::uint32_t>(
+                divide_unsigned_by_small(magnitude, 1000000000)
+            );
         }
+
+        std::string result;
+        result.reserve(chunk_count * 9 + negative);
         if (negative) result.push_back('-');
-        std::reverse(result.begin(), result.end());
+        result += std::to_string(chunks[chunk_count - 1]);
+        char digits[9];
+        while (--chunk_count != 0) {
+            std::uint32_t chunk = chunks[chunk_count - 1];
+            for (int index = 8; index >= 0; --index) {
+                digits[index] = static_cast<char>('0' + chunk % 10);
+                chunk /= 10;
+            }
+            result.append(digits, 9);
+        }
         return result;
     }
 
@@ -185,6 +206,46 @@ class FixedInt {
         if (quotient_negative) quotient = -quotient;
         if (remainder_negative) remainder = -remainder;
         return std::make_pair(quotient, remainder);
+    }
+
+    friend constexpr std::pair<FixedInt, std::int64_t> divmod_small(
+        const FixedInt& dividend,
+        std::uint32_t divisor
+    ) {
+        if (divisor == 0) {
+            throw std::domain_error("fixed-width integer division by zero");
+        }
+
+        LimbArray quotient_limbs = dividend.unsigned_magnitude();
+        const std::uint64_t unsigned_remainder =
+            divide_unsigned_by_small(quotient_limbs, divisor);
+        FixedInt quotient;
+        quotient.limbs_ = quotient_limbs;
+        if (dividend.is_negative()) quotient = -quotient;
+        const std::int64_t remainder = dividend.is_negative()
+                                           ? -std::int64_t(unsigned_remainder)
+                                           : std::int64_t(unsigned_remainder);
+        return std::make_pair(quotient, remainder);
+    }
+
+    friend constexpr std::int64_t mod_small(
+        const FixedInt& dividend,
+        std::uint32_t divisor
+    ) {
+        if (divisor == 0) {
+            throw std::domain_error("fixed-width integer division by zero");
+        }
+        const bool negative = dividend.is_negative();
+        const std::uint64_t remainder = negative
+                                            ? remainder_unsigned_by_small(
+                                                  dividend.unsigned_magnitude(),
+                                                  divisor
+                                              )
+                                            : remainder_unsigned_by_small(
+                                                  dividend.limbs_, divisor
+                                              );
+        return negative ? -std::int64_t(remainder)
+                        : std::int64_t(remainder);
     }
 
     friend constexpr FixedInt operator+(
@@ -290,7 +351,7 @@ class FixedInt {
         return result;
     }
 
-    constexpr void multiply_small(std::uint64_t value) {
+    constexpr void multiply_unsigned_small(std::uint64_t value) {
         __uint128_t carry = 0;
         for (std::size_t index = 0; index < limb_count; ++index) {
             const __uint128_t current =
@@ -370,17 +431,40 @@ class FixedInt {
         return true;
     }
 
-    static unsigned divide_unsigned_by_ten(LimbArray& value) {
-        __uint128_t remainder = 0;
+    static constexpr std::uint64_t divide_unsigned_by_small(
+        LimbArray& value,
+        std::uint32_t divisor
+    ) {
+        std::uint64_t remainder = 0;
         for (std::size_t offset = 0; offset < limb_count; ++offset) {
             const std::size_t index = limb_count - 1 - offset;
-            const __uint128_t current =
-                (remainder << 64) | value[index];
-            value[index] = static_cast<std::uint64_t>(current / 10);
-            remainder = current % 10;
+            const std::uint64_t high =
+                (remainder << 32) | (value[index] >> 32);
+            const std::uint64_t quotient_high = high / divisor;
+            remainder = high % divisor;
+            const std::uint64_t low =
+                (remainder << 32) | std::uint32_t(value[index]);
+            const std::uint64_t quotient_low = low / divisor;
+            remainder = low % divisor;
+            value[index] = (quotient_high << 32) | quotient_low;
         }
-        return static_cast<unsigned>(remainder);
+        return remainder;
     }
+
+    static constexpr std::uint64_t remainder_unsigned_by_small(
+        const LimbArray& value,
+        std::uint32_t divisor
+    ) {
+        std::uint64_t remainder = 0;
+        for (std::size_t offset = 0; offset < limb_count; ++offset) {
+            const std::size_t index = limb_count - 1 - offset;
+            remainder = ((remainder << 32) | (value[index] >> 32)) % divisor;
+            remainder =
+                ((remainder << 32) | std::uint32_t(value[index])) % divisor;
+        }
+        return remainder;
+    }
+
 };
 
 }  // namespace detail

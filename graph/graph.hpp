@@ -1,6 +1,7 @@
 #ifndef M1UNE_GRAPH_GRAPH_HPP
 #define M1UNE_GRAPH_GRAPH_HPP 1
 
+#include <array>
 #include <cassert>
 #include <utility>
 #include <vector>
@@ -34,10 +35,20 @@ struct Graph {
     using cost_type = T;
 
    private:
+    struct EdgePositions {
+        std::array<std::pair<int, int>, 2> value{};
+        int size = 0;
+
+        void push_back(std::pair<int, int> position) {
+            assert(size < 2);
+            value[size++] = position;
+        }
+    };
+
     int _n;
     int _edge_count;
     std::vector<std::vector<edge_type>> _g;
-    std::vector<std::vector<std::pair<int, int>>> _edge_positions;
+    std::vector<EdgePositions> _edge_positions;
 
    public:
     Graph() : _n(0), _edge_count(0) {}
@@ -89,7 +100,8 @@ struct Graph {
 
     void set_edge_alive(int id, bool alive) {
         assert(0 <= id && id < _edge_count);
-        for (auto [v, idx] : _edge_positions[id]) {
+        for (int i = 0; i < _edge_positions[id].size; ++i) {
+            auto [v, idx] = _edge_positions[id].value[i];
             _g[v][idx].alive = alive;
         }
     }
@@ -104,8 +116,8 @@ struct Graph {
 
     bool is_edge_alive(int id) const {
         assert(0 <= id && id < _edge_count);
-        assert(!_edge_positions[id].empty());
-        auto [v, idx] = _edge_positions[id][0];
+        assert(_edge_positions[id].size != 0);
+        auto [v, idx] = _edge_positions[id].value[0];
         return _g[v][idx].alive;
     }
 

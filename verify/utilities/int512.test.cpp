@@ -24,6 +24,8 @@ void test_small_arithmetic() {
     static_assert(sizeof(Int512) == 64);
     constexpr Int512 six = Int512(2) * Int512(3);
     static_assert(six == Int512(6));
+    constexpr Int512 forty_two = Int512(6).multiply_small(7);
+    static_assert(forty_two == Int512(42));
     static_assert(Int512(-7) < Int512(2));
     static_assert((-Int512(-9)).sign() == 1);
 
@@ -87,6 +89,10 @@ void test_division() {
     static_assert(Int512(7) / Int512(3) == Int512(2));
     static_assert(Int512(-7) / Int512(3) == Int512(-2));
     static_assert(Int512(-7) % Int512(3) == Int512(-1));
+    constexpr auto small_division = divmod_small(Int512(-100), 7);
+    static_assert(small_division.first == Int512(-14));
+    static_assert(small_division.second == -2);
+    static_assert(mod_small(Int512(-100), 7) == -2);
 
     std::mt19937_64 random(0x685113e57a4a94f1ULL);
     for (int iteration = 0; iteration < 4000; ++iteration) {
@@ -101,6 +107,19 @@ void test_division() {
         assert(result.first.to_string() == std::to_string(dividend / divisor));
         assert(result.second.to_string() == std::to_string(dividend % divisor));
         assert(result.first * divisor + result.second == dividend);
+
+        const std::uint32_t small_divisor =
+            static_cast<std::uint32_t>(random()) | 1;
+        const auto [small_quotient, small_remainder] =
+            divmod_small(Int512(dividend), small_divisor);
+        assert(
+            small_quotient.to_string() ==
+            std::to_string(dividend / std::int64_t(small_divisor))
+        );
+        assert(small_remainder == dividend % std::int64_t(small_divisor));
+        assert(
+            mod_small(Int512(dividend), small_divisor) == small_remainder
+        );
     }
 
     const Int512 dividend(
@@ -111,6 +130,12 @@ void test_division() {
     const auto [quotient, remainder] = divmod(dividend, divisor);
     assert(quotient * divisor + remainder == dividend);
     assert(remainder >= 0 && remainder < divisor);
+
+    const auto [small_quotient, small_remainder] =
+        divmod_small(dividend, 1000000007);
+    assert(
+        small_quotient * Int512(1000000007) + small_remainder == dividend
+    );
 
     Int512 minimum = 1;
     for (int exponent = 0; exponent < 511; ++exponent) minimum *= 2;
