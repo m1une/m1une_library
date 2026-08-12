@@ -44,6 +44,7 @@ normalized Knuth division to avoid transform overhead.
 | `operator/`, `operator/=` | Returns the quotient, truncated toward zero. | $O(N\log N)$ on the balanced Newton path; $O(N\log M)$ on the blocked path; $O(NM)$ for the bounded fallback |
 | `operator%`, `operator%=` | Returns the remainder associated with truncated division. | Same as division |
 | `divmod(const BigInt& a, const BigInt& b)` | Returns `std::pair<BigInt, BigInt>` containing `a / b` and `a % b`. | Same as division |
+| `gcd(BigInt a, BigInt b)` | Returns the nonnegative greatest common divisor of `abs(a)` and `abs(b)`. | $O(N^2\log N)$ in the worst case |
 | `<`, `>`, `<=`, `>=`, `==`, `!=` | Compares two values. | $O(N+M)$ |
 | `operator<<`, `operator>>` | Writes or reads decimal text through standard streams. | $O(N)$ |
 
@@ -61,6 +62,9 @@ zero, `a == (a / b) * b + a % b`, the nonzero remainder has the sign of `a`,
 and its absolute value is smaller than `abs(b)`. Division by zero throws
 `std::domain_error`.
 
+`gcd(0, 0)` is defined as `0`. The arguments are passed by value, so computing a
+greatest common divisor does not mutate the caller's values.
+
 ## Example
 
 ```cpp
@@ -76,6 +80,7 @@ int main() {
     BigInt sum = a + b;
     BigInt diff = a - b;
     BigInt product = a * b;
+    BigInt common_divisor = gcd(a, b);
 
     // std::pair<BigInt, BigInt>
     auto [quotient, remainder] = divmod(a, b);
@@ -83,6 +88,7 @@ int main() {
     std::cout << "Sum: " << sum << "\n";
     std::cout << "Difference: " << diff << "\n";
     std::cout << "Product: " << product << "\n";
+    std::cout << "GCD: " << common_divisor << "\n";
     std::cout << "Quotient: " << quotient << " R: " << remainder << "\n";
 
     if (a > b) {
