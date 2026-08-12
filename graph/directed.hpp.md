@@ -1078,34 +1078,49 @@ data:
     \ dag_shortest_path(\n    const Graph<T>& g, int s, T inf = std::numeric_limits<T>::max()\
     \ / T(4)) {\n    return dag_shortest_path(g, std::vector<int>{s}, inf);\n}\n\n\
     }  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/dijkstra.hpp\"\
-    \n\n\n\n#line 11 \"graph/dijkstra.hpp\"\n\n#line 13 \"graph/dijkstra.hpp\"\n\n\
+    \n\n\n\n#line 9 \"graph/dijkstra.hpp\"\n\n#line 11 \"graph/dijkstra.hpp\"\n\n\
     namespace m1une {\nnamespace graph {\n\ntemplate <class T>\nstruct DijkstraResult\
-    \ {\n    std::vector<T> dist;\n    std::vector<int> parent;\n    std::vector<int>\
-    \ parent_edge;\n    T inf;\n\n    bool reachable(int v) const {\n        assert(0\
-    \ <= v && v < int(dist.size()));\n        return dist[v] != inf;\n    }\n\n  \
-    \  std::vector<int> path(int t) const {\n        assert(reachable(t));\n     \
-    \   std::vector<int> result;\n        for (int v = t; v != -1; v = parent[v])\
+    \ {\n    std::vector<T> dist;\n    std::vector<char> reached;\n    std::vector<int>\
+    \ parent;\n    std::vector<int> parent_edge;\n    T inf = T();\n\n    bool reachable(int\
+    \ v) const {\n        assert(0 <= v && v < int(dist.size()));\n        return\
+    \ reached[v];\n    }\n\n    std::vector<int> path(int t) const {\n        assert(reachable(t));\n\
+    \        std::vector<int> result;\n        for (int v = t; v != -1; v = parent[v])\
     \ result.push_back(v);\n        std::reverse(result.begin(), result.end());\n\
-    \        return result;\n    }\n};\n\ntemplate <class T>\nDijkstraResult<T> dijkstra(const\
-    \ Graph<T>& g, const std::vector<int>& sources,\n                           T\
-    \ inf = std::numeric_limits<T>::max() / T(4)) {\n    int n = g.size();\n    DijkstraResult<T>\
-    \ result;\n    result.dist.assign(n, inf);\n    result.parent.assign(n, -1);\n\
-    \    result.parent_edge.assign(n, -1);\n    result.inf = inf;\n\n    using P =\
-    \ std::pair<T, int>;\n    std::priority_queue<P, std::vector<P>, std::greater<P>>\
-    \ que;\n    for (int s : sources) {\n        assert(0 <= s && s < n);\n      \
-    \  if (result.dist[s] == T(0)) continue;\n        result.dist[s] = T(0);\n   \
-    \     que.emplace(T(0), s);\n    }\n\n    while (!que.empty()) {\n        auto\
-    \ [d, v] = que.top();\n        que.pop();\n        if (result.dist[v] != d) continue;\n\
-    \        for (const auto& e : g[v]) {\n            if (!e.alive) continue;\n \
-    \           T nd = d + e.cost;\n            if (result.dist[e.to] <= nd) continue;\n\
-    \            result.dist[e.to] = nd;\n            result.parent[e.to] = v;\n \
-    \           result.parent_edge[e.to] = e.id;\n            que.emplace(nd, e.to);\n\
-    \        }\n    }\n\n    return result;\n}\n\ntemplate <class T>\nDijkstraResult<T>\
-    \ dijkstra(const Graph<T>& g, int s, T inf = std::numeric_limits<T>::max() / T(4))\
-    \ {\n    return dijkstra(g, std::vector<int>{s}, inf);\n}\n\n}  // namespace graph\n\
-    }  // namespace m1une\n\n\n#line 1 \"graph/k_shortest_walk.hpp\"\n\n\n\n#line\
-    \ 10 \"graph/k_shortest_walk.hpp\"\n\n#line 12 \"graph/k_shortest_walk.hpp\"\n\
-    \nnamespace m1une {\nnamespace graph {\n\nnamespace internal {\n\ntemplate <class\
+    \        return result;\n    }\n};\n\nnamespace internal {\n\ntemplate <class\
+    \ T>\nstruct DijkstraQueueNode {\n    T dist;\n    int vertex;\n};\n\ntemplate\
+    \ <class T>\nstruct DijkstraQueueCompare {\n    bool operator()(const DijkstraQueueNode<T>&\
+    \ first,\n                    const DijkstraQueueNode<T>& second) const {\n  \
+    \      return second.dist < first.dist;\n    }\n};\n\n}  // namespace internal\n\
+    \ntemplate <class T>\nDijkstraResult<T> dijkstra(const Graph<T>& g,\n        \
+    \                   const std::vector<int>& sources) {\n    int n = g.size();\n\
+    \    DijkstraResult<T> result;\n    result.dist.resize(n);\n    result.reached.assign(n,\
+    \ false);\n    result.parent.assign(n, -1);\n    result.parent_edge.assign(n,\
+    \ -1);\n\n    using Node = internal::DijkstraQueueNode<T>;\n    using Compare\
+    \ = internal::DijkstraQueueCompare<T>;\n    std::priority_queue<Node, std::vector<Node>,\
+    \ Compare> que;\n    for (int s : sources) {\n        assert(0 <= s && s < n);\n\
+    \        if (result.reached[s]) continue;\n        result.reached[s] = true;\n\
+    \        result.dist[s] = T();\n        que.push(Node{T(), s});\n    }\n\n   \
+    \ while (!que.empty()) {\n        Node current = que.top();\n        que.pop();\n\
+    \        if (result.dist[current.vertex] < current.dist) continue;\n        for\
+    \ (const auto& e : g[current.vertex]) {\n            if (!e.alive) continue;\n\
+    \            T nd = current.dist + e.cost;\n            if (result.reached[e.to]\
+    \ && !(nd < result.dist[e.to])) continue;\n            result.reached[e.to] =\
+    \ true;\n            result.dist[e.to] = nd;\n            result.parent[e.to]\
+    \ = current.vertex;\n            result.parent_edge[e.to] = e.id;\n          \
+    \  que.push(Node{std::move(nd), e.to});\n        }\n    }\n\n    return result;\n\
+    }\n\ntemplate <class T>\nDijkstraResult<T> dijkstra(const Graph<T>& g, int s)\
+    \ {\n    return dijkstra(g, std::vector<int>{s});\n}\n\n// Compatibility overload:\
+    \ unreachable distances are replaced by inf after the\n// search. Reachability\
+    \ itself never depends on this sentinel.\ntemplate <class T>\nDijkstraResult<T>\
+    \ dijkstra(const Graph<T>& g,\n                           const std::vector<int>&\
+    \ sources, const T& inf) {\n    DijkstraResult<T> result = dijkstra(g, sources);\n\
+    \    result.inf = inf;\n    for (int v = 0; v < int(result.dist.size()); v++)\
+    \ {\n        if (!result.reachable(v)) result.dist[v] = inf;\n    }\n    return\
+    \ result;\n}\n\ntemplate <class T>\nDijkstraResult<T> dijkstra(const Graph<T>&\
+    \ g, int s, const T& inf) {\n    return dijkstra(g, std::vector<int>{s}, inf);\n\
+    }\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/k_shortest_walk.hpp\"\
+    \n\n\n\n#line 10 \"graph/k_shortest_walk.hpp\"\n\n#line 12 \"graph/k_shortest_walk.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\nnamespace internal {\n\ntemplate <class\
     \ T>\nclass KShortestWalkHeap {\n    struct Node {\n        T key;\n        int\
     \ to;\n        int left;\n        int right;\n        int rank;\n    };\n\n  \
     \  std::vector<Node> _nodes;\n\n    int rank(int root) const {\n        return\
@@ -1376,7 +1391,7 @@ data:
   path: graph/directed.hpp
   requiredBy:
   - graph/all.hpp
-  timestamp: '2026-07-17 02:44:01+09:00'
+  timestamp: '2026-08-13 00:22:33+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/graph_algorithms.test.cpp

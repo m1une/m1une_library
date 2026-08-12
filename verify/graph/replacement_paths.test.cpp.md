@@ -271,7 +271,7 @@ data:
     \n#include <limits>\n#include <queue>\n#include <random>\n#line 11 \"verify/graph/replacement_paths.test.cpp\"\
     \n#include <vector>\n\n#line 1 \"graph/replacement_paths.hpp\"\n\n\n\n#line 11\
     \ \"graph/replacement_paths.hpp\"\n\n#line 1 \"graph/dijkstra.hpp\"\n\n\n\n#line\
-    \ 11 \"graph/dijkstra.hpp\"\n\n#line 1 \"graph/graph.hpp\"\n\n\n\n#line 7 \"graph/graph.hpp\"\
+    \ 9 \"graph/dijkstra.hpp\"\n\n#line 1 \"graph/graph.hpp\"\n\n\n\n#line 7 \"graph/graph.hpp\"\
     \n\nnamespace m1une {\nnamespace graph {\n\ntemplate <class T = int>\nstruct Edge\
     \ {\n    using cost_type = T;\n\n    int from;\n    int to;\n    T cost;\n   \
     \ int id;\n    bool alive;\n\n    Edge() : from(-1), to(-1), cost(T()), id(-1),\
@@ -325,33 +325,49 @@ data:
     \ e.from, e.cost, e.id, e.alive));\n                if (0 <= e.id && e.id < _edge_count)\
     \ result._edge_positions[e.id].push_back({e.to, idx});\n            }\n      \
     \  }\n        return result;\n    }\n};\n\n}  // namespace graph\n}  // namespace\
-    \ m1une\n\n\n#line 13 \"graph/dijkstra.hpp\"\n\nnamespace m1une {\nnamespace graph\
+    \ m1une\n\n\n#line 11 \"graph/dijkstra.hpp\"\n\nnamespace m1une {\nnamespace graph\
     \ {\n\ntemplate <class T>\nstruct DijkstraResult {\n    std::vector<T> dist;\n\
-    \    std::vector<int> parent;\n    std::vector<int> parent_edge;\n    T inf;\n\
-    \n    bool reachable(int v) const {\n        assert(0 <= v && v < int(dist.size()));\n\
-    \        return dist[v] != inf;\n    }\n\n    std::vector<int> path(int t) const\
-    \ {\n        assert(reachable(t));\n        std::vector<int> result;\n       \
-    \ for (int v = t; v != -1; v = parent[v]) result.push_back(v);\n        std::reverse(result.begin(),\
-    \ result.end());\n        return result;\n    }\n};\n\ntemplate <class T>\nDijkstraResult<T>\
-    \ dijkstra(const Graph<T>& g, const std::vector<int>& sources,\n             \
-    \              T inf = std::numeric_limits<T>::max() / T(4)) {\n    int n = g.size();\n\
-    \    DijkstraResult<T> result;\n    result.dist.assign(n, inf);\n    result.parent.assign(n,\
-    \ -1);\n    result.parent_edge.assign(n, -1);\n    result.inf = inf;\n\n    using\
-    \ P = std::pair<T, int>;\n    std::priority_queue<P, std::vector<P>, std::greater<P>>\
-    \ que;\n    for (int s : sources) {\n        assert(0 <= s && s < n);\n      \
-    \  if (result.dist[s] == T(0)) continue;\n        result.dist[s] = T(0);\n   \
-    \     que.emplace(T(0), s);\n    }\n\n    while (!que.empty()) {\n        auto\
-    \ [d, v] = que.top();\n        que.pop();\n        if (result.dist[v] != d) continue;\n\
-    \        for (const auto& e : g[v]) {\n            if (!e.alive) continue;\n \
-    \           T nd = d + e.cost;\n            if (result.dist[e.to] <= nd) continue;\n\
-    \            result.dist[e.to] = nd;\n            result.parent[e.to] = v;\n \
-    \           result.parent_edge[e.to] = e.id;\n            que.emplace(nd, e.to);\n\
-    \        }\n    }\n\n    return result;\n}\n\ntemplate <class T>\nDijkstraResult<T>\
-    \ dijkstra(const Graph<T>& g, int s, T inf = std::numeric_limits<T>::max() / T(4))\
-    \ {\n    return dijkstra(g, std::vector<int>{s}, inf);\n}\n\n}  // namespace graph\n\
-    }  // namespace m1une\n\n\n#line 14 \"graph/replacement_paths.hpp\"\n\nnamespace\
-    \ m1une {\nnamespace graph {\n\nstruct GraphPath {\n    std::vector<int> vertices;\n\
-    \    std::vector<int> edges;\n};\n\ntemplate <class T>\nstruct EdgeReplacementPathsResult\
+    \    std::vector<char> reached;\n    std::vector<int> parent;\n    std::vector<int>\
+    \ parent_edge;\n    T inf = T();\n\n    bool reachable(int v) const {\n      \
+    \  assert(0 <= v && v < int(dist.size()));\n        return reached[v];\n    }\n\
+    \n    std::vector<int> path(int t) const {\n        assert(reachable(t));\n  \
+    \      std::vector<int> result;\n        for (int v = t; v != -1; v = parent[v])\
+    \ result.push_back(v);\n        std::reverse(result.begin(), result.end());\n\
+    \        return result;\n    }\n};\n\nnamespace internal {\n\ntemplate <class\
+    \ T>\nstruct DijkstraQueueNode {\n    T dist;\n    int vertex;\n};\n\ntemplate\
+    \ <class T>\nstruct DijkstraQueueCompare {\n    bool operator()(const DijkstraQueueNode<T>&\
+    \ first,\n                    const DijkstraQueueNode<T>& second) const {\n  \
+    \      return second.dist < first.dist;\n    }\n};\n\n}  // namespace internal\n\
+    \ntemplate <class T>\nDijkstraResult<T> dijkstra(const Graph<T>& g,\n        \
+    \                   const std::vector<int>& sources) {\n    int n = g.size();\n\
+    \    DijkstraResult<T> result;\n    result.dist.resize(n);\n    result.reached.assign(n,\
+    \ false);\n    result.parent.assign(n, -1);\n    result.parent_edge.assign(n,\
+    \ -1);\n\n    using Node = internal::DijkstraQueueNode<T>;\n    using Compare\
+    \ = internal::DijkstraQueueCompare<T>;\n    std::priority_queue<Node, std::vector<Node>,\
+    \ Compare> que;\n    for (int s : sources) {\n        assert(0 <= s && s < n);\n\
+    \        if (result.reached[s]) continue;\n        result.reached[s] = true;\n\
+    \        result.dist[s] = T();\n        que.push(Node{T(), s});\n    }\n\n   \
+    \ while (!que.empty()) {\n        Node current = que.top();\n        que.pop();\n\
+    \        if (result.dist[current.vertex] < current.dist) continue;\n        for\
+    \ (const auto& e : g[current.vertex]) {\n            if (!e.alive) continue;\n\
+    \            T nd = current.dist + e.cost;\n            if (result.reached[e.to]\
+    \ && !(nd < result.dist[e.to])) continue;\n            result.reached[e.to] =\
+    \ true;\n            result.dist[e.to] = nd;\n            result.parent[e.to]\
+    \ = current.vertex;\n            result.parent_edge[e.to] = e.id;\n          \
+    \  que.push(Node{std::move(nd), e.to});\n        }\n    }\n\n    return result;\n\
+    }\n\ntemplate <class T>\nDijkstraResult<T> dijkstra(const Graph<T>& g, int s)\
+    \ {\n    return dijkstra(g, std::vector<int>{s});\n}\n\n// Compatibility overload:\
+    \ unreachable distances are replaced by inf after the\n// search. Reachability\
+    \ itself never depends on this sentinel.\ntemplate <class T>\nDijkstraResult<T>\
+    \ dijkstra(const Graph<T>& g,\n                           const std::vector<int>&\
+    \ sources, const T& inf) {\n    DijkstraResult<T> result = dijkstra(g, sources);\n\
+    \    result.inf = inf;\n    for (int v = 0; v < int(result.dist.size()); v++)\
+    \ {\n        if (!result.reachable(v)) result.dist[v] = inf;\n    }\n    return\
+    \ result;\n}\n\ntemplate <class T>\nDijkstraResult<T> dijkstra(const Graph<T>&\
+    \ g, int s, const T& inf) {\n    return dijkstra(g, std::vector<int>{s}, inf);\n\
+    }\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 14 \"graph/replacement_paths.hpp\"\
+    \n\nnamespace m1une {\nnamespace graph {\n\nstruct GraphPath {\n    std::vector<int>\
+    \ vertices;\n    std::vector<int> edges;\n};\n\ntemplate <class T>\nstruct EdgeReplacementPathsResult\
     \ {\n    GraphPath path;\n    std::vector<T> replacement_dist;\n    T inf;\n\n\
     \    bool reachable(int path_edge_index) const {\n        assert(0 <= path_edge_index\
     \ && path_edge_index < int(replacement_dist.size()));\n        return replacement_dist[path_edge_index]\
@@ -364,25 +380,26 @@ data:
     \ - b) return inf;\n    return a + b;\n}\n\ntemplate <class T>\nDijkstraResult<T>\
     \ replacement_paths_dijkstra(const Graph<T>& g, int s, T inf) {\n    int n = g.size();\n\
     \    assert(0 <= s && s < n);\n    DijkstraResult<T> result;\n    result.dist.assign(n,\
-    \ inf);\n    result.parent.assign(n, -1);\n    result.parent_edge.assign(n, -1);\n\
-    \    result.inf = inf;\n\n    using P = std::pair<T, int>;\n    std::priority_queue<P,\
-    \ std::vector<P>, std::greater<P>> que;\n    result.dist[s] = T(0);\n    que.emplace(T(0),\
+    \ inf);\n    result.reached.assign(n, false);\n    result.parent.assign(n, -1);\n\
+    \    result.parent_edge.assign(n, -1);\n    result.inf = inf;\n\n    using P =\
+    \ std::pair<T, int>;\n    std::priority_queue<P, std::vector<P>, std::greater<P>>\
+    \ que;\n    result.dist[s] = T(0);\n    result.reached[s] = true;\n    que.emplace(T(0),\
     \ s);\n    while (!que.empty()) {\n        auto [d, v] = que.top();\n        que.pop();\n\
     \        if (result.dist[v] != d) continue;\n        for (const auto& e : g[v])\
     \ {\n            if (!e.alive) continue;\n            T nd = replacement_paths_safe_add(d,\
     \ e.cost, inf);\n            if (result.dist[e.to] <= nd) continue;\n        \
-    \    result.dist[e.to] = nd;\n            result.parent[e.to] = v;\n         \
-    \   result.parent_edge[e.to] = e.id;\n            que.emplace(nd, e.to);\n   \
-    \     }\n    }\n    return result;\n}\n\ntemplate <class T>\nstd::vector<Edge<T>>\
-    \ replacement_paths_validate_graph(const Graph<T>& g, T inf) {\n    assert(T(0)\
-    \ < inf);\n    std::vector<int> occurrence(g.edge_count(), 0);\n    std::vector<Edge<T>>\
-    \ edge_by_id(g.edge_count());\n    for (int v = 0; v < g.size(); v++) {\n    \
-    \    for (const auto& e : g[v]) {\n            assert(e.from == v);\n        \
-    \    assert(0 <= e.to && e.to < g.size());\n            assert(0 <= e.id && e.id\
-    \ < g.edge_count());\n            if (e.alive) assert(T(0) < e.cost);\n      \
-    \      if (occurrence[e.id] == 0) {\n                edge_by_id[e.id] = e;\n \
-    \           } else {\n                assert(occurrence[e.id] == 1);\n       \
-    \         const auto& other = edge_by_id[e.id];\n                assert(e.from\
+    \    result.reached[e.to] = true;\n            result.dist[e.to] = nd;\n     \
+    \       result.parent[e.to] = v;\n            result.parent_edge[e.to] = e.id;\n\
+    \            que.emplace(nd, e.to);\n        }\n    }\n    return result;\n}\n\
+    \ntemplate <class T>\nstd::vector<Edge<T>> replacement_paths_validate_graph(const\
+    \ Graph<T>& g, T inf) {\n    assert(T(0) < inf);\n    std::vector<int> occurrence(g.edge_count(),\
+    \ 0);\n    std::vector<Edge<T>> edge_by_id(g.edge_count());\n    for (int v =\
+    \ 0; v < g.size(); v++) {\n        for (const auto& e : g[v]) {\n            assert(e.from\
+    \ == v);\n            assert(0 <= e.to && e.to < g.size());\n            assert(0\
+    \ <= e.id && e.id < g.edge_count());\n            if (e.alive) assert(T(0) < e.cost);\n\
+    \            if (occurrence[e.id] == 0) {\n                edge_by_id[e.id] =\
+    \ e;\n            } else {\n                assert(occurrence[e.id] == 1);\n \
+    \               const auto& other = edge_by_id[e.id];\n                assert(e.from\
     \ == other.to && e.to == other.from);\n                assert(e.cost == other.cost\
     \ && e.alive == other.alive);\n            }\n            occurrence[e.id]++;\n\
     \        }\n    }\n\n    for (int id = 0; id < g.edge_count(); id++) {\n     \
@@ -390,28 +407,28 @@ data:
     \        assert(occurrence[id] == 2);\n    }\n    return edge_by_id;\n}\n\ntemplate\
     \ <class T>\nvoid replacement_paths_validate_path(const Graph<T>& g, const GraphPath&\
     \ path,\n                                     const std::vector<Edge<T>>& edge_by_id,\n\
-    \                                     const DijkstraResult<T>& from_s) {\n   \
-    \ assert(!path.vertices.empty());\n    assert(path.edges.size() + 1 == path.vertices.size());\n\
-    \    std::vector<char> used_vertex(g.size(), false);\n    for (int v : path.vertices)\
-    \ {\n        assert(0 <= v && v < g.size());\n        assert(!used_vertex[v]);\n\
-    \        used_vertex[v] = true;\n    }\n\n    T path_cost = T(0);\n    for (int\
-    \ i = 0; i < int(path.edges.size()); i++) {\n        int id = path.edges[i];\n\
-    \        assert(0 <= id && id < g.edge_count());\n        assert(g.is_edge_alive(id));\n\
-    \        const auto& e = edge_by_id[id];\n        int u = path.vertices[i];\n\
-    \        int v = path.vertices[i + 1];\n        assert((e.from == u && e.to ==\
-    \ v) || (e.from == v && e.to == u));\n        assert(T(0) < e.cost);\n       \
-    \ path_cost = replacement_paths_safe_add(path_cost, e.cost, from_s.inf);\n   \
-    \ }\n    assert(from_s.reachable(path.vertices.back()));\n    assert(path_cost\
-    \ == from_s.dist[path.vertices.back()]);\n}\n\ntemplate <class T>\nGraphPath replacement_paths_restore_path(const\
-    \ DijkstraResult<T>& result, int s, int t) {\n    assert(result.reachable(t));\n\
-    \    GraphPath path;\n    for (int v = t; v != s; v = result.parent[v]) {\n  \
-    \      assert(v != -1 && result.parent[v] != -1 && result.parent_edge[v] != -1);\n\
-    \        path.vertices.push_back(v);\n        path.edges.push_back(result.parent_edge[v]);\n\
-    \    }\n    path.vertices.push_back(s);\n    std::reverse(path.vertices.begin(),\
-    \ path.vertices.end());\n    std::reverse(path.edges.begin(), path.edges.end());\n\
-    \    return path;\n}\n\ntemplate <class T>\nstruct ReplacementPathsData {\n  \
-    \  GraphPath path;\n    std::vector<T> dist_s;\n    std::vector<T> dist_t;\n \
-    \   std::vector<int> block;\n    std::vector<char> is_path_edge;\n    std::vector<Edge<T>>\
+    \                                     const DijkstraResult<T>& from_s, T inf)\
+    \ {\n    assert(!path.vertices.empty());\n    assert(path.edges.size() + 1 ==\
+    \ path.vertices.size());\n    std::vector<char> used_vertex(g.size(), false);\n\
+    \    for (int v : path.vertices) {\n        assert(0 <= v && v < g.size());\n\
+    \        assert(!used_vertex[v]);\n        used_vertex[v] = true;\n    }\n\n \
+    \   T path_cost = T(0);\n    for (int i = 0; i < int(path.edges.size()); i++)\
+    \ {\n        int id = path.edges[i];\n        assert(0 <= id && id < g.edge_count());\n\
+    \        assert(g.is_edge_alive(id));\n        const auto& e = edge_by_id[id];\n\
+    \        int u = path.vertices[i];\n        int v = path.vertices[i + 1];\n  \
+    \      assert((e.from == u && e.to == v) || (e.from == v && e.to == u));\n   \
+    \     assert(T(0) < e.cost);\n        path_cost = replacement_paths_safe_add(path_cost,\
+    \ e.cost, inf);\n    }\n    assert(from_s.reachable(path.vertices.back()));\n\
+    \    assert(path_cost == from_s.dist[path.vertices.back()]);\n}\n\ntemplate <class\
+    \ T>\nGraphPath replacement_paths_restore_path(const DijkstraResult<T>& result,\
+    \ int s, int t) {\n    assert(result.reachable(t));\n    GraphPath path;\n   \
+    \ for (int v = t; v != s; v = result.parent[v]) {\n        assert(v != -1 && result.parent[v]\
+    \ != -1 && result.parent_edge[v] != -1);\n        path.vertices.push_back(v);\n\
+    \        path.edges.push_back(result.parent_edge[v]);\n    }\n    path.vertices.push_back(s);\n\
+    \    std::reverse(path.vertices.begin(), path.vertices.end());\n    std::reverse(path.edges.begin(),\
+    \ path.edges.end());\n    return path;\n}\n\ntemplate <class T>\nstruct ReplacementPathsData\
+    \ {\n    GraphPath path;\n    std::vector<T> dist_s;\n    std::vector<T> dist_t;\n\
+    \    std::vector<int> block;\n    std::vector<char> is_path_edge;\n    std::vector<Edge<T>>\
     \ edge_by_id;\n    T inf;\n};\n\ntemplate <class T>\nReplacementPathsData<T> replacement_paths_prepare(const\
     \ Graph<T>& g, const GraphPath& path,\n                                      \
     \             T inf, const DijkstraResult<T>* known_from_s) {\n    auto edge_by_id\
@@ -420,7 +437,7 @@ data:
     \ nullptr\n                               ? replacement_paths_dijkstra(g, s, inf)\n\
     \                               : DijkstraResult<T>();\n    const auto& from_s\
     \ = known_from_s == nullptr ? computed_from_s : *known_from_s;\n    replacement_paths_validate_path(g,\
-    \ path, edge_by_id, from_s);\n    auto from_t = replacement_paths_dijkstra(g,\
+    \ path, edge_by_id, from_s, inf);\n    auto from_t = replacement_paths_dijkstra(g,\
     \ t, inf);\n\n    int n = g.size();\n    std::vector<int> path_position(n, -1);\n\
     \    std::vector<char> is_path_edge(g.edge_count(), false);\n    for (int i =\
     \ 0; i < int(path.vertices.size()); i++) path_position[path.vertices[i]] = i;\n\
@@ -737,7 +754,7 @@ data:
   isVerificationFile: true
   path: verify/graph/replacement_paths.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-08-13 00:22:33+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/replacement_paths.test.cpp

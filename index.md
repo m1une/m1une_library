@@ -1991,6 +1991,9 @@ data:
       path: verify/graph/dfs.test.cpp
       title: verify/graph/dfs.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/graph/dijkstra_custom_cost.test.cpp
+      title: verify/graph/dijkstra_custom_cost.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/graph/directed_mst.test.cpp
       title: verify/graph/directed_mst.test.cpp
     - icon: ':heavy_check_mark:'

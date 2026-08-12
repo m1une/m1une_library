@@ -25,6 +25,9 @@ data:
     path: verify/graph/cow_game.test.cpp
     title: verify/graph/cow_game.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/dijkstra_custom_cost.test.cpp
+    title: verify/graph/dijkstra_custom_cost.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/graph_algorithms.test.cpp
     title: verify/graph/graph_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
@@ -42,27 +45,26 @@ data:
   attributes:
     links: []
   bundledCode: "#line 1 \"graph/dijkstra.hpp\"\n\n\n\n#include <algorithm>\n#include\
-    \ <cassert>\n#include <functional>\n#include <limits>\n#include <queue>\n#include\
-    \ <utility>\n#include <vector>\n\n#line 1 \"graph/graph.hpp\"\n\n\n\n#line 7 \"\
-    graph/graph.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\ntemplate <class T\
-    \ = int>\nstruct Edge {\n    using cost_type = T;\n\n    int from;\n    int to;\n\
-    \    T cost;\n    int id;\n    bool alive;\n\n    Edge() : from(-1), to(-1), cost(T()),\
-    \ id(-1), alive(true) {}\n    Edge(int from_, int to_, T cost_ = T(1), int id_\
-    \ = -1, bool alive_ = true)\n        : from(from_), to(to_), cost(cost_), id(id_),\
-    \ alive(alive_) {}\n\n    int other(int v) const {\n        assert(v == from ||\
-    \ v == to);\n        return from ^ to ^ v;\n    }\n};\n\ntemplate <class T = int>\n\
-    struct Graph {\n    using edge_type = Edge<T>;\n    using cost_type = T;\n\n \
-    \  private:\n    int _n;\n    int _edge_count;\n    std::vector<std::vector<edge_type>>\
-    \ _g;\n    std::vector<std::vector<std::pair<int, int>>> _edge_positions;\n\n\
-    \   public:\n    Graph() : _n(0), _edge_count(0) {}\n    explicit Graph(int n)\
-    \ : _n(n), _edge_count(0), _g(n) {\n        assert(0 <= n);\n    }\n\n    int\
-    \ size() const {\n        return _n;\n    }\n\n    bool empty() const {\n    \
-    \    return _n == 0;\n    }\n\n    int edge_count() const {\n        return _edge_count;\n\
-    \    }\n\n    int add_vertex() {\n        _g.emplace_back();\n        return _n++;\n\
-    \    }\n\n    int add_directed_edge(int from, int to, T cost = T(1)) {\n     \
-    \   assert(0 <= from && from < _n);\n        assert(0 <= to && to < _n);\n   \
-    \     int id = _edge_count++;\n        int idx = int(_g[from].size());\n     \
-    \   _g[from].push_back(edge_type(from, to, cost, id));\n        _edge_positions.emplace_back();\n\
+    \ <cassert>\n#include <queue>\n#include <utility>\n#include <vector>\n\n#line\
+    \ 1 \"graph/graph.hpp\"\n\n\n\n#line 7 \"graph/graph.hpp\"\n\nnamespace m1une\
+    \ {\nnamespace graph {\n\ntemplate <class T = int>\nstruct Edge {\n    using cost_type\
+    \ = T;\n\n    int from;\n    int to;\n    T cost;\n    int id;\n    bool alive;\n\
+    \n    Edge() : from(-1), to(-1), cost(T()), id(-1), alive(true) {}\n    Edge(int\
+    \ from_, int to_, T cost_ = T(1), int id_ = -1, bool alive_ = true)\n        :\
+    \ from(from_), to(to_), cost(cost_), id(id_), alive(alive_) {}\n\n    int other(int\
+    \ v) const {\n        assert(v == from || v == to);\n        return from ^ to\
+    \ ^ v;\n    }\n};\n\ntemplate <class T = int>\nstruct Graph {\n    using edge_type\
+    \ = Edge<T>;\n    using cost_type = T;\n\n   private:\n    int _n;\n    int _edge_count;\n\
+    \    std::vector<std::vector<edge_type>> _g;\n    std::vector<std::vector<std::pair<int,\
+    \ int>>> _edge_positions;\n\n   public:\n    Graph() : _n(0), _edge_count(0) {}\n\
+    \    explicit Graph(int n) : _n(n), _edge_count(0), _g(n) {\n        assert(0\
+    \ <= n);\n    }\n\n    int size() const {\n        return _n;\n    }\n\n    bool\
+    \ empty() const {\n        return _n == 0;\n    }\n\n    int edge_count() const\
+    \ {\n        return _edge_count;\n    }\n\n    int add_vertex() {\n        _g.emplace_back();\n\
+    \        return _n++;\n    }\n\n    int add_directed_edge(int from, int to, T\
+    \ cost = T(1)) {\n        assert(0 <= from && from < _n);\n        assert(0 <=\
+    \ to && to < _n);\n        int id = _edge_count++;\n        int idx = int(_g[from].size());\n\
+    \        _g[from].push_back(edge_type(from, to, cost, id));\n        _edge_positions.emplace_back();\n\
     \        _edge_positions.back().push_back({from, idx});\n        return id;\n\
     \    }\n\n    int add_edge(int u, int v, T cost = T(1)) {\n        assert(0 <=\
     \ u && u < _n);\n        assert(0 <= v && v < _n);\n        int id = _edge_count++;\n\
@@ -97,59 +99,90 @@ data:
     \ e.from, e.cost, e.id, e.alive));\n                if (0 <= e.id && e.id < _edge_count)\
     \ result._edge_positions[e.id].push_back({e.to, idx});\n            }\n      \
     \  }\n        return result;\n    }\n};\n\n}  // namespace graph\n}  // namespace\
-    \ m1une\n\n\n#line 13 \"graph/dijkstra.hpp\"\n\nnamespace m1une {\nnamespace graph\
+    \ m1une\n\n\n#line 11 \"graph/dijkstra.hpp\"\n\nnamespace m1une {\nnamespace graph\
     \ {\n\ntemplate <class T>\nstruct DijkstraResult {\n    std::vector<T> dist;\n\
-    \    std::vector<int> parent;\n    std::vector<int> parent_edge;\n    T inf;\n\
-    \n    bool reachable(int v) const {\n        assert(0 <= v && v < int(dist.size()));\n\
-    \        return dist[v] != inf;\n    }\n\n    std::vector<int> path(int t) const\
-    \ {\n        assert(reachable(t));\n        std::vector<int> result;\n       \
-    \ for (int v = t; v != -1; v = parent[v]) result.push_back(v);\n        std::reverse(result.begin(),\
-    \ result.end());\n        return result;\n    }\n};\n\ntemplate <class T>\nDijkstraResult<T>\
-    \ dijkstra(const Graph<T>& g, const std::vector<int>& sources,\n             \
-    \              T inf = std::numeric_limits<T>::max() / T(4)) {\n    int n = g.size();\n\
-    \    DijkstraResult<T> result;\n    result.dist.assign(n, inf);\n    result.parent.assign(n,\
-    \ -1);\n    result.parent_edge.assign(n, -1);\n    result.inf = inf;\n\n    using\
-    \ P = std::pair<T, int>;\n    std::priority_queue<P, std::vector<P>, std::greater<P>>\
-    \ que;\n    for (int s : sources) {\n        assert(0 <= s && s < n);\n      \
-    \  if (result.dist[s] == T(0)) continue;\n        result.dist[s] = T(0);\n   \
-    \     que.emplace(T(0), s);\n    }\n\n    while (!que.empty()) {\n        auto\
-    \ [d, v] = que.top();\n        que.pop();\n        if (result.dist[v] != d) continue;\n\
-    \        for (const auto& e : g[v]) {\n            if (!e.alive) continue;\n \
-    \           T nd = d + e.cost;\n            if (result.dist[e.to] <= nd) continue;\n\
-    \            result.dist[e.to] = nd;\n            result.parent[e.to] = v;\n \
-    \           result.parent_edge[e.to] = e.id;\n            que.emplace(nd, e.to);\n\
-    \        }\n    }\n\n    return result;\n}\n\ntemplate <class T>\nDijkstraResult<T>\
-    \ dijkstra(const Graph<T>& g, int s, T inf = std::numeric_limits<T>::max() / T(4))\
-    \ {\n    return dijkstra(g, std::vector<int>{s}, inf);\n}\n\n}  // namespace graph\n\
-    }  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_GRAPH_DIJKSTRA_HPP\n#define M1UNE_GRAPH_DIJKSTRA_HPP 1\n\n\
-    #include <algorithm>\n#include <cassert>\n#include <functional>\n#include <limits>\n\
-    #include <queue>\n#include <utility>\n#include <vector>\n\n#include \"graph.hpp\"\
-    \n\nnamespace m1une {\nnamespace graph {\n\ntemplate <class T>\nstruct DijkstraResult\
-    \ {\n    std::vector<T> dist;\n    std::vector<int> parent;\n    std::vector<int>\
-    \ parent_edge;\n    T inf;\n\n    bool reachable(int v) const {\n        assert(0\
-    \ <= v && v < int(dist.size()));\n        return dist[v] != inf;\n    }\n\n  \
-    \  std::vector<int> path(int t) const {\n        assert(reachable(t));\n     \
-    \   std::vector<int> result;\n        for (int v = t; v != -1; v = parent[v])\
+    \    std::vector<char> reached;\n    std::vector<int> parent;\n    std::vector<int>\
+    \ parent_edge;\n    T inf = T();\n\n    bool reachable(int v) const {\n      \
+    \  assert(0 <= v && v < int(dist.size()));\n        return reached[v];\n    }\n\
+    \n    std::vector<int> path(int t) const {\n        assert(reachable(t));\n  \
+    \      std::vector<int> result;\n        for (int v = t; v != -1; v = parent[v])\
     \ result.push_back(v);\n        std::reverse(result.begin(), result.end());\n\
-    \        return result;\n    }\n};\n\ntemplate <class T>\nDijkstraResult<T> dijkstra(const\
-    \ Graph<T>& g, const std::vector<int>& sources,\n                           T\
-    \ inf = std::numeric_limits<T>::max() / T(4)) {\n    int n = g.size();\n    DijkstraResult<T>\
-    \ result;\n    result.dist.assign(n, inf);\n    result.parent.assign(n, -1);\n\
-    \    result.parent_edge.assign(n, -1);\n    result.inf = inf;\n\n    using P =\
-    \ std::pair<T, int>;\n    std::priority_queue<P, std::vector<P>, std::greater<P>>\
-    \ que;\n    for (int s : sources) {\n        assert(0 <= s && s < n);\n      \
-    \  if (result.dist[s] == T(0)) continue;\n        result.dist[s] = T(0);\n   \
-    \     que.emplace(T(0), s);\n    }\n\n    while (!que.empty()) {\n        auto\
-    \ [d, v] = que.top();\n        que.pop();\n        if (result.dist[v] != d) continue;\n\
-    \        for (const auto& e : g[v]) {\n            if (!e.alive) continue;\n \
-    \           T nd = d + e.cost;\n            if (result.dist[e.to] <= nd) continue;\n\
-    \            result.dist[e.to] = nd;\n            result.parent[e.to] = v;\n \
-    \           result.parent_edge[e.to] = e.id;\n            que.emplace(nd, e.to);\n\
-    \        }\n    }\n\n    return result;\n}\n\ntemplate <class T>\nDijkstraResult<T>\
-    \ dijkstra(const Graph<T>& g, int s, T inf = std::numeric_limits<T>::max() / T(4))\
-    \ {\n    return dijkstra(g, std::vector<int>{s}, inf);\n}\n\n}  // namespace graph\n\
-    }  // namespace m1une\n\n#endif  // M1UNE_GRAPH_DIJKSTRA_HPP\n"
+    \        return result;\n    }\n};\n\nnamespace internal {\n\ntemplate <class\
+    \ T>\nstruct DijkstraQueueNode {\n    T dist;\n    int vertex;\n};\n\ntemplate\
+    \ <class T>\nstruct DijkstraQueueCompare {\n    bool operator()(const DijkstraQueueNode<T>&\
+    \ first,\n                    const DijkstraQueueNode<T>& second) const {\n  \
+    \      return second.dist < first.dist;\n    }\n};\n\n}  // namespace internal\n\
+    \ntemplate <class T>\nDijkstraResult<T> dijkstra(const Graph<T>& g,\n        \
+    \                   const std::vector<int>& sources) {\n    int n = g.size();\n\
+    \    DijkstraResult<T> result;\n    result.dist.resize(n);\n    result.reached.assign(n,\
+    \ false);\n    result.parent.assign(n, -1);\n    result.parent_edge.assign(n,\
+    \ -1);\n\n    using Node = internal::DijkstraQueueNode<T>;\n    using Compare\
+    \ = internal::DijkstraQueueCompare<T>;\n    std::priority_queue<Node, std::vector<Node>,\
+    \ Compare> que;\n    for (int s : sources) {\n        assert(0 <= s && s < n);\n\
+    \        if (result.reached[s]) continue;\n        result.reached[s] = true;\n\
+    \        result.dist[s] = T();\n        que.push(Node{T(), s});\n    }\n\n   \
+    \ while (!que.empty()) {\n        Node current = que.top();\n        que.pop();\n\
+    \        if (result.dist[current.vertex] < current.dist) continue;\n        for\
+    \ (const auto& e : g[current.vertex]) {\n            if (!e.alive) continue;\n\
+    \            T nd = current.dist + e.cost;\n            if (result.reached[e.to]\
+    \ && !(nd < result.dist[e.to])) continue;\n            result.reached[e.to] =\
+    \ true;\n            result.dist[e.to] = nd;\n            result.parent[e.to]\
+    \ = current.vertex;\n            result.parent_edge[e.to] = e.id;\n          \
+    \  que.push(Node{std::move(nd), e.to});\n        }\n    }\n\n    return result;\n\
+    }\n\ntemplate <class T>\nDijkstraResult<T> dijkstra(const Graph<T>& g, int s)\
+    \ {\n    return dijkstra(g, std::vector<int>{s});\n}\n\n// Compatibility overload:\
+    \ unreachable distances are replaced by inf after the\n// search. Reachability\
+    \ itself never depends on this sentinel.\ntemplate <class T>\nDijkstraResult<T>\
+    \ dijkstra(const Graph<T>& g,\n                           const std::vector<int>&\
+    \ sources, const T& inf) {\n    DijkstraResult<T> result = dijkstra(g, sources);\n\
+    \    result.inf = inf;\n    for (int v = 0; v < int(result.dist.size()); v++)\
+    \ {\n        if (!result.reachable(v)) result.dist[v] = inf;\n    }\n    return\
+    \ result;\n}\n\ntemplate <class T>\nDijkstraResult<T> dijkstra(const Graph<T>&\
+    \ g, int s, const T& inf) {\n    return dijkstra(g, std::vector<int>{s}, inf);\n\
+    }\n\n}  // namespace graph\n}  // namespace m1une\n\n\n"
+  code: "#ifndef M1UNE_GRAPH_DIJKSTRA_HPP\n#define M1UNE_GRAPH_DIJKSTRA_HPP 1\n\n\
+    #include <algorithm>\n#include <cassert>\n#include <queue>\n#include <utility>\n\
+    #include <vector>\n\n#include \"graph.hpp\"\n\nnamespace m1une {\nnamespace graph\
+    \ {\n\ntemplate <class T>\nstruct DijkstraResult {\n    std::vector<T> dist;\n\
+    \    std::vector<char> reached;\n    std::vector<int> parent;\n    std::vector<int>\
+    \ parent_edge;\n    T inf = T();\n\n    bool reachable(int v) const {\n      \
+    \  assert(0 <= v && v < int(dist.size()));\n        return reached[v];\n    }\n\
+    \n    std::vector<int> path(int t) const {\n        assert(reachable(t));\n  \
+    \      std::vector<int> result;\n        for (int v = t; v != -1; v = parent[v])\
+    \ result.push_back(v);\n        std::reverse(result.begin(), result.end());\n\
+    \        return result;\n    }\n};\n\nnamespace internal {\n\ntemplate <class\
+    \ T>\nstruct DijkstraQueueNode {\n    T dist;\n    int vertex;\n};\n\ntemplate\
+    \ <class T>\nstruct DijkstraQueueCompare {\n    bool operator()(const DijkstraQueueNode<T>&\
+    \ first,\n                    const DijkstraQueueNode<T>& second) const {\n  \
+    \      return second.dist < first.dist;\n    }\n};\n\n}  // namespace internal\n\
+    \ntemplate <class T>\nDijkstraResult<T> dijkstra(const Graph<T>& g,\n        \
+    \                   const std::vector<int>& sources) {\n    int n = g.size();\n\
+    \    DijkstraResult<T> result;\n    result.dist.resize(n);\n    result.reached.assign(n,\
+    \ false);\n    result.parent.assign(n, -1);\n    result.parent_edge.assign(n,\
+    \ -1);\n\n    using Node = internal::DijkstraQueueNode<T>;\n    using Compare\
+    \ = internal::DijkstraQueueCompare<T>;\n    std::priority_queue<Node, std::vector<Node>,\
+    \ Compare> que;\n    for (int s : sources) {\n        assert(0 <= s && s < n);\n\
+    \        if (result.reached[s]) continue;\n        result.reached[s] = true;\n\
+    \        result.dist[s] = T();\n        que.push(Node{T(), s});\n    }\n\n   \
+    \ while (!que.empty()) {\n        Node current = que.top();\n        que.pop();\n\
+    \        if (result.dist[current.vertex] < current.dist) continue;\n        for\
+    \ (const auto& e : g[current.vertex]) {\n            if (!e.alive) continue;\n\
+    \            T nd = current.dist + e.cost;\n            if (result.reached[e.to]\
+    \ && !(nd < result.dist[e.to])) continue;\n            result.reached[e.to] =\
+    \ true;\n            result.dist[e.to] = nd;\n            result.parent[e.to]\
+    \ = current.vertex;\n            result.parent_edge[e.to] = e.id;\n          \
+    \  que.push(Node{std::move(nd), e.to});\n        }\n    }\n\n    return result;\n\
+    }\n\ntemplate <class T>\nDijkstraResult<T> dijkstra(const Graph<T>& g, int s)\
+    \ {\n    return dijkstra(g, std::vector<int>{s});\n}\n\n// Compatibility overload:\
+    \ unreachable distances are replaced by inf after the\n// search. Reachability\
+    \ itself never depends on this sentinel.\ntemplate <class T>\nDijkstraResult<T>\
+    \ dijkstra(const Graph<T>& g,\n                           const std::vector<int>&\
+    \ sources, const T& inf) {\n    DijkstraResult<T> result = dijkstra(g, sources);\n\
+    \    result.inf = inf;\n    for (int v = 0; v < int(result.dist.size()); v++)\
+    \ {\n        if (!result.reachable(v)) result.dist[v] = inf;\n    }\n    return\
+    \ result;\n}\n\ntemplate <class T>\nDijkstraResult<T> dijkstra(const Graph<T>&\
+    \ g, int s, const T& inf) {\n    return dijkstra(g, std::vector<int>{s}, inf);\n\
+    }\n\n}  // namespace graph\n}  // namespace m1une\n\n#endif  // M1UNE_GRAPH_DIJKSTRA_HPP\n"
   dependsOn:
   - graph/graph.hpp
   isVerificationFile: false
@@ -160,13 +193,14 @@ data:
   - graph/all.hpp
   - graph/replacement_paths.hpp
   - graph/directed.hpp
-  timestamp: '2026-07-11 19:47:32+09:00'
+  timestamp: '2026-08-13 00:22:33+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/replacement_paths.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/shortest_path.test.cpp
   - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/dijkstra_custom_cost.test.cpp
   - verify/graph/cow_game.test.cpp
 documentation_of: graph/dijkstra.hpp
 layout: document
@@ -190,21 +224,27 @@ also on undirected graphs built with `add_edge`.
 
 ## How to Use It
 
-Use `Graph<T>` with a numeric cost type, usually `long long`.
+Use `Graph<T>` with a cost type such as `long long` or a small user-defined
+class. Dijkstra does not use `std::numeric_limits<T>` and does not need an
+infinity value. Reachability is stored separately from distances.
 
-The optional `inf` argument is the value used for unreachable vertices. The
-default is `std::numeric_limits<T>::max() / 4`, which leaves room for additions
-without overflowing in ordinary use. Pass your own `inf` if edge costs or path
-costs can be close to that value.
+`T` must be default-constructible, with `T()` representing zero. It must also
+be copyable/movable and support `a + b` and strict comparison `a < b`. Equality,
+`>`, `<=`, subtraction, conversion to a built-in number, and a
+`std::numeric_limits` specialization are not required.
+
+Every reachable path sum must be representable by `T`. For built-in signed
+integers, choose a sufficiently wide type so `a + b` does not overflow.
 
 The result contains these members:
 
 | Member | Type / Signature | Meaning |
 | --- | --- | --- |
-| `dist` | `std::vector<T>` | `dist[v]` is the shortest distance from the nearest source to `v`, or `inf` if unreachable. |
+| `dist` | `std::vector<T>` | `dist[v]` is the shortest distance from the nearest source when `reachable(v)` is true. Without an explicit sentinel argument, unreachable entries contain `T()`. |
+| `reached` | `std::vector<char>` | Stores whether each vertex was reached. Prefer `reachable(v)` over accessing this directly. |
 | `parent` | `std::vector<int>` | `parent[v]` is the previous vertex on one shortest path, or `-1`. |
 | `parent_edge` | `std::vector<int>` | `parent_edge[v]` is the edge id used to enter `v`, or `-1`. |
-| `inf` | `T` | The unreachable-distance sentinel used by this run. |
+| `inf` | `T` | Stores the explicit sentinel argument when one was passed, and `T()` otherwise. Kept for source compatibility; `reachable(v)` does not use it. |
 | `reachable` | `bool reachable(int v) const` | Returns whether `v` was reached. |
 | `path` | `std::vector<int> path(int t) const` | Restores one shortest path from a source to `t`. Requires `reachable(t)`. |
 
@@ -212,8 +252,10 @@ The result contains these members:
 
 | Function | Signature | Description | Complexity |
 | --- | --- | --- | --- |
-| `dijkstra` | `template <class T> DijkstraResult<T> dijkstra(const Graph<T>& g, int s, T inf = std::numeric_limits<T>::max() / T(4))` | Runs from one source. | $O((N + M) \log N)$ |
-| `dijkstra` | `template <class T> DijkstraResult<T> dijkstra(const Graph<T>& g, const std::vector<int>& sources, T inf = std::numeric_limits<T>::max() / T(4))` | Runs from multiple sources. | $O((N + M) \log N)$ |
+| `dijkstra` | `template <class T> DijkstraResult<T> dijkstra(const Graph<T>& g, int s)` | Runs from one source. | $O((N + M) \log N)$ |
+| `dijkstra` | `template <class T> DijkstraResult<T> dijkstra(const Graph<T>& g, const std::vector<int>& sources)` | Runs from multiple sources. | $O((N + M) \log N)$ |
+| `dijkstra` | `template <class T> DijkstraResult<T> dijkstra(const Graph<T>& g, int s, const T& inf)` | Compatibility overload that writes `inf` into unreachable `dist` entries after the search. | $O((N + M) \log N)$ |
+| `dijkstra` | `template <class T> DijkstraResult<T> dijkstra(const Graph<T>& g, const std::vector<int>& sources, const T& inf)` | Multi-source compatibility overload with an unreachable display value. | $O((N + M) \log N)$ |
 
 ## Example
 
@@ -229,6 +271,38 @@ int main() {
     g.add_directed_edge(2, 1, 4);
 
     auto res = m1une::graph::dijkstra(g, 0);
-    std::cout << res.dist[1] << "\n";  // 7
+    if (res.reachable(1)) {
+        std::cout << res.dist[1] << "\n";  // 7
+    }
 }
 ```
+
+Do not determine reachability by comparing `dist[v]` with a sentinel. Always
+call `reachable(v)`. This remains correct even when a finite shortest distance
+happens to equal the `inf` value passed to a compatibility overload.
+
+## User-Defined Cost Example
+
+Only zero construction, addition, and `<` are needed:
+
+```cpp
+struct Cost {
+    long long value = 0;
+
+    Cost operator+(const Cost& other) const {
+        return Cost{value + other.value};
+    }
+
+    friend bool operator<(const Cost& first, const Cost& second) {
+        return first.value < second.value;
+    }
+};
+
+m1une::graph::Graph<Cost> graph(3);
+graph.add_directed_edge(0, 1, Cost{4});
+graph.add_directed_edge(1, 2, Cost{7});
+auto result = m1une::graph::dijkstra(graph, 0);
+// result.reachable(2) is true and result.dist[2].value is 11.
+```
+
+No `std::numeric_limits<Cost>` specialization is necessary.

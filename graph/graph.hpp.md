@@ -265,6 +265,12 @@ data:
     path: verify/graph/dfs.test.cpp
     title: verify/graph/dfs.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/dijkstra_custom_cost.test.cpp
+    title: verify/graph/dijkstra_custom_cost.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/dijkstra_custom_cost.test.cpp
+    title: verify/graph/dijkstra_custom_cost.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/directed_mst.test.cpp
     title: verify/graph/directed_mst.test.cpp
   - icon: ':heavy_check_mark:'
@@ -675,6 +681,8 @@ data:
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/dominator_tree.test.cpp
   - verify/graph/dominator_tree.test.cpp
+  - verify/graph/dijkstra_custom_cost.test.cpp
+  - verify/graph/dijkstra_custom_cost.test.cpp
   - verify/graph/bipartite_edge_coloring.test.cpp
   - verify/graph/chromatic_number_randomized.test.cpp
   - verify/graph/chromatic_number_randomized.test.cpp
