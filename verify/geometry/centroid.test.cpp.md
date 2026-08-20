@@ -47,6 +47,9 @@ data:
     path: geometry/detail/convex_polygon_normalize.hpp
     title: geometry/detail/convex_polygon_normalize.hpp
   - icon: ':heavy_check_mark:'
+    path: geometry/detail/floating_predicate.hpp
+    title: geometry/detail/floating_predicate.hpp
+  - icon: ':heavy_check_mark:'
     path: geometry/euclidean_mst.hpp
     title: Euclidean Minimum Spanning Tree
   - icon: ':heavy_check_mark:'
@@ -216,6 +219,7 @@ data:
   - geometry/all.hpp
   - geometry/angle_sort.hpp
   - geometry/point.hpp
+  - geometry/detail/floating_predicate.hpp
   - geometry/circle.hpp
   - geometry/ray.hpp
   - geometry/line.hpp
@@ -256,7 +260,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/centroid.test.cpp
   requiredBy: []
-  timestamp: '2026-08-20 20:51:34+09:00'
+  timestamp: '2026-08-20 21:15:27+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/centroid.test.cpp

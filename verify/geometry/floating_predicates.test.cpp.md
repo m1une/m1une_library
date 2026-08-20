@@ -11,6 +11,9 @@ data:
     path: geometry/point.hpp
     title: 2D Point and Predicates
   - icon: ':heavy_check_mark:'
+    path: geometry/ray.hpp
+    title: Rays
+  - icon: ':heavy_check_mark:'
     path: utilities/fast_io.hpp
     title: Fast IO
   _extendedRequiredBy: []
@@ -20,21 +23,21 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    ERROR: 1e-8
-    PROBLEM: https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_2_C
+    PROBLEM: https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_1_C
     links:
-    - https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_2_C
-  bundledCode: "#line 1 \"verify/geometry/segment_intersection_point.test.cpp\"\n\
-    #define PROBLEM \"https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_2_C\"\
-    \n#define ERROR \"1e-8\"\n\n#line 1 \"geometry/line.hpp\"\n\n\n\n#include <algorithm>\n\
-    #include <array>\n#include <cassert>\n#include <cmath>\n#include <optional>\n\n\
-    #line 1 \"geometry/point.hpp\"\n\n\n\n#line 5 \"geometry/point.hpp\"\n#include\
-    \ <concepts>\n#line 7 \"geometry/point.hpp\"\n#include <type_traits>\n\n#line\
-    \ 1 \"geometry/detail/floating_predicate.hpp\"\n\n\n\nnamespace m1une {\nnamespace\
-    \ geometry {\nnamespace predicate_detail {\n\ntemplate <typename T>\nconstexpr\
-    \ T absolute(T value) {\n    return value < T(0) ? -value : value;\n}\n\ntemplate\
-    \ <typename T>\nconstexpr T max_value(T first, T second) {\n    return first <\
-    \ second ? second : first;\n}\n\ntemplate <typename T>\nconstexpr T vector_scale(T\
+    - https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_1_C
+  bundledCode: "#line 1 \"verify/geometry/floating_predicates.test.cpp\"\n#define\
+    \ PROBLEM \"https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_1_C\"\
+    \n\n#line 1 \"geometry/ray.hpp\"\n\n\n\n#include <algorithm>\n#include <cassert>\n\
+    #include <optional>\n\n#line 1 \"geometry/line.hpp\"\n\n\n\n#line 5 \"geometry/line.hpp\"\
+    \n#include <array>\n#line 7 \"geometry/line.hpp\"\n#include <cmath>\n#line 9 \"\
+    geometry/line.hpp\"\n\n#line 1 \"geometry/point.hpp\"\n\n\n\n#line 5 \"geometry/point.hpp\"\
+    \n#include <concepts>\n#line 7 \"geometry/point.hpp\"\n#include <type_traits>\n\
+    \n#line 1 \"geometry/detail/floating_predicate.hpp\"\n\n\n\nnamespace m1une {\n\
+    namespace geometry {\nnamespace predicate_detail {\n\ntemplate <typename T>\n\
+    constexpr T absolute(T value) {\n    return value < T(0) ? -value : value;\n}\n\
+    \ntemplate <typename T>\nconstexpr T max_value(T first, T second) {\n    return\
+    \ first < second ? second : first;\n}\n\ntemplate <typename T>\nconstexpr T vector_scale(T\
     \ x, T y) {\n    return max_value(absolute(x), absolute(y));\n}\n\ntemplate <bool\
     \ Exact, typename T>\nconstexpr int scaled_sign(T value, T scale, long double\
     \ eps) {\n    if constexpr (Exact) {\n        return (value > T(0)) - (value <\
@@ -323,13 +326,186 @@ data:
     template <Coordinate T>\nstd::optional<Point<long double>> line_segment_intersection(\n\
     \    const Segment<T>& segment,\n    const Line<T>& line,\n    long double eps\
     \ = 1e-12L\n) {\n    return line_segment_intersection(line, segment, eps);\n}\n\
-    \n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 5 \"verify/geometry/segment_intersection_point.test.cpp\"\
-    \n\n#line 8 \"verify/geometry/segment_intersection_point.test.cpp\"\n#include\
-    \ <vector>\n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 6 \"utilities/fast_io.hpp\"\
+    \n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 9 \"geometry/ray.hpp\"\
+    \n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <Coordinate T>\nstruct\
+    \ Ray {\n    Point<T> origin;\n    Point<T> through;\n};\n\nnamespace ray_detail\
+    \ {\n\ntemplate <Coordinate T>\nstruct Parameters {\n    wide_type<T> denominator;\n\
+    \    wide_type<T> denominator_scale;\n    wide_type<T> first_numerator;\n    wide_type<T>\
+    \ second_numerator;\n};\n\ntemplate <Coordinate T>\nParameters<T> parameters(\n\
+    \    const Point<T>& first_origin,\n    const Point<T>& first_through,\n    const\
+    \ Point<T>& second_origin,\n    const Point<T>& second_through\n) {\n    using\
+    \ W = wide_type<T>;\n    W first_x = W(first_through.x) - W(first_origin.x);\n\
+    \    W first_y = W(first_through.y) - W(first_origin.y);\n    W second_x = W(second_through.x)\
+    \ - W(second_origin.x);\n    W second_y = W(second_through.y) - W(second_origin.y);\n\
+    \    W offset_x = W(second_origin.x) - W(first_origin.x);\n    W offset_y = W(second_origin.y)\
+    \ - W(first_origin.y);\n    return Parameters<T>{\n        first_x * second_y\
+    \ - first_y * second_x,\n        predicate_detail::determinant_scale<std::integral<T>>(\n\
+    \            first_x,\n            first_y,\n            second_x,\n         \
+    \   second_y\n        ),\n        offset_x * second_y - offset_y * second_x,\n\
+    \        offset_x * first_y - offset_y * first_x\n    };\n}\n\ntemplate <Coordinate\
+    \ T>\nint denominator_sign(const Parameters<T>& values, long double eps) {\n \
+    \   return predicate_detail::scaled_sign<std::integral<T>>(\n        values.denominator,\n\
+    \        values.denominator_scale,\n        eps\n    );\n}\n\ntemplate <Coordinate\
+    \ T>\nbool ratio_nonnegative(\n    wide_type<T> numerator,\n    wide_type<T> denominator,\n\
+    \    long double eps\n) {\n    const int numerator_sign =\n        predicate_detail::scaled_sign<std::integral<T>>(\n\
+    \            numerator,\n            predicate_detail::absolute(denominator),\n\
+    \            eps\n        );\n    const int denominator_direction =\n        (denominator\
+    \ > 0) - (denominator < 0);\n    return\n        numerator_sign == 0 ||\n    \
+    \    numerator_sign == denominator_direction;\n}\n\ntemplate <Coordinate T>\n\
+    bool ratio_in_unit_interval(\n    wide_type<T> numerator,\n    wide_type<T> denominator,\n\
+    \    long double eps\n) {\n    const auto scale = predicate_detail::absolute(denominator);\n\
+    \    const int start_sign =\n        predicate_detail::scaled_sign<std::integral<T>>(\n\
+    \            numerator,\n            scale,\n            eps\n        );\n   \
+    \ const int finish_sign =\n        predicate_detail::scaled_sign<std::integral<T>>(\n\
+    \            numerator - denominator,\n            scale,\n            eps\n \
+    \       );\n    if (denominator > 0) {\n        return start_sign >= 0 && finish_sign\
+    \ <= 0;\n    }\n    return start_sign <= 0 && finish_sign >= 0;\n}\n\ntemplate\
+    \ <Coordinate T>\nPoint<long double> point_at(\n    const Ray<T>& ray,\n    wide_type<T>\
+    \ numerator,\n    wide_type<T> denominator\n) {\n    long double ratio =\n   \
+    \     static_cast<long double>(numerator) /\n        static_cast<long double>(denominator);\n\
+    \    Point<long double> origin(ray.origin);\n    Point<long double> direction\
+    \ =\n        Point<long double>(ray.through) - origin;\n    return origin + direction\
+    \ * ratio;\n}\n\n}  // namespace ray_detail\n\ntemplate <Coordinate T>\nbool on_ray(\n\
+    \    const Ray<T>& ray,\n    const Point<T>& point,\n    long double eps = 1e-12L\n\
+    ) {\n    assert(ray.origin != ray.through);\n    if (orientation(ray.origin, ray.through,\
+    \ point, eps) != 0) return false;\n    using W = wide_type<T>;\n    W direction_x\
+    \ = W(ray.through.x) - W(ray.origin.x);\n    W direction_y = W(ray.through.y)\
+    \ - W(ray.origin.y);\n    W offset_x = W(point.x) - W(ray.origin.x);\n    W offset_y\
+    \ = W(point.y) - W(ray.origin.y);\n    const W projection =\n        direction_x\
+    \ * offset_x + direction_y * offset_y;\n    const W length_squared =\n       \
+    \ direction_x * direction_x + direction_y * direction_y;\n    return predicate_detail::scaled_sign<std::integral<T>>(\n\
+    \        projection,\n        length_squared,\n        eps\n    ) >= 0;\n}\n\n\
+    template <Coordinate T>\nPoint<long double> projection(const Ray<T>& ray, const\
+    \ Point<T>& point) {\n    assert(ray.origin != ray.through);\n    Point<long double>\
+    \ origin(ray.origin);\n    Point<long double> direction =\n        Point<long\
+    \ double>(ray.through) - origin;\n    Point<long double> offset = Point<long double>(point)\
+    \ - origin;\n    long double ratio = dot(offset, direction) / dot(direction, direction);\n\
+    \    if (ratio < 0) ratio = 0;\n    return origin + direction * ratio;\n}\n\n\
+    template <Coordinate T>\nlong double distance(const Ray<T>& ray, const Point<T>&\
+    \ point) {\n    return geometry::distance(projection(ray, point), Point<long double>(point));\n\
+    }\n\ntemplate <Coordinate T>\nlong double distance(const Point<T>& point, const\
+    \ Ray<T>& ray) {\n    return distance(ray, point);\n}\n\ntemplate <Coordinate\
+    \ T>\nRay<long double> reflection(const Line<T>& line, const Ray<T>& ray) {\n\
+    \    assert(ray.origin != ray.through);\n    return Ray<long double>{\n      \
+    \  reflection(line, ray.origin),\n        reflection(line, ray.through)\n    };\n\
+    }\n\ntemplate <Coordinate T>\nRay<long double> reflected_ray(\n    const Ray<T>&\
+    \ incoming,\n    const Point<T>& hit,\n    const Line<T>& mirror,\n    long double\
+    \ eps = 1e-12L\n) {\n    assert(incoming.origin != incoming.through);\n    assert(on_line(mirror,\
+    \ hit, eps));\n    Point<T> translated = hit + (incoming.through - incoming.origin);\n\
+    \    return Ray<long double>{\n        Point<long double>(hit),\n        reflection(mirror,\
+    \ translated)\n    };\n}\n\ntemplate <Coordinate T>\nbool intersects(\n    const\
+    \ Ray<T>& ray,\n    const Line<T>& line,\n    long double eps = 1e-12L\n) {\n\
+    \    assert(ray.origin != ray.through);\n    assert(line.a != line.b);\n    ray_detail::Parameters<T>\
+    \ values = ray_detail::parameters(\n        ray.origin,\n        ray.through,\n\
+    \        line.a,\n        line.b\n    );\n    if (ray_detail::denominator_sign(values,\
+    \ eps) == 0) {\n        return on_line(line, ray.origin, eps);\n    }\n    return\
+    \ ray_detail::ratio_nonnegative<T>(\n        values.first_numerator,\n       \
+    \ values.denominator,\n        eps\n    );\n}\n\ntemplate <Coordinate T>\nbool\
+    \ intersects(\n    const Line<T>& line,\n    const Ray<T>& ray,\n    long double\
+    \ eps = 1e-12L\n) {\n    return intersects(ray, line, eps);\n}\n\ntemplate <Coordinate\
+    \ T>\nlong double distance(const Ray<T>& ray, const Line<T>& line) {\n    return\
+    \ intersects(ray, line) ? 0 : distance(line, ray.origin);\n}\n\ntemplate <Coordinate\
+    \ T>\nlong double distance(const Line<T>& line, const Ray<T>& ray) {\n    return\
+    \ distance(ray, line);\n}\n\ntemplate <Coordinate T>\nbool intersects(\n    const\
+    \ Ray<T>& ray,\n    const Segment<T>& segment,\n    long double eps = 1e-12L\n\
+    ) {\n    assert(ray.origin != ray.through);\n    if (segment.a == segment.b) return\
+    \ on_ray(ray, segment.a, eps);\n\n    ray_detail::Parameters<T> values = ray_detail::parameters(\n\
+    \        ray.origin,\n        ray.through,\n        segment.a,\n        segment.b\n\
+    \    );\n    if (ray_detail::denominator_sign(values, eps) == 0) {\n        if\
+    \ (orientation(ray.origin, ray.through, segment.a, eps) != 0) {\n            return\
+    \ false;\n        }\n        return on_ray(ray, segment.a, eps) ||\n         \
+    \      on_ray(ray, segment.b, eps) ||\n               on_segment(segment, ray.origin,\
+    \ eps);\n    }\n    return ray_detail::ratio_nonnegative<T>(\n               values.first_numerator,\n\
+    \               values.denominator,\n               eps\n           ) &&\n   \
+    \        ray_detail::ratio_in_unit_interval<T>(\n               values.second_numerator,\n\
+    \               values.denominator,\n               eps\n           );\n}\n\n\
+    template <Coordinate T>\nbool intersects(\n    const Segment<T>& segment,\n  \
+    \  const Ray<T>& ray,\n    long double eps = 1e-12L\n) {\n    return intersects(ray,\
+    \ segment, eps);\n}\n\ntemplate <Coordinate T>\nlong double distance(const Ray<T>&\
+    \ ray, const Segment<T>& segment) {\n    if (intersects(ray, segment)) return\
+    \ 0;\n    return std::min({\n        distance(ray, segment.a),\n        distance(ray,\
+    \ segment.b),\n        distance(segment, ray.origin)\n    });\n}\n\ntemplate <Coordinate\
+    \ T>\nlong double distance(const Segment<T>& segment, const Ray<T>& ray) {\n \
+    \   return distance(ray, segment);\n}\n\ntemplate <Coordinate T>\nbool intersects(\n\
+    \    const Ray<T>& first,\n    const Ray<T>& second,\n    long double eps = 1e-12L\n\
+    ) {\n    assert(first.origin != first.through);\n    assert(second.origin != second.through);\n\
+    \    ray_detail::Parameters<T> values = ray_detail::parameters(\n        first.origin,\n\
+    \        first.through,\n        second.origin,\n        second.through\n    );\n\
+    \    if (ray_detail::denominator_sign(values, eps) == 0) {\n        if (orientation(first.origin,\
+    \ first.through, second.origin, eps) != 0) {\n            return false;\n    \
+    \    }\n        return on_ray(first, second.origin, eps) ||\n               on_ray(second,\
+    \ first.origin, eps);\n    }\n    return ray_detail::ratio_nonnegative<T>(\n \
+    \              values.first_numerator,\n               values.denominator,\n \
+    \              eps\n           ) &&\n           ray_detail::ratio_nonnegative<T>(\n\
+    \               values.second_numerator,\n               values.denominator,\n\
+    \               eps\n           );\n}\n\ntemplate <Coordinate T>\nlong double\
+    \ distance(const Ray<T>& first, const Ray<T>& second) {\n    if (intersects(first,\
+    \ second)) return 0;\n    return std::min(\n        distance(first, second.origin),\n\
+    \        distance(second, first.origin)\n    );\n}\n\ntemplate <Coordinate T>\n\
+    std::optional<Point<long double>> ray_line_intersection(\n    const Ray<T>& ray,\n\
+    \    const Line<T>& line,\n    long double eps = 1e-12L\n) {\n    assert(ray.origin\
+    \ != ray.through);\n    assert(line.a != line.b);\n    ray_detail::Parameters<T>\
+    \ values = ray_detail::parameters(\n        ray.origin,\n        ray.through,\n\
+    \        line.a,\n        line.b\n    );\n    if (\n        ray_detail::denominator_sign(values,\
+    \ eps) == 0 ||\n        !ray_detail::ratio_nonnegative<T>(\n            values.first_numerator,\n\
+    \            values.denominator,\n            eps\n        )\n    ) {\n      \
+    \  return std::nullopt;\n    }\n    return ray_detail::point_at(\n        ray,\n\
+    \        values.first_numerator,\n        values.denominator\n    );\n}\n\ntemplate\
+    \ <Coordinate T>\nstd::optional<Point<long double>> ray_line_intersection(\n \
+    \   const Line<T>& line,\n    const Ray<T>& ray,\n    long double eps = 1e-12L\n\
+    ) {\n    return ray_line_intersection(ray, line, eps);\n}\n\ntemplate <Coordinate\
+    \ T>\nstd::optional<Point<long double>> ray_segment_intersection(\n    const Ray<T>&\
+    \ ray,\n    const Segment<T>& segment,\n    long double eps = 1e-12L\n) {\n  \
+    \  assert(ray.origin != ray.through);\n    if (segment.a == segment.b) {\n   \
+    \     if (on_ray(ray, segment.a, eps)) {\n            return Point<long double>(segment.a);\n\
+    \        }\n        return std::nullopt;\n    }\n\n    ray_detail::Parameters<T>\
+    \ values = ray_detail::parameters(\n        ray.origin,\n        ray.through,\n\
+    \        segment.a,\n        segment.b\n    );\n    if (ray_detail::denominator_sign(values,\
+    \ eps) == 0) {\n        if (orientation(ray.origin, ray.through, segment.a, eps)\
+    \ != 0) {\n            return std::nullopt;\n        }\n        if (\n       \
+    \     segment.a == ray.origin &&\n            !on_ray(ray, segment.b, eps)\n \
+    \       ) {\n            return Point<long double>(ray.origin);\n        }\n \
+    \       if (\n            segment.b == ray.origin &&\n            !on_ray(ray,\
+    \ segment.a, eps)\n        ) {\n            return Point<long double>(ray.origin);\n\
+    \        }\n        return std::nullopt;\n    }\n    if (\n        !ray_detail::ratio_nonnegative<T>(\n\
+    \            values.first_numerator,\n            values.denominator,\n      \
+    \      eps\n        ) ||\n        !ray_detail::ratio_in_unit_interval<T>(\n  \
+    \          values.second_numerator,\n            values.denominator,\n       \
+    \     eps\n        )\n    ) {\n        return std::nullopt;\n    }\n    return\
+    \ ray_detail::point_at(\n        ray,\n        values.first_numerator,\n     \
+    \   values.denominator\n    );\n}\n\ntemplate <Coordinate T>\nstd::optional<Point<long\
+    \ double>> ray_segment_intersection(\n    const Segment<T>& segment,\n    const\
+    \ Ray<T>& ray,\n    long double eps = 1e-12L\n) {\n    return ray_segment_intersection(ray,\
+    \ segment, eps);\n}\n\ntemplate <Coordinate T>\nstd::optional<Point<long double>>\
+    \ ray_intersection(\n    const Ray<T>& first,\n    const Ray<T>& second,\n   \
+    \ long double eps = 1e-12L\n) {\n    assert(first.origin != first.through);\n\
+    \    assert(second.origin != second.through);\n    ray_detail::Parameters<T> values\
+    \ = ray_detail::parameters(\n        first.origin,\n        first.through,\n \
+    \       second.origin,\n        second.through\n    );\n    if (ray_detail::denominator_sign(values,\
+    \ eps) == 0) {\n        if (\n            first.origin != second.origin ||\n \
+    \           orientation(\n                first.origin,\n                first.through,\n\
+    \                second.through,\n                eps\n            ) != 0\n  \
+    \      ) {\n            return std::nullopt;\n        }\n        using W = wide_type<T>;\n\
+    \        W first_x = W(first.through.x) - W(first.origin.x);\n        W first_y\
+    \ = W(first.through.y) - W(first.origin.y);\n        W second_x = W(second.through.x)\
+    \ - W(second.origin.x);\n        W second_y = W(second.through.y) - W(second.origin.y);\n\
+    \        if (\n            predicate_detail::dot_sign<std::integral<T>>(\n   \
+    \             first_x,\n                first_y,\n                second_x,\n\
+    \                second_y,\n                eps\n            ) < 0\n        )\
+    \ {\n            return Point<long double>(first.origin);\n        }\n       \
+    \ return std::nullopt;\n    }\n    if (\n        !ray_detail::ratio_nonnegative<T>(\n\
+    \            values.first_numerator,\n            values.denominator,\n      \
+    \      eps\n        ) ||\n        !ray_detail::ratio_nonnegative<T>(\n       \
+    \     values.second_numerator,\n            values.denominator,\n            eps\n\
+    \        )\n    ) {\n        return std::nullopt;\n    }\n    return ray_detail::point_at(\n\
+    \        first,\n        values.first_numerator,\n        values.denominator\n\
+    \    );\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 4 \"\
+    verify/geometry/floating_predicates.test.cpp\"\n\n#line 7 \"verify/geometry/floating_predicates.test.cpp\"\
+    \n#include <cstdint>\n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 6 \"utilities/fast_io.hpp\"\
     \n#include <cerrno>\n#include <charconv>\n#include <cstddef>\n#include <cstdio>\n\
-    #include <cstdlib>\n#include <cstdint>\n#include <cstring>\n#include <iterator>\n\
-    #include <string>\n#include <sys/stat.h>\n#line 17 \"utilities/fast_io.hpp\"\n\
-    #include <utility>\n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities\
+    #include <cstdlib>\n#line 12 \"utilities/fast_io.hpp\"\n#include <cstring>\n#include\
+    \ <iterator>\n#include <string>\n#include <sys/stat.h>\n#line 17 \"utilities/fast_io.hpp\"\
+    \n#include <utility>\n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities\
     \ {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class\
     \ T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate <class T>\n\
     struct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
@@ -567,153 +743,206 @@ data:
     \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
     n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 11 \"verify/geometry/segment_intersection_point.test.cpp\"\
-    \n\nnamespace {\n\nusing m1une::geometry::Point;\nusing m1une::geometry::Segment;\n\
-    using m1une::geometry::SegmentIntersection;\nusing m1une::geometry::SegmentIntersectionKind;\n\
-    \nbool close(long double first, long double second) {\n    return std::fabs(first\
-    \ - second) <= 1e-12L;\n}\n\nbool close(\n    const Point<long double>& first,\n\
-    \    const Point<long double>& second\n) {\n    return close(first.x, second.x)\
-    \ && close(first.y, second.y);\n}\n\ntemplate <class T>\nSegment<T> make_segment(T\
-    \ ax, T ay, T bx, T by) {\n    Segment<T> result;\n    result.a = Point<T>(ax,\
-    \ ay);\n    result.b = Point<T>(bx, by);\n    return result;\n}\n\nvoid test_examples()\
-    \ {\n    using namespace m1une::geometry;\n\n    Segment<long long> first = make_segment(0LL,\
-    \ 0LL, 4LL, 4LL);\n    Segment<long long> second = make_segment(0LL, 4LL, 4LL,\
-    \ 0LL);\n    SegmentIntersection result = segment_intersection(first, second);\n\
-    \    assert(result.kind == SegmentIntersectionKind::Point);\n    assert(close(result.first,\
-    \ Point<long double>(2, 2)));\n    assert(close(result.first, result.second));\n\
-    \n    first = make_segment(4LL, 0LL, 0LL, 0LL);\n    second = make_segment(1LL,\
-    \ 0LL, 3LL, 0LL);\n    result = segment_intersection(first, second);\n    assert(result.kind\
-    \ == SegmentIntersectionKind::Overlap);\n    assert(close(result.first, Point<long\
-    \ double>(3, 0)));\n    assert(close(result.second, Point<long double>(1, 0)));\n\
-    \n    first = make_segment(0LL, 0LL, 2LL, 0LL);\n    second = make_segment(2LL,\
-    \ 0LL, 5LL, 0LL);\n    result = segment_intersection(first, second);\n    assert(result.kind\
-    \ == SegmentIntersectionKind::Point);\n    assert(close(result.first, Point<long\
-    \ double>(2, 0)));\n\n    second = make_segment(3LL, 0LL, 5LL, 0LL);\n    result\
-    \ = segment_intersection(first, second);\n    assert(result.kind == SegmentIntersectionKind::Empty);\n\
-    \n    first = make_segment(1LL, 1LL, 1LL, 1LL);\n    second = make_segment(0LL,\
-    \ 0LL, 2LL, 2LL);\n    result = segment_intersection(first, second);\n    assert(result.kind\
-    \ == SegmentIntersectionKind::Point);\n    assert(close(result.first, Point<long\
-    \ double>(1, 1)));\n\n    first = make_segment(0LL, 0LL, 3LL, 3LL);\n    second\
-    \ = make_segment(0LL, 3LL, 3LL, 0LL);\n    result = segment_intersection(first,\
-    \ second);\n    assert(result.kind == SegmentIntersectionKind::Point);\n    assert(close(result.first,\
-    \ Point<long double>(1.5L, 1.5L)));\n}\n\nvoid test_exhaustive_small_integer_segments()\
-    \ {\n    using namespace m1une::geometry;\n    std::vector<Segment<long long>>\
-    \ segments;\n    for (long long ax = -1; ax <= 1; ++ax) {\n        for (long long\
-    \ ay = -1; ay <= 1; ++ay) {\n            for (long long bx = -1; bx <= 1; ++bx)\
-    \ {\n                for (long long by = -1; by <= 1; ++by) {\n              \
-    \      segments.push_back(make_segment(ax, ay, bx, by));\n                }\n\
-    \            }\n        }\n    }\n\n    for (const Segment<long long>& first :\
-    \ segments) {\n        for (const Segment<long long>& second : segments) {\n \
-    \           const SegmentIntersection result =\n                segment_intersection(first,\
-    \ second);\n            assert(\n                (result.kind != SegmentIntersectionKind::Empty)\
-    \ ==\n                intersects(first, second)\n            );\n            if\
-    \ (result.kind == SegmentIntersectionKind::Empty) continue;\n\n            Segment<long\
-    \ double> first_floating;\n            first_floating.a = Point<long double>(first.a);\n\
-    \            first_floating.b = Point<long double>(first.b);\n            Segment<long\
-    \ double> second_floating;\n            second_floating.a = Point<long double>(second.a);\n\
-    \            second_floating.b = Point<long double>(second.b);\n            assert(on_segment(first_floating,\
-    \ result.first));\n            assert(on_segment(second_floating, result.first));\n\
-    \            assert(on_segment(first_floating, result.second));\n            assert(on_segment(second_floating,\
-    \ result.second));\n\n            if (result.kind == SegmentIntersectionKind::Point)\
-    \ {\n                assert(close(result.first, result.second));\n           \
-    \ } else {\n                assert(result.kind == SegmentIntersectionKind::Overlap);\n\
-    \                assert(!close(result.first, result.second));\n              \
-    \  const Point<long double> middle =\n                    (result.first + result.second)\
-    \ / 2.0L;\n                assert(on_segment(first_floating, middle));\n     \
-    \           assert(on_segment(second_floating, middle));\n            }\n    \
-    \    }\n    }\n}\n\n}  // namespace\n\nint main() {\n    test_examples();\n  \
-    \  test_exhaustive_small_integer_segments();\n\n    m1une::utilities::FastInput\
-    \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n    fast_output.set_fixed(15);\n\
-    \n    int query_count;\n    fast_input >> query_count;\n    while (query_count--)\
-    \ {\n        Segment<long double> first;\n        Segment<long double> second;\n\
-    \        fast_input >> first.a.x >> first.a.y >> first.b.x >> first.b.y;\n   \
-    \     fast_input >> second.a.x >> second.a.y >> second.b.x >> second.b.y;\n  \
-    \      const SegmentIntersection result =\n            m1une::geometry::segment_intersection(first,\
-    \ second);\n        assert(result.kind == SegmentIntersectionKind::Point);\n \
-    \       fast_output << result.first.x << ' ' << result.first.y << '\\n';\n   \
-    \ }\n}\n"
-  code: "#define PROBLEM \"https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_2_C\"\
-    \n#define ERROR \"1e-8\"\n\n#include \"../../geometry/line.hpp\"\n\n#include <cassert>\n\
-    #include <cmath>\n#include <vector>\n\n#include \"../../utilities/fast_io.hpp\"\
-    \n\nnamespace {\n\nusing m1une::geometry::Point;\nusing m1une::geometry::Segment;\n\
-    using m1une::geometry::SegmentIntersection;\nusing m1une::geometry::SegmentIntersectionKind;\n\
-    \nbool close(long double first, long double second) {\n    return std::fabs(first\
-    \ - second) <= 1e-12L;\n}\n\nbool close(\n    const Point<long double>& first,\n\
-    \    const Point<long double>& second\n) {\n    return close(first.x, second.x)\
-    \ && close(first.y, second.y);\n}\n\ntemplate <class T>\nSegment<T> make_segment(T\
-    \ ax, T ay, T bx, T by) {\n    Segment<T> result;\n    result.a = Point<T>(ax,\
-    \ ay);\n    result.b = Point<T>(bx, by);\n    return result;\n}\n\nvoid test_examples()\
-    \ {\n    using namespace m1une::geometry;\n\n    Segment<long long> first = make_segment(0LL,\
-    \ 0LL, 4LL, 4LL);\n    Segment<long long> second = make_segment(0LL, 4LL, 4LL,\
-    \ 0LL);\n    SegmentIntersection result = segment_intersection(first, second);\n\
-    \    assert(result.kind == SegmentIntersectionKind::Point);\n    assert(close(result.first,\
-    \ Point<long double>(2, 2)));\n    assert(close(result.first, result.second));\n\
-    \n    first = make_segment(4LL, 0LL, 0LL, 0LL);\n    second = make_segment(1LL,\
-    \ 0LL, 3LL, 0LL);\n    result = segment_intersection(first, second);\n    assert(result.kind\
-    \ == SegmentIntersectionKind::Overlap);\n    assert(close(result.first, Point<long\
-    \ double>(3, 0)));\n    assert(close(result.second, Point<long double>(1, 0)));\n\
-    \n    first = make_segment(0LL, 0LL, 2LL, 0LL);\n    second = make_segment(2LL,\
-    \ 0LL, 5LL, 0LL);\n    result = segment_intersection(first, second);\n    assert(result.kind\
-    \ == SegmentIntersectionKind::Point);\n    assert(close(result.first, Point<long\
-    \ double>(2, 0)));\n\n    second = make_segment(3LL, 0LL, 5LL, 0LL);\n    result\
-    \ = segment_intersection(first, second);\n    assert(result.kind == SegmentIntersectionKind::Empty);\n\
-    \n    first = make_segment(1LL, 1LL, 1LL, 1LL);\n    second = make_segment(0LL,\
-    \ 0LL, 2LL, 2LL);\n    result = segment_intersection(first, second);\n    assert(result.kind\
-    \ == SegmentIntersectionKind::Point);\n    assert(close(result.first, Point<long\
-    \ double>(1, 1)));\n\n    first = make_segment(0LL, 0LL, 3LL, 3LL);\n    second\
-    \ = make_segment(0LL, 3LL, 3LL, 0LL);\n    result = segment_intersection(first,\
-    \ second);\n    assert(result.kind == SegmentIntersectionKind::Point);\n    assert(close(result.first,\
-    \ Point<long double>(1.5L, 1.5L)));\n}\n\nvoid test_exhaustive_small_integer_segments()\
-    \ {\n    using namespace m1une::geometry;\n    std::vector<Segment<long long>>\
-    \ segments;\n    for (long long ax = -1; ax <= 1; ++ax) {\n        for (long long\
-    \ ay = -1; ay <= 1; ++ay) {\n            for (long long bx = -1; bx <= 1; ++bx)\
-    \ {\n                for (long long by = -1; by <= 1; ++by) {\n              \
-    \      segments.push_back(make_segment(ax, ay, bx, by));\n                }\n\
-    \            }\n        }\n    }\n\n    for (const Segment<long long>& first :\
-    \ segments) {\n        for (const Segment<long long>& second : segments) {\n \
-    \           const SegmentIntersection result =\n                segment_intersection(first,\
-    \ second);\n            assert(\n                (result.kind != SegmentIntersectionKind::Empty)\
-    \ ==\n                intersects(first, second)\n            );\n            if\
-    \ (result.kind == SegmentIntersectionKind::Empty) continue;\n\n            Segment<long\
-    \ double> first_floating;\n            first_floating.a = Point<long double>(first.a);\n\
-    \            first_floating.b = Point<long double>(first.b);\n            Segment<long\
-    \ double> second_floating;\n            second_floating.a = Point<long double>(second.a);\n\
-    \            second_floating.b = Point<long double>(second.b);\n            assert(on_segment(first_floating,\
-    \ result.first));\n            assert(on_segment(second_floating, result.first));\n\
-    \            assert(on_segment(first_floating, result.second));\n            assert(on_segment(second_floating,\
-    \ result.second));\n\n            if (result.kind == SegmentIntersectionKind::Point)\
-    \ {\n                assert(close(result.first, result.second));\n           \
-    \ } else {\n                assert(result.kind == SegmentIntersectionKind::Overlap);\n\
-    \                assert(!close(result.first, result.second));\n              \
-    \  const Point<long double> middle =\n                    (result.first + result.second)\
-    \ / 2.0L;\n                assert(on_segment(first_floating, middle));\n     \
-    \           assert(on_segment(second_floating, middle));\n            }\n    \
-    \    }\n    }\n}\n\n}  // namespace\n\nint main() {\n    test_examples();\n  \
-    \  test_exhaustive_small_integer_segments();\n\n    m1une::utilities::FastInput\
-    \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n    fast_output.set_fixed(15);\n\
-    \n    int query_count;\n    fast_input >> query_count;\n    while (query_count--)\
-    \ {\n        Segment<long double> first;\n        Segment<long double> second;\n\
-    \        fast_input >> first.a.x >> first.a.y >> first.b.x >> first.b.y;\n   \
-    \     fast_input >> second.a.x >> second.a.y >> second.b.x >> second.b.y;\n  \
-    \      const SegmentIntersection result =\n            m1une::geometry::segment_intersection(first,\
-    \ second);\n        assert(result.kind == SegmentIntersectionKind::Point);\n \
-    \       fast_output << result.first.x << ' ' << result.first.y << '\\n';\n   \
-    \ }\n}\n"
+    \ utilities\n}  // namespace m1une\n\n\n#line 10 \"verify/geometry/floating_predicates.test.cpp\"\
+    \n\nnamespace {\n\nusing namespace m1une::geometry;\nusing IntegerPoint = Point<long\
+    \ long>;\nusing FloatingPoint = Point<long double>;\n\nFloatingPoint scaled(const\
+    \ IntegerPoint& point, long double scale) {\n    return FloatingPoint(point.x\
+    \ * scale, point.y * scale);\n}\n\ntemplate <class Object>\nObject make_object(\n\
+    \    const IntegerPoint& first,\n    const IntegerPoint& second\n) {\n    Object\
+    \ result;\n    result.a = first;\n    result.b = second;\n    return result;\n\
+    }\n\ntemplate <class Object>\nObject make_directed_object(\n    const IntegerPoint&\
+    \ first,\n    const IntegerPoint& second\n) {\n    Object result;\n    result.origin\
+    \ = first;\n    result.through = second;\n    return result;\n}\n\nLine<long double>\
+    \ scaled(\n    const Line<long long>& line,\n    long double scale\n) {\n    Line<long\
+    \ double> result;\n    result.a = scaled(line.a, scale);\n    result.b = scaled(line.b,\
+    \ scale);\n    return result;\n}\n\nSegment<long double> scaled(\n    const Segment<long\
+    \ long>& segment,\n    long double scale\n) {\n    Segment<long double> result;\n\
+    \    result.a = scaled(segment.a, scale);\n    result.b = scaled(segment.b, scale);\n\
+    \    return result;\n}\n\nRay<long double> scaled(const Ray<long long>& ray, long\
+    \ double scale) {\n    Ray<long double> result;\n    result.origin = scaled(ray.origin,\
+    \ scale);\n    result.through = scaled(ray.through, scale);\n    return result;\n\
+    }\n\nvoid test_small_triangle() {\n    const FloatingPoint origin(0, 0);\n   \
+    \ assert(\n        orientation(\n            origin,\n            FloatingPoint(1e-30L,\
+    \ 0),\n            FloatingPoint(0, 1e-30L)\n        ) == 1\n    );\n    assert(\n\
+    \        orientation(\n            origin,\n            FloatingPoint(1e30L, 0),\n\
+    \            FloatingPoint(0, 1e30L)\n        ) == 1\n    );\n\n    Segment<long\
+    \ double> segment;\n    segment.a = FloatingPoint(9, 10);\n    segment.b = FloatingPoint(21,\
+    \ 9);\n    const FloatingPoint rounded_endpoint(9, 10 - 2e-15L);\n    assert(orientation(segment.a,\
+    \ segment.b, rounded_endpoint) == 0);\n    assert(on_segment(segment, rounded_endpoint));\n\
+    }\n\nvoid test_scale_invariance() {\n    std::uint64_t state = 0x243f6a8885a308d3ULL;\n\
+    \    auto random = [&state]() {\n        state ^= state << 7;\n        state ^=\
+    \ state >> 9;\n        return state;\n    };\n    auto random_point = [&]() {\n\
+    \        return IntegerPoint(\n            static_cast<long long>(random() % 21)\
+    \ - 10,\n            static_cast<long long>(random() % 21) - 10\n        );\n\
+    \    };\n\n    for (int trial = 0; trial < 10000; ++trial) {\n        IntegerPoint\
+    \ first = random_point();\n        IntegerPoint second;\n        do {\n      \
+    \      second = random_point();\n        } while (second == first);\n        IntegerPoint\
+    \ third = random_point();\n        IntegerPoint fourth;\n        do {\n      \
+    \      fourth = random_point();\n        } while (fourth == third);\n        IntegerPoint\
+    \ query = random_point();\n\n        Line<long long> first_line =\n          \
+    \  make_object<Line<long long>>(first, second);\n        Line<long long> second_line\
+    \ =\n            make_object<Line<long long>>(third, fourth);\n        Segment<long\
+    \ long> first_segment =\n            make_object<Segment<long long>>(first, second);\n\
+    \        Segment<long long> second_segment =\n            make_object<Segment<long\
+    \ long>>(third, fourth);\n        Ray<long long> first_ray =\n            make_directed_object<Ray<long\
+    \ long>>(first, second);\n        Ray<long long> second_ray =\n            make_directed_object<Ray<long\
+    \ long>>(third, fourth);\n\n        const int exponent = int(random() % 161) -\
+    \ 80;\n        const long double scale = std::ldexp(1.0L, exponent);\n       \
+    \ const FloatingPoint floating_first = scaled(first, scale);\n        const FloatingPoint\
+    \ floating_second = scaled(second, scale);\n        const FloatingPoint floating_query\
+    \ = scaled(query, scale);\n        const Line<long double> floating_first_line\
+    \ =\n            scaled(first_line, scale);\n        const Line<long double> floating_second_line\
+    \ =\n            scaled(second_line, scale);\n        const Segment<long double>\
+    \ floating_first_segment =\n            scaled(first_segment, scale);\n      \
+    \  const Segment<long double> floating_second_segment =\n            scaled(second_segment,\
+    \ scale);\n        const Ray<long double> floating_first_ray =\n            scaled(first_ray,\
+    \ scale);\n        const Ray<long double> floating_second_ray =\n            scaled(second_ray,\
+    \ scale);\n\n        assert(\n            orientation(first, second, query) ==\n\
+    \            orientation(floating_first, floating_second, floating_query)\n  \
+    \      );\n        assert(\n            on_line(first_line, query) ==\n      \
+    \      on_line(floating_first_line, floating_query)\n        );\n        assert(\n\
+    \            on_segment(first_segment, query) ==\n            on_segment(floating_first_segment,\
+    \ floating_query)\n        );\n        assert(\n            on_ray(first_ray,\
+    \ query) ==\n            on_ray(floating_first_ray, floating_query)\n        );\n\
+    \        assert(\n            parallel(first_line, second_line) ==\n         \
+    \   parallel(floating_first_line, floating_second_line)\n        );\n        assert(\n\
+    \            orthogonal(first_line, second_line) ==\n            orthogonal(floating_first_line,\
+    \ floating_second_line)\n        );\n        assert(\n            intersects(first_segment,\
+    \ second_segment) ==\n            intersects(floating_first_segment, floating_second_segment)\n\
+    \        );\n        assert(\n            intersects(first_ray, second_segment)\
+    \ ==\n            intersects(floating_first_ray, floating_second_segment)\n  \
+    \      );\n        assert(\n            intersects(first_ray, second_line) ==\n\
+    \            intersects(floating_first_ray, floating_second_line)\n        );\n\
+    \        assert(\n            intersects(first_ray, second_ray) ==\n         \
+    \   intersects(floating_first_ray, floating_second_ray)\n        );\n        assert(\n\
+    \            segment_intersection(first_segment, second_segment).kind ==\n   \
+    \         segment_intersection(\n                floating_first_segment,\n   \
+    \             floating_second_segment\n            ).kind\n        );\n    }\n\
+    }\n\n}  // namespace\n\nint main() {\n    test_small_triangle();\n    test_scale_invariance();\n\
+    \n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
+    \ fast_output;\n\n    Point<long double> first;\n    Point<long double> second;\n\
+    \    fast_input >> first.x >> first.y >> second.x >> second.y;\n    Line<long\
+    \ double> line;\n    line.a = first;\n    line.b = second;\n    Segment<long double>\
+    \ segment;\n    segment.a = first;\n    segment.b = second;\n    Ray<long double>\
+    \ ray;\n    ray.origin = first;\n    ray.through = second;\n\n    int query_count;\n\
+    \    fast_input >> query_count;\n    while (query_count--) {\n        Point<long\
+    \ double> point;\n        fast_input >> point.x >> point.y;\n        const int\
+    \ turn = orientation(first, second, point);\n        if (turn > 0) {\n       \
+    \     fast_output << \"COUNTER_CLOCKWISE\\n\";\n        } else if (turn < 0) {\n\
+    \            fast_output << \"CLOCKWISE\\n\";\n        } else if (on_segment(segment,\
+    \ point)) {\n            fast_output << \"ON_SEGMENT\\n\";\n        } else if\
+    \ (on_ray(ray, point)) {\n            fast_output << \"ONLINE_FRONT\\n\";\n  \
+    \      } else {\n            fast_output << \"ONLINE_BACK\\n\";\n        }\n \
+    \   }\n}\n"
+  code: "#define PROBLEM \"https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_1_C\"\
+    \n\n#include \"../../geometry/ray.hpp\"\n\n#include <cassert>\n#include <cmath>\n\
+    #include <cstdint>\n\n#include \"../../utilities/fast_io.hpp\"\n\nnamespace {\n\
+    \nusing namespace m1une::geometry;\nusing IntegerPoint = Point<long long>;\nusing\
+    \ FloatingPoint = Point<long double>;\n\nFloatingPoint scaled(const IntegerPoint&\
+    \ point, long double scale) {\n    return FloatingPoint(point.x * scale, point.y\
+    \ * scale);\n}\n\ntemplate <class Object>\nObject make_object(\n    const IntegerPoint&\
+    \ first,\n    const IntegerPoint& second\n) {\n    Object result;\n    result.a\
+    \ = first;\n    result.b = second;\n    return result;\n}\n\ntemplate <class Object>\n\
+    Object make_directed_object(\n    const IntegerPoint& first,\n    const IntegerPoint&\
+    \ second\n) {\n    Object result;\n    result.origin = first;\n    result.through\
+    \ = second;\n    return result;\n}\n\nLine<long double> scaled(\n    const Line<long\
+    \ long>& line,\n    long double scale\n) {\n    Line<long double> result;\n  \
+    \  result.a = scaled(line.a, scale);\n    result.b = scaled(line.b, scale);\n\
+    \    return result;\n}\n\nSegment<long double> scaled(\n    const Segment<long\
+    \ long>& segment,\n    long double scale\n) {\n    Segment<long double> result;\n\
+    \    result.a = scaled(segment.a, scale);\n    result.b = scaled(segment.b, scale);\n\
+    \    return result;\n}\n\nRay<long double> scaled(const Ray<long long>& ray, long\
+    \ double scale) {\n    Ray<long double> result;\n    result.origin = scaled(ray.origin,\
+    \ scale);\n    result.through = scaled(ray.through, scale);\n    return result;\n\
+    }\n\nvoid test_small_triangle() {\n    const FloatingPoint origin(0, 0);\n   \
+    \ assert(\n        orientation(\n            origin,\n            FloatingPoint(1e-30L,\
+    \ 0),\n            FloatingPoint(0, 1e-30L)\n        ) == 1\n    );\n    assert(\n\
+    \        orientation(\n            origin,\n            FloatingPoint(1e30L, 0),\n\
+    \            FloatingPoint(0, 1e30L)\n        ) == 1\n    );\n\n    Segment<long\
+    \ double> segment;\n    segment.a = FloatingPoint(9, 10);\n    segment.b = FloatingPoint(21,\
+    \ 9);\n    const FloatingPoint rounded_endpoint(9, 10 - 2e-15L);\n    assert(orientation(segment.a,\
+    \ segment.b, rounded_endpoint) == 0);\n    assert(on_segment(segment, rounded_endpoint));\n\
+    }\n\nvoid test_scale_invariance() {\n    std::uint64_t state = 0x243f6a8885a308d3ULL;\n\
+    \    auto random = [&state]() {\n        state ^= state << 7;\n        state ^=\
+    \ state >> 9;\n        return state;\n    };\n    auto random_point = [&]() {\n\
+    \        return IntegerPoint(\n            static_cast<long long>(random() % 21)\
+    \ - 10,\n            static_cast<long long>(random() % 21) - 10\n        );\n\
+    \    };\n\n    for (int trial = 0; trial < 10000; ++trial) {\n        IntegerPoint\
+    \ first = random_point();\n        IntegerPoint second;\n        do {\n      \
+    \      second = random_point();\n        } while (second == first);\n        IntegerPoint\
+    \ third = random_point();\n        IntegerPoint fourth;\n        do {\n      \
+    \      fourth = random_point();\n        } while (fourth == third);\n        IntegerPoint\
+    \ query = random_point();\n\n        Line<long long> first_line =\n          \
+    \  make_object<Line<long long>>(first, second);\n        Line<long long> second_line\
+    \ =\n            make_object<Line<long long>>(third, fourth);\n        Segment<long\
+    \ long> first_segment =\n            make_object<Segment<long long>>(first, second);\n\
+    \        Segment<long long> second_segment =\n            make_object<Segment<long\
+    \ long>>(third, fourth);\n        Ray<long long> first_ray =\n            make_directed_object<Ray<long\
+    \ long>>(first, second);\n        Ray<long long> second_ray =\n            make_directed_object<Ray<long\
+    \ long>>(third, fourth);\n\n        const int exponent = int(random() % 161) -\
+    \ 80;\n        const long double scale = std::ldexp(1.0L, exponent);\n       \
+    \ const FloatingPoint floating_first = scaled(first, scale);\n        const FloatingPoint\
+    \ floating_second = scaled(second, scale);\n        const FloatingPoint floating_query\
+    \ = scaled(query, scale);\n        const Line<long double> floating_first_line\
+    \ =\n            scaled(first_line, scale);\n        const Line<long double> floating_second_line\
+    \ =\n            scaled(second_line, scale);\n        const Segment<long double>\
+    \ floating_first_segment =\n            scaled(first_segment, scale);\n      \
+    \  const Segment<long double> floating_second_segment =\n            scaled(second_segment,\
+    \ scale);\n        const Ray<long double> floating_first_ray =\n            scaled(first_ray,\
+    \ scale);\n        const Ray<long double> floating_second_ray =\n            scaled(second_ray,\
+    \ scale);\n\n        assert(\n            orientation(first, second, query) ==\n\
+    \            orientation(floating_first, floating_second, floating_query)\n  \
+    \      );\n        assert(\n            on_line(first_line, query) ==\n      \
+    \      on_line(floating_first_line, floating_query)\n        );\n        assert(\n\
+    \            on_segment(first_segment, query) ==\n            on_segment(floating_first_segment,\
+    \ floating_query)\n        );\n        assert(\n            on_ray(first_ray,\
+    \ query) ==\n            on_ray(floating_first_ray, floating_query)\n        );\n\
+    \        assert(\n            parallel(first_line, second_line) ==\n         \
+    \   parallel(floating_first_line, floating_second_line)\n        );\n        assert(\n\
+    \            orthogonal(first_line, second_line) ==\n            orthogonal(floating_first_line,\
+    \ floating_second_line)\n        );\n        assert(\n            intersects(first_segment,\
+    \ second_segment) ==\n            intersects(floating_first_segment, floating_second_segment)\n\
+    \        );\n        assert(\n            intersects(first_ray, second_segment)\
+    \ ==\n            intersects(floating_first_ray, floating_second_segment)\n  \
+    \      );\n        assert(\n            intersects(first_ray, second_line) ==\n\
+    \            intersects(floating_first_ray, floating_second_line)\n        );\n\
+    \        assert(\n            intersects(first_ray, second_ray) ==\n         \
+    \   intersects(floating_first_ray, floating_second_ray)\n        );\n        assert(\n\
+    \            segment_intersection(first_segment, second_segment).kind ==\n   \
+    \         segment_intersection(\n                floating_first_segment,\n   \
+    \             floating_second_segment\n            ).kind\n        );\n    }\n\
+    }\n\n}  // namespace\n\nint main() {\n    test_small_triangle();\n    test_scale_invariance();\n\
+    \n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
+    \ fast_output;\n\n    Point<long double> first;\n    Point<long double> second;\n\
+    \    fast_input >> first.x >> first.y >> second.x >> second.y;\n    Line<long\
+    \ double> line;\n    line.a = first;\n    line.b = second;\n    Segment<long double>\
+    \ segment;\n    segment.a = first;\n    segment.b = second;\n    Ray<long double>\
+    \ ray;\n    ray.origin = first;\n    ray.through = second;\n\n    int query_count;\n\
+    \    fast_input >> query_count;\n    while (query_count--) {\n        Point<long\
+    \ double> point;\n        fast_input >> point.x >> point.y;\n        const int\
+    \ turn = orientation(first, second, point);\n        if (turn > 0) {\n       \
+    \     fast_output << \"COUNTER_CLOCKWISE\\n\";\n        } else if (turn < 0) {\n\
+    \            fast_output << \"CLOCKWISE\\n\";\n        } else if (on_segment(segment,\
+    \ point)) {\n            fast_output << \"ON_SEGMENT\\n\";\n        } else if\
+    \ (on_ray(ray, point)) {\n            fast_output << \"ONLINE_FRONT\\n\";\n  \
+    \      } else {\n            fast_output << \"ONLINE_BACK\\n\";\n        }\n \
+    \   }\n}\n"
   dependsOn:
+  - geometry/ray.hpp
   - geometry/line.hpp
   - geometry/point.hpp
   - geometry/detail/floating_predicate.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
-  path: verify/geometry/segment_intersection_point.test.cpp
+  path: verify/geometry/floating_predicates.test.cpp
   requiredBy: []
   timestamp: '2026-08-20 21:15:27+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/geometry/segment_intersection_point.test.cpp
+documentation_of: verify/geometry/floating_predicates.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/geometry/segment_intersection_point.test.cpp
-- /verify/verify/geometry/segment_intersection_point.test.cpp.html
-title: verify/geometry/segment_intersection_point.test.cpp
+- /verify/verify/geometry/floating_predicates.test.cpp
+- /verify/verify/geometry/floating_predicates.test.cpp.html
+title: verify/geometry/floating_predicates.test.cpp
 ---

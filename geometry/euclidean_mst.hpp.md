@@ -5,6 +5,9 @@ data:
     path: ds/dsu/dsu.hpp
     title: DSU (Disjoint Set Union)
   - icon: ':heavy_check_mark:'
+    path: geometry/detail/floating_predicate.hpp
+    title: geometry/detail/floating_predicate.hpp
+  - icon: ':heavy_check_mark:'
     path: geometry/point.hpp
     title: 2D Point and Predicates
   _extendedRequiredBy:
@@ -77,9 +80,39 @@ data:
     \ [&](const std::vector<int>& v) { return v.empty(); }),\n                   \
     \  result.end());\n        return result;\n    }\n};\n\n}  // namespace ds\n}\
     \  // namespace m1une\n\n\n#line 1 \"geometry/point.hpp\"\n\n\n\n#line 7 \"geometry/point.hpp\"\
-    \n#include <type_traits>\n\nnamespace m1une {\nnamespace geometry {\n\ntemplate\
-    \ <typename T>\nconcept Coordinate = std::is_arithmetic_v<T> && !std::same_as<std::remove_cv_t<T>,\
-    \ bool>;\n\ntemplate <Coordinate T>\nusing wide_type = std::conditional_t<std::integral<T>,\
+    \n#include <type_traits>\n\n#line 1 \"geometry/detail/floating_predicate.hpp\"\
+    \n\n\n\nnamespace m1une {\nnamespace geometry {\nnamespace predicate_detail {\n\
+    \ntemplate <typename T>\nconstexpr T absolute(T value) {\n    return value < T(0)\
+    \ ? -value : value;\n}\n\ntemplate <typename T>\nconstexpr T max_value(T first,\
+    \ T second) {\n    return first < second ? second : first;\n}\n\ntemplate <typename\
+    \ T>\nconstexpr T vector_scale(T x, T y) {\n    return max_value(absolute(x),\
+    \ absolute(y));\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int scaled_sign(T\
+    \ value, T scale, long double eps) {\n    if constexpr (Exact) {\n        return\
+    \ (value > T(0)) - (value < T(0));\n    } else {\n        const T tolerance =\
+    \ T(eps) * scale;\n        return (value > tolerance) - (value < -tolerance);\n\
+    \    }\n}\n\ntemplate <bool Exact, typename T>\nconstexpr T determinant_scale(T\
+    \ ax, T ay, T bx, T by) {\n    if constexpr (Exact) {\n        return T(0);\n\
+    \    } else {\n        return vector_scale(ax, ay) * vector_scale(bx, by);\n \
+    \   }\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int determinant_sign(\n\
+    \    T ax,\n    T ay,\n    T bx,\n    T by,\n    long double eps\n) {\n    const\
+    \ T determinant = ax * by - ay * bx;\n    return scaled_sign<Exact>(\n       \
+    \ determinant,\n        determinant_scale<Exact>(ax, ay, bx, by),\n        eps\n\
+    \    );\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int orientation_sign(\n\
+    \    T direction_x,\n    T direction_y,\n    T offset_x,\n    T offset_y,\n  \
+    \  long double eps\n) {\n    const T determinant =\n        direction_x * offset_y\
+    \ - direction_y * offset_x;\n    T scale = T(0);\n    if constexpr (!Exact) {\n\
+    \        const T direction_scale =\n            vector_scale(direction_x, direction_y);\n\
+    \        scale = direction_scale * max_value(\n            direction_scale,\n\
+    \            vector_scale(offset_x, offset_y)\n        );\n    }\n    return scaled_sign<Exact>(determinant,\
+    \ scale, eps);\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int dot_sign(\n\
+    \    T ax,\n    T ay,\n    T bx,\n    T by,\n    long double eps\n) {\n    const\
+    \ T value = ax * bx + ay * by;\n    T scale = T(0);\n    if constexpr (!Exact)\
+    \ {\n        scale = vector_scale(ax, ay) * vector_scale(bx, by);\n    }\n   \
+    \ return scaled_sign<Exact>(value, scale, eps);\n}\n\n}  // namespace predicate_detail\n\
+    }  // namespace geometry\n}  // namespace m1une\n\n\n#line 10 \"geometry/point.hpp\"\
+    \n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <typename T>\nconcept\
+    \ Coordinate = std::is_arithmetic_v<T> && !std::same_as<std::remove_cv_t<T>, bool>;\n\
+    \ntemplate <Coordinate T>\nusing wide_type = std::conditional_t<std::integral<T>,\
     \ __int128_t, long double>;\n\ntemplate <Coordinate T>\nstruct Point {\n    T\
     \ x;\n    T y;\n\n    constexpr Point() : x(0), y(0) {}\n    constexpr Point(T\
     \ x_value, T y_value) : x(x_value), y(y_value) {}\n\n    template <Coordinate\
@@ -142,27 +175,30 @@ data:
     \ assert(denominator != 0);\n    Point<long double> first(a);\n    Point<long\
     \ double> direction = Point<long double>(b) - first;\n    return first + direction\
     \ * (first_ratio / denominator);\n}\n\ntemplate <Coordinate T>\nconstexpr int\
-    \ sign(wide_type<T> value, long double eps = 1e-12L) {\n    if constexpr (std::integral<T>)\
-    \ {\n        return (value > 0) - (value < 0);\n    } else {\n        return (value\
-    \ > eps) - (value < -eps);\n    }\n}\n\ntemplate <Coordinate T>\nconstexpr int\
-    \ orientation(\n    const Point<T>& a,\n    const Point<T>& b,\n    const Point<T>&\
-    \ c,\n    long double eps = 1e-12L\n) {\n    return sign<T>(cross(a, b, c), eps);\n\
-    }\n\ntemplate <Coordinate T>\nconstexpr bool collinear(\n    const Point<T>& a,\n\
-    \    const Point<T>& b,\n    const Point<T>& c,\n    long double eps = 1e-12L\n\
-    ) {\n    return orientation(a, b, c, eps) == 0;\n}\n\ntemplate <Coordinate T>\n\
-    Point<long double> rotate(const Point<T>& point, long double angle) {\n    long\
-    \ double cosine = std::cos(angle);\n    long double sine = std::sin(angle);\n\
-    \    return Point<long double>(\n        static_cast<long double>(point.x) * cosine\
-    \ -\n            static_cast<long double>(point.y) * sine,\n        static_cast<long\
-    \ double>(point.x) * sine +\n            static_cast<long double>(point.y) * cosine\n\
-    \    );\n}\n\ntemplate <Coordinate T>\nPoint<long double> normalized(const Point<T>&\
-    \ point) {\n    long double length = norm(point);\n    assert(length != 0);\n\
-    \    return Point<long double>(\n        static_cast<long double>(point.x) / length,\n\
-    \        static_cast<long double>(point.y) / length\n    );\n}\n\n}  // namespace\
-    \ geometry\n}  // namespace m1une\n\n\n#line 16 \"geometry/euclidean_mst.hpp\"\
-    \n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <class T>\nstruct EuclideanMstEdge\
-    \ {\n    int from;\n    int to;\n    T squared_distance;\n};\n\ntemplate <class\
-    \ T>\nstruct EuclideanMst {\n    long double cost;\n    std::vector<EuclideanMstEdge<T>>\
+    \ sign(wide_type<T> value, long double eps = 1e-12L) {\n    return predicate_detail::scaled_sign<std::integral<T>>(\n\
+    \        value,\n        wide_type<T>(1),\n        eps\n    );\n}\n\ntemplate\
+    \ <Coordinate T>\nconstexpr int orientation(\n    const Point<T>& a,\n    const\
+    \ Point<T>& b,\n    const Point<T>& c,\n    long double eps = 1e-12L\n) {\n  \
+    \  using W = wide_type<T>;\n    const W first_x = W(b.x) - W(a.x);\n    const\
+    \ W first_y = W(b.y) - W(a.y);\n    const W second_x = W(c.x) - W(a.x);\n    const\
+    \ W second_y = W(c.y) - W(a.y);\n    return predicate_detail::orientation_sign<std::integral<T>>(\n\
+    \        first_x,\n        first_y,\n        second_x,\n        second_y,\n  \
+    \      eps\n    );\n}\n\ntemplate <Coordinate T>\nconstexpr bool collinear(\n\
+    \    const Point<T>& a,\n    const Point<T>& b,\n    const Point<T>& c,\n    long\
+    \ double eps = 1e-12L\n) {\n    return orientation(a, b, c, eps) == 0;\n}\n\n\
+    template <Coordinate T>\nPoint<long double> rotate(const Point<T>& point, long\
+    \ double angle) {\n    long double cosine = std::cos(angle);\n    long double\
+    \ sine = std::sin(angle);\n    return Point<long double>(\n        static_cast<long\
+    \ double>(point.x) * cosine -\n            static_cast<long double>(point.y) *\
+    \ sine,\n        static_cast<long double>(point.x) * sine +\n            static_cast<long\
+    \ double>(point.y) * cosine\n    );\n}\n\ntemplate <Coordinate T>\nPoint<long\
+    \ double> normalized(const Point<T>& point) {\n    long double length = norm(point);\n\
+    \    assert(length != 0);\n    return Point<long double>(\n        static_cast<long\
+    \ double>(point.x) / length,\n        static_cast<long double>(point.y) / length\n\
+    \    );\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 16 \"\
+    geometry/euclidean_mst.hpp\"\n\nnamespace m1une {\nnamespace geometry {\n\ntemplate\
+    \ <class T>\nstruct EuclideanMstEdge {\n    int from;\n    int to;\n    T squared_distance;\n\
+    };\n\ntemplate <class T>\nstruct EuclideanMst {\n    long double cost;\n    std::vector<EuclideanMstEdge<T>>\
     \ edges;\n};\n\nnamespace detail {\n\ntemplate <std::integral T>\nclass EuclideanDelaunay\
     \ {\n   private:\n    using W = wide_type<T>;\n\n    struct InternalPoint {\n\
     \        W x;\n        W y;\n\n        friend bool operator==(const InternalPoint&,\
@@ -549,13 +585,14 @@ data:
   dependsOn:
   - ds/dsu/dsu.hpp
   - geometry/point.hpp
+  - geometry/detail/floating_predicate.hpp
   isVerificationFile: false
   path: geometry/euclidean_mst.hpp
   requiredBy:
   - geometry/delaunay_triangulation.hpp
   - geometry/all.hpp
   - geometry/voronoi_diagram.hpp
-  timestamp: '2026-07-22 14:57:12+09:00'
+  timestamp: '2026-08-20 21:15:27+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/voronoi_diagram.test.cpp

@@ -436,6 +436,9 @@ data:
     path: verify/geometry/farthest_pair.test.cpp
     title: verify/geometry/farthest_pair.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/floating_predicates.test.cpp
+    title: verify/geometry/floating_predicates.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/geometry_algorithms.test.cpp
     title: verify/geometry/geometry_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1641,6 +1644,7 @@ data:
   - verify/geometry/circle_ray.test.cpp
   - verify/geometry/convex_diameter.test.cpp
   - verify/geometry/circle_polygon_intersection_area.test.cpp
+  - verify/geometry/floating_predicates.test.cpp
   - verify/geometry/convex_layers.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/polygon_area.test.cpp

@@ -44,6 +44,9 @@ data:
     path: geometry/detail/convex_polygon_normalize.hpp
     title: geometry/detail/convex_polygon_normalize.hpp
   - icon: ':heavy_check_mark:'
+    path: geometry/detail/floating_predicate.hpp
+    title: geometry/detail/floating_predicate.hpp
+  - icon: ':heavy_check_mark:'
     path: geometry/euclidean_mst.hpp
     title: Euclidean Minimum Spanning Tree
   - icon: ':heavy_check_mark:'
@@ -206,6 +209,7 @@ data:
   dependsOn:
   - geometry/angle_sort.hpp
   - geometry/point.hpp
+  - geometry/detail/floating_predicate.hpp
   - geometry/circle.hpp
   - geometry/ray.hpp
   - geometry/line.hpp
@@ -245,7 +249,7 @@ data:
   isVerificationFile: false
   path: geometry/all.hpp
   requiredBy: []
-  timestamp: '2026-08-20 20:51:34+09:00'
+  timestamp: '2026-08-20 21:15:27+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/centroid.test.cpp
@@ -293,6 +297,12 @@ title: Geometry Bundle
 
 Integral predicates promote to signed 128-bit arithmetic. Constructions that
 may be non-integral return `Point<long double>`.
+
+Core floating-point point, line, segment, and ray predicates use a
+dimensionless scale-aware epsilon. Uniformly scaling a complete configuration
+does not change their orientation, direction, containment, or intersection
+classification. See the individual point, line, and ray pages for the exact
+tolerance semantics.
 
 ## Centroid overloads
 

@@ -668,6 +668,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: geometry/detail/convex_polygon_normalize.hpp
       title: geometry/detail/convex_polygon_normalize.hpp
+    - icon: ':heavy_check_mark:'
+      path: geometry/detail/floating_predicate.hpp
+      title: geometry/detail/floating_predicate.hpp
   - name: graph
     pages:
     - icon: ':heavy_check_mark:'
@@ -1880,6 +1883,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/geometry/farthest_pair.test.cpp
       title: verify/geometry/farthest_pair.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/geometry/floating_predicates.test.cpp
+      title: verify/geometry/floating_predicates.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/geometry/geometry_algorithms.test.cpp
       title: verify/geometry/geometry_algorithms.test.cpp

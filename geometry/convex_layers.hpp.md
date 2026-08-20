@@ -2,6 +2,9 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
+    path: geometry/detail/floating_predicate.hpp
+    title: geometry/detail/floating_predicate.hpp
+  - icon: ':heavy_check_mark:'
     path: geometry/point.hpp
     title: 2D Point and Predicates
   _extendedRequiredBy:
@@ -26,35 +29,65 @@ data:
   bundledCode: "#line 1 \"geometry/convex_layers.hpp\"\n\n\n\n#include <algorithm>\n\
     #include <cassert>\n#include <cstddef>\n#include <utility>\n#include <vector>\n\
     \n#line 1 \"geometry/point.hpp\"\n\n\n\n#include <cmath>\n#include <concepts>\n\
-    #line 7 \"geometry/point.hpp\"\n#include <type_traits>\n\nnamespace m1une {\n\
-    namespace geometry {\n\ntemplate <typename T>\nconcept Coordinate = std::is_arithmetic_v<T>\
-    \ && !std::same_as<std::remove_cv_t<T>, bool>;\n\ntemplate <Coordinate T>\nusing\
-    \ wide_type = std::conditional_t<std::integral<T>, __int128_t, long double>;\n\
-    \ntemplate <Coordinate T>\nstruct Point {\n    T x;\n    T y;\n\n    constexpr\
-    \ Point() : x(0), y(0) {}\n    constexpr Point(T x_value, T y_value) : x(x_value),\
-    \ y(y_value) {}\n\n    template <Coordinate U>\n    explicit constexpr Point(const\
-    \ Point<U>& other)\n        : x(static_cast<T>(other.x)), y(static_cast<T>(other.y))\
-    \ {}\n\n    constexpr Point& operator+=(const Point& other) {\n        x += other.x;\n\
-    \        y += other.y;\n        return *this;\n    }\n\n    constexpr Point& operator-=(const\
-    \ Point& other) {\n        x -= other.x;\n        y -= other.y;\n        return\
-    \ *this;\n    }\n\n    constexpr Point operator+() const {\n        return *this;\n\
-    \    }\n\n    constexpr Point operator-() const {\n        return Point(-x, -y);\n\
-    \    }\n\n    friend constexpr Point operator+(Point left, const Point& right)\
-    \ {\n        return left += right;\n    }\n\n    friend constexpr Point operator-(Point\
-    \ left, const Point& right) {\n        return left -= right;\n    }\n\n    friend\
-    \ constexpr bool operator==(const Point&, const Point&) = default;\n\n    friend\
-    \ constexpr bool operator<(const Point& left, const Point& right) {\n        if\
-    \ (left.x != right.x) return left.x < right.x;\n        return left.y < right.y;\n\
-    \    }\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const\
-    \ Point<T>& point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate\
-    \ T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(const\
+    #line 7 \"geometry/point.hpp\"\n#include <type_traits>\n\n#line 1 \"geometry/detail/floating_predicate.hpp\"\
+    \n\n\n\nnamespace m1une {\nnamespace geometry {\nnamespace predicate_detail {\n\
+    \ntemplate <typename T>\nconstexpr T absolute(T value) {\n    return value < T(0)\
+    \ ? -value : value;\n}\n\ntemplate <typename T>\nconstexpr T max_value(T first,\
+    \ T second) {\n    return first < second ? second : first;\n}\n\ntemplate <typename\
+    \ T>\nconstexpr T vector_scale(T x, T y) {\n    return max_value(absolute(x),\
+    \ absolute(y));\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int scaled_sign(T\
+    \ value, T scale, long double eps) {\n    if constexpr (Exact) {\n        return\
+    \ (value > T(0)) - (value < T(0));\n    } else {\n        const T tolerance =\
+    \ T(eps) * scale;\n        return (value > tolerance) - (value < -tolerance);\n\
+    \    }\n}\n\ntemplate <bool Exact, typename T>\nconstexpr T determinant_scale(T\
+    \ ax, T ay, T bx, T by) {\n    if constexpr (Exact) {\n        return T(0);\n\
+    \    } else {\n        return vector_scale(ax, ay) * vector_scale(bx, by);\n \
+    \   }\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int determinant_sign(\n\
+    \    T ax,\n    T ay,\n    T bx,\n    T by,\n    long double eps\n) {\n    const\
+    \ T determinant = ax * by - ay * bx;\n    return scaled_sign<Exact>(\n       \
+    \ determinant,\n        determinant_scale<Exact>(ax, ay, bx, by),\n        eps\n\
+    \    );\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int orientation_sign(\n\
+    \    T direction_x,\n    T direction_y,\n    T offset_x,\n    T offset_y,\n  \
+    \  long double eps\n) {\n    const T determinant =\n        direction_x * offset_y\
+    \ - direction_y * offset_x;\n    T scale = T(0);\n    if constexpr (!Exact) {\n\
+    \        const T direction_scale =\n            vector_scale(direction_x, direction_y);\n\
+    \        scale = direction_scale * max_value(\n            direction_scale,\n\
+    \            vector_scale(offset_x, offset_y)\n        );\n    }\n    return scaled_sign<Exact>(determinant,\
+    \ scale, eps);\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int dot_sign(\n\
+    \    T ax,\n    T ay,\n    T bx,\n    T by,\n    long double eps\n) {\n    const\
+    \ T value = ax * bx + ay * by;\n    T scale = T(0);\n    if constexpr (!Exact)\
+    \ {\n        scale = vector_scale(ax, ay) * vector_scale(bx, by);\n    }\n   \
+    \ return scaled_sign<Exact>(value, scale, eps);\n}\n\n}  // namespace predicate_detail\n\
+    }  // namespace geometry\n}  // namespace m1une\n\n\n#line 10 \"geometry/point.hpp\"\
+    \n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <typename T>\nconcept\
+    \ Coordinate = std::is_arithmetic_v<T> && !std::same_as<std::remove_cv_t<T>, bool>;\n\
+    \ntemplate <Coordinate T>\nusing wide_type = std::conditional_t<std::integral<T>,\
+    \ __int128_t, long double>;\n\ntemplate <Coordinate T>\nstruct Point {\n    T\
+    \ x;\n    T y;\n\n    constexpr Point() : x(0), y(0) {}\n    constexpr Point(T\
+    \ x_value, T y_value) : x(x_value), y(y_value) {}\n\n    template <Coordinate\
+    \ U>\n    explicit constexpr Point(const Point<U>& other)\n        : x(static_cast<T>(other.x)),\
+    \ y(static_cast<T>(other.y)) {}\n\n    constexpr Point& operator+=(const Point&\
+    \ other) {\n        x += other.x;\n        y += other.y;\n        return *this;\n\
+    \    }\n\n    constexpr Point& operator-=(const Point& other) {\n        x -=\
+    \ other.x;\n        y -= other.y;\n        return *this;\n    }\n\n    constexpr\
+    \ Point operator+() const {\n        return *this;\n    }\n\n    constexpr Point\
+    \ operator-() const {\n        return Point(-x, -y);\n    }\n\n    friend constexpr\
+    \ Point operator+(Point left, const Point& right) {\n        return left += right;\n\
+    \    }\n\n    friend constexpr Point operator-(Point left, const Point& right)\
+    \ {\n        return left -= right;\n    }\n\n    friend constexpr bool operator==(const\
+    \ Point&, const Point&) = default;\n\n    friend constexpr bool operator<(const\
+    \ Point& left, const Point& right) {\n        if (left.x != right.x) return left.x\
+    \ < right.x;\n        return left.y < right.y;\n    }\n};\n\ntemplate <Coordinate\
+    \ T>\nconstexpr Point<long double> centroid(const Point<T>& point) {\n    return\
+    \ Point<long double>(point);\n}\n\ntemplate <Coordinate T, typename Scalar>\n\
+    requires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(const Point<T>&\
+    \ point, Scalar scalar) {\n    using Result = std::common_type_t<T, Scalar>;\n\
+    \    return Point<Result>(\n        Result(point.x) * Result(scalar),\n      \
+    \  Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate <typename Scalar, Coordinate\
+    \ T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(Scalar scalar,\
+    \ const Point<T>& point) {\n    return point * scalar;\n}\n\ntemplate <Coordinate\
+    \ T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator/(const\
     \ Point<T>& point, Scalar scalar) {\n    using Result = std::common_type_t<T,\
-    \ Scalar>;\n    return Point<Result>(\n        Result(point.x) * Result(scalar),\n\
-    \        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate <typename Scalar,\
-    \ Coordinate T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(Scalar\
-    \ scalar, const Point<T>& point) {\n    return point * scalar;\n}\n\ntemplate\
-    \ <Coordinate T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr\
-    \ auto operator/(const Point<T>& point, Scalar scalar) {\n    using Result = std::common_type_t<T,\
     \ Scalar>;\n    return Point<Result>(\n        Result(point.x) / Result(scalar),\n\
     \        Result(point.y) / Result(scalar)\n    );\n}\n\ntemplate <Coordinate T>\n\
     constexpr wide_type<T> dot(const Point<T>& a, const Point<T>& b) {\n    using\
@@ -91,33 +124,36 @@ data:
     \ assert(denominator != 0);\n    Point<long double> first(a);\n    Point<long\
     \ double> direction = Point<long double>(b) - first;\n    return first + direction\
     \ * (first_ratio / denominator);\n}\n\ntemplate <Coordinate T>\nconstexpr int\
-    \ sign(wide_type<T> value, long double eps = 1e-12L) {\n    if constexpr (std::integral<T>)\
-    \ {\n        return (value > 0) - (value < 0);\n    } else {\n        return (value\
-    \ > eps) - (value < -eps);\n    }\n}\n\ntemplate <Coordinate T>\nconstexpr int\
-    \ orientation(\n    const Point<T>& a,\n    const Point<T>& b,\n    const Point<T>&\
-    \ c,\n    long double eps = 1e-12L\n) {\n    return sign<T>(cross(a, b, c), eps);\n\
-    }\n\ntemplate <Coordinate T>\nconstexpr bool collinear(\n    const Point<T>& a,\n\
-    \    const Point<T>& b,\n    const Point<T>& c,\n    long double eps = 1e-12L\n\
-    ) {\n    return orientation(a, b, c, eps) == 0;\n}\n\ntemplate <Coordinate T>\n\
-    Point<long double> rotate(const Point<T>& point, long double angle) {\n    long\
-    \ double cosine = std::cos(angle);\n    long double sine = std::sin(angle);\n\
-    \    return Point<long double>(\n        static_cast<long double>(point.x) * cosine\
-    \ -\n            static_cast<long double>(point.y) * sine,\n        static_cast<long\
-    \ double>(point.x) * sine +\n            static_cast<long double>(point.y) * cosine\n\
-    \    );\n}\n\ntemplate <Coordinate T>\nPoint<long double> normalized(const Point<T>&\
-    \ point) {\n    long double length = norm(point);\n    assert(length != 0);\n\
-    \    return Point<long double>(\n        static_cast<long double>(point.x) / length,\n\
-    \        static_cast<long double>(point.y) / length\n    );\n}\n\n}  // namespace\
-    \ geometry\n}  // namespace m1une\n\n\n#line 11 \"geometry/convex_layers.hpp\"\
-    \n\nnamespace m1une {\nnamespace geometry {\n\nnamespace convex_layers_detail\
-    \ {\n\ntemplate <Coordinate T>\nstruct LayerPoint {\n    wide_type<T> x;\n   \
-    \ wide_type<T> y;\n};\n\ntemplate <Coordinate T>\nwide_type<T> layer_cross(\n\
-    \    const LayerPoint<T>& first,\n    const LayerPoint<T>& second,\n    const\
-    \ LayerPoint<T>& third\n) {\n    return\n        (second.x - first.x) * (third.y\
-    \ - first.y) -\n        (second.y - first.y) * (third.x - first.x);\n}\n\ntemplate\
-    \ <Coordinate T>\nclass DecrementalHull {\n   private:\n    struct Node {\n  \
-    \      int left_bound;\n        int right_bound;\n        int bridge_left;\n \
-    \       int bridge_right;\n        int left_child;\n        int right_child;\n\
+    \ sign(wide_type<T> value, long double eps = 1e-12L) {\n    return predicate_detail::scaled_sign<std::integral<T>>(\n\
+    \        value,\n        wide_type<T>(1),\n        eps\n    );\n}\n\ntemplate\
+    \ <Coordinate T>\nconstexpr int orientation(\n    const Point<T>& a,\n    const\
+    \ Point<T>& b,\n    const Point<T>& c,\n    long double eps = 1e-12L\n) {\n  \
+    \  using W = wide_type<T>;\n    const W first_x = W(b.x) - W(a.x);\n    const\
+    \ W first_y = W(b.y) - W(a.y);\n    const W second_x = W(c.x) - W(a.x);\n    const\
+    \ W second_y = W(c.y) - W(a.y);\n    return predicate_detail::orientation_sign<std::integral<T>>(\n\
+    \        first_x,\n        first_y,\n        second_x,\n        second_y,\n  \
+    \      eps\n    );\n}\n\ntemplate <Coordinate T>\nconstexpr bool collinear(\n\
+    \    const Point<T>& a,\n    const Point<T>& b,\n    const Point<T>& c,\n    long\
+    \ double eps = 1e-12L\n) {\n    return orientation(a, b, c, eps) == 0;\n}\n\n\
+    template <Coordinate T>\nPoint<long double> rotate(const Point<T>& point, long\
+    \ double angle) {\n    long double cosine = std::cos(angle);\n    long double\
+    \ sine = std::sin(angle);\n    return Point<long double>(\n        static_cast<long\
+    \ double>(point.x) * cosine -\n            static_cast<long double>(point.y) *\
+    \ sine,\n        static_cast<long double>(point.x) * sine +\n            static_cast<long\
+    \ double>(point.y) * cosine\n    );\n}\n\ntemplate <Coordinate T>\nPoint<long\
+    \ double> normalized(const Point<T>& point) {\n    long double length = norm(point);\n\
+    \    assert(length != 0);\n    return Point<long double>(\n        static_cast<long\
+    \ double>(point.x) / length,\n        static_cast<long double>(point.y) / length\n\
+    \    );\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 11 \"\
+    geometry/convex_layers.hpp\"\n\nnamespace m1une {\nnamespace geometry {\n\nnamespace\
+    \ convex_layers_detail {\n\ntemplate <Coordinate T>\nstruct LayerPoint {\n   \
+    \ wide_type<T> x;\n    wide_type<T> y;\n};\n\ntemplate <Coordinate T>\nwide_type<T>\
+    \ layer_cross(\n    const LayerPoint<T>& first,\n    const LayerPoint<T>& second,\n\
+    \    const LayerPoint<T>& third\n) {\n    return\n        (second.x - first.x)\
+    \ * (third.y - first.y) -\n        (second.y - first.y) * (third.x - first.x);\n\
+    }\n\ntemplate <Coordinate T>\nclass DecrementalHull {\n   private:\n    struct\
+    \ Node {\n        int left_bound;\n        int right_bound;\n        int bridge_left;\n\
+    \        int bridge_right;\n        int left_child;\n        int right_child;\n\
     \    };\n\n    std::vector<LayerPoint<T>> points;\n    std::vector<Node> nodes;\n\
     \    int root;\n\n    bool is_leaf(int node) const {\n        return nodes[node].left_child\
     \ == -1 && nodes[node].right_child == -1;\n    }\n\n    void pull(int node) {\n\
@@ -335,11 +371,12 @@ data:
     \ M1UNE_GEOMETRY_CONVEX_LAYERS_HPP\n"
   dependsOn:
   - geometry/point.hpp
+  - geometry/detail/floating_predicate.hpp
   isVerificationFile: false
   path: geometry/convex_layers.hpp
   requiredBy:
   - geometry/all.hpp
-  timestamp: '2026-07-22 02:25:12+09:00'
+  timestamp: '2026-08-20 21:15:27+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/centroid.test.cpp

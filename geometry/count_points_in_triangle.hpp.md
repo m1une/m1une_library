@@ -2,6 +2,9 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
+    path: geometry/detail/floating_predicate.hpp
+    title: geometry/detail/floating_predicate.hpp
+  - icon: ':heavy_check_mark:'
     path: geometry/point.hpp
     title: 2D Point and Predicates
   _extendedRequiredBy:
@@ -27,9 +30,39 @@ data:
     \ <algorithm>\n#include <cassert>\n#include <concepts>\n#include <cstddef>\n#include\
     \ <limits>\n#include <numeric>\n#include <utility>\n#include <vector>\n\n#line\
     \ 1 \"geometry/point.hpp\"\n\n\n\n#include <cmath>\n#line 7 \"geometry/point.hpp\"\
-    \n#include <type_traits>\n\nnamespace m1une {\nnamespace geometry {\n\ntemplate\
-    \ <typename T>\nconcept Coordinate = std::is_arithmetic_v<T> && !std::same_as<std::remove_cv_t<T>,\
-    \ bool>;\n\ntemplate <Coordinate T>\nusing wide_type = std::conditional_t<std::integral<T>,\
+    \n#include <type_traits>\n\n#line 1 \"geometry/detail/floating_predicate.hpp\"\
+    \n\n\n\nnamespace m1une {\nnamespace geometry {\nnamespace predicate_detail {\n\
+    \ntemplate <typename T>\nconstexpr T absolute(T value) {\n    return value < T(0)\
+    \ ? -value : value;\n}\n\ntemplate <typename T>\nconstexpr T max_value(T first,\
+    \ T second) {\n    return first < second ? second : first;\n}\n\ntemplate <typename\
+    \ T>\nconstexpr T vector_scale(T x, T y) {\n    return max_value(absolute(x),\
+    \ absolute(y));\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int scaled_sign(T\
+    \ value, T scale, long double eps) {\n    if constexpr (Exact) {\n        return\
+    \ (value > T(0)) - (value < T(0));\n    } else {\n        const T tolerance =\
+    \ T(eps) * scale;\n        return (value > tolerance) - (value < -tolerance);\n\
+    \    }\n}\n\ntemplate <bool Exact, typename T>\nconstexpr T determinant_scale(T\
+    \ ax, T ay, T bx, T by) {\n    if constexpr (Exact) {\n        return T(0);\n\
+    \    } else {\n        return vector_scale(ax, ay) * vector_scale(bx, by);\n \
+    \   }\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int determinant_sign(\n\
+    \    T ax,\n    T ay,\n    T bx,\n    T by,\n    long double eps\n) {\n    const\
+    \ T determinant = ax * by - ay * bx;\n    return scaled_sign<Exact>(\n       \
+    \ determinant,\n        determinant_scale<Exact>(ax, ay, bx, by),\n        eps\n\
+    \    );\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int orientation_sign(\n\
+    \    T direction_x,\n    T direction_y,\n    T offset_x,\n    T offset_y,\n  \
+    \  long double eps\n) {\n    const T determinant =\n        direction_x * offset_y\
+    \ - direction_y * offset_x;\n    T scale = T(0);\n    if constexpr (!Exact) {\n\
+    \        const T direction_scale =\n            vector_scale(direction_x, direction_y);\n\
+    \        scale = direction_scale * max_value(\n            direction_scale,\n\
+    \            vector_scale(offset_x, offset_y)\n        );\n    }\n    return scaled_sign<Exact>(determinant,\
+    \ scale, eps);\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int dot_sign(\n\
+    \    T ax,\n    T ay,\n    T bx,\n    T by,\n    long double eps\n) {\n    const\
+    \ T value = ax * bx + ay * by;\n    T scale = T(0);\n    if constexpr (!Exact)\
+    \ {\n        scale = vector_scale(ax, ay) * vector_scale(bx, by);\n    }\n   \
+    \ return scaled_sign<Exact>(value, scale, eps);\n}\n\n}  // namespace predicate_detail\n\
+    }  // namespace geometry\n}  // namespace m1une\n\n\n#line 10 \"geometry/point.hpp\"\
+    \n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <typename T>\nconcept\
+    \ Coordinate = std::is_arithmetic_v<T> && !std::same_as<std::remove_cv_t<T>, bool>;\n\
+    \ntemplate <Coordinate T>\nusing wide_type = std::conditional_t<std::integral<T>,\
     \ __int128_t, long double>;\n\ntemplate <Coordinate T>\nstruct Point {\n    T\
     \ x;\n    T y;\n\n    constexpr Point() : x(0), y(0) {}\n    constexpr Point(T\
     \ x_value, T y_value) : x(x_value), y(y_value) {}\n\n    template <Coordinate\
@@ -92,60 +125,63 @@ data:
     \ assert(denominator != 0);\n    Point<long double> first(a);\n    Point<long\
     \ double> direction = Point<long double>(b) - first;\n    return first + direction\
     \ * (first_ratio / denominator);\n}\n\ntemplate <Coordinate T>\nconstexpr int\
-    \ sign(wide_type<T> value, long double eps = 1e-12L) {\n    if constexpr (std::integral<T>)\
-    \ {\n        return (value > 0) - (value < 0);\n    } else {\n        return (value\
-    \ > eps) - (value < -eps);\n    }\n}\n\ntemplate <Coordinate T>\nconstexpr int\
-    \ orientation(\n    const Point<T>& a,\n    const Point<T>& b,\n    const Point<T>&\
-    \ c,\n    long double eps = 1e-12L\n) {\n    return sign<T>(cross(a, b, c), eps);\n\
-    }\n\ntemplate <Coordinate T>\nconstexpr bool collinear(\n    const Point<T>& a,\n\
-    \    const Point<T>& b,\n    const Point<T>& c,\n    long double eps = 1e-12L\n\
-    ) {\n    return orientation(a, b, c, eps) == 0;\n}\n\ntemplate <Coordinate T>\n\
-    Point<long double> rotate(const Point<T>& point, long double angle) {\n    long\
-    \ double cosine = std::cos(angle);\n    long double sine = std::sin(angle);\n\
-    \    return Point<long double>(\n        static_cast<long double>(point.x) * cosine\
-    \ -\n            static_cast<long double>(point.y) * sine,\n        static_cast<long\
-    \ double>(point.x) * sine +\n            static_cast<long double>(point.y) * cosine\n\
-    \    );\n}\n\ntemplate <Coordinate T>\nPoint<long double> normalized(const Point<T>&\
-    \ point) {\n    long double length = norm(point);\n    assert(length != 0);\n\
-    \    return Point<long double>(\n        static_cast<long double>(point.x) / length,\n\
-    \        static_cast<long double>(point.y) / length\n    );\n}\n\n}  // namespace\
-    \ geometry\n}  // namespace m1une\n\n\n#line 14 \"geometry/count_points_in_triangle.hpp\"\
-    \n\nnamespace m1une {\nnamespace geometry {\n\nnamespace count_points_in_triangle_detail\
-    \ {\n\nclass FenwickTree {\n   private:\n    std::vector<int> values;\n\n   public:\n\
-    \    explicit FenwickTree(std::size_t size) : values(size, 0) {}\n\n    void add(std::size_t\
-    \ position) {\n        for (\n            ++position;\n            position <=\
-    \ values.size();\n            position += position & -position\n        ) {\n\
-    \            values[position - 1]++;\n        }\n    }\n\n    int prefix_sum(std::size_t\
-    \ right) const {\n        int result = 0;\n        for (; right > 0; right -=\
-    \ right & -right) {\n            result += values[right - 1];\n        }\n   \
-    \     return result;\n    }\n};\n\ntemplate <std::integral T>\nstruct SweepItem\
-    \ {\n    using Wide = wide_type<T>;\n\n    Wide x;\n    Wide y;\n    int index;\n\
-    \    int kind;\n};\n\n}  // namespace count_points_in_triangle_detail\n\ntemplate\
-    \ <std::integral T>\nclass CountPointsInTriangle {\n   private:\n    using Wide\
-    \ = wide_type<T>;\n    using SweepItem = count_points_in_triangle_detail::SweepItem<T>;\n\
-    \n    static constexpr int before_counted_points = 0;\n    static constexpr int\
-    \ counted_point = 1;\n    static constexpr int after_counted_points = 2;\n\n \
-    \   std::vector<Point<T>> vertices;\n    std::vector<int> horizontal_left;\n \
-    \   std::vector<int> horizontal_equal;\n    std::vector<std::vector<int>> edge_left;\n\
-    \    std::vector<std::vector<int>> edge_equal;\n\n    static bool yx_less(const\
-    \ Point<T>& first, const Point<T>& second) {\n        if (first.y != second.y)\
-    \ return first.y < second.y;\n        return first.x < second.x;\n    }\n\n  \
-    \  SweepItem make_item(\n        const Point<T>& origin,\n        const Point<T>&\
-    \ point,\n        int index,\n        int kind\n    ) const {\n        return\
-    \ SweepItem{\n            Wide(point.x) - Wide(origin.x),\n            Wide(point.y)\
-    \ - Wide(origin.y),\n            index,\n            kind\n        };\n    }\n\
-    \n    void build(const std::vector<Point<T>>& counted_points) {\n        const\
-    \ int vertex_count = int(vertices.size());\n        const int counted_point_count\
-    \ = int(counted_points.size());\n        for (int anchor = 0; anchor < vertex_count;\
-    \ ++anchor) {\n            for (const Point<T>& point : counted_points) {\n  \
-    \              if (point.y != vertices[anchor].y) continue;\n                if\
-    \ (point.x < vertices[anchor].x) {\n                    horizontal_left[anchor]++;\n\
-    \                } else if (point.x == vertices[anchor].x) {\n               \
-    \     horizontal_equal[anchor]++;\n                }\n            }\n\n      \
-    \      std::vector<SweepItem> items;\n            items.reserve(2 * vertices.size()\
-    \ + counted_points.size());\n            for (int index = 0; index < vertex_count;\
-    \ ++index) {\n                if (vertices[anchor].y < vertices[index].y) {\n\
-    \                    items.push_back(make_item(\n                        vertices[anchor],\n\
+    \ sign(wide_type<T> value, long double eps = 1e-12L) {\n    return predicate_detail::scaled_sign<std::integral<T>>(\n\
+    \        value,\n        wide_type<T>(1),\n        eps\n    );\n}\n\ntemplate\
+    \ <Coordinate T>\nconstexpr int orientation(\n    const Point<T>& a,\n    const\
+    \ Point<T>& b,\n    const Point<T>& c,\n    long double eps = 1e-12L\n) {\n  \
+    \  using W = wide_type<T>;\n    const W first_x = W(b.x) - W(a.x);\n    const\
+    \ W first_y = W(b.y) - W(a.y);\n    const W second_x = W(c.x) - W(a.x);\n    const\
+    \ W second_y = W(c.y) - W(a.y);\n    return predicate_detail::orientation_sign<std::integral<T>>(\n\
+    \        first_x,\n        first_y,\n        second_x,\n        second_y,\n  \
+    \      eps\n    );\n}\n\ntemplate <Coordinate T>\nconstexpr bool collinear(\n\
+    \    const Point<T>& a,\n    const Point<T>& b,\n    const Point<T>& c,\n    long\
+    \ double eps = 1e-12L\n) {\n    return orientation(a, b, c, eps) == 0;\n}\n\n\
+    template <Coordinate T>\nPoint<long double> rotate(const Point<T>& point, long\
+    \ double angle) {\n    long double cosine = std::cos(angle);\n    long double\
+    \ sine = std::sin(angle);\n    return Point<long double>(\n        static_cast<long\
+    \ double>(point.x) * cosine -\n            static_cast<long double>(point.y) *\
+    \ sine,\n        static_cast<long double>(point.x) * sine +\n            static_cast<long\
+    \ double>(point.y) * cosine\n    );\n}\n\ntemplate <Coordinate T>\nPoint<long\
+    \ double> normalized(const Point<T>& point) {\n    long double length = norm(point);\n\
+    \    assert(length != 0);\n    return Point<long double>(\n        static_cast<long\
+    \ double>(point.x) / length,\n        static_cast<long double>(point.y) / length\n\
+    \    );\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 14 \"\
+    geometry/count_points_in_triangle.hpp\"\n\nnamespace m1une {\nnamespace geometry\
+    \ {\n\nnamespace count_points_in_triangle_detail {\n\nclass FenwickTree {\n  \
+    \ private:\n    std::vector<int> values;\n\n   public:\n    explicit FenwickTree(std::size_t\
+    \ size) : values(size, 0) {}\n\n    void add(std::size_t position) {\n       \
+    \ for (\n            ++position;\n            position <= values.size();\n   \
+    \         position += position & -position\n        ) {\n            values[position\
+    \ - 1]++;\n        }\n    }\n\n    int prefix_sum(std::size_t right) const {\n\
+    \        int result = 0;\n        for (; right > 0; right -= right & -right) {\n\
+    \            result += values[right - 1];\n        }\n        return result;\n\
+    \    }\n};\n\ntemplate <std::integral T>\nstruct SweepItem {\n    using Wide =\
+    \ wide_type<T>;\n\n    Wide x;\n    Wide y;\n    int index;\n    int kind;\n};\n\
+    \n}  // namespace count_points_in_triangle_detail\n\ntemplate <std::integral T>\n\
+    class CountPointsInTriangle {\n   private:\n    using Wide = wide_type<T>;\n \
+    \   using SweepItem = count_points_in_triangle_detail::SweepItem<T>;\n\n    static\
+    \ constexpr int before_counted_points = 0;\n    static constexpr int counted_point\
+    \ = 1;\n    static constexpr int after_counted_points = 2;\n\n    std::vector<Point<T>>\
+    \ vertices;\n    std::vector<int> horizontal_left;\n    std::vector<int> horizontal_equal;\n\
+    \    std::vector<std::vector<int>> edge_left;\n    std::vector<std::vector<int>>\
+    \ edge_equal;\n\n    static bool yx_less(const Point<T>& first, const Point<T>&\
+    \ second) {\n        if (first.y != second.y) return first.y < second.y;\n   \
+    \     return first.x < second.x;\n    }\n\n    SweepItem make_item(\n        const\
+    \ Point<T>& origin,\n        const Point<T>& point,\n        int index,\n    \
+    \    int kind\n    ) const {\n        return SweepItem{\n            Wide(point.x)\
+    \ - Wide(origin.x),\n            Wide(point.y) - Wide(origin.y),\n           \
+    \ index,\n            kind\n        };\n    }\n\n    void build(const std::vector<Point<T>>&\
+    \ counted_points) {\n        const int vertex_count = int(vertices.size());\n\
+    \        const int counted_point_count = int(counted_points.size());\n       \
+    \ for (int anchor = 0; anchor < vertex_count; ++anchor) {\n            for (const\
+    \ Point<T>& point : counted_points) {\n                if (point.y != vertices[anchor].y)\
+    \ continue;\n                if (point.x < vertices[anchor].x) {\n           \
+    \         horizontal_left[anchor]++;\n                } else if (point.x == vertices[anchor].x)\
+    \ {\n                    horizontal_equal[anchor]++;\n                }\n    \
+    \        }\n\n            std::vector<SweepItem> items;\n            items.reserve(2\
+    \ * vertices.size() + counted_points.size());\n            for (int index = 0;\
+    \ index < vertex_count; ++index) {\n                if (vertices[anchor].y < vertices[index].y)\
+    \ {\n                    items.push_back(make_item(\n                        vertices[anchor],\n\
     \                        vertices[index],\n                        index,\n  \
     \                      before_counted_points\n                    ));\n      \
     \          }\n            }\n            for (int index = 0; index < counted_point_count;\
@@ -327,11 +363,12 @@ data:
     \   }\n};\n\n}  // namespace geometry\n}  // namespace m1une\n\n#endif  // M1UNE_GEOMETRY_COUNT_POINTS_IN_TRIANGLE_HPP\n"
   dependsOn:
   - geometry/point.hpp
+  - geometry/detail/floating_predicate.hpp
   isVerificationFile: false
   path: geometry/count_points_in_triangle.hpp
   requiredBy:
   - geometry/all.hpp
-  timestamp: '2026-07-22 02:25:12+09:00'
+  timestamp: '2026-08-20 21:15:27+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/centroid.test.cpp
