@@ -5,12 +5,13 @@ documentation_of: ../../geometry/circle_union_area.hpp
 
 ## Overview
 
-`circle_union_area` returns the area covered by at least one closed disk.
+`circle_union_area` returns the area covered by at least one circle's enclosed
+region, regardless of each `Circle::filled` flag.
 Overlaps are counted once. Circles may be disjoint, tangent, nested, or
 coincident, and radius-zero circles contribute no area.
 
 For each circle, the implementation finds and merges the angular intervals of
-its circumference covered by other disks. It integrates the remaining exposed
+its circumference covered by other circles. It integrates the remaining exposed
 arcs using Green's theorem.
 
 ## Interface

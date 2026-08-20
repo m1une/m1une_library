@@ -8,9 +8,10 @@
 #include <cstddef>
 #include <limits>
 #include <optional>
+#include <type_traits>
 #include <vector>
 
-#include "linear.hpp"
+#include "circle.hpp"
 
 namespace m1une {
 namespace geometry {
@@ -19,6 +20,12 @@ enum class PointInPolygon {
     Outside = 0,
     Boundary = 1,
     Inside = 2,
+};
+
+template <Coordinate T>
+struct Polygon {
+    std::vector<Point<T>> vertices;
+    bool filled = true;
 };
 
 template <Coordinate T>
@@ -348,6 +355,37 @@ PointInPolygon point_in_polygon(
     return inside ? PointInPolygon::Inside : PointInPolygon::Outside;
 }
 
+template <Coordinate T, Coordinate P>
+PointInPolygon point_in_polygon(
+    const Polygon<T>& polygon,
+    const Point<P>& point,
+    long double eps = 1e-12L
+) {
+    assert(polygon.vertices.size() >= 3);
+    if constexpr (std::is_same_v<T, P>) {
+        return point_in_polygon(polygon.vertices, point, eps);
+    } else {
+        std::vector<Point<long double>> vertices;
+        vertices.reserve(polygon.vertices.size());
+        for (const Point<T>& vertex : polygon.vertices) {
+            vertices.emplace_back(vertex);
+        }
+        return point_in_polygon(vertices, Point<long double>(point), eps);
+    }
+}
+
+template <Coordinate T, Coordinate P>
+bool contains(
+    const Polygon<T>& polygon,
+    const Point<P>& point,
+    long double eps = 1e-12L
+) {
+    const PointInPolygon relation = point_in_polygon(polygon, point, eps);
+    return polygon.filled
+        ? relation != PointInPolygon::Outside
+        : relation == PointInPolygon::Boundary;
+}
+
 template <Coordinate T>
 std::vector<Point<long double>> ray_polygon_intersections(
     const Ray<T>& ray,
@@ -527,6 +565,441 @@ long double distance(
         }
     }
     return result;
+}
+
+template <Coordinate T>
+wide_type<T> polygon_area2(const Polygon<T>& polygon) {
+    return polygon_area2(polygon.vertices);
+}
+
+template <Coordinate T>
+long double polygon_area(const Polygon<T>& polygon) {
+    return polygon_area(polygon.vertices);
+}
+
+template <Coordinate T>
+std::optional<Point<long double>> polygon_centroid(
+    const Polygon<T>& polygon,
+    long double eps = 1e-12L
+) {
+    return polygon_centroid(polygon.vertices, eps);
+}
+
+template <Coordinate T>
+std::optional<Point<long double>> centroid(
+    const Polygon<T>& polygon,
+    long double eps = 1e-12L
+) {
+    return polygon_centroid(polygon.vertices, eps);
+}
+
+namespace polygon_detail {
+
+template <Coordinate T>
+Segment<long double> edge(const Polygon<T>& polygon, std::size_t index) {
+    return Segment<long double>{
+        Point<long double>(polygon.vertices[index]),
+        Point<long double>(
+            polygon.vertices[(index + 1) % polygon.vertices.size()]
+        )
+    };
+}
+
+template <Coordinate T>
+ClosestPoints closest_boundary_point(
+    const Polygon<T>& polygon,
+    const Point<long double>& point
+) {
+    assert(polygon.vertices.size() >= 3);
+    ClosestPoints result = closest_points(edge(polygon, 0), point);
+    for (std::size_t index = 1; index < polygon.vertices.size(); ++index) {
+        closest_points_detail::consider(
+            result,
+            closest_points(edge(polygon, index), point)
+        );
+    }
+    return result;
+}
+
+template <Coordinate T, class Object>
+ClosestPoints closest_boundary_object(
+    const Polygon<T>& polygon,
+    const Object& object
+) {
+    assert(polygon.vertices.size() >= 3);
+    ClosestPoints result = closest_points(edge(polygon, 0), object);
+    for (std::size_t index = 1; index < polygon.vertices.size(); ++index) {
+        closest_points_detail::consider(
+            result,
+            closest_points(edge(polygon, index), object)
+        );
+    }
+    return result;
+}
+
+template <Coordinate A, Coordinate B>
+ClosestPoints closest_boundaries(
+    const Polygon<A>& first,
+    const Polygon<B>& second
+) {
+    assert(first.vertices.size() >= 3);
+    assert(second.vertices.size() >= 3);
+    ClosestPoints result = closest_points(edge(first, 0), edge(second, 0));
+    for (
+        std::size_t first_index = 0;
+        first_index < first.vertices.size();
+        ++first_index
+    ) {
+        for (
+            std::size_t second_index = 0;
+            second_index < second.vertices.size();
+            ++second_index
+        ) {
+            closest_points_detail::consider(
+                result,
+                closest_points(
+                    edge(first, first_index),
+                    edge(second, second_index)
+                )
+            );
+        }
+    }
+    return result;
+}
+
+}  // namespace polygon_detail
+
+template <Coordinate T, Coordinate P>
+ClosestPoints closest_points(
+    const Polygon<T>& polygon,
+    const Point<P>& point,
+    long double eps = 1e-12L
+) {
+    assert(polygon.vertices.size() >= 3);
+    const Point<long double> converted(point);
+    if (polygon.filled && contains(polygon, point, eps)) {
+        return ClosestPoints{converted, converted};
+    }
+    return polygon_detail::closest_boundary_point(polygon, converted);
+}
+
+template <Coordinate P, Coordinate T>
+ClosestPoints closest_points(
+    const Point<P>& point,
+    const Polygon<T>& polygon,
+    long double eps = 1e-12L
+) {
+    return closest_points_detail::reversed(
+        closest_points(polygon, point, eps)
+    );
+}
+
+template <Coordinate T, Coordinate S>
+ClosestPoints closest_points(
+    const Polygon<T>& polygon,
+    const Segment<S>& segment,
+    long double eps = 1e-12L
+) {
+    assert(polygon.vertices.size() >= 3);
+    const Segment<long double> converted{
+        Point<long double>(segment.a),
+        Point<long double>(segment.b)
+    };
+    if (polygon.filled) {
+        if (contains(polygon, segment.a, eps)) {
+            const Point<long double> point(segment.a);
+            return ClosestPoints{point, point};
+        }
+        if (contains(polygon, segment.b, eps)) {
+            const Point<long double> point(segment.b);
+            return ClosestPoints{point, point};
+        }
+    }
+    return polygon_detail::closest_boundary_object(polygon, converted);
+}
+
+template <Coordinate S, Coordinate T>
+ClosestPoints closest_points(
+    const Segment<S>& segment,
+    const Polygon<T>& polygon,
+    long double eps = 1e-12L
+) {
+    return closest_points_detail::reversed(
+        closest_points(polygon, segment, eps)
+    );
+}
+
+template <Coordinate T, Coordinate R>
+ClosestPoints closest_points(
+    const Polygon<T>& polygon,
+    const Ray<R>& ray,
+    long double eps = 1e-12L
+) {
+    assert(polygon.vertices.size() >= 3);
+    const Ray<long double> converted{
+        Point<long double>(ray.origin),
+        Point<long double>(ray.through)
+    };
+    if (polygon.filled && contains(polygon, ray.origin, eps)) {
+        const Point<long double> point(ray.origin);
+        return ClosestPoints{point, point};
+    }
+    return polygon_detail::closest_boundary_object(polygon, converted);
+}
+
+template <Coordinate R, Coordinate T>
+ClosestPoints closest_points(
+    const Ray<R>& ray,
+    const Polygon<T>& polygon,
+    long double eps = 1e-12L
+) {
+    return closest_points_detail::reversed(
+        closest_points(polygon, ray, eps)
+    );
+}
+
+template <Coordinate A, Coordinate B>
+ClosestPoints closest_points(
+    const Polygon<A>& first,
+    const Polygon<B>& second,
+    long double eps = 1e-12L
+) {
+    assert(first.vertices.size() >= 3);
+    assert(second.vertices.size() >= 3);
+    ClosestPoints result = polygon_detail::closest_boundaries(first, second);
+    if (geometry::distance(result.first, result.second) <= eps) return result;
+
+    if (first.filled) {
+        for (const Point<B>& vertex : second.vertices) {
+            if (contains(first, vertex, eps)) {
+                const Point<long double> point(vertex);
+                return ClosestPoints{point, point};
+            }
+        }
+    }
+    if (second.filled) {
+        for (const Point<A>& vertex : first.vertices) {
+            if (contains(second, vertex, eps)) {
+                const Point<long double> point(vertex);
+                return ClosestPoints{point, point};
+            }
+        }
+    }
+    return result;
+}
+
+template <Coordinate C, Coordinate T>
+ClosestPoints closest_points(
+    const Circle<C>& circle,
+    const Polygon<T>& polygon,
+    long double eps = 1e-12L
+) {
+    assert(polygon.vertices.size() >= 3);
+    ClosestPoints result = closest_points(
+        circle,
+        polygon_detail::edge(polygon, 0),
+        eps
+    );
+    for (std::size_t index = 1; index < polygon.vertices.size(); ++index) {
+        closest_points_detail::consider(
+            result,
+            closest_points(circle, polygon_detail::edge(polygon, index), eps)
+        );
+    }
+    if (geometry::distance(result.first, result.second) <= eps) return result;
+
+    if (polygon.filled) {
+        Point<long double> member(circle.center);
+        if (!circle.filled) {
+            member = circle_detail::point_toward(circle, member);
+        }
+        if (contains(polygon, member, eps)) {
+            return ClosestPoints{member, member};
+        }
+    }
+    return result;
+}
+
+template <Coordinate T, Coordinate C>
+ClosestPoints closest_points(
+    const Polygon<T>& polygon,
+    const Circle<C>& circle,
+    long double eps = 1e-12L
+) {
+    return closest_points_detail::reversed(
+        closest_points(circle, polygon, eps)
+    );
+}
+
+template <Coordinate T, Coordinate P>
+bool intersects(
+    const Polygon<T>& polygon,
+    const Point<P>& point,
+    long double eps = 1e-12L
+) {
+    return contains(polygon, point, eps);
+}
+
+template <Coordinate P, Coordinate T>
+bool intersects(
+    const Point<P>& point,
+    const Polygon<T>& polygon,
+    long double eps = 1e-12L
+) {
+    return intersects(polygon, point, eps);
+}
+
+template <Coordinate T, Coordinate S>
+bool intersects(
+    const Polygon<T>& polygon,
+    const Segment<S>& segment,
+    long double eps = 1e-12L
+) {
+    const ClosestPoints result = closest_points(polygon, segment, eps);
+    return geometry::distance(result.first, result.second) <= eps;
+}
+
+template <Coordinate S, Coordinate T>
+bool intersects(
+    const Segment<S>& segment,
+    const Polygon<T>& polygon,
+    long double eps = 1e-12L
+) {
+    return intersects(polygon, segment, eps);
+}
+
+template <Coordinate T, Coordinate R>
+bool intersects(
+    const Polygon<T>& polygon,
+    const Ray<R>& ray,
+    long double eps = 1e-12L
+) {
+    const ClosestPoints result = closest_points(polygon, ray, eps);
+    return geometry::distance(result.first, result.second) <= eps;
+}
+
+template <Coordinate R, Coordinate T>
+bool intersects(
+    const Ray<R>& ray,
+    const Polygon<T>& polygon,
+    long double eps = 1e-12L
+) {
+    return intersects(polygon, ray, eps);
+}
+
+template <Coordinate A, Coordinate B>
+bool intersects(
+    const Polygon<A>& first,
+    const Polygon<B>& second,
+    long double eps = 1e-12L
+) {
+    const ClosestPoints result = closest_points(first, second, eps);
+    return geometry::distance(result.first, result.second) <= eps;
+}
+
+template <Coordinate C, Coordinate T>
+bool intersects(
+    const Circle<C>& circle,
+    const Polygon<T>& polygon,
+    long double eps = 1e-12L
+) {
+    const ClosestPoints result = closest_points(circle, polygon, eps);
+    return geometry::distance(result.first, result.second) <= eps;
+}
+
+template <Coordinate T, Coordinate C>
+bool intersects(
+    const Polygon<T>& polygon,
+    const Circle<C>& circle,
+    long double eps = 1e-12L
+) {
+    return intersects(circle, polygon, eps);
+}
+
+template <Coordinate A, Coordinate B>
+long double distance(
+    const Polygon<A>& first,
+    const Polygon<B>& second
+) {
+    const ClosestPoints result = closest_points(first, second);
+    return geometry::distance(result.first, result.second);
+}
+
+template <Coordinate C, Coordinate T>
+long double distance(
+    const Circle<C>& circle,
+    const Polygon<T>& polygon
+) {
+    const ClosestPoints result = closest_points(circle, polygon);
+    return geometry::distance(result.first, result.second);
+}
+
+template <Coordinate T, Coordinate C>
+long double distance(
+    const Polygon<T>& polygon,
+    const Circle<C>& circle
+) {
+    return distance(circle, polygon);
+}
+
+template <Coordinate C, Coordinate T>
+long double circle_polygon_intersection_area(
+    const Circle<C>& circle,
+    const Polygon<T>& polygon,
+    long double eps = 1e-12L
+) {
+    return circle_polygon_intersection_area(circle, polygon.vertices, eps);
+}
+
+template <Coordinate T, Coordinate P>
+long double distance(
+    const Polygon<T>& polygon,
+    const Point<P>& point
+) {
+    const ClosestPoints result = closest_points(polygon, point);
+    return geometry::distance(result.first, result.second);
+}
+
+template <Coordinate P, Coordinate T>
+long double distance(
+    const Point<P>& point,
+    const Polygon<T>& polygon
+) {
+    return distance(polygon, point);
+}
+
+template <Coordinate T, Coordinate S>
+long double distance(
+    const Polygon<T>& polygon,
+    const Segment<S>& segment
+) {
+    const ClosestPoints result = closest_points(polygon, segment);
+    return geometry::distance(result.first, result.second);
+}
+
+template <Coordinate S, Coordinate T>
+long double distance(
+    const Segment<S>& segment,
+    const Polygon<T>& polygon
+) {
+    return distance(polygon, segment);
+}
+
+template <Coordinate T, Coordinate R>
+long double distance(
+    const Polygon<T>& polygon,
+    const Ray<R>& ray
+) {
+    const ClosestPoints result = closest_points(polygon, ray);
+    return geometry::distance(result.first, result.second);
+}
+
+template <Coordinate R, Coordinate T>
+long double distance(
+    const Ray<R>& ray,
+    const Polygon<T>& polygon
+) {
+    return distance(polygon, ray);
 }
 
 }  // namespace geometry

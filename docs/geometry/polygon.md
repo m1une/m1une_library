@@ -9,8 +9,22 @@ This header provides polygon area, point containment, ray queries, polygon
 intersection and distance, triangulation, and centroids for general simple
 polygons.
 
-Polygons are represented by `std::vector<Point<T>>`. The first point must not be
-repeated at the end.
+Algorithms accept the traditional `std::vector<Point<T>>` boundary. The
+`Polygon<T>` object adds explicit set semantics:
+
+```cpp
+template <Coordinate T>
+struct Polygon {
+    std::vector<Point<T>> vertices;
+    bool filled = true;
+};
+```
+
+When `filled` is `true`, the object is the closed polygonal region. When it is
+`false`, it is only the boundary. General `contains`, `intersects`,
+`closest_points`, and `distance` overloads honor the flag. Area, centroid,
+triangulation, and explicitly named boundary-event functions use `vertices`
+independently of the flag. The first vertex must not be repeated at the end.
 
 ## Point Containment
 
@@ -21,6 +35,65 @@ repeated at the end.
 * `PointInPolygon::Inside`
 
 The polygon may be clockwise or counterclockwise and may be non-convex.
+
+## Polygon object interface
+
+The query families below support both argument orders.
+
+```cpp
+template <Coordinate T, Coordinate P>
+PointInPolygon point_in_polygon(
+    const Polygon<T>& polygon,
+    const Point<P>& point,
+    long double eps = 1e-12L
+);
+
+template <Coordinate T, Coordinate P>
+bool contains(
+    const Polygon<T>& polygon,
+    const Point<P>& point,
+    long double eps = 1e-12L
+);
+
+template <Coordinate T, Coordinate P>
+ClosestPoints closest_points(
+    const Polygon<T>& polygon,
+    const Point<P>& point,
+    long double eps = 1e-12L
+);
+
+template <Coordinate T, Coordinate S>
+ClosestPoints closest_points(
+    const Polygon<T>& polygon,
+    const Segment<S>& segment,
+    long double eps = 1e-12L
+);
+
+template <Coordinate T, Coordinate R>
+ClosestPoints closest_points(
+    const Polygon<T>& polygon,
+    const Ray<R>& ray,
+    long double eps = 1e-12L
+);
+
+template <Coordinate A, Coordinate B>
+ClosestPoints closest_points(
+    const Polygon<A>& first,
+    const Polygon<B>& second,
+    long double eps = 1e-12L
+);
+
+template <Coordinate C, Coordinate T>
+ClosestPoints closest_points(
+    const Circle<C>& circle,
+    const Polygon<T>& polygon,
+    long double eps = 1e-12L
+);
+```
+
+`intersects` has the same five pairs and `eps`; `distance` has the same pairs
+without `eps`. Reverse overloads swap the two returned witnesses for
+`closest_points`.
 
 ## Functions
 
@@ -41,6 +114,13 @@ The polygon may be clockwise or counterclockwise and may be non-convex.
 | `distance(ray, polygon)` | Minimum distance to the closed filled polygon. Both argument orders are supported. | $O(N \log N)$ |
 | `intersects(first, second, eps)` | Tests whether two closed filled simple polygons intersect. | $O(NM)$ |
 | `distance(first, second)` | Minimum distance between two closed filled simple polygons. | $O(NM)$ |
+| `point_in_polygon(Polygon, point, eps)` | Classifies against the enclosed region, regardless of `filled`. | $O(N)$ |
+| `contains(Polygon, point, eps)` | Tests membership in the set selected by `filled`. | $O(N)$ |
+| `closest_points(Polygon, point/segment/ray, eps)` | Returns minimum-distance witnesses for the selected set. | $O(N)$ |
+| `closest_points(first_polygon, second_polygon, eps)` | Returns witnesses for the selected polygon sets. | $O(NM)$ |
+| `closest_points(circle, polygon, eps)` | Returns witnesses while honoring both `filled` flags. | $O(N)$ |
+| `intersects(Polygon, object, eps)` | Tests whether the selected sets overlap. | Same as `closest_points` |
+| `distance(Polygon, object)` | Returns the distance between the selected sets. | Same as `closest_points` |
 
 Polygon queries require at least three vertices unless stated otherwise.
 
@@ -106,11 +186,15 @@ and an exact minimum-piece dynamic program.
 
 int main() {
     using Point = m1une::geometry::Point<long long>;
-    std::vector<Point> polygon;
-    polygon.emplace_back(0, 0);
-    polygon.emplace_back(2, 0);
-    polygon.emplace_back(0, 2);
+    m1une::geometry::Polygon<long long> polygon;
+    polygon.vertices.emplace_back(0, 0);
+    polygon.vertices.emplace_back(2, 0);
+    polygon.vertices.emplace_back(0, 2);
 
     std::cout << m1une::geometry::polygon_area(polygon) << "\n"; // 2
+    std::cout << m1une::geometry::contains(polygon, Point(1, 0)) << "\n"; // 1
+
+    polygon.filled = false;
+    std::cout << m1une::geometry::contains(polygon, Point(1, 1)) << "\n"; // 1
 }
 ```

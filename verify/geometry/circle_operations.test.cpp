@@ -24,11 +24,18 @@ void test_basic_queries() {
     circle.center = Point<long long>(2, -1);
     circle.radius = 5;
     assert(point_in_circle(circle, Point<int>(2, -1)) == PointInCircle::Inside);
-    assert(point_in_circle(circle, Point<int>(5, 3)) == PointInCircle::Boundary);
-    assert(point_in_circle(circle, Point<int>(8, -1)) == PointInCircle::Outside);
+    assert(
+        point_in_circle(circle, Point<int>(5, 3)) == PointInCircle::Boundary
+    );
+    assert(
+        point_in_circle(circle, Point<int>(8, -1)) == PointInCircle::Outside
+    );
     assert(contains(circle, Point<int>(5, 3)));
     assert(on_circle(circle, Point<int>(5, 3)));
-    assert(close(circle_area(circle), 25.0L * std::numbers::pi_v<long double>));
+    assert(close(
+        circle_area(circle),
+        25.0L * std::numbers::pi_v<long double>
+    ));
     assert(close(
         circle_circumference(circle),
         10.0L * std::numbers::pi_v<long double>
@@ -37,9 +44,11 @@ void test_basic_queries() {
     Circle<int> first;
     first.center = Point<int>(0, 0);
     first.radius = 5;
+    first.filled = false;
     Circle<long long> second;
     second.center = Point<long long>(9, 0);
     second.radius = 4;
+    second.filled = false;
     assert(circle_relation(first, second) == CircleRelation::ExternallyTangent);
     assert(intersects(first, second));
     second.center.x = 1;
@@ -296,7 +305,10 @@ void test_intersection_areas() {
     small_square.emplace_back(0.25L, -0.25L);
     small_square.emplace_back(0.25L, 0.25L);
     small_square.emplace_back(-0.25L, 0.25L);
-    assert(close(circle_polygon_intersection_area(first, small_square), 0.25L));
+    assert(close(
+        circle_polygon_intersection_area(first, small_square),
+        0.25L
+    ));
 }
 
 }  // namespace

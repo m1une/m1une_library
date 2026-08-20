@@ -41,6 +41,8 @@ void test_fixed() {
 
     const Circle<long long> circle{P(-3, 9), 5};
     assert(centroid(circle) == Point<long double>(-3, 9));
+    const Circle<long long> boundary{P(7, -4), 3, false};
+    assert(centroid(boundary) == Point<long double>(7, -4));
 
     std::vector<P> concave;
     concave.emplace_back(0, 0);

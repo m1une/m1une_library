@@ -36,7 +36,7 @@ std::optional<MinimumEnclosingCircle> minimum_enclosing_circle(
 
 The function returns `std::nullopt` for an empty input. For one or more points,
 `support` is nonempty. It may omit other input points that also lie on the
-boundary.
+boundary. The returned circle has `filled == true`.
 
 For integral coordinates, containment decisions use signed 128-bit arithmetic;
 all predicate intermediates must fit in that type. The returned center and

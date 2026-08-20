@@ -12,8 +12,8 @@ documentation_of: ../../geometry/all.hpp
 | Header | Contents |
 | --- | --- |
 | `geometry/angle_sort.hpp` | Atan-free counterclockwise angle sorting around an arbitrary origin. |
-| `geometry/circle_coverage_areas.hpp` | Areas covered by exactly $k$ circles for every $k$ in $O(N^2\log N)$. |
-| `geometry/circle_union_area.hpp` | Union area of circles in $O(N^2\log N)$. |
+| `geometry/circle_coverage_areas.hpp` | Areas covered by exactly $k$ enclosed circles for every $k$ in $O(N^2\log N)$. |
+| `geometry/circle_union_area.hpp` | Union area of enclosed circles in $O(N^2\log N)$. |
 | `geometry/point.hpp` | Points, vectors, dot/cross products, exact orientation, distance, centroid, and rotation. |
 | `geometry/closest_pair.hpp` | Euclidean closest pair with original indices in $O(N\log N)$. |
 | `geometry/convex_decomposition.hpp` | Hertel--Mehlhorn approximate and Keil--Snoeyink minimum convex decompositions of a simple polygon. |
@@ -35,8 +35,8 @@ documentation_of: ../../geometry/all.hpp
 | `geometry/rectangle_union_area.hpp` | Exact union area of axis-aligned rectangles in $O(N\log N)$. |
 | `geometry/steiner_convex_decomposition.hpp` | Floating-point Steiner convex decomposition with an exact union and a strict 2-approximation piece count. |
 | `geometry/voronoi_diagram.hpp` | Exact-topology Euclidean Voronoi diagrams with segments, rays, lines, and per-site boundary edges in $O(N\log N)$. |
-| `geometry/polygon.hpp` | General polygon area, centroids, triangulation, containment, ray queries, intersection, and distance. |
-| `geometry/circle.hpp` | Circle classification, triangle constructions, intersections, tangents, reflection, and overlap area. |
+| `geometry/polygon.hpp` | Filled-or-boundary polygon objects, area, centroids, triangulation, containment, intersections, and distance. |
+| `geometry/circle.hpp` | Filled-or-boundary circles, relations, intersections, closest points, areas, tangents, and reflection. |
 
 Integral predicates promote to signed 128-bit arithmetic. Constructions that
 may be non-integral return `Point<long double>`.
@@ -69,6 +69,12 @@ Point<long double> centroid(const Circle<T>& circle);
 template <Coordinate T>
 std::optional<Point<long double>> centroid(
     const std::vector<Point<T>>& polygon,
+    long double eps = 1e-12L
+);
+
+template <Coordinate T>
+std::optional<Point<long double>> centroid(
+    const Polygon<T>& polygon,
     long double eps = 1e-12L
 );
 

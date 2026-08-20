@@ -5,9 +5,10 @@ documentation_of: ../../geometry/circle_coverage_areas.hpp
 
 ## Overview
 
-`circle_coverage_areas` calculates the area covered by exactly $k$ closed disks
-for every $k$. Circles may be disjoint, tangent, nested, or coincident, and
-radius-zero circles do not affect any area.
+`circle_coverage_areas` calculates the area covered by exactly $k$ enclosed
+circle regions for every $k$, regardless of each `Circle::filled` flag. Circles
+may be disjoint, tangent, nested, or coincident, and radius-zero circles do not
+affect any area.
 
 The implementation sweeps the intersection angles around every circumference.
 Each arc is assigned its coverage multiplicity, then integrated with Green's
