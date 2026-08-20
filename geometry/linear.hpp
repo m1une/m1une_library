@@ -2,7 +2,6 @@
 #define M1UNE_GEOMETRY_LINEAR_HPP 1
 
 #include <algorithm>
-#include <array>
 #include <cassert>
 #include <cmath>
 
@@ -75,33 +74,6 @@ LinearIntersection make_object(
         Point<long double>(first),
         Point<long double>(second),
     };
-}
-
-template <Coordinate T>
-Point<long double> crossing_point(
-    const Line<T>& first,
-    const Line<T>& second
-) {
-    using W = wide_type<T>;
-    const W first_x = W(first.b.x) - W(first.a.x);
-    const W first_y = W(first.b.y) - W(first.a.y);
-    const W second_x = W(second.b.x) - W(second.a.x);
-    const W second_y = W(second.b.y) - W(second.a.y);
-    const W offset_x = W(second.a.x) - W(first.a.x);
-    const W offset_y = W(second.a.y) - W(first.a.y);
-    const W denominator =
-        first_x * second_y - first_y * second_x;
-    assert(denominator != W(0));
-    const W numerator = offset_x * second_y - offset_y * second_x;
-    const long double ratio =
-        static_cast<long double>(numerator) /
-        static_cast<long double>(denominator);
-    return Point<long double>(
-        static_cast<long double>(first.a.x) +
-            static_cast<long double>(first_x) * ratio,
-        static_cast<long double>(first.a.y) +
-            static_cast<long double>(first_y) * ratio
-    );
 }
 
 }  // namespace linear_intersection_detail
@@ -334,204 +306,7 @@ long double distance(const Segment<T>& segment, const Line<T>& line) {
     return distance(line, segment);
 }
 
-template <Coordinate T>
-LinearIntersection linear_intersection(
-    const Line<T>& first,
-    const Line<T>& second,
-    long double eps = 1e-12L
-) {
-    assert(first.a != first.b);
-    assert(second.a != second.b);
-    if (parallel(first, second, eps)) {
-        if (on_line(first, second.a, eps)) {
-            return linear_intersection_detail::make_object(
-                LinearIntersectionKind::Line,
-                first.a,
-                first.b
-            );
-        }
-        return linear_intersection_detail::make_empty();
-    }
-    return linear_intersection_detail::make_point(
-        linear_intersection_detail::crossing_point(first, second)
-    );
-}
-
-template <Coordinate T>
-LinearIntersection linear_intersection(
-    const Line<T>& line,
-    const Segment<T>& segment,
-    long double eps = 1e-12L
-) {
-    assert(line.a != line.b);
-    if (!intersects(line, segment, eps)) {
-        return linear_intersection_detail::make_empty();
-    }
-    if (segment.a == segment.b) {
-        return linear_intersection_detail::make_point(segment.a);
-    }
-
-    const int first_side =
-        orientation(line.a, line.b, segment.a, eps);
-    const int second_side =
-        orientation(line.a, line.b, segment.b, eps);
-    if (first_side == 0 && second_side == 0) {
-        return linear_intersection_detail::make_object(
-            LinearIntersectionKind::Segment,
-            segment.a,
-            segment.b
-        );
-    }
-    if (first_side == 0) {
-        return linear_intersection_detail::make_point(segment.a);
-    }
-    if (second_side == 0) {
-        return linear_intersection_detail::make_point(segment.b);
-    }
-
-    return linear_intersection_detail::make_point(
-        linear_intersection_detail::crossing_point(
-            line,
-            Line<T>{segment.a, segment.b}
-        )
-    );
-}
-
-template <Coordinate T>
-LinearIntersection linear_intersection(
-    const Segment<T>& segment,
-    const Line<T>& line,
-    long double eps = 1e-12L
-) {
-    return linear_intersection(line, segment, eps);
-}
-
-template <Coordinate T>
-LinearIntersection linear_intersection(
-    const Segment<T>& first,
-    const Segment<T>& second,
-    long double eps = 1e-12L
-) {
-    if (!intersects(first, second, eps)) {
-        return linear_intersection_detail::make_empty();
-    }
-    if (first.a == first.b) {
-        return linear_intersection_detail::make_point(first.a);
-    }
-    if (second.a == second.b) {
-        return linear_intersection_detail::make_point(second.a);
-    }
-
-    const int first_a_side =
-        orientation(second.a, second.b, first.a, eps);
-    const int first_b_side =
-        orientation(second.a, second.b, first.b, eps);
-    const int second_a_side =
-        orientation(first.a, first.b, second.a, eps);
-    const int second_b_side =
-        orientation(first.a, first.b, second.b, eps);
-    const bool collinear_intersection =
-        first_a_side == 0 && first_b_side == 0 &&
-        second_a_side == 0 && second_b_side == 0;
-
-    if (!collinear_intersection) {
-        if (first_a_side == 0 && on_segment(second, first.a, eps)) {
-            return linear_intersection_detail::make_point(first.a);
-        }
-        if (first_b_side == 0 && on_segment(second, first.b, eps)) {
-            return linear_intersection_detail::make_point(first.b);
-        }
-        if (second_a_side == 0 && on_segment(first, second.a, eps)) {
-            return linear_intersection_detail::make_point(second.a);
-        }
-        if (second_b_side == 0 && on_segment(first, second.b, eps)) {
-            return linear_intersection_detail::make_point(second.b);
-        }
-        return linear_intersection_detail::make_point(
-            linear_intersection_detail::crossing_point(
-                Line<T>{first.a, first.b},
-                Line<T>{second.a, second.b}
-            )
-        );
-    }
-
-    std::array<Point<T>, 4> candidates{
-        first.a,
-        first.b,
-        second.a,
-        second.b,
-    };
-    std::array<Point<T>, 4> common;
-    int common_size = 0;
-    long double overlap_scale = 0.0L;
-    if constexpr (!std::integral<T>) {
-        overlap_scale = std::max(
-            geometry::distance(first.a, first.b),
-            geometry::distance(second.a, second.b)
-        );
-    }
-    auto same_point = [eps, overlap_scale](
-        const Point<T>& left,
-        const Point<T>& right
-    ) {
-        if constexpr (std::integral<T>) {
-            return left == right;
-        } else {
-            return geometry::distance(left, right) <= eps * overlap_scale;
-        }
-    };
-    for (const Point<T>& candidate : candidates) {
-        if (
-            !on_segment(first, candidate, eps) ||
-            !on_segment(second, candidate, eps)
-        ) {
-            continue;
-        }
-        bool duplicate = false;
-        for (int index = 0; index < common_size; ++index) {
-            if (same_point(common[index], candidate)) {
-                duplicate = true;
-                break;
-            }
-        }
-        if (!duplicate) common[common_size++] = candidate;
-    }
-    assert(common_size >= 1);
-
-    using W = wide_type<T>;
-    const W direction_x = W(first.b.x) - W(first.a.x);
-    const W direction_y = W(first.b.y) - W(first.a.y);
-    const W absolute_x = direction_x >= 0 ? direction_x : -direction_x;
-    const W absolute_y = direction_y >= 0 ? direction_y : -direction_y;
-    const bool use_x = absolute_x >= absolute_y;
-    auto parameter = [&](const Point<T>& point) {
-        if (use_x) {
-            return direction_x >= 0 ? W(point.x) : -W(point.x);
-        }
-        return direction_y >= 0 ? W(point.y) : -W(point.y);
-    };
-    int start_index = 0;
-    int finish_index = 0;
-    for (int index = 1; index < common_size; ++index) {
-        if (parameter(common[index]) < parameter(common[start_index])) {
-            start_index = index;
-        }
-        if (parameter(common[finish_index]) < parameter(common[index])) {
-            finish_index = index;
-        }
-    }
-
-    if (same_point(common[start_index], common[finish_index])) {
-        return linear_intersection_detail::make_point(common[start_index]);
-    }
-    return linear_intersection_detail::make_object(
-        LinearIntersectionKind::Segment,
-        common[start_index],
-        common[finish_index]
-    );
-}
-
-namespace ray_detail {
+namespace linear_parameter_detail {
 
 template <Coordinate T>
 struct Parameters {
@@ -621,22 +396,7 @@ bool ratio_in_unit_interval(
     return start_sign <= 0 && finish_sign >= 0;
 }
 
-template <Coordinate T>
-Point<long double> point_at(
-    const Ray<T>& ray,
-    wide_type<T> numerator,
-    wide_type<T> denominator
-) {
-    long double ratio =
-        static_cast<long double>(numerator) /
-        static_cast<long double>(denominator);
-    Point<long double> origin(ray.origin);
-    Point<long double> direction =
-        Point<long double>(ray.through) - origin;
-    return origin + direction * ratio;
-}
-
-}  // namespace ray_detail
+}  // namespace linear_parameter_detail
 
 template <Coordinate T>
 bool on_ray(
@@ -717,16 +477,17 @@ bool intersects(
 ) {
     assert(ray.origin != ray.through);
     assert(line.a != line.b);
-    ray_detail::Parameters<T> values = ray_detail::parameters(
+    linear_parameter_detail::Parameters<T> values =
+        linear_parameter_detail::parameters(
         ray.origin,
         ray.through,
         line.a,
         line.b
     );
-    if (ray_detail::denominator_sign(values, eps) == 0) {
+    if (linear_parameter_detail::denominator_sign(values, eps) == 0) {
         return on_line(line, ray.origin, eps);
     }
-    return ray_detail::ratio_nonnegative<T>(
+    return linear_parameter_detail::ratio_nonnegative<T>(
         values.first_numerator,
         values.denominator,
         eps
@@ -761,13 +522,14 @@ bool intersects(
     assert(ray.origin != ray.through);
     if (segment.a == segment.b) return on_ray(ray, segment.a, eps);
 
-    ray_detail::Parameters<T> values = ray_detail::parameters(
+    linear_parameter_detail::Parameters<T> values =
+        linear_parameter_detail::parameters(
         ray.origin,
         ray.through,
         segment.a,
         segment.b
     );
-    if (ray_detail::denominator_sign(values, eps) == 0) {
+    if (linear_parameter_detail::denominator_sign(values, eps) == 0) {
         if (orientation(ray.origin, ray.through, segment.a, eps) != 0) {
             return false;
         }
@@ -775,12 +537,12 @@ bool intersects(
                on_ray(ray, segment.b, eps) ||
                on_segment(segment, ray.origin, eps);
     }
-    return ray_detail::ratio_nonnegative<T>(
+    return linear_parameter_detail::ratio_nonnegative<T>(
                values.first_numerator,
                values.denominator,
                eps
            ) &&
-           ray_detail::ratio_in_unit_interval<T>(
+           linear_parameter_detail::ratio_in_unit_interval<T>(
                values.second_numerator,
                values.denominator,
                eps
@@ -819,25 +581,26 @@ bool intersects(
 ) {
     assert(first.origin != first.through);
     assert(second.origin != second.through);
-    ray_detail::Parameters<T> values = ray_detail::parameters(
+    linear_parameter_detail::Parameters<T> values =
+        linear_parameter_detail::parameters(
         first.origin,
         first.through,
         second.origin,
         second.through
     );
-    if (ray_detail::denominator_sign(values, eps) == 0) {
+    if (linear_parameter_detail::denominator_sign(values, eps) == 0) {
         if (orientation(first.origin, first.through, second.origin, eps) != 0) {
             return false;
         }
         return on_ray(first, second.origin, eps) ||
                on_ray(second, first.origin, eps);
     }
-    return ray_detail::ratio_nonnegative<T>(
+    return linear_parameter_detail::ratio_nonnegative<T>(
                values.first_numerator,
                values.denominator,
                eps
            ) &&
-           ray_detail::ratio_nonnegative<T>(
+           linear_parameter_detail::ratio_nonnegative<T>(
                values.second_numerator,
                values.denominator,
                eps
@@ -853,221 +616,332 @@ long double distance(const Ray<T>& first, const Ray<T>& second) {
     );
 }
 
+namespace linear_intersection_detail {
+
+enum class Domain {
+    Line,
+    Segment,
+    Ray,
+};
+
 template <Coordinate T>
-LinearIntersection linear_intersection(
-    const Ray<T>& ray,
-    const Line<T>& line,
-    long double eps = 1e-12L
-) {
-    assert(ray.origin != ray.through);
+struct ParametricObject {
+    Point<T> origin;
+    Point<T> through;
+    Domain domain;
+};
+
+template <Coordinate T>
+ParametricObject<T> parametric_object(const Line<T>& line) {
     assert(line.a != line.b);
-    const ray_detail::Parameters<T> values = ray_detail::parameters(
-        ray.origin,
-        ray.through,
-        line.a,
-        line.b
+    return ParametricObject<T>{line.a, line.b, Domain::Line};
+}
+
+template <Coordinate T>
+ParametricObject<T> parametric_object(const Segment<T>& segment) {
+    return ParametricObject<T>{segment.a, segment.b, Domain::Segment};
+}
+
+template <Coordinate T>
+ParametricObject<T> parametric_object(const Ray<T>& ray) {
+    assert(ray.origin != ray.through);
+    return ParametricObject<T>{ray.origin, ray.through, Domain::Ray};
+}
+
+template <Coordinate T>
+bool contains(
+    const ParametricObject<T>& object,
+    const Point<T>& point,
+    long double eps
+) {
+    if (object.domain == Domain::Line) {
+        return on_line(Line<T>{object.origin, object.through}, point, eps);
+    }
+    if (object.domain == Domain::Segment) {
+        return on_segment(
+            Segment<T>{object.origin, object.through},
+            point,
+            eps
+        );
+    }
+    return on_ray(Ray<T>{object.origin, object.through}, point, eps);
+}
+
+template <Coordinate T>
+bool accepts_parameter(
+    Domain domain,
+    wide_type<T> numerator,
+    wide_type<T> denominator,
+    long double eps
+) {
+    if (domain == Domain::Line) return true;
+    if (domain == Domain::Ray) {
+        return linear_parameter_detail::ratio_nonnegative<T>(
+            numerator,
+            denominator,
+            eps
+        );
+    }
+    return linear_parameter_detail::ratio_in_unit_interval<T>(
+        numerator,
+        denominator,
+        eps
     );
-    if (ray_detail::denominator_sign(values, eps) == 0) {
-        if (on_line(line, ray.origin, eps)) {
-            return linear_intersection_detail::make_object(
-                LinearIntersectionKind::Ray,
-                ray.origin,
-                ray.through
-            );
-        }
-        return linear_intersection_detail::make_empty();
+}
+
+template <Coordinate T>
+Point<long double> point_at_ratio(
+    const ParametricObject<T>& object,
+    wide_type<T> numerator,
+    wide_type<T> denominator
+) {
+    const long double ratio =
+        static_cast<long double>(numerator) /
+        static_cast<long double>(denominator);
+    const Point<long double> origin(object.origin);
+    const Point<long double> direction =
+        Point<long double>(object.through) - origin;
+    return origin + direction * ratio;
+}
+
+template <Coordinate T>
+struct AxisProjection {
+    bool use_x;
+    bool negate;
+
+    wide_type<T> operator()(const Point<T>& point) const {
+        const wide_type<T> value = use_x
+            ? wide_type<T>(point.x)
+            : wide_type<T>(point.y);
+        return negate ? -value : value;
+    }
+};
+
+template <Coordinate T>
+AxisProjection<T> axis_projection(const ParametricObject<T>& object) {
+    using W = wide_type<T>;
+    const W direction_x = W(object.through.x) - W(object.origin.x);
+    const W direction_y = W(object.through.y) - W(object.origin.y);
+    const bool use_x =
+        predicate_detail::absolute(direction_x) >=
+        predicate_detail::absolute(direction_y);
+    const W component = use_x ? direction_x : direction_y;
+    assert(component != W(0));
+    return AxisProjection<T>{use_x, component < W(0)};
+}
+
+template <Coordinate T>
+struct ParameterInterval {
+    bool has_lower;
+    bool has_upper;
+    wide_type<T> lower;
+    wide_type<T> upper;
+};
+
+template <Coordinate T>
+ParameterInterval<T> parameter_interval(
+    const ParametricObject<T>& object,
+    const AxisProjection<T>& projection
+) {
+    using W = wide_type<T>;
+    const W origin = projection(object.origin);
+    const W through = projection(object.through);
+    if (object.domain == Domain::Line) {
+        return ParameterInterval<T>{false, false, W(0), W(0)};
+    }
+    if (object.domain == Domain::Segment) {
+        return ParameterInterval<T>{
+            true,
+            true,
+            std::min(origin, through),
+            std::max(origin, through),
+        };
+    }
+    if (origin < through) {
+        return ParameterInterval<T>{true, false, origin, W(0)};
+    }
+    return ParameterInterval<T>{false, true, W(0), origin};
+}
+
+template <Coordinate T>
+ParameterInterval<T> intersect_intervals(
+    ParameterInterval<T> first,
+    const ParameterInterval<T>& second
+) {
+    if (
+        second.has_lower &&
+        (!first.has_lower || first.lower < second.lower)
+    ) {
+        first.has_lower = true;
+        first.lower = second.lower;
     }
     if (
-        !ray_detail::ratio_nonnegative<T>(
-            values.first_numerator,
-            values.denominator,
-            eps
-        )
+        second.has_upper &&
+        (!first.has_upper || second.upper < first.upper)
     ) {
-        return linear_intersection_detail::make_empty();
+        first.has_upper = true;
+        first.upper = second.upper;
     }
-    return linear_intersection_detail::make_point(
-        ray_detail::point_at(
-            ray,
-            values.first_numerator,
-            values.denominator
-        )
-    );
+    return first;
 }
 
 template <Coordinate T>
-LinearIntersection linear_intersection(
-    const Line<T>& line,
-    const Ray<T>& ray,
-    long double eps = 1e-12L
+Point<long double> point_at_projection(
+    const ParametricObject<T>& object,
+    const AxisProjection<T>& projection,
+    long double target
 ) {
-    return linear_intersection(ray, line, eps);
+    const long double origin =
+        static_cast<long double>(projection(object.origin));
+    const long double through =
+        static_cast<long double>(projection(object.through));
+    const long double ratio = (target - origin) / (through - origin);
+    const Point<long double> point(object.origin);
+    const Point<long double> direction =
+        Point<long double>(object.through) - point;
+    return point + direction * ratio;
 }
 
 template <Coordinate T>
-LinearIntersection linear_intersection(
-    const Ray<T>& ray,
-    const Segment<T>& segment,
-    long double eps = 1e-12L
+LinearIntersection collinear_intersection(
+    const ParametricObject<T>& first,
+    const ParametricObject<T>& second,
+    long double eps
 ) {
-    assert(ray.origin != ray.through);
-    if (segment.a == segment.b) {
-        if (on_ray(ray, segment.a, eps)) {
-            return linear_intersection_detail::make_point(segment.a);
-        }
-        return linear_intersection_detail::make_empty();
-    }
-
-    const ray_detail::Parameters<T> values = ray_detail::parameters(
-        ray.origin,
-        ray.through,
-        segment.a,
-        segment.b
-    );
-    if (ray_detail::denominator_sign(values, eps) != 0) {
-        if (
-            !ray_detail::ratio_nonnegative<T>(
-                values.first_numerator,
-                values.denominator,
-                eps
-            ) ||
-            !ray_detail::ratio_in_unit_interval<T>(
-                values.second_numerator,
-                values.denominator,
-                eps
-            )
-        ) {
-            return linear_intersection_detail::make_empty();
-        }
-        return linear_intersection_detail::make_point(
-            ray_detail::point_at(
-                ray,
-                values.first_numerator,
-                values.denominator
-            )
-        );
-    }
-    if (orientation(ray.origin, ray.through, segment.a, eps) != 0) {
-        return linear_intersection_detail::make_empty();
-    }
-
-    std::array<Point<T>, 3> candidates{
-        ray.origin,
-        segment.a,
-        segment.b,
-    };
-    std::array<Point<T>, 3> common;
-    int common_size = 0;
-    long double object_scale = 0.0L;
-    if constexpr (!std::integral<T>) {
-        object_scale = std::max(
-            geometry::distance(ray.origin, ray.through),
-            geometry::distance(segment.a, segment.b)
-        );
-    }
-    auto same_point = [eps, object_scale](
-        const Point<T>& first,
-        const Point<T>& second
-    ) {
-        if constexpr (std::integral<T>) {
-            return first == second;
-        } else {
-            return
-                geometry::distance(first, second) <= eps * object_scale;
-        }
-    };
-    for (const Point<T>& candidate : candidates) {
-        if (
-            !on_ray(ray, candidate, eps) ||
-            !on_segment(segment, candidate, eps)
-        ) {
-            continue;
-        }
-        bool duplicate = false;
-        for (int index = 0; index < common_size; ++index) {
-            if (same_point(common[index], candidate)) {
-                duplicate = true;
-                break;
-            }
-        }
-        if (!duplicate) common[common_size++] = candidate;
-    }
-    if (common_size == 0) {
-        return linear_intersection_detail::make_empty();
-    }
-
     using W = wide_type<T>;
-    const W direction_x = W(ray.through.x) - W(ray.origin.x);
-    const W direction_y = W(ray.through.y) - W(ray.origin.y);
-    const W absolute_x = predicate_detail::absolute(direction_x);
-    const W absolute_y = predicate_detail::absolute(direction_y);
-    const bool use_x = absolute_x >= absolute_y;
-    auto parameter = [&](const Point<T>& point) {
-        if (use_x) {
-            return direction_x >= 0 ? W(point.x) : -W(point.x);
+    const AxisProjection<T> projection = axis_projection(first);
+    const ParameterInterval<T> first_interval =
+        parameter_interval(first, projection);
+    const ParameterInterval<T> second_interval =
+        parameter_interval(second, projection);
+    const ParameterInterval<T> common =
+        intersect_intervals(first_interval, second_interval);
+
+    W scale = predicate_detail::absolute(
+        projection(first.through) - projection(first.origin)
+    );
+    scale = std::max(
+        scale,
+        predicate_detail::absolute(
+            projection(second.through) - projection(second.origin)
+        )
+    );
+
+    if (common.has_lower && common.has_upper) {
+        const int order = predicate_detail::scaled_sign<std::integral<T>>(
+            common.lower - common.upper,
+            scale,
+            eps
+        );
+        if (order > 0) return make_empty();
+        if (order == 0) {
+            const long double coordinate =
+                (
+                    static_cast<long double>(common.lower) +
+                    static_cast<long double>(common.upper)
+                ) / 2.0L;
+            return make_point(
+                point_at_projection(first, projection, coordinate)
+            );
         }
-        return direction_y >= 0 ? W(point.y) : -W(point.y);
-    };
-    int start_index = 0;
-    int finish_index = 0;
-    for (int index = 1; index < common_size; ++index) {
-        if (parameter(common[index]) < parameter(common[start_index])) {
-            start_index = index;
-        }
-        if (parameter(common[finish_index]) < parameter(common[index])) {
-            finish_index = index;
-        }
+        return make_object(
+            LinearIntersectionKind::Segment,
+            point_at_projection(
+                first,
+                projection,
+                static_cast<long double>(common.lower)
+            ),
+            point_at_projection(
+                first,
+                projection,
+                static_cast<long double>(common.upper)
+            )
+        );
     }
-    if (same_point(common[start_index], common[finish_index])) {
-        return linear_intersection_detail::make_point(common[start_index]);
+
+    const Point<long double> direction =
+        Point<long double>(first.through) -
+        Point<long double>(first.origin);
+    if (common.has_lower) {
+        const Point<long double> origin = point_at_projection(
+            first,
+            projection,
+            static_cast<long double>(common.lower)
+        );
+        return make_object(
+            LinearIntersectionKind::Ray,
+            origin,
+            origin + direction
+        );
     }
-    return linear_intersection_detail::make_object(
-        LinearIntersectionKind::Segment,
-        common[start_index],
-        common[finish_index]
+    if (common.has_upper) {
+        const Point<long double> origin = point_at_projection(
+            first,
+            projection,
+            static_cast<long double>(common.upper)
+        );
+        return make_object(
+            LinearIntersectionKind::Ray,
+            origin,
+            origin - direction
+        );
+    }
+    return make_object(
+        LinearIntersectionKind::Line,
+        first.origin,
+        first.through
     );
 }
 
 template <Coordinate T>
-LinearIntersection linear_intersection(
-    const Segment<T>& segment,
-    const Ray<T>& ray,
-    long double eps = 1e-12L
+LinearIntersection intersect(
+    const ParametricObject<T>& first,
+    const ParametricObject<T>& second,
+    long double eps
 ) {
-    return linear_intersection(ray, segment, eps);
-}
+    const bool first_degenerate = first.origin == first.through;
+    const bool second_degenerate = second.origin == second.through;
+    if (first_degenerate) {
+        assert(first.domain == Domain::Segment);
+        if (contains(second, first.origin, eps)) {
+            return make_point(first.origin);
+        }
+        return make_empty();
+    }
+    if (second_degenerate) {
+        assert(second.domain == Domain::Segment);
+        if (contains(first, second.origin, eps)) {
+            return make_point(second.origin);
+        }
+        return make_empty();
+    }
 
-template <Coordinate T>
-LinearIntersection linear_intersection(
-    const Ray<T>& first,
-    const Ray<T>& second,
-    long double eps = 1e-12L
-) {
-    assert(first.origin != first.through);
-    assert(second.origin != second.through);
-    const ray_detail::Parameters<T> values = ray_detail::parameters(
+    const linear_parameter_detail::Parameters<T> values =
+        linear_parameter_detail::parameters(
         first.origin,
         first.through,
         second.origin,
         second.through
     );
-    if (ray_detail::denominator_sign(values, eps) != 0) {
+    if (linear_parameter_detail::denominator_sign(values, eps) != 0) {
         if (
-            !ray_detail::ratio_nonnegative<T>(
+            !accepts_parameter<T>(
+                first.domain,
                 values.first_numerator,
                 values.denominator,
                 eps
             ) ||
-            !ray_detail::ratio_nonnegative<T>(
+            !accepts_parameter<T>(
+                second.domain,
                 values.second_numerator,
                 values.denominator,
                 eps
             )
         ) {
-            return linear_intersection_detail::make_empty();
+            return make_empty();
         }
-        return linear_intersection_detail::make_point(
-            ray_detail::point_at(
+        return make_point(
+            point_at_ratio(
                 first,
                 values.first_numerator,
                 values.denominator
@@ -1082,75 +956,128 @@ LinearIntersection linear_intersection(
             eps
         ) != 0
     ) {
-        return linear_intersection_detail::make_empty();
+        return make_empty();
     }
+    return collinear_intersection(first, second, eps);
+}
 
-    using W = wide_type<T>;
-    const W first_x = W(first.through.x) - W(first.origin.x);
-    const W first_y = W(first.through.y) - W(first.origin.y);
-    const W second_x = W(second.through.x) - W(second.origin.x);
-    const W second_y = W(second.through.y) - W(second.origin.y);
-    const int direction_relation =
-        predicate_detail::dot_sign<std::integral<T>>(
-            first_x,
-            first_y,
-            second_x,
-            second_y,
-            eps
-        );
+}  // namespace linear_intersection_detail
 
-    bool same_origin;
-    if constexpr (std::integral<T>) {
-        same_origin = first.origin == second.origin;
-    } else {
-        const long double object_scale = std::max(
-            geometry::distance(first.origin, first.through),
-            geometry::distance(second.origin, second.through)
-        );
-        same_origin =
-            geometry::distance(first.origin, second.origin) <=
-            eps * object_scale;
-    }
-    if (same_origin) {
-        if (direction_relation < 0) {
-            return linear_intersection_detail::make_point(first.origin);
-        }
-        return linear_intersection_detail::make_object(
-            LinearIntersectionKind::Ray,
-            first.origin,
-            first.through
-        );
-    }
+template <Coordinate T>
+LinearIntersection linear_intersection(
+    const Line<T>& first,
+    const Line<T>& second,
+    long double eps = 1e-12L
+) {
+    return linear_intersection_detail::intersect(
+        linear_intersection_detail::parametric_object(first),
+        linear_intersection_detail::parametric_object(second),
+        eps
+    );
+}
 
-    const bool first_contains_second =
-        on_ray(first, second.origin, eps);
-    const bool second_contains_first =
-        on_ray(second, first.origin, eps);
-    if (direction_relation >= 0) {
-        if (first_contains_second) {
-            return linear_intersection_detail::make_object(
-                LinearIntersectionKind::Ray,
-                second.origin,
-                second.through
-            );
-        }
-        if (second_contains_first) {
-            return linear_intersection_detail::make_object(
-                LinearIntersectionKind::Ray,
-                first.origin,
-                first.through
-            );
-        }
-        return linear_intersection_detail::make_empty();
-    }
-    if (first_contains_second && second_contains_first) {
-        return linear_intersection_detail::make_object(
-            LinearIntersectionKind::Segment,
-            first.origin,
-            second.origin
-        );
-    }
-    return linear_intersection_detail::make_empty();
+template <Coordinate T>
+LinearIntersection linear_intersection(
+    const Line<T>& line,
+    const Segment<T>& segment,
+    long double eps = 1e-12L
+) {
+    return linear_intersection_detail::intersect(
+        linear_intersection_detail::parametric_object(line),
+        linear_intersection_detail::parametric_object(segment),
+        eps
+    );
+}
+
+template <Coordinate T>
+LinearIntersection linear_intersection(
+    const Segment<T>& segment,
+    const Line<T>& line,
+    long double eps = 1e-12L
+) {
+    return linear_intersection_detail::intersect(
+        linear_intersection_detail::parametric_object(segment),
+        linear_intersection_detail::parametric_object(line),
+        eps
+    );
+}
+
+template <Coordinate T>
+LinearIntersection linear_intersection(
+    const Segment<T>& first,
+    const Segment<T>& second,
+    long double eps = 1e-12L
+) {
+    return linear_intersection_detail::intersect(
+        linear_intersection_detail::parametric_object(first),
+        linear_intersection_detail::parametric_object(second),
+        eps
+    );
+}
+
+template <Coordinate T>
+LinearIntersection linear_intersection(
+    const Ray<T>& ray,
+    const Line<T>& line,
+    long double eps = 1e-12L
+) {
+    return linear_intersection_detail::intersect(
+        linear_intersection_detail::parametric_object(ray),
+        linear_intersection_detail::parametric_object(line),
+        eps
+    );
+}
+
+template <Coordinate T>
+LinearIntersection linear_intersection(
+    const Line<T>& line,
+    const Ray<T>& ray,
+    long double eps = 1e-12L
+) {
+    return linear_intersection_detail::intersect(
+        linear_intersection_detail::parametric_object(line),
+        linear_intersection_detail::parametric_object(ray),
+        eps
+    );
+}
+
+template <Coordinate T>
+LinearIntersection linear_intersection(
+    const Ray<T>& ray,
+    const Segment<T>& segment,
+    long double eps = 1e-12L
+) {
+    return linear_intersection_detail::intersect(
+        linear_intersection_detail::parametric_object(ray),
+        linear_intersection_detail::parametric_object(segment),
+        eps
+    );
+}
+
+template <Coordinate T>
+LinearIntersection linear_intersection(
+    const Segment<T>& segment,
+    const Ray<T>& ray,
+    long double eps = 1e-12L
+) {
+    return linear_intersection_detail::intersect(
+        linear_intersection_detail::parametric_object(segment),
+        linear_intersection_detail::parametric_object(ray),
+        eps
+    );
+}
+
+template <Coordinate T>
+LinearIntersection linear_intersection(
+    const Ray<T>& first,
+    const Ray<T>& second,
+    long double eps = 1e-12L
+) {
+    return linear_intersection_detail::intersect(
+        linear_intersection_detail::parametric_object(first),
+        linear_intersection_detail::parametric_object(second),
+        eps
+    );
 }
 
 }  // namespace geometry

@@ -5,6 +5,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <cstdint>
 #include <vector>
 
 #include "../../utilities/fast_io.hpp"
@@ -75,6 +76,10 @@ void verify_result(const First& first, const Second& second) {
     assert(contains(floating_second, result.first));
     assert(contains(floating_first, result.second));
     assert(contains(floating_second, result.second));
+    assert(contains(floating_first, reversed.first));
+    assert(contains(floating_second, reversed.first));
+    assert(contains(floating_first, reversed.second));
+    assert(contains(floating_second, reversed.second));
 
     if (result.kind == LinearIntersectionKind::Point) {
         assert(close(result.first, result.second));
@@ -94,6 +99,12 @@ void verify_result(const First& first, const Second& second) {
         const FloatingPoint forward = result.second + direction;
         assert(contains(floating_first, forward));
         assert(contains(floating_second, forward));
+        const FloatingPoint reversed_direction =
+            reversed.second - reversed.first;
+        const FloatingPoint reversed_forward =
+            reversed.second + reversed_direction;
+        assert(contains(floating_first, reversed_forward));
+        assert(contains(floating_second, reversed_forward));
         return;
     }
     assert(result.kind == LinearIntersectionKind::Line);
@@ -244,11 +255,67 @@ void test_exhaustive_small_integer_objects() {
     }
 }
 
+void test_random_integer_objects() {
+    std::uint64_t state = 0x4f2c91b8376adeULL;
+    auto random = [&state]() {
+        state ^= state << 7;
+        state ^= state >> 9;
+        return state;
+    };
+    auto random_point = [&]() {
+        return P(
+            static_cast<long long>(random() % 41) - 20,
+            static_cast<long long>(random() % 41) - 20
+        );
+    };
+
+    for (int trial = 0; trial < 5000; ++trial) {
+        IntegerLine first_line;
+        first_line.a = random_point();
+        do {
+            first_line.b = random_point();
+        } while (first_line.a == first_line.b);
+
+        IntegerLine second_line;
+        second_line.a = random_point();
+        do {
+            second_line.b = random_point();
+        } while (second_line.a == second_line.b);
+
+        IntegerSegment first_segment;
+        first_segment.a = random_point();
+        first_segment.b = random_point();
+        IntegerSegment second_segment;
+        second_segment.a = random_point();
+        second_segment.b = random_point();
+
+        IntegerRay first_ray;
+        first_ray.origin = random_point();
+        do {
+            first_ray.through = random_point();
+        } while (first_ray.origin == first_ray.through);
+
+        IntegerRay second_ray;
+        second_ray.origin = random_point();
+        do {
+            second_ray.through = random_point();
+        } while (second_ray.origin == second_ray.through);
+
+        verify_result(first_line, second_line);
+        verify_result(first_line, first_segment);
+        verify_result(first_line, first_ray);
+        verify_result(first_segment, second_segment);
+        verify_result(first_segment, first_ray);
+        verify_result(first_ray, second_ray);
+    }
+}
+
 }  // namespace
 
 int main() {
     test_each_topology();
     test_exhaustive_small_integer_objects();
+    test_random_integer_objects();
 
     m1une::utilities::FastInput fast_input;
     m1une::utilities::FastOutput fast_output;

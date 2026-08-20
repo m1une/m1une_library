@@ -140,6 +140,14 @@ LinearIntersection linear_intersection(
 
 Every overload runs in $O(1)$.
 
+All overloads share one parametric kernel. Internally an object is written as
+$P(t)=O+tD$ with one of three parameter domains: every real value for a line,
+$[0,1]$ for a segment, or $[0,+\infty)$ for a ray. Nonparallel objects test
+the unique crossing parameter against both domains. Collinear objects
+intersect their one-dimensional parameter intervals and translate the result
+back into `Empty`, `Point`, `Segment`, `Ray`, or `Line`. Degenerate segments
+are handled as singleton points before a supporting direction is required.
+
 ## Line and segment operations
 
 | Function | Description | Complexity |

@@ -197,6 +197,41 @@ void test_scale_invariance() {
                 floating_second_segment
             ).kind
         );
+        assert(
+            linear_intersection(first_line, second_line).kind ==
+            linear_intersection(
+                floating_first_line,
+                floating_second_line
+            ).kind
+        );
+        assert(
+            linear_intersection(first_line, second_segment).kind ==
+            linear_intersection(
+                floating_first_line,
+                floating_second_segment
+            ).kind
+        );
+        assert(
+            linear_intersection(first_line, second_ray).kind ==
+            linear_intersection(
+                floating_first_line,
+                floating_second_ray
+            ).kind
+        );
+        assert(
+            linear_intersection(first_ray, second_segment).kind ==
+            linear_intersection(
+                floating_first_ray,
+                floating_second_segment
+            ).kind
+        );
+        assert(
+            linear_intersection(first_ray, second_ray).kind ==
+            linear_intersection(
+                floating_first_ray,
+                floating_second_ray
+            ).kind
+        );
     }
 }
 
