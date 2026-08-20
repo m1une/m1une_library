@@ -5,8 +5,8 @@ data:
     path: geometry/detail/floating_predicate.hpp
     title: geometry/detail/floating_predicate.hpp
   - icon: ':heavy_check_mark:'
-    path: geometry/line.hpp
-    title: Lines and Segments
+    path: geometry/linear.hpp
+    title: Linear Objects
   - icon: ':heavy_check_mark:'
     path: geometry/point.hpp
     title: 2D Point and Predicates
@@ -31,33 +31,32 @@ data:
     links: []
   bundledCode: "#line 1 \"geometry/perpendicular_bisector.hpp\"\n\n\n\n#include <algorithm>\n\
     #include <cassert>\n#include <concepts>\n#include <limits>\n#include <numeric>\n\
-    \n#line 1 \"geometry/line.hpp\"\n\n\n\n#line 5 \"geometry/line.hpp\"\n#include\
-    \ <array>\n#line 7 \"geometry/line.hpp\"\n#include <cmath>\n#include <optional>\n\
-    \n#line 1 \"geometry/point.hpp\"\n\n\n\n#line 7 \"geometry/point.hpp\"\n#include\
-    \ <type_traits>\n\n#line 1 \"geometry/detail/floating_predicate.hpp\"\n\n\n\n\
-    namespace m1une {\nnamespace geometry {\nnamespace predicate_detail {\n\ntemplate\
-    \ <typename T>\nconstexpr T absolute(T value) {\n    return value < T(0) ? -value\
-    \ : value;\n}\n\ntemplate <typename T>\nconstexpr T max_value(T first, T second)\
-    \ {\n    return first < second ? second : first;\n}\n\ntemplate <typename T>\n\
-    constexpr T vector_scale(T x, T y) {\n    return max_value(absolute(x), absolute(y));\n\
-    }\n\ntemplate <bool Exact, typename T>\nconstexpr int scaled_sign(T value, T scale,\
-    \ long double eps) {\n    if constexpr (Exact) {\n        return (value > T(0))\
-    \ - (value < T(0));\n    } else {\n        const T tolerance = T(eps) * scale;\n\
-    \        return (value > tolerance) - (value < -tolerance);\n    }\n}\n\ntemplate\
-    \ <bool Exact, typename T>\nconstexpr T determinant_scale(T ax, T ay, T bx, T\
-    \ by) {\n    if constexpr (Exact) {\n        return T(0);\n    } else {\n    \
-    \    return vector_scale(ax, ay) * vector_scale(bx, by);\n    }\n}\n\ntemplate\
-    \ <bool Exact, typename T>\nconstexpr int determinant_sign(\n    T ax,\n    T\
-    \ ay,\n    T bx,\n    T by,\n    long double eps\n) {\n    const T determinant\
-    \ = ax * by - ay * bx;\n    return scaled_sign<Exact>(\n        determinant,\n\
-    \        determinant_scale<Exact>(ax, ay, bx, by),\n        eps\n    );\n}\n\n\
-    template <bool Exact, typename T>\nconstexpr int orientation_sign(\n    T direction_x,\n\
-    \    T direction_y,\n    T offset_x,\n    T offset_y,\n    long double eps\n)\
-    \ {\n    const T determinant =\n        direction_x * offset_y - direction_y *\
-    \ offset_x;\n    T scale = T(0);\n    if constexpr (!Exact) {\n        const T\
-    \ direction_scale =\n            vector_scale(direction_x, direction_y);\n   \
-    \     scale = direction_scale * max_value(\n            direction_scale,\n   \
-    \         vector_scale(offset_x, offset_y)\n        );\n    }\n    return scaled_sign<Exact>(determinant,\
+    \n#line 1 \"geometry/linear.hpp\"\n\n\n\n#line 5 \"geometry/linear.hpp\"\n#include\
+    \ <array>\n#line 7 \"geometry/linear.hpp\"\n#include <cmath>\n\n#line 1 \"geometry/point.hpp\"\
+    \n\n\n\n#line 7 \"geometry/point.hpp\"\n#include <type_traits>\n\n#line 1 \"geometry/detail/floating_predicate.hpp\"\
+    \n\n\n\nnamespace m1une {\nnamespace geometry {\nnamespace predicate_detail {\n\
+    \ntemplate <typename T>\nconstexpr T absolute(T value) {\n    return value < T(0)\
+    \ ? -value : value;\n}\n\ntemplate <typename T>\nconstexpr T max_value(T first,\
+    \ T second) {\n    return first < second ? second : first;\n}\n\ntemplate <typename\
+    \ T>\nconstexpr T vector_scale(T x, T y) {\n    return max_value(absolute(x),\
+    \ absolute(y));\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int scaled_sign(T\
+    \ value, T scale, long double eps) {\n    if constexpr (Exact) {\n        return\
+    \ (value > T(0)) - (value < T(0));\n    } else {\n        const T tolerance =\
+    \ T(eps) * scale;\n        return (value > tolerance) - (value < -tolerance);\n\
+    \    }\n}\n\ntemplate <bool Exact, typename T>\nconstexpr T determinant_scale(T\
+    \ ax, T ay, T bx, T by) {\n    if constexpr (Exact) {\n        return T(0);\n\
+    \    } else {\n        return vector_scale(ax, ay) * vector_scale(bx, by);\n \
+    \   }\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int determinant_sign(\n\
+    \    T ax,\n    T ay,\n    T bx,\n    T by,\n    long double eps\n) {\n    const\
+    \ T determinant = ax * by - ay * bx;\n    return scaled_sign<Exact>(\n       \
+    \ determinant,\n        determinant_scale<Exact>(ax, ay, bx, by),\n        eps\n\
+    \    );\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int orientation_sign(\n\
+    \    T direction_x,\n    T direction_y,\n    T offset_x,\n    T offset_y,\n  \
+    \  long double eps\n) {\n    const T determinant =\n        direction_x * offset_y\
+    \ - direction_y * offset_x;\n    T scale = T(0);\n    if constexpr (!Exact) {\n\
+    \        const T direction_scale =\n            vector_scale(direction_x, direction_y);\n\
+    \        scale = direction_scale * max_value(\n            direction_scale,\n\
+    \            vector_scale(offset_x, offset_y)\n        );\n    }\n    return scaled_sign<Exact>(determinant,\
     \ scale, eps);\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int dot_sign(\n\
     \    T ax,\n    T ay,\n    T bx,\n    T by,\n    long double eps\n) {\n    const\
     \ T value = ax * bx + ay * by;\n    T scale = T(0);\n    if constexpr (!Exact)\
@@ -149,31 +148,55 @@ data:
     \ double> normalized(const Point<T>& point) {\n    long double length = norm(point);\n\
     \    assert(length != 0);\n    return Point<long double>(\n        static_cast<long\
     \ double>(point.x) / length,\n        static_cast<long double>(point.y) / length\n\
-    \    );\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 11 \"\
-    geometry/line.hpp\"\n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <Coordinate\
+    \    );\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 10 \"\
+    geometry/linear.hpp\"\n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <Coordinate\
     \ T>\nstruct Line {\n    Point<T> a;\n    Point<T> b;\n};\n\ntemplate <Coordinate\
-    \ T>\nstruct Segment {\n    Point<T> a;\n    Point<T> b;\n};\n\nenum class SegmentIntersectionKind\
-    \ {\n    Empty,\n    Point,\n    Overlap,\n};\n\nstruct SegmentIntersection {\n\
-    \    SegmentIntersectionKind kind;\n    Point<long double> first;\n    Point<long\
-    \ double> second;\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long double>\
-    \ centroid(const Segment<T>& segment) {\n    return Point<long double>(\n    \
-    \    (\n            static_cast<long double>(segment.a.x) +\n            static_cast<long\
-    \ double>(segment.b.x)\n        ) / 2,\n        (\n            static_cast<long\
-    \ double>(segment.a.y) +\n            static_cast<long double>(segment.b.y)\n\
-    \        ) / 2\n    );\n}\n\ntemplate <Coordinate T>\nbool on_line(\n    const\
-    \ Line<T>& line,\n    const Point<T>& point,\n    long double eps = 1e-12L\n)\
-    \ {\n    assert(line.a != line.b);\n    return orientation(line.a, line.b, point,\
-    \ eps) == 0;\n}\n\ntemplate <Coordinate T>\nbool parallel(const Line<T>& first,\
-    \ const Line<T>& second, long double eps = 1e-12L) {\n    using W = wide_type<T>;\n\
-    \    W first_x = W(first.b.x) - W(first.a.x);\n    W first_y = W(first.b.y) -\
-    \ W(first.a.y);\n    W second_x = W(second.b.x) - W(second.a.x);\n    W second_y\
-    \ = W(second.b.y) - W(second.a.y);\n    return predicate_detail::determinant_sign<std::integral<T>>(\n\
-    \        first_x,\n        first_y,\n        second_x,\n        second_y,\n  \
-    \      eps\n    ) == 0;\n}\n\ntemplate <Coordinate T>\nbool orthogonal(const Line<T>&\
-    \ first, const Line<T>& second, long double eps = 1e-12L) {\n    using W = wide_type<T>;\n\
-    \    W first_x = W(first.b.x) - W(first.a.x);\n    W first_y = W(first.b.y) -\
-    \ W(first.a.y);\n    W second_x = W(second.b.x) - W(second.a.x);\n    W second_y\
-    \ = W(second.b.y) - W(second.a.y);\n    return predicate_detail::dot_sign<std::integral<T>>(\n\
+    \ T>\nstruct Segment {\n    Point<T> a;\n    Point<T> b;\n};\n\ntemplate <Coordinate\
+    \ T>\nstruct Ray {\n    Point<T> origin;\n    Point<T> through;\n};\n\nenum class\
+    \ LinearIntersectionKind {\n    Empty,\n    Point,\n    Segment,\n    Ray,\n \
+    \   Line,\n};\n\nstruct LinearIntersection {\n    LinearIntersectionKind kind;\n\
+    \    Point<long double> first;\n    Point<long double> second;\n};\n\nnamespace\
+    \ linear_intersection_detail {\n\ninline LinearIntersection make_empty() {\n \
+    \   const Point<long double> zero;\n    return LinearIntersection{\n        LinearIntersectionKind::Empty,\n\
+    \        zero,\n        zero,\n    };\n}\n\ntemplate <Coordinate T>\nLinearIntersection\
+    \ make_point(const Point<T>& point) {\n    const Point<long double> converted(point);\n\
+    \    return LinearIntersection{\n        LinearIntersectionKind::Point,\n    \
+    \    converted,\n        converted,\n    };\n}\n\ntemplate <Coordinate T>\nLinearIntersection\
+    \ make_object(\n    LinearIntersectionKind kind,\n    const Point<T>& first,\n\
+    \    const Point<T>& second\n) {\n    return LinearIntersection{\n        kind,\n\
+    \        Point<long double>(first),\n        Point<long double>(second),\n   \
+    \ };\n}\n\ntemplate <Coordinate T>\nPoint<long double> crossing_point(\n    const\
+    \ Line<T>& first,\n    const Line<T>& second\n) {\n    using W = wide_type<T>;\n\
+    \    const W first_x = W(first.b.x) - W(first.a.x);\n    const W first_y = W(first.b.y)\
+    \ - W(first.a.y);\n    const W second_x = W(second.b.x) - W(second.a.x);\n   \
+    \ const W second_y = W(second.b.y) - W(second.a.y);\n    const W offset_x = W(second.a.x)\
+    \ - W(first.a.x);\n    const W offset_y = W(second.a.y) - W(first.a.y);\n    const\
+    \ W denominator =\n        first_x * second_y - first_y * second_x;\n    assert(denominator\
+    \ != W(0));\n    const W numerator = offset_x * second_y - offset_y * second_x;\n\
+    \    const long double ratio =\n        static_cast<long double>(numerator) /\n\
+    \        static_cast<long double>(denominator);\n    return Point<long double>(\n\
+    \        static_cast<long double>(first.a.x) +\n            static_cast<long double>(first_x)\
+    \ * ratio,\n        static_cast<long double>(first.a.y) +\n            static_cast<long\
+    \ double>(first_y) * ratio\n    );\n}\n\n}  // namespace linear_intersection_detail\n\
+    \ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const Segment<T>&\
+    \ segment) {\n    return Point<long double>(\n        (\n            static_cast<long\
+    \ double>(segment.a.x) +\n            static_cast<long double>(segment.b.x)\n\
+    \        ) / 2,\n        (\n            static_cast<long double>(segment.a.y)\
+    \ +\n            static_cast<long double>(segment.b.y)\n        ) / 2\n    );\n\
+    }\n\ntemplate <Coordinate T>\nbool on_line(\n    const Line<T>& line,\n    const\
+    \ Point<T>& point,\n    long double eps = 1e-12L\n) {\n    assert(line.a != line.b);\n\
+    \    return orientation(line.a, line.b, point, eps) == 0;\n}\n\ntemplate <Coordinate\
+    \ T>\nbool parallel(const Line<T>& first, const Line<T>& second, long double eps\
+    \ = 1e-12L) {\n    using W = wide_type<T>;\n    W first_x = W(first.b.x) - W(first.a.x);\n\
+    \    W first_y = W(first.b.y) - W(first.a.y);\n    W second_x = W(second.b.x)\
+    \ - W(second.a.x);\n    W second_y = W(second.b.y) - W(second.a.y);\n    return\
+    \ predicate_detail::determinant_sign<std::integral<T>>(\n        first_x,\n  \
+    \      first_y,\n        second_x,\n        second_y,\n        eps\n    ) == 0;\n\
+    }\n\ntemplate <Coordinate T>\nbool orthogonal(const Line<T>& first, const Line<T>&\
+    \ second, long double eps = 1e-12L) {\n    using W = wide_type<T>;\n    W first_x\
+    \ = W(first.b.x) - W(first.a.x);\n    W first_y = W(first.b.y) - W(first.a.y);\n\
+    \    W second_x = W(second.b.x) - W(second.a.x);\n    W second_y = W(second.b.y)\
+    \ - W(second.a.y);\n    return predicate_detail::dot_sign<std::integral<T>>(\n\
     \        first_x,\n        first_y,\n        second_x,\n        second_y,\n  \
     \      eps\n    ) == 0;\n}\n\ntemplate <Coordinate T>\nPoint<long double> projection(const\
     \ Line<T>& line, const Point<T>& point) {\n    assert(line.a != line.b);\n   \
@@ -249,87 +272,306 @@ data:
     \    return std::min(distance(line, segment.a), distance(line, segment.b));\n\
     }\n\ntemplate <Coordinate T>\nlong double distance(const Segment<T>& segment,\
     \ const Line<T>& line) {\n    return distance(line, segment);\n}\n\ntemplate <Coordinate\
-    \ T>\nstd::optional<Point<long double>> line_intersection(\n    const Line<T>&\
-    \ first,\n    const Line<T>& second,\n    long double eps = 1e-12L\n) {\n    assert(first.a\
-    \ != first.b);\n    assert(second.a != second.b);\n    using W = wide_type<T>;\n\
-    \    const W first_x = W(first.b.x) - W(first.a.x);\n    const W first_y = W(first.b.y)\
-    \ - W(first.a.y);\n    const W second_x = W(second.b.x) - W(second.a.x);\n   \
-    \ const W second_y = W(second.b.y) - W(second.a.y);\n    const W offset_x = W(second.a.x)\
-    \ - W(first.a.x);\n    const W offset_y = W(second.a.y) - W(first.a.y);\n    const\
-    \ W denominator =\n        first_x * second_y - first_y * second_x;\n    if (\n\
-    \        predicate_detail::determinant_sign<std::integral<T>>(\n            first_x,\n\
-    \            first_y,\n            second_x,\n            second_y,\n        \
-    \    eps\n        ) == 0\n    ) {\n        return std::nullopt;\n    }\n    const\
-    \ W numerator = offset_x * second_y - offset_y * second_x;\n    const long double\
-    \ ratio =\n        static_cast<long double>(numerator) /\n        static_cast<long\
-    \ double>(denominator);\n    return Point<long double>(\n        static_cast<long\
-    \ double>(first.a.x) +\n            static_cast<long double>(first_x) * ratio,\n\
-    \        static_cast<long double>(first.a.y) +\n            static_cast<long double>(first_y)\
-    \ * ratio\n    );\n}\n\ntemplate <Coordinate T>\nSegmentIntersection segment_intersection(\n\
-    \    const Segment<T>& first,\n    const Segment<T>& second,\n    long double\
-    \ eps = 1e-12L\n) {\n    const Point<long double> zero;\n    if (!intersects(first,\
-    \ second, eps)) {\n        return SegmentIntersection{\n            SegmentIntersectionKind::Empty,\n\
-    \            zero,\n            zero,\n        };\n    }\n    if (first.a == first.b)\
-    \ {\n        const Point<long double> point(first.a);\n        return SegmentIntersection{\n\
-    \            SegmentIntersectionKind::Point,\n            point,\n           \
-    \ point,\n        };\n    }\n    if (second.a == second.b) {\n        const Point<long\
-    \ double> point(second.a);\n        return SegmentIntersection{\n            SegmentIntersectionKind::Point,\n\
-    \            point,\n            point,\n        };\n    }\n\n    const int first_a_side\
-    \ =\n        orientation(second.a, second.b, first.a, eps);\n    const int first_b_side\
-    \ =\n        orientation(second.a, second.b, first.b, eps);\n    const int second_a_side\
-    \ =\n        orientation(first.a, first.b, second.a, eps);\n    const int second_b_side\
-    \ =\n        orientation(first.a, first.b, second.b, eps);\n    const bool collinear_intersection\
-    \ =\n        first_a_side == 0 && first_b_side == 0 &&\n        second_a_side\
-    \ == 0 && second_b_side == 0;\n\n    if (!collinear_intersection) {\n        const\
-    \ auto point = line_intersection(\n            Line<T>{first.a, first.b},\n  \
-    \          Line<T>{second.a, second.b},\n            0.0L\n        );\n      \
-    \  assert(point.has_value());\n        return SegmentIntersection{\n         \
-    \   SegmentIntersectionKind::Point,\n            *point,\n            *point,\n\
-    \        };\n    }\n\n    std::array<Point<T>, 4> candidates{\n        first.a,\n\
-    \        first.b,\n        second.a,\n        second.b,\n    };\n    std::array<Point<T>,\
-    \ 4> common;\n    int common_size = 0;\n    long double overlap_scale = 0.0L;\n\
-    \    if constexpr (!std::integral<T>) {\n        overlap_scale = std::max(\n \
-    \           geometry::distance(first.a, first.b),\n            geometry::distance(second.a,\
-    \ second.b)\n        );\n    }\n    auto same_point = [eps, overlap_scale](\n\
-    \        const Point<T>& left,\n        const Point<T>& right\n    ) {\n     \
-    \   if constexpr (std::integral<T>) {\n            return left == right;\n   \
-    \     } else {\n            return geometry::distance(left, right) <= eps * overlap_scale;\n\
-    \        }\n    };\n    for (const Point<T>& candidate : candidates) {\n     \
-    \   if (\n            !on_segment(first, candidate, eps) ||\n            !on_segment(second,\
+    \ T>\nLinearIntersection linear_intersection(\n    const Line<T>& first,\n   \
+    \ const Line<T>& second,\n    long double eps = 1e-12L\n) {\n    assert(first.a\
+    \ != first.b);\n    assert(second.a != second.b);\n    if (parallel(first, second,\
+    \ eps)) {\n        if (on_line(first, second.a, eps)) {\n            return linear_intersection_detail::make_object(\n\
+    \                LinearIntersectionKind::Line,\n                first.a,\n   \
+    \             first.b\n            );\n        }\n        return linear_intersection_detail::make_empty();\n\
+    \    }\n    return linear_intersection_detail::make_point(\n        linear_intersection_detail::crossing_point(first,\
+    \ second)\n    );\n}\n\ntemplate <Coordinate T>\nLinearIntersection linear_intersection(\n\
+    \    const Line<T>& line,\n    const Segment<T>& segment,\n    long double eps\
+    \ = 1e-12L\n) {\n    assert(line.a != line.b);\n    if (!intersects(line, segment,\
+    \ eps)) {\n        return linear_intersection_detail::make_empty();\n    }\n \
+    \   if (segment.a == segment.b) {\n        return linear_intersection_detail::make_point(segment.a);\n\
+    \    }\n\n    const int first_side =\n        orientation(line.a, line.b, segment.a,\
+    \ eps);\n    const int second_side =\n        orientation(line.a, line.b, segment.b,\
+    \ eps);\n    if (first_side == 0 && second_side == 0) {\n        return linear_intersection_detail::make_object(\n\
+    \            LinearIntersectionKind::Segment,\n            segment.a,\n      \
+    \      segment.b\n        );\n    }\n    if (first_side == 0) {\n        return\
+    \ linear_intersection_detail::make_point(segment.a);\n    }\n    if (second_side\
+    \ == 0) {\n        return linear_intersection_detail::make_point(segment.b);\n\
+    \    }\n\n    return linear_intersection_detail::make_point(\n        linear_intersection_detail::crossing_point(\n\
+    \            line,\n            Line<T>{segment.a, segment.b}\n        )\n   \
+    \ );\n}\n\ntemplate <Coordinate T>\nLinearIntersection linear_intersection(\n\
+    \    const Segment<T>& segment,\n    const Line<T>& line,\n    long double eps\
+    \ = 1e-12L\n) {\n    return linear_intersection(line, segment, eps);\n}\n\ntemplate\
+    \ <Coordinate T>\nLinearIntersection linear_intersection(\n    const Segment<T>&\
+    \ first,\n    const Segment<T>& second,\n    long double eps = 1e-12L\n) {\n \
+    \   if (!intersects(first, second, eps)) {\n        return linear_intersection_detail::make_empty();\n\
+    \    }\n    if (first.a == first.b) {\n        return linear_intersection_detail::make_point(first.a);\n\
+    \    }\n    if (second.a == second.b) {\n        return linear_intersection_detail::make_point(second.a);\n\
+    \    }\n\n    const int first_a_side =\n        orientation(second.a, second.b,\
+    \ first.a, eps);\n    const int first_b_side =\n        orientation(second.a,\
+    \ second.b, first.b, eps);\n    const int second_a_side =\n        orientation(first.a,\
+    \ first.b, second.a, eps);\n    const int second_b_side =\n        orientation(first.a,\
+    \ first.b, second.b, eps);\n    const bool collinear_intersection =\n        first_a_side\
+    \ == 0 && first_b_side == 0 &&\n        second_a_side == 0 && second_b_side ==\
+    \ 0;\n\n    if (!collinear_intersection) {\n        if (first_a_side == 0 && on_segment(second,\
+    \ first.a, eps)) {\n            return linear_intersection_detail::make_point(first.a);\n\
+    \        }\n        if (first_b_side == 0 && on_segment(second, first.b, eps))\
+    \ {\n            return linear_intersection_detail::make_point(first.b);\n   \
+    \     }\n        if (second_a_side == 0 && on_segment(first, second.a, eps)) {\n\
+    \            return linear_intersection_detail::make_point(second.a);\n      \
+    \  }\n        if (second_b_side == 0 && on_segment(first, second.b, eps)) {\n\
+    \            return linear_intersection_detail::make_point(second.b);\n      \
+    \  }\n        return linear_intersection_detail::make_point(\n            linear_intersection_detail::crossing_point(\n\
+    \                Line<T>{first.a, first.b},\n                Line<T>{second.a,\
+    \ second.b}\n            )\n        );\n    }\n\n    std::array<Point<T>, 4> candidates{\n\
+    \        first.a,\n        first.b,\n        second.a,\n        second.b,\n  \
+    \  };\n    std::array<Point<T>, 4> common;\n    int common_size = 0;\n    long\
+    \ double overlap_scale = 0.0L;\n    if constexpr (!std::integral<T>) {\n     \
+    \   overlap_scale = std::max(\n            geometry::distance(first.a, first.b),\n\
+    \            geometry::distance(second.a, second.b)\n        );\n    }\n    auto\
+    \ same_point = [eps, overlap_scale](\n        const Point<T>& left,\n        const\
+    \ Point<T>& right\n    ) {\n        if constexpr (std::integral<T>) {\n      \
+    \      return left == right;\n        } else {\n            return geometry::distance(left,\
+    \ right) <= eps * overlap_scale;\n        }\n    };\n    for (const Point<T>&\
+    \ candidate : candidates) {\n        if (\n            !on_segment(first, candidate,\
+    \ eps) ||\n            !on_segment(second, candidate, eps)\n        ) {\n    \
+    \        continue;\n        }\n        bool duplicate = false;\n        for (int\
+    \ index = 0; index < common_size; ++index) {\n            if (same_point(common[index],\
+    \ candidate)) {\n                duplicate = true;\n                break;\n \
+    \           }\n        }\n        if (!duplicate) common[common_size++] = candidate;\n\
+    \    }\n    assert(common_size >= 1);\n\n    using W = wide_type<T>;\n    const\
+    \ W direction_x = W(first.b.x) - W(first.a.x);\n    const W direction_y = W(first.b.y)\
+    \ - W(first.a.y);\n    const W absolute_x = direction_x >= 0 ? direction_x : -direction_x;\n\
+    \    const W absolute_y = direction_y >= 0 ? direction_y : -direction_y;\n   \
+    \ const bool use_x = absolute_x >= absolute_y;\n    auto parameter = [&](const\
+    \ Point<T>& point) {\n        if (use_x) {\n            return direction_x >=\
+    \ 0 ? W(point.x) : -W(point.x);\n        }\n        return direction_y >= 0 ?\
+    \ W(point.y) : -W(point.y);\n    };\n    int start_index = 0;\n    int finish_index\
+    \ = 0;\n    for (int index = 1; index < common_size; ++index) {\n        if (parameter(common[index])\
+    \ < parameter(common[start_index])) {\n            start_index = index;\n    \
+    \    }\n        if (parameter(common[finish_index]) < parameter(common[index]))\
+    \ {\n            finish_index = index;\n        }\n    }\n\n    if (same_point(common[start_index],\
+    \ common[finish_index])) {\n        return linear_intersection_detail::make_point(common[start_index]);\n\
+    \    }\n    return linear_intersection_detail::make_object(\n        LinearIntersectionKind::Segment,\n\
+    \        common[start_index],\n        common[finish_index]\n    );\n}\n\nnamespace\
+    \ ray_detail {\n\ntemplate <Coordinate T>\nstruct Parameters {\n    wide_type<T>\
+    \ denominator;\n    wide_type<T> denominator_scale;\n    wide_type<T> first_numerator;\n\
+    \    wide_type<T> second_numerator;\n};\n\ntemplate <Coordinate T>\nParameters<T>\
+    \ parameters(\n    const Point<T>& first_origin,\n    const Point<T>& first_through,\n\
+    \    const Point<T>& second_origin,\n    const Point<T>& second_through\n) {\n\
+    \    using W = wide_type<T>;\n    W first_x = W(first_through.x) - W(first_origin.x);\n\
+    \    W first_y = W(first_through.y) - W(first_origin.y);\n    W second_x = W(second_through.x)\
+    \ - W(second_origin.x);\n    W second_y = W(second_through.y) - W(second_origin.y);\n\
+    \    W offset_x = W(second_origin.x) - W(first_origin.x);\n    W offset_y = W(second_origin.y)\
+    \ - W(first_origin.y);\n    return Parameters<T>{\n        first_x * second_y\
+    \ - first_y * second_x,\n        predicate_detail::determinant_scale<std::integral<T>>(\n\
+    \            first_x,\n            first_y,\n            second_x,\n         \
+    \   second_y\n        ),\n        offset_x * second_y - offset_y * second_x,\n\
+    \        offset_x * first_y - offset_y * first_x\n    };\n}\n\ntemplate <Coordinate\
+    \ T>\nint denominator_sign(const Parameters<T>& values, long double eps) {\n \
+    \   return predicate_detail::scaled_sign<std::integral<T>>(\n        values.denominator,\n\
+    \        values.denominator_scale,\n        eps\n    );\n}\n\ntemplate <Coordinate\
+    \ T>\nbool ratio_nonnegative(\n    wide_type<T> numerator,\n    wide_type<T> denominator,\n\
+    \    long double eps\n) {\n    const int numerator_sign =\n        predicate_detail::scaled_sign<std::integral<T>>(\n\
+    \            numerator,\n            predicate_detail::absolute(denominator),\n\
+    \            eps\n        );\n    const int denominator_direction =\n        (denominator\
+    \ > 0) - (denominator < 0);\n    return\n        numerator_sign == 0 ||\n    \
+    \    numerator_sign == denominator_direction;\n}\n\ntemplate <Coordinate T>\n\
+    bool ratio_in_unit_interval(\n    wide_type<T> numerator,\n    wide_type<T> denominator,\n\
+    \    long double eps\n) {\n    const auto scale = predicate_detail::absolute(denominator);\n\
+    \    const int start_sign =\n        predicate_detail::scaled_sign<std::integral<T>>(\n\
+    \            numerator,\n            scale,\n            eps\n        );\n   \
+    \ const int finish_sign =\n        predicate_detail::scaled_sign<std::integral<T>>(\n\
+    \            numerator - denominator,\n            scale,\n            eps\n \
+    \       );\n    if (denominator > 0) {\n        return start_sign >= 0 && finish_sign\
+    \ <= 0;\n    }\n    return start_sign <= 0 && finish_sign >= 0;\n}\n\ntemplate\
+    \ <Coordinate T>\nPoint<long double> point_at(\n    const Ray<T>& ray,\n    wide_type<T>\
+    \ numerator,\n    wide_type<T> denominator\n) {\n    long double ratio =\n   \
+    \     static_cast<long double>(numerator) /\n        static_cast<long double>(denominator);\n\
+    \    Point<long double> origin(ray.origin);\n    Point<long double> direction\
+    \ =\n        Point<long double>(ray.through) - origin;\n    return origin + direction\
+    \ * ratio;\n}\n\n}  // namespace ray_detail\n\ntemplate <Coordinate T>\nbool on_ray(\n\
+    \    const Ray<T>& ray,\n    const Point<T>& point,\n    long double eps = 1e-12L\n\
+    ) {\n    assert(ray.origin != ray.through);\n    if (orientation(ray.origin, ray.through,\
+    \ point, eps) != 0) return false;\n    using W = wide_type<T>;\n    W direction_x\
+    \ = W(ray.through.x) - W(ray.origin.x);\n    W direction_y = W(ray.through.y)\
+    \ - W(ray.origin.y);\n    W offset_x = W(point.x) - W(ray.origin.x);\n    W offset_y\
+    \ = W(point.y) - W(ray.origin.y);\n    const W projection =\n        direction_x\
+    \ * offset_x + direction_y * offset_y;\n    const W length_squared =\n       \
+    \ direction_x * direction_x + direction_y * direction_y;\n    return predicate_detail::scaled_sign<std::integral<T>>(\n\
+    \        projection,\n        length_squared,\n        eps\n    ) >= 0;\n}\n\n\
+    template <Coordinate T>\nPoint<long double> projection(const Ray<T>& ray, const\
+    \ Point<T>& point) {\n    assert(ray.origin != ray.through);\n    Point<long double>\
+    \ origin(ray.origin);\n    Point<long double> direction =\n        Point<long\
+    \ double>(ray.through) - origin;\n    Point<long double> offset = Point<long double>(point)\
+    \ - origin;\n    long double ratio = dot(offset, direction) / dot(direction, direction);\n\
+    \    if (ratio < 0) ratio = 0;\n    return origin + direction * ratio;\n}\n\n\
+    template <Coordinate T>\nlong double distance(const Ray<T>& ray, const Point<T>&\
+    \ point) {\n    return geometry::distance(projection(ray, point), Point<long double>(point));\n\
+    }\n\ntemplate <Coordinate T>\nlong double distance(const Point<T>& point, const\
+    \ Ray<T>& ray) {\n    return distance(ray, point);\n}\n\ntemplate <Coordinate\
+    \ T>\nRay<long double> reflection(const Line<T>& line, const Ray<T>& ray) {\n\
+    \    assert(ray.origin != ray.through);\n    return Ray<long double>{\n      \
+    \  reflection(line, ray.origin),\n        reflection(line, ray.through)\n    };\n\
+    }\n\ntemplate <Coordinate T>\nRay<long double> reflected_ray(\n    const Ray<T>&\
+    \ incoming,\n    const Point<T>& hit,\n    const Line<T>& mirror,\n    long double\
+    \ eps = 1e-12L\n) {\n    assert(incoming.origin != incoming.through);\n    assert(on_line(mirror,\
+    \ hit, eps));\n    Point<T> translated = hit + (incoming.through - incoming.origin);\n\
+    \    return Ray<long double>{\n        Point<long double>(hit),\n        reflection(mirror,\
+    \ translated)\n    };\n}\n\ntemplate <Coordinate T>\nbool intersects(\n    const\
+    \ Ray<T>& ray,\n    const Line<T>& line,\n    long double eps = 1e-12L\n) {\n\
+    \    assert(ray.origin != ray.through);\n    assert(line.a != line.b);\n    ray_detail::Parameters<T>\
+    \ values = ray_detail::parameters(\n        ray.origin,\n        ray.through,\n\
+    \        line.a,\n        line.b\n    );\n    if (ray_detail::denominator_sign(values,\
+    \ eps) == 0) {\n        return on_line(line, ray.origin, eps);\n    }\n    return\
+    \ ray_detail::ratio_nonnegative<T>(\n        values.first_numerator,\n       \
+    \ values.denominator,\n        eps\n    );\n}\n\ntemplate <Coordinate T>\nbool\
+    \ intersects(\n    const Line<T>& line,\n    const Ray<T>& ray,\n    long double\
+    \ eps = 1e-12L\n) {\n    return intersects(ray, line, eps);\n}\n\ntemplate <Coordinate\
+    \ T>\nlong double distance(const Ray<T>& ray, const Line<T>& line) {\n    return\
+    \ intersects(ray, line) ? 0 : distance(line, ray.origin);\n}\n\ntemplate <Coordinate\
+    \ T>\nlong double distance(const Line<T>& line, const Ray<T>& ray) {\n    return\
+    \ distance(ray, line);\n}\n\ntemplate <Coordinate T>\nbool intersects(\n    const\
+    \ Ray<T>& ray,\n    const Segment<T>& segment,\n    long double eps = 1e-12L\n\
+    ) {\n    assert(ray.origin != ray.through);\n    if (segment.a == segment.b) return\
+    \ on_ray(ray, segment.a, eps);\n\n    ray_detail::Parameters<T> values = ray_detail::parameters(\n\
+    \        ray.origin,\n        ray.through,\n        segment.a,\n        segment.b\n\
+    \    );\n    if (ray_detail::denominator_sign(values, eps) == 0) {\n        if\
+    \ (orientation(ray.origin, ray.through, segment.a, eps) != 0) {\n            return\
+    \ false;\n        }\n        return on_ray(ray, segment.a, eps) ||\n         \
+    \      on_ray(ray, segment.b, eps) ||\n               on_segment(segment, ray.origin,\
+    \ eps);\n    }\n    return ray_detail::ratio_nonnegative<T>(\n               values.first_numerator,\n\
+    \               values.denominator,\n               eps\n           ) &&\n   \
+    \        ray_detail::ratio_in_unit_interval<T>(\n               values.second_numerator,\n\
+    \               values.denominator,\n               eps\n           );\n}\n\n\
+    template <Coordinate T>\nbool intersects(\n    const Segment<T>& segment,\n  \
+    \  const Ray<T>& ray,\n    long double eps = 1e-12L\n) {\n    return intersects(ray,\
+    \ segment, eps);\n}\n\ntemplate <Coordinate T>\nlong double distance(const Ray<T>&\
+    \ ray, const Segment<T>& segment) {\n    if (intersects(ray, segment)) return\
+    \ 0;\n    return std::min({\n        distance(ray, segment.a),\n        distance(ray,\
+    \ segment.b),\n        distance(segment, ray.origin)\n    });\n}\n\ntemplate <Coordinate\
+    \ T>\nlong double distance(const Segment<T>& segment, const Ray<T>& ray) {\n \
+    \   return distance(ray, segment);\n}\n\ntemplate <Coordinate T>\nbool intersects(\n\
+    \    const Ray<T>& first,\n    const Ray<T>& second,\n    long double eps = 1e-12L\n\
+    ) {\n    assert(first.origin != first.through);\n    assert(second.origin != second.through);\n\
+    \    ray_detail::Parameters<T> values = ray_detail::parameters(\n        first.origin,\n\
+    \        first.through,\n        second.origin,\n        second.through\n    );\n\
+    \    if (ray_detail::denominator_sign(values, eps) == 0) {\n        if (orientation(first.origin,\
+    \ first.through, second.origin, eps) != 0) {\n            return false;\n    \
+    \    }\n        return on_ray(first, second.origin, eps) ||\n               on_ray(second,\
+    \ first.origin, eps);\n    }\n    return ray_detail::ratio_nonnegative<T>(\n \
+    \              values.first_numerator,\n               values.denominator,\n \
+    \              eps\n           ) &&\n           ray_detail::ratio_nonnegative<T>(\n\
+    \               values.second_numerator,\n               values.denominator,\n\
+    \               eps\n           );\n}\n\ntemplate <Coordinate T>\nlong double\
+    \ distance(const Ray<T>& first, const Ray<T>& second) {\n    if (intersects(first,\
+    \ second)) return 0;\n    return std::min(\n        distance(first, second.origin),\n\
+    \        distance(second, first.origin)\n    );\n}\n\ntemplate <Coordinate T>\n\
+    LinearIntersection linear_intersection(\n    const Ray<T>& ray,\n    const Line<T>&\
+    \ line,\n    long double eps = 1e-12L\n) {\n    assert(ray.origin != ray.through);\n\
+    \    assert(line.a != line.b);\n    const ray_detail::Parameters<T> values = ray_detail::parameters(\n\
+    \        ray.origin,\n        ray.through,\n        line.a,\n        line.b\n\
+    \    );\n    if (ray_detail::denominator_sign(values, eps) == 0) {\n        if\
+    \ (on_line(line, ray.origin, eps)) {\n            return linear_intersection_detail::make_object(\n\
+    \                LinearIntersectionKind::Ray,\n                ray.origin,\n \
+    \               ray.through\n            );\n        }\n        return linear_intersection_detail::make_empty();\n\
+    \    }\n    if (\n        !ray_detail::ratio_nonnegative<T>(\n            values.first_numerator,\n\
+    \            values.denominator,\n            eps\n        )\n    ) {\n      \
+    \  return linear_intersection_detail::make_empty();\n    }\n    return linear_intersection_detail::make_point(\n\
+    \        ray_detail::point_at(\n            ray,\n            values.first_numerator,\n\
+    \            values.denominator\n        )\n    );\n}\n\ntemplate <Coordinate\
+    \ T>\nLinearIntersection linear_intersection(\n    const Line<T>& line,\n    const\
+    \ Ray<T>& ray,\n    long double eps = 1e-12L\n) {\n    return linear_intersection(ray,\
+    \ line, eps);\n}\n\ntemplate <Coordinate T>\nLinearIntersection linear_intersection(\n\
+    \    const Ray<T>& ray,\n    const Segment<T>& segment,\n    long double eps =\
+    \ 1e-12L\n) {\n    assert(ray.origin != ray.through);\n    if (segment.a == segment.b)\
+    \ {\n        if (on_ray(ray, segment.a, eps)) {\n            return linear_intersection_detail::make_point(segment.a);\n\
+    \        }\n        return linear_intersection_detail::make_empty();\n    }\n\n\
+    \    const ray_detail::Parameters<T> values = ray_detail::parameters(\n      \
+    \  ray.origin,\n        ray.through,\n        segment.a,\n        segment.b\n\
+    \    );\n    if (ray_detail::denominator_sign(values, eps) != 0) {\n        if\
+    \ (\n            !ray_detail::ratio_nonnegative<T>(\n                values.first_numerator,\n\
+    \                values.denominator,\n                eps\n            ) ||\n\
+    \            !ray_detail::ratio_in_unit_interval<T>(\n                values.second_numerator,\n\
+    \                values.denominator,\n                eps\n            )\n   \
+    \     ) {\n            return linear_intersection_detail::make_empty();\n    \
+    \    }\n        return linear_intersection_detail::make_point(\n            ray_detail::point_at(\n\
+    \                ray,\n                values.first_numerator,\n             \
+    \   values.denominator\n            )\n        );\n    }\n    if (orientation(ray.origin,\
+    \ ray.through, segment.a, eps) != 0) {\n        return linear_intersection_detail::make_empty();\n\
+    \    }\n\n    std::array<Point<T>, 3> candidates{\n        ray.origin,\n     \
+    \   segment.a,\n        segment.b,\n    };\n    std::array<Point<T>, 3> common;\n\
+    \    int common_size = 0;\n    long double object_scale = 0.0L;\n    if constexpr\
+    \ (!std::integral<T>) {\n        object_scale = std::max(\n            geometry::distance(ray.origin,\
+    \ ray.through),\n            geometry::distance(segment.a, segment.b)\n      \
+    \  );\n    }\n    auto same_point = [eps, object_scale](\n        const Point<T>&\
+    \ first,\n        const Point<T>& second\n    ) {\n        if constexpr (std::integral<T>)\
+    \ {\n            return first == second;\n        } else {\n            return\n\
+    \                geometry::distance(first, second) <= eps * object_scale;\n  \
+    \      }\n    };\n    for (const Point<T>& candidate : candidates) {\n       \
+    \ if (\n            !on_ray(ray, candidate, eps) ||\n            !on_segment(segment,\
     \ candidate, eps)\n        ) {\n            continue;\n        }\n        bool\
     \ duplicate = false;\n        for (int index = 0; index < common_size; ++index)\
     \ {\n            if (same_point(common[index], candidate)) {\n               \
     \ duplicate = true;\n                break;\n            }\n        }\n      \
-    \  if (!duplicate) common[common_size++] = candidate;\n    }\n    assert(common_size\
-    \ >= 1);\n\n    using W = wide_type<T>;\n    const W direction_x = W(first.b.x)\
-    \ - W(first.a.x);\n    const W direction_y = W(first.b.y) - W(first.a.y);\n  \
-    \  const W absolute_x = direction_x >= 0 ? direction_x : -direction_x;\n    const\
-    \ W absolute_y = direction_y >= 0 ? direction_y : -direction_y;\n    const bool\
-    \ use_x = absolute_x >= absolute_y;\n    auto parameter = [&](const Point<T>&\
-    \ point) {\n        if (use_x) {\n            return direction_x >= 0 ? W(point.x)\
-    \ : -W(point.x);\n        }\n        return direction_y >= 0 ? W(point.y) : -W(point.y);\n\
-    \    };\n    int start_index = 0;\n    int finish_index = 0;\n    for (int index\
-    \ = 1; index < common_size; ++index) {\n        if (parameter(common[index]) <\
-    \ parameter(common[start_index])) {\n            start_index = index;\n      \
-    \  }\n        if (parameter(common[finish_index]) < parameter(common[index]))\
-    \ {\n            finish_index = index;\n        }\n    }\n\n    const Point<long\
-    \ double> start(common[start_index]);\n    const Point<long double> finish(common[finish_index]);\n\
-    \    if (same_point(common[start_index], common[finish_index])) {\n        return\
-    \ SegmentIntersection{\n            SegmentIntersectionKind::Point,\n        \
-    \    start,\n            start,\n        };\n    }\n    return SegmentIntersection{\n\
-    \        SegmentIntersectionKind::Overlap,\n        start,\n        finish,\n\
-    \    };\n}\n\ntemplate <Coordinate T>\nstd::optional<Point<long double>> line_segment_intersection(\n\
-    \    const Line<T>& line,\n    const Segment<T>& segment,\n    long double eps\
-    \ = 1e-12L\n) {\n    assert(line.a != line.b);\n    if (segment.a == segment.b)\
-    \ {\n        if (on_line(line, segment.a, eps)) {\n            return Point<long\
-    \ double>(segment.a);\n        }\n        return std::nullopt;\n    }\n    if\
-    \ (!intersects(line, segment, eps)) return std::nullopt;\n    Line<T> supporting_line{segment.a,\
-    \ segment.b};\n    return line_intersection(line, supporting_line, eps);\n}\n\n\
-    template <Coordinate T>\nstd::optional<Point<long double>> line_segment_intersection(\n\
-    \    const Segment<T>& segment,\n    const Line<T>& line,\n    long double eps\
-    \ = 1e-12L\n) {\n    return line_segment_intersection(line, segment, eps);\n}\n\
-    \n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 11 \"geometry/perpendicular_bisector.hpp\"\
-    \n\nnamespace m1une {\nnamespace geometry {\n\nnamespace perpendicular_bisector_detail\
+    \  if (!duplicate) common[common_size++] = candidate;\n    }\n    if (common_size\
+    \ == 0) {\n        return linear_intersection_detail::make_empty();\n    }\n\n\
+    \    using W = wide_type<T>;\n    const W direction_x = W(ray.through.x) - W(ray.origin.x);\n\
+    \    const W direction_y = W(ray.through.y) - W(ray.origin.y);\n    const W absolute_x\
+    \ = predicate_detail::absolute(direction_x);\n    const W absolute_y = predicate_detail::absolute(direction_y);\n\
+    \    const bool use_x = absolute_x >= absolute_y;\n    auto parameter = [&](const\
+    \ Point<T>& point) {\n        if (use_x) {\n            return direction_x >=\
+    \ 0 ? W(point.x) : -W(point.x);\n        }\n        return direction_y >= 0 ?\
+    \ W(point.y) : -W(point.y);\n    };\n    int start_index = 0;\n    int finish_index\
+    \ = 0;\n    for (int index = 1; index < common_size; ++index) {\n        if (parameter(common[index])\
+    \ < parameter(common[start_index])) {\n            start_index = index;\n    \
+    \    }\n        if (parameter(common[finish_index]) < parameter(common[index]))\
+    \ {\n            finish_index = index;\n        }\n    }\n    if (same_point(common[start_index],\
+    \ common[finish_index])) {\n        return linear_intersection_detail::make_point(common[start_index]);\n\
+    \    }\n    return linear_intersection_detail::make_object(\n        LinearIntersectionKind::Segment,\n\
+    \        common[start_index],\n        common[finish_index]\n    );\n}\n\ntemplate\
+    \ <Coordinate T>\nLinearIntersection linear_intersection(\n    const Segment<T>&\
+    \ segment,\n    const Ray<T>& ray,\n    long double eps = 1e-12L\n) {\n    return\
+    \ linear_intersection(ray, segment, eps);\n}\n\ntemplate <Coordinate T>\nLinearIntersection\
+    \ linear_intersection(\n    const Ray<T>& first,\n    const Ray<T>& second,\n\
+    \    long double eps = 1e-12L\n) {\n    assert(first.origin != first.through);\n\
+    \    assert(second.origin != second.through);\n    const ray_detail::Parameters<T>\
+    \ values = ray_detail::parameters(\n        first.origin,\n        first.through,\n\
+    \        second.origin,\n        second.through\n    );\n    if (ray_detail::denominator_sign(values,\
+    \ eps) != 0) {\n        if (\n            !ray_detail::ratio_nonnegative<T>(\n\
+    \                values.first_numerator,\n                values.denominator,\n\
+    \                eps\n            ) ||\n            !ray_detail::ratio_nonnegative<T>(\n\
+    \                values.second_numerator,\n                values.denominator,\n\
+    \                eps\n            )\n        ) {\n            return linear_intersection_detail::make_empty();\n\
+    \        }\n        return linear_intersection_detail::make_point(\n         \
+    \   ray_detail::point_at(\n                first,\n                values.first_numerator,\n\
+    \                values.denominator\n            )\n        );\n    }\n    if\
+    \ (\n        orientation(\n            first.origin,\n            first.through,\n\
+    \            second.origin,\n            eps\n        ) != 0\n    ) {\n      \
+    \  return linear_intersection_detail::make_empty();\n    }\n\n    using W = wide_type<T>;\n\
+    \    const W first_x = W(first.through.x) - W(first.origin.x);\n    const W first_y\
+    \ = W(first.through.y) - W(first.origin.y);\n    const W second_x = W(second.through.x)\
+    \ - W(second.origin.x);\n    const W second_y = W(second.through.y) - W(second.origin.y);\n\
+    \    const int direction_relation =\n        predicate_detail::dot_sign<std::integral<T>>(\n\
+    \            first_x,\n            first_y,\n            second_x,\n         \
+    \   second_y,\n            eps\n        );\n\n    bool same_origin;\n    if constexpr\
+    \ (std::integral<T>) {\n        same_origin = first.origin == second.origin;\n\
+    \    } else {\n        const long double object_scale = std::max(\n          \
+    \  geometry::distance(first.origin, first.through),\n            geometry::distance(second.origin,\
+    \ second.through)\n        );\n        same_origin =\n            geometry::distance(first.origin,\
+    \ second.origin) <=\n            eps * object_scale;\n    }\n    if (same_origin)\
+    \ {\n        if (direction_relation < 0) {\n            return linear_intersection_detail::make_point(first.origin);\n\
+    \        }\n        return linear_intersection_detail::make_object(\n        \
+    \    LinearIntersectionKind::Ray,\n            first.origin,\n            first.through\n\
+    \        );\n    }\n\n    const bool first_contains_second =\n        on_ray(first,\
+    \ second.origin, eps);\n    const bool second_contains_first =\n        on_ray(second,\
+    \ first.origin, eps);\n    if (direction_relation >= 0) {\n        if (first_contains_second)\
+    \ {\n            return linear_intersection_detail::make_object(\n           \
+    \     LinearIntersectionKind::Ray,\n                second.origin,\n         \
+    \       second.through\n            );\n        }\n        if (second_contains_first)\
+    \ {\n            return linear_intersection_detail::make_object(\n           \
+    \     LinearIntersectionKind::Ray,\n                first.origin,\n          \
+    \      first.through\n            );\n        }\n        return linear_intersection_detail::make_empty();\n\
+    \    }\n    if (first_contains_second && second_contains_first) {\n        return\
+    \ linear_intersection_detail::make_object(\n            LinearIntersectionKind::Segment,\n\
+    \            first.origin,\n            second.origin\n        );\n    }\n   \
+    \ return linear_intersection_detail::make_empty();\n}\n\n}  // namespace geometry\n\
+    }  // namespace m1une\n\n\n#line 11 \"geometry/perpendicular_bisector.hpp\"\n\n\
+    namespace m1une {\nnamespace geometry {\n\nnamespace perpendicular_bisector_detail\
     \ {\n\ntemplate <class Integer>\nconstexpr Integer absolute(Integer value) {\n\
     \    return value < 0 ? -value : value;\n}\n\ntemplate <class Integer>\nconstexpr\
     \ Integer gcd(Integer first, Integer second) {\n    first = absolute(first);\n\
@@ -391,7 +633,7 @@ data:
     \ namespace geometry\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_GEOMETRY_PERPENDICULAR_BISECTOR_HPP\n#define M1UNE_GEOMETRY_PERPENDICULAR_BISECTOR_HPP\
     \ 1\n\n#include <algorithm>\n#include <cassert>\n#include <concepts>\n#include\
-    \ <limits>\n#include <numeric>\n\n#include \"line.hpp\"\n\nnamespace m1une {\n\
+    \ <limits>\n#include <numeric>\n\n#include \"linear.hpp\"\n\nnamespace m1une {\n\
     namespace geometry {\n\nnamespace perpendicular_bisector_detail {\n\ntemplate\
     \ <class Integer>\nconstexpr Integer absolute(Integer value) {\n    return value\
     \ < 0 ? -value : value;\n}\n\ntemplate <class Integer>\nconstexpr Integer gcd(Integer\
@@ -453,14 +695,14 @@ data:
     \   result.b = midpoint + direction;\n        return result;\n    }\n}\n\n}  //\
     \ namespace geometry\n}  // namespace m1une\n\n#endif  // M1UNE_GEOMETRY_PERPENDICULAR_BISECTOR_HPP\n"
   dependsOn:
-  - geometry/line.hpp
+  - geometry/linear.hpp
   - geometry/point.hpp
   - geometry/detail/floating_predicate.hpp
   isVerificationFile: false
   path: geometry/perpendicular_bisector.hpp
   requiredBy:
   - geometry/all.hpp
-  timestamp: '2026-08-20 21:15:27+09:00'
+  timestamp: '2026-08-20 21:54:38+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/perpendicular_bisector.test.cpp

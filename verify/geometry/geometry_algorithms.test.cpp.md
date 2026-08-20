@@ -62,8 +62,8 @@ data:
     path: geometry/lattice_point_count.hpp
     title: Lattice-Point Count
   - icon: ':heavy_check_mark:'
-    path: geometry/line.hpp
-    title: Lines and Segments
+    path: geometry/linear.hpp
+    title: Linear Objects
   - icon: ':heavy_check_mark:'
     path: geometry/manhattan_mst.hpp
     title: Manhattan Minimum Spanning Tree
@@ -88,9 +88,6 @@ data:
   - icon: ':heavy_check_mark:'
     path: geometry/polygon.hpp
     title: Polygons
-  - icon: ':heavy_check_mark:'
-    path: geometry/ray.hpp
-    title: Rays
   - icon: ':heavy_check_mark:'
     path: geometry/rectangle_union_area.hpp
     title: Area of Union of Rectangles
@@ -171,22 +168,22 @@ data:
     \ = projection(horizontal, P(2, 3));\n    assert(close(projected.x, 2));\n   \
     \ assert(close(projected.y, 0));\n\n    Line<long long> diagonal1;\n    diagonal1.a\
     \ = P(0, 0);\n    diagonal1.b = P(2, 2);\n    Line<long long> diagonal2;\n   \
-    \ diagonal2.a = P(0, 2);\n    diagonal2.b = P(2, 0);\n    [[maybe_unused]] auto\
-    \ crossing = line_intersection(diagonal1, diagonal2);\n    assert(crossing.has_value());\n\
-    \    assert(close(crossing->x, 1));\n    assert(close(crossing->y, 1));\n\n  \
-    \  std::vector<P> square;\n    square.emplace_back(0, 0);\n    square.emplace_back(2,\
-    \ 0);\n    square.emplace_back(2, 2);\n    square.emplace_back(0, 2);\n    assert(polygon_area2(square)\
-    \ == 8);\n    assert(point_in_polygon(square, P(1, 1)) == PointInPolygon::Inside);\n\
-    \    assert(point_in_polygon(square, P(0, 1)) == PointInPolygon::Boundary);\n\
-    \    assert(point_in_polygon(square, P(3, 1)) == PointInPolygon::Outside);\n \
-    \   assert(convex_diameter2(square) == 8);\n\n    Circle<long double> circle;\n\
-    \    circle.center = Point<long double>(0, 0);\n    circle.radius = 2;\n    Line<long\
-    \ double> line;\n    line.a = Point<long double>(-3, 0);\n    line.b = Point<long\
-    \ double>(3, 0);\n    auto intersections = circle_line_intersections(circle, line);\n\
-    \    assert(intersections.size() == 2);\n    assert(close(intersections[0].x,\
-    \ -2));\n    assert(close(intersections[1].x, 2));\n\n    Circle<long double>\
-    \ other;\n    other.center = Point<long double>(3, 0);\n    other.radius = 2;\n\
-    \    assert(circle_relation(circle, other) == CircleRelation::Intersecting);\n\
+    \ diagonal2.a = P(0, 2);\n    diagonal2.b = P(2, 0);\n    const LinearIntersection\
+    \ crossing =\n        linear_intersection(diagonal1, diagonal2);\n    assert(crossing.kind\
+    \ == LinearIntersectionKind::Point);\n    assert(close(crossing.first.x, 1));\n\
+    \    assert(close(crossing.first.y, 1));\n\n    std::vector<P> square;\n    square.emplace_back(0,\
+    \ 0);\n    square.emplace_back(2, 0);\n    square.emplace_back(2, 2);\n    square.emplace_back(0,\
+    \ 2);\n    assert(polygon_area2(square) == 8);\n    assert(point_in_polygon(square,\
+    \ P(1, 1)) == PointInPolygon::Inside);\n    assert(point_in_polygon(square, P(0,\
+    \ 1)) == PointInPolygon::Boundary);\n    assert(point_in_polygon(square, P(3,\
+    \ 1)) == PointInPolygon::Outside);\n    assert(convex_diameter2(square) == 8);\n\
+    \n    Circle<long double> circle;\n    circle.center = Point<long double>(0, 0);\n\
+    \    circle.radius = 2;\n    Line<long double> line;\n    line.a = Point<long\
+    \ double>(-3, 0);\n    line.b = Point<long double>(3, 0);\n    auto intersections\
+    \ = circle_line_intersections(circle, line);\n    assert(intersections.size()\
+    \ == 2);\n    assert(close(intersections[0].x, -2));\n    assert(close(intersections[1].x,\
+    \ 2));\n\n    Circle<long double> other;\n    other.center = Point<long double>(3,\
+    \ 0);\n    other.radius = 2;\n    assert(circle_relation(circle, other) == CircleRelation::Intersecting);\n\
     \    auto circle_points = circle_intersections(circle, other);\n    assert(circle_points.size()\
     \ == 2);\n    for ([[maybe_unused]] const auto& point : circle_points) {\n   \
     \     assert(close(distance(point, circle.center), circle.radius));\n        assert(close(distance(point,\
@@ -228,8 +225,7 @@ data:
   - geometry/point.hpp
   - geometry/detail/floating_predicate.hpp
   - geometry/circle.hpp
-  - geometry/ray.hpp
-  - geometry/line.hpp
+  - geometry/linear.hpp
   - geometry/circle_coverage_areas.hpp
   - geometry/circle_union_area.hpp
   - geometry/closest_pair.hpp
@@ -267,7 +263,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/geometry_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-08-20 21:15:27+09:00'
+  timestamp: '2026-08-20 21:54:38+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/geometry_algorithms.test.cpp

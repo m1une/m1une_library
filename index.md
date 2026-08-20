@@ -628,8 +628,8 @@ data:
       path: geometry/lattice_point_count.hpp
       title: Lattice-Point Count
     - icon: ':heavy_check_mark:'
-      path: geometry/line.hpp
-      title: Lines and Segments
+      path: geometry/linear.hpp
+      title: Linear Objects
     - icon: ':heavy_check_mark:'
       path: geometry/manhattan_mst.hpp
       title: Manhattan Minimum Spanning Tree
@@ -651,9 +651,6 @@ data:
     - icon: ':heavy_check_mark:'
       path: geometry/polygon.hpp
       title: Polygons
-    - icon: ':heavy_check_mark:'
-      path: geometry/ray.hpp
-      title: Rays
     - icon: ':heavy_check_mark:'
       path: geometry/rectangle_union_area.hpp
       title: Area of Union of Rectangles
@@ -1904,6 +1901,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/geometry/lattice_point_count.test.cpp
       title: verify/geometry/lattice_point_count.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/geometry/linear_intersection.test.cpp
+      title: verify/geometry/linear_intersection.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/geometry/manhattan_mst.test.cpp
       title: verify/geometry/manhattan_mst.test.cpp

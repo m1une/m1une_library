@@ -60,8 +60,8 @@ data:
     path: geometry/half_plane_intersection.hpp
     title: Half-Plane Intersection
   - icon: ':heavy_check_mark:'
-    path: geometry/line.hpp
-    title: Lines and Segments
+    path: geometry/linear.hpp
+    title: Linear Objects
   - icon: ':heavy_check_mark:'
     path: geometry/manhattan_mst.hpp
     title: Manhattan Minimum Spanning Tree
@@ -80,9 +80,6 @@ data:
   - icon: ':heavy_check_mark:'
     path: geometry/polygon.hpp
     title: Polygons
-  - icon: ':heavy_check_mark:'
-    path: geometry/ray.hpp
-    title: Rays
   - icon: ':heavy_check_mark:'
     path: geometry/rectangle_union_area.hpp
     title: Area of Union of Rectangles
@@ -204,6 +201,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/is_convex_polygon.test.cpp
     title: verify/geometry/is_convex_polygon.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/linear_intersection.test.cpp
+    title: verify/geometry/linear_intersection.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/manhattan_mst.test.cpp
     title: verify/geometry/manhattan_mst.test.cpp
@@ -477,6 +477,7 @@ data:
   - geometry/angle_sort.hpp
   - geometry/circle_union_area.hpp
   - geometry/polygon.hpp
+  - geometry/linear.hpp
   - geometry/perpendicular_bisector.hpp
   - geometry/half_plane_intersection.hpp
   - geometry/manhattan_mst.hpp
@@ -496,12 +497,10 @@ data:
   - geometry/convex_polygon.hpp
   - geometry/circle.hpp
   - geometry/rectangle_union_area.hpp
-  - geometry/ray.hpp
   - geometry/minkowski_sum.hpp
   - geometry/voronoi_diagram.hpp
   - geometry/farthest_pair.hpp
   - geometry/convex_decomposition.hpp
-  - geometry/line.hpp
   timestamp: '2026-08-20 21:15:27+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
@@ -534,6 +533,7 @@ data:
   - verify/geometry/steiner_convex_decomposition.test.cpp
   - verify/geometry/circumcircle.test.cpp
   - verify/geometry/projection.test.cpp
+  - verify/geometry/linear_intersection.test.cpp
   - verify/geometry/ray.test.cpp
   - verify/geometry/circle_common_tangents.test.cpp
   - verify/geometry/segment_intersection_point.test.cpp

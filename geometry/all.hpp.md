@@ -59,8 +59,8 @@ data:
     path: geometry/lattice_point_count.hpp
     title: Lattice-Point Count
   - icon: ':heavy_check_mark:'
-    path: geometry/line.hpp
-    title: Lines and Segments
+    path: geometry/linear.hpp
+    title: Linear Objects
   - icon: ':heavy_check_mark:'
     path: geometry/manhattan_mst.hpp
     title: Manhattan Minimum Spanning Tree
@@ -85,9 +85,6 @@ data:
   - icon: ':heavy_check_mark:'
     path: geometry/polygon.hpp
     title: Polygons
-  - icon: ':heavy_check_mark:'
-    path: geometry/ray.hpp
-    title: Rays
   - icon: ':heavy_check_mark:'
     path: geometry/rectangle_union_area.hpp
     title: Area of Union of Rectangles
@@ -178,7 +175,7 @@ data:
 
     #include "lattice_point_count.hpp"
 
-    #include "line.hpp"
+    #include "linear.hpp"
 
     #include "manhattan_mst.hpp"
 
@@ -193,8 +190,6 @@ data:
     #include "point.hpp"
 
     #include "polygon.hpp"
-
-    #include "ray.hpp"
 
     #include "rectangle_union_area.hpp"
 
@@ -211,8 +206,7 @@ data:
   - geometry/point.hpp
   - geometry/detail/floating_predicate.hpp
   - geometry/circle.hpp
-  - geometry/ray.hpp
-  - geometry/line.hpp
+  - geometry/linear.hpp
   - geometry/circle_coverage_areas.hpp
   - geometry/circle_union_area.hpp
   - geometry/closest_pair.hpp
@@ -249,7 +243,7 @@ data:
   isVerificationFile: false
   path: geometry/all.hpp
   requiredBy: []
-  timestamp: '2026-08-20 21:15:27+09:00'
+  timestamp: '2026-08-20 21:54:38+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/centroid.test.cpp
@@ -286,9 +280,8 @@ title: Geometry Bundle
 | `geometry/manhattan_segment_intersections.hpp` | Counts or enumerates intersections of axis-aligned integral segments. |
 | `geometry/minimum_enclosing_circle.hpp` | Randomized linear-time minimum enclosing circle with support indices. |
 | `geometry/minkowski_sum.hpp` | Linear-time Minkowski sum of two ordered convex polygons. |
-| `geometry/line.hpp` | Lines, segments, segment centroid, projection, intersection, and distances. |
+| `geometry/linear.hpp` | Lines, segments, rays, classified linear intersections, projection, reflection, centroids, and distances. |
 | `geometry/perpendicular_bisector.hpp` | Floating-point and lattice-point perpendicular bisectors of two distinct points. |
-| `geometry/ray.hpp` | Rays, containment, projection, intersections, and distances with other linear objects. |
 | `geometry/rectangle_union_area.hpp` | Exact union area of axis-aligned rectangles in $O(N\log N)$. |
 | `geometry/steiner_convex_decomposition.hpp` | Floating-point Steiner convex decomposition with an exact union and a strict 2-approximation piece count. |
 | `geometry/voronoi_diagram.hpp` | Exact-topology Euclidean Voronoi diagrams with segments, rays, lines, and per-site boundary edges in $O(N\log N)$. |

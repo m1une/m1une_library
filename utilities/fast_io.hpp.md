@@ -457,6 +457,9 @@ data:
     path: verify/geometry/lattice_point_count.test.cpp
     title: verify/geometry/lattice_point_count.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/linear_intersection.test.cpp
+    title: verify/geometry/linear_intersection.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/manhattan_mst.test.cpp
     title: verify/geometry/manhattan_mst.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1632,6 +1635,7 @@ data:
   - verify/geometry/circumcircle.test.cpp
   - verify/geometry/projection.test.cpp
   - verify/geometry/lattice_point_count.test.cpp
+  - verify/geometry/linear_intersection.test.cpp
   - verify/geometry/ray.test.cpp
   - verify/geometry/circle_common_tangents.test.cpp
   - verify/geometry/segment_intersection_point.test.cpp

@@ -62,8 +62,8 @@ data:
     path: geometry/lattice_point_count.hpp
     title: Lattice-Point Count
   - icon: ':heavy_check_mark:'
-    path: geometry/line.hpp
-    title: Lines and Segments
+    path: geometry/linear.hpp
+    title: Linear Objects
   - icon: ':heavy_check_mark:'
     path: geometry/manhattan_mst.hpp
     title: Manhattan Minimum Spanning Tree
@@ -88,9 +88,6 @@ data:
   - icon: ':heavy_check_mark:'
     path: geometry/polygon.hpp
     title: Polygons
-  - icon: ':heavy_check_mark:'
-    path: geometry/ray.hpp
-    title: Rays
   - icon: ':heavy_check_mark:'
     path: geometry/rectangle_union_area.hpp
     title: Area of Union of Rectangles
@@ -221,8 +218,7 @@ data:
   - geometry/point.hpp
   - geometry/detail/floating_predicate.hpp
   - geometry/circle.hpp
-  - geometry/ray.hpp
-  - geometry/line.hpp
+  - geometry/linear.hpp
   - geometry/circle_coverage_areas.hpp
   - geometry/circle_union_area.hpp
   - geometry/closest_pair.hpp
@@ -260,7 +256,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/centroid.test.cpp
   requiredBy: []
-  timestamp: '2026-08-20 21:15:27+09:00'
+  timestamp: '2026-08-20 21:54:38+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/centroid.test.cpp
