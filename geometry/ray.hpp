@@ -21,6 +21,7 @@ namespace ray_detail {
 template <Coordinate T>
 struct Parameters {
     wide_type<T> denominator;
+    wide_type<T> denominator_scale;
     wide_type<T> first_numerator;
     wide_type<T> second_numerator;
 };
@@ -41,9 +42,24 @@ Parameters<T> parameters(
     W offset_y = W(second_origin.y) - W(first_origin.y);
     return Parameters<T>{
         first_x * second_y - first_y * second_x,
+        predicate_detail::determinant_scale<std::integral<T>>(
+            first_x,
+            first_y,
+            second_x,
+            second_y
+        ),
         offset_x * second_y - offset_y * second_x,
         offset_x * first_y - offset_y * first_x
     };
+}
+
+template <Coordinate T>
+int denominator_sign(const Parameters<T>& values, long double eps) {
+    return predicate_detail::scaled_sign<std::integral<T>>(
+        values.denominator,
+        values.denominator_scale,
+        eps
+    );
 }
 
 template <Coordinate T>
@@ -52,9 +68,17 @@ bool ratio_nonnegative(
     wide_type<T> denominator,
     long double eps
 ) {
-    int numerator_sign = sign<T>(numerator, eps);
-    int denominator_sign = sign<T>(denominator, eps);
-    return numerator_sign == 0 || numerator_sign == denominator_sign;
+    const int numerator_sign =
+        predicate_detail::scaled_sign<std::integral<T>>(
+            numerator,
+            predicate_detail::absolute(denominator),
+            eps
+        );
+    const int denominator_direction =
+        (denominator > 0) - (denominator < 0);
+    return
+        numerator_sign == 0 ||
+        numerator_sign == denominator_direction;
 }
 
 template <Coordinate T>
@@ -63,12 +87,23 @@ bool ratio_in_unit_interval(
     wide_type<T> denominator,
     long double eps
 ) {
-    if (sign<T>(denominator, eps) > 0) {
-        return sign<T>(numerator, eps) >= 0 &&
-               sign<T>(numerator - denominator, eps) <= 0;
+    const auto scale = predicate_detail::absolute(denominator);
+    const int start_sign =
+        predicate_detail::scaled_sign<std::integral<T>>(
+            numerator,
+            scale,
+            eps
+        );
+    const int finish_sign =
+        predicate_detail::scaled_sign<std::integral<T>>(
+            numerator - denominator,
+            scale,
+            eps
+        );
+    if (denominator > 0) {
+        return start_sign >= 0 && finish_sign <= 0;
     }
-    return sign<T>(numerator, eps) <= 0 &&
-           sign<T>(numerator - denominator, eps) >= 0;
+    return start_sign <= 0 && finish_sign >= 0;
 }
 
 template <Coordinate T>
@@ -101,7 +136,15 @@ bool on_ray(
     W direction_y = W(ray.through.y) - W(ray.origin.y);
     W offset_x = W(point.x) - W(ray.origin.x);
     W offset_y = W(point.y) - W(ray.origin.y);
-    return sign<T>(direction_x * offset_x + direction_y * offset_y, eps) >= 0;
+    const W projection =
+        direction_x * offset_x + direction_y * offset_y;
+    const W length_squared =
+        direction_x * direction_x + direction_y * direction_y;
+    return predicate_detail::scaled_sign<std::integral<T>>(
+        projection,
+        length_squared,
+        eps
+    ) >= 0;
 }
 
 template <Coordinate T>
@@ -165,7 +208,7 @@ bool intersects(
         line.a,
         line.b
     );
-    if (sign<T>(values.denominator, eps) == 0) {
+    if (ray_detail::denominator_sign(values, eps) == 0) {
         return on_line(line, ray.origin, eps);
     }
     return ray_detail::ratio_nonnegative<T>(
@@ -209,7 +252,7 @@ bool intersects(
         segment.a,
         segment.b
     );
-    if (sign<T>(values.denominator, eps) == 0) {
+    if (ray_detail::denominator_sign(values, eps) == 0) {
         if (orientation(ray.origin, ray.through, segment.a, eps) != 0) {
             return false;
         }
@@ -267,7 +310,7 @@ bool intersects(
         second.origin,
         second.through
     );
-    if (sign<T>(values.denominator, eps) == 0) {
+    if (ray_detail::denominator_sign(values, eps) == 0) {
         if (orientation(first.origin, first.through, second.origin, eps) != 0) {
             return false;
         }
@@ -310,7 +353,7 @@ std::optional<Point<long double>> ray_line_intersection(
         line.b
     );
     if (
-        sign<T>(values.denominator, eps) == 0 ||
+        ray_detail::denominator_sign(values, eps) == 0 ||
         !ray_detail::ratio_nonnegative<T>(
             values.first_numerator,
             values.denominator,
@@ -355,7 +398,7 @@ std::optional<Point<long double>> ray_segment_intersection(
         segment.a,
         segment.b
     );
-    if (sign<T>(values.denominator, eps) == 0) {
+    if (ray_detail::denominator_sign(values, eps) == 0) {
         if (orientation(ray.origin, ray.through, segment.a, eps) != 0) {
             return std::nullopt;
         }
@@ -417,7 +460,7 @@ std::optional<Point<long double>> ray_intersection(
         second.origin,
         second.through
     );
-    if (sign<T>(values.denominator, eps) == 0) {
+    if (ray_detail::denominator_sign(values, eps) == 0) {
         if (
             first.origin != second.origin ||
             orientation(
@@ -434,7 +477,15 @@ std::optional<Point<long double>> ray_intersection(
         W first_y = W(first.through.y) - W(first.origin.y);
         W second_x = W(second.through.x) - W(second.origin.x);
         W second_y = W(second.through.y) - W(second.origin.y);
-        if (sign<T>(first_x * second_x + first_y * second_y, eps) < 0) {
+        if (
+            predicate_detail::dot_sign<std::integral<T>>(
+                first_x,
+                first_y,
+                second_x,
+                second_y,
+                eps
+            ) < 0
+        ) {
             return Point<long double>(first.origin);
         }
         return std::nullopt;

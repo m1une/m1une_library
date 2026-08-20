@@ -42,6 +42,12 @@ documentation_of: ../../geometry/all.hpp
 Integral predicates promote to signed 128-bit arithmetic. Constructions that
 may be non-integral return `Point<long double>`.
 
+Core floating-point point, line, segment, and ray predicates use a
+dimensionless scale-aware epsilon. Uniformly scaling a complete configuration
+does not change their orientation, direction, containment, or intersection
+classification. See the individual point, line, and ray pages for the exact
+tolerance semantics.
+
 ## Centroid overloads
 
 The bounded geometry types share the free function name `centroid`:

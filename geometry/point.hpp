@@ -6,6 +6,8 @@
 #include <cassert>
 #include <type_traits>
 
+#include "detail/floating_predicate.hpp"
+
 namespace m1une {
 namespace geometry {
 
@@ -185,11 +187,11 @@ constexpr Point<long double> external_division_point(
 
 template <Coordinate T>
 constexpr int sign(wide_type<T> value, long double eps = 1e-12L) {
-    if constexpr (std::integral<T>) {
-        return (value > 0) - (value < 0);
-    } else {
-        return (value > eps) - (value < -eps);
-    }
+    return predicate_detail::scaled_sign<std::integral<T>>(
+        value,
+        wide_type<T>(1),
+        eps
+    );
 }
 
 template <Coordinate T>
@@ -199,7 +201,18 @@ constexpr int orientation(
     const Point<T>& c,
     long double eps = 1e-12L
 ) {
-    return sign<T>(cross(a, b, c), eps);
+    using W = wide_type<T>;
+    const W first_x = W(b.x) - W(a.x);
+    const W first_y = W(b.y) - W(a.y);
+    const W second_x = W(c.x) - W(a.x);
+    const W second_y = W(c.y) - W(a.y);
+    return predicate_detail::orientation_sign<std::integral<T>>(
+        first_x,
+        first_y,
+        second_x,
+        second_y,
+        eps
+    );
 }
 
 template <Coordinate T>

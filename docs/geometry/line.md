@@ -12,6 +12,13 @@ intersections.
 Segment predicates are exact for integral coordinates through 128-bit cross
 products. Constructed coordinates are returned as `Point<long double>`.
 
+For floating-point coordinates, `eps` is relative to the directions or segment
+lengths involved. Parallelism, orthogonality, and collinearity use scale-aware
+determinant or dot-product tests. Segment endpoint checks allow a normalized
+parameter error of `eps`, so uniformly scaling the complete configuration does
+not change the result. A degenerate segment has no length scale; its point test
+therefore uses `eps` as an absolute coordinate tolerance.
+
 ## Types
 
 ```cpp

@@ -67,7 +67,13 @@ bool parallel(const Line<T>& first, const Line<T>& second, long double eps = 1e-
     W first_y = W(first.b.y) - W(first.a.y);
     W second_x = W(second.b.x) - W(second.a.x);
     W second_y = W(second.b.y) - W(second.a.y);
-    return sign<T>(first_x * second_y - first_y * second_x, eps) == 0;
+    return predicate_detail::determinant_sign<std::integral<T>>(
+        first_x,
+        first_y,
+        second_x,
+        second_y,
+        eps
+    ) == 0;
 }
 
 template <Coordinate T>
@@ -77,7 +83,13 @@ bool orthogonal(const Line<T>& first, const Line<T>& second, long double eps = 1
     W first_y = W(first.b.y) - W(first.a.y);
     W second_x = W(second.b.x) - W(second.a.x);
     W second_y = W(second.b.y) - W(second.a.y);
-    return sign<T>(first_x * second_x + first_y * second_y, eps) == 0;
+    return predicate_detail::dot_sign<std::integral<T>>(
+        first_x,
+        first_y,
+        second_x,
+        second_y,
+        eps
+    ) == 0;
 }
 
 template <Coordinate T>
@@ -143,18 +155,34 @@ bool on_segment(
 ) {
     if (orientation(segment.a, segment.b, point, eps) != 0) return false;
     using W = wide_type<T>;
-    W px = W(point.x);
-    W py = W(point.y);
-    W min_x = std::min(W(segment.a.x), W(segment.b.x));
-    W max_x = std::max(W(segment.a.x), W(segment.b.x));
-    W min_y = std::min(W(segment.a.y), W(segment.b.y));
-    W max_y = std::max(W(segment.a.y), W(segment.b.y));
-    if constexpr (std::integral<T>) {
-        return min_x <= px && px <= max_x && min_y <= py && py <= max_y;
-    } else {
-        return min_x - eps <= px && px <= max_x + eps &&
-               min_y - eps <= py && py <= max_y + eps;
+    const W direction_x = W(segment.b.x) - W(segment.a.x);
+    const W direction_y = W(segment.b.y) - W(segment.a.y);
+    if (direction_x == W(0) && direction_y == W(0)) {
+        if constexpr (std::integral<T>) {
+            return point == segment.a;
+        } else {
+            return
+                predicate_detail::absolute(W(point.x) - W(segment.a.x)) <= eps &&
+                predicate_detail::absolute(W(point.y) - W(segment.a.y)) <= eps;
+        }
     }
+    const W offset_x = W(point.x) - W(segment.a.x);
+    const W offset_y = W(point.y) - W(segment.a.y);
+    const W projection =
+        offset_x * direction_x + offset_y * direction_y;
+    const W length_squared =
+        direction_x * direction_x + direction_y * direction_y;
+    return
+        predicate_detail::scaled_sign<std::integral<T>>(
+            projection,
+            length_squared,
+            eps
+        ) >= 0 &&
+        predicate_detail::scaled_sign<std::integral<T>>(
+            projection - length_squared,
+            length_squared,
+            eps
+        ) <= 0;
 }
 
 template <Coordinate T>
@@ -253,7 +281,17 @@ std::optional<Point<long double>> line_intersection(
     const W offset_y = W(second.a.y) - W(first.a.y);
     const W denominator =
         first_x * second_y - first_y * second_x;
-    if (sign<T>(denominator, eps) == 0) return std::nullopt;
+    if (
+        predicate_detail::determinant_sign<std::integral<T>>(
+            first_x,
+            first_y,
+            second_x,
+            second_y,
+            eps
+        ) == 0
+    ) {
+        return std::nullopt;
+    }
     const W numerator = offset_x * second_y - offset_y * second_x;
     const long double ratio =
         static_cast<long double>(numerator) /
@@ -331,11 +369,21 @@ SegmentIntersection segment_intersection(
     };
     std::array<Point<T>, 4> common;
     int common_size = 0;
-    auto same_point = [eps](const Point<T>& left, const Point<T>& right) {
+    long double overlap_scale = 0.0L;
+    if constexpr (!std::integral<T>) {
+        overlap_scale = std::max(
+            geometry::distance(first.a, first.b),
+            geometry::distance(second.a, second.b)
+        );
+    }
+    auto same_point = [eps, overlap_scale](
+        const Point<T>& left,
+        const Point<T>& right
+    ) {
         if constexpr (std::integral<T>) {
             return left == right;
         } else {
-            return geometry::distance(left, right) <= eps;
+            return geometry::distance(left, right) <= eps * overlap_scale;
         }
     };
     for (const Point<T>& candidate : candidates) {

@@ -16,6 +16,11 @@ segments, and other rays.
 Integral intersection predicates use signed 128-bit arithmetic. Constructed
 points and distances use `long double`.
 
+For floating-point coordinates, `eps` is scale-aware. Direction comparisons
+use relative determinant or dot-product tolerances, and forward/range checks
+allow a normalized ray or segment parameter error of `eps`. Uniformly scaling
+the complete configuration therefore does not change predicate results.
+
 ## Type
 
 ```cpp

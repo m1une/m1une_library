@@ -11,7 +11,7 @@ orientation, rotation, normalization, and its trivial centroid.
 
 For integral coordinates, dot products, cross products, squared norms, and
 orientation calculations use signed 128-bit arithmetic. For floating-point
-coordinates, predicates use `long double` and accept an epsilon.
+coordinates, predicates use `long double` and accept a scale-aware epsilon.
 
 As with ordinary integer geometry code, inputs must be small enough that the
 promoted 128-bit intermediate result does not overflow.
@@ -49,6 +49,26 @@ subtraction, scalar multiplication, and scalar division.
 | `normalized(p)` | Returns a unit vector in `p`'s direction. | $O(1)$ |
 
 `normalized` requires a nonzero vector.
+
+## Floating-point tolerance
+
+For floating-point `orientation` and `collinear`, `eps` is a dimensionless
+relative tolerance. If `u = b - a`, `v = c - a`, and
+`s(w) = max(abs(w.x), abs(w.y))`, their determinant is treated as zero when
+
+$$
+|u_xv_y-u_yv_x|
+\leq \mathtt{eps}\,s(u)\max(s(u),s(v)).
+$$
+
+Consequently, uniformly scaling all coordinates does not change the result.
+The `s(u)^2` floor also absorbs roundoff near either endpoint of the directed
+baseline `a`--`b`.
+Passing `eps = 0` requests a strict comparison of the computed `long double`
+determinant. Integral predicates ignore `eps` and remain exact.
+
+The lower-level `sign(value, eps)` function retains absolute-tolerance
+semantics because it has no operands from which to derive a scale.
 
 ## Internal and external division
 

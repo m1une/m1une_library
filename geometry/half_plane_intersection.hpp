@@ -35,17 +35,19 @@ namespace half_plane_intersection_detail {
 struct HalfPlane {
     Point<long double> point;
     Point<long double> direction;
+    long double angle;
+
+    HalfPlane(
+        const Point<long double>& point_value,
+        const Point<long double>& direction_value
+    ) : point(point_value), direction(direction_value) {
+        angle = std::atan2(direction.y, direction.x);
+        if (angle < 0) angle += 2 * std::numbers::pi_v<long double>;
+    }
 };
 
-inline int direction_half(const Point<long double>& direction) {
-    return direction.y > 0 || (direction.y == 0 && direction.x >= 0) ? 0 : 1;
-}
-
 inline bool direction_less(const HalfPlane& first, const HalfPlane& second) {
-    int first_half = direction_half(first.direction);
-    int second_half = direction_half(second.direction);
-    if (first_half != second_half) return first_half < second_half;
-    return cross(first.direction, second.direction) > 0;
+    return first.angle < second.angle;
 }
 
 inline bool parallel(
@@ -191,22 +193,12 @@ inline bool has_bounded_recession_cone(
     if (half_planes.empty()) return false;
 
     constexpr long double pi = std::numbers::pi_v<long double>;
-    std::vector<long double> angles;
-    angles.reserve(half_planes.size());
-    for (const HalfPlane& half_plane : half_planes) {
-        long double angle = std::atan2(
-            half_plane.direction.y,
-            half_plane.direction.x
-        );
-        if (angle < 0) angle += 2 * pi;
-        angles.push_back(angle);
-    }
-
-    long double maximum_gap = angles.front() + 2 * pi - angles.back();
-    for (std::size_t index = 1; index < angles.size(); ++index) {
+    long double maximum_gap =
+        half_planes.front().angle + 2 * pi - half_planes.back().angle;
+    for (std::size_t index = 1; index < half_planes.size(); ++index) {
         maximum_gap = std::max(
             maximum_gap,
-            angles[index] - angles[index - 1]
+            half_planes[index].angle - half_planes[index - 1].angle
         );
     }
     return maximum_gap < pi - eps;
