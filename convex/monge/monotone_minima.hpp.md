@@ -93,14 +93,14 @@ data:
   isVerificationFile: false
   path: convex/monge/monotone_minima.hpp
   requiredBy:
-  - convex/all.hpp
-  - convex/monge/divide_and_conquer_optimization.hpp
   - convex/monge/all.hpp
+  - convex/monge/divide_and_conquer_optimization.hpp
+  - convex/all.hpp
   timestamp: '2026-07-07 18:38:36+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/convex/monge/monge_algorithms.test.cpp
   - verify/convex/monge/monge_dp_optimization.test.cpp
+  - verify/convex/monge/monge_algorithms.test.cpp
 documentation_of: convex/monge/monotone_minima.hpp
 layout: document
 title: Monotone Minima

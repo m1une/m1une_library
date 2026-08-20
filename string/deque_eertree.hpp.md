@@ -298,8 +298,8 @@ data:
   timestamp: '2026-07-16 20:00:24+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/string/string_algorithms.test.cpp
   - verify/string/deque_eertree.test.cpp
+  - verify/string/string_algorithms.test.cpp
 documentation_of: string/deque_eertree.hpp
 layout: document
 title: Deque Eertree

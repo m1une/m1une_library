@@ -293,17 +293,17 @@ data:
   path: graph/tree/sparse_table_lca.hpp
   requiredBy:
   - graph/all.hpp
+  - graph/tree/virtual_tree.hpp
   - graph/tree/all.hpp
   - graph/tree/tree.hpp
-  - graph/tree/virtual_tree.hpp
   timestamp: '2026-08-13 01:41:40+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/graph/graph_algorithms.test.cpp
   - verify/graph/library_checker_lowest_common_ancestor.test.cpp
-  - verify/graph/tree/tree_algorithms.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
   - verify/graph/cow_game.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/tree/tree_algorithms.test.cpp
 documentation_of: graph/tree/sparse_table_lca.hpp
 layout: document
 title: Sparse Table LCA

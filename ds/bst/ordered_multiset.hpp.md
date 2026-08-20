@@ -367,8 +367,8 @@ data:
   timestamp: '2026-07-13 03:01:19+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/rollback_counterparts.test.cpp
   - verify/ds/bst/ordered_multiset.test.cpp
+  - verify/ds/rollback_counterparts.test.cpp
 documentation_of: ds/bst/ordered_multiset.hpp
 layout: document
 title: Ordered Multiset

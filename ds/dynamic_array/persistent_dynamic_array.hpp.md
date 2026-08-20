@@ -507,9 +507,9 @@ data:
   timestamp: '2026-08-12 03:11:00+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/dynamic_array/persistent_dynamic_array.test.cpp
-  - verify/ds/persistent_release.test.cpp
   - verify/ds/persistent_cow.test.cpp
+  - verify/ds/persistent_release.test.cpp
+  - verify/ds/dynamic_array/persistent_dynamic_array.test.cpp
 documentation_of: ds/dynamic_array/persistent_dynamic_array.hpp
 layout: document
 title: Persistent Dynamic Array

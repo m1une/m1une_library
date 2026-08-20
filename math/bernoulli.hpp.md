@@ -1087,10 +1087,10 @@ data:
   timestamp: '2026-08-10 17:30:05+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/bernoulli_utilities.test.cpp
-  - verify/math/math_algorithms.test.cpp
   - verify/math/stirling_number_of_the_second_kind.test.cpp
+  - verify/math/bernoulli_utilities.test.cpp
   - verify/math/bernoulli_number.test.cpp
+  - verify/math/math_algorithms.test.cpp
   - verify/math/bell_number.test.cpp
 documentation_of: math/bernoulli.hpp
 layout: document

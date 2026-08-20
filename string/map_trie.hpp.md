@@ -181,8 +181,8 @@ data:
   timestamp: '2026-08-11 13:50:43+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/string/map_trie.test.cpp
   - verify/string/string_algorithms.test.cpp
+  - verify/string/map_trie.test.cpp
 documentation_of: string/map_trie.hpp
 layout: document
 title: Map Trie

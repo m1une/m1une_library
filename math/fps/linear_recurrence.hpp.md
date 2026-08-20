@@ -972,10 +972,10 @@ data:
   timestamp: '2026-08-10 17:30:05+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/math_algorithms.test.cpp
+  - verify/math/fps/find_linear_recurrence.test.cpp
   - verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
   - verify/math/fps/fps_algorithms.test.cpp
-  - verify/math/fps/find_linear_recurrence.test.cpp
+  - verify/math/math_algorithms.test.cpp
 documentation_of: math/fps/linear_recurrence.hpp
 layout: document
 title: Linear Recurrences and Bostan-Mori

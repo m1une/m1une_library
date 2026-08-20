@@ -138,43 +138,43 @@ data:
   path: monoid/add.hpp
   requiredBy:
   - graph/all.hpp
-  - graph/tree/range_contour_query.hpp
   - graph/tree/all.hpp
+  - graph/tree/range_contour_query.hpp
   - ds/dynamic_connectivity/online_dynamic_connectivity.hpp
   - ds/dynamic_connectivity/all.hpp
   timestamp: '2026-07-21 20:17:47+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/graph/graph_algorithms.test.cpp
-  - verify/graph/tree/vertex_get_range_contour_add_on_tree.test.cpp
-  - verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
-  - verify/graph/tree/tree_algorithms.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
   - verify/graph/cow_game.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
+  - verify/graph/tree/vertex_get_range_contour_add_on_tree.test.cpp
+  - verify/graph/tree/tree_algorithms.test.cpp
+  - verify/ds/persistent_cow.test.cpp
+  - verify/ds/persistent_release.test.cpp
   - verify/ds/dynamic_array/dynamic_monoid_array.test.cpp
   - verify/ds/dynamic_array/persistent_dynamic_monoid_array.test.cpp
-  - verify/ds/dsu/potentialized_dsu.test.cpp
-  - verify/ds/dsu/persistent_potentialized_dsu.test.cpp
-  - verify/ds/dsu/rollback_potentialized_dsu.test.cpp
-  - verify/ds/dsu/dsu_monoid.test.cpp
+  - verify/ds/dynamic_connectivity/dynamic_connectivity.test.cpp
   - verify/ds/binary_trie/binary_trie_monoid.test.cpp
   - verify/ds/rollback_counterparts.test.cpp
-  - verify/ds/persistent_release.test.cpp
-  - verify/ds/dynamic_tree/link_cut_tree.test.cpp
-  - verify/ds/dynamic_tree/path_link_cut_tree.test.cpp
-  - verify/ds/segtree/persistent_dynamic_dual_segtree.test.cpp
-  - verify/ds/segtree/dynamic_dual_segtree.test.cpp
-  - verify/ds/segtree/persistent_dual_segtree.test.cpp
-  - verify/ds/segtree/segtree.test.cpp
-  - verify/ds/segtree/segtree_2d.test.cpp
-  - verify/ds/segtree/dual_segtree_2d.test.cpp
-  - verify/ds/segtree/persistent_dynamic_segtree.test.cpp
-  - verify/ds/segtree/persistent_segtree.test.cpp
-  - verify/ds/segtree/dynamic_segtree.test.cpp
-  - verify/ds/range_query/sqrt_tree.test.cpp
+  - verify/ds/dsu/dsu_monoid.test.cpp
+  - verify/ds/dsu/persistent_potentialized_dsu.test.cpp
+  - verify/ds/dsu/rollback_potentialized_dsu.test.cpp
+  - verify/ds/dsu/potentialized_dsu.test.cpp
   - verify/ds/range_query/disjoint_sparse_table.test.cpp
-  - verify/ds/persistent_cow.test.cpp
-  - verify/ds/dynamic_connectivity/dynamic_connectivity.test.cpp
+  - verify/ds/range_query/sqrt_tree.test.cpp
+  - verify/ds/dynamic_tree/path_link_cut_tree.test.cpp
+  - verify/ds/dynamic_tree/link_cut_tree.test.cpp
+  - verify/ds/segtree/persistent_dual_segtree.test.cpp
+  - verify/ds/segtree/persistent_segtree.test.cpp
+  - verify/ds/segtree/segtree_2d.test.cpp
+  - verify/ds/segtree/persistent_dynamic_segtree.test.cpp
+  - verify/ds/segtree/dual_segtree_2d.test.cpp
+  - verify/ds/segtree/dynamic_segtree.test.cpp
+  - verify/ds/segtree/dynamic_dual_segtree.test.cpp
+  - verify/ds/segtree/segtree.test.cpp
+  - verify/ds/segtree/persistent_dynamic_dual_segtree.test.cpp
   - verify/monoid/commutative_flags.test.cpp
 documentation_of: monoid/add.hpp
 layout: document

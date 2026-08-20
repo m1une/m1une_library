@@ -2,14 +2,8 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: ds/range_query/fenwick_tree.hpp
-    title: Fenwick Tree (Binary Indexed Tree)
-  - icon: ':heavy_check_mark:'
     path: geometry/line.hpp
     title: Lines and Segments
-  - icon: ':heavy_check_mark:'
-    path: geometry/manhattan_segment_intersections.hpp
-    title: Manhattan Segment Intersections
   - icon: ':heavy_check_mark:'
     path: geometry/point.hpp
     title: 2D Point and Predicates
@@ -23,75 +17,44 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_6_A
+    ERROR: 1e-8
+    PROBLEM: https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_2_C
     links:
-    - https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_6_A
-  bundledCode: "#line 1 \"verify/geometry/manhattan_segment_intersections.test.cpp\"\
-    \n#define PROBLEM \"https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_6_A\"\
-    \n\n#line 1 \"geometry/manhattan_segment_intersections.hpp\"\n\n\n\n#line 1 \"\
-    ds/range_query/fenwick_tree.hpp\"\n\n\n\n#include <cassert>\n#include <vector>\n\
-    \nnamespace m1une {\nnamespace ds {\n\ntemplate <typename T>\nstruct FenwickTree\
-    \ {\n   private:\n    int _n;\n    int _max_power;\n    std::vector<T> _data;\n\
-    \n    static int max_power_leq(int n) {\n        int result = 1;\n        while\
-    \ (result <= n / 2) result <<= 1;\n        return result;\n    }\n\n    T prefix_sum(int\
-    \ r) const {\n        T result{};\n        const T* data = _data.data();\n   \
-    \     while (r > 0) {\n            result += data[r];\n            r -= r & -r;\n\
-    \        }\n        return result;\n    }\n\n   public:\n    FenwickTree() : _n(0),\
-    \ _max_power(0) {}\n\n    explicit FenwickTree(int n)\n        : _n(n), _max_power(max_power_leq(n\
-    \ > 0 ? n : 1)), _data(n + 1, T{}) {}\n\n    explicit FenwickTree(const std::vector<T>&\
-    \ a)\n        : _n(int(a.size())),\n          _max_power(max_power_leq(_n > 0\
-    \ ? _n : 1)),\n          _data(a.size() + 1, T{}) {\n        for (int i = 1; i\
-    \ <= _n; ++i) {\n            _data[i] += a[i - 1];\n            const int p =\
-    \ i + (i & -i);\n            if (p <= _n) {\n                _data[p] += _data[i];\n\
-    \            }\n        }\n    }\n\n    int size() const {\n        return _n;\n\
-    \    }\n\n    bool empty() const {\n        return _n == 0;\n    }\n\n    // Adds\
-    \ `x` to the element at zero-based index `p`.\n    void add(int p, const T& x)\
-    \ {\n        assert(0 <= p && p < _n);\n        ++p;\n        T* data = _data.data();\n\
-    \        while (p <= _n) {\n            data[p] += x;\n            p += p & -p;\n\
-    \        }\n    }\n\n    // Returns the sum of elements in the range [0, r).\n\
-    \    T sum(int r) const {\n        assert(0 <= r && r <= _n);\n        return\
-    \ prefix_sum(r);\n    }\n\n    // Returns the sum of elements in the range [l,\
-    \ r).\n    T sum(int l, int r) const {\n        assert(0 <= l && l <= r && r <=\
-    \ _n);\n        return prefix_sum(r) - prefix_sum(l);\n    }\n\n    // Returns\
-    \ the minimum index `r` such that the sum of [0, r) >= w.\n    // Requires all\
-    \ elements in the tree to be non-negative.\n    int lower_bound(T w) const {\n\
-    \        if (w <= 0) return 0;\n        int x = 0;\n        const T* data = _data.data();\n\
-    \        for (int k = _max_power; k > 0; k >>= 1) {\n            if (x + k <=\
-    \ _n && data[x + k] < w) {\n                w -= data[x + k];\n              \
-    \  x += k;\n            }\n        }\n        return x + 1;\n    }\n};\n\n}  //\
-    \ namespace ds\n}  // namespace m1une\n\n\n#line 1 \"geometry/line.hpp\"\n\n\n\
-    \n#include <algorithm>\n#include <array>\n#line 7 \"geometry/line.hpp\"\n#include\
-    \ <cmath>\n#include <optional>\n\n#line 1 \"geometry/point.hpp\"\n\n\n\n#line\
-    \ 5 \"geometry/point.hpp\"\n#include <concepts>\n#line 7 \"geometry/point.hpp\"\
-    \n#include <type_traits>\n\nnamespace m1une {\nnamespace geometry {\n\ntemplate\
-    \ <typename T>\nconcept Coordinate = std::is_arithmetic_v<T> && !std::same_as<std::remove_cv_t<T>,\
-    \ bool>;\n\ntemplate <Coordinate T>\nusing wide_type = std::conditional_t<std::integral<T>,\
-    \ __int128_t, long double>;\n\ntemplate <Coordinate T>\nstruct Point {\n    T\
-    \ x;\n    T y;\n\n    constexpr Point() : x(0), y(0) {}\n    constexpr Point(T\
-    \ x_value, T y_value) : x(x_value), y(y_value) {}\n\n    template <Coordinate\
-    \ U>\n    explicit constexpr Point(const Point<U>& other)\n        : x(static_cast<T>(other.x)),\
-    \ y(static_cast<T>(other.y)) {}\n\n    constexpr Point& operator+=(const Point&\
-    \ other) {\n        x += other.x;\n        y += other.y;\n        return *this;\n\
-    \    }\n\n    constexpr Point& operator-=(const Point& other) {\n        x -=\
-    \ other.x;\n        y -= other.y;\n        return *this;\n    }\n\n    constexpr\
-    \ Point operator+() const {\n        return *this;\n    }\n\n    constexpr Point\
-    \ operator-() const {\n        return Point(-x, -y);\n    }\n\n    friend constexpr\
-    \ Point operator+(Point left, const Point& right) {\n        return left += right;\n\
-    \    }\n\n    friend constexpr Point operator-(Point left, const Point& right)\
-    \ {\n        return left -= right;\n    }\n\n    friend constexpr bool operator==(const\
-    \ Point&, const Point&) = default;\n\n    friend constexpr bool operator<(const\
-    \ Point& left, const Point& right) {\n        if (left.x != right.x) return left.x\
-    \ < right.x;\n        return left.y < right.y;\n    }\n};\n\ntemplate <Coordinate\
-    \ T>\nconstexpr Point<long double> centroid(const Point<T>& point) {\n    return\
-    \ Point<long double>(point);\n}\n\ntemplate <Coordinate T, typename Scalar>\n\
-    requires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(const Point<T>&\
-    \ point, Scalar scalar) {\n    using Result = std::common_type_t<T, Scalar>;\n\
-    \    return Point<Result>(\n        Result(point.x) * Result(scalar),\n      \
-    \  Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate <typename Scalar, Coordinate\
-    \ T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(Scalar scalar,\
-    \ const Point<T>& point) {\n    return point * scalar;\n}\n\ntemplate <Coordinate\
-    \ T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator/(const\
+    - https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_2_C
+  bundledCode: "#line 1 \"verify/geometry/segment_intersection_point.test.cpp\"\n\
+    #define PROBLEM \"https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_2_C\"\
+    \n#define ERROR \"1e-8\"\n\n#line 1 \"geometry/line.hpp\"\n\n\n\n#include <algorithm>\n\
+    #include <array>\n#include <cassert>\n#include <cmath>\n#include <optional>\n\n\
+    #line 1 \"geometry/point.hpp\"\n\n\n\n#line 5 \"geometry/point.hpp\"\n#include\
+    \ <concepts>\n#line 7 \"geometry/point.hpp\"\n#include <type_traits>\n\nnamespace\
+    \ m1une {\nnamespace geometry {\n\ntemplate <typename T>\nconcept Coordinate =\
+    \ std::is_arithmetic_v<T> && !std::same_as<std::remove_cv_t<T>, bool>;\n\ntemplate\
+    \ <Coordinate T>\nusing wide_type = std::conditional_t<std::integral<T>, __int128_t,\
+    \ long double>;\n\ntemplate <Coordinate T>\nstruct Point {\n    T x;\n    T y;\n\
+    \n    constexpr Point() : x(0), y(0) {}\n    constexpr Point(T x_value, T y_value)\
+    \ : x(x_value), y(y_value) {}\n\n    template <Coordinate U>\n    explicit constexpr\
+    \ Point(const Point<U>& other)\n        : x(static_cast<T>(other.x)), y(static_cast<T>(other.y))\
+    \ {}\n\n    constexpr Point& operator+=(const Point& other) {\n        x += other.x;\n\
+    \        y += other.y;\n        return *this;\n    }\n\n    constexpr Point& operator-=(const\
+    \ Point& other) {\n        x -= other.x;\n        y -= other.y;\n        return\
+    \ *this;\n    }\n\n    constexpr Point operator+() const {\n        return *this;\n\
+    \    }\n\n    constexpr Point operator-() const {\n        return Point(-x, -y);\n\
+    \    }\n\n    friend constexpr Point operator+(Point left, const Point& right)\
+    \ {\n        return left += right;\n    }\n\n    friend constexpr Point operator-(Point\
+    \ left, const Point& right) {\n        return left -= right;\n    }\n\n    friend\
+    \ constexpr bool operator==(const Point&, const Point&) = default;\n\n    friend\
+    \ constexpr bool operator<(const Point& left, const Point& right) {\n        if\
+    \ (left.x != right.x) return left.x < right.x;\n        return left.y < right.y;\n\
+    \    }\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const\
+    \ Point<T>& point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate\
+    \ T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(const\
     \ Point<T>& point, Scalar scalar) {\n    using Result = std::common_type_t<T,\
+    \ Scalar>;\n    return Point<Result>(\n        Result(point.x) * Result(scalar),\n\
+    \        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate <typename Scalar,\
+    \ Coordinate T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(Scalar\
+    \ scalar, const Point<T>& point) {\n    return point * scalar;\n}\n\ntemplate\
+    \ <Coordinate T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr\
+    \ auto operator/(const Point<T>& point, Scalar scalar) {\n    using Result = std::common_type_t<T,\
     \ Scalar>;\n    return Point<Result>(\n        Result(point.x) / Result(scalar),\n\
     \        Result(point.y) / Result(scalar)\n    );\n}\n\ntemplate <Coordinate T>\n\
     constexpr wide_type<T> dot(const Point<T>& a, const Point<T>& b) {\n    using\
@@ -310,82 +273,14 @@ data:
     template <Coordinate T>\nstd::optional<Point<long double>> line_segment_intersection(\n\
     \    const Segment<T>& segment,\n    const Line<T>& line,\n    long double eps\
     \ = 1e-12L\n) {\n    return line_segment_intersection(line, segment, eps);\n}\n\
-    \n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 6 \"geometry/manhattan_segment_intersections.hpp\"\
-    \n\n#line 10 \"geometry/manhattan_segment_intersections.hpp\"\n#include <limits>\n\
-    #include <set>\n#line 13 \"geometry/manhattan_segment_intersections.hpp\"\n\n\
-    namespace m1une {\nnamespace geometry {\n\nnamespace manhattan_segment_intersections_detail\
-    \ {\n\nenum class EventKind {\n    add,\n    query,\n    remove,\n};\n\ntemplate\
-    \ <std::integral T>\nstruct Event {\n    T y;\n    T left;\n    T right;\n   \
-    \ EventKind kind;\n\n    Event(T y_value, T left_value, T right_value, EventKind\
-    \ kind_value)\n        : y(y_value),\n          left(left_value),\n          right(right_value),\n\
-    \          kind(kind_value) {}\n};\n\ntemplate <std::integral T>\nstd::vector<Event<T>>\
-    \ make_events(\n    const std::vector<Segment<T>>& segments,\n    std::vector<T>*\
-    \ vertical_x_coordinates = nullptr\n) {\n    assert(segments.size() <= std::size_t(std::numeric_limits<int>::max()));\n\
-    \n    std::vector<Event<T>> events;\n    events.reserve(2 * segments.size());\n\
-    \    if (vertical_x_coordinates != nullptr) {\n        vertical_x_coordinates->reserve(segments.size());\n\
-    \    }\n\n    for (const Segment<T>& segment : segments) {\n        assert(segment.a\
-    \ != segment.b);\n        assert(segment.a.x == segment.b.x || segment.a.y ==\
-    \ segment.b.y);\n\n        if (segment.a.x == segment.b.x) {\n            T bottom\
-    \ = std::min(segment.a.y, segment.b.y);\n            T top = std::max(segment.a.y,\
-    \ segment.b.y);\n            events.emplace_back(\n                bottom,\n \
-    \               segment.a.x,\n                segment.a.x,\n                EventKind::add\n\
-    \            );\n            events.emplace_back(\n                top,\n    \
-    \            segment.a.x,\n                segment.a.x,\n                EventKind::remove\n\
-    \            );\n            if (vertical_x_coordinates != nullptr) {\n      \
-    \          vertical_x_coordinates->push_back(segment.a.x);\n            }\n  \
-    \      } else {\n            T left = std::min(segment.a.x, segment.b.x);\n  \
-    \          T right = std::max(segment.a.x, segment.b.x);\n            events.emplace_back(\n\
-    \                segment.a.y,\n                left,\n                right,\n\
-    \                EventKind::query\n            );\n        }\n    }\n\n    std::sort(\n\
-    \        events.begin(),\n        events.end(),\n        [](const Event<T>& a,\
-    \ const Event<T>& b) {\n            if (a.y != b.y) return a.y < b.y;\n      \
-    \      if (a.kind != b.kind) return a.kind < b.kind;\n            if (a.left !=\
-    \ b.left) return a.left < b.left;\n            return a.right < b.right;\n   \
-    \     }\n    );\n    return events;\n}\n\n}  // namespace manhattan_segment_intersections_detail\n\
-    \n// Counts intersecting horizontal-vertical pairs of closed segments.\ntemplate\
-    \ <std::integral T>\nlong long manhattan_segment_intersections(\n    const std::vector<Segment<T>>&\
-    \ segments\n) {\n    using Event = manhattan_segment_intersections_detail::Event<T>;\n\
-    \    using EventKind =\n        manhattan_segment_intersections_detail::EventKind;\n\
-    \n    std::vector<T> vertical_x_coordinates;\n    std::vector<Event> events =\n\
-    \        manhattan_segment_intersections_detail::make_events(\n            segments,\n\
-    \            &vertical_x_coordinates\n        );\n\n    std::sort(\n        vertical_x_coordinates.begin(),\n\
-    \        vertical_x_coordinates.end()\n    );\n    vertical_x_coordinates.erase(\n\
-    \        std::unique(\n            vertical_x_coordinates.begin(),\n         \
-    \   vertical_x_coordinates.end()\n        ),\n        vertical_x_coordinates.end()\n\
-    \    );\n    m1une::ds::FenwickTree<long long> active(\n        int(vertical_x_coordinates.size())\n\
-    \    );\n    long long result = 0;\n    for (const Event& event : events) {\n\
-    \        if (event.kind == EventKind::query) {\n            int left = int(\n\
-    \                std::lower_bound(\n                    vertical_x_coordinates.begin(),\n\
-    \                    vertical_x_coordinates.end(),\n                    event.left\n\
-    \                ) - vertical_x_coordinates.begin()\n            );\n        \
-    \    int right = int(\n                std::upper_bound(\n                   \
-    \ vertical_x_coordinates.begin(),\n                    vertical_x_coordinates.end(),\n\
-    \                    event.right\n                ) - vertical_x_coordinates.begin()\n\
-    \            );\n            result += active.sum(left, right);\n            continue;\n\
-    \        }\n\n        int x = int(\n            std::lower_bound(\n          \
-    \      vertical_x_coordinates.begin(),\n                vertical_x_coordinates.end(),\n\
-    \                event.left\n            ) - vertical_x_coordinates.begin()\n\
-    \        );\n        active.add(x, event.kind == EventKind::add ? 1 : -1);\n \
-    \   }\n    return result;\n}\n\n// Returns one point per intersecting horizontal-vertical\
-    \ pair.\ntemplate <std::integral T>\nstd::vector<Point<T>> manhattan_segment_intersection_points(\n\
-    \    const std::vector<Segment<T>>& segments\n) {\n    using Event = manhattan_segment_intersections_detail::Event<T>;\n\
-    \    using EventKind =\n        manhattan_segment_intersections_detail::EventKind;\n\
-    \n    std::vector<Event> events =\n        manhattan_segment_intersections_detail::make_events(segments);\n\
-    \    std::multiset<T> active;\n    std::vector<Point<T>> result;\n\n    for (const\
-    \ Event& event : events) {\n        if (event.kind == EventKind::add) {\n    \
-    \        active.insert(event.left);\n        } else if (event.kind == EventKind::remove)\
-    \ {\n            auto iterator = active.find(event.left);\n            assert(iterator\
-    \ != active.end());\n            active.erase(iterator);\n        } else {\n \
-    \           auto iterator = active.lower_bound(event.left);\n            while\
-    \ (iterator != active.end() && *iterator <= event.right) {\n                result.emplace_back(*iterator,\
-    \ event.y);\n                ++iterator;\n            }\n        }\n    }\n  \
-    \  return result;\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n\
-    #line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 6 \"utilities/fast_io.hpp\"\n#include\
-    \ <cerrno>\n#include <charconv>\n#include <cstddef>\n#include <cstdio>\n#include\
-    \ <cstdlib>\n#include <cstdint>\n#include <cstring>\n#include <iterator>\n#include\
-    \ <string>\n#include <sys/stat.h>\n#line 17 \"utilities/fast_io.hpp\"\n#include\
-    \ <utility>\n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\n\
-    namespace internal {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class\
+    \n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 5 \"verify/geometry/segment_intersection_point.test.cpp\"\
+    \n\n#line 8 \"verify/geometry/segment_intersection_point.test.cpp\"\n#include\
+    \ <vector>\n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 6 \"utilities/fast_io.hpp\"\
+    \n#include <cerrno>\n#include <charconv>\n#include <cstddef>\n#include <cstdio>\n\
+    #include <cstdlib>\n#include <cstdint>\n#include <cstring>\n#include <iterator>\n\
+    #include <string>\n#include <sys/stat.h>\n#line 17 \"utilities/fast_io.hpp\"\n\
+    #include <utility>\n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities\
+    \ {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class\
     \ T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate <class T>\n\
     struct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
     \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
@@ -622,147 +517,152 @@ data:
     \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
     n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 5 \"verify/geometry/manhattan_segment_intersections.test.cpp\"\
-    \n\n#line 11 \"verify/geometry/manhattan_segment_intersections.test.cpp\"\n\n\
-    namespace {\n\nusing Point = m1une::geometry::Point<long long>;\nusing Segment\
-    \ = m1une::geometry::Segment<long long>;\n\nbool perpendicular_intersection(const\
-    \ Segment& first, const Segment& second) {\n    const Segment* vertical = &first;\n\
-    \    const Segment* horizontal = &second;\n    if (vertical->a.y == vertical->b.y)\
-    \ std::swap(vertical, horizontal);\n    if (\n        vertical->a.x != vertical->b.x\
-    \ ||\n        horizontal->a.y != horizontal->b.y\n    ) {\n        return false;\n\
-    \    }\n\n    long long left = std::min(horizontal->a.x, horizontal->b.x);\n \
-    \   long long right = std::max(horizontal->a.x, horizontal->b.x);\n    long long\
-    \ bottom = std::min(vertical->a.y, vertical->b.y);\n    long long top = std::max(vertical->a.y,\
-    \ vertical->b.y);\n    return left <= vertical->a.x && vertical->a.x <= right\
-    \ &&\n           bottom <= horizontal->a.y && horizontal->a.y <= top;\n}\n\nstd::vector<Point>\
-    \ brute(const std::vector<Segment>& segments) {\n    std::vector<Point> result;\n\
-    \    for (int i = 0; i < int(segments.size()); i++) {\n        for (int j = 0;\
-    \ j < i; j++) {\n            if (!perpendicular_intersection(segments[i], segments[j]))\
-    \ {\n                continue;\n            }\n            const Segment* vertical\
-    \ = &segments[i];\n            const Segment* horizontal = &segments[j];\n   \
-    \         if (vertical->a.y == vertical->b.y) {\n                std::swap(vertical,\
-    \ horizontal);\n            }\n            result.emplace_back(vertical->a.x,\
-    \ horizontal->a.y);\n        }\n    }\n    std::sort(result.begin(), result.end());\n\
-    \    return result;\n}\n\nvoid check(const std::vector<Segment>& segments) {\n\
-    \    std::vector<Point> expected = brute(segments);\n    std::vector<Point> actual\
-    \ =\n        m1une::geometry::manhattan_segment_intersection_points(segments);\n\
-    \    std::sort(actual.begin(), actual.end());\n    assert(actual == expected);\n\
-    \    assert(\n        m1une::geometry::manhattan_segment_intersections(segments)\
-    \ ==\n        static_cast<long long>(expected.size())\n    );\n}\n\nvoid test_fixed()\
-    \ {\n    check({});\n    check({Segment{Point(0, -1), Point(0, 1)}});\n\n    std::vector<Segment>\
-    \ sample;\n    sample.push_back(Segment{Point(2, 2), Point(2, 5)});\n    sample.push_back(Segment{Point(1,\
-    \ 3), Point(5, 3)});\n    sample.push_back(Segment{Point(4, 1), Point(4, 4)});\n\
-    \    sample.push_back(Segment{Point(5, 2), Point(7, 2)});\n    sample.push_back(Segment{Point(6,\
-    \ 1), Point(6, 3)});\n    sample.push_back(Segment{Point(6, 5), Point(6, 7)});\n\
-    \    check(sample);\n    assert(m1une::geometry::manhattan_segment_intersections(sample)\
-    \ == 3);\n\n    std::vector<Segment> endpoint_touches;\n    endpoint_touches.push_back(Segment{Point(0,\
-    \ 0), Point(0, 2)});\n    endpoint_touches.push_back(Segment{Point(-3, 0), Point(0,\
-    \ 0)});\n    endpoint_touches.push_back(Segment{Point(0, 2), Point(4, 2)});\n\
-    \    check(endpoint_touches);\n    assert(\n        m1une::geometry::manhattan_segment_intersections(endpoint_touches)\
-    \ == 2\n    );\n\n    long long low = std::numeric_limits<long long>::min();\n\
-    \    long long high = std::numeric_limits<long long>::max();\n    std::vector<Segment>\
-    \ limits;\n    limits.push_back(Segment{Point(low, low), Point(low, high)});\n\
-    \    limits.push_back(Segment{Point(low, 0), Point(high, 0)});\n    check(limits);\n\
-    }\n\nvoid test_randomized() {\n    std::uint64_t state = 1732050807ULL;\n    auto\
-    \ random = [&state]() {\n        state ^= state << 7;\n        state ^= state\
-    \ >> 9;\n        return state;\n    };\n\n    for (int trial = 0; trial < 5000;\
-    \ trial++) {\n        int count = int(random() % 31);\n        std::vector<Segment>\
-    \ segments;\n        segments.reserve(count);\n        for (int i = 0; i < count;\
-    \ i++) {\n            long long first = static_cast<long long>(random() % 21)\
-    \ - 10;\n            long long second = static_cast<long long>(random() % 21)\
-    \ - 10;\n            if (first == second) second++;\n            long long fixed\
-    \ = static_cast<long long>(random() % 21) - 10;\n            if (random() & 1)\
-    \ {\n                segments.push_back(\n                    Segment{Point(fixed,\
-    \ first), Point(fixed, second)}\n                );\n            } else {\n  \
-    \              segments.push_back(\n                    Segment{Point(first, fixed),\
-    \ Point(second, fixed)}\n                );\n            }\n        }\n      \
-    \  check(segments);\n    }\n}\n\n}  // namespace\n\nint main() {\n    test_fixed();\n\
-    \    test_randomized();\n\n    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput\
-    \ output;\n\n    int n = 0;\n    input.read(n);\n    std::vector<Segment> segments;\n\
-    \    segments.reserve(n);\n    for (int i = 0; i < n; i++) {\n        long long\
-    \ x1 = 0, y1 = 0, x2 = 0, y2 = 0;\n        input.read(x1, y1, x2, y2);\n     \
-    \   segments.push_back(Segment{Point(x1, y1), Point(x2, y2)});\n    }\n    output.println(\n\
-    \        m1une::geometry::manhattan_segment_intersections(segments)\n    );\n\
-    }\n"
-  code: "#define PROBLEM \"https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_6_A\"\
-    \n\n#include \"../../geometry/manhattan_segment_intersections.hpp\"\n#include\
-    \ \"../../utilities/fast_io.hpp\"\n\n#include <algorithm>\n#include <cassert>\n\
-    #include <cstdint>\n#include <limits>\n#include <vector>\n\nnamespace {\n\nusing\
-    \ Point = m1une::geometry::Point<long long>;\nusing Segment = m1une::geometry::Segment<long\
-    \ long>;\n\nbool perpendicular_intersection(const Segment& first, const Segment&\
-    \ second) {\n    const Segment* vertical = &first;\n    const Segment* horizontal\
-    \ = &second;\n    if (vertical->a.y == vertical->b.y) std::swap(vertical, horizontal);\n\
-    \    if (\n        vertical->a.x != vertical->b.x ||\n        horizontal->a.y\
-    \ != horizontal->b.y\n    ) {\n        return false;\n    }\n\n    long long left\
-    \ = std::min(horizontal->a.x, horizontal->b.x);\n    long long right = std::max(horizontal->a.x,\
-    \ horizontal->b.x);\n    long long bottom = std::min(vertical->a.y, vertical->b.y);\n\
-    \    long long top = std::max(vertical->a.y, vertical->b.y);\n    return left\
-    \ <= vertical->a.x && vertical->a.x <= right &&\n           bottom <= horizontal->a.y\
-    \ && horizontal->a.y <= top;\n}\n\nstd::vector<Point> brute(const std::vector<Segment>&\
-    \ segments) {\n    std::vector<Point> result;\n    for (int i = 0; i < int(segments.size());\
-    \ i++) {\n        for (int j = 0; j < i; j++) {\n            if (!perpendicular_intersection(segments[i],\
-    \ segments[j])) {\n                continue;\n            }\n            const\
-    \ Segment* vertical = &segments[i];\n            const Segment* horizontal = &segments[j];\n\
-    \            if (vertical->a.y == vertical->b.y) {\n                std::swap(vertical,\
-    \ horizontal);\n            }\n            result.emplace_back(vertical->a.x,\
-    \ horizontal->a.y);\n        }\n    }\n    std::sort(result.begin(), result.end());\n\
-    \    return result;\n}\n\nvoid check(const std::vector<Segment>& segments) {\n\
-    \    std::vector<Point> expected = brute(segments);\n    std::vector<Point> actual\
-    \ =\n        m1une::geometry::manhattan_segment_intersection_points(segments);\n\
-    \    std::sort(actual.begin(), actual.end());\n    assert(actual == expected);\n\
-    \    assert(\n        m1une::geometry::manhattan_segment_intersections(segments)\
-    \ ==\n        static_cast<long long>(expected.size())\n    );\n}\n\nvoid test_fixed()\
-    \ {\n    check({});\n    check({Segment{Point(0, -1), Point(0, 1)}});\n\n    std::vector<Segment>\
-    \ sample;\n    sample.push_back(Segment{Point(2, 2), Point(2, 5)});\n    sample.push_back(Segment{Point(1,\
-    \ 3), Point(5, 3)});\n    sample.push_back(Segment{Point(4, 1), Point(4, 4)});\n\
-    \    sample.push_back(Segment{Point(5, 2), Point(7, 2)});\n    sample.push_back(Segment{Point(6,\
-    \ 1), Point(6, 3)});\n    sample.push_back(Segment{Point(6, 5), Point(6, 7)});\n\
-    \    check(sample);\n    assert(m1une::geometry::manhattan_segment_intersections(sample)\
-    \ == 3);\n\n    std::vector<Segment> endpoint_touches;\n    endpoint_touches.push_back(Segment{Point(0,\
-    \ 0), Point(0, 2)});\n    endpoint_touches.push_back(Segment{Point(-3, 0), Point(0,\
-    \ 0)});\n    endpoint_touches.push_back(Segment{Point(0, 2), Point(4, 2)});\n\
-    \    check(endpoint_touches);\n    assert(\n        m1une::geometry::manhattan_segment_intersections(endpoint_touches)\
-    \ == 2\n    );\n\n    long long low = std::numeric_limits<long long>::min();\n\
-    \    long long high = std::numeric_limits<long long>::max();\n    std::vector<Segment>\
-    \ limits;\n    limits.push_back(Segment{Point(low, low), Point(low, high)});\n\
-    \    limits.push_back(Segment{Point(low, 0), Point(high, 0)});\n    check(limits);\n\
-    }\n\nvoid test_randomized() {\n    std::uint64_t state = 1732050807ULL;\n    auto\
-    \ random = [&state]() {\n        state ^= state << 7;\n        state ^= state\
-    \ >> 9;\n        return state;\n    };\n\n    for (int trial = 0; trial < 5000;\
-    \ trial++) {\n        int count = int(random() % 31);\n        std::vector<Segment>\
-    \ segments;\n        segments.reserve(count);\n        for (int i = 0; i < count;\
-    \ i++) {\n            long long first = static_cast<long long>(random() % 21)\
-    \ - 10;\n            long long second = static_cast<long long>(random() % 21)\
-    \ - 10;\n            if (first == second) second++;\n            long long fixed\
-    \ = static_cast<long long>(random() % 21) - 10;\n            if (random() & 1)\
-    \ {\n                segments.push_back(\n                    Segment{Point(fixed,\
-    \ first), Point(fixed, second)}\n                );\n            } else {\n  \
-    \              segments.push_back(\n                    Segment{Point(first, fixed),\
-    \ Point(second, fixed)}\n                );\n            }\n        }\n      \
-    \  check(segments);\n    }\n}\n\n}  // namespace\n\nint main() {\n    test_fixed();\n\
-    \    test_randomized();\n\n    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput\
-    \ output;\n\n    int n = 0;\n    input.read(n);\n    std::vector<Segment> segments;\n\
-    \    segments.reserve(n);\n    for (int i = 0; i < n; i++) {\n        long long\
-    \ x1 = 0, y1 = 0, x2 = 0, y2 = 0;\n        input.read(x1, y1, x2, y2);\n     \
-    \   segments.push_back(Segment{Point(x1, y1), Point(x2, y2)});\n    }\n    output.println(\n\
-    \        m1une::geometry::manhattan_segment_intersections(segments)\n    );\n\
-    }\n"
+    \ utilities\n}  // namespace m1une\n\n\n#line 11 \"verify/geometry/segment_intersection_point.test.cpp\"\
+    \n\nnamespace {\n\nusing m1une::geometry::Point;\nusing m1une::geometry::Segment;\n\
+    using m1une::geometry::SegmentIntersection;\nusing m1une::geometry::SegmentIntersectionKind;\n\
+    \nbool close(long double first, long double second) {\n    return std::fabs(first\
+    \ - second) <= 1e-12L;\n}\n\nbool close(\n    const Point<long double>& first,\n\
+    \    const Point<long double>& second\n) {\n    return close(first.x, second.x)\
+    \ && close(first.y, second.y);\n}\n\ntemplate <class T>\nSegment<T> make_segment(T\
+    \ ax, T ay, T bx, T by) {\n    Segment<T> result;\n    result.a = Point<T>(ax,\
+    \ ay);\n    result.b = Point<T>(bx, by);\n    return result;\n}\n\nvoid test_examples()\
+    \ {\n    using namespace m1une::geometry;\n\n    Segment<long long> first = make_segment(0LL,\
+    \ 0LL, 4LL, 4LL);\n    Segment<long long> second = make_segment(0LL, 4LL, 4LL,\
+    \ 0LL);\n    SegmentIntersection result = segment_intersection(first, second);\n\
+    \    assert(result.kind == SegmentIntersectionKind::Point);\n    assert(close(result.first,\
+    \ Point<long double>(2, 2)));\n    assert(close(result.first, result.second));\n\
+    \n    first = make_segment(4LL, 0LL, 0LL, 0LL);\n    second = make_segment(1LL,\
+    \ 0LL, 3LL, 0LL);\n    result = segment_intersection(first, second);\n    assert(result.kind\
+    \ == SegmentIntersectionKind::Overlap);\n    assert(close(result.first, Point<long\
+    \ double>(3, 0)));\n    assert(close(result.second, Point<long double>(1, 0)));\n\
+    \n    first = make_segment(0LL, 0LL, 2LL, 0LL);\n    second = make_segment(2LL,\
+    \ 0LL, 5LL, 0LL);\n    result = segment_intersection(first, second);\n    assert(result.kind\
+    \ == SegmentIntersectionKind::Point);\n    assert(close(result.first, Point<long\
+    \ double>(2, 0)));\n\n    second = make_segment(3LL, 0LL, 5LL, 0LL);\n    result\
+    \ = segment_intersection(first, second);\n    assert(result.kind == SegmentIntersectionKind::Empty);\n\
+    \n    first = make_segment(1LL, 1LL, 1LL, 1LL);\n    second = make_segment(0LL,\
+    \ 0LL, 2LL, 2LL);\n    result = segment_intersection(first, second);\n    assert(result.kind\
+    \ == SegmentIntersectionKind::Point);\n    assert(close(result.first, Point<long\
+    \ double>(1, 1)));\n\n    first = make_segment(0LL, 0LL, 3LL, 3LL);\n    second\
+    \ = make_segment(0LL, 3LL, 3LL, 0LL);\n    result = segment_intersection(first,\
+    \ second);\n    assert(result.kind == SegmentIntersectionKind::Point);\n    assert(close(result.first,\
+    \ Point<long double>(1.5L, 1.5L)));\n}\n\nvoid test_exhaustive_small_integer_segments()\
+    \ {\n    using namespace m1une::geometry;\n    std::vector<Segment<long long>>\
+    \ segments;\n    for (long long ax = -1; ax <= 1; ++ax) {\n        for (long long\
+    \ ay = -1; ay <= 1; ++ay) {\n            for (long long bx = -1; bx <= 1; ++bx)\
+    \ {\n                for (long long by = -1; by <= 1; ++by) {\n              \
+    \      segments.push_back(make_segment(ax, ay, bx, by));\n                }\n\
+    \            }\n        }\n    }\n\n    for (const Segment<long long>& first :\
+    \ segments) {\n        for (const Segment<long long>& second : segments) {\n \
+    \           const SegmentIntersection result =\n                segment_intersection(first,\
+    \ second);\n            assert(\n                (result.kind != SegmentIntersectionKind::Empty)\
+    \ ==\n                intersects(first, second)\n            );\n            if\
+    \ (result.kind == SegmentIntersectionKind::Empty) continue;\n\n            Segment<long\
+    \ double> first_floating;\n            first_floating.a = Point<long double>(first.a);\n\
+    \            first_floating.b = Point<long double>(first.b);\n            Segment<long\
+    \ double> second_floating;\n            second_floating.a = Point<long double>(second.a);\n\
+    \            second_floating.b = Point<long double>(second.b);\n            assert(on_segment(first_floating,\
+    \ result.first));\n            assert(on_segment(second_floating, result.first));\n\
+    \            assert(on_segment(first_floating, result.second));\n            assert(on_segment(second_floating,\
+    \ result.second));\n\n            if (result.kind == SegmentIntersectionKind::Point)\
+    \ {\n                assert(close(result.first, result.second));\n           \
+    \ } else {\n                assert(result.kind == SegmentIntersectionKind::Overlap);\n\
+    \                assert(!close(result.first, result.second));\n              \
+    \  const Point<long double> middle =\n                    (result.first + result.second)\
+    \ / 2.0L;\n                assert(on_segment(first_floating, middle));\n     \
+    \           assert(on_segment(second_floating, middle));\n            }\n    \
+    \    }\n    }\n}\n\n}  // namespace\n\nint main() {\n    test_examples();\n  \
+    \  test_exhaustive_small_integer_segments();\n\n    m1une::utilities::FastInput\
+    \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n    fast_output.set_fixed(15);\n\
+    \n    int query_count;\n    fast_input >> query_count;\n    while (query_count--)\
+    \ {\n        Segment<long double> first;\n        Segment<long double> second;\n\
+    \        fast_input >> first.a.x >> first.a.y >> first.b.x >> first.b.y;\n   \
+    \     fast_input >> second.a.x >> second.a.y >> second.b.x >> second.b.y;\n  \
+    \      const SegmentIntersection result =\n            m1une::geometry::segment_intersection(first,\
+    \ second);\n        assert(result.kind == SegmentIntersectionKind::Point);\n \
+    \       fast_output << result.first.x << ' ' << result.first.y << '\\n';\n   \
+    \ }\n}\n"
+  code: "#define PROBLEM \"https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_2_C\"\
+    \n#define ERROR \"1e-8\"\n\n#include \"../../geometry/line.hpp\"\n\n#include <cassert>\n\
+    #include <cmath>\n#include <vector>\n\n#include \"../../utilities/fast_io.hpp\"\
+    \n\nnamespace {\n\nusing m1une::geometry::Point;\nusing m1une::geometry::Segment;\n\
+    using m1une::geometry::SegmentIntersection;\nusing m1une::geometry::SegmentIntersectionKind;\n\
+    \nbool close(long double first, long double second) {\n    return std::fabs(first\
+    \ - second) <= 1e-12L;\n}\n\nbool close(\n    const Point<long double>& first,\n\
+    \    const Point<long double>& second\n) {\n    return close(first.x, second.x)\
+    \ && close(first.y, second.y);\n}\n\ntemplate <class T>\nSegment<T> make_segment(T\
+    \ ax, T ay, T bx, T by) {\n    Segment<T> result;\n    result.a = Point<T>(ax,\
+    \ ay);\n    result.b = Point<T>(bx, by);\n    return result;\n}\n\nvoid test_examples()\
+    \ {\n    using namespace m1une::geometry;\n\n    Segment<long long> first = make_segment(0LL,\
+    \ 0LL, 4LL, 4LL);\n    Segment<long long> second = make_segment(0LL, 4LL, 4LL,\
+    \ 0LL);\n    SegmentIntersection result = segment_intersection(first, second);\n\
+    \    assert(result.kind == SegmentIntersectionKind::Point);\n    assert(close(result.first,\
+    \ Point<long double>(2, 2)));\n    assert(close(result.first, result.second));\n\
+    \n    first = make_segment(4LL, 0LL, 0LL, 0LL);\n    second = make_segment(1LL,\
+    \ 0LL, 3LL, 0LL);\n    result = segment_intersection(first, second);\n    assert(result.kind\
+    \ == SegmentIntersectionKind::Overlap);\n    assert(close(result.first, Point<long\
+    \ double>(3, 0)));\n    assert(close(result.second, Point<long double>(1, 0)));\n\
+    \n    first = make_segment(0LL, 0LL, 2LL, 0LL);\n    second = make_segment(2LL,\
+    \ 0LL, 5LL, 0LL);\n    result = segment_intersection(first, second);\n    assert(result.kind\
+    \ == SegmentIntersectionKind::Point);\n    assert(close(result.first, Point<long\
+    \ double>(2, 0)));\n\n    second = make_segment(3LL, 0LL, 5LL, 0LL);\n    result\
+    \ = segment_intersection(first, second);\n    assert(result.kind == SegmentIntersectionKind::Empty);\n\
+    \n    first = make_segment(1LL, 1LL, 1LL, 1LL);\n    second = make_segment(0LL,\
+    \ 0LL, 2LL, 2LL);\n    result = segment_intersection(first, second);\n    assert(result.kind\
+    \ == SegmentIntersectionKind::Point);\n    assert(close(result.first, Point<long\
+    \ double>(1, 1)));\n\n    first = make_segment(0LL, 0LL, 3LL, 3LL);\n    second\
+    \ = make_segment(0LL, 3LL, 3LL, 0LL);\n    result = segment_intersection(first,\
+    \ second);\n    assert(result.kind == SegmentIntersectionKind::Point);\n    assert(close(result.first,\
+    \ Point<long double>(1.5L, 1.5L)));\n}\n\nvoid test_exhaustive_small_integer_segments()\
+    \ {\n    using namespace m1une::geometry;\n    std::vector<Segment<long long>>\
+    \ segments;\n    for (long long ax = -1; ax <= 1; ++ax) {\n        for (long long\
+    \ ay = -1; ay <= 1; ++ay) {\n            for (long long bx = -1; bx <= 1; ++bx)\
+    \ {\n                for (long long by = -1; by <= 1; ++by) {\n              \
+    \      segments.push_back(make_segment(ax, ay, bx, by));\n                }\n\
+    \            }\n        }\n    }\n\n    for (const Segment<long long>& first :\
+    \ segments) {\n        for (const Segment<long long>& second : segments) {\n \
+    \           const SegmentIntersection result =\n                segment_intersection(first,\
+    \ second);\n            assert(\n                (result.kind != SegmentIntersectionKind::Empty)\
+    \ ==\n                intersects(first, second)\n            );\n            if\
+    \ (result.kind == SegmentIntersectionKind::Empty) continue;\n\n            Segment<long\
+    \ double> first_floating;\n            first_floating.a = Point<long double>(first.a);\n\
+    \            first_floating.b = Point<long double>(first.b);\n            Segment<long\
+    \ double> second_floating;\n            second_floating.a = Point<long double>(second.a);\n\
+    \            second_floating.b = Point<long double>(second.b);\n            assert(on_segment(first_floating,\
+    \ result.first));\n            assert(on_segment(second_floating, result.first));\n\
+    \            assert(on_segment(first_floating, result.second));\n            assert(on_segment(second_floating,\
+    \ result.second));\n\n            if (result.kind == SegmentIntersectionKind::Point)\
+    \ {\n                assert(close(result.first, result.second));\n           \
+    \ } else {\n                assert(result.kind == SegmentIntersectionKind::Overlap);\n\
+    \                assert(!close(result.first, result.second));\n              \
+    \  const Point<long double> middle =\n                    (result.first + result.second)\
+    \ / 2.0L;\n                assert(on_segment(first_floating, middle));\n     \
+    \           assert(on_segment(second_floating, middle));\n            }\n    \
+    \    }\n    }\n}\n\n}  // namespace\n\nint main() {\n    test_examples();\n  \
+    \  test_exhaustive_small_integer_segments();\n\n    m1une::utilities::FastInput\
+    \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n    fast_output.set_fixed(15);\n\
+    \n    int query_count;\n    fast_input >> query_count;\n    while (query_count--)\
+    \ {\n        Segment<long double> first;\n        Segment<long double> second;\n\
+    \        fast_input >> first.a.x >> first.a.y >> first.b.x >> first.b.y;\n   \
+    \     fast_input >> second.a.x >> second.a.y >> second.b.x >> second.b.y;\n  \
+    \      const SegmentIntersection result =\n            m1une::geometry::segment_intersection(first,\
+    \ second);\n        assert(result.kind == SegmentIntersectionKind::Point);\n \
+    \       fast_output << result.first.x << ' ' << result.first.y << '\\n';\n   \
+    \ }\n}\n"
   dependsOn:
-  - geometry/manhattan_segment_intersections.hpp
-  - ds/range_query/fenwick_tree.hpp
   - geometry/line.hpp
   - geometry/point.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
-  path: verify/geometry/manhattan_segment_intersections.test.cpp
+  path: verify/geometry/segment_intersection_point.test.cpp
   requiredBy: []
   timestamp: '2026-08-20 20:51:34+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/geometry/manhattan_segment_intersections.test.cpp
+documentation_of: verify/geometry/segment_intersection_point.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/geometry/manhattan_segment_intersections.test.cpp
-- /verify/verify/geometry/manhattan_segment_intersections.test.cpp.html
-title: verify/geometry/manhattan_segment_intersections.test.cpp
+- /verify/verify/geometry/segment_intersection_point.test.cpp
+- /verify/verify/geometry/segment_intersection_point.test.cpp.html
+title: verify/geometry/segment_intersection_point.test.cpp
 ---

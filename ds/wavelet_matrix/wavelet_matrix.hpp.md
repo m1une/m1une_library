@@ -313,8 +313,8 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/wavelet_matrix/wavelet_matrix.test.cpp
-  - verify/ds/range_query/range_lis_query.test.cpp
   - verify/ds/range_query/static_range_count_distinct.test.cpp
+  - verify/ds/range_query/range_lis_query.test.cpp
 documentation_of: ds/wavelet_matrix/wavelet_matrix.hpp
 layout: document
 title: Wavelet Matrix

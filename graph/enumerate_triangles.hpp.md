@@ -136,15 +136,15 @@ data:
   isVerificationFile: false
   path: graph/enumerate_triangles.hpp
   requiredBy:
-  - graph/undirected.hpp
   - graph/all.hpp
+  - graph/undirected.hpp
   timestamp: '2026-08-13 01:41:40+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/graph/graph_algorithms.test.cpp
-  - verify/graph/enumerate_triangles.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
   - verify/graph/cow_game.test.cpp
+  - verify/graph/enumerate_triangles.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
 documentation_of: graph/enumerate_triangles.hpp
 layout: document
 title: Enumerate Triangles

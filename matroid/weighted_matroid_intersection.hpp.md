@@ -317,8 +317,8 @@ data:
   timestamp: '2026-07-01 14:47:47+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/matroid/matroids.test.cpp
   - verify/matroid/weighted_matroid_intersection.test.cpp
+  - verify/matroid/matroids.test.cpp
 documentation_of: matroid/weighted_matroid_intersection.hpp
 layout: document
 title: Weighted Matroid Intersection

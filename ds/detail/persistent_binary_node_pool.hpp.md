@@ -179,31 +179,31 @@ data:
   isVerificationFile: false
   path: ds/detail/persistent_binary_node_pool.hpp
   requiredBy:
-  - ds/dynamic_array/persistent_dynamic_monoid_array.hpp
-  - ds/dynamic_array/persistent_dynamic_array.hpp
-  - ds/dynamic_array/persistent_dynamic_lazy_monoid_array.hpp
-  - ds/dsu/persistent_dsu.hpp
-  - ds/dsu/persistent_potentialized_dsu.hpp
   - ds/bst/persistent_ordered_set.hpp
   - ds/bst/persistent_ordered_multiset.hpp
+  - ds/dynamic_array/persistent_dynamic_array.hpp
+  - ds/dynamic_array/persistent_dynamic_lazy_monoid_array.hpp
+  - ds/dynamic_array/persistent_dynamic_monoid_array.hpp
+  - ds/dsu/persistent_potentialized_dsu.hpp
+  - ds/dsu/persistent_dsu.hpp
   timestamp: '2026-08-12 03:11:00+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/ds/bst/persistent_ordered_set.test.cpp
+  - verify/ds/bst/persistent_ordered_multiset.test.cpp
+  - verify/ds/persistent_cow.test.cpp
+  - verify/ds/persistent_cow.test.cpp
+  - verify/ds/persistent_cow.test.cpp
+  - verify/ds/persistent_release.test.cpp
+  - verify/ds/persistent_release.test.cpp
+  - verify/ds/persistent_release.test.cpp
+  - verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array_range_ap.test.cpp
   - verify/ds/dynamic_array/persistent_dynamic_monoid_array.test.cpp
   - verify/ds/dynamic_array/persistent_dynamic_array.test.cpp
-  - verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array_range_ap.test.cpp
   - verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array.test.cpp
-  - verify/ds/dsu/persistent_dsu.test.cpp
   - verify/ds/dsu/persistent_potentialized_dsu.test.cpp
+  - verify/ds/dsu/persistent_dsu.test.cpp
   - verify/ds/dsu/persistent_dsu_library_checker.test.cpp
-  - verify/ds/persistent_release.test.cpp
-  - verify/ds/persistent_release.test.cpp
-  - verify/ds/persistent_release.test.cpp
-  - verify/ds/bst/persistent_ordered_multiset.test.cpp
-  - verify/ds/bst/persistent_ordered_set.test.cpp
-  - verify/ds/persistent_cow.test.cpp
-  - verify/ds/persistent_cow.test.cpp
-  - verify/ds/persistent_cow.test.cpp
 documentation_of: ds/detail/persistent_binary_node_pool.hpp
 layout: document
 redirect_from:

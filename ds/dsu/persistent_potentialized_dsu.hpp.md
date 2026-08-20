@@ -328,9 +328,9 @@ data:
   timestamp: '2026-08-12 03:11:00+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/dsu/persistent_potentialized_dsu.test.cpp
-  - verify/ds/persistent_release.test.cpp
   - verify/ds/persistent_cow.test.cpp
+  - verify/ds/persistent_release.test.cpp
+  - verify/ds/dsu/persistent_potentialized_dsu.test.cpp
 documentation_of: ds/dsu/persistent_potentialized_dsu.hpp
 layout: document
 title: Persistent Potentialized DSU

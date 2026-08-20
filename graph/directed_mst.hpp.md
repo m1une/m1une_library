@@ -402,10 +402,10 @@ data:
   timestamp: '2026-08-13 01:41:40+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/graph/graph_algorithms.test.cpp
-  - verify/graph/directed_mst.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
   - verify/graph/cow_game.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/directed_mst.test.cpp
 documentation_of: graph/directed_mst.hpp
 layout: document
 title: Directed Minimum Spanning Tree

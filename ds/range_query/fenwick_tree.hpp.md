@@ -106,19 +106,19 @@ data:
   isVerificationFile: false
   path: ds/range_query/fenwick_tree.hpp
   requiredBy:
-  - ds/range_query/offline_rectangle_add_rectangle_sum.hpp
-  - geometry/all.hpp
   - geometry/manhattan_segment_intersections.hpp
+  - geometry/all.hpp
+  - ds/range_query/offline_rectangle_add_rectangle_sum.hpp
   timestamp: '2026-06-27 04:10:54+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/graph/tree/vertex_add_subtree_sum.test.cpp
-  - verify/ds/range_query/offline_rectangle_add_rectangle_sum.test.cpp
-  - verify/ds/range_query/fenwick_tree.test.cpp
-  - verify/algo/offline/mo.test.cpp
-  - verify/geometry/manhattan_segment_intersections.test.cpp
   - verify/geometry/centroid.test.cpp
+  - verify/geometry/manhattan_segment_intersections.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
+  - verify/graph/tree/vertex_add_subtree_sum.test.cpp
+  - verify/ds/range_query/fenwick_tree.test.cpp
+  - verify/ds/range_query/offline_rectangle_add_rectangle_sum.test.cpp
+  - verify/algo/offline/mo.test.cpp
 documentation_of: ds/range_query/fenwick_tree.hpp
 layout: document
 title: Fenwick Tree (Binary Indexed Tree)

@@ -333,10 +333,10 @@ data:
   timestamp: '2026-08-13 01:13:27+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/math_algorithms.test.cpp
-  - verify/math/stern_brocot_tree.test.cpp
   - verify/math/yosupo_stern_brocot_tree.test.cpp
+  - verify/math/stern_brocot_tree.test.cpp
   - verify/math/rational.test.cpp
+  - verify/math/math_algorithms.test.cpp
 documentation_of: math/rational.hpp
 layout: document
 title: Rational Number

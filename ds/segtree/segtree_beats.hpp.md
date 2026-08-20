@@ -396,8 +396,8 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/segtree/segtree_beats.test.cpp
-  - verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
   - verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
+  - verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
 documentation_of: ds/segtree/segtree_beats.hpp
 layout: document
 title: Generic Segment Tree Beats!

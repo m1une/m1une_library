@@ -155,16 +155,16 @@ data:
   isVerificationFile: false
   path: graph/zero_one_bfs.hpp
   requiredBy:
-  - graph/undirected.hpp
-  - graph/shortest_path.hpp
   - graph/all.hpp
+  - graph/undirected.hpp
   - graph/directed.hpp
+  - graph/shortest_path.hpp
   timestamp: '2026-08-13 01:41:40+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/graph/cow_game.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/range_edge_graph.test.cpp
-  - verify/graph/cow_game.test.cpp
 documentation_of: graph/zero_one_bfs.hpp
 layout: document
 title: 0-1 BFS

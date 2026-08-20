@@ -129,8 +129,8 @@ data:
   timestamp: '2026-06-20 09:18:49+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/math_algorithms.test.cpp
   - verify/math/enumerate_primes.test.cpp
+  - verify/math/math_algorithms.test.cpp
 documentation_of: math/prime_sieve.hpp
 layout: document
 title: Prime Sieve

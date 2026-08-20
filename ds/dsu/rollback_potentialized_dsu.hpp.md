@@ -185,8 +185,8 @@ data:
   timestamp: '2026-08-12 17:21:09+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/dsu/rollback_potentialized_dsu.test.cpp
   - verify/ds/rollback_counterparts.test.cpp
+  - verify/ds/dsu/rollback_potentialized_dsu.test.cpp
 documentation_of: ds/dsu/rollback_potentialized_dsu.hpp
 layout: document
 title: Rollback Potentialized DSU

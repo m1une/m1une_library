@@ -433,20 +433,20 @@ data:
   isVerificationFile: false
   path: utilities/detail/fixed_int.hpp
   requiredBy:
-  - utilities/int256.hpp
-  - utilities/int512.hpp
-  - utilities/int1024.hpp
   - geometry/all.hpp
   - geometry/convex_decomposition.hpp
+  - utilities/int1024.hpp
+  - utilities/int512.hpp
+  - utilities/int256.hpp
   timestamp: '2026-08-13 01:41:40+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/utilities/int512.test.cpp
-  - verify/utilities/int256.test.cpp
-  - verify/utilities/int1024.test.cpp
   - verify/geometry/centroid.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/convex_decomposition.test.cpp
+  - verify/utilities/int512.test.cpp
+  - verify/utilities/int1024.test.cpp
+  - verify/utilities/int256.test.cpp
 documentation_of: utilities/detail/fixed_int.hpp
 layout: document
 redirect_from:

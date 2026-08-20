@@ -215,8 +215,8 @@ data:
   timestamp: '2026-07-16 20:44:42+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/segtree/segtree.test.cpp
   - verify/ds/range_query/range_sort_range_composite.test.cpp
+  - verify/ds/segtree/segtree.test.cpp
 documentation_of: ds/segtree/segtree.hpp
 layout: document
 title: Segment Tree

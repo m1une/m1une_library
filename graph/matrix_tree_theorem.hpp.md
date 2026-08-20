@@ -396,17 +396,17 @@ data:
   isVerificationFile: false
   path: graph/matrix_tree_theorem.hpp
   requiredBy:
-  - graph/undirected.hpp
   - graph/all.hpp
+  - graph/undirected.hpp
   - graph/directed.hpp
   timestamp: '2026-08-13 01:41:40+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/graph/graph_algorithms.test.cpp
-  - verify/graph/counting_spanning_tree_undirected.test.cpp
-  - verify/graph/range_edge_graph.test.cpp
-  - verify/graph/cow_game.test.cpp
   - verify/graph/counting_spanning_tree_directed.test.cpp
+  - verify/graph/cow_game.test.cpp
+  - verify/graph/counting_spanning_tree_undirected.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
 documentation_of: graph/matrix_tree_theorem.hpp
 layout: document
 title: Matrix-Tree Theorem

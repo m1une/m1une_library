@@ -83,20 +83,20 @@ data:
   isVerificationFile: false
   path: beats_acted_monoid/concept.hpp
   requiredBy:
+  - ds/segtree/persistent_segtree_beats.hpp
   - ds/segtree/segtree_beats.hpp
   - ds/segtree/rollback_segtree_beats.hpp
-  - ds/segtree/persistent_segtree_beats.hpp
   timestamp: '2026-08-12 01:20:42+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/rollback_counterparts.test.cpp
-  - verify/ds/segtree/persistent_segtree_beats.test.cpp
-  - verify/ds/segtree/segtree_beats.test.cpp
   - verify/ds/persistent_cow.test.cpp
-  - verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
-  - verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
+  - verify/ds/rollback_counterparts.test.cpp
+  - verify/ds/segtree/segtree_beats.test.cpp
+  - verify/ds/segtree/persistent_segtree_beats.test.cpp
   - verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
   - verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
+  - verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
+  - verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
   - verify/monoid/commutative_flags.test.cpp
 documentation_of: beats_acted_monoid/concept.hpp
 layout: document

@@ -1935,6 +1935,9 @@ data:
       path: verify/geometry/segment_intersection.test.cpp
       title: verify/geometry/segment_intersection.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/geometry/segment_intersection_point.test.cpp
+      title: verify/geometry/segment_intersection_point.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/geometry/steiner_convex_decomposition.test.cpp
       title: verify/geometry/steiner_convex_decomposition.test.cpp
     - icon: ':heavy_check_mark:'

@@ -297,8 +297,8 @@ data:
   timestamp: '2026-06-20 20:05:21+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/dynamic_tree/yosupo_point_set_tree_path_composite_sum.test.cpp
   - verify/ds/dynamic_tree/rake_compress_link_cut_tree.test.cpp
+  - verify/ds/dynamic_tree/yosupo_point_set_tree_path_composite_sum.test.cpp
 documentation_of: ds/dynamic_tree/rake_compress_link_cut_tree.hpp
 layout: document
 title: Rake-Compress Link-Cut Tree

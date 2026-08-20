@@ -521,11 +521,11 @@ data:
   timestamp: '2026-08-12 03:11:00+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/persistent_release.test.cpp
-  - verify/ds/persistent_release.test.cpp
-  - verify/ds/bst/persistent_ordered_multiset.test.cpp
   - verify/ds/bst/persistent_ordered_set.test.cpp
+  - verify/ds/bst/persistent_ordered_multiset.test.cpp
   - verify/ds/persistent_cow.test.cpp
+  - verify/ds/persistent_release.test.cpp
+  - verify/ds/persistent_release.test.cpp
 documentation_of: ds/bst/persistent_ordered_multiset.hpp
 layout: document
 title: Persistent Ordered Multiset
