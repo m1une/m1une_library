@@ -42,6 +42,11 @@ struct LinearIntersection {
     Point<long double> second;
 };
 
+struct ClosestPoints {
+    Point<long double> first;
+    Point<long double> second;
+};
+
 namespace linear_intersection_detail {
 
 inline LinearIntersection make_empty() {
@@ -157,36 +162,12 @@ Point<long double> reflection(const Line<T>& line, const Point<T>& point) {
 }
 
 template <Coordinate T>
-long double distance(const Line<T>& line, const Point<T>& point) {
-    assert(line.a != line.b);
-    Point<long double> direction(
-        static_cast<long double>(line.b.x) - static_cast<long double>(line.a.x),
-        static_cast<long double>(line.b.y) - static_cast<long double>(line.a.y)
-    );
-    Point<long double> offset(
-        static_cast<long double>(point.x) - static_cast<long double>(line.a.x),
-        static_cast<long double>(point.y) - static_cast<long double>(line.a.y)
-    );
-    return std::fabs(cross(direction, offset)) / norm(direction);
-}
-
-template <Coordinate T>
-long double distance(const Point<T>& point, const Line<T>& line) {
-    return distance(line, point);
-}
-
-template <Coordinate T>
 bool intersects(
     const Line<T>& first,
     const Line<T>& second,
     long double eps = 1e-12L
 ) {
     return !parallel(first, second, eps) || on_line(first, second.a, eps);
-}
-
-template <Coordinate T>
-long double distance(const Line<T>& first, const Line<T>& second) {
-    return intersects(first, second) ? 0 : distance(first, second.a);
 }
 
 template <Coordinate T>
@@ -228,6 +209,24 @@ bool on_segment(
 }
 
 template <Coordinate T>
+Point<long double> projection(
+    const Segment<T>& segment,
+    const Point<T>& point
+) {
+    const Point<long double> first(segment.a);
+    const Point<long double> direction =
+        Point<long double>(segment.b) - first;
+    const long double length_squared = dot(direction, direction);
+    if (length_squared == 0) return first;
+    const long double ratio = std::clamp(
+        dot(Point<long double>(point) - first, direction) / length_squared,
+        0.0L,
+        1.0L
+    );
+    return first + direction * ratio;
+}
+
+template <Coordinate T>
 bool intersects(
     const Segment<T>& first,
     const Segment<T>& second,
@@ -263,47 +262,6 @@ bool intersects(
     long double eps = 1e-12L
 ) {
     return intersects(line, segment, eps);
-}
-
-template <Coordinate T>
-long double distance(const Segment<T>& segment, const Point<T>& point) {
-    Point<long double> a(segment.a);
-    Point<long double> b(segment.b);
-    Point<long double> p(point);
-    Point<long double> direction = b - a;
-    long double length_squared = dot(direction, direction);
-    if (length_squared == 0) return geometry::distance(segment.a, point);
-    long double ratio = dot(p - a, direction) / length_squared;
-    ratio = std::clamp(ratio, 0.0L, 1.0L);
-    Point<long double> closest = a + direction * ratio;
-    return geometry::distance(closest, p);
-}
-
-template <Coordinate T>
-long double distance(const Point<T>& point, const Segment<T>& segment) {
-    return distance(segment, point);
-}
-
-template <Coordinate T>
-long double distance(const Segment<T>& first, const Segment<T>& second) {
-    if (intersects(first, second)) return 0;
-    return std::min({
-        distance(first, second.a),
-        distance(first, second.b),
-        distance(second, first.a),
-        distance(second, first.b),
-    });
-}
-
-template <Coordinate T>
-long double distance(const Line<T>& line, const Segment<T>& segment) {
-    if (intersects(line, segment)) return 0;
-    return std::min(distance(line, segment.a), distance(line, segment.b));
-}
-
-template <Coordinate T>
-long double distance(const Segment<T>& segment, const Line<T>& line) {
-    return distance(line, segment);
 }
 
 namespace linear_parameter_detail {
@@ -435,16 +393,6 @@ Point<long double> projection(const Ray<T>& ray, const Point<T>& point) {
 }
 
 template <Coordinate T>
-long double distance(const Ray<T>& ray, const Point<T>& point) {
-    return geometry::distance(projection(ray, point), Point<long double>(point));
-}
-
-template <Coordinate T>
-long double distance(const Point<T>& point, const Ray<T>& ray) {
-    return distance(ray, point);
-}
-
-template <Coordinate T>
 Ray<long double> reflection(const Line<T>& line, const Ray<T>& ray) {
     assert(ray.origin != ray.through);
     return Ray<long double>{
@@ -504,16 +452,6 @@ bool intersects(
 }
 
 template <Coordinate T>
-long double distance(const Ray<T>& ray, const Line<T>& line) {
-    return intersects(ray, line) ? 0 : distance(line, ray.origin);
-}
-
-template <Coordinate T>
-long double distance(const Line<T>& line, const Ray<T>& ray) {
-    return distance(ray, line);
-}
-
-template <Coordinate T>
 bool intersects(
     const Ray<T>& ray,
     const Segment<T>& segment,
@@ -559,21 +497,6 @@ bool intersects(
 }
 
 template <Coordinate T>
-long double distance(const Ray<T>& ray, const Segment<T>& segment) {
-    if (intersects(ray, segment)) return 0;
-    return std::min({
-        distance(ray, segment.a),
-        distance(ray, segment.b),
-        distance(segment, ray.origin)
-    });
-}
-
-template <Coordinate T>
-long double distance(const Segment<T>& segment, const Ray<T>& ray) {
-    return distance(ray, segment);
-}
-
-template <Coordinate T>
 bool intersects(
     const Ray<T>& first,
     const Ray<T>& second,
@@ -605,15 +528,6 @@ bool intersects(
                values.denominator,
                eps
            );
-}
-
-template <Coordinate T>
-long double distance(const Ray<T>& first, const Ray<T>& second) {
-    if (intersects(first, second)) return 0;
-    return std::min(
-        distance(first, second.origin),
-        distance(second, first.origin)
-    );
 }
 
 namespace linear_intersection_detail {
@@ -1078,6 +992,380 @@ LinearIntersection linear_intersection(
         linear_intersection_detail::parametric_object(second),
         eps
     );
+}
+
+namespace closest_points_detail {
+
+inline ClosestPoints reversed(const ClosestPoints& result) {
+    return ClosestPoints{result.second, result.first};
+}
+
+inline bool point_less(
+    const Point<long double>& first,
+    const Point<long double>& second
+) {
+    if (first.x != second.x) return first.x < second.x;
+    return first.y < second.y;
+}
+
+inline ClosestPoints common_point(const LinearIntersection& intersection) {
+    assert(intersection.kind != LinearIntersectionKind::Empty);
+    Point<long double> point = intersection.first;
+    if (intersection.kind == LinearIntersectionKind::Segment) {
+        if (point_less(intersection.second, point)) {
+            point = intersection.second;
+        }
+    } else if (intersection.kind == LinearIntersectionKind::Line) {
+        const Line<long double> line{
+            intersection.first,
+            intersection.second
+        };
+        point = projection(line, Point<long double>(0, 0));
+    }
+    return ClosestPoints{point, point};
+}
+
+inline long double separation2(const ClosestPoints& result) {
+    return distance2(result.first, result.second);
+}
+
+inline bool canonical_less(
+    const ClosestPoints& first,
+    const ClosestPoints& second
+) {
+    Point<long double> first_start = first.first;
+    Point<long double> first_finish = first.second;
+    if (point_less(first_finish, first_start)) {
+        std::swap(first_start, first_finish);
+    }
+    Point<long double> second_start = second.first;
+    Point<long double> second_finish = second.second;
+    if (point_less(second_finish, second_start)) {
+        std::swap(second_start, second_finish);
+    }
+    if (point_less(first_start, second_start)) return true;
+    if (point_less(second_start, first_start)) return false;
+    return point_less(first_finish, second_finish);
+}
+
+inline void consider(ClosestPoints& best, const ClosestPoints& candidate) {
+    const long double best_distance = separation2(best);
+    const long double candidate_distance = separation2(candidate);
+    if (
+        candidate_distance < best_distance ||
+        (
+            candidate_distance == best_distance &&
+            canonical_less(candidate, best)
+        )
+    ) {
+        best = candidate;
+    }
+}
+
+}  // namespace closest_points_detail
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Point<T>& first,
+    const Point<T>& second
+) {
+    return ClosestPoints{
+        Point<long double>(first),
+        Point<long double>(second),
+    };
+}
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Line<T>& line,
+    const Point<T>& point
+) {
+    return ClosestPoints{
+        projection(line, point),
+        Point<long double>(point),
+    };
+}
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Point<T>& point,
+    const Line<T>& line
+) {
+    return closest_points_detail::reversed(closest_points(line, point));
+}
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Segment<T>& segment,
+    const Point<T>& point
+) {
+    return ClosestPoints{
+        projection(segment, point),
+        Point<long double>(point),
+    };
+}
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Point<T>& point,
+    const Segment<T>& segment
+) {
+    return closest_points_detail::reversed(closest_points(segment, point));
+}
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Ray<T>& ray,
+    const Point<T>& point
+) {
+    return ClosestPoints{
+        projection(ray, point),
+        Point<long double>(point),
+    };
+}
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Point<T>& point,
+    const Ray<T>& ray
+) {
+    return closest_points_detail::reversed(closest_points(ray, point));
+}
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Line<T>& first,
+    const Line<T>& second,
+    long double eps = 1e-12L
+) {
+    const LinearIntersection intersection =
+        linear_intersection(first, second, eps);
+    if (intersection.kind != LinearIntersectionKind::Empty) {
+        return closest_points_detail::common_point(intersection);
+    }
+    ClosestPoints result = closest_points(first, second.a);
+    closest_points_detail::consider(
+        result,
+        closest_points(first.a, second)
+    );
+    return result;
+}
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Line<T>& line,
+    const Segment<T>& segment,
+    long double eps = 1e-12L
+) {
+    const LinearIntersection intersection =
+        linear_intersection(line, segment, eps);
+    if (intersection.kind != LinearIntersectionKind::Empty) {
+        return closest_points_detail::common_point(intersection);
+    }
+    ClosestPoints result = closest_points(line, segment.a);
+    closest_points_detail::consider(
+        result,
+        closest_points(line, segment.b)
+    );
+    return result;
+}
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Segment<T>& segment,
+    const Line<T>& line,
+    long double eps = 1e-12L
+) {
+    return closest_points_detail::reversed(
+        closest_points(line, segment, eps)
+    );
+}
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Segment<T>& first,
+    const Segment<T>& second,
+    long double eps = 1e-12L
+) {
+    const LinearIntersection intersection =
+        linear_intersection(first, second, eps);
+    if (intersection.kind != LinearIntersectionKind::Empty) {
+        return closest_points_detail::common_point(intersection);
+    }
+    ClosestPoints result = closest_points(first, second.a);
+    closest_points_detail::consider(
+        result,
+        closest_points(first, second.b)
+    );
+    closest_points_detail::consider(
+        result,
+        closest_points(first.a, second)
+    );
+    closest_points_detail::consider(
+        result,
+        closest_points(first.b, second)
+    );
+    return result;
+}
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Line<T>& line,
+    const Ray<T>& ray,
+    long double eps = 1e-12L
+) {
+    const LinearIntersection intersection =
+        linear_intersection(line, ray, eps);
+    if (intersection.kind != LinearIntersectionKind::Empty) {
+        return closest_points_detail::common_point(intersection);
+    }
+    return closest_points(line, ray.origin);
+}
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Ray<T>& ray,
+    const Line<T>& line,
+    long double eps = 1e-12L
+) {
+    return closest_points_detail::reversed(closest_points(line, ray, eps));
+}
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Ray<T>& ray,
+    const Segment<T>& segment,
+    long double eps = 1e-12L
+) {
+    const LinearIntersection intersection =
+        linear_intersection(ray, segment, eps);
+    if (intersection.kind != LinearIntersectionKind::Empty) {
+        return closest_points_detail::common_point(intersection);
+    }
+    ClosestPoints result = closest_points(ray, segment.a);
+    closest_points_detail::consider(
+        result,
+        closest_points(ray, segment.b)
+    );
+    closest_points_detail::consider(
+        result,
+        closest_points(ray.origin, segment)
+    );
+    return result;
+}
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Segment<T>& segment,
+    const Ray<T>& ray,
+    long double eps = 1e-12L
+) {
+    return closest_points_detail::reversed(
+        closest_points(ray, segment, eps)
+    );
+}
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Ray<T>& first,
+    const Ray<T>& second,
+    long double eps = 1e-12L
+) {
+    const LinearIntersection intersection =
+        linear_intersection(first, second, eps);
+    if (intersection.kind != LinearIntersectionKind::Empty) {
+        return closest_points_detail::common_point(intersection);
+    }
+    ClosestPoints result = closest_points(first, second.origin);
+    closest_points_detail::consider(
+        result,
+        closest_points(first.origin, second)
+    );
+    return result;
+}
+
+template <Coordinate T>
+long double distance(const Line<T>& line, const Point<T>& point) {
+    const ClosestPoints result = closest_points(line, point);
+    return geometry::distance(result.first, result.second);
+}
+
+template <Coordinate T>
+long double distance(const Point<T>& point, const Line<T>& line) {
+    return distance(line, point);
+}
+
+template <Coordinate T>
+long double distance(const Segment<T>& segment, const Point<T>& point) {
+    const ClosestPoints result = closest_points(segment, point);
+    return geometry::distance(result.first, result.second);
+}
+
+template <Coordinate T>
+long double distance(const Point<T>& point, const Segment<T>& segment) {
+    return distance(segment, point);
+}
+
+template <Coordinate T>
+long double distance(const Ray<T>& ray, const Point<T>& point) {
+    const ClosestPoints result = closest_points(ray, point);
+    return geometry::distance(result.first, result.second);
+}
+
+template <Coordinate T>
+long double distance(const Point<T>& point, const Ray<T>& ray) {
+    return distance(ray, point);
+}
+
+template <Coordinate T>
+long double distance(const Line<T>& first, const Line<T>& second) {
+    const ClosestPoints result = closest_points(first, second);
+    return geometry::distance(result.first, result.second);
+}
+
+template <Coordinate T>
+long double distance(const Line<T>& line, const Segment<T>& segment) {
+    const ClosestPoints result = closest_points(line, segment);
+    return geometry::distance(result.first, result.second);
+}
+
+template <Coordinate T>
+long double distance(const Segment<T>& segment, const Line<T>& line) {
+    return distance(line, segment);
+}
+
+template <Coordinate T>
+long double distance(const Segment<T>& first, const Segment<T>& second) {
+    const ClosestPoints result = closest_points(first, second);
+    return geometry::distance(result.first, result.second);
+}
+
+template <Coordinate T>
+long double distance(const Line<T>& line, const Ray<T>& ray) {
+    const ClosestPoints result = closest_points(line, ray);
+    return geometry::distance(result.first, result.second);
+}
+
+template <Coordinate T>
+long double distance(const Ray<T>& ray, const Line<T>& line) {
+    return distance(line, ray);
+}
+
+template <Coordinate T>
+long double distance(const Ray<T>& ray, const Segment<T>& segment) {
+    const ClosestPoints result = closest_points(ray, segment);
+    return geometry::distance(result.first, result.second);
+}
+
+template <Coordinate T>
+long double distance(const Segment<T>& segment, const Ray<T>& ray) {
+    return distance(ray, segment);
+}
+
+template <Coordinate T>
+long double distance(const Ray<T>& first, const Ray<T>& second) {
+    const ClosestPoints result = closest_points(first, second);
+    return geometry::distance(result.first, result.second);
 }
 
 }  // namespace geometry

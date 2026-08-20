@@ -788,7 +788,7 @@ inline Point<long double> interpolate(
 }
 
 template <Coordinate T>
-std::pair<Point<long double>, Point<long double>>
+ClosestPoints
 closest_points_from_difference(
     const MinkowskiDifferenceView<T>& difference,
     long double eps
@@ -799,7 +799,7 @@ closest_points_from_difference(
             closest_boundary_feature<T>(difference, location, eps);
         const auto first_components = difference.components(feature.first);
         const auto second_components = difference.components(feature.second);
-        return std::pair<Point<long double>, Point<long double>>(
+        return ClosestPoints{
             interpolate(
                 Point<long double>(first_components.first),
                 Point<long double>(second_components.first),
@@ -810,7 +810,7 @@ closest_points_from_difference(
                 Point<long double>(second_components.second),
                 feature.ratio
             )
-        );
+        };
     }
 
     assert(location.simplex_size == 2 || location.simplex_size == 3);
@@ -845,76 +845,10 @@ closest_points_from_difference(
         second_result +=
             Point<long double>(components.second) * weight[index];
     }
-    return std::pair<Point<long double>, Point<long double>>(
+    return ClosestPoints{
         first_result,
         second_result
-    );
-}
-
-template <Coordinate T>
-Point<long double> closest_point_on_segment(
-    const Segment<T>& segment,
-    const Point<T>& point
-) {
-    const Point<long double> first(segment.a);
-    const Point<long double> direction =
-        Point<long double>(segment.b) - first;
-    const long double length2 = dot(direction, direction);
-    if (length2 == 0) return first;
-    const long double ratio = std::clamp(
-        dot(Point<long double>(point) - first, direction) / length2,
-        0.0L,
-        1.0L
-    );
-    return first + direction * ratio;
-}
-
-template <Coordinate T>
-std::pair<Point<long double>, Point<long double>>
-closest_points_between_segments(
-    const Segment<T>& first,
-    const Segment<T>& second,
-    long double eps
-) {
-    const LinearIntersection common =
-        linear_intersection(first, second, eps);
-    if (common.kind != LinearIntersectionKind::Empty) {
-        return std::pair<Point<long double>, Point<long double>>(
-            common.first,
-            common.first
-        );
-    }
-
-    std::pair<Point<long double>, Point<long double>> result(
-        Point<long double>(first.a),
-        closest_point_on_segment(second, first.a)
-    );
-    long double result_distance = distance(result.first, result.second);
-    auto consider = [&](const Point<long double>& first_point,
-                        const Point<long double>& second_point) {
-        const long double candidate_distance =
-            distance(first_point, second_point);
-        if (candidate_distance < result_distance) {
-            result = std::pair<Point<long double>, Point<long double>>(
-                first_point,
-                second_point
-            );
-            result_distance = candidate_distance;
-        }
     };
-    consider(
-        Point<long double>(first.b),
-        closest_point_on_segment(second, first.b)
-    );
-    consider(
-        closest_point_on_segment(first, second.a),
-        Point<long double>(second.a)
-    );
-    consider(
-        closest_point_on_segment(first, second.b),
-        Point<long double>(second.b)
-    );
-    return result;
 }
 
 }  // namespace convex_polygon_detail
@@ -1073,7 +1007,7 @@ bool convex_polygons_intersect(
 }
 
 template <Coordinate T>
-std::pair<Point<long double>, Point<long double>>
+ClosestPoints
 convex_polygons_closest_points(
     const ConvexPolygon<T>& first,
     const ConvexPolygon<T>& second,
@@ -1082,7 +1016,7 @@ convex_polygons_closest_points(
     assert(!first.empty());
     assert(!second.empty());
     if (first.size() <= 2 && second.size() <= 2) {
-        return convex_polygon_detail::closest_points_between_segments(
+        return closest_points(
             Segment<T>{first[0], first[first.size() - 1]},
             Segment<T>{second[0], second[second.size() - 1]},
             eps
@@ -1099,7 +1033,7 @@ convex_polygons_closest_points(
 }
 
 template <Coordinate T>
-std::pair<Point<long double>, Point<long double>>
+ClosestPoints
 convex_polygons_closest_points(
     const std::vector<Point<T>>& first,
     const std::vector<Point<T>>& second,

@@ -37,7 +37,7 @@ template <Coordinate T>
 void assert_closest_points(
     const std::vector<Point<T>>& first,
     const std::vector<Point<T>>& second,
-    const std::pair<Point<long double>, Point<long double>>& points,
+    const ClosestPoints& points,
     long double expected_distance
 ) {
     assert(contains_closed(first, points.first));

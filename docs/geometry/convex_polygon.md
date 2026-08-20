@@ -158,7 +158,7 @@ long double convex_polygons_distance(
 );
 
 template <Coordinate T>
-std::pair<Point<long double>, Point<long double>>
+ClosestPoints
 convex_polygons_closest_points(
     const std::vector<Point<T>>& first,
     const std::vector<Point<T>>& second,
@@ -180,7 +180,7 @@ long double convex_polygons_distance(
 );
 
 template <Coordinate T>
-std::pair<Point<long double>, Point<long double>>
+ClosestPoints
 convex_polygons_closest_points(
     const ConvexPolygon<T>& first,
     const ConvexPolygon<T>& second,
@@ -230,11 +230,11 @@ Here $N$ and $M$ are the numbers of vertices after each query object's
 normalization. Empty query objects are invalid; points and segments are
 supported. All pair-query overloads treat the polygons as closed, so sharing
 a vertex or edge counts as intersection and makes the distance zero.
-`convex_polygons_closest_points` returns `{first_point, second_point}`, where
-`first_point` belongs to the first polygon and `second_point` belongs to the
-second. The returned points use `long double` because a closest point may lie
-inside an edge. If the polygons intersect, both returned points describe one
-common point; when several answers exist, any one may be returned. `eps`
+`convex_polygons_closest_points` returns `ClosestPoints{first, second}`, where
+`first` belongs to the first polygon and `second` belongs to the second. The
+returned points use `long double` because a closest point may lie inside an
+edge. If the polygons intersect, both returned points describe one common
+point; when several answers exist, any one may be returned. `eps`
 controls geometric classification during the pair query; each object's
 constructor tolerance has already been applied during its normalization.
 

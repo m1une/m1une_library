@@ -7,7 +7,7 @@ documentation_of: ../../geometry/linear.hpp
 
 This header provides `Line<T>`, `Segment<T>`, and `Ray<T>` together with
 projection, reflection, distances, intersection predicates, segment centroids,
-and classified intersections.
+classified intersections, and closest-point witnesses.
 
 Integral predicates use signed 128-bit arithmetic. Constructed coordinates and
 distances are returned using `long double`.
@@ -71,7 +71,7 @@ direction. For `Line`, the two points are distinct representatives of the
 line. An `Empty` result has no meaningful point values. Segment endpoints do
 not have a canonical order.
 
-`line.hpp` provides these overloads:
+`linear.hpp` provides these overloads:
 
 ```cpp
 template <Coordinate T>
@@ -148,6 +148,115 @@ intersect their one-dimensional parameter intervals and translate the result
 back into `Empty`, `Point`, `Segment`, `Ray`, or `Line`. Degenerate segments
 are handled as singleton points before a supporting direction is required.
 
+## Closest points
+
+```cpp
+struct ClosestPoints {
+    Point<long double> first;
+    Point<long double> second;
+};
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Point<T>& first,
+    const Point<T>& second
+);
+
+template <Coordinate T>
+ClosestPoints closest_points(const Line<T>& line, const Point<T>& point);
+
+template <Coordinate T>
+ClosestPoints closest_points(const Point<T>& point, const Line<T>& line);
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Segment<T>& segment,
+    const Point<T>& point
+);
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Point<T>& point,
+    const Segment<T>& segment
+);
+
+template <Coordinate T>
+ClosestPoints closest_points(const Ray<T>& ray, const Point<T>& point);
+
+template <Coordinate T>
+ClosestPoints closest_points(const Point<T>& point, const Ray<T>& ray);
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Line<T>& first,
+    const Line<T>& second,
+    long double eps = 1e-12L
+);
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Line<T>& line,
+    const Segment<T>& segment,
+    long double eps = 1e-12L
+);
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Segment<T>& segment,
+    const Line<T>& line,
+    long double eps = 1e-12L
+);
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Segment<T>& first,
+    const Segment<T>& second,
+    long double eps = 1e-12L
+);
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Line<T>& line,
+    const Ray<T>& ray,
+    long double eps = 1e-12L
+);
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Ray<T>& ray,
+    const Line<T>& line,
+    long double eps = 1e-12L
+);
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Ray<T>& ray,
+    const Segment<T>& segment,
+    long double eps = 1e-12L
+);
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Segment<T>& segment,
+    const Ray<T>& ray,
+    long double eps = 1e-12L
+);
+
+template <Coordinate T>
+ClosestPoints closest_points(
+    const Ray<T>& first,
+    const Ray<T>& second,
+    long double eps = 1e-12L
+);
+```
+
+`first` belongs to the first argument and `second` belongs to the second. Their
+distance is minimal. Intersecting objects return the same point twice.
+Reversing the arguments swaps the witnesses; when several minimizing pairs
+exist, a deterministic coordinate-based tie-break is used. Every overload
+runs in $O(1)$. The linear-object `distance` overloads return the distance
+between these witnesses.
+
 ## Line and segment operations
 
 | Function | Description | Complexity |
@@ -162,6 +271,7 @@ are handled as singleton points before a supporting direction is required.
 | `distance(line, point)` | Point-to-line distance. Both argument orders are supported. | $O(1)$ |
 | `distance(first, second)` | Distance between two infinite lines. | $O(1)$ |
 | `on_segment(segment, point, eps)` | Tests whether a point lies on a closed segment. | $O(1)$ |
+| `projection(segment, point)` | Returns the closest point on the closed segment, including for a degenerate segment. | $O(1)$ |
 | `intersects(first, second, eps)` | Tests whether two closed segments intersect, including overlap. | $O(1)$ |
 | `intersects(line, segment, eps)` | Tests whether an infinite line and a closed segment intersect. Both argument orders are supported. | $O(1)$ |
 | `distance(segment, point)` | Point-to-segment distance. Both argument orders are supported. | $O(1)$ |
@@ -193,6 +303,21 @@ the angle of incidence equals the angle of reflection. Collinear overlap counts
 as an intersection. A line and ray can intersect in an empty set, a point, or
 a ray. A segment and ray can intersect in an empty set, a point, or a segment.
 Two rays can intersect in an empty set, a point, a segment, or a ray.
+
+## Closest-points example
+
+```cpp
+Segment<long long> segment;
+segment.a = Point<long long>(0, 0);
+segment.b = Point<long long>(2, 0);
+
+Ray<long long> ray;
+ray.origin = Point<long long>(5, 3);
+ray.through = Point<long long>(6, 3);
+
+ClosestPoints result = closest_points(segment, ray);
+// result.first == (2, 0), result.second == (5, 3)
+```
 
 ## Example
 
