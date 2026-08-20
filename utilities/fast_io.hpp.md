@@ -409,6 +409,9 @@ data:
     path: verify/geometry/closest_pair.test.cpp
     title: verify/geometry/closest_pair.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/closest_points.test.cpp
+    title: verify/geometry/closest_points.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/convex_decomposition.test.cpp
     title: verify/geometry/convex_decomposition.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1636,6 +1639,7 @@ data:
   - verify/geometry/projection.test.cpp
   - verify/geometry/lattice_point_count.test.cpp
   - verify/geometry/linear_intersection.test.cpp
+  - verify/geometry/closest_points.test.cpp
   - verify/geometry/ray.test.cpp
   - verify/geometry/circle_common_tangents.test.cpp
   - verify/geometry/segment_intersection_point.test.cpp

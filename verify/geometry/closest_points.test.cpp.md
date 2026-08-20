@@ -10,63 +10,25 @@ data:
   - icon: ':heavy_check_mark:'
     path: geometry/point.hpp
     title: 2D Point and Predicates
-  _extendedRequiredBy:
   - icon: ':heavy_check_mark:'
-    path: geometry/all.hpp
-    title: Geometry Bundle
-  - icon: ':heavy_check_mark:'
-    path: geometry/convex_decomposition.hpp
-    title: Convex Decomposition
-  - icon: ':heavy_check_mark:'
-    path: geometry/convex_polygon.hpp
-    title: Convex Polygons
-  - icon: ':heavy_check_mark:'
-    path: geometry/steiner_convex_decomposition.hpp
-    title: Steiner Convex Decomposition
-  _extendedVerifiedWith:
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/centroid.test.cpp
-    title: verify/geometry/centroid.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/convex_decomposition.test.cpp
-    title: verify/geometry/convex_decomposition.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/convex_diameter.test.cpp
-    title: verify/geometry/convex_diameter.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/convex_polygon.test.cpp
-    title: verify/geometry/convex_polygon.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/geometry_algorithms.test.cpp
-    title: verify/geometry/geometry_algorithms.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/is_convex_polygon.test.cpp
-    title: verify/geometry/is_convex_polygon.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/point_in_polygon.test.cpp
-    title: verify/geometry/point_in_polygon.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/polygon_area.test.cpp
-    title: verify/geometry/polygon_area.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/polygon_operations.test.cpp
-    title: verify/geometry/polygon_operations.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/polygon_operations.test.cpp
-    title: verify/geometry/polygon_operations.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/geometry/steiner_convex_decomposition.test.cpp
-    title: verify/geometry/steiner_convex_decomposition.test.cpp
+    path: utilities/fast_io.hpp
+    title: Fast IO
+  _extendedRequiredBy: []
+  _extendedVerifiedWith: []
   _isVerificationFailed: false
-  _pathExtension: hpp
+  _pathExtension: cpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
-    links: []
-  bundledCode: "#line 1 \"geometry/polygon.hpp\"\n\n\n\n#include <algorithm>\n#include\
-    \ <array>\n#include <cassert>\n#include <cmath>\n#include <cstddef>\n#include\
-    \ <limits>\n#include <optional>\n#include <vector>\n\n#line 1 \"geometry/linear.hpp\"\
-    \n\n\n\n#line 7 \"geometry/linear.hpp\"\n\n#line 1 \"geometry/point.hpp\"\n\n\n\
-    \n#line 5 \"geometry/point.hpp\"\n#include <concepts>\n#line 7 \"geometry/point.hpp\"\
+    '*NOT_SPECIAL_COMMENTS*': ''
+    ERROR: 1e-8
+    PROBLEM: https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_2_D
+    links:
+    - https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_2_D
+  bundledCode: "#line 1 \"verify/geometry/closest_points.test.cpp\"\n#define PROBLEM\
+    \ \"https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_2_D\"\n#define\
+    \ ERROR \"1e-8\"\n\n#line 1 \"geometry/linear.hpp\"\n\n\n\n#include <algorithm>\n\
+    #include <cassert>\n#include <cmath>\n\n#line 1 \"geometry/point.hpp\"\n\n\n\n\
+    #line 5 \"geometry/point.hpp\"\n#include <concepts>\n#line 7 \"geometry/point.hpp\"\
     \n#include <type_traits>\n\n#line 1 \"geometry/detail/floating_predicate.hpp\"\
     \n\n\n\nnamespace m1une {\nnamespace geometry {\nnamespace predicate_detail {\n\
     \ntemplate <typename T>\nconstexpr T absolute(T value) {\n    return value < T(0)\
@@ -657,542 +619,497 @@ data:
     \ <Coordinate T>\nlong double distance(const Ray<T>& first, const Ray<T>& second)\
     \ {\n    const ClosestPoints result = closest_points(first, second);\n    return\
     \ geometry::distance(result.first, result.second);\n}\n\n}  // namespace geometry\n\
-    }  // namespace m1une\n\n\n#line 14 \"geometry/polygon.hpp\"\n\nnamespace m1une\
-    \ {\nnamespace geometry {\n\nenum class PointInPolygon {\n    Outside = 0,\n \
-    \   Boundary = 1,\n    Inside = 2,\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long\
-    \ double> centroid(\n    const std::array<Point<T>, 3>& triangle\n) {\n    return\
-    \ Point<long double>(\n        (\n            static_cast<long double>(triangle[0].x)\
-    \ +\n            static_cast<long double>(triangle[1].x) +\n            static_cast<long\
-    \ double>(triangle[2].x)\n        ) / 3,\n        (\n            static_cast<long\
-    \ double>(triangle[0].y) +\n            static_cast<long double>(triangle[1].y)\
-    \ +\n            static_cast<long double>(triangle[2].y)\n        ) / 3\n    );\n\
-    }\n\nnamespace polygon_detail {\n\ninline bool close(\n    const Point<long double>&\
-    \ first,\n    const Point<long double>& second,\n    long double eps\n) {\n  \
-    \  return geometry::distance(first, second) <= eps;\n}\n\ninline void push_unique(\n\
-    \    std::vector<Point<long double>>& points,\n    const Point<long double>& point,\n\
-    \    long double eps\n) {\n    for (const Point<long double>& existing : points)\
-    \ {\n        if (close(existing, point, eps)) return;\n    }\n    points.push_back(point);\n\
-    }\n\ntemplate <Coordinate T>\nstd::vector<Point<T>> clean_polygon_vertices(\n\
-    \    std::vector<Point<T>> polygon,\n    long double eps\n) {\n    if (\n    \
-    \    polygon.size() >= 2 &&\n        polygon.front() == polygon.back()\n    )\
-    \ {\n        polygon.pop_back();\n    }\n\n    std::vector<Point<T>> deduplicated;\n\
-    \    for (const Point<T>& point : polygon) {\n        if (deduplicated.empty()\
-    \ || deduplicated.back() != point) {\n            deduplicated.push_back(point);\n\
-    \        }\n    }\n    if (\n        deduplicated.size() >= 2 &&\n        deduplicated.front()\
-    \ == deduplicated.back()\n    ) {\n        deduplicated.pop_back();\n    }\n\n\
-    \    bool changed = true;\n    while (changed && deduplicated.size() >= 3) {\n\
-    \        changed = false;\n        std::vector<Point<T>> cleaned;\n        std::size_t\
-    \ size = deduplicated.size();\n        for (std::size_t index = 0; index < size;\
-    \ ++index) {\n            const Point<T>& previous =\n                deduplicated[(index\
-    \ + size - 1) % size];\n            const Point<T>& current = deduplicated[index];\n\
-    \            const Point<T>& next =\n                deduplicated[(index + 1)\
-    \ % size];\n            if (\n                orientation(previous, current, next,\
-    \ eps) == 0 &&\n                sign<T>(dot(current - previous, next - current),\
-    \ eps) >= 0\n            ) {\n                changed = true;\n            } else\
-    \ {\n                cleaned.push_back(current);\n            }\n        }\n \
-    \       deduplicated = std::move(cleaned);\n    }\n    return deduplicated;\n\
-    }\n\ntemplate <Coordinate T>\nbool in_ccw_triangle(\n    const Point<T>& point,\n\
-    \    const Point<T>& first,\n    const Point<T>& second,\n    const Point<T>&\
-    \ third,\n    long double eps\n) {\n    return\n        orientation(first, second,\
-    \ point, eps) >= 0 &&\n        orientation(second, third, point, eps) >= 0 &&\n\
-    \        orientation(third, first, point, eps) >= 0;\n}\n\n}  // namespace polygon_detail\n\
-    \ntemplate <Coordinate T>\nwide_type<T> polygon_area2(const std::vector<Point<T>>&\
-    \ polygon) {\n    wide_type<T> result = 0;\n    std::size_t n = polygon.size();\n\
-    \    for (std::size_t i = 0; i < n; i++) {\n        result += cross(polygon[i],\
-    \ polygon[(i + 1) % n]);\n    }\n    return result;\n}\n\ntemplate <Coordinate\
-    \ T>\nlong double polygon_area(const std::vector<Point<T>>& polygon) {\n    return\
-    \ std::fabs(static_cast<long double>(polygon_area2(polygon))) / 2;\n}\n\ntemplate\
-    \ <Coordinate T>\nstd::optional<Point<long double>> polygon_centroid(\n    const\
-    \ std::vector<Point<T>>& polygon,\n    long double eps = 1e-12L\n) {\n    if (polygon.size()\
-    \ < 3) return std::nullopt;\n\n    wide_type<T> signed_area2 = polygon_area2(polygon);\n\
-    \    if (sign<T>(signed_area2, eps) == 0) return std::nullopt;\n\n    long double\
-    \ x_numerator = 0;\n    long double y_numerator = 0;\n    std::size_t size = polygon.size();\n\
-    \    for (std::size_t index = 0; index < size; ++index) {\n        const Point<T>&\
-    \ current = polygon[index];\n        const Point<T>& next = polygon[(index + 1)\
-    \ % size];\n        long double weight = static_cast<long double>(cross(current,\
-    \ next));\n        x_numerator +=\n            (static_cast<long double>(current.x)\
-    \ +\n             static_cast<long double>(next.x)) *\n            weight;\n \
-    \       y_numerator +=\n            (static_cast<long double>(current.y) +\n \
-    \            static_cast<long double>(next.y)) *\n            weight;\n    }\n\
-    \    long double denominator =\n        3.0L * static_cast<long double>(signed_area2);\n\
-    \    return Point<long double>(\n        x_numerator / denominator,\n        y_numerator\
-    \ / denominator\n    );\n}\n\ntemplate <Coordinate T>\nstd::optional<Point<long\
-    \ double>> centroid(\n    const std::vector<Point<T>>& polygon,\n    long double\
-    \ eps = 1e-12L\n) {\n    return polygon_centroid(polygon, eps);\n}\n\ntemplate\
-    \ <Coordinate T>\nstd::optional<Point<long double>> polygon_center_of_gravity(\n\
-    \    const std::vector<Point<T>>& polygon,\n    long double eps = 1e-12L\n) {\n\
-    \    return polygon_centroid(polygon, eps);\n}\n\ntemplate <Coordinate T>\nbool\
-    \ is_simple_polygon(\n    const std::vector<Point<T>>& polygon,\n    long double\
-    \ eps = 1e-12L\n) {\n    if (polygon.size() < 3) return false;\n    std::size_t\
-    \ size = polygon.size();\n    for (std::size_t index = 0; index < size; ++index)\
-    \ {\n        const Point<T>& previous = polygon[(index + size - 1) % size];\n\
-    \        const Point<T>& current = polygon[index];\n        const Point<T>& next\
-    \ = polygon[(index + 1) % size];\n        if (current == next) return false;\n\
-    \        if (\n            orientation(previous, current, next, eps) == 0 &&\n\
-    \            sign<T>(dot(current - previous, next - current), eps) < 0\n     \
-    \   ) {\n            return false;\n        }\n    }\n    for (std::size_t first_index\
-    \ = 0; first_index < size; ++first_index) {\n        Segment<T> first{\n     \
-    \       polygon[first_index],\n            polygon[(first_index + 1) % size]\n\
-    \        };\n        for (\n            std::size_t second_index = first_index\
-    \ + 1;\n            second_index < size;\n            ++second_index\n       \
-    \ ) {\n            bool adjacent =\n                second_index == first_index\
-    \ + 1 ||\n                (first_index == 0 && second_index + 1 == size);\n  \
-    \          if (adjacent) continue;\n\n            Segment<T> second{\n       \
-    \         polygon[second_index],\n                polygon[(second_index + 1) %\
-    \ size]\n            };\n            if (intersects(first, second, eps)) return\
-    \ false;\n        }\n    }\n    return true;\n}\n\ntemplate <Coordinate T>\nstd::optional<std::vector<std::array<Point<T>,\
-    \ 3>>> triangulate_polygon(\n    std::vector<Point<T>> polygon,\n    long double\
-    \ eps = 1e-12L\n) {\n    polygon =\n        polygon_detail::clean_polygon_vertices(std::move(polygon),\
-    \ eps);\n    if (polygon.size() < 3) return std::nullopt;\n\n    wide_type<T>\
-    \ signed_area2 = polygon_area2(polygon);\n    if (sign<T>(signed_area2, eps) ==\
-    \ 0) return std::nullopt;\n    if (!is_simple_polygon(polygon, eps)) return std::nullopt;\n\
-    \    if (sign<T>(signed_area2, eps) < 0) {\n        std::reverse(polygon.begin(),\
-    \ polygon.end());\n    }\n\n    std::vector<std::size_t> remaining(polygon.size());\n\
-    \    for (std::size_t index = 0; index < polygon.size(); ++index) {\n        remaining[index]\
-    \ = index;\n    }\n\n    std::vector<std::array<Point<T>, 3>> result;\n    result.reserve(polygon.size()\
-    \ - 2);\n    while (remaining.size() > 3) {\n        bool found_ear = false;\n\
-    \        std::size_t size = remaining.size();\n        for (std::size_t position\
-    \ = 0; position < size; ++position) {\n            std::size_t previous_index\
-    \ =\n                remaining[(position + size - 1) % size];\n            std::size_t\
-    \ current_index = remaining[position];\n            std::size_t next_index =\n\
-    \                remaining[(position + 1) % size];\n            const Point<T>&\
-    \ previous = polygon[previous_index];\n            const Point<T>& current = polygon[current_index];\n\
-    \            const Point<T>& next = polygon[next_index];\n            if (orientation(previous,\
-    \ current, next, eps) <= 0) continue;\n\n            bool contains_vertex = false;\n\
-    \            for (std::size_t other_index : remaining) {\n                if (\n\
-    \                    other_index == previous_index ||\n                    other_index\
-    \ == current_index ||\n                    other_index == next_index\n       \
-    \         ) {\n                    continue;\n                }\n            \
-    \    if (\n                    polygon_detail::in_ccw_triangle(\n            \
-    \            polygon[other_index],\n                        previous,\n      \
-    \                  current,\n                        next,\n                 \
-    \       eps\n                    )\n                ) {\n                    contains_vertex\
-    \ = true;\n                    break;\n                }\n            }\n    \
-    \        if (contains_vertex) continue;\n\n            std::array<Point<T>, 3>\
-    \ triangle;\n            triangle[0] = previous;\n            triangle[1] = current;\n\
-    \            triangle[2] = next;\n            result.push_back(std::move(triangle));\n\
-    \            remaining.erase(\n                remaining.begin() +\n         \
-    \       static_cast<std::ptrdiff_t>(position)\n            );\n            found_ear\
-    \ = true;\n            break;\n        }\n        if (!found_ear) return std::nullopt;\n\
-    \    }\n\n    std::array<Point<T>, 3> triangle;\n    triangle[0] = polygon[remaining[0]];\n\
-    \    triangle[1] = polygon[remaining[1]];\n    triangle[2] = polygon[remaining[2]];\n\
-    \    if (orientation(triangle[0], triangle[1], triangle[2], eps) <= 0) {\n   \
-    \     return std::nullopt;\n    }\n    result.push_back(std::move(triangle));\n\
-    \    return result;\n}\n\ntemplate <Coordinate T>\nPointInPolygon point_in_polygon(\n\
-    \    const std::vector<Point<T>>& polygon,\n    const Point<T>& point,\n    long\
-    \ double eps = 1e-12L\n) {\n    bool inside = false;\n    std::size_t n = polygon.size();\n\
-    \    for (std::size_t i = 0; i < n; i++) {\n        const Point<T>& a = polygon[i];\n\
-    \        const Point<T>& b = polygon[(i + 1) % n];\n        if (on_segment(Segment<T>{a,\
-    \ b}, point, eps)) {\n            return PointInPolygon::Boundary;\n        }\n\
-    \n        if (a.y <= point.y) {\n            if (point.y < b.y && orientation(a,\
-    \ b, point, eps) > 0) {\n                inside = !inside;\n            }\n  \
-    \      } else if (b.y <= point.y && orientation(a, b, point, eps) < 0) {\n   \
-    \         inside = !inside;\n        }\n    }\n    return inside ? PointInPolygon::Inside\
-    \ : PointInPolygon::Outside;\n}\n\ntemplate <Coordinate T>\nstd::vector<Point<long\
-    \ double>> ray_polygon_intersections(\n    const Ray<T>& ray,\n    const std::vector<Point<T>>&\
-    \ polygon,\n    long double eps = 1e-12L\n) {\n    assert(ray.origin != ray.through);\n\
-    \    assert(polygon.size() >= 3);\n    std::vector<Point<long double>> result;\n\
-    \    std::size_t size = polygon.size();\n    for (std::size_t index = 0; index\
-    \ < size; ++index) {\n        Segment<T> edge{\n            polygon[index],\n\
-    \            polygon[(index + 1) % size]\n        };\n        const LinearIntersection\
-    \ intersection =\n            linear_intersection(ray, edge, eps);\n        if\
-    \ (intersection.kind == LinearIntersectionKind::Point) {\n            polygon_detail::push_unique(result,\
-    \ intersection.first, eps);\n        } else if (intersection.kind == LinearIntersectionKind::Segment)\
-    \ {\n            polygon_detail::push_unique(result, intersection.first, eps);\n\
-    \            polygon_detail::push_unique(result, intersection.second, eps);\n\
-    \        } else {\n            assert(intersection.kind == LinearIntersectionKind::Empty);\n\
-    \        }\n    }\n\n    Point<long double> origin(ray.origin);\n    Point<long\
-    \ double> direction =\n        Point<long double>(ray.through) - origin;\n   \
-    \ std::sort(\n        result.begin(),\n        result.end(),\n        [&](const\
-    \ Point<long double>& first, const Point<long double>& second) {\n           \
-    \ return dot(first - origin, direction) <\n                   dot(second - origin,\
-    \ direction);\n        }\n    );\n    return result;\n}\n\ntemplate <Coordinate\
-    \ T>\nstd::optional<Point<long double>> first_ray_polygon_intersection(\n    const\
-    \ Ray<T>& ray,\n    const std::vector<Point<T>>& polygon,\n    long double eps\
-    \ = 1e-12L\n) {\n    std::vector<Point<long double>> points =\n        ray_polygon_intersections(ray,\
-    \ polygon, eps);\n    if (points.empty()) return std::nullopt;\n    return points.front();\n\
-    }\n\ntemplate <Coordinate T>\nbool intersects(\n    const Ray<T>& ray,\n    const\
-    \ std::vector<Point<T>>& polygon,\n    long double eps = 1e-12L\n) {\n    assert(polygon.size()\
-    \ >= 3);\n    if (point_in_polygon(polygon, ray.origin, eps) != PointInPolygon::Outside)\
-    \ {\n        return true;\n    }\n    return !ray_polygon_intersections(ray, polygon,\
-    \ eps).empty();\n}\n\ntemplate <Coordinate T>\nbool intersects(\n    const std::vector<Point<T>>&\
-    \ polygon,\n    const Ray<T>& ray,\n    long double eps = 1e-12L\n) {\n    return\
-    \ intersects(ray, polygon, eps);\n}\n\ntemplate <Coordinate T>\nlong double distance(\n\
-    \    const Ray<T>& ray,\n    const std::vector<Point<T>>& polygon\n) {\n    assert(polygon.size()\
-    \ >= 3);\n    if (intersects(ray, polygon)) return 0;\n    long double result\
-    \ = std::numeric_limits<long double>::infinity();\n    std::size_t size = polygon.size();\n\
-    \    for (std::size_t index = 0; index < size; ++index) {\n        result = std::min(\n\
-    \            result,\n            distance(\n                ray,\n          \
-    \      Segment<T>{\n                    polygon[index],\n                    polygon[(index\
-    \ + 1) % size]\n                }\n            )\n        );\n    }\n    return\
-    \ result;\n}\n\ntemplate <Coordinate T>\nlong double distance(\n    const std::vector<Point<T>>&\
-    \ polygon,\n    const Ray<T>& ray\n) {\n    return distance(ray, polygon);\n}\n\
-    \ntemplate <Coordinate T>\nbool intersects(\n    const std::vector<Point<T>>&\
-    \ first,\n    const std::vector<Point<T>>& second,\n    long double eps = 1e-12L\n\
-    ) {\n    assert(first.size() >= 3);\n    assert(second.size() >= 3);\n    std::size_t\
-    \ first_size = first.size();\n    std::size_t second_size = second.size();\n \
-    \   for (\n        std::size_t first_index = 0;\n        first_index < first_size;\n\
-    \        ++first_index\n    ) {\n        Segment<T> first_edge{\n            first[first_index],\n\
-    \            first[(first_index + 1) % first_size]\n        };\n        for (\n\
-    \            std::size_t second_index = 0;\n            second_index < second_size;\n\
-    \            ++second_index\n        ) {\n            Segment<T> second_edge{\n\
-    \                second[second_index],\n                second[(second_index +\
-    \ 1) % second_size]\n            };\n            if (intersects(first_edge, second_edge,\
-    \ eps)) return true;\n        }\n    }\n    return\n        point_in_polygon(first,\
-    \ second.front(), eps) !=\n            PointInPolygon::Outside ||\n        point_in_polygon(second,\
-    \ first.front(), eps) !=\n            PointInPolygon::Outside;\n}\n\ntemplate\
-    \ <Coordinate T>\nlong double distance(\n    const std::vector<Point<T>>& first,\n\
-    \    const std::vector<Point<T>>& second\n) {\n    assert(first.size() >= 3);\n\
-    \    assert(second.size() >= 3);\n    if (intersects(first, second)) return 0;\n\
-    \n    long double result = std::numeric_limits<long double>::infinity();\n   \
-    \ std::size_t first_size = first.size();\n    std::size_t second_size = second.size();\n\
-    \    for (\n        std::size_t first_index = 0;\n        first_index < first_size;\n\
-    \        ++first_index\n    ) {\n        Segment<T> first_edge{\n            first[first_index],\n\
-    \            first[(first_index + 1) % first_size]\n        };\n        for (\n\
-    \            std::size_t second_index = 0;\n            second_index < second_size;\n\
-    \            ++second_index\n        ) {\n            Segment<T> second_edge{\n\
-    \                second[second_index],\n                second[(second_index +\
-    \ 1) % second_size]\n            };\n            result = std::min(result, distance(first_edge,\
-    \ second_edge));\n        }\n    }\n    return result;\n}\n\n}  // namespace geometry\n\
-    }  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_GEOMETRY_POLYGON_HPP\n#define M1UNE_GEOMETRY_POLYGON_HPP 1\n\
-    \n#include <algorithm>\n#include <array>\n#include <cassert>\n#include <cmath>\n\
-    #include <cstddef>\n#include <limits>\n#include <optional>\n#include <vector>\n\
-    \n#include \"linear.hpp\"\n\nnamespace m1une {\nnamespace geometry {\n\nenum class\
-    \ PointInPolygon {\n    Outside = 0,\n    Boundary = 1,\n    Inside = 2,\n};\n\
-    \ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(\n    const std::array<Point<T>,\
-    \ 3>& triangle\n) {\n    return Point<long double>(\n        (\n            static_cast<long\
-    \ double>(triangle[0].x) +\n            static_cast<long double>(triangle[1].x)\
-    \ +\n            static_cast<long double>(triangle[2].x)\n        ) / 3,\n   \
-    \     (\n            static_cast<long double>(triangle[0].y) +\n            static_cast<long\
-    \ double>(triangle[1].y) +\n            static_cast<long double>(triangle[2].y)\n\
-    \        ) / 3\n    );\n}\n\nnamespace polygon_detail {\n\ninline bool close(\n\
-    \    const Point<long double>& first,\n    const Point<long double>& second,\n\
-    \    long double eps\n) {\n    return geometry::distance(first, second) <= eps;\n\
-    }\n\ninline void push_unique(\n    std::vector<Point<long double>>& points,\n\
-    \    const Point<long double>& point,\n    long double eps\n) {\n    for (const\
-    \ Point<long double>& existing : points) {\n        if (close(existing, point,\
-    \ eps)) return;\n    }\n    points.push_back(point);\n}\n\ntemplate <Coordinate\
-    \ T>\nstd::vector<Point<T>> clean_polygon_vertices(\n    std::vector<Point<T>>\
-    \ polygon,\n    long double eps\n) {\n    if (\n        polygon.size() >= 2 &&\n\
-    \        polygon.front() == polygon.back()\n    ) {\n        polygon.pop_back();\n\
-    \    }\n\n    std::vector<Point<T>> deduplicated;\n    for (const Point<T>& point\
-    \ : polygon) {\n        if (deduplicated.empty() || deduplicated.back() != point)\
-    \ {\n            deduplicated.push_back(point);\n        }\n    }\n    if (\n\
-    \        deduplicated.size() >= 2 &&\n        deduplicated.front() == deduplicated.back()\n\
-    \    ) {\n        deduplicated.pop_back();\n    }\n\n    bool changed = true;\n\
-    \    while (changed && deduplicated.size() >= 3) {\n        changed = false;\n\
-    \        std::vector<Point<T>> cleaned;\n        std::size_t size = deduplicated.size();\n\
-    \        for (std::size_t index = 0; index < size; ++index) {\n            const\
-    \ Point<T>& previous =\n                deduplicated[(index + size - 1) % size];\n\
-    \            const Point<T>& current = deduplicated[index];\n            const\
-    \ Point<T>& next =\n                deduplicated[(index + 1) % size];\n      \
-    \      if (\n                orientation(previous, current, next, eps) == 0 &&\n\
-    \                sign<T>(dot(current - previous, next - current), eps) >= 0\n\
-    \            ) {\n                changed = true;\n            } else {\n    \
-    \            cleaned.push_back(current);\n            }\n        }\n        deduplicated\
-    \ = std::move(cleaned);\n    }\n    return deduplicated;\n}\n\ntemplate <Coordinate\
-    \ T>\nbool in_ccw_triangle(\n    const Point<T>& point,\n    const Point<T>& first,\n\
-    \    const Point<T>& second,\n    const Point<T>& third,\n    long double eps\n\
-    ) {\n    return\n        orientation(first, second, point, eps) >= 0 &&\n    \
-    \    orientation(second, third, point, eps) >= 0 &&\n        orientation(third,\
-    \ first, point, eps) >= 0;\n}\n\n}  // namespace polygon_detail\n\ntemplate <Coordinate\
-    \ T>\nwide_type<T> polygon_area2(const std::vector<Point<T>>& polygon) {\n   \
-    \ wide_type<T> result = 0;\n    std::size_t n = polygon.size();\n    for (std::size_t\
-    \ i = 0; i < n; i++) {\n        result += cross(polygon[i], polygon[(i + 1) %\
-    \ n]);\n    }\n    return result;\n}\n\ntemplate <Coordinate T>\nlong double polygon_area(const\
-    \ std::vector<Point<T>>& polygon) {\n    return std::fabs(static_cast<long double>(polygon_area2(polygon)))\
-    \ / 2;\n}\n\ntemplate <Coordinate T>\nstd::optional<Point<long double>> polygon_centroid(\n\
-    \    const std::vector<Point<T>>& polygon,\n    long double eps = 1e-12L\n) {\n\
-    \    if (polygon.size() < 3) return std::nullopt;\n\n    wide_type<T> signed_area2\
-    \ = polygon_area2(polygon);\n    if (sign<T>(signed_area2, eps) == 0) return std::nullopt;\n\
-    \n    long double x_numerator = 0;\n    long double y_numerator = 0;\n    std::size_t\
-    \ size = polygon.size();\n    for (std::size_t index = 0; index < size; ++index)\
-    \ {\n        const Point<T>& current = polygon[index];\n        const Point<T>&\
-    \ next = polygon[(index + 1) % size];\n        long double weight = static_cast<long\
-    \ double>(cross(current, next));\n        x_numerator +=\n            (static_cast<long\
-    \ double>(current.x) +\n             static_cast<long double>(next.x)) *\n   \
-    \         weight;\n        y_numerator +=\n            (static_cast<long double>(current.y)\
-    \ +\n             static_cast<long double>(next.y)) *\n            weight;\n \
-    \   }\n    long double denominator =\n        3.0L * static_cast<long double>(signed_area2);\n\
-    \    return Point<long double>(\n        x_numerator / denominator,\n        y_numerator\
-    \ / denominator\n    );\n}\n\ntemplate <Coordinate T>\nstd::optional<Point<long\
-    \ double>> centroid(\n    const std::vector<Point<T>>& polygon,\n    long double\
-    \ eps = 1e-12L\n) {\n    return polygon_centroid(polygon, eps);\n}\n\ntemplate\
-    \ <Coordinate T>\nstd::optional<Point<long double>> polygon_center_of_gravity(\n\
-    \    const std::vector<Point<T>>& polygon,\n    long double eps = 1e-12L\n) {\n\
-    \    return polygon_centroid(polygon, eps);\n}\n\ntemplate <Coordinate T>\nbool\
-    \ is_simple_polygon(\n    const std::vector<Point<T>>& polygon,\n    long double\
-    \ eps = 1e-12L\n) {\n    if (polygon.size() < 3) return false;\n    std::size_t\
-    \ size = polygon.size();\n    for (std::size_t index = 0; index < size; ++index)\
-    \ {\n        const Point<T>& previous = polygon[(index + size - 1) % size];\n\
-    \        const Point<T>& current = polygon[index];\n        const Point<T>& next\
-    \ = polygon[(index + 1) % size];\n        if (current == next) return false;\n\
-    \        if (\n            orientation(previous, current, next, eps) == 0 &&\n\
-    \            sign<T>(dot(current - previous, next - current), eps) < 0\n     \
-    \   ) {\n            return false;\n        }\n    }\n    for (std::size_t first_index\
-    \ = 0; first_index < size; ++first_index) {\n        Segment<T> first{\n     \
-    \       polygon[first_index],\n            polygon[(first_index + 1) % size]\n\
-    \        };\n        for (\n            std::size_t second_index = first_index\
-    \ + 1;\n            second_index < size;\n            ++second_index\n       \
-    \ ) {\n            bool adjacent =\n                second_index == first_index\
-    \ + 1 ||\n                (first_index == 0 && second_index + 1 == size);\n  \
-    \          if (adjacent) continue;\n\n            Segment<T> second{\n       \
-    \         polygon[second_index],\n                polygon[(second_index + 1) %\
-    \ size]\n            };\n            if (intersects(first, second, eps)) return\
-    \ false;\n        }\n    }\n    return true;\n}\n\ntemplate <Coordinate T>\nstd::optional<std::vector<std::array<Point<T>,\
-    \ 3>>> triangulate_polygon(\n    std::vector<Point<T>> polygon,\n    long double\
-    \ eps = 1e-12L\n) {\n    polygon =\n        polygon_detail::clean_polygon_vertices(std::move(polygon),\
-    \ eps);\n    if (polygon.size() < 3) return std::nullopt;\n\n    wide_type<T>\
-    \ signed_area2 = polygon_area2(polygon);\n    if (sign<T>(signed_area2, eps) ==\
-    \ 0) return std::nullopt;\n    if (!is_simple_polygon(polygon, eps)) return std::nullopt;\n\
-    \    if (sign<T>(signed_area2, eps) < 0) {\n        std::reverse(polygon.begin(),\
-    \ polygon.end());\n    }\n\n    std::vector<std::size_t> remaining(polygon.size());\n\
-    \    for (std::size_t index = 0; index < polygon.size(); ++index) {\n        remaining[index]\
-    \ = index;\n    }\n\n    std::vector<std::array<Point<T>, 3>> result;\n    result.reserve(polygon.size()\
-    \ - 2);\n    while (remaining.size() > 3) {\n        bool found_ear = false;\n\
-    \        std::size_t size = remaining.size();\n        for (std::size_t position\
-    \ = 0; position < size; ++position) {\n            std::size_t previous_index\
-    \ =\n                remaining[(position + size - 1) % size];\n            std::size_t\
-    \ current_index = remaining[position];\n            std::size_t next_index =\n\
-    \                remaining[(position + 1) % size];\n            const Point<T>&\
-    \ previous = polygon[previous_index];\n            const Point<T>& current = polygon[current_index];\n\
-    \            const Point<T>& next = polygon[next_index];\n            if (orientation(previous,\
-    \ current, next, eps) <= 0) continue;\n\n            bool contains_vertex = false;\n\
-    \            for (std::size_t other_index : remaining) {\n                if (\n\
-    \                    other_index == previous_index ||\n                    other_index\
-    \ == current_index ||\n                    other_index == next_index\n       \
-    \         ) {\n                    continue;\n                }\n            \
-    \    if (\n                    polygon_detail::in_ccw_triangle(\n            \
-    \            polygon[other_index],\n                        previous,\n      \
-    \                  current,\n                        next,\n                 \
-    \       eps\n                    )\n                ) {\n                    contains_vertex\
-    \ = true;\n                    break;\n                }\n            }\n    \
-    \        if (contains_vertex) continue;\n\n            std::array<Point<T>, 3>\
-    \ triangle;\n            triangle[0] = previous;\n            triangle[1] = current;\n\
-    \            triangle[2] = next;\n            result.push_back(std::move(triangle));\n\
-    \            remaining.erase(\n                remaining.begin() +\n         \
-    \       static_cast<std::ptrdiff_t>(position)\n            );\n            found_ear\
-    \ = true;\n            break;\n        }\n        if (!found_ear) return std::nullopt;\n\
-    \    }\n\n    std::array<Point<T>, 3> triangle;\n    triangle[0] = polygon[remaining[0]];\n\
-    \    triangle[1] = polygon[remaining[1]];\n    triangle[2] = polygon[remaining[2]];\n\
-    \    if (orientation(triangle[0], triangle[1], triangle[2], eps) <= 0) {\n   \
-    \     return std::nullopt;\n    }\n    result.push_back(std::move(triangle));\n\
-    \    return result;\n}\n\ntemplate <Coordinate T>\nPointInPolygon point_in_polygon(\n\
-    \    const std::vector<Point<T>>& polygon,\n    const Point<T>& point,\n    long\
-    \ double eps = 1e-12L\n) {\n    bool inside = false;\n    std::size_t n = polygon.size();\n\
-    \    for (std::size_t i = 0; i < n; i++) {\n        const Point<T>& a = polygon[i];\n\
-    \        const Point<T>& b = polygon[(i + 1) % n];\n        if (on_segment(Segment<T>{a,\
-    \ b}, point, eps)) {\n            return PointInPolygon::Boundary;\n        }\n\
-    \n        if (a.y <= point.y) {\n            if (point.y < b.y && orientation(a,\
-    \ b, point, eps) > 0) {\n                inside = !inside;\n            }\n  \
-    \      } else if (b.y <= point.y && orientation(a, b, point, eps) < 0) {\n   \
-    \         inside = !inside;\n        }\n    }\n    return inside ? PointInPolygon::Inside\
-    \ : PointInPolygon::Outside;\n}\n\ntemplate <Coordinate T>\nstd::vector<Point<long\
-    \ double>> ray_polygon_intersections(\n    const Ray<T>& ray,\n    const std::vector<Point<T>>&\
-    \ polygon,\n    long double eps = 1e-12L\n) {\n    assert(ray.origin != ray.through);\n\
-    \    assert(polygon.size() >= 3);\n    std::vector<Point<long double>> result;\n\
-    \    std::size_t size = polygon.size();\n    for (std::size_t index = 0; index\
-    \ < size; ++index) {\n        Segment<T> edge{\n            polygon[index],\n\
-    \            polygon[(index + 1) % size]\n        };\n        const LinearIntersection\
-    \ intersection =\n            linear_intersection(ray, edge, eps);\n        if\
-    \ (intersection.kind == LinearIntersectionKind::Point) {\n            polygon_detail::push_unique(result,\
-    \ intersection.first, eps);\n        } else if (intersection.kind == LinearIntersectionKind::Segment)\
-    \ {\n            polygon_detail::push_unique(result, intersection.first, eps);\n\
-    \            polygon_detail::push_unique(result, intersection.second, eps);\n\
-    \        } else {\n            assert(intersection.kind == LinearIntersectionKind::Empty);\n\
-    \        }\n    }\n\n    Point<long double> origin(ray.origin);\n    Point<long\
-    \ double> direction =\n        Point<long double>(ray.through) - origin;\n   \
-    \ std::sort(\n        result.begin(),\n        result.end(),\n        [&](const\
-    \ Point<long double>& first, const Point<long double>& second) {\n           \
-    \ return dot(first - origin, direction) <\n                   dot(second - origin,\
-    \ direction);\n        }\n    );\n    return result;\n}\n\ntemplate <Coordinate\
-    \ T>\nstd::optional<Point<long double>> first_ray_polygon_intersection(\n    const\
-    \ Ray<T>& ray,\n    const std::vector<Point<T>>& polygon,\n    long double eps\
-    \ = 1e-12L\n) {\n    std::vector<Point<long double>> points =\n        ray_polygon_intersections(ray,\
-    \ polygon, eps);\n    if (points.empty()) return std::nullopt;\n    return points.front();\n\
-    }\n\ntemplate <Coordinate T>\nbool intersects(\n    const Ray<T>& ray,\n    const\
-    \ std::vector<Point<T>>& polygon,\n    long double eps = 1e-12L\n) {\n    assert(polygon.size()\
-    \ >= 3);\n    if (point_in_polygon(polygon, ray.origin, eps) != PointInPolygon::Outside)\
-    \ {\n        return true;\n    }\n    return !ray_polygon_intersections(ray, polygon,\
-    \ eps).empty();\n}\n\ntemplate <Coordinate T>\nbool intersects(\n    const std::vector<Point<T>>&\
-    \ polygon,\n    const Ray<T>& ray,\n    long double eps = 1e-12L\n) {\n    return\
-    \ intersects(ray, polygon, eps);\n}\n\ntemplate <Coordinate T>\nlong double distance(\n\
-    \    const Ray<T>& ray,\n    const std::vector<Point<T>>& polygon\n) {\n    assert(polygon.size()\
-    \ >= 3);\n    if (intersects(ray, polygon)) return 0;\n    long double result\
-    \ = std::numeric_limits<long double>::infinity();\n    std::size_t size = polygon.size();\n\
-    \    for (std::size_t index = 0; index < size; ++index) {\n        result = std::min(\n\
-    \            result,\n            distance(\n                ray,\n          \
-    \      Segment<T>{\n                    polygon[index],\n                    polygon[(index\
-    \ + 1) % size]\n                }\n            )\n        );\n    }\n    return\
-    \ result;\n}\n\ntemplate <Coordinate T>\nlong double distance(\n    const std::vector<Point<T>>&\
-    \ polygon,\n    const Ray<T>& ray\n) {\n    return distance(ray, polygon);\n}\n\
-    \ntemplate <Coordinate T>\nbool intersects(\n    const std::vector<Point<T>>&\
-    \ first,\n    const std::vector<Point<T>>& second,\n    long double eps = 1e-12L\n\
-    ) {\n    assert(first.size() >= 3);\n    assert(second.size() >= 3);\n    std::size_t\
-    \ first_size = first.size();\n    std::size_t second_size = second.size();\n \
-    \   for (\n        std::size_t first_index = 0;\n        first_index < first_size;\n\
-    \        ++first_index\n    ) {\n        Segment<T> first_edge{\n            first[first_index],\n\
-    \            first[(first_index + 1) % first_size]\n        };\n        for (\n\
-    \            std::size_t second_index = 0;\n            second_index < second_size;\n\
-    \            ++second_index\n        ) {\n            Segment<T> second_edge{\n\
-    \                second[second_index],\n                second[(second_index +\
-    \ 1) % second_size]\n            };\n            if (intersects(first_edge, second_edge,\
-    \ eps)) return true;\n        }\n    }\n    return\n        point_in_polygon(first,\
-    \ second.front(), eps) !=\n            PointInPolygon::Outside ||\n        point_in_polygon(second,\
-    \ first.front(), eps) !=\n            PointInPolygon::Outside;\n}\n\ntemplate\
-    \ <Coordinate T>\nlong double distance(\n    const std::vector<Point<T>>& first,\n\
-    \    const std::vector<Point<T>>& second\n) {\n    assert(first.size() >= 3);\n\
-    \    assert(second.size() >= 3);\n    if (intersects(first, second)) return 0;\n\
-    \n    long double result = std::numeric_limits<long double>::infinity();\n   \
-    \ std::size_t first_size = first.size();\n    std::size_t second_size = second.size();\n\
-    \    for (\n        std::size_t first_index = 0;\n        first_index < first_size;\n\
-    \        ++first_index\n    ) {\n        Segment<T> first_edge{\n            first[first_index],\n\
-    \            first[(first_index + 1) % first_size]\n        };\n        for (\n\
-    \            std::size_t second_index = 0;\n            second_index < second_size;\n\
-    \            ++second_index\n        ) {\n            Segment<T> second_edge{\n\
-    \                second[second_index],\n                second[(second_index +\
-    \ 1) % second_size]\n            };\n            result = std::min(result, distance(first_edge,\
-    \ second_edge));\n        }\n    }\n    return result;\n}\n\n}  // namespace geometry\n\
-    }  // namespace m1une\n\n#endif  // M1UNE_GEOMETRY_POLYGON_HPP\n"
+    }  // namespace m1une\n\n\n#line 5 \"verify/geometry/closest_points.test.cpp\"\
+    \n\n#line 8 \"verify/geometry/closest_points.test.cpp\"\n#include <cstdint>\n\
+    #include <vector>\n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 5 \"utilities/fast_io.hpp\"\
+    \n#include <array>\n#include <cerrno>\n#include <charconv>\n#include <cstddef>\n\
+    #include <cstdio>\n#include <cstdlib>\n#line 12 \"utilities/fast_io.hpp\"\n#include\
+    \ <cstring>\n#include <iterator>\n#include <string>\n#include <sys/stat.h>\n#line\
+    \ 17 \"utilities/fast_io.hpp\"\n#include <utility>\n#include <unistd.h>\n\nnamespace\
+    \ m1une {\nnamespace utilities {\nnamespace internal {\n\n// Detect std::begin(x),\
+    \ std::end(x).\ntemplate <class T, class = void>\nstruct is_range : std::false_type\
+    \ {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
+    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
+    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
+    \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
+    \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
+    \ std::void_t<typename std::remove_cv_t<std::remove_reference_t<T>>::value_type>>\
+    \ {\n    using type = typename std::remove_cv_t<std::remove_reference_t<T>>::value_type;\n\
+    };\n\ntemplate <class T>\nusing range_stored_value_t = typename range_stored_value<T>::type;\n\
+    \n// Treat strings and C strings as scalar output objects, not as ranges.\ntemplate\
+    \ <class T>\nstruct is_char_array : std::false_type {};\n\ntemplate <class T,\
+    \ std::size_t N>\nstruct is_char_array<T[N]>\n    : std::bool_constant<std::is_same_v<std::remove_cv_t<T>,\
+    \ char>> {};\n\ntemplate <class T>\nstruct is_string_like\n    : std::bool_constant<\n\
+    \          std::is_same_v<std::decay_t<T>, std::string>\n          || std::is_same_v<std::decay_t<T>,\
+    \ const char*>\n          || std::is_same_v<std::decay_t<T>, char*>\n        \
+    \  || is_char_array<std::remove_reference_t<T>>::value\n      > {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_string_like_v = is_string_like<T>::value;\n\
+    \n// ModInt-like type: x.val() is printable, and x can be assigned from long long.\n\
+    template <class T, class = void>\nstruct has_val_method : std::false_type {};\n\
+    \ntemplate <class T>\nstruct has_val_method<T, std::void_t<decltype(std::declval<const\
+    \ T&>().val())>>\n    : std::true_type {};\n\ntemplate <class T>\ninline constexpr\
+    \ bool has_val_method_v = has_val_method<T>::value;\n\ntemplate <class T, class\
+    \ = void>\nstruct has_static_mod_raw : std::false_type {};\n\ntemplate <class\
+    \ T>\nstruct has_static_mod_raw<\n    T, std::void_t<decltype(T::mod()), decltype(T::raw(std::declval<uint32_t>()))>>\n\
+    \    : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool has_static_mod_raw_v\
+    \ = has_static_mod_raw<T>::value;\n\n// libstdc++ before GCC 16 does not classify\
+    \ __int128 as an integral type in\n// strict ISO modes such as -std=c++23. Keep\
+    \ the fast-I/O interface independent\n// of that implementation detail.\ntemplate\
+    \ <class T>\ninline constexpr bool is_integral_v =\n    std::is_integral_v<T>\n\
+    \    || std::is_same_v<std::remove_cv_t<T>, __int128_t>\n    || std::is_same_v<std::remove_cv_t<T>,\
+    \ __uint128_t>;\n\ntemplate <class T>\ninline constexpr bool is_signed_v =\n \
+    \   std::is_signed_v<T>\n    || std::is_same_v<std::remove_cv_t<T>, __int128_t>;\n\
+    \ntemplate <class T>\nstruct make_unsigned {\n    using type = std::make_unsigned_t<T>;\n\
+    };\n\ntemplate <>\nstruct make_unsigned<__int128_t> {\n    using type = __uint128_t;\n\
+    };\n\ntemplate <>\nstruct make_unsigned<__uint128_t> {\n    using type = __uint128_t;\n\
+    };\n\ntemplate <class T>\nusing make_unsigned_t = typename make_unsigned<std::remove_cv_t<T>>::type;\n\
+    \n}  // namespace internal\n\nstruct FastInput {\n    static constexpr int buffer_size\
+    \ = 1 << 20;\n\n   private:\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
+    \    int _position;\n    int _length;\n    int _file_descriptor;\n    bool _streaming;\n\
+    \n    bool refill() {\n        _position = 0;\n        if (_streaming) {\n   \
+    \         ssize_t length;\n            do {\n                length = ::read(_file_descriptor,\
+    \ _buffer, buffer_size);\n            } while (length < 0 && errno == EINTR);\n\
+    \            if (length <= 0) {\n                _length = 0;\n              \
+    \  return false;\n            }\n            _length = int(length);\n        }\
+    \ else {\n            _length = int(std::fread(_buffer, 1, buffer_size, _stream));\n\
+    \        }\n        return _length != 0;\n    }\n\n    template <class T>\n  \
+    \  bool read_integer_from_stream(T& value) {\n        if (!skip_spaces()) return\
+    \ false;\n        int c = read_char_raw();\n\n        bool negative = false;\n\
+    \        if (c == '-') {\n            negative = true;\n            c = read_char_raw();\n\
+    \        }\n\n        if constexpr (internal::is_signed_v<T>) {\n            T\
+    \ result = 0;\n            while ('0' <= c && c <= '9') {\n                result\
+    \ = negative ? result * 10 - (c - '0')\n                                  : result\
+    \ * 10 + (c - '0');\n                c = read_char_raw();\n            }\n   \
+    \         value = result;\n        } else {\n            T result = 0;\n     \
+    \       while ('0' <= c && c <= '9') {\n                result = result * 10 +\
+    \ T(c - '0');\n                c = read_char_raw();\n            }\n         \
+    \   value = negative ? T(0) - result : result;\n        }\n        return true;\n\
+    \    }\n\n    bool prepare_number() {\n        if (_length - _position >= 64)\
+    \ return true;\n        const int remaining = _length - _position;\n        if\
+    \ (remaining > 0) std::memmove(_buffer, _buffer + _position, remaining);\n   \
+    \     const int added = int(std::fread(_buffer + remaining, 1, buffer_size - remaining,\
+    \ _stream));\n        _position = 0;\n        _length = remaining + added;\n \
+    \       if (_length < buffer_size) _buffer[_length] = '\\0';\n        return _length\
+    \ != 0;\n    }\n\n   public:\n    explicit FastInput(std::FILE* stream = stdin)\n\
+    \        : _stream(stream),\n          _position(0),\n          _length(0),\n\
+    \          _file_descriptor(::fileno(stream)),\n          _streaming([&] {\n \
+    \             struct stat status;\n              return _file_descriptor >= 0\n\
+    \                     && ::fstat(_file_descriptor, &status) == 0\n           \
+    \          && !S_ISREG(status.st_mode);\n          }()) {}\n\n    FastInput(const\
+    \ FastInput&) = delete;\n    FastInput& operator=(const FastInput&) = delete;\n\
+    \n    int read_char_raw() {\n        if (_position == _length && !refill()) return\
+    \ EOF;\n        return _buffer[_position++];\n    }\n\n    bool skip_spaces()\
+    \ {\n        int c = read_char_raw();\n        while (c != EOF && c <= ' ') c\
+    \ = read_char_raw();\n        if (c == EOF) return false;\n        --_position;\n\
+    \        return true;\n    }\n\n    bool read(char& value) {\n        if (!skip_spaces())\
+    \ return false;\n        value = char(read_char_raw());\n        return true;\n\
+    \    }\n\n    bool read(std::string& value) {\n        if (!skip_spaces()) return\
+    \ false;\n        value.clear();\n        while (true) {\n            const int\
+    \ begin = _position;\n            while (_position < _length &&\n            \
+    \       static_cast<unsigned char>(_buffer[_position]) > ' ') {\n            \
+    \    ++_position;\n            }\n            value.append(_buffer + begin, _position\
+    \ - begin);\n            if (_position < _length) {\n                ++_position;\n\
+    \                return true;\n            }\n            if (!refill()) return\
+    \ true;\n        }\n    }\n\n    bool read(bool& value) {\n        int x;\n  \
+    \      if (!read(x)) return false;\n        value = x != 0;\n        return true;\n\
+    \    }\n\n    template <class T>\n    std::enable_if_t<\n        internal::is_integral_v<T>\n\
+    \            && !std::is_same_v<std::remove_cv_t<T>, bool>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ char>,\n        bool\n    >\n    read(T& value) {\n        if (_streaming) return\
+    \ read_integer_from_stream(value);\n        if (!prepare_number()) return false;\n\
+    \        int c = static_cast<unsigned char>(_buffer[_position++]);\n        while\
+    \ (c <= ' ') c = static_cast<unsigned char>(_buffer[_position++]);\n\n       \
+    \ bool negative = false;\n        if (c == '-') {\n            negative = true;\n\
+    \            c = static_cast<unsigned char>(_buffer[_position++]);\n        }\n\
+    \n        if constexpr (internal::is_signed_v<T>) {\n            T result = 0;\n\
+    \            while ('0' <= c && c <= '9') {\n                const int first =\
+    \ c - '0';\n                const int second = static_cast<unsigned char>(_buffer[_position])\
+    \ - '0';\n                if (0 <= second && second <= 9) {\n                \
+    \    result = negative ? result * 100 - (first * 10 + second)\n              \
+    \                        : result * 100 + (first * 10 + second);\n           \
+    \         ++_position;\n                } else {\n                    result =\
+    \ negative ? result * 10 - first : result * 10 + first;\n                }\n \
+    \               c = static_cast<unsigned char>(_buffer[_position++]);\n      \
+    \      }\n            value = result;\n        } else {\n            T result\
+    \ = 0;\n            while ('0' <= c && c <= '9') {\n                const unsigned\
+    \ first = unsigned(c - '0');\n                const int second = static_cast<unsigned\
+    \ char>(_buffer[_position]) - '0';\n                if (0 <= second && second\
+    \ <= 9) {\n                    result = result * 100 + T(first * 10 + unsigned(second));\n\
+    \                    ++_position;\n                } else {\n                \
+    \    result = result * 10 + T(first);\n                }\n                c =\
+    \ static_cast<unsigned char>(_buffer[_position++]);\n            }\n         \
+    \   value = negative ? T(0) - result : result;\n        }\n        if (_position\
+    \ > _length) _position = _length;\n        return true;\n    }\n\n    template\
+    \ <class T>\n    std::enable_if_t<std::is_floating_point_v<T>, bool>\n    read(T&\
+    \ value) {\n        if (!skip_spaces()) return false;\n        int c = read_char_raw();\n\
+    \        bool negative = false;\n        if (c == '-' || c == '+') {\n       \
+    \     negative = c == '-';\n            c = read_char_raw();\n        }\n\n  \
+    \      long double result = 0;\n        while ('0' <= c && c <= '9') {\n     \
+    \       result = result * 10 + (c - '0');\n            c = read_char_raw();\n\
+    \        }\n        if (c == '.') {\n            long double place = 0.1L;\n \
+    \           c = read_char_raw();\n            while ('0' <= c && c <= '9') {\n\
+    \                result += (c - '0') * place;\n                place *= 0.1L;\n\
+    \                c = read_char_raw();\n            }\n        }\n        if (c\
+    \ == 'e' || c == 'E') {\n            c = read_char_raw();\n            bool exponent_negative\
+    \ = false;\n            if (c == '-' || c == '+') {\n                exponent_negative\
+    \ = c == '-';\n                c = read_char_raw();\n            }\n         \
+    \   int exponent = 0;\n            while ('0' <= c && c <= '9') {\n          \
+    \      exponent = exponent * 10 + (c - '0');\n                c = read_char_raw();\n\
+    \            }\n            long double scale = 1;\n            long double power\
+    \ = 10;\n            while (exponent > 0) {\n                if (exponent & 1)\
+    \ scale *= power;\n                power *= power;\n                exponent >>=\
+    \ 1;\n            }\n            result = exponent_negative ? result / scale :\
+    \ result * scale;\n        }\n        value = static_cast<T>(negative ? -result\
+    \ : result);\n        return true;\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
+    \        internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
+    \            && !internal::is_range_v<T>,\n        bool\n    >\n    read(T& value)\
+    \ {\n        long long x;\n        if (!read(x)) return false;\n        if constexpr\
+    \ (internal::has_static_mod_raw_v<T>) {\n            if (x >= 0 && uint64_t(x)\
+    \ < uint64_t(T::mod())) {\n                value = T::raw(uint32_t(x));\n    \
+    \        } else {\n                value = T(x);\n            }\n        } else\
+    \ {\n            value = T(x);\n        }\n        return true;\n    }\n\n   \
+    \ template <class First, class Second>\n    bool read(std::pair<First, Second>&\
+    \ value) {\n        if (!read(value.first)) return false;\n        return read(value.second);\n\
+    \    }\n\n    template <class Range>\n    std::enable_if_t<\n        internal::is_range_v<Range>\n\
+    \            && !internal::is_string_like_v<Range>,\n        bool\n    >\n   \
+    \ read(Range& range) {\n        using StoredValue = internal::range_stored_value_t<Range>;\n\
+    \        constexpr bool nested = internal::is_range_v<StoredValue>\n         \
+    \                       && !internal::is_string_like_v<StoredValue>;\n\n     \
+    \   for (auto&& value : range) {\n            if constexpr (std::is_same_v<StoredValue,\
+    \ bool> && !nested) {\n                bool x;\n                if (!read(x))\
+    \ return false;\n                value = x;\n            } else {\n          \
+    \      if (!read(value)) return false;\n            }\n        }\n        return\
+    \ true;\n    }\n\n    template <class First, class Second, class... Rest>\n  \
+    \  bool read(First& first, Second& second, Rest&... rest) {\n        if (!read(first))\
+    \ return false;\n        return read(second, rest...);\n    }\n\n    template\
+    \ <class T>\n    FastInput& operator>>(T& value) {\n        if (!read(value))\
+    \ std::abort();\n        return *this;\n    }\n};\n\nstruct FastOutput {\n   \
+    \ static constexpr int buffer_size = 1 << 20;\n\n   private:\n    inline static\
+    \ const auto digit_quads = [] {\n        std::array<char, 40000> result{};\n \
+    \       for (int i = 0; i < 10000; i++) {\n            int value = i;\n      \
+    \      for (int j = 3; j >= 0; j--) {\n                result[4 * i + j] = char('0'\
+    \ + value % 10);\n                value /= 10;\n            }\n        }\n   \
+    \     return result;\n    }();\n\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
+    \    int _position;\n    int _precision;\n    std::chars_format _float_format;\n\
+    \    char _range_separator;\n\n   public:\n    explicit FastOutput(std::FILE*\
+    \ stream = stdout)\n        : _stream(stream),\n          _position(0),\n    \
+    \      _precision(6),\n          _float_format(std::chars_format::general),\n\
+    \          _range_separator(' ') {}\n\n    FastOutput(const FastOutput&) = delete;\n\
+    \    FastOutput& operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n\
+    \        flush();\n    }\n\n    void flush() {\n        if (_position != 0) {\n\
+    \            std::fwrite(_buffer, 1, _position, _stream);\n            _position\
+    \ = 0;\n        }\n        std::fflush(_stream);\n    }\n\n    void write_char(char\
+    \ c) {\n        if (_position == buffer_size) flush();\n        _buffer[_position++]\
+    \ = c;\n    }\n\n    void write(const char* s) {\n        while (*s != '\\0')\
+    \ write_char(*s++);\n    }\n\n    void write(const std::string& s) {\n       \
+    \ std::size_t position = 0;\n        while (position < s.size()) {\n         \
+    \   if (_position == buffer_size) flush();\n            const std::size_t copied\
+    \ =\n                std::min<std::size_t>(buffer_size - _position, s.size() -\
+    \ position);\n            std::memcpy(_buffer + _position, s.data() + position,\
+    \ copied);\n            _position += int(copied);\n            position += copied;\n\
+    \        }\n    }\n\n    void write(char c) {\n        write_char(c);\n    }\n\
+    \n    void write(bool value) {\n        write_char(value ? '1' : '0');\n    }\n\
+    \n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>>\n\
+    \    write(T value) {\n        char digits[128];\n        auto [end, error] =\
+    \ std::to_chars(\n            digits,\n            digits + sizeof(digits),\n\
+    \            value,\n            _float_format,\n            _precision\n    \
+    \    );\n        if (error != std::errc()) std::abort();\n        for (const char*\
+    \ pointer = digits; pointer != end; pointer++) {\n            write_char(*pointer);\n\
+    \        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n        internal::is_integral_v<T>\n\
+    \            && !std::is_same_v<std::remove_cv_t<T>, bool>\n            && !std::is_same_v<std::remove_cv_t<T>,\
+    \ char>\n    >\n    write(T value) {\n        using Raw = std::remove_cv_t<T>;\n\
+    \        using Unsigned = internal::make_unsigned_t<Raw>;\n\n        Unsigned\
+    \ magnitude;\n        if constexpr (internal::is_signed_v<Raw>) {\n          \
+    \  if (value < 0) {\n                write_char('-');\n                magnitude\
+    \ = Unsigned(0) - Unsigned(value);\n            } else {\n                magnitude\
+    \ = Unsigned(value);\n            }\n        } else {\n            magnitude =\
+    \ value;\n        }\n\n        if (magnitude == 0) {\n            write_char('0');\n\
+    \            return;\n        }\n\n        unsigned chunks[16];\n        int count\
+    \ = 0;\n        while (magnitude >= 10000) {\n            const Unsigned quotient\
+    \ = magnitude / 10000;\n            chunks[count++] = unsigned(magnitude - quotient\
+    \ * 10000);\n            magnitude = quotient;\n        }\n        if (_position\
+    \ > buffer_size - 64) flush();\n        const unsigned leading = unsigned(magnitude);\n\
+    \        const char* first = digit_quads.data() + 4 * leading;\n        int skip\
+    \ = leading < 10 ? 3 : leading < 100 ? 2 : leading < 1000 ? 1 : 0;\n        for\
+    \ (; skip < 4; skip++) _buffer[_position++] = first[skip];\n        while (count--)\
+    \ {\n            const char* digits = digit_quads.data() + 4 * chunks[count];\n\
+    \            std::memcpy(_buffer + _position, digits, 4);\n            _position\
+    \ += 4;\n        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n \
+    \       internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
+    \            && !internal::is_range_v<T>\n    >\n    write(const T& value) {\n\
+    \        write(value.val());\n    }\n\n    template <class First, class Second>\n\
+    \    void write(const std::pair<First, Second>& value) {\n        write(value.first);\n\
+    \        write_char(' ');\n        write(value.second);\n    }\n\n    template\
+    \ <class Range>\n    std::enable_if_t<\n        internal::is_range_v<Range>\n\
+    \            && !internal::is_string_like_v<Range>\n    >\n    write(const Range&\
+    \ range) {\n        using StoredValue = internal::range_stored_value_t<const Range>;\n\
+    \        constexpr bool nested = internal::is_range_v<StoredValue>\n         \
+    \                       && !internal::is_string_like_v<StoredValue>;\n\n     \
+    \   bool first = true;\n        for (const auto& value : range) {\n          \
+    \  if (!first) write_char(nested ? '\\n' : _range_separator);\n            first\
+    \ = false;\n            if constexpr (std::is_same_v<StoredValue, bool> && !nested)\
+    \ {\n                write(static_cast<bool>(value));\n            } else {\n\
+    \                write(value);\n            }\n        }\n    }\n\n    template\
+    \ <class First, class... Rest>\n    void print(const First& first, const Rest&...\
+    \ rest) {\n        write(first);\n        ((write_char(' '), write(rest)), ...);\n\
+    \    }\n\n    void println() {\n        write_char('\\n');\n    }\n\n    void\
+    \ set_precision(int precision) {\n        _precision = precision;\n    }\n\n \
+    \   void set_fixed(int precision = 6) {\n        _float_format = std::chars_format::fixed;\n\
+    \        _precision = precision;\n    }\n\n    void set_general(int precision\
+    \ = 6) {\n        _float_format = std::chars_format::general;\n        _precision\
+    \ = precision;\n    }\n\n    void set_range_separator(char separator) {\n    \
+    \    _range_separator = separator;\n    }\n\n    template <class... Args>\n  \
+    \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
+    n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
+    \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
+    \ utilities\n}  // namespace m1une\n\n\n#line 12 \"verify/geometry/closest_points.test.cpp\"\
+    \n\nnamespace {\n\nusing namespace m1une::geometry;\nusing IntegerLine = Line<long\
+    \ long>;\nusing IntegerRay = Ray<long long>;\nusing IntegerSegment = Segment<long\
+    \ long>;\nusing P = Point<long long>;\nusing FloatingPoint = Point<long double>;\n\
+    \nbool close(long double first, long double second) {\n    return std::fabs(first\
+    \ - second) <= 1e-9L;\n}\n\nbool close(const FloatingPoint& first, const FloatingPoint&\
+    \ second) {\n    return distance(first, second) <= 1e-9L;\n}\n\nFloatingPoint\
+    \ floating(const P& point) {\n    return FloatingPoint(point);\n}\n\nLine<long\
+    \ double> floating(const IntegerLine& line) {\n    Line<long double> result;\n\
+    \    result.a = FloatingPoint(line.a);\n    result.b = FloatingPoint(line.b);\n\
+    \    return result;\n}\n\nSegment<long double> floating(const IntegerSegment&\
+    \ segment) {\n    Segment<long double> result;\n    result.a = FloatingPoint(segment.a);\n\
+    \    result.b = FloatingPoint(segment.b);\n    return result;\n}\n\nRay<long double>\
+    \ floating(const IntegerRay& ray) {\n    Ray<long double> result;\n    result.origin\
+    \ = FloatingPoint(ray.origin);\n    result.through = FloatingPoint(ray.through);\n\
+    \    return result;\n}\n\nbool contains(const FloatingPoint& object, const FloatingPoint&\
+    \ point) {\n    return close(object, point);\n}\n\nbool contains(const Line<long\
+    \ double>& line, const FloatingPoint& point) {\n    return on_line(line, point,\
+    \ 1e-9L);\n}\n\nbool contains(\n    const Segment<long double>& segment,\n   \
+    \ const FloatingPoint& point\n) {\n    return on_segment(segment, point, 1e-9L);\n\
+    }\n\nbool contains(const Ray<long double>& ray, const FloatingPoint& point) {\n\
+    \    return on_ray(ray, point, 1e-9L);\n}\n\ntemplate <class First, class Second>\n\
+    void verify_closest(const First& first, const Second& second) {\n    const ClosestPoints\
+    \ result = closest_points(first, second);\n    const ClosestPoints reversed =\
+    \ closest_points(second, first);\n    const auto floating_first = floating(first);\n\
+    \    const auto floating_second = floating(second);\n\n    assert(contains(floating_first,\
+    \ result.first));\n    assert(contains(floating_second, result.second));\n   \
+    \ assert(contains(floating_first, reversed.second));\n    assert(contains(floating_second,\
+    \ reversed.first));\n    assert(close(result.first, reversed.second));\n    assert(close(result.second,\
+    \ reversed.first));\n\n    const long double witness_distance =\n        m1une::geometry::distance(result.first,\
+    \ result.second);\n    assert(close(witness_distance, distance(first, second)));\n\
+    \n    if constexpr (requires { linear_intersection(first, second); }) {\n    \
+    \    const bool has_intersection =\n            linear_intersection(first, second).kind\
+    \ !=\n            LinearIntersectionKind::Empty;\n        assert((witness_distance\
+    \ <= 1e-9L) == has_intersection);\n    }\n}\n\nvoid test_examples() {\n    IntegerSegment\
+    \ segment;\n    segment.a = P(0, 0);\n    segment.b = P(2, 0);\n    IntegerRay\
+    \ ray;\n    ray.origin = P(5, 3);\n    ray.through = P(6, 3);\n    const ClosestPoints\
+    \ separated = closest_points(segment, ray);\n    assert(close(separated.first,\
+    \ FloatingPoint(2, 0)));\n    assert(close(separated.second, FloatingPoint(5,\
+    \ 3)));\n\n    IntegerLine horizontal;\n    horizontal.a = P(0, 0);\n    horizontal.b\
+    \ = P(1, 0);\n    IntegerLine vertical;\n    vertical.a = P(3, -1);\n    vertical.b\
+    \ = P(3, 1);\n    const ClosestPoints crossing = closest_points(horizontal, vertical);\n\
+    \    assert(close(crossing.first, FloatingPoint(3, 0)));\n    assert(close(crossing.first,\
+    \ crossing.second));\n\n    IntegerSegment first_overlap;\n    first_overlap.a\
+    \ = P(4, 0);\n    first_overlap.b = P(1, 0);\n    IntegerSegment second_overlap;\n\
+    \    second_overlap.a = P(2, 0);\n    second_overlap.b = P(6, 0);\n    const ClosestPoints\
+    \ overlap =\n        closest_points(first_overlap, second_overlap);\n    assert(close(overlap.first,\
+    \ FloatingPoint(2, 0)));\n    assert(close(overlap.first, overlap.second));\n\
+    }\n\nvoid test_scale_invariance() {\n    const long double scales[] = {1e-20L,\
+    \ 1.0L, 1e20L};\n    for (const long double scale : scales) {\n        Segment<long\
+    \ double> segment;\n        segment.a = FloatingPoint(0, 0);\n        segment.b\
+    \ = FloatingPoint(2 * scale, 0);\n        Ray<long double> ray;\n        ray.origin\
+    \ = FloatingPoint(5 * scale, 3 * scale);\n        ray.through = FloatingPoint(6\
+    \ * scale, 3 * scale);\n\n        const ClosestPoints result = closest_points(segment,\
+    \ ray);\n        const long double tolerance = 1e-9L * scale;\n        assert(\n\
+    \            distance(result.first, FloatingPoint(2 * scale, 0)) <=\n        \
+    \    tolerance\n        );\n        assert(\n            distance(result.second,\
+    \ FloatingPoint(5 * scale, 3 * scale)) <=\n            tolerance\n        );\n\
+    \        assert(\n            std::fabs(distance(segment, ray) - std::sqrt(18.0L)\
+    \ * scale) <=\n            tolerance\n        );\n    }\n}\n\nvoid test_exhaustive_small_integer_objects()\
+    \ {\n    std::vector<P> points;\n    for (long long x = -1; x <= 1; ++x) {\n \
+    \       for (long long y = -1; y <= 1; ++y) {\n            points.emplace_back(x,\
+    \ y);\n        }\n    }\n\n    std::vector<IntegerLine> lines;\n    std::vector<IntegerSegment>\
+    \ segments;\n    std::vector<IntegerRay> rays;\n    for (const P& first : points)\
+    \ {\n        for (const P& second : points) {\n            IntegerSegment segment;\n\
+    \            segment.a = first;\n            segment.b = second;\n           \
+    \ segments.push_back(segment);\n            if (first == second) continue;\n\n\
+    \            IntegerLine line;\n            line.a = first;\n            line.b\
+    \ = second;\n            lines.push_back(line);\n\n            IntegerRay ray;\n\
+    \            ray.origin = first;\n            ray.through = second;\n        \
+    \    rays.push_back(ray);\n        }\n    }\n\n    for (const P& first : points)\
+    \ {\n        for (const P& second : points) verify_closest(first, second);\n \
+    \       for (const IntegerLine& line : lines) verify_closest(first, line);\n \
+    \       for (const IntegerSegment& segment : segments) {\n            verify_closest(first,\
+    \ segment);\n        }\n        for (const IntegerRay& ray : rays) verify_closest(first,\
+    \ ray);\n    }\n    for (const IntegerLine& first : lines) {\n        for (const\
+    \ IntegerLine& second : lines) {\n            verify_closest(first, second);\n\
+    \        }\n        for (const IntegerSegment& segment : segments) {\n       \
+    \     verify_closest(first, segment);\n        }\n        for (const IntegerRay&\
+    \ ray : rays) verify_closest(first, ray);\n    }\n    for (const IntegerSegment&\
+    \ first : segments) {\n        for (const IntegerSegment& second : segments) {\n\
+    \            verify_closest(first, second);\n        }\n        for (const IntegerRay&\
+    \ ray : rays) verify_closest(first, ray);\n    }\n    for (const IntegerRay& first\
+    \ : rays) {\n        for (const IntegerRay& second : rays) {\n            verify_closest(first,\
+    \ second);\n        }\n    }\n}\n\nvoid test_random_integer_objects() {\n    std::uint64_t\
+    \ state = 0xa7d36c219e45bfULL;\n    auto random = [&state]() {\n        state\
+    \ ^= state << 7;\n        state ^= state >> 9;\n        return state;\n    };\n\
+    \    auto random_point = [&]() {\n        return P(\n            static_cast<long\
+    \ long>(random() % 41) - 20,\n            static_cast<long long>(random() % 41)\
+    \ - 20\n        );\n    };\n\n    for (int trial = 0; trial < 5000; ++trial) {\n\
+    \        P point = random_point();\n        IntegerLine line;\n        line.a\
+    \ = random_point();\n        do {\n            line.b = random_point();\n    \
+    \    } while (line.a == line.b);\n        IntegerSegment first_segment;\n    \
+    \    first_segment.a = random_point();\n        first_segment.b = random_point();\n\
+    \        IntegerSegment second_segment;\n        second_segment.a = random_point();\n\
+    \        second_segment.b = random_point();\n        IntegerRay first_ray;\n \
+    \       first_ray.origin = random_point();\n        do {\n            first_ray.through\
+    \ = random_point();\n        } while (first_ray.origin == first_ray.through);\n\
+    \        IntegerRay second_ray;\n        second_ray.origin = random_point();\n\
+    \        do {\n            second_ray.through = random_point();\n        } while\
+    \ (second_ray.origin == second_ray.through);\n\n        verify_closest(point,\
+    \ line);\n        verify_closest(point, first_segment);\n        verify_closest(point,\
+    \ first_ray);\n        verify_closest(line, first_segment);\n        verify_closest(line,\
+    \ first_ray);\n        verify_closest(first_segment, second_segment);\n      \
+    \  verify_closest(first_segment, first_ray);\n        verify_closest(first_ray,\
+    \ second_ray);\n    }\n}\n\n}  // namespace\n\nint main() {\n    test_examples();\n\
+    \    test_scale_invariance();\n    test_exhaustive_small_integer_objects();\n\
+    \    test_random_integer_objects();\n\n    m1une::utilities::FastInput fast_input;\n\
+    \    m1une::utilities::FastOutput fast_output;\n    fast_output.set_fixed(15);\n\
+    \n    int query_count;\n    fast_input >> query_count;\n    while (query_count--)\
+    \ {\n        Segment<long double> first;\n        Segment<long double> second;\n\
+    \        fast_input >> first.a.x >> first.a.y >> first.b.x >> first.b.y;\n   \
+    \     fast_input >> second.a.x >> second.a.y >> second.b.x >> second.b.y;\n  \
+    \      const ClosestPoints result = closest_points(first, second);\n        fast_output\
+    \ << distance(result.first, result.second) << '\\n';\n    }\n}\n"
+  code: "#define PROBLEM \"https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_2_D\"\
+    \n#define ERROR \"1e-8\"\n\n#include \"../../geometry/linear.hpp\"\n\n#include\
+    \ <cassert>\n#include <cmath>\n#include <cstdint>\n#include <vector>\n\n#include\
+    \ \"../../utilities/fast_io.hpp\"\n\nnamespace {\n\nusing namespace m1une::geometry;\n\
+    using IntegerLine = Line<long long>;\nusing IntegerRay = Ray<long long>;\nusing\
+    \ IntegerSegment = Segment<long long>;\nusing P = Point<long long>;\nusing FloatingPoint\
+    \ = Point<long double>;\n\nbool close(long double first, long double second) {\n\
+    \    return std::fabs(first - second) <= 1e-9L;\n}\n\nbool close(const FloatingPoint&\
+    \ first, const FloatingPoint& second) {\n    return distance(first, second) <=\
+    \ 1e-9L;\n}\n\nFloatingPoint floating(const P& point) {\n    return FloatingPoint(point);\n\
+    }\n\nLine<long double> floating(const IntegerLine& line) {\n    Line<long double>\
+    \ result;\n    result.a = FloatingPoint(line.a);\n    result.b = FloatingPoint(line.b);\n\
+    \    return result;\n}\n\nSegment<long double> floating(const IntegerSegment&\
+    \ segment) {\n    Segment<long double> result;\n    result.a = FloatingPoint(segment.a);\n\
+    \    result.b = FloatingPoint(segment.b);\n    return result;\n}\n\nRay<long double>\
+    \ floating(const IntegerRay& ray) {\n    Ray<long double> result;\n    result.origin\
+    \ = FloatingPoint(ray.origin);\n    result.through = FloatingPoint(ray.through);\n\
+    \    return result;\n}\n\nbool contains(const FloatingPoint& object, const FloatingPoint&\
+    \ point) {\n    return close(object, point);\n}\n\nbool contains(const Line<long\
+    \ double>& line, const FloatingPoint& point) {\n    return on_line(line, point,\
+    \ 1e-9L);\n}\n\nbool contains(\n    const Segment<long double>& segment,\n   \
+    \ const FloatingPoint& point\n) {\n    return on_segment(segment, point, 1e-9L);\n\
+    }\n\nbool contains(const Ray<long double>& ray, const FloatingPoint& point) {\n\
+    \    return on_ray(ray, point, 1e-9L);\n}\n\ntemplate <class First, class Second>\n\
+    void verify_closest(const First& first, const Second& second) {\n    const ClosestPoints\
+    \ result = closest_points(first, second);\n    const ClosestPoints reversed =\
+    \ closest_points(second, first);\n    const auto floating_first = floating(first);\n\
+    \    const auto floating_second = floating(second);\n\n    assert(contains(floating_first,\
+    \ result.first));\n    assert(contains(floating_second, result.second));\n   \
+    \ assert(contains(floating_first, reversed.second));\n    assert(contains(floating_second,\
+    \ reversed.first));\n    assert(close(result.first, reversed.second));\n    assert(close(result.second,\
+    \ reversed.first));\n\n    const long double witness_distance =\n        m1une::geometry::distance(result.first,\
+    \ result.second);\n    assert(close(witness_distance, distance(first, second)));\n\
+    \n    if constexpr (requires { linear_intersection(first, second); }) {\n    \
+    \    const bool has_intersection =\n            linear_intersection(first, second).kind\
+    \ !=\n            LinearIntersectionKind::Empty;\n        assert((witness_distance\
+    \ <= 1e-9L) == has_intersection);\n    }\n}\n\nvoid test_examples() {\n    IntegerSegment\
+    \ segment;\n    segment.a = P(0, 0);\n    segment.b = P(2, 0);\n    IntegerRay\
+    \ ray;\n    ray.origin = P(5, 3);\n    ray.through = P(6, 3);\n    const ClosestPoints\
+    \ separated = closest_points(segment, ray);\n    assert(close(separated.first,\
+    \ FloatingPoint(2, 0)));\n    assert(close(separated.second, FloatingPoint(5,\
+    \ 3)));\n\n    IntegerLine horizontal;\n    horizontal.a = P(0, 0);\n    horizontal.b\
+    \ = P(1, 0);\n    IntegerLine vertical;\n    vertical.a = P(3, -1);\n    vertical.b\
+    \ = P(3, 1);\n    const ClosestPoints crossing = closest_points(horizontal, vertical);\n\
+    \    assert(close(crossing.first, FloatingPoint(3, 0)));\n    assert(close(crossing.first,\
+    \ crossing.second));\n\n    IntegerSegment first_overlap;\n    first_overlap.a\
+    \ = P(4, 0);\n    first_overlap.b = P(1, 0);\n    IntegerSegment second_overlap;\n\
+    \    second_overlap.a = P(2, 0);\n    second_overlap.b = P(6, 0);\n    const ClosestPoints\
+    \ overlap =\n        closest_points(first_overlap, second_overlap);\n    assert(close(overlap.first,\
+    \ FloatingPoint(2, 0)));\n    assert(close(overlap.first, overlap.second));\n\
+    }\n\nvoid test_scale_invariance() {\n    const long double scales[] = {1e-20L,\
+    \ 1.0L, 1e20L};\n    for (const long double scale : scales) {\n        Segment<long\
+    \ double> segment;\n        segment.a = FloatingPoint(0, 0);\n        segment.b\
+    \ = FloatingPoint(2 * scale, 0);\n        Ray<long double> ray;\n        ray.origin\
+    \ = FloatingPoint(5 * scale, 3 * scale);\n        ray.through = FloatingPoint(6\
+    \ * scale, 3 * scale);\n\n        const ClosestPoints result = closest_points(segment,\
+    \ ray);\n        const long double tolerance = 1e-9L * scale;\n        assert(\n\
+    \            distance(result.first, FloatingPoint(2 * scale, 0)) <=\n        \
+    \    tolerance\n        );\n        assert(\n            distance(result.second,\
+    \ FloatingPoint(5 * scale, 3 * scale)) <=\n            tolerance\n        );\n\
+    \        assert(\n            std::fabs(distance(segment, ray) - std::sqrt(18.0L)\
+    \ * scale) <=\n            tolerance\n        );\n    }\n}\n\nvoid test_exhaustive_small_integer_objects()\
+    \ {\n    std::vector<P> points;\n    for (long long x = -1; x <= 1; ++x) {\n \
+    \       for (long long y = -1; y <= 1; ++y) {\n            points.emplace_back(x,\
+    \ y);\n        }\n    }\n\n    std::vector<IntegerLine> lines;\n    std::vector<IntegerSegment>\
+    \ segments;\n    std::vector<IntegerRay> rays;\n    for (const P& first : points)\
+    \ {\n        for (const P& second : points) {\n            IntegerSegment segment;\n\
+    \            segment.a = first;\n            segment.b = second;\n           \
+    \ segments.push_back(segment);\n            if (first == second) continue;\n\n\
+    \            IntegerLine line;\n            line.a = first;\n            line.b\
+    \ = second;\n            lines.push_back(line);\n\n            IntegerRay ray;\n\
+    \            ray.origin = first;\n            ray.through = second;\n        \
+    \    rays.push_back(ray);\n        }\n    }\n\n    for (const P& first : points)\
+    \ {\n        for (const P& second : points) verify_closest(first, second);\n \
+    \       for (const IntegerLine& line : lines) verify_closest(first, line);\n \
+    \       for (const IntegerSegment& segment : segments) {\n            verify_closest(first,\
+    \ segment);\n        }\n        for (const IntegerRay& ray : rays) verify_closest(first,\
+    \ ray);\n    }\n    for (const IntegerLine& first : lines) {\n        for (const\
+    \ IntegerLine& second : lines) {\n            verify_closest(first, second);\n\
+    \        }\n        for (const IntegerSegment& segment : segments) {\n       \
+    \     verify_closest(first, segment);\n        }\n        for (const IntegerRay&\
+    \ ray : rays) verify_closest(first, ray);\n    }\n    for (const IntegerSegment&\
+    \ first : segments) {\n        for (const IntegerSegment& second : segments) {\n\
+    \            verify_closest(first, second);\n        }\n        for (const IntegerRay&\
+    \ ray : rays) verify_closest(first, ray);\n    }\n    for (const IntegerRay& first\
+    \ : rays) {\n        for (const IntegerRay& second : rays) {\n            verify_closest(first,\
+    \ second);\n        }\n    }\n}\n\nvoid test_random_integer_objects() {\n    std::uint64_t\
+    \ state = 0xa7d36c219e45bfULL;\n    auto random = [&state]() {\n        state\
+    \ ^= state << 7;\n        state ^= state >> 9;\n        return state;\n    };\n\
+    \    auto random_point = [&]() {\n        return P(\n            static_cast<long\
+    \ long>(random() % 41) - 20,\n            static_cast<long long>(random() % 41)\
+    \ - 20\n        );\n    };\n\n    for (int trial = 0; trial < 5000; ++trial) {\n\
+    \        P point = random_point();\n        IntegerLine line;\n        line.a\
+    \ = random_point();\n        do {\n            line.b = random_point();\n    \
+    \    } while (line.a == line.b);\n        IntegerSegment first_segment;\n    \
+    \    first_segment.a = random_point();\n        first_segment.b = random_point();\n\
+    \        IntegerSegment second_segment;\n        second_segment.a = random_point();\n\
+    \        second_segment.b = random_point();\n        IntegerRay first_ray;\n \
+    \       first_ray.origin = random_point();\n        do {\n            first_ray.through\
+    \ = random_point();\n        } while (first_ray.origin == first_ray.through);\n\
+    \        IntegerRay second_ray;\n        second_ray.origin = random_point();\n\
+    \        do {\n            second_ray.through = random_point();\n        } while\
+    \ (second_ray.origin == second_ray.through);\n\n        verify_closest(point,\
+    \ line);\n        verify_closest(point, first_segment);\n        verify_closest(point,\
+    \ first_ray);\n        verify_closest(line, first_segment);\n        verify_closest(line,\
+    \ first_ray);\n        verify_closest(first_segment, second_segment);\n      \
+    \  verify_closest(first_segment, first_ray);\n        verify_closest(first_ray,\
+    \ second_ray);\n    }\n}\n\n}  // namespace\n\nint main() {\n    test_examples();\n\
+    \    test_scale_invariance();\n    test_exhaustive_small_integer_objects();\n\
+    \    test_random_integer_objects();\n\n    m1une::utilities::FastInput fast_input;\n\
+    \    m1une::utilities::FastOutput fast_output;\n    fast_output.set_fixed(15);\n\
+    \n    int query_count;\n    fast_input >> query_count;\n    while (query_count--)\
+    \ {\n        Segment<long double> first;\n        Segment<long double> second;\n\
+    \        fast_input >> first.a.x >> first.a.y >> first.b.x >> first.b.y;\n   \
+    \     fast_input >> second.a.x >> second.a.y >> second.b.x >> second.b.y;\n  \
+    \      const ClosestPoints result = closest_points(first, second);\n        fast_output\
+    \ << distance(result.first, result.second) << '\\n';\n    }\n}\n"
   dependsOn:
   - geometry/linear.hpp
   - geometry/point.hpp
   - geometry/detail/floating_predicate.hpp
-  isVerificationFile: false
-  path: geometry/polygon.hpp
-  requiredBy:
-  - geometry/all.hpp
-  - geometry/steiner_convex_decomposition.hpp
-  - geometry/convex_polygon.hpp
-  - geometry/convex_decomposition.hpp
+  - utilities/fast_io.hpp
+  isVerificationFile: true
+  path: verify/geometry/closest_points.test.cpp
+  requiredBy: []
   timestamp: '2026-08-20 22:35:59+09:00'
-  verificationStatus: LIBRARY_ALL_AC
-  verifiedWith:
-  - verify/geometry/polygon_operations.test.cpp
-  - verify/geometry/polygon_operations.test.cpp
-  - verify/geometry/point_in_polygon.test.cpp
-  - verify/geometry/convex_polygon.test.cpp
-  - verify/geometry/is_convex_polygon.test.cpp
-  - verify/geometry/centroid.test.cpp
-  - verify/geometry/steiner_convex_decomposition.test.cpp
-  - verify/geometry/convex_diameter.test.cpp
-  - verify/geometry/geometry_algorithms.test.cpp
-  - verify/geometry/polygon_area.test.cpp
-  - verify/geometry/convex_decomposition.test.cpp
-documentation_of: geometry/polygon.hpp
+  verificationStatus: TEST_ACCEPTED
+  verifiedWith: []
+documentation_of: verify/geometry/closest_points.test.cpp
 layout: document
-title: Polygons
+redirect_from:
+- /verify/verify/geometry/closest_points.test.cpp
+- /verify/verify/geometry/closest_points.test.cpp.html
+title: verify/geometry/closest_points.test.cpp
 ---
-
-## Overview
-
-This header provides polygon area, point containment, ray queries, polygon
-intersection and distance, triangulation, and centroids for general simple
-polygons.
-
-Polygons are represented by `std::vector<Point<T>>`. The first point must not be
-repeated at the end.
-
-## Point Containment
-
-`point_in_polygon` returns:
-
-* `PointInPolygon::Outside`
-* `PointInPolygon::Boundary`
-* `PointInPolygon::Inside`
-
-The polygon may be clockwise or counterclockwise and may be non-convex.
-
-## Functions
-
-| Function | Description | Complexity |
-| --- | --- | --- |
-| `centroid(triangle)` | Returns the filled triangle's centroid. The triangle is a `std::array<Point<T>, 3>`. | $O(1)$ |
-| `centroid(polygon, eps)` | Returns the uniformly filled polygon's centroid, or `nullopt` for zero area. | $O(N)$ |
-| `polygon_area2(polygon)` | Returns signed twice-area. Positive means counterclockwise. | $O(N)$ |
-| `polygon_area(polygon)` | Returns absolute area as `long double`. | $O(N)$ |
-| `polygon_centroid(polygon, eps)` | Returns the centroid of a uniformly filled polygon, or `nullopt` for zero area. | $O(N)$ |
-| `polygon_center_of_gravity(polygon, eps)` | Alias of `polygon_centroid`. | $O(N)$ |
-| `is_simple_polygon(polygon, eps)` | Tests whether polygon edges only meet at adjacent endpoints. | $O(N^2)$ |
-| `triangulate_polygon(polygon, eps)` | Ear-clips a simple polygon, or returns `nullopt` when triangulation fails. | $O(N^2)$ |
-| `point_in_polygon(polygon, point, eps)` | Classifies a point against any simple polygon. | $O(N)$ |
-| `ray_polygon_intersections(ray, polygon, eps)` | Returns distinct boundary events ordered from the ray origin. | $O(N \log N)$ |
-| `first_ray_polygon_intersection(ray, polygon, eps)` | Returns the first boundary event, or `nullopt`. | $O(N \log N)$ |
-| `intersects(ray, polygon, eps)` | Tests intersection with the closed filled polygon. Both argument orders are supported. | $O(N \log N)$ |
-| `distance(ray, polygon)` | Minimum distance to the closed filled polygon. Both argument orders are supported. | $O(N \log N)$ |
-| `intersects(first, second, eps)` | Tests whether two closed filled simple polygons intersect. | $O(NM)$ |
-| `distance(first, second)` | Minimum distance between two closed filled simple polygons. | $O(NM)$ |
-
-Polygon queries require at least three vertices unless stated otherwise.
-
-## Centroid and center of gravity
-
-`centroid(polygon)` and `polygon_centroid` compute the center of gravity of a
-lamina with uniform density over the polygon's filled area.
-`centroid(polygon)` is the geometry-wide overload and `polygon_centroid` is its
-explicitly named equivalent. Both accept clockwise or counterclockwise simple
-polygons and return `std::optional<Point<long double>>`.
-
-A polygon with zero signed area has no area centroid, so the function returns
-`std::nullopt`. This is different from the arithmetic mean of the vertices,
-which generally is not the polygon's center of gravity.
-
-For a triangle represented by `std::array<Point<T>, 3>`, `centroid(triangle)`
-returns the arithmetic mean of its three vertices. This formula is also the
-usual filled-area centroid for every nondegenerate triangle.
-
-## Triangulation
-
-`triangulate_polygon` uses ear clipping and accepts clockwise or
-counterclockwise simple polygons. It removes a repeated closing point,
-consecutive duplicate points, and redundant collinear boundary vertices before
-triangulation. The result contains counterclockwise triangles whose interiors
-are disjoint and whose union is the polygon. An input with $K$ remaining
-vertices produces $K-2$ triangles.
-
-The return value is `std::nullopt` for fewer than three effective vertices,
-zero area, self-intersection, or another failure to find a valid ear.
-
-## Ray intersections
-
-`ray_polygon_intersections` reports polygon-boundary events, not the whole
-filled interval inside the polygon. A collinear boundary overlap contributes
-its finite endpoints and the ray origin when the overlap starts there. Shared
-polygon vertices are deduplicated.
-
-`intersects(ray, polygon)` instead treats the polygon as a closed filled region,
-so a ray whose origin is inside the polygon intersects immediately.
-
-## Polygon intersection and distance
-
-`intersects(first, second)` and `distance(first, second)` accept any simple
-polygons, in clockwise or counterclockwise order.
-
-For optimized containment, cuts, diameter, intersection construction,
-Minkowski sums, and other convex-only operations, include
-[`geometry/convex_polygon.hpp`](convex_polygon.md).
-
-To partition a simple polygon into convex pieces, include
-[`geometry/convex_decomposition.hpp`](convex_decomposition.md). It provides a
-fast exact partition with a four-approximation guarantee on the piece count,
-and an exact minimum-piece dynamic program.
-
-## Example
-
-```cpp
-#include "geometry/polygon.hpp"
-
-#include <iostream>
-#include <vector>
-
-int main() {
-    using Point = m1une::geometry::Point<long long>;
-    std::vector<Point> polygon;
-    polygon.emplace_back(0, 0);
-    polygon.emplace_back(2, 0);
-    polygon.emplace_back(0, 2);
-
-    std::cout << m1une::geometry::polygon_area(polygon) << "\n"; // 2
-}
-```

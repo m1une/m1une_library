@@ -1854,6 +1854,9 @@ data:
       path: verify/geometry/closest_pair.test.cpp
       title: verify/geometry/closest_pair.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/geometry/closest_points.test.cpp
+      title: verify/geometry/closest_points.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/geometry/convex_decomposition.test.cpp
       title: verify/geometry/convex_decomposition.test.cpp
     - icon: ':heavy_check_mark:'

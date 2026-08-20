@@ -256,7 +256,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/centroid.test.cpp
   requiredBy: []
-  timestamp: '2026-08-20 22:08:49+09:00'
+  timestamp: '2026-08-20 22:35:59+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/centroid.test.cpp
