@@ -92,34 +92,38 @@ void test_linear_intersections() {
     Line<long double> line;
     line.a = Point<long double>(-10, 0);
     line.b = Point<long double>(10, 0);
-    auto points = circle_line_intersections(line, circle);
-    assert(points.size() == 2);
-    assert(close(points[0].x, -5));
-    assert(close(points[1].x, 5));
+    auto result = circle_boundary_intersection(line, circle);
+    assert(result.contact_count == 2);
+    assert(close(result.contacts[0].point.x, -5));
+    assert(close(result.contacts[1].point.x, 5));
     assert(intersects(line, circle));
 
     Segment<long long> crossing;
     crossing.a = Point<long long>(10, 0);
     crossing.b = Point<long long>(-2, 0);
-    points = circle_segment_intersections(circle, crossing);
-    assert(points.size() == 1);
-    assert(close(points[0].x, 5));
+    result = circle_boundary_intersection(circle, crossing);
+    assert(result.contact_count == 1);
+    assert(close(result.contacts[0].point.x, 5));
 
     Segment<long long> chord;
     chord.a = Point<long long>(10, 0);
     chord.b = Point<long long>(-10, 0);
-    points = circle_segment_intersections(chord, circle);
-    assert(points.size() == 2);
-    assert(close(points[0].x, 5));
-    assert(close(points[1].x, -5));
+    result = circle_boundary_intersection(chord, circle);
+    assert(result.contact_count == 2);
+    assert(close(result.contacts[0].point.x, 5));
+    assert(close(result.contacts[1].point.x, -5));
 
     Segment<long long> point_segment;
     point_segment.a = Point<long long>(0, 5);
     point_segment.b = point_segment.a;
-    assert(circle_segment_intersections(circle, point_segment).size() == 1);
+    assert(
+        circle_boundary_intersection(circle, point_segment).contact_count == 1
+    );
     point_segment.a = Point<long long>(0, 0);
     point_segment.b = point_segment.a;
-    assert(circle_segment_intersections(circle, point_segment).empty());
+    assert(
+        circle_boundary_intersection(circle, point_segment).contact_count == 0
+    );
 }
 
 void test_tangents() {

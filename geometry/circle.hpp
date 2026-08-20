@@ -2,6 +2,7 @@
 #define M1UNE_GEOMETRY_CIRCLE_HPP 1
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cmath>
 #include <cstddef>
@@ -35,6 +36,57 @@ enum class CircleRelation {
     InternallyTangent,
     Contained,
     Coincident,
+};
+
+enum class AngularCoverageKind {
+    Empty,
+    Point,
+    Arc,
+    Full,
+};
+
+struct AngularCoverage {
+    AngularCoverageKind kind = AngularCoverageKind::Empty;
+    long double begin = 0.0L;
+    long double end = 0.0L;
+};
+
+struct CircleContact {
+    Point<long double> point;
+    long double first_argument = 0.0L;
+    long double second_argument = 0.0L;
+};
+
+enum class CircleContactKind {
+    Empty,
+    Point,
+    TwoPoints,
+    Coincident,
+};
+
+struct CircleCircleIntersection {
+    CircleRelation relation = CircleRelation::Separate;
+    CircleContactKind contact_kind = CircleContactKind::Empty;
+    std::array<CircleContact, 2> contacts;
+    AngularCoverage first_inside_second;
+    AngularCoverage second_inside_first;
+
+    constexpr int contact_count() const noexcept {
+        if (contact_kind == CircleContactKind::Point) return 1;
+        if (contact_kind == CircleContactKind::TwoPoints) return 2;
+        return 0;
+    }
+};
+
+struct CircleLinearContact {
+    Point<long double> point;
+    long double circle_argument = 0.0L;
+    long double linear_parameter = 0.0L;
+};
+
+struct CircleLinearIntersection {
+    int contact_count = 0;
+    std::array<CircleLinearContact, 2> contacts;
 };
 
 namespace circle_detail {
@@ -195,6 +247,51 @@ constexpr long double circle_area(const Circle<T>& circle) {
     return std::numbers::pi_v<long double> * radius * radius;
 }
 
+inline long double normalize_circle_argument(long double argument) {
+    const long double full = 2.0L * std::numbers::pi_v<long double>;
+    argument = std::fmod(argument, full);
+    if (argument < 0.0L) argument += full;
+    if (argument == full) argument = 0.0L;
+    return argument;
+}
+
+template <Coordinate T>
+Point<long double> circle_point_at(
+    const Circle<T>& circle,
+    long double argument
+) {
+    assert(circle.radius >= 0);
+    const long double radius = static_cast<long double>(circle.radius);
+    return Point<long double>(circle.center) + Point<long double>(
+        radius * std::cos(argument),
+        radius * std::sin(argument)
+    );
+}
+
+inline long double angular_measure(const AngularCoverage& coverage) {
+    if (
+        coverage.kind == AngularCoverageKind::Empty ||
+        coverage.kind == AngularCoverageKind::Point
+    ) {
+        return 0.0L;
+    }
+    if (coverage.kind == AngularCoverageKind::Full) {
+        return 2.0L * std::numbers::pi_v<long double>;
+    }
+    assert(coverage.kind == AngularCoverageKind::Arc);
+    assert(coverage.begin <= coverage.end);
+    return coverage.end - coverage.begin;
+}
+
+template <Coordinate T>
+long double circle_arc_length(
+    const Circle<T>& circle,
+    const AngularCoverage& coverage
+) {
+    assert(circle.radius >= 0);
+    return static_cast<long double>(circle.radius) * angular_measure(coverage);
+}
+
 template <Coordinate C, Coordinate P>
 PointInCircle point_in_circle(
     const Circle<C>& circle,
@@ -264,6 +361,20 @@ bool on_circle(
             eps
         ) == 0;
     }
+}
+
+template <Coordinate C, Coordinate P>
+long double circle_argument(
+    const Circle<C>& circle,
+    const Point<P>& point
+) {
+    assert(circle.radius >= 0);
+    return normalize_circle_argument(std::atan2(
+        static_cast<long double>(point.y) -
+            static_cast<long double>(circle.center.y),
+        static_cast<long double>(point.x) -
+            static_cast<long double>(circle.center.x)
+    ));
 }
 
 template <Coordinate C, Coordinate P>
@@ -404,7 +515,7 @@ CircleRelation circle_relation(
 }
 
 template <Coordinate C, Coordinate L>
-std::vector<Point<long double>> circle_line_intersections(
+CircleLinearIntersection circle_boundary_intersection(
     const Circle<C>& circle,
     const Line<L>& line,
     long double eps = 1e-12L
@@ -413,135 +524,151 @@ std::vector<Point<long double>> circle_line_intersections(
     assert(line.a != line.b);
     assert(eps >= 0.0L);
 
-    Point<long double> center(circle.center);
-    Point<long double> a(line.a);
-    Point<long double> direction = Point<long double>(line.b) - a;
-    long double length = norm(direction);
-    Point<long double> unit = direction / length;
-    Point<long double> foot =
-        a + direction * (dot(center - a, direction) / dot(direction, direction));
-    long double distance_to_line = geometry::distance(center, foot);
-    long double radius = static_cast<long double>(circle.radius);
-    int relation = circle_detail::compare(distance_to_line, radius, eps);
-    if (relation > 0) return {};
-    if (relation == 0) return {foot};
+    const Point<long double> center(circle.center);
+    const Point<long double> origin(line.a);
+    const Point<long double> direction =
+        Point<long double>(line.b) - origin;
+    const long double squared_length = dot(direction, direction);
+    const long double length = std::sqrt(squared_length);
+    const long double foot_parameter =
+        dot(center - origin, direction) / squared_length;
+    const Point<long double> foot =
+        origin + direction * foot_parameter;
+    const long double distance_to_line = geometry::distance(center, foot);
+    const long double radius = static_cast<long double>(circle.radius);
+    const int relation =
+        circle_detail::compare(distance_to_line, radius, eps);
 
-    long double offset = std::sqrt(std::max(
+    CircleLinearIntersection result;
+    if (relation > 0) return result;
+    if (relation == 0) {
+        result.contact_count = 1;
+        result.contacts[0] = CircleLinearContact{
+            foot,
+            circle_argument(circle, foot),
+            foot_parameter
+        };
+        return result;
+    }
+
+    const long double offset = std::sqrt(std::max(
         0.0L,
         radius * radius - distance_to_line * distance_to_line
     ));
-    Point<long double> first = foot - unit * offset;
-    Point<long double> second = foot + unit * offset;
-    if (second < first) std::swap(first, second);
-    return {first, second};
+    const long double parameter_offset = offset / length;
+    result.contact_count = 2;
+    for (int index = 0; index < 2; ++index) {
+        const long double parameter = foot_parameter +
+            (index == 0 ? -parameter_offset : parameter_offset);
+        const Point<long double> point = origin + direction * parameter;
+        result.contacts[index] = CircleLinearContact{
+            point,
+            circle_argument(circle, point),
+            parameter
+        };
+    }
+    return result;
 }
 
-template <Coordinate C, Coordinate L>
-std::vector<Point<long double>> circle_line_intersections(
+template <Coordinate L, Coordinate C>
+CircleLinearIntersection circle_boundary_intersection(
     const Line<L>& line,
     const Circle<C>& circle,
     long double eps = 1e-12L
 ) {
-    return circle_line_intersections(circle, line, eps);
+    return circle_boundary_intersection(circle, line, eps);
 }
 
 template <Coordinate C, Coordinate R>
-std::vector<Point<long double>> circle_ray_intersections(
+CircleLinearIntersection circle_boundary_intersection(
     const Circle<C>& circle,
     const Ray<R>& ray,
     long double eps = 1e-12L
 ) {
-    assert(circle.radius >= 0);
     assert(ray.origin != ray.through);
-    assert(eps >= 0.0L);
-
-    Point<long double> origin(ray.origin);
-    Point<long double> direction = Point<long double>(ray.through) - origin;
-    Point<long double> unit = direction / norm(direction);
-    Line<R> line{ray.origin, ray.through};
-    std::vector<Point<long double>> line_points =
-        circle_line_intersections(circle, line, eps);
-    std::vector<Point<long double>> result;
-    for (Point<long double> point : line_points) {
-        long double along = dot(point - origin, unit);
-        if (along < -eps) continue;
-        if (std::fabs(along) <= eps) point = origin;
-        circle_detail::push_unique(result, point, eps);
-    }
-    std::sort(
-        result.begin(),
-        result.end(),
-        [&](const Point<long double>& first, const Point<long double>& second) {
-            return dot(first - origin, unit) < dot(second - origin, unit);
+    const Line<R> line{ray.origin, ray.through};
+    const CircleLinearIntersection line_result =
+        circle_boundary_intersection(circle, line, eps);
+    CircleLinearIntersection result;
+    for (int index = 0; index < line_result.contact_count; ++index) {
+        CircleLinearContact contact = line_result.contacts[index];
+        if (contact.linear_parameter < -eps) continue;
+        if (std::fabs(contact.linear_parameter) <= eps) {
+            contact.linear_parameter = 0.0L;
+            contact.point = Point<long double>(ray.origin);
+            contact.circle_argument = circle_argument(circle, contact.point);
         }
-    );
+        result.contacts[result.contact_count++] = contact;
+    }
     return result;
 }
 
-template <Coordinate C, Coordinate R>
-std::vector<Point<long double>> circle_ray_intersections(
+template <Coordinate R, Coordinate C>
+CircleLinearIntersection circle_boundary_intersection(
     const Ray<R>& ray,
     const Circle<C>& circle,
     long double eps = 1e-12L
 ) {
-    return circle_ray_intersections(circle, ray, eps);
+    return circle_boundary_intersection(circle, ray, eps);
 }
 
 template <Coordinate C, Coordinate S>
-std::vector<Point<long double>> circle_segment_intersections(
+CircleLinearIntersection circle_boundary_intersection(
     const Circle<C>& circle,
     const Segment<S>& segment,
     long double eps = 1e-12L
 ) {
     assert(circle.radius >= 0);
     assert(eps >= 0.0L);
+    CircleLinearIntersection result;
     if (segment.a == segment.b) {
         if (on_circle(circle, segment.a, eps)) {
-            return {Point<long double>(segment.a)};
+            const Point<long double> point(segment.a);
+            result.contact_count = 1;
+            result.contacts[0] = CircleLinearContact{
+                point,
+                circle_argument(circle, point),
+                0.0L
+            };
         }
-        return {};
+        return result;
     }
 
-    Point<long double> first_endpoint(segment.a);
-    Point<long double> direction =
-        Point<long double>(segment.b) - first_endpoint;
-    long double length = norm(direction);
-    Point<long double> unit = direction / length;
-    Line<S> line{segment.a, segment.b};
-    std::vector<Point<long double>> line_points =
-        circle_line_intersections(circle, line, eps);
-    std::vector<Point<long double>> result;
-    for (Point<long double> point : line_points) {
-        long double along = dot(point - first_endpoint, unit);
-        if (along < -eps || along > length + eps) continue;
-        if (std::fabs(along) <= eps) point = first_endpoint;
-        if (std::fabs(along - length) <= eps) {
-            point = Point<long double>(segment.b);
+    const Line<S> line{segment.a, segment.b};
+    const CircleLinearIntersection line_result =
+        circle_boundary_intersection(circle, line, eps);
+    for (int index = 0; index < line_result.contact_count; ++index) {
+        CircleLinearContact contact = line_result.contacts[index];
+        if (
+            contact.linear_parameter < -eps ||
+            contact.linear_parameter > 1.0L + eps
+        ) {
+            continue;
         }
-        circle_detail::push_unique(result, point, eps);
+        if (std::fabs(contact.linear_parameter) <= eps) {
+            contact.linear_parameter = 0.0L;
+            contact.point = Point<long double>(segment.a);
+        } else if (std::fabs(contact.linear_parameter - 1.0L) <= eps) {
+            contact.linear_parameter = 1.0L;
+            contact.point = Point<long double>(segment.b);
+        }
+        contact.circle_argument = circle_argument(circle, contact.point);
+        result.contacts[result.contact_count++] = contact;
     }
-    std::sort(
-        result.begin(),
-        result.end(),
-        [&](const Point<long double>& first, const Point<long double>& second) {
-            return dot(first - first_endpoint, unit) <
-                   dot(second - first_endpoint, unit);
-        }
-    );
     return result;
 }
 
-template <Coordinate C, Coordinate S>
-std::vector<Point<long double>> circle_segment_intersections(
+template <Coordinate S, Coordinate C>
+CircleLinearIntersection circle_boundary_intersection(
     const Segment<S>& segment,
     const Circle<C>& circle,
     long double eps = 1e-12L
 ) {
-    return circle_segment_intersections(circle, segment, eps);
+    return circle_boundary_intersection(circle, segment, eps);
 }
 
 template <Coordinate A, Coordinate B>
-std::vector<Point<long double>> circle_intersections(
+CircleCircleIntersection circle_boundary_intersection(
     const Circle<A>& first,
     const Circle<B>& second,
     long double eps = 1e-12L
@@ -549,55 +676,129 @@ std::vector<Point<long double>> circle_intersections(
     assert(first.radius >= 0);
     assert(second.radius >= 0);
     assert(eps >= 0.0L);
-    CircleRelation relation = circle_relation(first, second, eps);
-    if (
-        relation == CircleRelation::Separate ||
-        relation == CircleRelation::Contained ||
-        relation == CircleRelation::Coincident
-    ) {
-        return {};
+    const long double full = 2.0L * std::numbers::pi_v<long double>;
+    const long double first_radius = static_cast<long double>(first.radius);
+    const long double second_radius = static_cast<long double>(second.radius);
+    CircleCircleIntersection result;
+    result.relation = circle_relation(first, second, eps);
+
+    auto point_coverage = [](long double argument) {
+        return AngularCoverage{
+            AngularCoverageKind::Point,
+            argument,
+            argument
+        };
+    };
+    auto full_coverage = [full]() {
+        return AngularCoverage{AngularCoverageKind::Full, 0.0L, full};
+    };
+
+    if (result.relation == CircleRelation::Coincident) {
+        if (first_radius == 0.0L) {
+            const Point<long double> point(first.center);
+            result.contact_kind = CircleContactKind::Point;
+            result.contacts[0] = CircleContact{point, 0.0L, 0.0L};
+            result.first_inside_second = point_coverage(0.0L);
+            result.second_inside_first = point_coverage(0.0L);
+        } else {
+            result.contact_kind = CircleContactKind::Coincident;
+            result.first_inside_second = full_coverage();
+            result.second_inside_first = full_coverage();
+        }
+        return result;
     }
 
-    Point<long double> first_center(first.center);
-    Point<long double> second_center(second.center);
-    Point<long double> direction = second_center - first_center;
-    long double center_distance = norm(direction);
-    long double first_radius = static_cast<long double>(first.radius);
-    long double second_radius = static_cast<long double>(second.radius);
-    long double along =
+    if (result.relation == CircleRelation::Separate) return result;
+    if (result.relation == CircleRelation::Contained) {
+        if (first_radius < second_radius) {
+            result.first_inside_second = first_radius == 0.0L
+                ? point_coverage(0.0L)
+                : full_coverage();
+        } else {
+            result.second_inside_first = second_radius == 0.0L
+                ? point_coverage(0.0L)
+                : full_coverage();
+        }
+        return result;
+    }
+
+    const Point<long double> first_center(first.center);
+    const Point<long double> second_center(second.center);
+    const Point<long double> center_direction = second_center - first_center;
+    const long double center_distance = norm(center_direction);
+    const Point<long double> unit = center_direction / center_distance;
+    const long double along =
         (first_radius * first_radius - second_radius * second_radius +
          center_distance * center_distance) /
         (2.0L * center_distance);
-    Point<long double> unit = direction / center_distance;
-    Point<long double> base = first_center + unit * along;
+    const Point<long double> base = first_center + unit * along;
+
     if (
-        relation == CircleRelation::ExternallyTangent ||
-        relation == CircleRelation::InternallyTangent
+        result.relation == CircleRelation::ExternallyTangent ||
+        result.relation == CircleRelation::InternallyTangent
     ) {
-        return {base};
+        const long double first_argument =
+            circle_argument(first, base);
+        const long double second_argument =
+            circle_argument(second, base);
+        result.contact_kind = CircleContactKind::Point;
+        result.contacts[0] = CircleContact{
+            base,
+            first_argument,
+            second_argument
+        };
+        result.first_inside_second = point_coverage(first_argument);
+        result.second_inside_first = point_coverage(second_argument);
+        if (result.relation == CircleRelation::InternallyTangent) {
+            if (first_radius < second_radius && first_radius > 0.0L) {
+                result.first_inside_second = full_coverage();
+            } else if (
+                second_radius < first_radius && second_radius > 0.0L
+            ) {
+                result.second_inside_first = full_coverage();
+            }
+        }
+        return result;
     }
 
-    long double height = std::sqrt(std::max(
+    assert(result.relation == CircleRelation::Intersecting);
+    const long double height = std::sqrt(std::max(
         0.0L,
         first_radius * first_radius - along * along
     ));
-    Point<long double> perpendicular(-unit.y, unit.x);
-    Point<long double> a = base - perpendicular * height;
-    Point<long double> b = base + perpendicular * height;
-    if (b < a) std::swap(a, b);
-    return {a, b};
-}
+    const Point<long double> perpendicular(-unit.y, unit.x);
+    const Point<long double> first_point = base - perpendicular * height;
+    const Point<long double> second_point = base + perpendicular * height;
+    result.contact_kind = CircleContactKind::TwoPoints;
+    result.contacts[0] = CircleContact{
+        first_point,
+        circle_argument(first, first_point),
+        circle_argument(second, first_point)
+    };
+    result.contacts[1] = CircleContact{
+        second_point,
+        circle_argument(first, second_point),
+        circle_argument(second, second_point)
+    };
 
-template <Coordinate C, Coordinate R>
-std::optional<Point<long double>> first_circle_ray_intersection(
-    const Circle<C>& circle,
-    const Ray<R>& ray,
-    long double eps = 1e-12L
-) {
-    std::vector<Point<long double>> points =
-        circle_ray_intersections(circle, ray, eps);
-    if (points.empty()) return std::nullopt;
-    return points.front();
+    const long double first_begin = result.contacts[0].first_argument;
+    long double first_end = result.contacts[1].first_argument;
+    if (first_end <= first_begin) first_end += full;
+    result.first_inside_second = AngularCoverage{
+        AngularCoverageKind::Arc,
+        first_begin,
+        first_end
+    };
+
+    const long double second_begin = result.contacts[1].second_argument;
+    long double second_end = result.contacts[0].second_argument;
+    if (second_end <= second_begin) second_end += full;
+    result.second_inside_first = AngularCoverage{
+        AngularCoverageKind::Arc,
+        second_begin,
+        second_end
+    };
+    return result;
 }
 
 template <Coordinate C, Coordinate L>
@@ -617,7 +818,7 @@ bool intersects(
             eps
         );
     }
-    return !circle_line_intersections(circle, line, eps).empty();
+    return circle_boundary_intersection(circle, line, eps).contact_count > 0;
 }
 
 template <Coordinate C, Coordinate L>
@@ -646,7 +847,7 @@ bool intersects(
             eps
         );
     }
-    return !circle_ray_intersections(circle, ray, eps).empty();
+    return circle_boundary_intersection(circle, ray, eps).contact_count > 0;
 }
 
 template <Coordinate C, Coordinate R>
@@ -675,7 +876,8 @@ bool intersects(
             eps
         );
     }
-    return !circle_segment_intersections(circle, segment, eps).empty();
+    return
+        circle_boundary_intersection(circle, segment, eps).contact_count > 0;
 }
 
 template <Coordinate C, Coordinate S>
@@ -1066,9 +1268,14 @@ ClosestPoints closest_points(
     );
     if (circle.filled) return closest_points(circle, point, eps);
 
-    const std::vector<Point<long double>> common =
-        circle_line_intersections(circle, line, eps);
-    if (!common.empty()) return ClosestPoints{common.front(), common.front()};
+    const CircleLinearIntersection common =
+        circle_boundary_intersection(circle, line, eps);
+    if (common.contact_count > 0) {
+        return ClosestPoints{
+            common.contacts[0].point,
+            common.contacts[0].point
+        };
+    }
     return ClosestPoints{
         circle_detail::point_toward(circle, point),
         point
@@ -1100,9 +1307,14 @@ ClosestPoints closest_points(
     );
     if (circle.filled) return closest_points(circle, point, eps);
 
-    const std::vector<Point<long double>> common =
-        circle_ray_intersections(circle, ray, eps);
-    if (!common.empty()) return ClosestPoints{common.front(), common.front()};
+    const CircleLinearIntersection common =
+        circle_boundary_intersection(circle, ray, eps);
+    if (common.contact_count > 0) {
+        return ClosestPoints{
+            common.contacts[0].point,
+            common.contacts[0].point
+        };
+    }
     return ClosestPoints{
         circle_detail::point_toward(circle, point),
         point
@@ -1132,9 +1344,14 @@ ClosestPoints closest_points(
     const Point<long double> projected = projection(converted, center);
     if (circle.filled) return closest_points(circle, projected, eps);
 
-    const std::vector<Point<long double>> common =
-        circle_segment_intersections(circle, segment, eps);
-    if (!common.empty()) return ClosestPoints{common.front(), common.front()};
+    const CircleLinearIntersection common =
+        circle_boundary_intersection(circle, segment, eps);
+    if (common.contact_count > 0) {
+        return ClosestPoints{
+            common.contacts[0].point,
+            common.contacts[0].point
+        };
+    }
     ClosestPoints result{
         circle_detail::point_toward(circle, projected),
         projected
@@ -1216,9 +1433,14 @@ ClosestPoints closest_points(
         };
     }
 
-    const std::vector<Point<long double>> common =
-        circle_intersections(first, second, eps);
-    if (!common.empty()) return ClosestPoints{common.front(), common.front()};
+    const CircleCircleIntersection common =
+        circle_boundary_intersection(first, second, eps);
+    if (common.contact_count() > 0) {
+        return ClosestPoints{
+            common.contacts[0].point,
+            common.contacts[0].point
+        };
+    }
 
     const Point<long double> first_center(first.center);
     const Point<long double> second_center(second.center);

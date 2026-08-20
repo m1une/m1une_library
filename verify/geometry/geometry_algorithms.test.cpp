@@ -89,18 +89,19 @@ void test_basic() {
     Line<long double> line;
     line.a = Point<long double>(-3, 0);
     line.b = Point<long double>(3, 0);
-    auto intersections = circle_line_intersections(circle, line);
-    assert(intersections.size() == 2);
-    assert(close(intersections[0].x, -2));
-    assert(close(intersections[1].x, 2));
+    auto intersections = circle_boundary_intersection(circle, line);
+    assert(intersections.contact_count == 2);
+    assert(close(intersections.contacts[0].point.x, -2));
+    assert(close(intersections.contacts[1].point.x, 2));
 
     Circle<long double> other;
     other.center = Point<long double>(3, 0);
     other.radius = 2;
     assert(circle_relation(circle, other) == CircleRelation::Intersecting);
-    auto circle_points = circle_intersections(circle, other);
-    assert(circle_points.size() == 2);
-    for ([[maybe_unused]] const auto& point : circle_points) {
+    auto circle_points = circle_boundary_intersection(circle, other);
+    assert(circle_points.contact_count() == 2);
+    for (int index = 0; index < circle_points.contact_count(); ++index) {
+        const auto& point = circle_points.contacts[index].point;
         assert(close(distance(point, circle.center), circle.radius));
         assert(close(distance(point, other.center), other.radius));
     }

@@ -18,6 +18,16 @@ bool close(long double first, long double second) {
     return std::fabs(first - second) <= 1e-10L;
 }
 
+std::vector<Point<long double>> contact_points(
+    const CircleLinearIntersection& intersection
+) {
+    std::vector<Point<long double>> result;
+    for (int index = 0; index < intersection.contact_count; ++index) {
+        result.push_back(intersection.contacts[index].point);
+    }
+    return result;
+}
+
 void test_intersections() {
     Circle<long long> circle;
     circle.center = P(0, 0);
@@ -26,7 +36,7 @@ void test_intersections() {
     Ray<long long> secant;
     secant.origin = P(-10, 0);
     secant.through = P(-9, 0);
-    auto points = circle_ray_intersections(circle, secant);
+    auto points = contact_points(circle_boundary_intersection(circle, secant));
     assert(points.size() == 2);
     assert(close(points[0].x, -5));
     assert(close(points[1].x, 5));
@@ -36,14 +46,14 @@ void test_intersections() {
     Ray<long long> inside;
     inside.origin = P(0, 0);
     inside.through = P(1, 0);
-    points = circle_ray_intersections(circle, inside);
+    points = contact_points(circle_boundary_intersection(circle, inside));
     assert(points.size() == 1);
     assert(close(points[0].x, 5));
 
     Ray<long long> tangent;
     tangent.origin = P(-10, 5);
     tangent.through = P(-9, 5);
-    points = circle_ray_intersections(circle, tangent);
+    points = contact_points(circle_boundary_intersection(circle, tangent));
     assert(points.size() == 1);
     assert(close(points[0].x, 0));
     assert(close(points[0].y, 5));
@@ -51,21 +61,23 @@ void test_intersections() {
     Ray<long long> away;
     away.origin = P(10, 0);
     away.through = P(11, 0);
-    assert(circle_ray_intersections(circle, away).empty());
+    const auto away_result = circle_boundary_intersection(circle, away);
+    assert(away_result.contact_count == 0);
     assert(!intersects(circle, away));
-    assert(!first_circle_ray_intersection(circle, away).has_value());
 
     Ray<long long> boundary;
     boundary.origin = P(5, 0);
     boundary.through = P(6, 0);
-    points = circle_ray_intersections(circle, boundary);
+    points = contact_points(circle_boundary_intersection(circle, boundary));
     assert(points.size() == 1);
     assert(close(points[0].x, 5));
 
     Circle<long long> point_circle;
     point_circle.center = P(2, 0);
     point_circle.radius = 0;
-    points = circle_ray_intersections(point_circle, inside);
+    points = contact_points(
+        circle_boundary_intersection(point_circle, inside)
+    );
     assert(points.size() == 1);
     assert(close(points[0].x, 2));
 }
@@ -142,7 +154,8 @@ void test_randomized_against_lines() {
         } while (ray.origin == ray.through);
 
         Line<long double> line{ray.origin, ray.through};
-        auto line_points = circle_line_intersections(circle, line);
+        const auto line_result = circle_boundary_intersection(circle, line);
+        auto line_points = contact_points(line_result);
         Point<long double> direction = ray.through - ray.origin;
         std::vector<Point<long double>> expected;
         for (const Point<long double>& point : line_points) {
@@ -159,7 +172,7 @@ void test_randomized_against_lines() {
             }
         );
 
-        auto actual = circle_ray_intersections(circle, ray);
+        auto actual = contact_points(circle_boundary_intersection(circle, ray));
         assert(actual.size() == expected.size());
         for (std::size_t index = 0; index < actual.size(); ++index) {
             assert(close(actual[index].x, expected[index].x));

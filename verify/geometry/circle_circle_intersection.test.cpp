@@ -3,6 +3,7 @@
 
 #include "../../geometry/circle.hpp"
 
+#include <algorithm>
 #include <cassert>
 #include "../../utilities/fast_io.hpp"
 
@@ -15,10 +16,14 @@ int main() {
     Circle<long long> second;
     fast_input >> first.center.x >> first.center.y >> first.radius;
     fast_input >> second.center.x >> second.center.y >> second.radius;
-    auto points = circle_intersections(first, second);
-    assert(!points.empty());
-    if (points.size() == 1) points.push_back(points.front());
+    const auto result = circle_boundary_intersection(first, second);
+    assert(result.contact_count() >= 1);
+    Point<long double> first_point = result.contacts[0].point;
+    Point<long double> second_point = result.contact_count() == 1
+        ? first_point
+        : result.contacts[1].point;
+    if (second_point < first_point) std::swap(first_point, second_point);
     fast_output.set_fixed(15);
-    fast_output << points[0].x << " " << points[0].y << " "
-                << points[1].x << " " << points[1].y << '\n';
+    fast_output << first_point.x << " " << first_point.y << " "
+                << second_point.x << " " << second_point.y << '\n';
 }

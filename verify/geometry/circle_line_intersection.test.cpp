@@ -3,6 +3,7 @@
 
 #include "../../geometry/circle.hpp"
 
+#include <algorithm>
 #include "../../utilities/fast_io.hpp"
 
 int main() {
@@ -19,9 +20,13 @@ int main() {
     while (q--) {
         Line<long double> line;
         fast_input >> line.a.x >> line.a.y >> line.b.x >> line.b.y;
-        auto points = circle_line_intersections(circle, line);
-        if (points.size() == 1) points.push_back(points[0]);
-        fast_output << points[0].x << " " << points[0].y << " "
-                  << points[1].x << " " << points[1].y << '\n';
+        const auto result = circle_boundary_intersection(circle, line);
+        Point<long double> first = result.contacts[0].point;
+        Point<long double> second = result.contact_count == 1
+            ? first
+            : result.contacts[1].point;
+        if (second < first) std::swap(first, second);
+        fast_output << first.x << " " << first.y << " "
+                  << second.x << " " << second.y << '\n';
     }
 }
