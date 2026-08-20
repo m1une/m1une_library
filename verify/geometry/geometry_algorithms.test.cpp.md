@@ -180,13 +180,14 @@ data:
     \n    Circle<long double> circle;\n    circle.center = Point<long double>(0, 0);\n\
     \    circle.radius = 2;\n    Line<long double> line;\n    line.a = Point<long\
     \ double>(-3, 0);\n    line.b = Point<long double>(3, 0);\n    auto intersections\
-    \ = circle_line_intersections(circle, line);\n    assert(intersections.size()\
-    \ == 2);\n    assert(close(intersections[0].x, -2));\n    assert(close(intersections[1].x,\
+    \ = circle_boundary_intersection(circle, line);\n    assert(intersections.contact_count\
+    \ == 2);\n    assert(close(intersections.contacts[0].point.x, -2));\n    assert(close(intersections.contacts[1].point.x,\
     \ 2));\n\n    Circle<long double> other;\n    other.center = Point<long double>(3,\
     \ 0);\n    other.radius = 2;\n    assert(circle_relation(circle, other) == CircleRelation::Intersecting);\n\
-    \    auto circle_points = circle_intersections(circle, other);\n    assert(circle_points.size()\
-    \ == 2);\n    for ([[maybe_unused]] const auto& point : circle_points) {\n   \
-    \     assert(close(distance(point, circle.center), circle.radius));\n        assert(close(distance(point,\
+    \    auto circle_points = circle_boundary_intersection(circle, other);\n    assert(circle_points.contact_count()\
+    \ == 2);\n    for (int index = 0; index < circle_points.contact_count(); ++index)\
+    \ {\n        const auto& point = circle_points.contacts[index].point;\n      \
+    \  assert(close(distance(point, circle.center), circle.radius));\n        assert(close(distance(point,\
     \ other.center), other.radius));\n    }\n\n    std::vector<P> collinear_points;\n\
     \    collinear_points.emplace_back(2, 0);\n    collinear_points.emplace_back(0,\
     \ 0);\n    collinear_points.emplace_back(1, 0);\n    assert(convex_hull(collinear_points).size()\
@@ -263,7 +264,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/geometry_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-08-21 00:19:11+09:00'
+  timestamp: '2026-08-21 00:43:43+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/geometry_algorithms.test.cpp

@@ -1815,6 +1815,9 @@ data:
       path: verify/geometry/centroid.test.cpp
       title: verify/geometry/centroid.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/geometry/circle_boundary_intersection.test.cpp
+      title: verify/geometry/circle_boundary_intersection.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/geometry/circle_circle_intersection.test.cpp
       title: verify/geometry/circle_circle_intersection.test.cpp
     - icon: ':heavy_check_mark:'

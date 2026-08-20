@@ -100,6 +100,9 @@ data:
     path: verify/geometry/centroid.test.cpp
     title: verify/geometry/centroid.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/circle_boundary_intersection.test.cpp
+    title: verify/geometry/circle_boundary_intersection.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/circle_circle_intersection.test.cpp
     title: verify/geometry/circle_circle_intersection.test.cpp
   - icon: ':heavy_check_mark:'
@@ -519,6 +522,7 @@ data:
   - verify/geometry/point_in_polygon.test.cpp
   - verify/geometry/perpendicular_bisector.test.cpp
   - verify/geometry/closest_pair.test.cpp
+  - verify/geometry/circle_boundary_intersection.test.cpp
   - verify/geometry/rectangle_union_area.test.cpp
   - verify/geometry/circle_union_area.test.cpp
   - verify/geometry/segment_intersection.test.cpp

@@ -26,8 +26,8 @@ data:
     PROBLEM: https://judge.yosupo.jp/problem/aplusb
     links:
     - https://judge.yosupo.jp/problem/aplusb
-  bundledCode: "#line 1 \"verify/geometry/circle_operations.test.cpp\"\n#define PROBLEM\
-    \ \"https://judge.yosupo.jp/problem/aplusb\"\n\n#line 1 \"geometry/circle.hpp\"\
+  bundledCode: "#line 1 \"verify/geometry/circle_boundary_intersection.test.cpp\"\n\
+    #define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#line 1 \"geometry/circle.hpp\"\
     \n\n\n\n#include <algorithm>\n#include <array>\n#include <cassert>\n#include <cmath>\n\
     #include <cstddef>\n#include <numbers>\n#include <optional>\n#include <type_traits>\n\
     #include <vector>\n\n#line 1 \"geometry/linear.hpp\"\n\n\n\n#line 7 \"geometry/linear.hpp\"\
@@ -1250,16 +1250,17 @@ data:
     \ A, Coordinate B>\nlong double distance(const Circle<A>& first, const Circle<B>&\
     \ second) {\n    const ClosestPoints result = closest_points(first, second);\n\
     \    return geometry::distance(result.first, result.second);\n}\n\n}  // namespace\
-    \ geometry\n}  // namespace m1une\n\n\n#line 4 \"verify/geometry/circle_operations.test.cpp\"\
-    \n\n#line 8 \"verify/geometry/circle_operations.test.cpp\"\n#include <cstdint>\n\
-    #line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 6 \"utilities/fast_io.hpp\"\n#include\
-    \ <cerrno>\n#include <charconv>\n#line 9 \"utilities/fast_io.hpp\"\n#include <cstdio>\n\
-    #include <cstdlib>\n#line 12 \"utilities/fast_io.hpp\"\n#include <cstring>\n#include\
-    \ <iterator>\n#include <string>\n#include <sys/stat.h>\n#line 17 \"utilities/fast_io.hpp\"\
-    \n#include <utility>\n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities\
-    \ {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class\
-    \ T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate <class T>\n\
-    struct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
+    \ geometry\n}  // namespace m1une\n\n\n#line 4 \"verify/geometry/circle_boundary_intersection.test.cpp\"\
+    \n\n#line 8 \"verify/geometry/circle_boundary_intersection.test.cpp\"\n#include\
+    \ <cstdint>\n#line 10 \"verify/geometry/circle_boundary_intersection.test.cpp\"\
+    \n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 6 \"utilities/fast_io.hpp\"\
+    \n#include <cerrno>\n#include <charconv>\n#line 9 \"utilities/fast_io.hpp\"\n\
+    #include <cstdio>\n#include <cstdlib>\n#line 12 \"utilities/fast_io.hpp\"\n#include\
+    \ <cstring>\n#include <iterator>\n#include <string>\n#include <sys/stat.h>\n#line\
+    \ 17 \"utilities/fast_io.hpp\"\n#include <utility>\n#include <unistd.h>\n\nnamespace\
+    \ m1une {\nnamespace utilities {\nnamespace internal {\n\n// Detect std::begin(x),\
+    \ std::end(x).\ntemplate <class T, class = void>\nstruct is_range : std::false_type\
+    \ {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
     \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
     \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
     \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
@@ -1494,288 +1495,228 @@ data:
     \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
     n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 12 \"verify/geometry/circle_operations.test.cpp\"\
-    \n\nnamespace {\n\nusing namespace m1une::geometry;\n\nbool close(long double\
-    \ first, long double second, long double eps = 1e-9L) {\n    long double scale\
-    \ = std::max({1.0L, std::fabs(first), std::fabs(second)});\n    return std::fabs(first\
-    \ - second) <= eps * scale;\n}\n\nvoid test_basic_queries() {\n    Circle<long\
-    \ long> circle;\n    circle.center = Point<long long>(2, -1);\n    circle.radius\
-    \ = 5;\n    assert(point_in_circle(circle, Point<int>(2, -1)) == PointInCircle::Inside);\n\
-    \    assert(\n        point_in_circle(circle, Point<int>(5, 3)) == PointInCircle::Boundary\n\
-    \    );\n    assert(\n        point_in_circle(circle, Point<int>(8, -1)) == PointInCircle::Outside\n\
-    \    );\n    assert(contains(circle, Point<int>(5, 3)));\n    assert(on_circle(circle,\
-    \ Point<int>(5, 3)));\n    assert(close(\n        circle_area(circle),\n     \
-    \   25.0L * std::numbers::pi_v<long double>\n    ));\n    assert(close(\n    \
-    \    circle_circumference(circle),\n        10.0L * std::numbers::pi_v<long double>\n\
-    \    ));\n\n    Circle<int> first;\n    first.center = Point<int>(0, 0);\n   \
-    \ first.radius = 5;\n    first.filled = false;\n    Circle<long long> second;\n\
-    \    second.center = Point<long long>(9, 0);\n    second.radius = 4;\n    second.filled\
-    \ = false;\n    assert(circle_relation(first, second) == CircleRelation::ExternallyTangent);\n\
-    \    assert(intersects(first, second));\n    second.center.x = 1;\n    second.radius\
-    \ = 2;\n    assert(circle_relation(first, second) == CircleRelation::Contained);\n\
-    \    assert(!intersects(first, second));\n}\n\nvoid test_constructions() {\n \
-    \   auto diameter = circle_from_diameter(\n        Point<int>(-2, 3),\n      \
-    \  Point<long long>(4, -5)\n    );\n    assert(close(diameter.center.x, 1));\n\
-    \    assert(close(diameter.center.y, -1));\n    assert(close(diameter.radius,\
-    \ 5));\n\n    Point<long long> first(0, 0);\n    Point<long long> second(6, 0);\n\
-    \    Point<long long> third(0, 8);\n    auto inner = incircle(first, second, third);\n\
-    \    assert(inner.has_value());\n    assert(close(inner->center.x, 2));\n    assert(close(inner->center.y,\
-    \ 2));\n    assert(close(inner->radius, 2));\n\n    auto outer = circumcircle(first,\
-    \ second, third);\n    assert(outer.has_value());\n    assert(close(outer->center.x,\
-    \ 3));\n    assert(close(outer->center.y, 4));\n    assert(close(outer->radius,\
-    \ 5));\n    assert(!incircle(first, second, Point<long long>(12, 0)).has_value());\n\
-    \    assert(!circumcircle(first, second, Point<long long>(12, 0)).has_value());\n\
-    }\n\nvoid test_linear_intersections() {\n    Circle<int> circle;\n    circle.center\
-    \ = Point<int>(0, 0);\n    circle.radius = 5;\n\n    Line<long double> line;\n\
-    \    line.a = Point<long double>(-10, 0);\n    line.b = Point<long double>(10,\
-    \ 0);\n    auto result = circle_boundary_intersection(line, circle);\n    assert(result.contact_count\
-    \ == 2);\n    assert(close(result.contacts[0].point.x, -5));\n    assert(close(result.contacts[1].point.x,\
-    \ 5));\n    assert(intersects(line, circle));\n\n    Segment<long long> crossing;\n\
-    \    crossing.a = Point<long long>(10, 0);\n    crossing.b = Point<long long>(-2,\
-    \ 0);\n    result = circle_boundary_intersection(circle, crossing);\n    assert(result.contact_count\
-    \ == 1);\n    assert(close(result.contacts[0].point.x, 5));\n\n    Segment<long\
-    \ long> chord;\n    chord.a = Point<long long>(10, 0);\n    chord.b = Point<long\
-    \ long>(-10, 0);\n    result = circle_boundary_intersection(chord, circle);\n\
-    \    assert(result.contact_count == 2);\n    assert(close(result.contacts[0].point.x,\
-    \ 5));\n    assert(close(result.contacts[1].point.x, -5));\n\n    Segment<long\
-    \ long> point_segment;\n    point_segment.a = Point<long long>(0, 5);\n    point_segment.b\
-    \ = point_segment.a;\n    assert(\n        circle_boundary_intersection(circle,\
-    \ point_segment).contact_count == 1\n    );\n    point_segment.a = Point<long\
-    \ long>(0, 0);\n    point_segment.b = point_segment.a;\n    assert(\n        circle_boundary_intersection(circle,\
-    \ point_segment).contact_count == 0\n    );\n}\n\nvoid test_tangents() {\n   \
-    \ Circle<long long> circle;\n    circle.center = Point<long long>(0, 0);\n   \
-    \ circle.radius = 5;\n    Point<long long> external(13, 0);\n    auto points =\
-    \ tangent_points(circle, external);\n    assert(points.size() == 2);\n    for\
-    \ (const Point<long double>& point : points) {\n        Point<long double> radius\
-    \ = point - Point<long double>(circle.center);\n        Point<long double> tangent\
-    \ = Point<long double>(external) - point;\n        assert(close(\n           \
-    \ norm(radius),\n            static_cast<long double>(circle.radius)\n       \
-    \ ));\n        assert(close(dot(radius, tangent), 0));\n    }\n    assert(tangent_points(circle,\
-    \ Point<long long>(0, 0)).empty());\n    assert(tangent_points(circle, Point<long\
-    \ long>(5, 0)).size() == 1);\n\n    Circle<long long> point_circle;\n    point_circle.center\
-    \ = Point<long long>(7, 4);\n    point_circle.radius = 0;\n    points = tangent_points(point_circle,\
-    \ Point<long long>(1, 2));\n    assert(points.size() == 1);\n    assert(close(points[0].x,\
-    \ 7));\n    assert(close(points[0].y, 4));\n}\n\nvoid test_common_tangents_randomized()\
-    \ {\n    std::uint64_t state = 0x319642b2d24d8ec3ULL;\n    auto random = [&]()\
-    \ {\n        state ^= state << 7;\n        state ^= state >> 9;\n        return\
-    \ state;\n    };\n    for (int trial = 0; trial < 10000; ++trial) {\n        Circle<long\
-    \ long> first;\n        Circle<long long> second;\n        first.center = Point<long\
-    \ long>(\n            static_cast<long long>(random() % 41) - 20,\n          \
-    \  static_cast<long long>(random() % 41) - 20\n        );\n        second.center\
-    \ = Point<long long>(\n            static_cast<long long>(random() % 41) - 20,\n\
-    \            static_cast<long long>(random() % 41) - 20\n        );\n        first.radius\
-    \ = static_cast<long long>(random() % 10) + 1;\n        second.radius = static_cast<long\
-    \ long>(random() % 10) + 1;\n        if (first.center == second.center && first.radius\
-    \ == second.radius) {\n            continue;\n        }\n\n        CircleRelation\
-    \ relation = circle_relation(first, second);\n        int expected = 0;\n    \
-    \    if (relation == CircleRelation::Separate) expected = 4;\n        if (relation\
-    \ == CircleRelation::ExternallyTangent) expected = 3;\n        if (relation ==\
-    \ CircleRelation::Intersecting) expected = 2;\n        if (relation == CircleRelation::InternallyTangent)\
-    \ expected = 1;\n        auto tangents = common_tangents(first, second);\n   \
-    \     assert(int(tangents.size()) == expected);\n        assert(common_tangent_points(first,\
-    \ second).size() == tangents.size());\n        for (const Line<long double>& tangent\
-    \ : tangents) {\n            assert(close(\n                distance(tangent,\
-    \ Point<long double>(first.center)),\n                static_cast<long double>(first.radius)\n\
-    \            ));\n            assert(close(\n                distance(tangent,\
-    \ Point<long double>(second.center)),\n                static_cast<long double>(second.radius)\n\
-    \            ));\n            assert(on_circle(first, tangent.a, 1e-9L));\n  \
-    \      }\n    }\n}\n\nvoid test_triangle_circles_randomized() {\n    std::uint64_t\
-    \ state = 0x94d049bb133111ebULL;\n    auto random = [&]() {\n        state ^=\
-    \ state << 7;\n        state ^= state >> 9;\n        return state;\n    };\n \
-    \   for (int trial = 0; trial < 5000; ++trial) {\n        Point<long long> first(\n\
-    \            static_cast<long long>(random() % 31) - 15,\n            static_cast<long\
-    \ long>(random() % 31) - 15\n        );\n        Point<long long> second(\n  \
-    \          static_cast<long long>(random() % 31) - 15,\n            static_cast<long\
-    \ long>(random() % 31) - 15\n        );\n        Point<long long> third(\n   \
-    \         static_cast<long long>(random() % 31) - 15,\n            static_cast<long\
-    \ long>(random() % 31) - 15\n        );\n        if (orientation(first, second,\
-    \ third) == 0) continue;\n\n        auto outer = circumcircle(first, second, third);\n\
-    \        assert(outer.has_value());\n        assert(close(\n            distance(outer->center,\
-    \ Point<long double>(first)),\n            outer->radius\n        ));\n      \
-    \  assert(close(\n            distance(outer->center, Point<long double>(second)),\n\
-    \            outer->radius\n        ));\n        assert(close(\n            distance(outer->center,\
-    \ Point<long double>(third)),\n            outer->radius\n        ));\n\n    \
-    \    auto inner = incircle(first, second, third);\n        assert(inner.has_value());\n\
-    \        Line<long double> first_side;\n        first_side.a = Point<long double>(first);\n\
-    \        first_side.b = Point<long double>(second);\n        Line<long double>\
-    \ second_side;\n        second_side.a = Point<long double>(second);\n        second_side.b\
-    \ = Point<long double>(third);\n        Line<long double> third_side;\n      \
-    \  third_side.a = Point<long double>(third);\n        third_side.b = Point<long\
-    \ double>(first);\n        assert(close(distance(first_side, inner->center), inner->radius));\n\
-    \        assert(close(distance(second_side, inner->center), inner->radius));\n\
-    \        assert(close(distance(third_side, inner->center), inner->radius));\n\
-    \    }\n}\n\nvoid test_intersection_areas() {\n    Circle<long double> first;\n\
-    \    first.center = Point<long double>(0, 0);\n    first.radius = 1;\n    Circle<long\
-    \ double> second = first;\n    assert(close(\n        circle_circle_intersection_area(first,\
-    \ second),\n        std::numbers::pi_v<long double>\n    ));\n    second.center.x\
-    \ = 1;\n    long double expected =\n        2.0L * std::numbers::pi_v<long double>\
-    \ / 3.0L -\n        std::sqrt(3.0L) / 2.0L;\n    assert(close(circle_circle_intersection_area(first,\
-    \ second), expected));\n    assert(close(circle_circle_intersection_area(second,\
-    \ first), expected));\n    second.center.x = 3;\n    assert(close(circle_circle_intersection_area(first,\
-    \ second), 0));\n    second.center.x = 0;\n    second.radius = 2;\n    assert(close(\n\
-    \        circle_circle_intersection_area(first, second),\n        std::numbers::pi_v<long\
-    \ double>\n    ));\n\n    std::vector<Point<long double>> square;\n    square.emplace_back(-2,\
-    \ -2);\n    square.emplace_back(2, -2);\n    square.emplace_back(2, 2);\n    square.emplace_back(-2,\
-    \ 2);\n    assert(close(\n        circle_polygon_intersection_area(first, square),\n\
-    \        std::numbers::pi_v<long double>\n    ));\n    std::reverse(square.begin(),\
-    \ square.end());\n    assert(close(\n        circle_polygon_intersection_area(first,\
-    \ square),\n        std::numbers::pi_v<long double>\n    ));\n\n    std::vector<Point<long\
-    \ double>> half_disk_box;\n    half_disk_box.emplace_back(0, -2);\n    half_disk_box.emplace_back(2,\
-    \ -2);\n    half_disk_box.emplace_back(2, 2);\n    half_disk_box.emplace_back(0,\
-    \ 2);\n    assert(close(\n        circle_polygon_intersection_area(first, half_disk_box),\n\
-    \        std::numbers::pi_v<long double> / 2.0L\n    ));\n\n    std::vector<Point<long\
-    \ double>> small_square;\n    small_square.emplace_back(-0.25L, -0.25L);\n   \
-    \ small_square.emplace_back(0.25L, -0.25L);\n    small_square.emplace_back(0.25L,\
-    \ 0.25L);\n    small_square.emplace_back(-0.25L, 0.25L);\n    assert(close(\n\
-    \        circle_polygon_intersection_area(first, small_square),\n        0.25L\n\
-    \    ));\n}\n\n}  // namespace\n\nint main() {\n    m1une::utilities::FastInput\
-    \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n\n    test_basic_queries();\n\
-    \    test_constructions();\n    test_linear_intersections();\n    test_tangents();\n\
-    \    test_common_tangents_randomized();\n    test_triangle_circles_randomized();\n\
-    \    test_intersection_areas();\n\n    long long first, second;\n    fast_input\
-    \ >> first >> second;\n    fast_output << first + second << '\\n';\n}\n"
+    \ utilities\n}  // namespace m1une\n\n\n#line 12 \"verify/geometry/circle_boundary_intersection.test.cpp\"\
+    \n\nnamespace {\n\nusing namespace m1une::geometry;\nusing P = Point<long long>;\n\
+    \nbool close(long double first, long double second) {\n    return std::fabs(first\
+    \ - second) <=\n        1e-9L * std::max({1.0L, std::fabs(first), std::fabs(second)});\n\
+    }\n\nbool close(\n    const Point<long double>& first,\n    const Point<long double>&\
+    \ second\n) {\n    return close(distance(first, second), 0.0L);\n}\n\ntemplate\
+    \ <Coordinate T>\nvoid validate_coverage(\n    const Circle<T>& circle,\n    const\
+    \ Circle<T>& enclosure,\n    const AngularCoverage& coverage\n) {\n    const long\
+    \ double full = 2.0L * std::numbers::pi_v<long double>;\n    if (coverage.kind\
+    \ == AngularCoverageKind::Empty) return;\n    assert(0.0L <= coverage.begin &&\
+    \ coverage.begin < full);\n    assert(coverage.begin <= coverage.end);\n    assert(coverage.end\
+    \ <= coverage.begin + full + 1e-9L);\n    if (coverage.kind == AngularCoverageKind::Point)\
+    \ {\n        assert(close(coverage.begin, coverage.end));\n        assert(\n \
+    \           point_in_circle(\n                enclosure,\n                circle_point_at(circle,\
+    \ coverage.begin),\n                1e-8L\n            ) != PointInCircle::Outside\n\
+    \        );\n        return;\n    }\n    if (coverage.kind == AngularCoverageKind::Full)\
+    \ {\n        assert(close(angular_measure(coverage), full));\n        for (int\
+    \ index = 0; index < 8; ++index) {\n            const long double argument = full\
+    \ * index / 8.0L;\n            assert(\n                point_in_circle(\n   \
+    \                 enclosure,\n                    circle_point_at(circle, argument),\n\
+    \                    1e-8L\n                ) != PointInCircle::Outside\n    \
+    \        );\n        }\n        return;\n    }\n\n    assert(coverage.kind ==\
+    \ AngularCoverageKind::Arc);\n    assert(coverage.begin < coverage.end);\n   \
+    \ const long double middle = (coverage.begin + coverage.end) / 2.0L;\n    const\
+    \ long double opposite = middle + std::numbers::pi_v<long double>;\n    assert(\n\
+    \        point_in_circle(\n            enclosure,\n            circle_point_at(circle,\
+    \ middle),\n            1e-8L\n        ) != PointInCircle::Outside\n    );\n \
+    \   assert(\n        point_in_circle(\n            enclosure,\n            circle_point_at(circle,\
+    \ opposite),\n            1e-8L\n        ) == PointInCircle::Outside\n    );\n\
+    }\n\nvoid test_fixed_circle_pairs() {\n    const Circle<long long> first{P(0,\
+    \ 0), 5, false};\n    const Circle<long long> second{P(6, 0), 5};\n    const CircleCircleIntersection\
+    \ crossing =\n        circle_boundary_intersection(first, second);\n    assert(crossing.relation\
+    \ == CircleRelation::Intersecting);\n    assert(crossing.contact_kind == CircleContactKind::TwoPoints);\n\
+    \    assert(crossing.contact_count() == 2);\n    assert(crossing.contacts[0].point\
+    \ == Point<long double>(3, -4));\n    assert(crossing.contacts[1].point == Point<long\
+    \ double>(3, 4));\n    assert(close(\n        circle_point_at(first, crossing.first_inside_second.begin),\n\
+    \        crossing.contacts[0].point\n    ));\n    assert(close(\n        circle_point_at(first,\
+    \ crossing.first_inside_second.end),\n        crossing.contacts[1].point\n   \
+    \ ));\n    validate_coverage(first, second, crossing.first_inside_second);\n \
+    \   validate_coverage(second, first, crossing.second_inside_first);\n    assert(close(\n\
+    \        circle_arc_length(first, crossing.first_inside_second),\n        first.radius\
+    \ * angular_measure(crossing.first_inside_second)\n    ));\n\n    const auto reversed\
+    \ = circle_boundary_intersection(second, first);\n    assert(close(\n        angular_measure(crossing.first_inside_second),\n\
+    \        angular_measure(reversed.second_inside_first)\n    ));\n    assert(close(\n\
+    \        angular_measure(crossing.second_inside_first),\n        angular_measure(reversed.first_inside_second)\n\
+    \    ));\n\n    const Circle<long long> separate{P(20, 0), 2};\n    const auto\
+    \ empty = circle_boundary_intersection(first, separate);\n    assert(empty.contact_kind\
+    \ == CircleContactKind::Empty);\n    assert(empty.first_inside_second.kind ==\
+    \ AngularCoverageKind::Empty);\n    assert(empty.second_inside_first.kind == AngularCoverageKind::Empty);\n\
+    \n    const Circle<long long> external{P(10, 0), 5};\n    const auto external_tangent\
+    \ =\n        circle_boundary_intersection(first, external);\n    assert(external_tangent.contact_kind\
+    \ == CircleContactKind::Point);\n    assert(\n        external_tangent.first_inside_second.kind\
+    \ ==\n        AngularCoverageKind::Point\n    );\n\n    const Circle<long long>\
+    \ small{P(0, 0), 2};\n    const auto contained = circle_boundary_intersection(small,\
+    \ first);\n    assert(contained.relation == CircleRelation::Contained);\n    assert(contained.first_inside_second.kind\
+    \ == AngularCoverageKind::Full);\n    assert(contained.second_inside_first.kind\
+    \ == AngularCoverageKind::Empty);\n\n    const Circle<long long> internally_tangent{P(3,\
+    \ 0), 2};\n    const auto internal =\n        circle_boundary_intersection(internally_tangent,\
+    \ first);\n    assert(internal.relation == CircleRelation::InternallyTangent);\n\
+    \    assert(internal.contact_kind == CircleContactKind::Point);\n    assert(internal.first_inside_second.kind\
+    \ == AngularCoverageKind::Full);\n    assert(internal.second_inside_first.kind\
+    \ == AngularCoverageKind::Point);\n\n    const auto coincident = circle_boundary_intersection(first,\
+    \ first);\n    assert(coincident.contact_kind == CircleContactKind::Coincident);\n\
+    \    assert(coincident.first_inside_second.kind == AngularCoverageKind::Full);\n\
+    \    assert(coincident.second_inside_first.kind == AngularCoverageKind::Full);\n\
+    \n    const Circle<long long> point_circle{P(2, -3), 0};\n    const auto coincident_point\
+    \ =\n        circle_boundary_intersection(point_circle, point_circle);\n    assert(coincident_point.contact_kind\
+    \ == CircleContactKind::Point);\n    assert(coincident_point.contact_count() ==\
+    \ 1);\n    assert(\n        coincident_point.first_inside_second.kind ==\n   \
+    \     AngularCoverageKind::Point\n    );\n}\n\nvoid test_linear_parameters() {\n\
+    \    const Circle<long long> circle{P(0, 0), 5, false};\n    const Line<long long>\
+    \ line{P(-10, 0), P(-9, 0)};\n    const auto line_result = circle_boundary_intersection(circle,\
+    \ line);\n    assert(line_result.contact_count == 2);\n    assert(close(line_result.contacts[0].linear_parameter,\
+    \ 5));\n    assert(close(line_result.contacts[1].linear_parameter, 15));\n   \
+    \ assert(line_result.contacts[0].point == Point<long double>(-5, 0));\n    assert(line_result.contacts[1].point\
+    \ == Point<long double>(5, 0));\n\n    const Ray<long long> ray{P(0, 0), P(1,\
+    \ 0)};\n    const auto ray_result = circle_boundary_intersection(circle, ray);\n\
+    \    assert(ray_result.contact_count == 1);\n    assert(close(ray_result.contacts[0].linear_parameter,\
+    \ 5));\n\n    const Segment<long long> segment{P(10, 0), P(-10, 0)};\n    const\
+    \ auto segment_result =\n        circle_boundary_intersection(circle, segment);\n\
+    \    assert(segment_result.contact_count == 2);\n    assert(close(segment_result.contacts[0].linear_parameter,\
+    \ 0.25L));\n    assert(close(segment_result.contacts[1].linear_parameter, 0.75L));\n\
+    \    assert(segment_result.contacts[0].point == Point<long double>(5, 0));\n \
+    \   assert(segment_result.contacts[1].point == Point<long double>(-5, 0));\n}\n\
+    \nvoid test_random_circle_pairs() {\n    std::uint64_t state = 0x243f6a8885a308d3ULL;\n\
+    \    auto random = [&state]() {\n        state ^= state << 7;\n        state ^=\
+    \ state >> 9;\n        return state;\n    };\n\n    for (int trial = 0; trial\
+    \ < 20000; ++trial) {\n        const Circle<long long> first{\n            P(\n\
+    \                static_cast<long long>(random() % 41) - 20,\n               \
+    \ static_cast<long long>(random() % 41) - 20\n            ),\n            static_cast<long\
+    \ long>(random() % 11),\n            static_cast<bool>(random() & 1)\n       \
+    \ };\n        const Circle<long long> second{\n            P(\n              \
+    \  static_cast<long long>(random() % 41) - 20,\n                static_cast<long\
+    \ long>(random() % 41) - 20\n            ),\n            static_cast<long long>(random()\
+    \ % 11),\n            static_cast<bool>(random() & 1)\n        };\n        const\
+    \ auto result = circle_boundary_intersection(first, second);\n        assert(result.relation\
+    \ == circle_relation(first, second));\n        assert(result.contact_count() <=\
+    \ 2);\n        for (int index = 0; index < result.contact_count(); ++index) {\n\
+    \            const CircleContact& contact = result.contacts[index];\n        \
+    \    assert(on_circle(first, contact.point, 1e-8L));\n            assert(on_circle(second,\
+    \ contact.point, 1e-8L));\n            assert(close(\n                circle_point_at(first,\
+    \ contact.first_argument),\n                contact.point\n            ));\n \
+    \           assert(close(\n                circle_point_at(second, contact.second_argument),\n\
+    \                contact.point\n            ));\n        }\n        validate_coverage(first,\
+    \ second, result.first_inside_second);\n        validate_coverage(second, first,\
+    \ result.second_inside_first);\n    }\n}\n\n}  // namespace\n\nint main() {\n\
+    \    test_fixed_circle_pairs();\n    test_linear_parameters();\n    test_random_circle_pairs();\n\
+    \n    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput output;\n\
+    \    long long first, second;\n    input >> first >> second;\n    output << first\
+    \ + second << '\\n';\n}\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
     ../../geometry/circle.hpp\"\n\n#include <algorithm>\n#include <cassert>\n#include\
-    \ <cmath>\n#include <cstdint>\n#include <numbers>\n#include <vector>\n#include\
-    \ \"../../utilities/fast_io.hpp\"\n\nnamespace {\n\nusing namespace m1une::geometry;\n\
-    \nbool close(long double first, long double second, long double eps = 1e-9L) {\n\
-    \    long double scale = std::max({1.0L, std::fabs(first), std::fabs(second)});\n\
-    \    return std::fabs(first - second) <= eps * scale;\n}\n\nvoid test_basic_queries()\
-    \ {\n    Circle<long long> circle;\n    circle.center = Point<long long>(2, -1);\n\
-    \    circle.radius = 5;\n    assert(point_in_circle(circle, Point<int>(2, -1))\
-    \ == PointInCircle::Inside);\n    assert(\n        point_in_circle(circle, Point<int>(5,\
-    \ 3)) == PointInCircle::Boundary\n    );\n    assert(\n        point_in_circle(circle,\
-    \ Point<int>(8, -1)) == PointInCircle::Outside\n    );\n    assert(contains(circle,\
-    \ Point<int>(5, 3)));\n    assert(on_circle(circle, Point<int>(5, 3)));\n    assert(close(\n\
-    \        circle_area(circle),\n        25.0L * std::numbers::pi_v<long double>\n\
-    \    ));\n    assert(close(\n        circle_circumference(circle),\n        10.0L\
-    \ * std::numbers::pi_v<long double>\n    ));\n\n    Circle<int> first;\n    first.center\
-    \ = Point<int>(0, 0);\n    first.radius = 5;\n    first.filled = false;\n    Circle<long\
-    \ long> second;\n    second.center = Point<long long>(9, 0);\n    second.radius\
-    \ = 4;\n    second.filled = false;\n    assert(circle_relation(first, second)\
-    \ == CircleRelation::ExternallyTangent);\n    assert(intersects(first, second));\n\
-    \    second.center.x = 1;\n    second.radius = 2;\n    assert(circle_relation(first,\
-    \ second) == CircleRelation::Contained);\n    assert(!intersects(first, second));\n\
-    }\n\nvoid test_constructions() {\n    auto diameter = circle_from_diameter(\n\
-    \        Point<int>(-2, 3),\n        Point<long long>(4, -5)\n    );\n    assert(close(diameter.center.x,\
-    \ 1));\n    assert(close(diameter.center.y, -1));\n    assert(close(diameter.radius,\
-    \ 5));\n\n    Point<long long> first(0, 0);\n    Point<long long> second(6, 0);\n\
-    \    Point<long long> third(0, 8);\n    auto inner = incircle(first, second, third);\n\
-    \    assert(inner.has_value());\n    assert(close(inner->center.x, 2));\n    assert(close(inner->center.y,\
-    \ 2));\n    assert(close(inner->radius, 2));\n\n    auto outer = circumcircle(first,\
-    \ second, third);\n    assert(outer.has_value());\n    assert(close(outer->center.x,\
-    \ 3));\n    assert(close(outer->center.y, 4));\n    assert(close(outer->radius,\
-    \ 5));\n    assert(!incircle(first, second, Point<long long>(12, 0)).has_value());\n\
-    \    assert(!circumcircle(first, second, Point<long long>(12, 0)).has_value());\n\
-    }\n\nvoid test_linear_intersections() {\n    Circle<int> circle;\n    circle.center\
-    \ = Point<int>(0, 0);\n    circle.radius = 5;\n\n    Line<long double> line;\n\
-    \    line.a = Point<long double>(-10, 0);\n    line.b = Point<long double>(10,\
-    \ 0);\n    auto result = circle_boundary_intersection(line, circle);\n    assert(result.contact_count\
-    \ == 2);\n    assert(close(result.contacts[0].point.x, -5));\n    assert(close(result.contacts[1].point.x,\
-    \ 5));\n    assert(intersects(line, circle));\n\n    Segment<long long> crossing;\n\
-    \    crossing.a = Point<long long>(10, 0);\n    crossing.b = Point<long long>(-2,\
-    \ 0);\n    result = circle_boundary_intersection(circle, crossing);\n    assert(result.contact_count\
-    \ == 1);\n    assert(close(result.contacts[0].point.x, 5));\n\n    Segment<long\
-    \ long> chord;\n    chord.a = Point<long long>(10, 0);\n    chord.b = Point<long\
-    \ long>(-10, 0);\n    result = circle_boundary_intersection(chord, circle);\n\
-    \    assert(result.contact_count == 2);\n    assert(close(result.contacts[0].point.x,\
-    \ 5));\n    assert(close(result.contacts[1].point.x, -5));\n\n    Segment<long\
-    \ long> point_segment;\n    point_segment.a = Point<long long>(0, 5);\n    point_segment.b\
-    \ = point_segment.a;\n    assert(\n        circle_boundary_intersection(circle,\
-    \ point_segment).contact_count == 1\n    );\n    point_segment.a = Point<long\
-    \ long>(0, 0);\n    point_segment.b = point_segment.a;\n    assert(\n        circle_boundary_intersection(circle,\
-    \ point_segment).contact_count == 0\n    );\n}\n\nvoid test_tangents() {\n   \
-    \ Circle<long long> circle;\n    circle.center = Point<long long>(0, 0);\n   \
-    \ circle.radius = 5;\n    Point<long long> external(13, 0);\n    auto points =\
-    \ tangent_points(circle, external);\n    assert(points.size() == 2);\n    for\
-    \ (const Point<long double>& point : points) {\n        Point<long double> radius\
-    \ = point - Point<long double>(circle.center);\n        Point<long double> tangent\
-    \ = Point<long double>(external) - point;\n        assert(close(\n           \
-    \ norm(radius),\n            static_cast<long double>(circle.radius)\n       \
-    \ ));\n        assert(close(dot(radius, tangent), 0));\n    }\n    assert(tangent_points(circle,\
-    \ Point<long long>(0, 0)).empty());\n    assert(tangent_points(circle, Point<long\
-    \ long>(5, 0)).size() == 1);\n\n    Circle<long long> point_circle;\n    point_circle.center\
-    \ = Point<long long>(7, 4);\n    point_circle.radius = 0;\n    points = tangent_points(point_circle,\
-    \ Point<long long>(1, 2));\n    assert(points.size() == 1);\n    assert(close(points[0].x,\
-    \ 7));\n    assert(close(points[0].y, 4));\n}\n\nvoid test_common_tangents_randomized()\
-    \ {\n    std::uint64_t state = 0x319642b2d24d8ec3ULL;\n    auto random = [&]()\
-    \ {\n        state ^= state << 7;\n        state ^= state >> 9;\n        return\
-    \ state;\n    };\n    for (int trial = 0; trial < 10000; ++trial) {\n        Circle<long\
-    \ long> first;\n        Circle<long long> second;\n        first.center = Point<long\
-    \ long>(\n            static_cast<long long>(random() % 41) - 20,\n          \
-    \  static_cast<long long>(random() % 41) - 20\n        );\n        second.center\
-    \ = Point<long long>(\n            static_cast<long long>(random() % 41) - 20,\n\
-    \            static_cast<long long>(random() % 41) - 20\n        );\n        first.radius\
-    \ = static_cast<long long>(random() % 10) + 1;\n        second.radius = static_cast<long\
-    \ long>(random() % 10) + 1;\n        if (first.center == second.center && first.radius\
-    \ == second.radius) {\n            continue;\n        }\n\n        CircleRelation\
-    \ relation = circle_relation(first, second);\n        int expected = 0;\n    \
-    \    if (relation == CircleRelation::Separate) expected = 4;\n        if (relation\
-    \ == CircleRelation::ExternallyTangent) expected = 3;\n        if (relation ==\
-    \ CircleRelation::Intersecting) expected = 2;\n        if (relation == CircleRelation::InternallyTangent)\
-    \ expected = 1;\n        auto tangents = common_tangents(first, second);\n   \
-    \     assert(int(tangents.size()) == expected);\n        assert(common_tangent_points(first,\
-    \ second).size() == tangents.size());\n        for (const Line<long double>& tangent\
-    \ : tangents) {\n            assert(close(\n                distance(tangent,\
-    \ Point<long double>(first.center)),\n                static_cast<long double>(first.radius)\n\
-    \            ));\n            assert(close(\n                distance(tangent,\
-    \ Point<long double>(second.center)),\n                static_cast<long double>(second.radius)\n\
-    \            ));\n            assert(on_circle(first, tangent.a, 1e-9L));\n  \
-    \      }\n    }\n}\n\nvoid test_triangle_circles_randomized() {\n    std::uint64_t\
-    \ state = 0x94d049bb133111ebULL;\n    auto random = [&]() {\n        state ^=\
-    \ state << 7;\n        state ^= state >> 9;\n        return state;\n    };\n \
-    \   for (int trial = 0; trial < 5000; ++trial) {\n        Point<long long> first(\n\
-    \            static_cast<long long>(random() % 31) - 15,\n            static_cast<long\
-    \ long>(random() % 31) - 15\n        );\n        Point<long long> second(\n  \
-    \          static_cast<long long>(random() % 31) - 15,\n            static_cast<long\
-    \ long>(random() % 31) - 15\n        );\n        Point<long long> third(\n   \
-    \         static_cast<long long>(random() % 31) - 15,\n            static_cast<long\
-    \ long>(random() % 31) - 15\n        );\n        if (orientation(first, second,\
-    \ third) == 0) continue;\n\n        auto outer = circumcircle(first, second, third);\n\
-    \        assert(outer.has_value());\n        assert(close(\n            distance(outer->center,\
-    \ Point<long double>(first)),\n            outer->radius\n        ));\n      \
-    \  assert(close(\n            distance(outer->center, Point<long double>(second)),\n\
-    \            outer->radius\n        ));\n        assert(close(\n            distance(outer->center,\
-    \ Point<long double>(third)),\n            outer->radius\n        ));\n\n    \
-    \    auto inner = incircle(first, second, third);\n        assert(inner.has_value());\n\
-    \        Line<long double> first_side;\n        first_side.a = Point<long double>(first);\n\
-    \        first_side.b = Point<long double>(second);\n        Line<long double>\
-    \ second_side;\n        second_side.a = Point<long double>(second);\n        second_side.b\
-    \ = Point<long double>(third);\n        Line<long double> third_side;\n      \
-    \  third_side.a = Point<long double>(third);\n        third_side.b = Point<long\
-    \ double>(first);\n        assert(close(distance(first_side, inner->center), inner->radius));\n\
-    \        assert(close(distance(second_side, inner->center), inner->radius));\n\
-    \        assert(close(distance(third_side, inner->center), inner->radius));\n\
-    \    }\n}\n\nvoid test_intersection_areas() {\n    Circle<long double> first;\n\
-    \    first.center = Point<long double>(0, 0);\n    first.radius = 1;\n    Circle<long\
-    \ double> second = first;\n    assert(close(\n        circle_circle_intersection_area(first,\
-    \ second),\n        std::numbers::pi_v<long double>\n    ));\n    second.center.x\
-    \ = 1;\n    long double expected =\n        2.0L * std::numbers::pi_v<long double>\
-    \ / 3.0L -\n        std::sqrt(3.0L) / 2.0L;\n    assert(close(circle_circle_intersection_area(first,\
-    \ second), expected));\n    assert(close(circle_circle_intersection_area(second,\
-    \ first), expected));\n    second.center.x = 3;\n    assert(close(circle_circle_intersection_area(first,\
-    \ second), 0));\n    second.center.x = 0;\n    second.radius = 2;\n    assert(close(\n\
-    \        circle_circle_intersection_area(first, second),\n        std::numbers::pi_v<long\
-    \ double>\n    ));\n\n    std::vector<Point<long double>> square;\n    square.emplace_back(-2,\
-    \ -2);\n    square.emplace_back(2, -2);\n    square.emplace_back(2, 2);\n    square.emplace_back(-2,\
-    \ 2);\n    assert(close(\n        circle_polygon_intersection_area(first, square),\n\
-    \        std::numbers::pi_v<long double>\n    ));\n    std::reverse(square.begin(),\
-    \ square.end());\n    assert(close(\n        circle_polygon_intersection_area(first,\
-    \ square),\n        std::numbers::pi_v<long double>\n    ));\n\n    std::vector<Point<long\
-    \ double>> half_disk_box;\n    half_disk_box.emplace_back(0, -2);\n    half_disk_box.emplace_back(2,\
-    \ -2);\n    half_disk_box.emplace_back(2, 2);\n    half_disk_box.emplace_back(0,\
-    \ 2);\n    assert(close(\n        circle_polygon_intersection_area(first, half_disk_box),\n\
-    \        std::numbers::pi_v<long double> / 2.0L\n    ));\n\n    std::vector<Point<long\
-    \ double>> small_square;\n    small_square.emplace_back(-0.25L, -0.25L);\n   \
-    \ small_square.emplace_back(0.25L, -0.25L);\n    small_square.emplace_back(0.25L,\
-    \ 0.25L);\n    small_square.emplace_back(-0.25L, 0.25L);\n    assert(close(\n\
-    \        circle_polygon_intersection_area(first, small_square),\n        0.25L\n\
-    \    ));\n}\n\n}  // namespace\n\nint main() {\n    m1une::utilities::FastInput\
-    \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n\n    test_basic_queries();\n\
-    \    test_constructions();\n    test_linear_intersections();\n    test_tangents();\n\
-    \    test_common_tangents_randomized();\n    test_triangle_circles_randomized();\n\
-    \    test_intersection_areas();\n\n    long long first, second;\n    fast_input\
-    \ >> first >> second;\n    fast_output << first + second << '\\n';\n}\n"
+    \ <cmath>\n#include <cstdint>\n#include <numbers>\n\n#include \"../../utilities/fast_io.hpp\"\
+    \n\nnamespace {\n\nusing namespace m1une::geometry;\nusing P = Point<long long>;\n\
+    \nbool close(long double first, long double second) {\n    return std::fabs(first\
+    \ - second) <=\n        1e-9L * std::max({1.0L, std::fabs(first), std::fabs(second)});\n\
+    }\n\nbool close(\n    const Point<long double>& first,\n    const Point<long double>&\
+    \ second\n) {\n    return close(distance(first, second), 0.0L);\n}\n\ntemplate\
+    \ <Coordinate T>\nvoid validate_coverage(\n    const Circle<T>& circle,\n    const\
+    \ Circle<T>& enclosure,\n    const AngularCoverage& coverage\n) {\n    const long\
+    \ double full = 2.0L * std::numbers::pi_v<long double>;\n    if (coverage.kind\
+    \ == AngularCoverageKind::Empty) return;\n    assert(0.0L <= coverage.begin &&\
+    \ coverage.begin < full);\n    assert(coverage.begin <= coverage.end);\n    assert(coverage.end\
+    \ <= coverage.begin + full + 1e-9L);\n    if (coverage.kind == AngularCoverageKind::Point)\
+    \ {\n        assert(close(coverage.begin, coverage.end));\n        assert(\n \
+    \           point_in_circle(\n                enclosure,\n                circle_point_at(circle,\
+    \ coverage.begin),\n                1e-8L\n            ) != PointInCircle::Outside\n\
+    \        );\n        return;\n    }\n    if (coverage.kind == AngularCoverageKind::Full)\
+    \ {\n        assert(close(angular_measure(coverage), full));\n        for (int\
+    \ index = 0; index < 8; ++index) {\n            const long double argument = full\
+    \ * index / 8.0L;\n            assert(\n                point_in_circle(\n   \
+    \                 enclosure,\n                    circle_point_at(circle, argument),\n\
+    \                    1e-8L\n                ) != PointInCircle::Outside\n    \
+    \        );\n        }\n        return;\n    }\n\n    assert(coverage.kind ==\
+    \ AngularCoverageKind::Arc);\n    assert(coverage.begin < coverage.end);\n   \
+    \ const long double middle = (coverage.begin + coverage.end) / 2.0L;\n    const\
+    \ long double opposite = middle + std::numbers::pi_v<long double>;\n    assert(\n\
+    \        point_in_circle(\n            enclosure,\n            circle_point_at(circle,\
+    \ middle),\n            1e-8L\n        ) != PointInCircle::Outside\n    );\n \
+    \   assert(\n        point_in_circle(\n            enclosure,\n            circle_point_at(circle,\
+    \ opposite),\n            1e-8L\n        ) == PointInCircle::Outside\n    );\n\
+    }\n\nvoid test_fixed_circle_pairs() {\n    const Circle<long long> first{P(0,\
+    \ 0), 5, false};\n    const Circle<long long> second{P(6, 0), 5};\n    const CircleCircleIntersection\
+    \ crossing =\n        circle_boundary_intersection(first, second);\n    assert(crossing.relation\
+    \ == CircleRelation::Intersecting);\n    assert(crossing.contact_kind == CircleContactKind::TwoPoints);\n\
+    \    assert(crossing.contact_count() == 2);\n    assert(crossing.contacts[0].point\
+    \ == Point<long double>(3, -4));\n    assert(crossing.contacts[1].point == Point<long\
+    \ double>(3, 4));\n    assert(close(\n        circle_point_at(first, crossing.first_inside_second.begin),\n\
+    \        crossing.contacts[0].point\n    ));\n    assert(close(\n        circle_point_at(first,\
+    \ crossing.first_inside_second.end),\n        crossing.contacts[1].point\n   \
+    \ ));\n    validate_coverage(first, second, crossing.first_inside_second);\n \
+    \   validate_coverage(second, first, crossing.second_inside_first);\n    assert(close(\n\
+    \        circle_arc_length(first, crossing.first_inside_second),\n        first.radius\
+    \ * angular_measure(crossing.first_inside_second)\n    ));\n\n    const auto reversed\
+    \ = circle_boundary_intersection(second, first);\n    assert(close(\n        angular_measure(crossing.first_inside_second),\n\
+    \        angular_measure(reversed.second_inside_first)\n    ));\n    assert(close(\n\
+    \        angular_measure(crossing.second_inside_first),\n        angular_measure(reversed.first_inside_second)\n\
+    \    ));\n\n    const Circle<long long> separate{P(20, 0), 2};\n    const auto\
+    \ empty = circle_boundary_intersection(first, separate);\n    assert(empty.contact_kind\
+    \ == CircleContactKind::Empty);\n    assert(empty.first_inside_second.kind ==\
+    \ AngularCoverageKind::Empty);\n    assert(empty.second_inside_first.kind == AngularCoverageKind::Empty);\n\
+    \n    const Circle<long long> external{P(10, 0), 5};\n    const auto external_tangent\
+    \ =\n        circle_boundary_intersection(first, external);\n    assert(external_tangent.contact_kind\
+    \ == CircleContactKind::Point);\n    assert(\n        external_tangent.first_inside_second.kind\
+    \ ==\n        AngularCoverageKind::Point\n    );\n\n    const Circle<long long>\
+    \ small{P(0, 0), 2};\n    const auto contained = circle_boundary_intersection(small,\
+    \ first);\n    assert(contained.relation == CircleRelation::Contained);\n    assert(contained.first_inside_second.kind\
+    \ == AngularCoverageKind::Full);\n    assert(contained.second_inside_first.kind\
+    \ == AngularCoverageKind::Empty);\n\n    const Circle<long long> internally_tangent{P(3,\
+    \ 0), 2};\n    const auto internal =\n        circle_boundary_intersection(internally_tangent,\
+    \ first);\n    assert(internal.relation == CircleRelation::InternallyTangent);\n\
+    \    assert(internal.contact_kind == CircleContactKind::Point);\n    assert(internal.first_inside_second.kind\
+    \ == AngularCoverageKind::Full);\n    assert(internal.second_inside_first.kind\
+    \ == AngularCoverageKind::Point);\n\n    const auto coincident = circle_boundary_intersection(first,\
+    \ first);\n    assert(coincident.contact_kind == CircleContactKind::Coincident);\n\
+    \    assert(coincident.first_inside_second.kind == AngularCoverageKind::Full);\n\
+    \    assert(coincident.second_inside_first.kind == AngularCoverageKind::Full);\n\
+    \n    const Circle<long long> point_circle{P(2, -3), 0};\n    const auto coincident_point\
+    \ =\n        circle_boundary_intersection(point_circle, point_circle);\n    assert(coincident_point.contact_kind\
+    \ == CircleContactKind::Point);\n    assert(coincident_point.contact_count() ==\
+    \ 1);\n    assert(\n        coincident_point.first_inside_second.kind ==\n   \
+    \     AngularCoverageKind::Point\n    );\n}\n\nvoid test_linear_parameters() {\n\
+    \    const Circle<long long> circle{P(0, 0), 5, false};\n    const Line<long long>\
+    \ line{P(-10, 0), P(-9, 0)};\n    const auto line_result = circle_boundary_intersection(circle,\
+    \ line);\n    assert(line_result.contact_count == 2);\n    assert(close(line_result.contacts[0].linear_parameter,\
+    \ 5));\n    assert(close(line_result.contacts[1].linear_parameter, 15));\n   \
+    \ assert(line_result.contacts[0].point == Point<long double>(-5, 0));\n    assert(line_result.contacts[1].point\
+    \ == Point<long double>(5, 0));\n\n    const Ray<long long> ray{P(0, 0), P(1,\
+    \ 0)};\n    const auto ray_result = circle_boundary_intersection(circle, ray);\n\
+    \    assert(ray_result.contact_count == 1);\n    assert(close(ray_result.contacts[0].linear_parameter,\
+    \ 5));\n\n    const Segment<long long> segment{P(10, 0), P(-10, 0)};\n    const\
+    \ auto segment_result =\n        circle_boundary_intersection(circle, segment);\n\
+    \    assert(segment_result.contact_count == 2);\n    assert(close(segment_result.contacts[0].linear_parameter,\
+    \ 0.25L));\n    assert(close(segment_result.contacts[1].linear_parameter, 0.75L));\n\
+    \    assert(segment_result.contacts[0].point == Point<long double>(5, 0));\n \
+    \   assert(segment_result.contacts[1].point == Point<long double>(-5, 0));\n}\n\
+    \nvoid test_random_circle_pairs() {\n    std::uint64_t state = 0x243f6a8885a308d3ULL;\n\
+    \    auto random = [&state]() {\n        state ^= state << 7;\n        state ^=\
+    \ state >> 9;\n        return state;\n    };\n\n    for (int trial = 0; trial\
+    \ < 20000; ++trial) {\n        const Circle<long long> first{\n            P(\n\
+    \                static_cast<long long>(random() % 41) - 20,\n               \
+    \ static_cast<long long>(random() % 41) - 20\n            ),\n            static_cast<long\
+    \ long>(random() % 11),\n            static_cast<bool>(random() & 1)\n       \
+    \ };\n        const Circle<long long> second{\n            P(\n              \
+    \  static_cast<long long>(random() % 41) - 20,\n                static_cast<long\
+    \ long>(random() % 41) - 20\n            ),\n            static_cast<long long>(random()\
+    \ % 11),\n            static_cast<bool>(random() & 1)\n        };\n        const\
+    \ auto result = circle_boundary_intersection(first, second);\n        assert(result.relation\
+    \ == circle_relation(first, second));\n        assert(result.contact_count() <=\
+    \ 2);\n        for (int index = 0; index < result.contact_count(); ++index) {\n\
+    \            const CircleContact& contact = result.contacts[index];\n        \
+    \    assert(on_circle(first, contact.point, 1e-8L));\n            assert(on_circle(second,\
+    \ contact.point, 1e-8L));\n            assert(close(\n                circle_point_at(first,\
+    \ contact.first_argument),\n                contact.point\n            ));\n \
+    \           assert(close(\n                circle_point_at(second, contact.second_argument),\n\
+    \                contact.point\n            ));\n        }\n        validate_coverage(first,\
+    \ second, result.first_inside_second);\n        validate_coverage(second, first,\
+    \ result.second_inside_first);\n    }\n}\n\n}  // namespace\n\nint main() {\n\
+    \    test_fixed_circle_pairs();\n    test_linear_parameters();\n    test_random_circle_pairs();\n\
+    \n    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput output;\n\
+    \    long long first, second;\n    input >> first >> second;\n    output << first\
+    \ + second << '\\n';\n}\n"
   dependsOn:
   - geometry/circle.hpp
   - geometry/linear.hpp
@@ -1783,15 +1724,15 @@ data:
   - geometry/detail/floating_predicate.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
-  path: verify/geometry/circle_operations.test.cpp
+  path: verify/geometry/circle_boundary_intersection.test.cpp
   requiredBy: []
   timestamp: '2026-08-21 00:43:43+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/geometry/circle_operations.test.cpp
+documentation_of: verify/geometry/circle_boundary_intersection.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/geometry/circle_operations.test.cpp
-- /verify/verify/geometry/circle_operations.test.cpp.html
-title: verify/geometry/circle_operations.test.cpp
+- /verify/verify/geometry/circle_boundary_intersection.test.cpp
+- /verify/verify/geometry/circle_boundary_intersection.test.cpp.html
+title: verify/geometry/circle_boundary_intersection.test.cpp
 ---
