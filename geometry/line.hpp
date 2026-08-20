@@ -2,6 +2,7 @@
 #define M1UNE_GEOMETRY_LINE_HPP 1
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cmath>
 #include <optional>
@@ -21,6 +22,18 @@ template <Coordinate T>
 struct Segment {
     Point<T> a;
     Point<T> b;
+};
+
+enum class SegmentIntersectionKind {
+    Empty,
+    Point,
+    Overlap,
+};
+
+struct SegmentIntersection {
+    SegmentIntersectionKind kind;
+    Point<long double> first;
+    Point<long double> second;
 };
 
 template <Coordinate T>
@@ -231,14 +244,155 @@ std::optional<Point<long double>> line_intersection(
 ) {
     assert(first.a != first.b);
     assert(second.a != second.b);
-    Point<long double> p(first.a);
-    Point<long double> q(second.a);
-    Point<long double> r = Point<long double>(first.b) - p;
-    Point<long double> s = Point<long double>(second.b) - q;
-    long double denominator = cross(r, s);
-    if (std::fabs(denominator) <= eps) return std::nullopt;
-    long double ratio = cross(q - p, s) / denominator;
-    return p + r * ratio;
+    using W = wide_type<T>;
+    const W first_x = W(first.b.x) - W(first.a.x);
+    const W first_y = W(first.b.y) - W(first.a.y);
+    const W second_x = W(second.b.x) - W(second.a.x);
+    const W second_y = W(second.b.y) - W(second.a.y);
+    const W offset_x = W(second.a.x) - W(first.a.x);
+    const W offset_y = W(second.a.y) - W(first.a.y);
+    const W denominator =
+        first_x * second_y - first_y * second_x;
+    if (sign<T>(denominator, eps) == 0) return std::nullopt;
+    const W numerator = offset_x * second_y - offset_y * second_x;
+    const long double ratio =
+        static_cast<long double>(numerator) /
+        static_cast<long double>(denominator);
+    return Point<long double>(
+        static_cast<long double>(first.a.x) +
+            static_cast<long double>(first_x) * ratio,
+        static_cast<long double>(first.a.y) +
+            static_cast<long double>(first_y) * ratio
+    );
+}
+
+template <Coordinate T>
+SegmentIntersection segment_intersection(
+    const Segment<T>& first,
+    const Segment<T>& second,
+    long double eps = 1e-12L
+) {
+    const Point<long double> zero;
+    if (!intersects(first, second, eps)) {
+        return SegmentIntersection{
+            SegmentIntersectionKind::Empty,
+            zero,
+            zero,
+        };
+    }
+    if (first.a == first.b) {
+        const Point<long double> point(first.a);
+        return SegmentIntersection{
+            SegmentIntersectionKind::Point,
+            point,
+            point,
+        };
+    }
+    if (second.a == second.b) {
+        const Point<long double> point(second.a);
+        return SegmentIntersection{
+            SegmentIntersectionKind::Point,
+            point,
+            point,
+        };
+    }
+
+    const int first_a_side =
+        orientation(second.a, second.b, first.a, eps);
+    const int first_b_side =
+        orientation(second.a, second.b, first.b, eps);
+    const int second_a_side =
+        orientation(first.a, first.b, second.a, eps);
+    const int second_b_side =
+        orientation(first.a, first.b, second.b, eps);
+    const bool collinear_intersection =
+        first_a_side == 0 && first_b_side == 0 &&
+        second_a_side == 0 && second_b_side == 0;
+
+    if (!collinear_intersection) {
+        const auto point = line_intersection(
+            Line<T>{first.a, first.b},
+            Line<T>{second.a, second.b},
+            0.0L
+        );
+        assert(point.has_value());
+        return SegmentIntersection{
+            SegmentIntersectionKind::Point,
+            *point,
+            *point,
+        };
+    }
+
+    std::array<Point<T>, 4> candidates{
+        first.a,
+        first.b,
+        second.a,
+        second.b,
+    };
+    std::array<Point<T>, 4> common;
+    int common_size = 0;
+    auto same_point = [eps](const Point<T>& left, const Point<T>& right) {
+        if constexpr (std::integral<T>) {
+            return left == right;
+        } else {
+            return geometry::distance(left, right) <= eps;
+        }
+    };
+    for (const Point<T>& candidate : candidates) {
+        if (
+            !on_segment(first, candidate, eps) ||
+            !on_segment(second, candidate, eps)
+        ) {
+            continue;
+        }
+        bool duplicate = false;
+        for (int index = 0; index < common_size; ++index) {
+            if (same_point(common[index], candidate)) {
+                duplicate = true;
+                break;
+            }
+        }
+        if (!duplicate) common[common_size++] = candidate;
+    }
+    assert(common_size >= 1);
+
+    using W = wide_type<T>;
+    const W direction_x = W(first.b.x) - W(first.a.x);
+    const W direction_y = W(first.b.y) - W(first.a.y);
+    const W absolute_x = direction_x >= 0 ? direction_x : -direction_x;
+    const W absolute_y = direction_y >= 0 ? direction_y : -direction_y;
+    const bool use_x = absolute_x >= absolute_y;
+    auto parameter = [&](const Point<T>& point) {
+        if (use_x) {
+            return direction_x >= 0 ? W(point.x) : -W(point.x);
+        }
+        return direction_y >= 0 ? W(point.y) : -W(point.y);
+    };
+    int start_index = 0;
+    int finish_index = 0;
+    for (int index = 1; index < common_size; ++index) {
+        if (parameter(common[index]) < parameter(common[start_index])) {
+            start_index = index;
+        }
+        if (parameter(common[finish_index]) < parameter(common[index])) {
+            finish_index = index;
+        }
+    }
+
+    const Point<long double> start(common[start_index]);
+    const Point<long double> finish(common[finish_index]);
+    if (same_point(common[start_index], common[finish_index])) {
+        return SegmentIntersection{
+            SegmentIntersectionKind::Point,
+            start,
+            start,
+        };
+    }
+    return SegmentIntersection{
+        SegmentIntersectionKind::Overlap,
+        start,
+        finish,
+    };
 }
 
 template <Coordinate T>

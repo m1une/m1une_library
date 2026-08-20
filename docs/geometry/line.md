@@ -6,8 +6,8 @@ documentation_of: ../../geometry/line.hpp
 ## Overview
 
 This header provides `Line<T>` and `Segment<T>` together with projection,
-reflection, distances, intersection tests, segment centroids, and line
-intersection coordinates.
+reflection, distances, intersection tests, segment centroids, and constructed
+intersections.
 
 Segment predicates are exact for integral coordinates through 128-bit cross
 products. Constructed coordinates are returned as `Point<long double>`.
@@ -30,6 +30,34 @@ struct Segment {
 
 A line requires distinct endpoints. A segment may be degenerate.
 
+Segment intersections are classified explicitly:
+
+```cpp
+enum class SegmentIntersectionKind {
+    Empty,
+    Point,
+    Overlap,
+};
+
+struct SegmentIntersection {
+    SegmentIntersectionKind kind;
+    Point<long double> first;
+    Point<long double> second;
+};
+
+template <Coordinate T>
+SegmentIntersection segment_intersection(
+    const Segment<T>& first,
+    const Segment<T>& second,
+    long double eps = 1e-12L
+);
+```
+
+For `Point`, both result points equal the unique intersection. For `Overlap`,
+they are the endpoints of the common closed segment, ordered from `first.a`
+toward `first.b` in the function call. The point values in an `Empty` result
+have no meaning and should not be inspected.
+
 ## Functions
 
 | Function | Description | Complexity |
@@ -50,6 +78,7 @@ A line requires distinct endpoints. A segment may be degenerate.
 | `distance(first, second)` | Segment-to-segment distance. | $O(1)$ |
 | `distance(line, segment)` | Line-to-segment distance. Both argument orders are supported. | $O(1)$ |
 | `line_intersection(first, second, eps)` | Returns the unique line intersection, or `nullopt` for parallel/coincident lines. | $O(1)$ |
+| `segment_intersection(first, second, eps)` | Classifies the intersection of two closed segments and returns its unique point or overlap endpoints. | $O(1)$ |
 | `line_segment_intersection(line, segment, eps)` | Returns the unique intersection, or `nullopt` for no intersection or collinear overlap. Both argument orders are supported. | $O(1)$ |
 
 For a degenerate segment, `line_segment_intersection` returns its endpoint when
@@ -73,6 +102,9 @@ int main() {
     second.a = Point<long long>(0, 2);
     second.b = Point<long long>(2, 0);
 
-    std::cout << intersects(first, second) << "\n"; // 1
+    SegmentIntersection result = segment_intersection(first, second);
+    if (result.kind == SegmentIntersectionKind::Point) {
+        std::cout << result.first.x << " " << result.first.y << "\n";
+    }
 }
 ```
