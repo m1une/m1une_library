@@ -5,7 +5,7 @@ documentation_of: ../../geometry/polygon.hpp
 
 ## Overview
 
-This header provides polygon area, point containment, ray queries, polygon
+This header provides polygon area, point containment, path clipping, polygon
 intersection and distance, triangulation, and centroids for general simple
 polygons.
 
@@ -95,6 +95,65 @@ ClosestPoints closest_points(
 without `eps`. Reverse overloads swap the two returned witnesses for
 `closest_points`.
 
+## Clipping interface
+
+`clip` returns the parts of its first argument contained in the set selected by
+`polygon.filled`. A filled polygon clips against its closed enclosed region; a
+boundary-only polygon retains only isolated contacts and collinear overlaps.
+The first argument is always treated as a path, independently of
+`circle.filled`.
+
+```cpp
+struct ParameterInterval {
+    long double begin;
+    long double end;
+};
+
+template <Coordinate L, Coordinate T>
+std::vector<ParameterInterval> clip(
+    const Line<L>& line,
+    const Polygon<T>& polygon,
+    long double eps = 1e-12L
+);
+
+template <Coordinate R, Coordinate T>
+std::vector<ParameterInterval> clip(
+    const Ray<R>& ray,
+    const Polygon<T>& polygon,
+    long double eps = 1e-12L
+);
+
+template <Coordinate S, Coordinate T>
+std::vector<ParameterInterval> clip(
+    const Segment<S>& segment,
+    const Polygon<T>& polygon,
+    long double eps = 1e-12L
+);
+
+template <Coordinate C, Coordinate T>
+std::vector<AngularCoverage> clip(
+    const Circle<C>& circle,
+    const Polygon<T>& polygon,
+    long double eps = 1e-12L
+);
+```
+
+For every linear object, parameter `t` denotes
+`origin + t * direction`. A line uses `origin = a` and
+`direction = b - a`; a ray uses `origin` and `through - origin`; a segment
+uses `a` and `b - a`. Line parameters are unrestricted, ray parameters are
+nonnegative, and segment parameters lie in `[0, 1]`.
+
+Linear results are sorted, disjoint, closed intervals. `begin == end` denotes
+an isolated contact such as a tangency. A degenerate segment returns `[0, 0]`
+exactly when its point belongs to the selected polygon set.
+
+Circle results use the `AngularCoverage` representation documented in
+[`geometry/circle.hpp`](circle.md): `Point` denotes an isolated contact, `Arc`
+denotes a counterclockwise interval, and `Full` denotes the complete
+circumference. Results are sorted by normalized `begin`; a wrapping arc has an
+`end` greater than $2\pi$. An empty vector denotes empty clipping.
+
 ## Functions
 
 | Function | Description | Complexity |
@@ -108,8 +167,8 @@ without `eps`. Reverse overloads swap the two returned witnesses for
 | `is_simple_polygon(polygon, eps)` | Tests whether polygon edges only meet at adjacent endpoints. | $O(N^2)$ |
 | `triangulate_polygon(polygon, eps)` | Ear-clips a simple polygon, or returns `nullopt` when triangulation fails. | $O(N^2)$ |
 | `point_in_polygon(polygon, point, eps)` | Classifies a point against any simple polygon. | $O(N)$ |
-| `ray_polygon_intersections(ray, polygon, eps)` | Returns distinct boundary events ordered from the ray origin. | $O(N \log N)$ |
-| `first_ray_polygon_intersection(ray, polygon, eps)` | Returns the first boundary event, or `nullopt`. | $O(N \log N)$ |
+| `clip(line/ray/segment, Polygon, eps)` | Returns parameter intervals belonging to the selected polygon set. | $O(N \log N)$ |
+| `clip(circle, Polygon, eps)` | Returns angular points and arcs belonging to the selected polygon set. | $O(N \log N)$ |
 | `intersects(ray, polygon, eps)` | Tests intersection with the closed filled polygon. Both argument orders are supported. | $O(N \log N)$ |
 | `distance(ray, polygon)` | Minimum distance to the closed filled polygon. Both argument orders are supported. | $O(N \log N)$ |
 | `intersects(first, second, eps)` | Tests whether two closed filled simple polygons intersect. | $O(NM)$ |
@@ -152,15 +211,16 @@ vertices produces $K-2$ triangles.
 The return value is `std::nullopt` for fewer than three effective vertices,
 zero area, self-intersection, or another failure to find a valid ear.
 
-## Ray intersections
+## Clipping behavior
 
-`ray_polygon_intersections` reports polygon-boundary events, not the whole
-filled interval inside the polygon. A collinear boundary overlap contributes
-its finite endpoints and the ray origin when the overlap starts there. Shared
-polygon vertices are deduplicated.
+Clipping a path against a concave polygon may produce multiple components. For
+example, a ray can produce intervals `[2, 4]` and `[7, 9]`; these directly
+describe the two pieces of the ray inside the polygon. Shared polygon vertices
+are counted once, tangencies become point intervals, and travel along a polygon
+edge becomes one continuous interval.
 
-`intersects(ray, polygon)` instead treats the polygon as a closed filled region,
-so a ray whose origin is inside the polygon intersects immediately.
+Unlike `intersects`, `clip` intentionally has no reverse argument overload:
+the first argument determines the parameter system and the type of the result.
 
 ## Polygon intersection and distance
 
@@ -193,6 +253,13 @@ int main() {
 
     std::cout << m1une::geometry::polygon_area(polygon) << "\n"; // 2
     std::cout << m1une::geometry::contains(polygon, Point(1, 0)) << "\n"; // 1
+
+    m1une::geometry::Segment<long long> path{
+        Point(-1, 1),
+        Point(3, 1)
+    };
+    auto parts = m1une::geometry::clip(path, polygon);
+    std::cout << parts[0].begin << " " << parts[0].end << "\n"; // 0.25 0.5
 
     polygon.filled = false;
     std::cout << m1une::geometry::contains(polygon, Point(1, 1)) << "\n"; // 1

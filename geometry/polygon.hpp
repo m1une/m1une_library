@@ -7,6 +7,7 @@
 #include <cmath>
 #include <cstddef>
 #include <limits>
+#include <numbers>
 #include <optional>
 #include <type_traits>
 #include <vector>
@@ -28,6 +29,11 @@ struct Polygon {
     bool filled = true;
 };
 
+struct ParameterInterval {
+    long double begin = 0.0L;
+    long double end = 0.0L;
+};
+
 template <Coordinate T>
 constexpr Point<long double> centroid(
     const std::array<Point<T>, 3>& triangle
@@ -47,25 +53,6 @@ constexpr Point<long double> centroid(
 }
 
 namespace polygon_detail {
-
-inline bool close(
-    const Point<long double>& first,
-    const Point<long double>& second,
-    long double eps
-) {
-    return geometry::distance(first, second) <= eps;
-}
-
-inline void push_unique(
-    std::vector<Point<long double>>& points,
-    const Point<long double>& point,
-    long double eps
-) {
-    for (const Point<long double>& existing : points) {
-        if (close(existing, point, eps)) return;
-    }
-    points.push_back(point);
-}
 
 template <Coordinate T>
 std::vector<Point<T>> clean_polygon_vertices(
@@ -386,57 +373,434 @@ bool contains(
         : relation == PointInPolygon::Boundary;
 }
 
-template <Coordinate T>
-std::vector<Point<long double>> ray_polygon_intersections(
-    const Ray<T>& ray,
-    const std::vector<Point<T>>& polygon,
-    long double eps = 1e-12L
+namespace polygon_clip_detail {
+
+struct Event {
+    long double parameter;
+    bool toggle;
+};
+
+inline bool close_parameter(
+    long double first,
+    long double second,
+    long double eps
 ) {
-    assert(ray.origin != ray.through);
-    assert(polygon.size() >= 3);
-    std::vector<Point<long double>> result;
-    std::size_t size = polygon.size();
-    for (std::size_t index = 0; index < size; ++index) {
-        Segment<T> edge{
-            polygon[index],
-            polygon[(index + 1) % size]
-        };
-        const LinearIntersection intersection =
-            linear_intersection(ray, edge, eps);
-        if (intersection.kind == LinearIntersectionKind::Point) {
-            polygon_detail::push_unique(result, intersection.first, eps);
-        } else if (intersection.kind == LinearIntersectionKind::Segment) {
-            polygon_detail::push_unique(result, intersection.first, eps);
-            polygon_detail::push_unique(result, intersection.second, eps);
+    return std::fabs(first - second) <= eps * std::max({
+        1.0L,
+        std::fabs(first),
+        std::fabs(second)
+    });
+}
+
+inline long double parameter_on_line(
+    const Point<long double>& origin,
+    const Point<long double>& direction,
+    const Point<long double>& point
+) {
+    return dot(point - origin, direction) / dot(direction, direction);
+}
+
+inline std::vector<Event> grouped_events(
+    std::vector<Event> events,
+    long double eps
+) {
+    std::sort(
+        events.begin(),
+        events.end(),
+        [](const Event& first, const Event& second) {
+            return first.parameter < second.parameter;
+        }
+    );
+    std::vector<Event> result;
+    for (const Event& event : events) {
+        if (
+            result.empty() ||
+            !close_parameter(result.back().parameter, event.parameter, eps)
+        ) {
+            result.push_back(event);
         } else {
-            assert(intersection.kind == LinearIntersectionKind::Empty);
+            result.back().toggle = result.back().toggle != event.toggle;
+        }
+    }
+    return result;
+}
+
+inline std::vector<ParameterInterval> merge_intervals(
+    std::vector<ParameterInterval> intervals,
+    long double eps
+) {
+    for (ParameterInterval& interval : intervals) {
+        if (interval.end < interval.begin) {
+            std::swap(interval.begin, interval.end);
+        }
+    }
+    std::sort(
+        intervals.begin(),
+        intervals.end(),
+        [](const ParameterInterval& first, const ParameterInterval& second) {
+            if (first.begin != second.begin) return first.begin < second.begin;
+            return first.end < second.end;
+        }
+    );
+    std::vector<ParameterInterval> result;
+    for (const ParameterInterval& interval : intervals) {
+        if (
+            result.empty() ||
+            interval.begin > result.back().end + eps * std::max({
+                1.0L,
+                std::fabs(interval.begin),
+                std::fabs(result.back().end)
+            })
+        ) {
+            result.push_back(interval);
+        } else if (result.back().end < interval.end) {
+            result.back().end = interval.end;
+        }
+    }
+    return result;
+}
+
+template <Coordinate T>
+std::vector<ParameterInterval> clip_line(
+    const Point<long double>& origin,
+    const Point<long double>& direction,
+    const Polygon<T>& polygon,
+    long double eps
+) {
+    assert(polygon.vertices.size() >= 3);
+    assert(direction != Point<long double>());
+    std::vector<Event> events;
+    std::vector<ParameterInterval> intervals;
+    events.reserve(polygon.vertices.size() * 2);
+    intervals.reserve(polygon.vertices.size());
+
+    const Line<long double> line{origin, origin + direction};
+    for (std::size_t index = 0; index < polygon.vertices.size(); ++index) {
+        const Point<long double> first(polygon.vertices[index]);
+        const Point<long double> second(
+            polygon.vertices[(index + 1) % polygon.vertices.size()]
+        );
+        assert(first != second);
+        const Segment<long double> edge{first, second};
+        const LinearIntersection intersection =
+            linear_intersection(line, edge, eps);
+        if (intersection.kind == LinearIntersectionKind::Empty) continue;
+        if (intersection.kind == LinearIntersectionKind::Segment) {
+            intervals.push_back(ParameterInterval{
+                parameter_on_line(origin, direction, intersection.first),
+                parameter_on_line(origin, direction, intersection.second)
+            });
+            continue;
+        }
+        assert(intersection.kind == LinearIntersectionKind::Point);
+        const Point<long double> point = intersection.first;
+        const Point<long double> edge_direction = second - first;
+        const long double edge_parameter =
+            dot(point - first, edge_direction) /
+            dot(edge_direction, edge_direction);
+        bool toggle = false;
+        if (edge_parameter <= eps) {
+            toggle = orientation(line.a, line.b, second, eps) > 0;
+        } else if (edge_parameter >= 1.0L - eps) {
+            toggle = orientation(line.a, line.b, first, eps) > 0;
+        } else {
+            toggle = true;
+        }
+        events.push_back(Event{
+            parameter_on_line(origin, direction, point),
+            toggle
+        });
+    }
+
+    const std::vector<Event> grouped = grouped_events(std::move(events), eps);
+    if (polygon.filled) {
+        bool inside = false;
+        for (std::size_t index = 0; index < grouped.size(); ++index) {
+            if (index > 0 && inside) {
+                intervals.push_back(ParameterInterval{
+                    grouped[index - 1].parameter,
+                    grouped[index].parameter
+                });
+            }
+            intervals.push_back(ParameterInterval{
+                grouped[index].parameter,
+                grouped[index].parameter
+            });
+            inside = inside != grouped[index].toggle;
+        }
+    } else {
+        for (const Event& event : grouped) {
+            intervals.push_back(ParameterInterval{
+                event.parameter,
+                event.parameter
+            });
+        }
+    }
+    return merge_intervals(std::move(intervals), eps);
+}
+
+inline std::vector<ParameterInterval> restrict_domain(
+    const std::vector<ParameterInterval>& intervals,
+    long double lower,
+    long double upper,
+    long double eps
+) {
+    std::vector<ParameterInterval> result;
+    result.reserve(intervals.size());
+    for (const ParameterInterval& interval : intervals) {
+        long double begin = std::max(interval.begin, lower);
+        long double end = std::min(interval.end, upper);
+        if (
+            end < begin &&
+            !close_parameter(begin, end, eps)
+        ) {
+            continue;
+        }
+        if (end < begin) {
+            const long double middle = (begin + end) / 2.0L;
+            begin = middle;
+            end = middle;
+        }
+        result.push_back(ParameterInterval{begin, end});
+    }
+    return merge_intervals(std::move(result), eps);
+}
+
+inline std::vector<Event> grouped_circle_events(
+    std::vector<Event> events,
+    long double eps
+) {
+    std::vector<Event> result = grouped_events(std::move(events), eps);
+    const long double full = 2.0L * std::numbers::pi_v<long double>;
+    if (
+        result.size() >= 2 &&
+        close_parameter(result.front().parameter + full,
+                        result.back().parameter, eps)
+    ) {
+        result.front().parameter = 0.0L;
+        result.front().toggle =
+            result.front().toggle != result.back().toggle;
+        result.pop_back();
+    }
+    return result;
+}
+
+template <Coordinate C, Coordinate T>
+std::vector<AngularCoverage> clip_circle(
+    const Circle<C>& circle,
+    const Polygon<T>& polygon,
+    long double eps
+) {
+    assert(circle.radius >= 0);
+    assert(polygon.vertices.size() >= 3);
+    if (circle.radius == 0) {
+        return contains(polygon, circle.center, eps)
+            ? std::vector<AngularCoverage>{AngularCoverage{
+                  AngularCoverageKind::Point,
+                  0.0L,
+                  0.0L
+              }}
+            : std::vector<AngularCoverage>();
+    }
+
+    std::vector<Event> events;
+    events.reserve(polygon.vertices.size() * 2);
+    for (std::size_t index = 0; index < polygon.vertices.size(); ++index) {
+        const Point<long double> first(polygon.vertices[index]);
+        const Point<long double> second(
+            polygon.vertices[(index + 1) % polygon.vertices.size()]
+        );
+        assert(first != second);
+        const Point<long double> direction = second - first;
+        const Segment<long double> edge{first, second};
+        const CircleLinearIntersection intersection =
+            circle_boundary_intersection(circle, edge, eps);
+        for (
+            int contact_index = 0;
+            contact_index < intersection.contact_count;
+            ++contact_index
+        ) {
+            const CircleLinearContact& contact =
+                intersection.contacts[contact_index];
+            const Point<long double> radial =
+                contact.point - Point<long double>(circle.center);
+            bool toggle = false;
+            if (contact.linear_parameter <= eps) {
+                toggle = predicate_detail::dot_sign<false>(
+                    radial.x,
+                    radial.y,
+                    direction.x,
+                    direction.y,
+                    eps
+                ) < 0;
+            } else if (contact.linear_parameter >= 1.0L - eps) {
+                toggle = predicate_detail::dot_sign<false>(
+                    radial.x,
+                    radial.y,
+                    -direction.x,
+                    -direction.y,
+                    eps
+                ) < 0;
+            } else {
+                toggle = predicate_detail::dot_sign<false>(
+                    radial.x,
+                    radial.y,
+                    direction.x,
+                    direction.y,
+                    eps
+                ) != 0;
+            }
+            events.push_back(Event{contact.circle_argument, toggle});
         }
     }
 
-    Point<long double> origin(ray.origin);
-    Point<long double> direction =
-        Point<long double>(ray.through) - origin;
+    const std::vector<Event> grouped =
+        grouped_circle_events(std::move(events), eps);
+    const long double full = 2.0L * std::numbers::pi_v<long double>;
+    if (grouped.empty()) {
+        return contains(polygon, circle_point_at(circle, 0.0L), eps)
+            ? std::vector<AngularCoverage>{AngularCoverage{
+                  AngularCoverageKind::Full,
+                  0.0L,
+                  full
+              }}
+            : std::vector<AngularCoverage>();
+    }
+
+    std::vector<bool> inside_gap(grouped.size(), false);
+    if (polygon.filled) {
+        const long double wrap_middle = normalize_circle_argument(
+            (grouped.back().parameter + grouped.front().parameter + full) /
+            2.0L
+        );
+        bool inside = point_in_polygon(
+            polygon,
+            circle_point_at(circle, wrap_middle),
+            eps
+        ) != PointInPolygon::Outside;
+        for (std::size_t index = 0; index < grouped.size(); ++index) {
+            inside = inside != grouped[index].toggle;
+            inside_gap[index] = inside;
+        }
+    }
+
+    if (
+        polygon.filled &&
+        std::all_of(
+            inside_gap.begin(),
+            inside_gap.end(),
+            [](bool inside) { return inside; }
+        )
+    ) {
+        return {AngularCoverage{AngularCoverageKind::Full, 0.0L, full}};
+    }
+
+    std::vector<AngularCoverage> result;
+    for (std::size_t index = 0; index < grouped.size(); ++index) {
+        const std::size_t previous =
+            (index + grouped.size() - 1) % grouped.size();
+        if (!inside_gap[previous] && !inside_gap[index]) {
+            result.push_back(AngularCoverage{
+                AngularCoverageKind::Point,
+                grouped[index].parameter,
+                grouped[index].parameter
+            });
+        }
+        if (!inside_gap[previous] && inside_gap[index]) {
+            std::size_t finish = index;
+            while (inside_gap[finish]) {
+                finish = (finish + 1) % grouped.size();
+            }
+            long double end = grouped[finish].parameter;
+            if (end <= grouped[index].parameter) end += full;
+            result.push_back(AngularCoverage{
+                AngularCoverageKind::Arc,
+                grouped[index].parameter,
+                end
+            });
+        }
+    }
     std::sort(
         result.begin(),
         result.end(),
-        [&](const Point<long double>& first, const Point<long double>& second) {
-            return dot(first - origin, direction) <
-                   dot(second - origin, direction);
+        [](const AngularCoverage& first, const AngularCoverage& second) {
+            return first.begin < second.begin;
         }
     );
     return result;
 }
 
-template <Coordinate T>
-std::optional<Point<long double>> first_ray_polygon_intersection(
-    const Ray<T>& ray,
-    const std::vector<Point<T>>& polygon,
+}  // namespace polygon_clip_detail
+
+template <Coordinate L, Coordinate T>
+std::vector<ParameterInterval> clip(
+    const Line<L>& line,
+    const Polygon<T>& polygon,
     long double eps = 1e-12L
 ) {
-    std::vector<Point<long double>> points =
-        ray_polygon_intersections(ray, polygon, eps);
-    if (points.empty()) return std::nullopt;
-    return points.front();
+    assert(line.a != line.b);
+    assert(eps >= 0.0L);
+    const Point<long double> origin(line.a);
+    const Point<long double> direction =
+        Point<long double>(line.b) - origin;
+    return polygon_clip_detail::clip_line(
+        origin,
+        direction,
+        polygon,
+        eps
+    );
+}
+
+template <Coordinate R, Coordinate T>
+std::vector<ParameterInterval> clip(
+    const Ray<R>& ray,
+    const Polygon<T>& polygon,
+    long double eps = 1e-12L
+) {
+    assert(ray.origin != ray.through);
+    assert(eps >= 0.0L);
+    const Point<long double> origin(ray.origin);
+    const Point<long double> direction =
+        Point<long double>(ray.through) - origin;
+    return polygon_clip_detail::restrict_domain(
+        polygon_clip_detail::clip_line(origin, direction, polygon, eps),
+        0.0L,
+        std::numeric_limits<long double>::infinity(),
+        eps
+    );
+}
+
+template <Coordinate S, Coordinate T>
+std::vector<ParameterInterval> clip(
+    const Segment<S>& segment,
+    const Polygon<T>& polygon,
+    long double eps = 1e-12L
+) {
+    assert(eps >= 0.0L);
+    if (segment.a == segment.b) {
+        return contains(polygon, segment.a, eps)
+            ? std::vector<ParameterInterval>{ParameterInterval{0.0L, 0.0L}}
+            : std::vector<ParameterInterval>();
+    }
+    const Point<long double> origin(segment.a);
+    const Point<long double> direction =
+        Point<long double>(segment.b) - origin;
+    return polygon_clip_detail::restrict_domain(
+        polygon_clip_detail::clip_line(origin, direction, polygon, eps),
+        0.0L,
+        1.0L,
+        eps
+    );
+}
+
+template <Coordinate C, Coordinate T>
+std::vector<AngularCoverage> clip(
+    const Circle<C>& circle,
+    const Polygon<T>& polygon,
+    long double eps = 1e-12L
+) {
+    assert(eps >= 0.0L);
+    return polygon_clip_detail::clip_circle(circle, polygon, eps);
 }
 
 template <Coordinate T>
@@ -449,7 +813,8 @@ bool intersects(
     if (point_in_polygon(polygon, ray.origin, eps) != PointInPolygon::Outside) {
         return true;
     }
-    return !ray_polygon_intersections(ray, polygon, eps).empty();
+    Polygon<T> region{polygon};
+    return !clip(ray, region, eps).empty();
 }
 
 template <Coordinate T>

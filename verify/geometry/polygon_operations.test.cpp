@@ -205,40 +205,41 @@ void test_reflection() {
 
 void test_ray_polygon() {
     std::vector<P> polygon = square(0, 0, 4, 4);
+    Polygon<long long> region{polygon};
     Ray<long long> crossing;
     crossing.origin = P(-2, 2);
     crossing.through = P(-1, 2);
-    auto hits = ray_polygon_intersections(crossing, polygon);
-    assert(hits.size() == 2);
-    assert(close(hits[0].x, 0));
-    assert(close(hits[1].x, 4));
+    auto crossing_parts = clip(crossing, region);
+    assert(crossing_parts.size() == 1);
+    assert(close(crossing_parts[0].begin, 2));
+    assert(close(crossing_parts[0].end, 6));
     assert(intersects(crossing, polygon));
     assert(close(distance(crossing, polygon), 0));
 
     Ray<long long> inside;
     inside.origin = P(2, 2);
     inside.through = P(3, 2);
-    auto first = first_ray_polygon_intersection(inside, polygon);
-    assert(first.has_value());
-    assert(close(first->x, 4));
+    auto inside_parts = clip(inside, region);
+    assert(inside_parts.size() == 1);
+    assert(close(inside_parts[0].begin, 0));
+    assert(close(inside_parts[0].end, 2));
     assert(intersects(inside, polygon));
 
     Ray<long long> collinear;
     collinear.origin = P(-2, 0);
     collinear.through = P(-1, 0);
-    auto boundary = ray_polygon_intersections(collinear, polygon);
-    assert(boundary.size() == 2);
-    assert(close(boundary[0].x, 0));
-    assert(close(boundary[1].x, 4));
+    auto boundary = clip(collinear, region);
+    assert(boundary.size() == 1);
+    assert(close(boundary[0].begin, 2));
+    assert(close(boundary[0].end, 6));
 
     Ray<long long> through_vertices;
     through_vertices.origin = P(-1, -1);
     through_vertices.through = P(0, 0);
-    auto vertex_hits =
-        ray_polygon_intersections(through_vertices, polygon);
-    assert(vertex_hits.size() == 2);
-    assert(close(vertex_hits[0].x, 0));
-    assert(close(vertex_hits[1].x, 4));
+    auto diagonal = clip(through_vertices, region);
+    assert(diagonal.size() == 1);
+    assert(close(diagonal[0].begin, 1));
+    assert(close(diagonal[0].end, 5));
 
     Ray<long long> missing;
     missing.origin = P(-2, 7);

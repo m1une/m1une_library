@@ -35,7 +35,7 @@ documentation_of: ../../geometry/all.hpp
 | `geometry/rectangle_union_area.hpp` | Exact union area of axis-aligned rectangles in $O(N\log N)$. |
 | `geometry/steiner_convex_decomposition.hpp` | Floating-point Steiner convex decomposition with an exact union and a strict 2-approximation piece count. |
 | `geometry/voronoi_diagram.hpp` | Exact-topology Euclidean Voronoi diagrams with segments, rays, lines, and per-site boundary edges in $O(N\log N)$. |
-| `geometry/polygon.hpp` | Filled-or-boundary polygon objects, area, centroids, triangulation, containment, intersections, and distance. |
+| `geometry/polygon.hpp` | Filled-or-boundary polygons, path clipping, area, centroids, triangulation, containment, intersections, and distance. |
 | `geometry/circle.hpp` | Filled-or-boundary circles, relations, intersections, closest points, areas, tangents, and reflection. |
 
 Integral predicates promote to signed 128-bit arithmetic. Constructions that
