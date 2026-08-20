@@ -161,12 +161,14 @@ data:
     \ Point<long double> triangle_center = centroid(triangle);\n    assert(close(triangle_center.x,\
     \ 2));\n    assert(close(triangle_center.y, 1));\n\n    const Circle<long long>\
     \ circle{P(-3, 9), 5};\n    assert(centroid(circle) == Point<long double>(-3,\
-    \ 9));\n\n    std::vector<P> concave;\n    concave.emplace_back(0, 0);\n    concave.emplace_back(5,\
-    \ 0);\n    concave.emplace_back(5, 1);\n    concave.emplace_back(1, 1);\n    concave.emplace_back(1,\
-    \ 5);\n    concave.emplace_back(0, 5);\n    const auto concave_center = centroid(concave);\n\
-    \    assert(concave_center.has_value());\n    assert(close(concave_center->x,\
-    \ 14.5L / 9));\n    assert(close(concave_center->y, 14.5L / 9));\n    std::reverse(concave.begin(),\
-    \ concave.end());\n    const auto clockwise_center = centroid(concave);\n    assert(clockwise_center.has_value());\n\
+    \ 9));\n    const Circle<long long> boundary{P(7, -4), 3, false};\n    assert(centroid(boundary)\
+    \ == Point<long double>(7, -4));\n\n    std::vector<P> concave;\n    concave.emplace_back(0,\
+    \ 0);\n    concave.emplace_back(5, 0);\n    concave.emplace_back(5, 1);\n    concave.emplace_back(1,\
+    \ 1);\n    concave.emplace_back(1, 5);\n    concave.emplace_back(0, 5);\n    const\
+    \ auto concave_center = centroid(concave);\n    assert(concave_center.has_value());\n\
+    \    assert(close(concave_center->x, 14.5L / 9));\n    assert(close(concave_center->y,\
+    \ 14.5L / 9));\n    std::reverse(concave.begin(), concave.end());\n    const auto\
+    \ clockwise_center = centroid(concave);\n    assert(clockwise_center.has_value());\n\
     \    assert(close(clockwise_center->x, concave_center->x));\n    assert(close(clockwise_center->y,\
     \ concave_center->y));\n\n    std::vector<P> square;\n    square.emplace_back(0,\
     \ 0);\n    square.emplace_back(4, 0);\n    square.emplace_back(4, 2);\n    square.emplace_back(0,\
@@ -256,7 +258,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/centroid.test.cpp
   requiredBy: []
-  timestamp: '2026-08-20 22:35:59+09:00'
+  timestamp: '2026-08-21 00:19:11+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/centroid.test.cpp

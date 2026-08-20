@@ -103,6 +103,9 @@ data:
     path: verify/geometry/circle_coverage_areas.test.cpp
     title: verify/geometry/circle_coverage_areas.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/circle_filled.test.cpp
+    title: verify/geometry/circle_filled.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/circle_line_intersection.test.cpp
     title: verify/geometry/circle_line_intersection.test.cpp
   - icon: ':heavy_check_mark:'
@@ -201,6 +204,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/geometry/polygon_area.test.cpp
     title: verify/geometry/polygon_area.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/polygon_filled.test.cpp
+    title: verify/geometry/polygon_filled.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/geometry/polygon_operations.test.cpp
     title: verify/geometry/polygon_operations.test.cpp
@@ -342,6 +348,7 @@ data:
   - verify/geometry/circle_circle_intersection_area.test.cpp
   - verify/geometry/circle_operations.test.cpp
   - verify/geometry/circle_relation.test.cpp
+  - verify/geometry/circle_filled.test.cpp
   - verify/geometry/manhattan_segment_intersections.test.cpp
   - verify/geometry/minimum_enclosing_circle.test.cpp
   - verify/geometry/steiner_convex_decomposition.test.cpp
@@ -364,6 +371,7 @@ data:
   - verify/geometry/floating_predicates.test.cpp
   - verify/geometry/convex_layers.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
+  - verify/geometry/polygon_filled.test.cpp
   - verify/geometry/polygon_area.test.cpp
   - verify/geometry/convex_decomposition.test.cpp
   - verify/geometry/circle_circle_intersection.test.cpp

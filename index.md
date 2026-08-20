@@ -1827,6 +1827,9 @@ data:
       path: verify/geometry/circle_coverage_areas.test.cpp
       title: verify/geometry/circle_coverage_areas.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/geometry/circle_filled.test.cpp
+      title: verify/geometry/circle_filled.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/geometry/circle_line_intersection.test.cpp
       title: verify/geometry/circle_line_intersection.test.cpp
     - icon: ':heavy_check_mark:'
@@ -1928,6 +1931,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/geometry/polygon_area.test.cpp
       title: verify/geometry/polygon_area.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/geometry/polygon_filled.test.cpp
+      title: verify/geometry/polygon_filled.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/geometry/polygon_operations.test.cpp
       title: verify/geometry/polygon_operations.test.cpp

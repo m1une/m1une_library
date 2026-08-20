@@ -625,15 +625,15 @@ data:
     \ geometry::distance(result.first, result.second);\n}\n\n}  // namespace geometry\n\
     }  // namespace m1une\n\n\n#line 14 \"geometry/circle.hpp\"\n\nnamespace m1une\
     \ {\nnamespace geometry {\n\ntemplate <Coordinate T>\nstruct Circle {\n    Point<T>\
-    \ center;\n    T radius;\n};\n\nenum class PointInCircle {\n    Outside = 0,\n\
-    \    Boundary = 1,\n    Inside = 2,\n};\n\nenum class CircleRelation {\n    Separate,\n\
-    \    ExternallyTangent,\n    Intersecting,\n    InternallyTangent,\n    Contained,\n\
-    \    Coincident,\n};\n\nnamespace circle_detail {\n\ninline int compare(long double\
-    \ first, long double second, long double eps) {\n    if (first < second - eps)\
-    \ return -1;\n    if (first > second + eps) return 1;\n    return 0;\n}\n\ninline\
-    \ bool close(\n    const Point<long double>& first,\n    const Point<long double>&\
-    \ second,\n    long double eps\n) {\n    return geometry::distance(first, second)\
-    \ <= eps;\n}\n\ninline void push_unique(\n    std::vector<Point<long double>>&\
+    \ center;\n    T radius;\n    bool filled = true;\n};\n\nenum class PointInCircle\
+    \ {\n    Outside = 0,\n    Boundary = 1,\n    Inside = 2,\n};\n\nenum class CircleRelation\
+    \ {\n    Separate,\n    ExternallyTangent,\n    Intersecting,\n    InternallyTangent,\n\
+    \    Contained,\n    Coincident,\n};\n\nnamespace circle_detail {\n\ninline int\
+    \ compare(long double first, long double second, long double eps) {\n    if (first\
+    \ < second - eps) return -1;\n    if (first > second + eps) return 1;\n    return\
+    \ 0;\n}\n\ninline bool close(\n    const Point<long double>& first,\n    const\
+    \ Point<long double>& second,\n    long double eps\n) {\n    return geometry::distance(first,\
+    \ second) <= eps;\n}\n\ninline void push_unique(\n    std::vector<Point<long double>>&\
     \ points,\n    const Point<long double>& point,\n    long double eps\n) {\n  \
     \  for (const Point<long double>& existing : points) {\n        if (close(existing,\
     \ point, eps)) return;\n    }\n    points.push_back(point);\n}\n\ninline bool\
@@ -649,34 +649,35 @@ data:
     \ < 0)\n    ) {\n        direction = -direction;\n    }\n    return Line<long\
     \ double>{contact, contact + direction};\n}\n\ninline long double circular_segment_angle_term(\n\
     \    long double angle,\n    long double sine,\n    long double cosine\n) {\n\
-    \    if (angle >= 0.01L) return angle - sine * cosine;\n    long double squared\
-    \ = angle * angle;\n    return angle * squared * (\n        2.0L / 3.0L +\n  \
-    \      squared * (\n            -2.0L / 15.0L +\n            squared * (4.0L /\
-    \ 315.0L - squared * 2.0L / 2835.0L)\n        )\n    );\n}\n\ninline long double\
+    \    if (angle >= 0.01L) return angle - sine * cosine;\n    const long double\
+    \ squared = angle * angle;\n    return angle * squared * (\n        2.0L / 3.0L\
+    \ +\n        squared * (\n            -2.0L / 15.0L +\n            squared * (4.0L\
+    \ / 315.0L - squared * 2.0L / 2835.0L)\n        )\n    );\n}\n\ninline long double\
     \ segment_disk_signed_area(\n    const Point<long double>& first,\n    const Point<long\
-    \ double>& second,\n    long double radius,\n    long double eps\n) {\n    Point<long\
-    \ double> direction = second - first;\n    long double quadratic = dot(direction,\
-    \ direction);\n    if (quadratic == 0.0L || radius == 0.0L) return 0.0L;\n\n \
-    \   std::vector<long double> cuts = {0.0L, 1.0L};\n    long double linear = 2.0L\
-    \ * dot(first, direction);\n    long double constant = dot(first, first) - radius\
-    \ * radius;\n    long double discriminant =\n        linear * linear - 4.0L *\
-    \ quadratic * constant;\n    long double tolerance = eps * std::max({\n      \
-    \  1.0L,\n        std::fabs(linear * linear),\n        std::fabs(4.0L * quadratic\
-    \ * constant)\n    });\n    if (discriminant >= -tolerance) {\n        long double\
-    \ root = std::sqrt(std::max(0.0L, discriminant));\n        long double first_ratio\
-    \ =\n            (-linear - root) / (2.0L * quadratic);\n        long double second_ratio\
-    \ =\n            (-linear + root) / (2.0L * quadratic);\n        if (eps < first_ratio\
-    \ && first_ratio < 1.0L - eps) {\n            cuts.push_back(first_ratio);\n \
-    \       }\n        if (eps < second_ratio && second_ratio < 1.0L - eps) {\n  \
-    \          cuts.push_back(second_ratio);\n        }\n    }\n    std::sort(cuts.begin(),\
-    \ cuts.end());\n    cuts.erase(\n        std::unique(\n            cuts.begin(),\n\
-    \            cuts.end(),\n            [eps](long double left, long double right)\
-    \ {\n                return std::fabs(left - right) <= eps;\n            }\n \
-    \       ),\n        cuts.end()\n    );\n\n    long double result = 0.0L;\n   \
-    \ for (std::size_t index = 1; index < cuts.size(); ++index) {\n        long double\
-    \ left = cuts[index - 1];\n        long double right = cuts[index];\n        Point<long\
-    \ double> a = first + direction * left;\n        Point<long double> b = first\
-    \ + direction * right;\n        Point<long double> middle =\n            first\
+    \ double>& second,\n    long double radius,\n    long double eps\n) {\n    const\
+    \ Point<long double> direction = second - first;\n    const long double quadratic\
+    \ = dot(direction, direction);\n    if (quadratic == 0.0L || radius == 0.0L) return\
+    \ 0.0L;\n\n    std::vector<long double> cuts = {0.0L, 1.0L};\n    const long double\
+    \ linear = 2.0L * dot(first, direction);\n    const long double constant = dot(first,\
+    \ first) - radius * radius;\n    const long double discriminant =\n        linear\
+    \ * linear - 4.0L * quadratic * constant;\n    const long double tolerance = eps\
+    \ * std::max({\n        1.0L,\n        std::fabs(linear * linear),\n        std::fabs(4.0L\
+    \ * quadratic * constant)\n    });\n    if (discriminant >= -tolerance) {\n  \
+    \      const long double root = std::sqrt(std::max(0.0L, discriminant));\n   \
+    \     const long double first_ratio =\n            (-linear - root) / (2.0L *\
+    \ quadratic);\n        const long double second_ratio =\n            (-linear\
+    \ + root) / (2.0L * quadratic);\n        if (eps < first_ratio && first_ratio\
+    \ < 1.0L - eps) {\n            cuts.push_back(first_ratio);\n        }\n     \
+    \   if (eps < second_ratio && second_ratio < 1.0L - eps) {\n            cuts.push_back(second_ratio);\n\
+    \        }\n    }\n    std::sort(cuts.begin(), cuts.end());\n    cuts.erase(\n\
+    \        std::unique(\n            cuts.begin(),\n            cuts.end(),\n  \
+    \          [eps](long double left, long double right) {\n                return\
+    \ std::fabs(left - right) <= eps;\n            }\n        ),\n        cuts.end()\n\
+    \    );\n\n    long double result = 0.0L;\n    for (std::size_t index = 1; index\
+    \ < cuts.size(); ++index) {\n        const long double left = cuts[index - 1];\n\
+    \        const long double right = cuts[index];\n        const Point<long double>\
+    \ a = first + direction * left;\n        const Point<long double> b = first +\
+    \ direction * right;\n        const Point<long double> middle =\n            first\
     \ + direction * ((left + right) / 2.0L);\n        if (norm(middle) <= radius +\
     \ eps) {\n            result += cross(a, b) / 2.0L;\n        } else {\n      \
     \      result +=\n                radius * radius * std::atan2(cross(a, b), dot(a,\
@@ -684,72 +685,86 @@ data:
     \ // namespace circle_detail\n\ntemplate <Coordinate T>\nconstexpr Point<long\
     \ double> centroid(const Circle<T>& circle) {\n    assert(circle.radius >= 0);\n\
     \    return Point<long double>(circle.center);\n}\n\ntemplate <Coordinate T>\n\
-    constexpr long double circle_area(const Circle<T>& circle) {\n    assert(circle.radius\
-    \ >= 0);\n    long double radius = static_cast<long double>(circle.radius);\n\
+    constexpr long double circle_circumference(const Circle<T>& circle) {\n    assert(circle.radius\
+    \ >= 0);\n    return\n        2.0L * std::numbers::pi_v<long double> *\n     \
+    \   static_cast<long double>(circle.radius);\n}\n\ntemplate <Coordinate T>\nconstexpr\
+    \ long double circle_area(const Circle<T>& circle) {\n    assert(circle.radius\
+    \ >= 0);\n    const long double radius = static_cast<long double>(circle.radius);\n\
     \    return std::numbers::pi_v<long double> * radius * radius;\n}\n\ntemplate\
-    \ <Coordinate T>\nconstexpr long double circle_circumference(const Circle<T>&\
-    \ circle) {\n    assert(circle.radius >= 0);\n    return\n        2.0L * std::numbers::pi_v<long\
-    \ double> *\n        static_cast<long double>(circle.radius);\n}\n\ntemplate <Coordinate\
-    \ C, Coordinate P>\nPointInCircle point_in_circle(\n    const Circle<C>& circle,\n\
-    \    const Point<P>& point,\n    long double eps = 1e-12L\n) {\n    assert(circle.radius\
-    \ >= 0);\n    assert(eps >= 0.0L);\n    if constexpr (std::integral<C> && std::integral<P>)\
-    \ {\n        using W = __int128_t;\n        W dx = W(point.x) - W(circle.center.x);\n\
-    \        W dy = W(point.y) - W(circle.center.y);\n        W radius = W(circle.radius);\n\
-    \        W squared_distance = dx * dx + dy * dy;\n        W squared_radius = radius\
-    \ * radius;\n        if (squared_distance < squared_radius) return PointInCircle::Inside;\n\
-    \        if (squared_distance > squared_radius) return PointInCircle::Outside;\n\
-    \        return PointInCircle::Boundary;\n    } else {\n        long double value\
-    \ = geometry::distance(\n            Point<long double>(circle.center),\n    \
-    \        Point<long double>(point)\n        );\n        int relation = circle_detail::compare(\n\
-    \            value,\n            static_cast<long double>(circle.radius),\n  \
-    \          eps\n        );\n        if (relation < 0) return PointInCircle::Inside;\n\
-    \        if (relation > 0) return PointInCircle::Outside;\n        return PointInCircle::Boundary;\n\
-    \    }\n}\n\ntemplate <Coordinate C, Coordinate P>\nbool on_circle(\n    const\
-    \ Circle<C>& circle,\n    const Point<P>& point,\n    long double eps = 1e-12L\n\
-    ) {\n    return point_in_circle(circle, point, eps) == PointInCircle::Boundary;\n\
-    }\n\ntemplate <Coordinate C, Coordinate P>\nbool contains(\n    const Circle<C>&\
+    \ <Coordinate C, Coordinate P>\nPointInCircle point_in_circle(\n    const Circle<C>&\
     \ circle,\n    const Point<P>& point,\n    long double eps = 1e-12L\n) {\n   \
-    \ return point_in_circle(circle, point, eps) != PointInCircle::Outside;\n}\n\n\
-    template <Coordinate A, Coordinate B>\nCircle<long double> circle_from_diameter(\n\
-    \    const Point<A>& first,\n    const Point<B>& second\n) {\n    Point<long double>\
-    \ a(first);\n    Point<long double> b(second);\n    Point<long double> center\
-    \ = (a + b) / 2.0L;\n    return Circle<long double>{center, geometry::distance(a,\
-    \ b) / 2.0L};\n}\n\ntemplate <Coordinate T>\nstd::optional<Circle<long double>>\
-    \ incircle(\n    const Point<T>& first,\n    const Point<T>& second,\n    const\
-    \ Point<T>& third,\n    long double eps = 1e-12L\n) {\n    assert(eps >= 0.0L);\n\
-    \    if (orientation(first, second, third, eps) == 0) return std::nullopt;\n\n\
-    \    long double opposite_first = geometry::distance(second, third);\n    long\
-    \ double opposite_second = geometry::distance(third, first);\n    long double\
-    \ opposite_third = geometry::distance(first, second);\n    long double perimeter\
-    \ =\n        opposite_first + opposite_second + opposite_third;\n    Point<long\
-    \ double> center =\n        (Point<long double>(first) * opposite_first +\n  \
-    \       Point<long double>(second) * opposite_second +\n         Point<long double>(third)\
-    \ * opposite_third) /\n        perimeter;\n    long double doubled_area = std::fabs(\n\
-    \        static_cast<long double>(cross(first, second, third))\n    );\n    return\
-    \ Circle<long double>{center, doubled_area / perimeter};\n}\n\ntemplate <Coordinate\
-    \ T>\nstd::optional<Circle<long double>> circumcircle(\n    const Point<T>& first,\n\
-    \    const Point<T>& second,\n    const Point<T>& third,\n    long double eps\
-    \ = 1e-12L\n) {\n    assert(eps >= 0.0L);\n    if (orientation(first, second,\
-    \ third, eps) == 0) return std::nullopt;\n\n    Point<long double> origin(first);\n\
-    \    Point<long double> u = Point<long double>(second) - origin;\n    Point<long\
-    \ double> v = Point<long double>(third) - origin;\n    long double denominator\
-    \ = 2.0L * cross(u, v);\n    long double u_norm = norm2(u);\n    long double v_norm\
-    \ = norm2(v);\n    Point<long double> offset(\n        (u_norm * v.y - v_norm\
-    \ * u.y) / denominator,\n        (u.x * v_norm - v.x * u_norm) / denominator\n\
-    \    );\n    Point<long double> center = origin + offset;\n    return Circle<long\
-    \ double>{center, norm(offset)};\n}\n\ntemplate <Coordinate A, Coordinate B>\n\
-    CircleRelation circle_relation(\n    const Circle<A>& first,\n    const Circle<B>&\
-    \ second,\n    long double eps = 1e-12L\n) {\n    assert(first.radius >= 0);\n\
-    \    assert(second.radius >= 0);\n    assert(eps >= 0.0L);\n    if constexpr (std::integral<A>\
-    \ && std::integral<B>) {\n        using W = __int128_t;\n        W dx = W(second.center.x)\
-    \ - W(first.center.x);\n        W dy = W(second.center.y) - W(first.center.y);\n\
-    \        W squared_distance = dx * dx + dy * dy;\n        W first_radius = W(first.radius);\n\
-    \        W second_radius = W(second.radius);\n        W sum = first_radius + second_radius;\n\
-    \        W difference = first_radius - second_radius;\n        if (difference\
-    \ < 0) difference = -difference;\n        if (squared_distance == 0 && difference\
-    \ == 0) {\n            return CircleRelation::Coincident;\n        }\n       \
-    \ if (squared_distance > sum * sum) return CircleRelation::Separate;\n       \
-    \ if (squared_distance == sum * sum) {\n            return CircleRelation::ExternallyTangent;\n\
+    \ assert(circle.radius >= 0);\n    assert(eps >= 0.0L);\n    if constexpr (std::integral<C>\
+    \ && std::integral<P>) {\n        using W = __int128_t;\n        const W dx =\
+    \ W(point.x) - W(circle.center.x);\n        const W dy = W(point.y) - W(circle.center.y);\n\
+    \        const W radius = W(circle.radius);\n        const W squared_distance\
+    \ = dx * dx + dy * dy;\n        const W squared_radius = radius * radius;\n  \
+    \      if (squared_distance < squared_radius) return PointInCircle::Inside;\n\
+    \        if (squared_distance > squared_radius) return PointInCircle::Outside;\n\
+    \        return PointInCircle::Boundary;\n    } else {\n        const int relation\
+    \ = circle_detail::compare(\n            geometry::distance(\n               \
+    \ Point<long double>(circle.center),\n                Point<long double>(point)\n\
+    \            ),\n            static_cast<long double>(circle.radius),\n      \
+    \      eps\n        );\n        if (relation < 0) return PointInCircle::Inside;\n\
+    \        if (relation > 0) return PointInCircle::Outside;\n        return PointInCircle::Boundary;\n\
+    \    }\n}\n\ntemplate <Coordinate C, Coordinate P>\nbool contains(\n    const\
+    \ Circle<C>& circle,\n    const Point<P>& point,\n    long double eps = 1e-12L\n\
+    ) {\n    const PointInCircle relation = point_in_circle(circle, point, eps);\n\
+    \    return circle.filled\n        ? relation != PointInCircle::Outside\n    \
+    \    : relation == PointInCircle::Boundary;\n}\n\ntemplate <Coordinate C, Coordinate\
+    \ P>\nbool on_circle(\n    const Circle<C>& circle,\n    const Point<P>& point,\n\
+    \    long double eps = 1e-12L\n) {\n    assert(circle.radius >= 0);\n    assert(eps\
+    \ >= 0.0L);\n    if constexpr (std::integral<C> && std::integral<P>) {\n     \
+    \   using W = __int128_t;\n        const W dx = W(point.x) - W(circle.center.x);\n\
+    \        const W dy = W(point.y) - W(circle.center.y);\n        const W radius\
+    \ = W(circle.radius);\n        return dx * dx + dy * dy == radius * radius;\n\
+    \    } else {\n        return circle_detail::compare(\n            geometry::distance(\n\
+    \                Point<long double>(circle.center),\n                Point<long\
+    \ double>(point)\n            ),\n            static_cast<long double>(circle.radius),\n\
+    \            eps\n        ) == 0;\n    }\n}\n\ntemplate <Coordinate C, Coordinate\
+    \ P>\nbool intersects(\n    const Circle<C>& circle,\n    const Point<P>& point,\n\
+    \    long double eps = 1e-12L\n) {\n    return contains(circle, point, eps);\n\
+    }\n\ntemplate <Coordinate P, Coordinate C>\nbool intersects(\n    const Point<P>&\
+    \ point,\n    const Circle<C>& circle,\n    long double eps = 1e-12L\n) {\n  \
+    \  return intersects(circle, point, eps);\n}\n\ntemplate <Coordinate A, Coordinate\
+    \ B>\nCircle<long double> circle_from_diameter(\n    const Point<A>& first,\n\
+    \    const Point<B>& second\n) {\n    Point<long double> a(first);\n    Point<long\
+    \ double> b(second);\n    Point<long double> center = (a + b) / 2.0L;\n    return\
+    \ Circle<long double>{center, geometry::distance(a, b) / 2.0L};\n}\n\ntemplate\
+    \ <Coordinate T>\nstd::optional<Circle<long double>> incircle(\n    const Point<T>&\
+    \ first,\n    const Point<T>& second,\n    const Point<T>& third,\n    long double\
+    \ eps = 1e-12L\n) {\n    assert(eps >= 0.0L);\n    if (orientation(first, second,\
+    \ third, eps) == 0) return std::nullopt;\n\n    long double opposite_first = geometry::distance(second,\
+    \ third);\n    long double opposite_second = geometry::distance(third, first);\n\
+    \    long double opposite_third = geometry::distance(first, second);\n    long\
+    \ double perimeter =\n        opposite_first + opposite_second + opposite_third;\n\
+    \    Point<long double> center =\n        (Point<long double>(first) * opposite_first\
+    \ +\n         Point<long double>(second) * opposite_second +\n         Point<long\
+    \ double>(third) * opposite_third) /\n        perimeter;\n    long double doubled_area\
+    \ = std::fabs(\n        static_cast<long double>(cross(first, second, third))\n\
+    \    );\n    return Circle<long double>{center, doubled_area / perimeter};\n}\n\
+    \ntemplate <Coordinate T>\nstd::optional<Circle<long double>> circumcircle(\n\
+    \    const Point<T>& first,\n    const Point<T>& second,\n    const Point<T>&\
+    \ third,\n    long double eps = 1e-12L\n) {\n    assert(eps >= 0.0L);\n    if\
+    \ (orientation(first, second, third, eps) == 0) return std::nullopt;\n\n    Point<long\
+    \ double> origin(first);\n    Point<long double> u = Point<long double>(second)\
+    \ - origin;\n    Point<long double> v = Point<long double>(third) - origin;\n\
+    \    long double denominator = 2.0L * cross(u, v);\n    long double u_norm = norm2(u);\n\
+    \    long double v_norm = norm2(v);\n    Point<long double> offset(\n        (u_norm\
+    \ * v.y - v_norm * u.y) / denominator,\n        (u.x * v_norm - v.x * u_norm)\
+    \ / denominator\n    );\n    Point<long double> center = origin + offset;\n  \
+    \  return Circle<long double>{center, norm(offset)};\n}\n\ntemplate <Coordinate\
+    \ A, Coordinate B>\nCircleRelation circle_relation(\n    const Circle<A>& first,\n\
+    \    const Circle<B>& second,\n    long double eps = 1e-12L\n) {\n    assert(first.radius\
+    \ >= 0);\n    assert(second.radius >= 0);\n    assert(eps >= 0.0L);\n    if constexpr\
+    \ (std::integral<A> && std::integral<B>) {\n        using W = __int128_t;\n  \
+    \      W dx = W(second.center.x) - W(first.center.x);\n        W dy = W(second.center.y)\
+    \ - W(first.center.y);\n        W squared_distance = dx * dx + dy * dy;\n    \
+    \    W first_radius = W(first.radius);\n        W second_radius = W(second.radius);\n\
+    \        W sum = first_radius + second_radius;\n        W difference = first_radius\
+    \ - second_radius;\n        if (difference < 0) difference = -difference;\n  \
+    \      if (squared_distance == 0 && difference == 0) {\n            return CircleRelation::Coincident;\n\
+    \        }\n        if (squared_distance > sum * sum) return CircleRelation::Separate;\n\
+    \        if (squared_distance == sum * sum) {\n            return CircleRelation::ExternallyTangent;\n\
     \        }\n        if (squared_distance < difference * difference) {\n      \
     \      return CircleRelation::Contained;\n        }\n        if (squared_distance\
     \ == difference * difference) {\n            return CircleRelation::InternallyTangent;\n\
@@ -852,37 +867,68 @@ data:
     ) {\n    std::vector<Point<long double>> points =\n        circle_ray_intersections(circle,\
     \ ray, eps);\n    if (points.empty()) return std::nullopt;\n    return points.front();\n\
     }\n\ntemplate <Coordinate C, Coordinate L>\nbool intersects(\n    const Circle<C>&\
-    \ circle,\n    const Line<L>& line,\n    long double eps = 1e-12L\n) {\n    return\
-    \ !circle_line_intersections(circle, line, eps).empty();\n}\n\ntemplate <Coordinate\
-    \ C, Coordinate L>\nbool intersects(\n    const Line<L>& line,\n    const Circle<C>&\
-    \ circle,\n    long double eps = 1e-12L\n) {\n    return intersects(circle, line,\
-    \ eps);\n}\n\ntemplate <Coordinate C, Coordinate R>\nbool intersects(\n    const\
-    \ Circle<C>& circle,\n    const Ray<R>& ray,\n    long double eps = 1e-12L\n)\
-    \ {\n    return !circle_ray_intersections(circle, ray, eps).empty();\n}\n\ntemplate\
-    \ <Coordinate C, Coordinate R>\nbool intersects(\n    const Ray<R>& ray,\n   \
-    \ const Circle<C>& circle,\n    long double eps = 1e-12L\n) {\n    return intersects(circle,\
-    \ ray, eps);\n}\n\ntemplate <Coordinate C, Coordinate S>\nbool intersects(\n \
-    \   const Circle<C>& circle,\n    const Segment<S>& segment,\n    long double\
-    \ eps = 1e-12L\n) {\n    return !circle_segment_intersections(circle, segment,\
-    \ eps).empty();\n}\n\ntemplate <Coordinate C, Coordinate S>\nbool intersects(\n\
+    \ circle,\n    const Line<L>& line,\n    long double eps = 1e-12L\n) {\n    if\
+    \ (circle.filled) {\n        const Line<long double> converted{\n            Point<long\
+    \ double>(line.a),\n            Point<long double>(line.b)\n        };\n     \
+    \   return contains(\n            circle,\n            projection(converted, Point<long\
+    \ double>(circle.center)),\n            eps\n        );\n    }\n    return !circle_line_intersections(circle,\
+    \ line, eps).empty();\n}\n\ntemplate <Coordinate C, Coordinate L>\nbool intersects(\n\
+    \    const Line<L>& line,\n    const Circle<C>& circle,\n    long double eps =\
+    \ 1e-12L\n) {\n    return intersects(circle, line, eps);\n}\n\ntemplate <Coordinate\
+    \ C, Coordinate R>\nbool intersects(\n    const Circle<C>& circle,\n    const\
+    \ Ray<R>& ray,\n    long double eps = 1e-12L\n) {\n    if (circle.filled) {\n\
+    \        const Ray<long double> converted{\n            Point<long double>(ray.origin),\n\
+    \            Point<long double>(ray.through)\n        };\n        return contains(\n\
+    \            circle,\n            projection(converted, Point<long double>(circle.center)),\n\
+    \            eps\n        );\n    }\n    return !circle_ray_intersections(circle,\
+    \ ray, eps).empty();\n}\n\ntemplate <Coordinate C, Coordinate R>\nbool intersects(\n\
+    \    const Ray<R>& ray,\n    const Circle<C>& circle,\n    long double eps = 1e-12L\n\
+    ) {\n    return intersects(circle, ray, eps);\n}\n\ntemplate <Coordinate C, Coordinate\
+    \ S>\nbool intersects(\n    const Circle<C>& circle,\n    const Segment<S>& segment,\n\
+    \    long double eps = 1e-12L\n) {\n    if (circle.filled) {\n        const Segment<long\
+    \ double> converted{\n            Point<long double>(segment.a),\n           \
+    \ Point<long double>(segment.b)\n        };\n        return contains(\n      \
+    \      circle,\n            projection(converted, Point<long double>(circle.center)),\n\
+    \            eps\n        );\n    }\n    return !circle_segment_intersections(circle,\
+    \ segment, eps).empty();\n}\n\ntemplate <Coordinate C, Coordinate S>\nbool intersects(\n\
     \    const Segment<S>& segment,\n    const Circle<C>& circle,\n    long double\
     \ eps = 1e-12L\n) {\n    return intersects(circle, segment, eps);\n}\n\ntemplate\
     \ <Coordinate A, Coordinate B>\nbool intersects(\n    const Circle<A>& first,\n\
-    \    const Circle<B>& second,\n    long double eps = 1e-12L\n) {\n    CircleRelation\
-    \ relation = circle_relation(first, second, eps);\n    return\n        relation\
-    \ == CircleRelation::ExternallyTangent ||\n        relation == CircleRelation::Intersecting\
-    \ ||\n        relation == CircleRelation::InternallyTangent ||\n        relation\
-    \ == CircleRelation::Coincident;\n}\n\ntemplate <Coordinate R, Coordinate H, Coordinate\
-    \ C>\nRay<long double> reflected_ray(\n    const Ray<R>& incoming,\n    const\
-    \ Point<H>& hit,\n    const Circle<C>& circle,\n    long double eps = 1e-12L\n\
-    ) {\n    assert(incoming.origin != incoming.through);\n    assert(eps >= 0.0L);\n\
-    \    assert(static_cast<long double>(circle.radius) > eps);\n    assert(\n   \
-    \     std::fabs(\n            geometry::distance(\n                Point<long\
-    \ double>(hit),\n                Point<long double>(circle.center)\n         \
-    \   ) -\n            static_cast<long double>(circle.radius)\n        ) <= eps\n\
-    \    );\n\n    Point<long double> hit_point(hit);\n    Point<long double> normal\
-    \ = normalized(\n        hit_point - Point<long double>(circle.center)\n    );\n\
-    \    Point<long double> incoming_direction =\n        Point<long double>(incoming.through)\
+    \    const Circle<B>& second,\n    long double eps = 1e-12L\n) {\n    assert(first.radius\
+    \ >= 0);\n    assert(second.radius >= 0);\n    assert(eps >= 0.0L);\n    if (first.filled\
+    \ && second.filled) {\n        if constexpr (std::integral<A> && std::integral<B>)\
+    \ {\n            using W = __int128_t;\n            const W dx = W(second.center.x)\
+    \ - W(first.center.x);\n            const W dy = W(second.center.y) - W(first.center.y);\n\
+    \            const W radius = W(first.radius) + W(second.radius);\n          \
+    \  return dx * dx + dy * dy <= radius * radius;\n        } else {\n          \
+    \  const long double center_distance = geometry::distance(\n                Point<long\
+    \ double>(first.center),\n                Point<long double>(second.center)\n\
+    \            );\n            const long double radius_sum =\n                static_cast<long\
+    \ double>(first.radius) +\n                static_cast<long double>(second.radius);\n\
+    \            return circle_detail::compare(\n                center_distance,\n\
+    \                radius_sum,\n                eps\n            ) <= 0;\n     \
+    \   }\n    }\n    if (first.filled != second.filled) {\n        const long double\
+    \ center_distance = geometry::distance(\n            Point<long double>(first.center),\n\
+    \            Point<long double>(second.center)\n        );\n        const long\
+    \ double boundary_radius = first.filled\n            ? static_cast<long double>(second.radius)\n\
+    \            : static_cast<long double>(first.radius);\n        const long double\
+    \ filled_radius = first.filled\n            ? static_cast<long double>(first.radius)\n\
+    \            : static_cast<long double>(second.radius);\n        return circle_detail::compare(\n\
+    \            std::fabs(center_distance - boundary_radius),\n            filled_radius,\n\
+    \            eps\n        ) <= 0;\n    }\n    CircleRelation relation = circle_relation(first,\
+    \ second, eps);\n    return\n        relation == CircleRelation::ExternallyTangent\
+    \ ||\n        relation == CircleRelation::Intersecting ||\n        relation ==\
+    \ CircleRelation::InternallyTangent ||\n        relation == CircleRelation::Coincident;\n\
+    }\n\ntemplate <Coordinate R, Coordinate H, Coordinate C>\nRay<long double> reflected_ray(\n\
+    \    const Ray<R>& incoming,\n    const Point<H>& hit,\n    const Circle<C>& circle,\n\
+    \    long double eps = 1e-12L\n) {\n    assert(incoming.origin != incoming.through);\n\
+    \    assert(eps >= 0.0L);\n    assert(static_cast<long double>(circle.radius)\
+    \ > eps);\n    assert(\n        std::fabs(\n            geometry::distance(\n\
+    \                Point<long double>(hit),\n                Point<long double>(circle.center)\n\
+    \            ) -\n            static_cast<long double>(circle.radius)\n      \
+    \  ) <= eps\n    );\n\n    Point<long double> hit_point(hit);\n    Point<long\
+    \ double> normal = normalized(\n        hit_point - Point<long double>(circle.center)\n\
+    \    );\n    Point<long double> incoming_direction =\n        Point<long double>(incoming.through)\
     \ -\n        Point<long double>(incoming.origin);\n    Point<long double> outgoing_direction\
     \ =\n        incoming_direction - normal * (2.0L * dot(incoming_direction, normal));\n\
     \    return Ray<long double>{hit_point, hit_point + outgoing_direction};\n}\n\n\
@@ -940,37 +986,39 @@ data:
     \ = 1e-12L\n) {\n    std::vector<Point<long double>> result;\n    for (const Line<long\
     \ double>& line : common_tangents(first, second, eps)) {\n        circle_detail::push_unique(result,\
     \ line.a, eps);\n    }\n    std::sort(result.begin(), result.end());\n    return\
-    \ result;\n}\n\ntemplate <Coordinate A, Coordinate B>\nlong double circle_circle_intersection_area(\n\
+    \ result;\n}\n\n// These area functions use the enclosed disks, independent of\
+    \ `filled`.\ntemplate <Coordinate A, Coordinate B>\nlong double circle_circle_intersection_area(\n\
     \    const Circle<A>& first,\n    const Circle<B>& second,\n    long double eps\
     \ = 1e-12L\n) {\n    assert(first.radius >= 0);\n    assert(second.radius >= 0);\n\
-    \    assert(eps >= 0.0L);\n    long double first_radius = static_cast<long double>(first.radius);\n\
-    \    long double second_radius = static_cast<long double>(second.radius);\n  \
-    \  CircleRelation relation = circle_relation(first, second, eps);\n    if (\n\
-    \        relation == CircleRelation::Separate ||\n        relation == CircleRelation::ExternallyTangent\n\
-    \    ) {\n        return 0.0L;\n    }\n    if (\n        relation == CircleRelation::Contained\
-    \ ||\n        relation == CircleRelation::InternallyTangent ||\n        relation\
-    \ == CircleRelation::Coincident\n    ) {\n        long double radius = std::min(first_radius,\
+    \    assert(eps >= 0.0L);\n    const long double first_radius = static_cast<long\
+    \ double>(first.radius);\n    const long double second_radius = static_cast<long\
+    \ double>(second.radius);\n    const CircleRelation relation = circle_relation(first,\
+    \ second, eps);\n    if (\n        relation == CircleRelation::Separate ||\n \
+    \       relation == CircleRelation::ExternallyTangent\n    ) {\n        return\
+    \ 0.0L;\n    }\n    if (\n        relation == CircleRelation::Contained ||\n \
+    \       relation == CircleRelation::InternallyTangent ||\n        relation ==\
+    \ CircleRelation::Coincident\n    ) {\n        const long double radius = std::min(first_radius,\
     \ second_radius);\n        return std::numbers::pi_v<long double> * radius * radius;\n\
-    \    }\n\n    long double center_distance = geometry::distance(\n        Point<long\
-    \ double>(first.center),\n        Point<long double>(second.center)\n    );\n\
-    \    long double first_cosine = std::clamp(\n        (\n            (center_distance\
-    \ - second_radius) *\n                (center_distance + second_radius) +\n  \
-    \          first_radius * first_radius\n        ) /\n            (2.0L * center_distance\
-    \ * first_radius),\n        -1.0L,\n        1.0L\n    );\n    long double second_cosine\
-    \ = std::clamp(\n        (\n            (center_distance - first_radius) *\n \
-    \               (center_distance + first_radius) +\n            second_radius\
-    \ * second_radius\n        ) /\n            (2.0L * center_distance * second_radius),\n\
-    \        -1.0L,\n        1.0L\n    );\n    long double radicand =\n        (-center_distance\
-    \ + first_radius + second_radius) *\n        (center_distance + first_radius -\
-    \ second_radius) *\n        (center_distance - first_radius + second_radius) *\n\
-    \        (center_distance + first_radius + second_radius);\n    long double height\
-    \ =\n        std::sqrt(std::max(0.0L, radicand)) /\n        (2.0L * center_distance);\n\
-    \    long double first_sine = std::clamp(\n        height / first_radius,\n  \
-    \      0.0L,\n        1.0L\n    );\n    long double second_sine = std::clamp(\n\
-    \        height / second_radius,\n        0.0L,\n        1.0L\n    );\n    long\
-    \ double first_angle = std::atan2(first_sine, first_cosine);\n    long double\
-    \ second_angle = std::atan2(second_sine, second_cosine);\n    return\n       \
-    \ first_radius * first_radius *\n            circle_detail::circular_segment_angle_term(\n\
+    \    }\n\n    const long double center_distance = geometry::distance(\n      \
+    \  Point<long double>(first.center),\n        Point<long double>(second.center)\n\
+    \    );\n    const long double first_cosine = std::clamp(\n        (\n       \
+    \     (center_distance - second_radius) *\n                (center_distance +\
+    \ second_radius) +\n            first_radius * first_radius\n        ) / (2.0L\
+    \ * center_distance * first_radius),\n        -1.0L,\n        1.0L\n    );\n \
+    \   const long double second_cosine = std::clamp(\n        (\n            (center_distance\
+    \ - first_radius) *\n                (center_distance + first_radius) +\n    \
+    \        second_radius * second_radius\n        ) / (2.0L * center_distance *\
+    \ second_radius),\n        -1.0L,\n        1.0L\n    );\n    const long double\
+    \ radicand =\n        (-center_distance + first_radius + second_radius) *\n  \
+    \      (center_distance + first_radius - second_radius) *\n        (center_distance\
+    \ - first_radius + second_radius) *\n        (center_distance + first_radius +\
+    \ second_radius);\n    const long double height =\n        std::sqrt(std::max(0.0L,\
+    \ radicand)) / (2.0L * center_distance);\n    const long double first_sine =\n\
+    \        std::clamp(height / first_radius, 0.0L, 1.0L);\n    const long double\
+    \ second_sine =\n        std::clamp(height / second_radius, 0.0L, 1.0L);\n   \
+    \ const long double first_angle = std::atan2(first_sine, first_cosine);\n    const\
+    \ long double second_angle = std::atan2(second_sine, second_cosine);\n    return\n\
+    \        first_radius * first_radius *\n            circle_detail::circular_segment_angle_term(\n\
     \                first_angle,\n                first_sine,\n                first_cosine\n\
     \            ) +\n        second_radius * second_radius *\n            circle_detail::circular_segment_angle_term(\n\
     \                second_angle,\n                second_sine,\n               \
@@ -978,17 +1026,148 @@ data:
     long double circle_polygon_intersection_area(\n    const Circle<C>& circle,\n\
     \    const std::vector<Point<P>>& polygon,\n    long double eps = 1e-12L\n) {\n\
     \    assert(circle.radius >= 0);\n    assert(eps >= 0.0L);\n    if (polygon.empty()\
-    \ || circle.radius == 0) return 0.0L;\n\n    Point<long double> center(circle.center);\n\
-    \    long double radius = static_cast<long double>(circle.radius);\n    long double\
-    \ result = 0.0L;\n    for (std::size_t index = 0; index < polygon.size(); ++index)\
-    \ {\n        Point<long double> first =\n            Point<long double>(polygon[index])\
-    \ - center;\n        Point<long double> second =\n            Point<long double>(polygon[(index\
-    \ + 1) % polygon.size()]) - center;\n        result += circle_detail::segment_disk_signed_area(\n\
-    \            first,\n            second,\n            radius,\n            eps\n\
-    \        );\n    }\n    return std::fabs(result);\n}\n\n}  // namespace geometry\n\
-    }  // namespace m1une\n\n\n#line 5 \"verify/geometry/incircle.test.cpp\"\n\n#line\
-    \ 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 5 \"utilities/fast_io.hpp\"\n#include\
-    \ <array>\n#include <cerrno>\n#include <charconv>\n#line 9 \"utilities/fast_io.hpp\"\
+    \ || circle.radius == 0) return 0.0L;\n\n    const Point<long double> center(circle.center);\n\
+    \    const long double radius = static_cast<long double>(circle.radius);\n   \
+    \ long double result = 0.0L;\n    for (std::size_t index = 0; index < polygon.size();\
+    \ ++index) {\n        const Point<long double> first =\n            Point<long\
+    \ double>(polygon[index]) - center;\n        const Point<long double> second =\n\
+    \            Point<long double>(polygon[(index + 1) % polygon.size()]) - center;\n\
+    \        result += circle_detail::segment_disk_signed_area(\n            first,\n\
+    \            second,\n            radius,\n            eps\n        );\n    }\n\
+    \    return std::fabs(result);\n}\n\nnamespace circle_detail {\n\ntemplate <Coordinate\
+    \ T>\nPoint<long double> point_toward(\n    const Circle<T>& circle,\n    const\
+    \ Point<long double>& target\n) {\n    assert(circle.radius >= 0);\n    const\
+    \ Point<long double> center(circle.center);\n    const long double radius = static_cast<long\
+    \ double>(circle.radius);\n    const Point<long double> direction = target - center;\n\
+    \    const long double length = norm(direction);\n    if (length == 0.0L) {\n\
+    \        return center + Point<long double>(-radius, 0.0L);\n    }\n    return\
+    \ center + direction * (radius / length);\n}\n\ninline void consider(\n    ClosestPoints&\
+    \ best,\n    const ClosestPoints& candidate\n) {\n    closest_points_detail::consider(best,\
+    \ candidate);\n}\n\n}  // namespace circle_detail\n\ntemplate <Coordinate C, Coordinate\
+    \ P>\nClosestPoints closest_points(\n    const Circle<C>& circle,\n    const Point<P>&\
+    \ point,\n    long double eps = 1e-12L\n) {\n    const Point<long double> converted(point);\n\
+    \    if (circle.filled && contains(circle, converted, eps)) {\n        return\
+    \ ClosestPoints{converted, converted};\n    }\n    return ClosestPoints{\n   \
+    \     circle_detail::point_toward(circle, converted),\n        converted\n   \
+    \ };\n}\n\ntemplate <Coordinate P, Coordinate C>\nClosestPoints closest_points(\n\
+    \    const Point<P>& point,\n    const Circle<C>& circle,\n    long double eps\
+    \ = 1e-12L\n) {\n    return closest_points_detail::reversed(\n        closest_points(circle,\
+    \ point, eps)\n    );\n}\n\ntemplate <Coordinate C, Coordinate L>\nClosestPoints\
+    \ closest_points(\n    const Circle<C>& circle,\n    const Line<L>& line,\n  \
+    \  long double eps = 1e-12L\n) {\n    const Line<long double> converted{\n   \
+    \     Point<long double>(line.a),\n        Point<long double>(line.b)\n    };\n\
+    \    const Point<long double> point = projection(\n        converted,\n      \
+    \  Point<long double>(circle.center)\n    );\n    if (circle.filled) return closest_points(circle,\
+    \ point, eps);\n\n    const std::vector<Point<long double>> common =\n       \
+    \ circle_line_intersections(circle, line, eps);\n    if (!common.empty()) return\
+    \ ClosestPoints{common.front(), common.front()};\n    return ClosestPoints{\n\
+    \        circle_detail::point_toward(circle, point),\n        point\n    };\n\
+    }\n\ntemplate <Coordinate L, Coordinate C>\nClosestPoints closest_points(\n  \
+    \  const Line<L>& line,\n    const Circle<C>& circle,\n    long double eps = 1e-12L\n\
+    ) {\n    return closest_points_detail::reversed(closest_points(circle, line, eps));\n\
+    }\n\ntemplate <Coordinate C, Coordinate R>\nClosestPoints closest_points(\n  \
+    \  const Circle<C>& circle,\n    const Ray<R>& ray,\n    long double eps = 1e-12L\n\
+    ) {\n    const Ray<long double> converted{\n        Point<long double>(ray.origin),\n\
+    \        Point<long double>(ray.through)\n    };\n    const Point<long double>\
+    \ point = projection(\n        converted,\n        Point<long double>(circle.center)\n\
+    \    );\n    if (circle.filled) return closest_points(circle, point, eps);\n\n\
+    \    const std::vector<Point<long double>> common =\n        circle_ray_intersections(circle,\
+    \ ray, eps);\n    if (!common.empty()) return ClosestPoints{common.front(), common.front()};\n\
+    \    return ClosestPoints{\n        circle_detail::point_toward(circle, point),\n\
+    \        point\n    };\n}\n\ntemplate <Coordinate R, Coordinate C>\nClosestPoints\
+    \ closest_points(\n    const Ray<R>& ray,\n    const Circle<C>& circle,\n    long\
+    \ double eps = 1e-12L\n) {\n    return closest_points_detail::reversed(closest_points(circle,\
+    \ ray, eps));\n}\n\ntemplate <Coordinate C, Coordinate S>\nClosestPoints closest_points(\n\
+    \    const Circle<C>& circle,\n    const Segment<S>& segment,\n    long double\
+    \ eps = 1e-12L\n) {\n    const Segment<long double> converted{\n        Point<long\
+    \ double>(segment.a),\n        Point<long double>(segment.b)\n    };\n    const\
+    \ Point<long double> center(circle.center);\n    const Point<long double> projected\
+    \ = projection(converted, center);\n    if (circle.filled) return closest_points(circle,\
+    \ projected, eps);\n\n    const std::vector<Point<long double>> common =\n   \
+    \     circle_segment_intersections(circle, segment, eps);\n    if (!common.empty())\
+    \ return ClosestPoints{common.front(), common.front()};\n    ClosestPoints result{\n\
+    \        circle_detail::point_toward(circle, projected),\n        projected\n\
+    \    };\n    for (const Point<long double>& point : {converted.a, converted.b})\
+    \ {\n        circle_detail::consider(\n            result,\n            ClosestPoints{circle_detail::point_toward(circle,\
+    \ point), point}\n        );\n    }\n    return result;\n}\n\ntemplate <Coordinate\
+    \ S, Coordinate C>\nClosestPoints closest_points(\n    const Segment<S>& segment,\n\
+    \    const Circle<C>& circle,\n    long double eps = 1e-12L\n) {\n    return closest_points_detail::reversed(\n\
+    \        closest_points(circle, segment, eps)\n    );\n}\n\ntemplate <Coordinate\
+    \ A, Coordinate B>\nClosestPoints closest_points(\n    const Circle<A>& first,\n\
+    \    const Circle<B>& second,\n    long double eps = 1e-12L\n) {\n    if (first.filled\
+    \ && !second.filled) {\n        return closest_points_detail::reversed(\n    \
+    \        closest_points(second, first, eps)\n        );\n    }\n\n    if (!first.filled\
+    \ && second.filled) {\n        const ClosestPoints center_result =\n         \
+    \   closest_points(first, second.center, eps);\n        if (contains(second, center_result.first,\
+    \ eps)) {\n            return ClosestPoints{center_result.first, center_result.first};\n\
+    \        }\n        const ClosestPoints filled_result =\n            closest_points(second,\
+    \ center_result.first, eps);\n        return ClosestPoints{center_result.first,\
+    \ filled_result.first};\n    }\n\n    if (first.filled && second.filled) {\n \
+    \       assert(first.radius >= 0);\n        assert(second.radius >= 0);\n    \
+    \    const Point<long double> first_center(first.center);\n        const Point<long\
+    \ double> second_center(second.center);\n        Point<long double> direction\
+    \ = second_center - first_center;\n        const long double center_distance =\
+    \ norm(direction);\n        if (center_distance == 0.0L) {\n            return\
+    \ ClosestPoints{first_center, first_center};\n        }\n        direction = direction\
+    \ / center_distance;\n        const long double first_radius =\n            static_cast<long\
+    \ double>(first.radius);\n        const long double second_radius =\n        \
+    \    static_cast<long double>(second.radius);\n        if (intersects(first, second,\
+    \ eps)) {\n            const long double left = std::max(\n                -first_radius,\n\
+    \                center_distance - second_radius\n            );\n           \
+    \ const long double right = std::min(\n                first_radius,\n       \
+    \         center_distance + second_radius\n            );\n            const Point<long\
+    \ double> common =\n                first_center + direction * ((left + right)\
+    \ / 2.0L);\n            return ClosestPoints{common, common};\n        }\n   \
+    \     return ClosestPoints{\n            first_center + direction * first_radius,\n\
+    \            second_center - direction * second_radius\n        };\n    }\n\n\
+    \    const std::vector<Point<long double>> common =\n        circle_intersections(first,\
+    \ second, eps);\n    if (!common.empty()) return ClosestPoints{common.front(),\
+    \ common.front()};\n\n    const Point<long double> first_center(first.center);\n\
+    \    const Point<long double> second_center(second.center);\n    if (circle_relation(first,\
+    \ second, eps) == CircleRelation::Coincident) {\n        const Point<long double>\
+    \ point =\n            circle_detail::point_toward(first, first_center);\n   \
+    \     return ClosestPoints{point, point};\n    }\n    Point<long double> direction\
+    \ = second_center - first_center;\n    const long double center_distance = norm(direction);\n\
+    \    if (center_distance == 0.0L) {\n        const Point<long double> first_point\
+    \ =\n            circle_detail::point_toward(first, first_center);\n        const\
+    \ Point<long double> second_point =\n            circle_detail::point_toward(second,\
+    \ second_center);\n        return ClosestPoints{first_point, second_point};\n\
+    \    }\n    direction = direction / center_distance;\n    const long double first_radius\
+    \ = static_cast<long double>(first.radius);\n    const long double second_radius\
+    \ = static_cast<long double>(second.radius);\n    ClosestPoints result{\n    \
+    \    first_center + direction * first_radius,\n        second_center + direction\
+    \ * second_radius\n    };\n    for (const long double first_sign : {-1.0L, 1.0L})\
+    \ {\n        for (const long double second_sign : {-1.0L, 1.0L}) {\n         \
+    \   circle_detail::consider(\n                result,\n                ClosestPoints{\n\
+    \                    first_center + direction * (first_sign * first_radius),\n\
+    \                    second_center + direction * (second_sign * second_radius)\n\
+    \                }\n            );\n        }\n    }\n    return result;\n}\n\n\
+    template <Coordinate C, Coordinate P>\nlong double distance(const Circle<C>& circle,\
+    \ const Point<P>& point) {\n    const ClosestPoints result = closest_points(circle,\
+    \ point);\n    return geometry::distance(result.first, result.second);\n}\n\n\
+    template <Coordinate P, Coordinate C>\nlong double distance(const Point<P>& point,\
+    \ const Circle<C>& circle) {\n    return distance(circle, point);\n}\n\ntemplate\
+    \ <Coordinate C, Coordinate L>\nlong double distance(const Circle<C>& circle,\
+    \ const Line<L>& line) {\n    const ClosestPoints result = closest_points(circle,\
+    \ line);\n    return geometry::distance(result.first, result.second);\n}\n\ntemplate\
+    \ <Coordinate L, Coordinate C>\nlong double distance(const Line<L>& line, const\
+    \ Circle<C>& circle) {\n    return distance(circle, line);\n}\n\ntemplate <Coordinate\
+    \ C, Coordinate R>\nlong double distance(const Circle<C>& circle, const Ray<R>&\
+    \ ray) {\n    const ClosestPoints result = closest_points(circle, ray);\n    return\
+    \ geometry::distance(result.first, result.second);\n}\n\ntemplate <Coordinate\
+    \ R, Coordinate C>\nlong double distance(const Ray<R>& ray, const Circle<C>& circle)\
+    \ {\n    return distance(circle, ray);\n}\n\ntemplate <Coordinate C, Coordinate\
+    \ S>\nlong double distance(const Circle<C>& circle, const Segment<S>& segment)\
+    \ {\n    const ClosestPoints result = closest_points(circle, segment);\n    return\
+    \ geometry::distance(result.first, result.second);\n}\n\ntemplate <Coordinate\
+    \ S, Coordinate C>\nlong double distance(const Segment<S>& segment, const Circle<C>&\
+    \ circle) {\n    return distance(circle, segment);\n}\n\ntemplate <Coordinate\
+    \ A, Coordinate B>\nlong double distance(const Circle<A>& first, const Circle<B>&\
+    \ second) {\n    const ClosestPoints result = closest_points(first, second);\n\
+    \    return geometry::distance(result.first, result.second);\n}\n\n}  // namespace\
+    \ geometry\n}  // namespace m1une\n\n\n#line 5 \"verify/geometry/incircle.test.cpp\"\
+    \n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 5 \"utilities/fast_io.hpp\"\
+    \n#include <array>\n#include <cerrno>\n#include <charconv>\n#line 9 \"utilities/fast_io.hpp\"\
     \n#include <cstdio>\n#include <cstdlib>\n#include <cstdint>\n#include <cstring>\n\
     #include <iterator>\n#include <string>\n#include <sys/stat.h>\n#line 17 \"utilities/fast_io.hpp\"\
     \n#include <utility>\n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities\
@@ -1257,7 +1436,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/incircle.test.cpp
   requiredBy: []
-  timestamp: '2026-08-20 22:35:59+09:00'
+  timestamp: '2026-08-21 00:19:11+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/incircle.test.cpp
