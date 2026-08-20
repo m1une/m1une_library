@@ -10,7 +10,7 @@
 #include <type_traits>
 #include <vector>
 
-#include "ray.hpp"
+#include "linear.hpp"
 
 namespace m1une {
 namespace geometry {

@@ -66,10 +66,11 @@ void test_basic() {
     Line<long long> diagonal2;
     diagonal2.a = P(0, 2);
     diagonal2.b = P(2, 0);
-    [[maybe_unused]] auto crossing = line_intersection(diagonal1, diagonal2);
-    assert(crossing.has_value());
-    assert(close(crossing->x, 1));
-    assert(close(crossing->y, 1));
+    const LinearIntersection crossing =
+        linear_intersection(diagonal1, diagonal2);
+    assert(crossing.kind == LinearIntersectionKind::Point);
+    assert(close(crossing.first.x, 1));
+    assert(close(crossing.first.y, 1));
 
     std::vector<P> square;
     square.emplace_back(0, 0);

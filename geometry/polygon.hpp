@@ -10,7 +10,7 @@
 #include <optional>
 #include <vector>
 
-#include "ray.hpp"
+#include "linear.hpp"
 
 namespace m1une {
 namespace geometry {
@@ -363,37 +363,15 @@ std::vector<Point<long double>> ray_polygon_intersections(
             polygon[index],
             polygon[(index + 1) % size]
         };
-        std::optional<Point<long double>> point =
-            ray_segment_intersection(ray, edge, eps);
-        if (point.has_value()) {
-            polygon_detail::push_unique(result, *point, eps);
-            continue;
-        }
-        if (
-            orientation(ray.origin, ray.through, edge.a, eps) == 0 &&
-            orientation(ray.origin, ray.through, edge.b, eps) == 0
-        ) {
-            if (on_ray(ray, edge.a, eps)) {
-                polygon_detail::push_unique(
-                    result,
-                    Point<long double>(edge.a),
-                    eps
-                );
-            }
-            if (on_ray(ray, edge.b, eps)) {
-                polygon_detail::push_unique(
-                    result,
-                    Point<long double>(edge.b),
-                    eps
-                );
-            }
-            if (on_segment(edge, ray.origin, eps)) {
-                polygon_detail::push_unique(
-                    result,
-                    Point<long double>(ray.origin),
-                    eps
-                );
-            }
+        const LinearIntersection intersection =
+            linear_intersection(ray, edge, eps);
+        if (intersection.kind == LinearIntersectionKind::Point) {
+            polygon_detail::push_unique(result, intersection.first, eps);
+        } else if (intersection.kind == LinearIntersectionKind::Segment) {
+            polygon_detail::push_unique(result, intersection.first, eps);
+            polygon_detail::push_unique(result, intersection.second, eps);
+        } else {
+            assert(intersection.kind == LinearIntersectionKind::Empty);
         }
     }
 

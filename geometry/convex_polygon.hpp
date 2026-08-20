@@ -876,34 +876,12 @@ closest_points_between_segments(
     const Segment<T>& second,
     long double eps
 ) {
-    if (intersects(first, second, eps)) {
-        for (const Point<T>& point : {first.a, first.b}) {
-            if (on_segment(second, point, eps)) {
-                const Point<long double> common(point);
-                return std::pair<Point<long double>, Point<long double>>(
-                    common,
-                    common
-                );
-            }
-        }
-        for (const Point<T>& point : {second.a, second.b}) {
-            if (on_segment(first, point, eps)) {
-                const Point<long double> common(point);
-                return std::pair<Point<long double>, Point<long double>>(
-                    common,
-                    common
-                );
-            }
-        }
-        const auto common = line_intersection(
-            Line<T>{first.a, first.b},
-            Line<T>{second.a, second.b},
-            eps
-        );
-        assert(common.has_value());
+    const LinearIntersection common =
+        linear_intersection(first, second, eps);
+    if (common.kind != LinearIntersectionKind::Empty) {
         return std::pair<Point<long double>, Point<long double>>(
-            *common,
-            *common
+            common.first,
+            common.first
         );
     }
 
@@ -1021,9 +999,11 @@ std::vector<Point<long double>> convex_cut(
         const bool current_inside = current_side >= 0;
         if (previous_inside != current_inside) {
             const Line<long double> crossing{previous, current};
-            const std::optional<Point<long double>> intersection =
-                line_intersection(line, crossing, eps);
-            if (intersection.has_value()) result.push_back(*intersection);
+            const LinearIntersection intersection =
+                linear_intersection(line, crossing, eps);
+            if (intersection.kind == LinearIntersectionKind::Point) {
+                result.push_back(intersection.first);
+            }
         }
         if (current_inside) result.push_back(current);
         previous = current;

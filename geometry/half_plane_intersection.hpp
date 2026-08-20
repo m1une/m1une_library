@@ -13,7 +13,7 @@
 #include <utility>
 #include <vector>
 
-#include "line.hpp"
+#include "linear.hpp"
 
 namespace m1une {
 namespace geometry {

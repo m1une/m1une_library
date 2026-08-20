@@ -1,6 +1,6 @@
 #define PROBLEM "https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_1_C"
 
-#include "../../geometry/ray.hpp"
+#include "../../geometry/linear.hpp"
 
 #include <cassert>
 #include <cmath>
@@ -191,8 +191,8 @@ void test_scale_invariance() {
             intersects(floating_first_ray, floating_second_ray)
         );
         assert(
-            segment_intersection(first_segment, second_segment).kind ==
-            segment_intersection(
+            linear_intersection(first_segment, second_segment).kind ==
+            linear_intersection(
                 floating_first_segment,
                 floating_second_segment
             ).kind

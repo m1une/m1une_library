@@ -1,6 +1,6 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/aplusb"
 
-#include "../../geometry/ray.hpp"
+#include "../../geometry/linear.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -39,10 +39,10 @@ void test_line_segment() {
     assert(intersects(horizontal, crossing));
     assert(intersects(crossing, horizontal));
     assert(close(distance(horizontal, crossing), 0));
-    auto point = line_segment_intersection(horizontal, crossing);
-    assert(point.has_value());
-    assert(close(point->x, 2));
-    assert(close(point->y, 0));
+    LinearIntersection point = linear_intersection(horizontal, crossing);
+    assert(point.kind == LinearIntersectionKind::Point);
+    assert(close(point.first.x, 2));
+    assert(close(point.first.y, 0));
 
     IntegerSegment above;
     above.a = P(-1, 3);
@@ -50,21 +50,28 @@ void test_line_segment() {
     assert(!intersects(horizontal, above));
     assert(close(distance(horizontal, above), 3));
     assert(close(distance(above, horizontal), 3));
-    assert(!line_segment_intersection(horizontal, above).has_value());
+    assert(
+        linear_intersection(horizontal, above).kind ==
+        LinearIntersectionKind::Empty
+    );
 
     IntegerSegment overlapping;
     overlapping.a = P(2, 0);
     overlapping.b = P(5, 0);
     assert(intersects(horizontal, overlapping));
     assert(close(distance(horizontal, overlapping), 0));
-    assert(!line_segment_intersection(horizontal, overlapping).has_value());
+    assert(
+        linear_intersection(horizontal, overlapping).kind ==
+        LinearIntersectionKind::Segment
+    );
 
     IntegerSegment point_segment;
     point_segment.a = P(7, 0);
     point_segment.b = point_segment.a;
-    auto degenerate = line_segment_intersection(horizontal, point_segment);
-    assert(degenerate.has_value());
-    assert(close(degenerate->x, 7));
+    const LinearIntersection degenerate =
+        linear_intersection(horizontal, point_segment);
+    assert(degenerate.kind == LinearIntersectionKind::Point);
+    assert(close(degenerate.first.x, 7));
 }
 
 void test_ray_point_and_line() {
@@ -88,17 +95,20 @@ void test_ray_point_and_line() {
     ahead.b = P(3, 2);
     assert(intersects(ray, ahead));
     assert(close(distance(ray, ahead), 0));
-    auto hit = ray_line_intersection(ray, ahead);
-    assert(hit.has_value());
-    assert(close(hit->x, 3));
-    assert(close(hit->y, 0));
+    LinearIntersection hit = linear_intersection(ray, ahead);
+    assert(hit.kind == LinearIntersectionKind::Point);
+    assert(close(hit.first.x, 3));
+    assert(close(hit.first.y, 0));
 
     IntegerLine behind;
     behind.a = P(-3, -2);
     behind.b = P(-3, 2);
     assert(!intersects(ray, behind));
     assert(close(distance(ray, behind), 3));
-    assert(!ray_line_intersection(ray, behind).has_value());
+    assert(
+        linear_intersection(ray, behind).kind ==
+        LinearIntersectionKind::Empty
+    );
 
     IntegerLine parallel_line;
     parallel_line.a = P(0, 4);
@@ -110,7 +120,10 @@ void test_ray_point_and_line() {
     supporting.a = P(-10, 0);
     supporting.b = P(10, 0);
     assert(intersects(ray, supporting));
-    assert(!ray_line_intersection(ray, supporting).has_value());
+    assert(
+        linear_intersection(ray, supporting).kind ==
+        LinearIntersectionKind::Ray
+    );
 }
 
 void test_ray_segment() {
@@ -123,10 +136,10 @@ void test_ray_segment() {
     crossing.b = P(3, 2);
     assert(intersects(ray, crossing));
     assert(intersects(crossing, ray));
-    auto hit = ray_segment_intersection(ray, crossing);
-    assert(hit.has_value());
-    assert(close(hit->x, 3));
-    assert(close(hit->y, 0));
+    LinearIntersection hit = linear_intersection(ray, crossing);
+    assert(hit.kind == LinearIntersectionKind::Point);
+    assert(close(hit.first.x, 3));
+    assert(close(hit.first.y, 0));
 
     IntegerSegment behind;
     behind.a = P(-4, -2);
@@ -138,15 +151,19 @@ void test_ray_segment() {
     overlap.a = P(-2, 0);
     overlap.b = P(5, 0);
     assert(intersects(ray, overlap));
-    assert(!ray_segment_intersection(ray, overlap).has_value());
+    assert(
+        linear_intersection(ray, overlap).kind ==
+        LinearIntersectionKind::Segment
+    );
 
     IntegerSegment touching_origin;
     touching_origin.a = P(-2, 0);
     touching_origin.b = P(0, 0);
-    auto endpoint_hit = ray_segment_intersection(ray, touching_origin);
-    assert(endpoint_hit.has_value());
-    assert(close(endpoint_hit->x, 0));
-    assert(close(endpoint_hit->y, 0));
+    const LinearIntersection endpoint_hit =
+        linear_intersection(ray, touching_origin);
+    assert(endpoint_hit.kind == LinearIntersectionKind::Point);
+    assert(close(endpoint_hit.first.x, 0));
+    assert(close(endpoint_hit.first.y, 0));
 
     IntegerSegment separated;
     separated.a = P(-3, 4);
@@ -165,32 +182,39 @@ void test_ray_ray() {
     vertical.origin = P(3, -2);
     vertical.through = P(3, -1);
     assert(intersects(horizontal, vertical));
-    auto crossing = ray_intersection(horizontal, vertical);
-    assert(crossing.has_value());
-    assert(close(crossing->x, 3));
-    assert(close(crossing->y, 0));
+    LinearIntersection crossing = linear_intersection(horizontal, vertical);
+    assert(crossing.kind == LinearIntersectionKind::Point);
+    assert(close(crossing.first.x, 3));
+    assert(close(crossing.first.y, 0));
 
     IntegerRay diverging;
     diverging.origin = P(-2, 0);
     diverging.through = P(-3, 0);
     assert(!intersects(horizontal, diverging));
     assert(close(distance(horizontal, diverging), 2));
-    assert(!ray_intersection(horizontal, diverging).has_value());
+    assert(
+        linear_intersection(horizontal, diverging).kind ==
+        LinearIntersectionKind::Empty
+    );
 
     IntegerRay facing;
     facing.origin = P(4, 0);
     facing.through = P(3, 0);
     assert(intersects(horizontal, facing));
     assert(close(distance(horizontal, facing), 0));
-    assert(!ray_intersection(horizontal, facing).has_value());
+    assert(
+        linear_intersection(horizontal, facing).kind ==
+        LinearIntersectionKind::Segment
+    );
 
     IntegerRay opposite_at_origin;
     opposite_at_origin.origin = P(0, 0);
     opposite_at_origin.through = P(-1, 0);
-    auto origin_hit = ray_intersection(horizontal, opposite_at_origin);
-    assert(origin_hit.has_value());
-    assert(close(origin_hit->x, 0));
-    assert(close(origin_hit->y, 0));
+    const LinearIntersection origin_hit =
+        linear_intersection(horizontal, opposite_at_origin);
+    assert(origin_hit.kind == LinearIntersectionKind::Point);
+    assert(close(origin_hit.first.x, 0));
+    assert(close(origin_hit.first.y, 0));
 
     IntegerRay offset;
     offset.origin = P(-2, 3);

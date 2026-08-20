@@ -7,7 +7,7 @@
 #include <limits>
 #include <numeric>
 
-#include "line.hpp"
+#include "linear.hpp"
 
 namespace m1une {
 namespace geometry {

@@ -1,7 +1,7 @@
 #define PROBLEM "https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_1_A"
 #define ERROR "1e-8"
 
-#include "../../geometry/line.hpp"
+#include "../../geometry/linear.hpp"
 
 #include "../../utilities/fast_io.hpp"
 

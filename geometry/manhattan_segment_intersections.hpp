@@ -2,7 +2,7 @@
 #define M1UNE_GEOMETRY_MANHATTAN_SEGMENT_INTERSECTIONS_HPP 1
 
 #include "../ds/range_query/fenwick_tree.hpp"
-#include "line.hpp"
+#include "linear.hpp"
 
 #include <algorithm>
 #include <cassert>
