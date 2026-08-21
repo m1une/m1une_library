@@ -13,6 +13,7 @@
 "verify/algo/search/golden_section_search.test.cpp": "2026-07-18 22:54:37 +0900",
 "verify/algo/search/ternary_search.test.cpp": "2026-07-18 22:54:37 +0900",
 "verify/algo/sequence/longest_increasing_subsequence.test.cpp": "2026-07-18 22:54:37 +0900",
+"verify/algo/sequence/merge_intervals.test.cpp": "2026-08-21 12:49:11 +0900",
 "verify/algo/sequence/non_adjacent_selection.test.cpp": "2026-07-18 22:54:37 +0900",
 "verify/algo/sequence/number_of_subsequences.test.cpp": "2026-07-18 22:54:37 +0900",
 "verify/algo/sequence/sequence_algorithms.test.cpp": "2026-07-18 22:54:37 +0900",
