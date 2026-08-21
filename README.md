@@ -22,7 +22,7 @@ they can be combined without rewriting boilerplate during a contest.
 | Directory | Contents |
 | --- | --- |
 | `convex/` | Convex-structure and convex-optimization tools, including CHT, Li Chao tree, slope trick, Alien Trick, Monge/SMAWK/Knuth/D&C optimization, and structured min-plus/max-plus convolution. |
-| `algo/` | One-shot algorithms that are not tied to a graph/string/geometry/convex domain, including sequence, search, offline, and enumeration helpers. |
+| `algo/` | One-shot algorithms that are not tied to a graph/string/geometry/convex domain, including interval merging, sequence, search, offline, and enumeration helpers. |
 | `graph/` | General graph algorithms and builders, plus `graph/tree/` for Euler tours, rooted-tree tools, offline Mo path queries, Cartesian tree construction, and `graph/flow/` for flow networks. |
 | `optimization/` | Combinatorial and numeric optimization solvers such as project selection, Hungarian assignment, simplex LP, and integer LP. |
 | `heuristic/` | Hill climbing, simulated annealing, and memory-bounded beam search for approximate optimization. |
@@ -61,7 +61,7 @@ short namespace segment after `m1une::`; nested directories are for browsing.
 
 | Directory | Use it for |
 | --- | --- |
-| `algo/sequence/` | Array and sequence algorithms such as LIS, inversion count, non-adjacent exact-count selection, distinct-subsequence counting, run-length encoding, and meet-in-the-middle subset sum. |
+| `algo/sequence/` | Array and sequence algorithms such as interval merging, LIS, inversion count, non-adjacent exact-count selection, distinct-subsequence counting, run-length encoding, and meet-in-the-middle subset sum. |
 | `algo/search/` | Search-over-answer and unimodal optimization helpers. |
 | `algo/offline/` | Offline query processing such as Mo's algorithm. |
 | `algo/enumeration/` | Enumeration helpers for combinations, permutations, bitmasks, Gray codes, and aligned segment-tree ranges. |

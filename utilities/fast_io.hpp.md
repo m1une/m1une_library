@@ -52,6 +52,9 @@ data:
     path: verify/algo/sequence/longest_increasing_subsequence.test.cpp
     title: verify/algo/sequence/longest_increasing_subsequence.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/algo/sequence/merge_intervals.test.cpp
+    title: verify/algo/sequence/merge_intervals.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/algo/sequence/non_adjacent_selection.test.cpp
     title: verify/algo/sequence/non_adjacent_selection.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1864,6 +1867,7 @@ data:
   - verify/algo/sequence/subset_sum.test.cpp
   - verify/algo/sequence/sequence_algorithms.test.cpp
   - verify/algo/sequence/longest_increasing_subsequence.test.cpp
+  - verify/algo/sequence/merge_intervals.test.cpp
   - verify/string/string_hash.test.cpp
   - verify/string/suffix_automaton.test.cpp
   - verify/string/aho_corasick.test.cpp

@@ -59,6 +59,9 @@ data:
     path: algo/sequence/lis.hpp
     title: Longest Increasing Subsequence (LIS)
   - icon: ':heavy_check_mark:'
+    path: algo/sequence/merge_intervals.hpp
+    title: Merge Intervals
+  - icon: ':heavy_check_mark:'
     path: algo/sequence/non_adjacent_selection.hpp
     title: Non-Adjacent Selection Sums
   - icon: ':heavy_check_mark:'
@@ -550,20 +553,38 @@ data:
     \    while (current != -1) {\n        result.push_back(current);\n        current\
     \ = predecessor[current];\n    }\n    std::reverse(result.begin(), result.end());\n\
     \    return result;\n}\n\n}  // namespace algo\n}  // namespace m1une\n\n\n#line\
-    \ 1 \"algo/sequence/non_adjacent_selection.hpp\"\n\n\n\n#include <functional>\n\
-    #include <queue>\n#line 7 \"algo/sequence/non_adjacent_selection.hpp\"\n\nnamespace\
-    \ m1une {\nnamespace algo {\n\nnamespace detail {\n\ntemplate <typename T>\nstruct\
-    \ NonAdjacentSelectionEntry {\n    T value;\n    int index;\n};\n\ntemplate <typename\
-    \ T, typename Better>\nstruct NonAdjacentSelectionCompare {\n    Better better;\n\
-    \n    bool operator()(\n        const NonAdjacentSelectionEntry<T>& lhs,\n   \
-    \     const NonAdjacentSelectionEntry<T>& rhs\n    ) const {\n        if (better(lhs.value,\
-    \ rhs.value)) return false;\n        if (better(rhs.value, lhs.value)) return\
-    \ true;\n        return lhs.index > rhs.index;\n    }\n};\n\ntemplate <typename\
-    \ T, typename Better>\nstd::vector<T> non_adjacent_selection_sums(const std::vector<T>&\
-    \ values, Better better) {\n    const int n = int(values.size());\n    std::vector<T>\
-    \ weight = values;\n    std::vector<int> left(n), right(n);\n    std::vector<char>\
-    \ alive(n, true);\n    for (int i = 0; i < n; ++i) {\n        left[i] = i - 1;\n\
-    \        right[i] = (i + 1 == n ? -1 : i + 1);\n    }\n\n    using Entry = NonAdjacentSelectionEntry<T>;\n\
+    \ 1 \"algo/sequence/merge_intervals.hpp\"\n\n\n\n#line 9 \"algo/sequence/merge_intervals.hpp\"\
+    \n\nnamespace m1une {\nnamespace algo {\n\n// Returns the union of half-open intervals\
+    \ as sorted, disjoint intervals.\ntemplate <typename T>\nstd::vector<std::pair<T,\
+    \ T>> merge_intervals(\n    std::vector<std::pair<T, T>> intervals\n) {\n    for\
+    \ (const auto& [left, right] : intervals) {\n        if (right < left) assert(false);\n\
+    \    }\n\n    std::sort(\n        intervals.begin(),\n        intervals.end(),\n\
+    \        [](const auto& lhs, const auto& rhs) {\n            if (lhs.first < rhs.first)\
+    \ return true;\n            if (rhs.first < lhs.first) return false;\n       \
+    \     return lhs.second < rhs.second;\n        }\n    );\n\n    std::size_t result_size\
+    \ = 0;\n    for (std::size_t index = 0; index < intervals.size(); ++index) {\n\
+    \        auto& [left, right] = intervals[index];\n        if (!(left < right))\
+    \ continue;\n        if (result_size == 0 || intervals[result_size - 1].second\
+    \ < left) {\n            if (result_size != index) {\n                intervals[result_size]\
+    \ = std::move(intervals[index]);\n            }\n            ++result_size;\n\
+    \        } else if (intervals[result_size - 1].second < right) {\n           \
+    \ intervals[result_size - 1].second = std::move(right);\n        }\n    }\n  \
+    \  intervals.erase(intervals.begin() + result_size, intervals.end());\n    return\
+    \ intervals;\n}\n\n}  // namespace algo\n}  // namespace m1une\n\n\n#line 1 \"\
+    algo/sequence/non_adjacent_selection.hpp\"\n\n\n\n#include <functional>\n#include\
+    \ <queue>\n#line 7 \"algo/sequence/non_adjacent_selection.hpp\"\n\nnamespace m1une\
+    \ {\nnamespace algo {\n\nnamespace detail {\n\ntemplate <typename T>\nstruct NonAdjacentSelectionEntry\
+    \ {\n    T value;\n    int index;\n};\n\ntemplate <typename T, typename Better>\n\
+    struct NonAdjacentSelectionCompare {\n    Better better;\n\n    bool operator()(\n\
+    \        const NonAdjacentSelectionEntry<T>& lhs,\n        const NonAdjacentSelectionEntry<T>&\
+    \ rhs\n    ) const {\n        if (better(lhs.value, rhs.value)) return false;\n\
+    \        if (better(rhs.value, lhs.value)) return true;\n        return lhs.index\
+    \ > rhs.index;\n    }\n};\n\ntemplate <typename T, typename Better>\nstd::vector<T>\
+    \ non_adjacent_selection_sums(const std::vector<T>& values, Better better) {\n\
+    \    const int n = int(values.size());\n    std::vector<T> weight = values;\n\
+    \    std::vector<int> left(n), right(n);\n    std::vector<char> alive(n, true);\n\
+    \    for (int i = 0; i < n; ++i) {\n        left[i] = i - 1;\n        right[i]\
+    \ = (i + 1 == n ? -1 : i + 1);\n    }\n\n    using Entry = NonAdjacentSelectionEntry<T>;\n\
     \    using Compare = NonAdjacentSelectionCompare<T, Better>;\n    std::priority_queue<Entry,\
     \ std::vector<Entry>, Compare> heap(Compare{better});\n    for (int i = 0; i <\
     \ n; ++i) heap.push(Entry{weight[i], i});\n\n    std::vector<T> result;\n    result.reserve((n\
@@ -645,7 +666,7 @@ data:
     \   --right_count;\n        }\n        if (right_count == 0) break;\n\n      \
     \  const T candidate = left + right_sums[right_count - 1];\n        if (answer\
     \ < candidate) answer = candidate;\n    }\n    return answer;\n}\n\n}  // namespace\
-    \ algo\n}  // namespace m1une\n\n\n#line 10 \"algo/sequence/all.hpp\"\n\n\n#line\
+    \ algo\n}  // namespace m1une\n\n\n#line 11 \"algo/sequence/all.hpp\"\n\n\n#line\
     \ 9 \"algo/all.hpp\"\n\n\n"
   code: '#ifndef M1UNE_ALGO_ALL_HPP
 
@@ -686,6 +707,7 @@ data:
   - algo/sequence/all.hpp
   - algo/sequence/inversion_count.hpp
   - algo/sequence/lis.hpp
+  - algo/sequence/merge_intervals.hpp
   - algo/sequence/non_adjacent_selection.hpp
   - algo/sequence/number_of_subsequences.hpp
   - algo/sequence/run_length_encoding.hpp
@@ -693,7 +715,7 @@ data:
   isVerificationFile: false
   path: algo/all.hpp
   requiredBy: []
-  timestamp: '2026-08-12 05:02:13+09:00'
+  timestamp: '2026-08-21 12:49:11+09:00'
   verificationStatus: LIBRARY_NO_TESTS
   verifiedWith: []
 documentation_of: algo/all.hpp
