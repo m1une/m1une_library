@@ -1935,6 +1935,9 @@ data:
       path: verify/geometry/polygon_area.test.cpp
       title: verify/geometry/polygon_area.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/geometry/polygon_clipping.test.cpp
+      title: verify/geometry/polygon_clipping.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/geometry/polygon_filled.test.cpp
       title: verify/geometry/polygon_filled.test.cpp
     - icon: ':heavy_check_mark:'

@@ -131,6 +131,9 @@ Create a single-file submission with the expander:
 python3 expander.py main.cpp > bundled.cpp
 ```
 
+Each inlined library header is annotated with a link to its source file in the
+GitHub repository.
+
 The FPS convolution headers include an optional x86 AVX2 implementation. On a
 judge with a strict source-size limit, omit that implementation from the bundle:
 

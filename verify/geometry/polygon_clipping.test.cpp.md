@@ -5,29 +5,11 @@ data:
     path: geometry/circle.hpp
     title: Circles
   - icon: ':heavy_check_mark:'
-    path: geometry/convex_hull.hpp
-    title: Convex Hull
-  - icon: ':heavy_check_mark:'
-    path: geometry/convex_polygon.hpp
-    title: Convex Polygons
-  - icon: ':heavy_check_mark:'
-    path: geometry/detail/convex_polygon_normalize.hpp
-    title: geometry/detail/convex_polygon_normalize.hpp
-  - icon: ':heavy_check_mark:'
     path: geometry/detail/floating_predicate.hpp
     title: geometry/detail/floating_predicate.hpp
   - icon: ':heavy_check_mark:'
-    path: geometry/half_plane_intersection.hpp
-    title: Half-Plane Intersection
-  - icon: ':heavy_check_mark:'
     path: geometry/linear.hpp
     title: Linear Objects
-  - icon: ':heavy_check_mark:'
-    path: geometry/minkowski_sum.hpp
-    title: Minkowski Sum
-  - icon: ':heavy_check_mark:'
-    path: geometry/point.hpp
-    title: 2D Point and Predicates
   - icon: ':heavy_check_mark:'
     path: geometry/point.hpp
     title: 2D Point and Predicates
@@ -44,39 +26,39 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_3_B
+    PROBLEM: https://judge.yosupo.jp/problem/aplusb
     links:
-    - https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_3_B
-  bundledCode: "#line 1 \"verify/geometry/is_convex_polygon.test.cpp\"\n#define PROBLEM\
-    \ \"https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_3_B\"\n\n#line\
-    \ 1 \"geometry/convex_polygon.hpp\"\n\n\n\n#include <algorithm>\n#include <array>\n\
-    #include <cassert>\n#include <cmath>\n#include <concepts>\n#include <cstddef>\n\
-    #include <deque>\n#include <limits>\n#include <numbers>\n#include <optional>\n\
-    #include <utility>\n#include <vector>\n\n#line 1 \"geometry/convex_hull.hpp\"\n\
-    \n\n\n#line 8 \"geometry/convex_hull.hpp\"\n\n#line 1 \"geometry/point.hpp\"\n\
-    \n\n\n#line 7 \"geometry/point.hpp\"\n#include <type_traits>\n\n#line 1 \"geometry/detail/floating_predicate.hpp\"\
-    \n\n\n\nnamespace m1une {\nnamespace geometry {\nnamespace predicate_detail {\n\
-    \ntemplate <typename T>\nconstexpr T absolute(T value) {\n    return value < T(0)\
-    \ ? -value : value;\n}\n\ntemplate <typename T>\nconstexpr T max_value(T first,\
-    \ T second) {\n    return first < second ? second : first;\n}\n\ntemplate <typename\
-    \ T>\nconstexpr T vector_scale(T x, T y) {\n    return max_value(absolute(x),\
-    \ absolute(y));\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int scaled_sign(T\
-    \ value, T scale, long double eps) {\n    if constexpr (Exact) {\n        return\
-    \ (value > T(0)) - (value < T(0));\n    } else {\n        const T tolerance =\
-    \ T(eps) * scale;\n        return (value > tolerance) - (value < -tolerance);\n\
-    \    }\n}\n\ntemplate <bool Exact, typename T>\nconstexpr T determinant_scale(T\
-    \ ax, T ay, T bx, T by) {\n    if constexpr (Exact) {\n        return T(0);\n\
-    \    } else {\n        return vector_scale(ax, ay) * vector_scale(bx, by);\n \
-    \   }\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int determinant_sign(\n\
-    \    T ax,\n    T ay,\n    T bx,\n    T by,\n    long double eps\n) {\n    const\
-    \ T determinant = ax * by - ay * bx;\n    return scaled_sign<Exact>(\n       \
-    \ determinant,\n        determinant_scale<Exact>(ax, ay, bx, by),\n        eps\n\
-    \    );\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int orientation_sign(\n\
-    \    T direction_x,\n    T direction_y,\n    T offset_x,\n    T offset_y,\n  \
-    \  long double eps\n) {\n    const T determinant =\n        direction_x * offset_y\
-    \ - direction_y * offset_x;\n    T scale = T(0);\n    if constexpr (!Exact) {\n\
-    \        const T direction_scale =\n            vector_scale(direction_x, direction_y);\n\
-    \        scale = direction_scale * max_value(\n            direction_scale,\n\
+    - https://judge.yosupo.jp/problem/aplusb
+  bundledCode: "#line 1 \"verify/geometry/polygon_clipping.test.cpp\"\n#define PROBLEM\
+    \ \"https://judge.yosupo.jp/problem/aplusb\"\n\n#line 1 \"geometry/polygon.hpp\"\
+    \n\n\n\n#include <algorithm>\n#include <array>\n#include <cassert>\n#include <cmath>\n\
+    #include <cstddef>\n#include <limits>\n#include <numbers>\n#include <optional>\n\
+    #include <type_traits>\n#include <vector>\n\n#line 1 \"geometry/circle.hpp\"\n\
+    \n\n\n#line 13 \"geometry/circle.hpp\"\n\n#line 1 \"geometry/linear.hpp\"\n\n\n\
+    \n#line 7 \"geometry/linear.hpp\"\n\n#line 1 \"geometry/point.hpp\"\n\n\n\n#line\
+    \ 5 \"geometry/point.hpp\"\n#include <concepts>\n#line 8 \"geometry/point.hpp\"\
+    \n\n#line 1 \"geometry/detail/floating_predicate.hpp\"\n\n\n\nnamespace m1une\
+    \ {\nnamespace geometry {\nnamespace predicate_detail {\n\ntemplate <typename\
+    \ T>\nconstexpr T absolute(T value) {\n    return value < T(0) ? -value : value;\n\
+    }\n\ntemplate <typename T>\nconstexpr T max_value(T first, T second) {\n    return\
+    \ first < second ? second : first;\n}\n\ntemplate <typename T>\nconstexpr T vector_scale(T\
+    \ x, T y) {\n    return max_value(absolute(x), absolute(y));\n}\n\ntemplate <bool\
+    \ Exact, typename T>\nconstexpr int scaled_sign(T value, T scale, long double\
+    \ eps) {\n    if constexpr (Exact) {\n        return (value > T(0)) - (value <\
+    \ T(0));\n    } else {\n        const T tolerance = T(eps) * scale;\n        return\
+    \ (value > tolerance) - (value < -tolerance);\n    }\n}\n\ntemplate <bool Exact,\
+    \ typename T>\nconstexpr T determinant_scale(T ax, T ay, T bx, T by) {\n    if\
+    \ constexpr (Exact) {\n        return T(0);\n    } else {\n        return vector_scale(ax,\
+    \ ay) * vector_scale(bx, by);\n    }\n}\n\ntemplate <bool Exact, typename T>\n\
+    constexpr int determinant_sign(\n    T ax,\n    T ay,\n    T bx,\n    T by,\n\
+    \    long double eps\n) {\n    const T determinant = ax * by - ay * bx;\n    return\
+    \ scaled_sign<Exact>(\n        determinant,\n        determinant_scale<Exact>(ax,\
+    \ ay, bx, by),\n        eps\n    );\n}\n\ntemplate <bool Exact, typename T>\n\
+    constexpr int orientation_sign(\n    T direction_x,\n    T direction_y,\n    T\
+    \ offset_x,\n    T offset_y,\n    long double eps\n) {\n    const T determinant\
+    \ =\n        direction_x * offset_y - direction_y * offset_x;\n    T scale = T(0);\n\
+    \    if constexpr (!Exact) {\n        const T direction_scale =\n            vector_scale(direction_x,\
+    \ direction_y);\n        scale = direction_scale * max_value(\n            direction_scale,\n\
     \            vector_scale(offset_x, offset_y)\n        );\n    }\n    return scaled_sign<Exact>(determinant,\
     \ scale, eps);\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int dot_sign(\n\
     \    T ax,\n    T ay,\n    T bx,\n    T by,\n    long double eps\n) {\n    const\
@@ -169,68 +151,43 @@ data:
     \ double> normalized(const Point<T>& point) {\n    long double length = norm(point);\n\
     \    assert(length != 0);\n    return Point<long double>(\n        static_cast<long\
     \ double>(point.x) / length,\n        static_cast<long double>(point.y) / length\n\
-    \    );\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 10 \"\
-    geometry/convex_hull.hpp\"\n\nnamespace m1une {\nnamespace geometry {\n\n// Returns\
-    \ the convex hull counterclockwise from its lexicographically smallest\n// point.\
-    \ The first point is not repeated at the end.\ntemplate <Coordinate T>\nstd::vector<Point<T>>\
-    \ convex_hull(\n    std::vector<Point<T>> points,\n    bool include_collinear\
-    \ = false\n) {\n    std::sort(points.begin(), points.end());\n    points.erase(std::unique(points.begin(),\
-    \ points.end()), points.end());\n    std::size_t size = points.size();\n    if\
-    \ (size <= 1) return points;\n\n    std::vector<Point<T>> hull;\n    hull.reserve(2\
-    \ * size);\n    auto should_pop = [include_collinear](\n        const Point<T>&\
-    \ first,\n        const Point<T>& second,\n        const Point<T>& third\n   \
-    \ ) {\n        int turn = orientation(first, second, third);\n        return include_collinear\
-    \ ? turn < 0 : turn <= 0;\n    };\n\n    for (const Point<T>& point : points)\
-    \ {\n        while (\n            hull.size() >= 2 &&\n            should_pop(hull[hull.size()\
-    \ - 2], hull.back(), point)\n        ) {\n            hull.pop_back();\n     \
-    \   }\n        hull.push_back(point);\n    }\n\n    std::size_t lower_size = hull.size();\n\
-    \    for (std::size_t index = size - 1; index-- > 0;) {\n        const Point<T>&\
-    \ point = points[index];\n        while (\n            hull.size() > lower_size\
-    \ &&\n            should_pop(hull[hull.size() - 2], hull.back(), point)\n    \
-    \    ) {\n            hull.pop_back();\n        }\n        hull.push_back(point);\n\
-    \    }\n    hull.pop_back();\n\n    if (include_collinear && hull.size() == 2\
-    \ * points.size() - 2) {\n        hull = std::move(points);\n    }\n    return\
-    \ hull;\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 1 \"\
-    geometry/half_plane_intersection.hpp\"\n\n\n\n#line 12 \"geometry/half_plane_intersection.hpp\"\
-    \n#include <random>\n#line 15 \"geometry/half_plane_intersection.hpp\"\n\n#line\
-    \ 1 \"geometry/linear.hpp\"\n\n\n\n#line 7 \"geometry/linear.hpp\"\n\n#line 9\
-    \ \"geometry/linear.hpp\"\n\nnamespace m1une {\nnamespace geometry {\n\ntemplate\
-    \ <Coordinate T>\nstruct Line {\n    Point<T> a;\n    Point<T> b;\n};\n\ntemplate\
-    \ <Coordinate T>\nstruct Segment {\n    Point<T> a;\n    Point<T> b;\n};\n\ntemplate\
-    \ <Coordinate T>\nstruct Ray {\n    Point<T> origin;\n    Point<T> through;\n\
-    };\n\nenum class LinearIntersectionKind {\n    Empty,\n    Point,\n    Segment,\n\
-    \    Ray,\n    Line,\n};\n\nstruct LinearIntersection {\n    LinearIntersectionKind\
-    \ kind;\n    Point<long double> first;\n    Point<long double> second;\n};\n\n\
-    struct ClosestPoints {\n    Point<long double> first;\n    Point<long double>\
-    \ second;\n};\n\nnamespace linear_intersection_detail {\n\ninline LinearIntersection\
-    \ make_empty() {\n    const Point<long double> zero;\n    return LinearIntersection{\n\
-    \        LinearIntersectionKind::Empty,\n        zero,\n        zero,\n    };\n\
-    }\n\ntemplate <Coordinate T>\nLinearIntersection make_point(const Point<T>& point)\
-    \ {\n    const Point<long double> converted(point);\n    return LinearIntersection{\n\
-    \        LinearIntersectionKind::Point,\n        converted,\n        converted,\n\
-    \    };\n}\n\ntemplate <Coordinate T>\nLinearIntersection make_object(\n    LinearIntersectionKind\
-    \ kind,\n    const Point<T>& first,\n    const Point<T>& second\n) {\n    return\
-    \ LinearIntersection{\n        kind,\n        Point<long double>(first),\n   \
-    \     Point<long double>(second),\n    };\n}\n\n}  // namespace linear_intersection_detail\n\
-    \ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const Segment<T>&\
-    \ segment) {\n    return Point<long double>(\n        (\n            static_cast<long\
-    \ double>(segment.a.x) +\n            static_cast<long double>(segment.b.x)\n\
-    \        ) / 2,\n        (\n            static_cast<long double>(segment.a.y)\
-    \ +\n            static_cast<long double>(segment.b.y)\n        ) / 2\n    );\n\
-    }\n\ntemplate <Coordinate T>\nbool on_line(\n    const Line<T>& line,\n    const\
-    \ Point<T>& point,\n    long double eps = 1e-12L\n) {\n    assert(line.a != line.b);\n\
-    \    return orientation(line.a, line.b, point, eps) == 0;\n}\n\ntemplate <Coordinate\
-    \ T>\nbool parallel(const Line<T>& first, const Line<T>& second, long double eps\
-    \ = 1e-12L) {\n    using W = wide_type<T>;\n    W first_x = W(first.b.x) - W(first.a.x);\n\
-    \    W first_y = W(first.b.y) - W(first.a.y);\n    W second_x = W(second.b.x)\
-    \ - W(second.a.x);\n    W second_y = W(second.b.y) - W(second.a.y);\n    return\
-    \ predicate_detail::determinant_sign<std::integral<T>>(\n        first_x,\n  \
-    \      first_y,\n        second_x,\n        second_y,\n        eps\n    ) == 0;\n\
-    }\n\ntemplate <Coordinate T>\nbool orthogonal(const Line<T>& first, const Line<T>&\
-    \ second, long double eps = 1e-12L) {\n    using W = wide_type<T>;\n    W first_x\
-    \ = W(first.b.x) - W(first.a.x);\n    W first_y = W(first.b.y) - W(first.a.y);\n\
-    \    W second_x = W(second.b.x) - W(second.a.x);\n    W second_y = W(second.b.y)\
-    \ - W(second.a.y);\n    return predicate_detail::dot_sign<std::integral<T>>(\n\
+    \    );\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 9 \"\
+    geometry/linear.hpp\"\n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <Coordinate\
+    \ T>\nstruct Line {\n    Point<T> a;\n    Point<T> b;\n};\n\ntemplate <Coordinate\
+    \ T>\nstruct Segment {\n    Point<T> a;\n    Point<T> b;\n};\n\ntemplate <Coordinate\
+    \ T>\nstruct Ray {\n    Point<T> origin;\n    Point<T> through;\n};\n\nenum class\
+    \ LinearIntersectionKind {\n    Empty,\n    Point,\n    Segment,\n    Ray,\n \
+    \   Line,\n};\n\nstruct LinearIntersection {\n    LinearIntersectionKind kind;\n\
+    \    Point<long double> first;\n    Point<long double> second;\n};\n\nstruct ClosestPoints\
+    \ {\n    Point<long double> first;\n    Point<long double> second;\n};\n\nnamespace\
+    \ linear_intersection_detail {\n\ninline LinearIntersection make_empty() {\n \
+    \   const Point<long double> zero;\n    return LinearIntersection{\n        LinearIntersectionKind::Empty,\n\
+    \        zero,\n        zero,\n    };\n}\n\ntemplate <Coordinate T>\nLinearIntersection\
+    \ make_point(const Point<T>& point) {\n    const Point<long double> converted(point);\n\
+    \    return LinearIntersection{\n        LinearIntersectionKind::Point,\n    \
+    \    converted,\n        converted,\n    };\n}\n\ntemplate <Coordinate T>\nLinearIntersection\
+    \ make_object(\n    LinearIntersectionKind kind,\n    const Point<T>& first,\n\
+    \    const Point<T>& second\n) {\n    return LinearIntersection{\n        kind,\n\
+    \        Point<long double>(first),\n        Point<long double>(second),\n   \
+    \ };\n}\n\n}  // namespace linear_intersection_detail\n\ntemplate <Coordinate\
+    \ T>\nconstexpr Point<long double> centroid(const Segment<T>& segment) {\n   \
+    \ return Point<long double>(\n        (\n            static_cast<long double>(segment.a.x)\
+    \ +\n            static_cast<long double>(segment.b.x)\n        ) / 2,\n     \
+    \   (\n            static_cast<long double>(segment.a.y) +\n            static_cast<long\
+    \ double>(segment.b.y)\n        ) / 2\n    );\n}\n\ntemplate <Coordinate T>\n\
+    bool on_line(\n    const Line<T>& line,\n    const Point<T>& point,\n    long\
+    \ double eps = 1e-12L\n) {\n    assert(line.a != line.b);\n    return orientation(line.a,\
+    \ line.b, point, eps) == 0;\n}\n\ntemplate <Coordinate T>\nbool parallel(const\
+    \ Line<T>& first, const Line<T>& second, long double eps = 1e-12L) {\n    using\
+    \ W = wide_type<T>;\n    W first_x = W(first.b.x) - W(first.a.x);\n    W first_y\
+    \ = W(first.b.y) - W(first.a.y);\n    W second_x = W(second.b.x) - W(second.a.x);\n\
+    \    W second_y = W(second.b.y) - W(second.a.y);\n    return predicate_detail::determinant_sign<std::integral<T>>(\n\
+    \        first_x,\n        first_y,\n        second_x,\n        second_y,\n  \
+    \      eps\n    ) == 0;\n}\n\ntemplate <Coordinate T>\nbool orthogonal(const Line<T>&\
+    \ first, const Line<T>& second, long double eps = 1e-12L) {\n    using W = wide_type<T>;\n\
+    \    W first_x = W(first.b.x) - W(first.a.x);\n    W first_y = W(first.b.y) -\
+    \ W(first.a.y);\n    W second_x = W(second.b.x) - W(second.a.x);\n    W second_y\
+    \ = W(second.b.y) - W(second.a.y);\n    return predicate_detail::dot_sign<std::integral<T>>(\n\
     \        first_x,\n        first_y,\n        second_x,\n        second_y,\n  \
     \      eps\n    ) == 0;\n}\n\ntemplate <Coordinate T>\nPoint<long double> projection(const\
     \ Line<T>& line, const Point<T>& point) {\n    assert(line.a != line.b);\n   \
@@ -669,221 +626,17 @@ data:
     \ <Coordinate T>\nlong double distance(const Ray<T>& first, const Ray<T>& second)\
     \ {\n    const ClosestPoints result = closest_points(first, second);\n    return\
     \ geometry::distance(result.first, result.second);\n}\n\n}  // namespace geometry\n\
-    }  // namespace m1une\n\n\n#line 17 \"geometry/half_plane_intersection.hpp\"\n\
-    \nnamespace m1une {\nnamespace geometry {\n\nenum class HalfPlaneIntersectionStatus\
-    \ {\n    Empty,\n    Unbounded,\n    Degenerate,\n    Bounded,\n};\n\nstruct HalfPlaneIntersectionResult\
-    \ {\n    HalfPlaneIntersectionStatus status;\n    std::vector<Point<long double>>\
-    \ polygon;\n};\n\nnamespace half_plane_intersection_detail {\n\nstruct HalfPlane\
-    \ {\n    Point<long double> point;\n    Point<long double> direction;\n    long\
-    \ double angle;\n\n    HalfPlane(\n        const Point<long double>& point_value,\n\
-    \        const Point<long double>& direction_value\n    ) : point(point_value),\
-    \ direction(direction_value) {\n        angle = std::atan2(direction.y, direction.x);\n\
-    \        if (angle < 0) angle += 2 * std::numbers::pi_v<long double>;\n    }\n\
-    };\n\ninline bool direction_less(const HalfPlane& first, const HalfPlane& second)\
-    \ {\n    return first.angle < second.angle;\n}\n\ninline bool parallel(\n    const\
-    \ HalfPlane& first,\n    const HalfPlane& second,\n    long double eps\n) {\n\
-    \    return std::fabs(cross(first.direction, second.direction)) <= eps;\n}\n\n\
-    inline bool same_direction(\n    const HalfPlane& first,\n    const HalfPlane&\
-    \ second,\n    long double eps\n) {\n    return parallel(first, second, eps) &&\n\
-    \           dot(first.direction, second.direction) > 0;\n}\n\ninline bool outside(\n\
-    \    const HalfPlane& half_plane,\n    const Point<long double>& point,\n    long\
-    \ double eps\n) {\n    return cross(half_plane.direction, point - half_plane.point)\
-    \ < -eps;\n}\n\ninline bool more_restrictive(\n    const HalfPlane& candidate,\n\
-    \    const HalfPlane& current,\n    long double eps\n) {\n    return cross(\n\
-    \        current.direction,\n        candidate.point - current.point\n    ) >\
-    \ eps;\n}\n\ninline std::optional<Point<long double>> intersection(\n    const\
-    \ HalfPlane& first,\n    const HalfPlane& second,\n    long double eps\n) {\n\
-    \    long double denominator = cross(first.direction, second.direction);\n   \
-    \ if (std::fabs(denominator) <= eps) return std::nullopt;\n    long double ratio\
-    \ = cross(\n        second.point - first.point,\n        second.direction\n  \
-    \  ) / denominator;\n    return first.point + first.direction * ratio;\n}\n\n\
-    inline void merge_same_direction(\n    std::vector<HalfPlane>& half_planes,\n\
-    \    const HalfPlane& half_plane,\n    long double eps\n) {\n    if (\n      \
-    \  half_planes.empty() ||\n        !same_direction(half_planes.back(), half_plane,\
-    \ eps)\n    ) {\n        half_planes.push_back(half_plane);\n        return;\n\
-    \    }\n    if (more_restrictive(half_plane, half_planes.back(), eps)) {\n   \
-    \     half_planes.back() = half_plane;\n    }\n}\n\ninline void merge_cyclic_ends(\n\
-    \    std::vector<HalfPlane>& half_planes,\n    long double eps\n) {\n    if (\n\
-    \        half_planes.size() < 2 ||\n        !same_direction(half_planes.front(),\
-    \ half_planes.back(), eps)\n    ) {\n        return;\n    }\n    if (more_restrictive(half_planes.back(),\
-    \ half_planes.front(), eps)) {\n        half_planes.front() = half_planes.back();\n\
-    \    }\n    half_planes.pop_back();\n}\n\ninline bool has_feasible_point(\n  \
-    \  std::vector<HalfPlane> half_planes,\n    long double eps\n) {\n    std::mt19937_64\
-    \ generator(0x6a09e667f3bcc909ULL);\n    std::shuffle(half_planes.begin(), half_planes.end(),\
-    \ generator);\n\n    Point<long double> feasible(0, 0);\n    for (std::size_t\
-    \ index = 0; index < half_planes.size(); ++index) {\n        const HalfPlane&\
-    \ current = half_planes[index];\n        if (!outside(current, feasible, eps))\
-    \ continue;\n\n        Point<long double> normal(\n            -current.direction.y,\n\
-    \            current.direction.x\n        );\n        Point<long double> base\
-    \ = normal * dot(normal, current.point);\n        long double lower = -std::numeric_limits<long\
-    \ double>::infinity();\n        long double upper = std::numeric_limits<long double>::infinity();\n\
-    \        for (std::size_t previous_index = 0;\n             previous_index < index;\n\
-    \             ++previous_index) {\n            const HalfPlane& previous = half_planes[previous_index];\n\
-    \            long double coefficient = cross(\n                previous.direction,\n\
-    \                current.direction\n            );\n            long double constant\
-    \ = cross(\n                previous.direction,\n                base - previous.point\n\
-    \            );\n            if (std::fabs(coefficient) <= eps) {\n          \
-    \      if (constant < -eps) return false;\n                continue;\n       \
-    \     }\n\n            long double bound = (-eps - constant) / coefficient;\n\
-    \            if (coefficient > 0) {\n                lower = std::max(lower, bound);\n\
-    \            } else {\n                upper = std::min(upper, bound);\n     \
-    \       }\n            if (lower > upper) return false;\n        }\n\n       \
-    \ long double parameter = 0;\n        if (parameter < lower) parameter = lower;\n\
-    \        if (parameter > upper) parameter = upper;\n        feasible = base +\
-    \ current.direction * parameter;\n    }\n    return true;\n}\n\ninline bool has_bounded_recession_cone(\n\
-    \    const std::vector<HalfPlane>& half_planes,\n    long double eps\n) {\n  \
-    \  if (half_planes.empty()) return false;\n\n    constexpr long double pi = std::numbers::pi_v<long\
-    \ double>;\n    long double maximum_gap =\n        half_planes.front().angle +\
-    \ 2 * pi - half_planes.back().angle;\n    for (std::size_t index = 1; index <\
-    \ half_planes.size(); ++index) {\n        maximum_gap = std::max(\n          \
-    \  maximum_gap,\n            half_planes[index].angle - half_planes[index - 1].angle\n\
-    \        );\n    }\n    return maximum_gap < pi - eps;\n}\n\n}  // namespace half_plane_intersection_detail\n\
-    \n// Each directed line keeps its closed left half-plane. Returns the vertices\
-    \ of\n// a bounded intersection with positive area in counterclockwise order.\
-    \ Empty,\n// unbounded, and bounded zero-area intersections have distinct statuses.\n\
-    template <Coordinate T>\nHalfPlaneIntersectionResult half_plane_intersection(\n\
-    \    const std::vector<Line<T>>& half_planes,\n    long double eps = 1e-12L\n\
-    ) {\n    using half_plane_intersection_detail::HalfPlane;\n    namespace detail\
-    \ = half_plane_intersection_detail;\n\n    assert(eps >= 0);\n    std::vector<HalfPlane>\
-    \ sorted;\n    sorted.reserve(half_planes.size());\n    for (const Line<T>& line\
-    \ : half_planes) {\n        assert(line.a != line.b);\n        Point<long double>\
-    \ point(line.a);\n        Point<long double> direction = Point<long double>(line.b)\
-    \ - point;\n        long double length = norm(direction);\n        direction =\
-    \ direction / length;\n        sorted.push_back(HalfPlane{point, direction});\n\
-    \    }\n    if (!detail::has_feasible_point(sorted, eps)) {\n        return HalfPlaneIntersectionResult{\n\
-    \            HalfPlaneIntersectionStatus::Empty,\n            {},\n        };\n\
-    \    }\n    std::sort(sorted.begin(), sorted.end(), detail::direction_less);\n\
-    \    if (!detail::has_bounded_recession_cone(sorted, eps)) {\n        return HalfPlaneIntersectionResult{\n\
-    \            HalfPlaneIntersectionStatus::Unbounded,\n            {},\n      \
-    \  };\n    }\n    if (sorted.size() < 3) {\n        return HalfPlaneIntersectionResult{\n\
-    \            HalfPlaneIntersectionStatus::Degenerate,\n            {},\n     \
-    \   };\n    }\n\n    std::vector<HalfPlane> unique;\n    unique.reserve(sorted.size());\n\
-    \    for (const HalfPlane& half_plane : sorted) {\n        detail::merge_same_direction(unique,\
-    \ half_plane, eps);\n    }\n    detail::merge_cyclic_ends(unique, eps);\n    if\
-    \ (unique.size() < 3) {\n        return HalfPlaneIntersectionResult{\n       \
-    \     HalfPlaneIntersectionStatus::Degenerate,\n            {},\n        };\n\
-    \    }\n\n    std::deque<HalfPlane> deque;\n    for (const HalfPlane& half_plane\
-    \ : unique) {\n        while (deque.size() >= 2) {\n            auto point = detail::intersection(\n\
-    \                deque[deque.size() - 2],\n                deque.back(),\n   \
-    \             eps\n            );\n            if (!point.has_value()) {\n   \
-    \             return HalfPlaneIntersectionResult{\n                    HalfPlaneIntersectionStatus::Degenerate,\n\
-    \                    {},\n                };\n            }\n            if (!detail::outside(half_plane,\
-    \ *point, eps)) break;\n            deque.pop_back();\n        }\n        while\
-    \ (deque.size() >= 2) {\n            auto point = detail::intersection(deque[0],\
-    \ deque[1], eps);\n            if (!point.has_value()) {\n                return\
-    \ HalfPlaneIntersectionResult{\n                    HalfPlaneIntersectionStatus::Degenerate,\n\
-    \                    {},\n                };\n            }\n            if (!detail::outside(half_plane,\
-    \ *point, eps)) break;\n            deque.pop_front();\n        }\n        deque.push_back(half_plane);\n\
-    \    }\n\n    while (deque.size() >= 3) {\n        auto point = detail::intersection(\n\
-    \            deque[deque.size() - 2],\n            deque.back(),\n           \
-    \ eps\n        );\n        if (!point.has_value()) {\n            return HalfPlaneIntersectionResult{\n\
-    \                HalfPlaneIntersectionStatus::Degenerate,\n                {},\n\
-    \            };\n        }\n        if (!detail::outside(deque.front(), *point,\
-    \ eps)) break;\n        deque.pop_back();\n    }\n    while (deque.size() >= 3)\
-    \ {\n        auto point = detail::intersection(deque[0], deque[1], eps);\n   \
-    \     if (!point.has_value()) {\n            return HalfPlaneIntersectionResult{\n\
-    \                HalfPlaneIntersectionStatus::Degenerate,\n                {},\n\
-    \            };\n        }\n        if (!detail::outside(deque.back(), *point,\
-    \ eps)) break;\n        deque.pop_front();\n    }\n    if (deque.size() < 3) {\n\
-    \        return HalfPlaneIntersectionResult{\n            HalfPlaneIntersectionStatus::Degenerate,\n\
-    \            {},\n        };\n    }\n\n    std::vector<Point<long double>> polygon;\n\
-    \    polygon.reserve(deque.size());\n    for (std::size_t index = 0; index < deque.size();\
-    \ ++index) {\n        auto point = detail::intersection(\n            deque[index],\n\
-    \            deque[(index + 1) % deque.size()],\n            eps\n        );\n\
-    \        if (!point.has_value()) {\n            return HalfPlaneIntersectionResult{\n\
-    \                HalfPlaneIntersectionStatus::Degenerate,\n                {},\n\
-    \            };\n        }\n        if (\n            polygon.empty() ||\n   \
-    \         distance(polygon.back(), *point) > eps\n        ) {\n            polygon.push_back(*point);\n\
-    \        }\n    }\n    if (\n        polygon.size() >= 2 &&\n        distance(polygon.front(),\
-    \ polygon.back()) <= eps\n    ) {\n        polygon.pop_back();\n    }\n    if\
-    \ (polygon.size() < 3) {\n        return HalfPlaneIntersectionResult{\n      \
-    \      HalfPlaneIntersectionStatus::Degenerate,\n            {},\n        };\n\
-    \    }\n\n    long double signed_area2 = 0;\n    Point<long double> origin = polygon.front();\n\
-    \    for (std::size_t index = 1; index + 1 < polygon.size(); ++index) {\n    \
-    \    signed_area2 += cross(\n            polygon[index] - origin,\n          \
-    \  polygon[index + 1] - origin\n        );\n    }\n    if (signed_area2 <= eps)\
-    \ {\n        return HalfPlaneIntersectionResult{\n            HalfPlaneIntersectionStatus::Degenerate,\n\
-    \            {},\n        };\n    }\n\n    auto first = std::min_element(polygon.begin(),\
-    \ polygon.end());\n    std::rotate(polygon.begin(), first, polygon.end());\n \
-    \   return HalfPlaneIntersectionResult{\n        HalfPlaneIntersectionStatus::Bounded,\n\
-    \        std::move(polygon),\n    };\n}\n\n}  // namespace geometry\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"geometry/minkowski_sum.hpp\"\n\n\n\n#line 8 \"geometry/minkowski_sum.hpp\"\
-    \n\n#line 1 \"geometry/detail/convex_polygon_normalize.hpp\"\n\n\n\n#line 8 \"\
-    geometry/detail/convex_polygon_normalize.hpp\"\n\n#line 10 \"geometry/detail/convex_polygon_normalize.hpp\"\
-    \n\nnamespace m1une {\nnamespace geometry {\nnamespace convex_polygon_detail {\n\
-    \ntemplate <Coordinate T>\nwide_type<T> boundary_area2(const std::vector<Point<T>>&\
-    \ polygon) {\n    wide_type<T> result = 0;\n    for (std::size_t index = 0; index\
-    \ < polygon.size(); ++index) {\n        result += cross(\n            polygon[index],\n\
-    \            polygon[(index + 1) % polygon.size()]\n        );\n    }\n    return\
-    \ result;\n}\n\ntemplate <Coordinate T>\nstd::vector<Point<T>> normalize_convex_boundary(\n\
-    \    std::vector<Point<T>> polygon,\n    long double eps\n) {\n    if (polygon.size()\
-    \ >= 2 && polygon.front() == polygon.back()) {\n        polygon.pop_back();\n\
-    \    }\n    polygon.erase(\n        std::unique(polygon.begin(), polygon.end()),\n\
-    \        polygon.end()\n    );\n    if (polygon.size() >= 2 && polygon.front()\
-    \ == polygon.back()) {\n        polygon.pop_back();\n    }\n    if (polygon.size()\
-    \ <= 1) return polygon;\n    if (\n        polygon.size() >= 3 &&\n        sign<T>(boundary_area2(polygon),\
-    \ eps) < 0\n    ) {\n        std::reverse(polygon.begin(), polygon.end());\n \
-    \   }\n\n    const auto start = std::min_element(\n        polygon.begin(),\n\
-    \        polygon.end(),\n        [](const Point<T>& first, const Point<T>& second)\
-    \ {\n            if (first.y != second.y) return first.y < second.y;\n       \
-    \     return first.x < second.x;\n        }\n    );\n    std::rotate(polygon.begin(),\
-    \ start, polygon.end());\n\n    if (polygon.size() >= 3) {\n        std::vector<Point<T>>\
-    \ cleaned;\n        const std::size_t size = polygon.size();\n        cleaned.reserve(size);\n\
-    \        for (std::size_t index = 0; index < size; ++index) {\n            const\
-    \ Point<T>& previous = polygon[(index + size - 1) % size];\n            const\
-    \ Point<T>& current = polygon[index];\n            const Point<T>& next = polygon[(index\
-    \ + 1) % size];\n            if (\n                orientation(previous, current,\
-    \ next, eps) != 0 ||\n                sign<T>(dot(current - previous, next - current),\
-    \ eps) < 0\n            ) {\n                cleaned.push_back(current);\n   \
-    \         }\n        }\n        polygon = std::move(cleaned);\n    }\n    return\
-    \ polygon;\n}\n\n}  // namespace convex_polygon_detail\n}  // namespace geometry\n\
-    }  // namespace m1une\n\n\n#line 10 \"geometry/minkowski_sum.hpp\"\n\nnamespace\
-    \ m1une {\nnamespace geometry {\n\n// Returns the normalized boundary of the Minkowski\
-    \ sum of two nonempty\n// ordered convex polygons.\ntemplate <Coordinate T>\n\
-    std::vector<Point<T>> minkowski_sum(\n    std::vector<Point<T>> first,\n    std::vector<Point<T>>\
-    \ second,\n    long double eps = 1e-12L\n) {\n    assert(!first.empty());\n  \
-    \  assert(!second.empty());\n    first = convex_polygon_detail::normalize_convex_boundary(\n\
-    \        std::move(first),\n        eps\n    );\n    second = convex_polygon_detail::normalize_convex_boundary(\n\
-    \        std::move(second),\n        eps\n    );\n\n    if (first.size() == 1\
-    \ || second.size() == 1) {\n        if (second.size() == 1) std::swap(first, second);\n\
-    \        for (Point<T>& point : second) point += first[0];\n        return convex_polygon_detail::normalize_convex_boundary(\n\
-    \            std::move(second),\n            eps\n        );\n    }\n\n    std::vector<Point<T>>\
-    \ first_edges;\n    std::vector<Point<T>> second_edges;\n    first_edges.reserve(first.size());\n\
-    \    second_edges.reserve(second.size());\n    for (std::size_t index = 0; index\
-    \ < first.size(); ++index) {\n        first_edges.push_back(\n            first[(index\
-    \ + 1) % first.size()] - first[index]\n        );\n    }\n    for (std::size_t\
-    \ index = 0; index < second.size(); ++index) {\n        second_edges.push_back(\n\
-    \            second[(index + 1) % second.size()] - second[index]\n        );\n\
-    \    }\n\n    Point<T> current = first.front() + second.front();\n    std::vector<Point<T>>\
-    \ result;\n    result.reserve(first.size() + second.size());\n    result.push_back(current);\n\
-    \    std::size_t first_index = 0;\n    std::size_t second_index = 0;\n    while\
-    \ (\n        first_index < first_edges.size() ||\n        second_index < second_edges.size()\n\
-    \    ) {\n        Point<T> step;\n        if (first_index == first_edges.size())\
-    \ {\n            step = second_edges[second_index++];\n        } else if (second_index\
-    \ == second_edges.size()) {\n            step = first_edges[first_index++];\n\
-    \        } else {\n            const auto turn = cross(\n                first_edges[first_index],\n\
-    \                second_edges[second_index]\n            );\n            if (turn\
-    \ > 0) {\n                step = first_edges[first_index++];\n            } else\
-    \ if (turn < 0) {\n                step = second_edges[second_index++];\n    \
-    \        } else {\n                step = first_edges[first_index++] +\n     \
-    \                  second_edges[second_index++];\n            }\n        }\n \
-    \       current += step;\n        if (\n            first_index < first_edges.size()\
-    \ ||\n            second_index < second_edges.size()\n        ) {\n          \
-    \  result.push_back(current);\n        }\n    }\n    return convex_polygon_detail::normalize_convex_boundary(\n\
-    \        std::move(result),\n        eps\n    );\n}\n\n}  // namespace geometry\n\
-    }  // namespace m1une\n\n\n#line 1 \"geometry/polygon.hpp\"\n\n\n\n#line 14 \"\
-    geometry/polygon.hpp\"\n\n#line 1 \"geometry/circle.hpp\"\n\n\n\n#line 13 \"geometry/circle.hpp\"\
-    \n\n#line 15 \"geometry/circle.hpp\"\n\nnamespace m1une {\nnamespace geometry\
-    \ {\n\ntemplate <Coordinate T>\nstruct Circle {\n    Point<T> center;\n    T radius;\n\
-    \    bool filled = true;\n};\n\nenum class PointInCircle {\n    Outside = 0,\n\
-    \    Boundary = 1,\n    Inside = 2,\n};\n\nenum class CircleRelation {\n    Separate,\n\
-    \    ExternallyTangent,\n    Intersecting,\n    InternallyTangent,\n    Contained,\n\
-    \    Coincident,\n};\n\nenum class AngularCoverageKind {\n    Empty,\n    Point,\n\
-    \    Arc,\n    Full,\n};\n\nstruct AngularCoverage {\n    AngularCoverageKind\
-    \ kind = AngularCoverageKind::Empty;\n    long double begin = 0.0L;\n    long\
-    \ double end = 0.0L;\n};\n\nstruct CircleContact {\n    Point<long double> point;\n\
-    \    long double first_argument = 0.0L;\n    long double second_argument = 0.0L;\n\
-    };\n\nenum class CircleContactKind {\n    Empty,\n    Point,\n    TwoPoints,\n\
+    }  // namespace m1une\n\n\n#line 15 \"geometry/circle.hpp\"\n\nnamespace m1une\
+    \ {\nnamespace geometry {\n\ntemplate <Coordinate T>\nstruct Circle {\n    Point<T>\
+    \ center;\n    T radius;\n    bool filled = true;\n};\n\nenum class PointInCircle\
+    \ {\n    Outside = 0,\n    Boundary = 1,\n    Inside = 2,\n};\n\nenum class CircleRelation\
+    \ {\n    Separate,\n    ExternallyTangent,\n    Intersecting,\n    InternallyTangent,\n\
+    \    Contained,\n    Coincident,\n};\n\nenum class AngularCoverageKind {\n   \
+    \ Empty,\n    Point,\n    Arc,\n    Full,\n};\n\nstruct AngularCoverage {\n  \
+    \  AngularCoverageKind kind = AngularCoverageKind::Empty;\n    long double begin\
+    \ = 0.0L;\n    long double end = 0.0L;\n};\n\nstruct CircleContact {\n    Point<long\
+    \ double> point;\n    long double first_argument = 0.0L;\n    long double second_argument\
+    \ = 0.0L;\n};\n\nenum class CircleContactKind {\n    Empty,\n    Point,\n    TwoPoints,\n\
     \    Coincident,\n};\n\nstruct CircleCircleIntersection {\n    CircleRelation\
     \ relation = CircleRelation::Separate;\n    CircleContactKind contact_kind = CircleContactKind::Empty;\n\
     \    std::array<CircleContact, 2> contacts;\n    AngularCoverage first_inside_second;\n\
@@ -2005,513 +1758,17 @@ data:
     \    const ClosestPoints result = closest_points(polygon, ray);\n    return geometry::distance(result.first,\
     \ result.second);\n}\n\ntemplate <Coordinate R, Coordinate T>\nlong double distance(\n\
     \    const Ray<R>& ray,\n    const Polygon<T>& polygon\n) {\n    return distance(polygon,\
-    \ ray);\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 21 \"\
-    geometry/convex_polygon.hpp\"\n\nnamespace m1une {\nnamespace geometry {\n\nnamespace\
-    \ convex_polygon_detail {\n\ninline bool points_close(\n    const Point<long double>&\
-    \ first,\n    const Point<long double>& second,\n    long double eps\n) {\n  \
-    \  return geometry::distance(first, second) <= eps;\n}\n\ninline std::vector<Point<long\
-    \ double>> clean_polygon(\n    std::vector<Point<long double>> polygon,\n    long\
-    \ double eps\n) {\n    if (polygon.empty()) return polygon;\n\n    std::vector<Point<long\
-    \ double>> deduplicated;\n    for (const Point<long double>& point : polygon)\
-    \ {\n        if (\n            deduplicated.empty() ||\n            !points_close(deduplicated.back(),\
-    \ point, eps)\n        ) {\n            deduplicated.push_back(point);\n     \
-    \   }\n    }\n    if (\n        deduplicated.size() >= 2 &&\n        points_close(\n\
-    \            deduplicated.front(),\n            deduplicated.back(),\n       \
-    \     eps\n        )\n    ) {\n        deduplicated.pop_back();\n    }\n    if\
-    \ (deduplicated.size() <= 2) return deduplicated;\n    std::vector<Point<long\
-    \ double>> cleaned;\n    const std::size_t size = deduplicated.size();\n    cleaned.reserve(size);\n\
-    \    for (std::size_t index = 0; index < size; ++index) {\n        const Point<long\
-    \ double>& previous =\n            deduplicated[(index + size - 1) % size];\n\
-    \        const Point<long double>& current = deduplicated[index];\n        const\
-    \ Point<long double>& next =\n            deduplicated[(index + 1) % size];\n\
-    \        if (\n            orientation(previous, current, next, eps) != 0 ||\n\
-    \            dot(current - previous, next - current) < -eps\n        ) {\n   \
-    \         cleaned.push_back(current);\n        }\n    }\n    return cleaned;\n\
-    }\n\n}  // namespace convex_polygon_detail\n\ntemplate <Coordinate T>\nbool is_convex_polygon(\n\
-    \    const std::vector<Point<T>>& polygon,\n    bool strict = false,\n    long\
-    \ double eps = 1e-12L\n) {\n    std::size_t size = polygon.size();\n    if (size\
-    \ >= 2 && polygon.front() == polygon.back()) size--;\n    if (size < 3) return\
-    \ false;\n\n    int direction = 0;\n    for (std::size_t index = 0; index < size;\
-    \ ++index) {\n        const Point<T>& current = polygon[index];\n        const\
-    \ Point<T>& next = polygon[(index + 1) % size];\n        const Point<T>& after\
-    \ = polygon[(index + 2) % size];\n        if (current == next) return false;\n\
-    \        const int turn = orientation(current, next, after, eps);\n        if\
-    \ (turn == 0) {\n            if (strict) return false;\n            continue;\n\
-    \        }\n        if (direction != 0 && direction != turn) return false;\n \
-    \       direction = turn;\n    }\n    return !strict || direction != 0;\n}\n\n\
-    template <Coordinate T>\nstd::vector<Point<T>> normalize_convex_polygon(\n   \
-    \ std::vector<Point<T>> polygon,\n    long double eps = 1e-12L\n) {\n    return\
-    \ convex_polygon_detail::normalize_convex_boundary(\n        std::move(polygon),\n\
-    \        eps\n    );\n}\n\ntemplate <Coordinate T>\nPointInPolygon point_in_convex_polygon(\n\
-    \    const std::vector<Point<T>>& polygon,\n    const Point<T>& point,\n    long\
-    \ double eps = 1e-12L\n) {\n    const std::size_t size = polygon.size();\n   \
-    \ if (size == 0) return PointInPolygon::Outside;\n    if (size == 1) {\n     \
-    \   return distance(polygon[0], point) <= eps\n            ? PointInPolygon::Boundary\n\
-    \            : PointInPolygon::Outside;\n    }\n    if (size == 2) {\n       \
-    \ return on_segment(Segment<T>{polygon[0], polygon[1]}, point, eps)\n        \
-    \    ? PointInPolygon::Boundary\n            : PointInPolygon::Outside;\n    }\n\
-    \n    const int order = orientation(\n        polygon[0],\n        polygon[1],\n\
-    \        polygon[size - 1],\n        eps\n    );\n    if (order == 0) return point_in_polygon(polygon,\
-    \ point, eps);\n    auto vertex = [&](std::size_t index) -> const Point<T>& {\n\
-    \        if (order > 0 || index == 0) return polygon[index];\n        return polygon[size\
-    \ - index];\n    };\n\n    const int first_side = orientation(vertex(0), vertex(1),\
-    \ point, eps);\n    const int last_side =\n        orientation(vertex(0), vertex(size\
-    \ - 1), point, eps);\n    if (first_side < 0 || last_side > 0) {\n        return\
-    \ PointInPolygon::Outside;\n    }\n    if (first_side == 0) {\n        return\
-    \ on_segment(Segment<T>{vertex(0), vertex(1)}, point, eps)\n            ? PointInPolygon::Boundary\n\
-    \            : PointInPolygon::Outside;\n    }\n    if (last_side == 0) {\n  \
-    \      return on_segment(\n            Segment<T>{vertex(0), vertex(size - 1)},\n\
-    \            point,\n            eps\n        )\n            ? PointInPolygon::Boundary\n\
-    \            : PointInPolygon::Outside;\n    }\n\n    std::size_t left = 1;\n\
-    \    std::size_t right = size - 1;\n    while (right - left >= 2) {\n        const\
-    \ std::size_t middle = (left + right) / 2;\n        if (orientation(vertex(0),\
-    \ vertex(middle), point, eps) >= 0) {\n            left = middle;\n        } else\
-    \ {\n            right = middle;\n        }\n    }\n    const int triangle_side\
-    \ =\n        orientation(vertex(left), vertex(right), point, eps);\n    if (triangle_side\
-    \ < 0) return PointInPolygon::Outside;\n    if (triangle_side == 0) return PointInPolygon::Boundary;\n\
-    \    return PointInPolygon::Inside;\n}\n\ntemplate <Coordinate T>\nclass ConvexPolygon\
-    \ {\n   public:\n    using Wide = wide_type<T>;\n\n   private:\n    std::vector<Point<T>>\
-    \ points;\n    std::vector<Wide> area_prefix;\n    long double epsilon;\n\n  \
-    \  template <class Compare>\n    int periodic_best(Compare better) const {\n \
-    \       const int size = int(points.size());\n        int left = 0;\n        int\
-    \ middle = size;\n        int right = 2 * size;\n        while (right - left >\
-    \ 2) {\n            const int left_middle = (left + middle) / 2;\n           \
-    \ const int right_middle = (middle + right + 1) / 2;\n            if (better(left_middle\
-    \ % size, middle % size)) {\n                right = middle;\n               \
-    \ middle = left_middle;\n            } else if (better(right_middle % size, middle\
-    \ % size)) {\n                left = middle;\n                middle = right_middle;\n\
-    \            } else {\n                left = left_middle;\n                right\
-    \ = right_middle;\n            }\n        }\n        return middle % size;\n \
-    \   }\n\n    int previous(int index) const {\n        return index == 0 ? int(points.size())\
-    \ - 1 : index - 1;\n    }\n\n    int next(int index) const {\n        return index\
-    \ + 1 == int(points.size()) ? 0 : index + 1;\n    }\n\n   public:\n    explicit\
-    \ ConvexPolygon(\n        std::vector<Point<T>> polygon,\n        long double\
-    \ eps = 1e-12L\n    )\n        : points(normalize_convex_polygon(std::move(polygon),\
-    \ eps)),\n          epsilon(eps) {\n        assert(\n            points.size()\
-    \ <=\n            static_cast<std::size_t>(\n                std::numeric_limits<int>::max()\
-    \ / 2\n            )\n        );\n        assert(\n            points.size() <\
-    \ 3 ||\n            is_convex_polygon(points, true, epsilon)\n        );\n   \
-    \     area_prefix.resize(2 * points.size() + 1, Wide(0));\n        for (std::size_t\
-    \ index = 0; index < 2 * points.size(); ++index) {\n            area_prefix[index\
-    \ + 1] =\n                area_prefix[index] +\n                cross(\n     \
-    \               points[index % points.size()],\n                    points[(index\
-    \ + 1) % points.size()]\n                );\n        }\n    }\n\n    int size()\
-    \ const noexcept {\n        return int(points.size());\n    }\n\n    bool empty()\
-    \ const noexcept {\n        return points.empty();\n    }\n\n    const std::vector<Point<T>>&\
-    \ vertices() const noexcept {\n        return points;\n    }\n\n    const Point<T>&\
-    \ operator[](int index) const {\n        assert(0 <= index && index < size());\n\
-    \        return points[index];\n    }\n\n    Wide area2() const {\n        if\
-    \ (points.empty()) return Wide(0);\n        return area_prefix[points.size()];\n\
-    \    }\n\n    Wide chain_area2(int first, int last) const {\n        assert(0\
-    \ <= first && first < size());\n        assert(0 <= last && last < size());\n\
-    \        int extended_last = last;\n        if (extended_last < first) extended_last\
-    \ += size();\n        return\n            area_prefix[extended_last] - area_prefix[first]\
-    \ +\n            cross(points[last], points[first]);\n    }\n\n    PointInPolygon\
-    \ contains(const Point<T>& point) const {\n        return point_in_convex_polygon(points,\
-    \ point, epsilon);\n    }\n\n    std::pair<Wide, int> min_dot(const Point<T>&\
-    \ direction) const {\n        assert(!points.empty());\n        const int index\
-    \ = periodic_best([&](int first, int second) {\n            return dot(points[first],\
-    \ direction) <\n                   dot(points[second], direction);\n        });\n\
-    \        return std::pair<Wide, int>(dot(points[index], direction), index);\n\
-    \    }\n\n    std::pair<Wide, int> max_dot(const Point<T>& direction) const {\n\
-    \        assert(!points.empty());\n        const int index = periodic_best([&](int\
-    \ first, int second) {\n            return dot(points[first], direction) >\n \
-    \                  dot(points[second], direction);\n        });\n        return\
-    \ std::pair<Wide, int>(dot(points[index], direction), index);\n    }\n\n    std::pair<int,\
-    \ int> tangent_vertices(const Point<T>& point) const {\n        assert(points.size()\
-    \ >= 3);\n        assert(contains(point) == PointInPolygon::Outside);\n      \
-    \  int first = periodic_best([&](int left, int right) {\n            return orientation(point,\
-    \ points[left], points[right], epsilon) < 0;\n        });\n        int second\
-    \ = periodic_best([&](int left, int right) {\n            return orientation(point,\
-    \ points[left], points[right], epsilon) > 0;\n        });\n        if (\n    \
-    \        orientation(\n                point,\n                points[first],\n\
-    \                points[previous(first)],\n                epsilon\n         \
-    \   ) == 0\n        ) {\n            first = previous(first);\n        }\n   \
-    \     if (\n            orientation(\n                point,\n               \
-    \ points[second],\n                points[next(second)],\n                epsilon\n\
-    \            ) == 0\n        ) {\n            second = next(second);\n       \
-    \ }\n        return std::pair<int, int>(first, second);\n    }\n};\n\ntemplate\
-    \ <Coordinate T>\nstd::optional<Point<long double>> centroid(\n    const ConvexPolygon<T>&\
-    \ polygon,\n    long double eps = 1e-12L\n) {\n    return polygon_centroid(polygon.vertices(),\
-    \ eps);\n}\n\nnamespace convex_polygon_detail {\n\ntemplate <Coordinate T>\nclass\
-    \ MinkowskiDifferenceView {\n   private:\n    struct Cycle {\n        const ConvexPolygon<T>*\
-    \ polygon;\n        int start;\n        bool negate;\n\n        int edge_count()\
-    \ const {\n            return polygon->size() >= 2 ? polygon->size() : 0;\n  \
-    \      }\n\n        Point<T> point(int index) const {\n            const int size\
-    \ = polygon->size();\n            const Point<T>& result = (*polygon)[(start +\
-    \ index) % size];\n            return negate ? -result : result;\n        }\n\n\
-    \        Point<T> edge(int index) const {\n            return point((index + 1)\
-    \ % polygon->size()) - point(index);\n        }\n    };\n\n    Cycle first;\n\
-    \    Cycle second;\n\n    std::pair<int, int> prefixes(int rank) const {\n   \
-    \     const int first_size = first.edge_count();\n        const int second_size\
-    \ = second.edge_count();\n        if (first_size + second_size == 0) {\n     \
-    \       return std::pair<int, int>(0, 0);\n        }\n\n        int low = std::max(0,\
-    \ rank - second_size);\n        int high = std::min(rank, first_size);\n     \
-    \   while (low <= high) {\n            const int first_prefix = (low + high) /\
-    \ 2;\n            const int second_prefix = rank - first_prefix;\n           \
-    \ if (\n                first_prefix > 0 &&\n                second_prefix < second_size\
-    \ &&\n                entry_less(\n                    second.edge(second_prefix),\n\
-    \                    1,\n                    first.edge(first_prefix - 1),\n \
-    \                   0\n                )\n            ) {\n                high\
-    \ = first_prefix - 1;\n                continue;\n            }\n            if\
-    \ (\n                second_prefix > 0 &&\n                first_prefix < first_size\
-    \ &&\n                entry_less(\n                    first.edge(first_prefix),\n\
-    \                    0,\n                    second.edge(second_prefix - 1),\n\
-    \                    1\n                )\n            ) {\n                low\
-    \ = first_prefix + 1;\n                continue;\n            }\n            return\
-    \ std::pair<int, int>(first_prefix, second_prefix);\n        }\n        assert(false);\n\
-    \        return std::pair<int, int>(0, 0);\n    }\n\n    static int direction_half(const\
-    \ Point<T>& direction) {\n        return\n            direction.y > 0 ||\n   \
-    \         (direction.y == 0 && direction.x >= 0)\n            ? 0\n          \
-    \  : 1;\n    }\n\n    static bool entry_less(\n        const Point<T>& left,\n\
-    \        int left_cycle,\n        const Point<T>& right,\n        int right_cycle\n\
-    \    ) {\n        if constexpr (std::floating_point<T>) {\n            long double\
-    \ left_angle = std::atan2(\n                static_cast<long double>(left.y),\n\
-    \                static_cast<long double>(left.x)\n            );\n          \
-    \  long double right_angle = std::atan2(\n                static_cast<long double>(right.y),\n\
-    \                static_cast<long double>(right.x)\n            );\n         \
-    \   if (left_angle < 0) {\n                left_angle += 2 * std::numbers::pi_v<long\
-    \ double>;\n            }\n            if (right_angle < 0) {\n              \
-    \  right_angle += 2 * std::numbers::pi_v<long double>;\n            }\n      \
-    \      if (left_angle != right_angle) return left_angle < right_angle;\n     \
-    \       return left_cycle < right_cycle;\n        }\n        const int left_half\
-    \ = direction_half(left);\n        const int right_half = direction_half(right);\n\
-    \        if (left_half != right_half) return left_half < right_half;\n       \
-    \ const auto turn = cross(left, right);\n        if (turn != 0) return turn >\
-    \ 0;\n        return left_cycle < right_cycle;\n    }\n\n    static int negated_start(const\
-    \ ConvexPolygon<T>& polygon) {\n        if (polygon.size() <= 1) return 0;\n \
-    \       int result = polygon.max_dot(Point<T>(0, 1)).second;\n        const int\
-    \ previous = result == 0 ? polygon.size() - 1 : result - 1;\n        const int\
-    \ next = result + 1 == polygon.size() ? 0 : result + 1;\n        for (const int\
-    \ candidate : {previous, next}) {\n            if (\n                polygon[candidate].y\
-    \ == polygon[result].y &&\n                polygon[candidate].x > polygon[result].x\n\
-    \            ) {\n                result = candidate;\n            }\n       \
-    \ }\n        return result;\n    }\n\n   public:\n    MinkowskiDifferenceView(\n\
-    \        const ConvexPolygon<T>& minuend,\n        const ConvexPolygon<T>& subtrahend\n\
-    \    )\n        : first{&minuend, 0, false},\n          second{&subtrahend, negated_start(subtrahend),\
-    \ true} {\n        assert(!minuend.empty());\n        assert(!subtrahend.empty());\n\
-    \    }\n\n    int size() const {\n        const int edge_count =\n           \
-    \ first.edge_count() + second.edge_count();\n        return edge_count == 0 ?\
-    \ 1 : edge_count;\n    }\n\n    Point<T> operator[](int rank) const {\n      \
-    \  assert(0 <= rank && rank < size());\n        const auto [first_prefix, second_prefix]\
-    \ = prefixes(rank);\n        return\n            first.point(first_prefix % first.polygon->size())\
-    \ +\n            second.point(second_prefix % second.polygon->size());\n    }\n\
-    \n    std::pair<Point<T>, Point<T>> components(int rank) const {\n        assert(0\
-    \ <= rank && rank < size());\n        const auto [first_prefix, second_prefix]\
-    \ = prefixes(rank);\n        return std::pair<Point<T>, Point<T>>(\n         \
-    \   first.point(first_prefix % first.polygon->size()),\n            -second.point(second_prefix\
-    \ % second.polygon->size())\n        );\n    }\n};\n\nstruct OriginLocation {\n\
-    \    PointInPolygon location;\n    int outside_edge;\n    std::array<int, 3> simplex;\n\
-    \    int simplex_size;\n};\n\ntemplate <Coordinate T, class Polygon>\nOriginLocation\
-    \ locate_origin(\n    const Polygon& polygon,\n    long double eps\n) {\n    const\
-    \ int size = polygon.size();\n    assert(size >= 3);\n    const Point<T> origin;\n\
-    \    const Point<T> base = polygon[0];\n    int first = 1;\n    if (\n       \
-    \ size >= 4 &&\n        orientation(base, polygon[1], polygon[2], eps) == 0 &&\n\
-    \        dot(polygon[1] - base, polygon[2] - polygon[1]) > 0\n    ) {\n      \
-    \  first = 2;\n    }\n    const int last = size - 1;\n\n    const int first_side\
-    \ = orientation(base, polygon[first], origin, eps);\n    const int last_side =\
-    \ orientation(base, polygon[last], origin, eps);\n    if (first_side < 0) {\n\
-    \        return OriginLocation{\n            PointInPolygon::Outside,\n      \
-    \      0,\n            std::array<int, 3>{0, 0, 0},\n            0,\n        };\n\
-    \    }\n    if (last_side > 0) {\n        return OriginLocation{\n           \
-    \ PointInPolygon::Outside,\n            last,\n            std::array<int, 3>{0,\
-    \ 0, 0},\n            0,\n        };\n    }\n    if (first_side == 0) {\n    \
-    \    if (on_segment(Segment<T>{base, polygon[first]}, origin, eps)) {\n      \
-    \      return OriginLocation{\n                PointInPolygon::Boundary,\n   \
-    \             -1,\n                std::array<int, 3>{0, first, 0},\n        \
-    \        2,\n            };\n        }\n        return OriginLocation{\n     \
-    \       PointInPolygon::Outside,\n            first,\n            std::array<int,\
-    \ 3>{0, 0, 0},\n            0,\n        };\n    }\n    if (last_side == 0) {\n\
-    \        if (on_segment(Segment<T>{base, polygon[last]}, origin, eps)) {\n   \
-    \         return OriginLocation{\n                PointInPolygon::Boundary,\n\
-    \                -1,\n                std::array<int, 3>{0, last, 0},\n      \
-    \          2,\n            };\n        }\n        return OriginLocation{\n   \
-    \         PointInPolygon::Outside,\n            last - 1,\n            std::array<int,\
-    \ 3>{0, 0, 0},\n            0,\n        };\n    }\n\n    int left = first;\n \
-    \   int right = last;\n    while (right - left >= 2) {\n        const int middle\
-    \ = (left + right) / 2;\n        if (orientation(base, polygon[middle], origin,\
-    \ eps) >= 0) {\n            left = middle;\n        } else {\n            right\
-    \ = middle;\n        }\n    }\n    const int side = orientation(polygon[left],\
-    \ polygon[right], origin, eps);\n    if (side < 0) {\n        return OriginLocation{\n\
-    \            PointInPolygon::Outside,\n            left,\n            std::array<int,\
-    \ 3>{0, 0, 0},\n            0,\n        };\n    }\n    if (side == 0) {\n    \
-    \    const bool boundary = on_segment(\n            Segment<T>{polygon[left],\
-    \ polygon[right]},\n            origin,\n            eps\n        );\n       \
-    \ return OriginLocation{\n            boundary ? PointInPolygon::Boundary : PointInPolygon::Outside,\n\
-    \            boundary ? -1 : left,\n            std::array<int, 3>{left, right,\
-    \ 0},\n            boundary ? 2 : 0,\n        };\n    }\n    return OriginLocation{\n\
-    \        PointInPolygon::Inside,\n        -1,\n        std::array<int, 3>{0, left,\
-    \ right},\n        3,\n    };\n}\n\ntemplate <class Compare>\nint periodic_best(int\
-    \ size, Compare better) {\n    int left = 0;\n    int middle = size;\n    int\
-    \ right = 2 * size;\n    while (right - left > 2) {\n        const int left_middle\
-    \ = (left + middle) / 2;\n        const int right_middle = (middle + right + 1)\
-    \ / 2;\n        if (better(left_middle % size, middle % size)) {\n           \
-    \ right = middle;\n            middle = left_middle;\n        } else if (better(right_middle\
-    \ % size, middle % size)) {\n            left = middle;\n            middle =\
-    \ right_middle;\n        } else {\n            left = left_middle;\n         \
-    \   right = right_middle;\n        }\n    }\n    return middle % size;\n}\n\n\
-    template <Coordinate T, class Polygon>\nstd::pair<int, int> tangent_vertices_from_origin(\n\
-    \    const Polygon& polygon,\n    long double eps\n) {\n    const int size = polygon.size();\n\
-    \    const Point<T> origin;\n    int first = periodic_best(size, [&](int left,\
-    \ int right) {\n        return orientation(origin, polygon[left], polygon[right],\
-    \ eps) < 0;\n    });\n    int second = periodic_best(size, [&](int left, int right)\
-    \ {\n        return orientation(origin, polygon[left], polygon[right], eps) >\
-    \ 0;\n    });\n    const int previous = first == 0 ? size - 1 : first - 1;\n \
-    \   if (orientation(origin, polygon[first], polygon[previous], eps) == 0) {\n\
-    \        first = previous;\n    }\n    const int next = second + 1 == size ? 0\
-    \ : second + 1;\n    if (orientation(origin, polygon[second], polygon[next], eps)\
-    \ == 0) {\n        second = next;\n    }\n    return std::pair<int, int>(first,\
-    \ second);\n}\n\nstruct ClosestBoundaryFeature {\n    int first;\n    int second;\n\
-    \    long double ratio;\n    long double distance;\n};\n\ntemplate <Coordinate\
-    \ T, class Polygon>\nClosestBoundaryFeature closest_boundary_feature(\n    const\
-    \ Polygon& polygon,\n    const OriginLocation& location,\n    long double eps\n\
-    ) {\n    const int size = polygon.size();\n    assert(size >= 3);\n    assert(location.location\
-    \ == PointInPolygon::Outside);\n    const Point<T> origin;\n\n    const auto tangents\
-    \ = tangent_vertices_from_origin<T>(polygon, eps);\n    auto visible = [&](int\
-    \ index) {\n        return orientation(\n            polygon[index],\n       \
-    \     polygon[(index + 1) % size],\n            origin,\n            eps\n   \
-    \     ) < 0;\n    };\n    auto forward_edges = [&](int start, int finish) {\n\
-    \        return finish >= start ? finish - start : finish + size - start;\n  \
-    \  };\n\n    int witness = location.outside_edge;\n    if (!visible(witness))\
-    \ {\n        const int previous = witness == 0 ? size - 1 : witness - 1;\n   \
-    \     const int next = witness + 1 == size ? 0 : witness + 1;\n        if (visible(previous))\
-    \ {\n            witness = previous;\n        } else if (visible(next)) {\n  \
-    \          witness = next;\n        }\n    }\n\n    int start = tangents.first;\n\
-    \    int finish = tangents.second;\n    if (forward_edges(start, witness) >= forward_edges(start,\
-    \ finish)) {\n        std::swap(start, finish);\n    }\n    int edge_count = forward_edges(start,\
-    \ finish);\n    if (edge_count == 0) {\n        start = location.outside_edge;\n\
-    \        finish = (start + 1) % size;\n        edge_count = 1;\n    }\n\n    auto\
-    \ vertex = [&](int offset) {\n        return polygon[(start + offset) % size];\n\
-    \    };\n    int left = 0;\n    int right = edge_count;\n    while (left < right)\
-    \ {\n        const int middle = (left + right) / 2;\n        if (norm2(vertex(middle))\
-    \ <= norm2(vertex(middle + 1))) {\n            right = middle;\n        } else\
-    \ {\n            left = middle + 1;\n        }\n    }\n\n    ClosestBoundaryFeature\
-    \ result{\n        (start + left) % size,\n        (start + left) % size,\n  \
-    \      0,\n        norm(vertex(left)),\n    };\n    auto consider_edge = [&](int\
-    \ first_offset, int second_offset) {\n        const Point<long double> first_point(vertex(first_offset));\n\
-    \        const Point<long double> second_point(vertex(second_offset));\n     \
-    \   const Point<long double> direction = second_point - first_point;\n       \
-    \ long double ratio =\n            -dot(first_point, direction) / dot(direction,\
-    \ direction);\n        ratio = std::clamp(ratio, 0.0L, 1.0L);\n        const long\
-    \ double candidate_distance =\n            norm(first_point + direction * ratio);\n\
-    \        if (candidate_distance < result.distance) {\n            result = ClosestBoundaryFeature{\n\
-    \                (start + first_offset) % size,\n                (start + second_offset)\
-    \ % size,\n                ratio,\n                candidate_distance,\n     \
-    \       };\n        }\n    };\n    if (left > 0) {\n        consider_edge(left\
-    \ - 1, left);\n    }\n    if (left < edge_count) {\n        consider_edge(left,\
-    \ left + 1);\n    }\n    return result;\n}\n\ntemplate <Coordinate T, class Polygon>\n\
-    long double distance_from_origin(\n    const Polygon& polygon,\n    long double\
-    \ eps\n) {\n    const OriginLocation location = locate_origin<T>(polygon, eps);\n\
-    \    if (location.location != PointInPolygon::Outside) return 0;\n    return closest_boundary_feature<T>(polygon,\
-    \ location, eps).distance;\n}\n\ninline Point<long double> interpolate(\n    const\
-    \ Point<long double>& first,\n    const Point<long double>& second,\n    long\
-    \ double ratio\n) {\n    return first + (second - first) * ratio;\n}\n\ntemplate\
-    \ <Coordinate T>\nClosestPoints\nclosest_points_from_difference(\n    const MinkowskiDifferenceView<T>&\
-    \ difference,\n    long double eps\n) {\n    const OriginLocation location = locate_origin<T>(difference,\
-    \ eps);\n    if (location.location == PointInPolygon::Outside) {\n        const\
-    \ ClosestBoundaryFeature feature =\n            closest_boundary_feature<T>(difference,\
-    \ location, eps);\n        const auto first_components = difference.components(feature.first);\n\
-    \        const auto second_components = difference.components(feature.second);\n\
-    \        return ClosestPoints{\n            interpolate(\n                Point<long\
-    \ double>(first_components.first),\n                Point<long double>(second_components.first),\n\
-    \                feature.ratio\n            ),\n            interpolate(\n   \
-    \             Point<long double>(first_components.second),\n                Point<long\
-    \ double>(second_components.second),\n                feature.ratio\n        \
-    \    )\n        };\n    }\n\n    assert(location.simplex_size == 2 || location.simplex_size\
-    \ == 3);\n    std::array<long double, 3> weight{0, 0, 0};\n    if (location.simplex_size\
-    \ == 2) {\n        const Point<long double> first(difference[location.simplex[0]]);\n\
-    \        const Point<long double> second(difference[location.simplex[1]]);\n \
-    \       const Point<long double> direction = second - first;\n        weight[1]\
-    \ = -dot(first, direction) / dot(direction, direction);\n        weight[1] = std::clamp(weight[1],\
-    \ 0.0L, 1.0L);\n        weight[0] = 1 - weight[1];\n    } else {\n        const\
-    \ Point<long double> first(difference[location.simplex[0]]);\n        const Point<long\
-    \ double> second(difference[location.simplex[1]]);\n        const Point<long double>\
-    \ third(difference[location.simplex[2]]);\n        const long double denominator\
-    \ = cross(\n            second - first,\n            third - first\n        );\n\
-    \        weight[0] = cross(second, third) / denominator;\n        weight[1] =\
-    \ cross(third, first) / denominator;\n        weight[2] = cross(first, second)\
-    \ / denominator;\n    }\n\n    Point<long double> first_result;\n    Point<long\
-    \ double> second_result;\n    for (int index = 0; index < location.simplex_size;\
-    \ ++index) {\n        const auto components = difference.components(\n       \
-    \     location.simplex[index]\n        );\n        first_result += Point<long\
-    \ double>(components.first) * weight[index];\n        second_result +=\n     \
-    \       Point<long double>(components.second) * weight[index];\n    }\n    return\
-    \ ClosestPoints{\n        first_result,\n        second_result\n    };\n}\n\n\
-    }  // namespace convex_polygon_detail\n\ntemplate <Coordinate T>\nstd::vector<std::array<Point<T>,\
-    \ 3>> triangulate_convex_polygon(\n    std::vector<Point<T>> polygon,\n    long\
-    \ double eps = 1e-12L\n) {\n    polygon = normalize_convex_polygon(std::move(polygon),\
-    \ eps);\n    if (polygon.size() < 3) return {};\n\n    std::vector<std::array<Point<T>,\
-    \ 3>> result;\n    result.reserve(polygon.size() - 2);\n    for (std::size_t index\
-    \ = 1; index + 1 < polygon.size(); ++index) {\n        std::array<Point<T>, 3>\
-    \ triangle;\n        triangle[0] = polygon[0];\n        triangle[1] = polygon[index];\n\
-    \        triangle[2] = polygon[index + 1];\n        result.push_back(std::move(triangle));\n\
-    \    }\n    return result;\n}\n\ntemplate <Coordinate T>\nwide_type<T> convex_diameter2(\n\
-    \    std::vector<Point<T>> polygon,\n    long double eps = 1e-12L\n) {\n    polygon\
-    \ = normalize_convex_polygon(std::move(polygon), eps);\n    const std::size_t\
-    \ size = polygon.size();\n    if (size <= 1) return 0;\n    if (size == 2) return\
-    \ distance2(polygon[1], polygon[0]);\n\n    wide_type<T> result = 0;\n    std::size_t\
-    \ opposite = 1;\n    for (std::size_t index = 0; index < size; ++index) {\n  \
-    \      const std::size_t next = (index + 1) % size;\n        while (true) {\n\
-    \            const std::size_t candidate = (opposite + 1) % size;\n          \
-    \  const auto current_area =\n                cross(polygon[index], polygon[next],\
-    \ polygon[opposite]);\n            const auto candidate_area =\n             \
-    \   cross(polygon[index], polygon[next], polygon[candidate]);\n            if\
-    \ (candidate_area <= current_area) break;\n            opposite = candidate;\n\
-    \        }\n        result = std::max(\n            result,\n            distance2(polygon[index],\
-    \ polygon[opposite])\n        );\n        result = std::max(\n            result,\n\
-    \            distance2(polygon[next], polygon[opposite])\n        );\n    }\n\
-    \    return result;\n}\n\ntemplate <Coordinate T>\nstd::vector<Point<long double>>\
-    \ convex_cut(\n    const std::vector<Point<T>>& polygon,\n    const Line<T>& boundary,\n\
-    \    long double eps = 1e-12L\n) {\n    assert(boundary.a != boundary.b);\n  \
-    \  std::vector<Point<long double>> input;\n    input.reserve(polygon.size());\n\
-    \    for (const Point<T>& point : polygon) input.emplace_back(point);\n    if\
-    \ (input.empty()) return input;\n\n    const Point<long double> line_start(boundary.a);\n\
-    \    const Point<long double> line_end(boundary.b);\n    const Line<long double>\
-    \ line{line_start, line_end};\n    std::vector<Point<long double>> result;\n \
-    \   Point<long double> previous = input.back();\n    int previous_side = orientation(line_start,\
-    \ line_end, previous, eps);\n    for (const Point<long double>& current : input)\
-    \ {\n        const int current_side =\n            orientation(line_start, line_end,\
-    \ current, eps);\n        const bool previous_inside = previous_side >= 0;\n \
-    \       const bool current_inside = current_side >= 0;\n        if (previous_inside\
-    \ != current_inside) {\n            const Line<long double> crossing{previous,\
-    \ current};\n            const LinearIntersection intersection =\n           \
-    \     linear_intersection(line, crossing, eps);\n            if (intersection.kind\
-    \ == LinearIntersectionKind::Point) {\n                result.push_back(intersection.first);\n\
-    \            }\n        }\n        if (current_inside) result.push_back(current);\n\
-    \        previous = current;\n        previous_side = current_side;\n    }\n \
-    \   return convex_polygon_detail::clean_polygon(std::move(result), eps);\n}\n\n\
-    template <Coordinate T>\nbool convex_polygons_intersect(\n    const ConvexPolygon<T>&\
-    \ first,\n    const ConvexPolygon<T>& second,\n    long double eps = 1e-12L\n\
-    ) {\n    assert(!first.empty());\n    assert(!second.empty());\n    if (first.size()\
-    \ <= 2 && second.size() <= 2) {\n        if (first.size() == 1 && second.size()\
-    \ == 1) {\n            return distance(first[0], second[0]) <= eps;\n        }\n\
-    \        if (first.size() == 1) {\n            return on_segment(\n          \
-    \      Segment<T>{second[0], second[1]},\n                first[0],\n        \
-    \        eps\n            );\n        }\n        if (second.size() == 1) {\n \
-    \           return on_segment(\n                Segment<T>{first[0], first[1]},\n\
-    \                second[0],\n                eps\n            );\n        }\n\
-    \        return intersects(\n            Segment<T>{first[0], first[1]},\n   \
-    \         Segment<T>{second[0], second[1]},\n            eps\n        );\n   \
-    \ }\n\n    const convex_polygon_detail::MinkowskiDifferenceView<T> difference(\n\
-    \        first,\n        second\n    );\n    return\n        convex_polygon_detail::locate_origin<T>(difference,\
-    \ eps).location !=\n        PointInPolygon::Outside;\n}\n\ntemplate <Coordinate\
-    \ T>\nbool convex_polygons_intersect(\n    const std::vector<Point<T>>& first,\n\
-    \    const std::vector<Point<T>>& second,\n    long double eps = 1e-12L\n) {\n\
-    \    assert(!first.empty());\n    assert(!second.empty());\n    std::vector<Point<T>>\
-    \ negated;\n    negated.reserve(second.size());\n    for (const Point<T>& point\
-    \ : second) negated.push_back(-point);\n    const std::vector<Point<T>> difference\
-    \ =\n        minkowski_sum(first, std::move(negated), eps);\n    return\n    \
-    \    point_in_convex_polygon(difference, Point<T>(), eps) !=\n        PointInPolygon::Outside;\n\
-    }\n\ntemplate <Coordinate T>\nClosestPoints\nconvex_polygons_closest_points(\n\
-    \    const ConvexPolygon<T>& first,\n    const ConvexPolygon<T>& second,\n   \
-    \ long double eps = 1e-12L\n) {\n    assert(!first.empty());\n    assert(!second.empty());\n\
-    \    if (first.size() <= 2 && second.size() <= 2) {\n        return closest_points(\n\
-    \            Segment<T>{first[0], first[first.size() - 1]},\n            Segment<T>{second[0],\
-    \ second[second.size() - 1]},\n            eps\n        );\n    }\n    const convex_polygon_detail::MinkowskiDifferenceView<T>\
-    \ difference(\n        first,\n        second\n    );\n    return convex_polygon_detail::closest_points_from_difference(\n\
-    \        difference,\n        eps\n    );\n}\n\ntemplate <Coordinate T>\nClosestPoints\n\
-    convex_polygons_closest_points(\n    const std::vector<Point<T>>& first,\n   \
-    \ const std::vector<Point<T>>& second,\n    long double eps = 1e-12L\n) {\n  \
-    \  assert(!first.empty());\n    assert(!second.empty());\n    const ConvexPolygon<T>\
-    \ first_query(first, eps);\n    const ConvexPolygon<T> second_query(second, eps);\n\
-    \    return convex_polygons_closest_points(first_query, second_query, eps);\n\
-    }\n\ntemplate <Coordinate T>\nlong double convex_polygons_distance(\n    const\
-    \ ConvexPolygon<T>& first,\n    const ConvexPolygon<T>& second,\n    long double\
-    \ eps = 1e-12L\n) {\n    assert(!first.empty());\n    assert(!second.empty());\n\
-    \    if (first.size() <= 2 && second.size() <= 2) {\n        if (convex_polygons_intersect(first,\
-    \ second, eps)) return 0;\n        if (first.size() == 1 && second.size() == 1)\
-    \ {\n            return distance(first[0], second[0]);\n        }\n        if\
-    \ (first.size() == 1) {\n            return distance(\n                Segment<T>{second[0],\
-    \ second[1]},\n                first[0]\n            );\n        }\n        if\
-    \ (second.size() == 1) {\n            return distance(\n                Segment<T>{first[0],\
-    \ first[1]},\n                second[0]\n            );\n        }\n        return\
-    \ distance(\n            Segment<T>{first[0], first[1]},\n            Segment<T>{second[0],\
-    \ second[1]}\n        );\n    }\n\n    const convex_polygon_detail::MinkowskiDifferenceView<T>\
-    \ difference(\n        first,\n        second\n    );\n    return convex_polygon_detail::distance_from_origin<T>(difference,\
-    \ eps);\n}\n\ntemplate <Coordinate T>\nstd::vector<Point<long double>> convex_polygon_intersection(\n\
-    \    const std::vector<Point<T>>& first,\n    const std::vector<Point<T>>& second,\n\
-    \    long double eps = 1e-12L\n) {\n    using HalfPlane = half_plane_intersection_detail::HalfPlane;\n\
-    \    namespace detail = half_plane_intersection_detail;\n\n    const std::vector<Point<T>>\
-    \ normalized_first =\n        normalize_convex_polygon(first, eps);\n    const\
-    \ std::vector<Point<T>> normalized_second =\n        normalize_convex_polygon(second,\
-    \ eps);\n    assert(normalized_first.size() >= 3);\n    assert(normalized_second.size()\
-    \ >= 3);\n    assert(is_convex_polygon(normalized_first, true, eps));\n    assert(is_convex_polygon(normalized_second,\
-    \ true, eps));\n    if (!convex_polygons_intersect(\n            normalized_first,\n\
-    \            normalized_second,\n            eps\n        )) {\n        return\
-    \ {};\n    }\n\n    auto boundaries = [](const std::vector<Point<T>>& polygon)\
-    \ {\n        std::vector<HalfPlane> result;\n        result.reserve(polygon.size());\n\
-    \        for (std::size_t index = 0; index < polygon.size(); ++index) {\n    \
-    \        const Point<long double> point(polygon[index]);\n            Point<long\
-    \ double> direction =\n                Point<long double>(polygon[(index + 1)\
-    \ % polygon.size()]) -\n                point;\n            direction = direction\
-    \ / norm(direction);\n            result.push_back(HalfPlane{point, direction});\n\
-    \        }\n        return result;\n    };\n    const std::vector<HalfPlane> first_boundaries\
-    \ =\n        boundaries(normalized_first);\n    const std::vector<HalfPlane> second_boundaries\
-    \ =\n        boundaries(normalized_second);\n\n    std::vector<HalfPlane> merged;\n\
-    \    merged.reserve(first_boundaries.size() + second_boundaries.size());\n   \
-    \ std::size_t first_index = 0;\n    std::size_t second_index = 0;\n    while (\n\
-    \        first_index < first_boundaries.size() ||\n        second_index < second_boundaries.size()\n\
-    \    ) {\n        const bool take_first =\n            second_index == second_boundaries.size()\
-    \ ||\n            (\n                first_index < first_boundaries.size() &&\n\
-    \                detail::direction_less(\n                    first_boundaries[first_index],\n\
-    \                    second_boundaries[second_index]\n                )\n    \
-    \        );\n        if (take_first) {\n            detail::merge_same_direction(\n\
-    \                merged,\n                first_boundaries[first_index++],\n \
-    \               eps\n            );\n        } else {\n            detail::merge_same_direction(\n\
-    \                merged,\n                second_boundaries[second_index++],\n\
-    \                eps\n            );\n        }\n    }\n    detail::merge_cyclic_ends(merged,\
-    \ eps);\n\n    std::deque<HalfPlane> active;\n    for (const HalfPlane& half_plane\
-    \ : merged) {\n        while (active.size() >= 2) {\n            const std::optional<Point<long\
-    \ double>> point =\n                detail::intersection(\n                  \
-    \  active[active.size() - 2],\n                    active.back(),\n          \
-    \          eps\n                );\n            if (\n                !point.has_value()\
-    \ ||\n                !detail::outside(half_plane, *point, eps)\n            )\
-    \ {\n                break;\n            }\n            active.pop_back();\n \
-    \       }\n        while (active.size() >= 2) {\n            const std::optional<Point<long\
-    \ double>> point =\n                detail::intersection(active[0], active[1],\
-    \ eps);\n            if (\n                !point.has_value() ||\n           \
-    \     !detail::outside(half_plane, *point, eps)\n            ) {\n           \
-    \     break;\n            }\n            active.pop_front();\n        }\n    \
-    \    active.push_back(half_plane);\n    }\n    while (active.size() >= 3) {\n\
-    \        const std::optional<Point<long double>> point =\n            detail::intersection(\n\
-    \                active[active.size() - 2],\n                active.back(),\n\
-    \                eps\n            );\n        if (\n            !point.has_value()\
-    \ ||\n            !detail::outside(active.front(), *point, eps)\n        ) {\n\
-    \            break;\n        }\n        active.pop_back();\n    }\n    while (active.size()\
-    \ >= 3) {\n        const std::optional<Point<long double>> point =\n         \
-    \   detail::intersection(active[0], active[1], eps);\n        if (\n         \
-    \   !point.has_value() ||\n            !detail::outside(active.back(), *point,\
-    \ eps)\n        ) {\n            break;\n        }\n        active.pop_front();\n\
-    \    }\n\n    std::vector<Point<long double>> result;\n    result.reserve(active.size());\n\
-    \    for (std::size_t index = 0; index < active.size(); ++index) {\n        const\
-    \ std::optional<Point<long double>> point =\n            detail::intersection(\n\
-    \                active[index],\n                active[(index + 1) % active.size()],\n\
-    \                eps\n            );\n        if (point.has_value()) result.push_back(*point);\n\
-    \    }\n    return convex_polygon_detail::clean_polygon(std::move(result), eps);\n\
-    }\n\ntemplate <Coordinate T>\nlong double convex_polygons_distance(\n    const\
-    \ std::vector<Point<T>>& first,\n    const std::vector<Point<T>>& second,\n  \
-    \  long double eps = 1e-12L\n) {\n    assert(!first.empty());\n    assert(!second.empty());\n\
-    \    std::vector<Point<T>> negated;\n    negated.reserve(second.size());\n   \
-    \ for (const Point<T>& point : second) negated.push_back(-point);\n    const std::vector<Point<T>>\
-    \ difference =\n        minkowski_sum(first, std::move(negated), eps);\n    const\
-    \ Point<T> origin;\n    if (\n        point_in_convex_polygon(difference, origin,\
-    \ eps) !=\n        PointInPolygon::Outside\n    ) {\n        return 0;\n    }\n\
-    \    if (difference.size() == 1) return distance(difference[0], origin);\n\n \
-    \   long double result = std::numeric_limits<long double>::infinity();\n    for\
-    \ (std::size_t index = 0; index < difference.size(); ++index) {\n        if (difference.size()\
-    \ == 2 && index == 1) break;\n        result = std::min(\n            result,\n\
-    \            distance(\n                Segment<T>{\n                    difference[index],\n\
-    \                    difference[(index + 1) % difference.size()]\n           \
-    \     },\n                origin\n            )\n        );\n    }\n    return\
-    \ result;\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 4 \"\
-    verify/geometry/is_convex_polygon.test.cpp\"\n\n#line 1 \"utilities/fast_io.hpp\"\
-    \n\n\n\n#line 6 \"utilities/fast_io.hpp\"\n#include <cerrno>\n#include <charconv>\n\
-    #line 9 \"utilities/fast_io.hpp\"\n#include <cstdio>\n#include <cstdlib>\n#include\
-    \ <cstdint>\n#include <cstring>\n#include <iterator>\n#include <string>\n#include\
-    \ <sys/stat.h>\n#line 18 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n\nnamespace\
-    \ m1une {\nnamespace utilities {\nnamespace internal {\n\n// Detect std::begin(x),\
-    \ std::end(x).\ntemplate <class T, class = void>\nstruct is_range : std::false_type\
-    \ {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
+    \ ray);\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 4 \"\
+    verify/geometry/polygon_clipping.test.cpp\"\n\n#line 8 \"verify/geometry/polygon_clipping.test.cpp\"\
+    \n#include <cstdint>\n#line 12 \"verify/geometry/polygon_clipping.test.cpp\"\n\
+    \n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 6 \"utilities/fast_io.hpp\"\n\
+    #include <cerrno>\n#include <charconv>\n#line 9 \"utilities/fast_io.hpp\"\n#include\
+    \ <cstdio>\n#include <cstdlib>\n#line 12 \"utilities/fast_io.hpp\"\n#include <cstring>\n\
+    #include <iterator>\n#include <string>\n#include <sys/stat.h>\n#line 17 \"utilities/fast_io.hpp\"\
+    \n#include <utility>\n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities\
+    \ {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class\
+    \ T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate <class T>\n\
+    struct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
     \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
     \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
     \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
@@ -2746,42 +2003,370 @@ data:
     \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
     n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 7 \"verify/geometry/is_convex_polygon.test.cpp\"\
-    \n\nint main() {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
-    \ fast_output;\n\n    int size;\n    fast_input >> size;\n    using Point = m1une::geometry::Point<long\
-    \ long>;\n    std::vector<Point> polygon(size);\n    for (Point& point : polygon)\
-    \ fast_input >> point.x >> point.y;\n    fast_output << m1une::geometry::is_convex_polygon(polygon)\
-    \ << '\\n';\n}\n"
-  code: "#define PROBLEM \"https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=CGL_3_B\"\
-    \n\n#include \"../../geometry/convex_polygon.hpp\"\n\n#include \"../../utilities/fast_io.hpp\"\
-    \n#include <vector>\n\nint main() {\n    m1une::utilities::FastInput fast_input;\n\
-    \    m1une::utilities::FastOutput fast_output;\n\n    int size;\n    fast_input\
-    \ >> size;\n    using Point = m1une::geometry::Point<long long>;\n    std::vector<Point>\
-    \ polygon(size);\n    for (Point& point : polygon) fast_input >> point.x >> point.y;\n\
-    \    fast_output << m1une::geometry::is_convex_polygon(polygon) << '\\n';\n}\n"
+    \ utilities\n}  // namespace m1une\n\n\n#line 14 \"verify/geometry/polygon_clipping.test.cpp\"\
+    \n\nnamespace {\n\nusing namespace m1une::geometry;\nusing P = Point<long long>;\n\
+    \nbool close(long double first, long double second) {\n    return std::fabs(first\
+    \ - second) <=\n        1e-9L * std::max({1.0L, std::fabs(first), std::fabs(second)});\n\
+    }\n\nPolygon<long long> rectangle(\n    long long left,\n    long long bottom,\n\
+    \    long long right,\n    long long top,\n    bool filled = true\n) {\n    Polygon<long\
+    \ long> result;\n    result.vertices.emplace_back(left, bottom);\n    result.vertices.emplace_back(right,\
+    \ bottom);\n    result.vertices.emplace_back(right, top);\n    result.vertices.emplace_back(left,\
+    \ top);\n    result.filled = filled;\n    return result;\n}\n\nbool covered(\n\
+    \    const std::vector<ParameterInterval>& intervals,\n    long double parameter\n\
+    ) {\n    for (const ParameterInterval& interval : intervals) {\n        if (\n\
+    \            interval.begin - 1e-9L <= parameter &&\n            parameter <=\
+    \ interval.end + 1e-9L\n        ) {\n            return true;\n        }\n   \
+    \ }\n    return false;\n}\n\nbool covered(\n    const std::vector<AngularCoverage>&\
+    \ coverages,\n    long double argument\n) {\n    const long double full = 2.0L\
+    \ * std::numbers::pi_v<long double>;\n    argument = normalize_circle_argument(argument);\n\
+    \    for (const AngularCoverage& coverage : coverages) {\n        if (coverage.kind\
+    \ == AngularCoverageKind::Full) return true;\n        if (coverage.kind == AngularCoverageKind::Point)\
+    \ {\n            long double difference = std::fabs(argument - coverage.begin);\n\
+    \            difference = std::min(difference, full - difference);\n         \
+    \   if (difference <= 1e-9L) return true;\n            continue;\n        }\n\
+    \        assert(coverage.kind == AngularCoverageKind::Arc);\n        long double\
+    \ lifted = argument;\n        if (lifted < coverage.begin) lifted += full;\n \
+    \       if (lifted <= coverage.end + 1e-9L) return true;\n    }\n    return false;\n\
+    }\n\nvoid validate_intervals(const std::vector<ParameterInterval>& intervals)\
+    \ {\n    for (std::size_t index = 0; index < intervals.size(); ++index) {\n  \
+    \      assert(intervals[index].begin <= intervals[index].end);\n        if (index\
+    \ > 0) {\n            assert(intervals[index - 1].end < intervals[index].begin);\n\
+    \        }\n    }\n}\n\nvoid validate_coverages(const std::vector<AngularCoverage>&\
+    \ coverages) {\n    const long double full = 2.0L * std::numbers::pi_v<long double>;\n\
+    \    for (std::size_t index = 0; index < coverages.size(); ++index) {\n      \
+    \  const AngularCoverage& coverage = coverages[index];\n        assert(0.0L <=\
+    \ coverage.begin && coverage.begin < full);\n        assert(coverage.begin <=\
+    \ coverage.end);\n        assert(coverage.end <= coverage.begin + full + 1e-9L);\n\
+    \        if (index > 0) {\n            assert(coverages[index - 1].begin < coverage.begin);\n\
+    \        }\n    }\n}\n\nvoid test_linear_clipping() {\n    const Polygon<long\
+    \ long> square = rectangle(0, 0, 4, 4);\n    const Line<long long> line{P(-2,\
+    \ 2), P(-1, 2)};\n    const std::vector<ParameterInterval> line_parts = clip(line,\
+    \ square);\n    assert(line_parts.size() == 1);\n    assert(close(line_parts[0].begin,\
+    \ 2));\n    assert(close(line_parts[0].end, 6));\n\n    const Ray<long long> ray{P(-2,\
+    \ 2), P(-1, 2)};\n    const std::vector<ParameterInterval> ray_parts = clip(ray,\
+    \ square);\n    assert(ray_parts.size() == 1);\n    assert(close(ray_parts[0].begin,\
+    \ 2));\n    assert(close(ray_parts[0].end, 6));\n\n    const Segment<long long>\
+    \ segment{P(-2, 2), P(6, 2)};\n    const std::vector<ParameterInterval> segment_parts\
+    \ =\n        clip(segment, square);\n    assert(segment_parts.size() == 1);\n\
+    \    assert(close(segment_parts[0].begin, 0.25L));\n    assert(close(segment_parts[0].end,\
+    \ 0.75L));\n\n    const Segment<long long> inside{P(1, 2), P(3, 2)};\n    const\
+    \ std::vector<ParameterInterval> whole = clip(inside, square);\n    assert(whole.size()\
+    \ == 1);\n    assert(close(whole[0].begin, 0));\n    assert(close(whole[0].end,\
+    \ 1));\n\n    const Segment<long long> inside_point{P(2, 2), P(2, 2)};\n    const\
+    \ Segment<long long> outside_point{P(7, 2), P(7, 2)};\n    assert(clip(inside_point,\
+    \ square).size() == 1);\n    assert(clip(outside_point, square).empty());\n\n\
+    \    const Line<long long> boundary_line{P(-2, 0), P(-1, 0)};\n    const std::vector<ParameterInterval>\
+    \ boundary =\n        clip(boundary_line, square);\n    assert(boundary.size()\
+    \ == 1);\n    assert(close(boundary[0].begin, 2));\n    assert(close(boundary[0].end,\
+    \ 6));\n\n    const Line<long long> tangent{P(-1, 1), P(0, 0)};\n    const std::vector<ParameterInterval>\
+    \ tangent_part =\n        clip(tangent, square);\n    assert(tangent_part.size()\
+    \ == 1);\n    assert(close(tangent_part[0].begin, 1));\n    assert(close(tangent_part[0].end,\
+    \ 1));\n\n    Polygon<long long> concave;\n    concave.vertices.emplace_back(0,\
+    \ 0);\n    concave.vertices.emplace_back(6, 0);\n    concave.vertices.emplace_back(6,\
+    \ 6);\n    concave.vertices.emplace_back(4, 6);\n    concave.vertices.emplace_back(4,\
+    \ 2);\n    concave.vertices.emplace_back(2, 2);\n    concave.vertices.emplace_back(2,\
+    \ 6);\n    concave.vertices.emplace_back(0, 6);\n    const Line<long long> through_arms{P(-1,\
+    \ 4), P(0, 4)};\n    const std::vector<ParameterInterval> arms =\n        clip(through_arms,\
+    \ concave);\n    assert(arms.size() == 2);\n    assert(close(arms[0].begin, 1));\n\
+    \    assert(close(arms[0].end, 3));\n    assert(close(arms[1].begin, 5));\n  \
+    \  assert(close(arms[1].end, 7));\n\n    const Polygon<long long> square_boundary\
+    \ = rectangle(0, 0, 4, 4, false);\n    const std::vector<ParameterInterval> crossing_boundary\
+    \ =\n        clip(line, square_boundary);\n    assert(crossing_boundary.size()\
+    \ == 2);\n    assert(close(crossing_boundary[0].begin, 2));\n    assert(close(crossing_boundary[0].end,\
+    \ 2));\n    assert(close(crossing_boundary[1].begin, 6));\n    assert(close(crossing_boundary[1].end,\
+    \ 6));\n    const std::vector<ParameterInterval> overlapping_boundary =\n    \
+    \    clip(boundary_line, square_boundary);\n    assert(overlapping_boundary.size()\
+    \ == 1);\n    assert(close(overlapping_boundary[0].begin, 2));\n    assert(close(overlapping_boundary[0].end,\
+    \ 6));\n    assert(clip(inside, square_boundary).empty());\n}\n\nvoid test_circle_clipping()\
+    \ {\n    const Polygon<long long> square = rectangle(-2, -2, 2, 2);\n    const\
+    \ Circle<long long> inside{P(0, 0), 1, false};\n    const std::vector<AngularCoverage>\
+    \ full = clip(inside, square);\n    assert(full.size() == 1);\n    assert(full[0].kind\
+    \ == AngularCoverageKind::Full);\n\n    const Circle<long double> crossing{\n\
+    \        Point<long double>(0, 0),\n        2.5L,\n        false\n    };\n   \
+    \ const std::vector<AngularCoverage> arcs = clip(crossing, square);\n    assert(arcs.size()\
+    \ == 4);\n    validate_coverages(arcs);\n    for (const AngularCoverage& arc :\
+    \ arcs) {\n        assert(arc.kind == AngularCoverageKind::Arc);\n        const\
+    \ long double middle = (arc.begin + arc.end) / 2.0L;\n        assert(contains(square,\
+    \ circle_point_at(crossing, middle), 1e-9L));\n    }\n\n    const Circle<long\
+    \ long> outside{P(0, 0), 5, false};\n    assert(clip(outside, square).empty());\n\
+    \n    const Circle<long long> tangent{P(5, 0), 3, false};\n    const std::vector<AngularCoverage>\
+    \ point = clip(tangent, square);\n    assert(point.size() == 1);\n    assert(point[0].kind\
+    \ == AngularCoverageKind::Point);\n    assert(close(point[0].begin, std::numbers::pi_v<long\
+    \ double>));\n\n    const Polygon<long long> boundary = rectangle(-2, -2, 2, 2,\
+    \ false);\n    const std::vector<AngularCoverage> contacts = clip(crossing, boundary);\n\
+    \    assert(contacts.size() == 8);\n    for (const AngularCoverage& contact :\
+    \ contacts) {\n        assert(contact.kind == AngularCoverageKind::Point);\n \
+    \   }\n\n    const Circle<long long> point_inside{P(0, 0), 0, false};\n    const\
+    \ Circle<long long> point_outside{P(8, 0), 0, false};\n    assert(clip(point_inside,\
+    \ square).size() == 1);\n    assert(clip(point_outside, square).empty());\n  \
+    \  assert(clip(point_inside, boundary).empty());\n}\n\nvoid test_random_rectangles()\
+    \ {\n    std::uint64_t state = 0x70b5b1bc21a2f3d7ULL;\n    auto random = [&state]()\
+    \ {\n        state ^= state << 7;\n        state ^= state >> 9;\n        return\
+    \ state;\n    };\n\n    for (int trial = 0; trial < 3000; ++trial) {\n       \
+    \ const long long left = static_cast<long long>(random() % 21) - 10;\n       \
+    \ const long long bottom = static_cast<long long>(random() % 21) - 10;\n     \
+    \   const long long width = 1 + static_cast<long long>(random() % 10);\n     \
+    \   const long long height = 1 + static_cast<long long>(random() % 10);\n    \
+    \    const Polygon<long long> polygon =\n            rectangle(left, bottom, left\
+    \ + width, bottom + height);\n        P origin(\n            static_cast<long\
+    \ long>(random() % 41) - 20,\n            static_cast<long long>(random() % 41)\
+    \ - 20\n        );\n        P direction(\n            static_cast<long long>(random()\
+    \ % 13) - 6,\n            static_cast<long long>(random() % 13) - 6\n        );\n\
+    \        if (direction == P()) direction.x = 1;\n        const Line<long long>\
+    \ line{origin, origin + direction};\n        const std::vector<ParameterInterval>\
+    \ intervals = clip(line, polygon);\n        validate_intervals(intervals);\n \
+    \       for (int sample = 0; sample < 80; ++sample) {\n            const long\
+    \ double parameter = -20.0L + (sample + 0.37L) / 2.0L;\n            const Point<long\
+    \ double> point =\n                Point<long double>(origin) +\n            \
+    \    Point<long double>(direction) * parameter;\n            assert(\n       \
+    \         covered(intervals, parameter) ==\n                contains(polygon,\
+    \ point, 1e-9L)\n            );\n        }\n\n        const Circle<long double>\
+    \ circle{\n            Point<long double>(\n                static_cast<long double>(\n\
+    \                    static_cast<long long>(random() % 31) - 15\n            \
+    \    ),\n                static_cast<long double>(\n                    static_cast<long\
+    \ long>(random() % 31) - 15\n                )\n            ),\n            0.25L\
+    \ + static_cast<long double>(random() % 40) / 4.0L,\n            false\n     \
+    \   };\n        const std::vector<AngularCoverage> coverages = clip(circle, polygon);\n\
+    \        validate_coverages(coverages);\n        const long double full = 2.0L\
+    \ * std::numbers::pi_v<long double>;\n        for (int sample = 0; sample < 80;\
+    \ ++sample) {\n            const long double argument =\n                full\
+    \ * (sample + 0.371L) / 80.0L;\n            assert(\n                covered(coverages,\
+    \ argument) ==\n                contains(\n                    polygon,\n    \
+    \                circle_point_at(circle, argument),\n                    1e-9L\n\
+    \                )\n            );\n        }\n    }\n}\n\nvoid test_concave_sampling()\
+    \ {\n    Polygon<long long> polygon;\n    polygon.vertices.emplace_back(0, 0);\n\
+    \    polygon.vertices.emplace_back(7, 0);\n    polygon.vertices.emplace_back(7,\
+    \ 7);\n    polygon.vertices.emplace_back(5, 7);\n    polygon.vertices.emplace_back(5,\
+    \ 2);\n    polygon.vertices.emplace_back(2, 2);\n    polygon.vertices.emplace_back(2,\
+    \ 7);\n    polygon.vertices.emplace_back(0, 7);\n\n    for (long long origin_x\
+    \ = -2; origin_x <= 8; ++origin_x) {\n        for (long long origin_y = -2; origin_y\
+    \ <= 8; ++origin_y) {\n            for (long long dx = -2; dx <= 2; ++dx) {\n\
+    \                for (long long dy = -2; dy <= 2; ++dy) {\n                  \
+    \  if (dx == 0 && dy == 0) continue;\n                    const P origin(origin_x,\
+    \ origin_y);\n                    const P direction(dx, dy);\n               \
+    \     const Line<long long> line{\n                        origin,\n         \
+    \               origin + direction\n                    };\n                 \
+    \   const std::vector<ParameterInterval> intervals =\n                       \
+    \ clip(line, polygon);\n                    validate_intervals(intervals);\n \
+    \                   for (int sample = 0; sample < 50; ++sample) {\n          \
+    \              const long double parameter =\n                            -8.0L\
+    \ + (sample + 0.314L) / 3.0L;\n                        const Point<long double>\
+    \ point =\n                            Point<long double>(origin) +\n        \
+    \                    Point<long double>(direction) * parameter;\n            \
+    \            assert(\n                            covered(intervals, parameter)\
+    \ ==\n                            contains(polygon, point, 1e-9L)\n          \
+    \              );\n                    }\n                }\n            }\n \
+    \       }\n    }\n\n    const long double full = 2.0L * std::numbers::pi_v<long\
+    \ double>;\n    for (long long center_x = -1; center_x <= 8; ++center_x) {\n \
+    \       for (long long center_y = -1; center_y <= 8; ++center_y) {\n         \
+    \   for (int radius_index = 1; radius_index <= 12; ++radius_index) {\n       \
+    \         const Circle<long double> circle{\n                    Point<long double>(center_x,\
+    \ center_y),\n                    radius_index / 2.0L,\n                    false\n\
+    \                };\n                const std::vector<AngularCoverage> coverages\
+    \ =\n                    clip(circle, polygon);\n                validate_coverages(coverages);\n\
+    \                for (int sample = 0; sample < 80; ++sample) {\n             \
+    \       const long double argument =\n                        full * (sample +\
+    \ 0.271L) / 80.0L;\n                    assert(\n                        covered(coverages,\
+    \ argument) ==\n                        contains(\n                          \
+    \  polygon,\n                            circle_point_at(circle, argument),\n\
+    \                            1e-9L\n                        )\n              \
+    \      );\n                }\n            }\n        }\n    }\n}\n\n}  // namespace\n\
+    \nint main() {\n    test_linear_clipping();\n    test_circle_clipping();\n   \
+    \ test_random_rectangles();\n    test_concave_sampling();\n\n    m1une::utilities::FastInput\
+    \ input;\n    m1une::utilities::FastOutput output;\n    long long first, second;\n\
+    \    input >> first >> second;\n    output << first + second << '\\n';\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
+    ../../geometry/polygon.hpp\"\n\n#include <algorithm>\n#include <cassert>\n#include\
+    \ <cmath>\n#include <cstdint>\n#include <limits>\n#include <numbers>\n#include\
+    \ <vector>\n\n#include \"../../utilities/fast_io.hpp\"\n\nnamespace {\n\nusing\
+    \ namespace m1une::geometry;\nusing P = Point<long long>;\n\nbool close(long double\
+    \ first, long double second) {\n    return std::fabs(first - second) <=\n    \
+    \    1e-9L * std::max({1.0L, std::fabs(first), std::fabs(second)});\n}\n\nPolygon<long\
+    \ long> rectangle(\n    long long left,\n    long long bottom,\n    long long\
+    \ right,\n    long long top,\n    bool filled = true\n) {\n    Polygon<long long>\
+    \ result;\n    result.vertices.emplace_back(left, bottom);\n    result.vertices.emplace_back(right,\
+    \ bottom);\n    result.vertices.emplace_back(right, top);\n    result.vertices.emplace_back(left,\
+    \ top);\n    result.filled = filled;\n    return result;\n}\n\nbool covered(\n\
+    \    const std::vector<ParameterInterval>& intervals,\n    long double parameter\n\
+    ) {\n    for (const ParameterInterval& interval : intervals) {\n        if (\n\
+    \            interval.begin - 1e-9L <= parameter &&\n            parameter <=\
+    \ interval.end + 1e-9L\n        ) {\n            return true;\n        }\n   \
+    \ }\n    return false;\n}\n\nbool covered(\n    const std::vector<AngularCoverage>&\
+    \ coverages,\n    long double argument\n) {\n    const long double full = 2.0L\
+    \ * std::numbers::pi_v<long double>;\n    argument = normalize_circle_argument(argument);\n\
+    \    for (const AngularCoverage& coverage : coverages) {\n        if (coverage.kind\
+    \ == AngularCoverageKind::Full) return true;\n        if (coverage.kind == AngularCoverageKind::Point)\
+    \ {\n            long double difference = std::fabs(argument - coverage.begin);\n\
+    \            difference = std::min(difference, full - difference);\n         \
+    \   if (difference <= 1e-9L) return true;\n            continue;\n        }\n\
+    \        assert(coverage.kind == AngularCoverageKind::Arc);\n        long double\
+    \ lifted = argument;\n        if (lifted < coverage.begin) lifted += full;\n \
+    \       if (lifted <= coverage.end + 1e-9L) return true;\n    }\n    return false;\n\
+    }\n\nvoid validate_intervals(const std::vector<ParameterInterval>& intervals)\
+    \ {\n    for (std::size_t index = 0; index < intervals.size(); ++index) {\n  \
+    \      assert(intervals[index].begin <= intervals[index].end);\n        if (index\
+    \ > 0) {\n            assert(intervals[index - 1].end < intervals[index].begin);\n\
+    \        }\n    }\n}\n\nvoid validate_coverages(const std::vector<AngularCoverage>&\
+    \ coverages) {\n    const long double full = 2.0L * std::numbers::pi_v<long double>;\n\
+    \    for (std::size_t index = 0; index < coverages.size(); ++index) {\n      \
+    \  const AngularCoverage& coverage = coverages[index];\n        assert(0.0L <=\
+    \ coverage.begin && coverage.begin < full);\n        assert(coverage.begin <=\
+    \ coverage.end);\n        assert(coverage.end <= coverage.begin + full + 1e-9L);\n\
+    \        if (index > 0) {\n            assert(coverages[index - 1].begin < coverage.begin);\n\
+    \        }\n    }\n}\n\nvoid test_linear_clipping() {\n    const Polygon<long\
+    \ long> square = rectangle(0, 0, 4, 4);\n    const Line<long long> line{P(-2,\
+    \ 2), P(-1, 2)};\n    const std::vector<ParameterInterval> line_parts = clip(line,\
+    \ square);\n    assert(line_parts.size() == 1);\n    assert(close(line_parts[0].begin,\
+    \ 2));\n    assert(close(line_parts[0].end, 6));\n\n    const Ray<long long> ray{P(-2,\
+    \ 2), P(-1, 2)};\n    const std::vector<ParameterInterval> ray_parts = clip(ray,\
+    \ square);\n    assert(ray_parts.size() == 1);\n    assert(close(ray_parts[0].begin,\
+    \ 2));\n    assert(close(ray_parts[0].end, 6));\n\n    const Segment<long long>\
+    \ segment{P(-2, 2), P(6, 2)};\n    const std::vector<ParameterInterval> segment_parts\
+    \ =\n        clip(segment, square);\n    assert(segment_parts.size() == 1);\n\
+    \    assert(close(segment_parts[0].begin, 0.25L));\n    assert(close(segment_parts[0].end,\
+    \ 0.75L));\n\n    const Segment<long long> inside{P(1, 2), P(3, 2)};\n    const\
+    \ std::vector<ParameterInterval> whole = clip(inside, square);\n    assert(whole.size()\
+    \ == 1);\n    assert(close(whole[0].begin, 0));\n    assert(close(whole[0].end,\
+    \ 1));\n\n    const Segment<long long> inside_point{P(2, 2), P(2, 2)};\n    const\
+    \ Segment<long long> outside_point{P(7, 2), P(7, 2)};\n    assert(clip(inside_point,\
+    \ square).size() == 1);\n    assert(clip(outside_point, square).empty());\n\n\
+    \    const Line<long long> boundary_line{P(-2, 0), P(-1, 0)};\n    const std::vector<ParameterInterval>\
+    \ boundary =\n        clip(boundary_line, square);\n    assert(boundary.size()\
+    \ == 1);\n    assert(close(boundary[0].begin, 2));\n    assert(close(boundary[0].end,\
+    \ 6));\n\n    const Line<long long> tangent{P(-1, 1), P(0, 0)};\n    const std::vector<ParameterInterval>\
+    \ tangent_part =\n        clip(tangent, square);\n    assert(tangent_part.size()\
+    \ == 1);\n    assert(close(tangent_part[0].begin, 1));\n    assert(close(tangent_part[0].end,\
+    \ 1));\n\n    Polygon<long long> concave;\n    concave.vertices.emplace_back(0,\
+    \ 0);\n    concave.vertices.emplace_back(6, 0);\n    concave.vertices.emplace_back(6,\
+    \ 6);\n    concave.vertices.emplace_back(4, 6);\n    concave.vertices.emplace_back(4,\
+    \ 2);\n    concave.vertices.emplace_back(2, 2);\n    concave.vertices.emplace_back(2,\
+    \ 6);\n    concave.vertices.emplace_back(0, 6);\n    const Line<long long> through_arms{P(-1,\
+    \ 4), P(0, 4)};\n    const std::vector<ParameterInterval> arms =\n        clip(through_arms,\
+    \ concave);\n    assert(arms.size() == 2);\n    assert(close(arms[0].begin, 1));\n\
+    \    assert(close(arms[0].end, 3));\n    assert(close(arms[1].begin, 5));\n  \
+    \  assert(close(arms[1].end, 7));\n\n    const Polygon<long long> square_boundary\
+    \ = rectangle(0, 0, 4, 4, false);\n    const std::vector<ParameterInterval> crossing_boundary\
+    \ =\n        clip(line, square_boundary);\n    assert(crossing_boundary.size()\
+    \ == 2);\n    assert(close(crossing_boundary[0].begin, 2));\n    assert(close(crossing_boundary[0].end,\
+    \ 2));\n    assert(close(crossing_boundary[1].begin, 6));\n    assert(close(crossing_boundary[1].end,\
+    \ 6));\n    const std::vector<ParameterInterval> overlapping_boundary =\n    \
+    \    clip(boundary_line, square_boundary);\n    assert(overlapping_boundary.size()\
+    \ == 1);\n    assert(close(overlapping_boundary[0].begin, 2));\n    assert(close(overlapping_boundary[0].end,\
+    \ 6));\n    assert(clip(inside, square_boundary).empty());\n}\n\nvoid test_circle_clipping()\
+    \ {\n    const Polygon<long long> square = rectangle(-2, -2, 2, 2);\n    const\
+    \ Circle<long long> inside{P(0, 0), 1, false};\n    const std::vector<AngularCoverage>\
+    \ full = clip(inside, square);\n    assert(full.size() == 1);\n    assert(full[0].kind\
+    \ == AngularCoverageKind::Full);\n\n    const Circle<long double> crossing{\n\
+    \        Point<long double>(0, 0),\n        2.5L,\n        false\n    };\n   \
+    \ const std::vector<AngularCoverage> arcs = clip(crossing, square);\n    assert(arcs.size()\
+    \ == 4);\n    validate_coverages(arcs);\n    for (const AngularCoverage& arc :\
+    \ arcs) {\n        assert(arc.kind == AngularCoverageKind::Arc);\n        const\
+    \ long double middle = (arc.begin + arc.end) / 2.0L;\n        assert(contains(square,\
+    \ circle_point_at(crossing, middle), 1e-9L));\n    }\n\n    const Circle<long\
+    \ long> outside{P(0, 0), 5, false};\n    assert(clip(outside, square).empty());\n\
+    \n    const Circle<long long> tangent{P(5, 0), 3, false};\n    const std::vector<AngularCoverage>\
+    \ point = clip(tangent, square);\n    assert(point.size() == 1);\n    assert(point[0].kind\
+    \ == AngularCoverageKind::Point);\n    assert(close(point[0].begin, std::numbers::pi_v<long\
+    \ double>));\n\n    const Polygon<long long> boundary = rectangle(-2, -2, 2, 2,\
+    \ false);\n    const std::vector<AngularCoverage> contacts = clip(crossing, boundary);\n\
+    \    assert(contacts.size() == 8);\n    for (const AngularCoverage& contact :\
+    \ contacts) {\n        assert(contact.kind == AngularCoverageKind::Point);\n \
+    \   }\n\n    const Circle<long long> point_inside{P(0, 0), 0, false};\n    const\
+    \ Circle<long long> point_outside{P(8, 0), 0, false};\n    assert(clip(point_inside,\
+    \ square).size() == 1);\n    assert(clip(point_outside, square).empty());\n  \
+    \  assert(clip(point_inside, boundary).empty());\n}\n\nvoid test_random_rectangles()\
+    \ {\n    std::uint64_t state = 0x70b5b1bc21a2f3d7ULL;\n    auto random = [&state]()\
+    \ {\n        state ^= state << 7;\n        state ^= state >> 9;\n        return\
+    \ state;\n    };\n\n    for (int trial = 0; trial < 3000; ++trial) {\n       \
+    \ const long long left = static_cast<long long>(random() % 21) - 10;\n       \
+    \ const long long bottom = static_cast<long long>(random() % 21) - 10;\n     \
+    \   const long long width = 1 + static_cast<long long>(random() % 10);\n     \
+    \   const long long height = 1 + static_cast<long long>(random() % 10);\n    \
+    \    const Polygon<long long> polygon =\n            rectangle(left, bottom, left\
+    \ + width, bottom + height);\n        P origin(\n            static_cast<long\
+    \ long>(random() % 41) - 20,\n            static_cast<long long>(random() % 41)\
+    \ - 20\n        );\n        P direction(\n            static_cast<long long>(random()\
+    \ % 13) - 6,\n            static_cast<long long>(random() % 13) - 6\n        );\n\
+    \        if (direction == P()) direction.x = 1;\n        const Line<long long>\
+    \ line{origin, origin + direction};\n        const std::vector<ParameterInterval>\
+    \ intervals = clip(line, polygon);\n        validate_intervals(intervals);\n \
+    \       for (int sample = 0; sample < 80; ++sample) {\n            const long\
+    \ double parameter = -20.0L + (sample + 0.37L) / 2.0L;\n            const Point<long\
+    \ double> point =\n                Point<long double>(origin) +\n            \
+    \    Point<long double>(direction) * parameter;\n            assert(\n       \
+    \         covered(intervals, parameter) ==\n                contains(polygon,\
+    \ point, 1e-9L)\n            );\n        }\n\n        const Circle<long double>\
+    \ circle{\n            Point<long double>(\n                static_cast<long double>(\n\
+    \                    static_cast<long long>(random() % 31) - 15\n            \
+    \    ),\n                static_cast<long double>(\n                    static_cast<long\
+    \ long>(random() % 31) - 15\n                )\n            ),\n            0.25L\
+    \ + static_cast<long double>(random() % 40) / 4.0L,\n            false\n     \
+    \   };\n        const std::vector<AngularCoverage> coverages = clip(circle, polygon);\n\
+    \        validate_coverages(coverages);\n        const long double full = 2.0L\
+    \ * std::numbers::pi_v<long double>;\n        for (int sample = 0; sample < 80;\
+    \ ++sample) {\n            const long double argument =\n                full\
+    \ * (sample + 0.371L) / 80.0L;\n            assert(\n                covered(coverages,\
+    \ argument) ==\n                contains(\n                    polygon,\n    \
+    \                circle_point_at(circle, argument),\n                    1e-9L\n\
+    \                )\n            );\n        }\n    }\n}\n\nvoid test_concave_sampling()\
+    \ {\n    Polygon<long long> polygon;\n    polygon.vertices.emplace_back(0, 0);\n\
+    \    polygon.vertices.emplace_back(7, 0);\n    polygon.vertices.emplace_back(7,\
+    \ 7);\n    polygon.vertices.emplace_back(5, 7);\n    polygon.vertices.emplace_back(5,\
+    \ 2);\n    polygon.vertices.emplace_back(2, 2);\n    polygon.vertices.emplace_back(2,\
+    \ 7);\n    polygon.vertices.emplace_back(0, 7);\n\n    for (long long origin_x\
+    \ = -2; origin_x <= 8; ++origin_x) {\n        for (long long origin_y = -2; origin_y\
+    \ <= 8; ++origin_y) {\n            for (long long dx = -2; dx <= 2; ++dx) {\n\
+    \                for (long long dy = -2; dy <= 2; ++dy) {\n                  \
+    \  if (dx == 0 && dy == 0) continue;\n                    const P origin(origin_x,\
+    \ origin_y);\n                    const P direction(dx, dy);\n               \
+    \     const Line<long long> line{\n                        origin,\n         \
+    \               origin + direction\n                    };\n                 \
+    \   const std::vector<ParameterInterval> intervals =\n                       \
+    \ clip(line, polygon);\n                    validate_intervals(intervals);\n \
+    \                   for (int sample = 0; sample < 50; ++sample) {\n          \
+    \              const long double parameter =\n                            -8.0L\
+    \ + (sample + 0.314L) / 3.0L;\n                        const Point<long double>\
+    \ point =\n                            Point<long double>(origin) +\n        \
+    \                    Point<long double>(direction) * parameter;\n            \
+    \            assert(\n                            covered(intervals, parameter)\
+    \ ==\n                            contains(polygon, point, 1e-9L)\n          \
+    \              );\n                    }\n                }\n            }\n \
+    \       }\n    }\n\n    const long double full = 2.0L * std::numbers::pi_v<long\
+    \ double>;\n    for (long long center_x = -1; center_x <= 8; ++center_x) {\n \
+    \       for (long long center_y = -1; center_y <= 8; ++center_y) {\n         \
+    \   for (int radius_index = 1; radius_index <= 12; ++radius_index) {\n       \
+    \         const Circle<long double> circle{\n                    Point<long double>(center_x,\
+    \ center_y),\n                    radius_index / 2.0L,\n                    false\n\
+    \                };\n                const std::vector<AngularCoverage> coverages\
+    \ =\n                    clip(circle, polygon);\n                validate_coverages(coverages);\n\
+    \                for (int sample = 0; sample < 80; ++sample) {\n             \
+    \       const long double argument =\n                        full * (sample +\
+    \ 0.271L) / 80.0L;\n                    assert(\n                        covered(coverages,\
+    \ argument) ==\n                        contains(\n                          \
+    \  polygon,\n                            circle_point_at(circle, argument),\n\
+    \                            1e-9L\n                        )\n              \
+    \      );\n                }\n            }\n        }\n    }\n}\n\n}  // namespace\n\
+    \nint main() {\n    test_linear_clipping();\n    test_circle_clipping();\n   \
+    \ test_random_rectangles();\n    test_concave_sampling();\n\n    m1une::utilities::FastInput\
+    \ input;\n    m1une::utilities::FastOutput output;\n    long long first, second;\n\
+    \    input >> first >> second;\n    output << first + second << '\\n';\n}\n"
   dependsOn:
-  - geometry/convex_polygon.hpp
-  - geometry/convex_hull.hpp
-  - geometry/point.hpp
-  - geometry/detail/floating_predicate.hpp
-  - geometry/half_plane_intersection.hpp
-  - geometry/linear.hpp
-  - geometry/minkowski_sum.hpp
-  - geometry/detail/convex_polygon_normalize.hpp
-  - geometry/point.hpp
   - geometry/polygon.hpp
   - geometry/circle.hpp
+  - geometry/linear.hpp
+  - geometry/point.hpp
+  - geometry/detail/floating_predicate.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
-  path: verify/geometry/is_convex_polygon.test.cpp
+  path: verify/geometry/polygon_clipping.test.cpp
   requiredBy: []
-  timestamp: '2026-08-21 12:41:06+09:00'
+  timestamp: '2026-08-21 01:13:34+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
-documentation_of: verify/geometry/is_convex_polygon.test.cpp
+documentation_of: verify/geometry/polygon_clipping.test.cpp
 layout: document
 redirect_from:
-- /verify/verify/geometry/is_convex_polygon.test.cpp
-- /verify/verify/geometry/is_convex_polygon.test.cpp.html
-title: verify/geometry/is_convex_polygon.test.cpp
+- /verify/verify/geometry/polygon_clipping.test.cpp
+- /verify/verify/geometry/polygon_clipping.test.cpp.html
+title: verify/geometry/polygon_clipping.test.cpp
 ---

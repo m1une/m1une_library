@@ -109,6 +109,9 @@ data:
     path: verify/geometry/polygon_area.test.cpp
     title: verify/geometry/polygon_area.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/polygon_clipping.test.cpp
+    title: verify/geometry/polygon_clipping.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/polygon_filled.test.cpp
     title: verify/geometry/polygon_filled.test.cpp
   - icon: ':heavy_check_mark:'
@@ -2000,6 +2003,7 @@ data:
   - verify/geometry/circle_tangent_points.test.cpp
   - verify/geometry/point_in_polygon.test.cpp
   - verify/geometry/circle_boundary_intersection.test.cpp
+  - verify/geometry/polygon_clipping.test.cpp
   - verify/geometry/circle_union_area.test.cpp
   - verify/geometry/incircle.test.cpp
   - verify/geometry/convex_polygon.test.cpp

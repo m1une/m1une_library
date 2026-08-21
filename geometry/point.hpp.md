@@ -238,6 +238,9 @@ data:
     path: verify/geometry/polygon_area.test.cpp
     title: verify/geometry/polygon_area.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/polygon_clipping.test.cpp
+    title: verify/geometry/polygon_clipping.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/polygon_filled.test.cpp
     title: verify/geometry/polygon_filled.test.cpp
   - icon: ':heavy_check_mark:'
@@ -523,6 +526,7 @@ data:
   - verify/geometry/perpendicular_bisector.test.cpp
   - verify/geometry/closest_pair.test.cpp
   - verify/geometry/circle_boundary_intersection.test.cpp
+  - verify/geometry/polygon_clipping.test.cpp
   - verify/geometry/rectangle_union_area.test.cpp
   - verify/geometry/circle_union_area.test.cpp
   - verify/geometry/segment_intersection.test.cpp
