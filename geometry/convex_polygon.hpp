@@ -24,6 +24,14 @@ namespace geometry {
 
 namespace convex_polygon_detail {
 
+inline bool points_close(
+    const Point<long double>& first,
+    const Point<long double>& second,
+    long double eps
+) {
+    return geometry::distance(first, second) <= eps;
+}
+
 inline std::vector<Point<long double>> clean_polygon(
     std::vector<Point<long double>> polygon,
     long double eps
@@ -34,14 +42,14 @@ inline std::vector<Point<long double>> clean_polygon(
     for (const Point<long double>& point : polygon) {
         if (
             deduplicated.empty() ||
-            !polygon_detail::close(deduplicated.back(), point, eps)
+            !points_close(deduplicated.back(), point, eps)
         ) {
             deduplicated.push_back(point);
         }
     }
     if (
         deduplicated.size() >= 2 &&
-        polygon_detail::close(
+        points_close(
             deduplicated.front(),
             deduplicated.back(),
             eps
