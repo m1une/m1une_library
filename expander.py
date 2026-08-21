@@ -5,6 +5,7 @@ import re
 LIBRARY_ROOT = os.path.abspath(os.path.dirname(__file__))
 LIBRARY_PARENT = os.path.dirname(LIBRARY_ROOT)
 INCLUDE_PATHS = ('.', LIBRARY_ROOT, LIBRARY_PARENT)
+GITHUB_SOURCE_ROOT = 'https://github.com/m1une/m1une_library/blob/main'
 visited = set()
 skipped_defined_macros = {'LOCAL'}
 
@@ -38,7 +39,15 @@ def resolve_include(header, current_file_dir):
     return None
 
 
-def expand_file(path, display_name=None):
+def library_source_url(path):
+    """Returns the GitHub URL for a file inside this library repository."""
+    relative_path = os.path.relpath(os.path.abspath(path), LIBRARY_ROOT)
+    if relative_path == os.pardir or relative_path.startswith(os.pardir + os.sep):
+        return None
+    return f'{GITHUB_SOURCE_ROOT}/{relative_path.replace(os.sep, "/")}'
+
+
+def expand_file(path, display_name=None, mention_source=False):
     """
     Recursively expands a C++ file by inlining its local #include directives.
     It removes include guards and skips blocks guarded by a macro configured as
@@ -54,6 +63,10 @@ def expand_file(path, display_name=None):
     marker_name = line_marker_name(display_name)
 
     print(f'// BEGIN: {display_name}')
+    if mention_source:
+        source_url = library_source_url(abs_path)
+        if source_url:
+            print(f'// Source: {source_url}')
 
     with open(path, encoding='utf-8') as f:
         lines = f.readlines()
@@ -160,7 +173,7 @@ def expand_file(path, display_name=None):
             header = m.group(1)
             resolved = resolve_include(header, current_file_dir)
             if resolved:
-                expand_file(resolved, header)
+                expand_file(resolved, header, mention_source=True)
                 print(f'#line {i + 2} "{marker_name}"')
             else:
                 print(f'// [warning] include not found: {header}')
