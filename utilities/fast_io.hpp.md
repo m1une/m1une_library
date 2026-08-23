@@ -376,6 +376,9 @@ data:
     path: verify/game/nim_product.test.cpp
     title: verify/game/nim_product.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/game/partisan_minimax.test.cpp
+    title: verify/game/partisan_minimax.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/angle_sort.test.cpp
     title: verify/geometry/angle_sort.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1844,6 +1847,7 @@ data:
   - verify/optimization/integer_lp.test.cpp
   - verify/optimization/simplex.test.cpp
   - verify/game/nim_product.test.cpp
+  - verify/game/partisan_minimax.test.cpp
   - verify/game/game_algorithms.test.cpp
   - verify/game/classic_games.test.cpp
   - verify/utilities/int512.test.cpp

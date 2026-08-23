@@ -592,11 +592,17 @@ data:
       path: game/grundy.hpp
       title: Grundy Numbers
     - icon: ':heavy_check_mark:'
+      path: game/minimax.hpp
+      title: DAG Minimax
+    - icon: ':heavy_check_mark:'
       path: game/nim.hpp
       title: Nim
     - icon: ':heavy_check_mark:'
       path: game/nim_product.hpp
       title: Nim Product
+    - icon: ':heavy_check_mark:'
+      path: game/partisan_game.hpp
+      title: Partisan Game Outcomes
     - icon: ':heavy_check_mark:'
       path: game/retrograde_analysis.hpp
       title: Game Retrograde Analysis
@@ -1867,6 +1873,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/game/nim_product.test.cpp
       title: verify/game/nim_product.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/game/partisan_minimax.test.cpp
+      title: verify/game/partisan_minimax.test.cpp
   - name: verify/geometry
     pages:
     - icon: ':heavy_check_mark:'
