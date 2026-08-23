@@ -13,6 +13,9 @@ The problem is reduced to a minimum `s-t` cut and solved with Dinic's algorithm.
 This is substantially faster and more predictable than a general integer
 programming solver for objectives that fit the supported forms.
 
+For ordered variables with more than two choices and supermodular pairwise gain
+tables, use [`KProjectSelection<T>`](k_project_selection.md).
+
 Project `i` is **selected** when `result.selected[i]` is true. Gains increase the
 objective and penalties decrease it. A cost of `c` for selecting project `i`
 can therefore be written as `add_gain(i, -c)`.
@@ -31,10 +34,29 @@ All gains and penalties are additive.
 | `add_gain_if_all_selected(projects, gain)` | Adds `gain` when every listed project is selected. |
 | `add_gain_if_all_unselected(projects, gain)` | Adds `gain` when every listed project is unselected. |
 
-Every `penalty` argument must be non-negative. The `gain` passed to
-`add_gain_if_same` and the two group methods must also be non-negative. The
-group methods treat an empty list as vacuously satisfying the condition, so
-their gain is always added.
+## Domain of Gains and Penalties
+
+The unary gains passed to either overload of `add_gain` may be **negative,
+zero, or positive**. In particular, a negative gain represents a cost for that
+choice. Both `selected_gain` and `unselected_gain` may be negative, and the
+optimal `max_gain` may also be negative when every feasible selection has a
+negative total gain.
+
+The other numeric arguments have a restricted domain because they become flow
+capacities:
+
+| Argument | Required domain |
+| --- | --- |
+| `add_gain(i, selected_gain)` | `selected_gain` may be any value representable by `T`. |
+| `add_gain(i, selected_gain, unselected_gain)` | Both gains may be any values representable by `T`. |
+| `add_penalty`, `add_penalty_if_different` | `penalty >= 0`. |
+| `add_gain_if_same` | `gain >= 0`. |
+| `add_gain_if_all_selected`, `add_gain_if_all_unselected` | `gain >= 0`. |
+
+The group methods treat an empty list as vacuously satisfying the condition,
+so their non-negative gain is always added. All accumulated values and
+intermediate differences must additionally satisfy the range requirements in
+the Numeric Requirements section.
 
 `add_penalty(i, j, penalty)` is the low-level finite implication primitive. It
 is useful for statements such as “choosing `i` without choosing `j` loses 20.”

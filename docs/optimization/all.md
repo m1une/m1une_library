@@ -18,5 +18,6 @@ routines live under `convex/`.
 | --- | --- |
 | `optimization/hungarian.hpp` | Hungarian algorithm for minimum-cost and maximum-cost rectangular assignment. |
 | `optimization/integer_lp.hpp` | Branch-and-bound solver for integer linear programming in standard inequality form. |
+| `optimization/k_project_selection.hpp` | Minimum-cut solver for ordered k-valued project selection with unary and supermodular pairwise gains. |
 | `optimization/project_selection.hpp` | Minimum-cut solver for binary project selection with gains, implication penalties, and hard constraints. |
 | `optimization/simplex.hpp` | Two-phase simplex algorithm for linear programming in standard inequality form. |

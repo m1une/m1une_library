@@ -3,6 +3,7 @@
 
 #include "hungarian.hpp"
 #include "integer_lp.hpp"
+#include "k_project_selection.hpp"
 #include "project_selection.hpp"
 #include "simplex.hpp"
 
