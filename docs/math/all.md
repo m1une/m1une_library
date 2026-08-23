@@ -32,6 +32,8 @@ You usually do not need to include this entire bundle:
 * Use `multivariate_convolution.hpp` for truncated or cyclic convolution of
   flattened multidimensional arrays.
 * Use `xor_basis.hpp` to maintain the XOR span of a set of unsigned integers.
+* Use `gaussian_integer.hpp` for exact arithmetic, Euclidean division, and GCDs
+  in the Gaussian integers.
 * Use `generalized_floor_sum.hpp` for polynomial moments of
   `floor((a * i + b) / mod)`.
 * Use `zeta_mobius_transform.hpp` for subset, superset, divisor, and multiple
@@ -109,6 +111,7 @@ few unused headers do not matter.
 | `math/cyclotomic_polynomial.hpp` | Integer coefficients of cyclotomic polynomials. |
 | `math/discrete_logarithm.hpp` | Extended baby-step--giant-step for discrete logarithms modulo any positive integer. |
 | `math/divisor_convolution.hpp` | GCD and LCM convolutions over positive integer indices. |
+| `math/gaussian_integer.hpp` | Exact Gaussian-integer arithmetic, Euclidean division, and extended GCD. |
 | `math/generalized_floor_sum.hpp` | Polynomial moments of a linear floor sequence using monoid floor sum. |
 | `math/number_theory.hpp` | Extended GCD, modular power and inverse, CRT, and floor sum. |
 | `math/partition_function.hpp` | Integer partition numbers via Euler's pentagonal theorem and FPS inversion. |

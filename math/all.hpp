@@ -11,6 +11,7 @@
 #include "cyclotomic_polynomial.hpp"
 #include "discrete_logarithm.hpp"
 #include "divisor_convolution.hpp"
+#include "gaussian_integer.hpp"
 #include "generalized_floor_sum.hpp"
 #include "integer_arithmetic.hpp"
 #include "lucas.hpp"
