@@ -42,6 +42,21 @@ data:
     path: graph/cycle_detection.hpp
     title: Cycle Detection
   - icon: ':heavy_check_mark:'
+    path: graph/dag.hpp
+    title: DAG Algorithms
+  - icon: ':heavy_check_mark:'
+    path: graph/dag_longest_path.hpp
+    title: DAG Longest Path
+  - icon: ':heavy_check_mark:'
+    path: graph/dag_path_count.hpp
+    title: DAG Path Count
+  - icon: ':heavy_check_mark:'
+    path: graph/dag_path_cover.hpp
+    title: Minimum DAG Path Cover
+  - icon: ':heavy_check_mark:'
+    path: graph/dag_reachability.hpp
+    title: DAG Reachability and Transitive Reduction
+  - icon: ':heavy_check_mark:'
     path: graph/dag_shortest_path.hpp
     title: DAG Shortest Path
   - icon: ':heavy_check_mark:'
@@ -258,6 +273,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/graph/cycle_detection_undirected.test.cpp
     title: verify/graph/cycle_detection_undirected.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/dag_algorithms.test.cpp
+    title: verify/graph/dag_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/graph/dfs.test.cpp
     title: verify/graph/dfs.test.cpp
@@ -562,6 +580,7 @@ data:
   - graph/scc.hpp
   - graph/biconnected_components.hpp
   - graph/range_edge_graph.hpp
+  - graph/dag_longest_path.hpp
   - graph/warshall_floyd.hpp
   - graph/kruskal.hpp
   - graph/zero_one_bfs.hpp
@@ -584,6 +603,7 @@ data:
   - graph/replacement_paths.hpp
   - graph/st_numbering.hpp
   - graph/undirected.hpp
+  - graph/dag.hpp
   - graph/bfs.hpp
   - graph/namori.hpp
   - graph/eulerian_trail.hpp
@@ -592,8 +612,11 @@ data:
   - graph/grid.hpp
   - graph/directed.hpp
   - graph/dijkstra.hpp
+  - graph/dag_path_cover.hpp
   - graph/connected_components.hpp
   - graph/general_matching.hpp
+  - graph/dag_path_count.hpp
+  - graph/dag_reachability.hpp
   - graph/enumerate_cliques.hpp
   - graph/tree/heavy_light_decomposition.hpp
   - graph/tree/distance_frequency.hpp
@@ -668,6 +691,7 @@ data:
   - verify/graph/dijkstra_custom_cost.test.cpp
   - verify/graph/dijkstra_custom_cost.test.cpp
   - verify/graph/two_edge_connected_components.test.cpp
+  - verify/graph/dag_algorithms.test.cpp
   - verify/graph/chromatic_number.test.cpp
   - verify/graph/chromatic_number.test.cpp
   - verify/graph/scc.test.cpp

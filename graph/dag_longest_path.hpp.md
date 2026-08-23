@@ -17,12 +17,6 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/directed.hpp
     title: Directed Graph Algorithms
-  - icon: ':heavy_check_mark:'
-    path: graph/shortest_path.hpp
-    title: Shortest Path
-  - icon: ':heavy_check_mark:'
-    path: graph/undirected.hpp
-    title: Undirected Graph Algorithms
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/graph/cow_game.test.cpp
@@ -41,7 +35,7 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"graph/dag_shortest_path.hpp\"\n\n\n\n#include <algorithm>\n\
+  bundledCode: "#line 1 \"graph/dag_longest_path.hpp\"\n\n\n\n#include <algorithm>\n\
     #include <cassert>\n#include <limits>\n#include <optional>\n#include <vector>\n\
     \n#line 1 \"graph/graph.hpp\"\n\n\n\n#include <array>\n#line 6 \"graph/graph.hpp\"\
     \n#include <utility>\n#line 8 \"graph/graph.hpp\"\n\nnamespace m1une {\nnamespace\
@@ -116,149 +110,135 @@ data:
     \ == 0) que.push(e.to);\n        }\n    }\n\n    if (int(order.size()) != n) return\
     \ std::nullopt;\n    return order;\n}\n\ntemplate <class T>\nbool is_dag(const\
     \ Graph<T>& g) {\n    return topological_sort(g).has_value();\n}\n\n}  // namespace\
-    \ graph\n}  // namespace m1une\n\n\n#line 12 \"graph/dag_shortest_path.hpp\"\n\
-    \nnamespace m1une {\nnamespace graph {\n\ntemplate <class T>\nstruct DagShortestPathResult\
+    \ graph\n}  // namespace m1une\n\n\n#line 12 \"graph/dag_longest_path.hpp\"\n\n\
+    namespace m1une {\nnamespace graph {\n\ntemplate <class T>\nstruct DagLongestPathResult\
     \ {\n    std::vector<T> dist;\n    std::vector<int> parent;\n    std::vector<int>\
-    \ parent_edge;\n    std::vector<int> topological_order;\n    T inf;\n\n    bool\
-    \ reachable(int v) const {\n        assert(0 <= v && v < int(dist.size()));\n\
-    \        return dist[v] != inf;\n    }\n\n    std::vector<int> path(int t) const\
-    \ {\n        assert(reachable(t));\n        std::vector<int> result;\n       \
-    \ for (int v = t; v != -1; v = parent[v]) result.push_back(v);\n        std::reverse(result.begin(),\
-    \ result.end());\n        return result;\n    }\n};\n\ntemplate <class T>\nstd::optional<DagShortestPathResult<T>>\
-    \ dag_shortest_path(\n    const Graph<T>& g, const std::vector<int>& sources,\
-    \ T inf = std::numeric_limits<T>::max() / T(4)) {\n    int n = g.size();\n   \
-    \ auto order = topological_sort(g);\n    if (!order) return std::nullopt;\n\n\
-    \    DagShortestPathResult<T> result;\n    result.dist.assign(n, inf);\n    result.parent.assign(n,\
-    \ -1);\n    result.parent_edge.assign(n, -1);\n    result.topological_order =\
-    \ *order;\n    result.inf = inf;\n\n    for (int s : sources) {\n        assert(0\
-    \ <= s && s < n);\n        if (result.dist[s] == T(0)) continue;\n        result.dist[s]\
-    \ = T(0);\n    }\n\n    for (int v : *order) {\n        if (result.dist[v] ==\
-    \ inf) continue;\n        for (const auto& e : g[v]) {\n            if (!e.alive)\
-    \ continue;\n            T nd = result.dist[v] + e.cost;\n            if (result.dist[e.to]\
-    \ <= nd) continue;\n            result.dist[e.to] = nd;\n            result.parent[e.to]\
+    \ parent_edge;\n    std::vector<int> topological_order;\n    T neg_inf;\n\n  \
+    \  bool reachable(int v) const {\n        assert(0 <= v && v < int(dist.size()));\n\
+    \        return dist[v] != neg_inf;\n    }\n\n    std::vector<int> path(int t)\
+    \ const {\n        assert(reachable(t));\n        std::vector<int> result;\n \
+    \       for (int v = t; v != -1; v = parent[v]) result.push_back(v);\n       \
+    \ std::reverse(result.begin(), result.end());\n        return result;\n    }\n\
+    };\n\ntemplate <class T>\nstd::optional<DagLongestPathResult<T>> dag_longest_path(\n\
+    \    const Graph<T>& g,\n    const std::vector<int>& sources,\n    T neg_inf =\
+    \ std::numeric_limits<T>::lowest() / T(4)\n) {\n    const int n = g.size();\n\
+    \    auto order = topological_sort(g);\n    if (!order) return std::nullopt;\n\
+    \n    DagLongestPathResult<T> result;\n    result.dist.assign(n, neg_inf);\n \
+    \   result.parent.assign(n, -1);\n    result.parent_edge.assign(n, -1);\n    result.topological_order\
+    \ = *order;\n    result.neg_inf = neg_inf;\n\n    for (int s : sources) {\n  \
+    \      assert(0 <= s && s < n);\n        result.dist[s] = T(0);\n    }\n\n   \
+    \ for (int v : *order) {\n        if (result.dist[v] == neg_inf) continue;\n \
+    \       for (const auto& e : g[v]) {\n            if (!e.alive) continue;\n  \
+    \          T nd = result.dist[v] + e.cost;\n            if (result.dist[e.to]\
+    \ >= nd) continue;\n            result.dist[e.to] = nd;\n            result.parent[e.to]\
     \ = v;\n            result.parent_edge[e.to] = e.id;\n        }\n    }\n\n   \
-    \ return result;\n}\n\ntemplate <class T>\nstd::optional<DagShortestPathResult<T>>\
-    \ dag_shortest_path(\n    const Graph<T>& g, int s, T inf = std::numeric_limits<T>::max()\
-    \ / T(4)) {\n    return dag_shortest_path(g, std::vector<int>{s}, inf);\n}\n\n\
-    }  // namespace graph\n}  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_GRAPH_DAG_SHORTEST_PATH_HPP\n#define M1UNE_GRAPH_DAG_SHORTEST_PATH_HPP\
+    \ return result;\n}\n\ntemplate <class T>\nstd::optional<DagLongestPathResult<T>>\
+    \ dag_longest_path(\n    const Graph<T>& g,\n    int s,\n    T neg_inf = std::numeric_limits<T>::lowest()\
+    \ / T(4)\n) {\n    return dag_longest_path(g, std::vector<int>{s}, neg_inf);\n\
+    }\n\n}  // namespace graph\n}  // namespace m1une\n\n\n"
+  code: "#ifndef M1UNE_GRAPH_DAG_LONGEST_PATH_HPP\n#define M1UNE_GRAPH_DAG_LONGEST_PATH_HPP\
     \ 1\n\n#include <algorithm>\n#include <cassert>\n#include <limits>\n#include <optional>\n\
     #include <vector>\n\n#include \"graph.hpp\"\n#include \"topological_sort.hpp\"\
-    \n\nnamespace m1une {\nnamespace graph {\n\ntemplate <class T>\nstruct DagShortestPathResult\
+    \n\nnamespace m1une {\nnamespace graph {\n\ntemplate <class T>\nstruct DagLongestPathResult\
     \ {\n    std::vector<T> dist;\n    std::vector<int> parent;\n    std::vector<int>\
-    \ parent_edge;\n    std::vector<int> topological_order;\n    T inf;\n\n    bool\
-    \ reachable(int v) const {\n        assert(0 <= v && v < int(dist.size()));\n\
-    \        return dist[v] != inf;\n    }\n\n    std::vector<int> path(int t) const\
-    \ {\n        assert(reachable(t));\n        std::vector<int> result;\n       \
-    \ for (int v = t; v != -1; v = parent[v]) result.push_back(v);\n        std::reverse(result.begin(),\
-    \ result.end());\n        return result;\n    }\n};\n\ntemplate <class T>\nstd::optional<DagShortestPathResult<T>>\
-    \ dag_shortest_path(\n    const Graph<T>& g, const std::vector<int>& sources,\
-    \ T inf = std::numeric_limits<T>::max() / T(4)) {\n    int n = g.size();\n   \
-    \ auto order = topological_sort(g);\n    if (!order) return std::nullopt;\n\n\
-    \    DagShortestPathResult<T> result;\n    result.dist.assign(n, inf);\n    result.parent.assign(n,\
-    \ -1);\n    result.parent_edge.assign(n, -1);\n    result.topological_order =\
-    \ *order;\n    result.inf = inf;\n\n    for (int s : sources) {\n        assert(0\
-    \ <= s && s < n);\n        if (result.dist[s] == T(0)) continue;\n        result.dist[s]\
-    \ = T(0);\n    }\n\n    for (int v : *order) {\n        if (result.dist[v] ==\
-    \ inf) continue;\n        for (const auto& e : g[v]) {\n            if (!e.alive)\
-    \ continue;\n            T nd = result.dist[v] + e.cost;\n            if (result.dist[e.to]\
-    \ <= nd) continue;\n            result.dist[e.to] = nd;\n            result.parent[e.to]\
+    \ parent_edge;\n    std::vector<int> topological_order;\n    T neg_inf;\n\n  \
+    \  bool reachable(int v) const {\n        assert(0 <= v && v < int(dist.size()));\n\
+    \        return dist[v] != neg_inf;\n    }\n\n    std::vector<int> path(int t)\
+    \ const {\n        assert(reachable(t));\n        std::vector<int> result;\n \
+    \       for (int v = t; v != -1; v = parent[v]) result.push_back(v);\n       \
+    \ std::reverse(result.begin(), result.end());\n        return result;\n    }\n\
+    };\n\ntemplate <class T>\nstd::optional<DagLongestPathResult<T>> dag_longest_path(\n\
+    \    const Graph<T>& g,\n    const std::vector<int>& sources,\n    T neg_inf =\
+    \ std::numeric_limits<T>::lowest() / T(4)\n) {\n    const int n = g.size();\n\
+    \    auto order = topological_sort(g);\n    if (!order) return std::nullopt;\n\
+    \n    DagLongestPathResult<T> result;\n    result.dist.assign(n, neg_inf);\n \
+    \   result.parent.assign(n, -1);\n    result.parent_edge.assign(n, -1);\n    result.topological_order\
+    \ = *order;\n    result.neg_inf = neg_inf;\n\n    for (int s : sources) {\n  \
+    \      assert(0 <= s && s < n);\n        result.dist[s] = T(0);\n    }\n\n   \
+    \ for (int v : *order) {\n        if (result.dist[v] == neg_inf) continue;\n \
+    \       for (const auto& e : g[v]) {\n            if (!e.alive) continue;\n  \
+    \          T nd = result.dist[v] + e.cost;\n            if (result.dist[e.to]\
+    \ >= nd) continue;\n            result.dist[e.to] = nd;\n            result.parent[e.to]\
     \ = v;\n            result.parent_edge[e.to] = e.id;\n        }\n    }\n\n   \
-    \ return result;\n}\n\ntemplate <class T>\nstd::optional<DagShortestPathResult<T>>\
-    \ dag_shortest_path(\n    const Graph<T>& g, int s, T inf = std::numeric_limits<T>::max()\
-    \ / T(4)) {\n    return dag_shortest_path(g, std::vector<int>{s}, inf);\n}\n\n\
-    }  // namespace graph\n}  // namespace m1une\n\n#endif  // M1UNE_GRAPH_DAG_SHORTEST_PATH_HPP\n"
+    \ return result;\n}\n\ntemplate <class T>\nstd::optional<DagLongestPathResult<T>>\
+    \ dag_longest_path(\n    const Graph<T>& g,\n    int s,\n    T neg_inf = std::numeric_limits<T>::lowest()\
+    \ / T(4)\n) {\n    return dag_longest_path(g, std::vector<int>{s}, neg_inf);\n\
+    }\n\n}  // namespace graph\n}  // namespace m1une\n\n#endif  // M1UNE_GRAPH_DAG_LONGEST_PATH_HPP\n"
   dependsOn:
   - graph/graph.hpp
   - graph/topological_sort.hpp
   isVerificationFile: false
-  path: graph/dag_shortest_path.hpp
+  path: graph/dag_longest_path.hpp
   requiredBy:
   - graph/all.hpp
-  - graph/undirected.hpp
   - graph/dag.hpp
   - graph/directed.hpp
-  - graph/shortest_path.hpp
-  timestamp: '2026-08-13 01:41:40+09:00'
+  timestamp: '2026-08-24 00:41:13+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/dag_algorithms.test.cpp
   - verify/graph/range_edge_graph.test.cpp
-documentation_of: graph/dag_shortest_path.hpp
+documentation_of: graph/dag_longest_path.hpp
 layout: document
-title: DAG Shortest Path
+title: DAG Longest Path
 ---
 
 ## Overview
 
-`dag_shortest_path` computes shortest paths in a directed acyclic graph. It
-first obtains a topological order, then relaxes outgoing edges in that order.
+`dag_longest_path` computes maximum-cost paths from one or more sources in a
+directed acyclic graph. Edges are relaxed once in topological order, so negative
+costs are supported and one optimal path can be restored.
 
-Because a DAG has no directed cycles, this works even when edge costs are
-negative. Use it when the graph is known to be a DAG; it is simpler and faster
-than Bellman-Ford for this case.
+The graph must be directed and acyclic. A cyclic graph returns `std::nullopt`.
+Inactive edges are ignored.
 
-## Graph Orientation
+## Requirements
 
-Directed only, and the graph must be acyclic. If the graph has a directed
-cycle, the function returns `std::nullopt`.
+The edge cost type `T` must be ordered and support construction from `0`,
+addition, and `std::numeric_limits<T>::lowest()`. The default `neg_inf` is
+intended for signed integer or floating-point costs. Pass an explicit sentinel
+for another compatible type.
 
-An undirected graph built with `add_edge` usually contains a two-edge directed
-cycle in the stored adjacency, so this algorithm is not for ordinary
-undirected graphs.
+Every source starts with distance `0`. With multiple sources, the result is the
+best path beginning at any source, including a zero-edge path. Duplicate source
+indices have no additional effect.
 
-## How to Use It
+## Result
 
-Call `dag_shortest_path(g, s)` for one source, or
-`dag_shortest_path(g, sources)` for multiple sources. Multi-source mode sets
-every source distance to `0`.
-
-The return type is `std::optional<DagShortestPathResult<T>>`.
-
-* If it has a value, the graph was a DAG and the result contains shortest
-  paths.
-* If it is `std::nullopt`, the graph was cyclic and DAG shortest paths were not
-  computed.
-
-The result contains these members:
-
-| Member | Type / Signature | Meaning |
-| --- | --- | --- |
-| `dist` | `std::vector<T>` | `dist[v]` is the shortest distance from the nearest source to `v`, or `inf` if unreachable. |
-| `parent` | `std::vector<int>` | `parent[v]` is the previous vertex on one shortest path, or `-1`. |
-| `parent_edge` | `std::vector<int>` | `parent_edge[v]` is the edge id used to enter `v`, or `-1`. |
-| `topological_order` | `std::vector<int>` | Topological order used for relaxation. |
-| `inf` | `T` | The unreachable-distance sentinel used by this run. |
-| `reachable` | `bool reachable(int v) const` | Returns whether `v` was reached. |
-| `path` | `std::vector<int> path(int t) const` | Restores one shortest path from a source to `t`. Requires `reachable(t)`. |
+| Member / method | Type / signature | Meaning | Complexity |
+| --- | --- | --- | --- |
+| `dist` | `std::vector<T>` | Maximum distance to each vertex, or `neg_inf` if unreachable. | Access: $O(1)$ |
+| `parent` | `std::vector<int>` | Previous vertex on one maximum path, or `-1`. | Access: $O(1)$ |
+| `parent_edge` | `std::vector<int>` | Original edge id entering the vertex, or `-1`. | Access: $O(1)$ |
+| `topological_order` | `std::vector<int>` | Order used by the relaxation. | Access: $O(1)$ |
+| `neg_inf` | `T` | Unreachable-distance sentinel. | Access: $O(1)$ |
+| `reachable` | `bool reachable(int v) const` | Tests whether a source reaches `v`. | $O(1)$ |
+| `path` | `std::vector<int> path(int t) const` | Restores one maximum path ending at reachable `t`. | $O(L)$ for path length $L$ |
 
 ## Functions
 
-| Function | Signature | Description | Complexity |
-| --- | --- | --- | --- |
-| `dag_shortest_path` | `template <class T> std::optional<DagShortestPathResult<T>> dag_shortest_path(const Graph<T>& g, int s, T inf = std::numeric_limits<T>::max() / T(4))` | Runs DAG shortest paths from one source. | $O(N + M)$ |
-| `dag_shortest_path` | `template <class T> std::optional<DagShortestPathResult<T>> dag_shortest_path(const Graph<T>& g, const std::vector<int>& sources, T inf = std::numeric_limits<T>::max() / T(4))` | Runs multi-source DAG shortest paths. | $O(N + M)$ |
+| Function | Signature | Complexity |
+| --- | --- | --- |
+| `dag_longest_path` | `template <class T> std::optional<DagLongestPathResult<T>> dag_longest_path(const Graph<T>& g, int s, T neg_inf = std::numeric_limits<T>::lowest() / T(4))` | $O(N + M)$ time and $O(N)$ memory |
+| `dag_longest_path` | `template <class T> std::optional<DagLongestPathResult<T>> dag_longest_path(const Graph<T>& g, const std::vector<int>& sources, T neg_inf = std::numeric_limits<T>::lowest() / T(4))` | $O(N + M)$ time and $O(N)$ memory |
 
 ## Example
 
 ```cpp
-#include "graph/dag_shortest_path.hpp"
+#include "graph/dag_longest_path.hpp"
 #include "graph/graph.hpp"
 #include <iostream>
 
 int main() {
-    m1une::graph::Graph<long long> g(5);
+    m1une::graph::Graph<long long> g(4);
     g.add_directed_edge(0, 1, 2);
     g.add_directed_edge(0, 2, 5);
-    g.add_directed_edge(1, 2, -4);
-    g.add_directed_edge(2, 3, 3);
-    g.add_directed_edge(3, 4, 1);
+    g.add_directed_edge(1, 3, 7);
+    g.add_directed_edge(2, 3, 1);
 
-    auto res = m1une::graph::dag_shortest_path(g, 0);
-    if (!res) return 0;
-
-    std::cout << res->dist[4] << "\n";  // 2
+    auto result = m1une::graph::dag_longest_path(g, 0);
+    if (result) std::cout << result->dist[3] << '\n';  // 9
 }
 ```

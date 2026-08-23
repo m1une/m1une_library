@@ -1,8 +1,32 @@
 ---
 data:
   _extendedDependsOn: []
-  _extendedRequiredBy: []
+  _extendedRequiredBy:
+  - icon: ':heavy_check_mark:'
+    path: graph/all.hpp
+    title: Graph All
+  - icon: ':heavy_check_mark:'
+    path: graph/dag.hpp
+    title: DAG Algorithms
+  - icon: ':heavy_check_mark:'
+    path: graph/dag_reachability.hpp
+    title: DAG Reachability and Transitive Reduction
+  - icon: ':heavy_check_mark:'
+    path: graph/directed.hpp
+    title: Directed Graph Algorithms
   _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/cow_game.test.cpp
+    title: verify/graph/cow_game.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/dag_algorithms.test.cpp
+    title: verify/graph/dag_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/graph_algorithms.test.cpp
+    title: verify/graph/graph_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/range_edge_graph.test.cpp
+    title: verify/graph/range_edge_graph.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/utilities/dynamic_bitset.test.cpp
     title: verify/utilities/dynamic_bitset.test.cpp
@@ -142,10 +166,18 @@ data:
   dependsOn: []
   isVerificationFile: false
   path: utilities/dynamic_bitset.hpp
-  requiredBy: []
+  requiredBy:
+  - graph/all.hpp
+  - graph/dag.hpp
+  - graph/directed.hpp
+  - graph/dag_reachability.hpp
   timestamp: '2026-06-21 04:03:53+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/graph/cow_game.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/dag_algorithms.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
   - verify/utilities/dynamic_bitset.test.cpp
 documentation_of: utilities/dynamic_bitset.hpp
 layout: document
