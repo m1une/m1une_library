@@ -147,6 +147,49 @@ void test_retrograde_random() {
             for (int vertex = 0; vertex < size; ++vertex) {
                 assert((actual.distance[vertex] == -1)
                        == (actual.outcome[vertex] == GameOutcome::Draw));
+                if (actual.outcome[vertex] == GameOutcome::Draw) {
+                    assert(actual.move[vertex] != -1);
+                    assert(actual.outcome[actual.move[vertex]] == GameOutcome::Draw);
+                } else if (graph[vertex].empty()) {
+                    assert(actual.outcome[vertex] == GameOutcome::Lose);
+                    assert(actual.distance[vertex] == 0);
+                    assert(actual.move[vertex] == -1);
+                } else {
+                    assert(
+                        std::find(
+                            graph[vertex].begin(),
+                            graph[vertex].end(),
+                            actual.move[vertex]
+                        ) != graph[vertex].end()
+                    );
+                    if (actual.outcome[vertex] == GameOutcome::Win) {
+                        assert(
+                            actual.outcome[actual.move[vertex]]
+                            == GameOutcome::Lose
+                        );
+                        int best = size + 1;
+                        for (int next : graph[vertex]) {
+                            if (actual.outcome[next] == GameOutcome::Lose) {
+                                best = std::min(best, actual.distance[next] + 1);
+                            }
+                        }
+                        assert(actual.distance[vertex] == best);
+                    } else {
+                        assert(
+                            actual.outcome[actual.move[vertex]]
+                            == GameOutcome::Win
+                        );
+                        int best = 0;
+                        for (int next : graph[vertex]) {
+                            best = std::max(best, actual.distance[next] + 1);
+                        }
+                        assert(actual.distance[vertex] == best);
+                    }
+                    assert(
+                        actual.distance[vertex]
+                        == actual.distance[actual.move[vertex]] + 1
+                    );
+                }
             }
         }
     }

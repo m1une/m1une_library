@@ -3,8 +3,10 @@
 
 #include "green_hackenbush.hpp"
 #include "grundy.hpp"
+#include "minimax.hpp"
 #include "nim.hpp"
 #include "nim_product.hpp"
+#include "partisan_game.hpp"
 #include "retrograde_analysis.hpp"
 #include "silver_dollar_game.hpp"
 #include "subtraction_game.hpp"

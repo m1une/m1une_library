@@ -1,7 +1,6 @@
 #ifndef M1UNE_GAME_RETROGRADE_ANALYSIS_HPP
 #define M1UNE_GAME_RETROGRADE_ANALYSIS_HPP 1
 
-#include <algorithm>
 #include <cassert>
 #include <queue>
 #include <utility>
@@ -15,6 +14,7 @@ enum class GameOutcome { Win, Lose, Draw };
 struct RetrogradeResult {
     std::vector<GameOutcome> outcome;
     std::vector<int> distance;
+    std::vector<int> move;
 };
 
 // graph[v] contains the states reachable from v in one move.
@@ -34,7 +34,9 @@ inline RetrogradeResult retrograde_analysis(
 
     std::vector<GameOutcome> outcome(size, GameOutcome::Draw);
     std::vector<int> distance(size, -1);
+    std::vector<int> move(size, -1);
     std::vector<int> longest_win_successor(size);
+    std::vector<int> longest_win_move(size, -1);
     std::vector<bool> decided(size);
     std::queue<int> queue;
     for (int vertex = 0; vertex < size; ++vertex) {
@@ -54,23 +56,35 @@ inline RetrogradeResult retrograde_analysis(
             if (outcome[vertex] == GameOutcome::Lose) {
                 outcome[previous] = GameOutcome::Win;
                 distance[previous] = distance[vertex] + 1;
+                move[previous] = vertex;
                 decided[previous] = true;
                 queue.push(previous);
             } else {
-                longest_win_successor[previous] = std::max(
-                    longest_win_successor[previous],
-                    distance[vertex]
-                );
+                if (longest_win_move[previous] == -1
+                    || longest_win_successor[previous] < distance[vertex]) {
+                    longest_win_successor[previous] = distance[vertex];
+                    longest_win_move[previous] = vertex;
+                }
                 if (--remaining[previous] == 0) {
                     outcome[previous] = GameOutcome::Lose;
                     distance[previous] = longest_win_successor[previous] + 1;
+                    move[previous] = longest_win_move[previous];
                     decided[previous] = true;
                     queue.push(previous);
                 }
             }
         }
     }
-    return {std::move(outcome), std::move(distance)};
+    for (int vertex = 0; vertex < size; ++vertex) {
+        if (outcome[vertex] != GameOutcome::Draw) continue;
+        for (int next : graph[vertex]) {
+            if (outcome[next] == GameOutcome::Draw) {
+                move[vertex] = next;
+                break;
+            }
+        }
+    }
+    return {std::move(outcome), std::move(distance), std::move(move)};
 }
 
 }  // namespace game

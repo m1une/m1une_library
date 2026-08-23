@@ -12,8 +12,9 @@ losing.
 
 A state is winning if it has a move to a losing state, and losing if every move
 goes to a winning state. States that cannot be resolved by these rules are
-draws. The result also records optimal game length for resolved states: a winner
-finishes as soon as possible, while a loser delays defeat as long as possible.
+draws. The result also records an optimal move and game length for resolved
+states: a winner finishes as soon as possible, while a loser delays defeat as
+long as possible. For a draw, the returned move preserves the draw.
 
 ## Types
 
@@ -27,6 +28,7 @@ All types are in namespace `m1une::game`.
 | --- | --- |
 | `std::vector<GameOutcome> outcome` | Classification of each state. |
 | `std::vector<int> distance` | Moves until termination under optimal play, or `-1` for a draw. |
+| `std::vector<int> move` | Chosen successor, or `-1` for a terminal state. |
 
 ## Functions
 
@@ -56,5 +58,6 @@ int main() {
     std::cout << (result.outcome[0] == GameOutcome::Draw) << '\n';
     std::cout << (result.outcome[2] == GameOutcome::Win) << '\n';
     std::cout << result.distance[2] << '\n';  // 1
+    std::cout << result.move[2] << '\n';      // 3
 }
 ```
