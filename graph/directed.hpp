@@ -6,6 +6,7 @@
 #include "dfs.hpp"
 #include "directed_mst.hpp"
 #include "eulerian_trail.hpp"
+#include "functional_graph.hpp"
 #include "graph.hpp"
 #include "incremental_scc.hpp"
 #include "matrix_tree_theorem.hpp"

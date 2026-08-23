@@ -46,6 +46,7 @@ Public namespaces stay flat and short: general graph helpers use
 | `graph/directed_mst.hpp` | Directed rooted graph | Minimum-cost spanning arborescence with edge reconstruction. |
 | `graph/scc.hpp` | Directed only | Strongly connected components and condensation DAG. |
 | `graph/incremental_scc.hpp` | Directed only | Offline SCC merge times under edge insertions. |
+| `graph/functional_graph.hpp` | One successor per vertex | Cycle decomposition, large jumps, paths and orbits, visit counts, reachability distances, and synchronized meetings. |
 | `graph/two_sat.hpp` | Implication graph | 2-SAT clauses, satisfiability, and one assignment. |
 | `graph/lowlink.hpp` | Undirected only | Articulation points and bridges. |
 | `graph/biconnected_components.hpp` | Undirected only | Vertex-biconnected blocks, articulation points, and block incidence. |
