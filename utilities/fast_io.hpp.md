@@ -367,6 +367,12 @@ data:
     path: verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp
     title: verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/game/game_algorithms.test.cpp
+    title: verify/game/game_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/game/nim_product.test.cpp
+    title: verify/game/nim_product.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/angle_sort.test.cpp
     title: verify/geometry/angle_sort.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1834,6 +1840,8 @@ data:
   - verify/optimization/k_project_selection.test.cpp
   - verify/optimization/integer_lp.test.cpp
   - verify/optimization/simplex.test.cpp
+  - verify/game/nim_product.test.cpp
+  - verify/game/game_algorithms.test.cpp
   - verify/utilities/int512.test.cpp
   - verify/utilities/bigint_addition.test.cpp
   - verify/utilities/arrow_dice.test.cpp

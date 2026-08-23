@@ -580,6 +580,23 @@ data:
     - icon: ':heavy_check_mark:'
       path: ds/wavelet_matrix/wavelet_matrix_sum.hpp
       title: Wavelet Matrix with Sums
+  - name: game
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: game/all.hpp
+      title: Game Library
+    - icon: ':heavy_check_mark:'
+      path: game/grundy.hpp
+      title: Grundy Numbers
+    - icon: ':heavy_check_mark:'
+      path: game/nim.hpp
+      title: Nim
+    - icon: ':heavy_check_mark:'
+      path: game/nim_product.hpp
+      title: Nim Product
+    - icon: ':heavy_check_mark:'
+      path: game/retrograde_analysis.hpp
+      title: Game Retrograde Analysis
   - name: geometry
     pages:
     - icon: ':heavy_check_mark:'
@@ -1830,6 +1847,14 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp
       title: verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp
+  - name: verify/game
+    pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/game/game_algorithms.test.cpp
+      title: verify/game/game_algorithms.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/game/nim_product.test.cpp
+      title: verify/game/nim_product.test.cpp
   - name: verify/geometry
     pages:
     - icon: ':heavy_check_mark:'
