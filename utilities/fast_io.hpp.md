@@ -367,6 +367,9 @@ data:
     path: verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp
     title: verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/game/classic_games.test.cpp
+    title: verify/game/classic_games.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/game/game_algorithms.test.cpp
     title: verify/game/game_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1842,6 +1845,7 @@ data:
   - verify/optimization/simplex.test.cpp
   - verify/game/nim_product.test.cpp
   - verify/game/game_algorithms.test.cpp
+  - verify/game/classic_games.test.cpp
   - verify/utilities/int512.test.cpp
   - verify/utilities/bigint_addition.test.cpp
   - verify/utilities/arrow_dice.test.cpp

@@ -5,6 +5,9 @@ data:
     path: game/all.hpp
     title: Game Library
   - icon: ':heavy_check_mark:'
+    path: game/green_hackenbush.hpp
+    title: Green Hackenbush
+  - icon: ':heavy_check_mark:'
     path: game/grundy.hpp
     title: Grundy Numbers
   - icon: ':heavy_check_mark:'
@@ -16,6 +19,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: game/retrograde_analysis.hpp
     title: Game Retrograde Analysis
+  - icon: ':heavy_check_mark:'
+    path: game/silver_dollar_game.hpp
+    title: Silver Dollar Game
+  - icon: ':heavy_check_mark:'
+    path: game/subtraction_game.hpp
+    title: Subtraction Game
   - icon: ':heavy_check_mark:'
     path: utilities/fast_io.hpp
     title: Fast IO
@@ -31,45 +40,92 @@ data:
     - https://judge.yosupo.jp/problem/aplusb
   bundledCode: "#line 1 \"verify/game/game_algorithms.test.cpp\"\n#define PROBLEM\
     \ \"https://judge.yosupo.jp/problem/aplusb\"\n\n#line 1 \"game/all.hpp\"\n\n\n\
-    \n#line 1 \"game/grundy.hpp\"\n\n\n\n#include <cassert>\n#include <queue>\n#include\
-    \ <vector>\n\nnamespace m1une {\nnamespace game {\n\n// graph[v] contains the\
-    \ states reachable from v in one move.\n// The graph must be a DAG.\ntemplate\
-    \ <typename Graph>\nstd::vector<int> grundy_numbers(const Graph& graph) {\n  \
-    \  const int size = int(graph.size());\n    std::vector<int> indegree(size);\n\
-    \    for (int vertex = 0; vertex < size; ++vertex) {\n        for (int next :\
-    \ graph[vertex]) {\n            assert(0 <= next && next < size);\n          \
-    \  indegree[next]++;\n        }\n    }\n\n    std::queue<int> queue;\n    for\
-    \ (int vertex = 0; vertex < size; ++vertex) {\n        if (indegree[vertex] ==\
-    \ 0) queue.push(vertex);\n    }\n    std::vector<int> order;\n    order.reserve(size);\n\
-    \    while (!queue.empty()) {\n        const int vertex = queue.front();\n   \
-    \     queue.pop();\n        order.push_back(vertex);\n        for (int next :\
-    \ graph[vertex]) {\n            if (--indegree[next] == 0) queue.push(next);\n\
-    \        }\n    }\n    assert(int(order.size()) == size);\n\n    std::vector<int>\
-    \ grundy(size);\n    std::vector<int> seen(size + 1, -1);\n    for (int position\
-    \ = size - 1; position >= 0; --position) {\n        const int vertex = order[position];\n\
-    \        for (int next : graph[vertex]) {\n            const int value = grundy[next];\n\
-    \            if (value <= size) seen[value] = vertex;\n        }\n        while\
-    \ (grundy[vertex] <= size && seen[grundy[vertex]] == vertex) {\n            grundy[vertex]++;\n\
-    \        }\n    }\n    return grundy;\n}\n\n}  // namespace game\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"game/nim.hpp\"\n\n\n\n#include <iterator>\n\nnamespace\
-    \ m1une {\nnamespace game {\n\ntemplate <typename Iterator>\nauto nim_sum(Iterator\
-    \ first, Iterator last) {\n    using T = typename std::iterator_traits<Iterator>::value_type;\n\
+    \n#line 1 \"game/green_hackenbush.hpp\"\n\n\n\n#include <cassert>\n#include <cstdint>\n\
+    #include <vector>\n\nnamespace m1une {\nnamespace game {\n\n// Every vertex represents\
+    \ one green edge. parent[v] == -1 attaches that edge\n// to the ground; otherwise\
+    \ it attaches it above the edge parent[v].\ninline uint64_t green_hackenbush_grundy(const\
+    \ std::vector<int>& parent) {\n    const int size = int(parent.size());\n    std::vector<std::vector<int>>\
+    \ children(size);\n    std::vector<int> roots;\n    for (int edge = 0; edge <\
+    \ size; ++edge) {\n        assert(-1 <= parent[edge] && parent[edge] < size);\n\
+    \        assert(parent[edge] != edge);\n        if (parent[edge] == -1) {\n  \
+    \          roots.push_back(edge);\n        } else {\n            children[parent[edge]].push_back(edge);\n\
+    \        }\n    }\n\n    std::vector<int> order = roots;\n    order.reserve(size);\n\
+    \    for (int position = 0; position < int(order.size()); ++position) {\n    \
+    \    const int edge = order[position];\n        for (int child : children[edge])\
+    \ order.push_back(child);\n    }\n    assert(int(order.size()) == size);\n\n \
+    \   std::vector<uint64_t> branch(size);\n    for (int position = size - 1; position\
+    \ >= 0; --position) {\n        const int edge = order[position];\n        uint64_t\
+    \ children_grundy = 0;\n        for (int child : children[edge]) children_grundy\
+    \ ^= branch[child];\n        branch[edge] = children_grundy + 1;\n    }\n\n  \
+    \  uint64_t result = 0;\n    for (int root : roots) result ^= branch[root];\n\
+    \    return result;\n}\n\ninline bool green_hackenbush_first_player_wins(\n  \
+    \  const std::vector<int>& parent\n) {\n    return green_hackenbush_grundy(parent)\
+    \ != 0;\n}\n\n}  // namespace game\n}  // namespace m1une\n\n\n#line 1 \"game/grundy.hpp\"\
+    \n\n\n\n#line 5 \"game/grundy.hpp\"\n#include <queue>\n#line 7 \"game/grundy.hpp\"\
+    \n\nnamespace m1une {\nnamespace game {\n\n// graph[v] contains the states reachable\
+    \ from v in one move.\n// The graph must be a DAG.\ntemplate <typename Graph>\n\
+    std::vector<int> grundy_numbers(const Graph& graph) {\n    const int size = int(graph.size());\n\
+    \    std::vector<int> indegree(size);\n    for (int vertex = 0; vertex < size;\
+    \ ++vertex) {\n        for (int next : graph[vertex]) {\n            assert(0\
+    \ <= next && next < size);\n            indegree[next]++;\n        }\n    }\n\n\
+    \    std::queue<int> queue;\n    for (int vertex = 0; vertex < size; ++vertex)\
+    \ {\n        if (indegree[vertex] == 0) queue.push(vertex);\n    }\n    std::vector<int>\
+    \ order;\n    order.reserve(size);\n    while (!queue.empty()) {\n        const\
+    \ int vertex = queue.front();\n        queue.pop();\n        order.push_back(vertex);\n\
+    \        for (int next : graph[vertex]) {\n            if (--indegree[next] ==\
+    \ 0) queue.push(next);\n        }\n    }\n    assert(int(order.size()) == size);\n\
+    \n    std::vector<int> grundy(size);\n    std::vector<int> seen(size + 1, -1);\n\
+    \    for (int position = size - 1; position >= 0; --position) {\n        const\
+    \ int vertex = order[position];\n        for (int next : graph[vertex]) {\n  \
+    \          const int value = grundy[next];\n            if (value <= size) seen[value]\
+    \ = vertex;\n        }\n        while (grundy[vertex] <= size && seen[grundy[vertex]]\
+    \ == vertex) {\n            grundy[vertex]++;\n        }\n    }\n    return grundy;\n\
+    }\n\n}  // namespace game\n}  // namespace m1une\n\n\n#line 1 \"game/nim.hpp\"\
+    \n\n\n\n#include <iterator>\n#include <optional>\n#include <type_traits>\n#include\
+    \ <utility>\n\nnamespace m1une {\nnamespace game {\n\ntemplate <typename T>\n\
+    struct NimMove {\n    int heap;\n    T new_size;\n};\n\ntemplate <typename Iterator>\n\
+    auto nim_sum(Iterator first, Iterator last) {\n    using T = typename std::iterator_traits<Iterator>::value_type;\n\
     \    T result{};\n    while (first != last) {\n        result ^= *first;\n   \
     \     ++first;\n    }\n    return result;\n}\n\ntemplate <typename Range>\nauto\
     \ nim_sum(const Range& heaps) {\n    using std::begin;\n    using std::end;\n\
     \    return nim_sum(begin(heaps), end(heaps));\n}\n\ntemplate <typename Range>\n\
     bool nim_first_player_wins(const Range& heaps) {\n    return nim_sum(heaps) !=\
-    \ 0;\n}\n\ntemplate <typename Range>\nbool misere_nim_first_player_wins(const\
-    \ Range& heaps) {\n    using std::begin;\n    using std::end;\n\n    auto first\
-    \ = begin(heaps);\n    const auto last = end(heaps);\n    bool odd_nonzero_heaps\
-    \ = false;\n    bool has_large_heap = false;\n    using T = typename std::iterator_traits<decltype(first)>::value_type;\n\
+    \ 0;\n}\n\ntemplate <typename Range>\nauto nim_winning_move(const Range& heaps)\
+    \ {\n    using std::begin;\n    using std::end;\n    using T = std::decay_t<decltype(*begin(heaps))>;\n\
+    \n    const T sum = nim_sum(heaps);\n    if (sum == 0) return std::optional<NimMove<T>>{};\n\
+    \    int index = 0;\n    for (\n        auto iterator = begin(heaps);\n      \
+    \  iterator != end(heaps);\n        ++iterator, ++index\n    ) {\n        const\
+    \ T new_size = *iterator ^ sum;\n        if (new_size < *iterator) return std::optional(NimMove<T>{index,\
+    \ new_size});\n    }\n    return std::optional<NimMove<T>>{};\n}\n\ntemplate <typename\
+    \ Range>\nbool misere_nim_first_player_wins(const Range& heaps) {\n    using std::begin;\n\
+    \    using std::end;\n\n    auto first = begin(heaps);\n    const auto last =\
+    \ end(heaps);\n    bool odd_nonzero_heaps = false;\n    bool has_large_heap =\
+    \ false;\n    using T = typename std::iterator_traits<decltype(first)>::value_type;\n\
     \    T sum{};\n    for (; first != last; ++first) {\n        sum ^= *first;\n\
     \        if (*first != 0) {\n            odd_nonzero_heaps = !odd_nonzero_heaps;\n\
     \        }\n        if (*first > 1) has_large_heap = true;\n    }\n    return\
-    \ has_large_heap ? sum != 0 : !odd_nonzero_heaps;\n}\n\n}  // namespace game\n\
-    }  // namespace m1une\n\n\n#line 1 \"game/nim_product.hpp\"\n\n\n\n#include <array>\n\
-    #line 6 \"game/nim_product.hpp\"\n#include <cstdint>\n#include <limits>\n\nnamespace\
-    \ m1une {\nnamespace game {\nnamespace internal {\n\ninline uint64_t nim_product_small(uint64_t\
+    \ has_large_heap ? sum != 0 : !odd_nonzero_heaps;\n}\n\ntemplate <typename Range>\n\
+    auto misere_nim_winning_move(const Range& heaps) {\n    using std::begin;\n  \
+    \  using std::end;\n    using T = std::decay_t<decltype(*begin(heaps))>;\n\n \
+    \   T sum{};\n    int ones = 0;\n    int large_heaps = 0;\n    int only_large_heap\
+    \ = -1;\n    int index = 0;\n    for (\n        auto iterator = begin(heaps);\n\
+    \        iterator != end(heaps);\n        ++iterator, ++index\n    ) {\n     \
+    \   sum ^= *iterator;\n        if (*iterator == 1) ones++;\n        if (*iterator\
+    \ > 1) {\n            large_heaps++;\n            only_large_heap = index;\n \
+    \       }\n    }\n\n    if (large_heaps == 0) {\n        if (ones == 0 || ones\
+    \ % 2 == 1) return std::optional<NimMove<T>>{};\n        index = 0;\n        for\
+    \ (\n            auto iterator = begin(heaps);\n            iterator != end(heaps);\n\
+    \            ++iterator, ++index\n        ) {\n            if (*iterator == 1)\
+    \ return std::optional(NimMove<T>{index, T(0)});\n        }\n    }\n    if (large_heaps\
+    \ == 1) {\n        const T new_size = ones % 2 == 0 ? T(1) : T(0);\n        return\
+    \ std::optional(NimMove<T>{only_large_heap, new_size});\n    }\n    if (sum ==\
+    \ 0) return std::optional<NimMove<T>>{};\n\n    index = 0;\n    for (auto iterator\
+    \ = begin(heaps); iterator != end(heaps); ++iterator, ++index) {\n        const\
+    \ T new_size = *iterator ^ sum;\n        if (new_size < *iterator) return std::optional(NimMove<T>{index,\
+    \ new_size});\n    }\n    return std::optional<NimMove<T>>{};\n}\n\n}  // namespace\
+    \ game\n}  // namespace m1une\n\n\n#line 1 \"game/nim_product.hpp\"\n\n\n\n#include\
+    \ <array>\n#line 7 \"game/nim_product.hpp\"\n#include <limits>\n\nnamespace m1une\
+    \ {\nnamespace game {\nnamespace internal {\n\ninline uint64_t nim_product_small(uint64_t\
     \ x, uint64_t y) {\n    if (x < 2 || y < 2) return x * y;\n\n    int shift = 1;\n\
     \    const uint64_t largest = x | y;\n    while ((uint64_t(1) << (shift * 2))\
     \ <= largest) shift *= 2;\n    const uint64_t mask = (uint64_t(1) << shift) -\
@@ -108,45 +164,73 @@ data:
     \ - 1);\n}\n\ninline uint64_t nim_quotient(uint64_t numerator, uint64_t denominator)\
     \ {\n    assert(denominator != 0);\n    return nim_product(numerator, nim_inverse(denominator));\n\
     }\n\n}  // namespace game\n}  // namespace m1une\n\n\n#line 1 \"game/retrograde_analysis.hpp\"\
-    \n\n\n\n#include <algorithm>\n#line 7 \"game/retrograde_analysis.hpp\"\n#include\
-    \ <utility>\n#line 9 \"game/retrograde_analysis.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ game {\n\nenum class GameOutcome { Win, Lose, Draw };\n\nstruct RetrogradeResult\
-    \ {\n    std::vector<GameOutcome> outcome;\n    std::vector<int> distance;\n};\n\
-    \n// graph[v] contains the states reachable from v in one move.\ninline RetrogradeResult\
-    \ retrograde_analysis(\n    const std::vector<std::vector<int>>& graph\n) {\n\
-    \    const int size = int(graph.size());\n    std::vector<std::vector<int>> reverse_graph(size);\n\
-    \    std::vector<int> remaining(size);\n    for (int vertex = 0; vertex < size;\
-    \ ++vertex) {\n        remaining[vertex] = int(graph[vertex].size());\n      \
-    \  for (int next : graph[vertex]) {\n            assert(0 <= next && next < size);\n\
-    \            reverse_graph[next].push_back(vertex);\n        }\n    }\n\n    std::vector<GameOutcome>\
-    \ outcome(size, GameOutcome::Draw);\n    std::vector<int> distance(size, -1);\n\
-    \    std::vector<int> longest_win_successor(size);\n    std::vector<bool> decided(size);\n\
-    \    std::queue<int> queue;\n    for (int vertex = 0; vertex < size; ++vertex)\
-    \ {\n        if (remaining[vertex] == 0) {\n            outcome[vertex] = GameOutcome::Lose;\n\
-    \            distance[vertex] = 0;\n            decided[vertex] = true;\n    \
-    \        queue.push(vertex);\n        }\n    }\n\n    while (!queue.empty()) {\n\
-    \        const int vertex = queue.front();\n        queue.pop();\n        for\
-    \ (int previous : reverse_graph[vertex]) {\n            if (decided[previous])\
-    \ continue;\n            if (outcome[vertex] == GameOutcome::Lose) {\n       \
-    \         outcome[previous] = GameOutcome::Win;\n                distance[previous]\
-    \ = distance[vertex] + 1;\n                decided[previous] = true;\n       \
-    \         queue.push(previous);\n            } else {\n                longest_win_successor[previous]\
-    \ = std::max(\n                    longest_win_successor[previous],\n        \
-    \            distance[vertex]\n                );\n                if (--remaining[previous]\
-    \ == 0) {\n                    outcome[previous] = GameOutcome::Lose;\n      \
-    \              distance[previous] = longest_win_successor[previous] + 1;\n   \
-    \                 decided[previous] = true;\n                    queue.push(previous);\n\
+    \n\n\n\n#include <algorithm>\n#line 9 \"game/retrograde_analysis.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace game {\n\nenum class GameOutcome { Win, Lose, Draw };\n\n\
+    struct RetrogradeResult {\n    std::vector<GameOutcome> outcome;\n    std::vector<int>\
+    \ distance;\n};\n\n// graph[v] contains the states reachable from v in one move.\n\
+    inline RetrogradeResult retrograde_analysis(\n    const std::vector<std::vector<int>>&\
+    \ graph\n) {\n    const int size = int(graph.size());\n    std::vector<std::vector<int>>\
+    \ reverse_graph(size);\n    std::vector<int> remaining(size);\n    for (int vertex\
+    \ = 0; vertex < size; ++vertex) {\n        remaining[vertex] = int(graph[vertex].size());\n\
+    \        for (int next : graph[vertex]) {\n            assert(0 <= next && next\
+    \ < size);\n            reverse_graph[next].push_back(vertex);\n        }\n  \
+    \  }\n\n    std::vector<GameOutcome> outcome(size, GameOutcome::Draw);\n    std::vector<int>\
+    \ distance(size, -1);\n    std::vector<int> longest_win_successor(size);\n   \
+    \ std::vector<bool> decided(size);\n    std::queue<int> queue;\n    for (int vertex\
+    \ = 0; vertex < size; ++vertex) {\n        if (remaining[vertex] == 0) {\n   \
+    \         outcome[vertex] = GameOutcome::Lose;\n            distance[vertex] =\
+    \ 0;\n            decided[vertex] = true;\n            queue.push(vertex);\n \
+    \       }\n    }\n\n    while (!queue.empty()) {\n        const int vertex = queue.front();\n\
+    \        queue.pop();\n        for (int previous : reverse_graph[vertex]) {\n\
+    \            if (decided[previous]) continue;\n            if (outcome[vertex]\
+    \ == GameOutcome::Lose) {\n                outcome[previous] = GameOutcome::Win;\n\
+    \                distance[previous] = distance[vertex] + 1;\n                decided[previous]\
+    \ = true;\n                queue.push(previous);\n            } else {\n     \
+    \           longest_win_successor[previous] = std::max(\n                    longest_win_successor[previous],\n\
+    \                    distance[vertex]\n                );\n                if\
+    \ (--remaining[previous] == 0) {\n                    outcome[previous] = GameOutcome::Lose;\n\
+    \                    distance[previous] = longest_win_successor[previous] + 1;\n\
+    \                    decided[previous] = true;\n                    queue.push(previous);\n\
     \                }\n            }\n        }\n    }\n    return {std::move(outcome),\
     \ std::move(distance)};\n}\n\n}  // namespace game\n}  // namespace m1une\n\n\n\
-    #line 8 \"game/all.hpp\"\n\n\n#line 4 \"verify/game/game_algorithms.test.cpp\"\
+    #line 1 \"game/silver_dollar_game.hpp\"\n\n\n\n#line 7 \"game/silver_dollar_game.hpp\"\
+    \n\nnamespace m1une {\nnamespace game {\n\ntemplate <typename T>\nT silver_dollar_grundy(const\
+    \ std::vector<T>& coins) {\n    for (int index = 0; index < int(coins.size());\
+    \ ++index) {\n        if constexpr (std::is_signed_v<T>) assert(coins[index] >=\
+    \ 0);\n        if (index != 0) assert(coins[index - 1] < coins[index]);\n    }\n\
+    \n    T result{};\n    int index = int(coins.size()) % 2;\n    if (index == 1)\
+    \ result ^= coins[0];\n    for (; index + 1 < int(coins.size()); index += 2) {\n\
+    \        result ^= coins[index + 1] - coins[index] - 1;\n    }\n    return result;\n\
+    }\n\ntemplate <typename T>\nbool silver_dollar_first_player_wins(const std::vector<T>&\
+    \ coins) {\n    return silver_dollar_grundy(coins) != 0;\n}\n\n}  // namespace\
+    \ game\n}  // namespace m1une\n\n\n#line 1 \"game/subtraction_game.hpp\"\n\n\n\
+    \n#line 7 \"game/subtraction_game.hpp\"\n\nnamespace m1une {\nnamespace game {\n\
+    \ninline std::vector<int> subtraction_game_grundy(\n    int max_heap,\n    const\
+    \ std::vector<int>& moves\n) {\n    assert(max_heap >= 0);\n    for (int move\
+    \ : moves) assert(move > 0);\n\n    std::vector<int> grundy(max_heap + 1);\n \
+    \   std::vector<int> seen(moves.size() + 1, -1);\n    for (int heap = 1; heap\
+    \ <= max_heap; ++heap) {\n        for (int move : moves) {\n            if (move\
+    \ > heap) continue;\n            const int value = grundy[heap - move];\n    \
+    \        if (value < int(seen.size())) seen[value] = heap;\n        }\n      \
+    \  while (\n            grundy[heap] < int(seen.size())\n            && seen[grundy[heap]]\
+    \ == heap\n        ) {\n            grundy[heap]++;\n        }\n    }\n    return\
+    \ grundy;\n}\n\ninline int subtraction_game_nim_sum(\n    const std::vector<int>&\
+    \ heaps,\n    const std::vector<int>& moves\n) {\n    int max_heap = 0;\n    for\
+    \ (int heap : heaps) {\n        assert(heap >= 0);\n        max_heap = std::max(max_heap,\
+    \ heap);\n    }\n    const std::vector<int> grundy = subtraction_game_grundy(max_heap,\
+    \ moves);\n    int result = 0;\n    for (int heap : heaps) result ^= grundy[heap];\n\
+    \    return result;\n}\n\ninline bool subtraction_game_first_player_wins(\n  \
+    \  const std::vector<int>& heaps,\n    const std::vector<int>& moves\n) {\n  \
+    \  return subtraction_game_nim_sum(heaps, moves) != 0;\n}\n\n}  // namespace game\n\
+    }  // namespace m1une\n\n\n#line 11 \"game/all.hpp\"\n\n\n#line 4 \"verify/game/game_algorithms.test.cpp\"\
     \n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 6 \"utilities/fast_io.hpp\"\
     \n#include <cerrno>\n#include <charconv>\n#include <cstddef>\n#include <cstdio>\n\
     #include <cstdlib>\n#line 12 \"utilities/fast_io.hpp\"\n#include <cstring>\n#line\
-    \ 14 \"utilities/fast_io.hpp\"\n#include <string>\n#include <sys/stat.h>\n#include\
-    \ <type_traits>\n#line 18 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n\nnamespace\
-    \ m1une {\nnamespace utilities {\nnamespace internal {\n\n// Detect std::begin(x),\
-    \ std::end(x).\ntemplate <class T, class = void>\nstruct is_range : std::false_type\
-    \ {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
+    \ 14 \"utilities/fast_io.hpp\"\n#include <string>\n#include <sys/stat.h>\n#line\
+    \ 18 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n\nnamespace m1une {\nnamespace\
+    \ utilities {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\n\
+    template <class T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate\
+    \ <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
     \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
     \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
     \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
@@ -391,8 +475,26 @@ data:
     \ one_one = {1, 1};\n    std::vector<int> one_one_one = {1, 1, 1};\n    assert(m1une::game::misere_nim_first_player_wins(one_one));\n\
     \    assert(!m1une::game::misere_nim_first_player_wins(one_one_one));\n\n    std::vector<int>\
     \ general = {1, 2, 3};\n    assert(!m1une::game::misere_nim_first_player_wins(general));\n\
-    }\n\nstd::vector<int> naive_grundy(const std::vector<std::vector<int>>& graph)\
-    \ {\n    const int size = int(graph.size());\n    std::vector<int> result(size);\n\
+    \n    for (int code = 0; code < 625; ++code) {\n        int remaining = code;\n\
+    \        std::vector<int> heaps(4);\n        for (int& heap : heaps) {\n     \
+    \       heap = remaining % 5;\n            remaining /= 5;\n        }\n\n    \
+    \    auto ordinary_move = m1une::game::nim_winning_move(heaps);\n        assert(bool(ordinary_move)\
+    \ == m1une::game::nim_first_player_wins(heaps));\n        if (ordinary_move) {\n\
+    \            assert(0 <= ordinary_move->heap && ordinary_move->heap < 4);\n  \
+    \          assert(ordinary_move->new_size < heaps[ordinary_move->heap]);\n   \
+    \         heaps[ordinary_move->heap] = ordinary_move->new_size;\n            assert(!m1une::game::nim_first_player_wins(heaps));\n\
+    \        }\n\n        remaining = code;\n        for (int& heap : heaps) {\n \
+    \           heap = remaining % 5;\n            remaining /= 5;\n        }\n  \
+    \      const bool has_stone = std::any_of(\n            heaps.begin(),\n     \
+    \       heaps.end(),\n            [](int heap) { return heap != 0; }\n       \
+    \ );\n        auto misere_move = m1une::game::misere_nim_winning_move(heaps);\n\
+    \        assert(\n            bool(misere_move)\n            == (has_stone &&\
+    \ m1une::game::misere_nim_first_player_wins(heaps))\n        );\n        if (misere_move)\
+    \ {\n            assert(0 <= misere_move->heap && misere_move->heap < 4);\n  \
+    \          assert(misere_move->new_size < heaps[misere_move->heap]);\n       \
+    \     heaps[misere_move->heap] = misere_move->new_size;\n            assert(!m1une::game::misere_nim_first_player_wins(heaps));\n\
+    \        }\n    }\n}\n\nstd::vector<int> naive_grundy(const std::vector<std::vector<int>>&\
+    \ graph) {\n    const int size = int(graph.size());\n    std::vector<int> result(size);\n\
     \    for (int vertex = size - 1; vertex >= 0; --vertex) {\n        std::vector<bool>\
     \ appears(size + 1);\n        for (int next : graph[vertex]) appears[result[next]]\
     \ = true;\n        while (appears[result[vertex]]) result[vertex]++;\n    }\n\
@@ -446,8 +548,26 @@ data:
     \ one_one = {1, 1};\n    std::vector<int> one_one_one = {1, 1, 1};\n    assert(m1une::game::misere_nim_first_player_wins(one_one));\n\
     \    assert(!m1une::game::misere_nim_first_player_wins(one_one_one));\n\n    std::vector<int>\
     \ general = {1, 2, 3};\n    assert(!m1une::game::misere_nim_first_player_wins(general));\n\
-    }\n\nstd::vector<int> naive_grundy(const std::vector<std::vector<int>>& graph)\
-    \ {\n    const int size = int(graph.size());\n    std::vector<int> result(size);\n\
+    \n    for (int code = 0; code < 625; ++code) {\n        int remaining = code;\n\
+    \        std::vector<int> heaps(4);\n        for (int& heap : heaps) {\n     \
+    \       heap = remaining % 5;\n            remaining /= 5;\n        }\n\n    \
+    \    auto ordinary_move = m1une::game::nim_winning_move(heaps);\n        assert(bool(ordinary_move)\
+    \ == m1une::game::nim_first_player_wins(heaps));\n        if (ordinary_move) {\n\
+    \            assert(0 <= ordinary_move->heap && ordinary_move->heap < 4);\n  \
+    \          assert(ordinary_move->new_size < heaps[ordinary_move->heap]);\n   \
+    \         heaps[ordinary_move->heap] = ordinary_move->new_size;\n            assert(!m1une::game::nim_first_player_wins(heaps));\n\
+    \        }\n\n        remaining = code;\n        for (int& heap : heaps) {\n \
+    \           heap = remaining % 5;\n            remaining /= 5;\n        }\n  \
+    \      const bool has_stone = std::any_of(\n            heaps.begin(),\n     \
+    \       heaps.end(),\n            [](int heap) { return heap != 0; }\n       \
+    \ );\n        auto misere_move = m1une::game::misere_nim_winning_move(heaps);\n\
+    \        assert(\n            bool(misere_move)\n            == (has_stone &&\
+    \ m1une::game::misere_nim_first_player_wins(heaps))\n        );\n        if (misere_move)\
+    \ {\n            assert(0 <= misere_move->heap && misere_move->heap < 4);\n  \
+    \          assert(misere_move->new_size < heaps[misere_move->heap]);\n       \
+    \     heaps[misere_move->heap] = misere_move->new_size;\n            assert(!m1une::game::misere_nim_first_player_wins(heaps));\n\
+    \        }\n    }\n}\n\nstd::vector<int> naive_grundy(const std::vector<std::vector<int>>&\
+    \ graph) {\n    const int size = int(graph.size());\n    std::vector<int> result(size);\n\
     \    for (int vertex = size - 1; vertex >= 0; --vertex) {\n        std::vector<bool>\
     \ appears(size + 1);\n        for (int next : graph[vertex]) appears[result[next]]\
     \ = true;\n        while (appears[result[vertex]]) result[vertex]++;\n    }\n\
@@ -492,15 +612,18 @@ data:
     \ << '\\n';\n}\n"
   dependsOn:
   - game/all.hpp
+  - game/green_hackenbush.hpp
   - game/grundy.hpp
   - game/nim.hpp
   - game/nim_product.hpp
   - game/retrograde_analysis.hpp
+  - game/silver_dollar_game.hpp
+  - game/subtraction_game.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
   path: verify/game/game_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-08-24 02:00:33+09:00'
+  timestamp: '2026-08-24 02:07:48+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/game/game_algorithms.test.cpp

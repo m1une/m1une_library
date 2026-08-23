@@ -586,6 +586,9 @@ data:
       path: game/all.hpp
       title: Game Library
     - icon: ':heavy_check_mark:'
+      path: game/green_hackenbush.hpp
+      title: Green Hackenbush
+    - icon: ':heavy_check_mark:'
       path: game/grundy.hpp
       title: Grundy Numbers
     - icon: ':heavy_check_mark:'
@@ -597,6 +600,12 @@ data:
     - icon: ':heavy_check_mark:'
       path: game/retrograde_analysis.hpp
       title: Game Retrograde Analysis
+    - icon: ':heavy_check_mark:'
+      path: game/silver_dollar_game.hpp
+      title: Silver Dollar Game
+    - icon: ':heavy_check_mark:'
+      path: game/subtraction_game.hpp
+      title: Subtraction Game
   - name: geometry
     pages:
     - icon: ':heavy_check_mark:'
@@ -1849,6 +1858,9 @@ data:
       title: verify/ds/wavelet_matrix/wavelet_matrix_sum.test.cpp
   - name: verify/game
     pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/game/classic_games.test.cpp
+      title: verify/game/classic_games.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/game/game_algorithms.test.cpp
       title: verify/game/game_algorithms.test.cpp
