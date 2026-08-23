@@ -27,6 +27,7 @@ they can be combined without rewriting boilerplate during a contest.
 | `optimization/` | Combinatorial and numeric optimization solvers such as binary and k-valued project selection, Hungarian assignment, simplex LP, and integer LP. |
 | `heuristic/` | Hill climbing, simulated annealing, and memory-bounded beam search for approximate optimization. |
 | `matroid/` | Uniform, partition, graphic, and linear matroids, plus weighted, unweighted, and randomized linear matroid intersection. |
+| `game/` | Nim and nimber arithmetic, Sprague-Grundy numbers for DAG games, and retrograde win/lose/draw analysis for directed games. |
 | `geometry/` | 2D points, lines, rays, segments, Manhattan segment intersections, perpendicular bisectors, polygons, convex decomposition, circle coverage multiplicities, circle- and rectangle-union area, convex hulls, Delaunay triangulations, Voronoi diagrams, half-plane intersection, lattice-point counting, and circles. |
 | `ds/` | Categorized data structures for range queries, online/offline dynamic connectivity, dynamic sequences and trees, ordered sets, heaps, intervals, and hash tables. |
 | `monoid/` | Reusable monoids for generic data structures such as `Segtree`. |
@@ -55,6 +56,7 @@ short namespace segment after `m1une::`; nested directories are for browsing.
 | `math/fps/` | `m1une::fps` |
 | `math/matrix/` | `m1une::matrix` |
 | `optimization/` | `m1une::opt` |
+| `game/` | `m1une::game` |
 | `geometry/`, `string/`, `matroid/`, `monoid/`, `acted_monoid/`, `beats_acted_monoid/` | Matching short top-level namespaces. |
 
 ### Algorithm categories
