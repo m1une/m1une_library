@@ -33,7 +33,7 @@ they can be combined without rewriting boilerplate during a contest.
 | `monoid/` | Reusable monoids for generic data structures such as `Segtree`. |
 | `acted_monoid/` | Ordinary acted monoids for lazy propagation structures such as `LazySegtree`, including generic range assignment/range product and combined bitwise AND/OR/XOR updates with range sums. |
 | `beats_acted_monoid/` | Fallible acted monoids intended for generic Beats structures such as `SegtreeBeats`, including chmin/chmax/add and bitwise AND/OR updates with range sums. |
-| `math/` | Number theory, modular arithmetic, combinatorics and partition functions, set power series and FPS/polynomials, XOR bases and bitwise transforms, matrices, exact rationals, and integer arithmetic. |
+| `math/` | Number theory, modular arithmetic, Gaussian integers, combinatorics and partition functions, set power series and FPS/polynomials, XOR bases and bitwise transforms, matrices, exact rationals, and integer arithmetic. |
 | `string/` | Z/KMP, wildcard matching, edit distance, Manacher, palindrome lexicographic rank/select, minimum rotation, Lyndon factorization, run enumeration, longest common extension/subsequence/substring, eertrees, suffix trees/automata/arrays, tries, Aho-Corasick, and string hashes. |
 | `utilities/` | Fast I/O, Base64 packing for embedded numeric sequences, fixed-width 256-, 512-, and 1024-bit integers, convolution-backed arbitrary-precision integers, parsing, dice, 2D grid transforms, integer helpers, compression, random generation, and stream-ready property, constructive, and interactive stress testing. |
 | `verify/` | Online Judge Verify Helper tests. |

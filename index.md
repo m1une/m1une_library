@@ -996,6 +996,9 @@ data:
       path: math/divisor_convolution.hpp
       title: Divisor Convolution
     - icon: ':heavy_check_mark:'
+      path: math/gaussian_integer.hpp
+      title: Gaussian Integer
+    - icon: ':heavy_check_mark:'
       path: math/generalized_floor_sum.hpp
       title: Generalized Floor Sum
     - icon: ':heavy_check_mark:'
@@ -2290,6 +2293,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/math/floor_sum.test.cpp
       title: verify/math/floor_sum.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/math/gcd_of_gaussian_integers.test.cpp
+      title: verify/math/gcd_of_gaussian_integers.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/math/generalized_floor_sum.test.cpp
       title: verify/math/generalized_floor_sum.test.cpp

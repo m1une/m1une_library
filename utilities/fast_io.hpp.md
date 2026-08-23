@@ -838,6 +838,9 @@ data:
     path: verify/math/fps/sqrt_of_formal_power_series_sparse.test.cpp
     title: verify/math/fps/sqrt_of_formal_power_series_sparse.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/math/gcd_of_gaussian_integers.test.cpp
+    title: verify/math/gcd_of_gaussian_integers.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/generalized_floor_sum.test.cpp
     title: verify/math/generalized_floor_sum.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1998,6 +2001,7 @@ data:
   - verify/math/extended_gcd.test.cpp
   - verify/math/bernoulli_number.test.cpp
   - verify/math/enumerate_primes.test.cpp
+  - verify/math/gcd_of_gaussian_integers.test.cpp
   - verify/math/primitive_root.test.cpp
   - verify/math/rational_approximation.test.cpp
   - verify/math/sum_of_totient_function.test.cpp
