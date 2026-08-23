@@ -991,6 +991,9 @@ data:
     path: verify/optimization/integer_lp.test.cpp
     title: verify/optimization/integer_lp.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/optimization/k_project_selection.test.cpp
+    title: verify/optimization/k_project_selection.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/optimization/project_selection.test.cpp
     title: verify/optimization/project_selection.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1828,6 +1831,7 @@ data:
   - verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
   - verify/optimization/project_selection.test.cpp
   - verify/optimization/hungarian.test.cpp
+  - verify/optimization/k_project_selection.test.cpp
   - verify/optimization/integer_lp.test.cpp
   - verify/optimization/simplex.test.cpp
   - verify/utilities/int512.test.cpp

@@ -11,6 +11,9 @@ data:
     path: optimization/integer_lp.hpp
     title: Integer Linear Programming
   - icon: ':heavy_check_mark:'
+    path: optimization/k_project_selection.hpp
+    title: K-Value Project Selection
+  - icon: ':heavy_check_mark:'
     path: optimization/project_selection.hpp
     title: Project Selection
   - icon: ':heavy_check_mark:'
@@ -312,43 +315,44 @@ data:
     \ integer_lp(const std::vector<std::vector<T>>& a, const std::vector<T>& b,\n\
     \                              const std::vector<T>& c, long double eps = 1e-10L)\
     \ {\n    return integer_lp_maximize(a, b, c, eps);\n}\n\n}  // namespace opt\n\
-    }  // namespace m1une\n\n\n#line 1 \"optimization/project_selection.hpp\"\n\n\n\
-    \n#line 9 \"optimization/project_selection.hpp\"\n\n#line 1 \"graph/flow/max_flow.hpp\"\
-    \n\n\n\n#line 6 \"graph/flow/max_flow.hpp\"\n#include <cstddef>\n#line 9 \"graph/flow/max_flow.hpp\"\
-    \n\nnamespace m1une {\nnamespace flow {\n\ntemplate <class Cap>\nstruct MaxFlow\
-    \ {\n    struct Edge {\n        int from;\n        int to;\n        Cap cap;\n\
-    \        Cap flow;\n    };\n\n   private:\n    struct InternalEdge {\n       \
-    \ int to;\n        int rev;\n        Cap cap;\n    };\n\n    struct Position {\n\
-    \        int from;\n        int edge;\n    };\n\n    int _n;\n    std::vector<Position>\
-    \ _pos;\n    std::vector<std::vector<InternalEdge>> _g;\n\n    Cap highest_label_preflow_push(int\
-    \ s, int t) {\n        const int dead = 2 * _n;\n        const int unreachable\
-    \ = _n + 1;\n        std::vector<Cap> excess(_n, Cap(0));\n        std::vector<int>\
-    \ state(8 * std::size_t(_n) + 2);\n        int* height = state.data();\n     \
-    \   int* height_count = height + _n;\n        int* current = height_count + dead\
-    \ + 1;\n        int* queue = current + _n;\n        int* next = queue + _n;\n\
-    \        int* bucket_head = next + _n;\n        std::vector<char> active(_n, false);\n\
-    \        int highest = -1;\n        long long work = 0;\n        const long long\
-    \ arc_count =\n            2LL * static_cast<long long>(_pos.size());\n      \
-    \  const long long work_limit = std::max(1LL, 4 * arc_count + _n);\n\n       \
-    \ auto activate = [&](int v) {\n            if (v == s || v == t || active[v]\
-    \ || excess[v] == Cap(0) ||\n                height[v] >= dead) {\n          \
-    \      return;\n            }\n            active[v] = true;\n            next[v]\
-    \ = bucket_head[height[v]];\n            bucket_head[height[v]] = v;\n       \
-    \     highest = std::max(highest, height[v]);\n        };\n\n        auto rebuild_buckets\
-    \ = [&]() {\n            std::fill(bucket_head, bucket_head + dead + 1, -1);\n\
-    \            std::fill(active.begin(), active.end(), false);\n            highest\
-    \ = -1;\n            for (int v = 0; v < _n; v++) activate(v);\n        };\n\n\
-    \        auto global_relabel = [&]() {\n            std::fill(height, height +\
-    \ _n, unreachable);\n            std::fill(height_count, height_count + dead +\
-    \ 1, 0);\n            std::fill(current, current + _n, 0);\n            int head\
-    \ = 0;\n            int tail = 0;\n            height[t] = 0;\n            height[s]\
-    \ = _n;\n            queue[tail++] = t;\n            while (head != tail) {\n\
-    \                int v = queue[head++];\n                for (const auto& e :\
-    \ _g[v]) {\n                    if (e.to == s || height[e.to] != unreachable)\
-    \ continue;\n                    const auto& reverse = _g[e.to][e.rev];\n    \
-    \                if (reverse.cap == Cap(0)) continue;\n                    height[e.to]\
-    \ = height[v] + 1;\n                    queue[tail++] = e.to;\n              \
-    \  }\n            }\n            for (int v = 0; v < _n; v++) height_count[height[v]]++;\n\
+    }  // namespace m1une\n\n\n#line 1 \"optimization/k_project_selection.hpp\"\n\n\
+    \n\n#line 5 \"optimization/k_project_selection.hpp\"\n#include <cstddef>\n#line\
+    \ 10 \"optimization/k_project_selection.hpp\"\n\n#line 1 \"optimization/project_selection.hpp\"\
+    \n\n\n\n#line 9 \"optimization/project_selection.hpp\"\n\n#line 1 \"graph/flow/max_flow.hpp\"\
+    \n\n\n\n#line 9 \"graph/flow/max_flow.hpp\"\n\nnamespace m1une {\nnamespace flow\
+    \ {\n\ntemplate <class Cap>\nstruct MaxFlow {\n    struct Edge {\n        int\
+    \ from;\n        int to;\n        Cap cap;\n        Cap flow;\n    };\n\n   private:\n\
+    \    struct InternalEdge {\n        int to;\n        int rev;\n        Cap cap;\n\
+    \    };\n\n    struct Position {\n        int from;\n        int edge;\n    };\n\
+    \n    int _n;\n    std::vector<Position> _pos;\n    std::vector<std::vector<InternalEdge>>\
+    \ _g;\n\n    Cap highest_label_preflow_push(int s, int t) {\n        const int\
+    \ dead = 2 * _n;\n        const int unreachable = _n + 1;\n        std::vector<Cap>\
+    \ excess(_n, Cap(0));\n        std::vector<int> state(8 * std::size_t(_n) + 2);\n\
+    \        int* height = state.data();\n        int* height_count = height + _n;\n\
+    \        int* current = height_count + dead + 1;\n        int* queue = current\
+    \ + _n;\n        int* next = queue + _n;\n        int* bucket_head = next + _n;\n\
+    \        std::vector<char> active(_n, false);\n        int highest = -1;\n   \
+    \     long long work = 0;\n        const long long arc_count =\n            2LL\
+    \ * static_cast<long long>(_pos.size());\n        const long long work_limit =\
+    \ std::max(1LL, 4 * arc_count + _n);\n\n        auto activate = [&](int v) {\n\
+    \            if (v == s || v == t || active[v] || excess[v] == Cap(0) ||\n   \
+    \             height[v] >= dead) {\n                return;\n            }\n \
+    \           active[v] = true;\n            next[v] = bucket_head[height[v]];\n\
+    \            bucket_head[height[v]] = v;\n            highest = std::max(highest,\
+    \ height[v]);\n        };\n\n        auto rebuild_buckets = [&]() {\n        \
+    \    std::fill(bucket_head, bucket_head + dead + 1, -1);\n            std::fill(active.begin(),\
+    \ active.end(), false);\n            highest = -1;\n            for (int v = 0;\
+    \ v < _n; v++) activate(v);\n        };\n\n        auto global_relabel = [&]()\
+    \ {\n            std::fill(height, height + _n, unreachable);\n            std::fill(height_count,\
+    \ height_count + dead + 1, 0);\n            std::fill(current, current + _n, 0);\n\
+    \            int head = 0;\n            int tail = 0;\n            height[t] =\
+    \ 0;\n            height[s] = _n;\n            queue[tail++] = t;\n          \
+    \  while (head != tail) {\n                int v = queue[head++];\n          \
+    \      for (const auto& e : _g[v]) {\n                    if (e.to == s || height[e.to]\
+    \ != unreachable) continue;\n                    const auto& reverse = _g[e.to][e.rev];\n\
+    \                    if (reverse.cap == Cap(0)) continue;\n                  \
+    \  height[e.to] = height[v] + 1;\n                    queue[tail++] = e.to;\n\
+    \                }\n            }\n            for (int v = 0; v < _n; v++) height_count[height[v]]++;\n\
     \            rebuild_buckets();\n            work = 0;\n        };\n\n       \
     \ auto gap = [&](int empty_height) {\n            for (int v = 0; v < _n; v++)\
     \ {\n                if (v == s || v == t || height[v] <= empty_height ||\n  \
@@ -565,7 +569,92 @@ data:
     \   for (int project = 0; project < _project_count; project++) {\n           \
     \ result.selected[project] = source_side[project];\n        }\n        return\
     \ result;\n    }\n};\n\n}  // namespace opt\n}  // namespace m1une\n\n\n#line\
-    \ 8 \"optimization/all.hpp\"\n\n\n"
+    \ 12 \"optimization/k_project_selection.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ opt {\n\ntemplate <class T>\nstruct KProjectSelectionResult {\n    bool feasible;\n\
+    \    T max_gain;\n    std::vector<int> values;\n\n    bool is_feasible() const\
+    \ {\n        return feasible;\n    }\n};\n\ntemplate <class T>\nclass KProjectSelection\
+    \ {\n    static_assert(std::is_integral_v<T> && std::is_signed_v<T>);\n    static_assert(sizeof(T)\
+    \ <= sizeof(long long));\n\n    using Wide = __int128_t;\n\n    std::vector<int>\
+    \ _value_counts;\n    std::vector<int> _first_threshold;\n    ProjectSelection<T>\
+    \ _binary;\n    T _constant = T();\n\n    static int threshold_count(const std::vector<int>&\
+    \ value_counts) {\n        assert(value_counts.size() <=\n               std::size_t(std::numeric_limits<int>::max()));\n\
+    \        long long count = 0;\n        for (int value_count : value_counts) {\n\
+    \            assert(value_count >= 1);\n            count += value_count - 1;\n\
+    \            assert(count <= std::numeric_limits<int>::max());\n        }\n  \
+    \      return int(count);\n    }\n\n    static std::vector<int> repeated_value_counts(\n\
+    \        int project_count,\n        int value_count\n    ) {\n        assert(project_count\
+    \ >= 0);\n        assert(value_count >= 1);\n        return std::vector<int>(project_count,\
+    \ value_count);\n    }\n\n    void assert_project(int project) const {\n     \
+    \   (void)project;\n        assert(0 <= project && project < size());\n    }\n\
+    \n    int threshold(int project, int value) const {\n        assert_project(project);\n\
+    \        (void)value;\n        assert(1 <= value && value < _value_counts[project]);\n\
+    \        return _first_threshold[project] + value - 1;\n    }\n\n    static T\
+    \ narrow(Wide value) {\n        assert(Wide(std::numeric_limits<T>::lowest())\
+    \ <= value);\n        assert(value <= Wide(std::numeric_limits<T>::max()));\n\
+    \        return T(value);\n    }\n\n    void add_constant(T gain) {\n        _constant\
+    \ = narrow(Wide(_constant) + gain);\n    }\n\n    void add_threshold_gain(int\
+    \ project, int value, Wide gain) {\n        if (gain == 0) return;\n        _binary.add_gain(threshold(project,\
+    \ value), narrow(gain));\n    }\n\n   public:\n    KProjectSelection() : KProjectSelection(std::vector<int>())\
+    \ {}\n\n    explicit KProjectSelection(std::vector<int> value_counts)\n      \
+    \  : _value_counts(std::move(value_counts)),\n          _first_threshold(_value_counts.size()),\n\
+    \          _binary(threshold_count(_value_counts)) {\n        int first = 0;\n\
+    \        for (int project = 0; project < size(); project++) {\n            _first_threshold[project]\
+    \ = first;\n            first += _value_counts[project] - 1;\n        }\n\n  \
+    \      for (int project = 0; project < size(); project++) {\n            for (int\
+    \ value = 2; value < _value_counts[project]; value++) {\n                _binary.add_hard_implication(\n\
+    \                    threshold(project, value),\n                    threshold(project,\
+    \ value - 1)\n                );\n            }\n        }\n    }\n\n    KProjectSelection(int\
+    \ project_count, int value_count)\n        : KProjectSelection(repeated_value_counts(project_count,\
+    \ value_count)) {}\n\n    int size() const {\n        return int(_value_counts.size());\n\
+    \    }\n\n    int value_count(int project) const {\n        assert_project(project);\n\
+    \        return _value_counts[project];\n    }\n\n    void add_gain(int project,\
+    \ const std::vector<T>& gains) {\n        assert_project(project);\n        assert(int(gains.size())\
+    \ == _value_counts[project]);\n        add_constant(gains[0]);\n        for (int\
+    \ value = 1; value < _value_counts[project]; value++) {\n            add_threshold_gain(\n\
+    \                project,\n                value,\n                Wide(gains[value])\
+    \ - gains[value - 1]\n            );\n        }\n    }\n\n    void add_gain(\n\
+    \        int project_a,\n        int project_b,\n        const std::vector<std::vector<T>>&\
+    \ gains\n    ) {\n        assert_project(project_a);\n        assert_project(project_b);\n\
+    \        assert(project_a != project_b);\n        const int count_a = _value_counts[project_a];\n\
+    \        const int count_b = _value_counts[project_b];\n        assert(int(gains.size())\
+    \ == count_a);\n        for (const auto& row : gains) assert(int(row.size()) ==\
+    \ count_b);\n\n        add_constant(gains[0][0]);\n        for (int value_a =\
+    \ 1; value_a < count_a; value_a++) {\n            add_threshold_gain(\n      \
+    \          project_a,\n                value_a,\n                Wide(gains[value_a][0])\
+    \ - gains[value_a - 1][0]\n            );\n        }\n        for (int value_b\
+    \ = 1; value_b < count_b; value_b++) {\n            add_threshold_gain(\n    \
+    \            project_b,\n                value_b,\n                Wide(gains[0][value_b])\
+    \ - gains[0][value_b - 1]\n            );\n        }\n\n        for (int value_a\
+    \ = 1; value_a < count_a; value_a++) {\n            for (int value_b = 1; value_b\
+    \ < count_b; value_b++) {\n                Wide mixed =\n                    Wide(gains[value_a][value_b])\n\
+    \                    - gains[value_a - 1][value_b]\n                    - gains[value_a][value_b\
+    \ - 1]\n                    + gains[value_a - 1][value_b - 1];\n             \
+    \   assert(mixed >= 0);\n                T gain = narrow(mixed);\n           \
+    \     if (gain == T()) continue;\n                int threshold_a = threshold(project_a,\
+    \ value_a);\n                int threshold_b = threshold(project_b, value_b);\n\
+    \                _binary.add_gain(threshold_a, gain);\n                _binary.add_penalty(threshold_a,\
+    \ threshold_b, gain);\n            }\n        }\n    }\n\n    void force_value(int\
+    \ project, int value) {\n        assert_project(project);\n        assert(0 <=\
+    \ value && value < _value_counts[project]);\n        force_value_at_least(project,\
+    \ value);\n        force_value_at_most(project, value);\n    }\n\n    void force_value_at_least(int\
+    \ project, int lower_bound) {\n        assert_project(project);\n        assert(0\
+    \ <= lower_bound && lower_bound < _value_counts[project]);\n        if (lower_bound\
+    \ > 0) {\n            _binary.force_selected(threshold(project, lower_bound));\n\
+    \        }\n    }\n\n    void force_value_at_most(int project, int upper_bound)\
+    \ {\n        assert_project(project);\n        assert(0 <= upper_bound && upper_bound\
+    \ < _value_counts[project]);\n        if (upper_bound + 1 < _value_counts[project])\
+    \ {\n            _binary.force_unselected(threshold(project, upper_bound + 1));\n\
+    \        }\n    }\n\n    KProjectSelectionResult<T> solve() const {\n        auto\
+    \ binary_result = _binary.solve();\n        KProjectSelectionResult<T> result;\n\
+    \        result.feasible = binary_result.feasible;\n        result.max_gain =\
+    \ T();\n        result.values.assign(size(), 0);\n        if (!result.feasible)\
+    \ return result;\n\n        result.max_gain = narrow(Wide(_constant) + binary_result.max_gain);\n\
+    \        for (int project = 0; project < size(); project++) {\n            for\
+    \ (int value = 1; value < _value_counts[project]; value++) {\n               \
+    \ if (!binary_result.selected[threshold(project, value)]) break;\n           \
+    \     result.values[project] = value;\n            }\n        }\n        return\
+    \ result;\n    }\n};\n\n}  // namespace opt\n}  // namespace m1une\n\n\n#line\
+    \ 9 \"optimization/all.hpp\"\n\n\n"
   code: '#ifndef M1UNE_OPTIMIZATION_ALL_HPP
 
     #define M1UNE_OPTIMIZATION_ALL_HPP 1
@@ -574,6 +663,8 @@ data:
     #include "hungarian.hpp"
 
     #include "integer_lp.hpp"
+
+    #include "k_project_selection.hpp"
 
     #include "project_selection.hpp"
 
@@ -587,12 +678,13 @@ data:
   - optimization/hungarian.hpp
   - optimization/integer_lp.hpp
   - optimization/simplex.hpp
+  - optimization/k_project_selection.hpp
   - optimization/project_selection.hpp
   - graph/flow/max_flow.hpp
   isVerificationFile: false
   path: optimization/all.hpp
   requiredBy: []
-  timestamp: '2026-08-04 16:49:58+09:00'
+  timestamp: '2026-08-24 01:51:31+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/optimization/project_selection.test.cpp
@@ -618,5 +710,6 @@ routines live under `convex/`.
 | --- | --- |
 | `optimization/hungarian.hpp` | Hungarian algorithm for minimum-cost and maximum-cost rectangular assignment. |
 | `optimization/integer_lp.hpp` | Branch-and-bound solver for integer linear programming in standard inequality form. |
+| `optimization/k_project_selection.hpp` | Minimum-cut solver for ordered k-valued project selection with unary and supermodular pairwise gains. |
 | `optimization/project_selection.hpp` | Minimum-cut solver for binary project selection with gains, implication penalties, and hard constraints. |
 | `optimization/simplex.hpp` | Two-phase simplex algorithm for linear programming in standard inequality form. |

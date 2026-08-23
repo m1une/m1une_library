@@ -18,6 +18,9 @@ data:
     path: optimization/all.hpp
     title: Optimization All
   - icon: ':heavy_check_mark:'
+    path: optimization/k_project_selection.hpp
+    title: K-Value Project Selection
+  - icon: ':heavy_check_mark:'
     path: optimization/project_selection.hpp
     title: Project Selection
   _extendedVerifiedWith:
@@ -48,6 +51,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/optimization/integer_lp.test.cpp
     title: verify/optimization/integer_lp.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/optimization/k_project_selection.test.cpp
+    title: verify/optimization/k_project_selection.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/optimization/project_selection.test.cpp
     title: verify/optimization/project_selection.test.cpp
@@ -392,6 +398,7 @@ data:
   - graph/flow/min_cost_flow.hpp
   - graph/flow/bounded_flow.hpp
   - optimization/project_selection.hpp
+  - optimization/k_project_selection.hpp
   - optimization/all.hpp
   timestamp: '2026-08-04 16:49:58+09:00'
   verificationStatus: LIBRARY_ALL_AC
@@ -405,6 +412,7 @@ data:
   - verify/graph/flow/max_flow.test.cpp
   - verify/graph/flow/min_cost_flow.test.cpp
   - verify/optimization/project_selection.test.cpp
+  - verify/optimization/k_project_selection.test.cpp
   - verify/optimization/integer_lp.test.cpp
   - verify/optimization/simplex.test.cpp
 documentation_of: graph/flow/max_flow.hpp
