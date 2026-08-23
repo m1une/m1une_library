@@ -18,6 +18,7 @@ Public namespaces stay flat and short: general graph helpers use
 | Header | Graph orientation | Contents |
 | --- | --- | --- |
 | `graph/graph.hpp` | Container | `Graph<T>` and `Edge<T>` adjacency-list container. |
+| `graph/dag.hpp` | Directed DAG only | Ordering, shortest and longest paths, path counts, reachability, transitive reduction, and minimum path cover. |
 | `graph/tree/all.hpp` | Tree algorithms | Euler tours, rooted-tree metadata, LCA, HLD, Mo path queries, distance frequencies, Cartesian trees, virtual trees, tree hashing, rerooting DP, static top trees, and centroid decomposition. |
 | `graph/flow/flow.hpp` | Flow networks | Max flow, min-cost flow, bounded flow, bounded min-cost flow, and Gomory-Hu trees. |
 | `graph/counting.hpp` | Counting formulas | Counts common labeled graph classes, tournaments, DAGs, and unlabeled trees by vertex number. |
@@ -37,6 +38,10 @@ Public namespaces stay flat and short: general graph helpers use
 | `graph/warshall_floyd.hpp` | Direction-respecting | All-pairs shortest paths. |
 | `graph/grid.hpp` | Undirected graph builder | Helper for converting 2D grid cells to graph vertex ids. |
 | `graph/topological_sort.hpp` | Directed only | DAG ordering and cycle check. |
+| `graph/dag_longest_path.hpp` | Directed DAG only | Maximum-cost paths from one or more sources with reconstruction. |
+| `graph/dag_path_count.hpp` | Directed DAG only | Path counts from one or more sources. |
+| `graph/dag_reachability.hpp` | Directed DAG only | Batched reachability queries and transitive reduction. |
+| `graph/dag_path_cover.hpp` | Directed DAG only | Minimum vertex-disjoint path cover. |
 | `graph/dominator_tree.hpp` | Directed rooted graph | Lengauer-Tarjan immediate dominators and dominator tree. |
 | `graph/directed_mst.hpp` | Directed rooted graph | Minimum-cost spanning arborescence with edge reconstruction. |
 | `graph/scc.hpp` | Directed only | Strongly connected components and condensation DAG. |
