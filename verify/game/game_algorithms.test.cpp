@@ -30,6 +30,46 @@ void test_nim() {
 
     std::vector<int> general = {1, 2, 3};
     assert(!m1une::game::misere_nim_first_player_wins(general));
+
+    for (int code = 0; code < 625; ++code) {
+        int remaining = code;
+        std::vector<int> heaps(4);
+        for (int& heap : heaps) {
+            heap = remaining % 5;
+            remaining /= 5;
+        }
+
+        auto ordinary_move = m1une::game::nim_winning_move(heaps);
+        assert(bool(ordinary_move) == m1une::game::nim_first_player_wins(heaps));
+        if (ordinary_move) {
+            assert(0 <= ordinary_move->heap && ordinary_move->heap < 4);
+            assert(ordinary_move->new_size < heaps[ordinary_move->heap]);
+            heaps[ordinary_move->heap] = ordinary_move->new_size;
+            assert(!m1une::game::nim_first_player_wins(heaps));
+        }
+
+        remaining = code;
+        for (int& heap : heaps) {
+            heap = remaining % 5;
+            remaining /= 5;
+        }
+        const bool has_stone = std::any_of(
+            heaps.begin(),
+            heaps.end(),
+            [](int heap) { return heap != 0; }
+        );
+        auto misere_move = m1une::game::misere_nim_winning_move(heaps);
+        assert(
+            bool(misere_move)
+            == (has_stone && m1une::game::misere_nim_first_player_wins(heaps))
+        );
+        if (misere_move) {
+            assert(0 <= misere_move->heap && misere_move->heap < 4);
+            assert(misere_move->new_size < heaps[misere_move->heap]);
+            heaps[misere_move->heap] = misere_move->new_size;
+            assert(!m1une::game::misere_nim_first_player_wins(heaps));
+        }
+    }
 }
 
 std::vector<int> naive_grundy(const std::vector<std::vector<int>>& graph) {
