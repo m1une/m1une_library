@@ -613,6 +613,9 @@ data:
     path: verify/graph/flow/min_cost_flow.test.cpp
     title: verify/graph/flow/min_cost_flow.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/functional_graph.test.cpp
+    title: verify/graph/functional_graph.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/general_weighted_matching.test.cpp
     title: verify/graph/general_weighted_matching.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1715,6 +1718,7 @@ data:
   - verify/graph/st_numbering.test.cpp
   - verify/graph/minimum_spanning_tree.test.cpp
   - verify/graph/cycle_detection.test.cpp
+  - verify/graph/functional_graph.test.cpp
   - verify/graph/shortest_path.test.cpp
   - verify/graph/dfs.test.cpp
   - verify/graph/graph_algorithms.test.cpp

@@ -790,6 +790,9 @@ data:
       path: graph/eulerian_trail.hpp
       title: Eulerian Trail
     - icon: ':heavy_check_mark:'
+      path: graph/functional_graph.hpp
+      title: Functional Graph
+    - icon: ':heavy_check_mark:'
       path: graph/general_matching.hpp
       title: General Matching
     - icon: ':heavy_check_mark:'
@@ -2108,6 +2111,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/graph/eulerian_trail_undirected.test.cpp
       title: verify/graph/eulerian_trail_undirected.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/functional_graph.test.cpp
+      title: verify/graph/functional_graph.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/graph/general_weighted_matching.test.cpp
       title: verify/graph/general_weighted_matching.test.cpp

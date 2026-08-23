@@ -110,6 +110,9 @@ data:
     path: graph/flow/min_cost_flow.hpp
     title: Min Cost Flow
   - icon: ':heavy_check_mark:'
+    path: graph/functional_graph.hpp
+    title: Functional Graph
+  - icon: ':heavy_check_mark:'
     path: graph/general_matching.hpp
     title: General Matching
   - icon: ':heavy_check_mark:'
@@ -2197,7 +2200,120 @@ data:
     \ > 0) {\n                chosen_start = vertex;\n                break;\n   \
     \         }\n        }\n    } else if (degree[chosen_start] == 0) {\n        return\
     \ std::nullopt;\n    }\n    return internal::hierholzer(graph, chosen_start, active_edge_count);\n\
-    }\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/incremental_scc.hpp\"\
+    }\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/functional_graph.hpp\"\
+    \n\n\n\n#line 10 \"graph/functional_graph.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ graph {\n\nstruct FunctionalGraph {\n    int component_count;\n    std::vector<int>\
+    \ successor;\n    std::vector<std::vector<int>> predecessors;\n    std::vector<std::vector<int>>\
+    \ cycles;\n    std::vector<int> component;\n    std::vector<int> component_size;\n\
+    \    std::vector<int> cycle_entry;\n    std::vector<int> cycle_position;\n   \
+    \ std::vector<int> distance_to_cycle;\n\n   private:\n    std::vector<std::vector<int>>\
+    \ _up;\n\n    void check_vertex(int vertex) const {\n        assert(0 <= vertex\
+    \ && vertex < size());\n    }\n\n    int advance_before_cycle(int vertex, int\
+    \ steps) const {\n        assert(0 <= steps && steps <= distance_to_cycle[vertex]);\n\
+    \        int bit = 0;\n        while (steps > 0) {\n            if (steps & 1)\
+    \ vertex = _up[bit][vertex];\n            steps >>= 1;\n            bit++;\n \
+    \       }\n        return vertex;\n    }\n\n   public:\n    FunctionalGraph()\
+    \ : component_count(0) {}\n\n    explicit FunctionalGraph(const std::vector<int>&\
+    \ successor_) {\n        build(successor_);\n    }\n\n    void build(const std::vector<int>&\
+    \ successor_) {\n        successor = successor_;\n        const int n = size();\n\
+    \        for (int to : successor) assert(0 <= to && to < n);\n\n        component_count\
+    \ = 0;\n        predecessors.assign(n, {});\n        cycles.clear();\n       \
+    \ component.assign(n, -1);\n        cycle_entry.assign(n, -1);\n        cycle_position.assign(n,\
+    \ -1);\n        distance_to_cycle.assign(n, -1);\n\n        std::vector<int> indegree(n,\
+    \ 0);\n        for (int vertex = 0; vertex < n; vertex++) {\n            predecessors[successor[vertex]].push_back(vertex);\n\
+    \            indegree[successor[vertex]]++;\n        }\n\n        std::queue<int>\
+    \ queue;\n        std::vector<char> removed(n, false);\n        for (int vertex\
+    \ = 0; vertex < n; vertex++) {\n            if (indegree[vertex] == 0) queue.push(vertex);\n\
+    \        }\n        while (!queue.empty()) {\n            const int vertex = queue.front();\n\
+    \            queue.pop();\n            removed[vertex] = true;\n            const\
+    \ int to = successor[vertex];\n            indegree[to]--;\n            if (indegree[to]\
+    \ == 0) queue.push(to);\n        }\n\n        for (int start = 0; start < n; start++)\
+    \ {\n            if (removed[start] || component[start] != -1) continue;\n   \
+    \         const int component_id = int(cycles.size());\n            std::vector<int>\
+    \ cycle;\n            int vertex = start;\n            do {\n                const\
+    \ int position = int(cycle.size());\n                cycle.push_back(vertex);\n\
+    \                component[vertex] = component_id;\n                cycle_entry[vertex]\
+    \ = vertex;\n                cycle_position[vertex] = position;\n            \
+    \    distance_to_cycle[vertex] = 0;\n                vertex = successor[vertex];\n\
+    \            } while (vertex != start);\n            cycles.push_back(std::move(cycle));\n\
+    \        }\n        component_count = int(cycles.size());\n\n        for (const\
+    \ std::vector<int>& cycle : cycles) {\n            for (int vertex : cycle) queue.push(vertex);\n\
+    \        }\n        while (!queue.empty()) {\n            const int vertex = queue.front();\n\
+    \            queue.pop();\n            for (int from : predecessors[vertex]) {\n\
+    \                if (component[from] != -1) continue;\n                component[from]\
+    \ = component[vertex];\n                cycle_entry[from] = cycle_entry[vertex];\n\
+    \                cycle_position[from] = cycle_position[vertex];\n            \
+    \    distance_to_cycle[from] = distance_to_cycle[vertex] + 1;\n              \
+    \  queue.push(from);\n            }\n        }\n\n        component_size.assign(component_count,\
+    \ 0);\n        for (int component_id : component) component_size[component_id]++;\n\
+    \n        int log = 1;\n        while ((std::uint64_t(1) << log) <= std::uint64_t(n))\
+    \ log++;\n        _up.assign(log, successor);\n        for (int bit = 1; bit <\
+    \ log; bit++) {\n            for (int vertex = 0; vertex < n; vertex++) {\n  \
+    \              _up[bit][vertex] = _up[bit - 1][_up[bit - 1][vertex]];\n      \
+    \      }\n        }\n    }\n\n    int size() const {\n        return int(successor.size());\n\
+    \    }\n\n    bool empty() const {\n        return successor.empty();\n    }\n\
+    \n    bool same_component(int first, int second) const {\n        check_vertex(first);\n\
+    \        check_vertex(second);\n        return component[first] == component[second];\n\
+    \    }\n\n    bool on_cycle(int vertex) const {\n        check_vertex(vertex);\n\
+    \        return distance_to_cycle[vertex] == 0;\n    }\n\n    int cycle_size(int\
+    \ vertex) const {\n        check_vertex(vertex);\n        return int(cycles[component[vertex]].size());\n\
+    \    }\n\n    int orbit_size(int vertex) const {\n        check_vertex(vertex);\n\
+    \        return distance_to_cycle[vertex] + cycle_size(vertex);\n    }\n\n   \
+    \ int jump(int vertex, std::uint64_t steps) const {\n        check_vertex(vertex);\n\
+    \        const int tail_length = distance_to_cycle[vertex];\n        if (steps\
+    \ < std::uint64_t(tail_length)) {\n            return advance_before_cycle(vertex,\
+    \ int(steps));\n        }\n\n        steps -= std::uint64_t(tail_length);\n  \
+    \      const int entry = cycle_entry[vertex];\n        const int length = cycle_size(entry);\n\
+    \        const int offset = int(steps % std::uint64_t(length));\n        const\
+    \ int position = (cycle_position[entry] + offset) % length;\n        return cycles[component[vertex]][position];\n\
+    \    }\n\n    long long distance(int from, int to) const {\n        check_vertex(from);\n\
+    \        check_vertex(to);\n        if (!same_component(from, to)) return -1;\n\
+    \n        if (!on_cycle(to)) {\n            if (distance_to_cycle[from] < distance_to_cycle[to])\
+    \ return -1;\n            const int difference = distance_to_cycle[from] - distance_to_cycle[to];\n\
+    \            return advance_before_cycle(from, difference) == to ? difference\
+    \ : -1;\n        }\n\n        const int entry = cycle_entry[from];\n        const\
+    \ int length = cycle_size(from);\n        int cycle_distance = cycle_position[to]\
+    \ - cycle_position[entry];\n        if (cycle_distance < 0) cycle_distance +=\
+    \ length;\n        return static_cast<long long>(distance_to_cycle[from]) + cycle_distance;\n\
+    \    }\n\n    bool reachable(int from, int to) const {\n        return distance(from,\
+    \ to) != -1;\n    }\n\n    std::vector<int> path(int from, int to) const {\n \
+    \       const long long path_length = distance(from, to);\n        if (path_length\
+    \ == -1) return {};\n\n        std::vector<int> result;\n        result.reserve(path_length\
+    \ + 1);\n        for (long long step = 0; step <= path_length; step++) {\n   \
+    \         result.push_back(from);\n            from = successor[from];\n     \
+    \   }\n        return result;\n    }\n\n    std::vector<int> orbit(int vertex)\
+    \ const {\n        check_vertex(vertex);\n        const int length = orbit_size(vertex);\n\
+    \        std::vector<int> result;\n        result.reserve(length);\n        for\
+    \ (int step = 0; step < length; step++) {\n            result.push_back(vertex);\n\
+    \            vertex = successor[vertex];\n        }\n        return result;\n\
+    \    }\n\n    std::uint64_t visit_count(\n        int from,\n        int to,\n\
+    \        std::uint64_t step_count\n    ) const {\n        const long long first_visit\
+    \ = distance(from, to);\n        if (first_visit == -1 ||\n            std::uint64_t(first_visit)\
+    \ >= step_count) {\n            return 0;\n        }\n        if (!on_cycle(to))\
+    \ return 1;\n\n        const std::uint64_t remaining =\n            step_count\
+    \ - 1 - std::uint64_t(first_visit);\n        return 1 + remaining / std::uint64_t(cycle_size(to));\n\
+    \    }\n\n    long long first_meeting_time(int first, int second) const {\n  \
+    \      check_vertex(first);\n        check_vertex(second);\n        if (!same_component(first,\
+    \ second)) return -1;\n        if (first == second) return 0;\n\n        const\
+    \ int first_depth = distance_to_cycle[first];\n        const int second_depth\
+    \ = distance_to_cycle[second];\n        if (first_depth == second_depth &&\n \
+    \           cycle_entry[first] == cycle_entry[second]) {\n            int elapsed\
+    \ = 0;\n            for (int bit = int(_up.size()) - 1; bit >= 0; bit--) {\n \
+    \               const int steps = 1 << bit;\n                if (first_depth -\
+    \ elapsed < steps) continue;\n                const int next_first = _up[bit][first];\n\
+    \                const int next_second = _up[bit][second];\n                if\
+    \ (next_first == next_second) continue;\n                first = next_first;\n\
+    \                second = next_second;\n                elapsed += steps;\n  \
+    \          }\n            return elapsed + 1;\n        }\n\n        const int\
+    \ length = cycle_size(first);\n        int first_phase =\n            cycle_position[first]\
+    \ - first_depth % length;\n        int second_phase =\n            cycle_position[second]\
+    \ - second_depth % length;\n        if (first_phase < 0) first_phase += length;\n\
+    \        if (second_phase < 0) second_phase += length;\n        if (first_phase\
+    \ != second_phase) return -1;\n        return std::max(first_depth, second_depth);\n\
+    \    }\n\n    int first_meeting_vertex(int first, int second) const {\n      \
+    \  const long long time = first_meeting_time(first, second);\n        if (time\
+    \ == -1) return -1;\n        return jump(first, std::uint64_t(time));\n    }\n\
+    };\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 1 \"graph/incremental_scc.hpp\"\
     \n\n\n\n#line 9 \"graph/incremental_scc.hpp\"\n\n#line 11 \"graph/incremental_scc.hpp\"\
     \n\nnamespace m1une {\nnamespace graph {\n\nnamespace incremental_scc_detail {\n\
     \nstruct EdgeEvent {\n    int id;\n    int from;\n    int to;\n};\n\ninline std::vector<int>\
@@ -3012,7 +3128,7 @@ data:
     \    assert(_solved && _satisfiable);\n        return _answer;\n    }\n\n    bool\
     \ value(int variable) const {\n        assert(_solved && _satisfiable);\n    \
     \    assert(0 <= variable && variable < _n);\n        return _answer[variable];\n\
-    \    }\n};\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 15 \"graph/directed.hpp\"\
+    \    }\n};\n\n}  // namespace graph\n}  // namespace m1une\n\n\n#line 16 \"graph/directed.hpp\"\
     \n\n\n#line 1 \"graph/dominator_tree.hpp\"\n\n\n\n#line 7 \"graph/dominator_tree.hpp\"\
     \n\n#line 9 \"graph/dominator_tree.hpp\"\n\nnamespace m1une {\nnamespace graph\
     \ {\n\nstruct DominatorTree {\n    int root;\n    std::vector<int> immediate_dominator;\n\
@@ -7727,6 +7843,7 @@ data:
   - graph/dfs.hpp
   - graph/directed_mst.hpp
   - graph/eulerian_trail.hpp
+  - graph/functional_graph.hpp
   - graph/incremental_scc.hpp
   - graph/matrix_tree_theorem.hpp
   - math/matrix/linear_algebra.hpp
@@ -7802,7 +7919,7 @@ data:
   isVerificationFile: false
   path: graph/all.hpp
   requiredBy: []
-  timestamp: '2026-08-24 00:41:13+09:00'
+  timestamp: '2026-08-24 02:34:24+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
@@ -7856,6 +7973,7 @@ Public namespaces stay flat and short: general graph helpers use
 | `graph/directed_mst.hpp` | Directed rooted graph | Minimum-cost spanning arborescence with edge reconstruction. |
 | `graph/scc.hpp` | Directed only | Strongly connected components and condensation DAG. |
 | `graph/incremental_scc.hpp` | Directed only | Offline SCC merge times under edge insertions. |
+| `graph/functional_graph.hpp` | One successor per vertex | Cycle decomposition, large jumps, paths and orbits, visit counts, reachability distances, and synchronized meetings. |
 | `graph/two_sat.hpp` | Implication graph | 2-SAT clauses, satisfiability, and one assignment. |
 | `graph/lowlink.hpp` | Undirected only | Articulation points and bridges. |
 | `graph/biconnected_components.hpp` | Undirected only | Vertex-biconnected blocks, articulation points, and block incidence. |
