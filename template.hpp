@@ -16,6 +16,9 @@ inline utilities::FastInput& input() {
 }
 
 inline utilities::FastOutput& output() {
+    if (auto* instance = utilities::internal::standard_output_instance) {
+        return *instance;
+    }
     static utilities::FastOutput instance;
     return instance;
 }

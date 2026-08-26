@@ -19,7 +19,13 @@
 
 namespace m1une {
 namespace utilities {
+
+struct FastOutput;
+
 namespace internal {
+
+// Shared with the convenience helpers in template.hpp.
+inline FastOutput* standard_output_instance = nullptr;
 
 // Detect std::begin(x), std::end(x).
 template <class T, class = void>
@@ -455,13 +461,21 @@ struct FastOutput {
           _position(0),
           _precision(6),
           _float_format(std::chars_format::general),
-          _range_separator(' ') {}
+          _range_separator(' ') {
+        if (_stream == stdout
+            && internal::standard_output_instance == nullptr) {
+            internal::standard_output_instance = this;
+        }
+    }
 
     FastOutput(const FastOutput&) = delete;
     FastOutput& operator=(const FastOutput&) = delete;
 
     ~FastOutput() {
         flush();
+        if (internal::standard_output_instance == this) {
+            internal::standard_output_instance = nullptr;
+        }
     }
 
     void flush() {

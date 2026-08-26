@@ -9,6 +9,7 @@
 #include <vector>
 
 std::FILE* helper_output = std::tmpfile();
+m1une::utilities::FastOutput fastout;
 
 void test_output_helpers() {
     assert(helper_output != nullptr);
@@ -27,6 +28,10 @@ void test_output_helpers() {
 
     const std::pair<int, int> edge(6, 7);
     print(edge);
+
+    fastout.set_fixed(20);
+    print(1.25, -0.5);
+    fastout.set_general();
 
     m1une::template_io::output().set_range_separator('\n');
     print(values);
@@ -51,7 +56,8 @@ void test_output_helpers() {
     const std::string result(buffer, buffer + length);
     assert(
         result
-        == "\n1 two\n3 4 5\n6 7\n3\n4\n5\n"
+        == "\n1 two\n3 4 5\n6 7\n"
+           "1.25000000000000000000 -0.50000000000000000000\n3\n4\n5\n"
            "YES\nNO\nYes\nNo\nYES\nNO\nYes\nNo\n"
     );
 }

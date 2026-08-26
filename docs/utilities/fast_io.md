@@ -135,6 +135,18 @@ after every query in an interactive problem. Otherwise, call `flush()` only
 when the output must become visible immediately. `flush()` drains both the
 `FastOutput` buffer and the underlying C stream buffer.
 
+When `template.hpp` is used, its `print(...)` helpers reuse a `FastOutput`
+already constructed for `stdout`. Consequently, formatting configured through
+that object also applies to `print(...)`:
+
+```cpp
+FastOutput fastout;
+fastout.set_fixed(20);
+print(1.25);  // 1.25000000000000000000
+```
+
+If no such object exists, the helpers create and reuse their own `FastOutput`.
+
 ## Example
 
 ```cpp
