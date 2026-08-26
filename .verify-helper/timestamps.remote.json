@@ -390,5 +390,5 @@
 "verify/utilities/random_generators.test.cpp": "2026-07-18 22:54:37 +0900",
 "verify/utilities/random_testing.test.cpp": "2026-08-11 14:24:35 +0900",
 "verify/utilities/shifted_array.test.cpp": "2026-07-18 22:54:37 +0900",
-"verify/utilities/template_fast_io.test.cpp": "2026-07-18 22:54:37 +0900"
+"verify/utilities/template_fast_io.test.cpp": "2026-08-26 23:07:16 +0900"
 }
