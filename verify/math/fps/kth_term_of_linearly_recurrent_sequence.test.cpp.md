@@ -42,10 +42,12 @@ data:
     #include <cstddef>\n#include <cstdio>\n#include <cstdlib>\n#line 12 \"utilities/fast_io.hpp\"\
     \n#include <cstring>\n#include <iterator>\n#include <string>\n#include <sys/stat.h>\n\
     #include <type_traits>\n#include <utility>\n#include <unistd.h>\n\nnamespace m1une\
-    \ {\nnamespace utilities {\nnamespace internal {\n\n// Detect std::begin(x), std::end(x).\n\
-    template <class T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate\
-    \ <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
-    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
+    \ {\nnamespace utilities {\n\nstruct FastOutput;\n\nnamespace internal {\n\n//\
+    \ Shared with the convenience helpers in template.hpp.\ninline FastOutput* standard_output_instance\
+    \ = nullptr;\n\n// Detect std::begin(x), std::end(x).\ntemplate <class T, class\
+    \ = void>\nstruct is_range : std::false_type {};\n\ntemplate <class T>\nstruct\
+    \ is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n  \
+    \  decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
     \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
     \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
@@ -211,22 +213,25 @@ data:
     \    char _range_separator;\n\n   public:\n    explicit FastOutput(std::FILE*\
     \ stream = stdout)\n        : _stream(stream),\n          _position(0),\n    \
     \      _precision(6),\n          _float_format(std::chars_format::general),\n\
-    \          _range_separator(' ') {}\n\n    FastOutput(const FastOutput&) = delete;\n\
-    \    FastOutput& operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n\
-    \        flush();\n    }\n\n    void flush() {\n        if (_position != 0) {\n\
-    \            std::fwrite(_buffer, 1, _position, _stream);\n            _position\
-    \ = 0;\n        }\n        std::fflush(_stream);\n    }\n\n    void write_char(char\
-    \ c) {\n        if (_position == buffer_size) flush();\n        _buffer[_position++]\
-    \ = c;\n    }\n\n    void write(const char* s) {\n        while (*s != '\\0')\
-    \ write_char(*s++);\n    }\n\n    void write(const std::string& s) {\n       \
-    \ std::size_t position = 0;\n        while (position < s.size()) {\n         \
-    \   if (_position == buffer_size) flush();\n            const std::size_t copied\
-    \ =\n                std::min<std::size_t>(buffer_size - _position, s.size() -\
-    \ position);\n            std::memcpy(_buffer + _position, s.data() + position,\
-    \ copied);\n            _position += int(copied);\n            position += copied;\n\
-    \        }\n    }\n\n    void write(char c) {\n        write_char(c);\n    }\n\
-    \n    void write(bool value) {\n        write_char(value ? '1' : '0');\n    }\n\
-    \n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>>\n\
+    \          _range_separator(' ') {\n        if (_stream == stdout\n          \
+    \  && internal::standard_output_instance == nullptr) {\n            internal::standard_output_instance\
+    \ = this;\n        }\n    }\n\n    FastOutput(const FastOutput&) = delete;\n \
+    \   FastOutput& operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n\
+    \        flush();\n        if (internal::standard_output_instance == this) {\n\
+    \            internal::standard_output_instance = nullptr;\n        }\n    }\n\
+    \n    void flush() {\n        if (_position != 0) {\n            std::fwrite(_buffer,\
+    \ 1, _position, _stream);\n            _position = 0;\n        }\n        std::fflush(_stream);\n\
+    \    }\n\n    void write_char(char c) {\n        if (_position == buffer_size)\
+    \ flush();\n        _buffer[_position++] = c;\n    }\n\n    void write(const char*\
+    \ s) {\n        while (*s != '\\0') write_char(*s++);\n    }\n\n    void write(const\
+    \ std::string& s) {\n        std::size_t position = 0;\n        while (position\
+    \ < s.size()) {\n            if (_position == buffer_size) flush();\n        \
+    \    const std::size_t copied =\n                std::min<std::size_t>(buffer_size\
+    \ - _position, s.size() - position);\n            std::memcpy(_buffer + _position,\
+    \ s.data() + position, copied);\n            _position += int(copied);\n     \
+    \       position += copied;\n        }\n    }\n\n    void write(char c) {\n  \
+    \      write_char(c);\n    }\n\n    void write(bool value) {\n        write_char(value\
+    \ ? '1' : '0');\n    }\n\n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>>\n\
     \    write(T value) {\n        char digits[128];\n        auto [end, error] =\
     \ std::to_chars(\n            digits,\n            digits + sizeof(digits),\n\
     \            value,\n            _float_format,\n            _precision\n    \
@@ -1173,7 +1178,7 @@ data:
   isVerificationFile: true
   path: verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp
   requiredBy: []
-  timestamp: '2026-08-10 17:30:05+09:00'
+  timestamp: '2026-08-26 23:16:21+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/math/fps/kth_term_of_linearly_recurrent_sequence.test.cpp

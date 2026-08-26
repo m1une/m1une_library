@@ -22,12 +22,14 @@ data:
     \n#include <bits/stdc++.h>\n#line 6 \"template.hpp\"\n\n#line 1 \"utilities/fast_io.hpp\"\
     \n\n\n\n#line 7 \"utilities/fast_io.hpp\"\n#include <charconv>\n#line 15 \"utilities/fast_io.hpp\"\
     \n#include <sys/stat.h>\n#include <type_traits>\n#line 18 \"utilities/fast_io.hpp\"\
-    \n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal\
-    \ {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\n\
-    struct is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T,\
-    \ std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
-    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
-    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    \n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\n\nstruct FastOutput;\n\
+    \nnamespace internal {\n\n// Shared with the convenience helpers in template.hpp.\n\
+    inline FastOutput* standard_output_instance = nullptr;\n\n// Detect std::begin(x),\
+    \ std::end(x).\ntemplate <class T, class = void>\nstruct is_range : std::false_type\
+    \ {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
+    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
+    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
     \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
     \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
@@ -191,22 +193,25 @@ data:
     \    char _range_separator;\n\n   public:\n    explicit FastOutput(std::FILE*\
     \ stream = stdout)\n        : _stream(stream),\n          _position(0),\n    \
     \      _precision(6),\n          _float_format(std::chars_format::general),\n\
-    \          _range_separator(' ') {}\n\n    FastOutput(const FastOutput&) = delete;\n\
-    \    FastOutput& operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n\
-    \        flush();\n    }\n\n    void flush() {\n        if (_position != 0) {\n\
-    \            std::fwrite(_buffer, 1, _position, _stream);\n            _position\
-    \ = 0;\n        }\n        std::fflush(_stream);\n    }\n\n    void write_char(char\
-    \ c) {\n        if (_position == buffer_size) flush();\n        _buffer[_position++]\
-    \ = c;\n    }\n\n    void write(const char* s) {\n        while (*s != '\\0')\
-    \ write_char(*s++);\n    }\n\n    void write(const std::string& s) {\n       \
-    \ std::size_t position = 0;\n        while (position < s.size()) {\n         \
-    \   if (_position == buffer_size) flush();\n            const std::size_t copied\
-    \ =\n                std::min<std::size_t>(buffer_size - _position, s.size() -\
-    \ position);\n            std::memcpy(_buffer + _position, s.data() + position,\
-    \ copied);\n            _position += int(copied);\n            position += copied;\n\
-    \        }\n    }\n\n    void write(char c) {\n        write_char(c);\n    }\n\
-    \n    void write(bool value) {\n        write_char(value ? '1' : '0');\n    }\n\
-    \n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>>\n\
+    \          _range_separator(' ') {\n        if (_stream == stdout\n          \
+    \  && internal::standard_output_instance == nullptr) {\n            internal::standard_output_instance\
+    \ = this;\n        }\n    }\n\n    FastOutput(const FastOutput&) = delete;\n \
+    \   FastOutput& operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n\
+    \        flush();\n        if (internal::standard_output_instance == this) {\n\
+    \            internal::standard_output_instance = nullptr;\n        }\n    }\n\
+    \n    void flush() {\n        if (_position != 0) {\n            std::fwrite(_buffer,\
+    \ 1, _position, _stream);\n            _position = 0;\n        }\n        std::fflush(_stream);\n\
+    \    }\n\n    void write_char(char c) {\n        if (_position == buffer_size)\
+    \ flush();\n        _buffer[_position++] = c;\n    }\n\n    void write(const char*\
+    \ s) {\n        while (*s != '\\0') write_char(*s++);\n    }\n\n    void write(const\
+    \ std::string& s) {\n        std::size_t position = 0;\n        while (position\
+    \ < s.size()) {\n            if (_position == buffer_size) flush();\n        \
+    \    const std::size_t copied =\n                std::min<std::size_t>(buffer_size\
+    \ - _position, s.size() - position);\n            std::memcpy(_buffer + _position,\
+    \ s.data() + position, copied);\n            _position += int(copied);\n     \
+    \       position += copied;\n        }\n    }\n\n    void write(char c) {\n  \
+    \      write_char(c);\n    }\n\n    void write(bool value) {\n        write_char(value\
+    \ ? '1' : '0');\n    }\n\n    template <class T>\n    std::enable_if_t<std::is_floating_point_v<T>>\n\
     \    write(T value) {\n        char digits[128];\n        auto [end, error] =\
     \ std::to_chars(\n            digits,\n            digits + sizeof(digits),\n\
     \            value,\n            _float_format,\n            _precision\n    \
@@ -262,18 +267,19 @@ data:
     \ utilities\n}  // namespace m1une\n\n\n#line 8 \"template.hpp\"\nusing namespace\
     \ std;\n\nnamespace m1une {\nnamespace template_io {\n\ninline utilities::FastInput&\
     \ input() {\n    static utilities::FastInput instance;\n    return instance;\n\
-    }\n\ninline utilities::FastOutput& output() {\n    static utilities::FastOutput\
-    \ instance;\n    return instance;\n}\n\n}  // namespace template_io\n}  // namespace\
-    \ m1une\n\nusing ll = long long;\nusing u32 = unsigned int;\nusing u64 = unsigned\
-    \ long long;\nusing i128 = __int128;\nusing u128 = unsigned __int128;\n#ifdef\
-    \ __SIZEOF_FLOAT128__\nusing f128 = __float128;\n#endif\n\ntemplate <class T>\n\
-    constexpr T infty = 0;\ntemplate <>\nconstexpr int infty<int> = 1'000'000'000;\n\
-    template <>\nconstexpr ll infty<ll> = ll(infty<int>) * infty<int> * 2;\ntemplate\
-    \ <>\nconstexpr u32 infty<u32> = infty<int>;\ntemplate <>\nconstexpr u64 infty<u64>\
-    \ = infty<ll>;\ntemplate <>\nconstexpr i128 infty<i128> = i128(infty<ll>) * infty<ll>;\n\
-    template <>\nconstexpr double infty<double> = infty<ll>;\ntemplate <>\nconstexpr\
-    \ long double infty<long double> = infty<ll>;\n\nusing pi = pair<int, int>;\n\
-    using pl = pair<ll, ll>;\nusing vi = vector<int>;\nusing vl = vector<ll>;\ntemplate\
+    }\n\ninline utilities::FastOutput& output() {\n    if (auto* instance = utilities::internal::standard_output_instance)\
+    \ {\n        return *instance;\n    }\n    static utilities::FastOutput instance;\n\
+    \    return instance;\n}\n\n}  // namespace template_io\n}  // namespace m1une\n\
+    \nusing ll = long long;\nusing u32 = unsigned int;\nusing u64 = unsigned long\
+    \ long;\nusing i128 = __int128;\nusing u128 = unsigned __int128;\n#ifdef __SIZEOF_FLOAT128__\n\
+    using f128 = __float128;\n#endif\n\ntemplate <class T>\nconstexpr T infty = 0;\n\
+    template <>\nconstexpr int infty<int> = 1'000'000'000;\ntemplate <>\nconstexpr\
+    \ ll infty<ll> = ll(infty<int>) * infty<int> * 2;\ntemplate <>\nconstexpr u32\
+    \ infty<u32> = infty<int>;\ntemplate <>\nconstexpr u64 infty<u64> = infty<ll>;\n\
+    template <>\nconstexpr i128 infty<i128> = i128(infty<ll>) * infty<ll>;\ntemplate\
+    \ <>\nconstexpr double infty<double> = infty<ll>;\ntemplate <>\nconstexpr long\
+    \ double infty<long double> = infty<ll>;\n\nusing pi = pair<int, int>;\nusing\
+    \ pl = pair<ll, ll>;\nusing vi = vector<int>;\nusing vl = vector<ll>;\ntemplate\
     \ <class T>\nusing vc = vector<T>;\ntemplate <class T>\nusing vvc = vector<vc<T>>;\n\
     using vvi = vvc<int>;\nusing vvl = vvc<ll>;\ntemplate <class T>\nusing vvvc =\
     \ vector<vvc<T>>;\ntemplate <class T>\nusing vvvvc = vector<vvvc<T>>;\ntemplate\
@@ -359,12 +365,35 @@ data:
     void Yes() {\n    m1une::template_io::output().println(\"Yes\");\n}\nvoid No()\
     \ {\n    m1une::template_io::output().println(\"No\");\n}\n\n#line 4 \"verify/utilities/template_fast_io.test.cpp\"\
     \n\n#line 10 \"verify/utilities/template_fast_io.test.cpp\"\n\nstd::FILE* helper_output\
-    \ = std::tmpfile();\n\nvoid test_output_helpers() {\n    assert(helper_output\
+    \ = std::tmpfile();\nm1une::utilities::FastOutput fastout;\n\nvoid test_output_helpers()\
+    \ {\n    assert(helper_output != nullptr);\n    const int saved_stdout = ::dup(::fileno(stdout));\n\
+    \    assert(saved_stdout != -1);\n    assert(::dup2(::fileno(helper_output), ::fileno(stdout))\
+    \ != -1);\n\n    print();\n    print(1, \"two\");\n\n    std::vector<int> values(3);\n\
+    \    values[0] = 3;\n    values[1] = 4;\n    values[2] = 5;\n    print(values);\n\
+    \n    const std::pair<int, int> edge(6, 7);\n    print(edge);\n\n    fastout.set_fixed(20);\n\
+    \    print(1.25, -0.5);\n    fastout.set_general();\n\n    m1une::template_io::output().set_range_separator('\\\
+    n');\n    print(values);\n    m1une::template_io::output().set_range_separator('\
+    \ ');\n\n    YESNO(true);\n    YESNO(false);\n    YesNo(true);\n    YesNo(false);\n\
+    \    YES();\n    NO();\n    Yes();\n    No();\n    m1une::template_io::output().flush();\n\
+    \    std::fflush(stdout);\n    assert(::dup2(saved_stdout, ::fileno(stdout)) !=\
+    \ -1);\n    ::close(saved_stdout);\n\n    std::rewind(helper_output);\n    char\
+    \ buffer[128];\n    const std::size_t length = std::fread(buffer, 1, sizeof(buffer),\
+    \ helper_output);\n    const std::string result(buffer, buffer + length);\n  \
+    \  assert(\n        result\n        == \"\\n1 two\\n3 4 5\\n6 7\\n\"\n       \
+    \    \"1.25000000000000000000 -0.50000000000000000000\\n3\\n4\\n5\\n\"\n     \
+    \      \"YES\\nNO\\nYes\\nNo\\nYES\\nNO\\nYes\\nNo\\n\"\n    );\n}\n\nint main()\
+    \ {\n    test_output_helpers();\n\n    long long a, b;\n    std::scanf(\"%lld%lld\"\
+    , &a, &b);\n    print(a + b);\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
+    ../../template.hpp\"\n\n#include <cassert>\n#include <cstdio>\n#include <string>\n\
+    #include <unistd.h>\n#include <vector>\n\nstd::FILE* helper_output = std::tmpfile();\n\
+    m1une::utilities::FastOutput fastout;\n\nvoid test_output_helpers() {\n    assert(helper_output\
     \ != nullptr);\n    const int saved_stdout = ::dup(::fileno(stdout));\n    assert(saved_stdout\
     \ != -1);\n    assert(::dup2(::fileno(helper_output), ::fileno(stdout)) != -1);\n\
     \n    print();\n    print(1, \"two\");\n\n    std::vector<int> values(3);\n  \
     \  values[0] = 3;\n    values[1] = 4;\n    values[2] = 5;\n    print(values);\n\
-    \n    const std::pair<int, int> edge(6, 7);\n    print(edge);\n\n    m1une::template_io::output().set_range_separator('\\\
+    \n    const std::pair<int, int> edge(6, 7);\n    print(edge);\n\n    fastout.set_fixed(20);\n\
+    \    print(1.25, -0.5);\n    fastout.set_general();\n\n    m1une::template_io::output().set_range_separator('\\\
     n');\n    print(values);\n    m1une::template_io::output().set_range_separator('\
     \ ');\n\n    YESNO(true);\n    YESNO(false);\n    YesNo(true);\n    YesNo(false);\n\
     \    YES();\n    NO();\n    Yes();\n    No();\n    m1une::template_io::output().flush();\n\
@@ -372,37 +401,18 @@ data:
     \ -1);\n    ::close(saved_stdout);\n\n    std::rewind(helper_output);\n    char\
     \ buffer[128];\n    const std::size_t length = std::fread(buffer, 1, sizeof(buffer),\
     \ helper_output);\n    const std::string result(buffer, buffer + length);\n  \
-    \  assert(\n        result\n        == \"\\n1 two\\n3 4 5\\n6 7\\n3\\n4\\n5\\\
-    n\"\n           \"YES\\nNO\\nYes\\nNo\\nYES\\nNO\\nYes\\nNo\\n\"\n    );\n}\n\n\
-    int main() {\n    test_output_helpers();\n\n    long long a, b;\n    std::scanf(\"\
-    %lld%lld\", &a, &b);\n    print(a + b);\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
-    ../../template.hpp\"\n\n#include <cassert>\n#include <cstdio>\n#include <string>\n\
-    #include <unistd.h>\n#include <vector>\n\nstd::FILE* helper_output = std::tmpfile();\n\
-    \nvoid test_output_helpers() {\n    assert(helper_output != nullptr);\n    const\
-    \ int saved_stdout = ::dup(::fileno(stdout));\n    assert(saved_stdout != -1);\n\
-    \    assert(::dup2(::fileno(helper_output), ::fileno(stdout)) != -1);\n\n    print();\n\
-    \    print(1, \"two\");\n\n    std::vector<int> values(3);\n    values[0] = 3;\n\
-    \    values[1] = 4;\n    values[2] = 5;\n    print(values);\n\n    const std::pair<int,\
-    \ int> edge(6, 7);\n    print(edge);\n\n    m1une::template_io::output().set_range_separator('\\\
-    n');\n    print(values);\n    m1une::template_io::output().set_range_separator('\
-    \ ');\n\n    YESNO(true);\n    YESNO(false);\n    YesNo(true);\n    YesNo(false);\n\
-    \    YES();\n    NO();\n    Yes();\n    No();\n    m1une::template_io::output().flush();\n\
-    \    std::fflush(stdout);\n    assert(::dup2(saved_stdout, ::fileno(stdout)) !=\
-    \ -1);\n    ::close(saved_stdout);\n\n    std::rewind(helper_output);\n    char\
-    \ buffer[128];\n    const std::size_t length = std::fread(buffer, 1, sizeof(buffer),\
-    \ helper_output);\n    const std::string result(buffer, buffer + length);\n  \
-    \  assert(\n        result\n        == \"\\n1 two\\n3 4 5\\n6 7\\n3\\n4\\n5\\\
-    n\"\n           \"YES\\nNO\\nYes\\nNo\\nYES\\nNO\\nYes\\nNo\\n\"\n    );\n}\n\n\
-    int main() {\n    test_output_helpers();\n\n    long long a, b;\n    std::scanf(\"\
-    %lld%lld\", &a, &b);\n    print(a + b);\n}\n"
+    \  assert(\n        result\n        == \"\\n1 two\\n3 4 5\\n6 7\\n\"\n       \
+    \    \"1.25000000000000000000 -0.50000000000000000000\\n3\\n4\\n5\\n\"\n     \
+    \      \"YES\\nNO\\nYes\\nNo\\nYES\\nNO\\nYes\\nNo\\n\"\n    );\n}\n\nint main()\
+    \ {\n    test_output_helpers();\n\n    long long a, b;\n    std::scanf(\"%lld%lld\"\
+    , &a, &b);\n    print(a + b);\n}\n"
   dependsOn:
   - template.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
   path: verify/utilities/template_fast_io.test.cpp
   requiredBy: []
-  timestamp: '2026-08-26 23:07:16+09:00'
+  timestamp: '2026-08-26 23:16:21+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/utilities/template_fast_io.test.cpp
