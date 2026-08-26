@@ -20,36 +20,14 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"template.hpp\"\n\n\n\n#include <algorithm>\n#include <any>\n\
-    #include <array>\n#include <atomic>\n#include <barrier>\n#include <bit>\n#include\
-    \ <bitset>\n#include <cassert>\n#include <cctype>\n#include <cerrno>\n#include\
-    \ <cfenv>\n#include <cfloat>\n#include <charconv>\n#include <chrono>\n#include\
-    \ <cinttypes>\n#include <climits>\n#include <clocale>\n#include <cmath>\n#include\
-    \ <codecvt>\n#include <compare>\n#include <complex>\n#include <concepts>\n#include\
-    \ <condition_variable>\n#include <coroutine>\n#include <cstdint>\n#include <cstdio>\n\
-    #include <cstdlib>\n#include <csetjmp>\n#include <csignal>\n#include <cstdarg>\n\
-    #include <cstddef>\n#include <cstring>\n#include <ctime>\n#include <cuchar>\n\
-    #include <cwchar>\n#include <cwctype>\n#include <deque>\n#include <exception>\n\
-    #include <execution>\n#include <filesystem>\n#include <format>\n#include <forward_list>\n\
-    #include <fstream>\n#include <functional>\n#include <future>\n#include <iomanip>\n\
-    #include <initializer_list>\n#include <iostream>\n#include <ios>\n#include <iosfwd>\n\
-    #include <istream>\n#include <iterator>\n#include <latch>\n#include <limits>\n\
-    #include <list>\n#include <locale>\n#include <map>\n#include <memory>\n#include\
-    \ <memory_resource>\n#include <mutex>\n#include <new>\n#include <numbers>\n#include\
-    \ <numeric>\n#include <optional>\n#include <ostream>\n#include <queue>\n#include\
-    \ <random>\n#include <ranges>\n#include <ratio>\n#include <regex>\n#include <scoped_allocator>\n\
-    #include <semaphore>\n#include <set>\n#include <shared_mutex>\n#include <source_location>\n\
-    #include <span>\n#include <sstream>\n#include <stack>\n#include <stdexcept>\n\
-    #include <stop_token>\n#include <streambuf>\n#include <string>\n#include <string_view>\n\
-    #include <syncstream>\n#include <system_error>\n#include <thread>\n#include <tuple>\n\
-    #include <type_traits>\n#include <typeindex>\n#include <typeinfo>\n#include <unordered_map>\n\
-    #include <unordered_set>\n#include <utility>\n#include <valarray>\n#include <variant>\n\
-    #include <vector>\n#include <version>\n\n#line 1 \"utilities/fast_io.hpp\"\n\n\
-    \n\n#line 15 \"utilities/fast_io.hpp\"\n#include <sys/stat.h>\n#line 18 \"utilities/fast_io.hpp\"\
-    \n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal\
-    \ {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\n\
-    struct is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T,\
-    \ std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
+  bundledCode: "#line 1 \"template.hpp\"\n\n\n\n#include <bits/stdc++.h>\n#line 6\
+    \ \"template.hpp\"\n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 7 \"utilities/fast_io.hpp\"\
+    \n#include <charconv>\n#line 15 \"utilities/fast_io.hpp\"\n#include <sys/stat.h>\n\
+    #include <type_traits>\n#line 18 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n\
+    \nnamespace m1une {\nnamespace utilities {\nnamespace internal {\n\n// Detect\
+    \ std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct is_range\
+    \ : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
+    \    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
     >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
     \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
@@ -283,7 +261,7 @@ data:
     \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
     n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 103 \"template.hpp\"\nusing namespace\
+    \ utilities\n}  // namespace m1une\n\n\n#line 8 \"template.hpp\"\nusing namespace\
     \ std;\n\nnamespace m1une {\nnamespace template_io {\n\ninline utilities::FastInput&\
     \ input() {\n    static utilities::FastInput instance;\n    return instance;\n\
     }\n\ninline utilities::FastOutput& output() {\n    static utilities::FastOutput\
@@ -382,46 +360,22 @@ data:
     YES\");\n}\nvoid NO() {\n    m1une::template_io::output().println(\"NO\");\n}\n\
     void Yes() {\n    m1une::template_io::output().println(\"Yes\");\n}\nvoid No()\
     \ {\n    m1une::template_io::output().println(\"No\");\n}\n\n"
-  code: "#ifndef M1UNE_TEMPLATE_HPP\n#define M1UNE_TEMPLATE_HPP 1\n\n#include <algorithm>\n\
-    #include <any>\n#include <array>\n#include <atomic>\n#include <barrier>\n#include\
-    \ <bit>\n#include <bitset>\n#include <cassert>\n#include <cctype>\n#include <cerrno>\n\
-    #include <cfenv>\n#include <cfloat>\n#include <charconv>\n#include <chrono>\n\
-    #include <cinttypes>\n#include <climits>\n#include <clocale>\n#include <cmath>\n\
-    #include <codecvt>\n#include <compare>\n#include <complex>\n#include <concepts>\n\
-    #include <condition_variable>\n#include <coroutine>\n#include <cstdint>\n#include\
-    \ <cstdio>\n#include <cstdlib>\n#include <csetjmp>\n#include <csignal>\n#include\
-    \ <cstdarg>\n#include <cstddef>\n#include <cstring>\n#include <ctime>\n#include\
-    \ <cuchar>\n#include <cwchar>\n#include <cwctype>\n#include <deque>\n#include\
-    \ <exception>\n#include <execution>\n#include <filesystem>\n#include <format>\n\
-    #include <forward_list>\n#include <fstream>\n#include <functional>\n#include <future>\n\
-    #include <iomanip>\n#include <initializer_list>\n#include <iostream>\n#include\
-    \ <ios>\n#include <iosfwd>\n#include <istream>\n#include <iterator>\n#include\
-    \ <latch>\n#include <limits>\n#include <list>\n#include <locale>\n#include <map>\n\
-    #include <memory>\n#include <memory_resource>\n#include <mutex>\n#include <new>\n\
-    #include <numbers>\n#include <numeric>\n#include <optional>\n#include <ostream>\n\
-    #include <queue>\n#include <random>\n#include <ranges>\n#include <ratio>\n#include\
-    \ <regex>\n#include <scoped_allocator>\n#include <semaphore>\n#include <set>\n\
-    #include <shared_mutex>\n#include <source_location>\n#include <span>\n#include\
-    \ <sstream>\n#include <stack>\n#include <stdexcept>\n#include <stop_token>\n#include\
-    \ <streambuf>\n#include <string>\n#include <string_view>\n#include <syncstream>\n\
-    #include <system_error>\n#include <thread>\n#include <tuple>\n#include <type_traits>\n\
-    #include <typeindex>\n#include <typeinfo>\n#include <unordered_map>\n#include\
-    \ <unordered_set>\n#include <utility>\n#include <valarray>\n#include <variant>\n\
-    #include <vector>\n#include <version>\n\n#include \"utilities/fast_io.hpp\"\n\
-    using namespace std;\n\nnamespace m1une {\nnamespace template_io {\n\ninline utilities::FastInput&\
-    \ input() {\n    static utilities::FastInput instance;\n    return instance;\n\
-    }\n\ninline utilities::FastOutput& output() {\n    static utilities::FastOutput\
-    \ instance;\n    return instance;\n}\n\n}  // namespace template_io\n}  // namespace\
-    \ m1une\n\nusing ll = long long;\nusing u32 = unsigned int;\nusing u64 = unsigned\
-    \ long long;\nusing i128 = __int128;\nusing u128 = unsigned __int128;\n#ifdef\
-    \ __SIZEOF_FLOAT128__\nusing f128 = __float128;\n#endif\n\ntemplate <class T>\n\
-    constexpr T infty = 0;\ntemplate <>\nconstexpr int infty<int> = 1'000'000'000;\n\
-    template <>\nconstexpr ll infty<ll> = ll(infty<int>) * infty<int> * 2;\ntemplate\
-    \ <>\nconstexpr u32 infty<u32> = infty<int>;\ntemplate <>\nconstexpr u64 infty<u64>\
-    \ = infty<ll>;\ntemplate <>\nconstexpr i128 infty<i128> = i128(infty<ll>) * infty<ll>;\n\
-    template <>\nconstexpr double infty<double> = infty<ll>;\ntemplate <>\nconstexpr\
-    \ long double infty<long double> = infty<ll>;\n\nusing pi = pair<int, int>;\n\
-    using pl = pair<ll, ll>;\nusing vi = vector<int>;\nusing vl = vector<ll>;\ntemplate\
+  code: "#ifndef M1UNE_TEMPLATE_HPP\n#define M1UNE_TEMPLATE_HPP 1\n\n#include <bits/stdc++.h>\n\
+    #include <cassert>\n\n#include \"utilities/fast_io.hpp\"\nusing namespace std;\n\
+    \nnamespace m1une {\nnamespace template_io {\n\ninline utilities::FastInput& input()\
+    \ {\n    static utilities::FastInput instance;\n    return instance;\n}\n\ninline\
+    \ utilities::FastOutput& output() {\n    static utilities::FastOutput instance;\n\
+    \    return instance;\n}\n\n}  // namespace template_io\n}  // namespace m1une\n\
+    \nusing ll = long long;\nusing u32 = unsigned int;\nusing u64 = unsigned long\
+    \ long;\nusing i128 = __int128;\nusing u128 = unsigned __int128;\n#ifdef __SIZEOF_FLOAT128__\n\
+    using f128 = __float128;\n#endif\n\ntemplate <class T>\nconstexpr T infty = 0;\n\
+    template <>\nconstexpr int infty<int> = 1'000'000'000;\ntemplate <>\nconstexpr\
+    \ ll infty<ll> = ll(infty<int>) * infty<int> * 2;\ntemplate <>\nconstexpr u32\
+    \ infty<u32> = infty<int>;\ntemplate <>\nconstexpr u64 infty<u64> = infty<ll>;\n\
+    template <>\nconstexpr i128 infty<i128> = i128(infty<ll>) * infty<ll>;\ntemplate\
+    \ <>\nconstexpr double infty<double> = infty<ll>;\ntemplate <>\nconstexpr long\
+    \ double infty<long double> = infty<ll>;\n\nusing pi = pair<int, int>;\nusing\
+    \ pl = pair<ll, ll>;\nusing vi = vector<int>;\nusing vl = vector<ll>;\ntemplate\
     \ <class T>\nusing vc = vector<T>;\ntemplate <class T>\nusing vvc = vector<vc<T>>;\n\
     using vvi = vvc<int>;\nusing vvl = vvc<ll>;\ntemplate <class T>\nusing vvvc =\
     \ vector<vvc<T>>;\ntemplate <class T>\nusing vvvvc = vector<vvvc<T>>;\ntemplate\
@@ -513,7 +467,7 @@ data:
   requiredBy:
   - main.cpp
   - pch.hpp
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-08-26 23:07:16+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/utilities/template_fast_io.test.cpp

@@ -19,32 +19,9 @@ data:
     - https://judge.yosupo.jp/problem/aplusb
   bundledCode: "#line 1 \"verify/utilities/template_fast_io.test.cpp\"\n#define PROBLEM\
     \ \"https://judge.yosupo.jp/problem/aplusb\"\n\n#line 1 \"template.hpp\"\n\n\n\
-    \n#include <algorithm>\n#include <any>\n#include <array>\n#include <atomic>\n\
-    #include <barrier>\n#include <bit>\n#include <bitset>\n#include <cassert>\n#include\
-    \ <cctype>\n#include <cerrno>\n#include <cfenv>\n#include <cfloat>\n#include <charconv>\n\
-    #include <chrono>\n#include <cinttypes>\n#include <climits>\n#include <clocale>\n\
-    #include <cmath>\n#include <codecvt>\n#include <compare>\n#include <complex>\n\
-    #include <concepts>\n#include <condition_variable>\n#include <coroutine>\n#include\
-    \ <cstdint>\n#include <cstdio>\n#include <cstdlib>\n#include <csetjmp>\n#include\
-    \ <csignal>\n#include <cstdarg>\n#include <cstddef>\n#include <cstring>\n#include\
-    \ <ctime>\n#include <cuchar>\n#include <cwchar>\n#include <cwctype>\n#include\
-    \ <deque>\n#include <exception>\n#include <execution>\n#include <filesystem>\n\
-    #include <format>\n#include <forward_list>\n#include <fstream>\n#include <functional>\n\
-    #include <future>\n#include <iomanip>\n#include <initializer_list>\n#include <iostream>\n\
-    #include <ios>\n#include <iosfwd>\n#include <istream>\n#include <iterator>\n#include\
-    \ <latch>\n#include <limits>\n#include <list>\n#include <locale>\n#include <map>\n\
-    #include <memory>\n#include <memory_resource>\n#include <mutex>\n#include <new>\n\
-    #include <numbers>\n#include <numeric>\n#include <optional>\n#include <ostream>\n\
-    #include <queue>\n#include <random>\n#include <ranges>\n#include <ratio>\n#include\
-    \ <regex>\n#include <scoped_allocator>\n#include <semaphore>\n#include <set>\n\
-    #include <shared_mutex>\n#include <source_location>\n#include <span>\n#include\
-    \ <sstream>\n#include <stack>\n#include <stdexcept>\n#include <stop_token>\n#include\
-    \ <streambuf>\n#include <string>\n#include <string_view>\n#include <syncstream>\n\
-    #include <system_error>\n#include <thread>\n#include <tuple>\n#include <type_traits>\n\
-    #include <typeindex>\n#include <typeinfo>\n#include <unordered_map>\n#include\
-    \ <unordered_set>\n#include <utility>\n#include <valarray>\n#include <variant>\n\
-    #include <vector>\n#include <version>\n\n#line 1 \"utilities/fast_io.hpp\"\n\n\
-    \n\n#line 15 \"utilities/fast_io.hpp\"\n#include <sys/stat.h>\n#line 18 \"utilities/fast_io.hpp\"\
+    \n#include <bits/stdc++.h>\n#line 6 \"template.hpp\"\n\n#line 1 \"utilities/fast_io.hpp\"\
+    \n\n\n\n#line 7 \"utilities/fast_io.hpp\"\n#include <charconv>\n#line 15 \"utilities/fast_io.hpp\"\
+    \n#include <sys/stat.h>\n#include <type_traits>\n#line 18 \"utilities/fast_io.hpp\"\
     \n#include <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\nnamespace internal\
     \ {\n\n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\n\
     struct is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T,\
@@ -282,7 +259,7 @@ data:
     \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
     n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
     \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 103 \"template.hpp\"\nusing namespace\
+    \ utilities\n}  // namespace m1une\n\n\n#line 8 \"template.hpp\"\nusing namespace\
     \ std;\n\nnamespace m1une {\nnamespace template_io {\n\ninline utilities::FastInput&\
     \ input() {\n    static utilities::FastInput instance;\n    return instance;\n\
     }\n\ninline utilities::FastOutput& output() {\n    static utilities::FastOutput\
@@ -425,7 +402,7 @@ data:
   isVerificationFile: true
   path: verify/utilities/template_fast_io.test.cpp
   requiredBy: []
-  timestamp: '2026-07-18 22:54:37+09:00'
+  timestamp: '2026-08-26 23:07:16+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/utilities/template_fast_io.test.cpp
