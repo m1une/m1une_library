@@ -32,22 +32,28 @@ long long brute(const std::vector<Rectangle>& rectangles) {
 }
 
 void test_edge_cases() {
+    Rectangle ordered(1, 4, 2, 8);
+    assert(ordered.left == 1);
+    assert(ordered.right == 4);
+    assert(ordered.bottom == 2);
+    assert(ordered.top == 8);
+
     std::vector<Rectangle> rectangles;
     assert(m1une::geometry::rectangle_union_area(rectangles) == 0);
 
-    rectangles.emplace_back(0, 0, 4, 3);
-    rectangles.emplace_back(2, 1, 6, 5);
+    rectangles.emplace_back(0, 4, 0, 3);
+    rectangles.emplace_back(2, 6, 1, 5);
     assert(m1une::geometry::rectangle_union_area(rectangles) == 24);
 
     rectangles.emplace_back(1, 1, 1, 10);
-    rectangles.emplace_back(-5, 2, 8, 2);
+    rectangles.emplace_back(-5, 8, 2, 2);
     assert(m1une::geometry::rectangle_union_area(rectangles) == 24);
 
     std::vector<Rectangle> large;
     large.emplace_back(
         -4'000'000'000LL,
-        -3'000'000'000LL,
         4'000'000'000LL,
+        -3'000'000'000LL,
         3'000'000'000LL
     );
     __int128 expected = __int128(8'000'000'000LL) * 6'000'000'000LL;
@@ -72,7 +78,7 @@ void test_randomized() {
             long long top = static_cast<long long>(random() % 16) - 8;
             if (right < left) std::swap(left, right);
             if (top < bottom) std::swap(bottom, top);
-            rectangles.emplace_back(left, bottom, right, top);
+            rectangles.emplace_back(left, right, bottom, top);
         }
         assert(
             m1une::geometry::rectangle_union_area(rectangles)
@@ -97,7 +103,7 @@ int main() {
     for (int i = 0; i < n; i++) {
         long long left = 0, bottom = 0, right = 0, top = 0;
         input.read(left, bottom, right, top);
-        rectangles.emplace_back(left, bottom, right, top);
+        rectangles.emplace_back(left, right, bottom, top);
     }
     long long answer = static_cast<long long>(
         m1une::geometry::rectangle_union_area(rectangles)

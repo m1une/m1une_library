@@ -13,22 +13,22 @@ namespace geometry {
 template <Coordinate T>
 struct AxisAlignedRectangle {
     T left;
-    T bottom;
     T right;
+    T bottom;
     T top;
 
     constexpr AxisAlignedRectangle()
-        : left(0), bottom(0), right(0), top(0) {}
+        : left(0), right(0), bottom(0), top(0) {}
 
     constexpr AxisAlignedRectangle(
         T left_value,
-        T bottom_value,
         T right_value,
+        T bottom_value,
         T top_value
     )
         : left(left_value),
-          bottom(bottom_value),
           right(right_value),
+          bottom(bottom_value),
           top(top_value) {}
 
     friend constexpr bool operator==(

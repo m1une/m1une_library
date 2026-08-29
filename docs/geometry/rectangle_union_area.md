@@ -19,8 +19,8 @@ Between consecutive x-events, that length is multiplied by the x-distance.
 template <Coordinate T>
 struct AxisAlignedRectangle {
     T left;
-    T bottom;
     T right;
+    T bottom;
     T top;
 };
 
@@ -33,7 +33,7 @@ wide_type<T> rectangle_union_area(
 | Member / Function | Complexity | Description |
 | --- | --- | --- |
 | `AxisAlignedRectangle<T>()` | $O(1)$ | Constructs a zero-area rectangle at the origin. |
-| `AxisAlignedRectangle<T>(left, bottom, right, top)` | $O(1)$ | Constructs `[left, right]` by `[bottom, top]`. |
+| `AxisAlignedRectangle<T>(left, right, bottom, top)` | $O(1)$ | Constructs `[left, right]` by `[bottom, top]`. |
 | `rectangle_union_area(rectangles)` | $O(N\log N)$ time and $O(N)$ memory | Returns the union area without modifying the input. |
 
 The constructor coordinates must satisfy `left <= right` and `bottom <= top`.
@@ -55,8 +55,8 @@ return type is `long double`.
 int main() {
     using Rectangle = m1une::geometry::AxisAlignedRectangle<long long>;
     std::vector<Rectangle> rectangles;
-    rectangles.emplace_back(0, 0, 4, 3);
-    rectangles.emplace_back(2, 1, 6, 5);
+    rectangles.emplace_back(0, 4, 0, 3);
+    rectangles.emplace_back(2, 6, 1, 5);
 
     long long area = static_cast<long long>(
         m1une::geometry::rectangle_union_area(rectangles)
