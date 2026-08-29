@@ -147,6 +147,9 @@ data:
     path: graph/tree/centroid_decomposition.hpp
     title: Centroid Decomposition
   - icon: ':heavy_check_mark:'
+    path: graph/tree/cumulative_sum.hpp
+    title: Tree Cumulative Sum
+  - icon: ':heavy_check_mark:'
     path: graph/tree/diameter.hpp
     title: Tree Diameter
   - icon: ':heavy_check_mark:'
@@ -424,6 +427,12 @@ data:
     path: verify/graph/tree/tree_algorithms.test.cpp
     title: verify/graph/tree/tree_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/tree_cumulative_sum.test.cpp
+    title: verify/graph/tree/tree_cumulative_sum.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/tree_cumulative_sum.test.cpp
+    title: verify/graph/tree/tree_cumulative_sum.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/tree/tree_diameter.test.cpp
     title: verify/graph/tree/tree_diameter.test.cpp
   - icon: ':heavy_check_mark:'
@@ -625,6 +634,7 @@ data:
   - graph/tree/rerooting_static_top_tree.hpp
   - graph/tree/rerooting_dp.hpp
   - graph/tree/virtual_tree.hpp
+  - graph/tree/cumulative_sum.hpp
   - graph/tree/centroid_decomposition.hpp
   - graph/tree/cartesian_tree.hpp
   - graph/tree/mo_on_tree.hpp
@@ -702,6 +712,8 @@ data:
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/bipartite_edge_coloring.test.cpp
   - verify/graph/biconnected_components.test.cpp
+  - verify/graph/tree/tree_cumulative_sum.test.cpp
+  - verify/graph/tree/tree_cumulative_sum.test.cpp
   - verify/graph/tree/distance_frequency.test.cpp
   - verify/graph/tree/distance_frequency.test.cpp
   - verify/graph/tree/mo_on_tree.test.cpp

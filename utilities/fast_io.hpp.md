@@ -685,6 +685,9 @@ data:
     path: verify/graph/tree/tree_algorithms.test.cpp
     title: verify/graph/tree/tree_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/tree_cumulative_sum.test.cpp
+    title: verify/graph/tree/tree_cumulative_sum.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/tree/tree_diameter.test.cpp
     title: verify/graph/tree/tree_diameter.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1749,6 +1752,7 @@ data:
   - verify/graph/flow/min_cost_flow.test.cpp
   - verify/graph/bipartite_edge_coloring.test.cpp
   - verify/graph/biconnected_components.test.cpp
+  - verify/graph/tree/tree_cumulative_sum.test.cpp
   - verify/graph/tree/distance_frequency.test.cpp
   - verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
   - verify/graph/tree/zero_one_on_tree.test.cpp

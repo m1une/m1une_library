@@ -896,6 +896,9 @@ data:
       path: graph/tree/centroid_decomposition.hpp
       title: Centroid Decomposition
     - icon: ':heavy_check_mark:'
+      path: graph/tree/cumulative_sum.hpp
+      title: Tree Cumulative Sum
+    - icon: ':heavy_check_mark:'
       path: graph/tree/diameter.hpp
       title: Tree Diameter
     - icon: ':heavy_check_mark:'
@@ -2217,6 +2220,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/graph/tree/tree_algorithms.test.cpp
       title: verify/graph/tree/tree_algorithms.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/graph/tree/tree_cumulative_sum.test.cpp
+      title: verify/graph/tree/tree_cumulative_sum.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/graph/tree/tree_diameter.test.cpp
       title: verify/graph/tree/tree_diameter.test.cpp

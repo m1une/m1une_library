@@ -34,6 +34,9 @@ data:
     path: verify/graph/tree/tree_algorithms.test.cpp
     title: verify/graph/tree/tree_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/tree_cumulative_sum.test.cpp
+    title: verify/graph/tree/tree_cumulative_sum.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
     title: verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
   - icon: ':heavy_check_mark:'
@@ -277,6 +280,7 @@ data:
   - verify/graph/cow_game.test.cpp
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/tree/tree_cumulative_sum.test.cpp
   - verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
   - verify/graph/tree/zero_one_on_tree.test.cpp
   - verify/graph/tree/vertex_get_range_contour_add_on_tree.test.cpp

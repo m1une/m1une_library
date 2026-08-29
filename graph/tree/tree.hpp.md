@@ -8,6 +8,9 @@ data:
     path: graph/graph.hpp
     title: Graph
   - icon: ':heavy_check_mark:'
+    path: graph/tree/cumulative_sum.hpp
+    title: Tree Cumulative Sum
+  - icon: ':heavy_check_mark:'
     path: graph/tree/diameter.hpp
     title: Tree Diameter
   - icon: ':heavy_check_mark:'
@@ -19,6 +22,12 @@ data:
   - icon: ':heavy_check_mark:'
     path: graph/tree/sparse_table_lca.hpp
     title: Sparse Table LCA
+  - icon: ':heavy_check_mark:'
+    path: monoid/add.hpp
+    title: Add Monoid
+  - icon: ':heavy_check_mark:'
+    path: monoid/concept.hpp
+    title: Monoid Concept
   - icon: ':heavy_check_mark:'
     path: monoid/concept.hpp
     title: Monoid Concept
@@ -47,21 +56,44 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"graph/tree/tree.hpp\"\n\n\n\n#line 1 \"graph/tree/diameter.hpp\"\
-    \n\n\n\n#include <algorithm>\n#include <vector>\n\n#line 1 \"graph/graph.hpp\"\
-    \n\n\n\n#include <array>\n#include <cassert>\n#include <utility>\n#line 8 \"graph/graph.hpp\"\
-    \n\nnamespace m1une {\nnamespace graph {\n\ntemplate <class T = int>\nstruct Edge\
-    \ {\n    using cost_type = T;\n\n    int from;\n    int to;\n    T cost;\n   \
-    \ int id;\n    bool alive;\n\n    Edge() : from(-1), to(-1), cost(T()), id(-1),\
-    \ alive(true) {}\n    Edge(int from_, int to_, T cost_ = T(1), int id_ = -1, bool\
-    \ alive_ = true)\n        : from(from_), to(to_), cost(cost_), id(id_), alive(alive_)\
-    \ {}\n\n    int other(int v) const {\n        assert(v == from || v == to);\n\
-    \        return from ^ to ^ v;\n    }\n};\n\ntemplate <class T = int>\nstruct\
-    \ Graph {\n    using edge_type = Edge<T>;\n    using cost_type = T;\n\n   private:\n\
-    \    struct EdgePositions {\n        std::array<std::pair<int, int>, 2> value{};\n\
-    \        int size = 0;\n\n        void push_back(std::pair<int, int> position)\
-    \ {\n            assert(size < 2);\n            value[size++] = position;\n  \
-    \      }\n    };\n\n    int _n;\n    int _edge_count;\n    std::vector<std::vector<edge_type>>\
+  bundledCode: "#line 1 \"graph/tree/tree.hpp\"\n\n\n\n#line 1 \"graph/tree/cumulative_sum.hpp\"\
+    \n\n\n\n#include <algorithm>\n#include <cassert>\n#include <utility>\n#include\
+    \ <vector>\n\n#line 1 \"monoid/add.hpp\"\n\n\n\nnamespace m1une {\nnamespace monoid\
+    \ {\n\n// Monoid for addition (Range Sum).\ntemplate <typename T>\nstruct Add\
+    \ {\n    using value_type = T;\n    static constexpr bool commutative = true;\n\
+    \n    // Returns the identity element for addition, which is 0.\n    static constexpr\
+    \ T id() {\n        return T(0);\n    }\n\n    // Returns the sum of a and b.\n\
+    \    static constexpr T op(const T& a, const T& b) {\n        return a + b;\n\
+    \    }\n\n    static constexpr T inv(const T& x) {\n        return -x;\n    }\n\
+    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 1 \"monoid/concept.hpp\"\
+    \n\n\n\n#include <concepts>\n\nnamespace m1une {\nnamespace monoid {\n\n// Concept\
+    \ to check if a type satisfies the requirements of a Monoid.\n// A Monoid must\
+    \ have a `value_type`, an identity element `id()`, and an associative binary operation\
+    \ `op()`.\ntemplate <typename M>\nconcept IsMonoid = requires(typename M::value_type\
+    \ a, typename M::value_type b) {\n    // 1. Must define `value_type`\n    typename\
+    \ M::value_type;\n\n    // 2. Must have a static method `id()` returning `value_type`\n\
+    \    { M::id() } -> std::same_as<typename M::value_type>;\n\n    // 3. Must have\
+    \ a static method `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
+    \ M::value_type>;\n};\n\n// Concept for groups. A type satisfying this concept\
+    \ must also obey the group\n// laws; concepts can check the interface but not\
+    \ the algebraic properties.\ntemplate <typename M>\nconcept IsGroup = IsMonoid<M>\
+    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
+    \ M::value_type>;\n};\n\n// Concept for commutative groups. Commutativity is a\
+    \ semantic requirement and\n// cannot be checked by a C++ concept.\ntemplate <typename\
+    \ M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\n}  // namespace monoid\n}  //\
+    \ namespace m1une\n\n\n#line 1 \"graph/graph.hpp\"\n\n\n\n#include <array>\n#line\
+    \ 8 \"graph/graph.hpp\"\n\nnamespace m1une {\nnamespace graph {\n\ntemplate <class\
+    \ T = int>\nstruct Edge {\n    using cost_type = T;\n\n    int from;\n    int\
+    \ to;\n    T cost;\n    int id;\n    bool alive;\n\n    Edge() : from(-1), to(-1),\
+    \ cost(T()), id(-1), alive(true) {}\n    Edge(int from_, int to_, T cost_ = T(1),\
+    \ int id_ = -1, bool alive_ = true)\n        : from(from_), to(to_), cost(cost_),\
+    \ id(id_), alive(alive_) {}\n\n    int other(int v) const {\n        assert(v\
+    \ == from || v == to);\n        return from ^ to ^ v;\n    }\n};\n\ntemplate <class\
+    \ T = int>\nstruct Graph {\n    using edge_type = Edge<T>;\n    using cost_type\
+    \ = T;\n\n   private:\n    struct EdgePositions {\n        std::array<std::pair<int,\
+    \ int>, 2> value{};\n        int size = 0;\n\n        void push_back(std::pair<int,\
+    \ int> position) {\n            assert(size < 2);\n            value[size++] =\
+    \ position;\n        }\n    };\n\n    int _n;\n    int _edge_count;\n    std::vector<std::vector<edge_type>>\
     \ _g;\n    std::vector<EdgePositions> _edge_positions;\n\n   public:\n    Graph()\
     \ : _n(0), _edge_count(0) {}\n    explicit Graph(int n) : _n(n), _edge_count(0),\
     \ _g(n) {\n        assert(0 <= n);\n    }\n\n    int size() const {\n        return\
@@ -106,9 +138,89 @@ data:
     \         result._g[e.to].push_back(edge_type(e.to, e.from, e.cost, e.id, e.alive));\n\
     \                if (0 <= e.id && e.id < _edge_count) result._edge_positions[e.id].push_back({e.to,\
     \ idx});\n            }\n        }\n        return result;\n    }\n};\n\n}  //\
-    \ namespace graph\n}  // namespace m1une\n\n\n#line 8 \"graph/tree/diameter.hpp\"\
-    \n\nnamespace m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct TreeDiameter\
-    \ {\n    T cost;\n    int edge_count;\n    int from;\n    int to;\n    std::vector<int>\
+    \ namespace graph\n}  // namespace m1une\n\n\n#line 12 \"graph/tree/cumulative_sum.hpp\"\
+    \n\nnamespace m1une {\nnamespace tree {\n\n// Static cumulative products on root\
+    \ paths. Values are attached to vertices by\n// default; set EdgeValues to true\
+    \ to index them by graph edge id instead.\ntemplate <m1une::monoid::IsCommutativeGroup\
+    \ Group, bool EdgeValues = false>\nclass TreeCumulativeProduct {\n   public:\n\
+    \    using value_type = typename Group::value_type;\n\n   private:\n    int _n\
+    \ = 0;\n    int _root = -1;\n    std::vector<int> _parent;\n    std::vector<int>\
+    \ _depth;\n    std::vector<int> _head;\n    std::vector<value_type> _prefix;\n\
+    \n    void check_vertex(int vertex) const {\n        assert(0 <= vertex && vertex\
+    \ < _n);\n    }\n\n   public:\n    TreeCumulativeProduct() = default;\n\n    template\
+    \ <class EdgeCost>\n    explicit TreeCumulativeProduct(\n        const m1une::graph::Graph<EdgeCost>&\
+    \ graph,\n        const std::vector<value_type>& values,\n        int root = 0\n\
+    \    ) {\n        build(graph, values, root);\n    }\n\n    template <class EdgeCost>\n\
+    \    void build(\n        const m1une::graph::Graph<EdgeCost>& graph,\n      \
+    \  const std::vector<value_type>& values,\n        int root = 0\n    ) {\n   \
+    \     _n = graph.size();\n        _root = _n == 0 ? -1 : root;\n        assert(\n\
+    \            int(values.size())\n            == (EdgeValues ? graph.edge_count()\
+    \ : graph.size())\n        );\n\n        _parent.assign(_n, -2);\n        _depth.assign(_n,\
+    \ 0);\n        _head.assign(_n, -1);\n        _prefix.assign(_n, Group::id());\n\
+    \        if (_n == 0) return;\n        assert(0 <= root && root < _n);\n\n   \
+    \     std::vector<int> parent_edge(_n, -1);\n        std::vector<int> order;\n\
+    \        order.reserve(_n);\n        std::vector<int> stack = {root};\n      \
+    \  _parent[root] = -1;\n        while (!stack.empty()) {\n            int vertex\
+    \ = stack.back();\n            stack.pop_back();\n            order.push_back(vertex);\n\
+    \            for (const auto& edge : graph[vertex]) {\n                if (!edge.alive\
+    \ || _parent[edge.to] != -2) continue;\n                _parent[edge.to] = vertex;\n\
+    \                parent_edge[edge.to] = edge.id;\n                _depth[edge.to]\
+    \ = _depth[vertex] + 1;\n                stack.push_back(edge.to);\n         \
+    \   }\n        }\n        assert(int(order.size()) == _n);\n\n        std::vector<int>\
+    \ subtree_size(_n, 1);\n        std::vector<int> heavy(_n, -1);\n        for (int\
+    \ index = _n - 1; index > 0; index--) {\n            int vertex = order[index];\n\
+    \            int parent = _parent[vertex];\n            subtree_size[parent] +=\
+    \ subtree_size[vertex];\n            if (\n                heavy[parent] == -1\n\
+    \                || subtree_size[heavy[parent]] < subtree_size[vertex]\n     \
+    \       ) {\n                heavy[parent] = vertex;\n            }\n        }\n\
+    \n        std::vector<std::pair<int, int>> starts;\n        starts.emplace_back(root,\
+    \ root);\n        while (!starts.empty()) {\n            auto [start, head] =\
+    \ starts.back();\n            starts.pop_back();\n            for (\n        \
+    \        int vertex = start;\n                vertex != -1;\n                vertex\
+    \ = heavy[vertex]\n            ) {\n                _head[vertex] = head;\n  \
+    \              for (const auto& edge : graph[vertex]) {\n                    if\
+    \ (\n                        edge.alive && _parent[edge.to] == vertex\n      \
+    \                  && edge.to != heavy[vertex]\n                    ) {\n    \
+    \                    starts.emplace_back(edge.to, edge.to);\n                \
+    \    }\n                }\n            }\n        }\n\n        if constexpr (!EdgeValues)\
+    \ _prefix[root] = values[root];\n        for (int vertex : order) {\n        \
+    \    if (vertex == root) continue;\n            if constexpr (EdgeValues) {\n\
+    \                assert(0 <= parent_edge[vertex]);\n                _prefix[vertex]\
+    \ = Group::op(\n                    _prefix[_parent[vertex]],\n              \
+    \      values[parent_edge[vertex]]\n                );\n            } else {\n\
+    \                _prefix[vertex] = Group::op(\n                    _prefix[_parent[vertex]],\n\
+    \                    values[vertex]\n                );\n            }\n     \
+    \   }\n    }\n\n    int size() const {\n        return _n;\n    }\n\n    bool\
+    \ empty() const {\n        return _n == 0;\n    }\n\n    int root() const {\n\
+    \        return _root;\n    }\n\n    int lca(int first, int second) const {\n\
+    \        check_vertex(first);\n        check_vertex(second);\n        while (_head[first]\
+    \ != _head[second]) {\n            if (_depth[_head[first]] < _depth[_head[second]])\
+    \ {\n                std::swap(first, second);\n            }\n            first\
+    \ = _parent[_head[first]];\n        }\n        return _depth[first] < _depth[second]\
+    \ ? first : second;\n    }\n\n    // Product on the root-to-vertex path. The root\
+    \ vertex is included for\n    // vertex values; no edge lies above it in edge-value\
+    \ mode.\n    value_type prod(int vertex) const {\n        check_vertex(vertex);\n\
+    \        return _prefix[vertex];\n    }\n\n    // Product on the simple path from\
+    \ first to second. Both endpoints are\n    // included for vertex values.\n  \
+    \  value_type prod(int first, int second) const {\n        int ancestor = lca(first,\
+    \ second);\n        value_type result = Group::op(_prefix[first], _prefix[second]);\n\
+    \        result = Group::op(result, Group::inv(_prefix[ancestor]));\n        if\
+    \ constexpr (EdgeValues) {\n            result = Group::op(result, Group::inv(_prefix[ancestor]));\n\
+    \        } else if (_parent[ancestor] != -1) {\n            result = Group::op(\n\
+    \                result,\n                Group::inv(_prefix[_parent[ancestor]])\n\
+    \            );\n        }\n        return result;\n    }\n};\n\ntemplate <m1une::monoid::IsCommutativeGroup\
+    \ Group>\nusing TreeEdgeCumulativeProduct = TreeCumulativeProduct<Group, true>;\n\
+    \ntemplate <class T, bool EdgeValues = false>\nclass TreeCumulativeSum\n    :\
+    \ public TreeCumulativeProduct<m1une::monoid::Add<T>, EdgeValues> {\n   private:\n\
+    \    using Base =\n        TreeCumulativeProduct<m1une::monoid::Add<T>, EdgeValues>;\n\
+    \n   public:\n    using Base::Base;\n\n    T sum(int vertex) const {\n       \
+    \ return Base::prod(vertex);\n    }\n\n    T sum(int first, int second) const\
+    \ {\n        return Base::prod(first, second);\n    }\n};\n\ntemplate <class T>\n\
+    using TreeEdgeCumulativeSum = TreeCumulativeSum<T, true>;\n\n}  // namespace tree\n\
+    }  // namespace m1une\n\n\n#line 1 \"graph/tree/diameter.hpp\"\n\n\n\n#line 6\
+    \ \"graph/tree/diameter.hpp\"\n\n#line 8 \"graph/tree/diameter.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct TreeDiameter {\n\
+    \    T cost;\n    int edge_count;\n    int from;\n    int to;\n    std::vector<int>\
     \ vertices;\n    std::vector<int> edge_ids;\n\n    bool empty() const {\n    \
     \    return vertices.empty();\n    }\n};\n\nnamespace internal {\n\ntemplate <class\
     \ T>\nstruct FarthestResult {\n    int vertex;\n    std::vector<char> seen;\n\
@@ -267,74 +379,57 @@ data:
     \    }\n};\n\n}  // namespace tree\n}  // namespace m1une\n\n\n#line 1 \"graph/tree/sparse_table_lca.hpp\"\
     \n\n\n\n#line 6 \"graph/tree/sparse_table_lca.hpp\"\n#include <limits>\n#line\
     \ 9 \"graph/tree/sparse_table_lca.hpp\"\n\n#line 1 \"ds/range_query/sparse_table.hpp\"\
-    \n\n\n\n#include <bit>\n#line 6 \"ds/range_query/sparse_table.hpp\"\n#include\
-    \ <concepts>\n#line 9 \"ds/range_query/sparse_table.hpp\"\n\n#line 1 \"monoid/concept.hpp\"\
-    \n\n\n\n#line 5 \"monoid/concept.hpp\"\n\nnamespace m1une {\nnamespace monoid\
-    \ {\n\n// Concept to check if a type satisfies the requirements of a Monoid.\n\
-    // A Monoid must have a `value_type`, an identity element `id()`, and an associative\
-    \ binary operation `op()`.\ntemplate <typename M>\nconcept IsMonoid = requires(typename\
-    \ M::value_type a, typename M::value_type b) {\n    // 1. Must define `value_type`\n\
-    \    typename M::value_type;\n\n    // 2. Must have a static method `id()` returning\
-    \ `value_type`\n    { M::id() } -> std::same_as<typename M::value_type>;\n\n \
-    \   // 3. Must have a static method `op(a, b)` returning `value_type`\n    { M::op(a,\
-    \ b) } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for groups.\
-    \ A type satisfying this concept must also obey the group\n// laws; concepts can\
-    \ check the interface but not the algebraic properties.\ntemplate <typename M>\n\
-    concept IsGroup = IsMonoid<M> && requires(typename M::value_type a) {\n    { M::inv(a)\
-    \ } -> std::same_as<typename M::value_type>;\n};\n\n// Concept for commutative\
-    \ groups. Commutativity is a semantic requirement and\n// cannot be checked by\
-    \ a C++ concept.\ntemplate <typename M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\
-    \n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 11 \"ds/range_query/sparse_table.hpp\"\
-    \n\nnamespace m1une {\nnamespace ds {\n\n// A Sparse Table utilizing C++20 Concepts\
-    \ for type safety.\n// It requires a Monoid struct that satisfies `m1une::monoid::IsMonoid`.\n\
-    // [IMPORTANT] For O(1) range queries to work correctly, the monoid operation\
-    \ MUST be idempotent.\n// i.e., Monoid::op(x, x) == x must hold (e.g., Min, Max,\
-    \ GCD, Bitwise AND/OR).\ntemplate <m1une::monoid::IsMonoid Monoid>\nstruct SparseTable\
-    \ {\n    using T = typename Monoid::value_type;\n\n   private:\n    int _n;\n\
-    \    std::vector<std::vector<T>> _st;\n\n   public:\n    // Constructs an empty\
-    \ sparse table.\n    SparseTable() : _n(0) {}\n\n    // Constructs a sparse table\
-    \ from an existing vector in O(N log N) time.\n    explicit SparseTable(const\
-    \ std::vector<T>& v) : _n(int(v.size())) {\n        if (_n == 0) return;\n\n \
-    \       // Compute the maximum power of 2 needed\n        int max_log = std::bit_width((unsigned\
-    \ int)_n);\n        _st.assign(max_log, std::vector<T>(_n));\n\n        // Initialize\
-    \ the base level\n        for (int i = 0; i < _n; i++) {\n            _st[0][i]\
-    \ = v[i];\n        }\n\n        // Build the sparse table\n        for (int k\
-    \ = 1; k < max_log; k++) {\n            for (int i = 0; i + (1 << k) <= _n; i++)\
-    \ {\n                _st[k][i] = Monoid::op(_st[k - 1][i], _st[k - 1][i + (1 <<\
-    \ (k - 1))]);\n            }\n        }\n    }\n    explicit SparseTable(std::vector<T>&&\
-    \ v) : _n(int(v.size())) {\n        if (_n == 0) return;\n\n        int max_log\
-    \ = std::bit_width((unsigned int)_n);\n        _st.assign(max_log, std::vector<T>(_n));\n\
-    \n        for (int i = 0; i < _n; i++) {\n            _st[0][i] = std::move(v[i]);\n\
-    \        }\n\n        for (int k = 1; k < max_log; k++) {\n            for (int\
-    \ i = 0; i + (1 << k) <= _n; i++) {\n                _st[k][i] = Monoid::op(_st[k\
-    \ - 1][i], _st[k - 1][i + (1 << (k - 1))]);\n            }\n        }\n    }\n\
-    \n    // Constructs a sparse table from a vector of a different type U.\n    //\
-    \ It automatically adapts to the Monoid's initialization requirements:\n    //\
-    \ 1. Monoid::make(val) if it exists.\n    // 2. Monoid::make(val, index) if the\
-    \ monoid requires global indices.\n    // 3. static_cast<T>(val) as a fallback\
-    \ for simple monoids.\n    template <typename U>\n    requires (!std::same_as<U,\
-    \ T>) && (\n        requires(U x) { Monoid::make(x); } ||\n        requires(U\
-    \ x, int i) { Monoid::make(x, i); } ||\n        std::convertible_to<U, T>\n  \
-    \  )\n    explicit SparseTable(const std::vector<U>& v) : _n(int(v.size())) {\n\
-    \        if (_n == 0) return;\n\n        int max_log = std::bit_width((unsigned\
-    \ int)_n);\n        _st.assign(max_log, std::vector<T>(_n));\n\n        // Compile-time\
-    \ branching based on the available make() signature\n        for (int i = 0; i\
-    \ < _n; i++) {\n            if constexpr (requires(U x) { Monoid::make(x); })\
-    \ {\n                _st[0][i] = Monoid::make(v[i]);\n            } else if constexpr\
-    \ (requires(U x, int idx) { Monoid::make(x, idx); }) {\n                _st[0][i]\
-    \ = Monoid::make(v[i], i);\n            } else {\n                _st[0][i] =\
-    \ static_cast<T>(v[i]);\n            }\n        }\n        for (int k = 1; k <\
-    \ max_log; k++) {\n            for (int i = 0; i + (1 << k) <= _n; i++) {\n  \
-    \              _st[k][i] = Monoid::op(_st[k - 1][i], _st[k - 1][i + (1 << (k -\
-    \ 1))]);\n            }\n        }\n    }\n\n    // Returns the product (result\
-    \ of the monoid operation) in the range [l, r) in O(1) time.\n    // Requires\
-    \ the monoid operation to be idempotent.\n    T prod(int l, int r) const {\n \
-    \       assert(0 <= l && l <= r && r <= _n);\n        if (l == r) return Monoid::id();\n\
-    \n        // Calculate the largest power of 2 less than or equal to the interval\
-    \ length\n        int k = std::bit_width((unsigned int)(r - l)) - 1;\n       \
-    \ return Monoid::op(_st[k][l], _st[k][r - (1 << k)]);\n    }\n};\n\n}  // namespace\
-    \ ds\n}  // namespace m1une\n\n\n#line 12 \"graph/tree/sparse_table_lca.hpp\"\n\
-    \nnamespace m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct SparseTableLca\
+    \n\n\n\n#include <bit>\n#line 9 \"ds/range_query/sparse_table.hpp\"\n\n#line 11\
+    \ \"ds/range_query/sparse_table.hpp\"\n\nnamespace m1une {\nnamespace ds {\n\n\
+    // A Sparse Table utilizing C++20 Concepts for type safety.\n// It requires a\
+    \ Monoid struct that satisfies `m1une::monoid::IsMonoid`.\n// [IMPORTANT] For\
+    \ O(1) range queries to work correctly, the monoid operation MUST be idempotent.\n\
+    // i.e., Monoid::op(x, x) == x must hold (e.g., Min, Max, GCD, Bitwise AND/OR).\n\
+    template <m1une::monoid::IsMonoid Monoid>\nstruct SparseTable {\n    using T =\
+    \ typename Monoid::value_type;\n\n   private:\n    int _n;\n    std::vector<std::vector<T>>\
+    \ _st;\n\n   public:\n    // Constructs an empty sparse table.\n    SparseTable()\
+    \ : _n(0) {}\n\n    // Constructs a sparse table from an existing vector in O(N\
+    \ log N) time.\n    explicit SparseTable(const std::vector<T>& v) : _n(int(v.size()))\
+    \ {\n        if (_n == 0) return;\n\n        // Compute the maximum power of 2\
+    \ needed\n        int max_log = std::bit_width((unsigned int)_n);\n        _st.assign(max_log,\
+    \ std::vector<T>(_n));\n\n        // Initialize the base level\n        for (int\
+    \ i = 0; i < _n; i++) {\n            _st[0][i] = v[i];\n        }\n\n        //\
+    \ Build the sparse table\n        for (int k = 1; k < max_log; k++) {\n      \
+    \      for (int i = 0; i + (1 << k) <= _n; i++) {\n                _st[k][i] =\
+    \ Monoid::op(_st[k - 1][i], _st[k - 1][i + (1 << (k - 1))]);\n            }\n\
+    \        }\n    }\n    explicit SparseTable(std::vector<T>&& v) : _n(int(v.size()))\
+    \ {\n        if (_n == 0) return;\n\n        int max_log = std::bit_width((unsigned\
+    \ int)_n);\n        _st.assign(max_log, std::vector<T>(_n));\n\n        for (int\
+    \ i = 0; i < _n; i++) {\n            _st[0][i] = std::move(v[i]);\n        }\n\
+    \n        for (int k = 1; k < max_log; k++) {\n            for (int i = 0; i +\
+    \ (1 << k) <= _n; i++) {\n                _st[k][i] = Monoid::op(_st[k - 1][i],\
+    \ _st[k - 1][i + (1 << (k - 1))]);\n            }\n        }\n    }\n\n    //\
+    \ Constructs a sparse table from a vector of a different type U.\n    // It automatically\
+    \ adapts to the Monoid's initialization requirements:\n    // 1. Monoid::make(val)\
+    \ if it exists.\n    // 2. Monoid::make(val, index) if the monoid requires global\
+    \ indices.\n    // 3. static_cast<T>(val) as a fallback for simple monoids.\n\
+    \    template <typename U>\n    requires (!std::same_as<U, T>) && (\n        requires(U\
+    \ x) { Monoid::make(x); } ||\n        requires(U x, int i) { Monoid::make(x, i);\
+    \ } ||\n        std::convertible_to<U, T>\n    )\n    explicit SparseTable(const\
+    \ std::vector<U>& v) : _n(int(v.size())) {\n        if (_n == 0) return;\n\n \
+    \       int max_log = std::bit_width((unsigned int)_n);\n        _st.assign(max_log,\
+    \ std::vector<T>(_n));\n\n        // Compile-time branching based on the available\
+    \ make() signature\n        for (int i = 0; i < _n; i++) {\n            if constexpr\
+    \ (requires(U x) { Monoid::make(x); }) {\n                _st[0][i] = Monoid::make(v[i]);\n\
+    \            } else if constexpr (requires(U x, int idx) { Monoid::make(x, idx);\
+    \ }) {\n                _st[0][i] = Monoid::make(v[i], i);\n            } else\
+    \ {\n                _st[0][i] = static_cast<T>(v[i]);\n            }\n      \
+    \  }\n        for (int k = 1; k < max_log; k++) {\n            for (int i = 0;\
+    \ i + (1 << k) <= _n; i++) {\n                _st[k][i] = Monoid::op(_st[k - 1][i],\
+    \ _st[k - 1][i + (1 << (k - 1))]);\n            }\n        }\n    }\n\n    //\
+    \ Returns the product (result of the monoid operation) in the range [l, r) in\
+    \ O(1) time.\n    // Requires the monoid operation to be idempotent.\n    T prod(int\
+    \ l, int r) const {\n        assert(0 <= l && l <= r && r <= _n);\n        if\
+    \ (l == r) return Monoid::id();\n\n        // Calculate the largest power of 2\
+    \ less than or equal to the interval length\n        int k = std::bit_width((unsigned\
+    \ int)(r - l)) - 1;\n        return Monoid::op(_st[k][l], _st[k][r - (1 << k)]);\n\
+    \    }\n};\n\n}  // namespace ds\n}  // namespace m1une\n\n\n#line 12 \"graph/tree/sparse_table_lca.hpp\"\
+    \n\nnamespace m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct SparseTableLca\
     \ {\n    using cost_type = T;\n    using edge_type = m1une::graph::Edge<T>;\n\n\
     \    int root;\n    std::vector<int> parent;\n    std::vector<int> parent_edge;\n\
     \    std::vector<int> depth;\n    std::vector<T> dist;\n    std::vector<int> subtree_size;\n\
@@ -388,11 +483,13 @@ data:
     \ = lca(u, v);\n        return dist[u] + dist[v] - dist[w] - dist[w];\n    }\n\
     \n    std::pair<int, int> subtree_range(int v) const {\n        check_vertex(v);\n\
     \        return {tin[v], tout[v]};\n    }\n};\n\n}  // namespace tree\n}  // namespace\
-    \ m1une\n\n\n#line 8 \"graph/tree/tree.hpp\"\n\n\n"
+    \ m1une\n\n\n#line 9 \"graph/tree/tree.hpp\"\n\n\n"
   code: '#ifndef M1UNE_TREE_TREE_HPP
 
     #define M1UNE_TREE_TREE_HPP 1
 
+
+    #include "cumulative_sum.hpp"
 
     #include "diameter.hpp"
 
@@ -407,8 +504,11 @@ data:
 
     '
   dependsOn:
-  - graph/tree/diameter.hpp
+  - graph/tree/cumulative_sum.hpp
+  - monoid/add.hpp
+  - monoid/concept.hpp
   - graph/graph.hpp
+  - graph/tree/diameter.hpp
   - graph/tree/euler_tour.hpp
   - graph/tree/rooted_tree.hpp
   - graph/tree/sparse_table_lca.hpp
@@ -419,7 +519,7 @@ data:
   requiredBy:
   - graph/all.hpp
   - graph/tree/all.hpp
-  timestamp: '2026-08-13 01:41:40+09:00'
+  timestamp: '2026-08-29 18:27:41+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
@@ -434,7 +534,8 @@ title: Tree
 ## Overview
 
 `graph/tree/tree.hpp` is a small tree bundle containing the core rooted-tree
-helpers, the sparse-table LCA helper, and the diameter routine.
+helpers, cumulative path sums, the sparse-table LCA helper, and the diameter
+routine.
 
 For the full tree toolbox, include `graph/tree/all.hpp`.
 
@@ -442,6 +543,7 @@ For the full tree toolbox, include `graph/tree/all.hpp`.
 
 | Header | Contents |
 | --- | --- |
+| `graph/tree/cumulative_sum.hpp` | Static commutative-group products and additive sums on vertex- or edge-weighted paths. |
 | `graph/tree/euler_tour.hpp` | Lightweight rooted-tree preorder, subtree ranges, and parent/depth metadata. |
 | `graph/tree/rooted_tree.hpp` | Rooted metadata, Euler intervals, LCA, jumps, paths, and distances. |
 | `graph/tree/sparse_table_lca.hpp` | Euler-tour sparse-table LCA with $O(1)$ queries. |

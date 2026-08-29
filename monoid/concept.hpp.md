@@ -123,11 +123,17 @@ data:
     path: graph/tree/all.hpp
     title: Tree All
   - icon: ':heavy_check_mark:'
+    path: graph/tree/cumulative_sum.hpp
+    title: Tree Cumulative Sum
+  - icon: ':heavy_check_mark:'
     path: graph/tree/range_contour_query.hpp
     title: Range Contour Query on Tree
   - icon: ':heavy_check_mark:'
     path: graph/tree/sparse_table_lca.hpp
     title: Sparse Table LCA
+  - icon: ':heavy_check_mark:'
+    path: graph/tree/tree.hpp
+    title: Tree
   - icon: ':heavy_check_mark:'
     path: graph/tree/tree.hpp
     title: Tree
@@ -283,6 +289,9 @@ data:
     path: verify/graph/tree/tree_algorithms.test.cpp
     title: verify/graph/tree/tree_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/graph/tree/tree_cumulative_sum.test.cpp
+    title: verify/graph/tree/tree_cumulative_sum.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
     title: verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
   - icon: ':heavy_check_mark:'
@@ -343,9 +352,11 @@ data:
   - graph/all.hpp
   - graph/all.hpp
   - graph/tree/virtual_tree.hpp
+  - graph/tree/cumulative_sum.hpp
   - graph/tree/all.hpp
   - graph/tree/all.hpp
   - graph/tree/sparse_table_lca.hpp
+  - graph/tree/tree.hpp
   - graph/tree/tree.hpp
   - graph/tree/range_contour_query.hpp
   - ds/dynamic_array/dynamic_monoid_array.hpp
@@ -395,6 +406,7 @@ data:
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/range_edge_graph.test.cpp
   - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/tree/tree_cumulative_sum.test.cpp
   - verify/graph/tree/vertex_add_range_contour_sum_on_tree.test.cpp
   - verify/graph/tree/vertex_get_range_contour_add_on_tree.test.cpp
   - verify/graph/tree/tree_algorithms.test.cpp

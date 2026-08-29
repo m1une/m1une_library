@@ -17,6 +17,9 @@ data:
     path: graph/tree/centroid_decomposition.hpp
     title: Centroid Decomposition
   - icon: ':heavy_check_mark:'
+    path: graph/tree/cumulative_sum.hpp
+    title: Tree Cumulative Sum
+  - icon: ':heavy_check_mark:'
     path: graph/tree/diameter.hpp
     title: Tree Diameter
   - icon: ':heavy_check_mark:'
@@ -242,10 +245,114 @@ data:
     \ v, -1, 0);\n        }\n    }\n\n    int size() const {\n        return n;\n\
     \    }\n\n    bool empty() const {\n        return n == 0;\n    }\n\n    int root()\
     \ const {\n        return roots.empty() ? -1 : roots[0];\n    }\n};\n\n}  // namespace\
-    \ tree\n}  // namespace m1une\n\n\n#line 1 \"graph/tree/diameter.hpp\"\n\n\n\n\
-    #line 6 \"graph/tree/diameter.hpp\"\n\n#line 8 \"graph/tree/diameter.hpp\"\n\n\
-    namespace m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct TreeDiameter\
-    \ {\n    T cost;\n    int edge_count;\n    int from;\n    int to;\n    std::vector<int>\
+    \ tree\n}  // namespace m1une\n\n\n#line 1 \"graph/tree/cumulative_sum.hpp\"\n\
+    \n\n\n#line 8 \"graph/tree/cumulative_sum.hpp\"\n\n#line 1 \"monoid/add.hpp\"\n\
+    \n\n\nnamespace m1une {\nnamespace monoid {\n\n// Monoid for addition (Range Sum).\n\
+    template <typename T>\nstruct Add {\n    using value_type = T;\n    static constexpr\
+    \ bool commutative = true;\n\n    // Returns the identity element for addition,\
+    \ which is 0.\n    static constexpr T id() {\n        return T(0);\n    }\n\n\
+    \    // Returns the sum of a and b.\n    static constexpr T op(const T& a, const\
+    \ T& b) {\n        return a + b;\n    }\n\n    static constexpr T inv(const T&\
+    \ x) {\n        return -x;\n    }\n};\n\n}  // namespace monoid\n}  // namespace\
+    \ m1une\n\n\n#line 1 \"monoid/concept.hpp\"\n\n\n\n#include <concepts>\n\nnamespace\
+    \ m1une {\nnamespace monoid {\n\n// Concept to check if a type satisfies the requirements\
+    \ of a Monoid.\n// A Monoid must have a `value_type`, an identity element `id()`,\
+    \ and an associative binary operation `op()`.\ntemplate <typename M>\nconcept\
+    \ IsMonoid = requires(typename M::value_type a, typename M::value_type b) {\n\
+    \    // 1. Must define `value_type`\n    typename M::value_type;\n\n    // 2.\
+    \ Must have a static method `id()` returning `value_type`\n    { M::id() } ->\
+    \ std::same_as<typename M::value_type>;\n\n    // 3. Must have a static method\
+    \ `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
+    \ M::value_type>;\n};\n\n// Concept for groups. A type satisfying this concept\
+    \ must also obey the group\n// laws; concepts can check the interface but not\
+    \ the algebraic properties.\ntemplate <typename M>\nconcept IsGroup = IsMonoid<M>\
+    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
+    \ M::value_type>;\n};\n\n// Concept for commutative groups. Commutativity is a\
+    \ semantic requirement and\n// cannot be checked by a C++ concept.\ntemplate <typename\
+    \ M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\n}  // namespace monoid\n}  //\
+    \ namespace m1une\n\n\n#line 12 \"graph/tree/cumulative_sum.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace tree {\n\n// Static cumulative products on root paths. Values\
+    \ are attached to vertices by\n// default; set EdgeValues to true to index them\
+    \ by graph edge id instead.\ntemplate <m1une::monoid::IsCommutativeGroup Group,\
+    \ bool EdgeValues = false>\nclass TreeCumulativeProduct {\n   public:\n    using\
+    \ value_type = typename Group::value_type;\n\n   private:\n    int _n = 0;\n \
+    \   int _root = -1;\n    std::vector<int> _parent;\n    std::vector<int> _depth;\n\
+    \    std::vector<int> _head;\n    std::vector<value_type> _prefix;\n\n    void\
+    \ check_vertex(int vertex) const {\n        assert(0 <= vertex && vertex < _n);\n\
+    \    }\n\n   public:\n    TreeCumulativeProduct() = default;\n\n    template <class\
+    \ EdgeCost>\n    explicit TreeCumulativeProduct(\n        const m1une::graph::Graph<EdgeCost>&\
+    \ graph,\n        const std::vector<value_type>& values,\n        int root = 0\n\
+    \    ) {\n        build(graph, values, root);\n    }\n\n    template <class EdgeCost>\n\
+    \    void build(\n        const m1une::graph::Graph<EdgeCost>& graph,\n      \
+    \  const std::vector<value_type>& values,\n        int root = 0\n    ) {\n   \
+    \     _n = graph.size();\n        _root = _n == 0 ? -1 : root;\n        assert(\n\
+    \            int(values.size())\n            == (EdgeValues ? graph.edge_count()\
+    \ : graph.size())\n        );\n\n        _parent.assign(_n, -2);\n        _depth.assign(_n,\
+    \ 0);\n        _head.assign(_n, -1);\n        _prefix.assign(_n, Group::id());\n\
+    \        if (_n == 0) return;\n        assert(0 <= root && root < _n);\n\n   \
+    \     std::vector<int> parent_edge(_n, -1);\n        std::vector<int> order;\n\
+    \        order.reserve(_n);\n        std::vector<int> stack = {root};\n      \
+    \  _parent[root] = -1;\n        while (!stack.empty()) {\n            int vertex\
+    \ = stack.back();\n            stack.pop_back();\n            order.push_back(vertex);\n\
+    \            for (const auto& edge : graph[vertex]) {\n                if (!edge.alive\
+    \ || _parent[edge.to] != -2) continue;\n                _parent[edge.to] = vertex;\n\
+    \                parent_edge[edge.to] = edge.id;\n                _depth[edge.to]\
+    \ = _depth[vertex] + 1;\n                stack.push_back(edge.to);\n         \
+    \   }\n        }\n        assert(int(order.size()) == _n);\n\n        std::vector<int>\
+    \ subtree_size(_n, 1);\n        std::vector<int> heavy(_n, -1);\n        for (int\
+    \ index = _n - 1; index > 0; index--) {\n            int vertex = order[index];\n\
+    \            int parent = _parent[vertex];\n            subtree_size[parent] +=\
+    \ subtree_size[vertex];\n            if (\n                heavy[parent] == -1\n\
+    \                || subtree_size[heavy[parent]] < subtree_size[vertex]\n     \
+    \       ) {\n                heavy[parent] = vertex;\n            }\n        }\n\
+    \n        std::vector<std::pair<int, int>> starts;\n        starts.emplace_back(root,\
+    \ root);\n        while (!starts.empty()) {\n            auto [start, head] =\
+    \ starts.back();\n            starts.pop_back();\n            for (\n        \
+    \        int vertex = start;\n                vertex != -1;\n                vertex\
+    \ = heavy[vertex]\n            ) {\n                _head[vertex] = head;\n  \
+    \              for (const auto& edge : graph[vertex]) {\n                    if\
+    \ (\n                        edge.alive && _parent[edge.to] == vertex\n      \
+    \                  && edge.to != heavy[vertex]\n                    ) {\n    \
+    \                    starts.emplace_back(edge.to, edge.to);\n                \
+    \    }\n                }\n            }\n        }\n\n        if constexpr (!EdgeValues)\
+    \ _prefix[root] = values[root];\n        for (int vertex : order) {\n        \
+    \    if (vertex == root) continue;\n            if constexpr (EdgeValues) {\n\
+    \                assert(0 <= parent_edge[vertex]);\n                _prefix[vertex]\
+    \ = Group::op(\n                    _prefix[_parent[vertex]],\n              \
+    \      values[parent_edge[vertex]]\n                );\n            } else {\n\
+    \                _prefix[vertex] = Group::op(\n                    _prefix[_parent[vertex]],\n\
+    \                    values[vertex]\n                );\n            }\n     \
+    \   }\n    }\n\n    int size() const {\n        return _n;\n    }\n\n    bool\
+    \ empty() const {\n        return _n == 0;\n    }\n\n    int root() const {\n\
+    \        return _root;\n    }\n\n    int lca(int first, int second) const {\n\
+    \        check_vertex(first);\n        check_vertex(second);\n        while (_head[first]\
+    \ != _head[second]) {\n            if (_depth[_head[first]] < _depth[_head[second]])\
+    \ {\n                std::swap(first, second);\n            }\n            first\
+    \ = _parent[_head[first]];\n        }\n        return _depth[first] < _depth[second]\
+    \ ? first : second;\n    }\n\n    // Product on the root-to-vertex path. The root\
+    \ vertex is included for\n    // vertex values; no edge lies above it in edge-value\
+    \ mode.\n    value_type prod(int vertex) const {\n        check_vertex(vertex);\n\
+    \        return _prefix[vertex];\n    }\n\n    // Product on the simple path from\
+    \ first to second. Both endpoints are\n    // included for vertex values.\n  \
+    \  value_type prod(int first, int second) const {\n        int ancestor = lca(first,\
+    \ second);\n        value_type result = Group::op(_prefix[first], _prefix[second]);\n\
+    \        result = Group::op(result, Group::inv(_prefix[ancestor]));\n        if\
+    \ constexpr (EdgeValues) {\n            result = Group::op(result, Group::inv(_prefix[ancestor]));\n\
+    \        } else if (_parent[ancestor] != -1) {\n            result = Group::op(\n\
+    \                result,\n                Group::inv(_prefix[_parent[ancestor]])\n\
+    \            );\n        }\n        return result;\n    }\n};\n\ntemplate <m1une::monoid::IsCommutativeGroup\
+    \ Group>\nusing TreeEdgeCumulativeProduct = TreeCumulativeProduct<Group, true>;\n\
+    \ntemplate <class T, bool EdgeValues = false>\nclass TreeCumulativeSum\n    :\
+    \ public TreeCumulativeProduct<m1une::monoid::Add<T>, EdgeValues> {\n   private:\n\
+    \    using Base =\n        TreeCumulativeProduct<m1une::monoid::Add<T>, EdgeValues>;\n\
+    \n   public:\n    using Base::Base;\n\n    T sum(int vertex) const {\n       \
+    \ return Base::prod(vertex);\n    }\n\n    T sum(int first, int second) const\
+    \ {\n        return Base::prod(first, second);\n    }\n};\n\ntemplate <class T>\n\
+    using TreeEdgeCumulativeSum = TreeCumulativeSum<T, true>;\n\n}  // namespace tree\n\
+    }  // namespace m1une\n\n\n#line 1 \"graph/tree/diameter.hpp\"\n\n\n\n#line 6\
+    \ \"graph/tree/diameter.hpp\"\n\n#line 8 \"graph/tree/diameter.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct TreeDiameter {\n\
+    \    T cost;\n    int edge_count;\n    int from;\n    int to;\n    std::vector<int>\
     \ vertices;\n    std::vector<int> edge_ids;\n\n    bool empty() const {\n    \
     \    return vertices.empty();\n    }\n};\n\nnamespace internal {\n\ntemplate <class\
     \ T>\nstruct FarthestResult {\n    int vertex;\n    std::vector<char> seen;\n\
@@ -1300,58 +1407,34 @@ data:
     \                if (extra != -1) remove(extra);\n            },\n           \
     \ block_size\n        );\n    }\n};\n\n}  // namespace tree\n}  // namespace m1une\n\
     \n\n#line 1 \"graph/tree/range_contour_query.hpp\"\n\n\n\n#line 7 \"graph/tree/range_contour_query.hpp\"\
-    \n\n#line 1 \"monoid/add.hpp\"\n\n\n\nnamespace m1une {\nnamespace monoid {\n\n\
-    // Monoid for addition (Range Sum).\ntemplate <typename T>\nstruct Add {\n   \
-    \ using value_type = T;\n    static constexpr bool commutative = true;\n\n   \
-    \ // Returns the identity element for addition, which is 0.\n    static constexpr\
-    \ T id() {\n        return T(0);\n    }\n\n    // Returns the sum of a and b.\n\
-    \    static constexpr T op(const T& a, const T& b) {\n        return a + b;\n\
-    \    }\n\n    static constexpr T inv(const T& x) {\n        return -x;\n    }\n\
-    };\n\n}  // namespace monoid\n}  // namespace m1une\n\n\n#line 1 \"monoid/concept.hpp\"\
-    \n\n\n\n#include <concepts>\n\nnamespace m1une {\nnamespace monoid {\n\n// Concept\
-    \ to check if a type satisfies the requirements of a Monoid.\n// A Monoid must\
-    \ have a `value_type`, an identity element `id()`, and an associative binary operation\
-    \ `op()`.\ntemplate <typename M>\nconcept IsMonoid = requires(typename M::value_type\
-    \ a, typename M::value_type b) {\n    // 1. Must define `value_type`\n    typename\
-    \ M::value_type;\n\n    // 2. Must have a static method `id()` returning `value_type`\n\
-    \    { M::id() } -> std::same_as<typename M::value_type>;\n\n    // 3. Must have\
-    \ a static method `op(a, b)` returning `value_type`\n    { M::op(a, b) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for groups. A type satisfying this concept\
-    \ must also obey the group\n// laws; concepts can check the interface but not\
-    \ the algebraic properties.\ntemplate <typename M>\nconcept IsGroup = IsMonoid<M>\
-    \ && requires(typename M::value_type a) {\n    { M::inv(a) } -> std::same_as<typename\
-    \ M::value_type>;\n};\n\n// Concept for commutative groups. Commutativity is a\
-    \ semantic requirement and\n// cannot be checked by a C++ concept.\ntemplate <typename\
-    \ M>\nconcept IsCommutativeGroup = IsGroup<M>;\n\n}  // namespace monoid\n}  //\
-    \ namespace m1une\n\n\n#line 1 \"graph/tree/rooted_tree.hpp\"\n\n\n\n#line 7 \"\
-    graph/tree/rooted_tree.hpp\"\n\n#line 9 \"graph/tree/rooted_tree.hpp\"\n\nnamespace\
-    \ m1une {\nnamespace tree {\n\ntemplate <class T = int>\nstruct RootedTree {\n\
-    \    using cost_type = T;\n    using edge_type = m1une::graph::Edge<T>;\n\n  \
-    \  int root;\n    std::vector<int> parent;\n    std::vector<int> parent_edge;\n\
-    \    std::vector<int> depth;\n    std::vector<T> dist;\n    std::vector<int> subtree_size;\n\
-    \    std::vector<int> tin;\n    std::vector<int> tout;\n    std::vector<int> order;\n\
-    \    std::vector<std::vector<int>> up;\n\n   private:\n    int _n;\n    int _log;\n\
-    \n    void check_vertex(int v) const {\n        assert(0 <= v && v < _n);\n  \
-    \      assert(tin[v] != -1);\n    }\n\n   public:\n    RootedTree() : root(-1),\
-    \ _n(0), _log(0) {}\n    explicit RootedTree(const m1une::graph::Graph<T>& g,\
-    \ int root_ = 0) {\n        build(g, root_);\n    }\n\n    void build(const m1une::graph::Graph<T>&\
-    \ g, int root_ = 0) {\n        _n = g.size();\n        root = _n == 0 ? -1 : root_;\n\
-    \        _log = 1;\n        while ((1U << _log) <= (unsigned int)(std::max(1,\
-    \ _n))) _log++;\n\n        parent.assign(_n, -1);\n        parent_edge.assign(_n,\
-    \ -1);\n        depth.assign(_n, 0);\n        dist.assign(_n, T(0));\n       \
-    \ subtree_size.assign(_n, 0);\n        tin.assign(_n, -1);\n        tout.assign(_n,\
-    \ -1);\n        order.clear();\n        order.reserve(_n);\n        up.assign(_log,\
-    \ std::vector<int>(_n, -1));\n\n        if (_n == 0) return;\n        assert(0\
-    \ <= root && root < _n);\n\n        struct Frame {\n            int v;\n     \
-    \       int state;\n        };\n\n        std::vector<char> visited(_n, false);\n\
-    \        std::vector<Frame> stack;\n        stack.push_back({root, 0});\n    \
-    \    visited[root] = true;\n        int timer = 0;\n\n        while (!stack.empty())\
-    \ {\n            Frame frame = stack.back();\n            stack.pop_back();\n\
-    \            int v = frame.v;\n            if (frame.state == 0) {\n         \
-    \       tin[v] = timer++;\n                order.push_back(v);\n             \
-    \   up[0][v] = parent[v];\n                for (int k = 1; k < _log; k++) {\n\
-    \                    int p = up[k - 1][v];\n                    up[k][v] = p ==\
-    \ -1 ? -1 : up[k - 1][p];\n                }\n\n                stack.push_back({v,\
+    \n\n#line 1 \"graph/tree/rooted_tree.hpp\"\n\n\n\n#line 7 \"graph/tree/rooted_tree.hpp\"\
+    \n\n#line 9 \"graph/tree/rooted_tree.hpp\"\n\nnamespace m1une {\nnamespace tree\
+    \ {\n\ntemplate <class T = int>\nstruct RootedTree {\n    using cost_type = T;\n\
+    \    using edge_type = m1une::graph::Edge<T>;\n\n    int root;\n    std::vector<int>\
+    \ parent;\n    std::vector<int> parent_edge;\n    std::vector<int> depth;\n  \
+    \  std::vector<T> dist;\n    std::vector<int> subtree_size;\n    std::vector<int>\
+    \ tin;\n    std::vector<int> tout;\n    std::vector<int> order;\n    std::vector<std::vector<int>>\
+    \ up;\n\n   private:\n    int _n;\n    int _log;\n\n    void check_vertex(int\
+    \ v) const {\n        assert(0 <= v && v < _n);\n        assert(tin[v] != -1);\n\
+    \    }\n\n   public:\n    RootedTree() : root(-1), _n(0), _log(0) {}\n    explicit\
+    \ RootedTree(const m1une::graph::Graph<T>& g, int root_ = 0) {\n        build(g,\
+    \ root_);\n    }\n\n    void build(const m1une::graph::Graph<T>& g, int root_\
+    \ = 0) {\n        _n = g.size();\n        root = _n == 0 ? -1 : root_;\n     \
+    \   _log = 1;\n        while ((1U << _log) <= (unsigned int)(std::max(1, _n)))\
+    \ _log++;\n\n        parent.assign(_n, -1);\n        parent_edge.assign(_n, -1);\n\
+    \        depth.assign(_n, 0);\n        dist.assign(_n, T(0));\n        subtree_size.assign(_n,\
+    \ 0);\n        tin.assign(_n, -1);\n        tout.assign(_n, -1);\n        order.clear();\n\
+    \        order.reserve(_n);\n        up.assign(_log, std::vector<int>(_n, -1));\n\
+    \n        if (_n == 0) return;\n        assert(0 <= root && root < _n);\n\n  \
+    \      struct Frame {\n            int v;\n            int state;\n        };\n\
+    \n        std::vector<char> visited(_n, false);\n        std::vector<Frame> stack;\n\
+    \        stack.push_back({root, 0});\n        visited[root] = true;\n        int\
+    \ timer = 0;\n\n        while (!stack.empty()) {\n            Frame frame = stack.back();\n\
+    \            stack.pop_back();\n            int v = frame.v;\n            if (frame.state\
+    \ == 0) {\n                tin[v] = timer++;\n                order.push_back(v);\n\
+    \                up[0][v] = parent[v];\n                for (int k = 1; k < _log;\
+    \ k++) {\n                    int p = up[k - 1][v];\n                    up[k][v]\
+    \ = p == -1 ? -1 : up[k - 1][p];\n                }\n\n                stack.push_back({v,\
     \ 1});\n                const auto& adj = g[v];\n                for (int i =\
     \ int(adj.size()) - 1; i >= 0; i--) {\n                    const auto& e = adj[i];\n\
     \                    if (!e.alive) continue;\n                    if (visited[e.to])\
@@ -2027,7 +2110,7 @@ data:
     \ std::vector<Vertex>&, Point, Compress, Rake, AddEdge, AddVertex)\n    -> StaticTopTree<T,\
     \ Vertex, std::invoke_result_t<AddVertex, Point, Vertex, int>, Point, Compress,\
     \ Rake,\n                     AddEdge, AddVertex>;\n\n}  // namespace tree\n}\
-    \  // namespace m1une\n\n\n#line 1 \"graph/tree/tree.hpp\"\n\n\n\n#line 8 \"graph/tree/tree.hpp\"\
+    \  // namespace m1une\n\n\n#line 1 \"graph/tree/tree.hpp\"\n\n\n\n#line 9 \"graph/tree/tree.hpp\"\
     \n\n\n#line 1 \"graph/tree/tree_hash.hpp\"\n\n\n\n#line 9 \"graph/tree/tree_hash.hpp\"\
     \n\n#line 11 \"graph/tree/tree_hash.hpp\"\n\nnamespace m1une {\nnamespace tree\
     \ {\n\nusing TreeHashValue = std::array<std::uint64_t, 2>;\n\nclass TreeHasher\
@@ -2185,7 +2268,7 @@ data:
     \ == n);\n    if (n == 0) return 0;\n    assert(0 <= root && root < n);\n    assert(int(graph.edges().size())\
     \ == n - 1);\n\n    RootedTree<T> rooted_tree(graph, root);\n    assert(int(rooted_tree.order.size())\
     \ == n);\n    return zero_one_on_tree(rooted_tree.parent, value);\n}\n\n}  //\
-    \ namespace tree\n}  // namespace m1une\n\n\n#line 22 \"graph/tree/all.hpp\"\n\
+    \ namespace tree\n}  // namespace m1une\n\n\n#line 23 \"graph/tree/all.hpp\"\n\
     \n\n"
   code: '#ifndef M1UNE_TREE_ALL_HPP
 
@@ -2195,6 +2278,8 @@ data:
     #include "cartesian_tree.hpp"
 
     #include "centroid_decomposition.hpp"
+
+    #include "cumulative_sum.hpp"
 
     #include "diameter.hpp"
 
@@ -2236,6 +2321,9 @@ data:
   - graph/tree/cartesian_tree.hpp
   - graph/graph.hpp
   - graph/tree/centroid_decomposition.hpp
+  - graph/tree/cumulative_sum.hpp
+  - monoid/add.hpp
+  - monoid/concept.hpp
   - graph/tree/diameter.hpp
   - graph/tree/distance_frequency.hpp
   - math/fps/convolution.hpp
@@ -2248,8 +2336,6 @@ data:
   - graph/tree/mo_on_tree.hpp
   - algo/offline/mo.hpp
   - graph/tree/range_contour_query.hpp
-  - monoid/add.hpp
-  - monoid/concept.hpp
   - graph/tree/rooted_tree.hpp
   - graph/tree/rerooting_dp.hpp
   - graph/tree/rerooting_static_top_tree.hpp
@@ -2265,7 +2351,7 @@ data:
   path: graph/tree/all.hpp
   requiredBy:
   - graph/all.hpp
-  timestamp: '2026-08-13 01:41:40+09:00'
+  timestamp: '2026-08-29 18:27:41+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/cow_game.test.cpp
@@ -2290,6 +2376,7 @@ same graph container.
 | --- | --- |
 | `graph/tree/cartesian_tree.hpp` | Cartesian tree construction from an array. |
 | `graph/tree/tree.hpp` | Core rooted tree and diameter bundle. |
+| `graph/tree/cumulative_sum.hpp` | Static commutative-group products and additive sums on vertex- or edge-weighted tree paths. |
 | `graph/tree/euler_tour.hpp` | Lightweight rooted-tree preorder, subtree ranges, and parent/depth metadata. |
 | `graph/tree/rooted_tree.hpp` | Rooted metadata, Euler intervals, LCA, jumps, paths, and distances. |
 | `graph/tree/sparse_table_lca.hpp` | Euler-tour sparse-table LCA with $O(1)$ queries. |
