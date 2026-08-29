@@ -296,11 +296,70 @@ The solver can:
 - report when either side of a difference is unbounded.
 
 If every primitive upper bound is nonnegative, the zero assignment proves
-feasibility immediately and bound queries use Dijkstra. Otherwise, the first
-feasibility check uses Bellman-Ford relaxation. A negative cycle means that the
-system is infeasible. A feasible assignment is cached and used as a Johnson
-potential, so later bound queries still use Dijkstra with nonnegative reduced
-edge costs.
+feasibility immediately and bound queries can run Dijkstra on the original
+edge costs. Otherwise, the first feasibility check uses Bellman-Ford
+relaxation. A negative edge alone does not make the system infeasible; a
+negative cycle does. If there is no negative cycle, the resulting feasible
+assignment is cached and used as a Johnson potential, so the actual bound
+search can run Dijkstra on nonnegative reduced edge costs.
+
+## Exactly When Dijkstra Can Be Used
+
+Each primitive constraint `x[a] - x[b] <= c` is the directed edge
+`b -> a` of cost `c`. The shortest-path distance from `source` to `v` is the
+tightest implied upper bound on `x[v] - x[source]`.
+
+`CowGame` runs Dijkstra directly on the original costs if and only if every
+primitive edge cost is nonnegative. This is the standard condition that
+guarantees Dijkstra's correctness; for this class, it means every stored
+`upper_bound` is at least zero. Be careful with the convenience methods:
+`add_lower_bound(a, b, l)` stores the reversed edge `a -> b` with cost `-l`.
+Therefore, a positive lower bound creates a negative edge even though the
+argument `l` itself is positive. Similarly, a nonzero equality creates one
+negative edge.
+
+If any primitive edge cost is negative, Dijkstra on the original costs is not
+guaranteed to be correct and `CowGame` does not use it. It could coincidentally
+produce the right answer for a particular source, but that is not a condition
+on which the solver relies. The negative edge does **not** by itself prove
+infeasibility, and it is not enough that the final shortest distance happens to
+be nonnegative. Dijkstra's correctness is instead guaranteed by nonnegative
+costs on the graph on which it is run. `CowGame` handles this case as follows:
+
+1. It runs Bellman-Ford relaxation from an implicit super-source connected to
+   every variable by a zero-cost edge. This checks the entire constraint system,
+   including components unreachable from the requested query source.
+2. If a negative cycle exists, the constraints are infeasible, so there are no
+   meaningful difference bounds and Dijkstra is not run.
+3. Otherwise, Bellman-Ford produces a feasible assignment `p`. For every edge
+   `b -> a` of cost `c`, feasibility gives `p[a] <= p[b] + c`, hence the reduced
+   cost
+
+   $$
+   c' = c + p[b] - p[a]
+   $$
+
+   is nonnegative. Dijkstra is then valid on these reduced costs. The original
+   distance is recovered by
+
+   $$
+   d(source, v) = d'(source, v) - p[source] + p[v].
+   $$
+
+Thus a bound query uses Dijkstra in either of two states:
+
+| State | What the next bound query does |
+| --- | --- |
+| All stored primitive costs are nonnegative | Uses Dijkstra immediately; the all-zero assignment already proves feasibility. |
+| Some primitive cost is negative, and a feasible assignment is cached | Uses Dijkstra immediately on Johnson-reweighted costs. |
+| Some primitive cost is negative, and no feasibility result is cached | Runs Bellman-Ford first; if feasible, then runs reweighted Dijkstra. |
+| The cached feasibility result is infeasible | Returns an infeasible result; it does not run Dijkstra. |
+
+Adding any constraint invalidates a cached feasible assignment. Consequently,
+in a mixed-sign system the next bound query must repeat the feasibility check,
+even if the newly added constraint would happen to preserve the old potential.
+The public bound-query methods perform all of this automatically; callers do
+not need to invoke `solve()` first.
 
 ## Adding Constraints
 
@@ -337,12 +396,15 @@ convenient representative, not a uniquely normalized solution.
 The feasibility result is cached until another constraint is added, which
 avoids repeating the global negative-cycle check across bound queries.
 
-`bool can_use_dijkstra() const` reports whether a bound query can use Dijkstra
-without first running Bellman-Ford. It is immediately true while all primitive
+`bool can_use_dijkstra() const` reports whether a bound query can start its
+shortest-path phase without first running Bellman-Ford. It does not mean that a
+query is forbidden when the result is false: the query performs the required
+feasibility check itself. The result is immediately true while all primitive
 upper bounds are nonnegative. For a mixed-sign system, it becomes true after a
-successful `solve()` or `is_feasible()` call caches a Johnson potential. In a
-mixed-sign system, adding another constraint invalidates that potential until
-feasibility is checked again. An infeasible system reports false.
+successful `solve()` or `is_feasible()` call caches a Johnson potential. Adding
+another constraint invalidates that potential until feasibility is checked
+again. An infeasible system reports false because no difference bound is
+meaningful.
 
 ## Tight Difference Bounds
 
