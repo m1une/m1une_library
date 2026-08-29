@@ -144,11 +144,11 @@ data:
     \    );\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 5 \"\
     geometry/rectangle_union_area.hpp\"\n\n#include <algorithm>\n#line 8 \"geometry/rectangle_union_area.hpp\"\
     \n#include <vector>\n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <Coordinate\
-    \ T>\nstruct AxisAlignedRectangle {\n    T left;\n    T bottom;\n    T right;\n\
-    \    T top;\n\n    constexpr AxisAlignedRectangle()\n        : left(0), bottom(0),\
-    \ right(0), top(0) {}\n\n    constexpr AxisAlignedRectangle(\n        T left_value,\n\
-    \        T bottom_value,\n        T right_value,\n        T top_value\n    )\n\
-    \        : left(left_value),\n          bottom(bottom_value),\n          right(right_value),\n\
+    \ T>\nstruct AxisAlignedRectangle {\n    T left;\n    T right;\n    T bottom;\n\
+    \    T top;\n\n    constexpr AxisAlignedRectangle()\n        : left(0), right(0),\
+    \ bottom(0), top(0) {}\n\n    constexpr AxisAlignedRectangle(\n        T left_value,\n\
+    \        T right_value,\n        T bottom_value,\n        T top_value\n    )\n\
+    \        : left(left_value),\n          right(right_value),\n          bottom(bottom_value),\n\
     \          top(top_value) {}\n\n    friend constexpr bool operator==(\n      \
     \  const AxisAlignedRectangle&,\n        const AxisAlignedRectangle&\n    ) =\
     \ default;\n};\n\nnamespace rectangle_union_area_detail {\n\ntemplate <Coordinate\
@@ -466,14 +466,16 @@ data:
     \ x && x < rectangle.right &&\n                    rectangle.bottom <= y && y\
     \ < rectangle.top\n                ) {\n                    covered = true;\n\
     \                }\n            }\n            result += covered;\n        }\n\
-    \    }\n    return result;\n}\n\nvoid test_edge_cases() {\n    std::vector<Rectangle>\
+    \    }\n    return result;\n}\n\nvoid test_edge_cases() {\n    Rectangle ordered(1,\
+    \ 4, 2, 8);\n    assert(ordered.left == 1);\n    assert(ordered.right == 4);\n\
+    \    assert(ordered.bottom == 2);\n    assert(ordered.top == 8);\n\n    std::vector<Rectangle>\
     \ rectangles;\n    assert(m1une::geometry::rectangle_union_area(rectangles) ==\
-    \ 0);\n\n    rectangles.emplace_back(0, 0, 4, 3);\n    rectangles.emplace_back(2,\
-    \ 1, 6, 5);\n    assert(m1une::geometry::rectangle_union_area(rectangles) == 24);\n\
-    \n    rectangles.emplace_back(1, 1, 1, 10);\n    rectangles.emplace_back(-5, 2,\
-    \ 8, 2);\n    assert(m1une::geometry::rectangle_union_area(rectangles) == 24);\n\
+    \ 0);\n\n    rectangles.emplace_back(0, 4, 0, 3);\n    rectangles.emplace_back(2,\
+    \ 6, 1, 5);\n    assert(m1une::geometry::rectangle_union_area(rectangles) == 24);\n\
+    \n    rectangles.emplace_back(1, 1, 1, 10);\n    rectangles.emplace_back(-5, 8,\
+    \ 2, 2);\n    assert(m1une::geometry::rectangle_union_area(rectangles) == 24);\n\
     \n    std::vector<Rectangle> large;\n    large.emplace_back(\n        -4'000'000'000LL,\n\
-    \        -3'000'000'000LL,\n        4'000'000'000LL,\n        3'000'000'000LL\n\
+    \        4'000'000'000LL,\n        -3'000'000'000LL,\n        3'000'000'000LL\n\
     \    );\n    __int128 expected = __int128(8'000'000'000LL) * 6'000'000'000LL;\n\
     \    assert(m1une::geometry::rectangle_union_area(large) == expected);\n}\n\n\
     void test_randomized() {\n    std::uint64_t state = 1414213562ULL;\n    auto random\
@@ -486,14 +488,14 @@ data:
     \ 16) - 8;\n            long long top = static_cast<long long>(random() % 16)\
     \ - 8;\n            if (right < left) std::swap(left, right);\n            if\
     \ (top < bottom) std::swap(bottom, top);\n            rectangles.emplace_back(left,\
-    \ bottom, right, top);\n        }\n        assert(\n            m1une::geometry::rectangle_union_area(rectangles)\n\
+    \ right, bottom, top);\n        }\n        assert(\n            m1une::geometry::rectangle_union_area(rectangles)\n\
     \            == brute(rectangles)\n        );\n    }\n}\n\n}  // namespace\n\n\
     int main() {\n    test_edge_cases();\n    test_randomized();\n\n    m1une::utilities::FastInput\
     \ input;\n    m1une::utilities::FastOutput output;\n\n    int n = 0;\n    input.read(n);\n\
     \    std::vector<Rectangle> rectangles;\n    rectangles.reserve(n);\n    for (int\
     \ i = 0; i < n; i++) {\n        long long left = 0, bottom = 0, right = 0, top\
     \ = 0;\n        input.read(left, bottom, right, top);\n        rectangles.emplace_back(left,\
-    \ bottom, right, top);\n    }\n    long long answer = static_cast<long long>(\n\
+    \ right, bottom, top);\n    }\n    long long answer = static_cast<long long>(\n\
     \        m1une::geometry::rectangle_union_area(rectangles)\n    );\n    output.println(answer);\n\
     }\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/area_of_union_of_rectangles\"\
@@ -507,14 +509,16 @@ data:
     \ <= x && x < rectangle.right &&\n                    rectangle.bottom <= y &&\
     \ y < rectangle.top\n                ) {\n                    covered = true;\n\
     \                }\n            }\n            result += covered;\n        }\n\
-    \    }\n    return result;\n}\n\nvoid test_edge_cases() {\n    std::vector<Rectangle>\
+    \    }\n    return result;\n}\n\nvoid test_edge_cases() {\n    Rectangle ordered(1,\
+    \ 4, 2, 8);\n    assert(ordered.left == 1);\n    assert(ordered.right == 4);\n\
+    \    assert(ordered.bottom == 2);\n    assert(ordered.top == 8);\n\n    std::vector<Rectangle>\
     \ rectangles;\n    assert(m1une::geometry::rectangle_union_area(rectangles) ==\
-    \ 0);\n\n    rectangles.emplace_back(0, 0, 4, 3);\n    rectangles.emplace_back(2,\
-    \ 1, 6, 5);\n    assert(m1une::geometry::rectangle_union_area(rectangles) == 24);\n\
-    \n    rectangles.emplace_back(1, 1, 1, 10);\n    rectangles.emplace_back(-5, 2,\
-    \ 8, 2);\n    assert(m1une::geometry::rectangle_union_area(rectangles) == 24);\n\
+    \ 0);\n\n    rectangles.emplace_back(0, 4, 0, 3);\n    rectangles.emplace_back(2,\
+    \ 6, 1, 5);\n    assert(m1une::geometry::rectangle_union_area(rectangles) == 24);\n\
+    \n    rectangles.emplace_back(1, 1, 1, 10);\n    rectangles.emplace_back(-5, 8,\
+    \ 2, 2);\n    assert(m1une::geometry::rectangle_union_area(rectangles) == 24);\n\
     \n    std::vector<Rectangle> large;\n    large.emplace_back(\n        -4'000'000'000LL,\n\
-    \        -3'000'000'000LL,\n        4'000'000'000LL,\n        3'000'000'000LL\n\
+    \        4'000'000'000LL,\n        -3'000'000'000LL,\n        3'000'000'000LL\n\
     \    );\n    __int128 expected = __int128(8'000'000'000LL) * 6'000'000'000LL;\n\
     \    assert(m1une::geometry::rectangle_union_area(large) == expected);\n}\n\n\
     void test_randomized() {\n    std::uint64_t state = 1414213562ULL;\n    auto random\
@@ -527,14 +531,14 @@ data:
     \ 16) - 8;\n            long long top = static_cast<long long>(random() % 16)\
     \ - 8;\n            if (right < left) std::swap(left, right);\n            if\
     \ (top < bottom) std::swap(bottom, top);\n            rectangles.emplace_back(left,\
-    \ bottom, right, top);\n        }\n        assert(\n            m1une::geometry::rectangle_union_area(rectangles)\n\
+    \ right, bottom, top);\n        }\n        assert(\n            m1une::geometry::rectangle_union_area(rectangles)\n\
     \            == brute(rectangles)\n        );\n    }\n}\n\n}  // namespace\n\n\
     int main() {\n    test_edge_cases();\n    test_randomized();\n\n    m1une::utilities::FastInput\
     \ input;\n    m1une::utilities::FastOutput output;\n\n    int n = 0;\n    input.read(n);\n\
     \    std::vector<Rectangle> rectangles;\n    rectangles.reserve(n);\n    for (int\
     \ i = 0; i < n; i++) {\n        long long left = 0, bottom = 0, right = 0, top\
     \ = 0;\n        input.read(left, bottom, right, top);\n        rectangles.emplace_back(left,\
-    \ bottom, right, top);\n    }\n    long long answer = static_cast<long long>(\n\
+    \ right, bottom, top);\n    }\n    long long answer = static_cast<long long>(\n\
     \        m1une::geometry::rectangle_union_area(rectangles)\n    );\n    output.println(answer);\n\
     }\n"
   dependsOn:
@@ -545,7 +549,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/rectangle_union_area.test.cpp
   requiredBy: []
-  timestamp: '2026-08-26 23:16:21+09:00'
+  timestamp: '2026-08-29 18:31:00+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/rectangle_union_area.test.cpp

@@ -145,11 +145,11 @@ data:
     \    );\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 5 \"\
     geometry/rectangle_union_area.hpp\"\n\n#include <algorithm>\n#line 8 \"geometry/rectangle_union_area.hpp\"\
     \n#include <vector>\n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <Coordinate\
-    \ T>\nstruct AxisAlignedRectangle {\n    T left;\n    T bottom;\n    T right;\n\
-    \    T top;\n\n    constexpr AxisAlignedRectangle()\n        : left(0), bottom(0),\
-    \ right(0), top(0) {}\n\n    constexpr AxisAlignedRectangle(\n        T left_value,\n\
-    \        T bottom_value,\n        T right_value,\n        T top_value\n    )\n\
-    \        : left(left_value),\n          bottom(bottom_value),\n          right(right_value),\n\
+    \ T>\nstruct AxisAlignedRectangle {\n    T left;\n    T right;\n    T bottom;\n\
+    \    T top;\n\n    constexpr AxisAlignedRectangle()\n        : left(0), right(0),\
+    \ bottom(0), top(0) {}\n\n    constexpr AxisAlignedRectangle(\n        T left_value,\n\
+    \        T right_value,\n        T bottom_value,\n        T top_value\n    )\n\
+    \        : left(left_value),\n          right(right_value),\n          bottom(bottom_value),\n\
     \          top(top_value) {}\n\n    friend constexpr bool operator==(\n      \
     \  const AxisAlignedRectangle&,\n        const AxisAlignedRectangle&\n    ) =\
     \ default;\n};\n\nnamespace rectangle_union_area_detail {\n\ntemplate <Coordinate\
@@ -215,11 +215,11 @@ data:
   code: "#ifndef M1UNE_GEOMETRY_RECTANGLE_UNION_AREA_HPP\n#define M1UNE_GEOMETRY_RECTANGLE_UNION_AREA_HPP\
     \ 1\n\n#include \"point.hpp\"\n\n#include <algorithm>\n#include <cassert>\n#include\
     \ <vector>\n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <Coordinate\
-    \ T>\nstruct AxisAlignedRectangle {\n    T left;\n    T bottom;\n    T right;\n\
-    \    T top;\n\n    constexpr AxisAlignedRectangle()\n        : left(0), bottom(0),\
-    \ right(0), top(0) {}\n\n    constexpr AxisAlignedRectangle(\n        T left_value,\n\
-    \        T bottom_value,\n        T right_value,\n        T top_value\n    )\n\
-    \        : left(left_value),\n          bottom(bottom_value),\n          right(right_value),\n\
+    \ T>\nstruct AxisAlignedRectangle {\n    T left;\n    T right;\n    T bottom;\n\
+    \    T top;\n\n    constexpr AxisAlignedRectangle()\n        : left(0), right(0),\
+    \ bottom(0), top(0) {}\n\n    constexpr AxisAlignedRectangle(\n        T left_value,\n\
+    \        T right_value,\n        T bottom_value,\n        T top_value\n    )\n\
+    \        : left(left_value),\n          right(right_value),\n          bottom(bottom_value),\n\
     \          top(top_value) {}\n\n    friend constexpr bool operator==(\n      \
     \  const AxisAlignedRectangle&,\n        const AxisAlignedRectangle&\n    ) =\
     \ default;\n};\n\nnamespace rectangle_union_area_detail {\n\ntemplate <Coordinate\
@@ -289,7 +289,7 @@ data:
   path: geometry/rectangle_union_area.hpp
   requiredBy:
   - geometry/all.hpp
-  timestamp: '2026-08-20 21:15:27+09:00'
+  timestamp: '2026-08-29 18:31:00+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/rectangle_union_area.test.cpp
@@ -316,8 +316,8 @@ Between consecutive x-events, that length is multiplied by the x-distance.
 template <Coordinate T>
 struct AxisAlignedRectangle {
     T left;
-    T bottom;
     T right;
+    T bottom;
     T top;
 };
 
@@ -330,7 +330,7 @@ wide_type<T> rectangle_union_area(
 | Member / Function | Complexity | Description |
 | --- | --- | --- |
 | `AxisAlignedRectangle<T>()` | $O(1)$ | Constructs a zero-area rectangle at the origin. |
-| `AxisAlignedRectangle<T>(left, bottom, right, top)` | $O(1)$ | Constructs `[left, right]` by `[bottom, top]`. |
+| `AxisAlignedRectangle<T>(left, right, bottom, top)` | $O(1)$ | Constructs `[left, right]` by `[bottom, top]`. |
 | `rectangle_union_area(rectangles)` | $O(N\log N)$ time and $O(N)$ memory | Returns the union area without modifying the input. |
 
 The constructor coordinates must satisfy `left <= right` and `bottom <= top`.
@@ -352,8 +352,8 @@ return type is `long double`.
 int main() {
     using Rectangle = m1une::geometry::AxisAlignedRectangle<long long>;
     std::vector<Rectangle> rectangles;
-    rectangles.emplace_back(0, 0, 4, 3);
-    rectangles.emplace_back(2, 1, 6, 5);
+    rectangles.emplace_back(0, 4, 0, 3);
+    rectangles.emplace_back(2, 6, 1, 5);
 
     long long area = static_cast<long long>(
         m1une::geometry::rectangle_union_area(rectangles)
