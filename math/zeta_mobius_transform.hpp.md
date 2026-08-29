@@ -224,18 +224,55 @@ performed. The vector is modified directly and no value is returned.
 
 ## Subset and Superset Transforms
 
-These transforms use each array index as a bit mask. The array length must be a
-nonzero power of two.
+Let the array length be $N = 2^n$. Index $S$ is interpreted as a subset of an
+$n$-element set: element $i$ belongs to $S$ exactly when bit $i$ of the index is
+set. For example, when $n = 3$, index `5 = 0b101` represents the subset
+$\{0, 2\}$. The array length must be a nonzero power of two.
 
-| Function | Result at mask `S` |
-| --- | --- |
-| `subset_zeta_transform(values)` | Sum of the original values over all submasks of `S`. |
-| `subset_mobius_transform(values)` | Inverse of the subset zeta transform. |
-| `superset_zeta_transform(values)` | Sum of the original values over all supermasks of `S`. |
-| `superset_mobius_transform(values)` | Inverse of the superset zeta transform. |
+Suppose that `values[S]` initially stores $f(S)$. The subset zeta transform
+replaces it with
 
-For an array of length $N$, each transform takes $O(N \log N)$ time and
-$O(1)$ additional memory.
+$$
+F(S) = \sum_{T \subseteq S} f(T),
+$$
+
+so the new value at `S` includes the old value at `S` and the old values at all
+of its submasks. The subset Mobius transform performs the inverse operation: if
+the input stores $F$, it recovers
+
+$$
+f(S) = \sum_{T \subseteq S} (-1)^{|S \setminus T|} F(T).
+$$
+
+In the other direction, the superset zeta transform replaces `values[S]` with
+
+$$
+G(S) = \sum_{T \supseteq S} f(T),
+$$
+
+which includes the old values at `S` and all of its supermasks. The superset
+Mobius transform recovers $f$ from $G$:
+
+$$
+f(S) = \sum_{T \supseteq S} (-1)^{|T \setminus S|} G(T).
+$$
+
+| Function | Input at mask `S` | Output at mask `S` | Time |
+| --- | --- | --- | --- |
+| `subset_zeta_transform(values)` | $f(S)$ | $\sum_{T \subseteq S} f(T)$ | $O(N \log N)$ |
+| `subset_mobius_transform(values)` | $F(S)$ | $\sum_{T \subseteq S} (-1)^{|S \setminus T|} F(T)$ | $O(N \log N)$ |
+| `superset_zeta_transform(values)` | $f(S)$ | $\sum_{T \supseteq S} f(T)$ | $O(N \log N)$ |
+| `superset_mobius_transform(values)` | $G(S)$ | $\sum_{T \supseteq S} (-1)^{|T \setminus S|} G(T)$ | $O(N \log N)$ |
+
+For example, let the masks `0`, `1`, `2`, and `3` represent $\varnothing$,
+$\{0\}$, $\{1\}$, and $\{0, 1\}$, respectively. Starting with
+`values = [1, 2, 4, 8]`:
+
+- the subset zeta transform produces `[1, 3, 5, 15]`;
+- the superset zeta transform produces `[15, 10, 12, 8]`.
+
+Applying the matching Mobius transform to either result restores
+`[1, 2, 4, 8]`. Each transform uses $O(1)$ additional memory.
 
 ## Divisor and Multiple Transforms
 
