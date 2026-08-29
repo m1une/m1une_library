@@ -1,6 +1,7 @@
 #ifndef M1UNE_TREE_TREE_HPP
 #define M1UNE_TREE_TREE_HPP 1
 
+#include "cumulative_sum.hpp"
 #include "diameter.hpp"
 #include "euler_tour.hpp"
 #include "rooted_tree.hpp"

@@ -6,7 +6,8 @@ documentation_of: ../../../graph/tree/tree.hpp
 ## Overview
 
 `graph/tree/tree.hpp` is a small tree bundle containing the core rooted-tree
-helpers, the sparse-table LCA helper, and the diameter routine.
+helpers, cumulative path sums, the sparse-table LCA helper, and the diameter
+routine.
 
 For the full tree toolbox, include `graph/tree/all.hpp`.
 
@@ -14,6 +15,7 @@ For the full tree toolbox, include `graph/tree/all.hpp`.
 
 | Header | Contents |
 | --- | --- |
+| `graph/tree/cumulative_sum.hpp` | Static commutative-group products and additive sums on vertex- or edge-weighted paths. |
 | `graph/tree/euler_tour.hpp` | Lightweight rooted-tree preorder, subtree ranges, and parent/depth metadata. |
 | `graph/tree/rooted_tree.hpp` | Rooted metadata, Euler intervals, LCA, jumps, paths, and distances. |
 | `graph/tree/sparse_table_lca.hpp` | Euler-tour sparse-table LCA with $O(1)$ queries. |
