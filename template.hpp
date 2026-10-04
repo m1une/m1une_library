@@ -292,4 +292,10 @@ void Yes() {
 void No() {
     m1une::template_io::output().println("No");
 }
+void Alice() {
+    m1une::template_io::output().println("Alice");
+}
+void Bob() {
+    m1une::template_io::output().println("Bob");
+}
 #endif  // M1UNE_TEMPLATE_HPP
