@@ -231,25 +231,25 @@ data:
   isVerificationFile: false
   path: geometry/convex_hull.hpp
   requiredBy:
+  - geometry/farthest_pair.hpp
   - geometry/all.hpp
   - geometry/convex_polygon.hpp
-  - geometry/farthest_pair.hpp
   timestamp: '2026-08-20 21:15:27+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/geometry/polygon_operations.test.cpp
-  - verify/geometry/convex_hull.test.cpp
-  - verify/geometry/delaunay_triangulation.test.cpp
-  - verify/geometry/convex_polygon.test.cpp
+  - verify/geometry/minkowski_sum.test.cpp
   - verify/geometry/is_convex_polygon.test.cpp
-  - verify/geometry/centroid.test.cpp
   - verify/geometry/steiner_convex_decomposition.test.cpp
-  - verify/geometry/farthest_pair.test.cpp
-  - verify/geometry/convex_diameter.test.cpp
-  - verify/geometry/convex_layers.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/convex_decomposition.test.cpp
-  - verify/geometry/minkowski_sum.test.cpp
+  - verify/geometry/polygon_operations.test.cpp
+  - verify/geometry/convex_diameter.test.cpp
+  - verify/geometry/centroid.test.cpp
+  - verify/geometry/delaunay_triangulation.test.cpp
+  - verify/geometry/convex_layers.test.cpp
+  - verify/geometry/convex_hull.test.cpp
+  - verify/geometry/farthest_pair.test.cpp
+  - verify/geometry/convex_polygon.test.cpp
 documentation_of: geometry/convex_hull.hpp
 layout: document
 title: Convex Hull

@@ -1447,9 +1447,9 @@ data:
   timestamp: '2026-08-21 00:43:43+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/geometry/centroid.test.cpp
-  - verify/geometry/minimum_enclosing_circle.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
+  - verify/geometry/minimum_enclosing_circle.test.cpp
+  - verify/geometry/centroid.test.cpp
 documentation_of: geometry/minimum_enclosing_circle.hpp
 layout: document
 title: Minimum Enclosing Circle

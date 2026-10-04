@@ -146,23 +146,23 @@ data:
   isVerificationFile: false
   path: graph/topological_sort.hpp
   requiredBy:
-  - graph/dag_longest_path.hpp
-  - graph/dag_shortest_path.hpp
-  - graph/all.hpp
-  - graph/undirected.hpp
-  - graph/dag.hpp
-  - graph/directed.hpp
   - graph/dag_path_cover.hpp
-  - graph/dag_path_count.hpp
-  - graph/dag_reachability.hpp
   - graph/shortest_path.hpp
+  - graph/dag_path_count.hpp
+  - graph/dag_longest_path.hpp
+  - graph/undirected.hpp
+  - graph/all.hpp
+  - graph/dag.hpp
+  - graph/dag_shortest_path.hpp
+  - graph/dag_reachability.hpp
+  - graph/directed.hpp
   timestamp: '2026-08-13 01:41:40+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/graph/cow_game.test.cpp
-  - verify/graph/graph_algorithms.test.cpp
-  - verify/graph/dag_algorithms.test.cpp
   - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/dag_algorithms.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/cow_game.test.cpp
 documentation_of: graph/topological_sort.hpp
 layout: document
 title: Topological Sort

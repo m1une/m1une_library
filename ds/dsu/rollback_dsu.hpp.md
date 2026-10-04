@@ -121,8 +121,8 @@ data:
   timestamp: '2026-07-11 19:52:35+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/dynamic_connectivity/dynamic_connectivity.test.cpp
   - verify/ds/dsu/rollback_dsu.test.cpp
+  - verify/ds/dynamic_connectivity/dynamic_connectivity.test.cpp
 documentation_of: ds/dsu/rollback_dsu.hpp
 layout: document
 title: Rollback DSU

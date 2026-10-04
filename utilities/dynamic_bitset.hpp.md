@@ -169,15 +169,15 @@ data:
   requiredBy:
   - graph/all.hpp
   - graph/dag.hpp
-  - graph/directed.hpp
   - graph/dag_reachability.hpp
+  - graph/directed.hpp
   timestamp: '2026-06-21 04:03:53+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/graph/cow_game.test.cpp
-  - verify/graph/graph_algorithms.test.cpp
-  - verify/graph/dag_algorithms.test.cpp
   - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/dag_algorithms.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/cow_game.test.cpp
   - verify/utilities/dynamic_bitset.test.cpp
 documentation_of: utilities/dynamic_bitset.hpp
 layout: document

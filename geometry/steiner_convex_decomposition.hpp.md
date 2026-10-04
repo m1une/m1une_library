@@ -2475,9 +2475,9 @@ data:
   timestamp: '2026-08-21 01:13:34+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/geometry/centroid.test.cpp
   - verify/geometry/steiner_convex_decomposition.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
+  - verify/geometry/centroid.test.cpp
 documentation_of: geometry/steiner_convex_decomposition.hpp
 layout: document
 title: Steiner Convex Decomposition

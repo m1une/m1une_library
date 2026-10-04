@@ -262,9 +262,9 @@ data:
   timestamp: '2026-08-20 21:15:27+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/centroid.test.cpp
   - verify/geometry/farthest_pair.test.cpp
-  - verify/geometry/geometry_algorithms.test.cpp
 documentation_of: geometry/farthest_pair.hpp
 layout: document
 title: Farthest Pair of Points

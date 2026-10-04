@@ -305,87 +305,87 @@ data:
   isVerificationFile: false
   path: geometry/detail/floating_predicate.hpp
   requiredBy:
-  - geometry/manhattan_segment_intersections.hpp
-  - geometry/angle_sort.hpp
-  - geometry/circle_union_area.hpp
-  - geometry/polygon.hpp
-  - geometry/linear.hpp
-  - geometry/perpendicular_bisector.hpp
-  - geometry/half_plane_intersection.hpp
-  - geometry/manhattan_mst.hpp
-  - geometry/delaunay_triangulation.hpp
-  - geometry/closest_pair.hpp
-  - geometry/detail/convex_polygon_normalize.hpp
-  - geometry/convex_hull.hpp
   - geometry/euclidean_mst.hpp
-  - geometry/minimum_enclosing_circle.hpp
-  - geometry/all.hpp
-  - geometry/steiner_convex_decomposition.hpp
-  - geometry/convex_layers.hpp
-  - geometry/count_points_in_triangle.hpp
-  - geometry/point.hpp
-  - geometry/circle_coverage_areas.hpp
-  - geometry/convex_polygon.hpp
-  - geometry/circle.hpp
+  - geometry/polygon.hpp
+  - geometry/perpendicular_bisector.hpp
+  - geometry/farthest_pair.hpp
+  - geometry/manhattan_segment_intersections.hpp
+  - geometry/circle_union_area.hpp
+  - geometry/angle_sort.hpp
+  - geometry/linear.hpp
   - geometry/rectangle_union_area.hpp
   - geometry/minkowski_sum.hpp
-  - geometry/voronoi_diagram.hpp
-  - geometry/farthest_pair.hpp
   - geometry/convex_decomposition.hpp
+  - geometry/half_plane_intersection.hpp
+  - geometry/point.hpp
+  - geometry/delaunay_triangulation.hpp
+  - geometry/count_points_in_triangle.hpp
+  - geometry/convex_hull.hpp
+  - geometry/manhattan_mst.hpp
+  - geometry/steiner_convex_decomposition.hpp
+  - geometry/circle_coverage_areas.hpp
+  - geometry/convex_layers.hpp
+  - geometry/all.hpp
+  - geometry/convex_polygon.hpp
+  - geometry/minimum_enclosing_circle.hpp
+  - geometry/detail/convex_polygon_normalize.hpp
+  - geometry/closest_pair.hpp
+  - geometry/circle.hpp
+  - geometry/voronoi_diagram.hpp
   timestamp: '2026-08-20 21:15:27+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/geometry/polygon_operations.test.cpp
-  - verify/geometry/circle_tangent_points.test.cpp
-  - verify/geometry/point_in_polygon.test.cpp
-  - verify/geometry/perpendicular_bisector.test.cpp
-  - verify/geometry/closest_pair.test.cpp
-  - verify/geometry/circle_boundary_intersection.test.cpp
-  - verify/geometry/polygon_clipping.test.cpp
-  - verify/geometry/rectangle_union_area.test.cpp
-  - verify/geometry/circle_union_area.test.cpp
-  - verify/geometry/segment_intersection.test.cpp
-  - verify/geometry/voronoi_diagram.test.cpp
-  - verify/geometry/convex_hull.test.cpp
-  - verify/geometry/incircle.test.cpp
-  - verify/geometry/delaunay_triangulation.test.cpp
-  - verify/geometry/convex_polygon.test.cpp
-  - verify/geometry/is_convex_polygon.test.cpp
-  - verify/geometry/circle_line_intersection.test.cpp
-  - verify/geometry/centroid.test.cpp
-  - verify/geometry/circle_circle_intersection_area.test.cpp
-  - verify/geometry/circle_operations.test.cpp
-  - verify/geometry/circle_relation.test.cpp
-  - verify/geometry/circle_filled.test.cpp
-  - verify/geometry/manhattan_segment_intersections.test.cpp
-  - verify/geometry/minimum_enclosing_circle.test.cpp
-  - verify/geometry/steiner_convex_decomposition.test.cpp
-  - verify/geometry/circumcircle.test.cpp
-  - verify/geometry/projection.test.cpp
-  - verify/geometry/linear_intersection.test.cpp
-  - verify/geometry/closest_points.test.cpp
   - verify/geometry/ray.test.cpp
-  - verify/geometry/circle_common_tangents.test.cpp
-  - verify/geometry/segment_intersection_point.test.cpp
-  - verify/geometry/farthest_pair.test.cpp
-  - verify/geometry/count_points_in_triangle.test.cpp
-  - verify/geometry/manhattan_mst.test.cpp
-  - verify/geometry/angle_sort.test.cpp
-  - verify/geometry/half_plane_intersection_random.test.cpp
   - verify/geometry/euclidean_mst.test.cpp
-  - verify/geometry/circle_ray.test.cpp
-  - verify/geometry/convex_diameter.test.cpp
-  - verify/geometry/circle_polygon_intersection_area.test.cpp
-  - verify/geometry/floating_predicates.test.cpp
-  - verify/geometry/convex_layers.test.cpp
-  - verify/geometry/geometry_algorithms.test.cpp
-  - verify/geometry/polygon_filled.test.cpp
-  - verify/geometry/polygon_area.test.cpp
-  - verify/geometry/convex_decomposition.test.cpp
-  - verify/geometry/circle_circle_intersection.test.cpp
   - verify/geometry/minkowski_sum.test.cpp
+  - verify/geometry/is_convex_polygon.test.cpp
+  - verify/geometry/steiner_convex_decomposition.test.cpp
+  - verify/geometry/polygon_filled.test.cpp
+  - verify/geometry/manhattan_mst.test.cpp
+  - verify/geometry/polygon_area.test.cpp
+  - verify/geometry/circle_circle_intersection.test.cpp
+  - verify/geometry/circle_line_intersection.test.cpp
+  - verify/geometry/incircle.test.cpp
+  - verify/geometry/circle_union_area.test.cpp
+  - verify/geometry/circle_polygon_intersection_area.test.cpp
+  - verify/geometry/geometry_algorithms.test.cpp
+  - verify/geometry/half_plane_intersection_random.test.cpp
   - verify/geometry/circle_coverage_areas.test.cpp
+  - verify/geometry/segment_intersection_point.test.cpp
+  - verify/geometry/convex_decomposition.test.cpp
+  - verify/geometry/polygon_operations.test.cpp
+  - verify/geometry/rectangle_union_area.test.cpp
+  - verify/geometry/circle_boundary_intersection.test.cpp
+  - verify/geometry/projection.test.cpp
   - verify/geometry/half_plane_intersection.test.cpp
+  - verify/geometry/minimum_enclosing_circle.test.cpp
+  - verify/geometry/closest_pair.test.cpp
+  - verify/geometry/linear_intersection.test.cpp
+  - verify/geometry/circle_circle_intersection_area.test.cpp
+  - verify/geometry/convex_diameter.test.cpp
+  - verify/geometry/centroid.test.cpp
+  - verify/geometry/circle_common_tangents.test.cpp
+  - verify/geometry/circle_ray.test.cpp
+  - verify/geometry/circumcircle.test.cpp
+  - verify/geometry/voronoi_diagram.test.cpp
+  - verify/geometry/delaunay_triangulation.test.cpp
+  - verify/geometry/closest_points.test.cpp
+  - verify/geometry/point_in_polygon.test.cpp
+  - verify/geometry/manhattan_segment_intersections.test.cpp
+  - verify/geometry/convex_layers.test.cpp
+  - verify/geometry/circle_tangent_points.test.cpp
+  - verify/geometry/circle_operations.test.cpp
+  - verify/geometry/segment_intersection.test.cpp
+  - verify/geometry/perpendicular_bisector.test.cpp
+  - verify/geometry/convex_hull.test.cpp
+  - verify/geometry/angle_sort.test.cpp
+  - verify/geometry/floating_predicates.test.cpp
+  - verify/geometry/polygon_clipping.test.cpp
+  - verify/geometry/circle_filled.test.cpp
+  - verify/geometry/count_points_in_triangle.test.cpp
+  - verify/geometry/farthest_pair.test.cpp
+  - verify/geometry/circle_relation.test.cpp
+  - verify/geometry/convex_polygon.test.cpp
 documentation_of: geometry/detail/floating_predicate.hpp
 layout: document
 redirect_from:

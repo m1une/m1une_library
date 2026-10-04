@@ -363,8 +363,10 @@ data:
     \ ? \"Yes\" : \"No\");\n}\nvoid YES() {\n    m1une::template_io::output().println(\"\
     YES\");\n}\nvoid NO() {\n    m1une::template_io::output().println(\"NO\");\n}\n\
     void Yes() {\n    m1une::template_io::output().println(\"Yes\");\n}\nvoid No()\
-    \ {\n    m1une::template_io::output().println(\"No\");\n}\n\n#line 4 \"verify/utilities/template_fast_io.test.cpp\"\
-    \n\n#line 10 \"verify/utilities/template_fast_io.test.cpp\"\n\nstd::FILE* helper_output\
+    \ {\n    m1une::template_io::output().println(\"No\");\n}\nvoid Alice() {\n  \
+    \  m1une::template_io::output().println(\"Alice\");\n}\nvoid Bob() {\n    m1une::template_io::output().println(\"\
+    Bob\");\n}\n\n#line 4 \"verify/utilities/template_fast_io.test.cpp\"\n\n#line\
+    \ 10 \"verify/utilities/template_fast_io.test.cpp\"\n\nstd::FILE* helper_output\
     \ = std::tmpfile();\nm1une::utilities::FastOutput fastout;\n\nvoid test_output_helpers()\
     \ {\n    assert(helper_output != nullptr);\n    const int saved_stdout = ::dup(::fileno(stdout));\n\
     \    assert(saved_stdout != -1);\n    assert(::dup2(::fileno(helper_output), ::fileno(stdout))\
@@ -412,7 +414,7 @@ data:
   isVerificationFile: true
   path: verify/utilities/template_fast_io.test.cpp
   requiredBy: []
-  timestamp: '2026-08-26 23:16:21+09:00'
+  timestamp: '2026-10-04 15:17:25+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/utilities/template_fast_io.test.cpp

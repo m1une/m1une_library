@@ -1197,8 +1197,8 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/multivariate_convolution_cyclic.test.cpp
-  - verify/math/multivariate_convolution_truncated.test.cpp
   - verify/math/math_algorithms.test.cpp
+  - verify/math/multivariate_convolution_truncated.test.cpp
 documentation_of: math/multivariate_convolution.hpp
 layout: document
 title: Multidimensional Convolution

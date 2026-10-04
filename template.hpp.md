@@ -365,7 +365,9 @@ data:
     \ ? \"Yes\" : \"No\");\n}\nvoid YES() {\n    m1une::template_io::output().println(\"\
     YES\");\n}\nvoid NO() {\n    m1une::template_io::output().println(\"NO\");\n}\n\
     void Yes() {\n    m1une::template_io::output().println(\"Yes\");\n}\nvoid No()\
-    \ {\n    m1une::template_io::output().println(\"No\");\n}\n\n"
+    \ {\n    m1une::template_io::output().println(\"No\");\n}\nvoid Alice() {\n  \
+    \  m1une::template_io::output().println(\"Alice\");\n}\nvoid Bob() {\n    m1une::template_io::output().println(\"\
+    Bob\");\n}\n\n"
   code: "#ifndef M1UNE_TEMPLATE_HPP\n#define M1UNE_TEMPLATE_HPP 1\n\n#include <bits/stdc++.h>\n\
     #include <cassert>\n\n#include \"utilities/fast_io.hpp\"\nusing namespace std;\n\
     \nnamespace m1une {\nnamespace template_io {\n\ninline utilities::FastInput& input()\
@@ -466,7 +468,9 @@ data:
     \ ? \"Yes\" : \"No\");\n}\nvoid YES() {\n    m1une::template_io::output().println(\"\
     YES\");\n}\nvoid NO() {\n    m1une::template_io::output().println(\"NO\");\n}\n\
     void Yes() {\n    m1une::template_io::output().println(\"Yes\");\n}\nvoid No()\
-    \ {\n    m1une::template_io::output().println(\"No\");\n}\n#endif  // M1UNE_TEMPLATE_HPP\n"
+    \ {\n    m1une::template_io::output().println(\"No\");\n}\nvoid Alice() {\n  \
+    \  m1une::template_io::output().println(\"Alice\");\n}\nvoid Bob() {\n    m1une::template_io::output().println(\"\
+    Bob\");\n}\n#endif  // M1UNE_TEMPLATE_HPP\n"
   dependsOn:
   - utilities/fast_io.hpp
   isVerificationFile: false
@@ -474,7 +478,7 @@ data:
   requiredBy:
   - main.cpp
   - pch.hpp
-  timestamp: '2026-08-26 23:16:21+09:00'
+  timestamp: '2026-10-04 15:17:25+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/utilities/template_fast_io.test.cpp

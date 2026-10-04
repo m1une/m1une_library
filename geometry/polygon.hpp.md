@@ -2316,26 +2316,26 @@ data:
   isVerificationFile: false
   path: geometry/polygon.hpp
   requiredBy:
-  - geometry/all.hpp
-  - geometry/steiner_convex_decomposition.hpp
-  - geometry/convex_polygon.hpp
   - geometry/convex_decomposition.hpp
+  - geometry/steiner_convex_decomposition.hpp
+  - geometry/all.hpp
+  - geometry/convex_polygon.hpp
   timestamp: '2026-08-21 01:13:34+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/geometry/is_convex_polygon.test.cpp
+  - verify/geometry/steiner_convex_decomposition.test.cpp
+  - verify/geometry/polygon_filled.test.cpp
+  - verify/geometry/polygon_area.test.cpp
+  - verify/geometry/geometry_algorithms.test.cpp
+  - verify/geometry/convex_decomposition.test.cpp
   - verify/geometry/polygon_operations.test.cpp
   - verify/geometry/polygon_operations.test.cpp
+  - verify/geometry/convex_diameter.test.cpp
+  - verify/geometry/centroid.test.cpp
   - verify/geometry/point_in_polygon.test.cpp
   - verify/geometry/polygon_clipping.test.cpp
   - verify/geometry/convex_polygon.test.cpp
-  - verify/geometry/is_convex_polygon.test.cpp
-  - verify/geometry/centroid.test.cpp
-  - verify/geometry/steiner_convex_decomposition.test.cpp
-  - verify/geometry/convex_diameter.test.cpp
-  - verify/geometry/geometry_algorithms.test.cpp
-  - verify/geometry/polygon_filled.test.cpp
-  - verify/geometry/polygon_area.test.cpp
-  - verify/geometry/convex_decomposition.test.cpp
 documentation_of: geometry/polygon.hpp
 layout: document
 title: Polygons

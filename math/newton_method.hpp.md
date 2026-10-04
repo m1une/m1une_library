@@ -926,8 +926,8 @@ data:
   isVerificationFile: false
   path: math/newton_method.hpp
   requiredBy:
-  - math/fps/all.hpp
   - math/fps/solve_fps_equation.hpp
+  - math/fps/all.hpp
   - math/all.hpp
   - math/all.hpp
   timestamp: '2026-08-11 14:11:53+09:00'

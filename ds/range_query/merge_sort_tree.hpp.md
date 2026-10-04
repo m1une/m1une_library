@@ -287,8 +287,8 @@ data:
   timestamp: '2026-07-14 01:36:28+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/range_query/merge_sort_tree.test.cpp
   - verify/ds/range_query/merge_sort_tree_sum.test.cpp
+  - verify/ds/range_query/merge_sort_tree.test.cpp
 documentation_of: ds/range_query/merge_sort_tree.hpp
 layout: document
 title: Merge Sort Tree

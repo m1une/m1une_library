@@ -71,8 +71,8 @@ data:
   timestamp: '2026-06-23 12:24:42+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/lucas.test.cpp
   - verify/math/math_algorithms.test.cpp
+  - verify/math/lucas.test.cpp
 documentation_of: math/lucas.hpp
 layout: document
 title: Lucas's Theorem

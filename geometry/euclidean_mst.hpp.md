@@ -595,11 +595,11 @@ data:
   timestamp: '2026-08-20 21:15:27+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/geometry/voronoi_diagram.test.cpp
-  - verify/geometry/delaunay_triangulation.test.cpp
-  - verify/geometry/centroid.test.cpp
   - verify/geometry/euclidean_mst.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
+  - verify/geometry/centroid.test.cpp
+  - verify/geometry/voronoi_diagram.test.cpp
+  - verify/geometry/delaunay_triangulation.test.cpp
 documentation_of: geometry/euclidean_mst.hpp
 layout: document
 title: Euclidean Minimum Spanning Tree

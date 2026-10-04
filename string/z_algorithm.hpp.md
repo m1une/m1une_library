@@ -47,8 +47,8 @@ data:
   timestamp: '2026-06-21 02:43:08+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/string/string_algorithms.test.cpp
   - verify/string/yosupo_zalgorithm.test.cpp
+  - verify/string/string_algorithms.test.cpp
 documentation_of: string/z_algorithm.hpp
 layout: document
 title: Z Algorithm

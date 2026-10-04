@@ -237,8 +237,8 @@ data:
   timestamp: '2026-07-13 05:49:34+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/binomial_coefficient_mod.test.cpp
   - verify/math/math_algorithms.test.cpp
+  - verify/math/binomial_coefficient_mod.test.cpp
 documentation_of: math/binomial_coefficient_mod.hpp
 layout: document
 title: Binomial Coefficient Modulo an Arbitrary Modulus

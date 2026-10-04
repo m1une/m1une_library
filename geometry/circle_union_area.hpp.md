@@ -1399,9 +1399,9 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/circle_union_area.test.cpp
-  - verify/geometry/centroid.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/circle_coverage_areas.test.cpp
+  - verify/geometry/centroid.test.cpp
 documentation_of: geometry/circle_union_area.hpp
 layout: document
 title: Area of Union of Circles

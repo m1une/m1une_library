@@ -488,10 +488,10 @@ data:
   timestamp: '2026-08-24 00:41:13+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/graph/cow_game.test.cpp
-  - verify/graph/graph_algorithms.test.cpp
-  - verify/graph/dag_algorithms.test.cpp
   - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/dag_algorithms.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/cow_game.test.cpp
 documentation_of: graph/dag_path_cover.hpp
 layout: document
 title: Minimum DAG Path Cover
