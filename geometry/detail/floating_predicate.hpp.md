@@ -220,6 +220,9 @@ data:
     path: verify/geometry/projection.test.cpp
     title: verify/geometry/projection.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/rational.test.cpp
+    title: verify/geometry/rational.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/ray.test.cpp
     title: verify/geometry/ray.test.cpp
   - icon: ':heavy_check_mark:'
@@ -339,6 +342,7 @@ data:
   - verify/geometry/euclidean_mst.test.cpp
   - verify/geometry/minkowski_sum.test.cpp
   - verify/geometry/is_convex_polygon.test.cpp
+  - verify/geometry/rational.test.cpp
   - verify/geometry/steiner_convex_decomposition.test.cpp
   - verify/geometry/polygon_filled.test.cpp
   - verify/geometry/manhattan_mst.test.cpp

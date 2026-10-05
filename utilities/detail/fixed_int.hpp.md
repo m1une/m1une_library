@@ -28,6 +28,9 @@ data:
     path: verify/geometry/geometry_algorithms.test.cpp
     title: verify/geometry/geometry_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/rational.test.cpp
+    title: verify/geometry/rational.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/utilities/int1024.test.cpp
     title: verify/utilities/int1024.test.cpp
   - icon: ':heavy_check_mark:'
@@ -444,6 +447,7 @@ data:
   - verify/utilities/int1024.test.cpp
   - verify/utilities/int512.test.cpp
   - verify/utilities/int256.test.cpp
+  - verify/geometry/rational.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/convex_decomposition.test.cpp
   - verify/geometry/centroid.test.cpp

@@ -10,6 +10,9 @@ data:
     title: Stern-Brocot Tree
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/rational.test.cpp
+    title: verify/geometry/rational.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/math/math_algorithms.test.cpp
     title: verify/math/math_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
@@ -103,11 +106,12 @@ data:
     \    {\n        const auto [numerator, numerator_exponent] = decimal_scientific(_numerator);\n\
     \        const auto [denominator, denominator_exponent] = decimal_scientific(_denominator);\n\
     \        return numerator / denominator *\n               std::pow(10.0L, numerator_exponent\
-    \ - denominator_exponent);\n    }\n\n    explicit constexpr operator long double()\
-    \ const\n        requires requires(const T& value) { static_cast<long double>(value);\
-    \ }\n    {\n        return to_long_double();\n    }\n\n    explicit operator long\
-    \ double() const\n        requires(!requires(const T& value) { static_cast<long\
-    \ double>(value); })\n    {\n        return to_long_double();\n    }\n\n    constexpr\
+    \ - denominator_exponent);\n    }\n\n    template <std::floating_point F>\n  \
+    \  explicit constexpr operator F() const\n        requires requires(const T& value)\
+    \ { static_cast<long double>(value); }\n    {\n        return static_cast<F>(to_long_double());\n\
+    \    }\n\n    template <std::floating_point F>\n    explicit operator F() const\n\
+    \        requires(!requires(const T& value) { static_cast<long double>(value);\
+    \ })\n    {\n        return static_cast<F>(to_long_double());\n    }\n\n    constexpr\
     \ T trunc() const {\n        return _numerator / _denominator;\n    }\n\n    constexpr\
     \ T floor() const {\n        T quotient = _numerator / _denominator;\n       \
     \ if (_numerator < 0 && _numerator % _denominator != 0) quotient -= T(1);\n  \
@@ -174,7 +178,13 @@ data:
     \                return input;\n            }\n        }\n        value = Rational(numerator,\
     \ denominator);\n        return input;\n    }\n};\n\ntemplate <rational_detail::IntegerLike\
     \ T>\nconstexpr Rational<T> abs(const Rational<T>& value) {\n    return value.abs();\n\
-    }\n\n}  // namespace math\n}  // namespace m1une\n\n\n"
+    }\n\n}  // namespace math\n}  // namespace m1une\n\nnamespace std {\n\n// Integer/rational\
+    \ common types already follow from implicit integer\n// construction. Mixing a\
+    \ floating scalar explicitly chooses approximation.\ntemplate <m1une::math::rational_detail::IntegerLike\
+    \ T, floating_point F>\nstruct common_type<m1une::math::Rational<T>, F> {\n  \
+    \  using type = long double;\n};\n\ntemplate <floating_point F, m1une::math::rational_detail::IntegerLike\
+    \ T>\nstruct common_type<F, m1une::math::Rational<T>> {\n    using type = long\
+    \ double;\n};\n\n}  // namespace std\n\n\n"
   code: "#ifndef M1UNE_MATH_RATIONAL_HPP\n#define M1UNE_MATH_RATIONAL_HPP 1\n\n#include\
     \ <algorithm>\n#include <cassert>\n#include <cmath>\n#include <compare>\n#include\
     \ <concepts>\n#include <iostream>\n#include <limits>\n#include <sstream>\n#include\
@@ -252,11 +262,12 @@ data:
     \    {\n        const auto [numerator, numerator_exponent] = decimal_scientific(_numerator);\n\
     \        const auto [denominator, denominator_exponent] = decimal_scientific(_denominator);\n\
     \        return numerator / denominator *\n               std::pow(10.0L, numerator_exponent\
-    \ - denominator_exponent);\n    }\n\n    explicit constexpr operator long double()\
-    \ const\n        requires requires(const T& value) { static_cast<long double>(value);\
-    \ }\n    {\n        return to_long_double();\n    }\n\n    explicit operator long\
-    \ double() const\n        requires(!requires(const T& value) { static_cast<long\
-    \ double>(value); })\n    {\n        return to_long_double();\n    }\n\n    constexpr\
+    \ - denominator_exponent);\n    }\n\n    template <std::floating_point F>\n  \
+    \  explicit constexpr operator F() const\n        requires requires(const T& value)\
+    \ { static_cast<long double>(value); }\n    {\n        return static_cast<F>(to_long_double());\n\
+    \    }\n\n    template <std::floating_point F>\n    explicit operator F() const\n\
+    \        requires(!requires(const T& value) { static_cast<long double>(value);\
+    \ })\n    {\n        return static_cast<F>(to_long_double());\n    }\n\n    constexpr\
     \ T trunc() const {\n        return _numerator / _denominator;\n    }\n\n    constexpr\
     \ T floor() const {\n        T quotient = _numerator / _denominator;\n       \
     \ if (_numerator < 0 && _numerator % _denominator != 0) quotient -= T(1);\n  \
@@ -323,16 +334,23 @@ data:
     \                return input;\n            }\n        }\n        value = Rational(numerator,\
     \ denominator);\n        return input;\n    }\n};\n\ntemplate <rational_detail::IntegerLike\
     \ T>\nconstexpr Rational<T> abs(const Rational<T>& value) {\n    return value.abs();\n\
-    }\n\n}  // namespace math\n}  // namespace m1une\n\n#endif  // M1UNE_MATH_RATIONAL_HPP\n"
+    }\n\n}  // namespace math\n}  // namespace m1une\n\nnamespace std {\n\n// Integer/rational\
+    \ common types already follow from implicit integer\n// construction. Mixing a\
+    \ floating scalar explicitly chooses approximation.\ntemplate <m1une::math::rational_detail::IntegerLike\
+    \ T, floating_point F>\nstruct common_type<m1une::math::Rational<T>, F> {\n  \
+    \  using type = long double;\n};\n\ntemplate <floating_point F, m1une::math::rational_detail::IntegerLike\
+    \ T>\nstruct common_type<F, m1une::math::Rational<T>> {\n    using type = long\
+    \ double;\n};\n\n}  // namespace std\n\n#endif  // M1UNE_MATH_RATIONAL_HPP\n"
   dependsOn: []
   isVerificationFile: false
   path: math/rational.hpp
   requiredBy:
   - math/stern_brocot_tree.hpp
   - math/all.hpp
-  timestamp: '2026-08-13 01:13:27+09:00'
+  timestamp: '2026-10-05 22:23:07+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/geometry/rational.test.cpp
   - verify/math/rational.test.cpp
   - verify/math/stern_brocot_tree.test.cpp
   - verify/math/math_algorithms.test.cpp
@@ -406,6 +424,44 @@ $O(G(N) + M(N) + D(N))$; addition and subtraction also perform linear-time
 addition on `T`. Comparison takes $O(M(N))$. For built-in types, Euclidean gcd
 is logarithmic in the numeric magnitude and the other primitive operations are
 $O(1)$.
+
+## Use with other libraries
+
+`Rational<T>` supports ordinary integer arithmetic, ordering, and containers,
+and can be used as the scalar type of `matrix::Matrix` and its exact linear
+algebra routines. The geometry library accepts it as a coordinate type:
+
+```cpp
+#include "math/rational.hpp"
+#include "geometry/point.hpp"
+
+using Fraction = m1une::math::Rational<>;
+using Point = m1une::geometry::Point<Fraction>;
+
+Point a(Fraction(1, 2), 0);
+Point b(0, Fraction(1, 3));
+Fraction determinant = m1une::geometry::cross(a, b); // 1/6
+Point scaled = a * Fraction(2, 3);                   // (1/3, 0)
+```
+
+Geometry preserves rational arithmetic for dot/cross products, squared
+distances, areas returned by `polygon_area2` and `rectangle_union_area`, and
+exact predicates. Functions returning `long double` or `Point<long double>`
+produce approximations. See [point types and predicates](../geometry/point.md).
+
+`template <std::floating_point F> explicit operator F() const` supports explicit
+conversion to `float`, `double`, or `long double`, with the same complexity as
+`to_long_double()`. It is `constexpr` when the underlying type has a direct
+`long double` conversion. Conversion is always approximate and never implicit.
+`std::common_type_t<Rational<T>, U>` is `Rational<T>` for a compatible integral
+`U`, and `long double` for a floating-point `U` (in either argument order).
+This lets generic scalar operations deliberately produce floating-point output.
+
+Rational numbers are not classified as built-in arithmetic types by standard
+traits. A template explicitly requiring integers, floating-point numbers, or
+transcendental operations has additional requirements; for example,
+`lattice_point_count` requires integer lattice coordinates. No rational square
+root exists for every rational value.
 
 ## Input and Output
 

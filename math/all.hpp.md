@@ -4019,11 +4019,12 @@ data:
     \    {\n        const auto [numerator, numerator_exponent] = decimal_scientific(_numerator);\n\
     \        const auto [denominator, denominator_exponent] = decimal_scientific(_denominator);\n\
     \        return numerator / denominator *\n               std::pow(10.0L, numerator_exponent\
-    \ - denominator_exponent);\n    }\n\n    explicit constexpr operator long double()\
-    \ const\n        requires requires(const T& value) { static_cast<long double>(value);\
-    \ }\n    {\n        return to_long_double();\n    }\n\n    explicit operator long\
-    \ double() const\n        requires(!requires(const T& value) { static_cast<long\
-    \ double>(value); })\n    {\n        return to_long_double();\n    }\n\n    constexpr\
+    \ - denominator_exponent);\n    }\n\n    template <std::floating_point F>\n  \
+    \  explicit constexpr operator F() const\n        requires requires(const T& value)\
+    \ { static_cast<long double>(value); }\n    {\n        return static_cast<F>(to_long_double());\n\
+    \    }\n\n    template <std::floating_point F>\n    explicit operator F() const\n\
+    \        requires(!requires(const T& value) { static_cast<long double>(value);\
+    \ })\n    {\n        return static_cast<F>(to_long_double());\n    }\n\n    constexpr\
     \ T trunc() const {\n        return _numerator / _denominator;\n    }\n\n    constexpr\
     \ T floor() const {\n        T quotient = _numerator / _denominator;\n       \
     \ if (_numerator < 0 && _numerator % _denominator != 0) quotient -= T(1);\n  \
@@ -4090,7 +4091,13 @@ data:
     \                return input;\n            }\n        }\n        value = Rational(numerator,\
     \ denominator);\n        return input;\n    }\n};\n\ntemplate <rational_detail::IntegerLike\
     \ T>\nconstexpr Rational<T> abs(const Rational<T>& value) {\n    return value.abs();\n\
-    }\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line 1 \"math/rational_approximation.hpp\"\
+    }\n\n}  // namespace math\n}  // namespace m1une\n\nnamespace std {\n\n// Integer/rational\
+    \ common types already follow from implicit integer\n// construction. Mixing a\
+    \ floating scalar explicitly chooses approximation.\ntemplate <m1une::math::rational_detail::IntegerLike\
+    \ T, floating_point F>\nstruct common_type<m1une::math::Rational<T>, F> {\n  \
+    \  using type = long double;\n};\n\ntemplate <floating_point F, m1une::math::rational_detail::IntegerLike\
+    \ T>\nstruct common_type<F, m1une::math::Rational<T>> {\n    using type = long\
+    \ double;\n};\n\n}  // namespace std\n\n\n#line 1 \"math/rational_approximation.hpp\"\
     \n\n\n\n#line 10 \"math/rational_approximation.hpp\"\n\nnamespace m1une {\nnamespace\
     \ math {\n\ntemplate <std::integral T>\nrequires(!std::same_as<std::remove_cv_t<T>,\
     \ bool>)\nstruct RationalApproximationResult {\n    using fraction_type = std::pair<T,\
@@ -4851,7 +4858,7 @@ data:
   isVerificationFile: false
   path: math/all.hpp
   requiredBy: []
-  timestamp: '2026-08-24 03:45:33+09:00'
+  timestamp: '2026-10-05 22:23:07+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/math_algorithms.test.cpp

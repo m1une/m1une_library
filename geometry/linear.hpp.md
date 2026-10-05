@@ -151,6 +151,9 @@ data:
     path: verify/geometry/projection.test.cpp
     title: verify/geometry/projection.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/rational.test.cpp
+    title: verify/geometry/rational.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/ray.test.cpp
     title: verify/geometry/ray.test.cpp
   - icon: ':heavy_check_mark:'
@@ -204,77 +207,87 @@ data:
     \ return scaled_sign<Exact>(value, scale, eps);\n}\n\n}  // namespace predicate_detail\n\
     }  // namespace geometry\n}  // namespace m1une\n\n\n#line 10 \"geometry/point.hpp\"\
     \n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <typename T>\nconcept\
-    \ Coordinate = std::is_arithmetic_v<T> && !std::same_as<std::remove_cv_t<T>, bool>;\n\
+    \ Coordinate = !std::same_as<std::remove_cv_t<T>, bool> &&\n    (std::is_arithmetic_v<T>\
+    \ ||\n     (std::copyable<T> && std::totally_ordered<T> && requires(T a, T b)\
+    \ {\n         T(0);\n         T(1);\n         static_cast<long double>(a);\n \
+    \        { +a } -> std::same_as<T>;\n         { -a } -> std::same_as<T>;\n   \
+    \      { a + b } -> std::same_as<T>;\n         { a - b } -> std::same_as<T>;\n\
+    \         { a * b } -> std::same_as<T>;\n         { a / b } -> std::same_as<T>;\n\
+    \         { a += b } -> std::same_as<T&>;\n         { a -= b } -> std::same_as<T&>;\n\
+    \     }));\n\n// Custom coordinate types keep their own exact arithmetic.\ntemplate\
+    \ <typename T>\nconcept ExactCoordinate = Coordinate<T> && !std::floating_point<T>;\n\
     \ntemplate <Coordinate T>\nusing wide_type = std::conditional_t<std::integral<T>,\
-    \ __int128_t, long double>;\n\ntemplate <Coordinate T>\nstruct Point {\n    T\
-    \ x;\n    T y;\n\n    constexpr Point() : x(0), y(0) {}\n    constexpr Point(T\
-    \ x_value, T y_value) : x(x_value), y(y_value) {}\n\n    template <Coordinate\
-    \ U>\n    explicit constexpr Point(const Point<U>& other)\n        : x(static_cast<T>(other.x)),\
-    \ y(static_cast<T>(other.y)) {}\n\n    constexpr Point& operator+=(const Point&\
-    \ other) {\n        x += other.x;\n        y += other.y;\n        return *this;\n\
-    \    }\n\n    constexpr Point& operator-=(const Point& other) {\n        x -=\
-    \ other.x;\n        y -= other.y;\n        return *this;\n    }\n\n    constexpr\
-    \ Point operator+() const {\n        return *this;\n    }\n\n    constexpr Point\
-    \ operator-() const {\n        return Point(-x, -y);\n    }\n\n    friend constexpr\
-    \ Point operator+(Point left, const Point& right) {\n        return left += right;\n\
-    \    }\n\n    friend constexpr Point operator-(Point left, const Point& right)\
-    \ {\n        return left -= right;\n    }\n\n    friend constexpr bool operator==(const\
-    \ Point&, const Point&) = default;\n\n    friend constexpr bool operator<(const\
-    \ Point& left, const Point& right) {\n        if (left.x != right.x) return left.x\
-    \ < right.x;\n        return left.y < right.y;\n    }\n};\n\ntemplate <Coordinate\
-    \ T>\nconstexpr Point<long double> centroid(const Point<T>& point) {\n    return\
-    \ Point<long double>(point);\n}\n\ntemplate <Coordinate T, typename Scalar>\n\
-    requires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(const Point<T>&\
-    \ point, Scalar scalar) {\n    using Result = std::common_type_t<T, Scalar>;\n\
-    \    return Point<Result>(\n        Result(point.x) * Result(scalar),\n      \
-    \  Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate <typename Scalar, Coordinate\
-    \ T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(Scalar scalar,\
-    \ const Point<T>& point) {\n    return point * scalar;\n}\n\ntemplate <Coordinate\
-    \ T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator/(const\
-    \ Point<T>& point, Scalar scalar) {\n    using Result = std::common_type_t<T,\
-    \ Scalar>;\n    return Point<Result>(\n        Result(point.x) / Result(scalar),\n\
-    \        Result(point.y) / Result(scalar)\n    );\n}\n\ntemplate <Coordinate T>\n\
-    constexpr wide_type<T> dot(const Point<T>& a, const Point<T>& b) {\n    using\
-    \ W = wide_type<T>;\n    return W(a.x) * W(b.x) + W(a.y) * W(b.y);\n}\n\ntemplate\
-    \ <Coordinate T>\nconstexpr wide_type<T> cross(const Point<T>& a, const Point<T>&\
-    \ b) {\n    using W = wide_type<T>;\n    return W(a.x) * W(b.y) - W(a.y) * W(b.x);\n\
-    }\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> cross(\n    const Point<T>&\
-    \ origin,\n    const Point<T>& a,\n    const Point<T>& b\n) {\n    using W = wide_type<T>;\n\
-    \    W ax = W(a.x) - W(origin.x);\n    W ay = W(a.y) - W(origin.y);\n    W bx\
-    \ = W(b.x) - W(origin.x);\n    W by = W(b.y) - W(origin.y);\n    return ax * by\
-    \ - ay * bx;\n}\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> norm2(const\
-    \ Point<T>& point) {\n    return dot(point, point);\n}\n\ntemplate <Coordinate\
-    \ T>\nconstexpr wide_type<T> distance2(const Point<T>& a, const Point<T>& b) {\n\
-    \    using W = wide_type<T>;\n    W dx = W(a.x) - W(b.x);\n    W dy = W(a.y) -\
-    \ W(b.y);\n    return dx * dx + dy * dy;\n}\n\ntemplate <Coordinate T>\nlong double\
-    \ norm(const Point<T>& point) {\n    return std::hypot(\n        static_cast<long\
-    \ double>(point.x),\n        static_cast<long double>(point.y)\n    );\n}\n\n\
-    template <Coordinate T>\nlong double distance(const Point<T>& a, const Point<T>&\
-    \ b) {\n    return std::hypot(\n        static_cast<long double>(a.x) - static_cast<long\
-    \ double>(b.x),\n        static_cast<long double>(a.y) - static_cast<long double>(b.y)\n\
-    \    );\n}\n\ntemplate <Coordinate T, typename M, typename N>\nrequires std::is_arithmetic_v<M>\
-    \ && std::is_arithmetic_v<N>\nconstexpr Point<long double> internal_division_point(\n\
-    \    const Point<T>& a,\n    const Point<T>& b,\n    M m,\n    N n\n) {\n    long\
+    \ __int128_t,\n    std::conditional_t<std::floating_point<T>, long double, T>>;\n\
+    \ntemplate <Coordinate T>\nstruct Point {\n    T x;\n    T y;\n\n    constexpr\
+    \ Point() : x(0), y(0) {}\n    constexpr Point(T x_value, T y_value) : x(x_value),\
+    \ y(y_value) {}\n\n    template <Coordinate U>\n    explicit constexpr Point(const\
+    \ Point<U>& other)\n        : x(static_cast<T>(other.x)), y(static_cast<T>(other.y))\
+    \ {}\n\n    constexpr Point& operator+=(const Point& other) {\n        x += other.x;\n\
+    \        y += other.y;\n        return *this;\n    }\n\n    constexpr Point& operator-=(const\
+    \ Point& other) {\n        x -= other.x;\n        y -= other.y;\n        return\
+    \ *this;\n    }\n\n    constexpr Point operator+() const {\n        return *this;\n\
+    \    }\n\n    constexpr Point operator-() const {\n        return Point(-x, -y);\n\
+    \    }\n\n    friend constexpr Point operator+(Point left, const Point& right)\
+    \ {\n        return left += right;\n    }\n\n    friend constexpr Point operator-(Point\
+    \ left, const Point& right) {\n        return left -= right;\n    }\n\n    friend\
+    \ constexpr bool operator==(const Point&, const Point&) = default;\n\n    friend\
+    \ constexpr bool operator<(const Point& left, const Point& right) {\n        if\
+    \ (left.x != right.x) return left.x < right.x;\n        return left.y < right.y;\n\
+    \    }\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const\
+    \ Point<T>& point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate\
+    \ T, typename Scalar>\nrequires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n\
+    constexpr auto operator*(const Point<T>& point, Scalar scalar) {\n    using Result\
+    \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
+    \ * Result(scalar),\n        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate\
+    \ <typename Scalar, Coordinate T>\nrequires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n\
+    constexpr auto operator*(Scalar scalar, const Point<T>& point) {\n    return point\
+    \ * scalar;\n}\n\ntemplate <Coordinate T, typename Scalar>\nrequires (std::is_arithmetic_v<Scalar>\
+    \ || Coordinate<Scalar>)\nconstexpr auto operator/(const Point<T>& point, Scalar\
+    \ scalar) {\n    using Result = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n\
+    \        Result(point.x) / Result(scalar),\n        Result(point.y) / Result(scalar)\n\
+    \    );\n}\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> dot(const Point<T>&\
+    \ a, const Point<T>& b) {\n    using W = wide_type<T>;\n    return W(a.x) * W(b.x)\
+    \ + W(a.y) * W(b.y);\n}\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> cross(const\
+    \ Point<T>& a, const Point<T>& b) {\n    using W = wide_type<T>;\n    return W(a.x)\
+    \ * W(b.y) - W(a.y) * W(b.x);\n}\n\ntemplate <Coordinate T>\nconstexpr wide_type<T>\
+    \ cross(\n    const Point<T>& origin,\n    const Point<T>& a,\n    const Point<T>&\
+    \ b\n) {\n    using W = wide_type<T>;\n    W ax = W(a.x) - W(origin.x);\n    W\
+    \ ay = W(a.y) - W(origin.y);\n    W bx = W(b.x) - W(origin.x);\n    W by = W(b.y)\
+    \ - W(origin.y);\n    return ax * by - ay * bx;\n}\n\ntemplate <Coordinate T>\n\
+    constexpr wide_type<T> norm2(const Point<T>& point) {\n    return dot(point, point);\n\
+    }\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> distance2(const Point<T>&\
+    \ a, const Point<T>& b) {\n    using W = wide_type<T>;\n    W dx = W(a.x) - W(b.x);\n\
+    \    W dy = W(a.y) - W(b.y);\n    return dx * dx + dy * dy;\n}\n\ntemplate <Coordinate\
+    \ T>\nlong double norm(const Point<T>& point) {\n    return std::hypot(\n    \
+    \    static_cast<long double>(point.x),\n        static_cast<long double>(point.y)\n\
+    \    );\n}\n\ntemplate <Coordinate T>\nlong double distance(const Point<T>& a,\
+    \ const Point<T>& b) {\n    return std::hypot(\n        static_cast<long double>(a.x)\
+    \ - static_cast<long double>(b.x),\n        static_cast<long double>(a.y) - static_cast<long\
+    \ double>(b.y)\n    );\n}\n\ntemplate <Coordinate T, typename M, typename N>\n\
+    requires (std::is_arithmetic_v<M> || Coordinate<M>) &&\n         (std::is_arithmetic_v<N>\
+    \ || Coordinate<N>)\nconstexpr Point<long double> internal_division_point(\n \
+    \   const Point<T>& a,\n    const Point<T>& b,\n    M m,\n    N n\n) {\n    long\
     \ double first_ratio = static_cast<long double>(m);\n    long double second_ratio\
     \ = static_cast<long double>(n);\n    long double denominator = first_ratio +\
     \ second_ratio;\n    assert(denominator != 0);\n    Point<long double> first(a);\n\
     \    Point<long double> direction = Point<long double>(b) - first;\n    return\
     \ first + direction * (first_ratio / denominator);\n}\n\ntemplate <Coordinate\
-    \ T, typename M, typename N>\nrequires std::is_arithmetic_v<M> && std::is_arithmetic_v<N>\n\
-    constexpr Point<long double> external_division_point(\n    const Point<T>& a,\n\
-    \    const Point<T>& b,\n    M m,\n    N n\n) {\n    long double first_ratio =\
-    \ static_cast<long double>(m);\n    long double second_ratio = static_cast<long\
-    \ double>(n);\n    long double denominator = first_ratio - second_ratio;\n   \
-    \ assert(denominator != 0);\n    Point<long double> first(a);\n    Point<long\
-    \ double> direction = Point<long double>(b) - first;\n    return first + direction\
-    \ * (first_ratio / denominator);\n}\n\ntemplate <Coordinate T>\nconstexpr int\
-    \ sign(wide_type<T> value, long double eps = 1e-12L) {\n    return predicate_detail::scaled_sign<std::integral<T>>(\n\
+    \ T, typename M, typename N>\nrequires (std::is_arithmetic_v<M> || Coordinate<M>)\
+    \ &&\n         (std::is_arithmetic_v<N> || Coordinate<N>)\nconstexpr Point<long\
+    \ double> external_division_point(\n    const Point<T>& a,\n    const Point<T>&\
+    \ b,\n    M m,\n    N n\n) {\n    long double first_ratio = static_cast<long double>(m);\n\
+    \    long double second_ratio = static_cast<long double>(n);\n    long double\
+    \ denominator = first_ratio - second_ratio;\n    assert(denominator != 0);\n \
+    \   Point<long double> first(a);\n    Point<long double> direction = Point<long\
+    \ double>(b) - first;\n    return first + direction * (first_ratio / denominator);\n\
+    }\n\ntemplate <Coordinate T>\nconstexpr int sign(wide_type<T> value, long double\
+    \ eps = 1e-12L) {\n    return predicate_detail::scaled_sign<ExactCoordinate<T>>(\n\
     \        value,\n        wide_type<T>(1),\n        eps\n    );\n}\n\ntemplate\
     \ <Coordinate T>\nconstexpr int orientation(\n    const Point<T>& a,\n    const\
     \ Point<T>& b,\n    const Point<T>& c,\n    long double eps = 1e-12L\n) {\n  \
     \  using W = wide_type<T>;\n    const W first_x = W(b.x) - W(a.x);\n    const\
     \ W first_y = W(b.y) - W(a.y);\n    const W second_x = W(c.x) - W(a.x);\n    const\
-    \ W second_y = W(c.y) - W(a.y);\n    return predicate_detail::orientation_sign<std::integral<T>>(\n\
+    \ W second_y = W(c.y) - W(a.y);\n    return predicate_detail::orientation_sign<ExactCoordinate<T>>(\n\
     \        first_x,\n        first_y,\n        second_x,\n        second_y,\n  \
     \      eps\n    );\n}\n\ntemplate <Coordinate T>\nconstexpr bool collinear(\n\
     \    const Point<T>& a,\n    const Point<T>& b,\n    const Point<T>& c,\n    long\
@@ -318,13 +331,13 @@ data:
     \ Line<T>& first, const Line<T>& second, long double eps = 1e-12L) {\n    using\
     \ W = wide_type<T>;\n    W first_x = W(first.b.x) - W(first.a.x);\n    W first_y\
     \ = W(first.b.y) - W(first.a.y);\n    W second_x = W(second.b.x) - W(second.a.x);\n\
-    \    W second_y = W(second.b.y) - W(second.a.y);\n    return predicate_detail::determinant_sign<std::integral<T>>(\n\
+    \    W second_y = W(second.b.y) - W(second.a.y);\n    return predicate_detail::determinant_sign<ExactCoordinate<T>>(\n\
     \        first_x,\n        first_y,\n        second_x,\n        second_y,\n  \
     \      eps\n    ) == 0;\n}\n\ntemplate <Coordinate T>\nbool orthogonal(const Line<T>&\
     \ first, const Line<T>& second, long double eps = 1e-12L) {\n    using W = wide_type<T>;\n\
     \    W first_x = W(first.b.x) - W(first.a.x);\n    W first_y = W(first.b.y) -\
     \ W(first.a.y);\n    W second_x = W(second.b.x) - W(second.a.x);\n    W second_y\
-    \ = W(second.b.y) - W(second.a.y);\n    return predicate_detail::dot_sign<std::integral<T>>(\n\
+    \ = W(second.b.y) - W(second.a.y);\n    return predicate_detail::dot_sign<ExactCoordinate<T>>(\n\
     \        first_x,\n        first_y,\n        second_x,\n        second_y,\n  \
     \      eps\n    ) == 0;\n}\n\ntemplate <Coordinate T>\nPoint<long double> projection(const\
     \ Line<T>& line, const Point<T>& point) {\n    assert(line.a != line.b);\n   \
@@ -344,16 +357,16 @@ data:
     \  if (orientation(segment.a, segment.b, point, eps) != 0) return false;\n   \
     \ using W = wide_type<T>;\n    const W direction_x = W(segment.b.x) - W(segment.a.x);\n\
     \    const W direction_y = W(segment.b.y) - W(segment.a.y);\n    if (direction_x\
-    \ == W(0) && direction_y == W(0)) {\n        if constexpr (std::integral<T>) {\n\
-    \            return point == segment.a;\n        } else {\n            return\n\
+    \ == W(0) && direction_y == W(0)) {\n        if constexpr (ExactCoordinate<T>)\
+    \ {\n            return point == segment.a;\n        } else {\n            return\n\
     \                predicate_detail::absolute(W(point.x) - W(segment.a.x)) <= eps\
     \ &&\n                predicate_detail::absolute(W(point.y) - W(segment.a.y))\
     \ <= eps;\n        }\n    }\n    const W offset_x = W(point.x) - W(segment.a.x);\n\
     \    const W offset_y = W(point.y) - W(segment.a.y);\n    const W projection =\n\
     \        offset_x * direction_x + offset_y * direction_y;\n    const W length_squared\
     \ =\n        direction_x * direction_x + direction_y * direction_y;\n    return\n\
-    \        predicate_detail::scaled_sign<std::integral<T>>(\n            projection,\n\
-    \            length_squared,\n            eps\n        ) >= 0 &&\n        predicate_detail::scaled_sign<std::integral<T>>(\n\
+    \        predicate_detail::scaled_sign<ExactCoordinate<T>>(\n            projection,\n\
+    \            length_squared,\n            eps\n        ) >= 0 &&\n        predicate_detail::scaled_sign<ExactCoordinate<T>>(\n\
     \            projection - length_squared,\n            length_squared,\n     \
     \       eps\n        ) <= 0;\n}\n\ntemplate <Coordinate T>\nPoint<long double>\
     \ projection(\n    const Segment<T>& segment,\n    const Point<T>& point\n) {\n\
@@ -389,24 +402,24 @@ data:
     \    W second_y = W(second_through.y) - W(second_origin.y);\n    W offset_x =\
     \ W(second_origin.x) - W(first_origin.x);\n    W offset_y = W(second_origin.y)\
     \ - W(first_origin.y);\n    return Parameters<T>{\n        first_x * second_y\
-    \ - first_y * second_x,\n        predicate_detail::determinant_scale<std::integral<T>>(\n\
+    \ - first_y * second_x,\n        predicate_detail::determinant_scale<ExactCoordinate<T>>(\n\
     \            first_x,\n            first_y,\n            second_x,\n         \
     \   second_y\n        ),\n        offset_x * second_y - offset_y * second_x,\n\
     \        offset_x * first_y - offset_y * first_x\n    };\n}\n\ntemplate <Coordinate\
     \ T>\nint denominator_sign(const Parameters<T>& values, long double eps) {\n \
-    \   return predicate_detail::scaled_sign<std::integral<T>>(\n        values.denominator,\n\
+    \   return predicate_detail::scaled_sign<ExactCoordinate<T>>(\n        values.denominator,\n\
     \        values.denominator_scale,\n        eps\n    );\n}\n\ntemplate <Coordinate\
     \ T>\nbool ratio_nonnegative(\n    wide_type<T> numerator,\n    wide_type<T> denominator,\n\
-    \    long double eps\n) {\n    const int numerator_sign =\n        predicate_detail::scaled_sign<std::integral<T>>(\n\
+    \    long double eps\n) {\n    const int numerator_sign =\n        predicate_detail::scaled_sign<ExactCoordinate<T>>(\n\
     \            numerator,\n            predicate_detail::absolute(denominator),\n\
     \            eps\n        );\n    const int denominator_direction =\n        (denominator\
     \ > 0) - (denominator < 0);\n    return\n        numerator_sign == 0 ||\n    \
     \    numerator_sign == denominator_direction;\n}\n\ntemplate <Coordinate T>\n\
     bool ratio_in_unit_interval(\n    wide_type<T> numerator,\n    wide_type<T> denominator,\n\
     \    long double eps\n) {\n    const auto scale = predicate_detail::absolute(denominator);\n\
-    \    const int start_sign =\n        predicate_detail::scaled_sign<std::integral<T>>(\n\
+    \    const int start_sign =\n        predicate_detail::scaled_sign<ExactCoordinate<T>>(\n\
     \            numerator,\n            scale,\n            eps\n        );\n   \
-    \ const int finish_sign =\n        predicate_detail::scaled_sign<std::integral<T>>(\n\
+    \ const int finish_sign =\n        predicate_detail::scaled_sign<ExactCoordinate<T>>(\n\
     \            numerator - denominator,\n            scale,\n            eps\n \
     \       );\n    if (denominator > 0) {\n        return start_sign >= 0 && finish_sign\
     \ <= 0;\n    }\n    return start_sign <= 0 && finish_sign >= 0;\n}\n\n}  // namespace\
@@ -418,7 +431,7 @@ data:
     \ - W(ray.origin.y);\n    W offset_x = W(point.x) - W(ray.origin.x);\n    W offset_y\
     \ = W(point.y) - W(ray.origin.y);\n    const W projection =\n        direction_x\
     \ * offset_x + direction_y * offset_y;\n    const W length_squared =\n       \
-    \ direction_x * direction_x + direction_y * direction_y;\n    return predicate_detail::scaled_sign<std::integral<T>>(\n\
+    \ direction_x * direction_x + direction_y * direction_y;\n    return predicate_detail::scaled_sign<ExactCoordinate<T>>(\n\
     \        projection,\n        length_squared,\n        eps\n    ) >= 0;\n}\n\n\
     template <Coordinate T>\nPoint<long double> projection(const Ray<T>& ray, const\
     \ Point<T>& point) {\n    assert(ray.origin != ray.through);\n    Point<long double>\
@@ -547,7 +560,7 @@ data:
     \ - projection(first.origin)\n    );\n    scale = std::max(\n        scale,\n\
     \        predicate_detail::absolute(\n            projection(second.through) -\
     \ projection(second.origin)\n        )\n    );\n\n    if (common.has_lower &&\
-    \ common.has_upper) {\n        const int order = predicate_detail::scaled_sign<std::integral<T>>(\n\
+    \ common.has_upper) {\n        const int order = predicate_detail::scaled_sign<ExactCoordinate<T>>(\n\
     \            common.lower - common.upper,\n            scale,\n            eps\n\
     \        );\n        if (order > 0) return make_empty();\n        if (order ==\
     \ 0) {\n            const long double coordinate =\n                (\n      \
@@ -795,13 +808,13 @@ data:
     \ Line<T>& first, const Line<T>& second, long double eps = 1e-12L) {\n    using\
     \ W = wide_type<T>;\n    W first_x = W(first.b.x) - W(first.a.x);\n    W first_y\
     \ = W(first.b.y) - W(first.a.y);\n    W second_x = W(second.b.x) - W(second.a.x);\n\
-    \    W second_y = W(second.b.y) - W(second.a.y);\n    return predicate_detail::determinant_sign<std::integral<T>>(\n\
+    \    W second_y = W(second.b.y) - W(second.a.y);\n    return predicate_detail::determinant_sign<ExactCoordinate<T>>(\n\
     \        first_x,\n        first_y,\n        second_x,\n        second_y,\n  \
     \      eps\n    ) == 0;\n}\n\ntemplate <Coordinate T>\nbool orthogonal(const Line<T>&\
     \ first, const Line<T>& second, long double eps = 1e-12L) {\n    using W = wide_type<T>;\n\
     \    W first_x = W(first.b.x) - W(first.a.x);\n    W first_y = W(first.b.y) -\
     \ W(first.a.y);\n    W second_x = W(second.b.x) - W(second.a.x);\n    W second_y\
-    \ = W(second.b.y) - W(second.a.y);\n    return predicate_detail::dot_sign<std::integral<T>>(\n\
+    \ = W(second.b.y) - W(second.a.y);\n    return predicate_detail::dot_sign<ExactCoordinate<T>>(\n\
     \        first_x,\n        first_y,\n        second_x,\n        second_y,\n  \
     \      eps\n    ) == 0;\n}\n\ntemplate <Coordinate T>\nPoint<long double> projection(const\
     \ Line<T>& line, const Point<T>& point) {\n    assert(line.a != line.b);\n   \
@@ -821,16 +834,16 @@ data:
     \  if (orientation(segment.a, segment.b, point, eps) != 0) return false;\n   \
     \ using W = wide_type<T>;\n    const W direction_x = W(segment.b.x) - W(segment.a.x);\n\
     \    const W direction_y = W(segment.b.y) - W(segment.a.y);\n    if (direction_x\
-    \ == W(0) && direction_y == W(0)) {\n        if constexpr (std::integral<T>) {\n\
-    \            return point == segment.a;\n        } else {\n            return\n\
+    \ == W(0) && direction_y == W(0)) {\n        if constexpr (ExactCoordinate<T>)\
+    \ {\n            return point == segment.a;\n        } else {\n            return\n\
     \                predicate_detail::absolute(W(point.x) - W(segment.a.x)) <= eps\
     \ &&\n                predicate_detail::absolute(W(point.y) - W(segment.a.y))\
     \ <= eps;\n        }\n    }\n    const W offset_x = W(point.x) - W(segment.a.x);\n\
     \    const W offset_y = W(point.y) - W(segment.a.y);\n    const W projection =\n\
     \        offset_x * direction_x + offset_y * direction_y;\n    const W length_squared\
     \ =\n        direction_x * direction_x + direction_y * direction_y;\n    return\n\
-    \        predicate_detail::scaled_sign<std::integral<T>>(\n            projection,\n\
-    \            length_squared,\n            eps\n        ) >= 0 &&\n        predicate_detail::scaled_sign<std::integral<T>>(\n\
+    \        predicate_detail::scaled_sign<ExactCoordinate<T>>(\n            projection,\n\
+    \            length_squared,\n            eps\n        ) >= 0 &&\n        predicate_detail::scaled_sign<ExactCoordinate<T>>(\n\
     \            projection - length_squared,\n            length_squared,\n     \
     \       eps\n        ) <= 0;\n}\n\ntemplate <Coordinate T>\nPoint<long double>\
     \ projection(\n    const Segment<T>& segment,\n    const Point<T>& point\n) {\n\
@@ -866,24 +879,24 @@ data:
     \    W second_y = W(second_through.y) - W(second_origin.y);\n    W offset_x =\
     \ W(second_origin.x) - W(first_origin.x);\n    W offset_y = W(second_origin.y)\
     \ - W(first_origin.y);\n    return Parameters<T>{\n        first_x * second_y\
-    \ - first_y * second_x,\n        predicate_detail::determinant_scale<std::integral<T>>(\n\
+    \ - first_y * second_x,\n        predicate_detail::determinant_scale<ExactCoordinate<T>>(\n\
     \            first_x,\n            first_y,\n            second_x,\n         \
     \   second_y\n        ),\n        offset_x * second_y - offset_y * second_x,\n\
     \        offset_x * first_y - offset_y * first_x\n    };\n}\n\ntemplate <Coordinate\
     \ T>\nint denominator_sign(const Parameters<T>& values, long double eps) {\n \
-    \   return predicate_detail::scaled_sign<std::integral<T>>(\n        values.denominator,\n\
+    \   return predicate_detail::scaled_sign<ExactCoordinate<T>>(\n        values.denominator,\n\
     \        values.denominator_scale,\n        eps\n    );\n}\n\ntemplate <Coordinate\
     \ T>\nbool ratio_nonnegative(\n    wide_type<T> numerator,\n    wide_type<T> denominator,\n\
-    \    long double eps\n) {\n    const int numerator_sign =\n        predicate_detail::scaled_sign<std::integral<T>>(\n\
+    \    long double eps\n) {\n    const int numerator_sign =\n        predicate_detail::scaled_sign<ExactCoordinate<T>>(\n\
     \            numerator,\n            predicate_detail::absolute(denominator),\n\
     \            eps\n        );\n    const int denominator_direction =\n        (denominator\
     \ > 0) - (denominator < 0);\n    return\n        numerator_sign == 0 ||\n    \
     \    numerator_sign == denominator_direction;\n}\n\ntemplate <Coordinate T>\n\
     bool ratio_in_unit_interval(\n    wide_type<T> numerator,\n    wide_type<T> denominator,\n\
     \    long double eps\n) {\n    const auto scale = predicate_detail::absolute(denominator);\n\
-    \    const int start_sign =\n        predicate_detail::scaled_sign<std::integral<T>>(\n\
+    \    const int start_sign =\n        predicate_detail::scaled_sign<ExactCoordinate<T>>(\n\
     \            numerator,\n            scale,\n            eps\n        );\n   \
-    \ const int finish_sign =\n        predicate_detail::scaled_sign<std::integral<T>>(\n\
+    \ const int finish_sign =\n        predicate_detail::scaled_sign<ExactCoordinate<T>>(\n\
     \            numerator - denominator,\n            scale,\n            eps\n \
     \       );\n    if (denominator > 0) {\n        return start_sign >= 0 && finish_sign\
     \ <= 0;\n    }\n    return start_sign <= 0 && finish_sign >= 0;\n}\n\n}  // namespace\
@@ -895,7 +908,7 @@ data:
     \ - W(ray.origin.y);\n    W offset_x = W(point.x) - W(ray.origin.x);\n    W offset_y\
     \ = W(point.y) - W(ray.origin.y);\n    const W projection =\n        direction_x\
     \ * offset_x + direction_y * offset_y;\n    const W length_squared =\n       \
-    \ direction_x * direction_x + direction_y * direction_y;\n    return predicate_detail::scaled_sign<std::integral<T>>(\n\
+    \ direction_x * direction_x + direction_y * direction_y;\n    return predicate_detail::scaled_sign<ExactCoordinate<T>>(\n\
     \        projection,\n        length_squared,\n        eps\n    ) >= 0;\n}\n\n\
     template <Coordinate T>\nPoint<long double> projection(const Ray<T>& ray, const\
     \ Point<T>& point) {\n    assert(ray.origin != ray.through);\n    Point<long double>\
@@ -1024,7 +1037,7 @@ data:
     \ - projection(first.origin)\n    );\n    scale = std::max(\n        scale,\n\
     \        predicate_detail::absolute(\n            projection(second.through) -\
     \ projection(second.origin)\n        )\n    );\n\n    if (common.has_lower &&\
-    \ common.has_upper) {\n        const int order = predicate_detail::scaled_sign<std::integral<T>>(\n\
+    \ common.has_upper) {\n        const int order = predicate_detail::scaled_sign<ExactCoordinate<T>>(\n\
     \            common.lower - common.upper,\n            scale,\n            eps\n\
     \        );\n        if (order > 0) return make_empty();\n        if (order ==\
     \ 0) {\n            const long double coordinate =\n                (\n      \
@@ -1259,11 +1272,12 @@ data:
   - geometry/convex_polygon.hpp
   - geometry/minimum_enclosing_circle.hpp
   - geometry/circle.hpp
-  timestamp: '2026-08-20 22:35:59+09:00'
+  timestamp: '2026-10-05 22:23:07+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/ray.test.cpp
   - verify/geometry/is_convex_polygon.test.cpp
+  - verify/geometry/rational.test.cpp
   - verify/geometry/steiner_convex_decomposition.test.cpp
   - verify/geometry/polygon_filled.test.cpp
   - verify/geometry/polygon_area.test.cpp
@@ -1308,6 +1322,12 @@ title: Linear Objects
 ---
 
 ## Overview
+
+Rational coordinates are supported, including `Rational<BigInt>`. Predicates
+that use exact arithmetic for integral inputs also use exact rational arithmetic
+and ignore `eps`. Constructed coordinates and lengths with `long double` return
+types remain approximations. Complexity bounds count scalar operations; rational
+inputs add the underlying arithmetic and gcd costs.
 
 This header provides `Line<T>`, `Segment<T>`, and `Ray<T>` together with
 projection, reflection, distances, intersection predicates, segment centroids,

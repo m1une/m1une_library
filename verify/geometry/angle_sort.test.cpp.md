@@ -57,77 +57,87 @@ data:
     \ return scaled_sign<Exact>(value, scale, eps);\n}\n\n}  // namespace predicate_detail\n\
     }  // namespace geometry\n}  // namespace m1une\n\n\n#line 10 \"geometry/point.hpp\"\
     \n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <typename T>\nconcept\
-    \ Coordinate = std::is_arithmetic_v<T> && !std::same_as<std::remove_cv_t<T>, bool>;\n\
+    \ Coordinate = !std::same_as<std::remove_cv_t<T>, bool> &&\n    (std::is_arithmetic_v<T>\
+    \ ||\n     (std::copyable<T> && std::totally_ordered<T> && requires(T a, T b)\
+    \ {\n         T(0);\n         T(1);\n         static_cast<long double>(a);\n \
+    \        { +a } -> std::same_as<T>;\n         { -a } -> std::same_as<T>;\n   \
+    \      { a + b } -> std::same_as<T>;\n         { a - b } -> std::same_as<T>;\n\
+    \         { a * b } -> std::same_as<T>;\n         { a / b } -> std::same_as<T>;\n\
+    \         { a += b } -> std::same_as<T&>;\n         { a -= b } -> std::same_as<T&>;\n\
+    \     }));\n\n// Custom coordinate types keep their own exact arithmetic.\ntemplate\
+    \ <typename T>\nconcept ExactCoordinate = Coordinate<T> && !std::floating_point<T>;\n\
     \ntemplate <Coordinate T>\nusing wide_type = std::conditional_t<std::integral<T>,\
-    \ __int128_t, long double>;\n\ntemplate <Coordinate T>\nstruct Point {\n    T\
-    \ x;\n    T y;\n\n    constexpr Point() : x(0), y(0) {}\n    constexpr Point(T\
-    \ x_value, T y_value) : x(x_value), y(y_value) {}\n\n    template <Coordinate\
-    \ U>\n    explicit constexpr Point(const Point<U>& other)\n        : x(static_cast<T>(other.x)),\
-    \ y(static_cast<T>(other.y)) {}\n\n    constexpr Point& operator+=(const Point&\
-    \ other) {\n        x += other.x;\n        y += other.y;\n        return *this;\n\
-    \    }\n\n    constexpr Point& operator-=(const Point& other) {\n        x -=\
-    \ other.x;\n        y -= other.y;\n        return *this;\n    }\n\n    constexpr\
-    \ Point operator+() const {\n        return *this;\n    }\n\n    constexpr Point\
-    \ operator-() const {\n        return Point(-x, -y);\n    }\n\n    friend constexpr\
-    \ Point operator+(Point left, const Point& right) {\n        return left += right;\n\
-    \    }\n\n    friend constexpr Point operator-(Point left, const Point& right)\
-    \ {\n        return left -= right;\n    }\n\n    friend constexpr bool operator==(const\
-    \ Point&, const Point&) = default;\n\n    friend constexpr bool operator<(const\
-    \ Point& left, const Point& right) {\n        if (left.x != right.x) return left.x\
-    \ < right.x;\n        return left.y < right.y;\n    }\n};\n\ntemplate <Coordinate\
-    \ T>\nconstexpr Point<long double> centroid(const Point<T>& point) {\n    return\
-    \ Point<long double>(point);\n}\n\ntemplate <Coordinate T, typename Scalar>\n\
-    requires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(const Point<T>&\
-    \ point, Scalar scalar) {\n    using Result = std::common_type_t<T, Scalar>;\n\
-    \    return Point<Result>(\n        Result(point.x) * Result(scalar),\n      \
-    \  Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate <typename Scalar, Coordinate\
-    \ T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(Scalar scalar,\
-    \ const Point<T>& point) {\n    return point * scalar;\n}\n\ntemplate <Coordinate\
-    \ T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator/(const\
-    \ Point<T>& point, Scalar scalar) {\n    using Result = std::common_type_t<T,\
-    \ Scalar>;\n    return Point<Result>(\n        Result(point.x) / Result(scalar),\n\
-    \        Result(point.y) / Result(scalar)\n    );\n}\n\ntemplate <Coordinate T>\n\
-    constexpr wide_type<T> dot(const Point<T>& a, const Point<T>& b) {\n    using\
-    \ W = wide_type<T>;\n    return W(a.x) * W(b.x) + W(a.y) * W(b.y);\n}\n\ntemplate\
-    \ <Coordinate T>\nconstexpr wide_type<T> cross(const Point<T>& a, const Point<T>&\
-    \ b) {\n    using W = wide_type<T>;\n    return W(a.x) * W(b.y) - W(a.y) * W(b.x);\n\
-    }\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> cross(\n    const Point<T>&\
-    \ origin,\n    const Point<T>& a,\n    const Point<T>& b\n) {\n    using W = wide_type<T>;\n\
-    \    W ax = W(a.x) - W(origin.x);\n    W ay = W(a.y) - W(origin.y);\n    W bx\
-    \ = W(b.x) - W(origin.x);\n    W by = W(b.y) - W(origin.y);\n    return ax * by\
-    \ - ay * bx;\n}\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> norm2(const\
-    \ Point<T>& point) {\n    return dot(point, point);\n}\n\ntemplate <Coordinate\
-    \ T>\nconstexpr wide_type<T> distance2(const Point<T>& a, const Point<T>& b) {\n\
-    \    using W = wide_type<T>;\n    W dx = W(a.x) - W(b.x);\n    W dy = W(a.y) -\
-    \ W(b.y);\n    return dx * dx + dy * dy;\n}\n\ntemplate <Coordinate T>\nlong double\
-    \ norm(const Point<T>& point) {\n    return std::hypot(\n        static_cast<long\
-    \ double>(point.x),\n        static_cast<long double>(point.y)\n    );\n}\n\n\
-    template <Coordinate T>\nlong double distance(const Point<T>& a, const Point<T>&\
-    \ b) {\n    return std::hypot(\n        static_cast<long double>(a.x) - static_cast<long\
-    \ double>(b.x),\n        static_cast<long double>(a.y) - static_cast<long double>(b.y)\n\
-    \    );\n}\n\ntemplate <Coordinate T, typename M, typename N>\nrequires std::is_arithmetic_v<M>\
-    \ && std::is_arithmetic_v<N>\nconstexpr Point<long double> internal_division_point(\n\
-    \    const Point<T>& a,\n    const Point<T>& b,\n    M m,\n    N n\n) {\n    long\
+    \ __int128_t,\n    std::conditional_t<std::floating_point<T>, long double, T>>;\n\
+    \ntemplate <Coordinate T>\nstruct Point {\n    T x;\n    T y;\n\n    constexpr\
+    \ Point() : x(0), y(0) {}\n    constexpr Point(T x_value, T y_value) : x(x_value),\
+    \ y(y_value) {}\n\n    template <Coordinate U>\n    explicit constexpr Point(const\
+    \ Point<U>& other)\n        : x(static_cast<T>(other.x)), y(static_cast<T>(other.y))\
+    \ {}\n\n    constexpr Point& operator+=(const Point& other) {\n        x += other.x;\n\
+    \        y += other.y;\n        return *this;\n    }\n\n    constexpr Point& operator-=(const\
+    \ Point& other) {\n        x -= other.x;\n        y -= other.y;\n        return\
+    \ *this;\n    }\n\n    constexpr Point operator+() const {\n        return *this;\n\
+    \    }\n\n    constexpr Point operator-() const {\n        return Point(-x, -y);\n\
+    \    }\n\n    friend constexpr Point operator+(Point left, const Point& right)\
+    \ {\n        return left += right;\n    }\n\n    friend constexpr Point operator-(Point\
+    \ left, const Point& right) {\n        return left -= right;\n    }\n\n    friend\
+    \ constexpr bool operator==(const Point&, const Point&) = default;\n\n    friend\
+    \ constexpr bool operator<(const Point& left, const Point& right) {\n        if\
+    \ (left.x != right.x) return left.x < right.x;\n        return left.y < right.y;\n\
+    \    }\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const\
+    \ Point<T>& point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate\
+    \ T, typename Scalar>\nrequires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n\
+    constexpr auto operator*(const Point<T>& point, Scalar scalar) {\n    using Result\
+    \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
+    \ * Result(scalar),\n        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate\
+    \ <typename Scalar, Coordinate T>\nrequires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n\
+    constexpr auto operator*(Scalar scalar, const Point<T>& point) {\n    return point\
+    \ * scalar;\n}\n\ntemplate <Coordinate T, typename Scalar>\nrequires (std::is_arithmetic_v<Scalar>\
+    \ || Coordinate<Scalar>)\nconstexpr auto operator/(const Point<T>& point, Scalar\
+    \ scalar) {\n    using Result = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n\
+    \        Result(point.x) / Result(scalar),\n        Result(point.y) / Result(scalar)\n\
+    \    );\n}\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> dot(const Point<T>&\
+    \ a, const Point<T>& b) {\n    using W = wide_type<T>;\n    return W(a.x) * W(b.x)\
+    \ + W(a.y) * W(b.y);\n}\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> cross(const\
+    \ Point<T>& a, const Point<T>& b) {\n    using W = wide_type<T>;\n    return W(a.x)\
+    \ * W(b.y) - W(a.y) * W(b.x);\n}\n\ntemplate <Coordinate T>\nconstexpr wide_type<T>\
+    \ cross(\n    const Point<T>& origin,\n    const Point<T>& a,\n    const Point<T>&\
+    \ b\n) {\n    using W = wide_type<T>;\n    W ax = W(a.x) - W(origin.x);\n    W\
+    \ ay = W(a.y) - W(origin.y);\n    W bx = W(b.x) - W(origin.x);\n    W by = W(b.y)\
+    \ - W(origin.y);\n    return ax * by - ay * bx;\n}\n\ntemplate <Coordinate T>\n\
+    constexpr wide_type<T> norm2(const Point<T>& point) {\n    return dot(point, point);\n\
+    }\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> distance2(const Point<T>&\
+    \ a, const Point<T>& b) {\n    using W = wide_type<T>;\n    W dx = W(a.x) - W(b.x);\n\
+    \    W dy = W(a.y) - W(b.y);\n    return dx * dx + dy * dy;\n}\n\ntemplate <Coordinate\
+    \ T>\nlong double norm(const Point<T>& point) {\n    return std::hypot(\n    \
+    \    static_cast<long double>(point.x),\n        static_cast<long double>(point.y)\n\
+    \    );\n}\n\ntemplate <Coordinate T>\nlong double distance(const Point<T>& a,\
+    \ const Point<T>& b) {\n    return std::hypot(\n        static_cast<long double>(a.x)\
+    \ - static_cast<long double>(b.x),\n        static_cast<long double>(a.y) - static_cast<long\
+    \ double>(b.y)\n    );\n}\n\ntemplate <Coordinate T, typename M, typename N>\n\
+    requires (std::is_arithmetic_v<M> || Coordinate<M>) &&\n         (std::is_arithmetic_v<N>\
+    \ || Coordinate<N>)\nconstexpr Point<long double> internal_division_point(\n \
+    \   const Point<T>& a,\n    const Point<T>& b,\n    M m,\n    N n\n) {\n    long\
     \ double first_ratio = static_cast<long double>(m);\n    long double second_ratio\
     \ = static_cast<long double>(n);\n    long double denominator = first_ratio +\
     \ second_ratio;\n    assert(denominator != 0);\n    Point<long double> first(a);\n\
     \    Point<long double> direction = Point<long double>(b) - first;\n    return\
     \ first + direction * (first_ratio / denominator);\n}\n\ntemplate <Coordinate\
-    \ T, typename M, typename N>\nrequires std::is_arithmetic_v<M> && std::is_arithmetic_v<N>\n\
-    constexpr Point<long double> external_division_point(\n    const Point<T>& a,\n\
-    \    const Point<T>& b,\n    M m,\n    N n\n) {\n    long double first_ratio =\
-    \ static_cast<long double>(m);\n    long double second_ratio = static_cast<long\
-    \ double>(n);\n    long double denominator = first_ratio - second_ratio;\n   \
-    \ assert(denominator != 0);\n    Point<long double> first(a);\n    Point<long\
-    \ double> direction = Point<long double>(b) - first;\n    return first + direction\
-    \ * (first_ratio / denominator);\n}\n\ntemplate <Coordinate T>\nconstexpr int\
-    \ sign(wide_type<T> value, long double eps = 1e-12L) {\n    return predicate_detail::scaled_sign<std::integral<T>>(\n\
+    \ T, typename M, typename N>\nrequires (std::is_arithmetic_v<M> || Coordinate<M>)\
+    \ &&\n         (std::is_arithmetic_v<N> || Coordinate<N>)\nconstexpr Point<long\
+    \ double> external_division_point(\n    const Point<T>& a,\n    const Point<T>&\
+    \ b,\n    M m,\n    N n\n) {\n    long double first_ratio = static_cast<long double>(m);\n\
+    \    long double second_ratio = static_cast<long double>(n);\n    long double\
+    \ denominator = first_ratio - second_ratio;\n    assert(denominator != 0);\n \
+    \   Point<long double> first(a);\n    Point<long double> direction = Point<long\
+    \ double>(b) - first;\n    return first + direction * (first_ratio / denominator);\n\
+    }\n\ntemplate <Coordinate T>\nconstexpr int sign(wide_type<T> value, long double\
+    \ eps = 1e-12L) {\n    return predicate_detail::scaled_sign<ExactCoordinate<T>>(\n\
     \        value,\n        wide_type<T>(1),\n        eps\n    );\n}\n\ntemplate\
     \ <Coordinate T>\nconstexpr int orientation(\n    const Point<T>& a,\n    const\
     \ Point<T>& b,\n    const Point<T>& c,\n    long double eps = 1e-12L\n) {\n  \
     \  using W = wide_type<T>;\n    const W first_x = W(b.x) - W(a.x);\n    const\
     \ W first_y = W(b.y) - W(a.y);\n    const W second_x = W(c.x) - W(a.x);\n    const\
-    \ W second_y = W(c.y) - W(a.y);\n    return predicate_detail::orientation_sign<std::integral<T>>(\n\
+    \ W second_y = W(c.y) - W(a.y);\n    return predicate_detail::orientation_sign<ExactCoordinate<T>>(\n\
     \        first_x,\n        first_y,\n        second_x,\n        second_y,\n  \
     \      eps\n    );\n}\n\ntemplate <Coordinate T>\nconstexpr bool collinear(\n\
     \    const Point<T>& a,\n    const Point<T>& b,\n    const Point<T>& c,\n    long\
@@ -508,7 +518,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/angle_sort.test.cpp
   requiredBy: []
-  timestamp: '2026-08-26 23:16:21+09:00'
+  timestamp: '2026-10-05 22:23:07+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/angle_sort.test.cpp

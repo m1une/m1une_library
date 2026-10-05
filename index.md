@@ -2026,6 +2026,9 @@ data:
       path: verify/geometry/projection.test.cpp
       title: verify/geometry/projection.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/geometry/rational.test.cpp
+      title: verify/geometry/rational.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/geometry/ray.test.cpp
       title: verify/geometry/ray.test.cpp
     - icon: ':heavy_check_mark:'

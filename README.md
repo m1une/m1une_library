@@ -28,7 +28,7 @@ they can be combined without rewriting boilerplate during a contest.
 | `heuristic/` | Hill climbing, simulated annealing, and memory-bounded beam search for approximate optimization. |
 | `matroid/` | Uniform, partition, graphic, and linear matroids, plus weighted, unweighted, and randomized linear matroid intersection. |
 | `game/` | Nim and nimber arithmetic, classic impartial games, partisan outcomes, DAG minimax, Sprague-Grundy numbers, and retrograde directed-game analysis. |
-| `geometry/` | 2D points, lines, rays, segments, Manhattan segment intersections, perpendicular bisectors, polygons, convex decomposition, circle coverage multiplicities, circle- and rectangle-union area, convex hulls, Delaunay triangulations, Voronoi diagrams, half-plane intersection, lattice-point counting, and circles. |
+| `geometry/` | 2D geometry with built-in or exact rational coordinates, lines, rays, segments, Manhattan segment intersections, perpendicular bisectors, polygons, convex decomposition, circle coverage multiplicities, circle- and rectangle-union area, convex hulls, Delaunay triangulations, Voronoi diagrams, half-plane intersection, lattice-point counting, and circles. |
 | `ds/` | Categorized data structures for range queries, online/offline dynamic connectivity, dynamic sequences and trees, ordered sets, heaps, intervals, and hash tables. |
 | `monoid/` | Reusable monoids for generic data structures such as `Segtree`. |
 | `acted_monoid/` | Ordinary acted monoids for lazy propagation structures such as `LazySegtree`, including generic range assignment/range product and combined bitwise AND/OR/XOR updates with range sums. |

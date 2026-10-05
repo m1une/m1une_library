@@ -64,6 +64,9 @@ data:
     path: verify/geometry/manhattan_mst.test.cpp
     title: verify/geometry/manhattan_mst.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/rational.test.cpp
+    title: verify/geometry/rational.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/voronoi_diagram.test.cpp
     title: verify/geometry/voronoi_diagram.test.cpp
   - icon: ':heavy_check_mark:'
@@ -186,6 +189,7 @@ data:
   - verify/graph/cow_game.test.cpp
   - verify/geometry/euclidean_mst.test.cpp
   - verify/geometry/euclidean_mst.test.cpp
+  - verify/geometry/rational.test.cpp
   - verify/geometry/manhattan_mst.test.cpp
   - verify/geometry/manhattan_mst.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp

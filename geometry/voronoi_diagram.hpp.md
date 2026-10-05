@@ -25,6 +25,9 @@ data:
     path: verify/geometry/geometry_algorithms.test.cpp
     title: verify/geometry/geometry_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/rational.test.cpp
+    title: verify/geometry/rational.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/voronoi_diagram.test.cpp
     title: verify/geometry/voronoi_diagram.test.cpp
   _isVerificationFailed: false
@@ -103,77 +106,87 @@ data:
     \ return scaled_sign<Exact>(value, scale, eps);\n}\n\n}  // namespace predicate_detail\n\
     }  // namespace geometry\n}  // namespace m1une\n\n\n#line 10 \"geometry/point.hpp\"\
     \n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <typename T>\nconcept\
-    \ Coordinate = std::is_arithmetic_v<T> && !std::same_as<std::remove_cv_t<T>, bool>;\n\
+    \ Coordinate = !std::same_as<std::remove_cv_t<T>, bool> &&\n    (std::is_arithmetic_v<T>\
+    \ ||\n     (std::copyable<T> && std::totally_ordered<T> && requires(T a, T b)\
+    \ {\n         T(0);\n         T(1);\n         static_cast<long double>(a);\n \
+    \        { +a } -> std::same_as<T>;\n         { -a } -> std::same_as<T>;\n   \
+    \      { a + b } -> std::same_as<T>;\n         { a - b } -> std::same_as<T>;\n\
+    \         { a * b } -> std::same_as<T>;\n         { a / b } -> std::same_as<T>;\n\
+    \         { a += b } -> std::same_as<T&>;\n         { a -= b } -> std::same_as<T&>;\n\
+    \     }));\n\n// Custom coordinate types keep their own exact arithmetic.\ntemplate\
+    \ <typename T>\nconcept ExactCoordinate = Coordinate<T> && !std::floating_point<T>;\n\
     \ntemplate <Coordinate T>\nusing wide_type = std::conditional_t<std::integral<T>,\
-    \ __int128_t, long double>;\n\ntemplate <Coordinate T>\nstruct Point {\n    T\
-    \ x;\n    T y;\n\n    constexpr Point() : x(0), y(0) {}\n    constexpr Point(T\
-    \ x_value, T y_value) : x(x_value), y(y_value) {}\n\n    template <Coordinate\
-    \ U>\n    explicit constexpr Point(const Point<U>& other)\n        : x(static_cast<T>(other.x)),\
-    \ y(static_cast<T>(other.y)) {}\n\n    constexpr Point& operator+=(const Point&\
-    \ other) {\n        x += other.x;\n        y += other.y;\n        return *this;\n\
-    \    }\n\n    constexpr Point& operator-=(const Point& other) {\n        x -=\
-    \ other.x;\n        y -= other.y;\n        return *this;\n    }\n\n    constexpr\
-    \ Point operator+() const {\n        return *this;\n    }\n\n    constexpr Point\
-    \ operator-() const {\n        return Point(-x, -y);\n    }\n\n    friend constexpr\
-    \ Point operator+(Point left, const Point& right) {\n        return left += right;\n\
-    \    }\n\n    friend constexpr Point operator-(Point left, const Point& right)\
-    \ {\n        return left -= right;\n    }\n\n    friend constexpr bool operator==(const\
-    \ Point&, const Point&) = default;\n\n    friend constexpr bool operator<(const\
-    \ Point& left, const Point& right) {\n        if (left.x != right.x) return left.x\
-    \ < right.x;\n        return left.y < right.y;\n    }\n};\n\ntemplate <Coordinate\
-    \ T>\nconstexpr Point<long double> centroid(const Point<T>& point) {\n    return\
-    \ Point<long double>(point);\n}\n\ntemplate <Coordinate T, typename Scalar>\n\
-    requires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(const Point<T>&\
-    \ point, Scalar scalar) {\n    using Result = std::common_type_t<T, Scalar>;\n\
-    \    return Point<Result>(\n        Result(point.x) * Result(scalar),\n      \
-    \  Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate <typename Scalar, Coordinate\
-    \ T>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator*(Scalar scalar,\
-    \ const Point<T>& point) {\n    return point * scalar;\n}\n\ntemplate <Coordinate\
-    \ T, typename Scalar>\nrequires std::is_arithmetic_v<Scalar>\nconstexpr auto operator/(const\
-    \ Point<T>& point, Scalar scalar) {\n    using Result = std::common_type_t<T,\
-    \ Scalar>;\n    return Point<Result>(\n        Result(point.x) / Result(scalar),\n\
-    \        Result(point.y) / Result(scalar)\n    );\n}\n\ntemplate <Coordinate T>\n\
-    constexpr wide_type<T> dot(const Point<T>& a, const Point<T>& b) {\n    using\
-    \ W = wide_type<T>;\n    return W(a.x) * W(b.x) + W(a.y) * W(b.y);\n}\n\ntemplate\
-    \ <Coordinate T>\nconstexpr wide_type<T> cross(const Point<T>& a, const Point<T>&\
-    \ b) {\n    using W = wide_type<T>;\n    return W(a.x) * W(b.y) - W(a.y) * W(b.x);\n\
-    }\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> cross(\n    const Point<T>&\
-    \ origin,\n    const Point<T>& a,\n    const Point<T>& b\n) {\n    using W = wide_type<T>;\n\
-    \    W ax = W(a.x) - W(origin.x);\n    W ay = W(a.y) - W(origin.y);\n    W bx\
-    \ = W(b.x) - W(origin.x);\n    W by = W(b.y) - W(origin.y);\n    return ax * by\
-    \ - ay * bx;\n}\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> norm2(const\
-    \ Point<T>& point) {\n    return dot(point, point);\n}\n\ntemplate <Coordinate\
-    \ T>\nconstexpr wide_type<T> distance2(const Point<T>& a, const Point<T>& b) {\n\
-    \    using W = wide_type<T>;\n    W dx = W(a.x) - W(b.x);\n    W dy = W(a.y) -\
-    \ W(b.y);\n    return dx * dx + dy * dy;\n}\n\ntemplate <Coordinate T>\nlong double\
-    \ norm(const Point<T>& point) {\n    return std::hypot(\n        static_cast<long\
-    \ double>(point.x),\n        static_cast<long double>(point.y)\n    );\n}\n\n\
-    template <Coordinate T>\nlong double distance(const Point<T>& a, const Point<T>&\
-    \ b) {\n    return std::hypot(\n        static_cast<long double>(a.x) - static_cast<long\
-    \ double>(b.x),\n        static_cast<long double>(a.y) - static_cast<long double>(b.y)\n\
-    \    );\n}\n\ntemplate <Coordinate T, typename M, typename N>\nrequires std::is_arithmetic_v<M>\
-    \ && std::is_arithmetic_v<N>\nconstexpr Point<long double> internal_division_point(\n\
-    \    const Point<T>& a,\n    const Point<T>& b,\n    M m,\n    N n\n) {\n    long\
+    \ __int128_t,\n    std::conditional_t<std::floating_point<T>, long double, T>>;\n\
+    \ntemplate <Coordinate T>\nstruct Point {\n    T x;\n    T y;\n\n    constexpr\
+    \ Point() : x(0), y(0) {}\n    constexpr Point(T x_value, T y_value) : x(x_value),\
+    \ y(y_value) {}\n\n    template <Coordinate U>\n    explicit constexpr Point(const\
+    \ Point<U>& other)\n        : x(static_cast<T>(other.x)), y(static_cast<T>(other.y))\
+    \ {}\n\n    constexpr Point& operator+=(const Point& other) {\n        x += other.x;\n\
+    \        y += other.y;\n        return *this;\n    }\n\n    constexpr Point& operator-=(const\
+    \ Point& other) {\n        x -= other.x;\n        y -= other.y;\n        return\
+    \ *this;\n    }\n\n    constexpr Point operator+() const {\n        return *this;\n\
+    \    }\n\n    constexpr Point operator-() const {\n        return Point(-x, -y);\n\
+    \    }\n\n    friend constexpr Point operator+(Point left, const Point& right)\
+    \ {\n        return left += right;\n    }\n\n    friend constexpr Point operator-(Point\
+    \ left, const Point& right) {\n        return left -= right;\n    }\n\n    friend\
+    \ constexpr bool operator==(const Point&, const Point&) = default;\n\n    friend\
+    \ constexpr bool operator<(const Point& left, const Point& right) {\n        if\
+    \ (left.x != right.x) return left.x < right.x;\n        return left.y < right.y;\n\
+    \    }\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const\
+    \ Point<T>& point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate\
+    \ T, typename Scalar>\nrequires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n\
+    constexpr auto operator*(const Point<T>& point, Scalar scalar) {\n    using Result\
+    \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
+    \ * Result(scalar),\n        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate\
+    \ <typename Scalar, Coordinate T>\nrequires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n\
+    constexpr auto operator*(Scalar scalar, const Point<T>& point) {\n    return point\
+    \ * scalar;\n}\n\ntemplate <Coordinate T, typename Scalar>\nrequires (std::is_arithmetic_v<Scalar>\
+    \ || Coordinate<Scalar>)\nconstexpr auto operator/(const Point<T>& point, Scalar\
+    \ scalar) {\n    using Result = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n\
+    \        Result(point.x) / Result(scalar),\n        Result(point.y) / Result(scalar)\n\
+    \    );\n}\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> dot(const Point<T>&\
+    \ a, const Point<T>& b) {\n    using W = wide_type<T>;\n    return W(a.x) * W(b.x)\
+    \ + W(a.y) * W(b.y);\n}\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> cross(const\
+    \ Point<T>& a, const Point<T>& b) {\n    using W = wide_type<T>;\n    return W(a.x)\
+    \ * W(b.y) - W(a.y) * W(b.x);\n}\n\ntemplate <Coordinate T>\nconstexpr wide_type<T>\
+    \ cross(\n    const Point<T>& origin,\n    const Point<T>& a,\n    const Point<T>&\
+    \ b\n) {\n    using W = wide_type<T>;\n    W ax = W(a.x) - W(origin.x);\n    W\
+    \ ay = W(a.y) - W(origin.y);\n    W bx = W(b.x) - W(origin.x);\n    W by = W(b.y)\
+    \ - W(origin.y);\n    return ax * by - ay * bx;\n}\n\ntemplate <Coordinate T>\n\
+    constexpr wide_type<T> norm2(const Point<T>& point) {\n    return dot(point, point);\n\
+    }\n\ntemplate <Coordinate T>\nconstexpr wide_type<T> distance2(const Point<T>&\
+    \ a, const Point<T>& b) {\n    using W = wide_type<T>;\n    W dx = W(a.x) - W(b.x);\n\
+    \    W dy = W(a.y) - W(b.y);\n    return dx * dx + dy * dy;\n}\n\ntemplate <Coordinate\
+    \ T>\nlong double norm(const Point<T>& point) {\n    return std::hypot(\n    \
+    \    static_cast<long double>(point.x),\n        static_cast<long double>(point.y)\n\
+    \    );\n}\n\ntemplate <Coordinate T>\nlong double distance(const Point<T>& a,\
+    \ const Point<T>& b) {\n    return std::hypot(\n        static_cast<long double>(a.x)\
+    \ - static_cast<long double>(b.x),\n        static_cast<long double>(a.y) - static_cast<long\
+    \ double>(b.y)\n    );\n}\n\ntemplate <Coordinate T, typename M, typename N>\n\
+    requires (std::is_arithmetic_v<M> || Coordinate<M>) &&\n         (std::is_arithmetic_v<N>\
+    \ || Coordinate<N>)\nconstexpr Point<long double> internal_division_point(\n \
+    \   const Point<T>& a,\n    const Point<T>& b,\n    M m,\n    N n\n) {\n    long\
     \ double first_ratio = static_cast<long double>(m);\n    long double second_ratio\
     \ = static_cast<long double>(n);\n    long double denominator = first_ratio +\
     \ second_ratio;\n    assert(denominator != 0);\n    Point<long double> first(a);\n\
     \    Point<long double> direction = Point<long double>(b) - first;\n    return\
     \ first + direction * (first_ratio / denominator);\n}\n\ntemplate <Coordinate\
-    \ T, typename M, typename N>\nrequires std::is_arithmetic_v<M> && std::is_arithmetic_v<N>\n\
-    constexpr Point<long double> external_division_point(\n    const Point<T>& a,\n\
-    \    const Point<T>& b,\n    M m,\n    N n\n) {\n    long double first_ratio =\
-    \ static_cast<long double>(m);\n    long double second_ratio = static_cast<long\
-    \ double>(n);\n    long double denominator = first_ratio - second_ratio;\n   \
-    \ assert(denominator != 0);\n    Point<long double> first(a);\n    Point<long\
-    \ double> direction = Point<long double>(b) - first;\n    return first + direction\
-    \ * (first_ratio / denominator);\n}\n\ntemplate <Coordinate T>\nconstexpr int\
-    \ sign(wide_type<T> value, long double eps = 1e-12L) {\n    return predicate_detail::scaled_sign<std::integral<T>>(\n\
+    \ T, typename M, typename N>\nrequires (std::is_arithmetic_v<M> || Coordinate<M>)\
+    \ &&\n         (std::is_arithmetic_v<N> || Coordinate<N>)\nconstexpr Point<long\
+    \ double> external_division_point(\n    const Point<T>& a,\n    const Point<T>&\
+    \ b,\n    M m,\n    N n\n) {\n    long double first_ratio = static_cast<long double>(m);\n\
+    \    long double second_ratio = static_cast<long double>(n);\n    long double\
+    \ denominator = first_ratio - second_ratio;\n    assert(denominator != 0);\n \
+    \   Point<long double> first(a);\n    Point<long double> direction = Point<long\
+    \ double>(b) - first;\n    return first + direction * (first_ratio / denominator);\n\
+    }\n\ntemplate <Coordinate T>\nconstexpr int sign(wide_type<T> value, long double\
+    \ eps = 1e-12L) {\n    return predicate_detail::scaled_sign<ExactCoordinate<T>>(\n\
     \        value,\n        wide_type<T>(1),\n        eps\n    );\n}\n\ntemplate\
     \ <Coordinate T>\nconstexpr int orientation(\n    const Point<T>& a,\n    const\
     \ Point<T>& b,\n    const Point<T>& c,\n    long double eps = 1e-12L\n) {\n  \
     \  using W = wide_type<T>;\n    const W first_x = W(b.x) - W(a.x);\n    const\
     \ W first_y = W(b.y) - W(a.y);\n    const W second_x = W(c.x) - W(a.x);\n    const\
-    \ W second_y = W(c.y) - W(a.y);\n    return predicate_detail::orientation_sign<std::integral<T>>(\n\
+    \ W second_y = W(c.y) - W(a.y);\n    return predicate_detail::orientation_sign<ExactCoordinate<T>>(\n\
     \        first_x,\n        first_y,\n        second_x,\n        second_y,\n  \
     \      eps\n    );\n}\n\ntemplate <Coordinate T>\nconstexpr bool collinear(\n\
     \    const Point<T>& a,\n    const Point<T>& b,\n    const Point<T>& c,\n    long\
@@ -191,7 +204,7 @@ data:
     geometry/euclidean_mst.hpp\"\n\nnamespace m1une {\nnamespace geometry {\n\ntemplate\
     \ <class T>\nstruct EuclideanMstEdge {\n    int from;\n    int to;\n    T squared_distance;\n\
     };\n\ntemplate <class T>\nstruct EuclideanMst {\n    long double cost;\n    std::vector<EuclideanMstEdge<T>>\
-    \ edges;\n};\n\nnamespace detail {\n\ntemplate <std::integral T>\nclass EuclideanDelaunay\
+    \ edges;\n};\n\nnamespace detail {\n\ntemplate <ExactCoordinate T>\nclass EuclideanDelaunay\
     \ {\n   private:\n    using W = wide_type<T>;\n\n    struct InternalPoint {\n\
     \        W x;\n        W y;\n\n        friend bool operator==(const InternalPoint&,\
     \ const InternalPoint&) = default;\n    };\n\n    struct Edge {\n        int to;\n\
@@ -358,18 +371,19 @@ data:
     \                result.emplace_back(vertex, duplicate_representative[vertex]);\n\
     \            }\n        }\n        return result;\n    }\n};\n\n}  // namespace\
     \ detail\n\n// Returns O(n) Delaunay edges containing a Euclidean minimum spanning\
-    \ tree.\ntemplate <std::integral T>\nstd::vector<EuclideanMstEdge<wide_type<T>>>\
+    \ tree.\ntemplate <ExactCoordinate T>\nstd::vector<EuclideanMstEdge<wide_type<T>>>\
     \ euclidean_mst_edges(\n    const std::vector<Point<T>>& points\n) {\n    using\
     \ W = wide_type<T>;\n    auto delaunay_edges = detail::EuclideanDelaunay<T>(points).get_edges();\n\
     \    std::vector<EuclideanMstEdge<W>> result;\n    result.reserve(delaunay_edges.size());\n\
     \    for (auto [from, to] : delaunay_edges) {\n        result.push_back(EuclideanMstEdge<W>{from,\
     \ to, distance2(points[from], points[to])});\n    }\n    return result;\n}\n\n\
-    // Returns a Euclidean minimum spanning tree.\ntemplate <std::integral T>\nEuclideanMst<wide_type<T>>\
-    \ euclidean_mst(const std::vector<Point<T>>& points) {\n    using W = wide_type<T>;\n\
-    \    auto candidates = euclidean_mst_edges(points);\n    std::sort(candidates.begin(),\
-    \ candidates.end(), [](const auto& left, const auto& right) {\n        if (left.squared_distance\
-    \ != right.squared_distance) {\n            return left.squared_distance < right.squared_distance;\n\
-    \        }\n        if (left.from != right.from) return left.from < right.from;\n\
+    // Returns a Euclidean minimum spanning tree.\ntemplate <ExactCoordinate T>\n\
+    EuclideanMst<wide_type<T>> euclidean_mst(const std::vector<Point<T>>& points)\
+    \ {\n    using W = wide_type<T>;\n    auto candidates = euclidean_mst_edges(points);\n\
+    \    std::sort(candidates.begin(), candidates.end(), [](const auto& left, const\
+    \ auto& right) {\n        if (left.squared_distance != right.squared_distance)\
+    \ {\n            return left.squared_distance < right.squared_distance;\n    \
+    \    }\n        if (left.from != right.from) return left.from < right.from;\n\
     \        return left.to < right.to;\n    });\n\n    m1une::ds::Dsu dsu(int(points.size()));\n\
     \    EuclideanMst<W> result;\n    result.cost = 0;\n    result.edges.reserve(points.empty()\
     \ ? 0 : points.size() - 1);\n    for (const auto& edge : candidates) {\n     \
@@ -385,10 +399,10 @@ data:
     \    Point<long double> point;\n    Point<long double> direction;\n};\n\nstruct\
     \ VoronoiDiagram {\n    std::vector<Point<long double>> vertices;\n    std::vector<VoronoiEdge>\
     \ edges;\n    std::vector<std::vector<int>> cell_edges;\n};\n\nnamespace voronoi_diagram_detail\
-    \ {\n\ntemplate <std::integral T>\nint direction_half(\n    const Point<T>& origin,\n\
-    \    const Point<T>& destination\n) {\n    using W = wide_type<T>;\n    W x =\
-    \ W(destination.x) - W(origin.x);\n    W y = W(destination.y) - W(origin.y);\n\
-    \    return y > 0 || (y == 0 && x >= 0) ? 0 : 1;\n}\n\ntemplate <std::integral\
+    \ {\n\ntemplate <ExactCoordinate T>\nint direction_half(\n    const Point<T>&\
+    \ origin,\n    const Point<T>& destination\n) {\n    using W = wide_type<T>;\n\
+    \    W x = W(destination.x) - W(origin.x);\n    W y = W(destination.y) - W(origin.y);\n\
+    \    return y > 0 || (y == 0 && x >= 0) ? 0 : 1;\n}\n\ntemplate <ExactCoordinate\
     \ T>\nbool direction_less(\n    const std::vector<Point<T>>& sites,\n    int origin,\n\
     \    int first,\n    int second\n) {\n    int first_half = direction_half(sites[origin],\
     \ sites[first]);\n    int second_half = direction_half(sites[origin], sites[second]);\n\
@@ -400,7 +414,7 @@ data:
     \ 0) return product > 0;\n\n    W first_norm = first_x * first_x + first_y * first_y;\n\
     \    W second_norm = second_x * second_x + second_y * second_y;\n    if (first_norm\
     \ != second_norm) return first_norm < second_norm;\n    return first < second;\n\
-    }\n\ntemplate <std::integral T>\nbool cocircular(\n    const Point<T>& first,\n\
+    }\n\ntemplate <ExactCoordinate T>\nbool cocircular(\n    const Point<T>& first,\n\
     \    const Point<T>& second,\n    const Point<T>& third,\n    const Point<T>&\
     \ fourth\n) {\n    using W = wide_type<T>;\n    W ax = W(first.x) - W(fourth.x);\n\
     \    W ay = W(first.y) - W(fourth.y);\n    W bx = W(second.x) - W(fourth.x);\n\
@@ -409,7 +423,7 @@ data:
     \ W b_norm = bx * bx + by * by;\n    W c_norm = cx * cx + cy * cy;\n    W determinant\
     \ =\n        (bx * cy - by * cx) * a_norm +\n        (cx * ay - cy * ax) * b_norm\
     \ +\n        (ax * by - ay * bx) * c_norm;\n    return determinant == 0;\n}\n\n\
-    template <std::integral T>\nPoint<long double> circumcenter(\n    const Point<T>&\
+    template <ExactCoordinate T>\nPoint<long double> circumcenter(\n    const Point<T>&\
     \ first,\n    const Point<T>& second,\n    const Point<T>& third\n) {\n    long\
     \ double ax = static_cast<long double>(first.x);\n    long double ay = static_cast<long\
     \ double>(first.y);\n    long double bx = static_cast<long double>(second.x);\n\
@@ -428,9 +442,9 @@ data:
     \ VoronoiEdge& edge, int site) {\n    assert(edge.first_site == site || edge.second_site\
     \ == site);\n    return edge.first_site == site ? edge.second_site : edge.first_site;\n\
     }\n\n}  // namespace voronoi_diagram_detail\n\n// Constructs the ordinary Euclidean\
-    \ Voronoi diagram of distinct integral sites.\ntemplate <std::integral T>\nVoronoiDiagram\
-    \ voronoi_diagram(const std::vector<Point<T>>& sites) {\n    namespace detail\
-    \ = voronoi_diagram_detail;\n    assert(sites.size() <= std::size_t(std::numeric_limits<int>::max()));\n\
+    \ Voronoi diagram of distinct exact-coordinate sites.\ntemplate <ExactCoordinate\
+    \ T>\nVoronoiDiagram voronoi_diagram(const std::vector<Point<T>>& sites) {\n \
+    \   namespace detail = voronoi_diagram_detail;\n    assert(sites.size() <= std::size_t(std::numeric_limits<int>::max()));\n\
     \n    const int size = int(sites.size());\n    std::vector<int> site_order(size);\n\
     \    std::iota(site_order.begin(), site_order.end(), 0);\n    std::sort(site_order.begin(),\
     \ site_order.end(), [&](int first, int second) {\n        return sites[first]\
@@ -568,10 +582,10 @@ data:
     \    Point<long double> point;\n    Point<long double> direction;\n};\n\nstruct\
     \ VoronoiDiagram {\n    std::vector<Point<long double>> vertices;\n    std::vector<VoronoiEdge>\
     \ edges;\n    std::vector<std::vector<int>> cell_edges;\n};\n\nnamespace voronoi_diagram_detail\
-    \ {\n\ntemplate <std::integral T>\nint direction_half(\n    const Point<T>& origin,\n\
-    \    const Point<T>& destination\n) {\n    using W = wide_type<T>;\n    W x =\
-    \ W(destination.x) - W(origin.x);\n    W y = W(destination.y) - W(origin.y);\n\
-    \    return y > 0 || (y == 0 && x >= 0) ? 0 : 1;\n}\n\ntemplate <std::integral\
+    \ {\n\ntemplate <ExactCoordinate T>\nint direction_half(\n    const Point<T>&\
+    \ origin,\n    const Point<T>& destination\n) {\n    using W = wide_type<T>;\n\
+    \    W x = W(destination.x) - W(origin.x);\n    W y = W(destination.y) - W(origin.y);\n\
+    \    return y > 0 || (y == 0 && x >= 0) ? 0 : 1;\n}\n\ntemplate <ExactCoordinate\
     \ T>\nbool direction_less(\n    const std::vector<Point<T>>& sites,\n    int origin,\n\
     \    int first,\n    int second\n) {\n    int first_half = direction_half(sites[origin],\
     \ sites[first]);\n    int second_half = direction_half(sites[origin], sites[second]);\n\
@@ -583,7 +597,7 @@ data:
     \ 0) return product > 0;\n\n    W first_norm = first_x * first_x + first_y * first_y;\n\
     \    W second_norm = second_x * second_x + second_y * second_y;\n    if (first_norm\
     \ != second_norm) return first_norm < second_norm;\n    return first < second;\n\
-    }\n\ntemplate <std::integral T>\nbool cocircular(\n    const Point<T>& first,\n\
+    }\n\ntemplate <ExactCoordinate T>\nbool cocircular(\n    const Point<T>& first,\n\
     \    const Point<T>& second,\n    const Point<T>& third,\n    const Point<T>&\
     \ fourth\n) {\n    using W = wide_type<T>;\n    W ax = W(first.x) - W(fourth.x);\n\
     \    W ay = W(first.y) - W(fourth.y);\n    W bx = W(second.x) - W(fourth.x);\n\
@@ -592,7 +606,7 @@ data:
     \ W b_norm = bx * bx + by * by;\n    W c_norm = cx * cx + cy * cy;\n    W determinant\
     \ =\n        (bx * cy - by * cx) * a_norm +\n        (cx * ay - cy * ax) * b_norm\
     \ +\n        (ax * by - ay * bx) * c_norm;\n    return determinant == 0;\n}\n\n\
-    template <std::integral T>\nPoint<long double> circumcenter(\n    const Point<T>&\
+    template <ExactCoordinate T>\nPoint<long double> circumcenter(\n    const Point<T>&\
     \ first,\n    const Point<T>& second,\n    const Point<T>& third\n) {\n    long\
     \ double ax = static_cast<long double>(first.x);\n    long double ay = static_cast<long\
     \ double>(first.y);\n    long double bx = static_cast<long double>(second.x);\n\
@@ -611,9 +625,9 @@ data:
     \ VoronoiEdge& edge, int site) {\n    assert(edge.first_site == site || edge.second_site\
     \ == site);\n    return edge.first_site == site ? edge.second_site : edge.first_site;\n\
     }\n\n}  // namespace voronoi_diagram_detail\n\n// Constructs the ordinary Euclidean\
-    \ Voronoi diagram of distinct integral sites.\ntemplate <std::integral T>\nVoronoiDiagram\
-    \ voronoi_diagram(const std::vector<Point<T>>& sites) {\n    namespace detail\
-    \ = voronoi_diagram_detail;\n    assert(sites.size() <= std::size_t(std::numeric_limits<int>::max()));\n\
+    \ Voronoi diagram of distinct exact-coordinate sites.\ntemplate <ExactCoordinate\
+    \ T>\nVoronoiDiagram voronoi_diagram(const std::vector<Point<T>>& sites) {\n \
+    \   namespace detail = voronoi_diagram_detail;\n    assert(sites.size() <= std::size_t(std::numeric_limits<int>::max()));\n\
     \n    const int size = int(sites.size());\n    std::vector<int> site_order(size);\n\
     \    std::iota(site_order.begin(), site_order.end(), 0);\n    std::sort(site_order.begin(),\
     \ site_order.end(), [&](int first, int second) {\n        return sites[first]\
@@ -750,9 +764,10 @@ data:
   path: geometry/voronoi_diagram.hpp
   requiredBy:
   - geometry/all.hpp
-  timestamp: '2026-08-20 21:15:27+09:00'
+  timestamp: '2026-10-05 22:23:07+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/geometry/rational.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/centroid.test.cpp
   - verify/geometry/voronoi_diagram.test.cpp
@@ -763,12 +778,19 @@ title: Voronoi Diagram
 
 ## Overview
 
+`T` may be a built-in integer or an exact coordinate class such as
+`math::Rational<long long>` or `math::Rational<utilities::BigInt>`.
+Rational intermediate arithmetic uses `T` without floating-point conversion.
+All intermediate fractions must be representable. Listed complexities count
+scalar operations; rational arithmetic adds its gcd and integer arithmetic costs.
+Returned lengths or constructed coordinates still use `long double`.
+
 `voronoi_diagram` constructs the ordinary Euclidean Voronoi diagram of a set
-of distinct integral sites. The diagram is the geometric dual of an exact
+of distinct exact-coordinate sites. The diagram is the geometric dual of an exact
 Delaunay triangulation, so it contains finite segments, unbounded rays, and,
 when every site is collinear, full lines.
 
-Combinatorial decisions use exact integral predicates. Finite vertices and
+Combinatorial decisions use exact predicates. Finite vertices and
 parametric edge geometry use `long double` because circumcenters need not be
 integral.
 
@@ -822,7 +844,7 @@ do not share an edge and therefore do not appear in each other's lists.
 The exact signature is:
 
 ```cpp
-template <std::integral T>
+template <ExactCoordinate T>
 VoronoiDiagram voronoi_diagram(
     const std::vector<Point<T>>& sites
 );

@@ -118,6 +118,9 @@ data:
     path: verify/geometry/lattice_point_count.test.cpp
     title: verify/geometry/lattice_point_count.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/rational.test.cpp
+    title: verify/geometry/rational.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/cow_game.test.cpp
     title: verify/graph/cow_game.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1306,6 +1309,7 @@ data:
   - verify/utilities/bigint_gcd.test.cpp
   - verify/utilities/bigint_division.test.cpp
   - verify/geometry/lattice_point_count.test.cpp
+  - verify/geometry/rational.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/centroid.test.cpp
   - verify/math/fps/half_gcd.test.cpp

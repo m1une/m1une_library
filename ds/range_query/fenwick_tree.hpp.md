@@ -31,6 +31,9 @@ data:
     path: verify/geometry/manhattan_segment_intersections.test.cpp
     title: verify/geometry/manhattan_segment_intersections.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/rational.test.cpp
+    title: verify/geometry/rational.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/tree/vertex_add_subtree_sum.test.cpp
     title: verify/graph/tree/vertex_add_subtree_sum.test.cpp
   _isVerificationFailed: false
@@ -113,6 +116,7 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/graph/tree/vertex_add_subtree_sum.test.cpp
+  - verify/geometry/rational.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/centroid.test.cpp
   - verify/geometry/manhattan_segment_intersections.test.cpp

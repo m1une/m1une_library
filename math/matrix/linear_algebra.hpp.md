@@ -25,6 +25,9 @@ data:
     title: Matrix Bundle
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/rational.test.cpp
+    title: verify/geometry/rational.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/graph/counting_spanning_tree_directed.test.cpp
     title: verify/graph/counting_spanning_tree_directed.test.cpp
   - icon: ':heavy_check_mark:'
@@ -383,6 +386,7 @@ data:
   - verify/graph/graph_algorithms.test.cpp
   - verify/graph/counting_spanning_tree_directed.test.cpp
   - verify/graph/cow_game.test.cpp
+  - verify/geometry/rational.test.cpp
   - verify/math/math_algorithms.test.cpp
   - verify/math/matrix/pfaffian.test.cpp
   - verify/math/matrix/sparse_determinant.test.cpp
