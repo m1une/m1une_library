@@ -29,6 +29,31 @@ struct Polygon {
     bool filled = true;
 };
 
+template <Coordinate T, typename Scalar>
+requires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)
+Polygon<std::common_type_t<T, Scalar>> operator*(
+    const Polygon<T>& polygon,
+    Scalar scalar
+) {
+    using Result = std::common_type_t<T, Scalar>;
+    Polygon<Result> scaled;
+    scaled.vertices.reserve(polygon.vertices.size());
+    for (const Point<T>& point : polygon.vertices) {
+        scaled.vertices.push_back(point * scalar);
+    }
+    scaled.filled = polygon.filled;
+    return scaled;
+}
+
+template <typename Scalar, Coordinate T>
+requires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)
+Polygon<std::common_type_t<T, Scalar>> operator*(
+    Scalar scalar,
+    const Polygon<T>& polygon
+) {
+    return polygon * scalar;
+}
+
 struct ParameterInterval {
     long double begin = 0.0L;
     long double end = 0.0L;

@@ -26,6 +26,40 @@ When `filled` is `true`, the object is the closed polygonal region. When it is
 triangulation, and explicitly named boundary-event functions use `vertices`
 independently of the flag. The first vertex must not be repeated at the end.
 
+## Scalar multiplication
+
+Both multiplication orders scale each vertex about the origin, including for
+non-convex polygons. They return a new polygon with the same `filled` flag,
+vertex count, and vertex order, leaving the original unchanged.
+
+```cpp
+template <Coordinate T, typename Scalar>
+requires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)
+Polygon<std::common_type_t<T, Scalar>> operator*(
+    const Polygon<T>& polygon,
+    Scalar scalar
+);
+
+template <typename Scalar, Coordinate T>
+requires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)
+Polygon<std::common_type_t<T, Scalar>> operator*(
+    Scalar scalar,
+    const Polygon<T>& polygon
+);
+```
+
+| Operation | Description | Complexity |
+| --- | --- | --- |
+| `Polygon<std::common_type_t<T, Scalar>> operator*(const Polygon<T>& polygon, Scalar scalar)` | Returns `polygon` scaled about `(0, 0)`. | $O(N)$ time and memory |
+| `Polygon<std::common_type_t<T, Scalar>> operator*(Scalar scalar, const Polygon<T>& polygon)` | Supports `scalar * polygon` with the same behavior. | $O(N)$ time and memory |
+
+As with point multiplication, the result uses `std::common_type_t<T, Scalar>`.
+For example, `Polygon<long long> * 0.5L` returns `Polygon<long double>`.
+The common type must satisfy `Coordinate`, and coordinate products must fit it.
+Negative scalars rotate the polygon by 180 degrees as well as scaling it, and
+preserve its winding direction. A zero scalar leaves every vertex at `(0, 0)`
+without removing duplicates. An empty polygon stays empty.
+
 ## Point Containment
 
 `point_in_polygon` returns:
@@ -253,6 +287,11 @@ int main() {
 
     std::cout << m1une::geometry::polygon_area(polygon) << "\n"; // 2
     std::cout << m1une::geometry::contains(polygon, Point(1, 0)) << "\n"; // 1
+
+    auto enlarged = polygon * 2;
+    auto half = 0.5L * polygon; // Polygon<long double>
+    std::cout << m1une::geometry::polygon_area(enlarged) << "\n"; // 8
+    std::cout << m1une::geometry::polygon_area(half) << "\n"; // 0.5
 
     m1une::geometry::Segment<long long> path{
         Point(-1, 1),
