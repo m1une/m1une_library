@@ -4,6 +4,7 @@
 #include "inversion_count.hpp"
 #include "lis.hpp"
 #include "merge_intervals.hpp"
+#include "mex.hpp"
 #include "non_adjacent_selection.hpp"
 #include "number_of_subsequences.hpp"
 #include "run_length_encoding.hpp"

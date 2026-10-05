@@ -12,7 +12,7 @@ one-shot sequence computations such as LIS are in `algo/sequence/`.
 | [`range_query/`](range_query/) | Repeated range-query objects: cumulative sums, Fenwick trees, SWAG, static and offline rectangle sums, static multidimensional k-d trees, offline-registered point-update order statistics, static inversions/LIS/modes, point-updatable majorities in `range_majority.hpp`, sqrt and merge-sort trees, and range-sort range-product queries |
 | [`wavelet_matrix/`](wavelet_matrix/) | `wavelet_matrix.hpp`, `dynamic_wavelet_matrix.hpp`, weighted `wavelet_matrix_sum.hpp` and update-optimized `dynamic_wavelet_matrix_sum.hpp` with configurable key width, plus `wavelet_matrix_2d.hpp` for multidimensional orthogonal queries |
 | [`dynamic_array/`](dynamic_array/) | Dynamic, persistent, and rollback implicit-treap arrays, with optional monoid or lazy aggregation |
-| [`bst/`](bst/) | Weight-balanced ordered sets and multisets, a fixed-universe predecessor set, and persistent or rollback red-black-tree variants |
+| [`bst/`](bst/) | Weight-balanced ordered sets and multisets, a fixed-universe predecessor set, `mex_multiset.hpp` for dynamic mex, and persistent or rollback red-black-tree variants |
 | [`binary_trie/`](binary_trie/) | Binary tries for integer xor queries and monoid aggregates |
 | [`dynamic_tree/`](dynamic_tree/) | Link-cut tree, path-oriented variants, and rake-compress link-cut tree |
 | [`dynamic_connectivity/`](dynamic_connectivity/) | Online and offline fully dynamic undirected connectivity |

@@ -63,7 +63,7 @@ short namespace segment after `m1une::`; nested directories are for browsing.
 
 | Directory | Use it for |
 | --- | --- |
-| `algo/sequence/` | Array and sequence algorithms such as interval merging, LIS, inversion count, non-adjacent exact-count selection, distinct-subsequence counting, run-length encoding, and meet-in-the-middle subset sum. |
+| `algo/sequence/` | Array and sequence algorithms such as mex, interval merging, LIS, inversion count, non-adjacent exact-count selection, distinct-subsequence counting, run-length encoding, and meet-in-the-middle subset sum. |
 | `algo/search/` | Search-over-answer and unimodal optimization helpers. |
 | `algo/offline/` | Offline query processing such as Mo's algorithm. |
 | `algo/enumeration/` | Enumeration helpers for combinations, permutations, bitmasks, Gray codes, and aligned segment-tree ranges. |
@@ -93,7 +93,7 @@ plumbing live in `utilities/`.
 | `ds/range_query/` | Objects built for repeated range queries, including cumulative sums, range LIS/modes/majorities and distinct counting, Fenwick and k-d trees, and static sparse-table queries. |
 | `ds/wavelet_matrix/` | Static and dynamic wavelet matrices for range order statistics, frequencies, dynamically updated weighted range sums, and multidimensional orthogonal queries. |
 | `ds/dynamic_array/` | Implicit-treap sequences with insertion, deletion, reversal, aggregation, persistence, or rollback. |
-| `ds/bst/` | Weight-balanced ordered sets and multisets, a fixed-universe predecessor set, and persistent or rollback red-black-tree variants. |
+| `ds/bst/` | Weight-balanced ordered sets and multisets, a fixed-universe predecessor set, a dynamic mex multiset, and persistent or rollback red-black-tree variants. |
 | `ds/binary_trie/` | Binary tries for integer xor queries and optional monoid aggregates. |
 | `ds/dynamic_tree/` | Link-cut trees and rake-compress trees for changing forests. |
 | `ds/dynamic_connectivity/` | Online and offline connectivity under edge insertions and deletions. |
