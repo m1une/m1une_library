@@ -3,9 +3,14 @@
 #include "../../utilities/fast_io.hpp"
 
 #include <cassert>
+#include <array>
 #include <cstdio>
+#include <iomanip>
+#include <limits>
 #include <poll.h>
+#include <random>
 #include <signal.h>
+#include <sstream>
 #include <string>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -257,6 +262,123 @@ void test_stream_operators_ranges_and_pairs() {
     std::fclose(output_file);
 }
 
+template <class Function>
+std::string capture_output(Function function) {
+    std::FILE* file = std::tmpfile();
+    assert(file != nullptr);
+    {
+        m1une::utilities::FastOutput output(file);
+        function(output);
+    }
+    std::rewind(file);
+    std::string result;
+    char buffer[4096];
+    while (const std::size_t length = std::fread(buffer, 1, sizeof(buffer), file)) {
+        result.append(buffer, length);
+    }
+    std::fclose(file);
+    return result;
+}
+
+void test_aligned_output() {
+    const std::vector<std::vector<int>> matrix = {
+        {1, -20, 300}, {4000, 5, -6}, {}, {7}
+    };
+    const auto original = matrix;
+    assert(capture_output([&](auto& output) {
+        output << "aligned\n";
+        output.println_aligned(matrix);
+        output << matrix << '\n';
+        output.set_range_separator(',');
+        output.write_aligned(matrix);
+        output << '!';
+        output.println_aligned(std::vector<std::vector<int>>{});
+    }) == "aligned\n   1 -20 300\n4000   5  -6\n\n   7\n"
+          "1 -20 300\n4000 5 -6\n\n7\n"
+          "   1,-20,300\n4000,  5, -6\n\n   7!\n");
+    assert(matrix == original);
+
+    const std::vector<std::vector<double>> decimals = {
+        {1.25, -0.5}, {100, 20.125}
+    };
+    assert(capture_output([&](auto& output) {
+        output.set_fixed(2);
+        output.println_aligned(decimals);
+        output.set_general(3);
+        output.println_aligned(decimals);
+    }) == "  1.25 -0.50\n100.00 20.12\n1.25 -0.5\n 100 20.1\n");
+
+    const std::vector<std::vector<std::string>> words = {
+        {"x", "long"}, {"word", "y"}
+    };
+    const std::vector<std::vector<bool>> flags = {
+        {true, false}, {false, true}
+    };
+    const int array[2][2] = { {1, 200}, {-30, 4} };
+    const std::array<std::array<char, 2>, 2> chars = {
+        std::array<char, 2>{'a', 'b'}, std::array<char, 2>{'c', 'd'}
+    };
+    const std::vector<std::vector<std::pair<int, int>>> pairs = {
+        {std::pair<int, int>(1, 2)}, {std::pair<int, int>(100, -3)}
+    };
+    assert(capture_output([&](auto& output) {
+        output.println_aligned(words);
+        output.println_aligned(flags);
+        output.println_aligned(array);
+        output.println_aligned(chars);
+        output.println_aligned(pairs);
+    }) == "   x long\nword    y\n1 0\n0 1\n  1 200\n-30   4\na b\nc d\n"
+          "   1 2\n100 -3\n");
+
+    __int128_t minimum = -(__int128_t(1) << 126);
+    minimum *= 2;
+    const std::vector<std::vector<__int128_t>> wide = { {minimum}, {0} };
+    const std::vector<std::vector<__uint128_t>> unsigned_wide = {
+        {~__uint128_t(0)}, {1}
+    };
+    assert(capture_output([&](auto& output) {
+        output.println_aligned(wide);
+        output.println_aligned(unsigned_wide);
+    }) == "-170141183460469231731687303715884105728\n"
+          + std::string(39, ' ') + "0\n"
+          + "340282366920938463463374607431768211455\n"
+          + std::string(38, ' ') + "1\n");
+
+    const std::string large(m1une::utilities::FastOutput::buffer_size + 123, 'x');
+    const std::vector<std::vector<std::string>> long_cells = { {large}, {"y"} };
+    assert(capture_output([&](auto& output) {
+        output.println_aligned(long_cells);
+        output.println(123456789);
+    }) == large + '\n' + std::string(large.size() - 1, ' ') + "y\n123456789\n");
+}
+
+void test_random_aligned_output() {
+    std::mt19937 random(20261005);
+    for (int trial = 0; trial < 200; ++trial) {
+        std::vector<std::vector<int>> matrix(random() % 9);
+        std::vector<int> widths(8);
+        for (auto& row : matrix) {
+            row.resize(random() % 9);
+            for (std::size_t j = 0; j < row.size(); ++j) {
+                row[j] = int(random() % 2000001) - 1000000;
+                if (random() % 10 == 0) row[j] = std::numeric_limits<int>::min();
+                widths[j] = std::max(widths[j], int(std::to_string(row[j]).size()));
+            }
+        }
+        std::ostringstream expected;
+        for (std::size_t i = 0; i < matrix.size(); ++i) {
+            if (i != 0) expected << '\n';
+            for (std::size_t j = 0; j < matrix[i].size(); ++j) {
+                if (j != 0) expected << ' ';
+                expected << std::setw(widths[j]) << matrix[i][j];
+            }
+        }
+        assert(capture_output([&](auto& output) {
+            output.write_aligned(matrix);
+        }) == expected.str());
+    }
+}
+
 int main() {
     test_fast_input();
     test_large_string_io();
@@ -264,6 +386,8 @@ int main() {
     test_fast_output();
     test_output_flush_reaches_pipe();
     test_stream_operators_ranges_and_pairs();
+    test_aligned_output();
+    test_random_aligned_output();
 
     m1une::utilities::FastInput input;
     m1une::utilities::FastOutput output;

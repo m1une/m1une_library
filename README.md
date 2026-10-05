@@ -119,6 +119,10 @@ Most generic data structures are parameterized by a monoid or acted monoid, so
 prefer the ready-made definitions in `monoid/`, `acted_monoid/`, and
 `beats_acted_monoid/` when possible.
 
+For readable matrix debugging with `template.hpp`, use `print_aligned(matrix)`
+to right-align columns. Ordinary `print(matrix)` keeps its usual spacing.
+See [Fast I/O](docs/utilities/fast_io.md) for the `FastOutput` interface.
+
 ```cpp
 using Sum = m1une::monoid::Add<long long>;
 m1une::ds::Segtree<Sum> seg(std::vector<long long>{1, 2, 3, 4});

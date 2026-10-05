@@ -37,6 +37,10 @@ void test_output_helpers() {
     print(values);
     m1une::template_io::output().set_range_separator(' ');
 
+    const std::vector<std::vector<int>> matrix = { {1, -20}, {300, 4} };
+    print_aligned(matrix);
+    print(matrix);
+
     YESNO(true);
     YESNO(false);
     YesNo(true);
@@ -51,13 +55,14 @@ void test_output_helpers() {
     ::close(saved_stdout);
 
     std::rewind(helper_output);
-    char buffer[128];
+    char buffer[256];
     const std::size_t length = std::fread(buffer, 1, sizeof(buffer), helper_output);
     const std::string result(buffer, buffer + length);
     assert(
         result
         == "\n1 two\n3 4 5\n6 7\n"
            "1.25000000000000000000 -0.50000000000000000000\n3\n4\n5\n"
+           "  1 -20\n300   4\n1 -20\n300 4\n"
            "YES\nNO\nYes\nNo\nYES\nNO\nYes\nNo\n"
     );
 }

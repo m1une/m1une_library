@@ -274,6 +274,10 @@ template <class... Ts>
 void print(const Ts&... values) {
     m1une::template_io::output().println(values...);
 }
+template <class Matrix>
+void print_aligned(const Matrix& matrix) {
+    m1une::template_io::output().println_aligned(matrix);
+}
 void YESNO(bool b) {
     m1une::template_io::output().println(b ? "YES" : "NO");
 }

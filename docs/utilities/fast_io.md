@@ -96,6 +96,50 @@ No trailing separator is written by the range itself. Add `<< '\n'` when a
 final newline is wanted. Higher-dimensional ranges use a newline at every
 nested-range boundary and the configured separator between scalar values.
 
+## Aligned matrix output
+
+Use `output.println_aligned(matrix)` to right-align each column independently.
+Ordinary `output << matrix`, `output.println(matrix)`, and `print(matrix)` keep
+their usual spacing. Alignment is explicit for each call:
+
+```cpp
+std::vector<std::vector<int>> matrix = {
+    {1, -20, 300},
+    {4000, 5, -6}
+};
+output.println_aligned(matrix);
+```
+
+```text
+   1 -20 300
+4000   5  -6
+```
+
+`write_aligned(matrix)` writes the same layout without adding a final newline.
+With `template.hpp`, the helper `print_aligned(matrix)` adds a final newline and
+reuses the same `FastOutput` as `print(...)`:
+
+```cpp
+print_aligned(matrix);
+print(matrix);  // Ordinary spacing
+```
+
+The argument must be a two-dimensional range of supported scalar output types;
+vectors, arrays, strings as cells, `std::vector<bool>` rows, and pairs as cells
+are supported. Ragged rows keep their original lengths. Empty rows produce
+empty lines between adjacent rows; an empty matrix writes nothing before the
+optional final newline. The matrix is never modified.
+
+Each cell uses the current floating-point format and precision. Columns use
+the current range separator, normally a space; use a horizontal separator for
+a table layout. Widths count bytes, so cells should contain single-line ASCII
+text without tabs or control characters. Pairs containing ranges are unsuitable
+as scalar cells.
+
+Alignment temporarily stores each formatted cell. For $R$ rows, $N$ cells,
+$C$ columns, $B$ formatted cell bytes, and $P$ padding spaces, it takes
+$O(R + N + B + P)$ time and $O(R + N + B + C)$ additional memory.
+
 ## Interface
 
 ### `FastInput`
@@ -123,6 +167,8 @@ detected.
 | `void print(a, b, ...)` | Writes several values separated by spaces. | Linear in produced output |
 | `void println(a, b, ...)` | Calls `print`, then writes a newline. | Linear in produced output |
 | `void println()` | Writes a newline. | Amortized $O(1)$ |
+| `void write_aligned(const Matrix& matrix)` | Writes a matrix with right-aligned columns and no final newline. | $O(R + N + B + P)$ |
+| `void println_aligned(const Matrix& matrix)` | Writes an aligned matrix followed by a newline. | $O(R + N + B + P)$ |
 | `void set_precision(int precision)` | Changes the number of significant or fractional digits used for floating-point output. | $O(1)$ |
 | `void set_fixed(int precision = 6)` | Selects fixed-point output with `precision` fractional digits. | $O(1)$ |
 | `void set_general(int precision = 6)` | Selects general floating-point output with `precision` significant digits. | $O(1)$ |
@@ -146,6 +192,10 @@ print(1.25);  // 1.25000000000000000000
 ```
 
 If no such object exists, the helpers create and reuse their own `FastOutput`.
+
+`template <class Matrix> void print_aligned(const Matrix& matrix)` calls
+`println_aligned(matrix)` on that shared output, with the same complexity.
+The two aligned `FastOutput` methods are also templated on `Matrix`.
 
 ## Example
 

@@ -16,6 +16,7 @@
 #include <type_traits>
 #include <utility>
 #include <unistd.h>
+#include <vector>
 
 namespace m1une {
 namespace utilities {
@@ -454,6 +455,49 @@ struct FastOutput {
     int _precision;
     std::chars_format _float_format;
     char _range_separator;
+    std::string* _capture = nullptr;
+
+    template <class T>
+    std::string format_cell(const T& value) {
+        std::string result;
+        struct CaptureGuard {
+            std::string*& target;
+            std::string* previous;
+            ~CaptureGuard() { target = previous; }
+        } guard{_capture, _capture};
+        _capture = &result;
+        write(value);
+        return result;
+    }
+
+    template <class Matrix>
+    void write_aligned_matrix(const Matrix& matrix) {
+        std::vector<std::vector<std::string>> rows;
+        std::vector<std::size_t> widths;
+        for (const auto& row : matrix) {
+            auto& cells = rows.emplace_back();
+            std::size_t column = 0;
+            for (const auto& value : row) {
+                cells.push_back(format_cell(value));
+                if (column == widths.size()) widths.push_back(0);
+                widths[column] = std::max(widths[column], cells.back().size());
+                ++column;
+            }
+        }
+        bool first = true;
+        for (const auto& row : rows) {
+            if (!first) write_char('\n');
+            first = false;
+            for (std::size_t column = 0; column < row.size(); ++column) {
+                if (column != 0) write_char(_range_separator);
+                for (std::size_t padding = row[column].size();
+                     padding < widths[column]; ++padding) {
+                    write_char(' ');
+                }
+                write(row[column]);
+            }
+        }
+    }
 
    public:
     explicit FastOutput(std::FILE* stream = stdout)
@@ -487,6 +531,10 @@ struct FastOutput {
     }
 
     void write_char(char c) {
+        if (_capture != nullptr) {
+            _capture->push_back(c);
+            return;
+        }
         if (_position == buffer_size) flush();
         _buffer[_position++] = c;
     }
@@ -496,6 +544,10 @@ struct FastOutput {
     }
 
     void write(const std::string& s) {
+        if (_capture != nullptr) {
+            _capture->append(s);
+            return;
+        }
         std::size_t position = 0;
         while (position < s.size()) {
             if (_position == buffer_size) flush();
@@ -566,15 +618,23 @@ struct FastOutput {
             chunks[count++] = unsigned(magnitude - quotient * 10000);
             magnitude = quotient;
         }
-        if (_position > buffer_size - 64) flush();
+        if (_capture == nullptr && _position > buffer_size - 64) flush();
+        char captured[64];
+        char* const begin = _capture != nullptr ? captured : _buffer + _position;
+        char* destination = begin;
         const unsigned leading = unsigned(magnitude);
         const char* first = digit_quads.data() + 4 * leading;
         int skip = leading < 10 ? 3 : leading < 100 ? 2 : leading < 1000 ? 1 : 0;
-        for (; skip < 4; skip++) _buffer[_position++] = first[skip];
+        for (; skip < 4; skip++) *destination++ = first[skip];
         while (count--) {
             const char* digits = digit_quads.data() + 4 * chunks[count];
-            std::memcpy(_buffer + _position, digits, 4);
-            _position += 4;
+            std::memcpy(destination, digits, 4);
+            destination += 4;
+        }
+        if (_capture != nullptr) {
+            _capture->append(begin, destination - begin);
+        } else {
+            _position += int(destination - begin);
         }
     }
 
@@ -643,6 +703,23 @@ struct FastOutput {
 
     void set_range_separator(char separator) {
         _range_separator = separator;
+    }
+
+    template <class Matrix>
+    void write_aligned(const Matrix& matrix) {
+        using Row = internal::range_stored_value_t<const Matrix>;
+        using Cell = internal::range_stored_value_t<const Row>;
+        static_assert(internal::is_range_v<Row> && !internal::is_string_like_v<Row>,
+                      "write_aligned requires a two-dimensional range");
+        static_assert(!internal::is_range_v<Cell> || internal::is_string_like_v<Cell>,
+                      "write_aligned requires scalar cells");
+        write_aligned_matrix(matrix);
+    }
+
+    template <class Matrix>
+    void println_aligned(const Matrix& matrix) {
+        write_aligned(matrix);
+        write_char('\n');
     }
 
     template <class... Args>
