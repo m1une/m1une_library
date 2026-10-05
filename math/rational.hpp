@@ -185,16 +185,18 @@ struct Rational {
                std::pow(10.0L, numerator_exponent - denominator_exponent);
     }
 
-    explicit constexpr operator long double() const
+    template <std::floating_point F>
+    explicit constexpr operator F() const
         requires requires(const T& value) { static_cast<long double>(value); }
     {
-        return to_long_double();
+        return static_cast<F>(to_long_double());
     }
 
-    explicit operator long double() const
+    template <std::floating_point F>
+    explicit operator F() const
         requires(!requires(const T& value) { static_cast<long double>(value); })
     {
-        return to_long_double();
+        return static_cast<F>(to_long_double());
     }
 
     constexpr T trunc() const {
@@ -339,5 +341,21 @@ constexpr Rational<T> abs(const Rational<T>& value) {
 
 }  // namespace math
 }  // namespace m1une
+
+namespace std {
+
+// Integer/rational common types already follow from implicit integer
+// construction. Mixing a floating scalar explicitly chooses approximation.
+template <m1une::math::rational_detail::IntegerLike T, floating_point F>
+struct common_type<m1une::math::Rational<T>, F> {
+    using type = long double;
+};
+
+template <floating_point F, m1une::math::rational_detail::IntegerLike T>
+struct common_type<F, m1une::math::Rational<T>> {
+    using type = long double;
+};
+
+}  // namespace std
 
 #endif  // M1UNE_MATH_RATIONAL_HPP

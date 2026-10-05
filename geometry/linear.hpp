@@ -114,7 +114,7 @@ bool parallel(const Line<T>& first, const Line<T>& second, long double eps = 1e-
     W first_y = W(first.b.y) - W(first.a.y);
     W second_x = W(second.b.x) - W(second.a.x);
     W second_y = W(second.b.y) - W(second.a.y);
-    return predicate_detail::determinant_sign<std::integral<T>>(
+    return predicate_detail::determinant_sign<ExactCoordinate<T>>(
         first_x,
         first_y,
         second_x,
@@ -130,7 +130,7 @@ bool orthogonal(const Line<T>& first, const Line<T>& second, long double eps = 1
     W first_y = W(first.b.y) - W(first.a.y);
     W second_x = W(second.b.x) - W(second.a.x);
     W second_y = W(second.b.y) - W(second.a.y);
-    return predicate_detail::dot_sign<std::integral<T>>(
+    return predicate_detail::dot_sign<ExactCoordinate<T>>(
         first_x,
         first_y,
         second_x,
@@ -181,7 +181,7 @@ bool on_segment(
     const W direction_x = W(segment.b.x) - W(segment.a.x);
     const W direction_y = W(segment.b.y) - W(segment.a.y);
     if (direction_x == W(0) && direction_y == W(0)) {
-        if constexpr (std::integral<T>) {
+        if constexpr (ExactCoordinate<T>) {
             return point == segment.a;
         } else {
             return
@@ -196,12 +196,12 @@ bool on_segment(
     const W length_squared =
         direction_x * direction_x + direction_y * direction_y;
     return
-        predicate_detail::scaled_sign<std::integral<T>>(
+        predicate_detail::scaled_sign<ExactCoordinate<T>>(
             projection,
             length_squared,
             eps
         ) >= 0 &&
-        predicate_detail::scaled_sign<std::integral<T>>(
+        predicate_detail::scaled_sign<ExactCoordinate<T>>(
             projection - length_squared,
             length_squared,
             eps
@@ -290,7 +290,7 @@ Parameters<T> parameters(
     W offset_y = W(second_origin.y) - W(first_origin.y);
     return Parameters<T>{
         first_x * second_y - first_y * second_x,
-        predicate_detail::determinant_scale<std::integral<T>>(
+        predicate_detail::determinant_scale<ExactCoordinate<T>>(
             first_x,
             first_y,
             second_x,
@@ -303,7 +303,7 @@ Parameters<T> parameters(
 
 template <Coordinate T>
 int denominator_sign(const Parameters<T>& values, long double eps) {
-    return predicate_detail::scaled_sign<std::integral<T>>(
+    return predicate_detail::scaled_sign<ExactCoordinate<T>>(
         values.denominator,
         values.denominator_scale,
         eps
@@ -317,7 +317,7 @@ bool ratio_nonnegative(
     long double eps
 ) {
     const int numerator_sign =
-        predicate_detail::scaled_sign<std::integral<T>>(
+        predicate_detail::scaled_sign<ExactCoordinate<T>>(
             numerator,
             predicate_detail::absolute(denominator),
             eps
@@ -337,13 +337,13 @@ bool ratio_in_unit_interval(
 ) {
     const auto scale = predicate_detail::absolute(denominator);
     const int start_sign =
-        predicate_detail::scaled_sign<std::integral<T>>(
+        predicate_detail::scaled_sign<ExactCoordinate<T>>(
             numerator,
             scale,
             eps
         );
     const int finish_sign =
-        predicate_detail::scaled_sign<std::integral<T>>(
+        predicate_detail::scaled_sign<ExactCoordinate<T>>(
             numerator - denominator,
             scale,
             eps
@@ -373,7 +373,7 @@ bool on_ray(
         direction_x * offset_x + direction_y * offset_y;
     const W length_squared =
         direction_x * direction_x + direction_y * direction_y;
-    return predicate_detail::scaled_sign<std::integral<T>>(
+    return predicate_detail::scaled_sign<ExactCoordinate<T>>(
         projection,
         length_squared,
         eps
@@ -742,7 +742,7 @@ LinearIntersection collinear_intersection(
     );
 
     if (common.has_lower && common.has_upper) {
-        const int order = predicate_detail::scaled_sign<std::integral<T>>(
+        const int order = predicate_detail::scaled_sign<ExactCoordinate<T>>(
             common.lower - common.upper,
             scale,
             eps

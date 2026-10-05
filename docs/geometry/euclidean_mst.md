@@ -5,7 +5,14 @@ documentation_of: ../../geometry/euclidean_mst.hpp
 
 ## Overview
 
-This header constructs a minimum spanning tree of two-dimensional integral
+`T` may be a built-in integer or an exact coordinate class such as
+`math::Rational<long long>` or `math::Rational<utilities::BigInt>`.
+Rational intermediate arithmetic uses `T` without floating-point conversion.
+All intermediate fractions must be representable. Listed complexities count
+scalar operations; rational arithmetic adds its gcd and integer arithmetic costs.
+Returned lengths or constructed coordinates still use `long double`.
+
+This header constructs a minimum spanning tree of two-dimensional exact-coordinate
 points under Euclidean distance. It first builds a Delaunay triangulation by
 divide and conquer, then applies Kruskal's algorithm to its $O(N)$ edges.
 
@@ -42,8 +49,8 @@ constraints.
 
 | Function | Description | Complexity |
 | --- | --- | --- |
-| `template <std::integral T> std::vector<EuclideanMstEdge<wide_type<T>>> euclidean_mst_edges(const std::vector<Point<T>>& points)` | Returns the $O(N)$ Delaunay and duplicate edges containing a Euclidean MST. | $O(N\log N)$ time and $O(N)$ memory |
-| `template <std::integral T> EuclideanMst<wide_type<T>> euclidean_mst(const std::vector<Point<T>>& points)` | Returns the MST length and its selected edges. | $O(N\log N)$ time and $O(N)$ memory |
+| `template <ExactCoordinate T> std::vector<EuclideanMstEdge<wide_type<T>>> euclidean_mst_edges(const std::vector<Point<T>>& points)` | Returns the $O(N)$ Delaunay and duplicate edges containing a Euclidean MST. | $O(N\log N)$ time and $O(N)$ memory |
+| `template <ExactCoordinate T> EuclideanMst<wide_type<T>> euclidean_mst(const std::vector<Point<T>>& points)` | Returns the MST length and its selected edges. | $O(N\log N)$ time and $O(N)$ memory |
 
 Vertices are identified by their zero-based indices in `points`. For zero or
 one point, the result has cost zero and no edges. For $N$ points with $N>0$,

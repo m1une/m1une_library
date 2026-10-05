@@ -12,10 +12,29 @@ namespace m1une {
 namespace geometry {
 
 template <typename T>
-concept Coordinate = std::is_arithmetic_v<T> && !std::same_as<std::remove_cv_t<T>, bool>;
+concept Coordinate = !std::same_as<std::remove_cv_t<T>, bool> &&
+    (std::is_arithmetic_v<T> ||
+     (std::copyable<T> && std::totally_ordered<T> && requires(T a, T b) {
+         T(0);
+         T(1);
+         static_cast<long double>(a);
+         { +a } -> std::same_as<T>;
+         { -a } -> std::same_as<T>;
+         { a + b } -> std::same_as<T>;
+         { a - b } -> std::same_as<T>;
+         { a * b } -> std::same_as<T>;
+         { a / b } -> std::same_as<T>;
+         { a += b } -> std::same_as<T&>;
+         { a -= b } -> std::same_as<T&>;
+     }));
+
+// Custom coordinate types keep their own exact arithmetic.
+template <typename T>
+concept ExactCoordinate = Coordinate<T> && !std::floating_point<T>;
 
 template <Coordinate T>
-using wide_type = std::conditional_t<std::integral<T>, __int128_t, long double>;
+using wide_type = std::conditional_t<std::integral<T>, __int128_t,
+    std::conditional_t<std::floating_point<T>, long double, T>>;
 
 template <Coordinate T>
 struct Point {
@@ -71,7 +90,7 @@ constexpr Point<long double> centroid(const Point<T>& point) {
 }
 
 template <Coordinate T, typename Scalar>
-requires std::is_arithmetic_v<Scalar>
+requires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)
 constexpr auto operator*(const Point<T>& point, Scalar scalar) {
     using Result = std::common_type_t<T, Scalar>;
     return Point<Result>(
@@ -81,13 +100,13 @@ constexpr auto operator*(const Point<T>& point, Scalar scalar) {
 }
 
 template <typename Scalar, Coordinate T>
-requires std::is_arithmetic_v<Scalar>
+requires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)
 constexpr auto operator*(Scalar scalar, const Point<T>& point) {
     return point * scalar;
 }
 
 template <Coordinate T, typename Scalar>
-requires std::is_arithmetic_v<Scalar>
+requires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)
 constexpr auto operator/(const Point<T>& point, Scalar scalar) {
     using Result = std::common_type_t<T, Scalar>;
     return Point<Result>(
@@ -152,7 +171,8 @@ long double distance(const Point<T>& a, const Point<T>& b) {
 }
 
 template <Coordinate T, typename M, typename N>
-requires std::is_arithmetic_v<M> && std::is_arithmetic_v<N>
+requires (std::is_arithmetic_v<M> || Coordinate<M>) &&
+         (std::is_arithmetic_v<N> || Coordinate<N>)
 constexpr Point<long double> internal_division_point(
     const Point<T>& a,
     const Point<T>& b,
@@ -169,7 +189,8 @@ constexpr Point<long double> internal_division_point(
 }
 
 template <Coordinate T, typename M, typename N>
-requires std::is_arithmetic_v<M> && std::is_arithmetic_v<N>
+requires (std::is_arithmetic_v<M> || Coordinate<M>) &&
+         (std::is_arithmetic_v<N> || Coordinate<N>)
 constexpr Point<long double> external_division_point(
     const Point<T>& a,
     const Point<T>& b,
@@ -187,7 +208,7 @@ constexpr Point<long double> external_division_point(
 
 template <Coordinate T>
 constexpr int sign(wide_type<T> value, long double eps = 1e-12L) {
-    return predicate_detail::scaled_sign<std::integral<T>>(
+    return predicate_detail::scaled_sign<ExactCoordinate<T>>(
         value,
         wide_type<T>(1),
         eps
@@ -206,7 +227,7 @@ constexpr int orientation(
     const W first_y = W(b.y) - W(a.y);
     const W second_x = W(c.x) - W(a.x);
     const W second_y = W(c.y) - W(a.y);
-    return predicate_detail::orientation_sign<std::integral<T>>(
+    return predicate_detail::orientation_sign<ExactCoordinate<T>>(
         first_x,
         first_y,
         second_x,

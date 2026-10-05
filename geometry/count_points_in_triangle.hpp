@@ -43,7 +43,7 @@ class FenwickTree {
     }
 };
 
-template <std::integral T>
+template <ExactCoordinate T>
 struct SweepItem {
     using Wide = wide_type<T>;
 
@@ -55,7 +55,7 @@ struct SweepItem {
 
 }  // namespace count_points_in_triangle_detail
 
-template <std::integral T>
+template <ExactCoordinate T>
 class CountPointsInTriangle {
    private:
     using Wide = wide_type<T>;

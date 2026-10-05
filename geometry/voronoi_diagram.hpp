@@ -41,7 +41,7 @@ struct VoronoiDiagram {
 
 namespace voronoi_diagram_detail {
 
-template <std::integral T>
+template <ExactCoordinate T>
 int direction_half(
     const Point<T>& origin,
     const Point<T>& destination
@@ -52,7 +52,7 @@ int direction_half(
     return y > 0 || (y == 0 && x >= 0) ? 0 : 1;
 }
 
-template <std::integral T>
+template <ExactCoordinate T>
 bool direction_less(
     const std::vector<Point<T>>& sites,
     int origin,
@@ -77,7 +77,7 @@ bool direction_less(
     return first < second;
 }
 
-template <std::integral T>
+template <ExactCoordinate T>
 bool cocircular(
     const Point<T>& first,
     const Point<T>& second,
@@ -101,7 +101,7 @@ bool cocircular(
     return determinant == 0;
 }
 
-template <std::integral T>
+template <ExactCoordinate T>
 Point<long double> circumcenter(
     const Point<T>& first,
     const Point<T>& second,
@@ -147,8 +147,8 @@ inline int other_site(const VoronoiEdge& edge, int site) {
 
 }  // namespace voronoi_diagram_detail
 
-// Constructs the ordinary Euclidean Voronoi diagram of distinct integral sites.
-template <std::integral T>
+// Constructs the ordinary Euclidean Voronoi diagram of distinct exact-coordinate sites.
+template <ExactCoordinate T>
 VoronoiDiagram voronoi_diagram(const std::vector<Point<T>>& sites) {
     namespace detail = voronoi_diagram_detail;
     assert(sites.size() <= std::size_t(std::numeric_limits<int>::max()));

@@ -22,7 +22,7 @@ enum class EventKind {
     remove,
 };
 
-template <std::integral T>
+template <ExactCoordinate T>
 struct Event {
     T y;
     T left;
@@ -36,7 +36,7 @@ struct Event {
           kind(kind_value) {}
 };
 
-template <std::integral T>
+template <ExactCoordinate T>
 std::vector<Event<T>> make_events(
     const std::vector<Segment<T>>& segments,
     std::vector<T>* vertical_x_coordinates = nullptr
@@ -99,7 +99,7 @@ std::vector<Event<T>> make_events(
 }  // namespace manhattan_segment_intersections_detail
 
 // Counts intersecting horizontal-vertical pairs of closed segments.
-template <std::integral T>
+template <ExactCoordinate T>
 long long manhattan_segment_intersections(
     const std::vector<Segment<T>>& segments
 ) {
@@ -162,7 +162,7 @@ long long manhattan_segment_intersections(
 }
 
 // Returns one point per intersecting horizontal-vertical pair.
-template <std::integral T>
+template <ExactCoordinate T>
 std::vector<Point<T>> manhattan_segment_intersection_points(
     const std::vector<Segment<T>>& segments
 ) {

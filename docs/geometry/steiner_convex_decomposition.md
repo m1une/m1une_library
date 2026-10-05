@@ -20,10 +20,14 @@ wedge, and stops at the first edge of the current subdivision. Convex-chain
 preprocessing makes ray intersections sensitive to the number of reflex
 vertices rather than requiring a scan of the full boundary for every cut.
 
+Input may use any `Coordinate` type, including rational numbers. The routine
+converts the input to `long double` before processing; its tolerance and output
+precision are therefore floating point even for exact input.
+
 ## Function
 
 ```cpp
-template <std::floating_point T>
+template <Coordinate T>
 std::optional<std::vector<std::vector<Point<long double>>>>
 steiner_convex_decomposition(
     const std::vector<Point<T>>& polygon,

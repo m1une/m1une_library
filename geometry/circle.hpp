@@ -300,8 +300,8 @@ PointInCircle point_in_circle(
 ) {
     assert(circle.radius >= 0);
     assert(eps >= 0.0L);
-    if constexpr (std::integral<C> && std::integral<P>) {
-        using W = __int128_t;
+    if constexpr (ExactCoordinate<C> && ExactCoordinate<P>) {
+        using W = std::common_type_t<wide_type<C>, wide_type<P>>;
         const W dx = W(point.x) - W(circle.center.x);
         const W dy = W(point.y) - W(circle.center.y);
         const W radius = W(circle.radius);
@@ -345,8 +345,8 @@ bool on_circle(
 ) {
     assert(circle.radius >= 0);
     assert(eps >= 0.0L);
-    if constexpr (std::integral<C> && std::integral<P>) {
-        using W = __int128_t;
+    if constexpr (ExactCoordinate<C> && ExactCoordinate<P>) {
+        using W = std::common_type_t<wide_type<C>, wide_type<P>>;
         const W dx = W(point.x) - W(circle.center.x);
         const W dy = W(point.y) - W(circle.center.y);
         const W radius = W(circle.radius);
@@ -465,8 +465,8 @@ CircleRelation circle_relation(
     assert(first.radius >= 0);
     assert(second.radius >= 0);
     assert(eps >= 0.0L);
-    if constexpr (std::integral<A> && std::integral<B>) {
-        using W = __int128_t;
+    if constexpr (ExactCoordinate<A> && ExactCoordinate<B>) {
+        using W = std::common_type_t<wide_type<A>, wide_type<B>>;
         W dx = W(second.center.x) - W(first.center.x);
         W dy = W(second.center.y) - W(first.center.y);
         W squared_distance = dx * dx + dy * dy;
@@ -899,8 +899,8 @@ bool intersects(
     assert(second.radius >= 0);
     assert(eps >= 0.0L);
     if (first.filled && second.filled) {
-        if constexpr (std::integral<A> && std::integral<B>) {
-            using W = __int128_t;
+        if constexpr (ExactCoordinate<A> && ExactCoordinate<B>) {
+            using W = std::common_type_t<wide_type<A>, wide_type<B>>;
             const W dx = W(second.center.x) - W(first.center.x);
             const W dy = W(second.center.y) - W(first.center.y);
             const W radius = W(first.radius) + W(second.radius);

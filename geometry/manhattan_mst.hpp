@@ -30,7 +30,7 @@ struct ManhattanMst {
 };
 
 // Returns O(n) edges containing a Manhattan minimum spanning tree.
-template <std::integral T>
+template <ExactCoordinate T>
 std::vector<ManhattanMstEdge<wide_type<T>>> manhattan_mst_edges(const std::vector<Point<T>>& points) {
     using W = wide_type<T>;
     assert(points.size() <= std::size_t(std::numeric_limits<int>::max()));
@@ -88,7 +88,7 @@ std::vector<ManhattanMstEdge<wide_type<T>>> manhattan_mst_edges(const std::vecto
 }
 
 // Returns a Manhattan minimum spanning tree.
-template <std::integral T>
+template <ExactCoordinate T>
 ManhattanMst<wide_type<T>> manhattan_mst(const std::vector<Point<T>>& points) {
     using W = wide_type<T>;
     auto candidates = manhattan_mst_edges(points);

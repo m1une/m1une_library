@@ -32,7 +32,7 @@ struct EuclideanMst {
 
 namespace detail {
 
-template <std::integral T>
+template <ExactCoordinate T>
 class EuclideanDelaunay {
    private:
     using W = wide_type<T>;
@@ -395,7 +395,7 @@ class EuclideanDelaunay {
 }  // namespace detail
 
 // Returns O(n) Delaunay edges containing a Euclidean minimum spanning tree.
-template <std::integral T>
+template <ExactCoordinate T>
 std::vector<EuclideanMstEdge<wide_type<T>>> euclidean_mst_edges(
     const std::vector<Point<T>>& points
 ) {
@@ -410,7 +410,7 @@ std::vector<EuclideanMstEdge<wide_type<T>>> euclidean_mst_edges(
 }
 
 // Returns a Euclidean minimum spanning tree.
-template <std::integral T>
+template <ExactCoordinate T>
 EuclideanMst<wide_type<T>> euclidean_mst(const std::vector<Point<T>>& points) {
     using W = wide_type<T>;
     auto candidates = euclidean_mst_edges(points);

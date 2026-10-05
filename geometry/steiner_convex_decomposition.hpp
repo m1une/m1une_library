@@ -33,7 +33,7 @@ inline bool close(
     return distance2(first, second) <= eps * eps;
 }
 
-template <std::floating_point T>
+template <Coordinate T>
 std::optional<std::vector<PointType>> prepare_polygon(
     const std::vector<Point<T>>& input,
     long double eps
@@ -752,7 +752,7 @@ class DecompositionGraph {
 
 }  // namespace steiner_convex_decomposition_detail
 
-template <std::floating_point T>
+template <Coordinate T>
 std::optional<std::vector<std::vector<Point<long double>>>>
 steiner_convex_decomposition(
     const std::vector<Point<T>>& input,

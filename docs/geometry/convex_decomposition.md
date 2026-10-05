@@ -5,6 +5,12 @@ documentation_of: ../../geometry/convex_decomposition.hpp
 
 ## Overview
 
+Rational coordinates are supported, including `Rational<BigInt>`. Predicates
+that use exact arithmetic for integral inputs also use exact rational arithmetic
+and ignore `eps`. Constructed coordinates and lengths with `long double` return
+types remain approximations. Complexity bounds count scalar operations; rational
+inputs add the underlying arithmetic and gcd costs.
+
 This header partitions a simple polygon without holes into convex polygons. It
 provides two choices:
 

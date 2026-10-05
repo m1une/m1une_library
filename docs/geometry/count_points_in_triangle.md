@@ -5,7 +5,13 @@ documentation_of: ../../geometry/count_points_in_triangle.hpp
 
 ## Overview
 
-`CountPointsInTriangle` preprocesses two integral point sets. Each query chooses
+`T` may be a built-in integer or an exact coordinate class such as
+`math::Rational<long long>` or `math::Rational<utilities::BigInt>`.
+Rational intermediate arithmetic uses `T` without floating-point conversion.
+All intermediate fractions must be representable. Listed complexities count
+scalar operations; rational arithmetic adds its gcd and integer arithmetic costs.
+
+`CountPointsInTriangle` preprocesses two exact-coordinate point sets. Each query chooses
 three points from the first set and returns how many points from the second set
 lie strictly inside their triangle.
 
@@ -16,7 +22,7 @@ an edge or vertex are excluded.
 ## Interface
 
 ```cpp
-template <std::integral T>
+template <ExactCoordinate T>
 class CountPointsInTriangle {
 public:
     CountPointsInTriangle(
@@ -38,7 +44,7 @@ Here, $N$ is the number of `triangle_vertices` and $M$ is the number of
 
 ## Behavior and Requirements
 
-* `T` must be an integral coordinate type.
+* `T` must satisfy `ExactCoordinate<T>`.
 * Query indices are zero-based and must refer to `triangle_vertices`.
 * The order of the three query indices does not matter.
 * A query with repeated or collinear triangle vertices returns `0`.
@@ -47,7 +53,7 @@ Here, $N$ is the number of `triangle_vertices` and $M$ is the number of
 * The triangle boundary is excluded exactly; no floating-point tolerance is
   used.
 * Coordinate differences and products used by orientation tests must fit
-  signed `__int128`.
+  `wide_type<T>` (`__int128_t` for built-in integers, `T` for rationals).
 
 ## Algorithm
 

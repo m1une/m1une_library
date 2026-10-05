@@ -5,6 +5,12 @@ documentation_of: ../../geometry/linear.hpp
 
 ## Overview
 
+Rational coordinates are supported, including `Rational<BigInt>`. Predicates
+that use exact arithmetic for integral inputs also use exact rational arithmetic
+and ignore `eps`. Constructed coordinates and lengths with `long double` return
+types remain approximations. Complexity bounds count scalar operations; rational
+inputs add the underlying arithmetic and gcd costs.
+
 This header provides `Line<T>`, `Segment<T>`, and `Ray<T>` together with
 projection, reflection, distances, intersection predicates, segment centroids,
 classified intersections, and closest-point witnesses.

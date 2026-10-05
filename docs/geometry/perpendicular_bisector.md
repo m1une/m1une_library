@@ -7,10 +7,15 @@ documentation_of: ../../geometry/perpendicular_bisector.hpp
 
 This header constructs the perpendicular bisector of two distinct 2D points.
 It returns an infinite `Line<T>` through two points of the same coordinate type
-as the input. Floating-point and integral coordinate types are both supported.
+as the input. Floating-point, integral, and rational coordinate types are supported.
 
 For integral coordinates, the returned endpoints are lattice points and all
 calculations used to construct them are integral.
+
+For rational coordinates, the returned line passes through the exact midpoint
+`(first + second) / 2` with direction `(first.y - second.y, second.x - first.x)`.
+Construction uses a constant number of rational operations; all intermediate
+fractions must be representable.
 
 ## Function
 

@@ -5,7 +5,13 @@ documentation_of: ../../geometry/manhattan_mst.hpp
 
 ## Overview
 
-This header constructs a minimum spanning tree of two-dimensional integral
+`T` may be a built-in integer or an exact coordinate class such as
+`math::Rational<long long>` or `math::Rational<utilities::BigInt>`.
+Rational intermediate arithmetic uses `T` without floating-point conversion.
+All intermediate fractions must be representable. Listed complexities count
+scalar operations; rational arithmetic adds its gcd and integer arithmetic costs.
+
+This header constructs a minimum spanning tree of two-dimensional exact-coordinate
 points under Manhattan distance:
 
 $$

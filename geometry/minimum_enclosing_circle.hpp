@@ -102,7 +102,7 @@ bool support_contains(
     const Point<T>& first = points[support.index[0]];
     if (support.size == 1) return point == first;
 
-    if constexpr (std::integral<T>) {
+    if constexpr (ExactCoordinate<T>) {
         using W = wide_type<T>;
         const Point<T>& second = points[support.index[1]];
         if (support.size == 2) {

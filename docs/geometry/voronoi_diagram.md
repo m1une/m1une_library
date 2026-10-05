@@ -5,12 +5,19 @@ documentation_of: ../../geometry/voronoi_diagram.hpp
 
 ## Overview
 
+`T` may be a built-in integer or an exact coordinate class such as
+`math::Rational<long long>` or `math::Rational<utilities::BigInt>`.
+Rational intermediate arithmetic uses `T` without floating-point conversion.
+All intermediate fractions must be representable. Listed complexities count
+scalar operations; rational arithmetic adds its gcd and integer arithmetic costs.
+Returned lengths or constructed coordinates still use `long double`.
+
 `voronoi_diagram` constructs the ordinary Euclidean Voronoi diagram of a set
-of distinct integral sites. The diagram is the geometric dual of an exact
+of distinct exact-coordinate sites. The diagram is the geometric dual of an exact
 Delaunay triangulation, so it contains finite segments, unbounded rays, and,
 when every site is collinear, full lines.
 
-Combinatorial decisions use exact integral predicates. Finite vertices and
+Combinatorial decisions use exact predicates. Finite vertices and
 parametric edge geometry use `long double` because circumcenters need not be
 integral.
 
@@ -64,7 +71,7 @@ do not share an edge and therefore do not appear in each other's lists.
 The exact signature is:
 
 ```cpp
-template <std::integral T>
+template <ExactCoordinate T>
 VoronoiDiagram voronoi_diagram(
     const std::vector<Point<T>>& sites
 );

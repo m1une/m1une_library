@@ -5,6 +5,12 @@ documentation_of: ../../geometry/circle.hpp
 
 ## Overview
 
+Rational coordinates are supported, including `Rational<BigInt>`. Predicates
+that use exact arithmetic for integral inputs also use exact rational arithmetic
+and ignore `eps`. Constructed coordinates and lengths with `long double` return
+types remain approximations. Complexity bounds count scalar operations; rational
+inputs add the underlying arithmetic and gcd costs.
+
 This header represents both a filled circular region and its circumference.
 It provides constant-time containment, intersections, closest points,
 distances, triangle-circle construction, tangents, reflection, and overlap

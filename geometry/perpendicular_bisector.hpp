@@ -159,7 +159,7 @@ constexpr Line<T> perpendicular_bisector(
             first,
             second
         );
-    } else {
+    } else if constexpr (std::floating_point<T>) {
         Point<T> midpoint(
             std::midpoint(first.x, second.x),
             std::midpoint(first.y, second.y)
@@ -170,6 +170,10 @@ constexpr Line<T> perpendicular_bisector(
         result.a = midpoint;
         result.b = midpoint + direction;
         return result;
+    } else {
+        const Point<T> midpoint = (first + second) / 2;
+        const Point<T> direction(first.y - second.y, second.x - first.x);
+        return Line<T>{midpoint, midpoint + direction};
     }
 }
 

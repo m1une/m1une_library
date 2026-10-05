@@ -5,6 +5,12 @@ documentation_of: ../../geometry/minimum_enclosing_circle.hpp
 
 ## Overview
 
+Rational coordinates are supported, including `Rational<BigInt>`. Predicates
+that use exact arithmetic for integral inputs also use exact rational arithmetic
+and ignore `eps`. Constructed coordinates and lengths with `long double` return
+types remain approximations. Complexity bounds count scalar operations; rational
+inputs add the underlying arithmetic and gcd costs.
+
 `minimum_enclosing_circle(points)` finds the unique smallest circle containing
 every input point. It uses the randomized incremental algorithm and returns the
 circle together with one support set of at most three original points that

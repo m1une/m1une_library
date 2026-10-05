@@ -77,7 +77,7 @@ Number predicate_number(T value) {
 
 template <Coordinate T, typename Number>
 int predicate_sign(const Number& value, long double eps) {
-    if constexpr (std::integral<T>) {
+    if constexpr (ExactCoordinate<T>) {
         return (value > 0) - (value < 0);
     } else {
         return (value > eps) - (value < -eps);
@@ -705,7 +705,7 @@ class BiasedPolygonReduction {
             candidates.end()
         );
 
-        if constexpr (std::integral<T>) {
+        if constexpr (ExactCoordinate<T>) {
             return exact_ray_shoot(origin, direction, candidates);
         } else {
             return floating_ray_shoot(origin, direction, candidates);
@@ -1943,7 +1943,7 @@ minimum_convex_decomposition(
         assert(false);
         return std::nullopt;
     } else {
-        return solve.template operator()<long double>();
+        return solve.template operator()<wide_type<T>>();
     }
 }
 

@@ -5,12 +5,18 @@ documentation_of: ../../geometry/delaunay_triangulation.hpp
 
 ## Overview
 
+`T` may be a built-in integer or an exact coordinate class such as
+`math::Rational<long long>` or `math::Rational<utilities::BigInt>`.
+Rational intermediate arithmetic uses `T` without floating-point conversion.
+All intermediate fractions must be representable. Listed complexities count
+scalar operations; rational arithmetic adds its gcd and integer arithmetic costs.
+
 `delaunay_triangulation` constructs one Delaunay triangulation of distinct
-two-dimensional integral points. It returns both the undirected edges and the
+two-dimensional exact-coordinate points. It returns both the undirected edges and the
 counterclockwise triangular faces, using the original zero-based point indices.
 
 The implementation uses divide and conquer. All topological decisions are made
-with exact integral orientation and incircle predicates.
+with exact orientation and incircle predicates.
 
 ## Type
 
@@ -33,7 +39,7 @@ triangle appears in `edges`.
 The exact signature is:
 
 ```cpp
-template <std::integral T>
+template <ExactCoordinate T>
 DelaunayTriangulation delaunay_triangulation(
     const std::vector<Point<T>>& points
 );

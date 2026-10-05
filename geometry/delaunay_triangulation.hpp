@@ -20,7 +20,7 @@ struct DelaunayTriangulation {
 
 namespace delaunay_triangulation_detail {
 
-template <std::integral T>
+template <ExactCoordinate T>
 int direction_half(
     const Point<T>& origin,
     const Point<T>& destination
@@ -31,7 +31,7 @@ int direction_half(
     return y > 0 || (y == 0 && x >= 0) ? 0 : 1;
 }
 
-template <std::integral T>
+template <ExactCoordinate T>
 bool direction_less(
     const std::vector<Point<T>>& points,
     int origin,
@@ -68,8 +68,8 @@ inline void rotate_minimum_first(std::array<int, 3>& triangle) {
 
 }  // namespace delaunay_triangulation_detail
 
-// Constructs one Delaunay triangulation of distinct integral points.
-template <std::integral T>
+// Constructs one Delaunay triangulation of distinct exact-coordinate points.
+template <ExactCoordinate T>
 DelaunayTriangulation delaunay_triangulation(
     const std::vector<Point<T>>& points
 ) {

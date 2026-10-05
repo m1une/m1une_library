@@ -68,6 +68,44 @@ addition on `T`. Comparison takes $O(M(N))$. For built-in types, Euclidean gcd
 is logarithmic in the numeric magnitude and the other primitive operations are
 $O(1)$.
 
+## Use with other libraries
+
+`Rational<T>` supports ordinary integer arithmetic, ordering, and containers,
+and can be used as the scalar type of `matrix::Matrix` and its exact linear
+algebra routines. The geometry library accepts it as a coordinate type:
+
+```cpp
+#include "math/rational.hpp"
+#include "geometry/point.hpp"
+
+using Fraction = m1une::math::Rational<>;
+using Point = m1une::geometry::Point<Fraction>;
+
+Point a(Fraction(1, 2), 0);
+Point b(0, Fraction(1, 3));
+Fraction determinant = m1une::geometry::cross(a, b); // 1/6
+Point scaled = a * Fraction(2, 3);                   // (1/3, 0)
+```
+
+Geometry preserves rational arithmetic for dot/cross products, squared
+distances, areas returned by `polygon_area2` and `rectangle_union_area`, and
+exact predicates. Functions returning `long double` or `Point<long double>`
+produce approximations. See [point types and predicates](../geometry/point.md).
+
+`template <std::floating_point F> explicit operator F() const` supports explicit
+conversion to `float`, `double`, or `long double`, with the same complexity as
+`to_long_double()`. It is `constexpr` when the underlying type has a direct
+`long double` conversion. Conversion is always approximate and never implicit.
+`std::common_type_t<Rational<T>, U>` is `Rational<T>` for a compatible integral
+`U`, and `long double` for a floating-point `U` (in either argument order).
+This lets generic scalar operations deliberately produce floating-point output.
+
+Rational numbers are not classified as built-in arithmetic types by standard
+traits. A template explicitly requiring integers, floating-point numbers, or
+transcendental operations has additional requirements; for example,
+`lattice_point_count` requires integer lattice coordinates. No rational square
+root exists for every rational value.
+
 ## Input and Output
 
 Output uses `numerator/denominator`, omitting `/1` for integers.

@@ -5,9 +5,15 @@ documentation_of: ../../geometry/manhattan_segment_intersections.hpp
 
 ## Overview
 
+`T` may be a built-in integer or an exact coordinate class such as
+`math::Rational<long long>` or `math::Rational<utilities::BigInt>`.
+Rational intermediate arithmetic uses `T` without floating-point conversion.
+All intermediate fractions must be representable. Listed complexities count
+scalar operations; rational arithmetic adds its gcd and integer arithmetic costs.
+
 `manhattan_segment_intersections` counts pairs formed by one horizontal and one
 vertical closed segment that intersect. `manhattan_segment_intersection_points`
-returns their exact integral intersection points. Segment endpoints are
+returns their exact intersection points. Segment endpoints are
 included, so a perpendicular pair touching at an endpoint contributes one.
 
 The implementation sweeps upward through the endpoint and query events. A
@@ -23,12 +29,12 @@ does not count parallel pairs.
 ## Interface
 
 ```cpp
-template <std::integral T>
+template <ExactCoordinate T>
 long long manhattan_segment_intersections(
     const std::vector<Segment<T>>& segments
 );
 
-template <std::integral T>
+template <ExactCoordinate T>
 std::vector<Point<T>> manhattan_segment_intersection_points(
     const std::vector<Segment<T>>& segments
 );
@@ -41,7 +47,7 @@ std::vector<Point<T>> manhattan_segment_intersection_points(
 
 Every segment must be nondegenerate and parallel to one coordinate axis. These
 requirements and the conversion of the input size to `int` are checked by
-assertions. Coordinates must be integral. The count is returned as `long long`.
+assertions. Coordinates must satisfy `ExactCoordinate<T>`. The count is returned as `long long`.
 The point order follows the sweep and should not be treated as sorted. If
 several segment pairs meet at the same coordinate, that point occurs once per
 pair, so the point-vector size always equals the counting result.
