@@ -7,6 +7,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstdint>
+#include <type_traits>
 #include "../../utilities/fast_io.hpp"
 #include <vector>
 
@@ -74,6 +75,139 @@ bool is_tangent(
         side = current;
     }
     return side != 0;
+}
+
+template <Coordinate T, typename Scalar>
+void assert_scaled(const ConvexPolygon<T>& polygon, Scalar scalar) {
+    using Result = std::common_type_t<T, Scalar>;
+    const auto scaled = polygon * scalar;
+    static_assert(std::is_same_v<
+        decltype(polygon * scalar),
+        ConvexPolygon<Result>
+    >);
+    static_assert(std::is_same_v<
+        decltype(scalar * polygon),
+        ConvexPolygon<Result>
+    >);
+    std::vector<Point<Result>> expected;
+    for (const Point<T>& point : polygon.vertices()) {
+        expected.emplace_back(
+            Result(point.x) * scalar,
+            Result(point.y) * scalar
+        );
+    }
+    expected = normalize_convex_polygon(convex_hull(std::move(expected)));
+    assert(scaled.vertices() == expected);
+    assert((scalar * polygon).vertices() == expected);
+    assert(scaled.area2() == polygon_area2(expected));
+    for (const auto& point : expected) {
+        assert(scaled.contains(point) == PointInPolygon::Boundary);
+    }
+    if (!expected.empty()) {
+        const Point<Result> direction(2, -3);
+        auto maximum = dot(expected[0], direction);
+        for (const auto& point : expected) {
+            maximum = std::max(maximum, dot(point, direction));
+        }
+        assert(scaled.max_dot(direction).first == maximum);
+    }
+}
+
+void test_arithmetic() {
+    std::vector<std::vector<PointType>> boundaries;
+    boundaries.push_back(std::vector<PointType>{PointType(2, -3)});
+    boundaries.push_back(std::vector<PointType>{PointType(4, 1), PointType(-2, 1)});
+    boundaries.push_back(std::vector<PointType>{PointType(0, 3), PointType(2, 1)});
+    boundaries.push_back(std::vector<PointType>{
+        PointType(0, 0), PointType(3, 0), PointType(0, 2)
+    });
+    boundaries.push_back(std::vector<PointType>{
+        PointType(0, 0), PointType(0, 4), PointType(4, 4),
+        PointType(4, 0), PointType(2, 0), PointType(0, 0)
+    });
+
+    auto check = [](const auto& first, const auto& second) {
+        const ConvexPolygon<long long> polygon(first);
+        const ConvexPolygon<long long> other(second);
+        const auto saved_first = polygon.vertices();
+        const auto saved_second = other.vertices();
+        std::vector<PointType> sums;
+        for (const auto& left : first) {
+            for (const auto& right : second) sums.push_back(left + right);
+        }
+        const auto expected =
+            normalize_convex_polygon(convex_hull(std::move(sums)));
+        const auto sum = polygon + other;
+        assert(sum.vertices() == expected);
+        assert((other + polygon).vertices() == expected);
+        assert(sum.area2() == polygon_area2(expected));
+        assert(sum.chain_area2(0, sum.size() - 1) == sum.area2());
+        assert(
+            (polygon * 0.5L + 0.5L * other).vertices() ==
+            (sum * 0.5L).vertices()
+        );
+        for (int scalar : {-3, -1, 0, 1, 2}) assert_scaled(polygon, scalar);
+        for (long double scalar : {-1.5L, 0.0L, 0.5L, 2.0L}) {
+            assert_scaled(polygon, scalar);
+        }
+        assert(polygon.vertices() == saved_first);
+        assert(other.vertices() == saved_second);
+    };
+    for (const auto& first : boundaries) {
+        for (const auto& second : boundaries) check(first, second);
+    }
+    const ConvexPolygon<long long> empty{std::vector<PointType>()};
+    assert_scaled(empty, 0);
+    assert_scaled(empty, -2);
+    assert_scaled(empty, 0.5L);
+
+    // A custom tolerance must survive both multiplication orders and addition.
+    using FloatingPoint = Point<long double>;
+    const ConvexPolygon<long double> point(
+        std::vector<FloatingPoint>{FloatingPoint(2, 3)}, 1e-3L
+    );
+    const ConvexPolygon<long double> origin(
+        std::vector<FloatingPoint>{FloatingPoint(0, 0)}, 1e-6L
+    );
+    assert(
+        (point * 2).contains(FloatingPoint(4.0005L, 6)) ==
+        PointInPolygon::Boundary
+    );
+    assert(
+        (2 * point).contains(FloatingPoint(4.0005L, 6)) ==
+        PointInPolygon::Boundary
+    );
+    assert(
+        (origin + point).contains(FloatingPoint(2.0005L, 3)) ==
+        PointInPolygon::Boundary
+    );
+    assert(
+        (point + origin).contains(FloatingPoint(2.0005L, 3)) ==
+        PointInPolygon::Boundary
+    );
+
+    std::uint64_t state = 0x3c6ef372fe94f82bULL;
+    auto random = [&state]() {
+        state ^= state << 7;
+        state ^= state >> 9;
+        return state;
+    };
+    for (int trial = 0; trial < 1500; ++trial) {
+        std::vector<PointType> first;
+        std::vector<PointType> second;
+        for (auto* points : {&first, &second}) {
+            const int count = 1 + int(random() % 12);
+            for (int index = 0; index < count; ++index) {
+                points->emplace_back(
+                    static_cast<long long>(random() % 31) - 15,
+                    static_cast<long long>(random() % 31) - 15
+                );
+            }
+            *points = convex_hull(std::move(*points));
+            if (random() & 1) std::reverse(points->begin(), points->end());
+        }
+        check(first, second);
+    }
 }
 
 void test_fixed() {
@@ -448,6 +582,7 @@ int main() {
     m1une::utilities::FastOutput fast_output;
 
     test_fixed();
+    test_arithmetic();
     test_randomized();
     test_randomized_floating_pairs();
 

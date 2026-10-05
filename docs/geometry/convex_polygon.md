@@ -9,6 +9,8 @@ documentation_of: ../../geometry/convex_polygon.hpp
 `ConvexPolygon<T>` query object. The query object normalizes an ordered convex
 boundary once, then supports point containment, directional extrema, tangents,
 and chain-area queries efficiently.
+It also supports Minkowski addition with `operator+` and scalar multiplication
+about the origin with `operator*`.
 
 The free functions cover convexity testing, normalization, triangulation,
 diameter, half-plane cuts, intersection construction, and intersection and
@@ -77,6 +79,19 @@ public:
     bool empty() const noexcept;
     const std::vector<Point<T>>& vertices() const noexcept;
     const Point<T>& operator[](int index) const;
+    ConvexPolygon operator+(const ConvexPolygon& other) const;
+
+    template <typename Scalar>
+    requires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)
+    ConvexPolygon<std::common_type_t<T, Scalar>> operator*(Scalar scalar) const;
+
+    template <typename Scalar>
+    requires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)
+    friend ConvexPolygon<std::common_type_t<T, Scalar>> operator*(
+        Scalar scalar,
+        const ConvexPolygon& polygon
+    );
+
     Wide area2() const;
     Wide chain_area2(int first, int last) const;
     PointInPolygon contains(const Point<T>& point) const;
@@ -96,6 +111,9 @@ std::optional<Point<long double>> centroid(
 | --- | --- | --- |
 | `ConvexPolygon(polygon, eps)` | Normalizes an ordered convex boundary and builds doubled prefix areas. | $O(N)$ time and memory |
 | `size()`, `empty()`, `vertices()`, `operator[]` | Access the normalized boundary. | $O(1)$ |
+| `ConvexPolygon operator+(const ConvexPolygon& other) const` | Returns the Minkowski sum with another polygon of the same coordinate type. Both inputs must be nonempty. | $O(N+M)$ time and memory |
+| `ConvexPolygon<std::common_type_t<T, Scalar>> operator*(Scalar scalar) const` | Returns a polygon with each vertex multiplied by `scalar`. | $O(N)$ time and memory |
+| `friend ConvexPolygon<std::common_type_t<T, Scalar>> operator*(Scalar scalar, const ConvexPolygon& polygon)` | Supports `scalar * polygon` with the same behavior as `polygon * scalar`. | $O(N)$ time and memory |
 | `area2()` | Returns signed twice-area. A nondegenerate normalized polygon has positive area. | $O(1)$ |
 | `chain_area2(first, last)` | Returns signed twice-area enclosed by the counterclockwise chain from `first` through `last` and the chord back to `first`. | $O(1)$ |
 | `contains(point)` | Classifies a point as `Outside`, `Boundary`, or `Inside`. | $O(\log N)$ |
@@ -107,6 +125,21 @@ std::optional<Point<long double>> centroid(
 requires at least three vertices and a point strictly outside the polygon.
 Ties may return either endpoint of an extreme edge. No ordering is promised
 between the two tangent indices.
+
+The arithmetic operators return new normalized query objects and do not mutate
+their operands. `first + second` represents all points `a + b` with `a` in
+`first` and `b` in `second`; points and segments are supported. It uses the
+larger of the two constructor tolerances for normalization and later queries.
+Coordinate sums and edge differences must fit `T`.
+
+Multiplication scales about `(0, 0)` and preserves the constructor tolerance.
+A negative scalar also rotates the polygon by 180 degrees; the returned
+boundary remains counterclockwise and starts at its lowest `(y, x)` vertex.
+A zero scalar maps a nonempty polygon to the single point `(0, 0)`.
+Scaling an empty polygon returns an empty polygon. The result coordinate type
+is `std::common_type_t<T, Scalar>`, as with `Point<T>` multiplication, so
+`ConvexPolygon<long long> * 0.5L` returns `ConvexPolygon<long double>`.
+The common type must satisfy `Coordinate`, and coordinate products must fit it.
 
 `centroid` is a free geometry-wide overload rather than a convex-only member.
 The same name also supports points, segments, triangles, circles, and general
@@ -271,7 +304,16 @@ int main() {
     std::cout << int(polygon.contains(Point(2, 2))) << "\n";  // 2
 
     auto maximum = polygon.max_dot(Point(1, 0));
-    std::cout << maximum.first << "\n";  // 4
+    std::cout << static_cast<long long>(maximum.first) << "\n";  // 4
+
+    auto sum = polygon + polygon;
+    std::cout << sum.size() << "\n";  // 4, square from (0, 0) to (8, 8)
+    auto enlarged = 2 * polygon;
+    auto reflected = polygon * -1;
+    auto half = polygon * 0.5L;  // ConvexPolygon<long double>
+    std::cout << enlarged[2].x << "\n";  // 8
+    std::cout << reflected[0].x << "\n";  // -4
+    std::cout << half[2].x << "\n";  // 2
 
     m1une::geometry::Line<long long> boundary{
         Point(2, -1),

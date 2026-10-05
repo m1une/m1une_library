@@ -11,6 +11,7 @@
 #include <limits>
 #include <numbers>
 #include <optional>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -270,6 +271,35 @@ class ConvexPolygon {
     const Point<T>& operator[](int index) const {
         assert(0 <= index && index < size());
         return points[index];
+    }
+
+    ConvexPolygon operator+(const ConvexPolygon& other) const {
+        const long double eps = std::max(epsilon, other.epsilon);
+        return ConvexPolygon(
+            minkowski_sum(points, other.points, eps),
+            eps
+        );
+    }
+
+    template <typename Scalar>
+    requires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)
+    ConvexPolygon<std::common_type_t<T, Scalar>> operator*(Scalar scalar) const {
+        using Result = std::common_type_t<T, Scalar>;
+        std::vector<Point<Result>> scaled;
+        scaled.reserve(points.size());
+        for (const Point<T>& point : points) {
+            scaled.push_back(point * scalar);
+        }
+        return ConvexPolygon<Result>(std::move(scaled), epsilon);
+    }
+
+    template <typename Scalar>
+    requires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)
+    friend ConvexPolygon<std::common_type_t<T, Scalar>> operator*(
+        Scalar scalar,
+        const ConvexPolygon& polygon
+    ) {
+        return polygon * scalar;
     }
 
     Wide area2() const {
