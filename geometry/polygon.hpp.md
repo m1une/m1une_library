@@ -1315,19 +1315,28 @@ data:
     \ m1une {\nnamespace geometry {\n\nenum class PointInPolygon {\n    Outside =\
     \ 0,\n    Boundary = 1,\n    Inside = 2,\n};\n\ntemplate <Coordinate T>\nstruct\
     \ Polygon {\n    std::vector<Point<T>> vertices;\n    bool filled = true;\n};\n\
-    \nstruct ParameterInterval {\n    long double begin = 0.0L;\n    long double end\
-    \ = 0.0L;\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(\n\
-    \    const std::array<Point<T>, 3>& triangle\n) {\n    return Point<long double>(\n\
-    \        (\n            static_cast<long double>(triangle[0].x) +\n          \
-    \  static_cast<long double>(triangle[1].x) +\n            static_cast<long double>(triangle[2].x)\n\
-    \        ) / 3,\n        (\n            static_cast<long double>(triangle[0].y)\
-    \ +\n            static_cast<long double>(triangle[1].y) +\n            static_cast<long\
-    \ double>(triangle[2].y)\n        ) / 3\n    );\n}\n\nnamespace polygon_detail\
-    \ {\n\ntemplate <Coordinate T>\nstd::vector<Point<T>> clean_polygon_vertices(\n\
-    \    std::vector<Point<T>> polygon,\n    long double eps\n) {\n    if (\n    \
-    \    polygon.size() >= 2 &&\n        polygon.front() == polygon.back()\n    )\
-    \ {\n        polygon.pop_back();\n    }\n\n    std::vector<Point<T>> deduplicated;\n\
-    \    for (const Point<T>& point : polygon) {\n        if (deduplicated.empty()\
+    \ntemplate <Coordinate T, typename Scalar>\nrequires (std::is_arithmetic_v<Scalar>\
+    \ || Coordinate<Scalar>)\nPolygon<std::common_type_t<T, Scalar>> operator*(\n\
+    \    const Polygon<T>& polygon,\n    Scalar scalar\n) {\n    using Result = std::common_type_t<T,\
+    \ Scalar>;\n    Polygon<Result> scaled;\n    scaled.vertices.reserve(polygon.vertices.size());\n\
+    \    for (const Point<T>& point : polygon.vertices) {\n        scaled.vertices.push_back(point\
+    \ * scalar);\n    }\n    scaled.filled = polygon.filled;\n    return scaled;\n\
+    }\n\ntemplate <typename Scalar, Coordinate T>\nrequires (std::is_arithmetic_v<Scalar>\
+    \ || Coordinate<Scalar>)\nPolygon<std::common_type_t<T, Scalar>> operator*(\n\
+    \    Scalar scalar,\n    const Polygon<T>& polygon\n) {\n    return polygon *\
+    \ scalar;\n}\n\nstruct ParameterInterval {\n    long double begin = 0.0L;\n  \
+    \  long double end = 0.0L;\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long\
+    \ double> centroid(\n    const std::array<Point<T>, 3>& triangle\n) {\n    return\
+    \ Point<long double>(\n        (\n            static_cast<long double>(triangle[0].x)\
+    \ +\n            static_cast<long double>(triangle[1].x) +\n            static_cast<long\
+    \ double>(triangle[2].x)\n        ) / 3,\n        (\n            static_cast<long\
+    \ double>(triangle[0].y) +\n            static_cast<long double>(triangle[1].y)\
+    \ +\n            static_cast<long double>(triangle[2].y)\n        ) / 3\n    );\n\
+    }\n\nnamespace polygon_detail {\n\ntemplate <Coordinate T>\nstd::vector<Point<T>>\
+    \ clean_polygon_vertices(\n    std::vector<Point<T>> polygon,\n    long double\
+    \ eps\n) {\n    if (\n        polygon.size() >= 2 &&\n        polygon.front()\
+    \ == polygon.back()\n    ) {\n        polygon.pop_back();\n    }\n\n    std::vector<Point<T>>\
+    \ deduplicated;\n    for (const Point<T>& point : polygon) {\n        if (deduplicated.empty()\
     \ || deduplicated.back() != point) {\n            deduplicated.push_back(point);\n\
     \        }\n    }\n    if (\n        deduplicated.size() >= 2 &&\n        deduplicated.front()\
     \ == deduplicated.back()\n    ) {\n        deduplicated.pop_back();\n    }\n\n\
@@ -1823,19 +1832,28 @@ data:
     \ m1une {\nnamespace geometry {\n\nenum class PointInPolygon {\n    Outside =\
     \ 0,\n    Boundary = 1,\n    Inside = 2,\n};\n\ntemplate <Coordinate T>\nstruct\
     \ Polygon {\n    std::vector<Point<T>> vertices;\n    bool filled = true;\n};\n\
-    \nstruct ParameterInterval {\n    long double begin = 0.0L;\n    long double end\
-    \ = 0.0L;\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(\n\
-    \    const std::array<Point<T>, 3>& triangle\n) {\n    return Point<long double>(\n\
-    \        (\n            static_cast<long double>(triangle[0].x) +\n          \
-    \  static_cast<long double>(triangle[1].x) +\n            static_cast<long double>(triangle[2].x)\n\
-    \        ) / 3,\n        (\n            static_cast<long double>(triangle[0].y)\
-    \ +\n            static_cast<long double>(triangle[1].y) +\n            static_cast<long\
-    \ double>(triangle[2].y)\n        ) / 3\n    );\n}\n\nnamespace polygon_detail\
-    \ {\n\ntemplate <Coordinate T>\nstd::vector<Point<T>> clean_polygon_vertices(\n\
-    \    std::vector<Point<T>> polygon,\n    long double eps\n) {\n    if (\n    \
-    \    polygon.size() >= 2 &&\n        polygon.front() == polygon.back()\n    )\
-    \ {\n        polygon.pop_back();\n    }\n\n    std::vector<Point<T>> deduplicated;\n\
-    \    for (const Point<T>& point : polygon) {\n        if (deduplicated.empty()\
+    \ntemplate <Coordinate T, typename Scalar>\nrequires (std::is_arithmetic_v<Scalar>\
+    \ || Coordinate<Scalar>)\nPolygon<std::common_type_t<T, Scalar>> operator*(\n\
+    \    const Polygon<T>& polygon,\n    Scalar scalar\n) {\n    using Result = std::common_type_t<T,\
+    \ Scalar>;\n    Polygon<Result> scaled;\n    scaled.vertices.reserve(polygon.vertices.size());\n\
+    \    for (const Point<T>& point : polygon.vertices) {\n        scaled.vertices.push_back(point\
+    \ * scalar);\n    }\n    scaled.filled = polygon.filled;\n    return scaled;\n\
+    }\n\ntemplate <typename Scalar, Coordinate T>\nrequires (std::is_arithmetic_v<Scalar>\
+    \ || Coordinate<Scalar>)\nPolygon<std::common_type_t<T, Scalar>> operator*(\n\
+    \    Scalar scalar,\n    const Polygon<T>& polygon\n) {\n    return polygon *\
+    \ scalar;\n}\n\nstruct ParameterInterval {\n    long double begin = 0.0L;\n  \
+    \  long double end = 0.0L;\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long\
+    \ double> centroid(\n    const std::array<Point<T>, 3>& triangle\n) {\n    return\
+    \ Point<long double>(\n        (\n            static_cast<long double>(triangle[0].x)\
+    \ +\n            static_cast<long double>(triangle[1].x) +\n            static_cast<long\
+    \ double>(triangle[2].x)\n        ) / 3,\n        (\n            static_cast<long\
+    \ double>(triangle[0].y) +\n            static_cast<long double>(triangle[1].y)\
+    \ +\n            static_cast<long double>(triangle[2].y)\n        ) / 3\n    );\n\
+    }\n\nnamespace polygon_detail {\n\ntemplate <Coordinate T>\nstd::vector<Point<T>>\
+    \ clean_polygon_vertices(\n    std::vector<Point<T>> polygon,\n    long double\
+    \ eps\n) {\n    if (\n        polygon.size() >= 2 &&\n        polygon.front()\
+    \ == polygon.back()\n    ) {\n        polygon.pop_back();\n    }\n\n    std::vector<Point<T>>\
+    \ deduplicated;\n    for (const Point<T>& point : polygon) {\n        if (deduplicated.empty()\
     \ || deduplicated.back() != point) {\n            deduplicated.push_back(point);\n\
     \        }\n    }\n    if (\n        deduplicated.size() >= 2 &&\n        deduplicated.front()\
     \ == deduplicated.back()\n    ) {\n        deduplicated.pop_back();\n    }\n\n\
@@ -2336,7 +2354,7 @@ data:
   - geometry/steiner_convex_decomposition.hpp
   - geometry/all.hpp
   - geometry/convex_polygon.hpp
-  timestamp: '2026-10-05 22:23:07+09:00'
+  timestamp: '2026-10-06 02:48:54+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/is_convex_polygon.test.cpp
@@ -2380,6 +2398,40 @@ When `filled` is `true`, the object is the closed polygonal region. When it is
 `closest_points`, and `distance` overloads honor the flag. Area, centroid,
 triangulation, and explicitly named boundary-event functions use `vertices`
 independently of the flag. The first vertex must not be repeated at the end.
+
+## Scalar multiplication
+
+Both multiplication orders scale each vertex about the origin, including for
+non-convex polygons. They return a new polygon with the same `filled` flag,
+vertex count, and vertex order, leaving the original unchanged.
+
+```cpp
+template <Coordinate T, typename Scalar>
+requires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)
+Polygon<std::common_type_t<T, Scalar>> operator*(
+    const Polygon<T>& polygon,
+    Scalar scalar
+);
+
+template <typename Scalar, Coordinate T>
+requires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)
+Polygon<std::common_type_t<T, Scalar>> operator*(
+    Scalar scalar,
+    const Polygon<T>& polygon
+);
+```
+
+| Operation | Description | Complexity |
+| --- | --- | --- |
+| `Polygon<std::common_type_t<T, Scalar>> operator*(const Polygon<T>& polygon, Scalar scalar)` | Returns `polygon` scaled about `(0, 0)`. | $O(N)$ time and memory |
+| `Polygon<std::common_type_t<T, Scalar>> operator*(Scalar scalar, const Polygon<T>& polygon)` | Supports `scalar * polygon` with the same behavior. | $O(N)$ time and memory |
+
+As with point multiplication, the result uses `std::common_type_t<T, Scalar>`.
+For example, `Polygon<long long> * 0.5L` returns `Polygon<long double>`.
+The common type must satisfy `Coordinate`, and coordinate products must fit it.
+Negative scalars rotate the polygon by 180 degrees as well as scaling it, and
+preserve its winding direction. A zero scalar leaves every vertex at `(0, 0)`
+without removing duplicates. An empty polygon stays empty.
 
 ## Point Containment
 
@@ -2608,6 +2660,11 @@ int main() {
 
     std::cout << m1une::geometry::polygon_area(polygon) << "\n"; // 2
     std::cout << m1une::geometry::contains(polygon, Point(1, 0)) << "\n"; // 1
+
+    auto enlarged = polygon * 2;
+    auto half = 0.5L * polygon; // Polygon<long double>
+    std::cout << m1une::geometry::polygon_area(enlarged) << "\n"; // 8
+    std::cout << m1une::geometry::polygon_area(half) << "\n"; // 0.5
 
     m1une::geometry::Segment<long long> path{
         Point(-1, 1),

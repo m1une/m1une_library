@@ -111,15 +111,15 @@ data:
     \n#include <array>\n#include <cerrno>\n#include <charconv>\n#include <cstddef>\n\
     #include <cstdio>\n#include <cstdlib>\n#line 12 \"utilities/fast_io.hpp\"\n#include\
     \ <cstring>\n#include <iterator>\n#include <string>\n#include <sys/stat.h>\n#include\
-    \ <type_traits>\n#line 18 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n\nnamespace\
-    \ m1une {\nnamespace utilities {\n\nstruct FastOutput;\n\nnamespace internal {\n\
-    \n// Shared with the convenience helpers in template.hpp.\ninline FastOutput*\
-    \ standard_output_instance = nullptr;\n\n// Detect std::begin(x), std::end(x).\n\
-    template <class T, class = void>\nstruct is_range : std::false_type {};\n\ntemplate\
-    \ <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
-    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
-    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
-    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    \ <type_traits>\n#line 18 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n#line\
+    \ 20 \"utilities/fast_io.hpp\"\n\nnamespace m1une {\nnamespace utilities {\n\n\
+    struct FastOutput;\n\nnamespace internal {\n\n// Shared with the convenience helpers\
+    \ in template.hpp.\ninline FastOutput* standard_output_instance = nullptr;\n\n\
+    // Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct\
+    \ is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
+    \    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
+    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
+    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
     \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
     \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
@@ -280,23 +280,44 @@ data:
     \ + value % 10);\n                value /= 10;\n            }\n        }\n   \
     \     return result;\n    }();\n\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
     \    int _position;\n    int _precision;\n    std::chars_format _float_format;\n\
-    \    char _range_separator;\n\n   public:\n    explicit FastOutput(std::FILE*\
-    \ stream = stdout)\n        : _stream(stream),\n          _position(0),\n    \
-    \      _precision(6),\n          _float_format(std::chars_format::general),\n\
-    \          _range_separator(' ') {\n        if (_stream == stdout\n          \
-    \  && internal::standard_output_instance == nullptr) {\n            internal::standard_output_instance\
-    \ = this;\n        }\n    }\n\n    FastOutput(const FastOutput&) = delete;\n \
-    \   FastOutput& operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n\
-    \        flush();\n        if (internal::standard_output_instance == this) {\n\
-    \            internal::standard_output_instance = nullptr;\n        }\n    }\n\
-    \n    void flush() {\n        if (_position != 0) {\n            std::fwrite(_buffer,\
-    \ 1, _position, _stream);\n            _position = 0;\n        }\n        std::fflush(_stream);\n\
-    \    }\n\n    void write_char(char c) {\n        if (_position == buffer_size)\
-    \ flush();\n        _buffer[_position++] = c;\n    }\n\n    void write(const char*\
-    \ s) {\n        while (*s != '\\0') write_char(*s++);\n    }\n\n    void write(const\
-    \ std::string& s) {\n        std::size_t position = 0;\n        while (position\
-    \ < s.size()) {\n            if (_position == buffer_size) flush();\n        \
-    \    const std::size_t copied =\n                std::min<std::size_t>(buffer_size\
+    \    char _range_separator;\n    std::string* _capture = nullptr;\n\n    template\
+    \ <class T>\n    std::string format_cell(const T& value) {\n        std::string\
+    \ result;\n        struct CaptureGuard {\n            std::string*& target;\n\
+    \            std::string* previous;\n            ~CaptureGuard() { target = previous;\
+    \ }\n        } guard{_capture, _capture};\n        _capture = &result;\n     \
+    \   write(value);\n        return result;\n    }\n\n    template <class Matrix>\n\
+    \    void write_aligned_matrix(const Matrix& matrix) {\n        std::vector<std::vector<std::string>>\
+    \ rows;\n        std::vector<std::size_t> widths;\n        for (const auto& row\
+    \ : matrix) {\n            auto& cells = rows.emplace_back();\n            std::size_t\
+    \ column = 0;\n            for (const auto& value : row) {\n                cells.push_back(format_cell(value));\n\
+    \                if (column == widths.size()) widths.push_back(0);\n         \
+    \       widths[column] = std::max(widths[column], cells.back().size());\n    \
+    \            ++column;\n            }\n        }\n        bool first = true;\n\
+    \        for (const auto& row : rows) {\n            if (!first) write_char('\\\
+    n');\n            first = false;\n            for (std::size_t column = 0; column\
+    \ < row.size(); ++column) {\n                if (column != 0) write_char(_range_separator);\n\
+    \                for (std::size_t padding = row[column].size();\n            \
+    \         padding < widths[column]; ++padding) {\n                    write_char('\
+    \ ');\n                }\n                write(row[column]);\n            }\n\
+    \        }\n    }\n\n   public:\n    explicit FastOutput(std::FILE* stream = stdout)\n\
+    \        : _stream(stream),\n          _position(0),\n          _precision(6),\n\
+    \          _float_format(std::chars_format::general),\n          _range_separator('\
+    \ ') {\n        if (_stream == stdout\n            && internal::standard_output_instance\
+    \ == nullptr) {\n            internal::standard_output_instance = this;\n    \
+    \    }\n    }\n\n    FastOutput(const FastOutput&) = delete;\n    FastOutput&\
+    \ operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n        flush();\n\
+    \        if (internal::standard_output_instance == this) {\n            internal::standard_output_instance\
+    \ = nullptr;\n        }\n    }\n\n    void flush() {\n        if (_position !=\
+    \ 0) {\n            std::fwrite(_buffer, 1, _position, _stream);\n           \
+    \ _position = 0;\n        }\n        std::fflush(_stream);\n    }\n\n    void\
+    \ write_char(char c) {\n        if (_capture != nullptr) {\n            _capture->push_back(c);\n\
+    \            return;\n        }\n        if (_position == buffer_size) flush();\n\
+    \        _buffer[_position++] = c;\n    }\n\n    void write(const char* s) {\n\
+    \        while (*s != '\\0') write_char(*s++);\n    }\n\n    void write(const\
+    \ std::string& s) {\n        if (_capture != nullptr) {\n            _capture->append(s);\n\
+    \            return;\n        }\n        std::size_t position = 0;\n        while\
+    \ (position < s.size()) {\n            if (_position == buffer_size) flush();\n\
+    \            const std::size_t copied =\n                std::min<std::size_t>(buffer_size\
     \ - _position, s.size() - position);\n            std::memcpy(_buffer + _position,\
     \ s.data() + position, copied);\n            _position += int(copied);\n     \
     \       position += copied;\n        }\n    }\n\n    void write(char c) {\n  \
@@ -319,15 +340,19 @@ data:
     \            return;\n        }\n\n        unsigned chunks[16];\n        int count\
     \ = 0;\n        while (magnitude >= 10000) {\n            const Unsigned quotient\
     \ = magnitude / 10000;\n            chunks[count++] = unsigned(magnitude - quotient\
-    \ * 10000);\n            magnitude = quotient;\n        }\n        if (_position\
-    \ > buffer_size - 64) flush();\n        const unsigned leading = unsigned(magnitude);\n\
+    \ * 10000);\n            magnitude = quotient;\n        }\n        if (_capture\
+    \ == nullptr && _position > buffer_size - 64) flush();\n        char captured[64];\n\
+    \        char* const begin = _capture != nullptr ? captured : _buffer + _position;\n\
+    \        char* destination = begin;\n        const unsigned leading = unsigned(magnitude);\n\
     \        const char* first = digit_quads.data() + 4 * leading;\n        int skip\
     \ = leading < 10 ? 3 : leading < 100 ? 2 : leading < 1000 ? 1 : 0;\n        for\
-    \ (; skip < 4; skip++) _buffer[_position++] = first[skip];\n        while (count--)\
+    \ (; skip < 4; skip++) *destination++ = first[skip];\n        while (count--)\
     \ {\n            const char* digits = digit_quads.data() + 4 * chunks[count];\n\
-    \            std::memcpy(_buffer + _position, digits, 4);\n            _position\
-    \ += 4;\n        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n \
-    \       internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
+    \            std::memcpy(destination, digits, 4);\n            destination +=\
+    \ 4;\n        }\n        if (_capture != nullptr) {\n            _capture->append(begin,\
+    \ destination - begin);\n        } else {\n            _position += int(destination\
+    \ - begin);\n        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
+    \        internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
     \            && !internal::is_range_v<T>\n    >\n    write(const T& value) {\n\
     \        write(value.val());\n    }\n\n    template <class First, class Second>\n\
     \    void write(const std::pair<First, Second>& value) {\n        write(value.first);\n\
@@ -350,58 +375,67 @@ data:
     \        _precision = precision;\n    }\n\n    void set_general(int precision\
     \ = 6) {\n        _float_format = std::chars_format::general;\n        _precision\
     \ = precision;\n    }\n\n    void set_range_separator(char separator) {\n    \
-    \    _range_separator = separator;\n    }\n\n    template <class... Args>\n  \
-    \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
-    n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
-    \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 10 \"verify/ds/range_query/sqrt_decomposition.test.cpp\"\
-    \n\nnamespace {\n\nstruct Concat {\n    using value_type = std::string;\n\n  \
-    \  static value_type id() {\n        return \"\";\n    }\n\n    static value_type\
-    \ op(const value_type& first, const value_type& second) {\n        return first\
-    \ + second;\n    }\n};\n\nconstexpr long long mod = 998244353;\n\nstruct Affine\
-    \ {\n    struct value_type {\n        long long a;\n        long long b;\n   \
-    \ };\n\n    static value_type id() {\n        return value_type{1, 0};\n    }\n\
-    \n    static value_type op(const value_type& first, const value_type& second)\
-    \ {\n        return value_type{\n            second.a * first.a % mod,\n     \
-    \       (second.a * first.b + second.b) % mod,\n        };\n    }\n};\n\nvoid\
-    \ test_fixed() {\n    m1une::ds::SqrtDecomposition<Concat> empty;\n    assert(empty.empty());\n\
-    \    assert(empty.prod(0, 0).empty());\n\n    std::vector<std::string> values\
-    \ = {\"a\", \"b\", \"c\", \"d\", \"e\"};\n    m1une::ds::SqrtDecomposition<Concat>\
-    \ blocks(values);\n    assert(blocks.prod(0, 5) == \"abcde\");\n    assert(blocks.prod(1,\
-    \ 4) == \"bcd\");\n    blocks.set(2, \"x\");\n    assert(blocks.prod(0, 5) ==\
-    \ \"abxde\");\n    assert(blocks.all_prod() == \"abxde\");\n\n    for (int block\
-    \ = 0; block < blocks.block_count(); ++block) {\n        auto range = blocks.block_range(block);\n\
-    \        std::string expected;\n        for (int index = range.first; index <\
-    \ range.second; ++index) {\n            expected += blocks[index];\n         \
-    \   assert(blocks.block_of(index) == block);\n        }\n        assert(blocks.block_products()[block]\
-    \ == expected);\n    }\n}\n\nvoid test_randomized() {\n    std::uint64_t state\
-    \ = 701;\n    auto random = [&state]() {\n        state ^= state << 7;\n     \
-    \   state ^= state >> 9;\n        return state;\n    };\n\n    for (int trial\
-    \ = 0; trial < 2000; ++trial) {\n        int size = int(random() % 180);\n   \
-    \     std::vector<std::string> values(size);\n        for (std::string& value\
-    \ : values) {\n            value = char('a' + random() % 5);\n        }\n    \
-    \    m1une::ds::SqrtDecomposition<Concat> blocks(values);\n\n        for (int\
-    \ operation = 0; operation < 300; ++operation) {\n            if (size != 0 &&\
-    \ random() % 3 == 0) {\n                int index = int(random() % size);\n  \
-    \              std::string value(1, char('a' + random() % 5));\n             \
-    \   values[index] = value;\n                blocks.set(index, value);\n      \
-    \      } else {\n                int left = int(random() % (size + 1));\n    \
-    \            int right = int(random() % (size + 1));\n                if (right\
-    \ < left) std::swap(left, right);\n                std::string expected;\n   \
-    \             for (int index = left; index < right; ++index) {\n             \
-    \       expected += values[index];\n                }\n                assert(blocks.prod(left,\
-    \ right) == expected);\n            }\n        }\n    }\n}\n\n}  // namespace\n\
-    \nint main() {\n    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
-    \ fast_output;\n\n    test_fixed();\n    test_randomized();\n\n    int n, q;\n\
-    \    fast_input >> n >> q;\n    std::vector<Affine::value_type> values(n);\n \
-    \   for (auto& value : values) fast_input >> value.a >> value.b;\n    m1une::ds::SqrtDecomposition<Affine>\
-    \ blocks(values);\n\n    while (q--) {\n        int type;\n        fast_input\
-    \ >> type;\n        if (type == 0) {\n            int index;\n            Affine::value_type\
-    \ value;\n            fast_input >> index >> value.a >> value.b;\n           \
-    \ blocks.set(index, value);\n        } else {\n            int left, right;\n\
-    \            long long x;\n            fast_input >> left >> right >> x;\n   \
-    \         auto function = blocks.prod(left, right);\n            fast_output <<\
-    \ (function.a * x + function.b) % mod << '\\n';\n        }\n    }\n}\n"
+    \    _range_separator = separator;\n    }\n\n    template <class Matrix>\n   \
+    \ void write_aligned(const Matrix& matrix) {\n        using Row = internal::range_stored_value_t<const\
+    \ Matrix>;\n        using Cell = internal::range_stored_value_t<const Row>;\n\
+    \        static_assert(internal::is_range_v<Row> && !internal::is_string_like_v<Row>,\n\
+    \                      \"write_aligned requires a two-dimensional range\");\n\
+    \        static_assert(!internal::is_range_v<Cell> || internal::is_string_like_v<Cell>,\n\
+    \                      \"write_aligned requires scalar cells\");\n        write_aligned_matrix(matrix);\n\
+    \    }\n\n    template <class Matrix>\n    void println_aligned(const Matrix&\
+    \ matrix) {\n        write_aligned(matrix);\n        write_char('\\n');\n    }\n\
+    \n    template <class... Args>\n    void println(const Args&... args) {\n    \
+    \    print(args...);\n        write_char('\\n');\n    }\n\n    template <class\
+    \ T>\n    FastOutput& operator<<(const T& value) {\n        write(value);\n  \
+    \      return *this;\n    }\n};\n\n}  // namespace utilities\n}  // namespace\
+    \ m1une\n\n\n#line 10 \"verify/ds/range_query/sqrt_decomposition.test.cpp\"\n\n\
+    namespace {\n\nstruct Concat {\n    using value_type = std::string;\n\n    static\
+    \ value_type id() {\n        return \"\";\n    }\n\n    static value_type op(const\
+    \ value_type& first, const value_type& second) {\n        return first + second;\n\
+    \    }\n};\n\nconstexpr long long mod = 998244353;\n\nstruct Affine {\n    struct\
+    \ value_type {\n        long long a;\n        long long b;\n    };\n\n    static\
+    \ value_type id() {\n        return value_type{1, 0};\n    }\n\n    static value_type\
+    \ op(const value_type& first, const value_type& second) {\n        return value_type{\n\
+    \            second.a * first.a % mod,\n            (second.a * first.b + second.b)\
+    \ % mod,\n        };\n    }\n};\n\nvoid test_fixed() {\n    m1une::ds::SqrtDecomposition<Concat>\
+    \ empty;\n    assert(empty.empty());\n    assert(empty.prod(0, 0).empty());\n\n\
+    \    std::vector<std::string> values = {\"a\", \"b\", \"c\", \"d\", \"e\"};\n\
+    \    m1une::ds::SqrtDecomposition<Concat> blocks(values);\n    assert(blocks.prod(0,\
+    \ 5) == \"abcde\");\n    assert(blocks.prod(1, 4) == \"bcd\");\n    blocks.set(2,\
+    \ \"x\");\n    assert(blocks.prod(0, 5) == \"abxde\");\n    assert(blocks.all_prod()\
+    \ == \"abxde\");\n\n    for (int block = 0; block < blocks.block_count(); ++block)\
+    \ {\n        auto range = blocks.block_range(block);\n        std::string expected;\n\
+    \        for (int index = range.first; index < range.second; ++index) {\n    \
+    \        expected += blocks[index];\n            assert(blocks.block_of(index)\
+    \ == block);\n        }\n        assert(blocks.block_products()[block] == expected);\n\
+    \    }\n}\n\nvoid test_randomized() {\n    std::uint64_t state = 701;\n    auto\
+    \ random = [&state]() {\n        state ^= state << 7;\n        state ^= state\
+    \ >> 9;\n        return state;\n    };\n\n    for (int trial = 0; trial < 2000;\
+    \ ++trial) {\n        int size = int(random() % 180);\n        std::vector<std::string>\
+    \ values(size);\n        for (std::string& value : values) {\n            value\
+    \ = char('a' + random() % 5);\n        }\n        m1une::ds::SqrtDecomposition<Concat>\
+    \ blocks(values);\n\n        for (int operation = 0; operation < 300; ++operation)\
+    \ {\n            if (size != 0 && random() % 3 == 0) {\n                int index\
+    \ = int(random() % size);\n                std::string value(1, char('a' + random()\
+    \ % 5));\n                values[index] = value;\n                blocks.set(index,\
+    \ value);\n            } else {\n                int left = int(random() % (size\
+    \ + 1));\n                int right = int(random() % (size + 1));\n          \
+    \      if (right < left) std::swap(left, right);\n                std::string\
+    \ expected;\n                for (int index = left; index < right; ++index) {\n\
+    \                    expected += values[index];\n                }\n         \
+    \       assert(blocks.prod(left, right) == expected);\n            }\n       \
+    \ }\n    }\n}\n\n}  // namespace\n\nint main() {\n    m1une::utilities::FastInput\
+    \ fast_input;\n    m1une::utilities::FastOutput fast_output;\n\n    test_fixed();\n\
+    \    test_randomized();\n\n    int n, q;\n    fast_input >> n >> q;\n    std::vector<Affine::value_type>\
+    \ values(n);\n    for (auto& value : values) fast_input >> value.a >> value.b;\n\
+    \    m1une::ds::SqrtDecomposition<Affine> blocks(values);\n\n    while (q--) {\n\
+    \        int type;\n        fast_input >> type;\n        if (type == 0) {\n  \
+    \          int index;\n            Affine::value_type value;\n            fast_input\
+    \ >> index >> value.a >> value.b;\n            blocks.set(index, value);\n   \
+    \     } else {\n            int left, right;\n            long long x;\n     \
+    \       fast_input >> left >> right >> x;\n            auto function = blocks.prod(left,\
+    \ right);\n            fast_output << (function.a * x + function.b) % mod << '\\\
+    n';\n        }\n    }\n}\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/point_set_range_composite\"\
     \n\n#include \"../../../ds/range_query/sqrt_decomposition.hpp\"\n\n#include <cassert>\n\
     #include <cstdint>\n#include \"../../../utilities/fast_io.hpp\"\n#include <string>\n\
@@ -459,7 +493,7 @@ data:
   isVerificationFile: true
   path: verify/ds/range_query/sqrt_decomposition.test.cpp
   requiredBy: []
-  timestamp: '2026-08-26 23:16:21+09:00'
+  timestamp: '2026-10-06 01:57:24+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/range_query/sqrt_decomposition.test.cpp

@@ -23,14 +23,14 @@ data:
     #include <cerrno>\n#include <charconv>\n#include <cstddef>\n#include <cstdio>\n\
     #include <cstdlib>\n#include <cstdint>\n#include <cstring>\n#include <iterator>\n\
     #include <string>\n#include <sys/stat.h>\n#include <type_traits>\n#include <utility>\n\
-    #include <unistd.h>\n\nnamespace m1une {\nnamespace utilities {\n\nstruct FastOutput;\n\
-    \nnamespace internal {\n\n// Shared with the convenience helpers in template.hpp.\n\
-    inline FastOutput* standard_output_instance = nullptr;\n\n// Detect std::begin(x),\
-    \ std::end(x).\ntemplate <class T, class = void>\nstruct is_range : std::false_type\
-    \ {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
-    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
-    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
-    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    #include <unistd.h>\n#include <vector>\n\nnamespace m1une {\nnamespace utilities\
+    \ {\n\nstruct FastOutput;\n\nnamespace internal {\n\n// Shared with the convenience\
+    \ helpers in template.hpp.\ninline FastOutput* standard_output_instance = nullptr;\n\
+    \n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct\
+    \ is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
+    \    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
+    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
+    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
     \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
     \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
@@ -191,23 +191,44 @@ data:
     \ + value % 10);\n                value /= 10;\n            }\n        }\n   \
     \     return result;\n    }();\n\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
     \    int _position;\n    int _precision;\n    std::chars_format _float_format;\n\
-    \    char _range_separator;\n\n   public:\n    explicit FastOutput(std::FILE*\
-    \ stream = stdout)\n        : _stream(stream),\n          _position(0),\n    \
-    \      _precision(6),\n          _float_format(std::chars_format::general),\n\
-    \          _range_separator(' ') {\n        if (_stream == stdout\n          \
-    \  && internal::standard_output_instance == nullptr) {\n            internal::standard_output_instance\
-    \ = this;\n        }\n    }\n\n    FastOutput(const FastOutput&) = delete;\n \
-    \   FastOutput& operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n\
-    \        flush();\n        if (internal::standard_output_instance == this) {\n\
-    \            internal::standard_output_instance = nullptr;\n        }\n    }\n\
-    \n    void flush() {\n        if (_position != 0) {\n            std::fwrite(_buffer,\
-    \ 1, _position, _stream);\n            _position = 0;\n        }\n        std::fflush(_stream);\n\
-    \    }\n\n    void write_char(char c) {\n        if (_position == buffer_size)\
-    \ flush();\n        _buffer[_position++] = c;\n    }\n\n    void write(const char*\
-    \ s) {\n        while (*s != '\\0') write_char(*s++);\n    }\n\n    void write(const\
-    \ std::string& s) {\n        std::size_t position = 0;\n        while (position\
-    \ < s.size()) {\n            if (_position == buffer_size) flush();\n        \
-    \    const std::size_t copied =\n                std::min<std::size_t>(buffer_size\
+    \    char _range_separator;\n    std::string* _capture = nullptr;\n\n    template\
+    \ <class T>\n    std::string format_cell(const T& value) {\n        std::string\
+    \ result;\n        struct CaptureGuard {\n            std::string*& target;\n\
+    \            std::string* previous;\n            ~CaptureGuard() { target = previous;\
+    \ }\n        } guard{_capture, _capture};\n        _capture = &result;\n     \
+    \   write(value);\n        return result;\n    }\n\n    template <class Matrix>\n\
+    \    void write_aligned_matrix(const Matrix& matrix) {\n        std::vector<std::vector<std::string>>\
+    \ rows;\n        std::vector<std::size_t> widths;\n        for (const auto& row\
+    \ : matrix) {\n            auto& cells = rows.emplace_back();\n            std::size_t\
+    \ column = 0;\n            for (const auto& value : row) {\n                cells.push_back(format_cell(value));\n\
+    \                if (column == widths.size()) widths.push_back(0);\n         \
+    \       widths[column] = std::max(widths[column], cells.back().size());\n    \
+    \            ++column;\n            }\n        }\n        bool first = true;\n\
+    \        for (const auto& row : rows) {\n            if (!first) write_char('\\\
+    n');\n            first = false;\n            for (std::size_t column = 0; column\
+    \ < row.size(); ++column) {\n                if (column != 0) write_char(_range_separator);\n\
+    \                for (std::size_t padding = row[column].size();\n            \
+    \         padding < widths[column]; ++padding) {\n                    write_char('\
+    \ ');\n                }\n                write(row[column]);\n            }\n\
+    \        }\n    }\n\n   public:\n    explicit FastOutput(std::FILE* stream = stdout)\n\
+    \        : _stream(stream),\n          _position(0),\n          _precision(6),\n\
+    \          _float_format(std::chars_format::general),\n          _range_separator('\
+    \ ') {\n        if (_stream == stdout\n            && internal::standard_output_instance\
+    \ == nullptr) {\n            internal::standard_output_instance = this;\n    \
+    \    }\n    }\n\n    FastOutput(const FastOutput&) = delete;\n    FastOutput&\
+    \ operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n        flush();\n\
+    \        if (internal::standard_output_instance == this) {\n            internal::standard_output_instance\
+    \ = nullptr;\n        }\n    }\n\n    void flush() {\n        if (_position !=\
+    \ 0) {\n            std::fwrite(_buffer, 1, _position, _stream);\n           \
+    \ _position = 0;\n        }\n        std::fflush(_stream);\n    }\n\n    void\
+    \ write_char(char c) {\n        if (_capture != nullptr) {\n            _capture->push_back(c);\n\
+    \            return;\n        }\n        if (_position == buffer_size) flush();\n\
+    \        _buffer[_position++] = c;\n    }\n\n    void write(const char* s) {\n\
+    \        while (*s != '\\0') write_char(*s++);\n    }\n\n    void write(const\
+    \ std::string& s) {\n        if (_capture != nullptr) {\n            _capture->append(s);\n\
+    \            return;\n        }\n        std::size_t position = 0;\n        while\
+    \ (position < s.size()) {\n            if (_position == buffer_size) flush();\n\
+    \            const std::size_t copied =\n                std::min<std::size_t>(buffer_size\
     \ - _position, s.size() - position);\n            std::memcpy(_buffer + _position,\
     \ s.data() + position, copied);\n            _position += int(copied);\n     \
     \       position += copied;\n        }\n    }\n\n    void write(char c) {\n  \
@@ -230,15 +251,19 @@ data:
     \            return;\n        }\n\n        unsigned chunks[16];\n        int count\
     \ = 0;\n        while (magnitude >= 10000) {\n            const Unsigned quotient\
     \ = magnitude / 10000;\n            chunks[count++] = unsigned(magnitude - quotient\
-    \ * 10000);\n            magnitude = quotient;\n        }\n        if (_position\
-    \ > buffer_size - 64) flush();\n        const unsigned leading = unsigned(magnitude);\n\
+    \ * 10000);\n            magnitude = quotient;\n        }\n        if (_capture\
+    \ == nullptr && _position > buffer_size - 64) flush();\n        char captured[64];\n\
+    \        char* const begin = _capture != nullptr ? captured : _buffer + _position;\n\
+    \        char* destination = begin;\n        const unsigned leading = unsigned(magnitude);\n\
     \        const char* first = digit_quads.data() + 4 * leading;\n        int skip\
     \ = leading < 10 ? 3 : leading < 100 ? 2 : leading < 1000 ? 1 : 0;\n        for\
-    \ (; skip < 4; skip++) _buffer[_position++] = first[skip];\n        while (count--)\
+    \ (; skip < 4; skip++) *destination++ = first[skip];\n        while (count--)\
     \ {\n            const char* digits = digit_quads.data() + 4 * chunks[count];\n\
-    \            std::memcpy(_buffer + _position, digits, 4);\n            _position\
-    \ += 4;\n        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n \
-    \       internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
+    \            std::memcpy(destination, digits, 4);\n            destination +=\
+    \ 4;\n        }\n        if (_capture != nullptr) {\n            _capture->append(begin,\
+    \ destination - begin);\n        } else {\n            _position += int(destination\
+    \ - begin);\n        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
+    \        internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
     \            && !internal::is_range_v<T>\n    >\n    write(const T& value) {\n\
     \        write(value.val());\n    }\n\n    template <class First, class Second>\n\
     \    void write(const std::pair<First, Second>& value) {\n        write(value.first);\n\
@@ -261,55 +286,64 @@ data:
     \        _precision = precision;\n    }\n\n    void set_general(int precision\
     \ = 6) {\n        _float_format = std::chars_format::general;\n        _precision\
     \ = precision;\n    }\n\n    void set_range_separator(char separator) {\n    \
-    \    _range_separator = separator;\n    }\n\n    template <class... Args>\n  \
-    \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
-    n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
-    \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 4 \"verify/utilities/shifted_array.test.cpp\"\
-    \n\n#include <bits/stdc++.h>\n#line 7 \"verify/utilities/shifted_array.test.cpp\"\
-    \nusing namespace std;\n\n#line 1 \"utilities/shifted_array.hpp\"\n\n\n\n#line\
-    \ 6 \"utilities/shifted_array.hpp\"\n\nnamespace m1une {\nnamespace utilities\
-    \ {\n\n// `bool` is not supported; use `char` for boolean-like arrays.\ntemplate\
-    \ <typename T>\nstruct ShiftedArray {\n   private:\n    long long _offset;\n \
-    \   long long _step;\n    long long _size;\n    std::vector<T> _data;\n\n    static\
-    \ long long checked_size(long long L, long long R, long long step) {\n       \
-    \ if (step <= 0) {\n            throw std::invalid_argument(\"Step must be positive\"\
-    );\n        }\n        if (L > R) {\n            throw std::invalid_argument(\"\
-    Left bound must be less than or equal to right bound\");\n        }\n        return\
-    \ (R - L) / step + 1;\n    }\n\n    long long to_index(long long i) const {\n\
-    \        if (i < _offset) {\n            throw std::out_of_range(\"Index out of\
-    \ range\");\n        }\n        long long diff = i - _offset;\n        if (diff\
-    \ % _step != 0) {\n            throw std::out_of_range(\"Index is not aligned\
-    \ to the step\");\n        }\n        long long index = diff / _step;\n      \
-    \  if (index >= _size) {\n            throw std::out_of_range(\"Index out of range\"\
-    );\n        }\n        return index;\n    }\n\n   public:\n    // Creates an array\
-    \ on the closed interval [L, R] using the given step.\n    ShiftedArray(long long\
-    \ L, long long R, T init_value = T(), long long step = 1)\n        : _offset(L),\
-    \ _step(step), _size(checked_size(L, R, step)), _data(_size, init_value) {}\n\n\
-    \    T& operator[](long long i) {\n        return _data[to_index(i)];\n    }\n\
-    \n    const T& operator[](long long i) const {\n        return _data[to_index(i)];\n\
-    \    }\n\n    long long index(long long i) const {\n        return to_index(i);\n\
-    \    }\n};\n\n}  // namespace utilities\n}  // namespace m1une\n\n\n#line 10 \"\
-    verify/utilities/shifted_array.test.cpp\"\n\nconstexpr long long MAX = 100000;\n\
-    \nvoid test_shifted_array_edges() {\n    m1une::utilities::ShiftedArray<int> stepped(-2,\
-    \ 4, 0, 2);\n    stepped[-2] = 1;\n    stepped[0] = 2;\n    stepped[4] = 3;\n\
-    \    assert(stepped.index(2) == 2);\n    assert(stepped[-2] == 1);\n    assert(stepped[0]\
-    \ == 2);\n    assert(stepped[4] == 3);\n\n    bool rejected = false;\n    try\
-    \ {\n        (void)stepped[1];\n    } catch (const out_of_range&) {\n        rejected\
-    \ = true;\n    }\n    assert(rejected);\n\n    rejected = false;\n    try {\n\
-    \        m1une::utilities::ShiftedArray<int> invalid_step(0, 10, 0, 0);\n    }\
-    \ catch (const invalid_argument&) {\n        rejected = true;\n    }\n    assert(rejected);\n\
-    }\n\nlong long solve(long long l, long long r) {\n    vector<char> is_prime(MAX,\
-    \ 1);\n    is_prime[0] = is_prime[1] = 0;\n    m1une::utilities::ShiftedArray<vector<long\
-    \ long>> prime_factors(l, r);\n    for (long long p = 2; p * p <= r; ++p) {\n\
-    \        if (!is_prime[p]) continue;\n        for (long long x = 2 * p; x < MAX;\
-    \ x += p) {\n            is_prime[x] = 0;\n        }\n        for (long long x\
-    \ = (l + p - 1) / p * p; x <= r; x += p) {\n            prime_factors[x].emplace_back(p);\n\
-    \        }\n    }\n    long long res = 0;\n    for (long long x = l; x <= r; ++x)\
-    \ {\n        long long factor_count = 0;\n        long long y = x;\n        for\
-    \ (long long p : prime_factors[x]) {\n            while (y % p == 0) {\n     \
-    \           y /= p;\n                ++factor_count;\n            }\n        }\n\
-    \        if (y > 1) {\n            ++factor_count;\n        }\n        if (is_prime[factor_count])\
+    \    _range_separator = separator;\n    }\n\n    template <class Matrix>\n   \
+    \ void write_aligned(const Matrix& matrix) {\n        using Row = internal::range_stored_value_t<const\
+    \ Matrix>;\n        using Cell = internal::range_stored_value_t<const Row>;\n\
+    \        static_assert(internal::is_range_v<Row> && !internal::is_string_like_v<Row>,\n\
+    \                      \"write_aligned requires a two-dimensional range\");\n\
+    \        static_assert(!internal::is_range_v<Cell> || internal::is_string_like_v<Cell>,\n\
+    \                      \"write_aligned requires scalar cells\");\n        write_aligned_matrix(matrix);\n\
+    \    }\n\n    template <class Matrix>\n    void println_aligned(const Matrix&\
+    \ matrix) {\n        write_aligned(matrix);\n        write_char('\\n');\n    }\n\
+    \n    template <class... Args>\n    void println(const Args&... args) {\n    \
+    \    print(args...);\n        write_char('\\n');\n    }\n\n    template <class\
+    \ T>\n    FastOutput& operator<<(const T& value) {\n        write(value);\n  \
+    \      return *this;\n    }\n};\n\n}  // namespace utilities\n}  // namespace\
+    \ m1une\n\n\n#line 4 \"verify/utilities/shifted_array.test.cpp\"\n\n#include <bits/stdc++.h>\n\
+    #line 7 \"verify/utilities/shifted_array.test.cpp\"\nusing namespace std;\n\n\
+    #line 1 \"utilities/shifted_array.hpp\"\n\n\n\n#line 6 \"utilities/shifted_array.hpp\"\
+    \n\nnamespace m1une {\nnamespace utilities {\n\n// `bool` is not supported; use\
+    \ `char` for boolean-like arrays.\ntemplate <typename T>\nstruct ShiftedArray\
+    \ {\n   private:\n    long long _offset;\n    long long _step;\n    long long\
+    \ _size;\n    std::vector<T> _data;\n\n    static long long checked_size(long\
+    \ long L, long long R, long long step) {\n        if (step <= 0) {\n         \
+    \   throw std::invalid_argument(\"Step must be positive\");\n        }\n     \
+    \   if (L > R) {\n            throw std::invalid_argument(\"Left bound must be\
+    \ less than or equal to right bound\");\n        }\n        return (R - L) / step\
+    \ + 1;\n    }\n\n    long long to_index(long long i) const {\n        if (i <\
+    \ _offset) {\n            throw std::out_of_range(\"Index out of range\");\n \
+    \       }\n        long long diff = i - _offset;\n        if (diff % _step !=\
+    \ 0) {\n            throw std::out_of_range(\"Index is not aligned to the step\"\
+    );\n        }\n        long long index = diff / _step;\n        if (index >= _size)\
+    \ {\n            throw std::out_of_range(\"Index out of range\");\n        }\n\
+    \        return index;\n    }\n\n   public:\n    // Creates an array on the closed\
+    \ interval [L, R] using the given step.\n    ShiftedArray(long long L, long long\
+    \ R, T init_value = T(), long long step = 1)\n        : _offset(L), _step(step),\
+    \ _size(checked_size(L, R, step)), _data(_size, init_value) {}\n\n    T& operator[](long\
+    \ long i) {\n        return _data[to_index(i)];\n    }\n\n    const T& operator[](long\
+    \ long i) const {\n        return _data[to_index(i)];\n    }\n\n    long long\
+    \ index(long long i) const {\n        return to_index(i);\n    }\n};\n\n}  //\
+    \ namespace utilities\n}  // namespace m1une\n\n\n#line 10 \"verify/utilities/shifted_array.test.cpp\"\
+    \n\nconstexpr long long MAX = 100000;\n\nvoid test_shifted_array_edges() {\n \
+    \   m1une::utilities::ShiftedArray<int> stepped(-2, 4, 0, 2);\n    stepped[-2]\
+    \ = 1;\n    stepped[0] = 2;\n    stepped[4] = 3;\n    assert(stepped.index(2)\
+    \ == 2);\n    assert(stepped[-2] == 1);\n    assert(stepped[0] == 2);\n    assert(stepped[4]\
+    \ == 3);\n\n    bool rejected = false;\n    try {\n        (void)stepped[1];\n\
+    \    } catch (const out_of_range&) {\n        rejected = true;\n    }\n    assert(rejected);\n\
+    \n    rejected = false;\n    try {\n        m1une::utilities::ShiftedArray<int>\
+    \ invalid_step(0, 10, 0, 0);\n    } catch (const invalid_argument&) {\n      \
+    \  rejected = true;\n    }\n    assert(rejected);\n}\n\nlong long solve(long long\
+    \ l, long long r) {\n    vector<char> is_prime(MAX, 1);\n    is_prime[0] = is_prime[1]\
+    \ = 0;\n    m1une::utilities::ShiftedArray<vector<long long>> prime_factors(l,\
+    \ r);\n    for (long long p = 2; p * p <= r; ++p) {\n        if (!is_prime[p])\
+    \ continue;\n        for (long long x = 2 * p; x < MAX; x += p) {\n          \
+    \  is_prime[x] = 0;\n        }\n        for (long long x = (l + p - 1) / p * p;\
+    \ x <= r; x += p) {\n            prime_factors[x].emplace_back(p);\n        }\n\
+    \    }\n    long long res = 0;\n    for (long long x = l; x <= r; ++x) {\n   \
+    \     long long factor_count = 0;\n        long long y = x;\n        for (long\
+    \ long p : prime_factors[x]) {\n            while (y % p == 0) {\n           \
+    \     y /= p;\n                ++factor_count;\n            }\n        }\n   \
+    \     if (y > 1) {\n            ++factor_count;\n        }\n        if (is_prime[factor_count])\
     \ {\n            ++res;\n        }\n    }\n    return res;\n}\n\nint main() {\n\
     \    m1une::utilities::FastInput fast_input;\n    m1une::utilities::FastOutput\
     \ fast_output;\n\n    test_shifted_array_edges();\n\n    long long l, r;\n   \
@@ -347,7 +381,7 @@ data:
   isVerificationFile: true
   path: verify/utilities/shifted_array.test.cpp
   requiredBy: []
-  timestamp: '2026-08-26 23:16:21+09:00'
+  timestamp: '2026-10-06 01:57:24+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/utilities/shifted_array.test.cpp

@@ -160,6 +160,9 @@ data:
       path: algo/sequence/merge_intervals.hpp
       title: Merge Intervals
     - icon: ':heavy_check_mark:'
+      path: algo/sequence/mex.hpp
+      title: Mex
+    - icon: ':heavy_check_mark:'
       path: algo/sequence/non_adjacent_selection.hpp
       title: Non-Adjacent Selection Sums
     - icon: ':heavy_check_mark:'
@@ -255,6 +258,9 @@ data:
       title: Binary Trie with Monoid
   - name: ds/bst
     pages:
+    - icon: ':heavy_check_mark:'
+      path: ds/bst/mex_multiset.hpp
+      title: Mex Multiset
     - icon: ':heavy_check_mark:'
       path: ds/bst/ordered_multiset.hpp
       title: Ordered Multiset
@@ -1579,6 +1585,9 @@ data:
       title: verify/ds/binary_trie/binary_trie_monoid.test.cpp
   - name: verify/ds/bst
     pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/ds/bst/mex_multiset.test.cpp
+      title: verify/ds/bst/mex_multiset.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/ds/bst/ordered_multiset.test.cpp
       title: verify/ds/bst/ordered_multiset.test.cpp

@@ -19,13 +19,13 @@ data:
     \n\n\n#include <algorithm>\n#include <array>\n#include <cerrno>\n#include <charconv>\n\
     #include <cstddef>\n#include <cstdio>\n#include <cstdlib>\n#include <cstdint>\n\
     #include <cstring>\n#include <iterator>\n#include <string>\n#include <sys/stat.h>\n\
-    #include <type_traits>\n#include <utility>\n#include <unistd.h>\n\nnamespace m1une\
-    \ {\nnamespace utilities {\n\nstruct FastOutput;\n\nnamespace internal {\n\n//\
-    \ Shared with the convenience helpers in template.hpp.\ninline FastOutput* standard_output_instance\
-    \ = nullptr;\n\n// Detect std::begin(x), std::end(x).\ntemplate <class T, class\
-    \ = void>\nstruct is_range : std::false_type {};\n\ntemplate <class T>\nstruct\
-    \ is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n  \
-    \  decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
+    #include <type_traits>\n#include <utility>\n#include <unistd.h>\n#include <vector>\n\
+    \nnamespace m1une {\nnamespace utilities {\n\nstruct FastOutput;\n\nnamespace\
+    \ internal {\n\n// Shared with the convenience helpers in template.hpp.\ninline\
+    \ FastOutput* standard_output_instance = nullptr;\n\n// Detect std::begin(x),\
+    \ std::end(x).\ntemplate <class T, class = void>\nstruct is_range : std::false_type\
+    \ {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
+    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
     \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
     \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
@@ -188,23 +188,44 @@ data:
     \ + value % 10);\n                value /= 10;\n            }\n        }\n   \
     \     return result;\n    }();\n\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
     \    int _position;\n    int _precision;\n    std::chars_format _float_format;\n\
-    \    char _range_separator;\n\n   public:\n    explicit FastOutput(std::FILE*\
-    \ stream = stdout)\n        : _stream(stream),\n          _position(0),\n    \
-    \      _precision(6),\n          _float_format(std::chars_format::general),\n\
-    \          _range_separator(' ') {\n        if (_stream == stdout\n          \
-    \  && internal::standard_output_instance == nullptr) {\n            internal::standard_output_instance\
-    \ = this;\n        }\n    }\n\n    FastOutput(const FastOutput&) = delete;\n \
-    \   FastOutput& operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n\
-    \        flush();\n        if (internal::standard_output_instance == this) {\n\
-    \            internal::standard_output_instance = nullptr;\n        }\n    }\n\
-    \n    void flush() {\n        if (_position != 0) {\n            std::fwrite(_buffer,\
-    \ 1, _position, _stream);\n            _position = 0;\n        }\n        std::fflush(_stream);\n\
-    \    }\n\n    void write_char(char c) {\n        if (_position == buffer_size)\
-    \ flush();\n        _buffer[_position++] = c;\n    }\n\n    void write(const char*\
-    \ s) {\n        while (*s != '\\0') write_char(*s++);\n    }\n\n    void write(const\
-    \ std::string& s) {\n        std::size_t position = 0;\n        while (position\
-    \ < s.size()) {\n            if (_position == buffer_size) flush();\n        \
-    \    const std::size_t copied =\n                std::min<std::size_t>(buffer_size\
+    \    char _range_separator;\n    std::string* _capture = nullptr;\n\n    template\
+    \ <class T>\n    std::string format_cell(const T& value) {\n        std::string\
+    \ result;\n        struct CaptureGuard {\n            std::string*& target;\n\
+    \            std::string* previous;\n            ~CaptureGuard() { target = previous;\
+    \ }\n        } guard{_capture, _capture};\n        _capture = &result;\n     \
+    \   write(value);\n        return result;\n    }\n\n    template <class Matrix>\n\
+    \    void write_aligned_matrix(const Matrix& matrix) {\n        std::vector<std::vector<std::string>>\
+    \ rows;\n        std::vector<std::size_t> widths;\n        for (const auto& row\
+    \ : matrix) {\n            auto& cells = rows.emplace_back();\n            std::size_t\
+    \ column = 0;\n            for (const auto& value : row) {\n                cells.push_back(format_cell(value));\n\
+    \                if (column == widths.size()) widths.push_back(0);\n         \
+    \       widths[column] = std::max(widths[column], cells.back().size());\n    \
+    \            ++column;\n            }\n        }\n        bool first = true;\n\
+    \        for (const auto& row : rows) {\n            if (!first) write_char('\\\
+    n');\n            first = false;\n            for (std::size_t column = 0; column\
+    \ < row.size(); ++column) {\n                if (column != 0) write_char(_range_separator);\n\
+    \                for (std::size_t padding = row[column].size();\n            \
+    \         padding < widths[column]; ++padding) {\n                    write_char('\
+    \ ');\n                }\n                write(row[column]);\n            }\n\
+    \        }\n    }\n\n   public:\n    explicit FastOutput(std::FILE* stream = stdout)\n\
+    \        : _stream(stream),\n          _position(0),\n          _precision(6),\n\
+    \          _float_format(std::chars_format::general),\n          _range_separator('\
+    \ ') {\n        if (_stream == stdout\n            && internal::standard_output_instance\
+    \ == nullptr) {\n            internal::standard_output_instance = this;\n    \
+    \    }\n    }\n\n    FastOutput(const FastOutput&) = delete;\n    FastOutput&\
+    \ operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n        flush();\n\
+    \        if (internal::standard_output_instance == this) {\n            internal::standard_output_instance\
+    \ = nullptr;\n        }\n    }\n\n    void flush() {\n        if (_position !=\
+    \ 0) {\n            std::fwrite(_buffer, 1, _position, _stream);\n           \
+    \ _position = 0;\n        }\n        std::fflush(_stream);\n    }\n\n    void\
+    \ write_char(char c) {\n        if (_capture != nullptr) {\n            _capture->push_back(c);\n\
+    \            return;\n        }\n        if (_position == buffer_size) flush();\n\
+    \        _buffer[_position++] = c;\n    }\n\n    void write(const char* s) {\n\
+    \        while (*s != '\\0') write_char(*s++);\n    }\n\n    void write(const\
+    \ std::string& s) {\n        if (_capture != nullptr) {\n            _capture->append(s);\n\
+    \            return;\n        }\n        std::size_t position = 0;\n        while\
+    \ (position < s.size()) {\n            if (_position == buffer_size) flush();\n\
+    \            const std::size_t copied =\n                std::min<std::size_t>(buffer_size\
     \ - _position, s.size() - position);\n            std::memcpy(_buffer + _position,\
     \ s.data() + position, copied);\n            _position += int(copied);\n     \
     \       position += copied;\n        }\n    }\n\n    void write(char c) {\n  \
@@ -227,15 +248,19 @@ data:
     \            return;\n        }\n\n        unsigned chunks[16];\n        int count\
     \ = 0;\n        while (magnitude >= 10000) {\n            const Unsigned quotient\
     \ = magnitude / 10000;\n            chunks[count++] = unsigned(magnitude - quotient\
-    \ * 10000);\n            magnitude = quotient;\n        }\n        if (_position\
-    \ > buffer_size - 64) flush();\n        const unsigned leading = unsigned(magnitude);\n\
+    \ * 10000);\n            magnitude = quotient;\n        }\n        if (_capture\
+    \ == nullptr && _position > buffer_size - 64) flush();\n        char captured[64];\n\
+    \        char* const begin = _capture != nullptr ? captured : _buffer + _position;\n\
+    \        char* destination = begin;\n        const unsigned leading = unsigned(magnitude);\n\
     \        const char* first = digit_quads.data() + 4 * leading;\n        int skip\
     \ = leading < 10 ? 3 : leading < 100 ? 2 : leading < 1000 ? 1 : 0;\n        for\
-    \ (; skip < 4; skip++) _buffer[_position++] = first[skip];\n        while (count--)\
+    \ (; skip < 4; skip++) *destination++ = first[skip];\n        while (count--)\
     \ {\n            const char* digits = digit_quads.data() + 4 * chunks[count];\n\
-    \            std::memcpy(_buffer + _position, digits, 4);\n            _position\
-    \ += 4;\n        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n \
-    \       internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
+    \            std::memcpy(destination, digits, 4);\n            destination +=\
+    \ 4;\n        }\n        if (_capture != nullptr) {\n            _capture->append(begin,\
+    \ destination - begin);\n        } else {\n            _position += int(destination\
+    \ - begin);\n        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
+    \        internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
     \            && !internal::is_range_v<T>\n    >\n    write(const T& value) {\n\
     \        write(value.val());\n    }\n\n    template <class First, class Second>\n\
     \    void write(const std::pair<First, Second>& value) {\n        write(value.first);\n\
@@ -258,116 +283,26 @@ data:
     \        _precision = precision;\n    }\n\n    void set_general(int precision\
     \ = 6) {\n        _float_format = std::chars_format::general;\n        _precision\
     \ = precision;\n    }\n\n    void set_range_separator(char separator) {\n    \
-    \    _range_separator = separator;\n    }\n\n    template <class... Args>\n  \
-    \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
-    n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
-    \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 4 \"verify/utilities/fast_io.test.cpp\"\
-    \n\n#include <cassert>\n#line 7 \"verify/utilities/fast_io.test.cpp\"\n#include\
-    \ <poll.h>\n#include <signal.h>\n#line 10 \"verify/utilities/fast_io.test.cpp\"\
-    \n#include <sys/wait.h>\n#line 13 \"verify/utilities/fast_io.test.cpp\"\n#include\
-    \ <vector>\n\nvoid test_fast_input() {\n    std::FILE* file = std::tmpfile();\n\
-    \    assert(file != nullptr);\n    std::fputs(\n        \" -123 456 token Z 1\
-    \ -12.5 6.25e2 \"\n        \"-170141183460469231731687303715884105728 \"\n   \
-    \     \"340282366920938463463374607431768211455\\n\",\n        file\n    );\n\
-    \    std::rewind(file);\n\n    m1une::utilities::FastInput input(file);\n    int\
-    \ a;\n    unsigned int b;\n    std::string s;\n    char c;\n    bool flag;\n \
-    \   double decimal;\n    long double exponent;\n    __int128_t signed_wide;\n\
-    \    __uint128_t unsigned_wide;\n    assert(input.read(\n        a, b, s, c, flag,\
-    \ decimal, exponent, signed_wide, unsigned_wide\n    ));\n    assert(a == -123);\n\
-    \    assert(b == 456);\n    assert(s == \"token\");\n    assert(c == 'Z');\n \
-    \   assert(flag);\n    assert(decimal == -12.5);\n    assert(exponent == 625.0L);\n\
-    \    __int128_t signed_minimum = -(__int128_t(1) << 126);\n    signed_minimum\
-    \ *= 2;\n    assert(signed_wide == signed_minimum);\n    assert(unsigned_wide\
-    \ == ~__uint128_t(0));\n    std::fclose(file);\n}\n\nvoid test_large_string_io()\
-    \ {\n    const std::string large(m1une::utilities::FastInput::buffer_size + 123,\
-    \ 'x');\n    std::FILE* input_file = std::tmpfile();\n    assert(input_file !=\
-    \ nullptr);\n    assert(std::fwrite(large.data(), 1, large.size(), input_file)\
-    \ == large.size());\n    std::fputs(\" tail\", input_file);\n    std::rewind(input_file);\n\
-    \n    m1une::utilities::FastInput input(input_file);\n    std::string actual,\
-    \ tail;\n    input >> actual >> tail;\n    assert(actual == large);\n    assert(tail\
-    \ == \"tail\");\n    std::fclose(input_file);\n\n    std::FILE* output_file =\
-    \ std::tmpfile();\n    assert(output_file != nullptr);\n    {\n        m1une::utilities::FastOutput\
-    \ output(output_file);\n        output << large;\n    }\n    assert(std::ftell(output_file)\
-    \ == long(large.size()));\n    std::rewind(output_file);\n    std::string written(large.size(),\
-    \ '\\0');\n    assert(std::fread(written.data(), 1, written.size(), output_file)\
-    \ == written.size());\n    assert(written == large);\n    std::fclose(output_file);\n\
-    }\n\nvoid test_pipe_input_does_not_wait_for_eof() {\n    int request[2];\n   \
-    \ int response[2];\n    assert(::pipe(request) == 0);\n    assert(::pipe(response)\
-    \ == 0);\n\n    const pid_t child = ::fork();\n    assert(child >= 0);\n    if\
-    \ (child == 0) {\n        ::close(request[1]);\n        ::close(response[0]);\n\
-    \        std::FILE* stream = ::fdopen(request[0], \"r\");\n        if (stream\
-    \ == nullptr) _exit(1);\n\n        m1une::utilities::FastInput input(stream);\n\
-    \        int value;\n        const bool ok = input.read(value) && value == 123456789;\n\
-    \        if (ok) {\n            const char byte = 'x';\n            if (::write(response[1],\
-    \ &byte, 1) != 1) _exit(1);\n        }\n        std::fclose(stream);\n       \
-    \ ::close(response[1]);\n        _exit(ok ? 0 : 1);\n    }\n\n    ::close(request[0]);\n\
-    \    ::close(response[1]);\n    const char query[] = \"123456789\\n\";\n    assert(\n\
-    \        ::write(request[1], query, sizeof(query) - 1)\n        == ssize_t(sizeof(query)\
-    \ - 1)\n    );\n\n    pollfd event;\n    event.fd = response[0];\n    event.events\
-    \ = POLLIN;\n    event.revents = 0;\n    const int ready = ::poll(&event, 1, 1000);\n\
-    \n    ::close(request[1]);\n    if (ready <= 0) ::kill(child, SIGKILL);\n    int\
-    \ status;\n    assert(::waitpid(child, &status, 0) == child);\n    assert(ready\
-    \ == 1);\n    assert((event.revents & POLLIN) != 0);\n    char byte;\n    assert(::read(response[0],\
-    \ &byte, 1) == 1);\n    assert(byte == 'x');\n    assert(WIFEXITED(status) &&\
-    \ WEXITSTATUS(status) == 0);\n    ::close(response[0]);\n}\n\nvoid test_fast_output()\
-    \ {\n    std::FILE* file = std::tmpfile();\n    assert(file != nullptr);\n\n \
-    \   {\n        m1une::utilities::FastOutput output(file);\n        output.println(\"\
-    answer\", -42, 17u);\n        output.println(false);\n        output.set_fixed(2);\n\
-    \        output.println(1.25);\n        __int128_t signed_minimum = -(__int128_t(1)\
-    \ << 126);\n        signed_minimum *= 2;\n        output.println(signed_minimum);\n\
-    \        output.println(~__uint128_t(0));\n        output.flush();\n    }\n\n\
-    \    std::rewind(file);\n    char buffer[256];\n    std::size_t length = std::fread(buffer,\
-    \ 1, sizeof(buffer), file);\n    std::string result(buffer, buffer + length);\n\
-    \    assert(\n        result\n        == \"answer -42 17\\n0\\n1.25\\n\"\n   \
-    \        \"-170141183460469231731687303715884105728\\n\"\n           \"340282366920938463463374607431768211455\\\
-    n\"\n    );\n    std::fclose(file);\n}\n\nvoid test_output_flush_reaches_pipe()\
-    \ {\n    int descriptors[2];\n    assert(::pipe(descriptors) == 0);\n    std::FILE*\
-    \ stream = ::fdopen(descriptors[1], \"w\");\n    assert(stream != nullptr);\n\n\
-    \    {\n        m1une::utilities::FastOutput output(stream);\n        output <<\
-    \ \"? 987654321\\n\";\n        output.flush();\n\n        pollfd event;\n    \
-    \    event.fd = descriptors[0];\n        event.events = POLLIN;\n        event.revents\
-    \ = 0;\n        assert(::poll(&event, 1, 1000) == 1);\n        assert((event.revents\
-    \ & POLLIN) != 0);\n\n        const char expected[] = \"? 987654321\\n\";\n  \
-    \      char actual[sizeof(expected) - 1];\n        assert(\n            ::read(descriptors[0],\
-    \ actual, sizeof(actual))\n            == ssize_t(sizeof(actual))\n        );\n\
-    \        assert(std::string(actual, actual + sizeof(actual)) == expected);\n \
-    \   }\n\n    std::fclose(stream);\n    ::close(descriptors[0]);\n}\n\nvoid test_stream_operators_ranges_and_pairs()\
-    \ {\n    std::FILE* input_file = std::tmpfile();\n    assert(input_file != nullptr);\n\
-    \    std::fputs(\n        \"2 3 1 2 3 4 5 6 label 7 8 9 10 11 12 13 14\",\n  \
-    \      input_file\n    );\n    std::rewind(input_file);\n\n    int h, w;\n   \
-    \ m1une::utilities::FastInput input(input_file);\n    input >> h >> w;\n    std::vector<std::vector<int>>\
-    \ matrix(h, std::vector<int>(w));\n    input >> matrix;\n    assert(matrix[0][0]\
-    \ == 1);\n    assert(matrix[1][2] == 6);\n\n    std::pair<std::string, int> item;\n\
-    \    input >> item;\n    assert(item.first == \"label\");\n    assert(item.second\
-    \ == 7);\n\n    std::vector<std::pair<int, int>> pairs(2);\n    input >> pairs;\n\
-    \    const std::pair<int, int> expected_first(8, 9);\n    const std::pair<int,\
-    \ int> expected_second(10, 11);\n    assert(pairs[0] == expected_first);\n   \
-    \ assert(pairs[1] == expected_second);\n\n    std::pair<std::vector<int>, int>\
-    \ grouped;\n    grouped.first.resize(2);\n    input >> grouped;\n    assert(grouped.first[0]\
-    \ == 12);\n    assert(grouped.first[1] == 13);\n    assert(grouped.second == 14);\n\
-    \    std::fclose(input_file);\n\n    std::FILE* output_file = std::tmpfile();\n\
-    \    assert(output_file != nullptr);\n    {\n        m1une::utilities::FastOutput\
-    \ output(output_file);\n        output << \"matrix\\n\" << matrix << '\\n';\n\
-    \        output << item << '\\n';\n        output << pairs << '\\n';\n       \
-    \ output << grouped << '\\n';\n        output.set_range_separator('\\n');\n  \
-    \      output << pairs << '\\n';\n        output.set_range_separator(' ');\n \
-    \       output << grouped.first << '\\n';\n        output.flush();\n    }\n\n\
-    \    std::rewind(output_file);\n    char buffer[128];\n    std::size_t length\
-    \ = std::fread(buffer, 1, sizeof(buffer), output_file);\n    std::string result(buffer,\
-    \ buffer + length);\n    assert(\n        result\n        == \"matrix\\n1 2 3\\\
-    n4 5 6\\nlabel 7\\n8 9 10 11\\n12 13 14\\n\"\n           \"8 9\\n10 11\\n12 13\\\
-    n\"\n    );\n    std::fclose(output_file);\n}\n\nint main() {\n    test_fast_input();\n\
-    \    test_large_string_io();\n    test_pipe_input_does_not_wait_for_eof();\n \
-    \   test_fast_output();\n    test_output_flush_reaches_pipe();\n    test_stream_operators_ranges_and_pairs();\n\
-    \n    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput output;\n\
-    \n    long long a, b;\n    input >> a >> b;\n    output << a + b << '\\n';\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
-    ../../utilities/fast_io.hpp\"\n\n#include <cassert>\n#include <cstdio>\n#include\
-    \ <poll.h>\n#include <signal.h>\n#include <string>\n#include <sys/wait.h>\n#include\
-    \ <unistd.h>\n#include <utility>\n#include <vector>\n\nvoid test_fast_input()\
-    \ {\n    std::FILE* file = std::tmpfile();\n    assert(file != nullptr);\n   \
-    \ std::fputs(\n        \" -123 456 token Z 1 -12.5 6.25e2 \"\n        \"-170141183460469231731687303715884105728\
+    \    _range_separator = separator;\n    }\n\n    template <class Matrix>\n   \
+    \ void write_aligned(const Matrix& matrix) {\n        using Row = internal::range_stored_value_t<const\
+    \ Matrix>;\n        using Cell = internal::range_stored_value_t<const Row>;\n\
+    \        static_assert(internal::is_range_v<Row> && !internal::is_string_like_v<Row>,\n\
+    \                      \"write_aligned requires a two-dimensional range\");\n\
+    \        static_assert(!internal::is_range_v<Cell> || internal::is_string_like_v<Cell>,\n\
+    \                      \"write_aligned requires scalar cells\");\n        write_aligned_matrix(matrix);\n\
+    \    }\n\n    template <class Matrix>\n    void println_aligned(const Matrix&\
+    \ matrix) {\n        write_aligned(matrix);\n        write_char('\\n');\n    }\n\
+    \n    template <class... Args>\n    void println(const Args&... args) {\n    \
+    \    print(args...);\n        write_char('\\n');\n    }\n\n    template <class\
+    \ T>\n    FastOutput& operator<<(const T& value) {\n        write(value);\n  \
+    \      return *this;\n    }\n};\n\n}  // namespace utilities\n}  // namespace\
+    \ m1une\n\n\n#line 4 \"verify/utilities/fast_io.test.cpp\"\n\n#include <cassert>\n\
+    #line 8 \"verify/utilities/fast_io.test.cpp\"\n#include <iomanip>\n#include <limits>\n\
+    #include <poll.h>\n#include <random>\n#include <signal.h>\n#include <sstream>\n\
+    #line 15 \"verify/utilities/fast_io.test.cpp\"\n#include <sys/wait.h>\n#line 19\
+    \ \"verify/utilities/fast_io.test.cpp\"\n\nvoid test_fast_input() {\n    std::FILE*\
+    \ file = std::tmpfile();\n    assert(file != nullptr);\n    std::fputs(\n    \
+    \    \" -123 456 token Z 1 -12.5 6.25e2 \"\n        \"-170141183460469231731687303715884105728\
     \ \"\n        \"340282366920938463463374607431768211455\\n\",\n        file\n\
     \    );\n    std::rewind(file);\n\n    m1une::utilities::FastInput input(file);\n\
     \    int a;\n    unsigned int b;\n    std::string s;\n    char c;\n    bool flag;\n\
@@ -456,17 +391,229 @@ data:
     \ = std::fread(buffer, 1, sizeof(buffer), output_file);\n    std::string result(buffer,\
     \ buffer + length);\n    assert(\n        result\n        == \"matrix\\n1 2 3\\\
     n4 5 6\\nlabel 7\\n8 9 10 11\\n12 13 14\\n\"\n           \"8 9\\n10 11\\n12 13\\\
-    n\"\n    );\n    std::fclose(output_file);\n}\n\nint main() {\n    test_fast_input();\n\
-    \    test_large_string_io();\n    test_pipe_input_does_not_wait_for_eof();\n \
-    \   test_fast_output();\n    test_output_flush_reaches_pipe();\n    test_stream_operators_ranges_and_pairs();\n\
-    \n    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput output;\n\
-    \n    long long a, b;\n    input >> a >> b;\n    output << a + b << '\\n';\n}\n"
+    n\"\n    );\n    std::fclose(output_file);\n}\n\ntemplate <class Function>\nstd::string\
+    \ capture_output(Function function) {\n    std::FILE* file = std::tmpfile();\n\
+    \    assert(file != nullptr);\n    {\n        m1une::utilities::FastOutput output(file);\n\
+    \        function(output);\n    }\n    std::rewind(file);\n    std::string result;\n\
+    \    char buffer[4096];\n    while (const std::size_t length = std::fread(buffer,\
+    \ 1, sizeof(buffer), file)) {\n        result.append(buffer, length);\n    }\n\
+    \    std::fclose(file);\n    return result;\n}\n\nvoid test_aligned_output() {\n\
+    \    const std::vector<std::vector<int>> matrix = {\n        {1, -20, 300}, {4000,\
+    \ 5, -6}, {}, {7}\n    };\n    const auto original = matrix;\n    assert(capture_output([&](auto&\
+    \ output) {\n        output << \"aligned\\n\";\n        output.println_aligned(matrix);\n\
+    \        output << matrix << '\\n';\n        output.set_range_separator(',');\n\
+    \        output.write_aligned(matrix);\n        output << '!';\n        output.println_aligned(std::vector<std::vector<int>>{});\n\
+    \    }) == \"aligned\\n   1 -20 300\\n4000   5  -6\\n\\n   7\\n\"\n          \"\
+    1 -20 300\\n4000 5 -6\\n\\n7\\n\"\n          \"   1,-20,300\\n4000,  5, -6\\n\\\
+    n   7!\\n\");\n    assert(matrix == original);\n\n    const std::vector<std::vector<double>>\
+    \ decimals = {\n        {1.25, -0.5}, {100, 20.125}\n    };\n    assert(capture_output([&](auto&\
+    \ output) {\n        output.set_fixed(2);\n        output.println_aligned(decimals);\n\
+    \        output.set_general(3);\n        output.println_aligned(decimals);\n \
+    \   }) == \"  1.25 -0.50\\n100.00 20.12\\n1.25 -0.5\\n 100 20.1\\n\");\n\n   \
+    \ const std::vector<std::vector<std::string>> words = {\n        {\"x\", \"long\"\
+    }, {\"word\", \"y\"}\n    };\n    const std::vector<std::vector<bool>> flags =\
+    \ {\n        {true, false}, {false, true}\n    };\n    const int array[2][2] =\
+    \ { {1, 200}, {-30, 4} };\n    const std::array<std::array<char, 2>, 2> chars\
+    \ = {\n        std::array<char, 2>{'a', 'b'}, std::array<char, 2>{'c', 'd'}\n\
+    \    };\n    const std::vector<std::vector<std::pair<int, int>>> pairs = {\n \
+    \       {std::pair<int, int>(1, 2)}, {std::pair<int, int>(100, -3)}\n    };\n\
+    \    assert(capture_output([&](auto& output) {\n        output.println_aligned(words);\n\
+    \        output.println_aligned(flags);\n        output.println_aligned(array);\n\
+    \        output.println_aligned(chars);\n        output.println_aligned(pairs);\n\
+    \    }) == \"   x long\\nword    y\\n1 0\\n0 1\\n  1 200\\n-30   4\\na b\\nc d\\\
+    n\"\n          \"   1 2\\n100 -3\\n\");\n\n    __int128_t minimum = -(__int128_t(1)\
+    \ << 126);\n    minimum *= 2;\n    const std::vector<std::vector<__int128_t>>\
+    \ wide = { {minimum}, {0} };\n    const std::vector<std::vector<__uint128_t>>\
+    \ unsigned_wide = {\n        {~__uint128_t(0)}, {1}\n    };\n    assert(capture_output([&](auto&\
+    \ output) {\n        output.println_aligned(wide);\n        output.println_aligned(unsigned_wide);\n\
+    \    }) == \"-170141183460469231731687303715884105728\\n\"\n          + std::string(39,\
+    \ ' ') + \"0\\n\"\n          + \"340282366920938463463374607431768211455\\n\"\n\
+    \          + std::string(38, ' ') + \"1\\n\");\n\n    const std::string large(m1une::utilities::FastOutput::buffer_size\
+    \ + 123, 'x');\n    const std::vector<std::vector<std::string>> long_cells = {\
+    \ {large}, {\"y\"} };\n    assert(capture_output([&](auto& output) {\n       \
+    \ output.println_aligned(long_cells);\n        output.println(123456789);\n  \
+    \  }) == large + '\\n' + std::string(large.size() - 1, ' ') + \"y\\n123456789\\\
+    n\");\n}\n\nvoid test_random_aligned_output() {\n    std::mt19937 random(20261005);\n\
+    \    for (int trial = 0; trial < 200; ++trial) {\n        std::vector<std::vector<int>>\
+    \ matrix(random() % 9);\n        std::vector<int> widths(8);\n        for (auto&\
+    \ row : matrix) {\n            row.resize(random() % 9);\n            for (std::size_t\
+    \ j = 0; j < row.size(); ++j) {\n                row[j] = int(random() % 2000001)\
+    \ - 1000000;\n                if (random() % 10 == 0) row[j] = std::numeric_limits<int>::min();\n\
+    \                widths[j] = std::max(widths[j], int(std::to_string(row[j]).size()));\n\
+    \            }\n        }\n        std::ostringstream expected;\n        for (std::size_t\
+    \ i = 0; i < matrix.size(); ++i) {\n            if (i != 0) expected << '\\n';\n\
+    \            for (std::size_t j = 0; j < matrix[i].size(); ++j) {\n          \
+    \      if (j != 0) expected << ' ';\n                expected << std::setw(widths[j])\
+    \ << matrix[i][j];\n            }\n        }\n        assert(capture_output([&](auto&\
+    \ output) {\n            output.write_aligned(matrix);\n        }) == expected.str());\n\
+    \    }\n}\n\nint main() {\n    test_fast_input();\n    test_large_string_io();\n\
+    \    test_pipe_input_does_not_wait_for_eof();\n    test_fast_output();\n    test_output_flush_reaches_pipe();\n\
+    \    test_stream_operators_ranges_and_pairs();\n    test_aligned_output();\n \
+    \   test_random_aligned_output();\n\n    m1une::utilities::FastInput input;\n\
+    \    m1une::utilities::FastOutput output;\n\n    long long a, b;\n    input >>\
+    \ a >> b;\n    output << a + b << '\\n';\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include \"\
+    ../../utilities/fast_io.hpp\"\n\n#include <cassert>\n#include <array>\n#include\
+    \ <cstdio>\n#include <iomanip>\n#include <limits>\n#include <poll.h>\n#include\
+    \ <random>\n#include <signal.h>\n#include <sstream>\n#include <string>\n#include\
+    \ <sys/wait.h>\n#include <unistd.h>\n#include <utility>\n#include <vector>\n\n\
+    void test_fast_input() {\n    std::FILE* file = std::tmpfile();\n    assert(file\
+    \ != nullptr);\n    std::fputs(\n        \" -123 456 token Z 1 -12.5 6.25e2 \"\
+    \n        \"-170141183460469231731687303715884105728 \"\n        \"340282366920938463463374607431768211455\\\
+    n\",\n        file\n    );\n    std::rewind(file);\n\n    m1une::utilities::FastInput\
+    \ input(file);\n    int a;\n    unsigned int b;\n    std::string s;\n    char\
+    \ c;\n    bool flag;\n    double decimal;\n    long double exponent;\n    __int128_t\
+    \ signed_wide;\n    __uint128_t unsigned_wide;\n    assert(input.read(\n     \
+    \   a, b, s, c, flag, decimal, exponent, signed_wide, unsigned_wide\n    ));\n\
+    \    assert(a == -123);\n    assert(b == 456);\n    assert(s == \"token\");\n\
+    \    assert(c == 'Z');\n    assert(flag);\n    assert(decimal == -12.5);\n   \
+    \ assert(exponent == 625.0L);\n    __int128_t signed_minimum = -(__int128_t(1)\
+    \ << 126);\n    signed_minimum *= 2;\n    assert(signed_wide == signed_minimum);\n\
+    \    assert(unsigned_wide == ~__uint128_t(0));\n    std::fclose(file);\n}\n\n\
+    void test_large_string_io() {\n    const std::string large(m1une::utilities::FastInput::buffer_size\
+    \ + 123, 'x');\n    std::FILE* input_file = std::tmpfile();\n    assert(input_file\
+    \ != nullptr);\n    assert(std::fwrite(large.data(), 1, large.size(), input_file)\
+    \ == large.size());\n    std::fputs(\" tail\", input_file);\n    std::rewind(input_file);\n\
+    \n    m1une::utilities::FastInput input(input_file);\n    std::string actual,\
+    \ tail;\n    input >> actual >> tail;\n    assert(actual == large);\n    assert(tail\
+    \ == \"tail\");\n    std::fclose(input_file);\n\n    std::FILE* output_file =\
+    \ std::tmpfile();\n    assert(output_file != nullptr);\n    {\n        m1une::utilities::FastOutput\
+    \ output(output_file);\n        output << large;\n    }\n    assert(std::ftell(output_file)\
+    \ == long(large.size()));\n    std::rewind(output_file);\n    std::string written(large.size(),\
+    \ '\\0');\n    assert(std::fread(written.data(), 1, written.size(), output_file)\
+    \ == written.size());\n    assert(written == large);\n    std::fclose(output_file);\n\
+    }\n\nvoid test_pipe_input_does_not_wait_for_eof() {\n    int request[2];\n   \
+    \ int response[2];\n    assert(::pipe(request) == 0);\n    assert(::pipe(response)\
+    \ == 0);\n\n    const pid_t child = ::fork();\n    assert(child >= 0);\n    if\
+    \ (child == 0) {\n        ::close(request[1]);\n        ::close(response[0]);\n\
+    \        std::FILE* stream = ::fdopen(request[0], \"r\");\n        if (stream\
+    \ == nullptr) _exit(1);\n\n        m1une::utilities::FastInput input(stream);\n\
+    \        int value;\n        const bool ok = input.read(value) && value == 123456789;\n\
+    \        if (ok) {\n            const char byte = 'x';\n            if (::write(response[1],\
+    \ &byte, 1) != 1) _exit(1);\n        }\n        std::fclose(stream);\n       \
+    \ ::close(response[1]);\n        _exit(ok ? 0 : 1);\n    }\n\n    ::close(request[0]);\n\
+    \    ::close(response[1]);\n    const char query[] = \"123456789\\n\";\n    assert(\n\
+    \        ::write(request[1], query, sizeof(query) - 1)\n        == ssize_t(sizeof(query)\
+    \ - 1)\n    );\n\n    pollfd event;\n    event.fd = response[0];\n    event.events\
+    \ = POLLIN;\n    event.revents = 0;\n    const int ready = ::poll(&event, 1, 1000);\n\
+    \n    ::close(request[1]);\n    if (ready <= 0) ::kill(child, SIGKILL);\n    int\
+    \ status;\n    assert(::waitpid(child, &status, 0) == child);\n    assert(ready\
+    \ == 1);\n    assert((event.revents & POLLIN) != 0);\n    char byte;\n    assert(::read(response[0],\
+    \ &byte, 1) == 1);\n    assert(byte == 'x');\n    assert(WIFEXITED(status) &&\
+    \ WEXITSTATUS(status) == 0);\n    ::close(response[0]);\n}\n\nvoid test_fast_output()\
+    \ {\n    std::FILE* file = std::tmpfile();\n    assert(file != nullptr);\n\n \
+    \   {\n        m1une::utilities::FastOutput output(file);\n        output.println(\"\
+    answer\", -42, 17u);\n        output.println(false);\n        output.set_fixed(2);\n\
+    \        output.println(1.25);\n        __int128_t signed_minimum = -(__int128_t(1)\
+    \ << 126);\n        signed_minimum *= 2;\n        output.println(signed_minimum);\n\
+    \        output.println(~__uint128_t(0));\n        output.flush();\n    }\n\n\
+    \    std::rewind(file);\n    char buffer[256];\n    std::size_t length = std::fread(buffer,\
+    \ 1, sizeof(buffer), file);\n    std::string result(buffer, buffer + length);\n\
+    \    assert(\n        result\n        == \"answer -42 17\\n0\\n1.25\\n\"\n   \
+    \        \"-170141183460469231731687303715884105728\\n\"\n           \"340282366920938463463374607431768211455\\\
+    n\"\n    );\n    std::fclose(file);\n}\n\nvoid test_output_flush_reaches_pipe()\
+    \ {\n    int descriptors[2];\n    assert(::pipe(descriptors) == 0);\n    std::FILE*\
+    \ stream = ::fdopen(descriptors[1], \"w\");\n    assert(stream != nullptr);\n\n\
+    \    {\n        m1une::utilities::FastOutput output(stream);\n        output <<\
+    \ \"? 987654321\\n\";\n        output.flush();\n\n        pollfd event;\n    \
+    \    event.fd = descriptors[0];\n        event.events = POLLIN;\n        event.revents\
+    \ = 0;\n        assert(::poll(&event, 1, 1000) == 1);\n        assert((event.revents\
+    \ & POLLIN) != 0);\n\n        const char expected[] = \"? 987654321\\n\";\n  \
+    \      char actual[sizeof(expected) - 1];\n        assert(\n            ::read(descriptors[0],\
+    \ actual, sizeof(actual))\n            == ssize_t(sizeof(actual))\n        );\n\
+    \        assert(std::string(actual, actual + sizeof(actual)) == expected);\n \
+    \   }\n\n    std::fclose(stream);\n    ::close(descriptors[0]);\n}\n\nvoid test_stream_operators_ranges_and_pairs()\
+    \ {\n    std::FILE* input_file = std::tmpfile();\n    assert(input_file != nullptr);\n\
+    \    std::fputs(\n        \"2 3 1 2 3 4 5 6 label 7 8 9 10 11 12 13 14\",\n  \
+    \      input_file\n    );\n    std::rewind(input_file);\n\n    int h, w;\n   \
+    \ m1une::utilities::FastInput input(input_file);\n    input >> h >> w;\n    std::vector<std::vector<int>>\
+    \ matrix(h, std::vector<int>(w));\n    input >> matrix;\n    assert(matrix[0][0]\
+    \ == 1);\n    assert(matrix[1][2] == 6);\n\n    std::pair<std::string, int> item;\n\
+    \    input >> item;\n    assert(item.first == \"label\");\n    assert(item.second\
+    \ == 7);\n\n    std::vector<std::pair<int, int>> pairs(2);\n    input >> pairs;\n\
+    \    const std::pair<int, int> expected_first(8, 9);\n    const std::pair<int,\
+    \ int> expected_second(10, 11);\n    assert(pairs[0] == expected_first);\n   \
+    \ assert(pairs[1] == expected_second);\n\n    std::pair<std::vector<int>, int>\
+    \ grouped;\n    grouped.first.resize(2);\n    input >> grouped;\n    assert(grouped.first[0]\
+    \ == 12);\n    assert(grouped.first[1] == 13);\n    assert(grouped.second == 14);\n\
+    \    std::fclose(input_file);\n\n    std::FILE* output_file = std::tmpfile();\n\
+    \    assert(output_file != nullptr);\n    {\n        m1une::utilities::FastOutput\
+    \ output(output_file);\n        output << \"matrix\\n\" << matrix << '\\n';\n\
+    \        output << item << '\\n';\n        output << pairs << '\\n';\n       \
+    \ output << grouped << '\\n';\n        output.set_range_separator('\\n');\n  \
+    \      output << pairs << '\\n';\n        output.set_range_separator(' ');\n \
+    \       output << grouped.first << '\\n';\n        output.flush();\n    }\n\n\
+    \    std::rewind(output_file);\n    char buffer[128];\n    std::size_t length\
+    \ = std::fread(buffer, 1, sizeof(buffer), output_file);\n    std::string result(buffer,\
+    \ buffer + length);\n    assert(\n        result\n        == \"matrix\\n1 2 3\\\
+    n4 5 6\\nlabel 7\\n8 9 10 11\\n12 13 14\\n\"\n           \"8 9\\n10 11\\n12 13\\\
+    n\"\n    );\n    std::fclose(output_file);\n}\n\ntemplate <class Function>\nstd::string\
+    \ capture_output(Function function) {\n    std::FILE* file = std::tmpfile();\n\
+    \    assert(file != nullptr);\n    {\n        m1une::utilities::FastOutput output(file);\n\
+    \        function(output);\n    }\n    std::rewind(file);\n    std::string result;\n\
+    \    char buffer[4096];\n    while (const std::size_t length = std::fread(buffer,\
+    \ 1, sizeof(buffer), file)) {\n        result.append(buffer, length);\n    }\n\
+    \    std::fclose(file);\n    return result;\n}\n\nvoid test_aligned_output() {\n\
+    \    const std::vector<std::vector<int>> matrix = {\n        {1, -20, 300}, {4000,\
+    \ 5, -6}, {}, {7}\n    };\n    const auto original = matrix;\n    assert(capture_output([&](auto&\
+    \ output) {\n        output << \"aligned\\n\";\n        output.println_aligned(matrix);\n\
+    \        output << matrix << '\\n';\n        output.set_range_separator(',');\n\
+    \        output.write_aligned(matrix);\n        output << '!';\n        output.println_aligned(std::vector<std::vector<int>>{});\n\
+    \    }) == \"aligned\\n   1 -20 300\\n4000   5  -6\\n\\n   7\\n\"\n          \"\
+    1 -20 300\\n4000 5 -6\\n\\n7\\n\"\n          \"   1,-20,300\\n4000,  5, -6\\n\\\
+    n   7!\\n\");\n    assert(matrix == original);\n\n    const std::vector<std::vector<double>>\
+    \ decimals = {\n        {1.25, -0.5}, {100, 20.125}\n    };\n    assert(capture_output([&](auto&\
+    \ output) {\n        output.set_fixed(2);\n        output.println_aligned(decimals);\n\
+    \        output.set_general(3);\n        output.println_aligned(decimals);\n \
+    \   }) == \"  1.25 -0.50\\n100.00 20.12\\n1.25 -0.5\\n 100 20.1\\n\");\n\n   \
+    \ const std::vector<std::vector<std::string>> words = {\n        {\"x\", \"long\"\
+    }, {\"word\", \"y\"}\n    };\n    const std::vector<std::vector<bool>> flags =\
+    \ {\n        {true, false}, {false, true}\n    };\n    const int array[2][2] =\
+    \ { {1, 200}, {-30, 4} };\n    const std::array<std::array<char, 2>, 2> chars\
+    \ = {\n        std::array<char, 2>{'a', 'b'}, std::array<char, 2>{'c', 'd'}\n\
+    \    };\n    const std::vector<std::vector<std::pair<int, int>>> pairs = {\n \
+    \       {std::pair<int, int>(1, 2)}, {std::pair<int, int>(100, -3)}\n    };\n\
+    \    assert(capture_output([&](auto& output) {\n        output.println_aligned(words);\n\
+    \        output.println_aligned(flags);\n        output.println_aligned(array);\n\
+    \        output.println_aligned(chars);\n        output.println_aligned(pairs);\n\
+    \    }) == \"   x long\\nword    y\\n1 0\\n0 1\\n  1 200\\n-30   4\\na b\\nc d\\\
+    n\"\n          \"   1 2\\n100 -3\\n\");\n\n    __int128_t minimum = -(__int128_t(1)\
+    \ << 126);\n    minimum *= 2;\n    const std::vector<std::vector<__int128_t>>\
+    \ wide = { {minimum}, {0} };\n    const std::vector<std::vector<__uint128_t>>\
+    \ unsigned_wide = {\n        {~__uint128_t(0)}, {1}\n    };\n    assert(capture_output([&](auto&\
+    \ output) {\n        output.println_aligned(wide);\n        output.println_aligned(unsigned_wide);\n\
+    \    }) == \"-170141183460469231731687303715884105728\\n\"\n          + std::string(39,\
+    \ ' ') + \"0\\n\"\n          + \"340282366920938463463374607431768211455\\n\"\n\
+    \          + std::string(38, ' ') + \"1\\n\");\n\n    const std::string large(m1une::utilities::FastOutput::buffer_size\
+    \ + 123, 'x');\n    const std::vector<std::vector<std::string>> long_cells = {\
+    \ {large}, {\"y\"} };\n    assert(capture_output([&](auto& output) {\n       \
+    \ output.println_aligned(long_cells);\n        output.println(123456789);\n  \
+    \  }) == large + '\\n' + std::string(large.size() - 1, ' ') + \"y\\n123456789\\\
+    n\");\n}\n\nvoid test_random_aligned_output() {\n    std::mt19937 random(20261005);\n\
+    \    for (int trial = 0; trial < 200; ++trial) {\n        std::vector<std::vector<int>>\
+    \ matrix(random() % 9);\n        std::vector<int> widths(8);\n        for (auto&\
+    \ row : matrix) {\n            row.resize(random() % 9);\n            for (std::size_t\
+    \ j = 0; j < row.size(); ++j) {\n                row[j] = int(random() % 2000001)\
+    \ - 1000000;\n                if (random() % 10 == 0) row[j] = std::numeric_limits<int>::min();\n\
+    \                widths[j] = std::max(widths[j], int(std::to_string(row[j]).size()));\n\
+    \            }\n        }\n        std::ostringstream expected;\n        for (std::size_t\
+    \ i = 0; i < matrix.size(); ++i) {\n            if (i != 0) expected << '\\n';\n\
+    \            for (std::size_t j = 0; j < matrix[i].size(); ++j) {\n          \
+    \      if (j != 0) expected << ' ';\n                expected << std::setw(widths[j])\
+    \ << matrix[i][j];\n            }\n        }\n        assert(capture_output([&](auto&\
+    \ output) {\n            output.write_aligned(matrix);\n        }) == expected.str());\n\
+    \    }\n}\n\nint main() {\n    test_fast_input();\n    test_large_string_io();\n\
+    \    test_pipe_input_does_not_wait_for_eof();\n    test_fast_output();\n    test_output_flush_reaches_pipe();\n\
+    \    test_stream_operators_ranges_and_pairs();\n    test_aligned_output();\n \
+    \   test_random_aligned_output();\n\n    m1une::utilities::FastInput input;\n\
+    \    m1une::utilities::FastOutput output;\n\n    long long a, b;\n    input >>\
+    \ a >> b;\n    output << a + b << '\\n';\n}\n"
   dependsOn:
   - utilities/fast_io.hpp
   isVerificationFile: true
   path: verify/utilities/fast_io.test.cpp
   requiredBy: []
-  timestamp: '2026-08-26 23:16:21+09:00'
+  timestamp: '2026-10-06 01:57:24+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/utilities/fast_io.test.cpp

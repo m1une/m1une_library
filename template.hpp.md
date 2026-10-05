@@ -24,14 +24,14 @@ data:
     \ \"template.hpp\"\n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 7 \"utilities/fast_io.hpp\"\
     \n#include <charconv>\n#line 15 \"utilities/fast_io.hpp\"\n#include <sys/stat.h>\n\
     #include <type_traits>\n#line 18 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n\
-    \nnamespace m1une {\nnamespace utilities {\n\nstruct FastOutput;\n\nnamespace\
-    \ internal {\n\n// Shared with the convenience helpers in template.hpp.\ninline\
-    \ FastOutput* standard_output_instance = nullptr;\n\n// Detect std::begin(x),\
-    \ std::end(x).\ntemplate <class T, class = void>\nstruct is_range : std::false_type\
-    \ {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
-    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
-    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
-    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    #line 20 \"utilities/fast_io.hpp\"\n\nnamespace m1une {\nnamespace utilities {\n\
+    \nstruct FastOutput;\n\nnamespace internal {\n\n// Shared with the convenience\
+    \ helpers in template.hpp.\ninline FastOutput* standard_output_instance = nullptr;\n\
+    \n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct\
+    \ is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
+    \    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
+    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
+    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
     \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
     \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
@@ -192,23 +192,44 @@ data:
     \ + value % 10);\n                value /= 10;\n            }\n        }\n   \
     \     return result;\n    }();\n\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
     \    int _position;\n    int _precision;\n    std::chars_format _float_format;\n\
-    \    char _range_separator;\n\n   public:\n    explicit FastOutput(std::FILE*\
-    \ stream = stdout)\n        : _stream(stream),\n          _position(0),\n    \
-    \      _precision(6),\n          _float_format(std::chars_format::general),\n\
-    \          _range_separator(' ') {\n        if (_stream == stdout\n          \
-    \  && internal::standard_output_instance == nullptr) {\n            internal::standard_output_instance\
-    \ = this;\n        }\n    }\n\n    FastOutput(const FastOutput&) = delete;\n \
-    \   FastOutput& operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n\
-    \        flush();\n        if (internal::standard_output_instance == this) {\n\
-    \            internal::standard_output_instance = nullptr;\n        }\n    }\n\
-    \n    void flush() {\n        if (_position != 0) {\n            std::fwrite(_buffer,\
-    \ 1, _position, _stream);\n            _position = 0;\n        }\n        std::fflush(_stream);\n\
-    \    }\n\n    void write_char(char c) {\n        if (_position == buffer_size)\
-    \ flush();\n        _buffer[_position++] = c;\n    }\n\n    void write(const char*\
-    \ s) {\n        while (*s != '\\0') write_char(*s++);\n    }\n\n    void write(const\
-    \ std::string& s) {\n        std::size_t position = 0;\n        while (position\
-    \ < s.size()) {\n            if (_position == buffer_size) flush();\n        \
-    \    const std::size_t copied =\n                std::min<std::size_t>(buffer_size\
+    \    char _range_separator;\n    std::string* _capture = nullptr;\n\n    template\
+    \ <class T>\n    std::string format_cell(const T& value) {\n        std::string\
+    \ result;\n        struct CaptureGuard {\n            std::string*& target;\n\
+    \            std::string* previous;\n            ~CaptureGuard() { target = previous;\
+    \ }\n        } guard{_capture, _capture};\n        _capture = &result;\n     \
+    \   write(value);\n        return result;\n    }\n\n    template <class Matrix>\n\
+    \    void write_aligned_matrix(const Matrix& matrix) {\n        std::vector<std::vector<std::string>>\
+    \ rows;\n        std::vector<std::size_t> widths;\n        for (const auto& row\
+    \ : matrix) {\n            auto& cells = rows.emplace_back();\n            std::size_t\
+    \ column = 0;\n            for (const auto& value : row) {\n                cells.push_back(format_cell(value));\n\
+    \                if (column == widths.size()) widths.push_back(0);\n         \
+    \       widths[column] = std::max(widths[column], cells.back().size());\n    \
+    \            ++column;\n            }\n        }\n        bool first = true;\n\
+    \        for (const auto& row : rows) {\n            if (!first) write_char('\\\
+    n');\n            first = false;\n            for (std::size_t column = 0; column\
+    \ < row.size(); ++column) {\n                if (column != 0) write_char(_range_separator);\n\
+    \                for (std::size_t padding = row[column].size();\n            \
+    \         padding < widths[column]; ++padding) {\n                    write_char('\
+    \ ');\n                }\n                write(row[column]);\n            }\n\
+    \        }\n    }\n\n   public:\n    explicit FastOutput(std::FILE* stream = stdout)\n\
+    \        : _stream(stream),\n          _position(0),\n          _precision(6),\n\
+    \          _float_format(std::chars_format::general),\n          _range_separator('\
+    \ ') {\n        if (_stream == stdout\n            && internal::standard_output_instance\
+    \ == nullptr) {\n            internal::standard_output_instance = this;\n    \
+    \    }\n    }\n\n    FastOutput(const FastOutput&) = delete;\n    FastOutput&\
+    \ operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n        flush();\n\
+    \        if (internal::standard_output_instance == this) {\n            internal::standard_output_instance\
+    \ = nullptr;\n        }\n    }\n\n    void flush() {\n        if (_position !=\
+    \ 0) {\n            std::fwrite(_buffer, 1, _position, _stream);\n           \
+    \ _position = 0;\n        }\n        std::fflush(_stream);\n    }\n\n    void\
+    \ write_char(char c) {\n        if (_capture != nullptr) {\n            _capture->push_back(c);\n\
+    \            return;\n        }\n        if (_position == buffer_size) flush();\n\
+    \        _buffer[_position++] = c;\n    }\n\n    void write(const char* s) {\n\
+    \        while (*s != '\\0') write_char(*s++);\n    }\n\n    void write(const\
+    \ std::string& s) {\n        if (_capture != nullptr) {\n            _capture->append(s);\n\
+    \            return;\n        }\n        std::size_t position = 0;\n        while\
+    \ (position < s.size()) {\n            if (_position == buffer_size) flush();\n\
+    \            const std::size_t copied =\n                std::min<std::size_t>(buffer_size\
     \ - _position, s.size() - position);\n            std::memcpy(_buffer + _position,\
     \ s.data() + position, copied);\n            _position += int(copied);\n     \
     \       position += copied;\n        }\n    }\n\n    void write(char c) {\n  \
@@ -231,15 +252,19 @@ data:
     \            return;\n        }\n\n        unsigned chunks[16];\n        int count\
     \ = 0;\n        while (magnitude >= 10000) {\n            const Unsigned quotient\
     \ = magnitude / 10000;\n            chunks[count++] = unsigned(magnitude - quotient\
-    \ * 10000);\n            magnitude = quotient;\n        }\n        if (_position\
-    \ > buffer_size - 64) flush();\n        const unsigned leading = unsigned(magnitude);\n\
+    \ * 10000);\n            magnitude = quotient;\n        }\n        if (_capture\
+    \ == nullptr && _position > buffer_size - 64) flush();\n        char captured[64];\n\
+    \        char* const begin = _capture != nullptr ? captured : _buffer + _position;\n\
+    \        char* destination = begin;\n        const unsigned leading = unsigned(magnitude);\n\
     \        const char* first = digit_quads.data() + 4 * leading;\n        int skip\
     \ = leading < 10 ? 3 : leading < 100 ? 2 : leading < 1000 ? 1 : 0;\n        for\
-    \ (; skip < 4; skip++) _buffer[_position++] = first[skip];\n        while (count--)\
+    \ (; skip < 4; skip++) *destination++ = first[skip];\n        while (count--)\
     \ {\n            const char* digits = digit_quads.data() + 4 * chunks[count];\n\
-    \            std::memcpy(_buffer + _position, digits, 4);\n            _position\
-    \ += 4;\n        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n \
-    \       internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
+    \            std::memcpy(destination, digits, 4);\n            destination +=\
+    \ 4;\n        }\n        if (_capture != nullptr) {\n            _capture->append(begin,\
+    \ destination - begin);\n        } else {\n            _position += int(destination\
+    \ - begin);\n        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
+    \        internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
     \            && !internal::is_range_v<T>\n    >\n    write(const T& value) {\n\
     \        write(value.val());\n    }\n\n    template <class First, class Second>\n\
     \    void write(const std::pair<First, Second>& value) {\n        write(value.first);\n\
@@ -262,14 +287,23 @@ data:
     \        _precision = precision;\n    }\n\n    void set_general(int precision\
     \ = 6) {\n        _float_format = std::chars_format::general;\n        _precision\
     \ = precision;\n    }\n\n    void set_range_separator(char separator) {\n    \
-    \    _range_separator = separator;\n    }\n\n    template <class... Args>\n  \
-    \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
-    n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
-    \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 8 \"template.hpp\"\nusing namespace\
-    \ std;\n\nnamespace m1une {\nnamespace template_io {\n\ninline utilities::FastInput&\
-    \ input() {\n    static utilities::FastInput instance;\n    return instance;\n\
-    }\n\ninline utilities::FastOutput& output() {\n    if (auto* instance = utilities::internal::standard_output_instance)\
+    \    _range_separator = separator;\n    }\n\n    template <class Matrix>\n   \
+    \ void write_aligned(const Matrix& matrix) {\n        using Row = internal::range_stored_value_t<const\
+    \ Matrix>;\n        using Cell = internal::range_stored_value_t<const Row>;\n\
+    \        static_assert(internal::is_range_v<Row> && !internal::is_string_like_v<Row>,\n\
+    \                      \"write_aligned requires a two-dimensional range\");\n\
+    \        static_assert(!internal::is_range_v<Cell> || internal::is_string_like_v<Cell>,\n\
+    \                      \"write_aligned requires scalar cells\");\n        write_aligned_matrix(matrix);\n\
+    \    }\n\n    template <class Matrix>\n    void println_aligned(const Matrix&\
+    \ matrix) {\n        write_aligned(matrix);\n        write_char('\\n');\n    }\n\
+    \n    template <class... Args>\n    void println(const Args&... args) {\n    \
+    \    print(args...);\n        write_char('\\n');\n    }\n\n    template <class\
+    \ T>\n    FastOutput& operator<<(const T& value) {\n        write(value);\n  \
+    \      return *this;\n    }\n};\n\n}  // namespace utilities\n}  // namespace\
+    \ m1une\n\n\n#line 8 \"template.hpp\"\nusing namespace std;\n\nnamespace m1une\
+    \ {\nnamespace template_io {\n\ninline utilities::FastInput& input() {\n    static\
+    \ utilities::FastInput instance;\n    return instance;\n}\n\ninline utilities::FastOutput&\
+    \ output() {\n    if (auto* instance = utilities::internal::standard_output_instance)\
     \ {\n        return *instance;\n    }\n    static utilities::FastOutput instance;\n\
     \    return instance;\n}\n\n}  // namespace template_io\n}  // namespace m1une\n\
     \nusing ll = long long;\nusing u32 = unsigned int;\nusing u64 = unsigned long\
@@ -360,6 +394,7 @@ data:
     }\ntemplate <class... T>\nconstexpr auto max(T... a) {\n    return max(initializer_list<common_type_t<T...>>{a...});\n\
     }\n\ntemplate <class... Ts>\nbool scan(Ts&... values) {\n    return m1une::template_io::input().read(values...);\n\
     }\n\ntemplate <class... Ts>\nvoid print(const Ts&... values) {\n    m1une::template_io::output().println(values...);\n\
+    }\ntemplate <class Matrix>\nvoid print_aligned(const Matrix& matrix) {\n    m1une::template_io::output().println_aligned(matrix);\n\
     }\nvoid YESNO(bool b) {\n    m1une::template_io::output().println(b ? \"YES\"\
     \ : \"NO\");\n}\nvoid YesNo(bool b) {\n    m1une::template_io::output().println(b\
     \ ? \"Yes\" : \"No\");\n}\nvoid YES() {\n    m1une::template_io::output().println(\"\
@@ -463,6 +498,7 @@ data:
     }\ntemplate <class... T>\nconstexpr auto max(T... a) {\n    return max(initializer_list<common_type_t<T...>>{a...});\n\
     }\n\ntemplate <class... Ts>\nbool scan(Ts&... values) {\n    return m1une::template_io::input().read(values...);\n\
     }\n\ntemplate <class... Ts>\nvoid print(const Ts&... values) {\n    m1une::template_io::output().println(values...);\n\
+    }\ntemplate <class Matrix>\nvoid print_aligned(const Matrix& matrix) {\n    m1une::template_io::output().println_aligned(matrix);\n\
     }\nvoid YESNO(bool b) {\n    m1une::template_io::output().println(b ? \"YES\"\
     \ : \"NO\");\n}\nvoid YesNo(bool b) {\n    m1une::template_io::output().println(b\
     \ ? \"Yes\" : \"No\");\n}\nvoid YES() {\n    m1une::template_io::output().println(\"\
@@ -478,7 +514,7 @@ data:
   requiredBy:
   - main.cpp
   - pch.hpp
-  timestamp: '2026-10-04 15:17:25+09:00'
+  timestamp: '2026-10-06 01:57:24+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/utilities/template_fast_io.test.cpp

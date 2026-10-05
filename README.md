@@ -28,7 +28,7 @@ they can be combined without rewriting boilerplate during a contest.
 | `heuristic/` | Hill climbing, simulated annealing, and memory-bounded beam search for approximate optimization. |
 | `matroid/` | Uniform, partition, graphic, and linear matroids, plus weighted, unweighted, and randomized linear matroid intersection. |
 | `game/` | Nim and nimber arithmetic, classic impartial games, partisan outcomes, DAG minimax, Sprague-Grundy numbers, and retrograde directed-game analysis. |
-| `geometry/` | 2D geometry with built-in or exact rational coordinates, lines, rays, segments, Manhattan segment intersections, perpendicular bisectors, polygons, convex decomposition, circle coverage multiplicities, circle- and rectangle-union area, convex hulls, Delaunay triangulations, Voronoi diagrams, half-plane intersection, lattice-point counting, and circles. |
+| `geometry/` | 2D geometry with built-in or exact rational coordinates, lines, rays, segments, Manhattan segment intersections, perpendicular bisectors, [polygons and scalar multiplication](docs/geometry/polygon.md), [convex polygon queries, Minkowski addition, and scalar multiplication](docs/geometry/convex_polygon.md), convex decomposition, circle coverage multiplicities, circle- and rectangle-union area, convex hulls, Delaunay triangulations, Voronoi diagrams, half-plane intersection, lattice-point counting, and circles. |
 | `ds/` | Categorized data structures for range queries, online/offline dynamic connectivity, dynamic sequences and trees, ordered sets, heaps, intervals, and hash tables. |
 | `monoid/` | Reusable monoids for generic data structures such as `Segtree`. |
 | `acted_monoid/` | Ordinary acted monoids for lazy propagation structures such as `LazySegtree`, including generic range assignment/range product and combined bitwise AND/OR/XOR updates with range sums. |
@@ -63,7 +63,7 @@ short namespace segment after `m1une::`; nested directories are for browsing.
 
 | Directory | Use it for |
 | --- | --- |
-| `algo/sequence/` | Array and sequence algorithms such as interval merging, LIS, inversion count, non-adjacent exact-count selection, distinct-subsequence counting, run-length encoding, and meet-in-the-middle subset sum. |
+| `algo/sequence/` | Array and sequence algorithms such as mex, interval merging, LIS, inversion count, non-adjacent exact-count selection, distinct-subsequence counting, run-length encoding, and meet-in-the-middle subset sum. |
 | `algo/search/` | Search-over-answer and unimodal optimization helpers. |
 | `algo/offline/` | Offline query processing such as Mo's algorithm. |
 | `algo/enumeration/` | Enumeration helpers for combinations, permutations, bitmasks, Gray codes, and aligned segment-tree ranges. |
@@ -93,7 +93,7 @@ plumbing live in `utilities/`.
 | `ds/range_query/` | Objects built for repeated range queries, including cumulative sums, range LIS/modes/majorities and distinct counting, Fenwick and k-d trees, and static sparse-table queries. |
 | `ds/wavelet_matrix/` | Static and dynamic wavelet matrices for range order statistics, frequencies, dynamically updated weighted range sums, and multidimensional orthogonal queries. |
 | `ds/dynamic_array/` | Implicit-treap sequences with insertion, deletion, reversal, aggregation, persistence, or rollback. |
-| `ds/bst/` | Weight-balanced ordered sets and multisets, a fixed-universe predecessor set, and persistent or rollback red-black-tree variants. |
+| `ds/bst/` | Weight-balanced ordered sets and multisets, a fixed-universe predecessor set, a dynamic mex multiset, and persistent or rollback red-black-tree variants. |
 | `ds/binary_trie/` | Binary tries for integer xor queries and optional monoid aggregates. |
 | `ds/dynamic_tree/` | Link-cut trees and rake-compress trees for changing forests. |
 | `ds/dynamic_connectivity/` | Online and offline connectivity under edge insertions and deletions. |
@@ -118,6 +118,10 @@ Include headers directly from the repository root and compile with C++20:
 Most generic data structures are parameterized by a monoid or acted monoid, so
 prefer the ready-made definitions in `monoid/`, `acted_monoid/`, and
 `beats_acted_monoid/` when possible.
+
+For readable matrix debugging with `template.hpp`, use `print_aligned(matrix)`
+to right-align columns. Ordinary `print(matrix)` keeps its usual spacing.
+See [Fast I/O](docs/utilities/fast_io.md) for the `FastOutput` interface.
 
 ```cpp
 using Sum = m1une::monoid::Add<long long>;

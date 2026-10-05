@@ -45,9 +45,9 @@ data:
     #include <charconv>\n#include <cstddef>\n#include <cstdio>\n#include <cstdlib>\n\
     #include <cstdint>\n#include <cstring>\n#include <iterator>\n#include <string>\n\
     #include <sys/stat.h>\n#include <type_traits>\n#include <utility>\n#include <unistd.h>\n\
-    \nnamespace m1une {\nnamespace utilities {\n\nstruct FastOutput;\n\nnamespace\
-    \ internal {\n\n// Shared with the convenience helpers in template.hpp.\ninline\
-    \ FastOutput* standard_output_instance = nullptr;\n\n// Detect std::begin(x),\
+    #include <vector>\n\nnamespace m1une {\nnamespace utilities {\n\nstruct FastOutput;\n\
+    \nnamespace internal {\n\n// Shared with the convenience helpers in template.hpp.\n\
+    inline FastOutput* standard_output_instance = nullptr;\n\n// Detect std::begin(x),\
     \ std::end(x).\ntemplate <class T, class = void>\nstruct is_range : std::false_type\
     \ {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
     \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
@@ -213,23 +213,44 @@ data:
     \ + value % 10);\n                value /= 10;\n            }\n        }\n   \
     \     return result;\n    }();\n\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
     \    int _position;\n    int _precision;\n    std::chars_format _float_format;\n\
-    \    char _range_separator;\n\n   public:\n    explicit FastOutput(std::FILE*\
-    \ stream = stdout)\n        : _stream(stream),\n          _position(0),\n    \
-    \      _precision(6),\n          _float_format(std::chars_format::general),\n\
-    \          _range_separator(' ') {\n        if (_stream == stdout\n          \
-    \  && internal::standard_output_instance == nullptr) {\n            internal::standard_output_instance\
-    \ = this;\n        }\n    }\n\n    FastOutput(const FastOutput&) = delete;\n \
-    \   FastOutput& operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n\
-    \        flush();\n        if (internal::standard_output_instance == this) {\n\
-    \            internal::standard_output_instance = nullptr;\n        }\n    }\n\
-    \n    void flush() {\n        if (_position != 0) {\n            std::fwrite(_buffer,\
-    \ 1, _position, _stream);\n            _position = 0;\n        }\n        std::fflush(_stream);\n\
-    \    }\n\n    void write_char(char c) {\n        if (_position == buffer_size)\
-    \ flush();\n        _buffer[_position++] = c;\n    }\n\n    void write(const char*\
-    \ s) {\n        while (*s != '\\0') write_char(*s++);\n    }\n\n    void write(const\
-    \ std::string& s) {\n        std::size_t position = 0;\n        while (position\
-    \ < s.size()) {\n            if (_position == buffer_size) flush();\n        \
-    \    const std::size_t copied =\n                std::min<std::size_t>(buffer_size\
+    \    char _range_separator;\n    std::string* _capture = nullptr;\n\n    template\
+    \ <class T>\n    std::string format_cell(const T& value) {\n        std::string\
+    \ result;\n        struct CaptureGuard {\n            std::string*& target;\n\
+    \            std::string* previous;\n            ~CaptureGuard() { target = previous;\
+    \ }\n        } guard{_capture, _capture};\n        _capture = &result;\n     \
+    \   write(value);\n        return result;\n    }\n\n    template <class Matrix>\n\
+    \    void write_aligned_matrix(const Matrix& matrix) {\n        std::vector<std::vector<std::string>>\
+    \ rows;\n        std::vector<std::size_t> widths;\n        for (const auto& row\
+    \ : matrix) {\n            auto& cells = rows.emplace_back();\n            std::size_t\
+    \ column = 0;\n            for (const auto& value : row) {\n                cells.push_back(format_cell(value));\n\
+    \                if (column == widths.size()) widths.push_back(0);\n         \
+    \       widths[column] = std::max(widths[column], cells.back().size());\n    \
+    \            ++column;\n            }\n        }\n        bool first = true;\n\
+    \        for (const auto& row : rows) {\n            if (!first) write_char('\\\
+    n');\n            first = false;\n            for (std::size_t column = 0; column\
+    \ < row.size(); ++column) {\n                if (column != 0) write_char(_range_separator);\n\
+    \                for (std::size_t padding = row[column].size();\n            \
+    \         padding < widths[column]; ++padding) {\n                    write_char('\
+    \ ');\n                }\n                write(row[column]);\n            }\n\
+    \        }\n    }\n\n   public:\n    explicit FastOutput(std::FILE* stream = stdout)\n\
+    \        : _stream(stream),\n          _position(0),\n          _precision(6),\n\
+    \          _float_format(std::chars_format::general),\n          _range_separator('\
+    \ ') {\n        if (_stream == stdout\n            && internal::standard_output_instance\
+    \ == nullptr) {\n            internal::standard_output_instance = this;\n    \
+    \    }\n    }\n\n    FastOutput(const FastOutput&) = delete;\n    FastOutput&\
+    \ operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n        flush();\n\
+    \        if (internal::standard_output_instance == this) {\n            internal::standard_output_instance\
+    \ = nullptr;\n        }\n    }\n\n    void flush() {\n        if (_position !=\
+    \ 0) {\n            std::fwrite(_buffer, 1, _position, _stream);\n           \
+    \ _position = 0;\n        }\n        std::fflush(_stream);\n    }\n\n    void\
+    \ write_char(char c) {\n        if (_capture != nullptr) {\n            _capture->push_back(c);\n\
+    \            return;\n        }\n        if (_position == buffer_size) flush();\n\
+    \        _buffer[_position++] = c;\n    }\n\n    void write(const char* s) {\n\
+    \        while (*s != '\\0') write_char(*s++);\n    }\n\n    void write(const\
+    \ std::string& s) {\n        if (_capture != nullptr) {\n            _capture->append(s);\n\
+    \            return;\n        }\n        std::size_t position = 0;\n        while\
+    \ (position < s.size()) {\n            if (_position == buffer_size) flush();\n\
+    \            const std::size_t copied =\n                std::min<std::size_t>(buffer_size\
     \ - _position, s.size() - position);\n            std::memcpy(_buffer + _position,\
     \ s.data() + position, copied);\n            _position += int(copied);\n     \
     \       position += copied;\n        }\n    }\n\n    void write(char c) {\n  \
@@ -252,15 +273,19 @@ data:
     \            return;\n        }\n\n        unsigned chunks[16];\n        int count\
     \ = 0;\n        while (magnitude >= 10000) {\n            const Unsigned quotient\
     \ = magnitude / 10000;\n            chunks[count++] = unsigned(magnitude - quotient\
-    \ * 10000);\n            magnitude = quotient;\n        }\n        if (_position\
-    \ > buffer_size - 64) flush();\n        const unsigned leading = unsigned(magnitude);\n\
+    \ * 10000);\n            magnitude = quotient;\n        }\n        if (_capture\
+    \ == nullptr && _position > buffer_size - 64) flush();\n        char captured[64];\n\
+    \        char* const begin = _capture != nullptr ? captured : _buffer + _position;\n\
+    \        char* destination = begin;\n        const unsigned leading = unsigned(magnitude);\n\
     \        const char* first = digit_quads.data() + 4 * leading;\n        int skip\
     \ = leading < 10 ? 3 : leading < 100 ? 2 : leading < 1000 ? 1 : 0;\n        for\
-    \ (; skip < 4; skip++) _buffer[_position++] = first[skip];\n        while (count--)\
+    \ (; skip < 4; skip++) *destination++ = first[skip];\n        while (count--)\
     \ {\n            const char* digits = digit_quads.data() + 4 * chunks[count];\n\
-    \            std::memcpy(_buffer + _position, digits, 4);\n            _position\
-    \ += 4;\n        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n \
-    \       internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
+    \            std::memcpy(destination, digits, 4);\n            destination +=\
+    \ 4;\n        }\n        if (_capture != nullptr) {\n            _capture->append(begin,\
+    \ destination - begin);\n        } else {\n            _position += int(destination\
+    \ - begin);\n        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
+    \        internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
     \            && !internal::is_range_v<T>\n    >\n    write(const T& value) {\n\
     \        write(value.val());\n    }\n\n    template <class First, class Second>\n\
     \    void write(const std::pair<First, Second>& value) {\n        write(value.first);\n\
@@ -283,71 +308,80 @@ data:
     \        _precision = precision;\n    }\n\n    void set_general(int precision\
     \ = 6) {\n        _float_format = std::chars_format::general;\n        _precision\
     \ = precision;\n    }\n\n    void set_range_separator(char separator) {\n    \
-    \    _range_separator = separator;\n    }\n\n    template <class... Args>\n  \
-    \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
-    n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
-    \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 7 \"verify/convex/monge/monge_algorithms.test.cpp\"\
-    \n#include <limits>\n#include <vector>\n\n#line 1 \"convex/monge/all.hpp\"\n\n\
-    \n\n#line 1 \"convex/monge/check.hpp\"\n\n\n\n#line 6 \"convex/monge/check.hpp\"\
-    \n\nnamespace m1une {\nnamespace convex {\n\ntemplate <class Value>\nbool is_monge(int\
-    \ row_count, int column_count, Value value) {\n    assert(row_count >= 0);\n \
-    \   assert(column_count >= 0);\n    for (int row = 0; row + 1 < row_count; row++)\
-    \ {\n        for (int column = 0; column + 1 < column_count; column++) {\n   \
-    \         if (value(row, column) + value(row + 1, column + 1) >\n            \
-    \    value(row, column + 1) + value(row + 1, column)) {\n                return\
-    \ false;\n            }\n        }\n    }\n    return true;\n}\n\ntemplate <class\
-    \ Value>\nbool is_anti_monge(int row_count, int column_count, Value value) {\n\
-    \    assert(row_count >= 0);\n    assert(column_count >= 0);\n    for (int row\
-    \ = 0; row + 1 < row_count; row++) {\n        for (int column = 0; column + 1\
-    \ < column_count; column++) {\n            if (value(row, column) + value(row\
-    \ + 1, column + 1) <\n                value(row, column + 1) + value(row + 1,\
+    \    _range_separator = separator;\n    }\n\n    template <class Matrix>\n   \
+    \ void write_aligned(const Matrix& matrix) {\n        using Row = internal::range_stored_value_t<const\
+    \ Matrix>;\n        using Cell = internal::range_stored_value_t<const Row>;\n\
+    \        static_assert(internal::is_range_v<Row> && !internal::is_string_like_v<Row>,\n\
+    \                      \"write_aligned requires a two-dimensional range\");\n\
+    \        static_assert(!internal::is_range_v<Cell> || internal::is_string_like_v<Cell>,\n\
+    \                      \"write_aligned requires scalar cells\");\n        write_aligned_matrix(matrix);\n\
+    \    }\n\n    template <class Matrix>\n    void println_aligned(const Matrix&\
+    \ matrix) {\n        write_aligned(matrix);\n        write_char('\\n');\n    }\n\
+    \n    template <class... Args>\n    void println(const Args&... args) {\n    \
+    \    print(args...);\n        write_char('\\n');\n    }\n\n    template <class\
+    \ T>\n    FastOutput& operator<<(const T& value) {\n        write(value);\n  \
+    \      return *this;\n    }\n};\n\n}  // namespace utilities\n}  // namespace\
+    \ m1une\n\n\n#line 7 \"verify/convex/monge/monge_algorithms.test.cpp\"\n#include\
+    \ <limits>\n#line 9 \"verify/convex/monge/monge_algorithms.test.cpp\"\n\n#line\
+    \ 1 \"convex/monge/all.hpp\"\n\n\n\n#line 1 \"convex/monge/check.hpp\"\n\n\n\n\
+    #line 6 \"convex/monge/check.hpp\"\n\nnamespace m1une {\nnamespace convex {\n\n\
+    template <class Value>\nbool is_monge(int row_count, int column_count, Value value)\
+    \ {\n    assert(row_count >= 0);\n    assert(column_count >= 0);\n    for (int\
+    \ row = 0; row + 1 < row_count; row++) {\n        for (int column = 0; column\
+    \ + 1 < column_count; column++) {\n            if (value(row, column) + value(row\
+    \ + 1, column + 1) >\n                value(row, column + 1) + value(row + 1,\
     \ column)) {\n                return false;\n            }\n        }\n    }\n\
-    \    return true;\n}\n\ntemplate <class T>\nbool is_monge(const std::vector<std::vector<T>>&\
-    \ matrix) {\n    int row_count = int(matrix.size());\n    int column_count = row_count\
-    \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
-    \ == column_count);\n    return is_monge(row_count, column_count,\n          \
-    \          [&](int row, int column) -> const T& { return matrix[row][column];\
-    \ });\n}\n\ntemplate <class T>\nbool is_anti_monge(const std::vector<std::vector<T>>&\
-    \ matrix) {\n    int row_count = int(matrix.size());\n    int column_count = row_count\
-    \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
-    \ == column_count);\n    return is_anti_monge(\n        row_count, column_count,\n\
-    \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
-    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n#line 1 \"convex/monge/divide_and_conquer_optimization.hpp\"\
-    \n\n\n\n#line 7 \"convex/monge/divide_and_conquer_optimization.hpp\"\n\n#line\
-    \ 1 \"convex/monge/monotone_minima.hpp\"\n\n\n\n#line 7 \"convex/monge/monotone_minima.hpp\"\
-    \n\nnamespace m1une {\nnamespace convex {\n\nnamespace monotone_minima_detail\
-    \ {\n\ntemplate <class Value, class Compare>\nvoid solve(int row_left, int row_right,\
-    \ int column_left, int column_right,\n           const Value& value, const Compare&\
-    \ compare, std::vector<int>& answer) {\n    if (row_left == row_right) return;\n\
-    \    int row = (row_left + row_right) / 2;\n    int best = column_left;\n    for\
-    \ (int column = column_left + 1; column < column_right; column++) {\n        if\
-    \ (compare(value(row, column), value(row, best))) best = column;\n    }\n    answer[row]\
-    \ = best;\n    solve(row_left, row, column_left, best + 1, value, compare, answer);\n\
-    \    solve(row + 1, row_right, best, column_right, value, compare, answer);\n\
-    }\n\n}  // namespace monotone_minima_detail\n\ntemplate <class Value, class Compare\
-    \ = std::less<>>\nstd::vector<int> monotone_row_optima(int row_count, int column_count,\
-    \ Value value,\n                                     Compare compare = Compare())\
-    \ {\n    assert(row_count >= 0);\n    assert(column_count >= 0);\n    std::vector<int>\
-    \ answer(row_count, -1);\n    if (row_count == 0 || column_count == 0) return\
-    \ answer;\n    monotone_minima_detail::solve(0, row_count, 0, column_count, value,\
-    \ compare, answer);\n    return answer;\n}\n\ntemplate <class Value>\nstd::vector<int>\
-    \ monotone_row_argmin(int row_count, int column_count, Value value) {\n    return\
-    \ monotone_row_optima(row_count, column_count, value, std::less<>());\n}\n\ntemplate\
-    \ <class Value>\nstd::vector<int> monotone_row_argmax(int row_count, int column_count,\
-    \ Value value) {\n    return monotone_row_optima(row_count, column_count, value,\
-    \ std::greater<>());\n}\n\ntemplate <class T>\nstd::vector<int> monotone_row_argmin(const\
+    \    return true;\n}\n\ntemplate <class Value>\nbool is_anti_monge(int row_count,\
+    \ int column_count, Value value) {\n    assert(row_count >= 0);\n    assert(column_count\
+    \ >= 0);\n    for (int row = 0; row + 1 < row_count; row++) {\n        for (int\
+    \ column = 0; column + 1 < column_count; column++) {\n            if (value(row,\
+    \ column) + value(row + 1, column + 1) <\n                value(row, column +\
+    \ 1) + value(row + 1, column)) {\n                return false;\n            }\n\
+    \        }\n    }\n    return true;\n}\n\ntemplate <class T>\nbool is_monge(const\
     \ std::vector<std::vector<T>>& matrix) {\n    int row_count = int(matrix.size());\n\
     \    int column_count = row_count == 0 ? 0 : int(matrix[0].size());\n    for (const\
-    \ auto& row : matrix) assert(int(row.size()) == column_count);\n    return monotone_row_argmin(\n\
+    \ auto& row : matrix) assert(int(row.size()) == column_count);\n    return is_monge(row_count,\
+    \ column_count,\n                    [&](int row, int column) -> const T& { return\
+    \ matrix[row][column]; });\n}\n\ntemplate <class T>\nbool is_anti_monge(const\
+    \ std::vector<std::vector<T>>& matrix) {\n    int row_count = int(matrix.size());\n\
+    \    int column_count = row_count == 0 ? 0 : int(matrix[0].size());\n    for (const\
+    \ auto& row : matrix) assert(int(row.size()) == column_count);\n    return is_anti_monge(\n\
     \        row_count, column_count,\n        [&](int row, int column) -> const T&\
-    \ { return matrix[row][column]; });\n}\n\ntemplate <class T>\nstd::vector<int>\
-    \ monotone_row_argmax(const std::vector<std::vector<T>>& matrix) {\n    int row_count\
+    \ { return matrix[row][column]; });\n}\n\n}  // namespace convex\n}  // namespace\
+    \ m1une\n\n\n#line 1 \"convex/monge/divide_and_conquer_optimization.hpp\"\n\n\n\
+    \n#line 7 \"convex/monge/divide_and_conquer_optimization.hpp\"\n\n#line 1 \"convex/monge/monotone_minima.hpp\"\
+    \n\n\n\n#line 7 \"convex/monge/monotone_minima.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ convex {\n\nnamespace monotone_minima_detail {\n\ntemplate <class Value, class\
+    \ Compare>\nvoid solve(int row_left, int row_right, int column_left, int column_right,\n\
+    \           const Value& value, const Compare& compare, std::vector<int>& answer)\
+    \ {\n    if (row_left == row_right) return;\n    int row = (row_left + row_right)\
+    \ / 2;\n    int best = column_left;\n    for (int column = column_left + 1; column\
+    \ < column_right; column++) {\n        if (compare(value(row, column), value(row,\
+    \ best))) best = column;\n    }\n    answer[row] = best;\n    solve(row_left,\
+    \ row, column_left, best + 1, value, compare, answer);\n    solve(row + 1, row_right,\
+    \ best, column_right, value, compare, answer);\n}\n\n}  // namespace monotone_minima_detail\n\
+    \ntemplate <class Value, class Compare = std::less<>>\nstd::vector<int> monotone_row_optima(int\
+    \ row_count, int column_count, Value value,\n                                \
+    \     Compare compare = Compare()) {\n    assert(row_count >= 0);\n    assert(column_count\
+    \ >= 0);\n    std::vector<int> answer(row_count, -1);\n    if (row_count == 0\
+    \ || column_count == 0) return answer;\n    monotone_minima_detail::solve(0, row_count,\
+    \ 0, column_count, value, compare, answer);\n    return answer;\n}\n\ntemplate\
+    \ <class Value>\nstd::vector<int> monotone_row_argmin(int row_count, int column_count,\
+    \ Value value) {\n    return monotone_row_optima(row_count, column_count, value,\
+    \ std::less<>());\n}\n\ntemplate <class Value>\nstd::vector<int> monotone_row_argmax(int\
+    \ row_count, int column_count, Value value) {\n    return monotone_row_optima(row_count,\
+    \ column_count, value, std::greater<>());\n}\n\ntemplate <class T>\nstd::vector<int>\
+    \ monotone_row_argmin(const std::vector<std::vector<T>>& matrix) {\n    int row_count\
     \ = int(matrix.size());\n    int column_count = row_count == 0 ? 0 : int(matrix[0].size());\n\
     \    for (const auto& row : matrix) assert(int(row.size()) == column_count);\n\
-    \    return monotone_row_argmax(\n        row_count, column_count,\n        [&](int\
-    \ row, int column) -> const T& { return matrix[row][column]; });\n}\n\n}  // namespace\
-    \ convex\n}  // namespace m1une\n\n\n#line 9 \"convex/monge/divide_and_conquer_optimization.hpp\"\
+    \    return monotone_row_argmin(\n        row_count, column_count,\n        [&](int\
+    \ row, int column) -> const T& { return matrix[row][column]; });\n}\n\ntemplate\
+    \ <class T>\nstd::vector<int> monotone_row_argmax(const std::vector<std::vector<T>>&\
+    \ matrix) {\n    int row_count = int(matrix.size());\n    int column_count = row_count\
+    \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
+    \ == column_count);\n    return monotone_row_argmax(\n        row_count, column_count,\n\
+    \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
+    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n#line 9 \"convex/monge/divide_and_conquer_optimization.hpp\"\
     \n\nnamespace m1une {\nnamespace convex {\n\ntemplate <class T>\nstruct DivideAndConquerDpResult\
     \ {\n    std::vector<T> value;\n    std::vector<int> argmin;\n};\n\ntemplate <class\
     \ Value>\nauto divide_and_conquer_dp(int state_count, int candidate_count, Value\
@@ -1062,7 +1096,7 @@ data:
   isVerificationFile: true
   path: verify/convex/monge/monge_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-08-26 23:16:21+09:00'
+  timestamp: '2026-10-06 01:57:24+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/convex/monge/monge_algorithms.test.cpp

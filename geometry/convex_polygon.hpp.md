@@ -71,31 +71,31 @@ data:
   bundledCode: "#line 1 \"geometry/convex_polygon.hpp\"\n\n\n\n#include <algorithm>\n\
     #include <array>\n#include <cassert>\n#include <cmath>\n#include <concepts>\n\
     #include <cstddef>\n#include <deque>\n#include <limits>\n#include <numbers>\n\
-    #include <optional>\n#include <utility>\n#include <vector>\n\n#line 1 \"geometry/convex_hull.hpp\"\
-    \n\n\n\n#line 8 \"geometry/convex_hull.hpp\"\n\n#line 1 \"geometry/point.hpp\"\
-    \n\n\n\n#line 7 \"geometry/point.hpp\"\n#include <type_traits>\n\n#line 1 \"geometry/detail/floating_predicate.hpp\"\
-    \n\n\n\nnamespace m1une {\nnamespace geometry {\nnamespace predicate_detail {\n\
-    \ntemplate <typename T>\nconstexpr T absolute(T value) {\n    return value < T(0)\
-    \ ? -value : value;\n}\n\ntemplate <typename T>\nconstexpr T max_value(T first,\
-    \ T second) {\n    return first < second ? second : first;\n}\n\ntemplate <typename\
-    \ T>\nconstexpr T vector_scale(T x, T y) {\n    return max_value(absolute(x),\
-    \ absolute(y));\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int scaled_sign(T\
-    \ value, T scale, long double eps) {\n    if constexpr (Exact) {\n        return\
-    \ (value > T(0)) - (value < T(0));\n    } else {\n        const T tolerance =\
-    \ T(eps) * scale;\n        return (value > tolerance) - (value < -tolerance);\n\
-    \    }\n}\n\ntemplate <bool Exact, typename T>\nconstexpr T determinant_scale(T\
-    \ ax, T ay, T bx, T by) {\n    if constexpr (Exact) {\n        return T(0);\n\
-    \    } else {\n        return vector_scale(ax, ay) * vector_scale(bx, by);\n \
-    \   }\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int determinant_sign(\n\
-    \    T ax,\n    T ay,\n    T bx,\n    T by,\n    long double eps\n) {\n    const\
-    \ T determinant = ax * by - ay * bx;\n    return scaled_sign<Exact>(\n       \
-    \ determinant,\n        determinant_scale<Exact>(ax, ay, bx, by),\n        eps\n\
-    \    );\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int orientation_sign(\n\
-    \    T direction_x,\n    T direction_y,\n    T offset_x,\n    T offset_y,\n  \
-    \  long double eps\n) {\n    const T determinant =\n        direction_x * offset_y\
-    \ - direction_y * offset_x;\n    T scale = T(0);\n    if constexpr (!Exact) {\n\
-    \        const T direction_scale =\n            vector_scale(direction_x, direction_y);\n\
-    \        scale = direction_scale * max_value(\n            direction_scale,\n\
+    #include <optional>\n#include <type_traits>\n#include <utility>\n#include <vector>\n\
+    \n#line 1 \"geometry/convex_hull.hpp\"\n\n\n\n#line 8 \"geometry/convex_hull.hpp\"\
+    \n\n#line 1 \"geometry/point.hpp\"\n\n\n\n#line 8 \"geometry/point.hpp\"\n\n#line\
+    \ 1 \"geometry/detail/floating_predicate.hpp\"\n\n\n\nnamespace m1une {\nnamespace\
+    \ geometry {\nnamespace predicate_detail {\n\ntemplate <typename T>\nconstexpr\
+    \ T absolute(T value) {\n    return value < T(0) ? -value : value;\n}\n\ntemplate\
+    \ <typename T>\nconstexpr T max_value(T first, T second) {\n    return first <\
+    \ second ? second : first;\n}\n\ntemplate <typename T>\nconstexpr T vector_scale(T\
+    \ x, T y) {\n    return max_value(absolute(x), absolute(y));\n}\n\ntemplate <bool\
+    \ Exact, typename T>\nconstexpr int scaled_sign(T value, T scale, long double\
+    \ eps) {\n    if constexpr (Exact) {\n        return (value > T(0)) - (value <\
+    \ T(0));\n    } else {\n        const T tolerance = T(eps) * scale;\n        return\
+    \ (value > tolerance) - (value < -tolerance);\n    }\n}\n\ntemplate <bool Exact,\
+    \ typename T>\nconstexpr T determinant_scale(T ax, T ay, T bx, T by) {\n    if\
+    \ constexpr (Exact) {\n        return T(0);\n    } else {\n        return vector_scale(ax,\
+    \ ay) * vector_scale(bx, by);\n    }\n}\n\ntemplate <bool Exact, typename T>\n\
+    constexpr int determinant_sign(\n    T ax,\n    T ay,\n    T bx,\n    T by,\n\
+    \    long double eps\n) {\n    const T determinant = ax * by - ay * bx;\n    return\
+    \ scaled_sign<Exact>(\n        determinant,\n        determinant_scale<Exact>(ax,\
+    \ ay, bx, by),\n        eps\n    );\n}\n\ntemplate <bool Exact, typename T>\n\
+    constexpr int orientation_sign(\n    T direction_x,\n    T direction_y,\n    T\
+    \ offset_x,\n    T offset_y,\n    long double eps\n) {\n    const T determinant\
+    \ =\n        direction_x * offset_y - direction_y * offset_x;\n    T scale = T(0);\n\
+    \    if constexpr (!Exact) {\n        const T direction_scale =\n            vector_scale(direction_x,\
+    \ direction_y);\n        scale = direction_scale * max_value(\n            direction_scale,\n\
     \            vector_scale(offset_x, offset_y)\n        );\n    }\n    return scaled_sign<Exact>(determinant,\
     \ scale, eps);\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int dot_sign(\n\
     \    T ax,\n    T ay,\n    T bx,\n    T by,\n    long double eps\n) {\n    const\
@@ -1537,19 +1537,28 @@ data:
     \ m1une {\nnamespace geometry {\n\nenum class PointInPolygon {\n    Outside =\
     \ 0,\n    Boundary = 1,\n    Inside = 2,\n};\n\ntemplate <Coordinate T>\nstruct\
     \ Polygon {\n    std::vector<Point<T>> vertices;\n    bool filled = true;\n};\n\
-    \nstruct ParameterInterval {\n    long double begin = 0.0L;\n    long double end\
-    \ = 0.0L;\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(\n\
-    \    const std::array<Point<T>, 3>& triangle\n) {\n    return Point<long double>(\n\
-    \        (\n            static_cast<long double>(triangle[0].x) +\n          \
-    \  static_cast<long double>(triangle[1].x) +\n            static_cast<long double>(triangle[2].x)\n\
-    \        ) / 3,\n        (\n            static_cast<long double>(triangle[0].y)\
-    \ +\n            static_cast<long double>(triangle[1].y) +\n            static_cast<long\
-    \ double>(triangle[2].y)\n        ) / 3\n    );\n}\n\nnamespace polygon_detail\
-    \ {\n\ntemplate <Coordinate T>\nstd::vector<Point<T>> clean_polygon_vertices(\n\
-    \    std::vector<Point<T>> polygon,\n    long double eps\n) {\n    if (\n    \
-    \    polygon.size() >= 2 &&\n        polygon.front() == polygon.back()\n    )\
-    \ {\n        polygon.pop_back();\n    }\n\n    std::vector<Point<T>> deduplicated;\n\
-    \    for (const Point<T>& point : polygon) {\n        if (deduplicated.empty()\
+    \ntemplate <Coordinate T, typename Scalar>\nrequires (std::is_arithmetic_v<Scalar>\
+    \ || Coordinate<Scalar>)\nPolygon<std::common_type_t<T, Scalar>> operator*(\n\
+    \    const Polygon<T>& polygon,\n    Scalar scalar\n) {\n    using Result = std::common_type_t<T,\
+    \ Scalar>;\n    Polygon<Result> scaled;\n    scaled.vertices.reserve(polygon.vertices.size());\n\
+    \    for (const Point<T>& point : polygon.vertices) {\n        scaled.vertices.push_back(point\
+    \ * scalar);\n    }\n    scaled.filled = polygon.filled;\n    return scaled;\n\
+    }\n\ntemplate <typename Scalar, Coordinate T>\nrequires (std::is_arithmetic_v<Scalar>\
+    \ || Coordinate<Scalar>)\nPolygon<std::common_type_t<T, Scalar>> operator*(\n\
+    \    Scalar scalar,\n    const Polygon<T>& polygon\n) {\n    return polygon *\
+    \ scalar;\n}\n\nstruct ParameterInterval {\n    long double begin = 0.0L;\n  \
+    \  long double end = 0.0L;\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long\
+    \ double> centroid(\n    const std::array<Point<T>, 3>& triangle\n) {\n    return\
+    \ Point<long double>(\n        (\n            static_cast<long double>(triangle[0].x)\
+    \ +\n            static_cast<long double>(triangle[1].x) +\n            static_cast<long\
+    \ double>(triangle[2].x)\n        ) / 3,\n        (\n            static_cast<long\
+    \ double>(triangle[0].y) +\n            static_cast<long double>(triangle[1].y)\
+    \ +\n            static_cast<long double>(triangle[2].y)\n        ) / 3\n    );\n\
+    }\n\nnamespace polygon_detail {\n\ntemplate <Coordinate T>\nstd::vector<Point<T>>\
+    \ clean_polygon_vertices(\n    std::vector<Point<T>> polygon,\n    long double\
+    \ eps\n) {\n    if (\n        polygon.size() >= 2 &&\n        polygon.front()\
+    \ == polygon.back()\n    ) {\n        polygon.pop_back();\n    }\n\n    std::vector<Point<T>>\
+    \ deduplicated;\n    for (const Point<T>& point : polygon) {\n        if (deduplicated.empty()\
     \ || deduplicated.back() != point) {\n            deduplicated.push_back(point);\n\
     \        }\n    }\n    if (\n        deduplicated.size() >= 2 &&\n        deduplicated.front()\
     \ == deduplicated.back()\n    ) {\n        deduplicated.pop_back();\n    }\n\n\
@@ -2037,7 +2046,7 @@ data:
     \    const ClosestPoints result = closest_points(polygon, ray);\n    return geometry::distance(result.first,\
     \ result.second);\n}\n\ntemplate <Coordinate R, Coordinate T>\nlong double distance(\n\
     \    const Ray<R>& ray,\n    const Polygon<T>& polygon\n) {\n    return distance(polygon,\
-    \ ray);\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 21 \"\
+    \ ray);\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 22 \"\
     geometry/convex_polygon.hpp\"\n\nnamespace m1une {\nnamespace geometry {\n\nnamespace\
     \ convex_polygon_detail {\n\ninline bool points_close(\n    const Point<long double>&\
     \ first,\n    const Point<long double>& second,\n    long double eps\n) {\n  \
@@ -2132,8 +2141,20 @@ data:
     \ const noexcept {\n        return points.empty();\n    }\n\n    const std::vector<Point<T>>&\
     \ vertices() const noexcept {\n        return points;\n    }\n\n    const Point<T>&\
     \ operator[](int index) const {\n        assert(0 <= index && index < size());\n\
-    \        return points[index];\n    }\n\n    Wide area2() const {\n        if\
-    \ (points.empty()) return Wide(0);\n        return area_prefix[points.size()];\n\
+    \        return points[index];\n    }\n\n    ConvexPolygon operator+(const ConvexPolygon&\
+    \ other) const {\n        const long double eps = std::max(epsilon, other.epsilon);\n\
+    \        return ConvexPolygon(\n            minkowski_sum(points, other.points,\
+    \ eps),\n            eps\n        );\n    }\n\n    template <typename Scalar>\n\
+    \    requires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n    ConvexPolygon<std::common_type_t<T,\
+    \ Scalar>> operator*(Scalar scalar) const {\n        using Result = std::common_type_t<T,\
+    \ Scalar>;\n        std::vector<Point<Result>> scaled;\n        scaled.reserve(points.size());\n\
+    \        for (const Point<T>& point : points) {\n            scaled.push_back(point\
+    \ * scalar);\n        }\n        return ConvexPolygon<Result>(std::move(scaled),\
+    \ epsilon);\n    }\n\n    template <typename Scalar>\n    requires (std::is_arithmetic_v<Scalar>\
+    \ || Coordinate<Scalar>)\n    friend ConvexPolygon<std::common_type_t<T, Scalar>>\
+    \ operator*(\n        Scalar scalar,\n        const ConvexPolygon& polygon\n \
+    \   ) {\n        return polygon * scalar;\n    }\n\n    Wide area2() const {\n\
+    \        if (points.empty()) return Wide(0);\n        return area_prefix[points.size()];\n\
     \    }\n\n    Wide chain_area2(int first, int last) const {\n        assert(0\
     \ <= first && first < size());\n        assert(0 <= last && last < size());\n\
     \        int extended_last = last;\n        if (extended_last < first) extended_last\
@@ -2539,13 +2560,13 @@ data:
   code: "#ifndef M1UNE_GEOMETRY_CONVEX_POLYGON_HPP\n#define M1UNE_GEOMETRY_CONVEX_POLYGON_HPP\
     \ 1\n\n#include <algorithm>\n#include <array>\n#include <cassert>\n#include <cmath>\n\
     #include <concepts>\n#include <cstddef>\n#include <deque>\n#include <limits>\n\
-    #include <numbers>\n#include <optional>\n#include <utility>\n#include <vector>\n\
-    \n#include \"convex_hull.hpp\"\n#include \"half_plane_intersection.hpp\"\n#include\
-    \ \"minkowski_sum.hpp\"\n#include \"polygon.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ geometry {\n\nnamespace convex_polygon_detail {\n\ninline bool points_close(\n\
-    \    const Point<long double>& first,\n    const Point<long double>& second,\n\
-    \    long double eps\n) {\n    return geometry::distance(first, second) <= eps;\n\
-    }\n\ninline std::vector<Point<long double>> clean_polygon(\n    std::vector<Point<long\
+    #include <numbers>\n#include <optional>\n#include <type_traits>\n#include <utility>\n\
+    #include <vector>\n\n#include \"convex_hull.hpp\"\n#include \"half_plane_intersection.hpp\"\
+    \n#include \"minkowski_sum.hpp\"\n#include \"polygon.hpp\"\n\nnamespace m1une\
+    \ {\nnamespace geometry {\n\nnamespace convex_polygon_detail {\n\ninline bool\
+    \ points_close(\n    const Point<long double>& first,\n    const Point<long double>&\
+    \ second,\n    long double eps\n) {\n    return geometry::distance(first, second)\
+    \ <= eps;\n}\n\ninline std::vector<Point<long double>> clean_polygon(\n    std::vector<Point<long\
     \ double>> polygon,\n    long double eps\n) {\n    if (polygon.empty()) return\
     \ polygon;\n\n    std::vector<Point<long double>> deduplicated;\n    for (const\
     \ Point<long double>& point : polygon) {\n        if (\n            deduplicated.empty()\
@@ -2635,8 +2656,20 @@ data:
     \ const noexcept {\n        return points.empty();\n    }\n\n    const std::vector<Point<T>>&\
     \ vertices() const noexcept {\n        return points;\n    }\n\n    const Point<T>&\
     \ operator[](int index) const {\n        assert(0 <= index && index < size());\n\
-    \        return points[index];\n    }\n\n    Wide area2() const {\n        if\
-    \ (points.empty()) return Wide(0);\n        return area_prefix[points.size()];\n\
+    \        return points[index];\n    }\n\n    ConvexPolygon operator+(const ConvexPolygon&\
+    \ other) const {\n        const long double eps = std::max(epsilon, other.epsilon);\n\
+    \        return ConvexPolygon(\n            minkowski_sum(points, other.points,\
+    \ eps),\n            eps\n        );\n    }\n\n    template <typename Scalar>\n\
+    \    requires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n    ConvexPolygon<std::common_type_t<T,\
+    \ Scalar>> operator*(Scalar scalar) const {\n        using Result = std::common_type_t<T,\
+    \ Scalar>;\n        std::vector<Point<Result>> scaled;\n        scaled.reserve(points.size());\n\
+    \        for (const Point<T>& point : points) {\n            scaled.push_back(point\
+    \ * scalar);\n        }\n        return ConvexPolygon<Result>(std::move(scaled),\
+    \ epsilon);\n    }\n\n    template <typename Scalar>\n    requires (std::is_arithmetic_v<Scalar>\
+    \ || Coordinate<Scalar>)\n    friend ConvexPolygon<std::common_type_t<T, Scalar>>\
+    \ operator*(\n        Scalar scalar,\n        const ConvexPolygon& polygon\n \
+    \   ) {\n        return polygon * scalar;\n    }\n\n    Wide area2() const {\n\
+    \        if (points.empty()) return Wide(0);\n        return area_prefix[points.size()];\n\
     \    }\n\n    Wide chain_area2(int first, int last) const {\n        assert(0\
     \ <= first && first < size());\n        assert(0 <= last && last < size());\n\
     \        int extended_last = last;\n        if (extended_last < first) extended_last\
@@ -3055,7 +3088,7 @@ data:
   path: geometry/convex_polygon.hpp
   requiredBy:
   - geometry/all.hpp
-  timestamp: '2026-10-05 22:23:07+09:00'
+  timestamp: '2026-10-06 02:48:54+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/is_convex_polygon.test.cpp
@@ -3078,6 +3111,8 @@ title: Convex Polygons
 `ConvexPolygon<T>` query object. The query object normalizes an ordered convex
 boundary once, then supports point containment, directional extrema, tangents,
 and chain-area queries efficiently.
+It also supports Minkowski addition with `operator+` and scalar multiplication
+about the origin with `operator*`.
 
 The free functions cover convexity testing, normalization, triangulation,
 diameter, half-plane cuts, intersection construction, and intersection and
@@ -3146,6 +3181,19 @@ public:
     bool empty() const noexcept;
     const std::vector<Point<T>>& vertices() const noexcept;
     const Point<T>& operator[](int index) const;
+    ConvexPolygon operator+(const ConvexPolygon& other) const;
+
+    template <typename Scalar>
+    requires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)
+    ConvexPolygon<std::common_type_t<T, Scalar>> operator*(Scalar scalar) const;
+
+    template <typename Scalar>
+    requires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)
+    friend ConvexPolygon<std::common_type_t<T, Scalar>> operator*(
+        Scalar scalar,
+        const ConvexPolygon& polygon
+    );
+
     Wide area2() const;
     Wide chain_area2(int first, int last) const;
     PointInPolygon contains(const Point<T>& point) const;
@@ -3165,6 +3213,9 @@ std::optional<Point<long double>> centroid(
 | --- | --- | --- |
 | `ConvexPolygon(polygon, eps)` | Normalizes an ordered convex boundary and builds doubled prefix areas. | $O(N)$ time and memory |
 | `size()`, `empty()`, `vertices()`, `operator[]` | Access the normalized boundary. | $O(1)$ |
+| `ConvexPolygon operator+(const ConvexPolygon& other) const` | Returns the Minkowski sum with another polygon of the same coordinate type. Both inputs must be nonempty. | $O(N+M)$ time and memory |
+| `ConvexPolygon<std::common_type_t<T, Scalar>> operator*(Scalar scalar) const` | Returns a polygon with each vertex multiplied by `scalar`. | $O(N)$ time and memory |
+| `friend ConvexPolygon<std::common_type_t<T, Scalar>> operator*(Scalar scalar, const ConvexPolygon& polygon)` | Supports `scalar * polygon` with the same behavior as `polygon * scalar`. | $O(N)$ time and memory |
 | `area2()` | Returns signed twice-area. A nondegenerate normalized polygon has positive area. | $O(1)$ |
 | `chain_area2(first, last)` | Returns signed twice-area enclosed by the counterclockwise chain from `first` through `last` and the chord back to `first`. | $O(1)$ |
 | `contains(point)` | Classifies a point as `Outside`, `Boundary`, or `Inside`. | $O(\log N)$ |
@@ -3176,6 +3227,21 @@ std::optional<Point<long double>> centroid(
 requires at least three vertices and a point strictly outside the polygon.
 Ties may return either endpoint of an extreme edge. No ordering is promised
 between the two tangent indices.
+
+The arithmetic operators return new normalized query objects and do not mutate
+their operands. `first + second` represents all points `a + b` with `a` in
+`first` and `b` in `second`; points and segments are supported. It uses the
+larger of the two constructor tolerances for normalization and later queries.
+Coordinate sums and edge differences must fit `T`.
+
+Multiplication scales about `(0, 0)` and preserves the constructor tolerance.
+A negative scalar also rotates the polygon by 180 degrees; the returned
+boundary remains counterclockwise and starts at its lowest `(y, x)` vertex.
+A zero scalar maps a nonempty polygon to the single point `(0, 0)`.
+Scaling an empty polygon returns an empty polygon. The result coordinate type
+is `std::common_type_t<T, Scalar>`, as with `Point<T>` multiplication, so
+`ConvexPolygon<long long> * 0.5L` returns `ConvexPolygon<long double>`.
+The common type must satisfy `Coordinate`, and coordinate products must fit it.
 
 `centroid` is a free geometry-wide overload rather than a convex-only member.
 The same name also supports points, segments, triangles, circles, and general
@@ -3340,7 +3406,16 @@ int main() {
     std::cout << int(polygon.contains(Point(2, 2))) << "\n";  // 2
 
     auto maximum = polygon.max_dot(Point(1, 0));
-    std::cout << maximum.first << "\n";  // 4
+    std::cout << static_cast<long long>(maximum.first) << "\n";  // 4
+
+    auto sum = polygon + polygon;
+    std::cout << sum.size() << "\n";  // 4, square from (0, 0) to (8, 8)
+    auto enlarged = 2 * polygon;
+    auto reflected = polygon * -1;
+    auto half = polygon * 0.5L;  // ConvexPolygon<long double>
+    std::cout << enlarged[2].x << "\n";  // 8
+    std::cout << reflected[0].x << "\n";  // -4
+    std::cout << half[2].x << "\n";  // 2
 
     m1une::geometry::Line<long long> boundary{
         Point(2, -1),

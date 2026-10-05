@@ -1,8 +1,14 @@
 ---
 data:
   _extendedDependsOn: []
-  _extendedRequiredBy: []
+  _extendedRequiredBy:
+  - icon: ':heavy_check_mark:'
+    path: ds/bst/mex_multiset.hpp
+    title: Mex Multiset
   _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/bst/mex_multiset.test.cpp
+    title: verify/ds/bst/mex_multiset.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/ds/bst/predecessor_set.test.cpp
     title: verify/ds/bst/predecessor_set.test.cpp
@@ -178,11 +184,13 @@ data:
   dependsOn: []
   isVerificationFile: false
   path: ds/bst/predecessor_set.hpp
-  requiredBy: []
+  requiredBy:
+  - ds/bst/mex_multiset.hpp
   timestamp: '2026-07-15 01:33:35+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/bst/predecessor_set.test.cpp
+  - verify/ds/bst/mex_multiset.test.cpp
 documentation_of: ds/bst/predecessor_set.hpp
 layout: document
 title: Predecessor Set

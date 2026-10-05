@@ -11,6 +11,9 @@ data:
     path: algo/sequence/merge_intervals.hpp
     title: Merge Intervals
   - icon: ':heavy_check_mark:'
+    path: algo/sequence/mex.hpp
+    title: Mex
+  - icon: ':heavy_check_mark:'
     path: algo/sequence/non_adjacent_selection.hpp
     title: Non-Adjacent Selection Sums
   - icon: ':heavy_check_mark:'
@@ -85,20 +88,33 @@ data:
     \ intervals[result_size - 1].second = std::move(right);\n        }\n    }\n  \
     \  intervals.erase(intervals.begin() + result_size, intervals.end());\n    return\
     \ intervals;\n}\n\n}  // namespace algo\n}  // namespace m1une\n\n\n#line 1 \"\
-    algo/sequence/non_adjacent_selection.hpp\"\n\n\n\n#include <functional>\n#include\
-    \ <queue>\n#line 7 \"algo/sequence/non_adjacent_selection.hpp\"\n\nnamespace m1une\
-    \ {\nnamespace algo {\n\nnamespace detail {\n\ntemplate <typename T>\nstruct NonAdjacentSelectionEntry\
-    \ {\n    T value;\n    int index;\n};\n\ntemplate <typename T, typename Better>\n\
-    struct NonAdjacentSelectionCompare {\n    Better better;\n\n    bool operator()(\n\
-    \        const NonAdjacentSelectionEntry<T>& lhs,\n        const NonAdjacentSelectionEntry<T>&\
-    \ rhs\n    ) const {\n        if (better(lhs.value, rhs.value)) return false;\n\
-    \        if (better(rhs.value, lhs.value)) return true;\n        return lhs.index\
-    \ > rhs.index;\n    }\n};\n\ntemplate <typename T, typename Better>\nstd::vector<T>\
-    \ non_adjacent_selection_sums(const std::vector<T>& values, Better better) {\n\
-    \    const int n = int(values.size());\n    std::vector<T> weight = values;\n\
-    \    std::vector<int> left(n), right(n);\n    std::vector<char> alive(n, true);\n\
-    \    for (int i = 0; i < n; ++i) {\n        left[i] = i - 1;\n        right[i]\
-    \ = (i + 1 == n ? -1 : i + 1);\n    }\n\n    using Entry = NonAdjacentSelectionEntry<T>;\n\
+    algo/sequence/mex.hpp\"\n\n\n\n#line 5 \"algo/sequence/mex.hpp\"\n#include <cstdint>\n\
+    #include <limits>\n#include <type_traits>\n#line 9 \"algo/sequence/mex.hpp\"\n\
+    \nnamespace m1une {\nnamespace algo {\n\n// Returns the smallest nonnegative integer\
+    \ absent from values.\ntemplate <class T>\nint mex(const std::vector<T>& values)\
+    \ {\n    static_assert(\n        std::is_integral_v<T> && sizeof(T) <= sizeof(std::uintmax_t),\n\
+    \        \"mex requires standard integral values\"\n    );\n    assert(values.size()\
+    \ <= static_cast<std::size_t>(std::numeric_limits<int>::max()));\n    const int\
+    \ n = int(values.size());\n    std::vector<unsigned char> present(n, 0);\n   \
+    \ for (T value : values) {\n        if constexpr (std::is_signed_v<T>) {\n   \
+    \         if (value < 0) continue;\n        }\n        if (static_cast<std::uintmax_t>(value)\
+    \ < static_cast<std::uintmax_t>(n)) {\n            present[int(value)] = 1;\n\
+    \        }\n    }\n    int answer = 0;\n    while (answer < n && present[answer])\
+    \ ++answer;\n    return answer;\n}\n\n}  // namespace algo\n}  // namespace m1une\n\
+    \n\n#line 1 \"algo/sequence/non_adjacent_selection.hpp\"\n\n\n\n#include <functional>\n\
+    #include <queue>\n#line 7 \"algo/sequence/non_adjacent_selection.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace algo {\n\nnamespace detail {\n\ntemplate <typename T>\nstruct\
+    \ NonAdjacentSelectionEntry {\n    T value;\n    int index;\n};\n\ntemplate <typename\
+    \ T, typename Better>\nstruct NonAdjacentSelectionCompare {\n    Better better;\n\
+    \n    bool operator()(\n        const NonAdjacentSelectionEntry<T>& lhs,\n   \
+    \     const NonAdjacentSelectionEntry<T>& rhs\n    ) const {\n        if (better(lhs.value,\
+    \ rhs.value)) return false;\n        if (better(rhs.value, lhs.value)) return\
+    \ true;\n        return lhs.index > rhs.index;\n    }\n};\n\ntemplate <typename\
+    \ T, typename Better>\nstd::vector<T> non_adjacent_selection_sums(const std::vector<T>&\
+    \ values, Better better) {\n    const int n = int(values.size());\n    std::vector<T>\
+    \ weight = values;\n    std::vector<int> left(n), right(n);\n    std::vector<char>\
+    \ alive(n, true);\n    for (int i = 0; i < n; ++i) {\n        left[i] = i - 1;\n\
+    \        right[i] = (i + 1 == n ? -1 : i + 1);\n    }\n\n    using Entry = NonAdjacentSelectionEntry<T>;\n\
     \    using Compare = NonAdjacentSelectionCompare<T, Better>;\n    std::priority_queue<Entry,\
     \ std::vector<Entry>, Compare> heap(Compare{better});\n    for (int i = 0; i <\
     \ n; ++i) heap.push(Entry{weight[i], i});\n\n    std::vector<T> result;\n    result.reserve((n\
@@ -180,7 +196,7 @@ data:
     \   --right_count;\n        }\n        if (right_count == 0) break;\n\n      \
     \  const T candidate = left + right_sums[right_count - 1];\n        if (answer\
     \ < candidate) answer = candidate;\n    }\n    return answer;\n}\n\n}  // namespace\
-    \ algo\n}  // namespace m1une\n\n\n#line 11 \"algo/sequence/all.hpp\"\n\n\n"
+    \ algo\n}  // namespace m1une\n\n\n#line 12 \"algo/sequence/all.hpp\"\n\n\n"
   code: '#ifndef M1UNE_ALGO_SEQUENCE_ALL_HPP
 
     #define M1UNE_ALGO_SEQUENCE_ALL_HPP 1
@@ -191,6 +207,8 @@ data:
     #include "lis.hpp"
 
     #include "merge_intervals.hpp"
+
+    #include "mex.hpp"
 
     #include "non_adjacent_selection.hpp"
 
@@ -208,6 +226,7 @@ data:
   - algo/sequence/inversion_count.hpp
   - algo/sequence/lis.hpp
   - algo/sequence/merge_intervals.hpp
+  - algo/sequence/mex.hpp
   - algo/sequence/non_adjacent_selection.hpp
   - algo/sequence/number_of_subsequences.hpp
   - algo/sequence/run_length_encoding.hpp
@@ -216,7 +235,7 @@ data:
   path: algo/sequence/all.hpp
   requiredBy:
   - algo/all.hpp
-  timestamp: '2026-08-21 12:49:11+09:00'
+  timestamp: '2026-10-06 02:15:41+09:00'
   verificationStatus: LIBRARY_NO_TESTS
   verifiedWith: []
 documentation_of: algo/sequence/all.hpp

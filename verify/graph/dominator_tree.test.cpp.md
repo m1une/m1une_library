@@ -157,14 +157,14 @@ data:
     \ <cstddef>\n#include <cstdio>\n#include <cstdlib>\n#line 12 \"utilities/fast_io.hpp\"\
     \n#include <cstring>\n#include <iterator>\n#include <string>\n#include <sys/stat.h>\n\
     #include <type_traits>\n#line 18 \"utilities/fast_io.hpp\"\n#include <unistd.h>\n\
-    \nnamespace m1une {\nnamespace utilities {\n\nstruct FastOutput;\n\nnamespace\
-    \ internal {\n\n// Shared with the convenience helpers in template.hpp.\ninline\
-    \ FastOutput* standard_output_instance = nullptr;\n\n// Detect std::begin(x),\
-    \ std::end(x).\ntemplate <class T, class = void>\nstruct is_range : std::false_type\
-    \ {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
-    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
-    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
-    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    #line 20 \"utilities/fast_io.hpp\"\n\nnamespace m1une {\nnamespace utilities {\n\
+    \nstruct FastOutput;\n\nnamespace internal {\n\n// Shared with the convenience\
+    \ helpers in template.hpp.\ninline FastOutput* standard_output_instance = nullptr;\n\
+    \n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct\
+    \ is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
+    \    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
+    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
+    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
     \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
     \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
@@ -325,23 +325,44 @@ data:
     \ + value % 10);\n                value /= 10;\n            }\n        }\n   \
     \     return result;\n    }();\n\n    std::FILE* _stream;\n    char _buffer[buffer_size];\n\
     \    int _position;\n    int _precision;\n    std::chars_format _float_format;\n\
-    \    char _range_separator;\n\n   public:\n    explicit FastOutput(std::FILE*\
-    \ stream = stdout)\n        : _stream(stream),\n          _position(0),\n    \
-    \      _precision(6),\n          _float_format(std::chars_format::general),\n\
-    \          _range_separator(' ') {\n        if (_stream == stdout\n          \
-    \  && internal::standard_output_instance == nullptr) {\n            internal::standard_output_instance\
-    \ = this;\n        }\n    }\n\n    FastOutput(const FastOutput&) = delete;\n \
-    \   FastOutput& operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n\
-    \        flush();\n        if (internal::standard_output_instance == this) {\n\
-    \            internal::standard_output_instance = nullptr;\n        }\n    }\n\
-    \n    void flush() {\n        if (_position != 0) {\n            std::fwrite(_buffer,\
-    \ 1, _position, _stream);\n            _position = 0;\n        }\n        std::fflush(_stream);\n\
-    \    }\n\n    void write_char(char c) {\n        if (_position == buffer_size)\
-    \ flush();\n        _buffer[_position++] = c;\n    }\n\n    void write(const char*\
-    \ s) {\n        while (*s != '\\0') write_char(*s++);\n    }\n\n    void write(const\
-    \ std::string& s) {\n        std::size_t position = 0;\n        while (position\
-    \ < s.size()) {\n            if (_position == buffer_size) flush();\n        \
-    \    const std::size_t copied =\n                std::min<std::size_t>(buffer_size\
+    \    char _range_separator;\n    std::string* _capture = nullptr;\n\n    template\
+    \ <class T>\n    std::string format_cell(const T& value) {\n        std::string\
+    \ result;\n        struct CaptureGuard {\n            std::string*& target;\n\
+    \            std::string* previous;\n            ~CaptureGuard() { target = previous;\
+    \ }\n        } guard{_capture, _capture};\n        _capture = &result;\n     \
+    \   write(value);\n        return result;\n    }\n\n    template <class Matrix>\n\
+    \    void write_aligned_matrix(const Matrix& matrix) {\n        std::vector<std::vector<std::string>>\
+    \ rows;\n        std::vector<std::size_t> widths;\n        for (const auto& row\
+    \ : matrix) {\n            auto& cells = rows.emplace_back();\n            std::size_t\
+    \ column = 0;\n            for (const auto& value : row) {\n                cells.push_back(format_cell(value));\n\
+    \                if (column == widths.size()) widths.push_back(0);\n         \
+    \       widths[column] = std::max(widths[column], cells.back().size());\n    \
+    \            ++column;\n            }\n        }\n        bool first = true;\n\
+    \        for (const auto& row : rows) {\n            if (!first) write_char('\\\
+    n');\n            first = false;\n            for (std::size_t column = 0; column\
+    \ < row.size(); ++column) {\n                if (column != 0) write_char(_range_separator);\n\
+    \                for (std::size_t padding = row[column].size();\n            \
+    \         padding < widths[column]; ++padding) {\n                    write_char('\
+    \ ');\n                }\n                write(row[column]);\n            }\n\
+    \        }\n    }\n\n   public:\n    explicit FastOutput(std::FILE* stream = stdout)\n\
+    \        : _stream(stream),\n          _position(0),\n          _precision(6),\n\
+    \          _float_format(std::chars_format::general),\n          _range_separator('\
+    \ ') {\n        if (_stream == stdout\n            && internal::standard_output_instance\
+    \ == nullptr) {\n            internal::standard_output_instance = this;\n    \
+    \    }\n    }\n\n    FastOutput(const FastOutput&) = delete;\n    FastOutput&\
+    \ operator=(const FastOutput&) = delete;\n\n    ~FastOutput() {\n        flush();\n\
+    \        if (internal::standard_output_instance == this) {\n            internal::standard_output_instance\
+    \ = nullptr;\n        }\n    }\n\n    void flush() {\n        if (_position !=\
+    \ 0) {\n            std::fwrite(_buffer, 1, _position, _stream);\n           \
+    \ _position = 0;\n        }\n        std::fflush(_stream);\n    }\n\n    void\
+    \ write_char(char c) {\n        if (_capture != nullptr) {\n            _capture->push_back(c);\n\
+    \            return;\n        }\n        if (_position == buffer_size) flush();\n\
+    \        _buffer[_position++] = c;\n    }\n\n    void write(const char* s) {\n\
+    \        while (*s != '\\0') write_char(*s++);\n    }\n\n    void write(const\
+    \ std::string& s) {\n        if (_capture != nullptr) {\n            _capture->append(s);\n\
+    \            return;\n        }\n        std::size_t position = 0;\n        while\
+    \ (position < s.size()) {\n            if (_position == buffer_size) flush();\n\
+    \            const std::size_t copied =\n                std::min<std::size_t>(buffer_size\
     \ - _position, s.size() - position);\n            std::memcpy(_buffer + _position,\
     \ s.data() + position, copied);\n            _position += int(copied);\n     \
     \       position += copied;\n        }\n    }\n\n    void write(char c) {\n  \
@@ -364,15 +385,19 @@ data:
     \            return;\n        }\n\n        unsigned chunks[16];\n        int count\
     \ = 0;\n        while (magnitude >= 10000) {\n            const Unsigned quotient\
     \ = magnitude / 10000;\n            chunks[count++] = unsigned(magnitude - quotient\
-    \ * 10000);\n            magnitude = quotient;\n        }\n        if (_position\
-    \ > buffer_size - 64) flush();\n        const unsigned leading = unsigned(magnitude);\n\
+    \ * 10000);\n            magnitude = quotient;\n        }\n        if (_capture\
+    \ == nullptr && _position > buffer_size - 64) flush();\n        char captured[64];\n\
+    \        char* const begin = _capture != nullptr ? captured : _buffer + _position;\n\
+    \        char* destination = begin;\n        const unsigned leading = unsigned(magnitude);\n\
     \        const char* first = digit_quads.data() + 4 * leading;\n        int skip\
     \ = leading < 10 ? 3 : leading < 100 ? 2 : leading < 1000 ? 1 : 0;\n        for\
-    \ (; skip < 4; skip++) _buffer[_position++] = first[skip];\n        while (count--)\
+    \ (; skip < 4; skip++) *destination++ = first[skip];\n        while (count--)\
     \ {\n            const char* digits = digit_quads.data() + 4 * chunks[count];\n\
-    \            std::memcpy(_buffer + _position, digits, 4);\n            _position\
-    \ += 4;\n        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n \
-    \       internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
+    \            std::memcpy(destination, digits, 4);\n            destination +=\
+    \ 4;\n        }\n        if (_capture != nullptr) {\n            _capture->append(begin,\
+    \ destination - begin);\n        } else {\n            _position += int(destination\
+    \ - begin);\n        }\n    }\n\n    template <class T>\n    std::enable_if_t<\n\
+    \        internal::has_val_method_v<T>\n            && !internal::is_integral_v<T>\n\
     \            && !internal::is_range_v<T>\n    >\n    write(const T& value) {\n\
     \        write(value.val());\n    }\n\n    template <class First, class Second>\n\
     \    void write(const std::pair<First, Second>& value) {\n        write(value.first);\n\
@@ -395,73 +420,81 @@ data:
     \        _precision = precision;\n    }\n\n    void set_general(int precision\
     \ = 6) {\n        _float_format = std::chars_format::general;\n        _precision\
     \ = precision;\n    }\n\n    void set_range_separator(char separator) {\n    \
-    \    _range_separator = separator;\n    }\n\n    template <class... Args>\n  \
-    \  void println(const Args&... args) {\n        print(args...);\n        write_char('\\\
-    n');\n    }\n\n    template <class T>\n    FastOutput& operator<<(const T& value)\
-    \ {\n        write(value);\n        return *this;\n    }\n};\n\n}  // namespace\
-    \ utilities\n}  // namespace m1une\n\n\n#line 9 \"verify/graph/dominator_tree.test.cpp\"\
-    \n\n#line 11 \"verify/graph/dominator_tree.test.cpp\"\n\nnamespace {\n\nstd::vector<int>\
-    \ brute_idom(\n    const m1une::graph::Graph<>& graph,\n    int root\n) {\n  \
-    \  int n = graph.size();\n    std::vector<char> reachable(n, false);\n    std::vector<int>\
-    \ stack = {root};\n    reachable[root] = true;\n    while (!stack.empty()) {\n\
-    \        int current = stack.back();\n        stack.pop_back();\n        for (const\
-    \ auto& edge : graph[current]) {\n            if (!edge.alive || reachable[edge.to])\
-    \ continue;\n            reachable[edge.to] = true;\n            stack.push_back(edge.to);\n\
-    \        }\n    }\n\n    std::vector<std::vector<char>> dominator(\n        n,\n\
-    \        std::vector<char>(n, false)\n    );\n    for (int vertex = 0; vertex\
-    \ < n; ++vertex) {\n        if (!reachable[vertex]) continue;\n        if (vertex\
-    \ == root) {\n            dominator[vertex][root] = true;\n        } else {\n\
-    \            for (int candidate = 0; candidate < n; ++candidate) {\n         \
-    \       dominator[vertex][candidate] = reachable[candidate];\n            }\n\
-    \        }\n    }\n\n    bool changed = true;\n    while (changed) {\n       \
-    \ changed = false;\n        for (int vertex = 0; vertex < n; ++vertex) {\n   \
-    \         if (!reachable[vertex] || vertex == root) continue;\n            std::vector<char>\
-    \ next(n, true);\n            bool has_predecessor = false;\n            for (int\
-    \ from = 0; from < n; ++from) {\n                for (const auto& edge : graph[from])\
-    \ {\n                    if (\n                        edge.alive &&\n       \
-    \                 edge.to == vertex &&\n                        reachable[from]\n\
-    \                    ) {\n                        if (!has_predecessor) {\n  \
-    \                          next = dominator[from];\n                         \
-    \   has_predecessor = true;\n                        } else {\n              \
-    \              for (int candidate = 0; candidate < n; ++candidate) {\n       \
-    \                         next[candidate] =\n                                \
-    \    next[candidate]\n                                    && dominator[from][candidate];\n\
-    \                            }\n                        }\n                  \
-    \  }\n                }\n            }\n            next[vertex] = true;\n   \
-    \         if (next != dominator[vertex]) {\n                dominator[vertex]\
-    \ = std::move(next);\n                changed = true;\n            }\n       \
-    \ }\n    }\n\n    std::vector<int> result(n, -1);\n    result[root] = root;\n\
-    \    for (int vertex = 0; vertex < n; ++vertex) {\n        if (!reachable[vertex]\
-    \ || vertex == root) continue;\n        for (int candidate = 0; candidate < n;\
-    \ ++candidate) {\n            if (\n                candidate == vertex ||\n \
-    \               !dominator[vertex][candidate]\n            ) {\n             \
-    \   continue;\n            }\n            bool immediate = true;\n           \
-    \ for (int other = 0; other < n; ++other) {\n                if (\n          \
-    \          other == vertex ||\n                    other == candidate ||\n   \
-    \                 !dominator[vertex][other]\n                ) {\n           \
-    \         continue;\n                }\n                if (dominator[other][candidate])\
-    \ {\n                    immediate = false;\n                    break;\n    \
-    \            }\n            }\n            if (immediate) {\n                result[vertex]\
-    \ = candidate;\n                break;\n            }\n        }\n    }\n    return\
-    \ result;\n}\n\nvoid test_randomized() {\n    std::uint64_t state = 1601;\n  \
-    \  auto random = [&state]() {\n        state ^= state << 7;\n        state ^=\
-    \ state >> 9;\n        return state;\n    };\n\n    for (int trial = 0; trial\
-    \ < 5000; ++trial) {\n        int n = 1 + int(random() % 12);\n        m1une::graph::Graph<>\
-    \ graph(n);\n        for (int from = 0; from < n; ++from) {\n            for (int\
-    \ to = 0; to < n; ++to) {\n                if (random() % 5 == 0) {\n        \
-    \            graph.add_directed_edge(from, to);\n                }\n         \
-    \   }\n        }\n        int root = int(random() % n);\n        auto actual =\
-    \ m1une::graph::dominator_tree(graph, root);\n        auto expected = brute_idom(graph,\
-    \ root);\n        assert(actual.immediate_dominator == expected);\n\n        for\
-    \ (int vertex = 0; vertex < n; ++vertex) {\n            assert(actual.reachable(vertex)\
-    \ == (expected[vertex] != -1));\n            for (int ancestor = 0; ancestor <\
-    \ n; ++ancestor) {\n                [[maybe_unused]] bool dominates = false;\n\
-    \                if (expected[vertex] != -1) {\n                    for (\n  \
-    \                      int current = vertex;\n                        current\
-    \ != -1;\n                        current = current == root\n                \
-    \            ? -1\n                            : expected[current]\n         \
-    \           ) {\n                        if (current == ancestor) dominates =\
-    \ true;\n                    }\n                }\n                assert(actual.dominates(ancestor,\
+    \    _range_separator = separator;\n    }\n\n    template <class Matrix>\n   \
+    \ void write_aligned(const Matrix& matrix) {\n        using Row = internal::range_stored_value_t<const\
+    \ Matrix>;\n        using Cell = internal::range_stored_value_t<const Row>;\n\
+    \        static_assert(internal::is_range_v<Row> && !internal::is_string_like_v<Row>,\n\
+    \                      \"write_aligned requires a two-dimensional range\");\n\
+    \        static_assert(!internal::is_range_v<Cell> || internal::is_string_like_v<Cell>,\n\
+    \                      \"write_aligned requires scalar cells\");\n        write_aligned_matrix(matrix);\n\
+    \    }\n\n    template <class Matrix>\n    void println_aligned(const Matrix&\
+    \ matrix) {\n        write_aligned(matrix);\n        write_char('\\n');\n    }\n\
+    \n    template <class... Args>\n    void println(const Args&... args) {\n    \
+    \    print(args...);\n        write_char('\\n');\n    }\n\n    template <class\
+    \ T>\n    FastOutput& operator<<(const T& value) {\n        write(value);\n  \
+    \      return *this;\n    }\n};\n\n}  // namespace utilities\n}  // namespace\
+    \ m1une\n\n\n#line 9 \"verify/graph/dominator_tree.test.cpp\"\n\n#line 11 \"verify/graph/dominator_tree.test.cpp\"\
+    \n\nnamespace {\n\nstd::vector<int> brute_idom(\n    const m1une::graph::Graph<>&\
+    \ graph,\n    int root\n) {\n    int n = graph.size();\n    std::vector<char>\
+    \ reachable(n, false);\n    std::vector<int> stack = {root};\n    reachable[root]\
+    \ = true;\n    while (!stack.empty()) {\n        int current = stack.back();\n\
+    \        stack.pop_back();\n        for (const auto& edge : graph[current]) {\n\
+    \            if (!edge.alive || reachable[edge.to]) continue;\n            reachable[edge.to]\
+    \ = true;\n            stack.push_back(edge.to);\n        }\n    }\n\n    std::vector<std::vector<char>>\
+    \ dominator(\n        n,\n        std::vector<char>(n, false)\n    );\n    for\
+    \ (int vertex = 0; vertex < n; ++vertex) {\n        if (!reachable[vertex]) continue;\n\
+    \        if (vertex == root) {\n            dominator[vertex][root] = true;\n\
+    \        } else {\n            for (int candidate = 0; candidate < n; ++candidate)\
+    \ {\n                dominator[vertex][candidate] = reachable[candidate];\n  \
+    \          }\n        }\n    }\n\n    bool changed = true;\n    while (changed)\
+    \ {\n        changed = false;\n        for (int vertex = 0; vertex < n; ++vertex)\
+    \ {\n            if (!reachable[vertex] || vertex == root) continue;\n       \
+    \     std::vector<char> next(n, true);\n            bool has_predecessor = false;\n\
+    \            for (int from = 0; from < n; ++from) {\n                for (const\
+    \ auto& edge : graph[from]) {\n                    if (\n                    \
+    \    edge.alive &&\n                        edge.to == vertex &&\n           \
+    \             reachable[from]\n                    ) {\n                     \
+    \   if (!has_predecessor) {\n                            next = dominator[from];\n\
+    \                            has_predecessor = true;\n                       \
+    \ } else {\n                            for (int candidate = 0; candidate < n;\
+    \ ++candidate) {\n                                next[candidate] =\n        \
+    \                            next[candidate]\n                               \
+    \     && dominator[from][candidate];\n                            }\n        \
+    \                }\n                    }\n                }\n            }\n\
+    \            next[vertex] = true;\n            if (next != dominator[vertex])\
+    \ {\n                dominator[vertex] = std::move(next);\n                changed\
+    \ = true;\n            }\n        }\n    }\n\n    std::vector<int> result(n, -1);\n\
+    \    result[root] = root;\n    for (int vertex = 0; vertex < n; ++vertex) {\n\
+    \        if (!reachable[vertex] || vertex == root) continue;\n        for (int\
+    \ candidate = 0; candidate < n; ++candidate) {\n            if (\n           \
+    \     candidate == vertex ||\n                !dominator[vertex][candidate]\n\
+    \            ) {\n                continue;\n            }\n            bool immediate\
+    \ = true;\n            for (int other = 0; other < n; ++other) {\n           \
+    \     if (\n                    other == vertex ||\n                    other\
+    \ == candidate ||\n                    !dominator[vertex][other]\n           \
+    \     ) {\n                    continue;\n                }\n                if\
+    \ (dominator[other][candidate]) {\n                    immediate = false;\n  \
+    \                  break;\n                }\n            }\n            if (immediate)\
+    \ {\n                result[vertex] = candidate;\n                break;\n   \
+    \         }\n        }\n    }\n    return result;\n}\n\nvoid test_randomized()\
+    \ {\n    std::uint64_t state = 1601;\n    auto random = [&state]() {\n       \
+    \ state ^= state << 7;\n        state ^= state >> 9;\n        return state;\n\
+    \    };\n\n    for (int trial = 0; trial < 5000; ++trial) {\n        int n = 1\
+    \ + int(random() % 12);\n        m1une::graph::Graph<> graph(n);\n        for\
+    \ (int from = 0; from < n; ++from) {\n            for (int to = 0; to < n; ++to)\
+    \ {\n                if (random() % 5 == 0) {\n                    graph.add_directed_edge(from,\
+    \ to);\n                }\n            }\n        }\n        int root = int(random()\
+    \ % n);\n        auto actual = m1une::graph::dominator_tree(graph, root);\n  \
+    \      auto expected = brute_idom(graph, root);\n        assert(actual.immediate_dominator\
+    \ == expected);\n\n        for (int vertex = 0; vertex < n; ++vertex) {\n    \
+    \        assert(actual.reachable(vertex) == (expected[vertex] != -1));\n     \
+    \       for (int ancestor = 0; ancestor < n; ++ancestor) {\n                [[maybe_unused]]\
+    \ bool dominates = false;\n                if (expected[vertex] != -1) {\n   \
+    \                 for (\n                        int current = vertex;\n     \
+    \                   current != -1;\n                        current = current\
+    \ == root\n                            ? -1\n                            : expected[current]\n\
+    \                    ) {\n                        if (current == ancestor) dominates\
+    \ = true;\n                    }\n                }\n                assert(actual.dominates(ancestor,\
     \ vertex) == dominates);\n            }\n        }\n    }\n}\n\nvoid test_long_path()\
     \ {\n    constexpr int n = 200000;\n    m1une::graph::Graph<> graph(n);\n    for\
     \ (int vertex = 1; vertex < n; ++vertex) {\n        graph.add_directed_edge(vertex\
@@ -562,7 +595,7 @@ data:
   isVerificationFile: true
   path: verify/graph/dominator_tree.test.cpp
   requiredBy: []
-  timestamp: '2026-08-26 23:16:21+09:00'
+  timestamp: '2026-10-06 01:57:24+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/graph/dominator_tree.test.cpp

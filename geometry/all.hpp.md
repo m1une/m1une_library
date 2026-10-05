@@ -246,7 +246,7 @@ data:
   isVerificationFile: false
   path: geometry/all.hpp
   requiredBy: []
-  timestamp: '2026-10-05 22:23:07+09:00'
+  timestamp: '2026-10-06 02:48:54+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/rational.test.cpp
