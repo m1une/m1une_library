@@ -7,6 +7,9 @@ data:
     path: verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
     title: verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/segtree/rollback_lazy_segtree.test.cpp
+    title: verify/ds/segtree/rollback_lazy_segtree.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/monoid/commutative_flags.test.cpp
     title: verify/monoid/commutative_flags.test.cpp
   _isVerificationFailed: false
@@ -16,95 +19,105 @@ data:
     links: []
   bundledCode: "#line 1 \"acted_monoid/range_bitwise_and_or_xor_range_sum.hpp\"\n\n\
     \n\n#include <array>\n#include <limits>\n#include <type_traits>\n\nnamespace m1une\
-    \ {\nnamespace acted_monoid {\n\ntemplate <typename T, int BITS>\nstruct RangeBitwiseAndOrXorRangeSumNode\
-    \ {\n    T sum;\n    std::array<long long, BITS> bit_count;\n    long long size;\n\
-    };\n\n// Acted monoid for range bitwise AND, OR, and XOR updates and range sum\
-    \ queries.\ntemplate <typename T, int BITS = 30>\nstruct RangeBitwiseAndOrXorRangeSum\
-    \ {\n    static_assert(std::is_integral_v<T> && !std::is_same_v<std::remove_cv_t<T>,\
+    \ {\nnamespace acted_monoid {\n\ntemplate <typename T, int BITS, typename Count\
+    \ = long long>\nstruct RangeBitwiseAndOrXorRangeSumNode {\n    T sum;\n    std::array<Count,\
+    \ BITS> bit_count;\n    Count size;\n};\n\n// Acted monoid for range bitwise AND,\
+    \ OR, and XOR updates and range sum queries.\ntemplate <typename T, int BITS =\
+    \ 30, typename Count = long long>\nstruct RangeBitwiseAndOrXorRangeSum {\n   \
+    \ static_assert(std::is_integral_v<T> && !std::is_same_v<std::remove_cv_t<T>,\
     \ bool>);\n    static_assert(0 < BITS && BITS <= std::numeric_limits<T>::digits);\n\
-    \n    using value_type = RangeBitwiseAndOrXorRangeSumNode<T, BITS>;\n\n    //\
-    \ Represents f(x) = (x & and_mask) ^ xor_mask on the lowest BITS bits.\n    struct\
-    \ operator_type {\n        T and_mask;\n        T xor_mask;\n    };\n\n    static\
-    \ constexpr bool commutative = true;\n    static constexpr bool operator_commutative\
-    \ = false;\n\n    static constexpr T bit_mask() {\n        if constexpr (std::is_unsigned_v<T>\
-    \ && BITS == std::numeric_limits<T>::digits) {\n            return ~T(0);\n  \
-    \      } else {\n            return (T(1) << (BITS - 1)) | ((T(1) << (BITS - 1))\
-    \ - 1);\n        }\n    }\n\n    static constexpr value_type id() {\n        value_type\
-    \ res;\n        res.sum = T(0);\n        res.bit_count.fill(0);\n        res.size\
-    \ = 0;\n        return res;\n    }\n\n    static constexpr value_type op(const\
-    \ value_type& a, const value_type& b) {\n        value_type res;\n        res.sum\
-    \ = a.sum + b.sum;\n        res.size = a.size + b.size;\n        for (int i =\
-    \ 0; i < BITS; ++i) {\n            res.bit_count[i] = a.bit_count[i] + b.bit_count[i];\n\
-    \        }\n        return res;\n    }\n\n    static constexpr operator_type op_id()\
-    \ {\n        return {bit_mask(), T(0)};\n    }\n\n    // Returns f(g(x)).\n  \
-    \  static constexpr operator_type op_comp(const operator_type& f, const operator_type&\
-    \ g) {\n        return {f.and_mask & g.and_mask, (g.xor_mask & f.and_mask) ^ f.xor_mask};\n\
-    \    }\n\n    static constexpr value_type mapping(const operator_type& f, const\
-    \ value_type& x) {\n        value_type res = x;\n        res.sum = T(0);\n   \
-    \     for (int i = 0; i < BITS; ++i) {\n            long long count = ((f.and_mask\
-    \ >> i) & T(1)) ? x.bit_count[i] : 0;\n            if ((f.xor_mask >> i) & T(1))\
-    \ count = x.size - count;\n            res.bit_count[i] = count;\n           \
-    \ res.sum += static_cast<T>(count) * (T(1) << i);\n        }\n        return res;\n\
-    \    }\n\n    static constexpr value_type make(const T& value) {\n        value_type\
-    \ res;\n        res.sum = value;\n        res.size = 1;\n        for (int i =\
-    \ 0; i < BITS; ++i) {\n            res.bit_count[i] = (value >> i) & T(1);\n \
-    \       }\n        return res;\n    }\n\n    static constexpr operator_type make_and(const\
-    \ T& mask) {\n        return {mask & bit_mask(), T(0)};\n    }\n\n    static constexpr\
-    \ operator_type make_or(const T& mask) {\n        T normalized = mask & bit_mask();\n\
-    \        return {bit_mask() ^ normalized, normalized};\n    }\n\n    static constexpr\
-    \ operator_type make_xor(const T& mask) {\n        return {bit_mask(), mask &\
-    \ bit_mask()};\n    }\n};\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\
-    \n\n"
+    \n    static_assert(std::is_integral_v<Count> && !std::is_same_v<std::remove_cv_t<Count>,\
+    \ bool>);\n\n    using value_type = RangeBitwiseAndOrXorRangeSumNode<T, BITS,\
+    \ Count>;\n\n    // Represents f(x) = (x & and_mask) ^ xor_mask on the lowest\
+    \ BITS bits.\n    struct operator_type {\n        T and_mask;\n        T xor_mask;\n\
+    \    };\n\n    static constexpr bool commutative = true;\n    static constexpr\
+    \ bool operator_commutative = false;\n\n    static constexpr T bit_mask() {\n\
+    \        if constexpr (std::is_unsigned_v<T> && BITS == std::numeric_limits<T>::digits)\
+    \ {\n            return ~T(0);\n        } else {\n            return (T(1) <<\
+    \ (BITS - 1)) | ((T(1) << (BITS - 1)) - 1);\n        }\n    }\n\n    static constexpr\
+    \ value_type id() {\n        value_type res;\n        res.sum = T(0);\n      \
+    \  res.bit_count.fill(0);\n        res.size = 0;\n        return res;\n    }\n\
+    \n    static constexpr value_type op(const value_type& a, const value_type& b)\
+    \ {\n        value_type res;\n        res.sum = a.sum + b.sum;\n        res.size\
+    \ = a.size + b.size;\n        for (int i = 0; i < BITS; ++i) {\n            res.bit_count[i]\
+    \ = a.bit_count[i] + b.bit_count[i];\n        }\n        return res;\n    }\n\n\
+    \    static constexpr operator_type op_id() {\n        return {bit_mask(), T(0)};\n\
+    \    }\n\n    // Returns f(g(x)).\n    static constexpr operator_type op_comp(const\
+    \ operator_type& f, const operator_type& g) {\n        return {f.and_mask & g.and_mask,\
+    \ (g.xor_mask & f.and_mask) ^ f.xor_mask};\n    }\n\n    static constexpr value_type\
+    \ mapping(const operator_type& f, const value_type& x) {\n        value_type res\
+    \ = x;\n        res.sum = T(0);\n        for (int i = 0; i < BITS; ++i) {\n  \
+    \          // Use full-width masks so both selections can be vectorized.\n   \
+    \         Count keep = -static_cast<Count>((f.and_mask >> i) & T(1));\n      \
+    \      Count flip = -static_cast<Count>((f.xor_mask >> i) & T(1));\n         \
+    \   Count count = x.bit_count[i] & keep;\n            count = (count & ~flip)\
+    \ | ((x.size - count) & flip);\n            res.bit_count[i] = count;\n      \
+    \      res.sum += static_cast<T>(count) * (T(1) << i);\n        }\n        return\
+    \ res;\n    }\n\n    static constexpr value_type make(const T& value) {\n    \
+    \    value_type res;\n        res.sum = value;\n        res.size = 1;\n      \
+    \  for (int i = 0; i < BITS; ++i) {\n            res.bit_count[i] = (value >>\
+    \ i) & T(1);\n        }\n        return res;\n    }\n\n    static constexpr operator_type\
+    \ make_and(const T& mask) {\n        return {mask & bit_mask(), T(0)};\n    }\n\
+    \n    static constexpr operator_type make_or(const T& mask) {\n        T normalized\
+    \ = mask & bit_mask();\n        return {bit_mask() ^ normalized, normalized};\n\
+    \    }\n\n    static constexpr operator_type make_xor(const T& mask) {\n     \
+    \   return {bit_mask(), mask & bit_mask()};\n    }\n};\n\n}  // namespace acted_monoid\n\
+    }  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_ACTED_MONOID_RANGE_BITWISE_AND_OR_XOR_RANGE_SUM_HPP\n#define\
     \ M1UNE_ACTED_MONOID_RANGE_BITWISE_AND_OR_XOR_RANGE_SUM_HPP 1\n\n#include <array>\n\
     #include <limits>\n#include <type_traits>\n\nnamespace m1une {\nnamespace acted_monoid\
-    \ {\n\ntemplate <typename T, int BITS>\nstruct RangeBitwiseAndOrXorRangeSumNode\
-    \ {\n    T sum;\n    std::array<long long, BITS> bit_count;\n    long long size;\n\
-    };\n\n// Acted monoid for range bitwise AND, OR, and XOR updates and range sum\
-    \ queries.\ntemplate <typename T, int BITS = 30>\nstruct RangeBitwiseAndOrXorRangeSum\
+    \ {\n\ntemplate <typename T, int BITS, typename Count = long long>\nstruct RangeBitwiseAndOrXorRangeSumNode\
+    \ {\n    T sum;\n    std::array<Count, BITS> bit_count;\n    Count size;\n};\n\
+    \n// Acted monoid for range bitwise AND, OR, and XOR updates and range sum queries.\n\
+    template <typename T, int BITS = 30, typename Count = long long>\nstruct RangeBitwiseAndOrXorRangeSum\
     \ {\n    static_assert(std::is_integral_v<T> && !std::is_same_v<std::remove_cv_t<T>,\
     \ bool>);\n    static_assert(0 < BITS && BITS <= std::numeric_limits<T>::digits);\n\
-    \n    using value_type = RangeBitwiseAndOrXorRangeSumNode<T, BITS>;\n\n    //\
-    \ Represents f(x) = (x & and_mask) ^ xor_mask on the lowest BITS bits.\n    struct\
-    \ operator_type {\n        T and_mask;\n        T xor_mask;\n    };\n\n    static\
-    \ constexpr bool commutative = true;\n    static constexpr bool operator_commutative\
-    \ = false;\n\n    static constexpr T bit_mask() {\n        if constexpr (std::is_unsigned_v<T>\
-    \ && BITS == std::numeric_limits<T>::digits) {\n            return ~T(0);\n  \
-    \      } else {\n            return (T(1) << (BITS - 1)) | ((T(1) << (BITS - 1))\
-    \ - 1);\n        }\n    }\n\n    static constexpr value_type id() {\n        value_type\
-    \ res;\n        res.sum = T(0);\n        res.bit_count.fill(0);\n        res.size\
-    \ = 0;\n        return res;\n    }\n\n    static constexpr value_type op(const\
-    \ value_type& a, const value_type& b) {\n        value_type res;\n        res.sum\
-    \ = a.sum + b.sum;\n        res.size = a.size + b.size;\n        for (int i =\
-    \ 0; i < BITS; ++i) {\n            res.bit_count[i] = a.bit_count[i] + b.bit_count[i];\n\
-    \        }\n        return res;\n    }\n\n    static constexpr operator_type op_id()\
-    \ {\n        return {bit_mask(), T(0)};\n    }\n\n    // Returns f(g(x)).\n  \
-    \  static constexpr operator_type op_comp(const operator_type& f, const operator_type&\
-    \ g) {\n        return {f.and_mask & g.and_mask, (g.xor_mask & f.and_mask) ^ f.xor_mask};\n\
-    \    }\n\n    static constexpr value_type mapping(const operator_type& f, const\
-    \ value_type& x) {\n        value_type res = x;\n        res.sum = T(0);\n   \
-    \     for (int i = 0; i < BITS; ++i) {\n            long long count = ((f.and_mask\
-    \ >> i) & T(1)) ? x.bit_count[i] : 0;\n            if ((f.xor_mask >> i) & T(1))\
-    \ count = x.size - count;\n            res.bit_count[i] = count;\n           \
-    \ res.sum += static_cast<T>(count) * (T(1) << i);\n        }\n        return res;\n\
-    \    }\n\n    static constexpr value_type make(const T& value) {\n        value_type\
-    \ res;\n        res.sum = value;\n        res.size = 1;\n        for (int i =\
-    \ 0; i < BITS; ++i) {\n            res.bit_count[i] = (value >> i) & T(1);\n \
-    \       }\n        return res;\n    }\n\n    static constexpr operator_type make_and(const\
-    \ T& mask) {\n        return {mask & bit_mask(), T(0)};\n    }\n\n    static constexpr\
-    \ operator_type make_or(const T& mask) {\n        T normalized = mask & bit_mask();\n\
-    \        return {bit_mask() ^ normalized, normalized};\n    }\n\n    static constexpr\
-    \ operator_type make_xor(const T& mask) {\n        return {bit_mask(), mask &\
-    \ bit_mask()};\n    }\n};\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\
-    \n#endif  // M1UNE_ACTED_MONOID_RANGE_BITWISE_AND_OR_XOR_RANGE_SUM_HPP\n"
+    \n    static_assert(std::is_integral_v<Count> && !std::is_same_v<std::remove_cv_t<Count>,\
+    \ bool>);\n\n    using value_type = RangeBitwiseAndOrXorRangeSumNode<T, BITS,\
+    \ Count>;\n\n    // Represents f(x) = (x & and_mask) ^ xor_mask on the lowest\
+    \ BITS bits.\n    struct operator_type {\n        T and_mask;\n        T xor_mask;\n\
+    \    };\n\n    static constexpr bool commutative = true;\n    static constexpr\
+    \ bool operator_commutative = false;\n\n    static constexpr T bit_mask() {\n\
+    \        if constexpr (std::is_unsigned_v<T> && BITS == std::numeric_limits<T>::digits)\
+    \ {\n            return ~T(0);\n        } else {\n            return (T(1) <<\
+    \ (BITS - 1)) | ((T(1) << (BITS - 1)) - 1);\n        }\n    }\n\n    static constexpr\
+    \ value_type id() {\n        value_type res;\n        res.sum = T(0);\n      \
+    \  res.bit_count.fill(0);\n        res.size = 0;\n        return res;\n    }\n\
+    \n    static constexpr value_type op(const value_type& a, const value_type& b)\
+    \ {\n        value_type res;\n        res.sum = a.sum + b.sum;\n        res.size\
+    \ = a.size + b.size;\n        for (int i = 0; i < BITS; ++i) {\n            res.bit_count[i]\
+    \ = a.bit_count[i] + b.bit_count[i];\n        }\n        return res;\n    }\n\n\
+    \    static constexpr operator_type op_id() {\n        return {bit_mask(), T(0)};\n\
+    \    }\n\n    // Returns f(g(x)).\n    static constexpr operator_type op_comp(const\
+    \ operator_type& f, const operator_type& g) {\n        return {f.and_mask & g.and_mask,\
+    \ (g.xor_mask & f.and_mask) ^ f.xor_mask};\n    }\n\n    static constexpr value_type\
+    \ mapping(const operator_type& f, const value_type& x) {\n        value_type res\
+    \ = x;\n        res.sum = T(0);\n        for (int i = 0; i < BITS; ++i) {\n  \
+    \          // Use full-width masks so both selections can be vectorized.\n   \
+    \         Count keep = -static_cast<Count>((f.and_mask >> i) & T(1));\n      \
+    \      Count flip = -static_cast<Count>((f.xor_mask >> i) & T(1));\n         \
+    \   Count count = x.bit_count[i] & keep;\n            count = (count & ~flip)\
+    \ | ((x.size - count) & flip);\n            res.bit_count[i] = count;\n      \
+    \      res.sum += static_cast<T>(count) * (T(1) << i);\n        }\n        return\
+    \ res;\n    }\n\n    static constexpr value_type make(const T& value) {\n    \
+    \    value_type res;\n        res.sum = value;\n        res.size = 1;\n      \
+    \  for (int i = 0; i < BITS; ++i) {\n            res.bit_count[i] = (value >>\
+    \ i) & T(1);\n        }\n        return res;\n    }\n\n    static constexpr operator_type\
+    \ make_and(const T& mask) {\n        return {mask & bit_mask(), T(0)};\n    }\n\
+    \n    static constexpr operator_type make_or(const T& mask) {\n        T normalized\
+    \ = mask & bit_mask();\n        return {bit_mask() ^ normalized, normalized};\n\
+    \    }\n\n    static constexpr operator_type make_xor(const T& mask) {\n     \
+    \   return {bit_mask(), mask & bit_mask()};\n    }\n};\n\n}  // namespace acted_monoid\n\
+    }  // namespace m1une\n\n#endif  // M1UNE_ACTED_MONOID_RANGE_BITWISE_AND_OR_XOR_RANGE_SUM_HPP\n"
   dependsOn: []
   isVerificationFile: false
   path: acted_monoid/range_bitwise_and_or_xor_range_sum.hpp
   requiredBy: []
-  timestamp: '2026-08-12 00:05:48+09:00'
+  timestamp: '2026-10-24 12:29:25+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/monoid/commutative_flags.test.cpp
+  - verify/ds/segtree/rollback_lazy_segtree.test.cpp
   - verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
 documentation_of: acted_monoid/range_bitwise_and_or_xor_range_sum.hpp
 layout: document
@@ -113,7 +126,7 @@ title: Range Bitwise AND/OR/XOR Range Sum
 
 ## Overview
 
-`RangeBitwiseAndOrXorRangeSum<T, BITS>` is an acted monoid for range bitwise
+`RangeBitwiseAndOrXorRangeSum<T, BITS, Count>` is an acted monoid for range bitwise
 AND, OR, and XOR updates and range sum queries. It is intended for lazy data
 structures such as `LazySegtree`.
 
@@ -127,8 +140,8 @@ $$
 This form represents AND, OR, XOR, and every composition of those operations.
 The order of lazy operators matters.
 
-`value_type` has members `T sum`, `std::array<long long, BITS> bit_count`, and
-`long long size`. `operator_type` has members `T and_mask` and `T xor_mask`.
+`value_type` has members `T sum`, `std::array<Count, BITS> bit_count`, and
+`Count size`. `operator_type` has members `T and_mask` and `T xor_mask`.
 Prefer the three update factories below instead of constructing an operator
 directly.
 
@@ -139,6 +152,11 @@ directly.
 * `BITS`: Number of low bits to track. It defaults to `30` and must not exceed
   `std::numeric_limits<T>::digits`. For values below $2^{60}$, use
   `RangeBitwiseAndOrXorRangeSum<long long, 60>`.
+* `Count`: A non-boolean integral type for segment sizes and per-bit counts. It
+  defaults to `long long` for compatibility. Every represented segment size
+  must fit in `Count`. For a fixed-size segment tree with at most `INT_MAX`
+  elements, `RangeBitwiseAndOrXorRangeSum<unsigned int, 30, int>` uses smaller
+  aggregates and allows more counts to be processed per SIMD instruction.
 
 ## Interface and Complexity
 

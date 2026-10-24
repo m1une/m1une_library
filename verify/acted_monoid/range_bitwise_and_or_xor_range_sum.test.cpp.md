@@ -48,14 +48,16 @@ data:
     \n\n#line 1 \"acted_monoid/range_bitwise_and_or_xor_range_sum.hpp\"\n\n\n\n#include\
     \ <array>\n#line 6 \"acted_monoid/range_bitwise_and_or_xor_range_sum.hpp\"\n#include\
     \ <type_traits>\n\nnamespace m1une {\nnamespace acted_monoid {\n\ntemplate <typename\
-    \ T, int BITS>\nstruct RangeBitwiseAndOrXorRangeSumNode {\n    T sum;\n    std::array<long\
-    \ long, BITS> bit_count;\n    long long size;\n};\n\n// Acted monoid for range\
-    \ bitwise AND, OR, and XOR updates and range sum queries.\ntemplate <typename\
-    \ T, int BITS = 30>\nstruct RangeBitwiseAndOrXorRangeSum {\n    static_assert(std::is_integral_v<T>\
-    \ && !std::is_same_v<std::remove_cv_t<T>, bool>);\n    static_assert(0 < BITS\
-    \ && BITS <= std::numeric_limits<T>::digits);\n\n    using value_type = RangeBitwiseAndOrXorRangeSumNode<T,\
-    \ BITS>;\n\n    // Represents f(x) = (x & and_mask) ^ xor_mask on the lowest BITS\
-    \ bits.\n    struct operator_type {\n        T and_mask;\n        T xor_mask;\n\
+    \ T, int BITS, typename Count = long long>\nstruct RangeBitwiseAndOrXorRangeSumNode\
+    \ {\n    T sum;\n    std::array<Count, BITS> bit_count;\n    Count size;\n};\n\
+    \n// Acted monoid for range bitwise AND, OR, and XOR updates and range sum queries.\n\
+    template <typename T, int BITS = 30, typename Count = long long>\nstruct RangeBitwiseAndOrXorRangeSum\
+    \ {\n    static_assert(std::is_integral_v<T> && !std::is_same_v<std::remove_cv_t<T>,\
+    \ bool>);\n    static_assert(0 < BITS && BITS <= std::numeric_limits<T>::digits);\n\
+    \n    static_assert(std::is_integral_v<Count> && !std::is_same_v<std::remove_cv_t<Count>,\
+    \ bool>);\n\n    using value_type = RangeBitwiseAndOrXorRangeSumNode<T, BITS,\
+    \ Count>;\n\n    // Represents f(x) = (x & and_mask) ^ xor_mask on the lowest\
+    \ BITS bits.\n    struct operator_type {\n        T and_mask;\n        T xor_mask;\n\
     \    };\n\n    static constexpr bool commutative = true;\n    static constexpr\
     \ bool operator_commutative = false;\n\n    static constexpr T bit_mask() {\n\
     \        if constexpr (std::is_unsigned_v<T> && BITS == std::numeric_limits<T>::digits)\
@@ -73,61 +75,63 @@ data:
     \ (g.xor_mask & f.and_mask) ^ f.xor_mask};\n    }\n\n    static constexpr value_type\
     \ mapping(const operator_type& f, const value_type& x) {\n        value_type res\
     \ = x;\n        res.sum = T(0);\n        for (int i = 0; i < BITS; ++i) {\n  \
-    \          long long count = ((f.and_mask >> i) & T(1)) ? x.bit_count[i] : 0;\n\
-    \            if ((f.xor_mask >> i) & T(1)) count = x.size - count;\n         \
-    \   res.bit_count[i] = count;\n            res.sum += static_cast<T>(count) *\
-    \ (T(1) << i);\n        }\n        return res;\n    }\n\n    static constexpr\
-    \ value_type make(const T& value) {\n        value_type res;\n        res.sum\
-    \ = value;\n        res.size = 1;\n        for (int i = 0; i < BITS; ++i) {\n\
-    \            res.bit_count[i] = (value >> i) & T(1);\n        }\n        return\
-    \ res;\n    }\n\n    static constexpr operator_type make_and(const T& mask) {\n\
-    \        return {mask & bit_mask(), T(0)};\n    }\n\n    static constexpr operator_type\
-    \ make_or(const T& mask) {\n        T normalized = mask & bit_mask();\n      \
-    \  return {bit_mask() ^ normalized, normalized};\n    }\n\n    static constexpr\
-    \ operator_type make_xor(const T& mask) {\n        return {bit_mask(), mask &\
-    \ bit_mask()};\n    }\n};\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\
-    \n\n#line 1 \"ds/segtree/lazy_segtree.hpp\"\n\n\n\n#include <bit>\n#line 7 \"\
-    ds/segtree/lazy_segtree.hpp\"\n#include <utility>\n#line 9 \"ds/segtree/lazy_segtree.hpp\"\
-    \n\n#line 1 \"math/bit_ceil.hpp\"\n\n\n\nnamespace m1une {\nnamespace math {\n\
-    \ntemplate <typename T>\nconstexpr T bit_ceil(T n) {\n    if (n <= 1) return 1;\n\
-    \    T x = 1;\n    while (x < n) x <<= 1;\n    return x;\n}\n\n}  // namespace\
-    \ math\n}  // namespace m1une\n\n\n#line 12 \"ds/segtree/lazy_segtree.hpp\"\n\n\
-    namespace m1une {\nnamespace ds {\n\n// A highly generic Lazy Segment Tree utilizing\
-    \ C++20 Concepts for type safety.\n// It operates on any Acted Monoid structure\
-    \ satisfying the `m1une::acted_monoid::IsActedMonoid` concept.\ntemplate <m1une::acted_monoid::IsActedMonoid\
-    \ ActedMonoid>\nstruct LazySegtree {\n    using T = typename ActedMonoid::value_type;\n\
-    \    using F = typename ActedMonoid::operator_type;\n\n   private:\n    int _n,\
-    \ _size, _log;\n    std::vector<T> _d;\n    std::vector<F> _lz;\n\n    // Recalculates\
-    \ the value of the node k from its children.\n    void update(int k) {\n     \
-    \   _d[k] = ActedMonoid::op(_d[2 * k], _d[2 * k + 1]);\n    }\n\n    static T\
-    \ mapping_at(const F& f, const T& value, long long ord) {\n        if constexpr\
-    \ (requires(F g, T x, long long i) { ActedMonoid::mapping(g, x, i); }) {\n   \
-    \         return ActedMonoid::mapping(f, value, ord);\n        } else {\n    \
-    \        return ActedMonoid::mapping(f, value);\n        }\n    }\n\n    static\
-    \ F shift_operator(const F& f, long long ord) {\n        if constexpr (requires(F\
-    \ g, long long i) { ActedMonoid::op_shift(g, i); }) {\n            return ActedMonoid::op_shift(f,\
-    \ ord);\n        } else {\n            return f;\n        }\n    }\n\n    int\
-    \ node_length(int k) const {\n        int level = std::bit_width((unsigned int)k)\
-    \ - 1;\n        return _size >> level;\n    }\n\n    int node_left(int k) const\
-    \ {\n        int level = std::bit_width((unsigned int)k) - 1;\n        int len\
-    \ = _size >> level;\n        return (k - (1 << level)) * len;\n    }\n\n    //\
-    \ Applies the operator f to the node k and updates its lazy tag if it's an internal\
-    \ node.\n    void all_apply(int k, F f) {\n        _d[k] = mapping_at(f, _d[k],\
-    \ 0);\n        if (k < _size) {\n            _lz[k] = ActedMonoid::op_comp(f,\
-    \ _lz[k]);\n        }\n    }\n\n    // Propagates the lazy tag of the node k down\
-    \ to its children.\n    void push(int k) {\n        all_apply(2 * k, _lz[k]);\n\
-    \        all_apply(2 * k + 1, shift_operator(_lz[k], node_length(k) / 2));\n \
-    \       _lz[k] = ActedMonoid::op_id();\n    }\n\n   public:\n    // Constructs\
-    \ an empty lazy segment tree.\n    LazySegtree() : LazySegtree(0) {}\n\n    //\
-    \ Constructs a lazy segment tree of size `n`, initialized with the identity element.\n\
-    \    explicit LazySegtree(int n) : LazySegtree(std::vector<T>(n, ActedMonoid::id()))\
-    \ {}\n\n    // Constructs a lazy segment tree from an existing vector.\n    explicit\
-    \ LazySegtree(const std::vector<T>& v) : _n(int(v.size())) {\n        _size =\
-    \ m1une::math::bit_ceil((unsigned int)(_n));\n        _log = 0;\n        while\
-    \ ((1U << _log) < (unsigned int)(_size)) _log++;\n        _d.assign(2 * _size,\
-    \ ActedMonoid::id());\n        _lz.assign(_size, ActedMonoid::op_id());\n    \
-    \    for (int i = 0; i < _n; i++) _d[_size + i] = v[i];\n        for (int i =\
-    \ _size - 1; i >= 1; i--) update(i);\n    }\n    explicit LazySegtree(std::vector<T>&&\
+    \          // Use full-width masks so both selections can be vectorized.\n   \
+    \         Count keep = -static_cast<Count>((f.and_mask >> i) & T(1));\n      \
+    \      Count flip = -static_cast<Count>((f.xor_mask >> i) & T(1));\n         \
+    \   Count count = x.bit_count[i] & keep;\n            count = (count & ~flip)\
+    \ | ((x.size - count) & flip);\n            res.bit_count[i] = count;\n      \
+    \      res.sum += static_cast<T>(count) * (T(1) << i);\n        }\n        return\
+    \ res;\n    }\n\n    static constexpr value_type make(const T& value) {\n    \
+    \    value_type res;\n        res.sum = value;\n        res.size = 1;\n      \
+    \  for (int i = 0; i < BITS; ++i) {\n            res.bit_count[i] = (value >>\
+    \ i) & T(1);\n        }\n        return res;\n    }\n\n    static constexpr operator_type\
+    \ make_and(const T& mask) {\n        return {mask & bit_mask(), T(0)};\n    }\n\
+    \n    static constexpr operator_type make_or(const T& mask) {\n        T normalized\
+    \ = mask & bit_mask();\n        return {bit_mask() ^ normalized, normalized};\n\
+    \    }\n\n    static constexpr operator_type make_xor(const T& mask) {\n     \
+    \   return {bit_mask(), mask & bit_mask()};\n    }\n};\n\n}  // namespace acted_monoid\n\
+    }  // namespace m1une\n\n\n#line 1 \"ds/segtree/lazy_segtree.hpp\"\n\n\n\n#include\
+    \ <bit>\n#line 7 \"ds/segtree/lazy_segtree.hpp\"\n#include <utility>\n#line 9\
+    \ \"ds/segtree/lazy_segtree.hpp\"\n\n#line 1 \"math/bit_ceil.hpp\"\n\n\n\nnamespace\
+    \ m1une {\nnamespace math {\n\ntemplate <typename T>\nconstexpr T bit_ceil(T n)\
+    \ {\n    if (n <= 1) return 1;\n    T x = 1;\n    while (x < n) x <<= 1;\n   \
+    \ return x;\n}\n\n}  // namespace math\n}  // namespace m1une\n\n\n#line 12 \"\
+    ds/segtree/lazy_segtree.hpp\"\n\nnamespace m1une {\nnamespace ds {\n\n// A highly\
+    \ generic Lazy Segment Tree utilizing C++20 Concepts for type safety.\n// It operates\
+    \ on any Acted Monoid structure satisfying the `m1une::acted_monoid::IsActedMonoid`\
+    \ concept.\ntemplate <m1une::acted_monoid::IsActedMonoid ActedMonoid>\nstruct\
+    \ LazySegtree {\n    using T = typename ActedMonoid::value_type;\n    using F\
+    \ = typename ActedMonoid::operator_type;\n\n   private:\n    int _n, _size, _log;\n\
+    \    std::vector<T> _d;\n    std::vector<F> _lz;\n\n    // Recalculates the value\
+    \ of the node k from its children.\n    void update(int k) {\n        _d[k] =\
+    \ ActedMonoid::op(_d[2 * k], _d[2 * k + 1]);\n    }\n\n    static T mapping_at(const\
+    \ F& f, const T& value, long long ord) {\n        if constexpr (requires(F g,\
+    \ T x, long long i) { ActedMonoid::mapping(g, x, i); }) {\n            return\
+    \ ActedMonoid::mapping(f, value, ord);\n        } else {\n            return ActedMonoid::mapping(f,\
+    \ value);\n        }\n    }\n\n    static F shift_operator(const F& f, long long\
+    \ ord) {\n        if constexpr (requires(F g, long long i) { ActedMonoid::op_shift(g,\
+    \ i); }) {\n            return ActedMonoid::op_shift(f, ord);\n        } else\
+    \ {\n            return f;\n        }\n    }\n\n    int node_length(int k) const\
+    \ {\n        int level = std::bit_width((unsigned int)k) - 1;\n        return\
+    \ _size >> level;\n    }\n\n    int node_left(int k) const {\n        int level\
+    \ = std::bit_width((unsigned int)k) - 1;\n        int len = _size >> level;\n\
+    \        return (k - (1 << level)) * len;\n    }\n\n    // Applies the operator\
+    \ f to the node k and updates its lazy tag if it's an internal node.\n    void\
+    \ all_apply(int k, F f) {\n        _d[k] = mapping_at(f, _d[k], 0);\n        if\
+    \ (k < _size) {\n            _lz[k] = ActedMonoid::op_comp(f, _lz[k]);\n     \
+    \   }\n    }\n\n    // Propagates the lazy tag of the node k down to its children.\n\
+    \    void push(int k) {\n        all_apply(2 * k, _lz[k]);\n        all_apply(2\
+    \ * k + 1, shift_operator(_lz[k], node_length(k) / 2));\n        _lz[k] = ActedMonoid::op_id();\n\
+    \    }\n\n   public:\n    // Constructs an empty lazy segment tree.\n    LazySegtree()\
+    \ : LazySegtree(0) {}\n\n    // Constructs a lazy segment tree of size `n`, initialized\
+    \ with the identity element.\n    explicit LazySegtree(int n) : LazySegtree(std::vector<T>(n,\
+    \ ActedMonoid::id())) {}\n\n    // Constructs a lazy segment tree from an existing\
+    \ vector.\n    explicit LazySegtree(const std::vector<T>& v) : _n(int(v.size()))\
+    \ {\n        _size = m1une::math::bit_ceil((unsigned int)(_n));\n        _log\
+    \ = 0;\n        while ((1U << _log) < (unsigned int)(_size)) _log++;\n       \
+    \ _d.assign(2 * _size, ActedMonoid::id());\n        _lz.assign(_size, ActedMonoid::op_id());\n\
+    \        for (int i = 0; i < _n; i++) _d[_size + i] = v[i];\n        for (int\
+    \ i = _size - 1; i >= 1; i--) update(i);\n    }\n    explicit LazySegtree(std::vector<T>&&\
     \ v) : _n(int(v.size())) {\n        _size = m1une::math::bit_ceil((unsigned int)(_n));\n\
     \        _log = 0;\n        while ((1U << _log) < (unsigned int)(_size)) _log++;\n\
     \        _d.assign(2 * _size, ActedMonoid::id());\n        _lz.assign(_size, ActedMonoid::op_id());\n\
@@ -232,32 +236,44 @@ data:
     \ operators) {\n            auto composition = AM::op_comp(f, g);\n          \
     \  for (long long x = 0; x < 32; ++x) {\n                assert(apply_scalar(composition,\
     \ x) == apply_scalar(f, apply_scalar(g, x)));\n            }\n        }\n    }\n\
-    }\n\nvoid test_randomized() {\n    constexpr int n = 73;\n    constexpr long long\
-    \ mask = (1LL << 10) - 1;\n    std::uint64_t state = 123456789;\n    auto random\
-    \ = [&state]() {\n        state ^= state << 7;\n        state ^= state >> 9;\n\
-    \        return state;\n    };\n\n    std::vector<long long> values(n);\n    for\
-    \ (long long& value : values) value = static_cast<long long>(random() & mask);\n\
-    \    m1une::ds::LazySegtree<AM> seg(values);\n\n    for (int step = 0; step <\
-    \ 5000; ++step) {\n        int l = static_cast<int>(random() % (n + 1));\n   \
-    \     int r = static_cast<int>(random() % (n + 1));\n        if (r < l) std::swap(l,\
+    }\n\ntemplate <class AM>\nvoid test_randomized() {\n    constexpr int n = 73;\n\
+    \    constexpr long long mask = (1LL << 10) - 1;\n    std::uint64_t state = 123456789;\n\
+    \    auto random = [&state]() {\n        state ^= state << 7;\n        state ^=\
+    \ state >> 9;\n        return state;\n    };\n\n    std::vector<long long> values(n);\n\
+    \    for (long long& value : values) value = static_cast<long long>(random() &\
+    \ mask);\n    m1une::ds::LazySegtree<AM> seg(values);\n\n    for (int step = 0;\
+    \ step < 5000; ++step) {\n        int l = static_cast<int>(random() % (n + 1));\n\
+    \        int r = static_cast<int>(random() % (n + 1));\n        if (r < l) std::swap(l,\
     \ r);\n\n        if (random() % 4 != 0) {\n            long long operand = static_cast<long\
     \ long>(random() & mask);\n            int type = static_cast<int>(random() %\
-    \ 3);\n            AM::operator_type f = AM::op_id();\n            if (type ==\
-    \ 0) {\n                f = AM::make_and(operand);\n                for (int i\
-    \ = l; i < r; ++i) values[i] &= operand;\n            } else if (type == 1) {\n\
-    \                f = AM::make_or(operand);\n                for (int i = l; i\
-    \ < r; ++i) values[i] |= operand;\n            } else {\n                f = AM::make_xor(operand);\n\
-    \                for (int i = l; i < r; ++i) values[i] ^= operand;\n         \
-    \   }\n            seg.apply(l, r, f);\n        } else {\n            long long\
-    \ expected = 0;\n            for (int i = l; i < r; ++i) expected += values[i];\n\
-    \            assert(seg.prod(l, r).sum == expected);\n        }\n\n        int\
-    \ index = static_cast<int>(random() % n);\n        assert(seg.get(index).sum ==\
-    \ values[index]);\n    }\n}\n\nstatic_assert(m1une::acted_monoid::IsActedMonoid<AM>);\n\
+    \ 3);\n            typename AM::operator_type f = AM::op_id();\n            if\
+    \ (type == 0) {\n                f = AM::make_and(operand);\n                for\
+    \ (int i = l; i < r; ++i) values[i] &= operand;\n            } else if (type ==\
+    \ 1) {\n                f = AM::make_or(operand);\n                for (int i\
+    \ = l; i < r; ++i) values[i] |= operand;\n            } else {\n             \
+    \   f = AM::make_xor(operand);\n                for (int i = l; i < r; ++i) values[i]\
+    \ ^= operand;\n            }\n            seg.apply(l, r, f);\n        } else\
+    \ {\n            long long expected = 0;\n            for (int i = l; i < r; ++i)\
+    \ expected += values[i];\n            assert(seg.prod(l, r).sum == expected);\n\
+    \        }\n\n        int index = static_cast<int>(random() % n);\n        assert(seg.get(index).sum\
+    \ == values[index]);\n    }\n}\n\nvoid test_large_counts() {\n    using Wide =\
+    \ m1une::acted_monoid::RangeBitwiseAndOrXorRangeSum<std::uint64_t>;\n    auto\
+    \ value = Wide::make(3);\n    for (int i = 0; i < 32; ++i) value = Wide::op(value,\
+    \ value);\n    assert(value.size == (1LL << 32));\n    assert(value.bit_count[0]\
+    \ == value.size && value.bit_count[1] == value.size);\n    auto mapped = Wide::mapping(Wide::make_xor(6),\
+    \ value);\n    assert(mapped.sum == 5ULL * (1ULL << 32));\n    assert(mapped.bit_count[0]\
+    \ == value.size);\n    assert(mapped.bit_count[1] == 0);\n    assert(mapped.bit_count[2]\
+    \ == value.size);\n\n    auto high = UnsignedFullWidth::make(1ULL << 63);\n  \
+    \  auto low = UnsignedFullWidth::mapping(UnsignedFullWidth::make_xor(~0ULL), high);\n\
+    \    assert(low.sum == (1ULL << 63) - 1);\n    assert(low.bit_count[63] == 0 &&\
+    \ low.bit_count[62] == 1);\n}\n\nstatic_assert(m1une::acted_monoid::IsActedMonoid<AM>);\n\
     static_assert(AM::commutative);\nstatic_assert(!AM::operator_commutative);\nstatic_assert(SignedFullWidth::bit_mask()\
     \ == std::numeric_limits<long long>::max());\nstatic_assert(UnsignedFullWidth::bit_mask()\
     \ == std::numeric_limits<unsigned long long>::max());\n\n}  // namespace\n\nint\
-    \ main() {\n    test_composition();\n    test_randomized();\n\n    long long a,\
-    \ b;\n    std::cin >> a >> b;\n    std::cout << a + b << '\\n';\n}\n"
+    \ main() {\n    test_composition();\n    test_randomized<AM>();\n    test_randomized<m1une::acted_monoid::RangeBitwiseAndOrXorRangeSum<long\
+    \ long, 10, int>>();\n    test_randomized<m1une::acted_monoid::RangeBitwiseAndOrXorRangeSum<std::uint32_t,\
+    \ 10, int>>();\n    test_large_counts();\n\n    long long a, b;\n    std::cin\
+    \ >> a >> b;\n    std::cout << a + b << '\\n';\n}\n"
   code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <algorithm>\n\
     #include <cassert>\n#include <cstdint>\n#include <iostream>\n#include <limits>\n\
     #include <vector>\n\n#include \"../../acted_monoid/concept.hpp\"\n#include \"\
@@ -274,32 +290,44 @@ data:
     \ operators) {\n            auto composition = AM::op_comp(f, g);\n          \
     \  for (long long x = 0; x < 32; ++x) {\n                assert(apply_scalar(composition,\
     \ x) == apply_scalar(f, apply_scalar(g, x)));\n            }\n        }\n    }\n\
-    }\n\nvoid test_randomized() {\n    constexpr int n = 73;\n    constexpr long long\
-    \ mask = (1LL << 10) - 1;\n    std::uint64_t state = 123456789;\n    auto random\
-    \ = [&state]() {\n        state ^= state << 7;\n        state ^= state >> 9;\n\
-    \        return state;\n    };\n\n    std::vector<long long> values(n);\n    for\
-    \ (long long& value : values) value = static_cast<long long>(random() & mask);\n\
-    \    m1une::ds::LazySegtree<AM> seg(values);\n\n    for (int step = 0; step <\
-    \ 5000; ++step) {\n        int l = static_cast<int>(random() % (n + 1));\n   \
-    \     int r = static_cast<int>(random() % (n + 1));\n        if (r < l) std::swap(l,\
+    }\n\ntemplate <class AM>\nvoid test_randomized() {\n    constexpr int n = 73;\n\
+    \    constexpr long long mask = (1LL << 10) - 1;\n    std::uint64_t state = 123456789;\n\
+    \    auto random = [&state]() {\n        state ^= state << 7;\n        state ^=\
+    \ state >> 9;\n        return state;\n    };\n\n    std::vector<long long> values(n);\n\
+    \    for (long long& value : values) value = static_cast<long long>(random() &\
+    \ mask);\n    m1une::ds::LazySegtree<AM> seg(values);\n\n    for (int step = 0;\
+    \ step < 5000; ++step) {\n        int l = static_cast<int>(random() % (n + 1));\n\
+    \        int r = static_cast<int>(random() % (n + 1));\n        if (r < l) std::swap(l,\
     \ r);\n\n        if (random() % 4 != 0) {\n            long long operand = static_cast<long\
     \ long>(random() & mask);\n            int type = static_cast<int>(random() %\
-    \ 3);\n            AM::operator_type f = AM::op_id();\n            if (type ==\
-    \ 0) {\n                f = AM::make_and(operand);\n                for (int i\
-    \ = l; i < r; ++i) values[i] &= operand;\n            } else if (type == 1) {\n\
-    \                f = AM::make_or(operand);\n                for (int i = l; i\
-    \ < r; ++i) values[i] |= operand;\n            } else {\n                f = AM::make_xor(operand);\n\
-    \                for (int i = l; i < r; ++i) values[i] ^= operand;\n         \
-    \   }\n            seg.apply(l, r, f);\n        } else {\n            long long\
-    \ expected = 0;\n            for (int i = l; i < r; ++i) expected += values[i];\n\
-    \            assert(seg.prod(l, r).sum == expected);\n        }\n\n        int\
-    \ index = static_cast<int>(random() % n);\n        assert(seg.get(index).sum ==\
-    \ values[index]);\n    }\n}\n\nstatic_assert(m1une::acted_monoid::IsActedMonoid<AM>);\n\
+    \ 3);\n            typename AM::operator_type f = AM::op_id();\n            if\
+    \ (type == 0) {\n                f = AM::make_and(operand);\n                for\
+    \ (int i = l; i < r; ++i) values[i] &= operand;\n            } else if (type ==\
+    \ 1) {\n                f = AM::make_or(operand);\n                for (int i\
+    \ = l; i < r; ++i) values[i] |= operand;\n            } else {\n             \
+    \   f = AM::make_xor(operand);\n                for (int i = l; i < r; ++i) values[i]\
+    \ ^= operand;\n            }\n            seg.apply(l, r, f);\n        } else\
+    \ {\n            long long expected = 0;\n            for (int i = l; i < r; ++i)\
+    \ expected += values[i];\n            assert(seg.prod(l, r).sum == expected);\n\
+    \        }\n\n        int index = static_cast<int>(random() % n);\n        assert(seg.get(index).sum\
+    \ == values[index]);\n    }\n}\n\nvoid test_large_counts() {\n    using Wide =\
+    \ m1une::acted_monoid::RangeBitwiseAndOrXorRangeSum<std::uint64_t>;\n    auto\
+    \ value = Wide::make(3);\n    for (int i = 0; i < 32; ++i) value = Wide::op(value,\
+    \ value);\n    assert(value.size == (1LL << 32));\n    assert(value.bit_count[0]\
+    \ == value.size && value.bit_count[1] == value.size);\n    auto mapped = Wide::mapping(Wide::make_xor(6),\
+    \ value);\n    assert(mapped.sum == 5ULL * (1ULL << 32));\n    assert(mapped.bit_count[0]\
+    \ == value.size);\n    assert(mapped.bit_count[1] == 0);\n    assert(mapped.bit_count[2]\
+    \ == value.size);\n\n    auto high = UnsignedFullWidth::make(1ULL << 63);\n  \
+    \  auto low = UnsignedFullWidth::mapping(UnsignedFullWidth::make_xor(~0ULL), high);\n\
+    \    assert(low.sum == (1ULL << 63) - 1);\n    assert(low.bit_count[63] == 0 &&\
+    \ low.bit_count[62] == 1);\n}\n\nstatic_assert(m1une::acted_monoid::IsActedMonoid<AM>);\n\
     static_assert(AM::commutative);\nstatic_assert(!AM::operator_commutative);\nstatic_assert(SignedFullWidth::bit_mask()\
     \ == std::numeric_limits<long long>::max());\nstatic_assert(UnsignedFullWidth::bit_mask()\
     \ == std::numeric_limits<unsigned long long>::max());\n\n}  // namespace\n\nint\
-    \ main() {\n    test_composition();\n    test_randomized();\n\n    long long a,\
-    \ b;\n    std::cin >> a >> b;\n    std::cout << a + b << '\\n';\n}\n"
+    \ main() {\n    test_composition();\n    test_randomized<AM>();\n    test_randomized<m1une::acted_monoid::RangeBitwiseAndOrXorRangeSum<long\
+    \ long, 10, int>>();\n    test_randomized<m1une::acted_monoid::RangeBitwiseAndOrXorRangeSum<std::uint32_t,\
+    \ 10, int>>();\n    test_large_counts();\n\n    long long a, b;\n    std::cin\
+    \ >> a >> b;\n    std::cout << a + b << '\\n';\n}\n"
   dependsOn:
   - acted_monoid/concept.hpp
   - acted_monoid/range_bitwise_and_or_xor_range_sum.hpp
@@ -309,7 +337,7 @@ data:
   isVerificationFile: true
   path: verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
   requiredBy: []
-  timestamp: '2026-08-12 00:05:48+09:00'
+  timestamp: '2026-10-24 12:29:25+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp

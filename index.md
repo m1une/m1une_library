@@ -1850,6 +1850,9 @@ data:
       path: verify/ds/segtree/range_update_range_product.test.cpp
       title: verify/ds/segtree/range_update_range_product.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/ds/segtree/rollback_lazy_segtree.test.cpp
+      title: verify/ds/segtree/rollback_lazy_segtree.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/ds/segtree/segtree.test.cpp
       title: verify/ds/segtree/segtree.test.cpp
     - icon: ':heavy_check_mark:'

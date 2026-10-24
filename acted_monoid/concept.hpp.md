@@ -124,6 +124,9 @@ data:
     path: verify/ds/segtree/range_update_range_product.test.cpp
     title: verify/ds/segtree/range_update_range_product.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/ds/segtree/rollback_lazy_segtree.test.cpp
+    title: verify/ds/segtree/rollback_lazy_segtree.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/ds/segtree/segtree_beats.test.cpp
     title: verify/ds/segtree/segtree_beats.test.cpp
   - icon: ':heavy_check_mark:'
@@ -197,6 +200,7 @@ data:
   - verify/monoid/commutative_flags.test.cpp
   - verify/ds/dynamic_tree/lazy_link_cut_tree.test.cpp
   - verify/ds/dynamic_tree/lazy_path_link_cut_tree.test.cpp
+  - verify/ds/segtree/rollback_lazy_segtree.test.cpp
   - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
   - verify/ds/segtree/persistent_lazy_segtree.test.cpp
   - verify/ds/segtree/segtree_beats.test.cpp

@@ -543,14 +543,16 @@ data:
     \n}  // namespace acted_monoid\n}  // namespace m1une\n\n\n#line 1 \"acted_monoid/range_bitwise_and_or_xor_range_sum.hpp\"\
     \n\n\n\n#include <array>\n#line 6 \"acted_monoid/range_bitwise_and_or_xor_range_sum.hpp\"\
     \n#include <type_traits>\n\nnamespace m1une {\nnamespace acted_monoid {\n\ntemplate\
-    \ <typename T, int BITS>\nstruct RangeBitwiseAndOrXorRangeSumNode {\n    T sum;\n\
-    \    std::array<long long, BITS> bit_count;\n    long long size;\n};\n\n// Acted\
-    \ monoid for range bitwise AND, OR, and XOR updates and range sum queries.\ntemplate\
-    \ <typename T, int BITS = 30>\nstruct RangeBitwiseAndOrXorRangeSum {\n    static_assert(std::is_integral_v<T>\
-    \ && !std::is_same_v<std::remove_cv_t<T>, bool>);\n    static_assert(0 < BITS\
-    \ && BITS <= std::numeric_limits<T>::digits);\n\n    using value_type = RangeBitwiseAndOrXorRangeSumNode<T,\
-    \ BITS>;\n\n    // Represents f(x) = (x & and_mask) ^ xor_mask on the lowest BITS\
-    \ bits.\n    struct operator_type {\n        T and_mask;\n        T xor_mask;\n\
+    \ <typename T, int BITS, typename Count = long long>\nstruct RangeBitwiseAndOrXorRangeSumNode\
+    \ {\n    T sum;\n    std::array<Count, BITS> bit_count;\n    Count size;\n};\n\
+    \n// Acted monoid for range bitwise AND, OR, and XOR updates and range sum queries.\n\
+    template <typename T, int BITS = 30, typename Count = long long>\nstruct RangeBitwiseAndOrXorRangeSum\
+    \ {\n    static_assert(std::is_integral_v<T> && !std::is_same_v<std::remove_cv_t<T>,\
+    \ bool>);\n    static_assert(0 < BITS && BITS <= std::numeric_limits<T>::digits);\n\
+    \n    static_assert(std::is_integral_v<Count> && !std::is_same_v<std::remove_cv_t<Count>,\
+    \ bool>);\n\n    using value_type = RangeBitwiseAndOrXorRangeSumNode<T, BITS,\
+    \ Count>;\n\n    // Represents f(x) = (x & and_mask) ^ xor_mask on the lowest\
+    \ BITS bits.\n    struct operator_type {\n        T and_mask;\n        T xor_mask;\n\
     \    };\n\n    static constexpr bool commutative = true;\n    static constexpr\
     \ bool operator_commutative = false;\n\n    static constexpr T bit_mask() {\n\
     \        if constexpr (std::is_unsigned_v<T> && BITS == std::numeric_limits<T>::digits)\
@@ -568,38 +570,40 @@ data:
     \ (g.xor_mask & f.and_mask) ^ f.xor_mask};\n    }\n\n    static constexpr value_type\
     \ mapping(const operator_type& f, const value_type& x) {\n        value_type res\
     \ = x;\n        res.sum = T(0);\n        for (int i = 0; i < BITS; ++i) {\n  \
-    \          long long count = ((f.and_mask >> i) & T(1)) ? x.bit_count[i] : 0;\n\
-    \            if ((f.xor_mask >> i) & T(1)) count = x.size - count;\n         \
-    \   res.bit_count[i] = count;\n            res.sum += static_cast<T>(count) *\
-    \ (T(1) << i);\n        }\n        return res;\n    }\n\n    static constexpr\
-    \ value_type make(const T& value) {\n        value_type res;\n        res.sum\
-    \ = value;\n        res.size = 1;\n        for (int i = 0; i < BITS; ++i) {\n\
-    \            res.bit_count[i] = (value >> i) & T(1);\n        }\n        return\
-    \ res;\n    }\n\n    static constexpr operator_type make_and(const T& mask) {\n\
-    \        return {mask & bit_mask(), T(0)};\n    }\n\n    static constexpr operator_type\
-    \ make_or(const T& mask) {\n        T normalized = mask & bit_mask();\n      \
-    \  return {bit_mask() ^ normalized, normalized};\n    }\n\n    static constexpr\
-    \ operator_type make_xor(const T& mask) {\n        return {bit_mask(), mask &\
-    \ bit_mask()};\n    }\n};\n\n}  // namespace acted_monoid\n}  // namespace m1une\n\
-    \n\n#line 1 \"acted_monoid/range_flip_range_binary_inversion.hpp\"\n\n\n\n#line\
-    \ 1 \"monoid/binary_inversion.hpp\"\n\n\n\nnamespace m1une {\nnamespace monoid\
-    \ {\n\ntemplate <typename T = long long>\nstruct BinaryInversionNode {\n    long\
-    \ long zeros;\n    long long ones;\n    T inversions;\n};\n\n// Monoid for counting\
-    \ zeros, ones, and inversions (1s before 0s) in a binary array.\ntemplate <typename\
-    \ T = long long>\nstruct BinaryInversion {\n    using value_type = BinaryInversionNode<T>;\n\
-    \    static constexpr bool commutative = false;\n\n    // The identity element\
-    \ has 0 zeros, 0 ones, and 0 inversions.\n    static constexpr value_type id()\
-    \ {\n        return {0, 0, 0};\n    }\n\n    // Merges two segments and calculates\
-    \ the new inversions.\n    // New inversions = left inversions + right inversions\
-    \ + (ones in left * zeros in right)\n    static constexpr value_type op(const\
-    \ value_type& a, const value_type& b) {\n        return {a.zeros + b.zeros, a.ones\
-    \ + b.ones, a.inversions + b.inversions + a.ones * b.zeros};\n    }\n\n    //\
-    \ Helper to securely create a leaf node from a value (0 or 1).\n    static constexpr\
-    \ value_type make(int val) {\n        if (val == 0) return {1, 0, 0};\n      \
-    \  return {0, 1, 0};\n    }\n};\n\n}  // namespace monoid\n}  // namespace m1une\n\
-    \n\n#line 5 \"acted_monoid/range_flip_range_binary_inversion.hpp\"\n\nnamespace\
-    \ m1une {\nnamespace acted_monoid {\n\ntemplate <typename T = long long>\nstruct\
-    \ RangeFlipRangeBinaryInversion {\n    using value_type = m1une::monoid::BinaryInversionNode<T>;\n\
+    \          // Use full-width masks so both selections can be vectorized.\n   \
+    \         Count keep = -static_cast<Count>((f.and_mask >> i) & T(1));\n      \
+    \      Count flip = -static_cast<Count>((f.xor_mask >> i) & T(1));\n         \
+    \   Count count = x.bit_count[i] & keep;\n            count = (count & ~flip)\
+    \ | ((x.size - count) & flip);\n            res.bit_count[i] = count;\n      \
+    \      res.sum += static_cast<T>(count) * (T(1) << i);\n        }\n        return\
+    \ res;\n    }\n\n    static constexpr value_type make(const T& value) {\n    \
+    \    value_type res;\n        res.sum = value;\n        res.size = 1;\n      \
+    \  for (int i = 0; i < BITS; ++i) {\n            res.bit_count[i] = (value >>\
+    \ i) & T(1);\n        }\n        return res;\n    }\n\n    static constexpr operator_type\
+    \ make_and(const T& mask) {\n        return {mask & bit_mask(), T(0)};\n    }\n\
+    \n    static constexpr operator_type make_or(const T& mask) {\n        T normalized\
+    \ = mask & bit_mask();\n        return {bit_mask() ^ normalized, normalized};\n\
+    \    }\n\n    static constexpr operator_type make_xor(const T& mask) {\n     \
+    \   return {bit_mask(), mask & bit_mask()};\n    }\n};\n\n}  // namespace acted_monoid\n\
+    }  // namespace m1une\n\n\n#line 1 \"acted_monoid/range_flip_range_binary_inversion.hpp\"\
+    \n\n\n\n#line 1 \"monoid/binary_inversion.hpp\"\n\n\n\nnamespace m1une {\nnamespace\
+    \ monoid {\n\ntemplate <typename T = long long>\nstruct BinaryInversionNode {\n\
+    \    long long zeros;\n    long long ones;\n    T inversions;\n};\n\n// Monoid\
+    \ for counting zeros, ones, and inversions (1s before 0s) in a binary array.\n\
+    template <typename T = long long>\nstruct BinaryInversion {\n    using value_type\
+    \ = BinaryInversionNode<T>;\n    static constexpr bool commutative = false;\n\n\
+    \    // The identity element has 0 zeros, 0 ones, and 0 inversions.\n    static\
+    \ constexpr value_type id() {\n        return {0, 0, 0};\n    }\n\n    // Merges\
+    \ two segments and calculates the new inversions.\n    // New inversions = left\
+    \ inversions + right inversions + (ones in left * zeros in right)\n    static\
+    \ constexpr value_type op(const value_type& a, const value_type& b) {\n      \
+    \  return {a.zeros + b.zeros, a.ones + b.ones, a.inversions + b.inversions + a.ones\
+    \ * b.zeros};\n    }\n\n    // Helper to securely create a leaf node from a value\
+    \ (0 or 1).\n    static constexpr value_type make(int val) {\n        if (val\
+    \ == 0) return {1, 0, 0};\n        return {0, 1, 0};\n    }\n};\n\n}  // namespace\
+    \ monoid\n}  // namespace m1une\n\n\n#line 5 \"acted_monoid/range_flip_range_binary_inversion.hpp\"\
+    \n\nnamespace m1une {\nnamespace acted_monoid {\n\ntemplate <typename T = long\
+    \ long>\nstruct RangeFlipRangeBinaryInversion {\n    using value_type = m1une::monoid::BinaryInversionNode<T>;\n\
     \    using operator_type = bool;\n    static constexpr bool commutative = false;\n\
     \    static constexpr bool operator_commutative = true;\n\n    static constexpr\
     \ value_type id() {\n        return {0, 0, 0};\n    }\n    static constexpr value_type\
@@ -1648,7 +1652,7 @@ data:
   isVerificationFile: true
   path: verify/monoid/commutative_flags.test.cpp
   requiredBy: []
-  timestamp: '2026-08-12 01:20:42+09:00'
+  timestamp: '2026-10-24 12:29:25+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/monoid/commutative_flags.test.cpp

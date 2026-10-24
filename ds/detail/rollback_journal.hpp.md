@@ -30,6 +30,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: verify/ds/rollback_counterparts.test.cpp
     title: verify/ds/rollback_counterparts.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/ds/segtree/rollback_lazy_segtree.test.cpp
+    title: verify/ds/segtree/rollback_lazy_segtree.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
@@ -132,6 +135,7 @@ data:
   timestamp: '2026-08-12 17:21:09+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/ds/segtree/rollback_lazy_segtree.test.cpp
   - verify/ds/rollback_counterparts.test.cpp
   - verify/ds/rollback_counterparts.test.cpp
 documentation_of: ds/detail/rollback_journal.hpp

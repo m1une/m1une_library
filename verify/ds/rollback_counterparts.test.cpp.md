@@ -2254,20 +2254,37 @@ data:
     \ 1].value,\n            _journal[node << 1 | 1].value\n        );\n    }\n\n\
     \    void all_apply(int node, const F& f) {\n        _journal.touch(node);\n \
     \       _journal[node].value = mapping_at(f, _journal[node].value, 0);\n     \
-    \   if (node < _size) {\n            _journal[node].lazy = ActedMonoid::op_comp(f,\
-    \ _journal[node].lazy);\n            _journal[node].has_lazy = true;\n       \
-    \ }\n    }\n\n    void push(int node) {\n        if (!_journal[node].has_lazy)\
-    \ return;\n        F lazy = _journal[node].lazy;\n        all_apply(node << 1,\
-    \ lazy);\n        all_apply(node << 1 | 1, shift_operator(lazy, node_length(node)\
-    \ / 2));\n        _journal.touch(node);\n        _journal[node].lazy = ActedMonoid::op_id();\n\
-    \        _journal[node].has_lazy = false;\n    }\n\n    template <class U>\n \
-    \   void build(const std::vector<U>& values) {\n        _n = int(values.size());\n\
-    \        _size = int(m1une::math::bit_ceil(static_cast<unsigned int>(_n)));\n\
-    \        _log = 0;\n        while ((1U << _log) < static_cast<unsigned int>(_size))\
-    \ ++_log;\n        _journal.nodes.assign(2 * _size, Node());\n        _journal.saved_epoch.assign(_journal.nodes.size(),\
-    \ 0);\n        for (int index = 0; index < _n; ++index) {\n            _journal[_size\
-    \ + index].value = make_value(values[index], index);\n        }\n        for (int\
-    \ node = _size - 1; node > 0; --node) {\n            _journal[node].value = ActedMonoid::op(\n\
+    \   if (node < _size) {\n            _journal[node].lazy = _journal[node].has_lazy\n\
+    \                ? ActedMonoid::op_comp(f, _journal[node].lazy) : f;\n       \
+    \     _journal[node].has_lazy = true;\n        }\n    }\n\n    void push(int node)\
+    \ {\n        if (!_journal[node].has_lazy) return;\n        F lazy = _journal[node].lazy;\n\
+    \        all_apply(node << 1, lazy);\n        all_apply(node << 1 | 1, shift_operator(lazy,\
+    \ node_length(node) / 2));\n        _journal.touch(node);\n        _journal[node].has_lazy\
+    \ = false;\n    }\n\n    // Ancestor tags are newer than the tags stored below\
+    \ them. Carry their\n    // composition down instead of pushing (and journaling)\
+    \ nodes for a query.\n    T prod_node(int node, int start, int length, int left,\
+    \ int right,\n                const F& inherited, bool has_inherited) const {\n\
+    \        const Node& current = _journal[node];\n        if (left <= start && start\
+    \ + length <= right) {\n            return has_inherited ? mapping_at(inherited,\
+    \ current.value, 0) : current.value;\n        }\n        F lazy = inherited;\n\
+    \        bool has_lazy = has_inherited || current.has_lazy;\n        if (current.has_lazy)\
+    \ {\n            lazy = has_inherited ? ActedMonoid::op_comp(inherited, current.lazy)\
+    \ : current.lazy;\n        }\n        int half = length / 2;\n        int middle\
+    \ = start + half;\n        if (right <= middle) {\n            return prod_node(node\
+    \ << 1, start, half, left, right, lazy, has_lazy);\n        }\n        F right_lazy\
+    \ = shift_operator(lazy, half);\n        if (middle <= left) {\n            return\
+    \ prod_node(node << 1 | 1, middle, half, left, right, right_lazy, has_lazy);\n\
+    \        }\n        return ActedMonoid::op(\n            prod_node(node << 1,\
+    \ start, half, left, right, lazy, has_lazy),\n            prod_node(node << 1\
+    \ | 1, middle, half, left, right, right_lazy, has_lazy)\n        );\n    }\n\n\
+    \    template <class U>\n    void build(const std::vector<U>& values) {\n    \
+    \    _n = int(values.size());\n        _size = int(m1une::math::bit_ceil(static_cast<unsigned\
+    \ int>(_n)));\n        _log = 0;\n        while ((1U << _log) < static_cast<unsigned\
+    \ int>(_size)) ++_log;\n        _journal.nodes.assign(2 * _size, Node());\n  \
+    \      _journal.saved_epoch.assign(_journal.nodes.size(), 0);\n        for (int\
+    \ index = 0; index < _n; ++index) {\n            _journal[_size + index].value\
+    \ = make_value(values[index], index);\n        }\n        for (int node = _size\
+    \ - 1; node > 0; --node) {\n            _journal[node].value = ActedMonoid::op(\n\
     \                _journal[node << 1].value,\n                _journal[node <<\
     \ 1 | 1].value\n            );\n        }\n    }\n\n   public:\n    RollbackLazySegtree()\
     \ { build(std::vector<T>()); }\n    explicit RollbackLazySegtree(int n) {\n  \
@@ -2283,65 +2300,59 @@ data:
     \ >> level);\n        _journal.touch(node);\n        _journal[node].value = std::move(value);\n\
     \        for (int level = 1; level <= _log; ++level) update(node >> level);\n\
     \    }\n\n    void set_inplace(int pos, T value) { set(pos, std::move(value));\
-    \ }\n\n    T get(int pos) {\n        assert(0 <= pos && pos < _n);\n        int\
-    \ node = pos + _size;\n        for (int level = _log; level >= 1; --level) push(node\
-    \ >> level);\n        return _journal[node].value;\n    }\n\n    T operator[](int\
-    \ pos) { return get(pos); }\n\n    T prod(int left, int right) {\n        assert(0\
-    \ <= left && left <= right && right <= _n);\n        if (left == right) return\
-    \ ActedMonoid::id();\n        left += _size;\n        right += _size;\n      \
-    \  for (int level = _log; level >= 1; --level) {\n            if (((left >> level)\
-    \ << level) != left) push(left >> level);\n            if (((right >> level) <<\
-    \ level) != right) push((right - 1) >> level);\n        }\n        T left_product\
-    \ = ActedMonoid::id();\n        T right_product = ActedMonoid::id();\n       \
-    \ while (left < right) {\n            if (left & 1) left_product = ActedMonoid::op(left_product,\
-    \ _journal[left++].value);\n            if (right & 1) right_product = ActedMonoid::op(_journal[--right].value,\
-    \ right_product);\n            left >>= 1;\n            right >>= 1;\n       \
-    \ }\n        return ActedMonoid::op(left_product, right_product);\n    }\n\n \
-    \   T all_prod() const { return _journal[1].value; }\n\n    std::vector<T> to_vector()\
-    \ {\n        for (int node = 1; node < _size; ++node) push(node);\n        std::vector<T>\
-    \ result;\n        result.reserve(_n);\n        for (int index = 0; index < _n;\
-    \ ++index) result.push_back(_journal[_size + index].value);\n        return result;\n\
-    \    }\n\n    std::vector<T> to_vector(int left, int right) {\n        assert(0\
-    \ <= left && left <= right && right <= _n);\n        std::vector<T> result;\n\
-    \        result.reserve(right - left);\n        for (int index = left; index <\
-    \ right; ++index) result.push_back(get(index));\n        return result;\n    }\n\
-    \n    void apply(int pos, const F& f) {\n        assert(0 <= pos && pos < _n);\n\
-    \        int node = pos + _size;\n        for (int level = _log; level >= 1; --level)\
-    \ push(node >> level);\n        _journal.touch(node);\n        _journal[node].value\
-    \ = mapping_at(f, _journal[node].value, 0);\n        for (int level = 1; level\
-    \ <= _log; ++level) update(node >> level);\n    }\n\n    void apply(int left,\
-    \ int right, const F& f) {\n        assert(0 <= left && left <= right && right\
-    \ <= _n);\n        if (left == right) return;\n        int base_left = left;\n\
-    \        left += _size;\n        right += _size;\n        for (int level = _log;\
-    \ level >= 1; --level) {\n            if (((left >> level) << level) != left)\
-    \ push(left >> level);\n            if (((right >> level) << level) != right)\
-    \ push((right - 1) >> level);\n        }\n        int saved_left = left;\n   \
-    \     int saved_right = right;\n        while (left < right) {\n            if\
-    \ (left & 1) {\n                all_apply(left, shift_operator(f, node_left(left)\
-    \ - base_left));\n                ++left;\n            }\n            if (right\
-    \ & 1) {\n                --right;\n                all_apply(right, shift_operator(f,\
-    \ node_left(right) - base_left));\n            }\n            left >>= 1;\n  \
-    \          right >>= 1;\n        }\n        left = saved_left;\n        right\
-    \ = saved_right;\n        for (int level = 1; level <= _log; ++level) {\n    \
-    \        if (((left >> level) << level) != left) update(left >> level);\n    \
-    \        if (((right >> level) << level) != right) update((right - 1) >> level);\n\
-    \        }\n    }\n\n    void apply_inplace(int pos, const F& f) { apply(pos,\
-    \ f); }\n    void apply_inplace(int left, int right, const F& f) { apply(left,\
-    \ right, f); }\n\n    template <class Predicate>\n    int max_right(int left,\
-    \ Predicate predicate) {\n        assert(0 <= left && left <= _n);\n        assert(predicate(ActedMonoid::id()));\n\
-    \        if (left == _n) return _n;\n        int node = left + _size;\n      \
-    \  for (int level = _log; level >= 1; --level) push(node >> level);\n        T\
-    \ product = ActedMonoid::id();\n        do {\n            while ((node & 1) ==\
-    \ 0) node >>= 1;\n            T next = ActedMonoid::op(product, _journal[node].value);\n\
-    \            if (!predicate(next)) {\n                while (node < _size) {\n\
-    \                    push(node);\n                    node <<= 1;\n          \
-    \          next = ActedMonoid::op(product, _journal[node].value);\n          \
-    \          if (predicate(next)) {\n                        product = std::move(next);\n\
-    \                        ++node;\n                    }\n                }\n \
-    \               return node - _size;\n            }\n            product = std::move(next);\n\
-    \            ++node;\n        } while ((node & -node) != node);\n        return\
-    \ _n;\n    }\n\n    template <class Predicate>\n    int min_left(int right, Predicate\
-    \ predicate) {\n        assert(0 <= right && right <= _n);\n        assert(predicate(ActedMonoid::id()));\n\
+    \ }\n\n    T get(int pos) const {\n        assert(0 <= pos && pos < _n);\n   \
+    \     return prod(pos, pos + 1);\n    }\n\n    T operator[](int pos) const { return\
+    \ get(pos); }\n\n    T prod(int left, int right) const {\n        assert(0 <=\
+    \ left && left <= right && right <= _n);\n        if (left == right) return ActedMonoid::id();\n\
+    \        return prod_node(1, 0, _size, left, right, ActedMonoid::op_id(), false);\n\
+    \    }\n\n    T all_prod() const { return _journal[1].value; }\n\n    std::vector<T>\
+    \ to_vector() {\n        for (int node = 1; node < _size; ++node) push(node);\n\
+    \        std::vector<T> result;\n        result.reserve(_n);\n        for (int\
+    \ index = 0; index < _n; ++index) result.push_back(_journal[_size + index].value);\n\
+    \        return result;\n    }\n\n    std::vector<T> to_vector(int left, int right)\
+    \ {\n        assert(0 <= left && left <= right && right <= _n);\n        std::vector<T>\
+    \ result;\n        result.reserve(right - left);\n        for (int index = left;\
+    \ index < right; ++index) result.push_back(get(index));\n        return result;\n\
+    \    }\n\n    void apply(int pos, const F& f) {\n        assert(0 <= pos && pos\
+    \ < _n);\n        int node = pos + _size;\n        for (int level = _log; level\
+    \ >= 1; --level) push(node >> level);\n        _journal.touch(node);\n       \
+    \ _journal[node].value = mapping_at(f, _journal[node].value, 0);\n        for\
+    \ (int level = 1; level <= _log; ++level) update(node >> level);\n    }\n\n  \
+    \  void apply(int left, int right, const F& f) {\n        assert(0 <= left &&\
+    \ left <= right && right <= _n);\n        if (left == right) return;\n       \
+    \ int base_left = left;\n        left += _size;\n        right += _size;\n   \
+    \     for (int level = _log; level >= 1; --level) {\n            if (((left >>\
+    \ level) << level) != left) push(left >> level);\n            if (((right >> level)\
+    \ << level) != right) push((right - 1) >> level);\n        }\n        int saved_left\
+    \ = left;\n        int saved_right = right;\n        while (left < right) {\n\
+    \            if (left & 1) {\n                all_apply(left, shift_operator(f,\
+    \ node_left(left) - base_left));\n                ++left;\n            }\n   \
+    \         if (right & 1) {\n                --right;\n                all_apply(right,\
+    \ shift_operator(f, node_left(right) - base_left));\n            }\n         \
+    \   left >>= 1;\n            right >>= 1;\n        }\n        left = saved_left;\n\
+    \        right = saved_right;\n        for (int level = 1; level <= _log; ++level)\
+    \ {\n            int left_node = left >> level;\n            int right_node =\
+    \ (right - 1) >> level;\n            bool update_left = (left_node << level) !=\
+    \ left;\n            if (update_left) update(left_node);\n            if (((right\
+    \ >> level) << level) != right &&\n                (!update_left || right_node\
+    \ != left_node)) update(right_node);\n        }\n    }\n\n    void apply_inplace(int\
+    \ pos, const F& f) { apply(pos, f); }\n    void apply_inplace(int left, int right,\
+    \ const F& f) { apply(left, right, f); }\n\n    template <class Predicate>\n \
+    \   int max_right(int left, Predicate predicate) {\n        assert(0 <= left &&\
+    \ left <= _n);\n        assert(predicate(ActedMonoid::id()));\n        if (left\
+    \ == _n) return _n;\n        int node = left + _size;\n        for (int level\
+    \ = _log; level >= 1; --level) push(node >> level);\n        T product = ActedMonoid::id();\n\
+    \        do {\n            while ((node & 1) == 0) node >>= 1;\n            T\
+    \ next = ActedMonoid::op(product, _journal[node].value);\n            if (!predicate(next))\
+    \ {\n                while (node < _size) {\n                    push(node);\n\
+    \                    node <<= 1;\n                    next = ActedMonoid::op(product,\
+    \ _journal[node].value);\n                    if (predicate(next)) {\n       \
+    \                 product = std::move(next);\n                        ++node;\n\
+    \                    }\n                }\n                return node - _size;\n\
+    \            }\n            product = std::move(next);\n            ++node;\n\
+    \        } while ((node & -node) != node);\n        return _n;\n    }\n\n    template\
+    \ <class Predicate>\n    int min_left(int right, Predicate predicate) {\n    \
+    \    assert(0 <= right && right <= _n);\n        assert(predicate(ActedMonoid::id()));\n\
     \        if (right == 0) return 0;\n        int node = right + _size;\n      \
     \  for (int level = _log; level >= 1; --level) push((node - 1) >> level);\n  \
     \      T product = ActedMonoid::id();\n        do {\n            --node;\n   \
@@ -3169,7 +3180,7 @@ data:
   isVerificationFile: true
   path: verify/ds/rollback_counterparts.test.cpp
   requiredBy: []
-  timestamp: '2026-08-12 17:21:09+09:00'
+  timestamp: '2026-10-24 12:29:25+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/ds/rollback_counterparts.test.cpp
