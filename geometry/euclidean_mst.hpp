@@ -353,7 +353,9 @@ class EuclideanDelaunay {
     }
 
    public:
-    explicit EuclideanDelaunay(const std::vector<Point<T>>& input_points) {
+    template <PointRecord P>
+    requires std::same_as<typename P::coordinate_type, T>
+    explicit EuclideanDelaunay(const std::vector<P>& input_points) {
         assert(input_points.size() <= std::size_t(std::numeric_limits<int>::max()));
         points.reserve(input_points.size());
         edges.reserve(std::size_t(6) * input_points.size());
@@ -395,10 +397,12 @@ class EuclideanDelaunay {
 }  // namespace detail
 
 // Returns O(n) Delaunay edges containing a Euclidean minimum spanning tree.
-template <ExactCoordinate T>
-std::vector<EuclideanMstEdge<wide_type<T>>> euclidean_mst_edges(
-    const std::vector<Point<T>>& points
+template <PointRecord P>
+requires ExactCoordinate<typename P::coordinate_type>
+std::vector<EuclideanMstEdge<wide_type<typename P::coordinate_type>>> euclidean_mst_edges(
+    const std::vector<P>& points
 ) {
+    using T = typename P::coordinate_type;
     using W = wide_type<T>;
     auto delaunay_edges = detail::EuclideanDelaunay<T>(points).get_edges();
     std::vector<EuclideanMstEdge<W>> result;
@@ -409,9 +413,16 @@ std::vector<EuclideanMstEdge<wide_type<T>>> euclidean_mst_edges(
     return result;
 }
 
-// Returns a Euclidean minimum spanning tree.
 template <ExactCoordinate T>
-EuclideanMst<wide_type<T>> euclidean_mst(const std::vector<Point<T>>& points) {
+std::vector<EuclideanMstEdge<wide_type<T>>> euclidean_mst_edges(const std::vector<Point<T>>& points) {
+    return euclidean_mst_edges<Point<T>>(points);
+}
+
+// Returns a Euclidean minimum spanning tree.
+template <PointRecord P>
+requires ExactCoordinate<typename P::coordinate_type>
+EuclideanMst<wide_type<typename P::coordinate_type>> euclidean_mst(const std::vector<P>& points) {
+    using T = typename P::coordinate_type;
     using W = wide_type<T>;
     auto candidates = euclidean_mst_edges(points);
     std::sort(candidates.begin(), candidates.end(), [](const auto& left, const auto& right) {
@@ -435,6 +446,11 @@ EuclideanMst<wide_type<T>> euclidean_mst(const std::vector<Point<T>>& points) {
     }
     assert(points.empty() || result.edges.size() + 1 == points.size());
     return result;
+}
+
+template <ExactCoordinate T>
+EuclideanMst<wide_type<T>> euclidean_mst(const std::vector<Point<T>>& points) {
+    return euclidean_mst<Point<T>>(points);
 }
 
 }  // namespace geometry

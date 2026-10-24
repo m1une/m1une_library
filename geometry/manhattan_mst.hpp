@@ -30,8 +30,10 @@ struct ManhattanMst {
 };
 
 // Returns O(n) edges containing a Manhattan minimum spanning tree.
-template <ExactCoordinate T>
-std::vector<ManhattanMstEdge<wide_type<T>>> manhattan_mst_edges(const std::vector<Point<T>>& points) {
+template <PointRecord P>
+requires ExactCoordinate<typename P::coordinate_type>
+std::vector<ManhattanMstEdge<wide_type<typename P::coordinate_type>>> manhattan_mst_edges(const std::vector<P>& points) {
+    using T = typename P::coordinate_type;
     using W = wide_type<T>;
     assert(points.size() <= std::size_t(std::numeric_limits<int>::max()));
     int n = int(points.size());
@@ -87,9 +89,16 @@ std::vector<ManhattanMstEdge<wide_type<T>>> manhattan_mst_edges(const std::vecto
     return edges;
 }
 
-// Returns a Manhattan minimum spanning tree.
 template <ExactCoordinate T>
-ManhattanMst<wide_type<T>> manhattan_mst(const std::vector<Point<T>>& points) {
+std::vector<ManhattanMstEdge<wide_type<T>>> manhattan_mst_edges(const std::vector<Point<T>>& points) {
+    return manhattan_mst_edges<Point<T>>(points);
+}
+
+// Returns a Manhattan minimum spanning tree.
+template <PointRecord P>
+requires ExactCoordinate<typename P::coordinate_type>
+ManhattanMst<wide_type<typename P::coordinate_type>> manhattan_mst(const std::vector<P>& points) {
+    using T = typename P::coordinate_type;
     using W = wide_type<T>;
     auto candidates = manhattan_mst_edges(points);
     std::sort(candidates.begin(), candidates.end(), [](const auto& a, const auto& b) { return a.cost < b.cost; });
@@ -107,6 +116,11 @@ ManhattanMst<wide_type<T>> manhattan_mst(const std::vector<Point<T>>& points) {
     }
     assert(points.empty() || result.edges.size() + 1 == points.size());
     return result;
+}
+
+template <ExactCoordinate T>
+ManhattanMst<wide_type<T>> manhattan_mst(const std::vector<Point<T>>& points) {
+    return manhattan_mst<Point<T>>(points);
 }
 
 }  // namespace geometry

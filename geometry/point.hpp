@@ -5,6 +5,8 @@
 #include <concepts>
 #include <cassert>
 #include <type_traits>
+#include <utility>
+#include <vector>
 
 #include "detail/floating_predicate.hpp"
 
@@ -38,6 +40,8 @@ using wide_type = std::conditional_t<std::integral<T>, __int128_t,
 
 template <Coordinate T>
 struct Point {
+    using coordinate_type = T;
+
     T x;
     T y;
 
@@ -83,6 +87,46 @@ struct Point {
         return left.y < right.y;
     }
 };
+
+// Attach arbitrary metadata without changing coordinate semantics.
+// Arithmetic and conversions inherited from Point return ordinary points.
+template <Coordinate T, typename Data>
+struct PointWithData : Point<T> {
+    Data data;
+
+    constexpr PointWithData() requires std::default_initializable<Data>
+        : Point<T>(), data() {}
+
+    constexpr PointWithData(T x, T y)
+        requires std::default_initializable<Data>
+        : Point<T>(x, y), data() {}
+
+    constexpr PointWithData(T x, T y, Data value)
+        : Point<T>(x, y), data(std::move(value)) {}
+
+    constexpr PointWithData(Point<T> point, Data value)
+        : Point<T>(std::move(point)), data(std::move(value)) {}
+};
+
+// User-defined records may publicly derive from Point<T> as well.
+template <typename P>
+concept PointRecord = requires {
+    typename P::coordinate_type;
+    requires Coordinate<typename P::coordinate_type>;
+    requires std::derived_from<P, Point<typename P::coordinate_type>>;
+};
+
+// Explicitly discard metadata for APIs that construct new geometric objects.
+template <PointRecord P>
+std::vector<Point<typename P::coordinate_type>> to_points(
+    const std::vector<P>& records
+) {
+    using T = typename P::coordinate_type;
+    std::vector<Point<T>> result;
+    result.reserve(records.size());
+    for (const Point<T>& point : records) result.push_back(point);
+    return result;
+}
 
 template <Coordinate T>
 constexpr Point<long double> centroid(const Point<T>& point) {

@@ -56,3 +56,15 @@ int main() {
     // 1, 1, 1, 1, 2
 }
 ```
+
+## Point records
+
+```cpp
+template <PointRecord P>
+std::vector<int> convex_layers(const std::vector<P>& points);
+```
+
+These overloads accept points carrying extra fields. See
+[points with metadata](https://m1une.github.io/m1une_library/geometry/point.hpp#points-with-metadata)
+for construction, payload behavior, and requirements. The complexity bounds above
+are unchanged, with additional record copy/move costs where applicable.

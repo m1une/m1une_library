@@ -60,3 +60,18 @@ int main() {
     }
 }
 ```
+
+## Point records
+
+```cpp
+template <PointRecord P>
+std::vector<P> convex_hull(std::vector<P> points, bool include_collinear = false);
+```
+
+These overloads accept points carrying extra fields. See
+[points with metadata](https://m1une.github.io/m1une_library/geometry/point.hpp#points-with-metadata)
+for construction, payload behavior, and requirements. The complexity bounds above
+are unchanged, with additional record copy/move costs where applicable.
+
+The hull retains complete records. Points with equal coordinates are deduplicated
+regardless of metadata, retaining the first input record.

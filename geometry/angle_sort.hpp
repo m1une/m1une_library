@@ -79,6 +79,28 @@ std::vector<Point<T>> angle_sorted(
     return points;
 }
 
+template <PointRecord P>
+requires (!std::same_as<P, Point<typename P::coordinate_type>>)
+void sort_by_angle(
+    std::vector<P>& points,
+    Point<typename P::coordinate_type> origin = {},
+    AngleSortStart start = AngleSortStart::NegativeXAxis
+) {
+    using T = typename P::coordinate_type;
+    std::sort(points.begin(), points.end(), AngleLess<T>(origin, start));
+}
+
+template <PointRecord P>
+requires (!std::same_as<P, Point<typename P::coordinate_type>>)
+std::vector<P> angle_sorted(
+    std::vector<P> points,
+    Point<typename P::coordinate_type> origin = {},
+    AngleSortStart start = AngleSortStart::NegativeXAxis
+) {
+    sort_by_angle(points, origin, start);
+    return points;
+}
+
 }  // namespace geometry
 }  // namespace m1une
 

@@ -31,13 +31,15 @@ int direction_half(
     return y > 0 || (y == 0 && x >= 0) ? 0 : 1;
 }
 
-template <ExactCoordinate T>
+template <PointRecord P>
+requires ExactCoordinate<typename P::coordinate_type>
 bool direction_less(
-    const std::vector<Point<T>>& points,
+    const std::vector<P>& points,
     int origin,
     int first,
     int second
 ) {
+    using T = typename P::coordinate_type;
     int first_half = direction_half(points[origin], points[first]);
     int second_half = direction_half(points[origin], points[second]);
     if (first_half != second_half) return first_half < second_half;
@@ -69,10 +71,12 @@ inline void rotate_minimum_first(std::array<int, 3>& triangle) {
 }  // namespace delaunay_triangulation_detail
 
 // Constructs one Delaunay triangulation of distinct exact-coordinate points.
-template <ExactCoordinate T>
+template <PointRecord P>
+requires ExactCoordinate<typename P::coordinate_type>
 DelaunayTriangulation delaunay_triangulation(
-    const std::vector<Point<T>>& points
+    const std::vector<P>& points
 ) {
+    using T = typename P::coordinate_type;
     namespace detail = delaunay_triangulation_detail;
 
     DelaunayTriangulation result;
@@ -132,6 +136,13 @@ DelaunayTriangulation delaunay_triangulation(
         result.triangles.end()
     );
     return result;
+}
+
+template <ExactCoordinate T>
+DelaunayTriangulation delaunay_triangulation(
+    const std::vector<Point<T>>& points
+) {
+    return delaunay_triangulation<Point<T>>(points);
 }
 
 }  // namespace geometry

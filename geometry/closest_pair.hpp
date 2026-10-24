@@ -19,10 +19,11 @@ struct ClosestPair {
 };
 
 // Returns two distinct original indices with minimum Euclidean distance.
-template <Coordinate T>
-std::optional<ClosestPair<T>> closest_pair(
-    const std::vector<Point<T>>& points
+template <PointRecord P>
+std::optional<ClosestPair<typename P::coordinate_type>> closest_pair(
+    const std::vector<P>& points
 ) {
+    using T = typename P::coordinate_type;
     const int n = int(points.size());
     if (n < 2) return std::nullopt;
 
@@ -146,6 +147,13 @@ std::optional<ClosestPair<T>> closest_pair(
     };
     solve(solve, 0, n);
     return result;
+}
+
+template <Coordinate T>
+std::optional<ClosestPair<T>> closest_pair(
+    const std::vector<Point<T>>& points
+) {
+    return closest_pair<Point<T>>(points);
 }
 
 }  // namespace geometry

@@ -14,7 +14,7 @@ documentation_of: ../../geometry/all.hpp
 | `geometry/angle_sort.hpp` | Atan-free counterclockwise angle sorting around an arbitrary origin. |
 | `geometry/circle_coverage_areas.hpp` | Areas covered by exactly $k$ enclosed circles for every $k$ in $O(N^2\log N)$. |
 | `geometry/circle_union_area.hpp` | Union area of enclosed circles in $O(N^2\log N)$. |
-| `geometry/point.hpp` | Points, vectors, dot/cross products, exact orientation, distance, centroid, and rotation. |
+| `geometry/point.hpp` | Points with optional metadata, coordinate-only conversion, vectors, dot/cross products, exact orientation, distance, centroid, and rotation. |
 | `geometry/closest_pair.hpp` | Euclidean closest pair with original indices in $O(N\log N)$. |
 | `geometry/convex_decomposition.hpp` | Hertel--Mehlhorn approximate and Keil--Snoeyink minimum convex decompositions of a simple polygon. |
 | `geometry/convex_hull.hpp` | Monotone-chain convex hull with optional boundary-collinear points. |

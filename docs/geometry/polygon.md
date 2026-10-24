@@ -304,3 +304,53 @@ int main() {
     std::cout << m1une::geometry::contains(polygon, Point(1, 1)) << "\n"; // 1
 }
 ```
+
+## Point records
+
+```cpp
+template <PointRecord P>
+wide_type<typename P::coordinate_type> polygon_area2(const std::vector<P>& polygon);
+
+template <PointRecord P>
+long double polygon_area(const std::vector<P>& polygon);
+
+template <PointRecord P>
+std::optional<Point<long double>> polygon_centroid(
+    const std::vector<P>& polygon,
+    long double eps = 1e-12L
+);
+
+template <PointRecord P>
+requires (!std::same_as<P, Point<typename P::coordinate_type>>)
+std::optional<Point<long double>> centroid(
+    const std::vector<P>& polygon,
+    long double eps = 1e-12L
+);
+
+template <PointRecord P>
+requires (!std::same_as<P, Point<typename P::coordinate_type>>)
+std::optional<Point<long double>> polygon_center_of_gravity(
+    const std::vector<P>& polygon,
+    long double eps = 1e-12L
+);
+
+template <PointRecord P>
+bool is_simple_polygon(
+    const std::vector<P>& polygon,
+    long double eps = 1e-12L
+);
+
+template <PointRecord P>
+PointInPolygon point_in_polygon(
+    const std::vector<P>& polygon,
+    const Point<typename P::coordinate_type>& point,
+    long double eps = 1e-12L
+);
+```
+
+These overloads accept records described in
+[points with metadata](https://m1une.github.io/m1une_library/geometry/point.hpp#points-with-metadata).
+They retain their documented complexities. Comparisons use coordinates only;
+sorting and convex-boundary normalization retain complete records for surviving
+vertices. Queries return the same geometric result types as the ordinary-point
+versions.

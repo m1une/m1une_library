@@ -80,3 +80,16 @@ int main() {
     assert(answer->circle.radius == 2.0L);
 }
 ```
+
+## Point records
+
+```cpp
+template <PointRecord P>
+std::optional<MinimumEnclosingCircle> minimum_enclosing_circle(
+    const std::vector<P>& points, long double eps = 1e-12L);
+```
+
+These overloads accept points carrying extra fields. See
+[points with metadata](https://m1une.github.io/m1une_library/geometry/point.hpp#points-with-metadata)
+for construction, payload behavior, and requirements. The complexity bounds above
+are unchanged, with additional record copy/move costs where applicable.

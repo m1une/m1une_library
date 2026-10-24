@@ -151,3 +151,84 @@ auto twice_b = b * 2;                    // Point<Fraction>(1, 0)
 auto area2 = m1une::geometry::cross(a, b, c); // Fraction(1, 6)
 auto hull = m1une::geometry::convex_hull(std::vector<Point>{a, b, c});
 ```
+
+## Points with metadata
+
+Use `PointWithData<T, Data>` to attach an index, color, or any other payload.
+It publicly derives from `Point<T>` and adds a public `Data data` member.
+`Point<T>` itself keeps its original layout and behavior. Both expose
+`using coordinate_type = T`.
+
+```cpp
+#include "geometry/convex_hull.hpp"
+#include <string>
+#include <vector>
+
+struct Info {
+    int index;
+    std::string color;
+};
+
+using Vertex = m1une::geometry::PointWithData<long long, Info>;
+std::vector<Vertex> vertices;
+vertices.emplace_back(0, 0, Info{4, "red"});
+vertices.emplace_back(2, 0, Info{7, "blue"});
+vertices.emplace_back(0, 2, Info{9, "green"});
+auto hull = m1une::geometry::convex_hull(vertices); // vector<Vertex>
+int original_index = hull[0].data.index;           // 4
+```
+
+`PointRecord<P>` accepts `Point<T>` and public, unambiguous subclasses of
+`Point<T>` with the inherited `coordinate_type`. You can instead define your
+own record with directly accessible fields:
+
+```cpp
+struct Vertex : m1une::geometry::Point<long long> {
+    int index;
+    int color;
+    Vertex(long long x, long long y, int index, int color)
+        : Point(x, y), index(index), color(color) {}
+};
+```
+
+Do not hide the base's coordinates or change its `coordinate_type`. Metadata
+needs no equality, ordering, or arithmetic operations. Algorithms that return
+or reorder records require copyable records. Read-only queries do not copy the
+payload. Payloads do not need default constructors when supplied explicitly.
+
+| Interface | Behavior | Complexity |
+| --- | --- | --- |
+| `PointWithData<T, Data>()` | Zero coordinates and value-initialized data; requires default-initializable `Data`. | $O(1)$ coordinate work plus data initialization |
+| `PointWithData<T, Data>(T x, T y)` | Coordinates and value-initialized data; requires default-initializable `Data`. | $O(1)$ coordinate work plus data initialization |
+| `PointWithData<T, Data>(T x, T y, Data value)` | Coordinates and the supplied data. | $O(1)$ coordinate work plus data construction |
+| `PointWithData<T, Data>(Point<T> point, Data value)` | Copies the coordinates and takes the supplied data. | $O(1)$ coordinate work plus data construction |
+| `template <PointRecord P> std::vector<Point<typename P::coordinate_type>> to_points(const std::vector<P>& records)` | Explicitly copies only coordinates, preserving input order. Does not mutate the records. | $O(N)$ time and memory |
+
+Equality and ordering inherited from `Point<T>` compare coordinates only.
+Single-point predicates such as `dot`, `cross`, `orientation`, and `distance2`
+accept these records through their base type. Arithmetic, coordinate
+conversions, rotations, centroids, and other constructions of new points return
+ordinary `Point` values: no metadata is assigned to a synthesized point.
+In-place `+=` and `-=` update coordinates and retain the existing data.
+
+These collection APIs also accept `std::vector<P>` with `PointRecord<P>`:
+
+| APIs | Metadata behavior |
+| --- | --- |
+| `convex_hull` | Returns `std::vector<P>` with complete input records. Duplicate coordinates retain the first input record. |
+| `sort_by_angle`, `angle_sorted` | Reorder complete records. Geometrically tied records can appear in either order. |
+| `normalize_convex_polygon` | Retains records for surviving vertices; consecutive duplicate coordinates retain the first record. |
+| `closest_pair`, `farthest_pair`, `furthest_pair`, `convex_layers` | Results refer to positions in the original vector, independently of metadata indices. |
+| `manhattan_mst_edges`, `manhattan_mst`, `euclidean_mst_edges`, `euclidean_mst`, `delaunay_triangulation`, `minimum_enclosing_circle` | Edge, triangle, and support indices refer to the original vector. Existing coordinate restrictions still apply. |
+| `polygon_area2`, `polygon_area`, `polygon_centroid`, `centroid`, `polygon_center_of_gravity`, `is_simple_polygon`, `point_in_polygon`, `is_convex_polygon`, `point_in_convex_polygon`, `convex_diameter2` | Use coordinates only and keep their original result types and complexities. |
+
+Algorithms use the coordinate base for geometric comparisons even when a custom
+record defines its own comparison operators. Costs retain the bounds documented
+on each algorithm's page, plus the cost of copying or moving records where
+applicable. Use small payloads or store an index into an external table for
+large metadata.
+
+Existing `Point<T>` calls, including explicit coordinate template arguments such
+as `convex_hull<long long>(points)`, remain supported. Other collection APIs,
+including polygon decomposition, Minkowski sums, and Voronoi diagrams, take
+ordinary points; pass `to_points(records)` explicitly when using those APIs.

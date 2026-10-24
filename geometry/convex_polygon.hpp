@@ -80,14 +80,17 @@ inline std::vector<Point<long double>> clean_polygon(
 
 }  // namespace convex_polygon_detail
 
-template <Coordinate T>
+template <PointRecord P>
 bool is_convex_polygon(
-    const std::vector<Point<T>>& polygon,
+    const std::vector<P>& polygon,
     bool strict = false,
     long double eps = 1e-12L
 ) {
+    using T = typename P::coordinate_type;
     std::size_t size = polygon.size();
-    if (size >= 2 && polygon.front() == polygon.back()) size--;
+    if (size >= 2 &&
+        static_cast<const Point<T>&>(polygon.front()) ==
+            static_cast<const Point<T>&>(polygon.back())) size--;
     if (size < 3) return false;
 
     int direction = 0;
@@ -108,8 +111,17 @@ bool is_convex_polygon(
 }
 
 template <Coordinate T>
-std::vector<Point<T>> normalize_convex_polygon(
-    std::vector<Point<T>> polygon,
+bool is_convex_polygon(
+    const std::vector<Point<T>>& polygon,
+    bool strict = false,
+    long double eps = 1e-12L
+) {
+    return is_convex_polygon<Point<T>>(polygon, strict, eps);
+}
+
+template <PointRecord P>
+std::vector<P> normalize_convex_polygon(
+    std::vector<P> polygon,
     long double eps = 1e-12L
 ) {
     return convex_polygon_detail::normalize_convex_boundary(
@@ -119,11 +131,20 @@ std::vector<Point<T>> normalize_convex_polygon(
 }
 
 template <Coordinate T>
-PointInPolygon point_in_convex_polygon(
-    const std::vector<Point<T>>& polygon,
-    const Point<T>& point,
+std::vector<Point<T>> normalize_convex_polygon(
+    std::vector<Point<T>> polygon,
     long double eps = 1e-12L
 ) {
+    return normalize_convex_polygon<Point<T>>(std::move(polygon), eps);
+}
+
+template <PointRecord P>
+PointInPolygon point_in_convex_polygon(
+    const std::vector<P>& polygon,
+    const Point<typename P::coordinate_type>& point,
+    long double eps = 1e-12L
+) {
+    using T = typename P::coordinate_type;
     const std::size_t size = polygon.size();
     if (size == 0) return PointInPolygon::Outside;
     if (size == 1) {
@@ -185,6 +206,15 @@ PointInPolygon point_in_convex_polygon(
     if (triangle_side < 0) return PointInPolygon::Outside;
     if (triangle_side == 0) return PointInPolygon::Boundary;
     return PointInPolygon::Inside;
+}
+
+template <Coordinate T>
+PointInPolygon point_in_convex_polygon(
+    const std::vector<Point<T>>& polygon,
+    const Point<T>& point,
+    long double eps = 1e-12L
+) {
+    return point_in_convex_polygon<Point<T>>(polygon, point, eps);
 }
 
 template <Coordinate T>
@@ -911,11 +941,12 @@ std::vector<std::array<Point<T>, 3>> triangulate_convex_polygon(
     return result;
 }
 
-template <Coordinate T>
-wide_type<T> convex_diameter2(
-    std::vector<Point<T>> polygon,
+template <PointRecord P>
+wide_type<typename P::coordinate_type> convex_diameter2(
+    std::vector<P> polygon,
     long double eps = 1e-12L
 ) {
+    using T = typename P::coordinate_type;
     polygon = normalize_convex_polygon(std::move(polygon), eps);
     const std::size_t size = polygon.size();
     if (size <= 1) return 0;
@@ -944,6 +975,14 @@ wide_type<T> convex_diameter2(
         );
     }
     return result;
+}
+
+template <Coordinate T>
+wide_type<T> convex_diameter2(
+    std::vector<Point<T>> polygon,
+    long double eps = 1e-12L
+) {
+    return convex_diameter2<Point<T>>(std::move(polygon), eps);
 }
 
 template <Coordinate T>

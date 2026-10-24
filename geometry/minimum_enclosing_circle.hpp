@@ -28,9 +28,9 @@ struct MinimumEnclosingCircleSupport {
     std::array<int, 3> index = {-1, -1, -1};
 };
 
-template <Coordinate T>
+template <PointRecord P>
 Circle<long double> circle_from_support(
-    const std::vector<Point<T>>& points,
+    const std::vector<P>& points,
     const MinimumEnclosingCircleSupport& support
 ) {
     assert(1 <= support.size && support.size <= 3);
@@ -64,11 +64,12 @@ Circle<long double> circle_from_support(
     return Circle<long double>{center, distance(center, first)};
 }
 
-template <Coordinate T>
+template <PointRecord P>
 void reduce_collinear_support(
-    const std::vector<Point<T>>& points,
+    const std::vector<P>& points,
     MinimumEnclosingCircleSupport& support
 ) {
+    using T = typename P::coordinate_type;
     if (support.size != 3) return;
     const Point<T>& first = points[support.index[0]];
     const Point<T>& second = points[support.index[1]];
@@ -90,13 +91,14 @@ void reduce_collinear_support(
     }
 }
 
-template <Coordinate T>
+template <PointRecord P>
 bool support_contains(
-    const std::vector<Point<T>>& points,
+    const std::vector<P>& points,
     const MinimumEnclosingCircleSupport& support,
     int point_index,
     long double eps
 ) {
+    using T = typename P::coordinate_type;
     if (support.size == 0) return false;
     const Point<T>& point = points[point_index];
     const Point<T>& first = points[support.index[0]];
@@ -147,9 +149,9 @@ inline std::uint64_t minimum_enclosing_circle_random(std::uint64_t& state) {
 }  // namespace internal
 
 // Returns the unique minimum circle containing every input point.
-template <Coordinate T>
+template <PointRecord P>
 std::optional<MinimumEnclosingCircle> minimum_enclosing_circle(
-    const std::vector<Point<T>>& points,
+    const std::vector<P>& points,
     long double eps = 1e-12L
 ) {
     if (points.empty()) return std::nullopt;
@@ -207,6 +209,14 @@ std::optional<MinimumEnclosingCircle> minimum_enclosing_circle(
     );
     std::sort(result.support.begin(), result.support.end());
     return result;
+}
+
+template <Coordinate T>
+std::optional<MinimumEnclosingCircle> minimum_enclosing_circle(
+    const std::vector<Point<T>>& points,
+    long double eps = 1e-12L
+) {
+    return minimum_enclosing_circle<Point<T>>(points, eps);
 }
 
 }  // namespace geometry

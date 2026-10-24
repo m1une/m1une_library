@@ -145,8 +145,9 @@ bool in_ccw_triangle(
 
 }  // namespace polygon_detail
 
-template <Coordinate T>
-wide_type<T> polygon_area2(const std::vector<Point<T>>& polygon) {
+template <PointRecord P>
+wide_type<typename P::coordinate_type> polygon_area2(const std::vector<P>& polygon) {
+    using T = typename P::coordinate_type;
     wide_type<T> result = 0;
     std::size_t n = polygon.size();
     for (std::size_t i = 0; i < n; i++) {
@@ -156,15 +157,26 @@ wide_type<T> polygon_area2(const std::vector<Point<T>>& polygon) {
 }
 
 template <Coordinate T>
-long double polygon_area(const std::vector<Point<T>>& polygon) {
+wide_type<T> polygon_area2(const std::vector<Point<T>>& polygon) {
+    return polygon_area2<Point<T>>(polygon);
+}
+
+template <PointRecord P>
+long double polygon_area(const std::vector<P>& polygon) {
     return std::fabs(static_cast<long double>(polygon_area2(polygon))) / 2;
 }
 
 template <Coordinate T>
+long double polygon_area(const std::vector<Point<T>>& polygon) {
+    return polygon_area<Point<T>>(polygon);
+}
+
+template <PointRecord P>
 std::optional<Point<long double>> polygon_centroid(
-    const std::vector<Point<T>>& polygon,
+    const std::vector<P>& polygon,
     long double eps = 1e-12L
 ) {
+    using T = typename P::coordinate_type;
     if (polygon.size() < 3) return std::nullopt;
 
     wide_type<T> signed_area2 = polygon_area2(polygon);
@@ -195,6 +207,14 @@ std::optional<Point<long double>> polygon_centroid(
 }
 
 template <Coordinate T>
+std::optional<Point<long double>> polygon_centroid(
+    const std::vector<Point<T>>& polygon,
+    long double eps = 1e-12L
+) {
+    return polygon_centroid<Point<T>>(polygon, eps);
+}
+
+template <Coordinate T>
 std::optional<Point<long double>> centroid(
     const std::vector<Point<T>>& polygon,
     long double eps = 1e-12L
@@ -210,11 +230,12 @@ std::optional<Point<long double>> polygon_center_of_gravity(
     return polygon_centroid(polygon, eps);
 }
 
-template <Coordinate T>
+template <PointRecord P>
 bool is_simple_polygon(
-    const std::vector<Point<T>>& polygon,
+    const std::vector<P>& polygon,
     long double eps = 1e-12L
 ) {
+    using T = typename P::coordinate_type;
     if (polygon.size() < 3) return false;
     std::size_t size = polygon.size();
     for (std::size_t index = 0; index < size; ++index) {
@@ -252,6 +273,14 @@ bool is_simple_polygon(
         }
     }
     return true;
+}
+
+template <Coordinate T>
+bool is_simple_polygon(
+    const std::vector<Point<T>>& polygon,
+    long double eps = 1e-12L
+) {
+    return is_simple_polygon<Point<T>>(polygon, eps);
 }
 
 template <Coordinate T>
@@ -341,12 +370,13 @@ std::optional<std::vector<std::array<Point<T>, 3>>> triangulate_polygon(
     return result;
 }
 
-template <Coordinate T>
+template <PointRecord P>
 PointInPolygon point_in_polygon(
-    const std::vector<Point<T>>& polygon,
-    const Point<T>& point,
+    const std::vector<P>& polygon,
+    const Point<typename P::coordinate_type>& point,
     long double eps = 1e-12L
 ) {
+    using T = typename P::coordinate_type;
     bool inside = false;
     std::size_t n = polygon.size();
     for (std::size_t i = 0; i < n; i++) {
@@ -365,6 +395,15 @@ PointInPolygon point_in_polygon(
         }
     }
     return inside ? PointInPolygon::Inside : PointInPolygon::Outside;
+}
+
+template <Coordinate T>
+PointInPolygon point_in_polygon(
+    const std::vector<Point<T>>& polygon,
+    const Point<T>& point,
+    long double eps = 1e-12L
+) {
+    return point_in_polygon<Point<T>>(polygon, point, eps);
 }
 
 template <Coordinate T, Coordinate P>
@@ -1390,6 +1429,24 @@ long double distance(
     const Polygon<T>& polygon
 ) {
     return distance(polygon, ray);
+}
+
+template <PointRecord P>
+requires (!std::same_as<P, Point<typename P::coordinate_type>>)
+std::optional<Point<long double>> centroid(
+    const std::vector<P>& polygon,
+    long double eps = 1e-12L
+) {
+    return polygon_centroid(polygon, eps);
+}
+
+template <PointRecord P>
+requires (!std::same_as<P, Point<typename P::coordinate_type>>)
+std::optional<Point<long double>> polygon_center_of_gravity(
+    const std::vector<P>& polygon,
+    long double eps = 1e-12L
+) {
+    return polygon_centroid(polygon, eps);
 }
 
 }  // namespace geometry

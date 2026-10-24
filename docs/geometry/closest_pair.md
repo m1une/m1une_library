@@ -71,3 +71,16 @@ int main() {
     assert(answer->distance_squared == 5);
 }
 ```
+
+## Point records
+
+```cpp
+template <PointRecord P>
+std::optional<ClosestPair<typename P::coordinate_type>> closest_pair(
+    const std::vector<P>& points);
+```
+
+These overloads accept points carrying extra fields. See
+[points with metadata](https://m1une.github.io/m1une_library/geometry/point.hpp#points-with-metadata)
+for construction, payload behavior, and requirements. The complexity bounds above
+are unchanged, with additional record copy/move costs where applicable.

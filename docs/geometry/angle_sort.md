@@ -97,3 +97,30 @@ int main() {
     }
 }
 ```
+
+## Point records
+
+```cpp
+template <PointRecord P>
+requires (!std::same_as<P, Point<typename P::coordinate_type>>)
+void sort_by_angle(
+    std::vector<P>& points,
+    Point<typename P::coordinate_type> origin = {},
+    AngleSortStart start = AngleSortStart::NegativeXAxis
+);
+
+template <PointRecord P>
+requires (!std::same_as<P, Point<typename P::coordinate_type>>)
+std::vector<P> angle_sorted(
+    std::vector<P> points,
+    Point<typename P::coordinate_type> origin = {},
+    AngleSortStart start = AngleSortStart::NegativeXAxis
+);
+```
+
+These overloads accept records described in
+[points with metadata](https://m1une.github.io/m1une_library/geometry/point.hpp#points-with-metadata).
+They retain their documented complexities. Comparisons use coordinates only;
+sorting and convex-boundary normalization retain complete records for surviving
+vertices. Queries return the same geometric result types as the ordinary-point
+versions.

@@ -323,3 +323,40 @@ int main() {
     std::cout << m1une::geometry::polygon_area(left_half) << "\n";  // 8
 }
 ```
+
+## Point records
+
+```cpp
+template <PointRecord P>
+bool is_convex_polygon(
+    const std::vector<P>& polygon,
+    bool strict = false,
+    long double eps = 1e-12L
+);
+
+template <PointRecord P>
+std::vector<P> normalize_convex_polygon(
+    std::vector<P> polygon,
+    long double eps = 1e-12L
+);
+
+template <PointRecord P>
+PointInPolygon point_in_convex_polygon(
+    const std::vector<P>& polygon,
+    const Point<typename P::coordinate_type>& point,
+    long double eps = 1e-12L
+);
+
+template <PointRecord P>
+wide_type<typename P::coordinate_type> convex_diameter2(
+    std::vector<P> polygon,
+    long double eps = 1e-12L
+);
+```
+
+These overloads accept records described in
+[points with metadata](https://m1une.github.io/m1une_library/geometry/point.hpp#points-with-metadata).
+They retain their documented complexities. Comparisons use coordinates only;
+sorting and convex-boundary normalization retain complete records for surviving
+vertices. Queries return the same geometric result types as the ordinary-point
+versions.

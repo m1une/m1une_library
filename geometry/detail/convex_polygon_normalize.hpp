@@ -12,8 +12,9 @@ namespace m1une {
 namespace geometry {
 namespace convex_polygon_detail {
 
-template <Coordinate T>
-wide_type<T> boundary_area2(const std::vector<Point<T>>& polygon) {
+template <PointRecord P>
+wide_type<typename P::coordinate_type> boundary_area2(const std::vector<P>& polygon) {
+    using T = typename P::coordinate_type;
     wide_type<T> result = 0;
     for (std::size_t index = 0; index < polygon.size(); ++index) {
         result += cross(
@@ -24,19 +25,23 @@ wide_type<T> boundary_area2(const std::vector<Point<T>>& polygon) {
     return result;
 }
 
-template <Coordinate T>
-std::vector<Point<T>> normalize_convex_boundary(
-    std::vector<Point<T>> polygon,
+template <PointRecord P>
+std::vector<P> normalize_convex_boundary(
+    std::vector<P> polygon,
     long double eps
 ) {
-    if (polygon.size() >= 2 && polygon.front() == polygon.back()) {
+    using T = typename P::coordinate_type;
+    if (polygon.size() >= 2 && static_cast<const Point<T>&>(polygon.front()) ==
+            static_cast<const Point<T>&>(polygon.back())) {
         polygon.pop_back();
     }
     polygon.erase(
-        std::unique(polygon.begin(), polygon.end()),
+        std::unique(polygon.begin(), polygon.end(),
+            [](const Point<T>& a, const Point<T>& b) { return a == b; }),
         polygon.end()
     );
-    if (polygon.size() >= 2 && polygon.front() == polygon.back()) {
+    if (polygon.size() >= 2 && static_cast<const Point<T>&>(polygon.front()) ==
+            static_cast<const Point<T>&>(polygon.back())) {
         polygon.pop_back();
     }
     if (polygon.size() <= 1) return polygon;
@@ -58,7 +63,7 @@ std::vector<Point<T>> normalize_convex_boundary(
     std::rotate(polygon.begin(), start, polygon.end());
 
     if (polygon.size() >= 3) {
-        std::vector<Point<T>> cleaned;
+        std::vector<P> cleaned;
         const std::size_t size = polygon.size();
         cleaned.reserve(size);
         for (std::size_t index = 0; index < size; ++index) {
@@ -69,7 +74,7 @@ std::vector<Point<T>> normalize_convex_boundary(
                 orientation(previous, current, next, eps) != 0 ||
                 sign<T>(dot(current - previous, next - current), eps) < 0
             ) {
-                cleaned.push_back(current);
+                cleaned.push_back(polygon[index]);
             }
         }
         polygon = std::move(cleaned);

@@ -73,3 +73,22 @@ int main() {
     std::cout << cost << "\n";
 }
 ```
+
+## Point records
+
+```cpp
+template <PointRecord P>
+requires ExactCoordinate<typename P::coordinate_type>
+std::vector<ManhattanMstEdge<wide_type<typename P::coordinate_type>>>
+manhattan_mst_edges(const std::vector<P>& points);
+
+template <PointRecord P>
+requires ExactCoordinate<typename P::coordinate_type>
+ManhattanMst<wide_type<typename P::coordinate_type>>
+manhattan_mst(const std::vector<P>& points);
+```
+
+These overloads accept points carrying extra fields. See
+[points with metadata](https://m1une.github.io/m1une_library/geometry/point.hpp#points-with-metadata)
+for construction, payload behavior, and requirements. The complexity bounds above
+are unchanged, with additional record copy/move costs where applicable.

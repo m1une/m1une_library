@@ -189,8 +189,9 @@ class DecrementalHull {
 
 }  // namespace convex_layers_detail
 
-template <Coordinate T>
-std::vector<int> convex_layers(const std::vector<Point<T>>& points) {
+template <PointRecord P>
+std::vector<int> convex_layers(const std::vector<P>& points) {
+    using T = typename P::coordinate_type;
     const int n = int(points.size());
     if (n == 0) return {};
 
@@ -277,6 +278,11 @@ std::vector<int> convex_layers(const std::vector<Point<T>>& points) {
         result[index] = layer_by_position[position[index]];
     }
     return result;
+}
+
+template <Coordinate T>
+std::vector<int> convex_layers(const std::vector<Point<T>>& points) {
+    return convex_layers<Point<T>>(points);
 }
 
 }  // namespace geometry

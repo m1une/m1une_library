@@ -21,13 +21,14 @@ struct FarthestPair {
 };
 
 // Returns two distinct original indices with maximum Euclidean distance.
-template <Coordinate T>
-std::optional<FarthestPair<T>> farthest_pair(
-    const std::vector<Point<T>>& points
+template <PointRecord P>
+std::optional<FarthestPair<typename P::coordinate_type>> farthest_pair(
+    const std::vector<P>& points
 ) {
+    using T = typename P::coordinate_type;
     if (points.size() < 2) return std::nullopt;
 
-    std::vector<Point<T>> hull = convex_hull(points);
+    auto hull = convex_hull(to_points(points));
     if (hull.size() == 1) {
         FarthestPair<T> result;
         result.first = 0;
@@ -102,10 +103,24 @@ std::optional<FarthestPair<T>> farthest_pair(
 }
 
 template <Coordinate T>
+std::optional<FarthestPair<T>> farthest_pair(
+    const std::vector<Point<T>>& points
+) {
+    return farthest_pair<Point<T>>(points);
+}
+
+template <PointRecord P>
+std::optional<FarthestPair<typename P::coordinate_type>> furthest_pair(
+    const std::vector<P>& points
+) {
+    return farthest_pair(points);
+}
+
+template <Coordinate T>
 std::optional<FarthestPair<T>> furthest_pair(
     const std::vector<Point<T>>& points
 ) {
-    return farthest_pair(points);
+    return farthest_pair<Point<T>>(points);
 }
 
 }  // namespace geometry
