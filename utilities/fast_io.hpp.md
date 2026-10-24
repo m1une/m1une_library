@@ -82,6 +82,9 @@ data:
     path: verify/convex/li_chao_tree_segment.test.cpp
     title: verify/convex/li_chao_tree_segment.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/convex/monge/anti_monge_shortest_path.test.cpp
+    title: verify/convex/monge/anti_monge_shortest_path.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/convex/monge/max_plus_convolution_concave_arbitrary.test.cpp
     title: verify/convex/monge/max_plus_convolution_concave_arbitrary.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1808,6 +1811,7 @@ data:
   - verify/convex/monge/max_plus_convolution_concave_concave.test.cpp
   - verify/convex/monge/monge_dp_optimization.test.cpp
   - verify/convex/monge/monge_algorithms.test.cpp
+  - verify/convex/monge/anti_monge_shortest_path.test.cpp
   - verify/convex/monge/min_plus_convolution_convex_arbitrary.test.cpp
   - verify/convex/monge/min_plus_convolution_convex_convex.test.cpp
   - verify/convex/slope_trick.test.cpp

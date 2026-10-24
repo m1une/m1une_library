@@ -226,7 +226,10 @@ data:
     pages:
     - icon: ':heavy_check_mark:'
       path: convex/monge/all.hpp
-      title: Monge All
+      title: Monge Optimization Guide
+    - icon: ':heavy_check_mark:'
+      path: convex/monge/anti_monge_shortest_path.hpp
+      title: Anti-Monge DAG Shortest Paths
     - icon: ':heavy_check_mark:'
       path: convex/monge/check.hpp
       title: Monge Checks
@@ -1557,6 +1560,9 @@ data:
       title: verify/convex/slope_trick.test.cpp
   - name: verify/convex/monge
     pages:
+    - icon: ':heavy_check_mark:'
+      path: verify/convex/monge/anti_monge_shortest_path.test.cpp
+      title: verify/convex/monge/anti_monge_shortest_path.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/convex/monge/max_plus_convolution_concave_arbitrary.test.cpp
       title: verify/convex/monge/max_plus_convolution_concave_arbitrary.test.cpp

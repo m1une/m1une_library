@@ -329,10 +329,14 @@ data:
     \ answer;\n\n    std::vector<int> rows(row_count), columns(column_count);\n  \
     \  std::iota(rows.begin(), rows.end(), 0);\n    std::iota(columns.begin(), columns.end(),\
     \ 0);\n    solve(rows, columns, select, answer);\n    return answer;\n}\n\n} \
-    \ // namespace smawk_detail\n\ntemplate <class Value, class Compare = std::less<>>\n\
-    std::vector<int> smawk_row_optima(int row_count, int column_count, Value value,\n\
-    \                                  Compare compare = Compare()) {\n    assert(row_count\
-    \ >= 0);\n    assert(column_count >= 0);\n    return smawk_detail::row_optima(\n\
+    \ // namespace smawk_detail\n\n// Search a fixed H x W rectangle, returning column\
+    \ indices (leftmost on ties).\n// Requires total monotonicity under Compare; Monge\
+    \ suffices for minima.\n// For anti-Monge minima, reverse columns in value and\
+    \ map indices back.\n// O(H + W) evaluations; callbacks may be queried out of\
+    \ row order.\ntemplate <class Value, class Compare = std::less<>>\nstd::vector<int>\
+    \ smawk_row_optima(int row_count, int column_count, Value value,\n           \
+    \                       Compare compare = Compare()) {\n    assert(row_count >=\
+    \ 0);\n    assert(column_count >= 0);\n    return smawk_detail::row_optima(\n\
     \        row_count, column_count,\n        [&](int row, int current, int candidate)\
     \ {\n            return compare(value(row, candidate), value(row, current));\n\
     \        });\n}\n\ntemplate <class Value>\nstd::vector<int> smawk_row_argmin(int\
@@ -524,7 +528,7 @@ data:
   isVerificationFile: true
   path: verify/convex/monge/min_plus_convolution_convex_arbitrary.test.cpp
   requiredBy: []
-  timestamp: '2026-10-06 01:57:24+09:00'
+  timestamp: '2026-10-24 20:27:26+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/convex/monge/min_plus_convolution_convex_arbitrary.test.cpp

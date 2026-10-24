@@ -10,7 +10,7 @@ data:
     title: Convex All
   - icon: ':heavy_check_mark:'
     path: convex/monge/all.hpp
-    title: Monge All
+    title: Monge Optimization Guide
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
     path: verify/convex/monge/max_plus_convolution_concave_arbitrary.test.cpp
@@ -61,10 +61,14 @@ data:
     \ answer;\n\n    std::vector<int> rows(row_count), columns(column_count);\n  \
     \  std::iota(rows.begin(), rows.end(), 0);\n    std::iota(columns.begin(), columns.end(),\
     \ 0);\n    solve(rows, columns, select, answer);\n    return answer;\n}\n\n} \
-    \ // namespace smawk_detail\n\ntemplate <class Value, class Compare = std::less<>>\n\
-    std::vector<int> smawk_row_optima(int row_count, int column_count, Value value,\n\
-    \                                  Compare compare = Compare()) {\n    assert(row_count\
-    \ >= 0);\n    assert(column_count >= 0);\n    return smawk_detail::row_optima(\n\
+    \ // namespace smawk_detail\n\n// Search a fixed H x W rectangle, returning column\
+    \ indices (leftmost on ties).\n// Requires total monotonicity under Compare; Monge\
+    \ suffices for minima.\n// For anti-Monge minima, reverse columns in value and\
+    \ map indices back.\n// O(H + W) evaluations; callbacks may be queried out of\
+    \ row order.\ntemplate <class Value, class Compare = std::less<>>\nstd::vector<int>\
+    \ smawk_row_optima(int row_count, int column_count, Value value,\n           \
+    \                       Compare compare = Compare()) {\n    assert(row_count >=\
+    \ 0);\n    assert(column_count >= 0);\n    return smawk_detail::row_optima(\n\
     \        row_count, column_count,\n        [&](int row, int current, int candidate)\
     \ {\n            return compare(value(row, candidate), value(row, current));\n\
     \        });\n}\n\ntemplate <class Value>\nstd::vector<int> smawk_row_argmin(int\
@@ -382,7 +386,7 @@ data:
   requiredBy:
   - convex/monge/all.hpp
   - convex/all.hpp
-  timestamp: '2026-07-07 18:38:36+09:00'
+  timestamp: '2026-10-24 20:27:26+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/convex/monge/max_plus_convolution_concave_arbitrary.test.cpp
@@ -418,6 +422,77 @@ When both inputs are structured,
 `max_plus_convolution_concave_concave` merge their adjacent differences
 directly. These specializations have the same linear asymptotic complexity but
 smaller constants than the SMAWK-based one-sided functions.
+
+## Worked example: split a total quantity between two suppliers
+
+Supplier A charges `a[i]` for exactly `i` units; supplier B charges `b[j]`
+for exactly `j` units. Given `a={0,5,1}` and `b={0,2,6}`, find the cheapest
+cost for **every** total quantity `k=i+j`.
+
+| Total `k` | Costs of valid splits | Minimum |
+| --- | --- | --- |
+| 0 | `a[0]+b[0]=0` | 0 |
+| 1 | `a[0]+b[1]=2`, `a[1]+b[0]=5` | 2 |
+| 2 | `a[0]+b[2]=6`, `a[1]+b[1]=7`, `a[2]+b[0]=1` | 1 |
+| 3 | `a[1]+b[2]=11`, `a[2]+b[1]=3` | 3 |
+| 4 | `a[2]+b[2]=7` | 7 |
+
+The straightforward implementation checks every pair:
+
+```cpp
+std::vector<long long> answer(a.size() + b.size() - 1, infinity);
+for (int i = 0; i < int(a.size()); ++i) {
+    for (int j = 0; j < int(b.size()); ++j) {
+        answer[i+j] = std::min(answer[i+j], a[i] + b[j]);
+    }
+}
+```
+
+Here B's adjacent price differences are `2,4`, which are nondecreasing.
+That makes `b` convex, so use:
+
+```cpp
+#include "convex/monge/min_plus_convolution.hpp"
+#include <cassert>
+#include <iostream>
+#include <vector>
+
+int main() {
+    std::vector<long long> a = {0, 5, 1};  // May have arbitrary differences.
+    std::vector<long long> b = {0, 2, 6};  // Differences 2,4: convex.
+    assert(m1une::convex::is_convex_sequence(b));
+    auto answer = m1une::convex::min_plus_convolution_convex(a, b);
+    assert(answer == std::vector<long long>({0, 2, 1, 3, 7}));
+    for (int k = 0; k < int(answer.size()); ++k) {
+        std::cout << k << ' ' << answer[k] << '\n';
+    }
+}
+```
+
+Output (total quantity, minimum cost):
+
+```text
+0 0
+1 2
+2 1
+3 3
+4 7
+```
+
+The arguments are the **two cost arrays**, with the convex one second; there
+is no callback. The result contains minimum **values**, not split indices.
+Its length is `a.size()+b.size()-1`, because possible totals run from `0` to
+`(a.size()-1)+(b.size()-1)`. Work drops from $O(NM)$ to $O(N+M)$.
+
+For your own inputs, check the second array's adjacent differences. If both
+arrays are convex, use `min_plus_convolution_convex_convex` for smaller
+constants. To maximize instead, use `max_plus_convolution_concave` with a
+concave second array (nonincreasing adjacent differences).
+
+If quantities are unavailable, use the sentinel-aware overload. For example,
+`b={0,2,6,INF}` says quantity 3 from B is unavailable. Pass `INF` as the third
+argument, and check output entries for `INF` before using them. The exact
+finite-domain restrictions are specified below.
 
 ## Functions
 
@@ -546,31 +621,3 @@ The convolution element type must support addition and comparison. The
 sentinel-aware overloads additionally require equality comparison. The
 precondition helpers and two-structured specializations require subtraction.
 Finite intermediate sums and adjacent differences must fit in the type.
-
-## Example
-
-```cpp
-#include "convex/monge/min_plus_convolution.hpp"
-#include <vector>
-
-int main() {
-    std::vector<long long> first = {4, -3, 8, 1};
-    std::vector<long long> second = {1, 2, 5, 10};
-
-    auto result = m1une::convex::min_plus_convolution_convex(first, second);
-
-    std::vector<long long> another_convex = {0, 3, 8, 15};
-    auto structured = m1une::convex::min_plus_convolution_convex_convex(
-        another_convex, second);
-
-    constexpr long long infinity = 2'000'000'000'000'000'000LL;
-    std::vector<long long> extended_convex = {0, 1, infinity, infinity};
-    auto extended = m1une::convex::min_plus_convolution_convex(
-        first, extended_convex, infinity);
-
-    std::vector<long long> first_max = {2, 9, -1, 5};
-    std::vector<long long> second_concave = {-1, -2, -5, -10};
-    auto maximum =
-        m1une::convex::max_plus_convolution_concave(first_max, second_concave);
-}
-```
