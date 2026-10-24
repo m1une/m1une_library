@@ -66,6 +66,10 @@ std::vector<int> row_optima(int row_count, int column_count, const Select& selec
 
 }  // namespace smawk_detail
 
+// Search a fixed H x W rectangle, returning column indices (leftmost on ties).
+// Requires total monotonicity under Compare; Monge suffices for minima.
+// For anti-Monge minima, reverse columns in value and map indices back.
+// O(H + W) evaluations; callbacks may be queried out of row order.
 template <class Value, class Compare = std::less<>>
 std::vector<int> smawk_row_optima(int row_count, int column_count, Value value,
                                   Compare compare = Compare()) {

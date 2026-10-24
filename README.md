@@ -84,6 +84,13 @@ plumbing live in `utilities/`.
 | `convex/slope_trick.hpp` | Slope trick for maintaining convex piecewise-linear functions. |
 | `convex/alien_trick.hpp` | Exact-count optimization through Lagrangian relaxation. |
 
+For Monge optimization, start with the [algorithm selection guide](docs/convex/monge/all.md).
+It explains how to express a recurrence as a matrix, choose an algorithm,
+handle Monge and anti-Monge orientation, and respect DP dependencies.
+Each algorithm's page specifies its callback, index mapping, assumptions,
+and complexity. Its worked example starts with a small task and the ordinary
+candidate-search loop, then shows the library call and its exact output.
+
 ### Data structure categories
 
 | Directory | Use it for |

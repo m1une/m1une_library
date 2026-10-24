@@ -26,6 +26,9 @@ void solve(int row_left, int row_right, int column_left, int column_right,
 
 }  // namespace monotone_minima_detail
 
+// Fixed rectangular matrix; leftmost optimal columns must be nondecreasing.
+// Returns column indices, or -1 when there are no columns. Not an online DP.
+// Anti-Monge minima require reversing one axis before using this routine.
 template <class Value, class Compare = std::less<>>
 std::vector<int> monotone_row_optima(int row_count, int column_count, Value value,
                                      Compare compare = Compare()) {

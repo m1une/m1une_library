@@ -32,6 +32,9 @@ auto divide_and_conquer_dp(int state_count, int candidate_count, Value value)
     return result;
 }
 
+// One transition from a finalized previous layer. This does not compute a
+// same-array recurrence dp[j] = min_i(dp[i] + cost(i,j)).
+// Leftmost minimizing candidates must be nondecreasing with the state index.
 template <class T, class Cost>
 auto divide_and_conquer_transition(const std::vector<T>& previous, int state_count,
                                    Cost cost)
