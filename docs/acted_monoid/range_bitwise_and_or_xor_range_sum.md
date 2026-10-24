@@ -5,7 +5,7 @@ documentation_of: ../../acted_monoid/range_bitwise_and_or_xor_range_sum.hpp
 
 ## Overview
 
-`RangeBitwiseAndOrXorRangeSum<T, BITS>` is an acted monoid for range bitwise
+`RangeBitwiseAndOrXorRangeSum<T, BITS, Count>` is an acted monoid for range bitwise
 AND, OR, and XOR updates and range sum queries. It is intended for lazy data
 structures such as `LazySegtree`.
 
@@ -19,8 +19,8 @@ $$
 This form represents AND, OR, XOR, and every composition of those operations.
 The order of lazy operators matters.
 
-`value_type` has members `T sum`, `std::array<long long, BITS> bit_count`, and
-`long long size`. `operator_type` has members `T and_mask` and `T xor_mask`.
+`value_type` has members `T sum`, `std::array<Count, BITS> bit_count`, and
+`Count size`. `operator_type` has members `T and_mask` and `T xor_mask`.
 Prefer the three update factories below instead of constructing an operator
 directly.
 
@@ -31,6 +31,11 @@ directly.
 * `BITS`: Number of low bits to track. It defaults to `30` and must not exceed
   `std::numeric_limits<T>::digits`. For values below $2^{60}$, use
   `RangeBitwiseAndOrXorRangeSum<long long, 60>`.
+* `Count`: A non-boolean integral type for segment sizes and per-bit counts. It
+  defaults to `long long` for compatibility. Every represented segment size
+  must fit in `Count`. For a fixed-size segment tree with at most `INT_MAX`
+  elements, `RangeBitwiseAndOrXorRangeSum<unsigned int, 30, int>` uses smaller
+  aggregates and allows more counts to be processed per SIMD instruction.
 
 ## Interface and Complexity
 

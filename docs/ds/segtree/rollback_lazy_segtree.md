@@ -18,6 +18,8 @@ Constructors and read-only methods follow the corresponding mutable structure.
 | `void set(int pos, T value)`, `void set_inplace(int pos, T value)` | Assigns one point. | $O(\log N)$ |
 | `void apply(int pos, const F& f)`, `void apply(int left, int right, const F& f)` | Applies an action to a point or `[left, right)`. | $O(\log N)$ |
 | `void apply_inplace(...)` | Aliases of `apply`. | $O(\log N)$ |
+| `T get(int pos) const`, `T operator[](int pos) const` | Reads one point without pushing lazy tags or saving rollback data. | $O(\log N)$ |
+| `T prod(int left, int right) const` | Returns the product on `[left, right)` without pushing lazy tags or saving rollback data. | $O(\log N)$ |
 | `int snapshot()` | Registers the current state and returns its token. | $O(1)$ |
 | `int snapshot_count() const` | Returns the number of active snapshots. | $O(1)$ |
 | `void reserve_snapshots(int count)` | Reserves snapshot tokens. | $O(H)$ |
@@ -30,6 +32,14 @@ Constructors and read-only methods follow the corresponding mutable structure.
 Updates made before the first `snapshot()` retain no rollback data. A snapshot token is positive and valid only on the current path. `rollback(state)` restores that registered state, keeps it active, and invalidates newer snapshots. `clear_history()` commits the current state and invalidates every token. No per-update reversal operation is provided.
 
 Within one snapshot interval, a tree node is saved only before its first mutation.
+`get`, `operator[]`, and `prod` carry pending actions through the query instead
+of mutating nodes. Other traversal methods may still push lazy tags and save
+nodes. Range updates recompute each affected ancestor at most once.
+
+The bounds above count acted-monoid operations and copies as $O(1)$. For an
+aggregate containing $B$ per-bit counts, for example, updates and range products
+take $O(B\log N)$ time. Rollback storage is proportional to the number of nodes
+saved across active snapshot intervals, multiplied by the node size.
 
 ## Example
 

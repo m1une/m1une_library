@@ -40,6 +40,7 @@ void test_composition() {
     }
 }
 
+template <class AM>
 void test_randomized() {
     constexpr int n = 73;
     constexpr long long mask = (1LL << 10) - 1;
@@ -62,7 +63,7 @@ void test_randomized() {
         if (random() % 4 != 0) {
             long long operand = static_cast<long long>(random() & mask);
             int type = static_cast<int>(random() % 3);
-            AM::operator_type f = AM::op_id();
+            typename AM::operator_type f = AM::op_id();
             if (type == 0) {
                 f = AM::make_and(operand);
                 for (int i = l; i < r; ++i) values[i] &= operand;
@@ -85,6 +86,24 @@ void test_randomized() {
     }
 }
 
+void test_large_counts() {
+    using Wide = m1une::acted_monoid::RangeBitwiseAndOrXorRangeSum<std::uint64_t>;
+    auto value = Wide::make(3);
+    for (int i = 0; i < 32; ++i) value = Wide::op(value, value);
+    assert(value.size == (1LL << 32));
+    assert(value.bit_count[0] == value.size && value.bit_count[1] == value.size);
+    auto mapped = Wide::mapping(Wide::make_xor(6), value);
+    assert(mapped.sum == 5ULL * (1ULL << 32));
+    assert(mapped.bit_count[0] == value.size);
+    assert(mapped.bit_count[1] == 0);
+    assert(mapped.bit_count[2] == value.size);
+
+    auto high = UnsignedFullWidth::make(1ULL << 63);
+    auto low = UnsignedFullWidth::mapping(UnsignedFullWidth::make_xor(~0ULL), high);
+    assert(low.sum == (1ULL << 63) - 1);
+    assert(low.bit_count[63] == 0 && low.bit_count[62] == 1);
+}
+
 static_assert(m1une::acted_monoid::IsActedMonoid<AM>);
 static_assert(AM::commutative);
 static_assert(!AM::operator_commutative);
@@ -95,7 +114,10 @@ static_assert(UnsignedFullWidth::bit_mask() == std::numeric_limits<unsigned long
 
 int main() {
     test_composition();
-    test_randomized();
+    test_randomized<AM>();
+    test_randomized<m1une::acted_monoid::RangeBitwiseAndOrXorRangeSum<long long, 10, int>>();
+    test_randomized<m1une::acted_monoid::RangeBitwiseAndOrXorRangeSum<std::uint32_t, 10, int>>();
+    test_large_counts();
 
     long long a, b;
     std::cin >> a >> b;

@@ -81,7 +81,8 @@ struct RollbackLazySegtree {
         _journal.touch(node);
         _journal[node].value = mapping_at(f, _journal[node].value, 0);
         if (node < _size) {
-            _journal[node].lazy = ActedMonoid::op_comp(f, _journal[node].lazy);
+            _journal[node].lazy = _journal[node].has_lazy
+                ? ActedMonoid::op_comp(f, _journal[node].lazy) : f;
             _journal[node].has_lazy = true;
         }
     }
@@ -92,8 +93,35 @@ struct RollbackLazySegtree {
         all_apply(node << 1, lazy);
         all_apply(node << 1 | 1, shift_operator(lazy, node_length(node) / 2));
         _journal.touch(node);
-        _journal[node].lazy = ActedMonoid::op_id();
         _journal[node].has_lazy = false;
+    }
+
+    // Ancestor tags are newer than the tags stored below them. Carry their
+    // composition down instead of pushing (and journaling) nodes for a query.
+    T prod_node(int node, int start, int length, int left, int right,
+                const F& inherited, bool has_inherited) const {
+        const Node& current = _journal[node];
+        if (left <= start && start + length <= right) {
+            return has_inherited ? mapping_at(inherited, current.value, 0) : current.value;
+        }
+        F lazy = inherited;
+        bool has_lazy = has_inherited || current.has_lazy;
+        if (current.has_lazy) {
+            lazy = has_inherited ? ActedMonoid::op_comp(inherited, current.lazy) : current.lazy;
+        }
+        int half = length / 2;
+        int middle = start + half;
+        if (right <= middle) {
+            return prod_node(node << 1, start, half, left, right, lazy, has_lazy);
+        }
+        F right_lazy = shift_operator(lazy, half);
+        if (middle <= left) {
+            return prod_node(node << 1 | 1, middle, half, left, right, right_lazy, has_lazy);
+        }
+        return ActedMonoid::op(
+            prod_node(node << 1, start, half, left, right, lazy, has_lazy),
+            prod_node(node << 1 | 1, middle, half, left, right, right_lazy, has_lazy)
+        );
     }
 
     template <class U>
@@ -143,33 +171,17 @@ struct RollbackLazySegtree {
 
     void set_inplace(int pos, T value) { set(pos, std::move(value)); }
 
-    T get(int pos) {
+    T get(int pos) const {
         assert(0 <= pos && pos < _n);
-        int node = pos + _size;
-        for (int level = _log; level >= 1; --level) push(node >> level);
-        return _journal[node].value;
+        return prod(pos, pos + 1);
     }
 
-    T operator[](int pos) { return get(pos); }
+    T operator[](int pos) const { return get(pos); }
 
-    T prod(int left, int right) {
+    T prod(int left, int right) const {
         assert(0 <= left && left <= right && right <= _n);
         if (left == right) return ActedMonoid::id();
-        left += _size;
-        right += _size;
-        for (int level = _log; level >= 1; --level) {
-            if (((left >> level) << level) != left) push(left >> level);
-            if (((right >> level) << level) != right) push((right - 1) >> level);
-        }
-        T left_product = ActedMonoid::id();
-        T right_product = ActedMonoid::id();
-        while (left < right) {
-            if (left & 1) left_product = ActedMonoid::op(left_product, _journal[left++].value);
-            if (right & 1) right_product = ActedMonoid::op(_journal[--right].value, right_product);
-            left >>= 1;
-            right >>= 1;
-        }
-        return ActedMonoid::op(left_product, right_product);
+        return prod_node(1, 0, _size, left, right, ActedMonoid::op_id(), false);
     }
 
     T all_prod() const { return _journal[1].value; }
@@ -226,8 +238,12 @@ struct RollbackLazySegtree {
         left = saved_left;
         right = saved_right;
         for (int level = 1; level <= _log; ++level) {
-            if (((left >> level) << level) != left) update(left >> level);
-            if (((right >> level) << level) != right) update((right - 1) >> level);
+            int left_node = left >> level;
+            int right_node = (right - 1) >> level;
+            bool update_left = (left_node << level) != left;
+            if (update_left) update(left_node);
+            if (((right >> level) << level) != right &&
+                (!update_left || right_node != left_node)) update(right_node);
         }
     }
 

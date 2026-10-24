@@ -8,20 +8,22 @@
 namespace m1une {
 namespace acted_monoid {
 
-template <typename T, int BITS>
+template <typename T, int BITS, typename Count = long long>
 struct RangeBitwiseAndOrXorRangeSumNode {
     T sum;
-    std::array<long long, BITS> bit_count;
-    long long size;
+    std::array<Count, BITS> bit_count;
+    Count size;
 };
 
 // Acted monoid for range bitwise AND, OR, and XOR updates and range sum queries.
-template <typename T, int BITS = 30>
+template <typename T, int BITS = 30, typename Count = long long>
 struct RangeBitwiseAndOrXorRangeSum {
     static_assert(std::is_integral_v<T> && !std::is_same_v<std::remove_cv_t<T>, bool>);
     static_assert(0 < BITS && BITS <= std::numeric_limits<T>::digits);
 
-    using value_type = RangeBitwiseAndOrXorRangeSumNode<T, BITS>;
+    static_assert(std::is_integral_v<Count> && !std::is_same_v<std::remove_cv_t<Count>, bool>);
+
+    using value_type = RangeBitwiseAndOrXorRangeSumNode<T, BITS, Count>;
 
     // Represents f(x) = (x & and_mask) ^ xor_mask on the lowest BITS bits.
     struct operator_type {
@@ -71,8 +73,11 @@ struct RangeBitwiseAndOrXorRangeSum {
         value_type res = x;
         res.sum = T(0);
         for (int i = 0; i < BITS; ++i) {
-            long long count = ((f.and_mask >> i) & T(1)) ? x.bit_count[i] : 0;
-            if ((f.xor_mask >> i) & T(1)) count = x.size - count;
+            // Use full-width masks so both selections can be vectorized.
+            Count keep = -static_cast<Count>((f.and_mask >> i) & T(1));
+            Count flip = -static_cast<Count>((f.xor_mask >> i) & T(1));
+            Count count = x.bit_count[i] & keep;
+            count = (count & ~flip) | ((x.size - count) & flip);
             res.bit_count[i] = count;
             res.sum += static_cast<T>(count) * (T(1) << i);
         }
