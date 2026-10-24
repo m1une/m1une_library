@@ -60,18 +60,18 @@ table, replace the lookup with your formula or range query.
 
 This example is Monge: its entries equal `base[row] + 4*(row-column)^2`,
 with `base={5,2,7}`. Your own cost needs the documented ordering property
-before you use this optimization. The [SMAWK worked example](smawk.md)
+before you use this optimization. The [SMAWK worked example](https://m1une.github.io/m1une_library/convex/monge/smawk.hpp)
 shows the original nested loop, exact output, and argument meanings.
 
 For other recurrences, start with the corresponding worked example:
 
 | What your straightforward code does | Worked example |
 | --- | --- |
-| Scans all choices independently for each answer | [SMAWK](smawk.md) or [monotone minima](monotone_minima.md). |
-| Builds a new cost array from a known previous array | [One more move from known costs](divide_and_conquer_optimization.md). |
-| Computes later DP values from earlier values in the same array | [Forward jumps with Monge costs](larsch.md) or [anti-Monge costs](anti_monge_shortest_path.md). |
-| Tries every split of an interval | [Merging adjacent piles](knuth_optimization.md). |
-| Tries every pair of quantities whose sum is a requested total | [Two-supplier convolution](min_plus_convolution.md). |
+| Scans all choices independently for each answer | [SMAWK](https://m1une.github.io/m1une_library/convex/monge/smawk.hpp) or [monotone minima](https://m1une.github.io/m1une_library/convex/monge/monotone_minima.hpp). |
+| Builds a new cost array from a known previous array | [One more move from known costs](https://m1une.github.io/m1une_library/convex/monge/divide_and_conquer_optimization.hpp). |
+| Computes later DP values from earlier values in the same array | [Forward jumps with Monge costs](https://m1une.github.io/m1une_library/convex/monge/larsch.hpp) or [anti-Monge costs](https://m1une.github.io/m1une_library/convex/monge/anti_monge_shortest_path.hpp). |
+| Tries every split of an interval | [Merging adjacent piles](https://m1une.github.io/m1une_library/convex/monge/knuth_optimization.hpp). |
+| Tries every pair of quantities whose sum is a requested total | [Two-supplier convolution](https://m1une.github.io/m1une_library/convex/monge/min_plus_convolution.hpp). |
 
 Each page starts with a small task and its straightforward implementation,
 then a complete library-based program, expected answers, and the condition
@@ -82,13 +82,13 @@ examples once the basic call is clear.
 
 | Task | API | Required structure | Work, for constant-time callbacks |
 | --- | --- | --- | --- |
-| `answer[r] = min_c M(r,c)`, all entries fixed | [smawk_row_argmin](smawk.md) | Total monotonicity for leftmost minima; Monge suffices. | $O(H+W)$ |
-| Same, but only the full matrix's argmins are known to be nondecreasing | [monotone_row_argmin](monotone_minima.md) | Nondecreasing leftmost argmins. | $O((H+W)\log(H+1))$ |
-| `next[j] = min_i(previous[i] + cost(i,j))` | [divide_and_conquer_transition](divide_and_conquer_optimization.md) | Previous layer fixed; nondecreasing minimizing candidates. | $O((H+W)\log(H+1))$ per layer |
-| `dp[j] = min_{i<j}(dp[i] + cost(i,j))`, Monge costs | [larsch_shortest_path](larsch.md) | Triangular total monotonicity for minima. | $O(V)$ |
-| Same forward DP, anti-Monge costs, optionally `j-i >= D` | [anti_monge_shortest_path](anti_monge_shortest_path.md) | Anti-Monge on valid rectangles. | $O(V\log V+VD)$; $O(V\log V)$ for fixed `D`. |
-| `dp[l][r] = cost(l,r) + min_k(dp[l][k]+dp[k][r])` | [knuth_optimization](knuth_optimization.md) | Knuth's split monotonicity. | $O(N^2)$ |
-| `answer[k] = min_{i+j=k}(a[i]+b[j])`, or the maximum analogue | [structured convolution](min_plus_convolution.md) | Convex or concave input sequences as documented. | $O(N+M)$ |
+| `answer[r] = min_c M(r,c)`, all entries fixed | [smawk_row_argmin](https://m1une.github.io/m1une_library/convex/monge/smawk.hpp) | Total monotonicity for leftmost minima; Monge suffices. | $O(H+W)$ |
+| Same, but only the full matrix's argmins are known to be nondecreasing | [monotone_row_argmin](https://m1une.github.io/m1une_library/convex/monge/monotone_minima.hpp) | Nondecreasing leftmost argmins. | $O((H+W)\log(H+1))$ |
+| `next[j] = min_i(previous[i] + cost(i,j))` | [divide_and_conquer_transition](https://m1une.github.io/m1une_library/convex/monge/divide_and_conquer_optimization.hpp) | Previous layer fixed; nondecreasing minimizing candidates. | $O((H+W)\log(H+1))$ per layer |
+| `dp[j] = min_{i<j}(dp[i] + cost(i,j))`, Monge costs | [larsch_shortest_path](https://m1une.github.io/m1une_library/convex/monge/larsch.hpp) | Triangular total monotonicity for minima. | $O(V)$ |
+| Same forward DP, anti-Monge costs, optionally `j-i >= D` | [anti_monge_shortest_path](https://m1une.github.io/m1une_library/convex/monge/anti_monge_shortest_path.hpp) | Anti-Monge on valid rectangles. | $O(V\log V+VD)$; $O(V\log V)$ for fixed `D`. |
+| `dp[l][r] = cost(l,r) + min_k(dp[l][k]+dp[k][r])` | [knuth_optimization](https://m1une.github.io/m1une_library/convex/monge/knuth_optimization.hpp) | Knuth's split monotonicity. | $O(N^2)$ |
+| `answer[k] = min_{i+j=k}(a[i]+b[j])`, or the maximum analogue | [structured convolution](https://m1une.github.io/m1une_library/convex/monge/min_plus_convolution.hpp) | Convex or concave input sequences as documented. | $O(N+M)$ |
 
 `divide_and_conquer_dp` is a value-and-choice wrapper around monotone minima;
 it does not imply that the recurrence has a segment-count dimension.
@@ -186,7 +186,7 @@ and whether the output is a value or an index. Then match that loop to the
 callback table above.
 
 For a previous-layer recurrence, follow the
-[known-costs example](divide_and_conquer_optimization.md): provide the previous
+[known-costs example](https://m1une.github.io/m1une_library/convex/monge/divide_and_conquer_optimization.hpp): provide the previous
 array and a transition-cost callback, then read `.value` and `.argmin`.
 For multiple layers, finish each layer before replacing `previous`. Layer
 count multiplies the work; the library does not decide whether your problem

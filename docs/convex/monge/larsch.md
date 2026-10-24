@@ -197,9 +197,9 @@ The implementation does not verify total monotonicity.
 
 Anti-Monge minimization has the opposite direction and is not covered by this
 guarantee. For that forward DP, including a minimum edge length, use
-[anti-Monge shortest paths](anti_monge_shortest_path.md). Do not assume that
+[anti-Monge shortest paths](https://m1une.github.io/m1une_library/convex/monge/anti_monge_shortest_path.hpp). Do not assume that
 padding forbidden edges with infinity preserves the precondition; see the
-[Monge guide](all.md) for validity masks and matrix orientation.
+[Monge guide](https://m1une.github.io/m1une_library/convex/monge/all.hpp) for validity masks and matrix orientation.
 
 ## Complexity
 

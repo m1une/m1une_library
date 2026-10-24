@@ -119,9 +119,9 @@ Unlike SMAWK, this function does not require every submatrix to preserve
 monotonicity.
 
 For anti-Monge minima, reverse columns and map the returned indices back,
-as shown in the [SMAWK documentation](smawk.md). Without reversal, anti-Monge
+as shown in the [SMAWK documentation](https://m1une.github.io/m1une_library/convex/monge/smawk.hpp). Without reversal, anti-Monge
 does not provide the required direction. Callbacks must describe fixed entries;
-this routine is not an online DP solver. See the [Monge guide](all.md) for
+this routine is not an online DP solver. See the [Monge guide](https://m1une.github.io/m1une_library/convex/monge/all.hpp) for
 recurrence-to-matrix mapping and DP dependency rules.
 
 ## Complexity
