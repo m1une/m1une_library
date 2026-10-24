@@ -315,11 +315,11 @@ data:
     \ m1une\n\n\n#line 7 \"verify/geometry/convex_layers.test.cpp\"\n#include <limits>\n\
     #line 9 \"verify/geometry/convex_layers.test.cpp\"\n\n#line 1 \"geometry/convex_hull.hpp\"\
     \n\n\n\n#line 8 \"geometry/convex_hull.hpp\"\n\n#line 1 \"geometry/point.hpp\"\
-    \n\n\n\n#include <cmath>\n#include <concepts>\n#line 8 \"geometry/point.hpp\"\n\
-    \n#line 1 \"geometry/detail/floating_predicate.hpp\"\n\n\n\nnamespace m1une {\n\
-    namespace geometry {\nnamespace predicate_detail {\n\ntemplate <typename T>\n\
-    constexpr T absolute(T value) {\n    return value < T(0) ? -value : value;\n}\n\
-    \ntemplate <typename T>\nconstexpr T max_value(T first, T second) {\n    return\
+    \n\n\n\n#include <cmath>\n#include <concepts>\n#line 10 \"geometry/point.hpp\"\
+    \n\n#line 1 \"geometry/detail/floating_predicate.hpp\"\n\n\n\nnamespace m1une\
+    \ {\nnamespace geometry {\nnamespace predicate_detail {\n\ntemplate <typename\
+    \ T>\nconstexpr T absolute(T value) {\n    return value < T(0) ? -value : value;\n\
+    }\n\ntemplate <typename T>\nconstexpr T max_value(T first, T second) {\n    return\
     \ first < second ? second : first;\n}\n\ntemplate <typename T>\nconstexpr T vector_scale(T\
     \ x, T y) {\n    return max_value(absolute(x), absolute(y));\n}\n\ntemplate <bool\
     \ Exact, typename T>\nconstexpr int scaled_sign(T value, T scale, long double\
@@ -344,7 +344,7 @@ data:
     \ T value = ax * bx + ay * by;\n    T scale = T(0);\n    if constexpr (!Exact)\
     \ {\n        scale = vector_scale(ax, ay) * vector_scale(bx, by);\n    }\n   \
     \ return scaled_sign<Exact>(value, scale, eps);\n}\n\n}  // namespace predicate_detail\n\
-    }  // namespace geometry\n}  // namespace m1une\n\n\n#line 10 \"geometry/point.hpp\"\
+    }  // namespace geometry\n}  // namespace m1une\n\n\n#line 12 \"geometry/point.hpp\"\
     \n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <typename T>\nconcept\
     \ Coordinate = !std::same_as<std::remove_cv_t<T>, bool> &&\n    (std::is_arithmetic_v<T>\
     \ ||\n     (std::copyable<T> && std::totally_ordered<T> && requires(T a, T b)\
@@ -357,24 +357,42 @@ data:
     \ <typename T>\nconcept ExactCoordinate = Coordinate<T> && !std::floating_point<T>;\n\
     \ntemplate <Coordinate T>\nusing wide_type = std::conditional_t<std::integral<T>,\
     \ __int128_t,\n    std::conditional_t<std::floating_point<T>, long double, T>>;\n\
-    \ntemplate <Coordinate T>\nstruct Point {\n    T x;\n    T y;\n\n    constexpr\
-    \ Point() : x(0), y(0) {}\n    constexpr Point(T x_value, T y_value) : x(x_value),\
-    \ y(y_value) {}\n\n    template <Coordinate U>\n    explicit constexpr Point(const\
-    \ Point<U>& other)\n        : x(static_cast<T>(other.x)), y(static_cast<T>(other.y))\
-    \ {}\n\n    constexpr Point& operator+=(const Point& other) {\n        x += other.x;\n\
-    \        y += other.y;\n        return *this;\n    }\n\n    constexpr Point& operator-=(const\
-    \ Point& other) {\n        x -= other.x;\n        y -= other.y;\n        return\
-    \ *this;\n    }\n\n    constexpr Point operator+() const {\n        return *this;\n\
-    \    }\n\n    constexpr Point operator-() const {\n        return Point(-x, -y);\n\
-    \    }\n\n    friend constexpr Point operator+(Point left, const Point& right)\
-    \ {\n        return left += right;\n    }\n\n    friend constexpr Point operator-(Point\
-    \ left, const Point& right) {\n        return left -= right;\n    }\n\n    friend\
-    \ constexpr bool operator==(const Point&, const Point&) = default;\n\n    friend\
-    \ constexpr bool operator<(const Point& left, const Point& right) {\n        if\
-    \ (left.x != right.x) return left.x < right.x;\n        return left.y < right.y;\n\
-    \    }\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const\
-    \ Point<T>& point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate\
-    \ T, typename Scalar>\nrequires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n\
+    \ntemplate <Coordinate T>\nstruct Point {\n    using coordinate_type = T;\n\n\
+    \    T x;\n    T y;\n\n    constexpr Point() : x(0), y(0) {}\n    constexpr Point(T\
+    \ x_value, T y_value) : x(x_value), y(y_value) {}\n\n    template <Coordinate\
+    \ U>\n    explicit constexpr Point(const Point<U>& other)\n        : x(static_cast<T>(other.x)),\
+    \ y(static_cast<T>(other.y)) {}\n\n    constexpr Point& operator+=(const Point&\
+    \ other) {\n        x += other.x;\n        y += other.y;\n        return *this;\n\
+    \    }\n\n    constexpr Point& operator-=(const Point& other) {\n        x -=\
+    \ other.x;\n        y -= other.y;\n        return *this;\n    }\n\n    constexpr\
+    \ Point operator+() const {\n        return *this;\n    }\n\n    constexpr Point\
+    \ operator-() const {\n        return Point(-x, -y);\n    }\n\n    friend constexpr\
+    \ Point operator+(Point left, const Point& right) {\n        return left += right;\n\
+    \    }\n\n    friend constexpr Point operator-(Point left, const Point& right)\
+    \ {\n        return left -= right;\n    }\n\n    friend constexpr bool operator==(const\
+    \ Point&, const Point&) = default;\n\n    friend constexpr bool operator<(const\
+    \ Point& left, const Point& right) {\n        if (left.x != right.x) return left.x\
+    \ < right.x;\n        return left.y < right.y;\n    }\n};\n\n// Attach arbitrary\
+    \ metadata without changing coordinate semantics.\n// Arithmetic and conversions\
+    \ inherited from Point return ordinary points.\ntemplate <Coordinate T, typename\
+    \ Data>\nstruct PointWithData : Point<T> {\n    Data data;\n\n    constexpr PointWithData()\
+    \ requires std::default_initializable<Data>\n        : Point<T>(), data() {}\n\
+    \n    constexpr PointWithData(T x, T y)\n        requires std::default_initializable<Data>\n\
+    \        : Point<T>(x, y), data() {}\n\n    constexpr PointWithData(T x, T y,\
+    \ Data value)\n        : Point<T>(x, y), data(std::move(value)) {}\n\n    constexpr\
+    \ PointWithData(Point<T> point, Data value)\n        : Point<T>(std::move(point)),\
+    \ data(std::move(value)) {}\n};\n\n// User-defined records may publicly derive\
+    \ from Point<T> as well.\ntemplate <typename P>\nconcept PointRecord = requires\
+    \ {\n    typename P::coordinate_type;\n    requires Coordinate<typename P::coordinate_type>;\n\
+    \    requires std::derived_from<P, Point<typename P::coordinate_type>>;\n};\n\n\
+    // Explicitly discard metadata for APIs that construct new geometric objects.\n\
+    template <PointRecord P>\nstd::vector<Point<typename P::coordinate_type>> to_points(\n\
+    \    const std::vector<P>& records\n) {\n    using T = typename P::coordinate_type;\n\
+    \    std::vector<Point<T>> result;\n    result.reserve(records.size());\n    for\
+    \ (const Point<T>& point : records) result.push_back(point);\n    return result;\n\
+    }\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const Point<T>&\
+    \ point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate T,\
+    \ typename Scalar>\nrequires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n\
     constexpr auto operator*(const Point<T>& point, Scalar scalar) {\n    using Result\
     \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
     \ * Result(scalar),\n        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate\
@@ -443,48 +461,56 @@ data:
     \    );\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 10 \"\
     geometry/convex_hull.hpp\"\n\nnamespace m1une {\nnamespace geometry {\n\n// Returns\
     \ the convex hull counterclockwise from its lexicographically smallest\n// point.\
-    \ The first point is not repeated at the end.\ntemplate <Coordinate T>\nstd::vector<Point<T>>\
-    \ convex_hull(\n    std::vector<Point<T>> points,\n    bool include_collinear\
-    \ = false\n) {\n    std::sort(points.begin(), points.end());\n    points.erase(std::unique(points.begin(),\
-    \ points.end()), points.end());\n    std::size_t size = points.size();\n    if\
-    \ (size <= 1) return points;\n\n    std::vector<Point<T>> hull;\n    hull.reserve(2\
-    \ * size);\n    auto should_pop = [include_collinear](\n        const Point<T>&\
-    \ first,\n        const Point<T>& second,\n        const Point<T>& third\n   \
-    \ ) {\n        int turn = orientation(first, second, third);\n        return include_collinear\
-    \ ? turn < 0 : turn <= 0;\n    };\n\n    for (const Point<T>& point : points)\
-    \ {\n        while (\n            hull.size() >= 2 &&\n            should_pop(hull[hull.size()\
+    \ The first point is not repeated at the end. Equal coordinates retain\n// the\
+    \ first input record, independently of metadata.\ntemplate <PointRecord P>\nstd::vector<P>\
+    \ convex_hull(\n    std::vector<P> points,\n    bool include_collinear = false\n\
+    ) {\n    using T = typename P::coordinate_type;\n    auto less = [](const Point<T>&\
+    \ a, const Point<T>& b) { return a < b; };\n    if constexpr (std::same_as<P,\
+    \ Point<T>>) {\n        std::sort(points.begin(), points.end(), less);\n    }\
+    \ else {\n        std::stable_sort(points.begin(), points.end(), less);\n    }\n\
+    \    points.erase(\n        std::unique(points.begin(), points.end(),\n      \
+    \      [](const Point<T>& a, const Point<T>& b) { return a == b; }),\n       \
+    \ points.end()\n    );\n    std::size_t size = points.size();\n    if (size <=\
+    \ 1) return points;\n\n    std::vector<P> hull;\n    hull.reserve(2 * size);\n\
+    \    auto should_pop = [include_collinear](\n        const Point<T>& first,\n\
+    \        const Point<T>& second,\n        const Point<T>& third\n    ) {\n   \
+    \     int turn = orientation(first, second, third);\n        return include_collinear\
+    \ ? turn < 0 : turn <= 0;\n    };\n\n    for (const P& point : points) {\n   \
+    \     while (\n            hull.size() >= 2 &&\n            should_pop(hull[hull.size()\
     \ - 2], hull.back(), point)\n        ) {\n            hull.pop_back();\n     \
     \   }\n        hull.push_back(point);\n    }\n\n    std::size_t lower_size = hull.size();\n\
-    \    for (std::size_t index = size - 1; index-- > 0;) {\n        const Point<T>&\
-    \ point = points[index];\n        while (\n            hull.size() > lower_size\
-    \ &&\n            should_pop(hull[hull.size() - 2], hull.back(), point)\n    \
-    \    ) {\n            hull.pop_back();\n        }\n        hull.push_back(point);\n\
+    \    for (std::size_t index = size - 1; index-- > 0;) {\n        const P& point\
+    \ = points[index];\n        while (\n            hull.size() > lower_size &&\n\
+    \            should_pop(hull[hull.size() - 2], hull.back(), point)\n        )\
+    \ {\n            hull.pop_back();\n        }\n        hull.push_back(point);\n\
     \    }\n    hull.pop_back();\n\n    if (include_collinear && hull.size() == 2\
     \ * points.size() - 2) {\n        hull = std::move(points);\n    }\n    return\
-    \ hull;\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 1 \"\
-    geometry/convex_layers.hpp\"\n\n\n\n#line 9 \"geometry/convex_layers.hpp\"\n\n\
-    #line 11 \"geometry/convex_layers.hpp\"\n\nnamespace m1une {\nnamespace geometry\
-    \ {\n\nnamespace convex_layers_detail {\n\ntemplate <Coordinate T>\nstruct LayerPoint\
-    \ {\n    wide_type<T> x;\n    wide_type<T> y;\n};\n\ntemplate <Coordinate T>\n\
-    wide_type<T> layer_cross(\n    const LayerPoint<T>& first,\n    const LayerPoint<T>&\
-    \ second,\n    const LayerPoint<T>& third\n) {\n    return\n        (second.x\
-    \ - first.x) * (third.y - first.y) -\n        (second.y - first.y) * (third.x\
-    \ - first.x);\n}\n\ntemplate <Coordinate T>\nclass DecrementalHull {\n   private:\n\
-    \    struct Node {\n        int left_bound;\n        int right_bound;\n      \
-    \  int bridge_left;\n        int bridge_right;\n        int left_child;\n    \
-    \    int right_child;\n    };\n\n    std::vector<LayerPoint<T>> points;\n    std::vector<Node>\
-    \ nodes;\n    int root;\n\n    bool is_leaf(int node) const {\n        return\
-    \ nodes[node].left_child == -1 && nodes[node].right_child == -1;\n    }\n\n  \
-    \  void pull(int node) {\n        int left = nodes[node].left_child;\n       \
-    \ int right = nodes[node].right_child;\n        assert(left != -1 && right !=\
-    \ -1);\n        using Wide = wide_type<T>;\n        const Wide split_y = points[nodes[right].left_bound].y;\n\
-    \n        while (!is_leaf(left) || !is_leaf(right)) {\n            const int a\
-    \ = nodes[left].bridge_left;\n            const int b = nodes[left].bridge_right;\n\
-    \            const int c = nodes[right].bridge_left;\n            const int d\
-    \ = nodes[right].bridge_right;\n\n            if (\n                a != b &&\n\
-    \                sign<T>(layer_cross<T>(points[a], points[b], points[c])) > 0\n\
-    \            ) {\n                left = nodes[left].left_child;\n           \
-    \ } else if (\n                c != d &&\n                sign<T>(layer_cross<T>(points[b],\
+    \ hull;\n}\n\ntemplate <Coordinate T>\nstd::vector<Point<T>> convex_hull(\n  \
+    \  std::vector<Point<T>> points,\n    bool include_collinear = false\n) {\n  \
+    \  return convex_hull<Point<T>>(std::move(points), include_collinear);\n}\n\n\
+    }  // namespace geometry\n}  // namespace m1une\n\n\n#line 1 \"geometry/convex_layers.hpp\"\
+    \n\n\n\n#line 9 \"geometry/convex_layers.hpp\"\n\n#line 11 \"geometry/convex_layers.hpp\"\
+    \n\nnamespace m1une {\nnamespace geometry {\n\nnamespace convex_layers_detail\
+    \ {\n\ntemplate <Coordinate T>\nstruct LayerPoint {\n    wide_type<T> x;\n   \
+    \ wide_type<T> y;\n};\n\ntemplate <Coordinate T>\nwide_type<T> layer_cross(\n\
+    \    const LayerPoint<T>& first,\n    const LayerPoint<T>& second,\n    const\
+    \ LayerPoint<T>& third\n) {\n    return\n        (second.x - first.x) * (third.y\
+    \ - first.y) -\n        (second.y - first.y) * (third.x - first.x);\n}\n\ntemplate\
+    \ <Coordinate T>\nclass DecrementalHull {\n   private:\n    struct Node {\n  \
+    \      int left_bound;\n        int right_bound;\n        int bridge_left;\n \
+    \       int bridge_right;\n        int left_child;\n        int right_child;\n\
+    \    };\n\n    std::vector<LayerPoint<T>> points;\n    std::vector<Node> nodes;\n\
+    \    int root;\n\n    bool is_leaf(int node) const {\n        return nodes[node].left_child\
+    \ == -1 && nodes[node].right_child == -1;\n    }\n\n    void pull(int node) {\n\
+    \        int left = nodes[node].left_child;\n        int right = nodes[node].right_child;\n\
+    \        assert(left != -1 && right != -1);\n        using Wide = wide_type<T>;\n\
+    \        const Wide split_y = points[nodes[right].left_bound].y;\n\n        while\
+    \ (!is_leaf(left) || !is_leaf(right)) {\n            const int a = nodes[left].bridge_left;\n\
+    \            const int b = nodes[left].bridge_right;\n            const int c\
+    \ = nodes[right].bridge_left;\n            const int d = nodes[right].bridge_right;\n\
+    \n            if (\n                a != b &&\n                sign<T>(layer_cross<T>(points[a],\
+    \ points[b], points[c])) > 0\n            ) {\n                left = nodes[left].left_child;\n\
+    \            } else if (\n                c != d &&\n                sign<T>(layer_cross<T>(points[b],\
     \ points[c], points[d])) > 0\n            ) {\n                right = nodes[right].right_child;\n\
     \            } else if (a == b) {\n                right = nodes[right].left_child;\n\
     \            } else if (c == d) {\n                left = nodes[left].right_child;\n\
@@ -534,30 +560,31 @@ data:
     \ int(points.size()) - 1, result);\n        return result;\n    }\n\n    void\
     \ erase(int position) {\n        assert(root != -1);\n        assert(0 <= position\
     \ && position < int(points.size()));\n        root = erase(root, position);\n\
-    \    }\n};\n\n}  // namespace convex_layers_detail\n\ntemplate <Coordinate T>\n\
-    std::vector<int> convex_layers(const std::vector<Point<T>>& points) {\n    const\
-    \ int n = int(points.size());\n    if (n == 0) return {};\n\n    struct IndexedPoint\
-    \ {\n        Point<T> point;\n        int original_index;\n    };\n    std::vector<IndexedPoint>\
-    \ indexed;\n    indexed.reserve(n);\n    for (int index = 0; index < n; index++)\
-    \ {\n        indexed.push_back(IndexedPoint{points[index], index});\n    }\n \
-    \   std::sort(\n        indexed.begin(),\n        indexed.end(),\n        [](const\
-    \ IndexedPoint& first, const IndexedPoint& second) {\n            if (first.point.y\
-    \ != second.point.y) {\n                return first.point.y < second.point.y;\n\
-    \            }\n            if (first.point.x != second.point.x) {\n         \
-    \       return first.point.x < second.point.x;\n            }\n            return\
-    \ first.original_index < second.original_index;\n        }\n    );\n\n    std::vector<Point<T>>\
-    \ ordered;\n    std::vector<int> position(n);\n    ordered.reserve(n);\n    for\
-    \ (const IndexedPoint& item : indexed) {\n        if (ordered.empty() || !(ordered.back()\
-    \ == item.point)) {\n            ordered.push_back(item.point);\n        }\n \
-    \       position[item.original_index] = int(ordered.size()) - 1;\n    }\n\n  \
-    \  using LayerPoint = convex_layers_detail::LayerPoint<T>;\n    using Wide = wide_type<T>;\n\
-    \    std::vector<LayerPoint> left_points;\n    left_points.reserve(ordered.size());\n\
-    \    for (const Point<T>& point : ordered) {\n        left_points.push_back(LayerPoint{Wide(point.x),\
-    \ Wide(point.y)});\n    }\n    convex_layers_detail::DecrementalHull<T> left_hull(\n\
-    \        std::move(left_points)\n    );\n\n    std::vector<LayerPoint> reversed;\n\
-    \    reversed.reserve(ordered.size());\n    for (auto iterator = ordered.rbegin();\
-    \ iterator != ordered.rend(); ++iterator) {\n        reversed.push_back(LayerPoint{-Wide(iterator->x),\
-    \ -Wide(iterator->y)});\n    }\n    convex_layers_detail::DecrementalHull<T> right_hull(std::move(reversed));\n\
+    \    }\n};\n\n}  // namespace convex_layers_detail\n\ntemplate <PointRecord P>\n\
+    std::vector<int> convex_layers(const std::vector<P>& points) {\n    using T =\
+    \ typename P::coordinate_type;\n    const int n = int(points.size());\n    if\
+    \ (n == 0) return {};\n\n    struct IndexedPoint {\n        Point<T> point;\n\
+    \        int original_index;\n    };\n    std::vector<IndexedPoint> indexed;\n\
+    \    indexed.reserve(n);\n    for (int index = 0; index < n; index++) {\n    \
+    \    indexed.push_back(IndexedPoint{points[index], index});\n    }\n    std::sort(\n\
+    \        indexed.begin(),\n        indexed.end(),\n        [](const IndexedPoint&\
+    \ first, const IndexedPoint& second) {\n            if (first.point.y != second.point.y)\
+    \ {\n                return first.point.y < second.point.y;\n            }\n \
+    \           if (first.point.x != second.point.x) {\n                return first.point.x\
+    \ < second.point.x;\n            }\n            return first.original_index <\
+    \ second.original_index;\n        }\n    );\n\n    std::vector<Point<T>> ordered;\n\
+    \    std::vector<int> position(n);\n    ordered.reserve(n);\n    for (const IndexedPoint&\
+    \ item : indexed) {\n        if (ordered.empty() || !(ordered.back() == item.point))\
+    \ {\n            ordered.push_back(item.point);\n        }\n        position[item.original_index]\
+    \ = int(ordered.size()) - 1;\n    }\n\n    using LayerPoint = convex_layers_detail::LayerPoint<T>;\n\
+    \    using Wide = wide_type<T>;\n    std::vector<LayerPoint> left_points;\n  \
+    \  left_points.reserve(ordered.size());\n    for (const Point<T>& point : ordered)\
+    \ {\n        left_points.push_back(LayerPoint{Wide(point.x), Wide(point.y)});\n\
+    \    }\n    convex_layers_detail::DecrementalHull<T> left_hull(\n        std::move(left_points)\n\
+    \    );\n\n    std::vector<LayerPoint> reversed;\n    reversed.reserve(ordered.size());\n\
+    \    for (auto iterator = ordered.rbegin(); iterator != ordered.rend(); ++iterator)\
+    \ {\n        reversed.push_back(LayerPoint{-Wide(iterator->x), -Wide(iterator->y)});\n\
+    \    }\n    convex_layers_detail::DecrementalHull<T> right_hull(std::move(reversed));\n\
     \n    const int distinct_count = int(ordered.size());\n    std::vector<int> layer_by_position(distinct_count,\
     \ 0);\n    std::vector<int> selected_in_layer(distinct_count, 0);\n    int remaining\
     \ = distinct_count;\n    for (int layer = 1; remaining > 0; layer++) {\n     \
@@ -573,19 +600,21 @@ data:
     \ - 1 - ordered_position);\n            remaining--;\n        }\n    }\n\n   \
     \ std::vector<int> result(n);\n    for (int index = 0; index < n; index++) {\n\
     \        result[index] = layer_by_position[position[index]];\n    }\n    return\
-    \ result;\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 13\
-    \ \"verify/geometry/convex_layers.test.cpp\"\n\nnamespace {\n\nusing Point = m1une::geometry::Point<long\
-    \ long>;\n\nstd::vector<int> naive_convex_layers(const std::vector<Point>& points)\
-    \ {\n    const int n = int(points.size());\n    std::vector<int> result(n, 0);\n\
-    \    int remaining = n;\n    for (int layer = 1; remaining > 0; layer++) {\n \
-    \       std::vector<Point> active;\n        for (int index = 0; index < n; index++)\
-    \ {\n            if (result[index] == 0) active.push_back(points[index]);\n  \
-    \      }\n        std::vector<Point> hull = m1une::geometry::convex_hull(active,\
-    \ true);\n        for (int index = 0; index < n; index++) {\n            if (result[index]\
-    \ != 0) continue;\n            if (std::find(hull.begin(), hull.end(), points[index])\
-    \ == hull.end()) {\n                continue;\n            }\n            result[index]\
-    \ = layer;\n            remaining--;\n        }\n    }\n    return result;\n}\n\
-    \nvoid test_randomized() {\n    assert(m1une::geometry::convex_layers(std::vector<Point>()).empty());\n\
+    \ result;\n}\n\ntemplate <Coordinate T>\nstd::vector<int> convex_layers(const\
+    \ std::vector<Point<T>>& points) {\n    return convex_layers<Point<T>>(points);\n\
+    }\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 13 \"verify/geometry/convex_layers.test.cpp\"\
+    \n\nnamespace {\n\nusing Point = m1une::geometry::Point<long long>;\n\nstd::vector<int>\
+    \ naive_convex_layers(const std::vector<Point>& points) {\n    const int n = int(points.size());\n\
+    \    std::vector<int> result(n, 0);\n    int remaining = n;\n    for (int layer\
+    \ = 1; remaining > 0; layer++) {\n        std::vector<Point> active;\n       \
+    \ for (int index = 0; index < n; index++) {\n            if (result[index] ==\
+    \ 0) active.push_back(points[index]);\n        }\n        std::vector<Point> hull\
+    \ = m1une::geometry::convex_hull(active, true);\n        for (int index = 0; index\
+    \ < n; index++) {\n            if (result[index] != 0) continue;\n           \
+    \ if (std::find(hull.begin(), hull.end(), points[index]) == hull.end()) {\n  \
+    \              continue;\n            }\n            result[index] = layer;\n\
+    \            remaining--;\n        }\n    }\n    return result;\n}\n\nvoid test_randomized()\
+    \ {\n    assert(m1une::geometry::convex_layers(std::vector<Point>()).empty());\n\
     \n    std::uint64_t state = 0x3141592653589793ULL;\n    auto random = [&]() {\n\
     \        state ^= state << 7;\n        state ^= state >> 9;\n        return state;\n\
     \    };\n    for (int test = 0; test < 500; test++) {\n        const int n = int(random()\
@@ -660,7 +689,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/convex_layers.test.cpp
   requiredBy: []
-  timestamp: '2026-10-06 01:57:24+09:00'
+  timestamp: '2026-10-24 23:29:06+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/convex_layers.test.cpp

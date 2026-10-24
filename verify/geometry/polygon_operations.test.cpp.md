@@ -56,12 +56,12 @@ data:
     #include <concepts>\n#include <cstddef>\n#include <deque>\n#include <limits>\n\
     #include <numbers>\n#include <optional>\n#include <type_traits>\n#include <utility>\n\
     #include <vector>\n\n#line 1 \"geometry/convex_hull.hpp\"\n\n\n\n#line 8 \"geometry/convex_hull.hpp\"\
-    \n\n#line 1 \"geometry/point.hpp\"\n\n\n\n#line 8 \"geometry/point.hpp\"\n\n#line\
-    \ 1 \"geometry/detail/floating_predicate.hpp\"\n\n\n\nnamespace m1une {\nnamespace\
-    \ geometry {\nnamespace predicate_detail {\n\ntemplate <typename T>\nconstexpr\
-    \ T absolute(T value) {\n    return value < T(0) ? -value : value;\n}\n\ntemplate\
-    \ <typename T>\nconstexpr T max_value(T first, T second) {\n    return first <\
-    \ second ? second : first;\n}\n\ntemplate <typename T>\nconstexpr T vector_scale(T\
+    \n\n#line 1 \"geometry/point.hpp\"\n\n\n\n#line 10 \"geometry/point.hpp\"\n\n\
+    #line 1 \"geometry/detail/floating_predicate.hpp\"\n\n\n\nnamespace m1une {\n\
+    namespace geometry {\nnamespace predicate_detail {\n\ntemplate <typename T>\n\
+    constexpr T absolute(T value) {\n    return value < T(0) ? -value : value;\n}\n\
+    \ntemplate <typename T>\nconstexpr T max_value(T first, T second) {\n    return\
+    \ first < second ? second : first;\n}\n\ntemplate <typename T>\nconstexpr T vector_scale(T\
     \ x, T y) {\n    return max_value(absolute(x), absolute(y));\n}\n\ntemplate <bool\
     \ Exact, typename T>\nconstexpr int scaled_sign(T value, T scale, long double\
     \ eps) {\n    if constexpr (Exact) {\n        return (value > T(0)) - (value <\
@@ -85,7 +85,7 @@ data:
     \ T value = ax * bx + ay * by;\n    T scale = T(0);\n    if constexpr (!Exact)\
     \ {\n        scale = vector_scale(ax, ay) * vector_scale(bx, by);\n    }\n   \
     \ return scaled_sign<Exact>(value, scale, eps);\n}\n\n}  // namespace predicate_detail\n\
-    }  // namespace geometry\n}  // namespace m1une\n\n\n#line 10 \"geometry/point.hpp\"\
+    }  // namespace geometry\n}  // namespace m1une\n\n\n#line 12 \"geometry/point.hpp\"\
     \n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <typename T>\nconcept\
     \ Coordinate = !std::same_as<std::remove_cv_t<T>, bool> &&\n    (std::is_arithmetic_v<T>\
     \ ||\n     (std::copyable<T> && std::totally_ordered<T> && requires(T a, T b)\
@@ -98,24 +98,42 @@ data:
     \ <typename T>\nconcept ExactCoordinate = Coordinate<T> && !std::floating_point<T>;\n\
     \ntemplate <Coordinate T>\nusing wide_type = std::conditional_t<std::integral<T>,\
     \ __int128_t,\n    std::conditional_t<std::floating_point<T>, long double, T>>;\n\
-    \ntemplate <Coordinate T>\nstruct Point {\n    T x;\n    T y;\n\n    constexpr\
-    \ Point() : x(0), y(0) {}\n    constexpr Point(T x_value, T y_value) : x(x_value),\
-    \ y(y_value) {}\n\n    template <Coordinate U>\n    explicit constexpr Point(const\
-    \ Point<U>& other)\n        : x(static_cast<T>(other.x)), y(static_cast<T>(other.y))\
-    \ {}\n\n    constexpr Point& operator+=(const Point& other) {\n        x += other.x;\n\
-    \        y += other.y;\n        return *this;\n    }\n\n    constexpr Point& operator-=(const\
-    \ Point& other) {\n        x -= other.x;\n        y -= other.y;\n        return\
-    \ *this;\n    }\n\n    constexpr Point operator+() const {\n        return *this;\n\
-    \    }\n\n    constexpr Point operator-() const {\n        return Point(-x, -y);\n\
-    \    }\n\n    friend constexpr Point operator+(Point left, const Point& right)\
-    \ {\n        return left += right;\n    }\n\n    friend constexpr Point operator-(Point\
-    \ left, const Point& right) {\n        return left -= right;\n    }\n\n    friend\
-    \ constexpr bool operator==(const Point&, const Point&) = default;\n\n    friend\
-    \ constexpr bool operator<(const Point& left, const Point& right) {\n        if\
-    \ (left.x != right.x) return left.x < right.x;\n        return left.y < right.y;\n\
-    \    }\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const\
-    \ Point<T>& point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate\
-    \ T, typename Scalar>\nrequires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n\
+    \ntemplate <Coordinate T>\nstruct Point {\n    using coordinate_type = T;\n\n\
+    \    T x;\n    T y;\n\n    constexpr Point() : x(0), y(0) {}\n    constexpr Point(T\
+    \ x_value, T y_value) : x(x_value), y(y_value) {}\n\n    template <Coordinate\
+    \ U>\n    explicit constexpr Point(const Point<U>& other)\n        : x(static_cast<T>(other.x)),\
+    \ y(static_cast<T>(other.y)) {}\n\n    constexpr Point& operator+=(const Point&\
+    \ other) {\n        x += other.x;\n        y += other.y;\n        return *this;\n\
+    \    }\n\n    constexpr Point& operator-=(const Point& other) {\n        x -=\
+    \ other.x;\n        y -= other.y;\n        return *this;\n    }\n\n    constexpr\
+    \ Point operator+() const {\n        return *this;\n    }\n\n    constexpr Point\
+    \ operator-() const {\n        return Point(-x, -y);\n    }\n\n    friend constexpr\
+    \ Point operator+(Point left, const Point& right) {\n        return left += right;\n\
+    \    }\n\n    friend constexpr Point operator-(Point left, const Point& right)\
+    \ {\n        return left -= right;\n    }\n\n    friend constexpr bool operator==(const\
+    \ Point&, const Point&) = default;\n\n    friend constexpr bool operator<(const\
+    \ Point& left, const Point& right) {\n        if (left.x != right.x) return left.x\
+    \ < right.x;\n        return left.y < right.y;\n    }\n};\n\n// Attach arbitrary\
+    \ metadata without changing coordinate semantics.\n// Arithmetic and conversions\
+    \ inherited from Point return ordinary points.\ntemplate <Coordinate T, typename\
+    \ Data>\nstruct PointWithData : Point<T> {\n    Data data;\n\n    constexpr PointWithData()\
+    \ requires std::default_initializable<Data>\n        : Point<T>(), data() {}\n\
+    \n    constexpr PointWithData(T x, T y)\n        requires std::default_initializable<Data>\n\
+    \        : Point<T>(x, y), data() {}\n\n    constexpr PointWithData(T x, T y,\
+    \ Data value)\n        : Point<T>(x, y), data(std::move(value)) {}\n\n    constexpr\
+    \ PointWithData(Point<T> point, Data value)\n        : Point<T>(std::move(point)),\
+    \ data(std::move(value)) {}\n};\n\n// User-defined records may publicly derive\
+    \ from Point<T> as well.\ntemplate <typename P>\nconcept PointRecord = requires\
+    \ {\n    typename P::coordinate_type;\n    requires Coordinate<typename P::coordinate_type>;\n\
+    \    requires std::derived_from<P, Point<typename P::coordinate_type>>;\n};\n\n\
+    // Explicitly discard metadata for APIs that construct new geometric objects.\n\
+    template <PointRecord P>\nstd::vector<Point<typename P::coordinate_type>> to_points(\n\
+    \    const std::vector<P>& records\n) {\n    using T = typename P::coordinate_type;\n\
+    \    std::vector<Point<T>> result;\n    result.reserve(records.size());\n    for\
+    \ (const Point<T>& point : records) result.push_back(point);\n    return result;\n\
+    }\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const Point<T>&\
+    \ point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate T,\
+    \ typename Scalar>\nrequires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n\
     constexpr auto operator*(const Point<T>& point, Scalar scalar) {\n    using Result\
     \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
     \ * Result(scalar),\n        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate\
@@ -184,62 +202,70 @@ data:
     \    );\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 10 \"\
     geometry/convex_hull.hpp\"\n\nnamespace m1une {\nnamespace geometry {\n\n// Returns\
     \ the convex hull counterclockwise from its lexicographically smallest\n// point.\
-    \ The first point is not repeated at the end.\ntemplate <Coordinate T>\nstd::vector<Point<T>>\
-    \ convex_hull(\n    std::vector<Point<T>> points,\n    bool include_collinear\
-    \ = false\n) {\n    std::sort(points.begin(), points.end());\n    points.erase(std::unique(points.begin(),\
-    \ points.end()), points.end());\n    std::size_t size = points.size();\n    if\
-    \ (size <= 1) return points;\n\n    std::vector<Point<T>> hull;\n    hull.reserve(2\
-    \ * size);\n    auto should_pop = [include_collinear](\n        const Point<T>&\
-    \ first,\n        const Point<T>& second,\n        const Point<T>& third\n   \
-    \ ) {\n        int turn = orientation(first, second, third);\n        return include_collinear\
-    \ ? turn < 0 : turn <= 0;\n    };\n\n    for (const Point<T>& point : points)\
-    \ {\n        while (\n            hull.size() >= 2 &&\n            should_pop(hull[hull.size()\
+    \ The first point is not repeated at the end. Equal coordinates retain\n// the\
+    \ first input record, independently of metadata.\ntemplate <PointRecord P>\nstd::vector<P>\
+    \ convex_hull(\n    std::vector<P> points,\n    bool include_collinear = false\n\
+    ) {\n    using T = typename P::coordinate_type;\n    auto less = [](const Point<T>&\
+    \ a, const Point<T>& b) { return a < b; };\n    if constexpr (std::same_as<P,\
+    \ Point<T>>) {\n        std::sort(points.begin(), points.end(), less);\n    }\
+    \ else {\n        std::stable_sort(points.begin(), points.end(), less);\n    }\n\
+    \    points.erase(\n        std::unique(points.begin(), points.end(),\n      \
+    \      [](const Point<T>& a, const Point<T>& b) { return a == b; }),\n       \
+    \ points.end()\n    );\n    std::size_t size = points.size();\n    if (size <=\
+    \ 1) return points;\n\n    std::vector<P> hull;\n    hull.reserve(2 * size);\n\
+    \    auto should_pop = [include_collinear](\n        const Point<T>& first,\n\
+    \        const Point<T>& second,\n        const Point<T>& third\n    ) {\n   \
+    \     int turn = orientation(first, second, third);\n        return include_collinear\
+    \ ? turn < 0 : turn <= 0;\n    };\n\n    for (const P& point : points) {\n   \
+    \     while (\n            hull.size() >= 2 &&\n            should_pop(hull[hull.size()\
     \ - 2], hull.back(), point)\n        ) {\n            hull.pop_back();\n     \
     \   }\n        hull.push_back(point);\n    }\n\n    std::size_t lower_size = hull.size();\n\
-    \    for (std::size_t index = size - 1; index-- > 0;) {\n        const Point<T>&\
-    \ point = points[index];\n        while (\n            hull.size() > lower_size\
-    \ &&\n            should_pop(hull[hull.size() - 2], hull.back(), point)\n    \
-    \    ) {\n            hull.pop_back();\n        }\n        hull.push_back(point);\n\
+    \    for (std::size_t index = size - 1; index-- > 0;) {\n        const P& point\
+    \ = points[index];\n        while (\n            hull.size() > lower_size &&\n\
+    \            should_pop(hull[hull.size() - 2], hull.back(), point)\n        )\
+    \ {\n            hull.pop_back();\n        }\n        hull.push_back(point);\n\
     \    }\n    hull.pop_back();\n\n    if (include_collinear && hull.size() == 2\
     \ * points.size() - 2) {\n        hull = std::move(points);\n    }\n    return\
-    \ hull;\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 1 \"\
-    geometry/half_plane_intersection.hpp\"\n\n\n\n#line 12 \"geometry/half_plane_intersection.hpp\"\
-    \n#include <random>\n#line 15 \"geometry/half_plane_intersection.hpp\"\n\n#line\
-    \ 1 \"geometry/linear.hpp\"\n\n\n\n#line 7 \"geometry/linear.hpp\"\n\n#line 9\
-    \ \"geometry/linear.hpp\"\n\nnamespace m1une {\nnamespace geometry {\n\ntemplate\
-    \ <Coordinate T>\nstruct Line {\n    Point<T> a;\n    Point<T> b;\n};\n\ntemplate\
-    \ <Coordinate T>\nstruct Segment {\n    Point<T> a;\n    Point<T> b;\n};\n\ntemplate\
-    \ <Coordinate T>\nstruct Ray {\n    Point<T> origin;\n    Point<T> through;\n\
-    };\n\nenum class LinearIntersectionKind {\n    Empty,\n    Point,\n    Segment,\n\
-    \    Ray,\n    Line,\n};\n\nstruct LinearIntersection {\n    LinearIntersectionKind\
-    \ kind;\n    Point<long double> first;\n    Point<long double> second;\n};\n\n\
-    struct ClosestPoints {\n    Point<long double> first;\n    Point<long double>\
-    \ second;\n};\n\nnamespace linear_intersection_detail {\n\ninline LinearIntersection\
-    \ make_empty() {\n    const Point<long double> zero;\n    return LinearIntersection{\n\
-    \        LinearIntersectionKind::Empty,\n        zero,\n        zero,\n    };\n\
-    }\n\ntemplate <Coordinate T>\nLinearIntersection make_point(const Point<T>& point)\
-    \ {\n    const Point<long double> converted(point);\n    return LinearIntersection{\n\
-    \        LinearIntersectionKind::Point,\n        converted,\n        converted,\n\
-    \    };\n}\n\ntemplate <Coordinate T>\nLinearIntersection make_object(\n    LinearIntersectionKind\
-    \ kind,\n    const Point<T>& first,\n    const Point<T>& second\n) {\n    return\
-    \ LinearIntersection{\n        kind,\n        Point<long double>(first),\n   \
-    \     Point<long double>(second),\n    };\n}\n\n}  // namespace linear_intersection_detail\n\
-    \ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const Segment<T>&\
-    \ segment) {\n    return Point<long double>(\n        (\n            static_cast<long\
-    \ double>(segment.a.x) +\n            static_cast<long double>(segment.b.x)\n\
-    \        ) / 2,\n        (\n            static_cast<long double>(segment.a.y)\
-    \ +\n            static_cast<long double>(segment.b.y)\n        ) / 2\n    );\n\
-    }\n\ntemplate <Coordinate T>\nbool on_line(\n    const Line<T>& line,\n    const\
-    \ Point<T>& point,\n    long double eps = 1e-12L\n) {\n    assert(line.a != line.b);\n\
-    \    return orientation(line.a, line.b, point, eps) == 0;\n}\n\ntemplate <Coordinate\
-    \ T>\nbool parallel(const Line<T>& first, const Line<T>& second, long double eps\
-    \ = 1e-12L) {\n    using W = wide_type<T>;\n    W first_x = W(first.b.x) - W(first.a.x);\n\
-    \    W first_y = W(first.b.y) - W(first.a.y);\n    W second_x = W(second.b.x)\
-    \ - W(second.a.x);\n    W second_y = W(second.b.y) - W(second.a.y);\n    return\
-    \ predicate_detail::determinant_sign<ExactCoordinate<T>>(\n        first_x,\n\
-    \        first_y,\n        second_x,\n        second_y,\n        eps\n    ) ==\
-    \ 0;\n}\n\ntemplate <Coordinate T>\nbool orthogonal(const Line<T>& first, const\
-    \ Line<T>& second, long double eps = 1e-12L) {\n    using W = wide_type<T>;\n\
+    \ hull;\n}\n\ntemplate <Coordinate T>\nstd::vector<Point<T>> convex_hull(\n  \
+    \  std::vector<Point<T>> points,\n    bool include_collinear = false\n) {\n  \
+    \  return convex_hull<Point<T>>(std::move(points), include_collinear);\n}\n\n\
+    }  // namespace geometry\n}  // namespace m1une\n\n\n#line 1 \"geometry/half_plane_intersection.hpp\"\
+    \n\n\n\n#line 12 \"geometry/half_plane_intersection.hpp\"\n#include <random>\n\
+    #line 15 \"geometry/half_plane_intersection.hpp\"\n\n#line 1 \"geometry/linear.hpp\"\
+    \n\n\n\n#line 7 \"geometry/linear.hpp\"\n\n#line 9 \"geometry/linear.hpp\"\n\n\
+    namespace m1une {\nnamespace geometry {\n\ntemplate <Coordinate T>\nstruct Line\
+    \ {\n    Point<T> a;\n    Point<T> b;\n};\n\ntemplate <Coordinate T>\nstruct Segment\
+    \ {\n    Point<T> a;\n    Point<T> b;\n};\n\ntemplate <Coordinate T>\nstruct Ray\
+    \ {\n    Point<T> origin;\n    Point<T> through;\n};\n\nenum class LinearIntersectionKind\
+    \ {\n    Empty,\n    Point,\n    Segment,\n    Ray,\n    Line,\n};\n\nstruct LinearIntersection\
+    \ {\n    LinearIntersectionKind kind;\n    Point<long double> first;\n    Point<long\
+    \ double> second;\n};\n\nstruct ClosestPoints {\n    Point<long double> first;\n\
+    \    Point<long double> second;\n};\n\nnamespace linear_intersection_detail {\n\
+    \ninline LinearIntersection make_empty() {\n    const Point<long double> zero;\n\
+    \    return LinearIntersection{\n        LinearIntersectionKind::Empty,\n    \
+    \    zero,\n        zero,\n    };\n}\n\ntemplate <Coordinate T>\nLinearIntersection\
+    \ make_point(const Point<T>& point) {\n    const Point<long double> converted(point);\n\
+    \    return LinearIntersection{\n        LinearIntersectionKind::Point,\n    \
+    \    converted,\n        converted,\n    };\n}\n\ntemplate <Coordinate T>\nLinearIntersection\
+    \ make_object(\n    LinearIntersectionKind kind,\n    const Point<T>& first,\n\
+    \    const Point<T>& second\n) {\n    return LinearIntersection{\n        kind,\n\
+    \        Point<long double>(first),\n        Point<long double>(second),\n   \
+    \ };\n}\n\n}  // namespace linear_intersection_detail\n\ntemplate <Coordinate\
+    \ T>\nconstexpr Point<long double> centroid(const Segment<T>& segment) {\n   \
+    \ return Point<long double>(\n        (\n            static_cast<long double>(segment.a.x)\
+    \ +\n            static_cast<long double>(segment.b.x)\n        ) / 2,\n     \
+    \   (\n            static_cast<long double>(segment.a.y) +\n            static_cast<long\
+    \ double>(segment.b.y)\n        ) / 2\n    );\n}\n\ntemplate <Coordinate T>\n\
+    bool on_line(\n    const Line<T>& line,\n    const Point<T>& point,\n    long\
+    \ double eps = 1e-12L\n) {\n    assert(line.a != line.b);\n    return orientation(line.a,\
+    \ line.b, point, eps) == 0;\n}\n\ntemplate <Coordinate T>\nbool parallel(const\
+    \ Line<T>& first, const Line<T>& second, long double eps = 1e-12L) {\n    using\
+    \ W = wide_type<T>;\n    W first_x = W(first.b.x) - W(first.a.x);\n    W first_y\
+    \ = W(first.b.y) - W(first.a.y);\n    W second_x = W(second.b.x) - W(second.a.x);\n\
+    \    W second_y = W(second.b.y) - W(second.a.y);\n    return predicate_detail::determinant_sign<ExactCoordinate<T>>(\n\
+    \        first_x,\n        first_y,\n        second_x,\n        second_y,\n  \
+    \      eps\n    ) == 0;\n}\n\ntemplate <Coordinate T>\nbool orthogonal(const Line<T>&\
+    \ first, const Line<T>& second, long double eps = 1e-12L) {\n    using W = wide_type<T>;\n\
     \    W first_x = W(first.b.x) - W(first.a.x);\n    W first_y = W(first.b.y) -\
     \ W(first.a.y);\n    W second_x = W(second.b.x) - W(second.a.x);\n    W second_y\
     \ = W(second.b.y) - W(second.a.y);\n    return predicate_detail::dot_sign<ExactCoordinate<T>>(\n\
@@ -823,31 +849,35 @@ data:
     \n\n#line 1 \"geometry/detail/convex_polygon_normalize.hpp\"\n\n\n\n#line 8 \"\
     geometry/detail/convex_polygon_normalize.hpp\"\n\n#line 10 \"geometry/detail/convex_polygon_normalize.hpp\"\
     \n\nnamespace m1une {\nnamespace geometry {\nnamespace convex_polygon_detail {\n\
-    \ntemplate <Coordinate T>\nwide_type<T> boundary_area2(const std::vector<Point<T>>&\
-    \ polygon) {\n    wide_type<T> result = 0;\n    for (std::size_t index = 0; index\
-    \ < polygon.size(); ++index) {\n        result += cross(\n            polygon[index],\n\
-    \            polygon[(index + 1) % polygon.size()]\n        );\n    }\n    return\
-    \ result;\n}\n\ntemplate <Coordinate T>\nstd::vector<Point<T>> normalize_convex_boundary(\n\
-    \    std::vector<Point<T>> polygon,\n    long double eps\n) {\n    if (polygon.size()\
-    \ >= 2 && polygon.front() == polygon.back()) {\n        polygon.pop_back();\n\
-    \    }\n    polygon.erase(\n        std::unique(polygon.begin(), polygon.end()),\n\
-    \        polygon.end()\n    );\n    if (polygon.size() >= 2 && polygon.front()\
-    \ == polygon.back()) {\n        polygon.pop_back();\n    }\n    if (polygon.size()\
-    \ <= 1) return polygon;\n    if (\n        polygon.size() >= 3 &&\n        sign<T>(boundary_area2(polygon),\
+    \ntemplate <PointRecord P>\nwide_type<typename P::coordinate_type> boundary_area2(const\
+    \ std::vector<P>& polygon) {\n    using T = typename P::coordinate_type;\n   \
+    \ wide_type<T> result = 0;\n    for (std::size_t index = 0; index < polygon.size();\
+    \ ++index) {\n        result += cross(\n            polygon[index],\n        \
+    \    polygon[(index + 1) % polygon.size()]\n        );\n    }\n    return result;\n\
+    }\n\ntemplate <PointRecord P>\nstd::vector<P> normalize_convex_boundary(\n   \
+    \ std::vector<P> polygon,\n    long double eps\n) {\n    using T = typename P::coordinate_type;\n\
+    \    if (polygon.size() >= 2 && static_cast<const Point<T>&>(polygon.front())\
+    \ ==\n            static_cast<const Point<T>&>(polygon.back())) {\n        polygon.pop_back();\n\
+    \    }\n    polygon.erase(\n        std::unique(polygon.begin(), polygon.end(),\n\
+    \            [](const Point<T>& a, const Point<T>& b) { return a == b; }),\n \
+    \       polygon.end()\n    );\n    if (polygon.size() >= 2 && static_cast<const\
+    \ Point<T>&>(polygon.front()) ==\n            static_cast<const Point<T>&>(polygon.back()))\
+    \ {\n        polygon.pop_back();\n    }\n    if (polygon.size() <= 1) return polygon;\n\
+    \    if (\n        polygon.size() >= 3 &&\n        sign<T>(boundary_area2(polygon),\
     \ eps) < 0\n    ) {\n        std::reverse(polygon.begin(), polygon.end());\n \
     \   }\n\n    const auto start = std::min_element(\n        polygon.begin(),\n\
     \        polygon.end(),\n        [](const Point<T>& first, const Point<T>& second)\
     \ {\n            if (first.y != second.y) return first.y < second.y;\n       \
     \     return first.x < second.x;\n        }\n    );\n    std::rotate(polygon.begin(),\
-    \ start, polygon.end());\n\n    if (polygon.size() >= 3) {\n        std::vector<Point<T>>\
+    \ start, polygon.end());\n\n    if (polygon.size() >= 3) {\n        std::vector<P>\
     \ cleaned;\n        const std::size_t size = polygon.size();\n        cleaned.reserve(size);\n\
     \        for (std::size_t index = 0; index < size; ++index) {\n            const\
     \ Point<T>& previous = polygon[(index + size - 1) % size];\n            const\
     \ Point<T>& current = polygon[index];\n            const Point<T>& next = polygon[(index\
     \ + 1) % size];\n            if (\n                orientation(previous, current,\
     \ next, eps) != 0 ||\n                sign<T>(dot(current - previous, next - current),\
-    \ eps) < 0\n            ) {\n                cleaned.push_back(current);\n   \
-    \         }\n        }\n        polygon = std::move(cleaned);\n    }\n    return\
+    \ eps) < 0\n            ) {\n                cleaned.push_back(polygon[index]);\n\
+    \            }\n        }\n        polygon = std::move(cleaned);\n    }\n    return\
     \ polygon;\n}\n\n}  // namespace convex_polygon_detail\n}  // namespace geometry\n\
     }  // namespace m1une\n\n\n#line 10 \"geometry/minkowski_sum.hpp\"\n\nnamespace\
     \ m1une {\nnamespace geometry {\n\n// Returns the normalized boundary of the Minkowski\
@@ -1561,51 +1591,60 @@ data:
     \ third,\n    long double eps\n) {\n    return\n        orientation(first, second,\
     \ point, eps) >= 0 &&\n        orientation(second, third, point, eps) >= 0 &&\n\
     \        orientation(third, first, point, eps) >= 0;\n}\n\n}  // namespace polygon_detail\n\
-    \ntemplate <Coordinate T>\nwide_type<T> polygon_area2(const std::vector<Point<T>>&\
-    \ polygon) {\n    wide_type<T> result = 0;\n    std::size_t n = polygon.size();\n\
-    \    for (std::size_t i = 0; i < n; i++) {\n        result += cross(polygon[i],\
-    \ polygon[(i + 1) % n]);\n    }\n    return result;\n}\n\ntemplate <Coordinate\
-    \ T>\nlong double polygon_area(const std::vector<Point<T>>& polygon) {\n    return\
-    \ std::fabs(static_cast<long double>(polygon_area2(polygon))) / 2;\n}\n\ntemplate\
-    \ <Coordinate T>\nstd::optional<Point<long double>> polygon_centroid(\n    const\
-    \ std::vector<Point<T>>& polygon,\n    long double eps = 1e-12L\n) {\n    if (polygon.size()\
-    \ < 3) return std::nullopt;\n\n    wide_type<T> signed_area2 = polygon_area2(polygon);\n\
-    \    if (sign<T>(signed_area2, eps) == 0) return std::nullopt;\n\n    long double\
-    \ x_numerator = 0;\n    long double y_numerator = 0;\n    std::size_t size = polygon.size();\n\
-    \    for (std::size_t index = 0; index < size; ++index) {\n        const Point<T>&\
-    \ current = polygon[index];\n        const Point<T>& next = polygon[(index + 1)\
-    \ % size];\n        long double weight = static_cast<long double>(cross(current,\
-    \ next));\n        x_numerator +=\n            (static_cast<long double>(current.x)\
-    \ +\n             static_cast<long double>(next.x)) *\n            weight;\n \
-    \       y_numerator +=\n            (static_cast<long double>(current.y) +\n \
-    \            static_cast<long double>(next.y)) *\n            weight;\n    }\n\
-    \    long double denominator =\n        3.0L * static_cast<long double>(signed_area2);\n\
+    \ntemplate <PointRecord P>\nwide_type<typename P::coordinate_type> polygon_area2(const\
+    \ std::vector<P>& polygon) {\n    using T = typename P::coordinate_type;\n   \
+    \ wide_type<T> result = 0;\n    std::size_t n = polygon.size();\n    for (std::size_t\
+    \ i = 0; i < n; i++) {\n        result += cross(polygon[i], polygon[(i + 1) %\
+    \ n]);\n    }\n    return result;\n}\n\ntemplate <Coordinate T>\nwide_type<T>\
+    \ polygon_area2(const std::vector<Point<T>>& polygon) {\n    return polygon_area2<Point<T>>(polygon);\n\
+    }\n\ntemplate <PointRecord P>\nlong double polygon_area(const std::vector<P>&\
+    \ polygon) {\n    return std::fabs(static_cast<long double>(polygon_area2(polygon)))\
+    \ / 2;\n}\n\ntemplate <Coordinate T>\nlong double polygon_area(const std::vector<Point<T>>&\
+    \ polygon) {\n    return polygon_area<Point<T>>(polygon);\n}\n\ntemplate <PointRecord\
+    \ P>\nstd::optional<Point<long double>> polygon_centroid(\n    const std::vector<P>&\
+    \ polygon,\n    long double eps = 1e-12L\n) {\n    using T = typename P::coordinate_type;\n\
+    \    if (polygon.size() < 3) return std::nullopt;\n\n    wide_type<T> signed_area2\
+    \ = polygon_area2(polygon);\n    if (sign<T>(signed_area2, eps) == 0) return std::nullopt;\n\
+    \n    long double x_numerator = 0;\n    long double y_numerator = 0;\n    std::size_t\
+    \ size = polygon.size();\n    for (std::size_t index = 0; index < size; ++index)\
+    \ {\n        const Point<T>& current = polygon[index];\n        const Point<T>&\
+    \ next = polygon[(index + 1) % size];\n        long double weight = static_cast<long\
+    \ double>(cross(current, next));\n        x_numerator +=\n            (static_cast<long\
+    \ double>(current.x) +\n             static_cast<long double>(next.x)) *\n   \
+    \         weight;\n        y_numerator +=\n            (static_cast<long double>(current.y)\
+    \ +\n             static_cast<long double>(next.y)) *\n            weight;\n \
+    \   }\n    long double denominator =\n        3.0L * static_cast<long double>(signed_area2);\n\
     \    return Point<long double>(\n        x_numerator / denominator,\n        y_numerator\
     \ / denominator\n    );\n}\n\ntemplate <Coordinate T>\nstd::optional<Point<long\
-    \ double>> centroid(\n    const std::vector<Point<T>>& polygon,\n    long double\
-    \ eps = 1e-12L\n) {\n    return polygon_centroid(polygon, eps);\n}\n\ntemplate\
-    \ <Coordinate T>\nstd::optional<Point<long double>> polygon_center_of_gravity(\n\
-    \    const std::vector<Point<T>>& polygon,\n    long double eps = 1e-12L\n) {\n\
-    \    return polygon_centroid(polygon, eps);\n}\n\ntemplate <Coordinate T>\nbool\
-    \ is_simple_polygon(\n    const std::vector<Point<T>>& polygon,\n    long double\
-    \ eps = 1e-12L\n) {\n    if (polygon.size() < 3) return false;\n    std::size_t\
-    \ size = polygon.size();\n    for (std::size_t index = 0; index < size; ++index)\
-    \ {\n        const Point<T>& previous = polygon[(index + size - 1) % size];\n\
-    \        const Point<T>& current = polygon[index];\n        const Point<T>& next\
-    \ = polygon[(index + 1) % size];\n        if (current == next) return false;\n\
-    \        if (\n            orientation(previous, current, next, eps) == 0 &&\n\
-    \            sign<T>(dot(current - previous, next - current), eps) < 0\n     \
-    \   ) {\n            return false;\n        }\n    }\n    for (std::size_t first_index\
-    \ = 0; first_index < size; ++first_index) {\n        Segment<T> first{\n     \
-    \       polygon[first_index],\n            polygon[(first_index + 1) % size]\n\
-    \        };\n        for (\n            std::size_t second_index = first_index\
-    \ + 1;\n            second_index < size;\n            ++second_index\n       \
-    \ ) {\n            bool adjacent =\n                second_index == first_index\
-    \ + 1 ||\n                (first_index == 0 && second_index + 1 == size);\n  \
-    \          if (adjacent) continue;\n\n            Segment<T> second{\n       \
-    \         polygon[second_index],\n                polygon[(second_index + 1) %\
-    \ size]\n            };\n            if (intersects(first, second, eps)) return\
-    \ false;\n        }\n    }\n    return true;\n}\n\ntemplate <Coordinate T>\nstd::optional<std::vector<std::array<Point<T>,\
+    \ double>> polygon_centroid(\n    const std::vector<Point<T>>& polygon,\n    long\
+    \ double eps = 1e-12L\n) {\n    return polygon_centroid<Point<T>>(polygon, eps);\n\
+    }\n\ntemplate <Coordinate T>\nstd::optional<Point<long double>> centroid(\n  \
+    \  const std::vector<Point<T>>& polygon,\n    long double eps = 1e-12L\n) {\n\
+    \    return polygon_centroid(polygon, eps);\n}\n\ntemplate <Coordinate T>\nstd::optional<Point<long\
+    \ double>> polygon_center_of_gravity(\n    const std::vector<Point<T>>& polygon,\n\
+    \    long double eps = 1e-12L\n) {\n    return polygon_centroid(polygon, eps);\n\
+    }\n\ntemplate <PointRecord P>\nbool is_simple_polygon(\n    const std::vector<P>&\
+    \ polygon,\n    long double eps = 1e-12L\n) {\n    using T = typename P::coordinate_type;\n\
+    \    if (polygon.size() < 3) return false;\n    std::size_t size = polygon.size();\n\
+    \    for (std::size_t index = 0; index < size; ++index) {\n        const Point<T>&\
+    \ previous = polygon[(index + size - 1) % size];\n        const Point<T>& current\
+    \ = polygon[index];\n        const Point<T>& next = polygon[(index + 1) % size];\n\
+    \        if (current == next) return false;\n        if (\n            orientation(previous,\
+    \ current, next, eps) == 0 &&\n            sign<T>(dot(current - previous, next\
+    \ - current), eps) < 0\n        ) {\n            return false;\n        }\n  \
+    \  }\n    for (std::size_t first_index = 0; first_index < size; ++first_index)\
+    \ {\n        Segment<T> first{\n            polygon[first_index],\n          \
+    \  polygon[(first_index + 1) % size]\n        };\n        for (\n            std::size_t\
+    \ second_index = first_index + 1;\n            second_index < size;\n        \
+    \    ++second_index\n        ) {\n            bool adjacent =\n              \
+    \  second_index == first_index + 1 ||\n                (first_index == 0 && second_index\
+    \ + 1 == size);\n            if (adjacent) continue;\n\n            Segment<T>\
+    \ second{\n                polygon[second_index],\n                polygon[(second_index\
+    \ + 1) % size]\n            };\n            if (intersects(first, second, eps))\
+    \ return false;\n        }\n    }\n    return true;\n}\n\ntemplate <Coordinate\
+    \ T>\nbool is_simple_polygon(\n    const std::vector<Point<T>>& polygon,\n   \
+    \ long double eps = 1e-12L\n) {\n    return is_simple_polygon<Point<T>>(polygon,\
+    \ eps);\n}\n\ntemplate <Coordinate T>\nstd::optional<std::vector<std::array<Point<T>,\
     \ 3>>> triangulate_polygon(\n    std::vector<Point<T>> polygon,\n    long double\
     \ eps = 1e-12L\n) {\n    polygon =\n        polygon_detail::clean_polygon_vertices(std::move(polygon),\
     \ eps);\n    if (polygon.size() < 3) return std::nullopt;\n\n    wide_type<T>\
@@ -1643,24 +1682,27 @@ data:
     \    triangle[1] = polygon[remaining[1]];\n    triangle[2] = polygon[remaining[2]];\n\
     \    if (orientation(triangle[0], triangle[1], triangle[2], eps) <= 0) {\n   \
     \     return std::nullopt;\n    }\n    result.push_back(std::move(triangle));\n\
-    \    return result;\n}\n\ntemplate <Coordinate T>\nPointInPolygon point_in_polygon(\n\
-    \    const std::vector<Point<T>>& polygon,\n    const Point<T>& point,\n    long\
-    \ double eps = 1e-12L\n) {\n    bool inside = false;\n    std::size_t n = polygon.size();\n\
-    \    for (std::size_t i = 0; i < n; i++) {\n        const Point<T>& a = polygon[i];\n\
-    \        const Point<T>& b = polygon[(i + 1) % n];\n        if (on_segment(Segment<T>{a,\
-    \ b}, point, eps)) {\n            return PointInPolygon::Boundary;\n        }\n\
-    \n        if (a.y <= point.y) {\n            if (point.y < b.y && orientation(a,\
+    \    return result;\n}\n\ntemplate <PointRecord P>\nPointInPolygon point_in_polygon(\n\
+    \    const std::vector<P>& polygon,\n    const Point<typename P::coordinate_type>&\
+    \ point,\n    long double eps = 1e-12L\n) {\n    using T = typename P::coordinate_type;\n\
+    \    bool inside = false;\n    std::size_t n = polygon.size();\n    for (std::size_t\
+    \ i = 0; i < n; i++) {\n        const Point<T>& a = polygon[i];\n        const\
+    \ Point<T>& b = polygon[(i + 1) % n];\n        if (on_segment(Segment<T>{a, b},\
+    \ point, eps)) {\n            return PointInPolygon::Boundary;\n        }\n\n\
+    \        if (a.y <= point.y) {\n            if (point.y < b.y && orientation(a,\
     \ b, point, eps) > 0) {\n                inside = !inside;\n            }\n  \
     \      } else if (b.y <= point.y && orientation(a, b, point, eps) < 0) {\n   \
     \         inside = !inside;\n        }\n    }\n    return inside ? PointInPolygon::Inside\
-    \ : PointInPolygon::Outside;\n}\n\ntemplate <Coordinate T, Coordinate P>\nPointInPolygon\
-    \ point_in_polygon(\n    const Polygon<T>& polygon,\n    const Point<P>& point,\n\
-    \    long double eps = 1e-12L\n) {\n    assert(polygon.vertices.size() >= 3);\n\
-    \    if constexpr (std::is_same_v<T, P>) {\n        return point_in_polygon(polygon.vertices,\
-    \ point, eps);\n    } else {\n        std::vector<Point<long double>> vertices;\n\
-    \        vertices.reserve(polygon.vertices.size());\n        for (const Point<T>&\
-    \ vertex : polygon.vertices) {\n            vertices.emplace_back(vertex);\n \
-    \       }\n        return point_in_polygon(vertices, Point<long double>(point),\
+    \ : PointInPolygon::Outside;\n}\n\ntemplate <Coordinate T>\nPointInPolygon point_in_polygon(\n\
+    \    const std::vector<Point<T>>& polygon,\n    const Point<T>& point,\n    long\
+    \ double eps = 1e-12L\n) {\n    return point_in_polygon<Point<T>>(polygon, point,\
+    \ eps);\n}\n\ntemplate <Coordinate T, Coordinate P>\nPointInPolygon point_in_polygon(\n\
+    \    const Polygon<T>& polygon,\n    const Point<P>& point,\n    long double eps\
+    \ = 1e-12L\n) {\n    assert(polygon.vertices.size() >= 3);\n    if constexpr (std::is_same_v<T,\
+    \ P>) {\n        return point_in_polygon(polygon.vertices, point, eps);\n    }\
+    \ else {\n        std::vector<Point<long double>> vertices;\n        vertices.reserve(polygon.vertices.size());\n\
+    \        for (const Point<T>& vertex : polygon.vertices) {\n            vertices.emplace_back(vertex);\n\
+    \        }\n        return point_in_polygon(vertices, Point<long double>(point),\
     \ eps);\n    }\n}\n\ntemplate <Coordinate T, Coordinate P>\nbool contains(\n \
     \   const Polygon<T>& polygon,\n    const Point<P>& point,\n    long double eps\
     \ = 1e-12L\n) {\n    const PointInPolygon relation = point_in_polygon(polygon,\
@@ -2029,57 +2071,71 @@ data:
     \    const ClosestPoints result = closest_points(polygon, ray);\n    return geometry::distance(result.first,\
     \ result.second);\n}\n\ntemplate <Coordinate R, Coordinate T>\nlong double distance(\n\
     \    const Ray<R>& ray,\n    const Polygon<T>& polygon\n) {\n    return distance(polygon,\
-    \ ray);\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 22 \"\
-    geometry/convex_polygon.hpp\"\n\nnamespace m1une {\nnamespace geometry {\n\nnamespace\
-    \ convex_polygon_detail {\n\ninline bool points_close(\n    const Point<long double>&\
-    \ first,\n    const Point<long double>& second,\n    long double eps\n) {\n  \
-    \  return geometry::distance(first, second) <= eps;\n}\n\ninline std::vector<Point<long\
-    \ double>> clean_polygon(\n    std::vector<Point<long double>> polygon,\n    long\
-    \ double eps\n) {\n    if (polygon.empty()) return polygon;\n\n    std::vector<Point<long\
-    \ double>> deduplicated;\n    for (const Point<long double>& point : polygon)\
-    \ {\n        if (\n            deduplicated.empty() ||\n            !points_close(deduplicated.back(),\
-    \ point, eps)\n        ) {\n            deduplicated.push_back(point);\n     \
-    \   }\n    }\n    if (\n        deduplicated.size() >= 2 &&\n        points_close(\n\
-    \            deduplicated.front(),\n            deduplicated.back(),\n       \
-    \     eps\n        )\n    ) {\n        deduplicated.pop_back();\n    }\n    if\
-    \ (deduplicated.size() <= 2) return deduplicated;\n    std::vector<Point<long\
-    \ double>> cleaned;\n    const std::size_t size = deduplicated.size();\n    cleaned.reserve(size);\n\
-    \    for (std::size_t index = 0; index < size; ++index) {\n        const Point<long\
-    \ double>& previous =\n            deduplicated[(index + size - 1) % size];\n\
-    \        const Point<long double>& current = deduplicated[index];\n        const\
-    \ Point<long double>& next =\n            deduplicated[(index + 1) % size];\n\
-    \        if (\n            orientation(previous, current, next, eps) != 0 ||\n\
-    \            dot(current - previous, next - current) < -eps\n        ) {\n   \
-    \         cleaned.push_back(current);\n        }\n    }\n    return cleaned;\n\
-    }\n\n}  // namespace convex_polygon_detail\n\ntemplate <Coordinate T>\nbool is_convex_polygon(\n\
-    \    const std::vector<Point<T>>& polygon,\n    bool strict = false,\n    long\
-    \ double eps = 1e-12L\n) {\n    std::size_t size = polygon.size();\n    if (size\
-    \ >= 2 && polygon.front() == polygon.back()) size--;\n    if (size < 3) return\
-    \ false;\n\n    int direction = 0;\n    for (std::size_t index = 0; index < size;\
-    \ ++index) {\n        const Point<T>& current = polygon[index];\n        const\
-    \ Point<T>& next = polygon[(index + 1) % size];\n        const Point<T>& after\
-    \ = polygon[(index + 2) % size];\n        if (current == next) return false;\n\
+    \ ray);\n}\n\ntemplate <PointRecord P>\nrequires (!std::same_as<P, Point<typename\
+    \ P::coordinate_type>>)\nstd::optional<Point<long double>> centroid(\n    const\
+    \ std::vector<P>& polygon,\n    long double eps = 1e-12L\n) {\n    return polygon_centroid(polygon,\
+    \ eps);\n}\n\ntemplate <PointRecord P>\nrequires (!std::same_as<P, Point<typename\
+    \ P::coordinate_type>>)\nstd::optional<Point<long double>> polygon_center_of_gravity(\n\
+    \    const std::vector<P>& polygon,\n    long double eps = 1e-12L\n) {\n    return\
+    \ polygon_centroid(polygon, eps);\n}\n\n}  // namespace geometry\n}  // namespace\
+    \ m1une\n\n\n#line 22 \"geometry/convex_polygon.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ geometry {\n\nnamespace convex_polygon_detail {\n\ninline bool points_close(\n\
+    \    const Point<long double>& first,\n    const Point<long double>& second,\n\
+    \    long double eps\n) {\n    return geometry::distance(first, second) <= eps;\n\
+    }\n\ninline std::vector<Point<long double>> clean_polygon(\n    std::vector<Point<long\
+    \ double>> polygon,\n    long double eps\n) {\n    if (polygon.empty()) return\
+    \ polygon;\n\n    std::vector<Point<long double>> deduplicated;\n    for (const\
+    \ Point<long double>& point : polygon) {\n        if (\n            deduplicated.empty()\
+    \ ||\n            !points_close(deduplicated.back(), point, eps)\n        ) {\n\
+    \            deduplicated.push_back(point);\n        }\n    }\n    if (\n    \
+    \    deduplicated.size() >= 2 &&\n        points_close(\n            deduplicated.front(),\n\
+    \            deduplicated.back(),\n            eps\n        )\n    ) {\n     \
+    \   deduplicated.pop_back();\n    }\n    if (deduplicated.size() <= 2) return\
+    \ deduplicated;\n    std::vector<Point<long double>> cleaned;\n    const std::size_t\
+    \ size = deduplicated.size();\n    cleaned.reserve(size);\n    for (std::size_t\
+    \ index = 0; index < size; ++index) {\n        const Point<long double>& previous\
+    \ =\n            deduplicated[(index + size - 1) % size];\n        const Point<long\
+    \ double>& current = deduplicated[index];\n        const Point<long double>& next\
+    \ =\n            deduplicated[(index + 1) % size];\n        if (\n           \
+    \ orientation(previous, current, next, eps) != 0 ||\n            dot(current -\
+    \ previous, next - current) < -eps\n        ) {\n            cleaned.push_back(current);\n\
+    \        }\n    }\n    return cleaned;\n}\n\n}  // namespace convex_polygon_detail\n\
+    \ntemplate <PointRecord P>\nbool is_convex_polygon(\n    const std::vector<P>&\
+    \ polygon,\n    bool strict = false,\n    long double eps = 1e-12L\n) {\n    using\
+    \ T = typename P::coordinate_type;\n    std::size_t size = polygon.size();\n \
+    \   if (size >= 2 &&\n        static_cast<const Point<T>&>(polygon.front()) ==\n\
+    \            static_cast<const Point<T>&>(polygon.back())) size--;\n    if (size\
+    \ < 3) return false;\n\n    int direction = 0;\n    for (std::size_t index = 0;\
+    \ index < size; ++index) {\n        const Point<T>& current = polygon[index];\n\
+    \        const Point<T>& next = polygon[(index + 1) % size];\n        const Point<T>&\
+    \ after = polygon[(index + 2) % size];\n        if (current == next) return false;\n\
     \        const int turn = orientation(current, next, after, eps);\n        if\
     \ (turn == 0) {\n            if (strict) return false;\n            continue;\n\
     \        }\n        if (direction != 0 && direction != turn) return false;\n \
     \       direction = turn;\n    }\n    return !strict || direction != 0;\n}\n\n\
-    template <Coordinate T>\nstd::vector<Point<T>> normalize_convex_polygon(\n   \
-    \ std::vector<Point<T>> polygon,\n    long double eps = 1e-12L\n) {\n    return\
-    \ convex_polygon_detail::normalize_convex_boundary(\n        std::move(polygon),\n\
-    \        eps\n    );\n}\n\ntemplate <Coordinate T>\nPointInPolygon point_in_convex_polygon(\n\
-    \    const std::vector<Point<T>>& polygon,\n    const Point<T>& point,\n    long\
-    \ double eps = 1e-12L\n) {\n    const std::size_t size = polygon.size();\n   \
-    \ if (size == 0) return PointInPolygon::Outside;\n    if (size == 1) {\n     \
-    \   return distance(polygon[0], point) <= eps\n            ? PointInPolygon::Boundary\n\
-    \            : PointInPolygon::Outside;\n    }\n    if (size == 2) {\n       \
-    \ return on_segment(Segment<T>{polygon[0], polygon[1]}, point, eps)\n        \
-    \    ? PointInPolygon::Boundary\n            : PointInPolygon::Outside;\n    }\n\
-    \n    const int order = orientation(\n        polygon[0],\n        polygon[1],\n\
-    \        polygon[size - 1],\n        eps\n    );\n    if (order == 0) return point_in_polygon(polygon,\
-    \ point, eps);\n    auto vertex = [&](std::size_t index) -> const Point<T>& {\n\
-    \        if (order > 0 || index == 0) return polygon[index];\n        return polygon[size\
-    \ - index];\n    };\n\n    const int first_side = orientation(vertex(0), vertex(1),\
-    \ point, eps);\n    const int last_side =\n        orientation(vertex(0), vertex(size\
+    template <Coordinate T>\nbool is_convex_polygon(\n    const std::vector<Point<T>>&\
+    \ polygon,\n    bool strict = false,\n    long double eps = 1e-12L\n) {\n    return\
+    \ is_convex_polygon<Point<T>>(polygon, strict, eps);\n}\n\ntemplate <PointRecord\
+    \ P>\nstd::vector<P> normalize_convex_polygon(\n    std::vector<P> polygon,\n\
+    \    long double eps = 1e-12L\n) {\n    return convex_polygon_detail::normalize_convex_boundary(\n\
+    \        std::move(polygon),\n        eps\n    );\n}\n\ntemplate <Coordinate T>\n\
+    std::vector<Point<T>> normalize_convex_polygon(\n    std::vector<Point<T>> polygon,\n\
+    \    long double eps = 1e-12L\n) {\n    return normalize_convex_polygon<Point<T>>(std::move(polygon),\
+    \ eps);\n}\n\ntemplate <PointRecord P>\nPointInPolygon point_in_convex_polygon(\n\
+    \    const std::vector<P>& polygon,\n    const Point<typename P::coordinate_type>&\
+    \ point,\n    long double eps = 1e-12L\n) {\n    using T = typename P::coordinate_type;\n\
+    \    const std::size_t size = polygon.size();\n    if (size == 0) return PointInPolygon::Outside;\n\
+    \    if (size == 1) {\n        return distance(polygon[0], point) <= eps\n   \
+    \         ? PointInPolygon::Boundary\n            : PointInPolygon::Outside;\n\
+    \    }\n    if (size == 2) {\n        return on_segment(Segment<T>{polygon[0],\
+    \ polygon[1]}, point, eps)\n            ? PointInPolygon::Boundary\n         \
+    \   : PointInPolygon::Outside;\n    }\n\n    const int order = orientation(\n\
+    \        polygon[0],\n        polygon[1],\n        polygon[size - 1],\n      \
+    \  eps\n    );\n    if (order == 0) return point_in_polygon(polygon, point, eps);\n\
+    \    auto vertex = [&](std::size_t index) -> const Point<T>& {\n        if (order\
+    \ > 0 || index == 0) return polygon[index];\n        return polygon[size - index];\n\
+    \    };\n\n    const int first_side = orientation(vertex(0), vertex(1), point,\
+    \ eps);\n    const int last_side =\n        orientation(vertex(0), vertex(size\
     \ - 1), point, eps);\n    if (first_side < 0 || last_side > 0) {\n        return\
     \ PointInPolygon::Outside;\n    }\n    if (first_side == 0) {\n        return\
     \ on_segment(Segment<T>{vertex(0), vertex(1)}, point, eps)\n            ? PointInPolygon::Boundary\n\
@@ -2093,14 +2149,17 @@ data:
     \ {\n            right = middle;\n        }\n    }\n    const int triangle_side\
     \ =\n        orientation(vertex(left), vertex(right), point, eps);\n    if (triangle_side\
     \ < 0) return PointInPolygon::Outside;\n    if (triangle_side == 0) return PointInPolygon::Boundary;\n\
-    \    return PointInPolygon::Inside;\n}\n\ntemplate <Coordinate T>\nclass ConvexPolygon\
-    \ {\n   public:\n    using Wide = wide_type<T>;\n\n   private:\n    std::vector<Point<T>>\
-    \ points;\n    std::vector<Wide> area_prefix;\n    long double epsilon;\n\n  \
-    \  template <class Compare>\n    int periodic_best(Compare better) const {\n \
-    \       const int size = int(points.size());\n        int left = 0;\n        int\
-    \ middle = size;\n        int right = 2 * size;\n        while (right - left >\
-    \ 2) {\n            const int left_middle = (left + middle) / 2;\n           \
-    \ const int right_middle = (middle + right + 1) / 2;\n            if (better(left_middle\
+    \    return PointInPolygon::Inside;\n}\n\ntemplate <Coordinate T>\nPointInPolygon\
+    \ point_in_convex_polygon(\n    const std::vector<Point<T>>& polygon,\n    const\
+    \ Point<T>& point,\n    long double eps = 1e-12L\n) {\n    return point_in_convex_polygon<Point<T>>(polygon,\
+    \ point, eps);\n}\n\ntemplate <Coordinate T>\nclass ConvexPolygon {\n   public:\n\
+    \    using Wide = wide_type<T>;\n\n   private:\n    std::vector<Point<T>> points;\n\
+    \    std::vector<Wide> area_prefix;\n    long double epsilon;\n\n    template\
+    \ <class Compare>\n    int periodic_best(Compare better) const {\n        const\
+    \ int size = int(points.size());\n        int left = 0;\n        int middle =\
+    \ size;\n        int right = 2 * size;\n        while (right - left > 2) {\n \
+    \           const int left_middle = (left + middle) / 2;\n            const int\
+    \ right_middle = (middle + right + 1) / 2;\n            if (better(left_middle\
     \ % size, middle % size)) {\n                right = middle;\n               \
     \ middle = left_middle;\n            } else if (better(right_middle % size, middle\
     \ % size)) {\n                left = middle;\n                middle = right_middle;\n\
@@ -2381,8 +2440,9 @@ data:
     \ = 1; index + 1 < polygon.size(); ++index) {\n        std::array<Point<T>, 3>\
     \ triangle;\n        triangle[0] = polygon[0];\n        triangle[1] = polygon[index];\n\
     \        triangle[2] = polygon[index + 1];\n        result.push_back(std::move(triangle));\n\
-    \    }\n    return result;\n}\n\ntemplate <Coordinate T>\nwide_type<T> convex_diameter2(\n\
-    \    std::vector<Point<T>> polygon,\n    long double eps = 1e-12L\n) {\n    polygon\
+    \    }\n    return result;\n}\n\ntemplate <PointRecord P>\nwide_type<typename\
+    \ P::coordinate_type> convex_diameter2(\n    std::vector<P> polygon,\n    long\
+    \ double eps = 1e-12L\n) {\n    using T = typename P::coordinate_type;\n    polygon\
     \ = normalize_convex_polygon(std::move(polygon), eps);\n    const std::size_t\
     \ size = polygon.size();\n    if (size <= 1) return 0;\n    if (size == 2) return\
     \ distance2(polygon[1], polygon[0]);\n\n    wide_type<T> result = 0;\n    std::size_t\
@@ -2396,19 +2456,21 @@ data:
     \        }\n        result = std::max(\n            result,\n            distance2(polygon[index],\
     \ polygon[opposite])\n        );\n        result = std::max(\n            result,\n\
     \            distance2(polygon[next], polygon[opposite])\n        );\n    }\n\
-    \    return result;\n}\n\ntemplate <Coordinate T>\nstd::vector<Point<long double>>\
-    \ convex_cut(\n    const std::vector<Point<T>>& polygon,\n    const Line<T>& boundary,\n\
-    \    long double eps = 1e-12L\n) {\n    assert(boundary.a != boundary.b);\n  \
-    \  std::vector<Point<long double>> input;\n    input.reserve(polygon.size());\n\
-    \    for (const Point<T>& point : polygon) input.emplace_back(point);\n    if\
-    \ (input.empty()) return input;\n\n    const Point<long double> line_start(boundary.a);\n\
-    \    const Point<long double> line_end(boundary.b);\n    const Line<long double>\
-    \ line{line_start, line_end};\n    std::vector<Point<long double>> result;\n \
-    \   Point<long double> previous = input.back();\n    int previous_side = orientation(line_start,\
-    \ line_end, previous, eps);\n    for (const Point<long double>& current : input)\
-    \ {\n        const int current_side =\n            orientation(line_start, line_end,\
-    \ current, eps);\n        const bool previous_inside = previous_side >= 0;\n \
-    \       const bool current_inside = current_side >= 0;\n        if (previous_inside\
+    \    return result;\n}\n\ntemplate <Coordinate T>\nwide_type<T> convex_diameter2(\n\
+    \    std::vector<Point<T>> polygon,\n    long double eps = 1e-12L\n) {\n    return\
+    \ convex_diameter2<Point<T>>(std::move(polygon), eps);\n}\n\ntemplate <Coordinate\
+    \ T>\nstd::vector<Point<long double>> convex_cut(\n    const std::vector<Point<T>>&\
+    \ polygon,\n    const Line<T>& boundary,\n    long double eps = 1e-12L\n) {\n\
+    \    assert(boundary.a != boundary.b);\n    std::vector<Point<long double>> input;\n\
+    \    input.reserve(polygon.size());\n    for (const Point<T>& point : polygon)\
+    \ input.emplace_back(point);\n    if (input.empty()) return input;\n\n    const\
+    \ Point<long double> line_start(boundary.a);\n    const Point<long double> line_end(boundary.b);\n\
+    \    const Line<long double> line{line_start, line_end};\n    std::vector<Point<long\
+    \ double>> result;\n    Point<long double> previous = input.back();\n    int previous_side\
+    \ = orientation(line_start, line_end, previous, eps);\n    for (const Point<long\
+    \ double>& current : input) {\n        const int current_side =\n            orientation(line_start,\
+    \ line_end, current, eps);\n        const bool previous_inside = previous_side\
+    \ >= 0;\n        const bool current_inside = current_side >= 0;\n        if (previous_inside\
     \ != current_inside) {\n            const Line<long double> crossing{previous,\
     \ current};\n            const LinearIntersection intersection =\n           \
     \     linear_intersection(line, crossing, eps);\n            if (intersection.kind\
@@ -3274,7 +3336,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/polygon_operations.test.cpp
   requiredBy: []
-  timestamp: '2026-10-06 02:48:54+09:00'
+  timestamp: '2026-10-24 23:29:06+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/polygon_operations.test.cpp

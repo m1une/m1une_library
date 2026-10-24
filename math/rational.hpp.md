@@ -10,6 +10,9 @@ data:
     title: Stern-Brocot Tree
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/point_data.test.cpp
+    title: verify/geometry/point_data.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/rational.test.cpp
     title: verify/geometry/rational.test.cpp
   - icon: ':heavy_check_mark:'
@@ -351,6 +354,7 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/rational.test.cpp
+  - verify/geometry/point_data.test.cpp
   - verify/math/rational.test.cpp
   - verify/math/stern_brocot_tree.test.cpp
   - verify/math/math_algorithms.test.cpp

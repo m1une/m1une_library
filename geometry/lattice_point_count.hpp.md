@@ -28,6 +28,9 @@ data:
     path: verify/geometry/lattice_point_count.test.cpp
     title: verify/geometry/lattice_point_count.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/point_data.test.cpp
+    title: verify/geometry/point_data.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/rational.test.cpp
     title: verify/geometry/rational.test.cpp
   _isVerificationFailed: false
@@ -248,6 +251,7 @@ data:
   - verify/geometry/lattice_point_count.test.cpp
   - verify/geometry/rational.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
+  - verify/geometry/point_data.test.cpp
   - verify/geometry/centroid.test.cpp
 documentation_of: geometry/lattice_point_count.hpp
 layout: document

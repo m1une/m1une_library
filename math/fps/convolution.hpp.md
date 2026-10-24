@@ -118,6 +118,9 @@ data:
     path: verify/geometry/lattice_point_count.test.cpp
     title: verify/geometry/lattice_point_count.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/point_data.test.cpp
+    title: verify/geometry/point_data.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/rational.test.cpp
     title: verify/geometry/rational.test.cpp
   - icon: ':heavy_check_mark:'
@@ -1311,6 +1314,7 @@ data:
   - verify/geometry/lattice_point_count.test.cpp
   - verify/geometry/rational.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
+  - verify/geometry/point_data.test.cpp
   - verify/geometry/centroid.test.cpp
   - verify/math/fps/half_gcd.test.cpp
   - verify/math/fps/inv_of_formal_power_series_sparse.test.cpp

@@ -202,6 +202,9 @@ data:
     path: verify/geometry/perpendicular_bisector.test.cpp
     title: verify/geometry/perpendicular_bisector.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/point_data.test.cpp
+    title: verify/geometry/point_data.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/point_in_polygon.test.cpp
     title: verify/geometry/point_in_polygon.test.cpp
   - icon: ':heavy_check_mark:'
@@ -358,6 +361,7 @@ data:
   - verify/geometry/segment_intersection_point.test.cpp
   - verify/geometry/convex_decomposition.test.cpp
   - verify/geometry/polygon_operations.test.cpp
+  - verify/geometry/point_data.test.cpp
   - verify/geometry/rectangle_union_area.test.cpp
   - verify/geometry/circle_boundary_intersection.test.cpp
   - verify/geometry/projection.test.cpp

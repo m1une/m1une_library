@@ -52,6 +52,9 @@ data:
     path: verify/geometry/minkowski_sum.test.cpp
     title: verify/geometry/minkowski_sum.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/point_data.test.cpp
+    title: verify/geometry/point_data.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/polygon_operations.test.cpp
     title: verify/geometry/polygon_operations.test.cpp
   - icon: ':heavy_check_mark:'
@@ -68,35 +71,36 @@ data:
   bundledCode: "#line 1 \"geometry/convex_hull.hpp\"\n\n\n\n#include <algorithm>\n\
     #include <cstddef>\n#include <utility>\n#include <vector>\n\n#line 1 \"geometry/point.hpp\"\
     \n\n\n\n#include <cmath>\n#include <concepts>\n#include <cassert>\n#include <type_traits>\n\
-    \n#line 1 \"geometry/detail/floating_predicate.hpp\"\n\n\n\nnamespace m1une {\n\
-    namespace geometry {\nnamespace predicate_detail {\n\ntemplate <typename T>\n\
-    constexpr T absolute(T value) {\n    return value < T(0) ? -value : value;\n}\n\
-    \ntemplate <typename T>\nconstexpr T max_value(T first, T second) {\n    return\
-    \ first < second ? second : first;\n}\n\ntemplate <typename T>\nconstexpr T vector_scale(T\
-    \ x, T y) {\n    return max_value(absolute(x), absolute(y));\n}\n\ntemplate <bool\
-    \ Exact, typename T>\nconstexpr int scaled_sign(T value, T scale, long double\
-    \ eps) {\n    if constexpr (Exact) {\n        return (value > T(0)) - (value <\
-    \ T(0));\n    } else {\n        const T tolerance = T(eps) * scale;\n        return\
-    \ (value > tolerance) - (value < -tolerance);\n    }\n}\n\ntemplate <bool Exact,\
-    \ typename T>\nconstexpr T determinant_scale(T ax, T ay, T bx, T by) {\n    if\
-    \ constexpr (Exact) {\n        return T(0);\n    } else {\n        return vector_scale(ax,\
-    \ ay) * vector_scale(bx, by);\n    }\n}\n\ntemplate <bool Exact, typename T>\n\
-    constexpr int determinant_sign(\n    T ax,\n    T ay,\n    T bx,\n    T by,\n\
-    \    long double eps\n) {\n    const T determinant = ax * by - ay * bx;\n    return\
-    \ scaled_sign<Exact>(\n        determinant,\n        determinant_scale<Exact>(ax,\
-    \ ay, bx, by),\n        eps\n    );\n}\n\ntemplate <bool Exact, typename T>\n\
-    constexpr int orientation_sign(\n    T direction_x,\n    T direction_y,\n    T\
-    \ offset_x,\n    T offset_y,\n    long double eps\n) {\n    const T determinant\
-    \ =\n        direction_x * offset_y - direction_y * offset_x;\n    T scale = T(0);\n\
-    \    if constexpr (!Exact) {\n        const T direction_scale =\n            vector_scale(direction_x,\
-    \ direction_y);\n        scale = direction_scale * max_value(\n            direction_scale,\n\
+    #line 10 \"geometry/point.hpp\"\n\n#line 1 \"geometry/detail/floating_predicate.hpp\"\
+    \n\n\n\nnamespace m1une {\nnamespace geometry {\nnamespace predicate_detail {\n\
+    \ntemplate <typename T>\nconstexpr T absolute(T value) {\n    return value < T(0)\
+    \ ? -value : value;\n}\n\ntemplate <typename T>\nconstexpr T max_value(T first,\
+    \ T second) {\n    return first < second ? second : first;\n}\n\ntemplate <typename\
+    \ T>\nconstexpr T vector_scale(T x, T y) {\n    return max_value(absolute(x),\
+    \ absolute(y));\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int scaled_sign(T\
+    \ value, T scale, long double eps) {\n    if constexpr (Exact) {\n        return\
+    \ (value > T(0)) - (value < T(0));\n    } else {\n        const T tolerance =\
+    \ T(eps) * scale;\n        return (value > tolerance) - (value < -tolerance);\n\
+    \    }\n}\n\ntemplate <bool Exact, typename T>\nconstexpr T determinant_scale(T\
+    \ ax, T ay, T bx, T by) {\n    if constexpr (Exact) {\n        return T(0);\n\
+    \    } else {\n        return vector_scale(ax, ay) * vector_scale(bx, by);\n \
+    \   }\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int determinant_sign(\n\
+    \    T ax,\n    T ay,\n    T bx,\n    T by,\n    long double eps\n) {\n    const\
+    \ T determinant = ax * by - ay * bx;\n    return scaled_sign<Exact>(\n       \
+    \ determinant,\n        determinant_scale<Exact>(ax, ay, bx, by),\n        eps\n\
+    \    );\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int orientation_sign(\n\
+    \    T direction_x,\n    T direction_y,\n    T offset_x,\n    T offset_y,\n  \
+    \  long double eps\n) {\n    const T determinant =\n        direction_x * offset_y\
+    \ - direction_y * offset_x;\n    T scale = T(0);\n    if constexpr (!Exact) {\n\
+    \        const T direction_scale =\n            vector_scale(direction_x, direction_y);\n\
+    \        scale = direction_scale * max_value(\n            direction_scale,\n\
     \            vector_scale(offset_x, offset_y)\n        );\n    }\n    return scaled_sign<Exact>(determinant,\
     \ scale, eps);\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int dot_sign(\n\
     \    T ax,\n    T ay,\n    T bx,\n    T by,\n    long double eps\n) {\n    const\
     \ T value = ax * bx + ay * by;\n    T scale = T(0);\n    if constexpr (!Exact)\
     \ {\n        scale = vector_scale(ax, ay) * vector_scale(bx, by);\n    }\n   \
     \ return scaled_sign<Exact>(value, scale, eps);\n}\n\n}  // namespace predicate_detail\n\
-    }  // namespace geometry\n}  // namespace m1une\n\n\n#line 10 \"geometry/point.hpp\"\
+    }  // namespace geometry\n}  // namespace m1une\n\n\n#line 12 \"geometry/point.hpp\"\
     \n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <typename T>\nconcept\
     \ Coordinate = !std::same_as<std::remove_cv_t<T>, bool> &&\n    (std::is_arithmetic_v<T>\
     \ ||\n     (std::copyable<T> && std::totally_ordered<T> && requires(T a, T b)\
@@ -109,24 +113,42 @@ data:
     \ <typename T>\nconcept ExactCoordinate = Coordinate<T> && !std::floating_point<T>;\n\
     \ntemplate <Coordinate T>\nusing wide_type = std::conditional_t<std::integral<T>,\
     \ __int128_t,\n    std::conditional_t<std::floating_point<T>, long double, T>>;\n\
-    \ntemplate <Coordinate T>\nstruct Point {\n    T x;\n    T y;\n\n    constexpr\
-    \ Point() : x(0), y(0) {}\n    constexpr Point(T x_value, T y_value) : x(x_value),\
-    \ y(y_value) {}\n\n    template <Coordinate U>\n    explicit constexpr Point(const\
-    \ Point<U>& other)\n        : x(static_cast<T>(other.x)), y(static_cast<T>(other.y))\
-    \ {}\n\n    constexpr Point& operator+=(const Point& other) {\n        x += other.x;\n\
-    \        y += other.y;\n        return *this;\n    }\n\n    constexpr Point& operator-=(const\
-    \ Point& other) {\n        x -= other.x;\n        y -= other.y;\n        return\
-    \ *this;\n    }\n\n    constexpr Point operator+() const {\n        return *this;\n\
-    \    }\n\n    constexpr Point operator-() const {\n        return Point(-x, -y);\n\
-    \    }\n\n    friend constexpr Point operator+(Point left, const Point& right)\
-    \ {\n        return left += right;\n    }\n\n    friend constexpr Point operator-(Point\
-    \ left, const Point& right) {\n        return left -= right;\n    }\n\n    friend\
-    \ constexpr bool operator==(const Point&, const Point&) = default;\n\n    friend\
-    \ constexpr bool operator<(const Point& left, const Point& right) {\n        if\
-    \ (left.x != right.x) return left.x < right.x;\n        return left.y < right.y;\n\
-    \    }\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const\
-    \ Point<T>& point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate\
-    \ T, typename Scalar>\nrequires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n\
+    \ntemplate <Coordinate T>\nstruct Point {\n    using coordinate_type = T;\n\n\
+    \    T x;\n    T y;\n\n    constexpr Point() : x(0), y(0) {}\n    constexpr Point(T\
+    \ x_value, T y_value) : x(x_value), y(y_value) {}\n\n    template <Coordinate\
+    \ U>\n    explicit constexpr Point(const Point<U>& other)\n        : x(static_cast<T>(other.x)),\
+    \ y(static_cast<T>(other.y)) {}\n\n    constexpr Point& operator+=(const Point&\
+    \ other) {\n        x += other.x;\n        y += other.y;\n        return *this;\n\
+    \    }\n\n    constexpr Point& operator-=(const Point& other) {\n        x -=\
+    \ other.x;\n        y -= other.y;\n        return *this;\n    }\n\n    constexpr\
+    \ Point operator+() const {\n        return *this;\n    }\n\n    constexpr Point\
+    \ operator-() const {\n        return Point(-x, -y);\n    }\n\n    friend constexpr\
+    \ Point operator+(Point left, const Point& right) {\n        return left += right;\n\
+    \    }\n\n    friend constexpr Point operator-(Point left, const Point& right)\
+    \ {\n        return left -= right;\n    }\n\n    friend constexpr bool operator==(const\
+    \ Point&, const Point&) = default;\n\n    friend constexpr bool operator<(const\
+    \ Point& left, const Point& right) {\n        if (left.x != right.x) return left.x\
+    \ < right.x;\n        return left.y < right.y;\n    }\n};\n\n// Attach arbitrary\
+    \ metadata without changing coordinate semantics.\n// Arithmetic and conversions\
+    \ inherited from Point return ordinary points.\ntemplate <Coordinate T, typename\
+    \ Data>\nstruct PointWithData : Point<T> {\n    Data data;\n\n    constexpr PointWithData()\
+    \ requires std::default_initializable<Data>\n        : Point<T>(), data() {}\n\
+    \n    constexpr PointWithData(T x, T y)\n        requires std::default_initializable<Data>\n\
+    \        : Point<T>(x, y), data() {}\n\n    constexpr PointWithData(T x, T y,\
+    \ Data value)\n        : Point<T>(x, y), data(std::move(value)) {}\n\n    constexpr\
+    \ PointWithData(Point<T> point, Data value)\n        : Point<T>(std::move(point)),\
+    \ data(std::move(value)) {}\n};\n\n// User-defined records may publicly derive\
+    \ from Point<T> as well.\ntemplate <typename P>\nconcept PointRecord = requires\
+    \ {\n    typename P::coordinate_type;\n    requires Coordinate<typename P::coordinate_type>;\n\
+    \    requires std::derived_from<P, Point<typename P::coordinate_type>>;\n};\n\n\
+    // Explicitly discard metadata for APIs that construct new geometric objects.\n\
+    template <PointRecord P>\nstd::vector<Point<typename P::coordinate_type>> to_points(\n\
+    \    const std::vector<P>& records\n) {\n    using T = typename P::coordinate_type;\n\
+    \    std::vector<Point<T>> result;\n    result.reserve(records.size());\n    for\
+    \ (const Point<T>& point : records) result.push_back(point);\n    return result;\n\
+    }\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const Point<T>&\
+    \ point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate T,\
+    \ typename Scalar>\nrequires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n\
     constexpr auto operator*(const Point<T>& point, Scalar scalar) {\n    using Result\
     \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
     \ * Result(scalar),\n        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate\
@@ -195,49 +217,66 @@ data:
     \    );\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 10 \"\
     geometry/convex_hull.hpp\"\n\nnamespace m1une {\nnamespace geometry {\n\n// Returns\
     \ the convex hull counterclockwise from its lexicographically smallest\n// point.\
-    \ The first point is not repeated at the end.\ntemplate <Coordinate T>\nstd::vector<Point<T>>\
-    \ convex_hull(\n    std::vector<Point<T>> points,\n    bool include_collinear\
-    \ = false\n) {\n    std::sort(points.begin(), points.end());\n    points.erase(std::unique(points.begin(),\
-    \ points.end()), points.end());\n    std::size_t size = points.size();\n    if\
-    \ (size <= 1) return points;\n\n    std::vector<Point<T>> hull;\n    hull.reserve(2\
-    \ * size);\n    auto should_pop = [include_collinear](\n        const Point<T>&\
-    \ first,\n        const Point<T>& second,\n        const Point<T>& third\n   \
-    \ ) {\n        int turn = orientation(first, second, third);\n        return include_collinear\
-    \ ? turn < 0 : turn <= 0;\n    };\n\n    for (const Point<T>& point : points)\
-    \ {\n        while (\n            hull.size() >= 2 &&\n            should_pop(hull[hull.size()\
+    \ The first point is not repeated at the end. Equal coordinates retain\n// the\
+    \ first input record, independently of metadata.\ntemplate <PointRecord P>\nstd::vector<P>\
+    \ convex_hull(\n    std::vector<P> points,\n    bool include_collinear = false\n\
+    ) {\n    using T = typename P::coordinate_type;\n    auto less = [](const Point<T>&\
+    \ a, const Point<T>& b) { return a < b; };\n    if constexpr (std::same_as<P,\
+    \ Point<T>>) {\n        std::sort(points.begin(), points.end(), less);\n    }\
+    \ else {\n        std::stable_sort(points.begin(), points.end(), less);\n    }\n\
+    \    points.erase(\n        std::unique(points.begin(), points.end(),\n      \
+    \      [](const Point<T>& a, const Point<T>& b) { return a == b; }),\n       \
+    \ points.end()\n    );\n    std::size_t size = points.size();\n    if (size <=\
+    \ 1) return points;\n\n    std::vector<P> hull;\n    hull.reserve(2 * size);\n\
+    \    auto should_pop = [include_collinear](\n        const Point<T>& first,\n\
+    \        const Point<T>& second,\n        const Point<T>& third\n    ) {\n   \
+    \     int turn = orientation(first, second, third);\n        return include_collinear\
+    \ ? turn < 0 : turn <= 0;\n    };\n\n    for (const P& point : points) {\n   \
+    \     while (\n            hull.size() >= 2 &&\n            should_pop(hull[hull.size()\
     \ - 2], hull.back(), point)\n        ) {\n            hull.pop_back();\n     \
     \   }\n        hull.push_back(point);\n    }\n\n    std::size_t lower_size = hull.size();\n\
-    \    for (std::size_t index = size - 1; index-- > 0;) {\n        const Point<T>&\
-    \ point = points[index];\n        while (\n            hull.size() > lower_size\
-    \ &&\n            should_pop(hull[hull.size() - 2], hull.back(), point)\n    \
-    \    ) {\n            hull.pop_back();\n        }\n        hull.push_back(point);\n\
+    \    for (std::size_t index = size - 1; index-- > 0;) {\n        const P& point\
+    \ = points[index];\n        while (\n            hull.size() > lower_size &&\n\
+    \            should_pop(hull[hull.size() - 2], hull.back(), point)\n        )\
+    \ {\n            hull.pop_back();\n        }\n        hull.push_back(point);\n\
     \    }\n    hull.pop_back();\n\n    if (include_collinear && hull.size() == 2\
     \ * points.size() - 2) {\n        hull = std::move(points);\n    }\n    return\
-    \ hull;\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n"
+    \ hull;\n}\n\ntemplate <Coordinate T>\nstd::vector<Point<T>> convex_hull(\n  \
+    \  std::vector<Point<T>> points,\n    bool include_collinear = false\n) {\n  \
+    \  return convex_hull<Point<T>>(std::move(points), include_collinear);\n}\n\n\
+    }  // namespace geometry\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_GEOMETRY_CONVEX_HULL_HPP\n#define M1UNE_GEOMETRY_CONVEX_HULL_HPP\
     \ 1\n\n#include <algorithm>\n#include <cstddef>\n#include <utility>\n#include\
     \ <vector>\n\n#include \"point.hpp\"\n\nnamespace m1une {\nnamespace geometry\
     \ {\n\n// Returns the convex hull counterclockwise from its lexicographically\
-    \ smallest\n// point. The first point is not repeated at the end.\ntemplate <Coordinate\
-    \ T>\nstd::vector<Point<T>> convex_hull(\n    std::vector<Point<T>> points,\n\
-    \    bool include_collinear = false\n) {\n    std::sort(points.begin(), points.end());\n\
-    \    points.erase(std::unique(points.begin(), points.end()), points.end());\n\
-    \    std::size_t size = points.size();\n    if (size <= 1) return points;\n\n\
-    \    std::vector<Point<T>> hull;\n    hull.reserve(2 * size);\n    auto should_pop\
-    \ = [include_collinear](\n        const Point<T>& first,\n        const Point<T>&\
-    \ second,\n        const Point<T>& third\n    ) {\n        int turn = orientation(first,\
-    \ second, third);\n        return include_collinear ? turn < 0 : turn <= 0;\n\
-    \    };\n\n    for (const Point<T>& point : points) {\n        while (\n     \
-    \       hull.size() >= 2 &&\n            should_pop(hull[hull.size() - 2], hull.back(),\
-    \ point)\n        ) {\n            hull.pop_back();\n        }\n        hull.push_back(point);\n\
-    \    }\n\n    std::size_t lower_size = hull.size();\n    for (std::size_t index\
-    \ = size - 1; index-- > 0;) {\n        const Point<T>& point = points[index];\n\
-    \        while (\n            hull.size() > lower_size &&\n            should_pop(hull[hull.size()\
+    \ smallest\n// point. The first point is not repeated at the end. Equal coordinates\
+    \ retain\n// the first input record, independently of metadata.\ntemplate <PointRecord\
+    \ P>\nstd::vector<P> convex_hull(\n    std::vector<P> points,\n    bool include_collinear\
+    \ = false\n) {\n    using T = typename P::coordinate_type;\n    auto less = [](const\
+    \ Point<T>& a, const Point<T>& b) { return a < b; };\n    if constexpr (std::same_as<P,\
+    \ Point<T>>) {\n        std::sort(points.begin(), points.end(), less);\n    }\
+    \ else {\n        std::stable_sort(points.begin(), points.end(), less);\n    }\n\
+    \    points.erase(\n        std::unique(points.begin(), points.end(),\n      \
+    \      [](const Point<T>& a, const Point<T>& b) { return a == b; }),\n       \
+    \ points.end()\n    );\n    std::size_t size = points.size();\n    if (size <=\
+    \ 1) return points;\n\n    std::vector<P> hull;\n    hull.reserve(2 * size);\n\
+    \    auto should_pop = [include_collinear](\n        const Point<T>& first,\n\
+    \        const Point<T>& second,\n        const Point<T>& third\n    ) {\n   \
+    \     int turn = orientation(first, second, third);\n        return include_collinear\
+    \ ? turn < 0 : turn <= 0;\n    };\n\n    for (const P& point : points) {\n   \
+    \     while (\n            hull.size() >= 2 &&\n            should_pop(hull[hull.size()\
     \ - 2], hull.back(), point)\n        ) {\n            hull.pop_back();\n     \
-    \   }\n        hull.push_back(point);\n    }\n    hull.pop_back();\n\n    if (include_collinear\
-    \ && hull.size() == 2 * points.size() - 2) {\n        hull = std::move(points);\n\
-    \    }\n    return hull;\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\
-    \n#endif  // M1UNE_GEOMETRY_CONVEX_HULL_HPP\n"
+    \   }\n        hull.push_back(point);\n    }\n\n    std::size_t lower_size = hull.size();\n\
+    \    for (std::size_t index = size - 1; index-- > 0;) {\n        const P& point\
+    \ = points[index];\n        while (\n            hull.size() > lower_size &&\n\
+    \            should_pop(hull[hull.size() - 2], hull.back(), point)\n        )\
+    \ {\n            hull.pop_back();\n        }\n        hull.push_back(point);\n\
+    \    }\n    hull.pop_back();\n\n    if (include_collinear && hull.size() == 2\
+    \ * points.size() - 2) {\n        hull = std::move(points);\n    }\n    return\
+    \ hull;\n}\n\ntemplate <Coordinate T>\nstd::vector<Point<T>> convex_hull(\n  \
+    \  std::vector<Point<T>> points,\n    bool include_collinear = false\n) {\n  \
+    \  return convex_hull<Point<T>>(std::move(points), include_collinear);\n}\n\n\
+    }  // namespace geometry\n}  // namespace m1une\n\n#endif  // M1UNE_GEOMETRY_CONVEX_HULL_HPP\n"
   dependsOn:
   - geometry/point.hpp
   - geometry/detail/floating_predicate.hpp
@@ -247,7 +286,7 @@ data:
   - geometry/farthest_pair.hpp
   - geometry/all.hpp
   - geometry/convex_polygon.hpp
-  timestamp: '2026-10-05 22:23:07+09:00'
+  timestamp: '2026-10-24 23:29:06+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/minkowski_sum.test.cpp
@@ -257,6 +296,7 @@ data:
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/convex_decomposition.test.cpp
   - verify/geometry/polygon_operations.test.cpp
+  - verify/geometry/point_data.test.cpp
   - verify/geometry/convex_diameter.test.cpp
   - verify/geometry/centroid.test.cpp
   - verify/geometry/delaunay_triangulation.test.cpp
@@ -326,3 +366,18 @@ int main() {
     }
 }
 ```
+
+## Point records
+
+```cpp
+template <PointRecord P>
+std::vector<P> convex_hull(std::vector<P> points, bool include_collinear = false);
+```
+
+These overloads accept points carrying extra fields. See
+[points with metadata](https://m1une.github.io/m1une_library/geometry/point.hpp#points-with-metadata)
+for construction, payload behavior, and requirements. The complexity bounds above
+are unchanged, with additional record copy/move costs where applicable.
+
+The hull retains complete records. Points with equal coordinates are deduplicated
+regardless of metadata, retaining the first input record.

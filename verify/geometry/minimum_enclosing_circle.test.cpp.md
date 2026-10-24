@@ -38,35 +38,36 @@ data:
     \ <cstddef>\n#include <numbers>\n#line 13 \"geometry/circle.hpp\"\n\n#line 1 \"\
     geometry/linear.hpp\"\n\n\n\n#line 7 \"geometry/linear.hpp\"\n\n#line 1 \"geometry/point.hpp\"\
     \n\n\n\n#line 5 \"geometry/point.hpp\"\n#include <concepts>\n#line 8 \"geometry/point.hpp\"\
-    \n\n#line 1 \"geometry/detail/floating_predicate.hpp\"\n\n\n\nnamespace m1une\
-    \ {\nnamespace geometry {\nnamespace predicate_detail {\n\ntemplate <typename\
-    \ T>\nconstexpr T absolute(T value) {\n    return value < T(0) ? -value : value;\n\
-    }\n\ntemplate <typename T>\nconstexpr T max_value(T first, T second) {\n    return\
-    \ first < second ? second : first;\n}\n\ntemplate <typename T>\nconstexpr T vector_scale(T\
-    \ x, T y) {\n    return max_value(absolute(x), absolute(y));\n}\n\ntemplate <bool\
-    \ Exact, typename T>\nconstexpr int scaled_sign(T value, T scale, long double\
-    \ eps) {\n    if constexpr (Exact) {\n        return (value > T(0)) - (value <\
-    \ T(0));\n    } else {\n        const T tolerance = T(eps) * scale;\n        return\
-    \ (value > tolerance) - (value < -tolerance);\n    }\n}\n\ntemplate <bool Exact,\
-    \ typename T>\nconstexpr T determinant_scale(T ax, T ay, T bx, T by) {\n    if\
-    \ constexpr (Exact) {\n        return T(0);\n    } else {\n        return vector_scale(ax,\
-    \ ay) * vector_scale(bx, by);\n    }\n}\n\ntemplate <bool Exact, typename T>\n\
-    constexpr int determinant_sign(\n    T ax,\n    T ay,\n    T bx,\n    T by,\n\
-    \    long double eps\n) {\n    const T determinant = ax * by - ay * bx;\n    return\
-    \ scaled_sign<Exact>(\n        determinant,\n        determinant_scale<Exact>(ax,\
-    \ ay, bx, by),\n        eps\n    );\n}\n\ntemplate <bool Exact, typename T>\n\
-    constexpr int orientation_sign(\n    T direction_x,\n    T direction_y,\n    T\
-    \ offset_x,\n    T offset_y,\n    long double eps\n) {\n    const T determinant\
-    \ =\n        direction_x * offset_y - direction_y * offset_x;\n    T scale = T(0);\n\
-    \    if constexpr (!Exact) {\n        const T direction_scale =\n            vector_scale(direction_x,\
-    \ direction_y);\n        scale = direction_scale * max_value(\n            direction_scale,\n\
+    \n#include <utility>\n#line 10 \"geometry/point.hpp\"\n\n#line 1 \"geometry/detail/floating_predicate.hpp\"\
+    \n\n\n\nnamespace m1une {\nnamespace geometry {\nnamespace predicate_detail {\n\
+    \ntemplate <typename T>\nconstexpr T absolute(T value) {\n    return value < T(0)\
+    \ ? -value : value;\n}\n\ntemplate <typename T>\nconstexpr T max_value(T first,\
+    \ T second) {\n    return first < second ? second : first;\n}\n\ntemplate <typename\
+    \ T>\nconstexpr T vector_scale(T x, T y) {\n    return max_value(absolute(x),\
+    \ absolute(y));\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int scaled_sign(T\
+    \ value, T scale, long double eps) {\n    if constexpr (Exact) {\n        return\
+    \ (value > T(0)) - (value < T(0));\n    } else {\n        const T tolerance =\
+    \ T(eps) * scale;\n        return (value > tolerance) - (value < -tolerance);\n\
+    \    }\n}\n\ntemplate <bool Exact, typename T>\nconstexpr T determinant_scale(T\
+    \ ax, T ay, T bx, T by) {\n    if constexpr (Exact) {\n        return T(0);\n\
+    \    } else {\n        return vector_scale(ax, ay) * vector_scale(bx, by);\n \
+    \   }\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int determinant_sign(\n\
+    \    T ax,\n    T ay,\n    T bx,\n    T by,\n    long double eps\n) {\n    const\
+    \ T determinant = ax * by - ay * bx;\n    return scaled_sign<Exact>(\n       \
+    \ determinant,\n        determinant_scale<Exact>(ax, ay, bx, by),\n        eps\n\
+    \    );\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int orientation_sign(\n\
+    \    T direction_x,\n    T direction_y,\n    T offset_x,\n    T offset_y,\n  \
+    \  long double eps\n) {\n    const T determinant =\n        direction_x * offset_y\
+    \ - direction_y * offset_x;\n    T scale = T(0);\n    if constexpr (!Exact) {\n\
+    \        const T direction_scale =\n            vector_scale(direction_x, direction_y);\n\
+    \        scale = direction_scale * max_value(\n            direction_scale,\n\
     \            vector_scale(offset_x, offset_y)\n        );\n    }\n    return scaled_sign<Exact>(determinant,\
     \ scale, eps);\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int dot_sign(\n\
     \    T ax,\n    T ay,\n    T bx,\n    T by,\n    long double eps\n) {\n    const\
     \ T value = ax * bx + ay * by;\n    T scale = T(0);\n    if constexpr (!Exact)\
     \ {\n        scale = vector_scale(ax, ay) * vector_scale(bx, by);\n    }\n   \
     \ return scaled_sign<Exact>(value, scale, eps);\n}\n\n}  // namespace predicate_detail\n\
-    }  // namespace geometry\n}  // namespace m1une\n\n\n#line 10 \"geometry/point.hpp\"\
+    }  // namespace geometry\n}  // namespace m1une\n\n\n#line 12 \"geometry/point.hpp\"\
     \n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <typename T>\nconcept\
     \ Coordinate = !std::same_as<std::remove_cv_t<T>, bool> &&\n    (std::is_arithmetic_v<T>\
     \ ||\n     (std::copyable<T> && std::totally_ordered<T> && requires(T a, T b)\
@@ -79,24 +80,42 @@ data:
     \ <typename T>\nconcept ExactCoordinate = Coordinate<T> && !std::floating_point<T>;\n\
     \ntemplate <Coordinate T>\nusing wide_type = std::conditional_t<std::integral<T>,\
     \ __int128_t,\n    std::conditional_t<std::floating_point<T>, long double, T>>;\n\
-    \ntemplate <Coordinate T>\nstruct Point {\n    T x;\n    T y;\n\n    constexpr\
-    \ Point() : x(0), y(0) {}\n    constexpr Point(T x_value, T y_value) : x(x_value),\
-    \ y(y_value) {}\n\n    template <Coordinate U>\n    explicit constexpr Point(const\
-    \ Point<U>& other)\n        : x(static_cast<T>(other.x)), y(static_cast<T>(other.y))\
-    \ {}\n\n    constexpr Point& operator+=(const Point& other) {\n        x += other.x;\n\
-    \        y += other.y;\n        return *this;\n    }\n\n    constexpr Point& operator-=(const\
-    \ Point& other) {\n        x -= other.x;\n        y -= other.y;\n        return\
-    \ *this;\n    }\n\n    constexpr Point operator+() const {\n        return *this;\n\
-    \    }\n\n    constexpr Point operator-() const {\n        return Point(-x, -y);\n\
-    \    }\n\n    friend constexpr Point operator+(Point left, const Point& right)\
-    \ {\n        return left += right;\n    }\n\n    friend constexpr Point operator-(Point\
-    \ left, const Point& right) {\n        return left -= right;\n    }\n\n    friend\
-    \ constexpr bool operator==(const Point&, const Point&) = default;\n\n    friend\
-    \ constexpr bool operator<(const Point& left, const Point& right) {\n        if\
-    \ (left.x != right.x) return left.x < right.x;\n        return left.y < right.y;\n\
-    \    }\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const\
-    \ Point<T>& point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate\
-    \ T, typename Scalar>\nrequires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n\
+    \ntemplate <Coordinate T>\nstruct Point {\n    using coordinate_type = T;\n\n\
+    \    T x;\n    T y;\n\n    constexpr Point() : x(0), y(0) {}\n    constexpr Point(T\
+    \ x_value, T y_value) : x(x_value), y(y_value) {}\n\n    template <Coordinate\
+    \ U>\n    explicit constexpr Point(const Point<U>& other)\n        : x(static_cast<T>(other.x)),\
+    \ y(static_cast<T>(other.y)) {}\n\n    constexpr Point& operator+=(const Point&\
+    \ other) {\n        x += other.x;\n        y += other.y;\n        return *this;\n\
+    \    }\n\n    constexpr Point& operator-=(const Point& other) {\n        x -=\
+    \ other.x;\n        y -= other.y;\n        return *this;\n    }\n\n    constexpr\
+    \ Point operator+() const {\n        return *this;\n    }\n\n    constexpr Point\
+    \ operator-() const {\n        return Point(-x, -y);\n    }\n\n    friend constexpr\
+    \ Point operator+(Point left, const Point& right) {\n        return left += right;\n\
+    \    }\n\n    friend constexpr Point operator-(Point left, const Point& right)\
+    \ {\n        return left -= right;\n    }\n\n    friend constexpr bool operator==(const\
+    \ Point&, const Point&) = default;\n\n    friend constexpr bool operator<(const\
+    \ Point& left, const Point& right) {\n        if (left.x != right.x) return left.x\
+    \ < right.x;\n        return left.y < right.y;\n    }\n};\n\n// Attach arbitrary\
+    \ metadata without changing coordinate semantics.\n// Arithmetic and conversions\
+    \ inherited from Point return ordinary points.\ntemplate <Coordinate T, typename\
+    \ Data>\nstruct PointWithData : Point<T> {\n    Data data;\n\n    constexpr PointWithData()\
+    \ requires std::default_initializable<Data>\n        : Point<T>(), data() {}\n\
+    \n    constexpr PointWithData(T x, T y)\n        requires std::default_initializable<Data>\n\
+    \        : Point<T>(x, y), data() {}\n\n    constexpr PointWithData(T x, T y,\
+    \ Data value)\n        : Point<T>(x, y), data(std::move(value)) {}\n\n    constexpr\
+    \ PointWithData(Point<T> point, Data value)\n        : Point<T>(std::move(point)),\
+    \ data(std::move(value)) {}\n};\n\n// User-defined records may publicly derive\
+    \ from Point<T> as well.\ntemplate <typename P>\nconcept PointRecord = requires\
+    \ {\n    typename P::coordinate_type;\n    requires Coordinate<typename P::coordinate_type>;\n\
+    \    requires std::derived_from<P, Point<typename P::coordinate_type>>;\n};\n\n\
+    // Explicitly discard metadata for APIs that construct new geometric objects.\n\
+    template <PointRecord P>\nstd::vector<Point<typename P::coordinate_type>> to_points(\n\
+    \    const std::vector<P>& records\n) {\n    using T = typename P::coordinate_type;\n\
+    \    std::vector<Point<T>> result;\n    result.reserve(records.size());\n    for\
+    \ (const Point<T>& point : records) result.push_back(point);\n    return result;\n\
+    }\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const Point<T>&\
+    \ point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate T,\
+    \ typename Scalar>\nrequires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n\
     constexpr auto operator*(const Point<T>& point, Scalar scalar) {\n    using Result\
     \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
     \ * Result(scalar),\n        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate\
@@ -1272,9 +1291,9 @@ data:
     \n\nnamespace m1une {\nnamespace geometry {\n\nstruct MinimumEnclosingCircle {\n\
     \    Circle<long double> circle;\n    std::vector<int> support;\n};\n\nnamespace\
     \ internal {\n\nstruct MinimumEnclosingCircleSupport {\n    int size = 0;\n  \
-    \  std::array<int, 3> index = {-1, -1, -1};\n};\n\ntemplate <Coordinate T>\nCircle<long\
-    \ double> circle_from_support(\n    const std::vector<Point<T>>& points,\n   \
-    \ const MinimumEnclosingCircleSupport& support\n) {\n    assert(1 <= support.size\
+    \  std::array<int, 3> index = {-1, -1, -1};\n};\n\ntemplate <PointRecord P>\n\
+    Circle<long double> circle_from_support(\n    const std::vector<P>& points,\n\
+    \    const MinimumEnclosingCircleSupport& support\n) {\n    assert(1 <= support.size\
     \ && support.size <= 3);\n    Point<long double> first(points[support.index[0]]);\n\
     \    if (support.size == 1) return Circle<long double>{first, 0.0L};\n\n    Point<long\
     \ double> second(points[support.index[1]]);\n    if (support.size == 2) {\n  \
@@ -1289,22 +1308,23 @@ data:
     \        (\n            first_norm * (third.x - second.x) +\n            second_norm\
     \ * (first.x - third.x) +\n            third_norm * (second.x - first.x)\n   \
     \     ) / denominator\n    );\n    return Circle<long double>{center, distance(center,\
-    \ first)};\n}\n\ntemplate <Coordinate T>\nvoid reduce_collinear_support(\n   \
-    \ const std::vector<Point<T>>& points,\n    MinimumEnclosingCircleSupport& support\n\
-    ) {\n    if (support.size != 3) return;\n    const Point<T>& first = points[support.index[0]];\n\
-    \    const Point<T>& second = points[support.index[1]];\n    const Point<T>& third\
-    \ = points[support.index[2]];\n    if (cross(first, second, third) != 0) return;\n\
-    \n    wide_type<T> first_second = distance2(first, second);\n    wide_type<T>\
-    \ second_third = distance2(second, third);\n    wide_type<T> first_third = distance2(first,\
-    \ third);\n    if (first_second >= second_third && first_second >= first_third)\
-    \ {\n        support.size = 2;\n    } else if (second_third >= first_second &&\
-    \ second_third >= first_third) {\n        support.size = 2;\n        support.index[0]\
-    \ = support.index[1];\n        support.index[1] = support.index[2];\n    } else\
-    \ {\n        support.size = 2;\n        support.index[1] = support.index[2];\n\
-    \    }\n}\n\ntemplate <Coordinate T>\nbool support_contains(\n    const std::vector<Point<T>>&\
-    \ points,\n    const MinimumEnclosingCircleSupport& support,\n    int point_index,\n\
-    \    long double eps\n) {\n    if (support.size == 0) return false;\n    const\
-    \ Point<T>& point = points[point_index];\n    const Point<T>& first = points[support.index[0]];\n\
+    \ first)};\n}\n\ntemplate <PointRecord P>\nvoid reduce_collinear_support(\n  \
+    \  const std::vector<P>& points,\n    MinimumEnclosingCircleSupport& support\n\
+    ) {\n    using T = typename P::coordinate_type;\n    if (support.size != 3) return;\n\
+    \    const Point<T>& first = points[support.index[0]];\n    const Point<T>& second\
+    \ = points[support.index[1]];\n    const Point<T>& third = points[support.index[2]];\n\
+    \    if (cross(first, second, third) != 0) return;\n\n    wide_type<T> first_second\
+    \ = distance2(first, second);\n    wide_type<T> second_third = distance2(second,\
+    \ third);\n    wide_type<T> first_third = distance2(first, third);\n    if (first_second\
+    \ >= second_third && first_second >= first_third) {\n        support.size = 2;\n\
+    \    } else if (second_third >= first_second && second_third >= first_third) {\n\
+    \        support.size = 2;\n        support.index[0] = support.index[1];\n   \
+    \     support.index[1] = support.index[2];\n    } else {\n        support.size\
+    \ = 2;\n        support.index[1] = support.index[2];\n    }\n}\n\ntemplate <PointRecord\
+    \ P>\nbool support_contains(\n    const std::vector<P>& points,\n    const MinimumEnclosingCircleSupport&\
+    \ support,\n    int point_index,\n    long double eps\n) {\n    using T = typename\
+    \ P::coordinate_type;\n    if (support.size == 0) return false;\n    const Point<T>&\
+    \ point = points[point_index];\n    const Point<T>& first = points[support.index[0]];\n\
     \    if (support.size == 1) return point == first;\n\n    if constexpr (ExactCoordinate<T>)\
     \ {\n        using W = wide_type<T>;\n        const Point<T>& second = points[support.index[1]];\n\
     \        if (support.size == 2) {\n            W ux = W(2) * W(point.x) - W(first.x)\
@@ -1328,10 +1348,10 @@ data:
     \ minimum_enclosing_circle_random(std::uint64_t& state) {\n    state ^= state\
     \ << 7;\n    state ^= state >> 9;\n    return state;\n}\n\n}  // namespace internal\n\
     \n// Returns the unique minimum circle containing every input point.\ntemplate\
-    \ <Coordinate T>\nstd::optional<MinimumEnclosingCircle> minimum_enclosing_circle(\n\
-    \    const std::vector<Point<T>>& points,\n    long double eps = 1e-12L\n) {\n\
-    \    if (points.empty()) return std::nullopt;\n    assert(eps >= 0.0L);\n\n  \
-    \  const int n = int(points.size());\n    std::vector<int> order(n);\n    std::iota(order.begin(),\
+    \ <PointRecord P>\nstd::optional<MinimumEnclosingCircle> minimum_enclosing_circle(\n\
+    \    const std::vector<P>& points,\n    long double eps = 1e-12L\n) {\n    if\
+    \ (points.empty()) return std::nullopt;\n    assert(eps >= 0.0L);\n\n    const\
+    \ int n = int(points.size());\n    std::vector<int> order(n);\n    std::iota(order.begin(),\
     \ order.end(), 0);\n    std::uint64_t state = 0x9e3779b97f4a7c15ULL;\n    for\
     \ (int index = n - 1; index >= 1; index--) {\n        int other = int(\n     \
     \       internal::minimum_enclosing_circle_random(state) %\n            std::uint64_t(index\
@@ -1354,21 +1374,24 @@ data:
     \        }\n    }\n\n    MinimumEnclosingCircle result;\n    result.circle = internal::circle_from_support(points,\
     \ support);\n    result.support.assign(\n        support.index.begin(),\n    \
     \    support.index.begin() + support.size\n    );\n    std::sort(result.support.begin(),\
-    \ result.support.end());\n    return result;\n}\n\n}  // namespace geometry\n\
-    }  // namespace m1une\n\n\n#line 4 \"verify/geometry/minimum_enclosing_circle.test.cpp\"\
-    \n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 6 \"utilities/fast_io.hpp\"\
-    \n#include <cerrno>\n#include <charconv>\n#line 9 \"utilities/fast_io.hpp\"\n\
-    #include <cstdio>\n#include <cstdlib>\n#line 12 \"utilities/fast_io.hpp\"\n#include\
-    \ <cstring>\n#include <iterator>\n#include <string>\n#include <sys/stat.h>\n#line\
-    \ 17 \"utilities/fast_io.hpp\"\n#include <utility>\n#include <unistd.h>\n#line\
-    \ 20 \"utilities/fast_io.hpp\"\n\nnamespace m1une {\nnamespace utilities {\n\n\
-    struct FastOutput;\n\nnamespace internal {\n\n// Shared with the convenience helpers\
-    \ in template.hpp.\ninline FastOutput* standard_output_instance = nullptr;\n\n\
-    // Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct\
-    \ is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
-    \    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
-    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
-    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    \ result.support.end());\n    return result;\n}\n\ntemplate <Coordinate T>\nstd::optional<MinimumEnclosingCircle>\
+    \ minimum_enclosing_circle(\n    const std::vector<Point<T>>& points,\n    long\
+    \ double eps = 1e-12L\n) {\n    return minimum_enclosing_circle<Point<T>>(points,\
+    \ eps);\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 4 \"\
+    verify/geometry/minimum_enclosing_circle.test.cpp\"\n\n#line 1 \"utilities/fast_io.hpp\"\
+    \n\n\n\n#line 6 \"utilities/fast_io.hpp\"\n#include <cerrno>\n#include <charconv>\n\
+    #line 9 \"utilities/fast_io.hpp\"\n#include <cstdio>\n#include <cstdlib>\n#line\
+    \ 12 \"utilities/fast_io.hpp\"\n#include <cstring>\n#include <iterator>\n#include\
+    \ <string>\n#include <sys/stat.h>\n#line 18 \"utilities/fast_io.hpp\"\n#include\
+    \ <unistd.h>\n#line 20 \"utilities/fast_io.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ utilities {\n\nstruct FastOutput;\n\nnamespace internal {\n\n// Shared with\
+    \ the convenience helpers in template.hpp.\ninline FastOutput* standard_output_instance\
+    \ = nullptr;\n\n// Detect std::begin(x), std::end(x).\ntemplate <class T, class\
+    \ = void>\nstruct is_range : std::false_type {};\n\ntemplate <class T>\nstruct\
+    \ is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n  \
+    \  decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
+    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
     \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
     \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
@@ -1835,7 +1858,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/minimum_enclosing_circle.test.cpp
   requiredBy: []
-  timestamp: '2026-10-06 01:57:24+09:00'
+  timestamp: '2026-10-24 23:29:06+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/minimum_enclosing_circle.test.cpp

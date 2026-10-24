@@ -124,6 +124,9 @@ data:
     path: verify/geometry/geometry_algorithms.test.cpp
     title: verify/geometry/geometry_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/point_data.test.cpp
+    title: verify/geometry/point_data.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/rational.test.cpp
     title: verify/geometry/rational.test.cpp
   _isVerificationFailed: false
@@ -246,11 +249,12 @@ data:
   isVerificationFile: false
   path: geometry/all.hpp
   requiredBy: []
-  timestamp: '2026-10-06 02:48:54+09:00'
+  timestamp: '2026-10-24 23:29:06+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/rational.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
+  - verify/geometry/point_data.test.cpp
   - verify/geometry/centroid.test.cpp
 documentation_of: geometry/all.hpp
 layout: document
@@ -268,7 +272,7 @@ title: Geometry Bundle
 | `geometry/angle_sort.hpp` | Atan-free counterclockwise angle sorting around an arbitrary origin. |
 | `geometry/circle_coverage_areas.hpp` | Areas covered by exactly $k$ enclosed circles for every $k$ in $O(N^2\log N)$. |
 | `geometry/circle_union_area.hpp` | Union area of enclosed circles in $O(N^2\log N)$. |
-| `geometry/point.hpp` | Points, vectors, dot/cross products, exact orientation, distance, centroid, and rotation. |
+| `geometry/point.hpp` | Points with optional metadata, coordinate-only conversion, vectors, dot/cross products, exact orientation, distance, centroid, and rotation. |
 | `geometry/closest_pair.hpp` | Euclidean closest pair with original indices in $O(N\log N)$. |
 | `geometry/convex_decomposition.hpp` | Hertel--Mehlhorn approximate and Keil--Snoeyink minimum convex decompositions of a simple polygon. |
 | `geometry/convex_hull.hpp` | Monotone-chain convex hull with optional boundary-collinear points. |

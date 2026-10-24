@@ -22,6 +22,9 @@ data:
     path: verify/geometry/geometry_algorithms.test.cpp
     title: verify/geometry/geometry_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/point_data.test.cpp
+    title: verify/geometry/point_data.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/rational.test.cpp
     title: verify/geometry/rational.test.cpp
   _isVerificationFailed: false
@@ -32,35 +35,36 @@ data:
   bundledCode: "#line 1 \"geometry/closest_pair.hpp\"\n\n\n\n#include <algorithm>\n\
     #include <optional>\n#include <utility>\n#include <vector>\n\n#line 1 \"geometry/point.hpp\"\
     \n\n\n\n#include <cmath>\n#include <concepts>\n#include <cassert>\n#include <type_traits>\n\
-    \n#line 1 \"geometry/detail/floating_predicate.hpp\"\n\n\n\nnamespace m1une {\n\
-    namespace geometry {\nnamespace predicate_detail {\n\ntemplate <typename T>\n\
-    constexpr T absolute(T value) {\n    return value < T(0) ? -value : value;\n}\n\
-    \ntemplate <typename T>\nconstexpr T max_value(T first, T second) {\n    return\
-    \ first < second ? second : first;\n}\n\ntemplate <typename T>\nconstexpr T vector_scale(T\
-    \ x, T y) {\n    return max_value(absolute(x), absolute(y));\n}\n\ntemplate <bool\
-    \ Exact, typename T>\nconstexpr int scaled_sign(T value, T scale, long double\
-    \ eps) {\n    if constexpr (Exact) {\n        return (value > T(0)) - (value <\
-    \ T(0));\n    } else {\n        const T tolerance = T(eps) * scale;\n        return\
-    \ (value > tolerance) - (value < -tolerance);\n    }\n}\n\ntemplate <bool Exact,\
-    \ typename T>\nconstexpr T determinant_scale(T ax, T ay, T bx, T by) {\n    if\
-    \ constexpr (Exact) {\n        return T(0);\n    } else {\n        return vector_scale(ax,\
-    \ ay) * vector_scale(bx, by);\n    }\n}\n\ntemplate <bool Exact, typename T>\n\
-    constexpr int determinant_sign(\n    T ax,\n    T ay,\n    T bx,\n    T by,\n\
-    \    long double eps\n) {\n    const T determinant = ax * by - ay * bx;\n    return\
-    \ scaled_sign<Exact>(\n        determinant,\n        determinant_scale<Exact>(ax,\
-    \ ay, bx, by),\n        eps\n    );\n}\n\ntemplate <bool Exact, typename T>\n\
-    constexpr int orientation_sign(\n    T direction_x,\n    T direction_y,\n    T\
-    \ offset_x,\n    T offset_y,\n    long double eps\n) {\n    const T determinant\
-    \ =\n        direction_x * offset_y - direction_y * offset_x;\n    T scale = T(0);\n\
-    \    if constexpr (!Exact) {\n        const T direction_scale =\n            vector_scale(direction_x,\
-    \ direction_y);\n        scale = direction_scale * max_value(\n            direction_scale,\n\
+    #line 10 \"geometry/point.hpp\"\n\n#line 1 \"geometry/detail/floating_predicate.hpp\"\
+    \n\n\n\nnamespace m1une {\nnamespace geometry {\nnamespace predicate_detail {\n\
+    \ntemplate <typename T>\nconstexpr T absolute(T value) {\n    return value < T(0)\
+    \ ? -value : value;\n}\n\ntemplate <typename T>\nconstexpr T max_value(T first,\
+    \ T second) {\n    return first < second ? second : first;\n}\n\ntemplate <typename\
+    \ T>\nconstexpr T vector_scale(T x, T y) {\n    return max_value(absolute(x),\
+    \ absolute(y));\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int scaled_sign(T\
+    \ value, T scale, long double eps) {\n    if constexpr (Exact) {\n        return\
+    \ (value > T(0)) - (value < T(0));\n    } else {\n        const T tolerance =\
+    \ T(eps) * scale;\n        return (value > tolerance) - (value < -tolerance);\n\
+    \    }\n}\n\ntemplate <bool Exact, typename T>\nconstexpr T determinant_scale(T\
+    \ ax, T ay, T bx, T by) {\n    if constexpr (Exact) {\n        return T(0);\n\
+    \    } else {\n        return vector_scale(ax, ay) * vector_scale(bx, by);\n \
+    \   }\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int determinant_sign(\n\
+    \    T ax,\n    T ay,\n    T bx,\n    T by,\n    long double eps\n) {\n    const\
+    \ T determinant = ax * by - ay * bx;\n    return scaled_sign<Exact>(\n       \
+    \ determinant,\n        determinant_scale<Exact>(ax, ay, bx, by),\n        eps\n\
+    \    );\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int orientation_sign(\n\
+    \    T direction_x,\n    T direction_y,\n    T offset_x,\n    T offset_y,\n  \
+    \  long double eps\n) {\n    const T determinant =\n        direction_x * offset_y\
+    \ - direction_y * offset_x;\n    T scale = T(0);\n    if constexpr (!Exact) {\n\
+    \        const T direction_scale =\n            vector_scale(direction_x, direction_y);\n\
+    \        scale = direction_scale * max_value(\n            direction_scale,\n\
     \            vector_scale(offset_x, offset_y)\n        );\n    }\n    return scaled_sign<Exact>(determinant,\
     \ scale, eps);\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int dot_sign(\n\
     \    T ax,\n    T ay,\n    T bx,\n    T by,\n    long double eps\n) {\n    const\
     \ T value = ax * bx + ay * by;\n    T scale = T(0);\n    if constexpr (!Exact)\
     \ {\n        scale = vector_scale(ax, ay) * vector_scale(bx, by);\n    }\n   \
     \ return scaled_sign<Exact>(value, scale, eps);\n}\n\n}  // namespace predicate_detail\n\
-    }  // namespace geometry\n}  // namespace m1une\n\n\n#line 10 \"geometry/point.hpp\"\
+    }  // namespace geometry\n}  // namespace m1une\n\n\n#line 12 \"geometry/point.hpp\"\
     \n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <typename T>\nconcept\
     \ Coordinate = !std::same_as<std::remove_cv_t<T>, bool> &&\n    (std::is_arithmetic_v<T>\
     \ ||\n     (std::copyable<T> && std::totally_ordered<T> && requires(T a, T b)\
@@ -73,24 +77,42 @@ data:
     \ <typename T>\nconcept ExactCoordinate = Coordinate<T> && !std::floating_point<T>;\n\
     \ntemplate <Coordinate T>\nusing wide_type = std::conditional_t<std::integral<T>,\
     \ __int128_t,\n    std::conditional_t<std::floating_point<T>, long double, T>>;\n\
-    \ntemplate <Coordinate T>\nstruct Point {\n    T x;\n    T y;\n\n    constexpr\
-    \ Point() : x(0), y(0) {}\n    constexpr Point(T x_value, T y_value) : x(x_value),\
-    \ y(y_value) {}\n\n    template <Coordinate U>\n    explicit constexpr Point(const\
-    \ Point<U>& other)\n        : x(static_cast<T>(other.x)), y(static_cast<T>(other.y))\
-    \ {}\n\n    constexpr Point& operator+=(const Point& other) {\n        x += other.x;\n\
-    \        y += other.y;\n        return *this;\n    }\n\n    constexpr Point& operator-=(const\
-    \ Point& other) {\n        x -= other.x;\n        y -= other.y;\n        return\
-    \ *this;\n    }\n\n    constexpr Point operator+() const {\n        return *this;\n\
-    \    }\n\n    constexpr Point operator-() const {\n        return Point(-x, -y);\n\
-    \    }\n\n    friend constexpr Point operator+(Point left, const Point& right)\
-    \ {\n        return left += right;\n    }\n\n    friend constexpr Point operator-(Point\
-    \ left, const Point& right) {\n        return left -= right;\n    }\n\n    friend\
-    \ constexpr bool operator==(const Point&, const Point&) = default;\n\n    friend\
-    \ constexpr bool operator<(const Point& left, const Point& right) {\n        if\
-    \ (left.x != right.x) return left.x < right.x;\n        return left.y < right.y;\n\
-    \    }\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const\
-    \ Point<T>& point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate\
-    \ T, typename Scalar>\nrequires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n\
+    \ntemplate <Coordinate T>\nstruct Point {\n    using coordinate_type = T;\n\n\
+    \    T x;\n    T y;\n\n    constexpr Point() : x(0), y(0) {}\n    constexpr Point(T\
+    \ x_value, T y_value) : x(x_value), y(y_value) {}\n\n    template <Coordinate\
+    \ U>\n    explicit constexpr Point(const Point<U>& other)\n        : x(static_cast<T>(other.x)),\
+    \ y(static_cast<T>(other.y)) {}\n\n    constexpr Point& operator+=(const Point&\
+    \ other) {\n        x += other.x;\n        y += other.y;\n        return *this;\n\
+    \    }\n\n    constexpr Point& operator-=(const Point& other) {\n        x -=\
+    \ other.x;\n        y -= other.y;\n        return *this;\n    }\n\n    constexpr\
+    \ Point operator+() const {\n        return *this;\n    }\n\n    constexpr Point\
+    \ operator-() const {\n        return Point(-x, -y);\n    }\n\n    friend constexpr\
+    \ Point operator+(Point left, const Point& right) {\n        return left += right;\n\
+    \    }\n\n    friend constexpr Point operator-(Point left, const Point& right)\
+    \ {\n        return left -= right;\n    }\n\n    friend constexpr bool operator==(const\
+    \ Point&, const Point&) = default;\n\n    friend constexpr bool operator<(const\
+    \ Point& left, const Point& right) {\n        if (left.x != right.x) return left.x\
+    \ < right.x;\n        return left.y < right.y;\n    }\n};\n\n// Attach arbitrary\
+    \ metadata without changing coordinate semantics.\n// Arithmetic and conversions\
+    \ inherited from Point return ordinary points.\ntemplate <Coordinate T, typename\
+    \ Data>\nstruct PointWithData : Point<T> {\n    Data data;\n\n    constexpr PointWithData()\
+    \ requires std::default_initializable<Data>\n        : Point<T>(), data() {}\n\
+    \n    constexpr PointWithData(T x, T y)\n        requires std::default_initializable<Data>\n\
+    \        : Point<T>(x, y), data() {}\n\n    constexpr PointWithData(T x, T y,\
+    \ Data value)\n        : Point<T>(x, y), data(std::move(value)) {}\n\n    constexpr\
+    \ PointWithData(Point<T> point, Data value)\n        : Point<T>(std::move(point)),\
+    \ data(std::move(value)) {}\n};\n\n// User-defined records may publicly derive\
+    \ from Point<T> as well.\ntemplate <typename P>\nconcept PointRecord = requires\
+    \ {\n    typename P::coordinate_type;\n    requires Coordinate<typename P::coordinate_type>;\n\
+    \    requires std::derived_from<P, Point<typename P::coordinate_type>>;\n};\n\n\
+    // Explicitly discard metadata for APIs that construct new geometric objects.\n\
+    template <PointRecord P>\nstd::vector<Point<typename P::coordinate_type>> to_points(\n\
+    \    const std::vector<P>& records\n) {\n    using T = typename P::coordinate_type;\n\
+    \    std::vector<Point<T>> result;\n    result.reserve(records.size());\n    for\
+    \ (const Point<T>& point : records) result.push_back(point);\n    return result;\n\
+    }\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const Point<T>&\
+    \ point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate T,\
+    \ typename Scalar>\nrequires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n\
     constexpr auto operator*(const Point<T>& point, Scalar scalar) {\n    using Result\
     \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
     \ * Result(scalar),\n        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate\
@@ -160,39 +182,40 @@ data:
     geometry/closest_pair.hpp\"\n\nnamespace m1une {\nnamespace geometry {\n\ntemplate\
     \ <Coordinate T>\nstruct ClosestPair {\n    int first;\n    int second;\n    wide_type<T>\
     \ distance_squared;\n};\n\n// Returns two distinct original indices with minimum\
-    \ Euclidean distance.\ntemplate <Coordinate T>\nstd::optional<ClosestPair<T>>\
-    \ closest_pair(\n    const std::vector<Point<T>>& points\n) {\n    const int n\
-    \ = int(points.size());\n    if (n < 2) return std::nullopt;\n\n    struct IndexedPoint\
-    \ {\n        Point<T> point;\n        int index;\n    };\n\n    std::vector<IndexedPoint>\
-    \ ordered;\n    ordered.reserve(n);\n    for (int index = 0; index < n; index++)\
-    \ {\n        ordered.push_back(IndexedPoint{points[index], index});\n    }\n \
-    \   std::sort(\n        ordered.begin(),\n        ordered.end(),\n        [](const\
-    \ IndexedPoint& first, const IndexedPoint& second) {\n            if (first.point\
-    \ < second.point) return true;\n            if (second.point < first.point) return\
-    \ false;\n            return first.index < second.index;\n        }\n    );\n\n\
-    \    std::optional<ClosestPair<T>> duplicate_result;\n    for (int first = 0;\
-    \ first < n;) {\n        int last = first + 1;\n        while (last < n && ordered[last].point\
-    \ == ordered[first].point) last++;\n        if (last - first >= 2) {\n       \
-    \     int first_index = ordered[first].index;\n            int second_index =\
-    \ ordered[first + 1].index;\n            std::pair<int, int> candidate(first_index,\
-    \ second_index);\n            if (\n                !duplicate_result ||\n   \
-    \             candidate < std::pair(\n                    duplicate_result->first,\n\
-    \                    duplicate_result->second\n                )\n           \
-    \ ) {\n                duplicate_result = ClosestPair<T>{\n                  \
-    \  first_index,\n                    second_index,\n                    wide_type<T>(0)\n\
-    \                };\n            }\n        }\n        first = last;\n    }\n\
-    \    if (duplicate_result) return duplicate_result;\n\n    std::optional<ClosestPair<T>>\
-    \ result;\n    auto consider = [&result, &points](int first, int second) {\n \
-    \       if (second < first) std::swap(first, second);\n        wide_type<T> squared\
-    \ = distance2(points[first], points[second]);\n        std::pair<int, int> candidate(first,\
-    \ second);\n        if (\n            !result ||\n            squared < result->distance_squared\
-    \ ||\n            (\n                squared == result->distance_squared &&\n\
-    \                candidate < std::pair(result->first, result->second)\n      \
-    \      )\n        ) {\n            result = ClosestPair<T>{first, second, squared};\n\
-    \        }\n    };\n    consider(ordered[0].index, ordered[1].index);\n\n    auto\
-    \ by_y = [](const IndexedPoint& first, const IndexedPoint& second) {\n       \
-    \ if (first.point.y != second.point.y) {\n            return first.point.y < second.point.y;\n\
-    \        }\n        if (first.point.x != second.point.x) {\n            return\
+    \ Euclidean distance.\ntemplate <PointRecord P>\nstd::optional<ClosestPair<typename\
+    \ P::coordinate_type>> closest_pair(\n    const std::vector<P>& points\n) {\n\
+    \    using T = typename P::coordinate_type;\n    const int n = int(points.size());\n\
+    \    if (n < 2) return std::nullopt;\n\n    struct IndexedPoint {\n        Point<T>\
+    \ point;\n        int index;\n    };\n\n    std::vector<IndexedPoint> ordered;\n\
+    \    ordered.reserve(n);\n    for (int index = 0; index < n; index++) {\n    \
+    \    ordered.push_back(IndexedPoint{points[index], index});\n    }\n    std::sort(\n\
+    \        ordered.begin(),\n        ordered.end(),\n        [](const IndexedPoint&\
+    \ first, const IndexedPoint& second) {\n            if (first.point < second.point)\
+    \ return true;\n            if (second.point < first.point) return false;\n  \
+    \          return first.index < second.index;\n        }\n    );\n\n    std::optional<ClosestPair<T>>\
+    \ duplicate_result;\n    for (int first = 0; first < n;) {\n        int last =\
+    \ first + 1;\n        while (last < n && ordered[last].point == ordered[first].point)\
+    \ last++;\n        if (last - first >= 2) {\n            int first_index = ordered[first].index;\n\
+    \            int second_index = ordered[first + 1].index;\n            std::pair<int,\
+    \ int> candidate(first_index, second_index);\n            if (\n             \
+    \   !duplicate_result ||\n                candidate < std::pair(\n           \
+    \         duplicate_result->first,\n                    duplicate_result->second\n\
+    \                )\n            ) {\n                duplicate_result = ClosestPair<T>{\n\
+    \                    first_index,\n                    second_index,\n       \
+    \             wide_type<T>(0)\n                };\n            }\n        }\n\
+    \        first = last;\n    }\n    if (duplicate_result) return duplicate_result;\n\
+    \n    std::optional<ClosestPair<T>> result;\n    auto consider = [&result, &points](int\
+    \ first, int second) {\n        if (second < first) std::swap(first, second);\n\
+    \        wide_type<T> squared = distance2(points[first], points[second]);\n  \
+    \      std::pair<int, int> candidate(first, second);\n        if (\n         \
+    \   !result ||\n            squared < result->distance_squared ||\n          \
+    \  (\n                squared == result->distance_squared &&\n               \
+    \ candidate < std::pair(result->first, result->second)\n            )\n      \
+    \  ) {\n            result = ClosestPair<T>{first, second, squared};\n       \
+    \ }\n    };\n    consider(ordered[0].index, ordered[1].index);\n\n    auto by_y\
+    \ = [](const IndexedPoint& first, const IndexedPoint& second) {\n        if (first.point.y\
+    \ != second.point.y) {\n            return first.point.y < second.point.y;\n \
+    \       }\n        if (first.point.x != second.point.x) {\n            return\
     \ first.point.x < second.point.x;\n        }\n        return first.index < second.index;\n\
     \    };\n\n    std::vector<IndexedPoint> buffer(n);\n    auto solve = [&](auto&&\
     \ self, int left, int right) -> void {\n        if (right - left <= 3) {\n   \
@@ -215,45 +238,48 @@ data:
     \            if (result->distance_squared < dy * dy) break;\n                consider(ordered[index].index,\
     \ buffer[previous].index);\n            }\n            buffer[strip_size++] =\
     \ ordered[index];\n        }\n    };\n    solve(solve, 0, n);\n    return result;\n\
+    }\n\ntemplate <Coordinate T>\nstd::optional<ClosestPair<T>> closest_pair(\n  \
+    \  const std::vector<Point<T>>& points\n) {\n    return closest_pair<Point<T>>(points);\n\
     }\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_GEOMETRY_CLOSEST_PAIR_HPP\n#define M1UNE_GEOMETRY_CLOSEST_PAIR_HPP\
     \ 1\n\n#include <algorithm>\n#include <optional>\n#include <utility>\n#include\
     \ <vector>\n\n#include \"point.hpp\"\n\nnamespace m1une {\nnamespace geometry\
     \ {\n\ntemplate <Coordinate T>\nstruct ClosestPair {\n    int first;\n    int\
     \ second;\n    wide_type<T> distance_squared;\n};\n\n// Returns two distinct original\
-    \ indices with minimum Euclidean distance.\ntemplate <Coordinate T>\nstd::optional<ClosestPair<T>>\
-    \ closest_pair(\n    const std::vector<Point<T>>& points\n) {\n    const int n\
-    \ = int(points.size());\n    if (n < 2) return std::nullopt;\n\n    struct IndexedPoint\
-    \ {\n        Point<T> point;\n        int index;\n    };\n\n    std::vector<IndexedPoint>\
-    \ ordered;\n    ordered.reserve(n);\n    for (int index = 0; index < n; index++)\
-    \ {\n        ordered.push_back(IndexedPoint{points[index], index});\n    }\n \
-    \   std::sort(\n        ordered.begin(),\n        ordered.end(),\n        [](const\
-    \ IndexedPoint& first, const IndexedPoint& second) {\n            if (first.point\
-    \ < second.point) return true;\n            if (second.point < first.point) return\
-    \ false;\n            return first.index < second.index;\n        }\n    );\n\n\
-    \    std::optional<ClosestPair<T>> duplicate_result;\n    for (int first = 0;\
-    \ first < n;) {\n        int last = first + 1;\n        while (last < n && ordered[last].point\
-    \ == ordered[first].point) last++;\n        if (last - first >= 2) {\n       \
-    \     int first_index = ordered[first].index;\n            int second_index =\
-    \ ordered[first + 1].index;\n            std::pair<int, int> candidate(first_index,\
-    \ second_index);\n            if (\n                !duplicate_result ||\n   \
-    \             candidate < std::pair(\n                    duplicate_result->first,\n\
-    \                    duplicate_result->second\n                )\n           \
-    \ ) {\n                duplicate_result = ClosestPair<T>{\n                  \
-    \  first_index,\n                    second_index,\n                    wide_type<T>(0)\n\
-    \                };\n            }\n        }\n        first = last;\n    }\n\
-    \    if (duplicate_result) return duplicate_result;\n\n    std::optional<ClosestPair<T>>\
-    \ result;\n    auto consider = [&result, &points](int first, int second) {\n \
-    \       if (second < first) std::swap(first, second);\n        wide_type<T> squared\
-    \ = distance2(points[first], points[second]);\n        std::pair<int, int> candidate(first,\
-    \ second);\n        if (\n            !result ||\n            squared < result->distance_squared\
-    \ ||\n            (\n                squared == result->distance_squared &&\n\
-    \                candidate < std::pair(result->first, result->second)\n      \
-    \      )\n        ) {\n            result = ClosestPair<T>{first, second, squared};\n\
-    \        }\n    };\n    consider(ordered[0].index, ordered[1].index);\n\n    auto\
-    \ by_y = [](const IndexedPoint& first, const IndexedPoint& second) {\n       \
-    \ if (first.point.y != second.point.y) {\n            return first.point.y < second.point.y;\n\
-    \        }\n        if (first.point.x != second.point.x) {\n            return\
+    \ indices with minimum Euclidean distance.\ntemplate <PointRecord P>\nstd::optional<ClosestPair<typename\
+    \ P::coordinate_type>> closest_pair(\n    const std::vector<P>& points\n) {\n\
+    \    using T = typename P::coordinate_type;\n    const int n = int(points.size());\n\
+    \    if (n < 2) return std::nullopt;\n\n    struct IndexedPoint {\n        Point<T>\
+    \ point;\n        int index;\n    };\n\n    std::vector<IndexedPoint> ordered;\n\
+    \    ordered.reserve(n);\n    for (int index = 0; index < n; index++) {\n    \
+    \    ordered.push_back(IndexedPoint{points[index], index});\n    }\n    std::sort(\n\
+    \        ordered.begin(),\n        ordered.end(),\n        [](const IndexedPoint&\
+    \ first, const IndexedPoint& second) {\n            if (first.point < second.point)\
+    \ return true;\n            if (second.point < first.point) return false;\n  \
+    \          return first.index < second.index;\n        }\n    );\n\n    std::optional<ClosestPair<T>>\
+    \ duplicate_result;\n    for (int first = 0; first < n;) {\n        int last =\
+    \ first + 1;\n        while (last < n && ordered[last].point == ordered[first].point)\
+    \ last++;\n        if (last - first >= 2) {\n            int first_index = ordered[first].index;\n\
+    \            int second_index = ordered[first + 1].index;\n            std::pair<int,\
+    \ int> candidate(first_index, second_index);\n            if (\n             \
+    \   !duplicate_result ||\n                candidate < std::pair(\n           \
+    \         duplicate_result->first,\n                    duplicate_result->second\n\
+    \                )\n            ) {\n                duplicate_result = ClosestPair<T>{\n\
+    \                    first_index,\n                    second_index,\n       \
+    \             wide_type<T>(0)\n                };\n            }\n        }\n\
+    \        first = last;\n    }\n    if (duplicate_result) return duplicate_result;\n\
+    \n    std::optional<ClosestPair<T>> result;\n    auto consider = [&result, &points](int\
+    \ first, int second) {\n        if (second < first) std::swap(first, second);\n\
+    \        wide_type<T> squared = distance2(points[first], points[second]);\n  \
+    \      std::pair<int, int> candidate(first, second);\n        if (\n         \
+    \   !result ||\n            squared < result->distance_squared ||\n          \
+    \  (\n                squared == result->distance_squared &&\n               \
+    \ candidate < std::pair(result->first, result->second)\n            )\n      \
+    \  ) {\n            result = ClosestPair<T>{first, second, squared};\n       \
+    \ }\n    };\n    consider(ordered[0].index, ordered[1].index);\n\n    auto by_y\
+    \ = [](const IndexedPoint& first, const IndexedPoint& second) {\n        if (first.point.y\
+    \ != second.point.y) {\n            return first.point.y < second.point.y;\n \
+    \       }\n        if (first.point.x != second.point.x) {\n            return\
     \ first.point.x < second.point.x;\n        }\n        return first.index < second.index;\n\
     \    };\n\n    std::vector<IndexedPoint> buffer(n);\n    auto solve = [&](auto&&\
     \ self, int left, int right) -> void {\n        if (right - left <= 3) {\n   \
@@ -276,6 +302,8 @@ data:
     \            if (result->distance_squared < dy * dy) break;\n                consider(ordered[index].index,\
     \ buffer[previous].index);\n            }\n            buffer[strip_size++] =\
     \ ordered[index];\n        }\n    };\n    solve(solve, 0, n);\n    return result;\n\
+    }\n\ntemplate <Coordinate T>\nstd::optional<ClosestPair<T>> closest_pair(\n  \
+    \  const std::vector<Point<T>>& points\n) {\n    return closest_pair<Point<T>>(points);\n\
     }\n\n}  // namespace geometry\n}  // namespace m1une\n\n#endif  // M1UNE_GEOMETRY_CLOSEST_PAIR_HPP\n"
   dependsOn:
   - geometry/point.hpp
@@ -284,11 +312,12 @@ data:
   path: geometry/closest_pair.hpp
   requiredBy:
   - geometry/all.hpp
-  timestamp: '2026-10-05 22:23:07+09:00'
+  timestamp: '2026-10-24 23:29:06+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/rational.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
+  - verify/geometry/point_data.test.cpp
   - verify/geometry/closest_pair.test.cpp
   - verify/geometry/centroid.test.cpp
 documentation_of: geometry/closest_pair.hpp
@@ -364,3 +393,16 @@ int main() {
     assert(answer->distance_squared == 5);
 }
 ```
+
+## Point records
+
+```cpp
+template <PointRecord P>
+std::optional<ClosestPair<typename P::coordinate_type>> closest_pair(
+    const std::vector<P>& points);
+```
+
+These overloads accept points carrying extra fields. See
+[points with metadata](https://m1une.github.io/m1une_library/geometry/point.hpp#points-with-metadata)
+for construction, payload behavior, and requirements. The complexity bounds above
+are unchanged, with additional record copy/move costs where applicable.

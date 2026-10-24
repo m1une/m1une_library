@@ -28,6 +28,9 @@ data:
     path: verify/geometry/geometry_algorithms.test.cpp
     title: verify/geometry/geometry_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/point_data.test.cpp
+    title: verify/geometry/point_data.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/rational.test.cpp
     title: verify/geometry/rational.test.cpp
   _isVerificationFailed: false
@@ -76,7 +79,7 @@ data:
     \ [&](const std::vector<int>& v) { return v.empty(); }),\n                   \
     \  result.end());\n        return result;\n    }\n};\n\n}  // namespace ds\n}\
     \  // namespace m1une\n\n\n#line 1 \"geometry/point.hpp\"\n\n\n\n#line 7 \"geometry/point.hpp\"\
-    \n#include <type_traits>\n\n#line 1 \"geometry/detail/floating_predicate.hpp\"\
+    \n#include <type_traits>\n#line 10 \"geometry/point.hpp\"\n\n#line 1 \"geometry/detail/floating_predicate.hpp\"\
     \n\n\n\nnamespace m1une {\nnamespace geometry {\nnamespace predicate_detail {\n\
     \ntemplate <typename T>\nconstexpr T absolute(T value) {\n    return value < T(0)\
     \ ? -value : value;\n}\n\ntemplate <typename T>\nconstexpr T max_value(T first,\
@@ -105,7 +108,7 @@ data:
     \ T value = ax * bx + ay * by;\n    T scale = T(0);\n    if constexpr (!Exact)\
     \ {\n        scale = vector_scale(ax, ay) * vector_scale(bx, by);\n    }\n   \
     \ return scaled_sign<Exact>(value, scale, eps);\n}\n\n}  // namespace predicate_detail\n\
-    }  // namespace geometry\n}  // namespace m1une\n\n\n#line 10 \"geometry/point.hpp\"\
+    }  // namespace geometry\n}  // namespace m1une\n\n\n#line 12 \"geometry/point.hpp\"\
     \n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <typename T>\nconcept\
     \ Coordinate = !std::same_as<std::remove_cv_t<T>, bool> &&\n    (std::is_arithmetic_v<T>\
     \ ||\n     (std::copyable<T> && std::totally_ordered<T> && requires(T a, T b)\
@@ -118,24 +121,42 @@ data:
     \ <typename T>\nconcept ExactCoordinate = Coordinate<T> && !std::floating_point<T>;\n\
     \ntemplate <Coordinate T>\nusing wide_type = std::conditional_t<std::integral<T>,\
     \ __int128_t,\n    std::conditional_t<std::floating_point<T>, long double, T>>;\n\
-    \ntemplate <Coordinate T>\nstruct Point {\n    T x;\n    T y;\n\n    constexpr\
-    \ Point() : x(0), y(0) {}\n    constexpr Point(T x_value, T y_value) : x(x_value),\
-    \ y(y_value) {}\n\n    template <Coordinate U>\n    explicit constexpr Point(const\
-    \ Point<U>& other)\n        : x(static_cast<T>(other.x)), y(static_cast<T>(other.y))\
-    \ {}\n\n    constexpr Point& operator+=(const Point& other) {\n        x += other.x;\n\
-    \        y += other.y;\n        return *this;\n    }\n\n    constexpr Point& operator-=(const\
-    \ Point& other) {\n        x -= other.x;\n        y -= other.y;\n        return\
-    \ *this;\n    }\n\n    constexpr Point operator+() const {\n        return *this;\n\
-    \    }\n\n    constexpr Point operator-() const {\n        return Point(-x, -y);\n\
-    \    }\n\n    friend constexpr Point operator+(Point left, const Point& right)\
-    \ {\n        return left += right;\n    }\n\n    friend constexpr Point operator-(Point\
-    \ left, const Point& right) {\n        return left -= right;\n    }\n\n    friend\
-    \ constexpr bool operator==(const Point&, const Point&) = default;\n\n    friend\
-    \ constexpr bool operator<(const Point& left, const Point& right) {\n        if\
-    \ (left.x != right.x) return left.x < right.x;\n        return left.y < right.y;\n\
-    \    }\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const\
-    \ Point<T>& point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate\
-    \ T, typename Scalar>\nrequires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n\
+    \ntemplate <Coordinate T>\nstruct Point {\n    using coordinate_type = T;\n\n\
+    \    T x;\n    T y;\n\n    constexpr Point() : x(0), y(0) {}\n    constexpr Point(T\
+    \ x_value, T y_value) : x(x_value), y(y_value) {}\n\n    template <Coordinate\
+    \ U>\n    explicit constexpr Point(const Point<U>& other)\n        : x(static_cast<T>(other.x)),\
+    \ y(static_cast<T>(other.y)) {}\n\n    constexpr Point& operator+=(const Point&\
+    \ other) {\n        x += other.x;\n        y += other.y;\n        return *this;\n\
+    \    }\n\n    constexpr Point& operator-=(const Point& other) {\n        x -=\
+    \ other.x;\n        y -= other.y;\n        return *this;\n    }\n\n    constexpr\
+    \ Point operator+() const {\n        return *this;\n    }\n\n    constexpr Point\
+    \ operator-() const {\n        return Point(-x, -y);\n    }\n\n    friend constexpr\
+    \ Point operator+(Point left, const Point& right) {\n        return left += right;\n\
+    \    }\n\n    friend constexpr Point operator-(Point left, const Point& right)\
+    \ {\n        return left -= right;\n    }\n\n    friend constexpr bool operator==(const\
+    \ Point&, const Point&) = default;\n\n    friend constexpr bool operator<(const\
+    \ Point& left, const Point& right) {\n        if (left.x != right.x) return left.x\
+    \ < right.x;\n        return left.y < right.y;\n    }\n};\n\n// Attach arbitrary\
+    \ metadata without changing coordinate semantics.\n// Arithmetic and conversions\
+    \ inherited from Point return ordinary points.\ntemplate <Coordinate T, typename\
+    \ Data>\nstruct PointWithData : Point<T> {\n    Data data;\n\n    constexpr PointWithData()\
+    \ requires std::default_initializable<Data>\n        : Point<T>(), data() {}\n\
+    \n    constexpr PointWithData(T x, T y)\n        requires std::default_initializable<Data>\n\
+    \        : Point<T>(x, y), data() {}\n\n    constexpr PointWithData(T x, T y,\
+    \ Data value)\n        : Point<T>(x, y), data(std::move(value)) {}\n\n    constexpr\
+    \ PointWithData(Point<T> point, Data value)\n        : Point<T>(std::move(point)),\
+    \ data(std::move(value)) {}\n};\n\n// User-defined records may publicly derive\
+    \ from Point<T> as well.\ntemplate <typename P>\nconcept PointRecord = requires\
+    \ {\n    typename P::coordinate_type;\n    requires Coordinate<typename P::coordinate_type>;\n\
+    \    requires std::derived_from<P, Point<typename P::coordinate_type>>;\n};\n\n\
+    // Explicitly discard metadata for APIs that construct new geometric objects.\n\
+    template <PointRecord P>\nstd::vector<Point<typename P::coordinate_type>> to_points(\n\
+    \    const std::vector<P>& records\n) {\n    using T = typename P::coordinate_type;\n\
+    \    std::vector<Point<T>> result;\n    result.reserve(records.size());\n    for\
+    \ (const Point<T>& point : records) result.push_back(point);\n    return result;\n\
+    }\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const Point<T>&\
+    \ point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate T,\
+    \ typename Scalar>\nrequires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n\
     constexpr auto operator*(const Point<T>& point, Scalar scalar) {\n    using Result\
     \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
     \ * Result(scalar),\n        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate\
@@ -353,13 +374,14 @@ data:
     \       duplicate_representative[vertex] = order[unique_size - 1];\n         \
     \   }\n        }\n\n        if (unique_size >= 2) solve_range(0, unique_size);\n\
     \        points.swap(original_points);\n        for (auto& edge : edges) edge.to\
-    \ = order[edge.to];\n    }\n\n   public:\n    explicit EuclideanDelaunay(const\
-    \ std::vector<Point<T>>& input_points) {\n        assert(input_points.size() <=\
-    \ std::size_t(std::numeric_limits<int>::max()));\n        points.reserve(input_points.size());\n\
-    \        edges.reserve(std::size_t(6) * input_points.size());\n        for (const\
-    \ auto& point : input_points) {\n            points.push_back(InternalPoint{W(point.x),\
-    \ W(point.y)});\n        }\n        solve();\n    }\n\n    bool has_duplicates()\
-    \ const {\n        for (\n            int vertex = 0;\n            vertex < int(duplicate_representative.size());\n\
+    \ = order[edge.to];\n    }\n\n   public:\n    template <PointRecord P>\n    requires\
+    \ std::same_as<typename P::coordinate_type, T>\n    explicit EuclideanDelaunay(const\
+    \ std::vector<P>& input_points) {\n        assert(input_points.size() <= std::size_t(std::numeric_limits<int>::max()));\n\
+    \        points.reserve(input_points.size());\n        edges.reserve(std::size_t(6)\
+    \ * input_points.size());\n        for (const auto& point : input_points) {\n\
+    \            points.push_back(InternalPoint{W(point.x), W(point.y)});\n      \
+    \  }\n        solve();\n    }\n\n    bool has_duplicates() const {\n        for\
+    \ (\n            int vertex = 0;\n            vertex < int(duplicate_representative.size());\n\
     \            ++vertex\n        ) {\n            if (duplicate_representative[vertex]\
     \ != vertex) return true;\n        }\n        return false;\n    }\n\n    std::vector<std::pair<int,\
     \ int>> get_edges() const {\n        std::vector<std::pair<int, int>> result;\n\
@@ -372,19 +394,23 @@ data:
     \                result.emplace_back(vertex, duplicate_representative[vertex]);\n\
     \            }\n        }\n        return result;\n    }\n};\n\n}  // namespace\
     \ detail\n\n// Returns O(n) Delaunay edges containing a Euclidean minimum spanning\
-    \ tree.\ntemplate <ExactCoordinate T>\nstd::vector<EuclideanMstEdge<wide_type<T>>>\
-    \ euclidean_mst_edges(\n    const std::vector<Point<T>>& points\n) {\n    using\
-    \ W = wide_type<T>;\n    auto delaunay_edges = detail::EuclideanDelaunay<T>(points).get_edges();\n\
+    \ tree.\ntemplate <PointRecord P>\nrequires ExactCoordinate<typename P::coordinate_type>\n\
+    std::vector<EuclideanMstEdge<wide_type<typename P::coordinate_type>>> euclidean_mst_edges(\n\
+    \    const std::vector<P>& points\n) {\n    using T = typename P::coordinate_type;\n\
+    \    using W = wide_type<T>;\n    auto delaunay_edges = detail::EuclideanDelaunay<T>(points).get_edges();\n\
     \    std::vector<EuclideanMstEdge<W>> result;\n    result.reserve(delaunay_edges.size());\n\
     \    for (auto [from, to] : delaunay_edges) {\n        result.push_back(EuclideanMstEdge<W>{from,\
     \ to, distance2(points[from], points[to])});\n    }\n    return result;\n}\n\n\
-    // Returns a Euclidean minimum spanning tree.\ntemplate <ExactCoordinate T>\n\
-    EuclideanMst<wide_type<T>> euclidean_mst(const std::vector<Point<T>>& points)\
-    \ {\n    using W = wide_type<T>;\n    auto candidates = euclidean_mst_edges(points);\n\
-    \    std::sort(candidates.begin(), candidates.end(), [](const auto& left, const\
-    \ auto& right) {\n        if (left.squared_distance != right.squared_distance)\
-    \ {\n            return left.squared_distance < right.squared_distance;\n    \
-    \    }\n        if (left.from != right.from) return left.from < right.from;\n\
+    template <ExactCoordinate T>\nstd::vector<EuclideanMstEdge<wide_type<T>>> euclidean_mst_edges(const\
+    \ std::vector<Point<T>>& points) {\n    return euclidean_mst_edges<Point<T>>(points);\n\
+    }\n\n// Returns a Euclidean minimum spanning tree.\ntemplate <PointRecord P>\n\
+    requires ExactCoordinate<typename P::coordinate_type>\nEuclideanMst<wide_type<typename\
+    \ P::coordinate_type>> euclidean_mst(const std::vector<P>& points) {\n    using\
+    \ T = typename P::coordinate_type;\n    using W = wide_type<T>;\n    auto candidates\
+    \ = euclidean_mst_edges(points);\n    std::sort(candidates.begin(), candidates.end(),\
+    \ [](const auto& left, const auto& right) {\n        if (left.squared_distance\
+    \ != right.squared_distance) {\n            return left.squared_distance < right.squared_distance;\n\
+    \        }\n        if (left.from != right.from) return left.from < right.from;\n\
     \        return left.to < right.to;\n    });\n\n    m1une::ds::Dsu dsu(int(points.size()));\n\
     \    EuclideanMst<W> result;\n    result.cost = 0;\n    result.edges.reserve(points.empty()\
     \ ? 0 : points.size() - 1);\n    for (const auto& edge : candidates) {\n     \
@@ -392,7 +418,9 @@ data:
     \ edge.to);\n        result.cost += std::sqrt(static_cast<long double>(edge.squared_distance));\n\
     \        result.edges.push_back(edge);\n        if (result.edges.size() + 1 ==\
     \ points.size()) break;\n    }\n    assert(points.empty() || result.edges.size()\
-    \ + 1 == points.size());\n    return result;\n}\n\n}  // namespace geometry\n\
+    \ + 1 == points.size());\n    return result;\n}\n\ntemplate <ExactCoordinate T>\n\
+    EuclideanMst<wide_type<T>> euclidean_mst(const std::vector<Point<T>>& points)\
+    \ {\n    return euclidean_mst<Point<T>>(points);\n}\n\n}  // namespace geometry\n\
     }  // namespace m1une\n\n\n#line 12 \"geometry/delaunay_triangulation.hpp\"\n\n\
     namespace m1une {\nnamespace geometry {\n\nstruct DelaunayTriangulation {\n  \
     \  std::vector<std::pair<int, int>> edges;\n    std::vector<std::array<int, 3>>\
@@ -400,25 +428,28 @@ data:
     \ T>\nint direction_half(\n    const Point<T>& origin,\n    const Point<T>& destination\n\
     ) {\n    using W = wide_type<T>;\n    W x = W(destination.x) - W(origin.x);\n\
     \    W y = W(destination.y) - W(origin.y);\n    return y > 0 || (y == 0 && x >=\
-    \ 0) ? 0 : 1;\n}\n\ntemplate <ExactCoordinate T>\nbool direction_less(\n    const\
-    \ std::vector<Point<T>>& points,\n    int origin,\n    int first,\n    int second\n\
-    ) {\n    int first_half = direction_half(points[origin], points[first]);\n   \
-    \ int second_half = direction_half(points[origin], points[second]);\n    if (first_half\
-    \ != second_half) return first_half < second_half;\n\n    using W = wide_type<T>;\n\
-    \    W first_x = W(points[first].x) - W(points[origin].x);\n    W first_y = W(points[first].y)\
-    \ - W(points[origin].y);\n    W second_x = W(points[second].x) - W(points[origin].x);\n\
-    \    W second_y = W(points[second].y) - W(points[origin].y);\n    W product =\
-    \ first_x * second_y - first_y * second_x;\n    if (product != 0) return product\
-    \ > 0;\n\n    W first_norm = first_x * first_x + first_y * first_y;\n    W second_norm\
-    \ = second_x * second_x + second_y * second_y;\n    if (first_norm != second_norm)\
-    \ return first_norm < second_norm;\n    return first < second;\n}\n\ninline void\
-    \ rotate_minimum_first(std::array<int, 3>& triangle) {\n    int minimum = int(std::min_element(triangle.begin(),\
-    \ triangle.end()) -\n                      triangle.begin());\n    std::rotate(\n\
-    \        triangle.begin(),\n        triangle.begin() + minimum,\n        triangle.end()\n\
-    \    );\n}\n\n}  // namespace delaunay_triangulation_detail\n\n// Constructs one\
-    \ Delaunay triangulation of distinct exact-coordinate points.\ntemplate <ExactCoordinate\
-    \ T>\nDelaunayTriangulation delaunay_triangulation(\n    const std::vector<Point<T>>&\
-    \ points\n) {\n    namespace detail = delaunay_triangulation_detail;\n\n    DelaunayTriangulation\
+    \ 0) ? 0 : 1;\n}\n\ntemplate <PointRecord P>\nrequires ExactCoordinate<typename\
+    \ P::coordinate_type>\nbool direction_less(\n    const std::vector<P>& points,\n\
+    \    int origin,\n    int first,\n    int second\n) {\n    using T = typename\
+    \ P::coordinate_type;\n    int first_half = direction_half(points[origin], points[first]);\n\
+    \    int second_half = direction_half(points[origin], points[second]);\n    if\
+    \ (first_half != second_half) return first_half < second_half;\n\n    using W\
+    \ = wide_type<T>;\n    W first_x = W(points[first].x) - W(points[origin].x);\n\
+    \    W first_y = W(points[first].y) - W(points[origin].y);\n    W second_x = W(points[second].x)\
+    \ - W(points[origin].x);\n    W second_y = W(points[second].y) - W(points[origin].y);\n\
+    \    W product = first_x * second_y - first_y * second_x;\n    if (product !=\
+    \ 0) return product > 0;\n\n    W first_norm = first_x * first_x + first_y * first_y;\n\
+    \    W second_norm = second_x * second_x + second_y * second_y;\n    if (first_norm\
+    \ != second_norm) return first_norm < second_norm;\n    return first < second;\n\
+    }\n\ninline void rotate_minimum_first(std::array<int, 3>& triangle) {\n    int\
+    \ minimum = int(std::min_element(triangle.begin(), triangle.end()) -\n       \
+    \               triangle.begin());\n    std::rotate(\n        triangle.begin(),\n\
+    \        triangle.begin() + minimum,\n        triangle.end()\n    );\n}\n\n} \
+    \ // namespace delaunay_triangulation_detail\n\n// Constructs one Delaunay triangulation\
+    \ of distinct exact-coordinate points.\ntemplate <PointRecord P>\nrequires ExactCoordinate<typename\
+    \ P::coordinate_type>\nDelaunayTriangulation delaunay_triangulation(\n    const\
+    \ std::vector<P>& points\n) {\n    using T = typename P::coordinate_type;\n  \
+    \  namespace detail = delaunay_triangulation_detail;\n\n    DelaunayTriangulation\
     \ result;\n    geometry::detail::EuclideanDelaunay<T> builder(points);\n    assert(!builder.has_duplicates());\n\
     \    result.edges = builder.get_edges();\n    for (auto& [first, second] : result.edges)\
     \ {\n        if (first > second) std::swap(first, second);\n    }\n    std::sort(result.edges.begin(),\
@@ -443,8 +474,10 @@ data:
     \            detail::rotate_minimum_first(triangle);\n            result.triangles.push_back(triangle);\n\
     \        }\n    }\n    std::sort(result.triangles.begin(), result.triangles.end());\n\
     \    result.triangles.erase(\n        std::unique(result.triangles.begin(), result.triangles.end()),\n\
-    \        result.triangles.end()\n    );\n    return result;\n}\n\n}  // namespace\
-    \ geometry\n}  // namespace m1une\n\n\n"
+    \        result.triangles.end()\n    );\n    return result;\n}\n\ntemplate <ExactCoordinate\
+    \ T>\nDelaunayTriangulation delaunay_triangulation(\n    const std::vector<Point<T>>&\
+    \ points\n) {\n    return delaunay_triangulation<Point<T>>(points);\n}\n\n}  //\
+    \ namespace geometry\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_GEOMETRY_DELAUNAY_TRIANGULATION_HPP\n#define M1UNE_GEOMETRY_DELAUNAY_TRIANGULATION_HPP\
     \ 1\n\n#include <algorithm>\n#include <array>\n#include <cassert>\n#include <concepts>\n\
     #include <utility>\n#include <vector>\n\n#include \"euclidean_mst.hpp\"\n\nnamespace\
@@ -454,28 +487,31 @@ data:
     \    const Point<T>& origin,\n    const Point<T>& destination\n) {\n    using\
     \ W = wide_type<T>;\n    W x = W(destination.x) - W(origin.x);\n    W y = W(destination.y)\
     \ - W(origin.y);\n    return y > 0 || (y == 0 && x >= 0) ? 0 : 1;\n}\n\ntemplate\
-    \ <ExactCoordinate T>\nbool direction_less(\n    const std::vector<Point<T>>&\
-    \ points,\n    int origin,\n    int first,\n    int second\n) {\n    int first_half\
-    \ = direction_half(points[origin], points[first]);\n    int second_half = direction_half(points[origin],\
-    \ points[second]);\n    if (first_half != second_half) return first_half < second_half;\n\
-    \n    using W = wide_type<T>;\n    W first_x = W(points[first].x) - W(points[origin].x);\n\
-    \    W first_y = W(points[first].y) - W(points[origin].y);\n    W second_x = W(points[second].x)\
-    \ - W(points[origin].x);\n    W second_y = W(points[second].y) - W(points[origin].y);\n\
-    \    W product = first_x * second_y - first_y * second_x;\n    if (product !=\
-    \ 0) return product > 0;\n\n    W first_norm = first_x * first_x + first_y * first_y;\n\
-    \    W second_norm = second_x * second_x + second_y * second_y;\n    if (first_norm\
-    \ != second_norm) return first_norm < second_norm;\n    return first < second;\n\
-    }\n\ninline void rotate_minimum_first(std::array<int, 3>& triangle) {\n    int\
-    \ minimum = int(std::min_element(triangle.begin(), triangle.end()) -\n       \
-    \               triangle.begin());\n    std::rotate(\n        triangle.begin(),\n\
-    \        triangle.begin() + minimum,\n        triangle.end()\n    );\n}\n\n} \
-    \ // namespace delaunay_triangulation_detail\n\n// Constructs one Delaunay triangulation\
-    \ of distinct exact-coordinate points.\ntemplate <ExactCoordinate T>\nDelaunayTriangulation\
-    \ delaunay_triangulation(\n    const std::vector<Point<T>>& points\n) {\n    namespace\
-    \ detail = delaunay_triangulation_detail;\n\n    DelaunayTriangulation result;\n\
-    \    geometry::detail::EuclideanDelaunay<T> builder(points);\n    assert(!builder.has_duplicates());\n\
-    \    result.edges = builder.get_edges();\n    for (auto& [first, second] : result.edges)\
-    \ {\n        if (first > second) std::swap(first, second);\n    }\n    std::sort(result.edges.begin(),\
+    \ <PointRecord P>\nrequires ExactCoordinate<typename P::coordinate_type>\nbool\
+    \ direction_less(\n    const std::vector<P>& points,\n    int origin,\n    int\
+    \ first,\n    int second\n) {\n    using T = typename P::coordinate_type;\n  \
+    \  int first_half = direction_half(points[origin], points[first]);\n    int second_half\
+    \ = direction_half(points[origin], points[second]);\n    if (first_half != second_half)\
+    \ return first_half < second_half;\n\n    using W = wide_type<T>;\n    W first_x\
+    \ = W(points[first].x) - W(points[origin].x);\n    W first_y = W(points[first].y)\
+    \ - W(points[origin].y);\n    W second_x = W(points[second].x) - W(points[origin].x);\n\
+    \    W second_y = W(points[second].y) - W(points[origin].y);\n    W product =\
+    \ first_x * second_y - first_y * second_x;\n    if (product != 0) return product\
+    \ > 0;\n\n    W first_norm = first_x * first_x + first_y * first_y;\n    W second_norm\
+    \ = second_x * second_x + second_y * second_y;\n    if (first_norm != second_norm)\
+    \ return first_norm < second_norm;\n    return first < second;\n}\n\ninline void\
+    \ rotate_minimum_first(std::array<int, 3>& triangle) {\n    int minimum = int(std::min_element(triangle.begin(),\
+    \ triangle.end()) -\n                      triangle.begin());\n    std::rotate(\n\
+    \        triangle.begin(),\n        triangle.begin() + minimum,\n        triangle.end()\n\
+    \    );\n}\n\n}  // namespace delaunay_triangulation_detail\n\n// Constructs one\
+    \ Delaunay triangulation of distinct exact-coordinate points.\ntemplate <PointRecord\
+    \ P>\nrequires ExactCoordinate<typename P::coordinate_type>\nDelaunayTriangulation\
+    \ delaunay_triangulation(\n    const std::vector<P>& points\n) {\n    using T\
+    \ = typename P::coordinate_type;\n    namespace detail = delaunay_triangulation_detail;\n\
+    \n    DelaunayTriangulation result;\n    geometry::detail::EuclideanDelaunay<T>\
+    \ builder(points);\n    assert(!builder.has_duplicates());\n    result.edges =\
+    \ builder.get_edges();\n    for (auto& [first, second] : result.edges) {\n   \
+    \     if (first > second) std::swap(first, second);\n    }\n    std::sort(result.edges.begin(),\
     \ result.edges.end());\n    result.edges.erase(\n        std::unique(result.edges.begin(),\
     \ result.edges.end()),\n        result.edges.end()\n    );\n\n    std::vector<std::vector<int>>\
     \ neighbors(points.size());\n    for (auto [first, second] : result.edges) {\n\
@@ -497,8 +533,10 @@ data:
     \            detail::rotate_minimum_first(triangle);\n            result.triangles.push_back(triangle);\n\
     \        }\n    }\n    std::sort(result.triangles.begin(), result.triangles.end());\n\
     \    result.triangles.erase(\n        std::unique(result.triangles.begin(), result.triangles.end()),\n\
-    \        result.triangles.end()\n    );\n    return result;\n}\n\n}  // namespace\
-    \ geometry\n}  // namespace m1une\n\n#endif  // M1UNE_GEOMETRY_DELAUNAY_TRIANGULATION_HPP\n"
+    \        result.triangles.end()\n    );\n    return result;\n}\n\ntemplate <ExactCoordinate\
+    \ T>\nDelaunayTriangulation delaunay_triangulation(\n    const std::vector<Point<T>>&\
+    \ points\n) {\n    return delaunay_triangulation<Point<T>>(points);\n}\n\n}  //\
+    \ namespace geometry\n}  // namespace m1une\n\n#endif  // M1UNE_GEOMETRY_DELAUNAY_TRIANGULATION_HPP\n"
   dependsOn:
   - geometry/euclidean_mst.hpp
   - ds/dsu/dsu.hpp
@@ -508,11 +546,12 @@ data:
   path: geometry/delaunay_triangulation.hpp
   requiredBy:
   - geometry/all.hpp
-  timestamp: '2026-10-05 22:23:07+09:00'
+  timestamp: '2026-10-24 23:29:06+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/rational.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
+  - verify/geometry/point_data.test.cpp
   - verify/geometry/centroid.test.cpp
   - verify/geometry/delaunay_triangulation.test.cpp
 documentation_of: geometry/delaunay_triangulation.hpp
@@ -603,3 +642,16 @@ int main() {
     }
 }
 ```
+
+## Point records
+
+```cpp
+template <PointRecord P>
+requires ExactCoordinate<typename P::coordinate_type>
+DelaunayTriangulation delaunay_triangulation(const std::vector<P>& points);
+```
+
+These overloads accept points carrying extra fields. See
+[points with metadata](https://m1une.github.io/m1une_library/geometry/point.hpp#points-with-metadata)
+for construction, payload behavior, and requirements. The complexity bounds above
+are unchanged, with additional record copy/move costs where applicable.

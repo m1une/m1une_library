@@ -350,7 +350,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/rational.test.cpp
   requiredBy: []
-  timestamp: '2026-10-06 02:48:54+09:00'
+  timestamp: '2026-10-24 23:29:06+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/rational.test.cpp

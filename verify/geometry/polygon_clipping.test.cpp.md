@@ -37,35 +37,36 @@ data:
     \n\n\n#line 13 \"geometry/circle.hpp\"\n\n#line 1 \"geometry/linear.hpp\"\n\n\n\
     \n#line 7 \"geometry/linear.hpp\"\n\n#line 1 \"geometry/point.hpp\"\n\n\n\n#line\
     \ 5 \"geometry/point.hpp\"\n#include <concepts>\n#line 8 \"geometry/point.hpp\"\
-    \n\n#line 1 \"geometry/detail/floating_predicate.hpp\"\n\n\n\nnamespace m1une\
-    \ {\nnamespace geometry {\nnamespace predicate_detail {\n\ntemplate <typename\
-    \ T>\nconstexpr T absolute(T value) {\n    return value < T(0) ? -value : value;\n\
-    }\n\ntemplate <typename T>\nconstexpr T max_value(T first, T second) {\n    return\
-    \ first < second ? second : first;\n}\n\ntemplate <typename T>\nconstexpr T vector_scale(T\
-    \ x, T y) {\n    return max_value(absolute(x), absolute(y));\n}\n\ntemplate <bool\
-    \ Exact, typename T>\nconstexpr int scaled_sign(T value, T scale, long double\
-    \ eps) {\n    if constexpr (Exact) {\n        return (value > T(0)) - (value <\
-    \ T(0));\n    } else {\n        const T tolerance = T(eps) * scale;\n        return\
-    \ (value > tolerance) - (value < -tolerance);\n    }\n}\n\ntemplate <bool Exact,\
-    \ typename T>\nconstexpr T determinant_scale(T ax, T ay, T bx, T by) {\n    if\
-    \ constexpr (Exact) {\n        return T(0);\n    } else {\n        return vector_scale(ax,\
-    \ ay) * vector_scale(bx, by);\n    }\n}\n\ntemplate <bool Exact, typename T>\n\
-    constexpr int determinant_sign(\n    T ax,\n    T ay,\n    T bx,\n    T by,\n\
-    \    long double eps\n) {\n    const T determinant = ax * by - ay * bx;\n    return\
-    \ scaled_sign<Exact>(\n        determinant,\n        determinant_scale<Exact>(ax,\
-    \ ay, bx, by),\n        eps\n    );\n}\n\ntemplate <bool Exact, typename T>\n\
-    constexpr int orientation_sign(\n    T direction_x,\n    T direction_y,\n    T\
-    \ offset_x,\n    T offset_y,\n    long double eps\n) {\n    const T determinant\
-    \ =\n        direction_x * offset_y - direction_y * offset_x;\n    T scale = T(0);\n\
-    \    if constexpr (!Exact) {\n        const T direction_scale =\n            vector_scale(direction_x,\
-    \ direction_y);\n        scale = direction_scale * max_value(\n            direction_scale,\n\
+    \n#include <utility>\n#line 10 \"geometry/point.hpp\"\n\n#line 1 \"geometry/detail/floating_predicate.hpp\"\
+    \n\n\n\nnamespace m1une {\nnamespace geometry {\nnamespace predicate_detail {\n\
+    \ntemplate <typename T>\nconstexpr T absolute(T value) {\n    return value < T(0)\
+    \ ? -value : value;\n}\n\ntemplate <typename T>\nconstexpr T max_value(T first,\
+    \ T second) {\n    return first < second ? second : first;\n}\n\ntemplate <typename\
+    \ T>\nconstexpr T vector_scale(T x, T y) {\n    return max_value(absolute(x),\
+    \ absolute(y));\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int scaled_sign(T\
+    \ value, T scale, long double eps) {\n    if constexpr (Exact) {\n        return\
+    \ (value > T(0)) - (value < T(0));\n    } else {\n        const T tolerance =\
+    \ T(eps) * scale;\n        return (value > tolerance) - (value < -tolerance);\n\
+    \    }\n}\n\ntemplate <bool Exact, typename T>\nconstexpr T determinant_scale(T\
+    \ ax, T ay, T bx, T by) {\n    if constexpr (Exact) {\n        return T(0);\n\
+    \    } else {\n        return vector_scale(ax, ay) * vector_scale(bx, by);\n \
+    \   }\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int determinant_sign(\n\
+    \    T ax,\n    T ay,\n    T bx,\n    T by,\n    long double eps\n) {\n    const\
+    \ T determinant = ax * by - ay * bx;\n    return scaled_sign<Exact>(\n       \
+    \ determinant,\n        determinant_scale<Exact>(ax, ay, bx, by),\n        eps\n\
+    \    );\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int orientation_sign(\n\
+    \    T direction_x,\n    T direction_y,\n    T offset_x,\n    T offset_y,\n  \
+    \  long double eps\n) {\n    const T determinant =\n        direction_x * offset_y\
+    \ - direction_y * offset_x;\n    T scale = T(0);\n    if constexpr (!Exact) {\n\
+    \        const T direction_scale =\n            vector_scale(direction_x, direction_y);\n\
+    \        scale = direction_scale * max_value(\n            direction_scale,\n\
     \            vector_scale(offset_x, offset_y)\n        );\n    }\n    return scaled_sign<Exact>(determinant,\
     \ scale, eps);\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int dot_sign(\n\
     \    T ax,\n    T ay,\n    T bx,\n    T by,\n    long double eps\n) {\n    const\
     \ T value = ax * bx + ay * by;\n    T scale = T(0);\n    if constexpr (!Exact)\
     \ {\n        scale = vector_scale(ax, ay) * vector_scale(bx, by);\n    }\n   \
     \ return scaled_sign<Exact>(value, scale, eps);\n}\n\n}  // namespace predicate_detail\n\
-    }  // namespace geometry\n}  // namespace m1une\n\n\n#line 10 \"geometry/point.hpp\"\
+    }  // namespace geometry\n}  // namespace m1une\n\n\n#line 12 \"geometry/point.hpp\"\
     \n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <typename T>\nconcept\
     \ Coordinate = !std::same_as<std::remove_cv_t<T>, bool> &&\n    (std::is_arithmetic_v<T>\
     \ ||\n     (std::copyable<T> && std::totally_ordered<T> && requires(T a, T b)\
@@ -78,24 +79,42 @@ data:
     \ <typename T>\nconcept ExactCoordinate = Coordinate<T> && !std::floating_point<T>;\n\
     \ntemplate <Coordinate T>\nusing wide_type = std::conditional_t<std::integral<T>,\
     \ __int128_t,\n    std::conditional_t<std::floating_point<T>, long double, T>>;\n\
-    \ntemplate <Coordinate T>\nstruct Point {\n    T x;\n    T y;\n\n    constexpr\
-    \ Point() : x(0), y(0) {}\n    constexpr Point(T x_value, T y_value) : x(x_value),\
-    \ y(y_value) {}\n\n    template <Coordinate U>\n    explicit constexpr Point(const\
-    \ Point<U>& other)\n        : x(static_cast<T>(other.x)), y(static_cast<T>(other.y))\
-    \ {}\n\n    constexpr Point& operator+=(const Point& other) {\n        x += other.x;\n\
-    \        y += other.y;\n        return *this;\n    }\n\n    constexpr Point& operator-=(const\
-    \ Point& other) {\n        x -= other.x;\n        y -= other.y;\n        return\
-    \ *this;\n    }\n\n    constexpr Point operator+() const {\n        return *this;\n\
-    \    }\n\n    constexpr Point operator-() const {\n        return Point(-x, -y);\n\
-    \    }\n\n    friend constexpr Point operator+(Point left, const Point& right)\
-    \ {\n        return left += right;\n    }\n\n    friend constexpr Point operator-(Point\
-    \ left, const Point& right) {\n        return left -= right;\n    }\n\n    friend\
-    \ constexpr bool operator==(const Point&, const Point&) = default;\n\n    friend\
-    \ constexpr bool operator<(const Point& left, const Point& right) {\n        if\
-    \ (left.x != right.x) return left.x < right.x;\n        return left.y < right.y;\n\
-    \    }\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const\
-    \ Point<T>& point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate\
-    \ T, typename Scalar>\nrequires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n\
+    \ntemplate <Coordinate T>\nstruct Point {\n    using coordinate_type = T;\n\n\
+    \    T x;\n    T y;\n\n    constexpr Point() : x(0), y(0) {}\n    constexpr Point(T\
+    \ x_value, T y_value) : x(x_value), y(y_value) {}\n\n    template <Coordinate\
+    \ U>\n    explicit constexpr Point(const Point<U>& other)\n        : x(static_cast<T>(other.x)),\
+    \ y(static_cast<T>(other.y)) {}\n\n    constexpr Point& operator+=(const Point&\
+    \ other) {\n        x += other.x;\n        y += other.y;\n        return *this;\n\
+    \    }\n\n    constexpr Point& operator-=(const Point& other) {\n        x -=\
+    \ other.x;\n        y -= other.y;\n        return *this;\n    }\n\n    constexpr\
+    \ Point operator+() const {\n        return *this;\n    }\n\n    constexpr Point\
+    \ operator-() const {\n        return Point(-x, -y);\n    }\n\n    friend constexpr\
+    \ Point operator+(Point left, const Point& right) {\n        return left += right;\n\
+    \    }\n\n    friend constexpr Point operator-(Point left, const Point& right)\
+    \ {\n        return left -= right;\n    }\n\n    friend constexpr bool operator==(const\
+    \ Point&, const Point&) = default;\n\n    friend constexpr bool operator<(const\
+    \ Point& left, const Point& right) {\n        if (left.x != right.x) return left.x\
+    \ < right.x;\n        return left.y < right.y;\n    }\n};\n\n// Attach arbitrary\
+    \ metadata without changing coordinate semantics.\n// Arithmetic and conversions\
+    \ inherited from Point return ordinary points.\ntemplate <Coordinate T, typename\
+    \ Data>\nstruct PointWithData : Point<T> {\n    Data data;\n\n    constexpr PointWithData()\
+    \ requires std::default_initializable<Data>\n        : Point<T>(), data() {}\n\
+    \n    constexpr PointWithData(T x, T y)\n        requires std::default_initializable<Data>\n\
+    \        : Point<T>(x, y), data() {}\n\n    constexpr PointWithData(T x, T y,\
+    \ Data value)\n        : Point<T>(x, y), data(std::move(value)) {}\n\n    constexpr\
+    \ PointWithData(Point<T> point, Data value)\n        : Point<T>(std::move(point)),\
+    \ data(std::move(value)) {}\n};\n\n// User-defined records may publicly derive\
+    \ from Point<T> as well.\ntemplate <typename P>\nconcept PointRecord = requires\
+    \ {\n    typename P::coordinate_type;\n    requires Coordinate<typename P::coordinate_type>;\n\
+    \    requires std::derived_from<P, Point<typename P::coordinate_type>>;\n};\n\n\
+    // Explicitly discard metadata for APIs that construct new geometric objects.\n\
+    template <PointRecord P>\nstd::vector<Point<typename P::coordinate_type>> to_points(\n\
+    \    const std::vector<P>& records\n) {\n    using T = typename P::coordinate_type;\n\
+    \    std::vector<Point<T>> result;\n    result.reserve(records.size());\n    for\
+    \ (const Point<T>& point : records) result.push_back(point);\n    return result;\n\
+    }\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const Point<T>&\
+    \ point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate T,\
+    \ typename Scalar>\nrequires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n\
     constexpr auto operator*(const Point<T>& point, Scalar scalar) {\n    using Result\
     \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
     \ * Result(scalar),\n        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate\
@@ -1312,51 +1331,60 @@ data:
     \ third,\n    long double eps\n) {\n    return\n        orientation(first, second,\
     \ point, eps) >= 0 &&\n        orientation(second, third, point, eps) >= 0 &&\n\
     \        orientation(third, first, point, eps) >= 0;\n}\n\n}  // namespace polygon_detail\n\
-    \ntemplate <Coordinate T>\nwide_type<T> polygon_area2(const std::vector<Point<T>>&\
-    \ polygon) {\n    wide_type<T> result = 0;\n    std::size_t n = polygon.size();\n\
-    \    for (std::size_t i = 0; i < n; i++) {\n        result += cross(polygon[i],\
-    \ polygon[(i + 1) % n]);\n    }\n    return result;\n}\n\ntemplate <Coordinate\
-    \ T>\nlong double polygon_area(const std::vector<Point<T>>& polygon) {\n    return\
-    \ std::fabs(static_cast<long double>(polygon_area2(polygon))) / 2;\n}\n\ntemplate\
-    \ <Coordinate T>\nstd::optional<Point<long double>> polygon_centroid(\n    const\
-    \ std::vector<Point<T>>& polygon,\n    long double eps = 1e-12L\n) {\n    if (polygon.size()\
-    \ < 3) return std::nullopt;\n\n    wide_type<T> signed_area2 = polygon_area2(polygon);\n\
-    \    if (sign<T>(signed_area2, eps) == 0) return std::nullopt;\n\n    long double\
-    \ x_numerator = 0;\n    long double y_numerator = 0;\n    std::size_t size = polygon.size();\n\
-    \    for (std::size_t index = 0; index < size; ++index) {\n        const Point<T>&\
-    \ current = polygon[index];\n        const Point<T>& next = polygon[(index + 1)\
-    \ % size];\n        long double weight = static_cast<long double>(cross(current,\
-    \ next));\n        x_numerator +=\n            (static_cast<long double>(current.x)\
-    \ +\n             static_cast<long double>(next.x)) *\n            weight;\n \
-    \       y_numerator +=\n            (static_cast<long double>(current.y) +\n \
-    \            static_cast<long double>(next.y)) *\n            weight;\n    }\n\
-    \    long double denominator =\n        3.0L * static_cast<long double>(signed_area2);\n\
+    \ntemplate <PointRecord P>\nwide_type<typename P::coordinate_type> polygon_area2(const\
+    \ std::vector<P>& polygon) {\n    using T = typename P::coordinate_type;\n   \
+    \ wide_type<T> result = 0;\n    std::size_t n = polygon.size();\n    for (std::size_t\
+    \ i = 0; i < n; i++) {\n        result += cross(polygon[i], polygon[(i + 1) %\
+    \ n]);\n    }\n    return result;\n}\n\ntemplate <Coordinate T>\nwide_type<T>\
+    \ polygon_area2(const std::vector<Point<T>>& polygon) {\n    return polygon_area2<Point<T>>(polygon);\n\
+    }\n\ntemplate <PointRecord P>\nlong double polygon_area(const std::vector<P>&\
+    \ polygon) {\n    return std::fabs(static_cast<long double>(polygon_area2(polygon)))\
+    \ / 2;\n}\n\ntemplate <Coordinate T>\nlong double polygon_area(const std::vector<Point<T>>&\
+    \ polygon) {\n    return polygon_area<Point<T>>(polygon);\n}\n\ntemplate <PointRecord\
+    \ P>\nstd::optional<Point<long double>> polygon_centroid(\n    const std::vector<P>&\
+    \ polygon,\n    long double eps = 1e-12L\n) {\n    using T = typename P::coordinate_type;\n\
+    \    if (polygon.size() < 3) return std::nullopt;\n\n    wide_type<T> signed_area2\
+    \ = polygon_area2(polygon);\n    if (sign<T>(signed_area2, eps) == 0) return std::nullopt;\n\
+    \n    long double x_numerator = 0;\n    long double y_numerator = 0;\n    std::size_t\
+    \ size = polygon.size();\n    for (std::size_t index = 0; index < size; ++index)\
+    \ {\n        const Point<T>& current = polygon[index];\n        const Point<T>&\
+    \ next = polygon[(index + 1) % size];\n        long double weight = static_cast<long\
+    \ double>(cross(current, next));\n        x_numerator +=\n            (static_cast<long\
+    \ double>(current.x) +\n             static_cast<long double>(next.x)) *\n   \
+    \         weight;\n        y_numerator +=\n            (static_cast<long double>(current.y)\
+    \ +\n             static_cast<long double>(next.y)) *\n            weight;\n \
+    \   }\n    long double denominator =\n        3.0L * static_cast<long double>(signed_area2);\n\
     \    return Point<long double>(\n        x_numerator / denominator,\n        y_numerator\
     \ / denominator\n    );\n}\n\ntemplate <Coordinate T>\nstd::optional<Point<long\
-    \ double>> centroid(\n    const std::vector<Point<T>>& polygon,\n    long double\
-    \ eps = 1e-12L\n) {\n    return polygon_centroid(polygon, eps);\n}\n\ntemplate\
-    \ <Coordinate T>\nstd::optional<Point<long double>> polygon_center_of_gravity(\n\
-    \    const std::vector<Point<T>>& polygon,\n    long double eps = 1e-12L\n) {\n\
-    \    return polygon_centroid(polygon, eps);\n}\n\ntemplate <Coordinate T>\nbool\
-    \ is_simple_polygon(\n    const std::vector<Point<T>>& polygon,\n    long double\
-    \ eps = 1e-12L\n) {\n    if (polygon.size() < 3) return false;\n    std::size_t\
-    \ size = polygon.size();\n    for (std::size_t index = 0; index < size; ++index)\
-    \ {\n        const Point<T>& previous = polygon[(index + size - 1) % size];\n\
-    \        const Point<T>& current = polygon[index];\n        const Point<T>& next\
-    \ = polygon[(index + 1) % size];\n        if (current == next) return false;\n\
-    \        if (\n            orientation(previous, current, next, eps) == 0 &&\n\
-    \            sign<T>(dot(current - previous, next - current), eps) < 0\n     \
-    \   ) {\n            return false;\n        }\n    }\n    for (std::size_t first_index\
-    \ = 0; first_index < size; ++first_index) {\n        Segment<T> first{\n     \
-    \       polygon[first_index],\n            polygon[(first_index + 1) % size]\n\
-    \        };\n        for (\n            std::size_t second_index = first_index\
-    \ + 1;\n            second_index < size;\n            ++second_index\n       \
-    \ ) {\n            bool adjacent =\n                second_index == first_index\
-    \ + 1 ||\n                (first_index == 0 && second_index + 1 == size);\n  \
-    \          if (adjacent) continue;\n\n            Segment<T> second{\n       \
-    \         polygon[second_index],\n                polygon[(second_index + 1) %\
-    \ size]\n            };\n            if (intersects(first, second, eps)) return\
-    \ false;\n        }\n    }\n    return true;\n}\n\ntemplate <Coordinate T>\nstd::optional<std::vector<std::array<Point<T>,\
+    \ double>> polygon_centroid(\n    const std::vector<Point<T>>& polygon,\n    long\
+    \ double eps = 1e-12L\n) {\n    return polygon_centroid<Point<T>>(polygon, eps);\n\
+    }\n\ntemplate <Coordinate T>\nstd::optional<Point<long double>> centroid(\n  \
+    \  const std::vector<Point<T>>& polygon,\n    long double eps = 1e-12L\n) {\n\
+    \    return polygon_centroid(polygon, eps);\n}\n\ntemplate <Coordinate T>\nstd::optional<Point<long\
+    \ double>> polygon_center_of_gravity(\n    const std::vector<Point<T>>& polygon,\n\
+    \    long double eps = 1e-12L\n) {\n    return polygon_centroid(polygon, eps);\n\
+    }\n\ntemplate <PointRecord P>\nbool is_simple_polygon(\n    const std::vector<P>&\
+    \ polygon,\n    long double eps = 1e-12L\n) {\n    using T = typename P::coordinate_type;\n\
+    \    if (polygon.size() < 3) return false;\n    std::size_t size = polygon.size();\n\
+    \    for (std::size_t index = 0; index < size; ++index) {\n        const Point<T>&\
+    \ previous = polygon[(index + size - 1) % size];\n        const Point<T>& current\
+    \ = polygon[index];\n        const Point<T>& next = polygon[(index + 1) % size];\n\
+    \        if (current == next) return false;\n        if (\n            orientation(previous,\
+    \ current, next, eps) == 0 &&\n            sign<T>(dot(current - previous, next\
+    \ - current), eps) < 0\n        ) {\n            return false;\n        }\n  \
+    \  }\n    for (std::size_t first_index = 0; first_index < size; ++first_index)\
+    \ {\n        Segment<T> first{\n            polygon[first_index],\n          \
+    \  polygon[(first_index + 1) % size]\n        };\n        for (\n            std::size_t\
+    \ second_index = first_index + 1;\n            second_index < size;\n        \
+    \    ++second_index\n        ) {\n            bool adjacent =\n              \
+    \  second_index == first_index + 1 ||\n                (first_index == 0 && second_index\
+    \ + 1 == size);\n            if (adjacent) continue;\n\n            Segment<T>\
+    \ second{\n                polygon[second_index],\n                polygon[(second_index\
+    \ + 1) % size]\n            };\n            if (intersects(first, second, eps))\
+    \ return false;\n        }\n    }\n    return true;\n}\n\ntemplate <Coordinate\
+    \ T>\nbool is_simple_polygon(\n    const std::vector<Point<T>>& polygon,\n   \
+    \ long double eps = 1e-12L\n) {\n    return is_simple_polygon<Point<T>>(polygon,\
+    \ eps);\n}\n\ntemplate <Coordinate T>\nstd::optional<std::vector<std::array<Point<T>,\
     \ 3>>> triangulate_polygon(\n    std::vector<Point<T>> polygon,\n    long double\
     \ eps = 1e-12L\n) {\n    polygon =\n        polygon_detail::clean_polygon_vertices(std::move(polygon),\
     \ eps);\n    if (polygon.size() < 3) return std::nullopt;\n\n    wide_type<T>\
@@ -1394,24 +1422,27 @@ data:
     \    triangle[1] = polygon[remaining[1]];\n    triangle[2] = polygon[remaining[2]];\n\
     \    if (orientation(triangle[0], triangle[1], triangle[2], eps) <= 0) {\n   \
     \     return std::nullopt;\n    }\n    result.push_back(std::move(triangle));\n\
-    \    return result;\n}\n\ntemplate <Coordinate T>\nPointInPolygon point_in_polygon(\n\
-    \    const std::vector<Point<T>>& polygon,\n    const Point<T>& point,\n    long\
-    \ double eps = 1e-12L\n) {\n    bool inside = false;\n    std::size_t n = polygon.size();\n\
-    \    for (std::size_t i = 0; i < n; i++) {\n        const Point<T>& a = polygon[i];\n\
-    \        const Point<T>& b = polygon[(i + 1) % n];\n        if (on_segment(Segment<T>{a,\
-    \ b}, point, eps)) {\n            return PointInPolygon::Boundary;\n        }\n\
-    \n        if (a.y <= point.y) {\n            if (point.y < b.y && orientation(a,\
+    \    return result;\n}\n\ntemplate <PointRecord P>\nPointInPolygon point_in_polygon(\n\
+    \    const std::vector<P>& polygon,\n    const Point<typename P::coordinate_type>&\
+    \ point,\n    long double eps = 1e-12L\n) {\n    using T = typename P::coordinate_type;\n\
+    \    bool inside = false;\n    std::size_t n = polygon.size();\n    for (std::size_t\
+    \ i = 0; i < n; i++) {\n        const Point<T>& a = polygon[i];\n        const\
+    \ Point<T>& b = polygon[(i + 1) % n];\n        if (on_segment(Segment<T>{a, b},\
+    \ point, eps)) {\n            return PointInPolygon::Boundary;\n        }\n\n\
+    \        if (a.y <= point.y) {\n            if (point.y < b.y && orientation(a,\
     \ b, point, eps) > 0) {\n                inside = !inside;\n            }\n  \
     \      } else if (b.y <= point.y && orientation(a, b, point, eps) < 0) {\n   \
     \         inside = !inside;\n        }\n    }\n    return inside ? PointInPolygon::Inside\
-    \ : PointInPolygon::Outside;\n}\n\ntemplate <Coordinate T, Coordinate P>\nPointInPolygon\
-    \ point_in_polygon(\n    const Polygon<T>& polygon,\n    const Point<P>& point,\n\
-    \    long double eps = 1e-12L\n) {\n    assert(polygon.vertices.size() >= 3);\n\
-    \    if constexpr (std::is_same_v<T, P>) {\n        return point_in_polygon(polygon.vertices,\
-    \ point, eps);\n    } else {\n        std::vector<Point<long double>> vertices;\n\
-    \        vertices.reserve(polygon.vertices.size());\n        for (const Point<T>&\
-    \ vertex : polygon.vertices) {\n            vertices.emplace_back(vertex);\n \
-    \       }\n        return point_in_polygon(vertices, Point<long double>(point),\
+    \ : PointInPolygon::Outside;\n}\n\ntemplate <Coordinate T>\nPointInPolygon point_in_polygon(\n\
+    \    const std::vector<Point<T>>& polygon,\n    const Point<T>& point,\n    long\
+    \ double eps = 1e-12L\n) {\n    return point_in_polygon<Point<T>>(polygon, point,\
+    \ eps);\n}\n\ntemplate <Coordinate T, Coordinate P>\nPointInPolygon point_in_polygon(\n\
+    \    const Polygon<T>& polygon,\n    const Point<P>& point,\n    long double eps\
+    \ = 1e-12L\n) {\n    assert(polygon.vertices.size() >= 3);\n    if constexpr (std::is_same_v<T,\
+    \ P>) {\n        return point_in_polygon(polygon.vertices, point, eps);\n    }\
+    \ else {\n        std::vector<Point<long double>> vertices;\n        vertices.reserve(polygon.vertices.size());\n\
+    \        for (const Point<T>& vertex : polygon.vertices) {\n            vertices.emplace_back(vertex);\n\
+    \        }\n        return point_in_polygon(vertices, Point<long double>(point),\
     \ eps);\n    }\n}\n\ntemplate <Coordinate T, Coordinate P>\nbool contains(\n \
     \   const Polygon<T>& polygon,\n    const Point<P>& point,\n    long double eps\
     \ = 1e-12L\n) {\n    const PointInPolygon relation = point_in_polygon(polygon,\
@@ -1780,20 +1811,27 @@ data:
     \    const ClosestPoints result = closest_points(polygon, ray);\n    return geometry::distance(result.first,\
     \ result.second);\n}\n\ntemplate <Coordinate R, Coordinate T>\nlong double distance(\n\
     \    const Ray<R>& ray,\n    const Polygon<T>& polygon\n) {\n    return distance(polygon,\
-    \ ray);\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 4 \"\
-    verify/geometry/polygon_clipping.test.cpp\"\n\n#line 8 \"verify/geometry/polygon_clipping.test.cpp\"\
-    \n#include <cstdint>\n#line 12 \"verify/geometry/polygon_clipping.test.cpp\"\n\
-    \n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n#line 6 \"utilities/fast_io.hpp\"\n\
-    #include <cerrno>\n#include <charconv>\n#line 9 \"utilities/fast_io.hpp\"\n#include\
-    \ <cstdio>\n#include <cstdlib>\n#line 12 \"utilities/fast_io.hpp\"\n#include <cstring>\n\
-    #include <iterator>\n#include <string>\n#include <sys/stat.h>\n#line 17 \"utilities/fast_io.hpp\"\
-    \n#include <utility>\n#include <unistd.h>\n#line 20 \"utilities/fast_io.hpp\"\n\
-    \nnamespace m1une {\nnamespace utilities {\n\nstruct FastOutput;\n\nnamespace\
-    \ internal {\n\n// Shared with the convenience helpers in template.hpp.\ninline\
-    \ FastOutput* standard_output_instance = nullptr;\n\n// Detect std::begin(x),\
-    \ std::end(x).\ntemplate <class T, class = void>\nstruct is_range : std::false_type\
-    \ {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
-    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
+    \ ray);\n}\n\ntemplate <PointRecord P>\nrequires (!std::same_as<P, Point<typename\
+    \ P::coordinate_type>>)\nstd::optional<Point<long double>> centroid(\n    const\
+    \ std::vector<P>& polygon,\n    long double eps = 1e-12L\n) {\n    return polygon_centroid(polygon,\
+    \ eps);\n}\n\ntemplate <PointRecord P>\nrequires (!std::same_as<P, Point<typename\
+    \ P::coordinate_type>>)\nstd::optional<Point<long double>> polygon_center_of_gravity(\n\
+    \    const std::vector<P>& polygon,\n    long double eps = 1e-12L\n) {\n    return\
+    \ polygon_centroid(polygon, eps);\n}\n\n}  // namespace geometry\n}  // namespace\
+    \ m1une\n\n\n#line 4 \"verify/geometry/polygon_clipping.test.cpp\"\n\n#line 8\
+    \ \"verify/geometry/polygon_clipping.test.cpp\"\n#include <cstdint>\n#line 12\
+    \ \"verify/geometry/polygon_clipping.test.cpp\"\n\n#line 1 \"utilities/fast_io.hpp\"\
+    \n\n\n\n#line 6 \"utilities/fast_io.hpp\"\n#include <cerrno>\n#include <charconv>\n\
+    #line 9 \"utilities/fast_io.hpp\"\n#include <cstdio>\n#include <cstdlib>\n#line\
+    \ 12 \"utilities/fast_io.hpp\"\n#include <cstring>\n#include <iterator>\n#include\
+    \ <string>\n#include <sys/stat.h>\n#line 18 \"utilities/fast_io.hpp\"\n#include\
+    \ <unistd.h>\n#line 20 \"utilities/fast_io.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ utilities {\n\nstruct FastOutput;\n\nnamespace internal {\n\n// Shared with\
+    \ the convenience helpers in template.hpp.\ninline FastOutput* standard_output_instance\
+    \ = nullptr;\n\n// Detect std::begin(x), std::end(x).\ntemplate <class T, class\
+    \ = void>\nstruct is_range : std::false_type {};\n\ntemplate <class T>\nstruct\
+    \ is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n  \
+    \  decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
     \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
     \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
@@ -2421,7 +2459,7 @@ data:
   isVerificationFile: true
   path: verify/geometry/polygon_clipping.test.cpp
   requiredBy: []
-  timestamp: '2026-10-06 02:48:54+09:00'
+  timestamp: '2026-10-24 23:29:06+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/geometry/polygon_clipping.test.cpp

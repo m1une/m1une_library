@@ -40,6 +40,9 @@ data:
     path: verify/geometry/minkowski_sum.test.cpp
     title: verify/geometry/minkowski_sum.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/point_data.test.cpp
+    title: verify/geometry/point_data.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/polygon_operations.test.cpp
     title: verify/geometry/polygon_operations.test.cpp
   - icon: ':heavy_check_mark:'
@@ -56,36 +59,36 @@ data:
   bundledCode: "#line 1 \"geometry/detail/convex_polygon_normalize.hpp\"\n\n\n\n#include\
     \ <algorithm>\n#include <cstddef>\n#include <utility>\n#include <vector>\n\n#line\
     \ 1 \"geometry/point.hpp\"\n\n\n\n#include <cmath>\n#include <concepts>\n#include\
-    \ <cassert>\n#include <type_traits>\n\n#line 1 \"geometry/detail/floating_predicate.hpp\"\
-    \n\n\n\nnamespace m1une {\nnamespace geometry {\nnamespace predicate_detail {\n\
-    \ntemplate <typename T>\nconstexpr T absolute(T value) {\n    return value < T(0)\
-    \ ? -value : value;\n}\n\ntemplate <typename T>\nconstexpr T max_value(T first,\
-    \ T second) {\n    return first < second ? second : first;\n}\n\ntemplate <typename\
-    \ T>\nconstexpr T vector_scale(T x, T y) {\n    return max_value(absolute(x),\
-    \ absolute(y));\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int scaled_sign(T\
-    \ value, T scale, long double eps) {\n    if constexpr (Exact) {\n        return\
-    \ (value > T(0)) - (value < T(0));\n    } else {\n        const T tolerance =\
-    \ T(eps) * scale;\n        return (value > tolerance) - (value < -tolerance);\n\
-    \    }\n}\n\ntemplate <bool Exact, typename T>\nconstexpr T determinant_scale(T\
-    \ ax, T ay, T bx, T by) {\n    if constexpr (Exact) {\n        return T(0);\n\
-    \    } else {\n        return vector_scale(ax, ay) * vector_scale(bx, by);\n \
-    \   }\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int determinant_sign(\n\
-    \    T ax,\n    T ay,\n    T bx,\n    T by,\n    long double eps\n) {\n    const\
-    \ T determinant = ax * by - ay * bx;\n    return scaled_sign<Exact>(\n       \
-    \ determinant,\n        determinant_scale<Exact>(ax, ay, bx, by),\n        eps\n\
-    \    );\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int orientation_sign(\n\
-    \    T direction_x,\n    T direction_y,\n    T offset_x,\n    T offset_y,\n  \
-    \  long double eps\n) {\n    const T determinant =\n        direction_x * offset_y\
-    \ - direction_y * offset_x;\n    T scale = T(0);\n    if constexpr (!Exact) {\n\
-    \        const T direction_scale =\n            vector_scale(direction_x, direction_y);\n\
-    \        scale = direction_scale * max_value(\n            direction_scale,\n\
+    \ <cassert>\n#include <type_traits>\n#line 10 \"geometry/point.hpp\"\n\n#line\
+    \ 1 \"geometry/detail/floating_predicate.hpp\"\n\n\n\nnamespace m1une {\nnamespace\
+    \ geometry {\nnamespace predicate_detail {\n\ntemplate <typename T>\nconstexpr\
+    \ T absolute(T value) {\n    return value < T(0) ? -value : value;\n}\n\ntemplate\
+    \ <typename T>\nconstexpr T max_value(T first, T second) {\n    return first <\
+    \ second ? second : first;\n}\n\ntemplate <typename T>\nconstexpr T vector_scale(T\
+    \ x, T y) {\n    return max_value(absolute(x), absolute(y));\n}\n\ntemplate <bool\
+    \ Exact, typename T>\nconstexpr int scaled_sign(T value, T scale, long double\
+    \ eps) {\n    if constexpr (Exact) {\n        return (value > T(0)) - (value <\
+    \ T(0));\n    } else {\n        const T tolerance = T(eps) * scale;\n        return\
+    \ (value > tolerance) - (value < -tolerance);\n    }\n}\n\ntemplate <bool Exact,\
+    \ typename T>\nconstexpr T determinant_scale(T ax, T ay, T bx, T by) {\n    if\
+    \ constexpr (Exact) {\n        return T(0);\n    } else {\n        return vector_scale(ax,\
+    \ ay) * vector_scale(bx, by);\n    }\n}\n\ntemplate <bool Exact, typename T>\n\
+    constexpr int determinant_sign(\n    T ax,\n    T ay,\n    T bx,\n    T by,\n\
+    \    long double eps\n) {\n    const T determinant = ax * by - ay * bx;\n    return\
+    \ scaled_sign<Exact>(\n        determinant,\n        determinant_scale<Exact>(ax,\
+    \ ay, bx, by),\n        eps\n    );\n}\n\ntemplate <bool Exact, typename T>\n\
+    constexpr int orientation_sign(\n    T direction_x,\n    T direction_y,\n    T\
+    \ offset_x,\n    T offset_y,\n    long double eps\n) {\n    const T determinant\
+    \ =\n        direction_x * offset_y - direction_y * offset_x;\n    T scale = T(0);\n\
+    \    if constexpr (!Exact) {\n        const T direction_scale =\n            vector_scale(direction_x,\
+    \ direction_y);\n        scale = direction_scale * max_value(\n            direction_scale,\n\
     \            vector_scale(offset_x, offset_y)\n        );\n    }\n    return scaled_sign<Exact>(determinant,\
     \ scale, eps);\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int dot_sign(\n\
     \    T ax,\n    T ay,\n    T bx,\n    T by,\n    long double eps\n) {\n    const\
     \ T value = ax * bx + ay * by;\n    T scale = T(0);\n    if constexpr (!Exact)\
     \ {\n        scale = vector_scale(ax, ay) * vector_scale(bx, by);\n    }\n   \
     \ return scaled_sign<Exact>(value, scale, eps);\n}\n\n}  // namespace predicate_detail\n\
-    }  // namespace geometry\n}  // namespace m1une\n\n\n#line 10 \"geometry/point.hpp\"\
+    }  // namespace geometry\n}  // namespace m1une\n\n\n#line 12 \"geometry/point.hpp\"\
     \n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <typename T>\nconcept\
     \ Coordinate = !std::same_as<std::remove_cv_t<T>, bool> &&\n    (std::is_arithmetic_v<T>\
     \ ||\n     (std::copyable<T> && std::totally_ordered<T> && requires(T a, T b)\
@@ -98,24 +101,42 @@ data:
     \ <typename T>\nconcept ExactCoordinate = Coordinate<T> && !std::floating_point<T>;\n\
     \ntemplate <Coordinate T>\nusing wide_type = std::conditional_t<std::integral<T>,\
     \ __int128_t,\n    std::conditional_t<std::floating_point<T>, long double, T>>;\n\
-    \ntemplate <Coordinate T>\nstruct Point {\n    T x;\n    T y;\n\n    constexpr\
-    \ Point() : x(0), y(0) {}\n    constexpr Point(T x_value, T y_value) : x(x_value),\
-    \ y(y_value) {}\n\n    template <Coordinate U>\n    explicit constexpr Point(const\
-    \ Point<U>& other)\n        : x(static_cast<T>(other.x)), y(static_cast<T>(other.y))\
-    \ {}\n\n    constexpr Point& operator+=(const Point& other) {\n        x += other.x;\n\
-    \        y += other.y;\n        return *this;\n    }\n\n    constexpr Point& operator-=(const\
-    \ Point& other) {\n        x -= other.x;\n        y -= other.y;\n        return\
-    \ *this;\n    }\n\n    constexpr Point operator+() const {\n        return *this;\n\
-    \    }\n\n    constexpr Point operator-() const {\n        return Point(-x, -y);\n\
-    \    }\n\n    friend constexpr Point operator+(Point left, const Point& right)\
-    \ {\n        return left += right;\n    }\n\n    friend constexpr Point operator-(Point\
-    \ left, const Point& right) {\n        return left -= right;\n    }\n\n    friend\
-    \ constexpr bool operator==(const Point&, const Point&) = default;\n\n    friend\
-    \ constexpr bool operator<(const Point& left, const Point& right) {\n        if\
-    \ (left.x != right.x) return left.x < right.x;\n        return left.y < right.y;\n\
-    \    }\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const\
-    \ Point<T>& point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate\
-    \ T, typename Scalar>\nrequires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n\
+    \ntemplate <Coordinate T>\nstruct Point {\n    using coordinate_type = T;\n\n\
+    \    T x;\n    T y;\n\n    constexpr Point() : x(0), y(0) {}\n    constexpr Point(T\
+    \ x_value, T y_value) : x(x_value), y(y_value) {}\n\n    template <Coordinate\
+    \ U>\n    explicit constexpr Point(const Point<U>& other)\n        : x(static_cast<T>(other.x)),\
+    \ y(static_cast<T>(other.y)) {}\n\n    constexpr Point& operator+=(const Point&\
+    \ other) {\n        x += other.x;\n        y += other.y;\n        return *this;\n\
+    \    }\n\n    constexpr Point& operator-=(const Point& other) {\n        x -=\
+    \ other.x;\n        y -= other.y;\n        return *this;\n    }\n\n    constexpr\
+    \ Point operator+() const {\n        return *this;\n    }\n\n    constexpr Point\
+    \ operator-() const {\n        return Point(-x, -y);\n    }\n\n    friend constexpr\
+    \ Point operator+(Point left, const Point& right) {\n        return left += right;\n\
+    \    }\n\n    friend constexpr Point operator-(Point left, const Point& right)\
+    \ {\n        return left -= right;\n    }\n\n    friend constexpr bool operator==(const\
+    \ Point&, const Point&) = default;\n\n    friend constexpr bool operator<(const\
+    \ Point& left, const Point& right) {\n        if (left.x != right.x) return left.x\
+    \ < right.x;\n        return left.y < right.y;\n    }\n};\n\n// Attach arbitrary\
+    \ metadata without changing coordinate semantics.\n// Arithmetic and conversions\
+    \ inherited from Point return ordinary points.\ntemplate <Coordinate T, typename\
+    \ Data>\nstruct PointWithData : Point<T> {\n    Data data;\n\n    constexpr PointWithData()\
+    \ requires std::default_initializable<Data>\n        : Point<T>(), data() {}\n\
+    \n    constexpr PointWithData(T x, T y)\n        requires std::default_initializable<Data>\n\
+    \        : Point<T>(x, y), data() {}\n\n    constexpr PointWithData(T x, T y,\
+    \ Data value)\n        : Point<T>(x, y), data(std::move(value)) {}\n\n    constexpr\
+    \ PointWithData(Point<T> point, Data value)\n        : Point<T>(std::move(point)),\
+    \ data(std::move(value)) {}\n};\n\n// User-defined records may publicly derive\
+    \ from Point<T> as well.\ntemplate <typename P>\nconcept PointRecord = requires\
+    \ {\n    typename P::coordinate_type;\n    requires Coordinate<typename P::coordinate_type>;\n\
+    \    requires std::derived_from<P, Point<typename P::coordinate_type>>;\n};\n\n\
+    // Explicitly discard metadata for APIs that construct new geometric objects.\n\
+    template <PointRecord P>\nstd::vector<Point<typename P::coordinate_type>> to_points(\n\
+    \    const std::vector<P>& records\n) {\n    using T = typename P::coordinate_type;\n\
+    \    std::vector<Point<T>> result;\n    result.reserve(records.size());\n    for\
+    \ (const Point<T>& point : records) result.push_back(point);\n    return result;\n\
+    }\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const Point<T>&\
+    \ point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate T,\
+    \ typename Scalar>\nrequires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n\
     constexpr auto operator*(const Point<T>& point, Scalar scalar) {\n    using Result\
     \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
     \ * Result(scalar),\n        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate\
@@ -183,63 +204,71 @@ data:
     \ double>(point.x) / length,\n        static_cast<long double>(point.y) / length\n\
     \    );\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n#line 10 \"\
     geometry/detail/convex_polygon_normalize.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ geometry {\nnamespace convex_polygon_detail {\n\ntemplate <Coordinate T>\nwide_type<T>\
-    \ boundary_area2(const std::vector<Point<T>>& polygon) {\n    wide_type<T> result\
-    \ = 0;\n    for (std::size_t index = 0; index < polygon.size(); ++index) {\n \
-    \       result += cross(\n            polygon[index],\n            polygon[(index\
-    \ + 1) % polygon.size()]\n        );\n    }\n    return result;\n}\n\ntemplate\
-    \ <Coordinate T>\nstd::vector<Point<T>> normalize_convex_boundary(\n    std::vector<Point<T>>\
-    \ polygon,\n    long double eps\n) {\n    if (polygon.size() >= 2 && polygon.front()\
-    \ == polygon.back()) {\n        polygon.pop_back();\n    }\n    polygon.erase(\n\
-    \        std::unique(polygon.begin(), polygon.end()),\n        polygon.end()\n\
-    \    );\n    if (polygon.size() >= 2 && polygon.front() == polygon.back()) {\n\
-    \        polygon.pop_back();\n    }\n    if (polygon.size() <= 1) return polygon;\n\
-    \    if (\n        polygon.size() >= 3 &&\n        sign<T>(boundary_area2(polygon),\
-    \ eps) < 0\n    ) {\n        std::reverse(polygon.begin(), polygon.end());\n \
-    \   }\n\n    const auto start = std::min_element(\n        polygon.begin(),\n\
-    \        polygon.end(),\n        [](const Point<T>& first, const Point<T>& second)\
-    \ {\n            if (first.y != second.y) return first.y < second.y;\n       \
-    \     return first.x < second.x;\n        }\n    );\n    std::rotate(polygon.begin(),\
-    \ start, polygon.end());\n\n    if (polygon.size() >= 3) {\n        std::vector<Point<T>>\
-    \ cleaned;\n        const std::size_t size = polygon.size();\n        cleaned.reserve(size);\n\
-    \        for (std::size_t index = 0; index < size; ++index) {\n            const\
-    \ Point<T>& previous = polygon[(index + size - 1) % size];\n            const\
-    \ Point<T>& current = polygon[index];\n            const Point<T>& next = polygon[(index\
+    \ geometry {\nnamespace convex_polygon_detail {\n\ntemplate <PointRecord P>\n\
+    wide_type<typename P::coordinate_type> boundary_area2(const std::vector<P>& polygon)\
+    \ {\n    using T = typename P::coordinate_type;\n    wide_type<T> result = 0;\n\
+    \    for (std::size_t index = 0; index < polygon.size(); ++index) {\n        result\
+    \ += cross(\n            polygon[index],\n            polygon[(index + 1) % polygon.size()]\n\
+    \        );\n    }\n    return result;\n}\n\ntemplate <PointRecord P>\nstd::vector<P>\
+    \ normalize_convex_boundary(\n    std::vector<P> polygon,\n    long double eps\n\
+    ) {\n    using T = typename P::coordinate_type;\n    if (polygon.size() >= 2 &&\
+    \ static_cast<const Point<T>&>(polygon.front()) ==\n            static_cast<const\
+    \ Point<T>&>(polygon.back())) {\n        polygon.pop_back();\n    }\n    polygon.erase(\n\
+    \        std::unique(polygon.begin(), polygon.end(),\n            [](const Point<T>&\
+    \ a, const Point<T>& b) { return a == b; }),\n        polygon.end()\n    );\n\
+    \    if (polygon.size() >= 2 && static_cast<const Point<T>&>(polygon.front())\
+    \ ==\n            static_cast<const Point<T>&>(polygon.back())) {\n        polygon.pop_back();\n\
+    \    }\n    if (polygon.size() <= 1) return polygon;\n    if (\n        polygon.size()\
+    \ >= 3 &&\n        sign<T>(boundary_area2(polygon), eps) < 0\n    ) {\n      \
+    \  std::reverse(polygon.begin(), polygon.end());\n    }\n\n    const auto start\
+    \ = std::min_element(\n        polygon.begin(),\n        polygon.end(),\n    \
+    \    [](const Point<T>& first, const Point<T>& second) {\n            if (first.y\
+    \ != second.y) return first.y < second.y;\n            return first.x < second.x;\n\
+    \        }\n    );\n    std::rotate(polygon.begin(), start, polygon.end());\n\n\
+    \    if (polygon.size() >= 3) {\n        std::vector<P> cleaned;\n        const\
+    \ std::size_t size = polygon.size();\n        cleaned.reserve(size);\n       \
+    \ for (std::size_t index = 0; index < size; ++index) {\n            const Point<T>&\
+    \ previous = polygon[(index + size - 1) % size];\n            const Point<T>&\
+    \ current = polygon[index];\n            const Point<T>& next = polygon[(index\
     \ + 1) % size];\n            if (\n                orientation(previous, current,\
     \ next, eps) != 0 ||\n                sign<T>(dot(current - previous, next - current),\
-    \ eps) < 0\n            ) {\n                cleaned.push_back(current);\n   \
-    \         }\n        }\n        polygon = std::move(cleaned);\n    }\n    return\
+    \ eps) < 0\n            ) {\n                cleaned.push_back(polygon[index]);\n\
+    \            }\n        }\n        polygon = std::move(cleaned);\n    }\n    return\
     \ polygon;\n}\n\n}  // namespace convex_polygon_detail\n}  // namespace geometry\n\
     }  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_GEOMETRY_DETAIL_CONVEX_POLYGON_NORMALIZE_HPP\n#define M1UNE_GEOMETRY_DETAIL_CONVEX_POLYGON_NORMALIZE_HPP\
     \ 1\n\n#include <algorithm>\n#include <cstddef>\n#include <utility>\n#include\
     \ <vector>\n\n#include \"../point.hpp\"\n\nnamespace m1une {\nnamespace geometry\
-    \ {\nnamespace convex_polygon_detail {\n\ntemplate <Coordinate T>\nwide_type<T>\
-    \ boundary_area2(const std::vector<Point<T>>& polygon) {\n    wide_type<T> result\
-    \ = 0;\n    for (std::size_t index = 0; index < polygon.size(); ++index) {\n \
-    \       result += cross(\n            polygon[index],\n            polygon[(index\
-    \ + 1) % polygon.size()]\n        );\n    }\n    return result;\n}\n\ntemplate\
-    \ <Coordinate T>\nstd::vector<Point<T>> normalize_convex_boundary(\n    std::vector<Point<T>>\
-    \ polygon,\n    long double eps\n) {\n    if (polygon.size() >= 2 && polygon.front()\
-    \ == polygon.back()) {\n        polygon.pop_back();\n    }\n    polygon.erase(\n\
-    \        std::unique(polygon.begin(), polygon.end()),\n        polygon.end()\n\
-    \    );\n    if (polygon.size() >= 2 && polygon.front() == polygon.back()) {\n\
-    \        polygon.pop_back();\n    }\n    if (polygon.size() <= 1) return polygon;\n\
-    \    if (\n        polygon.size() >= 3 &&\n        sign<T>(boundary_area2(polygon),\
-    \ eps) < 0\n    ) {\n        std::reverse(polygon.begin(), polygon.end());\n \
-    \   }\n\n    const auto start = std::min_element(\n        polygon.begin(),\n\
-    \        polygon.end(),\n        [](const Point<T>& first, const Point<T>& second)\
-    \ {\n            if (first.y != second.y) return first.y < second.y;\n       \
-    \     return first.x < second.x;\n        }\n    );\n    std::rotate(polygon.begin(),\
-    \ start, polygon.end());\n\n    if (polygon.size() >= 3) {\n        std::vector<Point<T>>\
-    \ cleaned;\n        const std::size_t size = polygon.size();\n        cleaned.reserve(size);\n\
-    \        for (std::size_t index = 0; index < size; ++index) {\n            const\
-    \ Point<T>& previous = polygon[(index + size - 1) % size];\n            const\
-    \ Point<T>& current = polygon[index];\n            const Point<T>& next = polygon[(index\
+    \ {\nnamespace convex_polygon_detail {\n\ntemplate <PointRecord P>\nwide_type<typename\
+    \ P::coordinate_type> boundary_area2(const std::vector<P>& polygon) {\n    using\
+    \ T = typename P::coordinate_type;\n    wide_type<T> result = 0;\n    for (std::size_t\
+    \ index = 0; index < polygon.size(); ++index) {\n        result += cross(\n  \
+    \          polygon[index],\n            polygon[(index + 1) % polygon.size()]\n\
+    \        );\n    }\n    return result;\n}\n\ntemplate <PointRecord P>\nstd::vector<P>\
+    \ normalize_convex_boundary(\n    std::vector<P> polygon,\n    long double eps\n\
+    ) {\n    using T = typename P::coordinate_type;\n    if (polygon.size() >= 2 &&\
+    \ static_cast<const Point<T>&>(polygon.front()) ==\n            static_cast<const\
+    \ Point<T>&>(polygon.back())) {\n        polygon.pop_back();\n    }\n    polygon.erase(\n\
+    \        std::unique(polygon.begin(), polygon.end(),\n            [](const Point<T>&\
+    \ a, const Point<T>& b) { return a == b; }),\n        polygon.end()\n    );\n\
+    \    if (polygon.size() >= 2 && static_cast<const Point<T>&>(polygon.front())\
+    \ ==\n            static_cast<const Point<T>&>(polygon.back())) {\n        polygon.pop_back();\n\
+    \    }\n    if (polygon.size() <= 1) return polygon;\n    if (\n        polygon.size()\
+    \ >= 3 &&\n        sign<T>(boundary_area2(polygon), eps) < 0\n    ) {\n      \
+    \  std::reverse(polygon.begin(), polygon.end());\n    }\n\n    const auto start\
+    \ = std::min_element(\n        polygon.begin(),\n        polygon.end(),\n    \
+    \    [](const Point<T>& first, const Point<T>& second) {\n            if (first.y\
+    \ != second.y) return first.y < second.y;\n            return first.x < second.x;\n\
+    \        }\n    );\n    std::rotate(polygon.begin(), start, polygon.end());\n\n\
+    \    if (polygon.size() >= 3) {\n        std::vector<P> cleaned;\n        const\
+    \ std::size_t size = polygon.size();\n        cleaned.reserve(size);\n       \
+    \ for (std::size_t index = 0; index < size; ++index) {\n            const Point<T>&\
+    \ previous = polygon[(index + size - 1) % size];\n            const Point<T>&\
+    \ current = polygon[index];\n            const Point<T>& next = polygon[(index\
     \ + 1) % size];\n            if (\n                orientation(previous, current,\
     \ next, eps) != 0 ||\n                sign<T>(dot(current - previous, next - current),\
-    \ eps) < 0\n            ) {\n                cleaned.push_back(current);\n   \
-    \         }\n        }\n        polygon = std::move(cleaned);\n    }\n    return\
+    \ eps) < 0\n            ) {\n                cleaned.push_back(polygon[index]);\n\
+    \            }\n        }\n        polygon = std::move(cleaned);\n    }\n    return\
     \ polygon;\n}\n\n}  // namespace convex_polygon_detail\n}  // namespace geometry\n\
     }  // namespace m1une\n\n#endif  // M1UNE_GEOMETRY_DETAIL_CONVEX_POLYGON_NORMALIZE_HPP\n"
   dependsOn:
@@ -251,7 +280,7 @@ data:
   - geometry/minkowski_sum.hpp
   - geometry/all.hpp
   - geometry/convex_polygon.hpp
-  timestamp: '2026-10-05 22:23:07+09:00'
+  timestamp: '2026-10-24 23:29:06+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/minkowski_sum.test.cpp
@@ -261,6 +290,7 @@ data:
   - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/convex_decomposition.test.cpp
   - verify/geometry/polygon_operations.test.cpp
+  - verify/geometry/point_data.test.cpp
   - verify/geometry/convex_diameter.test.cpp
   - verify/geometry/centroid.test.cpp
   - verify/geometry/convex_polygon.test.cpp

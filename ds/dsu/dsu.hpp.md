@@ -64,6 +64,9 @@ data:
     path: verify/geometry/manhattan_mst.test.cpp
     title: verify/geometry/manhattan_mst.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/point_data.test.cpp
+    title: verify/geometry/point_data.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/rational.test.cpp
     title: verify/geometry/rational.test.cpp
   - icon: ':heavy_check_mark:'
@@ -193,6 +196,7 @@ data:
   - verify/geometry/manhattan_mst.test.cpp
   - verify/geometry/manhattan_mst.test.cpp
   - verify/geometry/geometry_algorithms.test.cpp
+  - verify/geometry/point_data.test.cpp
   - verify/geometry/centroid.test.cpp
   - verify/geometry/voronoi_diagram.test.cpp
   - verify/geometry/delaunay_triangulation.test.cpp

@@ -232,6 +232,12 @@ data:
     path: verify/geometry/perpendicular_bisector.test.cpp
     title: verify/geometry/perpendicular_bisector.test.cpp
   - icon: ':heavy_check_mark:'
+    path: verify/geometry/point_data.test.cpp
+    title: verify/geometry/point_data.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/geometry/point_data.test.cpp
+    title: verify/geometry/point_data.test.cpp
+  - icon: ':heavy_check_mark:'
     path: verify/geometry/point_in_polygon.test.cpp
     title: verify/geometry/point_in_polygon.test.cpp
   - icon: ':heavy_check_mark:'
@@ -285,36 +291,36 @@ data:
   attributes:
     links: []
   bundledCode: "#line 1 \"geometry/point.hpp\"\n\n\n\n#include <cmath>\n#include <concepts>\n\
-    #include <cassert>\n#include <type_traits>\n\n#line 1 \"geometry/detail/floating_predicate.hpp\"\
-    \n\n\n\nnamespace m1une {\nnamespace geometry {\nnamespace predicate_detail {\n\
-    \ntemplate <typename T>\nconstexpr T absolute(T value) {\n    return value < T(0)\
-    \ ? -value : value;\n}\n\ntemplate <typename T>\nconstexpr T max_value(T first,\
-    \ T second) {\n    return first < second ? second : first;\n}\n\ntemplate <typename\
-    \ T>\nconstexpr T vector_scale(T x, T y) {\n    return max_value(absolute(x),\
-    \ absolute(y));\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int scaled_sign(T\
-    \ value, T scale, long double eps) {\n    if constexpr (Exact) {\n        return\
-    \ (value > T(0)) - (value < T(0));\n    } else {\n        const T tolerance =\
-    \ T(eps) * scale;\n        return (value > tolerance) - (value < -tolerance);\n\
-    \    }\n}\n\ntemplate <bool Exact, typename T>\nconstexpr T determinant_scale(T\
-    \ ax, T ay, T bx, T by) {\n    if constexpr (Exact) {\n        return T(0);\n\
-    \    } else {\n        return vector_scale(ax, ay) * vector_scale(bx, by);\n \
-    \   }\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int determinant_sign(\n\
-    \    T ax,\n    T ay,\n    T bx,\n    T by,\n    long double eps\n) {\n    const\
-    \ T determinant = ax * by - ay * bx;\n    return scaled_sign<Exact>(\n       \
-    \ determinant,\n        determinant_scale<Exact>(ax, ay, bx, by),\n        eps\n\
-    \    );\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int orientation_sign(\n\
-    \    T direction_x,\n    T direction_y,\n    T offset_x,\n    T offset_y,\n  \
-    \  long double eps\n) {\n    const T determinant =\n        direction_x * offset_y\
-    \ - direction_y * offset_x;\n    T scale = T(0);\n    if constexpr (!Exact) {\n\
-    \        const T direction_scale =\n            vector_scale(direction_x, direction_y);\n\
-    \        scale = direction_scale * max_value(\n            direction_scale,\n\
+    #include <cassert>\n#include <type_traits>\n#include <utility>\n#include <vector>\n\
+    \n#line 1 \"geometry/detail/floating_predicate.hpp\"\n\n\n\nnamespace m1une {\n\
+    namespace geometry {\nnamespace predicate_detail {\n\ntemplate <typename T>\n\
+    constexpr T absolute(T value) {\n    return value < T(0) ? -value : value;\n}\n\
+    \ntemplate <typename T>\nconstexpr T max_value(T first, T second) {\n    return\
+    \ first < second ? second : first;\n}\n\ntemplate <typename T>\nconstexpr T vector_scale(T\
+    \ x, T y) {\n    return max_value(absolute(x), absolute(y));\n}\n\ntemplate <bool\
+    \ Exact, typename T>\nconstexpr int scaled_sign(T value, T scale, long double\
+    \ eps) {\n    if constexpr (Exact) {\n        return (value > T(0)) - (value <\
+    \ T(0));\n    } else {\n        const T tolerance = T(eps) * scale;\n        return\
+    \ (value > tolerance) - (value < -tolerance);\n    }\n}\n\ntemplate <bool Exact,\
+    \ typename T>\nconstexpr T determinant_scale(T ax, T ay, T bx, T by) {\n    if\
+    \ constexpr (Exact) {\n        return T(0);\n    } else {\n        return vector_scale(ax,\
+    \ ay) * vector_scale(bx, by);\n    }\n}\n\ntemplate <bool Exact, typename T>\n\
+    constexpr int determinant_sign(\n    T ax,\n    T ay,\n    T bx,\n    T by,\n\
+    \    long double eps\n) {\n    const T determinant = ax * by - ay * bx;\n    return\
+    \ scaled_sign<Exact>(\n        determinant,\n        determinant_scale<Exact>(ax,\
+    \ ay, bx, by),\n        eps\n    );\n}\n\ntemplate <bool Exact, typename T>\n\
+    constexpr int orientation_sign(\n    T direction_x,\n    T direction_y,\n    T\
+    \ offset_x,\n    T offset_y,\n    long double eps\n) {\n    const T determinant\
+    \ =\n        direction_x * offset_y - direction_y * offset_x;\n    T scale = T(0);\n\
+    \    if constexpr (!Exact) {\n        const T direction_scale =\n            vector_scale(direction_x,\
+    \ direction_y);\n        scale = direction_scale * max_value(\n            direction_scale,\n\
     \            vector_scale(offset_x, offset_y)\n        );\n    }\n    return scaled_sign<Exact>(determinant,\
     \ scale, eps);\n}\n\ntemplate <bool Exact, typename T>\nconstexpr int dot_sign(\n\
     \    T ax,\n    T ay,\n    T bx,\n    T by,\n    long double eps\n) {\n    const\
     \ T value = ax * bx + ay * by;\n    T scale = T(0);\n    if constexpr (!Exact)\
     \ {\n        scale = vector_scale(ax, ay) * vector_scale(bx, by);\n    }\n   \
     \ return scaled_sign<Exact>(value, scale, eps);\n}\n\n}  // namespace predicate_detail\n\
-    }  // namespace geometry\n}  // namespace m1une\n\n\n#line 10 \"geometry/point.hpp\"\
+    }  // namespace geometry\n}  // namespace m1une\n\n\n#line 12 \"geometry/point.hpp\"\
     \n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <typename T>\nconcept\
     \ Coordinate = !std::same_as<std::remove_cv_t<T>, bool> &&\n    (std::is_arithmetic_v<T>\
     \ ||\n     (std::copyable<T> && std::totally_ordered<T> && requires(T a, T b)\
@@ -327,24 +333,42 @@ data:
     \ <typename T>\nconcept ExactCoordinate = Coordinate<T> && !std::floating_point<T>;\n\
     \ntemplate <Coordinate T>\nusing wide_type = std::conditional_t<std::integral<T>,\
     \ __int128_t,\n    std::conditional_t<std::floating_point<T>, long double, T>>;\n\
-    \ntemplate <Coordinate T>\nstruct Point {\n    T x;\n    T y;\n\n    constexpr\
-    \ Point() : x(0), y(0) {}\n    constexpr Point(T x_value, T y_value) : x(x_value),\
-    \ y(y_value) {}\n\n    template <Coordinate U>\n    explicit constexpr Point(const\
-    \ Point<U>& other)\n        : x(static_cast<T>(other.x)), y(static_cast<T>(other.y))\
-    \ {}\n\n    constexpr Point& operator+=(const Point& other) {\n        x += other.x;\n\
-    \        y += other.y;\n        return *this;\n    }\n\n    constexpr Point& operator-=(const\
-    \ Point& other) {\n        x -= other.x;\n        y -= other.y;\n        return\
-    \ *this;\n    }\n\n    constexpr Point operator+() const {\n        return *this;\n\
-    \    }\n\n    constexpr Point operator-() const {\n        return Point(-x, -y);\n\
-    \    }\n\n    friend constexpr Point operator+(Point left, const Point& right)\
-    \ {\n        return left += right;\n    }\n\n    friend constexpr Point operator-(Point\
-    \ left, const Point& right) {\n        return left -= right;\n    }\n\n    friend\
-    \ constexpr bool operator==(const Point&, const Point&) = default;\n\n    friend\
-    \ constexpr bool operator<(const Point& left, const Point& right) {\n        if\
-    \ (left.x != right.x) return left.x < right.x;\n        return left.y < right.y;\n\
-    \    }\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const\
-    \ Point<T>& point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate\
-    \ T, typename Scalar>\nrequires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n\
+    \ntemplate <Coordinate T>\nstruct Point {\n    using coordinate_type = T;\n\n\
+    \    T x;\n    T y;\n\n    constexpr Point() : x(0), y(0) {}\n    constexpr Point(T\
+    \ x_value, T y_value) : x(x_value), y(y_value) {}\n\n    template <Coordinate\
+    \ U>\n    explicit constexpr Point(const Point<U>& other)\n        : x(static_cast<T>(other.x)),\
+    \ y(static_cast<T>(other.y)) {}\n\n    constexpr Point& operator+=(const Point&\
+    \ other) {\n        x += other.x;\n        y += other.y;\n        return *this;\n\
+    \    }\n\n    constexpr Point& operator-=(const Point& other) {\n        x -=\
+    \ other.x;\n        y -= other.y;\n        return *this;\n    }\n\n    constexpr\
+    \ Point operator+() const {\n        return *this;\n    }\n\n    constexpr Point\
+    \ operator-() const {\n        return Point(-x, -y);\n    }\n\n    friend constexpr\
+    \ Point operator+(Point left, const Point& right) {\n        return left += right;\n\
+    \    }\n\n    friend constexpr Point operator-(Point left, const Point& right)\
+    \ {\n        return left -= right;\n    }\n\n    friend constexpr bool operator==(const\
+    \ Point&, const Point&) = default;\n\n    friend constexpr bool operator<(const\
+    \ Point& left, const Point& right) {\n        if (left.x != right.x) return left.x\
+    \ < right.x;\n        return left.y < right.y;\n    }\n};\n\n// Attach arbitrary\
+    \ metadata without changing coordinate semantics.\n// Arithmetic and conversions\
+    \ inherited from Point return ordinary points.\ntemplate <Coordinate T, typename\
+    \ Data>\nstruct PointWithData : Point<T> {\n    Data data;\n\n    constexpr PointWithData()\
+    \ requires std::default_initializable<Data>\n        : Point<T>(), data() {}\n\
+    \n    constexpr PointWithData(T x, T y)\n        requires std::default_initializable<Data>\n\
+    \        : Point<T>(x, y), data() {}\n\n    constexpr PointWithData(T x, T y,\
+    \ Data value)\n        : Point<T>(x, y), data(std::move(value)) {}\n\n    constexpr\
+    \ PointWithData(Point<T> point, Data value)\n        : Point<T>(std::move(point)),\
+    \ data(std::move(value)) {}\n};\n\n// User-defined records may publicly derive\
+    \ from Point<T> as well.\ntemplate <typename P>\nconcept PointRecord = requires\
+    \ {\n    typename P::coordinate_type;\n    requires Coordinate<typename P::coordinate_type>;\n\
+    \    requires std::derived_from<P, Point<typename P::coordinate_type>>;\n};\n\n\
+    // Explicitly discard metadata for APIs that construct new geometric objects.\n\
+    template <PointRecord P>\nstd::vector<Point<typename P::coordinate_type>> to_points(\n\
+    \    const std::vector<P>& records\n) {\n    using T = typename P::coordinate_type;\n\
+    \    std::vector<Point<T>> result;\n    result.reserve(records.size());\n    for\
+    \ (const Point<T>& point : records) result.push_back(point);\n    return result;\n\
+    }\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const Point<T>&\
+    \ point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate T,\
+    \ typename Scalar>\nrequires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n\
     constexpr auto operator*(const Point<T>& point, Scalar scalar) {\n    using Result\
     \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
     \ * Result(scalar),\n        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate\
@@ -413,36 +437,55 @@ data:
     \    );\n}\n\n}  // namespace geometry\n}  // namespace m1une\n\n\n"
   code: "#ifndef M1UNE_GEOMETRY_POINT_HPP\n#define M1UNE_GEOMETRY_POINT_HPP 1\n\n\
     #include <cmath>\n#include <concepts>\n#include <cassert>\n#include <type_traits>\n\
-    \n#include \"detail/floating_predicate.hpp\"\n\nnamespace m1une {\nnamespace geometry\
-    \ {\n\ntemplate <typename T>\nconcept Coordinate = !std::same_as<std::remove_cv_t<T>,\
-    \ bool> &&\n    (std::is_arithmetic_v<T> ||\n     (std::copyable<T> && std::totally_ordered<T>\
-    \ && requires(T a, T b) {\n         T(0);\n         T(1);\n         static_cast<long\
-    \ double>(a);\n         { +a } -> std::same_as<T>;\n         { -a } -> std::same_as<T>;\n\
-    \         { a + b } -> std::same_as<T>;\n         { a - b } -> std::same_as<T>;\n\
+    #include <utility>\n#include <vector>\n\n#include \"detail/floating_predicate.hpp\"\
+    \n\nnamespace m1une {\nnamespace geometry {\n\ntemplate <typename T>\nconcept\
+    \ Coordinate = !std::same_as<std::remove_cv_t<T>, bool> &&\n    (std::is_arithmetic_v<T>\
+    \ ||\n     (std::copyable<T> && std::totally_ordered<T> && requires(T a, T b)\
+    \ {\n         T(0);\n         T(1);\n         static_cast<long double>(a);\n \
+    \        { +a } -> std::same_as<T>;\n         { -a } -> std::same_as<T>;\n   \
+    \      { a + b } -> std::same_as<T>;\n         { a - b } -> std::same_as<T>;\n\
     \         { a * b } -> std::same_as<T>;\n         { a / b } -> std::same_as<T>;\n\
     \         { a += b } -> std::same_as<T&>;\n         { a -= b } -> std::same_as<T&>;\n\
     \     }));\n\n// Custom coordinate types keep their own exact arithmetic.\ntemplate\
     \ <typename T>\nconcept ExactCoordinate = Coordinate<T> && !std::floating_point<T>;\n\
     \ntemplate <Coordinate T>\nusing wide_type = std::conditional_t<std::integral<T>,\
     \ __int128_t,\n    std::conditional_t<std::floating_point<T>, long double, T>>;\n\
-    \ntemplate <Coordinate T>\nstruct Point {\n    T x;\n    T y;\n\n    constexpr\
-    \ Point() : x(0), y(0) {}\n    constexpr Point(T x_value, T y_value) : x(x_value),\
-    \ y(y_value) {}\n\n    template <Coordinate U>\n    explicit constexpr Point(const\
-    \ Point<U>& other)\n        : x(static_cast<T>(other.x)), y(static_cast<T>(other.y))\
-    \ {}\n\n    constexpr Point& operator+=(const Point& other) {\n        x += other.x;\n\
-    \        y += other.y;\n        return *this;\n    }\n\n    constexpr Point& operator-=(const\
-    \ Point& other) {\n        x -= other.x;\n        y -= other.y;\n        return\
-    \ *this;\n    }\n\n    constexpr Point operator+() const {\n        return *this;\n\
-    \    }\n\n    constexpr Point operator-() const {\n        return Point(-x, -y);\n\
-    \    }\n\n    friend constexpr Point operator+(Point left, const Point& right)\
-    \ {\n        return left += right;\n    }\n\n    friend constexpr Point operator-(Point\
-    \ left, const Point& right) {\n        return left -= right;\n    }\n\n    friend\
-    \ constexpr bool operator==(const Point&, const Point&) = default;\n\n    friend\
-    \ constexpr bool operator<(const Point& left, const Point& right) {\n        if\
-    \ (left.x != right.x) return left.x < right.x;\n        return left.y < right.y;\n\
-    \    }\n};\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const\
-    \ Point<T>& point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate\
-    \ T, typename Scalar>\nrequires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n\
+    \ntemplate <Coordinate T>\nstruct Point {\n    using coordinate_type = T;\n\n\
+    \    T x;\n    T y;\n\n    constexpr Point() : x(0), y(0) {}\n    constexpr Point(T\
+    \ x_value, T y_value) : x(x_value), y(y_value) {}\n\n    template <Coordinate\
+    \ U>\n    explicit constexpr Point(const Point<U>& other)\n        : x(static_cast<T>(other.x)),\
+    \ y(static_cast<T>(other.y)) {}\n\n    constexpr Point& operator+=(const Point&\
+    \ other) {\n        x += other.x;\n        y += other.y;\n        return *this;\n\
+    \    }\n\n    constexpr Point& operator-=(const Point& other) {\n        x -=\
+    \ other.x;\n        y -= other.y;\n        return *this;\n    }\n\n    constexpr\
+    \ Point operator+() const {\n        return *this;\n    }\n\n    constexpr Point\
+    \ operator-() const {\n        return Point(-x, -y);\n    }\n\n    friend constexpr\
+    \ Point operator+(Point left, const Point& right) {\n        return left += right;\n\
+    \    }\n\n    friend constexpr Point operator-(Point left, const Point& right)\
+    \ {\n        return left -= right;\n    }\n\n    friend constexpr bool operator==(const\
+    \ Point&, const Point&) = default;\n\n    friend constexpr bool operator<(const\
+    \ Point& left, const Point& right) {\n        if (left.x != right.x) return left.x\
+    \ < right.x;\n        return left.y < right.y;\n    }\n};\n\n// Attach arbitrary\
+    \ metadata without changing coordinate semantics.\n// Arithmetic and conversions\
+    \ inherited from Point return ordinary points.\ntemplate <Coordinate T, typename\
+    \ Data>\nstruct PointWithData : Point<T> {\n    Data data;\n\n    constexpr PointWithData()\
+    \ requires std::default_initializable<Data>\n        : Point<T>(), data() {}\n\
+    \n    constexpr PointWithData(T x, T y)\n        requires std::default_initializable<Data>\n\
+    \        : Point<T>(x, y), data() {}\n\n    constexpr PointWithData(T x, T y,\
+    \ Data value)\n        : Point<T>(x, y), data(std::move(value)) {}\n\n    constexpr\
+    \ PointWithData(Point<T> point, Data value)\n        : Point<T>(std::move(point)),\
+    \ data(std::move(value)) {}\n};\n\n// User-defined records may publicly derive\
+    \ from Point<T> as well.\ntemplate <typename P>\nconcept PointRecord = requires\
+    \ {\n    typename P::coordinate_type;\n    requires Coordinate<typename P::coordinate_type>;\n\
+    \    requires std::derived_from<P, Point<typename P::coordinate_type>>;\n};\n\n\
+    // Explicitly discard metadata for APIs that construct new geometric objects.\n\
+    template <PointRecord P>\nstd::vector<Point<typename P::coordinate_type>> to_points(\n\
+    \    const std::vector<P>& records\n) {\n    using T = typename P::coordinate_type;\n\
+    \    std::vector<Point<T>> result;\n    result.reserve(records.size());\n    for\
+    \ (const Point<T>& point : records) result.push_back(point);\n    return result;\n\
+    }\n\ntemplate <Coordinate T>\nconstexpr Point<long double> centroid(const Point<T>&\
+    \ point) {\n    return Point<long double>(point);\n}\n\ntemplate <Coordinate T,\
+    \ typename Scalar>\nrequires (std::is_arithmetic_v<Scalar> || Coordinate<Scalar>)\n\
     constexpr auto operator*(const Point<T>& point, Scalar scalar) {\n    using Result\
     \ = std::common_type_t<T, Scalar>;\n    return Point<Result>(\n        Result(point.x)\
     \ * Result(scalar),\n        Result(point.y) * Result(scalar)\n    );\n}\n\ntemplate\
@@ -542,7 +585,7 @@ data:
   - geometry/closest_pair.hpp
   - geometry/circle.hpp
   - geometry/voronoi_diagram.hpp
-  timestamp: '2026-10-05 22:23:07+09:00'
+  timestamp: '2026-10-24 23:29:06+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/geometry/ray.test.cpp
@@ -572,6 +615,8 @@ data:
   - verify/geometry/convex_decomposition.test.cpp
   - verify/geometry/polygon_operations.test.cpp
   - verify/geometry/polygon_operations.test.cpp
+  - verify/geometry/point_data.test.cpp
+  - verify/geometry/point_data.test.cpp
   - verify/geometry/rectangle_union_area.test.cpp
   - verify/geometry/circle_boundary_intersection.test.cpp
   - verify/geometry/projection.test.cpp
@@ -761,3 +806,84 @@ auto twice_b = b * 2;                    // Point<Fraction>(1, 0)
 auto area2 = m1une::geometry::cross(a, b, c); // Fraction(1, 6)
 auto hull = m1une::geometry::convex_hull(std::vector<Point>{a, b, c});
 ```
+
+## Points with metadata
+
+Use `PointWithData<T, Data>` to attach an index, color, or any other payload.
+It publicly derives from `Point<T>` and adds a public `Data data` member.
+`Point<T>` itself keeps its original layout and behavior. Both expose
+`using coordinate_type = T`.
+
+```cpp
+#include "geometry/convex_hull.hpp"
+#include <string>
+#include <vector>
+
+struct Info {
+    int index;
+    std::string color;
+};
+
+using Vertex = m1une::geometry::PointWithData<long long, Info>;
+std::vector<Vertex> vertices;
+vertices.emplace_back(0, 0, Info{4, "red"});
+vertices.emplace_back(2, 0, Info{7, "blue"});
+vertices.emplace_back(0, 2, Info{9, "green"});
+auto hull = m1une::geometry::convex_hull(vertices); // vector<Vertex>
+int original_index = hull[0].data.index;           // 4
+```
+
+`PointRecord<P>` accepts `Point<T>` and public, unambiguous subclasses of
+`Point<T>` with the inherited `coordinate_type`. You can instead define your
+own record with directly accessible fields:
+
+```cpp
+struct Vertex : m1une::geometry::Point<long long> {
+    int index;
+    int color;
+    Vertex(long long x, long long y, int index, int color)
+        : Point(x, y), index(index), color(color) {}
+};
+```
+
+Do not hide the base's coordinates or change its `coordinate_type`. Metadata
+needs no equality, ordering, or arithmetic operations. Algorithms that return
+or reorder records require copyable records. Read-only queries do not copy the
+payload. Payloads do not need default constructors when supplied explicitly.
+
+| Interface | Behavior | Complexity |
+| --- | --- | --- |
+| `PointWithData<T, Data>()` | Zero coordinates and value-initialized data; requires default-initializable `Data`. | $O(1)$ coordinate work plus data initialization |
+| `PointWithData<T, Data>(T x, T y)` | Coordinates and value-initialized data; requires default-initializable `Data`. | $O(1)$ coordinate work plus data initialization |
+| `PointWithData<T, Data>(T x, T y, Data value)` | Coordinates and the supplied data. | $O(1)$ coordinate work plus data construction |
+| `PointWithData<T, Data>(Point<T> point, Data value)` | Copies the coordinates and takes the supplied data. | $O(1)$ coordinate work plus data construction |
+| `template <PointRecord P> std::vector<Point<typename P::coordinate_type>> to_points(const std::vector<P>& records)` | Explicitly copies only coordinates, preserving input order. Does not mutate the records. | $O(N)$ time and memory |
+
+Equality and ordering inherited from `Point<T>` compare coordinates only.
+Single-point predicates such as `dot`, `cross`, `orientation`, and `distance2`
+accept these records through their base type. Arithmetic, coordinate
+conversions, rotations, centroids, and other constructions of new points return
+ordinary `Point` values: no metadata is assigned to a synthesized point.
+In-place `+=` and `-=` update coordinates and retain the existing data.
+
+These collection APIs also accept `std::vector<P>` with `PointRecord<P>`:
+
+| APIs | Metadata behavior |
+| --- | --- |
+| `convex_hull` | Returns `std::vector<P>` with complete input records. Duplicate coordinates retain the first input record. |
+| `sort_by_angle`, `angle_sorted` | Reorder complete records. Geometrically tied records can appear in either order. |
+| `normalize_convex_polygon` | Retains records for surviving vertices; consecutive duplicate coordinates retain the first record. |
+| `closest_pair`, `farthest_pair`, `furthest_pair`, `convex_layers` | Results refer to positions in the original vector, independently of metadata indices. |
+| `manhattan_mst_edges`, `manhattan_mst`, `euclidean_mst_edges`, `euclidean_mst`, `delaunay_triangulation`, `minimum_enclosing_circle` | Edge, triangle, and support indices refer to the original vector. Existing coordinate restrictions still apply. |
+| `polygon_area2`, `polygon_area`, `polygon_centroid`, `centroid`, `polygon_center_of_gravity`, `is_simple_polygon`, `point_in_polygon`, `is_convex_polygon`, `point_in_convex_polygon`, `convex_diameter2` | Use coordinates only and keep their original result types and complexities. |
+
+Algorithms use the coordinate base for geometric comparisons even when a custom
+record defines its own comparison operators. Costs retain the bounds documented
+on each algorithm's page, plus the cost of copying or moving records where
+applicable. Use small payloads or store an index into an external table for
+large metadata.
+
+Existing `Point<T>` calls, including explicit coordinate template arguments such
+as `convex_hull<long long>(points)`, remain supported. Other collection APIs,
+including polygon decomposition, Minkowski sums, and Voronoi diagrams, take
+ordinary points; pass `to_points(records)` explicitly when using those APIs.

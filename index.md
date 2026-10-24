@@ -2026,6 +2026,9 @@ data:
       path: verify/geometry/perpendicular_bisector.test.cpp
       title: verify/geometry/perpendicular_bisector.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/geometry/point_data.test.cpp
+      title: verify/geometry/point_data.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/geometry/point_in_polygon.test.cpp
       title: verify/geometry/point_in_polygon.test.cpp
     - icon: ':heavy_check_mark:'
