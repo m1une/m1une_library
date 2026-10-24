@@ -198,9 +198,9 @@ $$
 
 For sequence partitioning, vertex `j` represents prefix `[0,j)`; use
 `vertex_count = sequence_length + 1`. The cost must be **anti-Monge**.
-For Monge costs, see [LARSCH](larsch.md). For transitions from a known
-previous DP layer, see [divide-and-conquer optimization](divide_and_conquer_optimization.md).
-The [Monge guide](all.md) explains how to identify the recurrence and choose
+For Monge costs, see [LARSCH](https://m1une.github.io/m1une_library/convex/monge/larsch.hpp). For transitions from a known
+previous DP layer, see [divide-and-conquer optimization](https://m1une.github.io/m1une_library/convex/monge/divide_and_conquer_optimization.hpp).
+The [Monge guide](https://m1une.github.io/m1une_library/convex/monge/all.hpp) explains how to identify the recurrence and choose
 between matrix search, previous-layer transitions, and forward DP.
 
 All names are in `m1une::convex`.

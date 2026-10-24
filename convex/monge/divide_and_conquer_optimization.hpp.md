@@ -137,9 +137,9 @@ both optimum values and their candidate indices.
 
 This is a **fixed-matrix / previous-layer** optimization. It does not solve
 `dp[j] = min_{i<j}(dp[i] + cost(i,j))` by reading unfinished values in the
-same array. Use [LARSCH](larsch.md) for Monge costs, or
-[anti-Monge shortest paths](anti_monge_shortest_path.md) for anti-Monge costs.
-The [Monge guide](all.md) explains how to distinguish these recurrences.
+same array. Use [LARSCH](https://m1une.github.io/m1une_library/convex/monge/larsch.hpp) for Monge costs, or
+[anti-Monge shortest paths](https://m1une.github.io/m1une_library/convex/monge/anti_monge_shortest_path.hpp) for anti-Monge costs.
+The [Monge guide](https://m1une.github.io/m1une_library/convex/monge/all.hpp) explains how to distinguish these recurrences.
 
 ## Worked example: make one more move from known costs
 

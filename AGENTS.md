@@ -58,6 +58,14 @@ Liquid syntax is active while pages are generated. Do not introduce two
 consecutive opening braces in Markdown examples, public headers, or verification
 sources that may be rendered by verification-helper.
 
+Verification-helper relocates a Markdown page with `documentation_of` to the
+documented header's path: for example, `docs/convex/monge/smawk.md` is published
+at `https://m1une.github.io/m1une_library/convex/monge/smawk.hpp`. It does not
+rewrite relative links in the page body. When linking between these pages, use
+their full published URLs so the links work both on GitHub and on the generated
+site. Validate targets against the generated page paths, not just the source
+Markdown files.
+
 In C++ examples and source listings, prefer brace elision, explicit default
 initialization plus assignments, `emplace_back`, or named expected values instead
 of nested aggregate initializer shorthand that contains consecutive opening

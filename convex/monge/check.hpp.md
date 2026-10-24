@@ -101,16 +101,16 @@ for every `i < k` and `j < l`. It is enough to test adjacent rows and columns,
 which gives an $O(HW)$ checker.
 
 Anti-Monge reverses the inequality. It supports row maxima directly, or row
-minima after reversing one axis; see [SMAWK](smawk.md). Transposition alone
+minima after reversing one axis; see [SMAWK](https://m1une.github.io/m1une_library/convex/monge/smawk.hpp). Transposition alone
 does not reverse the inequality. These checks require a full rectangle:
 restrict an interval-cost callback to valid ranges rather than querying
-undefined intervals. See the [Monge guide](all.md).
+undefined intervals. See the [Monge guide](https://m1une.github.io/m1une_library/convex/monge/all.hpp).
 
 ## Worked example: check the matrix you intend to search
 
 Use this checker on small instances while deriving a cost model. For example,
 the following table is the same three-request, four-choice table used in the
-[SMAWK example](smawk.md):
+[SMAWK example](https://m1une.github.io/m1une_library/convex/monge/smawk.hpp):
 
 ```cpp
 #include "convex/monge/check.hpp"

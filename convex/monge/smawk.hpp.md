@@ -181,7 +181,7 @@ primitive for Monge optimization.
 
 All names are in `m1une::convex`.
 
-See the [Monge guide](all.md) for algorithm selection, recurrence-to-matrix
+See the [Monge guide](https://m1une.github.io/m1une_library/convex/monge/all.hpp) for algorithm selection, recurrence-to-matrix
 mapping, and examples of previous-layer and forward DP.
 
 ## Worked example: replace a row-by-row search
