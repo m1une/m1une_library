@@ -1,97 +1,44 @@
 ---
-title: Monge Checks
+title: Monge and Anti-Monge Checks
 documentation_of: ../../../convex/monge/check.hpp
 ---
 
-## Overview
+Check adjacent $2\times2$ inequalities of a complete rectangle. Monge means
+$A(r,c)+A(r+1,c+1)\le A(r,c+1)+A(r+1,c)$; anti-Monge uses $\ge$.
+For finite ordered arithmetic these local conditions imply all rectangle
+inequalities by summation. Neither function checks total monotonicity alone.
 
-This header checks the Monge or anti-Monge quadrangle inequality.
+All APIs use `m1une::convex`. `V` receives `(row,column)` and returns a finite
+value supporting addition and comparison. Sums must fit in the value type;
+NaNs and arithmetic with infinity are not supported. These are offline
+checks and do not mutate their inputs. No optimum is returned, so ties are
+irrelevant and equality satisfies both properties.
 
-An `H` by `W` matrix `A` is Monge when
+## Interface
 
-$$
-A[i][j] + A[k][l] \le A[i][l] + A[k][j]
-$$
+| Signature | Time | Extra memory |
+| --- | --- | --- |
+| `template<class V> bool is_monge(int row_count, int column_count, V value)` | $O(HW)$ | $O(1)$ |
+| `template<class V> bool is_anti_monge(int row_count, int column_count, V value)` | $O(HW)$ | $O(1)$ |
+| `template<class V> bool is_monge(std::span<const int> rows, std::span<const int> columns, V value)` | $O(HW)$ | $O(1)$ |
+| `template<class V> bool is_anti_monge(std::span<const int> rows, std::span<const int> columns, V value)` | $O(HW)$ | $O(1)$ |
+| `template<class T> bool is_monge(const std::vector<std::vector<T>>& matrix)` | $O(H+HW)$ | $O(1)$ |
+| `template<class T> bool is_anti_monge(const std::vector<std::vector<T>>& matrix)` | $O(H+HW)$ | $O(1)$ |
 
-for every `i < k` and `j < l`. It is enough to test adjacent rows and columns,
-which gives an $O(HW)$ checker.
-
-Anti-Monge reverses the inequality. It supports row maxima directly, or row
-minima after reversing one axis; see [SMAWK](https://m1une.github.io/m1une_library/convex/monge/smawk.hpp). Transposition alone
-does not reverse the inequality. These checks require a full rectangle:
-restrict an interval-cost callback to valid ranges rather than querying
-undefined intervals. See the [Monge guide](https://m1une.github.io/m1une_library/convex/monge/all.hpp).
-
-## Worked example: check the matrix you intend to search
-
-Use this checker on small instances while deriving a cost model. For example,
-the following table is the same three-request, four-choice table used in the
-[SMAWK example](https://m1une.github.io/m1une_library/convex/monge/smawk.hpp):
+Dimensions must be nonnegative; dense overloads assert rectangular shape.
+A dimension below two makes the inequality vacuous and returns `true`.
+The ordered forms check `value(rows[r],columns[c])`, with distinct nonnegative
+IDs in each list. Anti-Monge is implemented through reversed virtual column
+order and is directly callable without building a reverse permutation.
 
 ```cpp
 #include "convex/monge/check.hpp"
 #include <cassert>
-#include <vector>
 
 int main() {
-    std::vector<std::vector<long long>> cost = {
-        {5, 9, 21, 41},
-        {6, 2, 6, 18},
-        {23, 11, 7, 11}
-    };
-    assert(m1une::convex::is_monge(cost));
-    assert(!m1une::convex::is_anti_monge(cost));
-
-    // Negating every entry reverses the inequality.
-    for (auto& row : cost) {
-        for (auto& entry : row) entry = -entry;
-    }
-    assert(m1une::convex::is_anti_monge(cost));
-
-    // For an implicit matrix, pass its dimensions and one-entry callback.
-    auto value = [](int row, int column) {
-        long long gap = row - column;
-        return gap * gap;
-    };
-    assert(m1une::convex::is_monge(3, 4, value));
+    auto squared_gap = [](int r, int c) { return (r-c)*(r-c); };
+    assert(m1une::convex::is_monge(4, 6, squared_gap));
+    assert(m1une::convex::is_anti_monge(4, 6,
+        [&](int r, int c) { return -squared_gap(r,c); }));
 }
 ```
-
-Both overloads return a boolean. For example, the first adjacent check is
-`5+2 <= 9+6`, and the remaining adjacent checks must also pass.
-A successful check justifies the property for this finite table. To use an
-optimization for arbitrary problem inputs, prove the inequality for the cost
-rule too. These functions do not check the weaker condition of monotone
-argmins, and they do not compute any minima.
-
-## Interface
-
-Implicit matrices:
-
-```cpp
-template <class Value>
-bool is_monge(int row_count, int column_count, Value value);
-
-template <class Value>
-bool is_anti_monge(int row_count, int column_count, Value value);
-```
-
-Explicit rectangular matrices:
-
-```cpp
-template <class T>
-bool is_monge(const std::vector<std::vector<T>>& matrix);
-
-template <class T>
-bool is_anti_monge(const std::vector<std::vector<T>>& matrix);
-```
-
-Empty matrices and matrices with fewer than two rows or columns satisfy both
-properties vacuously.
-
-The element type must support addition and comparison. Intermediate sums must
-fit in the element type.
-
-## Complexity
-
-$O(HW)$ time and $O(1)$ additional memory.

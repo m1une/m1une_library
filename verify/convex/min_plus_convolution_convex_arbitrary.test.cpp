@@ -1,9 +1,9 @@
 #define PROBLEM "https://judge.yosupo.jp/problem/min_plus_convolution_convex_arbitrary"
 
-#include "../../../utilities/fast_io.hpp"
+#include "../../utilities/fast_io.hpp"
 #include <vector>
 
-#include "../../../convex/monge/min_plus_convolution.hpp"
+#include "../../convex/min_plus_convolution.hpp"
 
 int main() {
     m1une::utilities::FastInput fast_input;

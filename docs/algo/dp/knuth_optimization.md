@@ -1,6 +1,6 @@
 ---
 title: Knuth Optimization
-documentation_of: ../../../convex/monge/knuth_optimization.hpp
+documentation_of: ../../../algo/dp/knuth_optimization.hpp
 ---
 
 ## Overview
@@ -44,7 +44,7 @@ for (int length = 2; length <= n; ++length) {
 Knuth optimization performs that DP with fewer candidate splits:
 
 ```cpp
-#include "convex/monge/knuth_optimization.hpp"
+#include "algo/dp/knuth_optimization.hpp"
 #include <cassert>
 #include <iostream>
 #include <vector>
@@ -57,7 +57,7 @@ int main() {
     auto merge_cost = [&](int l, int r) {
         return prefix[r] - prefix[l];  // Weight of [l,r), excluding r.
     };
-    auto result = m1une::convex::knuth_optimization(n, merge_cost);
+    auto result = m1une::algo::knuth_optimization(n, merge_cost);
     assert(result.value[0][2] == 5);  // Merge the first two piles.
     assert(result.value[1][3] == 7);  // Merge the last two piles.
     assert(result.split[0][3] == 2);  // Final split: [0,2) and [2,3).
@@ -96,11 +96,21 @@ auto knuth_optimization(
 
 The result is `KnuthOptimizationResult<T>`:
 
-| Member / Method | Meaning |
-| --- | --- |
-| `value[l][r]` | Optimal value for `[l, r)`. |
-| `split[l][r]` | Leftmost optimal split `k`. |
-| `optimum()` | Returns `value[0][element_count]`. |
+| Member / Method | Meaning | Time |
+| --- | --- | --- |
+| `std::vector<std::vector<T>> value` | Optimal values for `[l,r)`, with zero on empty/singleton intervals. | Direct access $O(1)$ |
+| `std::vector<std::vector<int>> split` | Leftmost optimal split; empty `[l,l)` uses `l`, singleton `[l,l+1)` uses `l+1`. | Direct access $O(1)$ |
+| `T optimum() const` | Returns `value[0][element_count]`, also zero for empty input. | $O(1)$ |
+
+| Exact function signature | Time | Memory |
+| --- | --- | --- |
+| `template<class IntervalCost> auto knuth_optimization(int element_count, IntervalCost interval_cost) -> KnuthOptimizationResult<std::decay_t<std::invoke_result_t<IntervalCost, int, int>>>` | $O(N^2)$ | $O(N^2)$ |
+
+`element_count >= 0` is asserted. Costs and arithmetic must be finite and fit
+in `T`, which supports default zero initialization, addition, and comparison.
+The callback receives original zero-based half-open interval endpoints and is
+called only for lengths at least two. Inputs are not modified. This is an
+interval recurrence, not a rectangular matrix transition or forward-DAG DP.
 
 For intervals of length at least two, the split is strictly inside the
 interval.

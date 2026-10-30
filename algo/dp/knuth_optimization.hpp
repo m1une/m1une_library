@@ -1,5 +1,5 @@
-#ifndef M1UNE_CONVEX_MONGE_KNUTH_OPTIMIZATION_HPP
-#define M1UNE_CONVEX_MONGE_KNUTH_OPTIMIZATION_HPP 1
+#ifndef M1UNE_ALGO_DP_KNUTH_OPTIMIZATION_HPP
+#define M1UNE_ALGO_DP_KNUTH_OPTIMIZATION_HPP 1
 
 #include <algorithm>
 #include <cassert>
@@ -7,7 +7,7 @@
 #include <vector>
 
 namespace m1une {
-namespace convex {
+namespace algo {
 
 template <class T>
 struct KnuthOptimizationResult {
@@ -56,7 +56,7 @@ auto knuth_optimization(int element_count, IntervalCost interval_cost)
     return result;
 }
 
-}  // namespace convex
+}  // namespace algo
 }  // namespace m1une
 
-#endif  // M1UNE_CONVEX_MONGE_KNUTH_OPTIMIZATION_HPP
+#endif  // M1UNE_ALGO_DP_KNUTH_OPTIMIZATION_HPP

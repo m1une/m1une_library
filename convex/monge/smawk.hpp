@@ -4,6 +4,7 @@
 #include <cassert>
 #include <functional>
 #include <numeric>
+#include <span>
 #include <vector>
 
 namespace m1une {
@@ -66,16 +67,40 @@ std::vector<int> row_optima(int row_count, int column_count, const Select& selec
 
 }  // namespace smawk_detail
 
-// Search a fixed H x W rectangle, returning column indices (leftmost on ties).
-// Requires total monotonicity under Compare; Monge suffices for minima.
-// For anti-Monge minima, reverse columns in value and map indices back.
-// O(H + W) evaluations; callbacks may be queried out of row order.
+// Comparison-oracle SMAWK. prefer(row, current, candidate) says whether to
+// replace current. The induced ordered matrix must be totally monotone with
+// this tie rule. This also permits symbolic invalid entries without sentinels.
+// O(H + W) oracle calls and memory. Entries must be fixed (offline search).
+template <class Prefer>
+std::vector<int> smawk_row_select(int row_count, int column_count, Prefer prefer) {
+    assert(row_count >= 0);
+    assert(column_count >= 0);
+    return smawk_detail::row_optima(row_count, column_count, prefer);
+}
+
+// Search value(rows[r], columns[c]); answers are original column IDs, in row
+// list order. Lists contain distinct nonnegative IDs; prefer defines the tie
+// rule with respect to the supplied order.
+template <class Prefer>
+std::vector<int> smawk_row_select(std::span<const int> rows,
+                                  std::span<const int> columns, Prefer prefer) {
+    auto answer = smawk_row_select(int(rows.size()), int(columns.size()),
+        [&](int row, int current, int candidate) {
+            return prefer(rows[row], columns[current], columns[candidate]);
+        });
+    for (int& column : answer) if (column != -1) column = columns[column];
+    return answer;
+}
+
+// Fixed rectangle, leftmost on ties. Requires total monotonicity for leftmost
+// optima under Compare (Monge suffices for minima). O(H + W) time and memory.
+// Callback evaluations may be out of row order; this is not an online DP.
 template <class Value, class Compare = std::less<>>
 std::vector<int> smawk_row_optima(int row_count, int column_count, Value value,
                                   Compare compare = Compare()) {
     assert(row_count >= 0);
     assert(column_count >= 0);
-    return smawk_detail::row_optima(
+    return smawk_row_select(
         row_count, column_count,
         [&](int row, int current, int candidate) {
             return compare(value(row, candidate), value(row, current));
@@ -90,6 +115,29 @@ std::vector<int> smawk_row_argmin(int row_count, int column_count, Value value) 
 template <class Value>
 std::vector<int> smawk_row_argmax(int row_count, int column_count, Value value) {
     return smawk_row_optima(row_count, column_count, value, std::greater<>());
+}
+
+// Ordered variants use supplied positions for total monotonicity and ties.
+template <class Value, class Compare = std::less<>>
+std::vector<int> smawk_row_optima(std::span<const int> rows,
+                                  std::span<const int> columns, Value value,
+                                  Compare compare = Compare()) {
+    return smawk_row_select(rows, columns,
+        [&](int row, int current, int candidate) {
+            return compare(value(row, candidate), value(row, current));
+        });
+}
+
+template <class Value>
+std::vector<int> smawk_row_argmin(std::span<const int> rows,
+                                  std::span<const int> columns, Value value) {
+    return smawk_row_optima(rows, columns, value, std::less<>());
+}
+
+template <class Value>
+std::vector<int> smawk_row_argmax(std::span<const int> rows,
+                                  std::span<const int> columns, Value value) {
+    return smawk_row_optima(rows, columns, value, std::greater<>());
 }
 
 template <class T>

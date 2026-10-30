@@ -1,4 +1,4 @@
-#define PROBLEM "https://judge.yosupo.jp/problem/aplusb"
+#define PROBLEM "https://judge.yosupo.jp/problem/min_plus_convolution_convex_arbitrary"
 
 #include <algorithm>
 #include <cassert>
@@ -7,7 +7,7 @@
 #include <limits>
 #include <vector>
 
-#include "../../../convex/monge/all.hpp"
+#include "../../../convex/all.hpp"
 
 template <class Value, class Compare>
 std::vector<int> brute_row_optima(int rows, int columns, Value value, Compare compare) {
@@ -366,7 +366,26 @@ int main() {
     test_monge_checks();
     test_structured_convolutions();
 
-    long long a, b;
-    fast_input >> a >> b;
-    fast_output << a + b << '\n';
+    int n, m;
+    fast_input >> n >> m;
+    std::vector<long long> convex(n), arbitrary(m);
+    for (auto& x : convex) fast_input >> x;
+    for (auto& x : arbitrary) fast_input >> x;
+    // Extend the convex sequence by sufficiently steep linear tails. The full
+    // rectangle remains Monge and invalid convolution pairs cannot minimize.
+    const long long slope = 4'000'000'000'000LL;
+    auto cost = [&](int from, int to) {
+        int k = to - from;
+        if (k < 0) return convex.front() - slope * k;
+        if (k >= n) return convex.back() + slope * (k - n + 1);
+        return convex[k];
+    };
+    auto result = m1une::convex::monge_transition(arbitrary, n + m - 1, cost);
+    auto monotone = m1une::convex::monotone_transition(arbitrary, n + m - 1, cost);
+    assert(result.value == monotone.value && result.argmin == monotone.argmin);
+    for (int i = 0; i < n + m - 1; ++i) {
+        if (i) fast_output << ' ';
+        fast_output << result.value[i];
+    }
+    fast_output << '\n';
 }

@@ -1,11 +1,11 @@
-#ifndef M1UNE_CONVEX_MONGE_MIN_PLUS_CONVOLUTION_HPP
-#define M1UNE_CONVEX_MONGE_MIN_PLUS_CONVOLUTION_HPP 1
+#ifndef M1UNE_CONVEX_MIN_PLUS_CONVOLUTION_HPP
+#define M1UNE_CONVEX_MIN_PLUS_CONVOLUTION_HPP 1
 
 #include <functional>
 #include <utility>
 #include <vector>
 
-#include "smawk.hpp"
+#include "monge/smawk.hpp"
 
 namespace m1une {
 namespace convex {
@@ -30,7 +30,7 @@ std::vector<T> structured_convolution(const std::vector<T>& arbitrary,
     };
 
     std::vector<int> optima =
-        smawk_detail::row_optima(result_size, first_size, select);
+        smawk_row_select(result_size, first_size, select);
     std::vector<T> result;
     result.reserve(result_size);
     for (int index = 0; index < result_size; index++) {
@@ -89,10 +89,10 @@ std::vector<T> structured_convolution_with_infinity(
             arbitrary[candidate] + structured[left + index - candidate];
         return !compare(current_value, candidate_value);
     };
-    std::vector<int> optima(middle_size, -1);
-    smawk_detail::solve(rows, columns, select, optima);
-    for (int row : rows) {
-        int first_index = optima[row];
+    auto optima = smawk_row_select(rows, columns, select);
+    for (int i = 0; i < int(rows.size()); i++) {
+        int row = rows[i];
+        int first_index = optima[i];
         result[left + row] =
             arbitrary[first_index] + structured[left + row - first_index];
     }
@@ -298,4 +298,4 @@ std::vector<T> max_plus_convolution_concave_concave(
 }  // namespace convex
 }  // namespace m1une
 
-#endif  // M1UNE_CONVEX_MONGE_MIN_PLUS_CONVOLUTION_HPP
+#endif  // M1UNE_CONVEX_MIN_PLUS_CONVOLUTION_HPP

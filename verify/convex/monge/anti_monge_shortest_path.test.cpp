@@ -9,7 +9,7 @@
 #include <random>
 #include <vector>
 
-#include "../../../convex/monge/anti_monge_shortest_path.hpp"
+#include "../../../convex/monge_shortest_path.hpp"
 #include "../../../utilities/fast_io.hpp"
 
 constexpr long long infinity = 1LL << 60;
@@ -40,6 +40,18 @@ void check(int n, int step, Cost cost) {
         infinity, step);
     assert(result.distance == distance);
     assert(result.parent == parent);
+    for (int j = 0; j < n; ++j) {
+        if (distance[j] == infinity) continue;
+        long long sum = 0;
+        int v = j;
+        while (v != 0) {
+            int p = result.parent[v];
+            assert(0 <= p && p < v && v-p >= step);
+            sum += cost(p, v);
+            v = p;
+        }
+        assert(sum == distance[j]);
+    }
 }
 
 void test_random_anti_monge() {

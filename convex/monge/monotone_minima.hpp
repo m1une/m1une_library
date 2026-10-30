@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <functional>
+#include <span>
 #include <vector>
 
 namespace m1une {
@@ -28,7 +29,7 @@ void solve(int row_left, int row_right, int column_left, int column_right,
 
 // Fixed rectangular matrix; leftmost optimal columns must be nondecreasing.
 // Returns column indices, or -1 when there are no columns. Not an online DP.
-// Anti-Monge minima require reversing one axis before using this routine.
+// O(H + W log(H+1)) time, O(H + log(H+1)) memory.
 template <class Value, class Compare = std::less<>>
 std::vector<int> monotone_row_optima(int row_count, int column_count, Value value,
                                      Compare compare = Compare()) {
@@ -48,6 +49,32 @@ std::vector<int> monotone_row_argmin(int row_count, int column_count, Value valu
 template <class Value>
 std::vector<int> monotone_row_argmax(int row_count, int column_count, Value value) {
     return monotone_row_optima(row_count, column_count, value, std::greater<>());
+}
+
+// Ordered matrix value(rows[r], columns[c]); return original column IDs in
+// row list order. Leftmost means first in columns. IDs are distinct/nonnegative.
+template <class Value, class Compare = std::less<>>
+std::vector<int> monotone_row_optima(std::span<const int> rows,
+                                     std::span<const int> columns, Value value,
+                                     Compare compare = Compare()) {
+    auto answer = monotone_row_optima(int(rows.size()), int(columns.size()),
+        [&](int row, int column) -> decltype(auto) {
+            return value(rows[row], columns[column]);
+        }, compare);
+    for (int& column : answer) if (column != -1) column = columns[column];
+    return answer;
+}
+
+template <class Value>
+std::vector<int> monotone_row_argmin(std::span<const int> rows,
+                                     std::span<const int> columns, Value value) {
+    return monotone_row_optima(rows, columns, value, std::less<>());
+}
+
+template <class Value>
+std::vector<int> monotone_row_argmax(std::span<const int> rows,
+                                     std::span<const int> columns, Value value) {
+    return monotone_row_optima(rows, columns, value, std::greater<>());
 }
 
 template <class T>

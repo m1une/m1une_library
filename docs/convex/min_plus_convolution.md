@@ -1,6 +1,6 @@
 ---
 title: Structured Min-Plus and Max-Plus Convolution
-documentation_of: ../../../convex/monge/min_plus_convolution.hpp
+documentation_of: ../../convex/min_plus_convolution.hpp
 ---
 
 ## Overview
@@ -55,7 +55,7 @@ Here B's adjacent price differences are `2,4`, which are nondecreasing.
 That makes `b` convex, so use:
 
 ```cpp
-#include "convex/monge/min_plus_convolution.hpp"
+#include "convex/min_plus_convolution.hpp"
 #include <cassert>
 #include <iostream>
 #include <vector>

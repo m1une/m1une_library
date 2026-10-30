@@ -15,3 +15,4 @@ Convex DP optimizations live under `convex/`.
 | Header | Contents |
 | --- | --- |
 | `algo/dp/knapsack.hpp` | Subset-sum and knapsack helper routines. |
+| `algo/dp/knuth_optimization.hpp` | Interval DP with monotone optimal splits, including optimal BST / adjacent merging. |

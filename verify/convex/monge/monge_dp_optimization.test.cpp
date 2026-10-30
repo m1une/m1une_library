@@ -6,16 +6,18 @@
 #include <limits>
 #include <vector>
 
-#include "../../../convex/monge/all.hpp"
+#include "../../../convex/all.hpp"
 
-void test_divide_and_conquer_dp() {
+void test_monotone_transition() {
     for (int states = 0; states <= 60; states++) {
         for (int candidates = 0; candidates <= 60; candidates++) {
             auto value = [&](int state, int candidate) {
                 long long difference = state * 3LL - candidate * 2LL;
                 return difference * difference + candidate * 5LL;
             };
-            auto result = m1une::convex::divide_and_conquer_dp(states, candidates, value);
+            std::vector<long long> previous(candidates, 0);
+            auto result = m1une::convex::monotone_transition(previous, states,
+                [&](int candidate, int state) { return value(state, candidate); });
             assert(int(result.value.size()) == states);
             assert(int(result.argmin.size()) == states);
             for (int state = 0; state < states; state++) {
@@ -34,7 +36,7 @@ void test_divide_and_conquer_dp() {
     }
 
     std::vector<long long> previous = {7, 1, 9, 3, 6};
-    auto result = m1une::convex::divide_and_conquer_transition(
+    auto result = m1une::convex::monotone_transition(
         previous, 8, [](int candidate, int state) {
             long long difference = state - candidate;
             return difference * difference;
@@ -49,50 +51,6 @@ void test_divide_and_conquer_dp() {
     }
 }
 
-void test_knuth_optimization() {
-    for (int n = 0; n <= 45; n++) {
-        for (int test = 0; test < 20; test++) {
-            std::vector<long long> weight(n);
-            for (int i = 0; i < n; i++) weight[i] = (test * 7 + i * 11 + n) % 13;
-            std::vector<long long> prefix(n + 1);
-            for (int i = 0; i < n; i++) prefix[i + 1] = prefix[i] + weight[i];
-            auto interval_cost = [&](int left, int right) {
-                return prefix[right] - prefix[left];
-            };
-
-            auto result = m1une::convex::knuth_optimization(n, interval_cost);
-            std::vector<std::vector<long long>> expected(
-                n + 1, std::vector<long long>(n + 1));
-            for (int length = 2; length <= n; length++) {
-                for (int left = 0; left + length <= n; left++) {
-                    int right = left + length;
-                    expected[left][right] = std::numeric_limits<long long>::max();
-                    for (int split = left + 1; split < right; split++) {
-                        expected[left][right] =
-                            std::min(expected[left][right],
-                                     expected[left][split] + expected[split][right] +
-                                         interval_cost(left, right));
-                    }
-                }
-            }
-            assert(result.value == expected);
-            assert(result.optimum() == expected[0][n]);
-
-            for (int length = 2; length <= n; length++) {
-                for (int left = 0; left + length <= n; left++) {
-                    int right = left + length;
-                    int split = result.split[left][right];
-                    assert(result.split[left][right - 1] <= split);
-                    assert(split <= result.split[left + 1][right]);
-                    assert(result.value[left][right] ==
-                           result.value[left][split] + result.value[split][right] +
-                               interval_cost(left, right));
-                }
-            }
-        }
-    }
-}
-
 void test_larsch_triangular_matrix() {
     for (int n = 0; n <= 100; n++) {
         int evaluations = 0;
@@ -104,7 +62,7 @@ void test_larsch_triangular_matrix() {
             evaluations++;
             return raw_value(row, column);
         };
-        m1une::convex::Larsch<long long> larsch(n, value);
+        m1une::convex::Larsch larsch(n, value);
         assert(larsch.size() == n);
         for (int row = 0; row < n; row++) {
             int expected = 0;
@@ -118,11 +76,11 @@ void test_larsch_triangular_matrix() {
         if (n != 0) assert(evaluations <= 50 * n);
     }
 
-    m1une::convex::Larsch<int> ties(80, [](int, int) { return 0; });
+    m1une::convex::Larsch ties(80, [](int, int) { return 0; });
     for (int row = 0; row < 80; row++) assert(ties.next_argmin() == 0);
 }
 
-void test_larsch_shortest_path() {
+void test_monge_shortest_path() {
     for (int n = 0; n <= 150; n++) {
         for (int test = 0; test < 12; test++) {
             std::vector<long long> position(n);
@@ -139,7 +97,7 @@ void test_larsch_shortest_path() {
                 return raw_cost(from, to);
             };
 
-            auto result = m1une::convex::larsch_shortest_path(n, cost);
+            auto result = m1une::convex::monge_shortest_path(n, cost, (1LL << 60));
             int larsch_evaluations = evaluations;
             std::vector<long long> expected(n);
             std::vector<int> parent(n, -1);
@@ -165,10 +123,9 @@ int main() {
     m1une::utilities::FastInput fast_input;
     m1une::utilities::FastOutput fast_output;
 
-    test_divide_and_conquer_dp();
-    test_knuth_optimization();
+    test_monotone_transition();
     test_larsch_triangular_matrix();
-    test_larsch_shortest_path();
+    test_monge_shortest_path();
 
     long long a, b;
     fast_input >> a >> b;

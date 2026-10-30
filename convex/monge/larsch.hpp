@@ -2,144 +2,92 @@
 #define M1UNE_CONVEX_MONGE_LARSCH_HPP 1
 
 #include <cassert>
-#include <functional>
-#include <memory>
-#include <type_traits>
 #include <utility>
 #include <vector>
 
 namespace m1une {
 namespace convex {
 
-template <class T>
+// Online minima of a lower-triangular totally monotone matrix (column <= row).
+// Leftmost ties. Before answering row r, only columns <= r are accessed, even
+// when evaluating future rows. Finalize column r+1 after receiving answer r.
+// O(N) total time/evaluations/memory; an individual next_argmin can take O(N).
+// Value is stored directly, with no type-erased callable. Use CTAD: Larsch q(n,f).
+template <class Value>
 class Larsch {
-    struct ReduceColumn;
-
-    struct ReduceRow {
+    struct Level {
         int size;
-        std::function<T(int, int)> value;
-        int current_row = 0;
+        int row = 0;
+        int column_row = 0;
         int boundary = 0;
-        std::unique_ptr<ReduceColumn> recursive;
-
-        explicit ReduceRow(int size_) : size(size_) {
-            if (size / 2 != 0) recursive = std::make_unique<ReduceColumn>(size / 2);
-        }
-
-        void set_value(std::function<T(int, int)> value_) {
-            value = std::move(value_);
-            if (recursive) {
-                recursive->set_value(
-                    [&](int row, int column) { return value(row * 2 + 1, column); });
-            }
-        }
-
-        int next_argmin() {
-            int row = current_row++;
-            if (row % 2 == 0) {
-                int previous = boundary;
-                int next = row + 1 == size ? size - 1 : recursive->next_argmin();
-                boundary = next;
-                int best = previous;
-                for (int column = previous + 1; column <= next; column++) {
-                    if (value(row, column) < value(row, best)) best = column;
-                }
-                return best;
-            }
-            return value(row, boundary) <= value(row, row) ? boundary : row;
-        }
-    };
-
-    struct ReduceColumn {
-        int size;
-        std::function<T(int, int)> value;
-        int current_row = 0;
         std::vector<int> columns;
-        ReduceRow recursive;
-
-        explicit ReduceColumn(int size_) : size(size_), recursive(size_) {}
-
-        void set_value(std::function<T(int, int)> value_) {
-            value = std::move(value_);
-            recursive.set_value(
-                [&](int row, int column) { return value(row, columns[column]); });
-        }
-
-        int next_argmin() {
-            int row = current_row++;
-            int first = row == 0 ? 0 : row * 2 - 1;
-            int last = row * 2;
-            for (int column = first; column <= last; column++) {
-                while (int(columns.size()) != row &&
-                       value(int(columns.size()) - 1, columns.back()) >
-                           value(int(columns.size()) - 1, column)) {
-                    columns.pop_back();
-                }
-                if (int(columns.size()) != size) columns.push_back(column);
-            }
-            return columns[recursive.next_argmin()];
-        }
+        explicit Level(int n) : size(n) {}
     };
 
     int _size;
-    int _processed = 0;
-    std::unique_ptr<ReduceRow> _base;
+    Value _value;
+    std::vector<Level> _levels;
+
+    auto entry(int depth, int row, int column) {
+        for (int d = depth; d > 0; --d) {
+            row = row * 2 + 1;
+            column = _levels[d].columns[column];
+        }
+        return _value(row, column);
+    }
+
+    int next_column(int depth) {
+        auto& level = _levels[depth];
+        int row = level.column_row++;
+        int first = row == 0 ? 0 : row * 2 - 1;
+        for (int column = first; column <= row * 2; ++column) {
+            while (int(level.columns.size()) != row &&
+                   entry(depth - 1, int(level.columns.size()) * 2 - 1,
+                         level.columns.back()) >
+                   entry(depth - 1, int(level.columns.size()) * 2 - 1, column)) {
+                level.columns.pop_back();
+            }
+            if (int(level.columns.size()) != level.size) {
+                level.columns.push_back(column);
+            }
+        }
+        return level.columns[next_row(depth)];
+    }
+
+    int next_row(int depth) {
+        auto& level = _levels[depth];
+        int row = level.row++;
+        if (row % 2 != 0) {
+            return entry(depth, row, level.boundary) <= entry(depth, row, row)
+                       ? level.boundary : row;
+        }
+        int previous = level.boundary;
+        int next = row + 1 == level.size ? level.size - 1
+                                        : next_column(depth + 1);
+        level.boundary = next;
+        int best = previous;
+        for (int column = previous + 1; column <= next; ++column) {
+            if (entry(depth, row, column) < entry(depth, row, best)) best = column;
+        }
+        return best;
+    }
 
    public:
-    template <class Value>
-    explicit Larsch(int size, Value value)
-        : _size(size), _base(std::make_unique<ReduceRow>(size)) {
+    explicit Larsch(int size, Value value) : _size(size), _value(std::move(value)) {
         assert(size >= 0);
-        _base->set_value(std::function<T(int, int)>(std::move(value)));
+        for (int n = size; n > 0; n /= 2) {
+            _levels.emplace_back(n);
+            if (_levels.size() > 1) _levels.back().columns.reserve(n);
+        }
     }
-
-    int size() const {
-        return _size;
-    }
-
-    int processed_rows() const {
-        return _processed;
-    }
-
-    bool finished() const {
-        return _processed == _size;
-    }
-
+    int size() const { return _size; }
+    int processed_rows() const { return _size == 0 ? 0 : _levels[0].row; }
+    bool finished() const { return processed_rows() == _size; }
     int next_argmin() {
         assert(!finished());
-        _processed++;
-        return _base->next_argmin();
+        return next_row(0);
     }
 };
-
-template <class T>
-struct LarschShortestPathResult {
-    std::vector<T> distance;
-    std::vector<int> parent;
-};
-
-template <class Cost>
-auto larsch_shortest_path(int vertex_count, Cost cost)
-    -> LarschShortestPathResult<
-        std::decay_t<std::invoke_result_t<Cost, int, int>>> {
-    using T = std::decay_t<std::invoke_result_t<Cost, int, int>>;
-    assert(vertex_count >= 0);
-
-    LarschShortestPathResult<T> result;
-    result.distance.assign(vertex_count, T());
-    result.parent.assign(vertex_count, -1);
-    if (vertex_count <= 1) return result;
-
-    Larsch<T> optimizer(vertex_count - 1, [&](int row, int column) {
-        return result.distance[column] + cost(column, row + 1);
-    });
-    for (int vertex = 1; vertex < vertex_count; vertex++) {
-        int parent = optimizer.next_argmin();
-        result.parent[vertex] = parent;
-        result.distance[vertex] = result.distance[parent] + cost(parent, vertex);
-    }
-    return result;
-}
 
 }  // namespace convex
 }  // namespace m1une
