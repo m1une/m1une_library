@@ -61,8 +61,8 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/string/minimum_rotation.test.cpp
-  - verify/string/string_algorithms.test.cpp
   - verify/string/lyndon_factorization.test.cpp
+  - verify/string/string_algorithms.test.cpp
 documentation_of: string/minimum_rotation.hpp
 layout: document
 title: Minimum Rotation

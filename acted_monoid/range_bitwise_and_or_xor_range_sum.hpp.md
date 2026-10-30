@@ -116,9 +116,9 @@ data:
   timestamp: '2026-10-24 12:29:25+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
+  - verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
   - verify/monoid/commutative_flags.test.cpp
   - verify/ds/segtree/rollback_lazy_segtree.test.cpp
-  - verify/acted_monoid/range_bitwise_and_or_xor_range_sum.test.cpp
 documentation_of: acted_monoid/range_bitwise_and_or_xor_range_sum.hpp
 layout: document
 title: Range Bitwise AND/OR/XOR Range Sum

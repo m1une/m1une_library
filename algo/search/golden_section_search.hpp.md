@@ -193,8 +193,8 @@ data:
   isVerificationFile: false
   path: algo/search/golden_section_search.hpp
   requiredBy:
-  - algo/search/all.hpp
   - algo/all.hpp
+  - algo/search/all.hpp
   timestamp: '2026-07-09 00:39:09+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:

@@ -93,8 +93,8 @@ data:
   timestamp: '2026-06-21 02:43:08+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/string/manacher.test.cpp
   - verify/string/string_algorithms.test.cpp
+  - verify/string/manacher.test.cpp
 documentation_of: string/manacher.hpp
 layout: document
 title: Manacher Algorithm

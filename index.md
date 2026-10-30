@@ -97,6 +97,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: algo/dp/knapsack.hpp
       title: Knapsack Helpers
+    - icon: ':heavy_check_mark:'
+      path: algo/dp/knuth_optimization.hpp
+      title: Knuth Optimization
   - name: algo/enumeration
     pages:
     - icon: ':warning:'
@@ -210,7 +213,7 @@ data:
     - icon: ':heavy_check_mark:'
       path: convex/alien_trick.hpp
       title: Alien Trick
-    - icon: ':warning:'
+    - icon: ':heavy_check_mark:'
       path: convex/all.hpp
       title: Convex All
     - icon: ':heavy_check_mark:'
@@ -220,34 +223,31 @@ data:
       path: convex/li_chao_tree.hpp
       title: Li Chao Tree
     - icon: ':heavy_check_mark:'
+      path: convex/min_plus_convolution.hpp
+      title: Structured Min-Plus and Max-Plus Convolution
+    - icon: ':heavy_check_mark:'
+      path: convex/monge_shortest_path.hpp
+      title: Monge and Anti-Monge Forward DAG Shortest Paths
+    - icon: ':heavy_check_mark:'
+      path: convex/monge_transition.hpp
+      title: Finalized-Layer Matrix Transitions
+    - icon: ':heavy_check_mark:'
       path: convex/slope_trick.hpp
       title: Slope Trick
   - name: convex/monge
     pages:
     - icon: ':heavy_check_mark:'
       path: convex/monge/all.hpp
-      title: Monge Optimization Guide
-    - icon: ':heavy_check_mark:'
-      path: convex/monge/anti_monge_shortest_path.hpp
-      title: Anti-Monge DAG Shortest Paths
+      title: Monge Matrix Primitives and Algorithm Guide
     - icon: ':heavy_check_mark:'
       path: convex/monge/check.hpp
-      title: Monge Checks
-    - icon: ':heavy_check_mark:'
-      path: convex/monge/divide_and_conquer_optimization.hpp
-      title: Divide-and-Conquer DP Optimization
-    - icon: ':heavy_check_mark:'
-      path: convex/monge/knuth_optimization.hpp
-      title: Knuth Optimization
+      title: Monge and Anti-Monge Checks
     - icon: ':heavy_check_mark:'
       path: convex/monge/larsch.hpp
-      title: LARSCH
-    - icon: ':heavy_check_mark:'
-      path: convex/monge/min_plus_convolution.hpp
-      title: Structured Min-Plus and Max-Plus Convolution
+      title: LARSCH Online Matrix Minima
     - icon: ':heavy_check_mark:'
       path: convex/monge/monotone_minima.hpp
-      title: Monotone Minima
+      title: Monotone Matrix Minima
     - icon: ':heavy_check_mark:'
       path: convex/monge/smawk.hpp
       title: SMAWK
@@ -1474,6 +1474,9 @@ data:
     - icon: ':heavy_check_mark:'
       path: verify/algo/dp/knapsack.test.cpp
       title: verify/algo/dp/knapsack.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/algo/dp/knuth_optimization.test.cpp
+      title: verify/algo/dp/knuth_optimization.test.cpp
   - name: verify/algo/enumeration
     pages:
     - icon: ':heavy_check_mark:'
@@ -1556,6 +1559,18 @@ data:
       path: verify/convex/li_chao_tree_segment.test.cpp
       title: verify/convex/li_chao_tree_segment.test.cpp
     - icon: ':heavy_check_mark:'
+      path: verify/convex/max_plus_convolution_concave_arbitrary.test.cpp
+      title: verify/convex/max_plus_convolution_concave_arbitrary.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/convex/max_plus_convolution_concave_concave.test.cpp
+      title: verify/convex/max_plus_convolution_concave_concave.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/convex/min_plus_convolution_convex_arbitrary.test.cpp
+      title: verify/convex/min_plus_convolution_convex_arbitrary.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/convex/min_plus_convolution_convex_convex.test.cpp
+      title: verify/convex/min_plus_convolution_convex_convex.test.cpp
+    - icon: ':heavy_check_mark:'
       path: verify/convex/slope_trick.test.cpp
       title: verify/convex/slope_trick.test.cpp
   - name: verify/convex/monge
@@ -1564,23 +1579,17 @@ data:
       path: verify/convex/monge/anti_monge_shortest_path.test.cpp
       title: verify/convex/monge/anti_monge_shortest_path.test.cpp
     - icon: ':heavy_check_mark:'
-      path: verify/convex/monge/max_plus_convolution_concave_arbitrary.test.cpp
-      title: verify/convex/monge/max_plus_convolution_concave_arbitrary.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/convex/monge/max_plus_convolution_concave_concave.test.cpp
-      title: verify/convex/monge/max_plus_convolution_concave_concave.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/convex/monge/min_plus_convolution_convex_arbitrary.test.cpp
-      title: verify/convex/monge/min_plus_convolution_convex_arbitrary.test.cpp
-    - icon: ':heavy_check_mark:'
-      path: verify/convex/monge/min_plus_convolution_convex_convex.test.cpp
-      title: verify/convex/monge/min_plus_convolution_convex_convex.test.cpp
-    - icon: ':heavy_check_mark:'
       path: verify/convex/monge/monge_algorithms.test.cpp
       title: verify/convex/monge/monge_algorithms.test.cpp
     - icon: ':heavy_check_mark:'
       path: verify/convex/monge/monge_dp_optimization.test.cpp
       title: verify/convex/monge/monge_dp_optimization.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/convex/monge/monge_shortest_path.test.cpp
+      title: verify/convex/monge/monge_shortest_path.test.cpp
+    - icon: ':heavy_check_mark:'
+      path: verify/convex/monge/ordered_matrix.test.cpp
+      title: verify/convex/monge/ordered_matrix.test.cpp
   - name: verify/ds/binary_trie
     pages:
     - icon: ':heavy_check_mark:'

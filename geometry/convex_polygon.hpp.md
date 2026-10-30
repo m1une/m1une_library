@@ -3170,16 +3170,16 @@ data:
   timestamp: '2026-10-24 23:29:06+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/geometry/is_convex_polygon.test.cpp
-  - verify/geometry/rational.test.cpp
   - verify/geometry/steiner_convex_decomposition.test.cpp
-  - verify/geometry/geometry_algorithms.test.cpp
-  - verify/geometry/convex_decomposition.test.cpp
-  - verify/geometry/polygon_operations.test.cpp
   - verify/geometry/point_data.test.cpp
+  - verify/geometry/polygon_operations.test.cpp
   - verify/geometry/convex_diameter.test.cpp
-  - verify/geometry/centroid.test.cpp
+  - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/convex_polygon.test.cpp
+  - verify/geometry/rational.test.cpp
+  - verify/geometry/is_convex_polygon.test.cpp
+  - verify/geometry/centroid.test.cpp
+  - verify/geometry/convex_decomposition.test.cpp
 documentation_of: geometry/convex_polygon.hpp
 layout: document
 title: Convex Polygons

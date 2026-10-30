@@ -1041,8 +1041,8 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/fps/fps_algorithms.test.cpp
-  - verify/math/fps/compositional_inverse.test.cpp
   - verify/math/fps/composition.test.cpp
+  - verify/math/fps/compositional_inverse.test.cpp
   - verify/math/math_algorithms.test.cpp
 documentation_of: math/fps/composition.hpp
 layout: document

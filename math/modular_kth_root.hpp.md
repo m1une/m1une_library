@@ -301,8 +301,8 @@ data:
   timestamp: '2026-07-16 21:30:39+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/math_algorithms.test.cpp
   - verify/math/modular_kth_root.test.cpp
+  - verify/math/math_algorithms.test.cpp
 documentation_of: math/modular_kth_root.hpp
 layout: document
 title: Modular Kth Root

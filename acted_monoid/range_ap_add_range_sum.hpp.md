@@ -87,12 +87,12 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/monoid/commutative_flags.test.cpp
+  - verify/ds/dynamic_array/dynamic_lazy_monoid_array_range_ap.test.cpp
+  - verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array_range_ap.test.cpp
   - verify/ds/segtree/rollback_lazy_segtree.test.cpp
   - verify/ds/segtree/dynamic_lazy_segtree.test.cpp
   - verify/ds/segtree/persistent_dynamic_lazy_segtree.test.cpp
   - verify/ds/segtree/persistent_segtree_beats.test.cpp
-  - verify/ds/dynamic_array/persistent_dynamic_lazy_monoid_array_range_ap.test.cpp
-  - verify/ds/dynamic_array/dynamic_lazy_monoid_array_range_ap.test.cpp
 documentation_of: acted_monoid/range_ap_add_range_sum.hpp
 layout: document
 title: Range AP Add Range Sum

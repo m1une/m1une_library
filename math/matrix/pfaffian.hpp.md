@@ -170,9 +170,9 @@ data:
   timestamp: '2026-07-14 02:42:28+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/math_algorithms.test.cpp
-  - verify/math/matrix/pfaffian.test.cpp
   - verify/math/matrix/matrix.test.cpp
+  - verify/math/matrix/pfaffian.test.cpp
+  - verify/math/math_algorithms.test.cpp
 documentation_of: math/matrix/pfaffian.hpp
 layout: document
 title: Pfaffian

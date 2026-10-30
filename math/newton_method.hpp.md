@@ -934,10 +934,10 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/fps/fps_algorithms.test.cpp
-  - verify/math/newton_method.test.cpp
-  - verify/math/newton_method.test.cpp
   - verify/math/math_algorithms.test.cpp
   - verify/math/math_algorithms.test.cpp
+  - verify/math/newton_method.test.cpp
+  - verify/math/newton_method.test.cpp
 documentation_of: math/newton_method.hpp
 layout: document
 title: Newton Method

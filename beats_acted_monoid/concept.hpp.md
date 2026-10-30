@@ -90,14 +90,14 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/monoid/commutative_flags.test.cpp
+  - verify/ds/persistent_cow.test.cpp
   - verify/ds/segtree/segtree_beats.test.cpp
   - verify/ds/segtree/persistent_segtree_beats.test.cpp
   - verify/ds/rollback_counterparts.test.cpp
-  - verify/ds/persistent_cow.test.cpp
-  - verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
-  - verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
   - verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
   - verify/beats_acted_monoid/range_chmin_chmax_add_range_sum.test.cpp
+  - verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
+  - verify/beats_acted_monoid/range_bitwise_and_or_range_sum.test.cpp
 documentation_of: beats_acted_monoid/concept.hpp
 layout: document
 title: Beats Acted Monoid Concept

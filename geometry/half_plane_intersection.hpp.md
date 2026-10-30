@@ -974,24 +974,24 @@ data:
   isVerificationFile: false
   path: geometry/half_plane_intersection.hpp
   requiredBy:
-  - geometry/all.hpp
   - geometry/convex_polygon.hpp
+  - geometry/all.hpp
   timestamp: '2026-10-24 23:29:06+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/geometry/is_convex_polygon.test.cpp
-  - verify/geometry/rational.test.cpp
   - verify/geometry/steiner_convex_decomposition.test.cpp
-  - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/half_plane_intersection_random.test.cpp
-  - verify/geometry/convex_decomposition.test.cpp
-  - verify/geometry/polygon_operations.test.cpp
   - verify/geometry/point_data.test.cpp
-  - verify/geometry/half_plane_intersection.test.cpp
-  - verify/geometry/convex_diameter.test.cpp
-  - verify/geometry/centroid.test.cpp
   - verify/geometry/voronoi_diagram.test.cpp
+  - verify/geometry/polygon_operations.test.cpp
+  - verify/geometry/convex_diameter.test.cpp
+  - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/convex_polygon.test.cpp
+  - verify/geometry/rational.test.cpp
+  - verify/geometry/half_plane_intersection.test.cpp
+  - verify/geometry/is_convex_polygon.test.cpp
+  - verify/geometry/centroid.test.cpp
+  - verify/geometry/convex_decomposition.test.cpp
 documentation_of: geometry/half_plane_intersection.hpp
 layout: document
 title: Half-Plane Intersection

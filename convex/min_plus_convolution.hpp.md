@@ -5,45 +5,45 @@ data:
     path: convex/monge/smawk.hpp
     title: SMAWK
   _extendedRequiredBy:
-  - icon: ':warning:'
+  - icon: ':heavy_check_mark:'
     path: convex/all.hpp
     title: Convex All
-  - icon: ':heavy_check_mark:'
-    path: convex/monge/all.hpp
-    title: Monge Optimization Guide
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
-    path: verify/convex/monge/max_plus_convolution_concave_arbitrary.test.cpp
-    title: verify/convex/monge/max_plus_convolution_concave_arbitrary.test.cpp
+    path: verify/convex/max_plus_convolution_concave_arbitrary.test.cpp
+    title: verify/convex/max_plus_convolution_concave_arbitrary.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/convex/monge/max_plus_convolution_concave_concave.test.cpp
-    title: verify/convex/monge/max_plus_convolution_concave_concave.test.cpp
+    path: verify/convex/max_plus_convolution_concave_concave.test.cpp
+    title: verify/convex/max_plus_convolution_concave_concave.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/convex/monge/min_plus_convolution_convex_arbitrary.test.cpp
-    title: verify/convex/monge/min_plus_convolution_convex_arbitrary.test.cpp
+    path: verify/convex/min_plus_convolution_convex_arbitrary.test.cpp
+    title: verify/convex/min_plus_convolution_convex_arbitrary.test.cpp
   - icon: ':heavy_check_mark:'
-    path: verify/convex/monge/min_plus_convolution_convex_convex.test.cpp
-    title: verify/convex/monge/min_plus_convolution_convex_convex.test.cpp
+    path: verify/convex/min_plus_convolution_convex_convex.test.cpp
+    title: verify/convex/min_plus_convolution_convex_convex.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/convex/monge/monge_algorithms.test.cpp
     title: verify/convex/monge/monge_algorithms.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/convex/monge/monge_dp_optimization.test.cpp
     title: verify/convex/monge/monge_dp_optimization.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/convex/monge/ordered_matrix.test.cpp
+    title: verify/convex/monge/ordered_matrix.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"convex/monge/min_plus_convolution.hpp\"\n\n\n\n#include\
-    \ <functional>\n#include <utility>\n#include <vector>\n\n#line 1 \"convex/monge/smawk.hpp\"\
-    \n\n\n\n#include <cassert>\n#line 6 \"convex/monge/smawk.hpp\"\n#include <numeric>\n\
-    #line 8 \"convex/monge/smawk.hpp\"\n\nnamespace m1une {\nnamespace convex {\n\n\
-    namespace smawk_detail {\n\ntemplate <class Select>\nvoid solve(const std::vector<int>&\
-    \ rows, const std::vector<int>& columns,\n           const Select& select, std::vector<int>&\
-    \ answer) {\n    if (rows.empty()) return;\n\n    std::vector<int> reduced;\n\
-    \    reduced.reserve(columns.size());\n    for (int column : columns) {\n    \
-    \    while (!reduced.empty()) {\n            int row = rows[int(reduced.size())\
+  bundledCode: "#line 1 \"convex/min_plus_convolution.hpp\"\n\n\n\n#include <functional>\n\
+    #include <utility>\n#include <vector>\n\n#line 1 \"convex/monge/smawk.hpp\"\n\n\
+    \n\n#include <cassert>\n#line 6 \"convex/monge/smawk.hpp\"\n#include <numeric>\n\
+    #include <span>\n#line 9 \"convex/monge/smawk.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ convex {\n\nnamespace smawk_detail {\n\ntemplate <class Select>\nvoid solve(const\
+    \ std::vector<int>& rows, const std::vector<int>& columns,\n           const Select&\
+    \ select, std::vector<int>& answer) {\n    if (rows.empty()) return;\n\n    std::vector<int>\
+    \ reduced;\n    reduced.reserve(columns.size());\n    for (int column : columns)\
+    \ {\n        while (!reduced.empty()) {\n            int row = rows[int(reduced.size())\
     \ - 1];\n            if (!select(row, reduced.back(), column)) break;\n      \
     \      reduced.pop_back();\n        }\n        if (reduced.size() < rows.size())\
     \ reduced.push_back(column);\n    }\n\n    std::vector<int> odd_rows;\n    odd_rows.reserve(rows.size()\
@@ -61,22 +61,49 @@ data:
     \ answer;\n\n    std::vector<int> rows(row_count), columns(column_count);\n  \
     \  std::iota(rows.begin(), rows.end(), 0);\n    std::iota(columns.begin(), columns.end(),\
     \ 0);\n    solve(rows, columns, select, answer);\n    return answer;\n}\n\n} \
-    \ // namespace smawk_detail\n\n// Search a fixed H x W rectangle, returning column\
-    \ indices (leftmost on ties).\n// Requires total monotonicity under Compare; Monge\
-    \ suffices for minima.\n// For anti-Monge minima, reverse columns in value and\
-    \ map indices back.\n// O(H + W) evaluations; callbacks may be queried out of\
-    \ row order.\ntemplate <class Value, class Compare = std::less<>>\nstd::vector<int>\
-    \ smawk_row_optima(int row_count, int column_count, Value value,\n           \
-    \                       Compare compare = Compare()) {\n    assert(row_count >=\
-    \ 0);\n    assert(column_count >= 0);\n    return smawk_detail::row_optima(\n\
-    \        row_count, column_count,\n        [&](int row, int current, int candidate)\
-    \ {\n            return compare(value(row, candidate), value(row, current));\n\
-    \        });\n}\n\ntemplate <class Value>\nstd::vector<int> smawk_row_argmin(int\
-    \ row_count, int column_count, Value value) {\n    return smawk_row_optima(row_count,\
-    \ column_count, value, std::less<>());\n}\n\ntemplate <class Value>\nstd::vector<int>\
-    \ smawk_row_argmax(int row_count, int column_count, Value value) {\n    return\
-    \ smawk_row_optima(row_count, column_count, value, std::greater<>());\n}\n\ntemplate\
-    \ <class T>\nstd::vector<int> smawk_row_argmin(const std::vector<std::vector<T>>&\
+    \ // namespace smawk_detail\n\n// Comparison-oracle SMAWK. prefer(row, current,\
+    \ candidate) says whether to\n// replace current. The induced ordered matrix must\
+    \ be totally monotone with\n// this tie rule. This also permits symbolic invalid\
+    \ entries without sentinels.\n// O(H + W) oracle calls and memory. Entries must\
+    \ be fixed (offline search).\ntemplate <class Prefer>\nstd::vector<int> smawk_row_select(int\
+    \ row_count, int column_count, Prefer prefer) {\n    assert(row_count >= 0);\n\
+    \    assert(column_count >= 0);\n    return smawk_detail::row_optima(row_count,\
+    \ column_count, prefer);\n}\n\n// Search value(rows[r], columns[c]); answers are\
+    \ original column IDs, in row\n// list order. Lists contain distinct nonnegative\
+    \ IDs; prefer defines the tie\n// rule with respect to the supplied order.\ntemplate\
+    \ <class Prefer>\nstd::vector<int> smawk_row_select(std::span<const int> rows,\n\
+    \                                  std::span<const int> columns, Prefer prefer)\
+    \ {\n    auto answer = smawk_row_select(int(rows.size()), int(columns.size()),\n\
+    \        [&](int row, int current, int candidate) {\n            return prefer(rows[row],\
+    \ columns[current], columns[candidate]);\n        });\n    for (int& column :\
+    \ answer) if (column != -1) column = columns[column];\n    return answer;\n}\n\
+    \n// Fixed rectangle, leftmost on ties. Requires total monotonicity for leftmost\n\
+    // optima under Compare (Monge suffices for minima). O(H + W) time and memory.\n\
+    // Callback evaluations may be out of row order; this is not an online DP.\ntemplate\
+    \ <class Value, class Compare = std::less<>>\nstd::vector<int> smawk_row_optima(int\
+    \ row_count, int column_count, Value value,\n                                \
+    \  Compare compare = Compare()) {\n    assert(row_count >= 0);\n    assert(column_count\
+    \ >= 0);\n    return smawk_row_select(\n        row_count, column_count,\n   \
+    \     [&](int row, int current, int candidate) {\n            return compare(value(row,\
+    \ candidate), value(row, current));\n        });\n}\n\ntemplate <class Value>\n\
+    std::vector<int> smawk_row_argmin(int row_count, int column_count, Value value)\
+    \ {\n    return smawk_row_optima(row_count, column_count, value, std::less<>());\n\
+    }\n\ntemplate <class Value>\nstd::vector<int> smawk_row_argmax(int row_count,\
+    \ int column_count, Value value) {\n    return smawk_row_optima(row_count, column_count,\
+    \ value, std::greater<>());\n}\n\n// Ordered variants use supplied positions for\
+    \ total monotonicity and ties.\ntemplate <class Value, class Compare = std::less<>>\n\
+    std::vector<int> smawk_row_optima(std::span<const int> rows,\n               \
+    \                   std::span<const int> columns, Value value,\n             \
+    \                     Compare compare = Compare()) {\n    return smawk_row_select(rows,\
+    \ columns,\n        [&](int row, int current, int candidate) {\n            return\
+    \ compare(value(row, candidate), value(row, current));\n        });\n}\n\ntemplate\
+    \ <class Value>\nstd::vector<int> smawk_row_argmin(std::span<const int> rows,\n\
+    \                                  std::span<const int> columns, Value value)\
+    \ {\n    return smawk_row_optima(rows, columns, value, std::less<>());\n}\n\n\
+    template <class Value>\nstd::vector<int> smawk_row_argmax(std::span<const int>\
+    \ rows,\n                                  std::span<const int> columns, Value\
+    \ value) {\n    return smawk_row_optima(rows, columns, value, std::greater<>());\n\
+    }\n\ntemplate <class T>\nstd::vector<int> smawk_row_argmin(const std::vector<std::vector<T>>&\
     \ matrix) {\n    int row_count = int(matrix.size());\n    int column_count = row_count\
     \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
     \ == column_count);\n    return smawk_row_argmin(\n        row_count, column_count,\n\
@@ -86,7 +113,7 @@ data:
     \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
     \ == column_count);\n    return smawk_row_argmax(\n        row_count, column_count,\n\
     \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
-    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n#line 9 \"convex/monge/min_plus_convolution.hpp\"\
+    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n#line 9 \"convex/min_plus_convolution.hpp\"\
     \n\nnamespace m1une {\nnamespace convex {\n\nnamespace convolution_detail {\n\n\
     template <class T, class Compare, class Add>\nstd::vector<T> structured_convolution(const\
     \ std::vector<T>& arbitrary,\n                                      const std::vector<T>&\
@@ -99,18 +126,17 @@ data:
     \ current_value = add(arbitrary[current], structured[index - current]);\n    \
     \    T candidate_value = add(arbitrary[candidate], structured[index - candidate]);\n\
     \        return !compare(current_value, candidate_value);\n    };\n\n    std::vector<int>\
-    \ optima =\n        smawk_detail::row_optima(result_size, first_size, select);\n\
-    \    std::vector<T> result;\n    result.reserve(result_size);\n    for (int index\
-    \ = 0; index < result_size; index++) {\n        int first_index = optima[index];\n\
-    \        result.emplace_back(add(arbitrary[first_index],\n                   \
-    \             structured[index - first_index]));\n    }\n    return result;\n\
-    }\n\ntemplate <class T>\nstd::pair<int, int> finite_interval(const std::vector<T>&\
-    \ sequence,\n                                    const T& infinity) {\n    int\
-    \ left = 0;\n    while (left < int(sequence.size()) && sequence[left] == infinity)\
-    \ left++;\n    int right = int(sequence.size());\n    while (right > left && sequence[right\
-    \ - 1] == infinity) right--;\n    return {left, right};\n}\n\ntemplate <class\
-    \ T, class Compare>\nstd::vector<T> structured_convolution_with_infinity(\n  \
-    \  const std::vector<T>& arbitrary, const std::vector<T>& structured,\n    const\
+    \ optima =\n        smawk_row_select(result_size, first_size, select);\n    std::vector<T>\
+    \ result;\n    result.reserve(result_size);\n    for (int index = 0; index < result_size;\
+    \ index++) {\n        int first_index = optima[index];\n        result.emplace_back(add(arbitrary[first_index],\n\
+    \                                structured[index - first_index]));\n    }\n \
+    \   return result;\n}\n\ntemplate <class T>\nstd::pair<int, int> finite_interval(const\
+    \ std::vector<T>& sequence,\n                                    const T& infinity)\
+    \ {\n    int left = 0;\n    while (left < int(sequence.size()) && sequence[left]\
+    \ == infinity) left++;\n    int right = int(sequence.size());\n    while (right\
+    \ > left && sequence[right - 1] == infinity) right--;\n    return {left, right};\n\
+    }\n\ntemplate <class T, class Compare>\nstd::vector<T> structured_convolution_with_infinity(\n\
+    \    const std::vector<T>& arbitrary, const std::vector<T>& structured,\n    const\
     \ T& infinity, Compare compare) {\n    if (arbitrary.empty() || structured.empty())\
     \ return {};\n\n    auto [left, right] = finite_interval(structured, infinity);\n\
     \    int result_size = int(arbitrary.size() + structured.size() - 1);\n    std::vector<T>\
@@ -129,9 +155,9 @@ data:
     \ current_value =\n            arbitrary[current] + structured[left + index -\
     \ current];\n        T candidate_value =\n            arbitrary[candidate] + structured[left\
     \ + index - candidate];\n        return !compare(current_value, candidate_value);\n\
-    \    };\n    std::vector<int> optima(middle_size, -1);\n    smawk_detail::solve(rows,\
-    \ columns, select, optima);\n    for (int row : rows) {\n        int first_index\
-    \ = optima[row];\n        result[left + row] =\n            arbitrary[first_index]\
+    \    };\n    auto optima = smawk_row_select(rows, columns, select);\n    for (int\
+    \ i = 0; i < int(rows.size()); i++) {\n        int row = rows[i];\n        int\
+    \ first_index = optima[i];\n        result[left + row] =\n            arbitrary[first_index]\
     \ + structured[left + row - first_index];\n    }\n    return result;\n}\n\ntemplate\
     \ <class T, class Compare>\nstd::vector<T> linear_structured_convolution(const\
     \ std::vector<T>& first,\n                                             const std::vector<T>&\
@@ -232,9 +258,9 @@ data:
     \ negative_infinity) {\n    return convolution_detail::linear_structured_convolution_with_infinity(\n\
     \        first, second, negative_infinity, std::greater<>());\n}\n\n}  // namespace\
     \ convex\n}  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_CONVEX_MONGE_MIN_PLUS_CONVOLUTION_HPP\n#define M1UNE_CONVEX_MONGE_MIN_PLUS_CONVOLUTION_HPP\
+  code: "#ifndef M1UNE_CONVEX_MIN_PLUS_CONVOLUTION_HPP\n#define M1UNE_CONVEX_MIN_PLUS_CONVOLUTION_HPP\
     \ 1\n\n#include <functional>\n#include <utility>\n#include <vector>\n\n#include\
-    \ \"smawk.hpp\"\n\nnamespace m1une {\nnamespace convex {\n\nnamespace convolution_detail\
+    \ \"monge/smawk.hpp\"\n\nnamespace m1une {\nnamespace convex {\n\nnamespace convolution_detail\
     \ {\n\ntemplate <class T, class Compare, class Add>\nstd::vector<T> structured_convolution(const\
     \ std::vector<T>& arbitrary,\n                                      const std::vector<T>&\
     \ structured,\n                                      Compare compare, Add add)\
@@ -246,18 +272,17 @@ data:
     \ current_value = add(arbitrary[current], structured[index - current]);\n    \
     \    T candidate_value = add(arbitrary[candidate], structured[index - candidate]);\n\
     \        return !compare(current_value, candidate_value);\n    };\n\n    std::vector<int>\
-    \ optima =\n        smawk_detail::row_optima(result_size, first_size, select);\n\
-    \    std::vector<T> result;\n    result.reserve(result_size);\n    for (int index\
-    \ = 0; index < result_size; index++) {\n        int first_index = optima[index];\n\
-    \        result.emplace_back(add(arbitrary[first_index],\n                   \
-    \             structured[index - first_index]));\n    }\n    return result;\n\
-    }\n\ntemplate <class T>\nstd::pair<int, int> finite_interval(const std::vector<T>&\
-    \ sequence,\n                                    const T& infinity) {\n    int\
-    \ left = 0;\n    while (left < int(sequence.size()) && sequence[left] == infinity)\
-    \ left++;\n    int right = int(sequence.size());\n    while (right > left && sequence[right\
-    \ - 1] == infinity) right--;\n    return {left, right};\n}\n\ntemplate <class\
-    \ T, class Compare>\nstd::vector<T> structured_convolution_with_infinity(\n  \
-    \  const std::vector<T>& arbitrary, const std::vector<T>& structured,\n    const\
+    \ optima =\n        smawk_row_select(result_size, first_size, select);\n    std::vector<T>\
+    \ result;\n    result.reserve(result_size);\n    for (int index = 0; index < result_size;\
+    \ index++) {\n        int first_index = optima[index];\n        result.emplace_back(add(arbitrary[first_index],\n\
+    \                                structured[index - first_index]));\n    }\n \
+    \   return result;\n}\n\ntemplate <class T>\nstd::pair<int, int> finite_interval(const\
+    \ std::vector<T>& sequence,\n                                    const T& infinity)\
+    \ {\n    int left = 0;\n    while (left < int(sequence.size()) && sequence[left]\
+    \ == infinity) left++;\n    int right = int(sequence.size());\n    while (right\
+    \ > left && sequence[right - 1] == infinity) right--;\n    return {left, right};\n\
+    }\n\ntemplate <class T, class Compare>\nstd::vector<T> structured_convolution_with_infinity(\n\
+    \    const std::vector<T>& arbitrary, const std::vector<T>& structured,\n    const\
     \ T& infinity, Compare compare) {\n    if (arbitrary.empty() || structured.empty())\
     \ return {};\n\n    auto [left, right] = finite_interval(structured, infinity);\n\
     \    int result_size = int(arbitrary.size() + structured.size() - 1);\n    std::vector<T>\
@@ -276,9 +301,9 @@ data:
     \ current_value =\n            arbitrary[current] + structured[left + index -\
     \ current];\n        T candidate_value =\n            arbitrary[candidate] + structured[left\
     \ + index - candidate];\n        return !compare(current_value, candidate_value);\n\
-    \    };\n    std::vector<int> optima(middle_size, -1);\n    smawk_detail::solve(rows,\
-    \ columns, select, optima);\n    for (int row : rows) {\n        int first_index\
-    \ = optima[row];\n        result[left + row] =\n            arbitrary[first_index]\
+    \    };\n    auto optima = smawk_row_select(rows, columns, select);\n    for (int\
+    \ i = 0; i < int(rows.size()); i++) {\n        int row = rows[i];\n        int\
+    \ first_index = optima[i];\n        result[left + row] =\n            arbitrary[first_index]\
     \ + structured[left + row - first_index];\n    }\n    return result;\n}\n\ntemplate\
     \ <class T, class Compare>\nstd::vector<T> linear_structured_convolution(const\
     \ std::vector<T>& first,\n                                             const std::vector<T>&\
@@ -378,24 +403,24 @@ data:
     \    const std::vector<T>& first, const std::vector<T>& second,\n    const T&\
     \ negative_infinity) {\n    return convolution_detail::linear_structured_convolution_with_infinity(\n\
     \        first, second, negative_infinity, std::greater<>());\n}\n\n}  // namespace\
-    \ convex\n}  // namespace m1une\n\n#endif  // M1UNE_CONVEX_MONGE_MIN_PLUS_CONVOLUTION_HPP\n"
+    \ convex\n}  // namespace m1une\n\n#endif  // M1UNE_CONVEX_MIN_PLUS_CONVOLUTION_HPP\n"
   dependsOn:
   - convex/monge/smawk.hpp
   isVerificationFile: false
-  path: convex/monge/min_plus_convolution.hpp
+  path: convex/min_plus_convolution.hpp
   requiredBy:
-  - convex/monge/all.hpp
   - convex/all.hpp
-  timestamp: '2026-10-24 20:27:26+09:00'
+  timestamp: '2026-10-30 15:56:19+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/convex/monge/max_plus_convolution_concave_arbitrary.test.cpp
-  - verify/convex/monge/max_plus_convolution_concave_concave.test.cpp
   - verify/convex/monge/monge_dp_optimization.test.cpp
   - verify/convex/monge/monge_algorithms.test.cpp
-  - verify/convex/monge/min_plus_convolution_convex_arbitrary.test.cpp
-  - verify/convex/monge/min_plus_convolution_convex_convex.test.cpp
-documentation_of: convex/monge/min_plus_convolution.hpp
+  - verify/convex/monge/ordered_matrix.test.cpp
+  - verify/convex/max_plus_convolution_concave_arbitrary.test.cpp
+  - verify/convex/max_plus_convolution_concave_concave.test.cpp
+  - verify/convex/min_plus_convolution_convex_arbitrary.test.cpp
+  - verify/convex/min_plus_convolution_convex_convex.test.cpp
+documentation_of: convex/min_plus_convolution.hpp
 layout: document
 title: Structured Min-Plus and Max-Plus Convolution
 ---
@@ -452,7 +477,7 @@ Here B's adjacent price differences are `2,4`, which are nondecreasing.
 That makes `b` convex, so use:
 
 ```cpp
-#include "convex/monge/min_plus_convolution.hpp"
+#include "convex/min_plus_convolution.hpp"
 #include <cassert>
 #include <iostream>
 #include <vector>

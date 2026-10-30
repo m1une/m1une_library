@@ -56,8 +56,8 @@ data:
   isVerificationFile: false
   path: algo/search/bisect.hpp
   requiredBy:
-  - algo/search/all.hpp
   - algo/all.hpp
+  - algo/search/all.hpp
   timestamp: '2026-07-07 21:49:48+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:

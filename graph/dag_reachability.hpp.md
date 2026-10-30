@@ -249,16 +249,16 @@ data:
   isVerificationFile: false
   path: graph/dag_reachability.hpp
   requiredBy:
-  - graph/all.hpp
-  - graph/dag.hpp
   - graph/directed.hpp
+  - graph/dag.hpp
+  - graph/all.hpp
   timestamp: '2026-08-24 00:41:13+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/graph/range_edge_graph.test.cpp
-  - verify/graph/dag_algorithms.test.cpp
-  - verify/graph/graph_algorithms.test.cpp
   - verify/graph/cow_game.test.cpp
+  - verify/graph/range_edge_graph.test.cpp
+  - verify/graph/graph_algorithms.test.cpp
+  - verify/graph/dag_algorithms.test.cpp
 documentation_of: graph/dag_reachability.hpp
 layout: document
 title: DAG Reachability and Transitive Reduction

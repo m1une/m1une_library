@@ -251,9 +251,9 @@ data:
   timestamp: '2026-07-18 19:05:08+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/math_algorithms.test.cpp
-  - verify/math/matrix/matrix.test.cpp
   - verify/math/matrix/matrix_det_arbitrary_mod.test.cpp
+  - verify/math/matrix/matrix.test.cpp
+  - verify/math/math_algorithms.test.cpp
 documentation_of: math/matrix/determinant_mod.hpp
 layout: document
 title: Determinant Modulo a Composite Modulus

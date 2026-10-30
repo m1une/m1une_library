@@ -61,8 +61,8 @@ data:
   isVerificationFile: false
   path: algo/offline/parallel_binary_search.hpp
   requiredBy:
-  - algo/all.hpp
   - algo/offline/all.hpp
+  - algo/all.hpp
   timestamp: '2026-07-07 22:10:04+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:

@@ -1075,8 +1075,8 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/stirling_number_of_the_second_kind.test.cpp
-  - verify/math/math_algorithms.test.cpp
   - verify/math/bell_number.test.cpp
+  - verify/math/math_algorithms.test.cpp
 documentation_of: math/combinatorial_sequences.hpp
 layout: document
 title: Combinatorial Sequences

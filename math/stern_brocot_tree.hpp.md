@@ -384,8 +384,8 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/stern_brocot_tree.test.cpp
-  - verify/math/math_algorithms.test.cpp
   - verify/math/yosupo_stern_brocot_tree.test.cpp
+  - verify/math/math_algorithms.test.cpp
 documentation_of: math/stern_brocot_tree.hpp
 layout: document
 title: Stern-Brocot Tree

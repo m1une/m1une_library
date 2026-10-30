@@ -538,8 +538,8 @@ data:
   isVerificationFile: false
   path: ds/dynamic_tree/link_cut_tree.hpp
   requiredBy:
-  - ds/dynamic_connectivity/all.hpp
   - ds/dynamic_connectivity/online_dynamic_connectivity.hpp
+  - ds/dynamic_connectivity/all.hpp
   timestamp: '2026-07-16 20:44:42+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:

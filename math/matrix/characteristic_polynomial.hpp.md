@@ -190,9 +190,9 @@ data:
   timestamp: '2026-07-13 05:25:31+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/math/math_algorithms.test.cpp
-  - verify/math/matrix/matrix.test.cpp
   - verify/math/matrix/characteristic_polynomial.test.cpp
+  - verify/math/matrix/matrix.test.cpp
+  - verify/math/math_algorithms.test.cpp
 documentation_of: math/matrix/characteristic_polynomial.hpp
 layout: document
 title: Characteristic Polynomial

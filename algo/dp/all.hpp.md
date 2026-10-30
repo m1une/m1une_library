@@ -4,6 +4,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: algo/dp/knapsack.hpp
     title: Knapsack Helpers
+  - icon: ':heavy_check_mark:'
+    path: algo/dp/knuth_optimization.hpp
+    title: Knuth Optimization
   _extendedRequiredBy:
   - icon: ':warning:'
     path: algo/all.hpp
@@ -99,7 +102,33 @@ data:
     \         if (dp[value - values[item]] == inf) continue;\n            dp[value]\
     \ = std::min(dp[value], dp[value - values[item]] + weights[item]);\n        }\n\
     \    }\n    return dp;\n}\n\n}  // namespace algo\n}  // namespace m1une\n\n\n\
-    #line 5 \"algo/dp/all.hpp\"\n\n\n"
+    #line 1 \"algo/dp/knuth_optimization.hpp\"\n\n\n\n#line 6 \"algo/dp/knuth_optimization.hpp\"\
+    \n#include <type_traits>\n#line 8 \"algo/dp/knuth_optimization.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace algo {\n\ntemplate <class T>\nstruct KnuthOptimizationResult\
+    \ {\n    std::vector<std::vector<T>> value;\n    std::vector<std::vector<int>>\
+    \ split;\n\n    T optimum() const {\n        return value[0].back();\n    }\n\
+    };\n\ntemplate <class IntervalCost>\nauto knuth_optimization(int element_count,\
+    \ IntervalCost interval_cost)\n    -> KnuthOptimizationResult<\n        std::decay_t<std::invoke_result_t<IntervalCost,\
+    \ int, int>>> {\n    assert(element_count >= 0);\n    using T = std::decay_t<std::invoke_result_t<IntervalCost,\
+    \ int, int>>;\n\n    KnuthOptimizationResult<T> result;\n    result.value.assign(element_count\
+    \ + 1, std::vector<T>(element_count + 1, T()));\n    result.split.assign(element_count\
+    \ + 1, std::vector<int>(element_count + 1, -1));\n\n    for (int left = 0; left\
+    \ <= element_count; left++) result.split[left][left] = left;\n    for (int left\
+    \ = 0; left < element_count; left++) result.split[left][left + 1] = left + 1;\n\
+    \n    for (int length = 2; length <= element_count; length++) {\n        for (int\
+    \ left = 0; left + length <= element_count; left++) {\n            int right =\
+    \ left + length;\n            int first = std::max(left + 1, result.split[left][right\
+    \ - 1]);\n            int last = std::min(right - 1, result.split[left + 1][right]);\n\
+    \            assert(first <= last);\n\n            int best = first;\n       \
+    \     T best_value = result.value[left][best] + result.value[best][right];\n \
+    \           for (int split = first + 1; split <= last; split++) {\n          \
+    \      T candidate = result.value[left][split] + result.value[split][right];\n\
+    \                if (candidate < best_value) {\n                    best = split;\n\
+    \                    best_value = candidate;\n                }\n            }\n\
+    \            result.value[left][right] = best_value + interval_cost(left, right);\n\
+    \            result.split[left][right] = best;\n        }\n    }\n    return result;\n\
+    }\n\n}  // namespace algo\n}  // namespace m1une\n\n\n#line 6 \"algo/dp/all.hpp\"\
+    \n\n\n"
   code: '#ifndef M1UNE_ALGO_DP_ALL_HPP
 
     #define M1UNE_ALGO_DP_ALL_HPP 1
@@ -107,17 +136,20 @@ data:
 
     #include "knapsack.hpp"
 
+    #include "knuth_optimization.hpp"
+
 
     #endif  // M1UNE_ALGO_DP_ALL_HPP
 
     '
   dependsOn:
   - algo/dp/knapsack.hpp
+  - algo/dp/knuth_optimization.hpp
   isVerificationFile: false
   path: algo/dp/all.hpp
   requiredBy:
   - algo/all.hpp
-  timestamp: '2026-08-12 05:02:13+09:00'
+  timestamp: '2026-10-30 15:56:19+09:00'
   verificationStatus: LIBRARY_NO_TESTS
   verifiedWith: []
 documentation_of: algo/dp/all.hpp
@@ -137,3 +169,4 @@ Convex DP optimizations live under `convex/`.
 | Header | Contents |
 | --- | --- |
 | `algo/dp/knapsack.hpp` | Subset-sum and knapsack helper routines. |
+| `algo/dp/knuth_optimization.hpp` | Interval DP with monotone optimal splits, including optimal BST / adjacent merging. |

@@ -2,32 +2,53 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: convex/monge/all.hpp
-    title: Monge Optimization Guide
+    path: convex/alien_trick.hpp
+    title: Alien Trick
   - icon: ':heavy_check_mark:'
-    path: convex/monge/anti_monge_shortest_path.hpp
-    title: Anti-Monge DAG Shortest Paths
+    path: convex/all.hpp
+    title: Convex All
   - icon: ':heavy_check_mark:'
-    path: convex/monge/check.hpp
-    title: Monge Checks
+    path: convex/convex_hull_trick.hpp
+    title: Convex Hull Trick
   - icon: ':heavy_check_mark:'
-    path: convex/monge/divide_and_conquer_optimization.hpp
-    title: Divide-and-Conquer DP Optimization
+    path: convex/li_chao_tree.hpp
+    title: Li Chao Tree
   - icon: ':heavy_check_mark:'
-    path: convex/monge/knuth_optimization.hpp
-    title: Knuth Optimization
-  - icon: ':heavy_check_mark:'
-    path: convex/monge/larsch.hpp
-    title: LARSCH
-  - icon: ':heavy_check_mark:'
-    path: convex/monge/min_plus_convolution.hpp
+    path: convex/min_plus_convolution.hpp
     title: Structured Min-Plus and Max-Plus Convolution
   - icon: ':heavy_check_mark:'
+    path: convex/monge/all.hpp
+    title: Monge Matrix Primitives and Algorithm Guide
+  - icon: ':heavy_check_mark:'
+    path: convex/monge/check.hpp
+    title: Monge and Anti-Monge Checks
+  - icon: ':heavy_check_mark:'
+    path: convex/monge/larsch.hpp
+    title: LARSCH Online Matrix Minima
+  - icon: ':heavy_check_mark:'
+    path: convex/monge/larsch.hpp
+    title: LARSCH Online Matrix Minima
+  - icon: ':heavy_check_mark:'
     path: convex/monge/monotone_minima.hpp
-    title: Monotone Minima
+    title: Monotone Matrix Minima
+  - icon: ':heavy_check_mark:'
+    path: convex/monge/monotone_minima.hpp
+    title: Monotone Matrix Minima
   - icon: ':heavy_check_mark:'
     path: convex/monge/smawk.hpp
     title: SMAWK
+  - icon: ':heavy_check_mark:'
+    path: convex/monge/smawk.hpp
+    title: SMAWK
+  - icon: ':heavy_check_mark:'
+    path: convex/monge_shortest_path.hpp
+    title: Monge and Anti-Monge Forward DAG Shortest Paths
+  - icon: ':heavy_check_mark:'
+    path: convex/monge_transition.hpp
+    title: Finalized-Layer Matrix Transitions
+  - icon: ':heavy_check_mark:'
+    path: convex/slope_trick.hpp
+    title: Slope Trick
   - icon: ':heavy_check_mark:'
     path: utilities/fast_io.hpp
     title: Fast IO
@@ -38,24 +59,24 @@ data:
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     '*NOT_SPECIAL_COMMENTS*': ''
-    PROBLEM: https://judge.yosupo.jp/problem/aplusb
+    PROBLEM: https://judge.yosupo.jp/problem/min_plus_convolution_convex_arbitrary
     links:
-    - https://judge.yosupo.jp/problem/aplusb
+    - https://judge.yosupo.jp/problem/min_plus_convolution_convex_arbitrary
   bundledCode: "#line 1 \"verify/convex/monge/monge_algorithms.test.cpp\"\n#define\
-    \ PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <algorithm>\n\
-    #include <cassert>\n#include <functional>\n#line 1 \"utilities/fast_io.hpp\"\n\
-    \n\n\n#line 5 \"utilities/fast_io.hpp\"\n#include <array>\n#include <cerrno>\n\
-    #include <charconv>\n#include <cstddef>\n#include <cstdio>\n#include <cstdlib>\n\
-    #include <cstdint>\n#include <cstring>\n#include <iterator>\n#include <string>\n\
-    #include <sys/stat.h>\n#include <type_traits>\n#include <utility>\n#include <unistd.h>\n\
-    #include <vector>\n\nnamespace m1une {\nnamespace utilities {\n\nstruct FastOutput;\n\
-    \nnamespace internal {\n\n// Shared with the convenience helpers in template.hpp.\n\
-    inline FastOutput* standard_output_instance = nullptr;\n\n// Detect std::begin(x),\
-    \ std::end(x).\ntemplate <class T, class = void>\nstruct is_range : std::false_type\
-    \ {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n\
-    \    decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
-    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
-    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    \ PROBLEM \"https://judge.yosupo.jp/problem/min_plus_convolution_convex_arbitrary\"\
+    \n\n#include <algorithm>\n#include <cassert>\n#include <functional>\n#line 1 \"\
+    utilities/fast_io.hpp\"\n\n\n\n#line 5 \"utilities/fast_io.hpp\"\n#include <array>\n\
+    #include <cerrno>\n#include <charconv>\n#include <cstddef>\n#include <cstdio>\n\
+    #include <cstdlib>\n#include <cstdint>\n#include <cstring>\n#include <iterator>\n\
+    #include <string>\n#include <sys/stat.h>\n#include <type_traits>\n#include <utility>\n\
+    #include <unistd.h>\n#include <vector>\n\nnamespace m1une {\nnamespace utilities\
+    \ {\n\nstruct FastOutput;\n\nnamespace internal {\n\n// Shared with the convenience\
+    \ helpers in template.hpp.\ninline FastOutput* standard_output_instance = nullptr;\n\
+    \n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct\
+    \ is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
+    \    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
+    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
+    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
     \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
     \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
@@ -326,9 +347,151 @@ data:
     \      return *this;\n    }\n};\n\n}  // namespace utilities\n}  // namespace\
     \ m1une\n\n\n#line 7 \"verify/convex/monge/monge_algorithms.test.cpp\"\n#include\
     \ <limits>\n#line 9 \"verify/convex/monge/monge_algorithms.test.cpp\"\n\n#line\
-    \ 1 \"convex/monge/all.hpp\"\n\n\n\n#line 1 \"convex/monge/anti_monge_shortest_path.hpp\"\
-    \n\n\n\n#line 7 \"convex/monge/anti_monge_shortest_path.hpp\"\n\n#line 1 \"convex/monge/smawk.hpp\"\
-    \n\n\n\n#line 6 \"convex/monge/smawk.hpp\"\n#include <numeric>\n#line 8 \"convex/monge/smawk.hpp\"\
+    \ 1 \"convex/all.hpp\"\n\n\n\n#line 1 \"convex/alien_trick.hpp\"\n\n\n\n#line\
+    \ 5 \"convex/alien_trick.hpp\"\n#include <concepts>\n#include <numeric>\n#line\
+    \ 9 \"convex/alien_trick.hpp\"\n\nnamespace m1une {\nnamespace convex {\n\nnamespace\
+    \ detail {\n\ntemplate <std::integral Penalty, std::integral Count, class Oracle>\n\
+    Penalty alien_trick_penalty(Penalty lower, Penalty upper, Count target_count,\
+    \ Oracle& oracle) {\n    assert(lower <= upper);\n    assert(oracle(lower).second\
+    \ >= target_count);\n    assert(oracle(upper).second <= target_count);\n\n   \
+    \ while (lower < upper) {\n        Penalty middle = std::midpoint(lower, upper);\n\
+    \        if (middle == lower) ++middle;\n        if (oracle(middle).second >=\
+    \ target_count) {\n            lower = middle;\n        } else {\n           \
+    \ upper = middle - 1;\n        }\n    }\n    return lower;\n}\n\n}  // namespace\
+    \ detail\n\n// Recovers the minimum value among solutions using exactly `target_count`\n\
+    // items. The oracle minimizes value + penalty * count and breaks ties in favor\n\
+    // of the larger count.\ntemplate <std::integral Penalty, std::integral Count,\
+    \ class Oracle>\nauto alien_trick_minimize(Penalty lower, Penalty upper, Count\
+    \ target_count, Oracle oracle) {\n    Penalty penalty = detail::alien_trick_penalty(lower,\
+    \ upper, target_count, oracle);\n    auto result = oracle(penalty);\n    using\
+    \ Value = std::remove_cvref_t<decltype(result.first)>;\n    return result.first\
+    \ - static_cast<Value>(penalty) * static_cast<Value>(target_count);\n}\n\n// Recovers\
+    \ the maximum value among solutions using exactly `target_count`\n// items. The\
+    \ oracle maximizes value - penalty * count and breaks ties in favor\n// of the\
+    \ larger count.\ntemplate <std::integral Penalty, std::integral Count, class Oracle>\n\
+    auto alien_trick_maximize(Penalty lower, Penalty upper, Count target_count, Oracle\
+    \ oracle) {\n    Penalty penalty = detail::alien_trick_penalty(lower, upper, target_count,\
+    \ oracle);\n    auto result = oracle(penalty);\n    using Value = std::remove_cvref_t<decltype(result.first)>;\n\
+    \    return result.first + static_cast<Value>(penalty) * static_cast<Value>(target_count);\n\
+    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n#line 1 \"convex/convex_hull_trick.hpp\"\
+    \n\n\n\n#line 7 \"convex/convex_hull_trick.hpp\"\n#include <optional>\n#line 10\
+    \ \"convex/convex_hull_trick.hpp\"\n\nnamespace m1une {\nnamespace convex {\n\n\
+    enum class LineOptimization {\n    Minimize,\n    Maximize,\n};\n\ntemplate <std::signed_integral\
+    \ T>\nusing line_wide_type = __int128_t;\n\ntemplate <std::signed_integral T>\n\
+    struct LinearFunction {\n    using value_type = line_wide_type<T>;\n\n    value_type\
+    \ slope;\n    value_type intercept;\n\n    constexpr LinearFunction() : slope(0),\
+    \ intercept(0) {}\n\n    constexpr LinearFunction(T slope_value, T intercept_value)\
+    \ : slope(slope_value), intercept(intercept_value) {}\n\n    constexpr value_type\
+    \ operator()(T x) const {\n        return slope * value_type(x) + intercept;\n\
+    \    }\n};\n\n// Convex hull trick for lines inserted in nondecreasing slope order.\n\
+    template <std::signed_integral T, LineOptimization Objective = LineOptimization::Minimize>\n\
+    struct ConvexHullTrick {\n    using Line = LinearFunction<T>;\n    using value_type\
+    \ = typename Line::value_type;\n\n   private:\n    std::vector<Line> _lines;\n\
+    \n    static bool better(value_type first, value_type second) {\n        if constexpr\
+    \ (Objective == LineOptimization::Minimize) {\n            return first < second;\n\
+    \        } else {\n            return second < first;\n        }\n    }\n\n  \
+    \  static bool redundant(const Line& first, const Line& middle, const Line& last)\
+    \ {\n        value_type left = (first.intercept - middle.intercept) * (last.slope\
+    \ - middle.slope);\n        value_type right = (middle.intercept - last.intercept)\
+    \ * (middle.slope - first.slope);\n        if constexpr (Objective == LineOptimization::Minimize)\
+    \ {\n            return left <= right;\n        } else {\n            return right\
+    \ <= left;\n        }\n    }\n\n   public:\n    ConvexHullTrick() = default;\n\
+    \n    int size() const {\n        return int(_lines.size());\n    }\n\n    bool\
+    \ empty() const {\n        return _lines.empty();\n    }\n\n    const std::vector<Line>&\
+    \ lines() const {\n        return _lines;\n    }\n\n    void reserve(std::size_t\
+    \ line_capacity) {\n        _lines.reserve(line_capacity);\n    }\n\n    void\
+    \ clear() {\n        _lines.clear();\n    }\n\n    // Slopes must be inserted\
+    \ in nondecreasing order.\n    void add_line(T slope, T intercept) {\n       \
+    \ Line line(slope, intercept);\n        if (!_lines.empty()) {\n            assert(_lines.back().slope\
+    \ <= line.slope);\n        }\n\n        if (!_lines.empty() && _lines.back().slope\
+    \ == line.slope) {\n            if (!better(line.intercept, _lines.back().intercept))\
+    \ return;\n            _lines.pop_back();\n        }\n\n        while (_lines.size()\
+    \ >= 2 && redundant(_lines[_lines.size() - 2], _lines.back(), line)) {\n     \
+    \       _lines.pop_back();\n        }\n        _lines.push_back(line);\n    }\n\
+    \n    std::optional<value_type> try_query(T x) const {\n        if (_lines.empty())\
+    \ return std::nullopt;\n        int low = 0;\n        int high = int(_lines.size())\
+    \ - 1;\n        while (low < high) {\n            int middle = low + (high - low)\
+    \ / 2;\n            value_type first = _lines[middle](x);\n            value_type\
+    \ second = _lines[middle + 1](x);\n            if (better(first, second) || first\
+    \ == second) {\n                high = middle;\n            } else {\n       \
+    \         low = middle + 1;\n            }\n        }\n        return _lines[low](x);\n\
+    \    }\n\n    value_type query(T x) const {\n        assert(!empty());\n     \
+    \   return *try_query(x);\n    }\n};\n\ntemplate <std::signed_integral T>\nusing\
+    \ MinConvexHullTrick = ConvexHullTrick<T, LineOptimization::Minimize>;\n\ntemplate\
+    \ <std::signed_integral T>\nusing MaxConvexHullTrick = ConvexHullTrick<T, LineOptimization::Maximize>;\n\
+    \n}  // namespace convex\n}  // namespace m1une\n\n\n#line 1 \"convex/li_chao_tree.hpp\"\
+    \n\n\n\n#line 13 \"convex/li_chao_tree.hpp\"\n\n#line 15 \"convex/li_chao_tree.hpp\"\
+    \n\nnamespace m1une {\nnamespace convex {\n\n// Dynamic Li Chao tree over an integral\
+    \ half-open coordinate domain.\ntemplate <std::signed_integral T, LineOptimization\
+    \ Objective = LineOptimization::Minimize>\nstruct LiChaoTree {\n    using Line\
+    \ = LinearFunction<T>;\n    using value_type = typename Line::value_type;\n\n\
+    \   private:\n    struct Node {\n        Line line;\n        bool has_line;\n\
+    \        int left;\n        int right;\n\n        Node() : has_line(false), left(-1),\
+    \ right(-1) {}\n\n        explicit Node(Line value) : line(std::move(value)),\
+    \ has_line(true), left(-1), right(-1) {}\n    };\n\n    T _left;\n    T _right;\n\
+    \    int _root;\n    std::vector<Node> _nodes;\n\n    static bool better(value_type\
+    \ first, value_type second) {\n        if constexpr (Objective == LineOptimization::Minimize)\
+    \ {\n            return first < second;\n        } else {\n            return\
+    \ second < first;\n        }\n    }\n\n    int new_node() {\n        assert(_nodes.size()\
+    \ < std::size_t(std::numeric_limits<int>::max()));\n        _nodes.emplace_back();\n\
+    \        return int(_nodes.size()) - 1;\n    }\n\n    int new_node(Line line)\
+    \ {\n        assert(_nodes.size() < std::size_t(std::numeric_limits<int>::max()));\n\
+    \        _nodes.emplace_back(std::move(line));\n        return int(_nodes.size())\
+    \ - 1;\n    }\n\n    int add_line_node(int node, T left, T right, Line line) {\n\
+    \        if (node == -1) return new_node(std::move(line));\n        if (!_nodes[node].has_line)\
+    \ {\n            _nodes[node].line = std::move(line);\n            _nodes[node].has_line\
+    \ = true;\n            return node;\n        }\n\n        T middle = std::midpoint(left,\
+    \ right);\n        bool left_better = better(line(left), _nodes[node].line(left));\n\
+    \        bool middle_better = better(line(middle), _nodes[node].line(middle));\n\
+    \        if (middle_better) std::swap(line, _nodes[node].line);\n        if (middle\
+    \ == left) return node;\n\n        if (left_better != middle_better) {\n     \
+    \       int child = add_line_node(_nodes[node].left, left, middle, std::move(line));\n\
+    \            _nodes[node].left = child;\n        } else {\n            int child\
+    \ = add_line_node(_nodes[node].right, middle, right, std::move(line));\n     \
+    \       _nodes[node].right = child;\n        }\n        return node;\n    }\n\n\
+    \    int add_segment_node(int node, T left, T right, T query_left, T query_right,\
+    \ const Line& line) {\n        if (query_right <= left || right <= query_left)\
+    \ return node;\n        if (query_left <= left && right <= query_right) {\n  \
+    \          return add_line_node(node, left, right, line);\n        }\n       \
+    \ if (node == -1) node = new_node();\n\n        T middle = std::midpoint(left,\
+    \ right);\n        if (middle == left) return add_line_node(node, left, right,\
+    \ line);\n        int left_child = add_segment_node(_nodes[node].left, left, middle,\
+    \ query_left, query_right, line);\n        int right_child = add_segment_node(_nodes[node].right,\
+    \ middle, right, query_left, query_right, line);\n        _nodes[node].left =\
+    \ left_child;\n        _nodes[node].right = right_child;\n        return node;\n\
+    \    }\n\n   public:\n    LiChaoTree() : _left(0), _right(0), _root(-1) {}\n\n\
+    \    LiChaoTree(T left, T right) : _left(left), _right(right), _root(-1) {\n \
+    \       assert(left <= right);\n    }\n\n    T left_bound() const {\n        return\
+    \ _left;\n    }\n\n    T right_bound() const {\n        return _right;\n    }\n\
+    \n    bool empty() const {\n        return _root == -1;\n    }\n\n    std::size_t\
+    \ node_count() const {\n        return _nodes.size();\n    }\n\n    void reserve(std::size_t\
+    \ node_capacity) {\n        _nodes.reserve(node_capacity);\n    }\n\n    void\
+    \ clear() {\n        _root = -1;\n        _nodes.clear();\n    }\n\n    void add_line(T\
+    \ slope, T intercept) {\n        assert(_left < _right);\n        _root = add_line_node(_root,\
+    \ _left, _right, Line(slope, intercept));\n    }\n\n    void add_segment(T segment_left,\
+    \ T segment_right, T slope, T intercept) {\n        assert(_left <= segment_left\
+    \ && segment_left <= segment_right && segment_right <= _right);\n        if (segment_left\
+    \ == segment_right) return;\n        _root = add_segment_node(_root, _left, _right,\
+    \ segment_left, segment_right, Line(slope, intercept));\n    }\n\n    // Returns\
+    \ nullopt when no inserted line covers x.\n    std::optional<value_type> query(T\
+    \ x) const {\n        assert(_left <= x && x < _right);\n        std::optional<value_type>\
+    \ result;\n        int node = _root;\n        T left = _left;\n        T right\
+    \ = _right;\n        while (node != -1) {\n            if (_nodes[node].has_line)\
+    \ {\n                value_type candidate = _nodes[node].line(x);\n          \
+    \      if (!result || better(candidate, *result)) {\n                    result\
+    \ = candidate;\n                }\n            }\n\n            T middle = std::midpoint(left,\
+    \ right);\n            if (middle == left) break;\n            if (x < middle)\
+    \ {\n                node = _nodes[node].left;\n                right = middle;\n\
+    \            } else {\n                node = _nodes[node].right;\n          \
+    \      left = middle;\n            }\n        }\n        return result;\n    }\n\
+    \n    value_type get(T x) const {\n        std::optional<value_type> result =\
+    \ query(x);\n        assert(result.has_value());\n        return result.value_or(value_type());\n\
+    \    }\n};\n\ntemplate <std::signed_integral T>\nusing MinLiChaoTree = LiChaoTree<T,\
+    \ LineOptimization::Minimize>;\n\ntemplate <std::signed_integral T>\nusing MaxLiChaoTree\
+    \ = LiChaoTree<T, LineOptimization::Maximize>;\n\n}  // namespace convex\n}  //\
+    \ namespace m1une\n\n\n#line 1 \"convex/min_plus_convolution.hpp\"\n\n\n\n#line\
+    \ 7 \"convex/min_plus_convolution.hpp\"\n\n#line 1 \"convex/monge/smawk.hpp\"\n\
+    \n\n\n#line 7 \"convex/monge/smawk.hpp\"\n#include <span>\n#line 9 \"convex/monge/smawk.hpp\"\
     \n\nnamespace m1une {\nnamespace convex {\n\nnamespace smawk_detail {\n\ntemplate\
     \ <class Select>\nvoid solve(const std::vector<int>& rows, const std::vector<int>&\
     \ columns,\n           const Select& select, std::vector<int>& answer) {\n   \
@@ -352,22 +515,49 @@ data:
     \ answer;\n\n    std::vector<int> rows(row_count), columns(column_count);\n  \
     \  std::iota(rows.begin(), rows.end(), 0);\n    std::iota(columns.begin(), columns.end(),\
     \ 0);\n    solve(rows, columns, select, answer);\n    return answer;\n}\n\n} \
-    \ // namespace smawk_detail\n\n// Search a fixed H x W rectangle, returning column\
-    \ indices (leftmost on ties).\n// Requires total monotonicity under Compare; Monge\
-    \ suffices for minima.\n// For anti-Monge minima, reverse columns in value and\
-    \ map indices back.\n// O(H + W) evaluations; callbacks may be queried out of\
-    \ row order.\ntemplate <class Value, class Compare = std::less<>>\nstd::vector<int>\
-    \ smawk_row_optima(int row_count, int column_count, Value value,\n           \
-    \                       Compare compare = Compare()) {\n    assert(row_count >=\
-    \ 0);\n    assert(column_count >= 0);\n    return smawk_detail::row_optima(\n\
-    \        row_count, column_count,\n        [&](int row, int current, int candidate)\
-    \ {\n            return compare(value(row, candidate), value(row, current));\n\
-    \        });\n}\n\ntemplate <class Value>\nstd::vector<int> smawk_row_argmin(int\
-    \ row_count, int column_count, Value value) {\n    return smawk_row_optima(row_count,\
-    \ column_count, value, std::less<>());\n}\n\ntemplate <class Value>\nstd::vector<int>\
-    \ smawk_row_argmax(int row_count, int column_count, Value value) {\n    return\
-    \ smawk_row_optima(row_count, column_count, value, std::greater<>());\n}\n\ntemplate\
-    \ <class T>\nstd::vector<int> smawk_row_argmin(const std::vector<std::vector<T>>&\
+    \ // namespace smawk_detail\n\n// Comparison-oracle SMAWK. prefer(row, current,\
+    \ candidate) says whether to\n// replace current. The induced ordered matrix must\
+    \ be totally monotone with\n// this tie rule. This also permits symbolic invalid\
+    \ entries without sentinels.\n// O(H + W) oracle calls and memory. Entries must\
+    \ be fixed (offline search).\ntemplate <class Prefer>\nstd::vector<int> smawk_row_select(int\
+    \ row_count, int column_count, Prefer prefer) {\n    assert(row_count >= 0);\n\
+    \    assert(column_count >= 0);\n    return smawk_detail::row_optima(row_count,\
+    \ column_count, prefer);\n}\n\n// Search value(rows[r], columns[c]); answers are\
+    \ original column IDs, in row\n// list order. Lists contain distinct nonnegative\
+    \ IDs; prefer defines the tie\n// rule with respect to the supplied order.\ntemplate\
+    \ <class Prefer>\nstd::vector<int> smawk_row_select(std::span<const int> rows,\n\
+    \                                  std::span<const int> columns, Prefer prefer)\
+    \ {\n    auto answer = smawk_row_select(int(rows.size()), int(columns.size()),\n\
+    \        [&](int row, int current, int candidate) {\n            return prefer(rows[row],\
+    \ columns[current], columns[candidate]);\n        });\n    for (int& column :\
+    \ answer) if (column != -1) column = columns[column];\n    return answer;\n}\n\
+    \n// Fixed rectangle, leftmost on ties. Requires total monotonicity for leftmost\n\
+    // optima under Compare (Monge suffices for minima). O(H + W) time and memory.\n\
+    // Callback evaluations may be out of row order; this is not an online DP.\ntemplate\
+    \ <class Value, class Compare = std::less<>>\nstd::vector<int> smawk_row_optima(int\
+    \ row_count, int column_count, Value value,\n                                \
+    \  Compare compare = Compare()) {\n    assert(row_count >= 0);\n    assert(column_count\
+    \ >= 0);\n    return smawk_row_select(\n        row_count, column_count,\n   \
+    \     [&](int row, int current, int candidate) {\n            return compare(value(row,\
+    \ candidate), value(row, current));\n        });\n}\n\ntemplate <class Value>\n\
+    std::vector<int> smawk_row_argmin(int row_count, int column_count, Value value)\
+    \ {\n    return smawk_row_optima(row_count, column_count, value, std::less<>());\n\
+    }\n\ntemplate <class Value>\nstd::vector<int> smawk_row_argmax(int row_count,\
+    \ int column_count, Value value) {\n    return smawk_row_optima(row_count, column_count,\
+    \ value, std::greater<>());\n}\n\n// Ordered variants use supplied positions for\
+    \ total monotonicity and ties.\ntemplate <class Value, class Compare = std::less<>>\n\
+    std::vector<int> smawk_row_optima(std::span<const int> rows,\n               \
+    \                   std::span<const int> columns, Value value,\n             \
+    \                     Compare compare = Compare()) {\n    return smawk_row_select(rows,\
+    \ columns,\n        [&](int row, int current, int candidate) {\n            return\
+    \ compare(value(row, candidate), value(row, current));\n        });\n}\n\ntemplate\
+    \ <class Value>\nstd::vector<int> smawk_row_argmin(std::span<const int> rows,\n\
+    \                                  std::span<const int> columns, Value value)\
+    \ {\n    return smawk_row_optima(rows, columns, value, std::less<>());\n}\n\n\
+    template <class Value>\nstd::vector<int> smawk_row_argmax(std::span<const int>\
+    \ rows,\n                                  std::span<const int> columns, Value\
+    \ value) {\n    return smawk_row_optima(rows, columns, value, std::greater<>());\n\
+    }\n\ntemplate <class T>\nstd::vector<int> smawk_row_argmin(const std::vector<std::vector<T>>&\
     \ matrix) {\n    int row_count = int(matrix.size());\n    int column_count = row_count\
     \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
     \ == column_count);\n    return smawk_row_argmin(\n        row_count, column_count,\n\
@@ -377,213 +567,7 @@ data:
     \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
     \ == column_count);\n    return smawk_row_argmax(\n        row_count, column_count,\n\
     \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
-    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n#line 9 \"convex/monge/anti_monge_shortest_path.hpp\"\
-    \n\nnamespace m1une {\nnamespace convex {\n\ntemplate <class T>\nstruct AntiMongeShortestPathResult\
-    \ {\n    std::vector<T> distance;\n    std::vector<int> parent;\n};\n\n// dist[j]\
-    \ = min(dist[i] + cost(i, j)), where j - i >= minimum_step.\n// cost must be finite\
-    \ and anti-Monge on valid rectangles; see the docs.\n// O(N log N + N * minimum_step)\
-    \ time for O(1) cost evaluations.\n// In particular, minimum_step = 1 or 2 gives\
-    \ O(N log N) time.\ntemplate <class T, class Cost>\nAntiMongeShortestPathResult<T>\
-    \ anti_monge_shortest_path(\n    int vertex_count, Cost cost, T infinity, int\
-    \ minimum_step = 1) {\n    assert(vertex_count >= 0);\n    assert(minimum_step\
-    \ >= 1);\n    assert(T() < infinity);\n\n    AntiMongeShortestPathResult<T> result;\n\
-    \    result.distance.assign(vertex_count, infinity);\n    result.parent.assign(vertex_count,\
-    \ -1);\n    if (vertex_count == 0) return result;\n    result.distance[0] = T();\n\
-    \    if (minimum_step >= vertex_count) return result;\n\n    auto relax = [&](int\
-    \ from, int to) {\n        if (result.distance[from] == infinity) return;\n  \
-    \      T candidate = result.distance[from] + cost(from, to);\n        if (candidate\
-    \ < result.distance[to] ||\n            (candidate == result.distance[to] && from\
-    \ > result.parent[to])) {\n            result.distance[to] = candidate;\n    \
-    \        result.parent[to] = from;\n        }\n    };\n\n    // All pairs in this\
-    \ rectangle are valid. Remove unreachable columns,\n    // then reverse the remaining\
-    \ columns to turn anti-Monge into Monge.\n    auto rectangle = [&](int first,\
-    \ int last, int top, int bottom) {\n        if (first == last || top == bottom)\
-    \ return;\n        std::vector<int> sources;\n        for (int from = last; from\
-    \ > first;) {\n            --from;\n            if (result.distance[from] != infinity)\
-    \ sources.push_back(from);\n        }\n        if (sources.empty()) return;\n\
-    \        if (sources.size() == 1) {\n            for (int to = top; to < bottom;\
-    \ to++) relax(sources[0], to);\n            return;\n        }\n        auto argmin\
-    \ = smawk_row_argmin(\n            bottom - top, int(sources.size()), [&](int\
-    \ row, int column) -> T {\n                int from = sources[column];\n     \
-    \           return result.distance[from] + cost(from, top + row);\n          \
-    \  });\n        for (int row = 0; row < bottom - top; row++) {\n            relax(sources[argmin[row]],\
-    \ top + row);\n        }\n    };\n\n    auto solve = [&](auto& self, int left,\
-    \ int right) -> void {\n        // Such a block contains no valid internal edge.\n\
-    \        if (right - left <= minimum_step) return;\n        int middle = left\
-    \ + (right - left) / 2;\n        self(self, left, middle);\n\n        // Two valid\
-    \ rectangles and a small corner partition the cross edges.\n        int source_end\
-    \ = std::max(left, middle - (minimum_step - 1));\n        int target_begin = middle\
-    \ + std::min(right - middle, minimum_step - 1);\n        rectangle(left, middle,\
-    \ target_begin, right);\n        rectangle(left, source_end, middle, target_begin);\n\
-    \        for (int from = source_end; from < middle; from++) {\n            //\
-    \ Subtraction avoids overflow when minimum_step is large.\n            if (minimum_step\
-    \ >= target_begin - from) continue;\n            for (int to = std::max(middle,\
-    \ from + minimum_step);\n                 to < target_begin; to++) {\n       \
-    \         relax(from, to);\n            }\n        }\n\n        // Incoming transitions\
-    \ must be applied BEFORE solving the right half.\n        self(self, middle, right);\n\
-    \    };\n    solve(solve, 0, vertex_count);\n    return result;\n}\n\n}  // namespace\
-    \ convex\n}  // namespace m1une\n\n\n#line 1 \"convex/monge/check.hpp\"\n\n\n\n\
-    #line 6 \"convex/monge/check.hpp\"\n\nnamespace m1une {\nnamespace convex {\n\n\
-    template <class Value>\nbool is_monge(int row_count, int column_count, Value value)\
-    \ {\n    assert(row_count >= 0);\n    assert(column_count >= 0);\n    for (int\
-    \ row = 0; row + 1 < row_count; row++) {\n        for (int column = 0; column\
-    \ + 1 < column_count; column++) {\n            if (value(row, column) + value(row\
-    \ + 1, column + 1) >\n                value(row, column + 1) + value(row + 1,\
-    \ column)) {\n                return false;\n            }\n        }\n    }\n\
-    \    return true;\n}\n\ntemplate <class Value>\nbool is_anti_monge(int row_count,\
-    \ int column_count, Value value) {\n    assert(row_count >= 0);\n    assert(column_count\
-    \ >= 0);\n    for (int row = 0; row + 1 < row_count; row++) {\n        for (int\
-    \ column = 0; column + 1 < column_count; column++) {\n            if (value(row,\
-    \ column) + value(row + 1, column + 1) <\n                value(row, column +\
-    \ 1) + value(row + 1, column)) {\n                return false;\n            }\n\
-    \        }\n    }\n    return true;\n}\n\ntemplate <class T>\nbool is_monge(const\
-    \ std::vector<std::vector<T>>& matrix) {\n    int row_count = int(matrix.size());\n\
-    \    int column_count = row_count == 0 ? 0 : int(matrix[0].size());\n    for (const\
-    \ auto& row : matrix) assert(int(row.size()) == column_count);\n    return is_monge(row_count,\
-    \ column_count,\n                    [&](int row, int column) -> const T& { return\
-    \ matrix[row][column]; });\n}\n\ntemplate <class T>\nbool is_anti_monge(const\
-    \ std::vector<std::vector<T>>& matrix) {\n    int row_count = int(matrix.size());\n\
-    \    int column_count = row_count == 0 ? 0 : int(matrix[0].size());\n    for (const\
-    \ auto& row : matrix) assert(int(row.size()) == column_count);\n    return is_anti_monge(\n\
-    \        row_count, column_count,\n        [&](int row, int column) -> const T&\
-    \ { return matrix[row][column]; });\n}\n\n}  // namespace convex\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"convex/monge/divide_and_conquer_optimization.hpp\"\n\n\n\
-    \n#line 7 \"convex/monge/divide_and_conquer_optimization.hpp\"\n\n#line 1 \"convex/monge/monotone_minima.hpp\"\
-    \n\n\n\n#line 7 \"convex/monge/monotone_minima.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ convex {\n\nnamespace monotone_minima_detail {\n\ntemplate <class Value, class\
-    \ Compare>\nvoid solve(int row_left, int row_right, int column_left, int column_right,\n\
-    \           const Value& value, const Compare& compare, std::vector<int>& answer)\
-    \ {\n    if (row_left == row_right) return;\n    int row = (row_left + row_right)\
-    \ / 2;\n    int best = column_left;\n    for (int column = column_left + 1; column\
-    \ < column_right; column++) {\n        if (compare(value(row, column), value(row,\
-    \ best))) best = column;\n    }\n    answer[row] = best;\n    solve(row_left,\
-    \ row, column_left, best + 1, value, compare, answer);\n    solve(row + 1, row_right,\
-    \ best, column_right, value, compare, answer);\n}\n\n}  // namespace monotone_minima_detail\n\
-    \n// Fixed rectangular matrix; leftmost optimal columns must be nondecreasing.\n\
-    // Returns column indices, or -1 when there are no columns. Not an online DP.\n\
-    // Anti-Monge minima require reversing one axis before using this routine.\ntemplate\
-    \ <class Value, class Compare = std::less<>>\nstd::vector<int> monotone_row_optima(int\
-    \ row_count, int column_count, Value value,\n                                \
-    \     Compare compare = Compare()) {\n    assert(row_count >= 0);\n    assert(column_count\
-    \ >= 0);\n    std::vector<int> answer(row_count, -1);\n    if (row_count == 0\
-    \ || column_count == 0) return answer;\n    monotone_minima_detail::solve(0, row_count,\
-    \ 0, column_count, value, compare, answer);\n    return answer;\n}\n\ntemplate\
-    \ <class Value>\nstd::vector<int> monotone_row_argmin(int row_count, int column_count,\
-    \ Value value) {\n    return monotone_row_optima(row_count, column_count, value,\
-    \ std::less<>());\n}\n\ntemplate <class Value>\nstd::vector<int> monotone_row_argmax(int\
-    \ row_count, int column_count, Value value) {\n    return monotone_row_optima(row_count,\
-    \ column_count, value, std::greater<>());\n}\n\ntemplate <class T>\nstd::vector<int>\
-    \ monotone_row_argmin(const std::vector<std::vector<T>>& matrix) {\n    int row_count\
-    \ = int(matrix.size());\n    int column_count = row_count == 0 ? 0 : int(matrix[0].size());\n\
-    \    for (const auto& row : matrix) assert(int(row.size()) == column_count);\n\
-    \    return monotone_row_argmin(\n        row_count, column_count,\n        [&](int\
-    \ row, int column) -> const T& { return matrix[row][column]; });\n}\n\ntemplate\
-    \ <class T>\nstd::vector<int> monotone_row_argmax(const std::vector<std::vector<T>>&\
-    \ matrix) {\n    int row_count = int(matrix.size());\n    int column_count = row_count\
-    \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
-    \ == column_count);\n    return monotone_row_argmax(\n        row_count, column_count,\n\
-    \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
-    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n#line 9 \"convex/monge/divide_and_conquer_optimization.hpp\"\
-    \n\nnamespace m1une {\nnamespace convex {\n\ntemplate <class T>\nstruct DivideAndConquerDpResult\
-    \ {\n    std::vector<T> value;\n    std::vector<int> argmin;\n};\n\ntemplate <class\
-    \ Value>\nauto divide_and_conquer_dp(int state_count, int candidate_count, Value\
-    \ value)\n    -> DivideAndConquerDpResult<\n        std::decay_t<std::invoke_result_t<Value,\
-    \ int, int>>> {\n    using T = std::decay_t<std::invoke_result_t<Value, int, int>>;\n\
-    \    DivideAndConquerDpResult<T> result;\n    result.argmin = monotone_row_argmin(state_count,\
-    \ candidate_count, value);\n    result.value.resize(state_count);\n    for (int\
-    \ state = 0; state < state_count; state++) {\n        if (result.argmin[state]\
-    \ != -1) {\n            result.value[state] = value(state, result.argmin[state]);\n\
-    \        }\n    }\n    return result;\n}\n\n// One transition from a finalized\
-    \ previous layer. This does not compute a\n// same-array recurrence dp[j] = min_i(dp[i]\
-    \ + cost(i,j)).\n// Leftmost minimizing candidates must be nondecreasing with\
-    \ the state index.\ntemplate <class T, class Cost>\nauto divide_and_conquer_transition(const\
-    \ std::vector<T>& previous, int state_count,\n                               \
-    \    Cost cost)\n    -> DivideAndConquerDpResult<\n        std::decay_t<decltype(std::declval<T>()\
-    \ + cost(0, 0))>> {\n    using Result = std::decay_t<decltype(std::declval<T>()\
-    \ + cost(0, 0))>;\n    return divide_and_conquer_dp(\n        state_count, int(previous.size()),\n\
-    \        [&](int state, int candidate) -> Result {\n            return previous[candidate]\
-    \ + cost(candidate, state);\n        });\n}\n\n}  // namespace convex\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"convex/monge/knuth_optimization.hpp\"\n\n\n\n#line 8 \"\
-    convex/monge/knuth_optimization.hpp\"\n\nnamespace m1une {\nnamespace convex {\n\
-    \ntemplate <class T>\nstruct KnuthOptimizationResult {\n    std::vector<std::vector<T>>\
-    \ value;\n    std::vector<std::vector<int>> split;\n\n    T optimum() const {\n\
-    \        return value[0].back();\n    }\n};\n\ntemplate <class IntervalCost>\n\
-    auto knuth_optimization(int element_count, IntervalCost interval_cost)\n    ->\
-    \ KnuthOptimizationResult<\n        std::decay_t<std::invoke_result_t<IntervalCost,\
-    \ int, int>>> {\n    assert(element_count >= 0);\n    using T = std::decay_t<std::invoke_result_t<IntervalCost,\
-    \ int, int>>;\n\n    KnuthOptimizationResult<T> result;\n    result.value.assign(element_count\
-    \ + 1, std::vector<T>(element_count + 1, T()));\n    result.split.assign(element_count\
-    \ + 1, std::vector<int>(element_count + 1, -1));\n\n    for (int left = 0; left\
-    \ <= element_count; left++) result.split[left][left] = left;\n    for (int left\
-    \ = 0; left < element_count; left++) result.split[left][left + 1] = left + 1;\n\
-    \n    for (int length = 2; length <= element_count; length++) {\n        for (int\
-    \ left = 0; left + length <= element_count; left++) {\n            int right =\
-    \ left + length;\n            int first = std::max(left + 1, result.split[left][right\
-    \ - 1]);\n            int last = std::min(right - 1, result.split[left + 1][right]);\n\
-    \            assert(first <= last);\n\n            int best = first;\n       \
-    \     T best_value = result.value[left][best] + result.value[best][right];\n \
-    \           for (int split = first + 1; split <= last; split++) {\n          \
-    \      T candidate = result.value[left][split] + result.value[split][right];\n\
-    \                if (candidate < best_value) {\n                    best = split;\n\
-    \                    best_value = candidate;\n                }\n            }\n\
-    \            result.value[left][right] = best_value + interval_cost(left, right);\n\
-    \            result.split[left][right] = best;\n        }\n    }\n    return result;\n\
-    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n#line 1 \"convex/monge/larsch.hpp\"\
-    \n\n\n\n#line 6 \"convex/monge/larsch.hpp\"\n#include <memory>\n#line 10 \"convex/monge/larsch.hpp\"\
-    \n\nnamespace m1une {\nnamespace convex {\n\ntemplate <class T>\nclass Larsch\
-    \ {\n    struct ReduceColumn;\n\n    struct ReduceRow {\n        int size;\n \
-    \       std::function<T(int, int)> value;\n        int current_row = 0;\n    \
-    \    int boundary = 0;\n        std::unique_ptr<ReduceColumn> recursive;\n\n \
-    \       explicit ReduceRow(int size_) : size(size_) {\n            if (size /\
-    \ 2 != 0) recursive = std::make_unique<ReduceColumn>(size / 2);\n        }\n\n\
-    \        void set_value(std::function<T(int, int)> value_) {\n            value\
-    \ = std::move(value_);\n            if (recursive) {\n                recursive->set_value(\n\
-    \                    [&](int row, int column) { return value(row * 2 + 1, column);\
-    \ });\n            }\n        }\n\n        int next_argmin() {\n            int\
-    \ row = current_row++;\n            if (row % 2 == 0) {\n                int previous\
-    \ = boundary;\n                int next = row + 1 == size ? size - 1 : recursive->next_argmin();\n\
-    \                boundary = next;\n                int best = previous;\n    \
-    \            for (int column = previous + 1; column <= next; column++) {\n   \
-    \                 if (value(row, column) < value(row, best)) best = column;\n\
-    \                }\n                return best;\n            }\n            return\
-    \ value(row, boundary) <= value(row, row) ? boundary : row;\n        }\n    };\n\
-    \n    struct ReduceColumn {\n        int size;\n        std::function<T(int, int)>\
-    \ value;\n        int current_row = 0;\n        std::vector<int> columns;\n  \
-    \      ReduceRow recursive;\n\n        explicit ReduceColumn(int size_) : size(size_),\
-    \ recursive(size_) {}\n\n        void set_value(std::function<T(int, int)> value_)\
-    \ {\n            value = std::move(value_);\n            recursive.set_value(\n\
-    \                [&](int row, int column) { return value(row, columns[column]);\
-    \ });\n        }\n\n        int next_argmin() {\n            int row = current_row++;\n\
-    \            int first = row == 0 ? 0 : row * 2 - 1;\n            int last = row\
-    \ * 2;\n            for (int column = first; column <= last; column++) {\n   \
-    \             while (int(columns.size()) != row &&\n                       value(int(columns.size())\
-    \ - 1, columns.back()) >\n                           value(int(columns.size())\
-    \ - 1, column)) {\n                    columns.pop_back();\n                }\n\
-    \                if (int(columns.size()) != size) columns.push_back(column);\n\
-    \            }\n            return columns[recursive.next_argmin()];\n       \
-    \ }\n    };\n\n    int _size;\n    int _processed = 0;\n    std::unique_ptr<ReduceRow>\
-    \ _base;\n\n   public:\n    template <class Value>\n    explicit Larsch(int size,\
-    \ Value value)\n        : _size(size), _base(std::make_unique<ReduceRow>(size))\
-    \ {\n        assert(size >= 0);\n        _base->set_value(std::function<T(int,\
-    \ int)>(std::move(value)));\n    }\n\n    int size() const {\n        return _size;\n\
-    \    }\n\n    int processed_rows() const {\n        return _processed;\n    }\n\
-    \n    bool finished() const {\n        return _processed == _size;\n    }\n\n\
-    \    int next_argmin() {\n        assert(!finished());\n        _processed++;\n\
-    \        return _base->next_argmin();\n    }\n};\n\ntemplate <class T>\nstruct\
-    \ LarschShortestPathResult {\n    std::vector<T> distance;\n    std::vector<int>\
-    \ parent;\n};\n\ntemplate <class Cost>\nauto larsch_shortest_path(int vertex_count,\
-    \ Cost cost)\n    -> LarschShortestPathResult<\n        std::decay_t<std::invoke_result_t<Cost,\
-    \ int, int>>> {\n    using T = std::decay_t<std::invoke_result_t<Cost, int, int>>;\n\
-    \    assert(vertex_count >= 0);\n\n    LarschShortestPathResult<T> result;\n \
-    \   result.distance.assign(vertex_count, T());\n    result.parent.assign(vertex_count,\
-    \ -1);\n    if (vertex_count <= 1) return result;\n\n    Larsch<T> optimizer(vertex_count\
-    \ - 1, [&](int row, int column) {\n        return result.distance[column] + cost(column,\
-    \ row + 1);\n    });\n    for (int vertex = 1; vertex < vertex_count; vertex++)\
-    \ {\n        int parent = optimizer.next_argmin();\n        result.parent[vertex]\
-    \ = parent;\n        result.distance[vertex] = result.distance[parent] + cost(parent,\
-    \ vertex);\n    }\n    return result;\n}\n\n}  // namespace convex\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"convex/monge/min_plus_convolution.hpp\"\n\n\n\n#line 7\
-    \ \"convex/monge/min_plus_convolution.hpp\"\n\n#line 9 \"convex/monge/min_plus_convolution.hpp\"\
+    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n#line 9 \"convex/min_plus_convolution.hpp\"\
     \n\nnamespace m1une {\nnamespace convex {\n\nnamespace convolution_detail {\n\n\
     template <class T, class Compare, class Add>\nstd::vector<T> structured_convolution(const\
     \ std::vector<T>& arbitrary,\n                                      const std::vector<T>&\
@@ -596,18 +580,17 @@ data:
     \ current_value = add(arbitrary[current], structured[index - current]);\n    \
     \    T candidate_value = add(arbitrary[candidate], structured[index - candidate]);\n\
     \        return !compare(current_value, candidate_value);\n    };\n\n    std::vector<int>\
-    \ optima =\n        smawk_detail::row_optima(result_size, first_size, select);\n\
-    \    std::vector<T> result;\n    result.reserve(result_size);\n    for (int index\
-    \ = 0; index < result_size; index++) {\n        int first_index = optima[index];\n\
-    \        result.emplace_back(add(arbitrary[first_index],\n                   \
-    \             structured[index - first_index]));\n    }\n    return result;\n\
-    }\n\ntemplate <class T>\nstd::pair<int, int> finite_interval(const std::vector<T>&\
-    \ sequence,\n                                    const T& infinity) {\n    int\
-    \ left = 0;\n    while (left < int(sequence.size()) && sequence[left] == infinity)\
-    \ left++;\n    int right = int(sequence.size());\n    while (right > left && sequence[right\
-    \ - 1] == infinity) right--;\n    return {left, right};\n}\n\ntemplate <class\
-    \ T, class Compare>\nstd::vector<T> structured_convolution_with_infinity(\n  \
-    \  const std::vector<T>& arbitrary, const std::vector<T>& structured,\n    const\
+    \ optima =\n        smawk_row_select(result_size, first_size, select);\n    std::vector<T>\
+    \ result;\n    result.reserve(result_size);\n    for (int index = 0; index < result_size;\
+    \ index++) {\n        int first_index = optima[index];\n        result.emplace_back(add(arbitrary[first_index],\n\
+    \                                structured[index - first_index]));\n    }\n \
+    \   return result;\n}\n\ntemplate <class T>\nstd::pair<int, int> finite_interval(const\
+    \ std::vector<T>& sequence,\n                                    const T& infinity)\
+    \ {\n    int left = 0;\n    while (left < int(sequence.size()) && sequence[left]\
+    \ == infinity) left++;\n    int right = int(sequence.size());\n    while (right\
+    \ > left && sequence[right - 1] == infinity) right--;\n    return {left, right};\n\
+    }\n\ntemplate <class T, class Compare>\nstd::vector<T> structured_convolution_with_infinity(\n\
+    \    const std::vector<T>& arbitrary, const std::vector<T>& structured,\n    const\
     \ T& infinity, Compare compare) {\n    if (arbitrary.empty() || structured.empty())\
     \ return {};\n\n    auto [left, right] = finite_interval(structured, infinity);\n\
     \    int result_size = int(arbitrary.size() + structured.size() - 1);\n    std::vector<T>\
@@ -626,9 +609,9 @@ data:
     \ current_value =\n            arbitrary[current] + structured[left + index -\
     \ current];\n        T candidate_value =\n            arbitrary[candidate] + structured[left\
     \ + index - candidate];\n        return !compare(current_value, candidate_value);\n\
-    \    };\n    std::vector<int> optima(middle_size, -1);\n    smawk_detail::solve(rows,\
-    \ columns, select, optima);\n    for (int row : rows) {\n        int first_index\
-    \ = optima[row];\n        result[left + row] =\n            arbitrary[first_index]\
+    \    };\n    auto optima = smawk_row_select(rows, columns, select);\n    for (int\
+    \ i = 0; i < int(rows.size()); i++) {\n        int row = rows[i];\n        int\
+    \ first_index = optima[i];\n        result[left + row] =\n            arbitrary[first_index]\
     \ + structured[left + row - first_index];\n    }\n    return result;\n}\n\ntemplate\
     \ <class T, class Compare>\nstd::vector<T> linear_structured_convolution(const\
     \ std::vector<T>& first,\n                                             const std::vector<T>&\
@@ -728,215 +711,302 @@ data:
     \    const std::vector<T>& first, const std::vector<T>& second,\n    const T&\
     \ negative_infinity) {\n    return convolution_detail::linear_structured_convolution_with_infinity(\n\
     \        first, second, negative_infinity, std::greater<>());\n}\n\n}  // namespace\
-    \ convex\n}  // namespace m1une\n\n\n#line 12 \"convex/monge/all.hpp\"\n\n\n#line\
-    \ 11 \"verify/convex/monge/monge_algorithms.test.cpp\"\n\ntemplate <class Value,\
-    \ class Compare>\nstd::vector<int> brute_row_optima(int rows, int columns, Value\
-    \ value, Compare compare) {\n    std::vector<int> result(rows, -1);\n    if (columns\
-    \ == 0) return result;\n    for (int row = 0; row < rows; row++) {\n        result[row]\
-    \ = 0;\n        for (int column = 1; column < columns; column++) {\n         \
-    \   if (compare(value(row, column), value(row, result[row]))) {\n            \
-    \    result[row] = column;\n            }\n        }\n    }\n    return result;\n\
-    }\n\nvoid test_smawk_monge() {\n    for (int rows = 0; rows <= 40; rows++) {\n\
-    \        for (int columns = 0; columns <= 40; columns++) {\n            auto value\
-    \ = [&](int row, int column) {\n                long long difference = row * 3LL\
-    \ - column * 2LL;\n                return difference * difference + row * 7LL\
-    \ + column * 5LL;\n            };\n            auto expected = brute_row_optima(rows,\
-    \ columns, value, std::less<>());\n            assert(m1une::convex::smawk_row_argmin(rows,\
-    \ columns, value) == expected);\n        }\n    }\n}\n\nvoid test_smawk_totally_monotone_and_ties()\
-    \ {\n    for (int rows = 1; rows <= 50; rows++) {\n        for (int columns =\
-    \ 1; columns <= 50; columns++) {\n            std::vector<int> threshold(rows);\n\
-    \            for (int row = 0; row < rows; row++) {\n                threshold[row]\
-    \ = std::min(columns - 1, (row * 7 + rows) / 5);\n            }\n            auto\
-    \ value = [&](int row, int column) {\n                int difference = column\
-    \ - threshold[row];\n                return difference * difference;\n       \
-    \     };\n            auto result = m1une::convex::smawk_row_argmin(rows, columns,\
-    \ value);\n            assert(result == threshold);\n        }\n    }\n\n    auto\
-    \ constant = [](int, int) { return 0; };\n    auto result = m1une::convex::smawk_row_argmin(20,\
-    \ 30, constant);\n    assert(result == std::vector<int>(20, 0));\n}\n\nvoid test_smawk_max()\
-    \ {\n    auto value = [](int row, int column) {\n        long long difference\
-    \ = row - column;\n        return -difference * difference;\n    };\n    auto\
-    \ expected = brute_row_optima(30, 25, value, std::greater<>());\n    assert(m1une::convex::smawk_row_argmax(30,\
-    \ 25, value) == expected);\n}\n\nvoid test_smawk_matrix_overload_and_evaluations()\
-    \ {\n    std::vector<std::vector<long long>> matrix(17, std::vector<long long>(23));\n\
-    \    for (int row = 0; row < 17; row++) {\n        for (int column = 0; column\
-    \ < 23; column++) {\n            long long difference = row * 2LL - column;\n\
-    \            matrix[row][column] = difference * difference;\n        }\n    }\n\
-    \    auto expected = brute_row_optima(\n        17, 23, [&](int row, int column)\
-    \ { return matrix[row][column]; }, std::less<>());\n    assert(m1une::convex::smawk_row_argmin(matrix)\
-    \ == expected);\n\n    for (auto sizes : std::vector<std::pair<int, int>>{\n \
-    \            std::pair<int, int>{10, 1000},\n             std::pair<int, int>{1000,\
-    \ 10},\n             std::pair<int, int>{700, 900},\n         }) {\n        int\
-    \ evaluations = 0;\n        auto value = [&](int row, int column) {\n        \
-    \    evaluations++;\n            long long difference = row * 3LL - column * 2LL;\n\
-    \            return difference * difference;\n        };\n        auto result\
-    \ = m1une::convex::smawk_row_argmin(sizes.first, sizes.second, value);\n     \
-    \   assert(int(result.size()) == sizes.first);\n        assert(evaluations <=\
-    \ 20 * (sizes.first + sizes.second));\n    }\n}\n\nvoid test_monotone_minima()\
-    \ {\n    for (int rows = 1; rows <= 40; rows++) {\n        for (int columns =\
-    \ 1; columns <= 40; columns++) {\n            std::vector<int> optimum(rows);\n\
-    \            for (int row = 0; row < rows; row++) {\n                optimum[row]\
-    \ = std::min(columns - 1, row * columns / rows);\n            }\n            auto\
-    \ value = [&](int row, int column) {\n                if (column == optimum[row])\
-    \ return 0;\n                return 1000 + (row * 97 + column * 53) % 101;\n \
-    \           };\n            auto result = m1une::convex::monotone_row_argmin(rows,\
-    \ columns, value);\n            assert(result == optimum);\n        }\n    }\n\
-    \n    auto empty = m1une::convex::monotone_row_argmin(5, 0, [](int, int) { return\
-    \ 0; });\n    assert(empty == std::vector<int>(5, -1));\n\n    std::vector<std::vector<int>>\
-    \ matrix;\n    matrix.emplace_back(std::vector<int>{0, 5, 7});\n    matrix.emplace_back(std::vector<int>{4,\
-    \ 0, 8});\n    matrix.emplace_back(std::vector<int>{9, 3, 0});\n    assert(m1une::convex::monotone_row_argmin(matrix)\
-    \ == std::vector<int>({0, 1, 2}));\n}\n\nvoid test_monge_checks() {\n    std::vector<std::vector<long\
-    \ long>> matrix(8, std::vector<long long>(11));\n    for (int row = 0; row < 8;\
-    \ row++) {\n        for (int column = 0; column < 11; column++) {\n          \
-    \  long long difference = row - column;\n            matrix[row][column] = difference\
-    \ * difference;\n        }\n    }\n    assert(m1une::convex::is_monge(matrix));\n\
-    \    assert(!m1une::convex::is_anti_monge(matrix));\n\n    for (auto& row : matrix)\
-    \ {\n        for (auto& value : row) value = -value;\n    }\n    assert(!m1une::convex::is_monge(matrix));\n\
-    \    assert(m1une::convex::is_anti_monge(matrix));\n\n    std::vector<std::vector<int>>\
-    \ empty;\n    assert(m1une::convex::is_monge(empty));\n    assert(m1une::convex::is_anti_monge(empty));\n\
-    }\n\ntemplate <class T, class Compare>\nstd::vector<T> brute_convolution(const\
-    \ std::vector<T>& first, const std::vector<T>& second,\n                     \
-    \            Compare compare) {\n    if (first.empty() || second.empty()) return\
-    \ {};\n    std::vector<T> result(first.size() + second.size() - 1);\n    for (int\
-    \ index = 0; index < int(result.size()); index++) {\n        int left = std::max(0,\
-    \ index - int(second.size()) + 1);\n        int right = std::min(int(first.size()),\
-    \ index + 1);\n        result[index] = first[left] + second[index - left];\n \
-    \       for (int i = left + 1; i < right; i++) {\n            T value = first[i]\
-    \ + second[index - i];\n            if (compare(value, result[index])) result[index]\
-    \ = value;\n        }\n    }\n    return result;\n}\n\ntemplate <class T, class\
-    \ Compare>\nstd::vector<T> brute_convolution_with_infinity(const std::vector<T>&\
-    \ first,\n                                               const std::vector<T>&\
-    \ second,\n                                               Compare compare,\n \
-    \                                              const T& infinity) {\n    if (first.empty()\
-    \ || second.empty()) return {};\n    std::vector<T> result(first.size() + second.size()\
-    \ - 1, infinity);\n    for (int i = 0; i < int(first.size()); i++) {\n       \
-    \ for (int j = 0; j < int(second.size()); j++) {\n            if (first[i] ==\
-    \ infinity || second[j] == infinity) continue;\n            T value = first[i]\
-    \ + second[j];\n            if (result[i + j] == infinity || compare(value, result[i\
-    \ + j])) {\n                result[i + j] = value;\n            }\n        }\n\
-    \    }\n    return result;\n}\n\nvoid test_structured_convolutions() {\n    const\
-    \ long long infinity = 2'000'000'000'000'000'000LL;\n    const long long negative_infinity\
-    \ = -infinity;\n    for (int first_size = 0; first_size <= 35; first_size++) {\n\
-    \        for (int second_size = 0; second_size <= 35; second_size++) {\n     \
-    \       for (int test = 0; test < 8; test++) {\n                std::vector<long\
-    \ long> arbitrary(first_size);\n                for (int i = 0; i < first_size;\
-    \ i++) {\n                    arbitrary[i] = (test * 17 + i * 31 + first_size\
-    \ * 7) % 61 - 30;\n                }\n\n                std::vector<long long>\
-    \ convex(second_size);\n                long long difference = -10 + test;\n \
-    \               for (int i = 1; i < second_size; i++) {\n                    difference\
-    \ += (test * 3 + i * 5) % 4;\n                    convex[i] = convex[i - 1] +\
-    \ difference;\n                }\n                assert(m1une::convex::is_convex_sequence(convex));\n\
-    \                auto expected_min = brute_convolution(arbitrary, convex, std::less<>());\n\
-    \                assert(m1une::convex::min_plus_convolution_convex(arbitrary,\
-    \ convex) ==\n                       expected_min);\n\n                std::vector<long\
-    \ long> arbitrary_extended = arbitrary;\n                for (int i = 0; i < first_size;\
-    \ i++) {\n                    if ((i + test) % 7 == 0) arbitrary_extended[i] =\
-    \ infinity;\n                }\n                std::vector<long long> convex_extended(second_size\
-    \ + 2, infinity);\n                std::copy(convex.begin(), convex.end(), convex_extended.begin()\
-    \ + 1);\n                assert(m1une::convex::is_convex_sequence(convex_extended,\
-    \ infinity));\n                auto expected_extended_min = brute_convolution_with_infinity(\n\
-    \                    arbitrary_extended, convex_extended, std::less<>(), infinity);\n\
-    \                assert(m1une::convex::min_plus_convolution_convex(\n        \
-    \                   arbitrary_extended, convex_extended, infinity) ==\n      \
-    \                 expected_extended_min);\n\n                std::vector<long\
-    \ long> first_convex(first_size);\n                difference = -12 - test;\n\
-    \                for (int i = 1; i < first_size; i++) {\n                    difference\
-    \ += (test * 5 + i * 7) % 5;\n                    first_convex[i] = first_convex[i\
-    \ - 1] + difference;\n                }\n                assert(m1une::convex::is_convex_sequence(first_convex));\n\
-    \                auto expected_convex =\n                    brute_convolution(first_convex,\
-    \ convex, std::less<>());\n                assert(m1une::convex::min_plus_convolution_convex(first_convex,\
-    \ convex) ==\n                       expected_convex);\n                assert(m1une::convex::min_plus_convolution_convex(convex,\
-    \ first_convex) ==\n                       expected_convex);\n               \
-    \ assert(m1une::convex::min_plus_convolution_convex_convex(first_convex,\n   \
-    \                                                                     convex)\
-    \ ==\n                       expected_convex);\n                assert(m1une::convex::min_plus_convolution_convex_convex(convex,\n\
-    \                                                                        first_convex)\
-    \ ==\n                       expected_convex);\n\n                std::vector<long\
-    \ long> first_convex_extended(first_size + 2,\n                              \
-    \                                infinity);\n                std::copy(first_convex.begin(),\
-    \ first_convex.end(),\n                          first_convex_extended.begin()\
-    \ + 1);\n                auto expected_extended_convex = brute_convolution_with_infinity(\n\
-    \                    first_convex_extended, convex_extended, std::less<>(), infinity);\n\
-    \                assert(m1une::convex::min_plus_convolution_convex_convex(\n \
-    \                          first_convex_extended, convex_extended, infinity) ==\n\
-    \                       expected_extended_convex);\n\n                std::vector<long\
-    \ long> concave = convex;\n                for (auto& value : concave) value =\
-    \ -value;\n                assert(m1une::convex::is_concave_sequence(concave));\n\
-    \                auto expected_max = brute_convolution(arbitrary, concave, std::greater<>());\n\
-    \                assert(m1une::convex::max_plus_convolution_concave(arbitrary,\
-    \ concave) ==\n                       expected_max);\n\n                std::vector<long\
-    \ long> first_concave = first_convex;\n                for (auto& value : first_concave)\
-    \ value = -value;\n                assert(m1une::convex::is_concave_sequence(first_concave));\n\
-    \                auto expected_concave =\n                    brute_convolution(first_concave,\
-    \ concave, std::greater<>());\n                assert(m1une::convex::max_plus_convolution_concave(first_concave,\
-    \ concave) ==\n                       expected_concave);\n                assert(m1une::convex::max_plus_convolution_concave(concave,\
-    \ first_concave) ==\n                       expected_concave);\n             \
-    \   assert(m1une::convex::max_plus_convolution_concave_concave(first_concave,\n\
-    \                                                                          concave)\
-    \ ==\n                       expected_concave);\n                assert(m1une::convex::max_plus_convolution_concave_concave(concave,\n\
-    \                                                                          first_concave)\
-    \ ==\n                       expected_concave);\n\n                std::vector<long\
-    \ long> arbitrary_max_extended = arbitrary_extended;\n                for (long\
-    \ long& value : arbitrary_max_extended) {\n                    value = value ==\
-    \ infinity ? negative_infinity : -value;\n                }\n                std::vector<long\
-    \ long> concave_extended = convex_extended;\n                for (long long& value\
-    \ : concave_extended) {\n                    value = value == infinity ? negative_infinity\
-    \ : -value;\n                }\n                auto expected_extended_max = brute_convolution_with_infinity(\n\
-    \                    arbitrary_max_extended, concave_extended, std::greater<>(),\n\
-    \                    negative_infinity);\n                assert(m1une::convex::max_plus_convolution_concave(\n\
-    \                           arbitrary_max_extended, concave_extended,\n      \
-    \                     negative_infinity) == expected_extended_max);\n\n      \
-    \          std::vector<long long> first_concave_extended =\n                 \
-    \   first_convex_extended;\n                for (long long& value : first_concave_extended)\
-    \ {\n                    value = value == infinity ? negative_infinity : -value;\n\
-    \                }\n                auto expected_extended_concave = brute_convolution_with_infinity(\n\
-    \                    first_concave_extended, concave_extended, std::greater<>(),\n\
-    \                    negative_infinity);\n                assert(m1une::convex::max_plus_convolution_concave_concave(\n\
-    \                           first_concave_extended, concave_extended,\n      \
-    \                     negative_infinity) == expected_extended_concave);\n    \
-    \        }\n        }\n    }\n\n    assert(!m1une::convex::is_convex_sequence(std::vector<int>{0,\
-    \ 2, 1}));\n    assert(!m1une::convex::is_concave_sequence(std::vector<int>{0,\
-    \ -2, -1}));\n    assert(!m1une::convex::is_convex_sequence(\n        std::vector<long\
-    \ long>{1, infinity, infinity}));\n    assert(m1une::convex::is_convex_sequence(\n\
-    \        std::vector<long long>{1, infinity, infinity}, infinity));\n    assert(m1une::convex::is_convex_sequence(\n\
-    \        std::vector<long long>{infinity, 0, 1, 4, infinity}, infinity));\n  \
-    \  assert(!m1une::convex::is_convex_sequence(\n        std::vector<long long>{0,\
-    \ infinity, 1}, infinity));\n\n    std::vector<long long> arbitrary = {infinity,\
-    \ 3, infinity, -2};\n    std::vector<long long> convex = {infinity, 0, 1, 4, infinity,\
-    \ infinity};\n    auto expected_min =\n        brute_convolution_with_infinity(arbitrary,\
-    \ convex, std::less<>(), infinity);\n    assert(m1une::convex::min_plus_convolution_convex(arbitrary,\
-    \ convex, infinity) ==\n           expected_min);\n\n    std::vector<long long>\
-    \ first_convex = {infinity, 2, 2, 3, infinity};\n    expected_min = brute_convolution_with_infinity(first_convex,\
-    \ convex,\n                                                   std::less<>(), infinity);\n\
-    \    assert(m1une::convex::min_plus_convolution_convex_convex(\n             \
-    \  first_convex, convex, infinity) == expected_min);\n\n    long long unordered_infinity\
-    \ = 7;\n    std::vector<long long> large_arbitrary = {10, 20};\n    std::vector<long\
-    \ long> small_convex = {0, 1};\n    assert(m1une::convex::min_plus_convolution_convex(\n\
-    \               large_arbitrary, small_convex, unordered_infinity) ==\n      \
-    \     std::vector<long long>({10, 11, 21}));\n\n    std::vector<long long> arbitrary_max\
-    \ = {negative_infinity, 3,\n                                             negative_infinity,\
-    \ -2};\n    std::vector<long long> concave = {negative_infinity, 0, -1, -4,\n\
-    \                                      negative_infinity};\n    assert(m1une::convex::is_concave_sequence(concave,\
-    \ negative_infinity));\n    auto expected_max = brute_convolution_with_infinity(\n\
-    \        arbitrary_max, concave, std::greater<>(), negative_infinity);\n    assert(m1une::convex::max_plus_convolution_concave(\n\
-    \               arbitrary_max, concave, negative_infinity) == expected_max);\n\
-    \n    std::vector<long long> first_concave = {negative_infinity, 2, 2, 1,\n  \
-    \                                          negative_infinity};\n    expected_max\
-    \ = brute_convolution_with_infinity(\n        first_concave, concave, std::greater<>(),\
-    \ negative_infinity);\n    assert(m1une::convex::max_plus_convolution_concave_concave(\n\
-    \               first_concave, concave, negative_infinity) == expected_max);\n\
-    \n    std::vector<long long> all_infinity(3, infinity);\n    assert(m1une::convex::is_convex_sequence(all_infinity,\
-    \ infinity));\n    assert(m1une::convex::min_plus_convolution_convex_convex(\n\
-    \               all_infinity, convex, infinity) ==\n           std::vector<long\
-    \ long>(all_infinity.size() + convex.size() - 1,\n                           \
-    \       infinity));\n}\n\nint main() {\n    m1une::utilities::FastInput fast_input;\n\
-    \    m1une::utilities::FastOutput fast_output;\n\n    test_smawk_monge();\n  \
-    \  test_smawk_totally_monotone_and_ties();\n    test_smawk_max();\n    test_smawk_matrix_overload_and_evaluations();\n\
-    \    test_monotone_minima();\n    test_monge_checks();\n    test_structured_convolutions();\n\
-    \n    long long a, b;\n    fast_input >> a >> b;\n    fast_output << a + b <<\
-    \ '\\n';\n}\n"
-  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <algorithm>\n\
-    #include <cassert>\n#include <functional>\n#include \"../../../utilities/fast_io.hpp\"\
-    \n#include <limits>\n#include <vector>\n\n#include \"../../../convex/monge/all.hpp\"\
+    \ convex\n}  // namespace m1une\n\n\n#line 1 \"convex/monge/all.hpp\"\n\n\n\n\
+    #line 1 \"convex/monge/check.hpp\"\n\n\n\n#line 7 \"convex/monge/check.hpp\"\n\
+    \nnamespace m1une {\nnamespace convex {\n\ntemplate <class Value>\nbool is_monge(int\
+    \ row_count, int column_count, Value value) {\n    assert(row_count >= 0);\n \
+    \   assert(column_count >= 0);\n    if (row_count < 2 || column_count < 2) return\
+    \ true;\n    for (int row = 0; row + 1 < row_count; row++) {\n        for (int\
+    \ column = 0; column + 1 < column_count; column++) {\n            if (value(row,\
+    \ column) + value(row + 1, column + 1) >\n                value(row, column +\
+    \ 1) + value(row + 1, column)) {\n                return false;\n            }\n\
+    \        }\n    }\n    return true;\n}\n\ntemplate <class Value>\nbool is_anti_monge(int\
+    \ row_count, int column_count, Value value) {\n    return is_monge(row_count,\
+    \ column_count,\n        [&](int row, int column) -> decltype(auto) {\n      \
+    \      return value(row, column_count - 1 - column);\n        });\n}\n\n// Check\
+    \ adjacent 2x2 inequalities in the supplied orders, O(HW) time,\n// O(1) extra\
+    \ memory. Distinct nonnegative IDs; arithmetic must not overflow.\ntemplate <class\
+    \ Value>\nbool is_monge(std::span<const int> rows, std::span<const int> columns,\
+    \ Value value) {\n    return is_monge(int(rows.size()), int(columns.size()),\n\
+    \        [&](int row, int column) -> decltype(auto) {\n            return value(rows[row],\
+    \ columns[column]);\n        });\n}\n\ntemplate <class Value>\nbool is_anti_monge(std::span<const\
+    \ int> rows, std::span<const int> columns,\n                   Value value) {\n\
+    \    return is_anti_monge(int(rows.size()), int(columns.size()),\n        [&](int\
+    \ row, int column) -> decltype(auto) {\n            return value(rows[row], columns[column]);\n\
+    \        });\n}\n\ntemplate <class T>\nbool is_monge(const std::vector<std::vector<T>>&\
+    \ matrix) {\n    int row_count = int(matrix.size());\n    int column_count = row_count\
+    \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
+    \ == column_count);\n    return is_monge(row_count, column_count,\n          \
+    \          [&](int row, int column) -> const T& { return matrix[row][column];\
+    \ });\n}\n\ntemplate <class T>\nbool is_anti_monge(const std::vector<std::vector<T>>&\
+    \ matrix) {\n    int row_count = int(matrix.size());\n    int column_count = row_count\
+    \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
+    \ == column_count);\n    return is_anti_monge(\n        row_count, column_count,\n\
+    \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
+    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n#line 1 \"convex/monge/larsch.hpp\"\
+    \n\n\n\n#line 7 \"convex/monge/larsch.hpp\"\n\nnamespace m1une {\nnamespace convex\
+    \ {\n\n// Online minima of a lower-triangular totally monotone matrix (column\
+    \ <= row).\n// Leftmost ties. Before answering row r, only columns <= r are accessed,\
+    \ even\n// when evaluating future rows. Finalize column r+1 after receiving answer\
+    \ r.\n// O(N) total time/evaluations/memory; an individual next_argmin can take\
+    \ O(N).\n// Value is stored directly, with no type-erased callable. Use CTAD:\
+    \ Larsch q(n,f).\ntemplate <class Value>\nclass Larsch {\n    struct Level {\n\
+    \        int size;\n        int row = 0;\n        int column_row = 0;\n      \
+    \  int boundary = 0;\n        std::vector<int> columns;\n        explicit Level(int\
+    \ n) : size(n) {}\n    };\n\n    int _size;\n    Value _value;\n    std::vector<Level>\
+    \ _levels;\n\n    auto entry(int depth, int row, int column) {\n        for (int\
+    \ d = depth; d > 0; --d) {\n            row = row * 2 + 1;\n            column\
+    \ = _levels[d].columns[column];\n        }\n        return _value(row, column);\n\
+    \    }\n\n    int next_column(int depth) {\n        auto& level = _levels[depth];\n\
+    \        int row = level.column_row++;\n        int first = row == 0 ? 0 : row\
+    \ * 2 - 1;\n        for (int column = first; column <= row * 2; ++column) {\n\
+    \            while (int(level.columns.size()) != row &&\n                   entry(depth\
+    \ - 1, int(level.columns.size()) * 2 - 1,\n                         level.columns.back())\
+    \ >\n                   entry(depth - 1, int(level.columns.size()) * 2 - 1, column))\
+    \ {\n                level.columns.pop_back();\n            }\n            if\
+    \ (int(level.columns.size()) != level.size) {\n                level.columns.push_back(column);\n\
+    \            }\n        }\n        return level.columns[next_row(depth)];\n  \
+    \  }\n\n    int next_row(int depth) {\n        auto& level = _levels[depth];\n\
+    \        int row = level.row++;\n        if (row % 2 != 0) {\n            return\
+    \ entry(depth, row, level.boundary) <= entry(depth, row, row)\n              \
+    \         ? level.boundary : row;\n        }\n        int previous = level.boundary;\n\
+    \        int next = row + 1 == level.size ? level.size - 1\n                 \
+    \                       : next_column(depth + 1);\n        level.boundary = next;\n\
+    \        int best = previous;\n        for (int column = previous + 1; column\
+    \ <= next; ++column) {\n            if (entry(depth, row, column) < entry(depth,\
+    \ row, best)) best = column;\n        }\n        return best;\n    }\n\n   public:\n\
+    \    explicit Larsch(int size, Value value) : _size(size), _value(std::move(value))\
+    \ {\n        assert(size >= 0);\n        for (int n = size; n > 0; n /= 2) {\n\
+    \            _levels.emplace_back(n);\n            if (_levels.size() > 1) _levels.back().columns.reserve(n);\n\
+    \        }\n    }\n    int size() const { return _size; }\n    int processed_rows()\
+    \ const { return _size == 0 ? 0 : _levels[0].row; }\n    bool finished() const\
+    \ { return processed_rows() == _size; }\n    int next_argmin() {\n        assert(!finished());\n\
+    \        return next_row(0);\n    }\n};\n\n}  // namespace convex\n}  // namespace\
+    \ m1une\n\n\n#line 1 \"convex/monge/monotone_minima.hpp\"\n\n\n\n#line 8 \"convex/monge/monotone_minima.hpp\"\
+    \n\nnamespace m1une {\nnamespace convex {\n\nnamespace monotone_minima_detail\
+    \ {\n\ntemplate <class Value, class Compare>\nvoid solve(int row_left, int row_right,\
+    \ int column_left, int column_right,\n           const Value& value, const Compare&\
+    \ compare, std::vector<int>& answer) {\n    if (row_left == row_right) return;\n\
+    \    int row = (row_left + row_right) / 2;\n    int best = column_left;\n    for\
+    \ (int column = column_left + 1; column < column_right; column++) {\n        if\
+    \ (compare(value(row, column), value(row, best))) best = column;\n    }\n    answer[row]\
+    \ = best;\n    solve(row_left, row, column_left, best + 1, value, compare, answer);\n\
+    \    solve(row + 1, row_right, best, column_right, value, compare, answer);\n\
+    }\n\n}  // namespace monotone_minima_detail\n\n// Fixed rectangular matrix; leftmost\
+    \ optimal columns must be nondecreasing.\n// Returns column indices, or -1 when\
+    \ there are no columns. Not an online DP.\n// O(H + W log(H+1)) time, O(H + log(H+1))\
+    \ memory.\ntemplate <class Value, class Compare = std::less<>>\nstd::vector<int>\
+    \ monotone_row_optima(int row_count, int column_count, Value value,\n        \
+    \                             Compare compare = Compare()) {\n    assert(row_count\
+    \ >= 0);\n    assert(column_count >= 0);\n    std::vector<int> answer(row_count,\
+    \ -1);\n    if (row_count == 0 || column_count == 0) return answer;\n    monotone_minima_detail::solve(0,\
+    \ row_count, 0, column_count, value, compare, answer);\n    return answer;\n}\n\
+    \ntemplate <class Value>\nstd::vector<int> monotone_row_argmin(int row_count,\
+    \ int column_count, Value value) {\n    return monotone_row_optima(row_count,\
+    \ column_count, value, std::less<>());\n}\n\ntemplate <class Value>\nstd::vector<int>\
+    \ monotone_row_argmax(int row_count, int column_count, Value value) {\n    return\
+    \ monotone_row_optima(row_count, column_count, value, std::greater<>());\n}\n\n\
+    // Ordered matrix value(rows[r], columns[c]); return original column IDs in\n\
+    // row list order. Leftmost means first in columns. IDs are distinct/nonnegative.\n\
+    template <class Value, class Compare = std::less<>>\nstd::vector<int> monotone_row_optima(std::span<const\
+    \ int> rows,\n                                     std::span<const int> columns,\
+    \ Value value,\n                                     Compare compare = Compare())\
+    \ {\n    auto answer = monotone_row_optima(int(rows.size()), int(columns.size()),\n\
+    \        [&](int row, int column) -> decltype(auto) {\n            return value(rows[row],\
+    \ columns[column]);\n        }, compare);\n    for (int& column : answer) if (column\
+    \ != -1) column = columns[column];\n    return answer;\n}\n\ntemplate <class Value>\n\
+    std::vector<int> monotone_row_argmin(std::span<const int> rows,\n            \
+    \                         std::span<const int> columns, Value value) {\n    return\
+    \ monotone_row_optima(rows, columns, value, std::less<>());\n}\n\ntemplate <class\
+    \ Value>\nstd::vector<int> monotone_row_argmax(std::span<const int> rows,\n  \
+    \                                   std::span<const int> columns, Value value)\
+    \ {\n    return monotone_row_optima(rows, columns, value, std::greater<>());\n\
+    }\n\ntemplate <class T>\nstd::vector<int> monotone_row_argmin(const std::vector<std::vector<T>>&\
+    \ matrix) {\n    int row_count = int(matrix.size());\n    int column_count = row_count\
+    \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
+    \ == column_count);\n    return monotone_row_argmin(\n        row_count, column_count,\n\
+    \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
+    }\n\ntemplate <class T>\nstd::vector<int> monotone_row_argmax(const std::vector<std::vector<T>>&\
+    \ matrix) {\n    int row_count = int(matrix.size());\n    int column_count = row_count\
+    \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
+    \ == column_count);\n    return monotone_row_argmax(\n        row_count, column_count,\n\
+    \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
+    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n#line 8 \"convex/monge/all.hpp\"\
+    \n\n\n#line 1 \"convex/monge_shortest_path.hpp\"\n\n\n\n#line 8 \"convex/monge_shortest_path.hpp\"\
+    \n\n#line 11 \"convex/monge_shortest_path.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ convex {\n\ntemplate <class T>\nstruct MongeShortestPathResult {\n    std::vector<T>\
+    \ distance;\n    std::vector<int> parent;\n};\n\n// Same-array forward recurrence:\
+    \ dp[j] = min(dp[i] + cost(i,j)), j-i >= D.\n// Finite Monge costs on every fully\
+    \ valid rectangle. Smallest parent on ties.\n// O(N) time/evaluations/memory,\
+    \ for any D >= 1. Never evaluates invalid edges\n// or adds infinity. Vertices\
+    \ 1..D-1 are unreachable; all vertices >=D are reachable.\ntemplate <class T,\
+    \ class Cost>\nMongeShortestPathResult<T> monge_shortest_path(\n    int vertex_count,\
+    \ Cost cost, T infinity, int minimum_step = 1) {\n    assert(vertex_count >= 0);\n\
+    \    assert(minimum_step >= 1);\n    assert(T() < infinity);\n    MongeShortestPathResult<T>\
+    \ result;\n    result.distance.assign(vertex_count, infinity);\n    result.parent.assign(vertex_count,\
+    \ -1);\n    if (vertex_count == 0) return result;\n    result.distance[0] = T();\n\
+    \    if (minimum_step >= vertex_count) return result;\n\n    // Row r targets\
+    \ r+D. Columns 1..D-1 would be unreachable permanently;\n    // duplicate source\
+    \ 0 instead. This nondecreasing source map preserves Monge.\n    auto source =\
+    \ [&](int column) { return column < minimum_step ? 0 : column; };\n    Larsch\
+    \ optimizer(vertex_count - minimum_step, [&](int row, int column) -> T {\n   \
+    \     int from = source(column);\n        return result.distance[from] + cost(from,\
+    \ row + minimum_step);\n    });\n    for (int to = minimum_step; to < vertex_count;\
+    \ ++to) {\n        int from = source(optimizer.next_argmin());\n        result.parent[to]\
+    \ = from;\n        result.distance[to] = result.distance[from] + cost(from, to);\n\
+    \    }\n    return result;\n}\n\n// dist[j] = min(dist[i] + cost(i, j)), where\
+    \ j - i >= minimum_step.\n// Same-array recurrence. Finite anti-Monge costs on\
+    \ every valid rectangle.\n// Largest parent on ties; O(N) memory. See docs for\
+    \ the numeric contract.\n// O(N log N + N * minimum_step) time for O(1) cost evaluations.\n\
+    // In particular, minimum_step = 1 or 2 gives O(N log N) time.\ntemplate <class\
+    \ T, class Cost>\nMongeShortestPathResult<T> anti_monge_shortest_path(\n    int\
+    \ vertex_count, Cost cost, T infinity, int minimum_step = 1) {\n    assert(vertex_count\
+    \ >= 0);\n    assert(minimum_step >= 1);\n    assert(T() < infinity);\n\n    MongeShortestPathResult<T>\
+    \ result;\n    result.distance.assign(vertex_count, infinity);\n    result.parent.assign(vertex_count,\
+    \ -1);\n    if (vertex_count == 0) return result;\n    result.distance[0] = T();\n\
+    \    if (minimum_step >= vertex_count) return result;\n\n    auto relax = [&](int\
+    \ from, int to) {\n        if (result.distance[from] == infinity) return;\n  \
+    \      T candidate = result.distance[from] + cost(from, to);\n        if (candidate\
+    \ < result.distance[to] ||\n            (candidate == result.distance[to] && from\
+    \ > result.parent[to])) {\n            result.distance[to] = candidate;\n    \
+    \        result.parent[to] = from;\n        }\n    };\n\n    // All pairs in this\
+    \ rectangle are valid. Remove unreachable columns,\n    // then reverse the remaining\
+    \ columns to turn anti-Monge into Monge.\n    auto rectangle = [&](int first,\
+    \ int last, int top, int bottom) {\n        if (first == last || top == bottom)\
+    \ return;\n        std::vector<int> sources;\n        for (int from = last; from\
+    \ > first;) {\n            --from;\n            if (result.distance[from] != infinity)\
+    \ sources.push_back(from);\n        }\n        if (sources.empty()) return;\n\
+    \        if (sources.size() == 1) {\n            for (int to = top; to < bottom;\
+    \ to++) relax(sources[0], to);\n            return;\n        }\n        std::vector<int>\
+    \ targets(bottom - top);\n        std::iota(targets.begin(), targets.end(), top);\n\
+    \        auto argmin = smawk_row_argmin(targets, sources, [&](int to, int from)\
+    \ -> T {\n            return result.distance[from] + cost(from, to);\n       \
+    \ });\n        for (int row = 0; row < bottom - top; row++) relax(argmin[row],\
+    \ top + row);\n    };\n\n    auto solve = [&](auto& self, int left, int right)\
+    \ -> void {\n        // Such a block contains no valid internal edge.\n      \
+    \  if (right - left <= minimum_step) return;\n        int middle = left + (right\
+    \ - left) / 2;\n        self(self, left, middle);\n\n        // Two valid rectangles\
+    \ and a small corner partition the cross edges.\n        int source_end = std::max(left,\
+    \ middle - (minimum_step - 1));\n        int target_begin = middle + std::min(right\
+    \ - middle, minimum_step - 1);\n        rectangle(left, middle, target_begin,\
+    \ right);\n        rectangle(left, source_end, middle, target_begin);\n      \
+    \  for (int from = source_end; from < middle; from++) {\n            // Subtraction\
+    \ avoids overflow when minimum_step is large.\n            if (minimum_step >=\
+    \ target_begin - from) continue;\n            for (int to = std::max(middle, from\
+    \ + minimum_step);\n                 to < target_begin; to++) {\n            \
+    \    relax(from, to);\n            }\n        }\n\n        // Incoming transitions\
+    \ must be applied BEFORE solving the right half.\n        self(self, middle, right);\n\
+    \    };\n    solve(solve, 0, vertex_count);\n    return result;\n}\n\n}  // namespace\
+    \ convex\n}  // namespace m1une\n\n\n#line 1 \"convex/monge_transition.hpp\"\n\
+    \n\n\n#line 9 \"convex/monge_transition.hpp\"\n\n#line 12 \"convex/monge_transition.hpp\"\
+    \n\nnamespace m1une {\nnamespace convex {\n\ntemplate <class T>\nstruct MatrixTransitionResult\
+    \ {\n    std::vector<T> value;\n    std::vector<int> argmin;\n};\n\nnamespace\
+    \ monge_transition_detail {\n\ntemplate <class T, class Cost, class Source, class\
+    \ Target, class Search>\nauto solve(const std::vector<T>& previous, int targets,\
+    \ int sources, Cost cost,\n           Source source, Target target, Search search)\
+    \ {\n    using R = std::decay_t<decltype(previous[0] + cost(0, 0))>;\n    auto\
+    \ value = [&](int row, int column) -> R {\n        return previous[source(column)]\
+    \ + cost(source(column), target(row));\n    };\n    MatrixTransitionResult<R>\
+    \ result;\n    result.argmin = search(targets, sources, value);\n    result.value.resize(targets);\n\
+    \    for (int row = 0; row < targets; ++row) {\n        int& column = result.argmin[row];\n\
+    \        if (column == -1) continue;\n        result.value[row] = value(row, column);\n\
+    \        column = source(column);\n    }\n    return result;\n}\n\n}  // namespace\
+    \ monge_transition_detail\n\n// Offline layer: g[j] = min_i(previous[i] + cost(i,j));\
+    \ previous is finalized.\n// Leftmost minimizing sources must be nondecreasing\
+    \ with target index. This is\n// weaker than total monotonicity. O(H + W log(H+1))\
+    \ time, O(H) result memory.\n// Ties select smallest source. Empty sources give\
+    \ argmin=-1, value=R().\ntemplate <class T, class Cost>\nauto monotone_transition(const\
+    \ std::vector<T>& previous, int state_count, Cost cost) {\n    auto identity =\
+    \ [](int i) { return i; };\n    return monge_transition_detail::solve(previous,\
+    \ state_count, int(previous.size()),\n        cost, identity, identity, [](int\
+    \ h, int w, auto value) {\n            return monotone_row_argmin(h, w, value);\n\
+    \        });\n}\n\n// Same offline recurrence, with finite Monge cost(source,target).\
+    \ Adding source\n// constants preserves Monge. O(H+W) time/memory; smallest source\
+    \ on ties.\ntemplate <class T, class Cost>\nauto monge_transition(const std::vector<T>&\
+    \ previous, int state_count, Cost cost) {\n    auto identity = [](int i) { return\
+    \ i; };\n    return monge_transition_detail::solve(previous, state_count, int(previous.size()),\n\
+    \        cost, identity, identity, [](int h, int w, auto value) {\n          \
+    \  return smawk_row_argmin(h, w, value);\n        });\n}\n\n// Anti-Monge specialization:\
+    \ reverse source order internally. Largest source\n// on ties; O(H+W) time/memory.\
+    \ All source-target pairs must be legal and finite.\ntemplate <class T, class\
+    \ Cost>\nauto anti_monge_transition(const std::vector<T>& previous, int state_count,\
+    \ Cost cost) {\n    int width = int(previous.size());\n    return monge_transition_detail::solve(previous,\
+    \ state_count, width, cost,\n        [=](int i) { return width - 1 - i; }, [](int\
+    \ i) { return i; },\n        [](int h, int w, auto value) { return smawk_row_argmin(h,\
+    \ w, value); });\n}\n\n// Ordered variants: the virtual matrix is previous[sources[c]]\
+    \ +\n// cost(sources[c], targets[r]). Return original source IDs, in target list\
+    \ order.\n// IDs must be distinct/nonnegative; sources must index previous. Ties\
+    \ choose the\n// first source in the supplied order. No same-array recurrence\
+    \ is computed.\ntemplate <class T, class Cost>\nauto monotone_transition(const\
+    \ std::vector<T>& previous,\n                         std::span<const int> targets,\
+    \ std::span<const int> sources,\n                         Cost cost) {\n    for\
+    \ (int i : sources) { assert(0 <= i && i < int(previous.size())); (void)i; }\n\
+    \    for (int j : targets) { assert(j >= 0); (void)j; }\n    return monge_transition_detail::solve(previous,\
+    \ int(targets.size()),\n        int(sources.size()), cost, [&](int i) { return\
+    \ sources[i]; },\n        [&](int i) { return targets[i]; },\n        [](int h,\
+    \ int w, auto value) { return monotone_row_argmin(h, w, value); });\n}\n\ntemplate\
+    \ <class T, class Cost>\nauto monge_transition(const std::vector<T>& previous,\n\
+    \                      std::span<const int> targets, std::span<const int> sources,\n\
+    \                      Cost cost) {\n    for (int i : sources) { assert(0 <= i\
+    \ && i < int(previous.size())); (void)i; }\n    for (int j : targets) { assert(j\
+    \ >= 0); (void)j; }\n    return monge_transition_detail::solve(previous, int(targets.size()),\n\
+    \        int(sources.size()), cost, [&](int i) { return sources[i]; },\n     \
+    \   [&](int i) { return targets[i]; },\n        [](int h, int w, auto value) {\
+    \ return smawk_row_argmin(h, w, value); });\n}\n\n}  // namespace convex\n}  //\
+    \ namespace m1une\n\n\n#line 1 \"convex/slope_trick.hpp\"\n\n\n\n#line 7 \"convex/slope_trick.hpp\"\
+    \n#include <queue>\n#line 11 \"convex/slope_trick.hpp\"\n\nnamespace m1une {\n\
+    namespace convex {\n\ntemplate <class T>\nstruct SlopeTrickArgmin {\n    std::optional<T>\
+    \ left;\n    std::optional<T> right;\n};\n\ntemplate <class T>\nclass SlopeTrick\
+    \ {\n    static_assert(std::is_arithmetic_v<T> && std::is_signed_v<T>);\n\n  \
+    \  T _minimum = T();\n    T _left_offset = T();\n    T _right_offset = T();\n\
+    \    std::priority_queue<T> _left;\n    std::priority_queue<T, std::vector<T>,\
+    \ std::greater<T>> _right;\n\n    T left_top() const {\n        return _left.top()\
+    \ + _left_offset;\n    }\n\n    T right_top() const {\n        return _right.top()\
+    \ + _right_offset;\n    }\n\n    void push_left(T value) {\n        _left.push(value\
+    \ - _left_offset);\n    }\n\n    void push_right(T value) {\n        _right.push(value\
+    \ - _right_offset);\n    }\n\n   public:\n    SlopeTrick() = default;\n\n    T\
+    \ minimum() const {\n        return _minimum;\n    }\n\n    int breakpoint_count()\
+    \ const {\n        return int(_left.size() + _right.size());\n    }\n\n    SlopeTrickArgmin<T>\
+    \ argmin() const {\n        SlopeTrickArgmin<T> result;\n        if (!_left.empty())\
+    \ result.left = left_top();\n        if (!_right.empty()) result.right = right_top();\n\
+    \        return result;\n    }\n\n    void add_constant(T value) {\n        _minimum\
+    \ += value;\n    }\n\n    void add_x_minus_a(T a) {\n        if (!_left.empty()\
+    \ && left_top() > a) {\n            T old = left_top();\n            _minimum\
+    \ += old - a;\n            _left.pop();\n            push_left(a);\n         \
+    \   push_right(old);\n        } else {\n            push_right(a);\n        }\n\
+    \    }\n\n    void add_a_minus_x(T a) {\n        if (!_right.empty() && right_top()\
+    \ < a) {\n            T old = right_top();\n            _minimum += a - old;\n\
+    \            _right.pop();\n            push_right(a);\n            push_left(old);\n\
+    \        } else {\n            push_left(a);\n        }\n    }\n\n    void add_abs(T\
+    \ a) {\n        add_a_minus_x(a);\n        add_x_minus_a(a);\n    }\n\n    void\
+    \ clear_left() {\n        _left = std::priority_queue<T>();\n    }\n\n    void\
+    \ clear_right() {\n        _right = std::priority_queue<T, std::vector<T>, std::greater<T>>();\n\
+    \    }\n\n    void prefix_minimum() {\n        clear_right();\n    }\n\n    void\
+    \ suffix_minimum() {\n        clear_left();\n    }\n\n    void shift(T delta)\
+    \ {\n        _left_offset += delta;\n        _right_offset += delta;\n    }\n\n\
+    \    void shift(T left_delta, T right_delta) {\n        assert(left_delta <= right_delta);\n\
+    \        _left_offset += left_delta;\n        _right_offset += right_delta;\n\
+    \    }\n\n    T evaluate(T x) const {\n        T result = _minimum;\n        auto\
+    \ left = _left;\n        while (!left.empty()) {\n            T breakpoint = left.top()\
+    \ + _left_offset;\n            if (breakpoint > x) result += breakpoint - x;\n\
+    \            left.pop();\n        }\n\n        auto right = _right;\n        while\
+    \ (!right.empty()) {\n            T breakpoint = right.top() + _right_offset;\n\
+    \            if (x > breakpoint) result += x - breakpoint;\n            right.pop();\n\
+    \        }\n        return result;\n    }\n\n    void merge(SlopeTrick other)\
+    \ {\n        add_constant(other._minimum);\n        while (!other._left.empty())\
+    \ {\n            add_a_minus_x(other.left_top());\n            other._left.pop();\n\
+    \        }\n        while (!other._right.empty()) {\n            add_x_minus_a(other.right_top());\n\
+    \            other._right.pop();\n        }\n    }\n\n    void min_plus_convolve(SlopeTrick\
+    \ other) {\n        SlopeTrick result;\n        result._minimum = _minimum + other._minimum;\n\
+    \n        while (!_left.empty() && !other._left.empty()) {\n            result.push_left(left_top()\
+    \ + other.left_top());\n            _left.pop();\n            other._left.pop();\n\
+    \        }\n        while (!_right.empty() && !other._right.empty()) {\n     \
+    \       result.push_right(right_top() + other.right_top());\n            _right.pop();\n\
+    \            other._right.pop();\n        }\n        *this = std::move(result);\n\
+    \    }\n};\n\ntemplate <class T>\nSlopeTrick<T> min_plus_convolution(SlopeTrick<T>\
+    \ first,\n                                   SlopeTrick<T> second) {\n    first.min_plus_convolve(std::move(second));\n\
+    \    return first;\n}\n\n}  // namespace convex\n}  // namespace m1une\n\n\n#line\
+    \ 12 \"convex/all.hpp\"\n\n\n#line 11 \"verify/convex/monge/monge_algorithms.test.cpp\"\
     \n\ntemplate <class Value, class Compare>\nstd::vector<int> brute_row_optima(int\
     \ rows, int columns, Value value, Compare compare) {\n    std::vector<int> result(rows,\
     \ -1);\n    if (columns == 0) return result;\n    for (int row = 0; row < rows;\
@@ -1139,23 +1209,260 @@ data:
     \    m1une::utilities::FastOutput fast_output;\n\n    test_smawk_monge();\n  \
     \  test_smawk_totally_monotone_and_ties();\n    test_smawk_max();\n    test_smawk_matrix_overload_and_evaluations();\n\
     \    test_monotone_minima();\n    test_monge_checks();\n    test_structured_convolutions();\n\
-    \n    long long a, b;\n    fast_input >> a >> b;\n    fast_output << a + b <<\
-    \ '\\n';\n}\n"
+    \n    int n, m;\n    fast_input >> n >> m;\n    std::vector<long long> convex(n),\
+    \ arbitrary(m);\n    for (auto& x : convex) fast_input >> x;\n    for (auto& x\
+    \ : arbitrary) fast_input >> x;\n    // Extend the convex sequence by sufficiently\
+    \ steep linear tails. The full\n    // rectangle remains Monge and invalid convolution\
+    \ pairs cannot minimize.\n    const long long slope = 4'000'000'000'000LL;\n \
+    \   auto cost = [&](int from, int to) {\n        int k = to - from;\n        if\
+    \ (k < 0) return convex.front() - slope * k;\n        if (k >= n) return convex.back()\
+    \ + slope * (k - n + 1);\n        return convex[k];\n    };\n    auto result =\
+    \ m1une::convex::monge_transition(arbitrary, n + m - 1, cost);\n    auto monotone\
+    \ = m1une::convex::monotone_transition(arbitrary, n + m - 1, cost);\n    assert(result.value\
+    \ == monotone.value && result.argmin == monotone.argmin);\n    for (int i = 0;\
+    \ i < n + m - 1; ++i) {\n        if (i) fast_output << ' ';\n        fast_output\
+    \ << result.value[i];\n    }\n    fast_output << '\\n';\n}\n"
+  code: "#define PROBLEM \"https://judge.yosupo.jp/problem/min_plus_convolution_convex_arbitrary\"\
+    \n\n#include <algorithm>\n#include <cassert>\n#include <functional>\n#include\
+    \ \"../../../utilities/fast_io.hpp\"\n#include <limits>\n#include <vector>\n\n\
+    #include \"../../../convex/all.hpp\"\n\ntemplate <class Value, class Compare>\n\
+    std::vector<int> brute_row_optima(int rows, int columns, Value value, Compare\
+    \ compare) {\n    std::vector<int> result(rows, -1);\n    if (columns == 0) return\
+    \ result;\n    for (int row = 0; row < rows; row++) {\n        result[row] = 0;\n\
+    \        for (int column = 1; column < columns; column++) {\n            if (compare(value(row,\
+    \ column), value(row, result[row]))) {\n                result[row] = column;\n\
+    \            }\n        }\n    }\n    return result;\n}\n\nvoid test_smawk_monge()\
+    \ {\n    for (int rows = 0; rows <= 40; rows++) {\n        for (int columns =\
+    \ 0; columns <= 40; columns++) {\n            auto value = [&](int row, int column)\
+    \ {\n                long long difference = row * 3LL - column * 2LL;\n      \
+    \          return difference * difference + row * 7LL + column * 5LL;\n      \
+    \      };\n            auto expected = brute_row_optima(rows, columns, value,\
+    \ std::less<>());\n            assert(m1une::convex::smawk_row_argmin(rows, columns,\
+    \ value) == expected);\n        }\n    }\n}\n\nvoid test_smawk_totally_monotone_and_ties()\
+    \ {\n    for (int rows = 1; rows <= 50; rows++) {\n        for (int columns =\
+    \ 1; columns <= 50; columns++) {\n            std::vector<int> threshold(rows);\n\
+    \            for (int row = 0; row < rows; row++) {\n                threshold[row]\
+    \ = std::min(columns - 1, (row * 7 + rows) / 5);\n            }\n            auto\
+    \ value = [&](int row, int column) {\n                int difference = column\
+    \ - threshold[row];\n                return difference * difference;\n       \
+    \     };\n            auto result = m1une::convex::smawk_row_argmin(rows, columns,\
+    \ value);\n            assert(result == threshold);\n        }\n    }\n\n    auto\
+    \ constant = [](int, int) { return 0; };\n    auto result = m1une::convex::smawk_row_argmin(20,\
+    \ 30, constant);\n    assert(result == std::vector<int>(20, 0));\n}\n\nvoid test_smawk_max()\
+    \ {\n    auto value = [](int row, int column) {\n        long long difference\
+    \ = row - column;\n        return -difference * difference;\n    };\n    auto\
+    \ expected = brute_row_optima(30, 25, value, std::greater<>());\n    assert(m1une::convex::smawk_row_argmax(30,\
+    \ 25, value) == expected);\n}\n\nvoid test_smawk_matrix_overload_and_evaluations()\
+    \ {\n    std::vector<std::vector<long long>> matrix(17, std::vector<long long>(23));\n\
+    \    for (int row = 0; row < 17; row++) {\n        for (int column = 0; column\
+    \ < 23; column++) {\n            long long difference = row * 2LL - column;\n\
+    \            matrix[row][column] = difference * difference;\n        }\n    }\n\
+    \    auto expected = brute_row_optima(\n        17, 23, [&](int row, int column)\
+    \ { return matrix[row][column]; }, std::less<>());\n    assert(m1une::convex::smawk_row_argmin(matrix)\
+    \ == expected);\n\n    for (auto sizes : std::vector<std::pair<int, int>>{\n \
+    \            std::pair<int, int>{10, 1000},\n             std::pair<int, int>{1000,\
+    \ 10},\n             std::pair<int, int>{700, 900},\n         }) {\n        int\
+    \ evaluations = 0;\n        auto value = [&](int row, int column) {\n        \
+    \    evaluations++;\n            long long difference = row * 3LL - column * 2LL;\n\
+    \            return difference * difference;\n        };\n        auto result\
+    \ = m1une::convex::smawk_row_argmin(sizes.first, sizes.second, value);\n     \
+    \   assert(int(result.size()) == sizes.first);\n        assert(evaluations <=\
+    \ 20 * (sizes.first + sizes.second));\n    }\n}\n\nvoid test_monotone_minima()\
+    \ {\n    for (int rows = 1; rows <= 40; rows++) {\n        for (int columns =\
+    \ 1; columns <= 40; columns++) {\n            std::vector<int> optimum(rows);\n\
+    \            for (int row = 0; row < rows; row++) {\n                optimum[row]\
+    \ = std::min(columns - 1, row * columns / rows);\n            }\n            auto\
+    \ value = [&](int row, int column) {\n                if (column == optimum[row])\
+    \ return 0;\n                return 1000 + (row * 97 + column * 53) % 101;\n \
+    \           };\n            auto result = m1une::convex::monotone_row_argmin(rows,\
+    \ columns, value);\n            assert(result == optimum);\n        }\n    }\n\
+    \n    auto empty = m1une::convex::monotone_row_argmin(5, 0, [](int, int) { return\
+    \ 0; });\n    assert(empty == std::vector<int>(5, -1));\n\n    std::vector<std::vector<int>>\
+    \ matrix;\n    matrix.emplace_back(std::vector<int>{0, 5, 7});\n    matrix.emplace_back(std::vector<int>{4,\
+    \ 0, 8});\n    matrix.emplace_back(std::vector<int>{9, 3, 0});\n    assert(m1une::convex::monotone_row_argmin(matrix)\
+    \ == std::vector<int>({0, 1, 2}));\n}\n\nvoid test_monge_checks() {\n    std::vector<std::vector<long\
+    \ long>> matrix(8, std::vector<long long>(11));\n    for (int row = 0; row < 8;\
+    \ row++) {\n        for (int column = 0; column < 11; column++) {\n          \
+    \  long long difference = row - column;\n            matrix[row][column] = difference\
+    \ * difference;\n        }\n    }\n    assert(m1une::convex::is_monge(matrix));\n\
+    \    assert(!m1une::convex::is_anti_monge(matrix));\n\n    for (auto& row : matrix)\
+    \ {\n        for (auto& value : row) value = -value;\n    }\n    assert(!m1une::convex::is_monge(matrix));\n\
+    \    assert(m1une::convex::is_anti_monge(matrix));\n\n    std::vector<std::vector<int>>\
+    \ empty;\n    assert(m1une::convex::is_monge(empty));\n    assert(m1une::convex::is_anti_monge(empty));\n\
+    }\n\ntemplate <class T, class Compare>\nstd::vector<T> brute_convolution(const\
+    \ std::vector<T>& first, const std::vector<T>& second,\n                     \
+    \            Compare compare) {\n    if (first.empty() || second.empty()) return\
+    \ {};\n    std::vector<T> result(first.size() + second.size() - 1);\n    for (int\
+    \ index = 0; index < int(result.size()); index++) {\n        int left = std::max(0,\
+    \ index - int(second.size()) + 1);\n        int right = std::min(int(first.size()),\
+    \ index + 1);\n        result[index] = first[left] + second[index - left];\n \
+    \       for (int i = left + 1; i < right; i++) {\n            T value = first[i]\
+    \ + second[index - i];\n            if (compare(value, result[index])) result[index]\
+    \ = value;\n        }\n    }\n    return result;\n}\n\ntemplate <class T, class\
+    \ Compare>\nstd::vector<T> brute_convolution_with_infinity(const std::vector<T>&\
+    \ first,\n                                               const std::vector<T>&\
+    \ second,\n                                               Compare compare,\n \
+    \                                              const T& infinity) {\n    if (first.empty()\
+    \ || second.empty()) return {};\n    std::vector<T> result(first.size() + second.size()\
+    \ - 1, infinity);\n    for (int i = 0; i < int(first.size()); i++) {\n       \
+    \ for (int j = 0; j < int(second.size()); j++) {\n            if (first[i] ==\
+    \ infinity || second[j] == infinity) continue;\n            T value = first[i]\
+    \ + second[j];\n            if (result[i + j] == infinity || compare(value, result[i\
+    \ + j])) {\n                result[i + j] = value;\n            }\n        }\n\
+    \    }\n    return result;\n}\n\nvoid test_structured_convolutions() {\n    const\
+    \ long long infinity = 2'000'000'000'000'000'000LL;\n    const long long negative_infinity\
+    \ = -infinity;\n    for (int first_size = 0; first_size <= 35; first_size++) {\n\
+    \        for (int second_size = 0; second_size <= 35; second_size++) {\n     \
+    \       for (int test = 0; test < 8; test++) {\n                std::vector<long\
+    \ long> arbitrary(first_size);\n                for (int i = 0; i < first_size;\
+    \ i++) {\n                    arbitrary[i] = (test * 17 + i * 31 + first_size\
+    \ * 7) % 61 - 30;\n                }\n\n                std::vector<long long>\
+    \ convex(second_size);\n                long long difference = -10 + test;\n \
+    \               for (int i = 1; i < second_size; i++) {\n                    difference\
+    \ += (test * 3 + i * 5) % 4;\n                    convex[i] = convex[i - 1] +\
+    \ difference;\n                }\n                assert(m1une::convex::is_convex_sequence(convex));\n\
+    \                auto expected_min = brute_convolution(arbitrary, convex, std::less<>());\n\
+    \                assert(m1une::convex::min_plus_convolution_convex(arbitrary,\
+    \ convex) ==\n                       expected_min);\n\n                std::vector<long\
+    \ long> arbitrary_extended = arbitrary;\n                for (int i = 0; i < first_size;\
+    \ i++) {\n                    if ((i + test) % 7 == 0) arbitrary_extended[i] =\
+    \ infinity;\n                }\n                std::vector<long long> convex_extended(second_size\
+    \ + 2, infinity);\n                std::copy(convex.begin(), convex.end(), convex_extended.begin()\
+    \ + 1);\n                assert(m1une::convex::is_convex_sequence(convex_extended,\
+    \ infinity));\n                auto expected_extended_min = brute_convolution_with_infinity(\n\
+    \                    arbitrary_extended, convex_extended, std::less<>(), infinity);\n\
+    \                assert(m1une::convex::min_plus_convolution_convex(\n        \
+    \                   arbitrary_extended, convex_extended, infinity) ==\n      \
+    \                 expected_extended_min);\n\n                std::vector<long\
+    \ long> first_convex(first_size);\n                difference = -12 - test;\n\
+    \                for (int i = 1; i < first_size; i++) {\n                    difference\
+    \ += (test * 5 + i * 7) % 5;\n                    first_convex[i] = first_convex[i\
+    \ - 1] + difference;\n                }\n                assert(m1une::convex::is_convex_sequence(first_convex));\n\
+    \                auto expected_convex =\n                    brute_convolution(first_convex,\
+    \ convex, std::less<>());\n                assert(m1une::convex::min_plus_convolution_convex(first_convex,\
+    \ convex) ==\n                       expected_convex);\n                assert(m1une::convex::min_plus_convolution_convex(convex,\
+    \ first_convex) ==\n                       expected_convex);\n               \
+    \ assert(m1une::convex::min_plus_convolution_convex_convex(first_convex,\n   \
+    \                                                                     convex)\
+    \ ==\n                       expected_convex);\n                assert(m1une::convex::min_plus_convolution_convex_convex(convex,\n\
+    \                                                                        first_convex)\
+    \ ==\n                       expected_convex);\n\n                std::vector<long\
+    \ long> first_convex_extended(first_size + 2,\n                              \
+    \                                infinity);\n                std::copy(first_convex.begin(),\
+    \ first_convex.end(),\n                          first_convex_extended.begin()\
+    \ + 1);\n                auto expected_extended_convex = brute_convolution_with_infinity(\n\
+    \                    first_convex_extended, convex_extended, std::less<>(), infinity);\n\
+    \                assert(m1une::convex::min_plus_convolution_convex_convex(\n \
+    \                          first_convex_extended, convex_extended, infinity) ==\n\
+    \                       expected_extended_convex);\n\n                std::vector<long\
+    \ long> concave = convex;\n                for (auto& value : concave) value =\
+    \ -value;\n                assert(m1une::convex::is_concave_sequence(concave));\n\
+    \                auto expected_max = brute_convolution(arbitrary, concave, std::greater<>());\n\
+    \                assert(m1une::convex::max_plus_convolution_concave(arbitrary,\
+    \ concave) ==\n                       expected_max);\n\n                std::vector<long\
+    \ long> first_concave = first_convex;\n                for (auto& value : first_concave)\
+    \ value = -value;\n                assert(m1une::convex::is_concave_sequence(first_concave));\n\
+    \                auto expected_concave =\n                    brute_convolution(first_concave,\
+    \ concave, std::greater<>());\n                assert(m1une::convex::max_plus_convolution_concave(first_concave,\
+    \ concave) ==\n                       expected_concave);\n                assert(m1une::convex::max_plus_convolution_concave(concave,\
+    \ first_concave) ==\n                       expected_concave);\n             \
+    \   assert(m1une::convex::max_plus_convolution_concave_concave(first_concave,\n\
+    \                                                                          concave)\
+    \ ==\n                       expected_concave);\n                assert(m1une::convex::max_plus_convolution_concave_concave(concave,\n\
+    \                                                                          first_concave)\
+    \ ==\n                       expected_concave);\n\n                std::vector<long\
+    \ long> arbitrary_max_extended = arbitrary_extended;\n                for (long\
+    \ long& value : arbitrary_max_extended) {\n                    value = value ==\
+    \ infinity ? negative_infinity : -value;\n                }\n                std::vector<long\
+    \ long> concave_extended = convex_extended;\n                for (long long& value\
+    \ : concave_extended) {\n                    value = value == infinity ? negative_infinity\
+    \ : -value;\n                }\n                auto expected_extended_max = brute_convolution_with_infinity(\n\
+    \                    arbitrary_max_extended, concave_extended, std::greater<>(),\n\
+    \                    negative_infinity);\n                assert(m1une::convex::max_plus_convolution_concave(\n\
+    \                           arbitrary_max_extended, concave_extended,\n      \
+    \                     negative_infinity) == expected_extended_max);\n\n      \
+    \          std::vector<long long> first_concave_extended =\n                 \
+    \   first_convex_extended;\n                for (long long& value : first_concave_extended)\
+    \ {\n                    value = value == infinity ? negative_infinity : -value;\n\
+    \                }\n                auto expected_extended_concave = brute_convolution_with_infinity(\n\
+    \                    first_concave_extended, concave_extended, std::greater<>(),\n\
+    \                    negative_infinity);\n                assert(m1une::convex::max_plus_convolution_concave_concave(\n\
+    \                           first_concave_extended, concave_extended,\n      \
+    \                     negative_infinity) == expected_extended_concave);\n    \
+    \        }\n        }\n    }\n\n    assert(!m1une::convex::is_convex_sequence(std::vector<int>{0,\
+    \ 2, 1}));\n    assert(!m1une::convex::is_concave_sequence(std::vector<int>{0,\
+    \ -2, -1}));\n    assert(!m1une::convex::is_convex_sequence(\n        std::vector<long\
+    \ long>{1, infinity, infinity}));\n    assert(m1une::convex::is_convex_sequence(\n\
+    \        std::vector<long long>{1, infinity, infinity}, infinity));\n    assert(m1une::convex::is_convex_sequence(\n\
+    \        std::vector<long long>{infinity, 0, 1, 4, infinity}, infinity));\n  \
+    \  assert(!m1une::convex::is_convex_sequence(\n        std::vector<long long>{0,\
+    \ infinity, 1}, infinity));\n\n    std::vector<long long> arbitrary = {infinity,\
+    \ 3, infinity, -2};\n    std::vector<long long> convex = {infinity, 0, 1, 4, infinity,\
+    \ infinity};\n    auto expected_min =\n        brute_convolution_with_infinity(arbitrary,\
+    \ convex, std::less<>(), infinity);\n    assert(m1une::convex::min_plus_convolution_convex(arbitrary,\
+    \ convex, infinity) ==\n           expected_min);\n\n    std::vector<long long>\
+    \ first_convex = {infinity, 2, 2, 3, infinity};\n    expected_min = brute_convolution_with_infinity(first_convex,\
+    \ convex,\n                                                   std::less<>(), infinity);\n\
+    \    assert(m1une::convex::min_plus_convolution_convex_convex(\n             \
+    \  first_convex, convex, infinity) == expected_min);\n\n    long long unordered_infinity\
+    \ = 7;\n    std::vector<long long> large_arbitrary = {10, 20};\n    std::vector<long\
+    \ long> small_convex = {0, 1};\n    assert(m1une::convex::min_plus_convolution_convex(\n\
+    \               large_arbitrary, small_convex, unordered_infinity) ==\n      \
+    \     std::vector<long long>({10, 11, 21}));\n\n    std::vector<long long> arbitrary_max\
+    \ = {negative_infinity, 3,\n                                             negative_infinity,\
+    \ -2};\n    std::vector<long long> concave = {negative_infinity, 0, -1, -4,\n\
+    \                                      negative_infinity};\n    assert(m1une::convex::is_concave_sequence(concave,\
+    \ negative_infinity));\n    auto expected_max = brute_convolution_with_infinity(\n\
+    \        arbitrary_max, concave, std::greater<>(), negative_infinity);\n    assert(m1une::convex::max_plus_convolution_concave(\n\
+    \               arbitrary_max, concave, negative_infinity) == expected_max);\n\
+    \n    std::vector<long long> first_concave = {negative_infinity, 2, 2, 1,\n  \
+    \                                          negative_infinity};\n    expected_max\
+    \ = brute_convolution_with_infinity(\n        first_concave, concave, std::greater<>(),\
+    \ negative_infinity);\n    assert(m1une::convex::max_plus_convolution_concave_concave(\n\
+    \               first_concave, concave, negative_infinity) == expected_max);\n\
+    \n    std::vector<long long> all_infinity(3, infinity);\n    assert(m1une::convex::is_convex_sequence(all_infinity,\
+    \ infinity));\n    assert(m1une::convex::min_plus_convolution_convex_convex(\n\
+    \               all_infinity, convex, infinity) ==\n           std::vector<long\
+    \ long>(all_infinity.size() + convex.size() - 1,\n                           \
+    \       infinity));\n}\n\nint main() {\n    m1une::utilities::FastInput fast_input;\n\
+    \    m1une::utilities::FastOutput fast_output;\n\n    test_smawk_monge();\n  \
+    \  test_smawk_totally_monotone_and_ties();\n    test_smawk_max();\n    test_smawk_matrix_overload_and_evaluations();\n\
+    \    test_monotone_minima();\n    test_monge_checks();\n    test_structured_convolutions();\n\
+    \n    int n, m;\n    fast_input >> n >> m;\n    std::vector<long long> convex(n),\
+    \ arbitrary(m);\n    for (auto& x : convex) fast_input >> x;\n    for (auto& x\
+    \ : arbitrary) fast_input >> x;\n    // Extend the convex sequence by sufficiently\
+    \ steep linear tails. The full\n    // rectangle remains Monge and invalid convolution\
+    \ pairs cannot minimize.\n    const long long slope = 4'000'000'000'000LL;\n \
+    \   auto cost = [&](int from, int to) {\n        int k = to - from;\n        if\
+    \ (k < 0) return convex.front() - slope * k;\n        if (k >= n) return convex.back()\
+    \ + slope * (k - n + 1);\n        return convex[k];\n    };\n    auto result =\
+    \ m1une::convex::monge_transition(arbitrary, n + m - 1, cost);\n    auto monotone\
+    \ = m1une::convex::monotone_transition(arbitrary, n + m - 1, cost);\n    assert(result.value\
+    \ == monotone.value && result.argmin == monotone.argmin);\n    for (int i = 0;\
+    \ i < n + m - 1; ++i) {\n        if (i) fast_output << ' ';\n        fast_output\
+    \ << result.value[i];\n    }\n    fast_output << '\\n';\n}\n"
   dependsOn:
   - utilities/fast_io.hpp
-  - convex/monge/all.hpp
-  - convex/monge/anti_monge_shortest_path.hpp
+  - convex/all.hpp
+  - convex/alien_trick.hpp
+  - convex/convex_hull_trick.hpp
+  - convex/li_chao_tree.hpp
+  - convex/min_plus_convolution.hpp
   - convex/monge/smawk.hpp
+  - convex/monge/all.hpp
   - convex/monge/check.hpp
-  - convex/monge/divide_and_conquer_optimization.hpp
-  - convex/monge/monotone_minima.hpp
-  - convex/monge/knuth_optimization.hpp
   - convex/monge/larsch.hpp
-  - convex/monge/min_plus_convolution.hpp
+  - convex/monge/monotone_minima.hpp
+  - convex/monge/smawk.hpp
+  - convex/monge_shortest_path.hpp
+  - convex/monge/larsch.hpp
+  - convex/monge_transition.hpp
+  - convex/monge/monotone_minima.hpp
+  - convex/slope_trick.hpp
   isVerificationFile: true
   path: verify/convex/monge/monge_algorithms.test.cpp
   requiredBy: []
-  timestamp: '2026-10-24 20:27:26+09:00'
+  timestamp: '2026-10-30 15:56:19+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/convex/monge/monge_algorithms.test.cpp

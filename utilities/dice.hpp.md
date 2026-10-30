@@ -551,8 +551,8 @@ data:
   timestamp: '2026-06-21 11:15:18+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/utilities/arrow_dice.test.cpp
   - verify/utilities/dice.test.cpp
+  - verify/utilities/arrow_dice.test.cpp
 documentation_of: utilities/dice.hpp
 layout: document
 title: Dice

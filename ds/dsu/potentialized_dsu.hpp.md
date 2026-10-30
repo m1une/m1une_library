@@ -155,8 +155,8 @@ data:
   timestamp: '2026-07-16 20:44:54+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp
   - verify/ds/dsu/potentialized_dsu.test.cpp
+  - verify/ds/dsu/unionfind_with_potential_non_commutative_group.test.cpp
 documentation_of: ds/dsu/potentialized_dsu.hpp
 layout: document
 title: Potentialized DSU

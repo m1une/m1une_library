@@ -947,8 +947,8 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/math/fps/fps_algorithms.test.cpp
-  - verify/math/newton_method.test.cpp
   - verify/math/math_algorithms.test.cpp
+  - verify/math/newton_method.test.cpp
 documentation_of: math/fps/solve_fps_equation.hpp
 layout: document
 title: Solve Formal Power Series Equation

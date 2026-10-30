@@ -512,8 +512,8 @@ data:
   isVerificationFile: false
   path: template.hpp
   requiredBy:
-  - main.cpp
   - pch.hpp
+  - main.cpp
   timestamp: '2026-10-06 01:57:24+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:

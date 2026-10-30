@@ -7,6 +7,9 @@ data:
   - icon: ':heavy_check_mark:'
     path: algo/dp/knapsack.hpp
     title: Knapsack Helpers
+  - icon: ':heavy_check_mark:'
+    path: algo/dp/knuth_optimization.hpp
+    title: Knuth Optimization
   - icon: ':warning:'
     path: algo/enumeration/all.hpp
     title: Enumeration Algorithms All
@@ -169,22 +172,47 @@ data:
     \         if (dp[value - values[item]] == inf) continue;\n            dp[value]\
     \ = std::min(dp[value], dp[value - values[item]] + weights[item]);\n        }\n\
     \    }\n    return dp;\n}\n\n}  // namespace algo\n}  // namespace m1une\n\n\n\
-    #line 5 \"algo/dp/all.hpp\"\n\n\n#line 1 \"algo/enumeration/all.hpp\"\n\n\n\n\
-    #line 1 \"algo/enumeration/combination.hpp\"\n\n\n\n#line 5 \"algo/enumeration/combination.hpp\"\
-    \n#include <concepts>\n#include <cstdint>\n#line 8 \"algo/enumeration/combination.hpp\"\
-    \n#include <type_traits>\n\nnamespace m1une {\nnamespace algo {\n\nnamespace internal\
-    \ {\n\ntemplate <std::unsigned_integral UInt>\nrequires(!std::same_as<std::remove_cv_t<UInt>,\
-    \ bool>)\nUInt combination_low_bits(int bit_count) {\n    constexpr int digits\
-    \ = std::numeric_limits<UInt>::digits;\n    assert(0 <= bit_count && bit_count\
-    \ <= digits);\n    if (bit_count == digits) return ~UInt(0);\n    return (UInt(1)\
-    \ << bit_count) - UInt(1);\n}\n\n}  // namespace internal\n\ntemplate <std::unsigned_integral\
-    \ UInt = std::uint64_t>\nrequires(!std::same_as<std::remove_cv_t<UInt>, bool>)\n\
-    UInt first_combination_mask(int bit_count, int choose) {\n    constexpr int digits\
-    \ = std::numeric_limits<UInt>::digits;\n    assert(0 <= choose && choose <= bit_count\
-    \ && bit_count <= digits);\n    if (choose == 0) return UInt(0);\n    if (choose\
-    \ == bit_count) return internal::combination_low_bits<UInt>(bit_count);\n    return\
-    \ (UInt(1) << choose) - UInt(1);\n}\n\ntemplate <std::unsigned_integral UInt>\n\
-    requires(!std::same_as<std::remove_cv_t<UInt>, bool>)\nbool next_combination_mask(UInt&\
+    #line 1 \"algo/dp/knuth_optimization.hpp\"\n\n\n\n#line 6 \"algo/dp/knuth_optimization.hpp\"\
+    \n#include <type_traits>\n#line 8 \"algo/dp/knuth_optimization.hpp\"\n\nnamespace\
+    \ m1une {\nnamespace algo {\n\ntemplate <class T>\nstruct KnuthOptimizationResult\
+    \ {\n    std::vector<std::vector<T>> value;\n    std::vector<std::vector<int>>\
+    \ split;\n\n    T optimum() const {\n        return value[0].back();\n    }\n\
+    };\n\ntemplate <class IntervalCost>\nauto knuth_optimization(int element_count,\
+    \ IntervalCost interval_cost)\n    -> KnuthOptimizationResult<\n        std::decay_t<std::invoke_result_t<IntervalCost,\
+    \ int, int>>> {\n    assert(element_count >= 0);\n    using T = std::decay_t<std::invoke_result_t<IntervalCost,\
+    \ int, int>>;\n\n    KnuthOptimizationResult<T> result;\n    result.value.assign(element_count\
+    \ + 1, std::vector<T>(element_count + 1, T()));\n    result.split.assign(element_count\
+    \ + 1, std::vector<int>(element_count + 1, -1));\n\n    for (int left = 0; left\
+    \ <= element_count; left++) result.split[left][left] = left;\n    for (int left\
+    \ = 0; left < element_count; left++) result.split[left][left + 1] = left + 1;\n\
+    \n    for (int length = 2; length <= element_count; length++) {\n        for (int\
+    \ left = 0; left + length <= element_count; left++) {\n            int right =\
+    \ left + length;\n            int first = std::max(left + 1, result.split[left][right\
+    \ - 1]);\n            int last = std::min(right - 1, result.split[left + 1][right]);\n\
+    \            assert(first <= last);\n\n            int best = first;\n       \
+    \     T best_value = result.value[left][best] + result.value[best][right];\n \
+    \           for (int split = first + 1; split <= last; split++) {\n          \
+    \      T candidate = result.value[left][split] + result.value[split][right];\n\
+    \                if (candidate < best_value) {\n                    best = split;\n\
+    \                    best_value = candidate;\n                }\n            }\n\
+    \            result.value[left][right] = best_value + interval_cost(left, right);\n\
+    \            result.split[left][right] = best;\n        }\n    }\n    return result;\n\
+    }\n\n}  // namespace algo\n}  // namespace m1une\n\n\n#line 6 \"algo/dp/all.hpp\"\
+    \n\n\n#line 1 \"algo/enumeration/all.hpp\"\n\n\n\n#line 1 \"algo/enumeration/combination.hpp\"\
+    \n\n\n\n#line 5 \"algo/enumeration/combination.hpp\"\n#include <concepts>\n#include\
+    \ <cstdint>\n#line 9 \"algo/enumeration/combination.hpp\"\n\nnamespace m1une {\n\
+    namespace algo {\n\nnamespace internal {\n\ntemplate <std::unsigned_integral UInt>\n\
+    requires(!std::same_as<std::remove_cv_t<UInt>, bool>)\nUInt combination_low_bits(int\
+    \ bit_count) {\n    constexpr int digits = std::numeric_limits<UInt>::digits;\n\
+    \    assert(0 <= bit_count && bit_count <= digits);\n    if (bit_count == digits)\
+    \ return ~UInt(0);\n    return (UInt(1) << bit_count) - UInt(1);\n}\n\n}  // namespace\
+    \ internal\n\ntemplate <std::unsigned_integral UInt = std::uint64_t>\nrequires(!std::same_as<std::remove_cv_t<UInt>,\
+    \ bool>)\nUInt first_combination_mask(int bit_count, int choose) {\n    constexpr\
+    \ int digits = std::numeric_limits<UInt>::digits;\n    assert(0 <= choose && choose\
+    \ <= bit_count && bit_count <= digits);\n    if (choose == 0) return UInt(0);\n\
+    \    if (choose == bit_count) return internal::combination_low_bits<UInt>(bit_count);\n\
+    \    return (UInt(1) << choose) - UInt(1);\n}\n\ntemplate <std::unsigned_integral\
+    \ UInt>\nrequires(!std::same_as<std::remove_cv_t<UInt>, bool>)\nbool next_combination_mask(UInt&\
     \ mask, int bit_count) {\n    const UInt universe = internal::combination_low_bits<UInt>(bit_count);\n\
     \    assert((mask & ~universe) == 0);\n    if (mask == 0) return false;\n\n  \
     \  const UInt lowest = mask & (~mask + UInt(1));\n    const UInt ripple = mask\
@@ -705,6 +733,7 @@ data:
   dependsOn:
   - algo/dp/all.hpp
   - algo/dp/knapsack.hpp
+  - algo/dp/knuth_optimization.hpp
   - algo/enumeration/all.hpp
   - algo/enumeration/combination.hpp
   - algo/enumeration/gray_code.hpp
@@ -731,7 +760,7 @@ data:
   isVerificationFile: false
   path: algo/all.hpp
   requiredBy: []
-  timestamp: '2026-10-06 02:15:41+09:00'
+  timestamp: '2026-10-30 15:56:19+09:00'
   verificationStatus: LIBRARY_NO_TESTS
   verifiedWith: []
 documentation_of: algo/all.hpp

@@ -331,8 +331,8 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/range_query/range_majority.test.cpp
-  - verify/ds/rollback_counterparts.test.cpp
   - verify/ds/bst/ordered_set.test.cpp
+  - verify/ds/rollback_counterparts.test.cpp
 documentation_of: ds/bst/ordered_set.hpp
 layout: document
 title: Ordered Set

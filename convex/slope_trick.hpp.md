@@ -2,10 +2,19 @@
 data:
   _extendedDependsOn: []
   _extendedRequiredBy:
-  - icon: ':warning:'
+  - icon: ':heavy_check_mark:'
     path: convex/all.hpp
     title: Convex All
   _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/convex/monge/monge_algorithms.test.cpp
+    title: verify/convex/monge/monge_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/convex/monge/monge_dp_optimization.test.cpp
+    title: verify/convex/monge/monge_dp_optimization.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/convex/monge/ordered_matrix.test.cpp
+    title: verify/convex/monge/ordered_matrix.test.cpp
   - icon: ':heavy_check_mark:'
     path: verify/convex/slope_trick.test.cpp
     title: verify/convex/slope_trick.test.cpp
@@ -132,6 +141,9 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/convex/slope_trick.test.cpp
+  - verify/convex/monge/monge_dp_optimization.test.cpp
+  - verify/convex/monge/monge_algorithms.test.cpp
+  - verify/convex/monge/ordered_matrix.test.cpp
 documentation_of: convex/slope_trick.hpp
 layout: document
 title: Slope Trick

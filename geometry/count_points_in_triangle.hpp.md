@@ -405,9 +405,9 @@ data:
   timestamp: '2026-10-24 23:29:06+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/geometry/rational.test.cpp
-  - verify/geometry/geometry_algorithms.test.cpp
   - verify/geometry/point_data.test.cpp
+  - verify/geometry/geometry_algorithms.test.cpp
+  - verify/geometry/rational.test.cpp
   - verify/geometry/centroid.test.cpp
   - verify/geometry/count_points_in_triangle.test.cpp
 documentation_of: geometry/count_points_in_triangle.hpp

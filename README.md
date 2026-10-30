@@ -21,7 +21,7 @@ they can be combined without rewriting boilerplate during a contest.
 
 | Directory | Contents |
 | --- | --- |
-| `convex/` | Convex-structure and convex-optimization tools, including CHT, Li Chao tree, slope trick, Alien Trick, Monge/SMAWK/Knuth/D&C optimization, and structured min-plus/max-plus convolution. |
+| `convex/` | Convex-structure and convex-optimization tools, including CHT, Li Chao tree, slope trick, Alien Trick, Monge/SMAWK matrix and DP optimization, and structured min-plus/max-plus convolution. |
 | `algo/` | One-shot algorithms that are not tied to a graph/string/geometry/convex domain, including interval merging, sequence, search, offline, and enumeration helpers. |
 | `graph/` | General graph algorithms and builders, functional-graph decomposition, successor/orbit queries, visit counting, and synchronized meetings, plus `graph/tree/` for Euler tours, rooted-tree tools, cumulative path sums, offline Mo path queries, Cartesian tree construction, and `graph/flow/` for flow networks. |
 | `optimization/` | Combinatorial and numeric optimization solvers such as binary and k-valued project selection, Hungarian assignment, simplex LP, and integer LP. |
@@ -67,7 +67,7 @@ short namespace segment after `m1une::`; nested directories are for browsing.
 | `algo/search/` | Search-over-answer and unimodal optimization helpers. |
 | `algo/offline/` | Offline query processing such as Mo's algorithm. |
 | `algo/enumeration/` | Enumeration helpers for combinations, permutations, bitmasks, Gray codes, and aligned segment-tree ranges. |
-| `algo/dp/` | Domain-neutral DP helpers such as knapsack routines. |
+| `algo/dp/` | DP helpers such as knapsack and Knuth interval optimization. |
 
 Rule of thumb: if you call a function once and use its returned result directly,
 look in `algo/`. If you construct an object and then call query methods such as
@@ -80,16 +80,19 @@ plumbing live in `utilities/`.
 | --- | --- |
 | `convex/convex_hull_trick.hpp` | Monotone-slope CHT for adding lines and querying an optimum at `x`. |
 | `convex/li_chao_tree.hpp` | Dynamic Li Chao tree for arbitrary line and line-segment insertion. |
-| `convex/monge/` | Monge/SMAWK/Knuth/D&C optimization, LARSCH, checks, and structured min-plus/max-plus convolution. |
+| `convex/monge/` | Matrix primitives: SMAWK, monotone minima, online LARSCH, and ordered Monge/anti-Monge checks. |
+| `convex/monge_transition.hpp` | Finalized-layer monotone, Monge, anti-Monge, and ordered matrix transitions. |
+| `convex/monge_shortest_path.hpp` | Monge and anti-Monge forward DAG recurrences with a minimum step. |
+| `convex/min_plus_convolution.hpp` | Structured sequence min-plus/max-plus convolution. |
 | `convex/slope_trick.hpp` | Slope trick for maintaining convex piecewise-linear functions. |
 | `convex/alien_trick.hpp` | Exact-count optimization through Lagrangian relaxation. |
 
 For Monge optimization, start with the [algorithm selection guide](docs/convex/monge/all.md).
 It explains how to express a recurrence as a matrix, choose an algorithm,
 handle Monge and anti-Monge orientation, and respect DP dependencies.
-Each algorithm's page specifies its callback, index mapping, assumptions,
-and complexity. Its worked example starts with a small task and the ordinary
-candidate-search loop, then shows the library call and its exact output.
+Each page specifies its callback, ordering and tie rules, assumptions, and
+complexity. Knuth interval optimization is in `algo/dp/knuth_optimization.hpp`
+under `m1une::algo`.
 
 ### Data structure categories
 

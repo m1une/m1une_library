@@ -523,9 +523,9 @@ data:
   verifiedWith:
   - verify/ds/persistent_release.test.cpp
   - verify/ds/persistent_release.test.cpp
-  - verify/ds/bst/persistent_ordered_set.test.cpp
-  - verify/ds/bst/persistent_ordered_multiset.test.cpp
   - verify/ds/persistent_cow.test.cpp
+  - verify/ds/bst/persistent_ordered_multiset.test.cpp
+  - verify/ds/bst/persistent_ordered_set.test.cpp
 documentation_of: ds/bst/persistent_ordered_multiset.hpp
 layout: document
 title: Persistent Ordered Multiset

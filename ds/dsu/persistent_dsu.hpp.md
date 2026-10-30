@@ -257,8 +257,8 @@ data:
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/ds/persistent_release.test.cpp
-  - verify/ds/dsu/persistent_dsu_library_checker.test.cpp
   - verify/ds/dsu/persistent_dsu.test.cpp
+  - verify/ds/dsu/persistent_dsu_library_checker.test.cpp
   - verify/ds/persistent_cow.test.cpp
 documentation_of: ds/dsu/persistent_dsu.hpp
 layout: document

@@ -11,40 +11,55 @@ data:
     path: convex/li_chao_tree.hpp
     title: Li Chao Tree
   - icon: ':heavy_check_mark:'
-    path: convex/monge/all.hpp
-    title: Monge Optimization Guide
-  - icon: ':heavy_check_mark:'
-    path: convex/monge/anti_monge_shortest_path.hpp
-    title: Anti-Monge DAG Shortest Paths
-  - icon: ':heavy_check_mark:'
-    path: convex/monge/check.hpp
-    title: Monge Checks
-  - icon: ':heavy_check_mark:'
-    path: convex/monge/divide_and_conquer_optimization.hpp
-    title: Divide-and-Conquer DP Optimization
-  - icon: ':heavy_check_mark:'
-    path: convex/monge/knuth_optimization.hpp
-    title: Knuth Optimization
-  - icon: ':heavy_check_mark:'
-    path: convex/monge/larsch.hpp
-    title: LARSCH
-  - icon: ':heavy_check_mark:'
-    path: convex/monge/min_plus_convolution.hpp
+    path: convex/min_plus_convolution.hpp
     title: Structured Min-Plus and Max-Plus Convolution
   - icon: ':heavy_check_mark:'
+    path: convex/monge/all.hpp
+    title: Monge Matrix Primitives and Algorithm Guide
+  - icon: ':heavy_check_mark:'
+    path: convex/monge/check.hpp
+    title: Monge and Anti-Monge Checks
+  - icon: ':heavy_check_mark:'
+    path: convex/monge/larsch.hpp
+    title: LARSCH Online Matrix Minima
+  - icon: ':heavy_check_mark:'
+    path: convex/monge/larsch.hpp
+    title: LARSCH Online Matrix Minima
+  - icon: ':heavy_check_mark:'
     path: convex/monge/monotone_minima.hpp
-    title: Monotone Minima
+    title: Monotone Matrix Minima
+  - icon: ':heavy_check_mark:'
+    path: convex/monge/monotone_minima.hpp
+    title: Monotone Matrix Minima
   - icon: ':heavy_check_mark:'
     path: convex/monge/smawk.hpp
     title: SMAWK
   - icon: ':heavy_check_mark:'
+    path: convex/monge/smawk.hpp
+    title: SMAWK
+  - icon: ':heavy_check_mark:'
+    path: convex/monge_shortest_path.hpp
+    title: Monge and Anti-Monge Forward DAG Shortest Paths
+  - icon: ':heavy_check_mark:'
+    path: convex/monge_transition.hpp
+    title: Finalized-Layer Matrix Transitions
+  - icon: ':heavy_check_mark:'
     path: convex/slope_trick.hpp
     title: Slope Trick
   _extendedRequiredBy: []
-  _extendedVerifiedWith: []
+  _extendedVerifiedWith:
+  - icon: ':heavy_check_mark:'
+    path: verify/convex/monge/monge_algorithms.test.cpp
+    title: verify/convex/monge/monge_algorithms.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/convex/monge/monge_dp_optimization.test.cpp
+    title: verify/convex/monge/monge_dp_optimization.test.cpp
+  - icon: ':heavy_check_mark:'
+    path: verify/convex/monge/ordered_matrix.test.cpp
+    title: verify/convex/monge/ordered_matrix.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
-  _verificationStatusIcon: ':warning:'
+  _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
   bundledCode: "#line 1 \"convex/all.hpp\"\n\n\n\n#line 1 \"convex/alien_trick.hpp\"\
@@ -190,14 +205,13 @@ data:
     \    }\n};\n\ntemplate <std::signed_integral T>\nusing MinLiChaoTree = LiChaoTree<T,\
     \ LineOptimization::Minimize>;\n\ntemplate <std::signed_integral T>\nusing MaxLiChaoTree\
     \ = LiChaoTree<T, LineOptimization::Maximize>;\n\n}  // namespace convex\n}  //\
-    \ namespace m1une\n\n\n#line 1 \"convex/monge/all.hpp\"\n\n\n\n#line 1 \"convex/monge/anti_monge_shortest_path.hpp\"\
-    \n\n\n\n#include <algorithm>\n#line 7 \"convex/monge/anti_monge_shortest_path.hpp\"\
-    \n\n#line 1 \"convex/monge/smawk.hpp\"\n\n\n\n#line 5 \"convex/monge/smawk.hpp\"\
-    \n#include <functional>\n#line 8 \"convex/monge/smawk.hpp\"\n\nnamespace m1une\
-    \ {\nnamespace convex {\n\nnamespace smawk_detail {\n\ntemplate <class Select>\n\
-    void solve(const std::vector<int>& rows, const std::vector<int>& columns,\n  \
-    \         const Select& select, std::vector<int>& answer) {\n    if (rows.empty())\
-    \ return;\n\n    std::vector<int> reduced;\n    reduced.reserve(columns.size());\n\
+    \ namespace m1une\n\n\n#line 1 \"convex/min_plus_convolution.hpp\"\n\n\n\n#include\
+    \ <functional>\n#line 7 \"convex/min_plus_convolution.hpp\"\n\n#line 1 \"convex/monge/smawk.hpp\"\
+    \n\n\n\n#line 7 \"convex/monge/smawk.hpp\"\n#include <span>\n#line 9 \"convex/monge/smawk.hpp\"\
+    \n\nnamespace m1une {\nnamespace convex {\n\nnamespace smawk_detail {\n\ntemplate\
+    \ <class Select>\nvoid solve(const std::vector<int>& rows, const std::vector<int>&\
+    \ columns,\n           const Select& select, std::vector<int>& answer) {\n   \
+    \ if (rows.empty()) return;\n\n    std::vector<int> reduced;\n    reduced.reserve(columns.size());\n\
     \    for (int column : columns) {\n        while (!reduced.empty()) {\n      \
     \      int row = rows[int(reduced.size()) - 1];\n            if (!select(row,\
     \ reduced.back(), column)) break;\n            reduced.pop_back();\n        }\n\
@@ -217,22 +231,49 @@ data:
     \ answer;\n\n    std::vector<int> rows(row_count), columns(column_count);\n  \
     \  std::iota(rows.begin(), rows.end(), 0);\n    std::iota(columns.begin(), columns.end(),\
     \ 0);\n    solve(rows, columns, select, answer);\n    return answer;\n}\n\n} \
-    \ // namespace smawk_detail\n\n// Search a fixed H x W rectangle, returning column\
-    \ indices (leftmost on ties).\n// Requires total monotonicity under Compare; Monge\
-    \ suffices for minima.\n// For anti-Monge minima, reverse columns in value and\
-    \ map indices back.\n// O(H + W) evaluations; callbacks may be queried out of\
-    \ row order.\ntemplate <class Value, class Compare = std::less<>>\nstd::vector<int>\
-    \ smawk_row_optima(int row_count, int column_count, Value value,\n           \
-    \                       Compare compare = Compare()) {\n    assert(row_count >=\
-    \ 0);\n    assert(column_count >= 0);\n    return smawk_detail::row_optima(\n\
-    \        row_count, column_count,\n        [&](int row, int current, int candidate)\
-    \ {\n            return compare(value(row, candidate), value(row, current));\n\
-    \        });\n}\n\ntemplate <class Value>\nstd::vector<int> smawk_row_argmin(int\
-    \ row_count, int column_count, Value value) {\n    return smawk_row_optima(row_count,\
-    \ column_count, value, std::less<>());\n}\n\ntemplate <class Value>\nstd::vector<int>\
-    \ smawk_row_argmax(int row_count, int column_count, Value value) {\n    return\
-    \ smawk_row_optima(row_count, column_count, value, std::greater<>());\n}\n\ntemplate\
-    \ <class T>\nstd::vector<int> smawk_row_argmin(const std::vector<std::vector<T>>&\
+    \ // namespace smawk_detail\n\n// Comparison-oracle SMAWK. prefer(row, current,\
+    \ candidate) says whether to\n// replace current. The induced ordered matrix must\
+    \ be totally monotone with\n// this tie rule. This also permits symbolic invalid\
+    \ entries without sentinels.\n// O(H + W) oracle calls and memory. Entries must\
+    \ be fixed (offline search).\ntemplate <class Prefer>\nstd::vector<int> smawk_row_select(int\
+    \ row_count, int column_count, Prefer prefer) {\n    assert(row_count >= 0);\n\
+    \    assert(column_count >= 0);\n    return smawk_detail::row_optima(row_count,\
+    \ column_count, prefer);\n}\n\n// Search value(rows[r], columns[c]); answers are\
+    \ original column IDs, in row\n// list order. Lists contain distinct nonnegative\
+    \ IDs; prefer defines the tie\n// rule with respect to the supplied order.\ntemplate\
+    \ <class Prefer>\nstd::vector<int> smawk_row_select(std::span<const int> rows,\n\
+    \                                  std::span<const int> columns, Prefer prefer)\
+    \ {\n    auto answer = smawk_row_select(int(rows.size()), int(columns.size()),\n\
+    \        [&](int row, int current, int candidate) {\n            return prefer(rows[row],\
+    \ columns[current], columns[candidate]);\n        });\n    for (int& column :\
+    \ answer) if (column != -1) column = columns[column];\n    return answer;\n}\n\
+    \n// Fixed rectangle, leftmost on ties. Requires total monotonicity for leftmost\n\
+    // optima under Compare (Monge suffices for minima). O(H + W) time and memory.\n\
+    // Callback evaluations may be out of row order; this is not an online DP.\ntemplate\
+    \ <class Value, class Compare = std::less<>>\nstd::vector<int> smawk_row_optima(int\
+    \ row_count, int column_count, Value value,\n                                \
+    \  Compare compare = Compare()) {\n    assert(row_count >= 0);\n    assert(column_count\
+    \ >= 0);\n    return smawk_row_select(\n        row_count, column_count,\n   \
+    \     [&](int row, int current, int candidate) {\n            return compare(value(row,\
+    \ candidate), value(row, current));\n        });\n}\n\ntemplate <class Value>\n\
+    std::vector<int> smawk_row_argmin(int row_count, int column_count, Value value)\
+    \ {\n    return smawk_row_optima(row_count, column_count, value, std::less<>());\n\
+    }\n\ntemplate <class Value>\nstd::vector<int> smawk_row_argmax(int row_count,\
+    \ int column_count, Value value) {\n    return smawk_row_optima(row_count, column_count,\
+    \ value, std::greater<>());\n}\n\n// Ordered variants use supplied positions for\
+    \ total monotonicity and ties.\ntemplate <class Value, class Compare = std::less<>>\n\
+    std::vector<int> smawk_row_optima(std::span<const int> rows,\n               \
+    \                   std::span<const int> columns, Value value,\n             \
+    \                     Compare compare = Compare()) {\n    return smawk_row_select(rows,\
+    \ columns,\n        [&](int row, int current, int candidate) {\n            return\
+    \ compare(value(row, candidate), value(row, current));\n        });\n}\n\ntemplate\
+    \ <class Value>\nstd::vector<int> smawk_row_argmin(std::span<const int> rows,\n\
+    \                                  std::span<const int> columns, Value value)\
+    \ {\n    return smawk_row_optima(rows, columns, value, std::less<>());\n}\n\n\
+    template <class Value>\nstd::vector<int> smawk_row_argmax(std::span<const int>\
+    \ rows,\n                                  std::span<const int> columns, Value\
+    \ value) {\n    return smawk_row_optima(rows, columns, value, std::greater<>());\n\
+    }\n\ntemplate <class T>\nstd::vector<int> smawk_row_argmin(const std::vector<std::vector<T>>&\
     \ matrix) {\n    int row_count = int(matrix.size());\n    int column_count = row_count\
     \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
     \ == column_count);\n    return smawk_row_argmin(\n        row_count, column_count,\n\
@@ -242,213 +283,7 @@ data:
     \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
     \ == column_count);\n    return smawk_row_argmax(\n        row_count, column_count,\n\
     \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
-    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n#line 9 \"convex/monge/anti_monge_shortest_path.hpp\"\
-    \n\nnamespace m1une {\nnamespace convex {\n\ntemplate <class T>\nstruct AntiMongeShortestPathResult\
-    \ {\n    std::vector<T> distance;\n    std::vector<int> parent;\n};\n\n// dist[j]\
-    \ = min(dist[i] + cost(i, j)), where j - i >= minimum_step.\n// cost must be finite\
-    \ and anti-Monge on valid rectangles; see the docs.\n// O(N log N + N * minimum_step)\
-    \ time for O(1) cost evaluations.\n// In particular, minimum_step = 1 or 2 gives\
-    \ O(N log N) time.\ntemplate <class T, class Cost>\nAntiMongeShortestPathResult<T>\
-    \ anti_monge_shortest_path(\n    int vertex_count, Cost cost, T infinity, int\
-    \ minimum_step = 1) {\n    assert(vertex_count >= 0);\n    assert(minimum_step\
-    \ >= 1);\n    assert(T() < infinity);\n\n    AntiMongeShortestPathResult<T> result;\n\
-    \    result.distance.assign(vertex_count, infinity);\n    result.parent.assign(vertex_count,\
-    \ -1);\n    if (vertex_count == 0) return result;\n    result.distance[0] = T();\n\
-    \    if (minimum_step >= vertex_count) return result;\n\n    auto relax = [&](int\
-    \ from, int to) {\n        if (result.distance[from] == infinity) return;\n  \
-    \      T candidate = result.distance[from] + cost(from, to);\n        if (candidate\
-    \ < result.distance[to] ||\n            (candidate == result.distance[to] && from\
-    \ > result.parent[to])) {\n            result.distance[to] = candidate;\n    \
-    \        result.parent[to] = from;\n        }\n    };\n\n    // All pairs in this\
-    \ rectangle are valid. Remove unreachable columns,\n    // then reverse the remaining\
-    \ columns to turn anti-Monge into Monge.\n    auto rectangle = [&](int first,\
-    \ int last, int top, int bottom) {\n        if (first == last || top == bottom)\
-    \ return;\n        std::vector<int> sources;\n        for (int from = last; from\
-    \ > first;) {\n            --from;\n            if (result.distance[from] != infinity)\
-    \ sources.push_back(from);\n        }\n        if (sources.empty()) return;\n\
-    \        if (sources.size() == 1) {\n            for (int to = top; to < bottom;\
-    \ to++) relax(sources[0], to);\n            return;\n        }\n        auto argmin\
-    \ = smawk_row_argmin(\n            bottom - top, int(sources.size()), [&](int\
-    \ row, int column) -> T {\n                int from = sources[column];\n     \
-    \           return result.distance[from] + cost(from, top + row);\n          \
-    \  });\n        for (int row = 0; row < bottom - top; row++) {\n            relax(sources[argmin[row]],\
-    \ top + row);\n        }\n    };\n\n    auto solve = [&](auto& self, int left,\
-    \ int right) -> void {\n        // Such a block contains no valid internal edge.\n\
-    \        if (right - left <= minimum_step) return;\n        int middle = left\
-    \ + (right - left) / 2;\n        self(self, left, middle);\n\n        // Two valid\
-    \ rectangles and a small corner partition the cross edges.\n        int source_end\
-    \ = std::max(left, middle - (minimum_step - 1));\n        int target_begin = middle\
-    \ + std::min(right - middle, minimum_step - 1);\n        rectangle(left, middle,\
-    \ target_begin, right);\n        rectangle(left, source_end, middle, target_begin);\n\
-    \        for (int from = source_end; from < middle; from++) {\n            //\
-    \ Subtraction avoids overflow when minimum_step is large.\n            if (minimum_step\
-    \ >= target_begin - from) continue;\n            for (int to = std::max(middle,\
-    \ from + minimum_step);\n                 to < target_begin; to++) {\n       \
-    \         relax(from, to);\n            }\n        }\n\n        // Incoming transitions\
-    \ must be applied BEFORE solving the right half.\n        self(self, middle, right);\n\
-    \    };\n    solve(solve, 0, vertex_count);\n    return result;\n}\n\n}  // namespace\
-    \ convex\n}  // namespace m1une\n\n\n#line 1 \"convex/monge/check.hpp\"\n\n\n\n\
-    #line 6 \"convex/monge/check.hpp\"\n\nnamespace m1une {\nnamespace convex {\n\n\
-    template <class Value>\nbool is_monge(int row_count, int column_count, Value value)\
-    \ {\n    assert(row_count >= 0);\n    assert(column_count >= 0);\n    for (int\
-    \ row = 0; row + 1 < row_count; row++) {\n        for (int column = 0; column\
-    \ + 1 < column_count; column++) {\n            if (value(row, column) + value(row\
-    \ + 1, column + 1) >\n                value(row, column + 1) + value(row + 1,\
-    \ column)) {\n                return false;\n            }\n        }\n    }\n\
-    \    return true;\n}\n\ntemplate <class Value>\nbool is_anti_monge(int row_count,\
-    \ int column_count, Value value) {\n    assert(row_count >= 0);\n    assert(column_count\
-    \ >= 0);\n    for (int row = 0; row + 1 < row_count; row++) {\n        for (int\
-    \ column = 0; column + 1 < column_count; column++) {\n            if (value(row,\
-    \ column) + value(row + 1, column + 1) <\n                value(row, column +\
-    \ 1) + value(row + 1, column)) {\n                return false;\n            }\n\
-    \        }\n    }\n    return true;\n}\n\ntemplate <class T>\nbool is_monge(const\
-    \ std::vector<std::vector<T>>& matrix) {\n    int row_count = int(matrix.size());\n\
-    \    int column_count = row_count == 0 ? 0 : int(matrix[0].size());\n    for (const\
-    \ auto& row : matrix) assert(int(row.size()) == column_count);\n    return is_monge(row_count,\
-    \ column_count,\n                    [&](int row, int column) -> const T& { return\
-    \ matrix[row][column]; });\n}\n\ntemplate <class T>\nbool is_anti_monge(const\
-    \ std::vector<std::vector<T>>& matrix) {\n    int row_count = int(matrix.size());\n\
-    \    int column_count = row_count == 0 ? 0 : int(matrix[0].size());\n    for (const\
-    \ auto& row : matrix) assert(int(row.size()) == column_count);\n    return is_anti_monge(\n\
-    \        row_count, column_count,\n        [&](int row, int column) -> const T&\
-    \ { return matrix[row][column]; });\n}\n\n}  // namespace convex\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"convex/monge/divide_and_conquer_optimization.hpp\"\n\n\n\
-    \n#line 7 \"convex/monge/divide_and_conquer_optimization.hpp\"\n\n#line 1 \"convex/monge/monotone_minima.hpp\"\
-    \n\n\n\n#line 7 \"convex/monge/monotone_minima.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ convex {\n\nnamespace monotone_minima_detail {\n\ntemplate <class Value, class\
-    \ Compare>\nvoid solve(int row_left, int row_right, int column_left, int column_right,\n\
-    \           const Value& value, const Compare& compare, std::vector<int>& answer)\
-    \ {\n    if (row_left == row_right) return;\n    int row = (row_left + row_right)\
-    \ / 2;\n    int best = column_left;\n    for (int column = column_left + 1; column\
-    \ < column_right; column++) {\n        if (compare(value(row, column), value(row,\
-    \ best))) best = column;\n    }\n    answer[row] = best;\n    solve(row_left,\
-    \ row, column_left, best + 1, value, compare, answer);\n    solve(row + 1, row_right,\
-    \ best, column_right, value, compare, answer);\n}\n\n}  // namespace monotone_minima_detail\n\
-    \n// Fixed rectangular matrix; leftmost optimal columns must be nondecreasing.\n\
-    // Returns column indices, or -1 when there are no columns. Not an online DP.\n\
-    // Anti-Monge minima require reversing one axis before using this routine.\ntemplate\
-    \ <class Value, class Compare = std::less<>>\nstd::vector<int> monotone_row_optima(int\
-    \ row_count, int column_count, Value value,\n                                \
-    \     Compare compare = Compare()) {\n    assert(row_count >= 0);\n    assert(column_count\
-    \ >= 0);\n    std::vector<int> answer(row_count, -1);\n    if (row_count == 0\
-    \ || column_count == 0) return answer;\n    monotone_minima_detail::solve(0, row_count,\
-    \ 0, column_count, value, compare, answer);\n    return answer;\n}\n\ntemplate\
-    \ <class Value>\nstd::vector<int> monotone_row_argmin(int row_count, int column_count,\
-    \ Value value) {\n    return monotone_row_optima(row_count, column_count, value,\
-    \ std::less<>());\n}\n\ntemplate <class Value>\nstd::vector<int> monotone_row_argmax(int\
-    \ row_count, int column_count, Value value) {\n    return monotone_row_optima(row_count,\
-    \ column_count, value, std::greater<>());\n}\n\ntemplate <class T>\nstd::vector<int>\
-    \ monotone_row_argmin(const std::vector<std::vector<T>>& matrix) {\n    int row_count\
-    \ = int(matrix.size());\n    int column_count = row_count == 0 ? 0 : int(matrix[0].size());\n\
-    \    for (const auto& row : matrix) assert(int(row.size()) == column_count);\n\
-    \    return monotone_row_argmin(\n        row_count, column_count,\n        [&](int\
-    \ row, int column) -> const T& { return matrix[row][column]; });\n}\n\ntemplate\
-    \ <class T>\nstd::vector<int> monotone_row_argmax(const std::vector<std::vector<T>>&\
-    \ matrix) {\n    int row_count = int(matrix.size());\n    int column_count = row_count\
-    \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
-    \ == column_count);\n    return monotone_row_argmax(\n        row_count, column_count,\n\
-    \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
-    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n#line 9 \"convex/monge/divide_and_conquer_optimization.hpp\"\
-    \n\nnamespace m1une {\nnamespace convex {\n\ntemplate <class T>\nstruct DivideAndConquerDpResult\
-    \ {\n    std::vector<T> value;\n    std::vector<int> argmin;\n};\n\ntemplate <class\
-    \ Value>\nauto divide_and_conquer_dp(int state_count, int candidate_count, Value\
-    \ value)\n    -> DivideAndConquerDpResult<\n        std::decay_t<std::invoke_result_t<Value,\
-    \ int, int>>> {\n    using T = std::decay_t<std::invoke_result_t<Value, int, int>>;\n\
-    \    DivideAndConquerDpResult<T> result;\n    result.argmin = monotone_row_argmin(state_count,\
-    \ candidate_count, value);\n    result.value.resize(state_count);\n    for (int\
-    \ state = 0; state < state_count; state++) {\n        if (result.argmin[state]\
-    \ != -1) {\n            result.value[state] = value(state, result.argmin[state]);\n\
-    \        }\n    }\n    return result;\n}\n\n// One transition from a finalized\
-    \ previous layer. This does not compute a\n// same-array recurrence dp[j] = min_i(dp[i]\
-    \ + cost(i,j)).\n// Leftmost minimizing candidates must be nondecreasing with\
-    \ the state index.\ntemplate <class T, class Cost>\nauto divide_and_conquer_transition(const\
-    \ std::vector<T>& previous, int state_count,\n                               \
-    \    Cost cost)\n    -> DivideAndConquerDpResult<\n        std::decay_t<decltype(std::declval<T>()\
-    \ + cost(0, 0))>> {\n    using Result = std::decay_t<decltype(std::declval<T>()\
-    \ + cost(0, 0))>;\n    return divide_and_conquer_dp(\n        state_count, int(previous.size()),\n\
-    \        [&](int state, int candidate) -> Result {\n            return previous[candidate]\
-    \ + cost(candidate, state);\n        });\n}\n\n}  // namespace convex\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"convex/monge/knuth_optimization.hpp\"\n\n\n\n#line 8 \"\
-    convex/monge/knuth_optimization.hpp\"\n\nnamespace m1une {\nnamespace convex {\n\
-    \ntemplate <class T>\nstruct KnuthOptimizationResult {\n    std::vector<std::vector<T>>\
-    \ value;\n    std::vector<std::vector<int>> split;\n\n    T optimum() const {\n\
-    \        return value[0].back();\n    }\n};\n\ntemplate <class IntervalCost>\n\
-    auto knuth_optimization(int element_count, IntervalCost interval_cost)\n    ->\
-    \ KnuthOptimizationResult<\n        std::decay_t<std::invoke_result_t<IntervalCost,\
-    \ int, int>>> {\n    assert(element_count >= 0);\n    using T = std::decay_t<std::invoke_result_t<IntervalCost,\
-    \ int, int>>;\n\n    KnuthOptimizationResult<T> result;\n    result.value.assign(element_count\
-    \ + 1, std::vector<T>(element_count + 1, T()));\n    result.split.assign(element_count\
-    \ + 1, std::vector<int>(element_count + 1, -1));\n\n    for (int left = 0; left\
-    \ <= element_count; left++) result.split[left][left] = left;\n    for (int left\
-    \ = 0; left < element_count; left++) result.split[left][left + 1] = left + 1;\n\
-    \n    for (int length = 2; length <= element_count; length++) {\n        for (int\
-    \ left = 0; left + length <= element_count; left++) {\n            int right =\
-    \ left + length;\n            int first = std::max(left + 1, result.split[left][right\
-    \ - 1]);\n            int last = std::min(right - 1, result.split[left + 1][right]);\n\
-    \            assert(first <= last);\n\n            int best = first;\n       \
-    \     T best_value = result.value[left][best] + result.value[best][right];\n \
-    \           for (int split = first + 1; split <= last; split++) {\n          \
-    \      T candidate = result.value[left][split] + result.value[split][right];\n\
-    \                if (candidate < best_value) {\n                    best = split;\n\
-    \                    best_value = candidate;\n                }\n            }\n\
-    \            result.value[left][right] = best_value + interval_cost(left, right);\n\
-    \            result.split[left][right] = best;\n        }\n    }\n    return result;\n\
-    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n#line 1 \"convex/monge/larsch.hpp\"\
-    \n\n\n\n#line 6 \"convex/monge/larsch.hpp\"\n#include <memory>\n#line 10 \"convex/monge/larsch.hpp\"\
-    \n\nnamespace m1une {\nnamespace convex {\n\ntemplate <class T>\nclass Larsch\
-    \ {\n    struct ReduceColumn;\n\n    struct ReduceRow {\n        int size;\n \
-    \       std::function<T(int, int)> value;\n        int current_row = 0;\n    \
-    \    int boundary = 0;\n        std::unique_ptr<ReduceColumn> recursive;\n\n \
-    \       explicit ReduceRow(int size_) : size(size_) {\n            if (size /\
-    \ 2 != 0) recursive = std::make_unique<ReduceColumn>(size / 2);\n        }\n\n\
-    \        void set_value(std::function<T(int, int)> value_) {\n            value\
-    \ = std::move(value_);\n            if (recursive) {\n                recursive->set_value(\n\
-    \                    [&](int row, int column) { return value(row * 2 + 1, column);\
-    \ });\n            }\n        }\n\n        int next_argmin() {\n            int\
-    \ row = current_row++;\n            if (row % 2 == 0) {\n                int previous\
-    \ = boundary;\n                int next = row + 1 == size ? size - 1 : recursive->next_argmin();\n\
-    \                boundary = next;\n                int best = previous;\n    \
-    \            for (int column = previous + 1; column <= next; column++) {\n   \
-    \                 if (value(row, column) < value(row, best)) best = column;\n\
-    \                }\n                return best;\n            }\n            return\
-    \ value(row, boundary) <= value(row, row) ? boundary : row;\n        }\n    };\n\
-    \n    struct ReduceColumn {\n        int size;\n        std::function<T(int, int)>\
-    \ value;\n        int current_row = 0;\n        std::vector<int> columns;\n  \
-    \      ReduceRow recursive;\n\n        explicit ReduceColumn(int size_) : size(size_),\
-    \ recursive(size_) {}\n\n        void set_value(std::function<T(int, int)> value_)\
-    \ {\n            value = std::move(value_);\n            recursive.set_value(\n\
-    \                [&](int row, int column) { return value(row, columns[column]);\
-    \ });\n        }\n\n        int next_argmin() {\n            int row = current_row++;\n\
-    \            int first = row == 0 ? 0 : row * 2 - 1;\n            int last = row\
-    \ * 2;\n            for (int column = first; column <= last; column++) {\n   \
-    \             while (int(columns.size()) != row &&\n                       value(int(columns.size())\
-    \ - 1, columns.back()) >\n                           value(int(columns.size())\
-    \ - 1, column)) {\n                    columns.pop_back();\n                }\n\
-    \                if (int(columns.size()) != size) columns.push_back(column);\n\
-    \            }\n            return columns[recursive.next_argmin()];\n       \
-    \ }\n    };\n\n    int _size;\n    int _processed = 0;\n    std::unique_ptr<ReduceRow>\
-    \ _base;\n\n   public:\n    template <class Value>\n    explicit Larsch(int size,\
-    \ Value value)\n        : _size(size), _base(std::make_unique<ReduceRow>(size))\
-    \ {\n        assert(size >= 0);\n        _base->set_value(std::function<T(int,\
-    \ int)>(std::move(value)));\n    }\n\n    int size() const {\n        return _size;\n\
-    \    }\n\n    int processed_rows() const {\n        return _processed;\n    }\n\
-    \n    bool finished() const {\n        return _processed == _size;\n    }\n\n\
-    \    int next_argmin() {\n        assert(!finished());\n        _processed++;\n\
-    \        return _base->next_argmin();\n    }\n};\n\ntemplate <class T>\nstruct\
-    \ LarschShortestPathResult {\n    std::vector<T> distance;\n    std::vector<int>\
-    \ parent;\n};\n\ntemplate <class Cost>\nauto larsch_shortest_path(int vertex_count,\
-    \ Cost cost)\n    -> LarschShortestPathResult<\n        std::decay_t<std::invoke_result_t<Cost,\
-    \ int, int>>> {\n    using T = std::decay_t<std::invoke_result_t<Cost, int, int>>;\n\
-    \    assert(vertex_count >= 0);\n\n    LarschShortestPathResult<T> result;\n \
-    \   result.distance.assign(vertex_count, T());\n    result.parent.assign(vertex_count,\
-    \ -1);\n    if (vertex_count <= 1) return result;\n\n    Larsch<T> optimizer(vertex_count\
-    \ - 1, [&](int row, int column) {\n        return result.distance[column] + cost(column,\
-    \ row + 1);\n    });\n    for (int vertex = 1; vertex < vertex_count; vertex++)\
-    \ {\n        int parent = optimizer.next_argmin();\n        result.parent[vertex]\
-    \ = parent;\n        result.distance[vertex] = result.distance[parent] + cost(parent,\
-    \ vertex);\n    }\n    return result;\n}\n\n}  // namespace convex\n}  // namespace\
-    \ m1une\n\n\n#line 1 \"convex/monge/min_plus_convolution.hpp\"\n\n\n\n#line 7\
-    \ \"convex/monge/min_plus_convolution.hpp\"\n\n#line 9 \"convex/monge/min_plus_convolution.hpp\"\
+    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n#line 9 \"convex/min_plus_convolution.hpp\"\
     \n\nnamespace m1une {\nnamespace convex {\n\nnamespace convolution_detail {\n\n\
     template <class T, class Compare, class Add>\nstd::vector<T> structured_convolution(const\
     \ std::vector<T>& arbitrary,\n                                      const std::vector<T>&\
@@ -461,18 +296,17 @@ data:
     \ current_value = add(arbitrary[current], structured[index - current]);\n    \
     \    T candidate_value = add(arbitrary[candidate], structured[index - candidate]);\n\
     \        return !compare(current_value, candidate_value);\n    };\n\n    std::vector<int>\
-    \ optima =\n        smawk_detail::row_optima(result_size, first_size, select);\n\
-    \    std::vector<T> result;\n    result.reserve(result_size);\n    for (int index\
-    \ = 0; index < result_size; index++) {\n        int first_index = optima[index];\n\
-    \        result.emplace_back(add(arbitrary[first_index],\n                   \
-    \             structured[index - first_index]));\n    }\n    return result;\n\
-    }\n\ntemplate <class T>\nstd::pair<int, int> finite_interval(const std::vector<T>&\
-    \ sequence,\n                                    const T& infinity) {\n    int\
-    \ left = 0;\n    while (left < int(sequence.size()) && sequence[left] == infinity)\
-    \ left++;\n    int right = int(sequence.size());\n    while (right > left && sequence[right\
-    \ - 1] == infinity) right--;\n    return {left, right};\n}\n\ntemplate <class\
-    \ T, class Compare>\nstd::vector<T> structured_convolution_with_infinity(\n  \
-    \  const std::vector<T>& arbitrary, const std::vector<T>& structured,\n    const\
+    \ optima =\n        smawk_row_select(result_size, first_size, select);\n    std::vector<T>\
+    \ result;\n    result.reserve(result_size);\n    for (int index = 0; index < result_size;\
+    \ index++) {\n        int first_index = optima[index];\n        result.emplace_back(add(arbitrary[first_index],\n\
+    \                                structured[index - first_index]));\n    }\n \
+    \   return result;\n}\n\ntemplate <class T>\nstd::pair<int, int> finite_interval(const\
+    \ std::vector<T>& sequence,\n                                    const T& infinity)\
+    \ {\n    int left = 0;\n    while (left < int(sequence.size()) && sequence[left]\
+    \ == infinity) left++;\n    int right = int(sequence.size());\n    while (right\
+    \ > left && sequence[right - 1] == infinity) right--;\n    return {left, right};\n\
+    }\n\ntemplate <class T, class Compare>\nstd::vector<T> structured_convolution_with_infinity(\n\
+    \    const std::vector<T>& arbitrary, const std::vector<T>& structured,\n    const\
     \ T& infinity, Compare compare) {\n    if (arbitrary.empty() || structured.empty())\
     \ return {};\n\n    auto [left, right] = finite_interval(structured, infinity);\n\
     \    int result_size = int(arbitrary.size() + structured.size() - 1);\n    std::vector<T>\
@@ -491,9 +325,9 @@ data:
     \ current_value =\n            arbitrary[current] + structured[left + index -\
     \ current];\n        T candidate_value =\n            arbitrary[candidate] + structured[left\
     \ + index - candidate];\n        return !compare(current_value, candidate_value);\n\
-    \    };\n    std::vector<int> optima(middle_size, -1);\n    smawk_detail::solve(rows,\
-    \ columns, select, optima);\n    for (int row : rows) {\n        int first_index\
-    \ = optima[row];\n        result[left + row] =\n            arbitrary[first_index]\
+    \    };\n    auto optima = smawk_row_select(rows, columns, select);\n    for (int\
+    \ i = 0; i < int(rows.size()); i++) {\n        int row = rows[i];\n        int\
+    \ first_index = optima[i];\n        result[left + row] =\n            arbitrary[first_index]\
     \ + structured[left + row - first_index];\n    }\n    return result;\n}\n\ntemplate\
     \ <class T, class Compare>\nstd::vector<T> linear_structured_convolution(const\
     \ std::vector<T>& first,\n                                             const std::vector<T>&\
@@ -593,10 +427,251 @@ data:
     \    const std::vector<T>& first, const std::vector<T>& second,\n    const T&\
     \ negative_infinity) {\n    return convolution_detail::linear_structured_convolution_with_infinity(\n\
     \        first, second, negative_infinity, std::greater<>());\n}\n\n}  // namespace\
-    \ convex\n}  // namespace m1une\n\n\n#line 12 \"convex/monge/all.hpp\"\n\n\n#line\
-    \ 1 \"convex/slope_trick.hpp\"\n\n\n\n#line 7 \"convex/slope_trick.hpp\"\n#include\
-    \ <queue>\n#line 11 \"convex/slope_trick.hpp\"\n\nnamespace m1une {\nnamespace\
-    \ convex {\n\ntemplate <class T>\nstruct SlopeTrickArgmin {\n    std::optional<T>\
+    \ convex\n}  // namespace m1une\n\n\n#line 1 \"convex/monge/all.hpp\"\n\n\n\n\
+    #line 1 \"convex/monge/check.hpp\"\n\n\n\n#line 7 \"convex/monge/check.hpp\"\n\
+    \nnamespace m1une {\nnamespace convex {\n\ntemplate <class Value>\nbool is_monge(int\
+    \ row_count, int column_count, Value value) {\n    assert(row_count >= 0);\n \
+    \   assert(column_count >= 0);\n    if (row_count < 2 || column_count < 2) return\
+    \ true;\n    for (int row = 0; row + 1 < row_count; row++) {\n        for (int\
+    \ column = 0; column + 1 < column_count; column++) {\n            if (value(row,\
+    \ column) + value(row + 1, column + 1) >\n                value(row, column +\
+    \ 1) + value(row + 1, column)) {\n                return false;\n            }\n\
+    \        }\n    }\n    return true;\n}\n\ntemplate <class Value>\nbool is_anti_monge(int\
+    \ row_count, int column_count, Value value) {\n    return is_monge(row_count,\
+    \ column_count,\n        [&](int row, int column) -> decltype(auto) {\n      \
+    \      return value(row, column_count - 1 - column);\n        });\n}\n\n// Check\
+    \ adjacent 2x2 inequalities in the supplied orders, O(HW) time,\n// O(1) extra\
+    \ memory. Distinct nonnegative IDs; arithmetic must not overflow.\ntemplate <class\
+    \ Value>\nbool is_monge(std::span<const int> rows, std::span<const int> columns,\
+    \ Value value) {\n    return is_monge(int(rows.size()), int(columns.size()),\n\
+    \        [&](int row, int column) -> decltype(auto) {\n            return value(rows[row],\
+    \ columns[column]);\n        });\n}\n\ntemplate <class Value>\nbool is_anti_monge(std::span<const\
+    \ int> rows, std::span<const int> columns,\n                   Value value) {\n\
+    \    return is_anti_monge(int(rows.size()), int(columns.size()),\n        [&](int\
+    \ row, int column) -> decltype(auto) {\n            return value(rows[row], columns[column]);\n\
+    \        });\n}\n\ntemplate <class T>\nbool is_monge(const std::vector<std::vector<T>>&\
+    \ matrix) {\n    int row_count = int(matrix.size());\n    int column_count = row_count\
+    \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
+    \ == column_count);\n    return is_monge(row_count, column_count,\n          \
+    \          [&](int row, int column) -> const T& { return matrix[row][column];\
+    \ });\n}\n\ntemplate <class T>\nbool is_anti_monge(const std::vector<std::vector<T>>&\
+    \ matrix) {\n    int row_count = int(matrix.size());\n    int column_count = row_count\
+    \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
+    \ == column_count);\n    return is_anti_monge(\n        row_count, column_count,\n\
+    \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
+    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n#line 1 \"convex/monge/larsch.hpp\"\
+    \n\n\n\n#line 7 \"convex/monge/larsch.hpp\"\n\nnamespace m1une {\nnamespace convex\
+    \ {\n\n// Online minima of a lower-triangular totally monotone matrix (column\
+    \ <= row).\n// Leftmost ties. Before answering row r, only columns <= r are accessed,\
+    \ even\n// when evaluating future rows. Finalize column r+1 after receiving answer\
+    \ r.\n// O(N) total time/evaluations/memory; an individual next_argmin can take\
+    \ O(N).\n// Value is stored directly, with no type-erased callable. Use CTAD:\
+    \ Larsch q(n,f).\ntemplate <class Value>\nclass Larsch {\n    struct Level {\n\
+    \        int size;\n        int row = 0;\n        int column_row = 0;\n      \
+    \  int boundary = 0;\n        std::vector<int> columns;\n        explicit Level(int\
+    \ n) : size(n) {}\n    };\n\n    int _size;\n    Value _value;\n    std::vector<Level>\
+    \ _levels;\n\n    auto entry(int depth, int row, int column) {\n        for (int\
+    \ d = depth; d > 0; --d) {\n            row = row * 2 + 1;\n            column\
+    \ = _levels[d].columns[column];\n        }\n        return _value(row, column);\n\
+    \    }\n\n    int next_column(int depth) {\n        auto& level = _levels[depth];\n\
+    \        int row = level.column_row++;\n        int first = row == 0 ? 0 : row\
+    \ * 2 - 1;\n        for (int column = first; column <= row * 2; ++column) {\n\
+    \            while (int(level.columns.size()) != row &&\n                   entry(depth\
+    \ - 1, int(level.columns.size()) * 2 - 1,\n                         level.columns.back())\
+    \ >\n                   entry(depth - 1, int(level.columns.size()) * 2 - 1, column))\
+    \ {\n                level.columns.pop_back();\n            }\n            if\
+    \ (int(level.columns.size()) != level.size) {\n                level.columns.push_back(column);\n\
+    \            }\n        }\n        return level.columns[next_row(depth)];\n  \
+    \  }\n\n    int next_row(int depth) {\n        auto& level = _levels[depth];\n\
+    \        int row = level.row++;\n        if (row % 2 != 0) {\n            return\
+    \ entry(depth, row, level.boundary) <= entry(depth, row, row)\n              \
+    \         ? level.boundary : row;\n        }\n        int previous = level.boundary;\n\
+    \        int next = row + 1 == level.size ? level.size - 1\n                 \
+    \                       : next_column(depth + 1);\n        level.boundary = next;\n\
+    \        int best = previous;\n        for (int column = previous + 1; column\
+    \ <= next; ++column) {\n            if (entry(depth, row, column) < entry(depth,\
+    \ row, best)) best = column;\n        }\n        return best;\n    }\n\n   public:\n\
+    \    explicit Larsch(int size, Value value) : _size(size), _value(std::move(value))\
+    \ {\n        assert(size >= 0);\n        for (int n = size; n > 0; n /= 2) {\n\
+    \            _levels.emplace_back(n);\n            if (_levels.size() > 1) _levels.back().columns.reserve(n);\n\
+    \        }\n    }\n    int size() const { return _size; }\n    int processed_rows()\
+    \ const { return _size == 0 ? 0 : _levels[0].row; }\n    bool finished() const\
+    \ { return processed_rows() == _size; }\n    int next_argmin() {\n        assert(!finished());\n\
+    \        return next_row(0);\n    }\n};\n\n}  // namespace convex\n}  // namespace\
+    \ m1une\n\n\n#line 1 \"convex/monge/monotone_minima.hpp\"\n\n\n\n#line 8 \"convex/monge/monotone_minima.hpp\"\
+    \n\nnamespace m1une {\nnamespace convex {\n\nnamespace monotone_minima_detail\
+    \ {\n\ntemplate <class Value, class Compare>\nvoid solve(int row_left, int row_right,\
+    \ int column_left, int column_right,\n           const Value& value, const Compare&\
+    \ compare, std::vector<int>& answer) {\n    if (row_left == row_right) return;\n\
+    \    int row = (row_left + row_right) / 2;\n    int best = column_left;\n    for\
+    \ (int column = column_left + 1; column < column_right; column++) {\n        if\
+    \ (compare(value(row, column), value(row, best))) best = column;\n    }\n    answer[row]\
+    \ = best;\n    solve(row_left, row, column_left, best + 1, value, compare, answer);\n\
+    \    solve(row + 1, row_right, best, column_right, value, compare, answer);\n\
+    }\n\n}  // namespace monotone_minima_detail\n\n// Fixed rectangular matrix; leftmost\
+    \ optimal columns must be nondecreasing.\n// Returns column indices, or -1 when\
+    \ there are no columns. Not an online DP.\n// O(H + W log(H+1)) time, O(H + log(H+1))\
+    \ memory.\ntemplate <class Value, class Compare = std::less<>>\nstd::vector<int>\
+    \ monotone_row_optima(int row_count, int column_count, Value value,\n        \
+    \                             Compare compare = Compare()) {\n    assert(row_count\
+    \ >= 0);\n    assert(column_count >= 0);\n    std::vector<int> answer(row_count,\
+    \ -1);\n    if (row_count == 0 || column_count == 0) return answer;\n    monotone_minima_detail::solve(0,\
+    \ row_count, 0, column_count, value, compare, answer);\n    return answer;\n}\n\
+    \ntemplate <class Value>\nstd::vector<int> monotone_row_argmin(int row_count,\
+    \ int column_count, Value value) {\n    return monotone_row_optima(row_count,\
+    \ column_count, value, std::less<>());\n}\n\ntemplate <class Value>\nstd::vector<int>\
+    \ monotone_row_argmax(int row_count, int column_count, Value value) {\n    return\
+    \ monotone_row_optima(row_count, column_count, value, std::greater<>());\n}\n\n\
+    // Ordered matrix value(rows[r], columns[c]); return original column IDs in\n\
+    // row list order. Leftmost means first in columns. IDs are distinct/nonnegative.\n\
+    template <class Value, class Compare = std::less<>>\nstd::vector<int> monotone_row_optima(std::span<const\
+    \ int> rows,\n                                     std::span<const int> columns,\
+    \ Value value,\n                                     Compare compare = Compare())\
+    \ {\n    auto answer = monotone_row_optima(int(rows.size()), int(columns.size()),\n\
+    \        [&](int row, int column) -> decltype(auto) {\n            return value(rows[row],\
+    \ columns[column]);\n        }, compare);\n    for (int& column : answer) if (column\
+    \ != -1) column = columns[column];\n    return answer;\n}\n\ntemplate <class Value>\n\
+    std::vector<int> monotone_row_argmin(std::span<const int> rows,\n            \
+    \                         std::span<const int> columns, Value value) {\n    return\
+    \ monotone_row_optima(rows, columns, value, std::less<>());\n}\n\ntemplate <class\
+    \ Value>\nstd::vector<int> monotone_row_argmax(std::span<const int> rows,\n  \
+    \                                   std::span<const int> columns, Value value)\
+    \ {\n    return monotone_row_optima(rows, columns, value, std::greater<>());\n\
+    }\n\ntemplate <class T>\nstd::vector<int> monotone_row_argmin(const std::vector<std::vector<T>>&\
+    \ matrix) {\n    int row_count = int(matrix.size());\n    int column_count = row_count\
+    \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
+    \ == column_count);\n    return monotone_row_argmin(\n        row_count, column_count,\n\
+    \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
+    }\n\ntemplate <class T>\nstd::vector<int> monotone_row_argmax(const std::vector<std::vector<T>>&\
+    \ matrix) {\n    int row_count = int(matrix.size());\n    int column_count = row_count\
+    \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
+    \ == column_count);\n    return monotone_row_argmax(\n        row_count, column_count,\n\
+    \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
+    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n#line 8 \"convex/monge/all.hpp\"\
+    \n\n\n#line 1 \"convex/monge_shortest_path.hpp\"\n\n\n\n#include <algorithm>\n\
+    #line 8 \"convex/monge_shortest_path.hpp\"\n\n#line 11 \"convex/monge_shortest_path.hpp\"\
+    \n\nnamespace m1une {\nnamespace convex {\n\ntemplate <class T>\nstruct MongeShortestPathResult\
+    \ {\n    std::vector<T> distance;\n    std::vector<int> parent;\n};\n\n// Same-array\
+    \ forward recurrence: dp[j] = min(dp[i] + cost(i,j)), j-i >= D.\n// Finite Monge\
+    \ costs on every fully valid rectangle. Smallest parent on ties.\n// O(N) time/evaluations/memory,\
+    \ for any D >= 1. Never evaluates invalid edges\n// or adds infinity. Vertices\
+    \ 1..D-1 are unreachable; all vertices >=D are reachable.\ntemplate <class T,\
+    \ class Cost>\nMongeShortestPathResult<T> monge_shortest_path(\n    int vertex_count,\
+    \ Cost cost, T infinity, int minimum_step = 1) {\n    assert(vertex_count >= 0);\n\
+    \    assert(minimum_step >= 1);\n    assert(T() < infinity);\n    MongeShortestPathResult<T>\
+    \ result;\n    result.distance.assign(vertex_count, infinity);\n    result.parent.assign(vertex_count,\
+    \ -1);\n    if (vertex_count == 0) return result;\n    result.distance[0] = T();\n\
+    \    if (minimum_step >= vertex_count) return result;\n\n    // Row r targets\
+    \ r+D. Columns 1..D-1 would be unreachable permanently;\n    // duplicate source\
+    \ 0 instead. This nondecreasing source map preserves Monge.\n    auto source =\
+    \ [&](int column) { return column < minimum_step ? 0 : column; };\n    Larsch\
+    \ optimizer(vertex_count - minimum_step, [&](int row, int column) -> T {\n   \
+    \     int from = source(column);\n        return result.distance[from] + cost(from,\
+    \ row + minimum_step);\n    });\n    for (int to = minimum_step; to < vertex_count;\
+    \ ++to) {\n        int from = source(optimizer.next_argmin());\n        result.parent[to]\
+    \ = from;\n        result.distance[to] = result.distance[from] + cost(from, to);\n\
+    \    }\n    return result;\n}\n\n// dist[j] = min(dist[i] + cost(i, j)), where\
+    \ j - i >= minimum_step.\n// Same-array recurrence. Finite anti-Monge costs on\
+    \ every valid rectangle.\n// Largest parent on ties; O(N) memory. See docs for\
+    \ the numeric contract.\n// O(N log N + N * minimum_step) time for O(1) cost evaluations.\n\
+    // In particular, minimum_step = 1 or 2 gives O(N log N) time.\ntemplate <class\
+    \ T, class Cost>\nMongeShortestPathResult<T> anti_monge_shortest_path(\n    int\
+    \ vertex_count, Cost cost, T infinity, int minimum_step = 1) {\n    assert(vertex_count\
+    \ >= 0);\n    assert(minimum_step >= 1);\n    assert(T() < infinity);\n\n    MongeShortestPathResult<T>\
+    \ result;\n    result.distance.assign(vertex_count, infinity);\n    result.parent.assign(vertex_count,\
+    \ -1);\n    if (vertex_count == 0) return result;\n    result.distance[0] = T();\n\
+    \    if (minimum_step >= vertex_count) return result;\n\n    auto relax = [&](int\
+    \ from, int to) {\n        if (result.distance[from] == infinity) return;\n  \
+    \      T candidate = result.distance[from] + cost(from, to);\n        if (candidate\
+    \ < result.distance[to] ||\n            (candidate == result.distance[to] && from\
+    \ > result.parent[to])) {\n            result.distance[to] = candidate;\n    \
+    \        result.parent[to] = from;\n        }\n    };\n\n    // All pairs in this\
+    \ rectangle are valid. Remove unreachable columns,\n    // then reverse the remaining\
+    \ columns to turn anti-Monge into Monge.\n    auto rectangle = [&](int first,\
+    \ int last, int top, int bottom) {\n        if (first == last || top == bottom)\
+    \ return;\n        std::vector<int> sources;\n        for (int from = last; from\
+    \ > first;) {\n            --from;\n            if (result.distance[from] != infinity)\
+    \ sources.push_back(from);\n        }\n        if (sources.empty()) return;\n\
+    \        if (sources.size() == 1) {\n            for (int to = top; to < bottom;\
+    \ to++) relax(sources[0], to);\n            return;\n        }\n        std::vector<int>\
+    \ targets(bottom - top);\n        std::iota(targets.begin(), targets.end(), top);\n\
+    \        auto argmin = smawk_row_argmin(targets, sources, [&](int to, int from)\
+    \ -> T {\n            return result.distance[from] + cost(from, to);\n       \
+    \ });\n        for (int row = 0; row < bottom - top; row++) relax(argmin[row],\
+    \ top + row);\n    };\n\n    auto solve = [&](auto& self, int left, int right)\
+    \ -> void {\n        // Such a block contains no valid internal edge.\n      \
+    \  if (right - left <= minimum_step) return;\n        int middle = left + (right\
+    \ - left) / 2;\n        self(self, left, middle);\n\n        // Two valid rectangles\
+    \ and a small corner partition the cross edges.\n        int source_end = std::max(left,\
+    \ middle - (minimum_step - 1));\n        int target_begin = middle + std::min(right\
+    \ - middle, minimum_step - 1);\n        rectangle(left, middle, target_begin,\
+    \ right);\n        rectangle(left, source_end, middle, target_begin);\n      \
+    \  for (int from = source_end; from < middle; from++) {\n            // Subtraction\
+    \ avoids overflow when minimum_step is large.\n            if (minimum_step >=\
+    \ target_begin - from) continue;\n            for (int to = std::max(middle, from\
+    \ + minimum_step);\n                 to < target_begin; to++) {\n            \
+    \    relax(from, to);\n            }\n        }\n\n        // Incoming transitions\
+    \ must be applied BEFORE solving the right half.\n        self(self, middle, right);\n\
+    \    };\n    solve(solve, 0, vertex_count);\n    return result;\n}\n\n}  // namespace\
+    \ convex\n}  // namespace m1une\n\n\n#line 1 \"convex/monge_transition.hpp\"\n\
+    \n\n\n#line 9 \"convex/monge_transition.hpp\"\n\n#line 12 \"convex/monge_transition.hpp\"\
+    \n\nnamespace m1une {\nnamespace convex {\n\ntemplate <class T>\nstruct MatrixTransitionResult\
+    \ {\n    std::vector<T> value;\n    std::vector<int> argmin;\n};\n\nnamespace\
+    \ monge_transition_detail {\n\ntemplate <class T, class Cost, class Source, class\
+    \ Target, class Search>\nauto solve(const std::vector<T>& previous, int targets,\
+    \ int sources, Cost cost,\n           Source source, Target target, Search search)\
+    \ {\n    using R = std::decay_t<decltype(previous[0] + cost(0, 0))>;\n    auto\
+    \ value = [&](int row, int column) -> R {\n        return previous[source(column)]\
+    \ + cost(source(column), target(row));\n    };\n    MatrixTransitionResult<R>\
+    \ result;\n    result.argmin = search(targets, sources, value);\n    result.value.resize(targets);\n\
+    \    for (int row = 0; row < targets; ++row) {\n        int& column = result.argmin[row];\n\
+    \        if (column == -1) continue;\n        result.value[row] = value(row, column);\n\
+    \        column = source(column);\n    }\n    return result;\n}\n\n}  // namespace\
+    \ monge_transition_detail\n\n// Offline layer: g[j] = min_i(previous[i] + cost(i,j));\
+    \ previous is finalized.\n// Leftmost minimizing sources must be nondecreasing\
+    \ with target index. This is\n// weaker than total monotonicity. O(H + W log(H+1))\
+    \ time, O(H) result memory.\n// Ties select smallest source. Empty sources give\
+    \ argmin=-1, value=R().\ntemplate <class T, class Cost>\nauto monotone_transition(const\
+    \ std::vector<T>& previous, int state_count, Cost cost) {\n    auto identity =\
+    \ [](int i) { return i; };\n    return monge_transition_detail::solve(previous,\
+    \ state_count, int(previous.size()),\n        cost, identity, identity, [](int\
+    \ h, int w, auto value) {\n            return monotone_row_argmin(h, w, value);\n\
+    \        });\n}\n\n// Same offline recurrence, with finite Monge cost(source,target).\
+    \ Adding source\n// constants preserves Monge. O(H+W) time/memory; smallest source\
+    \ on ties.\ntemplate <class T, class Cost>\nauto monge_transition(const std::vector<T>&\
+    \ previous, int state_count, Cost cost) {\n    auto identity = [](int i) { return\
+    \ i; };\n    return monge_transition_detail::solve(previous, state_count, int(previous.size()),\n\
+    \        cost, identity, identity, [](int h, int w, auto value) {\n          \
+    \  return smawk_row_argmin(h, w, value);\n        });\n}\n\n// Anti-Monge specialization:\
+    \ reverse source order internally. Largest source\n// on ties; O(H+W) time/memory.\
+    \ All source-target pairs must be legal and finite.\ntemplate <class T, class\
+    \ Cost>\nauto anti_monge_transition(const std::vector<T>& previous, int state_count,\
+    \ Cost cost) {\n    int width = int(previous.size());\n    return monge_transition_detail::solve(previous,\
+    \ state_count, width, cost,\n        [=](int i) { return width - 1 - i; }, [](int\
+    \ i) { return i; },\n        [](int h, int w, auto value) { return smawk_row_argmin(h,\
+    \ w, value); });\n}\n\n// Ordered variants: the virtual matrix is previous[sources[c]]\
+    \ +\n// cost(sources[c], targets[r]). Return original source IDs, in target list\
+    \ order.\n// IDs must be distinct/nonnegative; sources must index previous. Ties\
+    \ choose the\n// first source in the supplied order. No same-array recurrence\
+    \ is computed.\ntemplate <class T, class Cost>\nauto monotone_transition(const\
+    \ std::vector<T>& previous,\n                         std::span<const int> targets,\
+    \ std::span<const int> sources,\n                         Cost cost) {\n    for\
+    \ (int i : sources) { assert(0 <= i && i < int(previous.size())); (void)i; }\n\
+    \    for (int j : targets) { assert(j >= 0); (void)j; }\n    return monge_transition_detail::solve(previous,\
+    \ int(targets.size()),\n        int(sources.size()), cost, [&](int i) { return\
+    \ sources[i]; },\n        [&](int i) { return targets[i]; },\n        [](int h,\
+    \ int w, auto value) { return monotone_row_argmin(h, w, value); });\n}\n\ntemplate\
+    \ <class T, class Cost>\nauto monge_transition(const std::vector<T>& previous,\n\
+    \                      std::span<const int> targets, std::span<const int> sources,\n\
+    \                      Cost cost) {\n    for (int i : sources) { assert(0 <= i\
+    \ && i < int(previous.size())); (void)i; }\n    for (int j : targets) { assert(j\
+    \ >= 0); (void)j; }\n    return monge_transition_detail::solve(previous, int(targets.size()),\n\
+    \        int(sources.size()), cost, [&](int i) { return sources[i]; },\n     \
+    \   [&](int i) { return targets[i]; },\n        [](int h, int w, auto value) {\
+    \ return smawk_row_argmin(h, w, value); });\n}\n\n}  // namespace convex\n}  //\
+    \ namespace m1une\n\n\n#line 1 \"convex/slope_trick.hpp\"\n\n\n\n#line 7 \"convex/slope_trick.hpp\"\
+    \n#include <queue>\n#line 11 \"convex/slope_trick.hpp\"\n\nnamespace m1une {\n\
+    namespace convex {\n\ntemplate <class T>\nstruct SlopeTrickArgmin {\n    std::optional<T>\
     \ left;\n    std::optional<T> right;\n};\n\ntemplate <class T>\nclass SlopeTrick\
     \ {\n    static_assert(std::is_arithmetic_v<T> && std::is_signed_v<T>);\n\n  \
     \  T _minimum = T();\n    T _left_offset = T();\n    T _right_offset = T();\n\
@@ -647,7 +722,7 @@ data:
     \    }\n};\n\ntemplate <class T>\nSlopeTrick<T> min_plus_convolution(SlopeTrick<T>\
     \ first,\n                                   SlopeTrick<T> second) {\n    first.min_plus_convolve(std::move(second));\n\
     \    return first;\n}\n\n}  // namespace convex\n}  // namespace m1une\n\n\n#line\
-    \ 9 \"convex/all.hpp\"\n\n\n"
+    \ 12 \"convex/all.hpp\"\n\n\n"
   code: '#ifndef M1UNE_CONVEX_ALL_HPP
 
     #define M1UNE_CONVEX_ALL_HPP 1
@@ -659,7 +734,13 @@ data:
 
     #include "li_chao_tree.hpp"
 
+    #include "min_plus_convolution.hpp"
+
     #include "monge/all.hpp"
+
+    #include "monge_shortest_path.hpp"
+
+    #include "monge_transition.hpp"
 
     #include "slope_trick.hpp"
 
@@ -671,22 +752,27 @@ data:
   - convex/alien_trick.hpp
   - convex/convex_hull_trick.hpp
   - convex/li_chao_tree.hpp
-  - convex/monge/all.hpp
-  - convex/monge/anti_monge_shortest_path.hpp
+  - convex/min_plus_convolution.hpp
   - convex/monge/smawk.hpp
+  - convex/monge/all.hpp
   - convex/monge/check.hpp
-  - convex/monge/divide_and_conquer_optimization.hpp
-  - convex/monge/monotone_minima.hpp
-  - convex/monge/knuth_optimization.hpp
   - convex/monge/larsch.hpp
-  - convex/monge/min_plus_convolution.hpp
+  - convex/monge/monotone_minima.hpp
+  - convex/monge/smawk.hpp
+  - convex/monge_shortest_path.hpp
+  - convex/monge/larsch.hpp
+  - convex/monge_transition.hpp
+  - convex/monge/monotone_minima.hpp
   - convex/slope_trick.hpp
   isVerificationFile: false
   path: convex/all.hpp
   requiredBy: []
-  timestamp: '2026-10-24 20:27:26+09:00'
-  verificationStatus: LIBRARY_NO_TESTS
-  verifiedWith: []
+  timestamp: '2026-10-30 15:56:19+09:00'
+  verificationStatus: LIBRARY_ALL_AC
+  verifiedWith:
+  - verify/convex/monge/monge_dp_optimization.test.cpp
+  - verify/convex/monge/monge_algorithms.test.cpp
+  - verify/convex/monge/ordered_matrix.test.cpp
 documentation_of: convex/all.hpp
 layout: document
 title: Convex All
@@ -704,5 +790,8 @@ helpers. The public namespace is `m1une::convex`.
 | `convex/alien_trick.hpp` | Exact-count optimization through Lagrangian relaxation. |
 | `convex/convex_hull_trick.hpp` | Monotone-slope CHT for minimum or maximum line queries. |
 | `convex/li_chao_tree.hpp` | Dynamic Li Chao tree for arbitrary line and line-segment insertion. |
-| `convex/monge/all.hpp` | SMAWK, monotone minima, Knuth/D&C DP optimization, LARSCH, Monge checks, and structured min-plus/max-plus convolution. |
+| `convex/monge/all.hpp` | SMAWK, monotone minima, online LARSCH, and ordered Monge/anti-Monge checks. |
 | `convex/slope_trick.hpp` | Heap-based slope trick for convex piecewise-linear functions. |
+| `convex/monge_transition.hpp` | Finalized-layer monotone, Monge, anti-Monge, and ordered transitions. |
+| `convex/monge_shortest_path.hpp` | Same-array Monge and anti-Monge forward DAG recurrences with minimum step. |
+| `convex/min_plus_convolution.hpp` | Structured sequence min-plus/max-plus convolution. |

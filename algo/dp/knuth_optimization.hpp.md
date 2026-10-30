@@ -3,30 +3,27 @@ data:
   _extendedDependsOn: []
   _extendedRequiredBy:
   - icon: ':warning:'
-    path: convex/all.hpp
-    title: Convex All
-  - icon: ':heavy_check_mark:'
-    path: convex/monge/all.hpp
-    title: Monge Optimization Guide
+    path: algo/all.hpp
+    title: Algorithms All
+  - icon: ':warning:'
+    path: algo/dp/all.hpp
+    title: DP Algorithms All
   _extendedVerifiedWith:
   - icon: ':heavy_check_mark:'
-    path: verify/convex/monge/monge_algorithms.test.cpp
-    title: verify/convex/monge/monge_algorithms.test.cpp
-  - icon: ':heavy_check_mark:'
-    path: verify/convex/monge/monge_dp_optimization.test.cpp
-    title: verify/convex/monge/monge_dp_optimization.test.cpp
+    path: verify/algo/dp/knuth_optimization.test.cpp
+    title: verify/algo/dp/knuth_optimization.test.cpp
   _isVerificationFailed: false
   _pathExtension: hpp
   _verificationStatusIcon: ':heavy_check_mark:'
   attributes:
     links: []
-  bundledCode: "#line 1 \"convex/monge/knuth_optimization.hpp\"\n\n\n\n#include <algorithm>\n\
+  bundledCode: "#line 1 \"algo/dp/knuth_optimization.hpp\"\n\n\n\n#include <algorithm>\n\
     #include <cassert>\n#include <type_traits>\n#include <vector>\n\nnamespace m1une\
-    \ {\nnamespace convex {\n\ntemplate <class T>\nstruct KnuthOptimizationResult\
-    \ {\n    std::vector<std::vector<T>> value;\n    std::vector<std::vector<int>>\
-    \ split;\n\n    T optimum() const {\n        return value[0].back();\n    }\n\
-    };\n\ntemplate <class IntervalCost>\nauto knuth_optimization(int element_count,\
-    \ IntervalCost interval_cost)\n    -> KnuthOptimizationResult<\n        std::decay_t<std::invoke_result_t<IntervalCost,\
+    \ {\nnamespace algo {\n\ntemplate <class T>\nstruct KnuthOptimizationResult {\n\
+    \    std::vector<std::vector<T>> value;\n    std::vector<std::vector<int>> split;\n\
+    \n    T optimum() const {\n        return value[0].back();\n    }\n};\n\ntemplate\
+    \ <class IntervalCost>\nauto knuth_optimization(int element_count, IntervalCost\
+    \ interval_cost)\n    -> KnuthOptimizationResult<\n        std::decay_t<std::invoke_result_t<IntervalCost,\
     \ int, int>>> {\n    assert(element_count >= 0);\n    using T = std::decay_t<std::invoke_result_t<IntervalCost,\
     \ int, int>>;\n\n    KnuthOptimizationResult<T> result;\n    result.value.assign(element_count\
     \ + 1, std::vector<T>(element_count + 1, T()));\n    result.split.assign(element_count\
@@ -45,10 +42,10 @@ data:
     \                    best_value = candidate;\n                }\n            }\n\
     \            result.value[left][right] = best_value + interval_cost(left, right);\n\
     \            result.split[left][right] = best;\n        }\n    }\n    return result;\n\
-    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n"
-  code: "#ifndef M1UNE_CONVEX_MONGE_KNUTH_OPTIMIZATION_HPP\n#define M1UNE_CONVEX_MONGE_KNUTH_OPTIMIZATION_HPP\
+    }\n\n}  // namespace algo\n}  // namespace m1une\n\n\n"
+  code: "#ifndef M1UNE_ALGO_DP_KNUTH_OPTIMIZATION_HPP\n#define M1UNE_ALGO_DP_KNUTH_OPTIMIZATION_HPP\
     \ 1\n\n#include <algorithm>\n#include <cassert>\n#include <type_traits>\n#include\
-    \ <vector>\n\nnamespace m1une {\nnamespace convex {\n\ntemplate <class T>\nstruct\
+    \ <vector>\n\nnamespace m1une {\nnamespace algo {\n\ntemplate <class T>\nstruct\
     \ KnuthOptimizationResult {\n    std::vector<std::vector<T>> value;\n    std::vector<std::vector<int>>\
     \ split;\n\n    T optimum() const {\n        return value[0].back();\n    }\n\
     };\n\ntemplate <class IntervalCost>\nauto knuth_optimization(int element_count,\
@@ -71,19 +68,18 @@ data:
     \                    best_value = candidate;\n                }\n            }\n\
     \            result.value[left][right] = best_value + interval_cost(left, right);\n\
     \            result.split[left][right] = best;\n        }\n    }\n    return result;\n\
-    }\n\n}  // namespace convex\n}  // namespace m1une\n\n#endif  // M1UNE_CONVEX_MONGE_KNUTH_OPTIMIZATION_HPP\n"
+    }\n\n}  // namespace algo\n}  // namespace m1une\n\n#endif  // M1UNE_ALGO_DP_KNUTH_OPTIMIZATION_HPP\n"
   dependsOn: []
   isVerificationFile: false
-  path: convex/monge/knuth_optimization.hpp
+  path: algo/dp/knuth_optimization.hpp
   requiredBy:
-  - convex/monge/all.hpp
-  - convex/all.hpp
-  timestamp: '2026-07-07 18:38:36+09:00'
+  - algo/dp/all.hpp
+  - algo/all.hpp
+  timestamp: '2026-10-30 15:56:19+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
-  - verify/convex/monge/monge_dp_optimization.test.cpp
-  - verify/convex/monge/monge_algorithms.test.cpp
-documentation_of: convex/monge/knuth_optimization.hpp
+  - verify/algo/dp/knuth_optimization.test.cpp
+documentation_of: algo/dp/knuth_optimization.hpp
 layout: document
 title: Knuth Optimization
 ---
@@ -129,7 +125,7 @@ for (int length = 2; length <= n; ++length) {
 Knuth optimization performs that DP with fewer candidate splits:
 
 ```cpp
-#include "convex/monge/knuth_optimization.hpp"
+#include "algo/dp/knuth_optimization.hpp"
 #include <cassert>
 #include <iostream>
 #include <vector>
@@ -142,7 +138,7 @@ int main() {
     auto merge_cost = [&](int l, int r) {
         return prefix[r] - prefix[l];  // Weight of [l,r), excluding r.
     };
-    auto result = m1une::convex::knuth_optimization(n, merge_cost);
+    auto result = m1une::algo::knuth_optimization(n, merge_cost);
     assert(result.value[0][2] == 5);  // Merge the first two piles.
     assert(result.value[1][3] == 7);  // Merge the last two piles.
     assert(result.split[0][3] == 2);  // Final split: [0,2) and [2,3).
@@ -181,11 +177,21 @@ auto knuth_optimization(
 
 The result is `KnuthOptimizationResult<T>`:
 
-| Member / Method | Meaning |
-| --- | --- |
-| `value[l][r]` | Optimal value for `[l, r)`. |
-| `split[l][r]` | Leftmost optimal split `k`. |
-| `optimum()` | Returns `value[0][element_count]`. |
+| Member / Method | Meaning | Time |
+| --- | --- | --- |
+| `std::vector<std::vector<T>> value` | Optimal values for `[l,r)`, with zero on empty/singleton intervals. | Direct access $O(1)$ |
+| `std::vector<std::vector<int>> split` | Leftmost optimal split; empty `[l,l)` uses `l`, singleton `[l,l+1)` uses `l+1`. | Direct access $O(1)$ |
+| `T optimum() const` | Returns `value[0][element_count]`, also zero for empty input. | $O(1)$ |
+
+| Exact function signature | Time | Memory |
+| --- | --- | --- |
+| `template<class IntervalCost> auto knuth_optimization(int element_count, IntervalCost interval_cost) -> KnuthOptimizationResult<std::decay_t<std::invoke_result_t<IntervalCost, int, int>>>` | $O(N^2)$ | $O(N^2)$ |
+
+`element_count >= 0` is asserted. Costs and arithmetic must be finite and fit
+in `T`, which supports default zero initialization, addition, and comparison.
+The callback receives original zero-based half-open interval endpoints and is
+called only for lengths at least two. Inputs are not modified. This is an
+interval recurrence, not a rectangular matrix transition or forward-DAG DP.
 
 For intervals of length at least two, the split is strictly inside the
 interval.

@@ -2,11 +2,14 @@
 data:
   _extendedDependsOn:
   - icon: ':heavy_check_mark:'
-    path: convex/monge/anti_monge_shortest_path.hpp
-    title: Anti-Monge DAG Shortest Paths
+    path: convex/monge/larsch.hpp
+    title: LARSCH Online Matrix Minima
   - icon: ':heavy_check_mark:'
     path: convex/monge/smawk.hpp
     title: SMAWK
+  - icon: ':heavy_check_mark:'
+    path: convex/monge_shortest_path.hpp
+    title: Monge and Anti-Monge Forward DAG Shortest Paths
   - icon: ':heavy_check_mark:'
     path: utilities/fast_io.hpp
     title: Fast IO
@@ -25,10 +28,50 @@ data:
     \ aplusb fallback runs the focused checks below before handling input.\n#define\
     \ PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <algorithm>\n\
     #include <bit>\n#include <cassert>\n#include <climits>\n#include <random>\n#include\
-    \ <vector>\n\n#line 1 \"convex/monge/anti_monge_shortest_path.hpp\"\n\n\n\n#line\
-    \ 7 \"convex/monge/anti_monge_shortest_path.hpp\"\n\n#line 1 \"convex/monge/smawk.hpp\"\
-    \n\n\n\n#line 5 \"convex/monge/smawk.hpp\"\n#include <functional>\n#include <numeric>\n\
-    #line 8 \"convex/monge/smawk.hpp\"\n\nnamespace m1une {\nnamespace convex {\n\n\
+    \ <vector>\n\n#line 1 \"convex/monge_shortest_path.hpp\"\n\n\n\n#line 6 \"convex/monge_shortest_path.hpp\"\
+    \n#include <numeric>\n#line 8 \"convex/monge_shortest_path.hpp\"\n\n#line 1 \"\
+    convex/monge/larsch.hpp\"\n\n\n\n#line 5 \"convex/monge/larsch.hpp\"\n#include\
+    \ <utility>\n#line 7 \"convex/monge/larsch.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ convex {\n\n// Online minima of a lower-triangular totally monotone matrix (column\
+    \ <= row).\n// Leftmost ties. Before answering row r, only columns <= r are accessed,\
+    \ even\n// when evaluating future rows. Finalize column r+1 after receiving answer\
+    \ r.\n// O(N) total time/evaluations/memory; an individual next_argmin can take\
+    \ O(N).\n// Value is stored directly, with no type-erased callable. Use CTAD:\
+    \ Larsch q(n,f).\ntemplate <class Value>\nclass Larsch {\n    struct Level {\n\
+    \        int size;\n        int row = 0;\n        int column_row = 0;\n      \
+    \  int boundary = 0;\n        std::vector<int> columns;\n        explicit Level(int\
+    \ n) : size(n) {}\n    };\n\n    int _size;\n    Value _value;\n    std::vector<Level>\
+    \ _levels;\n\n    auto entry(int depth, int row, int column) {\n        for (int\
+    \ d = depth; d > 0; --d) {\n            row = row * 2 + 1;\n            column\
+    \ = _levels[d].columns[column];\n        }\n        return _value(row, column);\n\
+    \    }\n\n    int next_column(int depth) {\n        auto& level = _levels[depth];\n\
+    \        int row = level.column_row++;\n        int first = row == 0 ? 0 : row\
+    \ * 2 - 1;\n        for (int column = first; column <= row * 2; ++column) {\n\
+    \            while (int(level.columns.size()) != row &&\n                   entry(depth\
+    \ - 1, int(level.columns.size()) * 2 - 1,\n                         level.columns.back())\
+    \ >\n                   entry(depth - 1, int(level.columns.size()) * 2 - 1, column))\
+    \ {\n                level.columns.pop_back();\n            }\n            if\
+    \ (int(level.columns.size()) != level.size) {\n                level.columns.push_back(column);\n\
+    \            }\n        }\n        return level.columns[next_row(depth)];\n  \
+    \  }\n\n    int next_row(int depth) {\n        auto& level = _levels[depth];\n\
+    \        int row = level.row++;\n        if (row % 2 != 0) {\n            return\
+    \ entry(depth, row, level.boundary) <= entry(depth, row, row)\n              \
+    \         ? level.boundary : row;\n        }\n        int previous = level.boundary;\n\
+    \        int next = row + 1 == level.size ? level.size - 1\n                 \
+    \                       : next_column(depth + 1);\n        level.boundary = next;\n\
+    \        int best = previous;\n        for (int column = previous + 1; column\
+    \ <= next; ++column) {\n            if (entry(depth, row, column) < entry(depth,\
+    \ row, best)) best = column;\n        }\n        return best;\n    }\n\n   public:\n\
+    \    explicit Larsch(int size, Value value) : _size(size), _value(std::move(value))\
+    \ {\n        assert(size >= 0);\n        for (int n = size; n > 0; n /= 2) {\n\
+    \            _levels.emplace_back(n);\n            if (_levels.size() > 1) _levels.back().columns.reserve(n);\n\
+    \        }\n    }\n    int size() const { return _size; }\n    int processed_rows()\
+    \ const { return _size == 0 ? 0 : _levels[0].row; }\n    bool finished() const\
+    \ { return processed_rows() == _size; }\n    int next_argmin() {\n        assert(!finished());\n\
+    \        return next_row(0);\n    }\n};\n\n}  // namespace convex\n}  // namespace\
+    \ m1une\n\n\n#line 1 \"convex/monge/smawk.hpp\"\n\n\n\n#line 5 \"convex/monge/smawk.hpp\"\
+    \n#include <functional>\n#line 7 \"convex/monge/smawk.hpp\"\n#include <span>\n\
+    #line 9 \"convex/monge/smawk.hpp\"\n\nnamespace m1une {\nnamespace convex {\n\n\
     namespace smawk_detail {\n\ntemplate <class Select>\nvoid solve(const std::vector<int>&\
     \ rows, const std::vector<int>& columns,\n           const Select& select, std::vector<int>&\
     \ answer) {\n    if (rows.empty()) return;\n\n    std::vector<int> reduced;\n\
@@ -51,22 +94,49 @@ data:
     \ answer;\n\n    std::vector<int> rows(row_count), columns(column_count);\n  \
     \  std::iota(rows.begin(), rows.end(), 0);\n    std::iota(columns.begin(), columns.end(),\
     \ 0);\n    solve(rows, columns, select, answer);\n    return answer;\n}\n\n} \
-    \ // namespace smawk_detail\n\n// Search a fixed H x W rectangle, returning column\
-    \ indices (leftmost on ties).\n// Requires total monotonicity under Compare; Monge\
-    \ suffices for minima.\n// For anti-Monge minima, reverse columns in value and\
-    \ map indices back.\n// O(H + W) evaluations; callbacks may be queried out of\
-    \ row order.\ntemplate <class Value, class Compare = std::less<>>\nstd::vector<int>\
-    \ smawk_row_optima(int row_count, int column_count, Value value,\n           \
-    \                       Compare compare = Compare()) {\n    assert(row_count >=\
-    \ 0);\n    assert(column_count >= 0);\n    return smawk_detail::row_optima(\n\
-    \        row_count, column_count,\n        [&](int row, int current, int candidate)\
-    \ {\n            return compare(value(row, candidate), value(row, current));\n\
-    \        });\n}\n\ntemplate <class Value>\nstd::vector<int> smawk_row_argmin(int\
-    \ row_count, int column_count, Value value) {\n    return smawk_row_optima(row_count,\
-    \ column_count, value, std::less<>());\n}\n\ntemplate <class Value>\nstd::vector<int>\
-    \ smawk_row_argmax(int row_count, int column_count, Value value) {\n    return\
-    \ smawk_row_optima(row_count, column_count, value, std::greater<>());\n}\n\ntemplate\
-    \ <class T>\nstd::vector<int> smawk_row_argmin(const std::vector<std::vector<T>>&\
+    \ // namespace smawk_detail\n\n// Comparison-oracle SMAWK. prefer(row, current,\
+    \ candidate) says whether to\n// replace current. The induced ordered matrix must\
+    \ be totally monotone with\n// this tie rule. This also permits symbolic invalid\
+    \ entries without sentinels.\n// O(H + W) oracle calls and memory. Entries must\
+    \ be fixed (offline search).\ntemplate <class Prefer>\nstd::vector<int> smawk_row_select(int\
+    \ row_count, int column_count, Prefer prefer) {\n    assert(row_count >= 0);\n\
+    \    assert(column_count >= 0);\n    return smawk_detail::row_optima(row_count,\
+    \ column_count, prefer);\n}\n\n// Search value(rows[r], columns[c]); answers are\
+    \ original column IDs, in row\n// list order. Lists contain distinct nonnegative\
+    \ IDs; prefer defines the tie\n// rule with respect to the supplied order.\ntemplate\
+    \ <class Prefer>\nstd::vector<int> smawk_row_select(std::span<const int> rows,\n\
+    \                                  std::span<const int> columns, Prefer prefer)\
+    \ {\n    auto answer = smawk_row_select(int(rows.size()), int(columns.size()),\n\
+    \        [&](int row, int current, int candidate) {\n            return prefer(rows[row],\
+    \ columns[current], columns[candidate]);\n        });\n    for (int& column :\
+    \ answer) if (column != -1) column = columns[column];\n    return answer;\n}\n\
+    \n// Fixed rectangle, leftmost on ties. Requires total monotonicity for leftmost\n\
+    // optima under Compare (Monge suffices for minima). O(H + W) time and memory.\n\
+    // Callback evaluations may be out of row order; this is not an online DP.\ntemplate\
+    \ <class Value, class Compare = std::less<>>\nstd::vector<int> smawk_row_optima(int\
+    \ row_count, int column_count, Value value,\n                                \
+    \  Compare compare = Compare()) {\n    assert(row_count >= 0);\n    assert(column_count\
+    \ >= 0);\n    return smawk_row_select(\n        row_count, column_count,\n   \
+    \     [&](int row, int current, int candidate) {\n            return compare(value(row,\
+    \ candidate), value(row, current));\n        });\n}\n\ntemplate <class Value>\n\
+    std::vector<int> smawk_row_argmin(int row_count, int column_count, Value value)\
+    \ {\n    return smawk_row_optima(row_count, column_count, value, std::less<>());\n\
+    }\n\ntemplate <class Value>\nstd::vector<int> smawk_row_argmax(int row_count,\
+    \ int column_count, Value value) {\n    return smawk_row_optima(row_count, column_count,\
+    \ value, std::greater<>());\n}\n\n// Ordered variants use supplied positions for\
+    \ total monotonicity and ties.\ntemplate <class Value, class Compare = std::less<>>\n\
+    std::vector<int> smawk_row_optima(std::span<const int> rows,\n               \
+    \                   std::span<const int> columns, Value value,\n             \
+    \                     Compare compare = Compare()) {\n    return smawk_row_select(rows,\
+    \ columns,\n        [&](int row, int current, int candidate) {\n            return\
+    \ compare(value(row, candidate), value(row, current));\n        });\n}\n\ntemplate\
+    \ <class Value>\nstd::vector<int> smawk_row_argmin(std::span<const int> rows,\n\
+    \                                  std::span<const int> columns, Value value)\
+    \ {\n    return smawk_row_optima(rows, columns, value, std::less<>());\n}\n\n\
+    template <class Value>\nstd::vector<int> smawk_row_argmax(std::span<const int>\
+    \ rows,\n                                  std::span<const int> columns, Value\
+    \ value) {\n    return smawk_row_optima(rows, columns, value, std::greater<>());\n\
+    }\n\ntemplate <class T>\nstd::vector<int> smawk_row_argmin(const std::vector<std::vector<T>>&\
     \ matrix) {\n    int row_count = int(matrix.size());\n    int column_count = row_count\
     \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
     \ == column_count);\n    return smawk_row_argmin(\n        row_count, column_count,\n\
@@ -76,17 +146,36 @@ data:
     \ == 0 ? 0 : int(matrix[0].size());\n    for (const auto& row : matrix) assert(int(row.size())\
     \ == column_count);\n    return smawk_row_argmax(\n        row_count, column_count,\n\
     \        [&](int row, int column) -> const T& { return matrix[row][column]; });\n\
-    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n#line 9 \"convex/monge/anti_monge_shortest_path.hpp\"\
-    \n\nnamespace m1une {\nnamespace convex {\n\ntemplate <class T>\nstruct AntiMongeShortestPathResult\
-    \ {\n    std::vector<T> distance;\n    std::vector<int> parent;\n};\n\n// dist[j]\
-    \ = min(dist[i] + cost(i, j)), where j - i >= minimum_step.\n// cost must be finite\
-    \ and anti-Monge on valid rectangles; see the docs.\n// O(N log N + N * minimum_step)\
-    \ time for O(1) cost evaluations.\n// In particular, minimum_step = 1 or 2 gives\
-    \ O(N log N) time.\ntemplate <class T, class Cost>\nAntiMongeShortestPathResult<T>\
-    \ anti_monge_shortest_path(\n    int vertex_count, Cost cost, T infinity, int\
-    \ minimum_step = 1) {\n    assert(vertex_count >= 0);\n    assert(minimum_step\
-    \ >= 1);\n    assert(T() < infinity);\n\n    AntiMongeShortestPathResult<T> result;\n\
-    \    result.distance.assign(vertex_count, infinity);\n    result.parent.assign(vertex_count,\
+    }\n\n}  // namespace convex\n}  // namespace m1une\n\n\n#line 11 \"convex/monge_shortest_path.hpp\"\
+    \n\nnamespace m1une {\nnamespace convex {\n\ntemplate <class T>\nstruct MongeShortestPathResult\
+    \ {\n    std::vector<T> distance;\n    std::vector<int> parent;\n};\n\n// Same-array\
+    \ forward recurrence: dp[j] = min(dp[i] + cost(i,j)), j-i >= D.\n// Finite Monge\
+    \ costs on every fully valid rectangle. Smallest parent on ties.\n// O(N) time/evaluations/memory,\
+    \ for any D >= 1. Never evaluates invalid edges\n// or adds infinity. Vertices\
+    \ 1..D-1 are unreachable; all vertices >=D are reachable.\ntemplate <class T,\
+    \ class Cost>\nMongeShortestPathResult<T> monge_shortest_path(\n    int vertex_count,\
+    \ Cost cost, T infinity, int minimum_step = 1) {\n    assert(vertex_count >= 0);\n\
+    \    assert(minimum_step >= 1);\n    assert(T() < infinity);\n    MongeShortestPathResult<T>\
+    \ result;\n    result.distance.assign(vertex_count, infinity);\n    result.parent.assign(vertex_count,\
+    \ -1);\n    if (vertex_count == 0) return result;\n    result.distance[0] = T();\n\
+    \    if (minimum_step >= vertex_count) return result;\n\n    // Row r targets\
+    \ r+D. Columns 1..D-1 would be unreachable permanently;\n    // duplicate source\
+    \ 0 instead. This nondecreasing source map preserves Monge.\n    auto source =\
+    \ [&](int column) { return column < minimum_step ? 0 : column; };\n    Larsch\
+    \ optimizer(vertex_count - minimum_step, [&](int row, int column) -> T {\n   \
+    \     int from = source(column);\n        return result.distance[from] + cost(from,\
+    \ row + minimum_step);\n    });\n    for (int to = minimum_step; to < vertex_count;\
+    \ ++to) {\n        int from = source(optimizer.next_argmin());\n        result.parent[to]\
+    \ = from;\n        result.distance[to] = result.distance[from] + cost(from, to);\n\
+    \    }\n    return result;\n}\n\n// dist[j] = min(dist[i] + cost(i, j)), where\
+    \ j - i >= minimum_step.\n// Same-array recurrence. Finite anti-Monge costs on\
+    \ every valid rectangle.\n// Largest parent on ties; O(N) memory. See docs for\
+    \ the numeric contract.\n// O(N log N + N * minimum_step) time for O(1) cost evaluations.\n\
+    // In particular, minimum_step = 1 or 2 gives O(N log N) time.\ntemplate <class\
+    \ T, class Cost>\nMongeShortestPathResult<T> anti_monge_shortest_path(\n    int\
+    \ vertex_count, Cost cost, T infinity, int minimum_step = 1) {\n    assert(vertex_count\
+    \ >= 0);\n    assert(minimum_step >= 1);\n    assert(T() < infinity);\n\n    MongeShortestPathResult<T>\
+    \ result;\n    result.distance.assign(vertex_count, infinity);\n    result.parent.assign(vertex_count,\
     \ -1);\n    if (vertex_count == 0) return result;\n    result.distance[0] = T();\n\
     \    if (minimum_step >= vertex_count) return result;\n\n    auto relax = [&](int\
     \ from, int to) {\n        if (result.distance[from] == infinity) return;\n  \
@@ -101,39 +190,40 @@ data:
     \ > first;) {\n            --from;\n            if (result.distance[from] != infinity)\
     \ sources.push_back(from);\n        }\n        if (sources.empty()) return;\n\
     \        if (sources.size() == 1) {\n            for (int to = top; to < bottom;\
-    \ to++) relax(sources[0], to);\n            return;\n        }\n        auto argmin\
-    \ = smawk_row_argmin(\n            bottom - top, int(sources.size()), [&](int\
-    \ row, int column) -> T {\n                int from = sources[column];\n     \
-    \           return result.distance[from] + cost(from, top + row);\n          \
-    \  });\n        for (int row = 0; row < bottom - top; row++) {\n            relax(sources[argmin[row]],\
-    \ top + row);\n        }\n    };\n\n    auto solve = [&](auto& self, int left,\
-    \ int right) -> void {\n        // Such a block contains no valid internal edge.\n\
-    \        if (right - left <= minimum_step) return;\n        int middle = left\
-    \ + (right - left) / 2;\n        self(self, left, middle);\n\n        // Two valid\
-    \ rectangles and a small corner partition the cross edges.\n        int source_end\
-    \ = std::max(left, middle - (minimum_step - 1));\n        int target_begin = middle\
-    \ + std::min(right - middle, minimum_step - 1);\n        rectangle(left, middle,\
-    \ target_begin, right);\n        rectangle(left, source_end, middle, target_begin);\n\
-    \        for (int from = source_end; from < middle; from++) {\n            //\
-    \ Subtraction avoids overflow when minimum_step is large.\n            if (minimum_step\
-    \ >= target_begin - from) continue;\n            for (int to = std::max(middle,\
-    \ from + minimum_step);\n                 to < target_begin; to++) {\n       \
-    \         relax(from, to);\n            }\n        }\n\n        // Incoming transitions\
+    \ to++) relax(sources[0], to);\n            return;\n        }\n        std::vector<int>\
+    \ targets(bottom - top);\n        std::iota(targets.begin(), targets.end(), top);\n\
+    \        auto argmin = smawk_row_argmin(targets, sources, [&](int to, int from)\
+    \ -> T {\n            return result.distance[from] + cost(from, to);\n       \
+    \ });\n        for (int row = 0; row < bottom - top; row++) relax(argmin[row],\
+    \ top + row);\n    };\n\n    auto solve = [&](auto& self, int left, int right)\
+    \ -> void {\n        // Such a block contains no valid internal edge.\n      \
+    \  if (right - left <= minimum_step) return;\n        int middle = left + (right\
+    \ - left) / 2;\n        self(self, left, middle);\n\n        // Two valid rectangles\
+    \ and a small corner partition the cross edges.\n        int source_end = std::max(left,\
+    \ middle - (minimum_step - 1));\n        int target_begin = middle + std::min(right\
+    \ - middle, minimum_step - 1);\n        rectangle(left, middle, target_begin,\
+    \ right);\n        rectangle(left, source_end, middle, target_begin);\n      \
+    \  for (int from = source_end; from < middle; from++) {\n            // Subtraction\
+    \ avoids overflow when minimum_step is large.\n            if (minimum_step >=\
+    \ target_begin - from) continue;\n            for (int to = std::max(middle, from\
+    \ + minimum_step);\n                 to < target_begin; to++) {\n            \
+    \    relax(from, to);\n            }\n        }\n\n        // Incoming transitions\
     \ must be applied BEFORE solving the right half.\n        self(self, middle, right);\n\
     \    };\n    solve(solve, 0, vertex_count);\n    return result;\n}\n\n}  // namespace\
     \ convex\n}  // namespace m1une\n\n\n#line 1 \"utilities/fast_io.hpp\"\n\n\n\n\
     #line 5 \"utilities/fast_io.hpp\"\n#include <array>\n#include <cerrno>\n#include\
     \ <charconv>\n#include <cstddef>\n#include <cstdio>\n#include <cstdlib>\n#include\
     \ <cstdint>\n#include <cstring>\n#include <iterator>\n#include <string>\n#include\
-    \ <sys/stat.h>\n#include <type_traits>\n#include <utility>\n#include <unistd.h>\n\
-    #line 20 \"utilities/fast_io.hpp\"\n\nnamespace m1une {\nnamespace utilities {\n\
-    \nstruct FastOutput;\n\nnamespace internal {\n\n// Shared with the convenience\
-    \ helpers in template.hpp.\ninline FastOutput* standard_output_instance = nullptr;\n\
-    \n// Detect std::begin(x), std::end(x).\ntemplate <class T, class = void>\nstruct\
-    \ is_range : std::false_type {};\n\ntemplate <class T>\nstruct is_range<T, std::void_t<\n\
-    \    decltype(std::begin(std::declval<T&>())),\n    decltype(std::end(std::declval<T&>()))\n\
-    >> : std::true_type {};\n\ntemplate <class T>\ninline constexpr bool is_range_v\
-    \ = is_range<T>::value;\n\ntemplate <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
+    \ <sys/stat.h>\n#include <type_traits>\n#line 18 \"utilities/fast_io.hpp\"\n#include\
+    \ <unistd.h>\n#line 20 \"utilities/fast_io.hpp\"\n\nnamespace m1une {\nnamespace\
+    \ utilities {\n\nstruct FastOutput;\n\nnamespace internal {\n\n// Shared with\
+    \ the convenience helpers in template.hpp.\ninline FastOutput* standard_output_instance\
+    \ = nullptr;\n\n// Detect std::begin(x), std::end(x).\ntemplate <class T, class\
+    \ = void>\nstruct is_range : std::false_type {};\n\ntemplate <class T>\nstruct\
+    \ is_range<T, std::void_t<\n    decltype(std::begin(std::declval<T&>())),\n  \
+    \  decltype(std::end(std::declval<T&>()))\n>> : std::true_type {};\n\ntemplate\
+    \ <class T>\ninline constexpr bool is_range_v = is_range<T>::value;\n\ntemplate\
+    \ <class T>\nusing range_reference_t = decltype(*std::begin(std::declval<T&>()));\n\
     \ntemplate <class T>\nusing range_value_t = std::remove_cv_t<std::remove_reference_t<range_reference_t<T>>>;\n\
     \ntemplate <class T, class = void>\nstruct range_stored_value {\n    using type\
     \ = range_value_t<T>;\n};\n\ntemplate <class T>\nstruct range_stored_value<T,\
@@ -415,40 +505,45 @@ data:
     \ from < to && to < n);\n            assert(to - from >= step);\n            assert(distance[from]\
     \ != infinity);\n            return cost(from, to);\n        },\n        infinity,\
     \ step);\n    assert(result.distance == distance);\n    assert(result.parent ==\
-    \ parent);\n}\n\nvoid test_random_anti_monge() {\n    std::mt19937 random(0xC0FFEE);\n\
-    \    for (int n = 0; n <= 65; ++n) {\n        for (int trial = 0; trial < 8; ++trial)\
-    \ {\n            std::vector<std::vector<long long>> matrix(\n               \
-    \ n, std::vector<long long>(n));\n            for (int i = 0; i < n; ++i) {\n\
-    \                matrix[i][0] = int(random() % 101) - 50;\n                matrix[0][i]\
-    \ = int(random() % 101) - 50;\n            }\n            // Nonnegative mixed\
-    \ second differences generate anti-Monge.\n            for (int i = 1; i < n;\
-    \ ++i) {\n                for (int j = 1; j < n; ++j) {\n                    matrix[i][j]\
-    \ = matrix[i - 1][j] + matrix[i][j - 1] -\n                                  \
-    \ matrix[i - 1][j - 1] + random() % 5;\n                }\n            }\n   \
-    \         auto cost = [&](int from, int to) { return matrix[from][to]; };\n  \
-    \          for (int step = 1; step <= n + 1; ++step) check(n, step, cost);\n \
-    \       }\n    }\n}\n\nvoid test_concave_gap_costs() {\n    std::mt19937 random(0x5EED);\n\
-    \    for (int n = 0; n <= 80; ++n) {\n        for (int trial = 0; trial < 8; ++trial)\
-    \ {\n            std::vector<long long> position(n), source_fee(n), target_fee(n);\n\
-    \            for (int i = 0; i < n; ++i) {\n                if (i > 0) position[i]\
-    \ = position[i - 1] + random() % 4;\n                source_fee[i] = int(random()\
-    \ % 101) - 50;\n                target_fee[i] = int(random() % 101) - 50;\n  \
-    \          }\n            auto quadratic = [&](int from, int to) {\n         \
-    \       long long gap = position[to] - position[from];\n                return\
-    \ source_fee[from] + target_fee[to] - gap * gap;\n            };\n           \
-    \ auto piecewise_linear = [&](int from, int to) {\n                long long gap\
-    \ = position[to] - position[from];\n                return source_fee[from] +\
-    \ target_fee[to] +\n                       std::min(2 * gap, gap + 5);\n     \
-    \       };\n            for (int step : std::vector<int>{1, 2, 3, n / 2 + 1, n\
-    \ + 1}) {\n                check(n, step, quadratic);\n                check(n,\
-    \ step, piecewise_linear);\n            }\n        }\n    }\n}\n\nvoid test_exhaustive_concave_sequences()\
-    \ {\n    // Enumerate concave gap costs by their nonincreasing first differences.\n\
-    \    // Arbitrary row/column fees retain anti-Monge and vary optimal parents.\n\
-    \    for (int n = 1, count = 1; n <= 8; ++n, count *= 3) {\n        for (int mask\
-    \ = 0; mask < count; ++mask) {\n            std::vector<long long> gap_cost(n);\n\
-    \            int code = mask;\n            long long difference = 3;\n       \
-    \     for (int gap = 1; gap < n; ++gap) {\n                difference -= code\
-    \ % 3;\n                code /= 3;\n                gap_cost[gap] = gap_cost[gap\
+    \ parent);\n    for (int j = 0; j < n; ++j) {\n        if (distance[j] == infinity)\
+    \ continue;\n        long long sum = 0;\n        int v = j;\n        while (v\
+    \ != 0) {\n            int p = result.parent[v];\n            assert(0 <= p &&\
+    \ p < v && v-p >= step);\n            sum += cost(p, v);\n            v = p;\n\
+    \        }\n        assert(sum == distance[j]);\n    }\n}\n\nvoid test_random_anti_monge()\
+    \ {\n    std::mt19937 random(0xC0FFEE);\n    for (int n = 0; n <= 65; ++n) {\n\
+    \        for (int trial = 0; trial < 8; ++trial) {\n            std::vector<std::vector<long\
+    \ long>> matrix(\n                n, std::vector<long long>(n));\n           \
+    \ for (int i = 0; i < n; ++i) {\n                matrix[i][0] = int(random() %\
+    \ 101) - 50;\n                matrix[0][i] = int(random() % 101) - 50;\n     \
+    \       }\n            // Nonnegative mixed second differences generate anti-Monge.\n\
+    \            for (int i = 1; i < n; ++i) {\n                for (int j = 1; j\
+    \ < n; ++j) {\n                    matrix[i][j] = matrix[i - 1][j] + matrix[i][j\
+    \ - 1] -\n                                   matrix[i - 1][j - 1] + random() %\
+    \ 5;\n                }\n            }\n            auto cost = [&](int from,\
+    \ int to) { return matrix[from][to]; };\n            for (int step = 1; step <=\
+    \ n + 1; ++step) check(n, step, cost);\n        }\n    }\n}\n\nvoid test_concave_gap_costs()\
+    \ {\n    std::mt19937 random(0x5EED);\n    for (int n = 0; n <= 80; ++n) {\n \
+    \       for (int trial = 0; trial < 8; ++trial) {\n            std::vector<long\
+    \ long> position(n), source_fee(n), target_fee(n);\n            for (int i = 0;\
+    \ i < n; ++i) {\n                if (i > 0) position[i] = position[i - 1] + random()\
+    \ % 4;\n                source_fee[i] = int(random() % 101) - 50;\n          \
+    \      target_fee[i] = int(random() % 101) - 50;\n            }\n            auto\
+    \ quadratic = [&](int from, int to) {\n                long long gap = position[to]\
+    \ - position[from];\n                return source_fee[from] + target_fee[to]\
+    \ - gap * gap;\n            };\n            auto piecewise_linear = [&](int from,\
+    \ int to) {\n                long long gap = position[to] - position[from];\n\
+    \                return source_fee[from] + target_fee[to] +\n                \
+    \       std::min(2 * gap, gap + 5);\n            };\n            for (int step\
+    \ : std::vector<int>{1, 2, 3, n / 2 + 1, n + 1}) {\n                check(n, step,\
+    \ quadratic);\n                check(n, step, piecewise_linear);\n           \
+    \ }\n        }\n    }\n}\n\nvoid test_exhaustive_concave_sequences() {\n    //\
+    \ Enumerate concave gap costs by their nonincreasing first differences.\n    //\
+    \ Arbitrary row/column fees retain anti-Monge and vary optimal parents.\n    for\
+    \ (int n = 1, count = 1; n <= 8; ++n, count *= 3) {\n        for (int mask = 0;\
+    \ mask < count; ++mask) {\n            std::vector<long long> gap_cost(n);\n \
+    \           int code = mask;\n            long long difference = 3;\n        \
+    \    for (int gap = 1; gap < n; ++gap) {\n                difference -= code %\
+    \ 3;\n                code /= 3;\n                gap_cost[gap] = gap_cost[gap\
     \ - 1] + difference;\n            }\n            auto cost = [&](int from, int\
     \ to) {\n                return gap_cost[to - from] + (from * 7) % 5 - 2 +\n \
     \                      (to * 11) % 7 - 3;\n            };\n            for (int\
@@ -482,54 +577,59 @@ data:
     // The aplusb fallback runs the focused checks below before handling input.\n\
     #define PROBLEM \"https://judge.yosupo.jp/problem/aplusb\"\n\n#include <algorithm>\n\
     #include <bit>\n#include <cassert>\n#include <climits>\n#include <random>\n#include\
-    \ <vector>\n\n#include \"../../../convex/monge/anti_monge_shortest_path.hpp\"\n\
-    #include \"../../../utilities/fast_io.hpp\"\n\nconstexpr long long infinity =\
-    \ 1LL << 60;\n\ntemplate <class Cost>\nvoid check(int n, int step, Cost cost)\
-    \ {\n    std::vector<long long> distance(n, infinity);\n    std::vector<int> parent(n,\
-    \ -1);\n    if (n > 0) distance[0] = 0;\n    for (int to = 1; to < n; ++to) {\n\
-    \        for (int from = 0; from <= to - step; ++from) {\n            if (distance[from]\
-    \ == infinity) continue;\n            long long candidate = distance[from] + cost(from,\
-    \ to);\n            if (candidate <= distance[to]) {\n                distance[to]\
-    \ = candidate;\n                parent[to] = from;\n            }\n        }\n\
-    \    }\n    auto result = m1une::convex::anti_monge_shortest_path(\n        n,\n\
+    \ <vector>\n\n#include \"../../../convex/monge_shortest_path.hpp\"\n#include \"\
+    ../../../utilities/fast_io.hpp\"\n\nconstexpr long long infinity = 1LL << 60;\n\
+    \ntemplate <class Cost>\nvoid check(int n, int step, Cost cost) {\n    std::vector<long\
+    \ long> distance(n, infinity);\n    std::vector<int> parent(n, -1);\n    if (n\
+    \ > 0) distance[0] = 0;\n    for (int to = 1; to < n; ++to) {\n        for (int\
+    \ from = 0; from <= to - step; ++from) {\n            if (distance[from] == infinity)\
+    \ continue;\n            long long candidate = distance[from] + cost(from, to);\n\
+    \            if (candidate <= distance[to]) {\n                distance[to] =\
+    \ candidate;\n                parent[to] = from;\n            }\n        }\n \
+    \   }\n    auto result = m1une::convex::anti_monge_shortest_path(\n        n,\n\
     \        [&](int from, int to) {\n            assert(0 <= from && from < to &&\
     \ to < n);\n            assert(to - from >= step);\n            assert(distance[from]\
     \ != infinity);\n            return cost(from, to);\n        },\n        infinity,\
     \ step);\n    assert(result.distance == distance);\n    assert(result.parent ==\
-    \ parent);\n}\n\nvoid test_random_anti_monge() {\n    std::mt19937 random(0xC0FFEE);\n\
-    \    for (int n = 0; n <= 65; ++n) {\n        for (int trial = 0; trial < 8; ++trial)\
-    \ {\n            std::vector<std::vector<long long>> matrix(\n               \
-    \ n, std::vector<long long>(n));\n            for (int i = 0; i < n; ++i) {\n\
-    \                matrix[i][0] = int(random() % 101) - 50;\n                matrix[0][i]\
-    \ = int(random() % 101) - 50;\n            }\n            // Nonnegative mixed\
-    \ second differences generate anti-Monge.\n            for (int i = 1; i < n;\
-    \ ++i) {\n                for (int j = 1; j < n; ++j) {\n                    matrix[i][j]\
-    \ = matrix[i - 1][j] + matrix[i][j - 1] -\n                                  \
-    \ matrix[i - 1][j - 1] + random() % 5;\n                }\n            }\n   \
-    \         auto cost = [&](int from, int to) { return matrix[from][to]; };\n  \
-    \          for (int step = 1; step <= n + 1; ++step) check(n, step, cost);\n \
-    \       }\n    }\n}\n\nvoid test_concave_gap_costs() {\n    std::mt19937 random(0x5EED);\n\
-    \    for (int n = 0; n <= 80; ++n) {\n        for (int trial = 0; trial < 8; ++trial)\
-    \ {\n            std::vector<long long> position(n), source_fee(n), target_fee(n);\n\
-    \            for (int i = 0; i < n; ++i) {\n                if (i > 0) position[i]\
-    \ = position[i - 1] + random() % 4;\n                source_fee[i] = int(random()\
-    \ % 101) - 50;\n                target_fee[i] = int(random() % 101) - 50;\n  \
-    \          }\n            auto quadratic = [&](int from, int to) {\n         \
-    \       long long gap = position[to] - position[from];\n                return\
-    \ source_fee[from] + target_fee[to] - gap * gap;\n            };\n           \
-    \ auto piecewise_linear = [&](int from, int to) {\n                long long gap\
-    \ = position[to] - position[from];\n                return source_fee[from] +\
-    \ target_fee[to] +\n                       std::min(2 * gap, gap + 5);\n     \
-    \       };\n            for (int step : std::vector<int>{1, 2, 3, n / 2 + 1, n\
-    \ + 1}) {\n                check(n, step, quadratic);\n                check(n,\
-    \ step, piecewise_linear);\n            }\n        }\n    }\n}\n\nvoid test_exhaustive_concave_sequences()\
-    \ {\n    // Enumerate concave gap costs by their nonincreasing first differences.\n\
-    \    // Arbitrary row/column fees retain anti-Monge and vary optimal parents.\n\
-    \    for (int n = 1, count = 1; n <= 8; ++n, count *= 3) {\n        for (int mask\
-    \ = 0; mask < count; ++mask) {\n            std::vector<long long> gap_cost(n);\n\
-    \            int code = mask;\n            long long difference = 3;\n       \
-    \     for (int gap = 1; gap < n; ++gap) {\n                difference -= code\
-    \ % 3;\n                code /= 3;\n                gap_cost[gap] = gap_cost[gap\
+    \ parent);\n    for (int j = 0; j < n; ++j) {\n        if (distance[j] == infinity)\
+    \ continue;\n        long long sum = 0;\n        int v = j;\n        while (v\
+    \ != 0) {\n            int p = result.parent[v];\n            assert(0 <= p &&\
+    \ p < v && v-p >= step);\n            sum += cost(p, v);\n            v = p;\n\
+    \        }\n        assert(sum == distance[j]);\n    }\n}\n\nvoid test_random_anti_monge()\
+    \ {\n    std::mt19937 random(0xC0FFEE);\n    for (int n = 0; n <= 65; ++n) {\n\
+    \        for (int trial = 0; trial < 8; ++trial) {\n            std::vector<std::vector<long\
+    \ long>> matrix(\n                n, std::vector<long long>(n));\n           \
+    \ for (int i = 0; i < n; ++i) {\n                matrix[i][0] = int(random() %\
+    \ 101) - 50;\n                matrix[0][i] = int(random() % 101) - 50;\n     \
+    \       }\n            // Nonnegative mixed second differences generate anti-Monge.\n\
+    \            for (int i = 1; i < n; ++i) {\n                for (int j = 1; j\
+    \ < n; ++j) {\n                    matrix[i][j] = matrix[i - 1][j] + matrix[i][j\
+    \ - 1] -\n                                   matrix[i - 1][j - 1] + random() %\
+    \ 5;\n                }\n            }\n            auto cost = [&](int from,\
+    \ int to) { return matrix[from][to]; };\n            for (int step = 1; step <=\
+    \ n + 1; ++step) check(n, step, cost);\n        }\n    }\n}\n\nvoid test_concave_gap_costs()\
+    \ {\n    std::mt19937 random(0x5EED);\n    for (int n = 0; n <= 80; ++n) {\n \
+    \       for (int trial = 0; trial < 8; ++trial) {\n            std::vector<long\
+    \ long> position(n), source_fee(n), target_fee(n);\n            for (int i = 0;\
+    \ i < n; ++i) {\n                if (i > 0) position[i] = position[i - 1] + random()\
+    \ % 4;\n                source_fee[i] = int(random() % 101) - 50;\n          \
+    \      target_fee[i] = int(random() % 101) - 50;\n            }\n            auto\
+    \ quadratic = [&](int from, int to) {\n                long long gap = position[to]\
+    \ - position[from];\n                return source_fee[from] + target_fee[to]\
+    \ - gap * gap;\n            };\n            auto piecewise_linear = [&](int from,\
+    \ int to) {\n                long long gap = position[to] - position[from];\n\
+    \                return source_fee[from] + target_fee[to] +\n                \
+    \       std::min(2 * gap, gap + 5);\n            };\n            for (int step\
+    \ : std::vector<int>{1, 2, 3, n / 2 + 1, n + 1}) {\n                check(n, step,\
+    \ quadratic);\n                check(n, step, piecewise_linear);\n           \
+    \ }\n        }\n    }\n}\n\nvoid test_exhaustive_concave_sequences() {\n    //\
+    \ Enumerate concave gap costs by their nonincreasing first differences.\n    //\
+    \ Arbitrary row/column fees retain anti-Monge and vary optimal parents.\n    for\
+    \ (int n = 1, count = 1; n <= 8; ++n, count *= 3) {\n        for (int mask = 0;\
+    \ mask < count; ++mask) {\n            std::vector<long long> gap_cost(n);\n \
+    \           int code = mask;\n            long long difference = 3;\n        \
+    \    for (int gap = 1; gap < n; ++gap) {\n                difference -= code %\
+    \ 3;\n                code /= 3;\n                gap_cost[gap] = gap_cost[gap\
     \ - 1] + difference;\n            }\n            auto cost = [&](int from, int\
     \ to) {\n                return gap_cost[to - from] + (from * 7) % 5 - 2 +\n \
     \                      (to * 11) % 7 - 3;\n            };\n            for (int\
@@ -560,13 +660,14 @@ data:
     \    m1une::utilities::FastInput input;\n    m1une::utilities::FastOutput output;\n\
     \    long long a, b;\n    input >> a >> b;\n    output << a + b << '\\n';\n}\n"
   dependsOn:
-  - convex/monge/anti_monge_shortest_path.hpp
+  - convex/monge_shortest_path.hpp
+  - convex/monge/larsch.hpp
   - convex/monge/smawk.hpp
   - utilities/fast_io.hpp
   isVerificationFile: true
   path: verify/convex/monge/anti_monge_shortest_path.test.cpp
   requiredBy: []
-  timestamp: '2026-10-24 20:27:26+09:00'
+  timestamp: '2026-10-30 15:56:19+09:00'
   verificationStatus: TEST_ACCEPTED
   verifiedWith: []
 documentation_of: verify/convex/monge/anti_monge_shortest_path.test.cpp
