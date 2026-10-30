@@ -75,6 +75,12 @@ finalized since the destination is `r+D`. Leftmost virtual ties map to the
 smallest original parent. The construction and all row searches take $O(N)$
 time and memory, independently of `D`; no numeric padding is used.
 
+The early return for `D>=N` precedes construction of LARSCH or evaluation of
+`r+D`. Otherwise `0<=r<N-D`, hence `r+D<=N-1`; the addition fits in `int`.
+This also covers `minimum_step=INT_MAX`, which always takes the early return
+for an `int` vertex count. In every case, existing vertices in `[1,min(D,N))`
+retain `distance=infinity` and `parent=-1`, and their costs are never queried.
+
 ## Anti-Monge CDQ and boundary handling
 
 For `[l,r)`, split at `m`, **solve the left half**, relax all legal left-to-right
@@ -128,5 +134,9 @@ int main() {
 
 Known permutations belong to the offline matrix/transition APIs. These graph
 solvers intentionally retain the natural topological order and index-step
-constraint. General source availability after arbitrary permutations is a
-different problem, and is not silently inferred from matrix ordering.
+constraint. A permutation that makes the cost matrix Monge does not by itself
+preserve online source availability (`i<j`), or the edge-legality constraint
+`j-i>=D`. A reordered column can require a distance that is still unfinished,
+or describe a forbidden edge. General source availability after arbitrary
+permutations is a different problem, and is not silently inferred from matrix
+ordering.

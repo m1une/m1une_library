@@ -5,8 +5,9 @@ documentation_of: ../../../convex/monge/smawk.hpp
 
 Find row optima of a **fixed complete rectangle**. The matrix must be totally
 monotone for the requested comparison and tie rule; Monge suffices for minima,
-anti-Monge suffices for maxima. Every submatrix's leftmost optima must be
-nondecreasing in row order. The property is assumed, not checked.
+anti-Monge suffices for maxima. Every submatrix's selected optimum positions
+must be nondecreasing in row order, using the same comparison and tie rule.
+The property is assumed, not checked.
 
 ## Interface
 
@@ -39,7 +40,20 @@ numeric infinity. Its comparisons must describe consistent ordered optima,
 and total monotonicity must hold **including the tie rule**. It does not make
 arbitrary validity masks safe. For example, strict `<` selects the first
 minimum, while `<=` selects the last, under their respective preconditions.
-Other files use this public oracle rather than `smawk_detail`.
+
+The oracle is independently useful when two entries can be compared directly
+without constructing their values: for example, by cancelling common terms in
+an implicit cost expression, or comparing valid and symbolic invalid entries
+without evaluating an undefined cost. It is a public algorithmic primitive;
+convolution is one user, not its defining purpose. Recursive row reduction and
+scratch storage remain private in `smawk_detail`.
+
+Only pairs with `current` earlier than `candidate` in the supplied column
+order are queried (their original numeric IDs may be reversed). The oracle
+must describe a fixed, consistent ordering for each row, with its tie rule
+included. In particular, for ordered rows `r < s` and column positions `a < b`,
+if the later column is preferred in row `r`, it must remain preferred in row
+`s`. This requirement is on positions in the supplied lists, not numeric IDs.
 
 `row_count` and `column_count` must be nonnegative. Matrix overloads assert
 rectangular shape. With no columns return `H` copies of `-1`; with no rows

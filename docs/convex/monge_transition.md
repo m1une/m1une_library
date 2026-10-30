@@ -33,6 +33,10 @@ Let `H` be the target count and `W` the source count.
 Total monotonicity of the full matrix is a weaker sufficient condition for
 either SMAWK-based function. `monotone_transition` needs only whole-matrix
 argmin monotonicity and uses monotone minima internally. `state_count >= 0`.
+When the cost is known to be Monge or anti-Monge, prefer `monge_transition`
+or `anti_monge_transition` for the linear bound. Use `monotone_transition`
+when only monotonicity of the full transition matrix's minimizing sources is
+established; it does not infer a stronger property or automatically use SMAWK.
 Ordered lists contain distinct nonnegative IDs, with every source indexing
 `previous`; source bounds and target nonnegativity are asserted. Subsets and
 permutations are both allowed. No ordering is inferred or sorted.

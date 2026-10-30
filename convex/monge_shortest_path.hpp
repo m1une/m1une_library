@@ -35,8 +35,14 @@ MongeShortestPathResult<T> monge_shortest_path(
     result.distance[0] = T();
     if (minimum_step >= vertex_count) return result;
 
-    // Row r targets r+D. Columns 1..D-1 would be unreachable permanently;
-    // duplicate source 0 instead. This nondecreasing source map preserves Monge.
+    // D=minimum_step < vertex_count here. Row r targets r+D, with
+    // 0 <= r < vertex_count-D, so r+D <= vertex_count-1 cannot overflow.
+    // The source map 0,...,0,D,D+1,... is nondecreasing: early columns
+    // duplicate source 0 instead of unreachable sources 1..D-1.
+    // LARSCH queries c <= r; source(c) <= c makes every edge satisfy the step.
+    // While answering row q it uses only c <= q, whose mapped sources are
+    // already finalized before target q+D. Duplicating ordered columns and
+    // adding their finalized distance constants both preserve Monge.
     auto source = [&](int column) { return column < minimum_step ? 0 : column; };
     Larsch optimizer(vertex_count - minimum_step, [&](int row, int column) -> T {
         int from = source(column);
