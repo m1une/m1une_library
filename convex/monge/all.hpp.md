@@ -304,8 +304,10 @@ Matrix primitives accept either dimensions or explicit `std::span<const int>`
 row/column lists (vectors and arrays convert). The virtual matrix is
 `value(rows[r], columns[c])`. Lists may be arbitrary permutations or subsets
 of distinct nonnegative IDs. Answers are original column IDs, stored compactly
-in **row list order**; `-1` means there are no columns. Ties choose the first
-column in the supplied order. The library neither discovers nor sorts an order.
+in **row list order**; `-1` means there are no columns. Value-based searches
+choose the first column in the supplied order on ties; `smawk_row_select`
+instead uses the tie rule specified by its comparison oracle, which must also
+preserve total monotonicity. The library neither discovers nor sorts an order.
 
 Reversing one axis turns anti-Monge into Monge. The public anti-Monge checks,
 transitions, and shortest paths do this internally where appropriate. Their

@@ -561,24 +561,30 @@ data:
     \    assert(minimum_step >= 1);\n    assert(T() < infinity);\n    MongeShortestPathResult<T>\
     \ result;\n    result.distance.assign(vertex_count, infinity);\n    result.parent.assign(vertex_count,\
     \ -1);\n    if (vertex_count == 0) return result;\n    result.distance[0] = T();\n\
-    \    if (minimum_step >= vertex_count) return result;\n\n    // Row r targets\
-    \ r+D. Columns 1..D-1 would be unreachable permanently;\n    // duplicate source\
-    \ 0 instead. This nondecreasing source map preserves Monge.\n    auto source =\
-    \ [&](int column) { return column < minimum_step ? 0 : column; };\n    Larsch\
-    \ optimizer(vertex_count - minimum_step, [&](int row, int column) -> T {\n   \
-    \     int from = source(column);\n        return result.distance[from] + cost(from,\
-    \ row + minimum_step);\n    });\n    for (int to = minimum_step; to < vertex_count;\
-    \ ++to) {\n        int from = source(optimizer.next_argmin());\n        result.parent[to]\
-    \ = from;\n        result.distance[to] = result.distance[from] + cost(from, to);\n\
-    \    }\n    return result;\n}\n\n// dist[j] = min(dist[i] + cost(i, j)), where\
-    \ j - i >= minimum_step.\n// Same-array recurrence. Finite anti-Monge costs on\
-    \ every valid rectangle.\n// Largest parent on ties; O(N) memory. See docs for\
-    \ the numeric contract.\n// O(N log N + N * minimum_step) time for O(1) cost evaluations.\n\
-    // In particular, minimum_step = 1 or 2 gives O(N log N) time.\ntemplate <class\
-    \ T, class Cost>\nMongeShortestPathResult<T> anti_monge_shortest_path(\n    int\
-    \ vertex_count, Cost cost, T infinity, int minimum_step = 1) {\n    assert(vertex_count\
-    \ >= 0);\n    assert(minimum_step >= 1);\n    assert(T() < infinity);\n\n    MongeShortestPathResult<T>\
-    \ result;\n    result.distance.assign(vertex_count, infinity);\n    result.parent.assign(vertex_count,\
+    \    if (minimum_step >= vertex_count) return result;\n\n    // D=minimum_step\
+    \ < vertex_count here. Row r targets r+D, with\n    // 0 <= r < vertex_count-D,\
+    \ so r+D <= vertex_count-1 cannot overflow.\n    // The source map 0,...,0,D,D+1,...\
+    \ is nondecreasing: early columns\n    // duplicate source 0 instead of unreachable\
+    \ sources 1..D-1.\n    // LARSCH queries c <= r; source(c) <= c makes every edge\
+    \ satisfy the step.\n    // While answering row q it uses only c <= q, whose mapped\
+    \ sources are\n    // already finalized before target q+D. Duplicating ordered\
+    \ columns and\n    // adding their finalized distance constants both preserve\
+    \ Monge.\n    auto source = [&](int column) { return column < minimum_step ? 0\
+    \ : column; };\n    Larsch optimizer(vertex_count - minimum_step, [&](int row,\
+    \ int column) -> T {\n        int from = source(column);\n        return result.distance[from]\
+    \ + cost(from, row + minimum_step);\n    });\n    for (int to = minimum_step;\
+    \ to < vertex_count; ++to) {\n        int from = source(optimizer.next_argmin());\n\
+    \        result.parent[to] = from;\n        result.distance[to] = result.distance[from]\
+    \ + cost(from, to);\n    }\n    return result;\n}\n\n// dist[j] = min(dist[i]\
+    \ + cost(i, j)), where j - i >= minimum_step.\n// Same-array recurrence. Finite\
+    \ anti-Monge costs on every valid rectangle.\n// Largest parent on ties; O(N)\
+    \ memory. See docs for the numeric contract.\n// O(N log N + N * minimum_step)\
+    \ time for O(1) cost evaluations.\n// In particular, minimum_step = 1 or 2 gives\
+    \ O(N log N) time.\ntemplate <class T, class Cost>\nMongeShortestPathResult<T>\
+    \ anti_monge_shortest_path(\n    int vertex_count, Cost cost, T infinity, int\
+    \ minimum_step = 1) {\n    assert(vertex_count >= 0);\n    assert(minimum_step\
+    \ >= 1);\n    assert(T() < infinity);\n\n    MongeShortestPathResult<T> result;\n\
+    \    result.distance.assign(vertex_count, infinity);\n    result.parent.assign(vertex_count,\
     \ -1);\n    if (vertex_count == 0) return result;\n    result.distance[0] = T();\n\
     \    if (minimum_step >= vertex_count) return result;\n\n    auto relax = [&](int\
     \ from, int to) {\n        if (result.distance[from] == infinity) return;\n  \
@@ -767,7 +773,7 @@ data:
   isVerificationFile: false
   path: convex/all.hpp
   requiredBy: []
-  timestamp: '2026-10-30 15:56:19+09:00'
+  timestamp: '2026-10-30 16:04:50+09:00'
   verificationStatus: LIBRARY_ALL_AC
   verifiedWith:
   - verify/convex/monge/monge_dp_optimization.test.cpp
